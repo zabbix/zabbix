@@ -8,11 +8,11 @@ RESOURCE_H = resource.h
 DESC_H = zabbix_agent_desc.h
 RESOURCE_RC = resource.rc
 RESOURCE_RES = zabbix_agent.res
-OBJS  = ..\..\..\src\libs\zbxcommon\alias.o \
+OBJS  = ..\..\..\src\libs\zbxalgo\algodefs.o \
+  ..\..\..\src\libs\zbxalgo\vector.o \
+  ..\..\..\src\libs\zbxcommon\alias.o \
 	..\..\..\src\libs\zbxcommon\comms.o \
-	..\..\..\src\libs\zbxcommon\gnuregex.o \
 	..\..\..\src\libs\zbxcommon\misc.o \
-	..\..\..\src\libs\zbxcommon\regexp.o \
 	..\..\..\src\libs\zbxcommon\str.o \
 	..\..\..\src\libs\zbxcommon\xml.o \
 	..\..\..\src\libs\zbxcommon\zbxgetopt.o \
@@ -62,7 +62,10 @@ OBJS  = ..\..\..\src\libs\zbxcommon\alias.o \
 	..\..\..\src\zabbix_agent\perfstat.o \
 	..\..\..\src\zabbix_agent\stats.o \
 	..\..\..\src\zabbix_agent\zabbix_agentd.o \
-	..\..\..\src\zabbix_agent\zbxconf.o
+	..\..\..\src\zabbix_agent\zbxconf.o \
+  ..\..\..\src\libs\zbxregexp\gnuregex.o \
+	..\..\..\src\libs\zbxregexp\zbxregexp.o
+
 
 LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib
 
@@ -81,20 +84,20 @@ $(MESSAGES_H): messages.mc
 $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 	$(RC) /d "NDEBUG" /d "_VC80_UPGRADE=0x0600" /l 0x419 /fo"$(RESOURCE_RES)" $(RESOURCE_RC)
 
+..\..\..\src\libs\zbxalgo\algodefs.o: ..\..\..\src\libs\zbxalgo\algodefs.c
+	$(CC) ..\..\..\src\libs\zbxalgo\algodefs.c /Fo"..\..\..\src\libs\zbxalgo\algodefs.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxalgo\vector.o: ..\..\..\src\libs\zbxalgo\vector.c
+	$(CC) ..\..\..\src\libs\zbxalgo\vector.c /Fo"..\..\..\src\libs\zbxalgo\vector.o" $(CFLAGS)
+
 ..\..\..\src\libs\zbxcommon\alias.o: ..\..\..\src\libs\zbxcommon\alias.c
 	$(CC) ..\..\..\src\libs\zbxcommon\alias.c /Fo"..\..\..\src\libs\zbxcommon\alias.o" $(CFLAGS)
 
 ..\..\..\src\libs\zbxcommon\comms.o: ..\..\..\src\libs\zbxcommon\comms.c
 	$(CC) ..\..\..\src\libs\zbxcommon\comms.c /Fo"..\..\..\src\libs\zbxcommon\comms.o" $(CFLAGS)
 
-..\..\..\src\libs\zbxcommon\gnuregex.o: ..\..\..\src\libs\zbxcommon\gnuregex.c
-	$(CC) ..\..\..\src\libs\zbxcommon\gnuregex.c /Fo"..\..\..\src\libs\zbxcommon\gnuregex.o" $(CFLAGS)
-
 ..\..\..\src\libs\zbxcommon\misc.o: ..\..\..\src\libs\zbxcommon\misc.c
 	$(CC) ..\..\..\src\libs\zbxcommon\misc.c /Fo"..\..\..\src\libs\zbxcommon\misc.o" $(CFLAGS)
-
-..\..\..\src\libs\zbxcommon\regexp.o: ..\..\..\src\libs\zbxcommon\regexp.c
-	$(CC) ..\..\..\src\libs\zbxcommon\regexp.c /Fo"..\..\..\src\libs\zbxcommon\regexp.o" $(CFLAGS)
 
 ..\..\..\src\libs\zbxcommon\str.o: ..\..\..\src\libs\zbxcommon\str.c
 	$(CC) ..\..\..\src\libs\zbxcommon\str.c /Fo"..\..\..\src\libs\zbxcommon\str.o" $(CFLAGS)
@@ -131,6 +134,12 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 
 ..\..\..\src\libs\zbxlog\log.o: ..\..\..\src\libs\zbxlog\log.c
 	$(CC) ..\..\..\src\libs\zbxlog\log.c /Fo"..\..\..\src\libs\zbxlog\log.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxregexp\gnuregex.o: ..\..\..\src\libs\zbxregexp\gnuregex.c
+	$(CC) ..\..\..\src\libs\zbxregexp\gnuregex.c /Fo"..\..\..\src\libs\zbxregexp\gnuregex.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxregexp\zbxregexp.o: ..\..\..\src\libs\zbxregexp\zbxregexp.c
+	$(CC) ..\..\..\src\libs\zbxregexp\zbxregexp.c /Fo"..\..\..\src\libs\zbxregexp\zbxregexp.o" $(CFLAGS)
 
 ..\..\..\src\libs\zbxsys\mutexs.o: ..\..\..\src\libs\zbxsys\mutexs.c
 	$(CC) ..\..\..\src\libs\zbxsys\mutexs.c /Fo"..\..\..\src\libs\zbxsys\mutexs.o" $(CFLAGS)
