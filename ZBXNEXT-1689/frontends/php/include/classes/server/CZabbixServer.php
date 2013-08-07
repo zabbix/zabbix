@@ -176,7 +176,7 @@ class CZabbixServer {
 	 *
 	 * @param array $params
 	 *
-	 * @return bool|mixed
+	 * @return mixed    the output of the script if it has been executed successfully or false otherwise
 	 */
 	protected function request(array $params) {
 		// connect to the server
