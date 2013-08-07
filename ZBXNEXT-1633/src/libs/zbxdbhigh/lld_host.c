@@ -2236,11 +2236,11 @@ static void	DBlld_templates_link(const zbx_vector_ptr_t *hosts)
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 			continue;
 
-		if (0 != host->lnk_templateids.values_num)
-			DBcopy_template_elements(host->hostid, &host->lnk_templateids);
-
 		if (0 != host->del_templateids.values_num)
 			DBdelete_template_elements(host->hostid, &host->del_templateids);
+
+		if (0 != host->lnk_templateids.values_num)
+			DBcopy_template_elements(host->hostid, &host->lnk_templateids);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
