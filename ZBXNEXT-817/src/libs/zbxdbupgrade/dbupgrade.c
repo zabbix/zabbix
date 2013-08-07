@@ -99,6 +99,93 @@ zbx_dbpatch_t;
 
 extern unsigned char	daemon_type;
 
+/*********************************************************************************
+ *                                                                               *
+ * Function: parse_db_monitor_item_params                                        *
+ *                                                                               *
+ * Purpose: parse database monitor item params string "user=<user> password=     *
+ *          <passsword> DSN=<dsn> sql=<sql>" into parameter values.              *
+ *                                                                               *
+ * Parameters:  params     - [IN] the params string                              *
+ *              dsn        - [OUT] the ODBC DSN output buffer                    *
+ *              user       - [OUT] the user name output buffer                   *
+ *              password   - [OUT] the password output buffer                    *
+ *              sql        - [OUT] the sql query output buffer                   *
+ *                                                                               *
+ * Comments: This function allocated memory to store parsed parameters, which    *
+ *           must be freed later by the caller.                                  *
+ *           Failed (or absent) parameters will contain empty string "".         *
+ *                                                                               *
+ *********************************************************************************/
+static void	parse_db_monitor_item_params(const char *params, char **dsn, char **user, char **password, char **sql)
+{
+	const char	*pvalue, *pnext, *pend;
+	char		**var;
+
+	for (;'\0' != *params; params = pnext)
+	{
+		while (0 != isspace(*params))
+			params++;
+
+		pvalue = strchr(params, '=');
+		pnext = strchr(params, '\n');
+
+		if (NULL == pvalue)
+			break;
+
+		if (NULL == pnext)
+			pnext = params + strlen(params);
+
+		if (pvalue > pnext)
+			continue;
+
+		for (pend = pvalue - 1; 0 != isspace(*pend); pend--)
+			;
+		pend++;
+
+		if (0 == strncmp(params, "user", pend - params))
+			var = user;
+		else if (0 == strncmp(params, "password", pend - params))
+			var = password;
+		else if (0 == strncmp(params, "DSN", pend - params))
+			var = dsn;
+		else if (0 == strncmp(params, "sql", pend - params))
+			var = sql;
+		else
+			continue;
+
+		pvalue++;
+		while (0 != isspace(*pvalue))
+			pvalue++;
+
+		if ('\0' == *pvalue)
+			continue;
+
+		for (pend = pnext - 1; 0 != isspace(*pend); pend--)
+			;
+		pend++;
+
+		if (NULL == *var)
+		{
+			*var = zbx_malloc(*var, pend - pvalue + 1);
+			memmove(*var, pvalue, pend - pvalue);
+			(*var)[pend - pvalue] = '\0';
+		}
+	}
+
+	if (NULL == *user)
+		*user = zbx_strdup(NULL, "");
+
+	if (NULL == *password)
+		*password = zbx_strdup(NULL, "");
+
+	if (NULL == *dsn)
+		*dsn = zbx_strdup(NULL, "");
+
+	if (NULL == *sql)
+		*sql = zbx_strdup(NULL, "");
+}
+
 #ifndef HAVE_SQLITE3
 static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offset, const ZBX_FIELD *field)
 {
@@ -1322,6 +1409,82 @@ static int	DBpatch_2010093(void)
 	return DBset_default("graphs", &field);
 }
 
+static int	DBpatch_2010094(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = SUCCEED;
+
+	result = DBselect("select i.itemid,i.key_,i.params,h.name"
+				" from items i,hosts h"
+				" where type=%d and i.hostid=h.hostid",
+				ITEM_TYPE_DB_MONITOR);
+
+	while (NULL != (row = DBfetch(result)) && SUCCEED == ret)
+	{
+		char		*user = NULL, *password = NULL, *dsn = NULL, *sql = NULL, key[ITEM_KEY_LEN * 4 + 1],
+				*error_message = NULL;
+		zbx_uint64_t	itemid;
+		int		key_len;
+
+		parse_db_monitor_item_params(row[2], &dsn, &user, &password, &sql);
+
+		if (zbx_strlen_utf8(row[1]) + 1 + zbx_strlen_utf8(dsn) > ITEM_KEY_LEN)
+			error_message = zbx_dsprintf(error_message, "key \"%s\" is too long", row[1]);
+		else if (0 == (key_len = strlen(row[1])))
+			error_message = zbx_dsprintf(error_message, "key is an empty string", user);
+		else if (']' != row[1][key_len - 1])
+			error_message = zbx_dsprintf(error_message, "key \"%s\" is invalid", row[1]);
+		else if (ITEM_USERNAME_LEN < strlen(user))
+			error_message = zbx_dsprintf(error_message, "ODBC username \"%s\" is too long", user);
+		else if (ITEM_PASSWORD_LEN < strlen(password))
+			error_message = zbx_dsprintf(error_message, "ODBC password \"%s\" is too long", password);
+
+		if (NULL == error_message)
+		{
+			char	*username_esc, *password_esc, *params_esc, *key_esc;
+
+			ZBX_STR2UINT64(itemid, row[0]);
+
+			memcpy(key, row[1], key_len);
+			zbx_snprintf(key + key_len - 1, sizeof(key) - key_len + 1, ",%s]", dsn);
+
+			username_esc = DBdyn_escape_string(user);
+			password_esc = DBdyn_escape_string(password);
+			params_esc = DBdyn_escape_string(sql);
+			key_esc = DBdyn_escape_string(key);
+
+			if (ZBX_DB_OK > DBexecute("update items set username='%s',password='%s',key_='%s',params='%s'"
+					" where itemid=" ZBX_FS_UI64,
+					username_esc, password_esc, key_esc, params_esc, itemid))
+			{
+				ret = FAIL;
+			}
+
+			zbx_free(username_esc);
+			zbx_free(password_esc);
+			zbx_free(params_esc);
+			zbx_free(key_esc);
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Failed to convert host \"%s\" db monitoring item because"
+					" %s. See upgrade notes for manual database monitor item conversion.",
+					row[3], error_message);
+		}
+
+		zbx_free(error_message);
+		zbx_free(user);
+		zbx_free(password);
+		zbx_free(dsn);
+		zbx_free(sql);
+	}
+
+	DBfree_result(result);
+
+	return ret;
+}
+
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 #define DBPATCH_END()					{NULL}};
@@ -1464,6 +1627,7 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010091, 0, 1)
 	DBPATCH_ADD(2010092, 0, 1)
 	DBPATCH_ADD(2010093, 0, 1)
+	DBPATCH_ADD(2010094, 0, 1)
 
 	DBPATCH_END()
 
