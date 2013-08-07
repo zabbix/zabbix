@@ -474,17 +474,15 @@ class CHostGroup extends CZBXAPI {
 		$groups = zbx_toArray($groups);
 
 		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can create groups.'));
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can create host groups.'));
 		}
 
 		foreach ($groups as $group) {
 			if (empty($group['name'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot create group without name.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot create host group without name.'));
 			}
 			if ($this->exists(array('name' => $group['name']))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Group with the same name "%1$s" already exists.', $group['name'])
-				);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host group "%1$s" already exists.', $group['name']));
 			}
 		}
 		$groupids = DB::insert('groups', $groups);
@@ -537,14 +535,12 @@ class CHostGroup extends CZBXAPI {
 		foreach ($groups as $group) {
 			if (isset($group['name'])) {
 				if (zbx_empty($group['name'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Group name cannot be empty.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Host group name cannot be empty.'));
 				}
 
 				if (isset($groupsNames[$group['name']])
 						&& !idcmp($groupsNames[$group['name']]['groupid'], $group['groupid'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Group with the same name "%1$s" already exists.', $group['name'])
-					);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host group "%1$s" already exists.', $group['name']));
 				}
 
 				$update[] = array(
@@ -584,7 +580,9 @@ class CHostGroup extends CZBXAPI {
 		$delGroups = $this->get($options);
 		foreach ($groupids as $groupid) {
 			if (!isset($delGroups[$groupid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
 			}
 			if ($delGroups[$groupid]['internal'] == ZBX_INTERNAL_GROUP) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -805,7 +803,7 @@ class CHostGroup extends CZBXAPI {
 		if (!empty($objectidsToUnlink)) {
 			$unlinkable = getUnlinkableHosts($groupids, $objectidsToUnlink);
 			if (count($objectidsToUnlink) != count($unlinkable)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('One of the objects is left without group.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('One of the objects is left without a host group.'));
 			}
 
 			DB::delete('hosts_groups', array(
@@ -930,7 +928,7 @@ class CHostGroup extends CZBXAPI {
 			$unlinkable = getUnlinkableHosts($groupIds, $hostIdsToValidate);
 
 			if (count($unlinkable) != count($hostIdsToValidate)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('One of the objects is left without group.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('One of the objects is left without a host group.'));
 			}
 		}
 
