@@ -254,54 +254,67 @@ else {
 array_push($sortFields, 'name', 'applicationid');
 CArrayHelper::sort($applications, $sortFields);
 
-$tab_rows = array();
+// fetch items and data
+$allItems = DBfetchArray(DBselect(
+	'SELECT DISTINCT i.hostid,i.itemid,i.name,i.value_type,i.units,i.state,i.valuemapid,i.key_,ia.applicationid'.
+	' FROM items i '.
+		' LEFT JOIN items_applications ia ON ia.itemid=i.itemid'.
+	' WHERE i.status='.ITEM_STATUS_ACTIVE.
+		' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
+		' AND '.dbConditionInt('i.hostid', $hostIds)
+));
+
+// check which items have history data
+$itemsWithData = Manager::History()->getItemsWithData(zbx_toHash($allItems, 'itemid'));
+
+// filter items
+foreach ($allItems as $key => &$item) {
+	// filter items without history
+	if (!get_request('show_without_data') && !isset($itemsWithData[$item['itemid']])) {
+		unset($allItems[$key]);
+
+		continue;
+	}
+
+	$item['resolvedName'] = itemName($item);
+
+	// filter items by name
+	if (!zbx_empty($_REQUEST['select']) && !zbx_stristr($item['resolvedName'], $_REQUEST['select'])) {
+		unset($allItems[$key]);
+		unset($itemsWithData[$item['itemid']]);
+	}
+}
+unset($item);
+
+// select history
+$history = Manager::History()->getLast($itemsWithData, 2);
+
+// add item last update date for sorting
+foreach ($allItems as &$item) {
+	if (isset($history[$item['itemid']])) {
+		$item['lastclock'] = $history[$item['itemid']][0]['clock'];
+	}
+}
+unset($item);
+
+// sort items
+if ($sortField == 'i.name') {
+	$sortFields = array(array('field' => 'resolvedName', 'order' => $sortOrder), 'itemid');
+}
+elseif ($sortField == 'i.lastclock') {
+	$sortFields = array(array('field' => 'lastclock', 'order' => $sortOrder), 'resolvedName', 'itemid');
+}
+else {
+	$sortFields = array('resolvedName', 'itemid');
+}
+CArrayHelper::sort($allItems, $sortFields);
 
 /**
  * Display APPLICATION ITEMS
  */
-// select items
-$sql = 'SELECT DISTINCT i.itemid,i.name,i.value_type,i.units,i.state,i.valuemapid,i.key_,ia.applicationid '.
-		' FROM items i,items_applications ia'.
-		' WHERE '.dbConditionInt('i.hostid', $hostIds).
-			' AND i.itemid=ia.itemid'.
-			' AND i.status='.ITEM_STATUS_ACTIVE.
-			' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED));
-
-$allItems = DBfetchArray(DBselect($sql));
-
-// if needed, skip items without data
-$itemsWithHistory = Manager::History()->getItemsWithData($allItems);
-
-// select history
-$history = Manager::History()->getLast($itemsWithHistory, 2);
-
-$displayItems = get_request('show_without_data') ? $allItems : $itemsWithHistory;
-foreach ($displayItems as $key => &$dbItem) {
-	$dbItem['resolvedName'] = itemName($dbItem);
-
-	// add item last update date for sorting
-	if (isset($history[$dbItem['itemid']])) {
-		$dbItem['lastclock'] = $history[$dbItem['itemid']][0]['clock'];
-	}
-}
-unset($dbItem);
-
-// if sortfield is item name
-if ($sortField == 'i.name') {
-	$sortFields = array(array('field' => 'resolvedName', 'order' => $sortOrder), 'itemid');
-}
-// if sortfield is item lastclock
-elseif ($sortField == 'i.lastclock') {
-	$sortFields = array(array('field' => 'lastclock', 'order' => $sortOrder), 'resolvedName', 'itemid');
-}
-// by default
-else {
-	$sortFields = array('resolvedName', 'itemid');
-}
-CArrayHelper::sort($displayItems, $sortFields);
-
-foreach ($displayItems as $db_item){
-	if (!empty($_REQUEST['select']) && !zbx_stristr($db_item['resolvedName'], $_REQUEST['select'])) {
+$tab_rows = array();
+foreach ($allItems as $key => $db_item){
+	if (!$db_item['applicationid']) {
 		continue;
 	}
 
@@ -371,6 +384,9 @@ foreach ($displayItems as $db_item){
 		new CCol(new CDiv($change, $item_status)),
 		$actions
 	)));
+
+	// remove items with applications from the collection
+	unset($allItems[$key]);
 }
 unset($app_rows);
 unset($db_app);
@@ -425,56 +441,8 @@ foreach ($applications as $appid => $dbApp) {
 /**
  * Display OTHER ITEMS (which are not linked to application)
  */
-
 $tab_rows = array();
-
-// select items
-$sql = 'SELECT DISTINCT i.hostid,i.itemid,i.name,i.value_type,i.units,i.state,i.valuemapid,i.key_ '.
-		' FROM items i '.
-			' LEFT JOIN items_applications ia ON ia.itemid=i.itemid'.
-		' WHERE ia.itemid is NULL '.
-			' AND i.status='.ITEM_STATUS_ACTIVE.
-			' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
-			' AND '.dbConditionInt('i.hostid', $hostIds);
-
-$allItems = DBfetchArray(DBselect($sql));
-
-// if needed, skip items without data
-$itemsWithHistory = Manager::History()->getItemsWithData($allItems);
-
-// select history
-$history = Manager::History()->getLast($itemsWithHistory, 2);
-
-$displayItems = get_request('show_without_data') ? $allItems : $itemsWithHistory;
-foreach ($displayItems as $key => &$dbItem) {
-	$dbItem['resolvedName'] = itemName($dbItem);
-
-	// add item last update date for sorting
-	if (isset($history[$dbItem['itemid']])) {
-		$dbItem['lastclock'] = $history[$dbItem['itemid']][0]['clock'];
-	}
-}
-unset($dbItem);
-
-// if sortfield is item name
-if ($sortField == 'i.name') {
-	$sortFields = array(array('field' => 'resolvedName', 'order' => $sortOrder), 'itemid');
-}
-// if sortfield is item lastclock
-elseif ($sortField == 'i.lastclock') {
-	$sortFields = array(array('field' => 'lastclock', 'order' => $sortOrder), 'resolvedName', 'itemid');
-}
-// by default
-else {
-	$sortFields = array('resolvedName', 'itemid');
-}
-CArrayHelper::sort($displayItems, $sortFields);
-
-foreach ($displayItems as $db_item){
-	if (!empty($_REQUEST['select']) && !zbx_stristr($db_item['resolvedName'], $_REQUEST['select'])) {
-		continue;
-	}
-
+foreach ($allItems as $db_item){
 	$lastHistory = isset($history[$db_item['itemid']][0]) ? $history[$db_item['itemid']][0] : null;
 	$prevHistory = isset($history[$db_item['itemid']][1]) ? $history[$db_item['itemid']][1] : null;
 
