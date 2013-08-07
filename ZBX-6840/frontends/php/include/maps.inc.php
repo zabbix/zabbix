@@ -1051,10 +1051,8 @@ function getSelementsInfo($sysmap) {
 		));
 		$all_hosts = array_merge($all_hosts, $hosts);
 		foreach ($hosts as $host) {
-			if (isset($hosts_map[$host['hostid']])) {
-				foreach ($hosts_map[$host['hostid']] as $belongs_to_sel) {
-					$selements[$belongs_to_sel]['hosts'][$host['hostid']] = $host['hostid'];
-				}
+			foreach ($hosts_map[$host['hostid']] as $belongs_to_sel) {
+				$selements[$belongs_to_sel]['hosts'][$host['hostid']] = $host['hostid'];
 			}
 		}
 	}
@@ -1106,10 +1104,8 @@ function getSelementsInfo($sysmap) {
 		$all_triggers = array_merge($all_triggers, $triggers);
 
 		foreach ($triggers as $trigger) {
-			if (isset($triggers_map[$trigger['triggerid']])) {
-				foreach ($triggers_map[$trigger['triggerid']] as $belongs_to_sel) {
-					$selements[$belongs_to_sel]['triggers'][$trigger['triggerid']] = $trigger['triggerid'];
-				}
+			foreach ($triggers_map[$trigger['triggerid']] as $belongs_to_sel) {
+				$selements[$belongs_to_sel]['triggers'][$trigger['triggerid']] = $trigger['triggerid'];
 			}
 		}
 	}
@@ -1127,10 +1123,8 @@ function getSelementsInfo($sysmap) {
 		$all_triggers = array_merge($all_triggers, $triggers);
 
 		foreach ($triggers as $trigger) {
-			if (isset($triggers_map_submaps[$trigger['triggerid']])) {
-				foreach ($triggers_map_submaps[$trigger['triggerid']] as $belongs_to_sel) {
-					$selements[$belongs_to_sel]['triggers'][$trigger['triggerid']] = $trigger['triggerid'];
-				}
+			foreach ($triggers_map_submaps[$trigger['triggerid']] as $belongs_to_sel) {
+				$selements[$belongs_to_sel]['triggers'][$trigger['triggerid']] = $trigger['triggerid'];
 			}
 		}
 	}
