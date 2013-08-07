@@ -28,40 +28,32 @@ $page['hist_arg'] = array('config');
 
 define('ZBX_PAGE_DO_REFRESH', 1);
 
-// item count to display in the details queue
-define('QUEUE_DETAIL_ITEM_COUNT', 500);
-
 require_once dirname(__FILE__).'/include/page_header.php';
+
+$queueModes = array(
+	QUEUE_OVERVIEW,
+	QUEUE_OVERVIEW_BY_PROXY,
+	QUEUE_DETAILS
+);
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields=array(
-	'config' =>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1,2"),	NULL)
+	'config' =>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN($queueModes),	NULL)
 );
 
 check_fields($fields);
 
-$_REQUEST['config'] = get_request('config', CProfile::get('web.queue.config', 0));
-CProfile::update('web.queue.config', $_REQUEST['config'], PROFILE_TYPE_INT);
+$config = get_request('config', CProfile::get('web.queue.config', 0));
+CProfile::update('web.queue.config', $config, PROFILE_TYPE_INT);
 
-$queueTypes = array(
-	0 => CZabbixServer::QUEUE_OVERVIEW,
-	1 => CZabbixServer::QUEUE_OVERVIEW_BY_PROXY,
-	2 => CZabbixServer::QUEUE_DETAILS
-);
-$config = $queueTypes[$_REQUEST['config']];
-
-$form = new CForm('get');
-$cmbMode = new CComboBox('config', $_REQUEST['config'], 'submit();');
-$cmbMode->addItem(0, _('Overview'));
-$cmbMode->addItem(1, _('Overview by proxy'));
-$cmbMode->addItem(2, _('Details'));
-$form->addItem($cmbMode);
-
-$queue_wdgt = new CWidget();
-$queue_wdgt->addPageHeader(_('QUEUE OF ITEMS TO BE UPDATED'), $form);
-
+// fetch data
 $zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
-$queueData = $zabbixServer->getQueue($config, get_cookie('zbx_sessionid'));
+$queueRequests = array(
+	QUEUE_OVERVIEW => CZabbixServer::QUEUE_OVERVIEW,
+	QUEUE_OVERVIEW_BY_PROXY => CZabbixServer::QUEUE_OVERVIEW_BY_PROXY,
+	QUEUE_DETAILS => CZabbixServer::QUEUE_DETAILS
+);
+$queueData = $zabbixServer->getQueue($queueRequests[$config], get_cookie('zbx_sessionid'));
 
 // check for errors error
 if ($zabbixServer->getError()) {
@@ -71,10 +63,22 @@ if ($zabbixServer->getError()) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
 }
 
+// create filter form
+$form = new CForm('get');
+$cmbMode = new CComboBox('config', $config, 'submit();');
+$cmbMode->addItem(QUEUE_OVERVIEW, _('Overview'));
+$cmbMode->addItem(QUEUE_OVERVIEW_BY_PROXY, _('Overview by proxy'));
+$cmbMode->addItem(QUEUE_DETAILS, _('Details'));
+$form->addItem($cmbMode);
+
+// display table
+$queue_wdgt = new CWidget();
+$queue_wdgt->addPageHeader(_('QUEUE OF ITEMS TO BE UPDATED'), $form);
+
 $table = new CTableInfo(_('The queue is empty.'));
 
 // overview
-if ($config == CZabbixServer::QUEUE_OVERVIEW) {
+if ($config == QUEUE_OVERVIEW) {
 	$itemTypes = array(
 		ITEM_TYPE_ZABBIX,
 		ITEM_TYPE_ZABBIX_ACTIVE,
@@ -131,7 +135,7 @@ if ($config == CZabbixServer::QUEUE_OVERVIEW) {
 	}
 }
 // overview by proxy
-elseif ($config == CZabbixServer::QUEUE_OVERVIEW_BY_PROXY){
+elseif ($config == QUEUE_OVERVIEW_BY_PROXY){
 	$proxies = API::proxy()->get(array(
 		'output' => array('hostid', 'host'),
 		'preservekeys' => true,
@@ -178,7 +182,7 @@ elseif ($config == CZabbixServer::QUEUE_OVERVIEW_BY_PROXY){
 	}
 }
 // details
-elseif ($config == CZabbixServer::QUEUE_DETAILS) {
+elseif ($config == QUEUE_DETAILS) {
 	$queueData = zbx_toHash($queueData, 'itemid');
 
 	$items = API::Item()->get(array(
@@ -222,7 +226,7 @@ $queue_wdgt->addItem($table);
 $queue_wdgt->Show();
 
 // display the table footer
-if ($config = CZabbixServer::QUEUE_OVERVIEW_BY_PROXY) {
+if ($config != QUEUE_OVERVIEW) {
 	show_table_header(
 		_('Total').": ".$table->GetNumRows().
 		((count($queueData) > QUEUE_DETAIL_ITEM_COUNT) ? ' ('._('Truncated').')' : '')
