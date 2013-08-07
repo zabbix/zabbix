@@ -582,7 +582,7 @@ class CGraphPrototype extends CGraphGeneral {
 	 * @return void
 	 */
 	protected function checkInput($graphs, $update = false) {
-		$graphs = parent::setGraphDefaultValues($graphs, $update);
+		$graphs = $this->setGraphDefaultValues($graphs, $update);
 
 		$itemids = array();
 
