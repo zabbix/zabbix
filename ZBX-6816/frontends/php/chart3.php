@@ -54,6 +54,11 @@ $fields = array(
 );
 $isDataValid = check_fields($fields);
 
+// validate permissions
+if (get_request('httptestid') && !API::HttpTest()->isReadable(array($_REQUEST['httptestid']))) {
+	access_deny();
+}
+
 if ($httptestid = get_request('httptestid', false)) {
 	$color = array(
 		'current' => 0,

@@ -42,9 +42,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //		VAR			     			 TYPE	   OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields=array(
 	'apps'=>				array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		NULL),
-	'applicationid'=>		array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		NULL),
-	'close'=>				array(T_ZBX_INT, O_OPT,	NULL,	IN('1'),	NULL),
-	'open'=>				array(T_ZBX_INT, O_OPT,	NULL,	IN('1'),	NULL),
 
 	'groupid'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
 	'hostid'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),

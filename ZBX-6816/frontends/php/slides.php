@@ -38,8 +38,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
 	'hostid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
-	'tr_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
-	'tr_hostid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
 	'elementid' =>		array(T_ZBX_INT, O_OPT, P_SYS|P_NZERO, DB_ID, null),
 	'step' =>			array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 65535), null),
 	'period' =>			array(T_ZBX_INT, O_OPT, P_SYS,	null,	null),
@@ -58,6 +56,18 @@ $fields = array(
 	'upd_counter' =>	array(T_ZBX_INT, O_OPT, P_ACT,	null,	null)
 );
 check_fields($fields);
+
+// validate permissions
+if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid'])) ||
+		get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
+	access_deny();
+}
+if (get_request('elementid')) {
+	$slides = get_slideshow_by_slideshowid($_REQUEST['elementid']);
+	if (!$slides) {
+		access_deny();
+	}
+}
 
 /*
  * Actions

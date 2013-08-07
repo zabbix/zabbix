@@ -51,9 +51,7 @@ asort_by_key($items, 'sortorder');
  */
 $dbItems = API::Item()->get(array(
 	'webitems' => true,
-	'itemids' => zbx_objectValues($items, 'itemid'),
-	'nodeids' => get_current_nodeid(true),
-	'filter' => array('flags' => null)
+	'itemids' => zbx_objectValues($items, 'itemid')
 ));
 
 $dbItems = zbx_toHash($dbItems, 'itemid');
