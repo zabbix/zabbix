@@ -5423,11 +5423,11 @@ static void	DBdelete_groups_validate(zbx_vector_uint64_t *groupids)
 
 		if (ZBX_INTERNAL_GROUP == internal)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "group \"%s\" is internal and cannot be deleted", row[2]);
+			zabbix_log(LOG_LEVEL_WARNING, "host group \"%s\" is internal and cannot be deleted", row[2]);
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "group \"%s\" cannot be deleted,"
+			zabbix_log(LOG_LEVEL_WARNING, "host group \"%s\" cannot be deleted,"
 					" because some hosts or templates depend on it", row[2]);
 		}
 	}
@@ -5463,7 +5463,7 @@ static void	DBdelete_groups_validate(zbx_vector_uint64_t *groupids)
 				zbx_vector_uint64_remove(groupids, index);
 			}
 
-			zabbix_log(LOG_LEVEL_WARNING, "group \"%s\" cannot be deleted,"
+			zabbix_log(LOG_LEVEL_WARNING, "host group \"%s\" cannot be deleted,"
 					" because it is used by a host prototype", row[1]);
 		}
 		DBfree_result(result);
