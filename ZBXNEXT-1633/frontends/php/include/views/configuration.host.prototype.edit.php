@@ -207,28 +207,47 @@ $divTabs->addTab('groupTab', _('Groups'), $groupList);
 // templates
 $tmplList = new CFormList('tmpllist');
 
+// create linked template table
+$linkedTemplateTable = new CTable(_('No templates defined.'), 'formElementTable');
+$linkedTemplateTable->attr('id', 'linkedTemplateTable');
+$linkedTemplateTable->attr('style', 'min-width: 400px;');
+$linkedTemplateTable->setHeader(array(_('Name'), _('Action')));
+
+$ignoreTemplates = array();
 if ($hostPrototype['templates']) {
-	foreach ($hostPrototype['templates'] as $templateId => $name) {
-		$frmHost->addVar('templates['.$templateId.']', $name);
-		$tmplList->addRow(
-			$name,
-			(!$hostPrototype['templateid']) ? new CSubmit('unlink['.$templateId.']', _('Unlink and clear'), null, 'link_menu') : ''
-		);
+	foreach ($hostPrototype['templates'] as $template) {
+		$tmplList->addVar('templates['.$template['templateid'].']', $template['templateid']);
+
+		$linkedTemplateTable->addRow(array(
+			$template['name'],
+			!$hostPrototype['templateid'] ? new CSubmit('unlink['.$template['templateid'].']', _('Unlink'), null, 'link_menu') : '',
+		));
+
+		$ignoreTemplates[$template['templateid']] = $template['name'];
 	}
+
+	$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
 }
 // for inherited prototypes with no templates display a text message
 elseif ($hostPrototype['templateid']) {
 	$tmplList->addRow(_('No templates linked.'));
 }
 
+// create new linked template table
 if (!$hostPrototype['templateid']) {
-	$tmplAdd = new CButton('add', _('Add'),
-		'return PopUp("popup.php?srctbl=templates&srcfld1=hostid&srcfld2=host'.
-			'&dstfrm='.$frmHost->getName().'&dstfld1=new_template&templated_hosts=1'.
-			url_param($hostPrototype['templates'], false, 'existed_templates').'", 450, 450)',
-		'link_menu'
-	);
-	$tmplList->addRow($tmplAdd, SPACE);
+	$newTemplateTable = new CTable(null, 'formElementTable');
+	$newTemplateTable->attr('id', 'newTemplateTable');
+	$newTemplateTable->attr('style', 'min-width: 400px;');
+
+	$newTemplateTable->addRow(array(new CMultiSelect(array(
+		'name' => 'add_templates[]',
+		'objectName' => 'templates',
+		'ignored' => $ignoreTemplates
+	))));
+
+	$newTemplateTable->addRow(array(new CSubmit('add_template', _('Add'), null, 'link_menu')));
+
+	$tmplList->addRow(_('Link new templates'), new CDiv($newTemplateTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
 }
 
 $divTabs->addTab('templateTab', _('Templates'), $tmplList);

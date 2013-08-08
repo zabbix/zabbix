@@ -42,7 +42,8 @@ $fields = array(
 	'status' =>		        	array(T_ZBX_INT, O_OPT, null,		        IN(array(HOST_STATUS_NOT_MONITORED, HOST_STATUS_MONITORED)), 'isset({save})'),
 	'inventory_mode' =>			array(T_ZBX_INT, O_OPT, null, IN(array(HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC)), null),
 	'templates' =>		    	array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null),
-	'group_links' =>				array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null),
+	'add_templates' =>		    array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null),
+	'group_links' =>			array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null),
 	'group_prototypes' =>		array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null),
 	'unlink' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 	'group_hostid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
@@ -128,7 +129,7 @@ elseif (isset($_REQUEST['save'])) {
 		'status' => get_request('status'),
 		'groupLinks' => array(),
 		'groupPrototypes' => array(),
-		'templates' => zbx_toObject(array_keys(get_request('templates', array())), 'templateid'),
+		'templates' => get_request('templates', array()),
 		'status' => get_request('status'),
 		'inventory' => array(
 			'inventory_mode' => get_request('inventory_mode')
@@ -238,7 +239,7 @@ if (isset($_REQUEST['form'])) {
 			'host' => get_request('host'),
 			'name' => get_request('name'),
 			'status' => get_request('status', HOST_STATUS_MONITORED),
-			'templates' => get_request('templates', array()),
+			'templates' => array(),
 			'inventory' => array(
 				'inventory_mode' => get_request('inventory_mode', HOST_INVENTORY_DISABLED)
 			),
@@ -247,6 +248,13 @@ if (isset($_REQUEST['form'])) {
 		),
 		'groups' => array()
 	);
+
+	// add already linked and new templates
+	$templateIds = array_merge(get_request('templates', array()), get_request('add_templates', array()));
+	$data['host_prototype']['templates'] = API::Template()->get(array(
+		'output' => array('templateid', 'name'),
+		'templateids' => $templateIds
+	));
 
 	// add parent host
 	$parentHost = API::Host()->get(array(
@@ -289,12 +297,6 @@ if (isset($_REQUEST['form'])) {
 			'preservekeys' => true
 		));
 
-		// add linked templates
-		$data['host_prototype']['templates'] = array();
-		foreach ($hostPrototype['templates'] as $template) {
-			$data['host_prototype']['templates'][$template['templateid']] = $template['name'];
-		}
-
 		// add parent templates
 		if ($hostPrototype['templateid']) {
 			$data['parents'] = array();
@@ -316,6 +318,9 @@ if (isset($_REQUEST['form'])) {
 			}
 		}
 	}
+
+	// order linked templates
+	CArrayHelper::sort($data['host_prototype']['templates'], array('name'));
 
 	// render view
 	$itemView = new CView('configuration.host.prototype.edit', $data);
