@@ -563,7 +563,7 @@
 					'objectName' => 'hosts',
 					'objectOptions' => array(
 						'editable' => true,
-						'templated_hosts' => true,
+						'templated_hosts' => true
 					),
 					'data' => $hostFilterData
 				))
