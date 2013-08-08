@@ -93,8 +93,8 @@ class CStringValidator extends CValidator {
 			return false;
 		}
 
-		if ($this->regex && !preg_match($this->regex, $value)) {
-			$this->error($this->messageRegex);
+		if ($this->regex && !zbx_empty($value) && !preg_match($this->regex, $value)) {
+			$this->error($this->messageRegex, $value);
 
 			return false;
 		}

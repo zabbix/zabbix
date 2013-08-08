@@ -36,11 +36,18 @@ class CCollectionValidator extends CValidator {
 	public $uniqueField;
 
 	/**
-	 * Error message if the string is empty.
+	 * Error message if the array is empty.
 	 *
 	 * @var string
 	 */
 	public $messageEmpty;
+
+	/**
+	 * Error message if the given value is not an array.
+	 *
+	 * @var array
+	 */
+	public $messageInvalid = array();
 
 	/**
 	 * Error message if duplicate objects exist.
@@ -58,6 +65,12 @@ class CCollectionValidator extends CValidator {
 	 */
 	public function validate($value)
 	{
+		if (!is_array($value)) {
+			$this->error($this->messageInvalid);
+
+			return false;
+		}
+
 		// check if it's empty
 		if (!$this->empty && !$value) {
 			$this->error($this->messageEmpty);
