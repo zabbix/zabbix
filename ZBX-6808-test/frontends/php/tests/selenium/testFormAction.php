@@ -40,7 +40,7 @@ class testFormAction extends CWebTest {
 			array(
 				array('event_source' => 'Triggers', 'evaltype' => 'OR')
 			),
-		/*	array(
+			array(
 				array('event_source' => 'Triggers', 'new_condition_conditiontype' => 'Application')
 			),
 			array(
@@ -135,7 +135,7 @@ class testFormAction extends CWebTest {
 			),
 			array(
 				array('event_source' => 'Internal', 'new_condition_conditiontype' => 'Host')
-			)*/
+			)
 		);
 	}
 
@@ -321,8 +321,8 @@ class testFormAction extends CWebTest {
 			}
 		}
 		else {
-			$this->zbxTestTextPresent('Type of calculation');
-			$this->assertElementPresent('evaltype');
+			$this->zbxTestTextNotPresent('Type of calculation');
+			$this->assertNotVisible('evaltype');
 		}
 
 		$this->zbxTestTextPresent(array(
@@ -442,7 +442,6 @@ class testFormAction extends CWebTest {
 						'=',
 						'<>'
 				));
-				$this->assertAttribute('//*[@id=\'new_condition_operator\']/option[text()=\'=\']/@selected', 'selected');
 				break;
 			case 'Trigger name':
 			case 'Host name':
@@ -474,14 +473,12 @@ class testFormAction extends CWebTest {
 						'in',
 						'not in'
 				));
-				$this->assertAttribute('//*[@id=\'new_condition_operator\']/option[text()=\'in\']/@selected', 'selected');
 				break;
 			case 'Uptime/Downtime':
 				$this->zbxTestDropdownHasOptions('new_condition_operator', array(
 						'>=',
 						'<='
 				));
-				$this->assertAttribute('//*[@id=\'new_condition_operator\']/option[text()=\'>=\']/@selected', 'selected');
 				break;
 			case 'Received value':
 				$this->zbxTestDropdownHasOptions('new_condition_operator', array(
@@ -492,32 +489,38 @@ class testFormAction extends CWebTest {
 						'like',
 						'not like'
 				));
-				$this->assertAttribute('//*[@id=\'new_condition_operator\']/option[text()=\'>=\']/@selected', 'selected');
 				break;
 		}
 
 		switch ($new_condition_conditiontype) {
 			case 'Application':
 			case 'Trigger name':
+			case 'Time period':
 			case 'Host IP':
 			case 'Uptime/Downtime':
 			case 'Received value':
 			case 'Host name':
 			case 'Host metadata':
+			case 'Service port':
 				$this->assertElementPresent('//input[@id=\'new_condition_value\']');
 				break;
+			case 'Proxy':
+				$this->assertNotVisible('//input[@id=\'new_condition_value\']');
+				break;
 			default:
-				$this->assertElementPresent('//input[@id=new_condition_value]');
+				$this->assertElementNotPresent('//input[@id=\'new_condition_value\']');
 				break;
 		}
 
 		switch ($new_condition_conditiontype) {
 			case 'Application':
 			case 'Trigger name':
+			case 'Time period':
 			case 'Host IP':
 			case 'Received value':
 			case 'Host name':
 			case 'Host metadata':
+			case 'Service port':
 				$this->assertAttribute('//input[@id=\'new_condition_value\']/@maxlength', 255);
 				$this->assertAttribute('//input[@id=\'new_condition_value\']/@size', 50);
 				break;
@@ -538,6 +541,9 @@ class testFormAction extends CWebTest {
 			case 'Time period':
 				$this->assertEquals($this->getValue('//input[@id=\'new_condition_value\']'), '1-7,00:00-24:00');
 				break;
+			case 'Service port':
+				$this->assertEquals($this->getValue('//input[@id=\'new_condition_value\']'), '0-1023,1024-49151');
+				break;
 			case 'Host IP':
 				$this->assertEquals($this->getValue('//input[@id=\'new_condition_value\']'), '192.168.0.1-127,192.168.2.1');
 				break;
@@ -551,11 +557,10 @@ class testFormAction extends CWebTest {
 			case 'Template':
 			case 'Host':
 			case 'Trigger':
-				$this->assertElementPresent('//div[@id=\'new_condition_value__\']/input');
-				$this->assertEquals($this->getValue('//div[@id=\'new_condition_value__\']/input'), "");
+				$this->assertElementPresent('//*[@id=\'new_condition_value_\']/input[@placeholder]');
 				break;
 			default:
-				$this->assertElementNotPresent("//div[@id='new_condition_value__']/input");
+				$this->assertElementNotPresent('//*[@id=\'new_condition_value_\']/input[@placeholder]');
 				break;
 		}
 
@@ -589,6 +594,7 @@ class testFormAction extends CWebTest {
 						'OK',
 						'PROBLEM'
 				));
+				break;
 			case 'Service type':
 				$this->zbxTestDropdownHasOptions('new_condition_value', array(
 						'SSH',
@@ -656,17 +662,39 @@ class testFormAction extends CWebTest {
 		switch ($new_condition_conditiontype) {
 			case 'Discovery rule':
 			case 'Discovery check':
-			case 'Proxy':
-				$this->assertElementPresent('//input[@id=\'drule\']');
-				$this->assertAttribute('//input[@id=\'drule\']/@maxlength', 255);
-				$this->assertAttribute('//input[@id=\'drule\']/@size', 50);
-				$this->assertAttribute('//input[@id=\'drule\']/@readonly', 'readonly');
+				$this->assertElementPresent('//input[@id=\'dcheck\']');
+				$this->assertAttribute('//input[@id=\'dcheck\']/@maxlength', 255);
+				$this->assertAttribute('//input[@id=\'dcheck\']/@size', 50);
+				$this->assertAttribute('//input[@id=\'dcheck\']/@readonly', 'readonly');
 
 				$this->assertElementPresent('//input[@id=\'btn1\']');
 				$this->assertAttribute('//input[@id=\'btn1\']/@value', 'Select');
 				break;
 			default:
-				$this->assertElementNotPresent('//input[@id=\'drule\']');
+				$this->assertElementNotPresent('//input[@id=\'dcheck\']');
+				break;
+		}
+
+		switch ($new_condition_conditiontype) {
+			case 'Proxy':
+				$this->assertElementPresent('//input[@id=\'proxy\']');
+				$this->assertAttribute('//input[@id=\'proxy\']/@maxlength', 255);
+				$this->assertAttribute('//input[@id=\'proxy\']/@size', 50);
+				$this->assertAttribute('//input[@id=\'proxy\']/@readonly', 'readonly');
+				break;
+			default:
+				$this->assertElementNotPresent('//input[@id=\'proxy\']');
+				break;
+		}
+
+		switch ($new_condition_conditiontype) {
+			case 'Discovery rule':
+			case 'Discovery check':
+			case 'Proxy':
+				$this->assertElementPresent('//input[@id=\'btn1\']');
+				$this->assertAttribute('//input[@id=\'btn1\']/@value', 'Select');
+				break;
+			default:
 				$this->assertElementNotPresent('//input[@id=\'btn1\']');
 				break;
 		}
