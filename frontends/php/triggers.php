@@ -86,6 +86,13 @@ $_REQUEST['status'] = isset($_REQUEST['status']) ? TRIGGER_STATUS_ENABLED : TRIG
 $_REQUEST['type'] = isset($_REQUEST['type']) ? TRIGGER_MULT_EVENT_ENABLED : TRIGGER_MULT_EVENT_DISABLED;
 $_REQUEST['go'] = get_request('go', 'none');
 
+// validate permissions
+if (get_request('triggerid') && !API::Trigger()->isWritable(array($_REQUEST['triggerid'])) ||
+		get_request('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid']))
+	) {
+	access_deny();
+}
+
 /*
  * Actions
  */
