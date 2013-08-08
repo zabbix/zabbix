@@ -26,6 +26,7 @@
 #include "logfiles.h"
 #ifdef _WINDOWS
 #	include "eventlog.h"
+#	include "winmeta.h"
 #endif
 #include "comms.h"
 #include "threads.h"
@@ -818,6 +819,7 @@ static void	process_active_checks(char *server, unsigned short port)
 	char		key_severity[MAX_STRING_LEN], str_severity[32] /* for `regex_match_ex' */;
 	char		key_source[MAX_STRING_LEN], *source = NULL;
 	char		key_logeventid[MAX_STRING_LEN], str_logeventid[8] /* for `regex_match_ex' */;
+	OSVERSIONINFO	versionInfo;
 #endif
 	char		encoding[32];
 	char		tmp[16];
@@ -1118,31 +1120,63 @@ static void	process_active_checks(char *server, unsigned short port)
 						break;
 					}
 
-					switch (severity)
-					{
-						case EVENTLOG_SUCCESS:
-						case EVENTLOG_INFORMATION_TYPE:
-							severity = 1;
-							zbx_snprintf(str_severity, sizeof(str_severity), INFORMATION_TYPE);
-							break;
-						case EVENTLOG_WARNING_TYPE:
-							severity = 2;
-							zbx_snprintf(str_severity, sizeof(str_severity), WARNING_TYPE);
-							break;
-						case EVENTLOG_ERROR_TYPE:
-							severity = 4;
-							zbx_snprintf(str_severity, sizeof(str_severity), ERROR_TYPE);
-							break;
-						case EVENTLOG_AUDIT_FAILURE:
-							severity = 7;
-							zbx_snprintf(str_severity, sizeof(str_severity), AUDIT_FAILURE);
-							break;
-						case EVENTLOG_AUDIT_SUCCESS:
-							severity = 8;
-							zbx_snprintf(str_severity, sizeof(str_severity), AUDIT_SUCCESS);
-							break;
-					}
+					versionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+					GetVersionEx(&versionInfo);
 
+					if (versionInfo.dwMajorVersion >= 6)    /* Windows Vista, Windows 7 or Windows Server 2008 */
+					{
+						switch (severity)
+							{
+								case WINEVENT_LEVEL_LOG_ALWAYS:
+								case WINEVENT_LEVEL_INFO:
+									severity = 1;
+									zbx_snprintf(str_severity, sizeof(str_severity), INFORMATION_TYPE);
+									break;
+								case WINEVENT_LEVEL_WARNING:
+									severity = 2;
+									zbx_snprintf(str_severity, sizeof(str_severity), WARNING_TYPE);
+									break;
+								case WINEVENT_LEVEL_ERROR:
+									severity = 4;
+									zbx_snprintf(str_severity, sizeof(str_severity), ERROR_TYPE);
+									break;
+								case WINEVENT_LEVEL_CRITICAL:
+									severity = 9;
+									zbx_snprintf(str_severity, sizeof(str_severity), CRITICAL_TYPE);
+									break;
+								case WINEVENT_LEVEL_VERBOSE:
+									severity = 10;
+									zbx_snprintf(str_severity, sizeof(str_severity), VERBOSE_TYPE);
+									break;
+							}
+					}
+					else
+					{
+						switch (severity)
+						{
+							case EVENTLOG_SUCCESS:
+							case EVENTLOG_INFORMATION_TYPE:
+								severity = 1;
+								zbx_snprintf(str_severity, sizeof(str_severity), INFORMATION_TYPE);
+								break;
+							case EVENTLOG_WARNING_TYPE:
+								severity = 2;
+								zbx_snprintf(str_severity, sizeof(str_severity), WARNING_TYPE);
+								break;
+							case EVENTLOG_ERROR_TYPE:
+								severity = 4;
+								zbx_snprintf(str_severity, sizeof(str_severity), ERROR_TYPE);
+								break;
+							case EVENTLOG_AUDIT_FAILURE:
+								severity = 7;
+								zbx_snprintf(str_severity, sizeof(str_severity), AUDIT_FAILURE);
+								break;
+							case EVENTLOG_AUDIT_SUCCESS:
+								severity = 8;
+								zbx_snprintf(str_severity, sizeof(str_severity), AUDIT_SUCCESS);
+								break;
+						}
+					}
 					zbx_snprintf(str_logeventid, sizeof(str_logeventid), "%lu", logeventid);
 
 					if (SUCCEED == regexp_sub_ex(regexps, regexps_num, value, pattern,
