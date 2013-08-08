@@ -181,16 +181,18 @@ class CHostPrototype extends CHostBase {
 				)),
 				'ruleid' => new CIdValidator(array(
 					'messageEmpty' => _('No discovery rule ID given for host prototype "%1$s".'),
-					'messageInvalid' => _('Incorrect discovery rule ID for host prototype "%1$s".')
+					'messageRegex' => _('Incorrect discovery rule ID for host prototype "%1$s".')
 				)),
 				'groupLinks' => new CCollectionValidator(array(
 					'uniqueField' => 'groupid',
 					'messageEmpty' => _('Host prototype "%1$s" must have at least one host group.'),
+					'messageInvalid' => _('Incorrect host groups for host prototype "%1$s".'),
 					'messageDuplicate' => _('Duplicate host group ID "%2$s" for host prototype "%1$s".')
 				)),
 				'groupPrototypes' => new CCollectionValidator(array(
 					'empty' => true,
 					'uniqueField' => 'name',
+					'messageInvalid' => _('Incorrect group prototypes for host prototype "%1$s".'),
 					'messageDuplicate' => _('Duplicate group prototype name "%2$s" for host prototype "%1$s".')
 				)),
 				'inventory' => new CSchemaValidator(array(
@@ -234,8 +236,8 @@ class CHostPrototype extends CHostBase {
 		return new CSchemaValidator(array(
 			'validators' => array(
 				'groupid' => new CIdValidator(array(
-					'empty' => true,
-					'messageInvalid' => _('Incorrect host group ID for group prototype.')
+					'messageEmpty' => _('No host group ID for group prototype.'),
+					'messageRegex' => _('Incorrect host group ID for group prototype.')
 				))
 			),
 			'required' => array('groupid'),
@@ -396,7 +398,7 @@ class CHostPrototype extends CHostBase {
 		$groupLinkValidator->required = array();
 		$groupLinkValidator->validators['group_prototypeid'] = new CIdValidator(array(
 			'messageEmpty' => _('Group prototype ID cannot be empty.'),
-			'messageInvalid' => _('Incorrect group prototype ID.')
+			'messageRegex' => _('Incorrect group prototype ID.')
 		));
 
 		// group prototype validator
@@ -404,7 +406,7 @@ class CHostPrototype extends CHostBase {
 		$groupPrototypeValidator->required = array();
 		$groupPrototypeValidator->validators['group_prototypeid'] = new CIdValidator(array(
 			'messageEmpty' => _('Group prototype ID cannot be empty.'),
-			'messageInvalid' => _('Incorrect group prototype ID.')
+			'messageRegex' => _('Incorrect group prototype ID.')
 		));
 
 		$groupPrototypeGroupIds = array();

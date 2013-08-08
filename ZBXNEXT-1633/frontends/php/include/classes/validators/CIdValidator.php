@@ -19,56 +19,13 @@
 **/
 
 
-class CIdValidator extends CValidator {
+class CIdValidator extends CStringValidator {
 
 	/**
-	 * If set to false, the ID cannot be empty.
-	 *
-	 * @var bool
-	 */
-	public $empty = false;
-
-	/**
-	 * Error message if the ID is empty.
+	 * Numeric ID regex.
 	 *
 	 * @var string
 	 */
-	public $messageEmpty;
-
-	/**
-	 * Error message if an incorrect ID is given.
-	 *
-	 * @var string
-	 */
-	public $messageInvalid;
-
-	/**
-	 * Checks if the given string is a valid object ID.
-	 *
-	 * @param string $value
-	 *
-	 * @return bool
-	 */
-	public function validate($value)
-	{
-		if (!$value) {
-			if ($this->empty) {
-				return true;
-			}
-			else {
-				$this->error($this->messageEmpty);
-
-				return false;
-			}
-		}
-
-		if (!is_numeric($value)) {
-			$this->error($this->messageInvalid, $value);
-
-			return false;
-		}
-
-		return true;
-	}
+	public $regex = '/^\d+$/';
 
 }
