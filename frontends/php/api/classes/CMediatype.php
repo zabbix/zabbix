@@ -213,7 +213,7 @@ class CMediatype extends CZBXAPI {
 	 * @param string $mediatypes['gsm_modem']
 	 * @param string $mediatypes['username']
 	 * @param string $mediatypes['passwd']
-	 * @param integer $mediatypes['status']
+	 * @param int $mediatypes['status']
 	 * @return array|boolean
 	 */
 	public function create($mediatypes) {
@@ -264,7 +264,7 @@ class CMediatype extends CZBXAPI {
 	 * @param string $mediatypes['gsm_modem']
 	 * @param string $mediatypes['username']
 	 * @param string $mediatypes['passwd']
-	 * @param integer $mediatypes['status']
+	 * @param int $mediatypes['status']
 	 * @return array
 	 */
 	public function update($mediatypes) {
