@@ -2382,13 +2382,14 @@ function get_status() {
 	// triggers
 	$dbTriggers = DBselect(
 		'SELECT COUNT(DISTINCT t.triggerid) AS cnt,t.status,t.value'.
-				' FROM triggers t'.
-				' INNER JOIN functions f ON t.triggerid=f.triggerid'.
-				' INNER JOIN items i ON f.itemid=i.itemid'.
-				' INNER JOIN hosts h ON i.hostid=h.hostid'.
-				' WHERE i.status='.ITEM_STATUS_ACTIVE.
+			' FROM triggers t'.
+			' INNER JOIN functions f ON t.triggerid=f.triggerid'.
+			' INNER JOIN items i ON f.itemid=i.itemid'.
+			' INNER JOIN hosts h ON i.hostid=h.hostid'.
+			' WHERE i.status='.ITEM_STATUS_ACTIVE.
 				' AND h.status='.HOST_STATUS_MONITORED.
-				' GROUP BY t.status,t.value');
+				' AND t.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
+			' GROUP BY t.status,t.value');
 	while ($dbTrigger = DBfetch($dbTriggers)) {
 		switch ($dbTrigger['status']) {
 			case TRIGGER_STATUS_ENABLED:
@@ -2415,6 +2416,8 @@ function get_status() {
 				' FROM items i'.
 				' INNER JOIN hosts h ON i.hostid=h.hostid'.
 				' WHERE h.status='.HOST_STATUS_MONITORED.
+					' AND i.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
+					' AND i.type<>'.ITEM_TYPE_HTTPTEST.
 				' GROUP BY i.status,i.state');
 	while ($dbItem = DBfetch($dbItems)) {
 		if ($dbItem['status'] == ITEM_STATUS_ACTIVE) {
@@ -2590,7 +2593,6 @@ function checkRequiredKeys(array $array, array $keys) {
  */
 function clearCookies($clear = false, $id = null) {
 	if ($clear) {
-		$url = new CUrl();
-		insert_js('cookie.eraseArray("'.basename($url->getPath(), '.php').($id ? '_'.$id : '').'")');
+		insert_js('cookie.eraseArray("'.basename($_SERVER['SCRIPT_NAME'], '.php').($id ? '_'.$id : '').'")');
 	}
 }
