@@ -131,6 +131,8 @@ $goComboBox->addItem($goOption);
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "group_hostid";');
+zbx_add_post_js('chkbxRange.prefix = "'.$discoveryRule['itemid'].'";');
+zbx_add_post_js('cookie.prefix = "'.$discoveryRule['itemid'].'";');
 
 // append table to form
 $itemForm->addItem(array($this->data['paging'], $hostTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
