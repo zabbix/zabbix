@@ -542,7 +542,7 @@ function get_accessible_nodes_by_rights(&$rights, $user_type, $perm, $perm_res =
 /**
  * Returns array of user groups by $userId
  *
- * @param integer $userId
+ * @param int $userId
  *
  * @return array
  */

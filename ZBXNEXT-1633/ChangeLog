@@ -1,12 +1,17 @@
 Changes for 2.1.2
 
 New features:
+...G...PS. [ZBXNEXT-1405] added IP to the warning about ignored messages because of their size (wiper)
 ........S. [ZBX-6770] improved host macro resolving by using configuration cache to get hosts used in trigger expressions (wiper)
 .......PS. [ZBXNEXT-1098] added internal check support to Zabbix proxies (wiper)
 ...GI..... [ZBX-6587] fixed Windows binaries descriptions (dimir)
 ...G...... [ZBXNEXT-1528] added net.if.in, net.if.out and net.if.total item support on HP-UX platforms (igors)
 
 Bug fixes:
+..F....... [ZBX-6795] corrected percentage value in graph pie charts (Guntis)
+..F....... [ZBX-6283] added graph filter gradation recalculation (Ivo)
+..F....... [ZBX-6451] fixed displaying correct number of items and triggers for "Status of Zabbix" (Ivo)
+...G...... [ZBX-6672] fixed windows agent performance counters being capped to 100 (wiper)
 A.F....... [ZBX-6808] fixed "Host metadata" field in actions and improved validation for action conditions (Ivo)
 ..F....... [ZBX-6825] fixed names of the added items, when editing graph (Guntis)
 ....I..... [ZBX-6843] fixed MySQL error while upgrading DB (Sasha)
@@ -320,8 +325,12 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.8rc1
 
 New features:
+...G...PS. [ZBXNEXT-1405] added IP to the warning about ignored messages because of their size (wiper)
+A.F....... [ZBX-1357] updated Dutch translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-6840] fixed undefined indexes for triggers in Monitoring > Maps and Dashboard (Ivo)
+...G...... [ZBX-6672] fixed windows agent performance counters being capped to 100 (wiper)
 ....I..... [ZBX-6831] fixed webtest item conversion in 1.8->2.0 database upgrade patch for mysql (wiper)
 ...G...... [ZBX-6527] fixed proc.mem calculations with getprocs() for AIX (wiper)
 ........S. [ZBX-5924] fixed curl verify host option setting in ez texting (wiper)
