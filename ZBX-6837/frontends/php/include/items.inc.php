@@ -106,7 +106,7 @@ function item_type2str($type = null) {
 /**
  * Returns human readable an item value type
  *
- * @param integer $valueType
+ * @param int $valueType
  *
  * @return string
  */
@@ -738,7 +738,7 @@ function get_items_data_overview($hostids, $application, $view_style) {
 	));
 
 	// fetch latest values
-	$history = Manager::History()->fetchLast(zbx_toHash($db_items, 'itemid'));
+	$history = Manager::History()->getLast(zbx_toHash($db_items, 'itemid'));
 
 	$options = array(
 		'output' => array('name', 'hostid'),
@@ -1068,96 +1068,75 @@ function getItemFunctionalValue($item, $function, $param) {
 	}
 }
 
-/*
- * Parameters:
- *     itemid - item ID
- *     last  - 0 - last value (clock is used), 1 - last value
+/**
+ * Returns the history value of the item at the given time. If no value exists at the given time, the function
+ * will return the previous value.
+ *
+ * The $db_item parameter must have the value_type and itemid properties set.
+ *
+ * @param array $db_item
+ * @param int $clock
+ * @param int $ns
+ *
+ * @return string
  */
-function item_get_history($db_item, $last = 1, $clock = 0, $ns = 0) {
+function item_get_history($db_item, $clock, $ns) {
 	$value = null;
 
-	switch ($db_item['value_type']) {
-		case ITEM_VALUE_TYPE_FLOAT:
-			$table = 'history';
-			break;
-		case ITEM_VALUE_TYPE_UINT64:
-			$table = 'history_uint';
-			break;
-		case ITEM_VALUE_TYPE_TEXT:
-			$table = 'history_text';
-			break;
-		case ITEM_VALUE_TYPE_STR:
-			$table = 'history_str';
-			break;
-		case ITEM_VALUE_TYPE_LOG:
-		default:
-			$table = 'history_log';
-			break;
+	$table = CHistoryManager::getTableName($db_item['value_type']);
+
+	$sql = 'SELECT value'.
+			' FROM '.$table.
+			' WHERE itemid='.$db_item['itemid'].
+				' AND clock='.$clock.
+				' AND ns='.$ns;
+	if (null != ($row = DBfetch(DBselect($sql, 1)))) {
+		$value = $row['value'];
+	}
+	if ($value != null) {
+		return $value;
 	}
 
-	if ($last == 0) {
+	$max_clock = 0;
+
+	$sql = 'SELECT DISTINCT clock'.
+			' FROM '.$table.
+			' WHERE itemid='.$db_item['itemid'].
+				' AND clock='.$clock.
+				' AND ns<'.$ns;
+	if (null != ($row = DBfetch(DBselect($sql)))) {
+		$max_clock = $row['clock'];
+	}
+	if ($max_clock == 0) {
+		$sql = 'SELECT MAX(clock) AS clock'.
+				' FROM '.$table.
+				' WHERE itemid='.$db_item['itemid'].
+					' AND clock<'.$clock;
+		if (null != ($row = DBfetch(DBselect($sql)))) {
+			$max_clock = $row['clock'];
+		}
+	}
+	if ($max_clock == 0) {
+		return $value;
+	}
+
+	if ($clock == $max_clock) {
 		$sql = 'SELECT value'.
 				' FROM '.$table.
 				' WHERE itemid='.$db_item['itemid'].
 					' AND clock='.$clock.
-					' AND ns='.$ns;
-		if (null != ($row = DBfetch(DBselect($sql, 1)))) {
-			$value = $row['value'];
-		}
-		if ($value != null) {
-			return $value;
-		}
-
-		$max_clock = 0;
-
-		$sql = 'SELECT DISTINCT clock'.
-				' FROM '.$table.
-				' WHERE itemid='.$db_item['itemid'].
-					' AND clock='.$clock.
 					' AND ns<'.$ns;
-		if (null != ($row = DBfetch(DBselect($sql)))) {
-			$max_clock = $row['clock'];
-		}
-		if ($max_clock == 0) {
-			$sql = 'SELECT MAX(clock) AS clock'.
-					' FROM '.$table.
-					' WHERE itemid='.$db_item['itemid'].
-						' AND clock<'.$clock;
-			if (null != ($row = DBfetch(DBselect($sql)))) {
-				$max_clock = $row['clock'];
-			}
-		}
-		if ($max_clock == 0) {
-			return $value;
-		}
-
-		if ($clock == $max_clock) {
-			$sql = 'SELECT value'.
-					' FROM '.$table.
-					' WHERE itemid='.$db_item['itemid'].
-						' AND clock='.$clock.
-						' AND ns<'.$ns;
-		}
-		else {
-			$sql = 'SELECT value'.
-					' FROM '.$table.
-					' WHERE itemid='.$db_item['itemid'].
-						' AND clock='.$max_clock.
-					' ORDER BY itemid,clock desc,ns desc';
-		}
-
-		if (null != ($row = DBfetch(DBselect($sql, 1)))) {
-			$value = $row['value'];
-		}
 	}
 	else {
-		$row = DBfetch(DBselect('SELECT MAX(clock) AS clock FROM '.$table.' WHERE itemid='.$db_item['itemid']));
-		if (!empty($row['clock'])) {
-			$row = DBfetch(DBselect('SELECT value FROM '.$table.' WHERE itemid='.$db_item['itemid'].' AND clock='.$row['clock'].' ORDER BY ns DESC', 1));
-			if (!empty($row['value'])) {
-				$value = $row['value'];
-			}
-		}
+		$sql = 'SELECT value'.
+				' FROM '.$table.
+				' WHERE itemid='.$db_item['itemid'].
+					' AND clock='.$max_clock.
+				' ORDER BY itemid,clock desc,ns desc';
+	}
+
+	if (null != ($row = DBfetch(DBselect($sql, 1)))) {
+		$value = $row['value'];
 	}
 
 	return $value;

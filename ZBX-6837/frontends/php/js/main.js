@@ -996,38 +996,28 @@ function rm4favorites(favobj, favid, menu_rowid) {
 	send_params(params);
 }
 
-function change_flicker_state(divid) {
+function changeFlickerState(id) {
 	deselectAll();
 
-	var switchArrows = function() {
-		switchElementsClass($('flicker_icon_l'), 'dbl_arrow_up', 'dbl_arrow_down');
-		switchElementsClass($('flicker_icon_r'), 'dbl_arrow_up', 'dbl_arrow_down');
-	};
+	var state = showHide(id);
 
-	var filter_state = showHide(divid);
-	switchArrows();
+	switchElementsClass($('flicker_icon_l'), 'dbl_arrow_up', 'dbl_arrow_down');
+	switchElementsClass($('flicker_icon_r'), 'dbl_arrow_up', 'dbl_arrow_down');
 
-	if (false === filter_state) {
-		return false;
-	}
+	send_params({
+		favaction: 'flop',
+		favobj: 'filter',
+		favref: id,
+		favstate: state
+	});
 
-	var params = {
-		'favaction': 'flop',
-		'favobj': 'filter',
-		'favref': divid,
-		'favstate': filter_state
-	};
-	send_params(params);
-
-	// selection box position
-	if (typeof(moveSBoxes) != 'undefined') {
-		moveSBoxes();
-	}
-
-	if (typeof(flickerResizeMultiselect) == 'undefined' && filter_state == 1) {
+	// resize multiselect
+	if (typeof(flickerResizeMultiselect) === 'undefined' && state == 1) {
 		flickerResizeMultiselect = true;
 
-		jQuery('#' + divid).multiSelect.resize();
+		if (jQuery('.multiselect').length > 0) {
+			jQuery('#' + id).multiSelect.resize();
+		}
 	}
 }
 
