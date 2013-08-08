@@ -276,7 +276,7 @@ switch ($data['method']) {
 				$hosts = API::Host()->get(array(
 					'editable' => isset($data['editable']) ? $data['editable'] : null,
 					'output' => array('hostid', 'name'),
-					'templated_hosts' => true,
+					'templated_hosts' => isset($data['templated_hosts']) ? $data['templated_hosts'] : null,
 					'startSearch' => true,
 					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
 					'limit' => $config['search_limit']

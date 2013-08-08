@@ -562,7 +562,8 @@
 					'selectedLimit' => 1,
 					'objectName' => 'hosts',
 					'objectOptions' => array(
-						'editable' => true
+						'editable' => true,
+						'templated_hosts' => true,
 					),
 					'data' => $hostFilterData
 				))
