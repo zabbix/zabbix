@@ -261,10 +261,14 @@ frontends/php/tests/selenium/testFormGraphPrototype.php -text
 frontends/php/tests/selenium/testFormWeb.php -text
 frontends/php/tests/selenium/testInheritanceGraphPrototype.php -text
 frontends/php/tests/selenium/testInheritanceWeb.php -text
+frontends/php/tests/selenium/testPageItemPrototypes.php -text
+frontends/php/tests/selenium/testPageTriggerPrototypes.php -text
+frontends/php/tests/selenium/testPageTriggers.php -text
 frontends/php/tests/selenium/testUrlParameters.php -text
 frontends/php/tests/selenium/testZBX6339.php -text
 frontends/php/tests/selenium/testZBX6648.php -text
 frontends/php/tests/selenium/testZBX6663.php -text
+include/zbxregexp.h -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
 man/zabbix_proxy.man -text
@@ -545,6 +549,7 @@ misc/init.d/tru64/zabbix_server -text
 src/libs/zbxalgo/vectorimpl.h -text
 src/libs/zbxdbcache/valuecache.c -text
 src/libs/zbxdbcache/valuecache.h -text
+src/libs/zbxregexp/Makefile.am -text
 src/libs/zbxsysinfo/aix/hostname.c -text
 src/libs/zbxsysinfo/aix/software.c -text
 src/libs/zbxsysinfo/freebsd/hostname.c -text

@@ -140,7 +140,7 @@ elseif (isset($_REQUEST['save'])) {
 	}
 	DBstart();
 	if (isset($_REQUEST['actionid'])) {
-		$action['actionid']= $_REQUEST['actionid'];
+		$action['actionid'] = $_REQUEST['actionid'];
 
 		$result = API::Action()->update($action);
 		show_messages($result, _('Action updated'), _('Cannot update action'));
@@ -180,6 +180,12 @@ elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) 
 		if ($newCondition) {
 			$conditions = get_request('conditions', array());
 
+			// when adding new maintenance, in order to check for an existing maintenance, it must have a not null value
+			if ($newCondition['conditiontype'] == CONDITION_TYPE_MAINTENANCE) {
+				$newCondition['value'] = '';
+			}
+
+			// check existing conditions and remove duplicate condition values
 			foreach ($conditions as $condition) {
 				if ($newCondition['conditiontype'] == $condition['conditiontype']) {
 					if (is_array($newCondition['value'])) {
@@ -190,30 +196,33 @@ elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) 
 						}
 					}
 					else {
-						if ($condition['value'] == $newCondition['value']) {
+						if ($newCondition['value'] == $condition['value']) {
 							$newCondition['value'] = null;
 						}
 					}
 				}
 			}
 
-			if (!zbx_empty($newCondition['value'])) {
-				$newConditionValues = zbx_toArray($newCondition['value']);
+			$validateConditions = $conditions;
 
+			if (isset($newCondition['value'])) {
+				$newConditionValues = zbx_toArray($newCondition['value']);
 				foreach ($newConditionValues as $newValue) {
 					$condition = $newCondition;
 					$condition['value'] = $newValue;
-
-					$_REQUEST['conditions'][] = $condition;
+					$validateConditions[] = $condition;
 				}
 			}
 
-			if ($_REQUEST['conditions']) {
-				CAction::validateConditions($_REQUEST['conditions']);
+			if ($validateConditions) {
+				CAction::validateConditions($validateConditions);
 			}
+
+			$_REQUEST['conditions'] = $validateConditions;
 		}
 	}
 	catch (APIException $e) {
+		show_error_message(_('Cannot add action condition'));
 		error($e->getMessage());
 	}
 }
@@ -398,7 +407,9 @@ if (isset($_REQUEST['form'])) {
 		}
 	}
 
-	if (empty($data['action']['actionid']) && !isset($_REQUEST['form_refresh'])) {
+	if (empty($data['action']['actionid'])
+			&& !isset($_REQUEST['form_refresh'])
+			&& $data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 		$data['action']['conditions'] = array(
 			array(
 				'conditiontype' => CONDITION_TYPE_TRIGGER_VALUE,

@@ -22,8 +22,8 @@
 #include "log.h"
 #include "zbxserver.h"
 #include "valuecache.h"
-
 #include "evalfunc.h"
+#include "zbxregexp.h"
 
 int	cmp_double(double a, double b)
 {
@@ -144,14 +144,14 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 		time_t now)
 {
 	const char			*__function_name = "evaluate_LOGEVENTID";
-	char				*arg1 = NULL, *arg1_esc;
+	char				*arg1 = NULL;
 	int				ret = FAIL;
-	ZBX_REGEXP			*regexps = NULL;
-	int				regexps_alloc = 0, regexps_num = 0;
+	zbx_vector_ptr_t		regexps;
 	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	zbx_vector_ptr_create(&regexps);
 	zbx_history_record_vector_create(&values);
 
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
@@ -164,25 +164,7 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 		goto out;
 
 	if ('@' == *arg1)
-	{
-		DB_RESULT	result;
-		DB_ROW		row;
-
-		arg1_esc = DBdyn_escape_string(arg1 + 1);
-		result = DBselect("select e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
-				" from regexps r,expressions e"
-				" where r.regexpid=e.regexpid"
-					" and r.name='%s'" ZBX_SQL_NODE,
-				arg1_esc, DBand_node_local("r.regexpid"));
-		zbx_free(arg1_esc);
-
-		while (NULL != (row = DBfetch(result)))
-		{
-			add_regexp_ex(&regexps, &regexps_alloc, &regexps_num,
-					arg1 + 1, row[0], atoi(row[1]), row[2][0], atoi(row[3]));
-		}
-		DBfree_result(result);
-	}
+		DCget_expressions_by_name(&regexps, arg1 + 1);
 
 	if (SUCCEED == zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) &&
 			0 < values.values_num)
@@ -191,7 +173,7 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 		size_t	size = 0, offset = 0;
 
 		zbx_snprintf_alloc(&logeventid, &size, &offset, "%d", values.values[0].value.log->logeventid);
-		if (SUCCEED == regexp_match_ex(regexps, regexps_num, logeventid, arg1, ZBX_CASE_SENSITIVE))
+		if (SUCCEED == regexp_match_ex(&regexps, logeventid, arg1, ZBX_CASE_SENSITIVE))
 			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 		else
 			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
@@ -203,13 +185,11 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGEVENTID is empty");
 
-	if ('@' == *arg1)
-	{
-		clean_regexps_ex(regexps, &regexps_num);
-		zbx_free(regexps);
-	}
 	zbx_free(arg1);
 out:
+	zbx_regexp_clean_expressions(&regexps);
+	zbx_vector_ptr_destroy(&regexps);
+
 	zbx_history_record_vector_destroy(&values, item->value_type);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
@@ -1390,7 +1370,7 @@ out:
 #define ZBX_FUNC_REGEXP		2
 #define ZBX_FUNC_IREGEXP	3
 
-static int	evaluate_STR_one(int func, ZBX_REGEXP *regexps, int regexps_num, const char *value, const char *arg1)
+static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *value, const char *arg1)
 {
 	switch (func)
 	{
@@ -1399,9 +1379,9 @@ static int	evaluate_STR_one(int func, ZBX_REGEXP *regexps, int regexps_num, cons
 				return SUCCEED;
 			break;
 		case ZBX_FUNC_REGEXP:
-			return regexp_match_ex(regexps, regexps_num, value, arg1, ZBX_CASE_SENSITIVE);
+			return regexp_match_ex(regexps, value, arg1, ZBX_CASE_SENSITIVE);
 		case ZBX_FUNC_IREGEXP:
-			return regexp_match_ex(regexps, regexps_num, value, arg1, ZBX_IGNORE_CASE);
+			return regexp_match_ex(regexps, value, arg1, ZBX_IGNORE_CASE);
 	}
 
 	return FAIL;
@@ -1410,16 +1390,14 @@ static int	evaluate_STR_one(int func, ZBX_REGEXP *regexps, int regexps_num, cons
 static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char			*__function_name = "evaluate_STR";
-	DB_RESULT			result;
-	DB_ROW				row;
-	char				*arg1 = NULL, *arg1_esc;
+	char				*arg1 = NULL;
 	int				arg2, flag, func, found = 0, i, ret = FAIL, seconds = 0, nvalues = 0;
-	ZBX_REGEXP			*regexps = NULL;
-	int				regexps_alloc = 0, regexps_num = 0;
+	zbx_vector_ptr_t		regexps;
 	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	zbx_vector_ptr_create(&regexps);
 	zbx_history_record_vector_create(&values);
 
 	if (ITEM_VALUE_TYPE_STR != item->value_type && ITEM_VALUE_TYPE_TEXT != item->value_type &&
@@ -1450,22 +1428,7 @@ static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const 
 	}
 
 	if ((ZBX_FUNC_REGEXP == func || ZBX_FUNC_IREGEXP == func) && '@' == *arg1)
-	{
-		arg1_esc = DBdyn_escape_string(arg1 + 1);
-		result = DBselect("select e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
-				" from regexps r,expressions e"
-				" where r.regexpid=e.regexpid"
-					" and r.name='%s'" ZBX_SQL_NODE,
-				arg1_esc, DBand_node_local("r.regexpid"));
-		zbx_free(arg1_esc);
-
-		while (NULL != (row = DBfetch(result)))
-		{
-			add_regexp_ex(&regexps, &regexps_alloc, &regexps_num,
-					arg1 + 1, row[0], atoi(row[1]), row[2][0], atoi(row[3]));
-		}
-		DBfree_result(result);
-	}
+		DCget_expressions_by_name(&regexps, arg1 + 1);
 
 	if (ZBX_FLAG_SEC == flag)
 		seconds = arg2;
@@ -1486,7 +1449,7 @@ static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const 
 	{
 		for (i = 0; i < values.values_num; i++)
 		{
-			if (SUCCEED == evaluate_STR_one(func, regexps, regexps_num, values.values[i].value.log->value, arg1))
+			if (SUCCEED == evaluate_STR_one(func, &regexps, values.values[i].value.log->value, arg1))
 			{
 				found = 1;
 				break;
@@ -1497,7 +1460,7 @@ static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const 
 	{
 		for (i = 0; i < values.values_num; i++)
 		{
-			if (SUCCEED == evaluate_STR_one(func, regexps, regexps_num, values.values[i].value.str, arg1))
+			if (SUCCEED == evaluate_STR_one(func, &regexps, values.values[i].value.str, arg1))
 			{
 				found = 1;
 				break;
@@ -1508,10 +1471,10 @@ static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const 
 	zbx_snprintf(value, MAX_BUFFER_LEN, "%d", found);
 	ret = SUCCEED;
 out:
-	zbx_history_record_vector_destroy(&values, item->value_type);
+	zbx_regexp_clean_expressions(&regexps);
+	zbx_vector_ptr_destroy(&regexps);
 
-	clean_regexps_ex(regexps, &regexps_num);
-	zbx_free(regexps);
+	zbx_history_record_vector_destroy(&values, item->value_type);
 
 	zbx_free(arg1);
 
@@ -1576,9 +1539,10 @@ clean:
 static int	evaluate_FUZZYTIME(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char			*__function_name = "evaluate_FUZZYTIME";
-	int				arg1, flag, fuzlow, fuzhig, ret = FAIL;
+	int				arg1, flag, ret = FAIL;
 	zbx_vector_history_record_t	values;
 	history_value_t			*lastvalue;
+	zbx_uint64_t			fuzlow, fuzhig;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1590,7 +1554,7 @@ static int	evaluate_FUZZYTIME(char *value, DB_ITEM *item, const char *function, 
 	if (1 < num_param(parameters))
 		goto out;
 
-	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
+	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || now <= arg1)
 		goto out;
 
 	if (ZBX_FLAG_SEC != flag)
