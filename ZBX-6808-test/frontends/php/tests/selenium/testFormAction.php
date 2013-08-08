@@ -29,17 +29,113 @@ class testFormAction extends CWebTest {
 	public static function layout() {
 		return array(
 			array(
-				array('event_source' => 'Triggers',)
+				array('event_source' => 'Triggers')
 			),
 			array(
-				array('event_source' => 'Discovery',)
+				array('event_source' => 'Triggers', 'recovery_msg' => 'true')
 			),
 			array(
-				array('event_source' => 'Auto registration',)
+				array('event_source' => 'Triggers', 'evaltype' => 'AND')
 			),
 			array(
-				array('event_source' => 'Internal',)
-			)
+				array('event_source' => 'Triggers', 'evaltype' => 'OR')
+			),
+		/*	array(
+				array('event_source' => 'Triggers', 'new_condition_conditiontype' => 'Application')
+			),
+			array(
+				array('event_source' => 'Triggers', 'new_condition_conditiontype' => 'Host group')
+			),
+			array(
+				array('event_source' => 'Triggers', 'new_condition_conditiontype' => 'Template')
+			),
+			array(
+				array('event_source' => 'Triggers', 'new_condition_conditiontype' => 'Host')
+			),
+			array(
+				array('event_source' => 'Triggers', 'new_condition_conditiontype' => 'Trigger')
+			),
+			array(
+				array('event_source' => 'Triggers', 'new_condition_conditiontype' => 'Trigger name')
+			),
+			array(
+				array('event_source' => 'Triggers', 'new_condition_conditiontype' => 'Trigger severity')
+			),
+			array(
+				array('event_source' => 'Triggers', 'new_condition_conditiontype' => 'Trigger value')
+			),
+			array(
+				array('event_source' => 'Triggers', 'new_condition_conditiontype' => 'Time period')
+			),
+			array(
+				array('event_source' => 'Triggers', 'new_condition_conditiontype' => 'Maintenance status')
+			),
+			array(
+				array('event_source' => 'Discovery')
+			),
+			array(
+				array('event_source' => 'Discovery', 'new_condition_conditiontype' => 'Host IP')
+			),
+			array(
+				array('event_source' => 'Discovery', 'new_condition_conditiontype' => 'Service type')
+			),
+			array(
+				array('event_source' => 'Discovery', 'new_condition_conditiontype' => 'Service port')
+			),
+			array(
+				array('event_source' => 'Discovery', 'new_condition_conditiontype' => 'Discovery rule')
+			),
+			array(
+				array('event_source' => 'Discovery', 'new_condition_conditiontype' => 'Discovery check')
+			),
+			array(
+				array('event_source' => 'Discovery', 'new_condition_conditiontype' => 'Discovery object')
+			),
+			array(
+				array('event_source' => 'Discovery', 'new_condition_conditiontype' => 'Discovery status')
+			),
+			array(
+				array('event_source' => 'Discovery', 'new_condition_conditiontype' => 'Uptime/Downtime')
+			),
+			array(
+				array('event_source' => 'Discovery', 'new_condition_conditiontype' => 'Received value')
+			),
+			array(
+				array('event_source' => 'Discovery', 'new_condition_conditiontype' => 'Proxy')
+			),
+			array(
+				array('event_source' => 'Auto registration')
+			),
+			array(
+				array('event_source' => 'Auto registration', 'new_condition_conditiontype' => 'Host name')
+			),
+			array(
+				array('event_source' => 'Auto registration', 'new_condition_conditiontype' => 'Proxy')
+			),
+			array(
+				array('event_source' => 'Auto registration', 'new_condition_conditiontype' => 'Host metadata')
+			),
+			array(
+				array('event_source' => 'Internal')
+			),
+			array(
+				array('event_source' => 'Internal', 'recovery_msg' => 'true')
+			),
+			array(
+				array('event_source' => 'Internal', 'new_condition_conditiontype' => 'Application')
+			),
+			array(
+				array('event_source' => 'Internal', 'new_condition_conditiontype' => 'Event type')
+			),
+			array(
+				array('event_source' => 'Internal', 'new_condition_conditiontype' => 'Host group')
+			),
+			array(
+				array('event_source' => 'Internal', 'new_condition_conditiontype' => 'Template')
+			),
+			array(
+				array('event_source' => 'Internal', 'new_condition_conditiontype' => 'Host')
+			)*/
 		);
 	}
 
@@ -48,11 +144,33 @@ class testFormAction extends CWebTest {
 	 */
 	public function testFormAction_CheckLayout($data) {
 		$this->zbxTestLogin('actionconf.php');
-			if (isset($data['event_source'])) {
-				$this->zbxTestDropdownSelectWait('//select[@id=\'eventsource\']', $data['event_source']);
-			}
+		if (isset($data['event_source'])) {
+			$this->zbxTestDropdownSelectWait('//select[@id=\'eventsource\']', $data['event_source']);
+		}
 		$eventsource = $this->getSelectedLabel('//select[@id=\'eventsource\']');
 		$this->zbxTestClickWait('form');
+
+		if (isset($data['recovery_msg'])) {
+			$this->zbxTestCheckboxSelect('recovery_msg');
+			$this->wait();
+			$recovery_msg = true;
+		}
+		else {
+			$recovery_msg = false;
+		}
+
+		if (isset($data['new_condition_conditiontype'])) {
+			$this->zbxTestDropdownSelectWait('//select[@id=\'new_condition_conditiontype\']', $data['new_condition_conditiontype']);
+		}
+		$new_condition_conditiontype = $this->getSelectedLabel('//select[@id=\'new_condition_conditiontype\']');
+
+		if ($eventsource == 'Triggers') {
+			if (isset($data['evaltype'])) {
+				$this->zbxTestDropdownSelectWait('//select[@id=\'evaltype\']', $data['evaltype']);
+			}
+			$evaltype = $this->getSelectedLabel('//select[@id=\'evaltype\']');
+		}
+
 
 		$this->checkTitle('Configuration of actions');
 		$this->zbxTestTextPresent(array(
@@ -132,29 +250,79 @@ class testFormAction extends CWebTest {
 			$this->assertElementNotPresent("//input[@type='checkbox' and @id='recovery_msg']");
 		}
 
+		if ($recovery_msg == true) {
+			$this->zbxTestTextPresent('Recovery subject');
+			$this->assertVisible('r_shortdata');
+			$this->assertAttribute("//input[@id='r_shortdata']/@maxlength", 255);
+			$this->assertAttribute("//input[@id='r_shortdata']/@size", 50);
+			switch ($eventsource) {
+				case 'Triggers':
+					$this->assertAttribute('//input[@id=\'r_shortdata\']/@value', '{TRIGGER.STATUS}: {TRIGGER.NAME}');
+					break;
+				case 'Internal':
+					$this->assertEquals($this->getValue('r_shortdata'), "");
+					break;
+			}
+
+			$this->zbxTestTextPresent('Recovery message');
+			$this->assertVisible('r_longdata');
+			$this->assertAttribute("//textarea[@id='r_longdata']/@rows", 7);
+			switch ($eventsource) {
+				case 'Triggers':
+					$r_longdata_val = 'Trigger: {TRIGGER.NAME}'.
+						' Trigger status: {TRIGGER.STATUS}'.
+						' Trigger severity: {TRIGGER.SEVERITY}'.
+						' Trigger URL: {TRIGGER.URL}'.
+						' Item values:'.
+						' 1. {ITEM.NAME1} ({HOST.NAME1}:{ITEM.KEY1}): {ITEM.VALUE1}'.
+						' 2. {ITEM.NAME2} ({HOST.NAME2}:{ITEM.KEY2}): {ITEM.VALUE2}'.
+						' 3. {ITEM.NAME3} ({HOST.NAME3}:{ITEM.KEY3}): {ITEM.VALUE3}'.
+						' Original event ID: {EVENT.ID}';
+						break;
+				case 'Internal':
+					$r_longdata_val = "";
+					break;
+			}
+			$this->assertEquals($this->getText('r_longdata'), $r_longdata_val);
+		}
+		elseif ($eventsource == 'Triggers') {
+			$this->assertNotVisible('r_shortdata');
+			$this->assertNotVisible('r_longdata');
+		}
+		else {
+			$this->assertElementNotPresent('r_shortdata');
+			$this->assertElementNotPresent('r_longdata');
+		}
+
 		$this->zbxTestTextPresent('Enabled');
 		$this->assertElementPresent('status');
 		$this->assertElementPresent("//input[@type='checkbox' and @id='status']");
 		$this->assertAttribute("//*[@id='status']/@checked", 'checked');
 
 		$this->zbxTestClick('link=Conditions');
+
 		if ($eventsource == 'Triggers') {
-			$this->zbxTestTextPresent(array(
-					'Type of calculation', '(A) and (B)'
-			));
+			$this->zbxTestTextPresent('Type of calculation');
 			$this->assertElementPresent('evaltype');
 			$this->zbxTestDropdownHasOptions('evaltype', array(
 					'AND / OR',
 					'AND',
 					'OR'
 			));
-			$this->assertAttribute('//*[@id=\'evaltype\']/option[text()=\'AND / OR\']/@selected', 'selected');
+			$this->assertAttribute('//*[@id=\'evaltype\']/option[text()=\''.$evaltype.'\']/@selected', 'selected');
+			switch ($evaltype) {
+				case 'AND / OR':
+				case 'AND':
+					$this->zbxTestTextPresent('(A) and (B)');
+					break;
+				default:
+					$this->zbxTestTextPresent('(A) or (B)');
+					break;
+			}
 		}
 		else {
-			$this->zbxTestTextNotPresent(array(
-					'Type of calculation', '(A) and (B)'
-			));
-			$this->assertNotVisible('evaltype');
+			$this->zbxTestTextPresent('Type of calculation');
+			$this->assertElementPresent('evaltype');
 		}
 
 		$this->zbxTestTextPresent(array(
@@ -230,66 +398,283 @@ class testFormAction extends CWebTest {
 				break;
 		}
 
-
-		switch ($eventsource) {
-			case 'Triggers':
-				$this->assertAttribute('//*[@id=\'new_condition_conditiontype\']/option[text()=\'Trigger name\']/@selected', 'selected');
-				break;
-			case 'Discovery':
-				$this->assertAttribute('//*[@id=\'new_condition_conditiontype\']/option[text()=\'Host IP\']/@selected', 'selected');
-				break;
-			case 'Auto registration':
-				$this->assertAttribute('//*[@id=\'new_condition_conditiontype\']/option[text()=\'Host name\']/@selected', 'selected');
-				break;
-			case 'Internal':
-				$this->assertAttribute('//*[@id=\'new_condition_conditiontype\']/option[text()=\'Application\']/@selected', 'selected');
-				break;
+		if (isset($data['new_condition_conditiontype'])) {
+			$this->assertAttribute('//*[@id=\'new_condition_conditiontype\']/option[text()=\''.
+				$new_condition_conditiontype.'\']/@selected', 'selected');
+		}
+		else {
+			switch ($eventsource) {
+				case 'Triggers':
+					$this->assertAttribute('//*[@id=\'new_condition_conditiontype\']/option[text()=\'Trigger name\']/@selected', 'selected');
+					break;
+				case 'Discovery':
+					$this->assertAttribute('//*[@id=\'new_condition_conditiontype\']/option[text()=\'Host IP\']/@selected', 'selected');
+					break;
+				case 'Auto registration':
+					$this->assertAttribute('//*[@id=\'new_condition_conditiontype\']/option[text()=\'Host name\']/@selected', 'selected');
+					break;
+				case 'Internal':
+					$this->assertAttribute('//*[@id=\'new_condition_conditiontype\']/option[text()=\'Application\']/@selected', 'selected');
+					break;
+			}
 		}
 
-
 		$this->assertElementPresent('new_condition_operator');
-		switch ($eventsource) {
-			case 'Discovery':
+
+		switch ($new_condition_conditiontype) {
+			case 'Application':
+				$this->zbxTestDropdownHasOptions('new_condition_operator', array(
+						'=',
+						'like',
+						'not like'
+				));
+				break;
+			case 'Host group':
+			case 'Template':
+			case 'Host':
+			case 'Trigger':
+			case 'Host IP':
+			case 'Service type':
+			case 'Discovery rule':
+			case 'Discovery check':
+			case 'Proxy':
 				$this->zbxTestDropdownHasOptions('new_condition_operator', array(
 						'=',
 						'<>'
 				));
+				$this->assertAttribute('//*[@id=\'new_condition_operator\']/option[text()=\'=\']/@selected', 'selected');
 				break;
-			default:
+			case 'Trigger name':
+			case 'Host name':
+			case 'Host metadata':
 				$this->zbxTestDropdownHasOptions('new_condition_operator', array(
 						'like',
 						'not like'
 				));
 				break;
+			case 'Trigger severity':
+				$this->zbxTestDropdownHasOptions('new_condition_operator', array(
+						'=',
+						'<>',
+						'>=',
+						'<='
+				));
+				break;
+			case 'Trigger value':
+			case 'Discovery object':
+			case 'Discovery status':
+			case 'Event type':
+				$this->zbxTestDropdownHasOptions('new_condition_operator', array(
+						'='
+				));
+				break;
+			case 'Time period':
+			case 'Maintenance status':
+				$this->zbxTestDropdownHasOptions('new_condition_operator', array(
+						'in',
+						'not in'
+				));
+				$this->assertAttribute('//*[@id=\'new_condition_operator\']/option[text()=\'in\']/@selected', 'selected');
+				break;
+			case 'Uptime/Downtime':
+				$this->zbxTestDropdownHasOptions('new_condition_operator', array(
+						'>=',
+						'<='
+				));
+				$this->assertAttribute('//*[@id=\'new_condition_operator\']/option[text()=\'>=\']/@selected', 'selected');
+				break;
+			case 'Received value':
+				$this->zbxTestDropdownHasOptions('new_condition_operator', array(
+						'=',
+						'<>',
+						'>=',
+						'<=',
+						'like',
+						'not like'
+				));
+				$this->assertAttribute('//*[@id=\'new_condition_operator\']/option[text()=\'>=\']/@selected', 'selected');
+				break;
 		}
 
-		switch ($eventsource) {
-			case 'Triggers':
-			case 'Auto registration':
-			case 'Internal':
-				$this->assertAttribute('//*[@id=\'new_condition_operator\']/option[text()=\'like\']/@selected', 'selected');
+		switch ($new_condition_conditiontype) {
+			case 'Application':
+			case 'Trigger name':
+			case 'Host IP':
+			case 'Uptime/Downtime':
+			case 'Received value':
+			case 'Host name':
+			case 'Host metadata':
+				$this->assertElementPresent('//input[@id=\'new_condition_value\']');
 				break;
 			default:
-				$this->assertElementNotPresent('//*[@id=\'new_condition_operator\']/option[text()=\'like\']/@selected');
+				$this->assertElementPresent('//input[@id=new_condition_value]');
 				break;
 		}
 
-		$this->assertElementPresent('new_condition_value');
-		$this->assertAttribute('//input[@id=\'new_condition_value\']/@maxlength', 255);
-		$this->assertAttribute('//input[@id=\'new_condition_value\']/@size', 50);
-		switch ($eventsource) {
-			case 'Discovery':
-				$this->assertEquals($this->getValue('new_condition_value'), '192.168.0.1-127,192.168.2.1');
+		switch ($new_condition_conditiontype) {
+			case 'Application':
+			case 'Trigger name':
+			case 'Host IP':
+			case 'Received value':
+			case 'Host name':
+			case 'Host metadata':
+				$this->assertAttribute('//input[@id=\'new_condition_value\']/@maxlength', 255);
+				$this->assertAttribute('//input[@id=\'new_condition_value\']/@size', 50);
+				break;
+			case 'Uptime/Downtime':
+				$this->assertAttribute('//input[@id=\'new_condition_value\']/@maxlength', 15);
+				$this->assertAttribute('//input[@id=\'new_condition_value\']/@size', 15);
+				break;
+		}
+
+		switch ($new_condition_conditiontype) {
+			case 'Application':
+			case 'Trigger name':
+			case 'Received value':
+			case 'Host name':
+			case 'Host metadata':
+				$this->assertEquals($this->getValue('//input[@id=\'new_condition_value\']'), "");
+				break;
+			case 'Time period':
+				$this->assertEquals($this->getValue('//input[@id=\'new_condition_value\']'), '1-7,00:00-24:00');
+				break;
+			case 'Host IP':
+				$this->assertEquals($this->getValue('//input[@id=\'new_condition_value\']'), '192.168.0.1-127,192.168.2.1');
+				break;
+			case 'Uptime/Downtime':
+				$this->assertEquals($this->getValue('//input[@id=\'new_condition_value\']'), 600);
+				break;
+		}
+
+		switch ($new_condition_conditiontype) {
+			case 'Host group':
+			case 'Template':
+			case 'Host':
+			case 'Trigger':
+				$this->assertElementPresent('//div[@id=\'new_condition_value__\']/input');
+				$this->assertEquals($this->getValue('//div[@id=\'new_condition_value__\']/input'), "");
 				break;
 			default:
-				$this->assertEquals($this->getValue('new_condition_value'), "");
+				$this->assertElementNotPresent("//div[@id='new_condition_value__']/input");
+				break;
+		}
+
+		switch ($new_condition_conditiontype) {
+			case 'Trigger severity':
+			case 'Trigger value':
+			case 'Service type':
+			case 'Discovery object':
+			case 'Discovery status':
+			case 'Event type':
+				$this->assertElementPresent('//select[@id=\'new_condition_value\']');
+				break;
+			default:
+				$this->assertElementNotPresent('//select[@id=\'new_condition_value\']');
+				break;
+		}
+
+		switch ($new_condition_conditiontype) {
+			case 'Trigger severity':
+				$this->zbxTestDropdownHasOptions('new_condition_value', array(
+						'Not classified',
+						'Information',
+						'Warning',
+						'Average',
+						'High',
+						'Disaster'
+				));
+				break;
+			case 'Trigger value':
+				$this->zbxTestDropdownHasOptions('new_condition_value', array(
+						'OK',
+						'PROBLEM'
+				));
+			case 'Service type':
+				$this->zbxTestDropdownHasOptions('new_condition_value', array(
+						'SSH',
+						'LDAP',
+						'SMTP',
+						'FTP',
+						'HTTP',
+						'HTTPS',
+						'POP',
+						'NNTP',
+						'IMAP',
+						'TCP',
+						'Zabbix agent',
+						'SNMPv1 agent',
+						'SNMPv2 agent',
+						'SNMPv3 agent',
+						'ICMP ping',
+						'Telnet'
+				));
+				break;
+			case 'Discovery object':
+				$this->zbxTestDropdownHasOptions('new_condition_value', array(
+						'Device',
+						'Service'
+				));
+				break;
+			case 'Discovery status':
+				$this->zbxTestDropdownHasOptions('new_condition_value', array(
+						'Up',
+						'Down',
+						'Discovered',
+						'Lost'
+				));
+				break;
+			case 'Event type':
+				$this->zbxTestDropdownHasOptions('new_condition_value', array(
+						'Item in "not supported" state',
+						'Item in "normal" state',
+						'Low-level discovery rule in "not supported" state',
+						'Low-level discovery rule in "normal" state',
+						'Trigger in "unknown" state',
+						'Trigger in "normal" state'
+				));
+				break;
+		}
+
+		switch ($new_condition_conditiontype) {
+			case 'Trigger severity':
+				$this->assertAttribute('//*[@id=\'new_condition_value\']/option[text()=\'Not classified\']/@selected', 'selected');
+				break;
+			case 'Event type':
+				$this->assertAttribute('//*[@id=\'new_condition_value\']/option[text()=\'Item in "not supported" state\']/@selected', 'selected');
+				break;
+		}
+
+		switch ($new_condition_conditiontype) {
+			case 'Maintenance status':
+				$this->assertElementPresent('//td[text()=\'maintenance\']');
+				break;
+			default:
+				$this->assertElementNotPresent('//td[text()=\'maintenance\']');
+				break;
+		}
+
+		switch ($new_condition_conditiontype) {
+			case 'Discovery rule':
+			case 'Discovery check':
+			case 'Proxy':
+				$this->assertElementPresent('//input[@id=\'drule\']');
+				$this->assertAttribute('//input[@id=\'drule\']/@maxlength', 255);
+				$this->assertAttribute('//input[@id=\'drule\']/@size', 50);
+				$this->assertAttribute('//input[@id=\'drule\']/@readonly', 'readonly');
+
+				$this->assertElementPresent('//input[@id=\'btn1\']');
+				$this->assertAttribute('//input[@id=\'btn1\']/@value', 'Select');
+				break;
+			default:
+				$this->assertElementNotPresent('//input[@id=\'drule\']');
+				$this->assertElementNotPresent('//input[@id=\'btn1\']');
 				break;
 		}
 
 		$this->assertElementPresent('add_condition');
 		$this->assertAttribute('//input[@id=\'add_condition\']/@value','Add');
 
-		$this->zbxTestClick('link=Conditions');
+		$this->zbxTestClick('link=Operations');
 
 		switch ($eventsource) {
 			case 'Triggers':
