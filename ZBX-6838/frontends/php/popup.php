@@ -172,7 +172,6 @@ $fields = array(
 	'templated_hosts' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'real_hosts' =>					array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'normal_only' =>				array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'simpleName' =>					array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'with_applications' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'with_graphs' =>				array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'with_items' =>					array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
@@ -216,7 +215,6 @@ $srcfld3 = get_request('srcfld3', null); //  source table field [can be differen
 $multiselect = get_request('multiselect', 0); // if create popup with checkboxes
 $dstact = get_request('dstact', '');
 $writeonly = get_request('writeonly');
-$simpleName = get_request('simpleName');
 $withApplications = get_request('with_applications', 0);
 $withGraphs = get_request('with_graphs', 0);
 $withItems = get_request('with_items', 0);
@@ -832,7 +830,7 @@ elseif ($srctbl == 'items') {
 
 		$item['name'] = itemName($item);
 		$description = new CLink($item['name'], '#');
-		$item['name'] = ($onlyHostid) ? $item['name'] : $item['hostname'].NAME_DELIMITER.$item['name'];
+		$item['name'] = $item['hostname'].NAME_DELIMITER.$item['name'];
 
 		if ($multiselect) {
 			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($item['itemid']).');';
@@ -1085,11 +1083,8 @@ elseif ($srctbl == 'graphs') {
 	foreach ($graphs as $graph) {
 		$host = reset($graph['hosts']);
 		$graph['hostname'] = $host['name'];
-
-		if (!$simpleName) {
-			$graph['name'] = $graph['hostname'].NAME_DELIMITER.$graph['name'];
-		}
 		$description = new CSpan($graph['name'], 'link');
+		$graph['name'] = $graph['hostname'].NAME_DELIMITER.$graph['name'];
 
 		if ($multiselect) {
 			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($graph['graphid']).');';
