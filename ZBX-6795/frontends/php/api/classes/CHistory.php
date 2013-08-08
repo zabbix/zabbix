@@ -89,9 +89,9 @@ class CHistory extends CZBXAPI {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
-		$tableName = CHistoryManager::getTableName($options['history'])
-			? CHistoryManager::getTableName($options['history'])
-			: 'history';
+		if (!$tableName = CHistoryManager::getTableName($options['history'])) {
+			$tableName = 'history';
+		}
 		$sqlParts['from']['history'] = $tableName.' h';
 
 		// editable + PERMISSION CHECK
