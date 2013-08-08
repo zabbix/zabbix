@@ -155,7 +155,7 @@ class CPie extends CGraphDraw {
 			}
 		}
 		if ($lastValueItems) {
-			$history = Manager::History()->fetchLast($lastValueItems);
+			$history = Manager::History()->getLast($lastValueItems);
 		}
 
 		for ($i = 0; $i < $this->num; $i++) {
