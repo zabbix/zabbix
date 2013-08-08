@@ -23,12 +23,12 @@ require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 class testFormAction extends CWebTest {
 
 	public function testFormAction_Setup() {
-	//	DBsave_tables('actions');
+		DBsave_tables('actions');
 	}
 
 	public static function layout() {
 		return array(
-			array(
+		/*	array(
 				array('event_source' => 'Triggers')
 			),
 			array(
@@ -135,7 +135,7 @@ class testFormAction extends CWebTest {
 			),
 			array(
 				array('event_source' => 'Internal', 'new_condition_conditiontype' => 'Host')
-			)
+			)*/
 		);
 	}
 
@@ -505,6 +505,8 @@ class testFormAction extends CWebTest {
 				$this->assertElementPresent('//input[@id=\'new_condition_value\']');
 				break;
 			case 'Proxy':
+			case 'Discovery rule':
+			case 'Discovery check':
 				$this->assertNotVisible('//input[@id=\'new_condition_value\']');
 				break;
 			default:
@@ -661,14 +663,22 @@ class testFormAction extends CWebTest {
 
 		switch ($new_condition_conditiontype) {
 			case 'Discovery rule':
+				$this->assertElementPresent('//input[@id=\'drule\']');
+				$this->assertAttribute('//input[@id=\'drule\']/@maxlength', 255);
+				$this->assertAttribute('//input[@id=\'drule\']/@size', 50);
+				$this->assertAttribute('//input[@id=\'drule\']/@readonly', 'readonly');
+				break;
+			default:
+				$this->assertElementNotPresent('//input[@id=\'drule\']');
+				break;
+		}
+
+		switch ($new_condition_conditiontype) {
 			case 'Discovery check':
 				$this->assertElementPresent('//input[@id=\'dcheck\']');
 				$this->assertAttribute('//input[@id=\'dcheck\']/@maxlength', 255);
 				$this->assertAttribute('//input[@id=\'dcheck\']/@size', 50);
 				$this->assertAttribute('//input[@id=\'dcheck\']/@readonly', 'readonly');
-
-				$this->assertElementPresent('//input[@id=\'btn1\']');
-				$this->assertAttribute('//input[@id=\'btn1\']/@value', 'Select');
 				break;
 			default:
 				$this->assertElementNotPresent('//input[@id=\'dcheck\']');
@@ -981,7 +991,53 @@ class testFormAction extends CWebTest {
 		$this->zbxTestTextPresent('Action added');
 	}
 */
+
+	public static function update() {
+		return DBdata(
+			'SELECT name, eventsource FROM actions where eventsource = 2');
+	}
+
+	/**
+	 * @dataProvider update
+	 */
+	public function testFormAction_SimpleUpdate($data) {
+		$name = $data['name'];
+		$eventsource = $data['eventsource'];
+
+		$sqlActions = "SELECT * FROM actions ORDER BY actionid";
+		$oldHashActions = DBhash($sqlActions);
+
+		$this->zbxTestLogin('actionconf.php');
+		switch ($eventsource) {
+			case EVENT_SOURCE_TRIGGERS:
+				$this->zbxTestDropdownSelectWait('//select[@id=\'eventsource\']', 'Triggers');
+				break;
+			case EVENT_SOURCE_DISCOVERY:
+				$this->zbxTestDropdownSelectWait('//select[@id=\'eventsource\']', 'Discovery');
+				break;
+			case EVENT_SOURCE_AUTO_REGISTRATION:
+				$this->zbxTestDropdownSelectWait('//select[@id=\'eventsource\']', 'Auto registration');
+				break;
+			case EVENT_SOURCE_INTERNAL;
+				$this->zbxTestDropdownSelectWait('//select[@id=\'eventsource\']', 'Internal');
+				break;
+		}
+
+		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestClickWait('save');
+		$this->checkTitle('Configuration of actions');
+		$this->zbxTestTextPresent(array(
+				'Action updated',
+				'CONFIGURATION OF ACTIONS',
+				'Actions',
+				$name
+		));
+
+		$this->assertEquals($oldHashActions, DBhash($sqlActions));
+	}
+
+
 	public function testFormAction_Teardown() {
-	//	DBrestore_tables('actions');
+		DBrestore_tables('actions');
 	}
 }
