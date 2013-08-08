@@ -320,7 +320,7 @@ class CPie extends CGraphDraw {
 						'units' => $this->items[$i]['units']
 					)),
 					$proc
-					);
+				);
 
 				$str = sprintf('%s: %s [%s] ',
 					str_pad($this->items[$i]['host'], $max_host_len, ' '),
