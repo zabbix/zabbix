@@ -87,12 +87,21 @@ $_REQUEST['type'] = isset($_REQUEST['type']) ? TRIGGER_MULT_EVENT_ENABLED : TRIG
 $_REQUEST['go'] = get_request('go', 'none');
 
 // validate permissions
-if (get_request('triggerid') && !API::Trigger()->isWritable(array($_REQUEST['triggerid'])) ||
-		get_request('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid']))
-	) {
+if (get_request('triggerid')) {
+	$triggers = API::Trigger()->get(array(
+		'triggerids' => $_REQUEST['triggerid'],
+		'output' => array('triggerid'),
+		'preservekeys' => true,
+		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
+		'editable' => true
+	));
+	if (!$triggers) {
+		access_deny();
+	}
+}
+if (get_request('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid']))) {
 	access_deny();
 }
-
 /*
  * Actions
  */
@@ -129,15 +138,14 @@ elseif (isset($_REQUEST['save'])) {
 		'dependencies' => zbx_toObject(get_request('dependencies', array()), 'triggerid')
 	);
 
-	if (isset($_REQUEST['triggerid'])) {
+	if (get_request('triggerid')) {
 		// update only changed fields
 		$oldTrigger = API::Trigger()->get(array(
 			'triggerids' => $_REQUEST['triggerid'],
 			'output' => API_OUTPUT_EXTEND,
 			'selectDependencies' => array('triggerid'),
-			'editable' => true
 		));
-		if (empty($oldTrigger)) {
+		if (!$oldTrigger) {
 			access_deny();
 		}
 
