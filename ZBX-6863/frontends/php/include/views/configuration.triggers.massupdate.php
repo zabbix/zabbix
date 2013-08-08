@@ -57,14 +57,17 @@ foreach ($this->data['g_triggerid'] as $triggerid) {
 $triggersFormList = new CFormList('triggersFormList');
 
 // append severity to form list
-$severityDiv = new CSeverity(array('name' => 'priority'));
-$severityDiv->setAttribute('id', 'priority_div');
+$severityDiv = new CSeverity(array(
+	'id' => 'priority_div',
+	'name' => 'priority',
+	'value' => $this->data['priority']
+));
 
 $triggersFormList->addRow(
 	array(
 		_('Severity'),
 		SPACE,
-		new CVisibilityBox('visible[priority]', !empty($this->data['visible']['priority']) ? 'yes' : 'no', 'priority_div', _('Original')),
+		new CVisibilityBox('visible[priority]', !empty($this->data['visible']['priority']), 'priority_div', _('Original')),
 	),
 	$severityDiv
 );

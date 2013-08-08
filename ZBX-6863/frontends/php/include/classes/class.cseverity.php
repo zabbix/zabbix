@@ -22,30 +22,37 @@
 class CSeverity extends CTag {
 
 	/**
+	 * @param string $options['id']
 	 * @param string $options['name']
 	 * @param int    $options['value']
 	 */
 	public function __construct(array $options = array()) {
 		parent::__construct('div', 'yes');
-		$this->attr('id', zbx_formatDomId($options['name']));
+		$this->attr('id', isset($options['id']) ? $options['id'] : zbx_formatDomId($options['name']));
 		$this->addClass('jqueryinputset control-severity');
 
 		if (!isset($options['value'])) {
 			$options['value'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 		}
 
-		$controls = array();
-
+		$items = array();
 		$jsIds = '';
 		$jsLabels = '';
 
 		foreach (getSeverityCaption() as $severity => $caption) {
-			$controls[] = new CRadioButton($options['name'], $severity, null, $options['name'].'_'.$severity, ($options['value'] == $severity));
+			$items[] = new CRadioButton($options['name'], $severity, null, $options['name'].'_'.$severity, ($options['value'] == $severity));
+
+			$css = getSeverityStyle($severity);
 
 			$label = new CLabel($caption, $options['name'].'_'.$severity, $options['name'].'_label_'.$severity);
 			$label->attr('data-severity', $severity);
-			$label->attr('data-severity-style', getSeverityStyle($severity));
-			$controls[] = $label;
+			$label->attr('data-severity-style', $css);
+
+			if ($options['value'] == $severity) {
+				$label->addClass($css);
+			}
+
+			$items[] = $label;
 
 			$jsIds .= ', #'.$options['name'].'_'.$severity;
 			$jsLabels .= ', #'.$options['name'].'_label_'.$severity;
@@ -56,34 +63,25 @@ class CSeverity extends CTag {
 			$jsLabels = substr($jsLabels, 2);
 		}
 
-		$this->addItem($controls);
+		$this->addItem($items);
 
 		insert_js('
-			jQuery("'.$jsIds.'").change(function() {
-				jQuery("#'.$this->getAttribute('id').' label").each(function(i, obj) {
-					obj = jQuery(obj);
-					obj.removeClass(obj.data("severityStyle"));
+			jQuery("'.$jsLabels.'").mouseenter(function() {
+				jQuery("'.$jsLabels.'").each(function() {
+					var obj = jQuery(this);
+
+					if (obj.attr("aria-pressed") == "false") {
+						obj.removeClass("ui-state-hover " + obj.data("severityStyle"));
+					}
 				});
 
-				var label = jQuery("#'.$options['name'].'_label_" + jQuery(this).val());
-				label.addClass(label.data("severityStyle"));
-			});
-
-			jQuery("'.$jsLabels.'").mouseenter(function() {
 				var obj = jQuery(this);
 
 				obj.addClass(obj.data("severityStyle"));
 			})
 			.mouseleave(function() {
-				var obj = jQuery(this);
-
-				if (!jQuery("#" + obj.attr("for")).prop("checked")) {
-					obj.removeClass(obj.data("severityStyle"));
-				}
-			});
-
-			// click on selected severity on form load
-			jQuery("input[name=\''.$options['name'].'\']:checked").change();'
+				jQuery("#'.$this->getAttribute('id').' [aria-pressed=\"true\"]").trigger("mouseenter");
+			});'
 		, true);
 	}
 }
