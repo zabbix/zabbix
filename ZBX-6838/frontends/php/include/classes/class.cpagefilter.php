@@ -521,7 +521,6 @@ class CPageFilter {
 			if ((!isset($this->data['hosts'][$hostId]) && $hostId > 0) || is_null($hostId)) {
 				// for popup select first host in the list
 				if ($this->config['popupDD'] && !empty($this->data['hosts'])) {
-					reset($this->data['hosts']);
 					$hostId = key($this->data['hosts']);
 				}
 				// otherwise hostid = 0 for 'Dropdown first entry' option ALL or NONE
