@@ -150,8 +150,26 @@ static void	DBfield_definition_string(char **sql, size_t *sql_alloc, size_t *sql
 		}
 #endif
 	}
+
 	if (0 != (field->flags & ZBX_NOTNULL))
+	{
+#if defined(HAVE_ORACLE)
+		switch (field->type)
+		{
+			case ZBX_TYPE_INT:
+			case ZBX_TYPE_FLOAT:
+			case ZBX_TYPE_BLOB:
+			case ZBX_TYPE_UINT:
+			case ZBX_TYPE_ID:
+				zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " not null");
+				break;
+			default:	/* ZBX_TYPE_CHAR, ZBX_TYPE_TEXT, ZBX_TYPE_SHORTTEXT or ZBX_TYPE_LONGTEXT */
+				/* nothing to do */;
+		}
+#else
 		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " not null");
+#endif
+	}
 }
 
 static void	DBcreate_table_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const ZBX_TABLE *table)
