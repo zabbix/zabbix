@@ -316,10 +316,11 @@ class CPie extends CGraphDraw {
 			if (isset($data) && isset($datavalue)) {
 				$strvalue = sprintf(_('Value').': %s ('.(round($proc) != round($proc, 2) ? '%0.2f' : '%0.0f').'%%)',
 					convert_units(array(
-					'value' => $datavalue,
-					'units' => $this->items[$i]['units']
+						'value' => $datavalue,
+						'units' => $this->items[$i]['units']
 					)),
-					$proc);
+					$proc
+					);
 
 				$str = sprintf('%s: %s [%s] ',
 					str_pad($this->items[$i]['host'], $max_host_len, ' '),
