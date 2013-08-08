@@ -635,14 +635,10 @@ class CGraph extends CGraphGeneral {
 			'preservekeys' => true
 		));
 
-		// check permissions only for non super admins
-		if (CUser::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			foreach ($itemids as $itemid) {
-				if (!isset($allowedItems[$itemid])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('No permissions to referred object or it does not exist!')
-					);
-				}
+		// check if items exist and user has permission to access those items
+		foreach ($itemids as $itemid) {
+			if (!isset($allowedItems[$itemid])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
 
