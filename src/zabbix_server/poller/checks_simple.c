@@ -26,202 +26,117 @@ typedef int	(*vmfunc_t)(AGENT_REQUEST *, AGENT_RESULT *);
 
 #define ZBX_VMWARE_PREFIX	"vmware."
 
-static char	*vmkeys[] =
+
+typedef struct
 {
-	"vcenter.cluster.discovery",
-	"vcenter.cluster.status",
-	"vcenter.eventlog",
-
-	"vcenter.hv.cluster.name",
-	"vcenter.hv.cpu.usage",
-	"vcenter.hv.discovery",
-	"vcenter.hv.fullname",
-	"vcenter.hv.hw.cpu.num",
-	"vcenter.hv.hw.cpu.freq",
-	"vcenter.hv.hw.cpu.model",
-	"vcenter.hv.hw.cpu.threads",
-	"vcenter.hv.hw.memory",
-	"vcenter.hv.hw.model",
-	"vcenter.hv.hw.uuid",
-	"vcenter.hv.hw.vendor",
-	"vcenter.hv.memory.size.ballooned",
-	"vcenter.hv.memory.used",
-	"vcenter.hv.status",
-	"vcenter.hv.uptime",
-	"vcenter.hv.version",
-	"vcenter.hv.vm.num",
-
-	"vcenter.vm.cluster.name",
-	"vcenter.vm.cpu.num",
-	"vcenter.vm.cpu.usage",
-	"vcenter.vm.discovery",
-	"vcenter.vm.hv.name",
-	"vcenter.vm.memory.size",
-	"vcenter.vm.memory.size.ballooned",
-	"vcenter.vm.memory.size.compressed",
-	"vcenter.vm.memory.size.swapped",
-	"vcenter.vm.memory.size.usage.guest",
-	"vcenter.vm.memory.size.usage.host",
-	"vcenter.vm.memory.size.private",
-	"vcenter.vm.memory.size.shared",
-	"vcenter.vm.net.if.discovery",
-	"vcenter.vm.net.if.in",
-	"vcenter.vm.net.if.out",
-	"vcenter.vm.powerstate",
-	"vcenter.vm.storage.committed",
-	"vcenter.vm.storage.unshared",
-	"vcenter.vm.storage.uncommitted",
-	"vcenter.vm.uptime",
-	"vcenter.vm.vfs.dev.discovery",
-	"vcenter.vm.vfs.dev.read",
-	"vcenter.vm.vfs.dev.write",
-	"vcenter.vm.vfs.fs.discovery",
-	"vcenter.vm.vfs.fs.size",
-
-	"vsphere.cpu.usage",
-	"vsphere.eventlog",
-	"vsphere.fullname",
-	"vsphere.hw.cpu.num",
-	"vsphere.hw.cpu.freq",
-	"vsphere.hw.cpu.model",
-	"vsphere.hw.cpu.threads",
-	"vsphere.hw.memory",
-	"vsphere.hw.model",
-	"vsphere.hw.uuid",
-	"vsphere.hw.vendor",
-	"vsphere.memory.size.ballooned",
-	"vsphere.memory.used",
-	"vsphere.status",
-	"vsphere.uptime",
-	"vsphere.version",
-	"vsphere.vm.num",
-
-	"vsphere.vm.cpu.num",
-	"vsphere.vm.cpu.usage",
-	"vsphere.vm.discovery",
-	"vsphere.vm.hv.name",
-	"vsphere.vm.memory.size",
-	"vsphere.vm.memory.size.ballooned",
-	"vsphere.vm.memory.size.compressed",
-	"vsphere.vm.memory.size.swapped",
-	"vsphere.vm.memory.size.usage.guest",
-	"vsphere.vm.memory.size.usage.host",
-	"vsphere.vm.memory.size.private",
-	"vsphere.vm.memory.size.shared",
-	"vsphere.vm.net.if.discovery",
-	"vsphere.vm.net.if.in",
-	"vsphere.vm.net.if.out",
-	"vsphere.vm.powerstate",
-	"vsphere.vm.storage.committed",
-	"vsphere.vm.storage.unshared",
-	"vsphere.vm.storage.uncommitted",
-	"vsphere.vm.uptime",
-	"vsphere.vm.vfs.dev.discovery",
-	"vsphere.vm.vfs.dev.read",
-	"vsphere.vm.vfs.dev.write",
-	"vsphere.vm.vfs.fs.discovery",
-	"vsphere.vm.vfs.fs.size",
-	NULL
-};
+	const char	*key;
+	vmfunc_t	func;
+}
+zbx_vmcheck_t;
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-static vmfunc_t	vmfuncs[] =
-{
-	check_vcenter_cluster_discovery,
-	check_vcenter_cluster_status,
-	check_vcenter_eventlog,
-
-	check_vcenter_hv_cluster_name,
-	check_vcenter_hv_cpu_usage,
-	check_vcenter_hv_discovery,
-	check_vcenter_hv_fullname,
-	check_vcenter_hv_hw_cpu_num,
-	check_vcenter_hv_hw_cpu_freq,
-	check_vcenter_hv_hw_cpu_model,
-	check_vcenter_hv_hw_cpu_threads,
-	check_vcenter_hv_hw_memory,
-	check_vcenter_hv_hw_model,
-	check_vcenter_hv_hw_uuid,
-	check_vcenter_hv_hw_vendor,
-	check_vcenter_hv_memory_size_ballooned,
-	check_vcenter_hv_memory_used,
-	check_vcenter_hv_status,
-	check_vcenter_hv_uptime,
-	check_vcenter_hv_version,
-	check_vcenter_hv_vm_num,
-
-	check_vcenter_vm_cluster_name,
-	check_vcenter_vm_cpu_num,
-	check_vcenter_vm_cpu_usage,
-	check_vcenter_vm_discovery,
-	check_vcenter_vm_hv_name,
-	check_vcenter_vm_memory_size,
-	check_vcenter_vm_memory_size_ballooned,
-	check_vcenter_vm_memory_size_compressed,
-	check_vcenter_vm_memory_size_swapped,
-	check_vcenter_vm_memory_size_usage_guest,
-	check_vcenter_vm_memory_size_usage_host,
-	check_vcenter_vm_memory_size_private,
-	check_vcenter_vm_memory_size_shared,
-	check_vcenter_vm_net_if_discovery,
-	check_vcenter_vm_net_if_in,
-	check_vcenter_vm_net_if_out,
-	check_vcenter_vm_powerstate,
-	check_vcenter_vm_storage_committed,
-	check_vcenter_vm_storage_unshared,
-	check_vcenter_vm_storage_uncommitted,
-	check_vcenter_vm_uptime,
-	check_vcenter_vm_vfs_dev_discovery,
-	check_vcenter_vm_vfs_dev_read,
-	check_vcenter_vm_vfs_dev_write,
-	check_vcenter_vm_vfs_fs_discovery,
-	check_vcenter_vm_vfs_fs_size,
-
-	check_vsphere_cpu_usage,
-	check_vsphere_eventlog,
-	check_vsphere_fullname,
-	check_vsphere_hw_cpu_num,
-	check_vsphere_hw_cpu_freq,
-	check_vsphere_hw_cpu_model,
-	check_vsphere_hw_cpu_threads,
-	check_vsphere_hw_memory,
-	check_vsphere_hw_model,
-	check_vsphere_hw_uuid,
-	check_vsphere_hw_vendor,
-	check_vsphere_memory_size_ballooned,
-	check_vsphere_memory_used,
-	check_vsphere_status,
-	check_vsphere_uptime,
-	check_vsphere_version,
-	check_vsphere_vm_num,
-
-	check_vsphere_vm_cpu_num,
-	check_vsphere_vm_cpu_usage,
-	check_vsphere_vm_discovery,
-	check_vsphere_vm_hv_name,
-	check_vsphere_vm_memory_size,
-	check_vsphere_vm_memory_size_ballooned,
-	check_vsphere_vm_memory_size_compressed,
-	check_vsphere_vm_memory_size_swapped,
-	check_vsphere_vm_memory_size_usage_guest,
-	check_vsphere_vm_memory_size_usage_host,
-	check_vsphere_vm_memory_size_private,
-	check_vsphere_vm_memory_size_shared,
-	check_vsphere_vm_net_if_discovery,
-	check_vsphere_vm_net_if_in,
-	check_vsphere_vm_net_if_out,
-	check_vsphere_vm_powerstate,
-	check_vsphere_vm_storage_committed,
-	check_vsphere_vm_storage_unshared,
-	check_vsphere_vm_storage_uncommitted,
-	check_vsphere_vm_uptime,
-	check_vsphere_vm_vfs_dev_discovery,
-	check_vsphere_vm_vfs_dev_read,
-	check_vsphere_vm_vfs_dev_write,
-	check_vsphere_vm_vfs_fs_discovery,
-	check_vsphere_vm_vfs_fs_size
-};
+# define VMCHECK_FUNC(func)	func
+#else
+# define VMCHECK_FUNC(func)	NULL
 #endif
+
+static zbx_vmcheck_t	vmchecks[] =
+{
+	{"vcenter.cluster.discovery", VMCHECK_FUNC(check_vcenter_cluster_discovery)},
+	{"vcenter.cluster.status", VMCHECK_FUNC(check_vcenter_cluster_status)},
+	{"vcenter.eventlog", VMCHECK_FUNC(check_vcenter_eventlog)},
+
+	{"vcenter.hv.cluster.name", VMCHECK_FUNC(check_vcenter_hv_cluster_name)},
+	{"vcenter.hv.cpu.usage", VMCHECK_FUNC(check_vcenter_hv_cpu_usage)},
+	{"vcenter.hv.discovery", VMCHECK_FUNC(check_vcenter_hv_discovery)},
+	{"vcenter.hv.fullname", VMCHECK_FUNC(check_vcenter_hv_fullname)},
+	{"vcenter.hv.hw.cpu.num", VMCHECK_FUNC(check_vcenter_hv_hw_cpu_num)},
+	{"vcenter.hv.hw.cpu.freq", VMCHECK_FUNC(check_vcenter_hv_hw_cpu_freq)},
+	{"vcenter.hv.hw.cpu.model", VMCHECK_FUNC(check_vcenter_hv_hw_cpu_model)},
+	{"vcenter.hv.hw.cpu.threads", VMCHECK_FUNC(check_vcenter_hv_hw_cpu_threads)},
+	{"vcenter.hv.hw.memory", VMCHECK_FUNC(check_vcenter_hv_hw_memory)},
+	{"vcenter.hv.hw.model", VMCHECK_FUNC(check_vcenter_hv_hw_model)},
+	{"vcenter.hv.hw.uuid", VMCHECK_FUNC(check_vcenter_hv_hw_uuid)},
+	{"vcenter.hv.hw.vendor", VMCHECK_FUNC(check_vcenter_hv_hw_vendor)},
+	{"vcenter.hv.memory.size.ballooned", VMCHECK_FUNC(check_vcenter_hv_memory_size_ballooned)},
+	{"vcenter.hv.memory.used", VMCHECK_FUNC(check_vcenter_hv_memory_used)},
+	{"vcenter.hv.status", VMCHECK_FUNC(check_vcenter_hv_status)},
+	{"vcenter.hv.uptime", VMCHECK_FUNC(check_vcenter_hv_uptime)},
+	{"vcenter.hv.version", VMCHECK_FUNC(check_vcenter_hv_version)},
+	{"vcenter.hv.vm.num", VMCHECK_FUNC(check_vcenter_hv_vm_num)},
+
+	{"vcenter.vm.cluster.name", VMCHECK_FUNC(check_vcenter_vm_cluster_name)},
+	{"vcenter.vm.cpu.num", VMCHECK_FUNC(check_vcenter_vm_cpu_num)},
+	{"vcenter.vm.cpu.usage", VMCHECK_FUNC(check_vcenter_vm_cpu_usage)},
+	{"vcenter.vm.discovery", VMCHECK_FUNC(check_vcenter_vm_discovery)},
+	{"vcenter.vm.hv.name", VMCHECK_FUNC(check_vcenter_vm_hv_name)},
+	{"vcenter.vm.memory.size", VMCHECK_FUNC(check_vcenter_vm_memory_size)},
+	{"vcenter.vm.memory.size.ballooned", VMCHECK_FUNC(check_vcenter_vm_memory_size_ballooned)},
+	{"vcenter.vm.memory.size.compressed", VMCHECK_FUNC(check_vcenter_vm_memory_size_compressed)},
+	{"vcenter.vm.memory.size.swapped", VMCHECK_FUNC(check_vcenter_vm_memory_size_swapped)},
+	{"vcenter.vm.memory.size.usage.guest", VMCHECK_FUNC(check_vcenter_vm_memory_size_usage_guest)},
+	{"vcenter.vm.memory.size.usage.host", VMCHECK_FUNC(check_vcenter_vm_memory_size_usage_host)},
+	{"vcenter.vm.memory.size.private", VMCHECK_FUNC(check_vcenter_vm_memory_size_private)},
+	{"vcenter.vm.memory.size.shared", VMCHECK_FUNC(check_vcenter_vm_memory_size_shared)},
+	{"vcenter.vm.net.if.discovery", VMCHECK_FUNC(check_vcenter_vm_net_if_discovery)},
+	{"vcenter.vm.net.if.in", VMCHECK_FUNC(check_vcenter_vm_net_if_in)},
+	{"vcenter.vm.net.if.out", VMCHECK_FUNC(check_vcenter_vm_net_if_out)},
+	{"vcenter.vm.powerstate", VMCHECK_FUNC(check_vcenter_vm_powerstate)},
+	{"vcenter.vm.storage.committed", VMCHECK_FUNC(check_vcenter_vm_storage_committed)},
+	{"vcenter.vm.storage.unshared", VMCHECK_FUNC(check_vcenter_vm_storage_unshared)},
+	{"vcenter.vm.storage.uncommitted", VMCHECK_FUNC(check_vcenter_vm_storage_uncommitted)},
+	{"vcenter.vm.uptime", VMCHECK_FUNC(check_vcenter_vm_uptime)},
+	{"vcenter.vm.vfs.dev.discovery", VMCHECK_FUNC(check_vcenter_vm_vfs_dev_discovery)},
+	{"vcenter.vm.vfs.dev.read", VMCHECK_FUNC(check_vcenter_vm_vfs_dev_read)},
+	{"vcenter.vm.vfs.dev.write", VMCHECK_FUNC(check_vcenter_vm_vfs_dev_write)},
+	{"vcenter.vm.vfs.fs.discovery", VMCHECK_FUNC(check_vcenter_vm_vfs_fs_discovery)},
+	{"vcenter.vm.vfs.fs.size", VMCHECK_FUNC(check_vcenter_vm_vfs_fs_size)},
+
+	{"vsphere.cpu.usage", VMCHECK_FUNC(check_vsphere_cpu_usage)},
+	{"vsphere.eventlog", VMCHECK_FUNC(check_vsphere_eventlog)},
+	{"vsphere.fullname", VMCHECK_FUNC(check_vsphere_fullname)},
+	{"vsphere.hw.cpu.num", VMCHECK_FUNC(check_vsphere_hw_cpu_num)},
+	{"vsphere.hw.cpu.freq", VMCHECK_FUNC(check_vsphere_hw_cpu_freq)},
+	{"vsphere.hw.cpu.model", VMCHECK_FUNC(check_vsphere_hw_cpu_model)},
+	{"vsphere.hw.cpu.threads", VMCHECK_FUNC(check_vsphere_hw_cpu_threads)},
+	{"vsphere.hw.memory", VMCHECK_FUNC(check_vsphere_hw_memory)},
+	{"vsphere.hw.model", VMCHECK_FUNC(check_vsphere_hw_model)},
+	{"vsphere.hw.uuid", VMCHECK_FUNC(check_vsphere_hw_uuid)},
+	{"vsphere.hw.vendor", VMCHECK_FUNC(check_vsphere_hw_vendor)},
+	{"vsphere.memory.size.ballooned", VMCHECK_FUNC(check_vsphere_memory_size_ballooned)},
+	{"vsphere.memory.used", VMCHECK_FUNC(check_vsphere_memory_used)},
+	{"vsphere.status", VMCHECK_FUNC(check_vsphere_status)},
+	{"vsphere.uptime", VMCHECK_FUNC(check_vsphere_uptime)},
+	{"vsphere.version", VMCHECK_FUNC(check_vsphere_version)},
+	{"vsphere.vm.num", VMCHECK_FUNC(check_vsphere_vm_num)},
+
+	{"vsphere.vm.cpu.num", VMCHECK_FUNC(check_vsphere_vm_cpu_num)},
+	{"vsphere.vm.cpu.usage", VMCHECK_FUNC(check_vsphere_vm_cpu_usage)},
+	{"vsphere.vm.discovery", VMCHECK_FUNC(check_vsphere_vm_discovery)},
+	{"vsphere.vm.hv.name", VMCHECK_FUNC(check_vsphere_vm_hv_name)},
+	{"vsphere.vm.memory.size", VMCHECK_FUNC(check_vsphere_vm_memory_size)},
+	{"vsphere.vm.memory.size.ballooned", VMCHECK_FUNC(check_vsphere_vm_memory_size_ballooned)},
+	{"vsphere.vm.memory.size.compressed", VMCHECK_FUNC(check_vsphere_vm_memory_size_compressed)},
+	{"vsphere.vm.memory.size.swapped", VMCHECK_FUNC(check_vsphere_vm_memory_size_swapped)},
+	{"vsphere.vm.memory.size.usage.guest", VMCHECK_FUNC(check_vsphere_vm_memory_size_usage_guest)},
+	{"vsphere.vm.memory.size.usage.host", VMCHECK_FUNC(check_vsphere_vm_memory_size_usage_host)},
+	{"vsphere.vm.memory.size.private", VMCHECK_FUNC(check_vsphere_vm_memory_size_private)},
+	{"vsphere.vm.memory.size.shared", VMCHECK_FUNC(check_vsphere_vm_memory_size_shared)},
+	{"vsphere.vm.net.if.discovery", VMCHECK_FUNC(check_vsphere_vm_net_if_discovery)},
+	{"vsphere.vm.net.if.in", VMCHECK_FUNC(check_vsphere_vm_net_if_in)},
+	{"vsphere.vm.net.if.out", VMCHECK_FUNC(check_vsphere_vm_net_if_out)},
+	{"vsphere.vm.powerstate", VMCHECK_FUNC(check_vsphere_vm_powerstate)},
+	{"vsphere.vm.storage.committed", VMCHECK_FUNC(check_vsphere_vm_storage_committed)},
+	{"vsphere.vm.storage.unshared", VMCHECK_FUNC(check_vsphere_vm_storage_unshared)},
+	{"vsphere.vm.storage.uncommitted", VMCHECK_FUNC(check_vsphere_vm_storage_uncommitted)},
+	{"vsphere.vm.uptime", VMCHECK_FUNC(check_vsphere_vm_uptime)},
+	{"vsphere.vm.vfs.dev.discovery", VMCHECK_FUNC(check_vsphere_vm_vfs_dev_discovery)},
+	{"vsphere.vm.vfs.dev.read", VMCHECK_FUNC(check_vsphere_vm_vfs_dev_read)},
+	{"vsphere.vm.vfs.dev.write", VMCHECK_FUNC(check_vsphere_vm_vfs_dev_write)},
+	{"vsphere.vm.vfs.fs.discovery", VMCHECK_FUNC(check_vsphere_vm_vfs_fs_discovery)},
+	{"vsphere.vm.vfs.fs.size", VMCHECK_FUNC(check_vsphere_vm_vfs_fs_size)},
+	{NULL, NULL}
+};
 
 /******************************************************************************
  *                                                                            *
@@ -238,20 +153,16 @@ static vmfunc_t	vmfuncs[] =
  ******************************************************************************/
 static int	get_vmware_function(const char *key, vmfunc_t *vmfunc)
 {
-	int	i;
+	zbx_vmcheck_t	*check;
 
 	if (0 != strncmp(key, ZBX_VMWARE_PREFIX, sizeof(ZBX_VMWARE_PREFIX) - 1))
 		return FAIL;
 
-	for (i = 0; NULL != vmkeys[i]; i++)
+	for (check = vmchecks; NULL != check->key; check++)
 	{
-		if (0 == strcmp(key + sizeof(ZBX_VMWARE_PREFIX) - 1, vmkeys[i]))
+		if (0 == strcmp(key + sizeof(ZBX_VMWARE_PREFIX) - 1, check->key))
 		{
-#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-			*vmfunc = vmfuncs[i];
-#else
-			*vmfunc = NULL;
-#endif
+			*vmfunc = check->func;
 			return SUCCEED;
 		}
 	}
