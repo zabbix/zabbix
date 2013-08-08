@@ -431,17 +431,26 @@ class CPageFilter {
 		}
 
 		// select remebered selection
-		if (is_null($groupid) && $this->_profileIds['groupid']) {
+		if (is_null($groupid)) {
 			// set group only if host is in group or hostid is not set
+			$host = null;
 			if ($hostid) {
 				$host = API::Host()->get(array(
 					'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 					'output' => array('hostid'),
 					'hostids' => $hostid,
-					'groupids' => $this->_profileIds['groupid']
+					'selectGroups' => array('groupid'),
+					'templated_hosts' => isset($options['templated_hosts']) ? $options['templated_hosts'] : null
 				));
 			}
-			if (!$hostid || !empty($host)) {
+			if ($host) {
+				$host = reset($host);
+				$group = reset($host['groups']);
+				if ($group) {
+					$groupid = $group['groupid'];
+				}
+			}
+			elseif ($this->_profileIds['groupid']) {
 				$groupid = $this->_profileIds['groupid'];
 			}
 		}
