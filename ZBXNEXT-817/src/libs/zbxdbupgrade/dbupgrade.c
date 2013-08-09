@@ -136,7 +136,7 @@ static void	parse_db_monitor_item_params(const char *params, char **dsn, char **
 		if (NULL == pnext)
 			pnext = params + strlen(params);
 
-		if (pvalue > pnext)
+		if (pvalue > pnext || pvalue == params)
 			continue;
 
 		for (pend = pvalue - 1; 0 != isspace(*pend); pend--)
@@ -157,6 +157,9 @@ static void	parse_db_monitor_item_params(const char *params, char **dsn, char **
 		pvalue++;
 		while (0 != isspace(*pvalue))
 			pvalue++;
+
+		if (pvalue > pnext)
+			continue;
 
 		if ('\0' == *pvalue)
 			continue;
