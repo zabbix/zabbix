@@ -103,9 +103,8 @@ int	get_value_db(DC_ITEM *item, AGENT_RESULT *result)
 	else
 		SET_MSG_RESULT(result, zbx_strdup(NULL, get_last_odbc_strerror()));
 out:
-out:
-	free_request(&request);
 
+	free_request(&request);
 
 #endif	/* HAVE_ODBC */
 
