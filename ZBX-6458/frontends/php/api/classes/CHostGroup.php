@@ -479,7 +479,7 @@ class CHostGroup extends CZBXAPI {
 
 		foreach ($groups as $group) {
 			if (empty($group['name'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot create host group without name.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Host group name cannot be empty.'));
 			}
 			if ($this->exists(array('name' => $group['name']))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host group "%1$s" already exists.', $group['name']));
@@ -595,7 +595,8 @@ class CHostGroup extends CZBXAPI {
 			foreach ($groupids as $groupid) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Host group "%1$s" cannot be deleted, because some hosts depend on it.',
-						$delGroups[$groupid]['name'])
+						$delGroups[$groupid]['name']
+					)
 				);
 			}
 		}
