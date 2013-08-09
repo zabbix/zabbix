@@ -1,6 +1,7 @@
 Changes for 2.1.2
 
 New features:
+..F....... [ZBXNEXT-1851] hid finnish, lithuanian and swedish translations from the frontend (Pavels, Richlv)
 ...G...PS. [ZBXNEXT-1405] added IP to the warning about ignored messages because of their size (wiper)
 ........S. [ZBX-6770] improved host macro resolving by using configuration cache to get hosts used in trigger expressions (wiper)
 .......PS. [ZBXNEXT-1098] added internal check support to Zabbix proxies (wiper)
@@ -8,6 +9,7 @@ New features:
 ...G...... [ZBXNEXT-1528] added net.if.in, net.if.out and net.if.total item support on HP-UX platforms (igors)
 
 Bug fixes:
+..F....... [ZBX-6817] fixed update for web scenarios, to link items to the right application (Guntis)
 ..F....... [ZBX-6837] added possibility select templated hosts in items configuration list filter (Guntis)
 ..F....... [ZBX-6795] corrected percentage value in graph pie charts (Guntis)
 ..F....... [ZBX-6283] added graph filter gradation recalculation (Ivo)
