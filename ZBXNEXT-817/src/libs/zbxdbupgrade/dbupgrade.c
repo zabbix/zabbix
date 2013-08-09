@@ -117,7 +117,7 @@ extern unsigned char	daemon_type;
  *           Failed (or absent) parameters will contain empty string "".         *
  *                                                                               *
  *********************************************************************************/
-void	parse_db_monitor_item_params(const char *params, char **dsn, char **user, char **password, char **sql)
+static void	parse_db_monitor_item_params(const char *params, char **dsn, char **user, char **password, char **sql)
 {
 	const char	*pvalue, *pnext, *pend;
 	char		**var;
