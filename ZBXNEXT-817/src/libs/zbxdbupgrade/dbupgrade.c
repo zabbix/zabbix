@@ -1430,7 +1430,7 @@ static int	DBpatch_2010094(void)
 				*error_message = NULL, *key_param, *key = NULL;
 		zbx_uint64_t	itemid;
 		int		key_len;
-		size_t		key_alloc = ITEM_KEY_LEN * 4 + 1, key_offset = 0;
+		size_t		key_alloc = 0, key_offset = 0;
 
 		parse_db_monitor_item_params(row[2], &dsn, &user, &password, &sql);
 
@@ -1444,11 +1444,15 @@ static int	DBpatch_2010094(void)
 			error_message = zbx_dsprintf(error_message, "ODBC password \"%s\" is too long", password);
 		else
 		{
-			int	key_prefix_len = key_param - row[1], param_len = key_len - key_prefix_len - 2;
 			char	*param = NULL;
+			int	param_len;
 
-			*key_param = '\0';
+			key_offset = key_param - row[1];
+			key_alloc = key_offset + 1;
+			key = zbx_malloc(key, key_alloc);
+			memcpy(key, row[1], key_offset);
 
+			param_len = key_len - key_offset - 2;
 			param = zbx_malloc(param, param_len + 1);
 			memcpy(param, key_param + 1, param_len);
 			param[param_len] = '\0';
@@ -1456,7 +1460,7 @@ static int	DBpatch_2010094(void)
 
 			quote_key_param(&dsn, 0);
 
-			zbx_snprintf_alloc(&key, &key_alloc, &key_offset, "%s[%s,%s]", row[1], param, dsn);
+			zbx_snprintf_alloc(&key, &key_alloc, &key_offset, "[%s,%s]", param, dsn);
 			zbx_free(param);
 
 			if (ITEM_KEY_LEN < zbx_strlen_utf8(key))
