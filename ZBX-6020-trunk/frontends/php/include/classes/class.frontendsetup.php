@@ -227,60 +227,55 @@ class FrontendSetup {
 	public function checkPhpDatabases() {
 		$current = array();
 
-		if (function_exists('mysqli_connect') &&
-				function_exists('mysqli_connect_error') &&
-				function_exists('mysqli_error') &&
-				function_exists('mysqli_query') &&
-				function_exists('mysqli_fetch_assoc') &&
-				function_exists('mysqli_free_result') &&
-				function_exists('mysqli_real_escape_string') &&
-				function_exists('mysqli_close')
-		) {
+		if (function_exists('mysqli_connect')
+				&& function_exists('mysqli_connect_error')
+				&& function_exists('mysqli_error')
+				&& function_exists('mysqli_query')
+				&& function_exists('mysqli_fetch_assoc')
+				&& function_exists('mysqli_free_result')
+				&& function_exists('mysqli_real_escape_string')
+				&& function_exists('mysqli_close')) {
 			$current[] = 'MySQL';
 			$current[] = BR();
 		}
 
-		if (function_exists('pg_pconnect') &&
-				function_exists('pg_fetch_array') &&
-				function_exists('pg_fetch_row') &&
-				function_exists('pg_exec') &&
-				function_exists('pg_getlastoid')
-		) {
+		if (function_exists('pg_pconnect')
+				&& function_exists('pg_fetch_array')
+				&& function_exists('pg_fetch_row')
+				&& function_exists('pg_exec')
+				&& function_exists('pg_getlastoid')) {
 			$current[] = 'PostgreSQL';
 			$current[] = BR();
 		}
 
-		if (function_exists('oci_connect') &&
-				function_exists('oci_error') &&
-				function_exists('oci_parse') &&
-				function_exists('oci_execute') &&
-				function_exists('oci_fetch_assoc') &&
-				function_exists('oci_commit') &&
-				function_exists('oci_close') &&
-				function_exists('oci_rollback') &&
-				function_exists('oci_field_type') &&
-				function_exists('oci_new_descriptor') &&
-				function_exists('oci_bind_by_name') &&
-				function_exists('oci_free_statement')
-		) {
-
+		if (function_exists('oci_connect')
+				&& function_exists('oci_error')
+				&& function_exists('oci_parse')
+				&& function_exists('oci_execute')
+				&& function_exists('oci_fetch_assoc')
+				&& function_exists('oci_commit')
+				&& function_exists('oci_close')
+				&& function_exists('oci_rollback')
+				&& function_exists('oci_field_type')
+				&& function_exists('oci_new_descriptor')
+				&& function_exists('oci_bind_by_name')
+				&& function_exists('oci_free_statement')) {
 			$current[] = 'Oracle';
 			$current[] = BR();
 		}
 
-		if (function_exists('db2_connect') &&
-				function_exists('db2_set_option') &&
-				function_exists('db2_commit') &&
-				function_exists('db2_rollback') &&
-				function_exists('db2_autocommit') &&
-				function_exists('db2_prepare') &&
-				function_exists('db2_execute') &&
-				function_exists('db2_stmt_errormsg') &&
-				function_exists('db2_fetch_assoc') &&
-				function_exists('db2_free_result') &&
-				function_exists('db2_escape_string') &&
-				function_exists('db2_close')
-		) {
+		if (function_exists('db2_connect')
+				&& function_exists('db2_set_option')
+				&& function_exists('db2_commit')
+				&& function_exists('db2_rollback')
+				&& function_exists('db2_autocommit')
+				&& function_exists('db2_prepare')
+				&& function_exists('db2_execute')
+				&& function_exists('db2_stmt_errormsg')
+				&& function_exists('db2_fetch_assoc')
+				&& function_exists('db2_free_result')
+				&& function_exists('db2_escape_string')
+				&& function_exists('db2_close')) {
 			$current[] = 'IBM DB2';
 			$current[] = BR();
 		}
