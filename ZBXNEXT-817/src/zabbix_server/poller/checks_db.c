@@ -60,7 +60,7 @@ int	get_value_db(DC_ITEM *item, AGENT_RESULT *result)
 
 #define DB_ODBC_SELECT_KEY	"db.odbc.select["
 
-	if (0 == strncmp(item->key, DB_ODBC_SELECT_KEY, strlen(DB_ODBC_SELECT_KEY)))
+	if (0 == strncmp(item->key, DB_ODBC_SELECT_KEY, sizeof(DB_ODBC_SELECT_KEY) - 1))
 	{
 
 		if (ZBX_COMMAND_WITH_PARAMS != parse_command(item->key, NULL, 0, params, sizeof(params)) ||
@@ -107,10 +107,9 @@ int	get_value_db(DC_ITEM *item, AGENT_RESULT *result)
 			SET_MSG_RESULT(result, zbx_strdup(NULL, get_last_odbc_strerror()));
 	}
 #undef DB_ODBC_SELECT_KEY
-
+out:
 #endif	/* HAVE_ODBC */
 
-out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
