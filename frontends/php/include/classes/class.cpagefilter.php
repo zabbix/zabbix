@@ -429,7 +429,6 @@ class CPageFilter {
 		foreach ($groups as $group) {
 			$this->data['groups'][$group['groupid']] = $group['name'];
 		}
-
 		// select remebered selection
 		if (!$groupid) {
 			// set group only if host is in group or hostid is not set
@@ -439,7 +438,7 @@ class CPageFilter {
 					'output' => array('hostid'),
 					'hostids' => $hostid,
 					'selectGroups' => array('groupid'),
-					'templated_hosts' => isset($options['templated_hosts']) ? $options['templated_hosts'] : null
+					'templated_hosts' => isset($options['with_hosts_and_templates']) ? $options['with_hosts_and_templates'] : null
 				));
 				if ($host) {
 					$host = reset($host);
@@ -456,7 +455,7 @@ class CPageFilter {
 		}
 
 		// nonexisting or unset $groupid
-		if ((!isset($this->data['groups'][$groupid]) && $groupid > 0) || is_null($groupid)) {
+		if (!$groupid || ($groupid > 0 && !isset($this->data['groups'][$groupid]))) {
 			// for popup select first group in the list
 			if ($this->config['popupDD'] && !empty($this->data['groups'])) {
 				reset($this->data['groups']);
@@ -521,6 +520,7 @@ class CPageFilter {
 			if ((!isset($this->data['hosts'][$hostId]) && $hostId > 0) || is_null($hostId)) {
 				// for popup select first host in the list
 				if ($this->config['popupDD'] && !empty($this->data['hosts'])) {
+					reset($this->data['hosts']);
 					$hostId = key($this->data['hosts']);
 				}
 				// otherwise hostid = 0 for 'Dropdown first entry' option ALL or NONE
