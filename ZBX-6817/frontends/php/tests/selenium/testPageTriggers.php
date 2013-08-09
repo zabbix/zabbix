@@ -20,8 +20,8 @@
 
 require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
-class testPageItems extends CWebTest {
-	// returns hosts and templates
+class testPageTriggers extends CWebTest {
+	// Returns all hosts
 	public static function data() {
 		return DBdata(
 			'SELECT hostid,status'.
@@ -33,48 +33,35 @@ class testPageItems extends CWebTest {
 	/**
 	* @dataProvider data
 	*/
-	public function testPageItems_CheckLayout($data) {
-		// Go to the list of items
-		$this->zbxTestLogin('items.php?hostid='.$data['hostid']);
+	public function testPageTriggers_CheckLayout($data) {
+		// Go to the list of triggers
+		$this->zbxTestLogin('triggers.php?hostid='.$data['hostid']);
 		// We are in the list of items
-		$this->checkTitle('Configuration of items');
-		$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
-		$this->zbxTestTextPresent('Items');
+		$this->checkTitle('Configuration of triggers');
+		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
+		$this->zbxTestTextPresent('Triggers');
 		$this->zbxTestTextPresent('Displaying');
-
 		if ($data['status'] == HOST_STATUS_MONITORED || $data['status'] == HOST_STATUS_NOT_MONITORED) {
 			$this->zbxTestTextPresent('Host list');
 			// Header
 			$this->zbxTestTextPresent(
 				array(
-					'Wizard',
+					'Severity',
 					'Name',
-					'Triggers',
-					'Key',
-					'Interval',
-					'History',
-					'Trends',
-					'Type',
-					'Applications',
+					'Expression',
 					'Status',
 					'Error'
 				)
 			);
 		}
-		elseif ($data['status'] == HOST_STATUS_TEMPLATE) {
+		if ($data['status'] == HOST_STATUS_TEMPLATE) {
 			$this->zbxTestTextPresent('Template list');
 			// Header
 			$this->zbxTestTextPresent(
 				array(
-					'Wizard',
+					'Severity',
 					'Name',
-					'Triggers',
-					'Key',
-					'Interval',
-					'History',
-					'Trends',
-					'Type',
-					'Applications',
+					'Expression',
 					'Status'
 				)
 			);
@@ -86,7 +73,6 @@ class testPageItems extends CWebTest {
 				'Disable selected',
 				'Mass update',
 				'Copy selected to ...',
-				'Clear history for selected',
 				'Delete selected'
 			));
 	}
