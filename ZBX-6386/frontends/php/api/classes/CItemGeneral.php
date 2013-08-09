@@ -171,7 +171,18 @@ abstract class CItemGeneral extends CZBXAPI {
 			'preservekeys' => true
 		));
 
-		if ($update){
+		if ($update) {
+			// discovered fields, except status, cannot be updated
+			foreach ($items as $item) {
+				if ($dbItems[$item['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+					foreach ($item as $key => $value) {
+						if (!in_array($key, array('itemid', 'status', 'flags'))) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update discovered item!'));
+						}
+					}
+				}
+			}
+
 			$items = $this->extendObjects($this->tableName(), $items, array('name'));
 		}
 

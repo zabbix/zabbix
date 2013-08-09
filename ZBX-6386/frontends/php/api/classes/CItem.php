@@ -512,9 +512,10 @@ class CItem extends CItemGeneral {
 		}
 		unset($item);
 
+		parent::checkInput($items, $update);
+
 		// validate if everything is ok with 'item->inventory fields' linkage
 		self::validateInventoryLinks($items, $update);
-		parent::checkInput($items, $update);
 	}
 
 	/**
