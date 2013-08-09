@@ -1419,25 +1419,26 @@ static int	DBpatch_2010094(void)
 	DB_ROW		row;
 	int		ret = SUCCEED;
 	char		*key = NULL;
-	size_t		key_alloc = 0, key_offset = 0;
+	size_t		key_alloc = 0, key_offset;
 
-	result = DBselect("select i.itemid,i.key_,i.params,h.name"
-				" from items i,hosts h"
-				" where type=%d and i.hostid=h.hostid",
-				ITEM_TYPE_DB_MONITOR);
+	result = DBselect(
+			"select i.itemid,i.key_,i.params,h.name"
+			" from items i,hosts h"
+			" where i.hostid=h.hostid"
+				" and i.type=%d",
+			ITEM_TYPE_DB_MONITOR);
 
 	while (NULL != (row = DBfetch(result)) && SUCCEED == ret)
 	{
-		char		*user = NULL, *password = NULL, *dsn = NULL, *sql = NULL,
-				*error_message = NULL, *key_param;
+		char		*user = NULL, *password = NULL, *dsn = NULL, *sql = NULL, *error_message = NULL;
 		zbx_uint64_t	itemid;
-		int		key_len;
+		size_t		key_len;
+
+		key_len = strlen(row[1]);
 
 		parse_db_monitor_item_params(row[2], &dsn, &user, &password, &sql);
 
-		if (0 == (key_len = strlen(row[1])))
-			error_message = zbx_dsprintf(error_message, "key is an empty string", user);
-		else if (']' != row[1][key_len - 1] || NULL == (key_param = strchr(row[1], '[')))
+		if (0 != strncmp(row[1], "db.odbc.select[", 15) || ']' != row[1][key_len - 1])
 			error_message = zbx_dsprintf(error_message, "key \"%s\" is invalid", row[1]);
 		else if (ITEM_USERNAME_LEN < strlen(user))
 			error_message = zbx_dsprintf(error_message, "ODBC username \"%s\" is too long", user);
@@ -1445,20 +1446,16 @@ static int	DBpatch_2010094(void)
 			error_message = zbx_dsprintf(error_message, "ODBC password \"%s\" is too long", password);
 		else
 		{
-			char	*param = NULL;
-			int	param_len;
+			char	*param;
 
-			zbx_strncpy_alloc(&key, &key_alloc, &key_offset, row[1], key_param - row[1]);
+			param = strndup(row[1] + 15, key_len - 16);
 
-			param_len = key_len - key_offset - 2;
-			param = zbx_malloc(param, param_len + 1);
-			memcpy(param, key_param + 1, param_len);
-			param[param_len] = '\0';
 			quote_key_param(&param, 0);
-
 			quote_key_param(&dsn, 0);
 
-			zbx_snprintf_alloc(&key, &key_alloc, &key_offset, "[%s,%s]", param, dsn);
+			key_offset = 0;
+			zbx_snprintf_alloc(&key, &key_alloc, &key_offset, "db.odbc.select[%s,%s]", param, dsn);
+
 			zbx_free(param);
 
 			if (ITEM_KEY_LEN < zbx_strlen_utf8(key))
@@ -1495,17 +1492,15 @@ static int	DBpatch_2010094(void)
 					row[3], error_message);
 		}
 
-		key_offset = 0;
-
 		zbx_free(error_message);
 		zbx_free(user);
 		zbx_free(password);
 		zbx_free(dsn);
 		zbx_free(sql);
 	}
-	zbx_free(key);
-
 	DBfree_result(result);
+
+	zbx_free(key);
 
 	return ret;
 }
