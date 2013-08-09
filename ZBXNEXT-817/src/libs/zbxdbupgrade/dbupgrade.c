@@ -1418,6 +1418,8 @@ static int	DBpatch_2010094(void)
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		ret = SUCCEED;
+	char		*key = NULL;
+	size_t		key_alloc = 0, key_offset = 0;
 
 	result = DBselect("select i.itemid,i.key_,i.params,h.name"
 				" from items i,hosts h"
@@ -1427,10 +1429,9 @@ static int	DBpatch_2010094(void)
 	while (NULL != (row = DBfetch(result)) && SUCCEED == ret)
 	{
 		char		*user = NULL, *password = NULL, *dsn = NULL, *sql = NULL,
-				*error_message = NULL, *key_param, *key = NULL;
+				*error_message = NULL, *key_param;
 		zbx_uint64_t	itemid;
 		int		key_len;
-		size_t		key_alloc = 0, key_offset = 0;
 
 		parse_db_monitor_item_params(row[2], &dsn, &user, &password, &sql);
 
@@ -1447,10 +1448,7 @@ static int	DBpatch_2010094(void)
 			char	*param = NULL;
 			int	param_len;
 
-			key_offset = key_param - row[1];
-			key_alloc = key_offset + 1;
-			key = zbx_malloc(key, key_alloc);
-			memcpy(key, row[1], key_offset);
+			zbx_strncpy_alloc(&key, &key_alloc, &key_offset, row[1], key_param - row[1]);
 
 			param_len = key_len - key_offset - 2;
 			param = zbx_malloc(param, param_len + 1);
@@ -1497,13 +1495,15 @@ static int	DBpatch_2010094(void)
 					row[3], error_message);
 		}
 
-		zbx_free(key);
+		key_offset = 0;
+
 		zbx_free(error_message);
 		zbx_free(user);
 		zbx_free(password);
 		zbx_free(dsn);
 		zbx_free(sql);
 	}
+	zbx_free(key);
 
 	DBfree_result(result);
 
