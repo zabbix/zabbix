@@ -541,6 +541,7 @@
 		if (!empty($filter_hostId)) {
 			$getHostInfo = API::Host()->get(array(
 				'hostids' => $filter_hostId,
+				'templated_hosts' => true,
 				'output' => array('name')
 			));
 			$getHostInfo = reset($getHostInfo);
@@ -561,7 +562,8 @@
 					'selectedLimit' => 1,
 					'objectName' => 'hosts',
 					'objectOptions' => array(
-						'editable' => true
+						'editable' => true,
+						'templated_hosts' => true
 					),
 					'data' => $hostFilterData
 				))
