@@ -518,7 +518,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 				if (isset($graph['gitems'])) {
 					foreach ($graph['gitems'] as $gitems) {
 						// validate gitemid if its set on Update. 0 is acceped since it's a new item. but empty is not.
-						if (isset($gitems['gitemid']) && zbx_empty($gitems['gitemid'])) {
+						if (isset($gitems['gitemid']) && !$gitems['gitemid']) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "gitemid" field for item.'));
 						}
 
