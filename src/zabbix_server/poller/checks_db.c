@@ -48,7 +48,7 @@ int	get_value_db(DC_ITEM *item, AGENT_RESULT *result)
 #ifdef HAVE_ODBC
 	ZBX_ODBC_DBH	dbh;
 	ZBX_ODBC_ROW	row;
-	char		params[MAX_STRING_LEN], db_dsn[MAX_STRING_LEN];
+	AGENT_REQUEST	request;
 #endif
 	int		ret = NOTSUPPORTED;
 
@@ -58,56 +58,55 @@ int	get_value_db(DC_ITEM *item, AGENT_RESULT *result)
 
 #ifdef HAVE_ODBC
 
-#define DB_ODBC_SELECT_KEY	"db.odbc.select["
+	init_request(&request);
 
-	if (0 == strncmp(item->key, DB_ODBC_SELECT_KEY, sizeof(DB_ODBC_SELECT_KEY) - 1))
+	if (SUCCEED != parse_item_key(item->key, &request) || 0 != strcmp(request.key, "db.odbc.select") ||
+			2 > request.nparam)
 	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Key is badly formatted"));
+		goto out;
+	}
 
-		if (ZBX_COMMAND_WITH_PARAMS != parse_command(item->key, NULL, 0, params, sizeof(params)) ||
-				0 != get_param(params, 2, db_dsn, sizeof(db_dsn)))
+	if (SUCCEED == odbc_DBconnect(&dbh, request.params[1], item->username, item->password, CONFIG_TIMEOUT))
+	{
+		if (NULL != odbc_DBselect(&dbh, item->params))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to parse item key."));
-			goto out;
-		}
-
-		if (SUCCEED == odbc_DBconnect(&dbh, db_dsn, item->username, item->password, CONFIG_TIMEOUT))
-		{
-			if (NULL != odbc_DBselect(&dbh, item->params))
+			if (NULL != (row = odbc_DBfetch(&dbh)))
 			{
-				if (NULL != (row = odbc_DBfetch(&dbh)))
+				if (NULL == row[0])
 				{
-					if (NULL == row[0])
-					{
-						SET_MSG_RESULT(result, zbx_strdup(NULL, "SQL query returned NULL "
-								"value."));
-					}
-					else if (SUCCEED == set_result_type(result, item->value_type, item->data_type,
-							row[0]))
-					{
-						ret = SUCCEED;
-					}
+					SET_MSG_RESULT(result, zbx_strdup(NULL, "SQL query returned NULL "
+							"value."));
 				}
-				else
+				else if (SUCCEED == set_result_type(result, item->value_type, item->data_type,
+						row[0]))
 				{
-					const char	*last_error = get_last_odbc_strerror();
-
-					if ('\0' != *last_error)
-						SET_MSG_RESULT(result, zbx_strdup(NULL, last_error));
-					else
-						SET_MSG_RESULT(result, zbx_strdup(NULL, "SQL query returned empty "
-								"result."));
+					ret = SUCCEED;
 				}
 			}
 			else
-				SET_MSG_RESULT(result, zbx_strdup(NULL, get_last_odbc_strerror()));
+			{
+				const char	*last_error = get_last_odbc_strerror();
 
-			odbc_DBclose(&dbh);
+				if ('\0' != *last_error)
+					SET_MSG_RESULT(result, zbx_strdup(NULL, last_error));
+				else
+					SET_MSG_RESULT(result, zbx_strdup(NULL, "SQL query returned empty "
+							"result."));
+			}
 		}
 		else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, get_last_odbc_strerror()));
+
+		odbc_DBclose(&dbh);
 	}
-#undef DB_ODBC_SELECT_KEY
+	else
+		SET_MSG_RESULT(result, zbx_strdup(NULL, get_last_odbc_strerror()));
 out:
+out:
+	free_request(&request);
+
+
 #endif	/* HAVE_ODBC */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
