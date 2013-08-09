@@ -527,6 +527,38 @@ int	main(int argc, char **argv)
 			break;
 	}
 
+	{
+		const char	*params =
+				"  sql      =     \t\tselect * from hosts     \n"
+				"user=   \n"
+				"password = <password>     \n"
+				"  DSN      =  oracle_db     ";
+		char		*dsn = NULL, *user = NULL, *password = NULL, *sql = NULL;
+
+		void	parse_db_monitor_item_params(const char *params, char **dsn, char **user, char **password, char **sql);
+
+		parse_db_monitor_item_params(params, &dsn, &user, &password, &sql);
+
+		if (NULL == dsn)
+			printf("dsn      : IS NULL\n");
+		else
+			printf("dsn      : '%s'\n", dsn);
+		if (NULL == user)
+			printf("user     : IS NULL\n");
+		else
+			printf("user     : '%s'\n", user);
+		if (NULL == password)
+			printf("password : IS NULL\n");
+		else
+			printf("password : '%s'\n", password);
+		if (NULL == sql)
+			printf("sql      : IS NULL\n");
+		else
+			printf("sql      : '%s'\n", sql);
+
+		return 0;
+	}
+
 	return daemon_start(CONFIG_ALLOW_ROOT);
 }
 
