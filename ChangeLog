@@ -9,6 +9,7 @@ New features:
 ...G...... [ZBXNEXT-1528] added net.if.in, net.if.out and net.if.total item support on HP-UX platforms (igors)
 
 Bug fixes:
+A......... [ZBX-6458] fixed "name" parameter validation for hostgroup.update method and improved error messages (Ivo)
 ..F....... [ZBX-6838] fixed bug with sql errors in the application popup window (Guntis)
 ..F....... [ZBX-6817] fixed update for web scenarios, to link items to the right application (Guntis)
 ..F....... [ZBX-6837] added possibility select templated hosts in items configuration list filter (Guntis)
