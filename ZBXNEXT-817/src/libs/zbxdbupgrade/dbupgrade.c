@@ -21,6 +21,7 @@
 
 #include "db.h"
 #include "log.h"
+#include "sysinfo.h"
 
 #ifdef HAVE_MYSQL
 #	define ZBX_DB_TABLE_OPTIONS	" engine=innodb"
@@ -1425,32 +1426,48 @@ static int	DBpatch_2010094(void)
 
 	while (NULL != (row = DBfetch(result)) && SUCCEED == ret)
 	{
-		char		*user = NULL, *password = NULL, *dsn = NULL, *sql = NULL, key[ITEM_KEY_LEN * 4 + 1],
-				*error_message = NULL;
+		char		*user = NULL, *password = NULL, *dsn = NULL, *sql = NULL,
+				*error_message = NULL, *key_param, *key = NULL;
 		zbx_uint64_t	itemid;
 		int		key_len;
+		size_t		key_alloc = ITEM_KEY_LEN * 4 + 1, key_offset = 0;
 
 		parse_db_monitor_item_params(row[2], &dsn, &user, &password, &sql);
 
-		if (zbx_strlen_utf8(row[1]) + 1 + zbx_strlen_utf8(dsn) > ITEM_KEY_LEN)
-			error_message = zbx_dsprintf(error_message, "key \"%s\" is too long", row[1]);
-		else if (0 == (key_len = strlen(row[1])))
+		if (0 == (key_len = strlen(row[1])))
 			error_message = zbx_dsprintf(error_message, "key is an empty string", user);
-		else if (']' != row[1][key_len - 1])
+		else if (']' != row[1][key_len - 1] || NULL == (key_param = strchr(row[1], '[')))
 			error_message = zbx_dsprintf(error_message, "key \"%s\" is invalid", row[1]);
 		else if (ITEM_USERNAME_LEN < strlen(user))
 			error_message = zbx_dsprintf(error_message, "ODBC username \"%s\" is too long", user);
 		else if (ITEM_PASSWORD_LEN < strlen(password))
 			error_message = zbx_dsprintf(error_message, "ODBC password \"%s\" is too long", password);
+		else
+		{
+			int	key_prefix_len = key_param - row[1], param_len = key_len - key_prefix_len - 2;
+			char	*param = NULL;
+
+			*key_param = '\0';
+
+			param = zbx_malloc(param, param_len + 1);
+			memcpy(param, key_param + 1, param_len);
+			param[param_len] = '\0';
+			quote_key_param(&param, 0);
+
+			quote_key_param(&dsn, 0);
+
+			zbx_snprintf_alloc(&key, &key_alloc, &key_offset, "%s[%s,%s]", row[1], param, dsn);
+			zbx_free(param);
+
+			if (ITEM_KEY_LEN < zbx_strlen_utf8(key))
+				error_message = zbx_dsprintf(error_message, "key \"%s\" is too long", row[1]);
+		}
 
 		if (NULL == error_message)
 		{
 			char	*username_esc, *password_esc, *params_esc, *key_esc;
 
 			ZBX_STR2UINT64(itemid, row[0]);
-
-			memcpy(key, row[1], key_len);
-			zbx_snprintf(key + key_len - 1, sizeof(key) - key_len + 1, ",%s]", dsn);
 
 			username_esc = DBdyn_escape_string(user);
 			password_esc = DBdyn_escape_string(password);
@@ -1476,6 +1493,7 @@ static int	DBpatch_2010094(void)
 					row[3], error_message);
 		}
 
+		zbx_free(key);
 		zbx_free(error_message);
 		zbx_free(user);
 		zbx_free(password);
