@@ -78,7 +78,7 @@ require_once dirname(__FILE__).'/validate.inc.php';
 
 function zbx_err_handler($errno, $errstr, $errfile, $errline) {
 	// necessary to surpress errors when calling with error control operator like @function_name()
-	if (error_reporting() === 0) {
+	if (error_reporting() === 0 || (version_compare(phpversion(), '5.3', '>') && $errno == E_DEPRECATED)) {
 		return true;
 	}
 
