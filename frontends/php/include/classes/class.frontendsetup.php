@@ -227,14 +227,14 @@ class FrontendSetup {
 	public function checkPhpDatabases() {
 		$current = array();
 
-		if (function_exists('mysql_pconnect') &&
-				function_exists('mysql_select_db') &&
-				function_exists('mysql_error') &&
-				function_exists('mysql_query') &&
-				function_exists('mysql_fetch_array') &&
-				function_exists('mysql_fetch_row') &&
-				function_exists('mysql_data_seek') &&
-				function_exists('mysql_insert_id')
+		if (function_exists('mysqli_connect') &&
+				function_exists('mysqli_connect_error') &&
+				function_exists('mysqli_error') &&
+				function_exists('mysqli_query') &&
+				function_exists('mysqli_fetch_assoc') &&
+				function_exists('mysqli_free_result') &&
+				function_exists('mysqli_real_escape_string') &&
+				function_exists('mysqli_close')
 		) {
 			$current[] = 'MySQL';
 			$current[] = BR();
