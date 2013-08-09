@@ -117,12 +117,12 @@ extern unsigned char	daemon_type;
  *           Failed (or absent) parameters will contain empty string "".         *
  *                                                                               *
  *********************************************************************************/
-static void	parse_db_monitor_item_params(const char *params, char **dsn, char **user, char **password, char **sql)
+void	parse_db_monitor_item_params(const char *params, char **dsn, char **user, char **password, char **sql)
 {
 	const char	*pvalue, *pnext, *pend;
 	char		**var;
 
-	for (;'\0' != *params; params = pnext)
+	for (; '\0' != *params; params = pnext)
 	{
 		while (0 != isspace(*params))
 			params++;
