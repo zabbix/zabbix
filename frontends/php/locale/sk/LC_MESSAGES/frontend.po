@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-10 04:22+0300\n"
-"PO-Revision-Date: 2013-03-02 17:23+0200\n"
+"POT-Creation-Date: 2013-08-10 04:25+0300\n"
+"PO-Revision-Date: 2013-07-19 22:54+0200\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -17,9 +17,9 @@ msgstr ""
 #: include/views/configuration.item.edit.php:391
 msgid " day"
 msgid_plural " days"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] " deň"
+msgstr[1] " dni"
+msgstr[2] " dní"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -63,9 +63,9 @@ msgstr[2] "%1$s Položiek"
 #, php-format
 msgid "%1$s day"
 msgid_plural "%1$s days"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s deň"
+msgstr[1] "%1$s dni"
+msgstr[2] "%1$s dní"
 
 #: include/page_header.php:459
 #, php-format
@@ -99,7 +99,7 @@ msgstr "(0 - donekonečna)"
 #: include/views/configuration.hostgroups.list.php:31
 #: include/views/configuration.template.edit.php:124
 msgid "(Only super admins can create groups)"
-msgstr ""
+msgstr "(Skupiny môžu vytvárať iba SuperAdmini)"
 
 #: include/forms.inc.php:594 include/forms.inc.php:609
 msgid "(in days)"
@@ -120,7 +120,7 @@ msgstr "(bez proxy)"
 
 #: include/blocks.inc.php:1468
 msgid "-"
-msgstr ""
+msgstr "-"
 
 #: acknow.php:131
 msgid "----[BULK ACKNOWLEDGE]----"
@@ -163,15 +163,14 @@ msgid "500 latest values"
 msgstr "500 posledných hodnôt"
 
 #: include/views/configuration.sysmap.edit.php:55
-#, fuzzy
 msgid "<manual>"
-msgstr "<manual>"
+msgstr "<manuálne>"
 
 #: include/views/configuration.item.edit.php:160
 #: include/views/configuration.item.massupdate.php:172
 #: include/views/js/configuration.discovery.edit.js.php:95
 msgid "AES"
-msgstr ""
+msgstr "AES"
 
 #: acknow.php:183
 msgid "ALARM ACKNOWLEDGES"
@@ -190,9 +189,8 @@ msgid "AND / OR"
 msgstr "A / ALEBO"
 
 #: include/views/administration.auditacts.list.php:31
-#, fuzzy
 msgid "AUDIT ACTIONS"
-msgstr "AUDIT AKCIÍ"
+msgstr "AKCIE AUDITU"
 
 #: include/views/administration.auditlogs.list.php:31
 msgid "AUDIT LOGS"
@@ -228,7 +226,7 @@ msgstr "Prístup zamietnutý!"
 
 #: include/func.inc.php:2039
 msgid "Access denied."
-msgstr ""
+msgstr "Prístup zamietnutý."
 
 #: api/classes/CUser.php:872
 #, php-format
@@ -452,11 +450,12 @@ msgstr "Pridať linku"
 
 #: include/views/conf.import.php:23
 msgid "Add missing"
-msgstr "Pridat chybajuce"
+msgstr "Pridať chýbajuce"
 
 #: include/views/configuration.item.massupdate.php:537
+#, fuzzy
 msgid "Add new or existing applications"
-msgstr ""
+msgstr "Pridať novú alebo existujúcu aplikáciu"
 
 #: include/views/configuration.host.massupdate.php:104
 msgid "Add new or existing host groups"
