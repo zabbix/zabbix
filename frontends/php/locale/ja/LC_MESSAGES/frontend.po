@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-24 15:52+0300\n"
+"POT-Creation-Date: 2013-08-10 04:19+0300\n"
 "PO-Revision-Date: 2013-04-05 18:38+0200\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -58,7 +58,7 @@ msgid "%1$s failed login attempt logged. Last failed attempt was from %2$s on %3
 msgid_plural "%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s at %4$s."
 msgstr[0] "%1$s回のログイン失敗がログに記録されています。最後のログイン失敗はホスト%2$sから%3$sの%4$sに行われています。"
 
-#: include/blocks.inc.php:982
+#: include/blocks.inc.php:984
 #, php-format
 msgid "%2$d of %1$d issue is shown"
 msgid_plural "%2$d of %1$d issues are shown"
@@ -204,7 +204,7 @@ msgid "Account is blocked for %s seconds"
 msgstr "アカウントは%s秒間ブロックされています"
 
 #: events.php:565 events.php:578 include/actions.inc.php:245
-#: include/blocks.inc.php:901 include/blocks.inc.php:1418
+#: include/blocks.inc.php:903 include/blocks.inc.php:1420
 #: include/events.inc.php:137 include/events.inc.php:210
 #: include/views/configuration.action.edit.php:938
 msgid "Ack"
@@ -309,8 +309,8 @@ msgstr "アクションの実行内容"
 msgid "Action updated"
 msgstr "アクションを更新しました"
 
-#: events.php:566 events.php:579 include/blocks.inc.php:902
-#: include/blocks.inc.php:1419 include/events.inc.php:138
+#: events.php:566 events.php:579 include/blocks.inc.php:904
+#: include/blocks.inc.php:1421 include/events.inc.php:138
 #: include/menu.inc.php:193 include/views/administration.auditacts.list.php:29
 #: include/views/administration.auditacts.list.php:32
 #: include/views/administration.auditlogs.list.php:29
@@ -345,9 +345,9 @@ msgstr "開始日時"
 msgid "Active till"
 msgstr "終了日時"
 
-#: dashconf.php:211 include/blocks.inc.php:1141 include/blocks.inc.php:1147
-#: include/blocks.inc.php:1261 include/blocks.inc.php:1306
-#: include/blocks.inc.php:1312 include/forms.inc.php:1705
+#: dashconf.php:211 include/blocks.inc.php:1143 include/blocks.inc.php:1149
+#: include/blocks.inc.php:1263 include/blocks.inc.php:1308
+#: include/blocks.inc.php:1314 include/forms.inc.php:1705
 #: include/forms.inc.php:2009 include/reports.inc.php:332
 #: include/reports.inc.php:428 include/reports.inc.php:468
 #: include/views/administration.auditlogs.list.php:45
@@ -466,7 +466,7 @@ msgstr "管理"
 msgid "Advanced labels"
 msgstr "拡張ラベル"
 
-#: include/blocks.inc.php:899 include/blocks.inc.php:1416
+#: include/blocks.inc.php:901 include/blocks.inc.php:1418
 #: include/events.inc.php:136 include/events.inc.php:210
 #: include/events.inc.php:213 tr_status.php:288
 msgid "Age"
@@ -503,9 +503,9 @@ msgstr "エイリアス"
 msgid "Align icons"
 msgstr "グリッドに揃える"
 
-#: dashconf.php:173 dashconf.php:254 include/blocks.inc.php:1240
-#: include/blocks.inc.php:1249 include/blocks.inc.php:1294
-#: include/blocks.inc.php:1378 include/blocks.inc.php:1387
+#: dashconf.php:173 dashconf.php:254 include/blocks.inc.php:1242
+#: include/blocks.inc.php:1251 include/blocks.inc.php:1296
+#: include/blocks.inc.php:1380 include/blocks.inc.php:1389
 #: include/nodes.inc.php:156 include/page_header.php:331
 #: include/reports.inc.php:554
 #: include/views/administration.auditlogs.list.php:42
@@ -3500,7 +3500,7 @@ msgstr "配布ステータス"
 msgid "Description"
 msgstr "説明"
 
-#: include/actions.inc.php:868 include/blocks.inc.php:714
+#: include/actions.inc.php:868 include/blocks.inc.php:716
 #: include/config.inc.php:344
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:43
@@ -3714,7 +3714,7 @@ msgid "Discovery object"
 msgstr "ディスカバリオブジェクト"
 
 #: include/actions.inc.php:70 include/audit.inc.php:44
-#: include/blocks.inc.php:1112 include/forms.inc.php:1018
+#: include/blocks.inc.php:1114 include/forms.inc.php:1018
 #: include/views/configuration.discovery.edit.php:76
 #: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:34
@@ -3840,7 +3840,7 @@ msgstr "Done"
 msgid "Dot"
 msgstr "点線"
 
-#: include/blocks.inc.php:1114
+#: include/blocks.inc.php:1116
 msgctxt "discovery results in dashboard"
 msgid "Down"
 msgstr "Down"
@@ -4418,7 +4418,7 @@ msgstr "FTP"
 msgid "Fail"
 msgstr "失敗"
 
-#: include/actions.inc.php:961 include/blocks.inc.php:1023
+#: include/actions.inc.php:961 include/blocks.inc.php:1025
 msgid "Failed"
 msgstr "失敗"
 
@@ -4435,15 +4435,15 @@ msgstr "テンプレートの更新の失敗"
 msgid "Failure Audit"
 msgstr "失敗の監査"
 
-#: dashboard.php:259 include/blocks.inc.php:1134
+#: dashboard.php:259 include/blocks.inc.php:1136
 msgid "Favourite graphs"
 msgstr "お気に入りのグラフ"
 
-#: dashboard.php:273 include/blocks.inc.php:1259
+#: dashboard.php:273 include/blocks.inc.php:1261
 msgid "Favourite maps"
 msgstr "お気に入りのマップ"
 
-#: dashboard.php:266 include/blocks.inc.php:1304
+#: dashboard.php:266 include/blocks.inc.php:1306
 msgid "Favourite screens"
 msgstr "お気に入りのスクリーン"
 
@@ -4718,7 +4718,7 @@ msgstr "Google Chrome"
 msgid "Gradient line"
 msgstr "グラデーションライン"
 
-#: include/audit.inc.php:29 include/blocks.inc.php:1141
+#: include/audit.inc.php:29 include/blocks.inc.php:1143
 #: include/screens.inc.php:30 include/views/configuration.graph.edit.php:287
 #: include/views/monitoring.charts.php:27
 #: include/views/monitoring.history.php:60 latest.php:318 latest.php:495
@@ -4842,7 +4842,7 @@ msgstr "\"%1$s\"の名前を持つグラフはグラフもしくはグラフの�
 msgid "Graph with same name but other type exist."
 msgstr "同じ名前で異なるタイプのグラフが存在します。"
 
-#: dashboard.php:260 hosts.php:686 hosts.php:765 include/blocks.inc.php:1240
+#: dashboard.php:260 hosts.php:686 hosts.php:765 include/blocks.inc.php:1242
 #: include/html.inc.php:464 include/html.inc.php:468 include/items.inc.php:802
 #: include/menu.inc.php:62 include/triggers.inc.php:1311
 #: include/views/configuration.graph.list.php:56
@@ -4973,9 +4973,9 @@ msgstr "H.i"
 msgid "H:i"
 msgstr "H:i"
 
-#: include/blocks.inc.php:363 include/blocks.inc.php:702
-#: include/blocks.inc.php:770 include/blocks.inc.php:980
-#: include/blocks.inc.php:1070 include/blocks.inc.php:1128
+#: include/blocks.inc.php:365 include/blocks.inc.php:704
+#: include/blocks.inc.php:772 include/blocks.inc.php:982
+#: include/blocks.inc.php:1072 include/blocks.inc.php:1130
 #: include/classes/screens/CScreenSystemStatus.php:47
 #: include/views/configuration.item.list.php:102
 msgid "H:i:s"
@@ -5108,9 +5108,9 @@ msgstr "横位置"
 #: hostinventories.php:157 httpconf.php:190 httpconf.php:289 httpconf.php:313
 #: httpconf.php:331 httpconf.php:351 httpmon.php:121 httpmon.php:141
 #: include/actions.inc.php:64 include/audit.inc.php:27
-#: include/blocks.inc.php:588 include/blocks.inc.php:635
-#: include/blocks.inc.php:886 include/blocks.inc.php:896
-#: include/blocks.inc.php:1414 include/classes/screens/CScreenEvents.php:46
+#: include/blocks.inc.php:590 include/blocks.inc.php:637
+#: include/blocks.inc.php:888 include/blocks.inc.php:898
+#: include/blocks.inc.php:1416 include/classes/screens/CScreenEvents.php:46
 #: include/classes/screens/CScreenHostgroupTriggers.php:121
 #: include/classes/screens/CScreenHostTriggers.php:63
 #: include/classes/screens/CScreenHostTriggers.php:123
@@ -5199,8 +5199,8 @@ msgid "Host deleted"
 msgstr "ホストを削除しました"
 
 #: include/actions.inc.php:60 include/audit.inc.php:35
-#: include/blocks.inc.php:185 include/blocks.inc.php:372
-#: include/blocks.inc.php:1021 include/forms.inc.php:486
+#: include/blocks.inc.php:185 include/blocks.inc.php:374
+#: include/blocks.inc.php:1023 include/forms.inc.php:486
 #: include/maps.inc.php:25 include/reports.inc.php:111
 #: include/views/administration.script.list.php:42
 #: include/views/configuration.hostgroups.edit.php:63
@@ -6347,7 +6347,7 @@ msgstr "グラフ\"%1$s\"のY軸の最小値のアイテムが正しくありま
 msgid "Indonesian (id_ID)"
 msgstr "インドネシア語 (id_ID)"
 
-#: include/blocks.inc.php:900 include/blocks.inc.php:1417
+#: include/blocks.inc.php:902 include/blocks.inc.php:1419
 #: include/classes/class.cformlist.php:65 tr_status.php:286
 msgid "Info"
 msgstr "情報"
@@ -6507,8 +6507,8 @@ msgstr "インベントリモード"
 msgid "Is online?"
 msgstr "ログイン状態"
 
-#: include/blocks.inc.php:888 include/blocks.inc.php:897
-#: include/blocks.inc.php:1415
+#: include/blocks.inc.php:890 include/blocks.inc.php:899
+#: include/blocks.inc.php:1417
 msgid "Issue"
 msgstr "問題"
 
@@ -6928,7 +6928,7 @@ msgstr "最新365日"
 msgid "Last 7 days"
 msgstr "最新7日"
 
-#: include/blocks.inc.php:890 include/blocks.inc.php:898 tr_status.php:287
+#: include/blocks.inc.php:892 include/blocks.inc.php:900 tr_status.php:287
 msgid "Last change"
 msgstr "最新の変更"
 
@@ -7336,11 +7336,11 @@ msgstr "メンテナンスタイプ"
 msgid "Maintenance updated"
 msgstr "メンテナンスを更新しました"
 
-#: include/blocks.inc.php:928 tr_status.php:623
+#: include/blocks.inc.php:930 tr_status.php:623
 msgid "Maintenance with data collection"
 msgstr "データ収集ありのメンテナンス"
 
-#: include/blocks.inc.php:927 tr_status.php:622
+#: include/blocks.inc.php:929 tr_status.php:622
 msgid "Maintenance without data collection"
 msgstr "データ収集なしのメンテナンス"
 
@@ -7362,7 +7362,7 @@ msgstr "マニュアル"
 msgid "Manual Logout"
 msgstr "手動ログアウト"
 
-#: include/audit.inc.php:40 include/blocks.inc.php:1261
+#: include/audit.inc.php:40 include/blocks.inc.php:1263
 #: include/maps.inc.php:27 include/screens.inc.php:34
 #: include/views/configuration.sysmap.edit.php:201
 #: include/views/js/configuration.sysmaps.js.php:16
@@ -7422,7 +7422,7 @@ msgstr "値のマッピング\"%1$s\"はユニークではありません。"
 msgid "Mappings"
 msgstr "マッピング"
 
-#: dashboard.php:274 include/blocks.inc.php:1294 include/menu.inc.php:72
+#: dashboard.php:274 include/blocks.inc.php:1296 include/menu.inc.php:72
 #: include/menu.inc.php:206 include/views/conf.import.php:36 popup.php:97
 #: sysmaps.php:251
 msgid "Maps"
@@ -8584,9 +8584,9 @@ msgstr "シナリオが設定されていません。"
 
 #: events.php:559 events.php:572 hostinventories.php:156 httpmon.php:140
 #: include/actions.inc.php:68 include/audit.inc.php:42
-#: include/blocks.inc.php:184 include/blocks.inc.php:371
-#: include/blocks.inc.php:895 include/blocks.inc.php:1020
-#: include/blocks.inc.php:1111 include/blocks.inc.php:1413
+#: include/blocks.inc.php:184 include/blocks.inc.php:373
+#: include/blocks.inc.php:897 include/blocks.inc.php:1022
+#: include/blocks.inc.php:1113 include/blocks.inc.php:1415
 #: include/classes/screens/CScreenEvents.php:45 include/page_header.php:354
 #: include/triggers.inc.php:1582 include/views/administration.node.edit.php:83
 #: include/views/configuration.httpconf.list.php:66
@@ -8727,11 +8727,11 @@ msgstr "11月"
 msgid "Now"
 msgstr "現在"
 
-#: include/blocks.inc.php:725 include/blocks.inc.php:727
+#: include/blocks.inc.php:727 include/blocks.inc.php:729
 msgid "Number of hosts (monitored/not monitored/templates)"
 msgstr "ホスト数 (有効/無効/テンプレート)"
 
-#: include/blocks.inc.php:734
+#: include/blocks.inc.php:736
 msgid "Number of items (monitored/disabled/not supported)"
 msgstr "アイテム数 (有効/無効/取得不可)"
 
@@ -8775,11 +8775,11 @@ msgstr "期間T内に含まれる(条件Oを満たす)値Vの個数 > N"
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is NOT N"
 msgstr "期間T内に含まれる(条件Oを満たす)値Vの個数 NOT N"
 
-#: include/blocks.inc.php:743
+#: include/blocks.inc.php:745
 msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
 msgstr "トリガー数 (有効/無効)[障害/不明/正常]"
 
-#: include/blocks.inc.php:754
+#: include/blocks.inc.php:756
 msgid "Number of users (online)"
 msgstr "ユーザー数 (オンライン)"
 
@@ -8870,7 +8870,7 @@ msgstr "10月"
 msgid "Off"
 msgstr "OFF"
 
-#: include/actions.inc.php:958 include/blocks.inc.php:1022
+#: include/actions.inc.php:958 include/blocks.inc.php:1024
 #: include/classes/class.ctriggersinfo.php:134
 #: include/views/administration.users.list.php:86 report2.php:238
 #: report3.php:85
@@ -8963,7 +8963,7 @@ msgstr "特権管理者のみがユーザーのメディアを削除できます
 msgid "Only characters are allowed."
 msgstr "文字列のみ使用することができます。"
 
-#: include/blocks.inc.php:735
+#: include/blocks.inc.php:737
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "有効なホストのアイテムのみカウント"
 
@@ -8984,7 +8984,7 @@ msgstr "特権管理者のみがプロキシを削除できます。"
 msgid "Only the last 20%% of the indicator is displayed."
 msgstr "上位20%%の領域が表示されています。"
 
-#: include/blocks.inc.php:744
+#: include/blocks.inc.php:746
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "有効なホストとアイテムのトリガーのみカウント"
 
@@ -9312,7 +9312,7 @@ msgstr "パレット"
 msgid "Palette #%1$s"
 msgstr "パレット #%1$s"
 
-#: include/blocks.inc.php:712
+#: include/blocks.inc.php:714
 #: include/views/configuration.screen.constructor.edit.php:191
 #: include/views/configuration.screen.constructor.edit.php:219
 #: include/views/configuration.screen.constructor.edit.php:273
@@ -9878,10 +9878,10 @@ msgstr "30日間記憶する"
 msgid "Remote command"
 msgstr "リモートコマンド"
 
-#: include/blocks.inc.php:1154 include/blocks.inc.php:1240
-#: include/blocks.inc.php:1249 include/blocks.inc.php:1266
-#: include/blocks.inc.php:1294 include/blocks.inc.php:1317
-#: include/blocks.inc.php:1378 include/blocks.inc.php:1387
+#: include/blocks.inc.php:1156 include/blocks.inc.php:1242
+#: include/blocks.inc.php:1251 include/blocks.inc.php:1268
+#: include/blocks.inc.php:1296 include/blocks.inc.php:1319
+#: include/blocks.inc.php:1380 include/blocks.inc.php:1389
 #: include/views/administration.general.iconmap.edit.php:69
 #: include/views/administration.general.iconmap.edit.php:106
 #: include/views/common.macros.php:38
@@ -10012,7 +10012,7 @@ msgstr "必要なホストへのアクセス権"
 msgid "Required performance (vps)"
 msgstr "要求パフォーマンス (vps)"
 
-#: include/blocks.inc.php:755
+#: include/blocks.inc.php:757
 msgid "Required server performance, new values per second"
 msgstr "1秒あたりの監視項目数(Zabbixサーバーの要求パフォーマンス)"
 
@@ -10500,7 +10500,7 @@ msgstr "シナリオ"
 msgid "Schedule"
 msgstr "スケジュール"
 
-#: include/audit.inc.php:41 include/blocks.inc.php:1306
+#: include/audit.inc.php:41 include/blocks.inc.php:1308
 #: include/screens.inc.php:36 include/views/configuration.screen.edit.php:45
 #: include/views/configuration.screen.list.php:51
 #: include/views/configuration.slideconf.edit.php:48
@@ -10570,7 +10570,7 @@ msgstr "ID \"%s\"を持つスクリーンは存在しません。"
 msgid "Screen with name \"%s\" does not exist."
 msgstr "スクリーン\"%s\"は存在しません。"
 
-#: dashboard.php:267 include/blocks.inc.php:1378 include/html.inc.php:477
+#: dashboard.php:267 include/blocks.inc.php:1380 include/html.inc.php:477
 #: include/html.inc.php:481 include/menu.inc.php:67 include/menu.inc.php:197
 #: include/views/configuration.screen.list.php:38
 #: include/views/configuration.template.edit.php:386
@@ -11047,11 +11047,11 @@ msgstr "標準"
 msgid "Simple check"
 msgstr "シンプルチェック"
 
-#: include/blocks.inc.php:1147 include/screens.inc.php:38
+#: include/blocks.inc.php:1149 include/screens.inc.php:38
 msgid "Simple graph"
 msgstr "シンプルグラフ"
 
-#: include/blocks.inc.php:1249 jsLoader.php:107
+#: include/blocks.inc.php:1251 jsLoader.php:107
 msgid "Simple graphs"
 msgstr "シンプルグラフ"
 
@@ -11100,7 +11100,7 @@ msgstr "ホスト\"%2$s\"へのグラフ\"%1$s\"のコピーをスキップし�
 msgid "Slide"
 msgstr "スライド"
 
-#: include/audit.inc.php:45 include/blocks.inc.php:1312
+#: include/audit.inc.php:45 include/blocks.inc.php:1314
 #: include/views/monitoring.slides.php:69
 msgid "Slide show"
 msgstr "スライドショー"
@@ -11132,7 +11132,7 @@ msgstr "スライドショーを更新しました"
 msgid "Slide shows"
 msgstr "スライドショー"
 
-#: include/blocks.inc.php:1387
+#: include/blocks.inc.php:1389
 #: include/views/configuration.slideconf.edit.php:96
 msgid "Slides"
 msgstr "スライド"
@@ -11829,7 +11829,7 @@ msgstr "プロキシ\"%s\"に設定されたインターフェースが多すぎ
 msgid "Top"
 msgstr "上"
 
-#: include/blocks.inc.php:375 include/classes/class.chostsinfo.php:128
+#: include/blocks.inc.php:377 include/classes/class.chostsinfo.php:128
 #: queue.php:289
 msgid "Total"
 msgstr "合計"
@@ -12263,7 +12263,7 @@ msgstr "単位"
 #: include/actions.inc.php:190 include/actions.inc.php:198
 #: include/actions.inc.php:212 include/actions.inc.php:223
 #: include/actions.inc.php:251 include/actions.inc.php:570
-#: include/blocks.inc.php:1024 include/classes/class.chostsinfo.php:127
+#: include/blocks.inc.php:1026 include/classes/class.chostsinfo.php:127
 #: include/discovery.inc.php:128 include/discovery.inc.php:162
 #: include/events.inc.php:29 include/graphs.inc.php:37
 #: include/graphs.inc.php:77 include/hosts.inc.php:53 include/hosts.inc.php:80
@@ -12391,7 +12391,7 @@ msgstr "インポートファイルの拡張子\"%1$s\"はサポートされて�
 msgid "Unsupported import format \"%1$s\"."
 msgstr "インポートフォーマット\"%1$s\"はサポートされていません。"
 
-#: include/blocks.inc.php:1113
+#: include/blocks.inc.php:1115
 msgctxt "discovery results in dashboard"
 msgid "Up"
 msgstr "Up"
@@ -12433,9 +12433,9 @@ msgstr "更新"
 msgid "Updated status of host"
 msgstr "ホストのステータスを更新しました"
 
-#: include/blocks.inc.php:363 include/blocks.inc.php:702
-#: include/blocks.inc.php:770 include/blocks.inc.php:980
-#: include/blocks.inc.php:1070 include/blocks.inc.php:1128
+#: include/blocks.inc.php:365 include/blocks.inc.php:704
+#: include/blocks.inc.php:772 include/blocks.inc.php:982
+#: include/blocks.inc.php:1072 include/blocks.inc.php:1130
 #: include/classes/screens/CScreenSystemStatus.php:47
 #, php-format
 msgid "Updated: %s"
@@ -12665,7 +12665,7 @@ msgstr "ユーザーのステータスを更新しました"
 msgid "Users unblocked"
 msgstr "ユーザーのブロックを解除しました"
 
-#: include/blocks.inc.php:713 include/classes/class.cpie.php:309
+#: include/blocks.inc.php:715 include/classes/class.cpie.php:309
 #: include/classes/screens/CScreenEvents.php:48
 #: include/classes/screens/CScreenHistory.php:168
 #: include/classes/screens/CScreenHistory.php:266 include/reports.inc.php:383
@@ -12959,7 +12959,7 @@ msgstr "データ収集あり"
 msgid "With last event unacknowledged"
 msgstr "コメント未入力の最新のイベント"
 
-#: include/blocks.inc.php:374
+#: include/blocks.inc.php:376
 msgid "With problems"
 msgstr "障害あり"
 
@@ -12972,7 +12972,7 @@ msgstr "トリガーあり"
 msgid "With unacknowledged events"
 msgstr "コメント未入力のイベント"
 
-#: include/blocks.inc.php:373
+#: include/blocks.inc.php:375
 msgid "Without problems"
 msgstr "障害なし"
 
@@ -13180,7 +13180,7 @@ msgstr "年"
 msgid "Yearly"
 msgstr "毎年"
 
-#: events.php:760 include/blocks.inc.php:722
+#: events.php:760 include/blocks.inc.php:724
 #: include/classes/class.cserverinfo.php:35 include/config.inc.php:563
 #: include/events.inc.php:304 include/events.inc.php:322
 #: include/forms.inc.php:1922 include/triggers.inc.php:1608
@@ -13358,7 +13358,7 @@ msgstr ""
 "1. \"zabbix.conf.php\"に設定されたサーバーのIPまたはDNSが正しくない;\n"
 "2. ネットワークの設定が正しくありません。\n"
 
-#: include/blocks.inc.php:723
+#: include/blocks.inc.php:725
 msgid "Zabbix server IP or port is not set!"
 msgstr "Zabbix serverのIPアドレスまたはポート番号が設定されていません！"
 
@@ -13374,7 +13374,7 @@ msgstr "Zabbixサーバーの情報"
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "Zabbixサーバが動作していません (画面のリフレッシュを行ってステータスを再確認してください)"
 
-#: include/blocks.inc.php:721
+#: include/blocks.inc.php:723
 msgid "Zabbix server is running"
 msgstr "Zabbixサーバーの起動"
 
@@ -13489,7 +13489,7 @@ msgid "d M Y H:i"
 msgstr "Y/m/d H:i"
 
 #: acknow.php:162 events.php:282 httpdetails.php:115 httpmon.php:242
-#: include/acknow.inc.php:59 include/blocks.inc.php:954
+#: include/acknow.inc.php:59 include/blocks.inc.php:956
 #: include/classes/screens/CScreenEvents.php:63
 #: include/classes/screens/CScreenPlainText.php:95 include/events.inc.php:116
 #: include/events.inc.php:187 include/events.inc.php:243
@@ -13713,7 +13713,7 @@ msgstr "有効なLDAPユーザーが必要です"
 msgid "no"
 msgstr "no"
 
-#: include/blocks.inc.php:1438 include/classes/class.cchart.php:1825
+#: include/blocks.inc.php:1440 include/classes/class.cchart.php:1825
 #: include/classes/class.cpie.php:320 include/maps.inc.php:435
 #: include/maps.inc.php:479
 #, php-format
@@ -13748,7 +13748,7 @@ msgstr "未送信"
 msgid "now"
 msgstr "現在"
 
-#: include/blocks.inc.php:348 include/blocks.inc.php:692
+#: include/blocks.inc.php:350 include/blocks.inc.php:694
 #: include/func.inc.php:1718
 msgid "of"
 msgstr "of"
