@@ -400,22 +400,22 @@ function bar_report_form3(){
 
 	// items
 	$itemid = 0;
-	$description = '';
+	$itemName = '';
 	if(count($items) && ($items[0]['itemid'] > 0)){
 		$itemid = $items[0]['itemid'];
-		$description = get_item_by_itemid($itemid);
-		$description = itemName($description);
+		$itemName = get_item_by_itemid($itemid);
+		$itemName = itemName($itemName);
 	}
 
 	$itemidVar = new CVar('itemid', $itemid, 'itemid');
 	$reportForm->addItem($itemidVar);
 
-	$txtCondVal = new CTextBox('itemsdescription',$description,50,'yes');
-	$txtCondVal->setAttribute('id', 'itemsdescription');
+	$txtCondVal = new CTextBox('item_name', $itemName, 50, 'yes');
+	$txtCondVal->setAttribute('id', 'item_name');
 
 	$btnSelect = new CButton('btn1', _('Select'),
 			"return PopUp('popup.php?dstfrm=".$reportForm->GetName().
-			"&dstfld1=itemid&dstfld2=itemsdescription&".
+			"&dstfld1=itemid&dstfld2=item_name&".
 			"srctbl=items&srcfld1=itemid&srcfld2=name&monitored_hosts=1');",
 			'T');
 

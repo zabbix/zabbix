@@ -58,13 +58,11 @@ $availabilityReportMode = get_request('mode', CProfile::get('web.avail_report.mo
 CProfile::update('web.avail_report.mode', $availabilityReportMode, PROFILE_TYPE_INT);
 
 // validate permission
-if (get_request('filter_groupid') && !API::HostGroup()->isReadable(array($_REQUEST['filter_groupid'])) ||
-		get_request('filter_hostid') && !API::Host()->isReadable(array($_REQUEST['filter_hostid']))
-	) {
-	access_deny();
-}
-if ($availabilityReportMode) {
-	if (get_request('hostgroupid') && !API::HostGroup()->isReadable(array($_REQUEST['hostgroupid']))) {
+if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
+	if (get_request('hostgroupid') && !API::HostGroup()->isReadable(array($_REQUEST['hostgroupid'])) ||
+			get_request('filter_groupid') && !API::HostGroup()->isReadable(array($_REQUEST['filter_groupid'])) ||
+			get_request('filter_hostid') && !API::Host()->isReadable(array($_REQUEST['filter_hostid']))
+		) {
 		access_deny();
 	}
 	if (get_request('tpl_triggerid')) {
@@ -73,9 +71,16 @@ if ($availabilityReportMode) {
 			'output' => array('triggerid'),
 			'filter' => array('flags' => null)
 		));
-		if (!$trigger){
+		if (!$trigger) {
 			access_deny();
 		}
+	}
+}
+else {
+	if (get_request('filter_groupid') && !API::HostGroup()->isReadable(array($_REQUEST['filter_groupid'])) ||
+			get_request('filter_hostid') && !API::Host()->isReadable(array($_REQUEST['filter_hostid']))
+		) {
+		access_deny();
 	}
 }
 
