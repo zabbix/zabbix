@@ -71,18 +71,25 @@ class DB {
 	 * @static
 	 *
 	 * @param array $table_counts table name, ids count tuple.
+	 * @param bool $commit_existing rollback existing transaction if present
 	 */
-	public static function commitReserveIds($table_counts=array()) {
+	public static function commitReserveIds(array $table_counts = array(), $commit_existing = false) {
 		global $DB;
+		$transaction = false;
 
-		if ($DB['TRANSACTIONS'] == 1) {
-			DBend(false); // do not commit?
-			DBstart(); // restart transactions
-			foreach ($table_counts as $table=>$count) {
-				self::reserveIds($table, $count, true);
-			}
-			DBend(true); // commit reserved Ids
-			DBstart();
+		if ($DB['TRANSACTIONS'] >= 1) {
+			DBend($commit_existing);
+			$transaction = true;
+		}
+
+		DBstart(); // start a transaction around id allocation
+		foreach ($table_counts as $table=>$count) {
+			self::reserveIds($table, $count, true);
+		}
+		DBend(true); // commit reserved Ids
+
+		if ($transaction) {
+			DBstart(); // restart transaction
 		}
 	}
 
@@ -100,7 +107,7 @@ class DB {
 	 *
 	 * @return string
 	 */
-	protected static function reserveIds($table, $count, $set_cache=false) {
+	protected static function reserveIds($table, $count, $set_cache = false) {
 		global $DB;
 		static $cache;
 		static $reservedIds;
