@@ -548,3 +548,5 @@ div.preloader {
 .multiselect .available .prefix { color: #77B7DA; }
 .multiselect .available ul li.hover { background: #4A7FA2; }
 .multiselect .available ul li.hover .prefix { color: #F1F1F1; }
+
+.not-monitored, .not-monitored:hover { color: #EE0000; }

@@ -54,8 +54,8 @@ $fields = array(
 check_fields($fields);
 
 $pageFilter = new CPageFilter(array(
-	'groups' => array('monitored_hosts' => true, 'with_graphs' => true),
-	'hosts' => array('monitored_hosts' => true, 'with_graphs' => true),
+	'groups' => array('real_hosts' => true, 'with_graphs' => true),
+	'hosts' => array('with_graphs' => true),
 	'groupid' => get_request('groupid', null),
 	'hostid' => get_request('hostid', null),
 	'graphs' => array('templated' => 0),
