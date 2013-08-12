@@ -327,8 +327,6 @@ function bar_report_form3(){
 // ----------
 
 // HOSTS
-//	validate_group(PERM_READ,array('real_hosts'),'web.last.conf.groupid');
-
 	$groupid = get_request('groupid',0);
 	$cmbGroups = new CComboBox('groupid',$groupid,'submit()');
 	$cmbGroups->addItem(0, _('All'));

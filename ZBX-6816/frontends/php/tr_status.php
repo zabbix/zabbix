@@ -116,12 +116,7 @@ if (isset($_REQUEST['filter_rst'])) {
 }
 
 // show triggers
-if (isset($_REQUEST['show_triggers'])) {
-	CProfile::update('web.tr_status.filter.show_triggers', $_REQUEST['show_triggers'], PROFILE_TYPE_INT);
-}
-else {
-	$_REQUEST['show_triggers'] = CProfile::get('web.tr_status.filter.show_triggers', TRIGGERS_OPTION_ONLYTRUE);
-}
+$_REQUEST['show_triggers'] = isset($_REQUEST['show_triggers']) ? $_REQUEST['show_triggers'] : TRIGGERS_OPTION_ONLYTRUE;
 
 // show events
 if (isset($_REQUEST['show_events'])) {
@@ -305,7 +300,7 @@ $severityComboBox->addItems(array(
 ));
 $filterForm->addRow(_('Minimum trigger severity'), $severityComboBox);
 
-$statusChangeDays = new CNumericBox('status_change_days', $_REQUEST['status_change_days'], 4);
+$statusChangeDays = new CNumericBox('status_change_days', $_REQUEST['status_change_days'], 4, false, false, false);
 if (!$_REQUEST['status_change']) {
 	$statusChangeDays->setAttribute('disabled', 'disabled');
 }

@@ -386,8 +386,8 @@ function DBrollback() {
  * DBselect('select * from users',50,200)
  *
  * @param string $query
- * @param integer $limit    max number of record to return
- * @param integer $offset   return starting from $offset record
+ * @param int $limit    max number of record to return
+ * @param int $offset   return starting from $offset record
  *
  * @return resource or object, False if failed
  */
@@ -487,8 +487,8 @@ function DBselect($query, $limit = null, $offset = 0) {
  * SELECT * FROM (SELECT * FROM tbl) WHERE rownum BETWEEN 6 AND 15
  *
  * @param $query
- * @param integer $limit    max number of record to return
- * @param integer $offset   return starting from $offset record
+ * @param int $limit    max number of record to return
+ * @param int $offset   return starting from $offset record
  *
  * @return bool|string
  */
