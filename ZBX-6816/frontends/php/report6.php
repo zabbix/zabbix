@@ -37,7 +37,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		'hostids'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, 		'isset({config})&&({config}==3)&&isset({report_show})&&!isset({groupids})'),
 		'groupids'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, 		'isset({config})&&({config}==3)&&isset({report_show})&&!isset({hostids})'),
 		'itemid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO,		'isset({config})&&({config}==3)&&isset({report_show})'),
-		'itemdescription'=>array(T_ZBX_STR, O_OPT, null, null, null),
 
 		'items'=>		array(T_ZBX_STR, O_OPT,	null,	DB_ID,		'isset({report_show})&&({config}!=3)'),
 		'new_graph_item'=>	array(T_ZBX_STR, O_OPT,	NULL,	null,		null),
@@ -89,13 +88,18 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		}
 		$_REQUEST['items']=array();
 		if (get_request('itemid')) {
+			if (!API::Item()->isReadable(array($_REQUEST['itemid']))) {
+				access_deny();
+			}
 			$_REQUEST['items'][] = array('itemid' => $_REQUEST['itemid']);
 		}
 	}
-	if (get_request('items') && count($_REQUEST['items']) > 0 && $_REQUEST['items'][0]['itemid'] > 0) {
-		$itemIds = zbx_objectValues($_REQUEST['items'], 'itemid');
-		if (!API::Item()->isReadable($itemIds)) {
-			access_deny();
+	else {
+		if (get_request('items') && count($_REQUEST['items']) > 0 && $_REQUEST['items'][0]['itemid'] > 0) {
+			$itemIds = zbx_objectValues($_REQUEST['items'], 'itemid');
+			if (!API::Item()->isReadable($itemIds)) {
+				access_deny();
+			}
 		}
 	}
 
