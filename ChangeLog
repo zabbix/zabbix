@@ -9,6 +9,7 @@ New features:
 ...G...... [ZBXNEXT-1528] added net.if.in, net.if.out and net.if.total item support on HP-UX platforms (igors)
 
 Bug fixes:
+.......PS. [ZBX-6746] fixed tamplate linking to proxy if the agent with the same name is auto-registered (igors)
 A......... [ZBX-6458] fixed "name" parameter validation for hostgroup.update method and improved error messages (Ivo)
 ..F....... [ZBX-6838] fixed bug with sql errors in the application popup window (Guntis)
 ..F....... [ZBX-6817] fixed update for web scenarios, to link items to the right application (Guntis)
@@ -334,6 +335,7 @@ New features:
 A.F....... [ZBX-1357] updated Dutch translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-6746] fixed tamplate linking to proxy if the agent with the same name is auto-registered (igors)
 ..F....... [ZBX-6840] fixed undefined indexes for triggers in Monitoring > Maps and Dashboard (Ivo)
 ...G...... [ZBX-6672] fixed windows agent performance counters being capped to 100 (wiper)
 ....I..... [ZBX-6831] fixed webtest item conversion in 1.8->2.0 database upgrade patch for mysql (wiper)
