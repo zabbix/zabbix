@@ -60,11 +60,11 @@ if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['gro
 	access_deny();
 }
 if (get_request('elementid')) {
-	$screenItems = API::Screen()->get(array(
+	$screens = API::Screen()->get(array(
 		'screenids' => array($_REQUEST['elementid']),
-		'countOutput' => true
+		'output' => array('screenid')
 	));
-	if (!$screenItems) {
+	if (!$screens) {
 		access_deny();
 	}
 }

@@ -88,7 +88,12 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		}
 		$_REQUEST['items']=array();
 		if (get_request('itemid')) {
-			if (!API::Item()->isReadable(array($_REQUEST['itemid']))) {
+			$items = API::Item()->get(array(
+				'itemids' => $_REQUEST['itemid'],
+				'webitems' => true,
+				'output' => array('itemid')
+			));
+			if (!$items) {
 				access_deny();
 			}
 			$_REQUEST['items'][] = array('itemid' => $_REQUEST['itemid']);
@@ -97,7 +102,13 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	else {
 		if (get_request('items') && count($_REQUEST['items']) > 0 && $_REQUEST['items'][0]['itemid'] > 0) {
 			$itemIds = zbx_objectValues($_REQUEST['items'], 'itemid');
-			if (!API::Item()->isReadable($itemIds)) {
+			$itemsCount = API::Item()->get(array(
+				'itemids' => $itemIds,
+				'webitems' => true,
+				'countOutput' => true
+			));
+
+			if (count($itemIds) != $itemsCount) {
 				access_deny();
 			}
 		}

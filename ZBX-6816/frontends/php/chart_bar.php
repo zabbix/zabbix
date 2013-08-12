@@ -62,8 +62,14 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	check_fields($fields);
 
 	// validate permissions
-	$items = get_request('items',array());
-	if (!API::Item()->isReadable(zbx_objectValues($items,'itemid'))) {
+	$items = get_request('items', array());
+	$itemIds = zbx_objectValues($_REQUEST['items'], 'itemid');
+	$itemsCount = API::Item()->get(array(
+		'itemids' => $itemIds,
+		'webitems' => true,
+		'countOutput' => true
+	));
+	if (count($itemIds) != $itemsCount) {
 		access_deny();
 	}
 
