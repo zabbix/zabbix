@@ -1988,13 +1988,10 @@ char	*DBget_unique_hostname_by_sample(const char *host_name_sample)
 			"select host"
 			" from hosts"
 			" where host like '%s%%' escape '%c'"
-			" and status in (%d,%d,%d)"
+				" and status in (%d,%d,%d)"
 				DB_NODE,
-			host_name_sample_esc,
-			ZBX_SQL_LIKE_ESCAPE_CHAR,
-			HOST_STATUS_MONITORED,
-			HOST_STATUS_NOT_MONITORED,
-			HOST_STATUS_TEMPLATE,
+			host_name_sample_esc, ZBX_SQL_LIKE_ESCAPE_CHAR,
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE,
 			DBnode_local("hostid"));
 
 	zbx_free(host_name_sample_esc);
