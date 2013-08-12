@@ -30,7 +30,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 	const ERROR_MISSING_ITEMS = 'missingItems';
 
 	/**
-	 * Check $graphs:
+	 * Check graphs:
 	 *	whether graphs have name field
 	 *	whether not set  templateid
 	 *	whether graphs has at least one item
@@ -41,16 +41,31 @@ abstract class CGraphGeneral extends CZBXAPI {
 	 *	whether not creating graphs with the same name
 	 *
 	 * @param array $graphs
-	 * @param boolean $update
-	 * @param boolean $prototype
+	 * @param bool  $update
+	 *
 	 * @return true
 	 */
 	protected function checkInput($graphs, $update = false) {
 		$colorValidator = new CColorValidator();
-		if ($update){
+
+		if ($update) {
+			// discovered fields cannot be updated
+			$dbGraphs = API::Graph()->get(array(
+				'graphids' => zbx_objectValues($graphs, 'graphid'),
+				'output' => array('graphid', 'flags'),
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+			foreach ($graphs as $graph) {
+				if ($dbGraphs[$graph['graphid']]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update discovered graph!'));
+				}
+			}
+
 			$graphs = $this->extendObjects($this->tableName(), $graphs, array('name'));
 		}
-		foreach ($graphs as $gnum => $graph) {
+
+		foreach ($graphs as $graph) {
 			if (($update && isset($graph['gitems']) && (!is_array($graph['gitems']) || !$graph['gitems']))
 					|| (!$update && (!isset($graph['gitems']) || !is_array($graph['gitems']) || !$graph['gitems']))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -124,12 +139,14 @@ abstract class CGraphGeneral extends CZBXAPI {
 				'preservekeys' => true, // faster
 				'limit' => 1 // one match enough for check
 			));
+
 			// if graph exists with given name and it is create action or update action with ids not matching, rise exception
 			foreach ($graphsExists as $graphExists) {
 				if (!$update || (bccomp($graphExists['graphid'], $graph['graphid']) != 0)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph with name "%1$s" already exists in graphs or graph prototypes.', $graph['name']));
 				}
 			}
+
 			// cheks that there is no two graphs with the same name within host
 			foreach ($hostAndTemplateIds as $id) {
 				if (!isset($graphNames[$graph['name']])) {

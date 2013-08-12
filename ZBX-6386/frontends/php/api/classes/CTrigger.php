@@ -623,8 +623,8 @@ class CTrigger extends CTriggerGeneral {
 	/**
 	 * Check input.
 	 *
-	 * @param $triggers
-	 * @param $method
+	 * @param array  $triggers
+	 * @param string $method
 	 */
 	public function checkInput(array &$triggers, $method) {
 		$create = ($method == 'create');
@@ -651,6 +651,17 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		if ($update) {
+			// discovered fields, except status, cannot be updated
+			foreach ($triggers as $trigger) {
+				if ($dbTriggers[$trigger['triggerid']]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+					foreach ($trigger as $key => $value) {
+						if (!in_array($key, array('triggerid', 'status'))) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update discovered trigger!'));
+						}
+					}
+				}
+			}
+
 			$triggers = $this->extendObjects($this->tableName(), $triggers, array('description'));
 		}
 
