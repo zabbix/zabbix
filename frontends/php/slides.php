@@ -63,8 +63,8 @@ if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['gro
 	access_deny();
 }
 if (get_request('elementid')) {
-	$slides = get_slideshow_by_slideshowid($_REQUEST['elementid']);
-	if (!$slides) {
+	$slideshow = get_slideshow_by_slideshowid($_REQUEST['elementid']);
+	if (!$slideshow) {
 		access_deny();
 	}
 }
