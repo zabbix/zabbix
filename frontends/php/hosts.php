@@ -583,15 +583,23 @@ elseif ($_REQUEST['go'] == 'delete') {
 elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 	$status = ($_REQUEST['go'] == 'activate') ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
 	$hosts = get_request('hosts', array());
-	$act_hosts = available_hosts($hosts, 1);
+	$actHosts = API::Host()->get(array(
+		'hostids' => $hosts,
+		'editable' => true,
+		'templated_hosts' => 1,
+		'output' => array('hostid')
+	));
+	$actHosts = zbx_objectValues($actHosts, 'hostid');
 
-	DBstart();
+	if ($actHosts) {
+		DBstart();
 
-	$goResult = updateHostStatus($act_hosts, $status);
-	$goResult = DBend($goResult);
+		$goResult = updateHostStatus($actHosts, $status);
+		$goResult = DBend($goResult);
 
-	show_messages($goResult, _('Host status updated'), _('Cannot update host status'));
-	clearCookies($goResult);
+		show_messages($goResult, _('Host status updated'), _('Cannot update host status'));
+		clearCookies($goResult);
+	}
 }
 
 /*
