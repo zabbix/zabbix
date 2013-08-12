@@ -64,6 +64,29 @@ class DB {
 	}
 
 	/**
+	 * Commit reserved ids for primary key of passed tables.
+	 * Uses the existing reserveIds mechanism, but primes the static cache to
+	 * avoid locking the ids table rows during transaction.
+	 *
+	 * @static
+	 *
+	 * @param array $table_counts table name, ids count tuple.
+	 */
+	public static function commitReserveIds($table_counts=array()) {
+		global $DB;
+
+		if ($DB['TRANSACTIONS'] == 1) {
+			DBend(false); // do not commit?
+			DBstart(); // restart transactions
+			foreach ($table_counts as $table=>$count) {
+				self::reserveIds($table, $count, true);
+			}
+			DBend(true); // commit reserved Ids
+			DBstart();
+		}
+	}
+
+	/**
 	 * Reserve ids for primary key of passed table.
 	 * If record for table does not exist or value is out of range, ids record is recreated
 	 * using maximum id from table or minimum allowed value.
@@ -73,50 +96,72 @@ class DB {
 	 *
 	 * @param string $table table name
 	 * @param int $count number of ids to reserve
+	 * @param bool $set_cache prime internal static cache with allocated ids
 	 *
 	 * @return string
 	 */
-	protected static function reserveIds($table, $count) {
+	protected static function reserveIds($table, $count, $set_cache=false) {
 		global $DB;
-
-		self::init();
-
-		$tableSchema = self::getSchema($table);
-		$id_name = $tableSchema['key'];
-
-		$sql = 'SELECT nextid'.
-				' FROM ids'.
-				' WHERE nodeid='.self::$nodeId.
-					' AND table_name='.zbx_dbstr($table).
-					' AND field_name='.zbx_dbstr($id_name);
-
-		// SQLite3 does not support this syntax. Since we are in transaction, it can be ignored.
-		if ($DB['TYPE'] != ZBX_DB_SQLITE3) {
-			$sql = $sql.' FOR UPDATE';
+		static $cache;
+		static $reservedIds;
+		if (!isset($cache)) {
+			$cache = array();
+		}
+		if (!isset($reservedIds)) {
+			$reservedIds = array();
 		}
 
-		$res = DBfetch(DBselect($sql));
-		if ($res) {
-			$maxNextId = bcadd($res['nextid'], $count, 0);
-			if (bccomp($maxNextId, self::$maxNodeId, 0) == 1 || bccomp($maxNextId, self::$minNodeId, 0) == -1) {
-				$nextid = self::refreshIds($table, $count);
-			}
-			else {
-				$sql = 'UPDATE ids'.
-						' SET nextid=nextid+'.$count.
-						' WHERE nodeid='.self::$nodeId.
-							' AND table_name='.zbx_dbstr($table).
-							' AND field_name='.zbx_dbstr($id_name);
-				if (!DBexecute($sql)) {
-					self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
-				}
-				$nextid = bcadd($res['nextid'], 1, 0);
-			}
+		// Return cached table nextid if available.
+		if (!empty($cache[$table]) && !$set_cache && ($cache[$table]+$count < $reservedIds[$table])) {
+			$nextid = $cache[$table];
+			$cache[$table] = $cache[$table] + $count;
+			return $nextid;
 		}
 		else {
-			$nextid = self::refreshIds($table, $count);
+			self::init();
+
+			$tableSchema = self::getSchema($table);
+			$id_name = $tableSchema['key'];
+
+			$sql = 'SELECT nextid'.
+					' FROM ids'.
+					' WHERE nodeid='.self::$nodeId.
+						' AND table_name='.zbx_dbstr($table).
+						' AND field_name='.zbx_dbstr($id_name);
+
+			// SQLite3 does not support this syntax. Since we are in transaction, it can be ignored.
+			if ($DB['TYPE'] != ZBX_DB_SQLITE3) {
+				$sql = $sql.' FOR UPDATE';
+			}
+
+			$res = DBfetch(DBselect($sql));
+			if ($res) {
+				$maxNextId = bcadd($res['nextid'], $count, 0);
+				if (bccomp($maxNextId, self::$maxNodeId, 0) == 1 || bccomp($maxNextId, self::$minNodeId, 0) == -1) {
+					$nextid = self::refreshIds($table, $count);
+				}
+				else {
+					$sql = 'UPDATE ids'.
+							' SET nextid=nextid+'.$count.
+							' WHERE nodeid='.self::$nodeId.
+								' AND table_name='.zbx_dbstr($table).
+								' AND field_name='.zbx_dbstr($id_name);
+					if (!DBexecute($sql)) {
+						self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
+					}
+					$nextid = bcadd($res['nextid'], 1, 0);
+				}
+			}
+			else {
+				$nextid = self::refreshIds($table, $count);
+			}
+
+			if ($set_cache) {
+				$reservedIds[$table] = $nextid + $count;
+				$cache[$table] = $nextid;
+			}
+			return $nextid;
 		}
-		return $nextid;
 	}
 
 	/**
