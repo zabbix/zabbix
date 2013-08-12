@@ -309,27 +309,28 @@ class DB {
 				continue;
 			}
 
-			if (is_null($values[$field])) {
-				if ($tableSchema['fields'][$field]['null']) {
-					$values[$field] = 'NULL';
-				}
-				elseif (isset($tableSchema['fields'][$field]['default'])) {
-					$values[$field] = $tableSchema['fields'][$field]['default'];
-				}
-				else {
-					self::exception(self::DBEXECUTE_ERROR, _s('Mandatory field "%1$s" is missing in table "%2$s".', $field, $table));
-				}
-			}
-
 			if (isset($tableSchema['fields'][$field]['ref_table'])) {
 				if ($tableSchema['fields'][$field]['null']) {
 					$values[$field] = zero2null($values[$field]);
 				}
 			}
 
-			if ($values[$field] === 'NULL') {
+			if (is_null($values[$field])) {
 				if (!$tableSchema['fields'][$field]['null']) {
-					self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "NULL" for NOT NULL field "%1$s".', $field));
+					self::exception(self::DBEXECUTE_ERROR,
+						_s('Incorrect value "NULL" for NOT NULL field "%1$s".', $field)
+					);
+				}
+				elseif ($tableSchema['fields'][$field]['null']) {
+					$values[$field] = 'NULL';
+				}
+				elseif (isset($tableSchema['fields'][$field]['default'])) {
+					$values[$field] = $tableSchema['fields'][$field]['default'];
+				}
+				else {
+					self::exception(self::DBEXECUTE_ERROR,
+						_s('Mandatory field "%1$s" is missing in table "%2$s".', $field, $table)
+					);
 				}
 			}
 			else {
