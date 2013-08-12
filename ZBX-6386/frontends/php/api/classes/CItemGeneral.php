@@ -178,7 +178,7 @@ abstract class CItemGeneral extends CZBXAPI {
 					foreach ($item as $key => $value) {
 						// flags must be ignored also because hi is setted by API
 						if (!in_array($key, array('itemid', 'status', 'flags'))) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update discovered item!'));
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update discovered item.'));
 						}
 					}
 				}

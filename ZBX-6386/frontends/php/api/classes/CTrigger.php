@@ -656,7 +656,7 @@ class CTrigger extends CTriggerGeneral {
 				if ($dbTriggers[$trigger['triggerid']]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 					foreach ($trigger as $key => $value) {
 						if (!in_array($key, array('triggerid', 'status'))) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update discovered trigger!'));
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update discovered trigger.'));
 						}
 					}
 				}

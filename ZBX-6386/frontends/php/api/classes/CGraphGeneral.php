@@ -58,7 +58,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 			));
 			foreach ($graphs as $graph) {
 				if ($dbGraphs[$graph['graphid']]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update discovered graph!'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update discovered graph.'));
 				}
 			}
 
