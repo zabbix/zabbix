@@ -77,14 +77,6 @@ $pageFilter = new CPageFilter($options);
 $_REQUEST['groupid'] = $pageFilter->groupid;
 
 $_REQUEST['hostid'] = get_request('hostid', 0);
-// permission check, imo should be removed in future.
-if($_REQUEST['hostid'] > 0){
-	$res = API::Host()->get(array(
-		'real_hosts' => 1,
-		'hostids' => $_REQUEST['hostid']
-	));
-	if(empty($res)) access_deny();
-}
 
 $hostinvent_wdgt = new CWidget();
 $hostinvent_wdgt->addPageHeader(_('HOST INVENTORIES'));
