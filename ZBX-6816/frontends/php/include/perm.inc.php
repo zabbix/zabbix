@@ -131,51 +131,6 @@ function get_user_system_auth($userid) {
 	return $result;
 }
 
-/***********************************************
-	GET ACCESSIBLE RESOURCES BY USERID
-************************************************/
-/**
- *
- * @deprecated
- * @see CHostGroup::isReadable()
- */
-function available_groups($groupids, $editable = null) {
-	$options = array();
-	$options['groupids'] = $groupids;
-	$options['editable'] = $editable;
-	$groups = API::HostGroup()->get($options);
-	return zbx_objectValues($groups, 'groupid');
-}
-
-/**
- *
- * @deprecated
- * @see CHost::isReadable()
- */
-function available_hosts($hostids, $editable = null) {
-	$options = array();
-	$options['hostids'] = $hostids;
-	$options['editable'] = $editable;
-	$options['templated_hosts'] = 1;
-	$hosts = API::Host()->get($options);
-	return zbx_objectValues($hosts, 'hostid');
-}
-
-/**
- *
- * @deprecated
- * @see CTrigger::isReadable()
- */
-function available_triggers($triggerids, $editable = null) {
-	$options = array(
-		'triggerids' => $triggerids,
-		'editable' => $editable,
-		'nodes' => get_current_nodeid(true)
-	);
-	$triggers = API::Trigger()->get($options);
-	return zbx_objectValues($triggers, 'triggerid');
-}
-
 /**
  * Returns the host groups that are accessible by the current user with the permission level given in $perm.
  *
