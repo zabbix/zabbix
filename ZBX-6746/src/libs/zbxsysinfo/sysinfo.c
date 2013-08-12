@@ -421,7 +421,7 @@ notsupported:
 
 		int	n1, n2 = 0;
 
-		n1 = printf("%s", in_command);
+		n1 = printf("%s", usr_cmd);
 
 		if (0 < n1 && '\0' != *param)
 			n2 = printf("[%s]", param);

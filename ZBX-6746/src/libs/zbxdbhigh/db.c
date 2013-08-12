@@ -925,8 +925,7 @@ int	DBget_queue_count(int from, int to)
 		ZBX_DBROW2UINT64(interfaceid, row[5]);
 		ZBX_DBROW2UINT64(proxy_hostid, row[6]);
 
-		if (FAIL == (lastclock = DCget_item_lastclock(itemid)))
-			lastclock = (time_t)atoi(row[4]);
+		lastclock = (time_t)atoi(row[4]);
 
 		nextcheck = calculate_item_nextcheck(interfaceid, itemid, item_type,
 				delay, delay_flex, lastclock, &effective_delay);
