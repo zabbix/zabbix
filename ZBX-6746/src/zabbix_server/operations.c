@@ -341,16 +341,21 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 			host_esc = DBdyn_escape_string_len(row[1], HOST_HOST_LEN);
 			port = (unsigned short)atoi(row[4]);
 
-			zabbix_log(LOG_LEVEL_WARNING, "host_esc (%s)", host_esc);
-
-			result2 = DBselect("select host from hosts where host='%s' and status=%d", host_esc, HOST_STATUS_TEMPLATE);
+			result2 = DBselect(
+					"select null"
+					" from hosts"
+					" where host='%s'"
+						" and status=%d",
+					host_esc, HOST_STATUS_TEMPLATE);
 
 			if (NULL != (row2 = DBfetch(result2)))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "cannot add discovered host: template with the same name already exists");
+				zabbix_log(LOG_LEVEL_WARNING, "cannot add discovered host \"%s\":"
+						" template with the same name already exists", row[1]);
 				DBfree_result(result2);
 				goto out;
 			}
+			DBfree_result(result2);
 
 			zbx_snprintf(sql, sizeof(sql),
 					"select hostid,proxy_hostid"
