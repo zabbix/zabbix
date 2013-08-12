@@ -1445,7 +1445,7 @@ function getParamFieldLabelByType($itemType) {
 		case ITEM_TYPE_JMX:
 			return _('Executed script');
 		case ITEM_TYPE_DB_MONITOR:
-			return _('Additional parameters');
+			return _('SQL query');
 		case ITEM_TYPE_CALCULATED:
 			return _('Formula');
 		default:

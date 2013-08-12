@@ -355,7 +355,7 @@ define('ITEM_DATA_TYPE_OCTAL',			1);
 define('ITEM_DATA_TYPE_HEXADECIMAL',	2);
 define('ITEM_DATA_TYPE_BOOLEAN',		3);
 
-define('ZBX_DEFAULT_KEY_DB_MONITOR',	'db.odbc.select[<unique short description>]');
+define('ZBX_DEFAULT_KEY_DB_MONITOR',	'db.odbc.select[<unique short description>,<dsn>]');
 define('ZBX_DEFAULT_KEY_SSH',			'ssh.run[<unique short description>,<ip>,<port>,<encoding>]');
 define('ZBX_DEFAULT_KEY_TELNET',		'telnet.run[<unique short description>,<ip>,<port>,<encoding>]');
 define('ZBX_DEFAULT_KEY_JMX',			'jmx[<object name>,<attribute name>]');
