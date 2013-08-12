@@ -135,11 +135,9 @@ $r_form = new CForm('get');
 
 $options = array(
 	'groups' => array(
-		'monitored_hosts' => 1,
+		'real_hosts' => 1,
 	),
-	'hosts' => array(
-		'monitored_hosts' => 1,
-	),
+	'hosts' => array(),
 	'hostid' => get_request('hostid', null),
 	'groupid' => get_request('groupid', null),
 );
@@ -152,7 +150,6 @@ $r_form->addItem(array(SPACE._('Host').SPACE, $pageFilter->getHostsCB(true)));
 
 $latest_wdgt->addHeader(_('Items'), $r_form);
 //-------------
-
 /************************* FILTER **************************/
 /***********************************************************/
 $filterForm = new CFormTable(null, null, 'get');
@@ -203,7 +200,7 @@ elseif ($pageFilter->hostsSelected) {
 }
 
 $hosts = API::Host()->get(array(
-	'output' => array('name', 'hostid'),
+	'output' => array('name', 'hostid', 'status'),
 	'hostids' => $availableHostIds,
 	'with_monitored_items' => true,
 	'selectScreens' => API_OUTPUT_COUNT,
@@ -413,7 +410,7 @@ foreach ($applications as $appid => $dbApp) {
 	// host JS menu link
 	$hostSpan = null;
 	if ($_REQUEST['hostid'] == 0) {
-		$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
+		$hostSpan = new CSpan($host['name'], 'link_menu menu-host'.($host['status'] == HOST_STATUS_NOT_MONITORED?' not-monitored':''));
 		$scripts = $hostScripts[$host['hostid']];
 		$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
 		$hostSpan = new CDiv($hostSpan);
@@ -536,7 +533,7 @@ foreach ($hosts as $hostId => $dbHost) {
 	// host JS menu link
 	$hostSpan = null;
 	if ($_REQUEST['hostid'] == 0) {
-		$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
+		$hostSpan = new CSpan($host['name'], 'link_menu menu-host'.($host['status'] == HOST_STATUS_NOT_MONITORED?' not-monitored':''));
 		$scripts = $hostScripts[$host['hostid']];
 		$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
 		$hostSpan = new CDiv($hostSpan);

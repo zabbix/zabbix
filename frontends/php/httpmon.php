@@ -41,12 +41,11 @@ validate_sort_and_sortorder('name', ZBX_SORT_DOWN);
 
 $options = array(
 	'groups' => array(
-		'monitored_hosts' => 1,
-		'with_monitored_httptests' => 1,
+		'real_hosts' => 1,
+		'with_httptests' => 1,
 	),
 	'hosts' => array(
-		'monitored_hosts' => 1,
-		'with_monitored_httptests' => 1,
+		'with_httptests' => 1,
 	),
 	'hostid' => get_request('hostid', null),
 	'groupid' => get_request('groupid', null),
@@ -87,7 +86,6 @@ if ($pageFilter->hostsSelected) {
 	$options = array(
 		'output' => array('httptestid'),
 		'templated' => false,
-		'monitored' => true,
 		'filter' => array('status' => HTTPTEST_STATUS_ACTIVE),
 		'limit' => $config['search_limit'] + 1
 	);
@@ -105,13 +103,13 @@ if ($pageFilter->hostsSelected) {
 		'httptestids' => zbx_objectValues($httpTests, 'httptestid'),
 		'preservekeys' => true,
 		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => API_OUTPUT_EXTEND,
+		'selectHosts' => array('name', 'status'),
 		'selectSteps' => API_OUTPUT_COUNT,
 	));
 
 	foreach ($httpTests as &$httpTest) {
-		$host = reset($httpTest['hosts']);
-		$httpTest['hostname'] = $host['name'];
+		$httpTest['hosts'] = reset($httpTest['hosts']);
+		$httpTest['hostname'] = $httpTest['hosts']['name'];
 	}
 	unset($httpTest);
 
@@ -149,7 +147,10 @@ if ($pageFilter->hostsSelected) {
 
 		$table->addRow(new CRow(array(
 			$displayNodes ? get_node_name_by_elid($httpTest['httptestid'], true) : null,
-			($_REQUEST['hostid'] > 0) ? null : $httpTest['hostname'],
+			(($_REQUEST['hostid'] > 0)
+				?null
+				:new CSpan($httpTest['hostname'], $httpTest['hosts']['status'] == HOST_STATUS_NOT_MONITORED?'not-monitored':'')
+			),
 			new CLink($httpTest['name'], 'httpdetails.php?httptestid='.$httpTest['httptestid']),
 			$httpTest['steps'],
 			$lastcheck,
