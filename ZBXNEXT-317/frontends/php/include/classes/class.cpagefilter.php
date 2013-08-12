@@ -490,7 +490,7 @@ class CPageFilter {
 		else {
 			$defaultOptions = array(
 				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
-				'output' => array('hostid', 'name'),
+				'output' => array('hostid', 'name', 'status'),
 				'groupids' => ($this->groupid > 0) ? $this->groupid : null
 			);
 			$hosts = API::Host()->get(zbx_array_merge($defaultOptions, $options));
@@ -499,7 +499,7 @@ class CPageFilter {
 				order_result($hosts, 'name');
 
 				foreach ($hosts as $host) {
-					$this->data['hosts'][$host['hostid']] = $host['name'];
+					$this->data['hosts'][$host['hostid']] = $host;
 				}
 			}
 
@@ -763,7 +763,12 @@ class CPageFilter {
 	 * @return CComboBox
 	 */
 	public function getHostsCB($withNode = false) {
-		return $this->_getCB('hostid', $this->hostid, $this->hosts, $withNode, array('objectName' => 'hosts'));
+		$items = $styles = array();
+		foreach ($this->hosts as $key => $value) {
+			$items[$key] = $value['name'];
+			$styles[$key] = ($value['status'] == HOST_STATUS_NOT_MONITORED ? 'not-monitored' : null);
+		}
+		return $this->_getCB('hostid', $this->hostid, $items, $withNode, array('objectName' => 'hosts', 'cssStyles' => $styles));
 	}
 
 	/**
@@ -847,6 +852,7 @@ class CPageFilter {
 	 * @param int    $allValue
 	 * @param array  $options
 	 * @param string $options['objectName']
+	 * @param array  $options['cssStyles']
 	 *
 	 * @return CComboBox
 	 */
@@ -872,9 +878,16 @@ class CPageFilter {
 
 			$items = array($firstLabel) + $items;
 		}
+		if (!isset($options['cssStyles'])) {
+			$options['cssStyles'] = array();
+		}
 
 		foreach ($items as $id => $name) {
-			$comboBox->addItem($id, $name);
+			$cssStyle = (isset($options['cssStyles']) && isset($options['cssStyles'][$id])
+				? $options['cssStyles'][$id]
+				: null
+			);
+			$comboBox->addItem($id, $name, null, 'yes', $cssStyle);
 		}
 
 		return $comboBox;

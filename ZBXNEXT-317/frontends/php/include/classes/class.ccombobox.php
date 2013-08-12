@@ -61,7 +61,7 @@ class CComboBox extends CTag {
 		parent::addItem($group);
 	}
 
-	public function addItem($value, $caption = '', $selected = null, $enabled = 'yes') {
+	public function addItem($value, $caption = '', $selected = null, $enabled = 'yes', $cssStyle  = null) {
 		if ($value instanceof CComboItem || $value instanceof COptGroup) {
 			parent::addItem($value);
 		}
@@ -90,6 +90,9 @@ class CComboBox extends CTag {
 			$citem = new CComboItem($value, $caption, $selected, $enabled);
 			if ($title) {
 				$citem->setTitle($caption);
+			}
+			if (!empty($cssStyle)) {
+				$citem->addClass($cssStyle);
 			}
 			parent::addItem($citem);
 		}
