@@ -9,6 +9,7 @@ New features:
 ...G...... [ZBXNEXT-1528] added net.if.in, net.if.out and net.if.total item support on HP-UX platforms (igors)
 
 Bug fixes:
+A.F.I..... [ZBX-6020] fixed displaying MySQL errors for PHP 5.5.0 and newer; thanks to Michel Meyers (Ivo)
 .......PS. [ZBX-6746] fixed tamplate linking to proxy if the agent with the same name is auto-registered (igors)
 A......... [ZBX-6458] fixed "name" parameter validation for hostgroup.update method and improved error messages (Ivo)
 ..F....... [ZBX-6838] fixed bug with sql errors in the application popup window (Guntis)
@@ -335,6 +336,7 @@ New features:
 A.F....... [ZBX-1357] updated Dutch translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-6020] fixed displaying MySQL errors for PHP 5.5.0 and newer (Ivo)
 .......PS. [ZBX-6746] fixed template linking to proxy if the agent with the same name is auto-registered (igors)
 ..F....... [ZBX-6840] fixed undefined indexes for triggers in Monitoring > Maps and Dashboard (Ivo)
 ...G...... [ZBX-6672] fixed windows agent performance counters being capped to 100 (wiper)
