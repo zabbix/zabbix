@@ -5,6 +5,7 @@ New features:
 A.F....... [ZBX-1357] updated Dutch translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-6020] fixed displaying MySQL errors for PHP 5.5.0 and newer (Ivo)
 .......PS. [ZBX-6746] fixed template linking to proxy if the agent with the same name is auto-registered (igors)
 ..F....... [ZBX-6840] fixed undefined indexes for triggers in Monitoring > Maps and Dashboard (Ivo)
 ...G...... [ZBX-6672] fixed windows agent performance counters being capped to 100 (wiper)
