@@ -1398,7 +1398,7 @@
 
 			// select first host from triggers if gived not match
 			$hosts = $data['trigger']['hosts'];
-			if (count($hosts) > 0  && !in_array(array('hostid' => $data['hostid']), $hosts)) {
+			if (count($hosts) > 0 && !in_array(array('hostid' => $data['hostid']), $hosts)) {
 				$host = reset($hosts);
 				$data['hostid'] = $host['hostid'];
 			}

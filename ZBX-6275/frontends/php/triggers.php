@@ -143,7 +143,7 @@ elseif (isset($_REQUEST['save'])) {
 		$oldTrigger = API::Trigger()->get(array(
 			'triggerids' => $_REQUEST['triggerid'],
 			'output' => API_OUTPUT_EXTEND,
-			'selectDependencies' => array('triggerid'),
+			'selectDependencies' => array('triggerid')
 		));
 		if (!$oldTrigger) {
 			access_deny();
@@ -450,7 +450,7 @@ else {
 			'editable' => true
 		));
 		$host = reset($host);
-		$data['showErrorColumn'] = (empty($host) || $host['status'] != HOST_STATUS_TEMPLATE);
+		$data['showErrorColumn'] = (!$host || $host['status'] != HOST_STATUS_TEMPLATE);
 	}
 
 	// nodes
