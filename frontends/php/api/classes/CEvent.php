@@ -640,16 +640,30 @@ class CEvent extends CZBXAPI {
 				));
 				$sqlParts['order'][] = 'a.clock DESC';
 
-				// if the user alias is requested, join the users table
-				if ($this->outputIsRequested('alias', $options['select_acknowledges'])) {
-					$sqlParts = $this->addQuerySelect('u.alias, u.name, u.surname', $sqlParts);
+				// if the user data is requested via extended output or specified fields, join the users table
+				$requestUserData = false;
+				$userFields = array('alias', 'name', 'surname');
+				foreach ($userFields as $userField) {
+					if ($this->outputIsRequested($userField, $options['select_acknowledges'])) {
+						$requestUserData = true;
+						break;
+					}
+				}
+
+				if ($options['select_acknowledges'] == API_OUTPUT_EXTEND) {
+					$sqlParts = $this->addQuerySelect('u.'.implode(',u.', $userFields), $sqlParts);
+					$sqlParts['from'][] = 'users u';
+					$sqlParts['where'][] = 'a.userid=u.userid';
+				}
+				elseif ($requestUserData) {
+					$selectFields = 'u.'.implode(',u.', array_intersect($options['select_acknowledges'], $userFields));
+					$sqlParts = $this->addQuerySelect($selectFields, $sqlParts);
 					$sqlParts['from'][] = 'users u';
 					$sqlParts['where'][] = 'a.userid=u.userid';
 				}
 
 				$acknowledges = DBFetchArrayAssoc(DBselect($this->createSelectQueryFromParts($sqlParts)), 'acknowledgeid');
 				$relationMap = $this->createRelationMap($acknowledges, 'eventid', 'acknowledgeid');
-
 				$acknowledges = $this->unsetExtraFields($acknowledges, array('eventid', 'acknowledgeid', 'clock'),
 					$options['select_acknowledges']
 				);
