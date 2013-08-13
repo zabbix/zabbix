@@ -76,9 +76,14 @@ require_once dirname(__FILE__).'/js.inc.php';
 // include validation
 require_once dirname(__FILE__).'/validate.inc.php';
 
+// disable deprecated errors in PHP newer then 5.5 to hide error messages caused by using the mysql extension
+if (version_compare(phpversion(), '5.5', '>')) {
+	error_reporting(error_reporting() & ~E_DEPRECATED);
+}
+
 function zbx_err_handler($errno, $errstr, $errfile, $errline) {
-	// necessary to surpress errors when calling with error control operator like @function_name()
-	if (error_reporting() === 0 || (version_compare(phpversion(), '5.3', '>') && $errno == E_DEPRECATED)) {
+	// skip errors that are disabled
+	if (!(error_reporting() & $errno)) {
 		return true;
 	}
 
