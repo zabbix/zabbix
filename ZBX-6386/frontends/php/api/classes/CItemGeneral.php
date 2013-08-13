@@ -174,7 +174,8 @@ abstract class CItemGeneral extends CZBXAPI {
 			foreach ($items as $item) {
 				// check permissions
 				if (!isset($dbItems[$item['itemid']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_('No permissions to referred object or it does not exist!'));
 				}
 
 				// discovered fields, except status, cannot be updated
