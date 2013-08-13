@@ -123,7 +123,10 @@ class testFormTrigger extends CWebTest {
 				)
 			),
 			array(
-				array('template' => 'Inheritance test template', 'form' => 'testInheritanceTrigger1'
+				array(
+					'template' => 'Inheritance test template',
+					'form' => 'testInheritanceTrigger1',
+					'inherited' => true
 				)
 			),
 			array(
@@ -153,6 +156,7 @@ class testFormTrigger extends CWebTest {
 				array(
 					'template' => 'Inheritance test template',
 					'form' => 'testInheritanceTrigger1',
+					'inherited' => true,
 					'constructor' => 'open'
 				)
 			),
@@ -215,7 +219,7 @@ class testFormTrigger extends CWebTest {
 
 		$this->zbxTestTextPresent('Trigger');
 
-		if (isset($data['templatedHost'])) {
+		if (isset($data['templatedHost']) || isset($data['inherited'])) {
 			$this->zbxTestTextPresent('Parent triggers');
 			if (isset($data['hostTemplate'])) {
 				$this->assertElementPresent("//a[text()='".$data['hostTemplate']."']");
