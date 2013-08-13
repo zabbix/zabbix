@@ -172,12 +172,16 @@ abstract class CItemGeneral extends CZBXAPI {
 		));
 
 		if ($update) {
-			// discovered fields, except status, cannot be updated
 			foreach ($items as $item) {
+				// check permissions
+				if (!isset($dbItems[$item['itemid']])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+				}
+
+				// discovered fields, except status, cannot be updated
 				if ($dbItems[$item['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 					foreach ($item as $key => $value) {
-						// flags must be ignored also because hi is setted by API
-						if (!in_array($key, array('itemid', 'status', 'flags'))) {
+						if (!in_array($key, array('itemid', 'status'))) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update discovered item.'));
 						}
 					}
@@ -197,10 +201,6 @@ abstract class CItemGeneral extends CZBXAPI {
 			}
 
 			if ($update) {
-				if (!isset($dbItems[$item['itemid']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-				}
-
 				check_db_fields($dbItems[$item['itemid']], $fullItem);
 
 				$this->checkNoParameters($item, array('templateid', 'state'),

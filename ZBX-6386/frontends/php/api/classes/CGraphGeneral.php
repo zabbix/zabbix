@@ -49,19 +49,6 @@ abstract class CGraphGeneral extends CZBXAPI {
 		$colorValidator = new CColorValidator();
 
 		if ($update) {
-			// discovered fields cannot be updated
-			$dbGraphs = API::Graph()->get(array(
-				'graphids' => zbx_objectValues($graphs, 'graphid'),
-				'output' => array('graphid', 'flags'),
-				'nopermissions' => true,
-				'preservekeys' => true
-			));
-			foreach ($graphs as $graph) {
-				if ($dbGraphs[$graph['graphid']]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update discovered graph.'));
-				}
-			}
-
 			$graphs = $this->extendObjects($this->tableName(), $graphs, array('name'));
 		}
 
@@ -165,17 +152,18 @@ abstract class CGraphGeneral extends CZBXAPI {
 	}
 
 	/**
-	 * Update existing graphs
+	 * Update existing graphs.
 	 *
 	 * @param array $graphs
+	 *
 	 * @return array
 	 */
 	public function update($graphs) {
 		$graphs = zbx_toArray($graphs);
-		$graphids = zbx_objectValues($graphs, 'graphid');
+		$graphIds = zbx_objectValues($graphs, 'graphid');
 
-		$updateGraphs = $this->get(array(
-			'graphids' => $graphids,
+		$dbGraphs = $this->get(array(
+			'graphids' => $graphIds,
 			'editable' => true,
 			'preservekeys' => true,
 			'output' => API_OUTPUT_EXTEND,
@@ -183,9 +171,14 @@ abstract class CGraphGeneral extends CZBXAPI {
 		));
 
 		foreach ($graphs as $graph) {
-			// if missing in $updateGraphs then no permissions
-			if (!isset($updateGraphs[$graph['graphid']])) {
+			// check permissions
+			if (!isset($dbGraphs[$graph['graphid']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+			}
+
+			// discovered fields cannot be updated
+			if ($dbGraphs[$graph['graphid']]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update discovered graph.'));
 			}
 		}
 
@@ -219,7 +212,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 			// check ymin, ymax items
 			$this->checkAxisItems($graph, $templatedGraph);
 
-			$this->updateReal($graph, $updateGraphs[$graph['graphid']]);
+			$this->updateReal($graph, $dbGraphs[$graph['graphid']]);
 
 			// inheritance
 			if ($templatedGraph) {
@@ -227,7 +220,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 			}
 		}
 
-		return array('graphids' => $graphids);
+		return array('graphids' => $graphIds);
 	}
 
 	/**
