@@ -9,7 +9,7 @@ New features:
 ...G...... [ZBXNEXT-1528] added net.if.in, net.if.out and net.if.total item support on HP-UX platforms (igors)
 
 Bug fixes:
-A.F.I..... [ZBX-6020] replaced mysql to mysqli functions to support PHP versions > 5.5.x (Ivo)
+A.F.I..... [ZBX-6020] fixed displaying MySQL errors for PHP 5.5.0 and newer; thanks to Michel Meyers (Ivo)
 ..F....... [ZBX-6817] fixed update for web scenarios, to link items to the right application (Guntis)
 ..F....... [ZBX-6837] added possibility select templated hosts in items configuration list filter (Guntis)
 ..F....... [ZBX-6795] corrected percentage value in graph pie charts (Guntis)
