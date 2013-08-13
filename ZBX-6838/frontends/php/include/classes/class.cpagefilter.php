@@ -429,8 +429,12 @@ class CPageFilter {
 		foreach ($groups as $group) {
 			$this->data['groups'][$group['groupid']] = $group['name'];
 		}
+		// unset empty groupid, if 'select all' is not allowed
+		if (!$groupid && $this->config['DDFirst'] != ZBX_DROPDOWN_FIRST_ALL) {
+			$groupid = null;
+		}
 		// select remebered selection
-		if (!$groupid) {
+		if ($groupid === null) {
 			// set group only if host is in group or hostid is not set
 			if ($hostid) {
 				$host = API::Host()->get(array(
@@ -449,7 +453,7 @@ class CPageFilter {
 				}
 
 			}
-			if (!$groupid) {
+			if ($groupid === null) {
 				$groupid = $this->_profileIds['groupid'];
 			}
 		}
