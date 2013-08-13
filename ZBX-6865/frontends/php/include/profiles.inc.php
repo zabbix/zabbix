@@ -354,7 +354,7 @@ function update_config($configs) {
 	foreach ($configs as $key => $value) {
 		if (!is_null($value)) {
 			if ($key == 'alert_usrgrpid') {
-				$update[] = $key.'='.($value == '0') ? 'NULL' : $value;
+				$update[] = $key.'='.($value == '0' ? 'NULL' : $value);
 			}
 			else{
 				$update[] = $key.'='.zbx_dbstr($value);
