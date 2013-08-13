@@ -26,7 +26,9 @@ $triggersWidget = new CWidget();
 // append host summary to widget header
 if (!empty($this->data['hostid'])) {
 	if (!empty($this->data['parent_discoveryid'])) {
-		$triggersWidget->addItem(get_header_host_table('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
+		$triggersWidget->addItem(
+			get_header_host_table('triggers', $this->data['hostid'], $this->data['parent_discoveryid'])
+		);
 	}
 	else {
 		$triggersWidget->addItem(get_header_host_table('triggers', $this->data['hostid']));
@@ -67,7 +69,12 @@ $triggersFormList->addRow(
 	array(
 		_('Severity'),
 		SPACE,
-		new CVisibilityBox('visible[priority]', !empty($this->data['visible']['priority']), 'priority_div', _('Original')),
+		new CVisibilityBox(
+			'visible[priority]',
+			isset($this->data['visible']['priority']),
+			'priority_div',
+			_('Original')
+		),
 	),
 	$severityDiv
 );
@@ -87,7 +94,12 @@ if (empty($this->data['parent_discoveryid'])) {
 
 		$row = new CRow(array(
 			$dependency['host'].NAME_DELIMITER.$dependency['description'],
-			new CButton('remove', _('Remove'), 'javascript: removeDependency(\''.$dependency['triggerid'].'\');', 'link_menu')
+			new CButton(
+				'remove',
+				_('Remove'),
+				'javascript: removeDependency(\''.$dependency['triggerid'].'\');',
+				'link_menu'
+			)
 		));
 		$row->setAttribute('id', 'dependency_'.$dependency['triggerid']);
 		$dependenciesTable->addRow($row);
@@ -119,7 +131,12 @@ if (empty($this->data['parent_discoveryid'])) {
 		array(
 			_('Replace depenencies'),
 			SPACE,
-			new CVisibilityBox('visible[dependencies]', !empty($this->data['visible']['dependencies']) ? 'yes' : 'no', 'dependencies_div', _('Original'))
+			new CVisibilityBox(
+				'visible[dependencies]',
+				isset($this->data['visible']['dependencies']),
+				'dependencies_div',
+				_('Original')
+			)
 		),
 		$dependenciesDiv
 	);

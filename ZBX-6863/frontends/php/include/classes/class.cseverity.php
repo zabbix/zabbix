@@ -40,7 +40,13 @@ class CSeverity extends CTag {
 		$jsLabels = '';
 
 		foreach (getSeverityCaption() as $severity => $caption) {
-			$items[] = new CRadioButton($options['name'], $severity, null, $options['name'].'_'.$severity, ($options['value'] == $severity));
+			$items[] = new CRadioButton(
+				$options['name'],
+				$severity,
+				null,
+				$options['name'].'_'.$severity,
+				($options['value'] == $severity)
+			);
 
 			$css = getSeverityStyle($severity);
 
@@ -80,6 +86,10 @@ class CSeverity extends CTag {
 				obj.addClass(obj.data("severityStyle"));
 			})
 			.mouseleave(function() {
+				jQuery("#'.$this->getAttribute('id').' [aria-pressed=\"true\"]").trigger("mouseenter");
+			});
+
+			jQuery("'.$jsIds.'").change(function() {
 				jQuery("#'.$this->getAttribute('id').' [aria-pressed=\"true\"]").trigger("mouseenter");
 			});'
 		, true);
