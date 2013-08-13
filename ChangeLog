@@ -335,7 +335,7 @@ New features:
 A.F....... [ZBX-1357] updated Dutch translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
-.......PS. [ZBX-6746] fixed tamplate linking to proxy if the agent with the same name is auto-registered (igors)
+.......PS. [ZBX-6746] fixed template linking to proxy if the agent with the same name is auto-registered (igors)
 ..F....... [ZBX-6840] fixed undefined indexes for triggers in Monitoring > Maps and Dashboard (Ivo)
 ...G...... [ZBX-6672] fixed windows agent performance counters being capped to 100 (wiper)
 ....I..... [ZBX-6831] fixed webtest item conversion in 1.8->2.0 database upgrade patch for mysql (wiper)
