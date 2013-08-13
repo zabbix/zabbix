@@ -57,6 +57,27 @@ jQuery(function($) {
 
 		return false;
 	});
+	/**
+	 * Adding or removing 'not-monitored' css class to specified dropdown.
+	 * In future can improve functionality, for work with more as one css class.
+	 *
+	 * @returns bool
+	 */
+	jQuery.fn.changeDropdownStyle = function(){
+		var objId = $(this).attr('id');
+		if (!objId) {
+			return false;
+		}
+		if ($('#'+objId+' option:selected.not-monitored').length) {
+			$('#'+objId).addClass('not-monitored');
+		}
+		else {
+			$('#'+objId).removeClass('not-monitored');
+		}
+		return true;
+	}
+	$('#hostid').changeDropdownStyle();
+	$('#hostid').change(jQuery.fn.changeDropdownStyle);
 
 	if (IE || KQ) {
 		setTimeout(function () {$('[autofocus]').focus()}, 10);
