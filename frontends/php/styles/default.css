@@ -549,4 +549,5 @@ div.suggest { position: absolute; border: 1px #5C7099 solid; width: 162px; z-ind
 .multiselect .available ul li.hover { background: #7A9FC1; color: #FFFFFF; }
 .multiselect .available ul li.hover .prefix { color: #F1F1F1; }
 
+option { color: black; }
 .not-monitored, .not-monitored:hover { color: #EE0000; }

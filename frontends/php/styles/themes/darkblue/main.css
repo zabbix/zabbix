@@ -550,3 +550,4 @@ div.preloader {
 .multiselect .available ul li.hover .prefix { color: #F1F1F1; }
 
 .not-monitored, .not-monitored:hover { color: #EE0000; }
+option { color: white; }
