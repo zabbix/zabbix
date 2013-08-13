@@ -103,8 +103,6 @@ class testFormHost extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickWait('form');
 		$this->input_type('host', $host);
-		$this->addSelection("id=groups_left", "label=Zabbix servers");
-		$this->zbxTestClick('remove');
 
 		$this->zbxTestClickWait('save');
 
