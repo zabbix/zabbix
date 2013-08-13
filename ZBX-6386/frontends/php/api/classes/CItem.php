@@ -500,22 +500,34 @@ class CItem extends CItemGeneral {
 	/**
 	 * Check item data and set flags field.
 	 *
-	 * @param array $items passed by reference
+	 * @param array $items
 	 * @param bool  $update
 	 *
 	 * @return void
 	 */
 	protected function checkInput(array &$items, $update = false) {
 		parent::checkInput($items, $update);
-
-		// validate if everything is ok with 'item->inventory fields' linkage
 		self::validateInventoryLinks($items, $update);
 
-		// add the values that cannot be changed, but are required for further processing
-		foreach ($items as &$item) {
-			$item['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
+		// set proper flags to divide normal and discovered items in future processing
+		if ($update) {
+			$dbItems = $this->get(array(
+				'itemids' => zbx_objectValues($items, 'itemid'),
+				'output' => array('itemid', 'flags'),
+				'editable' => true,
+				'preservekeys' => true
+			));
+			foreach ($items as &$item) {
+				$item['flags'] = $dbItems[$item['itemid']]['flags'];
+			}
+			unset($item);
 		}
-		unset($item);
+		else {
+			foreach ($items as &$item) {
+				$item['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
+			}
+			unset($item);
+		}
 	}
 
 	/**
@@ -527,6 +539,7 @@ class CItem extends CItemGeneral {
 	 */
 	public function create($items) {
 		$items = zbx_toArray($items);
+
 		$this->checkInput($items);
 		$this->createReal($items);
 		$this->inherit($items);
@@ -639,6 +652,7 @@ class CItem extends CItemGeneral {
 	 */
 	public function update($items) {
 		$items = zbx_toArray($items);
+
 		$this->checkInput($items, true);
 		$this->updateReal($items);
 		$this->inherit($items);

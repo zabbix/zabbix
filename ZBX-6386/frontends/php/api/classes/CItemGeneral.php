@@ -115,7 +115,6 @@ abstract class CItemGeneral extends CZBXAPI {
 	 * @return void
 	 */
 	protected function checkInput(array &$items, $update = false) {
-		// permissions
 		if ($update) {
 			$itemDbFields = array('itemid' => null);
 
