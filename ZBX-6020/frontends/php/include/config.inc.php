@@ -77,7 +77,7 @@ require_once dirname(__FILE__).'/js.inc.php';
 require_once dirname(__FILE__).'/validate.inc.php';
 
 // disable deprecated errors in PHP newer then 5.5 to hide error messages caused by using the mysql extension
-if (version_compare(phpversion(), '5.5', '>')) {
+if (version_compare(phpversion(), '5.5', '>=')) {
 	error_reporting(error_reporting() & ~E_DEPRECATED);
 }
 
