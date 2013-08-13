@@ -311,7 +311,7 @@ class DB {
 
 			if (isset($tableSchema['fields'][$field]['ref_table'])) {
 				if ($tableSchema['fields'][$field]['null']) {
-					$values[$field] = zero2null($values[$field]);
+					$values[$field] = ($values[$field] == '0') ? NULL : $values[$field];
 				}
 			}
 
@@ -324,7 +324,7 @@ class DB {
 				}
 				else {
 					self::exception(self::DBEXECUTE_ERROR,
-						_s('Field "%1$s" cannot be set to NULL.', $field, $table)
+						_s('Field "%1$s" cannot be set to NULL.', $field)
 					);
 				}
 			}

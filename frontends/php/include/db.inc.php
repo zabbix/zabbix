@@ -1163,18 +1163,6 @@ function dbConditionString($fieldName, array $values, $notIn = false) {
 }
 
 /**
- * Convert foreign key zeros to NULL.
- *
- * @param $val
- * @param bool $string		option to return NULL in normal or string mode
- *
- * @return mixed
- */
-function zero2null($val, $string = false) {
-	return ($val == '0') ? ($string ? 'NULL' : NULL) : $val; // string 0 because ('any string' == 0) = true
-}
-
-/**
  * Transform DB cursor to array.
  *
  * @return array
