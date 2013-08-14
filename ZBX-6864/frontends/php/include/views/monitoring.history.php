@@ -41,6 +41,9 @@ if (count($this->data['items']) == 1) {
 	}
 }
 
+$header['right'][] = SPACE;
+$header['right'][] = get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']));
+
 // append action form to header
 $actionForm = new CForm('get');
 $actionForm->addVar('itemid', $_REQUEST['itemid']);
