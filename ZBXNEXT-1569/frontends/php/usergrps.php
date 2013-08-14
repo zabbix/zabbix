@@ -420,11 +420,16 @@ if (isset($_REQUEST['form'])) {
 	}
 
 	$data['users'] = DBfetchArray(DBselect(
-		'SELECT DISTINCT u.userid,u.alias'.
+		'SELECT DISTINCT u.userid,u.alias,u.name,u.surname'.
 		' FROM users u'.$sqlFrom.
 			$sqlWhere.
 		' ORDER BY u.alias'
 	));
+
+	foreach ($data['users'] as &$user) {
+		$user['alias'] = getUserFullname($user);
+	}
+	unset($user);
 
 	// get user groups
 	$data['usergroups'] = DBfetchArray(DBselect(
