@@ -176,6 +176,7 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  * Display
  */
 $data = array(
+	'fullscreen' => $_REQUEST['fullscreen'],
 	'slideshows' => array()
 );
 
@@ -194,7 +195,6 @@ order_result($data['slideshows'], 'name');
 
 // get element id
 $data['elementid'] = get_request('elementid', CProfile::get('web.slides.elementid', null));
-$data['fullscreen'] = get_request('fullscreen', null);
 
 CProfile::update('web.slides.elementid', $data['elementid'], PROFILE_TYPE_ID);
 
