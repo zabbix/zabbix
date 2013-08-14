@@ -137,12 +137,6 @@ $data = array(
 if (empty($data['elementid']) && !$data['use_screen_name']) {
 	// get element id saved in profile from the last visit
 	$data['elementid'] = CProfile::get('web.screens.elementid', null);
-
-	// this flag will be used in case this element does not exist
-	$data['id_has_been_fetched_from_profile'] = true;
-}
-else {
-	$data['id_has_been_fetched_from_profile'] = false;
 }
 
 $data['screens'] = API::Screen()->get(array(
