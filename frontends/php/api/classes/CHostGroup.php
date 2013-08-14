@@ -955,9 +955,10 @@ class CHostGroup extends CZBXAPI {
 	}
 
 	/**
-	 * Check if user has read permissions for host groups
+	 * Check if user has read permissions for host groups.
 	 *
 	 * @param array $ids
+	 *
 	 * @return bool
 	 */
 	public function isReadable(array $ids) {
@@ -979,9 +980,10 @@ class CHostGroup extends CZBXAPI {
 	}
 
 	/**
-	 * Check if user has write permissions for host groups
+	 * Check if user has write permissions for host groups.
 	 *
 	 * @param array $ids
+	 *
 	 * @return bool
 	 */
 	public function isWritable(array $ids) {

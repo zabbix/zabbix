@@ -160,6 +160,7 @@
 		param = (<?php echo $this->data['is_template'] ? 'true' : 'false'; ?>)
 			? '&only_hostid=<?php echo $this->data['hostid']; ?>'
 			: '&real_hosts=1';
+
 		return param;
 	}
 

@@ -50,9 +50,6 @@ $fields = array(
 	'favstate' =>			array(T_ZBX_INT, O_OPT, P_ACT, NOT_EMPTY,		'isset({favobj})&&"filter"=={favobj}')
 );
 check_fields($fields);
-if (get_request('triggerid') && !API::Trigger()->isReadable(array($_REQUEST['triggerid']))) {
-	access_deny();
-}
 
 $availabilityReportMode = get_request('mode', CProfile::get('web.avail_report.mode', AVAILABILITY_REPORT_BY_HOST));
 CProfile::update('web.avail_report.mode', $availabilityReportMode, PROFILE_TYPE_INT);
@@ -61,8 +58,8 @@ CProfile::update('web.avail_report.mode', $availabilityReportMode, PROFILE_TYPE_
 if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
 	if (get_request('hostgroupid') && !API::HostGroup()->isReadable(array($_REQUEST['hostgroupid'])) ||
 			get_request('filter_groupid') && !API::HostGroup()->isReadable(array($_REQUEST['filter_groupid'])) ||
-			get_request('filter_hostid') && !API::Host()->isReadable(array($_REQUEST['filter_hostid']))
-		) {
+			get_request('filter_hostid') && !API::Host()->isReadable(array($_REQUEST['filter_hostid'])) ) {
+
 		access_deny();
 	}
 	if (get_request('tpl_triggerid')) {
@@ -78,10 +75,13 @@ if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
 }
 else {
 	if (get_request('filter_groupid') && !API::HostGroup()->isReadable(array($_REQUEST['filter_groupid'])) ||
-			get_request('filter_hostid') && !API::Host()->isReadable(array($_REQUEST['filter_hostid']))
-		) {
+			get_request('filter_hostid') && !API::Host()->isReadable(array($_REQUEST['filter_hostid']))) {
+
 		access_deny();
 	}
+}
+if (get_request('triggerid') && !API::Trigger()->isReadable(array($_REQUEST['triggerid']))) {
+	access_deny();
 }
 
 /*
