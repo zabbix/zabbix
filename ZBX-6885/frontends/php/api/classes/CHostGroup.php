@@ -571,13 +571,13 @@ class CHostGroup extends CZBXAPI {
 		}
 		$groupids = zbx_toArray($groupids);
 
-		$options = array(
+		$delGroups = $this->get(array(
 			'groupids' => $groupids,
 			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
-		);
-		$delGroups = $this->get($options);
+		));
+
 		foreach ($groupids as $groupid) {
 			if (!isset($delGroups[$groupid])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
