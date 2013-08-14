@@ -1155,10 +1155,6 @@ function dbConditionString($fieldName, array $values, $notIn = false) {
 	return '('.$fieldName.$in.'('.$condition.'))';
 }
 
-function zero2null($val) {
-	return ($val == '0') ? 'NULL' : $val; // string 0 because ('any string' == 0) = true
-}
-
 /**
  * Transform DB cursor to array.
  *
