@@ -950,6 +950,9 @@ class CUser extends CZBXAPI {
 		}
 
 		CWebUser::$data = self::$userData = $userData;
+		if (isset($userData['fullname'])) {
+			unset($userData['fullname']);
+		}
 
 		return isset($user['userData']) ? $userData : $userData['sessionid'];
 	}
@@ -1015,6 +1018,9 @@ class CUser extends CZBXAPI {
 		$userData['gui_access'] = $guiAccess;
 
 		CWebUser::$data = self::$userData = $userData;
+		if (isset($userData['fullname'])) {
+			unset($userData['fullname']);
+		}
 
 		return $userData;
 	}
@@ -1029,16 +1035,7 @@ class CUser extends CZBXAPI {
 			' WHERE u.userid='.$userid
 		));
 
-		$fullname = '';
-		if ($userData['name']) {
-			$fullname = $userData['name'];
-		}
-		if ($userData['surname']) {
-			$fullname .= $fullname ? ' '.$userData['surname'] : $userData['surname'];
-		}
-		if ($fullname) {
-			$userData['fullname'] = $userData['alias'].' ('.$fullname.')';
-		}
+		$userData['fullname'] = getUserFullname($userData);
 
 		$userData['debug_mode'] = (bool) DBfetch(DBselect(
 			'SELECT ug.userid'.
