@@ -273,3 +273,26 @@ function change_group_debug_mode($userGroupIds, $debugMode) {
 		'UPDATE usrgrp SET debug_mode='.$debugMode.' WHERE '.dbConditionInt('usrgrpid', $userGroupIds)
 	);
 }
+
+/**
+ * Gets user full name in format "alias (name surname)"
+ *
+ * @param array $data
+ *
+ * return string
+ */
+function getUserFullname($userData) {
+	$fullname = '';
+	if ($userData['name']) {
+		$fullname = $userData['name'];
+	}
+	if ($userData['surname']) {
+		$fullname .= $fullname ? ' '.$userData['surname'] : $userData['surname'];
+	}
+	if ($fullname) {
+		return $userData['alias'].' ('.$fullname.')';
+	}
+	else {
+		return $userData['alias'];
+	}
+}

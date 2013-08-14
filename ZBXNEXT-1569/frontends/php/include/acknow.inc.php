@@ -50,16 +50,7 @@ function makeAckTab($event) {
 
 	if (!empty($event['acknowledges']) && is_array($event['acknowledges'])) {
 		foreach ($event['acknowledges'] as $acknowledge) {
-			$fullname = '';
-			if ($acknowledge['name']) {
-				$fullname = $acknowledge['name'];
-			}
-			if ($acknowledge['surname']) {
-				$fullname .= $fullname ? ' '.$acknowledge['surname'] : $acknowledge['surname'];
-			}
-			if ($fullname) {
-				$acknowledge['alias'] .= ' ('.$fullname.')';
-			}
+			$acknowledge['alias'] = getUserFullname($acknowledge);
 			$acknowledgeTable->addRow(array(
 				zbx_date2str(_('d M Y H:i:s'), $acknowledge['clock']),
 				$acknowledge['alias'],

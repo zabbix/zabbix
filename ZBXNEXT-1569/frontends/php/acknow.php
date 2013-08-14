@@ -201,16 +201,7 @@ else {
 		$acknowledgesTable->setAlign('center');
 
 		while ($acknowledge = DBfetch($acknowledges)) {
-			$fullname = '';
-			if ($acknowledge['name']) {
-				$fullname = $acknowledge['name'];
-			}
-			if ($acknowledge['surname']) {
-				$fullname .= $fullname ? ' '.$acknowledge['surname'] : $acknowledge['surname'];
-			}
-			if ($fullname) {
-				$acknowledge['alias'] .= ' ('.$fullname.')';
-			}
+			$acknowledge['alias'] = getUserFullname($acknowledge);
 			$acknowledgesTable->addRow(array(
 				new CCol($acknowledge['alias'], 'user'),
 				new CCol(zbx_date2str(_('d M Y H:i:s'), $acknowledge['clock']), 'time')),

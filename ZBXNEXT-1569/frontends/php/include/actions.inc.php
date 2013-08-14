@@ -332,16 +332,7 @@ function get_operation_descr($type, $data) {
 					order_result($users, 'alias');
 
 					foreach ($users as $user) {
-						$fullname = '';
-						if ($user['name']) {
-							$fullname = $user['name'];
-						}
-						if ($user['surname']) {
-							$fullname .= $fullname ? ' '.$user['surname'] : $user['surname'];
-						}
-						if ($fullname) {
-							$fullnames[] = $user['alias'].' ('.$fullname.')';
-						}
+						$fullnames[] = getUserFullname($user);
 					}
 
 					$result[] = bold(_('Send message to users').NAME_DELIMITER);

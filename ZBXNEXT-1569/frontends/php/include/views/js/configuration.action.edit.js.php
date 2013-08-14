@@ -151,16 +151,6 @@
 
 			switch (list.object) {
 				case 'userid':
-					var fullname = '';
-					if (value.name) {
-						fullname = value.name;
-					}
-					if (value.surname) {
-						fullname = value.name ? value.name + ' ' + value.surname : value.surname;
-					}
-					if (fullname) {
-						value.fullname = value.alias + ' (' + fullname + ')';
-					}
 					if (jQuery('#opmsgUserRow_' + value.userid).length) {
 						continue;
 					}
