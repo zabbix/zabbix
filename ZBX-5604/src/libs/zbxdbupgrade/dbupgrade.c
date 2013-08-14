@@ -1332,6 +1332,60 @@ static int	DBpatch_2010094(void)
 	return FAIL;
 }
 
+static int	DBpatch_2010095(void)
+{
+#ifdef HAVE_MYSQL
+	return DBdrop_index("history_sync", "id");
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_2010096(void)
+{
+#ifdef HAVE_MYSQL
+	return DBdrop_index("history_uint_sync", "id");
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_2010097(void)
+{
+#ifdef HAVE_MYSQL
+	return DBdrop_index("history_str_sync", "id");
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_2010098(void)
+{
+#ifdef HAVE_MYSQL
+	return DBdrop_index("proxy_history", "id");
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_2010099(void)
+{
+#ifdef HAVE_MYSQL
+	return DBdrop_index("proxy_dhistory", "id");
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_2010100(void)
+{
+#ifdef HAVE_MYSQL
+	return DBdrop_index("proxy_autoreg_host", "id");
+#else
+	return SUCCEED;
+#endif
+}
+
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 #define DBPATCH_END()					{NULL}};
@@ -1475,6 +1529,12 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010092, 0, 1)
 	DBPATCH_ADD(2010093, 0, 1)
 	DBPATCH_ADD(2010094, 0, 1)
+	DBPATCH_ADD(2010095, 0, 0)
+	DBPATCH_ADD(2010096, 0, 0)
+	DBPATCH_ADD(2010097, 0, 0)
+	DBPATCH_ADD(2010098, 0, 0)
+	DBPATCH_ADD(2010099, 0, 0)
+	DBPATCH_ADD(2010100, 0, 0)
 
 	DBPATCH_END()
 
