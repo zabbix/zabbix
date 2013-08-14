@@ -1661,7 +1661,7 @@ try_again:
 			if (0 < retries--)
 			{
 				DBfree_result(result);
-				zabbix_log(LOG_LEVEL_DEBUG, "%s(): " ZBX_FS_UI64 " record(s) missing. Waiting %f sec,"
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing. Waiting %f sec,"
 						" retrying.", __function_name, *lastid - id - 1,
 						(double)t_sleep.tv_sec + (double)t_sleep.tv_nsec / 1.0e9);
 				nanosleep(&t_sleep, &t_rem);
@@ -1669,7 +1669,7 @@ try_again:
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s(): " ZBX_FS_UI64 " record(s) missing. No more retries.",
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing. No more retries.",
 						__function_name, *lastid - id - 1);
 			}
 		}
@@ -1769,7 +1769,7 @@ try_again:
 			if (0 < retries--)
 			{
 				DBfree_result(result);
-				zabbix_log(LOG_LEVEL_DEBUG, "%s(): " ZBX_FS_UI64 " record(s) missing. Waiting %f sec,"
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing. Waiting %f sec,"
 						" retrying.", __function_name, *lastid - id - 1,
 						(double)t_sleep.tv_sec + (double)t_sleep.tv_nsec / 1.0e9);
 				nanosleep(&t_sleep, &t_rem);
@@ -1777,7 +1777,7 @@ try_again:
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s(): " ZBX_FS_UI64 " record(s) missing. No more retries.",
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing. No more retries.",
 						__function_name, *lastid - id - 1);
 			}
 		}
