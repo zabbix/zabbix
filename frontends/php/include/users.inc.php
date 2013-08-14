@@ -275,9 +275,9 @@ function change_group_debug_mode($userGroupIds, $debugMode) {
 }
 
 /**
- * Gets user full name in format "alias (name surname)"
+ * Gets user full name in format "alias (name surname)". If both name and surname exist, returns translated string.
  *
- * @param array $data
+ * @param array $userData
  *
  * return string
  */
@@ -286,9 +286,16 @@ function getUserFullname($userData) {
 	if ($userData['name']) {
 		$fullname = $userData['name'];
 	}
+
+	// return full name and surname
 	if ($userData['surname']) {
-		$fullname .= $fullname ? ' '.$userData['surname'] : $userData['surname'];
+		if ($userData['name']) {
+			return $userData['alias'].' '._s('(%1$s %2$s)', $userData['name'], $userData['surname']);
+		}
+		$fullname = $userData['surname'];
 	}
+
+	// return only name or surname
 	if ($fullname) {
 		return $userData['alias'].' ('.$fullname.')';
 	}
