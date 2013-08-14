@@ -1058,9 +1058,10 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
-	 * Check if user has read permissions for templates
+	 * Check if user has read permissions for templates.
 	 *
 	 * @param array $ids
+	 *
 	 * @return bool
 	 */
 	public function isReadable(array $ids) {
@@ -1079,9 +1080,10 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
-	 * Check if user has write permissions for templates
+	 * Check if user has write permissions for templates.
 	 *
 	 * @param array $ids
+	 *
 	 * @return bool
 	 */
 	public function isWritable(array $ids) {

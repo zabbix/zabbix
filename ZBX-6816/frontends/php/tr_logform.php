@@ -59,6 +59,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 	if (get_request('itemid') && !API::Item()->isWritable(array($_REQUEST['itemid'])) ||
 			get_request('triggerid') && !API::Trigger()->isWritable(array($_REQUEST['triggerid']))) {
+
 		access_deny();
 	}
 

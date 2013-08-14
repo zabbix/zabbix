@@ -1562,10 +1562,12 @@ class CHost extends CHostGeneral {
 
 		return array('hostids' => $hostIds);
 	}
+
 	/**
 	 * Check if user has read permissions for host.
 	 *
 	 * @param array $ids
+	 *
 	 * @return bool
 	 */
 	public function isReadable(array $ids) {
@@ -1587,10 +1589,12 @@ class CHost extends CHostGeneral {
 
 		return (count($ids) == $count);
 	}
+
 	/**
-	 * Check if user has write permissions for host
+	 * Check if user has write permissions for host.
 	 *
 	 * @param array $ids
+	 *
 	 * @return bool
 	 */
 	public function isWritable(array $ids) {

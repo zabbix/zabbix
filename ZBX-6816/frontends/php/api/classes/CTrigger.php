@@ -1631,7 +1631,7 @@ class CTrigger extends CTriggerGeneral {
 	}
 
 	/**
-	 * Check if user has read permissions for triggers
+	 * Check if user has read permissions for triggers.
 	 *
 	 * @param $ids
 	 *
@@ -1653,7 +1653,7 @@ class CTrigger extends CTriggerGeneral {
 	}
 
 	/**
-	 *  Check if user has write permissions for triggers
+	 *  Check if user has write permissions for triggers.
 	 *
 	 * @param $ids
 	 *

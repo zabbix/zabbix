@@ -93,6 +93,7 @@ if (get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid'])
 if (get_request('triggerid') && !API::Trigger()->isReadable(array($_REQUEST['triggerid']))) {
 	access_deny();
 }
+
 /*
  * Ajax
  */

@@ -54,7 +54,6 @@ $fields = array(
 );
 $isDataValid = check_fields($fields);
 
-
 if ($httptestid = get_request('httptestid', false)) {
 	if (!API::HttpTest()->isReadable(array($_REQUEST['httptestid']))) {
 		access_deny();
