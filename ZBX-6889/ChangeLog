@@ -1,3 +1,9 @@
+Changes for 2.0.8rc2
+
+Bug fixes:
+........S. [ZBX-6889] fixed processing of availability data by the server (Sasha)
+
+--------------------------------------------------------------------------------
 Changes for 2.0.8rc1
 
 New features:
