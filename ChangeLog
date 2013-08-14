@@ -9,6 +9,7 @@ New features:
 ...G...... [ZBXNEXT-1528] added net.if.in, net.if.out and net.if.total item support on HP-UX platforms (igors)
 
 Bug fixes:
+..F....... [ZBX-6864] fixed fullscreen parameter validation (Vitalij)
 A.F....... [ZBX-6865] fixed "NULL" value validation (Ivo)
 ..F....... [ZBX-6863] fixed severity buttonset colors displaing (Eduard)
 A......... [ZBX-6386] fixed discovered fields update validation in items, triggers and graphs (Eduard)
