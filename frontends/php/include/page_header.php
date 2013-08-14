@@ -42,7 +42,9 @@ if (!defined('ZBX_PAGE_NO_THEME')) {
 switch ($page['type']) {
 	case PAGE_TYPE_IMAGE:
 		set_image_header();
-		define('ZBX_PAGE_NO_MENU', 1);
+		if (!defined('ZBX_PAGE_NO_MENU')) {
+			define('ZBX_PAGE_NO_MENU', 1);
+		}
 		break;
 	case PAGE_TYPE_XML:
 		header('Content-Type: text/xml');
@@ -172,7 +174,7 @@ CSS;
 	$pageHeader->addJsBeforeScripts('var PHP_TZ_OFFSET = '.date('Z').';');
 
 	// show GUI messages in pages with menus and in fullscreen mode
-	$showGuiMessaging = (!defined('ZBX_PAGE_NO_MENU') || (isset($_REQUEST['fullscreen']) && $_REQUEST['fullscreen'])) ? 1 : 0;
+	$showGuiMessaging = (!defined('ZBX_PAGE_NO_MENU') || $_REQUEST['fullscreen'] == 1) ? 1 : 0;
 	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.CWebUser::$data['lang'].'&showGuiMessaging='.$showGuiMessaging;
 	$pageHeader->addJsFile($path);
 
