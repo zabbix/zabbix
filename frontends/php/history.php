@@ -151,7 +151,8 @@ $data = array(
 	'stime' => get_request('stime'),
 	'plaintext' => isset($_REQUEST['plaintext']),
 	'iv_string' => array(ITEM_VALUE_TYPE_LOG => 1, ITEM_VALUE_TYPE_TEXT => 1),
-	'iv_numeric' => array(ITEM_VALUE_TYPE_FLOAT => 1, ITEM_VALUE_TYPE_UINT64 => 1)
+	'iv_numeric' => array(ITEM_VALUE_TYPE_FLOAT => 1, ITEM_VALUE_TYPE_UINT64 => 1),
+	'fullscreen' => $_REQUEST['fullscreen']
 );
 
 // render view
