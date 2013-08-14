@@ -156,10 +156,11 @@
 	}
 
 	function getOnlyHostParam() {
-		var param = '';
-		param = (<?php echo $this->data['is_template'] ? 'true' : 'false'; ?>)
-			? '&only_hostid=<?php echo $this->data['hostid']; ?>'
-			: '&real_hosts=1';
+		<?php if ($this->data['is_template']): ?>
+			var param = '&only_hostid=<?php echo $this->data['hostid']; ?>';
+		<?php else: ?>
+			var param = '&real_hosts=1';
+		<?php endif ?>
 
 		return param;
 	}
