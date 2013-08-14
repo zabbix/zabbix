@@ -276,7 +276,7 @@ function bar_report_form3(){
 	$report_timesince = get_request('report_timesince', date(TIMESTAMP_FORMAT, time() - SEC_PER_DAY));
 	$report_timetill = get_request('report_timetill', date(TIMESTAMP_FORMAT));
 
-	$items = get_request('items',array());
+	$itemId = get_request('itemid', 0);
 
 	$hostids = get_request('hostids', array());
 	$hostids = zbx_toHash($hostids);
@@ -289,16 +289,13 @@ function bar_report_form3(){
 	$reportForm->setAttribute('name','zbx_report');
 	$reportForm->setAttribute('id','zbx_report');
 
-//	$reportForm->setMethod('post');
-	if(isset($_REQUEST['report_show']) && !empty($items))
+	if (isset($_REQUEST['report_show']) && $itemId) {
 		$reportForm->addVar('report_show','show');
+	}
 
 	$reportForm->addVar('config',$config);
 	$reportForm->addVar('report_timesince',date(TIMESTAMP_FORMAT, $report_timesince));
 	$reportForm->addVar('report_timetill',date(TIMESTAMP_FORMAT, $report_timetill));
-
-//	$reportForm->addVar('items',$items); 				//params are set later!!
-//	$reportForm->addVar('periods',$periods);
 
 	$reportForm->addRow(_('Title'), new CTextBox('title', $title, 40));
 	$reportForm->addRow(_('X label'), new CTextBox('xlabel', $xlabel, 40));
@@ -399,15 +396,13 @@ function bar_report_form3(){
 	$reportForm->addRow(_('Average by'), $avgcmb);
 
 	// items
-	$itemid = 0;
 	$itemName = '';
-	if(count($items) && ($items[0]['itemid'] > 0)){
-		$itemid = $items[0]['itemid'];
-		$itemName = get_item_by_itemid($itemid);
+	if ($itemId) {
+		$itemName = get_item_by_itemid($itemId);
 		$itemName = itemName($itemName);
 	}
 
-	$itemidVar = new CVar('itemid', $itemid, 'itemid');
+	$itemidVar = new CVar('itemid', $itemId, 'itemid');
 	$reportForm->addItem($itemidVar);
 
 	$txtCondVal = new CTextBox('item_name', $itemName, 50, 'yes');
