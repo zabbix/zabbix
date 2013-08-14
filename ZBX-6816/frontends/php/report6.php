@@ -86,7 +86,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		if (get_request('hostids') && !API::Host()->isReadable($_REQUEST['hostids'])) {
 			access_deny();
 		}
-		$_REQUEST['items']=array();
 		if (get_request('itemid')) {
 			$items = API::Item()->get(array(
 				'itemids' => $_REQUEST['itemid'],
@@ -96,7 +95,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			if (!$items) {
 				access_deny();
 			}
-			$_REQUEST['items'][] = array('itemid' => $_REQUEST['itemid']);
 		}
 	}
 	else {
@@ -221,6 +219,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$rep6_wdgt->addFlicker($rep_form, CProfile::get('web.report6.filter.state', 1));
 
 	if(isset($_REQUEST['report_show'])){
+		$items = (get_request('config') == 3)
+			? array(array('itemid' => get_request('itemid')))
+			: get_request('items');
 		$src = 'chart_bar.php?config='.$_REQUEST['config'].
 					url_param('title').
 					url_param('xlabel').
@@ -232,7 +233,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 					url_param('report_timesince').
 					url_param('report_timetill').
 					url_param('periods').
-					url_param('items').
+					url_param($items, false, 'items').
 					url_param('hostids').
 					url_param('groupids').
 					url_param('palette').
