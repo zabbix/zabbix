@@ -1018,9 +1018,6 @@ class CUser extends CZBXAPI {
 		$userData['gui_access'] = $guiAccess;
 
 		CWebUser::$data = self::$userData = $userData;
-		if (isset($userData['fullname'])) {
-			unset($userData['fullname']);
-		}
 
 		return $userData;
 	}
