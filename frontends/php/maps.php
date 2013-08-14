@@ -120,7 +120,7 @@ CProfile::update('web.maps.sysmapid', $_REQUEST['sysmapid'], PROFILE_TYPE_ID);
  * Display
  */
 $data = array(
-	'fullscreen' => get_request('fullscreen'),
+	'fullscreen' => $_REQUEST['fullscreen'],
 	'sysmapid' => $_REQUEST['sysmapid'],
 	'maps' => $maps
 );
