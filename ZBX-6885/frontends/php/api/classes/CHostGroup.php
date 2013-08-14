@@ -593,7 +593,9 @@ class CHostGroup extends CZBXAPI {
 		$dltGroupids = getDeletableHostGroups($groupids);
 		if (count($groupids) != count($dltGroupids)) {
 			foreach ($groupids as $groupid) {
-				if(in_array($groupid, $dltGroupids)) continue;
+				if (isset($dltGroupids[$groupid])) {
+					continue;
+				}
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Host group "%1$s" cannot be deleted, because some hosts depend on it.',
 						$delGroups[$groupid]['name']
