@@ -29,7 +29,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 	const ERROR_TEMPLATE_HOST_MIX = 'templateHostMix';
 
 	/**
-	 * Check $graphs:
+	 * Check graphs:
 	 *	whether graphs have name field
 	 *	whether not set  templateid
 	 *	whether graphs has at least one item
@@ -40,8 +40,8 @@ abstract class CGraphGeneral extends CZBXAPI {
 	 *	whether not creating graphs with the same name
 	 *
 	 * @param array $graphs
-	 * @param boolean $update
-	 * @param boolean $prototype
+	 * @param bool  $update
+	 *
 	 * @return true
 	 */
 	protected function checkInput($graphs, $update = false) {
@@ -140,6 +140,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 				'preservekeys' => true, // faster
 				'limit' => 1 // one match enough for check
 			));
+
 			// if graph exists with given name and it is create action or update action with ids not matching, rise exception
 			foreach ($graphsExists as $graphExists) {
 				if (!$update || (bccomp($graphExists['graphid'], $graph['graphid']) != 0)) {
@@ -148,6 +149,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 					);
 				}
 			}
+
 			// cheks that there is no two graphs with the same name within host
 			foreach ($hostAndTemplateIds as $id) {
 				if (!isset($graphNames[$graph['name']])) {
@@ -168,17 +170,18 @@ abstract class CGraphGeneral extends CZBXAPI {
 	}
 
 	/**
-	 * Update existing graphs
+	 * Update existing graphs.
 	 *
 	 * @param array $graphs
+	 *
 	 * @return array
 	 */
 	public function update($graphs) {
 		$graphs = zbx_toArray($graphs);
-		$graphids = zbx_objectValues($graphs, 'graphid');
+		$graphIds = zbx_objectValues($graphs, 'graphid');
 
-		$updateGraphs = $this->get(array(
-			'graphids' => $graphids,
+		$dbGraphs = $this->get(array(
+			'graphids' => $graphIds,
 			'editable' => true,
 			'preservekeys' => true,
 			'output' => API_OUTPUT_EXTEND,
@@ -186,9 +189,14 @@ abstract class CGraphGeneral extends CZBXAPI {
 		));
 
 		foreach ($graphs as $graph) {
-			// if missing in $updateGraphs then no permissions
-			if (!isset($updateGraphs[$graph['graphid']])) {
+			// check permissions
+			if (!isset($dbGraphs[$graph['graphid']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+			}
+
+			// discovered fields cannot be updated
+			if ($dbGraphs[$graph['graphid']]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update discovered graph.'));
 			}
 		}
 
@@ -197,14 +205,14 @@ abstract class CGraphGeneral extends CZBXAPI {
 		foreach ($graphs as $graph) {
 			unset($graph['templateid']);
 
-			$graph['gitems'] = isset($graph['gitems']) ? $graph['gitems'] : $updateGraphs[$graph['graphid']]['gitems'];
+			$graph['gitems'] = isset($graph['gitems']) ? $graph['gitems'] : $dbGraphs[$graph['graphid']]['gitems'];
 
-			$this->updateReal($graph, $updateGraphs[$graph['graphid']]);
+			$this->updateReal($graph, $dbGraphs[$graph['graphid']]);
 
 			$this->inherit($graph);
 		}
 
-		return array('graphids' => $graphids);
+		return array('graphids' => $graphIds);
 	}
 
 	/**

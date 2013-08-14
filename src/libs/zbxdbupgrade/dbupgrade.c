@@ -132,9 +132,23 @@ static void	DBfield_definition_string(char **sql, size_t *sql_alloc, size_t *sql
 	{
 		char	*default_value_esc;
 
-		default_value_esc = DBdyn_escape_string(field->default_value);
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " default '%s'", default_value_esc);
-		zbx_free(default_value_esc);
+#if defined(HAVE_MYSQL)
+		switch (field->type)
+		{
+			case ZBX_TYPE_BLOB:
+			case ZBX_TYPE_TEXT:
+			case ZBX_TYPE_SHORTTEXT:
+			case ZBX_TYPE_LONGTEXT:
+				/* MySQL: BLOB and TEXT columns cannot be assigned a default value */
+				break;
+			default:
+#endif
+				default_value_esc = DBdyn_escape_string(field->default_value);
+				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " default '%s'", default_value_esc);
+				zbx_free(default_value_esc);
+#if defined(HAVE_MYSQL)
+		}
+#endif
 	}
 
 	if (0 != (field->flags & ZBX_NOTNULL))
@@ -1294,6 +1308,30 @@ static int	DBpatch_2010091(void)
 	return DBdrop_field("items", "prevorgvalue");
 }
 
+static int	DBpatch_2010092(void)
+{
+	const ZBX_FIELD	field = {"width", "900", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("graphs", &field);
+}
+
+static int	DBpatch_2010093(void)
+{
+	const ZBX_FIELD	field = {"height", "200", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("graphs", &field);
+}
+
+static int	DBpatch_2010094(void)
+{
+	if (ZBX_DB_OK <= DBexecute("update items set history=1 where history=0"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 #define DBPATCH_END()					{NULL}};
@@ -1434,6 +1472,9 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010089, 0, 1)
 	DBPATCH_ADD(2010090, 0, 1)
 	DBPATCH_ADD(2010091, 0, 1)
+	DBPATCH_ADD(2010092, 0, 1)
+	DBPATCH_ADD(2010093, 0, 1)
+	DBPATCH_ADD(2010094, 0, 1)
 
 	DBPATCH_END()
 
