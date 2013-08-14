@@ -155,7 +155,7 @@ class CPie extends CGraphDraw {
 			}
 		}
 		if ($lastValueItems) {
-			$history = Manager::History()->fetchLast($lastValueItems);
+			$history = Manager::History()->getLast($lastValueItems);
 		}
 
 		for ($i = 0; $i < $this->num; $i++) {
@@ -170,8 +170,7 @@ class CPie extends CGraphDraw {
 				$real_item['history'] = ZBX_HISTORY_DATA_UPKEEP;
 			}
 
-			if (($real_item['history'] * SEC_PER_DAY) > (time() - ($from_time + $this->period / 2)) // should pick data from history or trends
-					&& ($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL)) { // is reasonable to take data from history?
+			if (($real_item['history'] * SEC_PER_DAY) > (time() - ($from_time + $this->period / 2))) { // should pick data from history or trends
 				$this->dataFrom = 'history';
 				array_push($sql_arr,
 					'SELECT h.itemid,'.
@@ -315,12 +314,13 @@ class CPie extends CGraphDraw {
 			$proc = $this->sum == 0 ? 0 : ($datavalue * 100) / $this->sum;
 
 			if (isset($data) && isset($datavalue)) {
-				$strvalue = sprintf(_('Value').': %s ('.(round($proc) != $proc? '%0.2f' : '%s').'%%)',
+				$strvalue = sprintf(_('Value').': %s ('.(round($proc) != round($proc, 2) ? '%0.2f' : '%0.0f').'%%)',
 					convert_units(array(
-					'value' => $datavalue,
-					'units' => $this->items[$i]['units']
+						'value' => $datavalue,
+						'units' => $this->items[$i]['units']
 					)),
-					$proc);
+					$proc
+				);
 
 				$str = sprintf('%s: %s [%s] ',
 					str_pad($this->items[$i]['host'], $max_host_len, ' '),

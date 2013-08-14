@@ -421,7 +421,7 @@ class testInheritanceGraph extends CWebTest {
 			$ymin_name = $data['ymin_name'];
 			$yminValue = $this->getValue('ymin_name');
 
-			$this->assertEquals($yminValue, $ymin_name);
+			$this->assertEquals($yminValue, $this->template.': '.$ymin_name);
 		}
 
 		if (isset($data['ymax_name'])) {
@@ -432,7 +432,7 @@ class testInheritanceGraph extends CWebTest {
 			$ymax_name = $data['ymax_name'];
 			$ymaxValue = $this->getValue('ymax_name');
 
-			$this->assertEquals($ymaxValue, $ymax_name);
+			$this->assertEquals($ymaxValue, $this->template.': '.$ymax_name);
 		}
 
 		$this->zbxTestClickWait('save');

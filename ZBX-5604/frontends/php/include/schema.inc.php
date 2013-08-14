@@ -2492,13 +2492,13 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0',
+				'default' => '900',
 			),
 			'height' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0',
+				'default' => '200',
 			),
 			'yaxismin' => array(
 				'null' => false,

@@ -567,9 +567,9 @@ class CGraph extends CGraphGeneral {
 	}
 
 	/**
-	 * Check graph data
+	 * Check graph data.
 	 *
-	 * @param array $graphs
+	 * @param array   $graphs
 	 * @param boolean $update
 	 *
 	 * @return void
@@ -592,6 +592,7 @@ class CGraph extends CGraphGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Missing items for graph "%1$s".', $graph['name']));
 			}
 
+
 			// validate item fields
 			if (isset($graph['gitems'])) {
 				$fields = array('itemid' => null);
@@ -607,7 +608,7 @@ class CGraph extends CGraphGeneral {
 				}
 			}
 
-			// add Y axis item IDs for persmission validation
+			// add Y axis item IDs for permission validation
 			if (isset($graph['ymin_type']) && $graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 				if (!isset($graph['ymin_itemid']) || zbx_empty($graph['ymin_itemid'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No "%1$s" given for graph.', 'ymin_itemid'));
