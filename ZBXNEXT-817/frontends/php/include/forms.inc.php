@@ -1040,8 +1040,10 @@
 		$data['types'] = item_type2str();
 		unset($data['types'][ITEM_TYPE_HTTPTEST]);
 		if (!empty($options['is_discovery_rule'])) {
-			unset($data['types'][ITEM_TYPE_AGGREGATE], $data['types'][ITEM_TYPE_CALCULATED],
-					$data['types'][ITEM_TYPE_SNMPTRAP], $data['types'][ITEM_TYPE_DB_MONITOR]);
+			unset($data['types'][ITEM_TYPE_AGGREGATE],
+				$data['types'][ITEM_TYPE_CALCULATED],
+				$data['types'][ITEM_TYPE_SNMPTRAP]
+			);
 		}
 
 		// item
