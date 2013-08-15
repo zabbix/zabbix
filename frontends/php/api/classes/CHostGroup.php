@@ -574,7 +574,7 @@ class CHostGroup extends CZBXAPI {
 		$delGroups = $this->get(array(
 			'groupids' => $groupids,
 			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('groupid', 'name', 'internal'),
 			'preservekeys' => true
 		));
 
