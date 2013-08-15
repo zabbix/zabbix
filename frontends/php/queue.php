@@ -136,10 +136,10 @@ if ($config == QUEUE_OVERVIEW) {
 }
 
 // overview by proxy
-elseif ($config == QUEUE_OVERVIEW_BY_PROXY){
+elseif ($config == QUEUE_OVERVIEW_BY_PROXY) {
 	$proxies = API::proxy()->get(array(
 		'output' => array('hostid', 'host'),
-		'preservekeys' => true,
+		'preservekeys' => true
 	));
 	order_result($proxies, 'host');
 
@@ -205,24 +205,26 @@ elseif ($config == QUEUE_DETAILS) {
 
 	$i = 0;
 	foreach ($queueData as $itemData) {
-		if (isset($items[$itemData['itemid']])) {
-			// display only the first 500 items
-			$i++;
-			if ($i > QUEUE_DETAIL_ITEM_COUNT) {
-				break;
-			}
-
-			$item = $items[$itemData['itemid']];
-			$host = reset($item['hosts']);
-
-			$table->addRow(array(
-				zbx_date2str(QUEUE_NODES_DATE_FORMAT, $itemData['nextcheck']),
-				zbx_date2age($itemData['nextcheck']),
-				get_node_name_by_elid($item['itemid']),
-				$host['name'],
-				itemName($item)
-			));
+		if (!isset($items[$itemData['itemid']])) {
+			continue;
 		}
+
+		// display only the first 500 items
+		$i++;
+		if ($i > QUEUE_DETAIL_ITEM_COUNT) {
+			break;
+		}
+
+		$item = $items[$itemData['itemid']];
+		$host = reset($item['hosts']);
+
+		$table->addRow(array(
+			zbx_date2str(QUEUE_NODES_DATE_FORMAT, $itemData['nextcheck']),
+			zbx_date2age($itemData['nextcheck']),
+			get_node_name_by_elid($item['itemid']),
+			$host['name'],
+			itemName($item)
+		));
 	}
 }
 
@@ -230,7 +232,10 @@ $queueWidget->addItem($table);
 $queueWidget->show();
 
 // display the table footer
-if ($config != QUEUE_OVERVIEW) {
+if ($config == QUEUE_OVERVIEW_BY_PROXY) {
+	show_table_header(_('Total').': '.$table->getNumRows());
+}
+elseif ($config == QUEUE_DETAILS) {
 	show_table_header(
 		_('Total').': '.$table->getNumRows().
 		((count($queueData) > QUEUE_DETAIL_ITEM_COUNT) ? ' ('._('Truncated').')' : '')
