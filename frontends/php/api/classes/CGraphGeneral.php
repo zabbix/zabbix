@@ -47,6 +47,15 @@ abstract class CGraphGeneral extends CZBXAPI {
 	protected function checkInput($graphs, $update = false) {
 		$colorValidator = new CColorValidator();
 
+		if ($update) {
+			$dbGitems = $this->get(array(
+				'graphids' => zbx_objectValues($graphs, 'graphid'),
+				'editable' => true,
+				'preservekeys' => true,
+				'selectGraphItems' => array('gitemid', 'itemid')
+			));
+		}
+
 		foreach ($graphs as $graph) {
 			// check for "templateid", because it is not allowed
 			if (array_key_exists('templateid', $graph)) {
@@ -59,28 +68,71 @@ abstract class CGraphGeneral extends CZBXAPI {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 
+			$templatedGraph = false;
 			if (isset($graph['gitems'])) {
-				// check if templated graph
-				$graphHosts = API::Host()->get(array(
-					'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
-					'output' => API_OUTPUT_EXTEND,
-					'editable' => true,
-					'templated_hosts' => true
-				));
+				// when updating graph check to what host graph belongs to and
+				// trow an error if new items added from other hosts
+				if ($update) {
+					// first item determines to which host graph belongs to
+					$gitem = array_shift($dbGitems[$graph['graphid']]['gitems']);
+					$graphHosts = API::Host()->get(array(
+						'itemids' => $gitem['itemid'],
+						'output' => array('hostid', 'status'),
+						'editable' => true,
+						'templated_hosts' => true
+					));
+					$host = array_shift($graphHosts);
 
-				// check - items from one template
-				$templatedGraph = false;
-				foreach ($graphHosts as $host) {
+					// if the current graph is templated and new items to be added
 					if (HOST_STATUS_TEMPLATE == $host['status']) {
 						$templatedGraph = $host['hostid'];
-						break;
+						foreach ($graph['gitems'] as $gitem) {
+							if (!isset($gitem['gitemid']) && isset($gitem['itemid'])) {
+								$itemIds[] = $gitem['itemid'];
+							}
+						}
+
+						if (isset($itemIds) && $itemIds) {
+							$itemHosts = API::Host()->get(array(
+								'itemids' => $itemIds,
+								'output' => array('hostid'),
+								'editable' => true,
+								'templated_hosts' => true
+							));
+
+							// only one host is allowed and it has to be the current. other templated hosts are allowed
+							$itemHosts = array_unique(zbx_objectValues($itemHosts, 'hostid'));
+							if (count($itemHosts) > 1 || !in_array($host['hostid'], $itemHosts)) {
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_s($this->getErrorMsg(self::ERROR_TEMPLATE_HOST_MIX), $graph['name'])
+								);
+							}
+						}
+
 					}
 				}
+				else {
+					// when creating, check if new items are from same templated host
+					$graphHosts = API::Host()->get(array(
+						'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
+						'output' => API_OUTPUT_EXTEND,
+						'editable' => true,
+						'templated_hosts' => true
+					));
 
-				if ($templatedGraph && count($graphHosts) > 1) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s($this->getErrorMsg(self::ERROR_TEMPLATE_HOST_MIX), $graph['name'])
-					);
+					// check - items from one template. at least one item belongs to template
+					foreach ($graphHosts as $host) {
+						if (HOST_STATUS_TEMPLATE == $host['status']) {
+							$templatedGraph = $host['hostid'];
+							break;
+						}
+					}
+
+					if ($templatedGraph && count($graphHosts) > 1) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s($this->getErrorMsg(self::ERROR_TEMPLATE_HOST_MIX), $graph['name'])
+						);
+					}
 				}
 
 				// items fields
@@ -92,6 +144,9 @@ abstract class CGraphGeneral extends CZBXAPI {
 					}
 				}
 			}
+
+			// check ymin, ymax items
+			$this->checkAxisItems($graph, $templatedGraph);
 
 			// more than one sum type item for pie graph
 			if ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED) {
@@ -119,9 +174,6 @@ abstract class CGraphGeneral extends CZBXAPI {
 
 		$graphNames = array();
 		foreach ($graphs as $graph) {
-			// check ymin, ymax items
-			$this->checkAxisItems($graph, $templatedGraph);
-
 			// check if the host has any graphs in DB with the same name within host
 			$hostsAndTemplates = API::Host()->get(array(
 				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),

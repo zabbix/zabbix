@@ -9,6 +9,7 @@ New features:
 ...G...... [ZBXNEXT-1528] added net.if.in, net.if.out and net.if.total item support on HP-UX platform (igors)
 
 Bug fixes:
+A......... [ZBX-6866] fixed beeing able to add graph items from other hosts for templated graphs (Ivo)
 ....I..... [ZBX-1583] removed duplicated indexes for 6 tables when using MySQL (igors)
 ..F....... [ZBX-6864] fixed fullscreen parameter validation (Vitalij)
 A.F....... [ZBX-6865] fixed "NULL" value validation (Ivo)
