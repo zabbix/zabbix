@@ -184,8 +184,13 @@ $icons = DBselect(
 	' WHERE i.imagetype='.IMAGE_TYPE_ICON.
 		andDbNode('i.imageid')
 );
+$data['defaultIconIndex'] = 0;
 while ($icon = DBfetch($icons)) {
 	$data['iconList'][] = array('imageid' => $icon['imageid'], 'name' => $icon['name']);
+	if ($icon['name'] == DEFAULT_ADD_ICON_NAME) {
+		end($data['iconList']);
+		$data['defaultIconIndex'] = key($data['iconList']);
+	}
 }
 CArrayHelper::sort($data['iconList'], array('name'));
 $data['iconList'] = array_values($data['iconList']);
