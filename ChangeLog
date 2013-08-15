@@ -9,6 +9,7 @@ New features:
 ...G...... [ZBXNEXT-1528] added net.if.in, net.if.out and net.if.total item support on HP-UX platform (igors)
 
 Bug fixes:
+........S. [ZBX-6889] fixed processing of availability data by the server (Sasha)
 A......... [ZBX-6885] fixed host group error message on delete (Vitalij)
 ....I..... [ZBX-1583] removed duplicated indexes for 6 tables when using MySQL (igors)
 ..F....... [ZBX-6864] fixed fullscreen parameter validation (Vitalij)
@@ -333,6 +334,12 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-5142] changed media type field label from 'Description' to 'Name' (Vedmak)
 ....I..... [ZBX-5314] increased size of autoincrement fields for PostgreSQL database (Sasha)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.8rc2
+
+Bug fixes:
+........S. [ZBX-6889] fixed processing of availability data by the server (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.8rc1
