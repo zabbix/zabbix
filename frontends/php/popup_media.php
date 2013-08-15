@@ -111,7 +111,7 @@ $types = DBselect(
 		'SELECT mt.mediatypeid,mt.description'.
 		' FROM media_type mt'.
 		whereDbNode('mt.mediatypeid').
-		' ORDER BY mt.type'
+		' ORDER BY mt.description'
 );
 while ($type = DBfetch($types)) {
 	$cmbType->addItem(
