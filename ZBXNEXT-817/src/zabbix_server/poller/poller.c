@@ -462,7 +462,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			res = get_value_snmp(item, result);
 			alarm(0);
 #else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SNMP checks was not compiled in"));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SNMP checks was not compiled in."));
 			res = NOTSUPPORTED;
 #endif
 			break;
@@ -470,7 +470,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 #ifdef HAVE_OPENIPMI
 			res = get_value_ipmi(item, result);
 #else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for IPMI checks was not compiled in"));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for IPMI checks was not compiled in."));
 			res = NOTSUPPORTED;
 #endif
 			break;
@@ -482,9 +482,15 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			res = get_value_internal(item, result);
 			break;
 		case ITEM_TYPE_DB_MONITOR:
+#ifdef HAVE_ODBC
 			alarm(CONFIG_TIMEOUT);
 			res = get_value_db(item, result);
 			alarm(0);
+#else
+			SET_MSG_RESULT(result,
+					zbx_strdup(NULL, "Support for Database monitor checks was not compiled in."));
+			res = NOTSUPPORTED;
+#endif
 			break;
 		case ITEM_TYPE_AGGREGATE:
 			res = get_value_aggregate(item, result);
@@ -499,7 +505,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			res = get_value_ssh(item, result);
 			alarm(0);
 #else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SSH checks was not compiled in"));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SSH checks was not compiled in."));
 			res = NOTSUPPORTED;
 #endif
 			break;

@@ -17,13 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "checks_db.h"
 
 #ifdef HAVE_ODBC
-#	include "zbxodbc.h"
-#endif
 
-#include "checks_db.h"
+#include "zbxodbc.h"
 #include "log.h"
 
 /******************************************************************************
@@ -45,36 +43,30 @@
 int	get_value_db(DC_ITEM *item, AGENT_RESULT *result)
 {
 	const char	*__function_name = "get_value_db";
-#ifdef HAVE_ODBC
 	ZBX_ODBC_DBH	dbh;
 	ZBX_ODBC_ROW	row;
 	AGENT_REQUEST	request;
-#endif
 	int		ret = NOTSUPPORTED;
 
-	init_result(result);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key_orig:'%s'", __function_name, item->key_orig);
-
-#ifdef HAVE_ODBC
 
 	init_request(&request);
 
 	if (SUCCEED != parse_item_key(item->key, &request))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Key is badly formatted"));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Key is badly formatted."));
 		goto out;
 	}
 
 	if (0 != strcmp(request.key, "db.odbc.select"))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Item key is not supported"));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Item key is not supported."));
 		goto out;
 	}
 
 	if (2 != request.nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters"));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		goto out;
 	}
 
@@ -113,9 +105,8 @@ int	get_value_db(DC_ITEM *item, AGENT_RESULT *result)
 out:
 	free_request(&request);
 
-#endif	/* HAVE_ODBC */
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
+#endif	/* HAVE_ODBC */
