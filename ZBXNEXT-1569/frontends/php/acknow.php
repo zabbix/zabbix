@@ -225,7 +225,7 @@ else {
 	}
 }
 
-$messageTable = new CFormTable($title.' "'.CWebUser::$data['fullname'].'"');
+$messageTable = new CFormTable($title.' "'.getUserFullname(CWebUser::$data).'"');
 $messageTable->addVar('backurl', $_REQUEST['backurl']);
 
 if (in_array($_REQUEST['backurl'], array('tr_events.php', 'events.php'))) {
