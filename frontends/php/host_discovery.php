@@ -134,8 +134,7 @@ if (get_request('itemid', false)) {
 	}
 	$_REQUEST['hostid'] = $item['hostid'];
 }
-
-if (get_request('hostid', 0) > 0) {
+elseif (get_request('hostid', 0) > 0) {
 	$hosts = API::Host()->get(array(
 		'hostids' => $_REQUEST['hostid'],
 		'output' => API_OUTPUT_EXTEND,
