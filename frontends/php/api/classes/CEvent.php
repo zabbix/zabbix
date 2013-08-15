@@ -641,23 +641,17 @@ class CEvent extends CZBXAPI {
 				$sqlParts['order'][] = 'a.clock DESC';
 
 				// if the user data is requested via extended output or specified fields, join the users table
-				$requestUserData = false;
 				$userFields = array('alias', 'name', 'surname');
+				$requestUserData = array();
 				foreach ($userFields as $userField) {
 					if ($this->outputIsRequested($userField, $options['select_acknowledges'])) {
-						$requestUserData = true;
-						break;
+						$requestUserData[] = $userField;
 					}
 				}
-
-				if ($options['select_acknowledges'] == API_OUTPUT_EXTEND) {
-					$sqlParts = $this->addQuerySelect('u.'.implode(',u.', $userFields), $sqlParts);
-					$sqlParts['from'][] = 'users u';
-					$sqlParts['where'][] = 'a.userid=u.userid';
-				}
-				elseif ($requestUserData) {
-					$selectFields = 'u.'.implode(',u.', array_intersect($options['select_acknowledges'], $userFields));
-					$sqlParts = $this->addQuerySelect($selectFields, $sqlParts);
+				if ($requestUserData) {
+					foreach ($requestUserData as $userField) {
+						$sqlParts = $this->addQuerySelect('u.'.$userField, $sqlParts);
+					}
 					$sqlParts['from'][] = 'users u';
 					$sqlParts['where'][] = 'a.userid=u.userid';
 				}
