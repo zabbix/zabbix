@@ -279,7 +279,7 @@ function change_group_debug_mode($userGroupIds, $debugMode) {
  *
  * @param array $userData
  *
- * return string
+ * @return string
  */
 function getUserFullname($userData) {
 	$fullname = '';
@@ -295,7 +295,7 @@ function getUserFullname($userData) {
 		$fullname = $userData['surname'];
 	}
 
-	// return only name or surname
+	// return alias with full name
 	if ($fullname) {
 		return $userData['alias'].' ('.$fullname.')';
 	}
