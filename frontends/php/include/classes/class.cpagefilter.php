@@ -766,7 +766,7 @@ class CPageFilter {
 		$items = $styles = array();
 		foreach ($this->hosts as $key => $value) {
 			$items[$key] = $value['name'];
-			$styles[$key] = ($value['status'] == HOST_STATUS_NOT_MONITORED ? 'not-monitored' : null);
+			$styles[$key] = ($value['status'] == HOST_STATUS_NOT_MONITORED) ? 'not-monitored' : null;
 		}
 		return $this->_getCB('hostid', $this->hostid, $items, $withNode, array('objectName' => 'hosts', 'cssStyles' => $styles));
 	}
