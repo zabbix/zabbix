@@ -182,9 +182,9 @@ elseif (isset($_REQUEST['save'])) {
 		$newHostPrototype['ruleid'] = get_request('parent_discoveryid');
 
 		// add group prototypes based on existing host groups
-		foreach (get_request('group_links', array()) as $group) {
+		foreach (get_request('group_links', array()) as $groupId) {
 			$newHostPrototype['groupLinks'][] = array(
-				'groupid' => $group['groupid']
+				'groupid' => $groupId
 			);
 		}
 
@@ -241,7 +241,6 @@ if (isset($_REQUEST['form'])) {
 			'inventory' => array(
 				'inventory_mode' => get_request('inventory_mode', HOST_INVENTORY_DISABLED)
 			),
-			'groupLinks' => get_request('group_links', array()),
 			'groupPrototypes' => get_request('group_prototypes', array())
 		),
 		'groups' => array()
