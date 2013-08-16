@@ -135,9 +135,11 @@ $r_form = new CForm('get');
 
 $options = array(
 	'groups' => array(
-		'real_hosts' => 1,
+		'real_hosts' => true,
 	),
-	'hosts' => array(),
+	'hosts' => array(
+		'with_monitored_items' => true
+	),
 	'hostid' => get_request('hostid', null),
 	'groupid' => get_request('groupid', null),
 );
