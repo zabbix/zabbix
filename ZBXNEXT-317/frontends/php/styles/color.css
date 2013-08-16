@@ -106,4 +106,5 @@ table.tableinfo a.disabled:visited		{ color: #DC0000; }
 table.tableinfo a.disabled:hover		{ color: #CC4444; }
 table.tableinfo a.disabled:active		{ color: #DC0000; }
 
+.input.select.not-monitored				{ color: #DC0000; }
 .input option.not-monitored				{ color: #DC0000; }
