@@ -22,22 +22,6 @@
 class CSchemaValidator extends CValidator {
 
 	/**
-	 * Array of validators where keys are object field names and values are either CValidator objects or nulls.
-	 *
-	 * If the value is set to null, it will not be validated, but no $messageUnsupported error will be triggered.
-	 *
-	 * @var array
-	 */
-	public $validators = array();
-
-	/**
-	 * Array of validators to validate the whole object.
-	 *
-	 * @var array
-	 */
-	public $postValidators = array();
-
-	/**
 	 * Array of required field names.
 	 *
 	 * @var array
@@ -59,24 +43,40 @@ class CSchemaValidator extends CValidator {
 	public $messageUnsupported;
 
 	/**
+	 * Array of validators where keys are object field names and values are either CValidator objects or nulls.
+	 *
+	 * If the value is set to null, it will not be validated, but no $messageUnsupported error will be triggered.
+	 *
+	 * @var array
+	 */
+	protected $validators = array();
+
+	/**
+	 * Array of validators to validate the whole object.
+	 *
+	 * @var array
+	 */
+	protected $postValidators = array();
+
+	/**
 	 * Checks each object field against the given validator, and then the whole object against the post validators.
 	 *
-	 * @param array $value
+	 * @param array $array
 	 *
 	 * @return bool
 	 */
-	public function validate($value) {
+	public function validate($array) {
 		$required = array_flip($this->required);
-		$unvalidatedFields = array_flip(array_keys($value));
+		$unvalidatedFields = array_flip(array_keys($array));
 
 		// field validators
 		foreach ($this->validators as $field => $validator) {
 			unset($unvalidatedFields[$field]);
 
 			// if the value is present
-			if (isset($value[$field])) {
+			if (isset($array[$field])) {
 				// validate it if a validator is given, skip it otherwise
-				if ($validator && !$validator->validate($value[$field])) {
+				if ($validator && !$validator->validate($array[$field])) {
 					$this->setError($validator->getError());
 
 					return false;
@@ -101,7 +101,7 @@ class CSchemaValidator extends CValidator {
 
 		// post validators
 		foreach ($this->postValidators as $validator) {
-			if (!$validator->validate($value)) {
+			if (!$validator->validate($array)) {
 				$this->setError($validator->getError());
 
 				return false;
@@ -109,6 +109,16 @@ class CSchemaValidator extends CValidator {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Set a validator for a field.
+	 *
+	 * @param $field
+	 * @param CValidator $validator
+	 */
+	public function setValidator($field, CValidator $validator = null) {
+		$this->validators[$field] = $validator;
 	}
 
 	/**

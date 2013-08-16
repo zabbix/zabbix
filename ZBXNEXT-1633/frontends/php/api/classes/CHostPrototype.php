@@ -160,7 +160,7 @@ class CHostPrototype extends CHostBase {
 	 * @return CSchemaValidator
 	 */
 	protected function getHostPrototypValidator() {
-		return new CSchemaValidator(array(
+		return new CPartialSchemaValidator(array(
 			'validators' => array(
 				'host' => new CLldMacroStringValidator(array(
 					'maxLength' => 64,
@@ -215,7 +215,7 @@ class CHostPrototype extends CHostBase {
 	 * @return CSchemaValidator
 	 */
 	protected function getGroupPrototypeValidator() {
-		return new CSchemaValidator(array(
+		return new CPartialSchemaValidator(array(
 			'validators' => array(
 				'name' => new CLldMacroStringValidator(array(
 					'messageEmpty' => _('Empty name for group prototype.'),
@@ -233,7 +233,7 @@ class CHostPrototype extends CHostBase {
 	 * @return CSchemaValidator
 	 */
 	protected function getGroupLinkValidator() {
-		return new CSchemaValidator(array(
+		return new CPartialSchemaValidator(array(
 			'validators' => array(
 				'groupid' => new CIdValidator(array(
 					'messageEmpty' => _('No host group ID for group prototype.'),
@@ -390,35 +390,32 @@ class CHostPrototype extends CHostBase {
 
 		// host prototype validator
 		$hostPrototypeValidator = $this->getHostPrototypValidator();
-		$hostPrototypeValidator->required = array();
-		$hostPrototypeValidator->validators['hostid'] = null;
+		$hostPrototypeValidator->setValidator('hostid',  null);
 
 		// group validator
 		$groupLinkValidator = $this->getGroupLinkValidator();
-		$groupLinkValidator->required = array();
-		$groupLinkValidator->validators['group_prototypeid'] = new CIdValidator(array(
+		$groupLinkValidator->setValidator('group_prototypeid', new CIdValidator(array(
 			'messageEmpty' => _('Group prototype ID cannot be empty.'),
 			'messageRegex' => _('Incorrect group prototype ID.')
-		));
+		)));
 
 		// group prototype validator
 		$groupPrototypeValidator = $this->getGroupPrototypeValidator();
-		$groupPrototypeValidator->required = array();
-		$groupPrototypeValidator->validators['group_prototypeid'] = new CIdValidator(array(
+		$groupPrototypeValidator->setValidator('group_prototypeid', new CIdValidator(array(
 			'messageEmpty' => _('Group prototype ID cannot be empty.'),
 			'messageRegex' => _('Incorrect group prototype ID.')
-		));
+		)));
 
 		$groupPrototypeGroupIds = array();
 		foreach ($hostPrototypes as $hostPrototype) {
 			// host prototype
 			$hostPrototypeValidator->setObjectName($hostPrototype['host']);
-			$this->checkValidator($hostPrototype, $hostPrototypeValidator);
+			$this->checkPartialValidator($hostPrototype, null, $hostPrototypeValidator);
 
 			// groups
 			if (isset($hostPrototype['groupLinks'])) {
 				foreach ($hostPrototype['groupLinks'] as $groupPrototype) {
-					$this->checkValidator($groupPrototype, $groupLinkValidator);
+					$this->checkPartialValidator($groupPrototype, null, $groupLinkValidator);
 
 					$groupPrototypeGroupIds[$groupPrototype['groupid']] = $groupPrototype['groupid'];
 				}
@@ -428,7 +425,7 @@ class CHostPrototype extends CHostBase {
 			if (isset($hostPrototype['groupPrototypes'])) {
 				foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
 					$groupPrototypeValidator->setObjectName(isset($groupPrototype['name']) ? $groupPrototype['name'] : '');
-					$this->checkValidator($groupPrototype, $groupPrototypeValidator);
+					$this->checkPartialValidator($groupPrototype, null, $groupPrototypeValidator);
 				}
 			}
 		}

@@ -44,6 +44,8 @@ abstract class CValidator {
 	}
 
 	/**
+	 * Returns true if the given $value is valid, or set's an error and returns false otherwise.
+	 *
 	 * @abstract
 	 *
 	 * @param $value
