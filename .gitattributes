@@ -172,8 +172,9 @@ frontends/php/include/classes/class.cseverity.php -text
 frontends/php/include/classes/core/CFactoryRegistry.php -text
 frontends/php/include/classes/validators/CCollectionValidator.php -text
 frontends/php/include/classes/validators/CIdValidator.php -text
-frontends/php/include/classes/validators/CSchemaValidator.php -text
 frontends/php/include/classes/validators/hostgroup/CHostGroupNormalValidator.php -text
+frontends/php/include/classes/validators/schema/CPartialSchemaValidator.php -text
+frontends/php/include/classes/validators/schema/CSchemaValidator.php -text
 frontends/php/include/classes/validators/string/CLldMacroStringValidator.php -text
 frontends/php/include/classes/validators/string/CStringValidator.php -text
 frontends/php/include/views/configuration.sysmap.constructor.php -text

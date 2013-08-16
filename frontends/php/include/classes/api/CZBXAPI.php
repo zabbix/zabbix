@@ -913,6 +913,19 @@ class CZBXAPI {
 	}
 
 	/**
+	 * Runs the given partial validator and throws an exception if it fails.
+	 *
+	 * @param array $array
+	 * @parma array $fullArray
+	 * @param CValidator $validator
+	 */
+	protected function checkPartialValidator(array $array, array $fullArray = null, CPartialValidatorInterface $validator) {
+		if (!$validator->validatePartial($array, $fullArray)) {
+			self::exception(ZBX_API_ERROR_INTERNAL, $validator->getError());
+		}
+	}
+
+	/**
 	 * Adds a deprecated property to an array of resulting objects if it's requested in $output. The value for the
 	 * deprecated property will be taken from the new one.
 	 *

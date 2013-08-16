@@ -192,6 +192,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/db',
 			$this->rootDir.'/include/classes/debug',
 			$this->rootDir.'/include/classes/validators',
+			$this->rootDir.'/include/classes/validators/schema',
 			$this->rootDir.'/include/classes/validators/string',
 			$this->rootDir.'/include/classes/validators/hostgroup',
 			$this->rootDir.'/include/classes/validators/host',
