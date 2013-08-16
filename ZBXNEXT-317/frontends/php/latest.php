@@ -412,7 +412,9 @@ foreach ($applications as $appid => $dbApp) {
 	// host JS menu link
 	$hostSpan = null;
 	if ($_REQUEST['hostid'] == 0) {
-		$hostSpan = new CSpan($host['name'], 'link_menu menu-host'.($host['status'] == HOST_STATUS_NOT_MONITORED?' not-monitored':''));
+		$hostSpan = new CSpan($host['name'],
+			'link_menu menu-host'.(($host['status'] == HOST_STATUS_NOT_MONITORED) ? ' not-monitored' : '')
+		);
 		$scripts = $hostScripts[$host['hostid']];
 		$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
 		$hostSpan = new CDiv($hostSpan);
@@ -535,7 +537,9 @@ foreach ($hosts as $hostId => $dbHost) {
 	// host JS menu link
 	$hostSpan = null;
 	if ($_REQUEST['hostid'] == 0) {
-		$hostSpan = new CSpan($host['name'], 'link_menu menu-host'.($host['status'] == HOST_STATUS_NOT_MONITORED?' not-monitored':''));
+		$hostSpan = new CSpan($host['name'],
+			'link_menu menu-host'.(($host['status'] == HOST_STATUS_NOT_MONITORED) ? ' not-monitored' : '')
+		);
 		$scripts = $hostScripts[$host['hostid']];
 		$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
 		$hostSpan = new CDiv($hostSpan);
