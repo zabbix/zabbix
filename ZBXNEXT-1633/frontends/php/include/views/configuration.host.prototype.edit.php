@@ -168,10 +168,10 @@ $groupList = new CFormList('grouplist');
 
 // existing groups
 $groups = array();
-foreach ($hostPrototype['groupLinks'] as $group) {
+foreach ($data['groups'] as $group) {
 	$groups[] = array(
 		'id' => $group['groupid'],
-		'name' => $data['groups'][$group['groupid']]['name']
+		'name' => $group['name']
 	);
 }
 $groupList->addRow(_('Groups'), new CMultiSelect(array(
