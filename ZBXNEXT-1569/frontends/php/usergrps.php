@@ -426,11 +426,6 @@ if (isset($_REQUEST['form'])) {
 		' ORDER BY u.alias'
 	));
 
-	foreach ($data['users'] as &$user) {
-		$user['alias'] = getUserFullname($user);
-	}
-	unset($user);
-
 	// get user groups
 	$data['usergroups'] = DBfetchArray(DBselect(
 		'SELECT ug.usrgrpid,ug.name'.

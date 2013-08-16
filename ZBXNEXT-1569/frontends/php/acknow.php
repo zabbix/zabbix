@@ -201,9 +201,8 @@ else {
 		$acknowledgesTable->setAlign('center');
 
 		while ($acknowledge = DBfetch($acknowledges)) {
-			$acknowledge['alias'] = getUserFullname($acknowledge);
 			$acknowledgesTable->addRow(array(
-				new CCol($acknowledge['alias'], 'user'),
+				new CCol(getUserFullname($acknowledge), 'user'),
 				new CCol(zbx_date2str(_('d M Y H:i:s'), $acknowledge['clock']), 'time')),
 				'title'
 			);
