@@ -396,8 +396,8 @@ class CAlert extends CZBXAPI {
 						' AND a.eventid=e.eventid'.
 						' AND e.objectid=f.triggerid'.
 						' AND f.itemid=i.itemid'.
-						' AND e.object='.EVENT_OBJECT_TRIGGER.
-						' AND e.source IN ('.EVENT_SOURCE_TRIGGERS.', '.EVENT_SOURCE_INTERNAL.')'
+						' AND e.object='.$options['eventobject'].
+						' AND e.source='.$options['eventsource']
 				);
 			}
 			// item and LLD rule events
@@ -409,7 +409,7 @@ class CAlert extends CZBXAPI {
 						' AND a.eventid=e.eventid'.
 						' AND e.objectid=i.itemid'.
 						' AND e.object='.$options['eventobject'].
-						' AND e.source IN ('.EVENT_SOURCE_INTERNAL.')'
+						' AND e.source='.$options['eventsource']
 				);
 			}
 
