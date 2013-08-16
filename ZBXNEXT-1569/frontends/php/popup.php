@@ -128,7 +128,7 @@ if ($min_user_type > CWebUser::$data['type']) {
  */
 // allowed 'srcfld*' parameter values for each 'srctbl' value
 $allowedSrcFields = array(
-	'users'					=> '"usergrpid", "alias", "name", "surname", "fullname", "userid"',
+	'users'					=> '"usergrpid", "alias", "fullname", "userid"',
 	'triggers'				=> '"description", "triggerid", "expression"',
 	'items'					=> '"itemid", "name"',
 	'prototypes'			=> '"itemid", "name", "flags"',

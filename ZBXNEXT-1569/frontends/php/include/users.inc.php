@@ -283,14 +283,14 @@ function change_group_debug_mode($userGroupIds, $debugMode) {
  */
 function getUserFullname($userData) {
 	$fullname = '';
-	if ($userData['name']) {
+	if (!zbx_empty($userData['name'])) {
 		$fullname = $userData['name'];
 	}
 
 	// return full name and surname
-	if ($userData['surname']) {
+	if (!zbx_empty($userData['surname'])) {
 		if ($userData['name']) {
-			return $userData['alias'].' '._s('(%1$s %2$s)', $userData['name'], $userData['surname']);
+			return $userData['alias'].' '._x('(%1$s %2$s)', 'user fullname', $userData['name'], $userData['surname']);
 		}
 		$fullname = $userData['surname'];
 	}
