@@ -115,7 +115,6 @@ abstract class CItemGeneral extends CZBXAPI {
 	 * @return void
 	 */
 	protected function checkInput(array &$items, $update = false) {
-		// permissions
 		if ($update) {
 			$itemDbFields = array('itemid' => null);
 
@@ -171,7 +170,24 @@ abstract class CItemGeneral extends CZBXAPI {
 			'preservekeys' => true
 		));
 
-		if ($update){
+		if ($update) {
+			foreach ($items as $item) {
+				// check permissions
+				if (!isset($dbItems[$item['itemid']])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_('No permissions to referred object or it does not exist!'));
+				}
+
+				// discovered fields, except status, cannot be updated
+				if ($dbItems[$item['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+					foreach ($item as $key => $value) {
+						if (!in_array($key, array('itemid', 'status'))) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update discovered item.'));
+						}
+					}
+				}
+			}
+
 			$items = $this->extendObjects($this->tableName(), $items, array('name'));
 		}
 
@@ -185,10 +201,6 @@ abstract class CItemGeneral extends CZBXAPI {
 			}
 
 			if ($update) {
-				if (!isset($dbItems[$item['itemid']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-				}
-
 				check_db_fields($dbItems[$item['itemid']], $fullItem);
 
 				$this->checkNoParameters($item, array('templateid', 'state'),

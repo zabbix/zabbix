@@ -154,13 +154,13 @@ $fields = array(
 	'dstfld1' =>					array(T_ZBX_STR, O_OPT, P_SYS,	NOT_EMPTY,	'!isset({multiselect})'),
 	'srctbl' =>						array(T_ZBX_STR, O_MAND, P_SYS,	NOT_EMPTY,	null),
 	'srcfld1' =>					array(T_ZBX_STR, O_MAND, P_SYS,	IN($allowedSrcFields[$_REQUEST['srctbl']]), null),
-	'nodeid' =>						array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'groupid' =>					array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
+	'nodeid' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'groupid' =>					array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'group' =>						array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'hostid' =>						array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
+	'hostid' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'host' =>						array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'parent_discoveryid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'screenid' =>					array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
+	'screenid' =>					array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'templates' =>					array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	null),
 	'host_templates' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	null),
 	'existed_templates' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	null),
@@ -203,7 +203,6 @@ $srcfldCount = countRequest('srcfld');
 for ($i = 2; $i <= $srcfldCount; $i++) {
 	$fields['srcfld'.$i] = array(T_ZBX_STR, O_OPT, P_SYS, IN($allowedSrcFields[$_REQUEST['srctbl']]), null);
 }
-
 check_fields($fields);
 
 $dstfrm = get_request('dstfrm', ''); // destination form
@@ -337,6 +336,7 @@ elseif ($withMonitoredTriggers) {
 	$options['groups']['with_monitored_triggers'] = true;
 	$options['hosts']['with_monitored_triggers'] = true;
 }
+
 $pageFilter = new CPageFilter($options);
 
 // get groupid

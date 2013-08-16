@@ -138,7 +138,7 @@ class testPageDiscoveryRules extends CWebTest {
 			'SELECT distinct h.hostid, h.host from hosts h, items i'.
 			' WHERE h.host LIKE ' .zbx_dbstr('%-layout-test-%').
 				' AND h.hostid = i.hostid'.
-				' AND i.flags = '.ZBX_FLAG_DISCOVERY
+				' AND i.flags = '.ZBX_FLAG_DISCOVERY_RULE
 		);
 	}
 

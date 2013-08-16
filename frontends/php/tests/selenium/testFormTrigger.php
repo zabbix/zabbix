@@ -123,7 +123,9 @@ class testFormTrigger extends CWebTest {
 				)
 			),
 			array(
-				array('template' => 'Inheritance test template', 'form' => 'testInheritanceTrigger1'
+				array(
+					'template' => 'Inheritance test template',
+					'form' => 'testInheritanceTrigger1'
 				)
 			),
 			array(
