@@ -342,13 +342,13 @@ class CItemPrototype extends CItemGeneral {
 	 * @return void
 	 */
 	protected function checkInput(array &$items, $update = false) {
-		// add the values that cannot be changed, but are required for further processing
+		parent::checkInput($items, $update);
+
+		// set proper flags to divide normal and discovered items in future processing
 		foreach ($items as &$item) {
 			$item['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		}
 		unset($item);
-
-		parent::checkInput($items, $update);
 	}
 
 	/**
@@ -464,7 +464,8 @@ class CItemPrototype extends CItemGeneral {
 	 * Update Itemprototype.
 	 *
 	 * @param array $items
-	 * @return boolean
+	 *
+	 * @return array
 	 */
 	public function update($items) {
 		$items = zbx_toArray($items);
