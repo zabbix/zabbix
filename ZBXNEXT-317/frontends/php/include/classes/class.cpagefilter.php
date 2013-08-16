@@ -763,12 +763,12 @@ class CPageFilter {
 	 * @return CComboBox
 	 */
 	public function getHostsCB($withNode = false) {
-		$items = $styles = array();
+		$items = $class = array();
 		foreach ($this->hosts as $key => $value) {
 			$items[$key] = $value['name'];
-			$styles[$key] = ($value['status'] == HOST_STATUS_NOT_MONITORED) ? 'not-monitored' : null;
+			$class[$key] = ($value['status'] == HOST_STATUS_NOT_MONITORED) ? 'not-monitored' : null;
 		}
-		$options = array('objectName' => 'hosts', 'cssStyles' => $styles);
+		$options = array('objectName' => 'hosts', 'class' => $class);
 
 		return $this->_getCB('hostid', $this->hostid, $items, $withNode, $options);
 	}
@@ -854,7 +854,7 @@ class CPageFilter {
 	 * @param int    $allValue
 	 * @param array  $options
 	 * @param string $options['objectName']
-	 * @param array  $options['cssStyles']
+	 * @param array  $options['class']
 	 *
 	 * @return CComboBox
 	 */
@@ -882,7 +882,7 @@ class CPageFilter {
 		}
 
 		foreach ($items as $id => $name) {
-			$cssStyle = isset($options['cssStyles'][$id]) ? $options['cssStyles'][$id] : null;
+			$cssStyle = isset($options['class'][$id]) ? $options['class'][$id] : null;
 			$comboBox->addItem($id, $name, null, 'yes', $cssStyle);
 		}
 
