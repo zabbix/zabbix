@@ -41,11 +41,12 @@ validate_sort_and_sortorder('name', ZBX_SORT_DOWN);
 
 $options = array(
 	'groups' => array(
-		'real_hosts' => 1,
-		'with_httptests' => 1,
+		'real_hosts' => true,
+		'with_httptests' => true
 	),
 	'hosts' => array(
-		'with_httptests' => 1,
+		'with_monitored_items' => true,
+		'with_httptests' => true
 	),
 	'hostid' => get_request('hostid', null),
 	'groupid' => get_request('groupid', null),
@@ -108,8 +109,8 @@ if ($pageFilter->hostsSelected) {
 	));
 
 	foreach ($httpTests as &$httpTest) {
-		$httpTest['hosts'] = reset($httpTest['hosts']);
-		$httpTest['hostname'] = $httpTest['hosts']['name'];
+		$httpTest['host'] = reset($httpTest['hosts']);
+		$httpTest['hostname'] = $httpTest['host']['name'];
 	}
 	unset($httpTest);
 
@@ -145,12 +146,12 @@ if ($pageFilter->hostsSelected) {
 			$status['style'] = 'unknown';
 		}
 
+		$cpsan = new CSpan($httpTest['hostname'],
+			($httpTest['host']['status'] == HOST_STATUS_NOT_MONITORED) ? 'not-monitored' : ''
+		);
 		$table->addRow(new CRow(array(
 			$displayNodes ? get_node_name_by_elid($httpTest['httptestid'], true) : null,
-			(($_REQUEST['hostid'] > 0)
-				?null
-				:new CSpan($httpTest['hostname'], $httpTest['hosts']['status'] == HOST_STATUS_NOT_MONITORED?'not-monitored':'')
-			),
+			($_REQUEST['hostid'] > 0) ? null : $cpsan,
 			new CLink($httpTest['name'], 'httpdetails.php?httptestid='.$httpTest['httptestid']),
 			$httpTest['steps'],
 			$lastcheck,

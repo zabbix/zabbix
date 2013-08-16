@@ -741,7 +741,7 @@ function get_items_data_overview($hostids, $application, $view_style) {
 	$history = Manager::History()->getLast(zbx_toHash($db_items, 'itemid'));
 
 	$options = array(
-		'output' => array('name', 'hostid'),
+		'output' => array('name', 'hostid', 'status'),
 		'monitored_hosts' => true,
 		'hostids' => $hostids,
 		'with_monitored_items' => true,

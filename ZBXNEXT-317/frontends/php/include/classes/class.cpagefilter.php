@@ -882,8 +882,7 @@ class CPageFilter {
 		}
 
 		foreach ($items as $id => $name) {
-			$cssStyle = isset($options['class'][$id]) ? $options['class'][$id] : null;
-			$comboBox->addItem($id, $name, null, 'yes', $cssStyle);
+			$comboBox->addItem($id, $name, null, 'yes', isset($options['class'][$id]) ? $options['class'][$id] : null);
 		}
 
 		return $comboBox;
