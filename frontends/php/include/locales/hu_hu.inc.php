@@ -467,7 +467,7 @@
 	'S_NOT_SELECTED_SMALL'=>			'nincs kiválasztva',
 	'S_GRAPH'=>			'Grafikon',
 	'S_ZABBIX'=>			'Zabbix',
-	'S_COPYRIGHT_BY'=>			'Szerzői jog 2001-2011',
+	'S_COPYRIGHT_BY'=>			'Szerzői jog 2001-2013',
 	'S_CONNECTED_AS'=>			'Csatlakozva mint',
 	'S_NOT_CONNECTED'=>			'Nincs csatlakozva',
 	'S_SIA_ZABBIX'=>			'Zabbix SIA',

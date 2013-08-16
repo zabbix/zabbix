@@ -104,7 +104,7 @@
 	'S_NO_PERMISSIONS'=>			'Accesso negato!',
 	'S_ALL_SMALL'=>			'tutti',
 	'S_GRAPH'=>			'Graph',
-	'S_COPYRIGHT_BY'=>			'Copyright 2001-2011 by',
+	'S_COPYRIGHT_BY'=>			'Copyright 2001-2013 by',
 	'S_CONNECTED_AS'=>			'Connesso come utente:',
 	'S_SIA_ZABBIX'=>			'SIA Zabbix',
 	'S_ITEM_ADDED'=>			'Elemento agguinto!',

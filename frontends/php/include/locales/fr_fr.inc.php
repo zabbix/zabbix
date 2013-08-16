@@ -555,7 +555,7 @@
 	'S_NOT_SELECTED_SMALL'=>			'non sélectionné',
 	'S_GRAPH'=>			'Graphique',
 	'S_ZABBIX'=>			'Zabbix',
-	'S_COPYRIGHT_BY'=>			'Copyright 2001-2011 par',
+	'S_COPYRIGHT_BY'=>			'Copyright 2001-2013 par',
 	'S_CONNECTED_AS'=>			'Connecté en tant que',
 	'S_NOT_CONNECTED'=>			'Non connecté',
 	'S_SIA_ZABBIX'=>			'SIA Zabbix',

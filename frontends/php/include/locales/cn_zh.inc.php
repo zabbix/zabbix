@@ -468,7 +468,7 @@
 	'S_NOT_SELECTED_SMALL'=>			'not selected',
 	'S_GRAPH'=>			'图形显示',
 	'S_ZABBIX'=>			'Zabbix',
-	'S_COPYRIGHT_BY'=>			'Copyright 2001-2011 by',
+	'S_COPYRIGHT_BY'=>			'Copyright 2001-2013 by',
 	'S_CONNECTED_AS'=>			'Connected as',
 	'S_NOT_CONNECTED'=>			'Not connected',
 	'S_SIA_ZABBIX'=>			'SIA Zabbix',

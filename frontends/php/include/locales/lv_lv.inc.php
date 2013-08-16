@@ -163,7 +163,7 @@
 	'S_AUTHENTICATION'=>			'Autentifikācija',
 	'S_WAS_NOT'=>			'netika',
 	'S_SUCCESSFUL_SMALL'=>			'veiksmīgs',
-	'S_COPYRIGHT_BY'=>			'Autortiesības 2001-2011',
+	'S_COPYRIGHT_BY'=>			'Autortiesības 2001-2013',
 	'S_CONNECTED_AS'=>			'Pievienojies kā',
 	'S_SIA_ZABBIX'=>			'SIA Zabbix',
 	'S_SORT_BY'=>			'Kārtot pēc',

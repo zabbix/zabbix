@@ -538,7 +538,7 @@
 	'S_NOT_SELECTED_SMALL'=>			'not selected',
 	'S_GRAPH'=>			'Graf',
 	'S_ZABBIX'=>			'Zabbix',
-	'S_COPYRIGHT_BY'=>			'Copyright 2001-2011 by',
+	'S_COPYRIGHT_BY'=>			'Copyright 2001-2013 by',
 	'S_CONNECTED_AS'=>			'Pripojený ako',
 	'S_NOT_CONNECTED'=>			'Nepripojený',
 	'S_SIA_ZABBIX'=>			'SIA Zabbix',

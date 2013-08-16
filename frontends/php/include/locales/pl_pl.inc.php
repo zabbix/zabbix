@@ -374,7 +374,7 @@
 	'S_MINUS_ALL_MINUS'=>				'- wszystkie -',
 	'S_MINUS_OTHER_MINUS'=>				'- inne -',
 	'S_GRAPH'=>					'Wykres',
-	'S_COPYRIGHT_BY'=>				'Prawa autorskie 2001-2011 dla',
+	'S_COPYRIGHT_BY'=>				'Prawa autorskie 2001-2013 dla',
 	'S_CONNECTED_AS'=>				'Połączony jako',
 	'S_NOT_CONNECTED'=>				'Nie połączony',
 	'S_SIA_ZABBIX'=>				'SIA Zabbix',

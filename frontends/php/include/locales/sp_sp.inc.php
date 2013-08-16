@@ -304,7 +304,7 @@
 	'S_MINUS_ALL_MINUS'=>			'- todo -',
 	'S_MINUS_OTHER_MINUS'=>			'- otros -',
 	'S_GRAPH'=>			'Gráficos',
-	'S_COPYRIGHT_BY'=>			'Copyright 2001-2011 por',
+	'S_COPYRIGHT_BY'=>			'Copyright 2001-2013 por',
 	'S_CONNECTED_AS'=>			'Conectado como',
 	'S_SIA_ZABBIX'=>			'SIA Zabbix',
 	'S_ITEM_ADDED'=>			'Monitor añadido',

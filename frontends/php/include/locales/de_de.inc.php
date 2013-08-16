@@ -526,7 +526,7 @@
 	'S_MINUS_OTHER_MINUS'=>			'- andere -',
 	'S_NOT_SELECTED_SMALL'=>			'nicht ausgewählt',
 	'S_GRAPH'=>			'Graph',
-	'S_COPYRIGHT_BY'=>			'Copyright 2001-2011 by',
+	'S_COPYRIGHT_BY'=>			'Copyright 2001-2013 by',
 	'S_CONNECTED_AS'=>			'Angemeldet:',
 	'S_NOT_CONNECTED'=>			'Nicht angemeldet',
 	'S_SIA_ZABBIX'=>			'SIA Zabbix',

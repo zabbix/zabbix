@@ -620,7 +620,7 @@
 
 //	Footer
 	'S_ZABBIX'=>				'Zabbix',
-	'S_COPYRIGHT_BY'=>			'Copyright 2001-2011 ',
+	'S_COPYRIGHT_BY'=>			'Copyright 2001-2013 ',
 	'S_CONNECTED_AS'=>			'Přihlášený uživatel:',
 	'S_NOT_CONNECTED'=>			'Nepřihlášený',
 	'S_SIA_ZABBIX'=>			'SIA Zabbix',

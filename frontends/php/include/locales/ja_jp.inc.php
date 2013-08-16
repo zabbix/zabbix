@@ -556,7 +556,7 @@
 	'S_NOT_SELECTED_SMALL'=>			'選択されていません',
 	'S_GRAPH'=>			'グラフ',
 	'S_ZABBIX'=>			'Zabbix',
-	'S_COPYRIGHT_BY'=>			'Copyright 2001-2011 by',
+	'S_COPYRIGHT_BY'=>			'Copyright 2001-2013 by',
 	'S_CONNECTED_AS'=>			'次のユーザでログイン中',
 	'S_NOT_CONNECTED'=>			'未ログイン',
 	'S_SIA_ZABBIX'=>			'SIA Zabbix',
