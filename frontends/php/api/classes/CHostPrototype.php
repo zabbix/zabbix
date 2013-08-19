@@ -106,8 +106,14 @@ class CHostPrototype extends CHostBase {
 	 * @return void
 	 */
 	protected function validateCreate(array $hostPrototypes) {
-		// validators
+		// host prototype validator
 		$hostPrototypeValidator = new CSchemaValidator($this->getHostPrototypeSchema());
+		$hostPrototypeValidator->setValidator('ruleid', new CIdValidator(array(
+			'messageEmpty' => _('No discovery rule ID given for host prototype "%1$s".'),
+			'messageRegex' => _('Incorrect discovery rule ID for host prototype "%1$s".')
+		)));
+
+		// group validators
 		$groupLinkValidator = new CSchemaValidator($this->getGroupLinkSchema());
 		$groupPrototypeValidator = new CSchemaValidator($this->getGroupPrototypeSchema());
 
@@ -178,10 +184,6 @@ class CHostPrototype extends CHostBase {
 				'status' => new CSetValidator(array(
 					'values' => array(HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED),
 					'messageInvalid' => _('Incorrect status for host prototype "%1$s".')
-				)),
-				'ruleid' => new CIdValidator(array(
-					'messageEmpty' => _('No discovery rule ID given for host prototype "%1$s".'),
-					'messageRegex' => _('Incorrect discovery rule ID for host prototype "%1$s".')
 				)),
 				'groupLinks' => new CCollectionValidator(array(
 					'uniqueField' => 'groupid',
