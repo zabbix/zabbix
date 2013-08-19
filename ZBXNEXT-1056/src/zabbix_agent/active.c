@@ -400,6 +400,12 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 			if (SUCCEED == (ret = SUCCEED_OR_FAIL(zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE, 0))))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "got [%s]", buf);
+
+				if (SUCCEED != last_ret)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "active check configuration update from [%s:%u]"
+							" is working again", host, port);
+				}
 				parse_list_of_checks(buf);
 			}
 		}
@@ -407,19 +413,11 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 		zbx_tcp_close(&s);
 	}
 
-	if (last_ret != ret)
+	if (SUCCEED != ret && SUCCEED == last_ret)
 	{
-		if (SUCCEED != ret)
-		{
-			zabbix_log(LOG_LEVEL_WARNING,
-					"active check configuration update from [%s:%u] started to fail (%s)",
-					host, port, zbx_tcp_strerror());
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "active check configuration update from [%s:%u] is working again",
-					host, port);
-		}
+		zabbix_log(LOG_LEVEL_WARNING,
+				"active check configuration update from [%s:%u] started to fail (%s)",
+				host, port, zbx_tcp_strerror());
 	}
 
 	last_ret = ret;
