@@ -120,7 +120,7 @@ $httpdetailsWidget->addPageHeader(
 	array(_('DETAILS OF SCENARIO').SPACE, bold(CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpTest['name'])), $lastcheck),
 	array(
 		get_icon('reset', array('id' => get_request('httptestid'))),
-		get_icon('fullscreen', array('fullscreen' => get_request('fullscreen')))
+		get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']))
 	)
 );
 

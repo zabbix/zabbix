@@ -571,13 +571,13 @@ class CHostGroup extends CZBXAPI {
 		}
 		$groupids = zbx_toArray($groupids);
 
-		$options = array(
+		$delGroups = $this->get(array(
 			'groupids' => $groupids,
 			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('groupid', 'name', 'internal'),
 			'preservekeys' => true
-		);
-		$delGroups = $this->get($options);
+		));
+
 		foreach ($groupids as $groupid) {
 			if (!isset($delGroups[$groupid])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
@@ -593,6 +593,9 @@ class CHostGroup extends CZBXAPI {
 		$dltGroupids = getDeletableHostGroups($groupids);
 		if (count($groupids) != count($dltGroupids)) {
 			foreach ($groupids as $groupid) {
+				if (isset($dltGroupids[$groupid])) {
+					continue;
+				}
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Host group "%1$s" cannot be deleted, because some hosts depend on it.',
 						$delGroups[$groupid]['name']
