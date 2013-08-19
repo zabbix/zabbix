@@ -1399,10 +1399,11 @@
 
 			$data['limited'] = $data['trigger']['templateid'] ? 'yes' : null;
 
-			// if no host has been selected for the navigation panel, use the first trigger host
-			if (!$data['hostid']) {
-				$hosts = reset($data['trigger']['hosts']);
-				$data['hostid'] = $hosts['hostid'];
+			// select first host from triggers if gived not match
+			$hosts = $data['trigger']['hosts'];
+			if (count($hosts) > 0 && !in_array(array('hostid' => $data['hostid']), $hosts)) {
+				$host = reset($hosts);
+				$data['hostid'] = $host['hostid'];
 			}
 		}
 
