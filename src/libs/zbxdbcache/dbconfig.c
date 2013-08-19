@@ -4916,7 +4916,6 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 {
 	zbx_hashset_iter_t	iter;
 	ZBX_DC_ITEM		*item;
-	ZBX_DC_HOST		*host = NULL;
 	int			now, nitems = 0;
 	zbx_queue_item_t	*queue_item;
 
@@ -4928,10 +4927,9 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 
 	while (NULL != (item = zbx_hashset_iter_next(&iter)))
 	{
-		if (ZBX_FLAG_DISCOVERY_CHILD == item->flags)
-			continue;
+		ZBX_DC_HOST	*host = NULL;
 
-		if (0 == item->lastclock)
+		if (0 != (item->flags & (ZBX_FLAG_DISCOVERY | ZBX_FLAG_DISCOVERY_CHILD)))
 			continue;
 
 		switch (item->type)

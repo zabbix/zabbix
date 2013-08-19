@@ -101,20 +101,22 @@ if (!$this->data['is_profile']) {
 $languageComboBox = new CComboBox('lang', $this->data['lang']);
 $languagesUnableSet = 0;
 
-foreach (getLocales() as $localeId => $localeName) {
-	// checking if this locale exists in the system. The only way of doing it is to try and set one
-	// trying to set only the LC_MONETARY locale to avoid changing LC_NUMERIC
-	$localeExists = (setlocale(LC_MONETARY , zbx_locale_variants($localeId)) || $localeId == 'en_GB') ? 'yes' : 'no';
+foreach (getLocales() as $localeId => $locale) {
+	if ($locale['display']) {
+		// checking if this locale exists in the system. The only way of doing it is to try and set one
+		// trying to set only the LC_MONETARY locale to avoid changing LC_NUMERIC
+		$localeExists = (setlocale(LC_MONETARY , zbx_locale_variants($localeId)) || $localeId == 'en_GB') ? 'yes' : 'no';
 
-	$languageComboBox->addItem(
-		$localeId,
-		$localeName,
-		($localeId == $this->data['lang']) ? true : null,
-		$localeExists
-	);
+		$languageComboBox->addItem(
+			$localeId,
+			$locale['name'],
+			($localeId == $this->data['lang']) ? true : null,
+			$localeExists
+		);
 
-	if ($localeExists != 'yes') {
-		$languagesUnableSet++;
+		if ($localeExists != 'yes') {
+			$languagesUnableSet++;
+		}
 	}
 }
 
