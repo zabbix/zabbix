@@ -20,6 +20,7 @@ require_once dirname(__FILE__).'/../page_header.php';
 				?>
 				<div style="height: 45px;"></div>
 				<span style="margin-left: 5px;">
+					<a class="highlight underline" href="charts.php?fullscreen=0&groupid=0&hostid=0&graphid=0"><?php echo _('Graphs'); ?></a>
 					<a class="highlight underline" href="profile.php"><?php echo _('Profile'); ?></a>
 				</span>
 			</div>
