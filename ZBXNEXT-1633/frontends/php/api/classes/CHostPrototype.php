@@ -484,9 +484,9 @@ class CHostPrototype extends CHostBase {
 
 		$this->validateUpdate($hostPrototypes, $dbHostPrototypes);
 
-		// fetch the data required for further processing
+		// fetch missing data from the DB
 		$hostPrototypes = $this->extendFromObjects(zbx_toHash($hostPrototypes, 'hostid'), $dbHostPrototypes, array(
-			'host'
+			'host', 'groupLinks', 'groupPrototypes'
 		));
 		foreach ($hostPrototypes as &$hostPrototype) {
 			$hostPrototype['ruleid'] = $dbHostPrototypes[$hostPrototype['hostid']]['discoveryRule']['itemid'];
