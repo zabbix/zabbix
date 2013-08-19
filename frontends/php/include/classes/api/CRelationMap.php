@@ -118,29 +118,4 @@ class CRelationMap {
 
 		return $baseObjects;
 	}
-
-	/**
-	 * Maps related object IDs to the base objects and adds them under the $name property. Each base object will
-	 * have only one related object ID.
-	 *
-	 * @param array $baseObjects        a hash of base objects with IDs as keys
-	 * @param string $name              the name of the property under which the related object ID will be added
-	 *
-	 * @return array
-	 */
-	public function mapIdOne(array $baseObjects, $name) {
-		foreach ($baseObjects as $baseObjectId => &$baseObject) {
-			$matchingRelatedId = null;
-
-			// add the related object ID if there is one
-			if (isset($this->map[$baseObjectId])) {
-				$matchingRelatedId = reset($this->map[$baseObjectId]);
-			}
-
-			$baseObject[$name] = $matchingRelatedId;
-		}
-		unset($baseObject);
-
-		return $baseObjects;
-	}
 }
