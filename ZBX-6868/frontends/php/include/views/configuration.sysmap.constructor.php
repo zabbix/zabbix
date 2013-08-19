@@ -98,7 +98,8 @@ zbx_add_post_js('ZABBIX.apps.map.run("sysmap_cnt", '.CJs::encodeJson(array(
 	'sysmap' => $this->data['sysmap'],
 	'iconList' => $this->data['iconList'],
 	'defaultAutoIconId' => $this->data['defaultAutoIconId'],
-	'defaultIconIndex' => $this->data['defaultIconIndex']
+	'defaultIconId' => $this->data['defaultIconId'],
+	'defaultIconName' => $this->data['defaultIconName']
 ), true).');');
 
 insert_show_color_picker_javascript();
