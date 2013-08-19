@@ -31,7 +31,7 @@ class testFormAction extends CWebTest {
 
 	public static function layout() {
 		return array(
-		/*	array(
+			array(
 				array('eventsource' => 'Triggers')
 			),
 			array(
@@ -444,7 +444,7 @@ class testFormAction extends CWebTest {
 					'new_operation_operationtype' => 'Send message',
 					'new_operation_opmessage_default_msg' => 'unchecked'
 				)
-			)*/
+			)
 		);
 	}
 
@@ -1646,7 +1646,7 @@ class testFormAction extends CWebTest {
 	/**
 	 * @dataProvider update
 	 */
-/*	public function testFormAction_SimpleUpdate($data) {
+	public function testFormAction_SimpleUpdate($data) {
 		$name = $data['name'];
 		$eventsource = $data['eventsource'];
 
@@ -1682,7 +1682,7 @@ class testFormAction extends CWebTest {
 		$this->assertEquals($oldHashActions, DBhash($sqlActions));
 	}
 
-*/
+
 	public static function create() {
 		return array(
 			array(array(
@@ -1765,7 +1765,6 @@ class testFormAction extends CWebTest {
 						'Warning. Field "operations" is mandatory.'
 				)
 			)),
-		);
 			array(array(
 				'expected' => ACTION_GOOD,
 				'eventsource' => EVENT_SOURCE_AUTO_REGISTRATION,
@@ -1801,11 +1800,10 @@ class testFormAction extends CWebTest {
 						'Warning. Field "operations" is mandatory.'
 				)
 			)),
-		);
 			array(array(
 				'expected' => ACTION_GOOD,
 				'eventsource' => EVENT_SOURCE_INTERNAL,
-				'name' => 'TestFormAction Triggers 001',
+				'name' => 'TestFormAction Internal 001',
 				'esc_period' => '123',
 				'def_shortdata' => 'def_shortdata',
 				'def_longdata' => 'def_longdata',
@@ -1824,6 +1822,7 @@ class testFormAction extends CWebTest {
 						'type' => 'Send message',
 						'media' => 'Email',
 					)
+				)
 			)),
 			array(array(
 				'expected' => ACTION_BAD,
@@ -1838,7 +1837,6 @@ class testFormAction extends CWebTest {
 						'Warning. Field "operations" is mandatory.'
 				)
 			)),
-		);
 		);
 	}
 
@@ -1869,21 +1867,40 @@ class testFormAction extends CWebTest {
 					case 'Application':
 					case 'Host name':
 					case 'Host metadata':
+					case 'Trigger name':
 						$this->input_type('new_condition_value', $condition['value']);
 						$this->zbxTestClickWait('add_condition');
-						$this->zbxTestTextPresent('Application = '.$condition['value']);
-						break;
-						case 'Trigger name':
-						$this->input_type('new_condition_value', $condition['value']);
-						$this->zbxTestClickWait('add_condition');
-						$this->zbxTestTextPresent('Trigger name like '.$condition['value']);
+						switch($condition['type']){
+							case 'Application':
+								$this->zbxTestTextPresent('Application = '.$condition['value']);
+								break;
+							case 'Host name':
+								$this->zbxTestTextPresent('Host name like '.$condition['value']);
+								break;
+							case 'Host metadata':
+								$this->zbxTestTextPresent('Host metadata like '.$condition['value']);
+								break;
+							case 'Trigger name':
+								$this->zbxTestTextPresent('Trigger name like '.$condition['value']);
+								break;
+						}
 						break;
 					case 'Trigger severity':
 					case 'Service type':
 					case 'Event type':
 						$this->zbxTestDropdownSelect('new_condition_value', $condition['value']);
 						$this->zbxTestClickWait('add_condition');
-						$this->zbxTestTextPresent('Trigger severity = '.$condition['value']);
+						switch($condition['type']){
+							case 'Trigger severity':
+								$this->zbxTestTextPresent('Trigger severity = '.$condition['value']);
+								break;
+							case 'Service type':
+								$this->zbxTestTextPresent('Service type = '.$condition['value']);
+								break;
+							case 'Event type':
+								$this->zbxTestTextPresent('Event type = '.$condition['value']);
+								break;
+						}
 						break;
 				}
 			}
@@ -1929,12 +1946,11 @@ class testFormAction extends CWebTest {
 
 		if (isset($data['esc_period'])){
 			$this->input_type('esc_period', $data['esc_period']);
+			$this->wait();
 		}
 
-		$this->zbxTestClickWait('save');
-
 		sleep(1);
-		$this->input_type('new_condition_value', '');
+		$this->zbxTestClick('search');
 		sleep(1);
 
 		$this->zbxTestClickWait('save');
@@ -1957,9 +1973,7 @@ class testFormAction extends CWebTest {
 			}
 	}
 
-
-
 	public function testFormAction_Teardown() {
-	//	DBrestore_tables('actions');
+		DBrestore_tables('actions');
 	}
 }
