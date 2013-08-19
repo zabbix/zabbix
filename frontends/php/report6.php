@@ -222,24 +222,27 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$items = (get_request('config') == 3)
 			? array(array('itemid' => get_request('itemid')))
 			: get_request('items');
-		$src = 'chart_bar.php?config='.$_REQUEST['config'].
-					url_param('title').
-					url_param('xlabel').
-					url_param('ylabel').
-					url_param('scaletype').
-					url_param('avgperiod').
-					url_param('showlegend').
-					url_param('sorttype').
-					url_param('report_timesince').
-					url_param('report_timetill').
-					url_param('periods').
-					url_param($items, false, 'items').
-					url_param('hostids').
-					url_param('groupids').
-					url_param('palette').
-					url_param('palettetype');
 
-		$rep_tab->addRow(new CImg($src, 'report'));
+		if ($items) {
+			$src = 'chart_bar.php?config='.$_REQUEST['config'].
+						url_param('title').
+						url_param('xlabel').
+						url_param('ylabel').
+						url_param('scaletype').
+						url_param('avgperiod').
+						url_param('showlegend').
+						url_param('sorttype').
+						url_param('report_timesince').
+						url_param('report_timetill').
+						url_param('periods').
+						url_param($items, false, 'items').
+						url_param('hostids').
+						url_param('groupids').
+						url_param('palette').
+						url_param('palettetype');
+
+			$rep_tab->addRow(new CImg($src, 'report'));
+		}
 	}
 
 	$outer_table = new CTable();
