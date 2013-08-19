@@ -71,10 +71,13 @@ class DB {
 	 * @static
 	 *
 	 * @param array $table_counts table name, ids count tuple.
+	 * @param String $lookup find commitReserve settings in config lookup
 	 * @param bool $commit_existing rollback existing transaction if present
 	 */
-	public static function commitReserveIds(array $table_counts = array(), $commit_existing = false) {
+	public static function commitReserveIds(array $table_counts = array(), $lookup = '', $commit_existing = false) {
 		global $DB;
+		global $RID_COMMIT;
+
 		$transaction = false;
 
 		if ($DB['TRANSACTIONS'] >= 1) {
@@ -82,6 +85,8 @@ class DB {
 			$transaction = true;
 		}
 
+		// Override table_counts from configuration file.
+		$table_counts = !empty($RID_COMMIT[$lookup]) ? array_merge($table_counts, $RID_COMMIT[$lookup]) : $table_counts;
 		DBstart(); // start a transaction around id allocation
 		foreach ($table_counts as $table=>$count) {
 			self::reserveIds($table, $count, true);

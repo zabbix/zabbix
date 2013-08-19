@@ -1476,9 +1476,12 @@ class CHost extends CHostGeneral {
 		$hostids = array();
 
 		$this->checkInput($hosts, __FUNCTION__);
-		DB::commitReserveIds($table_counts = array(
+
+		// Commit known id counts prior to processing.
+		DB::commitReserveIds(array(
 			'hosts' => count($hosts),
-		));
+		), __CLASS__ . '::' . __FUNCTION__);
+
 		foreach ($hosts as $host) {
 			$hostid = DB::insert('hosts', array($host));
 			$hostids[] = $hostid = reset($hostid);

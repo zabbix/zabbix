@@ -16,4 +16,20 @@ $ZBX_SERVER_PORT		= '10051';
 $ZBX_SERVER_NAME		= '';
 
 $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
+
+
+// // Internal tuning customization:
+// // Pre-commit a range of ids to be used during a request;
+// //  to reduce contention on the ids table.
+// global $RID_COMMIT;
+//
+// // Reserve ID Commit configuration.
+// // (See: DB::commitReserveIds)
+// $RID_COMMIT = array(
+//   'CHost::create' => array(
+//     'hosts' => 1,
+//     'hosts_groups' => 1,
+//     // ...
+//   ),
+// );
 ?>
