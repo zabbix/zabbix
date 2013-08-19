@@ -96,7 +96,7 @@ if (!empty($this->data['items'])) {
 			$item['yaxisside'] = 0;
 		}
 
-		insert_js('loadItem('.$number.', '.$item['gitemid'].', '.$this->data['graphid'].', '.$item['itemid'].', '.
+		insert_js('loadItem('.$number.', '.CJs::encodeJson($item['gitemid']).', '.$this->data['graphid'].', '.$item['itemid'].', '.
 			CJs::encodeJson($name).', '.$item['type'].', '.$item['calc_fnc'].', '.$item['drawtype'].', '.
 			$item['yaxisside'].', \''.$item['color'].'\', '.$item['flags'].');',
 			true
@@ -300,7 +300,7 @@ $graphForm->addItem($graphTab);
 $saveButton = new CSubmit('save', _('Save'));
 $cancelButton = new CButtonCancel(url_param('parent_discoveryid'));
 if (!empty($this->data['graphid'])) {
-	$deleteButton = new CButtonDelete(_('Delete graph?'), url_param('graphid').url_param('parent_discoveryid'));
+	$deleteButton = new CButtonDelete(_('Delete graph?'), url_params(array('graphid', 'parent_discoveryid', 'hostid')));
 	$cloneButton = new CSubmit('clone', _('Clone'));
 
 	if (!empty($this->data['templateid'])) {

@@ -106,7 +106,7 @@ if (!empty($_REQUEST['period']) || !empty($_REQUEST['stime'])) {
 		'stime' => get_request('stime')
 	));
 
-	$curl = new Curl($_SERVER['REQUEST_URI']);
+	$curl = new Curl();
 	$curl->removeArgument('period');
 	$curl->removeArgument('stime');
 
@@ -127,7 +127,7 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 $data = array(
 	'pageFilter' => $pageFilter,
 	'graphid' => $pageFilter->graphid,
-	'fullscreen' => get_request('fullscreen')
+	'fullscreen' => $_REQUEST['fullscreen']
 );
 
 // render view

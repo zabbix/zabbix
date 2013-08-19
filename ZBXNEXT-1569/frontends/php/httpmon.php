@@ -58,7 +58,7 @@ $_REQUEST['hostid'] = $pageFilter->hostid;
 $displayNodes = (is_array(get_current_nodeid()) && $pageFilter->groupid == 0 && $pageFilter->hostid == 0);
 
 $r_form = new CForm('get');
-$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
+$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
 $r_form->addItem(array(_('Group').SPACE,$pageFilter->getGroupsCB(true)));
 $r_form->addItem(array(SPACE._('Host').SPACE,$pageFilter->getHostsCB(true)));
 
@@ -120,7 +120,7 @@ if ($pageFilter->hostsSelected) {
 	order_result($httpTests, getPageSortField('name'), getPageSortOrder());
 
 	// fetch the latest results of the web scenario
-	$lastHttpTestData = Manager::HttpTest()->fetchLastData(array_keys($httpTests));
+	$lastHttpTestData = Manager::HttpTest()->getLastData(array_keys($httpTests));
 
 	foreach($httpTests as $httpTest) {
 		$lastData = isset($lastHttpTestData[$httpTest['httptestid']]) ? $lastHttpTestData[$httpTest['httptestid']] : null;

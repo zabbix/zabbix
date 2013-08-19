@@ -429,25 +429,33 @@ class CPageFilter {
 		foreach ($groups as $group) {
 			$this->data['groups'][$group['groupid']] = $group['name'];
 		}
-
 		// select remebered selection
-		if (is_null($groupid) && $this->_profileIds['groupid']) {
+		if (!$groupid) {
 			// set group only if host is in group or hostid is not set
 			if ($hostid) {
 				$host = API::Host()->get(array(
 					'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 					'output' => array('hostid'),
 					'hostids' => $hostid,
-					'groupids' => $this->_profileIds['groupid']
+					'selectGroups' => array('groupid'),
+					'templated_hosts' => isset($options['with_hosts_and_templates']) ? $options['with_hosts_and_templates'] : null
 				));
+				if ($host) {
+					$host = reset($host);
+					$group = reset($host['groups']);
+					if ($group) {
+						$groupid = $group['groupid'];
+					}
+				}
+
 			}
-			if (!$hostid || !empty($host)) {
+			if (!$groupid) {
 				$groupid = $this->_profileIds['groupid'];
 			}
 		}
 
 		// nonexisting or unset $groupid
-		if ((!isset($this->data['groups'][$groupid]) && $groupid > 0) || is_null($groupid)) {
+		if (!$groupid || ($groupid > 0 && !isset($this->data['groups'][$groupid]))) {
 			// for popup select first group in the list
 			if ($this->config['popupDD'] && !empty($this->data['groups'])) {
 				reset($this->data['groups']);

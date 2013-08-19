@@ -110,9 +110,7 @@ if ($resourceType == SCREEN_RESOURCE_GRAPH) {
 		order_result($graph['hosts'], 'name');
 		$graph['host'] = reset($graph['hosts']);
 
-		$caption = ($graph['host']['status'] != HOST_STATUS_TEMPLATE)
-			? $graph['host']['name'].NAME_DELIMITER.$graph['name']
-			: $graph['name'];
+		$caption = $graph['host']['name'].NAME_DELIMITER.$graph['name'];
 
 		$nodeName = get_node_name_by_elid($graph['host']['hostid']);
 		if (!zbx_empty($nodeName)) {
@@ -125,7 +123,7 @@ if ($resourceType == SCREEN_RESOURCE_GRAPH) {
 			'javascript: return PopUp("popup.php?srctbl=graphs&srcfld1=graphid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
 				'&templated_hosts=1&only_hostid='.$this->data['screen']['templateid'].
-				'&writeonly=1&simpleName=1", 800, 450);',
+				'&writeonly=1", 800, 450);',
 			'formlist'
 		);
 	}
@@ -162,9 +160,7 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 		$item = reset($items);
 		$item['host'] = reset($item['hosts']);
 
-		$caption = $item['host']['status'] != HOST_STATUS_TEMPLATE
-			? $item['host']['name'].NAME_DELIMITER.itemName($item)
-			: itemName($item);
+		$caption = $item['host']['name'].NAME_DELIMITER.itemName($item);
 
 		$nodeName = get_node_name_by_elid($item['itemid']);
 		if (!zbx_empty($nodeName)) {
@@ -494,9 +490,11 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 			'selectHosts' => array('name'),
 			'output' => API_OUTPUT_EXTEND
 		));
-		$item = reset($items);
-		$host = reset($item['hosts']);
-		$caption = $host['name'].NAME_DELIMITER.$item['name'];
+		if ($items) {
+			$item = reset($items);
+			$host = reset($item['hosts']);
+			$caption = $host['name'].NAME_DELIMITER.itemName($item);
+		}
 	}
 
 	$screenFormList->addVar('resourceid', $resourceId);
