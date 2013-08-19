@@ -186,6 +186,14 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['graphid'])) {
 elseif (isset($_REQUEST['save'])) {
 	$items = get_request('items', array());
 
+	// remove passing "gitemid" to API if new items added via pop-up
+	foreach ($items as &$item) {
+		if (!$item['gitemid']) {
+			unset($item['gitemid']);
+		}
+	}
+	unset($item);
+
 	$graph = array(
 		'name' => $_REQUEST['name'],
 		'width' => $_REQUEST['width'],

@@ -125,7 +125,7 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  * Display
  */
 $data = array(
-	'fullscreen' => get_request('fullscreen'),
+	'fullscreen' => $_REQUEST['fullscreen'],
 	'period' => get_request('period'),
 	'stime' => get_request('stime'),
 	'elementid' => get_request('elementid', false),

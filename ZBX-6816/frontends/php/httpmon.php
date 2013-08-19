@@ -68,7 +68,7 @@ $_REQUEST['hostid'] = $pageFilter->hostid;
 $displayNodes = (is_array(get_current_nodeid()) && $pageFilter->groupid == 0 && $pageFilter->hostid == 0);
 
 $r_form = new CForm('get');
-$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
+$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
 $r_form->addItem(array(_('Group').SPACE,$pageFilter->getGroupsCB(true)));
 $r_form->addItem(array(SPACE._('Host').SPACE,$pageFilter->getHostsCB(true)));
 

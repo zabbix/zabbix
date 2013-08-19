@@ -23,7 +23,7 @@ $screenWidget = new CWidget();
 $screenWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.hostscreen.filter.state', 1));
 
 $form = new CForm('get');
-$form->addVar('fullscreen', $_REQUEST['fullscreen']);
+$form->addVar('fullscreen', $this->data['fullscreen']);
 $screenWidget->addItem($form);
 
 if (empty($this->data['screen']) || empty($this->data['host'])) {

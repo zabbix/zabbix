@@ -131,7 +131,7 @@
 			var item = [];
 			item['number'] = jQuery('#itemsTable tr.sortable').length;
 			item['number_nr'] = item['number'] + 1;
-			item['gitemid'] = 0;
+			item['gitemid'] = null;
 			item['graphid'] = <?php echo $this->data['graphid']; ?>;
 			item['itemid'] = list.values[i].itemid;
 			item['type'] = null;
