@@ -4,6 +4,8 @@ New features:
 A.F.I..... [ZBXNEXT-1569] implemented user name and surname displaying in acknowledgements (Ivo, Oleg)
 
 Bug fixes:
+..F....... [ZBX-6275] fixed error after saving an LLD rule (Guntis)
+..F....... [ZBX-6275] fixed several "error" column displaying problems in template item and trigger list (Guntis)
 ..F.....S. [ZBX-6882] fixed "Undexined index" on queue page; server won't include lld-rules in queue (Eduard, Sasha)
 
 --------------------------------------------------------------------------------
