@@ -4905,7 +4905,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 
 	while (NULL != (item = zbx_hashset_iter_next(&iter)))
 	{
-		if (ZBX_FLAG_DISCOVERY_CHILD == item->flags)
+		if (0 != (item->flags & (ZBX_FLAG_DISCOVERY | ZBX_FLAG_DISCOVERY_CHILD)))
 			continue;
 
 		if (0 == item->lastclock)
