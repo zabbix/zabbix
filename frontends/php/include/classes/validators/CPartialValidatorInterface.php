@@ -36,6 +36,6 @@ interface CPartialValidatorInterface {
 	 *
 	 * @return bool
 	 */
-	public function validatePartial(array $array, array $fullArray = null);
+	public function validatePartial(array $array, array $fullArray);
 
 }

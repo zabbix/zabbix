@@ -58,6 +58,26 @@ class CSchemaValidator extends CValidator {
 	 */
 	protected $postValidators = array();
 
+	public function __construct(array $options = array()) {
+		// set validators via the public setter method
+		if (isset($options['validators'])) {
+			foreach ($options['validators'] as $field => $validator) {
+				$this->setValidator($field, $validator);
+			}
+		}
+		unset($options['validator']);
+
+		// set post validators via the public setter method
+		if (isset($options['postValidators'])) {
+			foreach ($options['postValidators'] as $validator) {
+				$this->addPostValidator($validator);
+			}
+		}
+		unset($options['validator']);
+
+		parent::__construct($options);
+	}
+
 	/**
 	 * Checks each object field against the given validator, and then the whole object against the post validators.
 	 *
@@ -119,6 +139,15 @@ class CSchemaValidator extends CValidator {
 	 */
 	public function setValidator($field, CValidator $validator = null) {
 		$this->validators[$field] = $validator;
+	}
+
+	/**
+	 * Add a post validator.
+	 *
+	 * @param CValidator $validator
+	 */
+	public function addPostValidator(CValidator $validator) {
+		$this->postValidators[] = $validator;
 	}
 
 	/**

@@ -21,19 +21,6 @@
 
 class CPartialSchemaValidator extends CSchemaValidator implements CPartialValidatorInterface {
 
-	public function __construct(array $options = array()) {
-		// check that all given post validators are instances of CPartialValidator
-		if (isset($options['postValidators']) && $options['postValidators']) {
-			foreach ($options['postValidators'] as $postValidator) {
-				if (!$postValidator instanceof CPartialValidator) {
-					throw new Exception('Partial schema validator post validator must be an instance of CPartialValidator.');
-				}
-			}
-		}
-
-		parent::__construct($options);
-	}
-
 	/**
 	 * Validates a partial array. Some data may be missing from the given $array, then it will be taken from the
 	 * full array.
@@ -45,7 +32,7 @@ class CPartialSchemaValidator extends CSchemaValidator implements CPartialValida
 	 *
 	 * @return bool
 	 */
-	public function validatePartial(array $array, array $fullArray = null) {
+	public function validatePartial(array $array, array $fullArray) {
 		$unvalidatedFields = array_flip(array_keys($array));
 
 		// field validators
@@ -82,6 +69,17 @@ class CPartialSchemaValidator extends CSchemaValidator implements CPartialValida
 		}
 
 		return true;
+	}
+
+	public function addPostValidator(CValidator $validator) {
+		// the post validators for the partial schema validator must implement the "CPartialValidatorInterface" interface.
+		if (!$validator instanceof CPartialValidatorInterface) {
+			throw new Exception(
+				'Partial schema validator post validator must implement the "CPartialValidatorInterface" interface.'
+			);
+		}
+
+		parent::addPostValidator($validator);
 	}
 
 }
