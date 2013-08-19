@@ -383,8 +383,12 @@ var chkbxRange = {
 
 			cookie.createJSON(this.cookieName, this.selectedIds);
 
-			if(jQuery('#go').length) jQuery('#go')[0].disabled = (countChecked == 0);
-			if(jQuery('#goButton').length) jQuery('#goButton')[0].disabled = (countChecked == 0);
+			if (jQuery('#go').length) {
+				jQuery('#go')[0].disabled = (countChecked == 0);
+			}
+			if (jQuery('#goButton').length) {
+				jQuery('#goButton')[0].disabled = (countChecked == 0);
+			}
 
 			this.pageGoCount = countChecked;
 		}
