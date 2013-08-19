@@ -1,6 +1,7 @@
 Changes for 2.1.3
 
 New features:
+.......PS. [ZBX-6852] removed support of iODBC (Sasha)
 
 Bug fixes:
 ..F.....S. [ZBX-6882] fixed "Undexined index" on queue page; server won't include lld-rules in queue (Eduard, Sasha)
