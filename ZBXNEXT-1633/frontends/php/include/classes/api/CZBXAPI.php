@@ -916,10 +916,10 @@ class CZBXAPI {
 	 * Runs the given partial validator and throws an exception if it fails.
 	 *
 	 * @param array $array
+	 * @param CPartialValidatorInterface $validator
 	 * @parma array $fullArray
-	 * @param CValidator $validator
 	 */
-	protected function checkPartialValidator(array $array, array $fullArray = null, CPartialValidatorInterface $validator) {
+	protected function checkPartialValidator(array $array, CPartialValidatorInterface $validator, $fullArray = array()) {
 		if (!$validator->validatePartial($array, $fullArray)) {
 			self::exception(ZBX_API_ERROR_INTERNAL, $validator->getError());
 		}
