@@ -110,14 +110,17 @@ $cmbType = new CComboBox('mediatypeid', $mediatypeid);
 $types = DBselect(
 		'SELECT mt.mediatypeid,mt.description'.
 		' FROM media_type mt'.
-		whereDbNode('mt.mediatypeid').
-		' ORDER BY mt.description'
+		whereDbNode('mt.mediatypeid')
 );
+$typesList = array();
 while ($type = DBfetch($types)) {
-	$cmbType->addItem(
-		$type['mediatypeid'],
-		get_node_name_by_elid($type['mediatypeid'], null, NAME_DELIMITER).$type['description']
+	$typesList[$type['mediatypeid']] = array(
+		'name' => get_node_name_by_elid($type['mediatypeid'], null, NAME_DELIMITER).$type['description']
 	);
+}
+CArrayHelper::sort($typesList, array('name'));
+foreach ($typesList as $i => $media_name) {
+	$cmbType->addItem($i, $media_name['name']);
 }
 $frmMedia->addRow(_('Type'), $cmbType);
 $frmMedia->addRow(_('Send to'), new CTextBox('sendto', $sendto, 48));
