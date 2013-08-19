@@ -26,12 +26,12 @@ define('ACTION_BAD', 1);
 class testFormAction extends CWebTest {
 
 	public function testFormAction_Setup() {
-	//	DBsave_tables('actions');
+		DBsave_tables('actions');
 	}
 
 	public static function layout() {
 		return array(
-			array(
+		/*	array(
 				array('eventsource' => 'Triggers')
 			),
 			array(
@@ -444,7 +444,7 @@ class testFormAction extends CWebTest {
 					'new_operation_operationtype' => 'Send message',
 					'new_operation_opmessage_default_msg' => 'unchecked'
 				)
-			)
+			)*/
 		);
 	}
 
@@ -1730,13 +1730,122 @@ class testFormAction extends CWebTest {
 						'Warning. Field "operations" is mandatory.'
 				)
 			)),
+			array(array(
+				'expected' => ACTION_GOOD,
+				'eventsource' => EVENT_SOURCE_DISCOVERY,
+				'name' => 'TestFormAction Discovery 001',
+				'def_shortdata' => 'def_shortdata',
+				'def_longdata' => 'def_longdata',
+				'conditions' => array(
+					array(
+						'type' => 'Service type',
+						'value' => 'FTP',
+					)
+				),
+				'operations' => array(
+					array(
+						'type' => 'Send message',
+						'media' => 'Email',
+					),
+					array(
+						'type' => 'Remote command',
+						'command' => 'command',
+					)
+				),
+			)),
+			array(array(
+				'expected' => ACTION_BAD,
+				'eventsource' => EVENT_SOURCE_DISCOVERY,
+				'name' => '',
+				'def_shortdata' => 'def_shortdata',
+				'def_longdata' => 'def_longdata',
+				'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Incorrect value for field "Name": cannot be empty.',
+						'Warning. Field "operations" is mandatory.'
+				)
+			)),
+		);
+			array(array(
+				'expected' => ACTION_GOOD,
+				'eventsource' => EVENT_SOURCE_AUTO_REGISTRATION,
+				'name' => 'TestFormAction Auto registration 001',
+				'def_shortdata' => 'def_shortdata',
+				'def_longdata' => 'def_longdata',
+				'conditions' => array(
+					array(
+						'type' => 'Host name',
+						'value' => 'Zabbix',
+					)
+				),
+				'operations' => array(
+					array(
+						'type' => 'Send message',
+						'media' => 'Email',
+					),
+					array(
+						'type' => 'Remote command',
+						'command' => 'command',
+					)
+				),
+			)),
+			array(array(
+				'expected' => ACTION_BAD,
+				'eventsource' => EVENT_SOURCE_AUTO_REGISTRATION,
+				'name' => '',
+				'def_shortdata' => 'def_shortdata',
+				'def_longdata' => 'def_longdata',
+				'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Incorrect value for field "Name": cannot be empty.',
+						'Warning. Field "operations" is mandatory.'
+				)
+			)),
+		);
+			array(array(
+				'expected' => ACTION_GOOD,
+				'eventsource' => EVENT_SOURCE_INTERNAL,
+				'name' => 'TestFormAction Triggers 001',
+				'esc_period' => '123',
+				'def_shortdata' => 'def_shortdata',
+				'def_longdata' => 'def_longdata',
+				'conditions' => array(
+					array(
+						'type' => 'Event type',
+						'value' => 'Trigger in "unknown" state',
+					),
+					array(
+						'type' => 'Application',
+						'value' => 'application',
+					),
+				),
+				'operations' => array(
+					array(
+						'type' => 'Send message',
+						'media' => 'Email',
+					)
+			)),
+			array(array(
+				'expected' => ACTION_BAD,
+				'eventsource' => EVENT_SOURCE_INTERNAL,
+				'name' => '',
+				'esc_period' => '123',
+				'def_shortdata' => 'def_shortdata',
+				'def_longdata' => 'def_longdata',
+				'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Incorrect value for field "Name": cannot be empty.',
+						'Warning. Field "operations" is mandatory.'
+				)
+			)),
+		);
 		);
 	}
 
 	/**
 	 * @dataProvider create
 	 */
-/*	public function testFormAction_SimpleCreate($data) {
+	public function testFormAction_SimpleCreate($data) {
 		$this->zbxTestLogin('actionconf.php?form=1&eventsource='.$data['eventsource']);
 		$this->checkTitle('Configuration of actions');
 
@@ -1757,30 +1866,22 @@ class testFormAction extends CWebTest {
 			foreach ($data['conditions'] as $condition) {
 				$this->zbxTestDropdownSelectWait("new_condition_conditiontype", $condition['type']);
 				switch ($condition['type']) {
+					case 'Application':
+					case 'Host name':
+					case 'Host metadata':
+						$this->input_type('new_condition_value', $condition['value']);
+						$this->zbxTestClickWait('add_condition');
+						$this->zbxTestTextPresent('Application = '.$condition['value']);
+						break;
 						case 'Trigger name':
 						$this->input_type('new_condition_value', $condition['value']);
 						$this->zbxTestClickWait('add_condition');
 						$this->zbxTestTextPresent('Trigger name like '.$condition['value']);
 						break;
 					case 'Trigger severity':
-						$this->zbxTestDropdownSelect('new_condition_value', $condition['value']);
-						$this->zbxTestClickWait('add_condition');
-						$this->zbxTestTextPresent('Trigger severity = '.$condition['value']);
-						break;
-					case 'Application':
-						$this->input_type('new_condition_value', $condition['value']);
-						$this->zbxTestClickWait('add_condition');
-						$this->zbxTestTextPresent('Application = '.$condition['value']);
-						break;
 					case 'Service type':
+					case 'Event type':
 						$this->zbxTestDropdownSelect('new_condition_value', $condition['value']);
-						$this->zbxTestDropdownSelect('new_condition_operator', $condition['operator']);
-						$this->zbxTestClickWait('add_condition');
-						$this->zbxTestTextPresent('Trigger severity = '.$condition['value']);
-						break;
-					case 'Host metadata':
-						$this->zbxTestDropdownSelect('new_condition_value', $condition['value']);
-						$this->zbxTestDropdownSelect('new_condition_operator', $condition['operator']);
 						$this->zbxTestClickWait('add_condition');
 						$this->zbxTestTextPresent('Trigger severity = '.$condition['value']);
 						break;
@@ -1795,7 +1896,6 @@ class testFormAction extends CWebTest {
 			if ($data['eventsource']!= EVENT_SOURCE_INTERNAL){
 				$this->zbxTestDropdownSelectWait('new_operation_operationtype', $operation['type']);
 			}
-
 				switch ($operation['type']) {
 					case 'Send message':
 						sleep(1);
@@ -1857,7 +1957,7 @@ class testFormAction extends CWebTest {
 			}
 	}
 
-*/
+
 
 	public function testFormAction_Teardown() {
 	//	DBrestore_tables('actions');
