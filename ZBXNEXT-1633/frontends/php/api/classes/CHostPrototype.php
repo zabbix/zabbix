@@ -372,21 +372,15 @@ class CHostPrototype extends CHostBase {
 	 * @throws APIException if the input is invalid
 	 *
 	 * @param array $hostPrototypes
+	 * @param arary $dbHostPrototypes	array of existing host prototypes with hostids as keys
 	 *
 	 * @return void
 	 */
-	protected function validateUpdate(array $hostPrototypes) {
-		foreach ($hostPrototypes as $host) {
-			if (empty($host['hostid'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
-			}
-		}
-
-		$hostPrototypes = zbx_toHash($hostPrototypes, 'hostid');
-
+	protected function validateUpdate(array $hostPrototypes, array $dbHostPrototypes) {
+		// TODO: permissions should be checked using the $dbHostPrototypes array
 		$this->checkHostPrototypePermissions(zbx_objectValues($hostPrototypes, 'hostid'));
 
-		$hostPrototypes = $this->extendObjects($this->tableName(), $hostPrototypes, array('host'));
+		$hostPrototypes = $this->extendFromObjects(zbx_toHash($hostPrototypes, 'hostid'), $dbHostPrototypes, array('host'));
 
 		// host prototype validator
 		$hostPrototypeValidator = new CPartialSchemaValidator($this->getHostPrototypeSchema());
@@ -433,8 +427,10 @@ class CHostPrototype extends CHostBase {
 		$this->checkHostGroupsPermissions($groupPrototypeGroupIds);
 
 		// check for duplicates
-		$relationMap = $this->createRelationMap($hostPrototypes, 'hostid', 'parent_itemid', 'host_discovery');
-		$hostPrototypes = $relationMap->mapIdOne($hostPrototypes, 'ruleid');
+		foreach ($hostPrototypes as &$hostPrototype) {
+			$hostPrototype['ruleid'] = $dbHostPrototypes[$hostPrototype['hostid']]['discoveryRule']['itemid'];
+		}
+		unset($hostPrototype);
 		$this->checkDuplicates($hostPrototypes, 'host', _('Host prototype "%1$s" already exists.'));
 		$this->checkExistingHostPrototypes($hostPrototypes);
 
@@ -454,7 +450,24 @@ class CHostPrototype extends CHostBase {
 	public function update(array $hostPrototypes) {
 		$hostPrototypes = zbx_toArray($hostPrototypes);
 
-		$hostPrototypes = $this->extendObjects($this->tableName(), $hostPrototypes, array('host'));
+		// check hostids before doing anything
+		$this->checkObjectIds($hostPrototypes, 'hostid',
+			_('No "%1$s" given for host prototype.'),
+			_('Empty host ID for host prototype.'),
+			_('Incorrect host prototype ID.')
+		);
+
+		// fetch updated objects from the DB
+		$dbHostPrototypes = $this->get(array(
+			'output' => array('host'),
+			'selectGroupLinks' => API_OUTPUT_EXTEND,
+			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
+			'selectDiscoveryRule' => array('itemid'),
+			'hostids' => zbx_objectValues($hostPrototypes, 'hostid'),
+			'editable' => true,
+			'preservekeys' => true
+		));
+
 		foreach ($hostPrototypes as &$hostPrototype) {
 			if (isset($hostPrototype['templates'])) {
 				$hostPrototype['templates'] = zbx_toArray($hostPrototype['templates']);
@@ -462,12 +475,23 @@ class CHostPrototype extends CHostBase {
 
 			// if the visible name is not set, use the technical name instead
 			if (isset($hostPrototype['name']) && zbx_empty(trim($hostPrototype['name']))) {
-				$hostPrototype['name'] = $hostPrototype['host'];
+				$hostPrototype['name'] = isset($hostPrototype['host'])
+					? $hostPrototype['host']
+					: $dbHostPrototypes[$hostPrototype['hostid']]['host'];
 			}
 		}
 		unset($hostPrototype);
 
-		$this->validateUpdate($hostPrototypes);
+		$this->validateUpdate($hostPrototypes, $dbHostPrototypes);
+
+		// fetch the data required for further processing
+		$hostPrototypes = $this->extendFromObjects(zbx_toHash($hostPrototypes, 'hostid'), $dbHostPrototypes, array(
+			'host'
+		));
+		foreach ($hostPrototypes as &$hostPrototype) {
+			$hostPrototype['ruleid'] = $dbHostPrototypes[$hostPrototype['hostid']]['discoveryRule']['itemid'];
+		}
+		unset($hostPrototype);
 
 		// merge group links into group prototypes
 		foreach ($hostPrototypes as &$hostPrototype) {
@@ -481,11 +505,6 @@ class CHostPrototype extends CHostBase {
 		unset($hostPrototype);
 
 		$hostPrototypes = $this->updateReal($hostPrototypes);
-
-		// load additional data required for inheritance
-		$hostPrototypes = zbx_toHash($hostPrototypes, 'hostid');
-		$relationMap = $this->createRelationMap($hostPrototypes, 'hostid', 'parent_itemid', 'host_discovery');
-		$hostPrototypes = $relationMap->mapIdOne($hostPrototypes, 'ruleid');
 		$this->inherit($hostPrototypes);
 
 		return array('hostids' => zbx_objectValues($hostPrototypes, 'hostid'));

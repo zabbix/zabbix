@@ -727,6 +727,53 @@ class CZBXAPI {
 	}
 
 	/**
+	 * For each object in $objects the method copies fields listed in $fields that are not present in the target
+	 * object from from the source object.
+	 *
+	 * Matching objects in both arrays must have the same keys.
+	 *
+	 * @param array  $objects
+	 * @param array  $sourceObjects
+	 *
+	 * @return array
+	 */
+	protected function extendFromObjects(array $objects, array $sourceObjects, array $fields) {
+		$fields = array_flip($fields);
+
+		foreach ($objects as $key => &$object) {
+			if (isset($sourceObjects[$key])) {
+				$object += array_intersect_key($sourceObjects[$key], $fields);
+			}
+		}
+		unset($object);
+
+		return $objects;
+	}
+
+	/**
+	 * Checks that each object has a valid ID.
+	 *
+	 * @param array $objects
+	 * @param $idField			name of the field that contains the id
+	 * @param $messageRequired	error message if no ID is given
+	 * @param $messageEmpty		error message if the ID is empty
+	 * @param $messageInvalid	error message if the ID is invalid
+	 */
+	protected function checkObjectIds(array $objects, $idField, $messageRequired, $messageEmpty, $messageInvalid) {
+		$idValidator = new CIdValidator(array(
+			'messageEmpty' => $messageEmpty,
+			'messageRegex' => $messageInvalid
+		));
+		foreach ($objects as $object) {
+			if (!isset($object[$idField])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $messageRequired);
+			}
+
+			$this->checkValidator($object[$idField], $idValidator);
+		}
+	}
+
+	/**
 	 * Checks if the object has any fields, that are not defined in the schema or in $additionalFields.
 	 *
 	 * @param string $tableName
