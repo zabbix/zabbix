@@ -17,6 +17,7 @@ New features:
 ...G...... [ZBXNEXT-1528] added net.if.in, net.if.out and net.if.total item support on HP-UX platform (igors)
 
 Bug fixes:
+........S. [ZBX-6898] fixed processing of queue request; not checked items will be included to the queue (Sasha)
 ........S. [ZBX-6889] fixed processing of availability data by the server (Sasha)
 A......... [ZBX-6885] fixed host group error message on delete (Vitalij)
 ....I..... [ZBX-1583] removed duplicated indexes for 6 tables when using MySQL (igors)
