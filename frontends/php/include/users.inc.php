@@ -289,14 +289,14 @@ function getUserFullname($userData) {
 
 	// return full name and surname
 	if (!zbx_empty($userData['surname'])) {
-		if ($userData['name']) {
+		if (!zbx_empty($userData['name'])) {
 			return $userData['alias'].' '._x('(%1$s %2$s)', 'user fullname', $userData['name'], $userData['surname']);
 		}
 		$fullname = $userData['surname'];
 	}
 
 	// return alias with full name
-	if ($fullname) {
+	if (!zbx_empty($fullname)) {
 		return $userData['alias'].' ('.$fullname.')';
 	}
 	else {
