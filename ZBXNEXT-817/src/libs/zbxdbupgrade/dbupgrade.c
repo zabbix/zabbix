@@ -1477,7 +1477,7 @@ static int	DBpatch_2010100(void)
 #endif
 }
 
-static int	DBpatch_2010094(void)
+static int	DBpatch_2010101(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
