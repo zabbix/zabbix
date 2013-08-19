@@ -605,7 +605,11 @@ function DBfetch($cursor, $convertNulls = true) {
 
 	switch ($DB['TYPE']) {
 		case ZBX_DB_MYSQL:
-			if (!$result = mysqli_fetch_assoc($cursor)) {
+			$result = mysqli_fetch_assoc($cursor);
+			if ($result === null) {
+				$result = false;
+			}
+			if (!$result) {
 				mysqli_free_result($cursor);
 			}
 			break;
