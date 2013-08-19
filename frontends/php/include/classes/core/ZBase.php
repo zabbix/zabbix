@@ -194,6 +194,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/validators',
 			$this->rootDir.'/include/classes/validators/schema',
 			$this->rootDir.'/include/classes/validators/string',
+			$this->rootDir.'/include/classes/validators/object',
 			$this->rootDir.'/include/classes/validators/hostgroup',
 			$this->rootDir.'/include/classes/validators/host',
 			$this->rootDir.'/include/classes/validators/hostprototype',

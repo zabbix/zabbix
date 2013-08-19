@@ -173,6 +173,7 @@ frontends/php/include/classes/core/CFactoryRegistry.php -text
 frontends/php/include/classes/validators/CCollectionValidator.php -text
 frontends/php/include/classes/validators/CIdValidator.php -text
 frontends/php/include/classes/validators/hostgroup/CHostGroupNormalValidator.php -text
+frontends/php/include/classes/validators/object/CUpdateDiscoveredValidator.php -text
 frontends/php/include/classes/validators/schema/CPartialSchemaValidator.php -text
 frontends/php/include/classes/validators/schema/CSchemaValidator.php -text
 frontends/php/include/classes/validators/string/CLldMacroStringValidator.php -text

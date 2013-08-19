@@ -91,14 +91,18 @@ elseif (isset($_REQUEST['save'])) {
 		));
 		$oldGroup = reset($oldGroup);
 
-		$result = API::HostGroup()->update(array(
-			'groupid' => $_REQUEST['groupid'],
-			'name' => $_REQUEST['name']
-		));
+		$result = true;
+		// don't try to update the name for a discovered host group
+		if ($oldGroup['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
+			$result = API::HostGroup()->update(array(
+				'groupid' => $_REQUEST['groupid'],
+				'name' => $_REQUEST['name']
+			));
+		}
 
 		if ($result) {
 			$groups = API::HostGroup()->get(array(
-				'groupids' => $result['groupids'],
+				'groupids' => $_REQUEST['groupid'],
 				'output' => API_OUTPUT_EXTEND
 			));
 

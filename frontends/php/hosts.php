@@ -470,6 +470,10 @@ elseif (isset($_REQUEST['save'])) {
 				'inventory' => (get_request('inventory_mode') != HOST_INVENTORY_DISABLED) ? get_request('host_inventory', array()) : null,
 				'inventory_mode' => get_request('inventory_mode')
 			);
+
+			if (!$createNew) {
+				$host['templates_clear'] = zbx_toObject(get_request('clear_templates', array()), 'templateid');
+			}
 		}
 
 		if ($createNew) {
@@ -486,8 +490,6 @@ elseif (isset($_REQUEST['save'])) {
 		}
 		else {
 			$hostId = $host['hostid'] = $_REQUEST['hostid'];
-
-			$host['templates_clear'] = zbx_toObject(get_request('clear_templates', array()), 'templateid');
 
 			if (!API::Host()->update($host)) {
 				throw new Exception();

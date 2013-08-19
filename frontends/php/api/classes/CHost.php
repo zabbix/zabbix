@@ -636,7 +636,7 @@ class CHost extends CHostGeneral {
 		if ($update) {
 			$hostDBfields = array('hostid' => null);
 			$dbHosts = $this->get(array(
-				'output' => array('hostid', 'host'),
+				'output' => array('hostid', 'host', 'flags'),
 				'hostids' => zbx_objectValues($hosts, 'hostid'),
 				'editable' => true,
 				'preservekeys' => true
@@ -679,10 +679,17 @@ class CHost extends CHostGeneral {
 				}
 			}
 
+			$updateDiscoveredValidator = new CUpdateDiscoveredValidator(array(
+				'allowed' => array('hostid', 'status', 'inventory'),
+				'messageAllowedField' => _('Cannot update "%1$s" for a discovered host.')
+			));
 			if ($update) {
 				if (!isset($dbHosts[$host['hostid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
+
+				// cannot update certain fields for discoverd hosts
+				$this->checkPartialValidator($host, $updateDiscoveredValidator, $dbHosts[$host['hostid']]);
 			}
 			else {
 				// if visible name is not given or empty it should be set to host name

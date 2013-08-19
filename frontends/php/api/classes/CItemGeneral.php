@@ -171,6 +171,10 @@ abstract class CItemGeneral extends CZBXAPI {
 		));
 
 		if ($update) {
+			$updateDiscoveredValidator = new CUpdateDiscoveredValidator(array(
+				'allowed' => array('itemid', 'status'),
+				'messageAllowedField' => _('Cannot update "%1$s" for a discovered item.')
+			));
 			foreach ($items as $item) {
 				// check permissions
 				if (!isset($dbItems[$item['itemid']])) {
@@ -179,13 +183,7 @@ abstract class CItemGeneral extends CZBXAPI {
 				}
 
 				// discovered fields, except status, cannot be updated
-				if ($dbItems[$item['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-					foreach ($item as $key => $value) {
-						if (!in_array($key, array('itemid', 'status'))) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update discovered item.'));
-						}
-					}
-				}
+				$this->checkPartialValidator($item, $updateDiscoveredValidator, $dbItems[$item['itemid']]);
 			}
 
 			$items = $this->extendObjects($this->tableName(), $items, array('name'));

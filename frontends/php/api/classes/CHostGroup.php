@@ -513,7 +513,7 @@ class CHostGroup extends CZBXAPI {
 		$updGroups = $this->get(array(
 			'groupids' => $groupids,
 			'editable' => true,
-			'output' => array('groupid'),
+			'output' => array('groupid', 'flags'),
 			'preservekeys' => true
 		));
 		foreach ($groups as $group) {
@@ -533,12 +533,19 @@ class CHostGroup extends CZBXAPI {
 		));
 		$groupsNames = zbx_toHash($groupsNames, 'name');
 
+		$updateDiscoveredValidator = new CUpdateDiscoveredValidator(array(
+			'messageAllowed' => _('Cannot update a discovered host group.')
+		));
+
 		$update = array();
 		foreach ($groups as $group) {
 			if (isset($group['name'])) {
 				if (zbx_empty($group['name'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Host group name cannot be empty.'));
 				}
+
+				// cannot update discovered host groups
+				$this->checkPartialValidator($group, $updateDiscoveredValidator, $updGroups[$group['groupid']]);
 
 				if (isset($groupsNames[$group['name']])
 						&& !idcmp($groupsNames[$group['name']]['groupid'], $group['groupid'])) {
