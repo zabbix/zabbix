@@ -157,12 +157,10 @@
 
 	function getOnlyHostParam() {
 		<?php if ($this->data['is_template']): ?>
-			var param = '&only_hostid=<?php echo $this->data['hostid']; ?>';
+			return '&only_hostid=<?php echo $this->data['hostid']; ?>';
 		<?php else: ?>
-			var param = '&real_hosts=1';
+			return '&real_hosts=1';
 		<?php endif ?>
-
-		return param;
 	}
 
 	function rewriteNameLinks() {
