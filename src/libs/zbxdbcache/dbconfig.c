@@ -4906,7 +4906,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 	{
 		ZBX_DC_HOST	*host = NULL;
 
-		if (ZBX_FLAG_DISCOVERY_CHILD == item->flags)
+		if (0 != (item->flags & (ZBX_FLAG_DISCOVERY | ZBX_FLAG_DISCOVERY_CHILD)))
 			continue;
 
 		switch (item->type)
