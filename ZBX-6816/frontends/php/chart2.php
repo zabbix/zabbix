@@ -48,7 +48,7 @@ $dbGraph = API::Graph()->get(array(
 	'graphids' => $_REQUEST['graphid'],
 	'output' => API_OUTPUT_EXTEND
 ));
-if (empty($dbGraph)) {
+if (!$dbGraph) {
 	access_deny();
 }
 else {

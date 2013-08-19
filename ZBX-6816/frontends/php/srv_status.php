@@ -48,7 +48,7 @@ $periods = array(
 $fields = array(
 	'serviceid' =>	array(T_ZBX_INT, O_OPT, P_SYS|P_NZERO, DB_ID,	null),
 	'showgraph' =>	array(T_ZBX_INT, O_OPT, P_SYS,	IN('1'),		'isset({serviceid})'),
-	'period' =>		array(T_ZBX_STR, O_OPT, P_SYS,	IN('"'.implode('","',array_keys($periods)).'"'),	null),
+	'period' =>		array(T_ZBX_STR, O_OPT, P_SYS,	IN('"'.implode('","', array_keys($periods)).'"'),	null),
 	'fullscreen' => array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),		null)
 );
 check_fields($fields);

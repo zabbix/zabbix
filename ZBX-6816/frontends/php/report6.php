@@ -72,7 +72,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 		'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})&&("filter"=={favobj})'),
 	);
-
 	check_fields($fields);
 
 	// validate permissions

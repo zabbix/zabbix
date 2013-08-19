@@ -48,8 +48,7 @@ $dbItems = API::Item()->get(array(
 	'itemids' => $_REQUEST['itemid'],
 	'webitems' => true,
 ));
-
-if (empty($dbItems)) {
+if (!$dbItems) {
 	access_deny();
 }
 

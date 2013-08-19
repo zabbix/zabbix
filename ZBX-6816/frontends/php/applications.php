@@ -56,7 +56,7 @@ if (isset($_REQUEST['applicationid'])) {
 		'applicationids' => array($_REQUEST['applicationid']),
 		'output' => array('name', 'hostid')
 	));
-	if (empty($dbApplication)) {
+	if (!$dbApplication) {
 		access_deny();
 	}
 }

@@ -409,13 +409,17 @@ function bar_report_form3(){
 	$txtCondVal->setAttribute('id', 'item_name');
 
 	$btnSelect = new CButton('btn1', _('Select'),
-			"return PopUp('popup.php?dstfrm=".$reportForm->GetName().
-			"&dstfld1=itemid&dstfld2=item_name&".
-			"srctbl=items&srcfld1=itemid&srcfld2=name&monitored_hosts=1');",
-			'T');
+		'return PopUp("popup.php?dstfrm='.$reportForm->GetName().
+			'&dstfld1=itemid'.
+			'&dstfld2=item_name'.
+			'&srctbl=items'.
+			'&srcfld1=itemid'.
+			'&srcfld2=name'.
+			'&monitored_hosts=1");',
+		'T'
+	);
 
 	$reportForm->addRow(_('Item'), array($txtCondVal, $btnSelect));
-
 
 	$paletteCmb = new CComboBox('palette', $palette);
 		$paletteCmb->addItem(0, _s('Palette #%1$s', 1));
