@@ -933,7 +933,7 @@ elseif ($srctbl == 'prototypes') {
 		$host = reset($item['hosts']);
 
 		$description = new CSpan(itemName($item), 'link');
-		$item['name'] = $host['name'].NAME_DELIMITER.$item['name'];
+		$item['name'] = $host['name'].NAME_DELIMITER.itemName($item);
 
 		if ($multiselect) {
 			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($item['itemid']).');';
