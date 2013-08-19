@@ -151,13 +151,13 @@ A.F....... [ZBXNEXT-1323] implemented macros in script confirmation text (Eduard
 ..F....... [ZBXNEXT-1441] added media type name to action operations description (Vedmak)
 A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression field for triggers (Sasha)
 ..F....... [ZBXNEXT-1433] moved operation delay field to Operation tab (Eduard)
-..F.I..PS. [ZBXNEXT-1322] automatic update of database structure when upgrading to newer version (Sasha, Vedmak)
+..F.I..PS. [ZBXNEXT-1322] implemented automatic update of database structure when upgrading to newer version (Sasha, Vedmak)
 ..F.....S. [ZBX-3236] added support of value mapping for character data (Sasha, Vedmak)
 .......P.. [ZBX-3817] improved performance of the "data sender" process (Sasha)
 .......PS. [ZBX-5436] added support of AllowRoot paramater by server and proxy daemons (Sasha)
-..F....... [ZBX-5180] maintenance periods form redesign (Vedmak)
-.......PS. [ZBXNEXT-1335] pingers work without connection to a database (Sasha)
-..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
+..F....... [ZBX-5180] redesigned maintenance periods form (Vedmak)
+.......PS. [ZBXNEXT-1335] changed pingers to work without connection to a database (Sasha)
+..F....... [ZBX-5127] redesigned regular expressions form (Vedmak)
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
