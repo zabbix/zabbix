@@ -49,7 +49,7 @@ check_fields($fields);
  * Display
  */
 $data = array(
-	'fullscreen' => get_request('fullscreen')
+	'fullscreen' => $_REQUEST['fullscreen']
 );
 
 $data['view_style'] = get_request('view_style', CProfile::get('web.overview.view.style', STYLE_TOP));
