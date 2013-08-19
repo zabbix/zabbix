@@ -18,9 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',     '2.1.2');
-define('ZABBIX_API_VERSION', '2.1.2');
-define('ZABBIX_DB_VERSION',	 2010094);
+define('ZABBIX_VERSION',     '2.1.3');
+define('ZABBIX_API_VERSION', '2.1.3');
+define('ZABBIX_DB_VERSION',	 2010101);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
 define('ZABBIX_COPYRIGHT_TO',   '2013');
@@ -355,7 +355,7 @@ define('ITEM_DATA_TYPE_OCTAL',			1);
 define('ITEM_DATA_TYPE_HEXADECIMAL',	2);
 define('ITEM_DATA_TYPE_BOOLEAN',		3);
 
-define('ZBX_DEFAULT_KEY_DB_MONITOR',	'db.odbc.select[<unique short description>]');
+define('ZBX_DEFAULT_KEY_DB_MONITOR',	'db.odbc.select[<unique short description>,<dsn>]');
 define('ZBX_DEFAULT_KEY_SSH',			'ssh.run[<unique short description>,<ip>,<port>,<encoding>]');
 define('ZBX_DEFAULT_KEY_TELNET',		'telnet.run[<unique short description>,<ip>,<port>,<encoding>]');
 define('ZBX_DEFAULT_KEY_JMX',			'jmx[<object name>,<attribute name>]');
@@ -959,6 +959,14 @@ define('SHORT_DESCRIPTION',	1);
 // availability report modes
 define('AVAILABILITY_REPORT_BY_HOST', 0);
 define('AVAILABILITY_REPORT_BY_TEMPLATE', 1);
+
+// queue modes
+define('QUEUE_OVERVIEW', 0);
+define('QUEUE_OVERVIEW_BY_PROXY', 1);
+define('QUEUE_DETAILS', 2);
+
+// item count to display in the details queue
+define('QUEUE_DETAIL_ITEM_COUNT', 500);
 
 // if magic quotes on, then get rid of them
 if (get_magic_quotes_gpc()) {

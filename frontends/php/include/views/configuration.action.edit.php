@@ -78,7 +78,7 @@ foreach ($this->data['action']['conditions'] as $condition) {
 		$condition['operator'] = 0;
 	}
 	if (!isset($condition['value'])) {
-		$condition['value'] = 0;
+		$condition['value'] = '';
 	}
 	if (!str_in_array($condition['conditiontype'], $this->data['allowedConditions'])) {
 		continue;
@@ -296,7 +296,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 		break;
 
 	case CONDITION_TYPE_HOST_METADATA:
-		$rowCondition[] = new CTextBox('new_condition[value]', '', ZBX_TEXTBOX_STANDARD_SIZE);
+		$condition = new CTextBox('new_condition[value]', '', ZBX_TEXTBOX_STANDARD_SIZE);
 		break;
 
 	default:
