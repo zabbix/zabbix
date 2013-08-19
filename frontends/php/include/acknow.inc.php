@@ -52,7 +52,7 @@ function makeAckTab($event) {
 		foreach ($event['acknowledges'] as $acknowledge) {
 			$acknowledgeTable->addRow(array(
 				zbx_date2str(_('d M Y H:i:s'), $acknowledge['clock']),
-				$acknowledge['alias'],
+				getUserFullname($acknowledge),
 				new CCol(zbx_nl2br($acknowledge['message']), 'wraptext')
 			));
 		}

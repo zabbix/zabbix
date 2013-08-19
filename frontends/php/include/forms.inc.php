@@ -23,7 +23,6 @@
 		$config = select_config();
 		$data = array('is_profile' => $isProfile);
 
-		// get title
 		if (isset($userid)) {
 			$options = array(
 				'userids' => $userid,
@@ -32,16 +31,15 @@
 			if ($data['is_profile']) {
 				$options['nodeids'] = id2nodeid($userid);
 			}
-			$users = API::User()->get($options);
 
+			$users = API::User()->get($options);
 			$user = reset($users);
-			$data['title'] = _('User').' "'.$user['alias'].'"';
+
+			$data['auth_type'] = get_user_system_auth($userid);
 		}
 		else {
-			$data['title'] = _('User');
+			$data['auth_type'] = $config['authentication_type'];
 		}
-
-		$data['auth_type'] = isset($userid) ? get_user_system_auth($userid) : $config['authentication_type'];
 
 		if (isset($userid) && (!isset($_REQUEST['form_refresh']) || isset($_REQUEST['register']))) {
 			$data['alias']			= $user['alias'];
