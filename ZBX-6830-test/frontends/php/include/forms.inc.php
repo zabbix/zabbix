@@ -23,7 +23,6 @@
 		$config = select_config();
 		$data = array('is_profile' => $isProfile);
 
-		// get title
 		if (isset($userid)) {
 			$options = array(
 				'userids' => $userid,
@@ -32,16 +31,15 @@
 			if ($data['is_profile']) {
 				$options['nodeids'] = id2nodeid($userid);
 			}
-			$users = API::User()->get($options);
 
+			$users = API::User()->get($options);
 			$user = reset($users);
-			$data['title'] = _('User').' "'.$user['alias'].'"';
+
+			$data['auth_type'] = get_user_system_auth($userid);
 		}
 		else {
-			$data['title'] = _('User');
+			$data['auth_type'] = $config['authentication_type'];
 		}
-
-		$data['auth_type'] = isset($userid) ? get_user_system_auth($userid) : $config['authentication_type'];
 
 		if (isset($userid) && (!isset($_REQUEST['form_refresh']) || isset($_REQUEST['register']))) {
 			$data['alias']			= $user['alias'];
@@ -541,6 +539,7 @@
 		if (!empty($filter_hostId)) {
 			$getHostInfo = API::Host()->get(array(
 				'hostids' => $filter_hostId,
+				'templated_hosts' => true,
 				'output' => array('name')
 			));
 			$getHostInfo = reset($getHostInfo);
@@ -561,7 +560,8 @@
 					'selectedLimit' => 1,
 					'objectName' => 'hosts',
 					'objectOptions' => array(
-						'editable' => true
+						'editable' => true,
+						'templated_hosts' => true
 					),
 					'data' => $hostFilterData
 				))
@@ -581,7 +581,8 @@
 				new CButton('btn_app', _('Select'),
 					'return PopUp("popup.php?srctbl=applications&srcfld1=name'.
 						'&dstfrm='.$form->getName().'&dstfld1=filter_application'.
-						'&with_applications=1&hostid=" + jQuery("input[name=\'filter_hostid\']").val()'
+						'&with_applications=1'.
+						'" + (jQuery("input[name=\'filter_hostid\']").length > 0 ? "&hostid="+jQuery("input[name=\'filter_hostid\']").val() : "")'
 						.', 550, 450, "application");',
 					'filter-select-button'
 				)
@@ -1040,8 +1041,10 @@
 		$data['types'] = item_type2str();
 		unset($data['types'][ITEM_TYPE_HTTPTEST]);
 		if (!empty($options['is_discovery_rule'])) {
-			unset($data['types'][ITEM_TYPE_AGGREGATE], $data['types'][ITEM_TYPE_CALCULATED],
-					$data['types'][ITEM_TYPE_SNMPTRAP], $data['types'][ITEM_TYPE_DB_MONITOR]);
+			unset($data['types'][ITEM_TYPE_AGGREGATE],
+				$data['types'][ITEM_TYPE_CALCULATED],
+				$data['types'][ITEM_TYPE_SNMPTRAP]
+			);
 		}
 
 		// item
