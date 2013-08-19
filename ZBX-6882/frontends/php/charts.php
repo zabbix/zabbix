@@ -127,7 +127,7 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 $data = array(
 	'pageFilter' => $pageFilter,
 	'graphid' => $pageFilter->graphid,
-	'fullscreen' => get_request('fullscreen')
+	'fullscreen' => $_REQUEST['fullscreen']
 );
 
 // render view
