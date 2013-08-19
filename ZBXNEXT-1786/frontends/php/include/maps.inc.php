@@ -122,53 +122,63 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 
 		order_result($elem['urls'], 'name');
 
-		$menuPopupOptions = array(
-			'isMap' => true,
+		$menuPopup = array(
 			'goto' => array(
-				'params' => array(),
-				'items' => array()
-			),
-			'urls' => array_values($elem['urls'])
+				'params' => array()
+			)
 		);
 
-		if ($elem['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
-			$host = $hosts[$elem['elementid']];
-
-			$menuPopupOptions['scripts'] = $scripts[$elem['elementid']];
-			$menuPopupOptions['goto']['params']['hostid'] = $elem['elementid'];
-			$menuPopupOptions['goto']['items']['triggerStatus'] = ($hosts[$elem['elementid']]['status'] == HOST_STATUS_MONITORED)
-				? array(
-					'filter_set' => 1,
-					'show_severity' => isset($options['severity_min']) ? $options['severity_min'] : null
-				)
-				: null;
-			$menuPopupOptions['goto']['items']['screens'] = !empty($host['screens']);
-		}
-		elseif ($elem['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) {
-			$menuPopupOptions['goto']['items']['map'] = array(
-				'sysmapid' => $elem['elementid'],
-				'severity_min' => isset($options['severity_min']) ? $options['severity_min'] : null
-			);
-		}
-		elseif ($elem['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
-			$menuPopupOptions['goto']['items']['events'] = array(
-				'source' => 0,
-				'triggerid' => $elem['elementid'],
-				'nav_time' => time() - SEC_PER_WEEK
-			);
-		}
-		elseif ($elem['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
-			$menuPopupOptions['goto']['items']['triggerStatus'] = array(
-				'hostid' => 0,
-				'groupid' => $elem['elementid'],
-				'show_severity' => isset($options['severity_min']) ? $options['severity_min'] : null,
-				'filter_set' => 1
-			);
+		foreach ($elem['urls'] as $url) {
+			$menuPopup['urls'][$url['name']] = $url['url'];
 		}
 
-		$menuPopup = new CMenuPopup($menuPopupOptions);
+		switch ($elem['elementtype']) {
+			case SYSMAP_ELEMENT_TYPE_HOST:
+				$host = $hosts[$elem['elementid']];
 
-		$area->attr('data-menupopup', $menuPopup->toString());
+				if ($scripts[$elem['elementid']]) {
+					$menuPopup['scripts'] = $scripts[$elem['elementid']];
+				}
+				if ($hosts[$elem['elementid']]['status'] == HOST_STATUS_MONITORED) {
+					$menuPopup['goto']['items']['triggerStatus'] = array(
+						'hostid' => $elem['elementid'],
+						'filter_set' => 1,
+						'show_severity' => isset($options['severity_min']) ? $options['severity_min'] : null
+					);
+				}
+				if ($host['screens']) {
+					$menuPopup['goto']['items']['screens'] = array(
+						'hostid' => $host['hostid']
+					);
+				}
+				break;
+
+			case SYSMAP_ELEMENT_TYPE_MAP:
+				$menuPopup['goto']['items']['map'] = array(
+					'sysmapid' => $elem['elementid'],
+					'severity_min' => isset($options['severity_min']) ? $options['severity_min'] : null
+				);
+				break;
+
+			case SYSMAP_ELEMENT_TYPE_TRIGGER:
+				$menuPopup['goto']['items']['events'] = array(
+					'source' => 0,
+					'triggerid' => $elem['elementid'],
+					'nav_time' => time() - SEC_PER_WEEK
+				);
+				break;
+
+			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+				$menuPopup['goto']['items']['triggerStatus'] = array(
+					'groupid' => $elem['elementid'],
+					'hostid' => 0,
+					'show_severity' => isset($options['severity_min']) ? $options['severity_min'] : null,
+					'filter_set' => 1
+				);
+				break;
+		}
+
+		$area->setMenuPopup($menuPopup);
 
 		$actionMap->addItem($area);
 	}

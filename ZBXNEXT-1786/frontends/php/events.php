@@ -671,13 +671,10 @@ else {
 
 				$triggerItems = array();
 				foreach ($trigger['items'] as $item) {
-					$triggerItems[] = array(
-						'name' => htmlspecialchars(itemName($item)),
-						'params' => array(
-							'itemid' => $item['itemid'],
-							'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
-								? 'showgraph' : 'showvalues'
-						)
+					$triggerItems[htmlspecialchars(itemName($item))] = array(
+						'itemid' => $item['itemid'],
+						'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
+							? 'showgraph' : 'showvalues'
 					);
 				}
 
@@ -686,30 +683,14 @@ else {
 					'ns' => $event['ns']
 				)));
 
-				$menuPopupId = CMenuPopup::getId();
-
 				$triggerDescription = new CSpan($description, 'pointer link_menu');
-				$triggerDescription->attr('data-menupopupid', $menuPopupId);
-
-				$triggerDescription = new CDiv(array(
-					$triggerDescription,
-					new CMenuPopup(array(
-						'id' => $menuPopupId,
-						'width' => 250,
-						'triggers' => array(
-							'triggerid' => $trigger['triggerid'],
-							'events' => array(
-								'nav_time' => $event['clock']
-							),
-							'configuration' => ($showAdminLinks && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)
-								? array('hostid' => $host['hostid']) : null,
-							'url' => zbx_empty($trigger['url']) ? null : CHtml::encode(CHtml::encode(resolveTriggerUrl($trigger)))
-						),
-						'history' => array(
-							'items' => $triggerItems
-						)
-					)))
-				);
+				$triggerDescription->setMenuPopup(getMenuPopupTrigger(array(
+					'trigger' => $trigger,
+					'eventTime' => $event['clock'],
+					'withConfiguration' => ($showAdminLinks && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL),
+					'withUrl' => true,
+					'items' => $triggerItems
+				)));
 
 				// acknowledge
 				$ack = getEventAckState($event, true);
@@ -730,31 +711,14 @@ else {
 				);
 
 				// host JS menu link
-				$hostDiv = null;
+				$hostName = null;
 
 				if ($_REQUEST['hostid'] == 0) {
-					$menuPopupId = CMenuPopup::getId();
-
 					$hostName = new CSpan($host['name'], 'link_menu');
-					$hostName->attr('data-menupopupid', $menuPopupId);
-
-					$hostDiv = new CDiv(array(
-						$hostName,
-						new CMenuPopup(array(
-							'id' => $menuPopupId,
-							'scripts' => $scripts[$host['hostid']],
-							'goto' => array(
-								'params' => array(
-									'hostid' => $host['hostid']
-								),
-								'items' => array(
-									'latest' => true,
-									'screens' => !empty($host['screens']),
-									'inventories' => !empty($host['inventory'])
-								)
-							)
-						)))
-					);
+					$hostName->setMenuPopup(getMenuPopupHost(array(
+						'host' => $host,
+						'scripts' => $scripts[$host['hostid']]
+					)));
 				}
 
 				// action
@@ -766,7 +730,7 @@ else {
 						'action'
 					),
 					is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
-					$hostDiv,
+					$hostName,
 					$triggerDescription,
 					$statusSpan,
 					getSeverityCell($trigger['priority'], null, !$event['value']),

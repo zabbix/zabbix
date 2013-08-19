@@ -1209,30 +1209,13 @@ function getTriggersOverview($hostIds, $application, $viewMode = null, $screenId
 		$scripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
 
 		foreach ($hostNames as $hostId => $hostName) {
-			$menuPopupId = CMenuPopup::getId();
-
 			$name = new CSpan($hostName, 'link_menu');
-			$name->attr('data-menupopupid', $menuPopupId);
+			$name->setMenuPopup(getMenuPopupHost(array(
+				'host' => $hosts[$hostId],
+				'scripts' => $scripts[$hostId]
+			)));
 
-			$hostDiv = new CDiv(array(
-				$name,
-				new CMenuPopup(array(
-					'id' => $menuPopupId,
-					'scripts' => $scripts[$hostId],
-					'goto' => array(
-						'params' => array(
-							'hostid' => $hostId
-						),
-						'items' => array(
-							'latest' => true,
-							'screens' => !empty($hosts[$hostId]['screens']),
-							'inventories' => !empty($hosts[$hostId]['inventory'])
-						)
-					)
-				)))
-			);
-
-			$columns = array($hostDiv);
+			$columns = array($name);
 			foreach ($triggers as $triggerHosts) {
 				$columns[] = getTriggerOverviewCells(
 					isset($triggerHosts[$hostName]) ? $triggerHosts[$hostName] : null,
@@ -1263,17 +1246,13 @@ function getTriggerOverviewCells($trigger, $screenId = null) {
 	$style = null;
 	$desc = array();
 	$config = select_config(); // for how long triggers should blink on status change (set by user in administration->general)
-	$menuPopupOptions = array();
+	$menuPopup = array();
 
 	if ($trigger) {
 		$style = 'cursor: pointer; ';
 
-		$menuPopupOptions = array(
-			'width' => 200,
-			'triggers' => array(
-				'triggerid' => $trigger['triggerid'],
-				'events' => true
-			)
+		$menuPopup = array(
+			'trigger' => $trigger
 		);
 
 		// problem trigger
@@ -1286,14 +1265,14 @@ function getTriggerOverviewCells($trigger, $screenId = null) {
 					if ($screenId) {
 						global $page;
 
-						$menuPopupOptions['triggers']['acknow'] = array(
+						$menuPopup['acknow'] = array(
 							'eventid' => $event['eventid'],
 							'screenid' => $screenId,
 							'backurl' => $page['file']
 						);
 					}
 					else {
-						$menuPopupOptions['triggers']['acknow'] = array(
+						$menuPopup['acknow'] = array(
 							'eventid' => $event['eventid'],
 							'backurl' => 'overview.php'
 						);
@@ -1324,13 +1303,10 @@ function getTriggerOverviewCells($trigger, $screenId = null) {
 			switch ($item['value_type']) {
 				case ITEM_VALUE_TYPE_UINT64:
 				case ITEM_VALUE_TYPE_FLOAT:
-					$menuPopupOptions['history']['items'][] = array(
-						'name' => $description,
-						'params' => array(
-							'action' => 'showgraph',
-							'itemid' => $item['itemid'],
-							'period' => 3600
-						)
+					$menuPopup['items'][$description] = array(
+						'action' => 'showgraph',
+						'itemid' => $item['itemid'],
+						'period' => 3600
 					);
 					break;
 
@@ -1338,13 +1314,10 @@ function getTriggerOverviewCells($trigger, $screenId = null) {
 				case ITEM_VALUE_TYPE_STR:
 				case ITEM_VALUE_TYPE_TEXT:
 				default:
-					$menuPopupOptions['history']['items'][] = array(
-						'name' => $description,
-						'params' => array(
-							'action' => 'showlatest',
-							'itemid' => $item['itemid'],
-							'period' => 3600
-						)
+					$menuPopup['items'][$description] = array(
+						'action' => 'showlatest',
+						'itemid' => $item['itemid'],
+						'period' => 3600
 					);
 					break;
 			}
@@ -1405,10 +1378,9 @@ function getTriggerOverviewCells($trigger, $screenId = null) {
 		$column->setAttribute('data-toggle-class', $css);
 	}
 
-	$menuPopupOptions['id'] = CMenuPopup::getId();
-
-	$column->attr('data-menupopupid', $menuPopupOptions['id']);
-	$column->addItem(new CMenuPopup($menuPopupOptions));
+	if ($menuPopup) {
+		$column->setMenuPopup(getMenuPopupTrigger($menuPopup));
+	}
 
 	return $column;
 }
@@ -1588,28 +1560,13 @@ function make_trigger_details($trigger) {
 	));
 	$host = reset($hosts);
 
-	$menuPopupId = CMenuPopup::getId();
+	$scripts = API::Script()->getScriptsByHosts($hostId);
 
 	$hostName = new CSpan($host['name'], 'link_menu');
-	$hostName->attr('data-menupopupid', $menuPopupId);
-
-	$hostDiv = new CDiv(array(
-		$hostName,
-		new CMenuPopup(array(
-			'id' => $menuPopupId,
-			'scripts' => $hostId,
-			'goto' => array(
-				'params' => array(
-					'hostid' => $hostId
-				),
-				'items' => array(
-					'latest' => true,
-					'screens' => !empty($host['screens']),
-					'inventories' => !empty($host['inventory'])
-				)
-			)
-		)))
-	);
+	$hostName->setMenuPopup(getMenuPopupHost(array(
+		'host' => $host,
+		'scripts' => $scripts ? reset($scripts) : null
+	)));
 
 	$table = new CTableInfo();
 
@@ -1617,7 +1574,7 @@ function make_trigger_details($trigger) {
 		$table->addRow(array(_('Node'), get_node_name_by_elid($trigger['triggerid'])));
 	}
 
-	$table->addRow(array(_('Host'), $hostDiv));
+	$table->addRow(array(_('Host'), $hostName));
 	$table->addRow(array(_('Trigger'), CMacrosResolverHelper::resolveTriggerName($trigger)));
 	$table->addRow(array(_('Severity'), getSeverityCell($trigger['priority'])));
 	$table->addRow(array(_('Expression'), explode_exp($trigger['expression'], true, true)));

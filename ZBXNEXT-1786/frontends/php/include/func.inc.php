@@ -2579,6 +2579,110 @@ function clearCookies($clear = false, $id = null) {
 	}
 }
 
-function removeBackslash($s) {
-	return str_replace('\/', '/', $s);
+/**
+ * Prepare data for host menu popup.
+ *
+ * @param array $options['host']
+ * @param array $options['scripts']
+ *
+ * @return array
+ */
+function getMenuPopupHost($options = array()) {
+	$data = array(
+		'goto' => array(
+			'params' => array(
+				'hostid' => $options['host']['hostid']
+			),
+			'items' => array(
+				'latest' => array()
+			)
+		)
+	);
+
+	if (isset($options['scripts']) && $options['scripts']) {
+		$data['scripts'] = $options['scripts'];
+
+		CArrayHelper::sort($options['scripts'], array('field' => 'name'));
+	}
+
+	if (isset($options['host']['screens']) && $options['host']['screens']) {
+		$data['goto']['items']['screens'] = array();
+	}
+
+	if (isset($options['host']['inventories']) && $options['host']['inventories']) {
+		$data['goto']['items']['inventories'] = array();
+	}
+
+	return $data;
+}
+
+/**
+ * Prepare data for item history menu popup.
+ *
+ * @param array $options['item']
+ * @param bool  $options['withLatestGraphs']	is link on latest graphs will be displayed
+ *
+ * @return array
+ */
+function getMenuPopupHistory($options = array()) {
+	$data = array(
+		'history' => array(
+			'params' => array(
+				'itemid' => $options['item']['itemid']
+			),
+			'latestValues' => true
+		)
+	);
+
+	if (isset($options['withLatestGraphs']) && $options['withLatestGraphs']) {
+		$data['history']['latestGraphs'] = true;
+	}
+
+	return $data;
+}
+
+/**
+ * Prepare data for trigger menu popup.
+ *
+ * @param array  $options['trigger']			trigger data
+ * @param bool   $options['withConfiguration']	is link to trigger configuration will be showen
+ * @param bool   $options['withUrl']			is trigger URL will be showen
+ * @param array  $options['acknow']				acknowledge link parameters
+ * @param array  $options['items']				trigger items
+ * @param string $options['eventTime']			event navigation time parameter
+ *
+ * @return array
+ */
+function getMenuPopupTrigger($options = array()) {
+	$data = array(
+		'trigger' => array(
+			'triggerid' => $options['trigger']['triggerid'],
+			'events' => array()
+		)
+	);
+
+	if (isset($options['eventTime']) && $options['eventTime']) {
+		$data['trigger']['events']['nav_time'] = $options['eventTime'];
+	}
+
+	if (isset($options['withConfiguration']) && $options['withConfiguration']) {
+		$data['trigger']['configuration'] = array(
+			'form' => 'update',
+			'switch_node' => id2nodeid($options['trigger']['triggerid'])
+		);
+	}
+
+	if (isset($options['withUrl']) && $options['withUrl'] && !zbx_empty($options['trigger']['url'])) {
+		$data['trigger']['url'] = CHtml::encode(CHtml::encode(resolveTriggerUrl($options['trigger'])));
+	}
+
+	if (isset($options['acknow']) && $options['acknow']) {
+		$data['trigger']['acknow'] = $options['acknow'];
+	}
+
+	if (isset($options['items']) && $options['items']) {
+		$data['trigger']['items'] = $options['items'];
+	}
+
+	return $data;
 }

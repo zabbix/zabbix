@@ -608,40 +608,21 @@ foreach ($triggers as $trigger) {
 			$itemName = $usedHosts[$item['hostid']].NAME_DELIMITER.$itemName;
 		}
 
-		$triggerItems[] = array(
-			'name' => $itemName,
-			'params' => array(
-				'itemid' => $item['itemid'],
-				'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
-					? 'showgraph' : 'showvalues'
-			)
+		$triggerItems[$itemName] = array(
+			'itemid' => $item['itemid'],
+			'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
+				? 'showgraph' : 'showvalues'
 		);
 	}
 
-	$menuPopupId = CMenuPopup::getId();
-
 	$triggerDescription = new CSpan($description, 'pointer link_menu');
-	$triggerDescription->attr('data-menupopupid', $menuPopupId);
-
-	$triggerDescription = new CDiv(array(
-		$triggerDescription,
-		new CMenuPopup(array(
-			'id' => $menuPopupId,
-			'width' => 250,
-			'triggers' => array(
-				'triggerid' => $trigger['triggerid'],
-				'events' => array(
-					'nav_time' => $trigger['lastchange']
-				),
-				'configuration' => ($showAdminLinks && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)
-					? array('hostid' => $pageFilter->hostid) : null,
-				'url' => zbx_empty($trigger['url']) ? null : CHtml::encode(CHtml::encode(resolveTriggerUrl($trigger)))
-			),
-			'history' => array(
-				'items' => $triggerItems
-			)
-		)))
-	);
+	$triggerDescription->setMenuPopup(getMenuPopupTrigger(array(
+		'trigger' => $trigger,
+		'withConfiguration' => ($showAdminLinks && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL),
+		'withUrl' => true,
+		'hostid' => $pageFilter->hostid,
+		'items' => $triggerItems
+	)));
 
 	// host js menu
 	$hostList = array();
@@ -656,28 +637,13 @@ foreach ($triggers as $trigger) {
 			}
 		}
 
-		$menuPopupId = CMenuPopup::getId();
-
 		$hostName = new CSpan($triggerHost['name'], 'link_menu');
-		$hostName->attr('data-menupopupid', $menuPopupId);
+		$hostName->setMenuPopup(getMenuPopupHost(array(
+			'host' => $host,
+			'scripts' => $scripts
+		)));
 
-		$hostDiv = new CDiv(array(
-			$hostName,
-			new CMenuPopup(array(
-				'id' => $menuPopupId,
-				'scripts' => $scripts,
-				'goto' => array(
-					'params' => array(
-						'hostid' => $triggerHost['hostid']
-					),
-					'items' => array(
-						'latest' => true,
-						'screens' => !empty($host['screens']),
-						'inventories' => !empty($host['inventory'])
-					)
-				)
-			)))
-		);
+		$hostDiv = new CDiv($hostName);
 
 		// add maintenance icon with hint if host is in maintenance
 		if ($triggerHost['maintenance_status']) {

@@ -916,28 +916,17 @@ function make_latest_issues(array $filter = array()) {
 
 	// triggers
 	foreach ($triggers as $trigger) {
-		$hostId = $trigger['hostid'];
-		$host = $hosts[$hostId];
+		if (!isset($trigger['event']) || !$trigger['event']) {
+			continue;
+		}
 
-		$menuPopupId = CMenuPopup::getId();
+		$host = $hosts[$trigger['hostid']];
 
 		$hostName = new CSpan($host['name'], 'link_menu');
-		$hostName->attr('data-menupopupid', $menuPopupId);
-
-		$hostMenuPopup = new CMenuPopup(array(
-			'id' => $menuPopupId,
-			'scripts' => $scripts[$hostId],
-			'goto' => array(
-				'params' => array(
-					'hostid' => $hostId
-				),
-				'items' => array(
-					'latest' => true,
-					'screens' => !empty($host['screens']),
-					'inventories' => !empty($host['inventory'])
-				)
-			)
-		));
+		$hostName->setMenuPopup(getMenuPopupHost(array(
+			'host' => $host,
+			'scripts' => $scripts[$host['hostid']]
+		)));
 
 		// add maintenance icon with hint if host is in maintenance
 		$maintenanceIcon = null;
@@ -968,10 +957,7 @@ function make_latest_issues(array $filter = array()) {
 			$hostName->addClass('left-to-icon-maintenance-abs');
 		}
 
-		$hostDiv = new CDiv(array(
-			new CDiv(array($hostName, $maintenanceIcon), 'maintenance-abs-cont'),
-			$hostMenuPopup
-		));
+		$hostDiv = new CDiv(array($hostName, $maintenanceIcon), 'maintenance-abs-cont');
 
 		// unknown triggers
 		$unknown = SPACE;
@@ -980,29 +966,27 @@ function make_latest_issues(array $filter = array()) {
 			$unknown->setHint($trigger['error'], '', 'on');
 		}
 
-		if (!empty($trigger['event'])) {
-			$ack = getEventAckState($trigger['event'], empty($filter['backUrl']) ? true : $filter['backUrl'], true, $ackParams);
-			$clock = new CLink(zbx_date2str(_('d M Y H:i:s'), $trigger['event']['clock']), 'events.php?triggerid='.$trigger['triggerid'].'&source=0&show_unknown=1&nav_time='.$trigger['event']['clock']);
+		$ack = getEventAckState($trigger['event'], empty($filter['backUrl']) ? true : $filter['backUrl'], true, $ackParams);
+		$clock = new CLink(zbx_date2str(_('d M Y H:i:s'), $trigger['event']['clock']), 'events.php?triggerid='.$trigger['triggerid'].'&source=0&show_unknown=1&nav_time='.$trigger['event']['clock']);
 
-			$description = CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, array('clock' => $trigger['event']['clock'], 'ns' => $trigger['event']['ns'])));
-			$description = $trigger['url']
-				? new CLink($description, resolveTriggerUrl($trigger), null, null, true)
-				: new CSpan($description, 'pointer');
+		$description = CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, array('clock' => $trigger['event']['clock'], 'ns' => $trigger['event']['ns'])));
+		$description = $trigger['url']
+			? new CLink($description, resolveTriggerUrl($trigger), null, null, true)
+			: new CSpan($description, 'pointer');
 
-			$description = new CCol($description, getSeverityStyle($trigger['priority']));
-			$description->setHint(make_popup_eventlist($trigger['triggerid'], $trigger['event']['eventid']), '', '', false);
+		$description = new CCol($description, getSeverityStyle($trigger['priority']));
+		$description->setHint(make_popup_eventlist($trigger['triggerid'], $trigger['event']['eventid']), '', '', false);
 
-			$table->addRow(array(
-				get_node_name_by_elid($trigger['triggerid']),
-				$hostDiv,
-				$description,
-				$clock,
-				zbx_date2age($trigger['event']['clock']),
-				$unknown,
-				$ack,
-				isset($actions[$trigger['event']['eventid']]) ? $actions[$trigger['event']['eventid']] : SPACE
-			));
-		}
+		$table->addRow(array(
+			get_node_name_by_elid($trigger['triggerid']),
+			$hostDiv,
+			$description,
+			$clock,
+			zbx_date2age($trigger['event']['clock']),
+			$unknown,
+			$ack,
+			isset($actions[$trigger['event']['eventid']]) ? $actions[$trigger['event']['eventid']] : SPACE
+		));
 	}
 
 	// initialize blinking

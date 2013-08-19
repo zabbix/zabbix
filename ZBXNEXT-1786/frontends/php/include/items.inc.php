@@ -814,30 +814,13 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 		foreach ($hostNames as $hostId => $hostName) {
 			$host = $hosts[$hostId];
 
-			$menuPopupId = CMenuPopup::getId();
-
 			$name = new CSpan($host['name'], 'link_menu');
-			$name->attr('data-menupopupid', $menuPopupId);
+			$name->setMenuPopup(getMenuPopupHost(array(
+				'host' => $host,
+				'scripts' => $scripts[$hostId]
+			)));
 
-			$hostDiv = new CDiv(array(
-				$name,
-				new CMenuPopup(array(
-					'id' => $menuPopupId,
-					'scripts' => $scripts[$hostId],
-					'goto' => array(
-						'params' => array(
-							'hostid' => $hostId
-						),
-						'items' => array(
-							'latest' => true,
-							'screens' => !empty($host['screens']),
-							'inventories' => !empty($host['inventory'])
-						)
-					)
-				)))
-			);
-
-			$tableRow = array(new CCol($hostDiv));
+			$tableRow = array(new CCol($name));
 			foreach ($items as $ithosts) {
 				$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $hostName);
 			}
@@ -874,18 +857,10 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 	$column = new CCol(array($value, $ack), $css);
 
 	if (isset($ithosts[$hostName])) {
-		$menuPopupId = CMenuPopup::getId();
-
-		$column->attr('data-menupopupid', $menuPopupId);
-		$column->addItem(new CMenuPopup(array(
-			'id' => $menuPopupId,
-			'history' => array(
-				'latest' => in_array($ithosts[$hostName]['value_type'], array(ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT))
-					? array('itemid' => $item['itemid']) : null,
-				'latestValues' => array(
-					'itemid' => $item['itemid']
-				)
-			)
+		$column->setMenuPopup(getMenuPopupHistory(array(
+			'item' => $item,
+			'withLatestGraphs' =>
+				in_array($ithosts[$hostName]['value_type'], array(ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT))
 		)));
 	}
 

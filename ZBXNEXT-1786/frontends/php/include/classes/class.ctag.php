@@ -218,8 +218,17 @@ class CTag extends CObject {
 		return true;
 	}
 
-	public function onClick($handle_code) {
-		$this->addAction('onclick', $handle_code);
+	/**
+	 * Set data for menu popup.
+	 *
+	 * @param array $options
+	 */
+	public function setMenuPopup($options = array()) {
+		$this->attr('data-menupopup', CJs::encodeJson($options));
+	}
+
+	public function onClick($handleCode) {
+		$this->addAction('onclick', $handleCode);
 	}
 
 	public function addStyle($value) {

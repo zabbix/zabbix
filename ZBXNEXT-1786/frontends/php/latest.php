@@ -390,38 +390,21 @@ foreach ($db_apps as $appid => $dbApp) {
 	$toggle->setAttribute('data-app-id', $dbApp['applicationid']);
 	$toggle->setAttribute('data-open-state', $openState);
 
-	$hostDiv = null;
+	$hostName = null;
 
 	if ($_REQUEST['hostid'] == 0) {
-		$menuPopupId = CMenuPopup::getId();
-
 		$hostName = new CSpan($host['name'], 'link_menu');
-		$hostName->attr('data-menupopupid', $menuPopupId);
-
-		$hostDiv = new CDiv(array(
-			$hostName,
-			new CMenuPopup(array(
-				'id' => $menuPopupId,
-				'scripts' => $scripts[$host['hostid']],
-				'goto' => array(
-					'params' => array(
-						'hostid' => $host['hostid']
-					),
-					'items' => array(
-						'latest' => true,
-						'screens' => !empty($host['screens']),
-						'inventories' => !empty($host['inventory'])
-					)
-				)
-			)))
-		);
+		$hostName->setMenuPopup(getMenuPopupHost(array(
+			'host' => $host,
+			'scripts' => $scripts[$host['hostid']]
+		)));
 	}
 
 	// add toggle row
 	$table->addRow(array(
 		$toggle,
 		get_node_name_by_elid($dbApp['applicationid']),
-		$hostDiv,
+		$hostName,
 		new CCol(array(
 				bold($dbApp['name']),
 				SPACE.'('._n('%1$s Item', '%1$s Items', $dbApp['item_cnt']).')'
@@ -611,38 +594,21 @@ foreach ($db_hosts as $hostId => $dbHost) {
 	$toggle->setAttribute('data-app-id', '0_'.$host['hostid']);
 	$toggle->setAttribute('data-open-state', $openState);
 
-	$hostDiv = null;
+	$hostName = null;
 
 	if ($_REQUEST['hostid'] == 0) {
-		$menuPopupId = CMenuPopup::getId();
-
 		$hostName = new CSpan($host['name'], 'link_menu');
-		$hostName->attr('data-menupopupid', $menuPopupId);
-
-		$hostDiv = new CDiv(array(
-			$hostName,
-			new CMenuPopup(array(
-				'id' => $menuPopupId,
-				'scripts' => $scripts[$host['hostid']],
-				'goto' => array(
-					'params' => array(
-						'hostid' => $host['hostid']
-					),
-					'items' => array(
-						'latest' => true,
-						'screens' => !empty($host['screens']),
-						'inventories' => !empty($host['inventory'])
-					)
-				)
-			)))
-		);
+		$hostName->setMenuPopup(getMenuPopupHost(array(
+			'host' => $host,
+			'scripts' => $scripts[$host['hostid']]
+		)));
 	}
 
 	// add toggle row
 	$table->addRow(array(
 		$toggle,
 		get_node_name_by_elid($dbHost['hostid']),
-		$hostDiv,
+		$hostName,
 		new CCol(
 			array(
 				bold('- '.('other').' -'),

@@ -27,4 +27,15 @@ jQuery(function($) {
 	if (IE || KQ) {
 		setTimeout(function () { $('[autofocus]').focus(); }, 10);
 	}
+
+	/**
+	 * Build menu popup for given elements.
+	 */
+	$(document).on('click', '[data-menupopup]', function(event) {
+		var obj = $(this);
+
+		obj.menuPopup(obj.data('menupopup'), event);
+
+		return false;
+	});
 });

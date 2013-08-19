@@ -190,6 +190,30 @@ $tranStrings = array(
 		'More matches found...' => _('More matches found...'),
 		'type here to search' => _('type here to search'),
 		'new' => _('new')
+	),
+	'menupopup.js' => array(
+		'Acknowledge' => _('Acknowledge'),
+		'Cancel' => _('Cancel'),
+		'Configuration' => _('Configuration'),
+		'Events' => _('Events'),
+		'Execute' => _('Execute'),
+		'Execution confirmation' => _('Execution confirmation'),
+		'Go to' => _('Go to'),
+		'History' => _('History'),
+		'Host inventories' => _('Host inventories'),
+		'Host screens' => _('Host screens'),
+		'Latest data' => _('Latest data'),
+		'Latest events' => _('Latest events'),
+		'Latest values' => _('Latest values'),
+		'Last hour graph' => _('Last hour graph'),
+		'Last month graph' => _('Last month graph'),
+		'Last week graph' => _('Last week graph'),
+		'Scripts' => _('Scripts'),
+		'Status of triggers' => _('Status of triggers'),
+		'Submap' => _('Submap'),
+		'Trigger' => _('Trigger'),
+		'URL' => _('URL'),
+		'URLs' => _('URLs')
 	)
 );
 
