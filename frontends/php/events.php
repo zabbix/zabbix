@@ -80,10 +80,11 @@ $fields = array(
 	'favstate'=>		array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})&&"filter"=={favobj}'),
 	'favid'=>			array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
 );
-
 check_fields($fields);
 
-// validate permissions
+/*
+ * Permissions
+ */
 if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
 	access_deny();
 }

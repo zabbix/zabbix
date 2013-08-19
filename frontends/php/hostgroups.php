@@ -53,7 +53,9 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 $_REQUEST['go'] = get_request('go', 'none');
 
-// validate permissions
+/*
+ * Permissions
+ */
 if (get_request('groupid') && !API::HostGroup()->isWritable(array($_REQUEST['groupid']))) {
 	access_deny();
 }

@@ -72,7 +72,9 @@ $fields = array(
 );
 check_fields($fields);
 
-// check permissions
+/*
+ * Permissions
+ */
 if (!empty($_REQUEST['serviceid'])) {
 	$options = array(
 		'output' => API_OUTPUT_EXTEND,
@@ -89,7 +91,6 @@ if (!empty($_REQUEST['serviceid'])) {
 	}
 
 	$service = API::Service()->get($options);
-
 	$service = reset($service);
 	if (!$service) {
 		access_deny();

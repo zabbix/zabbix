@@ -54,12 +54,13 @@ check_fields($fields);
 $availabilityReportMode = get_request('mode', CProfile::get('web.avail_report.mode', AVAILABILITY_REPORT_BY_HOST));
 CProfile::update('web.avail_report.mode', $availabilityReportMode, PROFILE_TYPE_INT);
 
-// validate permission
+/*
+ * Permissions
+ */
 if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
-	if (get_request('hostgroupid') && !API::HostGroup()->isReadable(array($_REQUEST['hostgroupid'])) ||
-			get_request('filter_groupid') && !API::HostGroup()->isReadable(array($_REQUEST['filter_groupid'])) ||
-			get_request('filter_hostid') && !API::Host()->isReadable(array($_REQUEST['filter_hostid'])) ) {
-
+	if (get_request('hostgroupid') && !API::HostGroup()->isReadable(array($_REQUEST['hostgroupid']))
+			|| get_request('filter_groupid') && !API::HostGroup()->isReadable(array($_REQUEST['filter_groupid']))
+			|| get_request('filter_hostid') && !API::Host()->isReadable(array($_REQUEST['filter_hostid']))) {
 		access_deny();
 	}
 	if (get_request('tpl_triggerid')) {
@@ -74,9 +75,8 @@ if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
 	}
 }
 else {
-	if (get_request('filter_groupid') && !API::HostGroup()->isReadable(array($_REQUEST['filter_groupid'])) ||
-			get_request('filter_hostid') && !API::Host()->isReadable(array($_REQUEST['filter_hostid']))) {
-
+	if (get_request('filter_groupid') && !API::HostGroup()->isReadable(array($_REQUEST['filter_groupid']))
+			|| get_request('filter_hostid') && !API::Host()->isReadable(array($_REQUEST['filter_hostid']))) {
 		access_deny();
 	}
 }
@@ -87,10 +87,8 @@ if (get_request('triggerid') && !API::Trigger()->isReadable(array($_REQUEST['tri
 /*
  * Ajax
  */
-if (isset($_REQUEST['favobj'])) {
-	if ($_REQUEST['favobj'] == 'filter') {
-		CProfile::update('web.avail_report.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
-	}
+if (isset($_REQUEST['favobj']) && $_REQUEST['favobj'] == 'filter') {
+	CProfile::update('web.avail_report.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 }
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	require_once dirname(__FILE__).'/include/page_footer.php';

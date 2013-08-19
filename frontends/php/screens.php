@@ -54,10 +54,11 @@ $fields = array(
 );
 check_fields($fields);
 
-// validate permissions
-if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid'])) ||
-		get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
-
+/*
+ * Permissions
+ */
+if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))
+		|| get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
 	access_deny();
 }
 if (get_request('elementid')) {

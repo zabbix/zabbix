@@ -83,7 +83,6 @@ if (isset($_REQUEST['yaxismin']) && zbx_empty($_REQUEST['yaxismin'])) {
 if (isset($_REQUEST['yaxismax']) && zbx_empty($_REQUEST['yaxismax'])) {
 	unset($_REQUEST['yaxismax']);
 }
-
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
 

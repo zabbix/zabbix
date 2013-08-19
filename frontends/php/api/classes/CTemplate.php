@@ -1065,8 +1065,12 @@ class CTemplate extends CHostGeneral {
 	 * @return bool
 	 */
 	public function isReadable(array $ids) {
-		if (!is_array($ids)) return false;
-		if (empty($ids)) return true;
+		if (!is_array($ids)) {
+			return false;
+		}
+		if (empty($ids)) {
+			return true;
+		}
 
 		$ids = array_unique($ids);
 
@@ -1087,8 +1091,12 @@ class CTemplate extends CHostGeneral {
 	 * @return bool
 	 */
 	public function isWritable(array $ids) {
-		if (!is_array($ids)) return false;
-		if (empty($ids)) return true;
+		if (!is_array($ids)) {
+			return false;
+		}
+		if (empty($ids)) {
+			return true;
+		}
 
 		$ids = array_unique($ids);
 
