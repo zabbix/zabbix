@@ -36,7 +36,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		'groupid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, 		NULL),
 		'hostids'=>		array(T_ZBX_INT, O_OPT,	null,	DB_ID, 		'isset({config})&&({config}==3)&&isset({report_show})&&!isset({groupids})'),
 		'groupids'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, 		'isset({config})&&({config}==3)&&isset({report_show})&&!isset({hostids})'),
-		'itemid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO,		'isset({config})&&({config}==3)&&isset({report_show})'),
+		'itemid'=>		array(T_ZBX_INT, O_OPT, null,	DB_ID.NOT_ZERO,		'isset({config})&&({config}==3)&&isset({report_show})'),
 
 		'items'=>		array(T_ZBX_STR, O_OPT,	null,	DB_ID,		'isset({report_show})&&({config}!=3)'),
 		'new_graph_item'=>	array(T_ZBX_STR, O_OPT,	NULL,	null,		null),
