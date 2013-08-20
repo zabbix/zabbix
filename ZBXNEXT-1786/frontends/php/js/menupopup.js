@@ -133,6 +133,8 @@ jQuery(function($) {
 				.data('isActive', false)
 				.mouseenter(function() {
 					menuPopup.data('isActive', true);
+
+					clearTimeout(window.menuPopupTimeoutHandler);
 				})
 				.mouseleave(function() {
 					menuPopup.data('isActive', false);
@@ -156,10 +158,12 @@ jQuery(function($) {
 	 * @param int    delay
 	 */
 	function closeInactiveMenuPopup(menuPopup, delay) {
-		setTimeout(function() {
+		clearTimeout(window.menuPopupTimeoutHandler);
+
+		window.menuPopupTimeoutHandler = window.setTimeout(function() {
 			if (!menuPopup.data('isActive')) {
 				menuPopup.data('isActive', false);
-				menuPopup.fadeOut(50);
+				menuPopup.fadeOut(0);
 			}
 		}, delay);
 	}
