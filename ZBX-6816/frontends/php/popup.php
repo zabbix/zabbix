@@ -128,7 +128,7 @@ if ($min_user_type > CWebUser::$data['type']) {
  */
 // allowed 'srcfld*' parameter values for each 'srctbl' value
 $allowedSrcFields = array(
-	'users'					=> '"usergrpid", "alias", "userid"',
+	'users'					=> '"usergrpid", "alias", "fullname", "userid"',
 	'triggers'				=> '"description", "triggerid", "expression"',
 	'items'					=> '"itemid", "name"',
 	'prototypes'			=> '"itemid", "name", "flags"',
@@ -627,9 +627,13 @@ elseif ($srctbl == 'users') {
 	$users = API::User()->get($options);
 	order_result($users, 'alias');
 
-	foreach ($users as $unum => $user) {
+	foreach ($users as &$user) {
 		$alias = new CSpan($user['alias'], 'link');
 		$alias->attr('id', 'spanid'.$user['userid']);
+
+		if (isset($srcfld2) && $srcfld2 == 'fullname') {
+			$user[$srcfld2] = getUserFullname($user);
+		}
 
 		if ($multiselect) {
 			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($user['userid']).');';
@@ -652,6 +656,7 @@ elseif ($srctbl == 'users') {
 			$user['surname']
 		));
 	}
+	unset($user);
 
 	if ($multiselect) {
 		$button = new CButton('select', _('Select'), "javascript: addSelectedValues('users', ".zbx_jsvalue($reference).');');

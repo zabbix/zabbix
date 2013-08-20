@@ -190,7 +190,7 @@ if ($bulk) {
 }
 else {
 	$acknowledges = DBselect(
-		'SELECT a.*,u.alias'.
+		'SELECT a.*,u.alias,u.name,u.surname'.
 		' FROM acknowledges a'.
 			' LEFT JOIN users u ON u.userid=a.userid'.
 		' WHERE a.eventid='.$_REQUEST['eventid']
@@ -202,7 +202,7 @@ else {
 
 		while ($acknowledge = DBfetch($acknowledges)) {
 			$acknowledgesTable->addRow(array(
-				new CCol($acknowledge['alias'], 'user'),
+				new CCol(getUserFullname($acknowledge), 'user'),
 				new CCol(zbx_date2str(_('d M Y H:i:s'), $acknowledge['clock']), 'time')),
 				'title'
 			);
@@ -224,7 +224,7 @@ else {
 	}
 }
 
-$messageTable = new CFormTable($title.' "'.CWebUser::$data['alias'].'"');
+$messageTable = new CFormTable($title.' "'.getUserFullname(CWebUser::$data).'"');
 $messageTable->addVar('backurl', $_REQUEST['backurl']);
 
 if (in_array($_REQUEST['backurl'], array('tr_events.php', 'events.php'))) {
