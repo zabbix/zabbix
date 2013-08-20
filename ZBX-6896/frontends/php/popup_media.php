@@ -112,15 +112,10 @@ $types = DBselect(
 		' FROM media_type mt'.
 		whereDbNode('mt.mediatypeid')
 );
-$typesList = array();
-while ($type = DBfetch($types)) {
-	$typesList[$type['mediatypeid']] = array(
-		'name' => get_node_name_by_elid($type['mediatypeid'], null, NAME_DELIMITER).$type['description']
-	);
-}
-CArrayHelper::sort($typesList, array('name'));
-foreach ($typesList as $i => $media_name) {
-	$cmbType->addItem($i, $media_name['name']);
+$types = DBfetchArrayAssoc($types, 'mediatypeid');
+CArrayHelper::sort($types, array('description'));
+foreach ($types as $imediatypeid => $type) {
+	$cmbType->addItem($imediatypeid, get_node_name_by_elid($type['mediatypeid'], null, NAME_DELIMITER).$type['description']);
 }
 $frmMedia->addRow(_('Type'), $cmbType);
 $frmMedia->addRow(_('Send to'), new CTextBox('sendto', $sendto, 48));
