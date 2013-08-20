@@ -1151,11 +1151,12 @@ void	proxy_set_areg_lastid(const zbx_uint64_t lastid)
 static int	proxy_get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht, zbx_uint64_t *lastid)
 {
 	const char	*__function_name = "proxy_get_history_data";
-	int		offset = 0, f, records = 0;
+	int		offset = 0, f, records = 0, records_lim = ZBX_MAX_HRECORDS, retries = 1;
 	char		sql[MAX_STRING_LEN];
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	id;
+	struct timespec	t_sleep = { 0, 100000000L }, t_rem;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s'", __function_name, ht->table);
 
@@ -1167,20 +1168,40 @@ static int	proxy_get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *h
 
 	for (f = 0; NULL != ht->fields[f].field; f++)
 		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, ",%s", ht->fields[f].field);
-
-	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " from %s%s p"
+try_again:
+	zbx_snprintf(sql + offset, sizeof(sql) - offset, " from %s%s p"
 			" where %sp.id>" ZBX_FS_UI64 " order by p.id",
 			ht->from, ht->table,
 			ht->where,
 			id);
 
-	result = DBselectN(sql, ZBX_MAX_HRECORDS);
+	result = DBselectN(sql, records_lim);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_json_addobject(j, NULL);
-
 		ZBX_STR2UINT64(*lastid, row[0]);
+
+		if (1 < *lastid - id)
+		{
+			/* At least one record is missing. It can happen if some DB syncer process has */
+			/* started but yet committed a transaction or a rollback occurred in a DB syncer. */
+			if (0 < retries--)
+			{
+				DBfree_result(result);
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing. Waiting %f sec,"
+						" retrying.", __function_name, *lastid - id - 1,
+						(double)t_sleep.tv_sec + (double)t_sleep.tv_nsec / 1.0e9);
+				nanosleep(&t_sleep, &t_rem);
+				goto try_again;
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing. No more retries.",
+						__function_name, *lastid - id - 1);
+			}
+		}
+
+		zbx_json_addobject(j, NULL);
 
 		for (f = 0; NULL != ht->fields[f].field; f++)
 		{
@@ -1193,6 +1214,9 @@ static int	proxy_get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *h
 		records++;
 
 		zbx_json_close(j);
+
+		id = *lastid;
+		records_lim--;
 	}
 
 	DBfree_result(result);
