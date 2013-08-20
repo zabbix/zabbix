@@ -111,6 +111,7 @@ if ($pageFilter->hostsSelected) {
 	foreach ($httpTests as &$httpTest) {
 		$httpTest['host'] = reset($httpTest['hosts']);
 		$httpTest['hostname'] = $httpTest['host']['name'];
+		unset($httpTest['hosts']);
 	}
 	unset($httpTest);
 
