@@ -739,7 +739,7 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 	));
 
 	// fetch latest values
-	$history = Manager::History()->getLast(zbx_toHash($db_items, 'itemid'));
+	$history = Manager::History()->getLast(zbx_toHash($dbItems, 'itemid'));
 
 	// fetch data for the host JS menu
 	$hosts = API::Host()->get(array(
