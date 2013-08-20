@@ -775,6 +775,11 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		move_out = 1;
 		move_field_nr = find_field_by_name(fields, fields_count, "key_");
 	}
+	else if (0 == strcmp("httptest", table->table))
+	{
+		move_out = 1;
+		move_field_nr = find_field_by_name(fields, fields_count, "name");
+	}
 
 	zbx_vector_uint64_create(&ins);
 
@@ -886,32 +891,18 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 			zbx_vector_uint64_clear(del);
 		}
 
-		/* special preprocessing for 'hostmacro' and 'items' tables to eliminate conflicts */
-		/* in the 'hostid,macro' and 'hostid,key_' unique indexes */
+		/* special preprocessing for 'hostmacro', 'items' and 'httptest' tables to eliminate conflicts */
+		/* in the 'hostid,macro', 'hostid,key_' and 'hostid,name' unique indexes */
 		if (1 < moves.values_num)
 		{
 			sql_offset = 0;
-			if (0 == strcmp("hostmacro", table->table))
-			{
 #ifdef HAVE_MYSQL
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hostmacro "
-						"set macro=concat('#',hostmacroid) where");
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set %s=concat('#',%s) where",
+					table->table, fields[move_field_nr]->name, table->recid);
 #else
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hostmacro "
-						"set macro='#'||hostmacroid where");
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set %s='#'||%s where",
+					table->table, fields[move_field_nr]->name, table->recid);
 #endif
-			}
-			else if (0 == strcmp("items", table->table))
-			{
-#ifdef HAVE_MYSQL
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items "
-						"set key_=concat('#',itemid) where");
-#else
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items "
-						"set key_='#'||itemid where");
-#endif
-			}
-
 			zbx_vector_uint64_sort(&moves, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, table->recid, moves.values,
 					moves.values_num);
