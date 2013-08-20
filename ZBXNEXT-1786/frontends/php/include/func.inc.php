@@ -2600,9 +2600,9 @@ function getMenuPopupHost($options = array()) {
 	);
 
 	if (isset($options['scripts']) && $options['scripts']) {
-		$data['scripts'] = $options['scripts'];
+		CArrayHelper::sort($options['scripts'], array('name'));
 
-		CArrayHelper::sort($options['scripts'], array('field' => 'name'));
+		$data['scripts'] = array_values($options['scripts']);
 	}
 
 	if (isset($options['host']['screens']) && $options['host']['screens']) {
