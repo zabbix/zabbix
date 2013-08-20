@@ -179,8 +179,19 @@ jQuery(function($) {
 				var script = options['scripts'][key];
 
 				if (typeof(script.hostid) !== 'undefined') {
-					var items = script.name.split(/\//g),
-						name = items.pop();
+					var items = [],
+						name,
+						regexp = /(?:[^\/\\]+|\\.)+/g,
+						matched;
+
+					while (matched = regexp.exec(script.name)) {
+						// remove backslash shielding
+						matched[0] = matched[0].replace(/\\\//g, '/');
+
+						items[items.length] = matched[0];
+					}
+
+					name = items.pop();
 
 					prepareTree(menuData, name, items, {
 						scriptId: script.scriptid,
@@ -402,12 +413,12 @@ jQuery(function($) {
 	}
 
 	/**
-	 * Recursive function to prepare menu tree items.
+	 * Recursive function to prepare menu tree data for createTree().
 	 *
 	 * @param array  menu		menu data
 	 * @param string name		script name
 	 * @param array  items		script path
-	 * @param object params		script params
+	 * @param object params		script params ("hostId", "scriptId" and "confirmation" fields)
 	 */
 	function prepareTree(menu, name, items, params) {
 		if (items.length > 0) {

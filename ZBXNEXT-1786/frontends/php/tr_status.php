@@ -551,6 +551,22 @@ foreach ($triggers as $trigger) {
 	}
 	$usedHostCount = count($usedHosts);
 
+	$triggerItems = array();
+	foreach ($trigger['items'] as $item) {
+		$itemName = htmlspecialchars(itemName($item));
+
+		// if we have items from different hosts, we must prefix a host name
+		if ($usedHostCount > 1) {
+			$itemName = $usedHosts[$item['hostid']].NAME_DELIMITER.$itemName;
+		}
+
+		$triggerItems[$itemName] = array(
+			'itemid' => $item['itemid'],
+			'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
+				? 'showgraph' : 'showvalues'
+		);
+	}
+
 	$description = $trigger['description'];
 
 	if ($_REQUEST['show_details']) {
@@ -560,6 +576,14 @@ foreach ($triggers as $trigger) {
 		$font->addItem(explode_exp($trigger['expression'], true, true));
 		$description = array($description, BR(), $font);
 	}
+
+	$description = new CSpan($description, 'link_menu');
+	$description->setMenuPopup(getMenuPopupTrigger(array(
+		'trigger' => $trigger,
+		'withConfiguration' => ($showAdminLinks && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL),
+		'withUrl' => true,
+		'items' => $triggerItems
+	)));
 
 	if (!empty($trigger['dependencies'])) {
 		$dependenciesTable = new CTableInfo();
@@ -599,30 +623,7 @@ foreach ($triggers as $trigger) {
 	}
 	unset($img, $dependenciesTable, $dependency);
 
-	$triggerItems = array();
-	foreach ($trigger['items'] as $item) {
-		$itemName = htmlspecialchars(itemName($item));
-
-		// if we have items from different hosts, we must prefix a host name
-		if ($usedHostCount > 1) {
-			$itemName = $usedHosts[$item['hostid']].NAME_DELIMITER.$itemName;
-		}
-
-		$triggerItems[$itemName] = array(
-			'itemid' => $item['itemid'],
-			'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
-				? 'showgraph' : 'showvalues'
-		);
-	}
-
-	$triggerDescription = new CSpan($description, 'pointer link_menu');
-	$triggerDescription->setMenuPopup(getMenuPopupTrigger(array(
-		'trigger' => $trigger,
-		'withConfiguration' => ($showAdminLinks && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL),
-		'withUrl' => true,
-		'hostid' => $pageFilter->hostid,
-		'items' => $triggerItems
-	)));
+	$triggerDescription = new CSpan($description, 'pointer');
 
 	// host js menu
 	$hostList = array();
