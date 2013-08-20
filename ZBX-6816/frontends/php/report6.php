@@ -61,7 +61,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // actions
 		'delete_item'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'delete_period'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'report_show'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 // filter
 		'report_show'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,		NULL),
 
@@ -72,7 +71,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 		'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})&&("filter"=={favobj})'),
 	);
-	check_fields($fields);
+	$isValid = check_fields($fields);
 
 	// validate permissions
 	if (get_request('config') == 3) {
@@ -222,7 +221,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			? array(array('itemid' => get_request('itemid')))
 			: get_request('items');
 
-		if ($items) {
+		if ($isValid) {
 			$src = 'chart_bar.php?config='.$_REQUEST['config'].
 						url_param('title').
 						url_param('xlabel').
