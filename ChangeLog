@@ -5,6 +5,7 @@ New features:
 A.F.I..... [ZBXNEXT-1569] implemented user name and surname displaying in acknowledgements (Ivo, Oleg)
 
 Bug fixes:
+..F....... [ZBX-6816] improved error message display when provided incorrect group and host IDs (Ivo, Guntis)
 ...G...... [ZBXNEXT-1056] improved active checks error messages (wiper)
 .......P.. [ZBX-6249] fixed data loss in proxy "Data sender" process caused by unfinished transactions; thanks to MATSUDA Daiki for patch (Andris)
 ..F....... [ZBX-6838] fixed not being able to select all host groups in the filter (Pavels)
