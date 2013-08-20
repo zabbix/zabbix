@@ -83,20 +83,11 @@ $_REQUEST['go'] = get_request('go', 'none');
 /*
  * Permissions
  */
-if (get_request('groupid', 0) > 0) {
-	$groupIds = available_groups($_REQUEST['groupid'], 1);
-	if (!$groupIds) {
-		access_deny();
-	}
+if (get_request('groupid') && !API::HostGroup()->isWritable(array($_REQUEST['groupid']))) {
+	access_deny();
 }
-if (get_request('templateid', 0) > 0) {
-	$templates = API::Template()->get(array(
-		'templateids' => $_REQUEST['templateid'],
-		'editable' => true
-	));
-	if (!$templates) {
-		access_deny();
-	}
+if (get_request('templateid') && !API::Template()->isWritable(array($_REQUEST['templateid']))) {
+	access_deny();
 }
 
 $templateIds = get_request('templates', array());

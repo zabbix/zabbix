@@ -53,6 +53,25 @@ $fields = array(
 );
 check_fields($fields);
 
+/*
+ * Permissions
+ */
+if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
+	access_deny();
+}
+if (get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
+	access_deny();
+}
+if (get_request('graphid')) {
+	$graphs = API::Graph()->get(array(
+		'graphids' => array($_REQUEST['graphid']),
+		'output' => array('graphid')
+	));
+	if (!$graphs) {
+		access_deny();
+	}
+}
+
 $pageFilter = new CPageFilter(array(
 	'groups' => array('monitored_hosts' => true, 'with_graphs' => true),
 	'hosts' => array('monitored_hosts' => true, 'with_graphs' => true),
