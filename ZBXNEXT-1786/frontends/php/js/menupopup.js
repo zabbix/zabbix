@@ -76,6 +76,12 @@ jQuery(function($) {
 			else {
 				menuPopup.fadeIn(50);
 			}
+
+			menuPopup.position({
+				of: openner,
+				my: 'left top',
+				at: 'left bottom'
+			});
 		}
 		else {
 			id = new Date().getTime();
