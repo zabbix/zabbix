@@ -34,7 +34,8 @@ class CGraphPrototype extends CGraphGeneral {
 		parent::__construct();
 
 		$this->errorMessages = array_merge($this->errorMessages, array(
-			self::ERROR_TEMPLATE_HOST_MIX => _('Graph prototype "%1$s" with templated items cannot contain items from other hosts.')
+			self::ERROR_TEMPLATE_HOST_MIX =>
+				_('Graph prototype "%1$s" with templated items cannot contain items from other hosts.')
 		));
 	}
 
@@ -581,28 +582,46 @@ class CGraphPrototype extends CGraphGeneral {
 	 * @return void
 	 */
 	protected function checkInput($graphs, $update = false) {
+		$graphs = $this->setGraphDefaultValues($graphs, $update);
+
 		$itemids = array();
+
 		foreach ($graphs as $graph) {
-			// no items
-			if (!isset($graph['gitems']) || !is_array($graph['gitems']) || empty($graph['gitems'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Missing items for graph "%1$s".', $graph['name']));
+			// validate graph name on create
+			$fields = array('name' => null);
+			if (!$update && !check_db_fields($fields, $graph)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "name" field for graph prototype.'));
 			}
 
-			$fields = array('itemid' => null);
-			foreach ($graph['gitems'] as $gitem) {
-				if (!check_db_fields($fields, $gitem)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "itemid" field for item.'));
-				}
+			// on create graph items are mandatory, but on update graph items are optional
+			if ((!$update && (!isset($graph['gitems']) || !is_array($graph['gitems']) || !$graph['gitems']))
+					|| ($update && isset($graph['gitems']) && (!is_array($graph['gitems']) || !$graph['gitems']))) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Missing items for graph prototype "%1$s".', $graph['name'])
+				);
+			}
 
-				// assigning with key preserves unique itemids
-				$itemids[$gitem['itemid']] = $gitem['itemid'];
+			// validate item fields
+			if (isset($graph['gitems'])) {
+				$fields = array('itemid' => null);
+				foreach ($graph['gitems'] as $gitem) {
+					// on create "itemid" is required, on update required only if no "gitemid" is set
+					if ($update && !isset($gitem['gitemid']) && !check_db_fields($fields, $gitem)
+							|| !$update && !check_db_fields($fields, $gitem)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "itemid" field for item.'));
+					}
+
+					// assigning with key preserves unique itemids
+					$itemids[$gitem['itemid']] = $gitem['itemid'];
+				}
 			}
 
 			// add Y axis item IDs for persmission validation
 			if (isset($graph['ymin_type']) && $graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 				if (!isset($graph['ymin_itemid']) || zbx_empty($graph['ymin_itemid'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('No "%1$s" given for graph prototype.', 'ymin_itemid'));
+						_s('No "%1$s" given for graph prototype.', 'ymin_itemid')
+					);
 				}
 				else {
 					$itemids[$graph['ymin_itemid']] = $graph['ymin_itemid'];
@@ -611,7 +630,8 @@ class CGraphPrototype extends CGraphGeneral {
 			if (isset($graph['ymax_type']) && $graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 				if (!isset($graph['ymax_itemid']) || zbx_empty($graph['ymax_itemid'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('No "%1$s" given for graph prototype.', 'ymax_itemid'));
+						_s('No "%1$s" given for graph prototype.', 'ymax_itemid')
+					);
 				}
 				else {
 					$itemids[$graph['ymax_itemid']] = $graph['ymax_itemid'];
@@ -635,30 +655,33 @@ class CGraphPrototype extends CGraphGeneral {
 			}
 		}
 
-
-		parent::checkInput($graphs, $update);
-
 		foreach ($graphs as $graph) {
-			// check if the graph has at least one prototype
-			$hasPrototype = false;
-			foreach ($graph['gitems'] as $gitem) {
-				// $allowedItems used because it is possible to make API call without full item data
-				if ($allowedItems[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
-					$hasPrototype = true;
-					break;
+			if (($update && isset($graph['gitems'])) || !$update) {
+				$hasPrototype = false;
+				if ($graph['gitems']) {
+					// check if the graph has at least one prototype
+					foreach ($graph['gitems'] as $gitem) {
+						// $allowedItems used because it is possible to make API call without full item data
+						if ($allowedItems[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
+							$hasPrototype = true;
+							break;
+						}
+					}
+				}
+
+				if (!$graph['gitems'] || !$hasPrototype) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph prototype must have at least one prototype.'));
 				}
 			}
-			if (!$hasPrototype) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph prototype must have at least one prototype.'));
-			}
 		}
+
+		parent::checkInput($graphs, $update);
 
 		$allowedValueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
 
 		foreach ($allowedItems as $item) {
 			if (!in_array($item['value_type'], $allowedValueTypes)) {
-				self::exception(
-					ZBX_API_ERROR_PARAMETERS,
+				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Cannot add a non-numeric item "%1$s" to graph "%2$s".', $item['name'], $graph['name'])
 				);
 			}

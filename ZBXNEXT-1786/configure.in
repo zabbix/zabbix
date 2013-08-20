@@ -20,7 +20,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT(src/zabbix_server/server.c)
-AM_INIT_AUTOMAKE([zabbix],[2.1.2])
+AM_INIT_AUTOMAKE([zabbix],[2.1.3])
 
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
@@ -1015,7 +1015,7 @@ esac],
 [ipv6=no])
 
 have_db="no"
-have_odbc="no"
+have_unixodbc="no"
 have_web_monitoring="no"
 have_jabber="no"
 have_snmp="no"
@@ -1202,50 +1202,20 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	AGENT_LDFLAGS="${AGENT_LDFLAGS} ${LIBCURL_LDFLAGS}"
 	AGENT_LIBS="${AGENT_LIBS} ${LIBCURL_LIBS}"
 
-	dnl Checking for iODBC support
-	LIBIODBC_CHECK_CONFIG([no])
-	if test "x$want_iodbc" = "xyes"; then
-		if test "x$found_iodbc" = "xyes"; then
-			have_odbc="iODBC"
-		else
-			AC_MSG_ERROR([iODBC library not found])
-		fi
-	fi
-
 	dnl Checking for unixODBC support
 	LIBUNIXODBC_CHECK_CONFIG([no])
 	if test "x$want_unixodbc" = "xyes"; then
-		if test "x$have_odbc" != "xno"; then
-			AC_MSG_ERROR([You can configure for only one ODBC driver.])
-		fi
-
-		if test "x$found_unixodbc" = "xyes"; then
-			have_odbc="unixODBC"
-		else
+		if test "x$found_unixodbc" != "xyes"; then
 			AC_MSG_ERROR($found_unixodbc)
 		fi
+		have_unixodbc="yes"
 	fi
+	CFLAGS="$CFLAGS $UNIXODBC_CFLAGS"
+	SERVER_LDFLAGS="$SERVER_LDFLAGS $UNIXODBC_LDFLAGS"
+	SERVER_LIBS="$SERVER_LIBS $UNIXODBC_LIBS"
 
-	if test "x$have_odbc" != "xno"; then
-
-		ODBC_CFLAGS="$IODBC_CFLAGS $UNIXODBC_CFLAGS"
-		ODBC_LDFLAGS="$IODBC_LDFLAGS $UNIXODBC_LDFLAGS"
-		ODBC_LIBS="$IODBC_LIBS $UNIXODBC_LIBS"
-
-		AC_SUBST(ODBC_CFLAGS)
-		AC_SUBST(ODBC_LDFLAGS)
-		AC_SUBST(ODBC_LIBS)
-
-		AC_DEFINE(HAVE_ODBC, 1, [Define to 1 if ODBC Driver Manager should be used.])
-
-		CFLAGS="$CFLAGS $ODBC_CFLAGS"
-		SERVER_LDFLAGS="$SERVER_LDFLAGS $ODBC_LDFLAGS"
-		SERVER_LIBS="$SERVER_LIBS $ODBC_LIBS"
-
-		PROXY_LDFLAGS="$PROXY_LDFLAGS $ODBC_LDFLAGS"
-		PROXY_LIBS="$PROXY_LIBS $ODBC_LIBS"
-
-	fi
+	PROXY_LDFLAGS="$PROXY_LDFLAGS $UNIXODBC_LDFLAGS"
+	PROXY_LIBS="$PROXY_LIBS $UNIXODBC_LIBS"
 
 	dnl Check for NET-SNMP [by default - skip]
 	LIBNETSNMP_CHECK_CONFIG([no])
@@ -1331,7 +1301,7 @@ if test "x$java" = "xyes"; then
 fi
 
 AM_CONDITIONAL(JABBER, test "x$found_jabber" = "xyes")
-AM_CONDITIONAL(WITH_ODBC, test "x$have_odbc" != "xno")
+AM_CONDITIONAL(WITH_ODBC, test "x$have_unixodbc" == "xyes")
 
 found_ldap="no"
 dnl Check for libLDAP [by default - skip]
@@ -1437,6 +1407,7 @@ AC_OUTPUT([
 	src/libs/zbxexec/Makefile
 	src/libs/zbxself/Makefile
 	src/libs/zbxmodules/Makefile
+	src/libs/zbxregexp/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_get/Makefile
 	src/zabbix_sender/Makefile
@@ -1490,7 +1461,7 @@ echo "  Server details:
     SNMP:                  ${have_snmp}
     IPMI:                  ${have_ipmi}
     SSH:                   ${have_ssh2}
-    ODBC:                  ${have_odbc}
+    ODBC:                  ${have_unixodbc}
     Linker flags:          ${LDFLAGS} ${SERVER_LDFLAGS}
     Libraries:             ${LIBS} ${SERVER_LIBS}"
 
@@ -1507,6 +1478,7 @@ echo "  Proxy details:
     SNMP:                  ${have_snmp}
     IPMI:                  ${have_ipmi}
     SSH:                   ${have_ssh2}
+    ODBC:                  ${have_unixodbc}
     Linker flags:          ${LDFLAGS} ${PROXY_LDFLAGS}
     Libraries:             ${LIBS} ${PROXY_LIBS}"
 

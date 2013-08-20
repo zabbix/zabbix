@@ -34,7 +34,8 @@ class CGraph extends CGraphGeneral {
 		parent::__construct();
 
 		$this->errorMessages = array_merge($this->errorMessages, array(
-			self::ERROR_TEMPLATE_HOST_MIX => _('Graph "%1$s" with templated items cannot contain items from other hosts.')
+			self::ERROR_TEMPLATE_HOST_MIX =>
+				_('Graph "%1$s" with templated items cannot contain items from other hosts.')
 		));
 	}
 
@@ -566,32 +567,48 @@ class CGraph extends CGraphGeneral {
 	}
 
 	/**
-	 * Check graph data
+	 * Check graph data.
 	 *
-	 * @param array $graphs
+	 * @param array   $graphs
 	 * @param boolean $update
 	 *
 	 * @return void
 	 */
 	protected function checkInput($graphs, $update = false) {
+		$graphs = $this->setGraphDefaultValues($graphs, $update);
+
 		$itemids = array();
+
 		foreach ($graphs as $graph) {
-			// no items
-			if (!isset($graph['gitems']) || !is_array($graph['gitems']) || empty($graph['gitems'])) {
+			// validate graph name on create
+			$fields = array('name' => null);
+			if (!$update && !check_db_fields($fields, $graph)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "name" field for graph.'));
+			}
+
+			// on create graph items are mandatory, but on update graph items are optional
+			if ((!$update && (!isset($graph['gitems']) || !is_array($graph['gitems']) || !$graph['gitems']))
+					|| ($update && isset($graph['gitems']) && (!is_array($graph['gitems']) || !$graph['gitems']))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Missing items for graph "%1$s".', $graph['name']));
 			}
 
-			$fields = array('itemid' => null);
-			foreach ($graph['gitems'] as $gitem) {
-				if (!check_db_fields($fields, $gitem)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "itemid" field for item.'));
-				}
 
-				// assigning with key preserves unique itemids
-				$itemids[$gitem['itemid']] = $gitem['itemid'];
+			// validate item fields
+			if (isset($graph['gitems'])) {
+				$fields = array('itemid' => null);
+				foreach ($graph['gitems'] as $gitem) {
+					// on create "itemid" is required, on update required only if no "gitemid" is set
+					if ($update && !isset($gitem['gitemid']) && !check_db_fields($fields, $gitem)
+							|| !$update && !check_db_fields($fields, $gitem)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "itemid" field for item.'));
+					}
+
+					// assigning with key preserves unique itemids
+					$itemids[$gitem['itemid']] = $gitem['itemid'];
+				}
 			}
 
-			// add Y axis item IDs for persmission validation
+			// add Y axis item IDs for permission validation
 			if (isset($graph['ymin_type']) && $graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 				if (!isset($graph['ymin_itemid']) || zbx_empty($graph['ymin_itemid'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No "%1$s" given for graph.', 'ymin_itemid'));
@@ -619,12 +636,10 @@ class CGraph extends CGraphGeneral {
 			'preservekeys' => true
 		));
 
-		// check permissions only for non super admins
-		if (CUser::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			foreach ($itemids as $itemid) {
-				if (!isset($allowedItems[$itemid])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-				}
+		// check if items exist and user has permission to access those items
+		foreach ($itemids as $itemid) {
+			if (!isset($allowedItems[$itemid])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
 
@@ -635,8 +650,7 @@ class CGraph extends CGraphGeneral {
 		// get value type and name for these items
 		foreach ($allowedItems as $item) {
 			if (!in_array($item['value_type'], $allowedValueTypes)) {
-				self::exception(
-					ZBX_API_ERROR_PARAMETERS,
+				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Cannot add a non-numeric item "%1$s" to graph "%2$s".', $item['name'], $graph['name'])
 				);
 			}

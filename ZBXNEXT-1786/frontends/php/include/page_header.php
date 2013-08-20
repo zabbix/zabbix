@@ -25,8 +25,11 @@ if (!isset($page['type'])) {
 if (!isset($page['file'])) {
 	$page['file'] = basename($_SERVER['PHP_SELF']);
 }
-if ($_REQUEST['fullscreen'] = get_request('fullscreen', 0)) {
-	define('ZBX_PAGE_NO_MENU', 1);
+$_REQUEST['fullscreen'] = get_request('fullscreen', 0);
+if ($_REQUEST['fullscreen'] === '1') {
+	if (!defined('ZBX_PAGE_NO_MENU')) {
+		define('ZBX_PAGE_NO_MENU', 1);
+	}
 	define('ZBX_PAGE_FULLSCREEN', 1);
 }
 
@@ -41,7 +44,9 @@ if (!defined('ZBX_PAGE_NO_THEME')) {
 switch ($page['type']) {
 	case PAGE_TYPE_IMAGE:
 		set_image_header();
-		define('ZBX_PAGE_NO_MENU', 1);
+		if (!defined('ZBX_PAGE_NO_MENU')) {
+			define('ZBX_PAGE_NO_MENU', 1);
+		}
 		break;
 	case PAGE_TYPE_XML:
 		header('Content-Type: text/xml');
@@ -171,7 +176,7 @@ CSS;
 	$pageHeader->addJsBeforeScripts('var PHP_TZ_OFFSET = '.date('Z').';');
 
 	// show GUI messages in pages with menus and in fullscreen mode
-	$showGuiMessaging = (!defined('ZBX_PAGE_NO_MENU') || (isset($_REQUEST['fullscreen']) && $_REQUEST['fullscreen'])) ? 1 : 0;
+	$showGuiMessaging = (!defined('ZBX_PAGE_NO_MENU') || $_REQUEST['fullscreen'] == 1) ? 1 : 0;
 	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.CWebUser::$data['lang'].'&showGuiMessaging='.$showGuiMessaging;
 	$pageHeader->addJsFile($path);
 
@@ -217,7 +222,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 	$support = new CLink(_('Get support'), 'http://www.zabbix.com/support.php', 'small_font', null, 'nosid');
 	$support->setTarget('_blank');
 
-	$req = new CUrl($_SERVER['REQUEST_URI']);
+	$req = new CUrl();
 	$req->setArgument('print', 1);
 	$printview = new CLink(_('Print'), $req->getUrl(), 'small_font', null, 'nosid');
 
@@ -238,17 +243,17 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 	}
 
 	if (CWebUser::isGuest()) {
-		$page_header_r_col[] = array(new CLink(_('Login'), 'index.php?reconnect=1', 'small_font', null, 'nosid'));
+		$page_header_r_col[] = array(new CLink(_('Login'), 'index.php?reconnect=1', 'small_font', null, null));
 	}
 	else {
 		// it is not possible to logout from HTTP authentication
 		$chck = $page['file'] == 'authentication.php' && isset($_REQUEST['save'], $_REQUEST['config']);
-		if ($chck && $_REQUEST['config'] == ZBX_AUTH_HTTP || !$chck && $config['authentication_type'] == ZBX_AUTH_HTTP) {
+		if ($chck && $_REQUEST['config'] == ZBX_AUTH_HTTP || !$chck && isset($config) && $config['authentication_type'] == ZBX_AUTH_HTTP) {
 			$logout =  new CLink(_('Logout'), '', 'small_font', null, 'nosid');
 			$logout->setHint(_s('It is not possible to logout from HTTP authentication.'), null, null, false);
 		}
 		else {
-			$logout =  new CLink(_('Logout'), 'index.php?reconnect=1', 'small_font', null, 'nosid');
+			$logout =  new CLink(_('Logout'), 'index.php?reconnect=1', 'small_font', null, null);
 		}
 		array_push($page_header_r_col, $logout);
 	}

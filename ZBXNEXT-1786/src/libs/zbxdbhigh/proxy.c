@@ -216,13 +216,13 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 				",hosts r where t.hostid=r.hostid"
 					" and r.proxy_hostid=" ZBX_FS_UI64
 					" and r.status in (%d,%d)"
-					" and t.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",
+					" and t.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",
 				proxy_hostid,
 				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 				ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c,
 				ITEM_TYPE_SNMPv3, ITEM_TYPE_IPMI, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH,
-				ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP);
+				ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_INTERNAL);
 	}
 	else if (0 == strcmp(table->table, "drules"))
 	{
@@ -775,6 +775,11 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		move_out = 1;
 		move_field_nr = find_field_by_name(fields, fields_count, "key_");
 	}
+	else if (0 == strcmp("httptest", table->table))
+	{
+		move_out = 1;
+		move_field_nr = find_field_by_name(fields, fields_count, "name");
+	}
 
 	zbx_vector_uint64_create(&ins);
 
@@ -886,32 +891,18 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 			zbx_vector_uint64_clear(del);
 		}
 
-		/* special preprocessing for 'hostmacro' and 'items' tables to eliminate conflicts */
-		/* in the 'hostid,macro' and 'hostid,key_' unique indexes */
+		/* special preprocessing for 'hostmacro', 'items' and 'httptest' tables to eliminate conflicts */
+		/* in the 'hostid,macro', 'hostid,key_' and 'hostid,name' unique indexes */
 		if (1 < moves.values_num)
 		{
 			sql_offset = 0;
-			if (0 == strcmp("hostmacro", table->table))
-			{
 #ifdef HAVE_MYSQL
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hostmacro "
-						"set macro=concat('#',hostmacroid) where");
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set %s=concat('#',%s) where",
+					table->table, fields[move_field_nr]->name, table->recid);
 #else
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hostmacro "
-						"set macro='#'||hostmacroid where");
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set %s='#'||%s where",
+					table->table, fields[move_field_nr]->name, table->recid);
 #endif
-			}
-			else if (0 == strcmp("items", table->table))
-			{
-#ifdef HAVE_MYSQL
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items "
-						"set key_=concat('#',itemid) where");
-#else
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items "
-						"set key_='#'||itemid where");
-#endif
-			}
-
 			zbx_vector_uint64_sort(&moves, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, table->recid, moves.values,
 					moves.values_num);
@@ -1375,7 +1366,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	const char		*p = NULL;
 	char			tmp[HOST_ERROR_LEN_MAX], *sql = NULL, *error_esc;
 	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0, tmp_offset;
-	int			availability_alloc = 0, availability_num = 0, availability_last = 0;
+	int			availability_alloc = 0, availability_num = 0;
 	zbx_host_availability_t	*availability = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1412,7 +1403,6 @@ void	process_host_availability(struct zbx_json_parse *jp)
 		}
 
 		tmp_offset = sql_offset;
-		availability_last = availability_num;
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set ");
 
@@ -1508,14 +1498,15 @@ void	process_host_availability(struct zbx_json_parse *jp)
 			zbx_free(error_esc);
 		}
 
-		if (availability_last == availability_num)
+		sql_offset--;
+
+		if (',' != sql[sql_offset])
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data");
 			sql_offset = tmp_offset;
 			continue;
 		}
 
-		sql_offset--;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where hostid=" ZBX_FS_UI64 ";\n", hostid);
 
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
@@ -1963,8 +1954,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 				items[i].host.maintenance_from <= values[i].ts.sec)
 			continue;
 
-		if (ITEM_TYPE_INTERNAL == items[i].type || ITEM_TYPE_AGGREGATE == items[i].type ||
-				ITEM_TYPE_CALCULATED == items[i].type)
+		if (ITEM_TYPE_AGGREGATE == items[i].type || ITEM_TYPE_CALCULATED == items[i].type)
 			continue;
 
 		if (0 == proxy_hostid && ITEM_TYPE_TRAPPER != items[i].type && ITEM_TYPE_ZABBIX_ACTIVE != items[i].type)
@@ -2437,4 +2427,36 @@ exit:
 	zbx_free(host_metadata);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: proxy_get_history_count                                          *
+ *                                                                            *
+ * Purpose: get the number of values waiting to be sent to the sever          *
+ *                                                                            *
+ * Return value: the number of history values                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	proxy_get_history_count()
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	id;
+	int 		count = 0;
+
+	proxy_get_lastid("proxy_history", "history_lastid", &id);
+
+	result = DBselect(
+			"select count(*)"
+			" from proxy_history"
+			" where id>" ZBX_FS_UI64,
+			id);
+
+	if (NULL != (row = DBfetch(result)))
+		count = atoi(row[0]);
+
+	DBfree_result(result);
+
+	return count;
 }

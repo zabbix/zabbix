@@ -94,7 +94,7 @@ class testFormHost extends CWebTest {
 	}
 
 	public function testFormHost_CreateHostNoGroups() {
-		$host = 'Test host w/o groups';
+		$host = 'Test host without groups';
 
 		$sqlHosts = 'select * from hosts where host='.zbx_dbstr($host);
 		$oldHashHosts = DBhash($sqlHosts);
@@ -103,6 +103,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickWait('form');
 		$this->input_type('host', $host);
+
 		$this->zbxTestClickWait('save');
 
 		$this->checkTitle('Configuration of hosts');

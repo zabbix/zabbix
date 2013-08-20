@@ -87,29 +87,21 @@ $_REQUEST['type'] = isset($_REQUEST['type']) ? TRIGGER_MULT_EVENT_ENABLED : TRIG
 $_REQUEST['go'] = get_request('go', 'none');
 
 // validate permissions
-if (get_request('triggerid', false)) {
+if (get_request('triggerid')) {
 	$triggers = API::Trigger()->get(array(
 		'triggerids' => $_REQUEST['triggerid'],
+		'output' => array('triggerid'),
 		'preservekeys' => true,
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 		'editable' => true
 	));
-	if (empty($triggers)) {
+	if (!$triggers) {
 		access_deny();
 	}
 }
-elseif (get_request('hostid', 0) > 0) {
-	$hosts = API::Host()->get(array(
-		'hostids' => $_REQUEST['hostid'],
-		'output' => API_OUTPUT_EXTEND,
-		'templated_hosts' => true,
-		'editable' => true
-	));
-	if (empty($hosts)) {
-		access_deny();
-	}
+if (get_request('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid']))) {
+	access_deny();
 }
-
 /*
  * Actions
  */
@@ -146,13 +138,17 @@ elseif (isset($_REQUEST['save'])) {
 		'dependencies' => zbx_toObject(get_request('dependencies', array()), 'triggerid')
 	);
 
-	if (isset($_REQUEST['triggerid'])) {
+	if (get_request('triggerid')) {
 		// update only changed fields
 		$oldTrigger = API::Trigger()->get(array(
 			'triggerids' => $_REQUEST['triggerid'],
 			'output' => API_OUTPUT_EXTEND,
 			'selectDependencies' => array('triggerid')
 		));
+		if (!$oldTrigger) {
+			access_deny();
+		}
+
 		$oldTrigger = reset($oldTrigger);
 		$oldTrigger['dependencies'] = zbx_toHash(zbx_objectValues($oldTrigger['dependencies'], 'triggerid'));
 
@@ -179,7 +175,6 @@ elseif (isset($_REQUEST['save'])) {
 		if ($updateDepencencies) {
 			$triggerToUpdate['dependencies'] = $newDependencies;
 		}
-
 		$result = API::Trigger()->update($triggerToUpdate);
 		show_messages($result, _('Trigger updated'), _('Cannot update trigger'));
 	}
@@ -390,7 +385,8 @@ else {
 	$data = array(
 		'showdisabled' => get_request('showdisabled', 1),
 		'parent_discoveryid' => null,
-		'triggers' => array()
+		'triggers' => array(),
+		'displayNodes' => (is_array(get_current_nodeid()) && empty($_REQUEST['groupid']) && empty($_REQUEST['hostid']))
 	);
 	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);
 
@@ -443,6 +439,27 @@ else {
 
 	// get real hosts
 	$data['realHosts'] = getParentHostsByTriggers($data['triggers']);
+
+	// determine, show or not column of errors
+	$data['showErrorColumn'] = true;
+	if ($data['hostid'] > 0) {
+		$host = API::Host()->get(array(
+			'hostids' => $_REQUEST['hostid'],
+			'output' => array('status'),
+			'templated_hosts' => true,
+			'editable' => true
+		));
+		$host = reset($host);
+		$data['showErrorColumn'] = (!$host || $host['status'] != HOST_STATUS_TEMPLATE);
+	}
+
+	// nodes
+	if ($data['displayNodes']) {
+		foreach ($data['triggers'] as &$trigger) {
+			$trigger['nodename'] = get_node_name_by_elid($trigger['triggerid'], true);
+		}
+		unset($trigger);
+	}
 
 	// render view
 	$triggersView = new CView('configuration.triggers.list', $data);

@@ -23,7 +23,6 @@
 		$config = select_config();
 		$data = array('is_profile' => $isProfile);
 
-		// get title
 		if (isset($userid)) {
 			$options = array(
 				'userids' => $userid,
@@ -32,16 +31,15 @@
 			if ($data['is_profile']) {
 				$options['nodeids'] = id2nodeid($userid);
 			}
-			$users = API::User()->get($options);
 
+			$users = API::User()->get($options);
 			$user = reset($users);
-			$data['title'] = _('User').' "'.$user['alias'].'"';
+
+			$data['auth_type'] = get_user_system_auth($userid);
 		}
 		else {
-			$data['title'] = _('User');
+			$data['auth_type'] = $config['authentication_type'];
 		}
-
-		$data['auth_type'] = isset($userid) ? get_user_system_auth($userid) : $config['authentication_type'];
 
 		if (isset($userid) && (!isset($_REQUEST['form_refresh']) || isset($_REQUEST['register']))) {
 			$data['alias']			= $user['alias'];
@@ -328,6 +326,8 @@
 	}
 
 	function getItemFilterForm(&$items) {
+		$displayNodes = is_array(get_current_nodeid());
+
 		$filter_groupId				= $_REQUEST['filter_groupid'];
 		$filter_hostId				= $_REQUEST['filter_hostid'];
 		$filter_application			= $_REQUEST['filter_application'];
@@ -508,7 +508,8 @@
 			if (!empty($getHostInfo)) {
 				$groupFilter[] = array(
 					'id' => $getHostInfo['groupid'],
-					'name' => $getHostInfo['name']
+					'name' => $getHostInfo['name'],
+					'prefix' => $displayNodes ? get_node_name_by_elid($getHostInfo['groupid'], true, NAME_DELIMITER) : ''
 				);
 			}
 		}
@@ -517,13 +518,13 @@
 			new CCol(bold(_('Host group').NAME_DELIMITER), 'label col1'),
 			new CCol(array(
 				new CMultiSelect(array(
-						'name' => 'filter_groupid',
-						'selectedLimit' => 1,
-						'objectName' => 'hostGroup',
-						'objectOptions' => array(
-							'editable' => true
-						),
-						'data' => $groupFilter
+					'name' => 'filter_groupid',
+					'selectedLimit' => 1,
+					'objectName' => 'hostGroup',
+					'objectOptions' => array(
+						'editable' => true
+					),
+					'data' => $groupFilter
 				))
 			), 'col1'),
 			new CCol(bold(_('Type').NAME_DELIMITER), 'label col2'),
@@ -538,13 +539,15 @@
 		if (!empty($filter_hostId)) {
 			$getHostInfo = API::Host()->get(array(
 				'hostids' => $filter_hostId,
+				'templated_hosts' => true,
 				'output' => array('name')
 			));
 			$getHostInfo = reset($getHostInfo);
 			if (!empty($getHostInfo)) {
 				$hostFilterData[] = array(
 					'id' => $getHostInfo['hostid'],
-					'name' => $getHostInfo['name']
+					'name' => $getHostInfo['name'],
+					'prefix' => $displayNodes ? get_node_name_by_elid($filter_hostId, true, NAME_DELIMITER) : ''
 				);
 			}
 		}
@@ -553,13 +556,14 @@
 			new CCol(bold(_('Host').NAME_DELIMITER), 'label'),
 			new CCol(array(
 				new CMultiSelect(array(
-						'name' => 'filter_hostid',
-						'selectedLimit' => 1,
-						'objectName' => 'hosts',
-						'objectOptions' => array(
-							'editable' => true
-						),
-						'data' => $hostFilterData
+					'name' => 'filter_hostid',
+					'selectedLimit' => 1,
+					'objectName' => 'hosts',
+					'objectOptions' => array(
+						'editable' => true,
+						'templated_hosts' => true
+					),
+					'data' => $hostFilterData
 				))
 			), 'col1'),
 			new CCol($updateIntervalLabel, 'label'),
@@ -577,7 +581,8 @@
 				new CButton('btn_app', _('Select'),
 					'return PopUp("popup.php?srctbl=applications&srcfld1=name'.
 						'&dstfrm='.$form->getName().'&dstfld1=filter_application'.
-						'&with_applications=1&hostid=" + jQuery("input[name=\'filter_hostid\']").val()'
+						'&with_applications=1'.
+						'" + (jQuery("input[name=\'filter_hostid\']").length > 0 ? "&hostid="+jQuery("input[name=\'filter_hostid\']").val() : "")'
 						.', 550, 450, "application");',
 					'filter-select-button'
 				)
@@ -1036,8 +1041,10 @@
 		$data['types'] = item_type2str();
 		unset($data['types'][ITEM_TYPE_HTTPTEST]);
 		if (!empty($options['is_discovery_rule'])) {
-			unset($data['types'][ITEM_TYPE_AGGREGATE], $data['types'][ITEM_TYPE_CALCULATED],
-					$data['types'][ITEM_TYPE_SNMPTRAP], $data['types'][ITEM_TYPE_DB_MONITOR]);
+			unset($data['types'][ITEM_TYPE_AGGREGATE],
+				$data['types'][ITEM_TYPE_CALCULATED],
+				$data['types'][ITEM_TYPE_SNMPTRAP]
+			);
 		}
 
 		// item
@@ -1392,10 +1399,11 @@
 
 			$data['limited'] = $data['trigger']['templateid'] ? 'yes' : null;
 
-			// if no host has been selected for the navigation panel, use the first trigger host
-			if (!$data['hostid']) {
-				$hosts = reset($data['trigger']['hosts']);
-				$data['hostid'] = $hosts['hostid'];
+			// select first host from triggers if gived not match
+			$hosts = $data['trigger']['hosts'];
+			if (count($hosts) > 0 && !in_array(array('hostid' => $data['hostid']), $hosts)) {
+				$host = reset($hosts);
+				$data['hostid'] = $host['hostid'];
 			}
 		}
 

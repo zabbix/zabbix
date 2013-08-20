@@ -214,7 +214,7 @@ elseif (isset($_REQUEST['save'])) {
 			$dbHttpTest = reset($dbHttpTest);
 			$dbHttpSteps = zbx_toHash($dbHttpTest['steps'], 'httpstepid');
 
-			$httpTest = CArrayHelper::unsetEqualValues($httpTest, $dbHttpTest);
+			$httpTest = CArrayHelper::unsetEqualValues($httpTest, $dbHttpTest, array('applicationid'));
 			foreach ($httpTest['steps'] as $snum => $step) {
 				if (isset($step['httpstepid'])) {
 					$newStep = CArrayHelper::unsetEqualValues($step, $dbHttpSteps[$step['httpstepid']], array('httpstepid'));
@@ -228,7 +228,7 @@ elseif (isset($_REQUEST['save'])) {
 				throw new Exception();
 			}
 			else {
-				clearCookies($result);
+				clearCookies($result, $_REQUEST['hostid']);
 			}
 
 		}
@@ -238,7 +238,7 @@ elseif (isset($_REQUEST['save'])) {
 				throw new Exception();
 			}
 			else {
-				clearCookies($result);
+				clearCookies($result, $_REQUEST['hostid']);
 			}
 			$httptestid = reset($result['httptestids']);
 		}
@@ -284,7 +284,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 	}
 
 	show_messages($goResult, $msg_ok, $msg_problem);
-	clearCookies($goResult);
+	clearCookies($goResult, $_REQUEST['hostid']);
 }
 elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'])) {
 	$goResult = false;
@@ -305,13 +305,13 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'
 	}
 
 	show_messages($goResult, _('History cleared'), null);
-	clearCookies($goResult);
+	clearCookies($goResult, $_REQUEST['hostid']);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_httptestid'])) {
 	$goResult = API::HttpTest()->delete($_REQUEST['group_httptestid']);
 
 	show_messages($goResult, _('Web scenario deleted'), _('Cannot delete web scenario'));
-	clearCookies($goResult);
+	clearCookies($goResult, $_REQUEST['hostid']);
 }
 
 show_messages();
@@ -432,7 +432,8 @@ else {
 		'pageFilter' => $pageFilter,
 		'showDisabled' => $showDisabled,
 		'httpTests' => array(),
-		'paging' => null
+		'paging' => null,
+		'displayNodes' => (is_array(get_current_nodeid()) && empty($_REQUEST['groupid']) && empty($_REQUEST['hostid']))
 	);
 
 	if ($data['pageFilter']->hostsSelected) {
@@ -484,6 +485,14 @@ else {
 		$data['parentTemplates'] = getHttpTestsParentTemplates($httpTests);
 
 		$data['httpTests'] = $httpTests;
+	}
+
+	// nodes
+	if ($data['displayNodes']) {
+		foreach ($data['httpTests'] as &$httpTest) {
+			$httpTest['nodename'] = get_node_name_by_elid($httpTest['httptestid'], true);
+		}
+		unset($httpTest);
 	}
 
 	// render view

@@ -55,9 +55,10 @@ $pageFilter = new CPageFilter($options);
 $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = $pageFilter->hostid;
 
+$displayNodes = (is_array(get_current_nodeid()) && $pageFilter->groupid == 0 && $pageFilter->hostid == 0);
 
 $r_form = new CForm('get');
-$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
+$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
 $r_form->addItem(array(_('Group').SPACE,$pageFilter->getGroupsCB(true)));
 $r_form->addItem(array(SPACE._('Host').SPACE,$pageFilter->getHostsCB(true)));
 
@@ -72,6 +73,7 @@ $httpmon_wdgt->addHeaderRowNumber();
 // TABLE
 $table = new CTableInfo(_('No web checks defined.'));
 $table->SetHeader(array(
+	$displayNodes ? _('Node') : null,
 	$_REQUEST['hostid'] == 0 ? make_sorting_header(_('Host'), 'hostname') : null,
 	make_sorting_header(_('Name'), 'name'),
 	_('Number of steps'),
@@ -118,7 +120,7 @@ if ($pageFilter->hostsSelected) {
 	order_result($httpTests, getPageSortField('name'), getPageSortOrder());
 
 	// fetch the latest results of the web scenario
-	$lastHttpTestData = Manager::HttpTest()->fetchLastData(array_keys($httpTests));
+	$lastHttpTestData = Manager::HttpTest()->getLastData(array_keys($httpTests));
 
 	foreach($httpTests as $httpTest) {
 		$lastData = isset($lastHttpTestData[$httpTest['httptestid']]) ? $lastHttpTestData[$httpTest['httptestid']] : null;
@@ -146,6 +148,7 @@ if ($pageFilter->hostsSelected) {
 		}
 
 		$table->addRow(new CRow(array(
+			$displayNodes ? get_node_name_by_elid($httpTest['httptestid'], true) : null,
 			($_REQUEST['hostid'] > 0) ? null : $httpTest['hostname'],
 			new CLink($httpTest['name'], 'httpdetails.php?httptestid='.$httpTest['httptestid']),
 			$httpTest['steps'],

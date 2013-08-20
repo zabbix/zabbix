@@ -161,15 +161,21 @@ function addTriggerValueStyle($object, $triggerValue, $triggerLastChange, $isAck
 	}
 }
 
-function trigger_value2str($value) {
-	$str_val[TRIGGER_VALUE_FALSE] = _('OK');
-	$str_val[TRIGGER_VALUE_TRUE] = _('PROBLEM');
+function trigger_value2str($value = null) {
+	$triggerValues = array(
+		TRIGGER_VALUE_FALSE => _('OK'),
+		TRIGGER_VALUE_TRUE => _('PROBLEM')
+	);
 
-	if (isset($str_val[$value])) {
-		return $str_val[$value];
+	if ($value === null) {
+		return $triggerValues;
 	}
-
-	return _('Unknown');
+	elseif (isset($triggerValues[$value])) {
+		return $triggerValues[$value];
+	}
+	else {
+		return _('Unknown');
+	}
 }
 
 function discovery_value($val = null) {

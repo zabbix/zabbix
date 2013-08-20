@@ -1062,7 +1062,7 @@ function make_webmon_overview($filter) {
 	));
 
 	// fetch HTTP test execution data
-	$httpTestData = Manager::HttpTest()->fetchLastData(zbx_objectValues($result, 'httptestid'));
+	$httpTestData = Manager::HttpTest()->getLastData(zbx_objectValues($result, 'httptestid'));
 
 	foreach ($result as $row) {
 		if (!isset($httpTestData[$row['httptestid']])) {

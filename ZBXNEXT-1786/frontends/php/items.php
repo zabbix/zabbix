@@ -188,17 +188,20 @@ if (get_request('itemid', false)) {
 		'itemids' => $_REQUEST['itemid'],
 		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
 		'output' => array('itemid'),
+		'selectHosts' => array('status'),
 		'editable' => true,
 		'preservekeys' => true
 	));
 	if (empty($item)) {
 		access_deny();
 	}
+	$item = reset($item);
+	$hosts = $item['hosts'];
 }
 elseif (get_request('hostid', 0) > 0) {
 	$hosts = API::Host()->get(array(
 		'hostids' => $_REQUEST['hostid'],
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('status'),
 		'templated_hosts' => true,
 		'editable' => true
 	));
@@ -899,7 +902,8 @@ else {
 	$data = array(
 		'form' => get_request('form'),
 		'hostid' => get_request('hostid'),
-		'sortfield' => getPageSortField('name')
+		'sortfield' => getPageSortField('name'),
+		'displayNodes' => (is_array(get_current_nodeid()) && empty($_REQUEST['filter_groupid']) && empty($_REQUEST['filter_hostid']))
 	);
 
 	// items
@@ -1099,6 +1103,22 @@ else {
 		'preservekeys' => true
 	));
 	$data['triggerRealHosts'] = getParentHostsByTriggers($data['itemTriggers']);
+
+	// nodes
+	if ($data['displayNodes']) {
+		foreach ($data['items'] as $key => $item) {
+			$data['items'][$key]['nodename'] = get_node_name_by_elid($item['itemid'], true);
+		}
+	}
+
+	// determine, show or not column of errors
+	if (isset($hosts)) {
+		$host = reset($hosts);
+		$data['showErrorColumn'] = ($host['status'] != HOST_STATUS_TEMPLATE);
+	}
+	else {
+		$data['showErrorColumn'] = true;
+	}
 
 	// render view
 	$itemView = new CView('configuration.item.list', $data);
