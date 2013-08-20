@@ -5,6 +5,7 @@ New features:
 A.F.I..... [ZBXNEXT-1569] implemented user name and surname displaying in acknowledgements (Ivo, Oleg)
 
 Bug fixes:
+.......P.. [ZBX-6249] fixed data loss in proxy "Data sender" process caused by unfinished transactions; thanks to MATSUDA Daiki for patch (Andris)
 ..F....... [ZBX-6838] fixed not being able to select all host groups in the filter (Pavels)
 ..F....... [ZBX-6275] fixed error after saving an LLD rule (Guntis)
 ..F....... [ZBX-6275] fixed several "error" column displaying problems in template item and trigger list (Guntis)
@@ -31,7 +32,7 @@ A......... [ZBX-6885] fixed host group error message on delete (Vitalij)
 A.F....... [ZBX-6865] fixed "NULL" value validation (Ivo)
 ..F....... [ZBX-6863] fixed severity buttonset colors displayng (Eduard)
 A......... [ZBX-6386] fixed discovered fields update validation in items, triggers and graphs (Eduard)
-A.F.I..... [ZBX-6020] fixed displaying MySQL errors for PHP 5.5.0 and newer; thanks to Michel Meyers (Ivo)
+A.F.I..... [ZBX-6020] fixed displaying MySQL errors for PHP 5.5.0 and newer; thanks to Michel Meyers (Ivo)
 .......PS. [ZBX-6746] fixed template linking to proxy if the agent with the same name is auto-registered (igors)
 A......... [ZBX-6458] fixed "name" parameter validation for hostgroup.update method and improved error messages (Ivo)
 ..F....... [ZBX-6838] fixed bug with SQL errors in the application popup window (Guntis)
