@@ -1,3 +1,15 @@
+Changes for 2.1.3
+
+New features:
+.......PS. [ZBX-6852] removed support of iODBC (Sasha)
+A.F.I..... [ZBXNEXT-1569] implemented user name and surname displaying in acknowledgements (Ivo, Oleg)
+
+Bug fixes:
+..F....... [ZBX-6275] fixed error after saving an LLD rule (Guntis)
+..F....... [ZBX-6275] fixed several "error" column displaying problems in template item and trigger list (Guntis)
+..F.....S. [ZBX-6882] fixed "Undexined index" on queue page; server won't include lld-rules in queue (Eduard, Sasha)
+
+--------------------------------------------------------------------------------
 Changes for 2.1.2
 
 New features:
@@ -10,6 +22,7 @@ New features:
 
 Bug fixes:
 .......P.. [ZBX-6897] fixed synchronization of the "httptest" configuration table (Sasha)
+........S. [ZBX-6898] fixed processing of queue request; not checked items will be included to the queue (Sasha)
 ........S. [ZBX-6889] fixed processing of availability data by the server (Sasha)
 A......... [ZBX-6885] fixed host group error message on delete (Vitalij)
 ....I..... [ZBX-1583] removed duplicated indexes for 6 tables when using MySQL (igors)
@@ -143,13 +156,13 @@ A.F....... [ZBXNEXT-1323] implemented macros in script confirmation text (Eduard
 ..F....... [ZBXNEXT-1441] added media type name to action operations description (Vedmak)
 A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression field for triggers (Sasha)
 ..F....... [ZBXNEXT-1433] moved operation delay field to Operation tab (Eduard)
-..F.I..PS. [ZBXNEXT-1322] automatic update of database structure when upgrading to newer version (Sasha, Vedmak)
+..F.I..PS. [ZBXNEXT-1322] implemented automatic update of database structure when upgrading to newer version (Sasha, Vedmak)
 ..F.....S. [ZBX-3236] added support of value mapping for character data (Sasha, Vedmak)
 .......P.. [ZBX-3817] improved performance of the "data sender" process (Sasha)
 .......PS. [ZBX-5436] added support of AllowRoot paramater by server and proxy daemons (Sasha)
-..F....... [ZBX-5180] maintenance periods form redesign (Vedmak)
-.......PS. [ZBXNEXT-1335] pingers work without connection to a database (Sasha)
-..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
+..F....... [ZBX-5180] redesigned maintenance periods form (Vedmak)
+.......PS. [ZBXNEXT-1335] changed pingers to work without connection to a database (Sasha)
+..F....... [ZBX-5127] redesigned regular expressions form (Vedmak)
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
