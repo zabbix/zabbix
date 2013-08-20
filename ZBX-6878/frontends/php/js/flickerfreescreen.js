@@ -111,7 +111,9 @@ jQuery(function($) {
 					}
 					else {
 						ajaxUrl.setArgument('resourcetype', !empty(screen.resourcetype) ? screen.resourcetype : null);
-						ajaxUrl.setArgument('itemid', !empty(screen.data.itemid) ? screen.data.itemid : null);
+						for (var i = 0; i < screen.data.itemid.length; i++) {
+							ajaxUrl.setArgument('itemid['+screen.data.itemid[i]+']', !empty(screen.data.itemid[i]) ? screen.data.itemid[i] : null);
+						}
 						ajaxUrl.setArgument('action', !empty(screen.data.action) ? screen.data.action : null);
 						ajaxUrl.setArgument('filter', !empty(screen.data.filter) ? screen.data.filter : null);
 						ajaxUrl.setArgument('filter_task', !empty(screen.data.filterTask) ? screen.data.filterTask : null);

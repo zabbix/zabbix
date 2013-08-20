@@ -140,10 +140,9 @@ foreach ($_REQUEST['itemid'] as $itemid) {
 $item = reset($items);
 $host = reset($item['hosts']);
 $item['hostname'] = $host['name'];
-$itemid = reset($_REQUEST['itemid']);
 
 $data = array(
-	'itemid' => $itemid,
+	'itemid' => get_request('itemid'),
 	'items' => $items,
 	'item' => $item,
 	'action' => get_request('action'),
