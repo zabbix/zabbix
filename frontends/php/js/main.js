@@ -411,27 +411,30 @@ var chkbxRange = {
 	}
 };
 
-/*
+/**
  * Add and remove css class 'not-monitored' for select dropdowns.
  */
 var selectDropdownBox = {
 	init: function () {
-		if (jQuery(".input.select").length) {
-			jQuery(".input.select").each(function() {
-				selectDropdownBox.change(this);
+		var $selects = jQuery(".input.select");
+		if ($selects.length) {
+			$selects.each(function() {
+				var $this = jQuery(this);
+				selectDropdownBox.change($this);
 
-				jQuery(this).change(function() {
-					selectDropdownBox.change(this);
+				$this.change(function() {
+					selectDropdownBox.change(jQuery(this));
 				});
 			});
 		}
 	},
 
 	change: function (obj) {
-		jQuery(obj).removeClass('not-monitored');
-		jQuery(obj).find("option").each(function() {
-			if (this.selected == true && jQuery(this).hasClass('not-monitored')) {
-				jQuery(this).parent().addClass('not-monitored');
+		obj.removeClass('not-monitored');
+		obj.find("option").each(function() {
+			var $this = jQuery(this);
+			if (this.selected == true && $this.hasClass('not-monitored')) {
+				$this.parent().addClass('not-monitored');
 			}
 		});
 	}
