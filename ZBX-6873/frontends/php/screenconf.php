@@ -291,7 +291,8 @@ else {
 	order_result($data['screens'], $sortfield, getPageSortOrder());
 
 	// paging
-	$data['paging'] = getPagingLine($data['screens']);
+	$urlParams = array('templateid' => $_REQUEST['templateid']);
+	$data['paging'] = getPagingLine($data['screens'], $urlParams);
 
 	// nodes
 	if ($data['displayNodes'] = is_array(get_current_nodeid())) {
