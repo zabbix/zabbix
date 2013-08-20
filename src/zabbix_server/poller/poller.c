@@ -482,7 +482,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			res = get_value_internal(item, result);
 			break;
 		case ITEM_TYPE_DB_MONITOR:
-#ifdef HAVE_ODBC
+#ifdef HAVE_UNIXODBC
 			alarm(CONFIG_TIMEOUT);
 			res = get_value_db(item, result);
 			alarm(0);
