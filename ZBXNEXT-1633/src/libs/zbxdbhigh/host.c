@@ -1209,15 +1209,13 @@ void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 		num = triggerids->values_num;
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select triggerid"
+				"select distinct triggerid"
 				" from trigger_discovery"
 				" where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_triggerid",
 				triggerids->values, triggerids->values_num);
 
 		DBselect_uint64(sql, triggerids);
-
-		zbx_vector_uint64_uniq(triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	}
 	while (num != triggerids->values_num);
 
@@ -1393,15 +1391,13 @@ void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
 		num = graphids->values_num;
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select graphid"
+				"select distinct graphid"
 				" from graph_discovery"
 				" where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_graphid",
 				graphids->values, graphids->values_num);
 
 		DBselect_uint64(sql, graphids);
-
-		zbx_vector_uint64_uniq(graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	}
 	while (num != graphids->values_num);
 
@@ -1533,13 +1529,11 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 	{
 		num = itemids->values_num;
 		sql_offset = 0;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select itemid from item_discovery where");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select distinct itemid from item_discovery where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_itemid",
 				itemids->values, itemids->values_num);
 
 		DBselect_uint64(sql, itemids);
-
-		zbx_vector_uint64_uniq(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	}
 	while (num != itemids->values_num);
 
