@@ -154,6 +154,6 @@ class testFormMap extends CWebTest {
 	 */
 	public function testFormMap_testZBX6840() {
 		$this->zbxTestLogin('maps.php');
-		$this->zbxTestDropdownSelectWait('sysmapid', 'testZBX6804');
+		$this->zbxTestDropdownSelectWait('sysmapid', 'testZBX6840');
 	}
 }
