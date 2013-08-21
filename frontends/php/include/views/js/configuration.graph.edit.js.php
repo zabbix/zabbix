@@ -131,7 +131,7 @@
 			var item = [];
 			item['number'] = jQuery('#itemsTable tr.sortable').length;
 			item['number_nr'] = item['number'] + 1;
-			item['gitemid'] = 0;
+			item['gitemid'] = null;
 			item['graphid'] = <?php echo $this->data['graphid']; ?>;
 			item['itemid'] = list.values[i].itemid;
 			item['type'] = null;
@@ -156,15 +156,11 @@
 	}
 
 	function getOnlyHostParam() {
-		var param = '';
-
-		jQuery(document).ready(function() {
-			param = (<?php echo $this->data['is_template'] ? 'true' : 'false'; ?>)
-				? '&only_hostid=<?php echo $this->data['hostid']; ?>'
-				: '&real_hosts=1';
-		});
-
-		return param;
+		<?php if ($this->data['is_template']): ?>
+			return '&only_hostid=<?php echo $this->data['hostid']; ?>';
+		<?php else: ?>
+			return '&real_hosts=1';
+		<?php endif ?>
 	}
 
 	function rewriteNameLinks() {

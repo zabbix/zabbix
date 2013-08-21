@@ -37,6 +37,16 @@ $fields = array(
 );
 check_fields($fields);
 
+/*
+ * Permissions
+ */
+if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
+	access_deny();
+}
+if (get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
+	access_deny();
+}
+
 validate_sort_and_sortorder('name', ZBX_SORT_DOWN);
 
 $options = array(

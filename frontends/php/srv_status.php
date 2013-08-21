@@ -32,11 +32,23 @@ define('ZBX_PAGE_DO_REFRESH', 1);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
+$periods = array(
+	'today' => _('Today'),
+	'week' => _('This week'),
+	'month' => _('This month'),
+	'year' => _('This year'),
+	24 => _('Last 24 hours'),
+	24 * 7 => _('Last 7 days'),
+	24 * 30 => _('Last 30 days'),
+	24 * DAY_IN_YEAR => _('Last 365 days')
+);
+
+
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'serviceid' =>	array(T_ZBX_INT, O_OPT, P_SYS|P_NZERO, DB_ID,	null),
 	'showgraph' =>	array(T_ZBX_INT, O_OPT, P_SYS,	IN('1'),		'isset({serviceid})'),
-	'period' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
+	'period' =>		array(T_ZBX_STR, O_OPT, P_SYS,	IN('"'.implode('","', array_keys($periods)).'"'),	null),
 	'fullscreen' => array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),		null)
 );
 check_fields($fields);
@@ -57,16 +69,6 @@ if (isset($_REQUEST['serviceid']) && isset($_REQUEST['showgraph'])) {
 	}
 }
 else {
-	$periods = array(
-		'today' => _('Today'),
-		'week' => _('This week'),
-		'month' => _('This month'),
-		'year' => _('This year'),
-		24 => _('Last 24 hours'),
-		24 * 7 => _('Last 7 days'),
-		24 * 30 => _('Last 30 days'),
-		24 * DAY_IN_YEAR => _('Last 365 days')
-	);
 	$period = get_request('period', 7 * 24);
 	$period_end = time();
 
