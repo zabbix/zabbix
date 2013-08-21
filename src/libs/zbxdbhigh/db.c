@@ -1603,6 +1603,23 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 	}
 
 	if (SUCCEED == res)
+        {
+                result = DBselect(
+                                "select actionid"
+                                " from actions"
+                                " where eventsource=%d"
+                                        " and status=%d"
+                                        DB_NODE,
+                                EVENT_SOURCE_AUTO_REGISTRATION,
+                                ACTION_STATUS_ACTIVE,
+                                DBnode_local("actionid"));
+        
+                if (NULL != DBfetch(result))
+                        res = FAIL;
+                DBfree_result(result);
+        }
+
+       if (SUCCEED == res)
 	{
 		ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
 		dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
