@@ -186,7 +186,7 @@ $icons = DBselect(
 );
 while ($icon = DBfetch($icons)) {
 	$data['iconList'][] = array('imageid' => $icon['imageid'], 'name' => $icon['name']);
-	if ($icon['name'] == DEFAULT_ADD_ICON_NAME || !isset($data['defaultIconId'])) {
+	if ($icon['name'] == MAP_DEFAULT_ICON || !isset($data['defaultIconId'])) {
 		$data['defaultIconId'] = $icon['imageid'];
 		$data['defaultIconName'] = $icon['name'];
 	}
