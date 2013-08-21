@@ -5,9 +5,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-10 04:19+0300\n"
-"PO-Revision-Date: 2013-04-28 10:14+0200\n"
-"Last-Translator: 鹏 <pengyao@pengyao.org>\n"
+"POT-Creation-Date: 2013-08-21 22:58+0300\n"
+"PO-Revision-Date: 2013-08-16 03:47+0200\n"
+"Last-Translator: solutionware <shiys@solutionware.com.cn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -81,7 +81,7 @@ msgstr "(0 -无限地)"
 #: include/views/configuration.hostgroups.list.php:31
 #: include/views/configuration.template.edit.php:143
 msgid "(Only super admins can create groups)"
-msgstr ""
+msgstr "只有超级管理员才能创建组"
 
 #: include/forms.inc.php:539 include/forms.inc.php:554
 msgid "(in days)"
@@ -872,7 +872,7 @@ msgstr "变亮"
 
 #: include/locales.inc.php:46
 msgid "Bulgarian (bg_BG)"
-msgstr ""
+msgstr "保加利亚语"
 
 #: tr_status.php:780
 msgid "Bulk acknowledge"
@@ -1099,7 +1099,7 @@ msgstr "无法断开连接模板"
 msgid "Canada (136 characters)"
 msgstr "加拿大 (136 字符)"
 
-#: include/classes/class.cbuttoncancel.php:25 include/config.inc.php:262
+#: include/classes/class.cbuttoncancel.php:25 include/config.inc.php:267
 #: include/forms.inc.php:1707 include/forms.inc.php:2010
 #: include/js.inc.php:222 include/setup.inc.php:137
 #: include/views/configuration.action.edit.php:946
@@ -2201,7 +2201,7 @@ msgstr "列跨幅"
 #: api/classes/CScreenItem.php:613
 #, php-format
 msgid "Column span of screen element located at X - %1$s and Y - %2$s is too big."
-msgstr ""
+msgstr "屏幕元素位于x - %1$s 和Y - %2$s 的列跨度太大"
 
 #: include/views/configuration.screen.edit.php:40 screenconf.php:51
 msgid "Columns"
@@ -3504,7 +3504,7 @@ msgid "Description"
 msgstr "描述"
 
 #: include/actions.inc.php:868 include/blocks.inc.php:716
-#: include/config.inc.php:344
+#: include/config.inc.php:349
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:43
 #: include/views/configuration.action.edit.php:317
@@ -3550,19 +3550,19 @@ msgstr "最末和之前的值的差, 则 N 非 1, 0 - 除外"
 
 #: popup_trexpr.php:178
 msgid "Difference between last and previous value is < N"
-msgstr ""
+msgstr "最后和先前的值之间的差异是 < N"
 
 #: popup_trexpr.php:186
 msgid "Difference between last and previous value is = N"
-msgstr ""
+msgstr "最后和先前的值之间的差异是 = N"
 
 #: popup_trexpr.php:182
 msgid "Difference between last and previous value is > N"
-msgstr ""
+msgstr "最后和先前的值之间的差异是 > N"
 
 #: popup_trexpr.php:190
 msgid "Difference between last and previous value is NOT N"
-msgstr ""
+msgstr "最后和先前的值之间的差异是 非 N"
 
 #: include/views/configuration.screen.list.php:50
 msgid "Dimension (cols x rows)"
@@ -3961,7 +3961,7 @@ msgctxt "Exa short"
 msgid "E"
 msgstr "E"
 
-#: include/config.inc.php:311
+#: include/config.inc.php:316
 msgid "ERROR"
 msgstr "错误"
 
@@ -4485,7 +4485,7 @@ msgstr "字段:"
 
 #: api/classes/CImage.php:593
 msgid "File format is unsupported."
-msgstr ""
+msgstr "文件格式是不支持的"
 
 #: include/classes/helpers/CUploadFile.php:153
 #, php-format
@@ -4521,11 +4521,11 @@ msgstr "依名称过滤"
 
 #: popup_trexpr.php:298
 msgid "Find string V in last (most recent) value. N = 1 - if found, 0 - otherwise"
-msgstr ""
+msgstr "发现字符串 V 在最后（最近）的值中。N = 1 - 如果发现， 0 - 其他"
 
 #: popup_trexpr.php:303
 msgid "Find string V in last (most recent) value. N NOT 1 - if found, 0 - otherwise"
-msgstr ""
+msgstr "发现字符串 V 在最后（最近）的值中。N 不是 1 - 如果发现， 0 - 其他"
 
 #: include/setup.inc.php:130
 msgid "Finish"
@@ -5635,7 +5635,7 @@ msgstr "图示对应并未启用"
 msgid "Icons"
 msgstr "图标"
 
-#: include/config.inc.php:258
+#: include/config.inc.php:263
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "假如您认为这个消息是错的, 请询问您的管理者关于如何取得需要的权限."
 
@@ -5664,11 +5664,11 @@ msgstr "图片标示类型"
 #: api/classes/CImage.php:343
 #, php-format
 msgid "Image load error [%1$s] in [%2$s]."
-msgstr ""
+msgstr "图像载入错误 [%1$s] 在 [%2$s]."
 
 #: api/classes/CImage.php:588 include/classes/helpers/CUploadFile.php:129
 msgid "Image size must be less than 1MB."
-msgstr ""
+msgstr "图像大小必须小于 1MB."
 
 #: adm.images.php:57
 msgid "Image updated"
@@ -5950,7 +5950,7 @@ msgstr "不正错的颜色\"%1$s\"."
 #: api/classes/CScreenItem.php:590
 #, php-format
 msgid "Incorrect column span provided for screen element located at X - %1$s and Y - %2$s."
-msgstr ""
+msgstr "不正确的列跨度屏幕元素位于X - %1$s和Y Y - %2$s."
 
 #: api/classes/CDRule.php:437
 msgid "Incorrect delay."
@@ -6183,7 +6183,7 @@ msgstr "提供了不正确的资源类型给筛选项目."
 #: api/classes/CScreenItem.php:585
 #, php-format
 msgid "Incorrect row span provided for screen element located at X - %1$s and Y - %2$s."
-msgstr ""
+msgstr "不正确的行跨度屏幕元素位于 X - %1$s和 Y - %2$s."
 
 #: api/classes/CScreenItem.php:558
 #, php-format
@@ -6448,7 +6448,7 @@ msgstr "无效的请求."
 #: maintenance.php:147 maintenance.php:161 services.php:187 services.php:201
 #, php-format
 msgid "Invalid date \"%s\"."
-msgstr ""
+msgstr "无效的日期  \"%s\"."
 
 #: api/classes/CUserMacro.php:920
 #, php-format
@@ -6462,7 +6462,7 @@ msgstr "无效的项目键值格式."
 
 #: maintenance.php:311
 msgid "Invalid maintenance period"
-msgstr ""
+msgstr "无效的维护期间"
 
 #: api/classes/CScreenItem.php:148 api/classes/CScreenItem.php:228
 #: api/classes/CService.php:209 api/classes/CService.php:385
@@ -7091,7 +7091,7 @@ msgstr "清单是空的"
 
 #: include/locales.inc.php:61
 msgid "Lithuanian (lt_LT)"
-msgstr ""
+msgstr "立陶宛 (lt_LT)"
 
 #: dashboard.php:294 dashboard.php:302 dashboard.php:309 dashboard.php:316
 #: dashboard.php:323 dashboard.php:333 include/views/monitoring.slides.php:108
@@ -7162,7 +7162,7 @@ msgstr "日志与SNMP捉捕器不符"
 msgid "Logged in as"
 msgstr "登录为"
 
-#: auditlogs.php:143 include/config.inc.php:261 include/menu.inc.php:285
+#: auditlogs.php:143 include/config.inc.php:266 include/menu.inc.php:285
 #: include/page_header.php:270
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:64
@@ -7181,7 +7181,7 @@ msgstr "登录失败\"%s\"."
 
 #: authentication.php:108 authentication.php:136
 msgid "Login name or password is incorrect"
-msgstr ""
+msgstr "登陆名或密码错误"
 
 #: api/classes/CUser.php:845 api/classes/CUser.php:863
 #: api/classes/CUser.php:910
@@ -7493,7 +7493,7 @@ msgid "Max count of events per trigger to show"
 msgstr "可显示的每触发器最多事件计数"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/config.inc.php:346
+#: include/config.inc.php:351
 msgid "Maximize"
 msgstr "最大化"
 
@@ -7511,19 +7511,19 @@ msgstr[0] "最大的主机名称长度是%2$d个字符, \"%3$s\" 是%1$d个字�
 
 #: popup_trexpr.php:242
 msgid "Maximum value for period T is < N"
-msgstr ""
+msgstr "期间T的最大值是 < N"
 
 #: popup_trexpr.php:252
 msgid "Maximum value for period T is = N"
-msgstr ""
+msgstr "期间T的最大值是 = N"
 
 #: popup_trexpr.php:247
 msgid "Maximum value for period T is > N"
-msgstr ""
+msgstr "期间T的最大值是 > N"
 
 #: popup_trexpr.php:257
 msgid "Maximum value for period T is NOT N"
-msgstr ""
+msgstr "期间T的最大值不是 N"
 
 #: api/classes/CHost.php:1383
 #, php-format
@@ -7662,7 +7662,7 @@ msgid "Min severity"
 msgstr "最低严重性"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/config.inc.php:346
+#: include/config.inc.php:351
 msgid "Minimize"
 msgstr "最小化"
 
@@ -7698,19 +7698,19 @@ msgstr "最小要求的PHP post尺寸是%s (配置选项\"post_max_size\")"
 
 #: popup_trexpr.php:262
 msgid "Minimum value for period T is < N"
-msgstr ""
+msgstr "期间T的最小值是 < N"
 
 #: popup_trexpr.php:272
 msgid "Minimum value for period T is = N"
-msgstr ""
+msgstr "期间T的最小值是 = N"
 
 #: popup_trexpr.php:267
 msgid "Minimum value for period T is > N"
-msgstr ""
+msgstr "期间T的最小值是 > N"
 
 #: popup_trexpr.php:277
 msgid "Minimum value for period T is NOT N"
-msgstr ""
+msgstr "期间T的最小值不是  N"
 
 #: include/forms.inc.php:1701
 msgid "Minutes"
@@ -8005,7 +8005,7 @@ msgstr "次"
 msgid "Next check"
 msgstr "下个检查"
 
-#: events.php:760 include/config.inc.php:563 include/events.inc.php:301
+#: events.php:760 include/config.inc.php:568 include/events.inc.php:301
 #: include/events.inc.php:319 include/forms.inc.php:1922
 #: include/triggers.inc.php:1608
 #: include/views/administration.users.list.php:75
@@ -8101,11 +8101,11 @@ msgstr "没有数据被已定义"
 
 #: popup_trexpr.php:494
 msgid "No data received during period of time T, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "在 T 期间段没有接收到数据， 那么 N = 1, 0 - 其他"
 
 #: popup_trexpr.php:499
 msgid "No data received during period of time T, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "在 T 期间段没有接收到数据， 那么 N 不是 1, 0 - 其他"
 
 #: api/classes/CHostInterface.php:1001
 #, php-format
@@ -8445,7 +8445,7 @@ msgstr "没有系统访问的许可权"
 #: api/classes/CTrigger.php:1357 api/classes/CTriggerPrototype.php:822
 #: api/classes/CTriggerPrototype.php:920 api/classes/CUserMacro.php:824
 #: api/classes/CUserMacro.php:933 api/classes/CWebCheck.php:444
-#: include/config.inc.php:244 report6.php:159
+#: include/config.inc.php:249 report6.php:159
 msgid "No permissions to referred object or it does not exist!"
 msgstr "没有所说的对象的许可权或其不存在!"
 
@@ -8764,19 +8764,19 @@ msgstr "步骤编号"
 
 #: popup_trexpr.php:194
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is < N"
-msgstr ""
+msgstr "在期间 T 期间成功获取到的值 V (执行运算符 0) 是 < N"
 
 #: popup_trexpr.php:204
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is = N"
-msgstr ""
+msgstr "在期间 T 期间成功获取到的值 V (执行运算符 0) 是 = N"
 
 #: popup_trexpr.php:199
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is > N"
-msgstr ""
+msgstr "在期间 T 期间成功获取到的值 V (执行运算符 0) 是 > N"
 
 #: popup_trexpr.php:209
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is NOT N"
-msgstr ""
+msgstr "在期间 T 期间成功获取到的值 V (执行运算符 0) 不是 N"
 
 #: include/blocks.inc.php:745
 msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
@@ -8819,15 +8819,15 @@ msgstr "正常"
 
 #: include/hosts.inc.php:304
 msgid "OOB IP address"
-msgstr "OOB IP位址"
+msgstr "OOB IP地址"
 
 #: include/hosts.inc.php:314
 msgid "OOB router"
-msgstr "OOP路由器"
+msgstr "OOP 路由器"
 
 #: include/hosts.inc.php:309
 msgid "OOB subnet mask"
-msgstr "OOB子网遮罩"
+msgstr "OOB 子网掩码"
 
 #: include/triggers.inc.php:1662
 #: include/views/configuration.action.edit.php:115
@@ -8846,7 +8846,7 @@ msgstr "操作系统(所有细节)"
 
 #: include/hosts.inc.php:134
 msgid "OS (Short)"
-msgstr "作业系统( 简)"
+msgstr "操作系统( 简称)"
 
 #: adm.other.php:119
 msgid "OTHER CONFIGURATION PARAMETERS"
@@ -8886,7 +8886,7 @@ msgstr "开"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:111
 msgid "On status change triggers blink for"
-msgstr "于状态改变时, 触发器因此闪烁于"
+msgstr "在状态变化时触发器闪烁"
 
 #: include/views/administration.users.edit.php:186
 msgid "Once"
@@ -8903,7 +8903,7 @@ msgstr " 单次停机时间"
 
 #: api/classes/CUserGroup.php:330 api/classes/CUserGroup.php:407
 msgid "Only Super Admins can add user groups."
-msgstr "只有超级管理员可以添加用户组."
+msgstr "只有超级管理员可以添加用户群组."
 
 #: api/classes/CUserMacro.php:398
 msgid "Only Super Admins can create global macros."
@@ -8911,11 +8911,11 @@ msgstr "只有超级管理员可以创建全局宏."
 
 #: api/classes/CHostGroup.php:642
 msgid "Only Super Admins can create host groups."
-msgstr "只有超级管理员可以创建主机组."
+msgstr "只有超级管理员可以创建主机群组."
 
 #: api/classes/CIconMap.php:244
 msgid "Only Super Admins can create icon maps."
-msgstr "只有超级管理员可以创建图示对应."
+msgstr "只有超级管理员能创建图示映射."
 
 #: api/classes/CMediatype.php:315
 msgid "Only Super Admins can create media types."
@@ -9534,7 +9534,7 @@ msgstr "波兰语 (pt_BR)"
 
 #: include/locales.inc.php:65
 msgid "Portuguese (pt_PT)"
-msgstr ""
+msgstr "葡萄牙 (pt_PT)"
 
 #: tr_logform.php:303
 msgid "Position"
@@ -10144,7 +10144,7 @@ msgstr "行宽度"
 #: api/classes/CScreenItem.php:608
 #, php-format
 msgid "Row span of screen element located at X - %1$s and Y - %2$s is too big."
-msgstr ""
+msgstr "位于X的屏幕元素 X - %1$s 和Y - %2$s的行跨度太大"
 
 #: include/views/configuration.screen.edit.php:41 screenconf.php:52
 msgid "Rows"
@@ -10871,7 +10871,7 @@ msgstr "服务不能同时为上层与下层"
 
 #: services.php:163
 msgid "Service created"
-msgstr ""
+msgstr "服务被创建"
 
 #: services.php:116
 msgid "Service deleted"
@@ -11393,7 +11393,7 @@ msgstr "成功审计"
 
 #: popup_trexpr.php:328
 msgid "Sum of values of a period T is < N"
-msgstr ""
+msgstr "期间 T 的值总数是 < N"
 
 #: popup_trexpr.php:338
 msgid "Sum of values of a period T is = N"
@@ -11405,7 +11405,7 @@ msgstr "期间的总时间是 T > N"
 
 #: popup_trexpr.php:343
 msgid "Sum of values of a period T is NOT N"
-msgstr ""
+msgstr "期间 T 的值总数不是 N"
 
 #: include/func.inc.php:194
 msgid "Sun"
@@ -12078,7 +12078,7 @@ msgstr "周二"
 
 #: include/locales.inc.php:70
 msgid "Turkish (tr_TR)"
-msgstr ""
+msgstr "土耳其(tr_TR)"
 
 #: jsLoader.php:151
 msgid "Two elements should be selected"
@@ -12209,7 +12209,7 @@ msgstr "USA (160字符)"
 msgid "USER PROFILE"
 msgstr "用户基本资料"
 
-#: include/config.inc.php:755
+#: include/config.inc.php:760
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -12227,7 +12227,7 @@ msgstr "不能选择配置."
 
 #: include/classes/helpers/CUploadFile.php:57
 msgid "Unable to upload file because \"file_uploads\" is disabled."
-msgstr ""
+msgstr " 不能上传文件因为\"文件上传\"被禁止"
 
 #: include/maps.inc.php:706 include/maps.inc.php:796 include/maps.inc.php:894
 msgid "Unacknowledged"
@@ -13184,7 +13184,7 @@ msgid "Yearly"
 msgstr "每年"
 
 #: events.php:760 include/blocks.inc.php:724
-#: include/classes/class.cserverinfo.php:35 include/config.inc.php:563
+#: include/classes/class.cserverinfo.php:35 include/config.inc.php:568
 #: include/events.inc.php:304 include/events.inc.php:322
 #: include/forms.inc.php:1922 include/triggers.inc.php:1608
 #: include/views/administration.users.list.php:74
@@ -13204,7 +13204,7 @@ msgstr "您无法选择某些语言, 因为这些语系并未安装于web服务�
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "您未被允许来帮用户\"%s\"转换优先权."
 
-#: include/config.inc.php:251
+#: include/config.inc.php:256
 msgid "You are not logged in."
 msgstr "您尚未登录."
 
@@ -13212,7 +13212,7 @@ msgstr "您尚未登录."
 msgid "You can not switch hosts for current selection."
 msgstr "您无法为目前的选择切换主机."
 
-#: include/config.inc.php:252
+#: include/config.inc.php:257
 msgid "You cannot view this URL as a"
 msgstr "您无法视此URL为一个"
 
@@ -13271,7 +13271,7 @@ msgstr "您没有许可权来更新其它用户."
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "您没有许可权来来更新用户或用户不存在."
 
-#: include/config.inc.php:256
+#: include/config.inc.php:261
 msgid "You must login to view this page."
 msgstr "您必需登录才能浏览此页面."
 
@@ -13296,7 +13296,7 @@ msgstr "Zabbix"
 #: include/views/general.login.php:47
 #, php-format
 msgid "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
-msgstr ""
+msgstr "Zabbix %1$s 版权 %2$s-%3$s 属于 Zabbix SIA"
 
 #: include/users.inc.php:40
 msgid "Zabbix Admin"
