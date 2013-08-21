@@ -411,35 +411,6 @@ var chkbxRange = {
 	}
 };
 
-/**
- * Add and remove css class 'not-monitored' for select dropdowns.
- */
-var selectDropdownBox = {
-	init: function () {
-		var $selects = jQuery(".input.select");
-		if ($selects.length) {
-			$selects.each(function() {
-				var $this = jQuery(this);
-				selectDropdownBox.change($this);
-
-				$this.change(function() {
-					selectDropdownBox.change(jQuery(this));
-				});
-			});
-		}
-	},
-
-	change: function (obj) {
-		obj.removeClass('not-monitored');
-		obj.find("option").each(function() {
-			var $this = jQuery(this);
-			if (this.selected == true && $this.hasClass('not-monitored')) {
-				$this.parent().addClass('not-monitored');
-			}
-		});
-	}
-};
-
 /*
  * Audio Control System
  */
