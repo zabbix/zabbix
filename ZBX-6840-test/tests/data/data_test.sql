@@ -1295,11 +1295,11 @@ INSERT INTO triggers (triggerid,expression,description,url,status,value,priority
 INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (16024,40063,16024,'last','0');
 INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (16025,40062,16025,'last','0');
 
---testFormMap.ZBX6840
+-- testFormMap.ZBX6840
 INSERT INTO hosts (hostid, host, name, status) VALUES (50008, 'Host-map-test-zbx6840','Host-map-test-zbx6840', 0);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50008, 50008, 4);
-INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.7.1', '', '1', '10071', '1', 50008, 50020);
-INSERT INTO items (itemid,type,snmp_community,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,multiplier,delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,formula,error,lastlogsize,logtimefmt,templateid,valuemapid,delay_flex,params,ipmi_sensor,data_type,authtype,username,password,publickey,privatekey,mtime,flags,filter,interfaceid,port,description,inventory_link,lifetime,snmpv3_authprotocol,snmpv3_privprotocol,state,snmpv3_contextname) VALUES (40065,0,'','',50008,'Item-layout-test-zbx6840','item-layout-test-002',30,90,365,0,3,'','',0,0,'',0,'','','1','',0,'',NULL,NULL,'','','',0,0,'','','','',0,0,'',50020,'','',0,'30',0,0,0,'');
+INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.7.1', '', '1', '10071', '1', 50008, 50021);
+INSERT INTO items (itemid,type,snmp_community,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,multiplier,delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,formula,error,lastlogsize,logtimefmt,templateid,valuemapid,delay_flex,params,ipmi_sensor,data_type,authtype,username,password,publickey,privatekey,mtime,flags,filter,interfaceid,port,description,inventory_link,lifetime,snmpv3_authprotocol,snmpv3_privprotocol,state,snmpv3_contextname) VALUES (40065,0,'','',50008,'Item-layout-test-zbx6840','item-layout-test-002',30,90,365,0,3,'','',0,0,'',0,'','','1','',0,'',NULL,NULL,'','','',0,0,'','','','',0,0,'',50021,'','',0,'30',0,0,0,'');
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (16026,'{16026}=0&{16027}=0','Trigger-map-test-zbx6840','',1,0,0,0,'','',NULL,0,0,0);
 INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (16026,40065,16026,'last','0');
 INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (16027,23287,16026,'last','0');
