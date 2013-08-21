@@ -208,7 +208,7 @@ var chkbxRange = {
 
 	// check if all checkboxes are selected and select main checkbox, else disable checkbox, select options and button
 	selectMainCheckbox: function() {
-		if(!jQuery('.tableinfo .header .checkbox:not(:disabled)').length){
+		if (!jQuery('.tableinfo .header .checkbox:not(:disabled)').length) {
 			return;
 		}
 
