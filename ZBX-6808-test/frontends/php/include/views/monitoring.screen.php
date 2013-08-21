@@ -41,13 +41,6 @@ if (empty($this->data['screens'])) {
 		'timeline' => $screenBuilder->timeline
 	));
 }
-elseif (!isset($this->data['screens'][$this->data['elementIdentifier']]) && !$this->data['id_has_been_fetched_from_profile']) {
-	// if screen we are searching for does not exist and was not fetched from profile
-	$error_msg = $this->data['use_screen_name']
-		? _s('Screen with name "%s" does not exist.', $this->data['elementIdentifier'])
-		: _s('Screen with ID "%s" does not exist.', $this->data['elementIdentifier']);
-	show_error_message($error_msg);
-}
 else {
 	if (!isset($this->data['screens'][$this->data['elementIdentifier']])) {
 		// this means id was fetched from profile and this screen does not exist
