@@ -360,6 +360,7 @@ Changes for 2.0.9rc1
 New features:
 
 Bug fixes:
+.......P.. [ZBX-6249] fixed data loss in proxy "Data sender" process caused by unfinished transactions; thanks to MATSUDA Daiki for patch (Andris)
 ...G...... [ZBXNEXT-1056] improved active checks error messages (wiper)
 
 --------------------------------------------------------------------------------
