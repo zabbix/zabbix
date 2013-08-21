@@ -464,8 +464,11 @@ int	main(int argc, char **argv)
 	zbx_task_t	task = ZBX_TASK_START;
 	char		ch = '\0';
 	int		nodeid = 0;
+	char		tmp[MAX_STRING_LEN];
 
-	progname = get_program_name(argv[0]);
+	/* make a copy of argv[0] because it will be overwitten in init_ps_display() and set_ps_display() */
+	zbx_strlcpy(tmp, get_program_name(argv[0]), strlen(argv[0]));
+	progname = tmp;
 
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
@@ -502,6 +505,10 @@ int	main(int argc, char **argv)
 				break;
 		}
 	}
+
+	save_ps_display_args(argc, argv);
+
+	init_ps_display("Zabbix Server");
 
 	if (NULL == CONFIG_FILE)
 		CONFIG_FILE = zbx_strdup(CONFIG_FILE, SYSCONFDIR "/zabbix_server.conf");

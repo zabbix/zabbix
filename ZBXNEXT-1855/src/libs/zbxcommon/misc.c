@@ -326,7 +326,6 @@ char    *zbx_strdup2(const char *filename, int line, char *old, const char *str)
  ******************************************************************************/
 void	__zbx_zbx_setproctitle(const char *fmt, ...)
 {
-#ifdef HAVE_FUNCTION_SETPROCTITLE
 	char	title[MAX_STRING_LEN];
 	va_list	args;
 
@@ -334,8 +333,7 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...)
 	zbx_vsnprintf(title, sizeof(title), fmt, args);
 	va_end(args);
 
-	setproctitle(title);
-#endif
+	set_ps_display(title);
 }
 
 /******************************************************************************

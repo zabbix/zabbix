@@ -454,6 +454,19 @@ AC_DEFINE(HAVE_TM_TM_GMTOFF,1,[Define to 1 if 'tm.tm_gmtoff' exists.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
+AC_CACHE_CHECK([for PS_STRINGS], [pgac_cv_var_PS_STRINGS],
+[AC_TRY_LINK(
+[#include <machine/vmparam.h>
+#include <sys/exec.h>
+],
+[PS_STRINGS->ps_nargvstr = 1;
+PS_STRINGS->ps_argvstr = "foo";],
+[pgac_cv_var_PS_STRINGS=yes],
+[pgac_cv_var_PS_STRINGS=no])])
+if test "$pgac_cv_var_PS_STRINGS" = yes ; then
+  AC_DEFINE([HAVE_PS_STRINGS], [], [Define to 1 if the PS_STRINGS struct exists.])
+fi
+
 dnl *****************************************************************
 dnl *                                                               *
 dnl *                     Checks for functions                      *
@@ -872,7 +885,7 @@ aix*)
 	;;
 darwin*|rhapsody*)
 	ARCH="osx"
-	AC_DEFINE([MAC_OS_X], 1, [Define to 1 if you are using Mac OS X])
+	AC_DEFINE([MAC_OS_X], 1, [Define to 1 if you are using Mac OS X.])
 	;;
 *solaris*)
 	ARCH="solaris"
@@ -894,15 +907,18 @@ hpux*)
 	;;
 freebsd*)
 	ARCH="freebsd"
+	AC_DEFINE([BSD], 1, [Define to 1 if you are using BSD.])
 	;;
 netbsd*)
 	ARCH="netbsd"
+	AC_DEFINE([BSD], 1, [Define to 1 if you are using BSD.])
 	;;
 osf*)
 	ARCH="osf"
 	;;
 openbsd*)
 	ARCH="openbsd"
+	AC_DEFINE([BSD], 1, [Define to 1 if you are using BSD.])
 	;;
 *)
 	ARCH="unknown"

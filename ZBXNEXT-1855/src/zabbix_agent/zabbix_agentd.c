@@ -731,6 +731,7 @@ void	zbx_sigusr_handler(zbx_task_t task)
 int	main(int argc, char **argv)
 {
 	ZBX_TASK_EX	t;
+	char		tmp[MAX_STRING_LEN];
 #ifdef _WINDOWS
 	int		ret;
 
@@ -744,7 +745,9 @@ int	main(int argc, char **argv)
 	memset(&t, 0, sizeof(t));
 	t.task = ZBX_TASK_START;
 
-	progname = get_program_name(argv[0]);
+	/* make a copy of argv[0] because it will be overwitten in init_ps_display() and set_ps_display() */
+	zbx_strlcpy(tmp, get_program_name(argv[0]), strlen(argv[0]));
+	progname = tmp;
 
 	parse_commandline(argc, argv, &t);
 
@@ -817,6 +820,10 @@ int	main(int argc, char **argv)
 			zbx_load_config(ZBX_CFG_FILE_REQUIRED);
 			break;
 	}
+
+	save_ps_display_args(argc, argv);
+
+	init_ps_display("Zabbix Agentd");
 
 	START_MAIN_ZABBIX_ENTRY(CONFIG_ALLOW_ROOT);
 

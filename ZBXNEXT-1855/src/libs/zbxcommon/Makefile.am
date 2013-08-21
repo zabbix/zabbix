@@ -11,5 +11,6 @@ libzbxcommon_a_SOURCES = \
 	zbxgetopt.c \
 	alias.c \
 	file.c \
-	int128.c
+	int128.c \
+	setproctitle.c
 

@@ -219,7 +219,6 @@ int	daemon_start(int allow_root)
 	zbx_set_child_signal_handler();
 
 	zbx_setproctitle("main process");
-
 	return MAIN_ZABBIX_ENTRY();
 }
 
