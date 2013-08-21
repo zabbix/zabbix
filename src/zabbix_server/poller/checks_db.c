@@ -19,8 +19,6 @@
 
 #include "checks_db.h"
 
-#ifdef HAVE_ODBC
-
 #include "zbxodbc.h"
 #include "log.h"
 
@@ -109,4 +107,3 @@ out:
 
 	return ret;
 }
-#endif	/* HAVE_ODBC */

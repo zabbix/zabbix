@@ -55,6 +55,10 @@ $fields = array(
 $isDataValid = check_fields($fields);
 
 if ($httptestid = get_request('httptestid', false)) {
+	if (!API::HttpTest()->isReadable(array($_REQUEST['httptestid']))) {
+		access_deny();
+	}
+
 	$color = array(
 		'current' => 0,
 		0 => array('next' => '1'),
@@ -100,8 +104,7 @@ elseif ($items = get_request('items', array())) {
 		'itemids' => zbx_objectValues($items, 'itemid'),
 		'nodeids' => get_current_nodeid(true),
 		'output' => array('itemid'),
-		'preservekeys' => true,
-		'filter' => array('flags' => null)
+		'preservekeys' => true
 	));
 
 	$dbItems = zbx_toHash($dbItems, 'itemid');
