@@ -969,7 +969,7 @@ define('QUEUE_DETAILS', 2);
 define('QUEUE_DETAIL_ITEM_COUNT', 500);
 
 // configuration -> maps default add icon name
-define('DEFAULT_ADD_ICON_NAME', 'Server_(96)');
+define('MAP_DEFAULT_ICON', 'Server_(96)');
 
 // if magic quotes on, then get rid of them
 if (get_magic_quotes_gpc()) {
