@@ -574,7 +574,7 @@ int	MAIN_ZABBIX_ENTRY()
 #else
 #	define LIBCURL_FEATURE_STATUS	" NO"
 #endif
-#ifdef	HAVE_ODBC
+#ifdef	HAVE_UNIXODBC
 #	define ODBC_FEATURE_STATUS 	"YES"
 #else
 #	define ODBC_FEATURE_STATUS 	" NO"
