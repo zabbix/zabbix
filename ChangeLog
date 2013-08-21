@@ -1,7 +1,6 @@
 Changes for 2.0.8rc2
 
 Bug fixes:
-...G...... [ZBXNEXT-1056] improved active checks error messages (wiper)
 ........S. [ZBX-6889] fixed processing of availability data by the server (Sasha)
 
 --------------------------------------------------------------------------------
