@@ -2619,7 +2619,7 @@ static void	DBcopy_template_applications(zbx_uint64_t hostid, const zbx_vector_u
 	if (0 != app_num)
 	{
 		zbx_uint64_t	applicationid = 0, application_templateid = 0;
-		int		i;
+		size_t		i;
 		const char	*ins_applications_sql = "insert into applications (applicationid,hostid,name) values ";
 		const char	*ins_application_template_sql =
 				"insert into application_template"
@@ -3523,8 +3523,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*sql = NULL;
-	size_t		sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
-	int		i;
+	size_t		sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0, i;
 	zbx_uint64_t	interfaceids[4];
 	zbx_item_t	*item = NULL;
 	size_t		item_alloc = 0, item_num = 0;
@@ -4116,10 +4115,9 @@ static void	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 	ZBX_GRAPH_ITEMS *gitems = NULL, *chd_gitems = NULL;
 	size_t		gitems_alloc = 0, gitems_num = 0,
 			chd_gitems_alloc = 0, chd_gitems_num = 0;
-	int		i;
 	zbx_uint64_t	hst_graphid, hst_gitemid;
 	char		*sql = NULL, *name_esc, *color_esc;
-	size_t		sql_alloc = ZBX_KIBIBYTE, sql_offset;
+	size_t		sql_alloc = ZBX_KIBIBYTE, sql_offset, i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -5346,7 +5344,7 @@ static void	DBdelete_groups_validate(zbx_vector_uint64_t *groupids)
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	hostids;
-	zbx_uint64_t		hostid, groupid;
+	zbx_uint64_t		groupid;
 	int			index, internal;
 
 	if (0 == groupids->values_num)
@@ -5371,15 +5369,7 @@ static void	DBdelete_groups_validate(zbx_vector_uint64_t *groupids)
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			")");
 
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result))) {
-		ZBX_STR2UINT64(hostid, row[0]);
-		zbx_vector_uint64_append(&hostids, hostid);
-	}
-	DBfree_result(result);
-
-	zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	DBselect_uint64(sql, &hostids);
 
 	/* select of the list of groups which cannot be deleted */
 
