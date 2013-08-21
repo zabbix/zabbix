@@ -879,8 +879,8 @@ static void	DCsync_items(DB_RESULT result)
 		{
 			item->triggers = NULL;
 			item->lastclock = 0;
-			ZBX_STR2UINT64(item->lastlogsize, row[32]);
-			item->mtime = atoi(row[33]);
+			ZBX_STR2UINT64(item->lastlogsize, row[31]);
+			item->mtime = atoi(row[32]);
 		}
 		else if (NULL != item->triggers && NULL == item->triggers[0])
 		{
