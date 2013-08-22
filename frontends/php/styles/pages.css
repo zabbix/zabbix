@@ -79,6 +79,10 @@
 
 .host-edit #groups { height: 140px; }
 
+.host-edit #linkedTemplateTable { min-width: 400px; }
+
+.host-edit.host-edit-discovered #linkedTemplateTable { min-width: 250px; }
+
 /* housekeeper elements */
 .hk .element-row { margin-top: -3px; border-top-width: 0; }
 .hk .element-row-first { border-top-width: 1px; }

@@ -51,24 +51,7 @@ $_REQUEST['hostid'] = get_request('hostid', 0);
 
 $frm_title = _('Host');
 if ($_REQUEST['hostid'] > 0) {
-	$dbHosts = API::Host()->get(array(
-		'hostids' => $_REQUEST['hostid'],
-		'selectGroups' => API_OUTPUT_EXTEND,
-		'selectParentTemplates' => array('templateid', 'name'),
-		'selectMacros' => API_OUTPUT_EXTEND,
-		'selectInventory' => true,
-		'selectDiscoveryRule' => array('name', 'itemid'),
-		'output' => API_OUTPUT_EXTEND
-	));
-	$dbHost = reset($dbHosts);
-
-	$dbHost['interfaces'] = API::HostInterface()->get(array(
-		'hostids' => $dbHost['hostid'],
-		'output' => API_OUTPUT_EXTEND,
-		'selectItems' => array('type'),
-		'sortfield' => 'interfaceid',
-		'preservekeys' => true
-	));
+	$dbHost = $this->data['dbHost'];
 
 	$frm_title .= SPACE.' ['.$dbHost['host'].']';
 	$original_templates = $dbHost['parentTemplates'];
@@ -645,17 +628,16 @@ $tmplList = new CFormList('tmpllist');
 // create linked template table
 $linkedTemplateTable = new CTable(_('No templates defined.'), 'formElementTable');
 $linkedTemplateTable->attr('id', 'linkedTemplateTable');
-$linkedTemplateTable->attr('style', 'min-width: 400px;');
-$linkedTemplateTable->setHeader(array(_('Name'), _('Action')));
 
 $linkedTemplates = API::Template()->get(array(
 	'templateids' => $templateIds,
 	'output' => array('templateid', 'name')
 ));
+CArrayHelper::sort($linkedTemplates, array('name'));
 
+// templates for normal hosts
 if (!$isDiscovered) {
-	CArrayHelper::sort($linkedTemplates, array('name'));
-
+	$linkedTemplateTable->setHeader(array(_('Name'), _('Action')));
 	$ignoredTemplates = array();
 	foreach ($linkedTemplates as $template) {
 		$tmplList->addVar('exist_templates[]', $template['templateid']);
@@ -695,15 +677,14 @@ if (!$isDiscovered) {
 
 	$tmplList->addRow(_('Link new templates'), new CDiv($newTemplateTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
 }
+// templates for discovered hosts
 else {
-	if ($linkedTemplates) {
-		foreach ($linkedTemplates as $templateId => $template) {
-			$tmplList->addRow($template['name'], '');
-		}
+	$linkedTemplateTable->setHeader(array(_('Name')));
+	foreach ($linkedTemplates as $template) {
+		$linkedTemplateTable->addRow(array($template['name']),null, 'conditions_'.$template['templateid']);
 	}
-	else {
-		$tmplList->addRow(_('No templates linked.'), ' ');
-	}
+
+	$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
 }
 
 $divTabs->addTab('templateTab', _('Templates'), $tmplList);

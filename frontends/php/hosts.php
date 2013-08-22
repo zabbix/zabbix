@@ -705,13 +705,40 @@ if ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['hosts'])) {
 elseif (isset($_REQUEST['form'])) {
 	$hostsWidget->addPageHeader(_('CONFIGURATION OF HOSTS'));
 
+	$data = array();
 	if ($hostId = get_request('hostid', 0)) {
 		$hostsWidget->addItem(get_header_host_table('', $_REQUEST['hostid']));
+
+		$dbHosts = API::Host()->get(array(
+			'hostids' => $hostId,
+			'selectGroups' => API_OUTPUT_EXTEND,
+			'selectParentTemplates' => array('templateid', 'name'),
+			'selectMacros' => API_OUTPUT_EXTEND,
+			'selectInventory' => true,
+			'selectDiscoveryRule' => array('name', 'itemid'),
+			'output' => API_OUTPUT_EXTEND
+		));
+		$dbHost = reset($dbHosts);
+
+		$dbHost['interfaces'] = API::HostInterface()->get(array(
+			'hostids' => $hostId,
+			'output' => API_OUTPUT_EXTEND,
+			'selectItems' => array('type'),
+			'sortfield' => 'interfaceid',
+			'preservekeys' => true
+		));
+
+		$data['dbHost'] = $dbHost;
 	}
 
-	$hostForm = new CView('configuration.host.edit');
+	$hostForm = new CView('configuration.host.edit', $data);
 	$hostsWidget->addItem($hostForm->render());
-	$hostsWidget->setRootClass('host-edit');
+
+	$rootClass = 'host-edit';
+	if (get_request('hostid') && $dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+		$rootClass .= ' host-edit-discovered';
+	}
+	$hostsWidget->setRootClass($rootClass);
 }
 else {
 	$displayNodes = (is_array(get_current_nodeid()) && $pageFilter->groupid == 0);
