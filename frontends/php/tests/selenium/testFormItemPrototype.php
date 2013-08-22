@@ -1181,20 +1181,17 @@ class testFormItemPrototype extends CWebTest {
 	 * @dataProvider update
 	 */
 	public function testFormItemPrototype_SimpleUpdate($data) {
-		$name = $data['name'];
-
 		$sqlItems = "select itemid, hostid, name, key_, delay from items order by itemid";
 		$oldHashItems = DBhash($sqlItems);
 
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickWait('link='.$this->host);
-		$this->zbxTestClickWait('link=Discovery rules');
-		$this->zbxTestClickWait('link='.$this->discoveryRule);
-		$this->zbxTestClickWait('link=Item prototypes');
-		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestLogin('disc_prototypes.php?form=update&itemid='.$data['itemid'].'&parent_discoveryid=33800');
 		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of item prototypes');
-		$this->zbxTestTextPresent(array('Item updated', "$name", 'CONFIGURATION OF ITEM PROTOTYPES', 'Item prototypes of '.$this->discoveryRule));
+		$this->zbxTestTextPresent(array(
+			'Item updated', $data['name'],
+			'CONFIGURATION OF ITEM PROTOTYPES',
+			'Item prototypes of '.$this->discoveryRule
+		));
 
 		$this->assertEquals($oldHashItems, DBhash($sqlItems));
 	}
@@ -2247,7 +2244,7 @@ class testFormItemPrototype extends CWebTest {
 					)
 				)
 			),
-			// Default
+			// Empty SQL query
 			array(
 				array(
 					'expected' => ITEM_BAD,
@@ -2256,6 +2253,19 @@ class testFormItemPrototype extends CWebTest {
 					'errors' => array(
 							'ERROR: Page received incorrect data',
 							'Warning. Incorrect value for field "SQL query": cannot be empty.'
+					)
+				)
+			),
+			// Default
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'type' => 'Database monitor',
+					'name' => 'Database monitor',
+					'params_ap' => 'SELECT * FROM items',
+					'errors' => array(
+							'ERROR: Cannot add item',
+							'Check the key, please. Default example was passed.'
 					)
 				)
 			),
@@ -2308,7 +2318,7 @@ class testFormItemPrototype extends CWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormItemPrototype_SimpleCreate($data) {
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin('disc_prototypes.php?hostid=40001&parent_discoveryid=33800');
 
 		if (isset($data['name'])) {
 			$itemName = $data['name'];
@@ -2317,10 +2327,6 @@ class testFormItemPrototype extends CWebTest {
 			$keyName = $data['key'];
 		}
 
-		$this->zbxTestClickWait('link='.$this->host);
-		$this->zbxTestClickWait("link=Discovery rules");
-		$this->zbxTestClickWait('link='.$this->discoveryRule);
-		$this->zbxTestClickWait("link=Item prototypes");
 		$this->zbxTestClickWait('form');
 
 		if (isset($data['type'])) {
