@@ -2781,6 +2781,7 @@ static void	DBlld_interfaces_validate(zbx_vector_ptr_t *hosts, char **error)
 				}
 			}
 		}
+		DBfree_result(result);
 	}
 
 	/* validate interfaces which should be deleted */
@@ -2806,6 +2807,7 @@ static void	DBlld_interfaces_validate(zbx_vector_ptr_t *hosts, char **error)
 	{
 		zbx_vector_uint64_sort(&interfaceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
+		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select interfaceid from items where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "interfaceid",
 				interfaceids.values, interfaceids.values_num);
@@ -2858,6 +2860,7 @@ static void	DBlld_interfaces_validate(zbx_vector_ptr_t *hosts, char **error)
 				}
 			}
 		}
+		DBfree_result(result);
 	}
 
 	zbx_vector_uint64_destroy(&interfaceids);
