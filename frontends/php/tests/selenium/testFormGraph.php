@@ -51,7 +51,7 @@ class testFormGraph extends CWebTest {
 	 * Backup the tables that will be modified during the tests.
 	 */
 	public function testFormGraph_Setup() {
-	//	DBsave_tables('graphs');
+		DBsave_tables('graphs');
 	}
 
 
@@ -1016,6 +1016,6 @@ class testFormGraph extends CWebTest {
 	 * Restore the original tables.
 	 */
 	public function testFormGraph_Teardown() {
-	//	DBrestore_tables('graphs');
+		DBrestore_tables('graphs');
 	}
 }
