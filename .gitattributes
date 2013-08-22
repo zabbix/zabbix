@@ -271,6 +271,7 @@ frontends/php/styles/themes/originalblue/images/icons_d40000.png -text
 frontends/php/styles/themes/originalblue/images/icons_ffffff.png -text
 frontends/php/styles/themes/originalblue/images/preloader.gif -text
 frontends/php/tests/bootstrap.php.template -text
+frontends/php/tests/selenium/testFormGraph.php -text
 frontends/php/tests/selenium/testPageItemPrototypes.php -text
 frontends/php/tests/selenium/testPageTriggerPrototypes.php -text
 frontends/php/tests/selenium/testPageTriggers.php -text
