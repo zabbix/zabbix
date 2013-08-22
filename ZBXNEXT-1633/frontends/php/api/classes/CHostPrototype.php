@@ -156,8 +156,25 @@ class CHostPrototype extends CHostBase {
 			'message' => _('Group prototype cannot be based on a discovered host group "%1$s".')
 		)));
 
-		$this->checkDuplicates($hostPrototypes, 'host', _('Host prototype "%1$s" already exists.'), 'ruleid');
-		$this->checkExistingHostPrototypes($hostPrototypes);
+		// check host name duplicates
+		$collectionValidator = new CCollectionValidator(array(
+			'empty' => true,
+			'uniqueField' => 'host',
+			'uniqueField2' => 'ruleid',
+			'messageDuplicate' => _('Host prototype with host name "%1$s" already exists.')
+		));
+		$this->checkValidator($hostPrototypes, $collectionValidator);
+		$this->checkExistingHostPrototypes($hostPrototypes, 'host',
+			_('Host prototype with host name "%1$s" already exists in discovery rule "%2$s".')
+		);
+
+		// check visible name duplicates
+		$collectionValidator->uniqueField = 'name';
+		$collectionValidator->messageDuplicate = _('Host prototype with visible name "%1$s" already exists.');
+		$this->checkValidator($hostPrototypes, $collectionValidator);
+		$this->checkExistingHostPrototypes($hostPrototypes, 'name',
+			_('Host prototype with visible name "%1$s" already exists in discovery rule "%2$s".')
+		);
 	}
 
 	/**
@@ -433,8 +450,26 @@ class CHostPrototype extends CHostBase {
 			$hostPrototype['ruleid'] = $dbHostPrototypes[$hostPrototype['hostid']]['discoveryRule']['itemid'];
 		}
 		unset($hostPrototype);
-		$this->checkDuplicates($hostPrototypes, 'host', _('Host prototype "%1$s" already exists.'));
-		$this->checkExistingHostPrototypes($hostPrototypes);
+
+		// check host name duplicates
+		$collectionValidator = new CCollectionValidator(array(
+			'empty' => true,
+			'uniqueField' => 'host',
+			'uniqueField2' => 'ruleid',
+			'messageDuplicate' => _('Host prototype with host name "%1$s" already exists.')
+		));
+		$this->checkValidator($hostPrototypes, $collectionValidator);
+		$this->checkExistingHostPrototypes($hostPrototypes, 'host',
+			_('Host prototype with host name "%1$s" already exists in discovery rule "%2$s".')
+		);
+
+		// check visible name duplicates
+		$collectionValidator->uniqueField = 'name';
+		$collectionValidator->messageDuplicate = _('Host prototype with visible name "%1$s" already exists.');
+		$this->checkValidator($hostPrototypes, $collectionValidator);
+		$this->checkExistingHostPrototypes($hostPrototypes, 'name',
+			_('Host prototype with visible name "%1$s" already exists in discovery rule "%2$s".')
+		);
 
 		// check if group prototypes use discovered host groups
 		$this->checkValidator(array_unique($groupPrototypeGroupIds), new CHostGroupNormalValidator(array(
@@ -1078,18 +1113,20 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * Check if any item from list already exists.
-	 * If items have item ids it will check for existing item with different itemid.
+	 * Check if a host with the same value in $field already exists on an LLD rule.
+	 * If host prototypes have host IDs it will check for existing prototypes with different host IDs.
 	 *
 	 * @throw APIException
 	 *
 	 * @param array $hostPrototypes
+	 * @param string $field				name of the field to check uniqueness by
+	 * @param string $error				error message in case duplicates are found
 	 */
-	protected function checkExistingHostPrototypes(array $hostPrototypes) {
-		$hostsByDiscoveryRuleId = array();
+	protected function checkExistingHostPrototypes(array $hostPrototypes, $field, $error) {
+		$valuesByDiscoveryRuleId = array();
 		$hostIds = array();
 		foreach ($hostPrototypes as $hostPrototype) {
-			$hostsByDiscoveryRuleId[$hostPrototype['ruleid']][] = $hostPrototype['host'];
+			$valuesByDiscoveryRuleId[$hostPrototype['ruleid']][] = $hostPrototype[$field];
 
 			if (isset($hostPrototype['hostid'])) {
 				$hostIds[] = $hostPrototype['hostid'];
@@ -1097,12 +1134,12 @@ class CHostPrototype extends CHostBase {
 		}
 
 		$sqlWhere = array();
-		foreach ($hostsByDiscoveryRuleId as $discoveryRuleId => $hosts) {
-			$sqlWhere[] = '(hd.parent_itemid='.$discoveryRuleId.' AND '.dbConditionString('h.host', $hosts).')';
+		foreach ($valuesByDiscoveryRuleId as $discoveryRuleId => $values) {
+			$sqlWhere[] = '(hd.parent_itemid='.$discoveryRuleId.' AND '.dbConditionString('h.'.$field, $values).')';
 		}
 
 		if ($sqlWhere) {
-			$sql = 'SELECT i.name,h.host'.
+			$sql = 'SELECT i.name as discovery_name,h.'.$field.
 				' FROM hosts h,host_discovery hd,items i'.
 				' WHERE h.hostid=hd.hostid AND hd.parent_itemid=i.itemid AND ('.implode(' OR ', $sqlWhere).')';
 
@@ -1112,8 +1149,7 @@ class CHostPrototype extends CHostBase {
 			}
 			$query = DBselect($sql, 1);
 			while ($row = DBfetch($query)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Host prototype "%1$s" already exists in discovery rule "%2$s".', $row['host'], $row['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s($error, $row[$field], $row['discovery_name']));
 			}
 		}
 	}
