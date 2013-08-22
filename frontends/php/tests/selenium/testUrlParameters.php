@@ -507,16 +507,6 @@ class testUrlParameters extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'url' => 'overview.php?&form_refresh=1&groupid=4&application=SomeApplication&type=0',
-					'title' => 'Overview \[refreshed every 30 sec\]',
-					'errors' => array(
-						'ERROR: No permissions to referred object or it does not exist!'
-					)
-				)
-			),
-			array(
-				array(
-					'expected' => LINK_BAD,
 					'url' => 'overview.php?&form_refresh=1&groupid=abc&application=Filesystems&type=0',
 					'title' => 'Overview \[refreshed every 30 sec\]',
 					'errors' => array(
@@ -815,7 +805,7 @@ class testUrlParameters extends CWebTest {
 					'url' => 'screens.php?&form_refresh=1&fullscreen=0&elementid=1',
 					'title' => 'Custom screens \[refreshed every 30 sec\]',
 					'errors' => array(
-						'ERROR: Screen with ID "1" does not exist.'
+						'ERROR: No permissions to referred object or it does not exist!'
 					)
 				)
 			),
