@@ -123,62 +123,54 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 		order_result($elem['urls'], 'name');
 
 		$menuPopup = array(
-			'goto' => array(
-				'params' => array()
-			)
+			'urls' => $elem['urls']
 		);
-
-		foreach ($elem['urls'] as $url) {
-			$menuPopup['urls'][$url['name']] = $url['url'];
-		}
 
 		switch ($elem['elementtype']) {
 			case SYSMAP_ELEMENT_TYPE_HOST:
 				$host = $hosts[$elem['elementid']];
 
 				if ($scripts[$elem['elementid']]) {
+					$menuPopup['hostId'] = $elem['elementid'];
 					$menuPopup['scripts'] = $scripts[$elem['elementid']];
 				}
 				if ($hosts[$elem['elementid']]['status'] == HOST_STATUS_MONITORED) {
-					$menuPopup['goto']['items']['triggerStatus'] = array(
+					$menuPopup['gotos']['triggerStatus'] = array(
 						'hostid' => $elem['elementid'],
-						'filter_set' => 1,
 						'show_severity' => isset($options['severity_min']) ? $options['severity_min'] : null
 					);
 				}
 				if ($host['screens']) {
-					$menuPopup['goto']['items']['screens'] = array(
+					$menuPopup['gotos']['screens'] = array(
 						'hostid' => $host['hostid']
 					);
 				}
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_MAP:
-				$menuPopup['goto']['items']['map'] = array(
+				$menuPopup['gotos']['submap'] = array(
 					'sysmapid' => $elem['elementid'],
 					'severity_min' => isset($options['severity_min']) ? $options['severity_min'] : null
 				);
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
-				$menuPopup['goto']['items']['events'] = array(
-					'source' => 0,
+				$menuPopup['gotos']['events'] = array(
 					'triggerid' => $elem['elementid'],
 					'nav_time' => time() - SEC_PER_WEEK
 				);
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-				$menuPopup['goto']['items']['triggerStatus'] = array(
+				$menuPopup['gotos']['triggerStatus'] = array(
 					'groupid' => $elem['elementid'],
 					'hostid' => 0,
-					'show_severity' => isset($options['severity_min']) ? $options['severity_min'] : null,
-					'filter_set' => 1
+					'show_severity' => isset($options['severity_min']) ? $options['severity_min'] : null
 				);
 				break;
 		}
 
-		$area->setMenuPopup($menuPopup);
+		$area->setMenuPopup(getMenuPopupMap($menuPopup));
 
 		$actionMap->addItem($area);
 	}

@@ -687,8 +687,8 @@ else {
 				$triggerDescription->setMenuPopup(getMenuPopupTrigger(array(
 					'trigger' => $trigger,
 					'eventTime' => $event['clock'],
-					'withConfiguration' => ($showAdminLinks && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL),
-					'withUrl' => true,
+					'hasConfiguration' => ($showAdminLinks && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL),
+					'hasUrl' => true,
 					'items' => $triggerItems
 				)));
 

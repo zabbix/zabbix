@@ -32,9 +32,33 @@ jQuery(function($) {
 	 * Build menu popup for given elements.
 	 */
 	$(document).on('click', '[data-menupopup]', function(event) {
-		var obj = $(this);
+		var obj = $(this),
+			data = obj.data('menupopup'),
+			labels = {
+				'Cancel': t('Cancel'),
+				'Execute': t('Execute'),
+				'Execution confirmation': t('Execution confirmation')
+			};
 
-		obj.menuPopup(obj.data('menupopup'), event);
+		switch (data.type) {
+			case 'host':
+				data = getMenuPopupHost(data);
+				break;
+
+			case 'trigger':
+				data = getMenuPopupTrigger(data);
+				break;
+
+			case 'history':
+				data = getMenuPopupHistory(data);
+				break;
+
+			case 'map':
+				data = getMenuPopupMap(data);
+				break;
+		}
+
+		obj.menuPopup(data, labels, event);
 
 		return false;
 	});

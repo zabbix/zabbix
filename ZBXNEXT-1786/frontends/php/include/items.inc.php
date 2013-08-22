@@ -858,8 +858,8 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 
 	if (isset($ithosts[$hostName])) {
 		$column->setMenuPopup(getMenuPopupHistory(array(
-			'item' => $item,
-			'withLatestGraphs' =>
+			'itemId' => $item['itemid'],
+			'hasLatestGraphs' =>
 				in_array($ithosts[$hostName]['value_type'], array(ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT))
 		)));
 	}

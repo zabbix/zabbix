@@ -18,46 +18,316 @@
 **/
 
 
+/**
+ * Get menu popup host section data.
+ *
+ * @param string options['hostId']			host id
+ * @param array  options['scripts']			host scripts
+ * @param bool   options['hasScreens']		link to host screen page
+ * @param bool   options['hasInventories']	link to host inventory page
+ *
+ * @return array
+ */
+function getMenuPopupHost(options) {
+	var sections = [], gotos = [];
+
+	// scripts
+	if (typeof(options.scripts) !== 'undefined') {
+		sections[sections.length] = {
+			type: 'scripts',
+			title: t('Scripts'),
+			hostId: options.hostId,
+			data: options.scripts
+		};
+	}
+
+	// latest
+	gotos[gotos.length] = {
+		label: t('Latest data'),
+		url: new Curl('latest.php?hostid=' + options.hostId).getUrl()
+	};
+
+	// screens
+	if (options.hasScreens) {
+		gotos[gotos.length] = {
+			label: t('Host screens'),
+			url: new Curl('host_screen.php?hostid=' + options.hostId).getUrl()
+		};
+	}
+
+	// inventories
+	if (options.hasInventories) {
+		gotos[gotos.length] = {
+			label: t('Host inventories'),
+			url: new Curl('hostinventories.php?hostid=' + options.hostId).getUrl()
+		};
+	}
+
+	sections[sections.length] = {
+		type: 'links',
+		title: t('Go to'),
+		data: gotos
+	};
+
+	return sections;
+}
+
+/**
+ * Get menu popup map section data.
+ *
+ * @param string options['hostId']					host id
+ * @param array  options['scripts']					host scripts
+ * @param object options['gotos']					links section
+ * @param array  options['gotos']['screens']		link to host screen page with url parameters ("name" => "value")
+ * @param array  options['gotos']['triggerStatus']	link to trigger status page with url parameters ("name" => "value")
+ * @param array  options['gotos']['submap']			link to submap page with url parameters ("name" => "value")
+ * @param array  options['gotos']['events']			link to events page with url parameters ("name" => "value")
+ * @param array  options['urls']					local and global map urls
+ *
+ * @return array
+ */
+function getMenuPopupMap(options) {
+	var sections = [];
+
+	// scripts
+	if (typeof(options.scripts) !== 'undefined') {
+		sections[sections.length] = {
+			type: 'scripts',
+			title: t('Scripts'),
+			hostId: options.hostId,
+			data: options.scripts
+		};
+	}
+
+	// gotos
+	if (typeof(options.gotos) !== 'undefined') {
+		var gotos = [];
+
+		// screens
+		if (typeof(options.gotos.screens) !== 'undefined') {
+			var url = new Curl('host_screen.php');
+
+			jQuery.each(options.gotos.screens, function(name, value) {
+				url.setArgument(name, value);
+			});
+
+			gotos[gotos.length] = {
+				label: t('Host screens'),
+				url: url.getUrl()
+			};
+		}
+
+		// trigger status
+		if (typeof(options.gotos.triggerStatus) !== 'undefined') {
+			var url = new Curl('tr_status.php?filter_set=1');
+
+			jQuery.each(options.gotos.triggerStatus, function(name, value) {
+				url.setArgument(name, value);
+			});
+
+			gotos[gotos.length] = {
+				label: t('Status of triggers'),
+				url: url.getUrl()
+			};
+		}
+
+		// submap
+		if (typeof(options.gotos.submap) !== 'undefined') {
+			var url = new Curl('maps.php');
+
+			jQuery.each(options.gotos.submap, function(name, value) {
+				url.setArgument(name, value);
+			});
+
+			gotos[gotos.length] = {
+				label: t('Submap'),
+				url: url.getUrl()
+			};
+		}
+
+		// events
+		if (typeof(options.gotos.events) !== 'undefined') {
+			var url = new Curl('events.php?source=0');
+
+			jQuery.each(options.gotos.events, function(name, value) {
+				url.setArgument(name, value);
+			});
+
+			gotos[gotos.length] = {
+				label: t('Latest events'),
+				url: url.getUrl()
+			};
+		}
+
+		sections[sections.length] = {
+			type: 'links',
+			title: t('Go to'),
+			data: gotos
+		};
+	}
+
+	// urls
+	if (typeof(options.urls) !== 'undefined') {
+		sections[sections.length] = {
+			type: 'links',
+			title: t('URLs'),
+			data: options.urls
+		};
+	}
+
+	return sections;
+}
+
+/**
+ * Get menu popup trigger section data.
+ *
+ * @param string options['triggerId']			trigger id
+ * @param int    options['eventTime']			event page url navigation time parameter
+ * @param object options['acknowledge']			link to acknowledge page with url parameters ("name" => "value")
+ * @param object options['hasConfiguration']	link to trigger configuration page
+ * @param string options['hostId']				host id
+ * @param string options['switchNode']			trigger configuration parameter for node switching
+ * @param string options['url']					trigger url link
+ * @param object options['items']				link to trigger item history page with url parameters ("name" => "value")
+ *
+ * @return array
+ */
+function getMenuPopupTrigger(options) {
+	var sections = [], items = [];
+
+	// events
+	var url = new Curl('events.php?triggerid=' + options.triggerId);
+
+	if (typeof(options.eventTime) !== 'undefined') {
+		url.setArgument('nav_time', options.eventTime);
+	}
+
+	items[items.length] = {
+		label: t('Events'),
+		url: url.getUrl()
+	};
+
+	// acknowledge
+	if (typeof(options.acknowledge) !== 'undefined' && objectSize(options.acknowledge) > 0) {
+		var url = new Curl('acknow.php');
+
+		jQuery.each(options.acknowledge, function(name, value) {
+			url.setArgument(name, value);
+		});
+
+		items[items.length] = {
+			label: t('Acknowledge'),
+			url: url.getUrl()
+		};
+	}
+
+	// configuration
+	if (typeof(options.hasConfiguration) !== 'undefined') {
+		var url = new Curl('triggers.php?triggerid=' + options.triggerId +
+			'&hostid=' + options.hostId + '&form=update&switch_node=' + options.switchNode);
+
+		items[items.length] = {
+			label: t('Configuration'),
+			url: url.getUrl()
+		};
+	}
+
+	// url
+	if (typeof(options.url) !== 'undefined') {
+		items[items.length] = {
+			label: t('URL'),
+			url: options.url
+		};
+	}
+
+	sections[sections.length] = {
+		type: 'links',
+		title: t('Trigger'),
+		data: items
+	};
+
+	// items
+	if (typeof(options.items) !== 'undefined' && objectSize(options.items) > 0) {
+		var items = [];
+
+		jQuery.each(options.items, function(name, item) {
+			var url = new Curl('history.php');
+
+			jQuery.each(item, function(key, value) {
+				url.setArgument(key, value);
+			});
+
+			items[items.length] = {
+				label: name,
+				url: url.getUrl()
+			};
+		});
+
+		sections[sections.length] = {
+			type: 'links',
+			title: t('History'),
+			data: items
+		};
+	}
+
+	return sections;
+}
+
+/**
+ * Get menu popup history section data.
+ *
+ * @param string options['itemId']				item id
+ * @param bool   options['hasLatestGraphs']		link to history page with showgraph action
+ *
+ * @return array
+ */
+function getMenuPopupHistory(options) {
+	var items = [];
+
+	// latest graphs
+	if (typeof(options.hasLatestGraphs) !== 'undefined' && options.hasLatestGraphs) {
+		items[items.length] = {
+			label: t('Last hour graph'),
+			url: new Curl('history.php?itemid=' + options.itemId + '&action=showgraph&period=3600').getUrl()
+		};
+
+		items[items.length] = {
+			label: t('Last week graph'),
+			url: new Curl('history.php?itemid=' + options.itemId + '&action=showgraph&period=604800').getUrl()
+		};
+
+		items[items.length] = {
+			label: t('Last month graph'),
+			url: new Curl('history.php?itemid=' + options.itemId + '&action=showgraph&period=2678400').getUrl()
+		};
+	}
+
+	// latest values
+	items[items.length] = {
+		label: t('Latest values'),
+		url: new Curl('history.php?itemid=' + options.itemId + '&action=showvalues&period=3600').getUrl()
+	};
+
+	return [{
+		type: 'links',
+		title: t('History'),
+		data: items
+	}];
+}
+
 jQuery(function($) {
 
 	/**
 	 * Menu popup.
 	 *
-	 * @param object options
-	 * @param object event
+	 * @param array  sections	menu sections usign structure "type", "title", "data"
+	 * @param object labels		translated labels
+	 * @param object event		menu popup call event
 	 */
-	$.fn.menuPopup = function(options, event) {
+	$.fn.menuPopup = function(sections, labels, event) {
 		if (!event) {
 			event = window.event;
 		}
-
-		var defaults = {
-			labels: {
-				'Acknowledge': t('Acknowledge'),
-				'Cancel': t('Cancel'),
-				'Configuration': t('Configuration'),
-				'Events': t('Events'),
-				'Execute': t('Execute'),
-				'Execution confirmation': t('Execution confirmation'),
-				'Go to': t('Go to'),
-				'History': t('History'),
-				'Host inventories': t('Host inventories'),
-				'Host screens': t('Host screens'),
-				'Latest data': t('Latest data'),
-				'Latest events': t('Latest events'),
-				'Latest values': t('Latest values'),
-				'Last hour graph': t('Last hour graph'),
-				'Last month graph': t('Last month graph'),
-				'Last week graph': t('Last week graph'),
-				'Scripts': t('Scripts'),
-				'Status of triggers': t('Status of triggers'),
-				'Submap': t('Submap'),
-				'Trigger': t('Trigger'),
-				'URL': t('URL'),
-				'URLs': t('URLs')
-			}
-		};
-		options = $.extend({}, defaults, options);
 
 		var openner = $(this),
 			id = openner.data('menuPopupId'),
@@ -91,12 +361,17 @@ jQuery(function($) {
 				'class': 'menuPopup'
 			});
 
-			// create sub menus
-			createScripts(menuPopup, options);
-			createGotos(menuPopup, options);
-			createTrigger(menuPopup, options);
-			createHistory(menuPopup, options);
-			createUrls(menuPopup, options);
+			// create sections
+			if (sections.length > 0) {
+				$.each(sections, function(i, section) {
+					if (section.type === 'scripts') {
+						createScripts(menuPopup, section, labels);
+					}
+					else {
+						createLinks(menuPopup, section);
+					}
+				});
+			}
 
 			// build jQuery Menu
 			$('.menu', menuPopup).menu();
@@ -179,247 +454,77 @@ jQuery(function($) {
 	 * Menu tree with ability to run script in popup window.
 	 *
 	 * @param object menuPopup
-	 * @param object options['scripts']
+	 * @param string section['title']	section title
+	 * @param string section['hostId']	host id
+	 * @param array  section['data']	screen items in structure ("name", "scriptId", "confirmation")
 	 */
-	function createScripts(menuPopup, options) {
-		if (typeof(options['scripts']) !== 'undefined' && objectSize(options['scripts']) > 0) {
-			var menuData = {};
+	function createScripts(menuPopup, section, labels) {
+		var menuData = {};
 
-			for (var key in options['scripts']) {
-				var script = options['scripts'][key];
+		for (var key in section.data) {
+			var script = section.data[key];
 
-				if (typeof(script.hostid) !== 'undefined') {
-					var items = [],
-						name,
-						regexp = /(?:[^\/\\]+|\\.)+/g,
-						matched;
+			if (typeof(script.scriptId) !== 'undefined') {
+				var items = [],
+					name,
+					regexp = /(?:[^\/\\]+|\\.)+/g,
+					matched;
 
-					while (matched = regexp.exec(script.name)) {
-						// remove backslash shielding
-						matched[0] = matched[0].replace(/\\\//g, '/');
+				while (matched = regexp.exec(script.name)) {
+					// remove backslash shielding
+					matched[0] = matched[0].replace(/\\\//g, '/');
 
-						items[items.length] = matched[0];
-					}
+					items[items.length] = matched[0];
+				}
 
-					name = items.pop();
+				name = items.pop();
 
-					prepareTree(menuData, name, items, {
-						scriptId: script.scriptid,
-						hostId: script.hostid,
-						confirmation: script.confirmation
+				prepareTree(menuData, name, items, {
+					hostId: section.hostId,
+					scriptId: script.scriptId,
+					confirmation: script.confirmation
+				});
+			}
+		}
+
+		if (objectSize(menuData) > 0) {
+			var menu = createMenu(menuPopup, section.title);
+
+			createTree(menu, menuData);
+
+			// execute script
+			$('li', menu).each(function() {
+				var item = $(this);
+
+				if (!empty(item.data('scriptId'))) {
+					item.click(function() {
+						menuPopup.fadeOut(50);
+
+						executeScript(
+							item.data('hostId'),
+							item.data('scriptId'),
+							item.data('confirmation'),
+							labels
+						);
 					});
 				}
-			}
-
-			if (objectSize(menuData) > 0) {
-				var menu = createMenu(menuPopup, options.labels['Scripts']);
-
-				createTree(menu, menuData);
-
-				// execute script
-				$('li', menu).each(function() {
-					var item = $(this);
-
-					if (!empty(item.data('scriptId'))) {
-						item.click(function() {
-							menuPopup.fadeOut(50);
-
-							executeScript(
-								item.data('hostId'),
-								item.data('scriptId'),
-								item.data('confirmation'),
-								options.labels
-							);
-						});
-					}
-				});
-			}
-		}
-	}
-
-	/**
-	 * Goto menu section.
-	 *
-	 * @param object options['goto']['params']	global params for every item
-	 * @param object options['goto']['items']	array of items with structure "name" => "parameters"
-	 */
-	function createGotos(menuPopup, options) {
-		if (typeof(options['goto']) !== 'undefined' && typeof(options['goto']['items']) !== 'undefined'
-				&& objectSize(options['goto']['items']) > 0) {
-			var menu = createMenu(menuPopup, options.labels['Go to']);
-
-			// latest
-			if (typeof(options['goto']['items']['latest']) !== 'undefined') {
-				menu.append(createMenuItem(
-					options.labels['Latest data'],
-					new Curl('latest.php'
-						+ getUrlParams(options['goto']['items']['latest'], options['goto']['params'])).getUrl()
-				));
-			}
-
-			// screens
-			if (typeof(options['goto']['items']['screens']) !== 'undefined') {
-				menu.append(createMenuItem(
-					options.labels['Host screens'],
-					new Curl('host_screen.php'
-						+ getUrlParams(options['goto']['items']['screens'], options['goto']['params'])).getUrl()
-				));
-			}
-
-			// inventories
-			if (typeof(options['goto']['items']['inventories']) !== 'undefined') {
-				menu.append(createMenuItem(
-					options.labels['Host inventories'],
-					new Curl('hostinventories.php'
-						+ getUrlParams(options['goto']['items']['inventories'], options['goto']['params'])).getUrl()
-				));
-			}
-
-			// triggerStatus
-			if (typeof(options['goto']['items']['triggerStatus']) !== 'undefined') {
-				menu.append(createMenuItem(
-					options.labels['Status of triggers'],
-					new Curl('tr_status.php'
-						+ getUrlParams(options['goto']['items']['triggerStatus'], options['goto']['params'])).getUrl()
-				));
-			}
-
-			// map
-			if (typeof(options['goto']['items']['map']) !== 'undefined') {
-				menu.append(createMenuItem(
-					options.labels['Submap'],
-					new Curl('maps.php'
-						+ getUrlParams(options['goto']['items']['map'], options['goto']['params'])).getUrl()
-				));
-			}
-
-			// events
-			if (typeof(options['goto']['items']['events']) !== 'undefined') {
-				menu.append(createMenuItem(
-					options.labels['Latest events'],
-					new Curl('events.php'
-						+ getUrlParams(options['goto']['items']['events'], options['goto']['params'])).getUrl()
-				));
-			}
-		}
-	}
-
-	/**
-	 * Trigger menu section.
-	 *
-	 * @param string options['trigger']['triggerid']		global parameter trigger id
-	 * @param object options['trigger']['events']			url parameters for event page
-	 * @param object options['trigger']['acknow']			url parameters for acknowledge page
-	 * @param object options['trigger']['configuration']	url parameters for trigger configuration page
-	 * @param object options['trigger']['url']				trigger url
-	 * @param object options['trigger']['items']			links to items history related with given trigger,
-	 *														using structure "name" => "parameters"
-	 */
-	function createTrigger(menuPopup, options) {
-		if (typeof(options['trigger']) !== 'undefined') {
-			var url,
-				menu = createMenu(menuPopup, options.labels['Trigger']),
-				params = {triggerid: options['trigger']['triggerid']};
-
-			// events
-			if (typeof(options['trigger']['events']) !== 'undefined') {
-				url = new Curl('events.php' + getUrlParams(params, options['trigger']['events']));
-
-				menu.append(createMenuItem(options.labels['Events'], url.getUrl()));
-			}
-
-			// acknow
-			if (typeof(options['trigger']['acknow']) !== 'undefined') {
-				url = new Curl('acknow.php' + getUrlParams(options['trigger']['acknow']));
-
-				menu.append(createMenuItem(options.labels['Acknowledge'], url.getUrl()));
-			}
-
-			// configuration
-			if (typeof(options['trigger']['configuration']) !== 'undefined') {
-				url = new Curl('triggers.php' + getUrlParams(params, options['trigger']['configuration']));
-
-				menu.append(createMenuItem(options.labels['Configuration'], url.getUrl()));
-			}
-
-			// url
-			if (typeof(options['trigger']['url']) !== 'undefined') {
-				menu.append(createMenuItem(options.labels['URL'], options['trigger']['url']));
-			}
-
-			// items
-			if (typeof(options['trigger']['items']) !== 'undefined') {
-				menu = createMenu(menuPopup, options.labels['History']);
-
-				$.each(options['trigger']['items'], function(name, params) {
-					url = new Curl('history.php' + getUrlParams(params));
-
-					menu.append(createMenuItem(name, url.getUrl()));
-				});
-			}
-		}
-	}
-
-	/**
-	 * History menu section.
-	 *
-	 * @param object options['history']['params']			global parameters
-	 * @param object options['history']['latestGraphs']		link to latest item history graphs
-	 * @param object options['history']['latestValues']		link to latest item history 500 values
-	 */
-	function createHistory(menuPopup, options) {
-		if (typeof(options['history']) !== 'undefined') {
-			var url, menu = createMenu(menuPopup, options.labels['History']);
-
-			// latest graphs
-			if (typeof(options['history']['latestGraphs']) !== 'undefined') {
-				url = new Curl('history.php' + getUrlParams(
-					{action: 'showgraph', period: '3600'},
-					options['history']['params']
-				));
-
-				menu.append(createMenuItem(options.labels['Last hour graph'], url.getUrl()));
-
-				url = new Curl('history.php' + getUrlParams(
-					{action: 'showgraph', period: '604800'},
-					options['history']['params']
-				));
-
-				menu.append(createMenuItem(options.labels['Last week graph'], url.getUrl()));
-
-				url = new Curl('history.php' + getUrlParams(
-					{action: 'showgraph', period: '2678400'},
-					options['history']['params']
-				));
-
-				menu.append(createMenuItem(options.labels['Last month graph'], url.getUrl()));
-			}
-
-			// latest values
-			if (typeof(options['history']['latestValues']) !== 'undefined') {
-				url = new Curl('history.php' + getUrlParams(
-					{action: 'showvalues', period: '3600'},
-					options['history']['params']
-				));
-
-				menu.append(createMenuItem(options.labels['Latest values'], url.getUrl()));
-			}
-		}
-	}
-
-	/**
-	 * Urls menu section.
-	 *
-	 * @param object options['urls']	array of links using structure "name" => "url"
-	 */
-	function createUrls(menuPopup, options) {
-		if (typeof(options['urls']) !== 'undefined' && objectSize(options['urls']) > 0) {
-			var menu = createMenu(menuPopup, options.labels['URLs']);
-
-			$.each(options['urls'], function(name, url) {
-				menu.append(createMenuItem(name, url));
 			});
 		}
+	}
+
+	/**
+	 * Links menu section.
+	 *
+	 * @param object menuPopup
+	 * @param string section['title']	section title
+	 * @param array  section['data']	items as "label" => "url"
+	 */
+	function createLinks(menuPopup, section) {
+		var menu = createMenu(menuPopup, section.title);
+
+		$.each(section.data, function(i, item) {
+			menu.append(createMenuItem(item.label, item.url));
+		});
 	}
 
 	/**
@@ -438,7 +543,7 @@ jQuery(function($) {
 				menu[item] = {items: {}};
 			}
 
-			prepareTree(menu[item]['items'], name, items, params);
+			prepareTree(menu[item].items, name, items, params);
 		}
 		else {
 			menu[name] = {
@@ -602,33 +707,5 @@ jQuery(function($) {
 		else {
 			execute();
 		}
-	}
-
-	/**
-	 * Get url parameters.
-	 * Merge global parameters and local parameters in one URL string.
-	 *
-	 * @param object $items
-	 * @param object $globals
-	 *
-	 * @return string
-	 */
-	function getUrlParams(items, globals) {
-		var params = '';
-
-		if (typeof(globals) !== 'undefined' && objectSize(globals) > 0) {
-			if (objectSize(items) == 0) {
-				items = {};
-			}
-
-			items = $.extend({}, items);
-			items = (objectSize(items) > 0) ? $.extend(items, globals) : globals;
-		}
-
-		$.each(items, function(name, value) {
-			params += ((params.length > 0) ? '&' : '?') + name + '=' + value;
-		});
-
-		return params;
 	}
 });

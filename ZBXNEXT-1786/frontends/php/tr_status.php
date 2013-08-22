@@ -577,8 +577,8 @@ foreach ($triggers as $trigger) {
 	$description = new CSpan($description, 'link_menu');
 	$description->setMenuPopup(getMenuPopupTrigger(array(
 		'trigger' => $trigger,
-		'withConfiguration' => ($showAdminLinks && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL),
-		'withUrl' => true,
+		'hasConfiguration' => ($showAdminLinks && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL),
+		'hasUrl' => true,
 		'items' => $triggerItems
 	)));
 

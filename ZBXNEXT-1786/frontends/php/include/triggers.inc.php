@@ -1271,14 +1271,14 @@ function getTriggerOverviewCells($trigger, $screenId = null) {
 					if ($screenId) {
 						global $page;
 
-						$menuPopup['acknow'] = array(
+						$menuPopup['acknowledge'] = array(
 							'eventid' => $event['eventid'],
 							'screenid' => $screenId,
 							'backurl' => $page['file']
 						);
 					}
 					else {
-						$menuPopup['acknow'] = array(
+						$menuPopup['acknowledge'] = array(
 							'eventid' => $event['eventid'],
 							'backurl' => 'overview.php'
 						);

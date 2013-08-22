@@ -2607,28 +2607,67 @@ function clearCookies($clear = false, $id = null) {
  */
 function getMenuPopupHost($options = array()) {
 	$data = array(
-		'goto' => array(
-			'params' => array(
-				'hostid' => $options['host']['hostid']
-			),
-			'items' => array(
-				'latest' => array()
-			)
-		)
+		'type' => 'host',
+		'hostId' => $options['host']['hostid'],
+		'hasScreens' => (isset($options['host']['screens']) && $options['host']['screens']),
+		'hasInventories' => (isset($options['host']['inventories']) && $options['host']['inventories'])
 	);
 
 	if (isset($options['scripts']) && $options['scripts']) {
 		CArrayHelper::sort($options['scripts'], array('name'));
 
-		$data['scripts'] = array_values($options['scripts']);
+		foreach (array_values($options['scripts']) as $script) {
+			$data['scripts'][] = array(
+				'name' => $script['name'],
+				'scriptId' => $script['scriptid'],
+				'confirmation' => $script['confirmation']
+			);
+		}
 	}
 
-	if (isset($options['host']['screens']) && $options['host']['screens']) {
-		$data['goto']['items']['screens'] = array();
+	return $data;
+}
+
+/**
+ * Prepare data for host menu popup.
+ *
+ * @param string $options['hostId']
+ * @param array  $options['scripts']
+ * @param array  $options['gotos']
+ * @param array  $options['urls']
+ *
+ * @return array
+ */
+function getMenuPopupMap($options = array()) {
+	$data = array(
+		'type' => 'map'
+	);
+
+	if (isset($options['scripts']) && $options['scripts']) {
+		CArrayHelper::sort($options['scripts'], array('name'));
+
+		$data['hostId'] = $options['hostId'];
+
+		foreach (array_values($options['scripts']) as $script) {
+			$data['scripts'][] = array(
+				'name' => $script['name'],
+				'scriptId' => $script['scriptid'],
+				'confirmation' => $script['confirmation']
+			);
+		}
 	}
 
-	if (isset($options['host']['inventories']) && $options['host']['inventories']) {
-		$data['goto']['items']['inventories'] = array();
+	if (isset($options['gotos']) && $options['gotos']) {
+		$data['gotos'] = $options['gotos'];
+	}
+
+	if (isset($options['urls']) && $options['urls']) {
+		foreach ($options['urls'] as $url) {
+			$data['urls'][] = array(
+				'label' => $url['name'],
+				'url' => $url['url']
+			);
+		}
 	}
 
 	return $data;
@@ -2637,35 +2676,23 @@ function getMenuPopupHost($options = array()) {
 /**
  * Prepare data for item history menu popup.
  *
- * @param array $options['item']
- * @param bool  $options['withLatestGraphs']	is link on latest graphs will be displayed
+ * @param array $options
  *
  * @return array
  */
 function getMenuPopupHistory($options = array()) {
-	$data = array(
-		'history' => array(
-			'params' => array(
-				'itemid' => $options['item']['itemid']
-			),
-			'latestValues' => true
-		)
-	);
+	$options['type'] = 'history';
 
-	if (isset($options['withLatestGraphs']) && $options['withLatestGraphs']) {
-		$data['history']['latestGraphs'] = true;
-	}
-
-	return $data;
+	return $options;
 }
 
 /**
  * Prepare data for trigger menu popup.
  *
  * @param array  $options['trigger']			trigger data
- * @param bool   $options['withConfiguration']	is link to trigger configuration will be showen
- * @param bool   $options['withUrl']			is trigger URL will be showen
- * @param array  $options['acknow']				acknowledge link parameters
+ * @param bool   $options['hasConfiguration']	is link to trigger configuration will be showen
+ * @param bool   $options['hasUrl']				is trigger URL will be showen
+ * @param array  $options['acknowledge']		acknowledge link parameters
  * @param array  $options['items']				trigger items
  * @param string $options['eventTime']			event navigation time parameter
  *
@@ -2673,33 +2700,23 @@ function getMenuPopupHistory($options = array()) {
  */
 function getMenuPopupTrigger($options = array()) {
 	$data = array(
-		'trigger' => array(
-			'triggerid' => $options['trigger']['triggerid'],
-			'events' => array()
-		)
+		'type' => 'trigger',
+		'triggerId' => $options['trigger']['triggerid'],
+		'eventTime' => isset($options['eventTime']) ? $options['eventTime'] : null,
+		'items' => (isset($options['items']) && $options['items']) ? $options['items'] : null,
+		'acknowledge' => (isset($options['acknowledge']) && $options['acknowledge']) ? $options['acknowledge'] : null
 	);
 
-	if (isset($options['eventTime']) && $options['eventTime']) {
-		$data['trigger']['events']['nav_time'] = $options['eventTime'];
+	if (isset($options['hasConfiguration']) && $options['hasConfiguration']) {
+		$host = reset($options['trigger']['hosts']);
+
+		$data['hasConfiguration'] = true;
+		$data['hostId'] = $host['hostid'];
+		$data['switchNode'] = id2nodeid($options['trigger']['triggerid']);
 	}
 
-	if (isset($options['withConfiguration']) && $options['withConfiguration']) {
-		$data['trigger']['configuration'] = array(
-			'form' => 'update',
-			'switch_node' => id2nodeid($options['trigger']['triggerid'])
-		);
-	}
-
-	if (isset($options['withUrl']) && $options['withUrl'] && !zbx_empty($options['trigger']['url'])) {
-		$data['trigger']['url'] = CHtml::encode(CHtml::encode(resolveTriggerUrl($options['trigger'])));
-	}
-
-	if (isset($options['acknow']) && $options['acknow']) {
-		$data['trigger']['acknow'] = $options['acknow'];
-	}
-
-	if (isset($options['items']) && $options['items']) {
-		$data['trigger']['items'] = $options['items'];
+	if (isset($options['hasUrl']) && $options['hasUrl'] && !zbx_empty($options['trigger']['url'])) {
+		$data['url'] = CHtml::encode(CHtml::encode(resolveTriggerUrl($options['trigger'])));
 	}
 
 	return $data;
