@@ -36,6 +36,13 @@ class CCollectionValidator extends CValidator {
 	public $uniqueField;
 
 	/**
+	 * Second field to be used as a uniqueness criteria.
+	 *
+	 * @var string
+	 */
+	public $uniqueField2;
+
+	/**
 	 * Error message if the array is empty.
 	 *
 	 * @var string
@@ -80,7 +87,7 @@ class CCollectionValidator extends CValidator {
 
 		// check for objects with duplicate values
 		if ($this->uniqueField) {
-			if ($duplicate = CArrayHelper::findDuplicate($value, $this->uniqueField)) {
+			if ($duplicate = CArrayHelper::findDuplicate($value, $this->uniqueField, $this->uniqueField2)) {
 				$this->error($this->messageDuplicate, $duplicate[$this->uniqueField]);
 
 				return false;
