@@ -51,7 +51,7 @@ class testFormGraph extends CWebTest {
 	 * Backup the tables that will be modified during the tests.
 	 */
 	public function testFormGraph_Setup() {
-		DBsave_tables('graphs');
+	//	DBsave_tables('graphs');
 	}
 
 
@@ -613,20 +613,17 @@ class testFormGraph extends CWebTest {
 	 * @dataProvider update
 	 */
 	public function testFormGraph_SimpleUpdate($data) {
-		$name = $data['name'];
-
 		$sqlGraphs = "select * from graphs";
 		$oldHashGraphs = DBhash($sqlGraphs);
 
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickWait('link='.$this->host);
-		$this->zbxTestClickWait("//div[@class='w']//a[text()='Graphs']");
-		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&hostid=40001');
 		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of graphs');
-		$this->zbxTestTextPresent('Graph updated');
-		$this->zbxTestTextPresent("$name");
-		$this->zbxTestTextPresent('GRAPHS');
+		$this->zbxTestTextPresent(array(
+			'Graph updated',
+			$data['name'],
+			'GRAPHS'
+		));
 
 		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
 	}
@@ -777,7 +774,7 @@ class testFormGraph extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Cannot add graph',
-						'Incorrect item for axis value.'
+						'No permissions to referred object or it does not exist!'
 					)
 				)
 			),
@@ -1019,6 +1016,6 @@ class testFormGraph extends CWebTest {
 	 * Restore the original tables.
 	 */
 	public function testFormGraph_Teardown() {
-		DBrestore_tables('graphs');
+	//	DBrestore_tables('graphs');
 	}
 }
