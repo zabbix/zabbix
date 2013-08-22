@@ -107,15 +107,16 @@ $frmMedia->addVar('media', $media);
 $frmMedia->addVar('dstfrm', $_REQUEST['dstfrm']);
 
 $cmbType = new CComboBox('mediatypeid', $mediatypeid);
-$types = DBselect(
-		'SELECT mt.mediatypeid,mt.description'.
-		' FROM media_type mt'.
-		whereDbNode('mt.mediatypeid')
-);
-$types = DBfetchArrayAssoc($types, 'mediatypeid');
+$types = DBfetchArrayAssoc(DBselect(
+	'SELECT mt.mediatypeid,mt.description'.
+	' FROM media_type mt'.
+	whereDbNode('mt.mediatypeid')
+), 'mediatypeid');
 CArrayHelper::sort($types, array('description'));
-foreach ($types as $imediatypeid => $type) {
-	$cmbType->addItem($imediatypeid, get_node_name_by_elid($type['mediatypeid'], null, NAME_DELIMITER).$type['description']);
+foreach ($types as $mediaTypeId => $type) {
+	$cmbType->addItem($mediaTypeId,
+		get_node_name_by_elid($type['mediatypeid'], null, NAME_DELIMITER).$type['description']
+	);
 }
 $frmMedia->addRow(_('Type'), $cmbType);
 $frmMedia->addRow(_('Send to'), new CTextBox('sendto', $sendto, 48));
