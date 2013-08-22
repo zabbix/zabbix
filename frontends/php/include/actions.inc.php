@@ -333,12 +333,16 @@ function get_operation_descr($type, $data) {
 				if (!empty($data['opmessage_usr'])) {
 					$users = API::User()->get(array(
 						'userids' => zbx_objectValues($data['opmessage_usr'], 'userid'),
-						'output' => array('userid', 'alias')
+						'output' => array('userid', 'alias', 'name', 'surname')
 					));
 					order_result($users, 'alias');
 
+					foreach ($users as $user) {
+						$fullnames[] = getUserFullname($user);
+					}
+
 					$result[] = bold(_('Send message to users').NAME_DELIMITER);
-					$result[] = array(implode(', ', zbx_objectValues($users, 'alias')), SPACE, _('via'), SPACE, $mediatype);
+					$result[] = array(implode(', ', $fullnames), SPACE, _('via'), SPACE, $mediatype);
 					$result[] = BR();
 				}
 
@@ -963,7 +967,7 @@ function get_actions_hint_by_eventid($eventid, $status = null) {
 		_('Status')
 	));
 
-	$sql = 'SELECT DISTINCT a.alertid,mt.description,u.alias,a.subject,a.message,a.sendto,a.status,a.retries,a.alerttype'.
+	$sql = 'SELECT DISTINCT a.alertid,mt.description,u.alias,u.name,u.surname,a.subject,a.message,a.sendto,a.status,a.retries,a.alerttype'.
 			' FROM events e,alerts a'.
 				' LEFT JOIN users u ON u.userid=a.userid'.
 				' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid'.
@@ -1001,9 +1005,25 @@ function get_actions_hint_by_eventid($eventid, $status = null) {
 				$message = '-';
 		}
 
+		if (!$row['alias']) {
+			$row['alias'] = ' - ';
+		}
+		else {
+			$fullname = '';
+			if ($row['name']) {
+				$fullname = $row['name'];
+			}
+			if ($row['surname']) {
+				$fullname .= $fullname ? ' '.$row['surname'] : $row['surname'];
+			}
+			if ($fullname) {
+				$row['alias'] .= ' ('.$fullname.')';
+			}
+		}
+
 		$tab_hint->addRow(array(
 			get_node_name_by_elid($row['alertid']),
-			empty($row['alias']) ? ' - ' : $row['alias'],
+			$row['alias'],
 			$message,
 			$status
 		));

@@ -4248,33 +4248,6 @@ static void	unquote_key_param(char *param)
 	*dst = '\0';
 }
 
-static void	quote_key_param(char **param, int forced)
-{
-	size_t	sz_src, sz_dst;
-
-	if (0 == forced)
-	{
-		if ('"' != **param && NULL == strchr(*param, ',') && NULL == strchr(*param, ']'))
-			return;
-	}
-
-	sz_dst = zbx_get_escape_string_len(*param, "\"") + 3;
-	sz_src = strlen(*param);
-
-	*param = zbx_realloc(*param, sz_dst);
-
-	(*param)[--sz_dst] = '\0';
-	(*param)[--sz_dst] = '"';
-
-	while (0 < sz_src)
-	{
-		(*param)[--sz_dst] = (*param)[--sz_src];
-		if ('"' == (*param)[sz_src])
-			(*param)[--sz_dst] = '\\';
-	}
-	(*param)[--sz_dst] = '"';
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: substitute_key_macros                                            *
