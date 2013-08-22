@@ -142,7 +142,7 @@ $host = reset($item['hosts']);
 $item['hostname'] = $host['name'];
 
 $data = array(
-	'itemid' => get_request('itemid'),
+	'itemids' => get_request('itemid'),
 	'items' => $items,
 	'item' => $item,
 	'action' => get_request('action'),
