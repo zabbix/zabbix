@@ -22,11 +22,11 @@
 class CScreenHistory extends CScreenBase {
 
 	/**
-	 * Item id
+	 * Item ids
 	 *
-	 * @var int
+	 * @var array
 	 */
-	public $itemid;
+	public $itemids;
 
 	/**
 	 * Search string
@@ -74,7 +74,7 @@ class CScreenHistory extends CScreenBase {
 	 * Init screen data.
 	 *
 	 * @param array		$options
-	 * @param int		$options['itemid']
+	 * @param array		$options['itemids']
 	 * @param string	$options['filter']
 	 * @param int		$options['filterTask']
 	 * @param int		$options['markColor']
@@ -88,7 +88,8 @@ class CScreenHistory extends CScreenBase {
 		$this->resourcetype = SCREEN_RESOURCE_HISTORY;
 
 		// mandatory
-		$this->itemid = isset($options['itemid']) ? $options['itemid'] : null;
+		$this->itemids = isset($options['itemid']) ? $options['itemid'] : null;
+		$this->itemids = isset($options['itemids']) ? $options['itemids'] : $this->itemids;
 		$this->filter = isset($options['filter']) ? $options['filter'] : null;
 		$this->filterTask = isset($options['filter_task']) ? $options['filter_task'] : null;
 		$this->markColor = isset($options['mark_color']) ? $options['mark_color'] : MARK_COLOR_RED;
@@ -101,7 +102,7 @@ class CScreenHistory extends CScreenBase {
 		if (empty($this->items)) {
 			$this->items = API::Item()->get(array(
 				'nodeids' => get_current_nodeid(),
-				'itemids' => $this->itemid,
+				'itemids' => $this->itemids,
 				'webitems' => true,
 				'selectHosts' => array('hostid', 'name'),
 				'output' => API_OUTPUT_EXTEND,
@@ -237,8 +238,8 @@ class CScreenHistory extends CScreenBase {
 						if (is_null($color)) {
 							$min_color = 0x98;
 							$max_color = 0xF8;
-							$int_color = ($max_color - $min_color) / count($this->itemid);
-							$int_color *= array_search($data['itemid'], array($this->itemid));
+							$int_color = ($max_color - $min_color) / count($this->itemids);
+							$int_color *= array_search($data['itemid'], $this->itemids);
 							$int_color += $min_color;
 							$newRow->setAttribute('style', 'background-color: '.sprintf("#%X%X%X", $int_color, $int_color, $int_color));
 						}
@@ -352,7 +353,7 @@ class CScreenHistory extends CScreenBase {
 		else {
 			if ($this->mode != SCREEN_MODE_JS) {
 				$flickerfreeData = array(
-					'itemid' => $this->itemid,
+					'itemids' => $this->itemids,
 					'action' => $this->action,
 					'filter' => $this->filter,
 					'filterTask' => $this->filterTask,
