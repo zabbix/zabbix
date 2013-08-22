@@ -79,20 +79,18 @@ class testInheritanceItemPrototype extends CWebTest {
 	 * @dataProvider update
 	 */
 	public function testInheritanceItemPrototype_SimpleUpdate($data) {
-		$name = $data['name'];
-
 		$sqlItems = "select itemid, hostid, name, key_, delay from items order by itemid";
 		$oldHashItems = DBhash($sqlItems);
 
-		$this->zbxTestLogin('templates.php');
-		$this->zbxTestClickWait('link='.$this->template);
-		$this->zbxTestClickWait('link=Discovery rules');
-		$this->zbxTestClickWait('link='.$this->discoveryRule);
-		$this->zbxTestClickWait('link=Item prototypes');
-		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestLogin('disc_prototypes.php?form=update&itemid='.$data['itemid'].'&parent_discoveryid=23500');
 		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of item prototypes');
-		$this->zbxTestTextPresent(array('Item updated', "$name", 'CONFIGURATION OF ITEM PROTOTYPES', 'Item prototypes of '.$this->discoveryRule));
+		$this->zbxTestTextPresent(array(
+			'Item updated',
+			$data['name'],
+			'CONFIGURATION OF ITEM PROTOTYPES',
+			'Item prototypes of '.$this->discoveryRule
+		));
 
 		$this->assertEquals($oldHashItems, DBhash($sqlItems));
 	}
@@ -1019,6 +1017,7 @@ class testInheritanceItemPrototype extends CWebTest {
 					'type' => 'Database monitor',
 					'name' => 'Database monitor',
 					'key' => 'item-database-monitor',
+					'params_ap' => 'SELECT * FROM items',
 					'dbCheck' => true,
 					'formCheck' => true
 				)
@@ -1141,12 +1140,26 @@ class testInheritanceItemPrototype extends CWebTest {
 					)
 				)
 			),
+			// SQL field empty
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'type' => 'Database monitor',
+					'name' => 'Database monitor',
+					'key' => 'item-database-error',
+					'errors' => array(
+							'ERROR: Page received incorrect data',
+							'Warning. Incorrect value for field "SQL query": cannot be empty.'
+					)
+				)
+			),
 			// Default
 			array(
 				array(
 					'expected' => ITEM_BAD,
 					'type' => 'Database monitor',
 					'name' => 'Database monitor',
+					'params_ap' => 'SELECT * FROM items',
 					'errors' => array(
 							'ERROR: Cannot add item',
 							'Check the key, please. Default example was passed.'
@@ -1237,6 +1250,10 @@ class testInheritanceItemPrototype extends CWebTest {
 
 		if (isset($data['ipmi_sensor'])) {
 			$this->input_type('ipmi_sensor', $data['ipmi_sensor']);
+		}
+
+		if (isset($data['params_ap'])) {
+			$this->input_type('params_ap', $data['params_ap']);
 		}
 
 		if (isset($data['params_es'])) {
