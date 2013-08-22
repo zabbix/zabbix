@@ -467,17 +467,17 @@ jQuery(function($) {
 			if (typeof(script.scriptId) !== 'undefined') {
 				var items = [],
 					name,
-					regexp = /(?:[^\/\\]+|\\.)+/g,
+					regexp = /(([^\/]*(\\\/)+)([^\/]*)+|([^\/]+))/g,
 					matched;
 
 				while (matched = regexp.exec(script.name)) {
-					// remove backslash shielding
-					matched[0] = matched[0].replace(/\\\//g, '/');
+					// remove backslashes
+					matched[0] = matched[0].replace(/\\\\/g, '\\').replace(/\\\//g, '/');
 
 					items[items.length] = matched[0];
 				}
 
-				name = items.pop();
+				name = (items.length > 0) ? items.pop() : script.name;
 
 				prepareTree(menuData, name, items, {
 					hostId: section.hostId,

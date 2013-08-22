@@ -400,16 +400,15 @@ class CScript extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty name for script.'));
 				}
 
-				$parts = explode('/', str_replace('\/', '_', $script['name']));
+				$items = preg_split('/(?<!\\\)\//', $script['name'], PREG_SPLIT_OFFSET_CAPTURE);
 
-				// menu1/menu2/{empty}
-				if (zbx_empty(end($parts))) {
+				if (zbx_empty(array_pop($items))) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Empty name for script "%1$s".', $script['name']));
 				}
 
 				// menu1/{empty}/name
-				for ($i = 0, $size = count($parts); $i < $size; $i++) {
-					if (zbx_empty($parts[$i])) {
+				foreach ($items as $item) {
+					if (zbx_empty($item)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect menu path for script "%1$s".', $script['name']));
 					}
 				}
