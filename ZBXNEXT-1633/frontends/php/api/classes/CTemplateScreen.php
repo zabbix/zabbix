@@ -236,6 +236,10 @@ class CTemplateScreen extends CScreen {
 			}
 		}
 
+		if ($options['countOutput'] !== null && $options['groupCount'] === null) {
+			return $result;
+		}
+
 		$screenIds = array_keys($result);
 
 		// adding screenitems

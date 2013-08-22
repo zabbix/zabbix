@@ -1218,17 +1218,15 @@ function order_result(&$data, $sortfield = null, $sortorder = ZBX_SORT_UP) {
 }
 
 function order_by($def, $allways = '') {
-	global $page;
-
 	$orderString = '';
 
-	$sortField = get_request('sort', CProfile::get('web.'.$page['file'].'.sort', null));
+	$sortField = getPageSortField();
 	$sortable = explode(',', $def);
 	if (!str_in_array($sortField, $sortable)) {
 		$sortField = null;
 	}
 	if ($sortField !== null) {
-		$sortOrder = get_request('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+		$sortOrder = getPageSortOrder();
 		$orderString .= $sortField.' '.$sortOrder;
 	}
 	if (!empty($allways)) {
@@ -1604,12 +1602,20 @@ function array_equal(array $a, array $b, $strict=false) {
 }
 
 /*************** PAGE SORTING ******************/
-// checking, setting AND saving sort params
+
+/**
+ * Get the sort and sort order parameters for the current page and save it into profiles.
+ *
+ * @param string $sort
+ * @param string $sortorder
+ *
+ * @retur void
+ */
 function validate_sort_and_sortorder($sort = null, $sortorder = ZBX_SORT_UP) {
 	global $page;
 
-	$_REQUEST['sort'] = get_request('sort', CProfile::get('web.'.$page['file'].'.sort', $sort));
-	$_REQUEST['sortorder'] = get_request('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', $sortorder));
+	$_REQUEST['sort'] = getPageSortField($sort);
+	$_REQUEST['sortorder'] = getPageSortOrder($sortorder);
 
 	if (!is_null($_REQUEST['sort'])) {
 		$_REQUEST['sort'] = preg_replace('/[^a-z\.\_]/i', '', $_REQUEST['sort']);
