@@ -209,7 +209,7 @@ void	init_result(AGENT_RESULT *result)
 	result->msg = NULL;
 }
 
-static void	zbx_log_free(zbx_log_t *log)
+static void	zbx_log_clean(zbx_log_t *log)
 {
 	zbx_free(log->source);
 	zbx_free(log->value);
@@ -220,7 +220,7 @@ void	zbx_logs_free(zbx_log_t **logs)
 	size_t	i;
 
 	for (i = 0; NULL != logs[i]; i++)
-		zbx_log_free(logs[i]);
+		zbx_log_clean(logs[i]);
 	zbx_free(logs);
 }
 
