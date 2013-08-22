@@ -42,6 +42,7 @@ $fields = array(
 	'status' =>		        	array(T_ZBX_INT, O_OPT, null,		        IN(array(HOST_STATUS_NOT_MONITORED, HOST_STATUS_MONITORED)), 'isset({save})'),
 	'inventory_mode' =>			array(T_ZBX_INT, O_OPT, null, IN(array(HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC)), null),
 	'templates' =>		    	array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null),
+	'add_template' =>			array(T_ZBX_STR, O_OPT, null,		null,	null),
 	'add_templates' =>		    array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null),
 	'group_links' =>			array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null),
 	'group_prototypes' =>		array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null),
@@ -94,10 +95,18 @@ if (get_request('parent_discoveryid')) {
 else {
 	access_deny();
 }
+
 /*
  * Actions
  */
-if (get_request('unlink')) {
+// add templates to the list
+if (get_request('add_template')) {
+	foreach (get_request('add_templates') as $templateId) {
+		$_REQUEST['templates'][$templateId] = $templateId;
+	}
+}
+// unlink templates
+elseif (get_request('unlink')) {
 	foreach (get_request('unlink') as $templateId => $value) {
 		unset($_REQUEST['templates'][$templateId]);
 	}
@@ -247,10 +256,9 @@ if (isset($_REQUEST['form'])) {
 	);
 
 	// add already linked and new templates
-	$templateIds = array_merge(get_request('templates', array()), get_request('add_templates', array()));
 	$data['host_prototype']['templates'] = API::Template()->get(array(
 		'output' => array('templateid', 'name'),
-		'templateids' => $templateIds
+		'templateids' => get_request('templates', array())
 	));
 
 	// add parent host
