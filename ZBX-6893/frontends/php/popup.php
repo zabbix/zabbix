@@ -128,7 +128,7 @@ if ($min_user_type > CWebUser::$data['type']) {
  */
 // allowed 'srcfld*' parameter values for each 'srctbl' value
 $allowedSrcFields = array(
-	'users'					=> '"usergrpid", "alias", "userid"',
+	'users'					=> '"usergrpid", "alias", "fullname", "userid"',
 	'triggers'				=> '"description", "triggerid", "expression"',
 	'items'					=> '"itemid", "name"',
 	'prototypes'			=> '"itemid", "name", "flags"',
@@ -159,7 +159,7 @@ $fields = array(
 	'group' =>						array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'hostid' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'host' =>						array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'parent_discoveryid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
+	'parent_discoveryid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'screenid' =>					array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'templates' =>					array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	null),
 	'host_templates' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	null),
@@ -167,7 +167,7 @@ $fields = array(
 	'multiselect' =>				array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'submit' =>						array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'excludeids' =>					array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'only_hostid' =>				array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
+	'only_hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'monitored_hosts' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'templated_hosts' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'real_hosts' =>					array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
@@ -204,6 +204,28 @@ for ($i = 2; $i <= $srcfldCount; $i++) {
 	$fields['srcfld'.$i] = array(T_ZBX_STR, O_OPT, P_SYS, IN($allowedSrcFields[$_REQUEST['srctbl']]), null);
 }
 check_fields($fields);
+
+// validate permissions
+if (get_request('only_hostid')) {
+	if (!API::Host()->isReadable(array($_REQUEST['only_hostid']))) {
+		access_deny();
+	}
+}
+else {
+	if (get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid'])) ||
+			get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
+		access_deny();
+	}
+	if (get_request('nodeid')) {
+		$node = get_node_by_nodeid($_REQUEST['nodeid']);
+		if (!$node) {
+			access_deny();
+		}
+	}
+}
+if (get_request('parent_discoveryid') && !API::DiscoveryRule()->isReadable(array($_REQUEST['parent_discoveryid']))) {
+	access_deny();
+}
 
 $dstfrm = get_request('dstfrm', ''); // destination form
 $dstfld1 = get_request('dstfld1', ''); // output field on destination form
@@ -475,10 +497,6 @@ if (isset($onlyHostid)) {
 	));
 	$host = reset($only_hosts);
 
-	if (empty($host)) {
-		access_deny();
-	}
-
 	$cmbHosts = new CComboBox('hostid', $hostid);
 	$cmbHosts->addItem($hostid, $host['host']);
 	$cmbHosts->setEnabled('disabled');
@@ -609,9 +627,13 @@ elseif ($srctbl == 'users') {
 	$users = API::User()->get($options);
 	order_result($users, 'alias');
 
-	foreach ($users as $unum => $user) {
+	foreach ($users as &$user) {
 		$alias = new CSpan($user['alias'], 'link');
 		$alias->attr('id', 'spanid'.$user['userid']);
+
+		if (isset($srcfld2) && $srcfld2 == 'fullname') {
+			$user[$srcfld2] = getUserFullname($user);
+		}
 
 		if ($multiselect) {
 			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($user['userid']).');';
@@ -634,6 +656,7 @@ elseif ($srctbl == 'users') {
 			$user['surname']
 		));
 	}
+	unset($user);
 
 	if ($multiselect) {
 		$button = new CButton('select', _('Select'), "javascript: addSelectedValues('users', ".zbx_jsvalue($reference).');');
