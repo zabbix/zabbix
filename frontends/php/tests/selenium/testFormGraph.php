@@ -859,12 +859,7 @@ class testFormGraph extends CWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormGraph_SimpleCreate($data) {
-
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickWait('link='.$this->host);
-		$this->zbxTestClickWait("//div[@class='w']//a[text()='Graphs']");
-
-		$this->zbxTestClickWait('form');
+		$this->zbxTestLogin('graphs.php?hostid=40001&form=Create+graph');
 		$this->checkTitle('Configuration of graphs');
 
 		if (isset($data['name'])) {
