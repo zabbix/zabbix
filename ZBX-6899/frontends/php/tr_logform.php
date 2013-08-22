@@ -34,35 +34,37 @@ define('ZBX_PAGE_NO_MENU', 1);
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+$fields = array(
+	'description' =>	array(T_ZBX_STR, O_OPT,  NULL,			NOT_EMPTY,			'isset({save_trigger})'),
+	'itemid' =>			array(T_ZBX_INT, O_OPT,	 P_SYS,			DB_ID,				'isset({save_trigger})'),
+	'sform' =>			array(T_ZBX_INT, O_OPT,  NULL,			IN('0,1'),			null),
+	'sitems' =>			array(T_ZBX_INT, O_OPT,  NULL,			IN('0,1'),			null),
+	'triggerid' =>		array(T_ZBX_INT, O_OPT,  P_SYS,			DB_ID,				null),
+	'type' =>			array(T_ZBX_INT, O_OPT,  NULL,			IN('0,1'),			null),
+	'priority' =>		array(T_ZBX_INT, O_OPT,  NULL,			IN('0,1,2,3,4,5'),	'isset({save_trigger})'),
+	'expressions' =>	array(T_ZBX_STR, O_OPT,	 NULL,			NOT_EMPTY,			'isset({save_trigger})'),
+	'expr_type' =>		array(T_ZBX_INT, O_OPT,  NULL,			IN('0,1'),			null),
+	'comments' =>		array(T_ZBX_STR, O_OPT,  null,			null,				null),
+	'url' =>			array(T_ZBX_STR, O_OPT,  null,			null,				null),
+	'status' =>			array(T_ZBX_INT, O_OPT,  NULL,			IN('0,1'),			null),
+	'form_refresh' =>	array(T_ZBX_INT, O_OPT,	 NULL,			NULL,				NULL),
+	'save_trigger' =>	array(T_ZBX_STR, O_OPT,	 P_SYS|P_ACT,	NULL,				null),
+	'keys '=> 			array(T_ZBX_STR, O_OPT,  NULL,			NULL,				NULL),
+);
+check_fields($fields);
 
-	$fields=array(
-		'description'=>		array(T_ZBX_STR, O_OPT,  NULL,		NOT_EMPTY,	'isset({save_trigger})'),
-		'itemid'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,		DB_ID,	'isset({save_trigger})'),
-		'sform'=>			array(T_ZBX_INT, O_OPT,  NULL,	  	IN('0,1'),	null),
-		'sitems'=>			array(T_ZBX_INT, O_OPT,  NULL, 		IN('0,1'),	null),
+/*
+ * Permissions
+ */
+if (get_request('itemid') && !API::Item()->isWritable(array($_REQUEST['itemid']))
+		|| get_request('triggerid') && !API::Trigger()->isWritable(array($_REQUEST['triggerid']))) {
+	access_deny();
+}
 
-		'groupid'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,		DB_ID,	null),
-		'hostid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,		DB_ID,	null),
-		'triggerid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,		DB_ID,	null),
-
-		'type'=>			array(T_ZBX_INT, O_OPT,  NULL, 		IN('0,1'),	null),
-		'priority'=>		array(T_ZBX_INT, O_OPT,  NULL, 		IN('0,1,2,3,4,5'),	'isset({save_trigger})'),
-		'expressions'=>		array(T_ZBX_STR, O_OPT,	 NULL,		NOT_EMPTY,	'isset({save_trigger})'),
-		'expr_type'=>		array(T_ZBX_INT, O_OPT,  NULL, 		IN('0,1'),	null),
-		'comments'=>		array(T_ZBX_STR, O_OPT,  null,  	null, null),
-		'url'=>				array(T_ZBX_STR, O_OPT,  null,  	null, null),
-		'status'=>			array(T_ZBX_INT, O_OPT,  NULL, 		IN('0,1'),	null),
-		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	 NULL,		NULL,	NULL),
-		'save_trigger'=>	array(T_ZBX_STR, O_OPT,	 P_SYS|P_ACT,	NULL,	null),
-		'keys'=> 			array(T_ZBX_STR, O_OPT,  NULL,		NULL,	NULL),
-	);
-
-	check_fields($fields);
-
-	$itemid = get_request('itemid',0);
+$itemid = get_request('itemid', 0);
 
 //------------------------ <ACTIONS> ---------------------------
-if(isset($_REQUEST['save_trigger'])){
+if (isset($_REQUEST['save_trigger'])) {
 	show_messages();
 
 	$exprs = get_request('expressions', false);
