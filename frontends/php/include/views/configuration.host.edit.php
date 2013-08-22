@@ -357,7 +357,7 @@ else {
 		$row->addItem(new CCol(_('No SNMP interfaces defined.'), null, 5));
 	}
 	$ifTab->addRow($row);
-	$hostList->addRow(_('SNMP interfaces'), new CDiv($ifTab, 'border_dotted objectgroup'), false, null, 'interface-row');
+	$hostList->addRow(_('SNMP interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row');
 
 	// table for JMX interfaces with footer
 	$ifTab = new CTable(null, 'formElementTable');
