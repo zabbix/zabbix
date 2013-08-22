@@ -513,7 +513,7 @@ if (!empty($this->data['new_operation'])) {
 			$userList->attr('style', 'min-width: 310px;');
 			$userList->setAttribute('id', 'opmsgUserList');
 
-			$addUserBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=alias&multiselect=1", 450, 450)', 'link_menu');
+			$addUserBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1", 450, 450)', 'link_menu');
 			$addUserBtn->attr('id', 'adduserbtn');
 			$userList->addRow(new CRow(new CCol($addUserBtn, null, 2), null, 'opmsgUserListFooter'));
 
@@ -534,9 +534,14 @@ if (!empty($this->data['new_operation'])) {
 
 			$users = API::User()->get(array(
 				'userids' => $userids,
-				'output' => array('alias')
+				'output' => array('alias', 'name', 'surname')
 			));
 			order_result($users, 'alias');
+
+			foreach ($users as &$user) {
+				$user['fullname'] = getUserFullname($user);
+			}
+			unset($user);
 
 			$jsInsert = 'addPopupValues('.zbx_jsvalue(array('object' => 'usrgrpid', 'values' => $usrgrps)).');';
 			$jsInsert .= 'addPopupValues('.zbx_jsvalue(array('object' => 'userid', 'values' => $users)).');';

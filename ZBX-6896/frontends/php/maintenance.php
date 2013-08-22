@@ -78,12 +78,17 @@ $fields = array(
 	'form' =>								array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form_refresh' =>						array(T_ZBX_STR, O_OPT, null,	null,		null)
 );
+
 check_fields($fields);
+
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 /*
  * Permissions
  */
+if (get_request('groupid') && !API::HostGroup()->isWritable(array($_REQUEST['groupid']))) {
+	access_deny();
+}
 if (isset($_REQUEST['maintenanceid'])) {
 	$dbMaintenance = API::Maintenance()->get(array(
 		'output' => API_OUTPUT_EXTEND,
@@ -97,12 +102,6 @@ if (isset($_REQUEST['maintenanceid'])) {
 }
 if (isset($_REQUEST['go']) && (!isset($_REQUEST['maintenanceids']) || !is_array($_REQUEST['maintenanceids']))) {
 	access_deny();
-}
-if (get_request('groupid', 0) > 0) {
-	$groupids = available_groups($_REQUEST['groupid'], 1);
-	if (empty($groupids)) {
-		access_deny();
-	}
 }
 $_REQUEST['go'] = get_request('go', 'none');
 
