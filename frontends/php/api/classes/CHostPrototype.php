@@ -399,7 +399,9 @@ class CHostPrototype extends CHostBase {
 		// TODO: permissions should be checked using the $dbHostPrototypes array
 		$this->checkHostPrototypePermissions(zbx_objectValues($hostPrototypes, 'hostid'));
 
-		$hostPrototypes = $this->extendFromObjects(zbx_toHash($hostPrototypes, 'hostid'), $dbHostPrototypes, array('host'));
+		$hostPrototypes = $this->extendFromObjects(zbx_toHash($hostPrototypes, 'hostid'), $dbHostPrototypes, array(
+			'host', 'name'
+		));
 
 		// host prototype validator
 		$hostPrototypeValidator = new CPartialSchemaValidator($this->getHostPrototypeSchema());
@@ -496,7 +498,7 @@ class CHostPrototype extends CHostBase {
 
 		// fetch updated objects from the DB
 		$dbHostPrototypes = $this->get(array(
-			'output' => array('host'),
+			'output' => array('host', 'name'),
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectDiscoveryRule' => array('itemid'),
