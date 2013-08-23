@@ -22,7 +22,7 @@
 #include "simple.h"
 #include "log.h"
 
-typedef int	(*vmfunc_t)(AGENT_REQUEST *, AGENT_RESULT *);
+typedef int	(*vmfunc_t)(AGENT_REQUEST *, const char *, const char *, AGENT_RESULT *);
 
 #define ZBX_VMWARE_PREFIX	"vmware."
 
@@ -205,7 +205,7 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 	{
 		if (NULL != vmfunc)
 		{
-			if (SYSINFO_RET_OK == vmfunc(&request, result))
+			if (SYSINFO_RET_OK == vmfunc(&request, item->username, item->password, result))
 				ret = SUCCEED;
 		}
 		else

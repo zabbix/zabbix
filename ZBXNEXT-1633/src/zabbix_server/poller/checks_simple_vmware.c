@@ -1093,8 +1093,8 @@ static void	vmware_get_counterid_by_key(const char *key, zbx_uint64_t *counterid
 	zbx_free(value);
 }
 
-static int	vmware_perf_counter_details_get(CURL *easyhandle, const zbx_vector_uint64_t *counterids, zbx_counters_t *counters,
-		char **error, unsigned flags)
+static int	vmware_perf_counter_details_get(CURL *easyhandle, const zbx_vector_uint64_t *counterids,
+		zbx_counters_t *counters, char **error, unsigned flags)
 {
 	const char	*__function_name = "vmware_perf_counter_details_get";
 
@@ -1539,6 +1539,18 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 		vcenters_initialized = 1;
 	}
 
+	if ('\0' == *url)
+	{
+		*error = zbx_strdup(*error, "URL cannot be empty.");
+		goto out;
+	}
+
+	if ('\0' == *username)
+	{
+		*error = zbx_strdup(*error, "User name cannot be empty.");
+		goto out;
+	}
+
 	if (NULL == (vcenter = vcenter_get(url, username, password)))
 	{
 		vcenter = zbx_malloc(NULL, sizeof(zbx_vcenter_t));
@@ -1868,6 +1880,18 @@ static int	vsphere_update(const char *url, const char *username, const char *pas
 		vspheres_initialized = 1;
 	}
 
+	if ('\0' == *url)
+	{
+		*error = zbx_strdup(*error, "URL cannot be empty.");
+		goto out;
+	}
+
+	if ('\0' == *username)
+	{
+		*error = zbx_strdup(*error, "User name cannot be empty.");
+		goto out;
+	}
+
 	if (NULL == (vsphere = vsphere_get(url, username, password)))
 	{
 		vsphere = zbx_malloc(NULL, sizeof(zbx_vsphere_t));
@@ -2085,23 +2109,22 @@ int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, AGENT_RESULT
  *                                                                            *
  ******************************************************************************/
 
-static int	get_vcenter_vmstat(AGENT_REQUEST *request, const char *xpath, AGENT_RESULT *result)
+static int	get_vcenter_vmstat(AGENT_REQUEST *request, const char *username, const char *password,
+		const char *xpath, AGENT_RESULT *result)
 {
 	zbx_vcenter_t	*vcenter;
 	zbx_vm_t	*vm = NULL;
 	zbx_hv_t	*hv;
-	char		*url, *username, *password, *uuid, *value, *error = NULL;
+	char		*url, *uuid, *value, *error = NULL;
 	int		i;
 
-	if (4 != request->nparam)
+	if (2 != request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
-	username = get_rparam(request, 1);
-	password = get_rparam(request, 2);
-	uuid = get_rparam(request, 3);
+	uuid = get_rparam(request, 1);
 
-	if ('\0' == *url || '\0' == *username || '\0' == *uuid)
+	if ('\0' == *uuid)
 		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vcenter_update(url, username, password, &error))
@@ -2132,21 +2155,20 @@ static int	get_vcenter_vmstat(AGENT_REQUEST *request, const char *xpath, AGENT_R
 	return SYSINFO_RET_OK;
 }
 
-static int	get_vcenter_hv_hoststat(AGENT_REQUEST *request, const char *xpath, AGENT_RESULT *result)
+static int	get_vcenter_hv_hoststat(AGENT_REQUEST *request, const char *username, const char *password,
+		const char *xpath, AGENT_RESULT *result)
 {
 	zbx_vcenter_t	*vcenter;
 	zbx_hv_t	*hv;
-	char		*url, *username, *password, *uuid, *value, *error = NULL;
+	char		*url, *uuid, *value, *error = NULL;
 
-	if (4 != request->nparam)
+	if (2 != request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
-	username = get_rparam(request, 1);
-	password = get_rparam(request, 2);
-	uuid = get_rparam(request, 3);
+	uuid = get_rparam(request, 1);
 
-	if ('\0' == *url || '\0' == *username || '\0' == *uuid)
+	if ('\0' == *uuid)
 		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vcenter_update(url, username, password, &error))
@@ -2172,24 +2194,23 @@ static int	get_vcenter_hv_hoststat(AGENT_REQUEST *request, const char *xpath, AG
 #define ZBX_OPT_XPATH		0
 #define ZBX_OPT_VM_NUM		1
 #define ZBX_OPT_MEM_BALLOONED	2
-static int	get_vcenter_hv_stat(AGENT_REQUEST *request, int opt, const char *xpath, AGENT_RESULT *result)
+static int	get_vcenter_hv_stat(AGENT_REQUEST *request, const char *username, const char *password,
+		int opt, const char *xpath, AGENT_RESULT *result)
 {
 	zbx_vcenter_t	*vcenter;
-	char		*url, *username, *password, *value, *uuid, *error = NULL;
+	char		*url, *value, *uuid, *error = NULL;
 	int		i;
 	zbx_hv_t	*hv;
 	zbx_vm_t	*vm;
 	zbx_uint64_t	value_uint64, value_uint64_sum;
 
-	if (4 != request->nparam)
+	if (2 != request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
-	username = get_rparam(request, 1);
-	password = get_rparam(request, 2);
-	uuid = get_rparam(request, 3);
+	uuid = get_rparam(request, 1);
 
-	if ('\0' == *url || '\0' == *username)
+	if ('\0' == *uuid)
 		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vcenter_update(url, username, password, &error))
@@ -2244,23 +2265,19 @@ static int	get_vcenter_hv_stat(AGENT_REQUEST *request, int opt, const char *xpat
 	return SYSINFO_RET_OK;
 }
 
-int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	struct zbx_json	j;
 	int		i;
-	char		*url, *username, *password, *error = NULL;
+	char		*url, *error = NULL;
 	zbx_vcenter_t	*vcenter = NULL;
 	zbx_cluster_t	*cluster = NULL;
 
-	if (3 != request->nparam)
+	if (1 != request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
-	username = get_rparam(request, 1);
-	password = get_rparam(request, 2);
-
-	if ('\0' == *url || '\0' == *username)
-		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vcenter_update(url, username, password, &error))
 	{
@@ -2293,21 +2310,20 @@ int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, AGENT_RESULT *result
 	return SYSINFO_RET_OK;
 }
 
-int	check_vcenter_cluster_status(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_cluster_status(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	char		*url, *username, *password, *name, *status, *error = NULL;
+	char		*url, *name, *status, *error = NULL;
 	zbx_vcenter_t	*vcenter;
 	zbx_cluster_t	*cluster;
 
-	if (4 != request->nparam)
+	if (2 != request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
-	username = get_rparam(request, 1);
-	password = get_rparam(request, 2);
-	name = get_rparam(request, 3);
+	name = get_rparam(request, 1);
 
-	if ('\0' == *url || '\0' == *username || '\0' == *name)
+	if ('\0' == *name)
 		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vcenter_update(url, username, password, &error))
@@ -2339,20 +2355,16 @@ int	check_vcenter_cluster_status(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	check_vcenter_eventlog(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_eventlog(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	zbx_vcenter_t	*vcenter;
-	char		*url, *username, *password, *error = NULL;
+	char		*url, *error = NULL;
 
-	if (3 != request->nparam)
+	if (1 != request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
-	username = get_rparam(request, 1);
-	password = get_rparam(request, 2);
-
-	if ('\0' == *url || '\0' == *username)
-		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vcenter_update(url, username, password, &error))
 	{
@@ -2366,22 +2378,21 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return vmware_get_events(vcenter->events, request->lastlogsize, result);
 }
 
-int	check_vcenter_hv_cluster_name(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_hv_cluster_name(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	char		*url, *username, *password, *uuid, *error = NULL;
+	char		*url, *uuid, *error = NULL;
 	zbx_vcenter_t	*vcenter;
 	zbx_hv_t	*hv;
 	zbx_cluster_t	*cluster = NULL;
 
-	if (4 != request->nparam)
+	if (2 != request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
-	username = get_rparam(request, 1);
-	password = get_rparam(request, 2);
-	uuid = get_rparam(request, 3);
+	uuid = get_rparam(request, 1);
 
-	if ('\0' == *url || '\0' == *username || '\0' == *uuid)
+	if ('\0' == *uuid)
 		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vcenter_update(url, username, password, &error))
@@ -2404,11 +2415,13 @@ int	check_vcenter_hv_cluster_name(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	check_vcenter_hv_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_hv_cpu_usage(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int	ret;
 
-	ret = get_vcenter_hv_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("quickStats", "overallCpuUsage"), result);
+	ret = get_vcenter_hv_stat(request, username, password, ZBX_OPT_XPATH,
+			ZBX_XPATH_LN2("quickStats", "overallCpuUsage"), result);
 
 	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * 1000000;
@@ -2416,23 +2429,19 @@ int	check_vcenter_hv_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	check_vcenter_hv_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	struct zbx_json	j;
 	int		i;
-	char		*url, *username, *password, *name, *error = NULL;
+	char		*url, *name, *error = NULL;
 	zbx_vcenter_t	*vcenter;
 	zbx_hv_t	*hv;
 
-	if (3 != request->nparam)
+	if (1 != request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
-	username = get_rparam(request, 1);
-	password = get_rparam(request, 2);
-
-	if ('\0' == *url || '\0' == *username)
-		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vcenter_update(url, username, password, &error))
 	{
@@ -2478,21 +2487,25 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	check_vcenter_hv_fullname(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_hv_fullname(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vcenter_hv_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("product", "fullName"), result);
+	return get_vcenter_hv_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_LN2("product", "fullName"),
+			result);
 }
 
-int	check_vcenter_hv_hw_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_hv_hw_cpu_num(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vcenter_hv_hoststat(request, ZBX_XPATH_LN2("hardware", "numCpuCores"), result);
+	return get_vcenter_hv_hoststat(request, username, password, ZBX_XPATH_LN2("hardware", "numCpuCores"), result);
 }
 
-int	check_vcenter_hv_hw_cpu_freq(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_hv_hw_cpu_freq(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int	ret;
 
-	ret = get_vcenter_hv_hoststat(request, ZBX_XPATH_LN2("hardware", "cpuMhz"), result);
+	ret = get_vcenter_hv_hoststat(request, username, password, ZBX_XPATH_LN2("hardware", "cpuMhz"), result);
 
 	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * 1000000;
@@ -2500,41 +2513,48 @@ int	check_vcenter_hv_hw_cpu_freq(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	check_vcenter_hv_hw_cpu_model(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_hv_hw_cpu_model(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vcenter_hv_hoststat(request, ZBX_XPATH_LN2("hardware", "cpuModel"), result);
+	return get_vcenter_hv_hoststat(request, username, password, ZBX_XPATH_LN2("hardware", "cpuModel"), result);
 }
 
-int	check_vcenter_hv_hw_cpu_threads(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_hv_hw_cpu_threads(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vcenter_hv_hoststat(request, ZBX_XPATH_LN2("hardware", "numCpuThreads"), result);
+	return get_vcenter_hv_hoststat(request, username, password, ZBX_XPATH_LN2("hardware", "numCpuThreads"), result);
 }
 
-int	check_vcenter_hv_hw_memory(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_hv_hw_memory(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vcenter_hv_hoststat(request, ZBX_XPATH_LN2("hardware", "memorySize"), result);
+	return get_vcenter_hv_hoststat(request, username, password, ZBX_XPATH_LN2("hardware", "memorySize"), result);
 }
 
-int	check_vcenter_hv_hw_model(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_hv_hw_model(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vcenter_hv_hoststat(request, ZBX_XPATH_LN2("hardware", "model"), result);
+	return get_vcenter_hv_hoststat(request, username, password, ZBX_XPATH_LN2("hardware", "model"), result);
 }
 
-int	check_vcenter_hv_hw_uuid(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_hv_hw_uuid(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vcenter_hv_hoststat(request, ZBX_XPATH_LN2("hardware", "uuid"), result);
+	return get_vcenter_hv_hoststat(request, username, password, ZBX_XPATH_LN2("hardware", "uuid"), result);
 }
 
-int	check_vcenter_hv_hw_vendor(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_hv_hw_vendor(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vcenter_hv_hoststat(request, ZBX_XPATH_LN2("hardware", "vendor"), result);
+	return get_vcenter_hv_hoststat(request, username, password, ZBX_XPATH_LN2("hardware", "vendor"), result);
 }
 
-int	check_vcenter_hv_memory_size_ballooned(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_hv_memory_size_ballooned(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int	ret;
 
-	ret = get_vcenter_hv_stat(request, ZBX_OPT_MEM_BALLOONED, NULL, result);
+	ret = get_vcenter_hv_stat(request, username, password, ZBX_OPT_MEM_BALLOONED, NULL, result);
 
 	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
@@ -2542,11 +2562,13 @@ int	check_vcenter_hv_memory_size_ballooned(AGENT_REQUEST *request, AGENT_RESULT 
 	return ret;
 }
 
-int	check_vcenter_hv_memory_used(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_hv_memory_used(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int	ret;
 
-	ret = get_vcenter_hv_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("quickStats", "overallMemoryUsage"), result);
+	ret = get_vcenter_hv_stat(request, username, password, ZBX_OPT_XPATH,
+			ZBX_XPATH_LN2("quickStats", "overallMemoryUsage"), result);
 
 	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
@@ -2554,11 +2576,13 @@ int	check_vcenter_hv_memory_used(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	check_vcenter_hv_status(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_hv_status(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int	ret;
 
-	ret = get_vcenter_hv_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("val", "overallStatus"), result);
+	ret = get_vcenter_hv_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_LN2("val", "overallStatus"),
+			result);
 
 	if (SYSINFO_RET_OK == ret && GET_STR_RESULT(result))
 	{
@@ -2579,43 +2603,48 @@ int	check_vcenter_hv_status(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	check_vcenter_hv_uptime(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_hv_uptime(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vcenter_hv_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("quickStats", "uptime"), result);
+	return get_vcenter_hv_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_LN2("quickStats", "uptime"),
+			result);
 }
 
-int	check_vcenter_hv_version(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_hv_version(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vcenter_hv_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("product", "version"), result);
+	return get_vcenter_hv_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_LN2("product", "version"),
+			result);
 }
 
-int	check_vcenter_hv_vm_num(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_hv_vm_num(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vcenter_hv_stat(request, ZBX_OPT_VM_NUM, NULL, result);
+	return get_vcenter_hv_stat(request, username, password, ZBX_OPT_VM_NUM, NULL, result);
 }
 
-int	check_vcenter_vm_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_vm_cpu_num(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vcenter_vmstat(request, ZBX_XPATH_LN2("config", "numCpu"), result);
+	return get_vcenter_vmstat(request, username, password, ZBX_XPATH_LN2("config", "numCpu"), result);
 }
 
-int	check_vcenter_vm_cluster_name(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_vm_cluster_name(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int		i;
-	char		*url, *username, *password, *uuid, *error = NULL;
+	char		*url, *uuid, *error = NULL;
 	zbx_vcenter_t	*vcenter;
 	zbx_hv_t	*hv;
 	zbx_cluster_t	*cluster = NULL;
 
-	if (4 != request->nparam)
+	if (2 != request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
-	username = get_rparam(request, 1);
-	password = get_rparam(request, 2);
-	uuid = get_rparam(request, 3);
+	uuid = get_rparam(request, 1);
 
-	if ('\0' == *url || '\0' == *username || '\0' == *uuid)
+	if ('\0' == *uuid)
 		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vcenter_update(url, username, password, &error))
@@ -2646,11 +2675,12 @@ int	check_vcenter_vm_cluster_name(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	check_vcenter_vm_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_vm_cpu_usage(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int	ret;
 
-	ret = get_vcenter_vmstat(request, ZBX_XPATH_LN2("quickStats", "overallCpuUsage"), result);
+	ret = get_vcenter_vmstat(request, username, password, ZBX_XPATH_LN2("quickStats", "overallCpuUsage"), result);
 
 	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * 1000000;
@@ -2658,24 +2688,20 @@ int	check_vcenter_vm_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	check_vcenter_vm_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	struct zbx_json	j;
 	int		i, k;
-	char		*url, *username, *password, *name, *host, *error = NULL;
+	char		*url, *name, *host, *error = NULL;
 	zbx_vcenter_t	*vcenter;
 	zbx_hv_t	*hv;
 	zbx_vm_t	*vm;
 
-	if (3 != request->nparam)
+	if (1 != request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
-	username = get_rparam(request, 1);
-	password = get_rparam(request, 2);
-
-	if ('\0' == *url || '\0' == *username)
-		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vcenter_update(url, username, password, &error))
 	{
@@ -2734,16 +2760,18 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	check_vcenter_vm_hv_name(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_vm_hv_name(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vcenter_vmstat(request, ZBX_XPATH_LN2("runtime", "host"), result);
+	return get_vcenter_vmstat(request, username, password, ZBX_XPATH_LN2("runtime", "host"), result);
 }
 
-int	check_vcenter_vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_vm_memory_size(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int	ret;
 
-	ret = get_vcenter_vmstat(request, ZBX_XPATH_LN2("config", "memorySizeMB"), result);
+	ret = get_vcenter_vmstat(request, username, password, ZBX_XPATH_LN2("config", "memorySizeMB"), result);
 
 	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
@@ -2751,11 +2779,12 @@ int	check_vcenter_vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	check_vcenter_vm_memory_size_ballooned(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_vm_memory_size_ballooned(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int	ret;
 
-	ret = get_vcenter_vmstat(request, ZBX_XPATH_LN2("quickStats", "balloonedMemory"), result);
+	ret = get_vcenter_vmstat(request, username, password, ZBX_XPATH_LN2("quickStats", "balloonedMemory"), result);
 
 	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
@@ -2763,11 +2792,12 @@ int	check_vcenter_vm_memory_size_ballooned(AGENT_REQUEST *request, AGENT_RESULT 
 	return ret;
 }
 
-int	check_vcenter_vm_memory_size_compressed(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_vm_memory_size_compressed(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int	ret;
 
-	ret = get_vcenter_vmstat(request, ZBX_XPATH_LN2("quickStats", "compressedMemory"), result);
+	ret = get_vcenter_vmstat(request, username, password, ZBX_XPATH_LN2("quickStats", "compressedMemory"), result);
 
 	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
@@ -2775,11 +2805,12 @@ int	check_vcenter_vm_memory_size_compressed(AGENT_REQUEST *request, AGENT_RESULT
 	return ret;
 }
 
-int	check_vcenter_vm_memory_size_swapped(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_vm_memory_size_swapped(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int	ret;
 
-	ret = get_vcenter_vmstat(request, ZBX_XPATH_LN2("quickStats", "swappedMemory"), result);
+	ret = get_vcenter_vmstat(request, username, password, ZBX_XPATH_LN2("quickStats", "swappedMemory"), result);
 
 	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
@@ -2787,11 +2818,12 @@ int	check_vcenter_vm_memory_size_swapped(AGENT_REQUEST *request, AGENT_RESULT *r
 	return ret;
 }
 
-int	check_vcenter_vm_memory_size_usage_guest(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_vm_memory_size_usage_guest(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int	ret;
 
-	ret = get_vcenter_vmstat(request, ZBX_XPATH_LN2("quickStats", "guestMemoryUsage"), result);
+	ret = get_vcenter_vmstat(request, username, password, ZBX_XPATH_LN2("quickStats", "guestMemoryUsage"), result);
 
 	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
@@ -2799,11 +2831,12 @@ int	check_vcenter_vm_memory_size_usage_guest(AGENT_REQUEST *request, AGENT_RESUL
 	return ret;
 }
 
-int	check_vcenter_vm_memory_size_usage_host(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_vm_memory_size_usage_host(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int	ret;
 
-	ret = get_vcenter_vmstat(request, ZBX_XPATH_LN2("quickStats", "hostMemoryUsage"), result);
+	ret = get_vcenter_vmstat(request, username, password, ZBX_XPATH_LN2("quickStats", "hostMemoryUsage"), result);
 
 	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
@@ -2811,11 +2844,12 @@ int	check_vcenter_vm_memory_size_usage_host(AGENT_REQUEST *request, AGENT_RESULT
 	return ret;
 }
 
-int	check_vcenter_vm_memory_size_private(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_vm_memory_size_private(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int	ret;
 
-	ret = get_vcenter_vmstat(request, ZBX_XPATH_LN2("quickStats", "privateMemory"), result);
+	ret = get_vcenter_vmstat(request, username, password, ZBX_XPATH_LN2("quickStats", "privateMemory"), result);
 
 	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
@@ -2823,11 +2857,12 @@ int	check_vcenter_vm_memory_size_private(AGENT_REQUEST *request, AGENT_RESULT *r
 	return ret;
 }
 
-int	check_vcenter_vm_memory_size_shared(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_vm_memory_size_shared(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int	ret;
 
-	ret = get_vcenter_vmstat(request, ZBX_XPATH_LN2("quickStats", "sharedMemory"), result);
+	ret = get_vcenter_vmstat(request, username, password, ZBX_XPATH_LN2("quickStats", "sharedMemory"), result);
 
 	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
@@ -2835,30 +2870,30 @@ int	check_vcenter_vm_memory_size_shared(AGENT_REQUEST *request, AGENT_RESULT *re
 	return ret;
 }
 
-int	check_vcenter_vm_powerstate(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_vm_powerstate(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vcenter_vmstat(request, ZBX_XPATH_LN2("runtime", "powerState"), result);
+	return get_vcenter_vmstat(request, username, password, ZBX_XPATH_LN2("runtime", "powerState"), result);
 }
 
-int	check_vcenter_vm_net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_vm_net_if_discovery(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	struct zbx_json		j;
 	zbx_vcenter_t		*vcenter;
 	zbx_hv_t		*hv;
 	zbx_vm_t		*vm = NULL;
 	zbx_dev_t		*dev;
-	char			*url, *username, *password, *uuid, *error = NULL;
+	char			*url, *uuid, *error = NULL;
 	int			i;
 
-	if (4 != request->nparam)
+	if (2 != request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
-	username = get_rparam(request, 1);
-	password = get_rparam(request, 2);
-	uuid = get_rparam(request, 3);
+	uuid = get_rparam(request, 1);
 
-	if ('\0' == *url || '\0' == *username || '\0' == *uuid)
+	if ('\0' == *uuid)
 		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vcenter_update(url, username, password, &error))
@@ -2905,28 +2940,26 @@ int	check_vcenter_vm_net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *resu
 	return SYSINFO_RET_OK;
 }
 
-int	check_vcenter_vm_net_if_in(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_vm_net_if_in(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int		i, ret = SYSINFO_RET_FAIL;
-	char		*url, *username, *password, *uuid, *instance, *mode, xpath[MAX_STRING_LEN], *value,
-			*error = NULL;
+	char		*url, *uuid, *instance, *mode, xpath[MAX_STRING_LEN], *value, *error = NULL;
 	zbx_vcenter_t	*vcenter;
 	zbx_hv_t	*hv;
 	zbx_vm_t	*vm = NULL;
 	zbx_dev_t	*dev;
 	zbx_uint64_t	counterid, value_ui64;
 
-	if (5 > request->nparam || request->nparam > 6)
+	if (3 > request->nparam || request->nparam > 4)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
-	username = get_rparam(request, 1);
-	password = get_rparam(request, 2);
-	uuid = get_rparam(request, 3);
-	instance = get_rparam(request, 4);
-	mode = get_rparam(request, 5);
+	uuid = get_rparam(request, 1);
+	instance = get_rparam(request, 2);
+	mode = get_rparam(request, 3);
 
-	if ('\0' == *url || '\0' == *username || '\0' == *uuid || '\0' == *instance)
+	if ('\0' == *uuid || '\0' == *instance)
 		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vcenter_update(url, username, password, &error))
@@ -2991,28 +3024,26 @@ int	check_vcenter_vm_net_if_in(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	check_vcenter_vm_net_if_out(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_vm_net_if_out(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int		i, ret = SYSINFO_RET_FAIL;
-	char		*url, *username, *password, *uuid, *instance, *mode, xpath[MAX_STRING_LEN], *value,
-			*error = NULL;
+	char		*url, *uuid, *instance, *mode, xpath[MAX_STRING_LEN], *value, *error = NULL;
 	zbx_vcenter_t	*vcenter;
 	zbx_hv_t	*hv;
 	zbx_vm_t	*vm = NULL;
 	zbx_dev_t	*dev;
 	zbx_uint64_t	counterid, value_ui64;
 
-	if (5 > request->nparam || request->nparam > 6)
+	if (3 > request->nparam || request->nparam > 4)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
-	username = get_rparam(request, 1);
-	password = get_rparam(request, 2);
-	uuid = get_rparam(request, 3);
-	instance = get_rparam(request, 4);
-	mode = get_rparam(request, 5);
+	uuid = get_rparam(request, 1);
+	instance = get_rparam(request, 2);
+	mode = get_rparam(request, 3);
 
-	if ('\0' == *url || '\0' == *username || '\0' == *uuid || '\0' == *instance)
+	if ('\0' == *uuid || '\0' == *instance)
 		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vcenter_update(url, username, password, &error))
@@ -3077,45 +3108,48 @@ int	check_vcenter_vm_net_if_out(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	check_vcenter_vm_storage_committed(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_vm_storage_committed(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vcenter_vmstat(request, ZBX_XPATH_LN2("storage", "committed"), result);
+	return get_vcenter_vmstat(request, username, password, ZBX_XPATH_LN2("storage", "committed"), result);
 }
 
-int	check_vcenter_vm_storage_unshared(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_vm_storage_unshared(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vcenter_vmstat(request, ZBX_XPATH_LN2("storage", "unshared"), result);
+	return get_vcenter_vmstat(request, username, password, ZBX_XPATH_LN2("storage", "unshared"), result);
 }
 
-int	check_vcenter_vm_storage_uncommitted(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_vm_storage_uncommitted(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vcenter_vmstat(request, ZBX_XPATH_LN2("storage", "uncommitted"), result);
+	return get_vcenter_vmstat(request, username, password, ZBX_XPATH_LN2("storage", "uncommitted"), result);
 }
 
-int	check_vcenter_vm_uptime(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_vm_uptime(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vcenter_vmstat(request, ZBX_XPATH_LN2("quickStats", "uptimeSeconds"), result);
+	return get_vcenter_vmstat(request, username, password, ZBX_XPATH_LN2("quickStats", "uptimeSeconds"), result);
 }
 
-int	check_vcenter_vm_vfs_dev_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_vm_vfs_dev_discovery(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	struct zbx_json		j;
 	zbx_vcenter_t		*vcenter;
 	zbx_hv_t		*hv;
 	zbx_vm_t		*vm = NULL;
 	zbx_dev_t		*dev;
-	char			*url, *username, *password, *uuid, *error = NULL;
+	char			*url, *uuid, *error = NULL;
 	int			i;
 
-	if (4 != request->nparam)
+	if (2 != request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
-	username = get_rparam(request, 1);
-	password = get_rparam(request, 2);
-	uuid = get_rparam(request, 3);
+	uuid = get_rparam(request, 1);
 
-	if ('\0' == *url || '\0' == *username || '\0' == *uuid)
+	if ('\0' == *uuid)
 		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vcenter_update(url, username, password, &error))
@@ -3162,28 +3196,26 @@ int	check_vcenter_vm_vfs_dev_discovery(AGENT_REQUEST *request, AGENT_RESULT *res
 	return SYSINFO_RET_OK;
 }
 
-int	check_vcenter_vm_vfs_dev_read(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_vm_vfs_dev_read(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int		i, ret = SYSINFO_RET_FAIL;
-	char		*url, *username, *password, *uuid, *instance, *mode, xpath[MAX_STRING_LEN], *value,
-			*error = NULL;
+	char		*url, *uuid, *instance, *mode, xpath[MAX_STRING_LEN], *value, *error = NULL;
 	zbx_vcenter_t	*vcenter;
 	zbx_hv_t	*hv;
 	zbx_vm_t	*vm = NULL;
 	zbx_dev_t	*dev;
 	zbx_uint64_t	counterid, value_ui64;
 
-	if (5 > request->nparam || request->nparam > 6)
+	if (3 > request->nparam || request->nparam > 4)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
-	username = get_rparam(request, 1);
-	password = get_rparam(request, 2);
-	uuid = get_rparam(request, 3);
-	instance = get_rparam(request, 4);
-	mode = get_rparam(request, 5);
+	uuid = get_rparam(request, 1);
+	instance = get_rparam(request, 2);
+	mode = get_rparam(request, 3);
 
-	if ('\0' == *url || '\0' == *username || '\0' == *uuid || '\0' == *instance)
+	if ('\0' == *uuid || '\0' == *instance)
 		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vcenter_update(url, username, password, &error))
@@ -3248,28 +3280,26 @@ int	check_vcenter_vm_vfs_dev_read(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	check_vcenter_vm_vfs_dev_write(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_vm_vfs_dev_write(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int		i, ret = SYSINFO_RET_FAIL;
-	char		*url, *username, *password, *uuid, *instance, *mode, xpath[MAX_STRING_LEN], *value,
-			*error = NULL;
+	char		*url, *uuid, *instance, *mode, xpath[MAX_STRING_LEN], *value, *error = NULL;
 	zbx_vcenter_t	*vcenter;
 	zbx_hv_t	*hv;
 	zbx_vm_t	*vm = NULL;
 	zbx_dev_t	*dev;
 	zbx_uint64_t	counterid, value_ui64;
 
-	if (5 > request->nparam || request->nparam > 6)
+	if (3 > request->nparam || request->nparam > 4)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
-	username = get_rparam(request, 1);
-	password = get_rparam(request, 2);
-	uuid = get_rparam(request, 3);
-	instance = get_rparam(request, 4);
-	mode = get_rparam(request, 5);
+	uuid = get_rparam(request, 1);
+	instance = get_rparam(request, 2);
+	mode = get_rparam(request, 3);
 
-	if ('\0' == *url || '\0' == *username || '\0' == *uuid || '\0' == *instance)
+	if ('\0' == *uuid || '\0' == *instance)
 		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vcenter_update(url, username, password, &error))
@@ -3334,25 +3364,24 @@ int	check_vcenter_vm_vfs_dev_write(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	struct zbx_json		j;
 	zbx_vcenter_t		*vcenter;
 	zbx_hv_t		*hv;
 	zbx_vm_t		*vm = NULL;
-	char			*url, *username, *password, *uuid, *error = NULL;
+	char			*url, *uuid, *error = NULL;
 	zbx_vector_str_t	disks;
 	int			i;
 
-	if (4 != request->nparam)
+	if (2 != request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
-	username = get_rparam(request, 1);
-	password = get_rparam(request, 2);
-	uuid = get_rparam(request, 3);
+	uuid = get_rparam(request, 1);
 
-	if ('\0' == *url || '\0' == *username || '\0' == *uuid)
+	if ('\0' == *uuid)
 		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vcenter_update(url, username, password, &error))
@@ -3404,26 +3433,25 @@ int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *resu
 	return SYSINFO_RET_OK;
 }
 
-int	check_vcenter_vm_vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_vm_vfs_fs_size(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	zbx_vcenter_t	*vcenter;
 	zbx_hv_t	*hv;
 	zbx_vm_t	*vm = NULL;
-	char		*url, *username, *password, *uuid, *fsname, *mode, *value, *error = NULL, xpath[MAX_STRING_LEN];
+	char		*url, *uuid, *fsname, *mode, *value, *error = NULL, xpath[MAX_STRING_LEN];
 	zbx_uint64_t	value_total, value_free;
 	int		i;
 
-	if (6 != request->nparam)
+	if (4 != request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
-	username = get_rparam(request, 1);
-	password = get_rparam(request, 2);
-	uuid = get_rparam(request, 3);
-	fsname = get_rparam(request, 4);
-	mode = get_rparam(request, 5);
+	uuid = get_rparam(request, 1);
+	fsname = get_rparam(request, 2);
+	mode = get_rparam(request, 3);
 
-	if ('\0' == *url || '\0' == *username || '\0' == *uuid)
+	if ('\0' == *uuid)
 		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vcenter_update(url, username, password, &error))
@@ -3497,11 +3525,11 @@ int	check_vcenter_vm_vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result)
  * Purpose: vSphere related checks                                            *
  *                                                                            *
  ******************************************************************************/
-
-static int	get_vsphere_stat(AGENT_REQUEST *request, int opt, const char *xpath, AGENT_RESULT *result)
+static int	get_vsphere_stat(AGENT_REQUEST *request, const char *username, const char *password,
+		int opt, const char *xpath, AGENT_RESULT *result)
 {
 	zbx_vsphere_t	*vsphere;
-	char		*url, *username, *password, *value, *error = NULL;
+	char		*url, *value, *error = NULL;
 	int		i;
 	zbx_vm_t	*vm;
 	zbx_uint64_t	value_uint64, value_uint64_sum;
@@ -3510,11 +3538,6 @@ static int	get_vsphere_stat(AGENT_REQUEST *request, int opt, const char *xpath, 
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
-	username = get_rparam(request, 1);
-	password = get_rparam(request, 2);
-
-	if ('\0' == *url || '\0' == *username)
-		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vsphere_update(url, username, password, &error))
 	{
@@ -3565,21 +3588,20 @@ static int	get_vsphere_stat(AGENT_REQUEST *request, int opt, const char *xpath, 
 	return SYSINFO_RET_OK;
 }
 
-static int	get_vsphere_vmstat(AGENT_REQUEST *request, const char *xpath, AGENT_RESULT *result)
+static int	get_vsphere_vmstat(AGENT_REQUEST *request, const char *username, const char *password,
+		const char *xpath, AGENT_RESULT *result)
 {
 	zbx_vsphere_t	*vsphere;
 	zbx_vm_t	*vm;
-	char		*url, *username, *password, *uuid, *value, *error = NULL;
+	char		*url, *uuid, *value, *error = NULL;
 
-	if (4 != request->nparam)
+	if (2 != request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
-	username = get_rparam(request, 1);
-	password = get_rparam(request, 2);
-	uuid = get_rparam(request, 3);
+	uuid = get_rparam(request, 1);
 
-	if ('\0' == *url || '\0' == *username || '\0' == *uuid)
+	if ('\0' == *uuid)
 		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vsphere_update(url, username, password, &error))
@@ -3602,11 +3624,13 @@ static int	get_vsphere_vmstat(AGENT_REQUEST *request, const char *xpath, AGENT_R
 	return SYSINFO_RET_OK;
 }
 
-int	check_vsphere_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_cpu_usage(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int	ret;
 
-	ret = get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("quickStats", "overallCpuUsage"), result);
+	ret = get_vsphere_stat(request, username, password, ZBX_OPT_XPATH,
+			ZBX_XPATH_LN2("quickStats", "overallCpuUsage"), result);
 
 	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * 1000000;
@@ -3614,20 +3638,16 @@ int	check_vsphere_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	check_vsphere_eventlog(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_eventlog(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	zbx_vsphere_t	*vsphere;
-	char		*url, *username, *password, *error = NULL;
+	char		*url, *error = NULL;
 
-	if (3 != request->nparam)
+	if (1 != request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
-	username = get_rparam(request, 1);
-	password = get_rparam(request, 2);
-
-	if ('\0' == *url || '\0' == *username)
-		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vsphere_update(url, username, password, &error))
 	{
@@ -3641,21 +3661,26 @@ int	check_vsphere_eventlog(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return vmware_get_events(vsphere->events, request->lastlogsize, result);
 }
 
-int	check_vsphere_fullname(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_fullname(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("product", "fullName"), result);
+	return get_vsphere_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_LN2("product", "fullName"),
+			result);
 }
 
-int	check_vsphere_hw_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_hw_cpu_num(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("hardware", "numCpuCores"), result);
+	return get_vsphere_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_LN2("hardware", "numCpuCores"),
+			result);
 }
 
-int	check_vsphere_hw_cpu_freq(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_hw_cpu_freq(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int	ret;
 
-	ret = get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("hardware", "cpuMhz"), result);
+	ret = get_vsphere_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_LN2("hardware", "cpuMhz"), result);
 
 	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * 1000000;
@@ -3663,41 +3688,52 @@ int	check_vsphere_hw_cpu_freq(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	check_vsphere_hw_cpu_model(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_hw_cpu_model(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("hardware", "cpuModel"), result);
+	return get_vsphere_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_LN2("hardware", "cpuModel"),
+			result);
 }
 
-int	check_vsphere_hw_cpu_threads(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_hw_cpu_threads(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("hardware", "numCpuThreads"), result);
+	return get_vsphere_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_LN2("hardware", "numCpuThreads"),
+			result);
 }
 
-int	check_vsphere_hw_memory(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_hw_memory(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("hardware", "memorySize"), result);
+	return get_vsphere_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_LN2("hardware", "memorySize"),
+			result);
 }
 
-int	check_vsphere_hw_model(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_hw_model(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("hardware", "model"), result);
+	return get_vsphere_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_LN2("hardware", "model"), result);
 }
 
-int	check_vsphere_hw_uuid(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_hw_uuid(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("hardware", "uuid"), result);
+	return get_vsphere_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_LN2("hardware", "uuid"), result);
 }
 
-int	check_vsphere_hw_vendor(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_hw_vendor(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("hardware", "vendor"), result);
+	return get_vsphere_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_LN2("hardware", "vendor"),
+			result);
 }
 
-int	check_vsphere_memory_size_ballooned(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_memory_size_ballooned(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int	ret;
 
-	ret = get_vsphere_stat(request, ZBX_OPT_MEM_BALLOONED, NULL, result);
+	ret = get_vsphere_stat(request, username, password, ZBX_OPT_MEM_BALLOONED, NULL, result);
 
 	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
@@ -3705,11 +3741,13 @@ int	check_vsphere_memory_size_ballooned(AGENT_REQUEST *request, AGENT_RESULT *re
 	return ret;
 }
 
-int	check_vsphere_memory_used(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_memory_used(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int	ret;
 
-	ret = get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("quickStats", "overallMemoryUsage"), result);
+	ret = get_vsphere_stat(request, username, password, ZBX_OPT_XPATH,
+			ZBX_XPATH_LN2("quickStats", "overallMemoryUsage"), result);
 
 	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
@@ -3717,11 +3755,13 @@ int	check_vsphere_memory_used(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	check_vsphere_status(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_status(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int	ret;
 
-	ret = get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("val", "overallStatus"), result);
+	ret = get_vsphere_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_LN2("val", "overallStatus"),
+			result);
 
 	if (SYSINFO_RET_OK == ret && GET_STR_RESULT(result))
 	{
@@ -3742,31 +3782,38 @@ int	check_vsphere_status(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	check_vsphere_uptime(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_uptime(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("quickStats", "uptime"), result);
+	return get_vsphere_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_LN2("quickStats", "uptime"),
+			result);
 }
 
-int	check_vsphere_version(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_version(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("product", "version"), result);
+	return get_vsphere_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_LN2("product", "version"),
+			result);
 }
 
-int	check_vsphere_vm_num(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_vm_num(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vsphere_stat(request, ZBX_OPT_VM_NUM, NULL, result);
+	return get_vsphere_stat(request, username, password, ZBX_OPT_VM_NUM, NULL, result);
 }
 
-int	check_vsphere_vm_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_vm_cpu_num(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vsphere_vmstat(request, ZBX_XPATH_LN2("config", "numCpu"), result);
+	return get_vsphere_vmstat(request, username, password, ZBX_XPATH_LN2("config", "numCpu"), result);
 }
 
-int	check_vsphere_vm_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_vm_cpu_usage(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int	ret;
 
-	ret = get_vsphere_vmstat(request, ZBX_XPATH_LN2("quickStats", "overallCpuUsage"), result);
+	ret = get_vsphere_vmstat(request, username, password, ZBX_XPATH_LN2("quickStats", "overallCpuUsage"), result);
 
 	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * 1000000;
@@ -3774,23 +3821,19 @@ int	check_vsphere_vm_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	check_vsphere_vm_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_vm_discovery(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	struct zbx_json	j;
 	int		i;
-	char		*url, *username, *password, *name, *error = NULL;
+	char		*url, *name, *error = NULL;
 	zbx_vsphere_t	*vsphere = NULL;
 	zbx_vm_t	*vm = NULL;
 
-	if (3 != request->nparam)
+	if (1 != request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
-	username = get_rparam(request, 1);
-	password = get_rparam(request, 2);
-
-	if ('\0' == *url || '\0' == *username)
-		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vsphere_update(url, username, password, &error))
 	{
@@ -3829,16 +3872,18 @@ int	check_vsphere_vm_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	check_vsphere_vm_hv_name(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_vm_hv_name(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vsphere_vmstat(request, ZBX_XPATH_LN2("runtime", "host"), result);
+	return get_vsphere_vmstat(request, username, password, ZBX_XPATH_LN2("runtime", "host"), result);
 }
 
-int	check_vsphere_vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_vm_memory_size(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int	ret;
 
-	ret = get_vsphere_vmstat(request, ZBX_XPATH_LN2("config", "memorySizeMB"), result);
+	ret = get_vsphere_vmstat(request, username, password, ZBX_XPATH_LN2("config", "memorySizeMB"), result);
 
 	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
@@ -3846,11 +3891,12 @@ int	check_vsphere_vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	check_vsphere_vm_memory_size_ballooned(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_vm_memory_size_ballooned(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int	ret;
 
-	ret = get_vsphere_vmstat(request, ZBX_XPATH_LN2("quickStats", "balloonedMemory"), result);
+	ret = get_vsphere_vmstat(request, username, password, ZBX_XPATH_LN2("quickStats", "balloonedMemory"), result);
 
 	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
@@ -3858,11 +3904,12 @@ int	check_vsphere_vm_memory_size_ballooned(AGENT_REQUEST *request, AGENT_RESULT 
 	return ret;
 }
 
-int	check_vsphere_vm_memory_size_compressed(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_vm_memory_size_compressed(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int	ret;
 
-	ret = get_vsphere_vmstat(request, ZBX_XPATH_LN2("quickStats", "compressedMemory"), result);
+	ret = get_vsphere_vmstat(request, username, password, ZBX_XPATH_LN2("quickStats", "compressedMemory"), result);
 
 	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
@@ -3870,11 +3917,12 @@ int	check_vsphere_vm_memory_size_compressed(AGENT_REQUEST *request, AGENT_RESULT
 	return ret;
 }
 
-int	check_vsphere_vm_memory_size_swapped(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_vm_memory_size_swapped(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int	ret;
 
-	ret = get_vsphere_vmstat(request, ZBX_XPATH_LN2("quickStats", "swappedMemory"), result);
+	ret = get_vsphere_vmstat(request, username, password, ZBX_XPATH_LN2("quickStats", "swappedMemory"), result);
 
 	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
@@ -3882,11 +3930,12 @@ int	check_vsphere_vm_memory_size_swapped(AGENT_REQUEST *request, AGENT_RESULT *r
 	return ret;
 }
 
-int	check_vsphere_vm_memory_size_usage_guest(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_vm_memory_size_usage_guest(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int	ret;
 
-	ret = get_vsphere_vmstat(request, ZBX_XPATH_LN2("quickStats", "guestMemoryUsage"), result);
+	ret = get_vsphere_vmstat(request, username, password, ZBX_XPATH_LN2("quickStats", "guestMemoryUsage"), result);
 
 	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
@@ -3894,11 +3943,12 @@ int	check_vsphere_vm_memory_size_usage_guest(AGENT_REQUEST *request, AGENT_RESUL
 	return ret;
 }
 
-int	check_vsphere_vm_memory_size_usage_host(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_vm_memory_size_usage_host(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int	ret;
 
-	ret = get_vsphere_vmstat(request, ZBX_XPATH_LN2("quickStats", "hostMemoryUsage"), result);
+	ret = get_vsphere_vmstat(request, username, password, ZBX_XPATH_LN2("quickStats", "hostMemoryUsage"), result);
 
 	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
@@ -3906,11 +3956,12 @@ int	check_vsphere_vm_memory_size_usage_host(AGENT_REQUEST *request, AGENT_RESULT
 	return ret;
 }
 
-int	check_vsphere_vm_memory_size_private(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_vm_memory_size_private(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int	ret;
 
-	ret = get_vsphere_vmstat(request, ZBX_XPATH_LN2("quickStats", "privateMemory"), result);
+	ret = get_vsphere_vmstat(request, username, password, ZBX_XPATH_LN2("quickStats", "privateMemory"), result);
 
 	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
@@ -3918,11 +3969,12 @@ int	check_vsphere_vm_memory_size_private(AGENT_REQUEST *request, AGENT_RESULT *r
 	return ret;
 }
 
-int	check_vsphere_vm_memory_size_shared(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_vm_memory_size_shared(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int	ret;
 
-	ret = get_vsphere_vmstat(request, ZBX_XPATH_LN2("quickStats", "sharedMemory"), result);
+	ret = get_vsphere_vmstat(request, username, password, ZBX_XPATH_LN2("quickStats", "sharedMemory"), result);
 
 	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
@@ -3930,30 +3982,27 @@ int	check_vsphere_vm_memory_size_shared(AGENT_REQUEST *request, AGENT_RESULT *re
 	return ret;
 }
 
-int	check_vsphere_vm_powerstate(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_vm_powerstate(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vsphere_vmstat(request, ZBX_XPATH_LN2("runtime", "powerState"), result);
+	return get_vsphere_vmstat(request, username, password, ZBX_XPATH_LN2("runtime", "powerState"), result);
 }
 
-int	check_vsphere_vm_net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_vm_net_if_discovery(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	struct zbx_json		j;
 	zbx_vsphere_t		*vsphere;
 	zbx_vm_t		*vm = NULL;
 	zbx_dev_t		*dev;
-	char			*url, *username, *password, *uuid, *error = NULL;
+	char			*url, *uuid, *error = NULL;
 	int			i;
 
-	if (4 != request->nparam)
+	if (2 != request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
-	username = get_rparam(request, 1);
-	password = get_rparam(request, 2);
-	uuid = get_rparam(request, 3);
-
-	if ('\0' == *url || '\0' == *username || '\0' == *uuid)
-		return SYSINFO_RET_FAIL;
+	uuid = get_rparam(request, 1);
 
 	if (SUCCEED != vsphere_update(url, username, password, &error))
 	{
@@ -3991,27 +4040,25 @@ int	check_vsphere_vm_net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *resu
 	return SYSINFO_RET_OK;
 }
 
-int	check_vsphere_vm_net_if_in(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_vm_net_if_in(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int		i, ret = SYSINFO_RET_FAIL;
-	char		*url, *username, *password, *uuid, *instance, *mode, xpath[MAX_STRING_LEN], *value,
-			*error = NULL;
+	char		*url, *uuid, *instance, *mode, xpath[MAX_STRING_LEN], *value, *error = NULL;
 	zbx_vsphere_t	*vsphere;
 	zbx_vm_t	*vm = NULL;
 	zbx_dev_t	*dev;
 	zbx_uint64_t	counterid, value_ui64;
 
-	if (5 > request->nparam || request->nparam > 6)
+	if (3 > request->nparam || request->nparam > 4)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
-	username = get_rparam(request, 1);
-	password = get_rparam(request, 2);
-	uuid = get_rparam(request, 3);
-	instance = get_rparam(request, 4);
-	mode = get_rparam(request, 5);
+	uuid = get_rparam(request, 1);
+	instance = get_rparam(request, 2);
+	mode = get_rparam(request, 3);
 
-	if ('\0' == *url || '\0' == *username || '\0' == *uuid || '\0' == *instance)
+	if ('\0' == *uuid || '\0' == *instance)
 		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vsphere_update(url, username, password, &error))
@@ -4068,27 +4115,26 @@ int	check_vsphere_vm_net_if_in(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	check_vsphere_vm_net_if_out(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_vm_net_if_out(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int		i, ret = SYSINFO_RET_FAIL;
-	char		*url, *username, *password, *uuid, *instance, *mode, xpath[MAX_STRING_LEN], *value,
+	char		*url, *uuid, *instance, *mode, xpath[MAX_STRING_LEN], *value,
 			*error = NULL;
 	zbx_vsphere_t	*vsphere;
 	zbx_vm_t	*vm = NULL;
 	zbx_dev_t	*dev;
 	zbx_uint64_t	counterid, value_ui64;
 
-	if (5 > request->nparam || request->nparam > 6)
+	if (3 > request->nparam || request->nparam > 4)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
-	username = get_rparam(request, 1);
-	password = get_rparam(request, 2);
-	uuid = get_rparam(request, 3);
-	instance = get_rparam(request, 4);
-	mode = get_rparam(request, 5);
+	uuid = get_rparam(request, 1);
+	instance = get_rparam(request, 2);
+	mode = get_rparam(request, 3);
 
-	if ('\0' == *url || '\0' == *username || '\0' == *uuid || '\0' == *instance)
+	if ('\0' == *uuid || '\0' == *instance)
 		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vsphere_update(url, username, password, &error))
@@ -4145,44 +4191,47 @@ int	check_vsphere_vm_net_if_out(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	check_vsphere_vm_storage_committed(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_vm_storage_committed(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vsphere_vmstat(request, ZBX_XPATH_LN2("storage", "committed"), result);
+	return get_vsphere_vmstat(request, username, password, ZBX_XPATH_LN2("storage", "committed"), result);
 }
 
-int	check_vsphere_vm_storage_unshared(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_vm_storage_unshared(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vsphere_vmstat(request, ZBX_XPATH_LN2("storage", "unshared"), result);
+	return get_vsphere_vmstat(request, username, password, ZBX_XPATH_LN2("storage", "unshared"), result);
 }
 
-int	check_vsphere_vm_storage_uncommitted(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_vm_storage_uncommitted(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vsphere_vmstat(request, ZBX_XPATH_LN2("storage", "uncommitted"), result);
+	return get_vsphere_vmstat(request, username, password, ZBX_XPATH_LN2("storage", "uncommitted"), result);
 }
 
-int	check_vsphere_vm_uptime(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_vm_uptime(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	return get_vsphere_vmstat(request, ZBX_XPATH_LN2("quickStats", "uptimeSeconds"), result);
+	return get_vsphere_vmstat(request, username, password, ZBX_XPATH_LN2("quickStats", "uptimeSeconds"), result);
 }
 
-int	check_vsphere_vm_vfs_dev_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_vm_vfs_dev_discovery(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	struct zbx_json		j;
 	zbx_vsphere_t		*vsphere;
 	zbx_vm_t		*vm = NULL;
 	zbx_dev_t		*dev;
-	char			*url, *username, *password, *uuid, *error = NULL;
+	char			*url, *uuid, *error = NULL;
 	int			i;
 
-	if (4 != request->nparam)
+	if (2 != request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
-	username = get_rparam(request, 1);
-	password = get_rparam(request, 2);
-	uuid = get_rparam(request, 3);
+	uuid = get_rparam(request, 1);
 
-	if ('\0' == *url || '\0' == *username || '\0' == *uuid)
+	if ('\0' == *uuid)
 		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vsphere_update(url, username, password, &error))
@@ -4221,27 +4270,25 @@ int	check_vsphere_vm_vfs_dev_discovery(AGENT_REQUEST *request, AGENT_RESULT *res
 	return SYSINFO_RET_OK;
 }
 
-int	check_vsphere_vm_vfs_dev_read(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_vm_vfs_dev_read(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int		i, ret = SYSINFO_RET_FAIL;
-	char		*url, *username, *password, *uuid, *instance, *mode, xpath[MAX_STRING_LEN], *value,
-			*error = NULL;
+	char		*url, *uuid, *instance, *mode, xpath[MAX_STRING_LEN], *value, *error = NULL;
 	zbx_vsphere_t	*vsphere;
 	zbx_vm_t	*vm = NULL;
 	zbx_dev_t	*dev;
 	zbx_uint64_t	counterid, value_ui64;
 
-	if (5 > request->nparam || request->nparam > 6)
+	if (3 > request->nparam || request->nparam > 4)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
-	username = get_rparam(request, 1);
-	password = get_rparam(request, 2);
-	uuid = get_rparam(request, 3);
-	instance = get_rparam(request, 4);
-	mode = get_rparam(request, 5);
+	uuid = get_rparam(request, 1);
+	instance = get_rparam(request, 2);
+	mode = get_rparam(request, 3);
 
-	if ('\0' == *url || '\0' == *username || '\0' == *uuid || '\0' == *instance)
+	if ('\0' == *uuid || '\0' == *instance)
 		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vsphere_update(url, username, password, &error))
@@ -4298,27 +4345,26 @@ int	check_vsphere_vm_vfs_dev_read(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	check_vsphere_vm_vfs_dev_write(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_vm_vfs_dev_write(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	int		i, ret = SYSINFO_RET_FAIL;
-	char		*url, *username, *password, *uuid, *instance, *mode, xpath[MAX_STRING_LEN], *value,
+	char		*url, *uuid, *instance, *mode, xpath[MAX_STRING_LEN], *value,
 			*error = NULL;
 	zbx_vsphere_t	*vsphere;
 	zbx_vm_t	*vm = NULL;
 	zbx_dev_t	*dev;
 	zbx_uint64_t	counterid, value_ui64;
 
-	if (5 > request->nparam || request->nparam > 6)
+	if (3 > request->nparam || request->nparam > 4)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
-	username = get_rparam(request, 1);
-	password = get_rparam(request, 2);
-	uuid = get_rparam(request, 3);
-	instance = get_rparam(request, 4);
-	mode = get_rparam(request, 5);
+	uuid = get_rparam(request, 1);
+	instance = get_rparam(request, 2);
+	mode = get_rparam(request, 3);
 
-	if ('\0' == *url || '\0' == *username || '\0' == *uuid || '\0' == *instance)
+	if ('\0' == *uuid || '\0' == *instance)
 		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vsphere_update(url, username, password, &error))
@@ -4375,24 +4421,23 @@ int	check_vsphere_vm_vfs_dev_write(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	check_vsphere_vm_vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_vm_vfs_fs_discovery(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	struct zbx_json		j;
 	zbx_vsphere_t		*vsphere;
 	zbx_vm_t		*vm;
-	char			*url, *username, *password, *uuid, *error = NULL;
+	char			*url, *uuid, *error = NULL;
 	zbx_vector_str_t	disks;
 	int			i;
 
-	if (4 != request->nparam)
+	if (2 != request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
-	username = get_rparam(request, 1);
-	password = get_rparam(request, 2);
-	uuid = get_rparam(request, 3);
+	uuid = get_rparam(request, 1);
 
-	if ('\0' == *url || '\0' == *username || '\0' == *uuid)
+	if ('\0' == *uuid)
 		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vsphere_update(url, username, password, &error))
@@ -4436,24 +4481,23 @@ int	check_vsphere_vm_vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *resu
 	return SYSINFO_RET_OK;
 }
 
-int	check_vsphere_vm_vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_vm_vfs_fs_size(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
 	zbx_vsphere_t	*vsphere;
 	zbx_vm_t	*vm;
-	char		*url, *username, *password, *uuid, *fsname, *mode, *value, *error = NULL, xpath[MAX_STRING_LEN];
+	char		*url, *uuid, *fsname, *mode, *value, *error = NULL, xpath[MAX_STRING_LEN];
 	zbx_uint64_t	value_total, value_free;
 
-	if (6 != request->nparam)
+	if (4 != request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
-	username = get_rparam(request, 1);
-	password = get_rparam(request, 2);
-	uuid = get_rparam(request, 3);
-	fsname = get_rparam(request, 4);
-	mode = get_rparam(request, 5);
+	uuid = get_rparam(request, 1);
+	fsname = get_rparam(request, 2);
+	mode = get_rparam(request, 3);
 
-	if ('\0' == *url || '\0' == *username || '\0' == *uuid)
+	if ('\0' == *uuid)
 		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vsphere_update(url, username, password, &error))
