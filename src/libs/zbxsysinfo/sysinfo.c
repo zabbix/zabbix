@@ -242,8 +242,6 @@ void	free_result(AGENT_RESULT *result)
  *                                                                            *
  * Parameters: request - pointer to the structure                             *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  ******************************************************************************/
 void	init_request(AGENT_REQUEST *request)
 {
@@ -261,8 +259,6 @@ void	init_request(AGENT_REQUEST *request)
  * Purpose: free memory used by the request                                   *
  *                                                                            *
  * Parameters: request - pointer to the request structure                     *
- *                                                                            *
- * Return value:                                                              *
  *                                                                            *
  ******************************************************************************/
 void	free_request(AGENT_REQUEST *request)
