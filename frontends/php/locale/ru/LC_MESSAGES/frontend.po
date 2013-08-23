@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-23 23:07+0300\n"
-"PO-Revision-Date: 2013-08-09 15:12+0200\n"
+"POT-Creation-Date: 2013-08-23 23:11+0300\n"
+"PO-Revision-Date: 2013-08-15 22:45+0200\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -317,7 +317,7 @@ msgstr "Действие"
 #: api/classes/CAction.php:684
 #, php-format
 msgid "Action \"%1$s\" already exists."
-msgstr ""
+msgstr "Действие \"%1$s\" уже существует."
 
 #: api/classes/CAction.php:540 api/classes/CAction.php:655
 #, php-format
@@ -327,7 +327,7 @@ msgstr "В действии \"%1$s\" задано некорректное зн�
 #: api/classes/CAction.php:726
 #, php-format
 msgid "Action \"%1$s\" no operations defined."
-msgstr ""
+msgstr "В действии \"%1$s\" нет заданных операций."
 
 #: api/classes/CAction.php:664
 #, php-format
@@ -1216,7 +1216,7 @@ msgstr "Не удалось добавить действие"
 
 #: actionconf.php:225
 msgid "Cannot add action condition"
-msgstr ""
+msgstr "Не удалось добавить условие действия"
 
 #: applications.php:109
 msgid "Cannot add application"
@@ -1660,7 +1660,7 @@ msgstr "Не удалось отключить веб-сценарий"
 
 #: queue.php:61
 msgid "Cannot display item queue."
-msgstr ""
+msgstr "Не удалось отобразить очередь элементов данных."
 
 #: media_types.php:160
 msgid "Cannot enable media type"
@@ -1852,7 +1852,7 @@ msgstr "Невозможно выполнить запрос обновлени�
 #: include/classes/server/CZabbixServer.php:222
 #, php-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
-msgstr ""
+msgstr "Не удалось прочитать ответ, проверьте соединение с Zabbix сервером \"%1$s\"."
 
 #: include/views/js/monitoring.history.js.php:35
 msgid "Cannot remove all items, at least one item should remain."
@@ -1873,7 +1873,7 @@ msgstr "Невозможно сохранить правило обнаруже�
 #: include/classes/server/CZabbixServer.php:192
 #, php-format
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
-msgstr ""
+msgstr "Не удалось отправить команду, проверьте соединение с Zabbix сервером \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:240
 #, php-format
@@ -2628,7 +2628,7 @@ msgstr "Подключен как '%1$s' с '%2$s'"
 #: include/classes/server/CZabbixServer.php:208
 #, php-format
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
-msgstr ""
+msgstr "Превышено время ожидания %1$s секунд при подключении к Zabbix серверу \"%2$s\"."
 
 #: include/classes/server/CZabbixServer.php:283
 #, php-format
@@ -4233,7 +4233,7 @@ msgstr "Пустые параметры"
 #: include/classes/server/CZabbixServer.php:232
 #, php-format
 msgid "Empty response received from Zabbix server \"%1$s\"."
-msgstr ""
+msgstr "Получен пустой ответ от Zabbix сервера \"%1$s\"."
 
 #: include/classes/validators/CTimePeriodValidator.php:39
 msgid "Empty time period."
@@ -5387,17 +5387,17 @@ msgstr "Группа узлов сети \"%1$s\" уже существует."
 #: api/classes/CHostGroup.php:618
 #, php-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
-msgstr ""
+msgstr "Группа узлов сети \"%1$s\" не может быть удалена, так как используется в глобальном скрипте."
 
 #: api/classes/CHostGroup.php:600
 #, php-format
 msgid "Host group \"%1$s\" cannot be deleted, because some hosts depend on it."
-msgstr ""
+msgstr "Группа узлов сети \"%1$s\" не может быть удалена, так как некоторые узлы сети принадлежат этой группе."
 
 #: api/classes/CHostGroup.php:589
 #, php-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
-msgstr ""
+msgstr "Группа узлов сети \"%1$s\" является внутренней и не может быть удалена."
 
 #: include/views/js/configuration.sysmaps.js.php:33
 msgid "Host group elements"
@@ -5409,7 +5409,7 @@ msgstr "Тип подписи к группе узлов сети"
 
 #: api/classes/CHostGroup.php:482 api/classes/CHostGroup.php:538
 msgid "Host group name cannot be empty."
-msgstr ""
+msgstr "Имя группы узлов сети не может быть пустым."
 
 #: include/forms.inc.php:198 include/menu.inc.php:160
 #: include/views/administration.script.edit.php:84
@@ -5976,7 +5976,7 @@ msgstr "Некорректная проверка обнаружения в ус
 
 #: api/classes/CAction.php:1547
 msgid "Incorrect action condition discovery object."
-msgstr ""
+msgstr "Некорректный объект обнаружения в условии действия"
 
 #: api/classes/CAction.php:1662
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
@@ -5988,7 +5988,7 @@ msgstr "Некорректное состояние обнаружения в у
 
 #: api/classes/CAction.php:1626
 msgid "Incorrect action condition event type."
-msgstr ""
+msgstr "Некорректный тип события в условии действия."
 
 #: api/classes/CAction.php:1650
 msgid "Incorrect action condition host group. Host group does not exist or you have no access to it."
@@ -6001,16 +6001,16 @@ msgstr "Некорректный узел сети в условии дейст�
 #: api/classes/CAction.php:1563
 #, php-format
 msgid "Incorrect action condition ip \"%1$s\"."
-msgstr ""
+msgstr "Некорректный ip \"%1$s\" в условии действия."
 
 #: api/classes/CAction.php:1485
 msgid "Incorrect action condition operator."
-msgstr ""
+msgstr "Некорректный оператор в условии действия."
 
 #: api/classes/CAction.php:1582
 #, php-format
 msgid "Incorrect action condition port \"%1$s\"."
-msgstr ""
+msgstr "Некорректный порт \"%1$s\" в условии действия."
 
 #: api/classes/CAction.php:1668
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
@@ -6022,11 +6022,11 @@ msgstr "Некорректный шаблон в условии действия
 
 #: api/classes/CAction.php:1608
 msgid "Incorrect action condition trigger severity."
-msgstr ""
+msgstr "Некорректная важность триггера в условии действия."
 
 #: api/classes/CAction.php:1617
 msgid "Incorrect action condition trigger value."
-msgstr ""
+msgstr "Некорректное значение триггера в условии действия."
 
 #: api/classes/CAction.php:1659
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
@@ -6043,7 +6043,7 @@ msgstr "Некорректный conditionid действия."
 #: api/classes/CAction.php:568 api/classes/CAction.php:691
 #, php-format
 msgid "Incorrect action conditions for action \"%1$s\"."
-msgstr ""
+msgstr "Некорректные условия действия для действия \"%1$s\"."
 
 #: api/classes/CAction.php:1349
 msgid "Incorrect action operation command type."
@@ -6146,7 +6146,7 @@ msgstr "Использованы некорректные символы в им
 #: api/classes/CProxy.php:240
 #, php-format
 msgid "Incorrect characters used for proxy name \"%1$s\"."
-msgstr ""
+msgstr "Использованы некорректные символы в имени прокси \"%1$s\"."
 
 #: api/classes/CTemplate.php:882
 #, php-format
@@ -6341,7 +6341,7 @@ msgstr "Некорректное значение объекта."
 #: api/classes/CAction.php:537 api/classes/CAction.php:588
 #, php-format
 msgid "Incorrect parameter for action \"%1$s\"."
-msgstr ""
+msgstr "Некорректный параметр для действия \"%1$s\"."
 
 #: api/classes/CAction.php:818
 msgid "Incorrect parameter for operations."
@@ -6408,7 +6408,7 @@ msgstr "Указан некорректный тип ресурса для эл�
 #: include/classes/server/CZabbixServer.php:239
 #, php-format
 msgid "Incorrect response received from Zabbix server \"%1$s\"."
-msgstr ""
+msgstr "Получен некорректный ответ от Zabbix сервера \"%1$s\"."
 
 #: api/classes/CScreenItem.php:583
 #, php-format
@@ -6565,7 +6565,7 @@ msgstr "Некорректное значение для setMessage(): \"%s\"."
 #: api/classes/CProxy.php:219 api/classes/CProxy.php:230
 #, php-format
 msgid "Incorrect value used for proxy status \"%1$s\"."
-msgstr ""
+msgstr "Использовано некорректное значение для состояния прокси \"%1$s\"."
 
 #: include/profiles.inc.php:274
 msgid "Incorrect working time."
@@ -6644,7 +6644,7 @@ msgstr "У интерфейса с IP адресом \"%1$s\" не может б
 #: include/views/administration.authentication.edit.php:35
 #: include/views/configuration.action.list.php:36
 msgid "Internal"
-msgstr "Внутренняя"
+msgstr "Внутренний"
 
 #: api/rpc/class.cjsonrpc.php:202
 msgid "Internal JSON-RPC error."
@@ -7172,7 +7172,7 @@ msgstr "Хранение динамики изменений (дней)"
 
 #: include/views/administration.general.housekeeper.edit.php:45
 msgid "Keep trigger data for (in days)"
-msgstr "Хранение данных о триггерах за (дней)"
+msgstr "Хранить данных о триггерах за (дней)"
 
 #: adm.housekeeper.php:34
 msgid "Keep trigger event and alert data for (in days)"
@@ -7720,7 +7720,7 @@ msgstr "Значение обслуживания \"Активно с\" не м�
 
 #: api/classes/CAction.php:1598
 msgid "Maintenance action condition value must be empty."
-msgstr ""
+msgstr "Значение обслуживания в условии действия должно быть пустым."
 
 #: maintenance.php:124
 msgid "Maintenance added"
@@ -8140,7 +8140,7 @@ msgstr "Минут"
 #: api/classes/CAction.php:574
 #, php-format
 msgid "Missing \"%1$s\" field for action condition."
-msgstr ""
+msgstr "Пропущено поле \"%1$s\" для условия действия."
 
 #: api/classes/CGraphGeneral.php:530
 msgid "Missing \"gitemid\" field for item."
@@ -8172,7 +8172,7 @@ msgstr "Отсутствуют элементы данных у графика \
 #: api/classes/CGraphPrototype.php:600
 #, php-format
 msgid "Missing items for graph prototype \"%1$s\"."
-msgstr ""
+msgstr "Отсутствуют элементы данных для прототипа графика \"%1$s\"."
 
 #: include/graphs.inc.php:321
 #, php-format
@@ -8720,7 +8720,7 @@ msgstr "Изображения не заданы."
 
 #: include/views/administration.proxy.edit.php:52
 msgid "No interface defined."
-msgstr ""
+msgstr "Интерфейс не задан."
 
 #: include/views/configuration.item.edit.php:112
 #: include/views/configuration.item.massupdate.php:77
@@ -8735,7 +8735,7 @@ msgstr "Интерфейс не найден."
 #: api/classes/CProxy.php:257 api/classes/CProxy.php:263
 #, php-format
 msgid "No interface provided for proxy \"%s\"."
-msgstr ""
+msgstr "Не указан интерфейс для прокси \"%s\"."
 
 #: api/classes/CHost.php:696 api/classes/CHost.php:714
 #, php-format
@@ -8979,7 +8979,7 @@ msgstr "Слайды не заданы."
 
 #: api/classes/CProxy.php:226
 msgid "No status for proxy."
-msgstr ""
+msgstr "Нет состояния для прокси."
 
 #: httpdetails.php:128 include/views/configuration.httpconf.edit.php:154
 msgid "No steps defined."
@@ -9381,7 +9381,7 @@ msgstr "Один раз"
 
 #: api/classes/CHostGroup.php:819 api/classes/CHostGroup.php:950
 msgid "One of the objects is left without a host group."
-msgstr ""
+msgstr "Один из объектов остался без группы узлов сети."
 
 #: include/forms.inc.php:1612 include/maintenances.inc.php:34
 msgid "One time only"
@@ -9629,7 +9629,7 @@ msgstr "Переопределено "
 
 #: include/views/administration.general.housekeeper.edit.php:128
 msgid "Override item history period"
-msgstr "Переопредлять период хранения истории элементов данных"
+msgstr "Переопределить периоды хранения истории элементов данных"
 
 #: include/views/administration.general.housekeeper.edit.php:150
 msgid "Override item trend period"
@@ -10975,7 +10975,7 @@ msgstr "Запланировано"
 
 #: queue.php:199
 msgid "Scheduled check"
-msgstr ""
+msgstr "Запланированная проверка"
 
 #: include/audit.inc.php:41 include/blocks.inc.php:1329
 #: include/screens.inc.php:36 include/views/configuration.screen.edit.php:47
@@ -11558,7 +11558,7 @@ msgstr "Область / район"
 #: include/classes/server/CZabbixServer.php:213
 #, php-format
 msgid "Size of the response received from Zabbix server \"%1$s\" exceeds the allowed size of %2$s bytes. This value can be increased in the ZBX_SOCKET_BYTES_LIMIT constant in include/defines.inc.php."
-msgstr ""
+msgstr "Размер полученного ответа от Zabbix сервера \"%1$s\" превышает допустимый размер в %2$s байт. Это значение можно увеличить с помощью ZBX_SOCKET_BYTES_LIMIT константы в include/defines.inc.php."
 
 #: include/graphs.inc.php:352
 #, php-format
@@ -12162,7 +12162,7 @@ msgstr "Элемент данных более не обнаруживается
 
 #: queue.php:78
 msgid "The queue is empty."
-msgstr ""
+msgstr "Очередь пуста."
 
 #: api/rpc/class.cjsonrpc.php:187
 msgid "The received JSON is not a valid JSON-RPC Request."
@@ -12488,7 +12488,7 @@ msgstr "Прототипы триггеров для"
 #: adm.valuemapping.php:134 adm.workingtime.php:69
 #: include/views/administration.general.triggerSeverity.edit.php:70
 msgid "Trigger severities"
-msgstr "Важности триггера"
+msgstr "Важности триггеров"
 
 #: include/actions.inc.php:54 include/views/administration.users.edit.php:272
 msgid "Trigger severity"
@@ -13615,7 +13615,7 @@ msgstr "Ошибочные поля для способа оповещения."
 #: api/classes/CProxy.php:206
 #, php-format
 msgid "Wrong fields for proxy \"%1$s\"."
-msgstr ""
+msgstr "Ошибочные поля для прокси \"%1$s\"."
 
 #: api/classes/CScreen.php:371 api/classes/CTemplateScreen.php:634
 #: api/classes/CTemplateScreen.php:672
@@ -14235,7 +14235,7 @@ msgstr "макрос(ы)"
 
 #: include/actions.inc.php:194 include/views/configuration.action.edit.php:191
 msgid "maintenance"
-msgstr "обслуживание"
+msgstr "обслуживании"
 
 #: api/classes/CMap.php:422
 msgid "map"

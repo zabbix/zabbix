@@ -2,30 +2,30 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-23 23:07+0300\n"
-"PO-Revision-Date: 2012-05-18 23:02+0200\n"
-"Last-Translator: jrprado <jrpradojunior@gmail.com>\n"
+"POT-Creation-Date: 2013-08-23 23:11+0300\n"
+"PO-Revision-Date: 2013-08-10 21:12+0200\n"
+"Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Pootle 2.1.4\n"
+"X-Generator: Pootle 2.1.6\n"
 "X-Poedit-Basepath: ../../\n"
 
 #: include/views/configuration.item.edit.php:389
 msgid " day"
 msgid_plural " days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] " dia"
+msgstr[1] " dias"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
 #: maintenance.php:141 maintenance.php:153 services.php:184 services.php:198
 #, php-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
-msgstr ""
+msgstr "\"%s\" deve estar entre 01/01/1970 e 18/01/2038."
 
 #: include/profiles.inc.php:321
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
@@ -60,8 +60,8 @@ msgstr[1] "%1$s Itens"
 #, php-format
 msgid "%1$s day"
 msgid_plural "%1$s days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s dia"
+msgstr[1] "%1$s dias"
 
 #: include/page_header.php:465
 #, php-format
@@ -74,8 +74,8 @@ msgstr[1] "%1$s falhas de login registradas. Última falha de login foi de %2$s 
 #, php-format
 msgid "%2$d of %1$d issue is shown"
 msgid_plural "%2$d of %1$d issues are shown"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%2$d de %1$d item é exibido"
+msgstr[1] "%2$d de %1$d itens são exibidos"
 
 #: include/views/monitoring.discovery.php:131
 #, php-format
@@ -98,7 +98,7 @@ msgstr "(0 - indefinidamente)"
 #: include/views/configuration.hostgroups.list.php:31
 #: include/views/configuration.template.edit.php:124
 msgid "(Only super admins can create groups)"
-msgstr ""
+msgstr "(Apenas super administradores podem criar grupos)"
 
 #: include/forms.inc.php:592 include/forms.inc.php:607
 msgid "(in days)"
@@ -119,7 +119,7 @@ msgstr "(sem proxy)"
 
 #: include/blocks.inc.php:1468
 msgid "-"
-msgstr ""
+msgstr "-"
 
 #: acknow.php:131
 msgid "----[BULK ACKNOWLEDGE]----"
@@ -201,19 +201,19 @@ msgstr "RELATÓRIO DE DISPONIBILIDADE"
 
 #: popup_trexpr.php:139
 msgid "Absolute difference between last and previous value is < N"
-msgstr ""
+msgstr "A diferença absoluta entre o último e o anterior é < N"
 
 #: popup_trexpr.php:147
 msgid "Absolute difference between last and previous value is = N"
-msgstr ""
+msgstr "A diferença absoluta entre o último e o anterior é = N"
 
 #: popup_trexpr.php:143
 msgid "Absolute difference between last and previous value is > N"
-msgstr ""
+msgstr "A diferença absoluta entre o último e o anterior é > N"
 
 #: popup_trexpr.php:151
 msgid "Absolute difference between last and previous value is NOT N"
-msgstr ""
+msgstr "A diferença absoluta entre o último e o anterior NÃO é N"
 
 #: report3.php:83 srv_status.php:143
 msgid "Acceptable SLA"
@@ -225,7 +225,7 @@ msgstr "Acesso negado!"
 
 #: include/func.inc.php:2039
 msgid "Access denied."
-msgstr ""
+msgstr "Acesso negado."
 
 #: api/classes/CUser.php:872
 #, php-format
@@ -310,7 +310,7 @@ msgstr "Ação"
 #: api/classes/CAction.php:684
 #, php-format
 msgid "Action \"%1$s\" already exists."
-msgstr ""
+msgstr "A ação \"%1$s\" já existe."
 
 #: api/classes/CAction.php:540 api/classes/CAction.php:655
 #, php-format
@@ -320,7 +320,7 @@ msgstr "Ação \"%1$s\" tem um valor incorreto para \"esc_period\" (mínimo %2$s
 #: api/classes/CAction.php:726
 #, php-format
 msgid "Action \"%1$s\" no operations defined."
-msgstr ""
+msgstr "A ação \"%1$s\" não possui operadores definidos."
 
 #: api/classes/CAction.php:664
 #, php-format
@@ -453,11 +453,11 @@ msgstr ""
 
 #: include/views/configuration.item.massupdate.php:537
 msgid "Add new or existing applications"
-msgstr ""
+msgstr "Adicionar aplicação nova ou existente"
 
 #: include/views/configuration.host.massupdate.php:104
 msgid "Add new or existing host groups"
-msgstr ""
+msgstr "Adicionar grupo novo ou existente"
 
 #: include/views/configuration.graph.edit.php:116
 msgid "Add prototype"
@@ -645,7 +645,7 @@ msgstr "Aplicar"
 #: include/views/configuration.maintenance.list.php:59
 msgctxt "maintenance status"
 msgid "Approaching"
-msgstr ""
+msgstr "Abordagem"
 
 #: include/func.inc.php:221
 msgid "Apr"
@@ -691,7 +691,7 @@ msgstr "Etiqueta de patrimônio"
 #: include/maintenances.inc.php:56
 #, php-format
 msgid "At %1$s:%2$s on %3$s"
-msgstr ""
+msgstr "Às %1$s:%2$s em %3$s"
 
 #: include/maintenances.inc.php:125
 #, php-format
