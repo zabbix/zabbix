@@ -763,12 +763,12 @@ class CPageFilter {
 	 * @return CComboBox
 	 */
 	public function getHostsCB($withNode = false) {
-		$items = $class = array();
+		$items = $classes = array();
 		foreach ($this->hosts as $id => $host) {
 			$items[$id] = $host['name'];
-			$class[$id] = ($host['status'] == HOST_STATUS_NOT_MONITORED) ? 'not-monitored' : null;
+			$classes[$id] = ($host['status'] == HOST_STATUS_NOT_MONITORED) ? 'not-monitored' : null;
 		}
-		$options = array('objectName' => 'hosts', 'classes' => $class);
+		$options = array('objectName' => 'hosts', 'classes' => $classes);
 
 		return $this->_getCB('hostid', $this->hostid, $items, $withNode, $options);
 	}
