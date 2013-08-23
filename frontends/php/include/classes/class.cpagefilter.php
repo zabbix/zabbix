@@ -94,7 +94,7 @@ class CPageFilter {
 	);
 
 	/**
-	 * Objects preset in the filter.
+	 * Objects present in the filter.
 	 *
 	 * @var array
 	 */
@@ -427,7 +427,7 @@ class CPageFilter {
 
 		$this->data['groups'] = array();
 		foreach ($groups as $group) {
-			$this->data['groups'][$group['groupid']] = $group['name'];
+			$this->data['groups'][$group['groupid']] = $group;
 		}
 
 		// select remebered selection
@@ -558,7 +558,7 @@ class CPageFilter {
 			order_result($graphs, 'name');
 
 			foreach ($graphs as $graph) {
-				$this->data['graphs'][$graph['graphid']] = $graph['name'];
+				$this->data['graphs'][$graph['graphid']] = $graph;
 			}
 
 			// no graphid provided
@@ -580,7 +580,7 @@ class CPageFilter {
 
 				// if there is a graph with the same name on new host, why not show it then?
 				foreach ($this->data['graphs'] as $gid => $graph) {
-					if ($graph === $selectedGraphInfo['name']) {
+					if ($graph['name'] === $selectedGraphInfo['name']) {
 						$graphid = $gid;
 						break;
 					}
@@ -621,7 +621,7 @@ class CPageFilter {
 			order_result($triggers, 'description');
 
 			foreach ($triggers as $trigger) {
-				$this->data['triggers'][$trigger['triggerid']] = $trigger['description'];
+				$this->data['triggers'][$trigger['triggerid']] = $trigger;
 			}
 
 			if (is_null($triggerid)) {
@@ -651,7 +651,7 @@ class CPageFilter {
 
 		$this->data['drules'] = array();
 		foreach ($drules as $drule) {
-			$this->data['drules'][$drule['druleid']] = $drule['name'];
+			$this->data['drules'][$drule['druleid']] = $drule;
 		}
 
 		if (is_null($druleid)) {
@@ -702,7 +702,7 @@ class CPageFilter {
 			$applications = API::Application()->get($options);
 
 			foreach ($applications as $app) {
-				$this->data['applications'][$app['name']] = $app['name'];
+				$this->data['applications'][$app['name']] = $app;
 			}
 
 			// select remembered selection
@@ -764,9 +764,9 @@ class CPageFilter {
 	 */
 	public function getHostsCB($withNode = false) {
 		$items = $class = array();
-		foreach ($this->hosts as $key => $value) {
-			$items[$key] = $value['name'];
-			$class[$key] = ($value['status'] == HOST_STATUS_NOT_MONITORED) ? 'not-monitored' : null;
+		foreach ($this->hosts as $id => $host) {
+			$items[$id] = $host['name'];
+			$class[$id] = ($host['status'] == HOST_STATUS_NOT_MONITORED) ? 'not-monitored' : null;
 		}
 		$options = array('objectName' => 'hosts', 'class' => $class);
 
@@ -781,7 +781,11 @@ class CPageFilter {
 	 * @return CComboBox
 	 */
 	public function getGroupsCB($withNode = false) {
-		return $this->_getCB('groupid', $this->groupid, $this->groups, $withNode, array('objectName' => 'groups'));
+		$items = array();
+		foreach ($this->groups as $id => $group) {
+			$items[$id] = $group['name'];
+		}
+		return $this->_getCB('groupid', $this->groupid, $items, $withNode, array('objectName' => 'groups'));
 	}
 
 	/**
@@ -792,18 +796,18 @@ class CPageFilter {
 	 * @return CComboBox
 	 */
 	public function getGraphsCB($withNode = false) {
-		$items = $this->graphs;
+		$graphs = $this->graphs;
 		if ($withNode) {
-			foreach ($items as $id => $item) {
-				$items[$id] = get_node_name_by_elid($id, null, NAME_DELIMITER).$item;
+			foreach ($graphs as $id => $graph) {
+				$graphs[$id] = get_node_name_by_elid($id, null, NAME_DELIMITER).$graph['name'];
 			}
 		}
 
-		natcasesort($items);
-		$items = array(0 => _('not selected')) + $items;
+		natcasesort($graphs);
+		$graphs = array(0 => _('not selected')) + $graphs;
 
 		$graphComboBox = new CComboBox('graphid', $this->graphid, 'javascript: submit();');
-		foreach ($items as $id => $name) {
+		foreach ($graphs as $id => $name) {
 			$graphComboBox->addItem($id, $name);
 		}
 
@@ -818,7 +822,11 @@ class CPageFilter {
 	 * @return CComboBox
 	 */
 	public function getDiscoveryCB($withNode = false) {
-		return $this->_getCB('druleid', $this->druleid, $this->drules, $withNode, array('objectName' => 'discovery'));
+		$items = array();
+		foreach ($this->drules as $id => $drule) {
+			$items[$id] = $drule['name'];
+		}
+		return $this->_getCB('druleid', $this->druleid, $items, $withNode, array('objectName' => 'discovery'));
 	}
 
 	/**
@@ -829,7 +837,11 @@ class CPageFilter {
 	 * @return CComboBox
 	 */
 	public function getApplicationsCB($withNode = false) {
-		return $this->_getCB('application', $this->application, $this->applications, $withNode, array(
+		$items = array();
+		foreach ($this->applications as $id => $application) {
+			$items[$id] = $application['name'];
+		}
+		return $this->_getCB('application', $this->application, $items, $withNode, array(
 			'objectName' => 'applications'
 		));
 	}
