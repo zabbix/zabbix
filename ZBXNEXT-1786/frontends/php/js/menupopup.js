@@ -472,7 +472,11 @@ jQuery(function($) {
 
 				while (matched = regexp.exec(script.name)) {
 					// remove backslashes
-					matched[0] = matched[0].replace(/\\\\/g, '\\').replace(/\\\//g, '/');
+					matched[0] = matched[0]
+						.replace(/\\\\/g, '//')
+						.replace(/\\\//g, '/')
+						.replace(/\\/g, '')
+						.replace(/\/\//g, '\\');
 
 					items[items.length] = matched[0];
 				}
