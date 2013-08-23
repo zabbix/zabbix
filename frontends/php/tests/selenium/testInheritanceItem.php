@@ -73,20 +73,17 @@ class testInheritanceItem extends CWebTest {
 	 * @dataProvider update
 	 */
 	public function testInheritanceItem_SimpleUpdate($data) {
-		$name = $data['name'];
-
 		$sqlItems = "select itemid,hostid, name, key_, delay from items order by itemid";
 		$oldHashItems = DBhash($sqlItems);
 
-		$this->zbxTestLogin('templates.php');
-		$this->zbxTestClickWait('link='.$this->template);
-		$this->zbxTestClickWait("//div[@class='w']//a[text()='Items']");
-		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestLogin('items.php?form=update&hostid=30000&itemid='.$data['itemid']);
 		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of items');
-		$this->zbxTestTextPresent('Item updated');
-		$this->zbxTestTextPresent("$name");
-		$this->zbxTestTextPresent('ITEMS');
+		$this->zbxTestTextPresent(array(
+			'Item updated',
+			$data['name'],
+			'ITEMS'
+		));
 
 		$this->assertEquals($oldHashItems, DBhash($sqlItems));
 	}
@@ -905,6 +902,7 @@ class testInheritanceItem extends CWebTest {
 					'type' => 'Database monitor',
 					'name' => 'Database monitor',
 					'key' => 'template-database-monitor',
+					'params_ap' => 'SELECT * FROM items',
 					'dbCheck' => true,
 					'hostCheck' => true
 				)
@@ -1017,12 +1015,26 @@ class testInheritanceItem extends CWebTest {
 					)
 				)
 			),
+			// SQL empty
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'type' => 'Database monitor',
+					'name' => 'Database monitor',
+					'key' => 'key-database-error',
+					'errors' => array(
+							'ERROR: Page received incorrect data',
+							'Warning. Incorrect value for field "SQL query": cannot be empty.'
+					)
+				)
+			),
 			// Default
 			array(
 				array(
 					'expected' => ITEM_BAD,
 					'type' => 'Database monitor',
 					'name' => 'Database monitor',
+					'params_ap' => 'SELECT * FROM items',
 					'errors' => array(
 							'ERROR: Cannot add item',
 							'Check the key, please. Default example was passed.'
@@ -1078,7 +1090,7 @@ class testInheritanceItem extends CWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceItem_SimpleCreate($data) {
-		$this->zbxTestLogin('templates.php');
+		$this->zbxTestLogin('items.php?hostid=30000');
 
 		if (isset($data['name'])) {
 			$itemName = $data['name'];
@@ -1088,8 +1100,6 @@ class testInheritanceItem extends CWebTest {
 			$keyName = $data['key'];
 		}
 
-		$this->zbxTestClickWait('link='.$this->template);
-		$this->zbxTestClickWait('link=Items');
 		$this->zbxTestClickWait('form');
 
 		if (isset($data['type'])) {
@@ -1108,6 +1118,10 @@ class testInheritanceItem extends CWebTest {
 
 		if (isset($data['username'])) {
 			$this->input_type('username', $data['username']);
+		}
+
+		if (isset($data['params_ap'])) {
+			$this->input_type('params_ap', $data['params_ap']);
 		}
 
 		if (isset($data['params_es'])) {

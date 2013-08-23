@@ -31,7 +31,7 @@ function DBconnect(&$error) {
 	global $DB;
 
 	if (isset($DB['DB'])) {
-		$error=_('Cannot create another database connection.');
+		$error = _('Cannot create another database connection.');
 		return false;
 	}
 
@@ -52,20 +52,13 @@ function DBconnect(&$error) {
 
 		switch ($DB['TYPE']) {
 			case ZBX_DB_MYSQL:
-				$mysql_server = $DB['SERVER'].(!empty($DB['PORT']) ? ':'.$DB['PORT'] : '');
-
-				if (!$DB['DB'] = @mysql_connect($mysql_server, $DB['USER'], $DB['PASSWORD'])) {
-					$error = 'Error connecting to database ['.trim(mysql_error()).']';
+				$DB['DB'] = @mysqli_connect($DB['SERVER'], $DB['USER'], $DB['PASSWORD'], $DB['DATABASE'], $DB['PORT']);
+				if (!$DB['DB']) {
+					$error = 'Error connecting to database ['.trim(mysqli_connect_error()).']';
 					$result = false;
 				}
 				else {
-					if (!mysql_select_db($DB['DATABASE'])) {
-						$error = 'Error database in selection ['.trim(mysql_error()).']';
-						$result = false;
-					}
-					else {
-						DBexecute('SET NAMES utf8');
-					}
+					DBexecute('SET NAMES utf8');
 				}
 
 				if ($result) {
@@ -198,7 +191,7 @@ function DBclose() {
 	if (isset($DB['DB']) && !empty($DB['DB'])) {
 		switch ($DB['TYPE']) {
 			case ZBX_DB_MYSQL:
-				$result = mysql_close($DB['DB']);
+				$result = mysqli_close($DB['DB']);
 				break;
 			case ZBX_DB_POSTGRESQL:
 				$result = pg_close($DB['DB']);
@@ -410,8 +403,8 @@ function DBselect($query, $limit = null, $offset = 0) {
 
 	switch ($DB['TYPE']) {
 		case ZBX_DB_MYSQL:
-			if (!$result = mysql_query($query, $DB['DB'])) {
-				error('Error in query ['.$query.'] ['.mysql_error().']');
+			if (!$result = mysqli_query($DB['DB'], $query)) {
+				error('Error in query ['.$query.'] ['.mysqli_error($DB['DB']).']');
 			}
 			break;
 		case ZBX_DB_POSTGRESQL:
@@ -546,8 +539,8 @@ function DBexecute($query, $skip_error_messages = 0) {
 
 	switch ($DB['TYPE']) {
 		case ZBX_DB_MYSQL:
-			if (!$result = mysql_query($query, $DB['DB'])) {
-				error('Error in query ['.$query.'] ['.mysql_error().']');
+			if (!$result = mysqli_query($DB['DB'], $query)) {
+				error('Error in query ['.$query.'] ['.mysqli_error($DB['DB']).']');
 			}
 			break;
 		case ZBX_DB_POSTGRESQL:
@@ -601,6 +594,14 @@ function DBexecute($query, $skip_error_messages = 0) {
 	return (bool) $result;
 }
 
+/**
+ * Returns the next data set from a DB resource or false if there are no more results.
+ *
+ * @param resource $cursor
+ * @param bool $convertNulls	convert all null values to string zeroes
+ *
+ * @return array|bool
+ */
 function DBfetch($cursor, $convertNulls = true) {
 	global $DB;
 
@@ -612,8 +613,9 @@ function DBfetch($cursor, $convertNulls = true) {
 
 	switch ($DB['TYPE']) {
 		case ZBX_DB_MYSQL:
-			if (!$result = mysql_fetch_assoc($cursor)) {
-				mysql_free_result($cursor);
+			$result = mysqli_fetch_assoc($cursor);
+			if (!$result) {
+				mysqli_free_result($cursor);
 			}
 			break;
 		case ZBX_DB_POSTGRESQL:
@@ -673,14 +675,19 @@ function DBfetch($cursor, $convertNulls = true) {
 			break;
 	}
 
-	if ($convertNulls && $result) {
-		foreach ($result as $key => $val) {
-			if (is_null($val)) {
-				$result[$key] = '0';
+	if ($result) {
+		if ($convertNulls) {
+			foreach ($result as $key => $val) {
+				if (is_null($val)) {
+					$result[$key] = '0';
+				}
 			}
 		}
+
+		return $result;
 	}
-	return $result;
+
+	return false;
 }
 
 function zbx_dbconcat($params) {
@@ -1162,10 +1169,6 @@ function dbConditionString($fieldName, array $values, $notIn = false) {
 	return '('.$fieldName.$in.'('.$condition.'))';
 }
 
-function zero2null($val) {
-	return ($val == '0') ? 'NULL' : $val; // string 0 because ('any string' == 0) = true
-}
-
 /**
  * Transform DB cursor to array.
  *
@@ -1303,11 +1306,11 @@ function zbx_dbstr($var) {
 		case ZBX_DB_MYSQL:
 			if (is_array($var)) {
 				foreach ($var as $vnum => $value) {
-					$var[$vnum] = "'".mysql_real_escape_string($value)."'";
+					$var[$vnum] = "'".mysqli_real_escape_string($DB['DB'], $value)."'";
 				}
 				return $var;
 			}
-			return "'".mysql_real_escape_string($var)."'";
+			return "'".mysqli_real_escape_string($DB['DB'], $var)."'";
 
 		case ZBX_DB_ORACLE:
 			if (is_array($var)) {

@@ -623,8 +623,8 @@ class CTrigger extends CTriggerGeneral {
 	/**
 	 * Check input.
 	 *
-	 * @param $triggers
-	 * @param $method
+	 * @param array  $triggers
+	 * @param string $method
 	 */
 	public function checkInput(array &$triggers, $method) {
 		$create = ($method == 'create');
@@ -641,6 +641,24 @@ class CTrigger extends CTriggerGeneral {
 				'preservekeys' => true,
 				'selectDependencies' => API_OUTPUT_REFER
 			));
+
+			foreach ($triggers as $trigger) {
+				// check permissions
+				if (!isset($dbTriggers[$trigger['triggerid']])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+				}
+
+				// discovered fields, except status, cannot be updated
+				if ($dbTriggers[$trigger['triggerid']]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+					foreach ($trigger as $key => $value) {
+						if (!in_array($key, array('triggerid', 'status'))) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update discovered trigger.'));
+						}
+					}
+				}
+			}
+
+			$triggers = $this->extendObjects($this->tableName(), $triggers, array('description'));
 		}
 		else {
 			$triggerDbFields = array(
@@ -650,16 +668,8 @@ class CTrigger extends CTriggerGeneral {
 			);
 		}
 
-		if ($update) {
-			$triggers = $this->extendObjects($this->tableName(), $triggers, array('description'));
-		}
-
 		foreach ($triggers as $tnum => &$trigger) {
 			$currentTrigger = $triggers[$tnum];
-
-			if ($update && !isset($dbTriggers[$trigger['triggerid']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-			}
 
 			if ($update) {
 				$error = _s('Cannot update "%1$s" for trigger "%2$s".', '%1$s', $trigger['description']);
@@ -1631,6 +1641,8 @@ class CTrigger extends CTriggerGeneral {
 	}
 
 	/**
+	 * Check if user has read permissions for triggers.
+	 *
 	 * @param $ids
 	 *
 	 * @return bool
@@ -1651,6 +1663,8 @@ class CTrigger extends CTriggerGeneral {
 	}
 
 	/**
+	 *  Check if user has write permissions for triggers.
+	 *
 	 * @param $ids
 	 *
 	 * @return bool

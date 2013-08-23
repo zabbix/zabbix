@@ -38,8 +38,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
 	'hostid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
-	'tr_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
-	'tr_hostid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
 	'elementid' =>		array(T_ZBX_INT, O_OPT, P_SYS|P_NZERO, DB_ID, null),
 	'step' =>			array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 65535), null),
 	'period' =>			array(T_ZBX_INT, O_OPT, P_SYS,	null,	null),
@@ -58,6 +56,20 @@ $fields = array(
 	'upd_counter' =>	array(T_ZBX_INT, O_OPT, P_ACT,	null,	null)
 );
 check_fields($fields);
+
+/*
+ * Permissions
+ */
+if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))
+		|| get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
+	access_deny();
+}
+if (get_request('elementid')) {
+	$slideshow = get_slideshow_by_slideshowid($_REQUEST['elementid']);
+	if (!$slideshow) {
+		access_deny();
+	}
+}
 
 /*
  * Actions
@@ -176,6 +188,7 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  * Display
  */
 $data = array(
+	'fullscreen' => $_REQUEST['fullscreen'],
 	'slideshows' => array()
 );
 
@@ -194,7 +207,6 @@ order_result($data['slideshows'], 'name');
 
 // get element id
 $data['elementid'] = get_request('elementid', CProfile::get('web.slides.elementid', null));
-$data['fullscreen'] = get_request('fullscreen', null);
 
 CProfile::update('web.slides.elementid', $data['elementid'], PROFILE_TYPE_ID);
 
