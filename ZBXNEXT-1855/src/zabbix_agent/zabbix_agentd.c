@@ -137,6 +137,9 @@ static char		*TEST_METRIC = NULL;
 int			threads_num = 0;
 ZBX_THREAD_HANDLE	*threads = NULL;
 
+char	**new_environ = NULL;
+char	**new_argv = NULL;
+
 unsigned char	daemon_type = ZBX_DAEMON_TYPE_AGENT;
 
 unsigned char	process_type = 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
@@ -704,6 +707,11 @@ void	zbx_free_service_resources(void)
 #endif
 	zabbix_close_log();
 
+#if defined(PS_USE_CLOBBER_ARGV)
+	zbx_free(new_environ);
+	zbx_free(new_argv);
+#endif
+
 	free_metrics();
 	alias_list_free();
 	free_collector_data();
@@ -821,7 +829,7 @@ int	main(int argc, char **argv)
 			break;
 	}
 
-	save_ps_display_args(argc, argv);
+	save_ps_display_args(argc, argv, new_environ, new_argv);
 	init_ps_display();
 
 	START_MAIN_ZABBIX_ENTRY(CONFIG_ALLOW_ROOT);

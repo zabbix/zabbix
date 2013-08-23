@@ -94,6 +94,9 @@ static char	shortopts[] = "c:n:hVR:";
 int	threads_num = 0;
 pid_t	*threads = NULL;
 
+char	**new_environ = NULL;
+char	**new_argv = NULL;
+
 unsigned char	daemon_type		= ZBX_DAEMON_TYPE_PROXY_ACTIVE;
 
 int		process_num		= 0;
@@ -533,7 +536,7 @@ int	main(int argc, char **argv)
 		}
 	}
 
-	save_ps_display_args(argc, argv);
+	save_ps_display_args(argc, argv, new_environ, new_argv);
 	init_ps_display();
 
 	if (NULL == CONFIG_FILE)
@@ -834,6 +837,11 @@ void	zbx_on_exit()
 			ZABBIX_VERSION, ZABBIX_REVISION);
 
 	zabbix_close_log();
+
+#if defined(PS_USE_CLOBBER_ARGV)
+	zbx_free(new_environ);
+	zbx_free(new_argv);
+#endif
 
 	exit(SUCCEED);
 }

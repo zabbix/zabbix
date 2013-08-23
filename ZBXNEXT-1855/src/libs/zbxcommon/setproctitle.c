@@ -73,12 +73,10 @@ static char		prog_prefix[MAX_STRING_LEN];
  * environment strings may be moved, so this should be called before any code
  * that might try to hang onto a getenv() result.)
  */
-void save_ps_display_args(int argc, char **argv)
+void save_ps_display_args(int argc, char **argv, char **new_environ, char **new_argv)
 {
 #if defined(PS_USE_CLOBBER_ARGV)
 	char	*end_of_area = NULL;
-	char	**new_environ = NULL;
-	char	**new_argv = NULL;
 	int	i;
 #endif /* PS_USE_CLOBBER_ARGV */
 
