@@ -402,14 +402,18 @@ class CScript extends CZBXAPI {
 
 				$items = preg_split('/(?<!\\\)\//', $script['name'], PREG_SPLIT_OFFSET_CAPTURE);
 
-				if (zbx_empty(array_pop($items))) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Empty name for script "%1$s".', $script['name']));
-				}
+				for ($i = 0, $size = count($items); $i < $size; $i++) {
+					$item = strtr($items[$i], array('\\' => '', '\\\\' => '\\'));
 
-				// menu1/{empty}/name
-				foreach ($items as $item) {
 					if (zbx_empty($item)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect menu path for script "%1$s".', $script['name']));
+						// menu1/menu2/{empty}
+						if ($i == $size - 1) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Empty name for script "%1$s".', $script['name']));
+						}
+						// menu1/{empty}/name
+						else {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect menu path for script "%1$s".', $script['name']));
+						}
 					}
 				}
 			}
