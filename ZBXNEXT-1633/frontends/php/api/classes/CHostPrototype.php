@@ -156,25 +156,7 @@ class CHostPrototype extends CHostBase {
 			'message' => _('Group prototype cannot be based on a discovered host group "%1$s".')
 		)));
 
-		// check host name duplicates
-		$collectionValidator = new CCollectionValidator(array(
-			'empty' => true,
-			'uniqueField' => 'host',
-			'uniqueField2' => 'ruleid',
-			'messageDuplicate' => _('Host prototype with host name "%1$s" already exists.')
-		));
-		$this->checkValidator($hostPrototypes, $collectionValidator);
-		$this->checkExistingHostPrototypes($hostPrototypes, 'host',
-			_('Host prototype with host name "%1$s" already exists in discovery rule "%2$s".')
-		);
-
-		// check visible name duplicates
-		$collectionValidator->uniqueField = 'name';
-		$collectionValidator->messageDuplicate = _('Host prototype with visible name "%1$s" already exists.');
-		$this->checkValidator($hostPrototypes, $collectionValidator);
-		$this->checkExistingHostPrototypes($hostPrototypes, 'name',
-			_('Host prototype with visible name "%1$s" already exists in discovery rule "%2$s".')
-		);
+		$this->checkDuplicates($hostPrototypes);
 	}
 
 	/**
@@ -447,36 +429,17 @@ class CHostPrototype extends CHostBase {
 
 		$this->checkHostGroupsPermissions($groupPrototypeGroupIds);
 
+		// check if group prototypes use discovered host groups
+		$this->checkValidator(array_unique($groupPrototypeGroupIds), new CHostGroupNormalValidator(array(
+			'message' => _('Group prototype cannot be based on a discovered host group "%1$s".')
+		)));
+
 		// check for duplicates
 		foreach ($hostPrototypes as &$hostPrototype) {
 			$hostPrototype['ruleid'] = $dbHostPrototypes[$hostPrototype['hostid']]['discoveryRule']['itemid'];
 		}
 		unset($hostPrototype);
-
-		// check host name duplicates
-		$collectionValidator = new CCollectionValidator(array(
-			'empty' => true,
-			'uniqueField' => 'host',
-			'uniqueField2' => 'ruleid',
-			'messageDuplicate' => _('Host prototype with host name "%1$s" already exists.')
-		));
-		$this->checkValidator($hostPrototypes, $collectionValidator);
-		$this->checkExistingHostPrototypes($hostPrototypes, 'host',
-			_('Host prototype with host name "%1$s" already exists in discovery rule "%2$s".')
-		);
-
-		// check visible name duplicates
-		$collectionValidator->uniqueField = 'name';
-		$collectionValidator->messageDuplicate = _('Host prototype with visible name "%1$s" already exists.');
-		$this->checkValidator($hostPrototypes, $collectionValidator);
-		$this->checkExistingHostPrototypes($hostPrototypes, 'name',
-			_('Host prototype with visible name "%1$s" already exists in discovery rule "%2$s".')
-		);
-
-		// check if group prototypes use discovered host groups
-		$this->checkValidator(array_unique($groupPrototypeGroupIds), new CHostGroupNormalValidator(array(
-			'message' => _('Group prototype cannot be based on a discovered host group "%1$s".')
-		)));
+		$this->checkDuplicates($hostPrototypes);
 	}
 
 	/**
@@ -1112,6 +1075,38 @@ class CHostPrototype extends CHostBase {
 		if ($hostPrototype = DBfetch($query)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot delete templated host prototype.'));
 		}
+	}
+
+	/**
+	 * Checks if host prototypes with the same technical or visible names already exist on the same LLD rule.
+	 *
+	 * Each host prototype must have the host, name and ruleid properties defined.
+	 *
+	 * @throws APIException 	if a host prototype with the same name or technical name exists
+	 * 							either in the given array or in the database.
+	 *
+	 * @param array $hostPrototypes
+	 */
+	protected function checkDuplicates(array $hostPrototypes) {
+		// check host name duplicates
+		$collectionValidator = new CCollectionValidator(array(
+			'empty' => true,
+			'uniqueField' => 'host',
+			'uniqueField2' => 'ruleid',
+			'messageDuplicate' => _('Host prototype with host name "%1$s" already exists.')
+		));
+		$this->checkValidator($hostPrototypes, $collectionValidator);
+		$this->checkExistingHostPrototypes($hostPrototypes, 'host',
+			_('Host prototype with host name "%1$s" already exists in discovery rule "%2$s".')
+		);
+
+		// check visible name duplicates
+		$collectionValidator->uniqueField = 'name';
+		$collectionValidator->messageDuplicate = _('Host prototype with visible name "%1$s" already exists.');
+		$this->checkValidator($hostPrototypes, $collectionValidator);
+		$this->checkExistingHostPrototypes($hostPrototypes, 'name',
+			_('Host prototype with visible name "%1$s" already exists in discovery rule "%2$s".')
+		);
 	}
 
 	/**
