@@ -101,7 +101,7 @@ else {
  */
 // add templates to the list
 if (get_request('add_template')) {
-	foreach (get_request('add_templates') as $templateId) {
+	foreach (get_request('add_templates', array()) as $templateId) {
 		$_REQUEST['templates'][$templateId] = $templateId;
 	}
 }
