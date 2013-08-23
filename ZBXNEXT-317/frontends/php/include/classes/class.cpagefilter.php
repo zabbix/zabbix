@@ -866,7 +866,7 @@ class CPageFilter {
 	 * @param int    $allValue
 	 * @param array  $options
 	 * @param string $options['objectName']
-	 * @param array  $options['class']
+	 * @param array  $options['classes']	array of class names for the combobox options with item IDs as keys
 	 *
 	 * @return CComboBox
 	 */
@@ -894,7 +894,7 @@ class CPageFilter {
 		}
 
 		foreach ($items as $id => $name) {
-			$comboBox->addItem($id, $name, null, 'yes', isset($options['class'][$id]) ? $options['class'][$id] : null);
+			$comboBox->addItem($id, $name, null, 'yes', isset($options['classes'][$id]) ? $options['class'][$id] : null);
 		}
 
 		return $comboBox;
