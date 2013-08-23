@@ -1068,9 +1068,20 @@ class CTemplate extends CHostGeneral {
 		return parent::massRemove($data);
 	}
 
-	public function isReadable($ids) {
-		if (!is_array($ids)) return false;
-		if (empty($ids)) return true;
+	/**
+	 * Check if user has read permissions for templates.
+	 *
+	 * @param array $ids
+	 *
+	 * @return bool
+	 */
+	public function isReadable(array $ids) {
+		if (!is_array($ids)) {
+			return false;
+		}
+		if (empty($ids)) {
+			return true;
+		}
 
 		$ids = array_unique($ids);
 
@@ -1083,9 +1094,20 @@ class CTemplate extends CHostGeneral {
 		return (count($ids) == $count);
 	}
 
-	public function isWritable($ids) {
-		if (!is_array($ids)) return false;
-		if (empty($ids)) return true;
+	/**
+	 * Check if user has write permissions for templates.
+	 *
+	 * @param array $ids
+	 *
+	 * @return bool
+	 */
+	public function isWritable(array $ids) {
+		if (!is_array($ids)) {
+			return false;
+		}
+		if (empty($ids)) {
+			return true;
+		}
 
 		$ids = array_unique($ids);
 

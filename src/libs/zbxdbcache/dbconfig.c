@@ -150,6 +150,8 @@ typedef struct
 {
 	zbx_uint64_t	itemid;
 	const char	*params;
+	const char	*username;
+	const char	*password;
 }
 ZBX_DC_DBITEM;
 
@@ -1057,11 +1059,16 @@ static void	DCsync_items(DB_RESULT result)
 			dbitem = DCfind_id(&config->dbitems, itemid, sizeof(ZBX_DC_DBITEM), &found);
 
 			DCstrpool_replace(found, &dbitem->params, row[19]);
+			DCstrpool_replace(found, &dbitem->username, row[22]);
+			DCstrpool_replace(found, &dbitem->password, row[23]);
 		}
 		else if (NULL != (dbitem = zbx_hashset_search(&config->dbitems, &itemid)))
 		{
 			/* remove db item parameters */
 			zbx_strpool_release(dbitem->params);
+			zbx_strpool_release(dbitem->username);
+			zbx_strpool_release(dbitem->password);
+
 			zbx_hashset_remove(&config->dbitems, &itemid);
 		}
 
@@ -1238,6 +1245,9 @@ static void	DCsync_items(DB_RESULT result)
 				NULL != (dbitem = zbx_hashset_search(&config->dbitems, &itemid)))
 		{
 			zbx_strpool_release(dbitem->params);
+			zbx_strpool_release(dbitem->username);
+			zbx_strpool_release(dbitem->password);
+
 			zbx_hashset_remove(&config->dbitems, &itemid);
 		}
 
@@ -3384,8 +3394,21 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 				*dst_item->ipmi_sensor = '\0';
 			break;
 		case ITEM_TYPE_DB_MONITOR:
-			dbitem = zbx_hashset_search(&config->dbitems, &src_item->itemid);
-			dst_item->params = zbx_strdup(NULL, NULL != dbitem ? dbitem->params : "");
+			if (NULL != (dbitem = zbx_hashset_search(&config->dbitems, &src_item->itemid)))
+			{
+				dst_item->params = zbx_strdup(NULL, dbitem->params);
+				strscpy(dst_item->username_orig, dbitem->username);
+				strscpy(dst_item->password_orig, dbitem->password);
+			}
+			else
+			{
+				dst_item->params = zbx_strdup(NULL, "");
+				*dst_item->username_orig = '\0';
+				*dst_item->password_orig = '\0';
+			}
+			dst_item->username = NULL;
+			dst_item->password = NULL;
+
 			break;
 		case ITEM_TYPE_SSH:
 			if (NULL != (sshitem = zbx_hashset_search(&config->sshitems, &src_item->itemid)))
@@ -4906,7 +4929,6 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 {
 	zbx_hashset_iter_t	iter;
 	ZBX_DC_ITEM		*item;
-	ZBX_DC_HOST		*host = NULL;
 	int			now, nitems = 0;
 	zbx_queue_item_t	*queue_item;
 
@@ -4918,10 +4940,9 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 
 	while (NULL != (item = zbx_hashset_iter_next(&iter)))
 	{
-		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == item->flags)
-			continue;
+		ZBX_DC_HOST	*host = NULL;
 
-		if (0 == item->lastclock)
+		if (0 != (item->flags & (ZBX_FLAG_DISCOVERY_RULE | ZBX_FLAG_DISCOVERY_PROTOTYPE)))
 			continue;
 
 		switch (item->type)

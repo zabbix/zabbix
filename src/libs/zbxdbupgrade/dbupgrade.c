@@ -21,6 +21,7 @@
 
 #include "db.h"
 #include "log.h"
+#include "sysinfo.h"
 
 #ifdef HAVE_MYSQL
 #	define ZBX_DB_TABLE_OPTIONS	" engine=innodb"
@@ -98,6 +99,96 @@ typedef struct
 zbx_dbpatch_t;
 
 extern unsigned char	daemon_type;
+
+/*********************************************************************************
+ *                                                                               *
+ * Function: parse_db_monitor_item_params                                        *
+ *                                                                               *
+ * Purpose: parse database monitor item params string "user=<user> password=     *
+ *          <passsword> DSN=<dsn> sql=<sql>" into parameter values.              *
+ *                                                                               *
+ * Parameters:  params     - [IN] the params string                              *
+ *              dsn        - [OUT] the ODBC DSN output buffer                    *
+ *              user       - [OUT] the user name output buffer                   *
+ *              password   - [OUT] the password output buffer                    *
+ *              sql        - [OUT] the sql query output buffer                   *
+ *                                                                               *
+ * Comments: This function allocated memory to store parsed parameters, which    *
+ *           must be freed later by the caller.                                  *
+ *           Failed (or absent) parameters will contain empty string "".         *
+ *                                                                               *
+ *********************************************************************************/
+static void	parse_db_monitor_item_params(const char *params, char **dsn, char **user, char **password, char **sql)
+{
+	const char	*pvalue, *pnext, *pend;
+	char		**var;
+
+	for (; '\0' != *params; params = pnext)
+	{
+		while (0 != isspace(*params))
+			params++;
+
+		pvalue = strchr(params, '=');
+		pnext = strchr(params, '\n');
+
+		if (NULL == pvalue)
+			break;
+
+		if (NULL == pnext)
+			pnext = params + strlen(params);
+
+		if (pvalue > pnext || pvalue == params)
+			continue;
+
+		for (pend = pvalue - 1; 0 != isspace(*pend); pend--)
+			;
+		pend++;
+
+		if (0 == strncmp(params, "user", pend - params))
+			var = user;
+		else if (0 == strncmp(params, "password", pend - params))
+			var = password;
+		else if (0 == strncmp(params, "DSN", pend - params))
+			var = dsn;
+		else if (0 == strncmp(params, "sql", pend - params))
+			var = sql;
+		else
+			continue;
+
+		pvalue++;
+		while (0 != isspace(*pvalue))
+			pvalue++;
+
+		if (pvalue > pnext)
+			continue;
+
+		if ('\0' == *pvalue)
+			continue;
+
+		for (pend = pnext - 1; 0 != isspace(*pend); pend--)
+			;
+		pend++;
+
+		if (NULL == *var)
+		{
+			*var = zbx_malloc(*var, pend - pvalue + 1);
+			memmove(*var, pvalue, pend - pvalue);
+			(*var)[pend - pvalue] = '\0';
+		}
+	}
+
+	if (NULL == *user)
+		*user = zbx_strdup(NULL, "");
+
+	if (NULL == *password)
+		*password = zbx_strdup(NULL, "");
+
+	if (NULL == *dsn)
+		*dsn = zbx_strdup(NULL, "");
+
+	if (NULL == *sql)
+		*sql = zbx_strdup(NULL, "");
+}
 
 #ifndef HAVE_SQLITE3
 static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offset, const ZBX_FIELD *field)
@@ -1392,12 +1483,104 @@ static int	DBpatch_2010100(void)
 
 static int	DBpatch_2010101(void)
 {
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = SUCCEED;
+	char		*key = NULL;
+	size_t		key_alloc = 0, key_offset;
+
+	result = DBselect(
+			"select i.itemid,i.key_,i.params,h.name"
+			" from items i,hosts h"
+			" where i.hostid=h.hostid"
+				" and i.type=%d",
+			ITEM_TYPE_DB_MONITOR);
+
+	while (NULL != (row = DBfetch(result)) && SUCCEED == ret)
+	{
+		char		*user = NULL, *password = NULL, *dsn = NULL, *sql = NULL, *error_message = NULL;
+		zbx_uint64_t	itemid;
+		size_t		key_len;
+
+		key_len = strlen(row[1]);
+
+		parse_db_monitor_item_params(row[2], &dsn, &user, &password, &sql);
+
+		if (0 != strncmp(row[1], "db.odbc.select[", 15) || ']' != row[1][key_len - 1])
+			error_message = zbx_dsprintf(error_message, "key \"%s\" is invalid", row[1]);
+		else if (ITEM_USERNAME_LEN < strlen(user))
+			error_message = zbx_dsprintf(error_message, "ODBC username \"%s\" is too long", user);
+		else if (ITEM_PASSWORD_LEN < strlen(password))
+			error_message = zbx_dsprintf(error_message, "ODBC password \"%s\" is too long", password);
+		else
+		{
+			char	*param;
+
+			param = strndup(row[1] + 15, key_len - 16);
+
+			quote_key_param(&param, 0);
+			quote_key_param(&dsn, 0);
+
+			key_offset = 0;
+			zbx_snprintf_alloc(&key, &key_alloc, &key_offset, "db.odbc.select[%s,%s]", param, dsn);
+
+			zbx_free(param);
+
+			if (ITEM_KEY_LEN < zbx_strlen_utf8(key))
+				error_message = zbx_dsprintf(error_message, "key \"%s\" is too long", row[1]);
+		}
+
+		if (NULL == error_message)
+		{
+			char	*username_esc, *password_esc, *params_esc, *key_esc;
+
+			ZBX_STR2UINT64(itemid, row[0]);
+
+			username_esc = DBdyn_escape_string(user);
+			password_esc = DBdyn_escape_string(password);
+			params_esc = DBdyn_escape_string(sql);
+			key_esc = DBdyn_escape_string(key);
+
+			if (ZBX_DB_OK > DBexecute("update items set username='%s',password='%s',key_='%s',params='%s'"
+					" where itemid=" ZBX_FS_UI64,
+					username_esc, password_esc, key_esc, params_esc, itemid))
+			{
+				ret = FAIL;
+			}
+
+			zbx_free(username_esc);
+			zbx_free(password_esc);
+			zbx_free(params_esc);
+			zbx_free(key_esc);
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Failed to convert host \"%s\" db monitoring item because"
+					" %s. See upgrade notes for manual database monitor item conversion.",
+					row[3], error_message);
+		}
+
+		zbx_free(error_message);
+		zbx_free(user);
+		zbx_free(password);
+		zbx_free(dsn);
+		zbx_free(sql);
+	}
+	DBfree_result(result);
+
+	zbx_free(key);
+
+	return ret;
+}
+
+static int	DBpatch_2010102(void)
+{
 	const ZBX_FIELD field = {"flags", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
 }
 
-static int	DBpatch_2010102(void)
+static int	DBpatch_2010103(void)
 {
 	const ZBX_TABLE	table =
 			{"host_discovery", "hostid", 0,
@@ -1415,42 +1598,42 @@ static int	DBpatch_2010102(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_2010103(void)
+static int	DBpatch_2010104(void)
 {
 	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("host_discovery", 1, &field);
 }
 
-static int	DBpatch_2010104(void)
+static int	DBpatch_2010105(void)
 {
 	const ZBX_FIELD	field = {"parent_hostid", NULL, "hosts", "hostid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("host_discovery", 2, &field);
 }
 
-static int	DBpatch_2010105(void)
+static int	DBpatch_2010106(void)
 {
 	const ZBX_FIELD	field = {"parent_itemid", NULL, "items", "itemid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("host_discovery", 3, &field);
 }
 
-static int	DBpatch_2010106(void)
+static int	DBpatch_2010107(void)
 {
 	const ZBX_FIELD field = {"templateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("hosts", &field);
 }
 
-static int	DBpatch_2010107(void)
+static int	DBpatch_2010108(void)
 {
 	const ZBX_FIELD	field = {"templateid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("hosts", 3, &field);
 }
 
-static int	DBpatch_2010108(void)
+static int	DBpatch_2010109(void)
 {
 	const ZBX_TABLE	table =
 			{"interface_discovery", "interfaceid", 0,
@@ -1464,14 +1647,14 @@ static int	DBpatch_2010108(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_2010109(void)
+static int	DBpatch_2010110(void)
 {
 	const ZBX_FIELD	field = {"interfaceid", NULL, "interface", "interfaceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("interface_discovery", 1, &field);
 }
 
-static int	DBpatch_2010110(void)
+static int	DBpatch_2010111(void)
 {
 	const ZBX_FIELD	field =
 			{"parent_interfaceid", NULL, "interface", "interfaceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
@@ -1479,7 +1662,7 @@ static int	DBpatch_2010110(void)
 	return DBadd_foreign_key("interface_discovery", 2, &field);
 }
 
-static int	DBpatch_2010111(void)
+static int	DBpatch_2010112(void)
 {
 	const ZBX_TABLE	table =
 			{"group_prototype", "group_prototypeid", 0,
@@ -1496,33 +1679,33 @@ static int	DBpatch_2010111(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_2010112(void)
+static int	DBpatch_2010113(void)
 {
 	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("group_prototype", 1, &field);
 }
 
-static int	DBpatch_2010113(void)
+static int	DBpatch_2010114(void)
 {
 	const ZBX_FIELD	field = {"groupid", NULL, "groups", "groupid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("group_prototype", 2, &field);
 }
 
-static int	DBpatch_2010114(void)
+static int	DBpatch_2010115(void)
 {
 	const ZBX_FIELD	field = {"templateid", NULL, "group_prototype", "group_prototypeid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("group_prototype", 3, &field);
 }
 
-static int	DBpatch_2010115(void)
+static int	DBpatch_2010116(void)
 {
 	return DBcreate_index("group_prototype", "group_prototype_1", "hostid", 0);
 }
 
-static int	DBpatch_2010116(void)
+static int	DBpatch_2010117(void)
 {
 	const ZBX_TABLE	table =
 			{"group_discovery", "groupid", 0,
@@ -1539,21 +1722,21 @@ static int	DBpatch_2010116(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_2010117(void)
+static int	DBpatch_2010118(void)
 {
 	const ZBX_FIELD	field = {"groupid", NULL, "groups", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("group_discovery", 1, &field);
 }
 
-static int	DBpatch_2010118(void)
+static int	DBpatch_2010119(void)
 {
 	const ZBX_FIELD	field = {"parent_group_prototypeid", NULL, "group_prototype", "group_prototypeid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("group_discovery", 2, &field);
 }
 
-static int	DBpatch_2010119(void)
+static int	DBpatch_2010120(void)
 {
 	const ZBX_FIELD field = {"flags", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
@@ -1728,6 +1911,7 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010117, 0, 1)
 	DBPATCH_ADD(2010118, 0, 1)
 	DBPATCH_ADD(2010119, 0, 1)
+	DBPATCH_ADD(2010120, 0, 1)
 
 	DBPATCH_END()
 

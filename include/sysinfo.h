@@ -188,6 +188,9 @@ int	parse_item_key(char *cmd, AGENT_REQUEST *request);
 zbx_log_t	*add_log_result(AGENT_RESULT *result, const char *value);
 void		set_log_result_empty(AGENT_RESULT *result);
 zbx_uint64_t	get_log_result_lastlogsize(AGENT_RESULT *result);
+
+void	quote_key_param(char **param, int forced);
+
 int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c);
 
 /* external system functions */

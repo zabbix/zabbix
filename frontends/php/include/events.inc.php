@@ -167,6 +167,7 @@ function get_next_event($currentEvent, array $eventList = array()) {
 			' WHERE e.objectid='.$currentEvent['objectid'].
 				' AND e.eventid>'.$currentEvent['eventid'].
 				' AND e.object='.$currentEvent['object'].
+				' AND e.source='.$currentEvent['source'].
 			' ORDER BY e.object,e.objectid,e.eventid';
 	return DBfetch(DBselect($sql, 1));
 }

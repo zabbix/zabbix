@@ -51,13 +51,44 @@ $fields = array(
 );
 check_fields($fields);
 
+$availabilityReportMode = get_request('mode', CProfile::get('web.avail_report.mode', AVAILABILITY_REPORT_BY_HOST));
+CProfile::update('web.avail_report.mode', $availabilityReportMode, PROFILE_TYPE_INT);
+
+/*
+ * Permissions
+ */
+if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
+	if (get_request('hostgroupid') && !API::HostGroup()->isReadable(array($_REQUEST['hostgroupid']))
+			|| get_request('filter_groupid') && !API::HostGroup()->isReadable(array($_REQUEST['filter_groupid']))
+			|| get_request('filter_hostid') && !API::Host()->isReadable(array($_REQUEST['filter_hostid']))) {
+		access_deny();
+	}
+	if (get_request('tpl_triggerid')) {
+		$trigger = API::Trigger()->get(array(
+			'triggerids' => $_REQUEST['tpl_triggerid'],
+			'output' => array('triggerid'),
+			'filter' => array('flags' => null)
+		));
+		if (!$trigger) {
+			access_deny();
+		}
+	}
+}
+else {
+	if (get_request('filter_groupid') && !API::HostGroup()->isReadable(array($_REQUEST['filter_groupid']))
+			|| get_request('filter_hostid') && !API::Host()->isReadable(array($_REQUEST['filter_hostid']))) {
+		access_deny();
+	}
+}
+if (get_request('triggerid') && !API::Trigger()->isReadable(array($_REQUEST['triggerid']))) {
+	access_deny();
+}
+
 /*
  * Ajax
  */
-if (isset($_REQUEST['favobj'])) {
-	if ($_REQUEST['favobj'] == 'filter') {
-		CProfile::update('web.avail_report.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
-	}
+if (isset($_REQUEST['favobj']) && $_REQUEST['favobj'] == 'filter') {
+	CProfile::update('web.avail_report.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 }
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
@@ -73,9 +104,6 @@ if (isset($_REQUEST['filter_rst'])) {
 	$_REQUEST['filter_timesince'] = 0;
 	$_REQUEST['filter_timetill'] = 0;
 }
-
-$availabilityReportMode = get_request('mode', CProfile::get('web.avail_report.mode', AVAILABILITY_REPORT_BY_HOST));
-CProfile::update('web.avail_report.mode', $availabilityReportMode, PROFILE_TYPE_INT);
 
 $config = select_config();
 

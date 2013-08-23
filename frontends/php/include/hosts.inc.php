@@ -818,7 +818,7 @@ function hostMenuData(array $host, array $scripts = array()) {
 	return array(
 		'scripts' => $menuScripts,
 		'hostid' => $host['hostid'],
-		'hasScreens' => (bool) $host['screens'],
+		'hasScreens' => (bool) ($host['screens'] && $host['status'] == HOST_STATUS_MONITORED),
 		'hasInventory' => (bool) $host['inventory']
 	);
 }
