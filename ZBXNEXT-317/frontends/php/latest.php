@@ -40,12 +40,8 @@ if (PAGE_TYPE_HTML == $page['type']) {
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR			     			 TYPE	   OPTIONAL FLAGS	VALIDATION	EXCEPTION
-$fields=array(
+$fields = array(
 	'apps'=>				array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		NULL),
-	'applicationid'=>		array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		NULL),
-	'close'=>				array(T_ZBX_INT, O_OPT,	NULL,	IN('1'),	NULL),
-	'open'=>				array(T_ZBX_INT, O_OPT,	NULL,	IN('1'),	NULL),
-
 	'groupid'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
 	'hostid'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
 
@@ -62,8 +58,17 @@ $fields=array(
 	'toggle_ids'=>			array(T_ZBX_STR, O_OPT, P_ACT,  NULL,		NULL),
 	'toggle_open_state'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NULL,		NULL)
 );
-
 check_fields($fields);
+
+/*
+ * Permissions
+ */
+if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
+	access_deny();
+}
+if (get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
+	access_deny();
+}
 
 /* AJAX */
 if (isset($_REQUEST['favobj'])) {
@@ -123,7 +128,6 @@ else {
 	$_REQUEST['show_without_data'] = CProfile::get('web.latest.filter.show_without_data', 0);
 }
 // --------------
-
 $latest_wdgt = new CWidget(null, 'latest-mon');
 
 // Header

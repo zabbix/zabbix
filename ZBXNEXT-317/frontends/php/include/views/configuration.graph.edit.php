@@ -96,7 +96,7 @@ if (!empty($this->data['items'])) {
 			$item['yaxisside'] = 0;
 		}
 
-		insert_js('loadItem('.$number.', '.$item['gitemid'].', '.$this->data['graphid'].', '.$item['itemid'].', '.
+		insert_js('loadItem('.$number.', '.CJs::encodeJson($item['gitemid']).', '.$this->data['graphid'].', '.$item['itemid'].', '.
 			CJs::encodeJson($name).', '.$item['type'].', '.$item['calc_fnc'].', '.$item['drawtype'].', '.
 			$item['yaxisside'].', \''.$item['color'].'\', '.$item['flags'].');',
 			true

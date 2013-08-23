@@ -53,6 +53,25 @@ $fields = array(
 );
 check_fields($fields);
 
+/*
+ * Permissions
+ */
+if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
+	access_deny();
+}
+if (get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
+	access_deny();
+}
+if (get_request('graphid')) {
+	$graphs = API::Graph()->get(array(
+		'graphids' => array($_REQUEST['graphid']),
+		'output' => array('graphid')
+	));
+	if (!$graphs) {
+		access_deny();
+	}
+}
+
 $pageFilter = new CPageFilter(array(
 	'groups' => array('real_hosts' => true, 'with_graphs' => true),
 	'hosts' => array('with_graphs' => true),
@@ -127,7 +146,7 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 $data = array(
 	'pageFilter' => $pageFilter,
 	'graphid' => $pageFilter->graphid,
-	'fullscreen' => get_request('fullscreen')
+	'fullscreen' => $_REQUEST['fullscreen']
 );
 
 // render view
