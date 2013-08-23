@@ -52,7 +52,7 @@ $fields = array(
 	'add_template' 		=> array(T_ZBX_STR, O_OPT, null,		null,	null),
 	'exist_templates' 	=> array(T_ZBX_INT, O_OPT, null,		DB_ID,	null),
 	'templateid'		=> array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	'isset({form})&&{form}=="update"'),
-	'template_name'		=> array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY, 'isset({save})'),
+	'template_name'		=> array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY, 'isset({save})', _('Template name')),
 	'visiblename'		=> array(T_ZBX_STR, O_OPT, null,		null,	'isset({save})'),
 	'groupid'			=> array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null),
 	'twb_groupid'		=> array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null),
