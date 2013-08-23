@@ -768,7 +768,7 @@ class CPageFilter {
 			$items[$id] = $host['name'];
 			$class[$id] = ($host['status'] == HOST_STATUS_NOT_MONITORED) ? 'not-monitored' : null;
 		}
-		$options = array('objectName' => 'hosts', 'class' => $class);
+		$options = array('objectName' => 'hosts', 'classes' => $class);
 
 		return $this->_getCB('hostid', $this->hostid, $items, $withNode, $options);
 	}
@@ -894,7 +894,7 @@ class CPageFilter {
 		}
 
 		foreach ($items as $id => $name) {
-			$comboBox->addItem($id, $name, null, 'yes', isset($options['classes'][$id]) ? $options['class'][$id] : null);
+			$comboBox->addItem($id, $name, null, 'yes', isset($options['classes'][$id]) ? $options['classes'][$id] : null);
 		}
 
 		return $comboBox;
