@@ -37,7 +37,6 @@ $paramsFieldName = getParamFieldNameByType(get_request('type', 0));
 $fields = array(
 	'parent_discoveryid' =>		array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
 	'itemid' =>					array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))'),
-	'groupid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'hostid' =>					array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'interfaceid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')),
 	'name' =>					array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Name')),

@@ -995,7 +995,14 @@ class CHostGroup extends CZBXAPI {
 		return array('groupids' => $groupIds);
 	}
 
-	public function isReadable($ids) {
+	/**
+	 * Check if user has read permissions for host groups.
+	 *
+	 * @param array $ids
+	 *
+	 * @return bool
+	 */
+	public function isReadable(array $ids) {
 		if (!is_array($ids)) {
 			return false;
 		}
@@ -1013,7 +1020,14 @@ class CHostGroup extends CZBXAPI {
 		return count($ids) == $count;
 	}
 
-	public function isWritable($ids) {
+	/**
+	 * Check if user has write permissions for host groups.
+	 *
+	 * @param array $ids
+	 *
+	 * @return bool
+	 */
+	public function isWritable(array $ids) {
 		if (!is_array($ids)) {
 			return false;
 		}

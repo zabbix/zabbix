@@ -53,8 +53,8 @@ $fields = array(
 	'status' =>					array(T_ZBX_INT, O_OPT, null,	IN(ITEM_STATUS_ACTIVE), null),
 	'type' =>				array(T_ZBX_INT, O_OPT, null,
 		IN(array(-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C,
-			ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI,
-			ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX)), 'isset({save})'),
+			ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
+			ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX)), 'isset({save})'),
 	'authtype' =>			array(T_ZBX_INT, O_OPT, null,	IN(ITEM_AUTHTYPE_PASSWORD.','.ITEM_AUTHTYPE_PUBLICKEY),
 		'isset({save})&&isset({type})&&({type}=='.ITEM_TYPE_SSH.')'),
 	'username' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
@@ -126,20 +126,20 @@ if (get_request('itemid', false)) {
 	$item = API::DiscoveryRule()->get(array(
 		'itemids' => $_REQUEST['itemid'],
 		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => API_OUTPUT_EXTEND,
+		'selectHosts' => array('status', 'flags'),
 		'editable' => true
 	));
 	$item = reset($item);
-	if(!$item) {
+	if (!$item) {
 		access_deny();
 	}
 	$_REQUEST['hostid'] = $item['hostid'];
 	$host = reset($item['hosts']);
 }
-elseif (get_request('hostid', 0) > 0) {
+else {
 	$hosts = API::Host()->get(array(
 		'hostids' => $_REQUEST['hostid'],
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('status', 'flags'),
 		'templated_hosts' => true,
 		'editable' => true
 	));
@@ -328,8 +328,7 @@ else {
 	));
 
 	// determine, show or not column of errors
-	$h = reset($hosts);
-	$data['showErrorColumn'] = ($h['status'] != HOST_STATUS_TEMPLATE);
+	$data['showErrorColumn'] = ($host['status'] != HOST_STATUS_TEMPLATE);
 
 	if (!empty($data['discoveries'])) {
 		order_result($data['discoveries'], $sortfield, getPageSortOrder());

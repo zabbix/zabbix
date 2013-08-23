@@ -58,27 +58,24 @@ class testInheritanceGraph extends CWebTest {
 
 	// Returns update data
 	public static function update() {
-		return DBdata("select * from graphs g left join graphs_items gi on gi.graphid=g.graphid where gi.itemid='23329' and g.name LIKE 'testInheritanceGraph%'");
+		return DBdata("select * from graphs g left join graphs_items gi on gi.graphid=g.graphid where gi.itemid='24329' and g.name LIKE 'testInheritanceGraph%' and g.graphid < 699999");
 	}
 
 	/**
 	 * @dataProvider update
 	 */
 	public function testInheritanceGraph_SimpleUpdate($data) {
-		$name = $data['name'];
-
 		$sqlGraphs = "select * from graphs";
 		$oldHashGraphs = DBhash($sqlGraphs);
 
-		$this->zbxTestLogin('templates.php');
-		$this->zbxTestClickWait('link='.$this->template);
-		$this->zbxTestClickWait("//div[@class='w']//a[text()='Graphs']");
-		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&hostid=30000');
 		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of graphs');
-		$this->zbxTestTextPresent('Graph updated');
-		$this->zbxTestTextPresent("$name");
-		$this->zbxTestTextPresent('GRAPHS');
+		$this->zbxTestTextPresent(array(
+			'Graph updated',
+			$data['name'],
+			'GRAPHS'
+		));
 
 		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
 	}
@@ -203,7 +200,7 @@ class testInheritanceGraph extends CWebTest {
 					'ymax_type' => 'Fixed',
 					'errors' => array(
 						'ERROR: Cannot add graph',
-						'Incorrect item for axis value.'
+						'No permissions to referred object or it does not exist!'
 					)
 				)
 			),
@@ -324,12 +321,7 @@ class testInheritanceGraph extends CWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceGraph_SimpleCreate($data) {
-		$this->zbxTestLogin('templates.php');
-
-
-		$this->zbxTestClickWait('link='.$this->template);
-		$this->zbxTestClickWait("//div[@class='w']//a[text()='Graphs']");
-		$this->zbxTestClickWait('form');
+		$this->zbxTestLogin('graphs.php?hostid=30000&form=Create+graph');
 
 		if (isset($data['name'])) {
 			$this->input_type('name', $data['name']);

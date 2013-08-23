@@ -760,22 +760,18 @@ class testFormGraphPrototype extends CWebTest {
 	 * @dataProvider update
 	 */
 	public function testFormGraphPrototype_SimpleUpdate($data) {
-		$name = $data['name'];
-
 		$sqlGraphs = "select * from graphs ORDER BY graphid";
 		$oldHashGraphs = DBhash($sqlGraphs);
 
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickWait('link='.$this->host);
-		$this->zbxTestClickWait('link=Discovery rules');
-		$this->zbxTestClickWait('link='.$this->discoveryRule);
-		$this->zbxTestClickWait('link=Graph prototypes');
-		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&parent_discoveryid=33800&hostid=40001');
 		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of graph prototypes');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF GRAPH PROTOTYPES', "Graph prototypes of ".$this->discoveryRule));
-		$this->zbxTestTextPresent('Graph updated');
-		$this->zbxTestTextPresent("$name");
+		$this->zbxTestTextPresent(array(
+			'CONFIGURATION OF GRAPH PROTOTYPES',
+			'Graph prototypes of '.$this->discoveryRule,
+			'Graph updated',
+			$data['name']
+		));
 
 		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
 	}
@@ -982,7 +978,7 @@ class testFormGraphPrototype extends CWebTest {
 					'noItem' => true,
 					'errors' => array(
 						'ERROR: Cannot add graph',
-						'Graph prototype must have at least one prototype.'
+						'Missing items for graph prototype "graphSaveCheck".'
 					)
 				)
 			),
@@ -1073,19 +1069,9 @@ class testFormGraphPrototype extends CWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormGraphPrototype_SimpleCreate($data) {
-
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickWait('link='.$this->host);
-		$this->zbxTestClickWait('link=Discovery rules');
-		$this->zbxTestClickWait('link='.$this->discoveryRule);
-		$this->zbxTestClickWait('link=Graph prototypes');
-
 		$itemName = $this->item;
+		$this->zbxTestLogin('graphs.php?parent_discoveryid=33800&form=Create+graph+prototype');
 
-		$this->checkTitle('Configuration of graph prototypes');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF GRAPH PROTOTYPES', "Graph prototypes of ".$this->discoveryRule));
-
-		$this->zbxTestClickWait('form');
 		$this->checkTitle('Configuration of graph prototypes');
 		$this->zbxTestTextPresent('CONFIGURATION OF GRAPH PROTOTYPES');
 		$this->assertElementPresent("//a[@id='tab_graphTab' and text()='Graph prototype']");

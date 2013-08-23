@@ -111,20 +111,11 @@ $_REQUEST['go'] = get_request('go', 'none');
 /*
  * Permissions
  */
-if (get_request('groupid', 0) > 0) {
-	$groupId = available_groups($_REQUEST['groupid'], 1);
-	if (!$groupId) {
-		access_deny();
-	}
+if (get_request('groupid') && !API::HostGroup()->isWritable(array($_REQUEST['groupid']))) {
+	access_deny();
 }
-if (get_request('hostid', 0) > 0) {
-	$hostId = API::Host()->get(array(
-		'hostids' => $_REQUEST['hostid'],
-		'editable' => true
-	));
-	if (!$hostId) {
-		access_deny();
-	}
+if (get_request('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid']))) {
+	access_deny();
 }
 
 /*
@@ -610,15 +601,23 @@ elseif ($_REQUEST['go'] == 'delete') {
 elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 	$status = ($_REQUEST['go'] == 'activate') ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
 	$hosts = get_request('hosts', array());
-	$act_hosts = available_hosts($hosts, 1);
+	$actHosts = API::Host()->get(array(
+		'hostids' => $hosts,
+		'editable' => true,
+		'templated_hosts' => 1,
+		'output' => array('hostid')
+	));
+	$actHosts = zbx_objectValues($actHosts, 'hostid');
 
-	DBstart();
+	if ($actHosts) {
+		DBstart();
 
-	$goResult = updateHostStatus($act_hosts, $status);
-	$goResult = DBend($goResult);
+		$goResult = updateHostStatus($actHosts, $status);
+		$goResult = DBend($goResult);
 
-	show_messages($goResult, _('Host status updated'), _('Cannot update host status'));
-	clearCookies($goResult);
+		show_messages($goResult, _('Host status updated'), _('Cannot update host status'));
+		clearCookies($goResult);
+	}
 }
 
 /*

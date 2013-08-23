@@ -149,7 +149,12 @@ class testPageDiscoveryRules extends CWebTest {
 	public function testPageDiscoveryRules_MassDelete($rule) {
 		$this->chooseOkOnNextConfirmation();
 
-		$hostids = DBdata('select hostid from items where hostid='.$rule['hostid'].' AND flags = '.ZBX_FLAG_DISCOVERY);
+		$hostids = DBdata(
+			'SELECT hostid'.
+			' FROM items'.
+			' WHERE hostid='.$rule['hostid'].
+				' AND flags = '.ZBX_FLAG_DISCOVERY_RULE
+		);
 		$hostids = zbx_objectValues($hostids, 'hostids');
 
 		$this->zbxTestLogin('host_discovery.php?&hostid='.$rule['hostid']);
