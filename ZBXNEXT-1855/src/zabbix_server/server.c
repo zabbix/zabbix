@@ -507,8 +507,7 @@ int	main(int argc, char **argv)
 	}
 
 	save_ps_display_args(argc, argv);
-
-	init_ps_display("Zabbix Server");
+	init_ps_display();
 
 	if (NULL == CONFIG_FILE)
 		CONFIG_FILE = zbx_strdup(CONFIG_FILE, SYSCONFDIR "/zabbix_server.conf");

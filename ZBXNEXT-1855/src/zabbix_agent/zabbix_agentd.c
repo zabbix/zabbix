@@ -822,8 +822,7 @@ int	main(int argc, char **argv)
 	}
 
 	save_ps_display_args(argc, argv);
-
-	init_ps_display("Zabbix Agentd");
+	init_ps_display();
 
 	START_MAIN_ZABBIX_ENTRY(CONFIG_ALLOW_ROOT);
 
