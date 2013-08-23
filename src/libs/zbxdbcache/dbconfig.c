@@ -182,6 +182,14 @@ typedef struct
 	const char	*username;
 	const char	*password;
 }
+ZBX_DC_SIMPLEITEM;
+
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	const char	*username;
+	const char	*password;
+}
 ZBX_DC_JMXITEM;
 
 typedef struct
@@ -360,6 +368,7 @@ typedef struct
 	zbx_hashset_t		dbitems;
 	zbx_hashset_t		sshitems;
 	zbx_hashset_t		telnetitems;
+	zbx_hashset_t		simpleitems;
 	zbx_hashset_t		jmxitems;
 	zbx_hashset_t		calcitems;
 	zbx_hashset_t		deltaitems;		/* history data for delta value calculations */
@@ -791,6 +800,7 @@ static void	DCsync_items(DB_RESULT result)
 	ZBX_DC_DBITEM		*dbitem;
 	ZBX_DC_SSHITEM		*sshitem;
 	ZBX_DC_TELNETITEM	*telnetitem;
+	ZBX_DC_SIMPLEITEM	*simpleitem;
 	ZBX_DC_JMXITEM		*jmxitem;
 	ZBX_DC_CALCITEM		*calcitem;
 	ZBX_DC_INTERFACE_ITEM	*interface_snmpitem;
@@ -1119,6 +1129,25 @@ static void	DCsync_items(DB_RESULT result)
 			zbx_hashset_remove(&config->telnetitems, &itemid);
 		}
 
+		/* Simple items */
+
+		if (ITEM_TYPE_SIMPLE == item->type)
+		{
+			simpleitem = DCfind_id(&config->simpleitems, itemid, sizeof(ZBX_DC_SIMPLEITEM), &found);
+
+			DCstrpool_replace(found, &simpleitem->username, row[22]);
+			DCstrpool_replace(found, &simpleitem->password, row[23]);
+		}
+		else if (NULL != (simpleitem = zbx_hashset_search(&config->simpleitems, &itemid)))
+		{
+			/* remove Simple item parameters */
+
+			zbx_strpool_release(simpleitem->username);
+			zbx_strpool_release(simpleitem->password);
+
+			zbx_hashset_remove(&config->simpleitems, &itemid);
+		}
+
 		/* JMX items */
 
 		if (ITEM_TYPE_JMX == item->type)
@@ -1277,6 +1306,18 @@ static void	DCsync_items(DB_RESULT result)
 			zbx_strpool_release(telnetitem->params);
 
 			zbx_hashset_remove(&config->telnetitems, &itemid);
+		}
+
+		/* Simple items */
+
+		if (ITEM_TYPE_SIMPLE == item->type)
+		{
+			simpleitem = zbx_hashset_search(&config->simpleitems, &itemid);
+
+			zbx_strpool_release(simpleitem->username);
+			zbx_strpool_release(simpleitem->password);
+
+			zbx_hashset_remove(&config->simpleitems, &itemid);
 		}
 
 		/* JMX items */
@@ -2698,6 +2739,8 @@ void	DCsync_configuration()
 			config->sshitems.num_data, config->sshitems.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() telnetitems: %d (%d slots)", __function_name,
 			config->telnetitems.num_data, config->telnetitems.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() simpleitems: %d (%d slots)", __function_name,
+			config->simpleitems.num_data, config->simpleitems.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() jmxitems   : %d (%d slots)", __function_name,
 			config->jmxitems.num_data, config->jmxitems.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() calcitems  : %d (%d slots)", __function_name,
@@ -3087,6 +3130,7 @@ void	init_configuration_cache()
 	CREATE_HASHSET(config->dbitems);
 	CREATE_HASHSET(config->sshitems);
 	CREATE_HASHSET(config->telnetitems);
+	CREATE_HASHSET(config->simpleitems);
 	CREATE_HASHSET(config->jmxitems);
 	CREATE_HASHSET(config->calcitems);
 	CREATE_HASHSET(config->deltaitems);
@@ -3326,6 +3370,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 	const ZBX_DC_FLEXITEM		*flexitem;
 	const ZBX_DC_SSHITEM		*sshitem;
 	const ZBX_DC_TELNETITEM		*telnetitem;
+	const ZBX_DC_SIMPLEITEM		*simpleitem;
 	const ZBX_DC_JMXITEM		*jmxitem;
 	const ZBX_DC_CALCITEM		*calcitem;
 	const ZBX_DC_INTERFACE		*dc_interface;
@@ -3446,6 +3491,20 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 				*dst_item->username_orig = '\0';
 				*dst_item->password_orig = '\0';
 				dst_item->params = zbx_strdup(NULL, "");
+			}
+			dst_item->username = NULL;
+			dst_item->password = NULL;
+			break;
+		case ITEM_TYPE_SIMPLE:
+			if (NULL != (simpleitem = zbx_hashset_search(&config->simpleitems, &src_item->itemid)))
+			{
+				strscpy(dst_item->username_orig, simpleitem->username);
+				strscpy(dst_item->password_orig, simpleitem->password);
+			}
+			else
+			{
+				*dst_item->username_orig = '\0';
+				*dst_item->password_orig = '\0';
 			}
 			dst_item->username = NULL;
 			dst_item->password = NULL;

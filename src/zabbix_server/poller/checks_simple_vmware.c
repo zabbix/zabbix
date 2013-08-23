@@ -3534,7 +3534,7 @@ static int	get_vsphere_stat(AGENT_REQUEST *request, const char *username, const 
 	zbx_vm_t	*vm;
 	zbx_uint64_t	value_uint64, value_uint64_sum;
 
-	if (3 != request->nparam)
+	if (1 != request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
