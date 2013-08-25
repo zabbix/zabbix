@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-10 04:19+0300\n"
+"POT-Creation-Date: 2013-08-25 13:59+0300\n"
 "PO-Revision-Date: 2013-04-29 23:58+0200\n"
 "Last-Translator: Murat <murat@profelis.com.tr>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1104,7 +1104,7 @@ msgstr "Şablonun bağlantısı kaldırılamıyor"
 msgid "Canada (136 characters)"
 msgstr "Canada (136 karakter)"
 
-#: include/classes/class.cbuttoncancel.php:25 include/config.inc.php:262
+#: include/classes/class.cbuttoncancel.php:25 include/config.inc.php:267
 #: include/forms.inc.php:1707 include/forms.inc.php:2010
 #: include/js.inc.php:222 include/setup.inc.php:137
 #: include/views/configuration.action.edit.php:946
@@ -3513,7 +3513,7 @@ msgid "Description"
 msgstr "Açıklama"
 
 #: include/actions.inc.php:868 include/blocks.inc.php:716
-#: include/config.inc.php:344
+#: include/config.inc.php:349
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:43
 #: include/views/configuration.action.edit.php:317
@@ -3970,7 +3970,7 @@ msgctxt "Exa short"
 msgid "E"
 msgstr ""
 
-#: include/config.inc.php:311
+#: include/config.inc.php:316
 msgid "ERROR"
 msgstr "HATA"
 
@@ -5644,7 +5644,7 @@ msgstr "Iconmap aktif değil"
 msgid "Icons"
 msgstr "Simgeler"
 
-#: include/config.inc.php:258
+#: include/config.inc.php:263
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "Eğer bu mesajın yanlış olduğunu düşünüyorsanız gerekli izinlerin alınması için lütfen yöneticilerinize danışın."
 
@@ -7172,7 +7172,7 @@ msgstr ""
 msgid "Logged in as"
 msgstr "olarak oturum açıldı"
 
-#: auditlogs.php:143 include/config.inc.php:261 include/menu.inc.php:285
+#: auditlogs.php:143 include/config.inc.php:266 include/menu.inc.php:285
 #: include/page_header.php:270
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:64
@@ -7503,7 +7503,7 @@ msgid "Max count of events per trigger to show"
 msgstr "Her tetik başına gösterilecek maksimum olay sayısı"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/config.inc.php:346
+#: include/config.inc.php:351
 msgid "Maximize"
 msgstr "Ekranı kapla"
 
@@ -7675,7 +7675,7 @@ msgid "Min severity"
 msgstr "Min önem derecesi"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/config.inc.php:346
+#: include/config.inc.php:351
 msgid "Minimize"
 msgstr "Küçült"
 
@@ -8018,7 +8018,7 @@ msgstr ""
 msgid "Next check"
 msgstr "Sonraki kontrol"
 
-#: events.php:760 include/config.inc.php:563 include/events.inc.php:301
+#: events.php:760 include/config.inc.php:568 include/events.inc.php:301
 #: include/events.inc.php:319 include/forms.inc.php:1922
 #: include/triggers.inc.php:1608
 #: include/views/administration.users.list.php:75
@@ -8458,7 +8458,7 @@ msgstr "Sistem erişimi için izin yok."
 #: api/classes/CTrigger.php:1357 api/classes/CTriggerPrototype.php:822
 #: api/classes/CTriggerPrototype.php:920 api/classes/CUserMacro.php:824
 #: api/classes/CUserMacro.php:933 api/classes/CWebCheck.php:444
-#: include/config.inc.php:244 report6.php:159
+#: include/config.inc.php:249 report6.php:159
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Refere edilen obje için izin yk veya mevcut değil!"
 
@@ -12227,7 +12227,7 @@ msgstr "USA(160 karakter)"
 msgid "USER PROFILE"
 msgstr "KULLANICI PROFİLİ"
 
-#: include/config.inc.php:755
+#: include/config.inc.php:760
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -13204,7 +13204,7 @@ msgid "Yearly"
 msgstr "Yıllık"
 
 #: events.php:760 include/blocks.inc.php:724
-#: include/classes/class.cserverinfo.php:35 include/config.inc.php:563
+#: include/classes/class.cserverinfo.php:35 include/config.inc.php:568
 #: include/events.inc.php:304 include/events.inc.php:322
 #: include/forms.inc.php:1922 include/triggers.inc.php:1608
 #: include/views/administration.users.list.php:74
@@ -13224,7 +13224,7 @@ msgstr "Web sunucu üzerinde yerelleştirme ayarları yapılmamış olan bazı d
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "\"%s\" kullanıcısının önceliklerini değiştirmenize izin verilmiyor."
 
-#: include/config.inc.php:251
+#: include/config.inc.php:256
 msgid "You are not logged in."
 msgstr "Oturum açmamışsınız."
 
@@ -13232,7 +13232,7 @@ msgstr "Oturum açmamışsınız."
 msgid "You can not switch hosts for current selection."
 msgstr ""
 
-#: include/config.inc.php:252
+#: include/config.inc.php:257
 msgid "You cannot view this URL as a"
 msgstr "Bu URL'i şu şekilde göremezsiniz"
 
@@ -13291,7 +13291,7 @@ msgstr "Diğer kullanıcıları güncellemek için izniniz yok."
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "Kullanıcı güncellemek için izniniz yok veya kullanıcı mevcut değil."
 
-#: include/config.inc.php:256
+#: include/config.inc.php:261
 msgid "You must login to view this page."
 msgstr "Bu sayfayı görmek için oturup açmak zorundasınız."
 

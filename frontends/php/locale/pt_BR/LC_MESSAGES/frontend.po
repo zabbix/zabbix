@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-10 04:19+0300\n"
+"POT-Creation-Date: 2013-08-25 13:59+0300\n"
 "PO-Revision-Date: 2013-07-17 12:07+0200\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1105,7 +1105,7 @@ msgstr "Impossível desvincular os templates"
 msgid "Canada (136 characters)"
 msgstr "Canadá (136 caracteres)"
 
-#: include/classes/class.cbuttoncancel.php:25 include/config.inc.php:262
+#: include/classes/class.cbuttoncancel.php:25 include/config.inc.php:267
 #: include/forms.inc.php:1707 include/forms.inc.php:2010
 #: include/js.inc.php:222 include/setup.inc.php:137
 #: include/views/configuration.action.edit.php:946
@@ -3517,7 +3517,7 @@ msgid "Description"
 msgstr "Descrição"
 
 #: include/actions.inc.php:868 include/blocks.inc.php:716
-#: include/config.inc.php:344
+#: include/config.inc.php:349
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:43
 #: include/views/configuration.action.edit.php:317
@@ -3974,7 +3974,7 @@ msgctxt "Exa short"
 msgid "E"
 msgstr "E"
 
-#: include/config.inc.php:311
+#: include/config.inc.php:316
 msgid "ERROR"
 msgstr "ERRO"
 
@@ -5651,7 +5651,7 @@ msgstr "O mapeamento de ícones não está ativado"
 msgid "Icons"
 msgstr "Ícones"
 
-#: include/config.inc.php:258
+#: include/config.inc.php:263
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "Se você entende que esta mensagem está errada, por favor consulte os administradores sobre como conseguir as permissões necessárias."
 
@@ -7181,7 +7181,7 @@ msgstr "Registrar traps SNMP não correspondentes"
 msgid "Logged in as"
 msgstr "Conectado como"
 
-#: auditlogs.php:143 include/config.inc.php:261 include/menu.inc.php:285
+#: auditlogs.php:143 include/config.inc.php:266 include/menu.inc.php:285
 #: include/page_header.php:270
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:64
@@ -7512,7 +7512,7 @@ msgid "Max count of events per trigger to show"
 msgstr "Máximo de eventos por trigger a exibir"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/config.inc.php:346
+#: include/config.inc.php:351
 msgid "Maximize"
 msgstr "Maximizar"
 
@@ -7684,7 +7684,7 @@ msgid "Min severity"
 msgstr "Severidade mínima"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/config.inc.php:346
+#: include/config.inc.php:351
 msgid "Minimize"
 msgstr "Minimizar"
 
@@ -8027,7 +8027,7 @@ msgstr "Próximo"
 msgid "Next check"
 msgstr "Próxima checagem"
 
-#: events.php:760 include/config.inc.php:563 include/events.inc.php:301
+#: events.php:760 include/config.inc.php:568 include/events.inc.php:301
 #: include/events.inc.php:319 include/forms.inc.php:1922
 #: include/triggers.inc.php:1608
 #: include/views/administration.users.list.php:75
@@ -8467,7 +8467,7 @@ msgstr "Sem permissões para aceso ao sistema."
 #: api/classes/CTrigger.php:1357 api/classes/CTriggerPrototype.php:822
 #: api/classes/CTriggerPrototype.php:920 api/classes/CUserMacro.php:824
 #: api/classes/CUserMacro.php:933 api/classes/CWebCheck.php:444
-#: include/config.inc.php:244 report6.php:159
+#: include/config.inc.php:249 report6.php:159
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Sem permissões para o referido objeto ou ele não existe!"
 
@@ -12235,7 +12235,7 @@ msgstr "EUA (160 caracteres)"
 msgid "USER PROFILE"
 msgstr "PROFILE DO USUÁRIO"
 
-#: include/config.inc.php:755
+#: include/config.inc.php:760
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -13212,7 +13212,7 @@ msgid "Yearly"
 msgstr "Anual"
 
 #: events.php:760 include/blocks.inc.php:724
-#: include/classes/class.cserverinfo.php:35 include/config.inc.php:563
+#: include/classes/class.cserverinfo.php:35 include/config.inc.php:568
 #: include/events.inc.php:304 include/events.inc.php:322
 #: include/forms.inc.php:1922 include/triggers.inc.php:1608
 #: include/views/administration.users.list.php:74
@@ -13232,7 +13232,7 @@ msgstr "Não é possível selecionar algumas das línguas, porque os locales par
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "Você não tem permissão para alterar os privilégios para o usuário \"%s\"."
 
-#: include/config.inc.php:251
+#: include/config.inc.php:256
 msgid "You are not logged in."
 msgstr "Você não está logado."
 
@@ -13240,7 +13240,7 @@ msgstr "Você não está logado."
 msgid "You can not switch hosts for current selection."
 msgstr "Você não pode mudar hosts para seleção atual."
 
-#: include/config.inc.php:252
+#: include/config.inc.php:257
 msgid "You cannot view this URL as a"
 msgstr "Você não pode ver esta URL como"
 
@@ -13300,7 +13300,7 @@ msgstr "Você não tem permissão para alterar outros usuários."
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "Você não tem permissão para atualizar o usuário ou o usuário não existe."
 
-#: include/config.inc.php:256
+#: include/config.inc.php:261
 msgid "You must login to view this page."
 msgstr "Você deve logar para ver esta página."
 
