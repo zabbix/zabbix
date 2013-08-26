@@ -186,43 +186,7 @@ function create_hat($caption, $items, $addicons = null, $id = null, $state = nul
 	return $table;
 }
 
-// searches items/objects for form tags like "<input"/form classes like CForm, and makes it empty
-function hide_form_items(&$obj) {
-	if (is_array($obj)) {
-		foreach ($obj as $id => $item) {
-			hide_form_items($obj[$id]); // attention recursion
-		}
-	}
-	elseif (is_object($obj)) {
-		$formObjects = array('cform', 'ccheckbox', 'cselect', 'cbutton', 'csubmit', 'cbuttonqmessage', 'cbuttondelete', 'cbuttoncancel');
-		if (is_object($obj) && str_in_array(zbx_strtolower(get_class($obj)), $formObjects)) {
-			$obj = SPACE;
-		}
-		if (isset($obj->items) && !empty($obj->items)) {
-			foreach ($obj->items as $id => $item) {
-				hide_form_items($obj->items[$id]); // attention recursion
-			}
-		}
-	}
-	else {
-		foreach (array('<form', '<input', '<select') as $item) {
-			if (zbx_strpos($obj, $item) !== false) {
-				$obj = SPACE;
-			}
-		}
-	}
-}
-
 function get_table_header($columnLeft, $columnRights = SPACE) {
-	if (isset($_REQUEST['print'])) {
-		hide_form_items($columnLeft);
-		hide_form_items($columnRights);
-
-		if ($columnLeft == SPACE && $columnRights == SPACE) {
-			return new CJSscript('');
-		}
-	}
-
 	$rights = array();
 
 	if ($columnRights) {
