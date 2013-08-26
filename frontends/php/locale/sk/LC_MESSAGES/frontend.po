@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-08-25 13:59+0300\n"
-"PO-Revision-Date: 2013-07-21 10:13+0200\n"
+"PO-Revision-Date: 2013-08-25 22:49+0200\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -448,7 +448,7 @@ msgstr "Pridať do"
 #: charts.php:93 history.php:94 host_screen.php:88 include/html.inc.php:249
 #: maps.php:70 screens.php:89
 msgid "Add to favourites"
-msgstr "Pridat do oblubenych"
+msgstr "Pridať do obľúbených"
 
 #: include/actions.inc.php:557
 msgid "Add to host group"
@@ -671,7 +671,7 @@ msgstr "Ako obyčajný text"
 
 #: include/hosts.inc.php:154
 msgid "Asset tag"
-msgstr "Inventarne cislo"
+msgstr "Inventárne číslo"
 
 #: include/maintenances.inc.php:54 include/maintenances.inc.php:57
 msgid "At"
@@ -898,21 +898,21 @@ msgstr "Podľa šablóny spúšťača"
 #: include/views/configuration.action.edit.php:25
 #: include/views/configuration.action.list.php:29
 msgid "CONFIGURATION OF ACTIONS"
-msgstr "KONFIGURÁCIA AKCIÍ"
+msgstr "NASTAVENIE AKCIÍ"
 
 #: include/views/configuration.application.edit.php:23
 #: include/views/configuration.application.list.php:33
 msgid "CONFIGURATION OF APPLICATIONS"
-msgstr "KONFIGURÁCIA APLIKÁCIÍ"
+msgstr "NASTAVENIE APLIKÁCIÍ"
 
 #: include/views/administration.authentication.edit.php:23
 msgid "CONFIGURATION OF AUTHENTICATION"
-msgstr "KONFIGURÁCIA PRIHLASOVANIA"
+msgstr "NASTAVENIE PRIHLASOVANIA"
 
 #: include/views/configuration.discovery.edit.php:25
 #: include/views/configuration.discovery.list.php:28
 msgid "CONFIGURATION OF DISCOVERY RULE"
-msgstr "KONFIGURÁCIA PRAVIDIEL ZISŤOVANIA"
+msgstr "NASTAVENIE PRAVIDIEL ZISŤOVANIA"
 
 #: host_discovery.php:263
 #: include/views/configuration.host.discovery.list.php:30
@@ -931,7 +931,7 @@ msgstr "NASTAVENIE GRAFOV"
 
 #: adm.gui.php:107
 msgid "CONFIGURATION OF GUI"
-msgstr "KONFIGURÁCIA GUI"
+msgstr "NASTAVENIE GUI"
 
 #: include/views/configuration.hostgroups.edit.php:23
 #: include/views/configuration.hostgroups.list.php:36
@@ -940,7 +940,7 @@ msgstr "NASTAVENIE SKUPÍN HOSTOV"
 
 #: hosts.php:570 hosts.php:619 hosts.php:639
 msgid "CONFIGURATION OF HOSTS"
-msgstr "KONFIGURÁCIA HOSTOV"
+msgstr "NASTAVENIE HOSTOV"
 
 #: adm.housekeeper.php:86
 msgid "CONFIGURATION OF HOUSEKEEPER"
@@ -952,7 +952,7 @@ msgstr "NASTAVENIE MAPOVANIA IKON"
 
 #: adm.images.php:149
 msgid "CONFIGURATION OF IMAGES"
-msgstr "KONFIGURÁCIA OBRÁZKOV"
+msgstr "NASTAVENIE OBRÁZKOV"
 
 #: include/views/configuration.services.edit.php:28
 #: include/views/configuration.services.list.php:25
@@ -1090,19 +1090,19 @@ msgstr "Callback úroveň"
 
 #: api/classes/CTemplate.php:1410
 msgid "Can't add group"
-msgstr "Nebolo možné pridať skupinu"
+msgstr "Nie je možné pridať skupinu"
 
 #: api/classes/CTemplate.php:1486 api/classes/CTemplate.php:1496
 msgid "Can't link template"
-msgstr "Nebolo možné pripojiť šablónu"
+msgstr "Nie je možné pripojiť šablónu"
 
 #: api/classes/CTemplate.php:1421
 msgid "Can't remove group"
-msgstr "Nebolo možné odstrániť skupinu"
+msgstr "Nie je možné odstrániť skupinu"
 
 #: api/classes/CTemplate.php:1457 api/classes/CTemplate.php:1475
 msgid "Can't unlink template"
-msgstr "Nebolo možné zrušiť prepojenie so šablónou"
+msgstr "Nie je možné zrušiť prepojenie so šablónou"
 
 #: include/views/administration.mediatypes.edit.php:88
 msgid "Canada (136 characters)"
@@ -1125,11 +1125,11 @@ msgstr "Zrušiť"
 
 #: acknow.php:119
 msgid "Cannot acknowledge event"
-msgstr "Nebolo možné potvrdiť udalosť"
+msgstr "Nie je možné potvrdiť udalosť"
 
 #: actionconf.php:149
 msgid "Cannot add action"
-msgstr "Nebolo možné pridať akciu"
+msgstr "Nie je možné pridať akciu"
 
 #: applications.php:129
 msgid "Cannot add application"
@@ -1569,7 +1569,7 @@ msgstr "Obrázok pozadia \"%1$s\" použitý v mape \"%2$s\" nebol nájdený."
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
 #, php-format
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
-msgstr "Graf \"%1$s\" použitý v Obrazovke \"%2$s\" nebol nájdený."
+msgstr "Graf \"%1$s\" použitý v obrazovke \"%2$s\" nebol nájdený."
 
 #: include/classes/import/CXmlImport18.php:723
 #: include/classes/import/importers/CMapImporter.php:210
@@ -1581,7 +1581,7 @@ msgstr "Skupina \"%1$s\" použitá v mape \"%2$s\" nebola nájdená."
 #: include/classes/import/importers/CAbstractScreenImporter.php:53
 #, php-format
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
-msgstr "Skupina \"%1$s\" použitá v Obrazovke \"%2$s\" nebola nájdená."
+msgstr "Skupina \"%1$s\" použitá v obrazovke \"%2$s\" nebola nájdená."
 
 #: include/classes/import/CXmlImport18.php:734
 #: include/classes/import/importers/CMapImporter.php:218
@@ -1593,7 +1593,7 @@ msgstr "Host \"%1$s\" použitý v mape \"%2$s\" nebol nájdený."
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
 #, php-format
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
-msgstr "Host \"%1$s\" použitý v Obrazovke \"%2$s\" nebol nájdený."
+msgstr "Host \"%1$s\" použitý v obrazovke \"%2$s\" nebol nájdený."
 
 #: api/classes/CDiscoveryRule.php:964 api/classes/CDiscoveryRule.php:1036
 #: api/classes/CItemGeneral.php:584 include/items.inc.php:288
@@ -1618,7 +1618,7 @@ msgstr "Mapa ikon \"%1$s\" použitá v mape \"%2$s\" nebola nájdená."
 #: include/classes/import/importers/CAbstractScreenImporter.php:82
 #, php-format
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
-msgstr "Položka \"%1$s\" použitá v Obrazovke \"%2$s\" nebola nájdená."
+msgstr "Položka \"%1$s\" použitá v obrazovke \"%2$s\" nebola nájdená."
 
 #: include/classes/import/CXmlImport18.php:712
 #, php-format
@@ -1634,7 +1634,7 @@ msgstr "Mapa \"%1$s\" použitá v mape \"%2$s\" nebola nájdená."
 #: include/classes/import/importers/CAbstractScreenImporter.php:90
 #, php-format
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
-msgstr "Mapa \"%1$s\" použitá v Obrazovke \"%2$s\" nebola nájdená."
+msgstr "Mapa \"%1$s\" použitá v obrazovke \"%2$s\" nebola nájdená."
 
 #: include/js.inc.php:248
 msgid "Cannot find objects with name"
@@ -1644,7 +1644,7 @@ msgstr "Nemôžem nájsť objekt s menom"
 #: include/classes/import/importers/CAbstractScreenImporter.php:98
 #, php-format
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
-msgstr "Obrazovka \"%1$s\" použitá v Obrazovke \"%2$s\" nebola nájdená."
+msgstr "Obrazovka \"%1$s\" použitá v obrazovke \"%2$s\" nebola nájdená."
 
 #: include/classes/import/CXmlImport18.php:745
 #: include/classes/import/CXmlImport18.php:788
@@ -1677,9 +1677,9 @@ msgstr "Nie je možné spracovať výraz \"%s\"."
 #, php-format
 msgid "Cannot import screen \"%2$s\": subscreen \"%3$s\" does not exist."
 msgid_plural "Cannot import screen \"%2$s\": subscreens \"%3$s\" do not exist."
-msgstr[0] "Nie je možné importovať Obrazovku \"%2$s\": sub-Obrazovka \"%3$s\" neexistuje."
-msgstr[1] "Nie je možné importovať Obrazovku \"%2$s\": sub-Obrazovky \"%3$s\" neexistujú."
-msgstr[2] "Nie je možné importovať Obrazovku \"%2$s\": sub-Obrazovky \"%3$s\" neexistujú."
+msgstr[0] "Nie je možné importovať obrazovku \"%2$s\": sub-obrazovka \"%3$s\" neexistuje."
+msgstr[1] "Nie je možné importovať obrazovku \"%2$s\": sub-obrazovky \"%3$s\" neexistujú."
+msgstr[2] "Nie je možné importovať obrazovku \"%2$s\": sub-obrazovky \"%3$s\" neexistujú."
 
 #: include/classes/import/importers/CTemplateImporter.php:114
 #, php-format
@@ -1976,11 +1976,11 @@ msgstr "Nie je možné upraviť scenár"
 
 #: screenconf.php:153
 msgid "Cannot update screen"
-msgstr "Nie je možné upraviť Obrazovku"
+msgstr "Nie je možné upraviť obrazovku"
 
 #: include/classes/import/CXmlImport18.php:1701
 msgid "Cannot update screen."
-msgstr "Nie je možné upraviť Obrazovku."
+msgstr "Nie je možné upraviť obrazovku."
 
 #: scripts.php:110
 msgid "Cannot update script"
@@ -2125,7 +2125,7 @@ msgstr "Kruhový odkaz v mapách: %1$s."
 #: include/classes/import/importers/CScreenImporter.php:104
 #, php-format
 msgid "Circular reference in screens: %1$s."
-msgstr "Kruhový odkaz v Obrazovkách: %1$s."
+msgstr "Kruhový odkaz v obrazovkách: %1$s."
 
 #: include/classes/import/importers/CTemplateImporter.php:139
 #, php-format
@@ -2336,7 +2336,7 @@ msgstr "Nastavenie hostov"
 
 #: adm.housekeeper.php:24
 msgid "Configuration of housekeeper"
-msgstr "Nastavenie housekeepera"
+msgstr "Nastavenie upratovača"
 
 #: adm.iconmapping.php:24
 msgid "Configuration of icon mapping"
@@ -2384,7 +2384,7 @@ msgstr "Nastavenie regulárnych výrazov"
 
 #: screenconf.php:38 screenedit.php:27
 msgid "Configuration of screens"
-msgstr "Nastavenie Obrazoviek"
+msgstr "Nastavenie obrazoviek"
 
 #: scripts.php:23
 msgid "Configuration of scripts"
@@ -2863,7 +2863,7 @@ msgstr "D, d M Y H:i:s O"
 
 #: dashconf.php:112
 msgid "DASHBOARD CONFIGURATION"
-msgstr "KONFIGURÁCIA KONZOLY"
+msgstr "NASTAVENIE KONZOLY"
 
 #: httpdetails.php:119
 msgid "DETAILS OF SCENARIO"
@@ -2918,7 +2918,7 @@ msgstr "Konzola"
 
 #: dashconf.php:27
 msgid "Dashboard configuration"
-msgstr "Konfigurácia konzoly"
+msgstr "Nastavenie konzoly"
 
 #: dashconf.php:168
 msgid "Dashboard filter"
@@ -3798,7 +3798,7 @@ msgstr "Zisťovacie pravidlá vypnuté"
 
 #: discoveryconf.php:182
 msgid "Discovery rules updated"
-msgstr "Zisťovacie pravidlá aktulizaované"
+msgstr "Zisťovacie pravidlá aktulizované"
 
 #: dashboard.php:334 include/actions.inc.php:82
 msgid "Discovery status"
@@ -4579,7 +4579,7 @@ msgstr "Flexibilné intervaly"
 
 #: profile.php:113 users.php:154
 msgid "For guest, password must be empty"
-msgstr "Heslo účtu guest musí byť prázdne"
+msgstr "Heslo používateľa guest musí byť prázdne"
 
 #: include/items.inc.php:1338 include/views/configuration.item.edit.php:200
 msgid "Formula"
@@ -5973,7 +5973,7 @@ msgstr "Neplatný rozsah stĺpca pre obrazovkový element umiestnený na X - %1$
 
 #: api/classes/CDRule.php:437
 msgid "Incorrect delay."
-msgstr "Nesprávne oneskorenie."
+msgstr "Neplatné oneskorenie."
 
 #: adm.regexps.php:181
 msgid "Incorrect expression"
@@ -11422,19 +11422,19 @@ msgstr "Audit úspešný"
 
 #: popup_trexpr.php:328
 msgid "Sum of values of a period T is < N"
-msgstr "Súčet hodnôt v periode T je < N"
+msgstr "Súčet hodnôt v perióde T je < N"
 
 #: popup_trexpr.php:338
 msgid "Sum of values of a period T is = N"
-msgstr "Súčet hodnôt v periode T je = N"
+msgstr "Súčet hodnôt v perióde T je = N"
 
 #: popup_trexpr.php:333
 msgid "Sum of values of a period T is > N"
-msgstr "Súčet hodnôt v periode T je > N"
+msgstr "Súčet hodnôt v perióde T je > N"
 
 #: popup_trexpr.php:343
 msgid "Sum of values of a period T is NOT N"
-msgstr "Súčet hodnôt v periode T NIE JE N"
+msgstr "Súčet hodnôt v perióde T NIE JE N"
 
 #: include/func.inc.php:194
 msgid "Sun"
