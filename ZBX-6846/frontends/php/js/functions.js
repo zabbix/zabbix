@@ -949,12 +949,9 @@ function formatTimestamp(timestamp, isTsDouble, isExtend) {
 
 function printLess(show) {
 	if (show) {
-		jQuery('.originalblue #mmenu').hide();
-		jQuery('.originalblue .page_header').hide();
-		jQuery('.originalblue .history').hide();
-		jQuery('.originalblue .page_footer').hide();
+		jQuery('#mmenu, .page_header, .history, .page_footer').hide();
 
-		jQuery('.originalblue .header_l.left, .originalblue .header_r.right').each(function(i, obj) {
+		jQuery('.header_l.left, .header_r.right').each(function(i, obj) {
 			if (jQuery(this).find('input, form, select, .menu_icon').length) {
 				jQuery(this).children().each(function() {
 					jQuery(this).hide()
@@ -966,15 +963,12 @@ function printLess(show) {
 			jQuery(this).find('input, form, select, .menu_icon').hide();
 		})
 
-		jQuery('.originalblue .printless').show();
+		jQuery('.printless').show();
 	}
 	else {
-		jQuery('.originalblue #mmenu').show();
-		jQuery('.originalblue .page_header').show();
-		jQuery('.originalblue .history').show();
-		jQuery('.originalblue .page_footer').show();
+		jQuery('#mmenu, .page_header, .history, .page_footer').show();
 
-		jQuery('.originalblue .header_l.left, .originalblue .header_r.right').each(function(i, obj){
+		jQuery('.header_l.left, .header_r.right').each(function(i, obj){
 			if (jQuery(this).find('input, form, select, .menu_icon').length) {
 				jQuery(this).children().each(function() {
 					jQuery(this).show()
@@ -986,7 +980,7 @@ function printLess(show) {
 			jQuery(this).find('input, form, select, .menu_icon').show();
 		})
 
-		jQuery('.originalblue .printless').hide();
+		jQuery('.printless').hide();
 	}
 
 	if (typeof(actionOnPrint) === 'function') {
