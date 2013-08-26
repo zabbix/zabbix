@@ -99,17 +99,20 @@ $tranStrings = array(
 		'S_DATE_FORMAT' => FILTER_TIMEBAR_DATE_FORMAT
 	),
 	'functions.js' => array(
+		'Cancel' => _('Cancel'),
 		'DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q' => _('Do you wish to replace the conditional expression?'),
+		'Events' => _('Events'),
+		'Execute' => _('Execute'),
+		'Execution confirmation' => _('Execution confirmation'),
+		'History' => _('History'),
+		'History and simple graphs' => _('History and simple graphs'),
 		'S_INSERT_MACRO' => _('Insert macro'),
 		'S_CREATE_LOG_TRIGGER' => _('Create trigger'),
 		'S_DELETE' => _('Delete'),
 		'S_DELETE_KEYWORD_Q' => _('Delete keyword?'),
 		'S_DELETE_EXPRESSION_Q' => _('Delete expression?'),
 		'Simple graphs' => _('Simple graphs'),
-		'History' => _('History'),
-		'History and simple graphs' => _('History and simple graphs'),
-		'Triggers' => _('Triggers'),
-		'Events' => _('Events'),
+		'Triggers' => _('Triggers')
 	),
 	'class.calendar.js' => array(
 		'S_JANUARY' => _('January'),
@@ -193,11 +196,8 @@ $tranStrings = array(
 	),
 	'menupopup.js' => array(
 		'Acknowledge' => _('Acknowledge'),
-		'Cancel' => _('Cancel'),
 		'Configuration' => _('Configuration'),
 		'Events' => _('Events'),
-		'Execute' => _('Execute'),
-		'Execution confirmation' => _('Execution confirmation'),
 		'Go to' => _('Go to'),
 		'History' => _('History'),
 		'Host inventories' => _('Host inventories'),

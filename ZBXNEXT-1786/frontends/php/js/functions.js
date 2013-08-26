@@ -989,3 +989,72 @@ function splitPath(path) {
 
 	return items;
 }
+
+/**
+ * Execute script.
+ *
+ * @param string hostId			host id
+ * @param string scriptId		script id
+ * @param string confirmation	confirmation text
+ */
+function executeScript(hostId, scriptId, confirmation) {
+	var execute = function() {
+		if (!empty(hostId)) {
+			openWinCentered('scripts_exec.php?execute=1&hostid=' + hostId + '&scriptid=' + scriptId, 'Tools', 560, 470,
+				'titlebar=no, resizable=yes, scrollbars=yes, dialog=no'
+			);
+		}
+	};
+
+	if (confirmation.length > 0) {
+		var scriptDialog = jQuery('#scriptDialog');
+
+		if (scriptDialog.length == 0) {
+			scriptDialog = jQuery('<div>', {
+				id: 'scriptDialog',
+				css: {
+					display: 'none',
+					'white-space': 'normal',
+					'z-index': 1000
+				}
+			});
+
+			jQuery('body').append(scriptDialog);
+		}
+
+		scriptDialog
+			.text(confirmation)
+			.dialog({
+				buttons: [
+					{text: t('Execute'), click: function() {
+						jQuery(this).dialog('destroy');
+						execute();
+					}},
+					{text: t('Cancel'), click: function() {
+						jQuery(this).dialog('destroy');
+					}}
+				],
+				draggable: false,
+				modal: true,
+				width: (scriptDialog.outerWidth() + 20 > 600) ? 600 : 'inherit',
+				resizable: false,
+				minWidth: 200,
+				minHeight: 100,
+				title: t('Execution confirmation'),
+				close: function() {
+					jQuery(this).dialog('destroy');
+				}
+			});
+
+		if (empty(hostId)) {
+			jQuery('.ui-dialog-buttonset button:first').prop('disabled', true).addClass('ui-state-disabled');
+			jQuery('.ui-dialog-buttonset button:last').addClass('main').focus();
+		}
+		else {
+			jQuery('.ui-dialog-buttonset button:first').addClass('main');
+		}
+	}
+	else {
+		execute();
+	}
+}

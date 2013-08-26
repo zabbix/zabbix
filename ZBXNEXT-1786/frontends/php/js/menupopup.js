@@ -321,10 +321,9 @@ jQuery(function($) {
 	 * Menu popup.
 	 *
 	 * @param array  sections	menu sections usign structure "type", "title", "data"
-	 * @param object labels		translated labels
 	 * @param object event		menu popup call event
 	 */
-	$.fn.menuPopup = function(sections, labels, event) {
+	$.fn.menuPopup = function(sections, event) {
 		if (!event) {
 			event = window.event;
 		}
@@ -365,7 +364,7 @@ jQuery(function($) {
 			if (sections.length > 0) {
 				$.each(sections, function(i, section) {
 					if (section.type === 'scripts') {
-						createScripts(menuPopup, section, labels);
+						createScripts(menuPopup, section);
 					}
 					else {
 						createLinks(menuPopup, section);
@@ -420,7 +419,7 @@ jQuery(function($) {
 				.mouseleave(function() {
 					menuPopup.data('isActive', false);
 
-					closeInactiveMenuPopup(menuPopup, 500);
+					closeInactiveMenuPopup(menuPopup, 1000);
 				})
 				.position({
 					of: (openner.prop('tagName') == 'AREA') ? mapContainer : openner,
@@ -444,6 +443,11 @@ jQuery(function($) {
 		window.menuPopupTimeoutHandler = window.setTimeout(function() {
 			if (!menuPopup.data('isActive')) {
 				menuPopup.data('isActive', false);
+
+				$('.menu', menuPopup).each(function() {
+					$(this).menu('collapseAll', null, true);
+				});
+
 				menuPopup.fadeOut(0);
 			}
 		}, delay);
@@ -458,7 +462,7 @@ jQuery(function($) {
 	 * @param string section['hostId']	host id
 	 * @param array  section['data']	screen items in structure ("name", "scriptId", "confirmation")
 	 */
-	function createScripts(menuPopup, section, labels) {
+	function createScripts(menuPopup, section) {
 		var menuData = {};
 
 		for (var key in section.data) {
@@ -492,9 +496,13 @@ jQuery(function($) {
 						executeScript(
 							item.data('hostId'),
 							item.data('scriptId'),
-							item.data('confirmation'),
-							labels
+							item.data('confirmation')
 						);
+					});
+				}
+				else {
+					item.click(function(e) {
+						cancelEvent(e);
 					});
 				}
 			});
@@ -634,67 +642,5 @@ jQuery(function($) {
 			}),
 			(typeof(subMenu) !== 'undefined') ? subMenu : null
 		);
-	}
-
-	/**
-	 * Execute script.
-	 *
-	 * @param string hostId			host id
-	 * @param string scriptId		script id
-	 * @param string confirmation	confirmation text
-	 * @param object labels			labels
-	 */
-	function executeScript(hostId, scriptId, confirmation, labels) {
-		var execute = function() {
-			openWinCentered('scripts_exec.php?execute=1&hostid=' + hostId + '&scriptid=' + scriptId, 'Tools', 560, 470,
-				'titlebar=no, resizable=yes, scrollbars=yes, dialog=no'
-			);
-		};
-
-		if (confirmation.length > 0) {
-			var scriptDialog = $('#scriptDialog');
-
-			if (scriptDialog.length == 0) {
-				scriptDialog = $('<div>', {
-					id: 'scriptDialog',
-					css: {
-						display: 'none',
-						'white-space': 'normal',
-						'z-index': 1000
-					}
-				});
-
-				$('body').append(scriptDialog);
-			}
-
-			scriptDialog
-				.text(confirmation)
-				.dialog({
-					buttons: [
-						{text: labels['Execute'], click: function() {
-							$(this).dialog('destroy');
-							execute();
-						}},
-						{text: labels['Cancel'], click: function() {
-							$(this).dialog('destroy');
-						}}
-					],
-					draggable: false,
-					modal: true,
-					width: (scriptDialog.outerWidth() + 20 > 600) ? 600 : 'inherit',
-					resizable: false,
-					minWidth: 200,
-					minHeight: 100,
-					title: labels['Execution confirmation'],
-					close: function() {
-						$(this).dialog('destroy');
-					}
-				});
-
-			$('.ui-dialog-buttonset button:first').addClass('main');
-		}
-		else {
-			execute();
-		}
 	}
 });

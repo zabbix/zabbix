@@ -33,12 +33,7 @@ jQuery(function($) {
 	 */
 	$(document).on('click', '[data-menupopup]', function(event) {
 		var obj = $(this),
-			data = obj.data('menupopup'),
-			labels = {
-				'Cancel': t('Cancel'),
-				'Execute': t('Execute'),
-				'Execution confirmation': t('Execution confirmation')
-			};
+			data = obj.data('menupopup');
 
 		switch (data.type) {
 			case 'host':
@@ -58,7 +53,7 @@ jQuery(function($) {
 				break;
 		}
 
-		obj.menuPopup(data, labels, event);
+		obj.menuPopup(data, event);
 
 		return false;
 	});
