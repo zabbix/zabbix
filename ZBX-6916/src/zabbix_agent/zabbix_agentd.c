@@ -472,6 +472,7 @@ static void	zbx_load_config(int requirement)
 
 	zbx_trim_str_list(CONFIG_HOSTS_ALLOWED, ',');
 	zbx_trim_str_list(active_hosts, ',');
+	zbx_trim_str_list(CONFIG_LISTEN_IP, ',');
 
 	if (ZBX_CFG_FILE_REQUIRED == requirement && NULL == CONFIG_HOSTS_ALLOWED && 0 != CONFIG_PASSIVE_FORKS)
 	{
