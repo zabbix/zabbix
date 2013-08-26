@@ -110,7 +110,7 @@ if ($exportData) {
 /*
  * Actions
  */
-if (!isset($_REQUEST['add_template'])) {
+if (!isset($_REQUEST['add_template']) && isset($_REQUEST['form'])) {
 	unset($_REQUEST['templates']);
 }
 
