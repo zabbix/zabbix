@@ -1773,6 +1773,56 @@ out:
 	return ret;
 }
 
+static int	vcenter_vm_counter_get(zbx_vcenter_t *vcenter, const char *uuid, const char *instance,
+		zbx_uint64_t counterid, int coeff, AGENT_RESULT *result)
+{
+	int		i, ret = SYSINFO_RET_FAIL;
+	char		xpath[MAX_STRING_LEN], *value;
+	zbx_hv_t	*hv;
+	zbx_vm_t	*vm = NULL;
+	zbx_dev_t	*dev;
+	zbx_uint64_t	value_ui64;
+
+	for (i = 0; i < vcenter->hvs.values_num; i++)
+	{
+		hv = (zbx_hv_t *)vcenter->hvs.values[i];
+
+		if (NULL != (vm = vm_get(&hv->vms, uuid)))
+			break;
+	}
+
+	if (i == vcenter->hvs.values_num)
+		return SYSINFO_RET_FAIL;
+
+	for (i = 0; i < vm->devs.values_num; i++)
+	{
+		dev = (zbx_dev_t *)vm->devs.values[i];
+
+		if (0 == strcmp(dev->instance, instance))
+			break;
+	}
+
+	if (i == vm->devs.values_num)
+		return SYSINFO_RET_FAIL;
+
+	zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_LN3("value", "id", "counterId") "[.='" ZBX_FS_UI64 "']/.."
+				ZBX_XPATH_LN("instance") "[.='%s']/../.." ZBX_XPATH_LN("value"), counterid, instance);
+
+	if (NULL == (value = read_xml_value(vm->stats, xpath)))
+		return SYSINFO_RET_FAIL;
+
+	if (SUCCEED == is_uint64(value, &value_ui64))
+	{
+		SET_UI64_RESULT(result, value_ui64 * coeff);
+
+		ret = SYSINFO_RET_OK;
+	}
+
+	zbx_free(value);
+
+	return ret;
+}
+
 static int	vsphere_hostdata_get(CURL *easyhandle, char **details, char **error)
 {
 #	define ZBX_POST_VSPHERE_HOSTDETAILS								\
@@ -2912,13 +2962,10 @@ int	check_vcenter_vm_net_if_discovery(AGENT_REQUEST *request, const char *userna
 int	check_vcenter_vm_net_if_in(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		i, ret = SYSINFO_RET_FAIL;
-	char		*url, *uuid, *instance, *mode, xpath[MAX_STRING_LEN], *value, *error = NULL;
+	char		*url, *uuid, *instance, *mode, *error = NULL;
 	zbx_vcenter_t	*vcenter;
-	zbx_hv_t	*hv;
-	zbx_vm_t	*vm = NULL;
-	zbx_dev_t	*dev;
-	zbx_uint64_t	counterid, value_ui64;
+	zbx_uint64_t	counterid;
+	int 		coeff;
 
 	if (3 > request->nparam || request->nparam > 4)
 		return SYSINFO_RET_FAIL;
@@ -2940,69 +2987,29 @@ int	check_vcenter_vm_net_if_in(AGENT_REQUEST *request, const char *username, con
 	if (NULL == (vcenter = vcenter_get(url, username, password)))
 		return SYSINFO_RET_FAIL;
 
-	for (i = 0; i < vcenter->hvs.values_num; i++)
-	{
-		hv = (zbx_hv_t *)vcenter->hvs.values[i];
-
-		if (NULL != (vm = vm_get(&hv->vms, uuid)))
-			break;
-	}
-
-	if (i == vcenter->hvs.values_num)
-		return SYSINFO_RET_FAIL;
-
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bps"))
+	{
 		counterid = vcenter->counters.nic_received;
+		coeff = ZBX_KIBIBYTE;
+	}
 	else if (0 == strcmp(mode, "pps"))
+	{
 		counterid = vcenter->counters.nic_packets_rx;
+		coeff = 1;
+	}
 	else
 		return SYSINFO_RET_FAIL;
 
-	for (i = 0; i < vm->devs.values_num; i++)
-	{
-		dev = (zbx_dev_t *)vm->devs.values[i];
-
-		if (ZBX_DEV_TYPE_NIC != dev->type)
-			continue;
-
-		if (0 == strcmp(dev->instance, instance))
-			break;
-	}
-
-	if (i == vm->devs.values_num)
-		return SYSINFO_RET_FAIL;
-
-	zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_LN3("value", "id", "counterId") "[.='" ZBX_FS_UI64 "']/.."
-				ZBX_XPATH_LN("instance") "[.='%s']/../.." ZBX_XPATH_LN("value"), counterid, instance);
-
-	if (NULL == (value = read_xml_value(vm->stats, xpath)))
-		return SYSINFO_RET_FAIL;
-
-	if (SUCCEED == is_uint64(value, &value_ui64))
-	{
-		if (counterid == vcenter->counters.nic_received)	/* bps */
-			value_ui64 *= ZBX_KIBIBYTE;
-
-		SET_UI64_RESULT(result, value_ui64);
-
-		ret = SYSINFO_RET_OK;
-	}
-
-	zbx_free(value);
-
-	return ret;
+	return vcenter_vm_counter_get(vcenter, uuid, instance, counterid, coeff, result);
 }
 
 int	check_vcenter_vm_net_if_out(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		i, ret = SYSINFO_RET_FAIL;
-	char		*url, *uuid, *instance, *mode, xpath[MAX_STRING_LEN], *value, *error = NULL;
+	char		*url, *uuid, *instance, *mode, *error = NULL;
 	zbx_vcenter_t	*vcenter;
-	zbx_hv_t	*hv;
-	zbx_vm_t	*vm = NULL;
-	zbx_dev_t	*dev;
-	zbx_uint64_t	counterid, value_ui64;
+	zbx_uint64_t	counterid;
+	int		coeff;
 
 	if (3 > request->nparam || request->nparam > 4)
 		return SYSINFO_RET_FAIL;
@@ -3024,57 +3031,20 @@ int	check_vcenter_vm_net_if_out(AGENT_REQUEST *request, const char *username, co
 	if (NULL == (vcenter = vcenter_get(url, username, password)))
 		return SYSINFO_RET_FAIL;
 
-	for (i = 0; i < vcenter->hvs.values_num; i++)
-	{
-		hv = (zbx_hv_t *)vcenter->hvs.values[i];
-
-		if (NULL != (vm = vm_get(&hv->vms, uuid)))
-			break;
-	}
-
-	if (i == vcenter->hvs.values_num)
-		return SYSINFO_RET_FAIL;
-
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bps"))
+	{
 		counterid = vcenter->counters.nic_transmitted;
+		coeff = ZBX_KIBIBYTE;
+	}
 	else if (0 == strcmp(mode, "pps"))
+	{
 		counterid = vcenter->counters.nic_packets_tx;
+		coeff = 1;
+	}
 	else
 		return SYSINFO_RET_FAIL;
 
-	for (i = 0; i < vm->devs.values_num; i++)
-	{
-		dev = (zbx_dev_t *)vm->devs.values[i];
-
-		if (ZBX_DEV_TYPE_NIC != dev->type)
-			continue;
-
-		if (0 == strcmp(dev->instance, instance))
-			break;
-	}
-
-	if (i == vm->devs.values_num)
-		return SYSINFO_RET_FAIL;
-
-	zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_LN3("value", "id", "counterId") "[.='" ZBX_FS_UI64 "']/.."
-				ZBX_XPATH_LN("instance") "[.='%s']/../.." ZBX_XPATH_LN("value"), counterid, instance);
-
-	if (NULL == (value = read_xml_value(vm->stats, xpath)))
-		return SYSINFO_RET_FAIL;
-
-	if (SUCCEED == is_uint64(value, &value_ui64))
-	{
-		if (counterid == vcenter->counters.nic_transmitted)	/* bps */
-			value_ui64 *= ZBX_KIBIBYTE;
-
-		SET_UI64_RESULT(result, value_ui64);
-
-		ret = SYSINFO_RET_OK;
-	}
-
-	zbx_free(value);
-
-	return ret;
+	return vcenter_vm_counter_get(vcenter, uuid, instance, counterid, coeff, result);
 }
 
 int	check_vcenter_vm_storage_committed(AGENT_REQUEST *request, const char *username, const char *password,
@@ -3168,13 +3138,10 @@ int	check_vcenter_vm_vfs_dev_discovery(AGENT_REQUEST *request, const char *usern
 int	check_vcenter_vm_vfs_dev_read(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		i, ret = SYSINFO_RET_FAIL;
-	char		*url, *uuid, *instance, *mode, xpath[MAX_STRING_LEN], *value, *error = NULL;
+	char		*url, *uuid, *instance, *mode, *error = NULL;
 	zbx_vcenter_t	*vcenter;
-	zbx_hv_t	*hv;
-	zbx_vm_t	*vm = NULL;
-	zbx_dev_t	*dev;
-	zbx_uint64_t	counterid, value_ui64;
+	zbx_uint64_t	counterid;
+	int		coeff;
 
 	if (3 > request->nparam || request->nparam > 4)
 		return SYSINFO_RET_FAIL;
@@ -3196,69 +3163,29 @@ int	check_vcenter_vm_vfs_dev_read(AGENT_REQUEST *request, const char *username, 
 	if (NULL == (vcenter = vcenter_get(url, username, password)))
 		return SYSINFO_RET_FAIL;
 
-	for (i = 0; i < vcenter->hvs.values_num; i++)
-	{
-		hv = (zbx_hv_t *)vcenter->hvs.values[i];
-
-		if (NULL != (vm = vm_get(&hv->vms, uuid)))
-			break;
-	}
-
-	if (i == vcenter->hvs.values_num)
-		return SYSINFO_RET_FAIL;
-
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bps"))
+	{
 		counterid = vcenter->counters.disk_read;
+		coeff = ZBX_KIBIBYTE;
+	}
 	else if (0 == strcmp(mode, "ops"))
+	{
 		counterid = vcenter->counters.disk_number_read_averaged;
+		coeff = 1;
+	}
 	else
 		return SYSINFO_RET_FAIL;
 
-	for (i = 0; i < vm->devs.values_num; i++)
-	{
-		dev = (zbx_dev_t *)vm->devs.values[i];
-
-		if (ZBX_DEV_TYPE_DISK != dev->type)
-			continue;
-
-		if (0 == strcmp(dev->instance, instance))
-			break;
-	}
-
-	if (i == vm->devs.values_num)
-		return SYSINFO_RET_FAIL;
-
-	zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_LN3("value", "id", "counterId") "[.='" ZBX_FS_UI64 "']/.."
-				ZBX_XPATH_LN("instance") "[.='%s']/../.." ZBX_XPATH_LN("value"), counterid, instance);
-
-	if (NULL == (value = read_xml_value(vm->stats, xpath)))
-		return SYSINFO_RET_FAIL;
-
-	if (SUCCEED == is_uint64(value, &value_ui64))
-	{
-		if (counterid == vcenter->counters.disk_read)	/* bps */
-			value_ui64 *= ZBX_KIBIBYTE;
-
-		SET_UI64_RESULT(result, value_ui64);
-
-		ret = SYSINFO_RET_OK;
-	}
-
-	zbx_free(value);
-
-	return ret;
+	return vcenter_vm_counter_get(vcenter, uuid, instance, counterid, coeff, result);
 }
 
 int	check_vcenter_vm_vfs_dev_write(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		i, ret = SYSINFO_RET_FAIL;
-	char		*url, *uuid, *instance, *mode, xpath[MAX_STRING_LEN], *value, *error = NULL;
+	char		*url, *uuid, *instance, *mode, *error = NULL;
 	zbx_vcenter_t	*vcenter;
-	zbx_hv_t	*hv;
-	zbx_vm_t	*vm = NULL;
-	zbx_dev_t	*dev;
-	zbx_uint64_t	counterid, value_ui64;
+	zbx_uint64_t	counterid;
+	int		coeff;
 
 	if (3 > request->nparam || request->nparam > 4)
 		return SYSINFO_RET_FAIL;
@@ -3280,57 +3207,20 @@ int	check_vcenter_vm_vfs_dev_write(AGENT_REQUEST *request, const char *username,
 	if (NULL == (vcenter = vcenter_get(url, username, password)))
 		return SYSINFO_RET_FAIL;
 
-	for (i = 0; i < vcenter->hvs.values_num; i++)
-	{
-		hv = (zbx_hv_t *)vcenter->hvs.values[i];
-
-		if (NULL != (vm = vm_get(&hv->vms, uuid)))
-			break;
-	}
-
-	if (i == vcenter->hvs.values_num)
-		return SYSINFO_RET_FAIL;
-
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bps"))
+	{
 		counterid = vcenter->counters.disk_write;
+		coeff = ZBX_KIBIBYTE;
+	}
 	else if (0 == strcmp(mode, "ops"))
+	{
 		counterid = vcenter->counters.disk_number_write_averaged;
+		coeff = 1;
+	}
 	else
 		return SYSINFO_RET_FAIL;
 
-	for (i = 0; i < vm->devs.values_num; i++)
-	{
-		dev = (zbx_dev_t *)vm->devs.values[i];
-
-		if (ZBX_DEV_TYPE_DISK != dev->type)
-			continue;
-
-		if (0 == strcmp(dev->instance, instance))
-			break;
-	}
-
-	if (i == vm->devs.values_num)
-		return SYSINFO_RET_FAIL;
-
-	zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_LN3("value", "id", "counterId") "[.='" ZBX_FS_UI64 "']/.."
-				ZBX_XPATH_LN("instance") "[.='%s']/../.." ZBX_XPATH_LN("value"), counterid, instance);
-
-	if (NULL == (value = read_xml_value(vm->stats, xpath)))
-		return SYSINFO_RET_FAIL;
-
-	if (SUCCEED == is_uint64(value, &value_ui64))
-	{
-		if (counterid == vcenter->counters.disk_write)	/* bps */
-			value_ui64 *= ZBX_KIBIBYTE;
-
-		SET_UI64_RESULT(result, value_ui64);
-
-		ret = SYSINFO_RET_OK;
-	}
-
-	zbx_free(value);
-
-	return ret;
+	return vcenter_vm_counter_get(vcenter, uuid, instance, counterid, coeff, result);
 }
 
 int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, const char *username, const char *password,
