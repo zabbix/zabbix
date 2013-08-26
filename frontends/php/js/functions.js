@@ -946,3 +946,50 @@ function formatTimestamp(timestamp, isTsDouble, isExtend) {
 
 	return str;
 }
+
+function printLess(show) {
+	if (show) {
+		jQuery('.originalblue #mmenu').hide();
+		jQuery('.originalblue .page_header').hide();
+		jQuery('.originalblue .history').hide();
+		jQuery('.originalblue .page_footer').hide();
+
+		jQuery('.originalblue .header_l.left, .originalblue .header_r.right').each(function(i, obj) {
+			if (jQuery(this).find('input, form, select, .menu_icon').length) {
+				jQuery(this).children().each(function() {
+					jQuery(this).hide()
+				});
+			}
+		})
+
+		jQuery('table tr.header, table tr.footer').each(function(i, obj) {
+			jQuery(this).find('input, form, select, .menu_icon').hide();
+		})
+
+		jQuery('.originalblue .printless').show();
+	}
+	else {
+		jQuery('.originalblue #mmenu').show();
+		jQuery('.originalblue .page_header').show();
+		jQuery('.originalblue .history').show();
+		jQuery('.originalblue .page_footer').show();
+
+		jQuery('.originalblue .header_l.left, .originalblue .header_r.right').each(function(i, obj){
+			if (jQuery(this).find('input, form, select, .menu_icon').length) {
+				jQuery(this).children().each(function() {
+					jQuery(this).show()
+				});
+			}
+		})
+
+		jQuery('table tr.header, table tr.footer').each(function(i, obj) {
+			jQuery(this).find('input, form, select, .menu_icon').show();
+		})
+
+		jQuery('.originalblue .printless').hide();
+	}
+
+	if (typeof(actionOnPrint) === 'function') {
+		actionOnPrint();
+	}
+}

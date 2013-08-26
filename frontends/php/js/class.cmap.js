@@ -2020,3 +2020,9 @@ function addPopupValues(list) {
 		ZABBIX.apps.map.object.linkForm.addNewTriggers(list.values);
 	}
 }
+
+function actionOnPrint() {
+	if (jQuery('#gridalignall').length) {
+		jQuery('#gridalignall').click();
+	}
+}
