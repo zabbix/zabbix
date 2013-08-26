@@ -88,8 +88,7 @@ class CScreenHistory extends CScreenBase {
 		$this->resourcetype = SCREEN_RESOURCE_HISTORY;
 
 		// mandatory
-		$this->itemids = isset($options['itemid']) ? $options['itemid'] : null;
-		$this->itemids = isset($options['itemids']) ? $options['itemids'] : $this->itemids;
+		$this->itemids = isset($options['itemids']) ? $options['itemids'] : null;
 		$this->filter = isset($options['filter']) ? $options['filter'] : null;
 		$this->filterTask = isset($options['filter_task']) ? $options['filter_task'] : null;
 		$this->markColor = isset($options['mark_color']) ? $options['mark_color'] : MARK_COLOR_RED;
