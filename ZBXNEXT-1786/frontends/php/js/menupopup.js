@@ -465,23 +465,8 @@ jQuery(function($) {
 			var script = section.data[key];
 
 			if (typeof(script.scriptId) !== 'undefined') {
-				var items = [],
-					name,
-					regexp = /(([^\/]*(\\\/)+)([^\/]*)+|([^\/]+))/g,
-					matched;
-
-				while (matched = regexp.exec(script.name)) {
-					// remove backslashes
-					matched[0] = matched[0]
-						.replace(/\\\\/g, '//')
-						.replace(/\\\//g, '/')
-						.replace(/\\/g, '')
-						.replace(/\/\//g, '\\');
-
-					items[items.length] = matched[0];
-				}
-
-				name = (items.length > 0) ? items.pop() : script.name;
+				var items = splitPath(script.name),
+					name = (items.length > 0) ? items.pop() : script.name;
 
 				prepareTree(menuData, name, items, {
 					hostId: section.hostId,

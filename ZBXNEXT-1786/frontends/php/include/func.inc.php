@@ -2721,3 +2721,43 @@ function getMenuPopupTrigger($options = array()) {
 
 	return $data;
 }
+
+function splitPath($path) {
+	$items = array();
+	$s = $escapes = '';
+
+	for ($i = 0, $size = strlen($path); $i < $size; $i++) {
+		if ($path[$i] === '/') {
+			if ($escapes === '') {
+				$items[] = $s;
+				$s = '';
+			}
+			else {
+				if (strlen($escapes) % 2 == 0) {
+					$s .= stripslashes($escapes);
+					$items[] = $s;
+					$s = $escapes = '';
+				}
+				else {
+					$s .= stripslashes($escapes).$path[$i];
+					$escapes = '';
+				}
+			}
+		}
+		elseif ($path[$i] === '\\') {
+			$escapes .= $path[$i];
+		}
+		else {
+			$s .= stripslashes($escapes).$path[$i];
+			$escapes = '';
+		}
+	}
+
+	if ($escapes !== '') {
+		$s .= stripslashes($escapes);
+	}
+
+	$items[] = $s;
+
+	return $items;
+}

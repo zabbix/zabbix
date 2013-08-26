@@ -946,3 +946,46 @@ function formatTimestamp(timestamp, isTsDouble, isExtend) {
 
 	return str;
 }
+
+function splitPath(path) {
+	var items = [],
+		s = '',
+		escapes = '';
+
+	for (var i in path) {
+		if (path.hasOwnProperty(i)) {
+			if (path[i] === '/') {
+				if (escapes === '') {
+					items[items.length] = s;
+					s = '';
+				}
+				else {
+					if (escapes.length % 2 == 0) {
+						s += escapes.replace(/\\\\/g, '\\');
+						items[items.length] = s;
+						s = escapes = '';
+					}
+					else {
+						s += escapes.replace(/\\\\/g, '\\') + path[i];
+						escapes = '';
+					}
+				}
+			}
+			else if (path[i] === '\\') {
+				escapes += path[i];
+			}
+			else {
+				s += escapes.replace(/\\\\/g, '\\') + path[i];
+				escapes = '';
+			}
+		}
+	}
+
+	if (escapes !== '') {
+		s += escapes.replace(/\\\\/g, '\\');
+	}
+
+	items[items.length] = s;
+
+	return items;
+}
