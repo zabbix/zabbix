@@ -447,6 +447,8 @@ static void	zbx_load_config()
 
 	parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT);
 
+	zbx_trim_str_list(CONFIG_LISTEN_IP, ',');
+
 	zbx_set_defaults();
 
 	zbx_validate_config();
