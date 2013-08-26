@@ -210,44 +210,38 @@ static char	*read_xml_value(const char *data, const char *xpath)
 	xmlXPathObject	*xpathObj;
 	xmlNodeSetPtr	nodeset;
 	xmlChar		*val;
-	char		*value;
+	char		*value = NULL;
 
 	if (NULL == data)
-		return NULL;
+		goto out;
 
 	if (NULL == (doc = xmlReadMemory(data, strlen(data), "noname.xml", NULL, 0)))
-		return NULL;
+		goto out;
 
 	xpathCtx = xmlXPathNewContext(doc);
 
 	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
-	{
-		xmlXPathFreeContext(xpathCtx);
-		xmlFreeDoc(doc);
-		xmlCleanupParser();
-		return NULL;
-	}
+		goto clean;
 
 	if (xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
-	{
-		xmlXPathFreeObject(xpathObj);
-		xmlXPathFreeContext(xpathCtx);
-		xmlFreeDoc(doc);
-		xmlCleanupParser();
-		return NULL;
-	}
+		goto clean;
 
 	nodeset = xpathObj->nodesetval;
 
 	val = xmlNodeListGetString(doc, nodeset->nodeTab[0]->xmlChildrenNode, 1);
 	value = zbx_strdup(NULL, (char *)val);
 	xmlFree(val);
+clean:
+	if (NULL != xpathObj)
+		xmlXPathFreeObject(xpathObj);
 
-	xmlXPathFreeObject(xpathObj);
-	xmlXPathFreeContext(xpathCtx);
-	xmlFreeDoc(doc);
-	xmlCleanupParser();
-
+	if (NULL != doc)
+	{
+		xmlXPathFreeContext(xpathCtx);
+		xmlFreeDoc(doc);
+		xmlCleanupParser();
+	}
+out:
 	return value;
 }
 
@@ -272,32 +266,21 @@ static int	read_xml_values(const char *data, const char *xpath, zbx_vector_str_t
 	xmlXPathObject	*xpathObj;
 	xmlNodeSetPtr	nodeset;
 	xmlChar		*val;
-	int		i;
+	int		i, ret = FAIL;
 
 	if (NULL == data)
-		return FAIL;
+		goto out;
 
 	if (NULL == (doc = xmlReadMemory(data, strlen(data), "noname.xml", NULL, 0)))
-		return FAIL;
+		goto out;
 
 	xpathCtx = xmlXPathNewContext(doc);
 
 	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)xpath, xpathCtx)))
-	{
-		xmlXPathFreeContext(xpathCtx);
-		xmlFreeDoc(doc);
-		xmlCleanupParser();
-		return FAIL;
-	}
+		goto clean;
 
 	if (xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
-	{
-		xmlXPathFreeObject(xpathObj);
-		xmlXPathFreeContext(xpathCtx);
-		xmlFreeDoc(doc);
-		xmlCleanupParser();
-		return FAIL;
-	}
+		goto clean;
 
 	nodeset = xpathObj->nodesetval;
 
@@ -309,12 +292,20 @@ static int	read_xml_values(const char *data, const char *xpath, zbx_vector_str_t
 		xmlFree(val);
 	}
 
-	xmlXPathFreeObject(xpathObj);
-	xmlXPathFreeContext(xpathCtx);
-	xmlFreeDoc(doc);
-	xmlCleanupParser();
+	ret = SUCCEED;
+clean:
+	if (NULL != xpathObj)
+		xmlXPathFreeObject(xpathObj);
 
-	return SUCCEED;
+	if (NULL != doc)
+	{
+		xmlXPathFreeContext(xpathCtx);
+		xmlFreeDoc(doc);
+		xmlCleanupParser();
+	}
+
+out:
+	return ret;
 }
 
 /******************************************************************************
