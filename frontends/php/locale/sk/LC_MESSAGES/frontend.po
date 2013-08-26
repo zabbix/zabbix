@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-23 23:07+0300\n"
-"PO-Revision-Date: 2013-08-25 11:56+0200\n"
+"POT-Creation-Date: 2013-08-26 12:14+0300\n"
+"PO-Revision-Date: 2013-08-25 22:42+0200\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -9263,7 +9263,7 @@ msgstr "Počet úspešne načítaných hodnôt V (ktoré spĺňajú operátor O)
 
 #: include/blocks.inc.php:748
 msgid "Number of triggers (enabled/disabled) [problem/ok]"
-msgstr "Počet spúšťačov (povolených-zakázaných)[problem/ok]"
+msgstr "Počet spúšťačov (povolených/zakázaných) [problem/ok]"
 
 #: include/blocks.inc.php:758
 msgid "Number of users (online)"
@@ -12037,7 +12037,7 @@ msgstr "Pripojenia šablón"
 msgid "Template list"
 msgstr "Zoznam šablón"
 
-#: include/views/configuration.template.edit.php:98
+#: include/views/configuration.template.edit.php:98 templates.php:55
 msgid "Template name"
 msgstr "Meno šablóny"
 
@@ -12137,7 +12137,7 @@ msgstr "Frontend nevybral Zabbix databázu."
 #: include/classes/db/DbBackend.php:48
 #, php-format
 msgid "The frontend does not match Zabbix database. Current database version (mandatory/optional): %d/%d. Required mandatory version: %d. Contact your system administrator."
-msgstr "Frontend nevybral Zabbix databázu. Aktuálna verzia databázy (povinná/voliteľná) %d/%d. Požadovaná verzia: %d. Kontaktujte Vášho systémového administrátora."
+msgstr "Frontend nevybral Zabbix databázu. Aktuálna verzia databázy (povinná/voliteľná): %d/%d. Požadovaná verzia: %d. Kontaktujte Vášho systémového administrátora."
 
 #: api/classes/CImage.php:493
 #, php-format
