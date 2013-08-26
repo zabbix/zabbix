@@ -1,4 +1,3 @@
-
 /* Layout helpers
 ----------------------------------*/
 .classic .ui-helper-hidden { display: none; }
@@ -6,9 +5,11 @@
 .classic .ui-helper-reset { margin: 0; padding: 0; border: 0; outline: 0; line-height: 1.3; text-decoration: none; font-size: 100%; list-style: none; }
 .classic .ui-helper-clearfix:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }
 .classic .ui-helper-clearfix { display: inline-block; }
-/* required comment for clearfix to work in Opera \*/
+
+/* required comment for clearfix to work in Opera */
 * html .ui-helper-clearfix { height: 1%; }
 .classic .ui-helper-clearfix { display: block; }
+
 /* end clearfix */
 .classic .ui-helper-zfix { width: 100%; height: 100%; top: 0; left: 0; position: absolute; opacity: 0; filter: Alpha(Opacity = 0); }
 
@@ -27,7 +28,6 @@
 
 /* Overlays */
 .classic .ui-widget-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-
 
 /* Component containers
 ----------------------------------*/
@@ -210,6 +210,7 @@
 .classic .ui-icon-seek-prev { background-position: -48px -160px; }
 .classic .ui-icon-seek-end { background-position: -64px -160px; }
 .classic .ui-icon-seek-start { background-position: -80px -160px; }
+
 /* ui-icon-seek-first is deprecated, use ui-icon-seek-start instead */
 .classic .ui-icon-seek-first { background-position: -80px -160px; }
 .classic .ui-icon-stop { background-position: -96px -160px; }
@@ -297,16 +298,15 @@
 
 /* workarounds */
 * html .ui-autocomplete { width: 1px; }
+
 /* without this, the menu expands to 100% in IE6 */
-
-
 .classic .ui-menu { list-style: none; padding: 2px; margin: 0; display: block; outline: none; }
 .classic .ui-menu .ui-menu { margin-top: -3px; position: absolute; }
 .classic .ui-menu .ui-menu-item { margin: 0; padding: 0; width: 100%; }
 .classic .ui-menu .ui-menu-divider { margin: 5px -2px 5px -2px; height: 0; font-size: 0; line-height: 0; border-width: 1px 0 0 0; }
 .classic .ui-menu .ui-menu-item a { text-decoration: none; display: block; padding: 2px .4em; line-height: 1.5; min-height: 0; font-weight: normal; }
 .classic .ui-menu .ui-menu-item a.ui-state-focus,
-.classic .ui-menu .ui-menu-item a.ui-state-active { font-weight: normal; margin: -1px; }
+.classic .ui-menu .ui-menu-item a.ui-state-active { font-weight: normal; margin: -1px; background: #DDD; color: #456582; }
 .classic .ui-menu .ui-state-disabled { font-weight: normal; margin: .4em 0 .2em; line-height: 1.5; }
 .classic .ui-menu .ui-state-disabled a { cursor: default; }
 .classic .ui-menu-icons { position: relative; }
@@ -315,10 +315,13 @@
 .classic .ui-menu .ui-menu-icon { position: static; float: right; }
 
 .classic .ui-button { display: inline-block; position: relative; margin-right: .1em; text-decoration: none !important; cursor: pointer; text-align: center; zoom: 1; overflow: visible; }
+
 /* the overflow property removes extra width in IE */
 .classic .ui-button-icon-only { width: 2.2em; }
+
 /* to make room for the icon, a width needs to be set here */
 button.ui-button-icon-only { width: 2.4em; }
+
 /* button elements seem to need a little more width */
 .classic .ui-button-icons-only { width: 3.4em; }
 button.ui-button-icons-only { width: 3.7em; }
@@ -330,6 +333,7 @@ button.ui-button-icons-only { width: 3.7em; }
 .classic .ui-button-text-icon-primary .ui-button-text, .classic .ui-button-text-icons .ui-button-text { padding: .4em 1em .4em 2.1em; }
 .classic .ui-button-text-icon-secondary .ui-button-text, .classic .ui-button-text-icons .ui-button-text { padding: .4em 2.1em .4em 1em; }
 .classic .ui-button-text-icons .ui-button-text { padding-left: 2.1em; padding-right: 2.1em; }
+
 /* no icon support for input elements, provide padding by default */
 input.ui-button { padding: .3em 1em; }
 
@@ -345,8 +349,8 @@ input.ui-button { padding: .3em 1em; }
 
 /* workarounds */
 button.ui-button::-moz-focus-inner { border: 0; padding: 0; }
-/* reset extra padding in Firefox */
 
+/* reset extra padding in Firefox */
 .classic .ui-dialog { position: absolute; top: 0; left: 0; padding: .2em; outline: 0; }
 .classic .ui-dialog .ui-dialog-titlebar { padding: .4em 1em; position: relative; }
 .classic .ui-dialog .ui-dialog-title { float: left; margin: .1em 0; white-space: nowrap; width: 90%; overflow: hidden; text-overflow: ellipsis; }
@@ -377,6 +381,7 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; }
 .classic .ui-slider-vertical .ui-slider-range-max { top: 0; }
 
 .classic .ui-tabs { position: relative; padding: .2em; zoom: 1; }
+
 /* position: relative prevents IE scroll bug (element with position: relative inside container with overflow: auto appear as "fixed") */
 .classic .ui-tabs .ui-tabs-nav { margin: 0; padding: .2em .2em 0; }
 .classic .ui-tabs .ui-tabs-nav li { list-style: none; float: left; position: relative; top: 1px; margin: 0 .2em 1px 0; border-bottom: 0 !important; padding: 0; white-space: nowrap; }
@@ -384,6 +389,7 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; }
 .classic .ui-tabs .ui-tabs-nav li.ui-tabs-selected { margin-bottom: 0; padding-bottom: 1px; }
 .classic .ui-tabs .ui-tabs-nav li.ui-tabs-selected a, .classic .ui-tabs .ui-tabs-nav li.ui-state-disabled a, .classic .ui-tabs .ui-tabs-nav li.ui-state-processing a { cursor: text; }
 .classic .ui-tabs .ui-tabs-nav li a, .classic .ui-tabs.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-selected a { cursor: pointer; }
+
 /* first selector in group seems obsolete, but required to overcome bug in Opera applying cursor: text overall if defined elsewhere... */
 .classic .ui-tabs .ui-tabs-panel { display: block; border-width: 0; padding: 1em 1.4em; background: none; }
 .classic .ui-tabs .ui-tabs-hide { display: none !important; }

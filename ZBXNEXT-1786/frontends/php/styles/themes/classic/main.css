@@ -135,5 +135,5 @@ div.preloader {
 
 /* menu popup */
 .menuPopup { border: 1px solid #314979; }
-.menuPopup .title { color: #ffffff; background: #314979 url('images/bg_h-hard_55.gif') 50% 50% repeat-x; }
+.menuPopup .title { color: #ffffff; background: #4E6EA7 url(images/widget_header.gif) repeat-x top left; }
 .menuPopup .ui-menu { border: 1px solid #314979; }
