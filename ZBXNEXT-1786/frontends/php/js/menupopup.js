@@ -372,6 +372,11 @@ jQuery(function($) {
 				});
 			}
 
+			// skip menu displaing with empty sections
+			if (menuPopup.children().length == 0) {
+				return;
+			}
+
 			// build jQuery Menu
 			$('.menu', menuPopup).menu();
 
