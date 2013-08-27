@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-23 23:07+0300\n"
+"POT-Creation-Date: 2013-08-28 00:27+0300\n"
 "PO-Revision-Date: 2012-05-01 13:23+0200\n"
 "Last-Translator: Lukasz <lucas.urbaniak@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -10641,6 +10641,10 @@ msgstr "Ponów"
 msgid "Right"
 msgstr "Prawo"
 
+#: include/locales.inc.php:72
+msgid "Romanian (ro_RO)"
+msgstr ""
+
 #: include/views/configuration.screen.constructor.edit.php:601
 #: screenedit.php:47
 msgid "Row span"
@@ -10703,7 +10707,7 @@ msgstr "Uruchom zdalne polecenia na grupach hostów"
 msgid "Run remote commands on hosts"
 msgstr "Uruchom zdalne polecenia na hostach"
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:73
 msgid "Russian (ru_RU)"
 msgstr "Rosyjski (ru_RU)"
 
@@ -11596,7 +11600,7 @@ msgstr "Pokazy slajdów"
 msgid "Slides"
 msgstr "Slajdy"
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:74
 msgid "Slovak (sk_SK)"
 msgstr "Słowacki (sk_SK)"
 
@@ -11658,7 +11662,7 @@ msgstr ""
 msgid "Source"
 msgstr "Źródło"
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:75
 msgid "Spanish (es_ES)"
 msgstr "Hiszpański (es_ES)"
 
@@ -11871,7 +11875,7 @@ msgstr "Wsparcie"
 msgid "Surname"
 msgstr "Nazwisko"
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:76
 msgid "Swedish (sv_SE)"
 msgstr "Szwedzki (sv_SE)"
 
@@ -12027,7 +12031,7 @@ msgstr "Powiązania szablonu"
 msgid "Template list"
 msgstr "Lista szablonów"
 
-#: include/views/configuration.template.edit.php:98
+#: include/views/configuration.template.edit.php:98 templates.php:55
 msgid "Template name"
 msgstr "Nazwa szablonu"
 
@@ -12562,7 +12566,7 @@ msgstr "Wto."
 msgid "Tuesday"
 msgstr "Wtorek"
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:77
 msgid "Turkish (tr_TR)"
 msgstr ""
 
@@ -12707,7 +12711,7 @@ msgstr "PROFIL UŻYTKOWNIKA"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:78
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukraiński (uk_UA)"
 

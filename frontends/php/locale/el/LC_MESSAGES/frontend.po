@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-23 23:07+0300\n"
+"POT-Creation-Date: 2013-08-28 00:27+0300\n"
 "PO-Revision-Date: 2012-05-04 10:10+0200\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -10640,6 +10640,10 @@ msgstr "Επανάληψη"
 msgid "Right"
 msgstr "Δεξιά"
 
+#: include/locales.inc.php:72
+msgid "Romanian (ro_RO)"
+msgstr ""
+
 #: include/views/configuration.screen.constructor.edit.php:601
 #: screenedit.php:47
 msgid "Row span"
@@ -10702,7 +10706,7 @@ msgstr "Εκτέλεση απομακρυσμένων εντολών στις ο
 msgid "Run remote commands on hosts"
 msgstr "Εκτέλεση απομακρυσμένων εντολών στους ξενιστές"
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:73
 msgid "Russian (ru_RU)"
 msgstr "Ρωσικά (ru_RU)"
 
@@ -11595,7 +11599,7 @@ msgstr "Προβολές διαφάνειας"
 msgid "Slides"
 msgstr "Διαφάνειες"
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:74
 msgid "Slovak (sk_SK)"
 msgstr "Σλοβακικά (sk_SK)"
 
@@ -11657,7 +11661,7 @@ msgstr "Ταξινόμηση με πεδίο \"%1$s\" δεν επιτρέπετ�
 msgid "Source"
 msgstr "Προέλευση"
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:75
 msgid "Spanish (es_ES)"
 msgstr "Ισπανικά (es_ES)"
 
@@ -11870,7 +11874,7 @@ msgstr "Υποστήριξη"
 msgid "Surname"
 msgstr "Επώνυμο"
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:76
 msgid "Swedish (sv_SE)"
 msgstr "Σουηδικά (sv_SE)"
 
@@ -12026,7 +12030,7 @@ msgstr "Συσχέτιση σχεδιότυπου"
 msgid "Template list"
 msgstr "Κατάλογος σχεδιότυπων"
 
-#: include/views/configuration.template.edit.php:98
+#: include/views/configuration.template.edit.php:98 templates.php:55
 msgid "Template name"
 msgstr "Όνομα σχεδιότυπου"
 
@@ -12558,7 +12562,7 @@ msgstr "Τρι"
 msgid "Tuesday"
 msgstr "Τρίτη"
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:77
 msgid "Turkish (tr_TR)"
 msgstr ""
 
@@ -12703,7 +12707,7 @@ msgstr "ΠΡΟΦΙΛ ΧΡΗΣΤΗ"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:78
 msgid "Ukrainian (uk_UA)"
 msgstr "Ουκρανικά (uk_UA)"
 

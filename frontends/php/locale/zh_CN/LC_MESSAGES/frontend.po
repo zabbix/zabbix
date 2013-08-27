@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-26 12:14+0300\n"
+"POT-Creation-Date: 2013-08-28 00:27+0300\n"
 "PO-Revision-Date: 2013-08-25 15:11+0200\n"
 "Last-Translator: solutionware <shiys@solutionware.com.cn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -10617,6 +10617,10 @@ msgstr "再试"
 msgid "Right"
 msgstr "右"
 
+#: include/locales.inc.php:72
+msgid "Romanian (ro_RO)"
+msgstr ""
+
 #: include/views/configuration.screen.constructor.edit.php:601
 #: screenedit.php:47
 msgid "Row span"
@@ -10679,7 +10683,7 @@ msgstr "于主机群组上执行远程命令"
 msgid "Run remote commands on hosts"
 msgstr "于主机上执行远程命令"
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:73
 msgid "Russian (ru_RU)"
 msgstr "俄语 (ru_RU)"
 
@@ -11572,7 +11576,7 @@ msgstr "简报片展示"
 msgid "Slides"
 msgstr "简报片"
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:74
 msgid "Slovak (sk_SK)"
 msgstr "斯洛伐克(sk_SK)"
 
@@ -11634,7 +11638,7 @@ msgstr "依栏位\"%1$s\"排序是不允许的."
 msgid "Source"
 msgstr "来源 "
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:75
 msgid "Spanish (es_ES)"
 msgstr "西班牙语 (es_ES)"
 
@@ -11847,7 +11851,7 @@ msgstr "支援"
 msgid "Surname"
 msgstr "姓氏"
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:76
 msgid "Swedish (sv_SE)"
 msgstr "瑞士(sv_SE)"
 
@@ -12532,7 +12536,7 @@ msgstr "二"
 msgid "Tuesday"
 msgstr "週二"
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:77
 msgid "Turkish (tr_TR)"
 msgstr "土耳其语 (tr_TR)"
 
@@ -12677,7 +12681,7 @@ msgstr "用户基本资料"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:78
 msgid "Ukrainian (uk_UA)"
 msgstr "乌克兰语 (uk_UA)"
 
