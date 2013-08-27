@@ -2609,8 +2609,8 @@ function getMenuPopupHost($options = array()) {
 	$data = array(
 		'type' => 'host',
 		'hostId' => $options['host']['hostid'],
-		'hasScreens' => (isset($options['host']['screens']) && $options['host']['screens']),
-		'hasInventories' => (isset($options['host']['inventories']) && $options['host']['inventories'])
+		'hasInventories' => (isset($options['host']['inventory']) && $options['host']['inventory']),
+		'hasScreens' => (isset($options['host']['screens']) && $options['host']['screens'])
 	);
 
 	if (isset($options['scripts']) && $options['scripts']) {

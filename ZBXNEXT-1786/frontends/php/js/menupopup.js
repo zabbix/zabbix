@@ -47,19 +47,19 @@ function getMenuPopupHost(options) {
 		url: new Curl('latest.php?hostid=' + options.hostId).getUrl()
 	};
 
-	// screens
-	if (options.hasScreens) {
-		gotos[gotos.length] = {
-			label: t('Host screens'),
-			url: new Curl('host_screen.php?hostid=' + options.hostId).getUrl()
-		};
-	}
-
 	// inventories
 	if (options.hasInventories) {
 		gotos[gotos.length] = {
 			label: t('Host inventories'),
 			url: new Curl('hostinventories.php?hostid=' + options.hostId).getUrl()
+		};
+	}
+
+	// screens
+	if (options.hasScreens) {
+		gotos[gotos.length] = {
+			label: t('Host screens'),
+			url: new Curl('host_screen.php?hostid=' + options.hostId).getUrl()
 		};
 	}
 
