@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-23 23:07+0300\n"
+"POT-Creation-Date: 2013-08-28 00:27+0300\n"
 "PO-Revision-Date: 2013-08-07 16:41+0200\n"
 "Last-Translator: open-future <patrik@open-future.be>\n"
 "Language-Team: NL\n"
@@ -10639,6 +10639,10 @@ msgstr ""
 msgid "Right"
 msgstr "Recht"
 
+#: include/locales.inc.php:72
+msgid "Romanian (ro_RO)"
+msgstr ""
+
 #: include/views/configuration.screen.constructor.edit.php:601
 #: screenedit.php:47
 msgid "Row span"
@@ -10701,7 +10705,7 @@ msgstr ""
 msgid "Run remote commands on hosts"
 msgstr ""
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:73
 msgid "Russian (ru_RU)"
 msgstr "Russian (ru_RU)"
 
@@ -11594,7 +11598,7 @@ msgstr ""
 msgid "Slides"
 msgstr ""
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:74
 msgid "Slovak (sk_SK)"
 msgstr ""
 
@@ -11656,7 +11660,7 @@ msgstr ""
 msgid "Source"
 msgstr "Bron"
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:75
 msgid "Spanish (es_ES)"
 msgstr "Spanish (es_ES)"
 
@@ -11869,7 +11873,7 @@ msgstr ""
 msgid "Surname"
 msgstr "Achternaam"
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:76
 msgid "Swedish (sv_SE)"
 msgstr ""
 
@@ -12025,7 +12029,7 @@ msgstr "Template verbindingen"
 msgid "Template list"
 msgstr ""
 
-#: include/views/configuration.template.edit.php:98
+#: include/views/configuration.template.edit.php:98 templates.php:55
 msgid "Template name"
 msgstr ""
 
@@ -12557,7 +12561,7 @@ msgstr "Di"
 msgid "Tuesday"
 msgstr "Dinsdag"
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:77
 msgid "Turkish (tr_TR)"
 msgstr ""
 
@@ -12702,7 +12706,7 @@ msgstr "GEBRUIKERS PROFIEL"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:78
 msgid "Ukrainian (uk_UA)"
 msgstr "Oekraïens (uk_UA)"
 
