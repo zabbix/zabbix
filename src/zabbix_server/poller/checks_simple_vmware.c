@@ -235,12 +235,9 @@ clean:
 	if (NULL != xpathObj)
 		xmlXPathFreeObject(xpathObj);
 
-	if (NULL != doc)
-	{
-		xmlXPathFreeContext(xpathCtx);
-		xmlFreeDoc(doc);
-		xmlCleanupParser();
-	}
+	xmlXPathFreeContext(xpathCtx);
+	xmlFreeDoc(doc);
+	xmlCleanupParser();
 out:
 	return value;
 }
@@ -297,12 +294,9 @@ clean:
 	if (NULL != xpathObj)
 		xmlXPathFreeObject(xpathObj);
 
-	if (NULL != doc)
-	{
-		xmlXPathFreeContext(xpathCtx);
-		xmlFreeDoc(doc);
-		xmlCleanupParser();
-	}
+	xmlXPathFreeContext(xpathCtx);
+	xmlFreeDoc(doc);
+	xmlCleanupParser();
 
 out:
 	return ret;
