@@ -555,5 +555,5 @@ div.suggest { position: absolute; border: 1px #5C7099 solid; width: 162px; z-ind
 	-webkit-box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.2); box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.2);
 }
 .menuPopup .title { padding: 2px 2px 2px 6px; color: #ffffff; font-weight: bold; background: #5c9ccc url(themes/originalblue/images/bg_h-hard_55.png) 50% 50% repeat-x; }
-.menuPopup .ui-menu { width: 165px; cursor: pointer; }
+.menuPopup .ui-menu { width: 165px; }
 .menuPopup ul.ui-corner-all { border-radius: 0; }
