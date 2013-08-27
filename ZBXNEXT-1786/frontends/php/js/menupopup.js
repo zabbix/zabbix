@@ -490,7 +490,7 @@ jQuery(function($) {
 				var item = $(this);
 
 				if (!empty(item.data('scriptId'))) {
-					item.click(function() {
+					item.click(function(e) {
 						menuPopup.fadeOut(50);
 
 						executeScript(
@@ -498,6 +498,8 @@ jQuery(function($) {
 							item.data('scriptId'),
 							item.data('confirmation')
 						);
+
+						cancelEvent(e);
 					});
 				}
 				else {
