@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-28 00:27+0300\n"
-"PO-Revision-Date: 2013-08-14 07:32+0200\n"
-"Last-Translator: Kodai <kodai74@gmail.com>\n"
+"POT-Creation-Date: 2013-08-28 00:45+0300\n"
+"PO-Revision-Date: 2013-08-27 05:56+0200\n"
+"Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -4609,7 +4609,7 @@ msgstr "フィールド"
 #: include/classes/db/DB.php:327
 #, php-format
 msgid "Field \"%1$s\" cannot be set to NULL."
-msgstr ""
+msgstr "フィールド\"%1$s\"はNULLに設定できません。"
 
 #: api/classes/CDRule.php:384
 msgid "Field \"druleid\" is required."
@@ -8109,7 +8109,7 @@ msgstr "アクションの実行条件の\"%1$s\"フィールドが存在しま�
 
 #: api/classes/CGraphGeneral.php:530
 msgid "Missing \"gitemid\" field for item."
-msgstr ""
+msgstr "アイテムの\"gitemid\"フィールドが存在しません。"
 
 #: api/classes/CGraph.php:603 api/classes/CGraphPrototype.php:611
 msgid "Missing \"itemid\" field for item."
@@ -8117,7 +8117,7 @@ msgstr "アイテムの\"itemid\"フィールドが存在しません。"
 
 #: api/classes/CGraphPrototype.php:593
 msgid "Missing \"name\" field for graph prototype."
-msgstr ""
+msgstr "グラフのプロトタイプの\"name\"フィールドが存在しません。"
 
 #: api/classes/CGraph.php:586
 msgid "Missing \"name\" field for graph."
