@@ -541,7 +541,7 @@ jQuery(function($) {
 	 */
 	function prepareTree(menu, name, items, params) {
 		if (items.length > 0) {
-			item = items.shift();
+			var item = items.shift();
 
 			if (typeof(menu[item]) === 'undefined') {
 				menu[item] = {items: {}};

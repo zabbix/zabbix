@@ -952,32 +952,30 @@ function splitPath(path) {
 		s = '',
 		escapes = '';
 
-	for (var i in path) {
-		if (path.hasOwnProperty(i)) {
-			if (path[i] === '/') {
-				if (escapes === '') {
-					items[items.length] = s;
-					s = '';
-				}
-				else {
-					if (escapes.length % 2 == 0) {
-						s += escapes.replace(/\\\\/g, '\\');
-						items[items.length] = s;
-						s = escapes = '';
-					}
-					else {
-						s += escapes.replace(/\\\\/g, '\\') + path[i];
-						escapes = '';
-					}
-				}
-			}
-			else if (path[i] === '\\') {
-				escapes += path[i];
+	for (var i = 0, size = path.length; i < size; i++) {
+		if (path[i] === '/') {
+			if (escapes === '') {
+				items[items.length] = s;
+				s = '';
 			}
 			else {
-				s += escapes.replace(/\\\\/g, '\\') + path[i];
-				escapes = '';
+				if (escapes.length % 2 == 0) {
+					s += escapes.replace(/\\\\/g, '\\');
+					items[items.length] = s;
+					s = escapes = '';
+				}
+				else {
+					s += escapes.replace(/\\\\/g, '\\') + path[i];
+					escapes = '';
+				}
 			}
+		}
+		else if (path[i] === '\\') {
+			escapes += path[i];
+		}
+		else {
+			s += escapes.replace(/\\\\/g, '\\') + path[i];
+			escapes = '';
 		}
 	}
 
