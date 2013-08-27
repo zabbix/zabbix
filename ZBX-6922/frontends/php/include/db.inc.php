@@ -1080,13 +1080,13 @@ function dbConditionInt($fieldName, array $values, $notIn = false, $sort = true)
 		return '1=0';
 	}
 
-	$values = array_unique($values);
+	$values = array_keys(array_flip($values));
 
 	if ($sort) {
 		natsort($values);
 	}
 
-	zbx_cleanHashes($values);
+	$values = array_values($values);
 
 	$betweens = array();
 	$data = array();
