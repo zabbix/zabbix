@@ -353,7 +353,7 @@ static void	zbx_load_config()
 			PARM_OPT,	1,			SEC_PER_HOUR},
 		{"UnavailableDelay",		&CONFIG_UNAVAILABLE_DELAY,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
-		{"ListenIP",			&CONFIG_LISTEN_IP,			TYPE_STRING,
+		{"ListenIP",			&CONFIG_LISTEN_IP,			TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
 		{"ListenPort",			&CONFIG_LISTEN_PORT,			TYPE_INT,
 			PARM_OPT,	1024,			32767},
@@ -414,8 +414,6 @@ static void	zbx_load_config()
 	zbx_strarr_init(&CONFIG_LOAD_MODULE);
 
 	parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT);
-
-	zbx_trim_str_list(CONFIG_LISTEN_IP, ',');
 
 	zbx_set_defaults();
 

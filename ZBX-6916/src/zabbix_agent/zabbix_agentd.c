@@ -391,9 +391,9 @@ static void	zbx_load_config(int requirement)
 	{
 		/* PARAMETER,			VAR,					TYPE,
 			MANDATORY,	MIN,			MAX */
-		{"Server",			&CONFIG_HOSTS_ALLOWED,			TYPE_STRING,
+		{"Server",			&CONFIG_HOSTS_ALLOWED,			TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
-		{"ServerActive",		&active_hosts,				TYPE_STRING,
+		{"ServerActive",		&active_hosts,				TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
 		{"Hostname",			&CONFIG_HOSTNAME,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -419,7 +419,7 @@ static void	zbx_load_config(int requirement)
 			PARM_OPT,	1,			30},
 		{"ListenPort",			&CONFIG_LISTEN_PORT,			TYPE_INT,
 			PARM_OPT,	1024,			32767},
-		{"ListenIP",			&CONFIG_LISTEN_IP,			TYPE_STRING,
+		{"ListenIP",			&CONFIG_LISTEN_IP,			TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
 		{"SourceIP",			&CONFIG_SOURCE_IP,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -469,10 +469,6 @@ static void	zbx_load_config(int requirement)
 	parse_cfg_file(CONFIG_FILE, cfg, requirement, ZBX_CFG_STRICT);
 
 	set_defaults();
-
-	zbx_trim_str_list(CONFIG_HOSTS_ALLOWED, ',');
-	zbx_trim_str_list(active_hosts, ',');
-	zbx_trim_str_list(CONFIG_LISTEN_IP, ',');
 
 	if (ZBX_CFG_FILE_REQUIRED == requirement && NULL == CONFIG_HOSTS_ALLOWED && 0 != CONFIG_PASSIVE_FORKS)
 	{
