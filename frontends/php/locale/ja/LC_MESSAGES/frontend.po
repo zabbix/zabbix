@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-25 13:59+0300\n"
+"POT-Creation-Date: 2013-08-28 00:19+0300\n"
 "PO-Revision-Date: 2013-04-05 18:38+0200\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -10133,6 +10133,10 @@ msgstr "再試行"
 msgid "Right"
 msgstr "右"
 
+#: include/locales.inc.php:66
+msgid "Romanian (ro_RO)"
+msgstr ""
+
 #: include/views/configuration.screen.constructor.edit.php:606
 #: screenedit.php:46
 msgid "Row span"
@@ -10195,7 +10199,7 @@ msgstr "ホストグループでリモートコマンドを実行"
 msgid "Run remote commands on hosts"
 msgstr "ホストでリモートコマンドを実行"
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:67
 msgid "Russian (ru_RU)"
 msgstr "ロシア語 (ru_RU)"
 
@@ -11137,7 +11141,7 @@ msgstr "スライドショー"
 msgid "Slides"
 msgstr "スライド"
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:68
 msgid "Slovak (sk_SK)"
 msgstr "スロバキア語 (sk_SK)"
 
@@ -11204,7 +11208,7 @@ msgstr "フィールド\"%s\"による並べ替えは許可されていません
 msgid "Source"
 msgstr "ソース"
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:69
 msgid "Spanish (es_ES)"
 msgstr "スペイン語(es_ES)"
 
@@ -11422,7 +11426,7 @@ msgstr "サポート"
 msgid "Surname"
 msgstr "名字"
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:70
 msgid "Swedish (sv_SE)"
 msgstr "スウェーデン語 (sv_SE)"
 
@@ -12073,7 +12077,7 @@ msgstr "火"
 msgid "Tuesday"
 msgstr "火曜"
 
-#: include/locales.inc.php:70
+#: include/locales.inc.php:71
 msgid "Turkish (tr_TR)"
 msgstr "トルコ語 (tr_TR)"
 
@@ -12210,7 +12214,7 @@ msgstr "ユーザープロファイル"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:71
+#: include/locales.inc.php:72
 msgid "Ukrainian (uk_UA)"
 msgstr "ウクライナ語 (uk_UA)"
 

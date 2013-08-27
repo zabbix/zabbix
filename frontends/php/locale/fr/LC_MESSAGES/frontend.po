@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-25 13:59+0300\n"
+"POT-Creation-Date: 2013-08-28 00:19+0300\n"
 "PO-Revision-Date: 2013-04-04 11:00+0200\n"
 "Last-Translator: Sébastien <sebastien@tiramiseb.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -10150,6 +10150,10 @@ msgstr "Réessayer"
 msgid "Right"
 msgstr "Droit"
 
+#: include/locales.inc.php:66
+msgid "Romanian (ro_RO)"
+msgstr ""
+
 #: include/views/configuration.screen.constructor.edit.php:606
 #: screenedit.php:46
 msgid "Row span"
@@ -10212,7 +10216,7 @@ msgstr "Exécuter des commandes distantes sur le groupe d'hôtes"
 msgid "Run remote commands on hosts"
 msgstr "Exécuter des commandes distantes sur l'hôte"
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:67
 msgid "Russian (ru_RU)"
 msgstr "Russe (ru_RU)"
 
@@ -11154,7 +11158,7 @@ msgstr "Diaporamas"
 msgid "Slides"
 msgstr "Diapositives"
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:68
 msgid "Slovak (sk_SK)"
 msgstr "Slovaque (sk_SK)"
 
@@ -11221,7 +11225,7 @@ msgstr "Tri par le champ \"%s\" non autorisé."
 msgid "Source"
 msgstr "Source"
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:69
 msgid "Spanish (es_ES)"
 msgstr "Espagnol (es_ES)"
 
@@ -11439,7 +11443,7 @@ msgstr "Support"
 msgid "Surname"
 msgstr "Prénom"
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:70
 msgid "Swedish (sv_SE)"
 msgstr "Suédois (sv_SE)"
 
@@ -12093,7 +12097,7 @@ msgstr "Mar"
 msgid "Tuesday"
 msgstr "Mardi"
 
-#: include/locales.inc.php:70
+#: include/locales.inc.php:71
 msgid "Turkish (tr_TR)"
 msgstr "Turc (tr_TR)"
 
@@ -12230,7 +12234,7 @@ msgstr "PROFIL UTILISATEUR"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:71
+#: include/locales.inc.php:72
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukrainien (uk_UA)"
 
