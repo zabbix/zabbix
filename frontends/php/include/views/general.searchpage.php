@@ -1,11 +1,8 @@
 <?php
 /*
 ** Zabbix
-** copy of include/views/general.login.php
+** copy of include/views/general.searchpage.php
 **/
-?>
-<?php
-require_once dirname(__FILE__).'/../page_header.php';
 ?>
 <div style="display: table; position: absolute; height: 99%; width: 99%;">
 <div class="vertical-middle">
@@ -20,8 +17,7 @@ require_once dirname(__FILE__).'/../page_header.php';
 				?>
 				<div style="height: 45px;"></div>
 				<span style="margin-left: 5px;">
-					<a class="highlight underline" href="charts.php?fullscreen=0&groupid=0&hostid=0&graphid=0"><?php echo _('Graphs'); ?></a>
-					<a class="highlight underline" href="profile.php"><?php echo _('Profile'); ?></a>
+					<a class="highlight underline" href="screens.php?form_refresh=1&fullscreen=0&elementid=100100000000004"><?php echo _('Performance'); ?></a>
 				</span>
 			</div>
 		</div>
@@ -37,6 +33,3 @@ require_once dirname(__FILE__).'/../page_header.php';
 		jQuery('#searchbttn').height(42);
 	});
 </script>
-<?php
-require_once dirname(__FILE__).'/../page_footer.php';
-?>
