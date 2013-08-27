@@ -37,7 +37,7 @@
 ----------------------------------*/
 
 /* Overlays */
-.darkblue .ui-widget-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+.darkblue .ui-widget-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; }
 
 /*
  * jQuery UI CSS Framework 1.8.9
@@ -289,7 +289,7 @@
 .darkblue .ui-corner-all { -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px; }
 
 /* Overlays */
-.darkblue .ui-widget-overlay { background: #aaaaaa url(images/bg_flat_10.png) 50% 50% repeat-x; opacity: .40;filter:Alpha(Opacity=40); }
+.darkblue .ui-widget-overlay { background: #aaaaaa url(images/bg_flat_10.png) 50% 50% repeat; opacity: .40;filter:Alpha(Opacity=40); }
 .darkblue .ui-widget-shadow { margin: -8px 0 0 -8px; padding: 8px; background: #aaaaaa url(images/bg_flat_0.png) 50% 50% repeat-x; opacity: .30;filter:Alpha(Opacity=30); -moz-border-radius: 8px; -webkit-border-radius: 8px; border-radius: 8px; }
 
 /*
