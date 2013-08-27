@@ -399,20 +399,6 @@ class CScript extends CZBXAPI {
 				if (!isset($script['name']) || zbx_empty($script['name'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty name for script.'));
 				}
-
-				$items = splitPath($script['name']);
-
-				// menu1/menu2/{empty}
-				if (zbx_empty(array_pop($items))) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Empty name for script "%1$s".', $script['name']));
-				}
-
-				// menu1/{empty}/name
-				foreach ($items as $item) {
-					if (zbx_empty($item)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect menu path for script "%1$s".', $script['name']));
-					}
-				}
 			}
 		}
 
@@ -519,6 +505,62 @@ class CScript extends CZBXAPI {
 			foreach ($actions as $action) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete scripts. Script "%1$s" is used in action operation "%2$s".',
 					$dbScripts[$action['scriptid']]['name'], $action['name']));
+			}
+		}
+
+		// validate menu path
+		if ($create || $update) {
+			$dbScripts = $this->get(array(
+				'output' => array('scriptid', 'name')
+			));
+
+			foreach ($scripts as $script) {
+				$folders = $path = splitPath($script['name']);
+				$name = array_pop($folders);
+
+				// menu1/menu2/{empty}
+				if (zbx_empty($name)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Empty name for script "%1$s".', $script['name']));
+				}
+
+				// menu1/{empty}/name
+				foreach ($folders as $folder) {
+					if (zbx_empty($folder)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect menu path for script "%1$s".', $script['name']));
+					}
+				}
+
+				// validate path
+				foreach ($dbScripts as $dbScript) {
+					if ($update && $script['scriptid'] === $dbScript['scriptid']) {
+						continue;
+					}
+
+					// script NAME cannot be a FOLDER for other scripts
+					$dbScriptFolders = $dbScriptPath = splitPath($dbScript['name']);
+					array_pop($dbScriptFolders);
+
+					if ($path === $dbScriptFolders) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Script name "%1$s" already used in menu path for script "%2$s".',
+								$script['name'], $dbScript['name'])
+						);
+					}
+
+					// script FOLDER cannot be a NAME for other scripts
+					$folderItems = array();
+					foreach ($folders as $folder) {
+						$folderItems[] = $folder;
+
+						if ($dbScriptPath === $folderItems) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Script menu path "%1$s" already used in script name "%2$s".',
+									$script['name'], $dbScript['name'])
+							);
+						}
+					}
+				}
 			}
 		}
 	}
