@@ -114,8 +114,8 @@ FIELD		|slideshowid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|slideshows
 FIELD		|screenid	|t_id		|	|NOT NULL	|ZBX_SYNC		|2|screens
 FIELD		|step		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|delay		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-INDEX		|slides_1	|slideshowid
-INDEX		|slides_2	|screenid
+INDEX		|1		|slideshowid
+INDEX		|2		|screenid
 
 TABLE|drules|druleid|ZBX_SYNC,ZBX_DATA
 FIELD		|druleid	|t_id		|	|NOT NULL	|0
@@ -166,7 +166,7 @@ FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_SYNC,ZBX_PROXY	|2|hosts
 FIELD		|templateid	|t_id		|	|NULL		|ZBX_SYNC		|3|httptest	|httptestid
 FIELD		|http_proxy	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY,ZBX_NODATA
 FIELD		|retries	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY,ZBX_NODATA
-INDEX		|httptest_1	|applicationid
+INDEX		|1		|applicationid
 UNIQUE		|2		|hostid,name
 INDEX		|3		|status
 INDEX		|4		|templateid
@@ -182,7 +182,7 @@ FIELD		|posts		|t_shorttext	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|required	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|status_codes	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|variables	|t_shorttext	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-INDEX		|httpstep_1	|httptestid
+INDEX		|1		|httptestid
 
 TABLE|interface|interfaceid|ZBX_SYNC,ZBX_DATA
 FIELD		|interfaceid	|t_id		|	|NOT NULL	|0
@@ -260,16 +260,16 @@ FIELD		|httpstepitemid	|t_id		|	|NOT NULL	|0
 FIELD		|httpstepid	|t_id		|	|NOT NULL	|ZBX_SYNC,ZBX_PROXY	|1|httpstep
 FIELD		|itemid		|t_id		|	|NOT NULL	|ZBX_SYNC,ZBX_PROXY	|2|items
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-UNIQUE		|httpstepitem_1	|httpstepid,itemid
-INDEX		|httpstepitem_2	|itemid
+UNIQUE		|1		|httpstepid,itemid
+INDEX		|2		|itemid
 
 TABLE|httptestitem|httptestitemid|ZBX_SYNC,ZBX_DATA
 FIELD		|httptestitemid	|t_id		|	|NOT NULL	|0
 FIELD		|httptestid	|t_id		|	|NOT NULL	|ZBX_SYNC,ZBX_PROXY	|1|httptest
 FIELD		|itemid		|t_id		|	|NOT NULL	|ZBX_SYNC,ZBX_PROXY	|2|items
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-UNIQUE		|httptestitem_1	|httptestid,itemid
-INDEX		|httptestitem_2	|itemid
+UNIQUE		|1		|httptestid,itemid
+INDEX		|2		|itemid
 
 TABLE|media_type|mediatypeid|ZBX_SYNC,ZBX_DATA
 FIELD		|mediatypeid	|t_id		|	|NOT NULL	|0
@@ -556,10 +556,10 @@ FIELD		|ymax_type	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|ymin_itemid	|t_id		|	|NULL		|ZBX_SYNC		|2|items	|itemid		|RESTRICT
 FIELD		|ymax_itemid	|t_id		|	|NULL		|ZBX_SYNC		|3|items	|itemid		|RESTRICT
 FIELD		|flags		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-INDEX		|graphs_1	|name
-INDEX		|graphs_2	|templateid
-INDEX		|graphs_3	|ymin_itemid
-INDEX		|graphs_4	|ymax_itemid
+INDEX		|1		|name
+INDEX		|2		|templateid
+INDEX		|3		|ymin_itemid
+INDEX		|4		|ymax_itemid
 
 TABLE|graphs_items|gitemid|ZBX_SYNC,ZBX_DATA
 FIELD		|gitemid	|t_id		|	|NOT NULL	|0
@@ -675,8 +675,8 @@ FIELD		|linkid		|t_id		|	|NOT NULL	|0
 FIELD		|serviceupid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|services	|serviceid
 FIELD		|servicedownid	|t_id		|	|NOT NULL	|ZBX_SYNC		|2|services	|serviceid
 FIELD		|soft		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-INDEX		|links_1	|servicedownid
-UNIQUE		|links_2	|serviceupid,servicedownid
+INDEX		|1		|servicedownid
+UNIQUE		|2		|serviceupid,servicedownid
 
 TABLE|services_times|timeid|ZBX_SYNC,ZBX_DATA
 FIELD		|timeid		|t_id		|	|NOT NULL	|0
@@ -685,7 +685,7 @@ FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|ts_from	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|ts_to		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|note		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-INDEX		|times_1	|serviceid,type,ts_from,ts_to
+INDEX		|1		|serviceid,type,ts_from,ts_to
 
 TABLE|icon_map|iconmapid|ZBX_SYNC,ZBX_DATA
 FIELD		|iconmapid	|t_id		|	|NOT NULL	|0
