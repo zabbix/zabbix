@@ -1534,6 +1534,7 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 				itemids->values, itemids->values_num);
 
 		DBselect_uint64(sql, itemids);
+		zbx_vector_uint64_uniq(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	}
 	while (num != itemids->values_num);
 
