@@ -1,21 +1,18 @@
-# Romanian translations for PACKAGE package.
-# Copyright (C) 2013 Zabbix SIA
-# This file is distributed under the same license as the PACKAGE package.
-# Automatically generated, 2013.
-#
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-08-28 00:27+0300\n"
-"PO-Revision-Date: 2012-07-03 14:59+0300\n"
+"PO-Revision-Date: 2013-07-01 20:21+0200\n"
 "Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
+"Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2;\n"
+"X-Generator: Pootle 2.1.6\n"
+"X-Poedit-Basepath: ../../\n"
 
 #: include/views/configuration.item.edit.php:389
 msgid " day"
