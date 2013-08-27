@@ -1216,6 +1216,7 @@ void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 				triggerids->values, triggerids->values_num);
 
 		DBselect_uint64(sql, triggerids);
+		zbx_vector_uint64_uniq(triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	}
 	while (num != triggerids->values_num);
 
@@ -1398,6 +1399,7 @@ void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
 				graphids->values, graphids->values_num);
 
 		DBselect_uint64(sql, graphids);
+		zbx_vector_uint64_uniq(graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	}
 	while (num != graphids->values_num);
 
