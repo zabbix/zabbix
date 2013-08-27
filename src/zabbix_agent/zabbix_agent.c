@@ -99,7 +99,6 @@ static void	zbx_load_config(int optional)
 	zbx_strarr_init(&CONFIG_USER_PARAMETERS);
 
 	parse_cfg_file(CONFIG_FILE, cfg, optional, ZBX_CFG_STRICT);
-
 }
 
 /******************************************************************************
