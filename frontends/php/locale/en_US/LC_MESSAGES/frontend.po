@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-23 23:07+0300\n"
+"POT-Creation-Date: 2013-08-28 00:27+0300\n"
 "PO-Revision-Date: 2012-09-05 20:50+0200\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: \n"
@@ -10630,6 +10630,10 @@ msgstr "Retry"
 msgid "Right"
 msgstr "Right"
 
+#: include/locales.inc.php:72
+msgid "Romanian (ro_RO)"
+msgstr ""
+
 #: include/views/configuration.screen.constructor.edit.php:601
 #: screenedit.php:47
 msgid "Row span"
@@ -10692,7 +10696,7 @@ msgstr "Run remote commands on host groups"
 msgid "Run remote commands on hosts"
 msgstr "Run remote commands on hosts"
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:73
 msgid "Russian (ru_RU)"
 msgstr "Russian (ru_RU)"
 
@@ -11585,7 +11589,7 @@ msgstr "Slide shows"
 msgid "Slides"
 msgstr "Slides"
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:74
 msgid "Slovak (sk_SK)"
 msgstr "Slovak (sk_SK)"
 
@@ -11647,7 +11651,7 @@ msgstr "Sorting by field \"%1$s\" not allowed."
 msgid "Source"
 msgstr "Source"
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:75
 msgid "Spanish (es_ES)"
 msgstr "Spanish (es_ES)"
 
@@ -11860,7 +11864,7 @@ msgstr "Support"
 msgid "Surname"
 msgstr "Last Name"
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:76
 msgid "Swedish (sv_SE)"
 msgstr "Swedish (sv_SE)"
 
@@ -12016,7 +12020,7 @@ msgstr "Template linkage"
 msgid "Template list"
 msgstr "Template list"
 
-#: include/views/configuration.template.edit.php:98
+#: include/views/configuration.template.edit.php:98 templates.php:55
 msgid "Template name"
 msgstr "Template name"
 
@@ -12548,7 +12552,7 @@ msgstr "Tue"
 msgid "Tuesday"
 msgstr "Tuesday"
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:77
 msgid "Turkish (tr_TR)"
 msgstr ""
 
@@ -12693,7 +12697,7 @@ msgstr "USER PROFILE"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:78
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukrainian (uk_UA)"
 

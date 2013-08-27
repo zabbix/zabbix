@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-23 23:07+0300\n"
+"POT-Creation-Date: 2013-08-28 00:27+0300\n"
 "PO-Revision-Date: 2013-01-09 22:10+0200\n"
 "Last-Translator: Robert <szenasy.robert@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -10622,6 +10622,10 @@ msgstr "Újra"
 msgid "Right"
 msgstr "Jobbra"
 
+#: include/locales.inc.php:72
+msgid "Romanian (ro_RO)"
+msgstr ""
+
 #: include/views/configuration.screen.constructor.edit.php:601
 #: screenedit.php:47
 msgid "Row span"
@@ -10684,7 +10688,7 @@ msgstr ""
 msgid "Run remote commands on hosts"
 msgstr ""
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:73
 msgid "Russian (ru_RU)"
 msgstr "Orosz (ru_RU)"
 
@@ -11577,7 +11581,7 @@ msgstr "Bemutatók"
 msgid "Slides"
 msgstr "Bemutatók"
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:74
 msgid "Slovak (sk_SK)"
 msgstr ""
 
@@ -11639,7 +11643,7 @@ msgstr ""
 msgid "Source"
 msgstr "Forrás"
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:75
 msgid "Spanish (es_ES)"
 msgstr "Spanyol (es_ES)"
 
@@ -11852,7 +11856,7 @@ msgstr ""
 msgid "Surname"
 msgstr "Vezetéknév"
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:76
 msgid "Swedish (sv_SE)"
 msgstr "Svéd (sv_SE)"
 
@@ -12008,7 +12012,7 @@ msgstr "Minta csatolások"
 msgid "Template list"
 msgstr ""
 
-#: include/views/configuration.template.edit.php:98
+#: include/views/configuration.template.edit.php:98 templates.php:55
 msgid "Template name"
 msgstr ""
 
@@ -12540,7 +12544,7 @@ msgstr ""
 msgid "Tuesday"
 msgstr "Kedd"
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:77
 msgid "Turkish (tr_TR)"
 msgstr ""
 
@@ -12685,7 +12689,7 @@ msgstr "FELHASZNÁLÓI PROFIL"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:78
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukrán (uk_UA)"
 

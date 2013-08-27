@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-23 23:07+0300\n"
+"POT-Creation-Date: 2013-08-28 00:27+0300\n"
 "PO-Revision-Date: 2013-07-01 20:21+0200\n"
 "Last-Translator: Jaba <janis.jaunbalodis@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -10640,6 +10640,10 @@ msgstr ""
 msgid "Right"
 msgstr "Pa labi"
 
+#: include/locales.inc.php:72
+msgid "Romanian (ro_RO)"
+msgstr ""
+
 #: include/views/configuration.screen.constructor.edit.php:601
 #: screenedit.php:47
 msgid "Row span"
@@ -10702,7 +10706,7 @@ msgstr ""
 msgid "Run remote commands on hosts"
 msgstr ""
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:73
 msgid "Russian (ru_RU)"
 msgstr "Krievu (ru_RU)"
 
@@ -11595,7 +11599,7 @@ msgstr ""
 msgid "Slides"
 msgstr "Slaidi"
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:74
 msgid "Slovak (sk_SK)"
 msgstr "Slovāku (sk_SK)"
 
@@ -11657,7 +11661,7 @@ msgstr ""
 msgid "Source"
 msgstr ""
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:75
 msgid "Spanish (es_ES)"
 msgstr "Spāņu (es_ES)"
 
@@ -11870,7 +11874,7 @@ msgstr "Atbalsts"
 msgid "Surname"
 msgstr "Uzvārds"
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:76
 msgid "Swedish (sv_SE)"
 msgstr "Zviedru (sv_SE)"
 
@@ -12026,7 +12030,7 @@ msgstr "Šablonu saistīšana"
 msgid "Template list"
 msgstr "Šablonu saraksts"
 
-#: include/views/configuration.template.edit.php:98
+#: include/views/configuration.template.edit.php:98 templates.php:55
 msgid "Template name"
 msgstr "Šablonu nosaukums"
 
@@ -12561,7 +12565,7 @@ msgstr "Otr"
 msgid "Tuesday"
 msgstr "Otrdiena"
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:77
 msgid "Turkish (tr_TR)"
 msgstr "Turku (tr_TR)"
 
@@ -12706,7 +12710,7 @@ msgstr "LIETOTĀJA PROFILA"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:78
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukraiņu (uk_UA)"
 
