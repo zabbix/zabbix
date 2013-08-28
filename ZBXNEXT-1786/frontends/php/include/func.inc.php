@@ -2722,6 +2722,13 @@ function getMenuPopupTrigger($options = array()) {
 	return $data;
 }
 
+/**
+ * Splitting string using slashes with escape backslash support.
+ *
+ * @param string $path
+ *
+ * @return array
+ */
 function splitPath($path) {
 	$items = array();
 	$s = $escapes = '';

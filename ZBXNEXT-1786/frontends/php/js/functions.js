@@ -947,6 +947,13 @@ function formatTimestamp(timestamp, isTsDouble, isExtend) {
 	return str;
 }
 
+/**
+ * Splitting string using slashes with escape backslash support.
+ *
+ * @param string $path
+ *
+ * @return array
+ */
 function splitPath(path) {
 	var items = [],
 		s = '',
@@ -960,12 +967,12 @@ function splitPath(path) {
 			}
 			else {
 				if (escapes.length % 2 == 0) {
-					s += escapes.replace(/\\\\/g, '\\');
+					s += stripslashes(escapes);
 					items[items.length] = s;
 					s = escapes = '';
 				}
 				else {
-					s += escapes.replace(/\\\\/g, '\\') + path[i];
+					s += stripslashes(escapes) + path[i];
 					escapes = '';
 				}
 			}
@@ -974,18 +981,40 @@ function splitPath(path) {
 			escapes += path[i];
 		}
 		else {
-			s += escapes.replace(/\\\\/g, '\\') + path[i];
+			s += stripslashes(escapes) + path[i];
 			escapes = '';
 		}
 	}
 
 	if (escapes !== '') {
-		s += escapes.replace(/\\\\/g, '\\');
+		s += stripslashes(escapes);
 	}
 
 	items[items.length] = s;
 
 	return items;
+}
+
+/**
+ * Removing unescaped backslashes from string.
+ * Analog of PHP stripslashes().
+ *
+ * @param string str
+ *
+ * @return string
+ */
+function stripslashes(str) {
+	return str.replace(/\\(.?)/g, function(s, chars) {
+		if (chars == '\\') {
+			return '\\';
+		}
+		else if (chars == '') {
+			return '';
+		}
+		else {
+			return chars;
+		}
+	});
 }
 
 /**
