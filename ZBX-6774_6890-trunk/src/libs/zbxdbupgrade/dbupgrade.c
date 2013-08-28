@@ -1586,7 +1586,7 @@ static int	DBpatch_2010104(void)
 
 static int	DBpatch_2010105(void)
 {
-	return DBcreate_index("slides", "slides_slides_2", "screenid", 0);
+	return DBcreate_index("slides", "slides_2", "screenid", 0);
 }
 
 static int	DBpatch_2010106(void)
@@ -1601,12 +1601,12 @@ static int	DBpatch_2010107(void)
 
 static int	DBpatch_2010108(void)
 {
-	return DBcreate_index("httpstepitem", "httpstepitem_httpstepitem_2", "itemid", 0);
+	return DBcreate_index("httpstepitem", "httpstepitem_2", "itemid", 0);
 }
 
 static int	DBpatch_2010109(void)
 {
-	return DBcreate_index("httptestitem", "httptestitem_httptestitem_2", "itemid", 0);
+	return DBcreate_index("httptestitem", "httptestitem_2", "itemid", 0);
 }
 
 static int	DBpatch_2010110(void)
@@ -1681,17 +1681,17 @@ static int	DBpatch_2010123(void)
 
 static int	DBpatch_2010124(void)
 {
-	return DBcreate_index("graphs", "graphs_graphs_2", "templateid", 0);
+	return DBcreate_index("graphs", "graphs_2", "templateid", 0);
 }
 
 static int	DBpatch_2010125(void)
 {
-	return DBcreate_index("graphs", "graphs_graphs_3", "ymin_itemid", 0);
+	return DBcreate_index("graphs", "graphs_3", "ymin_itemid", 0);
 }
 
 static int	DBpatch_2010126(void)
 {
-	return DBcreate_index("graphs", "graphs_graphs_4", "ymax_itemid", 0);
+	return DBcreate_index("graphs", "graphs_4", "ymax_itemid", 0);
 }
 
 static int	DBpatch_2010127(void)
