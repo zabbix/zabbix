@@ -1802,92 +1802,92 @@ static int	DBpatch_2010147(void)
 
 static int	DBpatch_2010148(void)
 {
-	return DBdrop_index("slides", "slides_slides_1");
+	return DBcreate_index("slides", "slides_1", "slideshowid", 0);
 }
 
 static int	DBpatch_2010149(void)
 {
-	return DBcreate_index("slides", "slides_1", "slideshowid", 0);
+	return DBdrop_index("slides", "slides_slides_1");
 }
 
 static int	DBpatch_2010150(void)
 {
-	return DBdrop_index("httptest", "httptest_httptest_1");
+	return DBcreate_index("httptest", "httptest_1", "applicationid", 0);
 }
 
 static int	DBpatch_2010151(void)
 {
-	return DBcreate_index("httptest", "httptest_1", "applicationid", 0);
+	return DBdrop_index("httptest", "httptest_httptest_1");
 }
 
 static int	DBpatch_2010152(void)
 {
-	return DBdrop_index("httpstep", "httpstep_httpstep_1");
+	return DBcreate_index("httpstep", "httpstep_1", "httptestid", 0);
 }
 
 static int	DBpatch_2010153(void)
 {
-	return DBcreate_index("httpstep", "httpstep_1", "httptestid", 0);
+	return DBdrop_index("httpstep", "httpstep_httpstep_1");
 }
 
 static int	DBpatch_2010154(void)
 {
-	return DBdrop_index("httpstepitem", "httpstepitem_httpstepitem_1");
+	return DBcreate_index("httpstepitem", "httpstepitem_1", "httpstepid,itemid", 1);
 }
 
 static int	DBpatch_2010155(void)
 {
-	return DBcreate_index("httpstepitem", "httpstepitem_1", "httpstepid,itemid", 1);
+	return DBdrop_index("httpstepitem", "httpstepitem_httpstepitem_1");
 }
 
 static int	DBpatch_2010156(void)
 {
-	return DBdrop_index("httptestitem", "httptestitem_httptestitem_1");
+	return DBcreate_index("httptestitem", "httptestitem_1", "httptestid,itemid", 1);
 }
 
 static int	DBpatch_2010157(void)
 {
-	return DBcreate_index("httptestitem", "httptestitem_1", "httptestid,itemid", 1);
+	return DBdrop_index("httptestitem", "httptestitem_httptestitem_1");
 }
 
 static int	DBpatch_2010158(void)
 {
-	return DBdrop_index("graphs", "graphs_graphs_1");
+	return DBcreate_index("graphs", "graphs_1", "name", 0);
 }
 
 static int	DBpatch_2010159(void)
 {
-	return DBcreate_index("graphs", "graphs_1", "name", 0);
+	return DBdrop_index("graphs", "graphs_graphs_1");
 }
 
 static int	DBpatch_2010160(void)
 {
-	return DBdrop_index("services_links", "services_links_links_1");
+	return DBcreate_index("services_links", "services_links_1", "servicedownid", 0);
 }
 
 static int	DBpatch_2010161(void)
 {
-	return DBcreate_index("services_links", "services_links_1", "servicedownid", 0);
+	return DBdrop_index("services_links", "services_links_links_1");
 }
 
 static int	DBpatch_2010162(void)
 {
-	return DBdrop_index("services_links", "services_links_links_2");
+	return DBcreate_index("services_links", "services_links_2", "serviceupid,servicedownid", 1);
 }
 
 static int	DBpatch_2010163(void)
 {
-	return DBcreate_index("services_links", "services_links_2", "serviceupid,servicedownid", 1);
+	return DBdrop_index("services_links", "services_links_links_2");
 }
 
 static int	DBpatch_2010164(void)
 {
-	return DBdrop_index("services_times", "services_times_times_1");
+	return DBcreate_index("services_times", "services_times_1", "serviceid,type,ts_from,ts_to", 0);
 }
 
 static int	DBpatch_2010165(void)
 {
-	return DBcreate_index("services_times", "services_times_1", "serviceid,type,ts_from,ts_to", 0);
+	return DBdrop_index("services_times", "services_times_times_1");
 }
 
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
