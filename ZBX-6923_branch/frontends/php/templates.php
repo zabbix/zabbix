@@ -382,7 +382,7 @@ else if(str_in_array($_REQUEST['go'], array('delete', 'delete_and_clear')) && is
 	DBstart();
 
 	$go_result = true;
-	if(isset($_REQUEST['delete'])){
+	if ($_REQUEST['go'] == 'delete_and_clear') {
 		$go_result = API::Template()->massUpdate(array(
 			'templateids' => $templates,
 			'hosts' => array()
