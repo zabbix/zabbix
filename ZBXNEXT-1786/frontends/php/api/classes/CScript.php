@@ -449,7 +449,8 @@ class CScript extends CZBXAPI {
 			}
 		}
 
-		$scriptIds = zbx_objectValues($scripts, 'scriptid');
+		$scripts = zbx_toHash($scripts, 'scriptid');
+		$scriptIds = array_keys($scripts);
 
 		$names = array();
 
