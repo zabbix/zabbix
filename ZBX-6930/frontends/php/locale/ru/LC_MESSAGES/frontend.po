@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-23 23:11+0300\n"
+"POT-Creation-Date: 2013-08-28 00:27+0300\n"
 "PO-Revision-Date: 2013-08-15 22:45+0200\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -10651,6 +10651,10 @@ msgstr "Повтор"
 msgid "Right"
 msgstr "По правой стороне"
 
+#: include/locales.inc.php:72
+msgid "Romanian (ro_RO)"
+msgstr ""
+
 #: include/views/configuration.screen.constructor.edit.php:601
 #: screenedit.php:47
 msgid "Row span"
@@ -10713,7 +10717,7 @@ msgstr "Выполнять удаленные команды в группах �
 msgid "Run remote commands on hosts"
 msgstr "Выполнять удаленные команды на узлах сети"
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:73
 msgid "Russian (ru_RU)"
 msgstr "Russian (ru_RU)"
 
@@ -11606,7 +11610,7 @@ msgstr "Слайд-шоу"
 msgid "Slides"
 msgstr "Слайды"
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:74
 msgid "Slovak (sk_SK)"
 msgstr "Slovak (sk_SK)"
 
@@ -11668,7 +11672,7 @@ msgstr "Сортировка по полю \"%1$s\" не разрешена."
 msgid "Source"
 msgstr "Источник"
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:75
 msgid "Spanish (es_ES)"
 msgstr "Spanish (es_ES)"
 
@@ -11881,7 +11885,7 @@ msgstr "Поддержка"
 msgid "Surname"
 msgstr "Фамилия"
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:76
 msgid "Swedish (sv_SE)"
 msgstr "Swedish (sv_SE)"
 
@@ -12037,7 +12041,7 @@ msgstr "Соединения с шаблонами"
 msgid "Template list"
 msgstr "Список шаблонов"
 
-#: include/views/configuration.template.edit.php:98
+#: include/views/configuration.template.edit.php:98 templates.php:55
 msgid "Template name"
 msgstr "Имя шаблона"
 
@@ -12572,7 +12576,7 @@ msgstr "Вт"
 msgid "Tuesday"
 msgstr "Вторник"
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:77
 msgid "Turkish (tr_TR)"
 msgstr "Турецкий (tr_TR)"
 
@@ -12717,7 +12721,7 @@ msgstr "ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:78
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukrainian (uk_UA)"
 

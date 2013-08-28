@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-26 12:14+0300\n"
+"POT-Creation-Date: 2013-08-28 00:27+0300\n"
 "PO-Revision-Date: 2013-08-25 22:42+0200\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -10651,6 +10651,10 @@ msgstr "Opakovať"
 msgid "Right"
 msgstr "Vpravo"
 
+#: include/locales.inc.php:72
+msgid "Romanian (ro_RO)"
+msgstr ""
+
 #: include/views/configuration.screen.constructor.edit.php:601
 #: screenedit.php:47
 msgid "Row span"
@@ -10713,7 +10717,7 @@ msgstr "Spusti vzdialené príkazy na skupine"
 msgid "Run remote commands on hosts"
 msgstr "Spusti vzdialené príkazy na hostoch"
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:73
 msgid "Russian (ru_RU)"
 msgstr "Rusky (ru_RU)"
 
@@ -11606,7 +11610,7 @@ msgstr "Prezentácie"
 msgid "Slides"
 msgstr "Slajdy"
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:74
 msgid "Slovak (sk_SK)"
 msgstr "Slovensky (sk_SK)"
 
@@ -11668,7 +11672,7 @@ msgstr "Zoradenie podľa pola \"%1$s\" nie je dovolené."
 msgid "Source"
 msgstr "Zdroj"
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:75
 msgid "Spanish (es_ES)"
 msgstr "Španielsky (es_ES)"
 
@@ -11881,7 +11885,7 @@ msgstr "Podpora"
 msgid "Surname"
 msgstr "Priezvisko"
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:76
 msgid "Swedish (sv_SE)"
 msgstr "Švédsky (sv_SE)"
 
@@ -12572,7 +12576,7 @@ msgstr "Uto"
 msgid "Tuesday"
 msgstr "Utorok"
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:77
 msgid "Turkish (tr_TR)"
 msgstr "Turecky (tr_TR)"
 
@@ -12717,7 +12721,7 @@ msgstr "POUŽÍVATEĽSKÝ PROFIL"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:78
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukrajinsky (uk_UA)"
 
