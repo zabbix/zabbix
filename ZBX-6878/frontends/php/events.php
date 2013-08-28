@@ -80,8 +80,20 @@ $fields = array(
 	'favstate'=>		array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})&&"filter"=={favobj}'),
 	'favid'=>			array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
 );
-
 check_fields($fields);
+
+/*
+ * Permissions
+ */
+if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
+	access_deny();
+}
+if (get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
+	access_deny();
+}
+if (get_request('triggerid') && !API::Trigger()->isReadable(array($_REQUEST['triggerid']))) {
+	access_deny();
+}
 
 /*
  * Ajax
@@ -647,7 +659,7 @@ else {
 			}
 			$hostids = zbx_objectValues($hosts, 'hostid');
 			$hosts = API::Host()->get(array(
-				'output' => array('name', 'hostid'),
+				'output' => array('name', 'hostid', 'status'),
 				'hostids' => $hostids,
 				'selectScreens' => API_OUTPUT_COUNT,
 				'selectInventory' => array('hostid'),

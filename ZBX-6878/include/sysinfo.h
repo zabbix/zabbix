@@ -169,6 +169,8 @@ void	free_request(AGENT_REQUEST *request);
 
 int	parse_item_key(char *cmd, AGENT_REQUEST *request);
 
+void	quote_key_param(char **param, int forced);
+
 int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c);
 
 /* external system functions */

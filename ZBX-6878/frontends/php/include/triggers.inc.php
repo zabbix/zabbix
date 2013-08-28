@@ -1134,7 +1134,7 @@ function get_triggers_overview($hostids, $application, $view_style = null, $scre
 	}
 
 	$options = array(
-		'output' => array('name', 'hostid'),
+		'output' => array('name', 'hostid', 'status'),
 		'hostids' => $hostids,
 		'preservekeys' => true
 	);
@@ -1584,7 +1584,7 @@ function make_trigger_details($trigger) {
 	$expression = explode_exp($trigger['expression'], true, true);
 
 	$host = API::Host()->get(array(
-		'output' => array('name', 'hostid'),
+		'output' => array('name', 'hostid', 'status'),
 		'hostids' => $trigger['hosts'][0]['hostid'],
 		'selectScreens' => API_OUTPUT_COUNT,
 		'selectInventory' => array('hostid'),
