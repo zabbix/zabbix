@@ -438,7 +438,7 @@ if (isset($_REQUEST['form'])) {
 
 		$data['original_templates'] = array();
 		foreach ($data['dbTemplate']['parentTemplates'] as $tnum => $tpl) {
-			$data['original_templates'][] = $tpl['templateid'];
+			$data['original_templates'][$tpl['templateid']] = $tpl['templateid'];
 		}
 	}
 	else {
