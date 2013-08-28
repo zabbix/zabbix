@@ -394,24 +394,19 @@ class CScript extends CZBXAPI {
 		$update = ($method == 'update');
 		$delete = ($method == 'delete');
 
-		if ($create || $update) {
-			foreach ($scripts as $script) {
-				if (!isset($script['name']) || zbx_empty($script['name'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty name for script.'));
-				}
-			}
-		}
+		$names = array();
 
 		// create
 		if ($create) {
 			$dbFields = array('command' => null);
-			$names = array();
 
 			foreach ($scripts as $script) {
 				if (!check_db_fields($dbFields, $script)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for script.'));
 				}
-
+				if (!isset($script['name']) || zbx_empty($script['name'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty name for script.'));
+				}
 				if (isset($names[$script['name']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate script name "%1$s".', $script['name']));
 				}
@@ -439,8 +434,6 @@ class CScript extends CZBXAPI {
 				'output' => array('scriptid'),
 				'preservekeys' => true
 			));
-
-			$names = array();
 
 			foreach ($scripts as $script) {
 				if (!isset($dbScripts[$script['scriptid']])) {
@@ -509,7 +502,7 @@ class CScript extends CZBXAPI {
 		}
 
 		// validate menu path
-		if ($create || $update) {
+		if ($names && ($create || $update)) {
 			$dbScripts = $this->get(array(
 				'output' => array('scriptid', 'name')
 			));
