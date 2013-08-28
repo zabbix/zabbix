@@ -191,7 +191,7 @@ switch ($data['method']) {
 			'updateProfile' => isset($data['updateProfile']) ? $data['updateProfile'] : null
 		);
 		if ($options['resourcetype'] == SCREEN_RESOURCE_HISTORY) {
-			$options['itemid'] = !empty($data['itemid']) ? $data['itemid'] : null;
+			$options['itemids'] = !empty($data['itemids']) ? $data['itemids'] : null;
 			$options['action'] = !empty($data['action']) ? $data['action'] : null;
 			$options['filter'] = !empty($data['filter']) ? $data['filter'] : null;
 			$options['filter_task'] = !empty($data['filter_task']) ? $data['filter_task'] : null;
