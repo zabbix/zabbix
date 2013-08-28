@@ -873,3 +873,43 @@ void	*get_result_value_by_type(AGENT_RESULT *result, int require_type)
 
 	return NULL;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: quote_key_param                                                  *
+ *                                                                            *
+ * Purpose: quotes special symbols in item key parameter                      *
+ *                                                                            *
+ * Parameters: param   - [IN/OUT] item key parameter                          *
+ *             forced  - [IN] 1 - enclose parameter in " even if it does not  *
+ *                                contain any special characters              *
+ *                            0 - do nothing if the paramter does not contain *
+ *                                any special characters                      *
+ *                                                                            *
+ ******************************************************************************/
+void	quote_key_param(char **param, int forced)
+{
+	size_t	sz_src, sz_dst;
+
+	if (0 == forced)
+	{
+		if ('"' != **param && NULL == strchr(*param, ',') && NULL == strchr(*param, ']'))
+			return;
+	}
+
+	sz_dst = zbx_get_escape_string_len(*param, "\"") + 3;
+	sz_src = strlen(*param);
+
+	*param = zbx_realloc(*param, sz_dst);
+
+	(*param)[--sz_dst] = '\0';
+	(*param)[--sz_dst] = '"';
+
+	while (0 < sz_src)
+	{
+		(*param)[--sz_dst] = (*param)[--sz_src];
+		if ('"' == (*param)[sz_src])
+			(*param)[--sz_dst] = '\\';
+	}
+	(*param)[--sz_dst] = '"';
+}

@@ -52,7 +52,7 @@ $fields = array(
 	'add_template' 		=> array(T_ZBX_STR, O_OPT, null,		null,	null),
 	'exist_templates' 	=> array(T_ZBX_INT, O_OPT, null,		DB_ID,	null),
 	'templateid'		=> array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	'isset({form})&&{form}=="update"'),
-	'template_name'		=> array(T_ZBX_STR, O_OPT, NOT_EMPTY,	null,	'isset({save})'),
+	'template_name'		=> array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY, 'isset({save})', _('Template name')),
 	'visiblename'		=> array(T_ZBX_STR, O_OPT, null,		null,	'isset({save})'),
 	'groupid'			=> array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null),
 	'twb_groupid'		=> array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null),
@@ -83,20 +83,11 @@ $_REQUEST['go'] = get_request('go', 'none');
 /*
  * Permissions
  */
-if (get_request('groupid', 0) > 0) {
-	$groupIds = available_groups($_REQUEST['groupid'], 1);
-	if (!$groupIds) {
-		access_deny();
-	}
+if (get_request('groupid') && !API::HostGroup()->isWritable(array($_REQUEST['groupid']))) {
+	access_deny();
 }
-if (get_request('templateid', 0) > 0) {
-	$templates = API::Template()->get(array(
-		'templateids' => $_REQUEST['templateid'],
-		'editable' => true
-	));
-	if (!$templates) {
-		access_deny();
-	}
+if (get_request('templateid') && !API::Template()->isWritable(array($_REQUEST['templateid']))) {
+	access_deny();
 }
 
 $templateIds = get_request('templates', array());
