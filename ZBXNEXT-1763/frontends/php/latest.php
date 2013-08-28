@@ -49,6 +49,7 @@ $fields = array(
 // filter
 	'select'=>				array(T_ZBX_STR, O_OPT, NULL,	NULL,		NULL),
 	'show_without_data'=>	array(T_ZBX_INT, O_OPT, NULL,	IN('0,1'),	NULL),
+	'show_details'=>		array(T_ZBX_INT, O_OPT, NULL,	IN('0,1'),	NULL),
 	'filter_rst'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),	NULL),
 	'filter_set'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	null,		NULL),
 //ajax
@@ -113,19 +114,25 @@ if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
 if (!isset($_REQUEST['show_without_data'])) {
 	$_REQUEST['show_without_data'] = 0;
 }
+if (!isset($_REQUEST['show_details'])) {
+	$_REQUEST['show_details'] = 0;
+}
 
 if(isset($_REQUEST['filter_rst'])){
 	$_REQUEST['select'] = '';
 	$_REQUEST['show_without_data'] = 0;
+	$_REQUEST['show_details'] = 0;
 }
 
 if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
 	CProfile::update('web.latest.filter.select',$_REQUEST['select'], PROFILE_TYPE_STR);
 	CProfile::update('web.latest.filter.show_without_data',$_REQUEST['show_without_data'], PROFILE_TYPE_INT);
+	CProfile::update('web.latest.filter.show_details',$_REQUEST['show_details'], PROFILE_TYPE_INT);
 }
 else {
 	$_REQUEST['select'] = CProfile::get('web.latest.filter.select', '');
 	$_REQUEST['show_without_data'] = CProfile::get('web.latest.filter.show_without_data', 0);
+	$_REQUEST['show_details'] = CProfile::get('web.latest.filter.show_details', 0);
 }
 // --------------
 $latest_wdgt = new CWidget(null, 'latest-mon');
@@ -164,6 +171,7 @@ $filterForm->setAttribute('id','zbx_filter');
 
 $filterForm->addRow(_('Show items with name like'), new CTextBox('select',$_REQUEST['select'],20));
 $filterForm->addRow(_('Show items without data'), new CCheckBox('show_without_data', $_REQUEST['show_without_data'], null, 1));
+$filterForm->addRow(_('Show details'), new CCheckBox('show_details', $_REQUEST['show_details'], null, 1));
 
 $reset = new CButton("filter_rst", _('Reset'), 'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
 

@@ -38,8 +38,41 @@ function jsRedirect($url, $timeout = null) {
 	insert_js($script);
 }
 
+/**
+ * Check if request exist.
+ *
+ * @param mixed		$name
+ *
+ * @return bool
+ */
+function hasRequest($name) {
+	return isset($_REQUEST[$name]);
+}
+
+/**
+ * Check request, if exist request - return request value, else return default value.
+ *
+ * @param mixed		$name
+ * @param mixed		$def
+ *
+ * @return mixed
+ */
+function getRequest($name, $def = null) {
+	return hasRequest($name) ? $_REQUEST[$name] : $def;
+}
+
+/**
+ * Check request, if exist request - return request value, else return default value.
+ *
+ * @deprecated function, use getRequest() instead
+ *
+ * @param mixed		$name
+ * @param mixed		$def
+ *
+ * @return mixed
+ */
 function get_request($name, $def = null) {
-	return isset($_REQUEST[$name]) ? $_REQUEST[$name] : $def;
+	return getRequest($name, $def);
 }
 
 function countRequest($str = null) {
