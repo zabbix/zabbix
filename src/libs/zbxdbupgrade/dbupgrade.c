@@ -22,6 +22,7 @@
 #include "db.h"
 #include "log.h"
 #include "sysinfo.h"
+#include "zbxdbupgrade.h"
 
 #ifdef HAVE_MYSQL
 #	define ZBX_DB_TABLE_OPTIONS	" engine=innodb"
@@ -1799,6 +1800,96 @@ static int	DBpatch_2010147(void)
 	return DBcreate_index("application_template", "application_template_2", "templateid", 0);
 }
 
+static int	DBpatch_2010148(void)
+{
+	return DBdrop_index("slides", "slides_slides_1");
+}
+
+static int	DBpatch_2010149(void)
+{
+	return DBcreate_index("slides", "slides_1", "slideshowid", 0);
+}
+
+static int	DBpatch_2010150(void)
+{
+	return DBdrop_index("httptest", "httptest_httptest_1");
+}
+
+static int	DBpatch_2010151(void)
+{
+	return DBcreate_index("httptest", "httptest_1", "applicationid", 0);
+}
+
+static int	DBpatch_2010152(void)
+{
+	return DBdrop_index("httpstep", "httpstep_httpstep_1");
+}
+
+static int	DBpatch_2010153(void)
+{
+	return DBcreate_index("httpstep", "httpstep_1", "httptestid", 0);
+}
+
+static int	DBpatch_2010154(void)
+{
+	return DBdrop_index("httpstepitem", "httpstepitem_httpstepitem_1");
+}
+
+static int	DBpatch_2010155(void)
+{
+	return DBcreate_index("httpstepitem", "httpstepitem_1", "httpstepid,itemid", 1);
+}
+
+static int	DBpatch_2010156(void)
+{
+	return DBdrop_index("httptestitem", "httptestitem_httptestitem_1");
+}
+
+static int	DBpatch_2010157(void)
+{
+	return DBcreate_index("httptestitem", "httptestitem_1", "httptestid,itemid", 1);
+}
+
+static int	DBpatch_2010158(void)
+{
+	return DBdrop_index("graphs", "graphs_graphs_1");
+}
+
+static int	DBpatch_2010159(void)
+{
+	return DBcreate_index("graphs", "graphs_1", "name", 0);
+}
+
+static int	DBpatch_2010160(void)
+{
+	return DBdrop_index("services_links", "services_links_links_1");
+}
+
+static int	DBpatch_2010161(void)
+{
+	return DBcreate_index("services_links", "services_links_1", "servicedownid", 0);
+}
+
+static int	DBpatch_2010162(void)
+{
+	return DBdrop_index("services_links", "services_links_links_2");
+}
+
+static int	DBpatch_2010163(void)
+{
+	return DBcreate_index("services_links", "services_links_2", "serviceupid,servicedownid", 1);
+}
+
+static int	DBpatch_2010164(void)
+{
+	return DBdrop_index("services_times", "services_times_times_1");
+}
+
+static int	DBpatch_2010165(void)
+{
+	return DBcreate_index("services_times", "services_times_1", "serviceid,type,ts_from,ts_to", 0);
+}
+
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 #define DBPATCH_END()					{NULL}};
@@ -1995,6 +2086,24 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010145, 0, 0)
 	DBPATCH_ADD(2010146, 0, 0)
 	DBPATCH_ADD(2010147, 0, 0)
+	DBPATCH_ADD(2010148, 0, 0)
+	DBPATCH_ADD(2010149, 0, 0)
+	DBPATCH_ADD(2010150, 0, 0)
+	DBPATCH_ADD(2010151, 0, 0)
+	DBPATCH_ADD(2010152, 0, 0)
+	DBPATCH_ADD(2010153, 0, 0)
+	DBPATCH_ADD(2010154, 0, 0)
+	DBPATCH_ADD(2010155, 0, 0)
+	DBPATCH_ADD(2010156, 0, 0)
+	DBPATCH_ADD(2010157, 0, 0)
+	DBPATCH_ADD(2010158, 0, 0)
+	DBPATCH_ADD(2010159, 0, 0)
+	DBPATCH_ADD(2010160, 0, 0)
+	DBPATCH_ADD(2010161, 0, 0)
+	DBPATCH_ADD(2010162, 0, 0)
+	DBPATCH_ADD(2010163, 0, 0)
+	DBPATCH_ADD(2010164, 0, 0)
+	DBPATCH_ADD(2010165, 0, 0)
 
 	DBPATCH_END()
 
