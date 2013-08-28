@@ -1763,25 +1763,3 @@
 		return $tblPeriod;
 	}
 
-	function insert_host_inventory_form(){
-		$frmHostP = new CFormTable(_('Host Inventory'));
-
-		$table_titles = getHostInventories();
-		$table_titles = zbx_toHash($table_titles, 'db_field');
-		$sql_fields = implode(', ', array_keys($table_titles));
-
-		$sql = 'SELECT '.$sql_fields.' FROM host_inventory WHERE hostid='.$_REQUEST['hostid'];
-		$result = DBselect($sql);
-
-		$row = DBfetch($result);
-		foreach($row as $key => $value){
-			if(!zbx_empty($value)){
-				$frmHostP->addRow($table_titles[$key]['title'], new CSpan(zbx_str2links($value), 'pre'));
-			}
-		}
-
-		$frmHostP->addItemToBottomRow(new CButtonCancel(url_param('groupid')));
-
-		return $frmHostP;
-	}
-
