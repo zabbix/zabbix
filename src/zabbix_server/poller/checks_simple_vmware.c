@@ -302,6 +302,30 @@ out:
 	return ret;
 }
 
+static int	vmware_set_powerstate_result(AGENT_RESULT *result)
+{
+	int	ret = SYSINFO_RET_FAIL;
+
+	if (NULL != GET_STR_RESULT(result))
+	{
+		ret = SYSINFO_RET_OK;
+
+		if (0 == strcmp(result->str, "poweredOff"))
+			SET_UI64_RESULT(result, 0);
+		else if (0 == strcmp(result->str, "poweredOn"))
+			SET_UI64_RESULT(result, 1);
+		else if (0 == strcmp(result->str, "suspended"))
+			SET_UI64_RESULT(result, 2);
+		else
+			ret = SYSINFO_RET_FAIL;
+
+		UNSET_STR_RESULT(result);
+	}
+
+	return ret;
+
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: vmware_authenticate                                              *
@@ -2925,7 +2949,14 @@ int	check_vcenter_vm_memory_size_shared(AGENT_REQUEST *request, const char *user
 int	check_vcenter_vm_powerstate(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return get_vcenter_vmstat(request, username, password, ZBX_XPATH_LN2("runtime", "powerState"), result);
+	int	ret;
+
+	ret = get_vcenter_vmstat(request, username, password, ZBX_XPATH_LN2("runtime", "powerState"), result);
+
+	if (SYSINFO_RET_OK == ret)
+		ret = vmware_set_powerstate_result(result);
+
+	return ret;
 }
 
 int	check_vcenter_vm_net_if_discovery(AGENT_REQUEST *request, const char *username, const char *password,
@@ -3648,7 +3679,7 @@ int	check_vsphere_status(AGENT_REQUEST *request, const char *username, const cha
 	ret = get_vsphere_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_LN2("val", "overallStatus"),
 			result);
 
-	if (SYSINFO_RET_OK == ret && GET_STR_RESULT(result))
+	if (SYSINFO_RET_OK == ret && NULL != GET_STR_RESULT(result))
 	{
 		if (0 == strcmp(result->str, "gray"))
 			SET_UI64_RESULT(result, 0);
@@ -3870,7 +3901,14 @@ int	check_vsphere_vm_memory_size_shared(AGENT_REQUEST *request, const char *user
 int	check_vsphere_vm_powerstate(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return get_vsphere_vmstat(request, username, password, ZBX_XPATH_LN2("runtime", "powerState"), result);
+	int	ret;
+
+	ret = get_vsphere_vmstat(request, username, password, ZBX_XPATH_LN2("runtime", "powerState"), result);
+
+	if (SYSINFO_RET_OK == ret)
+		ret = vmware_set_powerstate_result(result);
+
+	return ret;
 }
 
 int	check_vsphere_vm_net_if_discovery(AGENT_REQUEST *request, const char *username, const char *password,
