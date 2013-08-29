@@ -57,7 +57,7 @@ if (getRequest('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))
 
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
-if (isset($_REQUEST['favobj'])) {
+if (hasRequest('favobj')) {
 	if('filter' == $_REQUEST['favobj']){
 		CProfile::update('web.hostinventories.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 	}
@@ -88,16 +88,66 @@ if ($hostid > 0) {
 	// overview tab
 	$host = API::Host()->get(array(
 		'hostids' => $hostid,
-		'output' => array('host', 'name', 'maintenance_status'),
+		'output' => array('hostid', 'host', 'name', 'maintenance_status'),
+		'selectInterfaces' => API_OUTPUT_EXTEND,
+		'selectItems' => API_OUTPUT_COUNT,
+		'selectTriggers' => API_OUTPUT_COUNT,
+		'selectGraphs' => API_OUTPUT_COUNT,
+		'selectApplications' => API_OUTPUT_COUNT,
+		'selectDiscoveries' => API_OUTPUT_COUNT,
+		'selectHttpTests' => API_OUTPUT_COUNT,
 		'preservekeys' => true
 	));
 
 	$data['overview']['host'] = reset($host);
-
 	$data['overview']['host']['status'] = null;
 	if ($data['overview']['host']['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
 		$data['overview']['host']['status'] = new CLink(_('In maintenance'), null, 'orange');
 	}
+
+	$data['overview']['host']['ip'] = array();
+	$data['overview']['host']['dns'] = array();
+	foreach ($data['overview']['host']['interfaces'] as $interface) {
+		switch ($interface['type']) {
+			case INTERFACE_TYPE_AGENT:
+				if ($interface['ip']) {
+					$data['overview']['host']['ip'][] = _('Agent').NAME_DELIMITER.SPACE.$interface['ip'];
+				}
+				if ($interface['dns']) {
+					$data['overview']['host']['dns'][] = _('Agent').NAME_DELIMITER.SPACE.$interface['dns'];
+				}
+				break;
+
+			case INTERFACE_TYPE_SNMP:
+				if ($interface['ip']) {
+					$data['overview']['host']['ip'][] = _('SNMP').NAME_DELIMITER.SPACE.$interface['ip'];
+				}
+				if ($interface['dns']) {
+					$data['overview']['host']['dns'][] = _('SNMP').NAME_DELIMITER.SPACE.$interface['dns'];
+				}
+				break;
+
+			case INTERFACE_TYPE_IPMI:
+				if ($interface['ip']) {
+					$data['overview']['host']['ip'][] = _('IPMI').NAME_DELIMITER.SPACE.$interface['ip'];
+				}
+				if ($interface['dns']) {
+					$data['overview']['host']['dns'][] = _('IPMI').NAME_DELIMITER.SPACE.$interface['dns'];
+				}
+				break;
+
+			case INTERFACE_TYPE_JMX:
+				if ($interface['ip']) {
+					$data['overview']['host']['ip'][] = _('JMX').NAME_DELIMITER.SPACE.$interface['ip'];
+				}
+				if ($interface['dns']) {
+					$data['overview']['host']['dns'][] = _('JMX').NAME_DELIMITER.SPACE.$interface['dns'];
+				}
+				break;
+		}
+	}
+	natsort($data['overview']['host']['ip']);
+	natsort($data['overview']['host']['dns']);
 
 	// view generation
 	$hostinventoriesView = new CView('inventory.host.view', $data);
