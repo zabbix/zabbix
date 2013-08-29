@@ -579,7 +579,7 @@ class CScript extends CZBXAPI {
 
 				// script NAME cannot be a FOLDER for other scripts
 				$dbScriptFolders = $dbScriptPath = splitPath($dbScript['name']);
-				array_pop($dbScriptFolders);
+				$dbScriptName = array_pop($dbScriptFolders);
 
 				if ($path === $dbScriptFolders) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -599,6 +599,11 @@ class CScript extends CZBXAPI {
 								$script['name'], $dbScript['name'])
 						);
 					}
+				}
+
+				// check name
+				if ($name === $dbScriptName) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.', $script['name']));
 				}
 			}
 		}
