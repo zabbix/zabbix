@@ -543,7 +543,7 @@ $newTemplateTable->attr('style', 'min-width: 400px;');
 
 $newTemplateTable->addRow(array(new CMultiSelect(array(
 	'name' => 'add_templates[]',
-	'objectName' => 'add_templates',
+	'objectName' => 'templates',
 	'ignored' => $ignoredTemplates
 ))));
 
