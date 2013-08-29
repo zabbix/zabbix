@@ -379,7 +379,6 @@ elseif (str_in_array($_REQUEST['go'], array('delete', 'delete_and_clear')) && is
 
 	if ($_REQUEST['go'] == 'delete') {
 		$goResult = API::Template()->massUpdate(array(
-// 			'templateids' => $templates,
 			'templates_clear' => zbx_toObject($templates, 'templateid'),
 			'templates' => zbx_toObject($templates, 'templateid'),
 			'hosts' => array()
