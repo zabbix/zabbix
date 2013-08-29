@@ -2528,8 +2528,11 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 
 			hv = (zbx_hv_t *)vcenter->hvs.values[i];
 
-			if (NULL == (name = read_xml_value(hv->details, ZBX_XPATH_LN2("config", "name"))))
+			if (NULL == (name = read_xml_value(hv->details,
+					"//*[local-name()='host' and @type='HostSystem']")))
+			{
 				continue;
+			}
 
 			if (NULL != hv->clusterid)
 				cluster = cluster_get(&vcenter->clusters, hv->clusterid);
