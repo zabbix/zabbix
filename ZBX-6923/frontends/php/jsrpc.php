@@ -307,6 +307,7 @@ switch ($data['method']) {
 				}
 				break;
 
+			case 'add_templates':
 			case 'templates':
 				$templates = API::Template()->get(array(
 					'editable' => isset($data['editable']) ? $data['editable'] : null,
