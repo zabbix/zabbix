@@ -2676,14 +2676,19 @@ function getMenuPopupMap(array $options) {
 /**
  * Prepare data for item history menu popup.
  *
- * @param array $options
+ * @param array $options['item']
  *
  * @return array
  */
 function getMenuPopupHistory(array $options) {
-	$options['type'] = 'history';
-
-	return $options;
+	return array(
+		'type' => 'history',
+		'itemId' => $options['item']['itemid'],
+		'hasLatestGraphs' => in_array(
+			$options['item']['value_type'],
+			array(ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT)
+		)
+	);
 }
 
 /**

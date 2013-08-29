@@ -1162,7 +1162,10 @@ function getTriggersOverview($hostIds, $application, $viewMode = null, $screenId
 				'triggerid' => $trigger['triggerid'],
 				'value' => $trigger['value'],
 				'lastchange' => $trigger['lastchange'],
-				'priority' => $trigger['priority']
+				'priority' => $trigger['priority'],
+				'flags' => $trigger['flags'],
+				'url' => $trigger['url'],
+				'hosts' => array($host)
 			);
 		}
 	}
@@ -1258,7 +1261,11 @@ function getTriggerOverviewCells($trigger, $screenId = null) {
 		$style = 'cursor: pointer; ';
 
 		$menuPopup = array(
-			'trigger' => $trigger
+			'trigger' => $trigger,
+			'hasConfiguration' =>
+				((CWebUser::$data['type'] == USER_TYPE_ZABBIX_ADMIN || CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN)
+					&& $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL),
+			'hasUrl' => true
 		);
 
 		// problem trigger

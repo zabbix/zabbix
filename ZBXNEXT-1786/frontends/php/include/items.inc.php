@@ -857,11 +857,7 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 	$column = new CCol(array($value, $ack), $css);
 
 	if (isset($ithosts[$hostName])) {
-		$column->setMenuPopup(getMenuPopupHistory(array(
-			'itemId' => $item['itemid'],
-			'hasLatestGraphs' =>
-				in_array($ithosts[$hostName]['value_type'], array(ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT))
-		)));
+		$column->setMenuPopup(getMenuPopupHistory(array('item' => $item)));
 	}
 
 	$tableRow[] = $column;
