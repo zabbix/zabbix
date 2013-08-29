@@ -370,7 +370,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Lithuanian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
-..F....... [ZBX-6923] 'Delete selected' works also as 'Delete selected with linked elements' in list of templates, fixed (Vitalij)
+..F....... [ZBX-6923] fixed mass delete in template list, 'Delete selected' and 'Delete selected with linked elements' functions (Vitalij)
 ..F....... [ZBX-6922] fixed host interface importing (Eduard)
 .......P.. [ZBX-6249] fixed data loss in proxy "Data sender" process caused by unfinished transactions; thanks to MATSUDA Daiki for patch (Andris)
 ...G...... [ZBXNEXT-1056] improved active checks error messages (wiper)
