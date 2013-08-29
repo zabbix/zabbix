@@ -439,7 +439,7 @@ if (isset($_REQUEST['form'])) {
 		$data['original_templates'] = array();
 	}
 
-	$templateIds = (isset($_REQUEST['unlink']) || isset($_REQUEST['add_template']))
+	$templateIds = isset($_REQUEST['templates'])
 		? get_request('templates', array())
 		: $data['original_templates'];
 
