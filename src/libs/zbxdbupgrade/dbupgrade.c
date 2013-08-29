@@ -386,6 +386,18 @@ static void	DBdrop_index_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 #endif
 }
 
+#if !defined(HAVE_MYSQL)
+static void	DBrename_index_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const char *old_name, const char *new_name)
+{
+#if defined(HAVE_POSTGRESQL) || defined(HAVE_ORACLE)
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter index %s rename to %s", old_name, new_name);
+#elif defined(HAVE_IBM_DB2)
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "rename index %s to %s", old_name, new_name);
+#endif
+}
+#endif	/* !defined(HAVE_MYSQL) */
+
 static void	DBadd_foreign_key_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, int id, const ZBX_FIELD *field)
 {
@@ -572,6 +584,29 @@ static int	DBdrop_index(const char *table_name, const char *index_name)
 
 	zbx_free(sql);
 
+	return ret;
+}
+
+static int	DBrename_index(const char *table_name, const char *old_name, const char *new_name, const char *fields,
+				int unique)
+{
+	int	ret = FAIL;
+
+#if defined(HAVE_POSTGRESQL) || defined(HAVE_ORACLE) || defined(HAVE_IBM_DB2)
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+
+	DBrename_index_sql(&sql, &sql_alloc, &sql_offset, old_name, new_name);
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		ret = SUCCEED;
+
+	zbx_free(sql);
+#elif defined(HAVE_MYSQL)
+	if (SUCCEED != (ret = DBcreate_index(table_name, new_name, fields, unique)))
+		return FAIL;
+	ret = DBdrop_index(table_name, old_name);
+#endif
 	return ret;
 }
 
@@ -1802,92 +1837,49 @@ static int	DBpatch_2010147(void)
 
 static int	DBpatch_2010148(void)
 {
-	return DBcreate_index("slides", "slides_1", "slideshowid", 0);
+	return DBrename_index("slides", "slides_slides_1", "slides_1", "slideshowid", 0);
 }
 
 static int	DBpatch_2010149(void)
 {
-	return DBdrop_index("slides", "slides_slides_1");
+	return DBrename_index("httptest", "httptest_httptest_1", "httptest_1", "applicationid", 0);
 }
 
 static int	DBpatch_2010150(void)
 {
-	return DBcreate_index("httptest", "httptest_1", "applicationid", 0);
+	return DBrename_index("httpstep", "httpstep_httpstep_1", "httpstep_1", "httptestid", 0);
 }
 
 static int	DBpatch_2010151(void)
 {
-	return DBdrop_index("httptest", "httptest_httptest_1");
+	return DBrename_index("httpstepitem", "httpstepitem_httpstepitem_1", "httpstepitem_1", "httpstepid,itemid", 1);
 }
 
 static int	DBpatch_2010152(void)
 {
-	return DBcreate_index("httpstep", "httpstep_1", "httptestid", 0);
+	return DBrename_index("httptestitem", "httptestitem_httptestitem_1", "httptestitem_1", "httptestid,itemid", 1);
 }
 
 static int	DBpatch_2010153(void)
 {
-	return DBdrop_index("httpstep", "httpstep_httpstep_1");
+	return DBrename_index("graphs", "graphs_graphs_1", "graphs_1", "name", 0);
 }
 
 static int	DBpatch_2010154(void)
 {
-	return DBcreate_index("httpstepitem", "httpstepitem_1", "httpstepid,itemid", 1);
+	return DBrename_index("services_links", "services_links_links_1", "services_links_1", "servicedownid", 0);
 }
 
 static int	DBpatch_2010155(void)
 {
-	return DBdrop_index("httpstepitem", "httpstepitem_httpstepitem_1");
+	return DBrename_index("services_links", "services_links_links_2", "services_links_2",
+			"serviceupid,servicedownid", 1);
 }
 
 static int	DBpatch_2010156(void)
 {
-	return DBcreate_index("httptestitem", "httptestitem_1", "httptestid,itemid", 1);
-}
-
-static int	DBpatch_2010157(void)
-{
-	return DBdrop_index("httptestitem", "httptestitem_httptestitem_1");
-}
-
-static int	DBpatch_2010158(void)
-{
-	return DBcreate_index("graphs", "graphs_1", "name", 0);
-}
-
-static int	DBpatch_2010159(void)
-{
-	return DBdrop_index("graphs", "graphs_graphs_1");
-}
-
-static int	DBpatch_2010160(void)
-{
-	return DBcreate_index("services_links", "services_links_1", "servicedownid", 0);
-}
-
-static int	DBpatch_2010161(void)
-{
-	return DBdrop_index("services_links", "services_links_links_1");
-}
-
-static int	DBpatch_2010162(void)
-{
-	return DBcreate_index("services_links", "services_links_2", "serviceupid,servicedownid", 1);
-}
-
-static int	DBpatch_2010163(void)
-{
-	return DBdrop_index("services_links", "services_links_links_2");
-}
-
-static int	DBpatch_2010164(void)
-{
-	return DBcreate_index("services_times", "services_times_1", "serviceid,type,ts_from,ts_to", 0);
-}
-
-static int	DBpatch_2010165(void)
-{
-	return DBdrop_index("services_times", "services_times_times_1");
+	return DBrename_index("services_times", "services_times_times_1", "services_times_1",
+			"serviceid,type,ts_from,ts_to", 0);
 }
 
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
@@ -2095,15 +2087,6 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010154, 0, 0)
 	DBPATCH_ADD(2010155, 0, 0)
 	DBPATCH_ADD(2010156, 0, 0)
-	DBPATCH_ADD(2010157, 0, 0)
-	DBPATCH_ADD(2010158, 0, 0)
-	DBPATCH_ADD(2010159, 0, 0)
-	DBPATCH_ADD(2010160, 0, 0)
-	DBPATCH_ADD(2010161, 0, 0)
-	DBPATCH_ADD(2010162, 0, 0)
-	DBPATCH_ADD(2010163, 0, 0)
-	DBPATCH_ADD(2010164, 0, 0)
-	DBPATCH_ADD(2010165, 0, 0)
 
 	DBPATCH_END()
 
