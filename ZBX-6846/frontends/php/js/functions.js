@@ -948,42 +948,21 @@ function formatTimestamp(timestamp, isTsDouble, isExtend) {
 }
 
 function printLess(show) {
-	if (show) {
-		jQuery('#mmenu, .page_header, .history, .page_footer').hide();
+	if (!jQuery("#printLess").length) {
+		jQuery('head').append('<link rel="stylesheet" href="./styles/printLess.css" type="text/css" id="printLess"/>');
 
 		jQuery('.header_l.left, .header_r.right').each(function(i, obj) {
 			if (jQuery(this).find('input, form, select, .menu_icon').length) {
-				jQuery(this).children().each(function() {
-					jQuery(this).hide()
-				});
+				jQuery(this).addClass('hide-all-children');
 			}
 		})
+		jQuery('body').prepend('<div class="printless" >«BACK</div>').click(printLess(0));
+	}
 
-		jQuery('table tr.header, table tr.footer').each(function(i, obj) {
-			jQuery(this).find('input, form, select, .menu_icon').hide();
-		})
-
-		jQuery('.printless').show();
+	if (show) {
+		jQuery("#printLess").removeAttr("disabled");
 	}
 	else {
-		jQuery('#mmenu, .page_header, .history, .page_footer').show();
-
-		jQuery('.header_l.left, .header_r.right').each(function(i, obj){
-			if (jQuery(this).find('input, form, select, .menu_icon').length) {
-				jQuery(this).children().each(function() {
-					jQuery(this).show()
-				});
-			}
-		})
-
-		jQuery('table tr.header, table tr.footer').each(function(i, obj) {
-			jQuery(this).find('input, form, select, .menu_icon').show();
-		})
-
-		jQuery('.printless').hide();
-	}
-
-	if (typeof(actionOnPrint) === 'function') {
-		actionOnPrint();
+		jQuery("#printLess").attr("disabled", "disabled");
 	}
 }

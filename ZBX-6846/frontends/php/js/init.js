@@ -61,4 +61,9 @@ jQuery(function($) {
 	if (IE || KQ) {
 		setTimeout(function () {$('[autofocus]').focus()}, 10);
 	}
+
+	$('.print-link').click(function () {
+		printLess(1);
+		return false;
+	});
 });
