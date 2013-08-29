@@ -2289,17 +2289,12 @@ static int	get_vcenter_hv_stat(AGENT_REQUEST *request, const char *username, con
 				vm = (zbx_vm_t *)hv->vms.values[i];
 
 				if (NULL == (value = read_xml_value(vm->status_ex, xpath)))
-					return SYSINFO_RET_FAIL;
+					continue;
 
-				if (SUCCEED != is_uint64(value, &value_uint64))
-				{
-					zbx_free(value);
-					return SYSINFO_RET_FAIL;
-				}
+				if (SUCCEED == is_uint64(value, &value_uint64))
+					value_uint64_sum += value_uint64;
 
 				zbx_free(value);
-
-				value_uint64_sum += value_uint64;
 			}
 
 			SET_UI64_RESULT(result, value_uint64_sum);
@@ -3463,17 +3458,12 @@ static int	get_vsphere_stat(AGENT_REQUEST *request, const char *username, const 
 				vm = (zbx_vm_t *)vsphere->vms.values[i];
 
 				if (NULL == (value = read_xml_value(vm->status_ex, xpath)))
-					return SYSINFO_RET_FAIL;
+					continue;
 
-				if (SUCCEED != is_uint64(value, &value_uint64))
-				{
-					zbx_free(value);
-					return SYSINFO_RET_FAIL;
-				}
+				if (SUCCEED == is_uint64(value, &value_uint64))
+					value_uint64_sum += value_uint64;
 
 				zbx_free(value);
-
-				value_uint64_sum += value_uint64;
 			}
 
 			SET_UI64_RESULT(result, value_uint64_sum);
