@@ -49,8 +49,8 @@ $fields = array(
 	'groups'			=> array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null),
 	'clear_templates'	=> array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null),
 	'templates'			=> array(T_ZBX_INT, O_OPT, null,		DB_ID,	null),
+	'add_templates'		=> array(T_ZBX_INT, O_OPT, null,		DB_ID,	null),
 	'add_template' 		=> array(T_ZBX_STR, O_OPT, null,		null,	null),
-	'exist_templates' 	=> array(T_ZBX_INT, O_OPT, null,		DB_ID,	null),
 	'templateid'		=> array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	'isset({form})&&{form}=="update"'),
 	'template_name'		=> array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY, 'isset({save})', _('Template name')),
 	'visiblename'		=> array(T_ZBX_STR, O_OPT, null,		null,	'isset({save})'),
@@ -110,14 +110,8 @@ if ($exportData) {
 /*
  * Actions
  */
-if (!isset($_REQUEST['add_template']) && isset($_REQUEST['form'])) {
-	unset($_REQUEST['templates']);
-}
-
-if (isset($_REQUEST['exist_templates'])) {
-	$_REQUEST['templates'] = (isset($_REQUEST['templates']) && isset($_REQUEST['add_template']))
-		? array_merge($_REQUEST['exist_templates'], $_REQUEST['templates'])
-		: $_REQUEST['templates'] = $_REQUEST['exist_templates'];
+if (isset($_REQUEST['add_template']) && isset($_REQUEST['add_templates'])) {
+	$_REQUEST['templates'] = array_merge($templateIds, $_REQUEST['add_templates']);
 }
 if (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear'])) {
 	$_REQUEST['clear_templates'] = get_request('clear_templates', array());
@@ -383,9 +377,11 @@ elseif (str_in_array($_REQUEST['go'], array('delete', 'delete_and_clear')) && is
 
 	$goResult = true;
 
-	if ($_REQUEST['go'] == 'delete_and_clear') {
+	if ($_REQUEST['go'] == 'delete') {
 		$goResult = API::Template()->massUpdate(array(
-			'templateids' => $templates,
+// 			'templateids' => $templates,
+			'templates_clear' => zbx_toObject($templates, 'templateid'),
+			'templates' => zbx_toObject($templates, 'templateid'),
 			'hosts' => array()
 		));
 	}
@@ -445,7 +441,7 @@ if (isset($_REQUEST['form'])) {
 		$data['original_templates'] = array();
 	}
 
-	$templateIds = (isset($_REQUEST['unlink']) || isset($_REQUEST['add_template']) || isset($_REQUEST['exist_templates']))
+	$templateIds = (isset($_REQUEST['unlink']) || isset($_REQUEST['add_template']))
 		? get_request('templates', array())
 		: $data['original_templates'];
 
