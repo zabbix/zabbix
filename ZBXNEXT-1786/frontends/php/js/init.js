@@ -31,9 +31,9 @@ jQuery(function($) {
 	/**
 	 * Build menu popup for given elements.
 	 */
-	$(document).on('click', '[data-menupopup]', function(event) {
+	$(document).on('click', '[data-menu-popup]', function(event) {
 		var obj = $(this),
-			data = obj.data('menupopup');
+			data = obj.data('menu-popup');
 
 		switch (data.type) {
 			case 'host':

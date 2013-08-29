@@ -32,7 +32,7 @@ function getMenuPopupHost(options) {
 	var sections = [], gotos = [];
 
 	// scripts
-	if (typeof(options.scripts) !== 'undefined') {
+	if (typeof options.scripts !== 'undefined') {
 		sections[sections.length] = {
 			type: 'scripts',
 			title: t('Scripts'),
@@ -90,7 +90,7 @@ function getMenuPopupMap(options) {
 	var sections = [];
 
 	// scripts
-	if (typeof(options.scripts) !== 'undefined') {
+	if (typeof options.scripts !== 'undefined') {
 		sections[sections.length] = {
 			type: 'scripts',
 			title: t('Scripts'),
@@ -100,11 +100,11 @@ function getMenuPopupMap(options) {
 	}
 
 	// gotos
-	if (typeof(options.gotos) !== 'undefined') {
+	if (typeof options.gotos !== 'undefined') {
 		var gotos = [];
 
 		// screens
-		if (typeof(options.gotos.screens) !== 'undefined') {
+		if (typeof options.gotos.screens !== 'undefined') {
 			var url = new Curl('host_screen.php');
 
 			jQuery.each(options.gotos.screens, function(name, value) {
@@ -118,7 +118,7 @@ function getMenuPopupMap(options) {
 		}
 
 		// trigger status
-		if (typeof(options.gotos.triggerStatus) !== 'undefined') {
+		if (typeof options.gotos.triggerStatus !== 'undefined') {
 			var url = new Curl('tr_status.php?filter_set=1');
 
 			jQuery.each(options.gotos.triggerStatus, function(name, value) {
@@ -132,7 +132,7 @@ function getMenuPopupMap(options) {
 		}
 
 		// submap
-		if (typeof(options.gotos.submap) !== 'undefined') {
+		if (typeof options.gotos.submap !== 'undefined') {
 			var url = new Curl('maps.php');
 
 			jQuery.each(options.gotos.submap, function(name, value) {
@@ -146,7 +146,7 @@ function getMenuPopupMap(options) {
 		}
 
 		// events
-		if (typeof(options.gotos.events) !== 'undefined') {
+		if (typeof options.gotos.events !== 'undefined') {
 			var url = new Curl('events.php?source=0');
 
 			jQuery.each(options.gotos.events, function(name, value) {
@@ -167,7 +167,7 @@ function getMenuPopupMap(options) {
 	}
 
 	// urls
-	if (typeof(options.urls) !== 'undefined') {
+	if (typeof options.urls !== 'undefined') {
 		sections[sections.length] = {
 			type: 'links',
 			title: t('URLs'),
@@ -283,7 +283,7 @@ function getMenuPopupHistory(options) {
 	var items = [];
 
 	// latest graphs
-	if (typeof(options.hasLatestGraphs) !== 'undefined' && options.hasLatestGraphs) {
+	if (typeof options.hasLatestGraphs !== 'undefined' && options.hasLatestGraphs) {
 		items[items.length] = {
 			label: t('Last hour graph'),
 			url: new Curl('history.php?itemid=' + options.itemId + '&action=showgraph&period=3600').getUrl()
@@ -327,7 +327,7 @@ jQuery(function($) {
 		}
 
 		var openner = $(this),
-			id = openner.data('menuPopupId'),
+			id = openner.data('menu-popup-id'),
 			menuPopup = $('#' + id),
 			mapContainer;
 
@@ -402,7 +402,7 @@ jQuery(function($) {
 
 			// others
 			else {
-				openner.data('menuPopupId', id);
+				openner.data('menu-popup-id', id);
 
 				$('body').append(menuPopup);
 			}
@@ -413,14 +413,14 @@ jQuery(function($) {
 			// display
 			menuPopup
 				.fadeIn(50)
-				.data('isActive', false)
+				.data('is-active', false)
 				.mouseenter(function() {
-					menuPopup.data('isActive', true);
+					menuPopup.data('is-active', true);
 
 					clearTimeout(window.menuPopupTimeoutHandler);
 				})
 				.mouseleave(function() {
-					menuPopup.data('isActive', false);
+					menuPopup.data('is-active', false);
 
 					closeInactiveMenuPopup(menuPopup, 1000);
 				})
@@ -444,8 +444,8 @@ jQuery(function($) {
 		clearTimeout(window.menuPopupTimeoutHandler);
 
 		window.menuPopupTimeoutHandler = window.setTimeout(function() {
-			if (!menuPopup.data('isActive')) {
-				menuPopup.data('isActive', false);
+			if (!menuPopup.data('is-active')) {
+				menuPopup.data('is-active', false);
 
 				$('.menu', menuPopup).each(function() {
 					$(this).menu('collapseAll', null, true);
@@ -471,7 +471,7 @@ jQuery(function($) {
 		for (var key in section.data) {
 			var script = section.data[key];
 
-			if (typeof(script.scriptId) !== 'undefined') {
+			if (typeof script.scriptId !== 'undefined') {
 				var items = splitPath(script.name),
 					name = (items.length > 0) ? items.pop() : script.name;
 
@@ -541,7 +541,7 @@ jQuery(function($) {
 		if (items.length > 0) {
 			var item = items.shift();
 
-			if (typeof(menu[item]) === 'undefined') {
+			if (typeof menu[item] === 'undefined') {
 				menu[item] = {items: {}};
 			}
 
@@ -645,7 +645,7 @@ jQuery(function($) {
 				text: label,
 				href: link
 			}),
-			(typeof(subMenu) !== 'undefined') ? subMenu : null
+			(typeof subMenu !== 'undefined') ? subMenu : null
 		);
 	}
 });
