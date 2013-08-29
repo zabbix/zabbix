@@ -923,10 +923,7 @@ function make_latest_issues(array $filter = array()) {
 		$host = $hosts[$trigger['hostid']];
 
 		$hostName = new CSpan($host['name'], 'link_menu');
-		$hostName->setMenuPopup(getMenuPopupHost(array(
-			'host' => $host,
-			'scripts' => $scripts[$host['hostid']]
-		)));
+		$hostName->setMenuPopup(getMenuPopupHost($host, $scripts[$host['hostid']]));
 
 		// add maintenance icon with hint if host is in maintenance
 		$maintenanceIcon = null;

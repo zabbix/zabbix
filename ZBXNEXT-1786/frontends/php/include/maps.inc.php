@@ -96,7 +96,7 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 	}
 	unset($selement);
 
-	$scripts = API::Script()->getScriptsByHosts($hostIds);
+	$hostScripts = API::Script()->getScriptsByHosts($hostIds);
 
 	$hosts = API::Host()->get(array(
 		'nodeids' => get_current_nodeid(true),
@@ -120,49 +120,47 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 		);
 		$area->addClass('menu-map');
 
-		order_result($elem['urls'], 'name');
-
-		$menuPopup = array(
-			'urls' => $elem['urls']
-		);
+		$hostId = null;
+		$scripts = null;
+		$gotos = null;
 
 		switch ($elem['elementtype']) {
 			case SYSMAP_ELEMENT_TYPE_HOST:
 				$host = $hosts[$elem['elementid']];
 
-				if ($scripts[$elem['elementid']]) {
-					$menuPopup['hostId'] = $elem['elementid'];
-					$menuPopup['scripts'] = $scripts[$elem['elementid']];
+				if ($hostScripts[$elem['elementid']]) {
+					$hostId = $elem['elementid'];
+					$scripts = $hostScripts[$elem['elementid']];
 				}
 				if ($hosts[$elem['elementid']]['status'] == HOST_STATUS_MONITORED) {
-					$menuPopup['gotos']['triggerStatus'] = array(
+					$gotos['triggerStatus'] = array(
 						'hostid' => $elem['elementid'],
 						'show_severity' => isset($options['severity_min']) ? $options['severity_min'] : null
 					);
 				}
 				if ($host['screens']) {
-					$menuPopup['gotos']['screens'] = array(
+					$gotos['screens'] = array(
 						'hostid' => $host['hostid']
 					);
 				}
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_MAP:
-				$menuPopup['gotos']['submap'] = array(
+				$gotos['submap'] = array(
 					'sysmapid' => $elem['elementid'],
 					'severity_min' => isset($options['severity_min']) ? $options['severity_min'] : null
 				);
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
-				$menuPopup['gotos']['events'] = array(
+				$gotos['events'] = array(
 					'triggerid' => $elem['elementid'],
 					'nav_time' => time() - SEC_PER_WEEK
 				);
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-				$menuPopup['gotos']['triggerStatus'] = array(
+				$gotos['triggerStatus'] = array(
 					'groupid' => $elem['elementid'],
 					'hostid' => 0,
 					'show_severity' => isset($options['severity_min']) ? $options['severity_min'] : null
@@ -170,7 +168,9 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 				break;
 		}
 
-		$area->setMenuPopup(getMenuPopupMap($menuPopup));
+		order_result($elem['urls'], 'name');
+
+		$area->setMenuPopup(getMenuPopupMap($hostId, $scripts, $gotos, $elem['urls']));
 
 		$actionMap->addItem($area);
 	}

@@ -548,6 +548,7 @@ foreach ($triggers as $trigger) {
 	$usedHostCount = count($usedHosts);
 
 	$triggerItems = array();
+
 	foreach ($trigger['items'] as $item) {
 		$itemName = htmlspecialchars(itemName($item));
 
@@ -556,10 +557,13 @@ foreach ($triggers as $trigger) {
 			$itemName = $usedHosts[$item['hostid']].NAME_DELIMITER.$itemName;
 		}
 
-		$triggerItems[$itemName] = array(
-			'itemid' => $item['itemid'],
-			'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
-				? 'showgraph' : 'showvalues'
+		$triggerItems[] = array(
+			'name' => $itemName,
+			'params' => array(
+				'itemid' => $item['itemid'],
+				'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
+					? 'showgraph' : 'showvalues'
+			)
 		);
 	}
 
@@ -574,10 +578,7 @@ foreach ($triggers as $trigger) {
 	}
 
 	$description = new CSpan($description, 'link_menu');
-	$description->setMenuPopup(getMenuPopupTrigger(array(
-		'trigger' => $trigger,
-		'items' => $triggerItems
-	)));
+	$description->setMenuPopup(getMenuPopupTrigger($trigger, $triggerItems));
 
 	if (!empty($trigger['dependencies'])) {
 		$dependenciesTable = new CTableInfo();
@@ -622,8 +623,6 @@ foreach ($triggers as $trigger) {
 	// host js menu
 	$hostList = array();
 	foreach ($trigger['hosts'] as $triggerHost) {
-		$host = $hosts[$triggerHost['hostid']];
-
 		// fetch scripts for the host js menu
 		$scripts = array();
 		if (isset($scriptsByHosts[$triggerHost['hostid']])) {
@@ -633,10 +632,7 @@ foreach ($triggers as $trigger) {
 		}
 
 		$hostName = new CSpan($triggerHost['name'], 'link_menu');
-		$hostName->setMenuPopup(getMenuPopupHost(array(
-			'host' => $host,
-			'scripts' => $scripts
-		)));
+		$hostName->setMenuPopup(getMenuPopupHost($hosts[$triggerHost['hostid']], $scripts));
 
 		$hostDiv = new CDiv($hostName);
 

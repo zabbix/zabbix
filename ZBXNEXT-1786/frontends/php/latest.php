@@ -410,10 +410,7 @@ foreach ($applications as $appid => $dbApp) {
 
 	if ($_REQUEST['hostid'] == 0) {
 		$hostName = new CSpan($host['name'], 'link_menu');
-		$hostName->setMenuPopup(getMenuPopupHost(array(
-			'host' => $host,
-			'scripts' => $hostScripts[$host['hostid']]
-		)));
+		$hostName->setMenuPopup(getMenuPopupHost($host, $hostScripts[$host['hostid']]));
 	}
 
 	// add toggle row
@@ -536,10 +533,7 @@ foreach ($hosts as $hostId => $dbHost) {
 
 	if ($_REQUEST['hostid'] == 0) {
 		$hostName = new CSpan($host['name'], 'link_menu');
-		$hostName->setMenuPopup(getMenuPopupHost(array(
-			'host' => $host,
-			'scripts' => $hostScripts[$host['hostid']]
-		)));
+		$hostName->setMenuPopup(getMenuPopupHost($host, $hostScripts[$host['hostid']]));
 	}
 
 	// add toggle row

@@ -2600,23 +2600,23 @@ function clearCookies($clear = false, $id = null) {
 /**
  * Prepare data for host menu popup.
  *
- * @param array $options['host']
- * @param array $options['scripts']
+ * @param array $host
+ * @param array $scripts
  *
  * @return array
  */
-function getMenuPopupHost(array $options) {
+function getMenuPopupHost(array $host, array $scripts = null) {
 	$data = array(
 		'type' => 'host',
-		'hostId' => $options['host']['hostid'],
-		'hasInventories' => (isset($options['host']['inventory']) && $options['host']['inventory']),
-		'hasScreens' => (isset($options['host']['screens']) && $options['host']['screens'])
+		'hostId' => $host['hostid'],
+		'hasInventory' => (isset($host['inventory']) && $host['inventory']),
+		'hasScreens' => (isset($host['screens']) && $host['screens'])
 	);
 
-	if (isset($options['scripts']) && $options['scripts']) {
-		CArrayHelper::sort($options['scripts'], array('name'));
+	if ($scripts) {
+		CArrayHelper::sort($scripts, array('name'));
 
-		foreach (array_values($options['scripts']) as $script) {
+		foreach (array_values($scripts) as $script) {
 			$data['scripts'][] = array(
 				'name' => $script['name'],
 				'scriptId' => $script['scriptid'],
@@ -2631,24 +2631,24 @@ function getMenuPopupHost(array $options) {
 /**
  * Prepare data for host menu popup.
  *
- * @param string $options['hostId']
- * @param array  $options['scripts']
- * @param array  $options['gotos']
- * @param array  $options['urls']
+ * @param string $hostId
+ * @param array  $scripts
+ * @param array  $gotos
+ * @param array  $urls
  *
  * @return array
  */
-function getMenuPopupMap(array $options) {
+function getMenuPopupMap($hostId, array $scripts = null, array $gotos = null, array $urls = null) {
 	$data = array(
 		'type' => 'map'
 	);
 
-	if (isset($options['scripts']) && $options['scripts']) {
-		CArrayHelper::sort($options['scripts'], array('name'));
+	if ($scripts) {
+		CArrayHelper::sort($scripts, array('name'));
 
-		$data['hostId'] = $options['hostId'];
+		$data['hostId'] = $hostId;
 
-		foreach (array_values($options['scripts']) as $script) {
+		foreach (array_values($scripts) as $script) {
 			$data['scripts'][] = array(
 				'name' => $script['name'],
 				'scriptId' => $script['scriptid'],
@@ -2657,12 +2657,12 @@ function getMenuPopupMap(array $options) {
 		}
 	}
 
-	if (isset($options['gotos']) && $options['gotos']) {
-		$data['gotos'] = $options['gotos'];
+	if ($gotos) {
+		$data['gotos'] = $gotos;
 	}
 
-	if (isset($options['urls']) && $options['urls']) {
-		foreach ($options['urls'] as $url) {
+	if ($urls) {
+		foreach ($urls as $url) {
 			$data['urls'][] = array(
 				'label' => $url['name'],
 				'url' => $url['url']
@@ -2676,49 +2676,51 @@ function getMenuPopupMap(array $options) {
 /**
  * Prepare data for item history menu popup.
  *
- * @param array $options['item']
+ * @param array $item
  *
  * @return array
  */
-function getMenuPopupHistory(array $options) {
+function getMenuPopupHistory(array $item) {
 	return array(
 		'type' => 'history',
-		'itemId' => $options['item']['itemid'],
-		'hasLatestGraphs' => in_array(
-			$options['item']['value_type'],
-			array(ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT)
-		)
+		'itemId' => $item['itemid'],
+		'hasLatestGraphs' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT))
 	);
 }
 
 /**
  * Prepare data for trigger menu popup.
  *
- * @param array  $options['trigger']		trigger data
- * @param bool   $options['hasUrl']			is trigger URL will be showen
- * @param array  $options['acknowledge']	acknowledge link parameters
- * @param array  $options['items']			trigger items
- * @param string $options['eventTime']		event navigation time parameter
+ * @param array  $trigger		trigger data
+ * @param array  $items			trigger items
+ * @param array  $acknowledge	acknowledge link parameters
+ * @param string $eventTime		event navigation time parameter
  *
  * @return array
  */
-function getMenuPopupTrigger(array $options) {
+function getMenuPopupTrigger(array $trigger, array $items = null, array $acknowledge = null, $eventTime = null) {
+	if ($items) {
+		CArrayHelper::sort($items, array('name'));
+	}
+
 	$data = array(
 		'type' => 'trigger',
-		'triggerId' => $options['trigger']['triggerid'],
-		'eventTime' => isset($options['eventTime']) ? $options['eventTime'] : null,
-		'items' => (isset($options['items']) && $options['items']) ? $options['items'] : null,
-		'acknowledge' => (isset($options['acknowledge']) && $options['acknowledge']) ? $options['acknowledge'] : null,
-		'url' => CHtml::encode(CHtml::encode(resolveTriggerUrl($options['trigger'])))
+		'triggerId' => $trigger['triggerid'],
+		'items' => $items,
+		'acknowledge' => $acknowledge,
+		'eventTime' => $eventTime,
+		'configuration' => null,
+		'url' => resolveTriggerUrl($trigger)
 	);
 
 	if ((CWebUser::$data['type'] == USER_TYPE_ZABBIX_ADMIN || CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN)
-			&& $options['trigger']['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-		$host = reset($options['trigger']['hosts']);
+			&& $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+		$host = reset($trigger['hosts']);
 
-		$data['hasConfiguration'] = true;
-		$data['hostId'] = $host['hostid'];
-		$data['switchNode'] = id2nodeid($options['trigger']['triggerid']);
+		$data['configuration'] = array(
+			'hostId' => $host['hostid'],
+			'switchNode' => id2nodeid($trigger['triggerid'])
+		);
 	}
 
 	return $data;

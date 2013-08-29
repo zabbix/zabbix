@@ -1219,10 +1219,7 @@ function getTriggersOverview($hostIds, $application, $viewMode = null, $screenId
 
 		foreach ($hostNames as $hostId => $hostName) {
 			$name = new CSpan($hostName, 'link_menu');
-			$name->setMenuPopup(getMenuPopupHost(array(
-				'host' => $hosts[$hostId],
-				'scripts' => $scripts[$hostId]
-			)));
+			$name->setMenuPopup(getMenuPopupHost($hosts[$hostId], $scripts[$hostId]));
 
 			$columns = array($name);
 			foreach ($triggers as $triggerHosts) {
@@ -1256,13 +1253,11 @@ function getTriggerOverviewCells($trigger, $screenId = null) {
 	$desc = array();
 	$config = select_config(); // for how long triggers should blink on status change (set by user in administration->general)
 	$menuPopup = array();
+	$triggerItems = array();
+	$acknowledge = array();
 
 	if ($trigger) {
 		$style = 'cursor: pointer; ';
-
-		$menuPopup = array(
-			'trigger' => $trigger
-		);
 
 		// problem trigger
 		if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
@@ -1274,14 +1269,14 @@ function getTriggerOverviewCells($trigger, $screenId = null) {
 					if ($screenId) {
 						global $page;
 
-						$menuPopup['acknowledge'] = array(
+						$acknowledge = array(
 							'eventid' => $event['eventid'],
 							'screenid' => $screenId,
 							'backurl' => $page['file']
 						);
 					}
 					else {
-						$menuPopup['acknowledge'] = array(
+						$acknowledge = array(
 							'eventid' => $event['eventid'],
 							'backurl' => 'overview.php'
 						);
@@ -1298,8 +1293,6 @@ function getTriggerOverviewCells($trigger, $screenId = null) {
 			$css = 'normal';
 		}
 
-		$itemMenu = array();
-
 		$dbItems = DBselect(
 			'SELECT DISTINCT i.itemid,i.name,i.key_,i.value_type'.
 			' FROM items i,functions f'.
@@ -1307,29 +1300,30 @@ function getTriggerOverviewCells($trigger, $screenId = null) {
 				' AND f.triggerid='.$trigger['triggerid']
 		);
 		while ($item = DBfetch($dbItems)) {
-			$description = itemName($item);
+			$action = null;
 
 			switch ($item['value_type']) {
 				case ITEM_VALUE_TYPE_UINT64:
 				case ITEM_VALUE_TYPE_FLOAT:
-					$menuPopup['items'][$description] = array(
-						'action' => 'showgraph',
-						'itemid' => $item['itemid'],
-						'period' => 3600
-					);
+					$action = 'showgraph';
 					break;
 
 				case ITEM_VALUE_TYPE_LOG:
 				case ITEM_VALUE_TYPE_STR:
 				case ITEM_VALUE_TYPE_TEXT:
 				default:
-					$menuPopup['items'][$description] = array(
-						'action' => 'showlatest',
-						'itemid' => $item['itemid'],
-						'period' => 3600
-					);
+					$action = 'showlatest';
 					break;
 			}
+
+			$triggerItems[] = array(
+				'name' => itemName($item),
+				'params' => array(
+					'action' => $action,
+					'itemid' => $item['itemid'],
+					'period' => 3600
+				)
+			);
 		}
 
 		// dependency: triggers on which depends this
@@ -1387,8 +1381,8 @@ function getTriggerOverviewCells($trigger, $screenId = null) {
 		$column->setAttribute('data-toggle-class', $css);
 	}
 
-	if ($menuPopup) {
-		$column->setMenuPopup(getMenuPopupTrigger($menuPopup));
+	if ($trigger) {
+		$column->setMenuPopup(getMenuPopupTrigger($trigger, $triggerItems, $acknowledge));
 	}
 
 	return $column;
@@ -1572,10 +1566,7 @@ function make_trigger_details($trigger) {
 	$scripts = API::Script()->getScriptsByHosts($hostId);
 
 	$hostName = new CSpan($host['name'], 'link_menu');
-	$hostName->setMenuPopup(getMenuPopupHost(array(
-		'host' => $host,
-		'scripts' => $scripts ? reset($scripts) : null
-	)));
+	$hostName->setMenuPopup(getMenuPopupHost($host, $scripts ? reset($scripts) : null));
 
 	$table = new CTableInfo();
 

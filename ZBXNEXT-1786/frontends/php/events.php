@@ -665,15 +665,20 @@ else {
 			// events
 			foreach ($events as $event) {
 				$trigger = $triggers[$event['objectid']];
+
 				$host = reset($trigger['hosts']);
 				$host = $hosts[$host['hostid']];
 
 				$triggerItems = array();
+
 				foreach ($trigger['items'] as $item) {
-					$triggerItems[htmlspecialchars(itemName($item))] = array(
-						'itemid' => $item['itemid'],
-						'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
-							? 'showgraph' : 'showvalues'
+					$triggerItems[] = array(
+						'name' => htmlspecialchars(itemName($item)),
+						'params' => array(
+							'itemid' => $item['itemid'],
+							'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
+								? 'showgraph' : 'showvalues'
+						)
 					);
 				}
 
@@ -683,11 +688,7 @@ else {
 				)));
 
 				$triggerDescription = new CSpan($description, 'pointer link_menu');
-				$triggerDescription->setMenuPopup(getMenuPopupTrigger(array(
-					'trigger' => $trigger,
-					'eventTime' => $event['clock'],
-					'items' => $triggerItems
-				)));
+				$triggerDescription->setMenuPopup(getMenuPopupTrigger($trigger, $triggerItems, null, $event['clock']));
 
 				// acknowledge
 				$ack = getEventAckState($event, true);
@@ -712,10 +713,7 @@ else {
 
 				if ($_REQUEST['hostid'] == 0) {
 					$hostName = new CSpan($host['name'], 'link_menu');
-					$hostName->setMenuPopup(getMenuPopupHost(array(
-						'host' => $host,
-						'scripts' => $scripts[$host['hostid']]
-					)));
+					$hostName->setMenuPopup(getMenuPopupHost($host, $scripts[$host['hostid']]));
 				}
 
 				// action

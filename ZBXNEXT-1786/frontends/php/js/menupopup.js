@@ -24,7 +24,7 @@
  * @param string options['hostId']			host id
  * @param array  options['scripts']			host scripts
  * @param bool   options['hasScreens']		link to host screen page
- * @param bool   options['hasInventories']	link to host inventory page
+ * @param bool   options['hasInventory']	link to host inventory page
  *
  * @return array
  */
@@ -48,7 +48,7 @@ function getMenuPopupHost(options) {
 	};
 
 	// inventories
-	if (options.hasInventories) {
+	if (options.hasInventory) {
 		gotos[gotos.length] = {
 			label: t('Host inventories'),
 			url: new Curl('hostinventories.php?hostid=' + options.hostId).getUrl()
@@ -181,14 +181,12 @@ function getMenuPopupMap(options) {
 /**
  * Get menu popup trigger section data.
  *
- * @param string options['triggerId']			trigger id
- * @param int    options['eventTime']			event page url navigation time parameter
- * @param object options['acknowledge']			link to acknowledge page with url parameters ("name" => "value")
- * @param object options['hasConfiguration']	link to trigger configuration page
- * @param string options['hostId']				host id
- * @param string options['switchNode']			trigger configuration parameter for node switching
- * @param string options['url']					trigger url link
- * @param object options['items']				link to trigger item history page with url parameters ("name" => "value")
+ * @param string options['triggerId']		trigger id
+ * @param object options['items']			link to trigger item history page with url parameters ("name" => "value")
+ * @param object options['acknowledge']		link to acknowledge page with url parameters ("name" => "value")
+ * @param int    options['eventTime']		event page url navigation time parameter
+ * @param object options['configuration']	link to trigger configuration page
+ * @param string options['url']				trigger url link
  *
  * @return array
  */
@@ -198,7 +196,7 @@ function getMenuPopupTrigger(options) {
 	// events
 	var url = new Curl('events.php?triggerid=' + options.triggerId);
 
-	if (typeof(options.eventTime) !== 'undefined') {
+	if (!empty(options.eventTime)) {
 		url.setArgument('nav_time', options.eventTime);
 	}
 
@@ -208,7 +206,7 @@ function getMenuPopupTrigger(options) {
 	};
 
 	// acknowledge
-	if (typeof(options.acknowledge) !== 'undefined' && objectSize(options.acknowledge) > 0) {
+	if (!empty(options.acknowledge)) {
 		var url = new Curl('acknow.php');
 
 		jQuery.each(options.acknowledge, function(name, value) {
@@ -222,9 +220,9 @@ function getMenuPopupTrigger(options) {
 	}
 
 	// configuration
-	if (typeof(options.hasConfiguration) !== 'undefined') {
+	if (!empty(options.configuration)) {
 		var url = new Curl('triggers.php?triggerid=' + options.triggerId +
-			'&hostid=' + options.hostId + '&form=update&switch_node=' + options.switchNode);
+			'&hostid=' + options.configuration.hostId + '&form=update&switch_node=' + options.configuration.switchNode);
 
 		items[items.length] = {
 			label: t('Configuration'),
@@ -233,7 +231,7 @@ function getMenuPopupTrigger(options) {
 	}
 
 	// url
-	if (options.url.length > 0) {
+	if (!empty(options.url)) {
 		items[items.length] = {
 			label: t('URL'),
 			url: options.url
@@ -247,18 +245,18 @@ function getMenuPopupTrigger(options) {
 	};
 
 	// items
-	if (typeof(options.items) !== 'undefined' && objectSize(options.items) > 0) {
+	if (!empty(options.items)) {
 		var items = [];
 
-		jQuery.each(options.items, function(name, item) {
+		jQuery.each(options.items, function(i, item) {
 			var url = new Curl('history.php');
 
-			jQuery.each(item, function(key, value) {
+			jQuery.each(item.params, function(key, value) {
 				url.setArgument(key, value);
 			});
 
 			items[items.length] = {
-				label: name,
+				label: item.name,
 				url: url.getUrl()
 			};
 		});
