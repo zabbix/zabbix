@@ -422,7 +422,6 @@ if (!$firstEvent) {
 else {
 	$config = select_config();
 	$starttime = $firstEvent['clock'];
-	$showAdminLinks = (CWebUser::$data['type'] == USER_TYPE_ZABBIX_ADMIN || CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN);
 
 	if ($source == EVENT_SOURCE_DISCOVERY) {
 		// fetch discovered service and discovered host events separately
@@ -687,8 +686,6 @@ else {
 				$triggerDescription->setMenuPopup(getMenuPopupTrigger(array(
 					'trigger' => $trigger,
 					'eventTime' => $event['clock'],
-					'hasConfiguration' => ($showAdminLinks && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL),
-					'hasUrl' => true,
 					'items' => $triggerItems
 				)));
 

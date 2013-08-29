@@ -233,7 +233,7 @@ function getMenuPopupTrigger(options) {
 	}
 
 	// url
-	if (typeof(options.url) !== 'undefined') {
+	if (options.url.length > 0) {
 		items[items.length] = {
 			label: t('URL'),
 			url: options.url

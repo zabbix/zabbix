@@ -2694,12 +2694,11 @@ function getMenuPopupHistory(array $options) {
 /**
  * Prepare data for trigger menu popup.
  *
- * @param array  $options['trigger']			trigger data
- * @param bool   $options['hasConfiguration']	is link to trigger configuration will be showen
- * @param bool   $options['hasUrl']				is trigger URL will be showen
- * @param array  $options['acknowledge']		acknowledge link parameters
- * @param array  $options['items']				trigger items
- * @param string $options['eventTime']			event navigation time parameter
+ * @param array  $options['trigger']		trigger data
+ * @param bool   $options['hasUrl']			is trigger URL will be showen
+ * @param array  $options['acknowledge']	acknowledge link parameters
+ * @param array  $options['items']			trigger items
+ * @param string $options['eventTime']		event navigation time parameter
  *
  * @return array
  */
@@ -2709,19 +2708,17 @@ function getMenuPopupTrigger(array $options) {
 		'triggerId' => $options['trigger']['triggerid'],
 		'eventTime' => isset($options['eventTime']) ? $options['eventTime'] : null,
 		'items' => (isset($options['items']) && $options['items']) ? $options['items'] : null,
-		'acknowledge' => (isset($options['acknowledge']) && $options['acknowledge']) ? $options['acknowledge'] : null
+		'acknowledge' => (isset($options['acknowledge']) && $options['acknowledge']) ? $options['acknowledge'] : null,
+		'url' => CHtml::encode(CHtml::encode(resolveTriggerUrl($options['trigger'])))
 	);
 
-	if (isset($options['hasConfiguration']) && $options['hasConfiguration']) {
+	if ((CWebUser::$data['type'] == USER_TYPE_ZABBIX_ADMIN || CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN)
+			&& $options['trigger']['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 		$host = reset($options['trigger']['hosts']);
 
 		$data['hasConfiguration'] = true;
 		$data['hostId'] = $host['hostid'];
 		$data['switchNode'] = id2nodeid($options['trigger']['triggerid']);
-	}
-
-	if (isset($options['hasUrl']) && $options['hasUrl'] && !zbx_empty($options['trigger']['url'])) {
-		$data['url'] = CHtml::encode(CHtml::encode(resolveTriggerUrl($options['trigger'])));
 	}
 
 	return $data;

@@ -326,7 +326,6 @@ $triggerForm->addVar('backurl', $page['file']);
 /*
  * Table
  */
-$showAdminLinks = (CWebUser::$data['type'] == USER_TYPE_ZABBIX_ADMIN || CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN);
 $showEventColumn = ($config['event_ack_enable'] && $_REQUEST['show_events'] != EVENTS_OPTION_NOEVENT);
 
 $switcherName = 'trigger_switchers';
@@ -577,8 +576,6 @@ foreach ($triggers as $trigger) {
 	$description = new CSpan($description, 'link_menu');
 	$description->setMenuPopup(getMenuPopupTrigger(array(
 		'trigger' => $trigger,
-		'hasConfiguration' => ($showAdminLinks && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL),
-		'hasUrl' => true,
 		'items' => $triggerItems
 	)));
 

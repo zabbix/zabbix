@@ -1261,11 +1261,7 @@ function getTriggerOverviewCells($trigger, $screenId = null) {
 		$style = 'cursor: pointer; ';
 
 		$menuPopup = array(
-			'trigger' => $trigger,
-			'hasConfiguration' =>
-				((CWebUser::$data['type'] == USER_TYPE_ZABBIX_ADMIN || CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN)
-					&& $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL),
-			'hasUrl' => true
+			'trigger' => $trigger
 		);
 
 		// problem trigger
