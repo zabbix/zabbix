@@ -33,11 +33,27 @@ function getMenuPopupHost(options) {
 
 	// scripts
 	if (typeof options.scripts !== 'undefined') {
+		var menuData = {};
+
+		for (var key in options.scripts) {
+			var script = options.scripts[key];
+
+			if (typeof script.scriptId !== 'undefined') {
+				var items = splitPath(script.name),
+					name = (items.length > 0) ? items.pop() : script.name;
+
+				prepareTree(menuData, name, items, {
+					hostId: options.hostId,
+					scriptId: script.scriptId,
+					confirmation: script.confirmation
+				});
+			}
+		}
+
 		sections[sections.length] = {
 			type: 'scripts',
 			title: t('Scripts'),
-			hostId: options.hostId,
-			data: options.scripts
+			data: menuData
 		};
 	}
 
@@ -91,11 +107,27 @@ function getMenuPopupMap(options) {
 
 	// scripts
 	if (typeof options.scripts !== 'undefined') {
+		var menuData = {};
+
+		for (var key in options.scripts) {
+			var script = options.scripts[key];
+
+			if (typeof script.scriptId !== 'undefined') {
+				var items = splitPath(script.name),
+					name = (items.length > 0) ? items.pop() : script.name;
+
+				prepareTree(menuData, name, items, {
+					hostId: options.hostId,
+					scriptId: script.scriptId,
+					confirmation: script.confirmation
+				});
+			}
+		}
+
 		sections[sections.length] = {
 			type: 'scripts',
 			title: t('Scripts'),
-			hostId: options.hostId,
-			data: options.scripts
+			data: menuData
 		};
 	}
 
@@ -313,21 +345,50 @@ function getMenuPopupHistory(options) {
 	}];
 }
 
+/**
+ * Recursive function to prepare menu tree data for createTree().
+ *
+ * @param array  menu		menu data
+ * @param string name		script name
+ * @param array  items		script path
+ * @param object params		script params ("hostId", "scriptId" and "confirmation" fields)
+ */
+function prepareTree(menu, name, items, params) {
+	if (items.length > 0) {
+		var item = items.shift();
+
+		if (typeof menu[item] === 'undefined') {
+			menu[item] = {items: {}};
+		}
+
+		prepareTree(menu[item].items, name, items, params);
+	}
+	else {
+		menu[name] = {
+			params: params,
+			items: {}
+		};
+	}
+}
+
 jQuery(function($) {
 
 	/**
 	 * Menu popup.
 	 *
-	 * @param array  sections	menu sections usign structure "type", "title", "data"
-	 * @param object event		menu popup call event
+	 * @param array  sections			menu sections
+	 * @param string sections['type']	section display type "script" or "links"
+	 * @param string sections['data']	if section type is "script": menu tree getted from prepareTree()
+	 *									if section type is "links": array with "name" => "url"
+	 * @param object event				menu popup call event
 	 */
 	$.fn.menuPopup = function(sections, event) {
 		if (!event) {
 			event = window.event;
 		}
 
-		var openner = $(this),
-			id = openner.data('menu-popup-id'),
+		var opener = $(this),
+			id = opener.data('menu-popup-id'),
 			menuPopup = $('#' + id),
 			mapContainer;
 
@@ -345,7 +406,7 @@ jQuery(function($) {
 			}
 
 			menuPopup.position({
-				of: openner,
+				of: opener,
 				my: 'left top',
 				at: 'left bottom'
 			});
@@ -379,12 +440,13 @@ jQuery(function($) {
 			$('.menu', menuPopup).menu();
 
 			// map
-			if (openner.prop('tagName') == 'AREA') {
+			if (opener.prop('tagName') == 'AREA') {
 				$('.menuPopupContainer').remove();
 
 				var iframe = $('#iframe'),
-					mapOpenner = openner.parent().parent();
+					mapOpener = opener.parent().parent();
 
+				// create container for menu popup to make absolute position
 				mapContainer = jQuery('<div>', {
 					'class': 'menuPopupContainer',
 					css: {
@@ -397,12 +459,11 @@ jQuery(function($) {
 				})
 				.append(menuPopup);
 
-				mapOpenner.append(mapContainer);
+				mapOpener.append(mapContainer);
 			}
-
 			// others
 			else {
-				openner.data('menu-popup-id', id);
+				opener.data('menu-popup-id', id);
 
 				$('body').append(menuPopup);
 			}
@@ -425,7 +486,7 @@ jQuery(function($) {
 					closeInactiveMenuPopup(menuPopup, 1000);
 				})
 				.position({
-					of: (openner.prop('tagName') == 'AREA') ? mapContainer : openner,
+					of: (opener.prop('tagName') == 'AREA') ? mapContainer : opener,
 					my: 'left top',
 					at: 'left bottom'
 				});
@@ -462,31 +523,13 @@ jQuery(function($) {
 	 *
 	 * @param object menuPopup
 	 * @param string section['title']	section title
-	 * @param string section['hostId']	host id
-	 * @param array  section['data']	screen items in structure ("name", "scriptId", "confirmation")
+	 * @param string sections['data']	menu tree getted from prepareTree()
 	 */
 	function createScripts(menuPopup, section) {
-		var menuData = {};
-
-		for (var key in section.data) {
-			var script = section.data[key];
-
-			if (typeof script.scriptId !== 'undefined') {
-				var items = splitPath(script.name),
-					name = (items.length > 0) ? items.pop() : script.name;
-
-				prepareTree(menuData, name, items, {
-					hostId: section.hostId,
-					scriptId: script.scriptId,
-					confirmation: script.confirmation
-				});
-			}
-		}
-
-		if (objectSize(menuData) > 0) {
+		if (objectSize(section.data) > 0) {
 			var menu = createMenu(menuPopup, section.title);
 
-			createTree(menu, menuData);
+			createTree(menu, section.data);
 
 			// execute script
 			$('li', menu).each(function() {
@@ -519,7 +562,7 @@ jQuery(function($) {
 	 *
 	 * @param object menuPopup
 	 * @param string section['title']	section title
-	 * @param array  section['data']	items as "label" => "url"
+	 * @param array  section['data']	if section type is "links": array with "name" => "url"
 	 */
 	function createLinks(menuPopup, section) {
 		var menu = createMenu(menuPopup, section.title);
@@ -527,32 +570,6 @@ jQuery(function($) {
 		$.each(section.data, function(i, item) {
 			menu.append(createMenuItem(item.label, item.url));
 		});
-	}
-
-	/**
-	 * Recursive function to prepare menu tree data for createTree().
-	 *
-	 * @param array  menu		menu data
-	 * @param string name		script name
-	 * @param array  items		script path
-	 * @param object params		script params ("hostId", "scriptId" and "confirmation" fields)
-	 */
-	function prepareTree(menu, name, items, params) {
-		if (items.length > 0) {
-			var item = items.shift();
-
-			if (typeof menu[item] === 'undefined') {
-				menu[item] = {items: {}};
-			}
-
-			prepareTree(menu[item].items, name, items, params);
-		}
-		else {
-			menu[name] = {
-				params: params,
-				items: {}
-			};
-		}
 	}
 
 	/**
