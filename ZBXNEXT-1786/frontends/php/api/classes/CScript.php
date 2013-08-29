@@ -48,7 +48,7 @@ class CScript extends CZBXAPI {
 	 *
 	 * @return array
 	 */
-	public function get($options = array()) {
+	public function get(array $options) {
 		$result = array();
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
@@ -214,7 +214,7 @@ class CScript extends CZBXAPI {
 	 *
 	 * @return array
 	 */
-	public function create($scripts) {
+	public function create(array $scripts) {
 		$scripts = zbx_toArray($scripts);
 
 		$this->validateCreate($scripts);
@@ -235,7 +235,7 @@ class CScript extends CZBXAPI {
 	 *
 	 * @return array
 	 */
-	public function update($scripts) {
+	public function update(array $scripts) {
 		$scripts = zbx_toArray($scripts);
 
 		$this->validateUpdate($scripts);
@@ -284,7 +284,7 @@ class CScript extends CZBXAPI {
 	 *
 	 * @return array
 	 */
-	public function execute($data) {
+	public function execute(array $data) {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 		$scriptId = $data['scriptid'];
@@ -394,7 +394,7 @@ class CScript extends CZBXAPI {
 	 *
 	 * @param array $scripts
 	 */
-	protected function validateCreate($scripts) {
+	protected function validateCreate(array $scripts) {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
@@ -438,7 +438,7 @@ class CScript extends CZBXAPI {
 	 *
 	 * @param array $scripts
 	 */
-	protected function validateUpdate($scripts) {
+	protected function validateUpdate(array $scripts) {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
@@ -503,7 +503,7 @@ class CScript extends CZBXAPI {
 	 *
 	 * @param array $scriptIds
 	 */
-	protected function validateDelete($scriptIds) {
+	protected function validateDelete(array $scriptIds) {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
@@ -548,7 +548,7 @@ class CScript extends CZBXAPI {
 	 * @param array  $scripts
 	 * @param string $method
 	 */
-	protected function checkMenuPath($scripts, $method) {
+	protected function checkMenuPath(array $scripts, $method) {
 		$dbScripts = $this->get(array(
 			'output' => array('scriptid', 'name'),
 			'nopermissions' => true
@@ -611,7 +611,7 @@ class CScript extends CZBXAPI {
 	 *
 	 * @return array
 	 */
-	protected function unsetExecutionType($scripts) {
+	protected function unsetExecutionType(array $scripts) {
 		foreach ($scripts as $key => $script) {
 			if (isset($script['type']) && $script['type'] == ZBX_SCRIPT_TYPE_IPMI) {
 				unset($scripts[$key]['execute_on']);

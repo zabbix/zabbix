@@ -2605,7 +2605,7 @@ function clearCookies($clear = false, $id = null) {
  *
  * @return array
  */
-function getMenuPopupHost($options = array()) {
+function getMenuPopupHost(array $options) {
 	$data = array(
 		'type' => 'host',
 		'hostId' => $options['host']['hostid'],
@@ -2638,7 +2638,7 @@ function getMenuPopupHost($options = array()) {
  *
  * @return array
  */
-function getMenuPopupMap($options = array()) {
+function getMenuPopupMap(array $options) {
 	$data = array(
 		'type' => 'map'
 	);
@@ -2680,7 +2680,7 @@ function getMenuPopupMap($options = array()) {
  *
  * @return array
  */
-function getMenuPopupHistory($options = array()) {
+function getMenuPopupHistory(array $options) {
 	$options['type'] = 'history';
 
 	return $options;
@@ -2698,7 +2698,7 @@ function getMenuPopupHistory($options = array()) {
  *
  * @return array
  */
-function getMenuPopupTrigger($options = array()) {
+function getMenuPopupTrigger(array $options) {
 	$data = array(
 		'type' => 'trigger',
 		'triggerId' => $options['trigger']['triggerid'],
