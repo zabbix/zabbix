@@ -33,7 +33,7 @@ function getMenuPopupHost(options) {
 
 	// scripts
 	if (typeof options.scripts !== 'undefined') {
-		var menuData = {};
+		var menuTree = {};
 
 		for (var key in options.scripts) {
 			var script = options.scripts[key];
@@ -42,7 +42,7 @@ function getMenuPopupHost(options) {
 				var items = splitPath(script.name),
 					name = (items.length > 0) ? items.pop() : script.name;
 
-				prepareTree(menuData, name, items, {
+				appendTreeItem(menuTree, name, items, {
 					hostId: options.hostId,
 					scriptId: script.scriptId,
 					confirmation: script.confirmation
@@ -53,7 +53,7 @@ function getMenuPopupHost(options) {
 		sections[sections.length] = {
 			type: 'scripts',
 			title: t('Scripts'),
-			data: menuData
+			data: menuTree
 		};
 	}
 
@@ -107,7 +107,7 @@ function getMenuPopupMap(options) {
 
 	// scripts
 	if (typeof options.scripts !== 'undefined') {
-		var menuData = {};
+		var menuTree = {};
 
 		for (var key in options.scripts) {
 			var script = options.scripts[key];
@@ -116,7 +116,7 @@ function getMenuPopupMap(options) {
 				var items = splitPath(script.name),
 					name = (items.length > 0) ? items.pop() : script.name;
 
-				prepareTree(menuData, name, items, {
+				appendTreeItem(menuTree, name, items, {
 					hostId: options.hostId,
 					scriptId: script.scriptId,
 					confirmation: script.confirmation
@@ -127,7 +127,7 @@ function getMenuPopupMap(options) {
 		sections[sections.length] = {
 			type: 'scripts',
 			title: t('Scripts'),
-			data: menuData
+			data: menuTree
 		};
 	}
 
@@ -346,25 +346,25 @@ function getMenuPopupHistory(options) {
 }
 
 /**
- * Recursive function to prepare menu tree data for createTree().
+ * Recursive function to prepare menu tree data for createMenuTree().
  *
- * @param array  menu		menu data
+ * @param array  tree		menu tree data, will be modified by reference
  * @param string name		script name
  * @param array  items		script path
  * @param object params		script params ("hostId", "scriptId" and "confirmation" fields)
  */
-function prepareTree(menu, name, items, params) {
+function appendTreeItem(tree, name, items, params) {
 	if (items.length > 0) {
 		var item = items.shift();
 
-		if (typeof menu[item] === 'undefined') {
-			menu[item] = {items: {}};
+		if (typeof tree[item] === 'undefined') {
+			tree[item] = {items: {}};
 		}
 
-		prepareTree(menu[item].items, name, items, params);
+		appendTreeItem(tree[item].items, name, items, params);
 	}
 	else {
-		menu[name] = {
+		tree[name] = {
 			params: params,
 			items: {}
 		};
@@ -378,7 +378,7 @@ jQuery(function($) {
 	 *
 	 * @param array  sections			menu sections
 	 * @param string sections['type']	section display type "script" or "links"
-	 * @param string sections['data']	if section type is "script": menu tree getted from prepareTree()
+	 * @param string sections['data']	if section type is "script": menu tree getted from appendTreeItem()
 	 *									if section type is "links": array with "name" => "url"
 	 * @param object event				menu popup call event
 	 */
@@ -390,7 +390,7 @@ jQuery(function($) {
 		var opener = $(this),
 			id = opener.data('menu-popup-id'),
 			menuPopup = $('#' + id),
-			mapContainer;
+			mapContainer = null;
 
 		if (menuPopup.length > 0) {
 			var display = menuPopup.css('display');
@@ -422,11 +422,51 @@ jQuery(function($) {
 			// create sections
 			if (sections.length > 0) {
 				$.each(sections, function(i, section) {
+					// scripts
 					if (section.type === 'scripts') {
-						createScripts(menuPopup, section);
+						if (objectSize(section.data) > 0) {
+							var menu = $('<ul>', {'class': 'menu'});
+
+							createMenuTree(menu, section.data);
+
+							// execute script
+							$('li', menu).each(function() {
+								var item = $(this);
+
+								if (!empty(item.data('scriptId'))) {
+									item.click(function(e) {
+										menuPopup.fadeOut(50);
+
+										executeScript(
+											item.data('hostId'),
+											item.data('scriptId'),
+											item.data('confirmation')
+										);
+
+										cancelEvent(e);
+									});
+								}
+								else {
+									item.click(function(e) {
+										cancelEvent(e);
+									});
+								}
+							});
+
+							menuPopup.append($('<div>', {'class': 'title', text: section.title}));
+							menuPopup.append(menu);
+						}
 					}
+					// links
 					else {
-						createLinks(menuPopup, section);
+						var menu = $('<ul>', {'class': 'menu'});
+
+						$.each(section.data, function(i, item) {
+							menu.append(createMenuItem(item.label, item.url));
+						});
+
+						menuPopup.append($('<div>', {'class': 'title', text: section.title}));
+						menuPopup.append(menu);
 					}
 				});
 			}
@@ -439,29 +479,23 @@ jQuery(function($) {
 			// build jQuery Menu
 			$('.menu', menuPopup).menu();
 
-			// map
+			// set menu popup for map area
 			if (opener.prop('tagName') == 'AREA') {
 				$('.menuPopupContainer').remove();
 
-				var iframe = $('#iframe'),
-					mapOpener = opener.parent().parent();
-
-				// create container for menu popup to make absolute position
 				mapContainer = jQuery('<div>', {
 					'class': 'menuPopupContainer',
 					css: {
 						position: 'absolute',
-						top: (iframe.length > 0)
-							? event.clientY + document.body.scrollTop - iframe.position().top
-							: event.clientY + document.body.scrollTop,
-						left: event.clientX
+						top: event.pageY,
+						left: event.pageX
 					}
 				})
 				.append(menuPopup);
 
-				mapOpener.append(mapContainer);
+				$('body').append(mapContainer);
 			}
-			// others
+			// set menu popup for common html elements
 			else {
 				opener.data('menu-popup-id', id);
 
@@ -518,61 +552,6 @@ jQuery(function($) {
 	}
 
 	/**
-	 * Script menu section.
-	 * Menu tree with ability to run script in popup window.
-	 *
-	 * @param object menuPopup
-	 * @param string section['title']	section title
-	 * @param string sections['data']	menu tree getted from prepareTree()
-	 */
-	function createScripts(menuPopup, section) {
-		if (objectSize(section.data) > 0) {
-			var menu = createMenu(menuPopup, section.title);
-
-			createTree(menu, section.data);
-
-			// execute script
-			$('li', menu).each(function() {
-				var item = $(this);
-
-				if (!empty(item.data('scriptId'))) {
-					item.click(function(e) {
-						menuPopup.fadeOut(50);
-
-						executeScript(
-							item.data('hostId'),
-							item.data('scriptId'),
-							item.data('confirmation')
-						);
-
-						cancelEvent(e);
-					});
-				}
-				else {
-					item.click(function(e) {
-						cancelEvent(e);
-					});
-				}
-			});
-		}
-	}
-
-	/**
-	 * Links menu section.
-	 *
-	 * @param object menuPopup
-	 * @param string section['title']	section title
-	 * @param array  section['data']	if section type is "links": array with "name" => "url"
-	 */
-	function createLinks(menuPopup, section) {
-		var menu = createMenu(menuPopup, section.title);
-
-		$.each(section.data, function(i, item) {
-			menu.append(createMenuItem(item.label, item.url));
-		});
-	}
-
-	/**
 	 * Create menu using structure:
 	 *
 	 * array(
@@ -609,20 +588,20 @@ jQuery(function($) {
 	 * 	)
 	 * )
 	 *
-	 * @param object obj	menu section
-	 * @param object data	menu data with prescribed structure
+	 * @param object ul		list object, will be modified by reference
+	 * @param object items	tree data with prescribed structure
 	 */
-	function createTree(obj, data) {
-		$.each(data, function(name, item) {
-			var subMenu = null;
+	function createMenuTree(ul, items) {
+		$.each(items, function(name, item) {
+			var innerUl = null;
 
 			if (objectSize(item.items) > 0) {
-				subMenu = $('<ul>');
+				innerUl = $('<ul>');
 
-				createTree(subMenu, item.items);
+				createMenuTree(innerUl, item.items);
 			}
 
-			var li = createMenuItem(name, null, subMenu);
+			var li = createMenuItem(name, null, innerUl);
 
 			if (objectSize(item.params) > 0) {
 				$.each(item.params, function(key, value) {
@@ -630,23 +609,8 @@ jQuery(function($) {
 				});
 			}
 
-			obj.append(li);
+			ul.append(li);
 		});
-	}
-
-	/**
-	 * Create new menu section with given title.
-	 *
-	 * @param object menuPopup
-	 * @param string title
-	 */
-	function createMenu(menuPopup, title) {
-		var menu = $('<ul>', {'class': 'menu'});
-
-		menuPopup.append($('<div>', {'class': 'title', text: title}));
-		menuPopup.append(menu);
-
-		return menu;
 	}
 
 	/**
@@ -655,6 +619,8 @@ jQuery(function($) {
 	 * @param string label		name of item
 	 * @param string link		url to create onClick action, by default is empty
 	 * @param object subMenu	sub menu to build menu tree
+	 *
+	 * @return object			list item
 	 */
 	function createMenuItem(label, link, subMenu) {
 		return $('<li>').append(
@@ -662,7 +628,7 @@ jQuery(function($) {
 				text: label,
 				href: link
 			}),
-			(typeof subMenu !== 'undefined') ? subMenu : null
+			(typeof subMenu === 'undefined') ? null : subMenu
 		);
 	}
 });
