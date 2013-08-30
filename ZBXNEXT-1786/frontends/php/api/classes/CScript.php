@@ -601,8 +601,8 @@ class CScript extends CZBXAPI {
 					}
 				}
 
-				// check name
-				if ($name === $dbScriptName) {
+				// check duplicate script names in same menu path
+				if ($path == $dbScriptPath) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.', $script['name']));
 				}
 			}
