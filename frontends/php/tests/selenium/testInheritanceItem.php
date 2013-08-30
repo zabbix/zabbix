@@ -120,7 +120,7 @@ class testInheritanceItem extends CWebTest {
 					'itemKey' =>'item-name-missing',
 					'errors' => array(
 						'Page received incorrect data',
-						'Warning. Incorrect value for field "Name": cannot be empty.'
+						'Incorrect value for field "Name": cannot be empty.'
 					)
 				)
 			),
@@ -131,7 +131,7 @@ class testInheritanceItem extends CWebTest {
 					'name' =>'Item name',
 					'errors' => array(
 						'Page received incorrect data',
-						'Warning. Incorrect value for field "Key": cannot be empty.'
+						'Incorrect value for field "Key": cannot be empty.'
 					)
 				)
 			),
@@ -145,7 +145,7 @@ class testInheritanceItem extends CWebTest {
 					'formulaValue' => '',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Field "Custom multiplier" is not decimal number.'
+						'Field "Custom multiplier" is not decimal number.'
 					)
 				)
 			),
@@ -159,7 +159,7 @@ class testInheritanceItem extends CWebTest {
 					'formulaValue' => 'form ula',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Field "Custom multiplier" is not decimal number.'
+						'Field "Custom multiplier" is not decimal number.'
 					)
 				)
 			),
@@ -173,7 +173,7 @@ class testInheritanceItem extends CWebTest {
 					'formulaValue' => 'a1b2 c3',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Field "Custom multiplier" is not decimal number.'
+						'Field "Custom multiplier" is not decimal number.'
 					)
 				)
 			),
@@ -187,7 +187,7 @@ class testInheritanceItem extends CWebTest {
 					'formulaValue' => '32 1 abc',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Field "Custom multiplier" is not decimal number.'
+						'Field "Custom multiplier" is not decimal number.'
 					)
 				)
 			),
@@ -201,7 +201,7 @@ class testInheritanceItem extends CWebTest {
 					'formulaValue' => '32 1 abc',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Field "Custom multiplier" is not decimal number.'
+						'Field "Custom multiplier" is not decimal number.'
 					)
 				)
 			),
@@ -215,7 +215,7 @@ class testInheritanceItem extends CWebTest {
 					'formulaValue' => '321abc',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Field "Custom multiplier" is not decimal number.'
+						'Field "Custom multiplier" is not decimal number.'
 					)
 				)
 			),
@@ -238,7 +238,7 @@ class testInheritanceItem extends CWebTest {
 					'delay' => '-30',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.'
+						'Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.'
 					)
 				)
 			),
@@ -251,7 +251,7 @@ class testInheritanceItem extends CWebTest {
 					'delay' => 86401,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.'
+						'Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.'
 					)
 				)
 			),
@@ -266,7 +266,7 @@ class testInheritanceItem extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "New flexible interval": cannot be empty.'
+						'Incorrect value for field "New flexible interval": cannot be empty.'
 					)
 				)
 			),
@@ -645,7 +645,7 @@ class testInheritanceItem extends CWebTest {
 					'history' => 65536,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Keep history (in days)": must be between 0 and 65535.'
+						'Incorrect value for field "Keep history (in days)": must be between 0 and 65535.'
 					)
 				)
 			),
@@ -658,7 +658,7 @@ class testInheritanceItem extends CWebTest {
 					'history' => '-1',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "Keep history (in days)": must be between 0 and 65535.'
+							'Incorrect value for field "Keep history (in days)": must be between 0 and 65535.'
 					)
 				)
 			),
@@ -691,7 +691,7 @@ class testInheritanceItem extends CWebTest {
 					'trends' => '-1',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "Keep trends (in days)": must be between 0 and 65535.'
+							'Incorrect value for field "Keep trends (in days)": must be between 0 and 65535.'
 					)
 				)
 			),
@@ -704,7 +704,7 @@ class testInheritanceItem extends CWebTest {
 					'trends' => 65536,
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "Keep trends (in days)": must be between 0 and 65535.'
+							'Incorrect value for field "Keep trends (in days)": must be between 0 and 65535.'
 					)
 				)
 			),
@@ -950,7 +950,7 @@ class testInheritanceItem extends CWebTest {
 					'key' => 'template-ipmi-agent-error',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "IPMI sensor": cannot be empty.'
+							'Incorrect value for field "IPMI sensor": cannot be empty.'
 					)
 				)
 			),
@@ -962,8 +962,8 @@ class testInheritanceItem extends CWebTest {
 					'key' => 'template-ssh-agent-error',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "User name": cannot be empty',
-							'Warning. Incorrect value for field "Executed script": cannot be empty.'
+							'Incorrect value for field "User name": cannot be empty',
+							'Incorrect value for field "Executed script": cannot be empty.'
 					)
 				)
 			),
@@ -975,8 +975,8 @@ class testInheritanceItem extends CWebTest {
 					'key' => 'template-telnet-agent-error',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "User name": cannot be empty',
-							'Warning. Incorrect value for field "Executed script": cannot be empty.'
+							'Incorrect value for field "User name": cannot be empty',
+							'Incorrect value for field "Executed script": cannot be empty.'
 					)
 				)
 			),
@@ -1011,7 +1011,7 @@ class testInheritanceItem extends CWebTest {
 					'key' => 'template-calculated',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "Formula": cannot be empty.'
+							'Incorrect value for field "Formula": cannot be empty.'
 					)
 				)
 			),
@@ -1024,7 +1024,7 @@ class testInheritanceItem extends CWebTest {
 					'key' => 'key-database-error',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "SQL query": cannot be empty.'
+							'Incorrect value for field "SQL query": cannot be empty.'
 					)
 				)
 			),
