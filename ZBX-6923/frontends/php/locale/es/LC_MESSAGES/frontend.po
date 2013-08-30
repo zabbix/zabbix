@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-23 23:07+0300\n"
+"POT-Creation-Date: 2013-08-30 01:14+0300\n"
 "PO-Revision-Date: 2012-04-11 10:35+0200\n"
 "Last-Translator: Javier <jtlopez@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -631,7 +631,7 @@ msgstr "Aplicación con ID \"%1$s\" no está disponible en \"%2$s\"."
 #: include/views/configuration.item.prototype.list.php:57
 #: include/views/configuration.template.edit.php:196 popup.php:40
 #: search.php:138 search.php:163 search.php:186 search.php:382 search.php:404
-#: search.php:431 templates.php:491 templates.php:551
+#: search.php:431 templates.php:489 templates.php:549
 msgid "Applications"
 msgstr "Aplicaciones"
 
@@ -1084,7 +1084,7 @@ msgstr "CONFIGURACIÓN DE SCRIPTS"
 msgid "CONFIGURATION OF SLIDE SHOWS"
 msgstr "CONFIGURACIÓN DE LAS DIAPOSITIVAS"
 
-#: templates.php:421 templates.php:475
+#: templates.php:421 templates.php:473
 msgid "CONFIGURATION OF TEMPLATES"
 msgstr "CONFIGURACIÓN DE PLANTILLAS"
 
@@ -2791,7 +2791,7 @@ msgstr "Crear script"
 msgid "Create slide show"
 msgstr "Crear diapositivas"
 
-#: templates.php:470
+#: templates.php:468
 msgid "Create template"
 msgstr "Crear plantilla"
 
@@ -3314,7 +3314,7 @@ msgstr "Eliminar"
 msgid "Delete and clear"
 msgstr "Eliminar y limpiar"
 
-#: templates.php:653
+#: templates.php:651
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr ""
 
@@ -3422,7 +3422,7 @@ msgstr "¿Eliminar script?"
 #: include/views/configuration.screen.list.php:72
 #: include/views/configuration.slideconf.list.php:61
 #: include/views/configuration.sysmap.list.php:64
-#: include/views/configuration.triggers.list.php:276 templates.php:649
+#: include/views/configuration.triggers.list.php:276 templates.php:647
 msgid "Delete selected"
 msgstr "Eliminar"
 
@@ -3521,7 +3521,7 @@ msgstr ""
 msgid "Delete selected slide shows?"
 msgstr ""
 
-#: templates.php:650
+#: templates.php:648
 msgid "Delete selected templates?"
 msgstr ""
 
@@ -3548,7 +3548,7 @@ msgid_plural "Delete selected value mapping? It is used for %d items!"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates.php:652
+#: templates.php:650
 msgid "Delete selected with linked elements"
 msgstr "Eliminar selección junto con los elementos vinculados"
 
@@ -3866,8 +3866,8 @@ msgstr ""
 
 #: events.php:297 hosts.php:759 hosts.php:836 include/html.inc.php:409
 #: include/menu.inc.php:77 include/menu.inc.php:208
-#: include/views/configuration.action.list.php:34 templates.php:496
-#: templates.php:561
+#: include/views/configuration.action.list.php:34 templates.php:494
+#: templates.php:559
 msgid "Discovery"
 msgstr "Descubrimiento"
 
@@ -4488,7 +4488,7 @@ msgid "Exploded"
 msgstr ""
 
 #: hosts.php:942 include/views/configuration.screen.list.php:70
-#: include/views/configuration.sysmap.list.php:63 templates.php:648
+#: include/views/configuration.sysmap.list.php:63 templates.php:646
 msgid "Export selected"
 msgstr ""
 
@@ -4845,7 +4845,7 @@ msgstr ""
 #: include/views/configuration.screen.list.php:76
 #: include/views/configuration.slideconf.list.php:64
 #: include/views/configuration.sysmap.list.php:67
-#: include/views/configuration.triggers.list.php:279 templates.php:655
+#: include/views/configuration.triggers.list.php:279 templates.php:653
 #: tr_status.php:885
 msgid "Go"
 msgstr ""
@@ -5004,7 +5004,7 @@ msgstr ""
 #: include/views/conf.import.php:34 include/views/monitoring.charts.php:32
 #: include/views/monitoring.charts.php:41 popup.php:76 search.php:141
 #: search.php:175 search.php:198 search.php:385 search.php:416 search.php:443
-#: templates.php:494 templates.php:557
+#: templates.php:492 templates.php:555
 msgid "Graphs"
 msgstr "Gráficos"
 
@@ -5047,7 +5047,7 @@ msgstr ""
 #: include/views/monitoring.overview.php:32
 #: include/views/monitoring.screen.php:98
 #: include/views/monitoring.slides.php:82 latest.php:154 popup.php:508
-#: templates.php:478 tr_status.php:252
+#: templates.php:476 tr_status.php:252
 msgid "Group"
 msgstr "Grupo"
 
@@ -5856,7 +5856,7 @@ msgstr ""
 #: hosts.php:704 include/views/configuration.screen.list.php:33
 #: include/views/configuration.sysmap.list.php:28
 #: include/views/conf.import.php:69 include/views/conf.import.php:74
-#: templates.php:471
+#: templates.php:469
 msgid "Import"
 msgstr "Importar"
 
@@ -6933,7 +6933,7 @@ msgstr ""
 #: include/views/configuration.template.edit.php:217
 #: include/views/conf.import.php:31 latest.php:157 popup.php:56 queue.php:101
 #: search.php:139 search.php:167 search.php:190 search.php:383 search.php:408
-#: search.php:435 templates.php:492 templates.php:553
+#: search.php:435 templates.php:490 templates.php:551
 msgid "Items"
 msgstr "Monitores"
 
@@ -7445,11 +7445,11 @@ msgstr ""
 
 #: include/views/configuration.host.edit.php:537
 #: include/views/configuration.template.edit.php:403
-#: include/views/configuration.template.edit.php:424 templates.php:498
+#: include/views/configuration.template.edit.php:424 templates.php:496
 msgid "Linked templates"
 msgstr ""
 
-#: templates.php:499
+#: templates.php:497
 msgid "Linked to"
 msgstr ""
 
@@ -8966,7 +8966,7 @@ msgid "No target selected."
 msgstr ""
 
 #: include/views/configuration.host.edit.php:503
-#: include/views/configuration.template.edit.php:376 templates.php:486
+#: include/views/configuration.template.edit.php:376 templates.php:484
 msgid "No templates defined."
 msgstr ""
 
@@ -9052,7 +9052,7 @@ msgstr ""
 #: include/views/configuration.triggers.list.php:107
 #: include/views/monitoring.discovery.php:40 latest.php:190 popup.php:485
 #: popup_right.php:66 queue.php:201 report2.php:395 report5.php:59
-#: search.php:129 search.php:270 search.php:380 templates.php:489
+#: search.php:129 search.php:270 search.php:380 templates.php:487
 #: tr_status.php:370
 msgid "Node"
 msgstr "Nodo"
@@ -10621,6 +10621,10 @@ msgstr "Reintentar"
 msgid "Right"
 msgstr "Derecho"
 
+#: include/locales.inc.php:72
+msgid "Romanian (ro_RO)"
+msgstr ""
+
 #: include/views/configuration.screen.constructor.edit.php:601
 #: screenedit.php:47
 msgid "Row span"
@@ -10683,7 +10687,7 @@ msgstr ""
 msgid "Run remote commands on hosts"
 msgstr ""
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:73
 msgid "Russian (ru_RU)"
 msgstr "Ruso (ru_RU)"
 
@@ -11015,7 +11019,7 @@ msgstr "Pantalla actualizada"
 #: include/views/monitoring.screen.php:79
 #: include/views/monitoring.slides.php:31 popup.php:68 popup.php:84
 #: search.php:136 search.php:218 search.php:386 search.php:420 search.php:447
-#: templates.php:495 templates.php:559
+#: templates.php:493 templates.php:557
 msgid "Screens"
 msgstr "Pantallas"
 
@@ -11576,7 +11580,7 @@ msgstr "Diapositivas"
 msgid "Slides"
 msgstr "Diapositivas"
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:74
 msgid "Slovak (sk_SK)"
 msgstr ""
 
@@ -11638,7 +11642,7 @@ msgstr ""
 msgid "Source"
 msgstr "Orígen"
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:75
 msgid "Spanish (es_ES)"
 msgstr "Español (es_ES)"
 
@@ -11851,7 +11855,7 @@ msgstr ""
 msgid "Surname"
 msgstr "Apellido"
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:76
 msgid "Swedish (sv_SE)"
 msgstr "Sueco (sv_SE)"
 
@@ -12007,7 +12011,7 @@ msgstr "Plantilla vinculada"
 msgid "Template list"
 msgstr ""
 
-#: include/views/configuration.template.edit.php:98
+#: include/views/configuration.template.edit.php:98 templates.php:55
 msgid "Template name"
 msgstr "Nombre de plantilla"
 
@@ -12049,7 +12053,7 @@ msgstr ""
 #: include/views/configuration.host.massupdate.php:287
 #: include/views/conf.import.php:28 search.php:276 search.php:305
 #: search.php:310 search.php:317 search.php:381 search.php:469
-#: templates.php:480 templates.php:490
+#: templates.php:478 templates.php:488
 msgid "Templates"
 msgstr "Plantillas"
 
@@ -12485,7 +12489,7 @@ msgstr "Valor del iniciador"
 #: include/views/monitoring.overview.php:28 jsLoader.php:110 popup.php:44
 #: search.php:134 search.php:140 search.php:171 search.php:194 search.php:216
 #: search.php:273 search.php:325 search.php:384 search.php:412 search.php:439
-#: templates.php:493 templates.php:555 tr_status.php:260
+#: templates.php:491 templates.php:553 tr_status.php:260
 msgid "Triggers"
 msgstr "Iniciadores"
 
@@ -12539,7 +12543,7 @@ msgstr ""
 msgid "Tuesday"
 msgstr "Martes"
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:77
 msgid "Turkish (tr_TR)"
 msgstr ""
 
@@ -12684,7 +12688,7 @@ msgstr "PERFIL DE USUARIO"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:78
 msgid "Ukrainian (uk_UA)"
 msgstr "Ucraniano (uk_UA)"
 
@@ -13381,7 +13385,7 @@ msgstr ""
 
 #: hosts.php:760 hosts.php:838 include/menu.inc.php:42 search.php:137
 #: search.php:142 search.php:179 search.php:202 search.php:219 search.php:387
-#: search.php:424 search.php:451 templates.php:497 templates.php:563
+#: search.php:424 search.php:451 templates.php:495 templates.php:561
 msgid "Web"
 msgstr "Web"
 
