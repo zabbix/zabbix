@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-30 01:14+0300\n"
+"POT-Creation-Date: 2013-08-30 13:52+0300\n"
 "PO-Revision-Date: 2013-01-12 23:52+0200\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -622,7 +622,7 @@ msgstr "Приложение актуализирано"
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Приложение с ID \"%1$s\" не е налично за \"%2$s\"."
 
-#: hosts.php:755 hosts.php:828 include/forms.inc.php:903
+#: hosts.php:749 hosts.php:822 include/forms.inc.php:903
 #: include/html.inc.php:419 include/html.inc.php:423
 #: include/views/configuration.application.list.php:47
 #: include/views/configuration.host.edit.php:318
@@ -631,7 +631,7 @@ msgstr "Приложение с ID \"%1$s\" не е налично за \"%2$s\"
 #: include/views/configuration.item.prototype.list.php:57
 #: include/views/configuration.template.edit.php:196 popup.php:40
 #: search.php:138 search.php:163 search.php:186 search.php:382 search.php:404
-#: search.php:431 templates.php:489 templates.php:549
+#: search.php:431 templates.php:481 templates.php:541
 msgid "Applications"
 msgstr "Приложения"
 
@@ -820,7 +820,7 @@ msgstr "Автоматично съответствие на икона"
 msgid "Automatic icon selection"
 msgstr "Автоматичен избор на икона"
 
-#: hosts.php:764
+#: hosts.php:758
 msgid "Availability"
 msgstr "Наличност"
 
@@ -1000,7 +1000,7 @@ msgstr "КОНФИГУРАЦИЯ НА ГРАФИЧНИЯ ПОТРЕБИТЕЛС�
 msgid "CONFIGURATION OF HOST GROUPS"
 msgstr "КОНФИГУРАЦИЯ НА ХОСТ ГРУПИ"
 
-#: hosts.php:622 hosts.php:687 hosts.php:708
+#: hosts.php:616 hosts.php:681 hosts.php:702
 msgid "CONFIGURATION OF HOSTS"
 msgstr "КОНФИГУРАЦИЯ НА ХОСТОВЕ"
 
@@ -1086,7 +1086,7 @@ msgstr "КОНФИГУРАЦИЯ НА СКРИПТОВЕ"
 msgid "CONFIGURATION OF SLIDE SHOWS"
 msgstr "КОНФИГУРАЦИЯ НА СЛАЙДШОУ"
 
-#: templates.php:421 templates.php:473
+#: templates.php:415 templates.php:465
 msgid "CONFIGURATION OF TEMPLATES"
 msgstr "КОНФИГУРАЦИЯ НА ШАБЛОНИТЕ"
 
@@ -1236,7 +1236,7 @@ msgstr "Не може да се добави графика"
 msgid "Cannot add group"
 msgstr "Не може да се добави група"
 
-#: hosts.php:374
+#: hosts.php:368
 msgid "Cannot add host"
 msgstr "Не може да се добави потребител"
 
@@ -1310,7 +1310,7 @@ msgstr "Не може да се добави услуга"
 msgid "Cannot add slide show"
 msgstr "Не може да се добави слайдшоу"
 
-#: templates.php:171
+#: templates.php:165
 msgid "Cannot add template"
 msgstr "Не може да се добави шаблон"
 
@@ -1481,7 +1481,7 @@ msgstr "Не може да се изтрият графиките, създад�
 msgid "Cannot delete group"
 msgstr "Не може да се изтрие групата"
 
-#: hosts.php:563 hosts.php:580
+#: hosts.php:557 hosts.php:574
 msgid "Cannot delete host"
 msgstr "Не може да се изтрие хоста"
 
@@ -1574,7 +1574,7 @@ msgstr "Не може да се изтрие услугата"
 msgid "Cannot delete slide show"
 msgstr "Не може да се изтрие слайдшоу"
 
-#: templates.php:355 templates.php:371 templates.php:399
+#: templates.php:349 templates.php:365 templates.php:393
 msgid "Cannot delete template"
 msgstr "Не може да се изтрие шаблона"
 
@@ -1654,6 +1654,10 @@ msgstr "Не може да се изключи уеб сценарий"
 
 #: queue.php:61
 msgid "Cannot display item queue."
+msgstr ""
+
+#: chart7.php:74
+msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr ""
 
 #: media_types.php:160
@@ -2034,15 +2038,15 @@ msgstr "Не може да се актуализира групата"
 msgid "Cannot update group."
 msgstr "Не може да се актуализира групата."
 
-#: hostgroups.php:217 hosts.php:369
+#: hostgroups.php:217 hosts.php:363
 msgid "Cannot update host"
 msgstr "Не може да се актуализира хоста"
 
-#: hosts.php:600
+#: hosts.php:594
 msgid "Cannot update host status"
 msgstr "Не може да се актуализира състоянието на хоста"
 
-#: hosts.php:353
+#: hosts.php:347
 msgid "Cannot update hosts"
 msgstr "Не може да се актуализират хостовете"
 
@@ -2128,7 +2132,7 @@ msgstr "Не може да се актуализира слайдшоу"
 msgid "Cannot update status"
 msgstr "Не може да се актуализира състоянието"
 
-#: templates.php:167
+#: templates.php:161
 msgid "Cannot update template"
 msgstr "Не може да се актуализира шаблона"
 
@@ -2340,7 +2344,8 @@ msgstr "Затвори израз конструктора"
 msgid "Colour"
 msgstr "Цвят"
 
-#: include/classes/validators/CColorValidator.php:33 jsLoader.php:159
+#: include/classes/validators/CColorValidator.php:33
+#: include/validate.inc.php:354 jsLoader.php:159
 #, fuzzy, php-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "Цвят \"%1$s\" не е коректен: очаква шестнадесетичен код на цвят (6 символа)."
@@ -2739,7 +2744,7 @@ msgstr "Създаване на графика (първо изберете хо
 msgid "Create graph prototype"
 msgstr "Създаване на графични прототипи"
 
-#: hosts.php:703
+#: hosts.php:697
 msgid "Create host"
 msgstr "Създаване на хост"
 
@@ -2809,7 +2814,7 @@ msgstr "Създаване на скрипт"
 msgid "Create slide show"
 msgstr "Създаване на слайдшоу"
 
-#: templates.php:468
+#: templates.php:460
 msgid "Create template"
 msgstr "Създаване на шаблон"
 
@@ -2871,71 +2876,6 @@ msgstr "Създадено: Тригер прототип \"%1$s\" в \"%2$s\"."
 #, php-format
 msgid "Created: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "Създадено: Уеб сценарий \"%1$s\" в \"%2$s\"."
-
-#: include/validate.inc.php:389
-#, php-format
-msgid "Critical error. Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
-msgstr "Критична грешка. Цвят \"%1$s\" не е коректен: очаква шестнадесетичен код на цвят (6 символа)."
-
-#: include/validate.inc.php:375
-#, php-format
-msgid "Critical error. Field \"%1$s\" contains Multibyte chars."
-msgstr "Критична грешка. Поле \"%1$s\" съдържа многобайтови символи."
-
-#: include/validate.inc.php:439
-#, php-format
-msgid "Critical error. Field \"%1$s\" is mandatory."
-msgstr "Критична грешка. Поле \"%1$s\" е задължително."
-
-#: include/validate.inc.php:315
-#, php-format
-msgid "Critical error. Field \"%1$s\" is not IP range."
-msgstr "Критична грешка. Поле \"%1$s\" не е IP обхват."
-
-#: include/validate.inc.php:301
-#, php-format
-msgid "Critical error. Field \"%1$s\" is not IP."
-msgstr "Критична грешка. Поле \"%1$s\" не е IP."
-
-#: include/validate.inc.php:353
-#, php-format
-msgid "Critical error. Field \"%1$s\" is not decimal number."
-msgstr "Критична грешка. Поле \"%1$s\" не е десетично число."
-
-#: include/validate.inc.php:329
-#, php-format
-msgid "Critical error. Field \"%1$s\" is not integer list or range."
-msgstr "Критична грешка. Поле \"%1$s\" не е списък от цели числа или диапазон."
-
-#: include/validate.inc.php:342
-#, php-format
-msgid "Critical error. Field \"%1$s\" is not integer."
-msgstr "Критична грешка. Поле \"%1$s\" не е цяло число."
-
-#: include/validate.inc.php:364
-#, php-format
-msgid "Critical error. Field \"%1$s\" is not string."
-msgstr "Критична грешка. Поле \"%1$s\" не е низ."
-
-#: include/validate.inc.php:456
-#, php-format
-msgid "Critical error. Field \"%1$s\" must be missing."
-msgstr "Критична грешка. Поле \"%1$s\" трябва да липсва."
-
-#: include/validate.inc.php:510
-#, php-format
-msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field."
-msgstr "Критична грешка. Неправилна стойност \"%1$s\" за поле \"%2$s\"."
-
-#: include/validate.inc.php:500
-#, php-format
-msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
-msgstr "Критична грешка. Неправилна стойност \"%1$s\" за поле \"%2$s\": трябва да бъде между %3$s и %4$s."
-
-#: include/validate.inc.php:491
-#, php-format
-msgid "Critical error. Incorrect value for field \"%1$s\": cannot be empty."
-msgstr "Критична грешка. Неправилна стойност \"%1$s\": не може да бъде празно."
 
 #: popup_trexpr.php:365
 msgid "Current date is < N"
@@ -3063,7 +3003,7 @@ msgstr "ОТКРИТО"
 msgid "DM"
 msgstr "РМ"
 
-#: events.php:503 events.php:512 hosts.php:721
+#: events.php:503 events.php:512 hosts.php:715
 #: include/views/administration.proxy.edit.php:62
 #: include/views/js/configuration.host.edit.js.php:18 search.php:132
 msgid "DNS"
@@ -3332,7 +3272,7 @@ msgstr "Изтриване"
 msgid "Delete and clear"
 msgstr "Изтриване и изчистване"
 
-#: templates.php:651
+#: templates.php:643
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "Изтриване и изчистване на избраните шаблони? (Внимание: всички свързани хостове ще бъдат изчистени!)"
 
@@ -3415,7 +3355,7 @@ msgstr "Изтриване на екран?"
 msgid "Delete script?"
 msgstr "Изтриване на скрипт?"
 
-#: hosts.php:950 include/reports.inc.php:103 include/reports.inc.php:197
+#: hosts.php:944 include/reports.inc.php:103 include/reports.inc.php:197
 #: include/reports.inc.php:239
 #: include/views/administration.general.regularexpressions.list.php:67
 #: include/views/administration.mediatypes.list.php:121
@@ -3441,7 +3381,7 @@ msgstr "Изтриване на скрипт?"
 #: include/views/configuration.screen.list.php:72
 #: include/views/configuration.slideconf.list.php:61
 #: include/views/configuration.sysmap.list.php:64
-#: include/views/configuration.triggers.list.php:276 templates.php:647
+#: include/views/configuration.triggers.list.php:276 templates.php:639
 msgid "Delete selected"
 msgstr "Изтриване на избраните"
 
@@ -3487,7 +3427,7 @@ msgstr "Изтриване на избраните хост групи?"
 msgid "Delete selected host?"
 msgstr "Изтриване на избрания хост?"
 
-#: hosts.php:951
+#: hosts.php:945
 msgid "Delete selected hosts?"
 msgstr "Изтриване на избраните хостове?"
 
@@ -3540,7 +3480,7 @@ msgstr "Изтриване на избраните скриптове?"
 msgid "Delete selected slide shows?"
 msgstr "Изтриване на избраните слайдшоу?"
 
-#: templates.php:648
+#: templates.php:640
 msgid "Delete selected templates?"
 msgstr "Изтриване на избраните шаблони?"
 
@@ -3567,7 +3507,7 @@ msgid_plural "Delete selected value mapping? It is used for %d items!"
 msgstr[0] "Изтриване на избраната стойност на реализациите? То се използва от елемент на данните %d !"
 msgstr[1] "Изтриване на избраната стойност на реализациите? То се използва от елементи на данните %d !"
 
-#: templates.php:650
+#: templates.php:642
 msgid "Delete selected with linked elements"
 msgstr "Изтриване на избраните и свързаните с тях елементи"
 
@@ -3784,7 +3724,7 @@ msgstr "Изключване режим за отстраняване на гр�
 msgid "Disable host"
 msgstr "Изключване на хост"
 
-#: hosts.php:871 hosts.php:884
+#: hosts.php:865 hosts.php:878
 msgid "Disable host?"
 msgstr "Изключване на хост?"
 
@@ -3796,7 +3736,7 @@ msgstr "Изключване на хост в избраната хост гру
 msgid "Disable hosts monitored by selected proxies?"
 msgstr "Изключване на хост, който се наблюдава от избраното прокси?"
 
-#: hosts.php:947 include/views/administration.mediatypes.list.php:117
+#: hosts.php:941 include/views/administration.mediatypes.list.php:117
 #: include/views/administration.proxy.list.php:101
 #: include/views/administration.usergroups.list.php:141
 #: include/views/configuration.action.list.php:101
@@ -3832,7 +3772,7 @@ msgstr "Изключване на избраните правила за отк�
 msgid "Disable selected groups?"
 msgstr "Изключване на избраните групи?"
 
-#: hosts.php:948
+#: hosts.php:942
 msgid "Disable selected hosts?"
 msgstr "Изключване на избраните хостове?"
 
@@ -3883,10 +3823,10 @@ msgstr "Открит"
 msgid "Discovered device"
 msgstr "Открито устройство"
 
-#: events.php:297 hosts.php:759 hosts.php:836 include/html.inc.php:409
+#: events.php:297 hosts.php:753 hosts.php:830 include/html.inc.php:409
 #: include/menu.inc.php:77 include/menu.inc.php:208
-#: include/views/configuration.action.list.php:34 templates.php:494
-#: templates.php:559
+#: include/views/configuration.action.list.php:34 templates.php:486
+#: templates.php:551
 msgid "Discovery"
 msgstr "Откриване"
 
@@ -4204,7 +4144,7 @@ msgstr "Състояние на действие празно."
 #: api/classes/CService.php:443 api/classes/CService.php:515
 #: api/classes/CTemplate.php:619 api/classes/CTrigger.php:896
 #: api/classes/CTrigger.php:960 api/classes/CTrigger.php:1050
-#: api/classes/CTriggerPrototype.php:652 api/classes/CUserGroup.php:608
+#: api/classes/CTriggerPrototype.php:652 api/classes/CUserGroup.php:602
 #: api/classes/CUserMacro.php:394 api/classes/CUserMacro.php:546
 #: api/classes/CUser.php:545
 msgid "Empty input parameter."
@@ -4259,7 +4199,7 @@ msgstr "Активиране потвърждаване на събитие"
 msgid "Enable host"
 msgstr "Активиране на хост"
 
-#: hosts.php:878
+#: hosts.php:872
 msgid "Enable host?"
 msgstr "Активиране на хост?"
 
@@ -4276,7 +4216,7 @@ msgstr "Активиране наблюдаване на хостове от и�
 msgid "Enable housekeeping"
 msgstr ""
 
-#: hosts.php:944 include/views/administration.mediatypes.list.php:113
+#: hosts.php:938 include/views/administration.mediatypes.list.php:113
 #: include/views/administration.proxy.list.php:97
 #: include/views/administration.usergroups.list.php:137
 #: include/views/configuration.action.list.php:97
@@ -4311,7 +4251,7 @@ msgstr "Активиране на избраните правила за отк�
 msgid "Enable selected groups?"
 msgstr "Активиране на избраните групи?"
 
-#: hosts.php:945 include/views/configuration.hostgroups.list.php:127
+#: hosts.php:939 include/views/configuration.hostgroups.list.php:127
 msgid "Enable selected hosts?"
 msgstr "Активиране на избраните хостове?"
 
@@ -4506,8 +4446,8 @@ msgstr "Изтекъл"
 msgid "Exploded"
 msgstr "Разширено кръгова"
 
-#: hosts.php:942 include/views/configuration.screen.list.php:70
-#: include/views/configuration.sysmap.list.php:63 templates.php:646
+#: hosts.php:936 include/views/configuration.screen.list.php:70
+#: include/views/configuration.sysmap.list.php:63 templates.php:638
 msgid "Export selected"
 msgstr "Експортиране на избраните"
 
@@ -4633,6 +4573,46 @@ msgstr "Поле"
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr ""
 
+#: include/validate.inc.php:400
+#, php-format
+msgid "Field \"%1$s\" is mandatory."
+msgstr ""
+
+#: include/validate.inc.php:313
+#, php-format
+msgid "Field \"%1$s\" is not IP range."
+msgstr ""
+
+#: include/validate.inc.php:303
+#, php-format
+msgid "Field \"%1$s\" is not IP."
+msgstr ""
+
+#: include/validate.inc.php:338
+#, php-format
+msgid "Field \"%1$s\" is not decimal number."
+msgstr ""
+
+#: include/validate.inc.php:323
+#, php-format
+msgid "Field \"%1$s\" is not integer list or range."
+msgstr ""
+
+#: include/validate.inc.php:332
+#, php-format
+msgid "Field \"%1$s\" is not integer."
+msgstr ""
+
+#: include/validate.inc.php:344
+#, php-format
+msgid "Field \"%1$s\" is not string."
+msgstr ""
+
+#: include/validate.inc.php:412
+#, php-format
+msgid "Field \"%1$s\" must be missing."
+msgstr ""
+
 #: api/classes/CDRule.php:384
 msgid "Field \"druleid\" is required."
 msgstr "Поле \"druleid\" е задължително."
@@ -4663,7 +4643,7 @@ msgstr "Файлът не съществува. Опитвате се да на�
 msgid "Filled region"
 msgstr "Запълване"
 
-#: events.php:356 hostinventories.php:133 hosts.php:726
+#: events.php:356 hostinventories.php:133 hosts.php:720
 #: include/classes/class.cwidget.php:130 include/forms.inc.php:628
 #: include/views/administration.auditacts.list.php:49
 #: include/views/administration.auditlogs.list.php:65
@@ -4844,7 +4824,7 @@ msgstr "Глобален скрипт"
 msgid "Global scripts"
 msgstr "Глобални скриптове"
 
-#: hosts.php:953
+#: hosts.php:947
 #: include/views/administration.general.regularexpressions.list.php:70
 #: include/views/administration.mediatypes.list.php:125
 #: include/views/administration.proxy.list.php:109
@@ -4864,7 +4844,7 @@ msgstr "Глобални скриптове"
 #: include/views/configuration.screen.list.php:76
 #: include/views/configuration.slideconf.list.php:64
 #: include/views/configuration.sysmap.list.php:67
-#: include/views/configuration.triggers.list.php:279 templates.php:653
+#: include/views/configuration.triggers.list.php:279 templates.php:645
 #: tr_status.php:885
 msgid "Go"
 msgstr "Изпълни"
@@ -5013,7 +4993,7 @@ msgstr "Графика с името \"%1$s\" вече съществува в �
 msgid "Graph with same name but other type exist."
 msgstr "Графика със същото име, но различен тип вече съществува."
 
-#: dashboard.php:293 hosts.php:758 hosts.php:834 include/blocks.inc.php:1263
+#: dashboard.php:293 hosts.php:752 hosts.php:828 include/blocks.inc.php:1263
 #: include/html.inc.php:493 include/html.inc.php:497 include/items.inc.php:866
 #: include/menu.inc.php:62 include/triggers.inc.php:1327
 #: include/views/configuration.graph.list.php:56
@@ -5023,7 +5003,7 @@ msgstr "Графика със същото име, но различен тип 
 #: include/views/conf.import.php:34 include/views/monitoring.charts.php:32
 #: include/views/monitoring.charts.php:41 popup.php:76 search.php:141
 #: search.php:175 search.php:198 search.php:385 search.php:416 search.php:443
-#: templates.php:492 templates.php:555
+#: templates.php:484 templates.php:547
 msgid "Graphs"
 msgstr "Графики"
 
@@ -5045,7 +5025,7 @@ msgid "Grid"
 msgstr "Решетка"
 
 #: events.php:285 hostinventoriesoverview.php:83 hostinventories.php:92
-#: hostinventories.php:159 hosts.php:711 httpmon.php:72
+#: hostinventories.php:159 hosts.php:705 httpmon.php:72
 #: include/classes/class.chostsinfo.php:112
 #: include/classes/class.ctriggersinfo.php:121
 #: include/classes/screens/CScreenHostgroupTriggers.php:61
@@ -5066,7 +5046,7 @@ msgstr "Решетка"
 #: include/views/monitoring.overview.php:32
 #: include/views/monitoring.screen.php:98
 #: include/views/monitoring.slides.php:82 latest.php:154 popup.php:508
-#: templates.php:476 tr_status.php:252
+#: templates.php:468 tr_status.php:252
 msgid "Group"
 msgstr "Група"
 
@@ -5344,7 +5324,7 @@ msgstr "Инвентарни данни на хост"
 msgid "Host access"
 msgstr "Хост достъп"
 
-#: hosts.php:373
+#: hosts.php:367
 msgid "Host added"
 msgstr "Хост добавен"
 
@@ -5357,7 +5337,7 @@ msgstr "Хоста не може да има повече от един стан
 msgid "Host count"
 msgstr "Хост брояч"
 
-#: hosts.php:563 hosts.php:580
+#: hosts.php:557 hosts.php:574
 msgid "Host deleted"
 msgstr "Хост изтрит"
 
@@ -5467,7 +5447,7 @@ msgstr "Хост екрани"
 msgid "Host status"
 msgstr "Състояние на хост"
 
-#: hostgroups.php:217 hosts.php:600 proxies.php:169
+#: hostgroups.php:217 hosts.php:594 proxies.php:169
 msgid "Host status updated"
 msgstr "Състояние на хост актуализирано"
 
@@ -5483,7 +5463,7 @@ msgstr "Хост време"
 msgid "Host update failed."
 msgstr "Актуализацията на хоста се провали."
 
-#: hosts.php:368
+#: hosts.php:362
 msgid "Host updated"
 msgstr "Хост актуализиран"
 
@@ -5498,7 +5478,7 @@ msgstr "Хост със същото име \"%s\" вече съществува
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "Хост със същото видимо име \"%s\" вече съществува."
 
-#: hostinventoriesoverview.php:85 hostinventories.php:93 hosts.php:713
+#: hostinventoriesoverview.php:85 hostinventories.php:93 hosts.php:707
 #: include/forms.inc.php:225 include/forms.inc.php:898
 #: include/items.inc.php:813 include/menu.inc.php:112 include/menu.inc.php:168
 #: include/reports.inc.php:366 include/views/administration.proxy.edit.php:84
@@ -5543,7 +5523,7 @@ msgstr "Информация за хостове"
 msgid "Hosts location"
 msgstr "Местоположение на хостове"
 
-#: hosts.php:346
+#: hosts.php:340
 msgid "Hosts updated"
 msgstr "Хостове актуализирани"
 
@@ -5584,7 +5564,7 @@ msgstr "ID"
 msgid "IMAP"
 msgstr "IMAP"
 
-#: events.php:502 events.php:511 hosts.php:722
+#: events.php:502 events.php:511 hosts.php:716
 #: include/views/administration.auditlogs.list.php:87
 #: include/views/administration.node.edit.php:75
 #: include/views/administration.node.list.php:44
@@ -5879,10 +5859,10 @@ msgstr "Изображенията за всички карти ще бъдат 
 msgid "Immediately"
 msgstr "Веднага"
 
-#: hosts.php:704 include/views/configuration.screen.list.php:33
+#: hosts.php:698 include/views/configuration.screen.list.php:33
 #: include/views/configuration.sysmap.list.php:28
 #: include/views/conf.import.php:69 include/views/conf.import.php:74
-#: templates.php:469
+#: templates.php:461
 msgid "Import"
 msgstr "Импортиране"
 
@@ -5922,7 +5902,7 @@ msgstr "В група"
 msgid "In groups"
 msgstr "В групи"
 
-#: hosts.php:863 include/views/configuration.maintenance.edit.php:168
+#: hosts.php:857 include/views/configuration.maintenance.edit.php:168
 #: include/views/configuration.maintenance.edit.php:176
 msgid "In maintenance"
 msgstr "В поддръжка"
@@ -6545,6 +6525,16 @@ msgstr "Неправилни потребителски данни в \"get_acce
 msgid "Incorrect user group."
 msgstr "Неправилна потребителска група."
 
+#: include/validate.inc.php:451
+#, php-format
+msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
+msgstr ""
+
+#: include/validate.inc.php:447
+#, php-format
+msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
+msgstr ""
+
 #: include/classes/db/DB.php:357
 #, php-format
 msgid "Incorrect value \"%1$s\" for float field \"%2$s\"."
@@ -6559,6 +6549,11 @@ msgstr "Неправилна стойност \"%1$s\" за поле цяло ч
 #, php-format
 msgid "Incorrect value \"%1$s\" for unsigned int field \"%2$s\"."
 msgstr "Неправилна стойност \"%1$s\" за поле цяло положително число \"%2$s\"."
+
+#: include/validate.inc.php:442
+#, php-format
+msgid "Incorrect value for field \"%1$s\": cannot be empty."
+msgstr ""
 
 #: include/classes/class.cbuttonqmessage.php:52
 #, php-format
@@ -6614,7 +6609,7 @@ msgstr "Инсталация"
 msgid "Installer name"
 msgstr "Име на инсталатора"
 
-#: disc_prototypes.php:41 host_discovery.php:40 hosts.php:761
+#: disc_prototypes.php:41 host_discovery.php:40 hosts.php:755
 #: include/views/administration.proxy.edit.php:71 items.php:40
 msgid "Interface"
 msgstr "Интерфейс"
@@ -6643,11 +6638,20 @@ msgstr "В интерфейс с IP \"%1$s\" не може да бъде пра�
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name."
 msgstr "В интерфейс с IP \"%1$s\" не може да бъде празно DNS името."
 
-#: include/users.inc.php:84
 #: include/views/administration.authentication.edit.php:35
-#: include/views/configuration.action.list.php:36
+msgctxt "authentication"
 msgid "Internal"
-msgstr "Вътрешен"
+msgstr ""
+
+#: include/views/configuration.action.list.php:36
+msgctxt "event source"
+msgid "Internal"
+msgstr ""
+
+#: include/users.inc.php:84
+msgctxt "user type"
+msgid "Internal"
+msgstr ""
 
 #: api/rpc/class.cjsonrpc.php:202
 msgid "Internal JSON-RPC error."
@@ -6948,7 +6952,7 @@ msgstr "Ключ от елемент на данните \"%1$s\" вече съ�
 msgid "Item with key \"%1$s\" already exists."
 msgstr "Ключ от елемент на данните \"%1$s\" вече съществува."
 
-#: hosts.php:756 hosts.php:830 include/html.inc.php:443
+#: hosts.php:750 hosts.php:824 include/html.inc.php:443
 #: include/html.inc.php:447 include/items.inc.php:794
 #: include/reports.inc.php:109 include/reports.inc.php:245
 #: include/views/configuration.application.list.php:99
@@ -6959,7 +6963,7 @@ msgstr "Ключ от елемент на данните \"%1$s\" вече съ�
 #: include/views/configuration.template.edit.php:217
 #: include/views/conf.import.php:31 latest.php:157 popup.php:56 queue.php:101
 #: search.php:139 search.php:167 search.php:190 search.php:383 search.php:408
-#: search.php:435 templates.php:490 templates.php:551
+#: search.php:435 templates.php:482 templates.php:543
 msgid "Items"
 msgstr "Елементи на данните "
 
@@ -7471,11 +7475,11 @@ msgstr "Връзка с шаблони"
 
 #: include/views/configuration.host.edit.php:537
 #: include/views/configuration.template.edit.php:403
-#: include/views/configuration.template.edit.php:424 templates.php:496
+#: include/views/configuration.template.edit.php:424 templates.php:488
 msgid "Linked templates"
 msgstr "Свързани шаблони"
 
-#: templates.php:497
+#: templates.php:489
 msgid "Linked to"
 msgstr "Свързано с"
 
@@ -7868,7 +7872,7 @@ msgstr "Маркирай избраните"
 msgid "Mask"
 msgstr ""
 
-#: hosts.php:943 include/views/configuration.item.list.php:280
+#: hosts.php:937 include/views/configuration.item.list.php:280
 #: include/views/configuration.item.massupdate.php:558
 #: include/views/configuration.triggers.list.php:270
 msgid "Mass update"
@@ -7930,6 +7934,13 @@ msgstr[1] "Максималната дължина на името на хост
 #: include/views/configuration.item.massupdate.php:372
 msgid "Maximum number of flexible intervals added"
 msgstr ""
+
+#: include/classes/screens/CScreenBase.php:339 include/graphs.inc.php:401
+#, php-format
+msgid "Maximum time period to display is %1$s day."
+msgid_plural "Maximum time period to display is %1$s days."
+msgstr[0] ""
+msgstr[1] ""
 
 #: popup_trexpr.php:259
 msgid "Maximum value for period T is < N"
@@ -8113,6 +8124,13 @@ msgstr "Минимално изискване за размер на PHP пос�
 msgid "Minimum severity"
 msgstr ""
 
+#: include/classes/screens/CScreenBase.php:334 include/graphs.inc.php:394
+#, php-format
+msgid "Minimum time period to display is %1$s hour."
+msgid_plural "Minimum time period to display is %1$s hours."
+msgstr[0] ""
+msgstr[1] ""
+
 #: include/views/configuration.sysmap.edit.php:132 tr_status.php:303
 msgid "Minimum trigger severity"
 msgstr ""
@@ -8179,7 +8197,7 @@ msgstr ""
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
 msgstr "Липсващ ключ \"%1$s\" за хост \"%2$s\"."
 
-#: api/classes/CUserGroup.php:417
+#: api/classes/CUserGroup.php:416
 msgid "Missing parameter: usrgrpids."
 msgstr "Липсващ параметър: usrgrpids."
 
@@ -8200,7 +8218,7 @@ msgstr "Пн"
 msgid "Monday"
 msgstr "Понеделник"
 
-#: hosts.php:867 include/html.inc.php:391
+#: hosts.php:861 include/html.inc.php:391
 #: include/views/configuration.host.edit.php:295
 #: include/views/configuration.host.massupdate.php:145
 msgid "Monitored"
@@ -8285,8 +8303,8 @@ msgstr "NTLM автентификация"
 
 #: actionconf.php:37 actionconf.php:158 adm.regexps.php:37 adm.regexps.php:140
 #: adm.regexps.php:178 applications.php:39 disc_prototypes.php:42
-#: graphs.php:42 host_discovery.php:41 hostinventories.php:160 hosts.php:720
-#: hosts.php:754 httpconf.php:44 httpmon.php:88 include/forms.inc.php:603
+#: graphs.php:42 host_discovery.php:41 hostinventories.php:160 hosts.php:714
+#: hosts.php:748 httpconf.php:44 httpmon.php:88 include/forms.inc.php:603
 #: include/hosts.inc.php:115 include/reports.inc.php:162
 #: include/setup.inc.php:325
 #: include/views/administration.general.iconmap.edit.php:29
@@ -8697,7 +8715,7 @@ msgstr "Няма хост група с groupid \"%s\"."
 msgid "No host with hostid \"%s\"."
 msgstr "Няма хост с  hostid \"%s\"."
 
-#: hostinventoriesoverview.php:88 hostinventories.php:155 hosts.php:750
+#: hostinventoriesoverview.php:88 hostinventories.php:155 hosts.php:744
 msgid "No hosts defined."
 msgstr "Не са дефинирани хостове."
 
@@ -8995,7 +9013,7 @@ msgid "No target selected."
 msgstr "Не е избрана цел."
 
 #: include/views/configuration.host.edit.php:503
-#: include/views/configuration.template.edit.php:376 templates.php:484
+#: include/views/configuration.template.edit.php:376 templates.php:476
 msgid "No templates defined."
 msgstr "Не са дефинирани шабнони."
 
@@ -9051,7 +9069,7 @@ msgstr "Не са дефинирани уеб проверки."
 msgid "No web scenarios defined."
 msgstr "Не са дефинирани уеб сценарии."
 
-#: events.php:578 events.php:591 hostinventories.php:157 hosts.php:753
+#: events.php:578 events.php:591 hostinventories.php:157 hosts.php:747
 #: httpmon.php:86 include/actions.inc.php:68 include/audit.inc.php:42
 #: include/blocks.inc.php:185 include/blocks.inc.php:375
 #: include/blocks.inc.php:908 include/blocks.inc.php:1044
@@ -9081,7 +9099,7 @@ msgstr "Не са дефинирани уеб сценарии."
 #: include/views/configuration.triggers.list.php:107
 #: include/views/monitoring.discovery.php:40 latest.php:190 popup.php:485
 #: popup_right.php:66 queue.php:201 report2.php:395 report5.php:59
-#: search.php:129 search.php:270 search.php:380 templates.php:487
+#: search.php:129 search.php:270 search.php:380 templates.php:479
 #: tr_status.php:370
 msgid "Node"
 msgstr "Възлова точка"
@@ -9164,7 +9182,7 @@ msgstr "Не е класифицирано"
 msgid "Not connected"
 msgstr "Не е свързан"
 
-#: hosts.php:876 include/html.inc.php:394
+#: hosts.php:870 include/html.inc.php:394
 #: include/views/configuration.host.edit.php:296
 #: include/views/configuration.host.massupdate.php:146
 msgid "Not monitored"
@@ -9423,7 +9441,7 @@ msgid "Only Super Admins can delete media types."
 msgstr "Само Супер Администраторите могат да изтриват методи на уведомление."
 
 #. GETTEXT: API exception
-#: api/classes/CUserGroup.php:612
+#: api/classes/CUserGroup.php:606
 msgid "Only Super Admins can delete user groups."
 msgstr "Само Супер Администраторите могат да изтриват потребителски групи."
 
@@ -9440,7 +9458,7 @@ msgstr "Само Супер Администраторите могат да а�
 msgid "Only Super Admins can update icon maps."
 msgstr "Само Супер Администраторите могат да актуализират съответствие на икона."
 
-#: api/classes/CUserGroup.php:289 api/classes/CUserGroup.php:411
+#: api/classes/CUserGroup.php:289 api/classes/CUserGroup.php:410
 msgid "Only Super Admins can update user groups."
 msgstr "Само Супер Администраторите могат да актуализират потребителски групи."
 
@@ -9468,7 +9486,7 @@ msgstr "Преброени са само елементи на данните в
 msgid "Only one check can be unique."
 msgstr "Само една проверка може да бъде уникална."
 
-#: api/classes/CUserGroup.php:424
+#: api/classes/CUserGroup.php:423
 msgid "Only one user group name can be changed at a time."
 msgstr "Само едно име на потребителска група може да бъде променено в даден момент."
 
@@ -9494,7 +9512,7 @@ msgstr "Opera"
 msgid "Operation \"%s\" already exists."
 msgstr "Операция \"%s\" вече съществува."
 
-#: include/validate.inc.php:472
+#: include/validate.inc.php:424
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "Операцията не може да се извърши поради неоторизирано искане."
 
@@ -9817,7 +9835,7 @@ msgstr "POP"
 msgid "PROBLEM"
 msgstr "ПРОБЛЕМ"
 
-#: include/validate.inc.php:577
+#: include/validate.inc.php:515
 msgid "Page received incorrect data"
 msgstr "Страницата получи неверни данни"
 
@@ -10006,7 +10024,7 @@ msgid "Populates host inventory field"
 msgstr "Попълнете полето: данни за инвентаризация на хост"
 
 #: authentication.php:37 disc_prototypes.php:82 host_discovery.php:79
-#: hosts.php:723 include/forms.inc.php:494 include/setup.inc.php:321
+#: hosts.php:717 include/forms.inc.php:494 include/setup.inc.php:321
 #: include/views/administration.authentication.edit.php:58
 #: include/views/administration.node.edit.php:78
 #: include/views/administration.node.list.php:44
@@ -10547,7 +10565,7 @@ msgstr "Необходими кодове за състояние"
 msgid "Required string"
 msgstr "Необходим низ"
 
-#: events.php:357 hostinventories.php:138 hosts.php:731
+#: events.php:357 hostinventories.php:138 hosts.php:725
 #: include/forms.inc.php:633 include/html.inc.php:285
 #: include/reports.inc.php:121 include/reports.inc.php:259
 #: include/reports.inc.php:438
@@ -11054,7 +11072,7 @@ msgstr "Екран актуализиран"
 #: include/views/monitoring.screen.php:79
 #: include/views/monitoring.slides.php:31 popup.php:68 popup.php:84
 #: search.php:136 search.php:218 search.php:386 search.php:420 search.php:447
-#: templates.php:493 templates.php:557
+#: templates.php:485 templates.php:549
 msgid "Screens"
 msgstr "Екрани"
 
@@ -11706,7 +11724,7 @@ msgstr "Започни в"
 msgid "State"
 msgstr "Състояние"
 
-#: events.php:505 events.php:514 events.php:581 events.php:594 hosts.php:763
+#: events.php:505 events.php:514 events.php:581 events.php:594 hosts.php:757
 #: httpdetails.php:134 httpmon.php:91 include/actions.inc.php:830
 #: include/actions.inc.php:908 include/actions.inc.php:967
 #: include/classes/screens/CScreenActions.php:58
@@ -12022,7 +12040,7 @@ msgstr ""
 msgid "Template \"%s\" already exists."
 msgstr "Шаблон \"%s\" вече съществува."
 
-#: templates.php:170
+#: templates.php:164
 msgid "Template added"
 msgstr "Шаблон добавен"
 
@@ -12030,7 +12048,7 @@ msgstr "Шаблон добавен"
 msgid "Template cannot be linked to another template more than once even through other templates."
 msgstr "Шаблонът не може да бъде прикрепен към друг шаблон повече от веднъж, дори чрез други шаблони."
 
-#: templates.php:355 templates.php:371 templates.php:399
+#: templates.php:349 templates.php:365 templates.php:393
 msgid "Template deleted"
 msgstr "Шаблон изтрит"
 
@@ -12058,7 +12076,7 @@ msgstr "Шаблон на екрани"
 msgid "Template trigger"
 msgstr "Шаблон на тригер"
 
-#: templates.php:166
+#: templates.php:160
 msgid "Template updated"
 msgstr "Шаблон актуалзиран"
 
@@ -12082,13 +12100,13 @@ msgstr "Шаблон със същото видимо име \"%s\" вече с�
 msgid "Templated items"
 msgstr "Шаблонни елементи на данните"
 
-#: hosts.php:762 include/menu.inc.php:164
+#: hosts.php:756 include/menu.inc.php:164
 #: include/views/configuration.host.edit.php:554
 #: include/views/configuration.hostgroups.list.php:116
 #: include/views/configuration.host.massupdate.php:287
 #: include/views/conf.import.php:28 search.php:276 search.php:305
 #: search.php:310 search.php:317 search.php:381 search.php:469
-#: templates.php:478 templates.php:488
+#: templates.php:470 templates.php:480
 msgid "Templates"
 msgstr "Шаблони"
 
@@ -12510,7 +12528,7 @@ msgstr "Тригер актуализиран"
 msgid "Trigger value"
 msgstr "Стойност на тригер"
 
-#: hosts.php:757 hosts.php:832 include/forms.inc.php:594
+#: hosts.php:751 hosts.php:826 include/forms.inc.php:594
 #: include/html.inc.php:468 include/html.inc.php:472 include/menu.inc.php:52
 #: include/triggers.inc.php:1183
 #: include/views/configuration.action.list.php:33
@@ -12525,7 +12543,7 @@ msgstr "Стойност на тригер"
 #: include/views/monitoring.overview.php:28 jsLoader.php:110 popup.php:44
 #: search.php:134 search.php:140 search.php:171 search.php:194 search.php:216
 #: search.php:273 search.php:325 search.php:384 search.php:412 search.php:439
-#: templates.php:491 templates.php:553 tr_status.php:260
+#: templates.php:483 templates.php:545 tr_status.php:260
 msgid "Triggers"
 msgstr "Тригери"
 
@@ -12771,7 +12789,7 @@ msgid "Units"
 msgstr "Единици за измерване"
 
 #: events.php:525 events.php:526 events.php:536 events.php:537 events.php:538
-#: events.php:539 hosts.php:883 httpdetails.php:163 httpmon.php:156
+#: events.php:539 hosts.php:877 httpdetails.php:163 httpmon.php:156
 #: include/actions.inc.php:41 include/actions.inc.php:98
 #: include/actions.inc.php:115 include/actions.inc.php:139
 #: include/actions.inc.php:163 include/actions.inc.php:176
@@ -13056,7 +13074,7 @@ msgstr "Потребител добавен"
 msgid "User can't change type for himself"
 msgstr "Потребителят не може да промени типа за себе си"
 
-#: api/classes/CUserGroup.php:467
+#: api/classes/CUserGroup.php:466
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "Потребителят не може да добави себе си към изключена група или група с изключен GUI достъп."
 
@@ -13085,17 +13103,17 @@ msgstr "Потребител изтрит"
 msgid "User group"
 msgstr "Потребителска група"
 
-#: api/classes/CUserGroup.php:625
+#: api/classes/CUserGroup.php:619
 #, php-format
 msgid "User group \"%1$s\" is used in script \"%2$s\"."
 msgstr "Потребителска група \"%1$s\" се използва в скрипт \"%2$s\"."
 
-#: api/classes/CUserGroup.php:435
+#: api/classes/CUserGroup.php:434
 #, php-format
 msgid "User group \"%s\" already exists."
 msgstr "Потребителска група \"%s\" вече съществува."
 
-#: api/classes/CUserGroup.php:632
+#: api/classes/CUserGroup.php:626
 #, php-format
 msgid "User group [%s] is used in configuration for database down messages."
 msgstr "Потребителска група [%s] се използва в конфигурация на съобщения при недостъпност на база данните."
@@ -13333,96 +13351,13 @@ msgstr "Ср"
 msgid "Warning"
 msgstr "Внимание"
 
-#: chart7.php:74
-msgid "Warning. Cannot display more than one item with type \"Graph sum\"."
-msgstr "Внимание. Не може да се покаже повече от един елемент с тип \"Сумарна графика\"."
-
-#: include/validate.inc.php:393
-#, php-format
-msgid "Warning. Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
-msgstr "Внимание. Цвят \"%1$s\" не е коректен: очаква шестнадесетичен код на цвят (6 символа)."
-
-#: include/validate.inc.php:443
-#, php-format
-msgid "Warning. Field \"%1$s\" is mandatory."
-msgstr "Внимание. Поле \"%1$s\" е задължително."
-
-#: include/validate.inc.php:319
-#, php-format
-msgid "Warning. Field \"%1$s\" is not IP range."
-msgstr "Внимание. Поле \"%1$s\" не е валиден IP диапазон."
-
-#: include/validate.inc.php:305
-#, php-format
-msgid "Warning. Field \"%1$s\" is not IP."
-msgstr "Внимание. Поле \"%1$s\" не е IP."
-
-#: include/validate.inc.php:357
-#, php-format
-msgid "Warning. Field \"%1$s\" is not decimal number."
-msgstr "Внимание. Поле \"%1$s\" не е десетично число."
-
-#: include/validate.inc.php:333
-#, php-format
-msgid "Warning. Field \"%1$s\" is not integer list or range."
-msgstr "Внимание. Поле \"%1$s\" не е списък на цяло число или диапазон."
-
-#: include/validate.inc.php:346
-#, php-format
-msgid "Warning. Field \"%1$s\" is not integer."
-msgstr "Внимание. Поле \"%1$s\" не е цяло число."
-
-#: include/validate.inc.php:368
-#, php-format
-msgid "Warning. Field \"%1$s\" is not string."
-msgstr "Внимание. Поле \"%1$s\" не е низ."
-
-#: include/validate.inc.php:379
-#, php-format
-msgid "Warning. Field \"%1$s\" multibyte chars are restricted."
-msgstr "Внимание. Поле \"%1$s\" многобайтовите символи са ограничени."
-
-#: include/validate.inc.php:460
-#, php-format
-msgid "Warning. Field \"%1$s\" must be missing."
-msgstr "Внимание. Поле \"%1$s\" трябва да липсва."
-
-#: include/validate.inc.php:513
-#, php-format
-msgid "Warning. Incorrect value for field \"%1$s\"."
-msgstr "Внимание. Неправилна стойност за поле \"%1$s\"."
-
-#: include/validate.inc.php:494
-#, php-format
-msgid "Warning. Incorrect value for field \"%1$s\": cannot be empty."
-msgstr "Внимание. Неправилна стойност за поле \"%1$s\": не може да бъде празно."
-
-#: include/validate.inc.php:504
-#, php-format
-msgid "Warning. Incorrect value for field \"%1$s\": must be between %2$s and %3$s."
-msgstr "Внимание. Неправилна стойност за поле \"%1$s\": трябва да бъде между %2$s и %3$s."
-
-#: include/classes/screens/CScreenBase.php:339 include/graphs.inc.php:401
-#, php-format
-msgid "Warning. Maximum time period to display is %1$s day."
-msgid_plural "Warning. Maximum time period to display is %1$s days."
-msgstr[0] "Внимание. Максималния период от време за показване е %1$s дена"
-msgstr[1] "Внимание. Максималния период от време за показване е %1$s дни."
-
-#: include/classes/screens/CScreenBase.php:334 include/graphs.inc.php:394
-#, php-format
-msgid "Warning. Minimum time period to display is %1$s hour."
-msgid_plural "Warning. Minimum time period to display is %1$s hours."
-msgstr[0] "Внимание. Минималния период от време за показване е %1$s часа."
-msgstr[1] "Внимание. Минималния период от време за показване е %1$s часа."
-
 #: jsLoader.php:170
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "Съжаляваме, достигнат е максималния възможен брой от елементи."
 
-#: hosts.php:760 hosts.php:838 include/menu.inc.php:42 search.php:137
+#: hosts.php:754 hosts.php:832 include/menu.inc.php:42 search.php:137
 #: search.php:142 search.php:179 search.php:202 search.php:219 search.php:387
-#: search.php:424 search.php:451 templates.php:495 templates.php:561
+#: search.php:424 search.php:451 templates.php:487 templates.php:553
 msgid "Web"
 msgstr "Уеб"
 
@@ -13894,7 +13829,7 @@ msgstr "Zabbix агент (активен)"
 msgid "Zabbix aggregate"
 msgstr "Zabbix агрегат"
 
-#: include/validate.inc.php:525
+#: include/validate.inc.php:462
 msgid "Zabbix has received an incorrect request."
 msgstr "Zabbix получи невалидна заявка."
 
@@ -14199,6 +14134,7 @@ msgid "in"
 msgstr "в"
 
 #: include/events.inc.php:37
+msgctxt "event source"
 msgid "internal"
 msgstr ""
 
@@ -14216,7 +14152,7 @@ msgstr ""
 msgid "last"
 msgstr "последно"
 
-#: hostinventories.php:121 hosts.php:720 hosts.php:721 hosts.php:722
+#: hostinventories.php:121 hosts.php:714 hosts.php:715 hosts.php:716
 #: include/actions.inc.php:29 include/forms.inc.php:473
 #: include/forms.inc.php:480 include/forms.inc.php:487
 #: include/forms.inc.php:494 include/forms.inc.php:603

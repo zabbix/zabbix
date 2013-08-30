@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-30 01:14+0300\n"
+"POT-Creation-Date: 2013-08-30 13:52+0300\n"
 "PO-Revision-Date: 2013-08-27 05:56+0200\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -615,7 +615,7 @@ msgstr "アプリケーションを更新しました"
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "\"%2$s\"にID\"%1$s\"を持つアプリケーションは利用できません。"
 
-#: hosts.php:755 hosts.php:828 include/forms.inc.php:903
+#: hosts.php:749 hosts.php:822 include/forms.inc.php:903
 #: include/html.inc.php:419 include/html.inc.php:423
 #: include/views/configuration.application.list.php:47
 #: include/views/configuration.host.edit.php:318
@@ -624,7 +624,7 @@ msgstr "\"%2$s\"にID\"%1$s\"を持つアプリケーションは利用できま
 #: include/views/configuration.item.prototype.list.php:57
 #: include/views/configuration.template.edit.php:196 popup.php:40
 #: search.php:138 search.php:163 search.php:186 search.php:382 search.php:404
-#: search.php:431 templates.php:489 templates.php:549
+#: search.php:431 templates.php:481 templates.php:541
 msgid "Applications"
 msgstr "アプリケーション"
 
@@ -810,7 +810,7 @@ msgstr "アイコンの自動マッピング"
 msgid "Automatic icon selection"
 msgstr "アイコンの自動選択"
 
-#: hosts.php:764
+#: hosts.php:758
 msgid "Availability"
 msgstr "エージェントの状態"
 
@@ -990,7 +990,7 @@ msgstr "GUIの設定"
 msgid "CONFIGURATION OF HOST GROUPS"
 msgstr "ホストグループの設定"
 
-#: hosts.php:622 hosts.php:687 hosts.php:708
+#: hosts.php:616 hosts.php:681 hosts.php:702
 msgid "CONFIGURATION OF HOSTS"
 msgstr "ホストの設定"
 
@@ -1075,7 +1075,7 @@ msgstr "スクリプトの設定"
 msgid "CONFIGURATION OF SLIDE SHOWS"
 msgstr "スライドショーの設定"
 
-#: templates.php:421 templates.php:473
+#: templates.php:415 templates.php:465
 msgid "CONFIGURATION OF TEMPLATES"
 msgstr "テンプレートの設定"
 
@@ -1225,7 +1225,7 @@ msgstr "グラフを追加できません"
 msgid "Cannot add group"
 msgstr "グループを追加できません"
 
-#: hosts.php:374
+#: hosts.php:368
 msgid "Cannot add host"
 msgstr "ホストを追加できません"
 
@@ -1299,7 +1299,7 @@ msgstr "サービスを追加できません"
 msgid "Cannot add slide show"
 msgstr "スライドショーを追加できません"
 
-#: templates.php:171
+#: templates.php:165
 msgid "Cannot add template"
 msgstr "テンプレートを追加できません"
 
@@ -1469,7 +1469,7 @@ msgstr "ローレベルディスカバリによって作成されたグラフは
 msgid "Cannot delete group"
 msgstr "グループを削除できません"
 
-#: hosts.php:563 hosts.php:580
+#: hosts.php:557 hosts.php:574
 msgid "Cannot delete host"
 msgstr "ホストを削除できません"
 
@@ -1560,7 +1560,7 @@ msgstr "サービスを削除できません"
 msgid "Cannot delete slide show"
 msgstr "スライドショーを削除できません"
 
-#: templates.php:355 templates.php:371 templates.php:399
+#: templates.php:349 templates.php:365 templates.php:393
 msgid "Cannot delete template"
 msgstr "テンプレートを削除できません"
 
@@ -1641,6 +1641,10 @@ msgstr "Webシナリオを無効にできません"
 #: queue.php:61
 msgid "Cannot display item queue."
 msgstr "アイテムのキューを表示できません。"
+
+#: chart7.php:74
+msgid "Cannot display more than one item with type \"Graph sum\"."
+msgstr ""
 
 #: media_types.php:160
 msgid "Cannot enable media type"
@@ -2018,15 +2022,15 @@ msgstr "グループを更新できません"
 msgid "Cannot update group."
 msgstr "グループを更新できません"
 
-#: hostgroups.php:217 hosts.php:369
+#: hostgroups.php:217 hosts.php:363
 msgid "Cannot update host"
 msgstr "ホストを更新できません"
 
-#: hosts.php:600
+#: hosts.php:594
 msgid "Cannot update host status"
 msgstr "ホストのステータスを更新できません"
 
-#: hosts.php:353
+#: hosts.php:347
 msgid "Cannot update hosts"
 msgstr "ホストを更新できません"
 
@@ -2111,7 +2115,7 @@ msgstr "スライドショーを更新できません"
 msgid "Cannot update status"
 msgstr "ステータスを更新できません"
 
-#: templates.php:167
+#: templates.php:161
 msgid "Cannot update template"
 msgstr "テンプレートを更新できません"
 
@@ -2323,7 +2327,8 @@ msgstr "条件式ビルダーを閉じる"
 msgid "Colour"
 msgstr "色"
 
-#: include/classes/validators/CColorValidator.php:33 jsLoader.php:159
+#: include/classes/validators/CColorValidator.php:33
+#: include/validate.inc.php:354 jsLoader.php:159
 #, php-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "色\"%1$s\"の設定が正しくありません: 16進数のカラーコードを指定してください(6文字)。"
@@ -2720,7 +2725,7 @@ msgstr "グラフの作成 (先にホストを選択)"
 msgid "Create graph prototype"
 msgstr "グラフのプロトタイプの作成"
 
-#: hosts.php:703
+#: hosts.php:697
 msgid "Create host"
 msgstr "ホストの作成"
 
@@ -2789,7 +2794,7 @@ msgstr "スクリプトの作成"
 msgid "Create slide show"
 msgstr "スライドショーの作成"
 
-#: templates.php:468
+#: templates.php:460
 msgid "Create template"
 msgstr "テンプレートの作成"
 
@@ -2851,71 +2856,6 @@ msgstr "作成: \"%2$s\"のトリガーのプロトタイプ\"%1$s\"。"
 #, php-format
 msgid "Created: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "作成: \"%2$s\"のWebシナリオ\"%1$s\"."
-
-#: include/validate.inc.php:389
-#, php-format
-msgid "Critical error. Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
-msgstr "クリティカルエラー。色\"%1$s\"の設定が正しくありません: 16進数のカラーコードを指定してください(6文字)。"
-
-#: include/validate.inc.php:375
-#, php-format
-msgid "Critical error. Field \"%1$s\" contains Multibyte chars."
-msgstr "クリティカルエラー。フィールド\"%1$s\"はマルチバイト文字列を含んでいます。"
-
-#: include/validate.inc.php:439
-#, php-format
-msgid "Critical error. Field \"%1$s\" is mandatory."
-msgstr "クリティカルエラー。フィールド\"%1$s\"は必須です。"
-
-#: include/validate.inc.php:315
-#, php-format
-msgid "Critical error. Field \"%1$s\" is not IP range."
-msgstr "クリティカルエラー。フィールド\"%1$s\"はIPアドレスの範囲ではありません。"
-
-#: include/validate.inc.php:301
-#, php-format
-msgid "Critical error. Field \"%1$s\" is not IP."
-msgstr "クリティカルエラー。フィールド\"%1$s\"はIPアドレスではありません。"
-
-#: include/validate.inc.php:353
-#, php-format
-msgid "Critical error. Field \"%1$s\" is not decimal number."
-msgstr "クリティカルエラー。フィールド\"%1$s\"は10進数ではありません。"
-
-#: include/validate.inc.php:329
-#, php-format
-msgid "Critical error. Field \"%1$s\" is not integer list or range."
-msgstr "クリティカルエラー。フィールド\"%1$s\"はリストや指定された範囲内の整数値ではありません。"
-
-#: include/validate.inc.php:342
-#, php-format
-msgid "Critical error. Field \"%1$s\" is not integer."
-msgstr "クリティカルエラー。フィールド\"%1$s\"は整数値ではありません。"
-
-#: include/validate.inc.php:364
-#, php-format
-msgid "Critical error. Field \"%1$s\" is not string."
-msgstr "クリティカルエラー。フィールド\"%1$s\"は文字列ではありません。"
-
-#: include/validate.inc.php:456
-#, php-format
-msgid "Critical error. Field \"%1$s\" must be missing."
-msgstr "クリティカルエラー。フィールド\"%1$s\"が入力されていません。"
-
-#: include/validate.inc.php:510
-#, php-format
-msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field."
-msgstr "クリティカルエラー。\"%2$s\"フィールドの値\"%1$s\"が正しくありません。"
-
-#: include/validate.inc.php:500
-#, php-format
-msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
-msgstr "クリティカルエラー。\"%2$s\"フィールドの値\"%1$s\"が正しくありません: %3$sから%4$sの間で設定してください。"
-
-#: include/validate.inc.php:491
-#, php-format
-msgid "Critical error. Incorrect value for field \"%1$s\": cannot be empty."
-msgstr "クリティカルエラー。フィールド\"%1$s\"の値が正しくありません: 空の値を設定することはできません。"
 
 #: popup_trexpr.php:365
 msgid "Current date is < N"
@@ -3043,7 +2983,7 @@ msgstr "DISCOVERED"
 msgid "DM"
 msgstr "分散監視"
 
-#: events.php:503 events.php:512 hosts.php:721
+#: events.php:503 events.php:512 hosts.php:715
 #: include/views/administration.proxy.edit.php:62
 #: include/views/js/configuration.host.edit.js.php:18 search.php:132
 msgid "DNS"
@@ -3312,7 +3252,7 @@ msgstr "削除"
 msgid "Delete and clear"
 msgstr "削除とクリア"
 
-#: templates.php:651
+#: templates.php:643
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "選択したテンプレートとデータを削除しますか？(警告: リンクしているすべてのホストからデータが削除されます！)"
 
@@ -3394,7 +3334,7 @@ msgstr "スクリーンを削除しますか？"
 msgid "Delete script?"
 msgstr "スクリプトを削除しますか？"
 
-#: hosts.php:950 include/reports.inc.php:103 include/reports.inc.php:197
+#: hosts.php:944 include/reports.inc.php:103 include/reports.inc.php:197
 #: include/reports.inc.php:239
 #: include/views/administration.general.regularexpressions.list.php:67
 #: include/views/administration.mediatypes.list.php:121
@@ -3420,7 +3360,7 @@ msgstr "スクリプトを削除しますか？"
 #: include/views/configuration.screen.list.php:72
 #: include/views/configuration.slideconf.list.php:61
 #: include/views/configuration.sysmap.list.php:64
-#: include/views/configuration.triggers.list.php:276 templates.php:647
+#: include/views/configuration.triggers.list.php:276 templates.php:639
 msgid "Delete selected"
 msgstr "選択を削除"
 
@@ -3466,7 +3406,7 @@ msgstr "選択したホストグループを削除しますか？"
 msgid "Delete selected host?"
 msgstr "選択したホストを削除しますか？"
 
-#: hosts.php:951
+#: hosts.php:945
 msgid "Delete selected hosts?"
 msgstr "選択したホストを削除しますか？"
 
@@ -3519,7 +3459,7 @@ msgstr "選択したスクリプトを削除しますか？"
 msgid "Delete selected slide shows?"
 msgstr "選択したスライドショーを削除しますか？"
 
-#: templates.php:648
+#: templates.php:640
 msgid "Delete selected templates?"
 msgstr "選択したテンプレートを削除しますか？"
 
@@ -3545,7 +3485,7 @@ msgid "Delete selected value mapping? It is used for %d item!"
 msgid_plural "Delete selected value mapping? It is used for %d items!"
 msgstr[0] "選択した値のマッピングを削除しますか？この設定はアイテム\"%d\"に利用されています！"
 
-#: templates.php:650
+#: templates.php:642
 msgid "Delete selected with linked elements"
 msgstr "選択したテンプレートとリンクされた要素を削除"
 
@@ -3762,7 +3702,7 @@ msgstr "選択したグループのデバッグモードを無効にしますか
 msgid "Disable host"
 msgstr "ホストを無効"
 
-#: hosts.php:871 hosts.php:884
+#: hosts.php:865 hosts.php:878
 msgid "Disable host?"
 msgstr "ホストを無効にしますか？"
 
@@ -3774,7 +3714,7 @@ msgstr "選択したホストグループのホストを無効にしますか？
 msgid "Disable hosts monitored by selected proxies?"
 msgstr "選択したプロキシによるホストの監視を無効にしますか？"
 
-#: hosts.php:947 include/views/administration.mediatypes.list.php:117
+#: hosts.php:941 include/views/administration.mediatypes.list.php:117
 #: include/views/administration.proxy.list.php:101
 #: include/views/administration.usergroups.list.php:141
 #: include/views/configuration.action.list.php:101
@@ -3810,7 +3750,7 @@ msgstr "選択したディスカバリルールを無効にしますか？"
 msgid "Disable selected groups?"
 msgstr "選択したグループを無効にしますか？"
 
-#: hosts.php:948
+#: hosts.php:942
 msgid "Disable selected hosts?"
 msgstr "選択したホストを無効にしますか？"
 
@@ -3861,10 +3801,10 @@ msgstr "発見"
 msgid "Discovered device"
 msgstr "発見されたホスト"
 
-#: events.php:297 hosts.php:759 hosts.php:836 include/html.inc.php:409
+#: events.php:297 hosts.php:753 hosts.php:830 include/html.inc.php:409
 #: include/menu.inc.php:77 include/menu.inc.php:208
-#: include/views/configuration.action.list.php:34 templates.php:494
-#: templates.php:559
+#: include/views/configuration.action.list.php:34 templates.php:486
+#: templates.php:551
 msgid "Discovery"
 msgstr "ディスカバリ"
 
@@ -4182,7 +4122,7 @@ msgstr "アクションの実行条件が空白です。"
 #: api/classes/CService.php:443 api/classes/CService.php:515
 #: api/classes/CTemplate.php:619 api/classes/CTrigger.php:896
 #: api/classes/CTrigger.php:960 api/classes/CTrigger.php:1050
-#: api/classes/CTriggerPrototype.php:652 api/classes/CUserGroup.php:608
+#: api/classes/CTriggerPrototype.php:652 api/classes/CUserGroup.php:602
 #: api/classes/CUserMacro.php:394 api/classes/CUserMacro.php:546
 #: api/classes/CUser.php:545
 msgid "Empty input parameter."
@@ -4237,7 +4177,7 @@ msgstr "イベントの障害対応コメントを有効"
 msgid "Enable host"
 msgstr "ホストを有効"
 
-#: hosts.php:878
+#: hosts.php:872
 msgid "Enable host?"
 msgstr "ホストを有効にしますか？"
 
@@ -4254,7 +4194,7 @@ msgstr "選択したプロキシによるホストの監視を有効にします
 msgid "Enable housekeeping"
 msgstr "データの自動削除処理を有効"
 
-#: hosts.php:944 include/views/administration.mediatypes.list.php:113
+#: hosts.php:938 include/views/administration.mediatypes.list.php:113
 #: include/views/administration.proxy.list.php:97
 #: include/views/administration.usergroups.list.php:137
 #: include/views/configuration.action.list.php:97
@@ -4289,7 +4229,7 @@ msgstr "選択したディスカバリルールを有効にしますか？"
 msgid "Enable selected groups?"
 msgstr "選択したグループを有効にしますか？"
 
-#: hosts.php:945 include/views/configuration.hostgroups.list.php:127
+#: hosts.php:939 include/views/configuration.hostgroups.list.php:127
 msgid "Enable selected hosts?"
 msgstr "選択したホストを有効にしますか？"
 
@@ -4484,8 +4424,8 @@ msgstr "期限切れ"
 msgid "Exploded"
 msgstr "分解円グラフ"
 
-#: hosts.php:942 include/views/configuration.screen.list.php:70
-#: include/views/configuration.sysmap.list.php:63 templates.php:646
+#: hosts.php:936 include/views/configuration.screen.list.php:70
+#: include/views/configuration.sysmap.list.php:63 templates.php:638
 msgid "Export selected"
 msgstr "選択をエクスポート"
 
@@ -4611,6 +4551,46 @@ msgstr "フィールド"
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr "フィールド\"%1$s\"はNULLに設定できません。"
 
+#: include/validate.inc.php:400
+#, php-format
+msgid "Field \"%1$s\" is mandatory."
+msgstr ""
+
+#: include/validate.inc.php:313
+#, php-format
+msgid "Field \"%1$s\" is not IP range."
+msgstr ""
+
+#: include/validate.inc.php:303
+#, php-format
+msgid "Field \"%1$s\" is not IP."
+msgstr ""
+
+#: include/validate.inc.php:338
+#, php-format
+msgid "Field \"%1$s\" is not decimal number."
+msgstr ""
+
+#: include/validate.inc.php:323
+#, php-format
+msgid "Field \"%1$s\" is not integer list or range."
+msgstr ""
+
+#: include/validate.inc.php:332
+#, php-format
+msgid "Field \"%1$s\" is not integer."
+msgstr ""
+
+#: include/validate.inc.php:344
+#, php-format
+msgid "Field \"%1$s\" is not string."
+msgstr ""
+
+#: include/validate.inc.php:412
+#, php-format
+msgid "Field \"%1$s\" must be missing."
+msgstr ""
+
 #: api/classes/CDRule.php:384
 msgid "Field \"druleid\" is required."
 msgstr "フィールド\"druleid\"を指定してください"
@@ -4641,7 +4621,7 @@ msgstr "表示するために生成したファイルが存在しません。\"%
 msgid "Filled region"
 msgstr "面"
 
-#: events.php:356 hostinventories.php:133 hosts.php:726
+#: events.php:356 hostinventories.php:133 hosts.php:720
 #: include/classes/class.cwidget.php:130 include/forms.inc.php:628
 #: include/views/administration.auditacts.list.php:49
 #: include/views/administration.auditlogs.list.php:65
@@ -4822,7 +4802,7 @@ msgstr "グローバルスクリプト"
 msgid "Global scripts"
 msgstr "グローバルスクリプト"
 
-#: hosts.php:953
+#: hosts.php:947
 #: include/views/administration.general.regularexpressions.list.php:70
 #: include/views/administration.mediatypes.list.php:125
 #: include/views/administration.proxy.list.php:109
@@ -4842,7 +4822,7 @@ msgstr "グローバルスクリプト"
 #: include/views/configuration.screen.list.php:76
 #: include/views/configuration.slideconf.list.php:64
 #: include/views/configuration.sysmap.list.php:67
-#: include/views/configuration.triggers.list.php:279 templates.php:653
+#: include/views/configuration.triggers.list.php:279 templates.php:645
 #: tr_status.php:885
 msgid "Go"
 msgstr "実行"
@@ -4991,7 +4971,7 @@ msgstr "\"%1$s\"の名前を持つグラフはグラフもしくはグラフの�
 msgid "Graph with same name but other type exist."
 msgstr "同じ名前で異なるタイプのグラフが存在します。"
 
-#: dashboard.php:293 hosts.php:758 hosts.php:834 include/blocks.inc.php:1263
+#: dashboard.php:293 hosts.php:752 hosts.php:828 include/blocks.inc.php:1263
 #: include/html.inc.php:493 include/html.inc.php:497 include/items.inc.php:866
 #: include/menu.inc.php:62 include/triggers.inc.php:1327
 #: include/views/configuration.graph.list.php:56
@@ -5001,7 +4981,7 @@ msgstr "同じ名前で異なるタイプのグラフが存在します。"
 #: include/views/conf.import.php:34 include/views/monitoring.charts.php:32
 #: include/views/monitoring.charts.php:41 popup.php:76 search.php:141
 #: search.php:175 search.php:198 search.php:385 search.php:416 search.php:443
-#: templates.php:492 templates.php:555
+#: templates.php:484 templates.php:547
 msgid "Graphs"
 msgstr "グラフ"
 
@@ -5023,7 +5003,7 @@ msgid "Grid"
 msgstr "グリッド"
 
 #: events.php:285 hostinventoriesoverview.php:83 hostinventories.php:92
-#: hostinventories.php:159 hosts.php:711 httpmon.php:72
+#: hostinventories.php:159 hosts.php:705 httpmon.php:72
 #: include/classes/class.chostsinfo.php:112
 #: include/classes/class.ctriggersinfo.php:121
 #: include/classes/screens/CScreenHostgroupTriggers.php:61
@@ -5044,7 +5024,7 @@ msgstr "グリッド"
 #: include/views/monitoring.overview.php:32
 #: include/views/monitoring.screen.php:98
 #: include/views/monitoring.slides.php:82 latest.php:154 popup.php:508
-#: templates.php:476 tr_status.php:252
+#: templates.php:468 tr_status.php:252
 msgid "Group"
 msgstr "グループ"
 
@@ -5322,7 +5302,7 @@ msgstr "ホストインベントリ"
 msgid "Host access"
 msgstr "ホストアクセス"
 
-#: hosts.php:373
+#: hosts.php:367
 msgid "Host added"
 msgstr "ホストを追加しました"
 
@@ -5335,7 +5315,7 @@ msgstr "ホストに同じタイプのデフォルトインターフェースは
 msgid "Host count"
 msgstr "ホスト数"
 
-#: hosts.php:563 hosts.php:580
+#: hosts.php:557 hosts.php:574
 msgid "Host deleted"
 msgstr "ホストを削除しました"
 
@@ -5445,7 +5425,7 @@ msgstr "ホストスクリーン"
 msgid "Host status"
 msgstr "ホストステータス"
 
-#: hostgroups.php:217 hosts.php:600 proxies.php:169
+#: hostgroups.php:217 hosts.php:594 proxies.php:169
 msgid "Host status updated"
 msgstr "ホストのステータスを更新しました"
 
@@ -5461,7 +5441,7 @@ msgstr "ホスト時間"
 msgid "Host update failed."
 msgstr "ホストの更新に失敗しました"
 
-#: hosts.php:368
+#: hosts.php:362
 msgid "Host updated"
 msgstr "ホストを更新しました"
 
@@ -5476,7 +5456,7 @@ msgstr "同じホスト名\"%s\"を持つホストがすでに存在します。
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "同じホストの表示名\"%s\"を持つホストがすでに存在します。"
 
-#: hostinventoriesoverview.php:85 hostinventories.php:93 hosts.php:713
+#: hostinventoriesoverview.php:85 hostinventories.php:93 hosts.php:707
 #: include/forms.inc.php:225 include/forms.inc.php:898
 #: include/items.inc.php:813 include/menu.inc.php:112 include/menu.inc.php:168
 #: include/reports.inc.php:366 include/views/administration.proxy.edit.php:84
@@ -5521,7 +5501,7 @@ msgstr "ホスト情報"
 msgid "Hosts location"
 msgstr "ホストの位置"
 
-#: hosts.php:346
+#: hosts.php:340
 msgid "Hosts updated"
 msgstr "ホストを更新しました"
 
@@ -5562,7 +5542,7 @@ msgstr "ID"
 msgid "IMAP"
 msgstr "IMAP"
 
-#: events.php:502 events.php:511 hosts.php:722
+#: events.php:502 events.php:511 hosts.php:716
 #: include/views/administration.auditlogs.list.php:87
 #: include/views/administration.node.edit.php:75
 #: include/views/administration.node.list.php:44
@@ -5850,10 +5830,10 @@ msgstr "すべてのマップのイメージがアップデートされます！
 msgid "Immediately"
 msgstr "すぐに"
 
-#: hosts.php:704 include/views/configuration.screen.list.php:33
+#: hosts.php:698 include/views/configuration.screen.list.php:33
 #: include/views/configuration.sysmap.list.php:28
 #: include/views/conf.import.php:69 include/views/conf.import.php:74
-#: templates.php:469
+#: templates.php:461
 msgid "Import"
 msgstr "インポート"
 
@@ -5893,7 +5873,7 @@ msgstr "グループ"
 msgid "In groups"
 msgstr "グループ"
 
-#: hosts.php:863 include/views/configuration.maintenance.edit.php:168
+#: hosts.php:857 include/views/configuration.maintenance.edit.php:168
 #: include/views/configuration.maintenance.edit.php:176
 msgid "In maintenance"
 msgstr "メンテナンス中"
@@ -6516,6 +6496,16 @@ msgstr "\"get_accessible_nodes_by_user\"中のユーザーデータが正しく�
 msgid "Incorrect user group."
 msgstr "ユーザーグループが正しくありません。"
 
+#: include/validate.inc.php:451
+#, php-format
+msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
+msgstr ""
+
+#: include/validate.inc.php:447
+#, php-format
+msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
+msgstr ""
+
 #: include/classes/db/DB.php:357
 #, php-format
 msgid "Incorrect value \"%1$s\" for float field \"%2$s\"."
@@ -6530,6 +6520,11 @@ msgstr "整数フィールド\"%2$s\"の値\"%1$s\"が正しくありません�
 #, php-format
 msgid "Incorrect value \"%1$s\" for unsigned int field \"%2$s\"."
 msgstr "符号なし整数フィールド\"%2$s\"の値\"%1$s\"が正しくありません。"
+
+#: include/validate.inc.php:442
+#, php-format
+msgid "Incorrect value for field \"%1$s\": cannot be empty."
+msgstr ""
 
 #: include/classes/class.cbuttonqmessage.php:52
 #, php-format
@@ -6585,7 +6580,7 @@ msgstr "インストール"
 msgid "Installer name"
 msgstr "インストーラ名"
 
-#: disc_prototypes.php:41 host_discovery.php:40 hosts.php:761
+#: disc_prototypes.php:41 host_discovery.php:40 hosts.php:755
 #: include/views/administration.proxy.edit.php:71 items.php:40
 msgid "Interface"
 msgstr "インターフェース"
@@ -6614,11 +6609,20 @@ msgstr "\"%2$s\"の\"DNSを使用\"にチェックが入っている場合、IP�
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name."
 msgstr "IPアドレス\"%1$s\"が設定されたインターフェースにDNS名を設定してください。"
 
-#: include/users.inc.php:84
 #: include/views/administration.authentication.edit.php:35
-#: include/views/configuration.action.list.php:36
+msgctxt "authentication"
 msgid "Internal"
-msgstr "Zabbixデータベース内のユーザー情報"
+msgstr ""
+
+#: include/views/configuration.action.list.php:36
+msgctxt "event source"
+msgid "Internal"
+msgstr ""
+
+#: include/users.inc.php:84
+msgctxt "user type"
+msgid "Internal"
+msgstr ""
 
 #: api/rpc/class.cjsonrpc.php:202
 msgid "Internal JSON-RPC error."
@@ -6919,7 +6923,7 @@ msgstr "キー\"%1$s\"が設定されたアイテムは指定したホスト\"%2
 msgid "Item with key \"%1$s\" already exists."
 msgstr "キー\"%1$s\"が設定されたアイテムがすでに存在します。"
 
-#: hosts.php:756 hosts.php:830 include/html.inc.php:443
+#: hosts.php:750 hosts.php:824 include/html.inc.php:443
 #: include/html.inc.php:447 include/items.inc.php:794
 #: include/reports.inc.php:109 include/reports.inc.php:245
 #: include/views/configuration.application.list.php:99
@@ -6930,7 +6934,7 @@ msgstr "キー\"%1$s\"が設定されたアイテムがすでに存在します�
 #: include/views/configuration.template.edit.php:217
 #: include/views/conf.import.php:31 latest.php:157 popup.php:56 queue.php:101
 #: search.php:139 search.php:167 search.php:190 search.php:383 search.php:408
-#: search.php:435 templates.php:490 templates.php:551
+#: search.php:435 templates.php:482 templates.php:543
 msgid "Items"
 msgstr "アイテム"
 
@@ -7441,11 +7445,11 @@ msgstr "テンプレートとのリンク"
 
 #: include/views/configuration.host.edit.php:537
 #: include/views/configuration.template.edit.php:403
-#: include/views/configuration.template.edit.php:424 templates.php:496
+#: include/views/configuration.template.edit.php:424 templates.php:488
 msgid "Linked templates"
 msgstr "テンプレートとのリンク"
 
-#: templates.php:497
+#: templates.php:489
 msgid "Linked to"
 msgstr "次にリンク"
 
@@ -7838,7 +7842,7 @@ msgstr "選択をマーク"
 msgid "Mask"
 msgstr "マスク"
 
-#: hosts.php:943 include/views/configuration.item.list.php:280
+#: hosts.php:937 include/views/configuration.item.list.php:280
 #: include/views/configuration.item.massupdate.php:558
 #: include/views/configuration.triggers.list.php:270
 msgid "Mass update"
@@ -7898,6 +7902,12 @@ msgstr[0] "ホスト名は最大%2$d文字です。\"%3$s\"は%1$d文字あり�
 #: include/views/configuration.item.massupdate.php:372
 msgid "Maximum number of flexible intervals added"
 msgstr "例外の更新間隔の設定数が上限に達しました"
+
+#: include/classes/screens/CScreenBase.php:339 include/graphs.inc.php:401
+#, php-format
+msgid "Maximum time period to display is %1$s day."
+msgid_plural "Maximum time period to display is %1$s days."
+msgstr[0] ""
 
 #: popup_trexpr.php:259
 msgid "Maximum value for period T is < N"
@@ -8078,6 +8088,12 @@ msgstr "PHPのpostサイズの最小値は%sです (\"post_max_size\"設定オ�
 msgid "Minimum severity"
 msgstr "最小の深刻度"
 
+#: include/classes/screens/CScreenBase.php:334 include/graphs.inc.php:394
+#, php-format
+msgid "Minimum time period to display is %1$s hour."
+msgid_plural "Minimum time period to display is %1$s hours."
+msgstr[0] ""
+
 #: include/views/configuration.sysmap.edit.php:132 tr_status.php:303
 msgid "Minimum trigger severity"
 msgstr "最小のトリガー深刻度"
@@ -8144,7 +8160,7 @@ msgstr "グラフのプロトタイプ\"%1$s\"のアイテムが存在しませ�
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
 msgstr "ホスト\"%2$s\"にはキー\"%1$s\"が設定されていません。"
 
-#: api/classes/CUserGroup.php:417
+#: api/classes/CUserGroup.php:416
 msgid "Missing parameter: usrgrpids."
 msgstr "パラメータが設定されていません: usrgrpids。"
 
@@ -8165,7 +8181,7 @@ msgstr "月"
 msgid "Monday"
 msgstr "月曜"
 
-#: hosts.php:867 include/html.inc.php:391
+#: hosts.php:861 include/html.inc.php:391
 #: include/views/configuration.host.edit.php:295
 #: include/views/configuration.host.massupdate.php:145
 msgid "Monitored"
@@ -8250,8 +8266,8 @@ msgstr "NTLM認証"
 
 #: actionconf.php:37 actionconf.php:158 adm.regexps.php:37 adm.regexps.php:140
 #: adm.regexps.php:178 applications.php:39 disc_prototypes.php:42
-#: graphs.php:42 host_discovery.php:41 hostinventories.php:160 hosts.php:720
-#: hosts.php:754 httpconf.php:44 httpmon.php:88 include/forms.inc.php:603
+#: graphs.php:42 host_discovery.php:41 hostinventories.php:160 hosts.php:714
+#: hosts.php:748 httpconf.php:44 httpmon.php:88 include/forms.inc.php:603
 #: include/hosts.inc.php:115 include/reports.inc.php:162
 #: include/setup.inc.php:325
 #: include/views/administration.general.iconmap.edit.php:29
@@ -8662,7 +8678,7 @@ msgstr "グループID\"%s\"を持つホストグループが設定されてい�
 msgid "No host with hostid \"%s\"."
 msgstr "ホストID\"%s\"を持つホストが設定されていません。"
 
-#: hostinventoriesoverview.php:88 hostinventories.php:155 hosts.php:750
+#: hostinventoriesoverview.php:88 hostinventories.php:155 hosts.php:744
 msgid "No hosts defined."
 msgstr "ホストが設定されていません。"
 
@@ -8959,7 +8975,7 @@ msgid "No target selected."
 msgstr "何も選択されていません。"
 
 #: include/views/configuration.host.edit.php:503
-#: include/views/configuration.template.edit.php:376 templates.php:484
+#: include/views/configuration.template.edit.php:376 templates.php:476
 msgid "No templates defined."
 msgstr "テンプレートが設定されていません。"
 
@@ -9015,7 +9031,7 @@ msgstr "ウェブ監視が設定されていません。"
 msgid "No web scenarios defined."
 msgstr "シナリオが設定されていません。"
 
-#: events.php:578 events.php:591 hostinventories.php:157 hosts.php:753
+#: events.php:578 events.php:591 hostinventories.php:157 hosts.php:747
 #: httpmon.php:86 include/actions.inc.php:68 include/audit.inc.php:42
 #: include/blocks.inc.php:185 include/blocks.inc.php:375
 #: include/blocks.inc.php:908 include/blocks.inc.php:1044
@@ -9045,7 +9061,7 @@ msgstr "シナリオが設定されていません。"
 #: include/views/configuration.triggers.list.php:107
 #: include/views/monitoring.discovery.php:40 latest.php:190 popup.php:485
 #: popup_right.php:66 queue.php:201 report2.php:395 report5.php:59
-#: search.php:129 search.php:270 search.php:380 templates.php:487
+#: search.php:129 search.php:270 search.php:380 templates.php:479
 #: tr_status.php:370
 msgid "Node"
 msgstr "ノード"
@@ -9128,7 +9144,7 @@ msgstr "未分類"
 msgid "Not connected"
 msgstr "未ログイン"
 
-#: hosts.php:876 include/html.inc.php:394
+#: hosts.php:870 include/html.inc.php:394
 #: include/views/configuration.host.edit.php:296
 #: include/views/configuration.host.massupdate.php:146
 msgid "Not monitored"
@@ -9386,7 +9402,7 @@ msgid "Only Super Admins can delete media types."
 msgstr "特権管理者のみがメディアタイプを削除できます。"
 
 #. GETTEXT: API exception
-#: api/classes/CUserGroup.php:612
+#: api/classes/CUserGroup.php:606
 msgid "Only Super Admins can delete user groups."
 msgstr "特権管理者のみがユーザーグループを削除できます。"
 
@@ -9402,7 +9418,7 @@ msgstr "特権管理者のみがグローバルマクロを更新できます。
 msgid "Only Super Admins can update icon maps."
 msgstr "特権管理者のみがアイコンのマッピングを更新できます。"
 
-#: api/classes/CUserGroup.php:289 api/classes/CUserGroup.php:411
+#: api/classes/CUserGroup.php:289 api/classes/CUserGroup.php:410
 msgid "Only Super Admins can update user groups."
 msgstr "特権管理者のみがユーザーグループを更新できます。"
 
@@ -9430,7 +9446,7 @@ msgstr "有効なホストのアイテムのみカウント"
 msgid "Only one check can be unique."
 msgstr "ユニークかどうかだけチェックします。"
 
-#: api/classes/CUserGroup.php:424
+#: api/classes/CUserGroup.php:423
 msgid "Only one user group name can be changed at a time."
 msgstr "同時には1つのユーザーグループ名しか変更できません。"
 
@@ -9456,7 +9472,7 @@ msgstr "Opera"
 msgid "Operation \"%s\" already exists."
 msgstr "実行するアクション\"%s\"はすでに存在します。"
 
-#: include/validate.inc.php:472
+#: include/validate.inc.php:424
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "認証されていないリクエストのため操作を実行できません。"
 
@@ -9779,7 +9795,7 @@ msgstr "POP"
 msgid "PROBLEM"
 msgstr "障害"
 
-#: include/validate.inc.php:577
+#: include/validate.inc.php:515
 msgid "Page received incorrect data"
 msgstr "誤ったデータを受信しました"
 
@@ -9968,7 +9984,7 @@ msgid "Populates host inventory field"
 msgstr "ホストインベントリフィールドの自動設定"
 
 #: authentication.php:37 disc_prototypes.php:82 host_discovery.php:79
-#: hosts.php:723 include/forms.inc.php:494 include/setup.inc.php:321
+#: hosts.php:717 include/forms.inc.php:494 include/setup.inc.php:321
 #: include/views/administration.authentication.edit.php:58
 #: include/views/administration.node.edit.php:78
 #: include/views/administration.node.list.php:44
@@ -10504,7 +10520,7 @@ msgstr "要求ステータスコード"
 msgid "Required string"
 msgstr "要求文字列"
 
-#: events.php:357 hostinventories.php:138 hosts.php:731
+#: events.php:357 hostinventories.php:138 hosts.php:725
 #: include/forms.inc.php:633 include/html.inc.php:285
 #: include/reports.inc.php:121 include/reports.inc.php:259
 #: include/reports.inc.php:438
@@ -11011,7 +11027,7 @@ msgstr "スクリーンを更新しました"
 #: include/views/monitoring.screen.php:79
 #: include/views/monitoring.slides.php:31 popup.php:68 popup.php:84
 #: search.php:136 search.php:218 search.php:386 search.php:420 search.php:447
-#: templates.php:493 templates.php:557
+#: templates.php:485 templates.php:549
 msgid "Screens"
 msgstr "スクリーン"
 
@@ -11663,7 +11679,7 @@ msgstr "開始時刻"
 msgid "State"
 msgstr "ステータス"
 
-#: events.php:505 events.php:514 events.php:581 events.php:594 hosts.php:763
+#: events.php:505 events.php:514 events.php:581 events.php:594 hosts.php:757
 #: httpdetails.php:134 httpmon.php:91 include/actions.inc.php:830
 #: include/actions.inc.php:908 include/actions.inc.php:967
 #: include/classes/screens/CScreenActions.php:58
@@ -11979,7 +11995,7 @@ msgstr "キー\"%2$s\"を持つローレベルディスカバリルールを含�
 msgid "Template \"%s\" already exists."
 msgstr "テンプレート\"%s\"はすでに存在します。"
 
-#: templates.php:170
+#: templates.php:164
 msgid "Template added"
 msgstr "テンプレートを追加しました"
 
@@ -11987,7 +12003,7 @@ msgstr "テンプレートを追加しました"
 msgid "Template cannot be linked to another template more than once even through other templates."
 msgstr "テンプレートは複数のテンプレートとリンクすることはできません(他のテンプレート経由でも不可)。"
 
-#: templates.php:355 templates.php:371 templates.php:399
+#: templates.php:349 templates.php:365 templates.php:393
 msgid "Template deleted"
 msgstr "テンプレートを削除しました"
 
@@ -12015,7 +12031,7 @@ msgstr "テンプレートスクリーン"
 msgid "Template trigger"
 msgstr "テンプレートトリガー"
 
-#: templates.php:166
+#: templates.php:160
 msgid "Template updated"
 msgstr "テンプレートを更新しました"
 
@@ -12039,13 +12055,13 @@ msgstr "同じ表示名\"%s\"を持つテンプレートがすでに存在しま
 msgid "Templated items"
 msgstr "テンプレートのアイテム"
 
-#: hosts.php:762 include/menu.inc.php:164
+#: hosts.php:756 include/menu.inc.php:164
 #: include/views/configuration.host.edit.php:554
 #: include/views/configuration.hostgroups.list.php:116
 #: include/views/configuration.host.massupdate.php:287
 #: include/views/conf.import.php:28 search.php:276 search.php:305
 #: search.php:310 search.php:317 search.php:381 search.php:469
-#: templates.php:478 templates.php:488
+#: templates.php:470 templates.php:480
 msgid "Templates"
 msgstr "テンプレート"
 
@@ -12463,7 +12479,7 @@ msgstr "トリガーを更新しました"
 msgid "Trigger value"
 msgstr "トリガーの値"
 
-#: hosts.php:757 hosts.php:832 include/forms.inc.php:594
+#: hosts.php:751 hosts.php:826 include/forms.inc.php:594
 #: include/html.inc.php:468 include/html.inc.php:472 include/menu.inc.php:52
 #: include/triggers.inc.php:1183
 #: include/views/configuration.action.list.php:33
@@ -12478,7 +12494,7 @@ msgstr "トリガーの値"
 #: include/views/monitoring.overview.php:28 jsLoader.php:110 popup.php:44
 #: search.php:134 search.php:140 search.php:171 search.php:194 search.php:216
 #: search.php:273 search.php:325 search.php:384 search.php:412 search.php:439
-#: templates.php:491 templates.php:553 tr_status.php:260
+#: templates.php:483 templates.php:545 tr_status.php:260
 msgid "Triggers"
 msgstr "トリガー"
 
@@ -12724,7 +12740,7 @@ msgid "Units"
 msgstr "単位"
 
 #: events.php:525 events.php:526 events.php:536 events.php:537 events.php:538
-#: events.php:539 hosts.php:883 httpdetails.php:163 httpmon.php:156
+#: events.php:539 hosts.php:877 httpdetails.php:163 httpmon.php:156
 #: include/actions.inc.php:41 include/actions.inc.php:98
 #: include/actions.inc.php:115 include/actions.inc.php:139
 #: include/actions.inc.php:163 include/actions.inc.php:176
@@ -13008,7 +13024,7 @@ msgstr "ユーザーを追加しました"
 msgid "User can't change type for himself"
 msgstr "ユーザーは自身のユーザータイプを変更できません"
 
-#: api/classes/CUserGroup.php:467
+#: api/classes/CUserGroup.php:466
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "ユーザーは無効のグループやGUIアクセスが無効のグループに自分自身を追加できません。"
 
@@ -13037,17 +13053,17 @@ msgstr "ユーザーを削除しました"
 msgid "User group"
 msgstr "ユーザーグループ"
 
-#: api/classes/CUserGroup.php:625
+#: api/classes/CUserGroup.php:619
 #, php-format
 msgid "User group \"%1$s\" is used in script \"%2$s\"."
 msgstr "ユーザーグループ\"%1$s\"はスクリプト\"%2$s\"に利用されています。"
 
-#: api/classes/CUserGroup.php:435
+#: api/classes/CUserGroup.php:434
 #, php-format
 msgid "User group \"%s\" already exists."
 msgstr "ユーザーグループ\"%s\"はすでに存在します。"
 
-#: api/classes/CUserGroup.php:632
+#: api/classes/CUserGroup.php:626
 #, php-format
 msgid "User group [%s] is used in configuration for database down messages."
 msgstr "ユーザーグループ[%s]はデータベース停止メッセージの設定に利用されています。"
@@ -13285,94 +13301,13 @@ msgstr "W"
 msgid "Warning"
 msgstr "警告"
 
-#: chart7.php:74
-msgid "Warning. Cannot display more than one item with type \"Graph sum\"."
-msgstr "警告。グラフの合計値は2つ以上表示できません。"
-
-#: include/validate.inc.php:393
-#, php-format
-msgid "Warning. Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
-msgstr "警告。色\"%1$s\"の設定が正しくありません: 16進数のカラーコードを指定してください(6文字)。"
-
-#: include/validate.inc.php:443
-#, php-format
-msgid "Warning. Field \"%1$s\" is mandatory."
-msgstr "警告。フィールド\"%1$s\"は必須です。"
-
-#: include/validate.inc.php:319
-#, php-format
-msgid "Warning. Field \"%1$s\" is not IP range."
-msgstr "警告。フィールド\"%1$s\"はIPアドレスの範囲ではありません。"
-
-#: include/validate.inc.php:305
-#, php-format
-msgid "Warning. Field \"%1$s\" is not IP."
-msgstr "警告。フィールド\"%1$s\"はIPアドレスではありません。"
-
-#: include/validate.inc.php:357
-#, php-format
-msgid "Warning. Field \"%1$s\" is not decimal number."
-msgstr "警告。フィールド\"%1$s\"は10進数ではありません。"
-
-#: include/validate.inc.php:333
-#, php-format
-msgid "Warning. Field \"%1$s\" is not integer list or range."
-msgstr "警告。フィールド\"%1$s\"はリストや指定された範囲内の整数値ではありません。"
-
-#: include/validate.inc.php:346
-#, php-format
-msgid "Warning. Field \"%1$s\" is not integer."
-msgstr "警告。フィールド\"%1$s\"は整数値ではありません。"
-
-#: include/validate.inc.php:368
-#, php-format
-msgid "Warning. Field \"%1$s\" is not string."
-msgstr "警告。フィールド\"%1$s\"は文字列ではありません。"
-
-#: include/validate.inc.php:379
-#, php-format
-msgid "Warning. Field \"%1$s\" multibyte chars are restricted."
-msgstr "警告。フィールド\"%1$s\"のマルチバイト文字列は制限されています。"
-
-#: include/validate.inc.php:460
-#, php-format
-msgid "Warning. Field \"%1$s\" must be missing."
-msgstr "警告。フィールド\"%1$s\"が入力されていません。"
-
-#: include/validate.inc.php:513
-#, php-format
-msgid "Warning. Incorrect value for field \"%1$s\"."
-msgstr "警告。フィールド\"%1$s\"の値が正しくありません。"
-
-#: include/validate.inc.php:494
-#, php-format
-msgid "Warning. Incorrect value for field \"%1$s\": cannot be empty."
-msgstr "警告。フィールド\"%1$s\"の値が正しくありません: 空の値を設定することはできません。"
-
-#: include/validate.inc.php:504
-#, php-format
-msgid "Warning. Incorrect value for field \"%1$s\": must be between %2$s and %3$s."
-msgstr "警告。フィールド\"%1$s\"の値が正しくありません: %2$sから%3$sの間で設定してください。"
-
-#: include/classes/screens/CScreenBase.php:339 include/graphs.inc.php:401
-#, php-format
-msgid "Warning. Maximum time period to display is %1$s day."
-msgid_plural "Warning. Maximum time period to display is %1$s days."
-msgstr[0] "警告。表示できる最大の期間は%1$s日です。"
-
-#: include/classes/screens/CScreenBase.php:334 include/graphs.inc.php:394
-#, php-format
-msgid "Warning. Minimum time period to display is %1$s hour."
-msgid_plural "Warning. Minimum time period to display is %1$s hours."
-msgstr[0] "警告。表示できる最小の期間は%1$s時間です。"
-
 #: jsLoader.php:170
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "要素を保存できる最大値に達しました"
 
-#: hosts.php:760 hosts.php:838 include/menu.inc.php:42 search.php:137
+#: hosts.php:754 hosts.php:832 include/menu.inc.php:42 search.php:137
 #: search.php:142 search.php:179 search.php:202 search.php:219 search.php:387
-#: search.php:424 search.php:451 templates.php:495 templates.php:561
+#: search.php:424 search.php:451 templates.php:487 templates.php:553
 msgid "Web"
 msgstr "ウェブ"
 
@@ -13841,7 +13776,7 @@ msgstr "Zabbixエージェント(アクティブ)"
 msgid "Zabbix aggregate"
 msgstr "Zabbixアグリゲート"
 
-#: include/validate.inc.php:525
+#: include/validate.inc.php:462
 msgid "Zabbix has received an incorrect request."
 msgstr "不正なURLパラメータ"
 
@@ -14146,8 +14081,9 @@ msgid "in"
 msgstr "期間中"
 
 #: include/events.inc.php:37
+msgctxt "event source"
 msgid "internal"
-msgstr "内部イベント"
+msgstr ""
 
 #: include/classes/class.cserverinfo.php:44
 msgid "is"
@@ -14163,7 +14099,7 @@ msgstr "アイテム"
 msgid "last"
 msgstr "最新値"
 
-#: hostinventories.php:121 hosts.php:720 hosts.php:721 hosts.php:722
+#: hostinventories.php:121 hosts.php:714 hosts.php:715 hosts.php:716
 #: include/actions.inc.php:29 include/forms.inc.php:473
 #: include/forms.inc.php:480 include/forms.inc.php:487
 #: include/forms.inc.php:494 include/forms.inc.php:603
