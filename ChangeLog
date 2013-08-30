@@ -8,6 +8,9 @@ New features:
 A.F.I..... [ZBXNEXT-1569] implemented user name and surname displaying in acknowledgements (Ivo, Oleg)
 
 Bug fixes:
+...G...PS. [ZBX-6916] added space delimeter support in configuration file (igors)
+..F....... [ZBX-6930] 'Unlink and clear' link bug fix, now it displayed (Vitalij)
+..F....... [ZBX-6878] fixed history screen log bug for two items, parametr itemid renamed to itemids (Vitalij)
 ..F....... [ZBX-6903] fixed template name trim (Eduard, Sasha)
 A.F....... [ZBX-6899] specified source parameter in SQL from events table (Vitalij)
 ..F....... [ZBX-6893] fixed prototype name error ($1 -> {#FSNAME}) on adding new prototype in the graph prototype form in the item prototype selection template (Vitalij)
@@ -364,9 +367,11 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.9rc1
 
 New features:
-A.F....... [ZBX-1357] updated Chinese (China) translation; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Chinese (China), Lithuanian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-6923] fixed mass delete in template list, 'Delete selected' and 'Delete selected with linked elements' functions (Vitalij)
+..F....... [ZBX-6922] fixed host interface importing (Eduard)
 .......P.. [ZBX-6249] fixed data loss in proxy "Data sender" process caused by unfinished transactions; thanks to MATSUDA Daiki for patch (Andris)
 ...G...... [ZBXNEXT-1056] improved active checks error messages (wiper)
 

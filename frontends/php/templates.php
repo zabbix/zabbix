@@ -431,8 +431,8 @@ if (isset($_REQUEST['form'])) {
 		$data['dbTemplate'] = reset($dbTemplates);
 
 		$data['original_templates'] = array();
-		foreach ($data['dbTemplate']['parentTemplates'] as $tnum => $tpl) {
-			$data['original_templates'][] = $tpl['templateid'];
+		foreach ($data['dbTemplate']['parentTemplates'] as $parentTemplate) {
+			$data['original_templates'][$parentTemplate['templateid']] = $parentTemplate['templateid'];
 		}
 	}
 	else {
@@ -440,8 +440,6 @@ if (isset($_REQUEST['form'])) {
 	}
 
 	$templateIds = get_request('templates', $data['original_templates']);
-
-	sort($templateIds);
 
 	$data['linkedTemplates'] = API::Template()->get(array(
 		'templateids' => $templateIds,
