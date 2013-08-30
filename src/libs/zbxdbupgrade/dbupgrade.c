@@ -386,17 +386,20 @@ static void	DBdrop_index_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 #endif
 }
 
-#if !defined(HAVE_MYSQL)
-static void	DBrename_index_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
-		const char *old_name, const char *new_name)
+static void	DBrename_index_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *table_name,
+		const char *old_name, const char *new_name, const char *fields, int unique)
 {
-#if defined(HAVE_POSTGRESQL) || defined(HAVE_ORACLE)
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter index %s rename to %s", old_name, new_name);
-#elif defined(HAVE_IBM_DB2)
+#if defined(HAVE_IBM_DB2)
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "rename index %s to %s", old_name, new_name);
+#elif defined(HAVE_MYSQL)
+	DBcreate_index_sql(sql, sql_alloc, sql_offset, table_name, new_name, fields, unique);
+	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
+	DBdrop_index_sql(sql, sql_alloc, sql_offset, table_name, old_name);
+	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
+#elif defined(HAVE_ORACLE) || defined(HAVE_POSTGRESQL)
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter index %s rename to %s", old_name, new_name);
 #endif
 }
-#endif	/* !defined(HAVE_MYSQL) */
 
 static void	DBadd_foreign_key_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, int id, const ZBX_FIELD *field)
@@ -590,23 +593,17 @@ static int	DBdrop_index(const char *table_name, const char *index_name)
 static int	DBrename_index(const char *table_name, const char *old_name, const char *new_name, const char *fields,
 				int unique)
 {
-	int	ret = FAIL;
-
-#if defined(HAVE_POSTGRESQL) || defined(HAVE_ORACLE) || defined(HAVE_IBM_DB2)
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = FAIL;
 
-	DBrename_index_sql(&sql, &sql_alloc, &sql_offset, old_name, new_name);
+	DBrename_index_sql(&sql, &sql_alloc, &sql_offset, table_name, old_name, new_name, fields, unique);
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
 		ret = SUCCEED;
 
 	zbx_free(sql);
-#elif defined(HAVE_MYSQL)
-	if (SUCCEED != (ret = DBcreate_index(table_name, new_name, fields, unique)))
-		return FAIL;
-	ret = DBdrop_index(table_name, old_name);
-#endif
+
 	return ret;
 }
 
