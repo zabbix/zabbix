@@ -514,7 +514,7 @@ CArrayHelper::sort($linkedTemplates, array('name'));
 
 $ignoredTemplates = array();
 foreach ($linkedTemplates as $template) {
-	$tmplList->addVar('exist_templates[]', $template['templateid']);
+	$tmplList->addVar('templates[]', $template['templateid']);
 
 	$linkedTemplateTable->addRow(
 		array(
@@ -542,7 +542,7 @@ $newTemplateTable->attr('id', 'newTemplateTable');
 $newTemplateTable->attr('style', 'min-width: 400px;');
 
 $newTemplateTable->addRow(array(new CMultiSelect(array(
-	'name' => 'templates[]',
+	'name' => 'add_templates[]',
 	'objectName' => 'templates',
 	'ignored' => $ignoredTemplates
 ))));
