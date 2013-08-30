@@ -987,7 +987,7 @@ class testFormGraphPrototype extends CWebTest {
 					'expected' => GRAPH_BAD,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Name": cannot be empty.'
+						'Incorrect value for field "Name": cannot be empty.'
 					)
 				)
 			),
@@ -1041,8 +1041,8 @@ class testFormGraphPrototype extends CWebTest {
 					'yaxismax' => 'name',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.',
-						'Warning. Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.'
+						'Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.',
+						'Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.'
 					)
 				)
 			),
@@ -1057,8 +1057,8 @@ class testFormGraphPrototype extends CWebTest {
 					'ymax_type' => 'Fixed',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.',
-						'Warning. Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.'
+						'Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.',
+						'Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.'
 					)
 				)
 			)
