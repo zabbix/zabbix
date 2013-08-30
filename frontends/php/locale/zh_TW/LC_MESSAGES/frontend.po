@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-30 01:14+0300\n"
+"POT-Creation-Date: 2013-08-30 13:52+0300\n"
 "PO-Revision-Date: 2012-11-06 15:57+0800\n"
 "Last-Translator: Yaochiu Huang <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -618,7 +618,7 @@ msgstr "應用集已更新"
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "ID為 \"%1$s\"的應用集不在\"%2$s\"之中."
 
-#: hosts.php:755 hosts.php:828 include/forms.inc.php:903
+#: hosts.php:749 hosts.php:822 include/forms.inc.php:903
 #: include/html.inc.php:419 include/html.inc.php:423
 #: include/views/configuration.application.list.php:47
 #: include/views/configuration.host.edit.php:318
@@ -627,7 +627,7 @@ msgstr "ID為 \"%1$s\"的應用集不在\"%2$s\"之中."
 #: include/views/configuration.item.prototype.list.php:57
 #: include/views/configuration.template.edit.php:196 popup.php:40
 #: search.php:138 search.php:163 search.php:186 search.php:382 search.php:404
-#: search.php:431 templates.php:489 templates.php:549
+#: search.php:431 templates.php:481 templates.php:541
 msgid "Applications"
 msgstr "應用集"
 
@@ -813,7 +813,7 @@ msgstr "自動的圖示對應"
 msgid "Automatic icon selection"
 msgstr "自動的圖示選擇"
 
-#: hosts.php:764
+#: hosts.php:758
 msgid "Availability"
 msgstr "可用性"
 
@@ -993,7 +993,7 @@ msgstr "圖形化介面的組態"
 msgid "CONFIGURATION OF HOST GROUPS"
 msgstr "主機群組的組態"
 
-#: hosts.php:622 hosts.php:687 hosts.php:708
+#: hosts.php:616 hosts.php:681 hosts.php:702
 msgid "CONFIGURATION OF HOSTS"
 msgstr "主機的組態"
 
@@ -1078,7 +1078,7 @@ msgstr "脚本的組態"
 msgid "CONFIGURATION OF SLIDE SHOWS"
 msgstr "簡報片展示的組態"
 
-#: templates.php:421 templates.php:473
+#: templates.php:415 templates.php:465
 msgid "CONFIGURATION OF TEMPLATES"
 msgstr "模板的組態"
 
@@ -1228,7 +1228,7 @@ msgstr "無法新增圖表"
 msgid "Cannot add group"
 msgstr "無法新增群組"
 
-#: hosts.php:374
+#: hosts.php:368
 msgid "Cannot add host"
 msgstr "無法新增主機"
 
@@ -1302,7 +1302,7 @@ msgstr "無法新增服務"
 msgid "Cannot add slide show"
 msgstr "無法新增簡報片展示"
 
-#: templates.php:171
+#: templates.php:165
 msgid "Cannot add template"
 msgstr "無法新增模板"
 
@@ -1472,7 +1472,7 @@ msgstr "無法刪除由低階層發現所創建的圖形."
 msgid "Cannot delete group"
 msgstr "無法刪除群組"
 
-#: hosts.php:563 hosts.php:580
+#: hosts.php:557 hosts.php:574
 msgid "Cannot delete host"
 msgstr "無法删除主機"
 
@@ -1563,7 +1563,7 @@ msgstr "無法删除服務"
 msgid "Cannot delete slide show"
 msgstr "無法刪除簡報片展示"
 
-#: templates.php:355 templates.php:371 templates.php:399
+#: templates.php:349 templates.php:365 templates.php:393
 msgid "Cannot delete template"
 msgstr "無法刪除模板"
 
@@ -1643,6 +1643,10 @@ msgstr ""
 
 #: queue.php:61
 msgid "Cannot display item queue."
+msgstr ""
+
+#: chart7.php:74
+msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr ""
 
 #: media_types.php:160
@@ -2021,15 +2025,15 @@ msgstr "無法更新群組"
 msgid "Cannot update group."
 msgstr "無法更新群組."
 
-#: hostgroups.php:217 hosts.php:369
+#: hostgroups.php:217 hosts.php:363
 msgid "Cannot update host"
 msgstr "無法更新主機"
 
-#: hosts.php:600
+#: hosts.php:594
 msgid "Cannot update host status"
 msgstr "無法更新主機狀態"
 
-#: hosts.php:353
+#: hosts.php:347
 msgid "Cannot update hosts"
 msgstr "無法更新主機"
 
@@ -2114,7 +2118,7 @@ msgstr "無法更新簡報片展示"
 msgid "Cannot update status"
 msgstr "無法更新狀態"
 
-#: templates.php:167
+#: templates.php:161
 msgid "Cannot update template"
 msgstr "無法更新模板"
 
@@ -2326,7 +2330,8 @@ msgstr "關閉表示式建構"
 msgid "Colour"
 msgstr "顏色"
 
-#: include/classes/validators/CColorValidator.php:33 jsLoader.php:159
+#: include/classes/validators/CColorValidator.php:33
+#: include/validate.inc.php:354 jsLoader.php:159
 #, php-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr ""
@@ -2723,7 +2728,7 @@ msgstr "創建圖形(先選擇主機)"
 msgid "Create graph prototype"
 msgstr "創建圖形原型"
 
-#: hosts.php:703
+#: hosts.php:697
 msgid "Create host"
 msgstr "創建主機"
 
@@ -2792,7 +2797,7 @@ msgstr "創建脚本"
 msgid "Create slide show"
 msgstr "創建簡報片展示"
 
-#: templates.php:468
+#: templates.php:460
 msgid "Create template"
 msgstr "創建模板"
 
@@ -2854,71 +2859,6 @@ msgstr "已創建: 觸發器原型 \"%1$s\" 於 \"%2$s\"."
 #, php-format
 msgid "Created: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr ""
-
-#: include/validate.inc.php:389
-#, php-format
-msgid "Critical error. Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
-msgstr ""
-
-#: include/validate.inc.php:375
-#, php-format
-msgid "Critical error. Field \"%1$s\" contains Multibyte chars."
-msgstr "關鍵錯誤. 欄位 \"%1$s\" 含有多位元字元."
-
-#: include/validate.inc.php:439
-#, php-format
-msgid "Critical error. Field \"%1$s\" is mandatory."
-msgstr "關鍵錯誤. 欄位 \"%1$s\" 是必要的."
-
-#: include/validate.inc.php:315
-#, php-format
-msgid "Critical error. Field \"%1$s\" is not IP range."
-msgstr "關鍵錯誤. 欄位 \"%1$s\" 不是IP範圍."
-
-#: include/validate.inc.php:301
-#, php-format
-msgid "Critical error. Field \"%1$s\" is not IP."
-msgstr "關鍵錯誤. 欄位 \"%1$s\" 不是IP"
-
-#: include/validate.inc.php:353
-#, php-format
-msgid "Critical error. Field \"%1$s\" is not decimal number."
-msgstr "關鍵錯誤. 欄位 \"%1$s\" 十進位數字."
-
-#: include/validate.inc.php:329
-#, php-format
-msgid "Critical error. Field \"%1$s\" is not integer list or range."
-msgstr "關鍵錯誤. 欄位\"%1$s\"不是整數列表或範圍."
-
-#: include/validate.inc.php:342
-#, php-format
-msgid "Critical error. Field \"%1$s\" is not integer."
-msgstr "關鍵錯誤. 欄位 \"%1$s\" 不是整數."
-
-#: include/validate.inc.php:364
-#, php-format
-msgid "Critical error. Field \"%1$s\" is not string."
-msgstr "關鍵錯誤. 欄位 \"%1$s\" 不是字串."
-
-#: include/validate.inc.php:456
-#, php-format
-msgid "Critical error. Field \"%1$s\" must be missing."
-msgstr "關鍵錯誤. 欄位 \"%1$s\" 應該未填入."
-
-#: include/validate.inc.php:510
-#, php-format
-msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field."
-msgstr "關鍵錯誤. 欄位 \"%2$s\"的值\"%1$s\"錯誤."
-
-#: include/validate.inc.php:500
-#, php-format
-msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
-msgstr "關鍵錯誤. 欄位 \"%2$s\"的值\"%1$s\"錯誤: 必須在%3$s 和%4$s之間."
-
-#: include/validate.inc.php:491
-#, php-format
-msgid "Critical error. Incorrect value for field \"%1$s\": cannot be empty."
-msgstr "關鍵錯誤. 欄位 \"%1$s\"的值錯誤: 不能是空白."
 
 #: popup_trexpr.php:365
 msgid "Current date is < N"
@@ -3046,7 +2986,7 @@ msgstr "探索到的"
 msgid "DM"
 msgstr "節點管理"
 
-#: events.php:503 events.php:512 hosts.php:721
+#: events.php:503 events.php:512 hosts.php:715
 #: include/views/administration.proxy.edit.php:62
 #: include/views/js/configuration.host.edit.js.php:18 search.php:132
 msgid "DNS"
@@ -3315,7 +3255,7 @@ msgstr "删除"
 msgid "Delete and clear"
 msgstr "刪除並清除"
 
-#: templates.php:651
+#: templates.php:643
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "刪除並清除所選的模板? (警告: 所有連結的主機將被清除!)"
 
@@ -3397,7 +3337,7 @@ msgstr "删除篩選?"
 msgid "Delete script?"
 msgstr "删除脚本?"
 
-#: hosts.php:950 include/reports.inc.php:103 include/reports.inc.php:197
+#: hosts.php:944 include/reports.inc.php:103 include/reports.inc.php:197
 #: include/reports.inc.php:239
 #: include/views/administration.general.regularexpressions.list.php:67
 #: include/views/administration.mediatypes.list.php:121
@@ -3423,7 +3363,7 @@ msgstr "删除脚本?"
 #: include/views/configuration.screen.list.php:72
 #: include/views/configuration.slideconf.list.php:61
 #: include/views/configuration.sysmap.list.php:64
-#: include/views/configuration.triggers.list.php:276 templates.php:647
+#: include/views/configuration.triggers.list.php:276 templates.php:639
 msgid "Delete selected"
 msgstr "删除所選的"
 
@@ -3469,7 +3409,7 @@ msgstr "刪除所選的主機群組?"
 msgid "Delete selected host?"
 msgstr "刪除所選的主機?"
 
-#: hosts.php:951
+#: hosts.php:945
 msgid "Delete selected hosts?"
 msgstr "删除所選的主機?"
 
@@ -3522,7 +3462,7 @@ msgstr "删除所選的脚本?"
 msgid "Delete selected slide shows?"
 msgstr "刪除所選的簡報片展示?"
 
-#: templates.php:648
+#: templates.php:640
 msgid "Delete selected templates?"
 msgstr "删除所選的模板?"
 
@@ -3548,7 +3488,7 @@ msgid "Delete selected value mapping? It is used for %d item!"
 msgid_plural "Delete selected value mapping? It is used for %d items!"
 msgstr[0] "刪除所選的值對應? 它是用於%d項目!"
 
-#: templates.php:650
+#: templates.php:642
 msgid "Delete selected with linked elements"
 msgstr "自連結的組件删除所選的"
 
@@ -3765,7 +3705,7 @@ msgstr "停用所選的群組的調試模式?"
 msgid "Disable host"
 msgstr "停用主機"
 
-#: hosts.php:871 hosts.php:884
+#: hosts.php:865 hosts.php:878
 msgid "Disable host?"
 msgstr "停用主機?"
 
@@ -3777,7 +3717,7 @@ msgstr "停用所選的主機群組中的主機?"
 msgid "Disable hosts monitored by selected proxies?"
 msgstr "停用所選的系統代理程式所監測的主機?"
 
-#: hosts.php:947 include/views/administration.mediatypes.list.php:117
+#: hosts.php:941 include/views/administration.mediatypes.list.php:117
 #: include/views/administration.proxy.list.php:101
 #: include/views/administration.usergroups.list.php:141
 #: include/views/configuration.action.list.php:101
@@ -3813,7 +3753,7 @@ msgstr "停用所選的探索規則?"
 msgid "Disable selected groups?"
 msgstr "停用所選的群組?"
 
-#: hosts.php:948
+#: hosts.php:942
 msgid "Disable selected hosts?"
 msgstr "停用所選的主機?"
 
@@ -3864,10 +3804,10 @@ msgstr "已探索到的"
 msgid "Discovered device"
 msgstr "已探索到的裝置"
 
-#: events.php:297 hosts.php:759 hosts.php:836 include/html.inc.php:409
+#: events.php:297 hosts.php:753 hosts.php:830 include/html.inc.php:409
 #: include/menu.inc.php:77 include/menu.inc.php:208
-#: include/views/configuration.action.list.php:34 templates.php:494
-#: templates.php:559
+#: include/views/configuration.action.list.php:34 templates.php:486
+#: templates.php:551
 msgid "Discovery"
 msgstr "探索"
 
@@ -4185,7 +4125,7 @@ msgstr "空的動作條件."
 #: api/classes/CService.php:443 api/classes/CService.php:515
 #: api/classes/CTemplate.php:619 api/classes/CTrigger.php:896
 #: api/classes/CTrigger.php:960 api/classes/CTrigger.php:1050
-#: api/classes/CTriggerPrototype.php:652 api/classes/CUserGroup.php:608
+#: api/classes/CTriggerPrototype.php:652 api/classes/CUserGroup.php:602
 #: api/classes/CUserMacro.php:394 api/classes/CUserMacro.php:546
 #: api/classes/CUser.php:545
 msgid "Empty input parameter."
@@ -4240,7 +4180,7 @@ msgstr "啟用事件知悉"
 msgid "Enable host"
 msgstr "啟用主機"
 
-#: hosts.php:878
+#: hosts.php:872
 msgid "Enable host?"
 msgstr "啟用主機?"
 
@@ -4257,7 +4197,7 @@ msgstr "啟用受所選的系統代理程式所監測的主機?"
 msgid "Enable housekeeping"
 msgstr ""
 
-#: hosts.php:944 include/views/administration.mediatypes.list.php:113
+#: hosts.php:938 include/views/administration.mediatypes.list.php:113
 #: include/views/administration.proxy.list.php:97
 #: include/views/administration.usergroups.list.php:137
 #: include/views/configuration.action.list.php:97
@@ -4292,7 +4232,7 @@ msgstr "啟用所選的探索規則?"
 msgid "Enable selected groups?"
 msgstr "啟用所選的群組?"
 
-#: hosts.php:945 include/views/configuration.hostgroups.list.php:127
+#: hosts.php:939 include/views/configuration.hostgroups.list.php:127
 msgid "Enable selected hosts?"
 msgstr "啟用所選的主機?"
 
@@ -4487,8 +4427,8 @@ msgstr "過期的"
 msgid "Exploded"
 msgstr "Exploded"
 
-#: hosts.php:942 include/views/configuration.screen.list.php:70
-#: include/views/configuration.sysmap.list.php:63 templates.php:646
+#: hosts.php:936 include/views/configuration.screen.list.php:70
+#: include/views/configuration.sysmap.list.php:63 templates.php:638
 msgid "Export selected"
 msgstr "匯出所選的"
 
@@ -4614,6 +4554,46 @@ msgstr "欄位"
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr ""
 
+#: include/validate.inc.php:400
+#, php-format
+msgid "Field \"%1$s\" is mandatory."
+msgstr ""
+
+#: include/validate.inc.php:313
+#, php-format
+msgid "Field \"%1$s\" is not IP range."
+msgstr ""
+
+#: include/validate.inc.php:303
+#, php-format
+msgid "Field \"%1$s\" is not IP."
+msgstr ""
+
+#: include/validate.inc.php:338
+#, php-format
+msgid "Field \"%1$s\" is not decimal number."
+msgstr ""
+
+#: include/validate.inc.php:323
+#, php-format
+msgid "Field \"%1$s\" is not integer list or range."
+msgstr ""
+
+#: include/validate.inc.php:332
+#, php-format
+msgid "Field \"%1$s\" is not integer."
+msgstr ""
+
+#: include/validate.inc.php:344
+#, php-format
+msgid "Field \"%1$s\" is not string."
+msgstr ""
+
+#: include/validate.inc.php:412
+#, php-format
+msgid "Field \"%1$s\" must be missing."
+msgstr ""
+
 #: api/classes/CDRule.php:384
 msgid "Field \"druleid\" is required."
 msgstr "欄位\"druleid\"是所要的."
@@ -4644,7 +4624,7 @@ msgstr "檔案用於一個viwq不存在. 試著找\"%s\"."
 msgid "Filled region"
 msgstr "填滿的區域"
 
-#: events.php:356 hostinventories.php:133 hosts.php:726
+#: events.php:356 hostinventories.php:133 hosts.php:720
 #: include/classes/class.cwidget.php:130 include/forms.inc.php:628
 #: include/views/administration.auditacts.list.php:49
 #: include/views/administration.auditlogs.list.php:65
@@ -4825,7 +4805,7 @@ msgstr "全域腳本"
 msgid "Global scripts"
 msgstr "全域腳本"
 
-#: hosts.php:953
+#: hosts.php:947
 #: include/views/administration.general.regularexpressions.list.php:70
 #: include/views/administration.mediatypes.list.php:125
 #: include/views/administration.proxy.list.php:109
@@ -4845,7 +4825,7 @@ msgstr "全域腳本"
 #: include/views/configuration.screen.list.php:76
 #: include/views/configuration.slideconf.list.php:64
 #: include/views/configuration.sysmap.list.php:67
-#: include/views/configuration.triggers.list.php:279 templates.php:653
+#: include/views/configuration.triggers.list.php:279 templates.php:645
 #: tr_status.php:885
 msgid "Go"
 msgstr "確認"
@@ -4994,7 +4974,7 @@ msgstr "名為\"%1$s\"的圖形已經存在於圖形或圖形原型中."
 msgid "Graph with same name but other type exist."
 msgstr "同名但不同類型的圖形已存在."
 
-#: dashboard.php:293 hosts.php:758 hosts.php:834 include/blocks.inc.php:1263
+#: dashboard.php:293 hosts.php:752 hosts.php:828 include/blocks.inc.php:1263
 #: include/html.inc.php:493 include/html.inc.php:497 include/items.inc.php:866
 #: include/menu.inc.php:62 include/triggers.inc.php:1327
 #: include/views/configuration.graph.list.php:56
@@ -5004,7 +4984,7 @@ msgstr "同名但不同類型的圖形已存在."
 #: include/views/conf.import.php:34 include/views/monitoring.charts.php:32
 #: include/views/monitoring.charts.php:41 popup.php:76 search.php:141
 #: search.php:175 search.php:198 search.php:385 search.php:416 search.php:443
-#: templates.php:492 templates.php:555
+#: templates.php:484 templates.php:547
 msgid "Graphs"
 msgstr "圖形"
 
@@ -5026,7 +5006,7 @@ msgid "Grid"
 msgstr "網格"
 
 #: events.php:285 hostinventoriesoverview.php:83 hostinventories.php:92
-#: hostinventories.php:159 hosts.php:711 httpmon.php:72
+#: hostinventories.php:159 hosts.php:705 httpmon.php:72
 #: include/classes/class.chostsinfo.php:112
 #: include/classes/class.ctriggersinfo.php:121
 #: include/classes/screens/CScreenHostgroupTriggers.php:61
@@ -5047,7 +5027,7 @@ msgstr "網格"
 #: include/views/monitoring.overview.php:32
 #: include/views/monitoring.screen.php:98
 #: include/views/monitoring.slides.php:82 latest.php:154 popup.php:508
-#: templates.php:476 tr_status.php:252
+#: templates.php:468 tr_status.php:252
 msgid "Group"
 msgstr "群組"
 
@@ -5325,7 +5305,7 @@ msgstr "主機資產紀錄"
 msgid "Host access"
 msgstr "主機存取"
 
-#: hosts.php:373
+#: hosts.php:367
 msgid "Host added"
 msgstr "已新增主機"
 
@@ -5338,7 +5318,7 @@ msgstr "主機不能有超過一個同類型的預設介面."
 msgid "Host count"
 msgstr "主機計數"
 
-#: hosts.php:563 hosts.php:580
+#: hosts.php:557 hosts.php:574
 msgid "Host deleted"
 msgstr "主機已删除"
 
@@ -5448,7 +5428,7 @@ msgstr "主機篩選"
 msgid "Host status"
 msgstr "主機狀態"
 
-#: hostgroups.php:217 hosts.php:600 proxies.php:169
+#: hostgroups.php:217 hosts.php:594 proxies.php:169
 msgid "Host status updated"
 msgstr "主機狀態已更新"
 
@@ -5464,7 +5444,7 @@ msgstr "主機時間"
 msgid "Host update failed."
 msgstr "主機更新失敗."
 
-#: hosts.php:368
+#: hosts.php:362
 msgid "Host updated"
 msgstr "主機已更新"
 
@@ -5479,7 +5459,7 @@ msgstr "名稱同樣為 \"%s\" 的主機已存在."
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "可視名稱同樣為 \"%s\" 的主機已存在."
 
-#: hostinventoriesoverview.php:85 hostinventories.php:93 hosts.php:713
+#: hostinventoriesoverview.php:85 hostinventories.php:93 hosts.php:707
 #: include/forms.inc.php:225 include/forms.inc.php:898
 #: include/items.inc.php:813 include/menu.inc.php:112 include/menu.inc.php:168
 #: include/reports.inc.php:366 include/views/administration.proxy.edit.php:84
@@ -5524,7 +5504,7 @@ msgstr "主機資訊"
 msgid "Hosts location"
 msgstr "主機位置"
 
-#: hosts.php:346
+#: hosts.php:340
 msgid "Hosts updated"
 msgstr "主機已更新"
 
@@ -5565,7 +5545,7 @@ msgstr "ID"
 msgid "IMAP"
 msgstr "IMAP"
 
-#: events.php:502 events.php:511 hosts.php:722
+#: events.php:502 events.php:511 hosts.php:716
 #: include/views/administration.auditlogs.list.php:87
 #: include/views/administration.node.edit.php:75
 #: include/views/administration.node.list.php:44
@@ -5853,10 +5833,10 @@ msgstr "所有拓墣圖都將被更新!"
 msgid "Immediately"
 msgstr "立即地"
 
-#: hosts.php:704 include/views/configuration.screen.list.php:33
+#: hosts.php:698 include/views/configuration.screen.list.php:33
 #: include/views/configuration.sysmap.list.php:28
 #: include/views/conf.import.php:69 include/views/conf.import.php:74
-#: templates.php:469
+#: templates.php:461
 msgid "Import"
 msgstr "匯入"
 
@@ -5896,7 +5876,7 @@ msgstr "在...群組之中"
 msgid "In groups"
 msgstr "在...群組之中"
 
-#: hosts.php:863 include/views/configuration.maintenance.edit.php:168
+#: hosts.php:857 include/views/configuration.maintenance.edit.php:168
 #: include/views/configuration.maintenance.edit.php:176
 msgid "In maintenance"
 msgstr "維修中"
@@ -6519,6 +6499,16 @@ msgstr "於\"get_accessible_nodes_by_user\"中不正確的用戶資料."
 msgid "Incorrect user group."
 msgstr "不正確的用戶群組."
 
+#: include/validate.inc.php:451
+#, php-format
+msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
+msgstr ""
+
+#: include/validate.inc.php:447
+#, php-format
+msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
+msgstr ""
+
 #: include/classes/db/DB.php:357
 #, php-format
 msgid "Incorrect value \"%1$s\" for float field \"%2$s\"."
@@ -6533,6 +6523,11 @@ msgstr "不正確的值\"%1$s\"於整數欄位\"%2$s\"中."
 #, php-format
 msgid "Incorrect value \"%1$s\" for unsigned int field \"%2$s\"."
 msgstr "不正確的值\"%1$s\"於無正負整數欄位\"%2$s\"中."
+
+#: include/validate.inc.php:442
+#, php-format
+msgid "Incorrect value for field \"%1$s\": cannot be empty."
+msgstr ""
 
 #: include/classes/class.cbuttonqmessage.php:52
 #, php-format
@@ -6588,7 +6583,7 @@ msgstr "安装"
 msgid "Installer name"
 msgstr "安裝名稱"
 
-#: disc_prototypes.php:41 host_discovery.php:40 hosts.php:761
+#: disc_prototypes.php:41 host_discovery.php:40 hosts.php:755
 #: include/views/administration.proxy.edit.php:71 items.php:40
 msgid "Interface"
 msgstr "介面"
@@ -6617,11 +6612,20 @@ msgstr " 當\"%2$s\"上有 \"Use DNS\"屬性, IP為\"%1$s\"的介面不能有空
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name."
 msgstr "IP為\"%1$s\"的介面不能有空白的DNS名稱."
 
-#: include/users.inc.php:84
 #: include/views/administration.authentication.edit.php:35
-#: include/views/configuration.action.list.php:36
+msgctxt "authentication"
 msgid "Internal"
-msgstr "內部的"
+msgstr ""
+
+#: include/views/configuration.action.list.php:36
+msgctxt "event source"
+msgid "Internal"
+msgstr ""
+
+#: include/users.inc.php:84
+msgctxt "user type"
+msgid "Internal"
+msgstr ""
 
 #: api/rpc/class.cjsonrpc.php:202
 msgid "Internal JSON-RPC error."
@@ -6922,7 +6926,7 @@ msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" ."
 msgid "Item with key \"%1$s\" already exists."
 msgstr ""
 
-#: hosts.php:756 hosts.php:830 include/html.inc.php:443
+#: hosts.php:750 hosts.php:824 include/html.inc.php:443
 #: include/html.inc.php:447 include/items.inc.php:794
 #: include/reports.inc.php:109 include/reports.inc.php:245
 #: include/views/configuration.application.list.php:99
@@ -6933,7 +6937,7 @@ msgstr ""
 #: include/views/configuration.template.edit.php:217
 #: include/views/conf.import.php:31 latest.php:157 popup.php:56 queue.php:101
 #: search.php:139 search.php:167 search.php:190 search.php:383 search.php:408
-#: search.php:435 templates.php:490 templates.php:551
+#: search.php:435 templates.php:482 templates.php:543
 msgid "Items"
 msgstr "項目"
 
@@ -7444,11 +7448,11 @@ msgstr "與模板連結"
 
 #: include/views/configuration.host.edit.php:537
 #: include/views/configuration.template.edit.php:403
-#: include/views/configuration.template.edit.php:424 templates.php:496
+#: include/views/configuration.template.edit.php:424 templates.php:488
 msgid "Linked templates"
 msgstr "連結的模板"
 
-#: templates.php:497
+#: templates.php:489
 msgid "Linked to"
 msgstr "已連結到"
 
@@ -7841,7 +7845,7 @@ msgstr "標記所選"
 msgid "Mask"
 msgstr ""
 
-#: hosts.php:943 include/views/configuration.item.list.php:280
+#: hosts.php:937 include/views/configuration.item.list.php:280
 #: include/views/configuration.item.massupdate.php:558
 #: include/views/configuration.triggers.list.php:270
 msgid "Mass update"
@@ -7901,6 +7905,12 @@ msgstr[0] "最大的主機名稱長度是%2$d個字元, \"%3$s\" 是%1$d個字�
 #: include/views/configuration.item.massupdate.php:372
 msgid "Maximum number of flexible intervals added"
 msgstr ""
+
+#: include/classes/screens/CScreenBase.php:339 include/graphs.inc.php:401
+#, php-format
+msgid "Maximum time period to display is %1$s day."
+msgid_plural "Maximum time period to display is %1$s days."
+msgstr[0] ""
 
 #: popup_trexpr.php:259
 msgid "Maximum value for period T is < N"
@@ -8081,6 +8091,12 @@ msgstr "最小要求的PHP post尺寸是%s (組態選項\"post_max_size\")"
 msgid "Minimum severity"
 msgstr ""
 
+#: include/classes/screens/CScreenBase.php:334 include/graphs.inc.php:394
+#, php-format
+msgid "Minimum time period to display is %1$s hour."
+msgid_plural "Minimum time period to display is %1$s hours."
+msgstr[0] ""
+
 #: include/views/configuration.sysmap.edit.php:132 tr_status.php:303
 msgid "Minimum trigger severity"
 msgstr ""
@@ -8147,7 +8163,7 @@ msgstr ""
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
 msgstr "缺少主機\"%2$s\"的鍵值 \"%1$s\"."
 
-#: api/classes/CUserGroup.php:417
+#: api/classes/CUserGroup.php:416
 msgid "Missing parameter: usrgrpids."
 msgstr "缺少參數: usrgrpids."
 
@@ -8168,7 +8184,7 @@ msgstr "一"
 msgid "Monday"
 msgstr "週一"
 
-#: hosts.php:867 include/html.inc.php:391
+#: hosts.php:861 include/html.inc.php:391
 #: include/views/configuration.host.edit.php:295
 #: include/views/configuration.host.massupdate.php:145
 msgid "Monitored"
@@ -8253,8 +8269,8 @@ msgstr "NTLM認證"
 
 #: actionconf.php:37 actionconf.php:158 adm.regexps.php:37 adm.regexps.php:140
 #: adm.regexps.php:178 applications.php:39 disc_prototypes.php:42
-#: graphs.php:42 host_discovery.php:41 hostinventories.php:160 hosts.php:720
-#: hosts.php:754 httpconf.php:44 httpmon.php:88 include/forms.inc.php:603
+#: graphs.php:42 host_discovery.php:41 hostinventories.php:160 hosts.php:714
+#: hosts.php:748 httpconf.php:44 httpmon.php:88 include/forms.inc.php:603
 #: include/hosts.inc.php:115 include/reports.inc.php:162
 #: include/setup.inc.php:325
 #: include/views/administration.general.iconmap.edit.php:29
@@ -8665,7 +8681,7 @@ msgstr "沒有含群組ID\"%s\"的主機群組."
 msgid "No host with hostid \"%s\"."
 msgstr "沒有含主機ID\"%s\"的主機."
 
-#: hostinventoriesoverview.php:88 hostinventories.php:155 hosts.php:750
+#: hostinventoriesoverview.php:88 hostinventories.php:155 hosts.php:744
 msgid "No hosts defined."
 msgstr "沒有已定義的主機."
 
@@ -8962,7 +8978,7 @@ msgid "No target selected."
 msgstr "沒有已選的目標"
 
 #: include/views/configuration.host.edit.php:503
-#: include/views/configuration.template.edit.php:376 templates.php:484
+#: include/views/configuration.template.edit.php:376 templates.php:476
 msgid "No templates defined."
 msgstr "沒有已定義的模板."
 
@@ -9018,7 +9034,7 @@ msgstr "沒有已定義的web檢查."
 msgid "No web scenarios defined."
 msgstr "沒有定義的web方案"
 
-#: events.php:578 events.php:591 hostinventories.php:157 hosts.php:753
+#: events.php:578 events.php:591 hostinventories.php:157 hosts.php:747
 #: httpmon.php:86 include/actions.inc.php:68 include/audit.inc.php:42
 #: include/blocks.inc.php:185 include/blocks.inc.php:375
 #: include/blocks.inc.php:908 include/blocks.inc.php:1044
@@ -9048,7 +9064,7 @@ msgstr "沒有定義的web方案"
 #: include/views/configuration.triggers.list.php:107
 #: include/views/monitoring.discovery.php:40 latest.php:190 popup.php:485
 #: popup_right.php:66 queue.php:201 report2.php:395 report5.php:59
-#: search.php:129 search.php:270 search.php:380 templates.php:487
+#: search.php:129 search.php:270 search.php:380 templates.php:479
 #: tr_status.php:370
 msgid "Node"
 msgstr "節點"
@@ -9131,7 +9147,7 @@ msgstr "未分類"
 msgid "Not connected"
 msgstr "未連接"
 
-#: hosts.php:876 include/html.inc.php:394
+#: hosts.php:870 include/html.inc.php:394
 #: include/views/configuration.host.edit.php:296
 #: include/views/configuration.host.massupdate.php:146
 msgid "Not monitored"
@@ -9389,7 +9405,7 @@ msgid "Only Super Admins can delete media types."
 msgstr "只有超級管理員可以刪除示警媒介類型."
 
 #. GETTEXT: API exception
-#: api/classes/CUserGroup.php:612
+#: api/classes/CUserGroup.php:606
 msgid "Only Super Admins can delete user groups."
 msgstr "只有超級管理員可以刪除用戶群組."
 
@@ -9405,7 +9421,7 @@ msgstr "只有超級管理員可以更新全域巨集."
 msgid "Only Super Admins can update icon maps."
 msgstr "只有超級管理員可以更新圖示對應."
 
-#: api/classes/CUserGroup.php:289 api/classes/CUserGroup.php:411
+#: api/classes/CUserGroup.php:289 api/classes/CUserGroup.php:410
 msgid "Only Super Admins can update user groups."
 msgstr "只有超級管理員可以更新用戶群組."
 
@@ -9433,7 +9449,7 @@ msgstr "只計算指派給啟用的主機的項目"
 msgid "Only one check can be unique."
 msgstr "只能一個檢查可為唯一."
 
-#: api/classes/CUserGroup.php:424
+#: api/classes/CUserGroup.php:423
 msgid "Only one user group name can be changed at a time."
 msgstr "每次僅有一個用戶群組可以被改變."
 
@@ -9459,7 +9475,7 @@ msgstr "Opera"
 msgid "Operation \"%s\" already exists."
 msgstr "操作\"%s\"已存在."
 
-#: include/validate.inc.php:472
+#: include/validate.inc.php:424
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "由於未認證的請求, 操作無法完成."
 
@@ -9782,7 +9798,7 @@ msgstr "POP"
 msgid "PROBLEM"
 msgstr "問題"
 
-#: include/validate.inc.php:577
+#: include/validate.inc.php:515
 msgid "Page received incorrect data"
 msgstr "頁面接收到不正確的資料"
 
@@ -9971,7 +9987,7 @@ msgid "Populates host inventory field"
 msgstr "填入主機資產紀錄欄位"
 
 #: authentication.php:37 disc_prototypes.php:82 host_discovery.php:79
-#: hosts.php:723 include/forms.inc.php:494 include/setup.inc.php:321
+#: hosts.php:717 include/forms.inc.php:494 include/setup.inc.php:321
 #: include/views/administration.authentication.edit.php:58
 #: include/views/administration.node.edit.php:78
 #: include/views/administration.node.list.php:44
@@ -10507,7 +10523,7 @@ msgstr "要求的狀態碼"
 msgid "Required string"
 msgstr "要求的字串"
 
-#: events.php:357 hostinventories.php:138 hosts.php:731
+#: events.php:357 hostinventories.php:138 hosts.php:725
 #: include/forms.inc.php:633 include/html.inc.php:285
 #: include/reports.inc.php:121 include/reports.inc.php:259
 #: include/reports.inc.php:438
@@ -11014,7 +11030,7 @@ msgstr "篩選已更新"
 #: include/views/monitoring.screen.php:79
 #: include/views/monitoring.slides.php:31 popup.php:68 popup.php:84
 #: search.php:136 search.php:218 search.php:386 search.php:420 search.php:447
-#: templates.php:493 templates.php:557
+#: templates.php:485 templates.php:549
 msgid "Screens"
 msgstr "篩選"
 
@@ -11666,7 +11682,7 @@ msgstr "開始於"
 msgid "State"
 msgstr "州"
 
-#: events.php:505 events.php:514 events.php:581 events.php:594 hosts.php:763
+#: events.php:505 events.php:514 events.php:581 events.php:594 hosts.php:757
 #: httpdetails.php:134 httpmon.php:91 include/actions.inc.php:830
 #: include/actions.inc.php:908 include/actions.inc.php:967
 #: include/classes/screens/CScreenActions.php:58
@@ -11982,7 +11998,7 @@ msgstr ""
 msgid "Template \"%s\" already exists."
 msgstr "模板 \"%s\" 已存在"
 
-#: templates.php:170
+#: templates.php:164
 msgid "Template added"
 msgstr "模板已新增"
 
@@ -11990,7 +12006,7 @@ msgstr "模板已新增"
 msgid "Template cannot be linked to another template more than once even through other templates."
 msgstr "模板不能重複連結到其它模板, 即使透過其它模板."
 
-#: templates.php:355 templates.php:371 templates.php:399
+#: templates.php:349 templates.php:365 templates.php:393
 msgid "Template deleted"
 msgstr "模板已刪除"
 
@@ -12018,7 +12034,7 @@ msgstr "模板篩選"
 msgid "Template trigger"
 msgstr "模板觸發器"
 
-#: templates.php:166
+#: templates.php:160
 msgid "Template updated"
 msgstr "模板已更新"
 
@@ -12042,13 +12058,13 @@ msgstr "含有相同可視名稱\"%1$s\"的模板已連結到主機."
 msgid "Templated items"
 msgstr "模板的項目"
 
-#: hosts.php:762 include/menu.inc.php:164
+#: hosts.php:756 include/menu.inc.php:164
 #: include/views/configuration.host.edit.php:554
 #: include/views/configuration.hostgroups.list.php:116
 #: include/views/configuration.host.massupdate.php:287
 #: include/views/conf.import.php:28 search.php:276 search.php:305
 #: search.php:310 search.php:317 search.php:381 search.php:469
-#: templates.php:478 templates.php:488
+#: templates.php:470 templates.php:480
 msgid "Templates"
 msgstr "模板"
 
@@ -12466,7 +12482,7 @@ msgstr "觸發器已更新"
 msgid "Trigger value"
 msgstr "觸發器值"
 
-#: hosts.php:757 hosts.php:832 include/forms.inc.php:594
+#: hosts.php:751 hosts.php:826 include/forms.inc.php:594
 #: include/html.inc.php:468 include/html.inc.php:472 include/menu.inc.php:52
 #: include/triggers.inc.php:1183
 #: include/views/configuration.action.list.php:33
@@ -12481,7 +12497,7 @@ msgstr "觸發器值"
 #: include/views/monitoring.overview.php:28 jsLoader.php:110 popup.php:44
 #: search.php:134 search.php:140 search.php:171 search.php:194 search.php:216
 #: search.php:273 search.php:325 search.php:384 search.php:412 search.php:439
-#: templates.php:491 templates.php:553 tr_status.php:260
+#: templates.php:483 templates.php:545 tr_status.php:260
 msgid "Triggers"
 msgstr "觸發器"
 
@@ -12727,7 +12743,7 @@ msgid "Units"
 msgstr "單位"
 
 #: events.php:525 events.php:526 events.php:536 events.php:537 events.php:538
-#: events.php:539 hosts.php:883 httpdetails.php:163 httpmon.php:156
+#: events.php:539 hosts.php:877 httpdetails.php:163 httpmon.php:156
 #: include/actions.inc.php:41 include/actions.inc.php:98
 #: include/actions.inc.php:115 include/actions.inc.php:139
 #: include/actions.inc.php:163 include/actions.inc.php:176
@@ -13011,7 +13027,7 @@ msgstr "新增用户"
 msgid "User can't change type for himself"
 msgstr "用戶不能自行改變類型"
 
-#: api/classes/CUserGroup.php:467
+#: api/classes/CUserGroup.php:466
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "用戶不能將自己加進一個取消的群組或已取消圖形介面存取權的群組."
 
@@ -13040,17 +13056,17 @@ msgstr "用户已删除"
 msgid "User group"
 msgstr "用户群組"
 
-#: api/classes/CUserGroup.php:625
+#: api/classes/CUserGroup.php:619
 #, php-format
 msgid "User group \"%1$s\" is used in script \"%2$s\"."
 msgstr "用戶群組\"%1$s\"被用於腳本\"%2$s\"."
 
-#: api/classes/CUserGroup.php:435
+#: api/classes/CUserGroup.php:434
 #, php-format
 msgid "User group \"%s\" already exists."
 msgstr "用戶群組\"%s\"已存在."
 
-#: api/classes/CUserGroup.php:632
+#: api/classes/CUserGroup.php:626
 #, php-format
 msgid "User group [%s] is used in configuration for database down messages."
 msgstr "用戶群組[%s]被用為資料庫離線訊息的組態."
@@ -13288,94 +13304,13 @@ msgstr "W"
 msgid "Warning"
 msgstr "警告"
 
-#: chart7.php:74
-msgid "Warning. Cannot display more than one item with type \"Graph sum\"."
-msgstr "警告. 無法顯示超過一個類型為\"Graph sum\"的項目."
-
-#: include/validate.inc.php:393
-#, php-format
-msgid "Warning. Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
-msgstr ""
-
-#: include/validate.inc.php:443
-#, php-format
-msgid "Warning. Field \"%1$s\" is mandatory."
-msgstr "警告. 欄位\"%1$s\"是必要的."
-
-#: include/validate.inc.php:319
-#, php-format
-msgid "Warning. Field \"%1$s\" is not IP range."
-msgstr "警告. 欄位\"%1$s\"不是IP範圍."
-
-#: include/validate.inc.php:305
-#, php-format
-msgid "Warning. Field \"%1$s\" is not IP."
-msgstr "警告. 欄位\"%1$s\"不是IP."
-
-#: include/validate.inc.php:357
-#, php-format
-msgid "Warning. Field \"%1$s\" is not decimal number."
-msgstr "警告. 欄位\"%1$s\"不是十進位數字"
-
-#: include/validate.inc.php:333
-#, php-format
-msgid "Warning. Field \"%1$s\" is not integer list or range."
-msgstr "警告. 欄位\"%1$s\"不是整數列表或範圍."
-
-#: include/validate.inc.php:346
-#, php-format
-msgid "Warning. Field \"%1$s\" is not integer."
-msgstr "警告. 欄位\"%1$s\"不是整數."
-
-#: include/validate.inc.php:368
-#, php-format
-msgid "Warning. Field \"%1$s\" is not string."
-msgstr "警告. 欄位\"%1$s\"不是字串."
-
-#: include/validate.inc.php:379
-#, php-format
-msgid "Warning. Field \"%1$s\" multibyte chars are restricted."
-msgstr " 警告. 欄位\"%1$s\"的多位元字元是受限的."
-
-#: include/validate.inc.php:460
-#, php-format
-msgid "Warning. Field \"%1$s\" must be missing."
-msgstr " 警告. 缺少了欄位\"%1$s\""
-
-#: include/validate.inc.php:513
-#, php-format
-msgid "Warning. Incorrect value for field \"%1$s\"."
-msgstr "警告: 不正確的值予欄位\"%1$s\"."
-
-#: include/validate.inc.php:494
-#, php-format
-msgid "Warning. Incorrect value for field \"%1$s\": cannot be empty."
-msgstr "警告: 不正確的值予欄位\"%1$s\": 不能是空白."
-
-#: include/validate.inc.php:504
-#, php-format
-msgid "Warning. Incorrect value for field \"%1$s\": must be between %2$s and %3$s."
-msgstr "警告: 不正確的值予欄位\"%1$s\": 必需介於 %2$s 和 %3$s."
-
-#: include/classes/screens/CScreenBase.php:339 include/graphs.inc.php:401
-#, php-format
-msgid "Warning. Maximum time period to display is %1$s day."
-msgid_plural "Warning. Maximum time period to display is %1$s days."
-msgstr[0] " 警告. 可顯示的最大的時間期間是 %1$s日."
-
-#: include/classes/screens/CScreenBase.php:334 include/graphs.inc.php:394
-#, php-format
-msgid "Warning. Minimum time period to display is %1$s hour."
-msgid_plural "Warning. Minimum time period to display is %1$s hours."
-msgstr[0] " 警告. 可顯示的最大的時間期間是 %1$s時."
-
 #: jsLoader.php:170
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "我們很抱歉, 已經到了可記住的最大可能的組件數量."
 
-#: hosts.php:760 hosts.php:838 include/menu.inc.php:42 search.php:137
+#: hosts.php:754 hosts.php:832 include/menu.inc.php:42 search.php:137
 #: search.php:142 search.php:179 search.php:202 search.php:219 search.php:387
-#: search.php:424 search.php:451 templates.php:495 templates.php:561
+#: search.php:424 search.php:451 templates.php:487 templates.php:553
 msgid "Web"
 msgstr "Web"
 
@@ -13844,7 +13779,7 @@ msgstr "Zabbix端點代理程式(主動式)"
 msgid "Zabbix aggregate"
 msgstr "Zabbix整合"
 
-#: include/validate.inc.php:525
+#: include/validate.inc.php:462
 msgid "Zabbix has received an incorrect request."
 msgstr "Zabbix已接收到一個不正確的請求."
 
@@ -14149,6 +14084,7 @@ msgid "in"
 msgstr "在"
 
 #: include/events.inc.php:37
+msgctxt "event source"
 msgid "internal"
 msgstr ""
 
@@ -14166,7 +14102,7 @@ msgstr ""
 msgid "last"
 msgstr "最新"
 
-#: hostinventories.php:121 hosts.php:720 hosts.php:721 hosts.php:722
+#: hostinventories.php:121 hosts.php:714 hosts.php:715 hosts.php:716
 #: include/actions.inc.php:29 include/forms.inc.php:473
 #: include/forms.inc.php:480 include/forms.inc.php:487
 #: include/forms.inc.php:494 include/forms.inc.php:603
