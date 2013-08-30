@@ -346,7 +346,7 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		return ($flags & P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
 	}
 
-	if ($type == T_ZBX_STR && !defined('ZBX_ALLOW_UNICODE') && zbx_strlen($var) != zbx_strlen($var)) {
+	if ($type == T_ZBX_STR && !defined('ZBX_ALLOW_UNICODE') && mb_strlen($var) != strlen($var)) {
 		info(_s('Field "%1$s" multibyte chars are restricted.', $caption));
 
 		return ($flags & P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
