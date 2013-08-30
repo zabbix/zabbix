@@ -8,6 +8,7 @@ New features:
 A.F.I..... [ZBXNEXT-1569] implemented user name and surname displaying in acknowledgements (Ivo, Oleg)
 
 Bug fixes:
+..F....... [ZBX-6927] improved validation messages (Eduard)
 ..F....... [ZBX-6923] fixed mass delete in template list, improved code quality in hosts and templates (Vitalij)
 ...G...PS. [ZBX-6916] added space delimeter support in configuration file (igors)
 ..F....... [ZBX-6930] 'Unlink and clear' link bug fix, now it displayed (Vitalij)
