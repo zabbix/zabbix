@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-08-30 13:52+0300\n"
-"PO-Revision-Date: 2013-08-30 11:43+0300\n"
-"Last-Translator: Adail <the.spaww@gmail.com>\n"
+"PO-Revision-Date: 2013-08-30 15:32+0300\n"
+"Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1377855839.0\n"
+"X-POOTLE-MTIME: 1377869520.0\n"
 
 #: include/views/configuration.item.edit.php:389
 msgid " day"
@@ -334,7 +334,7 @@ msgstr "Ação incluída"
 
 #: actionconf.php:169
 msgid "Action deleted"
-msgstr "Ação removida"
+msgstr "Ação excluída"
 
 #: include/views/configuration.action.edit.php:411
 msgid "Action operations"
@@ -609,7 +609,7 @@ msgstr "Aplicação incluída"
 
 #: applications.php:141 applications.php:180
 msgid "Application deleted"
-msgstr "Aplicação removida"
+msgstr "Aplicação excluída"
 
 #: api/rpc/class.cjsonrpc.php:206
 msgid "Application error."
@@ -663,7 +663,7 @@ msgstr "Você tem certeza que deseja executar esta ação?"
 
 #: include/views/js/common.macros.js.php:53
 msgid "Are you sure you want to delete"
-msgstr "Você tem certeza que deseja remover"
+msgstr "Você tem certeza que deseja excluir"
 
 #: include/views/js/configuration.sysmaps.js.php:50
 msgid "Area size"
@@ -1439,11 +1439,11 @@ msgstr "Não é possível excluir o usuário interno do Zabbix \"%1$s\", tente d
 
 #: actionconf.php:169
 msgid "Cannot delete action"
-msgstr "Ação não foi removida"
+msgstr "Ação não foi excluída"
 
 #: applications.php:141 applications.php:180
 msgid "Cannot delete application"
-msgstr "Aplicação não foi removida"
+msgstr "Aplicação não foi excluída"
 
 #: api/classes/CTrigger.php:1085
 msgid "Cannot delete dependency"
@@ -1452,7 +1452,7 @@ msgstr "Não é possível excluir dependência"
 #: api/classes/CDiscoveryRule.php:399 discoveryconf.php:172
 #: host_discovery.php:184
 msgid "Cannot delete discovery rule"
-msgstr "Regra de autobusca não pode ser removida"
+msgstr "A descoberta de rede não pôde ser excluída"
 
 #: host_discovery.php:293
 msgid "Cannot delete discovery rules"
@@ -1496,7 +1496,7 @@ msgstr "Não foi possível remover icone do mapa"
 
 #: adm.images.php:121
 msgid "Cannot delete image"
-msgstr "Imagem não foi removida"
+msgstr "A imagem não foi excluída"
 
 #: api/classes/CHost.php:1254
 msgid "Cannot delete inventory."
@@ -1610,7 +1610,7 @@ msgstr "Não é possível excluir cenários web vindos do template \"%1$s\"."
 
 #: trigger_prototypes.php:181 triggers.php:197
 msgid "Cannot delete trigger"
-msgstr "Trigger não foi removida"
+msgstr "A trigger não foi excluída"
 
 #: api/classes/CItemPrototype.php:582
 msgid "Cannot delete trigger prototype"
@@ -1622,7 +1622,7 @@ msgstr "Trigger não foi excluída."
 
 #: trigger_prototypes.php:297 triggers.php:362
 msgid "Cannot delete triggers"
-msgstr "Triggers não foram removidas"
+msgstr "As triggers não foram excluídas"
 
 #: api/classes/CTriggerPrototype.php:712
 msgid "Cannot delete triggers created by low level discovery."
@@ -3879,7 +3879,7 @@ msgstr "A regra de descoberta foi criada"
 
 #: discoveryconf.php:172 host_discovery.php:184
 msgid "Discovery rule deleted"
-msgstr "Regra de autobusca removida"
+msgstr "A regra de autobusca excluída"
 
 #: discoveryconf.php:148 host_discovery.php:262
 msgid "Discovery rule updated"
@@ -4011,7 +4011,7 @@ msgstr "Dependências duplicadas na trigger \"%1$s\"."
 #: api/classes/CHost.php:738
 #, php-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
-msgstr "Host duplicado. Já existe outro com o mesmo hostname: \"%s\"."
+msgstr "Host duplicado. Já existe outro com o mesmo nome de host: \"%s\"."
 
 #: api/classes/CHost.php:770
 #, php-format
@@ -5811,7 +5811,7 @@ msgstr "Imagem incluída"
 
 #: adm.images.php:121
 msgid "Image deleted"
-msgstr "Imagem removida"
+msgstr "Imagem excluída"
 
 #: include/views/configuration.sysmap.edit.php:107
 msgid "Image label type"
@@ -6216,7 +6216,7 @@ msgstr "Foi informado um parâmetro inválido para a interface IP \"%s\"."
 #: api/classes/CHostInterface.php:653
 #, php-format
 msgid "Incorrect interface port \"%s\" provided."
-msgstr "Foi informada uma porta inválida para a interface \"%s\"."
+msgstr "Foi informada uma porta inválida para a interface: \"%s\"."
 
 #: api/classes/CHost.php:675
 #, php-format
@@ -6524,7 +6524,7 @@ msgstr "O valor \"%1$s\" não é válido para o campo \"%2$s\"."
 #: include/validate.inc.php:447
 #, php-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
-msgstr "O valor \"%1$s\" não é válido para o campo \"%2$s\": seu valor deve estar entre %2$s e %4$s."
+msgstr "O valor \"%1$s\" não é válido para o campo \"%2$s\": seu valor deve estar entre %3$s e %4$s."
 
 #: include/classes/db/DB.php:357
 #, php-format
@@ -7753,7 +7753,7 @@ msgstr "Manutenção adicionada"
 
 #: maintenance.php:228
 msgid "Maintenance deleted"
-msgstr "Manutenção removida"
+msgstr "Manutenção excluída"
 
 #: include/views/configuration.maintenance.edit.php:150
 msgid "Maintenance period"
@@ -7959,8 +7959,8 @@ msgstr "A quantidade máxima de intervalos flexíveis foi alcançada"
 #, php-format
 msgid "Maximum time period to display is %1$s day."
 msgid_plural "Maximum time period to display is %1$s days."
-msgstr[0] "O período máximo a ser exibido é de %1%s dia."
-msgstr[1] "O período máximo a ser exibido é de %1%s dias."
+msgstr[0] "O período máximo a ser exibido é de %1$s dia."
+msgstr[1] "O período máximo a ser exibido é de %1$s dias."
 
 #: popup_trexpr.php:259
 msgid "Maximum value for period T is < N"
@@ -8016,7 +8016,7 @@ msgstr "Tipo de mídia adicionado"
 
 #: media_types.php:143 media_types.php:183
 msgid "Media type deleted"
-msgstr "Mídia removida"
+msgstr "Tipo de mídia excluído"
 
 #: media_types.php:177
 msgid "Media type disabled"
@@ -11074,7 +11074,7 @@ msgstr "Configuração de célula de tela"
 
 #: screenconf.php:223
 msgid "Screen deleted"
-msgstr "Tela removida"
+msgstr "A tela foi excluída"
 
 #: api/classes/CScreenItem.php:174
 msgid "Screen item in same cell already exists."
@@ -12039,7 +12039,7 @@ msgstr "Template"
 #: api/classes/CHost.php:1080
 #, php-format
 msgid "Template \"%1$s\" already exists."
-msgstr "Já existe o template \"%1$s\"."
+msgstr "O template \"%1$s\" já existe."
 
 #: include/classes/import/importers/CHostImporter.php:33
 #, php-format
@@ -12461,7 +12461,7 @@ msgstr "Comentários"
 
 #: trigger_prototypes.php:181 triggers.php:197
 msgid "Trigger deleted"
-msgstr "Trigger removida"
+msgstr "A trigger foi excluída"
 
 #: adm.gui.php:101 adm.housekeeper.php:129 adm.iconmapping.php:118
 #: adm.images.php:140 adm.macros.php:167 adm.other.php:113 adm.regexps.php:201
@@ -12579,7 +12579,7 @@ msgstr "Triggers (e/d)[p/o]"
 
 #: trigger_prototypes.php:297 triggers.php:362
 msgid "Triggers deleted"
-msgstr "Triggers removidas"
+msgstr "As triggers foram excluídas"
 
 #: include/classes/class.ctriggersinfo.php:110 include/screens.inc.php:42
 msgid "Triggers info"
