@@ -862,9 +862,6 @@ define('ZBX_GUEST_USER','guest');
 
 define('ZBX_FAVORITES_ALL', -1);
 
-// allow for testing
-define('ZBX_ALLOW_UNICODE', 1);
-
 // IPMI
 define('IPMI_AUTHTYPE_DEFAULT',		-1);
 define('IPMI_AUTHTYPE_NONE',		0);
