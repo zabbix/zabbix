@@ -190,6 +190,9 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 
 						*((int *)cfg[i].variable) = (int)var;
 						break;
+					case TYPE_STRING_LIST:
+						zbx_trim_str_list(value, ',');
+						/* break; is not missing here */
 					case TYPE_STRING:
 						*((char **)cfg[i].variable) =
 								zbx_strdup(*((char **)cfg[i].variable), value);
@@ -232,6 +235,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 					goto missing_mandatory;
 				break;
 			case TYPE_STRING:
+			case TYPE_STRING_LIST:
 				if (NULL == (*(char **)cfg[i].variable))
 					goto missing_mandatory;
 				break;

@@ -381,7 +381,7 @@ $linkedTemplateTable->setHeader(array(_('Name'), _('Action')));
 
 $ignoredTemplates = array();
 foreach ($this->data['linkedTemplates'] as $template) {
-	$tmplList->addVar('exist_templates[]', $template['templateid']);
+	$tmplList->addVar('templates[]', $template['templateid']);
 
 	$linkedTemplateTable->addRow(
 		array(
@@ -409,7 +409,7 @@ $newTemplateTable->attr('id', 'newTemplateTable');
 $newTemplateTable->attr('style', 'min-width: 400px;');
 
 $newTemplateTable->addRow(array(new CMultiSelect(array(
-	'name' => 'templates[]',
+	'name' => 'add_templates[]',
 	'objectName' => 'templates',
 	'ignored' => $ignoredTemplates
 ))));

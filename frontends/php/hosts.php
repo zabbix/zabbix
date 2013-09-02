@@ -59,7 +59,7 @@ $fields = array(
 	'mainInterfaces' =>	array(T_ZBX_INT, O_OPT, null,			DB_ID,		null),
 	'templates' =>		array(T_ZBX_INT, O_OPT, null,			DB_ID,		null),
 	'add_template' =>	array(T_ZBX_STR, O_OPT, null,			null,		null),
-	'exist_templates' => array(T_ZBX_INT, O_OPT, null,			DB_ID,		null),
+	'add_templates' => array(T_ZBX_INT, O_OPT, null,			DB_ID,		null),
 	'templates_rem' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 	'clear_templates' => array(T_ZBX_INT, O_OPT, null,			DB_ID,		null),
 	'ipmi_authtype' =>	array(T_ZBX_INT, O_OPT, null,			BETWEEN(-1, 6), null),
@@ -176,16 +176,10 @@ else {
 /*
  * Actions
  */
-if (!isset($_REQUEST['add_template'])) {
-	unset($_REQUEST['templates']);
+if (isset($_REQUEST['add_template']) && isset($_REQUEST['add_templates'])) {
+	$_REQUEST['templates'] = get_request('templates', array());
+	$_REQUEST['templates'] = array_merge($_REQUEST['templates'], $_REQUEST['add_templates']);
 }
-
-if (isset($_REQUEST['exist_templates'])) {
-	$_REQUEST['templates'] = (isset($_REQUEST['templates']) && isset($_REQUEST['add_template']))
-		? array_merge($_REQUEST['exist_templates'], $_REQUEST['templates'])
-		: $_REQUEST['exist_templates'];
-}
-
 if (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear'])) {
 	$_REQUEST['clear_templates'] = get_request('clear_templates', array());
 
