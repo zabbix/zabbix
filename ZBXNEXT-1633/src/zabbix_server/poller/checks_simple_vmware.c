@@ -2528,11 +2528,8 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 
 			hv = (zbx_hv_t *)vcenter->hvs.values[i];
 
-			if (NULL == (name = read_xml_value(hv->details,
-					"//*[local-name()='host' and @type='HostSystem']")))
-			{
+			if (NULL == (name = read_xml_value(hv->details, ZBX_XPATH_LN2("config", "name"))))
 				continue;
-			}
 
 			if (NULL != hv->clusterid)
 				cluster = cluster_get(&vcenter->clusters, hv->clusterid);
@@ -2842,7 +2839,47 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 int	check_vcenter_vm_hv_name(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return get_vcenter_vmstat(request, username, password, ZBX_XPATH_LN2("runtime", "host"), result);
+	int		ret = SYSINFO_RET_FAIL;
+	zbx_vcenter_t	*vcenter;
+	zbx_hv_t	*hv;
+	char		*url, *uuid, *error = NULL, *name;
+	int		i;
+
+	if (2 != request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	uuid = get_rparam(request, 1);
+
+	if ('\0' == *uuid)
+		return SYSINFO_RET_FAIL;
+
+	if (SUCCEED != vcenter_update(url, username, password, &error))
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL == (vcenter = vcenter_get(url, username, password)))
+		return SYSINFO_RET_FAIL;
+
+	for (i = 0; i < vcenter->hvs.values_num; i++)
+	{
+		hv = (zbx_hv_t *)vcenter->hvs.values[i];
+
+		if (NULL != vm_get(&hv->vms, uuid))
+			break;
+	}
+
+	if (i != vcenter->hvs.values_num)
+	{
+		name = read_xml_value(hv->details, ZBX_XPATH_LN2("config", "name"));
+
+		SET_STR_RESULT(result, name);
+		ret = SYSINFO_RET_OK;
+	}
+
+	return ret;
 }
 
 int	check_vcenter_vm_memory_size(AGENT_REQUEST *request, const char *username, const char *password,
@@ -3794,7 +3831,7 @@ int	check_vsphere_vm_discovery(AGENT_REQUEST *request, const char *username, con
 int	check_vsphere_vm_hv_name(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return get_vsphere_vmstat(request, username, password, ZBX_XPATH_LN2("runtime", "host"), result);
+	return get_vsphere_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_LN2("config", "name"), result);
 }
 
 int	check_vsphere_vm_memory_size(AGENT_REQUEST *request, const char *username, const char *password,
