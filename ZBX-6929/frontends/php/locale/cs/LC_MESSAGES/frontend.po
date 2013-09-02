@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-25 13:59+0300\n"
+"POT-Creation-Date: 2013-08-28 00:19+0300\n"
 "PO-Revision-Date: 2012-09-12 12:19+0200\n"
 "Last-Translator: jiri <jiri.pavliska@elvac.eu>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -10154,6 +10154,10 @@ msgstr "Znovu zkusit"
 msgid "Right"
 msgstr "vpravo"
 
+#: include/locales.inc.php:66
+msgid "Romanian (ro_RO)"
+msgstr ""
+
 #: include/views/configuration.screen.constructor.edit.php:606
 #: screenedit.php:46
 msgid "Row span"
@@ -10216,7 +10220,7 @@ msgstr ""
 msgid "Run remote commands on hosts"
 msgstr ""
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:67
 msgid "Russian (ru_RU)"
 msgstr "Rusky (ru_RU)"
 
@@ -11158,7 +11162,7 @@ msgstr "Prezentace"
 msgid "Slides"
 msgstr "Slajdy"
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:68
 msgid "Slovak (sk_SK)"
 msgstr ""
 
@@ -11225,7 +11229,7 @@ msgstr ""
 msgid "Source"
 msgstr "Zdroj"
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:69
 msgid "Spanish (es_ES)"
 msgstr "Španělsky (es_ES)"
 
@@ -11443,7 +11447,7 @@ msgstr ""
 msgid "Surname"
 msgstr "Příjmení"
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:70
 msgid "Swedish (sv_SE)"
 msgstr "Švédsky (sv_SE)"
 
@@ -12100,7 +12104,7 @@ msgstr "út"
 msgid "Tuesday"
 msgstr "úterý"
 
-#: include/locales.inc.php:70
+#: include/locales.inc.php:71
 msgid "Turkish (tr_TR)"
 msgstr ""
 
@@ -12237,7 +12241,7 @@ msgstr "PROFIL UŽIVATELE"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:71
+#: include/locales.inc.php:72
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukrajinsky (uk_UA)"
 

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-25 13:59+0300\n"
-"PO-Revision-Date: 2013-02-01 16:06+0200\n"
+"POT-Creation-Date: 2013-08-28 00:20+0300\n"
+"PO-Revision-Date: 2013-08-27 14:55+0200\n"
 "Last-Translator: Saulute <salomejazelskyte@gmail.com>\n"
 "Language-Team: none\n"
 "Language: lt\n"
@@ -28,7 +28,6 @@ msgstr "\"Rodyti OK trigerius\" reikšmė turi būti \"0\" arba teigiamas sveika
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
 msgstr "\"Trigeriai mirksi keičiantis statusui\" reikšmė turi būti \"0\" arba teigiamas sveikasis skaičius."
 
-# 
 # „%1 -ą“ (1, 21, 31, 41, 51 and etc..)
 # „%1 -as“ (2-9, 22-29,49,42, and etc.)
 # „%1 -ų“ (10-20, 30, 40, 50 and etc..)
@@ -37,9 +36,9 @@ msgstr "\"Trigeriai mirksi keičiantis statusui\" reikšmė turi būti \"0\" arb
 #, php-format
 msgid "%1$d day, "
 msgid_plural "%1$d days, "
-msgstr[0] "%1$d dieną,"
-msgstr[1] "%1$d dienas,"
-msgstr[2] "%1$d dienų,"
+msgstr[0] "%1$d dieną, "
+msgstr[1] "%1$d dienas, "
+msgstr[2] "%1$d dienų, "
 
 #: httpmon.php:295 include/views/configuration.httpconf.list.php:116
 #, php-format
@@ -66,35 +65,35 @@ msgstr[2] "%1$s Elementų"
 #, php-format
 msgid "%1$s failed login attempt logged. Last failed attempt was from %2$s on %3$s at %4$s."
 msgid_plural "%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s at %4$s."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s nesėkmingas prisijungimas įtrauktas į registrą. Paskutinis nesėkmingas prisijungimas buvo iš %2$s on %3$s at %4$s."
+msgstr[1] "%1$s nesėkmingi prisijungimai įtraukti į registrą. Paskutinis nesėkmingas prisijungimas buvo iš %2$s on %3$s at %4$s."
+msgstr[2] "%1$s nesėkmingų prisijungimų įtraukti į registrą. Paskutinis nesėkmingas prisijungimas buvo iš %2$s on %3$s at %4$s."
 
 #: include/blocks.inc.php:984
 #, php-format
 msgid "%2$d of %1$d issue is shown"
 msgid_plural "%2$d of %1$d issues are shown"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%2$d iš %1$d problema yra rodomos"
+msgstr[1] "%2$d iš %1$d problemos yra rodoma"
+msgstr[2] "%2$d iš %1$d problemų yra rodoma"
 
 #: include/views/monitoring.discovery.php:133
 #, php-format
 msgid "%d device"
 msgid_plural "%d devices"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%d įtaisą"
+msgstr[1] "%d įtaisus"
+msgstr[2] "%d įtaisų"
 
 #: include/views/configuration.action.edit.php:424
 msgid "(0 - infinitely)"
-msgstr ""
+msgstr "(0 - begalybės)"
 
 #: include/views/configuration.host.edit.php:193
 #: include/views/configuration.hostgroups.list.php:31
 #: include/views/configuration.template.edit.php:143
 msgid "(Only super admins can create groups)"
-msgstr ""
+msgstr "(Tik super administratoriai gali kurti grupes)"
 
 #: include/forms.inc.php:539 include/forms.inc.php:554
 msgid "(in days)"
@@ -120,7 +119,7 @@ msgstr "- visos grupės -"
 
 #: acknow.php:97
 msgid "----[BULK ACKNOWLEDGE]----"
-msgstr ""
+msgstr "----[BULK ACKNOWLEDGE]----"
 
 #: include/triggers.inc.php:2223 include/triggers.inc.php:2224
 #: include/triggers.inc.php:2225 include/triggers.inc.php:2227
@@ -160,112 +159,119 @@ msgstr "500 paskutinių reikšmių"
 
 #: include/views/configuration.sysmap.edit.php:67
 msgid "<manual>"
-msgstr ""
+msgstr "<rankinis>"
 
 #: acknow.php:146
 msgid "ALARM ACKNOWLEDGES"
-msgstr ""
+msgstr "ALARM ACKNOWLEDGES"
 
 #: include/triggers.inc.php:1662
 #: include/views/configuration.action.edit.php:114
 #: include/views/configuration.action.edit.php:880
 #: include/views/configuration.triggers.edit.php:104 tr_logform.php:290
 msgid "AND"
-msgstr ""
+msgstr "AND"
 
 #: include/views/configuration.action.edit.php:113
 #: include/views/configuration.action.edit.php:879
 msgid "AND / OR"
-msgstr ""
+msgstr "AND / OR"
 
+# VEIKSMŲ AUDITAS
 #: include/views/administration.auditacts.list.php:31
 msgid "AUDIT ACTIONS"
-msgstr ""
+msgstr "AUDIT ACTIONS"
 
+# REGISTRŲ AUDITAS
 #: include/views/administration.auditlogs.list.php:31
 msgid "AUDIT LOGS"
-msgstr ""
+msgstr "AUDIT LOGS"
 
+# PRIEINAMUMO ATASKAITA
 #: report2.php:137
 msgid "AVAILABILITY REPORT"
-msgstr ""
+msgstr "AVAILABILITY REPORT"
 
 #: popup_trexpr.php:122
 msgid "Absolute difference between last and previous value is < N"
-msgstr ""
+msgstr "Absoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra < N"
 
 #: popup_trexpr.php:130
 msgid "Absolute difference between last and previous value is = N"
-msgstr ""
+msgstr "Absoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra = N"
 
 #: popup_trexpr.php:126
 msgid "Absolute difference between last and previous value is > N"
-msgstr ""
+msgstr "Absoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra > N"
 
 #: popup_trexpr.php:134
 msgid "Absolute difference between last and previous value is NOT N"
-msgstr ""
+msgstr "Absoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra NOT N"
 
 #: report3.php:85 srv_status.php:160
 msgid "Acceptable SLA"
-msgstr ""
+msgstr "Priimtinas SLA"
 
 #: sysmap.php:75
 msgid "Access denied!"
-msgstr ""
+msgstr "Prieiga uždrausta!"
 
+# 1 sekundei
+# 2-9 sekundėms
+# 20-100 sekundžių and e.t.c.
 #: api/classes/CUser.php:916
 #, php-format
 msgid "Account is blocked for %s seconds"
-msgstr ""
+msgstr "Paskyra užblokuota %s sekundžių"
 
+# There is no acronym for this word in LT language we're writing all word "Pripažinimas"
 #: events.php:565 events.php:578 include/actions.inc.php:245
 #: include/blocks.inc.php:903 include/blocks.inc.php:1420
 #: include/events.inc.php:137 include/events.inc.php:210
 #: include/views/configuration.action.edit.php:938
 msgid "Ack"
-msgstr ""
+msgstr "Pripažinimas"
 
 #: acknow.php:179 include/triggers.inc.php:1236 include/triggers.inc.php:1239
 #: tr_status.php:664
 msgid "Acknowledge"
-msgstr ""
+msgstr "Pripažinimas"
 
 #: acknow.php:122
 msgid "Acknowledge added"
-msgstr ""
+msgstr "Pripažinimas pridėtas"
 
 #: acknow.php:150 acknow.php:178
 msgid "Acknowledge alarm by"
-msgstr ""
+msgstr "Pripažinimo aliarmas pagal"
 
 #: acknow.php:151 acknow.php:180
 msgid "Acknowledge and return"
-msgstr ""
+msgstr "Pripažinti ir sugrįžti"
 
 #: tr_status.php:202
 msgid "Acknowledge status"
-msgstr ""
+msgstr "Pripažinimo būsena"
 
 #: include/events.inc.php:122 tr_status.php:290 tr_status.php:667
 msgid "Acknowledged"
-msgstr ""
+msgstr "Pripažintas"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:83
 msgid "Acknowledged OK events"
-msgstr ""
+msgstr "Pripažinti OK įvykiai"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:49
 msgid "Acknowledged PROBLEM events"
-msgstr ""
+msgstr "Pripažinti PROBLEM įvykiai"
 
 #: acknow.php:27 tr_events.php:123
 msgid "Acknowledges"
-msgstr ""
+msgstr "Pripažinimai"
 
 #: include/views/configuration.sysmap.edit.php:144
 msgid "Acknowledging disabled"
-msgstr ""
+msgstr "Pripažinimas išjungtas"
 
 #: include/audit.inc.php:28 include/views/administration.auditlogs.list.php:62
 #: include/views/administration.auditlogs.list.php:89
@@ -291,39 +297,39 @@ msgstr ""
 #: include/views/configuration.triggers.massupdate.php:79 tr_logform.php:299
 #: tr_logform.php:303
 msgid "Action"
-msgstr ""
+msgstr "Veiksmas"
 
 #: api/classes/CAction.php:774 api/classes/CAction.php:871
 #, php-format
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seconds)."
-msgstr ""
+msgstr "Veiksmas \"%1$s\" turi neteisinga reikšme \"esc_period\" (minimaliai %2$s sekundžių)."
 
 #: api/classes/CAction.php:777 api/classes/CAction.php:791
 #: api/classes/CAction.php:880 api/classes/CAction.php:899
 #, php-format
 msgid "Action \"%s\" already exists."
-msgstr ""
+msgstr "Veiksmas \"%s\" jau egzistuoja."
 
 #: api/classes/CAction.php:926
 #, php-format
 msgid "Action \"%s\" no operations defined."
-msgstr ""
+msgstr "Veiksme \"%s\" nėra apibrėžtų operacijų."
 
 #: actionconf.php:149
 msgid "Action added"
-msgstr ""
+msgstr "Veiksmas pridėtas"
 
 #: actionconf.php:170
 msgid "Action deleted"
-msgstr ""
+msgstr "Veiksmas ištrintas"
 
 #: include/views/configuration.action.edit.php:399
 msgid "Action operations"
-msgstr ""
+msgstr "Veiksmo operacijos"
 
 #: actionconf.php:145
 msgid "Action updated"
-msgstr ""
+msgstr "Veiksmas atnaujintas"
 
 #: events.php:566 events.php:579 include/blocks.inc.php:904
 #: include/blocks.inc.php:1421 include/events.inc.php:138
@@ -332,34 +338,34 @@ msgstr ""
 #: include/views/administration.auditlogs.list.php:29
 #: include/views/configuration.action.list.php:39
 msgid "Actions"
-msgstr ""
+msgstr "Veiksmai"
 
 #: include/views/configuration.item.prototype.list.php:104
 msgid "Activate selected"
-msgstr ""
+msgstr "Veiksmas pažymėtas"
 
 #: include/views/administration.proxy.edit.php:40
 #: include/views/administration.proxy.list.php:84
 #: include/views/configuration.httpconf.edit.php:118
 msgid "Active"
-msgstr ""
+msgstr "Aktyvus"
 
 #: include/views/configuration.maintenance.list.php:61
 msgctxt "maintenance status"
 msgid "Active"
-msgstr ""
+msgstr "Aktyvus"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:571
 #: include/views/configuration.maintenance.edit.php:81 maintenance.php:147
 #: maintenance.php:153
 msgid "Active since"
-msgstr ""
+msgstr "Aktyvus nuo"
 
 #: api/classes/CMaintenance.php:463 api/classes/CMaintenance.php:576
 #: include/views/configuration.maintenance.edit.php:121 maintenance.php:161
 #: maintenance.php:165
 msgid "Active till"
-msgstr ""
+msgstr "Aktyvus iki"
 
 #: dashconf.php:211 include/blocks.inc.php:1143 include/blocks.inc.php:1149
 #: include/blocks.inc.php:1263 include/blocks.inc.php:1308
@@ -410,114 +416,114 @@ msgstr ""
 #: popup_media.php:141 popup_period.php:183 tr_logform.php:289
 #: tr_status.php:717
 msgid "Add"
-msgstr ""
+msgstr "Pridėti"
 
 #: acknow.php:173
 msgid "Add comment by"
-msgstr ""
+msgstr "Pridėti komentarą pagal"
 
 #: sysmap.php:144
 msgid "Add element"
-msgstr ""
+msgstr "Pridėti elementą"
 
 #: include/views/configuration.graph.edit.php:209
 #: include/views/configuration.graph.edit.php:267
 msgid "Add graph items first"
-msgstr ""
+msgstr "Pirmiausia pridėti grafiko elementus"
 
 #: include/actions.inc.php:338 include/actions.inc.php:553
 msgid "Add host"
-msgstr ""
+msgstr "Pridėti mazgą"
 
 #: sysmap.php:150
 msgid "Add link"
-msgstr ""
+msgstr "Pridėti nuorodą"
 
 #: include/views/conf.import.php:23
 msgid "Add missing"
-msgstr ""
+msgstr "Pridėti trūkstamą"
 
 #: include/views/configuration.graph.edit.php:114
 msgid "Add prototype"
-msgstr ""
+msgstr "Pridėti prototipą"
 
 #: jsLoader.php:181
 msgid "Add service"
-msgstr ""
+msgstr "Pridėti servisą"
 
 #: slides.php:83
 msgid "Add to"
-msgstr ""
+msgstr "Pridėti prie"
 
 #: charts.php:93 history.php:94 host_screen.php:88 include/html.inc.php:249
 #: maps.php:70 screens.php:89
 msgid "Add to favourites"
-msgstr ""
+msgstr "Pridėti prie mėgstamiausių"
 
 #: include/actions.inc.php:557
 msgid "Add to host group"
-msgstr ""
+msgstr "Pridėti prie mazgų grupės"
 
 #: include/actions.inc.php:364 include/views/configuration.action.edit.php:766
 msgid "Add to host groups"
-msgstr ""
+msgstr "Pridėti prie mazgų grupių"
 
 #: auditlogs.php:134
 msgid "Added"
-msgstr ""
+msgstr "Pridėtas"
 
 #: include/items.inc.php:1336 include/views/configuration.item.edit.php:190
 msgid "Additional parameters"
-msgstr ""
+msgstr "Papildomi parametrai"
 
 #: include/hosts.inc.php:69
 msgid "Admin"
-msgstr ""
+msgstr "Adminas"
 
 #: include/menu.inc.php:220
 msgid "Administration"
-msgstr ""
+msgstr "Administravimas"
 
 #: include/views/configuration.sysmap.edit.php:84
 msgid "Advanced labels"
-msgstr ""
+msgstr "Sudėtingesnė žymė"
 
 #: include/blocks.inc.php:901 include/blocks.inc.php:1418
 #: include/events.inc.php:136 include/events.inc.php:210
 #: include/events.inc.php:213 tr_status.php:288
 msgid "Age"
-msgstr ""
+msgstr "Laikotarpis"
 
 #: tr_status.php:236
 msgid "Age less than"
-msgstr ""
+msgstr "Laikotarpis mažesnis už"
 
 #: include/views/monitoring.overview.php:53
 #, php-format
 msgid "Age less than %s"
-msgstr ""
+msgstr "Laikotarpis mažesnis už %s"
 
 #: include/items.inc.php:185 include/views/administration.script.list.php:64
 #: include/views/configuration.httpconf.edit.php:114 popup.php:1856
 msgid "Agent"
-msgstr ""
+msgstr "Agentas"
 
 #: include/views/configuration.host.edit.php:233
 msgid "Agent interfaces"
-msgstr ""
+msgstr "Agento sąsaja"
 
 #: hosts.php:56
 msgid "Agent or SNMP or JMX or IPMI interface"
-msgstr ""
+msgstr "Agentas arba SNMP arba JMX arba IPMI sąsaja"
 
 #: include/hosts.inc.php:119 include/views/administration.users.edit.php:49
 #: include/views/administration.users.list.php:54 popup.php:896 users.php:43
 msgid "Alias"
-msgstr ""
+msgstr "Alternatyvus vardas"
 
 #: sysmap.php:174
 msgid "Align icons"
-msgstr ""
+msgstr "Piktogramų lygiavimas"
 
 #: dashconf.php:173 dashconf.php:254 include/blocks.inc.php:1242
 #: include/blocks.inc.php:1251 include/blocks.inc.php:1296
@@ -538,34 +544,34 @@ msgstr ""
 #: include/views/configuration.sysmap.edit.php:138 jsLoader.php:87
 #: popup_right.php:56 tr_status.php:215
 msgid "All"
-msgstr ""
+msgstr "Visi"
 
 #: include/classes/class.chostsinfo.php:115
 #: include/classes/class.ctriggersinfo.php:124
 msgid "All groups"
-msgstr ""
+msgstr "Visos grupės"
 
 #: jsLoader.php:154
 msgid "All links should have \"Name\" and \"URL\" specified"
-msgstr ""
+msgstr "Visos nuorodos turi turėti apibrėžtą \"Pavadinimą\" ir \"URL\""
 
 #: include/page_header.php:121
 msgid "All nodes"
-msgstr ""
+msgstr "Visi susikirtimo taškai"
 
 #: include/views/configuration.item.edit.php:345
 #: include/views/configuration.item.edit.php:389
 #: include/views/configuration.item.massupdate.php:407
 msgid "Allowed hosts"
-msgstr ""
+msgstr "Leidžiami mazgai"
 
 #: tr_status.php:193 tr_status.php:199
 msgid "Any"
-msgstr ""
+msgstr "Bet kuris"
 
 #: include/regexp.inc.php:194
 msgid "Any character string included"
-msgstr ""
+msgstr "Bet kuri simbolio eilutė įtraukta"
 
 #: applications.php:136 httpconf.php:42 include/actions.inc.php:90
 #: include/audit.inc.php:32 include/forms.inc.php:526
@@ -573,43 +579,43 @@ msgstr ""
 #: include/views/configuration.application.list.php:54
 #: include/views/configuration.httpconf.edit.php:44
 msgid "Application"
-msgstr ""
+msgstr "Programa"
 
 #: api/classes/CApplication.php:799
 #, php-format
 msgid "Application \"%1$s\" already exists for host \"%2$s\"."
-msgstr ""
+msgstr "Programa \"%1$s\" jau egzistuoja ant mazgo \"%2$s\"."
 
 #: api/classes/CApplication.php:489
 #, php-format
 msgid "Application \"%1$s\" already exists."
-msgstr ""
+msgstr "Programa \"%1$s\" jau egzistuoja."
 
 #: api/classes/CApplication.php:633
 #, php-format
 msgid "Application \"%1$s\" used by scenario \"%2$s\" and can't be deleted."
-msgstr ""
+msgstr "Programa \"%1$s\" naudojama pagal scenarijų \"%2$s\" ir negali būti ištrinta."
 
 #: applications.php:128
 msgid "Application added"
-msgstr ""
+msgstr "Programa pridėta"
 
 #: applications.php:155 applications.php:186
 msgid "Application deleted"
-msgstr ""
+msgstr "Programa ištrinta"
 
 #: api/rpc/class.cjsonrpc.php:206
 msgid "Application error."
-msgstr ""
+msgstr "Programos klaida."
 
 #: applications.php:121
 msgid "Application updated"
-msgstr ""
+msgstr "Programa atnaujinta"
 
 #: api/classes/CItemGeneral.php:333
 #, php-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
-msgstr ""
+msgstr "Programa su ID \"%1$s\" yra nepasiekiama ant \"%2$s\"."
 
 #: hosts.php:683 hosts.php:759 include/forms.inc.php:823
 #: include/html.inc.php:390 include/html.inc.php:394
@@ -623,43 +629,43 @@ msgstr ""
 #: search.php:136 search.php:160 search.php:179 search.php:368 search.php:389
 #: search.php:412 templates.php:458 templates.php:521
 msgid "Applications"
-msgstr ""
+msgstr "Programos"
 
 #: include/views/js/configuration.sysmaps.js.php:184
 #: include/views/js/configuration.sysmaps.js.php:273
 #: include/views/js/configuration.sysmaps.js.php:374
 msgid "Apply"
-msgstr ""
+msgstr "Taikyti"
 
 #: include/views/configuration.maintenance.list.php:58
 msgctxt "maintenance status"
 msgid "Approaching"
-msgstr ""
+msgstr "Kreipiantis"
 
 #: include/func.inc.php:221
 msgid "Apr"
-msgstr ""
+msgstr "Bal"
 
 #: include/forms.inc.php:1556 include/func.inc.php:107
 #: include/func.inc.php:238 jsLoader.php:117
 msgid "April"
-msgstr ""
+msgstr "Balandis"
 
 #: include/classes/class.cbuttonqmessage.php:49
 msgid "Are you sure you want perform this action?"
-msgstr ""
+msgstr "Ar tikrai jūs norite atlikti šį veiksmą?"
 
 #: include/views/js/common.macros.js.php:53
 msgid "Are you sure you want to delete"
-msgstr ""
+msgstr "Ar jūs tikrai norite ištrinti"
 
 #: include/views/js/configuration.sysmaps.js.php:48
 msgid "Area size"
-msgstr ""
+msgstr "Srities dydis"
 
 #: include/views/js/configuration.sysmaps.js.php:36
 msgid "Area type"
-msgstr ""
+msgstr "Srities tipas"
 
 #: include/views/configuration.item.edit.php:360
 #: include/views/configuration.item.edit.php:377
@@ -667,450 +673,453 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:374
 #: include/views/configuration.item.massupdate.php:388
 msgid "As is"
-msgstr ""
+msgstr "Kaip"
 
 #: include/views/monitoring.history.php:67
 msgid "As plain text"
-msgstr ""
+msgstr "Kaip gryną tekstą"
 
 #: include/hosts.inc.php:154
 msgid "Asset tag"
-msgstr ""
+msgstr "Aprašo punkto gairė"
 
 #: include/maintenances.inc.php:54 include/maintenances.inc.php:57
 msgid "At"
-msgstr ""
+msgstr "Prie"
 
 #: include/forms.inc.php:1682
 msgid "At (hour:minute)"
-msgstr ""
+msgstr "Ties (valanda:minutė)"
 
 #: api/classes/CMaintenance.php:403 api/classes/CMaintenance.php:595
 msgid "At least one host or group should be selected."
-msgstr ""
+msgstr "Bent vienas mazgas arba grupė turi būti pažymėti."
 
 #: api/classes/CMaintenance.php:473 api/classes/CMaintenance.php:586
 msgid "At least one maintenance period must be created."
-msgstr ""
+msgstr "Bent vienas priežiūros periodas turi būti sukurtas."
 
 #: include/classes/class.frontendsetup.php:292
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
-msgstr ""
+msgstr "Bent vienas iš MySQL, PostgreSQL, Oracle, SQLite3 arba IBM DB2 turėtų būti palaikomas"
 
 #: include/menu.inc.php:266
 msgid "Audit"
-msgstr ""
+msgstr "Auditas"
 
 #: auditacts.php:27
 msgid "Audit actions"
-msgstr ""
+msgstr "Veiksmų auditas"
 
 #: auditlogs.php:27
 msgid "Audit logs"
-msgstr ""
+msgstr "Registrų auditas"
 
 #: include/func.inc.php:225
 msgid "Aug"
-msgstr ""
+msgstr "Rugpj"
 
 #: include/forms.inc.php:1548 include/func.inc.php:111
 #: include/func.inc.php:242 jsLoader.php:121
 msgid "August"
-msgstr ""
+msgstr "Rugpjūtis"
 
 #: include/menu.inc.php:249 include/views/configuration.httpconf.edit.php:59
 msgid "Authentication"
-msgstr ""
+msgstr "Autentifikacija"
 
 #: include/views/configuration.host.edit.php:534
 msgid "Authentication algorithm"
-msgstr ""
+msgstr "Autentifikacijos algoritmas"
 
 #: include/views/configuration.action.edit.php:673
 #: include/views/configuration.item.edit.php:173
 #: include/views/configuration.item.massupdate.php:200
 msgid "Authentication method"
-msgstr ""
+msgstr "Autentifikacijos metodas"
 
 #: authentication.php:158 authentication.php:159
 msgid "Authentication method changed to HTTP"
-msgstr ""
+msgstr "Autentifikacijos metodas pakeistas į HTTP"
 
 #: authentication.php:121 authentication.php:122
 msgid "Authentication method changed to LDAP"
-msgstr ""
+msgstr "Autentifikacijos metodas pakeistas į LDAP"
 
 #: authentication.php:83 authentication.php:84
 msgid "Authentication method changed to Zabbix internal"
-msgstr ""
+msgstr "Autentifikacijos metodas pakeistas į Zabbix vidinį"
 
 #: include/views/configuration.action.list.php:35
 msgid "Auto registration"
-msgstr ""
+msgstr "Automatinė registracija"
 
 #: include/views/administration.users.edit.php:119
 msgid "Auto-login"
-msgstr ""
+msgstr "Automatinis prisijungimas"
 
 #: include/views/administration.users.edit.php:120 profile.php:47 users.php:60
 msgid "Auto-logout (min 90 seconds)"
-msgstr ""
+msgstr "Automatinis atsijungimas (minimum 90 sekundžių)"
 
 #: include/views/configuration.host.edit.php:574
 #: include/views/configuration.host.massupdate.php:179
 msgid "Automatic"
-msgstr ""
+msgstr "Automatinis"
 
 #: include/views/configuration.sysmap.edit.php:78
 msgid "Automatic icon mapping"
-msgstr ""
+msgstr "Automatinis piktogramų išdėstymas"
 
 #: include/views/js/configuration.sysmaps.js.php:116
 #: include/views/js/configuration.sysmaps.js.php:238
 msgid "Automatic icon selection"
-msgstr ""
+msgstr "Automatinis piktogramų pažymėjimas"
 
 #: hosts.php:691 popup.php:543
 msgid "Availability"
-msgstr ""
+msgstr "Prieinamumas"
 
 #: include/menu.inc.php:129 report2.php:26
 msgid "Availability report"
-msgstr ""
+msgstr "Prieinamumo ataskaita"
 
 #: include/classes/class.chostsinfo.php:125 popup.php:586
 msgid "Available"
-msgstr ""
+msgstr "Pasiekiamas"
 
 #: adm.triggerseverities.php:60
 #: include/views/administration.general.triggerSeverity.edit.php:52
 msgid "Average"
-msgstr ""
+msgstr "Vidutinis"
 
 #: include/reports.inc.php:677
 msgid "Average by"
-msgstr ""
+msgstr "Vidutinis pagal"
 
 #: popup_trexpr.php:138
 msgid "Average value of a period T is < N"
-msgstr ""
+msgstr "Vidutinė laikotarpio reikšmė T yra < N"
 
 #: popup_trexpr.php:148
 msgid "Average value of a period T is = N"
-msgstr ""
+msgstr "Vidutinė laikotarpio reikšmė T yra = N"
 
 #: popup_trexpr.php:143
 msgid "Average value of a period T is > N"
-msgstr ""
+msgstr "Vidutinė laikotarpio reikšmė T yra > N"
 
 #: popup_trexpr.php:153
 msgid "Average value of a period T is NOT N"
-msgstr ""
+msgstr "Vidutinė laikotarpio reikšmė T yra NOT N"
 
 #: popup_bitem.php:140
 msgid "Axis side"
-msgstr ""
+msgstr "Koordinačių ašį"
 
 #: include/func.inc.php:401
 msgctxt "Byte short"
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: include/page_header.php:224
 msgid "BACK"
-msgstr ""
+msgstr "BACK"
 
 #: include/views/administration.general.image.edit.php:29
 #: include/views/administration.general.image.list.php:25
 msgid "Background"
-msgstr ""
+msgstr "Fonas"
 
 #: include/views/configuration.sysmap.edit.php:63
 msgid "Background image"
-msgstr ""
+msgstr "Fono paveikslėlis"
 
 #: include/menu.inc.php:137 report6.php:25 report6.php:180
 msgid "Bar reports"
-msgstr ""
+msgstr "Stulpinė ataskaita"
 
 #: authentication.php:39
 #: include/views/administration.authentication.edit.php:59
 msgid "Base DN"
-msgstr ""
+msgstr "Bazė DN"
 
 #: include/httptest.inc.php:28
 msgid "Basic authentication"
-msgstr ""
+msgstr "Pagrindinė autentifikacija"
 
 #: include/views/administration.authentication.edit.php:61
 msgid "Bind DN"
-msgstr ""
+msgstr "Įrišti DN"
 
 #: authentication.php:49
 #: include/views/administration.authentication.edit.php:62
 msgid "Bind password"
-msgstr ""
+msgstr "Įrišti slaptažodį"
 
 #: include/classes/core/ZBase.php:137
 msgid "Black & Blue"
-msgstr ""
+msgstr "Juoda ir Mėlyna"
 
+# female - mirksinti
+# male - mirksintis
+#
 #: include/views/administration.general.triggerDisplayOptions.edit.php:28
 msgid "Blinking"
-msgstr ""
+msgstr "Mirksinti"
 
 #: include/views/administration.users.list.php:83
 msgid "Blocked"
-msgstr ""
+msgstr "Užblokuotas"
 
 #: include/graphs.inc.php:69 include/views/js/configuration.sysmaps.js.php:334
 #: include/views/js/configuration.sysmaps.js.php:410
 msgid "Bold line"
-msgstr ""
+msgstr "Pusjuodė eilutė"
 
 #: include/items.inc.php:131
 msgid "Boolean"
-msgstr ""
+msgstr "Būlio"
 
 #: include/views/configuration.screen.constructor.edit.php:602
 #: include/views/configuration.sysmap.edit.php:132
 #: include/views/js/configuration.sysmaps.js.php:72
 #: include/views/js/configuration.sysmaps.js.php:228
 msgid "Bottom"
-msgstr ""
+msgstr "Apačia"
 
 #: include/reports.inc.php:712
 msgid "Brighten"
-msgstr ""
+msgstr "Šviesinti"
 
 #: include/locales.inc.php:46
 msgid "Bulgarian (bg_BG)"
-msgstr ""
+msgstr "Bulgarų (bg_BG)"
 
 #: tr_status.php:780
 msgid "Bulk acknowledge"
-msgstr ""
+msgstr "Didžiosios dalies pripažinimas"
 
 #: report2.php:180
 msgid "By host"
-msgstr ""
+msgstr "Pagal mazgą"
 
 #: report2.php:181
 msgid "By trigger template"
-msgstr ""
+msgstr "Pagal trigerio šabloną"
 
 #: include/views/configuration.action.edit.php:25
 #: include/views/configuration.action.list.php:29
 msgid "CONFIGURATION OF ACTIONS"
-msgstr ""
+msgstr "CONFIGURATION OF ACTIONS"
 
 #: include/views/configuration.application.edit.php:23
 #: include/views/configuration.application.list.php:33
 msgid "CONFIGURATION OF APPLICATIONS"
-msgstr ""
+msgstr "CONFIGURATION OF APPLICATIONS"
 
 #: include/views/administration.authentication.edit.php:23
 msgid "CONFIGURATION OF AUTHENTICATION"
-msgstr ""
+msgstr "CONFIGURATION OF AUTHENTICATION"
 
 #: include/views/configuration.discovery.edit.php:25
 #: include/views/configuration.discovery.list.php:28
 msgid "CONFIGURATION OF DISCOVERY RULE"
-msgstr ""
+msgstr "CONFIGURATION OF DISCOVERY RULE"
 
 #: host_discovery.php:263
 #: include/views/configuration.host.discovery.list.php:30
 msgid "CONFIGURATION OF DISCOVERY RULES"
-msgstr ""
+msgstr "CONFIGURATION OF DISCOVERY RULES"
 
 #: include/views/configuration.graph.edit.php:25
 #: include/views/configuration.graph.list.php:31
 msgid "CONFIGURATION OF GRAPH PROTOTYPES"
-msgstr ""
+msgstr "CONFIGURATION OF GRAPH PROTOTYPES"
 
 #: include/views/configuration.graph.edit.php:29
 #: include/views/configuration.graph.list.php:50
 msgid "CONFIGURATION OF GRAPHS"
-msgstr ""
+msgstr "CONFIGURATION OF GRAPHS"
 
 #: adm.gui.php:107
 msgid "CONFIGURATION OF GUI"
-msgstr ""
+msgstr "CONFIGURATION OF GUI"
 
 #: include/views/configuration.hostgroups.edit.php:23
 #: include/views/configuration.hostgroups.list.php:36
 msgid "CONFIGURATION OF HOST GROUPS"
-msgstr ""
+msgstr "CONFIGURATION OF HOST GROUPS"
 
 #: hosts.php:570 hosts.php:619 hosts.php:639
 msgid "CONFIGURATION OF HOSTS"
-msgstr ""
+msgstr "CONFIGURATION OF HOSTS"
 
 #: adm.housekeeper.php:86
 msgid "CONFIGURATION OF HOUSEKEEPER"
-msgstr ""
+msgstr "CONFIGURATION OF HOUSEKEEPER"
 
 #: adm.iconmapping.php:127
 msgid "CONFIGURATION OF ICON MAPPING"
-msgstr ""
+msgstr "CONFIGURATION OF ICON MAPPING"
 
 #: adm.images.php:149
 msgid "CONFIGURATION OF IMAGES"
-msgstr ""
+msgstr "CONFIGURATION OF IMAGES"
 
 #: include/views/configuration.services.edit.php:28
 #: include/views/configuration.services.list.php:25
 msgid "CONFIGURATION OF IT SERVICES"
-msgstr ""
+msgstr "CONFIGURATION OF IT SERVICES"
 
 #: disc_prototypes.php:313
 #: include/views/configuration.item.prototype.list.php:29
 msgid "CONFIGURATION OF ITEM PROTOTYPES"
-msgstr ""
+msgstr "CONFIGURATION OF ITEM PROTOTYPES"
 
 #: include/views/configuration.item.copy.php:28
 #: include/views/configuration.item.list.php:31
 #: include/views/configuration.item.massupdate.php:28 items.php:664
 msgid "CONFIGURATION OF ITEMS"
-msgstr ""
+msgstr "CONFIGURATION OF ITEMS"
 
 #: adm.macros.php:173
 msgid "CONFIGURATION OF MACROS"
-msgstr ""
+msgstr "CONFIGURATION OF MACROS"
 
 #: include/views/configuration.maintenance.edit.php:23
 #: include/views/configuration.maintenance.list.php:28
 msgid "CONFIGURATION OF MAINTENANCE PERIODS"
-msgstr ""
+msgstr "CONFIGURATION OF MAINTENANCE PERIODS"
 
 #: include/views/administration.mediatypes.edit.php:23
 #: include/views/administration.mediatypes.list.php:27
 msgid "CONFIGURATION OF MEDIA TYPES"
-msgstr ""
+msgstr "CONFIGURATION OF MEDIA TYPES"
 
 #: sysmap.php:121 sysmaps.php:215
 msgid "CONFIGURATION OF NETWORK MAPS"
-msgstr ""
+msgstr "CONFIGURATION OF NETWORK MAPS"
 
 #: include/views/administration.node.edit.php:25
 #: include/views/administration.node.list.php:60
 msgid "CONFIGURATION OF NODES"
-msgstr ""
+msgstr "CONFIGURATION OF NODES"
 
 #: include/views/administration.proxy.edit.php:23
 #: include/views/administration.proxy.list.php:33
 msgid "CONFIGURATION OF PROXIES"
-msgstr ""
+msgstr "CONFIGURATION OF PROXIES"
 
 #: adm.regexps.php:226
 msgid "CONFIGURATION OF REGULAR EXPRESSIONS"
-msgstr ""
+msgstr "CONFIGURATION OF REGULAR EXPRESSIONS"
 
 #: include/views/configuration.screen.constructor.list.php:25
 msgid "CONFIGURATION OF SCREEN"
-msgstr ""
+msgstr "CONFIGURATION OF SCREEN"
 
 #: include/views/configuration.screen.edit.php:23
 #: include/views/configuration.screen.list.php:35
 msgid "CONFIGURATION OF SCREENS"
-msgstr ""
+msgstr "CONFIGURATION OF SCREENS"
 
 #: include/views/administration.script.edit.php:28
 #: include/views/administration.script.list.php:26
 msgid "CONFIGURATION OF SCRIPTS"
-msgstr ""
+msgstr "CONFIGURATION OF SCRIPTS"
 
 #: include/views/configuration.slideconf.edit.php:25
 #: include/views/configuration.slideconf.list.php:28
 msgid "CONFIGURATION OF SLIDE SHOWS"
-msgstr ""
+msgstr "CONFIGURATION OF SLIDE SHOWS"
 
 #: templates.php:422 templates.php:442
 msgid "CONFIGURATION OF TEMPLATES"
-msgstr ""
+msgstr "CONFIGURATION OF TEMPLATES"
 
 #: include/views/configuration.triggers.edit.php:37
 #: include/views/configuration.triggers.list.php:41
 #: include/views/configuration.triggers.massupdate.php:37
 msgid "CONFIGURATION OF TRIGGER PROTOTYPES"
-msgstr ""
+msgstr "CONFIGURATION OF TRIGGER PROTOTYPES"
 
 #: adm.triggerseverities.php:94
 msgid "CONFIGURATION OF TRIGGER SEVERITIES"
-msgstr ""
+msgstr "CONFIGURATION OF TRIGGER SEVERITIES"
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:45
 #: include/views/configuration.triggers.massupdate.php:40 triggers.php:376
 msgid "CONFIGURATION OF TRIGGERS"
-msgstr ""
+msgstr "CONFIGURATION OF TRIGGERS"
 
 #: include/views/administration.users.edit.php:30
 msgid "CONFIGURATION OF USER"
-msgstr ""
+msgstr "CONFIGURATION OF USER"
 
 #: include/views/administration.usergroups.edit.php:23
 msgid "CONFIGURATION OF USER GROUP"
-msgstr ""
+msgstr "CONFIGURATION OF USER GROUP"
 
 #: include/views/administration.usergroups.list.php:31
 #: include/views/administration.users.list.php:31
 msgid "CONFIGURATION OF USERS AND USER GROUPS"
-msgstr ""
+msgstr "CONFIGURATION OF USERS AND USER GROUPS"
 
 #: adm.valuemapping.php:143
 msgid "CONFIGURATION OF VALUE MAPPING"
-msgstr ""
+msgstr "CONFIGURATION OF VALUE MAPPING"
 
 #: include/views/configuration.httpconf.edit.php:25
 #: include/views/configuration.httpconf.list.php:37
 msgid "CONFIGURATION OF WEB MONITORING"
-msgstr ""
+msgstr "CONFIGURATION OF WEB MONITORING"
 
 #: adm.workingtime.php:76
 msgid "CONFIGURATION OF WORKING TIME"
-msgstr ""
+msgstr "CONFIGURATION OF WORKING TIME"
 
 #: adm.triggerdisplayoptions.php:89
 msgid "CONFIGURATION OF ZABBIX"
-msgstr ""
+msgstr "CONFIGURATION OF ZABBIX"
 
 #: include/views/configuration.services.edit.php:62 services.php:45
 msgid "Calculate SLA, acceptable SLA (in %)"
-msgstr ""
+msgstr "Apskaičiuoti SLA, priimtinas SLA (į %)"
 
 #: include/items.inc.php:92 include/views/configuration.graph.edit.php:162
 #: include/views/configuration.graph.edit.php:220
 msgid "Calculated"
-msgstr ""
+msgstr "Apskaičiuotas"
 
 #: include/views/administration.usergroups.edit.php:114
 msgid "Calculated permissions"
-msgstr ""
+msgstr "Apskaičiavimo leidimai"
 
 #: include/hosts.inc.php:66
 msgid "Callback"
-msgstr ""
+msgstr "Atgalinis skambutis"
 
 #: api/classes/CTemplate.php:1410
 msgid "Can't add group"
-msgstr ""
+msgstr "Negalima pridėti grupės"
 
 #: api/classes/CTemplate.php:1486 api/classes/CTemplate.php:1496
 msgid "Can't link template"
-msgstr ""
+msgstr "Negalima susieti šablono"
 
 #: api/classes/CTemplate.php:1421
 msgid "Can't remove group"
-msgstr ""
+msgstr "Negalima sunaikinti grupės"
 
 #: api/classes/CTemplate.php:1457 api/classes/CTemplate.php:1475
 msgid "Can't unlink template"
-msgstr ""
+msgstr "Negalima atsieti šablono"
 
 #: include/views/administration.mediatypes.edit.php:88
 msgid "Canada (136 characters)"
-msgstr ""
+msgstr "Kanada (136 ženklų)"
 
 #: include/classes/class.cbuttoncancel.php:25 include/config.inc.php:267
 #: include/forms.inc.php:1707 include/forms.inc.php:2010
@@ -1125,178 +1134,178 @@ msgstr ""
 #: include/views/js/configuration.discovery.edit.js.php:69
 #: include/views/js/general.script.confirm.js.php:41 tr_logform.php:372
 msgid "Cancel"
-msgstr ""
+msgstr "Atšaukti"
 
 #: acknow.php:119
 msgid "Cannot acknowledge event"
-msgstr ""
+msgstr "Negalima pripažinti įvykio"
 
 #: actionconf.php:149
 msgid "Cannot add action"
-msgstr ""
+msgstr "Negalima pridėti veiksmo"
 
 #: applications.php:129
 msgid "Cannot add application"
-msgstr ""
+msgstr "Negalima pridėti programą"
 
 #: api/classes/CTrigger.php:1713
 msgid "Cannot add dependency from a host to a template."
-msgstr ""
+msgstr "Negalima pridėti priklausomybės iš mazgo į šabloną."
 
 #: include/triggers.inc.php:501
 #, php-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
-msgstr ""
+msgstr "Negalima pridėti priklausomybės iš trigerio \"%1$s:%2$s\" į neegzistuojantį trigerį \"%3$s:%4$s\"."
 
 #: host_discovery.php:233
 msgid "Cannot add discovery rule"
-msgstr ""
+msgstr "Negalima pridėti atradimo taisyklės"
 
 #: graphs.php:246
 msgid "Cannot add graph"
-msgstr ""
+msgstr "Negalima pridėti grafiko"
 
 #: hostgroups.php:145 usergrps.php:173
 msgid "Cannot add group"
-msgstr ""
+msgstr "Negalima pridėti grupės"
 
 #: hosts.php:327
 msgid "Cannot add host"
-msgstr ""
+msgstr "Negalima pridėti mazgo"
 
 #: adm.images.php:62
 msgid "Cannot add image"
-msgstr ""
+msgstr "Negalima pridėti atvaizdo"
 
 #: include/classes/import/CXmlImport18.php:632
 msgid "Cannot add image."
-msgstr ""
+msgstr "Negalima pridėti atvaizdo."
 
 #: disc_prototypes.php:277 items.php:450 screenedit.php:180
 msgid "Cannot add item"
-msgstr ""
+msgstr "Negalima pridėti elemento"
 
 #: adm.macros.php:120
 msgid "Cannot add macro."
-msgstr ""
+msgstr "Negalima pridėti makro."
 
 #: maintenance.php:137
 msgid "Cannot add maintenance"
-msgstr ""
+msgstr "Negalima pridėti priežiūros"
 
 #: media_types.php:118
 msgid "Cannot add media type"
-msgstr ""
+msgstr "Negalima pridėti medijos tipo"
 
 #: api/classes/CGraphGeneral.php:84
 #, php-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
-msgstr ""
+msgstr "Negalima pridėti daugiau nei vieno elemento su tipu \"Grafiko suma\" ant grafiko \"%1$s\"."
 
 #: sysmaps.php:170
 msgid "Cannot add network map"
-msgstr ""
+msgstr "Negalima pridėti tinklo žemėlapio"
 
 #: httpconf.php:256
 msgid "Cannot add new application."
-msgstr ""
+msgstr "Negalima pridėti naujos programos."
 
 #: nodes.php:77
 msgid "Cannot add node"
-msgstr ""
+msgstr "Negalima pridėti susikirtimo taško"
 
 #: proxies.php:111
 msgid "Cannot add proxy"
-msgstr ""
+msgstr "Negalima pridėti įgaliotojo serverio"
 
 #: adm.regexps.php:105
 msgid "Cannot add regular expression"
-msgstr ""
+msgstr "Negalima pridėti reguliarios išraiškos"
 
 #: httpconf.php:210
 msgid "Cannot add scenario"
-msgstr ""
+msgstr "Negalima pridėti scenarijaus"
 
 #: screenconf.php:178
 msgid "Cannot add screen"
-msgstr ""
+msgstr "Negalima pridėti ekrano"
 
 #: scripts.php:87 scripts.php:91 scripts.php:117
 msgid "Cannot add script"
-msgstr ""
+msgstr "Negalima pridėti skripto"
 
 #: services.php:163
 msgid "Cannot add service"
-msgstr ""
+msgstr "Negalima pridėti serviso"
 
 #: slideconf.php:105
 msgid "Cannot add slide show"
-msgstr ""
+msgstr "Negalima pridėti skaidrių rodymo"
 
 #: templates.php:183
 msgid "Cannot add template"
-msgstr ""
+msgstr "Negalima pridėti šablono"
 
 #: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
 #: tr_logform.php:147
 msgid "Cannot add trigger"
-msgstr ""
+msgstr "Negalima pridėti trigerio"
 
 #: users.php:196
 msgid "Cannot add user"
-msgstr ""
+msgstr "Negalima pridėti vartotojo"
 
 #: users.php:150
 msgid "Cannot add user. Both passwords must be equal."
-msgstr ""
+msgstr "Negalima pridėti vartotojo. Abu slaptažodžiai turi sutapti."
 
 #: api/classes/CUserGroup.php:363
 msgid "Cannot add users."
-msgstr ""
+msgstr "Negalima pridėti vartotojų."
 
 #: adm.valuemapping.php:72
 msgid "Cannot add value map"
-msgstr ""
+msgstr "Negalima pridėti reikšmių žemėlapio"
 
 #: authentication.php:163
 msgid "Cannot change authentication method to HTTP"
-msgstr ""
+msgstr "Negalima pakeisti autentifikacijos metodo į HTTP"
 
 #: authentication.php:126
 msgid "Cannot change authentication method to LDAP"
-msgstr ""
+msgstr "Negalima pakeisti autentifikacijos metodo į LDAP"
 
 #: authentication.php:88
 msgid "Cannot change authentication method to Zabbix internal"
-msgstr ""
+msgstr "Negalima pakeisti autentifikacijos metodo į Zabbix vidinį"
 
 #: items.php:472
 msgid "Cannot clear history"
-msgstr ""
+msgstr "Negalima išvalyti istorijos"
 
 #: api/classes/CDiscoveryRule.php:1163
 msgid "Cannot clone graph prototypes."
-msgstr ""
+msgstr "Negalima klonuoti grafiko prototipų."
 
 #: api/classes/CDiscoveryRule.php:1048
 msgid "Cannot clone item prototypes."
-msgstr ""
+msgstr "Negalima klonuoti elemento prototipų."
 
 #: api/classes/CDiscoveryRule.php:805
 msgid "Cannot clone trigger prototypes."
-msgstr ""
+msgstr "Negalima klonuoti trigerio prototipų."
 
 #: scripts_exec.php:64
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
-msgstr ""
+msgstr "Negalima prisijungti prie traperio jungties zabbixo serverio tarnybos, bet turėtų būti galima paleisti skriptą."
 
 #: graphs.php:310
 msgid "Cannot copy graphs"
-msgstr ""
+msgstr "Negalima nukopijuoti grafiko"
 
 #: items.php:605
 msgid "Cannot copy items"
-msgstr ""
+msgstr "Negalima nukopijuoti elementų"
 
 #: include/triggers.inc.php:408
 #, php-format
@@ -10156,6 +10165,10 @@ msgstr ""
 msgid "Right"
 msgstr ""
 
+#: include/locales.inc.php:66
+msgid "Romanian (ro_RO)"
+msgstr ""
+
 #: include/views/configuration.screen.constructor.edit.php:606
 #: screenedit.php:46
 msgid "Row span"
@@ -10218,7 +10231,7 @@ msgstr ""
 msgid "Run remote commands on hosts"
 msgstr ""
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:67
 msgid "Russian (ru_RU)"
 msgstr ""
 
@@ -11160,7 +11173,7 @@ msgstr ""
 msgid "Slides"
 msgstr ""
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:68
 msgid "Slovak (sk_SK)"
 msgstr ""
 
@@ -11227,7 +11240,7 @@ msgstr ""
 msgid "Source"
 msgstr ""
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:69
 msgid "Spanish (es_ES)"
 msgstr ""
 
@@ -11445,7 +11458,7 @@ msgstr ""
 msgid "Surname"
 msgstr ""
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:70
 msgid "Swedish (sv_SE)"
 msgstr ""
 
@@ -12102,7 +12115,7 @@ msgstr ""
 msgid "Tuesday"
 msgstr ""
 
-#: include/locales.inc.php:70
+#: include/locales.inc.php:71
 msgid "Turkish (tr_TR)"
 msgstr ""
 
@@ -12239,7 +12252,7 @@ msgstr ""
 msgid "UTF-8"
 msgstr ""
 
-#: include/locales.inc.php:71
+#: include/locales.inc.php:72
 msgid "Ukrainian (uk_UA)"
 msgstr ""
 

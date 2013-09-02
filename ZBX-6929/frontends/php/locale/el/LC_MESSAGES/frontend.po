@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-25 13:59+0300\n"
+"POT-Creation-Date: 2013-08-28 00:19+0300\n"
 "PO-Revision-Date: 2013-04-06 11:39+0200\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -10155,6 +10155,10 @@ msgstr "Επανάληψη"
 msgid "Right"
 msgstr "Δεξιά"
 
+#: include/locales.inc.php:66
+msgid "Romanian (ro_RO)"
+msgstr ""
+
 #: include/views/configuration.screen.constructor.edit.php:606
 #: screenedit.php:46
 msgid "Row span"
@@ -10217,7 +10221,7 @@ msgstr "Εκτέλεση απομακρυσμένων εντολών στις ο
 msgid "Run remote commands on hosts"
 msgstr "Εκτέλεση απομακρυσμένων εντολών στους ξενιστές"
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:67
 msgid "Russian (ru_RU)"
 msgstr "Ρωσικά (ru_RU)"
 
@@ -11159,7 +11163,7 @@ msgstr "Προβολές διαφάνειας"
 msgid "Slides"
 msgstr "Διαφάνειες"
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:68
 msgid "Slovak (sk_SK)"
 msgstr "Σλοβακικά (sk_SK)"
 
@@ -11226,7 +11230,7 @@ msgstr "Ταξινόμηση με πεδίο \"%s\" δεν επιτρέπετα�
 msgid "Source"
 msgstr "Προέλευση"
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:69
 msgid "Spanish (es_ES)"
 msgstr "Ισπανικά (es_ES)"
 
@@ -11444,7 +11448,7 @@ msgstr "Υποστήριξη"
 msgid "Surname"
 msgstr "Επώνυμο"
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:70
 msgid "Swedish (sv_SE)"
 msgstr "Σουηδικά (sv_SE)"
 
@@ -12098,7 +12102,7 @@ msgstr "Τρι"
 msgid "Tuesday"
 msgstr "Τρίτη"
 
-#: include/locales.inc.php:70
+#: include/locales.inc.php:71
 msgid "Turkish (tr_TR)"
 msgstr "Τουρκικά (tr_TR)"
 
@@ -12235,7 +12239,7 @@ msgstr "ΠΡΟΦΙΛ ΧΡΗΣΤΗ"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:71
+#: include/locales.inc.php:72
 msgid "Ukrainian (uk_UA)"
 msgstr "Ουκρανικά (uk_UA)"
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-25 13:59+0300\n"
+"POT-Creation-Date: 2013-08-28 00:19+0300\n"
 "PO-Revision-Date: 2013-04-07 21:14+0200\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -10201,6 +10201,10 @@ msgstr "Wiederholen"
 msgid "Right"
 msgstr "Rechts"
 
+#: include/locales.inc.php:66
+msgid "Romanian (ro_RO)"
+msgstr ""
+
 # Es geht um die Verbindung von Tabellenzellen
 #: include/views/configuration.screen.constructor.edit.php:606
 #: screenedit.php:46
@@ -10264,7 +10268,7 @@ msgstr "Befehl ausführen auf Hostgruppe"
 msgid "Run remote commands on hosts"
 msgstr "Befehle ausführen auf Hosts"
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:67
 msgid "Russian (ru_RU)"
 msgstr "Russisch (ru_RU)"
 
@@ -11215,7 +11219,7 @@ msgstr "Vorführung"
 msgid "Slides"
 msgstr "Seiten"
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:68
 msgid "Slovak (sk_SK)"
 msgstr "Slovakisch (sk_SK)"
 
@@ -11282,7 +11286,7 @@ msgstr "Nach Feld \"%s\" darf nicht sortiert werden."
 msgid "Source"
 msgstr "Quelle"
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:69
 msgid "Spanish (es_ES)"
 msgstr "Spanisch (es_ES)"
 
@@ -11502,7 +11506,7 @@ msgstr "Unterstützung"
 msgid "Surname"
 msgstr "Nachname"
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:70
 msgid "Swedish (sv_SE)"
 msgstr "Schwedisch (sv_SE)"
 
@@ -12159,7 +12163,7 @@ msgstr "Di"
 msgid "Tuesday"
 msgstr "Dienstag"
 
-#: include/locales.inc.php:70
+#: include/locales.inc.php:71
 msgid "Turkish (tr_TR)"
 msgstr "Türkisch (tr_TR)"
 
@@ -12296,7 +12300,7 @@ msgstr "BENUTZERPROFIL"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:71
+#: include/locales.inc.php:72
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukrainisch (uk_UA)"
 

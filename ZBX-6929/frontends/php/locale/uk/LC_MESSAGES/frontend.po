@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-25 13:59+0300\n"
+"POT-Creation-Date: 2013-08-28 00:19+0300\n"
 "PO-Revision-Date: 2013-04-04 12:23+0200\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -10163,6 +10163,10 @@ msgstr "Повторити"
 msgid "Right"
 msgstr "З правого боку"
 
+#: include/locales.inc.php:66
+msgid "Romanian (ro_RO)"
+msgstr ""
+
 #: include/views/configuration.screen.constructor.edit.php:606
 #: screenedit.php:46
 msgid "Row span"
@@ -10225,7 +10229,7 @@ msgstr "Виконати віддалені команди в групах ву�
 msgid "Run remote commands on hosts"
 msgstr "Виконати віддалені команди на вузлах мережі"
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:67
 msgid "Russian (ru_RU)"
 msgstr "Російська (ru_RU)"
 
@@ -11167,7 +11171,7 @@ msgstr "Слайдшоу"
 msgid "Slides"
 msgstr "Слайди"
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:68
 msgid "Slovak (sk_SK)"
 msgstr "Словацька (sk_SK)"
 
@@ -11234,7 +11238,7 @@ msgstr "Сортування по полю \"%s\" не дозволено."
 msgid "Source"
 msgstr "Джерело"
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:69
 msgid "Spanish (es_ES)"
 msgstr "Іспанська (es_ES)"
 
@@ -11452,7 +11456,7 @@ msgstr "Підтримка"
 msgid "Surname"
 msgstr "Прізвище"
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:70
 msgid "Swedish (sv_SE)"
 msgstr "Шведська (sv_SE)"
 
@@ -12109,7 +12113,7 @@ msgstr "Вів"
 msgid "Tuesday"
 msgstr "Вівторок"
 
-#: include/locales.inc.php:70
+#: include/locales.inc.php:71
 msgid "Turkish (tr_TR)"
 msgstr "Турецька (tr_TR)"
 
@@ -12246,7 +12250,7 @@ msgstr "ПРОФІЛЬ КОРИСТУВАЧА"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:71
+#: include/locales.inc.php:72
 msgid "Ukrainian (uk_UA)"
 msgstr "Українська (uk_UA)"
 
