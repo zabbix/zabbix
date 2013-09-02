@@ -20,7 +20,7 @@
 
 define('ZABBIX_VERSION',     '2.1.3');
 define('ZABBIX_API_VERSION', '2.1.3');
-define('ZABBIX_DB_VERSION',	 2010101);
+define('ZABBIX_DB_VERSION',	 2010175);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
 define('ZABBIX_COPYRIGHT_TO',   '2013');
@@ -66,9 +66,9 @@ define('ZBX_SCRIPT_EXECUTE_ON_AGENT',	0);
 define('ZBX_SCRIPT_EXECUTE_ON_SERVER',	1);
 
 define('ZBX_FLAG_DISCOVERY_NORMAL',		0x0); // a normal item
-define('ZBX_FLAG_DISCOVERY',			0x1); // a low level discovery rule
-define('ZBX_FLAG_DISCOVERY_CHILD',		0x2); // an item prototype
-define('ZBX_FLAG_DISCOVERY_CREATED',	0x4); // an item created via a discovery rule
+define('ZBX_FLAG_DISCOVERY_RULE',		0x1); // a low level discovery rule
+define('ZBX_FLAG_DISCOVERY_PROTOTYPE',	0x2); // an item prototype
+define('ZBX_FLAG_DISCOVERY_CREATED',		0x4); // an item created via a discovery rule
 
 define('EXTACK_OPTION_ALL',		0);
 define('EXTACK_OPTION_UNACK',	1);
@@ -806,6 +806,7 @@ define('ZBX_TIME_SUFFIXES', 'smhdw');
 // preg
 define('ZBX_PREG_PRINT', '^\x{00}-\x{1F}');
 define('ZBX_PREG_MACRO_NAME', '([A-Z0-9\._]+)');
+define('ZBX_PREG_MACRO_NAME_LLD', '([A-Z0-9\._]+)');
 define('ZBX_PREG_INTERNAL_NAMES', '([0-9a-zA-Z_\. \-]+)'); // !!! Don't forget sync code with C !!!
 define('ZBX_PREG_PARAMS', '(['.ZBX_PREG_PRINT.']+?)?');
 define('ZBX_PREG_SIGN', '([&|><=+*\/#\-])');

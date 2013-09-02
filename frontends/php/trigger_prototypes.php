@@ -153,7 +153,7 @@ elseif (isset($_REQUEST['save'])) {
 		'status' => $_REQUEST['status'],
 		'comments' => $_REQUEST['comments'],
 		'url' => $_REQUEST['url'],
-		'flags' => ZBX_FLAG_DISCOVERY_CHILD
+		'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE
 	);
 
 	if (isset($_REQUEST['triggerid'])) {
