@@ -30,7 +30,11 @@ $hostInventoriesForm = new CForm();
  */
 $overviewFormList = new CFormList('hostinventoriesOverviewFormList');
 
-$overviewFormList->addRow(_('Host name'), $this->data['overview']['host']['host']);
+$hostSpan = new CSpan($this->data['overview']['host']['host'], 'link_menu menu-host');
+$scripts = $this->data['hostScripts'][$this->data['overview']['host']['hostid']];
+$hostSpan->setAttribute('data-menu', hostMenuData($this->data['overview']['host'], $scripts));
+
+$overviewFormList->addRow(_('Host name'), $hostSpan);
 
 if ($this->data['overview']['host']['host'] != $this->data['overview']['host']['name']) {
 	$overviewFormList->addRow(_('Visible name'), $this->data['overview']['host']['name']);
@@ -51,7 +55,8 @@ foreach ($this->data['tableValues'] as $key => $value) {
 
 // latest data
 $latestArray = array(
-	new CLink(_('Latest data'), 'latest.php?hostid='.$this->data['overview']['host']['hostid'].url_param('groupid')),
+	new CLink(_('Latest data'), 'latest.php?form=1&select=&show_details=1&filter_set=Filter&hostid='.
+		$this->data['overview']['host']['hostid'].url_param('groupid')),
 	SPACE,
 	new CLink(_('Web'), 'httpmon.php?hostid='.$this->data['overview']['host']['hostid'].url_param('groupid')),
 	SPACE,
@@ -60,7 +65,8 @@ $latestArray = array(
 	new CLink(_('Screens'), 'screens.php?hostid='.$this->data['overview']['host']['hostid'].url_param('groupid')),
 	SPACE,
 	new CLink(_('Triggers status'),
-		'tr_status.php?hostid='.$this->data['overview']['host']['hostid'].url_param('groupid')),
+		'tr_status.php?show_triggers=2&ack_status=1&show_events=1&show_events=0&show_details=1&txt_select=&show_maintenance=0'.
+		'&hostid='.$this->data['overview']['host']['hostid'].url_param('groupid')),
 	SPACE,
 	new CLink(_('Events'), 'events.php?hostid='.$this->data['overview']['host']['hostid'].url_param('groupid'))
 );
