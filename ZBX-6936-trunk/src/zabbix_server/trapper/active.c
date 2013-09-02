@@ -69,9 +69,13 @@ static int	get_hostid_by_host(const char *host, const char *ip, unsigned short p
 			" from hosts"
 			" where host='%s'"
 				" and status in (%d,%d)"
+				" and flags<>%d"
 		       		" and proxy_hostid is null"
 				ZBX_SQL_NODE,
-			host_esc, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, DBand_node_local("hostid"));
+			host_esc,
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
+			ZBX_FLAG_DISCOVERY_PROTOTYPE,
+			DBand_node_local("hostid"));
 
 	if (NULL != (row = DBfetch(result)))
 	{
@@ -114,40 +118,24 @@ out:
 	return ret;
 }
 
-typedef struct
-{
-	zbx_uint64_t	lastlogsize;
-	int		mtime;
-}
-zbx_active_t;
-
-static void	get_list_of_active_checks(zbx_uint64_t hostid, zbx_uint64_t **itemids, zbx_active_t **items, size_t *items_num)
+static void	get_list_of_active_checks(zbx_uint64_t hostid, zbx_vector_uint64_t *itemids)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	size_t		items_alloc = 0;
+	zbx_uint64_t	itemid;
 
 	result = DBselect(
-			"select itemid,lastlogsize,mtime"
+			"select itemid"
 			" from items"
 			" where type=%d"
 				" and flags<>%d"
 				" and hostid=" ZBX_FS_UI64,
-			ITEM_TYPE_ZABBIX_ACTIVE, ZBX_FLAG_DISCOVERY_CHILD, hostid);
+			ITEM_TYPE_ZABBIX_ACTIVE, ZBX_FLAG_DISCOVERY_PROTOTYPE, hostid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		if (items_alloc == *items_num)
-		{
-			items_alloc += 256;
-			*itemids = zbx_realloc(*itemids, sizeof(zbx_uint64_t) * items_alloc);
-			*items = zbx_realloc(*items, sizeof(zbx_active_t) * items_alloc);
-		}
-
-		ZBX_STR2UINT64((*itemids)[*items_num], row[0]);
-		ZBX_STR2UINT64((*items)[*items_num].lastlogsize, row[1]);
-		(*items)[*items_num].mtime = atoi(row[2]);
-		(*items_num)++;
+		ZBX_STR2UINT64(itemid, row[0]);
+		zbx_vector_uint64_append(itemids, itemid);
 	}
 	DBfree_result(result);
 }
@@ -170,13 +158,13 @@ static void	get_list_of_active_checks(zbx_uint64_t hostid, zbx_uint64_t **itemid
  ******************************************************************************/
 int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 {
-	const char	*__function_name = "send_list_of_active_checks";
+	const char		*__function_name = "send_list_of_active_checks";
 
-	char		*host = NULL, *p, *buffer = NULL, error[MAX_STRING_LEN], ip[INTERFACE_IP_LEN_MAX];
-	size_t		buffer_alloc = 8 * ZBX_KIBIBYTE, buffer_offset = 0, items_num = 0, i;
-	int		ret = FAIL;
-	zbx_uint64_t	hostid, *itemids = NULL;
-	zbx_active_t	*items = NULL;
+	char			*host = NULL, *p, *buffer = NULL, error[MAX_STRING_LEN], ip[INTERFACE_IP_LEN_MAX];
+	size_t			buffer_alloc = 8 * ZBX_KIBIBYTE, buffer_offset = 0;
+	int			ret = FAIL, i;
+	zbx_uint64_t		hostid;
+	zbx_vector_uint64_t	itemids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -198,29 +186,31 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 	if (FAIL == get_hostid_by_host(host, ip, ZBX_DEFAULT_AGENT_PORT, "", &hostid, error))
 		goto out;
 
-	get_list_of_active_checks(hostid, &itemids, &items, &items_num);
+	zbx_vector_uint64_create(&itemids);
+
+	get_list_of_active_checks(hostid, &itemids);
 
 	buffer = zbx_malloc(buffer, buffer_alloc);
 
-	if (0 != items_num)
+	if (0 != itemids.values_num)
 	{
 		DC_ITEM	*dc_items;
 		int	*errcodes, refresh_unsupported, now;
 
-		dc_items = zbx_malloc(NULL, sizeof(DC_ITEM) * items_num);
-		errcodes = zbx_malloc(NULL, sizeof(int) * items_num);
+		dc_items = zbx_malloc(NULL, sizeof(DC_ITEM) * itemids.values_num);
+		errcodes = zbx_malloc(NULL, sizeof(int) * itemids.values_num);
 
-		DCconfig_get_items_by_itemids(dc_items, itemids, errcodes, items_num);
+		DCconfig_get_items_by_itemids(dc_items, itemids.values, errcodes, itemids.values_num);
 		DCconfig_get_config_data(&refresh_unsupported, CONFIG_REFRESH_UNSUPPORTED);
 
 		now = time(NULL);
 
-		for (i = 0; i < items_num; i++)
+		for (i = 0; i < itemids.values_num; i++)
 		{
 			if (SUCCEED != errcodes[i])
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() Item [" ZBX_FS_UI64 "] was not found in the"
-						" server cache. Not sending now.", __function_name, itemids[i]);
+						" server cache. Not sending now.", __function_name, itemids.values[i]);
 				continue;
 			}
 
@@ -231,17 +221,16 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 			}
 
 			zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, "%s:%d:" ZBX_FS_UI64 "\n",
-					dc_items[i].key_orig, dc_items[i].delay, items[i].lastlogsize);
+					dc_items[i].key_orig, dc_items[i].delay, dc_items[i].lastlogsize);
 		}
 
-		DCconfig_clean_items(dc_items, errcodes, items_num);
+		DCconfig_clean_items(dc_items, errcodes, itemids.values_num);
 
 		zbx_free(errcodes);
 		zbx_free(dc_items);
 	}
 
-	zbx_free(items);
-	zbx_free(itemids);
+	zbx_vector_uint64_destroy(&itemids);
 
 	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset, "ZBX_EOF\n");
 
@@ -302,7 +291,7 @@ static void	zbx_vector_str_append_uniq(zbx_vector_str_t *vector, char *str)
  ******************************************************************************/
 int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 {
-	const char	*__function_name = "send_list_of_active_checks_json";
+	const char		*__function_name = "send_list_of_active_checks_json";
 
 #define ZBX_KEY_OTHER		0
 #define ZBX_KEY_LOG		1
@@ -312,10 +301,10 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 				ip[INTERFACE_IP_LEN_MAX], error[MAX_STRING_LEN], *host_metadata = NULL;
 	struct zbx_json		json;
 	int			ret = FAIL, i;
-	zbx_uint64_t		hostid, *itemids = NULL;
-	zbx_active_t		*items = NULL;
-	size_t			items_num = 0, host_metadata_alloc = 1;	/* for at least NUL-termination char */
+	zbx_uint64_t		hostid;
+	size_t			host_metadata_alloc = 1;	/* for at least NUL-termination char */
 	unsigned short		port;
+	zbx_vector_uint64_t	itemids;
 
 	unsigned char		item_key;
 	zbx_vector_ptr_t	regexps;
@@ -352,31 +341,33 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	if (FAIL == get_hostid_by_host(host, ip, port, host_metadata, &hostid, error))
 		goto error;
 
-	get_list_of_active_checks(hostid, &itemids, &items, &items_num);
+	zbx_vector_uint64_create(&itemids);
+
+	get_list_of_active_checks(hostid, &itemids);
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
 	zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
 
-	if (0 != items_num)
+	if (0 != itemids.values_num)
 	{
 		DC_ITEM	*dc_items;
 		int	*errcodes, refresh_unsupported, now;
 
-		dc_items = zbx_malloc(NULL, sizeof(DC_ITEM) * items_num);
-		errcodes = zbx_malloc(NULL, sizeof(int) * items_num);
+		dc_items = zbx_malloc(NULL, sizeof(DC_ITEM) * itemids.values_num);
+		errcodes = zbx_malloc(NULL, sizeof(int) * itemids.values_num);
 
-		DCconfig_get_items_by_itemids(dc_items, itemids, errcodes, items_num);
+		DCconfig_get_items_by_itemids(dc_items, itemids.values, errcodes, itemids.values_num);
 		DCconfig_get_config_data(&refresh_unsupported, CONFIG_REFRESH_UNSUPPORTED);
 
 		now = time(NULL);
 
-		for (i = 0; i < (int)items_num; i++)
+		for (i = 0; i < itemids.values_num; i++)
 		{
 			if (SUCCEED != errcodes[i])
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() Item [" ZBX_FS_UI64 "] was not found in the"
-						" server cache. Not sending now.", __function_name, itemids[i]);
+						" server cache. Not sending now.", __function_name, itemids.values[i]);
 				continue;
 			}
 
@@ -399,8 +390,8 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_DELAY, dc_items[i].delay);
 			/* The agent expects ALWAYS to have lastlogsize and mtime tags. */
 			/* Removing those would cause older agents to fail. */
-			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGLASTSIZE, items[i].lastlogsize);
-			zbx_json_adduint64(&json, ZBX_PROTO_TAG_MTIME, items[i].mtime);
+			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGLASTSIZE, dc_items[i].lastlogsize);
+			zbx_json_adduint64(&json, ZBX_PROTO_TAG_MTIME, dc_items[i].mtime);
 			zbx_json_close(&json);
 
 			if (0 == strncmp(dc_items[i].key, "log[", 4) || 0 == strncmp(dc_items[i].key, "logrt[", 6))
@@ -431,14 +422,13 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 			zbx_free(dc_items[i].key);
 		}
 
-		DCconfig_clean_items(dc_items, errcodes, items_num);
+		DCconfig_clean_items(dc_items, errcodes, itemids.values_num);
 
 		zbx_free(errcodes);
 		zbx_free(dc_items);
 	}
 
-	zbx_free(items);
-	zbx_free(itemids);
+	zbx_vector_uint64_destroy(&itemids);
 
 	zbx_json_close(&json);
 

@@ -641,14 +641,18 @@ static int	DBdrop_foreign_key(const char *table_name, int id)
 
 static int	DBcreate_dbversion_table(void)
 {
-	const ZBX_TABLE	*table;
+	const ZBX_TABLE	table =
+			{"dbversion", "", 0,
+				{
+					{"mandatory", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"optional", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{NULL}
+				}
+			};
 	int		ret;
 
-	if (NULL == (table = DBget_table("dbversion")))
-		assert(0);
-
 	DBbegin();
-	if (SUCCEED == (ret = DBcreate_table(table)))
+	if (SUCCEED == (ret = DBcreate_table(&table)))
 	{
 		if (ZBX_DB_OK > DBexecute("insert into dbversion (mandatory,optional) values (%d,%d)",
 				ZBX_FIRST_DB_VERSION, ZBX_FIRST_DB_VERSION))
@@ -1880,6 +1884,176 @@ static int	DBpatch_2010156(void)
 			"serviceid,type,ts_from,ts_to", 0);
 }
 
+static int	DBpatch_2010157(void)
+{
+	const ZBX_FIELD field = {"flags", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_2010158(void)
+{
+	const ZBX_TABLE	table =
+			{"host_discovery", "hostid", 0,
+				{
+					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"parent_hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"parent_itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"host", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"lastcheck", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"ts_delete", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{NULL}
+				}
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2010159(void)
+{
+	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("host_discovery", 1, &field);
+}
+
+static int	DBpatch_2010160(void)
+{
+	const ZBX_FIELD	field = {"parent_hostid", NULL, "hosts", "hostid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("host_discovery", 2, &field);
+}
+
+static int	DBpatch_2010161(void)
+{
+	const ZBX_FIELD	field = {"parent_itemid", NULL, "items", "itemid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("host_discovery", 3, &field);
+}
+
+static int	DBpatch_2010162(void)
+{
+	const ZBX_FIELD field = {"templateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_2010163(void)
+{
+	const ZBX_FIELD	field = {"templateid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("hosts", 3, &field);
+}
+
+static int	DBpatch_2010164(void)
+{
+	const ZBX_TABLE	table =
+			{"interface_discovery", "interfaceid", 0,
+				{
+					{"interfaceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"parent_interfaceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{NULL}
+				}
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2010165(void)
+{
+	const ZBX_FIELD	field = {"interfaceid", NULL, "interface", "interfaceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("interface_discovery", 1, &field);
+}
+
+static int	DBpatch_2010166(void)
+{
+	const ZBX_FIELD	field =
+			{"parent_interfaceid", NULL, "interface", "interfaceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("interface_discovery", 2, &field);
+}
+
+static int	DBpatch_2010167(void)
+{
+	const ZBX_TABLE	table =
+			{"group_prototype", "group_prototypeid", 0,
+				{
+					{"group_prototypeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"templateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{NULL}
+				}
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2010168(void)
+{
+	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("group_prototype", 1, &field);
+}
+
+static int	DBpatch_2010169(void)
+{
+	const ZBX_FIELD	field = {"groupid", NULL, "groups", "groupid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("group_prototype", 2, &field);
+}
+
+static int	DBpatch_2010170(void)
+{
+	const ZBX_FIELD	field = {"templateid", NULL, "group_prototype", "group_prototypeid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("group_prototype", 3, &field);
+}
+
+static int	DBpatch_2010171(void)
+{
+	return DBcreate_index("group_prototype", "group_prototype_1", "hostid", 0);
+}
+
+static int	DBpatch_2010172(void)
+{
+	const ZBX_TABLE	table =
+			{"group_discovery", "groupid", 0,
+				{
+					{"groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"parent_group_prototypeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"lastcheck", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"ts_delete", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{NULL}
+				}
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2010173(void)
+{
+	const ZBX_FIELD	field = {"groupid", NULL, "groups", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("group_discovery", 1, &field);
+}
+
+static int	DBpatch_2010174(void)
+{
+	const ZBX_FIELD	field = {"parent_group_prototypeid", NULL, "group_prototype", "group_prototypeid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("group_discovery", 2, &field);
+}
+
+static int	DBpatch_2010175(void)
+{
+	const ZBX_FIELD field = {"flags", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("groups", &field);
+}
+
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 #define DBPATCH_END()					{NULL}};
@@ -2085,6 +2259,25 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010154, 0, 0)
 	DBPATCH_ADD(2010155, 0, 0)
 	DBPATCH_ADD(2010156, 0, 0)
+	DBPATCH_ADD(2010157, 0, 1)
+	DBPATCH_ADD(2010158, 0, 1)
+	DBPATCH_ADD(2010159, 0, 1)
+	DBPATCH_ADD(2010160, 0, 1)
+	DBPATCH_ADD(2010161, 0, 1)
+	DBPATCH_ADD(2010162, 0, 1)
+	DBPATCH_ADD(2010163, 0, 1)
+	DBPATCH_ADD(2010164, 0, 1)
+	DBPATCH_ADD(2010165, 0, 1)
+	DBPATCH_ADD(2010166, 0, 1)
+	DBPATCH_ADD(2010167, 0, 1)
+	DBPATCH_ADD(2010168, 0, 1)
+	DBPATCH_ADD(2010169, 0, 1)
+	DBPATCH_ADD(2010170, 0, 1)
+	DBPATCH_ADD(2010171, 0, 1)
+	DBPATCH_ADD(2010172, 0, 1)
+	DBPATCH_ADD(2010173, 0, 1)
+	DBPATCH_ADD(2010174, 0, 1)
+	DBPATCH_ADD(2010175, 0, 1)
 
 	DBPATCH_END()
 

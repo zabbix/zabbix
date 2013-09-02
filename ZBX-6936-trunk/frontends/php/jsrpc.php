@@ -244,7 +244,8 @@ switch ($data['method']) {
 					'output' => array('groupid', 'name'),
 					'startSearch' => true,
 					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
-					'limit' => $config['search_limit']
+					'filter' => isset($data['filter']) ? $data['filter'] : null,
+					'limit' => isset($data['limit']) ? $data['limit'] : null
 				));
 
 				if ($hostGroups) {
