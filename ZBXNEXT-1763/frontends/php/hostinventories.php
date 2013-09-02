@@ -110,6 +110,23 @@ if ($hostid > 0) {
 		$data['overview']['host']['status'] = new CLink(_('In maintenance'), null, 'orange');
 	}
 
+	// get permissions
+	$userType = CWebUser::getType();
+	if ($userType == USER_TYPE_SUPER_ADMIN) {
+		$data['rwHost'] = true;
+	}
+	else if ($userType == USER_TYPE_ZABBIX_ADMIN) {
+		$data['rwHost'] = API::Host()->get(array(
+			'hostids' => $hostid,
+			'editable' => true
+		));
+		$data['rwHost'] = zbx_toHash($data['rwHost'], 'hostid');
+		$data['rwHost'] = isset($data['rwHost'][$hostid]) ? true : false;
+	}
+	else {
+		$data['rwHost'] = false;
+	}
+
 	$data['overview']['host']['ip'] = array();
 	$dnsInterfaces = array();
 	$ipInterfaces = array();

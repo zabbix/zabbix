@@ -57,50 +57,69 @@ foreach ($this->data['tableValues'] as $key => $value) {
 $latestArray = array(
 	new CLink(_('Latest data'), 'latest.php?form=1&select=&show_details=1&filter_set=Filter&hostid='.
 		$this->data['overview']['host']['hostid'].url_param('groupid')),
-	SPACE,
+	SPACE.SPACE,
 	new CLink(_('Web'), 'httpmon.php?hostid='.$this->data['overview']['host']['hostid'].url_param('groupid')),
-	SPACE,
+	SPACE.SPACE,
 	new CLink(_('Graphs'), 'httpmon.php?hostid='.$this->data['overview']['host']['hostid'].url_param('groupid')),
-	SPACE,
+	SPACE.SPACE,
 	new CLink(_('Screens'), 'screens.php?hostid='.$this->data['overview']['host']['hostid'].url_param('groupid')),
-	SPACE,
+	SPACE.SPACE,
 	new CLink(_('Triggers status'),
-		'tr_status.php?show_triggers=2&ack_status=1&show_events=1&show_events=0&show_details=1&txt_select=&show_maintenance=0'.
-		'&hostid='.$this->data['overview']['host']['hostid'].url_param('groupid')),
-	SPACE,
+		'tr_status.php?show_triggers=2&ack_status=1&show_events=1&show_events=0&show_details=1'.
+		'&txt_select=&show_maintenance=0&hostid='.$this->data['overview']['host']['hostid'].url_param('groupid')),
+	SPACE.SPACE,
 	new CLink(_('Events'), 'events.php?hostid='.$this->data['overview']['host']['hostid'].url_param('groupid'))
 );
 
 $overviewFormList->addRow(_('Latest data'), $latestArray);
 
 // configuration
+if ($this->data['rwHost']) {
+	$hostLink = new CLink(_('Host'),
+		'hosts.php?form=update&hostid='.$this->data['overview']['host']['hostid'].url_param('groupid'));
+	$applicationsLink = new CLink(_('Application'),
+		'applications.php?hostid='.$this->data['overview']['host']['hostid'].url_param('groupid'));
+	$itemsLink = new CLink(_('Items'), 'items.php?hostid='.$this->data['overview']['host']['hostid'].url_param('groupid'));
+	$triggersLink = new CLink(_('Triggers'), 'triggers.php?hostid='.$this->data['overview']['host']['hostid'].url_param('groupid'));
+	$graphsLink = new CLink(_('Graphs'), 'graphs.php?hostid='.$this->data['overview']['host']['hostid'].url_param('groupid'));
+	$discoveryLink = new CLink(_('Discovery'),
+		'host_discovery.php?hostid='.$this->data['overview']['host']['hostid'].url_param('groupid'));
+	$webLink = new CLink(_('Web'), 'httpconf.php?hostid='.$this->data['overview']['host']['hostid'].url_param('groupid'));
+}
+else {
+	$hostLink = _('Host');
+	$applicationsLink = _('Application');
+	$itemsLink = _('Items');
+	$triggersLink = _('Triggers');
+	$graphsLink = _('Graphs');
+	$discoveryLink = _('Discovery');
+	$webLink = _('Web');
+}
+
 $configurationArray = array(
-	new CLink(_('Host'),
-		'hosts.php?form=update&hostid='.$this->data['overview']['host']['hostid'].url_param('groupid')),
-	SPACE,
-	new CLink(_('Application'),
-		'applications.php?hostid='.$this->data['overview']['host']['hostid'].url_param('groupid')),
+	$hostLink,
+	SPACE.SPACE,
+	$applicationsLink,
 	SPACE,
 	'('.$this->data['overview']['host']['applications'].')',
-	SPACE,
-	new CLink(_('Items'), 'items.php?hostid='.$this->data['overview']['host']['hostid'].url_param('groupid')),
+	SPACE.SPACE,
+	$itemsLink,
 	SPACE,
 	'('.$this->data['overview']['host']['items'].')',
-	SPACE,
-	new CLink(_('Triggers'), 'triggers.php?hostid='.$this->data['overview']['host']['hostid'].url_param('groupid')),
+	SPACE.SPACE,
+	$triggersLink,
 	SPACE,
 	'('.$this->data['overview']['host']['triggers'].')',
-	SPACE,
-	new CLink(_('Graphs'), 'graphs.php?hostid='.$this->data['overview']['host']['hostid'].url_param('groupid')),
+	SPACE.SPACE,
+	$graphsLink,
 	SPACE,
 	'('.$this->data['overview']['host']['graphs'].')',
-	SPACE,
-	new CLink(_('Discovery'),
-		'host_discovery.php?hostid='.$this->data['overview']['host']['hostid'].url_param('groupid')),
+	SPACE.SPACE,
+	$discoveryLink,
 	SPACE,
 	'('.$this->data['overview']['host']['discoveries'].')',
-	SPACE,
-	new CLink(_('Web'), 'events.php?hostid='.$this->data['overview']['host']['hostid'].url_param('groupid')),
+	SPACE.SPACE,
+	$webLink,
 	SPACE,
 	'('.$this->data['overview']['host']['httpTests'].')'
 );
