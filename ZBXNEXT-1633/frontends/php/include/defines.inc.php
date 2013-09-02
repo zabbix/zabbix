@@ -20,7 +20,7 @@
 
 define('ZABBIX_VERSION',     '2.1.3');
 define('ZABBIX_API_VERSION', '2.1.3');
-define('ZABBIX_DB_VERSION',	 2010120);
+define('ZABBIX_DB_VERSION',	 2010175);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
 define('ZABBIX_COPYRIGHT_TO',   '2013');
@@ -862,9 +862,6 @@ define('ZBX_USER_ONLINE_TIME', 600); // 10min
 define('ZBX_GUEST_USER','guest');
 
 define('ZBX_FAVORITES_ALL', -1);
-
-// allow for testing
-define('ZBX_ALLOW_UNICODE', 1);
 
 // IPMI
 define('IPMI_AUTHTYPE_DEFAULT',		-1);

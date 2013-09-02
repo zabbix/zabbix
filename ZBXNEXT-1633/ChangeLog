@@ -8,10 +8,19 @@ New features:
 A.F.I..... [ZBXNEXT-1569] implemented user name and surname displaying in acknowledgements (Ivo, Oleg)
 
 Bug fixes:
+....I..... [ZBX-6890] added missing indexes in child-tables for foreign key contraints, rename some indexes to meet naming convention (Andris)
+..F....... [ZBX-6887] allowed to translate "Internal" in a different way in authentication, event and user context (Eduard)
+A......... [ZBX-6124] removed unused API methods (Eduard)
+..F....... [ZBX-6927] improved validation messages (Eduard)
+..F....... [ZBX-6923] fixed mass delete in template list, improved code quality in hosts and templates (Vitalij)
+...G...PS. [ZBX-6916] added space delimeter support in configuration file (igors)
+..F....... [ZBX-6930] 'Unlink and clear' link bug fix, now it displayed (Vitalij)
+..F....... [ZBX-6878] fixed history screen log bug for two items, parametr itemid renamed to itemids (Vitalij)
+..F....... [ZBX-6903] fixed template name trim (Eduard, Sasha)
 A.F....... [ZBX-6899] specified source parameter in SQL from events table (Vitalij)
 ..F....... [ZBX-6893] fixed prototype name error ($1 -> {#FSNAME}) on adding new prototype in the graph prototype form in the item prototype selection template (Vitalij)
 ..F....... [ZBX-6816] improved permission validation on multiple pages (Ivo, Guntis)
-...G...... [ZBXNEXT-1056] improved active checks error messages (wiper)
+...G...... [ZBXNEXT-1056] improved active check error messages to proclaim active checks working again before complaining about a missing host (wiper)
 .......P.. [ZBX-6249] fixed data loss in proxy "Data sender" process caused by unfinished transactions; thanks to MATSUDA Daiki for patch (Andris)
 ..F....... [ZBX-6838] fixed not being able to select all host groups in the filter (Pavels)
 ..F....... [ZBX-6275] fixed error after saving an LLD rule (Guntis)
@@ -363,9 +372,11 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.9rc1
 
 New features:
-A.F....... [ZBX-1357] updated Chinese (China) translation; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Chinese (China), Lithuanian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-6923] fixed mass delete in template list, 'Delete selected' and 'Delete selected with linked elements' functions (Vitalij)
+..F....... [ZBX-6922] fixed host interface importing (Eduard)
 .......P.. [ZBX-6249] fixed data loss in proxy "Data sender" process caused by unfinished transactions; thanks to MATSUDA Daiki for patch (Andris)
 ...G...... [ZBXNEXT-1056] improved active checks error messages (wiper)
 

@@ -71,7 +71,7 @@ foreach ($items as $item) {
 			array_push($types, $item['type']);
 		}
 		else {
-			show_error_message(_('Warning. Cannot display more than one item with type "Graph sum".'));
+			show_error_message(_('Cannot display more than one item with type "Graph sum".'));
 			break;
 		}
 	}
