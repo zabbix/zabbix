@@ -36,10 +36,10 @@ if ($this->data['overview']['host']['host'] != $this->data['overview']['host']['
 	$overviewFormList->addRow(_('Visible name'), $this->data['overview']['host']['name']);
 }
 if ($this->data['overview']['host']['ip']) {
-	$overviewFormList->addRow(_('IP'), implode($this->data['overview']['host']['ip'], ', '));
+	$overviewFormList->addRow(_('IP'), $this->data['overview']['host']['ip']);
 }
 if ($this->data['overview']['host']['dns']) {
-	$overviewFormList->addRow(_('DNS'), implode($this->data['overview']['host']['dns'], ', '));
+	$overviewFormList->addRow(_('DNS'), $this->data['overview']['host']['dns']);
 }
 // interface (OS, Hardware, Software)
 foreach ($this->data['tableValues'] as $key => $value) {
@@ -99,7 +99,7 @@ $configurationArray = array(
 	'('.$this->data['overview']['host']['httpTests'].')'
 );
 
-$overviewFormList->addRow(_('Latest data'), $configurationArray);
+$overviewFormList->addRow(_('Configuration'), $configurationArray);
 
 $hostInventoriesTab = new CTabView(array('remember' => true));
 $hostInventoriesTab->setSelected(0);
@@ -111,10 +111,15 @@ $hostInventoriesTab->addTab('overviewTab', _('Overview'), $overviewFormList);
  */
 $detailsFormList = new CFormList('hostinventoriesDetailsFormList');
 
+$inventoryValues = false;
 foreach ($this->data['tableValues'] as $key => $value) {
 	if (!zbx_empty($value)) {
 		$detailsFormList->addRow($this->data['tableTitles'][$key]['title'], new CSpan(zbx_str2links($value), 'pre'));
+		$inventoryValues = true;
 	}
+}
+if (!$inventoryValues) {
+	$hostInventoriesTab->setDisabled(1);
 }
 
 $hostInventoriesTab->addTab('detailsTab', _('Details'), $detailsFormList);

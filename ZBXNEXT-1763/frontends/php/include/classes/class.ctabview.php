@@ -26,6 +26,7 @@ class CTabView extends CDiv {
 	protected $headers = array();
 	protected $selectedTab = null;
 	protected $rememberTab = false;
+	protected $disabledTab = null;
 
 	public function __construct($data = array()) {
 		if (isset($data['id'])) {
@@ -48,6 +49,10 @@ class CTabView extends CDiv {
 
 	public function setSelected($selected) {
 		$this->selectedTab = $selected;
+	}
+
+	public function setDisabled($disabled) {
+		$this->disabledTab = $disabled;
 	}
 
 	public function addTab($id, $header, $body) {
@@ -84,10 +89,14 @@ class CTabView extends CDiv {
 			if (!is_null($this->selectedTab)) {
 				$options['selected'] = $this->selectedTab;
 			}
+			if (!is_null($this->disabledTab)) {
+				$options['disabled'] = array($this->disabledTab);
+			}
 			if ($this->rememberTab) {
 				$options['cookie'] = array();
 			}
-			zbx_add_post_js('jQuery("#'.$this->id.'").tabs('.zbx_jsvalue($options, true).').show();');
+
+			zbx_add_post_js('jQuery("#'.$this->id.'").tabs('.CJs::encodeJson($options).').show();');
 		}
 		return parent::toString($destroy);
 	}

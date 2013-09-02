@@ -26,7 +26,7 @@ $r_form->addItem(array(_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB
 $hostInventoryWidget->addPageHeader(_('HOST INVENTORIES'), SPACE);
 $hostInventoryWidget->addHeader(_('Hosts'), $r_form);
 
-// HOST INVENTORY FILTER {{{
+// host inventory filter
 if (hasRequest('filter_set')) {
 	$filterField = getRequest('filter_field');
 	$filterFieldValue = getRequest('filter_field_value');
