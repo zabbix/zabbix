@@ -8,6 +8,7 @@ New features:
 A.F.I..... [ZBXNEXT-1569] implemented user name and surname displaying in acknowledgements (Ivo, Oleg)
 
 Bug fixes:
+....I..... [ZBX-6890] added missing indexes in child-tables for foreign key contraints, rename some indexes to meet naming convention (Andris)
 ..F....... [ZBX-6887] allowed to translate "Internal" in a different way in authentication, event and user context (Eduard)
 A......... [ZBX-6124] removed unused API methods (Eduard)
 ..F....... [ZBX-6927] improved validation messages (Eduard)
