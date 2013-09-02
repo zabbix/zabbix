@@ -1283,62 +1283,56 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
  ******************************************************************************/
 static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 {
-	const char	*__function_name = "DCmass_proxy_update_items";
-	size_t		sql_offset = 0;
-	zbx_uint64_t	*ids = NULL, lastlogsize;
-	int		ids_alloc, ids_num = 0;
-	int		mtime, i, j;
+	const char		*__function_name = "DCmass_proxy_update_items";
+
+	size_t			sql_offset = 0;
+	zbx_vector_uint64_t	itemids;
+	int			i, j;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ids_alloc = history_num;
-	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
+	zbx_vector_uint64_create(&itemids);
 
 	for (i = 0; i < history_num; i++)
 	{
 		if (ITEM_VALUE_TYPE_LOG == history[i].value_type)
-			uint64_array_add(&ids, &ids_alloc, &ids_num, history[i].itemid, 64);
+			zbx_vector_uint64_append(&itemids, history[i].itemid);
 	}
+
+	zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	for (i = 0; i < ids_num; i++)
+	for (i = 0; i < itemids.values_num; i++)
 	{
-		lastlogsize = mtime = -1;
-
-		for (j = 0; j < history_num; j++)
+		for (j = history_num - 1; j >= 0; j--)
 		{
-			if (history[j].itemid != ids[i])
+			if (history[j].itemid != itemids.values[i])
 				continue;
 
 			if (ITEM_VALUE_TYPE_LOG != history[j].value_type)
 				continue;
 
-			if (lastlogsize < history[j].lastlogsize)
-				lastlogsize = history[j].lastlogsize;
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"update items"
+					" set lastlogsize=" ZBX_FS_UI64
+						",mtime=%d"
+					" where itemid=" ZBX_FS_UI64 ";\n",
+					history[j].lastlogsize, history[j].mtime, history[j].itemid);
 
-			if (mtime < history[j].mtime)
-				mtime = history[j].mtime;
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
+			break;
 		}
-
-		if (-1 == lastlogsize || -1 == mtime)
-			continue;
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"update items set lastlogsize=" ZBX_FS_UI64 ",mtime=%d where itemid=" ZBX_FS_UI64 ";\n",
-				lastlogsize,
-				mtime,
-				ids[i]);
-
-		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	zbx_free(ids);
-
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
+
+	zbx_vector_uint64_destroy(&itemids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
