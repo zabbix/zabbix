@@ -637,8 +637,12 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		zbx_vector_uint64_t *del, char **error)
 {
 	const char		*__function_name = "process_proxyconfig_table";
+
 	int			f, fields_count = 0, insert, is_null, i, ret = FAIL, id_field_nr = 0,
 				move_out = 0, move_field_nr = 0;
+#ifdef HAVE_MYSQL
+	int			ex_fields_count = 0;
+#endif
 	const ZBX_FIELD		*fields[ZBX_MAX_FIELDS];
 	struct zbx_json_parse	jp_data, jp_row;
 	char			buf[MAX_STRING_LEN], *esc;
@@ -706,6 +710,30 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 			goto out;
 		}
 	}
+
+#ifdef HAVE_MYSQL
+	/* MySQL: BLOB and TEXT columns doesn't have a default value; we shall add them into an insert statement */
+	for (i = 0; NULL != table->fields[i].name; i++)
+	{
+		switch (table->fields[i].type)
+		{
+			case ZBX_TYPE_BLOB:
+			case ZBX_TYPE_TEXT:
+			case ZBX_TYPE_SHORTTEXT:
+			case ZBX_TYPE_LONGTEXT:
+				for (f = 0; f < fields_count; f++)
+				{
+					if (fields[f] == &table->fields[i])
+						break;
+				}
+
+				if (f == fields_count)
+					fields[fields_count + ex_fields_count++] = &table->fields[i];
+
+				break;
+		}
+	}
+#endif
 
 	/* get the entries (line 8 in T1) */
 	if (FAIL == zbx_json_brackets_by_name(jp_obj, ZBX_PROTO_TAG_DATA, &jp_data))
@@ -934,8 +962,15 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "insert into %s (", table->table);
 
+#ifdef HAVE_MYSQL
+			for (f = 0; f < fields_count + ex_fields_count; f++)
+#else
 			for (f = 0; f < fields_count; f++)
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s,", fields[f]->name);
+#endif
+			{
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, fields[f]->name);
+				zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ',');
+			}
 
 			sql_offset--;
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ") values (" ZBX_FS_UI64 ",", recid);
@@ -1026,6 +1061,14 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		sql_offset--;
 		if (0 != insert)
 		{
+#ifdef HAVE_MYSQL
+			for (f = fields_count; f < fields_count + ex_fields_count; f++)
+			{
+				esc = DBdyn_escape_string(fields[f]->default_value);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",'%s'", esc);
+				zbx_free(esc);
+			}
+#endif
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ");\n");
 		}
 		else
