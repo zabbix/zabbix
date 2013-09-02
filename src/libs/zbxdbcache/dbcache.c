@@ -935,7 +935,7 @@ static void	DCcalculate_item_delta_float(DB_ITEM *item, ZBX_DC_HISTORY *h, zbx_i
 				" [" ZBX_FS_DBL "] is not suitable for value type [%s]",
 				h->value.dbl, zbx_item_value_type_string(h->value_type));
 
-		DCrequeue_items(&h->itemid, &h->state, &h->ts.sec, &errcode, 1);
+		DCrequeue_items(&h->itemid, &h->state, &h->ts.sec, NULL, NULL, &errcode, 1);
 	}
 }
 
@@ -1045,7 +1045,8 @@ notsupported:
 			zabbix_log(LOG_LEVEL_WARNING, "item [%s] became not supported: %s",
 					zbx_host_key_string(h->itemid), h->value_orig.err);
 
-			object = (0 != (ZBX_FLAG_DISCOVERY & item->flags) ? EVENT_OBJECT_LLDRULE : EVENT_OBJECT_ITEM);
+			object = (0 != (ZBX_FLAG_DISCOVERY_RULE & item->flags) ?
+					EVENT_OBJECT_LLDRULE : EVENT_OBJECT_ITEM);
 			add_event(0, EVENT_SOURCE_INTERNAL, object, item->itemid, &h->ts, h->state, NULL, NULL, 0, 0);
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "%sstate=%d", sql_start, (int)h->state);
@@ -2983,7 +2984,7 @@ static void	dc_local_add_history_lld(zbx_uint64_t itemid, zbx_timespec_t *ts, co
 	item_value->itemid = itemid;
 	item_value->ts = *ts;
 	item_value->state = ITEM_STATE_NORMAL;
-	item_value->flags = ZBX_FLAG_DISCOVERY;
+	item_value->flags = ZBX_FLAG_DISCOVERY_RULE;
 	item_value->value.value_str.len = strlen(value_orig) + 1;
 
 	dc_string_buffer_realloc(item_value->value.value_str.len);
@@ -3001,9 +3002,8 @@ static void	dc_local_add_history_lld(zbx_uint64_t itemid, zbx_timespec_t *ts, co
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags,
-		AGENT_RESULT *value, zbx_timespec_t *ts, unsigned char state, const char *error,
-		int timestamp, const char *source, int severity, int logeventid, zbx_uint64_t lastlogsize, int mtime)
+void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags, AGENT_RESULT *value,
+		zbx_timespec_t *ts, unsigned char state, const char *error)
 {
 	if (ITEM_STATE_NOTSUPPORTED == state)
 	{
@@ -3011,7 +3011,7 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 		return;
 	}
 
-	if (0 != (ZBX_FLAG_DISCOVERY & flags))
+	if (0 != (ZBX_FLAG_DISCOVERY_RULE & flags))
 	{
 		if (NULL == GET_TEXT_RESULT(value))
 			return;
@@ -3044,10 +3044,18 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 				dc_local_add_history_text(itemid, ts, value->text);
 			break;
 		case ITEM_VALUE_TYPE_LOG:
-			if (GET_STR_RESULT(value))
+			if (GET_LOG_RESULT(value))
 			{
-				dc_local_add_history_log(itemid, ts, value->str, timestamp, source, severity,
-						logeventid, lastlogsize, mtime);
+				size_t		i;
+				zbx_log_t	*log;
+
+				for (i = 0; NULL != value->logs[i]; i++)
+				{
+					log = value->logs[i];
+
+					dc_local_add_history_log(itemid, ts, log->value, log->timestamp, log->source,
+							log->severity, log->logeventid, log->lastlogsize, log->mtime);
+				}
 			}
 			break;
 		default:
@@ -3075,7 +3083,7 @@ void	dc_flush_history()
 		{
 			DCadd_history_notsupported(item_value);
 		}
-		else if (0 != (ZBX_FLAG_DISCOVERY & item_value->flags))
+		else if (0 != (ZBX_FLAG_DISCOVERY_RULE & item_value->flags))
 		{
 			DCadd_history_lld(item_value);
 		}

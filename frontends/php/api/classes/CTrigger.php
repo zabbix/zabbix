@@ -642,6 +642,10 @@ class CTrigger extends CTriggerGeneral {
 				'selectDependencies' => API_OUTPUT_REFER
 			));
 
+			$updateDiscoveredValidator = new CUpdateDiscoveredValidator(array(
+				'allowed' => array('triggerid', 'status'),
+				'messageAllowedField' => _('Cannot update "%1$s" for a discovered trigger.')
+			));
 			foreach ($triggers as $trigger) {
 				// check permissions
 				if (!isset($dbTriggers[$trigger['triggerid']])) {
@@ -649,13 +653,7 @@ class CTrigger extends CTriggerGeneral {
 				}
 
 				// discovered fields, except status, cannot be updated
-				if ($dbTriggers[$trigger['triggerid']]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-					foreach ($trigger as $key => $value) {
-						if (!in_array($key, array('triggerid', 'status'))) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update discovered trigger.'));
-						}
-					}
-				}
+				$this->checkPartialValidator($trigger, $updateDiscoveredValidator, $dbTriggers[$trigger['triggerid']]);
 			}
 
 			$triggers = $this->extendObjects($this->tableName(), $triggers, array('description'));
