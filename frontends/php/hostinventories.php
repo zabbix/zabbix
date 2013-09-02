@@ -75,6 +75,9 @@ $data = array();
  * Display
  */
 if ($hostid > 0) {
+	// host scripts
+	$data['hostScripts'] = API::Script()->getScriptsByHosts($hostid);
+
 	// inventory info
 	$data['tableTitles'] = getHostInventories();
 	$data['tableTitles'] = zbx_toHash($data['tableTitles'], 'db_field');
@@ -92,6 +95,8 @@ if ($hostid > 0) {
 		'selectInterfaces' => API_OUTPUT_EXTEND,
 		'selectItems' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,
+		'selectScreens' => API_OUTPUT_COUNT,
+		'selectInventory' => array('hostid'),
 		'selectGraphs' => API_OUTPUT_COUNT,
 		'selectApplications' => API_OUTPUT_COUNT,
 		'selectDiscoveries' => API_OUTPUT_COUNT,
@@ -179,6 +184,9 @@ if ($hostid > 0) {
 			$data['overview']['host']['dns'][] = new CSpan($dns, $spanClass);
 		}
 	}
+
+	// js templates
+	require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php';
 
 	// view generation
 	$hostinventoriesView = new CView('inventory.host.view', $data);
