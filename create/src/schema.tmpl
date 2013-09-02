@@ -62,6 +62,8 @@ FIELD		|jmx_available	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
 FIELD		|jmx_errors_from|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|jmx_error	|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
 FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|flags		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|templateid	|t_id		|	|NULL		|ZBX_SYNC		|3|hosts	|hostid
 INDEX		|1		|host
 INDEX		|2		|status
 INDEX		|3		|proxy_hostid
@@ -72,7 +74,23 @@ TABLE|groups|groupid|ZBX_SYNC,ZBX_DATA
 FIELD		|groupid	|t_id		|	|NOT NULL	|0
 FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|internal	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|flags		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|name
+
+TABLE|group_prototype|group_prototypeid|ZBX_SYNC,ZBX_DATA
+FIELD		|group_prototypeid|t_id		|	|NOT NULL	|0
+FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_SYNC		|1|hosts
+FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|groupid	|t_id		|	|NULL		|ZBX_SYNC		|2|groups	|		|RESTRICT
+FIELD		|templateid	|t_id		|	|NULL		|ZBX_SYNC		|3|group_prototype|group_prototypeid
+INDEX		|1		|hostid
+
+TABLE|group_discovery|groupid|ZBX_SYNC,ZBX_DATA
+FIELD		|groupid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|groups
+FIELD		|parent_group_prototypeid|t_id	|	|NOT NULL	|ZBX_SYNC		|2|group_prototype|group_prototypeid|RESTRICT
+FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_NODATA
+FIELD		|lastcheck	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|ts_delete	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
 
 TABLE|screens|screenid|ZBX_SYNC,ZBX_DATA
 FIELD		|screenid	|t_id		|	|NOT NULL	|0
@@ -1225,6 +1243,18 @@ FIELD		|ts_delete	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
 UNIQUE		|1		|itemid,parent_itemid
 INDEX		|2		|parent_itemid
 
+TABLE|host_discovery|hostid|ZBX_SYNC,ZBX_DATA
+FIELD		|hostid		|t_id		|	|NOT NULL	|0			|1|hosts
+FIELD		|parent_hostid	|t_id		|	|NULL		|ZBX_SYNC		|2|hosts	|hostid		|RESTRICT
+FIELD		|parent_itemid	|t_id		|	|NULL		|ZBX_SYNC		|3|items	|itemid		|RESTRICT
+FIELD		|host		|t_varchar(64)	|''	|NOT NULL	|ZBX_NODATA
+FIELD		|lastcheck	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|ts_delete	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
+
+TABLE|interface_discovery|interfaceid|ZBX_SYNC
+FIELD		|interfaceid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|interface
+FIELD		|parent_interfaceid|t_id	|	|NOT NULL	|ZBX_SYNC		|2|interface	|interfaceid
+
 TABLE|profiles|profileid|0
 FIELD		|profileid	|t_id		|	|NOT NULL	|0
 FIELD		|userid		|t_id		|	|NOT NULL	|0			|1|users
@@ -1278,4 +1308,4 @@ INDEX		|2		|templateid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2010101	|2010156
+ROW		|2010175	|2010175
