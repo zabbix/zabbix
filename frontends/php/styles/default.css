@@ -215,6 +215,7 @@ ul.formlist .formrow .dd { margin-left: 10px; }
 ul.formlist .hidden { display: none; }
 ul.formlist .text, ul.formlist textarea, ul.formlist .password { padding: 3px; }
 ul.formlist select { padding: 2px; }
+div.dd .default_interface { font-weight: bold; }
 
 /* formlist buttons */
 div.footer { padding: 4px 1.8em; }

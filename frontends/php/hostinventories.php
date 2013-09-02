@@ -48,10 +48,10 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (getRequest('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
+if (getRequest('groupid') && !API::HostGroup()->isReadable(array(getRequest('groupid')))) {
 	access_deny();
 }
-if (getRequest('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
+if (getRequest('hostid') && !API::Host()->isReadable(array(getRequest('hostid')))) {
 	access_deny();
 }
 
@@ -59,7 +59,7 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 if (hasRequest('favobj')) {
 	if('filter' == $_REQUEST['favobj']){
-		CProfile::update('web.hostinventories.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
+		CProfile::update('web.hostinventories.filter.state', getRequest('favstate'), PROFILE_TYPE_INT);
 	}
 }
 
@@ -106,48 +106,79 @@ if ($hostid > 0) {
 	}
 
 	$data['overview']['host']['ip'] = array();
-	$data['overview']['host']['dns'] = array();
+	$dnsInterfaces = array();
+	$ipInterfaces = array();
+
+	$i = 0;
 	foreach ($data['overview']['host']['interfaces'] as $interface) {
+		$defaultInterface[$i] = $interface['main'];
+
 		switch ($interface['type']) {
 			case INTERFACE_TYPE_AGENT:
 				if ($interface['ip']) {
-					$data['overview']['host']['ip'][] = _('Agent').NAME_DELIMITER.SPACE.$interface['ip'];
+					$ipInterfaces[$i] = _('Agent').NAME_DELIMITER.$interface['ip'];
 				}
 				if ($interface['dns']) {
-					$data['overview']['host']['dns'][] = _('Agent').NAME_DELIMITER.SPACE.$interface['dns'];
+					$dnsInterfaces[$i] = _('Agent').NAME_DELIMITER.$interface['dns'];
 				}
 				break;
 
 			case INTERFACE_TYPE_SNMP:
 				if ($interface['ip']) {
-					$data['overview']['host']['ip'][] = _('SNMP').NAME_DELIMITER.SPACE.$interface['ip'];
+					$ipInterfaces[$i] = _('SNMP').NAME_DELIMITER.$interface['ip'];
 				}
 				if ($interface['dns']) {
-					$data['overview']['host']['dns'][] = _('SNMP').NAME_DELIMITER.SPACE.$interface['dns'];
+					$dnsInterfaces[$i] = _('SNMP').NAME_DELIMITER.$interface['dns'];
 				}
 				break;
 
 			case INTERFACE_TYPE_IPMI:
 				if ($interface['ip']) {
-					$data['overview']['host']['ip'][] = _('IPMI').NAME_DELIMITER.SPACE.$interface['ip'];
+					$ipInterfaces[$i] = _('IPMI').NAME_DELIMITER.$interface['ip'];
 				}
 				if ($interface['dns']) {
-					$data['overview']['host']['dns'][] = _('IPMI').NAME_DELIMITER.SPACE.$interface['dns'];
+					$dnsInterfaces[$i] = _('IPMI').NAME_DELIMITER.$interface['dns'];
 				}
 				break;
 
 			case INTERFACE_TYPE_JMX:
 				if ($interface['ip']) {
-					$data['overview']['host']['ip'][] = _('JMX').NAME_DELIMITER.SPACE.$interface['ip'];
+					$ipInterfaces[$i] = _('JMX').NAME_DELIMITER.$interface['ip'];
 				}
 				if ($interface['dns']) {
-					$data['overview']['host']['dns'][] = _('JMX').NAME_DELIMITER.SPACE.$interface['dns'];
+					$dnsInterfaces[$i] = _('JMX').NAME_DELIMITER.$interface['dns'];
 				}
 				break;
 		}
+
+		$i++;
 	}
-	natsort($data['overview']['host']['ip']);
-	natsort($data['overview']['host']['dns']);
+	natsort($ipInterfaces);
+	natsort($dnsInterfaces);
+
+	$data['overview']['host']['ip'] = null;
+	foreach ($ipInterfaces as $key => $ip) {
+		$spanClass = $defaultInterface[$key] ? 'default_interface' : null;
+		if (!$data['overview']['host']['ip']) {
+			$data['overview']['host']['ip'][] = new CSpan($ip, $spanClass);
+		}
+		else {
+			$data['overview']['host']['ip'][] = ','.SPACE;
+			$data['overview']['host']['ip'][] = new CSpan($ip, $spanClass);
+		}
+	}
+
+	$data['overview']['host']['dns'] = null;
+	foreach ($dnsInterfaces as $key => $dns) {
+		$spanClass = $defaultInterface[$key] ? 'default_interface' : null;
+		if (!$data['overview']['host']['dns']) {
+			$data['overview']['host']['dns'][] = new CSpan($dns, $spanClass);
+		}
+		else {
+			$data['overview']['host']['dns'][] = ','.SPACE;
+			$data['overview']['host']['dns'][] = new CSpan($dns, $spanClass);
+		}
+	}
 
 	// view generation
 	$hostinventoriesView = new CView('inventory.host.view', $data);
@@ -163,8 +194,6 @@ else{
 		'groupid' => getRequest('groupid', null),
 	);
 	$data['pageFilter'] = new CPageFilter($options);
-
-	$_REQUEST['groupid'] = $data['pageFilter']->groupid;
 
 	$hostinventoriesView = new CView('inventory.host.list', $data);
 	$hostinventoriesView->render();
