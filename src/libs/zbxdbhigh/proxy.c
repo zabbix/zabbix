@@ -325,9 +325,9 @@ static void	get_proxy_monitored_hosts(zbx_uint64_t proxy_hostid, zbx_vector_uint
 			"select hostid"
 			" from hosts"
 			" where proxy_hostid=" ZBX_FS_UI64
-				" and status in (%d,%d)",
-			proxy_hostid,
-			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
+				" and status in (%d,%d)"
+				" and flags<>%d",
+			proxy_hostid, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1914,9 +1914,8 @@ int	proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid)
 	return proxy_get_history_data_simple(j, &areg, lastid);
 }
 
-void	calc_timestamp(char *line, int *timestamp, char *format)
+void	calc_timestamp(const char *line, int *timestamp, const char *format)
 {
-
 	const char	*__function_name = "calc_timestamp";
 	int		hh, mm, ss, yyyy, dd, MM;
 	int		hhc = 0, mmc = 0, ssc = 0, yyyyc = 0, ddc = 0, MMc = 0;
@@ -1982,7 +1981,7 @@ void	calc_timestamp(char *line, int *timestamp, char *format)
 			*timestamp = t;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() timestamp:%d",	__function_name, *timestamp);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() timestamp:%d", __function_name, *timestamp);
 }
 
 /******************************************************************************
@@ -2009,9 +2008,9 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 	DC_ITEM		*items = NULL;
 	zbx_host_key_t	*keys = NULL;
 	size_t		i;
-	zbx_uint64_t	*itemids = NULL;
+	zbx_uint64_t	*itemids = NULL, *lastlogsizes = NULL;
 	unsigned char	*states = NULL;
-	int		*lastclocks = NULL, *errcodes = NULL, *errcodes2 = NULL;
+	int		*lastclocks = NULL, *errcodes = NULL, *mtimes = NULL, *errcodes2 = NULL;
 	size_t		num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -2022,6 +2021,8 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 	itemids = zbx_malloc(itemids, sizeof(zbx_uint64_t) * values_num);
 	states = zbx_malloc(states, sizeof(unsigned char) * values_num);
 	lastclocks = zbx_malloc(lastclocks, sizeof(int) * values_num);
+	lastlogsizes = zbx_malloc(lastlogsizes, sizeof(zbx_uint64_t) * values_num);
+	mtimes = zbx_malloc(mtimes, sizeof(int) * values_num);
 	errcodes2 = zbx_malloc(errcodes2, sizeof(int) * values_num);
 
 	for (i = 0; i < values_num; i++)
@@ -2037,7 +2038,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 		if (SUCCEED != errcodes[i])
 			continue;
 
-		if (ZBX_FLAG_DISCOVERY_CHILD == items[i].flags)
+		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == items[i].flags)
 			continue;
 
 		if (HOST_MAINTENANCE_STATUS_ON == items[i].host.maintenance_status &&
@@ -2074,7 +2075,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 		{
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &values[i].ts,
-					items[i].state, values[i].value, 0, NULL, 0, 0, 0, 0);
+					items[i].state, values[i].value);
 
 			if (NULL != processed)
 				(*processed)++;
@@ -2087,16 +2088,28 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 					proxy_hostid ? ITEM_DATA_TYPE_DECIMAL : items[i].data_type, values[i].value))
 			{
 				if (ITEM_VALUE_TYPE_LOG == items[i].value_type)
-					calc_timestamp(values[i].value, &values[i].timestamp, items[i].logtimefmt);
+				{
+					zbx_log_t	*log;
 
-				if (NULL != values[i].source)
-					zbx_replace_invalid_utf8(values[i].source);
+					log = agent.logs[0];
+
+					log->timestamp = values[i].timestamp;
+					if (NULL != values[i].source)
+					{
+						zbx_replace_invalid_utf8(values[i].source);
+						log->source = zbx_strdup(log->source, values[i].source);
+					}
+					log->severity = values[i].severity;
+					log->logeventid = values[i].logeventid;
+					log->lastlogsize = values[i].lastlogsize;
+					log->mtime = values[i].mtime;
+
+					calc_timestamp(log->value, &log->timestamp, items[i].logtimefmt);
+				}
 
 				items[i].state = ITEM_STATE_NORMAL;
 				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &agent,
-						&values[i].ts, items[i].state, NULL, values[i].timestamp,
-						values[i].source, values[i].severity, values[i].logeventid,
-						values[i].lastlogsize, values[i].mtime);
+						&values[i].ts, items[i].state, NULL);
 
 				if (NULL != processed)
 					(*processed)++;
@@ -2108,7 +2121,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 
 				items[i].state = ITEM_STATE_NOTSUPPORTED;
 				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL,
-						&values[i].ts, items[i].state, agent.msg, 0, NULL, 0, 0, 0, 0);
+						&values[i].ts, items[i].state, agent.msg);
 			}
 			else
 				THIS_SHOULD_NEVER_HAPPEN; /* set_result_type() always sets MSG result if not SUCCEED */
@@ -2119,15 +2132,19 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 		itemids[num] = items[i].itemid;
 		states[num] = items[i].state;
 		lastclocks[num] = values[i].ts.sec;
+		lastlogsizes[num] = values[i].lastlogsize;
+		mtimes[num] = values[i].mtime;
 		errcodes2[num] = SUCCEED;
 		num++;
 	}
 
 	DCconfig_clean_items(items, errcodes, values_num);
 
-	DCrequeue_items(itemids, states, lastclocks, errcodes2, num);
+	DCrequeue_items(itemids, states, lastclocks, lastlogsizes, mtimes, errcodes2, num);
 
 	zbx_free(errcodes2);
+	zbx_free(mtimes);
+	zbx_free(lastlogsizes);
 	zbx_free(lastclocks);
 	zbx_free(states);
 	zbx_free(itemids);

@@ -1271,6 +1271,22 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	PROXY_LDFLAGS="$PROXY_LDFLAGS $SSH2_LDFLAGS"
 	PROXY_LIBS="$PROXY_LIBS $SSH2_LIBS"
 
+	dnl Check for LIBXML2 [by default - skip]
+	LIBXML2_CHECK_CONFIG([no])
+	if test "x$want_libxml2" = "xyes"; then
+		if test "x$found_libxml2" != "xyes"; then
+			AC_MSG_ERROR([LIBXML2 library not found])
+		else
+			have_libxml2="yes"
+		fi
+	fi
+	CFLAGS="$CFLAGS $LIBXML2_CFLAGS"
+	SERVER_LDFLAGS="$SERVER_LDFLAGS $LIBXML2_LDFLAGS"
+	SERVER_LIBS="$SERVER_LIBS $LIBXML2_LIBS"
+
+	PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBXML2_LDFLAGS"
+	PROXY_LIBS="$PROXY_LIBS $LIBXML2_LIBS"
+
 	found_openipmi="no"
 	dnl Check for libOpenIPMI [by default - skip]
 	LIBOPENIPMI_CHECK_CONFIG([no])

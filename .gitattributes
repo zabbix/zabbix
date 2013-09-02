@@ -7,6 +7,8 @@ bin/win64/zabbix_agentd.exe -text
 bin/win64/zabbix_get.exe -text
 bin/win64/zabbix_sender.exe -text
 create/src/data.tmpl -text
+frontends/php/api/classes/CHostBase.php -text
+frontends/php/api/classes/managers/CHistoryManager.php -text
 frontends/php/audio/alarm_average.wav -text
 frontends/php/audio/alarm_disaster.wav -text
 frontends/php/audio/alarm_high.wav -text
@@ -166,6 +168,19 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
+frontends/php/include/classes/class.cseverity.php -text
+frontends/php/include/classes/core/CFactoryRegistry.php -text
+frontends/php/include/classes/validators/CCollectionValidator.php -text
+frontends/php/include/classes/validators/CIdValidator.php -text
+frontends/php/include/classes/validators/hostgroup/CHostGroupNormalValidator.php -text
+frontends/php/include/classes/validators/object/CUpdateDiscoveredValidator.php -text
+frontends/php/include/classes/validators/schema/CPartialSchemaValidator.php -text
+frontends/php/include/classes/validators/schema/CSchemaValidator.php -text
+frontends/php/include/classes/validators/string/CLldMacroStringValidator.php -text
+frontends/php/include/classes/validators/string/CStringValidator.php -text
+frontends/php/include/views/configuration.sysmap.constructor.php -text
+frontends/php/include/views/configuration.sysmap.list.php -text
+frontends/php/include/views/js/configuration.host.prototype.edit.js.php -text
 frontends/php/js/flickerfreescreen.js -text svneol=unset#text/plain
 frontends/php/js/multiselect.js -text svneol=unset#text/plain
 frontends/php/js/servercheck.js -text
@@ -257,6 +272,12 @@ frontends/php/styles/themes/originalblue/images/icons_d40000.png -text
 frontends/php/styles/themes/originalblue/images/icons_ffffff.png -text
 frontends/php/styles/themes/originalblue/images/preloader.gif -text
 frontends/php/tests/bootstrap.php.template -text
+frontends/php/tests/selenium/testFormGraph.php -text
+frontends/php/tests/selenium/testInheritanceItem.php -text
+frontends/php/tests/selenium/testPageItemPrototypes.php -text
+frontends/php/tests/selenium/testPageTriggerPrototypes.php -text
+frontends/php/tests/selenium/testPageTriggers.php -text
+m4/libxml2.m4 -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
 man/zabbix_proxy.man -text
@@ -534,11 +555,19 @@ misc/init.d/fedora/core5/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
+src/libs/zbxdbhigh/lld.h -text
+src/libs/zbxdbhigh/lld_common.c -text
+src/libs/zbxdbhigh/lld_graph.c -text
+src/libs/zbxdbhigh/lld_host.c -text
+src/libs/zbxdbhigh/lld_item.c -text
+src/libs/zbxdbhigh/lld_trigger.c -text
 src/zabbix_java/lib/logback-classic-0.9.27.jar -text
 src/zabbix_java/lib/logback-core-0.9.27.jar -text
 src/zabbix_java/lib/org-json-2010-12-28.jar -text
 src/zabbix_java/lib/slf4j-api-1.6.1.jar -text
 src/zabbix_java/tests/junit-4.8.2.jar -text
+src/zabbix_server/poller/checks_simple_vmware.c -text
+src/zabbix_server/poller/checks_simple_vmware.h -text
 tests/data/README -text
 tests/templates/sqlite3.init -text
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub.png -text svneol=unset#image/png

@@ -1,6 +1,8 @@
 Changes for 2.1.3
 
 New features:
+A.F.I..PS. [ZBXNEXT-1633] implemented host prototypes (Pavels, Sasha)
+.......PS. [ZBXNEXT-1633] implemented monitoring of vCenter and vSphere (Alexei, Sasha, wiper)
 ..F....... [ZBXNEXT-317] enabled access to historical data for disabled hosts (Guntis, Ivo)
 ..F....... [ZBX-6896] list of media types for creating new medias in a user's profile sorted by name (Vitalij)
 ..F....... [ZBX-6868] maps default add icon defined in defines.inc.php (Vitalij)
@@ -9,6 +11,7 @@ A.F.I..... [ZBXNEXT-1569] implemented user name and surname displaying in acknow
 
 Bug fixes:
 .......P.. [ZBX-6936] fixed MySQL errors when updating configuration of the proxy (Sasha)
+.......P.. [ZBX-6929] fixed updating of lastlogsize and mtime in the proxy's database (Sasha)
 ....I..... [ZBX-6890] added missing indexes in child-tables for foreign key contraints, rename some indexes to meet naming convention (Andris)
 ..F....... [ZBX-6887] allowed to translate "Internal" in a different way in authentication, event and user context (Eduard)
 A......... [ZBX-6124] removed unused API methods (Eduard)
@@ -376,6 +379,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Lithuanian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......P.. [ZBX-6929] fixed updating of lastlogsize and mtime in the proxy's database (Sasha)
 ..F....... [ZBX-6923] fixed mass delete in template list, 'Delete selected' and 'Delete selected with linked elements' functions (Vitalij)
 ..F....... [ZBX-6922] fixed host interface importing (Eduard)
 .......P.. [ZBX-6249] fixed data loss in proxy "Data sender" process caused by unfinished transactions; thanks to MATSUDA Daiki for patch (Andris)
