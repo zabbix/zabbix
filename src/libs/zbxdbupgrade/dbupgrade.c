@@ -22,6 +22,7 @@
 #include "db.h"
 #include "log.h"
 #include "sysinfo.h"
+#include "zbxdbupgrade.h"
 
 #ifdef HAVE_MYSQL
 #	define ZBX_DB_TABLE_OPTIONS	" engine=innodb"
@@ -91,7 +92,7 @@
 
 typedef struct
 {
-	int		(*function)();
+	int		(*function)(void);
 	int		version;
 	int		duplicates;
 	unsigned char	mandatory;
@@ -385,6 +386,21 @@ static void	DBdrop_index_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 #endif
 }
 
+static void	DBrename_index_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *table_name,
+		const char *old_name, const char *new_name, const char *fields, int unique)
+{
+#if defined(HAVE_IBM_DB2)
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "rename index %s to %s", old_name, new_name);
+#elif defined(HAVE_MYSQL)
+	DBcreate_index_sql(sql, sql_alloc, sql_offset, table_name, new_name, fields, unique);
+	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
+	DBdrop_index_sql(sql, sql_alloc, sql_offset, table_name, old_name);
+	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
+#elif defined(HAVE_ORACLE) || defined(HAVE_POSTGRESQL)
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter index %s rename to %s", old_name, new_name);
+#endif
+}
+
 static void	DBadd_foreign_key_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, int id, const ZBX_FIELD *field)
 {
@@ -565,6 +581,23 @@ static int	DBdrop_index(const char *table_name, const char *index_name)
 	int	ret = FAIL;
 
 	DBdrop_index_sql(&sql, &sql_alloc, &sql_offset, table_name, index_name);
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		ret = SUCCEED;
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBrename_index(const char *table_name, const char *old_name, const char *new_name, const char *fields,
+				int unique)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = FAIL;
+
+	DBrename_index_sql(&sql, &sql_alloc, &sql_offset, table_name, old_name, new_name, fields, unique);
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
 		ret = SUCCEED;
@@ -1176,7 +1209,7 @@ static int	DBpatch_2010064(void)
 
 static int	DBpatch_2010065(void)
 {
-	const ZBX_FIELD field = {"hk_trends_mode", "1 ", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"hk_trends_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
@@ -1281,7 +1314,8 @@ static int	DBpatch_2010076(void)
 					{"applicationid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"templateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{NULL}
-				}
+				},
+				NULL
 			};
 
 	return DBcreate_table(&table);
@@ -1569,6 +1603,283 @@ static int	DBpatch_2010101(void)
 	return ret;
 }
 
+static int	DBpatch_2010102(void)
+{
+	return DBcreate_index("hosts", "hosts_5", "maintenanceid", 0);
+}
+
+static int	DBpatch_2010103(void)
+{
+	return DBcreate_index("screens", "screens_1", "templateid", 0);
+}
+
+static int	DBpatch_2010104(void)
+{
+	return DBcreate_index("screens_items", "screens_items_1", "screenid", 0);
+}
+
+static int	DBpatch_2010105(void)
+{
+	return DBcreate_index("slides", "slides_2", "screenid", 0);
+}
+
+static int	DBpatch_2010106(void)
+{
+	return DBcreate_index("drules", "drules_1", "proxy_hostid", 0);
+}
+
+static int	DBpatch_2010107(void)
+{
+	return DBcreate_index("items", "items_6", "interfaceid", 0);
+}
+
+static int	DBpatch_2010108(void)
+{
+	return DBcreate_index("httpstepitem", "httpstepitem_2", "itemid", 0);
+}
+
+static int	DBpatch_2010109(void)
+{
+	return DBcreate_index("httptestitem", "httptestitem_2", "itemid", 0);
+}
+
+static int	DBpatch_2010110(void)
+{
+	return DBcreate_index("users_groups", "users_groups_2", "userid", 0);
+}
+
+static int	DBpatch_2010111(void)
+{
+	return DBcreate_index("scripts", "scripts_1", "usrgrpid", 0);
+}
+
+static int	DBpatch_2010112(void)
+{
+	return DBcreate_index("scripts", "scripts_2", "groupid", 0);
+}
+
+static int	DBpatch_2010113(void)
+{
+	return DBcreate_index("opmessage", "opmessage_1", "mediatypeid", 0);
+}
+
+static int	DBpatch_2010114(void)
+{
+	return DBcreate_index("opmessage_grp", "opmessage_grp_2", "usrgrpid", 0);
+}
+
+static int	DBpatch_2010115(void)
+{
+	return DBcreate_index("opmessage_usr", "opmessage_usr_2", "userid", 0);
+}
+
+static int	DBpatch_2010116(void)
+{
+	return DBcreate_index("opcommand", "opcommand_1", "scriptid", 0);
+}
+
+static int	DBpatch_2010117(void)
+{
+	return DBcreate_index("opcommand_hst", "opcommand_hst_2", "hostid", 0);
+}
+
+static int	DBpatch_2010118(void)
+{
+	return DBcreate_index("opcommand_grp", "opcommand_grp_2", "groupid", 0);
+}
+
+static int	DBpatch_2010119(void)
+{
+	return DBcreate_index("opgroup", "opgroup_2", "groupid", 0);
+}
+
+static int	DBpatch_2010120(void)
+{
+	return DBcreate_index("optemplate", "optemplate_2", "templateid", 0);
+}
+
+static int	DBpatch_2010121(void)
+{
+	return DBcreate_index("config", "config_1", "alert_usrgrpid", 0);
+}
+
+static int	DBpatch_2010122(void)
+{
+	return DBcreate_index("config", "config_2", "discovery_groupid", 0);
+}
+
+static int	DBpatch_2010123(void)
+{
+	return DBcreate_index("triggers", "triggers_3", "templateid", 0);
+}
+
+static int	DBpatch_2010124(void)
+{
+	return DBcreate_index("graphs", "graphs_2", "templateid", 0);
+}
+
+static int	DBpatch_2010125(void)
+{
+	return DBcreate_index("graphs", "graphs_3", "ymin_itemid", 0);
+}
+
+static int	DBpatch_2010126(void)
+{
+	return DBcreate_index("graphs", "graphs_4", "ymax_itemid", 0);
+}
+
+static int	DBpatch_2010127(void)
+{
+	return DBcreate_index("icon_map", "icon_map_2", "default_iconid", 0);
+}
+
+static int	DBpatch_2010128(void)
+{
+	return DBcreate_index("icon_mapping", "icon_mapping_2", "iconid", 0);
+}
+
+static int	DBpatch_2010129(void)
+{
+	return DBcreate_index("sysmaps", "sysmaps_2", "backgroundid", 0);
+}
+
+static int	DBpatch_2010130(void)
+{
+	return DBcreate_index("sysmaps", "sysmaps_3", "iconmapid", 0);
+}
+
+static int	DBpatch_2010131(void)
+{
+	return DBcreate_index("sysmaps_elements", "sysmaps_elements_1", "sysmapid", 0);
+}
+
+static int	DBpatch_2010132(void)
+{
+	return DBcreate_index("sysmaps_elements", "sysmaps_elements_2", "iconid_off", 0);
+}
+
+static int	DBpatch_2010133(void)
+{
+	return DBcreate_index("sysmaps_elements", "sysmaps_elements_3", "iconid_on", 0);
+}
+
+static int	DBpatch_2010134(void)
+{
+	return DBcreate_index("sysmaps_elements", "sysmaps_elements_4", "iconid_disabled", 0);
+}
+
+static int	DBpatch_2010135(void)
+{
+	return DBcreate_index("sysmaps_elements", "sysmaps_elements_5", "iconid_maintenance", 0);
+}
+
+static int	DBpatch_2010136(void)
+{
+	return DBcreate_index("sysmaps_links", "sysmaps_links_1", "sysmapid", 0);
+}
+
+static int	DBpatch_2010137(void)
+{
+	return DBcreate_index("sysmaps_links", "sysmaps_links_2", "selementid1", 0);
+}
+
+static int	DBpatch_2010138(void)
+{
+	return DBcreate_index("sysmaps_links", "sysmaps_links_3", "selementid2", 0);
+}
+
+static int	DBpatch_2010139(void)
+{
+	return DBcreate_index("sysmaps_link_triggers", "sysmaps_link_triggers_2", "triggerid", 0);
+}
+
+static int	DBpatch_2010140(void)
+{
+	return DBcreate_index("maintenances_hosts", "maintenances_hosts_2", "hostid", 0);
+}
+
+static int	DBpatch_2010141(void)
+{
+	return DBcreate_index("maintenances_groups", "maintenances_groups_2", "groupid", 0);
+}
+
+static int	DBpatch_2010142(void)
+{
+	return DBcreate_index("maintenances_windows", "maintenances_windows_2", "timeperiodid", 0);
+}
+
+static int	DBpatch_2010143(void)
+{
+	return DBcreate_index("nodes", "nodes_1", "masterid", 0);
+}
+
+static int	DBpatch_2010144(void)
+{
+	return DBcreate_index("graph_discovery", "graph_discovery_2", "parent_graphid", 0);
+}
+
+static int	DBpatch_2010145(void)
+{
+	return DBcreate_index("item_discovery", "item_discovery_2", "parent_itemid", 0);
+}
+
+static int	DBpatch_2010146(void)
+{
+	return DBcreate_index("trigger_discovery", "trigger_discovery_2", "parent_triggerid", 0);
+}
+
+static int	DBpatch_2010147(void)
+{
+	return DBcreate_index("application_template", "application_template_2", "templateid", 0);
+}
+
+static int	DBpatch_2010148(void)
+{
+	return DBrename_index("slides", "slides_slides_1", "slides_1", "slideshowid", 0);
+}
+
+static int	DBpatch_2010149(void)
+{
+	return DBrename_index("httptest", "httptest_httptest_1", "httptest_1", "applicationid", 0);
+}
+
+static int	DBpatch_2010150(void)
+{
+	return DBrename_index("httpstep", "httpstep_httpstep_1", "httpstep_1", "httptestid", 0);
+}
+
+static int	DBpatch_2010151(void)
+{
+	return DBrename_index("httpstepitem", "httpstepitem_httpstepitem_1", "httpstepitem_1", "httpstepid,itemid", 1);
+}
+
+static int	DBpatch_2010152(void)
+{
+	return DBrename_index("httptestitem", "httptestitem_httptestitem_1", "httptestitem_1", "httptestid,itemid", 1);
+}
+
+static int	DBpatch_2010153(void)
+{
+	return DBrename_index("graphs", "graphs_graphs_1", "graphs_1", "name", 0);
+}
+
+static int	DBpatch_2010154(void)
+{
+	return DBrename_index("services_links", "services_links_links_1", "services_links_1", "servicedownid", 0);
+}
+
+static int	DBpatch_2010155(void)
+{
+	return DBrename_index("services_links", "services_links_links_2", "services_links_2",
+			"serviceupid,servicedownid", 1);
+}
+
+static int	DBpatch_2010156(void)
+{
+	return DBrename_index("services_times", "services_times_times_1", "services_times_1",
+			"serviceid,type,ts_from,ts_to", 0);
+}
+
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 #define DBPATCH_END()					{NULL}};
@@ -1719,6 +2030,61 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010099, 0, 0)
 	DBPATCH_ADD(2010100, 0, 0)
 	DBPATCH_ADD(2010101, 0, 1)
+	DBPATCH_ADD(2010102, 0, 0)
+	DBPATCH_ADD(2010103, 0, 0)
+	DBPATCH_ADD(2010104, 0, 0)
+	DBPATCH_ADD(2010105, 0, 0)
+	DBPATCH_ADD(2010106, 0, 0)
+	DBPATCH_ADD(2010107, 0, 0)
+	DBPATCH_ADD(2010108, 0, 0)
+	DBPATCH_ADD(2010109, 0, 0)
+	DBPATCH_ADD(2010110, 0, 0)
+	DBPATCH_ADD(2010111, 0, 0)
+	DBPATCH_ADD(2010112, 0, 0)
+	DBPATCH_ADD(2010113, 0, 0)
+	DBPATCH_ADD(2010114, 0, 0)
+	DBPATCH_ADD(2010115, 0, 0)
+	DBPATCH_ADD(2010116, 0, 0)
+	DBPATCH_ADD(2010117, 0, 0)
+	DBPATCH_ADD(2010118, 0, 0)
+	DBPATCH_ADD(2010119, 0, 0)
+	DBPATCH_ADD(2010120, 0, 0)
+	DBPATCH_ADD(2010121, 0, 0)
+	DBPATCH_ADD(2010122, 0, 0)
+	DBPATCH_ADD(2010123, 0, 0)
+	DBPATCH_ADD(2010124, 0, 0)
+	DBPATCH_ADD(2010125, 0, 0)
+	DBPATCH_ADD(2010126, 0, 0)
+	DBPATCH_ADD(2010127, 0, 0)
+	DBPATCH_ADD(2010128, 0, 0)
+	DBPATCH_ADD(2010129, 0, 0)
+	DBPATCH_ADD(2010130, 0, 0)
+	DBPATCH_ADD(2010131, 0, 0)
+	DBPATCH_ADD(2010132, 0, 0)
+	DBPATCH_ADD(2010133, 0, 0)
+	DBPATCH_ADD(2010134, 0, 0)
+	DBPATCH_ADD(2010135, 0, 0)
+	DBPATCH_ADD(2010136, 0, 0)
+	DBPATCH_ADD(2010137, 0, 0)
+	DBPATCH_ADD(2010138, 0, 0)
+	DBPATCH_ADD(2010139, 0, 0)
+	DBPATCH_ADD(2010140, 0, 0)
+	DBPATCH_ADD(2010141, 0, 0)
+	DBPATCH_ADD(2010142, 0, 0)
+	DBPATCH_ADD(2010143, 0, 0)
+	DBPATCH_ADD(2010144, 0, 0)
+	DBPATCH_ADD(2010145, 0, 0)
+	DBPATCH_ADD(2010146, 0, 0)
+	DBPATCH_ADD(2010147, 0, 0)
+	DBPATCH_ADD(2010148, 0, 0)
+	DBPATCH_ADD(2010149, 0, 0)
+	DBPATCH_ADD(2010150, 0, 0)
+	DBPATCH_ADD(2010151, 0, 0)
+	DBPATCH_ADD(2010152, 0, 0)
+	DBPATCH_ADD(2010153, 0, 0)
+	DBPATCH_ADD(2010154, 0, 0)
+	DBPATCH_ADD(2010155, 0, 0)
+	DBPATCH_ADD(2010156, 0, 0)
 
 	DBPATCH_END()
 
