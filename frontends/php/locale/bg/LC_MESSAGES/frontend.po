@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-30 13:52+0300\n"
+"POT-Creation-Date: 2013-09-03 18:47+0300\n"
 "PO-Revision-Date: 2013-01-12 23:52+0200\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -112,8 +112,10 @@ msgstr "(в сек)"
 msgid "(minimum 60 seconds, 0 - use action default)"
 msgstr "(минимум 60 секунди, 0 - използване подразбиращото се)"
 
-#: include/views/configuration.host.edit.php:284
+#: include/views/configuration.host.edit.php:375
+#: include/views/configuration.host.edit.php:396
 #: include/views/configuration.host.massupdate.php:130
+#: include/views/configuration.host.prototype.edit.php:153
 msgid "(no proxy)"
 msgstr "(без прокси)"
 
@@ -291,14 +293,15 @@ msgstr "Потвърждаване изключено"
 #: include/views/configuration.action.edit.php:879
 #: include/views/configuration.action.edit.php:1021
 #: include/views/configuration.graph.edit.php:78
-#: include/views/configuration.host.edit.php:506
+#: include/views/configuration.host.edit.php:640
+#: include/views/configuration.host.prototype.edit.php:214
 #: include/views/configuration.item.edit.php:276
 #: include/views/configuration.item.massupdate.php:321
 #: include/views/configuration.maintenance.edit.php:103
 #: include/views/configuration.services.edit.php:93
 #: include/views/configuration.services.edit.php:129
 #: include/views/configuration.slideconf.edit.php:52
-#: include/views/configuration.template.edit.php:379
+#: include/views/configuration.template.edit.php:380
 #: include/views/configuration.triggers.edit.php:149
 #: include/views/configuration.triggers.edit.php:276
 #: include/views/configuration.triggers.massupdate.php:89 tr_logform.php:301
@@ -345,13 +348,14 @@ msgstr "Действие актуализирано"
 
 #: events.php:585 events.php:598 include/blocks.inc.php:915
 #: include/blocks.inc.php:1442 include/events.inc.php:202
-#: include/menu.inc.php:190 include/views/administration.auditacts.list.php:29
+#: include/menu.inc.php:191 include/views/administration.auditacts.list.php:29
 #: include/views/administration.auditacts.list.php:32
 #: include/views/administration.auditlogs.list.php:29
 #: include/views/configuration.action.list.php:40
 msgid "Actions"
 msgstr "Действия"
 
+#: include/views/configuration.host.prototype.list.php:119
 #: include/views/configuration.item.prototype.list.php:111
 msgid "Activate selected"
 msgstr "Включване на избраните"
@@ -392,7 +396,7 @@ msgstr "Активно до"
 #: include/views/administration.usergroups.edit.php:115
 #: include/views/administration.users.edit.php:90
 #: include/views/administration.users.edit.php:194
-#: include/views/common.macros.php:51
+#: include/views/common.macros.php:66
 #: include/views/configuration.action.edit.php:308
 #: include/views/configuration.action.edit.php:507
 #: include/views/configuration.action.edit.php:516
@@ -401,11 +405,13 @@ msgstr "Активно до"
 #: include/views/configuration.action.edit.php:1000
 #: include/views/configuration.action.edit.php:1009
 #: include/views/configuration.graph.edit.php:107
-#: include/views/configuration.host.edit.php:225
-#: include/views/configuration.host.edit.php:242
-#: include/views/configuration.host.edit.php:258
-#: include/views/configuration.host.edit.php:273
-#: include/views/configuration.host.edit.php:550
+#: include/views/configuration.host.edit.php:238
+#: include/views/configuration.host.edit.php:255
+#: include/views/configuration.host.edit.php:271
+#: include/views/configuration.host.edit.php:286
+#: include/views/configuration.host.edit.php:676
+#: include/views/configuration.host.prototype.edit.php:193
+#: include/views/configuration.host.prototype.edit.php:248
 #: include/views/configuration.httpconf.edit.php:231
 #: include/views/configuration.httpconf.popup.php:93
 #: include/views/configuration.item.edit.php:315
@@ -415,7 +421,7 @@ msgstr "Активно до"
 #: include/views/configuration.services.edit.php:266
 #: include/views/configuration.slideconf.edit.php:87
 #: include/views/configuration.sysmap.edit.php:173
-#: include/views/configuration.template.edit.php:418
+#: include/views/configuration.template.edit.php:419
 #: include/views/configuration.triggers.edit.php:81
 #: include/views/configuration.triggers.edit.php:98
 #: include/views/configuration.triggers.edit.php:293
@@ -492,7 +498,7 @@ msgstr "Добавено"
 msgid "Admin"
 msgstr "Администратор"
 
-#: include/menu.inc.php:217
+#: include/menu.inc.php:218
 msgid "Administration"
 msgstr "Администрация"
 
@@ -520,7 +526,9 @@ msgstr "Възраст по-малка от %s"
 msgid "Agent"
 msgstr "Агент"
 
-#: include/views/configuration.host.edit.php:233
+#: include/views/configuration.host.edit.php:246
+#: include/views/configuration.host.edit.php:330
+#: include/views/configuration.host.prototype.edit.php:107
 msgid "Agent interfaces"
 msgstr "Интерфейси на агента"
 
@@ -551,7 +559,7 @@ msgstr "Подравняване на иконите"
 #: include/views/administration.usergroups.edit.php:45
 #: include/views/administration.users.list.php:36
 #: include/views/configuration.action.edit.php:554
-#: include/views/configuration.hostgroups.edit.php:41
+#: include/views/configuration.hostgroups.edit.php:44
 #: include/views/configuration.sysmap.edit.php:121
 #: include/views/monitoring.dashconf.php:48
 #: include/views/monitoring.dashconf.php:92 jsLoader.php:89 popup_right.php:56
@@ -617,21 +625,21 @@ msgstr "Грешка в приложението."
 msgid "Application updated"
 msgstr "Приложение актуализирано"
 
-#: api/classes/CItemGeneral.php:370
+#: api/classes/CItemGeneral.php:368
 #, php-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Приложение с ID \"%1$s\" не е налично за \"%2$s\"."
 
-#: hosts.php:749 hosts.php:822 include/forms.inc.php:903
-#: include/html.inc.php:419 include/html.inc.php:423
+#: hosts.php:794 hosts.php:869 include/forms.inc.php:903
+#: include/html.inc.php:432 include/html.inc.php:436
 #: include/views/configuration.application.list.php:47
-#: include/views/configuration.host.edit.php:318
+#: include/views/configuration.host.edit.php:425
 #: include/views/configuration.item.edit.php:452
 #: include/views/configuration.item.list.php:71
 #: include/views/configuration.item.prototype.list.php:57
-#: include/views/configuration.template.edit.php:196 popup.php:40
+#: include/views/configuration.template.edit.php:197 popup.php:40
 #: search.php:138 search.php:163 search.php:186 search.php:382 search.php:404
-#: search.php:431 templates.php:481 templates.php:541
+#: search.php:431 templates.php:486 templates.php:546
 msgid "Applications"
 msgstr "Приложения"
 
@@ -732,7 +740,7 @@ msgstr "Трябва да бъдат създаден най-малко един
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
 msgstr "Трябва да поддържа най-малко една от базите данни MySQL, PostgreSQL, Oracle, SQLite3 или IBM DB2"
 
-#: include/menu.inc.php:263
+#: include/menu.inc.php:264
 #: include/views/administration.general.housekeeper.edit.php:93
 msgid "Audit"
 msgstr "Одит"
@@ -754,11 +762,13 @@ msgstr "Авг"
 msgid "August"
 msgstr "Август"
 
-#: include/menu.inc.php:246 include/views/configuration.httpconf.edit.php:80
+#: include/menu.inc.php:247 include/views/configuration.httpconf.edit.php:80
 msgid "Authentication"
 msgstr "Автентификация"
 
-#: include/views/configuration.host.edit.php:566
+#: include/views/configuration.host.edit.php:704
+#: include/views/configuration.host.edit.php:716
+#: include/views/configuration.host.prototype.edit.php:261
 msgid "Authentication algorithm"
 msgstr "Алгоритъм за автентификация"
 
@@ -805,8 +815,9 @@ msgstr "Автоматичен вход"
 msgid "Auto-logout (min 90 seconds)"
 msgstr "Автоматичен изход (мин 90 секунди)"
 
-#: include/views/configuration.host.edit.php:607
+#: include/views/configuration.host.edit.php:764
 #: include/views/configuration.host.massupdate.php:240
+#: include/views/configuration.host.prototype.edit.php:303
 msgid "Automatic"
 msgstr "Автоматично"
 
@@ -820,7 +831,7 @@ msgstr "Автоматично съответствие на икона"
 msgid "Automatic icon selection"
 msgstr "Автоматичен избор на икона"
 
-#: hosts.php:758
+#: hosts.php:803
 msgid "Availability"
 msgstr "Наличност"
 
@@ -909,7 +920,7 @@ msgstr ""
 msgid "Bitwise AND of last (most recent) T value and mask is NOT N"
 msgstr ""
 
-#: include/classes/core/ZBase.php:227
+#: include/classes/core/ZBase.php:233
 msgid "Black & Blue"
 msgstr "Черен & Син"
 
@@ -976,8 +987,8 @@ msgstr "КОНФИГУРАЦИЯ НА АВТЕНТИКАЦИЯ"
 msgid "CONFIGURATION OF DISCOVERY RULE"
 msgstr "КОНФИГУРАЦИЯ НА ПРАВИЛО ЗА ОТКРИВАНЕ"
 
-#: host_discovery.php:302
-#: include/views/configuration.host.discovery.list.php:30
+#: host_discovery.php:303
+#: include/views/configuration.host.discovery.list.php:28
 msgid "CONFIGURATION OF DISCOVERY RULES"
 msgstr "КОНФИГУРАЦИЯ НА ПРАВИЛА ЗА ОТКРИВАНЕ"
 
@@ -1000,7 +1011,12 @@ msgstr "КОНФИГУРАЦИЯ НА ГРАФИЧНИЯ ПОТРЕБИТЕЛС�
 msgid "CONFIGURATION OF HOST GROUPS"
 msgstr "КОНФИГУРАЦИЯ НА ХОСТ ГРУПИ"
 
-#: hosts.php:616 hosts.php:681 hosts.php:702
+#: include/views/configuration.host.prototype.edit.php:29
+#: include/views/configuration.host.prototype.list.php:31
+msgid "CONFIGURATION OF HOST PROTOTYPES"
+msgstr ""
+
+#: hosts.php:634 hosts.php:699 hosts.php:747
 msgid "CONFIGURATION OF HOSTS"
 msgstr "КОНФИГУРАЦИЯ НА ХОСТОВЕ"
 
@@ -1086,7 +1102,7 @@ msgstr "КОНФИГУРАЦИЯ НА СКРИПТОВЕ"
 msgid "CONFIGURATION OF SLIDE SHOWS"
 msgstr "КОНФИГУРАЦИЯ НА СЛАЙДШОУ"
 
-#: templates.php:415 templates.php:465
+#: templates.php:420 templates.php:470
 msgid "CONFIGURATION OF TEMPLATES"
 msgstr "КОНФИГУРАЦИЯ НА ШАБЛОНИТЕ"
 
@@ -1153,19 +1169,19 @@ msgstr "Последни права за достъп"
 msgid "Callback"
 msgstr "Обратно повикване"
 
-#: api/classes/CTemplate.php:927
+#: api/classes/CTemplate.php:932
 msgid "Can't add group"
 msgstr "Групата не може да се добави "
 
-#: api/classes/CTemplate.php:1003 api/classes/CTemplate.php:1013
+#: api/classes/CTemplate.php:1009 api/classes/CTemplate.php:1019
 msgid "Can't link template"
 msgstr "Шаблона не може да се свърже "
 
-#: api/classes/CTemplate.php:938
+#: api/classes/CTemplate.php:943
 msgid "Can't remove group"
 msgstr "Групата не може да се премахне "
 
-#: api/classes/CTemplate.php:974 api/classes/CTemplate.php:992
+#: api/classes/CTemplate.php:980 api/classes/CTemplate.php:998
 msgid "Can't unlink template"
 msgstr "Не може да се прекъснете връзката с шаблона"
 
@@ -1215,7 +1231,7 @@ msgstr ""
 msgid "Cannot add application"
 msgstr "Не може да се добави приложение"
 
-#: api/classes/CTrigger.php:1416
+#: api/classes/CTrigger.php:1414
 msgid "Cannot add dependency from a host to a template."
 msgstr "Не може да се добави зависимост от хост към шаблон."
 
@@ -1224,7 +1240,7 @@ msgstr "Не може да се добави зависимост от хост 
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
 msgstr "Не може да се добави зависимост от тригер \"%1$s:%2$s\" към несъществуващ тригер \"%3$s:%4$s\"."
 
-#: host_discovery.php:266
+#: host_discovery.php:267
 msgid "Cannot add discovery rule"
 msgstr "Не може да се добави правило за откриване"
 
@@ -1232,13 +1248,17 @@ msgstr "Не може да се добави правило за открива�
 msgid "Cannot add graph"
 msgstr "Не може да се добави графика"
 
-#: hostgroups.php:149 usergrps.php:185
+#: hostgroups.php:154 usergrps.php:185
 msgid "Cannot add group"
 msgstr "Не може да се добави група"
 
-#: hosts.php:368
+#: hosts.php:375
 msgid "Cannot add host"
 msgstr "Не може да се добави потребител"
+
+#: host_prototypes.php:202
+msgid "Cannot add host prototype"
+msgstr ""
 
 #: adm.images.php:62
 msgid "Cannot add image"
@@ -1286,7 +1306,7 @@ msgstr "Не може да се добави ново приложение \"%1$
 msgid "Cannot add node"
 msgstr "Не можe да се добави възлова точка"
 
-#: proxies.php:108
+#: proxies.php:114
 msgid "Cannot add proxy"
 msgstr "Не може да се добави прокси"
 
@@ -1310,7 +1330,7 @@ msgstr "Не може да се добави услуга"
 msgid "Cannot add slide show"
 msgstr "Не може да се добави слайдшоу"
 
-#: templates.php:165
+#: templates.php:164
 msgid "Cannot add template"
 msgstr "Не може да се добави шаблон"
 
@@ -1355,15 +1375,19 @@ msgstr "Не може да се промени метода на автенти�
 msgid "Cannot clear history"
 msgstr "Не може да се изчисти историята"
 
-#: api/classes/CDiscoveryRule.php:934
+#: api/classes/CDiscoveryRule.php:952
 msgid "Cannot clone graph prototypes."
 msgstr "Не може да се клонират графичните прототипи"
 
-#: api/classes/CDiscoveryRule.php:818
+#: api/classes/CDiscoveryRule.php:1000
+msgid "Cannot clone host prototypes."
+msgstr ""
+
+#: api/classes/CDiscoveryRule.php:836
 msgid "Cannot clone item prototypes."
 msgstr "Не може да се клонират елемент на данните прототипи"
 
-#: api/classes/CDiscoveryRule.php:578
+#: api/classes/CDiscoveryRule.php:593
 msgid "Cannot clone trigger prototypes."
 msgstr "Не може да се клонират тригер прототипите"
 
@@ -1384,15 +1408,20 @@ msgstr "Не може да се копират елементите от дан�
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
 msgstr "Не може да се копира тригер \"%1$s:%2$s\", защото има множество хостове в израза."
 
+#: api/classes/CHostPrototype.php:151
+#, php-format
+msgid "Cannot create a host prototype on a discovered host \"%1$s\"."
+msgstr ""
+
 #: include/db.inc.php:34
 msgid "Cannot create another database connection."
 msgstr "Не може да се създаде друга връзка към базата данни."
 
-#: api/classes/CTrigger.php:1450
+#: api/classes/CTrigger.php:1448
 msgid "Cannot create circular dependencies."
 msgstr "Не може да създаде циклична зависимост."
 
-#: api/classes/CTrigger.php:1422
+#: api/classes/CTrigger.php:1420
 msgid "Cannot create dependency on trigger itself."
 msgstr "Не може да се създаде зависимост на тригера от себе си."
 
@@ -1400,7 +1429,7 @@ msgstr "Не може да се създаде зависимост на три�
 msgid "Cannot create discovery rule"
 msgstr "Не може да се създаде правило за откриване"
 
-#: api/classes/CHost.php:1154
+#: api/classes/CHost.php:1186
 msgid "Cannot create host group."
 msgstr "Не може да се създаде хост група."
 
@@ -1444,16 +1473,16 @@ msgstr "Не може да се изтрие действието"
 msgid "Cannot delete application"
 msgstr "Не може да се изтрие приложението"
 
-#: api/classes/CTrigger.php:1085
+#: api/classes/CTrigger.php:1083
 msgid "Cannot delete dependency"
 msgstr "Не може да се изтрие зависимостта"
 
-#: api/classes/CDiscoveryRule.php:399 discoveryconf.php:172
-#: host_discovery.php:184
+#: api/classes/CDiscoveryRule.php:400 discoveryconf.php:172
+#: host_discovery.php:185
 msgid "Cannot delete discovery rule"
 msgstr "Не може да се изтрие правило за откриване"
 
-#: host_discovery.php:293
+#: host_discovery.php:294
 msgid "Cannot delete discovery rules"
 msgstr "Не може да се изтрият правилата за откриване"
 
@@ -1477,17 +1506,25 @@ msgstr "Не може да се изтрият графиките"
 msgid "Cannot delete graphs created by low level discovery."
 msgstr "Не може да се изтрият графиките, създадени с ниско ниво на откриване."
 
-#: hostgroups.php:163 hostgroups.php:174 usergrps.php:200 usergrps.php:233
+#: hostgroups.php:168 hostgroups.php:179 usergrps.php:200 usergrps.php:233
 msgid "Cannot delete group"
 msgstr "Не може да се изтрие групата"
 
-#: hosts.php:557 hosts.php:574
+#: hosts.php:575 hosts.php:592
 msgid "Cannot delete host"
 msgstr "Не може да се изтрие хоста"
 
-#: api/classes/CHost.php:1165
+#: api/classes/CHost.php:1197
 msgid "Cannot delete host group."
 msgstr "Не може да се изтрие хост групата."
+
+#: api/classes/CDiscoveryRule.php:412
+msgid "Cannot delete host prototype."
+msgstr ""
+
+#: host_prototypes.php:119 host_prototypes.php:232
+msgid "Cannot delete host prototypes"
+msgstr ""
 
 #: adm.iconmapping.php:97
 #, fuzzy
@@ -1498,7 +1535,7 @@ msgstr "Не може да се изтрие съответствие на ик�
 msgid "Cannot delete image"
 msgstr "Не може да се изтрие изображението"
 
-#: api/classes/CHost.php:1254
+#: api/classes/CHost.php:1286
 msgid "Cannot delete inventory."
 msgstr "Не може да се изтрият инвентарните данни."
 
@@ -1530,7 +1567,7 @@ msgstr "Не може да се изтрие картата на мрежата"
 msgid "Cannot delete node"
 msgstr "Не може да се изтрие възловата точка"
 
-#: proxies.php:130 proxies.php:178
+#: proxies.php:136 proxies.php:184
 msgid "Cannot delete proxy"
 msgstr "Не може да се изтрие проксито"
 
@@ -1574,7 +1611,7 @@ msgstr "Не може да се изтрие услугата"
 msgid "Cannot delete slide show"
 msgstr "Не може да се изтрие слайдшоу"
 
-#: templates.php:349 templates.php:365 templates.php:393
+#: templates.php:354 templates.php:370 templates.php:398
 msgid "Cannot delete template"
 msgstr "Не може да се изтрие шаблона"
 
@@ -1586,6 +1623,10 @@ msgstr ""
 msgid "Cannot delete templated graphs."
 msgstr "Не може да се изтрият шаблонни графики."
 
+#: api/classes/CHostPrototype.php:1076
+msgid "Cannot delete templated host prototype."
+msgstr ""
+
 #: api/classes/CItem.php:691
 msgid "Cannot delete templated item."
 msgstr "Не може да се изтрие шаблонния елемент на данните."
@@ -1594,11 +1635,11 @@ msgstr "Не може да се изтрие шаблонния елемент �
 msgid "Cannot delete templated items"
 msgstr "Не може да се изтрият шаблонни елементи на данните"
 
-#: api/classes/CDiscoveryRule.php:359
+#: api/classes/CDiscoveryRule.php:360
 msgid "Cannot delete templated items."
 msgstr "Не може да се изтрият шаблонни елементи на данните."
 
-#: api/classes/CTrigger.php:1866 api/classes/CTriggerPrototype.php:674
+#: api/classes/CTrigger.php:1864 api/classes/CTriggerPrototype.php:674
 #, php-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Не може да се изтрие шаблонния тригер \"%1$s:%2$s\"."
@@ -1701,7 +1742,7 @@ msgstr "Не може да се намери хоста \"%1$s\" използв�
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не може да се намери хоста \"%1$s\" използван в екран \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:733 api/classes/CDiscoveryRule.php:806
+#: api/classes/CDiscoveryRule.php:748 api/classes/CDiscoveryRule.php:824
 #: api/classes/CItemGeneral.php:101 include/items.inc.php:338
 #: include/items.inc.php:389
 #, php-format
@@ -1768,11 +1809,11 @@ msgstr "Не може да се изгради дървовидна структ
 msgid "Cannot format tree."
 msgstr "Не може да се изгради дървовидна структора."
 
-#: api/classes/CTemplate.php:897
+#: api/classes/CTemplate.php:902
 msgid "Cannot have empty visible template name"
 msgstr "Видимото име на шаблон не може да бъде празно"
 
-#: api/classes/CTrigger.php:1118 api/classes/CTrigger.php:1258
+#: api/classes/CTrigger.php:1116 api/classes/CTrigger.php:1256
 #: api/classes/CTriggerPrototype.php:755 api/classes/CTriggerPrototype.php:814
 #, php-format
 msgid "Cannot implode expression \"%s\"."
@@ -1801,7 +1842,7 @@ msgstr "Неуспешно свързване с \"view file\" \"%s\"."
 msgid "Cannot insert user media."
 msgstr "Не може да вмъкне потребителско уведомление."
 
-#: api/classes/CHost.php:1233
+#: api/classes/CHost.php:1265
 msgid "Cannot link template"
 msgstr "Не може да се върже шаблона"
 
@@ -1809,23 +1850,23 @@ msgstr "Не може да се върже шаблона"
 msgid "Cannot logout."
 msgstr "Неуспешно излизане от системата."
 
-#: api/classes/CHost.php:1062
+#: api/classes/CHost.php:1094
 msgid "Cannot mass update host name."
 msgstr "Неуспешно общо актуализиране името на хоста."
 
-#: api/classes/CTemplate.php:856
+#: api/classes/CTemplate.php:861
 msgid "Cannot mass update template name"
 msgstr "Неуспешно общо актуализиране името на шаблона."
 
-#: api/classes/CHost.php:1052
+#: api/classes/CHost.php:1084
 msgid "Cannot mass update visible host name."
 msgstr "Неуспешно общо актуализиране видимото име на хоста."
 
-#: api/classes/CTemplate.php:829
+#: api/classes/CTemplate.php:834
 msgid "Cannot mass update visible template name"
 msgstr "Неуспешно общо актуализиране видимото име на шаблона."
 
-#: api/classes/CHostGeneral.php:160
+#: api/classes/CHostBase.php:57
 #, php-format
 msgid "Cannot pass duplicate template IDs for the linkage: %s."
 msgstr "Неправилни ID-та на дублиран шаблон за връзката: %s."
@@ -1871,12 +1912,12 @@ msgstr "Правилата за откриване не може да се за�
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:240
+#: api/classes/CItemGeneral.php:238
 #, php-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTrigger.php:678
+#: api/classes/CTrigger.php:676
 #, php-format
 msgid "Cannot set \"%1$s\" for trigger \"%2$s\"."
 msgstr ""
@@ -1901,7 +1942,7 @@ msgstr "Не може да се зададе \"templateid\" за екран \"%1
 msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "Не може да се зададе \"templateid\" за тригер прототип \"%1$s\"."
 
-#: api/classes/CHost.php:669 api/classes/CHost.php:1110
+#: api/classes/CHost.php:671 api/classes/CHost.php:1142
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr ""
 
@@ -1913,53 +1954,68 @@ msgstr "Не може да се превключи хоста на мрежов�
 msgid "Cannot unblock users"
 msgstr "Не може да се деблокират потребителите"
 
-#: api/classes/CHostGeneral.php:725
+#: api/classes/CHostGeneral.php:525
 msgid "Cannot unlink and clear Web scenarios."
 msgstr "Не може да се премахнат и изчистят уеб сценариите."
 
-#: api/classes/CHostGeneral.php:778
+#: api/classes/CHostGeneral.php:578
 msgid "Cannot unlink and clear applications."
 msgstr ""
 
-#: api/classes/CHostGeneral.php:583
+#: api/classes/CHostGeneral.php:352
 msgid "Cannot unlink and clear discovery rules"
 msgstr "Не може да се премахнат и изчистят правилата за откриване"
 
-#: api/classes/CHostGeneral.php:669
+#: api/classes/CHostGeneral.php:469
 msgid "Cannot unlink and clear graph prototypes"
 msgstr "Не може да се премахнат и изчистят графичните прототипи"
 
-#: api/classes/CHostGeneral.php:686
+#: api/classes/CHostGeneral.php:486
 msgid "Cannot unlink and clear graphs."
 msgstr "Не може да се премахнат и изчистят графиките."
 
-#: api/classes/CHostGeneral.php:617
+#: api/classes/CHostGeneral.php:386
 msgid "Cannot unlink and clear item prototypes"
 msgstr "Не може да се премахнат и изчистят елемент на данните прототипите"
 
-#: api/classes/CHostGeneral.php:600
+#: api/classes/CHostGeneral.php:369
 msgid "Cannot unlink and clear items"
 msgstr "Не може да се премахнат и изчистят елементите от данните"
 
-#: api/classes/CHostGeneral.php:523 api/classes/CHostGeneral.php:540
+#: api/classes/CHostGeneral.php:292 api/classes/CHostGeneral.php:309
 msgid "Cannot unlink and clear triggers"
 msgstr "Не може да се премахнат и изчистят тригерите"
 
-#: api/classes/CHost.php:1224
+#: api/classes/CHost.php:1256
 msgid "Cannot unlink template"
 msgstr "Не може да се премахне шаблона"
 
-#: api/classes/CHostGeneral.php:478
+#: api/classes/CHostGeneral.php:247
 #, php-format
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
 msgstr "Не може да се премахне тригер \"%s\", той има елементи на данните от шаблона, които са останали свързани към хост."
 
-#: api/classes/CItemGeneral.php:207
+#: api/classes/CHost.php:684
+#, php-format
+msgid "Cannot update \"%1$s\" for a discovered host."
+msgstr ""
+
+#: api/classes/CItemGeneral.php:176
+#, php-format
+msgid "Cannot update \"%1$s\" for a discovered item."
+msgstr ""
+
+#: api/classes/CTrigger.php:647
+#, php-format
+msgid "Cannot update \"%1$s\" for a discovered trigger."
+msgstr ""
+
+#: api/classes/CItemGeneral.php:205
 #, php-format
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTrigger.php:675
+#: api/classes/CTrigger.php:673
 #, php-format
 msgid "Cannot update \"%1$s\" for trigger \"%2$s\"."
 msgstr ""
@@ -1984,6 +2040,14 @@ msgstr "Не може да се актуализира \"templateid\" за ек�
 msgid "Cannot update \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "Не може да се актуализира \"templateid\" за тригер прототип \"%1$s\"."
 
+#: api/classes/CGraphGeneral.php:192
+msgid "Cannot update a discovered graph."
+msgstr ""
+
+#: api/classes/CHostGroup.php:537
+msgid "Cannot update a discovered host group."
+msgstr ""
+
 #: actionconf.php:146
 msgid "Cannot update action"
 msgstr "Не може да се актуализира действието"
@@ -2006,19 +2070,7 @@ msgstr "Не може да се актуализира конфигурация�
 msgid "Cannot update debug mode"
 msgstr "Не може да се актуализира режима за отстраняване на грешки"
 
-#: api/classes/CGraphGeneral.php:199
-msgid "Cannot update discovered graph."
-msgstr ""
-
-#: api/classes/CItemGeneral.php:185
-msgid "Cannot update discovered item."
-msgstr ""
-
-#: api/classes/CTrigger.php:655
-msgid "Cannot update discovered trigger."
-msgstr ""
-
-#: discoveryconf.php:149 host_discovery.php:262
+#: discoveryconf.php:149 host_discovery.php:263
 msgid "Cannot update discovery rule"
 msgstr "Не може да се актуализират правилата за откриване"
 
@@ -2030,7 +2082,7 @@ msgstr "Не може да се актуализира достъпа до уе�
 msgid "Cannot update graph"
 msgstr "Не може да се актуализира графиката"
 
-#: hostgroups.php:120 usergrps.php:179
+#: hostgroups.php:125 usergrps.php:179
 msgid "Cannot update group"
 msgstr "Не може да се актуализира групата"
 
@@ -2038,15 +2090,25 @@ msgstr "Не може да се актуализира групата"
 msgid "Cannot update group."
 msgstr "Не може да се актуализира групата."
 
-#: hostgroups.php:217 hosts.php:363
+#: api/classes/CHostGroup.php:791 api/classes/CHostGroup.php:849
+#: api/classes/CHostGroup.php:908
+#, php-format
+msgid "Cannot update groups for discovered host \"%1$s\"."
+msgstr ""
+
+#: hostgroups.php:222 hosts.php:363
 msgid "Cannot update host"
 msgstr "Не може да се актуализира хоста"
 
-#: hosts.php:594
+#: host_prototypes.php:188
+msgid "Cannot update host prototype"
+msgstr ""
+
+#: hosts.php:612
 msgid "Cannot update host status"
 msgstr "Не може да се актуализира състоянието на хоста"
 
-#: hosts.php:347
+#: hosts.php:352
 msgid "Cannot update hosts"
 msgstr "Не може да се актуализират хостовете"
 
@@ -2062,6 +2124,11 @@ msgstr "Не може да се актуализира изображениет�
 #: include/classes/import/CXmlImport18.php:640
 msgid "Cannot update image."
 msgstr "Не може да се актуализира изображението."
+
+#: api/classes/CHostInterface.php:395
+#, php-format
+msgid "Cannot update interface for discovered host \"%1$s\"."
+msgstr ""
 
 #: disc_prototypes.php:304 items.php:455 screenedit.php:176
 msgid "Cannot update item"
@@ -2100,9 +2167,14 @@ msgstr "Не може да се актуализира картата на мр�
 msgid "Cannot update node"
 msgstr "Не може да се актуализира възловата точка"
 
-#: proxies.php:101
+#: proxies.php:107
 msgid "Cannot update proxy"
 msgstr "Не може да се актуализира проксито"
+
+#: api/classes/CProxy.php:298
+#, php-format
+msgid "Cannot update proxy for discovered host \"%1$s\"."
+msgstr ""
 
 #: adm.regexps.php:127
 msgid "Cannot update regular expression"
@@ -2132,12 +2204,17 @@ msgstr "Не може да се актуализира слайдшоу"
 msgid "Cannot update status"
 msgstr "Не може да се актуализира състоянието"
 
-#: templates.php:161
+#: templates.php:160
 msgid "Cannot update template"
 msgstr "Не може да се актуализира шаблона"
 
 #: api/classes/CApplication.php:353
 msgid "Cannot update templated applications."
+msgstr ""
+
+#: api/classes/CTemplate.php:790 api/classes/CTemplate.php:1061
+#, php-format
+msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr ""
 
 #: trigger_prototypes.php:163 trigger_prototypes.php:208 triggers.php:179
@@ -2226,7 +2303,7 @@ msgstr "Проверката вече съществува."
 msgid "Check expression part starting from \"%1$s\"."
 msgstr "Проверете част от израза започваща от \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:279
+#: api/classes/CItemGeneral.php:277
 msgid "Check the key, please. Default example was passed."
 msgstr "Моля, проверете ключа. Пример показва по подразбиране."
 
@@ -2275,11 +2352,11 @@ msgstr "Циклична връзка в екраните: %1$s."
 msgid "Circular reference in templates: %1$s."
 msgstr "Циклична връзка в шаблоните: %1$s."
 
-#: api/classes/CHostGeneral.php:369 api/classes/CHostGeneral.php:840
+#: api/classes/CHostBase.php:234 api/classes/CHostBase.php:289
 msgid "Circular template linkage is not allowed."
 msgstr "Връзката към цикличен шаблон не е позволена."
 
-#: include/classes/core/ZBase.php:225
+#: include/classes/core/ZBase.php:231
 msgid "Classic"
 msgstr "Класически"
 
@@ -2306,21 +2383,22 @@ msgstr "Часовник"
 
 #: include/views/administration.general.iconmap.edit.php:145
 #: include/views/administration.general.regularexpressions.edit.php:85
-#: include/views/administration.proxy.edit.php:96
+#: include/views/administration.proxy.edit.php:100
 #: include/views/administration.script.edit.php:115
 #: include/views/configuration.action.edit.php:1029
 #: include/views/configuration.application.edit.php:54
 #: include/views/configuration.discovery.edit.php:92
 #: include/views/configuration.graph.edit.php:304
-#: include/views/configuration.host.edit.php:671
-#: include/views/configuration.hostgroups.edit.php:83
+#: include/views/configuration.host.edit.php:828
+#: include/views/configuration.hostgroups.edit.php:86
+#: include/views/configuration.host.prototype.edit.php:324
 #: include/views/configuration.httpconf.edit.php:250
 #: include/views/configuration.item.edit.php:498
 #: include/views/configuration.maintenance.edit.php:201
 #: include/views/configuration.screen.edit.php:54
 #: include/views/configuration.slideconf.edit.php:116
 #: include/views/configuration.sysmap.edit.php:190
-#: include/views/configuration.template.edit.php:441
+#: include/views/configuration.template.edit.php:442
 #: include/views/configuration.triggers.edit.php:316
 msgid "Clone"
 msgstr "Клониране"
@@ -2344,7 +2422,7 @@ msgstr "Затвори израз конструктора"
 msgid "Colour"
 msgstr "Цвят"
 
-#: include/classes/validators/CColorValidator.php:33
+#: include/classes/validators/CColorValidator.php:32
 #: include/validate.inc.php:354 jsLoader.php:159
 #, fuzzy, php-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
@@ -2485,6 +2563,10 @@ msgstr "Конфигурация на графики"
 msgid "Configuration of host groups"
 msgstr "Конфигурация на хост групи"
 
+#: host_prototypes.php:27
+msgid "Configuration of host prototypes"
+msgstr ""
+
 #: hosts.php:32
 msgid "Configuration of hosts"
 msgstr "Конфигурация на хостове"
@@ -2610,7 +2692,9 @@ msgid "Confirmation text"
 msgstr "Потвърждение текст"
 
 #: include/views/administration.proxy.edit.php:56
-#: include/views/configuration.host.edit.php:217
+#: include/views/configuration.host.edit.php:230
+#: include/views/configuration.host.edit.php:317
+#: include/views/configuration.host.prototype.edit.php:94
 #: include/views/js/configuration.sysmaps.js.php:357
 msgid "Connect to"
 msgstr "Свържи се с"
@@ -2728,7 +2812,7 @@ msgid "Create application (select host first)"
 msgstr ""
 
 #: include/views/configuration.discovery.list.php:27
-#: include/views/configuration.host.discovery.list.php:29
+#: include/views/configuration.host.discovery.list.php:27
 msgid "Create discovery rule"
 msgstr "Създаване на правило за откриване"
 
@@ -2744,7 +2828,7 @@ msgstr "Създаване на графика (първо изберете хо
 msgid "Create graph prototype"
 msgstr "Създаване на графични прототипи"
 
-#: hosts.php:697
+#: hosts.php:742
 msgid "Create host"
 msgstr "Създаване на хост"
 
@@ -2752,6 +2836,10 @@ msgstr "Създаване на хост"
 #: include/views/configuration.hostgroups.list.php:31
 msgid "Create host group"
 msgstr "Създаване на хост група"
+
+#: include/views/configuration.host.prototype.list.php:30
+msgid "Create host prototype"
+msgstr ""
 
 #: adm.iconmapping.php:126
 #, fuzzy
@@ -2814,7 +2902,7 @@ msgstr "Създаване на скрипт"
 msgid "Create slide show"
 msgstr "Създаване на слайдшоу"
 
-#: templates.php:460
+#: templates.php:465
 msgid "Create template"
 msgstr "Създаване на шаблон"
 
@@ -2847,10 +2935,15 @@ msgstr "Създаване стойност на реализациите"
 msgid "Created: Application \"%1$s\" on \"%2$s\"."
 msgstr "Създадено: Приложение \"%1$s\" в \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:600
+#: api/classes/CDiscoveryRule.php:615
 #, php-format
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Създадено: Правило за откриване \"%1$s\" в \"%2$s\"."
+
+#: api/classes/CHostPrototype.php:364
+#, php-format
+msgid "Created: Host prototype \"%1$s\" on \"%2$s\"."
+msgstr ""
 
 #: api/classes/CItem.php:590
 #, php-format
@@ -2862,7 +2955,7 @@ msgstr "Създадено: елемент на данните \"%1$s\" в \"%2$
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Създадено: елемент на данните прототип \"%1$s\" в \"%2$s\"."
 
-#: api/classes/CTrigger.php:1152
+#: api/classes/CTrigger.php:1150
 #, php-format
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Създадено: Тригер \"%1$s\" в \"%2$s\"."
@@ -2999,18 +3092,20 @@ msgstr "ИЗКЛЮЧЕНО"
 msgid "DISCOVERED"
 msgstr "ОТКРИТО"
 
-#: include/menu.inc.php:241
+#: include/menu.inc.php:242
 msgid "DM"
 msgstr "РМ"
 
-#: events.php:503 events.php:512 hosts.php:715
+#: events.php:503 events.php:512 hosts.php:760
 #: include/views/administration.proxy.edit.php:62
 #: include/views/js/configuration.host.edit.js.php:18 search.php:132
 msgid "DNS"
 msgstr "DNS"
 
 #: include/views/administration.proxy.edit.php:55
-#: include/views/configuration.host.edit.php:216
+#: include/views/configuration.host.edit.php:229
+#: include/views/configuration.host.edit.php:316
+#: include/views/configuration.host.prototype.edit.php:93
 msgid "DNS name"
 msgstr "DNS име"
 
@@ -3024,7 +3119,7 @@ msgstr "НЕДОСТЪПНО"
 msgid "Daily"
 msgstr "Ежедневно"
 
-#: include/classes/core/ZBase.php:228
+#: include/classes/core/ZBase.php:234
 msgid "Dark orange"
 msgstr "Тъмно оранжево"
 
@@ -3208,7 +3303,9 @@ msgstr "Десетичен"
 #: include/hosts.inc.php:37
 #: include/views/administration.general.iconmap.edit.php:133
 #: include/views/configuration.action.edit.php:365
-#: include/views/configuration.host.edit.php:219
+#: include/views/configuration.host.edit.php:232
+#: include/views/configuration.host.edit.php:319
+#: include/views/configuration.host.prototype.edit.php:96
 #: include/views/js/configuration.sysmaps.js.php:82
 #: include/views/js/configuration.sysmaps.js.php:136
 #: include/views/js/configuration.sysmaps.js.php:244
@@ -3268,15 +3365,15 @@ msgstr "Закъснение с"
 msgid "Delete"
 msgstr "Изтриване"
 
-#: include/views/configuration.template.edit.php:444
+#: include/views/configuration.template.edit.php:445
 msgid "Delete and clear"
 msgstr "Изтриване и изчистване"
 
-#: templates.php:643
+#: templates.php:648
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "Изтриване и изчистване на избраните шаблони? (Внимание: всички свързани хостове ще бъдат изчистени!)"
 
-#: include/views/configuration.template.edit.php:444
+#: include/views/configuration.template.edit.php:445
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgstr "Изтриване и изчистване на шаблона? (Внимание: всички свързани хостове ще бъдат изчистени!)"
 
@@ -3335,7 +3432,7 @@ msgstr "Изтриване периода на поддръжка?"
 msgid "Delete network map?"
 msgstr "Изтриване карта на мрежата?"
 
-#: include/views/administration.proxy.edit.php:97
+#: include/views/administration.proxy.edit.php:101
 msgid "Delete proxy?"
 msgstr "Изтриване на прокси?"
 
@@ -3355,7 +3452,7 @@ msgstr "Изтриване на екран?"
 msgid "Delete script?"
 msgstr "Изтриване на скрипт?"
 
-#: hosts.php:944 include/reports.inc.php:103 include/reports.inc.php:197
+#: hosts.php:995 include/reports.inc.php:103 include/reports.inc.php:197
 #: include/reports.inc.php:239
 #: include/views/administration.general.regularexpressions.list.php:67
 #: include/views/administration.mediatypes.list.php:121
@@ -3372,8 +3469,9 @@ msgstr "Изтриване на скрипт?"
 #: include/views/configuration.application.list.php:120
 #: include/views/configuration.discovery.list.php:77
 #: include/views/configuration.graph.list.php:158
-#: include/views/configuration.host.discovery.list.php:114
-#: include/views/configuration.hostgroups.list.php:132
+#: include/views/configuration.host.discovery.list.php:123
+#: include/views/configuration.hostgroups.list.php:167
+#: include/views/configuration.host.prototype.list.php:127
 #: include/views/configuration.httpconf.list.php:109
 #: include/views/configuration.item.list.php:290
 #: include/views/configuration.item.prototype.list.php:119
@@ -3381,7 +3479,7 @@ msgstr "Изтриване на скрипт?"
 #: include/views/configuration.screen.list.php:72
 #: include/views/configuration.slideconf.list.php:61
 #: include/views/configuration.sysmap.list.php:64
-#: include/views/configuration.triggers.list.php:276 templates.php:639
+#: include/views/configuration.triggers.list.php:276 templates.php:644
 msgid "Delete selected"
 msgstr "Изтриване на избраните"
 
@@ -3398,7 +3496,7 @@ msgid "Delete selected applications?"
 msgstr "Изтриване на избраните приложения?"
 
 #: include/views/configuration.discovery.list.php:78
-#: include/views/configuration.host.discovery.list.php:115
+#: include/views/configuration.host.discovery.list.php:124
 msgid "Delete selected discovery rules?"
 msgstr "Изтриване на избраните правила за откриване?"
 
@@ -3411,7 +3509,7 @@ msgid "Delete selected graphs?"
 msgstr "Изтриване на избраните графики?"
 
 #: include/views/administration.usergroups.edit.php:145
-#: include/views/configuration.hostgroups.edit.php:75
+#: include/views/configuration.hostgroups.edit.php:78
 msgid "Delete selected group?"
 msgstr "Изтриване на избраната група ?"
 
@@ -3419,15 +3517,23 @@ msgstr "Изтриване на избраната група ?"
 msgid "Delete selected groups?"
 msgstr "Изтриване на избраните групи?"
 
-#: include/views/configuration.hostgroups.list.php:133
+#: include/views/configuration.hostgroups.list.php:168
 msgid "Delete selected host groups?"
 msgstr "Изтриване на избраните хост групи?"
 
-#: include/views/configuration.host.edit.php:673
+#: include/views/configuration.host.prototype.edit.php:321
+msgid "Delete selected host prototype?"
+msgstr ""
+
+#: include/views/configuration.host.prototype.list.php:128
+msgid "Delete selected host prototypes?"
+msgstr ""
+
+#: include/views/configuration.host.edit.php:830
 msgid "Delete selected host?"
 msgstr "Изтриване на избрания хост?"
 
-#: hosts.php:945
+#: hosts.php:996
 msgid "Delete selected hosts?"
 msgstr "Изтриване на избраните хостове?"
 
@@ -3480,7 +3586,7 @@ msgstr "Изтриване на избраните скриптове?"
 msgid "Delete selected slide shows?"
 msgstr "Изтриване на избраните слайдшоу?"
 
-#: templates.php:640
+#: templates.php:645
 msgid "Delete selected templates?"
 msgstr "Изтриване на избраните шаблони?"
 
@@ -3507,7 +3613,7 @@ msgid_plural "Delete selected value mapping? It is used for %d items!"
 msgstr[0] "Изтриване на избраната стойност на реализациите? То се използва от елемент на данните %d !"
 msgstr[1] "Изтриване на избраната стойност на реализациите? То се използва от елементи на данните %d !"
 
-#: templates.php:642
+#: templates.php:647
 msgid "Delete selected with linked elements"
 msgstr "Изтриване на избраните и свързаните с тях елементи"
 
@@ -3519,7 +3625,7 @@ msgstr "Изтриване на услугата"
 msgid "Delete slide show?"
 msgstr "Изтриване на слайдшоу?"
 
-#: include/views/configuration.template.edit.php:443
+#: include/views/configuration.template.edit.php:444
 msgid "Delete template?"
 msgstr "Изтриване на шаблон?"
 
@@ -3540,7 +3646,7 @@ msgstr "Изтрито"
 msgid "Deleted: Application \"%1$s\" on \"%2$s\"."
 msgstr "Изтрито: Приложение \"%1$s\" в \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:407
+#: api/classes/CDiscoveryRule.php:422
 #, php-format
 msgid "Deleted: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Изтрито: Правило за откриване \"%1$s\" в \"%2$s\"."
@@ -3550,10 +3656,15 @@ msgstr "Изтрито: Правило за откриване \"%1$s\" в \"%2$
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Изтрито: Графика \"%1$s\" в \"%2$s\"."
 
-#: api/classes/CHost.php:1556
+#: api/classes/CHost.php:1592
 #, php-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Изтрито: Хост \"%1$s\"."
+
+#: api/classes/CHostPrototype.php:971
+#, php-format
+msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
+msgstr ""
 
 #: api/classes/CItem.php:782
 #, php-format
@@ -3565,17 +3676,17 @@ msgstr "Изтрито: елемент на данните \"%1$s\" в \"%2$s\".
 msgid "Deleted: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Изтрито: елемент на данните прототип \"%1$s\" в \"%2$s\"."
 
-#: api/classes/CProxy.php:454
+#: api/classes/CProxy.php:469
 #, php-format
 msgid "Deleted: Proxy \"%1$s\"."
 msgstr "Изтрито: Прокси \"%1$s\"."
 
-#: api/classes/CTemplate.php:758
+#: api/classes/CTemplate.php:756
 #, php-format
 msgid "Deleted: Template \"%1$s\"."
 msgstr "Изтрито: Шаблон \"%1$s\"."
 
-#: api/classes/CTrigger.php:872
+#: api/classes/CTrigger.php:870
 #, php-format
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Изтрито: Тригер \"%1$s\" on \"%2$s\"."
@@ -3724,11 +3835,11 @@ msgstr "Изключване режим за отстраняване на гр�
 msgid "Disable host"
 msgstr "Изключване на хост"
 
-#: hosts.php:865 hosts.php:878
+#: hosts.php:916 hosts.php:929
 msgid "Disable host?"
 msgstr "Изключване на хост?"
 
-#: include/views/configuration.hostgroups.list.php:130
+#: include/views/configuration.hostgroups.list.php:165
 msgid "Disable hosts in the selected host groups?"
 msgstr "Изключване на хост в избраната хост група?"
 
@@ -3736,14 +3847,15 @@ msgstr "Изключване на хост в избраната хост гру
 msgid "Disable hosts monitored by selected proxies?"
 msgstr "Изключване на хост, който се наблюдава от избраното прокси?"
 
-#: hosts.php:941 include/views/administration.mediatypes.list.php:117
+#: hosts.php:992 include/views/administration.mediatypes.list.php:117
 #: include/views/administration.proxy.list.php:101
 #: include/views/administration.usergroups.list.php:141
 #: include/views/configuration.action.list.php:101
 #: include/views/configuration.application.list.php:116
 #: include/views/configuration.discovery.list.php:73
-#: include/views/configuration.host.discovery.list.php:110
-#: include/views/configuration.hostgroups.list.php:129
+#: include/views/configuration.host.discovery.list.php:119
+#: include/views/configuration.hostgroups.list.php:164
+#: include/views/configuration.host.prototype.list.php:123
 #: include/views/configuration.httpconf.list.php:101
 #: include/views/configuration.item.list.php:276
 #: include/views/configuration.item.prototype.list.php:115
@@ -3764,7 +3876,7 @@ msgid "Disable selected applications?"
 msgstr "Изключване на избраните приложения?"
 
 #: include/views/configuration.discovery.list.php:74
-#: include/views/configuration.host.discovery.list.php:111
+#: include/views/configuration.host.discovery.list.php:120
 msgid "Disable selected discovery rules?"
 msgstr "Изключване на избраните правила за откриване??"
 
@@ -3772,7 +3884,11 @@ msgstr "Изключване на избраните правила за отк�
 msgid "Disable selected groups?"
 msgstr "Изключване на избраните групи?"
 
-#: hosts.php:942
+#: include/views/configuration.host.prototype.list.php:124
+msgid "Disable selected host prototypes?"
+msgstr ""
+
+#: hosts.php:993
 msgid "Disable selected hosts?"
 msgstr "Изключване на избраните хостове?"
 
@@ -3801,8 +3917,9 @@ msgstr "Изключване на избраните тригери?"
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.list.php:73
-#: include/views/configuration.host.edit.php:597
+#: include/views/configuration.host.edit.php:760
 #: include/views/configuration.host.massupdate.php:238
+#: include/views/configuration.host.prototype.edit.php:299
 #: include/views/configuration.item.massupdate.php:300
 #: include/views/js/configuration.sysmaps.js.php:153
 #: include/views/monitoring.dashconf.php:41 popup_media.php:137
@@ -3819,14 +3936,18 @@ msgstr "Бедствие"
 msgid "Discovered"
 msgstr "Открит"
 
+#: include/views/configuration.host.edit.php:158
+msgid "Discovered by"
+msgstr ""
+
 #: include/views/monitoring.discovery.php:41
 msgid "Discovered device"
 msgstr "Открито устройство"
 
-#: events.php:297 hosts.php:753 hosts.php:830 include/html.inc.php:409
-#: include/menu.inc.php:77 include/menu.inc.php:208
-#: include/views/configuration.action.list.php:34 templates.php:486
-#: templates.php:551
+#: events.php:297 hosts.php:798 hosts.php:877 include/html.inc.php:422
+#: include/menu.inc.php:77 include/menu.inc.php:209
+#: include/views/configuration.action.list.php:34 templates.php:491
+#: templates.php:556
 msgid "Discovery"
 msgstr "Откриване"
 
@@ -3842,7 +3963,7 @@ msgstr "Проверка за откриване"
 msgid "Discovery checks"
 msgstr "Проверки за откриване"
 
-#: include/html.inc.php:407
+#: include/html.inc.php:420
 msgid "Discovery list"
 msgstr "Списък за откриване"
 
@@ -3868,7 +3989,7 @@ msgstr ""
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Правило за откриване \"%1$s\" вече съществува в \"%2$s\", наследен от друг шаблон."
 
-#: api/classes/CDiscoveryRule.php:652
+#: api/classes/CDiscoveryRule.php:667
 #, php-format
 msgid "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
 msgstr "В правило за откриване \"%1$s:%2$s\" има неправилен период за съхранение на изгубените ресурси: \"%3$s\". (мин: %4$d, макс: %5$d, потребителско макро позволено)"
@@ -3878,36 +3999,36 @@ msgstr "В правило за откриване \"%1$s:%2$s\" има непр�
 msgid "Discovery rule \"%s\" already exists."
 msgstr "Правило за откриване \"%s\" вече съществува."
 
-#: discoveryconf.php:154 host_discovery.php:266
+#: discoveryconf.php:154 host_discovery.php:267
 msgid "Discovery rule created"
 msgstr "Правило за откриване създадено"
 
-#: discoveryconf.php:172 host_discovery.php:184
+#: discoveryconf.php:172 host_discovery.php:185
 msgid "Discovery rule deleted"
 msgstr "Правило за откриване изтрито"
 
-#: discoveryconf.php:148 host_discovery.php:262
+#: discoveryconf.php:148 host_discovery.php:263
 msgid "Discovery rule updated"
 msgstr "Правило за откриване актуализирано"
 
-#: include/html.inc.php:518 include/html.inc.php:522
-#: include/views/configuration.host.discovery.list.php:33
-#: include/views/configuration.host.edit.php:423
-#: include/views/configuration.template.edit.php:280
+#: include/html.inc.php:543 include/html.inc.php:547
+#: include/views/configuration.host.discovery.list.php:31
+#: include/views/configuration.host.edit.php:530
+#: include/views/configuration.template.edit.php:281
 #: include/views/conf.import.php:32 include/views/monitoring.discovery.php:33
 #: popup.php:96
 msgid "Discovery rules"
 msgstr "Правила за откриване"
 
-#: host_discovery.php:285
+#: host_discovery.php:286
 msgid "Discovery rules activated"
 msgstr "Правила за откриване активирани"
 
-#: discoveryconf.php:205 host_discovery.php:293
+#: discoveryconf.php:205 host_discovery.php:294
 msgid "Discovery rules deleted"
 msgstr "Правила за откриване изтрити"
 
-#: host_discovery.php:285
+#: host_discovery.php:286
 msgid "Discovery rules disabled"
 msgstr "Правила за откриване изключени"
 
@@ -3974,19 +4095,19 @@ msgstr "Недостъпен"
 msgid "Downtime"
 msgstr "Време на прекъсване"
 
-#: include/views/configuration.host.edit.php:271
+#: include/views/configuration.host.edit.php:284
 msgid "Drag here to change the type of the interface to \"IPMI\" type."
 msgstr "Плъзнете тук, за да промените типа на интерфейса на \"IPMI\" тип."
 
-#: include/views/configuration.host.edit.php:256
+#: include/views/configuration.host.edit.php:269
 msgid "Drag here to change the type of the interface to \"JMX\" type."
 msgstr "Плъзнете тук, за да промените типа на интерфейса на \"JMX\" тип."
 
-#: include/views/configuration.host.edit.php:240
+#: include/views/configuration.host.edit.php:253
 msgid "Drag here to change the type of the interface to \"SNMP\" type."
 msgstr "Плъзнете тук, за да промените типа на интерфейса на \"SNMP\" тип."
 
-#: include/views/configuration.host.edit.php:223
+#: include/views/configuration.host.edit.php:236
 msgid "Drag here to change the type of the interface to \"agent\" type."
 msgstr "Плъзнете тук, за да промените типа на интерфейса на \"agent\" тип."
 
@@ -4008,17 +4129,27 @@ msgstr "Първо влизане в падащо меню \"%1$s\"."
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr "Запомни избраното в падащо меню \"%1$s\"."
 
-#: api/classes/CTrigger.php:1592
+#: api/classes/CTrigger.php:1590
 #, php-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Дублиране на зависимостите в тригер \"%1$s\"."
 
-#: api/classes/CHost.php:738
+#: api/classes/CHostPrototype.php:197
+#, php-format
+msgid "Duplicate group prototype name \"%2$s\" for host prototype \"%1$s\"."
+msgstr ""
+
+#: api/classes/CHostPrototype.php:191
+#, php-format
+msgid "Duplicate host group ID \"%2$s\" for host prototype \"%1$s\"."
+msgstr ""
+
+#: api/classes/CHost.php:747
 #, php-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
 msgstr "Дублиране на хост. Хост със същото име \"%s\" вече съществува в данните."
 
-#: api/classes/CHost.php:770
+#: api/classes/CHost.php:779
 #, php-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr "Дублиране на хост. Хост със същото видимо име \"%s\" вече съществува в данните."
@@ -4133,20 +4264,32 @@ msgstr "Празен"
 msgid "Empty action condition."
 msgstr "Състояние на действие празно."
 
+#: include/classes/validators/CColorValidator.php:33
+msgid "Empty color."
+msgstr ""
+
+#: api/classes/CHostPrototype.php:458
+msgid "Empty host ID for host prototype."
+msgstr ""
+
+#: api/classes/CHostPrototype.php:173
+msgid "Empty host."
+msgstr ""
+
 #: api/classes/CAction.php:1235 api/classes/CApplication.php:288
-#: api/classes/CApplication.php:495 api/classes/CDiscoveryRule.php:338
+#: api/classes/CApplication.php:495 api/classes/CDiscoveryRule.php:339
 #: api/classes/CGraph.php:509 api/classes/CGraphPrototype.php:519
-#: api/classes/CHostGroup.php:507 api/classes/CHostGroup.php:570
-#: api/classes/CHostInterface.php:457 api/classes/CHost.php:1395
-#: api/classes/CIconMap.php:316 api/classes/CItem.php:670
-#: api/classes/CItemPrototype.php:489 api/classes/CProxy.php:471
-#: api/classes/CService.php:341 api/classes/CService.php:377
-#: api/classes/CService.php:443 api/classes/CService.php:515
-#: api/classes/CTemplate.php:619 api/classes/CTrigger.php:896
-#: api/classes/CTrigger.php:960 api/classes/CTrigger.php:1050
-#: api/classes/CTriggerPrototype.php:652 api/classes/CUserGroup.php:602
-#: api/classes/CUserMacro.php:394 api/classes/CUserMacro.php:546
-#: api/classes/CUser.php:545
+#: api/classes/CHostGroup.php:509 api/classes/CHostGroup.php:580
+#: api/classes/CHostInterface.php:465 api/classes/CHost.php:1428
+#: api/classes/CHostPrototype.php:906 api/classes/CIconMap.php:316
+#: api/classes/CItem.php:670 api/classes/CItemPrototype.php:489
+#: api/classes/CProxy.php:486 api/classes/CService.php:341
+#: api/classes/CService.php:377 api/classes/CService.php:443
+#: api/classes/CService.php:515 api/classes/CTemplate.php:617
+#: api/classes/CTrigger.php:894 api/classes/CTrigger.php:958
+#: api/classes/CTrigger.php:1048 api/classes/CTriggerPrototype.php:652
+#: api/classes/CUserGroup.php:602 api/classes/CUserMacro.php:394
+#: api/classes/CUserMacro.php:546 api/classes/CUser.php:545
 msgid "Empty input parameter."
 msgstr "Празен входен параметър."
 
@@ -4157,6 +4300,15 @@ msgstr "Празен вход."
 #: api/classes/CUserMacro.php:787
 msgid "Empty macro."
 msgstr "Празно макро."
+
+#: api/classes/CHostPrototype.php:222
+msgid "Empty name for group prototype."
+msgstr ""
+
+#: api/classes/CHostPrototype.php:181
+#, php-format
+msgid "Empty name for host prototype \"%1$s\"."
+msgstr ""
 
 #: api/classes/CService.php:1109
 msgid "Empty name."
@@ -4171,7 +4323,7 @@ msgstr "Празни параметри"
 msgid "Empty response received from Zabbix server \"%1$s\"."
 msgstr ""
 
-#: include/classes/validators/CTimePeriodValidator.php:39
+#: include/classes/validators/CTimePeriodValidator.php:46
 msgid "Empty time period."
 msgstr "Празен период от време.."
 
@@ -4199,7 +4351,7 @@ msgstr "Активиране потвърждаване на събитие"
 msgid "Enable host"
 msgstr "Активиране на хост"
 
-#: hosts.php:872
+#: hosts.php:923
 msgid "Enable host?"
 msgstr "Активиране на хост?"
 
@@ -4216,14 +4368,14 @@ msgstr "Активиране наблюдаване на хостове от и�
 msgid "Enable housekeeping"
 msgstr ""
 
-#: hosts.php:938 include/views/administration.mediatypes.list.php:113
+#: hosts.php:989 include/views/administration.mediatypes.list.php:113
 #: include/views/administration.proxy.list.php:97
 #: include/views/administration.usergroups.list.php:137
 #: include/views/configuration.action.list.php:97
 #: include/views/configuration.application.list.php:112
 #: include/views/configuration.discovery.list.php:69
-#: include/views/configuration.host.discovery.list.php:106
-#: include/views/configuration.hostgroups.list.php:126
+#: include/views/configuration.host.discovery.list.php:115
+#: include/views/configuration.hostgroups.list.php:161
 #: include/views/configuration.httpconf.list.php:97
 #: include/views/configuration.item.list.php:272
 #: include/views/configuration.triggers.list.php:264
@@ -4243,7 +4395,7 @@ msgid "Enable selected applications?"
 msgstr "Активиране на избраните приложения?"
 
 #: include/views/configuration.discovery.list.php:70
-#: include/views/configuration.host.discovery.list.php:107
+#: include/views/configuration.host.discovery.list.php:116
 msgid "Enable selected discovery rules?"
 msgstr "Активиране на избраните правила за откриване?"
 
@@ -4251,7 +4403,11 @@ msgstr "Активиране на избраните правила за отк�
 msgid "Enable selected groups?"
 msgstr "Активиране на избраните групи?"
 
-#: hosts.php:939 include/views/configuration.hostgroups.list.php:127
+#: include/views/configuration.host.prototype.list.php:120
+msgid "Enable selected host prototypes?"
+msgstr ""
+
+#: hosts.php:990 include/views/configuration.hostgroups.list.php:162
 msgid "Enable selected hosts?"
 msgstr "Активиране на избраните хостове?"
 
@@ -4302,7 +4458,7 @@ msgstr "Английски (US)"
 #: include/actions.inc.php:834 include/actions.inc.php:910
 #: include/classes/screens/CScreenActions.php:130 include/items.inc.php:35
 #: include/views/administration.auditacts.list.php:76
-#: include/views/configuration.host.discovery.list.php:59
+#: include/views/configuration.host.discovery.list.php:58
 #: include/views/configuration.item.list.php:73
 #: include/views/configuration.triggers.edit.php:148
 #: include/views/configuration.triggers.list.php:113 popup.php:108
@@ -4446,8 +4602,8 @@ msgstr "Изтекъл"
 msgid "Exploded"
 msgstr "Разширено кръгова"
 
-#: hosts.php:936 include/views/configuration.screen.list.php:70
-#: include/views/configuration.sysmap.list.php:63 templates.php:638
+#: hosts.php:987 include/views/configuration.screen.list.php:70
+#: include/views/configuration.sysmap.list.php:63 templates.php:643
 msgid "Export selected"
 msgstr "Експортиране на избраните"
 
@@ -4531,7 +4687,7 @@ msgstr "Неуспешно"
 msgid "Failed"
 msgstr "Неуспешно"
 
-#: api/classes/CTemplate.php:600
+#: api/classes/CTemplate.php:598
 msgid "Failed to update template"
 msgstr "Неуспешно актуализиране на шаблон"
 
@@ -4617,7 +4773,7 @@ msgstr ""
 msgid "Field \"druleid\" is required."
 msgstr "Поле \"druleid\" е задължително."
 
-#: api/classes/CTemplate.php:499
+#: api/classes/CTemplate.php:497
 msgid "Field \"host\" is mandatory"
 msgstr "Поле \"host\" е задължително"
 
@@ -4643,7 +4799,7 @@ msgstr "Файлът не съществува. Опитвате се да на�
 msgid "Filled region"
 msgstr "Запълване"
 
-#: events.php:356 hostinventories.php:133 hosts.php:720
+#: events.php:356 hostinventories.php:133 hosts.php:765
 #: include/classes/class.cwidget.php:130 include/forms.inc.php:628
 #: include/views/administration.auditacts.list.php:49
 #: include/views/administration.auditlogs.list.php:65
@@ -4751,8 +4907,8 @@ msgstr "Достъп до уеб интерфейс актуализиран"
 msgid "Frontend messaging"
 msgstr "Съобщения в уеб интерфейс"
 
-#: include/views/configuration.host.edit.php:672
-#: include/views/configuration.template.edit.php:442
+#: include/views/configuration.host.edit.php:829
+#: include/views/configuration.template.edit.php:443
 msgid "Full clone"
 msgstr "Пълен клонинг"
 
@@ -4787,7 +4943,7 @@ msgstr "Графичен потребителски интерфейс (GUI)"
 msgid "GUI access disabled."
 msgstr "GUI достъп забранен."
 
-#: include/menu.inc.php:225
+#: include/menu.inc.php:226
 msgid "General"
 msgstr "Общ"
 
@@ -4824,7 +4980,7 @@ msgstr "Глобален скрипт"
 msgid "Global scripts"
 msgstr "Глобални скриптове"
 
-#: hosts.php:947
+#: hosts.php:998
 #: include/views/administration.general.regularexpressions.list.php:70
 #: include/views/administration.mediatypes.list.php:125
 #: include/views/administration.proxy.list.php:109
@@ -4835,8 +4991,9 @@ msgstr "Глобални скриптове"
 #: include/views/configuration.application.list.php:124
 #: include/views/configuration.discovery.list.php:81
 #: include/views/configuration.graph.list.php:162
-#: include/views/configuration.host.discovery.list.php:118
-#: include/views/configuration.hostgroups.list.php:135
+#: include/views/configuration.host.discovery.list.php:127
+#: include/views/configuration.hostgroups.list.php:170
+#: include/views/configuration.host.prototype.list.php:131
 #: include/views/configuration.httpconf.list.php:113
 #: include/views/configuration.item.list.php:294
 #: include/views/configuration.item.prototype.list.php:123
@@ -4844,7 +5001,7 @@ msgstr "Глобални скриптове"
 #: include/views/configuration.screen.list.php:76
 #: include/views/configuration.slideconf.list.php:64
 #: include/views/configuration.sysmap.list.php:67
-#: include/views/configuration.triggers.list.php:279 templates.php:645
+#: include/views/configuration.triggers.list.php:279 templates.php:650
 #: tr_status.php:885
 msgid "Go"
 msgstr "Изпълни"
@@ -4958,10 +5115,10 @@ msgstr "Графичен прототип \"%s\" изтрит."
 msgid "Graph prototype must have at least one prototype."
 msgstr "Графичния прототип трябва да има поне един прототип."
 
-#: include/html.inc.php:482 include/html.inc.php:486
-#: include/views/configuration.host.discovery.list.php:95
-#: include/views/configuration.host.edit.php:494
-#: include/views/configuration.template.edit.php:342
+#: include/html.inc.php:495 include/html.inc.php:499
+#: include/views/configuration.host.discovery.list.php:103
+#: include/views/configuration.host.edit.php:601
+#: include/views/configuration.template.edit.php:343
 msgid "Graph prototypes"
 msgstr "Графични прототипи"
 
@@ -4993,17 +5150,17 @@ msgstr "Графика с името \"%1$s\" вече съществува в �
 msgid "Graph with same name but other type exist."
 msgstr "Графика със същото име, но различен тип вече съществува."
 
-#: dashboard.php:293 hosts.php:752 hosts.php:828 include/blocks.inc.php:1263
-#: include/html.inc.php:493 include/html.inc.php:497 include/items.inc.php:866
+#: dashboard.php:293 hosts.php:797 hosts.php:875 include/blocks.inc.php:1263
+#: include/html.inc.php:506 include/html.inc.php:510 include/items.inc.php:866
 #: include/menu.inc.php:62 include/triggers.inc.php:1327
 #: include/views/configuration.graph.list.php:56
-#: include/views/configuration.host.discovery.list.php:54
-#: include/views/configuration.host.edit.php:400
-#: include/views/configuration.template.edit.php:259
+#: include/views/configuration.host.discovery.list.php:52
+#: include/views/configuration.host.edit.php:507
+#: include/views/configuration.template.edit.php:260
 #: include/views/conf.import.php:34 include/views/monitoring.charts.php:32
 #: include/views/monitoring.charts.php:41 popup.php:76 search.php:141
 #: search.php:175 search.php:198 search.php:385 search.php:416 search.php:443
-#: templates.php:484 templates.php:547
+#: templates.php:489 templates.php:552
 msgid "Graphs"
 msgstr "Графики"
 
@@ -5025,7 +5182,7 @@ msgid "Grid"
 msgstr "Решетка"
 
 #: events.php:285 hostinventoriesoverview.php:83 hostinventories.php:92
-#: hostinventories.php:159 hosts.php:705 httpmon.php:72
+#: hostinventories.php:159 hosts.php:750 httpmon.php:72
 #: include/classes/class.chostsinfo.php:112
 #: include/classes/class.ctriggersinfo.php:121
 #: include/classes/screens/CScreenHostgroupTriggers.php:61
@@ -5046,9 +5203,14 @@ msgstr "Решетка"
 #: include/views/monitoring.overview.php:32
 #: include/views/monitoring.screen.php:98
 #: include/views/monitoring.slides.php:82 latest.php:154 popup.php:508
-#: templates.php:468 tr_status.php:252
+#: templates.php:473 tr_status.php:252
 msgid "Group"
 msgstr "Група"
+
+#: api/classes/CHostGroup.php:613
+#, php-format
+msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
+msgstr ""
 
 #: include/classes/import/importers/CTemplateImporter.php:233
 #, php-format
@@ -5060,11 +5222,11 @@ msgstr "Група \"%1$s\" не съществува."
 msgid "Group \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Група \"%1$s\" за хост \"%2$s\" не съществува."
 
-#: hostgroups.php:148 usergrps.php:185
+#: hostgroups.php:153 usergrps.php:185
 msgid "Group added"
 msgstr "Група добавена"
 
-#: hostgroups.php:163 hostgroups.php:174 usergrps.php:200 usergrps.php:233
+#: hostgroups.php:168 hostgroups.php:179 usergrps.php:200 usergrps.php:233
 msgid "Group deleted"
 msgstr "Група изтрита"
 
@@ -5077,11 +5239,24 @@ msgid "Group for discovered hosts."
 msgstr "Група за откритите хостове."
 
 #: include/views/administration.usergroups.edit.php:41
-#: include/views/configuration.hostgroups.edit.php:37
+#: include/views/configuration.hostgroups.edit.php:40
 msgid "Group name"
 msgstr "Име на група"
 
-#: hostgroups.php:119 usergrps.php:179
+#: api/classes/CHostPrototype.php:395 api/classes/CHostPrototype.php:402
+msgid "Group prototype ID cannot be empty."
+msgstr ""
+
+#: api/classes/CHostPrototype.php:156 api/classes/CHostPrototype.php:434
+#, php-format
+msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
+msgstr ""
+
+#: include/views/configuration.host.prototype.edit.php:203
+msgid "Group prototypes"
+msgstr ""
+
+#: hostgroups.php:124 usergrps.php:179
 msgid "Group updated"
 msgstr "Група актуализирана"
 
@@ -5092,6 +5267,9 @@ msgstr "Групиране по"
 #: include/reports.inc.php:323 include/views/administration.users.edit.php:87
 #: include/views/administration.users.list.php:59
 #: include/views/configuration.host.edit.php:187
+#: include/views/configuration.host.edit.php:206
+#: include/views/configuration.host.prototype.edit.php:177
+#: include/views/configuration.host.prototype.edit.php:205
 #: include/views/configuration.template.edit.php:117
 #: include/views/conf.import.php:26 popup_usrgrp.php:25 popup_usrgrp.php:49
 msgid "Groups"
@@ -5113,7 +5291,8 @@ msgstr "h:i A"
 #: include/blocks.inc.php:367 include/blocks.inc.php:707
 #: include/blocks.inc.php:774 include/blocks.inc.php:993
 #: include/blocks.inc.php:1092 include/blocks.inc.php:1150
-#: include/classes/screens/CScreenSystemStatus.php:47
+#: include/classes/screens/CScreenSystemStatus.php:47 include/html.inc.php:629
+#: include/views/configuration.hostgroups.list.php:139
 #: include/views/configuration.item.list.php:128
 msgid "H:i:s"
 msgstr "h:i:s A"
@@ -5259,15 +5438,16 @@ msgstr "Хоризонтално подравняване"
 #: include/classes/screens/CScreenHostgroupTriggers.php:121
 #: include/classes/screens/CScreenHostTriggers.php:63
 #: include/classes/screens/CScreenHostTriggers.php:123
-#: include/forms.inc.php:556 include/html.inc.php:401 include/maps.inc.php:24
+#: include/forms.inc.php:556 include/html.inc.php:414 include/maps.inc.php:24
 #: include/setup.inc.php:317 include/triggers.inc.php:1204
 #: include/triggers.inc.php:1603
 #: include/views/configuration.application.list.php:45
 #: include/views/configuration.application.list.php:61
 #: include/views/configuration.graph.list.php:54
 #: include/views/configuration.host.edit.php:52
-#: include/views/configuration.host.edit.php:497
+#: include/views/configuration.host.edit.php:623
 #: include/views/configuration.host.massupdate.php:286
+#: include/views/configuration.host.prototype.edit.php:164
 #: include/views/configuration.httpconf.list.php:44
 #: include/views/configuration.httpconf.list.php:62
 #: include/views/configuration.item.list.php:63
@@ -5288,17 +5468,17 @@ msgstr "Хоризонтално подравняване"
 msgid "Host"
 msgstr "Хост"
 
-#: api/classes/CHost.php:1075
+#: api/classes/CHost.php:1107
 #, php-format
 msgid "Host \"%1$s\" already exists."
 msgstr "Хост \"%1$s\" вече съществува."
 
-#: api/classes/CProxy.php:575
+#: api/classes/CProxy.php:590
 #, php-format
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
 msgstr "Хост \"%1$s\" се наблюдава с прокси \"%2$s\"."
 
-#: api/classes/CTemplate.php:512
+#: api/classes/CTemplate.php:510
 #, php-format
 msgid "Host \"%s\" already exists."
 msgstr "Хост \"%s\" вече съществува."
@@ -5324,11 +5504,11 @@ msgstr "Инвентарни данни на хост"
 msgid "Host access"
 msgstr "Хост достъп"
 
-#: hosts.php:367
+#: hosts.php:374
 msgid "Host added"
 msgstr "Хост добавен"
 
-#: api/classes/CHostInterface.php:823
+#: api/classes/CHostInterface.php:831
 msgid "Host cannot have more than one default interface of the same type."
 msgstr "Хоста не може да има повече от един стандартен интерфейс от един и същ тип."
 
@@ -5337,7 +5517,7 @@ msgstr "Хоста не може да има повече от един стан
 msgid "Host count"
 msgstr "Хост брояч"
 
-#: hosts.php:557 hosts.php:574
+#: hosts.php:575 hosts.php:592
 msgid "Host deleted"
 msgstr "Хост изтрит"
 
@@ -5345,7 +5525,7 @@ msgstr "Хост изтрит"
 #: include/blocks.inc.php:186 include/blocks.inc.php:376
 #: include/blocks.inc.php:1045 include/forms.inc.php:518
 #: include/maps.inc.php:25 include/views/administration.script.list.php:44
-#: include/views/configuration.hostgroups.edit.php:64
+#: include/views/configuration.hostgroups.edit.php:67
 #: include/views/js/configuration.action.edit.js.php:89
 #: include/views/js/configuration.action.edit.js.php:196
 #: include/views/js/configuration.sysmaps.js.php:20
@@ -5355,22 +5535,22 @@ msgstr "Хост изтрит"
 msgid "Host group"
 msgstr "Хост група"
 
-#: api/classes/CHostGroup.php:485 api/classes/CHostGroup.php:543
+#: api/classes/CHostGroup.php:487 api/classes/CHostGroup.php:552
 #, php-format
 msgid "Host group \"%1$s\" already exists."
 msgstr "Хост група \"%1$s\" вече съществува."
 
-#: api/classes/CHostGroup.php:618
+#: api/classes/CHostGroup.php:644
 #, php-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
 msgstr ""
 
-#: api/classes/CHostGroup.php:600
+#: api/classes/CHostGroup.php:626
 #, php-format
 msgid "Host group \"%1$s\" cannot be deleted, because some hosts depend on it."
 msgstr ""
 
-#: api/classes/CHostGroup.php:589
+#: api/classes/CHostGroup.php:600
 #, php-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
 msgstr ""
@@ -5383,7 +5563,7 @@ msgstr "Елементи на хост група"
 msgid "Host group label type"
 msgstr "Тип етикет на хост група"
 
-#: api/classes/CHostGroup.php:482 api/classes/CHostGroup.php:538
+#: api/classes/CHostGroup.php:484 api/classes/CHostGroup.php:544
 msgid "Host group name cannot be empty."
 msgstr ""
 
@@ -5405,7 +5585,8 @@ msgstr "Хост интерфейс"
 msgid "Host inventories"
 msgstr "Инвентарни данни на хост"
 
-#: include/views/configuration.host.edit.php:663
+#: include/views/configuration.host.edit.php:820
+#: include/views/configuration.host.prototype.edit.php:312
 msgid "Host inventory"
 msgstr "Инвентарни данни на хост"
 
@@ -5417,7 +5598,7 @@ msgstr "Преглед инвентарните данни на хост"
 msgid "Host label type"
 msgstr "Хост етикет"
 
-#: include/html.inc.php:370
+#: include/html.inc.php:383
 msgid "Host list"
 msgstr "Хост списък"
 
@@ -5425,14 +5606,94 @@ msgstr "Хост списък"
 msgid "Host metadata"
 msgstr ""
 
-#: hosts.php:53 include/actions.inc.php:58
-#: include/views/configuration.host.edit.php:171
+#: host_prototypes.php:40 hosts.php:53 include/actions.inc.php:58
+#: include/views/configuration.host.edit.php:169
+#: include/views/configuration.host.prototype.edit.php:65
 msgid "Host name"
 msgstr "Име на хоста"
+
+#: api/classes/CHostPrototype.php:174
+#, php-format
+msgid "Host name \"%1$s\" is too long, it must not be longer than %2$d characters."
+msgstr ""
+
+#: api/classes/CHostPrototype.php:176
+#, php-format
+msgid "Host name for host prototype \"%1$s\" must contain macros."
+msgstr ""
 
 #: include/hosts.inc.php:290
 msgid "Host networks"
 msgstr "Хост мрежи"
+
+#: api/classes/CHostPrototype.php:785
+#, php-format
+msgid "Host prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
+msgstr ""
+
+#: api/classes/CHostPrototype.php:773
+#, php-format
+msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
+msgstr ""
+
+#: api/classes/CHostPrototype.php:189
+#, php-format
+msgid "Host prototype \"%1$s\" must have at least one host group."
+msgstr ""
+
+#: host_prototypes.php:202
+msgid "Host prototype added"
+msgstr ""
+
+#: host_prototypes.php:119
+msgid "Host prototype deleted"
+msgstr ""
+
+#: host_prototypes.php:188
+msgid "Host prototype updated"
+msgstr ""
+
+#: api/classes/CHostPrototype.php:1100
+#, php-format
+msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\"."
+msgstr ""
+
+#: api/classes/CHostPrototype.php:1096
+#, php-format
+msgid "Host prototype with host name \"%1$s\" already exists."
+msgstr ""
+
+#: api/classes/CHostPrototype.php:1108
+#, php-format
+msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
+msgstr ""
+
+#: api/classes/CHostPrototype.php:1105
+#, php-format
+msgid "Host prototype with visible name \"%1$s\" already exists."
+msgstr ""
+
+#: include/html.inc.php:519 include/html.inc.php:523
+#: include/views/configuration.host.discovery.list.php:93
+#: include/views/configuration.host.edit.php:620
+msgid "Host prototypes"
+msgstr ""
+
+#: host_prototypes.php:225
+msgid "Host prototypes activated"
+msgstr ""
+
+#: host_prototypes.php:232
+msgid "Host prototypes deleted"
+msgstr ""
+
+#: host_prototypes.php:225
+msgid "Host prototypes disabled"
+msgstr ""
+
+#: include/views/configuration.host.prototype.list.php:34
+msgid "Host prototypes of"
+msgstr ""
 
 #: include/hosts.inc.php:300
 msgid "Host router"
@@ -5447,7 +5708,7 @@ msgstr "Хост екрани"
 msgid "Host status"
 msgstr "Състояние на хост"
 
-#: hostgroups.php:217 hosts.php:594 proxies.php:169
+#: hostgroups.php:222 hosts.php:612 proxies.php:175
 msgid "Host status updated"
 msgstr "Състояние на хост актуализирано"
 
@@ -5459,7 +5720,7 @@ msgstr "Маска на подмрежата на хоста"
 msgid "Host time"
 msgstr "Хост време"
 
-#: api/classes/CHost.php:950
+#: api/classes/CHost.php:982
 msgid "Host update failed."
 msgstr "Актуализацията на хоста се провали."
 
@@ -5467,26 +5728,27 @@ msgstr "Актуализацията на хоста се провали."
 msgid "Host updated"
 msgstr "Хост актуализиран"
 
-#: api/classes/CHost.php:800 api/classes/CTemplate.php:877
+#: api/classes/CHost.php:809 api/classes/CTemplate.php:882
 #, php-format
 msgid "Host with the same name \"%s\" already exists."
 msgstr "Хост със същото име \"%s\" вече съществува."
 
-#: api/classes/CHost.php:806 api/classes/CTemplate.php:522
-#: api/classes/CTemplate.php:850
+#: api/classes/CHost.php:815 api/classes/CTemplate.php:520
+#: api/classes/CTemplate.php:855
 #, php-format
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "Хост със същото видимо име \"%s\" вече съществува."
 
-#: hostinventoriesoverview.php:85 hostinventories.php:93 hosts.php:707
+#: hostinventoriesoverview.php:85 hostinventories.php:93 hosts.php:752
 #: include/forms.inc.php:225 include/forms.inc.php:898
 #: include/items.inc.php:813 include/menu.inc.php:112 include/menu.inc.php:168
-#: include/reports.inc.php:366 include/views/administration.proxy.edit.php:84
+#: include/reports.inc.php:366 include/views/administration.proxy.edit.php:88
 #: include/views/administration.proxy.list.php:52
 #: include/views/configuration.copy.elements.php:46
 #: include/views/configuration.graph.list.php:77
-#: include/views/configuration.hostgroups.edit.php:60
-#: include/views/configuration.hostgroups.list.php:118
+#: include/views/configuration.host.discovery.list.php:53
+#: include/views/configuration.hostgroups.edit.php:63
+#: include/views/configuration.hostgroups.list.php:152
 #: include/views/configuration.item.copy.php:42
 #: include/views/conf.import.php:27 include/views/monitoring.dashconf.php:75
 #: search.php:130 search.php:231 search.php:275 search.php:295 search.php:300
@@ -5502,11 +5764,11 @@ msgstr "Хостове & Групи"
 msgid "Hosts (m/n/t)"
 msgstr "Хостове (наблюдаван/не е наблюдаван/шаблон)"
 
-#: include/views/configuration.template.edit.php:172
+#: include/views/configuration.template.edit.php:173
 msgid "Hosts / templates"
 msgstr "Хостове / шаблони"
 
-#: include/views/configuration.hostgroups.edit.php:60
+#: include/views/configuration.hostgroups.edit.php:63
 msgid "Hosts in"
 msgstr "Хостове в"
 
@@ -5523,7 +5785,7 @@ msgstr "Информация за хостове"
 msgid "Hosts location"
 msgstr "Местоположение на хостове"
 
-#: hosts.php:340
+#: hosts.php:345
 msgid "Hosts updated"
 msgstr "Хостове актуализирани"
 
@@ -5564,7 +5826,7 @@ msgstr "ID"
 msgid "IMAP"
 msgstr "IMAP"
 
-#: events.php:502 events.php:511 hosts.php:716
+#: events.php:502 events.php:511 hosts.php:761
 #: include/views/administration.auditlogs.list.php:87
 #: include/views/administration.node.edit.php:75
 #: include/views/administration.node.list.php:44
@@ -5575,7 +5837,9 @@ msgstr "IP"
 
 #: include/maps.inc.php:46 include/views/administration.proxy.edit.php:54
 #: include/views/configuration.discovery.edit.php:68
-#: include/views/configuration.host.edit.php:215
+#: include/views/configuration.host.edit.php:228
+#: include/views/configuration.host.edit.php:315
+#: include/views/configuration.host.prototype.edit.php:92
 msgid "IP address"
 msgstr "IP адрес"
 
@@ -5596,8 +5860,9 @@ msgstr "IP диапазонът не може да бъде празен."
 #: include/views/administration.script.edit.php:46
 #: include/views/administration.script.list.php:54
 #: include/views/configuration.action.edit.php:681
-#: include/views/configuration.host.edit.php:576
+#: include/views/configuration.host.edit.php:724
 #: include/views/configuration.host.massupdate.php:288
+#: include/views/configuration.host.prototype.edit.php:268
 msgid "IPMI"
 msgstr "IPMI"
 
@@ -5609,7 +5874,9 @@ msgstr "IPMI агент"
 msgid "IPMI authentication algorithm"
 msgstr "IPMI алгоритъм за автентификация"
 
-#: include/views/configuration.host.edit.php:280
+#: include/views/configuration.host.edit.php:293
+#: include/views/configuration.host.edit.php:369
+#: include/views/configuration.host.prototype.edit.php:146
 msgid "IPMI interfaces"
 msgstr "IPMI интирфейс"
 
@@ -5650,7 +5917,7 @@ msgstr "Зависимости на IT услуга"
 msgid "IT service parent"
 msgstr "Главна IT услуга"
 
-#: include/menu.inc.php:82 include/menu.inc.php:212
+#: include/menu.inc.php:82 include/menu.inc.php:213
 #: include/views/administration.general.housekeeper.edit.php:74
 #: include/views/configuration.services.list.php:26 srv_status.php:26
 #: srv_status.php:163
@@ -5859,10 +6126,10 @@ msgstr "Изображенията за всички карти ще бъдат 
 msgid "Immediately"
 msgstr "Веднага"
 
-#: hosts.php:698 include/views/configuration.screen.list.php:33
+#: hosts.php:743 include/views/configuration.screen.list.php:33
 #: include/views/configuration.sysmap.list.php:28
 #: include/views/conf.import.php:69 include/views/conf.import.php:74
-#: templates.php:461
+#: templates.php:466
 msgid "Import"
 msgstr "Импортиране"
 
@@ -5889,7 +6156,7 @@ msgstr "Невъзможно е да се премахне последния р
 
 #: include/classes/class.ctweenbox.php:73
 #: include/classes/class.ctweenbox.php:100
-#: include/views/configuration.template.edit.php:172
+#: include/views/configuration.template.edit.php:173
 msgid "In"
 msgstr "В"
 
@@ -5902,7 +6169,7 @@ msgstr "В група"
 msgid "In groups"
 msgstr "В групи"
 
-#: hosts.php:857 include/views/configuration.maintenance.edit.php:168
+#: hosts.php:908 include/views/configuration.maintenance.edit.php:168
 #: include/views/configuration.maintenance.edit.php:176
 msgid "In maintenance"
 msgstr "В поддръжка"
@@ -6088,8 +6355,8 @@ msgid "Incorrect arguments passed to function"
 msgstr "Подадени са неправилни аргументи за функцията"
 
 #: api/classes/CApplication.php:322 api/classes/CHostInterface.php:314
-#: api/classes/CHostInterface.php:505 api/classes/CHttpTest.php:535
-#: api/classes/CItemGeneral.php:200
+#: api/classes/CHostInterface.php:513 api/classes/CHttpTest.php:535
+#: api/classes/CItemGeneral.php:198
 msgid "Incorrect arguments passed to function."
 msgstr "Подадени са неправилни аргументи за функцията."
 
@@ -6102,7 +6369,7 @@ msgstr "Подадени са неправилни аргументи за ме�
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr "Неправилен протокол за автентификация на правило за откриването \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:351
+#: api/classes/CItemGeneral.php:349
 #, php-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr "Неправилен протокол за автентификация за елемент на данните \"%1$s\"."
@@ -6116,12 +6383,17 @@ msgstr "Неправилно изчислена стойност SLA за усл
 msgid "Incorrect characters used for Node name."
 msgstr "Използвани са неправилни символи за името на възловата точка."
 
-#: api/classes/CTemplate.php:503
+#: api/classes/CTemplate.php:501
 #, php-format
 msgid "Incorrect characters used for Template name [ %1$s ]"
 msgstr "Използвани са неправилни символи за името на шаблон [ %1$s ]"
 
-#: api/classes/CHost.php:734 api/classes/CHost.php:1058
+#: api/classes/CHostPrototype.php:175
+#, php-format
+msgid "Incorrect characters used for host \"%1$s\"."
+msgstr ""
+
+#: api/classes/CHost.php:743 api/classes/CHost.php:1090
 #, php-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "Използвани са неправилни символи за името на хост \"%s\"."
@@ -6131,7 +6403,7 @@ msgstr "Използвани са неправилни символи за им�
 msgid "Incorrect characters used for proxy name \"%1$s\"."
 msgstr ""
 
-#: api/classes/CTemplate.php:882
+#: api/classes/CTemplate.php:887
 #, php-format
 msgid "Incorrect characters used for template name \"%s\"."
 msgstr "Използвани са неправилни символи за името на шаблон \"%s\"."
@@ -6145,7 +6417,12 @@ msgstr "Зададен е невелиден диапазон за участъ�
 msgid "Incorrect delay."
 msgstr "Неправилно закъснение."
 
-#: include/classes/validators/event/CEventSourceObjectValidator.php:43
+#: api/classes/CHostPrototype.php:113
+#, php-format
+msgid "Incorrect discovery rule ID for host prototype \"%1$s\"."
+msgstr ""
+
+#: include/classes/validators/event/CEventSourceObjectValidator.php:66
 #, php-format
 msgid "Incorrect event object \"%1$s\" (%2$s) for event source \"%3$s\" (%4$s), only the following objects are supported: %5$s."
 msgstr ""
@@ -6167,7 +6444,7 @@ msgstr "Неправилно име на поле \"%1$s\" или стойнос
 msgid "Incorrect fields for sysmap."
 msgstr ""
 
-#: api/classes/CTrigger.php:683
+#: api/classes/CTrigger.php:681
 msgid "Incorrect fields for trigger."
 msgstr "Неправилни полета за тригер."
 
@@ -6175,12 +6452,12 @@ msgstr "Неправилни полета за тригер."
 msgid "Incorrect file upload."
 msgstr "Неправилно качване на файл."
 
-#: api/classes/CItemGeneral.php:807
+#: api/classes/CItemGeneral.php:805
 #, php-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "Неправилен променлив интервал \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:796
+#: api/classes/CItemGeneral.php:794
 #, php-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Неправилен променлив интервал в елемент на данните \"%1$s\". Променливият интервал трябва да бъде низ."
@@ -6195,6 +6472,15 @@ msgstr "Използва се неправилна функция"
 msgid "Incorrect graph ID \"%s\" provided for screen element."
 msgstr "Зададено е неправилно ID на графика \"%s\" за елемент от екрана."
 
+#: api/classes/CHostPrototype.php:396 api/classes/CHostPrototype.php:403
+msgid "Incorrect group prototype ID."
+msgstr ""
+
+#: api/classes/CHostPrototype.php:196
+#, php-format
+msgid "Incorrect group prototypes for host prototype \"%1$s\"."
+msgstr ""
+
 #: api/classes/CScreenItem.php:500
 #, php-format
 msgid "Incorrect host ID \"%s\" provided for screen element."
@@ -6205,30 +6491,43 @@ msgstr "Зададено е неправилно ID на хост \"%s\" за е
 msgid "Incorrect host group ID \"%s\" provided for screen element."
 msgstr "Зададено е неправилно ID на хост група \"%s\" за елемент от екрана."
 
+#: api/classes/CHostPrototype.php:241
+msgid "Incorrect host group ID for group prototype."
+msgstr ""
+
 #: include/profiles.inc.php:292
 msgid "Incorrect host group."
 msgstr "Неправилна хост група."
+
+#: api/classes/CHostPrototype.php:190
+#, php-format
+msgid "Incorrect host groups for host prototype \"%1$s\"."
+msgstr ""
+
+#: api/classes/CHostPrototype.php:459
+msgid "Incorrect host prototype ID."
+msgstr ""
 
 #: image.php:46
 msgid "Incorrect image index."
 msgstr "Неправилен индекс на изображение."
 
-#: api/classes/CHostInterface.php:622
+#: api/classes/CHostInterface.php:630
 #, php-format
 msgid "Incorrect interface DNS parameter \"%s\" provided."
 msgstr "За интерфейса е зададен неправилен DNS параметър \"%s\"."
 
-#: api/classes/CHostInterface.php:637
+#: api/classes/CHostInterface.php:645
 #, php-format
 msgid "Incorrect interface IP parameter \"%s\" provided."
 msgstr "За интерфейса е зададен неправилен IP параметър \"%s\"."
 
-#: api/classes/CHostInterface.php:653
+#: api/classes/CHostInterface.php:661
 #, php-format
 msgid "Incorrect interface port \"%s\" provided."
 msgstr "За интерфейса е зададен неправилен порт \"%s\"."
 
-#: api/classes/CHost.php:675
+#: api/classes/CHost.php:677
 #, php-format
 msgid "Incorrect inventory field \"%s\"."
 msgstr "Неправилно поле \"%s\" за инвентарни данни."
@@ -6238,16 +6537,16 @@ msgstr "Неправилно поле \"%s\" за инвентарни данн�
 msgid "Incorrect item ID \"%s\" provided for screen element."
 msgstr "Зададено е неправилно ID на елемент на данните \"%s\" за елемент от екрана."
 
-#: api/classes/CGraphGeneral.php:395
+#: api/classes/CGraphGeneral.php:396
 msgid "Incorrect item for axis value."
 msgstr "Неправилен елемент на данните за стойност ос."
 
-#: api/classes/CTrigger.php:751 include/triggers.inc.php:963
+#: api/classes/CTrigger.php:749 include/triggers.inc.php:963
 #, php-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
 msgstr "В тригер израза \"%2$s\" е зададен неправилен ключ за елемента на данните \"%1$s\"."
 
-#: include/classes/validators/CTriggerFunctionValidator.php:71
+#: include/classes/validators/CTriggerFunctionValidator.php:254
 #, php-format
 msgid "Incorrect item value type \"%1$s\" provided for trigger function \"%2$s\"."
 msgstr "В тригер функцията \"%2$s\" е зададен неправилен тип стойност за елемента на данните \"%1$s\"."
@@ -6256,7 +6555,7 @@ msgstr "В тригер функцията \"%2$s\" е зададен непра
 msgid "Incorrect key."
 msgstr "Неправилен ключ."
 
-#: api/classes/CDRule.php:319 api/classes/CItemGeneral.php:284
+#: api/classes/CDRule.php:319 api/classes/CItemGeneral.php:282
 #: discoveryconf.php:111
 #, php-format
 msgid "Incorrect key: \"%1$s\"."
@@ -6375,7 +6674,7 @@ msgstr "Неправилен диапазон от портовете."
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr "Неправилен протокол за поверителност на правило за откриване \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:360
+#: api/classes/CItemGeneral.php:358
 #, php-format
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr "Неправилен протокол за поверителност за елемент на данните \"%1$s\"."
@@ -6428,6 +6727,11 @@ msgstr "Неправилно подреждане за услуга \"%1$s\"."
 msgid "Incorrect source value."
 msgstr ""
 
+#: api/classes/CHostPrototype.php:185
+#, php-format
+msgid "Incorrect status for host prototype \"%1$s\"."
+msgstr ""
+
 #: api/classes/CService.php:1232
 #, php-format
 msgid "Incorrect status for service \"%1$s\"."
@@ -6447,18 +6751,18 @@ msgstr "Неправилен синтаксис около \"%1$s\" в пози�
 msgid "Incorrect syntax near \"%1$s\"."
 msgstr "Неправилен синтаксис около \"%1$s\"."
 
-#: include/classes/validators/CTimePeriodValidator.php:92
+#: include/classes/validators/CTimePeriodValidator.php:99
 #, php-format
 msgid "Incorrect time period \"%1$s\" start day must be less or equal to end day."
 msgstr "Неправилен времеви период \"%1$s\". Началото на деня трябва да бъде по-малко или равно до края на деня."
 
-#: include/classes/validators/CTimePeriodValidator.php:98
+#: include/classes/validators/CTimePeriodValidator.php:105
 #, php-format
 msgid "Incorrect time period \"%1$s\" start time must be less than end time."
 msgstr "Неправилен времеви период \"%1$s\". Началото на времето трябва да бъде по-малко или равно до края на времето."
 
-#: include/classes/validators/CTimePeriodValidator.php:82
-#: include/classes/validators/CTimePeriodValidator.php:87
+#: include/classes/validators/CTimePeriodValidator.php:89
+#: include/classes/validators/CTimePeriodValidator.php:94
 #, php-format
 msgid "Incorrect time period \"%1$s\"."
 msgstr "Неправилен времеви период \"%1$s\"."
@@ -6482,23 +6786,23 @@ msgstr "Неправилен израз в тригер."
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr "Неправилен израз в тригер. Хост \"%1$s\" не съществува или нямате права за достъп до него."
 
-#: api/classes/CTrigger.php:731
+#: api/classes/CTrigger.php:729
 #, php-format
 msgid "Incorrect trigger expression. Host \"%s\" does not exist or you have no access to this host."
 msgstr "Неправилен израз в тригер. Хост \"%s\" не съществува или нямате права за достъп до него."
 
-#: api/classes/CTrigger.php:737
+#: api/classes/CTrigger.php:735
 msgid "Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously."
 msgstr "Неправилен израз в тригер. Елементите на израза в тригер не трябва да принадлежат към един шаблон и хост едновременно."
 
-#: include/classes/validators/CTriggerFunctionValidator.php:65
-#: include/classes/validators/CTriggerFunctionValidator.php:77
-#: include/classes/validators/CTriggerFunctionValidator.php:92
-#: include/classes/validators/CTriggerFunctionValidator.php:105
-#: include/classes/validators/CTriggerFunctionValidator.php:113
-#: include/classes/validators/CTriggerFunctionValidator.php:121
-#: include/classes/validators/CTriggerFunctionValidator.php:129
-#: include/classes/validators/CTriggerFunctionValidator.php:137
+#: include/classes/validators/CTriggerFunctionValidator.php:248
+#: include/classes/validators/CTriggerFunctionValidator.php:260
+#: include/classes/validators/CTriggerFunctionValidator.php:275
+#: include/classes/validators/CTriggerFunctionValidator.php:288
+#: include/classes/validators/CTriggerFunctionValidator.php:296
+#: include/classes/validators/CTriggerFunctionValidator.php:304
+#: include/classes/validators/CTriggerFunctionValidator.php:312
+#: include/classes/validators/CTriggerFunctionValidator.php:320
 #, php-format
 msgid "Incorrect trigger function \"%1$s\" provided in expression."
 msgstr "В израза е зададена неправилна тригер функция \"%1$s\"."
@@ -6601,7 +6905,7 @@ msgstr "Вмъкване"
 msgid "Insert macro"
 msgstr "Вмъкване макро"
 
-#: include/menu.inc.php:276 include/profiles.inc.php:262 setup.php:120
+#: include/menu.inc.php:277 include/profiles.inc.php:262 setup.php:120
 msgid "Installation"
 msgstr "Инсталация"
 
@@ -6609,12 +6913,12 @@ msgstr "Инсталация"
 msgid "Installer name"
 msgstr "Име на инсталатора"
 
-#: disc_prototypes.php:41 host_discovery.php:40 hosts.php:755
+#: disc_prototypes.php:41 host_discovery.php:40 hosts.php:800
 #: include/views/administration.proxy.edit.php:71 items.php:40
 msgid "Interface"
 msgstr "Интерфейс"
 
-#: api/classes/CHostInterface.php:843
+#: api/classes/CHostInterface.php:851
 #, php-format
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
 msgstr "Интерфейса е свързан с елемента на данните \"%1$s\" в \"%2$s\"."
@@ -6666,7 +6970,7 @@ msgid "Internet Explorer"
 msgstr "Internet Explorer"
 
 #: include/forms.inc.php:948
-#: include/views/configuration.host.discovery.list.php:56
+#: include/views/configuration.host.discovery.list.php:55
 #: include/views/configuration.item.edit.php:276
 #: include/views/configuration.item.list.php:67
 #: include/views/configuration.item.massupdate.php:321
@@ -6693,11 +6997,11 @@ msgstr "Невалидна заявка."
 msgid "Invalid date \"%s\"."
 msgstr "Невалидна дата \\\"%s\\\"."
 
-#: include/classes/validators/CTriggerFunctionValidator.php:83
+#: include/classes/validators/CTriggerFunctionValidator.php:266
 msgid "Invalid first parameter."
 msgstr ""
 
-#: include/classes/validators/CTriggerFunctionValidator.php:86
+#: include/classes/validators/CTriggerFunctionValidator.php:269
 msgid "Invalid fourth parameter."
 msgstr ""
 
@@ -6722,7 +7026,7 @@ msgstr "Невалиден период на поддръжка"
 msgid "Invalid method parameters."
 msgstr "Невалидни параметри на метода."
 
-#: include/classes/validators/CTriggerFunctionValidator.php:78
+#: include/classes/validators/CTriggerFunctionValidator.php:261
 msgid "Invalid number of parameters."
 msgstr ""
 
@@ -6740,15 +7044,15 @@ msgstr "Невалиден код на отговор \"%1$s\"."
 msgid "Invalid response code range \"%1$s\"."
 msgstr "Невалиден диапазон за код на отговор \"%1$s\"."
 
-#: include/classes/validators/CTriggerFunctionValidator.php:84
+#: include/classes/validators/CTriggerFunctionValidator.php:267
 msgid "Invalid second parameter."
 msgstr ""
 
-#: include/classes/validators/CTriggerFunctionValidator.php:85
+#: include/classes/validators/CTriggerFunctionValidator.php:268
 msgid "Invalid third parameter."
 msgstr ""
 
-#: disc_prototypes.php:195 host_discovery.php:178 items.php:333
+#: disc_prototypes.php:195 host_discovery.php:179 items.php:333
 msgid "Invalid time period"
 msgstr "Невалиден период на време"
 
@@ -6762,7 +7066,7 @@ msgstr "Невалидно име за преглед дава \"%s\". Позв�
 msgid "Inventory"
 msgstr "Инвентаризация"
 
-#: api/classes/CHost.php:1271
+#: api/classes/CHost.php:1303
 #, php-format
 msgid "Inventory disabled for host \"%s\"."
 msgstr ""
@@ -6839,7 +7143,7 @@ msgstr "Елемент на данните \"%1$s\" не съществува в
 msgid "Item \"%1$s\" does not exist."
 msgstr "Елемент на данните \"%1$s\" не съществува."
 
-#: include/classes/import/CConfigurationImport.php:562
+#: include/classes/import/CConfigurationImport.php:578
 #, php-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Елемент на данните \"%1$s\" в \"%2$s\": приложение \"%3$s\" не съществува."
@@ -6850,7 +7154,7 @@ msgstr "Елемент на данните \"%1$s\" в \"%2$s\": приложе�
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Елемент на данните \"%1$s\" пропуска - потребителското правило."
 
-#: api/classes/CItemGeneral.php:342
+#: api/classes/CItemGeneral.php:340
 #, php-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "Елемент на данните \"%1$s:%2$s\" има невалиден порт: \"%3$s\"."
@@ -6889,10 +7193,10 @@ msgstr ""
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr ""
 
-#: include/html.inc.php:432 include/html.inc.php:436
-#: include/views/configuration.host.discovery.list.php:93
-#: include/views/configuration.host.edit.php:443
-#: include/views/configuration.template.edit.php:300
+#: include/html.inc.php:445 include/html.inc.php:449
+#: include/views/configuration.host.discovery.list.php:101
+#: include/views/configuration.host.edit.php:550
+#: include/views/configuration.template.edit.php:301
 msgid "Item prototypes"
 msgstr "Елемент на данните прототипи"
 
@@ -6904,44 +7208,44 @@ msgstr "Елемент на данните прототип за"
 msgid "Item updated"
 msgstr "Елемент на данните актуализиран"
 
-#: api/classes/CItemGeneral.php:263
+#: api/classes/CItemGeneral.php:261
 msgid "Item uses host interface from non-parent host."
 msgstr "Елемент на данните използва интерфейс от не родителски хост."
 
-#: api/classes/CItemGeneral.php:266
+#: api/classes/CItemGeneral.php:264
 msgid "Item uses incorrect interface type."
 msgstr "Елемент на данните използва невалиден тип интерфейс."
 
-#: api/classes/CItemGeneral.php:320
+#: api/classes/CItemGeneral.php:318
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Елемента на данните не се обновява. Моля, въведете правилния интервал за актуализация."
 
-#: api/classes/CItemGeneral.php:413
+#: api/classes/CItemGeneral.php:411
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Ключ от елемент на данните \"%1$s\" вече съществува в \"%2$s\" като правило за откриване."
 
-#: api/classes/CItemGeneral.php:419
+#: api/classes/CItemGeneral.php:417
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Ключ от елемент на данните \"%1$s\" вече съществува в \"%2$s\" като елемент на данните създаден в елемент на данните прототип."
 
-#: api/classes/CItemGeneral.php:416
+#: api/classes/CItemGeneral.php:414
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Ключ от елемент на данните \"%1$s\" вече съществува в \"%2$s\" като елемент на данните прототип."
 
-#: api/classes/CItemGeneral.php:410
+#: api/classes/CItemGeneral.php:408
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Ключ от елемент на данните \"%1$s\" вече съществува в \"%2$s\" като елемент на данните."
 
-#: api/classes/CItemGeneral.php:422
+#: api/classes/CItemGeneral.php:420
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Ключ от елемент на данните \"%1$s\" вече съществува в \"%2$s\" като неизвестен елемент на данните."
 
-#: api/classes/CItemGeneral.php:773
+#: api/classes/CItemGeneral.php:771
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Ключ от елемент на данните \"%1$s\" вече съществува в \"%2$s\"."
@@ -6952,18 +7256,18 @@ msgstr "Ключ от елемент на данните \"%1$s\" вече съ�
 msgid "Item with key \"%1$s\" already exists."
 msgstr "Ключ от елемент на данните \"%1$s\" вече съществува."
 
-#: hosts.php:750 hosts.php:824 include/html.inc.php:443
-#: include/html.inc.php:447 include/items.inc.php:794
+#: hosts.php:795 hosts.php:871 include/html.inc.php:456
+#: include/html.inc.php:460 include/items.inc.php:794
 #: include/reports.inc.php:109 include/reports.inc.php:245
 #: include/views/configuration.application.list.php:99
 #: include/views/configuration.graph.edit.php:276
-#: include/views/configuration.host.discovery.list.php:52
-#: include/views/configuration.host.edit.php:338
+#: include/views/configuration.host.discovery.list.php:50
+#: include/views/configuration.host.edit.php:445
 #: include/views/configuration.item.list.php:42
-#: include/views/configuration.template.edit.php:217
+#: include/views/configuration.template.edit.php:218
 #: include/views/conf.import.php:31 latest.php:157 popup.php:56 queue.php:101
 #: search.php:139 search.php:167 search.php:190 search.php:383 search.php:408
-#: search.php:435 templates.php:482 templates.php:543
+#: search.php:435 templates.php:487 templates.php:548
 msgid "Items"
 msgstr "Елементи на данните "
 
@@ -7003,7 +7307,9 @@ msgstr "JMX"
 msgid "JMX agent"
 msgstr "JMX агент"
 
-#: include/views/configuration.host.edit.php:265
+#: include/views/configuration.host.edit.php:278
+#: include/views/configuration.host.edit.php:356
+#: include/views/configuration.host.prototype.edit.php:133
 msgid "JMX interfaces"
 msgstr "JMX интерфейс"
 
@@ -7200,7 +7506,7 @@ msgid "Keep user session data for (in days) \"%1$s\"."
 msgstr ""
 
 #: disc_prototypes.php:44 host_discovery.php:45 include/forms.inc.php:618
-#: include/views/configuration.host.discovery.list.php:55
+#: include/views/configuration.host.discovery.list.php:54
 #: include/views/configuration.item.edit.php:78
 #: include/views/configuration.item.list.php:66
 #: include/views/configuration.item.prototype.list.php:52
@@ -7209,7 +7515,7 @@ msgstr ""
 msgid "Key"
 msgstr "Ключ"
 
-#: api/classes/CItemGeneral.php:294
+#: api/classes/CItemGeneral.php:292
 #, php-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Ключ \"%1$s\" не съвпада с <grpmax|grpmin|grpsum|grpavg>[\"Хост група(и)\", \"Ключ елемент на данните\", \"<last|min|max|avg|sum|count>\", \"параметри\"]."
@@ -7437,8 +7743,9 @@ msgstr "Индикатори на връзка"
 msgid "Link name should be unique for map \"%s\"."
 msgstr "Имета на връзката трябва да бъде уникална за карта на мрежата \"%s\"."
 
-#: include/views/configuration.host.edit.php:552
-#: include/views/configuration.template.edit.php:422
+#: include/views/configuration.host.edit.php:678
+#: include/views/configuration.host.prototype.edit.php:250
+#: include/views/configuration.template.edit.php:423
 msgid "Link new templates"
 msgstr ""
 
@@ -7473,13 +7780,15 @@ msgstr "Връзка към шаблони"
 msgid "Link with templates"
 msgstr "Връзка с шаблони"
 
-#: include/views/configuration.host.edit.php:537
-#: include/views/configuration.template.edit.php:403
-#: include/views/configuration.template.edit.php:424 templates.php:488
+#: include/views/configuration.host.edit.php:663
+#: include/views/configuration.host.edit.php:687
+#: include/views/configuration.host.prototype.edit.php:229
+#: include/views/configuration.template.edit.php:404
+#: include/views/configuration.template.edit.php:425 templates.php:493
 msgid "Linked templates"
 msgstr "Свързани шаблони"
 
-#: templates.php:489
+#: templates.php:494
 msgid "Linked to"
 msgstr "Свързано с"
 
@@ -7569,7 +7878,7 @@ msgid "Logged in as"
 msgstr "Влезли сте като"
 
 #: auditlogs.php:143 include/func.inc.php:2053 include/func.inc.php:2070
-#: include/menu.inc.php:281 include/page_header.php:246
+#: include/menu.inc.php:282 include/page_header.php:246
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:64
 #: include/views/administration.users.list.php:61
@@ -7653,7 +7962,7 @@ msgstr "MD5"
 msgid "MOST BUSY TRIGGERS TOP 100"
 msgstr "ТОП 100 НА НАЙ-АКТИВНИТЕ ТРИГЕРИ"
 
-#: include/audit.inc.php:50 include/views/common.macros.php:25
+#: include/audit.inc.php:50 include/views/common.macros.php:37
 #: include/views/configuration.item.edit.php:342
 msgid "Macro"
 msgstr "Макро"
@@ -7698,8 +8007,9 @@ msgstr "Макро с hostmacroid \"%1$s\" не съществува."
 #: adm.triggerdisplayoptions.php:78 adm.triggerseverities.php:84
 #: adm.valuemapping.php:131 adm.workingtime.php:66
 #: include/views/administration.general.macros.edit.php:31
-#: include/views/configuration.host.edit.php:588
-#: include/views/configuration.template.edit.php:434
+#: include/views/configuration.host.edit.php:737
+#: include/views/configuration.host.prototype.edit.php:275
+#: include/views/configuration.template.edit.php:435
 msgid "Macros"
 msgstr "Макроси"
 
@@ -7708,7 +8018,7 @@ msgid "Macros updated"
 msgstr "Макроси актуализирани"
 
 #: include/audit.inc.php:48 include/maps.inc.php:785 include/maps.inc.php:871
-#: include/menu.inc.php:186
+#: include/menu.inc.php:187
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/js/configuration.sysmaps.js.php:148
 msgid "Maintenance"
@@ -7767,12 +8077,13 @@ msgstr "Поддръжка и събиране на данни"
 msgid "Maintenance without data collection"
 msgstr "Поддръжка без събиране на данни"
 
-#: include/classes/validators/CTriggerFunctionValidator.php:93
+#: include/classes/validators/CTriggerFunctionValidator.php:276
 msgid "Mandatory parameter is missing."
 msgstr "Задължителния параметър липсва."
 
-#: include/views/configuration.host.edit.php:602
+#: include/views/configuration.host.edit.php:762
 #: include/views/configuration.host.massupdate.php:239
+#: include/views/configuration.host.prototype.edit.php:301
 msgid "Manual"
 msgstr "Ръчно"
 
@@ -7841,7 +8152,7 @@ msgid "Mappings"
 msgstr "Съответствия"
 
 #: dashboard.php:307 include/blocks.inc.php:1317 include/menu.inc.php:72
-#: include/menu.inc.php:203 include/views/configuration.sysmap.list.php:36
+#: include/menu.inc.php:204 include/views/configuration.sysmap.list.php:36
 #: include/views/conf.import.php:36 include/views/monitoring.maps.php:39
 #: popup.php:80
 msgid "Maps"
@@ -7872,7 +8183,7 @@ msgstr "Маркирай избраните"
 msgid "Mask"
 msgstr ""
 
-#: hosts.php:937 include/views/configuration.item.list.php:280
+#: hosts.php:988 include/views/configuration.item.list.php:280
 #: include/views/configuration.item.massupdate.php:558
 #: include/views/configuration.triggers.list.php:270
 msgid "Mass update"
@@ -7923,7 +8234,7 @@ msgid_plural "Maximum alias length is %2$d characters, \"%3$s\" is %1$d characte
 msgstr[0] "Максималната дължина на псевдонима е %2$d символа, \"%3$s\" съдържа %1$d символа."
 msgstr[1] "Максималната дължина на псевдонима е %2$d символа, \"%3$s\" съдържа %1$d символа."
 
-#: api/classes/CHost.php:724
+#: api/classes/CHost.php:733
 #, php-format
 msgid "Maximum host name length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum host name length is %2$d characters, \"%3$s\" is %1$d characters."
@@ -7958,7 +8269,7 @@ msgstr "Максималната стойност за период T е > N"
 msgid "Maximum value for period T is NOT N"
 msgstr "Максималната стойност за период T НЕ е N"
 
-#: api/classes/CHost.php:760
+#: api/classes/CHost.php:769
 #, php-format
 msgid "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d characters."
@@ -8010,7 +8321,7 @@ msgstr "Метод на уведомление включено"
 msgid "Media type updated"
 msgstr "Метод на уведомление актуализирано"
 
-#: include/menu.inc.php:255
+#: include/menu.inc.php:256
 #: include/views/administration.mediatypes.list.php:28
 msgid "Media types"
 msgstr "Методи на уведомление"
@@ -8025,7 +8336,7 @@ msgid "Mega"
 msgstr "Мега"
 
 #: include/views/administration.usergroups.list.php:48
-#: include/views/configuration.hostgroups.list.php:53
+#: include/views/configuration.hostgroups.list.php:62
 msgid "Members"
 msgstr "Членове на групата"
 
@@ -8160,7 +8471,7 @@ msgstr "Минути"
 msgid "Missing \"%1$s\" field for action condition."
 msgstr ""
 
-#: api/classes/CGraphGeneral.php:530
+#: api/classes/CGraphGeneral.php:531
 msgid "Missing \"gitemid\" field for item."
 msgstr ""
 
@@ -8218,14 +8529,16 @@ msgstr "Пн"
 msgid "Monday"
 msgstr "Понеделник"
 
-#: hosts.php:861 include/html.inc.php:391
-#: include/views/configuration.host.edit.php:295
+#: hosts.php:912 include/html.inc.php:404
+#: include/views/configuration.host.edit.php:402
 #: include/views/configuration.host.massupdate.php:145
+#: include/views/configuration.host.prototype.edit.php:159
 msgid "Monitored"
 msgstr "Наблюдава се"
 
-#: include/views/configuration.host.edit.php:292
+#: include/views/configuration.host.edit.php:399
 #: include/views/configuration.host.massupdate.php:136
+#: include/views/configuration.host.prototype.edit.php:155
 msgid "Monitored by proxy"
 msgstr "Наблюдава се чрез прокси"
 
@@ -8247,7 +8560,7 @@ msgstr "Месец"
 msgid "Monthly"
 msgstr "Ежемесечно"
 
-#: include/classes/class.cmultiselect.php:50 jsLoader.php:189
+#: include/classes/class.cmultiselect.php:52 jsLoader.php:189
 msgid "More matches found..."
 msgstr ""
 
@@ -8303,8 +8616,8 @@ msgstr "NTLM автентификация"
 
 #: actionconf.php:37 actionconf.php:158 adm.regexps.php:37 adm.regexps.php:140
 #: adm.regexps.php:178 applications.php:39 disc_prototypes.php:42
-#: graphs.php:42 host_discovery.php:41 hostinventories.php:160 hosts.php:714
-#: hosts.php:748 httpconf.php:44 httpmon.php:88 include/forms.inc.php:603
+#: graphs.php:42 host_discovery.php:41 hostinventories.php:160 hosts.php:759
+#: hosts.php:793 httpconf.php:44 httpmon.php:88 include/forms.inc.php:603
 #: include/hosts.inc.php:115 include/reports.inc.php:162
 #: include/setup.inc.php:325
 #: include/views/administration.general.iconmap.edit.php:29
@@ -8334,9 +8647,12 @@ msgstr "NTLM автентификация"
 #: include/views/configuration.graph.edit.php:55
 #: include/views/configuration.graph.edit.php:70
 #: include/views/configuration.graph.list.php:78
-#: include/views/configuration.host.discovery.list.php:51
-#: include/views/configuration.host.edit.php:506
-#: include/views/configuration.hostgroups.list.php:51
+#: include/views/configuration.host.discovery.list.php:49
+#: include/views/configuration.host.edit.php:640
+#: include/views/configuration.host.edit.php:682
+#: include/views/configuration.hostgroups.list.php:60
+#: include/views/configuration.host.prototype.edit.php:214
+#: include/views/configuration.host.prototype.list.php:52
 #: include/views/configuration.httpconf.edit.php:59
 #: include/views/configuration.httpconf.edit.php:162
 #: include/views/configuration.httpconf.list.php:63
@@ -8355,7 +8671,7 @@ msgstr "NTLM автентификация"
 #: include/views/configuration.sysmap.edit.php:41
 #: include/views/configuration.sysmap.edit.php:137
 #: include/views/configuration.sysmap.list.php:44
-#: include/views/configuration.template.edit.php:379
+#: include/views/configuration.template.edit.php:380
 #: include/views/configuration.triggers.edit.php:63
 #: include/views/configuration.triggers.edit.php:276
 #: include/views/configuration.triggers.list.php:110
@@ -8372,6 +8688,11 @@ msgstr "NTLM автентификация"
 #: trigger_prototypes.php:41 triggers.php:41 tr_status.php:372 users.php:43
 msgid "Name"
 msgstr "Име"
+
+#: api/classes/CHostPrototype.php:223
+#, php-format
+msgid "Name for group prototype \"%1$s\" must contain macros."
+msgstr ""
 
 #: sysmaps.php:171
 msgid "Network map added"
@@ -8476,6 +8797,16 @@ msgstr ""
 msgid "No \"%1$s\" given for graph."
 msgstr ""
 
+#: api/classes/CHostPrototype.php:457
+#, php-format
+msgid "No \"%1$s\" given for host prototype."
+msgstr ""
+
+#: api/classes/CHostPrototype.php:208
+#, php-format
+msgid "No \"%2$s\" given for host prototype \"%1$s\"."
+msgstr ""
+
 #: include/classes/import/CXmlImport18.php:1572
 #, php-format
 msgid "No \"ymax_type\" field for graph \"%s\"."
@@ -8485,6 +8816,21 @@ msgstr "Не полето \"ymax_type\" за графика \"%s\"."
 #, php-format
 msgid "No \"ymin_type\" field for graph \"%s\"."
 msgstr "Не полето \"ymin_type\" за графика \"%s\"."
+
+#: include/views/configuration.host.edit.php:366
+#: include/views/configuration.host.prototype.edit.php:143
+msgid "No IPMI interfaces defined."
+msgstr ""
+
+#: include/views/configuration.host.edit.php:353
+#: include/views/configuration.host.prototype.edit.php:130
+msgid "No JMX interfaces defined."
+msgstr ""
+
+#: include/views/configuration.host.edit.php:340
+#: include/views/configuration.host.prototype.edit.php:117
+msgid "No SNMP interfaces defined."
+msgstr ""
 
 #: api/classes/CScreenItem.php:472
 msgid "No URL provided for screen element."
@@ -8511,6 +8857,11 @@ msgstr "Не са дефинирани действия."
 #: include/actions.inc.php:961 include/classes/screens/CScreenActions.php:121
 msgid "No actions found."
 msgstr "Не са налични действия."
+
+#: include/views/configuration.host.edit.php:326
+#: include/views/configuration.host.prototype.edit.php:103
+msgid "No agent interfaces defined."
+msgstr ""
 
 #: include/hosts.inc.php:588
 #, php-format
@@ -8539,7 +8890,7 @@ msgstr "В операция на действие за команда \"%s\" н�
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "В операция на действие за команда \"%s\" не е уточнено потребителското име за автентификация."
 
-#: api/classes/CItemGeneral.php:326
+#: api/classes/CItemGeneral.php:324
 msgid "No authentication user name specified."
 msgstr "Не е уточнено потребителското име за автентификация."
 
@@ -8574,7 +8925,7 @@ msgstr "Няма получени данни през период от врем
 msgid "No data received during period of time T, then N NOT 1, 0 - otherwise"
 msgstr "Няма получени данни през период от време T, тогава N НЕ е 1, 0 - в противен случай"
 
-#: api/classes/CHostInterface.php:819
+#: api/classes/CHostInterface.php:827
 #, php-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "Не е интерфейс по подразбиране \"%1$s\" тип в хост \"%2$s\"."
@@ -8598,12 +8949,17 @@ msgstr "Не са дефинирани откривания."
 msgid "No discovery checks defined."
 msgstr "Не са дефинирани проверки за откриване."
 
-#: api/classes/CDiscoveryRule.php:428
+#: api/classes/CHostPrototype.php:112
+#, php-format
+msgid "No discovery rule ID given for host prototype \"%1$s\"."
+msgstr ""
+
+#: api/classes/CDiscoveryRule.php:443
 msgid "No discovery rule IDs given."
 msgstr "Не уточнено ID на правило за откриване."
 
 #: include/views/configuration.discovery.list.php:37
-#: include/views/configuration.host.discovery.list.php:43 popup.php:1418
+#: include/views/configuration.host.discovery.list.php:41 popup.php:1418
 msgid "No discovery rules defined."
 msgstr "Не са дефинирани правила за откриване."
 
@@ -8661,20 +9017,20 @@ msgstr "Не са дефинирани прототипи за графика."
 msgid "No graphs defined."
 msgstr "Не са дефинирани графики."
 
-#: api/classes/CHost.php:692 api/classes/CHost.php:702
+#: api/classes/CHost.php:701 api/classes/CHost.php:711
 #, php-format
 msgid "No groups for host \"%s\"."
 msgstr "Няма групи за хост \"%s\"."
 
-#: api/classes/CHost.php:1044
+#: api/classes/CHost.php:1076
 msgid "No groups for hosts."
 msgstr "Няма групи за хостове."
 
-#: api/classes/CTemplate.php:821
+#: api/classes/CTemplate.php:826
 msgid "No groups for template"
 msgstr "Няма групи за шаблони."
 
-#: api/classes/CTemplate.php:462
+#: api/classes/CTemplate.php:460
 #, php-format
 msgid "No groups for template [ %s ]"
 msgstr "Няма групи за шаблон [ %s ]"
@@ -8684,11 +9040,11 @@ msgstr "Няма групи за шаблон [ %s ]"
 msgid "No history defined."
 msgstr "Няма дефинирана история."
 
-#: api/classes/CHost.php:1416
+#: api/classes/CHost.php:1452
 msgid "No host ID given."
 msgstr ""
 
-#: api/classes/CDiscoveryRule.php:431
+#: api/classes/CDiscoveryRule.php:446
 msgid "No host IDs given."
 msgstr "Не е дефинирано ID на хост."
 
@@ -8697,11 +9053,15 @@ msgstr "Не е дефинирано ID на хост."
 msgid "No host given for macro \"%1$s\"."
 msgstr "Не е зададен хост за макро \"%1$s\"."
 
+#: api/classes/CHostPrototype.php:240
+msgid "No host group ID for group prototype."
+msgstr ""
+
 #: api/classes/CScreenItem.php:436
 msgid "No host group ID provided for screen element."
 msgstr "Не е определено ID на хост група за елемент от екрана."
 
-#: include/views/configuration.hostgroups.list.php:47 popup.php:1391
+#: include/views/configuration.hostgroups.list.php:56 popup.php:1391
 msgid "No host groups defined."
 msgstr "Не е дефинирана хост група"
 
@@ -8710,12 +9070,16 @@ msgstr "Не е дефинирана хост група"
 msgid "No host groups with groupid \"%s\"."
 msgstr "Няма хост група с groupid \"%s\"."
 
+#: include/views/configuration.host.prototype.list.php:44
+msgid "No host prototypes defined."
+msgstr ""
+
 #: include/hosts.inc.php:536
 #, php-format
 msgid "No host with hostid \"%s\"."
 msgstr "Няма хост с  hostid \"%s\"."
 
-#: hostinventoriesoverview.php:88 hostinventories.php:155 hosts.php:744
+#: hostinventoriesoverview.php:88 hostinventories.php:155 hosts.php:789
 msgid "No hosts defined."
 msgstr "Не са дефинирани хостове."
 
@@ -8747,7 +9111,7 @@ msgstr ""
 msgid "No interface found"
 msgstr "Не е открит интерфейс"
 
-#: api/classes/CItemGeneral.php:260
+#: api/classes/CItemGeneral.php:258
 msgid "No interface found."
 msgstr "Не е открит интерфейс."
 
@@ -8756,7 +9120,7 @@ msgstr "Не е открит интерфейс."
 msgid "No interface provided for proxy \"%s\"."
 msgstr ""
 
-#: api/classes/CHost.php:696 api/classes/CHost.php:714
+#: api/classes/CHost.php:705 api/classes/CHost.php:723
 #, php-format
 msgid "No interfaces for host \"%s\"."
 msgstr "Няма интерфейс за хост \"%s\"."
@@ -8790,6 +9154,10 @@ msgstr "Не са дефинирани елементи на данните."
 msgid "No items prototypes defined."
 msgstr "Не са дефинирани прототипи на елементи на данните."
 
+#: include/views/common.macros.php:26
+msgid "No macros defined."
+msgstr ""
+
 #: include/views/configuration.maintenance.list.php:41
 msgid "No maintenance defined."
 msgstr "Не е дефинирана поддръжката."
@@ -8807,7 +9175,7 @@ msgstr "Не е определено ID на карта на мрежата за
 msgid "No maps defined."
 msgstr "Не са дефинирани карти на мрежата."
 
-#: include/classes/class.cmultiselect.php:49 jsLoader.php:188
+#: include/classes/class.cmultiselect.php:51 jsLoader.php:188
 msgid "No matches found"
 msgstr ""
 
@@ -8827,8 +9195,8 @@ msgstr "Не са дефинирани възлови точки."
 msgid "No operations defined."
 msgstr "Не са дефинирани операции."
 
-#: include/classes/import/CConfigurationImport.php:820
-#: include/classes/import/CConfigurationImport.php:897
+#: include/classes/import/CConfigurationImport.php:877
+#: include/classes/import/CConfigurationImport.php:954
 #: include/classes/import/CXmlImport18.php:1553
 #, php-format
 msgid "No permission for graph \"%1$s\"."
@@ -8884,23 +9252,25 @@ msgstr "Нямате право на достъп до системата."
 #: api/classes/CAction.php:638 api/classes/CAction.php:1248
 #: api/classes/CApplication.php:328 api/classes/CApplication.php:335
 #: api/classes/CApplication.php:441 api/classes/CApplication.php:513
-#: api/classes/CApplication.php:533 api/classes/CDiscoveryRule.php:356
-#: api/classes/CDiscoveryRule.php:436 api/classes/CDiscoveryRule.php:441
+#: api/classes/CApplication.php:533 api/classes/CDiscoveryRule.php:357
+#: api/classes/CDiscoveryRule.php:451 api/classes/CDiscoveryRule.php:456
 #: api/classes/CDRule.php:255 api/classes/CDRule.php:578
-#: api/classes/CEvent.php:732 api/classes/CGraphGeneral.php:194
-#: api/classes/CGraphGeneral.php:541 api/classes/CGraph.php:642
-#: api/classes/CGraphPrototype.php:654 api/classes/CHostGeneral.php:374
-#: api/classes/CHostGeneral.php:377 api/classes/CHostGroup.php:520
-#: api/classes/CHostGroup.php:584 api/classes/CHostGroup.php:752
-#: api/classes/CHostGroup.php:809 api/classes/CHostGroup.php:856
-#: api/classes/CHostGroup.php:871 api/classes/CHostGroup.php:889
+#: api/classes/CEvent.php:732 api/classes/CGraphGeneral.php:197
+#: api/classes/CGraphGeneral.php:542 api/classes/CGraph.php:642
+#: api/classes/CGraphPrototype.php:654 api/classes/CHostBase.php:45
+#: api/classes/CHostGeneral.php:139 api/classes/CHostGroup.php:522
+#: api/classes/CHostGroup.php:595 api/classes/CHostGroup.php:778
+#: api/classes/CHostGroup.php:840 api/classes/CHostGroup.php:893
+#: api/classes/CHostGroup.php:902 api/classes/CHostGroup.php:924
 #: api/classes/CHostInterface.php:319 api/classes/CHostInterface.php:335
-#: api/classes/CHostInterface.php:468 api/classes/CHostInterface.php:666
-#: api/classes/CHost.php:682 api/classes/CHost.php:707
-#: api/classes/CHost.php:1742 api/classes/CHttpTest.php:393
+#: api/classes/CHostInterface.php:476 api/classes/CHostInterface.php:674
+#: api/classes/CHost.php:688 api/classes/CHost.php:716
+#: api/classes/CHost.php:1813 api/classes/CHostPrototype.php:1020
+#: api/classes/CHostPrototype.php:1035 api/classes/CHostPrototype.php:1048
+#: api/classes/CHostPrototype.php:1061 api/classes/CHttpTest.php:393
 #: api/classes/CIconMap.php:319 api/classes/CImage.php:243
 #: api/classes/CImage.php:357 api/classes/CImage.php:474
-#: api/classes/CItemGeneral.php:178 api/classes/CItemGeneral.php:234
+#: api/classes/CItemGeneral.php:182 api/classes/CItemGeneral.php:232
 #: api/classes/CItem.php:688 api/classes/CItemPrototype.php:508
 #: api/classes/CMaintenance.php:320 api/classes/CMaintenance.php:345
 #: api/classes/CMaintenance.php:358 api/classes/CMaintenance.php:466
@@ -8908,13 +9278,13 @@ msgstr "Нямате право на достъп до системата."
 #: api/classes/CMapElement.php:56 api/classes/CMapElement.php:145
 #: api/classes/CMap.php:389 api/classes/CProxy.php:171
 #: api/classes/CProxy.php:212 api/classes/CProxy.php:284
-#: api/classes/CProxy.php:535 api/classes/CScreenItem.php:328
+#: api/classes/CProxy.php:550 api/classes/CScreenItem.php:328
 #: api/classes/CScreenItem.php:412 api/classes/CScreen.php:438
 #: api/classes/CScreen.php:518 api/classes/CService.php:1253
 #: api/classes/CService.php:1268 api/classes/CTemplateScreen.php:703
 #: api/classes/CTemplateScreen.php:724 api/classes/CTemplateScreen.php:730
-#: api/classes/CTrigger.php:648 api/classes/CTrigger.php:979
-#: api/classes/CTrigger.php:1000 api/classes/CTrigger.php:1845
+#: api/classes/CTrigger.php:652 api/classes/CTrigger.php:977
+#: api/classes/CTrigger.php:998 api/classes/CTrigger.php:1843
 #: api/classes/CTriggerPrototype.php:566 api/classes/CTriggerPrototype.php:669
 #: api/classes/CUserMacro.php:726 api/classes/CUserMacro.php:835
 #: api/classes/CUser.php:1156 include/func.inc.php:2026
@@ -8926,7 +9296,7 @@ msgstr "Нямате право на достъп до посочения обе
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "Не е уточнен файла с личен ключ за команда \"%s\" в операция на действие."
 
-#: api/classes/CItemGeneral.php:334
+#: api/classes/CItemGeneral.php:332
 msgid "No private key file specified."
 msgstr "Не е уточнен файла с личен ключ."
 
@@ -8938,7 +9308,7 @@ msgstr "Не са дефинирани проксита."
 msgid "No proxy"
 msgstr "Няма прокси"
 
-#: api/classes/CProxy.php:404
+#: api/classes/CProxy.php:419
 msgid "No proxy ID given."
 msgstr ""
 
@@ -8947,7 +9317,7 @@ msgstr ""
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "Не е уточнен файла с обществен ключ за команда \"%s\" в операция на действие."
 
-#: api/classes/CItemGeneral.php:331
+#: api/classes/CItemGeneral.php:329
 msgid "No public key file specified."
 msgstr "Не е уточнен файла с обществен ключ."
 
@@ -9012,10 +9382,15 @@ msgstr "Не е избрана цел"
 msgid "No target selected."
 msgstr "Не е избрана цел."
 
-#: include/views/configuration.host.edit.php:503
-#: include/views/configuration.template.edit.php:376 templates.php:476
+#: include/views/configuration.host.edit.php:629
+#: include/views/configuration.host.prototype.edit.php:211
+#: include/views/configuration.template.edit.php:377 templates.php:481
 msgid "No templates defined."
 msgstr "Не са дефинирани шабнони."
+
+#: include/views/configuration.host.prototype.edit.php:233
+msgid "No templates linked."
+msgstr ""
 
 #: include/views/configuration.services.edit.php:127
 msgid "No times defined. Work 24x7."
@@ -9069,7 +9444,7 @@ msgstr "Не са дефинирани уеб проверки."
 msgid "No web scenarios defined."
 msgstr "Не са дефинирани уеб сценарии."
 
-#: events.php:578 events.php:591 hostinventories.php:157 hosts.php:747
+#: events.php:578 events.php:591 hostinventories.php:157 hosts.php:792
 #: httpmon.php:86 include/actions.inc.php:68 include/audit.inc.php:42
 #: include/blocks.inc.php:185 include/blocks.inc.php:375
 #: include/blocks.inc.php:908 include/blocks.inc.php:1044
@@ -9089,7 +9464,7 @@ msgstr "Не са дефинирани уеб сценарии."
 #: include/views/configuration.application.list.php:60
 #: include/views/configuration.discovery.list.php:40
 #: include/views/configuration.graph.list.php:76
-#: include/views/configuration.hostgroups.list.php:50
+#: include/views/configuration.hostgroups.list.php:59
 #: include/views/configuration.httpconf.list.php:61
 #: include/views/configuration.item.list.php:61
 #: include/views/configuration.maintenance.list.php:44
@@ -9099,7 +9474,7 @@ msgstr "Не са дефинирани уеб сценарии."
 #: include/views/configuration.triggers.list.php:107
 #: include/views/monitoring.discovery.php:40 latest.php:190 popup.php:485
 #: popup_right.php:66 queue.php:201 report2.php:395 report5.php:59
-#: search.php:129 search.php:270 search.php:380 templates.php:479
+#: search.php:129 search.php:270 search.php:380 templates.php:484
 #: tr_status.php:370
 msgid "Node"
 msgstr "Възлова точка"
@@ -9156,7 +9531,7 @@ msgstr "Непотвърдено"
 msgid "Not Templated items"
 msgstr "Няма шаблонни елементи на данните"
 
-#: api/classes/CTrigger.php:1495
+#: api/classes/CTrigger.php:1493
 #, php-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr "Не всички шаблони са свързани към \"%s\"."
@@ -9182,9 +9557,10 @@ msgstr "Не е класифицирано"
 msgid "Not connected"
 msgstr "Не е свързан"
 
-#: hosts.php:870 include/html.inc.php:394
-#: include/views/configuration.host.edit.php:296
+#: hosts.php:921 include/html.inc.php:407
+#: include/views/configuration.host.edit.php:403
 #: include/views/configuration.host.massupdate.php:146
+#: include/views/configuration.host.prototype.edit.php:160
 msgid "Not monitored"
 msgstr "Не се наблюдава"
 
@@ -9214,7 +9590,7 @@ msgstr "Нищо общо."
 msgid "Notification report"
 msgstr "Доклад за нотификациите"
 
-#: include/menu.inc.php:272 report4.php:72 report4.php:123
+#: include/menu.inc.php:273 report4.php:72 report4.php:123
 msgid "Notifications"
 msgstr "Нотификации"
 
@@ -9398,7 +9774,7 @@ msgstr "Мигане на тригери при промяна на състоя
 msgid "Once"
 msgstr "Веднъж"
 
-#: api/classes/CHostGroup.php:819 api/classes/CHostGroup.php:950
+#: api/classes/CHostGroup.php:856 api/classes/CHostGroup.php:988
 msgid "One of the objects is left without a host group."
 msgstr ""
 
@@ -9419,7 +9795,7 @@ msgstr "Само Супер Администраторите могат да д�
 msgid "Only Super Admins can create global macros."
 msgstr "Само Супер Администраторите могат да създават глобални макроси."
 
-#: api/classes/CHostGroup.php:477
+#: api/classes/CHostGroup.php:479
 msgid "Only Super Admins can create host groups."
 msgstr "Само Супер Администраторите могат да създават хост групи."
 
@@ -9595,7 +9971,7 @@ msgstr "Оператор"
 msgid "Original"
 msgstr "Оригинал"
 
-#: include/classes/core/ZBase.php:226
+#: include/classes/core/ZBase.php:232
 msgid "Original blue"
 msgstr "Оригинално синьо"
 
@@ -9620,12 +9996,12 @@ msgstr "Други конфигурационни параметри"
 msgid "Other groups"
 msgstr "Други групи"
 
-#: include/views/administration.proxy.edit.php:84
+#: include/views/administration.proxy.edit.php:88
 msgid "Other hosts"
 msgstr "Други хостове"
 
 #: include/reports.inc.php:366
-#: include/views/configuration.hostgroups.edit.php:60
+#: include/views/configuration.hostgroups.edit.php:63
 #: include/views/configuration.maintenance.edit.php:168
 msgid "Other hosts | Group"
 msgstr "Други хостове | Група"
@@ -9634,7 +10010,7 @@ msgstr "Други хостове | Група"
 msgid "Other parameters"
 msgstr "Други параметри"
 
-#: include/views/configuration.template.edit.php:173
+#: include/views/configuration.template.edit.php:174
 msgid "Other | group"
 msgstr "Друг | група"
 
@@ -9859,6 +10235,7 @@ msgstr "Палитра #%1$s"
 msgid "Parameter"
 msgstr "Параметър"
 
+#: include/views/configuration.host.prototype.edit.php:55
 #: include/views/configuration.item.edit.php:53
 msgid "Parent discovery rules"
 msgstr "Родителски правила за откриване."
@@ -9904,7 +10281,8 @@ msgstr "Пасивен"
 #: include/views/administration.users.edit.php:73
 #: include/views/configuration.action.edit.php:704
 #: include/views/configuration.action.edit.php:737
-#: include/views/configuration.host.edit.php:575
+#: include/views/configuration.host.edit.php:723
+#: include/views/configuration.host.prototype.edit.php:267
 #: include/views/configuration.httpconf.edit.php:83
 #: include/views/configuration.item.edit.php:180
 #: include/views/configuration.item.edit.php:192
@@ -10024,20 +10402,22 @@ msgid "Populates host inventory field"
 msgstr "Попълнете полето: данни за инвентаризация на хост"
 
 #: authentication.php:37 disc_prototypes.php:82 host_discovery.php:79
-#: hosts.php:717 include/forms.inc.php:494 include/setup.inc.php:321
+#: hosts.php:762 include/forms.inc.php:494 include/setup.inc.php:321
 #: include/views/administration.authentication.edit.php:58
 #: include/views/administration.node.edit.php:78
 #: include/views/administration.node.list.php:44
 #: include/views/administration.proxy.edit.php:57
 #: include/views/configuration.action.edit.php:751
-#: include/views/configuration.host.edit.php:218
+#: include/views/configuration.host.edit.php:231
+#: include/views/configuration.host.edit.php:318
+#: include/views/configuration.host.prototype.edit.php:95
 #: include/views/configuration.item.edit.php:170
 #: include/views/configuration.item.massupdate.php:199 items.php:86
 #: items.php:149 nodes.php:40 setup.php:53
 msgid "Port"
 msgstr "Порт"
 
-#: api/classes/CHostInterface.php:650
+#: api/classes/CHostInterface.php:658
 msgid "Port cannot be empty for host interface."
 msgstr "Порта не може да бъде празен за хост интерфейс."
 
@@ -10143,7 +10523,9 @@ msgstr "Протокол за поверителност"
 msgid "Private key file"
 msgstr "Файл с личен ключ"
 
-#: include/views/configuration.host.edit.php:573
+#: include/views/configuration.host.edit.php:711
+#: include/views/configuration.host.edit.php:719
+#: include/views/configuration.host.prototype.edit.php:264
 msgid "Privilege level"
 msgstr "Ниво на привилегия"
 
@@ -10197,7 +10579,7 @@ msgid "Proxies"
 msgstr "Проксита"
 
 #: include/actions.inc.php:92 include/audit.inc.php:46
-#: include/views/administration.proxy.edit.php:88 queue.php:149
+#: include/views/administration.proxy.edit.php:92 queue.php:149
 msgid "Proxy"
 msgstr "Прокси"
 
@@ -10206,7 +10588,7 @@ msgstr "Прокси"
 msgid "Proxy \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Прокси \"%1$s\" за хост \"%2$s\" не съществува."
 
-#: api/classes/CProxy.php:555
+#: api/classes/CProxy.php:570
 #, php-format
 msgid "Proxy \"%1$s\" is used by discovery rule \"%2$s\"."
 msgstr "Прокси \"%1$s\" се използва от правило за откриване \"%2$s\"."
@@ -10216,23 +10598,23 @@ msgstr "Прокси \"%1$s\" се използва от правило за о�
 msgid "Proxy \"%s\" already exists."
 msgstr "Прокси \"%s\" вече съществува."
 
-#: proxies.php:107
+#: proxies.php:113
 msgid "Proxy added"
 msgstr "Прокси добавено"
 
-#: proxies.php:130 proxies.php:178
+#: proxies.php:136 proxies.php:184
 msgid "Proxy deleted"
 msgstr "Прокси изтрито"
 
-#: include/views/administration.proxy.edit.php:84
+#: include/views/administration.proxy.edit.php:88
 msgid "Proxy hosts"
 msgstr "Хостове на прокси"
 
-#: api/classes/CProxy.php:314
+#: api/classes/CProxy.php:325
 msgid "Proxy interface creation failed."
 msgstr "Създаването на прокси интерфейс се провали."
 
-#: api/classes/CProxy.php:377
+#: api/classes/CProxy.php:392
 msgid "Proxy interface update failed."
 msgstr "Актуализирането на прокси интерфейс се провали."
 
@@ -10244,7 +10626,7 @@ msgstr "Режим на прокси"
 msgid "Proxy name"
 msgstr "Име на прокси"
 
-#: proxies.php:100
+#: proxies.php:106
 msgid "Proxy updated"
 msgstr "Прокси актуализирано"
 
@@ -10264,7 +10646,7 @@ msgstr "Файл с обществен ключ"
 msgid "QUEUE OF ITEMS TO BE UPDATED"
 msgstr "ПРЕХВЪРЛЯНЕ ЕЛЕМЕНТИ НА ДАННИТЕ, ЧАКАЩИ АКТУАЛИЗИРАНЕ"
 
-#: include/menu.inc.php:268 queue.php:25
+#: include/menu.inc.php:269 queue.php:25
 msgid "Queue"
 msgstr "Опашка"
 
@@ -10417,7 +10799,7 @@ msgstr "Отдалечена команда"
 #: include/blocks.inc.php:1401 include/blocks.inc.php:1410
 #: include/views/administration.general.iconmap.edit.php:74
 #: include/views/administration.general.iconmap.edit.php:113
-#: include/views/common.macros.php:38
+#: include/views/common.macros.php:51
 #: include/views/configuration.action.edit.php:97
 #: include/views/configuration.action.edit.php:379
 #: include/views/configuration.action.edit.php:392
@@ -10446,6 +10828,7 @@ msgstr "Отдалечена команда"
 #: include/views/js/configuration.graph.edit.js.php:89
 #: include/views/js/configuration.host.edit.js.php:29
 #: include/views/js/configuration.host.edit.macros.js.php:13
+#: include/views/js/configuration.host.prototype.edit.js.php:8
 #: include/views/js/configuration.services.edit.js.php:74
 #: include/views/js/configuration.slideconf.edit.js.php:16
 #: include/views/js/configuration.sysmaps.js.php:199
@@ -10565,7 +10948,7 @@ msgstr "Необходими кодове за състояние"
 msgid "Required string"
 msgstr "Необходим низ"
 
-#: events.php:357 hostinventories.php:138 hosts.php:725
+#: events.php:357 hostinventories.php:138 hosts.php:770
 #: include/forms.inc.php:633 include/html.inc.php:285
 #: include/reports.inc.php:121 include/reports.inc.php:259
 #: include/reports.inc.php:438
@@ -10830,7 +11213,9 @@ msgstr "SNMP OID"
 msgid "SNMP community"
 msgstr "SNMP community"
 
-#: include/views/configuration.host.edit.php:250
+#: include/views/configuration.host.edit.php:263
+#: include/views/configuration.host.edit.php:343
+#: include/views/configuration.host.prototype.edit.php:120
 msgid "SNMP interfaces"
 msgstr "SNMP интерфейс"
 
@@ -10838,7 +11223,7 @@ msgstr "SNMP интерфейс"
 msgid "SNMP trap"
 msgstr "SNMP trap"
 
-#: api/classes/CItemGeneral.php:302
+#: api/classes/CItemGeneral.php:300
 msgid "SNMP trap key is invalid."
 msgstr "Ключа за SNMP trap е невалиден."
 
@@ -10934,8 +11319,8 @@ msgstr "Събота"
 #: include/views/administration.mediatypes.edit.php:107
 #: include/views/administration.mediatypes.edit.php:110
 #: include/views/administration.node.edit.php:91
-#: include/views/administration.proxy.edit.php:94
-#: include/views/administration.proxy.edit.php:104
+#: include/views/administration.proxy.edit.php:98
+#: include/views/administration.proxy.edit.php:108
 #: include/views/administration.script.edit.php:119
 #: include/views/administration.usergroups.edit.php:137
 #: include/views/administration.usergroups.edit.php:143
@@ -10947,9 +11332,10 @@ msgstr "Събота"
 #: include/views/configuration.application.edit.php:62
 #: include/views/configuration.discovery.edit.php:90
 #: include/views/configuration.graph.edit.php:300
-#: include/views/configuration.host.edit.php:677
-#: include/views/configuration.hostgroups.edit.php:70
-#: include/views/configuration.hostgroups.edit.php:81
+#: include/views/configuration.host.edit.php:834
+#: include/views/configuration.hostgroups.edit.php:73
+#: include/views/configuration.hostgroups.edit.php:84
+#: include/views/configuration.host.prototype.edit.php:329
 #: include/views/configuration.httpconf.edit.php:248
 #: include/views/configuration.httpconf.edit.php:258
 #: include/views/configuration.item.edit.php:519
@@ -10963,7 +11349,7 @@ msgstr "Събота"
 #: include/views/configuration.slideconf.edit.php:114
 #: include/views/configuration.sysmap.constructor.php:62
 #: include/views/configuration.sysmap.edit.php:195
-#: include/views/configuration.template.edit.php:448
+#: include/views/configuration.template.edit.php:449
 #: include/views/configuration.triggers.edit.php:326
 #: include/views/configuration.triggers.massupdate.php:152
 #: include/views/monitoring.dashconf.php:107
@@ -11064,15 +11450,15 @@ msgstr "Екрана трябва да съдържа най-малко един
 msgid "Screen updated"
 msgstr "Екран актуализиран"
 
-#: dashboard.php:300 include/blocks.inc.php:1401 include/html.inc.php:506
-#: include/html.inc.php:510 include/menu.inc.php:67 include/menu.inc.php:194
+#: dashboard.php:300 include/blocks.inc.php:1401 include/html.inc.php:531
+#: include/html.inc.php:535 include/menu.inc.php:67 include/menu.inc.php:195
 #: include/views/configuration.screen.list.php:38
-#: include/views/configuration.template.edit.php:363
+#: include/views/configuration.template.edit.php:364
 #: include/views/conf.import.php:35 include/views/monitoring.screen.php:29
 #: include/views/monitoring.screen.php:79
 #: include/views/monitoring.slides.php:31 popup.php:68 popup.php:84
 #: search.php:136 search.php:218 search.php:386 search.php:420 search.php:447
-#: templates.php:485 templates.php:549
+#: templates.php:490 templates.php:554
 msgid "Screens"
 msgstr "Екрани"
 
@@ -11116,7 +11502,7 @@ msgstr "Скрипт актуализиран"
 msgid "Script with scriptid \"%s\" does not exist."
 msgstr "Скрипт с scriptid \"%s\" не съществува."
 
-#: include/menu.inc.php:259 include/views/administration.script.list.php:28
+#: include/menu.inc.php:260 include/views/administration.script.list.php:28
 #: include/views/js/monitoring.maps.js.php:12 jsLoader.php:180 report5.php:160
 #: scripts_exec.php:26
 msgid "Scripts"
@@ -11622,7 +12008,7 @@ msgstr "Слайдшоу трябва да съдържа слайдове."
 msgid "Slide show updated"
 msgstr "Слайдшоу актуализирано"
 
-#: include/menu.inc.php:199 include/views/configuration.slideconf.list.php:29
+#: include/menu.inc.php:200 include/views/configuration.slideconf.list.php:29
 #: include/views/monitoring.screen.php:30
 #: include/views/monitoring.slides.php:32 popup.php:72
 msgid "Slide shows"
@@ -11724,7 +12110,7 @@ msgstr "Започни в"
 msgid "State"
 msgstr "Състояние"
 
-#: events.php:505 events.php:514 events.php:581 events.php:594 hosts.php:757
+#: events.php:505 events.php:514 events.php:581 events.php:594 hosts.php:802
 #: httpdetails.php:134 httpmon.php:91 include/actions.inc.php:830
 #: include/actions.inc.php:908 include/actions.inc.php:967
 #: include/classes/screens/CScreenActions.php:58
@@ -11738,9 +12124,12 @@ msgstr "Състояние"
 #: include/views/administration.users.list.php:64
 #: include/views/configuration.action.list.php:55
 #: include/views/configuration.discovery.list.php:45
-#: include/views/configuration.host.discovery.list.php:58
-#: include/views/configuration.host.edit.php:298
+#: include/views/configuration.host.discovery.list.php:57
+#: include/views/configuration.host.edit.php:405
+#: include/views/configuration.hostgroups.list.php:63
 #: include/views/configuration.host.massupdate.php:149
+#: include/views/configuration.host.prototype.edit.php:162
+#: include/views/configuration.host.prototype.list.php:54
 #: include/views/configuration.httpconf.list.php:66
 #: include/views/configuration.item.list.php:72
 #: include/views/configuration.item.list.php:139
@@ -12004,13 +12393,13 @@ msgstr "Telnet"
 
 #: include/actions.inc.php:62 include/audit.inc.php:51
 #: include/forms.inc.php:609 include/forms.inc.php:928
-#: include/html.inc.php:386 include/views/configuration.template.edit.php:37
-#: include/views/configuration.template.edit.php:367
+#: include/html.inc.php:399 include/views/configuration.template.edit.php:37
+#: include/views/configuration.template.edit.php:368
 #: include/views/configuration.triggers.list.php:126 report2.php:257
 msgid "Template"
 msgstr "Шаблон"
 
-#: api/classes/CHost.php:1080
+#: api/classes/CHost.php:1112
 #, php-format
 msgid "Template \"%1$s\" already exists."
 msgstr "Шаблон \"%1$s\" вече съществува."
@@ -12020,35 +12409,25 @@ msgstr "Шаблон \"%1$s\" вече съществува."
 msgid "Template \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Шаблон \"%1$s\" за хост \"%2$s\" не съществува."
 
-#: api/classes/CHostGeneral.php:216
+#: api/classes/CHostBase.php:94
 #, php-format
 msgid "Template \"%1$s\" with item key \"%2$s\" already linked to host."
 msgstr ""
 
-#: api/classes/CHostGeneral.php:226
-#, php-format
-msgid "Template \"%1$s\" with item prototype key \"%2$s\" already linked to host."
-msgstr ""
-
-#: api/classes/CHostGeneral.php:221
-#, php-format
-msgid "Template \"%1$s\" with low level discovery rule key \"%2$s\" already linked to host."
-msgstr ""
-
-#: api/classes/CTemplate.php:508
+#: api/classes/CTemplate.php:506
 #, php-format
 msgid "Template \"%s\" already exists."
 msgstr "Шаблон \"%s\" вече съществува."
 
-#: templates.php:164
+#: templates.php:163
 msgid "Template added"
 msgstr "Шаблон добавен"
 
-#: api/classes/CHostGeneral.php:843
+#: api/classes/CHostBase.php:292
 msgid "Template cannot be linked to another template more than once even through other templates."
 msgstr "Шаблонът не може да бъде прикрепен към друг шаблон повече от веднъж, дори чрез други шаблони."
 
-#: templates.php:349 templates.php:365 templates.php:393
+#: templates.php:354 templates.php:370 templates.php:398
 msgid "Template deleted"
 msgstr "Шаблон изтрит"
 
@@ -12060,7 +12439,7 @@ msgstr "Група на шаблон"
 msgid "Template linkage"
 msgstr "Връзка с шаблон"
 
-#: include/html.inc.php:359
+#: include/html.inc.php:372
 msgid "Template list"
 msgstr "Списък на шаблони"
 
@@ -12076,22 +12455,22 @@ msgstr "Шаблон на екрани"
 msgid "Template trigger"
 msgstr "Шаблон на тригер"
 
-#: templates.php:160
+#: templates.php:159
 msgid "Template updated"
 msgstr "Шаблон актуалзиран"
 
-#: include/hosts.inc.php:675
+#: include/hosts.inc.php:724
 #, php-format
 msgid "Template with item key \"%1$s\" already linked to host."
 msgstr "Шаблон с ключ за елементи на данните \"%1$s\" вече е свързан към хост."
 
-#: api/classes/CHost.php:816 api/classes/CTemplate.php:872
+#: api/classes/CHost.php:825 api/classes/CTemplate.php:877
 #, php-format
 msgid "Template with the same name \"%s\" already exists."
 msgstr "Шаблон със същото име \"%s\" вече съществува."
 
-#: api/classes/CHost.php:822 api/classes/CTemplate.php:518
-#: api/classes/CTemplate.php:845
+#: api/classes/CHost.php:831 api/classes/CTemplate.php:516
+#: api/classes/CTemplate.php:850
 #, php-format
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr "Шаблон със същото видимо име \"%s\" вече съществува."
@@ -12100,17 +12479,19 @@ msgstr "Шаблон със същото видимо име \"%s\" вече с�
 msgid "Templated items"
 msgstr "Шаблонни елементи на данните"
 
-#: hosts.php:756 include/menu.inc.php:164
-#: include/views/configuration.host.edit.php:554
-#: include/views/configuration.hostgroups.list.php:116
+#: hosts.php:801 include/menu.inc.php:164
+#: include/views/configuration.host.edit.php:690
+#: include/views/configuration.hostgroups.list.php:150
 #: include/views/configuration.host.massupdate.php:287
+#: include/views/configuration.host.prototype.edit.php:253
+#: include/views/configuration.host.prototype.list.php:53
 #: include/views/conf.import.php:28 search.php:276 search.php:305
 #: search.php:310 search.php:317 search.php:381 search.php:469
-#: templates.php:470 templates.php:480
+#: templates.php:475 templates.php:485
 msgid "Templates"
 msgstr "Шаблони"
 
-#: api/classes/CHostGeneral.php:821
+#: api/classes/CHostBase.php:270
 #, php-format
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "Шаблони \"%1$s\" изключени от хостове \"%2$s\"."
@@ -12166,6 +12547,16 @@ msgstr "Интерфейса не съответства на Zabbix база д
 msgid "The frontend does not match Zabbix database. Current database version (mandatory/optional): %d/%d. Required mandatory version: %d. Contact your system administrator."
 msgstr "Интерфейса не съответства на Zabbix база данни. Текуща версия на базата данни (задължително/по избор): %d/%d. Изисква се задължителна версия: %d. Свържете се с вашия системен администратор."
 
+#: include/views/configuration.hostgroups.list.php:137
+#, php-format
+msgid "The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
+msgstr ""
+
+#: include/html.inc.php:627
+#, php-format
+msgid "The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
+msgstr ""
+
 #: api/classes/CImage.php:493
 #, fuzzy, php-format
 msgid "The image is used in icon map %2$s."
@@ -12217,7 +12608,7 @@ msgstr[1] "Съществуват \"%1$d\" групи с вътрешен дос
 msgid "Third"
 msgstr "Трети"
 
-#: include/views/configuration.host.edit.php:637
+#: include/views/configuration.host.edit.php:794
 #, php-format
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "Това поле се попълва автоматично от елемент на данните \"%s\"."
@@ -12403,8 +12794,8 @@ msgstr "Тригер"
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr "Тригер \"%1$s\" вече съществува в \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:935
-#: include/classes/import/CConfigurationImport.php:971
+#: include/classes/import/CConfigurationImport.php:992
+#: include/classes/import/CConfigurationImport.php:1028
 #, php-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Тригер \"%1$s\" зависи от тригер \"%2$s\", който не съществува."
@@ -12415,7 +12806,7 @@ msgstr "Тригер \"%1$s\" зависи от тригер \"%2$s\", койт�
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "Тригер \"%1$s\" пропуснат - потребителско правило."
 
-#: api/classes/CTrigger.php:1634
+#: api/classes/CTrigger.php:1632
 #, php-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Тригер \"%s\" принадлежи към шаблони с различни връзки."
@@ -12425,7 +12816,7 @@ msgstr "Тригер \"%s\" принадлежи към шаблони с раз
 msgid "Trigger added"
 msgstr "Тригер добавен"
 
-#: api/classes/CTrigger.php:1538
+#: api/classes/CTrigger.php:1536
 msgid "Trigger cannot be dependent on a trigger that is inherited from it."
 msgstr ""
 
@@ -12449,7 +12840,7 @@ msgstr "Преглед на опциите на тригер"
 msgid "Trigger expression condition"
 msgstr "Състояние на тригер израза"
 
-#: api/classes/CTrigger.php:711 api/classes/CTriggerPrototype.php:802
+#: api/classes/CTrigger.php:709 api/classes/CTriggerPrototype.php:802
 msgid "Trigger expression must contain at least one host:key reference."
 msgstr "Тригер израза трябва да съдържа поне един хост: ключова отправна точка."
 
@@ -12457,7 +12848,7 @@ msgstr "Тригер израза трябва да съдържа поне ед
 msgid "Trigger form"
 msgstr "Форма на тригер за дневника"
 
-#: api/classes/CHostGeneral.php:321
+#: api/classes/CHostBase.php:187
 #, php-format
 msgid "Trigger has items from template \"%1$s\" that is not linked to host."
 msgstr "В тригера има елементи на данните от шаблон \"%1$s\", който не е свързан към хост."
@@ -12470,7 +12861,7 @@ msgstr ""
 msgid "Trigger in \"unknown\" state"
 msgstr ""
 
-#: api/classes/CHostGeneral.php:276
+#: api/classes/CHostBase.php:143
 #, php-format
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "В тригер от шаблон \"%1$s\" има зависимост с тригер от шаблон \"%2$s\"."
@@ -12496,10 +12887,10 @@ msgstr "Тригер прототип"
 msgid "Trigger prototype expression \"%1$s\" must contain at least one item prototype."
 msgstr ""
 
-#: include/html.inc.php:457 include/html.inc.php:461
-#: include/views/configuration.host.discovery.list.php:94
-#: include/views/configuration.host.edit.php:470
-#: include/views/configuration.template.edit.php:321
+#: include/html.inc.php:470 include/html.inc.php:474
+#: include/views/configuration.host.discovery.list.php:102
+#: include/views/configuration.host.edit.php:577
+#: include/views/configuration.template.edit.php:322
 msgid "Trigger prototypes"
 msgstr "Тригер прототипи"
 
@@ -12528,22 +12919,22 @@ msgstr "Тригер актуализиран"
 msgid "Trigger value"
 msgstr "Стойност на тригер"
 
-#: hosts.php:751 hosts.php:826 include/forms.inc.php:594
-#: include/html.inc.php:468 include/html.inc.php:472 include/menu.inc.php:52
+#: hosts.php:796 hosts.php:873 include/forms.inc.php:594
+#: include/html.inc.php:481 include/html.inc.php:485 include/menu.inc.php:52
 #: include/triggers.inc.php:1183
 #: include/views/configuration.action.list.php:33
-#: include/views/configuration.host.discovery.list.php:53
-#: include/views/configuration.host.edit.php:369
+#: include/views/configuration.host.discovery.list.php:51
+#: include/views/configuration.host.edit.php:476
 #: include/views/configuration.item.list.php:65
 #: include/views/configuration.item.list.php:196
-#: include/views/configuration.template.edit.php:238
+#: include/views/configuration.template.edit.php:239
 #: include/views/configuration.triggers.list.php:77
 #: include/views/conf.import.php:33
 #: include/views/js/configuration.sysmaps.js.php:392
 #: include/views/monitoring.overview.php:28 jsLoader.php:110 popup.php:44
 #: search.php:134 search.php:140 search.php:171 search.php:194 search.php:216
 #: search.php:273 search.php:325 search.php:384 search.php:412 search.php:439
-#: templates.php:483 templates.php:545 tr_status.php:260
+#: templates.php:488 templates.php:550 tr_status.php:260
 msgid "Triggers"
 msgstr "Тригери"
 
@@ -12626,7 +13017,7 @@ msgstr "Двата елемента на данните (\"%1$s\" и \"%2$s\") �
 #: include/views/administration.script.list.php:40
 #: include/views/configuration.action.edit.php:693
 #: include/views/configuration.graph.edit.php:72
-#: include/views/configuration.host.discovery.list.php:57
+#: include/views/configuration.host.discovery.list.php:56
 #: include/views/configuration.item.edit.php:67
 #: include/views/configuration.item.edit.php:74
 #: include/views/configuration.item.list.php:70
@@ -12671,11 +13062,11 @@ msgstr "Тип на изчислението"
 msgid "Type of information"
 msgstr "Тип на информацията"
 
-#: api/classes/CItemGeneral.php:312
+#: api/classes/CItemGeneral.php:310
 msgid "Type of information must be \"Log\" for log key."
 msgstr "За ключ на дневника (лога) типа на информацията трябва да бъде \"Дневник (лог)\"."
 
-#: api/classes/CItemGeneral.php:308
+#: api/classes/CItemGeneral.php:306
 msgid "Type of information must be \"Numeric (float)\" for aggregate items."
 msgstr "За обобщаване елентите на данните типа на информацията трябва да бъде \"Числен (с плаваща точка)\"."
 
@@ -12789,7 +13180,7 @@ msgid "Units"
 msgstr "Единици за измерване"
 
 #: events.php:525 events.php:526 events.php:536 events.php:537 events.php:538
-#: events.php:539 hosts.php:877 httpdetails.php:163 httpmon.php:156
+#: events.php:539 hosts.php:928 httpdetails.php:163 httpmon.php:156
 #: include/actions.inc.php:41 include/actions.inc.php:98
 #: include/actions.inc.php:115 include/actions.inc.php:139
 #: include/actions.inc.php:163 include/actions.inc.php:176
@@ -12801,7 +13192,7 @@ msgstr "Единици за измерване"
 #: include/discovery.inc.php:170 include/events.inc.php:47
 #: include/events.inc.php:78 include/graphs.inc.php:37
 #: include/graphs.inc.php:77 include/hosts.inc.php:53 include/hosts.inc.php:80
-#: include/html.inc.php:397 include/httptest.inc.php:39
+#: include/html.inc.php:410 include/httptest.inc.php:39
 #: include/httptest.inc.php:56 include/items.inc.php:41
 #: include/items.inc.php:102 include/items.inc.php:126
 #: include/items.inc.php:143 include/items.inc.php:159
@@ -12825,7 +13216,7 @@ msgstr "Неизвестно действие"
 msgid "Unknown calculation algorithm of service status"
 msgstr "Неизвестен алгоритъм за изчисляване състоянието на услугите"
 
-#: include/classes/validators/CTriggerFunctionValidator.php:66
+#: include/classes/validators/CTriggerFunctionValidator.php:249
 msgid "Unknown function."
 msgstr "Неизвестна функция."
 
@@ -12849,13 +13240,14 @@ msgstr "Неизвестен ресурс"
 msgid "Unknown value type"
 msgstr "Неизвестен тип стойност"
 
-#: include/views/configuration.host.edit.php:523
-#: include/views/configuration.template.edit.php:389
+#: include/views/configuration.host.edit.php:649
+#: include/views/configuration.host.prototype.edit.php:223
+#: include/views/configuration.template.edit.php:390
 msgid "Unlink"
 msgstr "Прекратяване на връзката"
 
-#: include/views/configuration.host.edit.php:527
-#: include/views/configuration.template.edit.php:393
+#: include/views/configuration.host.edit.php:653
+#: include/views/configuration.template.edit.php:394
 msgid "Unlink and clear"
 msgstr "Прекратяване на връзката и изчистване"
 
@@ -12867,47 +13259,52 @@ msgstr "Прекратяване на връзката от шаблон"
 msgid "Unlink from templates"
 msgstr "Прекратяване на връзката от шаблони"
 
-#: api/classes/CHostGeneral.php:783
+#: api/classes/CHostGeneral.php:583
 #, php-format
 msgid "Unlinked: Application \"%1$s\" on \"%2$s\"."
 msgstr "Прекратена връзка: Приложение \"%1$s\" от \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:592
+#: api/classes/CHostGeneral.php:361
 #, php-format
 msgid "Unlinked: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Прекратена връзка: Правило за откриване \"%1$s\" от \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:695
+#: api/classes/CHostGeneral.php:495
 #, php-format
 msgid "Unlinked: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Прекратена връзка: Графика \"%1$s\" от \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:678
+#: api/classes/CHostGeneral.php:478
 #, php-format
 msgid "Unlinked: Graph prototype \"%1$s\" on \"%2$s\"."
 msgstr "Прекратена връзка: Графичен прототип \"%1$s\" от \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:609
+#: api/classes/CHostGeneral.php:426
+#, php-format
+msgid "Unlinked: Host prototype \"%1$s\" on \"%2$s\"."
+msgstr ""
+
+#: api/classes/CHostGeneral.php:378
 #, php-format
 msgid "Unlinked: Item \"%1$s\" on \"%2$s\"."
 msgstr "Прекратена връзка: Елемент на данните \"%1$s\" от \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:626
+#: api/classes/CHostGeneral.php:395
 #, php-format
 msgid "Unlinked: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Прекратена връзка: Прототип на елемент на данните \"%1$s\" от \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:532
+#: api/classes/CHostGeneral.php:301
 #, php-format
 msgid "Unlinked: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Прекратена връзка: Тригер \"%1$s\" от \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:549
+#: api/classes/CHostGeneral.php:318
 #, php-format
 msgid "Unlinked: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Прекратена връзка: Тригер прототип \"%1$s\" от \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:734
+#: api/classes/CHostGeneral.php:534
 #, php-format
 msgid "Unlinked: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "Прекратена връзка: Уеб сценарий \"%1$s\" в \"%2$s\"."
@@ -12925,6 +13322,21 @@ msgstr "Неподдържано разширение на файла за им�
 #, php-format
 msgid "Unsupported import format \"%1$s\"."
 msgstr "Неподдържан формат за импортиране \"%1$s\"."
+
+#: api/classes/CHostPrototype.php:227 api/classes/CHostPrototype.php:245
+#, php-format
+msgid "Unsupported parameter \"%1$s\" for group prototype."
+msgstr ""
+
+#: api/classes/CHostPrototype.php:209
+#, php-format
+msgid "Unsupported parameter \"%2$s\" for host prototype \"%1$s\"."
+msgstr ""
+
+#: api/classes/CHostPrototype.php:203
+#, php-format
+msgid "Unsupported parameter \"%2$s\" for host prototype %1$s host inventory."
+msgstr ""
 
 #: include/blocks.inc.php:1135
 msgctxt "discovery results in dashboard"
@@ -12984,10 +13396,15 @@ msgstr "Актуализирано: %s"
 msgid "Updated: Application \"%1$s\" on \"%2$s\"."
 msgstr "Актуализирано: Проиложение \"%1$s\" в \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:628
+#: api/classes/CDiscoveryRule.php:643
 #, php-format
 msgid "Updated: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Актуализирано: Правило за откриване \"%1$s\" в \"%2$s\"."
+
+#: api/classes/CHostPrototype.php:615
+#, php-format
+msgid "Updated: Host prototype \"%1$s\" on \"%2$s\"."
+msgstr ""
 
 #: api/classes/CItem.php:642
 #, php-format
@@ -12999,7 +13416,7 @@ msgstr "Актуализирано: Елемент на данните \"%1$s\" 
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Актуализирано: Прототип на елемент на данните \"%1$s\" в \"%2$s\"."
 
-#: api/classes/CTrigger.php:1289
+#: api/classes/CTrigger.php:1287
 #, php-format
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Актуализирано: Тригер \"%1$s\" в \"%2$s\"."
@@ -13187,12 +13604,13 @@ msgstr "Потребител с псевдоним \"%s\" вече същест�
 
 #: include/views/administration.mediatypes.edit.php:85
 #: include/views/administration.mediatypes.list.php:69
-#: include/views/configuration.host.edit.php:574
+#: include/views/configuration.host.edit.php:722
+#: include/views/configuration.host.prototype.edit.php:266
 #: include/views/general.login.php:66 index.php:34
 msgid "Username"
 msgstr "Потребителско име"
 
-#: include/menu.inc.php:250
+#: include/menu.inc.php:251
 #: include/views/administration.usergroups.edit.php:55
 #: include/views/administration.usergroups.list.php:29
 #: include/views/administration.usergroups.list.php:126
@@ -13218,7 +13636,7 @@ msgstr "Деблокирани потребители"
 #: include/classes/screens/CScreenHistory.php:168
 #: include/classes/screens/CScreenHistory.php:266 include/reports.inc.php:163
 #: include/views/administration.general.valuemapping.edit.php:41
-#: include/views/common.macros.php:25 tr_testexpr.php:50
+#: include/views/common.macros.php:37 tr_testexpr.php:50
 #, php-format
 msgid "Value"
 msgstr "Стойност"
@@ -13332,12 +13750,13 @@ msgstr "Вертикално подравняване"
 msgid "View is not rendered."
 msgstr "Прегледа не се показва."
 
-#: include/views/configuration.host.edit.php:175
+#: include/views/configuration.host.edit.php:173
+#: include/views/configuration.host.prototype.edit.php:70
 #: include/views/configuration.template.edit.php:102
 msgid "Visible name"
 msgstr "Видимо име"
 
-#: api/classes/CHost.php:749
+#: api/classes/CHost.php:758
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "Видимото име не може да бъде празно, ако липсва име на хост."
 
@@ -13355,9 +13774,9 @@ msgstr "Внимание"
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "Съжаляваме, достигнат е максималния възможен брой от елементи."
 
-#: hosts.php:754 hosts.php:832 include/menu.inc.php:42 search.php:137
+#: hosts.php:799 hosts.php:879 include/menu.inc.php:42 search.php:137
 #: search.php:142 search.php:179 search.php:202 search.php:219 search.php:387
-#: search.php:424 search.php:451 templates.php:487 templates.php:553
+#: search.php:424 search.php:451 templates.php:492 templates.php:558
 msgid "Web"
 msgstr "Уеб"
 
@@ -13416,7 +13835,7 @@ msgstr "Името на стъпка от уеб сценарий трябва �
 msgid "Web scenario step number cannot be less than 1."
 msgstr "Номера на стъпка от уеб сценарий не може да бъде по-малко от 1."
 
-#: include/html.inc.php:530 include/html.inc.php:534
+#: include/html.inc.php:555 include/html.inc.php:559
 msgid "Web scenarios"
 msgstr "Уеб сценарии"
 
@@ -13515,7 +13934,7 @@ msgstr "Грешни полета за зависимост на услуга \"
 msgid "Wrong fields for element."
 msgstr "Грешни полета за елемент."
 
-#: api/classes/CHost.php:663
+#: api/classes/CHost.php:665
 #, php-format
 msgid "Wrong fields for host \"%s\"."
 msgstr "Грешни полета за хот \"%s\"."
@@ -13742,15 +14161,15 @@ msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr "Вие не сте уточнили цели за глобален скрипт \"%s\" в операция на действие."
 
 #: api/classes/CGraph.php:525 api/classes/CGraphPrototype.php:535
-#: api/classes/CHost.php:981 api/classes/CHost.php:1038
-#: api/classes/CHost.php:1362 api/classes/CHttpTest.php:503
+#: api/classes/CHost.php:1013 api/classes/CHost.php:1070
+#: api/classes/CHost.php:1394 api/classes/CHttpTest.php:503
 #: api/classes/CMaintenance.php:537 api/classes/CMaintenance.php:644
 #: api/classes/CMaintenance.php:656 api/classes/CScript.php:227
 #: api/classes/CScript.php:275 api/classes/CScript.php:339
-#: api/classes/CScript.php:390 api/classes/CTemplate.php:482
-#: api/classes/CTemplate.php:574 api/classes/CTemplate.php:633
-#: api/classes/CTemplate.php:783 api/classes/CTemplate.php:815
-#: api/classes/CTemplate.php:1049 api/classes/CTemplateScreen.php:662
+#: api/classes/CScript.php:390 api/classes/CTemplate.php:480
+#: api/classes/CTemplate.php:572 api/classes/CTemplate.php:631
+#: api/classes/CTemplate.php:781 api/classes/CTemplate.php:820
+#: api/classes/CTemplate.php:1055 api/classes/CTemplateScreen.php:662
 msgid "You do not have permission to perform this operation."
 msgstr "Вие нямате права за извършване на тази операция."
 
@@ -13988,8 +14407,9 @@ msgctxt "day short"
 msgid "d"
 msgstr "д"
 
-#: include/maintenances.inc.php:59 include/page_header.php:469
-#: include/translateDefines.inc.php:42
+#: include/html.inc.php:628 include/maintenances.inc.php:59
+#: include/page_header.php:469 include/translateDefines.inc.php:42
+#: include/views/configuration.hostgroups.list.php:138
 #: include/views/configuration.item.list.php:127 report3.php:132
 msgid "d M Y"
 msgstr "d M Y"
@@ -14037,7 +14457,7 @@ msgstr "d.m.y"
 msgid "days"
 msgstr "дни"
 
-#: include/html.inc.php:636
+#: include/html.inc.php:672
 msgid "dd"
 msgstr "дд"
 
@@ -14108,7 +14528,7 @@ msgctxt "hour short"
 msgid "h"
 msgstr "ч"
 
-#: include/html.inc.php:642 include/views/configuration.services.edit.php:241
+#: include/html.inc.php:678 include/views/configuration.services.edit.php:241
 #: include/views/configuration.services.edit.php:247
 msgid "hh"
 msgstr "чч"
@@ -14152,7 +14572,7 @@ msgstr ""
 msgid "last"
 msgstr "последно"
 
-#: hostinventories.php:121 hosts.php:714 hosts.php:715 hosts.php:716
+#: hostinventories.php:121 hosts.php:759 hosts.php:760 hosts.php:761
 #: include/actions.inc.php:29 include/forms.inc.php:473
 #: include/forms.inc.php:480 include/forms.inc.php:487
 #: include/forms.inc.php:494 include/forms.inc.php:603
@@ -14204,7 +14624,7 @@ msgstr "мин"
 msgid "minimum 60 seconds"
 msgstr "минимум 60 секунди"
 
-#: include/html.inc.php:638 include/html.inc.php:644
+#: include/html.inc.php:674 include/html.inc.php:680
 #: include/views/configuration.services.edit.php:244
 #: include/views/configuration.services.edit.php:250
 msgid "mm"
@@ -14219,7 +14639,7 @@ msgstr "милисекунда"
 msgid "must be a valid LDAP user"
 msgstr "трябва да бъде валиден LDAP потребител"
 
-#: include/classes/class.cmultiselect.php:52 jsLoader.php:191
+#: include/classes/class.cmultiselect.php:54 jsLoader.php:191
 msgid "new"
 msgstr ""
 
@@ -14346,7 +14766,7 @@ msgstr "покажи съответствие на икони"
 msgid "show value mappings"
 msgstr "покажи стойност на реализациите"
 
-#: api/classes/CHostGeneral.php:156
+#: api/classes/CHostBase.php:53
 #, php-format
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "шаблон с ID \"%1$s\" е изпълнен  %2$s пъти"
@@ -14360,7 +14780,7 @@ msgstr "до"
 msgid "trigger"
 msgstr "тригер"
 
-#: include/classes/class.cmultiselect.php:51 jsLoader.php:190
+#: include/classes/class.cmultiselect.php:53 jsLoader.php:190
 msgid "type here to search"
 msgstr ""
 
@@ -14370,7 +14790,7 @@ msgstr ""
 msgid "unknown"
 msgstr "неизвестен"
 
-#: include/views/common.macros.php:34
+#: include/views/common.macros.php:45
 msgid "value"
 msgstr "стойност"
 
@@ -14398,6 +14818,6 @@ msgstr "г"
 msgid "yes"
 msgstr "да"
 
-#: include/html.inc.php:640
+#: include/html.inc.php:676
 msgid "yyyy"
 msgstr "гггг"
