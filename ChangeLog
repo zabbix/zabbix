@@ -386,6 +386,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Lithuanian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-6902] reverting Solaris system.swap.size calculation from "swap -s" (used in 2.0.7, 2.0.8) to "swap -l"-like algorithm (as in 2.0.6) (Andris)
 .......P.. [ZBX-6936] fixed MySQL errors when updating configuration of the proxy (Sasha)
 .......P.. [ZBX-6929] fixed updating of lastlogsize and mtime in the proxy's database (Sasha)
 ..F....... [ZBX-6923] fixed mass delete in template list, 'Delete selected' and 'Delete selected with linked elements' functions (Vitalij)
