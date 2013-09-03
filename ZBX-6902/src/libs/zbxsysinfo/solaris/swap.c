@@ -35,7 +35,6 @@
 static int	get_swapinfo(zbx_uint64_t *total, zbx_uint64_t *free1)
 {
 	int			i, cnt, cnt2, page_size, ret = SUCCEED;
-	zbx_uint64_t		t, f;
 	struct swaptable	*swt = NULL;
 	struct swapent		*ste;
 	static char		path[256];
@@ -71,7 +70,7 @@ static int	get_swapinfo(zbx_uint64_t *total, zbx_uint64_t *free1)
 	}
 
 	/* walk through the structs and sum up the fields */
-	t = f = 0;
+	*total = *free1 = 0;
 	ste = &(swt->swt_ent[0]);
 	i = cnt;
 	while (--i >= 0)
@@ -79,8 +78,8 @@ static int	get_swapinfo(zbx_uint64_t *total, zbx_uint64_t *free1)
 		/* don't count slots being deleted */
 		if (0 == (ste->ste_flags & (ST_INDEL | ST_DOINGDEL)))
 		{
-			t += ste->ste_pages;
-			f += ste->ste_free;
+			*total += ste->ste_pages;
+			*free += ste->ste_free;
 		}
 		ste++;
 	}
@@ -88,8 +87,8 @@ static int	get_swapinfo(zbx_uint64_t *total, zbx_uint64_t *free1)
 	page_size = getpagesize();
 
 	/* fill in the results */
-	*total = page_size * t;
-	*free1 = page_size * f;
+	*total *= page_size;
+	*free1 *= page_size;
 finish:
 	zbx_free(swt);
 
