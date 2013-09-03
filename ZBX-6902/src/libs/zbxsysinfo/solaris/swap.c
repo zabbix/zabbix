@@ -34,12 +34,11 @@
  ******************************************************************************/
 static int	get_swapinfo(zbx_uint64_t *total, zbx_uint64_t *free1)
 {
-	int	i, cnt, cnt2, page_size, ret = SUCCEED;
-
-	zbx_uint64_t	t, f;
-	struct swaptable *swt = NULL;
-	struct swapent *ste;
-	static char path[256];
+	int			i, cnt, cnt2, page_size, ret = SUCCEED;
+	zbx_uint64_t		t, f;
+	struct swaptable	*swt = NULL;
+	struct swapent		*ste;
+	static char		path[256];
 
 	/* get total number of swap entries */
 	if (-1 == (cnt = swapctl(SC_GETNSWP, 0)))
@@ -78,7 +77,7 @@ static int	get_swapinfo(zbx_uint64_t *total, zbx_uint64_t *free1)
 	while (--i >= 0)
 	{
 		/* don't count slots being deleted */
-		if (!(ste->ste_flags & ST_INDEL) && !(ste->ste_flags & ST_DOINGDEL))
+		if (0 == (ste->ste_flags & (ST_INDEL | ST_DOINGDEL)))
 		{
 			t += ste->ste_pages;
 			f += ste->ste_free;
@@ -157,8 +156,8 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 	{
 		{"total",	SYSTEM_SWAP_TOTAL},
 		{"free",	SYSTEM_SWAP_FREE},
-		{"pused",       SYSTEM_SWAP_PUSED},
-		{"pfree",       SYSTEM_SWAP_PFREE},
+		{"pused",	SYSTEM_SWAP_PUSED},
+		{"pfree",	SYSTEM_SWAP_PFREE},
 		{NULL,		0}
 	};
 
@@ -172,7 +171,7 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 		return SYSINFO_RET_FAIL;	/* first parameter must be one of missing, empty or "all" */
 
 	if (0 != get_param(param, 2, mode, sizeof(mode)) || '\0' == *mode)
-		zbx_snprintf(mode, sizeof(mode), "free");	/* default parameter */
+		strscpy(mode, "free");	/* default parameter */
 
 	for (i = 0; NULL != fl[i].mode; i++)
 	{
