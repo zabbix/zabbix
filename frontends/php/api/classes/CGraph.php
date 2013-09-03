@@ -571,6 +571,7 @@ class CGraph extends CGraphGeneral {
 	 *
 	 * @param array   $graphs
 	 * @param boolean $update
+	 * @param array $dbGraphs
 	 *
 	 * @return void
 	 */
