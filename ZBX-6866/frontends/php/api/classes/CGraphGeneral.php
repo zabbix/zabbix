@@ -41,6 +41,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 	 *
 	 * @param array $graphs
 	 * @param bool  $update
+	 * @param array $dbGraphs
 	 *
 	 * @return true
 	 */
@@ -547,6 +548,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 	 *
 	 * @param array $graphs
 	 * @param boolean $update
+	 * @param array $dbGraphs
 	 *
 	 * @return array
 	 */
