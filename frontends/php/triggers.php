@@ -425,6 +425,8 @@ else {
 		$data['triggers'] = API::Trigger()->get($options);
 	}
 
+	$_REQUEST['hostid'] = isset($_REQUEST['hostid']) ? $_REQUEST['hostid'] : $data['pageFilter']->hostid;
+
 	// paging
 	$urlParams = array('hostid' => $_REQUEST['hostid']);
 	$data['paging'] = getPagingLine($data['triggers'], $urlParams);
