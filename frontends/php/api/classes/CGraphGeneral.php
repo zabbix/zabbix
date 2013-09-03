@@ -44,17 +44,8 @@ abstract class CGraphGeneral extends CZBXAPI {
 	 *
 	 * @return true
 	 */
-	protected function checkInput($graphs, $update = false) {
+	protected function checkInput($graphs, $update = false, $dbGraphs = array()) {
 		$colorValidator = new CColorValidator();
-
-		if ($update) {
-			$dbGitems = $this->get(array(
-				'graphids' => zbx_objectValues($graphs, 'graphid'),
-				'editable' => true,
-				'preservekeys' => true,
-				'selectGraphItems' => array('gitemid', 'itemid')
-			));
-		}
 
 		foreach ($graphs as $graph) {
 			// check for "templateid", because it is not allowed
@@ -74,7 +65,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 				// trow an error if new items added from other hosts
 				if ($update) {
 					// first item determines to which host graph belongs to
-					$gitem = array_shift($dbGitems[$graph['graphid']]['gitems']);
+					$gitem = array_shift($dbGraphs[$graph['graphid']]['gitems']);
 					$graphHosts = API::Host()->get(array(
 						'itemids' => $gitem['itemid'],
 						'output' => array('hostid', 'status'),
@@ -115,7 +106,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 					// when creating, check if new items are from same templated host
 					$graphHosts = API::Host()->get(array(
 						'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
-						'output' => API_OUTPUT_EXTEND,
+						'output' => array('hostid', 'status'),
 						'editable' => true,
 						'templated_hosts' => true
 					));
@@ -252,7 +243,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 			}
 		}
 
-		$this->checkInput($graphs, true);
+		$this->checkInput($graphs, true, $dbGraphs);
 
 		foreach ($graphs as $graph) {
 			unset($graph['templateid']);
@@ -277,7 +268,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 		$graphs = zbx_toArray($graphs);
 		$graphids = array();
 
-		$this->checkInput($graphs);
+		$this->checkInput($graphs, false);
 
 		foreach ($graphs as $graph) {
 			$graph['graphid'] = $this->createReal($graph);
@@ -559,19 +550,12 @@ abstract class CGraphGeneral extends CZBXAPI {
 	 *
 	 * @return array
 	 */
-	protected function setGraphDefaultValues($graphs, $update = false) {
+	protected function setGraphDefaultValues($graphs, $update = false, $dbGraphs = array()) {
 		// get graph fields and items on Update
 		if ($update) {
 			$graphs = $this->extendObjects($this->tableName(), $graphs,
 				array('name', 'graphtype', 'ymin_type', 'ymax_type', 'yaxismin', 'yaxismax')
 			);
-
-			$dbGitems = $this->get(array(
-				'graphids' => zbx_objectValues($graphs, 'graphid'),
-				'editable' => true,
-				'preservekeys' => true,
-				'selectGraphItems' => array('gitemid', 'itemid', 'type')
-			));
 
 			// load graph items from DB on Update
 			foreach ($graphs as &$graph) {
@@ -584,7 +568,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 
 						if (isset($gitems['gitemid']) && $gitems['gitemid']) {
 							$validGitemIds = array();
-							foreach ($dbGitems[$graph['graphid']]['gitems'] as $dbGitem) {
+							foreach ($dbGraphs[$graph['graphid']]['gitems'] as $dbGitem) {
 								$validGitemIds[$dbGitem['gitemid']] = $dbGitem['gitemid'];
 							}
 
@@ -597,7 +581,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 					}
 				}
 				else {
-					$graph['gitems'] = $dbGitems[$graph['graphid']]['gitems'];
+					$graph['gitems'] = $dbGraphs[$graph['graphid']]['gitems'];
 				}
 			}
 			unset($graph);

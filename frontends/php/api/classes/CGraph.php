@@ -574,8 +574,8 @@ class CGraph extends CGraphGeneral {
 	 *
 	 * @return void
 	 */
-	protected function checkInput($graphs, $update = false) {
-		$graphs = $this->setGraphDefaultValues($graphs, $update);
+	protected function checkInput($graphs, $update = false, $dbGraphs = array()) {
+		$graphs = $this->setGraphDefaultValues($graphs, $update, $dbGraphs);
 
 		$itemids = array();
 
@@ -643,7 +643,7 @@ class CGraph extends CGraphGeneral {
 			}
 		}
 
-		parent::checkInput($graphs, $update);
+		parent::checkInput($graphs, $update, $dbGraphs);
 
 		$allowedValueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
 
