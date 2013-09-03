@@ -272,6 +272,14 @@ if (isset($_REQUEST['filter_set'])) {
 	CProfile::update('web.items.filter_templated_items', $_REQUEST['filter_templated_items'], PROFILE_TYPE_INT);
 	CProfile::update('web.items.filter_with_triggers', $_REQUEST['filter_with_triggers'], PROFILE_TYPE_INT);
 	CProfile::update('web.items.filter_ipmi_sensor', $_REQUEST['filter_ipmi_sensor'], PROFILE_TYPE_STR);
+
+	// subfilters
+	foreach (array('subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'subfilter_status', 'subfilter_state',
+			'subfilter_templated_items', 'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval',
+			'subfilter_history', 'subfilter_trends') as $name) {
+		$_REQUEST[$name] = get_request($name, Array());
+		CProfile::update('web.items.'.$name, implode(";", $_REQUEST[$name]), PROFILE_TYPE_STR);
+	}
 }
 else {
 	$_REQUEST['filter_groupid'] = CProfile::get('web.items.filter_groupid');
@@ -294,6 +302,17 @@ else {
 	$_REQUEST['filter_templated_items'] = CProfile::get('web.items.filter_templated_items', -1);
 	$_REQUEST['filter_with_triggers'] = CProfile::get('web.items.filter_with_triggers', -1);
 	$_REQUEST['filter_ipmi_sensor'] = CProfile::get('web.items.filter_ipmi_sensor');
+
+	// subfilters
+	foreach (array('subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'subfilter_status', 'subfilter_state',
+			'subfilter_templated_items', 'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval',
+			'subfilter_history', 'subfilter_trends') as $name) {
+		$_REQUEST[$name] = Array();
+		if ($tmpVal = CProfile::get('web.items.'.$name)) {
+			$_REQUEST[$name] = explode(";", $tmpVal);
+			$_REQUEST[$name] = array_combine($_REQUEST[$name], $_REQUEST[$name]);
+		}
+	}
 }
 
 if (!isset($_REQUEST['form']) && isset($_REQUEST['filter_hostid']) && !empty($_REQUEST['filter_hostid'])) {
@@ -307,13 +326,6 @@ if (!isset($_REQUEST['form']) && isset($_REQUEST['filter_hostid']) && !empty($_R
 	if ($host) {
 		$_REQUEST['hostid'] = isset($host['hostid']) ? $host['hostid'] : $host['templateid'];
 	}
-}
-
-// subfilters
-foreach (array('subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'subfilter_status', 'subfilter_state',
-			'subfilter_templated_items', 'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval',
-			'subfilter_history', 'subfilter_trends') as $name) {
-	$_REQUEST[$name] = isset($_REQUEST['filter_set']) ? array() : get_request($name, array());
 }
 
 /*
@@ -340,7 +352,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 	}
 	show_messages($result, _('Item deleted'), _('Cannot delete item'));
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
-	clearCookies($result, $_REQUEST['hostid']);
+	clearCookies($result, get_request('hostid'));
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])) {
 	unset($_REQUEST['itemid']);
@@ -460,7 +472,7 @@ elseif (isset($_REQUEST['save'])) {
 
 	if ($result) {
 		unset($_REQUEST['itemid'], $_REQUEST['form']);
-		clearCookies($result, $_REQUEST['hostid']);
+		clearCookies($result, get_request('hostid'));
 	}
 }
 // cleaning history for one item
@@ -482,7 +494,7 @@ elseif (isset($_REQUEST['del_history']) && isset($_REQUEST['itemid'])) {
 	$result = DBend($result);
 
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
-	clearCookies($result, $_REQUEST['hostid']);
+	clearCookies($result, get_request('hostid'));
 }
 // mass update
 elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])) {
@@ -640,7 +652,7 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 
 	if ($result) {
 		unset($_REQUEST['group_itemid'], $_REQUEST['massupdate'], $_REQUEST['update'], $_REQUEST['form']);
-		clearCookies($result, $_REQUEST['hostid']);
+		clearCookies($result, get_request('hostid'));
 	}
 }
 elseif ($_REQUEST['go'] == 'activate' && isset($_REQUEST['group_itemid'])) {
@@ -652,7 +664,7 @@ elseif ($_REQUEST['go'] == 'activate' && isset($_REQUEST['group_itemid'])) {
 	$goResult = DBend($goResult);
 
 	show_messages($goResult, _('Items activated'), null);
-	clearCookies($goResult, $_REQUEST['hostid']);
+	clearCookies($goResult, get_request('hostid'));
 }
 elseif ($_REQUEST['go'] == 'disable' && isset($_REQUEST['group_itemid'])) {
 	$group_itemid = $_REQUEST['group_itemid'];
@@ -663,7 +675,7 @@ elseif ($_REQUEST['go'] == 'disable' && isset($_REQUEST['group_itemid'])) {
 	$goResult = DBend($goResult);
 
 	show_messages($goResult, _('Items disabled'), null);
-	clearCookies($goResult, $_REQUEST['hostid']);
+	clearCookies($goResult, get_request('hostid'));
 }
 elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQUEST['group_itemid'])) {
 	if (isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])) {
@@ -693,7 +705,7 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQU
 		$goResult = DBend($goResult);
 
 		show_messages($goResult, _('Items copied'), _('Cannot copy items'));
-		clearCookies($goResult, $_REQUEST['hostid']);
+		clearCookies($goResult, get_request('hostid'));
 
 		$_REQUEST['go'] = 'none2';
 	}
@@ -721,7 +733,7 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_itemid'])) 
 	$goResult = DBend($goResult);
 
 	show_messages($goResult, _('History cleared'), $goResult);
-	clearCookies($goResult, $_REQUEST['hostid']);
+	clearCookies($goResult, get_request('hostid'));
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
 	DBstart();
@@ -746,7 +758,7 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
 	}
 
 	show_messages(DBend($goResult), _('Items deleted'), _('Cannot delete items'));
-	clearCookies($goResult, $_REQUEST['hostid']);
+	clearCookies($goResult, get_request('hostid'));
 }
 
 /*
@@ -899,6 +911,8 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['group_itemid'])) {
 }
 // list of items
 else {
+	$_REQUEST['hostid'] = empty($_REQUEST['filter_hostid']) ? NULL : $_REQUEST['filter_hostid'];
+
 	$data = array(
 		'form' => get_request('form'),
 		'hostid' => get_request('hostid'),
