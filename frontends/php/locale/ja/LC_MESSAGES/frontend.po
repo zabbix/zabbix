@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-03 18:47+0300\n"
-"PO-Revision-Date: 2013-08-27 05:56+0200\n"
+"POT-Creation-Date: 2013-09-03 18:54+0300\n"
+"PO-Revision-Date: 2013-08-31 11:02+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -11,8 +11,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Pootle 2.1.6\n"
+"X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
+"X-POOTLE-MTIME: 1377939775.0\n"
 
 #: include/views/configuration.item.edit.php:389
 msgid " day"
@@ -557,7 +558,7 @@ msgstr "グリッドに揃える"
 #: include/views/monitoring.dashconf.php:48
 #: include/views/monitoring.dashconf.php:92 jsLoader.php:89 popup_right.php:56
 msgid "All"
-msgstr "全て"
+msgstr "すべて"
 
 #: include/classes/class.chostsinfo.php:115
 #: include/classes/class.ctriggersinfo.php:124
