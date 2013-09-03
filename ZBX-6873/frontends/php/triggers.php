@@ -424,7 +424,10 @@ else {
 		}
 		$data['triggers'] = API::Trigger()->get($options);
 	}
-	$data['paging'] = getPagingLine($data['triggers']);
+
+	// paging
+	$urlParams = array('hostid' => $_REQUEST['hostid']);
+	$data['paging'] = getPagingLine($data['triggers'], $urlParams);
 
 	$data['triggers'] = API::Trigger()->get(array(
 		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid'),
