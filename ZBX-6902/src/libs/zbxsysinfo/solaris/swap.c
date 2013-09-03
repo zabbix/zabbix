@@ -79,7 +79,7 @@ static int	get_swapinfo(zbx_uint64_t *total, zbx_uint64_t *free1)
 		if (0 == (ste->ste_flags & (ST_INDEL | ST_DOINGDEL)))
 		{
 			*total += ste->ste_pages;
-			*free += ste->ste_free;
+			*free1 += ste->ste_free;
 		}
 		ste++;
 	}
