@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-03 18:47+0300\n"
-"PO-Revision-Date: 2013-08-15 22:45+0200\n"
+"POT-Creation-Date: 2013-09-03 18:54+0300\n"
+"PO-Revision-Date: 2013-09-02 13:11+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -11,8 +11,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Pootle 2.1.6\n"
+"X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
+"X-POOTLE-MTIME: 1378120275.0\n"
 
 #: include/views/configuration.item.edit.php:389
 msgid " day"
@@ -95,7 +96,7 @@ msgstr[2] "%d устройств"
 #, php-format
 msgctxt "user fullname"
 msgid "(%1$s %2$s)"
-msgstr ""
+msgstr "(%1$s %2$s)"
 
 #: include/views/configuration.action.edit.php:436
 msgid "(0 - infinitely)"
@@ -4731,47 +4732,47 @@ msgstr "Поле"
 #: include/classes/db/DB.php:327
 #, php-format
 msgid "Field \"%1$s\" cannot be set to NULL."
-msgstr ""
+msgstr "Поле \"%1$s\" не может быть NULL."
 
 #: include/validate.inc.php:400
 #, php-format
 msgid "Field \"%1$s\" is mandatory."
-msgstr ""
+msgstr "Поле \"%1$s\" обязательно."
 
 #: include/validate.inc.php:313
 #, php-format
 msgid "Field \"%1$s\" is not IP range."
-msgstr ""
+msgstr "Поле \"%1$s\" не диапазон IP адресов."
 
 #: include/validate.inc.php:303
 #, php-format
 msgid "Field \"%1$s\" is not IP."
-msgstr ""
+msgstr "Поле \"%1$s\" не IP адрес."
 
 #: include/validate.inc.php:338
 #, php-format
 msgid "Field \"%1$s\" is not decimal number."
-msgstr ""
+msgstr "Поле \"%1$s\" не десятичное число."
 
 #: include/validate.inc.php:323
 #, php-format
 msgid "Field \"%1$s\" is not integer list or range."
-msgstr ""
+msgstr "Поле \"%1$s\" не список и не диапазон чисел."
 
 #: include/validate.inc.php:332
 #, php-format
 msgid "Field \"%1$s\" is not integer."
-msgstr ""
+msgstr "Поле \"%1$s\" не число."
 
 #: include/validate.inc.php:344
 #, php-format
 msgid "Field \"%1$s\" is not string."
-msgstr ""
+msgstr "Поле \"%1$s\" не строка."
 
 #: include/validate.inc.php:412
 #, php-format
 msgid "Field \"%1$s\" must be missing."
-msgstr ""
+msgstr "Поле \"%1$s\" должно быть пропущено."
 
 #: api/classes/CDRule.php:384
 msgid "Field \"druleid\" is required."
@@ -6829,12 +6830,12 @@ msgstr "Некорректная группа пользователей."
 #: include/validate.inc.php:451
 #, php-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
-msgstr ""
+msgstr "Некорректное значение \"%1$s\" для \"%2$s\" поля."
 
 #: include/validate.inc.php:447
 #, php-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
-msgstr ""
+msgstr "Некорректное значение \"%1$s\" для \"%2$s\" поля: должно быть между %3$s и %4$s."
 
 #: include/classes/db/DB.php:357
 #, php-format
@@ -6854,7 +6855,7 @@ msgstr "Некорректное значение \"%1$s\" для поля це�
 #: include/validate.inc.php:442
 #, php-format
 msgid "Incorrect value for field \"%1$s\": cannot be empty."
-msgstr ""
+msgstr "Некорректное значение для поля \"%1$s\": не может быть пустым."
 
 #: include/classes/class.cbuttonqmessage.php:52
 #, php-format
@@ -6942,17 +6943,17 @@ msgstr "У интерфейса с IP адресом \"%1$s\" не может б
 #: include/views/administration.authentication.edit.php:35
 msgctxt "authentication"
 msgid "Internal"
-msgstr ""
+msgstr "Внутренняя"
 
 #: include/views/configuration.action.list.php:36
 msgctxt "event source"
 msgid "Internal"
-msgstr ""
+msgstr "Внутренняя"
 
 #: include/users.inc.php:84
 msgctxt "user type"
 msgid "Internal"
-msgstr ""
+msgstr "Внутренний"
 
 #: api/rpc/class.cjsonrpc.php:202
 msgid "Internal JSON-RPC error."
@@ -8251,9 +8252,9 @@ msgstr "Добавлено максимальное количество пер�
 #, php-format
 msgid "Maximum time period to display is %1$s day."
 msgid_plural "Maximum time period to display is %1$s days."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Максимальный период времени отображения %1$s день."
+msgstr[1] "Максимальный период времени отображения %1$s дней."
+msgstr[2] "Максимальный период времени отображения %1$s дня."
 
 #: popup_trexpr.php:259
 msgid "Maximum value for period T is < N"
@@ -8440,9 +8441,9 @@ msgstr "Минимальная важность"
 #, php-format
 msgid "Minimum time period to display is %1$s hour."
 msgid_plural "Minimum time period to display is %1$s hours."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Максимальный период времени отображения %1$s час."
+msgstr[1] "Максимальный период времени отображения %1$s часов."
+msgstr[2] "Максимальный период времени отображения %1$s часа."
 
 #: include/views/configuration.sysmap.edit.php:132 tr_status.php:303
 msgid "Minimum trigger severity"
@@ -8475,7 +8476,7 @@ msgstr "Пропущено поле \"%1$s\" для условия действ�
 
 #: api/classes/CGraphGeneral.php:531
 msgid "Missing \"gitemid\" field for item."
-msgstr ""
+msgstr "Пропущено \"gitemid\" поле для элемента данных."
 
 #: api/classes/CGraph.php:603 api/classes/CGraphPrototype.php:611
 msgid "Missing \"itemid\" field for item."
@@ -8483,7 +8484,7 @@ msgstr "Пропущено поле \"itemid\" для элемента данн�
 
 #: api/classes/CGraphPrototype.php:593
 msgid "Missing \"name\" field for graph prototype."
-msgstr ""
+msgstr "Пропущено \"name\" поле для прототипа графика."
 
 #: api/classes/CGraph.php:586
 msgid "Missing \"name\" field for graph."
@@ -11056,7 +11057,7 @@ msgstr "По правой стороне"
 
 #: include/locales.inc.php:72
 msgid "Romanian (ro_RO)"
-msgstr ""
+msgstr "Румынский (ro_RO)"
 
 #: include/views/configuration.screen.constructor.edit.php:601
 #: screenedit.php:47
@@ -11246,7 +11247,7 @@ msgstr "Количество SQL: %s (selects: %s | executes: %s)"
 
 #: include/items.inc.php:1427 include/views/configuration.item.edit.php:199
 msgid "SQL query"
-msgstr ""
+msgstr "SQL запрос"
 
 #: include/classes/db/DB.php:716
 #, php-format
@@ -14546,7 +14547,7 @@ msgstr "изображение"
 
 #: include/actions.inc.php:33
 msgid "in"
-msgstr "в"
+msgstr "внутреннее"
 
 #: include/events.inc.php:37
 msgctxt "event source"

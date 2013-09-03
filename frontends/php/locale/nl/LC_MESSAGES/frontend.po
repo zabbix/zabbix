@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-03 18:47+0300\n"
-"PO-Revision-Date: 2013-08-07 16:41+0200\n"
+"POT-Creation-Date: 2013-09-03 18:54+0300\n"
+"PO-Revision-Date: 2013-09-02 13:03+0300\n"
 "Last-Translator: open-future <patrik@open-future.be>\n"
 "Language-Team: NL\n"
 "Language: nl\n"
@@ -13,8 +13,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.1.6\n"
+"X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
+"X-POOTLE-MTIME: 1378119820.0\n"
 
 #: include/views/configuration.item.edit.php:389
 msgid " day"
@@ -90,7 +91,7 @@ msgstr[1] "%d devices"
 #, php-format
 msgctxt "user fullname"
 msgid "(%1$s %2$s)"
-msgstr ""
+msgstr "(%1$s %2$s)"
 
 #: include/views/configuration.action.edit.php:436
 msgid "(0 - infinitely)"
@@ -315,7 +316,7 @@ msgstr "Actie"
 #: api/classes/CAction.php:684
 #, php-format
 msgid "Action \"%1$s\" already exists."
-msgstr ""
+msgstr "Actie \"%1$s\" bestaat reeds."
 
 #: api/classes/CAction.php:540 api/classes/CAction.php:655
 #, php-format
@@ -325,7 +326,7 @@ msgstr "Actie \"%14s\" heeft verkeerde waare voor \"esc_period\" (minimum %2$s s
 #: api/classes/CAction.php:726
 #, php-format
 msgid "Action \"%1$s\" no operations defined."
-msgstr ""
+msgstr "Actie \"%1$s\" geen bewerking gedefinieerd."
 
 #: api/classes/CAction.php:664
 #, php-format
@@ -915,11 +916,11 @@ msgstr "Bind paswoord"
 
 #: popup_trexpr.php:521
 msgid "Bitwise AND of last (most recent) T value and mask is = N"
-msgstr ""
+msgstr "Bitsgewijs AND van de laatste (meest recente) T-waarde en masker is = N"
 
 #: popup_trexpr.php:526
 msgid "Bitwise AND of last (most recent) T value and mask is NOT N"
-msgstr ""
+msgstr "Bitsgewijs AND van de laatste (meest recente) T-waarde en masker is NOT N"
 
 #: include/classes/core/ZBase.php:233
 msgid "Black & Blue"
