@@ -41,7 +41,7 @@ $actionWidget->addHeader(_('Actions'), $filterForm);
 $actionWidget->addHeaderRowNumber();
 
 // create form
-$actionForm = new CForm('get');
+$actionForm = new CForm();
 $actionForm->setName('actionForm');
 
 // create table
