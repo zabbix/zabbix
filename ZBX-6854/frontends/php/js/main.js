@@ -208,16 +208,15 @@ var chkbxRange = {
 
 	// check if all checkboxes are selected and select main checkbox, else disable checkbox, select options and button
 	selectMainCheckbox: function() {
-		if (!jQuery('.tableinfo .header .checkbox:not(:disabled)').length) {
-			return;
-		}
+		var countAvailable = jQuery('.tableinfo tr:not(.header) .checkbox:not(:disabled)').length,
+			mainCheckbox = jQuery('.tableinfo .header .checkbox:not(:disabled)');
 
-		var countAvailable = jQuery('.tableinfo tr:not(.header) .checkbox:not(:disabled)').length;
-		var countChecked = jQuery('.tableinfo tr:not(.header) .checkbox:not(:disabled):checked').length;
-		var mainCheckbox = jQuery('.tableinfo .header .checkbox:not(:disabled)')[0];
+		if (countAvailable > 0 && mainCheckbox.length > 0) {
+			var countChecked = jQuery('.tableinfo tr:not(.header) .checkbox:not(:disabled):checked').length;
 
-		if (countAvailable > 0) {
+			mainCheckbox = mainCheckbox[0];
 			mainCheckbox.checked = (countChecked == countAvailable);
+
 			if (mainCheckbox.checked) {
 				jQuery('.tableinfo .header').addClass('selectedMain');
 			}
@@ -225,7 +224,7 @@ var chkbxRange = {
 				jQuery('.tableinfo .header').removeClass('selectedMain');
 			}
 		}
-		else if (typeof(mainCheckbox) !== 'undefined') {
+		else if (mainCheckbox.length > 0) {
 			mainCheckbox.disabled = true;
 		}
 	},
