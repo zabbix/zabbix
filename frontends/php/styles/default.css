@@ -180,6 +180,7 @@ textarea.textarea_big { height: auto; }
 .textarea_big { width: 524px; }
 .button { border: 1px solid #808080; vertical-align: top; margin: 1px 2px 1px 1px; background: #F0F0F0 url('../images/gradients/button.gif') repeat-x top left; }
 .button:hover { border-color: black; cursor: pointer; }
+.textElement { margin-top: 2px; display: inline-block; height: 14px; }
 
 /* button displayed as link */
 .link_menu {
