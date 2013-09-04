@@ -35,7 +35,12 @@ class CGraphPrototype extends CGraphGeneral {
 
 		$this->errorMessages = array_merge($this->errorMessages, array(
 			self::ERROR_TEMPLATE_HOST_MIX =>
-				_('Graph prototype "%1$s" with templated items cannot contain items from other hosts.')
+				_('Graph prototype "%1$s" with templated items cannot contain items from other hosts.'),
+			self::ERROR_MISSING_GRAPH_NAME => _('Missing "name" field for graph prototype.'),
+			self::ERROR_MISSING_GRAPH_ITEMS => _('Missing items for graph prototype "%1$s".'),
+			self::ERROR_MISSING_REQUIRED_VALUE => _('No "%1$s" given for graph prototype.'),
+			self::ERROR_TEMPLATED_ID => _('Cannot update "templateid" for graph prototype "%1$s".'),
+			self::ERROR_GRAPH_SUM => _('Cannot add more than one item with type "Graph sum" on graph prototype "%1$s".')
 		));
 	}
 
@@ -573,122 +578,6 @@ class CGraphPrototype extends CGraphGeneral {
 		return array('graphids' => $delGraphPrototypeIds);
 	}
 
-	/**
-	 * Check graph data
-	 *
-	 * @param array $graphs
-	 * @param boolean $update
-	 * @param array $dbGraphs
-	 *
-	 * @return void
-	 */
-	protected function checkInput($graphs, $update = false, $dbGraphs = array()) {
-		$graphs = $this->setGraphDefaultValues($graphs, $update, $dbGraphs);
-
-		$itemids = array();
-
-		foreach ($graphs as $graph) {
-			// validate graph name on create
-			$fields = array('name' => null);
-			if (!$update && !check_db_fields($fields, $graph)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "name" field for graph prototype.'));
-			}
-
-			// on create graph items are mandatory, but on update graph items are optional
-			if ((!$update && (!isset($graph['gitems']) || !is_array($graph['gitems']) || !$graph['gitems']))
-					|| ($update && isset($graph['gitems']) && (!is_array($graph['gitems']) || !$graph['gitems']))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Missing items for graph prototype "%1$s".', $graph['name'])
-				);
-			}
-
-			// validate item fields
-			if (isset($graph['gitems'])) {
-				$fields = array('itemid' => null);
-				foreach ($graph['gitems'] as $gitem) {
-					// on create "itemid" is required, on update required only if no "gitemid" is set
-					if ($update && !isset($gitem['gitemid']) && !check_db_fields($fields, $gitem)
-							|| !$update && !check_db_fields($fields, $gitem)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "itemid" field for item.'));
-					}
-
-					// assigning with key preserves unique itemids
-					$itemids[$gitem['itemid']] = $gitem['itemid'];
-				}
-			}
-
-			// add Y axis item IDs for persmission validation
-			if (isset($graph['ymin_type']) && $graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-				if (!isset($graph['ymin_itemid']) || zbx_empty($graph['ymin_itemid'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('No "%1$s" given for graph prototype.', 'ymin_itemid')
-					);
-				}
-				else {
-					$itemids[$graph['ymin_itemid']] = $graph['ymin_itemid'];
-				}
-			}
-			if (isset($graph['ymax_type']) && $graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-				if (!isset($graph['ymax_itemid']) || zbx_empty($graph['ymax_itemid'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('No "%1$s" given for graph prototype.', 'ymax_itemid')
-					);
-				}
-				else {
-					$itemids[$graph['ymax_itemid']] = $graph['ymax_itemid'];
-				}
-			}
-		}
-
-		$allowedItems = API::Item()->get(array(
-			'nodeids' => get_current_nodeid(true),
-			'itemids' => $itemids,
-			'webitems' => true,
-			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true,
-			'filter' => array('flags' => null)
-		));
-
-		foreach ($itemids as $itemid) {
-			if (!isset($allowedItems[$itemid])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-			}
-		}
-
-		foreach ($graphs as $graph) {
-			if (($update && isset($graph['gitems'])) || !$update) {
-				$hasPrototype = false;
-				if ($graph['gitems']) {
-					// check if the graph has at least one prototype
-					foreach ($graph['gitems'] as $gitem) {
-						// $allowedItems used because it is possible to make API call without full item data
-						if ($allowedItems[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
-							$hasPrototype = true;
-							break;
-						}
-					}
-				}
-
-				if (!$graph['gitems'] || !$hasPrototype) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph prototype must have at least one prototype.'));
-				}
-			}
-		}
-
-		parent::checkInput($graphs, $update, $dbGraphs);
-
-		$allowedValueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
-
-		foreach ($allowedItems as $item) {
-			if (!in_array($item['value_type'], $allowedValueTypes)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Cannot add a non-numeric item "%1$s" to graph "%2$s".', $item['name'], $graph['name'])
-				);
-			}
-		}
-	}
-
 	protected function createReal($graph) {
 		// mark the graph as a graph prototype
 		$graph['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
@@ -740,5 +629,122 @@ class CGraphPrototype extends CGraphGeneral {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Validate graph prototype specific data on Create method.
+	 * Get allowed item ID's, check permissions, check if items have at least one prototype, do all general validation,
+	 * and check for numeric item types.
+	 *
+	 * @param array $graphs
+	 */
+	protected function validateCreate(array $graphs) {
+		$itemIds = $this->validateItemsCreate($graphs);
+
+		$allowedItems = API::Item()->get(array(
+			'nodeids' => get_current_nodeid(true),
+			'itemids' => $itemIds,
+			'webitems' => true,
+			'editable' => true,
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true,
+			'filter' => array('flags' => null)
+		));
+
+		foreach ($itemIds as $itemid) {
+			if (!isset($allowedItems[$itemid])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+			}
+		}
+
+		foreach ($graphs as $graph) {
+			$hasPrototype = false;
+			if ($graph['gitems']) {
+				// check if the graph has at least one prototype
+				foreach ($graph['gitems'] as $gitem) {
+					// $allowedItems used because it is possible to make API call without full item data
+					if ($allowedItems[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
+						$hasPrototype = true;
+						break;
+					}
+				}
+			}
+
+			if (!$graph['gitems'] || !$hasPrototype) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph prototype must have at least one prototype.'));
+			}
+		}
+
+		parent::validateCreate($graphs);
+
+		$allowedValueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
+
+		foreach ($allowedItems as $item) {
+			if (!in_array($item['value_type'], $allowedValueTypes)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Cannot add a non-numeric item "%1$s" to graph prototype "%2$s".', $item['name'], $graph['name'])
+				);
+			}
+		}
+	}
+
+	/**
+	 * Validate graph prototype specific data on Update method.
+	 * Get allowed item ID's, check permissions, check if items have at least one prototype, do all general validation,
+	 * and check for numeric item types.
+	 *
+	 * @param array $graphs
+	 * @param array $dbGraphs
+	 */
+	protected function validateUpdate(array $graphs, array $dbGraphs) {
+		$itemIds = $this->validateItemsUpdate($graphs);
+
+		$allowedItems = API::Item()->get(array(
+			'nodeids' => get_current_nodeid(true),
+			'itemids' => $itemIds,
+			'webitems' => true,
+			'editable' => true,
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true,
+			'filter' => array('flags' => null)
+		));
+
+		foreach ($itemIds as $itemid) {
+			if (!isset($allowedItems[$itemid])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+			}
+		}
+
+		foreach ($graphs as $graph) {
+			if (isset($graph['gitems'])) {
+				$hasPrototype = false;
+				if ($graph['gitems']) {
+					// check if the graph has at least one prototype
+					foreach ($graph['gitems'] as $gitem) {
+						// $allowedItems used because it is possible to make API call without full item data
+						if ($allowedItems[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
+							$hasPrototype = true;
+							break;
+						}
+					}
+				}
+
+				if (!$graph['gitems'] || !$hasPrototype) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph prototype must have at least one prototype.'));
+				}
+			}
+		}
+
+		parent::validateUpdate($graphs, $dbGraphs);
+
+		$allowedValueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
+
+		foreach ($allowedItems as $item) {
+			if (!in_array($item['value_type'], $allowedValueTypes)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Cannot add a non-numeric item "%1$s" to graph prototype "%2$s".', $item['name'], $graph['name'])
+				);
+			}
+		}
 	}
 }
