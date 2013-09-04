@@ -625,7 +625,7 @@ jQuery(function($) {
 	function createMenuItem(label, link, subMenu) {
 		return $('<li>').append(
 			$('<a>', {
-				text: label,
+				html: label,
 				href: link
 			}),
 			(typeof subMenu === 'undefined') ? null : subMenu
