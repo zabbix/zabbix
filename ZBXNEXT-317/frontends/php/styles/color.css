@@ -108,3 +108,4 @@ table.tableinfo a.disabled:active		{ color: #DC0000; }
 
 .input.select.not-monitored				{ color: #DC0000; }
 .input option.not-monitored				{ color: #DC0000; }
+.input option.disabled					{ color: #DC0000; }
