@@ -41,7 +41,7 @@ $hostName = $this->data['overview']['host']['maintenance_status'] == HOST_MAINTE
 $overviewFormList->addRow(_('Host name'), $hostName);
 
 if ($this->data['overview']['host']['host'] != $this->data['overview']['host']['name']) {
-	$overviewFormList->addRow(_('Visible name'), $this->data['overview']['host']['name']);
+	$overviewFormList->addRow(_('Visible name'), new CSpan($this->data['overview']['host']['name'], 'textElement'));
 }
 
 foreach ($this->data['overview']['host']['interfaces'] as $interface) {
@@ -149,7 +149,7 @@ if (isset($jmxInterfaceRow)) {
 foreach ($this->data['tableValues'] as $key => $value) {
 	if (($this->data['tableTitles'][$key]['title'] == 'OS' || $this->data['tableTitles'][$key]['title'] == 'Hardware'
 			|| $this->data['tableTitles'][$key]['title'] == 'Software') && !zbx_empty($value)) {
-		$overviewFormList->addRow($this->data['tableTitles'][$key]['title'], new CSpan(zbx_str2links($value), 'pre'));
+		$overviewFormList->addRow($this->data['tableTitles'][$key]['title'], new CSpan(zbx_str2links($value), 'textElement'));
 	}
 }
 
@@ -239,7 +239,7 @@ $detailsFormList = new CFormList('hostinventoriesDetailsFormList');
 $inventoryValues = false;
 foreach ($this->data['tableValues'] as $key => $value) {
 	if (!zbx_empty($value)) {
-		$detailsFormList->addRow($this->data['tableTitles'][$key]['title'], new CSpan(zbx_str2links($value), 'pre'));
+		$detailsFormList->addRow($this->data['tableTitles'][$key]['title'], new CSpan(zbx_str2links($value), 'textElement'));
 		$inventoryValues = true;
 	}
 }

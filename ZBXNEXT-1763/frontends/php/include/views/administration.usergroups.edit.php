@@ -67,8 +67,8 @@ if ($isGranted) {
 else {
 	$userGroupForm->addVar('gui_access', $this->data['gui_access']);
 	$userGroupForm->addVar('users_status', GROUP_STATUS_ENABLED);
-	$userGroupFormList->addRow(_('Frontend access'), new CSpan(user_auth_type2str($this->data['gui_access']), 'green'));
-	$userGroupFormList->addRow(_('Enabled'), new CSpan(_('Enabled'), 'green'));
+	$userGroupFormList->addRow(_('Frontend access'), new CSpan(user_auth_type2str($this->data['gui_access']), 'textElement green'));
+	$userGroupFormList->addRow(_('Enabled'), new CSpan(_('Enabled'), 'textElement green'));
 }
 $userGroupFormList->addRow(_('Debug mode'), new CCheckBox('debug_mode', $this->data['debug_mode'], null, 1));
 
