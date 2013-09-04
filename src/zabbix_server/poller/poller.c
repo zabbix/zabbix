@@ -482,7 +482,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			res = get_value_internal(item, result);
 			break;
 		case ITEM_TYPE_DB_MONITOR:
-#ifdef HAVE_ODBC
+#ifdef HAVE_UNIXODBC
 			alarm(CONFIG_TIMEOUT);
 			res = get_value_db(item, result);
 			alarm(0);
@@ -568,6 +568,7 @@ static int	get_values(unsigned char poller_type)
 	const char	*__function_name = "get_values";
 	DC_ITEM		items[MAX_BUNCH_ITEMS];
 	AGENT_RESULT	results[MAX_BUNCH_ITEMS];
+	zbx_uint64_t	lastlogsizes[MAX_BUNCH_ITEMS];
 	int		errcodes[MAX_BUNCH_ITEMS];
 	zbx_timespec_t	timespec;
 	int		i, num;
@@ -586,6 +587,7 @@ static int	get_values(unsigned char poller_type)
 	{
 		init_result(&results[i]);
 		errcodes[i] = SUCCEED;
+		lastlogsizes[i] = 0;
 
 		ZBX_STRDUP(items[i].key, items[i].key_orig);
 		if (SUCCEED != substitute_key_macros(&items[i].key, NULL, &items[i], NULL,
@@ -663,6 +665,7 @@ static int	get_values(unsigned char poller_type)
 				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
 						NULL, &items[i].params, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
 				/* break; is not missing here */
+			case ITEM_TYPE_SIMPLE:
 			case ITEM_TYPE_JMX:
 				items[i].username = zbx_strdup(items[i].username, items[i].username_orig);
 				items[i].password = zbx_strdup(items[i].password, items[i].password_orig);
@@ -688,7 +691,6 @@ static int	get_values(unsigned char poller_type)
 		alarm(CONFIG_TIMEOUT);
 		get_values_java(ZBX_JAVA_GATEWAY_REQUEST_JMX, items, results, errcodes, num);
 		alarm(0);
-
 	}
 
 	zbx_timespec(&timespec);
@@ -716,16 +718,18 @@ static int	get_values(unsigned char poller_type)
 		{
 			items[i].state = ITEM_STATE_NORMAL;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i], &timespec,
-					items[i].state, NULL, 0, NULL, 0, 0, 0, 0);
+					items[i].state, NULL);
+			lastlogsizes[i] = get_log_result_lastlogsize(&results[i]);
 		}
 		else if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i])
 		{
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &timespec,
-					items[i].state, results[i].msg, 0, NULL, 0, 0, 0, 0);
+					items[i].state, results[i].msg);
 		}
 
-		DCrequeue_items(&items[i].itemid, &items[i].state, &timespec.sec, &errcodes[i], 1);
+		DCrequeue_items(&items[i].itemid, &items[i].state, &timespec.sec, &lastlogsizes[i], NULL,
+				&errcodes[i], 1);
 
 		zbx_free(items[i].key);
 
@@ -748,6 +752,7 @@ static int	get_values(unsigned char poller_type)
 				/* break; is not missing here */
 			case ITEM_TYPE_TELNET:
 			case ITEM_TYPE_DB_MONITOR:
+			case ITEM_TYPE_SIMPLE:
 			case ITEM_TYPE_JMX:
 				zbx_free(items[i].username);
 				zbx_free(items[i].password);

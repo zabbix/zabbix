@@ -49,10 +49,10 @@ $fields = array(
 	'groups'			=> array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null),
 	'clear_templates'	=> array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null),
 	'templates'			=> array(T_ZBX_INT, O_OPT, null,		DB_ID,	null),
+	'add_templates'		=> array(T_ZBX_INT, O_OPT, null,		DB_ID,	null),
 	'add_template' 		=> array(T_ZBX_STR, O_OPT, null,		null,	null),
-	'exist_templates' 	=> array(T_ZBX_INT, O_OPT, null,		DB_ID,	null),
 	'templateid'		=> array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	'isset({form})&&{form}=="update"'),
-	'template_name'		=> array(T_ZBX_STR, O_OPT, NOT_EMPTY,	null,	'isset({save})'),
+	'template_name'		=> array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY, 'isset({save})', _('Template name')),
 	'visiblename'		=> array(T_ZBX_STR, O_OPT, null,		null,	'isset({save})'),
 	'groupid'			=> array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null),
 	'twb_groupid'		=> array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null),
@@ -83,20 +83,11 @@ $_REQUEST['go'] = get_request('go', 'none');
 /*
  * Permissions
  */
-if (get_request('groupid', 0) > 0) {
-	$groupIds = available_groups($_REQUEST['groupid'], 1);
-	if (!$groupIds) {
-		access_deny();
-	}
+if (get_request('groupid') && !API::HostGroup()->isWritable(array($_REQUEST['groupid']))) {
+	access_deny();
 }
-if (get_request('templateid', 0) > 0) {
-	$templates = API::Template()->get(array(
-		'templateids' => $_REQUEST['templateid'],
-		'editable' => true
-	));
-	if (!$templates) {
-		access_deny();
-	}
+if (get_request('templateid') && !API::Template()->isWritable(array($_REQUEST['templateid']))) {
+	access_deny();
 }
 
 $templateIds = get_request('templates', array());
@@ -119,14 +110,8 @@ if ($exportData) {
 /*
  * Actions
  */
-if (!isset($_REQUEST['add_template'])) {
-	unset($_REQUEST['templates']);
-}
-
-if (isset($_REQUEST['exist_templates'])) {
-	$_REQUEST['templates'] = (isset($_REQUEST['templates']) && isset($_REQUEST['add_template']))
-		? array_merge($_REQUEST['exist_templates'], $_REQUEST['templates'])
-		: $_REQUEST['templates'] = $_REQUEST['exist_templates'];
+if (isset($_REQUEST['add_template']) && isset($_REQUEST['add_templates'])) {
+	$_REQUEST['templates'] = array_merge($templateIds, $_REQUEST['add_templates']);
 }
 if (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear'])) {
 	$_REQUEST['clear_templates'] = get_request('clear_templates', array());
@@ -157,7 +142,6 @@ elseif (isset($_REQUEST['save'])) {
 
 		$macros = get_request('macros', array());
 		$groups = get_request('groups', array());
-		$hosts = get_request('hosts', array());
 		$templates = get_request('templates', array());
 		$templatesClear = get_request('clear_templates', array());
 		$templateId = get_request('templateid', 0);
@@ -222,7 +206,13 @@ elseif (isset($_REQUEST['save'])) {
 
 		$templatesClear = zbx_toObject($templatesClear, 'templateid');
 
-		$hosts = zbx_toObject($hosts, 'hostid');
+		// skip discovered hosts
+		$hosts = API::Host()->get(array(
+			'hostids' => get_request('hosts', array()),
+			'output' => array('hostid'),
+			'templated_hosts' => true,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
+		));
 
 		$template = array(
 			'host' => $templateName,
@@ -392,9 +382,9 @@ elseif (str_in_array($_REQUEST['go'], array('delete', 'delete_and_clear')) && is
 
 	$goResult = true;
 
-	if (isset($_REQUEST['delete'])) {
+	if ($_REQUEST['go'] == 'delete') {
 		$goResult = API::Template()->massUpdate(array(
-			'templateids' => $templates,
+			'templates' => zbx_toObject($templates, 'templateid'),
 			'hosts' => array()
 		));
 	}
@@ -446,19 +436,15 @@ if (isset($_REQUEST['form'])) {
 		$data['dbTemplate'] = reset($dbTemplates);
 
 		$data['original_templates'] = array();
-		foreach ($data['dbTemplate']['parentTemplates'] as $tnum => $tpl) {
-			$data['original_templates'][] = $tpl['templateid'];
+		foreach ($data['dbTemplate']['parentTemplates'] as $parentTemplate) {
+			$data['original_templates'][$parentTemplate['templateid']] = $parentTemplate['templateid'];
 		}
 	}
 	else {
 		$data['original_templates'] = array();
 	}
 
-	$templateIds = (isset($_REQUEST['unlink']) || isset($_REQUEST['add_template']) || isset($_REQUEST['exist_templates']))
-		? get_request('templates', array())
-		: $data['original_templates'];
-
-	sort($templateIds);
+	$templateIds = get_request('templates', $data['original_templates']);
 
 	$data['linkedTemplates'] = API::Template()->get(array(
 		'templateids' => $templateIds,
