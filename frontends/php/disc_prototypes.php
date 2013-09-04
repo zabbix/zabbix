@@ -372,7 +372,9 @@ else {
 	if (!empty($data['items'])) {
 		order_result($data['items'], $sortfield, getPageSortOrder());
 	}
-	$data['paging'] = getPagingLine($data['items']);
+
+	$urlParams = array('hostid' => $_REQUEST['hostid'], 'parent_discoveryid' => $_REQUEST['parent_discoveryid']);
+	$data['paging'] = getPagingLine($data['items'], $urlParams);
 
 	// render view
 	$itemView = new CView('configuration.item.prototype.list', $data);

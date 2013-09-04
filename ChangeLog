@@ -5,6 +5,7 @@ A.F.I..PS. [ZBXNEXT-1633] implemented host prototypes (Pavels, Sasha)
 .......PS. [ZBXNEXT-1633] implemented monitoring of vCenter and vSphere (Alexei, Sasha, wiper)
 
 Bug fixes:
+..F....... [ZBX-6873] fixed errors in page switching after executing an action (Ivo)
 .......P.. [ZBX-6936] fixed MySQL errors when updating configuration of the proxy (Sasha)
 .......P.. [ZBX-6929] fixed updating of lastlogsize and mtime in the proxy's database (Sasha)
 ....I..... [ZBX-6890] added missing indexes in child-tables for foreign key contraints, rename some indexes to meet naming convention (Andris)
