@@ -106,9 +106,6 @@ if ($hostid > 0) {
 
 	$data['overview']['host'] = reset($host);
 	$data['overview']['host']['status'] = null;
-	if ($data['overview']['host']['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
-		$data['overview']['host']['status'] = new CLink(_('In maintenance'), null, 'orange');
-	}
 
 	// get permissions
 	$userType = CWebUser::getType();
@@ -127,80 +124,6 @@ if ($hostid > 0) {
 		$data['rwHost'] = false;
 	}
 
-	$data['overview']['host']['ip'] = array();
-	$dnsInterfaces = array();
-	$ipInterfaces = array();
-
-	$i = 0;
-	foreach ($data['overview']['host']['interfaces'] as $interface) {
-		$defaultInterface[$i] = $interface['main'];
-
-		switch ($interface['type']) {
-			case INTERFACE_TYPE_AGENT:
-				if ($interface['ip']) {
-					$ipInterfaces[$i] = _('Agent').NAME_DELIMITER.$interface['ip'];
-				}
-				if ($interface['dns']) {
-					$dnsInterfaces[$i] = _('Agent').NAME_DELIMITER.$interface['dns'];
-				}
-				break;
-
-			case INTERFACE_TYPE_SNMP:
-				if ($interface['ip']) {
-					$ipInterfaces[$i] = _('SNMP').NAME_DELIMITER.$interface['ip'];
-				}
-				if ($interface['dns']) {
-					$dnsInterfaces[$i] = _('SNMP').NAME_DELIMITER.$interface['dns'];
-				}
-				break;
-
-			case INTERFACE_TYPE_IPMI:
-				if ($interface['ip']) {
-					$ipInterfaces[$i] = _('IPMI').NAME_DELIMITER.$interface['ip'];
-				}
-				if ($interface['dns']) {
-					$dnsInterfaces[$i] = _('IPMI').NAME_DELIMITER.$interface['dns'];
-				}
-				break;
-
-			case INTERFACE_TYPE_JMX:
-				if ($interface['ip']) {
-					$ipInterfaces[$i] = _('JMX').NAME_DELIMITER.$interface['ip'];
-				}
-				if ($interface['dns']) {
-					$dnsInterfaces[$i] = _('JMX').NAME_DELIMITER.$interface['dns'];
-				}
-				break;
-		}
-
-		$i++;
-	}
-	natsort($ipInterfaces);
-	natsort($dnsInterfaces);
-
-	$data['overview']['host']['ip'] = null;
-	foreach ($ipInterfaces as $key => $ip) {
-		$spanClass = $defaultInterface[$key] ? 'default_interface' : null;
-		if (!$data['overview']['host']['ip']) {
-			$data['overview']['host']['ip'][] = new CSpan($ip, $spanClass);
-		}
-		else {
-			$data['overview']['host']['ip'][] = ','.SPACE;
-			$data['overview']['host']['ip'][] = new CSpan($ip, $spanClass);
-		}
-	}
-
-	$data['overview']['host']['dns'] = null;
-	foreach ($dnsInterfaces as $key => $dns) {
-		$spanClass = $defaultInterface[$key] ? 'default_interface' : null;
-		if (!$data['overview']['host']['dns']) {
-			$data['overview']['host']['dns'][] = new CSpan($dns, $spanClass);
-		}
-		else {
-			$data['overview']['host']['dns'][] = ','.SPACE;
-			$data['overview']['host']['dns'][] = new CSpan($dns, $spanClass);
-		}
-	}
 
 	// js templates
 	require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php';
