@@ -219,6 +219,10 @@ class CScript extends CZBXAPI {
 
 		$this->validateCreate($scripts);
 
+		$scripts = $this->trimMenuPath($scripts);
+
+		$this->validateMenuPath($scripts, __FUNCTION__);
+
 		$scripts = $this->unsetExecutionType($scripts);
 
 		$scriptIds = DB::insert('scripts', $scripts);
@@ -239,6 +243,10 @@ class CScript extends CZBXAPI {
 		$scripts = zbx_toArray($scripts);
 
 		$this->validateUpdate($scripts);
+
+		$scripts = $this->trimMenuPath($scripts);
+
+		$this->validateMenuPath($scripts, __FUNCTION__);
 
 		$scripts = $this->unsetExecutionType($scripts);
 
@@ -425,10 +433,6 @@ class CScript extends CZBXAPI {
 		if ($dbScript = reset($dbScripts)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.', $dbScript['name']));
 		}
-
-		if ($names) {
-			$this->checkMenuPath($scripts, 'create');
-		}
 	}
 
 	/**
@@ -491,8 +495,6 @@ class CScript extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.', $dbScript['name']));
 				}
 			}
-
-			$this->checkMenuPath($scripts, 'update');
 		}
 	}
 
@@ -548,13 +550,17 @@ class CScript extends CZBXAPI {
 	 * @param array  $scripts
 	 * @param string $method
 	 */
-	protected function checkMenuPath(array $scripts, $method) {
+	protected function validateMenuPath(array $scripts, $method) {
 		$dbScripts = $this->get(array(
 			'output' => array('scriptid', 'name'),
 			'nopermissions' => true
 		));
 
 		foreach ($scripts as $script) {
+			if (!isset($script['name'])) {
+				continue;
+			}
+
 			$folders = $path = splitPath($script['name']);
 			$name = array_pop($folders);
 
@@ -607,6 +613,34 @@ class CScript extends CZBXAPI {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Trim script name menu path.
+	 *
+	 * @param array $scripts
+	 *
+	 * @return array
+	 */
+	protected function trimMenuPath(array $scripts) {
+		foreach ($scripts as &$script) {
+			if (!isset($script['name'])) {
+				continue;
+			}
+
+			$path = splitPath($script['name']);
+
+			$script['name'] = '';
+
+			foreach ($path as $item) {
+				$script['name'] .= str_replace('/', '\/', addslashes(trim($item))).'/';
+			}
+
+			$script['name'] = substr($script['name'], 0, strlen($script['name']) - 1);
+		}
+		unset($script);
+
+		return $scripts;
 	}
 
 	/**
