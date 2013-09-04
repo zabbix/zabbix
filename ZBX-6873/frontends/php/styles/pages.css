@@ -17,22 +17,71 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
-/* host interfaces */
-.host-edit .interface-group { width: 750px; }
-.host-edit .interface-row .dt { padding-top: 5px; }
-.host-edit .interface-row .dd { padding: 0; line-height: 1.0em; }
-.host-edit .interface-row .dd .interface-group { line-height: 1.8em; }
-.host-edit .interface-row .objectgroup { border-top-width: 0; padding-top: 4px; }
+/* host edit */
+.host-edit .interface-group,
+.hostprototype-edit .interface-group {
+	width: 750px;
+}
+.host-edit .interface-row .dt,
+.hostprototype-edit .interface-row .dt {
+	padding-top: 5px;
+}
+.host-edit .interface-row .dd,
+.hostprototype-edit .interface-row .dd {
+	padding: 0; line-height: 1.0em;
+}
+.host-edit .interface-row .dd .interface-group,
+.hostprototype-edit .interface-row .dd .interface-group {
+	line-height: 1.8em;
+}
+.host-edit .interface-row .objectgroup,
+.hostprototype-edit .interface-row .objectgroup {
+	border-top-width: 0; padding-top: 4px;
+}
 .host-edit .interface-row .interface-drag-control,
-.host-edit .interface-row .interface-add-control { width: 2em; }
-.host-edit .interface-row .interface-ip { width: 16.5em; }
-.host-edit .interface-row .interface-dns { width: 20em; }
-.host-edit .interface-row .interface-connect-to { width: 8em; white-space: nowrap; }
-.host-edit .interface-row .interface-port { width: 11em; }
-.host-edit .interface-row .interface-default { width: 4em; }
-.host-edit .interface-row-first .dd { padding-top: 2px; }
-.host-edit .interface-row-first .objectgroup { border-top-width: 1px; padding-top: 0; }
-.host-edit .dropArea .interface-add-control { visibility: hidden; }
+.host-edit .interface-row .interface-add-control,
+.hostprototype-edit .interface-row .interface-drag-control,
+.hostprototype-edit .interface-row .interface-add-control {
+	width: 2em;
+}
+.host-edit .interface-row .interface-ip,
+.hostprototype-edit .interface-row .interface-ip {
+	width: 16.5em;
+}
+.host-edit .interface-row .interface-dns,
+.hostprototype-edit .interface-row .interface-dns {
+	width: 20em;
+}
+.host-edit .interface-row .interface-connect-to,
+.hostprototype-edit .interface-row .interface-connect-to {
+	width: 8em; white-space: nowrap;
+}
+.host-edit .interface-row .interface-port,
+.hostprototype-edit .interface-row .interface-port {
+	width: 11em;
+}
+.host-edit .interface-row .interface-default,
+.hostprototype-edit .interface-row .interface-default {
+	width: 4em;
+}
+.host-edit .interface-row-first .dd,
+.hostprototype-edit .interface-row-first .dd {
+	padding-top: 2px;
+}
+.host-edit .interface-row-first .objectgroup,
+.hostprototype-edit .interface-row-first .objectgroup {
+	border-top-width: 1px; padding-top: 0;
+}
+.host-edit .dropArea .interface-add-control,
+.hostprototype-edit .dropArea .interface-add-control {
+	visibility: hidden;
+}
+
+.host-edit #groups { height: 140px; }
+
+.host-edit #linkedTemplateTable { min-width: 400px; }
+
+.host-edit.host-edit-discovered #linkedTemplateTable { min-width: 250px; }
 
 /* housekeeper elements */
 .hk .element-row { margin-top: -3px; border-top-width: 0; }
@@ -69,6 +118,10 @@
 
 /* host list */
 .host-list table.filter tr td { width: 25%; }
+.host-list .iconwarning, .host-edit .iconwarning { margin-left: 5px; }
+
+/* host prototype list */
+.hostprototype-edit #grouplist .group-prototypes { width: 310px; padding-top: 8px; }
 
 /* item list */
 .item-list table.filter { text-align: left; min-width: 1024px; }

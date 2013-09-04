@@ -387,7 +387,6 @@ class CUserGroup extends CZBXAPI {
 		return array('usrgrpids' => $usrgrpids);
 	}
 
-
 	/**
 	 * Mass update user group.
 	 * Checks for permissions - only super admins can change user groups.
@@ -582,12 +581,7 @@ class CUserGroup extends CZBXAPI {
 			}
 		}
 
-
 		return array('usrgrpids' => $usrgrpids);
-	}
-
-	public function massRemove($data) {
-
 	}
 
 	/**
