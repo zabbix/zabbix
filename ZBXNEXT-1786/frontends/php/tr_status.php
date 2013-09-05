@@ -567,7 +567,8 @@ foreach ($triggers as $trigger) {
 		);
 	}
 
-	$description = $trigger['description'];
+	$description = new CSpan($trigger['description'], 'link_menu');
+	$description->setMenuPopup(getMenuPopupTrigger($trigger, $triggerItems));
 
 	if ($_REQUEST['show_details']) {
 		$font = new CTag('font', 'yes');
@@ -576,9 +577,6 @@ foreach ($triggers as $trigger) {
 		$font->addItem(explode_exp($trigger['expression'], true, true));
 		$description = array($description, BR(), $font);
 	}
-
-	$description = new CSpan($description, 'link_menu');
-	$description->setMenuPopup(getMenuPopupTrigger($trigger, $triggerItems));
 
 	if (!empty($trigger['dependencies'])) {
 		$dependenciesTable = new CTableInfo();
