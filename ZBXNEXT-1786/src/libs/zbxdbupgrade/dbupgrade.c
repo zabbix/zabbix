@@ -2054,6 +2054,36 @@ static int	DBpatch_2010175(void)
 	return DBadd_field("groups", &field);
 }
 
+static int	DBpatch_2010176(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*name, *name_esc;
+	int		ret = SUCCEED;
+
+	result = DBselect("select scriptid,name from scripts");
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		name = zbx_dyn_escape_string(row[1], "/\\");
+
+		if (0 != strcmp(name, row[1]))
+		{
+			name_esc = DBdyn_escape_string(name);
+
+			if (ZBX_DB_OK > DBexecute("update scripts set name='%s' where scriptid=%s", name_esc, row[0]))
+				ret = FAIL;
+
+			zbx_free(name_esc);
+		}
+
+		zbx_free(name);
+	}
+	DBfree_result(result);
+
+	return ret;
+}
+
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 #define DBPATCH_END()					{NULL}};
@@ -2278,6 +2308,7 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010173, 0, 1)
 	DBPATCH_ADD(2010174, 0, 1)
 	DBPATCH_ADD(2010175, 0, 1)
+	DBPATCH_ADD(2010176, 0, 1)
 
 	DBPATCH_END()
 
