@@ -3,6 +3,7 @@ Changes for 2.1.5
 New features:
 
 Bug fixes:
+..F....... [ZBX-6854] fixed javascript error on pages with checkboxes, but without main checkbox (Vitalij)
 ..F....... [ZBX-6873] fixed errors in page switching after executing an action (Ivo)
 
 --------------------------------------------------------------------------------
