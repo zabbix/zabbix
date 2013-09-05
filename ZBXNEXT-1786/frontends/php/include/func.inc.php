@@ -2708,16 +2708,20 @@ function getMenuPopupHistory(array $item) {
 /**
  * Prepare data for trigger menu popup.
  *
- * @param array  $trigger					trigger data
- * @param string $trigger['triggerid']		trigger id
- * @param array  $items						trigger items (optional)
- * @param string $items[]['name']			item name
- * @param array  $items[]['params']			item url parameters ("name" => "value")
- * @param array  $acknowledge				acknowledge link parameters (optional)
- * @param string $acknowledge['eventid']	event id
- * @param string $acknowledge['screenid']	screen id (optional)
- * @param string $acknowledge['backurl']	return url (optional)
- * @param string $eventTime					event navigation time parameter (optional)
+ * @param array  $trigger						trigger data
+ * @param string $trigger['triggerid']			trigger id
+ * @param int    $trigger['flags']				trigger flags (TRIGGER_FLAG_DISCOVERY*)
+ * @param int    $trigger['hosts']				hosts, used by trigger expression
+ * @param int    $trigger['hosts'][]['hostid']	host id
+ * @param int    $trigger['url']				url
+ * @param array  $items							trigger items (optional)
+ * @param string $items[]['name']				item name
+ * @param array  $items[]['params']				item url parameters ("name" => "value")
+ * @param array  $acknowledge					acknowledge link parameters (optional)
+ * @param string $acknowledge['eventid']		event id
+ * @param string $acknowledge['screenid']		screen id (optional)
+ * @param string $acknowledge['backurl']		return url (optional)
+ * @param string $eventTime						event navigation time parameter (optional)
  *
  * @return array
  */
