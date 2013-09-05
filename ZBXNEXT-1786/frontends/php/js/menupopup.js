@@ -22,7 +22,10 @@
  * Get menu popup host section data.
  *
  * @param string options['hostid']			host id
- * @param array  options['scripts']			host scripts
+ * @param array  options['scripts']			host scripts (optional)
+ * @param string options[]['name']			script name
+ * @param string options[]['scriptid']		script id
+ * @param string options[]['confirmation']	confirmation text
  * @param bool   options['hasScreens']		link to host screen page
  * @param bool   options['hasInventory']	link to host inventory page
  *
@@ -92,13 +95,18 @@ function getMenuPopupHost(options) {
  * Get menu popup map section data.
  *
  * @param string options['hostid']					host id
- * @param array  options['scripts']					host scripts
- * @param object options['gotos']					links section
+ * @param array  options['scripts']					host scripts (optional)
+ * @param string options[]['name']					script name
+ * @param string options[]['scriptid']				script id
+ * @param string options[]['confirmation']			confirmation text
+ * @param object options['gotos']					links section (optional)
  * @param array  options['gotos']['screens']		link to host screen page with url parameters ("name" => "value")
  * @param array  options['gotos']['triggerStatus']	link to trigger status page with url parameters ("name" => "value")
  * @param array  options['gotos']['submap']			link to submap page with url parameters ("name" => "value")
  * @param array  options['gotos']['events']			link to events page with url parameters ("name" => "value")
- * @param array  options['urls']					local and global map urls
+ * @param array  options['urls']					local and global map urls (optional)
+ * @param string options['url'][]['label']			url label
+ * @param string options['url'][]['url']			url
  *
  * @return array
  */
@@ -213,12 +221,17 @@ function getMenuPopupMap(options) {
 /**
  * Get menu popup trigger section data.
  *
- * @param string options['triggerid']		trigger id
- * @param object options['items']			link to trigger item history page with url parameters ("name" => "value")
- * @param object options['acknowledge']		link to acknowledge page with url parameters ("name" => "value")
- * @param int    options['eventTime']		event page url navigation time parameter
- * @param object options['configuration']	link to trigger configuration page
- * @param string options['url']				trigger url link
+ * @param string options['triggerid']				trigger id
+ * @param object options['items']					link to trigger item history page (optional)
+ * @param string options['items'][]['name']			item name
+ * @param object options['items'][]['params']		item url parameters ("name" => "value")
+ * @param object options['acknowledge']				link to acknowledge page (optional)
+ * @param string options['acknowledge']['eventid']	event id
+ * @param string options['acknowledge']['screenid']	screen id (optional)
+ * @param string options['acknowledge']['backurl']	return url (optional)
+ * @param int    options['eventTime']				event page url navigation time parameter (optional)
+ * @param object options['configuration']			link to trigger configuration page (optional)
+ * @param string options['url']						trigger url link (optional)
  *
  * @return array
  */
@@ -307,7 +320,7 @@ function getMenuPopupTrigger(options) {
  * Get menu popup history section data.
  *
  * @param string options['itemid']				item id
- * @param bool   options['hasLatestGraphs']		link to history page with showgraph action
+ * @param bool   options['hasLatestGraphs']		link to history page with showgraph action (optional)
  *
  * @return array
  */

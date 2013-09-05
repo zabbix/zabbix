@@ -583,15 +583,20 @@ class CScript extends CZBXAPI {
 					continue;
 				}
 
-				// script NAME cannot be a FOLDER for other scripts
 				$dbScriptFolders = $dbScriptPath = splitPath($dbScript['name']);
-				$dbScriptName = array_pop($dbScriptFolders);
+				array_pop($dbScriptFolders);
 
-				if ($path === $dbScriptFolders) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Script name "%1$s" already used in menu path for script "%2$s".',
-							$script['name'], $dbScript['name'])
-					);
+				// script NAME cannot be a FOLDER for other scripts
+				$dbScriptFolderItems = array();
+				foreach ($dbScriptFolders as $dbScriptFolder) {
+					$dbScriptFolderItems[] = $dbScriptFolder;
+
+					if ($path === $dbScriptFolderItems) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Script name "%1$s" already used in menu path for script "%2$s".',
+								$script['name'], $dbScript['name'])
+						);
+					}
 				}
 
 				// script FOLDER cannot be a NAME for other scripts

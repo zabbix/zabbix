@@ -2600,8 +2600,14 @@ function clearCookies($clear = false, $id = null) {
 /**
  * Prepare data for host menu popup.
  *
- * @param array $host			host data
- * @param array $scripts		host scripts
+ * @param array  $host						host data
+ * @param string $host['hostid']			host id
+ * @param array  $host['inventory']			host inventory (optional)
+ * @param array  $host['screens']			host screens (optional)
+ * @param array  $scripts					host scripts (optional)
+ * @param string $scripts[]['name']			script name
+ * @param string $scripts[]['scriptid']		script id
+ * @param string $scripts[]['confirmation']	confirmation text
  *
  * @return array
  */
@@ -2632,12 +2638,18 @@ function getMenuPopupHost(array $host, array $scripts = null) {
  * Prepare data for host menu popup.
  *
  * @param string $hostId					host id
- * @param array  $scripts					host scripts
- * @param array  $gotos['screens']			link to host screen page with url parameters ("name" => "value")
- * @param array  $gotos['triggerStatus']	link to trigger status page with url parameters ("name" => "value")
- * @param array  $gotos['submap']			link to submap page with url parameters ("name" => "value")
- * @param array  $gotos['events']			link to events page with url parameters ("name" => "value")
- * @param array  $urls						local and global map urls
+ * @param array  $scripts					host scripts (optional)
+ * @param string $scripts[]['name']			script name
+ * @param string $scripts[]['scriptid']		script id
+ * @param string $scripts[]['confirmation']	confirmation text
+ * @param array  $gotos						goto links (optional)
+ * @param array  $gotos['screens']			link to host screen page with url parameters ("name" => "value") (optional)
+ * @param array  $gotos['triggerStatus']	link to trigger status page with url parameters ("name" => "value") (optional)
+ * @param array  $gotos['submap']			link to submap page with url parameters ("name" => "value") (optional)
+ * @param array  $gotos['events']			link to events page with url parameters ("name" => "value") (optional)
+ * @param array  $urls						local and global map urls (optional)
+ * @param string $urls[]['name']			url name
+ * @param string $urls[]['url']				url
  *
  * @return array
  */
@@ -2680,8 +2692,8 @@ function getMenuPopupMap($hostId, array $scripts = null, array $gotos = null, ar
  * Prepare data for item history menu popup.
  *
  * @param array $item				item data
- * @param array $item['itemid']		item id
- * @param array $item['value_type']	item value type
+ * @param int   $item['itemid']		item id
+ * @param int   $item['value_type']	item value type
  *
  * @return array
  */
@@ -2696,10 +2708,16 @@ function getMenuPopupHistory(array $item) {
 /**
  * Prepare data for trigger menu popup.
  *
- * @param array  $trigger		trigger data
- * @param array  $items			trigger items
- * @param array  $acknowledge	acknowledge link parameters
- * @param string $eventTime		event navigation time parameter
+ * @param array  $trigger					trigger data
+ * @param string $trigger['triggerid']		trigger id
+ * @param array  $items						trigger items (optional)
+ * @param string $items[]['name']			item name
+ * @param array  $items[]['params']			item url parameters ("name" => "value")
+ * @param array  $acknowledge				acknowledge link parameters (optional)
+ * @param string $acknowledge['eventid']	event id
+ * @param string $acknowledge['screenid']	screen id (optional)
+ * @param string $acknowledge['backurl']	return url (optional)
+ * @param string $eventTime					event navigation time parameter (optional)
  *
  * @return array
  */
