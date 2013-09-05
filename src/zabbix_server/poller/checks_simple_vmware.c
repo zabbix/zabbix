@@ -59,7 +59,6 @@ typedef struct
 }
 ZBX_HTTPPAGE;
 
-static int		page_initialized = 0;
 static ZBX_HTTPPAGE	page;
 
 static int		vcenters_initialized = 0;
@@ -81,6 +80,9 @@ typedef struct
 	zbx_uint64_t	disk_write;
 	zbx_uint64_t	disk_number_read_averaged;
 	zbx_uint64_t	disk_number_write_averaged;
+
+	zbx_uint64_t	datastore_read_latency;
+	zbx_uint64_t	datastore_write_latency;
 }
 zbx_counters_t;
 
@@ -170,15 +172,6 @@ static size_t	WRITEFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userdat
 {
 	size_t	r_size = size * nmemb;
 
-	/* first piece of data */
-	if (0 == page_initialized)
-	{
-		page.alloc = 0;
-		page.data = NULL;
-
-		page_initialized = 1;
-	}
-
 	zbx_strncpy_alloc(&page.data, &page.alloc, &page.offset, ptr, r_size);
 
 	return r_size;
@@ -244,6 +237,54 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: read_xml_node_value                                              *
+ *                                                                            *
+ * Purpose: read xml node value relative to the the specified node            *
+ *                                                                            *
+ * Parameters: doc    - [IN] the XML document                                 *
+ *             node   - [IN] the starting XML node                            *
+ *             xpath  - [IN] the ML XPath                                     *
+ *             values - [OUT] the node value                                  *
+ *                                                                            *
+ * Return: Upon successful completion the function return SUCCEED.            *
+ *         Otherwise, FAIL is returned.                                       *
+ *                                                                            *
+ ******************************************************************************/
+static char	*read_xml_node_value(xmlDoc *doc, xmlNode *node, const char *xpath)
+{
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+	xmlNodeSetPtr	nodeset;
+	xmlChar		*val;
+	char		*value = NULL;
+
+	xpathCtx = xmlXPathNewContext(doc);
+
+	xpathCtx->node = node;
+
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
+		goto clean;
+
+	if (xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+		goto clean;
+
+	nodeset = xpathObj->nodesetval;
+
+	val = xmlNodeListGetString(doc, nodeset->nodeTab[0]->xmlChildrenNode, 1);
+	value = zbx_strdup(NULL, (char *)val);
+	xmlFree(val);
+clean:
+	if (NULL != xpathObj)
+		xmlXPathFreeObject(xpathObj);
+
+	xmlXPathFreeContext(xpathCtx);
+	xmlCleanupParser();
+
+	return value;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: read_xml_values                                                  *
  *                                                                            *
  * Purpose: populate array of values from a xml data                          *
@@ -301,6 +342,350 @@ clean:
 out:
 	return ret;
 }
+
+/*
+ * key - performance counter reference mapping
+ */
+typedef struct
+{
+	const char	*key;
+	zbx_uint64_t	*pcounter;
+}
+zbx_perfcounter_mapping_t;
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_get_group_perfcounters                                    *
+ *                                                                            *
+ * Purpose: read the specified performance counter ids filtered by a group    *
+ *                                                                            *
+ * Parameters: data     - [IN] XML data                                       *
+ *             size     - [IN] the size of XML data                           *
+ *             grou  p  - [IN] the group name                                 *
+ *             counters - [IN/OUT] mapping of counter keys to output values   *
+ *                                                                            *
+ * Return: Upon successful completion the function return SUCCEED.            *
+ *         Otherwise, FAIL is returned.                                       *
+ *                                                                            *
+ ******************************************************************************/
+static int	vmware_get_group_perfcounters(const char *data, int size, const char *group,
+		zbx_perfcounter_mapping_t *counters)
+{
+	xmlDoc		*doc;
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+	xmlNodeSetPtr	nodeset;
+	char		*xpath = NULL;
+	int		i, ret = FAIL;
+
+	if (NULL == (doc = xmlReadMemory(data, size, "noname.xml", NULL, 0)))
+		goto out;
+
+	xpathCtx = xmlXPathNewContext(doc);
+
+	xpath = zbx_dsprintf(xpath, "//*[local-name()='PerfCounterInfo'][*[local-name()='groupInfo']"
+			"/*[local-name()='key']/text()='%s']", group);
+
+	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)xpath, xpathCtx)))
+		goto clean;
+
+	if (xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+		goto clean;
+
+	nodeset = xpathObj->nodesetval;
+
+	for (i = 0; i < nodeset->nodeNr; i++)
+	{
+		char				*key, *counterId;
+		zbx_perfcounter_mapping_t	*counter;
+
+		if (NULL == (key = read_xml_node_value(doc, nodeset->nodeTab[i],
+				"*[local-name()='nameInfo']/*[local-name()='key']")))
+		{
+			continue;
+		}
+
+		for (counter = counters; NULL != counter->key; counter++)
+		{
+			if (0 != strcmp(counter->key, key))
+				continue;
+
+			if (NULL == (counterId = read_xml_node_value(doc, nodeset->nodeTab[i],
+					"*[local-name()='key']")))
+			{
+				continue;
+			}
+
+			is_uint64(counterId, counter->pcounter);
+			zbx_free(counterId);
+		}
+
+		zbx_free(key);
+	}
+
+	ret = SUCCEED;
+
+clean:
+	if (NULL != xpathObj)
+		xmlXPathFreeObject(xpathObj);
+
+	if (NULL != xpath)
+		zbx_free(xpath);
+
+	xmlXPathFreeContext(xpathCtx);
+	xmlFreeDoc(doc);
+	xmlCleanupParser();
+
+out:
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_init_perf_counters                                        *
+ *                                                                            *
+ * Purpose: initializes performance counters                                  *
+ *                                                                            *
+ * Parameters: data     - [IN] easyhandle                                     *
+ *             size     - [OUT] the size of XML data                          *
+ *             error    - [OUT] error message                                 *
+ *             flags    - [OUT] ZBX_VMWARE_FLAG_VCENTER                       *
+ *                              ZBX_VMWARE_FLAG_VCENTER                       *
+ *                                                                            *
+ * Return: Upon successful completion the function return SUCCEED.            *
+ *         Otherwise, FAIL is returned.                                       *
+ *                                                                            *
+ ******************************************************************************/
+static int	vmware_init_perf_counters(CURL *easyhandle, zbx_counters_t *counters, char **error, unsigned flags)
+{
+#	define ZBX_POST_VMWARE_GET_PERFCOUTNER							\
+		ZBX_POST_VSPHERE_HEADER								\
+		"<ns0:RetrieveProperties>"							\
+			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"	\
+			"<ns0:specSet>"								\
+				"<ns0:propSet>"							\
+					"<ns0:type>PerformanceManager</ns0:type>"		\
+					"<ns0:pathSet>perfCounter</ns0:pathSet>"		\
+				"</ns0:propSet>"						\
+				"<ns0:objectSet>"						\
+					"<ns0:obj type=\"PerformanceManager\">%s</ns0:obj>"	\
+				"</ns0:objectSet>"						\
+			"</ns0:specSet>"							\
+		"</ns0:RetrieveProperties>"							\
+		ZBX_POST_VSPHERE_FOOTER
+
+	const char	*__function_name = "vmware_init_perf_counters";
+	char		tmp[MAX_STRING_LEN];
+	int		opts, err, ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (1 != counters->initialized)
+	{
+		zbx_perfcounter_mapping_t disk_counters[] = {
+				{"read", &counters->disk_read},
+				{"write", &counters->disk_write},
+				{"numberReadAveraged", &counters->disk_number_read_averaged},
+				{"numberWriteAveraged", &counters->disk_number_write_averaged},
+				{NULL, NULL}};
+
+		zbx_perfcounter_mapping_t nic_counters[] = {
+				{"packetsRx", &counters->nic_packets_rx},
+				{"packetsTx", &counters->nic_packets_tx},
+				{"received", &counters->nic_received},
+				{"transmitted", &counters->nic_transmitted},
+				{NULL, NULL}};
+
+		zbx_perfcounter_mapping_t datastore_counters[] = {
+				{"totalReadLatency", &counters->datastore_read_latency},
+				{"totalWriteLatency", &counters->datastore_write_latency},
+				{NULL, NULL}};
+
+		ret = FAIL;
+
+		zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_GET_PERFCOUTNER,
+			ZBX_VMWARE_FLAG_VCENTER == flags ? "propertyCollector" : "ha-property-collector",
+			ZBX_VMWARE_FLAG_VCENTER == flags ? "PerfMgr" : "ha-perfmgr");
+
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opts = CURLOPT_POSTFIELDS, tmp)))
+		{
+			*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opts, curl_easy_strerror(err));
+			goto out;
+		}
+
+		page.offset = 0;
+
+		if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
+		{
+			*error = zbx_strdup(*error, curl_easy_strerror(err));
+			goto out;
+		}
+
+		if (NULL != (*error = read_xml_value(page.data, ZBX_XPATH_LN1("faultstring"))))
+			goto out;
+
+		if (SUCCEED != vmware_get_group_perfcounters(page.data, page.offset, "virtualDisk", disk_counters))
+		{
+			*error = zbx_strdup(*error, "Cannot find performance counters for virtualDisk group");
+			goto out;
+		}
+
+		if (SUCCEED != vmware_get_group_perfcounters(page.data, page.offset, "net", nic_counters))
+		{
+			*error = zbx_strdup(*error, "Cannot find performance counters for net group");
+			goto out;
+		}
+
+		if (SUCCEED != vmware_get_group_perfcounters(page.data, page.offset, "datastore", datastore_counters))
+		{
+			*error = zbx_strdup(*error, "Cannot find performance counters for datastore group");
+			goto out;
+		}
+
+		counters->initialized = 1;
+
+		/* The counter data uses a lot of memory which is used only once during initialization. */
+		/* Reset the download buffer afterwards so the memory is not wasted.                    */
+		zbx_free(page.data);
+		page.alloc = 0;
+		page.offset = 0;
+
+		ret = SUCCEED;
+	}
+
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: wmware_get_vm_nic_devices                                        *
+ *                                                                            *
+ * Purpose: scan vm configuration for virtual networking cards and add to     *
+ *          the device vector                                                 *
+ *                                                                            *
+ * Parameters: vm     - [IN/OUT] virtual machine                              *
+ *                                                                            *
+ ******************************************************************************/
+static void	wmware_vm_populate_nic_devices(zbx_vm_t *vm)
+{
+	xmlDoc		*doc;
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+	xmlNodeSetPtr	nodeset;
+	int		i;
+
+	if (NULL == (doc = xmlReadMemory(vm->status_ex, strlen(vm->status_ex), "noname.xml", NULL, 0)))
+		return;
+
+	xpathCtx = xmlXPathNewContext(doc);
+
+	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)"//*[local-name()='hardware']/"
+			"*[local-name()='device'][*[local-name()='macAddress']]", xpathCtx)))
+	{
+		goto out;
+	}
+
+	if (xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+		goto out;
+
+	nodeset = xpathObj->nodesetval;
+
+	for (i = 0; i < nodeset->nodeNr; i++)
+	{
+		char		*key;
+		zbx_dev_t	*dev;
+
+		if (NULL == (key = read_xml_node_value(doc, nodeset->nodeTab[i],
+				"*[local-name()='key']")))
+		{
+			continue;
+		}
+
+		dev = zbx_malloc(NULL, sizeof(zbx_dev_t));
+		dev->type =  ZBX_DEV_TYPE_NIC;
+		dev->instance = key;
+		zbx_vector_uint64_create(&dev->counterids);
+
+		zbx_vector_ptr_append(&vm->devs, dev);
+	}
+out:
+
+	if (NULL != xpathObj)
+		xmlXPathFreeObject(xpathObj);
+
+	xmlXPathFreeContext(xpathCtx);
+	xmlFreeDoc(doc);
+	xmlCleanupParser();
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: wmware_vm_populate_disk_devices_by_counterid                     *
+ *                                                                            *
+ * Purpose: scan disk stats for a specific counter value and add found disks  *
+ *          the device vector                                                 *
+ *                                                                            *
+ * Parameters: vm         - [IN/OUT] virtual machine                          *
+ *             counterid  - [IN] the counter id to scan for                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	wmware_vm_populate_disk_devices_by_counterid(zbx_vm_t *vm, zbx_uint64_t counterid)
+{
+	xmlDoc		*doc;
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+	xmlNodeSetPtr	nodeset;
+	char		*xpath = NULL;
+	int		i;
+
+	if (NULL == (doc = xmlReadMemory(vm->stats, strlen(vm->stats), "noname.xml", NULL, 0)))
+		return;
+
+	xpathCtx = xmlXPathNewContext(doc);
+
+	xpath = zbx_dsprintf(xpath, "//*[local-name()='value']/*[local-name()='id']"
+			"[*[local-name()='counterId']/text()='" ZBX_FS_UI64 "']", counterid);
+
+	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)xpath, xpathCtx)))
+		goto out;
+
+	if (xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+		goto out;
+
+	nodeset = xpathObj->nodesetval;
+
+	for (i = 0; i < nodeset->nodeNr; i++)
+	{
+		char		*instance;
+		zbx_dev_t	*dev;
+
+		if (NULL == (instance = read_xml_node_value(doc, nodeset->nodeTab[i],
+				"*[local-name()='instance']")))
+		{
+			continue;
+		}
+
+		dev = zbx_malloc(NULL, sizeof(zbx_dev_t));
+		dev->type =  ZBX_DEV_TYPE_DISK;
+		dev->instance = instance;
+		zbx_vector_uint64_create(&dev->counterids);
+
+		zbx_vector_ptr_append(&vm->devs, dev);
+	}
+out:
+
+	if (NULL != xpathObj)
+		xmlXPathFreeObject(xpathObj);
+
+	xmlXPathFreeContext(xpathCtx);
+	xmlFreeDoc(doc);
+	xmlCleanupParser();
+}
+
 
 static int	vmware_set_powerstate_result(AGENT_RESULT *result)
 {
@@ -965,225 +1350,15 @@ out:
 	return ret;
 }
 
-static int	vmware_perf_counters_get(CURL *easyhandle, const char *guestvmid, zbx_vm_t *vm, unsigned flags)
-{
-#	define ZBX_POST_VCENTER_PERF_COUNTERS 					\
-		ZBX_POST_VSPHERE_HEADER						\
-		"<ns0:QueryAvailablePerfMetric>"				\
-			"<ns0:_this type=\"PerformanceManager\">%s</ns0:_this>"	\
-			"<ns0:entity type=\"VirtualMachine\">%s</ns0:entity>"	\
-			"<ns0:intervalId>%d</ns0:intervalId>"			\
-		"</ns0:QueryAvailablePerfMetric>"				\
-		ZBX_POST_VSPHERE_FOOTER
-
-	const char		*__function_name = "vmware_perf_counters_get";
-
-	int			i, j, err, o, ret = FAIL;
-	char			*error = NULL, tmp[MAX_STRING_LEN], xpath[MAX_STRING_LEN];
-	zbx_vector_str_t	instances, counters;
-	zbx_uint64_t		counterid;
-	zbx_dev_t		*dev;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	if (SUCCEED != vmware_perf_counters_refresh_rate_get(easyhandle, guestvmid, &vm->refresh_rate, &error, flags))
-		goto out;
-
-	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VCENTER_PERF_COUNTERS,
-			ZBX_VMWARE_FLAG_VCENTER == flags ? "PerfMgr" : "ha-perfmgr", guestvmid, vm->refresh_rate);
-
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_POSTFIELDS, tmp)))
-	{
-		error = zbx_dsprintf(error, "Cannot set cURL option [%d]: %s", o, curl_easy_strerror(err));
-		goto out;
-	}
-
-	page.offset = 0;
-
-	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
-	{
-		error = zbx_strdup(error, curl_easy_strerror(err));
-		goto out;
-	}
-
-	if (NULL != (error = read_xml_value(page.data, ZBX_XPATH_LN1("faultstring"))))
-		goto out;
-
-	zbx_devs_free(&vm->devs);
-
-	zbx_vector_str_create(&instances);
-	zbx_vector_str_create(&counters);
-
-	read_xml_values(page.data, ZBX_XPATH_LN2("returnval", "instance"), &instances);
-
-	zbx_vector_str_sort(&instances, ZBX_DEFAULT_STR_COMPARE_FUNC);
-
-	/* zbx_vetor_str_uniq doesn't free memory */
-	if (1 < instances.values_num)
-	{
-		int	j = 0;
-
-		for (i = 1; i < instances.values_num; i++)
-		{
-			if (0 == strcmp(instances.values[j], instances.values[i]))
-				zbx_free(instances.values[i]);
-			else
-				instances.values[++j] = instances.values[i];
-		}
-
-		instances.values_num = ++j;
-	}
-
-	for (i = 0; i < instances.values_num; i++)
-	{
-		int	type;
-
-		if (0 == strncmp(instances.values[i], "vmnic", 5))
-			type = ZBX_DEV_TYPE_NIC;
-		else if (NULL != strstr(instances.values[i], "vmhba"))
-			type = ZBX_DEV_TYPE_DISK;
-		else
-			continue;
-
-		dev = zbx_malloc(NULL, sizeof(zbx_dev_t));
-		dev->type = type;
-		dev->instance = zbx_strdup(NULL, instances.values[i]);
-		zbx_vector_uint64_create(&dev->counterids);
-
-		zbx_vector_ptr_append(&vm->devs, dev);
-
-		/* populate counterids */
-
-		zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_LN2("returnval", "instance")
-				"[.='%s']/.." ZBX_XPATH_LN1("counterId"), instances.values[i]);
-
-		read_xml_values(page.data, xpath, &counters);
-
-		for (j = 0; j < counters.values_num; j++)
-		{
-			if (SUCCEED == is_uint64(counters.values[j], &counterid))
-				zbx_vector_uint64_append(&dev->counterids, counterid);
-
-			zbx_free(counters.values[j]);
-		}
-
-		zbx_vector_uint64_sort(&dev->counterids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-		counters.values_num = 0;
-		zbx_free(instances.values[i]);
-	}
-
-	zbx_vector_str_destroy(&counters);
-	zbx_vector_str_destroy(&instances);
-
-	ret = SUCCEED;
-out:
-	if (SUCCEED != ret)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: %s", error);
-		zbx_free(error);
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
-}
-
-static void	vmware_get_counterid_by_key(const char *key, zbx_uint64_t *counterid)
-{
-	char	*value, xpath[MAX_STRING_LEN];
-
-	zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_LN3("returnval", "nameInfo", "key") "[.='%s']/../.."
-			ZBX_XPATH_LN("key"), key);
-
-	if (NULL != (value = read_xml_value(page.data, xpath)))
-		is_uint64(value, counterid);
-
-	zbx_free(value);
-}
-
-static int	vmware_perf_counter_details_get(CURL *easyhandle, const zbx_vector_uint64_t *counterids,
-		zbx_counters_t *counters, char **error, unsigned flags)
-{
-	const char	*__function_name = "vmware_perf_counter_details_get";
-
-	int		i, err, o, ret = FAIL;
-	char		*tmp = NULL;
-	size_t		tmp_alloc = 0, tmp_offset = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	if (0 != counters->initialized)
-	{
-		ret = SUCCEED;
-		goto out;
-	}
-
-	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, ZBX_POST_VSPHERE_HEADER);
-	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:QueryPerfCounter>");
-	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:_this type=\"PerformanceManager\">");
-	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, ZBX_VMWARE_FLAG_VCENTER == flags ? "PerfMgr" : "ha-perfmgr");
-	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "</ns0:_this>");
-	for (i = 0; i < counterids->values_num; i++)
-	{
-		zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:counterId>" ZBX_FS_UI64 "</ns0:counterId>",
-				counterids->values[i]);
-	}
-	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "</ns0:QueryPerfCounter>");
-	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, ZBX_POST_VSPHERE_FOOTER);
-
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_POSTFIELDS, tmp)))
-	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", o, curl_easy_strerror(err));
-		goto out;
-	}
-
-	page.offset = 0;
-
-	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
-	{
-		*error = zbx_strdup(*error, curl_easy_strerror(err));
-		goto out;
-	}
-
-	if (NULL == (*error = read_xml_value(page.data, ZBX_XPATH_LN1("faultstring"))))
-	{
-		vmware_get_counterid_by_key("packetsRx", &counters->nic_packets_rx);
-		vmware_get_counterid_by_key("packetsTx", &counters->nic_packets_tx);
-		vmware_get_counterid_by_key("received", &counters->nic_received);
-		vmware_get_counterid_by_key("transmitted", &counters->nic_transmitted);
-
-		vmware_get_counterid_by_key("read", &counters->disk_read);
-		vmware_get_counterid_by_key("write", &counters->disk_write);
-		vmware_get_counterid_by_key("numberReadAveraged", &counters->disk_number_read_averaged);
-		vmware_get_counterid_by_key("numberWriteAveraged", &counters->disk_number_write_averaged);
-
-		counters->initialized = 1;
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() page.data:'%s'", __function_name, page.data);
-		zbx_free(*error);
-	}
-
-	ret = SUCCEED;
-out:
-	zbx_free(tmp);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
-}
-
-static void	add_perf_counter_stat_metric(char **tmp, size_t *tmp_alloc, size_t *tmp_offset, zbx_dev_t *dev,
+static void	add_perf_counter_stat_metric(char **tmp, size_t *tmp_alloc, size_t *tmp_offset, const char *instance,
 		zbx_uint64_t counterid)
 {
-	if (FAIL == zbx_vector_uint64_bsearch(&dev->counterids, counterid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+	if (0 == counterid)
 		return;
 
 	zbx_strcpy_alloc(tmp, tmp_alloc, tmp_offset, "<ns0:metricId>");
 	zbx_snprintf_alloc(tmp, tmp_alloc, tmp_offset, "<ns0:counterId>" ZBX_FS_UI64 "</ns0:counterId>", counterid);
-	zbx_snprintf_alloc(tmp, tmp_alloc, tmp_offset, "<ns0:instance>%s</ns0:instance>", dev->instance);
+	zbx_snprintf_alloc(tmp, tmp_alloc, tmp_offset, "<ns0:instance>%s</ns0:instance>", instance);
 	zbx_strcpy_alloc(tmp, tmp_alloc, tmp_offset, "</ns0:metricId>");
 }
 
@@ -1207,6 +1382,8 @@ static int	vmware_perf_counter_stats_get(CURL *easyhandle, zbx_vm_t *vm, zbx_cou
 	zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:entity type=\"VirtualMachine\">%s</ns0:entity>",
 			vm->id);
 	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:maxSample>1</ns0:maxSample>");
+
+	/* first add networking devices which are already populated in device list */
 	for (i = 0; i < vm->devs.values_num; i++)
 	{
 		dev = (zbx_dev_t *)vm->devs.values[i];
@@ -1214,27 +1391,24 @@ static int	vmware_perf_counter_stats_get(CURL *easyhandle, zbx_vm_t *vm, zbx_cou
 		switch (dev->type)
 		{
 			case ZBX_DEV_TYPE_NIC:
-				add_perf_counter_stat_metric(&tmp, &tmp_alloc, &tmp_offset, dev,
+				add_perf_counter_stat_metric(&tmp, &tmp_alloc, &tmp_offset, dev->instance,
 						counters->nic_packets_rx);
-				add_perf_counter_stat_metric(&tmp, &tmp_alloc, &tmp_offset, dev,
+				add_perf_counter_stat_metric(&tmp, &tmp_alloc, &tmp_offset, dev->instance,
 						counters->nic_packets_tx);
-				add_perf_counter_stat_metric(&tmp, &tmp_alloc, &tmp_offset, dev,
+				add_perf_counter_stat_metric(&tmp, &tmp_alloc, &tmp_offset, dev->instance,
 						counters->nic_received);
-				add_perf_counter_stat_metric(&tmp, &tmp_alloc, &tmp_offset, dev,
+				add_perf_counter_stat_metric(&tmp, &tmp_alloc, &tmp_offset, dev->instance,
 						counters->nic_transmitted);
-				break;
-			case ZBX_DEV_TYPE_DISK:
-				add_perf_counter_stat_metric(&tmp, &tmp_alloc, &tmp_offset, dev,
-						counters->disk_read);
-				add_perf_counter_stat_metric(&tmp, &tmp_alloc, &tmp_offset, dev,
-						counters->disk_write);
-				add_perf_counter_stat_metric(&tmp, &tmp_alloc, &tmp_offset, dev,
-						counters->disk_number_read_averaged);
-				add_perf_counter_stat_metric(&tmp, &tmp_alloc, &tmp_offset, dev,
-						counters->disk_number_write_averaged);
 				break;
 		}
 	}
+
+	/* then add all virtual disk devices */
+	add_perf_counter_stat_metric(&tmp, &tmp_alloc, &tmp_offset, "*", counters->disk_read);
+	add_perf_counter_stat_metric(&tmp, &tmp_alloc, &tmp_offset, "*", counters->disk_write);
+	add_perf_counter_stat_metric(&tmp, &tmp_alloc, &tmp_offset, "*", counters->disk_number_read_averaged);
+	add_perf_counter_stat_metric(&tmp, &tmp_alloc, &tmp_offset, "*", counters->disk_number_write_averaged);
+
 	zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:intervalId>%d</ns0:intervalId>", vm->refresh_rate);
 	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "</ns0:querySpec>");
 	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "</ns0:QueryPerf>");
@@ -1525,7 +1699,7 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 	const char		*__function_name = "vcenter_update";
 
 	CURL			*easyhandle = NULL;
-	int			o, i, j, k, l, err, ret = FAIL;
+	int			o, i, j, err, ret = FAIL;
 	zbx_vector_str_t	guesthvids, guestvmids, clusterids;
 	struct curl_slist	*headers = NULL;
 	zbx_vcenter_t		*vcenter;
@@ -1535,7 +1709,6 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 	char			*uuid, *name, *event_session = NULL, *clusters = NULL,
 				xpath[MAX_STRING_LEN];
 	zbx_vector_uint64_t	counterids;
-	zbx_dev_t		*dev;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() url:'%s' username:'%s' password:'%s'",
 			__function_name, url, username, password);
@@ -1600,6 +1773,9 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 	}
 
 	if (SUCCEED != vmware_authenticate(easyhandle, url, username, password, error, ZBX_VMWARE_FLAG_VCENTER))
+		goto clean;
+
+	if (SUCCEED != vmware_init_perf_counters(easyhandle, &vcenter->counters, error, ZBX_VMWARE_FLAG_VCENTER))
 		goto clean;
 
 	if (SUCCEED != vcenter_guesthvids_get(easyhandle, error))
@@ -1678,45 +1854,28 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 			vm->id = zbx_strdup(vm->id, guestvmids.values[j]);
 			vm->status_ex = zbx_strdup(vm->status_ex, page.data);
 
-			vmware_perf_counters_get(easyhandle, guestvmids.values[j], vm, ZBX_VMWARE_FLAG_VCENTER);
+			zbx_devs_free(&vm->devs);
 
-			for (k = 0; k < vm->devs.values_num; k++)
+			wmware_vm_populate_nic_devices(vm);
+
+			if (SUCCEED != vmware_perf_counters_refresh_rate_get(easyhandle, guestvmids.values[j],
+					&vm->refresh_rate, error, ZBX_VMWARE_FLAG_VCENTER))
 			{
-				dev = (zbx_dev_t *)vm->devs.values[k];
-
-				for (l = 0; l < dev->counterids.values_num; l++)
-					zbx_vector_uint64_append(&counterids, dev->counterids.values[l]);
+				goto clean;
 			}
-		}
-
-		for (j = 0; j < guestvmids.values_num; j++)
-			zbx_free(guestvmids.values[j]);
-		guestvmids.values_num = 0;
-	}
-
-	zbx_vector_uint64_sort(&counterids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(&counterids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	if (SUCCEED != vmware_perf_counter_details_get(easyhandle, &counterids, &vcenter->counters, error,
-			ZBX_VMWARE_FLAG_VCENTER))
-	{
-		goto clean;
-	}
-
-	for (i = 0; i < vcenter->hvs.values_num; i++)
-	{
-		hv = (zbx_hv_t *)vcenter->hvs.values[i];
-
-		for (j = 0; j < hv->vms.values_num; j++)
-		{
-			vm = (zbx_vm_t *)hv->vms.values[j];
 
 			if (SUCCEED != vmware_perf_counter_stats_get(easyhandle, vm, &vcenter->counters, error,
 					ZBX_VMWARE_FLAG_VCENTER))
 			{
 				goto clean;
 			}
+
+			wmware_vm_populate_disk_devices_by_counterid(vm, vcenter->counters.disk_read);
 		}
+
+		for (j = 0; j < guestvmids.values_num; j++)
+			zbx_free(guestvmids.values[j]);
+		guestvmids.values_num = 0;
 	}
 
 	if (SUCCEED != vmware_event_session_get(easyhandle, &event_session, error, ZBX_VMWARE_FLAG_VCENTER))
@@ -1919,14 +2078,13 @@ static int	vsphere_update(const char *url, const char *username, const char *pas
 	const char		*__function_name = "vsphere_update";
 
 	CURL			*easyhandle = NULL;
-	int			o, i, j, k, err, ret = FAIL;
+	int			o, i, err, ret = FAIL;
 	zbx_vector_str_t	guestvmids;
 	struct curl_slist	*headers = NULL;
 	zbx_vsphere_t		*vsphere;
 	zbx_vm_t		*vm;
 	char			*uuid, *event_session = NULL;
 	zbx_vector_uint64_t	counterids;
-	zbx_dev_t		*dev;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() url:'%s' username:'%s' password:'%s'",
 			__function_name, url, username, password);
@@ -1994,6 +2152,9 @@ static int	vsphere_update(const char *url, const char *username, const char *pas
 	if (SUCCEED != vmware_hv_guestvmids_get(easyhandle, "ha-host", &guestvmids, error, ZBX_VMWARE_FLAG_VSPHERE))
 		goto clean;
 
+	if (SUCCEED != vmware_init_perf_counters(easyhandle, &vsphere->counters, error, ZBX_VMWARE_FLAG_VSPHERE))
+		goto clean;
+
 	if (SUCCEED != vsphere_hostdata_get(easyhandle, &vsphere->details, error))
 		goto clean;
 
@@ -2027,35 +2188,23 @@ static int	vsphere_update(const char *url, const char *username, const char *pas
 		vm->id = zbx_strdup(vm->id, guestvmids.values[i]);
 		vm->status_ex = zbx_strdup(vm->status_ex, page.data);
 
-		vmware_perf_counters_get(easyhandle, guestvmids.values[i], vm, ZBX_VMWARE_FLAG_VSPHERE);
+		zbx_devs_free(&vm->devs);
 
-		for (j = 0; j < vm->devs.values_num; j++)
+		wmware_vm_populate_nic_devices(vm);
+
+		if (SUCCEED != vmware_perf_counters_refresh_rate_get(easyhandle, guestvmids.values[i],
+				&vm->refresh_rate, error, ZBX_VMWARE_FLAG_VSPHERE))
 		{
-			dev = (zbx_dev_t *)vm->devs.values[j];
-
-			for (k = 0; k < dev->counterids.values_num; k++)
-				zbx_vector_uint64_append(&counterids, dev->counterids.values[k]);
+			goto clean;
 		}
-	}
-
-	zbx_vector_uint64_sort(&counterids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(&counterids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	if (SUCCEED != vmware_perf_counter_details_get(easyhandle, &counterids, &vsphere->counters, error,
-			ZBX_VMWARE_FLAG_VSPHERE))
-	{
-		goto clean;
-	}
-
-	for (i = 0; i < vsphere->vms.values_num; i++)
-	{
-		vm = (zbx_vm_t *)vsphere->vms.values[i];
 
 		if (SUCCEED != vmware_perf_counter_stats_get(easyhandle, vm, &vsphere->counters, error,
 				ZBX_VMWARE_FLAG_VSPHERE))
 		{
 			goto clean;
 		}
+
+		wmware_vm_populate_disk_devices_by_counterid(vm, vsphere->counters.disk_read);
 	}
 
 	if (SUCCEED != vmware_event_session_get(easyhandle, &event_session, error, ZBX_VMWARE_FLAG_VSPHERE))
@@ -2102,9 +2251,6 @@ static int	vsphere_vm_counter_get(zbx_vsphere_t *vsphere, const char *uuid, cons
 	for (i = 0; i < vm->devs.values_num; i++)
 	{
 		dev = (zbx_dev_t *)vm->devs.values[i];
-
-		if (ZBX_DEV_TYPE_NIC != dev->type)
-			continue;
 
 		if (0 == strcmp(dev->instance, instance))
 			break;
@@ -3831,7 +3977,7 @@ int	check_vsphere_vm_discovery(AGENT_REQUEST *request, const char *username, con
 int	check_vsphere_vm_hv_name(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return get_vsphere_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_LN2("config", "name"), result);
+	return get_vsphere_vmstat(request, username, password, ZBX_XPATH_LN2("runtime", "host"), result);
 }
 
 int	check_vsphere_vm_memory_size(AGENT_REQUEST *request, const char *username, const char *password,
