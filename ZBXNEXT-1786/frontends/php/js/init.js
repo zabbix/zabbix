@@ -29,7 +29,28 @@ jQuery(function($) {
 	}
 
 	/**
-	 * Build menu popup for given elements.
+	 * Change combobox color according selected option.
+	 */
+	$('.input.select').each(function() {
+		var comboBox = $(this),
+			changeClass = function(obj) {
+				if (obj.find('option.not-monitored:selected').length > 0) {
+					obj.addClass('not-monitored');
+				}
+				else {
+					obj.removeClass('not-monitored');
+				}
+			};
+
+		comboBox.change(function() {
+			changeClass($(this));
+		});
+
+		changeClass(comboBox);
+	});
+
+	/**
+	 * Handles host pop up menus.
 	 */
 	$(document).on('click', '[data-menu-popup]', function(event) {
 		var obj = $(this),

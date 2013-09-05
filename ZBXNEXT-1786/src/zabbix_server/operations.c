@@ -361,10 +361,11 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 					"select hostid,proxy_hostid"
 					" from hosts"
 					" where host='%s'"
+						" and flags<>%d"
 						" and status in (%d,%d)"
 						ZBX_SQL_NODE
 					" order by hostid",
-					host_esc,
+					host_esc, ZBX_FLAG_DISCOVERY_PROTOTYPE,
 					HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 					DBand_node_local("hostid"));
 
@@ -453,8 +454,10 @@ void	op_host_add(const DB_EVENT *event)
  ******************************************************************************/
 void	op_host_del(const DB_EVENT *event)
 {
-	const char	*__function_name = "op_host_del";
-	zbx_uint64_t	hostid;
+	const char		*__function_name = "op_host_del";
+
+	zbx_vector_uint64_t	hostids;
+	zbx_uint64_t		hostid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -467,7 +470,13 @@ void	op_host_del(const DB_EVENT *event)
 	if (0 == (hostid = select_discovered_host(event)))
 		return;
 
-	DBdelete_host(hostid);
+	zbx_vector_uint64_create(&hostids);
+
+	zbx_vector_uint64_append(&hostids, hostid);
+
+	DBdelete_hosts(&hostids);
+
+	zbx_vector_uint64_destroy(&hostids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

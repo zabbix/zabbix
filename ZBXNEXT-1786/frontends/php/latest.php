@@ -40,12 +40,8 @@ if (PAGE_TYPE_HTML == $page['type']) {
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR			     			 TYPE	   OPTIONAL FLAGS	VALIDATION	EXCEPTION
-$fields=array(
+$fields = array(
 	'apps'=>				array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		NULL),
-	'applicationid'=>		array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		NULL),
-	'close'=>				array(T_ZBX_INT, O_OPT,	NULL,	IN('1'),	NULL),
-	'open'=>				array(T_ZBX_INT, O_OPT,	NULL,	IN('1'),	NULL),
-
 	'groupid'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
 	'hostid'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
 
@@ -62,8 +58,17 @@ $fields=array(
 	'toggle_ids'=>			array(T_ZBX_STR, O_OPT, P_ACT,  NULL,		NULL),
 	'toggle_open_state'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NULL,		NULL)
 );
-
 check_fields($fields);
+
+/*
+ * Permissions
+ */
+if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
+	access_deny();
+}
+if (get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
+	access_deny();
+}
 
 /* AJAX */
 if (isset($_REQUEST['favobj'])) {
@@ -123,7 +128,6 @@ else {
 	$_REQUEST['show_without_data'] = CProfile::get('web.latest.filter.show_without_data', 0);
 }
 // --------------
-
 $latest_wdgt = new CWidget(null, 'latest-mon');
 
 // Header
@@ -135,10 +139,10 @@ $r_form = new CForm('get');
 
 $options = array(
 	'groups' => array(
-		'monitored_hosts' => 1,
+		'real_hosts' => true,
 	),
 	'hosts' => array(
-		'monitored_hosts' => 1,
+		'with_monitored_items' => true
 	),
 	'hostid' => get_request('hostid', null),
 	'groupid' => get_request('groupid', null),
@@ -152,7 +156,6 @@ $r_form->addItem(array(SPACE._('Host').SPACE, $pageFilter->getHostsCB(true)));
 
 $latest_wdgt->addHeader(_('Items'), $r_form);
 //-------------
-
 /************************* FILTER **************************/
 /***********************************************************/
 $filterForm = new CFormTable(null, null, 'get');
@@ -202,7 +205,7 @@ elseif ($pageFilter->hostsSelected) {
 }
 
 $hosts = API::Host()->get(array(
-	'output' => array('name', 'hostid'),
+	'output' => array('name', 'hostid', 'status'),
 	'hostids' => $availableHostIds,
 	'with_monitored_items' => true,
 	'selectScreens' => API_OUTPUT_COUNT,
@@ -409,7 +412,10 @@ foreach ($applications as $appid => $dbApp) {
 	$hostName = null;
 
 	if ($_REQUEST['hostid'] == 0) {
-		$hostName = new CSpan($host['name'], 'link_menu');
+		$hostName = new CSpan(
+			$host['name'],
+			'link_menu menu-host'.(($host['status'] == HOST_STATUS_NOT_MONITORED) ? ' not-monitored' : ''
+		));
 		$hostName->setMenuPopup(getMenuPopupHost($host, $hostScripts[$host['hostid']]));
 	}
 
@@ -532,7 +538,10 @@ foreach ($hosts as $hostId => $dbHost) {
 	$hostName = null;
 
 	if ($_REQUEST['hostid'] == 0) {
-		$hostName = new CSpan($host['name'], 'link_menu');
+		$hostName = new CSpan(
+			$host['name'],
+			'link_menu menu-host'.(($host['status'] == HOST_STATUS_NOT_MONITORED) ? ' not-monitored' : ''
+		));
 		$hostName->setMenuPopup(getMenuPopupHost($host, $hostScripts[$host['hostid']]));
 	}
 

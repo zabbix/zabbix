@@ -38,7 +38,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'serviceid' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'group_serviceid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'name' => 							array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save_service})', _('Name')),
 	'algorithm' =>						array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'),'isset({save_service})'),
 	'showsla' =>						array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
@@ -73,7 +72,9 @@ $fields = array(
 );
 check_fields($fields);
 
-// check permissions
+/*
+ * Permissions
+ */
 if (!empty($_REQUEST['serviceid'])) {
 	$options = array(
 		'output' => API_OUTPUT_EXTEND,
@@ -90,7 +91,6 @@ if (!empty($_REQUEST['serviceid'])) {
 	}
 
 	$service = API::Service()->get($options);
-
 	$service = reset($service);
 	if (!$service) {
 		access_deny();
