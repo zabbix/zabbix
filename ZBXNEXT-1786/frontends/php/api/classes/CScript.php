@@ -628,12 +628,12 @@ class CScript extends CZBXAPI {
 				continue;
 			}
 
-			$path = splitPath($script['name']);
+			$path = splitPath($script['name'], false);
 
 			$script['name'] = '';
 
 			foreach ($path as $item) {
-				$script['name'] .= str_replace('/', '\/', str_replace('\\', '\\\\', trim($item))).'/';
+				$script['name'] .= trim($item).'/';
 			}
 
 			$script['name'] = substr($script['name'], 0, strlen($script['name']) - 1);

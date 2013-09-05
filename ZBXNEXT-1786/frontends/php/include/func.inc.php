@@ -2730,10 +2730,11 @@ function getMenuPopupTrigger(array $trigger, array $items = null, array $acknowl
  * Splitting string using slashes with escape backslash support.
  *
  * @param string $path
+ * @param bool   $stripSlashes
  *
  * @return array
  */
-function splitPath($path) {
+function splitPath($path, $stripSlashes = true) {
 	$items = array();
 	$s = $escapes = '';
 
@@ -2745,12 +2746,12 @@ function splitPath($path) {
 			}
 			else {
 				if (strlen($escapes) % 2 == 0) {
-					$s .= stripslashes($escapes);
+					$s .= $stripSlashes ? stripslashes($escapes) : $escapes;
 					$items[] = $s;
 					$s = $escapes = '';
 				}
 				else {
-					$s .= stripslashes($escapes).$path[$i];
+					$s .= $stripSlashes ? stripslashes($escapes).$path[$i] : $escapes.$path[$i];
 					$escapes = '';
 				}
 			}
@@ -2759,13 +2760,13 @@ function splitPath($path) {
 			$escapes .= $path[$i];
 		}
 		else {
-			$s .= stripslashes($escapes).$path[$i];
+			$s .= $stripSlashes ? stripslashes($escapes).$path[$i] : $escapes.$path[$i];
 			$escapes = '';
 		}
 	}
 
 	if ($escapes !== '') {
-		$s .= stripslashes($escapes);
+		$s .= $stripSlashes ? stripslashes($escapes) : $escapes;
 	}
 
 	$items[] = $s;
