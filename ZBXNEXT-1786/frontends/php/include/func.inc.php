@@ -2711,9 +2711,9 @@ function getMenuPopupHistory(array $item) {
  * @param array  $trigger						trigger data
  * @param string $trigger['triggerid']			trigger id
  * @param int    $trigger['flags']				trigger flags (TRIGGER_FLAG_DISCOVERY*)
- * @param int    $trigger['hosts']				hosts, used by trigger expression
- * @param int    $trigger['hosts'][]['hostid']	host id
- * @param int    $trigger['url']				url
+ * @param array  $trigger['hosts']				hosts, used by trigger expression
+ * @param string $trigger['hosts'][]['hostid']	host id
+ * @param string $trigger['url']				url
  * @param array  $items							trigger items (optional)
  * @param string $items[]['name']				item name
  * @param array  $items[]['params']				item url parameters ("name" => "value")
