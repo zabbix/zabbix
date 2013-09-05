@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-03 18:47+0300\n"
+"POT-Creation-Date: 2013-09-06 01:17+0300\n"
 "PO-Revision-Date: 2013-08-25 22:42+0200\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -232,7 +232,7 @@ msgstr "Akceptovateľná SLA"
 msgid "Access denied!"
 msgstr "Prístup zamietnutý!"
 
-#: include/func.inc.php:2039
+#: include/func.inc.php:2045
 msgid "Access denied."
 msgstr "Prístup zamietnutý."
 
@@ -1321,7 +1321,7 @@ msgstr "Nie je možné pridať proxy"
 msgid "Cannot add regular expression"
 msgstr "Nie je možné pridať regulárny výraz"
 
-#: screenconf.php:174
+#: screenconf.php:172
 msgid "Cannot add screen"
 msgstr "Nie je možné pridať obrazovku"
 
@@ -1583,7 +1583,7 @@ msgstr[0] "Nie je možné zmazať regulárny výraz"
 msgstr[1] "Nie je možné zmazať regulárne výrazy"
 msgstr[2] "Nie je možné zmazať regulárne výrazy"
 
-#: screenconf.php:223
+#: screenconf.php:221
 msgid "Cannot delete screen"
 msgstr "Nie je možné zmazať obrazovku"
 
@@ -2188,7 +2188,7 @@ msgstr ""
 msgid "Cannot update regular expression"
 msgstr "Nie je možné upraviť regulárny výraz"
 
-#: screenconf.php:153
+#: screenconf.php:151
 msgid "Cannot update screen"
 msgstr "Nie je možné upraviť Obrazovku"
 
@@ -3761,7 +3761,7 @@ msgid "Description"
 msgstr "Poznámka"
 
 #: include/actions.inc.php:966 include/blocks.inc.php:719
-#: include/func.inc.php:2159
+#: include/func.inc.php:2165
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:44
 #: include/views/configuration.action.edit.php:328
@@ -4050,7 +4050,7 @@ msgstr "Stav zisťovania"
 msgid "Display OK triggers for"
 msgstr "Zobrazovať spúšťače v stave OK po dobu"
 
-#: include/func.inc.php:1842
+#: include/func.inc.php:1848
 msgid "Displaying"
 msgstr "Zobrazujem"
 
@@ -4202,7 +4202,7 @@ msgctxt "Exa short"
 msgid "E"
 msgstr "E"
 
-#: include/func.inc.php:2126
+#: include/func.inc.php:2132
 msgid "ERROR"
 msgstr "CHYBA"
 
@@ -4844,7 +4844,7 @@ msgstr "Fínsky (fi_FI)"
 msgid "First"
 msgstr "Prvý"
 
-#: include/func.inc.php:1787
+#: include/func.inc.php:1793
 msgctxt "page navigation"
 msgid "First"
 msgstr "Prvá"
@@ -5016,7 +5016,7 @@ msgstr "Spusti"
 msgid "Go to"
 msgstr "Choď na"
 
-#: include/func.inc.php:2057
+#: include/func.inc.php:2063
 msgid "Go to dashboard"
 msgstr "Choď na konzolu"
 
@@ -6064,7 +6064,7 @@ msgstr "Ikony"
 msgid "Identical expression already exists"
 msgstr "Identický výraz už existuje"
 
-#: include/func.inc.php:2047 include/func.inc.php:2067
+#: include/func.inc.php:2053 include/func.inc.php:2073
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "Pokiaľ si myslíte, že táto správa je zlá, prosím kontaktuje vášho administrátora pre pridelenie potrebných oprávnení."
 
@@ -7596,7 +7596,7 @@ msgstr "Jazyk"
 msgid "Last"
 msgstr "Posledný"
 
-#: include/func.inc.php:1827
+#: include/func.inc.php:1833
 msgctxt "page navigation"
 msgid "Last"
 msgstr "Posledná"
@@ -7877,7 +7877,7 @@ msgstr "Logovať aj nenastavené SNMP trapy"
 msgid "Logged in as"
 msgstr "Prihlásený ako"
 
-#: auditlogs.php:143 include/func.inc.php:2053 include/func.inc.php:2070
+#: auditlogs.php:143 include/func.inc.php:2059 include/func.inc.php:2076
 #: include/menu.inc.php:282 include/page_header.php:246
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:64
@@ -8223,7 +8223,7 @@ msgid "Max count of events per trigger to show"
 msgstr "Maximálny počet zobrazovaných udalostí spúšťača"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2161
+#: include/func.inc.php:2167
 msgid "Maximize"
 msgstr "Maximalizovať"
 
@@ -8399,7 +8399,7 @@ msgid "Middle"
 msgstr "Stred"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2161
+#: include/func.inc.php:2167
 msgid "Minimize"
 msgstr "Minimimalizovať"
 
@@ -8777,13 +8777,13 @@ msgstr "Nový čas služby"
 msgid "Next"
 msgstr "Nasledujúce"
 
-#: include/func.inc.php:1820
+#: include/func.inc.php:1826
 msgctxt "page navigation"
 msgid "Next"
 msgstr "Nasledujúce"
 
 #: events.php:756 include/events.inc.php:356 include/events.inc.php:374
-#: include/func.inc.php:2380 include/triggers.inc.php:1608
+#: include/func.inc.php:2386 include/triggers.inc.php:1608
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
 #: include/views/js/adm.regexprs.edit.js.php:142
@@ -9289,7 +9289,7 @@ msgstr "Žiadne oprávnenia pre prístup do systému."
 #: api/classes/CTrigger.php:998 api/classes/CTrigger.php:1843
 #: api/classes/CTriggerPrototype.php:566 api/classes/CTriggerPrototype.php:669
 #: api/classes/CUserMacro.php:726 api/classes/CUserMacro.php:835
-#: api/classes/CUser.php:1156 include/func.inc.php:2026
+#: api/classes/CUser.php:1156 include/func.inc.php:2032
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Žiadne oprávnenia k odkazovanému objektu alebo objekt neexistuje!"
 
@@ -10452,7 +10452,7 @@ msgstr "Náhľad"
 msgid "Previous"
 msgstr "Predchádzajúce"
 
-#: include/func.inc.php:1793
+#: include/func.inc.php:1799
 msgctxt "page navigation"
 msgid "Previous"
 msgstr "Predchádzajúca"
@@ -10712,11 +10712,11 @@ msgstr "Predmet správy po zotavení"
 msgid "Refresh (in seconds)"
 msgstr "Obnoviť (v sekundách)"
 
-#: include/func.inc.php:1901
+#: include/func.inc.php:1907
 msgid "Refresh time in seconds"
 msgstr "Obnovovací čas v sekundách"
 
-#: include/func.inc.php:1905
+#: include/func.inc.php:1911
 msgid "Refresh time multiplier"
 msgstr "Násobok obnovovacieho času"
 
@@ -11423,7 +11423,7 @@ msgstr "Obrazovka \"%1$s\" preskočená - používateľské pravidlo."
 msgid "Screen \"%1$s\" updated."
 msgstr "Obrazovka \"%1$s\" aktualizovaná."
 
-#: screenconf.php:174
+#: screenconf.php:172
 msgid "Screen added"
 msgstr "Obrazovka pridaná"
 
@@ -11431,7 +11431,7 @@ msgstr "Obrazovka pridaná"
 msgid "Screen cell configuration"
 msgstr "Nastavenie bunky obrazovky"
 
-#: screenconf.php:223
+#: screenconf.php:221
 msgid "Screen deleted"
 msgstr "Obrazovka zmazaná"
 
@@ -11443,7 +11443,7 @@ msgstr "Položka obrazovky už existuje v tej istej bunke."
 msgid "Screen should contain at least one row and column."
 msgstr "Obrazovka musí obsahovať najmenej jeden riadok a stĺpec."
 
-#: screenconf.php:153
+#: screenconf.php:151
 msgid "Screen updated"
 msgstr "Obrazovka aktualizovaná"
 
@@ -13128,7 +13128,7 @@ msgstr "USA (160 znakov)"
 msgid "USER PROFILE"
 msgstr "POUŽÍVATEĽSKÝ PROFIL"
 
-#: include/func.inc.php:2559
+#: include/func.inc.php:2565
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -14109,7 +14109,7 @@ msgstr "Ročne"
 
 #: events.php:756 include/blocks.inc.php:727
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:359
-#: include/events.inc.php:377 include/func.inc.php:2380
+#: include/events.inc.php:377 include/func.inc.php:2386
 #: include/triggers.inc.php:1608
 #: include/views/administration.users.list.php:76
 #: include/views/js/adm.regexprs.edit.js.php:139
@@ -14129,7 +14129,7 @@ msgstr "Nemôžete si vybrať niektoré jazyky pretože locales pre ne nie sú n
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "Nie je Vám dovolené meniť privilégiá pre používateľa \"%s\"."
 
-#: include/func.inc.php:2063
+#: include/func.inc.php:2069
 msgid "You are not logged in."
 msgstr "Nie ste prihlásený."
 
@@ -14180,15 +14180,15 @@ msgstr "Nemáte oprávnenia na aktualizáciu iných používateľov."
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "Nemáte oprávnenia na aktulizáciu používateľa alebo používateľ neexistuje."
 
-#: include/func.inc.php:2045
+#: include/func.inc.php:2051
 msgid "You have no permissions to access this page."
 msgstr "Nemáte oprávnenia k prístupu k tejto stránke."
 
-#: include/func.inc.php:2065
+#: include/func.inc.php:2071
 msgid "You must login to view this page."
 msgstr "Musíte byť prihlásený pre zobrazenie tejto stránky."
 
-#: include/func.inc.php:2041
+#: include/func.inc.php:2047
 msgid "Your are logged in as"
 msgstr "Ste prihlásený ako"
 
@@ -14508,7 +14508,7 @@ msgstr "spustené"
 msgid "fixed"
 msgstr "pevný"
 
-#: include/func.inc.php:1852
+#: include/func.inc.php:1858
 msgid "found"
 msgstr "nájdených"
 
@@ -14687,7 +14687,7 @@ msgid "now"
 msgstr "teraz"
 
 #: include/blocks.inc.php:352 include/blocks.inc.php:696
-#: include/func.inc.php:1849
+#: include/func.inc.php:1855
 msgid "of"
 msgstr "z"
 
@@ -14765,7 +14765,7 @@ msgstr "zobraziť párovanie hodnôt"
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "šablóna ID \"%1$s\" je použitá %2$s krát"
 
-#: include/func.inc.php:1845
+#: include/func.inc.php:1851
 msgid "to"
 msgstr "do"
 
