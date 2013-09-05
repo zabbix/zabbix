@@ -659,7 +659,7 @@ else {
 			}
 			$hostids = zbx_objectValues($hosts, 'hostid');
 			$hosts = API::Host()->get(array(
-				'output' => array('name', 'hostid'),
+				'output' => array('name', 'hostid', 'status'),
 				'hostids' => $hostids,
 				'selectScreens' => API_OUTPUT_COUNT,
 				'selectInventory' => array('hostid'),
