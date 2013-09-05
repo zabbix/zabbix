@@ -26,7 +26,6 @@
 .disabled	{ color: #DC0000; }
 .on			{ color: #DC0000; }
 .off		{ color: #00AA00; }
-.hidden		{ display: none; }
 
 .green	{ color: #00AA00; }
 .red	{ color: #DC0000; }
@@ -93,12 +92,18 @@ table.tableinfo tr.green:hover			{ background-color: #AAEEAA; border: 1px #AAEEA
 table.tableinfo tr.blue					{ background-color: #BBBBFF; border: 1px #BBBBFF solid; }
 table.tableinfo tr.blue:hover			{ background-color: #AAAAEE; border: 1px #AAAAEE solid; }
 
+table.tableinfo .not-monitored			{ color: #DC0000; }
+table.tableinfo .not-monitored:hover	{ color: #CC4444; }
+
 /* require if tableinfo is inside jQuery Tab */
-table.tableinfo a.enabled:link		{ color: #00AA00; }
-table.tableinfo a.enabled:visited	{ color: #00AA00; }
-table.tableinfo a.enabled:hover		{ color: #44CC44; }
-table.tableinfo a.enabled:active	{ color: #00AA00; }
-table.tableinfo a.disabled:link		{ color: #DC0000; }
-table.tableinfo a.disabled:visited	{ color: #DC0000; }
-table.tableinfo a.disabled:hover	{ color: #CC4444; }
-table.tableinfo a.disabled:active	{ color: #DC0000; }
+table.tableinfo a.enabled:link			{ color: #00AA00; }
+table.tableinfo a.enabled:visited		{ color: #00AA00; }
+table.tableinfo a.enabled:hover			{ color: #44CC44; }
+table.tableinfo a.enabled:active		{ color: #00AA00; }
+table.tableinfo a.disabled:link			{ color: #DC0000; }
+table.tableinfo a.disabled:visited		{ color: #DC0000; }
+table.tableinfo a.disabled:hover		{ color: #CC4444; }
+table.tableinfo a.disabled:active		{ color: #DC0000; }
+
+.input.select.not-monitored				{ color: #DC0000; }
+.input option.not-monitored				{ color: #DC0000; }

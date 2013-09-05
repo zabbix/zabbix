@@ -76,7 +76,7 @@ static void	zbx_load_config(int optional)
 	{
 		/* PARAMETER,			VAR,					TYPE,
 			MANDATORY,	MIN,			MAX */
-		{"Server",			&CONFIG_HOSTS_ALLOWED,			TYPE_STRING,
+		{"Server",			&CONFIG_HOSTS_ALLOWED,			TYPE_STRING_LIST,
 			PARM_MAND,	0,			0},
 		{"Timeout",			&CONFIG_TIMEOUT,			TYPE_INT,
 			PARM_OPT,	1,			30},
@@ -99,8 +99,6 @@ static void	zbx_load_config(int optional)
 	zbx_strarr_init(&CONFIG_USER_PARAMETERS);
 
 	parse_cfg_file(CONFIG_FILE, cfg, optional, ZBX_CFG_STRICT);
-
-	zbx_trim_str_list(CONFIG_HOSTS_ALLOWED, ',');
 }
 
 /******************************************************************************

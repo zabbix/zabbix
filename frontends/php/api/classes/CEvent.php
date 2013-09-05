@@ -501,7 +501,8 @@ class CEvent extends CZBXAPI {
 						' WHERE '.dbConditionInt('e.eventid', $eventIds).
 						' AND e.objectid=f.triggerid'.
 						' AND f.itemid=i.itemid'.
-						' AND e.object='.EVENT_OBJECT_TRIGGER
+						' AND e.object='.$options['object'].
+						' AND e.source='.$options['source']
 				);
 			}
 			// item and LLD rule events
@@ -511,7 +512,8 @@ class CEvent extends CZBXAPI {
 						' FROM events e,items i'.
 						' WHERE '.dbConditionInt('e.eventid', $eventIds).
 						' AND e.objectid=i.itemid'.
-						' AND e.object='.$options['object']
+						' AND e.object='.$options['object'].
+						' AND e.source='.$options['source']
 				);
 			}
 

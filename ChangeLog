@@ -1,12 +1,38 @@
+Changes for 2.1.4
+
+New features:
+A.F.I..PS. [ZBXNEXT-1633] implemented host prototypes (Pavels, Sasha)
+.......PS. [ZBXNEXT-1633] implemented monitoring of vCenter and vSphere (Alexei, Sasha, wiper)
+
+Bug fixes:
+..F....... [ZBX-6873] fixed errors in page switching after executing an action (Ivo)
+.......P.. [ZBX-6936] fixed MySQL errors when updating configuration of the proxy (Sasha)
+.......P.. [ZBX-6929] fixed updating of lastlogsize and mtime in the proxy's database (Sasha)
+....I..... [ZBX-6890] added missing indexes in child-tables for foreign key contraints, rename some indexes to meet naming convention (Andris)
+..F....... [ZBX-6887] allowed to translate "Internal" in a different way in authentication, event and user context (Eduard)
+A......... [ZBX-6124] removed unused API methods (Eduard)
+..F....... [ZBX-6927] improved validation messages (Eduard)
+..F....... [ZBX-6923] fixed mass delete in template list, improved code quality in hosts and templates (Vitalij)
+
+--------------------------------------------------------------------------------
 Changes for 2.1.3
 
 New features:
+..F....... [ZBXNEXT-317] enabled access to historical data for disabled hosts (Guntis, Ivo)
+..F....... [ZBX-6896] list of media types for creating new medias in a user's profile sorted by name (Vitalij)
+..F....... [ZBX-6868] maps default add icon defined in defines.inc.php (Vitalij)
 .......PS. [ZBX-6852] removed support of iODBC (Sasha)
 A.F.I..... [ZBXNEXT-1569] implemented user name and surname displaying in acknowledgements (Ivo, Oleg)
 
 Bug fixes:
+...G...PS. [ZBX-6916] added space delimeter support in configuration file (igors)
+..F....... [ZBX-6930] 'Unlink and clear' link bug fix, now it displayed (Vitalij)
+..F....... [ZBX-6878] fixed history screen log bug for two items, parametr itemid renamed to itemids (Vitalij)
+..F....... [ZBX-6903] fixed template name trim (Eduard, Sasha)
+A.F....... [ZBX-6899] specified source parameter in SQL from events table (Vitalij)
+..F....... [ZBX-6893] fixed prototype name error ($1 -> {#FSNAME}) on adding new prototype in the graph prototype form in the item prototype selection template (Vitalij)
 ..F....... [ZBX-6816] improved permission validation on multiple pages (Ivo, Guntis)
-...G...... [ZBXNEXT-1056] improved active checks error messages (wiper)
+...G...... [ZBXNEXT-1056] improved active check error messages to proclaim active checks working again before complaining about a missing host (wiper)
 .......P.. [ZBX-6249] fixed data loss in proxy "Data sender" process caused by unfinished transactions; thanks to MATSUDA Daiki for patch (Andris)
 ..F....... [ZBX-6838] fixed not being able to select all host groups in the filter (Pavels)
 ..F....... [ZBX-6275] fixed error after saving an LLD rule (Guntis)
@@ -25,6 +51,7 @@ New features:
 ...G...... [ZBXNEXT-1528] added net.if.in, net.if.out and net.if.total item support on HP-UX platform (igors)
 
 Bug fixes:
+..F....... [ZBX-6888] fixed javascript error in popups with "select all" checkbox
 .......P.. [ZBX-6897] fixed synchronization of the "httptest" configuration table (Sasha)
 ........S. [ZBX-6898] fixed processing of queue request; not checked items will be included to the queue (Sasha)
 ........S. [ZBX-6889] fixed processing of availability data by the server (Sasha)
@@ -354,10 +381,29 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
 
 --------------------------------------------------------------------------------
+Changes for 2.0.9rc1
+
+New features:
+A.F....... [ZBX-1357] updated Chinese (China), Lithuanian and Slovak translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+...G...... [ZBX-6902] reverting Solaris system.swap.size calculation from "swap -s" (used in 2.0.7, 2.0.8) to "swap -l"-like algorithm (as in 2.0.6) (Andris)
+.......P.. [ZBX-6936] fixed MySQL errors when updating configuration of the proxy (Sasha)
+.......P.. [ZBX-6929] fixed updating of lastlogsize and mtime in the proxy's database (Sasha)
+..F....... [ZBX-6923] fixed mass delete in template list, 'Delete selected' and 'Delete selected with linked elements' functions (Vitalij)
+..F....... [ZBX-6922] fixed host interface importing (Eduard)
+.......P.. [ZBX-6249] fixed data loss in proxy "Data sender" process caused by unfinished transactions; thanks to MATSUDA Daiki for patch (Andris)
+...G...... [ZBXNEXT-1056] improved active checks error messages (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.8
+
+2.0.8rc2 was released as 2.0.8 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.0.8rc2
 
 Bug fixes:
-...G...... [ZBXNEXT-1056] improved active checks error messages (wiper)
 ........S. [ZBX-6889] fixed processing of availability data by the server (Sasha)
 
 --------------------------------------------------------------------------------

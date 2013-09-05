@@ -72,7 +72,8 @@ elseif (isset($_REQUEST['save'])) {
 
 	$hosts = API::Host()->get(array(
 		'hostids' => $hostIds,
-		'output' => array('hostid')
+		'output' => array('hostid'),
+		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 	));
 
 	$templates = API::Template()->get(array(
@@ -89,14 +90,18 @@ elseif (isset($_REQUEST['save'])) {
 		));
 		$oldGroup = reset($oldGroup);
 
-		$result = API::HostGroup()->update(array(
-			'groupid' => $_REQUEST['groupid'],
-			'name' => $_REQUEST['name']
-		));
+		$result = true;
+		// don't try to update the name for a discovered host group
+		if ($oldGroup['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
+			$result = API::HostGroup()->update(array(
+				'groupid' => $_REQUEST['groupid'],
+				'name' => $_REQUEST['name']
+			));
+		}
 
 		if ($result) {
 			$groups = API::HostGroup()->get(array(
-				'groupids' => $result['groupids'],
+				'groupids' => $_REQUEST['groupid'],
 				'output' => API_OUTPUT_EXTEND
 			));
 
@@ -268,7 +273,8 @@ if (isset($_REQUEST['form'])) {
 		'templated_hosts' => true,
 		'sortfield' => 'name',
 		'editable' => true,
-		'output' => API_OUTPUT_EXTEND
+		'output' => API_OUTPUT_EXTEND,
+		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 	));
 
 	// get selected hosts
@@ -316,6 +322,7 @@ else {
 	);
 
 	$sortfield = getPageSortField('name');
+	$sortorder =  getPageSortOrder();
 
 	$groups = API::HostGroup()->get(array(
 		'editable' => true,
@@ -340,11 +347,12 @@ else {
 		'groupids' => zbx_objectValues($groups, 'groupid'),
 		'selectHosts' => array('hostid', 'name', 'status'),
 		'selectTemplates' => array('hostid', 'name', 'status'),
+		'selectGroupDiscovery' => array('ts_delete'),
+		'selectDiscoveryRule' => array('itemid', 'name'),
 		'output' => API_OUTPUT_EXTEND,
-		'nopermissions' => 1,
 		'limitSelects' => $config['max_in_table'] + 1
 	));
-	order_result($data['groups'], $sortfield, getPageSortOrder());
+	order_result($data['groups'], $sortfield, $sortorder);
 
 	// nodes
 	if ($data['displayNodes']) {
