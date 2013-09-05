@@ -1300,26 +1300,11 @@ function getTriggerOverviewCells($trigger, $screenId = null) {
 				' AND f.triggerid='.$trigger['triggerid']
 		);
 		while ($item = DBfetch($dbItems)) {
-			$action = null;
-
-			switch ($item['value_type']) {
-				case ITEM_VALUE_TYPE_UINT64:
-				case ITEM_VALUE_TYPE_FLOAT:
-					$action = 'showgraph';
-					break;
-
-				case ITEM_VALUE_TYPE_LOG:
-				case ITEM_VALUE_TYPE_STR:
-				case ITEM_VALUE_TYPE_TEXT:
-				default:
-					$action = 'showlatest';
-					break;
-			}
-
 			$triggerItems[] = array(
 				'name' => itemName($item),
 				'params' => array(
-					'action' => $action,
+					'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
+						? 'showgraph' : 'showlatest',
 					'itemid' => $item['itemid'],
 					'period' => 3600
 				)
