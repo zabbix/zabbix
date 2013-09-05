@@ -21,7 +21,7 @@
 /**
  * Get menu popup host section data.
  *
- * @param string options['hostId']			host id
+ * @param string options['hostid']			host id
  * @param array  options['scripts']			host scripts
  * @param bool   options['hasScreens']		link to host screen page
  * @param bool   options['hasInventory']	link to host inventory page
@@ -38,13 +38,13 @@ function getMenuPopupHost(options) {
 		for (var key in options.scripts) {
 			var script = options.scripts[key];
 
-			if (typeof script.scriptId !== 'undefined') {
+			if (typeof script.scriptid !== 'undefined') {
 				var items = splitPath(script.name),
 					name = (items.length > 0) ? items.pop() : script.name;
 
 				appendTreeItem(menuTree, name, items, {
-					hostId: options.hostId,
-					scriptId: script.scriptId,
+					hostId: options.hostid,
+					scriptId: script.scriptid,
 					confirmation: script.confirmation
 				});
 			}
@@ -60,14 +60,14 @@ function getMenuPopupHost(options) {
 	// latest
 	gotos[gotos.length] = {
 		label: t('Latest data'),
-		url: new Curl('latest.php?hostid=' + options.hostId).getUrl()
+		url: new Curl('latest.php?hostid=' + options.hostid).getUrl()
 	};
 
 	// inventories
 	if (options.hasInventory) {
 		gotos[gotos.length] = {
 			label: t('Host inventories'),
-			url: new Curl('hostinventories.php?hostid=' + options.hostId).getUrl()
+			url: new Curl('hostinventories.php?hostid=' + options.hostid).getUrl()
 		};
 	}
 
@@ -75,7 +75,7 @@ function getMenuPopupHost(options) {
 	if (options.hasScreens) {
 		gotos[gotos.length] = {
 			label: t('Host screens'),
-			url: new Curl('host_screen.php?hostid=' + options.hostId).getUrl()
+			url: new Curl('host_screen.php?hostid=' + options.hostid).getUrl()
 		};
 	}
 
@@ -91,7 +91,7 @@ function getMenuPopupHost(options) {
 /**
  * Get menu popup map section data.
  *
- * @param string options['hostId']					host id
+ * @param string options['hostid']					host id
  * @param array  options['scripts']					host scripts
  * @param object options['gotos']					links section
  * @param array  options['gotos']['screens']		link to host screen page with url parameters ("name" => "value")
@@ -112,13 +112,13 @@ function getMenuPopupMap(options) {
 		for (var key in options.scripts) {
 			var script = options.scripts[key];
 
-			if (typeof script.scriptId !== 'undefined') {
+			if (typeof script.scriptid !== 'undefined') {
 				var items = splitPath(script.name),
 					name = (items.length > 0) ? items.pop() : script.name;
 
 				appendTreeItem(menuTree, name, items, {
-					hostId: options.hostId,
-					scriptId: script.scriptId,
+					hostId: options.hostid,
+					scriptId: script.scriptid,
 					confirmation: script.confirmation
 				});
 			}
@@ -213,7 +213,7 @@ function getMenuPopupMap(options) {
 /**
  * Get menu popup trigger section data.
  *
- * @param string options['triggerId']		trigger id
+ * @param string options['triggerid']		trigger id
  * @param object options['items']			link to trigger item history page with url parameters ("name" => "value")
  * @param object options['acknowledge']		link to acknowledge page with url parameters ("name" => "value")
  * @param int    options['eventTime']		event page url navigation time parameter
@@ -226,7 +226,7 @@ function getMenuPopupTrigger(options) {
 	var sections = [], items = [];
 
 	// events
-	var url = new Curl('events.php?triggerid=' + options.triggerId);
+	var url = new Curl('events.php?triggerid=' + options.triggerid);
 
 	if (!empty(options.eventTime)) {
 		url.setArgument('nav_time', options.eventTime);
@@ -253,8 +253,8 @@ function getMenuPopupTrigger(options) {
 
 	// configuration
 	if (!empty(options.configuration)) {
-		var url = new Curl('triggers.php?triggerid=' + options.triggerId +
-			'&hostid=' + options.configuration.hostId + '&form=update&switch_node=' + options.configuration.switchNode);
+		var url = new Curl('triggers.php?triggerid=' + options.triggerid +
+			'&hostid=' + options.configuration.hostid + '&form=update&switch_node=' + options.configuration.switchNode);
 
 		items[items.length] = {
 			label: t('Configuration'),
@@ -306,7 +306,7 @@ function getMenuPopupTrigger(options) {
 /**
  * Get menu popup history section data.
  *
- * @param string options['itemId']				item id
+ * @param string options['itemid']				item id
  * @param bool   options['hasLatestGraphs']		link to history page with showgraph action
  *
  * @return array
@@ -318,24 +318,24 @@ function getMenuPopupHistory(options) {
 	if (typeof options.hasLatestGraphs !== 'undefined' && options.hasLatestGraphs) {
 		items[items.length] = {
 			label: t('Last hour graph'),
-			url: new Curl('history.php?itemid=' + options.itemId + '&action=showgraph&period=3600').getUrl()
+			url: new Curl('history.php?itemid=' + options.itemid + '&action=showgraph&period=3600').getUrl()
 		};
 
 		items[items.length] = {
 			label: t('Last week graph'),
-			url: new Curl('history.php?itemid=' + options.itemId + '&action=showgraph&period=604800').getUrl()
+			url: new Curl('history.php?itemid=' + options.itemid + '&action=showgraph&period=604800').getUrl()
 		};
 
 		items[items.length] = {
 			label: t('Last month graph'),
-			url: new Curl('history.php?itemid=' + options.itemId + '&action=showgraph&period=2678400').getUrl()
+			url: new Curl('history.php?itemid=' + options.itemid + '&action=showgraph&period=2678400').getUrl()
 		};
 	}
 
 	// latest values
 	items[items.length] = {
 		label: t('Latest values'),
-		url: new Curl('history.php?itemid=' + options.itemId + '&action=showvalues&period=3600').getUrl()
+		url: new Curl('history.php?itemid=' + options.itemid + '&action=showvalues&period=3600').getUrl()
 	};
 
 	return [{
@@ -625,7 +625,7 @@ jQuery(function($) {
 	function createMenuItem(label, link, subMenu) {
 		return $('<li>').append(
 			$('<a>', {
-				html: label,
+				text: label,
 				href: link
 			}),
 			(typeof subMenu === 'undefined') ? null : subMenu

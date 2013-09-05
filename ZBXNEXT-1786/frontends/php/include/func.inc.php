@@ -2600,15 +2600,15 @@ function clearCookies($clear = false, $id = null) {
 /**
  * Prepare data for host menu popup.
  *
- * @param array $host
- * @param array $scripts
+ * @param array $host			host data
+ * @param array $scripts		host scripts
  *
  * @return array
  */
 function getMenuPopupHost(array $host, array $scripts = null) {
 	$data = array(
 		'type' => 'host',
-		'hostId' => $host['hostid'],
+		'hostid' => $host['hostid'],
 		'hasInventory' => (isset($host['inventory']) && $host['inventory']),
 		'hasScreens' => (isset($host['screens']) && $host['screens'])
 	);
@@ -2619,7 +2619,7 @@ function getMenuPopupHost(array $host, array $scripts = null) {
 		foreach (array_values($scripts) as $script) {
 			$data['scripts'][] = array(
 				'name' => $script['name'],
-				'scriptId' => $script['scriptid'],
+				'scriptid' => $script['scriptid'],
 				'confirmation' => $script['confirmation']
 			);
 		}
@@ -2631,10 +2631,13 @@ function getMenuPopupHost(array $host, array $scripts = null) {
 /**
  * Prepare data for host menu popup.
  *
- * @param string $hostId
- * @param array  $scripts
- * @param array  $gotos
- * @param array  $urls
+ * @param string $hostId					host id
+ * @param array  $scripts					host scripts
+ * @param array  $gotos['screens']			link to host screen page with url parameters ("name" => "value")
+ * @param array  $gotos['triggerStatus']	link to trigger status page with url parameters ("name" => "value")
+ * @param array  $gotos['submap']			link to submap page with url parameters ("name" => "value")
+ * @param array  $gotos['events']			link to events page with url parameters ("name" => "value")
+ * @param array  $urls						local and global map urls
  *
  * @return array
  */
@@ -2646,12 +2649,12 @@ function getMenuPopupMap($hostId, array $scripts = null, array $gotos = null, ar
 	if ($scripts) {
 		CArrayHelper::sort($scripts, array('name'));
 
-		$data['hostId'] = $hostId;
+		$data['hostid'] = $hostId;
 
 		foreach (array_values($scripts) as $script) {
 			$data['scripts'][] = array(
 				'name' => $script['name'],
-				'scriptId' => $script['scriptid'],
+				'scriptid' => $script['scriptid'],
 				'confirmation' => $script['confirmation']
 			);
 		}
@@ -2676,14 +2679,16 @@ function getMenuPopupMap($hostId, array $scripts = null, array $gotos = null, ar
 /**
  * Prepare data for item history menu popup.
  *
- * @param array $item
+ * @param array $item				item data
+ * @param array $item['itemid']		item id
+ * @param array $item['value_type']	item value type
  *
  * @return array
  */
 function getMenuPopupHistory(array $item) {
 	return array(
 		'type' => 'history',
-		'itemId' => $item['itemid'],
+		'itemid' => $item['itemid'],
 		'hasLatestGraphs' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT))
 	);
 }
@@ -2705,7 +2710,7 @@ function getMenuPopupTrigger(array $trigger, array $items = null, array $acknowl
 
 	$data = array(
 		'type' => 'trigger',
-		'triggerId' => $trigger['triggerid'],
+		'triggerid' => $trigger['triggerid'],
 		'items' => $items,
 		'acknowledge' => $acknowledge,
 		'eventTime' => $eventTime,
@@ -2718,7 +2723,7 @@ function getMenuPopupTrigger(array $trigger, array $items = null, array $acknowl
 		$host = reset($trigger['hosts']);
 
 		$data['configuration'] = array(
-			'hostId' => $host['hostid'],
+			'hostid' => $host['hostid'],
 			'switchNode' => id2nodeid($trigger['triggerid'])
 		);
 	}
@@ -2729,8 +2734,8 @@ function getMenuPopupTrigger(array $trigger, array $items = null, array $acknowl
 /**
  * Splitting string using slashes with escape backslash support.
  *
- * @param string $path
- * @param bool   $stripSlashes
+ * @param string $path				string path to parse
+ * @param bool   $stripSlashes		remove escaped slashes from the path pieces
  *
  * @return array
  */

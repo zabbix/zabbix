@@ -224,7 +224,7 @@ class CTag extends CObject {
 	 * @param array $data
 	 */
 	public function setMenuPopup(array $data) {
-		$this->attr('data-menu-popup', $this->encode($data, $this->attrEncStrategy));
+		$this->attr('data-menu-popup', $data);
 	}
 
 	public function onClick($handleCode) {
