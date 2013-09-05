@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-03 18:47+0300\n"
+"POT-Creation-Date: 2013-09-06 01:17+0300\n"
 "PO-Revision-Date: 2012-03-21 08:20+0200\n"
 "Last-Translator: Murat <murat@profelis.com.tr>\n"
 "Language-Team: Zabbix translation team\n"
@@ -225,7 +225,7 @@ msgstr ""
 msgid "Access denied!"
 msgstr "Erişim reddedildi!"
 
-#: include/func.inc.php:2039
+#: include/func.inc.php:2045
 msgid "Access denied."
 msgstr ""
 
@@ -1312,7 +1312,7 @@ msgstr "Vekil eklenemedi"
 msgid "Cannot add regular expression"
 msgstr "Düzenli ifade eklenemedi"
 
-#: screenconf.php:174
+#: screenconf.php:172
 msgid "Cannot add screen"
 msgstr "Ekran eklenemedi"
 
@@ -1574,7 +1574,7 @@ msgid_plural "Cannot delete regular expressions"
 msgstr[0] "Düzenli ifade silienemedi"
 msgstr[1] "Düzenli ifade silienemedi"
 
-#: screenconf.php:223
+#: screenconf.php:221
 msgid "Cannot delete screen"
 msgstr ""
 
@@ -2176,7 +2176,7 @@ msgstr ""
 msgid "Cannot update regular expression"
 msgstr "Düzenli ifade güncellenemedi"
 
-#: screenconf.php:153
+#: screenconf.php:151
 msgid "Cannot update screen"
 msgstr "Ekran güncellenemedi"
 
@@ -3736,7 +3736,7 @@ msgid "Description"
 msgstr "Açıklama"
 
 #: include/actions.inc.php:966 include/blocks.inc.php:719
-#: include/func.inc.php:2159
+#: include/func.inc.php:2165
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:44
 #: include/views/configuration.action.edit.php:328
@@ -4025,7 +4025,7 @@ msgstr "Keşif Durumu"
 msgid "Display OK triggers for"
 msgstr ""
 
-#: include/func.inc.php:1842
+#: include/func.inc.php:1848
 msgid "Displaying"
 msgstr "Gösteriliyor"
 
@@ -4177,7 +4177,7 @@ msgctxt "Exa short"
 msgid "E"
 msgstr ""
 
-#: include/func.inc.php:2126
+#: include/func.inc.php:2132
 msgid "ERROR"
 msgstr "HATA"
 
@@ -4819,7 +4819,7 @@ msgstr ""
 msgid "First"
 msgstr "İlk"
 
-#: include/func.inc.php:1787
+#: include/func.inc.php:1793
 msgctxt "page navigation"
 msgid "First"
 msgstr ""
@@ -4991,7 +4991,7 @@ msgstr "Git"
 msgid "Go to"
 msgstr ""
 
-#: include/func.inc.php:2057
+#: include/func.inc.php:2063
 msgid "Go to dashboard"
 msgstr ""
 
@@ -6039,7 +6039,7 @@ msgstr ""
 msgid "Identical expression already exists"
 msgstr ""
 
-#: include/func.inc.php:2047 include/func.inc.php:2067
+#: include/func.inc.php:2053 include/func.inc.php:2073
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "Eğer bu mesajın yanlış olduğunu düşünüyorsanız gerekli izinlerin alınması için lütfen yöneticilerinize danışın."
 
@@ -7571,7 +7571,7 @@ msgstr "Dil"
 msgid "Last"
 msgstr "Son"
 
-#: include/func.inc.php:1827
+#: include/func.inc.php:1833
 msgctxt "page navigation"
 msgid "Last"
 msgstr ""
@@ -7851,7 +7851,7 @@ msgstr ""
 msgid "Logged in as"
 msgstr "olarak oturum açıldı"
 
-#: auditlogs.php:143 include/func.inc.php:2053 include/func.inc.php:2070
+#: auditlogs.php:143 include/func.inc.php:2059 include/func.inc.php:2076
 #: include/menu.inc.php:282 include/page_header.php:246
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:64
@@ -8197,7 +8197,7 @@ msgid "Max count of events per trigger to show"
 msgstr ""
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2161
+#: include/func.inc.php:2167
 msgid "Maximize"
 msgstr "Ekranı kapla"
 
@@ -8369,7 +8369,7 @@ msgid "Middle"
 msgstr "Orta"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2161
+#: include/func.inc.php:2167
 msgid "Minimize"
 msgstr "Küçült"
 
@@ -8746,13 +8746,13 @@ msgstr "Yeni servis zamanı"
 msgid "Next"
 msgstr "Sonraki"
 
-#: include/func.inc.php:1820
+#: include/func.inc.php:1826
 msgctxt "page navigation"
 msgid "Next"
 msgstr ""
 
 #: events.php:756 include/events.inc.php:356 include/events.inc.php:374
-#: include/func.inc.php:2380 include/triggers.inc.php:1608
+#: include/func.inc.php:2386 include/triggers.inc.php:1608
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
 #: include/views/js/adm.regexprs.edit.js.php:142
@@ -9258,7 +9258,7 @@ msgstr "Sistem erişimi için izin yok."
 #: api/classes/CTrigger.php:998 api/classes/CTrigger.php:1843
 #: api/classes/CTriggerPrototype.php:566 api/classes/CTriggerPrototype.php:669
 #: api/classes/CUserMacro.php:726 api/classes/CUserMacro.php:835
-#: api/classes/CUser.php:1156 include/func.inc.php:2026
+#: api/classes/CUser.php:1156 include/func.inc.php:2032
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Refere edilen obje için izin yk veya mevcut değil!"
 
@@ -10421,7 +10421,7 @@ msgstr "Önizleme"
 msgid "Previous"
 msgstr "Önceki"
 
-#: include/func.inc.php:1793
+#: include/func.inc.php:1799
 msgctxt "page navigation"
 msgid "Previous"
 msgstr ""
@@ -10681,11 +10681,11 @@ msgstr "Düzelme başlığı"
 msgid "Refresh (in seconds)"
 msgstr "Yenileme(saniye olarak)"
 
-#: include/func.inc.php:1901
+#: include/func.inc.php:1907
 msgid "Refresh time in seconds"
 msgstr "Saniye olarak yenileme zamanı"
 
-#: include/func.inc.php:1905
+#: include/func.inc.php:1911
 msgid "Refresh time multiplier"
 msgstr "Yenileme zaman çarpanı"
 
@@ -11392,7 +11392,7 @@ msgstr ""
 msgid "Screen \"%1$s\" updated."
 msgstr ""
 
-#: screenconf.php:174
+#: screenconf.php:172
 msgid "Screen added"
 msgstr "Ekran eklendi"
 
@@ -11400,7 +11400,7 @@ msgstr "Ekran eklendi"
 msgid "Screen cell configuration"
 msgstr "Ekran hücre yapılandırması"
 
-#: screenconf.php:223
+#: screenconf.php:221
 msgid "Screen deleted"
 msgstr "Ekran silindi"
 
@@ -11412,7 +11412,7 @@ msgstr ""
 msgid "Screen should contain at least one row and column."
 msgstr ""
 
-#: screenconf.php:153
+#: screenconf.php:151
 msgid "Screen updated"
 msgstr "Ekran güncellendi"
 
@@ -13094,7 +13094,7 @@ msgstr "USA(160 karakter)"
 msgid "USER PROFILE"
 msgstr "KULLANICI PROFİLİ"
 
-#: include/func.inc.php:2559
+#: include/func.inc.php:2565
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -14075,7 +14075,7 @@ msgstr "Yıllık"
 
 #: events.php:756 include/blocks.inc.php:727
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:359
-#: include/events.inc.php:377 include/func.inc.php:2380
+#: include/events.inc.php:377 include/func.inc.php:2386
 #: include/triggers.inc.php:1608
 #: include/views/administration.users.list.php:76
 #: include/views/js/adm.regexprs.edit.js.php:139
@@ -14095,7 +14095,7 @@ msgstr "Web sunucu üzerinde yerelleştirme ayarları yapılmamış olan bazı d
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "\"%s\" kullanıcısının önceliklerini değiştirmenize izin verilmiyor."
 
-#: include/func.inc.php:2063
+#: include/func.inc.php:2069
 msgid "You are not logged in."
 msgstr "Oturum açmamışsınız."
 
@@ -14146,15 +14146,15 @@ msgstr "Diğer kullanıcıları güncellemek için izniniz yok."
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "Kullanıcı güncellemek için izniniz yok veya kullanıcı mevcut değil."
 
-#: include/func.inc.php:2045
+#: include/func.inc.php:2051
 msgid "You have no permissions to access this page."
 msgstr ""
 
-#: include/func.inc.php:2065
+#: include/func.inc.php:2071
 msgid "You must login to view this page."
 msgstr "Bu sayfayı görmek için oturup açmak zorundasınız."
 
-#: include/func.inc.php:2041
+#: include/func.inc.php:2047
 msgid "Your are logged in as"
 msgstr ""
 
@@ -14471,7 +14471,7 @@ msgstr "çalıştırılmış"
 msgid "fixed"
 msgstr "sabit"
 
-#: include/func.inc.php:1852
+#: include/func.inc.php:1858
 msgid "found"
 msgstr "bulunan"
 
@@ -14650,7 +14650,7 @@ msgid "now"
 msgstr "şimdi"
 
 #: include/blocks.inc.php:352 include/blocks.inc.php:696
-#: include/func.inc.php:1849
+#: include/func.inc.php:1855
 msgid "of"
 msgstr "un"
 
@@ -14728,7 +14728,7 @@ msgstr "değer eşlemelerini göster"
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "\"%1$s\" şablon ismi  %2$s defa geçti"
 
-#: include/func.inc.php:1845
+#: include/func.inc.php:1851
 msgid "to"
 msgstr "e"
 

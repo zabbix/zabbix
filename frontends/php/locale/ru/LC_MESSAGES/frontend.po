@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-03 18:54+0300\n"
+"POT-Creation-Date: 2013-09-06 01:17+0300\n"
 "PO-Revision-Date: 2013-09-02 13:11+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -233,7 +233,7 @@ msgstr "Допустимый уровень SLA"
 msgid "Access denied!"
 msgstr "Доступ запрещен!"
 
-#: include/func.inc.php:2039
+#: include/func.inc.php:2045
 msgid "Access denied."
 msgstr "Доступ запрещен."
 
@@ -1322,7 +1322,7 @@ msgstr "Не удалось добавить прокси"
 msgid "Cannot add regular expression"
 msgstr "Не удалось добавить регулярное выражение"
 
-#: screenconf.php:174
+#: screenconf.php:172
 msgid "Cannot add screen"
 msgstr "Не удалось добавить комплексный экран"
 
@@ -1584,7 +1584,7 @@ msgstr[0] "Не удалось удалить регулярное выраже�
 msgstr[1] "Не удалось удалить регулярные выражения"
 msgstr[2] "Не удалось удалить регулярные выражения"
 
-#: screenconf.php:223
+#: screenconf.php:221
 msgid "Cannot delete screen"
 msgstr "Не удалось удалить комплексный экран"
 
@@ -2188,7 +2188,7 @@ msgstr ""
 msgid "Cannot update regular expression"
 msgstr "Не удалось обновить регулярное выражение"
 
-#: screenconf.php:153
+#: screenconf.php:151
 msgid "Cannot update screen"
 msgstr "Не удалось обновить комплексный экран"
 
@@ -3760,7 +3760,7 @@ msgid "Description"
 msgstr "Описание"
 
 #: include/actions.inc.php:966 include/blocks.inc.php:719
-#: include/func.inc.php:2159
+#: include/func.inc.php:2165
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:44
 #: include/views/configuration.action.edit.php:328
@@ -4049,7 +4049,7 @@ msgstr "Состояние обнаружения"
 msgid "Display OK triggers for"
 msgstr "Отображать триггеры ОК в течении"
 
-#: include/func.inc.php:1842
+#: include/func.inc.php:1848
 msgid "Displaying"
 msgstr "Отображено"
 
@@ -4201,7 +4201,7 @@ msgctxt "Exa short"
 msgid "E"
 msgstr "Э"
 
-#: include/func.inc.php:2126
+#: include/func.inc.php:2132
 msgid "ERROR"
 msgstr "ОШИБКА"
 
@@ -4843,7 +4843,7 @@ msgstr "Финский (fi_FI)"
 msgid "First"
 msgstr "Первый"
 
-#: include/func.inc.php:1787
+#: include/func.inc.php:1793
 msgctxt "page navigation"
 msgid "First"
 msgstr "Первая"
@@ -5015,7 +5015,7 @@ msgstr "Выполнить"
 msgid "Go to"
 msgstr "Перейти к"
 
-#: include/func.inc.php:2057
+#: include/func.inc.php:2063
 msgid "Go to dashboard"
 msgstr "Перейти на ПАНЕЛЬ"
 
@@ -6063,7 +6063,7 @@ msgstr "Иконки"
 msgid "Identical expression already exists"
 msgstr "Идентичное выражение уже существует"
 
-#: include/func.inc.php:2047 include/func.inc.php:2067
+#: include/func.inc.php:2053 include/func.inc.php:2073
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "Если вы считаете это сообщение ошибкой, пожалуйста, свяжитесь с вашими администраторами для получения прав доступа."
 
@@ -7596,7 +7596,7 @@ msgstr "Язык"
 msgid "Last"
 msgstr "Последний"
 
-#: include/func.inc.php:1827
+#: include/func.inc.php:1833
 msgctxt "page navigation"
 msgid "Last"
 msgstr "Последняя"
@@ -7877,7 +7877,7 @@ msgstr "Записывать не совпадающие SNMP трапы"
 msgid "Logged in as"
 msgstr "Вход выполнен под"
 
-#: auditlogs.php:143 include/func.inc.php:2053 include/func.inc.php:2070
+#: auditlogs.php:143 include/func.inc.php:2059 include/func.inc.php:2076
 #: include/menu.inc.php:282 include/page_header.php:246
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:64
@@ -8223,7 +8223,7 @@ msgid "Max count of events per trigger to show"
 msgstr "Макс. количество отображаемых событий у триггера"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2161
+#: include/func.inc.php:2167
 msgid "Maximize"
 msgstr "Развернуть"
 
@@ -8399,7 +8399,7 @@ msgid "Middle"
 msgstr "По середине"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2161
+#: include/func.inc.php:2167
 msgid "Minimize"
 msgstr "Свернуть"
 
@@ -8777,13 +8777,13 @@ msgstr "Новый интервал времени услуги"
 msgid "Next"
 msgstr "Далее"
 
-#: include/func.inc.php:1820
+#: include/func.inc.php:1826
 msgctxt "page navigation"
 msgid "Next"
 msgstr "Следующая"
 
 #: events.php:756 include/events.inc.php:356 include/events.inc.php:374
-#: include/func.inc.php:2380 include/triggers.inc.php:1608
+#: include/func.inc.php:2386 include/triggers.inc.php:1608
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
 #: include/views/js/adm.regexprs.edit.js.php:142
@@ -9289,7 +9289,7 @@ msgstr "Нет прав доступа в систему."
 #: api/classes/CTrigger.php:998 api/classes/CTrigger.php:1843
 #: api/classes/CTriggerPrototype.php:566 api/classes/CTriggerPrototype.php:669
 #: api/classes/CUserMacro.php:726 api/classes/CUserMacro.php:835
-#: api/classes/CUser.php:1156 include/func.inc.php:2026
+#: api/classes/CUser.php:1156 include/func.inc.php:2032
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Нет прав доступа к запрашиваемому объекту или он не существует!"
 
@@ -10452,7 +10452,7 @@ msgstr "Предпросмотр"
 msgid "Previous"
 msgstr "Назад"
 
-#: include/func.inc.php:1793
+#: include/func.inc.php:1799
 msgctxt "page navigation"
 msgid "Previous"
 msgstr "Предыдущая"
@@ -10712,12 +10712,12 @@ msgstr "Тема восстановления"
 msgid "Refresh (in seconds)"
 msgstr "Обновление (в секундах)"
 
-#: include/func.inc.php:1901
+#: include/func.inc.php:1907
 msgid "Refresh time in seconds"
 msgstr "Время обновления в секундах"
 
 # это в поп-апе при просмотре слайдшоу
-#: include/func.inc.php:1905
+#: include/func.inc.php:1911
 msgid "Refresh time multiplier"
 msgstr "Множитель интервала обновления"
 
@@ -11424,7 +11424,7 @@ msgstr "Комплексный экран \"%1$s\" пропущен - прави
 msgid "Screen \"%1$s\" updated."
 msgstr "Комплексный экран \"%1$s\" обновлен."
 
-#: screenconf.php:174
+#: screenconf.php:172
 msgid "Screen added"
 msgstr "Комплексный экран добавлен"
 
@@ -11432,7 +11432,7 @@ msgstr "Комплексный экран добавлен"
 msgid "Screen cell configuration"
 msgstr "Настройка элемента комплексного экрана"
 
-#: screenconf.php:223
+#: screenconf.php:221
 msgid "Screen deleted"
 msgstr "Комплексный экран удален"
 
@@ -11444,7 +11444,7 @@ msgstr "Элемент комплексного экрана уже сущест
 msgid "Screen should contain at least one row and column."
 msgstr "Комплексный экран должен содержать по крайней мере одну строку и колонку."
 
-#: screenconf.php:153
+#: screenconf.php:151
 msgid "Screen updated"
 msgstr "Комплексный экран обновлен"
 
@@ -13129,7 +13129,7 @@ msgstr "США (160 символов)"
 msgid "USER PROFILE"
 msgstr "ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ"
 
-#: include/func.inc.php:2559
+#: include/func.inc.php:2565
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -14110,7 +14110,7 @@ msgstr "Ежегодно"
 
 #: events.php:756 include/blocks.inc.php:727
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:359
-#: include/events.inc.php:377 include/func.inc.php:2380
+#: include/events.inc.php:377 include/func.inc.php:2386
 #: include/triggers.inc.php:1608
 #: include/views/administration.users.list.php:76
 #: include/views/js/adm.regexprs.edit.js.php:139
@@ -14130,7 +14130,7 @@ msgstr "Вы не можете выбрать некоторые языки, т.
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "Вам не разрешено менять привилегии пользователя \"%s\"."
 
-#: include/func.inc.php:2063
+#: include/func.inc.php:2069
 msgid "You are not logged in."
 msgstr "Вы не вошли в систему."
 
@@ -14181,15 +14181,15 @@ msgstr "У вас нет полномочий для обновления дру
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "У вас нет полномочий для обновления пользователя или он не существует."
 
-#: include/func.inc.php:2045
+#: include/func.inc.php:2051
 msgid "You have no permissions to access this page."
 msgstr "У вас нет полномочий для доступа к этой странице."
 
-#: include/func.inc.php:2065
+#: include/func.inc.php:2071
 msgid "You must login to view this page."
 msgstr "Для просмотра этой страницы вы должны войти в систему."
 
-#: include/func.inc.php:2041
+#: include/func.inc.php:2047
 msgid "Your are logged in as"
 msgstr "Вы подключены как"
 
@@ -14509,7 +14509,7 @@ msgstr "выполнено"
 msgid "fixed"
 msgstr "фикс"
 
-#: include/func.inc.php:1852
+#: include/func.inc.php:1858
 msgid "found"
 msgstr "найденных"
 
@@ -14688,7 +14688,7 @@ msgid "now"
 msgstr "сейчас"
 
 #: include/blocks.inc.php:352 include/blocks.inc.php:696
-#: include/func.inc.php:1849
+#: include/func.inc.php:1855
 msgid "of"
 msgstr "из"
 
@@ -14766,7 +14766,7 @@ msgstr "преобразования значений"
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "шаблон с ID \"%1$s\" был встречен %2$s раз"
 
-#: include/func.inc.php:1845
+#: include/func.inc.php:1851
 msgid "to"
 msgstr "до"
 
