@@ -88,6 +88,13 @@ zbx_counters_t;
 
 typedef struct
 {
+	char	*name;
+	char	*uuid;
+}
+zbx_datastore_t;
+
+typedef struct
+{
 	char			*url;
 	char			*username;
 	char			*password;
@@ -106,9 +113,11 @@ typedef struct
 	char			*password;
 	char			*events;
 	char			*details;
+	char			*stats;
 	zbx_vector_ptr_t	vms;
 	int			lastcheck;
 	zbx_counters_t		counters;
+	zbx_vector_ptr_t	datastores;
 }
 zbx_vsphere_t;
 
@@ -118,7 +127,9 @@ typedef struct
 	char			*id;
 	char			*details;
 	char			*clusterid;
+	char			*stats;
 	zbx_vector_ptr_t	vms;
+	zbx_vector_ptr_t	datastores;
 }
 zbx_hv_t;
 
@@ -129,7 +140,6 @@ typedef struct
 	char			*status_ex;
 	char			*stats;
 	zbx_vector_ptr_t	devs;
-	int			refresh_rate;
 }
 zbx_vm_t;
 
@@ -159,13 +169,11 @@ static void	zbx_dev_free(zbx_dev_t *dev)
 	zbx_free(dev);
 }
 
-static void	zbx_devs_free(zbx_vector_ptr_t *devs)
+static void	zbx_datastore_free(zbx_datastore_t *datastore)
 {
-	int	i;
-
-	for (i = 0; i < devs->values_num; i++)
-		zbx_dev_free((zbx_dev_t *)devs->values[i]);
-	devs->values_num = 0;
+	zbx_free(datastore->name);
+	zbx_free(datastore->uuid);
+	zbx_free(datastore);
 }
 
 static size_t	WRITEFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userdata)
@@ -1246,6 +1254,7 @@ static int	vcenter_hv_data_get(CURL *easyhandle, const char *guesthvid, char **h
 					"<ns0:pathSet>vm</ns0:pathSet>"				\
 					"<ns0:pathSet>summary</ns0:pathSet>"			\
 					"<ns0:pathSet>parent</ns0:pathSet>"			\
+					"<ns0:pathSet>datastore</ns0:pathSet>"			\
 				"</ns0:propSet>"						\
 				"<ns0:objectSet>"						\
 					"<ns0:obj type=\"HostSystem\">%s</ns0:obj>"		\
@@ -1362,17 +1371,20 @@ static void	add_perf_counter_stat_metric(char **tmp, size_t *tmp_alloc, size_t *
 	zbx_strcpy_alloc(tmp, tmp_alloc, tmp_offset, "</ns0:metricId>");
 }
 
-static int	vmware_perf_counter_stats_get(CURL *easyhandle, zbx_vm_t *vm, zbx_counters_t *counters, char **error,
+static int	vmware_vm_perf_counter_stats_get(CURL *easyhandle, zbx_vm_t *vm, zbx_counters_t *counters, char **error,
 		unsigned flags)
 {
 	const char		*__function_name = "vmware_perf_counter_stats_get";
 
-	int			i, err, o, ret = FAIL;
+	int			i, err, o, ret = FAIL, refresh_rate;
 	char			*tmp = NULL;
 	size_t			tmp_alloc = 0, tmp_offset = 0;
 	zbx_dev_t		*dev;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (SUCCEED != vmware_perf_counters_refresh_rate_get(easyhandle, vm->id, &refresh_rate, error, flags))
+		goto out;
 
 	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, ZBX_POST_VSPHERE_HEADER);
 	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:QueryPerf>");
@@ -1409,7 +1421,7 @@ static int	vmware_perf_counter_stats_get(CURL *easyhandle, zbx_vm_t *vm, zbx_cou
 	add_perf_counter_stat_metric(&tmp, &tmp_alloc, &tmp_offset, "*", counters->disk_number_read_averaged);
 	add_perf_counter_stat_metric(&tmp, &tmp_alloc, &tmp_offset, "*", counters->disk_number_write_averaged);
 
-	zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:intervalId>%d</ns0:intervalId>", vm->refresh_rate);
+	zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:intervalId>%d</ns0:intervalId>", refresh_rate);
 	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "</ns0:querySpec>");
 	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "</ns0:QueryPerf>");
 	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, ZBX_POST_VSPHERE_FOOTER);
@@ -1441,6 +1453,71 @@ out:
 
 	return ret;
 }
+
+static int	vmware_perf_counter_stats_get(CURL *easyhandle, const char *host, zbx_counters_t *counters, char **stats,
+		char **error, unsigned flags)
+{
+	const char		*__function_name = "vmware_perf_counter_stats_get";
+
+	int			err, o, ret = FAIL, refresh_rate;
+	char			*tmp = NULL;
+	size_t			tmp_alloc = 0, tmp_offset = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (SUCCEED != vmware_perf_counters_refresh_rate_get(easyhandle, host, &refresh_rate, error, flags))
+		goto out;
+
+	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, ZBX_POST_VSPHERE_HEADER);
+	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:QueryPerf>");
+	zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:_this type=\"PerformanceManager\">%s</ns0:_this>",
+			ZBX_VMWARE_FLAG_VCENTER == flags ? "PerfMgr" : "ha-perfmgr");
+	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:querySpec>");
+	zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:entity type=\"HostSystem\">%s</ns0:entity>",
+			host);
+	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:maxSample>1</ns0:maxSample>");
+
+	/* add total host networking stats */
+	add_perf_counter_stat_metric(&tmp, &tmp_alloc, &tmp_offset, "", counters->nic_received);
+	add_perf_counter_stat_metric(&tmp, &tmp_alloc, &tmp_offset, "", counters->nic_transmitted);
+
+	/* add datastore stats */
+	add_perf_counter_stat_metric(&tmp, &tmp_alloc, &tmp_offset, "*", counters->datastore_read_latency);
+	add_perf_counter_stat_metric(&tmp, &tmp_alloc, &tmp_offset, "*", counters->datastore_write_latency);
+
+	zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:intervalId>%d</ns0:intervalId>", refresh_rate);
+	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "</ns0:querySpec>");
+	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "</ns0:QueryPerf>");
+	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, ZBX_POST_VSPHERE_FOOTER);
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_POSTFIELDS, tmp)))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", o, curl_easy_strerror(err));
+		goto out;
+	}
+
+	page.offset = 0;
+
+	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
+	{
+		*error = zbx_strdup(*error, curl_easy_strerror(err));
+		goto out;
+	}
+
+	if (NULL != (*error = read_xml_value(page.data, ZBX_XPATH_LN1("faultstring"))))
+		goto out;
+
+	*stats = zbx_strdup(*stats, page.data);
+
+	ret = SUCCEED;
+out:
+	zbx_free(tmp);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
 
 static int	vmware_vm_status_ex_get(CURL *easyhandle, const char *vmid, unsigned flags)
 {
@@ -1606,6 +1683,102 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_datastores_add                                            *
+ *                                                                            *
+ * Purpose: add the specified datastore to a list                             *
+ *                                                                            *
+ * Parameters: easyhandle   - [IN] connection handle                          *
+ *             datastores   - [OUT] the vector of datastores found in details *
+ *             id           - [IN] an id of the datastore to add              *
+ *             flags        - [OUT] ZBX_VMWARE_FLAG_VCENTER                   *
+ *                                  ZBX_VMWARE_FLAG_VCENTER                   *
+ *                                                                            *
+ * Comments: This function retrieves datastore name/vmfs uuid from the server.*
+ *           If an error occured then id is used as datastore name.           *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_datastores_add(CURL *easyhandle, zbx_vector_ptr_t *datastores, char *id, unsigned flags)
+{
+#	define ZBX_POST_DATASTORE_GET								\
+		ZBX_POST_VSPHERE_HEADER								\
+		"<ns0:RetrievePropertiesEx>"							\
+			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"			\
+			"<ns0:specSet>"								\
+				"<ns0:propSet>"							\
+					"<ns0:type>Datastore</ns0:type>"			\
+					"<ns0:pathSet>info</ns0:pathSet>"			\
+				"</ns0:propSet>"						\
+				"<ns0:objectSet>"						\
+					"<ns0:obj type=\"Datastore\">%s</ns0:obj>"		\
+				"</ns0:objectSet>"						\
+			"</ns0:specSet>"							\
+			"<ns0:options/>"							\
+		"</ns0:RetrievePropertiesEx>"							\
+		ZBX_POST_VSPHERE_FOOTER
+
+	char		tmp[MAX_STRING_LEN], *uuid = NULL, *name = NULL;
+	zbx_datastore_t	*datastore;
+
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_DATASTORE_GET,
+			ZBX_VMWARE_FLAG_VCENTER == flags ? "propertyCollector" : "ha-property-collector", id);
+
+	if (CURLE_OK != curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, tmp))
+		goto out;
+
+	page.offset = 0;
+
+	if (CURLE_OK != curl_easy_perform(easyhandle))
+		goto out;
+
+	uuid = read_xml_value(page.data, ZBX_XPATH_LN2("vmfs", "uuid"));
+	name = read_xml_value(page.data, ZBX_XPATH_LN2("vmfs", "name"));
+out:
+	datastore = zbx_malloc(NULL, sizeof(zbx_datastore_t));
+	if (NULL != name)
+	{
+		datastore->name = name;
+		zbx_free(id);
+	}
+	else
+		datastore->name = id;
+
+	datastore->uuid = uuid;
+	zbx_vector_ptr_append(datastores, datastore);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_datastores_update                                         *
+ *                                                                            *
+ * Purpose: update datastore list from datastores listed in host details      *
+ *                                                                            *
+ * Parameters: easyhandle   - [IN] connection handle                          *
+ *             datastores   - [OUT] the vector of datastores found in details *
+ *             flags        - [OUT] ZBX_VMWARE_FLAG_VCENTER                   *
+ *                                  ZBX_VMWARE_FLAG_VCENTER                   *
+ *                                                                            *
+ ******************************************************************************/
+
+static void	vmware_datastores_update(CURL *easyhandle, zbx_vector_ptr_t *datastores, const char *details,
+		unsigned flags)
+{
+	int			i;
+	zbx_vector_str_t	values;
+
+	zbx_vector_ptr_clean(datastores, (zbx_mem_free_func_t)zbx_datastore_free);
+
+	zbx_vector_str_create(&values);
+
+	read_xml_values(details,  "//*[@type='Datastore']", &values);
+
+	for (i = 0; i < values.values_num; i++)
+		vmware_datastores_add(easyhandle, datastores, values.values[i], flags);
+
+	zbx_vector_str_destroy(&values);
 }
 
 static zbx_vcenter_t	*vcenter_get(const char *url, const char *username, const char *password)
@@ -1803,7 +1976,9 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 			hv->id = NULL;
 			hv->details = NULL;
 			hv->clusterid = NULL;
+			hv->stats = NULL;
 			zbx_vector_ptr_create(&hv->vms);
+			zbx_vector_ptr_create(&hv->datastores);
 
 			zbx_vector_ptr_append(&vcenter->hvs, hv);
 		}
@@ -1818,6 +1993,14 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 		hv->id = zbx_strdup(hv->id, guesthvids.values[i]);
 		hv->details = hv_details;
 		hv->clusterid = read_xml_value(hv_details, "//*[@type='ClusterComputeResource']");
+
+		vmware_datastores_update(easyhandle, &hv->datastores, hv->details, ZBX_VMWARE_FLAG_VCENTER);
+
+		if (SUCCEED != vmware_perf_counter_stats_get(easyhandle, hv->id, &vcenter->counters, &hv->stats,
+				error, ZBX_VMWARE_FLAG_VCENTER))
+		{
+			goto clean;
+		}
 
 		read_xml_values(hv_details, "//*[@type='VirtualMachine']", &guestvmids);
 
@@ -1840,7 +2023,6 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 				vm->status_ex = NULL;
 				vm->stats = NULL;
 				zbx_vector_ptr_create(&vm->devs);
-				vm->refresh_rate = 0;
 
 				zbx_vector_ptr_append(&hv->vms, vm);
 			}
@@ -1854,17 +2036,11 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 			vm->id = zbx_strdup(vm->id, guestvmids.values[j]);
 			vm->status_ex = zbx_strdup(vm->status_ex, page.data);
 
-			zbx_devs_free(&vm->devs);
+			zbx_vector_ptr_clean(&vm->devs, (zbx_mem_free_func_t)zbx_dev_free);
 
 			wmware_vm_populate_nic_devices(vm);
 
-			if (SUCCEED != vmware_perf_counters_refresh_rate_get(easyhandle, guestvmids.values[j],
-					&vm->refresh_rate, error, ZBX_VMWARE_FLAG_VCENTER))
-			{
-				goto clean;
-			}
-
-			if (SUCCEED != vmware_perf_counter_stats_get(easyhandle, vm, &vcenter->counters, error,
+			if (SUCCEED != vmware_vm_perf_counter_stats_get(easyhandle, vm, &vcenter->counters, error,
 					ZBX_VMWARE_FLAG_VCENTER))
 			{
 				goto clean;
@@ -2011,6 +2187,7 @@ static int	vsphere_hostdata_get(CURL *easyhandle, char **details, char **error)
 					"<ns0:type>HostSystem</ns0:type>"				\
 					"<ns0:all>false</ns0:all>"					\
 					"<ns0:pathSet>summary</ns0:pathSet>"				\
+					"<ns0:pathSet>datastore</ns0:pathSet>"				\
 				"</ns0:propSet>"							\
 				"<ns0:objectSet>"							\
 					"<ns0:obj type=\"HostSystem\">ha-host</ns0:obj>"		\
@@ -2117,8 +2294,10 @@ static int	vsphere_update(const char *url, const char *username, const char *pas
 		vsphere->password = zbx_strdup(NULL, password);
 		vsphere->events = NULL;
 		vsphere->details = NULL;
+		vsphere->stats = NULL;
 		vsphere->lastcheck = 0;
 		zbx_vector_ptr_create(&vsphere->vms);
+		zbx_vector_ptr_create(&vsphere->datastores);
 		memset(&vsphere->counters, 0, sizeof(zbx_counters_t));
 
 		zbx_vector_ptr_append(&vspheres, vsphere);
@@ -2149,14 +2328,22 @@ static int	vsphere_update(const char *url, const char *username, const char *pas
 	if (SUCCEED != vmware_authenticate(easyhandle, url, username, password, error, ZBX_VMWARE_FLAG_VSPHERE))
 		goto clean;
 
-	if (SUCCEED != vmware_hv_guestvmids_get(easyhandle, "ha-host", &guestvmids, error, ZBX_VMWARE_FLAG_VSPHERE))
+	if (SUCCEED != vmware_init_perf_counters(easyhandle, &vsphere->counters, error, ZBX_VMWARE_FLAG_VSPHERE))
 		goto clean;
 
-	if (SUCCEED != vmware_init_perf_counters(easyhandle, &vsphere->counters, error, ZBX_VMWARE_FLAG_VSPHERE))
+	if (SUCCEED != vmware_hv_guestvmids_get(easyhandle, "ha-host", &guestvmids, error, ZBX_VMWARE_FLAG_VSPHERE))
 		goto clean;
 
 	if (SUCCEED != vsphere_hostdata_get(easyhandle, &vsphere->details, error))
 		goto clean;
+
+	vmware_datastores_update(easyhandle, &vsphere->datastores, vsphere->details, ZBX_VMWARE_FLAG_VSPHERE);
+
+	if (SUCCEED != vmware_perf_counter_stats_get(easyhandle, "ha-host", &vsphere->counters, &vsphere->stats,
+			error, ZBX_VMWARE_FLAG_VSPHERE))
+	{
+		goto clean;
+	}
 
 	for (i = 0; i < guestvmids.values_num; i++)
 	{
@@ -2174,7 +2361,6 @@ static int	vsphere_update(const char *url, const char *username, const char *pas
 			vm->status_ex = NULL;
 			vm->stats = NULL;
 			zbx_vector_ptr_create(&vm->devs);
-			vm->refresh_rate = 0;
 
 			zbx_vector_ptr_append(&vsphere->vms, vm);
 		}
@@ -2188,17 +2374,11 @@ static int	vsphere_update(const char *url, const char *username, const char *pas
 		vm->id = zbx_strdup(vm->id, guestvmids.values[i]);
 		vm->status_ex = zbx_strdup(vm->status_ex, page.data);
 
-		zbx_devs_free(&vm->devs);
+		zbx_vector_ptr_clean(&vm->devs, (zbx_mem_free_func_t)zbx_dev_free);
 
 		wmware_vm_populate_nic_devices(vm);
 
-		if (SUCCEED != vmware_perf_counters_refresh_rate_get(easyhandle, guestvmids.values[i],
-				&vm->refresh_rate, error, ZBX_VMWARE_FLAG_VSPHERE))
-		{
-			goto clean;
-		}
-
-		if (SUCCEED != vmware_perf_counter_stats_get(easyhandle, vm, &vsphere->counters, error,
+		if (SUCCEED != vmware_vm_perf_counter_stats_get(easyhandle, vm, &vsphere->counters, error,
 				ZBX_VMWARE_FLAG_VSPHERE))
 		{
 			goto clean;
@@ -2236,33 +2416,17 @@ out:
 	return ret;
 }
 
-static int	vsphere_vm_counter_get(zbx_vsphere_t *vsphere, const char *uuid, const char *instance,
-		zbx_uint64_t counterid, int coeff, AGENT_RESULT *result)
+static int	vmware_counter_get(const char *stats, const char *instance, zbx_uint64_t counterid, int coeff,
+		AGENT_RESULT *result)
 {
-	int		i, ret = SYSINFO_RET_FAIL;
+	int		ret = SYSINFO_RET_FAIL;
 	char		xpath[MAX_STRING_LEN], *value;
-	zbx_vm_t	*vm = NULL;
-	zbx_dev_t	*dev;
 	zbx_uint64_t	value_ui64;
-
-	if (NULL == (vm = vm_get(&vsphere->vms, uuid)))
-		return SYSINFO_RET_FAIL;
-
-	for (i = 0; i < vm->devs.values_num; i++)
-	{
-		dev = (zbx_dev_t *)vm->devs.values[i];
-
-		if (0 == strcmp(dev->instance, instance))
-			break;
-	}
-
-	if (i == vm->devs.values_num)
-		return SYSINFO_RET_FAIL;
 
 	zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_LN3("value", "id", "counterId") "[.='" ZBX_FS_UI64 "']/.."
 				ZBX_XPATH_LN("instance") "[.='%s']/../.." ZBX_XPATH_LN("value"), counterid, instance);
 
-	if (NULL == (value = read_xml_value(vm->stats, xpath)))
+	if (NULL == (value = read_xml_value(stats, xpath)))
 		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED == is_uint64(value, &value_ui64))
@@ -2275,6 +2439,17 @@ static int	vsphere_vm_counter_get(zbx_vsphere_t *vsphere, const char *uuid, cons
 	zbx_free(value);
 
 	return ret;
+}
+
+static int	vsphere_vm_counter_get(zbx_vsphere_t *vsphere, const char *uuid, const char *instance,
+		zbx_uint64_t counterid, int coeff, AGENT_RESULT *result)
+{
+	zbx_vm_t	*vm = NULL;
+
+	if (NULL == (vm = vm_get(&vsphere->vms, uuid)))
+		return SYSINFO_RET_FAIL;
+
+	return  vmware_counter_get(vm->stats, instance, counterid, coeff, result);
 }
 
 int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, AGENT_RESULT *result)
@@ -2845,6 +3020,214 @@ int	check_vcenter_hv_vm_num(AGENT_REQUEST *request, const char *username, const 
 	return get_vcenter_hv_stat(request, username, password, ZBX_OPT_VM_NUM, NULL, result);
 }
 
+int	check_vcenter_hv_network_in(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	char		*url, *mode, *uuid, *error = NULL;
+	zbx_vcenter_t	*vcenter;
+	zbx_hv_t	*hv;
+
+	if (2 > request->nparam || request->nparam > 3)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	uuid = get_rparam(request, 1);
+	mode = get_rparam(request, 2);
+
+	if (NULL != mode && '\0' != *mode && 0 != strcmp(mode, "bps"))
+		return SYSINFO_RET_FAIL;
+
+	if (SUCCEED != vcenter_update(url, username, password, &error))
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL == (vcenter = vcenter_get(url, username, password)))
+		return SYSINFO_RET_FAIL;
+
+	if (NULL == (hv = hv_get(&vcenter->hvs, uuid)))
+		return SYSINFO_RET_FAIL;
+
+	return vmware_counter_get(hv->stats, "", vcenter->counters.nic_received, ZBX_KIBIBYTE, result);
+}
+
+int	check_vcenter_hv_network_out(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	char		*url, *mode, *uuid, *error = NULL;
+	zbx_vcenter_t	*vcenter;
+	zbx_hv_t	*hv;
+
+	if (2 > request->nparam || request->nparam > 3)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	uuid = get_rparam(request, 1);
+	mode = get_rparam(request, 2);
+
+	if (NULL != mode && '\0' != *mode && 0 != strcmp(mode, "bps"))
+		return SYSINFO_RET_FAIL;
+
+	if (SUCCEED != vcenter_update(url, username, password, &error))
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL == (vcenter = vcenter_get(url, username, password)))
+		return SYSINFO_RET_FAIL;
+
+	if (NULL == (hv = hv_get(&vcenter->hvs, uuid)))
+		return SYSINFO_RET_FAIL;
+
+	return vmware_counter_get(hv->stats, "", vcenter->counters.nic_transmitted, ZBX_KIBIBYTE, result);
+}
+
+int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	char		*url, *uuid, *error = NULL;
+	zbx_vcenter_t	*vcenter;
+	zbx_hv_t	*hv;
+	struct zbx_json	j;
+	int		i;
+
+	if (2 != request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	uuid = get_rparam(request, 1);
+
+	if (SUCCEED != vcenter_update(url, username, password, &error))
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL == (vcenter = vcenter_get(url, username, password)))
+		return SYSINFO_RET_FAIL;
+
+	if (NULL == (hv = hv_get(&vcenter->hvs, uuid)))
+		return SYSINFO_RET_FAIL;
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
+
+	for (i = 0; i < hv->datastores.values_num; i++)
+	{
+		zbx_datastore_t	*datastore = hv->datastores.values[i];
+
+		zbx_json_addobject(&j, NULL);
+		zbx_json_addstring(&j, "{#DATASTORE}", datastore->name, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&j);
+	}
+
+	zbx_json_close(&j);
+
+	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
+
+	zbx_json_free(&j);
+
+	return SYSINFO_RET_OK;
+}
+
+int	check_vcenter_hv_datastore_read(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	char		*url, *mode, *uuid, *name, *error = NULL;
+	zbx_vcenter_t	*vcenter;
+	zbx_hv_t	*hv;
+	int		i;
+
+	if (3 > request->nparam || request->nparam > 4)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	uuid = get_rparam(request, 1);
+	name = get_rparam(request, 2);
+	mode = get_rparam(request, 3);
+
+	if (NULL != mode && '\0' != *mode && 0 != strcmp(mode, "latency"))
+		return SYSINFO_RET_FAIL;
+
+	if (SUCCEED != vcenter_update(url, username, password, &error))
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL == (vcenter = vcenter_get(url, username, password)))
+		return SYSINFO_RET_FAIL;
+
+	if (NULL == (hv = hv_get(&vcenter->hvs, uuid)))
+		return SYSINFO_RET_FAIL;
+
+	for (i = 0; i < hv->datastores.values_num; i++)
+	{
+		zbx_datastore_t	*datastore = hv->datastores.values[i];
+
+		if (0 == strcmp(name, datastore->name))
+		{
+			if (NULL == datastore->uuid)
+				break;
+
+			return vmware_counter_get(hv->stats, datastore->uuid,
+					vcenter->counters.datastore_read_latency, 1, result);
+		}
+	}
+
+	return SYSINFO_RET_FAIL;
+}
+
+int	check_vcenter_hv_datastore_write(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	char		*url, *mode, *uuid, *name, *error = NULL;
+	zbx_vcenter_t	*vcenter;
+	zbx_hv_t	*hv;
+	int		i;
+
+	if (3 > request->nparam || request->nparam > 4)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	uuid = get_rparam(request, 1);
+	name = get_rparam(request, 2);
+	mode = get_rparam(request, 3);
+
+	if (NULL != mode && '\0' != *mode && 0 != strcmp(mode, "latency"))
+		return SYSINFO_RET_FAIL;
+
+	if (SUCCEED != vcenter_update(url, username, password, &error))
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL == (vcenter = vcenter_get(url, username, password)))
+		return SYSINFO_RET_FAIL;
+
+	if (NULL == (hv = hv_get(&vcenter->hvs, uuid)))
+		return SYSINFO_RET_FAIL;
+
+	for (i = 0; i < hv->datastores.values_num; i++)
+	{
+		zbx_datastore_t	*datastore = hv->datastores.values[i];
+
+		if (0 == strcmp(name, datastore->name))
+		{
+			if (NULL == datastore->uuid)
+				break;
+
+			return vmware_counter_get(hv->stats, datastore->uuid,
+					vcenter->counters.datastore_write_latency, 1, result);
+		}
+	}
+
+	return SYSINFO_RET_FAIL;
+}
+
 int	check_vcenter_vm_cpu_num(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
@@ -2952,7 +3335,7 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 				if (NULL == (name = read_xml_value(vm->status_ex, ZBX_XPATH_LN2("config", "name"))))
 					continue;
 
-				if (NULL == (host = read_xml_value(vm->status_ex, ZBX_XPATH_LN1("host"))))
+				if (NULL == (host = read_xml_value(hv->details, ZBX_XPATH_LN2("config", "name"))))
 				{
 					zbx_free(name);
 					continue;
@@ -3921,6 +4304,189 @@ int	check_vsphere_vm_cpu_usage(AGENT_REQUEST *request, const char *username, con
 		result->ui64 = result->ui64 * 1000000;
 
 	return ret;
+}
+
+int	check_vsphere_hv_network_in(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	char		*url, *mode, *error = NULL;
+	zbx_vsphere_t	*vsphere;
+
+	if (1 > request->nparam || request->nparam > 2)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	mode = get_rparam(request, 1);
+
+	if (NULL != mode && '\0' != *mode && 0 != strcmp(mode, "bps"))
+		return SYSINFO_RET_FAIL;
+
+	if (SUCCEED != vsphere_update(url, username, password, &error))
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL == (vsphere = vsphere_get(url, username, password)))
+		return SYSINFO_RET_FAIL;
+
+	return vmware_counter_get(vsphere->stats, "", vsphere->counters.nic_received, ZBX_KIBIBYTE, result);
+}
+
+int	check_vsphere_hv_network_out(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	char		*url, *mode, *error = NULL;
+	zbx_vsphere_t	*vsphere;
+
+	if (1 > request->nparam || request->nparam > 2)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	mode = get_rparam(request, 1);
+
+	if (NULL != mode && '\0' != *mode && 0 != strcmp(mode, "bps"))
+		return SYSINFO_RET_FAIL;
+
+	if (SUCCEED != vsphere_update(url, username, password, &error))
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL == (vsphere = vsphere_get(url, username, password)))
+		return SYSINFO_RET_FAIL;
+
+	return vmware_counter_get(vsphere->stats, "", vsphere->counters.nic_transmitted, ZBX_KIBIBYTE, result);
+}
+
+int	check_vsphere_hv_datastore_discovery(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	struct zbx_json		j;
+	zbx_vsphere_t		*vsphere;
+	char			*url, *error = NULL;
+	int			i;
+
+	if (1 != request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+
+	if (SUCCEED != vsphere_update(url, username, password, &error))
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL == (vsphere = vsphere_get(url, username, password)))
+		return SYSINFO_RET_FAIL;
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
+
+	for (i = 0; i < vsphere->datastores.values_num; i++)
+	{
+		zbx_datastore_t	*datastore = vsphere->datastores.values[i];
+
+		zbx_json_addobject(&j, NULL);
+		zbx_json_addstring(&j, "{#DATASTORE}", datastore->name, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&j);
+	}
+
+	zbx_json_close(&j);
+
+	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
+
+	zbx_json_free(&j);
+
+	return SYSINFO_RET_OK;
+}
+
+int	check_vsphere_hv_datastore_read(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	char		*url, *mode, *name, *error = NULL;
+	zbx_vsphere_t	*vsphere;
+	int		i;
+
+	if (2 > request->nparam || request->nparam > 3)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	name = get_rparam(request, 1);
+	mode = get_rparam(request, 2);
+
+	if (NULL != mode && '\0' != *mode && 0 != strcmp(mode, "latency"))
+		return SYSINFO_RET_FAIL;
+
+	if (SUCCEED != vsphere_update(url, username, password, &error))
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL == (vsphere = vsphere_get(url, username, password)))
+		return SYSINFO_RET_FAIL;
+
+	for (i = 0; i < vsphere->datastores.values_num; i++)
+	{
+		zbx_datastore_t	*datastore = vsphere->datastores.values[i];
+
+		if (0 == strcmp(name, datastore->name))
+		{
+			if (NULL == datastore->uuid)
+				break;
+
+			return vmware_counter_get(vsphere->stats, datastore->uuid,
+					vsphere->counters.datastore_read_latency, 1, result);
+		}
+	}
+
+	return SYSINFO_RET_FAIL;
+}
+
+int	check_vsphere_hv_datastore_write(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	char		*url, *mode, *name, *error = NULL;
+	zbx_vsphere_t	*vsphere;
+	int		i;
+
+	if (2 > request->nparam || request->nparam > 3)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	name = get_rparam(request, 1);
+	mode = get_rparam(request, 2);
+
+	if (NULL != mode && '\0' != *mode && 0 != strcmp(mode, "latency"))
+		return SYSINFO_RET_FAIL;
+
+	if (SUCCEED != vsphere_update(url, username, password, &error))
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL == (vsphere = vsphere_get(url, username, password)))
+		return SYSINFO_RET_FAIL;
+
+	for (i = 0; i < vsphere->datastores.values_num; i++)
+	{
+		zbx_datastore_t	*datastore = vsphere->datastores.values[i];
+
+		if (0 == strcmp(name, datastore->name))
+		{
+			if (NULL == datastore->uuid)
+				break;
+
+			return vmware_counter_get(vsphere->stats, datastore->uuid,
+					vsphere->counters.datastore_write_latency, 1, result);
+		}
+	}
+
+	return SYSINFO_RET_FAIL;
 }
 
 int	check_vsphere_vm_discovery(AGENT_REQUEST *request, const char *username, const char *password,
