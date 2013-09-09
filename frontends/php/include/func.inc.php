@@ -1788,6 +1788,8 @@ function getPagingLine(&$items, array $urlParams = array()) {
 			}
 		}
 
+		$url->removeArgument('go');
+
 		if ($startPage > 1) {
 			$url->setArgument('page', 1);
 			$pageLine[] = new CLink('<< '._x('First', 'page navigation'), $url->getUrl(), null, null, true);

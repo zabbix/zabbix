@@ -353,7 +353,9 @@ else {
 	if ($data['hostPrototypes']) {
 		order_result($data['hostPrototypes'], $sortfield, getPageSortOrder());
 	}
-	$data['paging'] = getPagingLine($data['hostPrototypes']);
+
+	$urlParams = array('parent_discoveryid' => $_REQUEST['parent_discoveryid']);
+	$data['paging'] = getPagingLine($data['hostPrototypes'], $urlParams);
 
 	// fetch templates linked to the prototypes
 	$templateIds = array();
