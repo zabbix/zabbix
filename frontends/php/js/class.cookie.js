@@ -24,7 +24,7 @@ var cookie = {
 	init: function() {
 		var path = new Curl();
 		var filename = basename(path.getPath(), '.php');
-		var cookieName = 'cb_' + filename + (is_null(this.prefix) ? '' : '_' + this.prefix);
+		var cookieName = 'cb_' + filename + (this.prefix.length ? '_' + this.prefix : '');
 		var allCookies = document.cookie.split('; ');
 
 		for (var i = 0; i < allCookies.length; i++) {

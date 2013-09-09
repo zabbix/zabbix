@@ -134,6 +134,7 @@ $fields = array(
 	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
 	// filter
 	'filter_set' =>				array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	'subfilter_set' =>				array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
 	'filter_groupid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'filter_hostid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'filter_application' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
@@ -277,8 +278,8 @@ if (isset($_REQUEST['filter_set'])) {
 	foreach (array('subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'subfilter_status', 'subfilter_state',
 			'subfilter_templated_items', 'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval',
 			'subfilter_history', 'subfilter_trends') as $name) {
-		$_REQUEST[$name] = get_request($name, Array());
-		CProfile::update('web.items.'.$name, implode(";", $_REQUEST[$name]), PROFILE_TYPE_STR);
+		$_REQUEST[$name] = Array();
+		CProfile::update('web.items.'.$name, '', PROFILE_TYPE_STR);
 	}
 }
 else {
@@ -307,13 +308,19 @@ else {
 	foreach (array('subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'subfilter_status', 'subfilter_state',
 			'subfilter_templated_items', 'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval',
 			'subfilter_history', 'subfilter_trends') as $name) {
-		$_REQUEST[$name] = Array();
-		if ($tmpVal = CProfile::get('web.items.'.$name)) {
-			$_REQUEST[$name] = explode(";", $tmpVal);
-			$_REQUEST[$name] = array_combine($_REQUEST[$name], $_REQUEST[$name]);
+		if (isset($_REQUEST['subfilter_set'])) {
+			$_REQUEST[$name] = get_request($name, array());
+			CProfile::update('web.items.'.$name, implode(';', $_REQUEST[$name]), PROFILE_TYPE_STR);
+		}
+		else{
+			$_REQUEST[$name] = Array();
+			if ($tmpVal = CProfile::get('web.items.'.$name)) {
+				$_REQUEST[$name] = explode(";", $tmpVal);
+			}
 		}
 	}
 }
+
 
 if (!isset($_REQUEST['form']) && isset($_REQUEST['filter_hostid']) && !empty($_REQUEST['filter_hostid'])) {
 	if (!isset($host)) {

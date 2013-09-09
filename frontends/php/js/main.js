@@ -168,7 +168,7 @@ var chkbxRange = {
 	init: function() {
 		var path = new Curl();
 		var filename = basename(path.getPath(), '.php');
-		this.cookieName = 'cb_' + filename + (is_null(this.prefix) ? '' : '_' + this.prefix);
+		this.cookieName = 'cb_' + filename + (this.prefix.length ? '_' + this.prefix : '');
 		this.selectedIds = cookie.readJSON(this.cookieName);
 
 		var chkboxes = jQuery('.tableinfo .checkbox:not(:disabled)');
