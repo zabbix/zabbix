@@ -946,3 +946,46 @@ function formatTimestamp(timestamp, isTsDouble, isExtend) {
 
 	return str;
 }
+
+/**
+ * Display jQuery model window.
+ *
+ * @param string title					modal window title
+ * @param string text					window message
+ * @param array  buttons				window buttons
+ * @param array  buttons[]['text']		button text
+ * @param object buttons[]['click']		button click action
+ */
+function showModalWindow(title, text, buttons) {
+	var modalWindow = jQuery('#modalWindow');
+
+	if (modalWindow.length == 0) {
+		modalWindow = jQuery('<div>', {
+			id: 'modalWindow',
+			css: {
+				padding: '10px',
+				display: 'none',
+				'white-space': 'normal',
+				'z-index': 1000
+			}
+		});
+
+		jQuery('body').append(modalWindow);
+	}
+
+	modalWindow
+		.text(text)
+		.dialog({
+			title: title,
+			buttons: buttons,
+			draggable: true,
+			modal: true,
+			resizable: false,
+			width: 'inherit',
+			minWidth: 200,
+			minHeight: 120,
+			close: function() {
+				jQuery(this).dialog('destroy');
+			}
+		});
+}
