@@ -492,6 +492,7 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 .originalblue .ui-tabs .ui-tabs-nav li a, .originalblue .ui-tabs.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-selected a { cursor: pointer; } /* first selector in group seems obsolete, but required to overcome bug in Opera applying cursor: text overall if defined elsewhere... */
 .originalblue .ui-tabs .ui-tabs-panel { display: block; border-width: 0; padding: 1em 1.4em; background: none; }
 .originalblue .ui-tabs .ui-tabs-hide { display: none !important; }
+.originalblue .ui-tabs .ui-tabs-nav li.ui-state-disabled a { color: #A8BFD4; }
 /*
  * jQuery UI Datepicker 1.8.7
  *
