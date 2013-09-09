@@ -290,8 +290,9 @@
 			// is activated
 			if (str_in_array($id, $subfilter)) {
 				$span = new CSpan($element['name'].SPACE.'('.$element['count'].')', 'subfilter_enabled');
-				$span->onClick(CHtml::encode('javascript: create_var("zbx_filter", "filter_set", "1", false); create_var("zbx_filter", '.
-					CJs::encodeJson($subfilterName.'['.$id.']').', null, true);'));
+				$span->onClick(CHtml::encode(
+						'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
+						'create_var("zbx_filter", '.CJs::encodeJson($subfilterName.'['.$id.']').', null, true);'));
 				$output[] = $span;
 			}
 
@@ -309,8 +310,10 @@
 						: new CSpan(SPACE.'('.$element['count'].')', 'subfilter_active');
 
 					$span = new CSpan($element['name'], 'subfilter_disabled');
-					$span->onClick(CHtml::encode('javascript: create_var("zbx_filter", "filter_set", "1", false); create_var("zbx_filter", '.
-						CJs::encodeJson($subfilterName.'['.$id.']').', '.CJs::encodeJson($id).', true);'));
+					$span->onClick(CHtml::encode(
+							'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
+							'create_var("zbx_filter", '.
+								CJs::encodeJson($subfilterName.'['.$id.']').', '.CJs::encodeJson($id).', true);'));
 
 					$output[] = $span;
 					$output[] = $nspan;
