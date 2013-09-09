@@ -72,7 +72,7 @@ if (get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid'])
 }
 
 /* AJAX */
-if (isset($_REQUEST['favobj'])) {
+if (hasRequest('favobj')) {
 	if ($_REQUEST['favobj'] == 'filter') {
 		CProfile::update('web.latest.filter.state',$_REQUEST['favstate'], PROFILE_TYPE_INT);
 	}
@@ -111,20 +111,20 @@ if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
 //--------
 
 /* FILTER */
-if (!isset($_REQUEST['show_without_data'])) {
+if (!hasRequest('show_without_data')) {
 	$_REQUEST['show_without_data'] = 0;
 }
-if (!isset($_REQUEST['show_details'])) {
+if (!hasRequest('show_details')) {
 	$_REQUEST['show_details'] = 0;
 }
 
-if(isset($_REQUEST['filter_rst'])){
+if(hasRequest('filter_rst')){
 	$_REQUEST['select'] = '';
 	$_REQUEST['show_without_data'] = 0;
 	$_REQUEST['show_details'] = 0;
 }
 
-if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
+if(hasRequest('filter_set') || hasRequest('filter_rst')){
 	CProfile::update('web.latest.filter.select',$_REQUEST['select'], PROFILE_TYPE_STR);
 	CProfile::update('web.latest.filter.show_without_data',$_REQUEST['show_without_data'], PROFILE_TYPE_INT);
 	CProfile::update('web.latest.filter.show_details',$_REQUEST['show_details'], PROFILE_TYPE_INT);
@@ -193,17 +193,35 @@ require_once dirname(__FILE__).'/include/views/js/monitoring.latest.js.php';
 $link = new CCol(new CDiv(null, 'app-list-toggle-all icon-plus-9x9'));
 
 $table = new CTableInfo(_('No values found.'));
-$table->setHeader(array(
-	$link,
-	is_show_all_nodes() ? make_sorting_header(_('Node'), 'h.hostid') : null,
-	($_REQUEST['hostid'] == 0) ? make_sorting_header(_('Host'), 'h.name') : NULL,
-	make_sorting_header(_('Name'), 'i.name'),
-	make_sorting_header(_('Last check'), 'i.lastclock'),
-	_('Last value'),
-	_x('Change', 'noun in latest data'),
-	_('History')
-));
 
+if (getRequest('show_details')) {
+	$table->setHeader(array(
+		$link,
+		is_show_all_nodes() ? make_sorting_header(_('Node'), 'h.hostid') : null,
+		($_REQUEST['hostid'] == 0) ? make_sorting_header(_('Host'), 'h.name') : NULL,
+		make_sorting_header(_('Name'), 'i.name'),
+		_('Interval'),
+		_('History'),
+		_('Trends'),
+		_('Type'),
+		_('Error'),
+		make_sorting_header(_('Last check'), 'i.lastclock'),
+		_('Last value'),
+		_x('Change', 'noun in latest data')
+	));
+}
+else {
+	$table->setHeader(array(
+		$link,
+		is_show_all_nodes() ? make_sorting_header(_('Node'), 'h.hostid') : null,
+		($_REQUEST['hostid'] == 0) ? make_sorting_header(_('Host'), 'h.name') : NULL,
+		make_sorting_header(_('Name'), 'i.name'),
+		make_sorting_header(_('Last check'), 'i.lastclock'),
+		_('Last value'),
+		_x('Change', 'noun in latest data'),
+		_('History')
+	));
+}
 // fetch hosts
 $availableHostIds = array();
 if ($_REQUEST['hostid']) {
@@ -265,14 +283,20 @@ else {
 array_push($sortFields, 'name', 'applicationid');
 CArrayHelper::sort($applications, $sortFields);
 
-// fetch items and data
-$allItems = DBfetchArray(DBselect(
-	'SELECT DISTINCT i.hostid,i.itemid,i.name,i.value_type,i.units,i.state,i.valuemapid,i.key_,ia.applicationid'.
-	' FROM items i '.
-		' LEFT JOIN items_applications ia ON ia.itemid=i.itemid'.
-	' WHERE i.status='.ITEM_STATUS_ACTIVE.
-		' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
-		' AND '.dbConditionInt('i.hostid', $hostIds)
+// items and data
+$allItems = API::Item()->get(array(
+	'hostids' => $hostIds,
+	'output' => API_OUTPUT_EXTEND,
+	'preservekeys' => true,
+	'selectApplications' => array('applicationid'),
+	'selectItemDiscovery' => array('ts_delete'),
+	'filter' => array(
+		'flags' => array(
+			ZBX_FLAG_DISCOVERY_NORMAL,
+			ZBX_FLAG_DISCOVERY_CREATED
+		),
+		'status' => array(ITEM_STATUS_ACTIVE)
+	)
 ));
 
 // check which items have history data
@@ -324,8 +348,9 @@ CArrayHelper::sort($allItems, $sortFields);
  * Display APPLICATION ITEMS
  */
 $tab_rows = array();
+
 foreach ($allItems as $key => $db_item){
-	if (!$db_item['applicationid']) {
+	if (!$db_item['applications']) {
 		continue;
 	}
 
@@ -336,10 +361,11 @@ foreach ($allItems as $key => $db_item){
 		list($db_item['units'], $db_item['unitsLong']) = explode(',', $db_item['units']);
 	else
 		$db_item['unitsLong'] = '';
+	$db_app = &$applications[reset($db_item['applications'])['applicationid']];
 
-	$db_app = &$applications[$db_item['applicationid']];
-
-	if(!isset($tab_rows[$db_app['applicationid']])) $tab_rows[$db_app['applicationid']] = array();
+	if (!isset($tab_rows[$db_app['applicationid']])) {
+		$tab_rows[$db_app['applicationid']] = array();
+	}
 	$app_rows = &$tab_rows[$db_app['applicationid']];
 
 	$db_app['item_cnt']++;
@@ -383,18 +409,64 @@ foreach ($allItems as $key => $db_item){
 		$actions = new CLink(_('History'),'history.php?action=showvalues&itemid='.$db_item['itemid']);
 	}
 
+	$itemName = array(SPACE, SPACE, $db_item['resolvedName']);
 	$item_status = $db_item['state'] == ITEM_STATE_NOTSUPPORTED ? 'unknown' : null;
 
-	array_push($app_rows, new CRow(array(
-		SPACE,
-		is_show_all_nodes() ? SPACE : null,
-		($_REQUEST['hostid'] > 0) ? null : SPACE,
-		new CCol(new CDiv(SPACE.SPACE.$db_item['resolvedName'], $item_status)),
-		new CCol(new CDiv($lastClock, $item_status)),
-		new CCol(new CDiv($lastValue, $item_status)),
-		new CCol(new CDiv($change, $item_status)),
-		$actions
-	)));
+	if (getRequest('show_details')) {
+		$itemKey = new CLink($db_item['key_'], 'items.php?form=update&itemid='.$db_item['itemid']);
+		$itemName = array_merge($itemName, array(BR(), SPACE, SPACE, $itemKey));
+
+		$statusIcons = array();
+		if ($db_item['status'] == ITEM_STATUS_ACTIVE) {
+			if (zbx_empty($db_item['error'])) {
+				$error = new CDiv(SPACE, 'status_icon iconok');
+			}
+			else {
+				$error = new CDiv(SPACE, 'status_icon iconerror');
+				$error->setHint($db_item['error'], '', 'on');
+			}
+			$statusIcons[] = $error;
+		}
+
+		// discovered item lifetime indicator
+		if ($db_item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $db_item['itemDiscovery']['ts_delete']) {
+			$deleteError = new CDiv(SPACE, 'status_icon iconwarning');
+			$deleteError->setHint(
+				_s('The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
+					zbx_date2age($db_item['itemDiscovery']['ts_delete']),
+					zbx_date2str(_('d M Y'), $db_item['itemDiscovery']['ts_delete']),
+					zbx_date2str(_('H:i:s'), $db_item['itemDiscovery']['ts_delete'])
+			));
+			$statusIcons[] = $deleteError;
+		}
+
+		array_push($app_rows, new CRow(array(
+			SPACE,
+			is_show_all_nodes() ? SPACE : null,
+			($_REQUEST['hostid'] > 0) ? null : SPACE,
+			new CCol(new CDiv($itemName, $item_status)),
+			new CCol(new CDiv($db_item['delay'], $item_status)),
+			new CCol(new CDiv($db_item['history'], $item_status)),
+			new CCol(new CDiv($db_item['trends'], $item_status)),
+			new CCol(new CDiv(item_type2str($db_item['type']), $item_status)),
+			new CCol($statusIcons),
+			new CCol(new CDiv($lastClock, $item_status)),
+			new CCol(new CDiv($lastValue, $item_status)),
+			$actions
+		)));
+	}
+	else {
+		array_push($app_rows, new CRow(array(
+			SPACE,
+			is_show_all_nodes() ? SPACE : null,
+			($_REQUEST['hostid'] > 0) ? null : SPACE,
+			new CCol(new CDiv($itemName, $item_status)),
+			new CCol(new CDiv($lastClock, $item_status)),
+			new CCol(new CDiv($lastValue, $item_status)),
+			new CCol(new CDiv($change, $item_status)),
+			$actions
+		)));
+	}
 
 	// remove items with applications from the collection
 	unset($allItems[$key]);
@@ -419,7 +491,7 @@ foreach ($applications as $appid => $dbApp) {
 	$toggle->setAttribute('data-open-state', $openState);
 
 	$col = new CCol(array(bold($dbApp['name']),SPACE.'('._n('%1$s Item', '%1$s Items', $dbApp['item_cnt']).')'));
-	$col->setColSpan(5);
+	$col->setColSpan(getRequest('show_details') ? 9 : 5);
 
 	// host JS menu link
 	$hostSpan = null;
@@ -512,16 +584,63 @@ foreach ($allItems as $db_item){
 	}
 
 	$item_status = $db_item['state'] == ITEM_STATE_NOTSUPPORTED ? 'unknown' : null;
-	array_push($app_rows, new CRow(array(
-		SPACE,
-		is_show_all_nodes() ? ($db_host['item_cnt'] ? SPACE : get_node_name_by_elid($db_item['itemid'])) : null,
-		$_REQUEST['hostid'] ? null : SPACE,
-		new CCol(new CDiv(SPACE.SPACE.$db_item['resolvedName'], $item_status)),
-		new CCol(new CDiv($lastClock, $item_status)),
-		new CCol(new CDiv($lastValue, $item_status)),
-		new CCol(new CDiv($change, $item_status)),
-		new CCol(new CDiv($actions, $item_status))
-	)));
+	$itemName = array(SPACE, SPACE, $db_item['resolvedName']);
+
+	if (getRequest('show_details')) {
+		$itemKey = new CLink($db_item['key_'], 'items.php?form=update&itemid='.$db_item['itemid']);
+		$itemName = array_merge($itemName, array(BR(), SPACE, SPACE, $itemKey));
+
+		$statusIcons = array();
+		if ($db_item['status'] == ITEM_STATUS_ACTIVE) {
+			if (zbx_empty($db_item['error'])) {
+				$error = new CDiv(SPACE, 'status_icon iconok');
+			}
+			else {
+				$error = new CDiv(SPACE, 'status_icon iconerror');
+				$error->setHint($db_item['error'], '', 'on');
+			}
+			$statusIcons[] = $error;
+		}
+
+		// discovered item lifetime indicator
+		if ($db_item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $db_item['itemDiscovery']['ts_delete']) {
+			$deleteError = new CDiv(SPACE, 'status_icon iconwarning');
+			$deleteError->setHint(
+				_s('The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
+					zbx_date2age($db_item['itemDiscovery']['ts_delete']),
+					zbx_date2str(_('d M Y'), $db_item['itemDiscovery']['ts_delete']),
+					zbx_date2str(_('H:i:s'), $db_item['itemDiscovery']['ts_delete'])
+			));
+			$statusIcons[] = $deleteError;
+		}
+
+		array_push($app_rows, new CRow(array(
+			SPACE,
+			is_show_all_nodes() ? ($db_host['item_cnt'] ? SPACE : get_node_name_by_elid($db_item['itemid'])) : null,
+			$_REQUEST['hostid'] ? null : SPACE,
+			new CCol(new CDiv($itemName, $item_status)),
+			new CCol(new CDiv($db_item['delay'], $item_status)),
+			new CCol(new CDiv($db_item['history'], $item_status)),
+			new CCol(new CDiv($db_item['trends'], $item_status)),
+			new CCol(new CDiv(item_type2str($db_item['type']), $item_status)),
+			new CCol($statusIcons),
+			new CCol(new CDiv($lastClock, $item_status)),
+			new CCol(new CDiv($lastValue, $item_status)),
+			$actions
+		)));
+	}
+	else {
+		array_push($app_rows, new CRow(array(
+			SPACE,
+			is_show_all_nodes() ? ($db_host['item_cnt'] ? SPACE : get_node_name_by_elid($db_item['itemid'])) : null,
+			$_REQUEST['hostid'] ? null : SPACE,
+			new CCol(new CDiv($itemName, $item_status)),
+			new CCol(new CDiv($lastClock, $item_status)),
+			new CCol(new CDiv($lastValue, $item_status)),
+			new CCol(new CDiv($change, $item_status)),
+			$actions
+		)));
+	}
 }
 unset($app_rows);
 unset($db_host);
@@ -544,7 +663,7 @@ foreach ($hosts as $hostId => $dbHost) {
 	$toggle->setAttribute('data-open-state', $openState);
 
 	$col = new CCol(array(bold('- '.('other').' -'), SPACE.'('._n('%1$s Item', '%1$s Items', $dbHost['item_cnt']).')'));
-	$col->setColSpan(5);
+	$col->setColSpan(getRequest('show_details') ? 9 : 5);
 
 	// host JS menu link
 	$hostSpan = null;
