@@ -637,38 +637,14 @@ class CGraph extends CGraphGeneral {
 	 * Get allowed item ID's, check permissions, do all general validation and check for numeric item types.
 	 *
 	 * @param array $graphs
+	 *
+	 * @return void
 	 */
 	protected function validateCreate(array $graphs) {
 		$itemIds = $this->validateItemsCreate($graphs);
-
-		$allowedItems = API::Item()->get(array(
-			'nodeids' => get_current_nodeid(true),
-			'itemids' => $itemIds,
-			'webitems' => true,
-			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
-		));
-
-		// check if items exist and user has permission to access those items
-		foreach ($itemIds as $itemid) {
-			if (!isset($allowedItems[$itemid])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-			}
-		}
+		$this->validateItems($itemIds);
 
 		parent::validateCreate($graphs);
-
-		$allowedValueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
-
-		// get value type and name for these items
-		foreach ($allowedItems as $item) {
-			if (!in_array($item['value_type'], $allowedValueTypes)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Cannot add a non-numeric item "%1$s" to graph "%2$s".', $item['name'], $graph['name'])
-				);
-			}
-		}
 	}
 
 	/**
@@ -677,10 +653,24 @@ class CGraph extends CGraphGeneral {
 	 *
 	 * @param array $graphs
 	 * @param array $dbGraphs
+	 *
+	 * @return void
 	 */
 	protected function validateUpdate(array $graphs, array $dbGraphs) {
 		$itemIds = $this->validateItemsUpdate($graphs);
+		$this->validateItems($itemIds);
 
+		parent::validateUpdate($graphs, $dbGraphs);
+	}
+
+	/**
+	 * Validates graph item permissions
+	 *
+	 * @param array $itemIds
+	 *
+	 * @return void
+	 */
+	protected function validateItems(array $itemIds) {
 		$allowedItems = API::Item()->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'itemids' => $itemIds,
@@ -696,8 +686,6 @@ class CGraph extends CGraphGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
-
-		parent::validateUpdate($graphs, $dbGraphs);
 
 		$allowedValueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
 

@@ -611,7 +611,7 @@ class CGraphPrototype extends CGraphGeneral {
 				'SELECT id.parent_itemid,gi.graphid'.
 					' FROM item_discovery id,graphs_items gi'.
 					' WHERE '.dbConditionInt('gi.graphid', $graphids).
-					' AND gi.itemid=id.itemid'
+						' AND gi.itemid=id.itemid'
 			);
 			$relationMap = new CRelationMap();
 			while ($relation = DBfetch($dbRules)) {
@@ -637,6 +637,8 @@ class CGraphPrototype extends CGraphGeneral {
 	 * and check for numeric item types.
 	 *
 	 * @param array $graphs
+	 *
+	 * @return void
 	 */
 	protected function validateCreate(array $graphs) {
 		$itemIds = $this->validateItemsCreate($graphs);
@@ -695,6 +697,8 @@ class CGraphPrototype extends CGraphGeneral {
 	 *
 	 * @param array $graphs
 	 * @param array $dbGraphs
+	 *
+	 * @return void
 	 */
 	protected function validateUpdate(array $graphs, array $dbGraphs) {
 		$itemIds = $this->validateItemsUpdate($graphs);
