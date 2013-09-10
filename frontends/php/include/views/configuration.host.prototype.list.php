@@ -36,7 +36,7 @@ $itemsWidget->addHeaderRowNumber();
 $itemsWidget->addItem(get_header_host_table('hosts', $discoveryRule['hostid'], $this->data['parent_discoveryid']));
 
 // create form
-$itemForm = new CForm('get');
+$itemForm = new CForm();
 $itemForm->setName('hosts');
 $itemForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 
