@@ -35,7 +35,6 @@ abstract class CGraphGeneral extends CZBXAPI {
 
 	/**
 	 * Update existing graphs.
-	 * Load graph additiona data from DB
 	 *
 	 * @param array $graphs
 	 *
@@ -504,6 +503,8 @@ abstract class CGraphGeneral extends CZBXAPI {
 	 * Check if new items are from same templated host, validate Y axis items and values and hosts and templates.
 	 *
 	 * @param array $graphs
+	 *
+	 * @return void
 	 */
 	protected function validateCreate(array $graphs) {
 		$colorValidator = new CColorValidator();
@@ -620,6 +621,8 @@ abstract class CGraphGeneral extends CZBXAPI {
 	 *
 	 * @param array $graphs
 	 * @param array $dbGraphs
+	 *
+	 * @return void
 	 */
 	protected function validateUpdate(array $graphs, array $dbGraphs) {
 		$colorValidator = new CColorValidator();
@@ -690,6 +693,8 @@ abstract class CGraphGeneral extends CZBXAPI {
 	 * Check if graph already exists somewhere in DB.
 	 *
 	 * @param array $graphs
+	 *
+	 * @return void
 	 */
 	protected function validateHostsAndTemplates(array $graphs) {
 		$graphNames = array();
