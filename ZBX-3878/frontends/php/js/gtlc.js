@@ -32,30 +32,32 @@ var timeControl = {
 	timeRefreshTimeoutHandler: null,
 
 	addObject: function(id, time, objData) {
-		this.objectList[id] = {
-			id: id,
-			containerid: null,
-			refresh: false,
-			processed: 0,
-			time: {},
-			objDims: {},
-			src: location.href,
-			dynamic: 1,
-			periodFixed: 1,
-			loadSBox: 0,
-			loadImage: 0,
-			loadScroll: 0,
-			mainObject: 0, // object on changing will reflect on all others
-			sliderMaximumTimePeriod: null // max period in seconds
-		};
+		if (typeof this.objectList[id] === 'undefined') {
+			this.objectList[id] = {
+				id: id,
+				containerid: null,
+				refresh: false,
+				processed: 0,
+				time: {},
+				objDims: {},
+				src: location.href,
+				dynamic: 1,
+				periodFixed: 1,
+				loadSBox: 0,
+				loadImage: 0,
+				loadScroll: 0,
+				mainObject: 0, // object on changing will reflect on all others
+				sliderMaximumTimePeriod: null // max period in seconds
+			};
 
-		for (var key in this.objectList[id]) {
-			if (isset(key, objData)) {
-				this.objectList[id][key] = objData[key];
+			for (var key in this.objectList[id]) {
+				if (isset(key, objData)) {
+					this.objectList[id][key] = objData[key];
+				}
 			}
-		}
 
-		this.objectList[id].time = time;
+			this.objectList[id].time = time;
+		}
 	},
 
 	processObjects: function() {

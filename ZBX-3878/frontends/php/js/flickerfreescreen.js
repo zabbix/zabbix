@@ -404,7 +404,12 @@ jQuery(function($) {
 
 			this.screens = [];
 			ZBX_SBOX = {};
-			timeControl.objectList = {};
+
+			for (var id in timeControl.objectList) {
+				if (id !== 'scrollbar' && timeControl.objectList.hasOwnProperty(id)) {
+					delete timeControl.objectList[id];
+				}
+			}
 
 			window.flickerfreeScreenShadow.cleanAll();
 		}
