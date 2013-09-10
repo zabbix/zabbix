@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 function permission2str($group_permission) {
 	$str_perm[PERM_READ_WRITE] = _('Read-write');
 	$str_perm[PERM_READ] = _('Read only');
@@ -129,36 +129,6 @@ function get_user_system_auth($userid) {
 			break;
 	}
 	return $result;
-}
-
-/***********************************************
-	GET ACCESSIBLE RESOURCES BY USERID
-************************************************/
-function available_groups($groupids, $editable = null) {
-	$options = array();
-	$options['groupids'] = $groupids;
-	$options['editable'] = $editable;
-	$groups = API::HostGroup()->get($options);
-	return zbx_objectValues($groups, 'groupid');
-}
-
-function available_hosts($hostids, $editable = null) {
-	$options = array();
-	$options['hostids'] = $hostids;
-	$options['editable'] = $editable;
-	$options['templated_hosts'] = 1;
-	$hosts = API::Host()->get($options);
-	return zbx_objectValues($hosts, 'hostid');
-}
-
-function available_triggers($triggerids, $editable = null) {
-	$options = array(
-		'triggerids' => $triggerids,
-		'editable' => $editable,
-		'nodes' => get_current_nodeid(true)
-	);
-	$triggers = API::Trigger()->get($options);
-	return zbx_objectValues($triggers, 'triggerid');
 }
 
 /**
@@ -354,6 +324,7 @@ function get_accessible_hosts_by_rights(&$rights, $user_type, $perm, $perm_res =
 	$where = array();
 
 	array_push($where, 'h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')');
+	array_push($where, dbConditionInt('h.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)));
 	if (!is_null($nodeid)) {
 		$where = sqlPartDbNode($where, 'h.hostid', $nodeid);
 	}

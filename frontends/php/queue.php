@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
 
@@ -37,8 +37,8 @@ $queueModes = array(
 );
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-$fields=array(
-	'config' =>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN($queueModes),	NULL)
+$fields = array(
+	'config' => array(T_ZBX_INT, O_OPT, P_SYS, IN($queueModes), null)
 );
 
 check_fields($fields);
@@ -72,8 +72,8 @@ $cmbMode->addItem(QUEUE_DETAILS, _('Details'));
 $form->addItem($cmbMode);
 
 // display table
-$queue_wdgt = new CWidget();
-$queue_wdgt->addPageHeader(_('QUEUE OF ITEMS TO BE UPDATED'), $form);
+$queueWidget = new CWidget();
+$queueWidget->addPageHeader(_('QUEUE OF ITEMS TO BE UPDATED'), $form);
 
 $table = new CTableInfo(_('The queue is empty.'));
 
@@ -130,15 +130,16 @@ if ($config == QUEUE_OVERVIEW) {
 			getSeverityCell(TRIGGER_SEVERITY_WARNING, $itemTypeData['delay30'], !$itemTypeData['delay30']),
 			getSeverityCell(TRIGGER_SEVERITY_AVERAGE, $itemTypeData['delay60'], !$itemTypeData['delay60']),
 			getSeverityCell(TRIGGER_SEVERITY_HIGH, $itemTypeData['delay300'], !$itemTypeData['delay300']),
-			getSeverityCell(TRIGGER_SEVERITY_DISASTER, $itemTypeData['delay600'], !$itemTypeData['delay600']),
+			getSeverityCell(TRIGGER_SEVERITY_DISASTER, $itemTypeData['delay600'], !$itemTypeData['delay600'])
 		));
 	}
 }
+
 // overview by proxy
-elseif ($config == QUEUE_OVERVIEW_BY_PROXY){
+elseif ($config == QUEUE_OVERVIEW_BY_PROXY) {
 	$proxies = API::proxy()->get(array(
 		'output' => array('hostid', 'host'),
-		'preservekeys' => true,
+		'preservekeys' => true
 	));
 	order_result($proxies, 'host');
 
@@ -177,10 +178,11 @@ elseif ($config == QUEUE_OVERVIEW_BY_PROXY){
 			getSeverityCell(TRIGGER_SEVERITY_WARNING, $proxyData['delay30'], !$proxyData['delay30']),
 			getSeverityCell(TRIGGER_SEVERITY_AVERAGE, $proxyData['delay60'], !$proxyData['delay60']),
 			getSeverityCell(TRIGGER_SEVERITY_HIGH, $proxyData['delay300'], !$proxyData['delay300']),
-			getSeverityCell(TRIGGER_SEVERITY_DISASTER, $proxyData['delay600'], !$proxyData['delay600']),
+			getSeverityCell(TRIGGER_SEVERITY_DISASTER, $proxyData['delay600'], !$proxyData['delay600'])
 		));
 	}
 }
+
 // details
 elseif ($config == QUEUE_DETAILS) {
 	$queueData = zbx_toHash($queueData, 'itemid');
@@ -203,6 +205,10 @@ elseif ($config == QUEUE_DETAILS) {
 
 	$i = 0;
 	foreach ($queueData as $itemData) {
+		if (!isset($items[$itemData['itemid']])) {
+			continue;
+		}
+
 		// display only the first 500 items
 		$i++;
 		if ($i > QUEUE_DETAIL_ITEM_COUNT) {
@@ -222,13 +228,16 @@ elseif ($config == QUEUE_DETAILS) {
 	}
 }
 
-$queue_wdgt->addItem($table);
-$queue_wdgt->Show();
+$queueWidget->addItem($table);
+$queueWidget->show();
 
 // display the table footer
-if ($config != QUEUE_OVERVIEW) {
+if ($config == QUEUE_OVERVIEW_BY_PROXY) {
+	show_table_header(_('Total').': '.$table->getNumRows());
+}
+elseif ($config == QUEUE_DETAILS) {
 	show_table_header(
-		_('Total').": ".$table->GetNumRows().
+		_('Total').': '.$table->getNumRows().
 		((count($queueData) > QUEUE_DETAIL_ITEM_COUNT) ? ' ('._('Truncated').')' : '')
 	);
 }

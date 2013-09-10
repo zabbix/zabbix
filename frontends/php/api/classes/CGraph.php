@@ -388,7 +388,7 @@ class CGraph extends CGraphGeneral {
 
 			// check if templated graph exists
 			$chdGraphs = $this->get(array(
-				'filter' => array('templateid' => $tmpGraph['graphid'], 'flags' => array(ZBX_FLAG_DISCOVERY_CHILD, ZBX_FLAG_DISCOVERY_NORMAL)),
+				'filter' => array('templateid' => $tmpGraph['graphid'], 'flags' => array(ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_NORMAL)),
 				'output' => API_OUTPUT_EXTEND,
 				'selectGraphItems' => API_OUTPUT_EXTEND,
 				'preservekeys' => true,
