@@ -474,10 +474,12 @@ jQuery(document).ready(function() {
 		ZABBIX.apps.map.object.updateImage();
 
 		jQuery('div.printless').unbind('click').click(function () {
-			printLess(0);
+			printLess(false);
 			ZABBIX.apps.map.object.updateImage();
+
 			return false;
 		});
+
 		return false;
 	});
 })
