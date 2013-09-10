@@ -585,11 +585,10 @@ else {
 
 	order_result($data['graphs'], $sortfield, $sortorder);
 
-	$urlParams = array('hostid' => $_REQUEST['hostid']);
-	if (isset($_REQUEST['parent_discoveryid'])) {
-		$urlParams['parent_discoveryid'] = $_REQUEST['parent_discoveryid'];
-	}
-	$data['paging'] = getPagingLine($data['graphs'], $urlParams);
+	$data['paging'] = getPagingLine($data['graphs'], array(
+		'hostid' => get_request('hostid'),
+		'parent_discoveryid' => get_request('parent_discoveryid')
+	));
 
 	// get graphs after paging
 	$options = array(

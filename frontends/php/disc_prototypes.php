@@ -373,8 +373,10 @@ else {
 		order_result($data['items'], $sortfield, getPageSortOrder());
 	}
 
-	$urlParams = array('hostid' => $_REQUEST['hostid'], 'parent_discoveryid' => $_REQUEST['parent_discoveryid']);
-	$data['paging'] = getPagingLine($data['items'], $urlParams);
+	$data['paging'] = getPagingLine($data['items'], array(
+		'hostid' => get_request('hostid'),
+		'parent_discoveryid' => get_request('parent_discoveryid')
+	));
 
 	// render view
 	$itemView = new CView('configuration.item.prototype.list', $data);
