@@ -58,7 +58,7 @@ class CGraphPrototype extends CGraphGeneral {
 		$sqlParts = array(
 			'select'	=> array('graphs' => 'g.graphid'),
 			'from'		=> array('graphs' => 'graphs g'),
-			'where'		=> array('g.flags='.ZBX_FLAG_DISCOVERY_CHILD),
+			'where'		=> array('g.flags='.ZBX_FLAG_DISCOVERY_PROTOTYPE),
 			'group'		=> array(),
 			'order'		=> array(),
 			'limit'		=> null
@@ -387,7 +387,11 @@ class CGraphPrototype extends CGraphGeneral {
 			if ($tmpGraph['ymin_itemid'] > 0) {
 				$yminItemid = get_same_graphitems_for_host(array(array('itemid' => $tmpGraph['ymin_itemid'])), $chdHost['hostid']);
 				if (!$yminItemid) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph "%1$s" cannot inherit. No required items on "%2$s" (Ymin value item).', $tmpGraph['name'], $chdHost['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Graph "%1$s" cannot inherit. No required items on "%2$s" (Ymin value item).',
+							$tmpGraph['name'],
+							$chdHost['host']
+					));
 				}
 				$yminItemid = reset($yminItemid);
 				$tmpGraph['ymin_itemid'] = $yminItemid['itemid'];
@@ -395,7 +399,10 @@ class CGraphPrototype extends CGraphGeneral {
 
 			// check if templated graph exists
 			$chdGraphs = $this->get(array(
-				'filter' => array('templateid' => $tmpGraph['graphid'], 'flags' => array(ZBX_FLAG_DISCOVERY_CHILD, ZBX_FLAG_DISCOVERY_NORMAL)),
+				'filter' => array(
+					'templateid' => $tmpGraph['graphid'],
+					'flags' => array(ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_NORMAL)
+				),
 				'output' => API_OUTPUT_EXTEND,
 				'selectGraphItems' => API_OUTPUT_EXTEND,
 				'preservekeys' => true,
@@ -405,7 +412,9 @@ class CGraphPrototype extends CGraphGeneral {
 			if ($chdGraph = reset($chdGraphs)) {
 				if (zbx_strtolower($tmpGraph['name']) != zbx_strtolower($chdGraph['name'])
 						&& $this->exists(array('name' => $tmpGraph['name'], 'hostids' => $chdHost['hostid']))) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph "%1$s" already exists on "%2$s".', $tmpGraph['name'], $chdHost['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Graph "%1$s" already exists on "%2$s".', $tmpGraph['name'], $chdHost['host'])
+					);
 				}
 				elseif ($chdGraph['flags'] != $tmpGraph['flags']) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph with same name but other type exist.'));
@@ -580,7 +589,7 @@ class CGraphPrototype extends CGraphGeneral {
 
 	protected function createReal($graph) {
 		// mark the graph as a graph prototype
-		$graph['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
+		$graph['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 
 		return parent::createReal($graph);
 	}
@@ -665,7 +674,7 @@ class CGraphPrototype extends CGraphGeneral {
 				// check if the graph has at least one prototype
 				foreach ($graph['gitems'] as $gitem) {
 					// $allowedItems used because it is possible to make API call without full item data
-					if ($allowedItems[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
+					if ($allowedItems[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 						$hasPrototype = true;
 						break;
 					}
@@ -726,7 +735,7 @@ class CGraphPrototype extends CGraphGeneral {
 					// check if the graph has at least one prototype
 					foreach ($graph['gitems'] as $gitem) {
 						// $allowedItems used because it is possible to make API call without full item data
-						if ($allowedItems[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
+						if ($allowedItems[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 							$hasPrototype = true;
 							break;
 						}

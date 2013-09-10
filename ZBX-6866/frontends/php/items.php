@@ -188,17 +188,20 @@ if (get_request('itemid', false)) {
 		'itemids' => $_REQUEST['itemid'],
 		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
 		'output' => array('itemid'),
+		'selectHosts' => array('status'),
 		'editable' => true,
 		'preservekeys' => true
 	));
 	if (empty($item)) {
 		access_deny();
 	}
+	$item = reset($item);
+	$hosts = $item['hosts'];
 }
 elseif (get_request('hostid', 0) > 0) {
 	$hosts = API::Host()->get(array(
 		'hostids' => $_REQUEST['hostid'],
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('status'),
 		'templated_hosts' => true,
 		'editable' => true
 	));
@@ -318,7 +321,7 @@ foreach (array('subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'su
  */
 $result = false;
 if (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
-	$timePeriodValidator = new CTimePeriodValidator(array('allow_multiple' => false));
+	$timePeriodValidator = new CTimePeriodValidator(array('allowMultiple' => false));
 	$_REQUEST['delay_flex'] = get_request('delay_flex', array());
 
 	if ($timePeriodValidator->validate($_REQUEST['new_delay_flex']['period'])) {
@@ -1110,8 +1113,8 @@ else {
 
 	// determine, show or not column of errors
 	if (isset($hosts)) {
-		$h = reset($hosts);
-		$data['showErrorColumn'] = ($h['status'] != HOST_STATUS_TEMPLATE);
+		$host = reset($hosts);
+		$data['showErrorColumn'] = ($host['status'] != HOST_STATUS_TEMPLATE);
 	}
 	else {
 		$data['showErrorColumn'] = true;

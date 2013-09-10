@@ -325,9 +325,9 @@ static void	get_proxy_monitored_hosts(zbx_uint64_t proxy_hostid, zbx_vector_uint
 			"select hostid"
 			" from hosts"
 			" where proxy_hostid=" ZBX_FS_UI64
-				" and status in (%d,%d)",
-			proxy_hostid,
-			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
+				" and status in (%d,%d)"
+				" and flags<>%d",
+			proxy_hostid, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -637,8 +637,12 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		zbx_vector_uint64_t *del, char **error)
 {
 	const char		*__function_name = "process_proxyconfig_table";
+
 	int			f, fields_count = 0, insert, is_null, i, ret = FAIL, id_field_nr = 0,
 				move_out = 0, move_field_nr = 0;
+#ifdef HAVE_MYSQL
+	int			ex_fields_count = 0;
+#endif
 	const ZBX_FIELD		*fields[ZBX_MAX_FIELDS];
 	struct zbx_json_parse	jp_data, jp_row;
 	char			buf[MAX_STRING_LEN], *esc;
@@ -707,6 +711,30 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		}
 	}
 
+#ifdef HAVE_MYSQL
+	/* MySQL: BLOB and TEXT columns doesn't have a default value; we shall add them into an insert statement */
+	for (i = 0; NULL != table->fields[i].name; i++)
+	{
+		switch (table->fields[i].type)
+		{
+			case ZBX_TYPE_BLOB:
+			case ZBX_TYPE_TEXT:
+			case ZBX_TYPE_SHORTTEXT:
+			case ZBX_TYPE_LONGTEXT:
+				for (f = 0; f < fields_count; f++)
+				{
+					if (fields[f] == &table->fields[i])
+						break;
+				}
+
+				if (f == fields_count)
+					fields[fields_count + ex_fields_count++] = &table->fields[i];
+
+				break;
+		}
+	}
+#endif
+
 	/* get the entries (line 8 in T1) */
 	if (FAIL == zbx_json_brackets_by_name(jp_obj, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
@@ -774,6 +802,11 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	{
 		move_out = 1;
 		move_field_nr = find_field_by_name(fields, fields_count, "key_");
+	}
+	else if (0 == strcmp("httptest", table->table))
+	{
+		move_out = 1;
+		move_field_nr = find_field_by_name(fields, fields_count, "name");
 	}
 
 	zbx_vector_uint64_create(&ins);
@@ -886,32 +919,18 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 			zbx_vector_uint64_clear(del);
 		}
 
-		/* special preprocessing for 'hostmacro' and 'items' tables to eliminate conflicts */
-		/* in the 'hostid,macro' and 'hostid,key_' unique indexes */
+		/* special preprocessing for 'hostmacro', 'items' and 'httptest' tables to eliminate conflicts */
+		/* in the 'hostid,macro', 'hostid,key_' and 'hostid,name' unique indexes */
 		if (1 < moves.values_num)
 		{
 			sql_offset = 0;
-			if (0 == strcmp("hostmacro", table->table))
-			{
 #ifdef HAVE_MYSQL
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hostmacro "
-						"set macro=concat('#',hostmacroid) where");
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set %s=concat('#',%s) where",
+					table->table, fields[move_field_nr]->name, table->recid);
 #else
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hostmacro "
-						"set macro='#'||hostmacroid where");
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set %s='#'||%s where",
+					table->table, fields[move_field_nr]->name, table->recid);
 #endif
-			}
-			else if (0 == strcmp("items", table->table))
-			{
-#ifdef HAVE_MYSQL
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items "
-						"set key_=concat('#',itemid) where");
-#else
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items "
-						"set key_='#'||itemid where");
-#endif
-			}
-
 			zbx_vector_uint64_sort(&moves, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, table->recid, moves.values,
 					moves.values_num);
@@ -943,8 +962,15 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "insert into %s (", table->table);
 
+#ifdef HAVE_MYSQL
+			for (f = 0; f < fields_count + ex_fields_count; f++)
+#else
 			for (f = 0; f < fields_count; f++)
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s,", fields[f]->name);
+#endif
+			{
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, fields[f]->name);
+				zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ',');
+			}
 
 			sql_offset--;
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ") values (" ZBX_FS_UI64 ",", recid);
@@ -1035,6 +1061,14 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		sql_offset--;
 		if (0 != insert)
 		{
+#ifdef HAVE_MYSQL
+			for (f = fields_count; f < fields_count + ex_fields_count; f++)
+			{
+				esc = DBdyn_escape_string(fields[f]->default_value);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",'%s'", esc);
+				zbx_free(esc);
+			}
+#endif
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ");\n");
 		}
 		else
@@ -1375,7 +1409,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	const char		*p = NULL;
 	char			tmp[HOST_ERROR_LEN_MAX], *sql = NULL, *error_esc;
 	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0, tmp_offset;
-	int			availability_alloc = 0, availability_num = 0, availability_last = 0;
+	int			availability_alloc = 0, availability_num = 0;
 	zbx_host_availability_t	*availability = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1412,7 +1446,6 @@ void	process_host_availability(struct zbx_json_parse *jp)
 		}
 
 		tmp_offset = sql_offset;
-		availability_last = availability_num;
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set ");
 
@@ -1508,14 +1541,15 @@ void	process_host_availability(struct zbx_json_parse *jp)
 			zbx_free(error_esc);
 		}
 
-		if (availability_last == availability_num)
+		sql_offset--;
+
+		if (',' != sql[sql_offset])
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data");
 			sql_offset = tmp_offset;
 			continue;
 		}
 
-		sql_offset--;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where hostid=" ZBX_FS_UI64 ";\n", hostid);
 
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
@@ -1627,11 +1661,12 @@ static int	proxy_get_history_data_simple(struct zbx_json *j, const zbx_history_t
 {
 	const char	*__function_name = "proxy_get_history_data_simple";
 	size_t		offset = 0;
-	int		f, records = 0;
+	int		f, records = 0, records_lim = ZBX_MAX_HRECORDS, retries = 1;
 	char		sql[MAX_STRING_LEN];
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	id;
+	struct timespec	t_sleep = { 0, 100000000L }, t_rem;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s'", __function_name, ht->table);
 
@@ -1643,17 +1678,37 @@ static int	proxy_get_history_data_simple(struct zbx_json *j, const zbx_history_t
 
 	for (f = 0; NULL != ht->fields[f].field; f++)
 		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, ",%s", ht->fields[f].field);
-
-	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " from %s where id>" ZBX_FS_UI64 " order by id",
+try_again:
+	zbx_snprintf(sql + offset, sizeof(sql) - offset, " from %s where id>" ZBX_FS_UI64 " order by id",
 			ht->table, id);
 
-	result = DBselectN(sql, ZBX_MAX_HRECORDS);
+	result = DBselectN(sql, records_lim);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_json_addobject(j, NULL);
-
 		ZBX_STR2UINT64(*lastid, row[0]);
+
+		if (1 < *lastid - id)
+		{
+			/* At least one record is missing. It can happen if some DB syncer process has */
+			/* started but yet committed a transaction or a rollback occurred in a DB syncer. */
+			if (0 < retries--)
+			{
+				DBfree_result(result);
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing. Waiting %f sec,"
+						" retrying.", __function_name, *lastid - id - 1,
+						(double)t_sleep.tv_sec + (double)t_sleep.tv_nsec / 1.0e9);
+				nanosleep(&t_sleep, &t_rem);
+				goto try_again;
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing. No more retries.",
+						__function_name, *lastid - id - 1);
+			}
+		}
+
+		zbx_json_addobject(j, NULL);
 
 		for (f = 0; NULL != ht->fields[f].field; f++)
 		{
@@ -1666,6 +1721,9 @@ static int	proxy_get_history_data_simple(struct zbx_json *j, const zbx_history_t
 		records++;
 
 		zbx_json_close(j);
+
+		id = *lastid;
+		records_lim--;
 	}
 	DBfree_result(result);
 
@@ -1712,8 +1770,9 @@ static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid)
 	static size_t			data_alloc = 0;
 	size_t				data_num = 0, i;
 	DC_ITEM				*dc_items;
-	int				*errcodes, records = 0;
+	int				*errcodes, records = 0, records_lim = ZBX_MAX_HRECORDS, retries = 1;
 	zbx_history_data_t		*hd;
+	struct timespec			t_sleep = { 0, 100000000L }, t_rem;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1723,7 +1782,7 @@ static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid)
 	*lastid = 0;
 
 	proxy_get_lastid("proxy_history", "history_lastid", &id);
-
+try_again:
 	zbx_snprintf(sql, sizeof(sql),
 			"select id,itemid,clock,ns,timestamp,source,severity,value,logeventid,state"
 			" from proxy_history"
@@ -1731,11 +1790,31 @@ static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid)
 			" order by id",
 			id);
 
-	result = DBselectN(sql, ZBX_MAX_HRECORDS);
+	result = DBselectN(sql, records_lim);
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(*lastid, row[0]);
+
+		if (1 < *lastid - id)
+		{
+			/* At least one record is missing. It can happen if some DB syncer process has */
+			/* started but yet committed a transaction or a rollback occurred in a DB syncer. */
+			if (0 < retries--)
+			{
+				DBfree_result(result);
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing. Waiting %f sec,"
+						" retrying.", __function_name, *lastid - id - 1,
+						(double)t_sleep.tv_sec + (double)t_sleep.tv_nsec / 1.0e9);
+				nanosleep(&t_sleep, &t_rem);
+				goto try_again;
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing. No more retries.",
+						__function_name, *lastid - id - 1);
+			}
+		}
 
 		if (data_alloc == data_num)
 		{
@@ -1771,6 +1850,9 @@ static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid)
 		hd->pvalue = string_buffer_offset;
 		memcpy(&string_buffer[string_buffer_offset], row[7], len2);
 		string_buffer_offset += len2;
+
+		id = *lastid;
+		records_lim--;
 	}
 	DBfree_result(result);
 
@@ -1832,9 +1914,8 @@ int	proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid)
 	return proxy_get_history_data_simple(j, &areg, lastid);
 }
 
-void	calc_timestamp(char *line, int *timestamp, char *format)
+void	calc_timestamp(const char *line, int *timestamp, const char *format)
 {
-
 	const char	*__function_name = "calc_timestamp";
 	int		hh, mm, ss, yyyy, dd, MM;
 	int		hhc = 0, mmc = 0, ssc = 0, yyyyc = 0, ddc = 0, MMc = 0;
@@ -1900,7 +1981,7 @@ void	calc_timestamp(char *line, int *timestamp, char *format)
 			*timestamp = t;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() timestamp:%d",	__function_name, *timestamp);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() timestamp:%d", __function_name, *timestamp);
 }
 
 /******************************************************************************
@@ -1927,9 +2008,9 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 	DC_ITEM		*items = NULL;
 	zbx_host_key_t	*keys = NULL;
 	size_t		i;
-	zbx_uint64_t	*itemids = NULL;
+	zbx_uint64_t	*itemids = NULL, *lastlogsizes = NULL;
 	unsigned char	*states = NULL;
-	int		*lastclocks = NULL, *errcodes = NULL, *errcodes2 = NULL;
+	int		*lastclocks = NULL, *errcodes = NULL, *mtimes = NULL, *errcodes2 = NULL;
 	size_t		num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1940,6 +2021,8 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 	itemids = zbx_malloc(itemids, sizeof(zbx_uint64_t) * values_num);
 	states = zbx_malloc(states, sizeof(unsigned char) * values_num);
 	lastclocks = zbx_malloc(lastclocks, sizeof(int) * values_num);
+	lastlogsizes = zbx_malloc(lastlogsizes, sizeof(zbx_uint64_t) * values_num);
+	mtimes = zbx_malloc(mtimes, sizeof(int) * values_num);
 	errcodes2 = zbx_malloc(errcodes2, sizeof(int) * values_num);
 
 	for (i = 0; i < values_num; i++)
@@ -1955,7 +2038,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 		if (SUCCEED != errcodes[i])
 			continue;
 
-		if (ZBX_FLAG_DISCOVERY_CHILD == items[i].flags)
+		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == items[i].flags)
 			continue;
 
 		if (HOST_MAINTENANCE_STATUS_ON == items[i].host.maintenance_status &&
@@ -1992,7 +2075,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 		{
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &values[i].ts,
-					items[i].state, values[i].value, 0, NULL, 0, 0, 0, 0);
+					items[i].state, values[i].value);
 
 			if (NULL != processed)
 				(*processed)++;
@@ -2005,16 +2088,28 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 					proxy_hostid ? ITEM_DATA_TYPE_DECIMAL : items[i].data_type, values[i].value))
 			{
 				if (ITEM_VALUE_TYPE_LOG == items[i].value_type)
-					calc_timestamp(values[i].value, &values[i].timestamp, items[i].logtimefmt);
+				{
+					zbx_log_t	*log;
 
-				if (NULL != values[i].source)
-					zbx_replace_invalid_utf8(values[i].source);
+					log = agent.logs[0];
+
+					log->timestamp = values[i].timestamp;
+					if (NULL != values[i].source)
+					{
+						zbx_replace_invalid_utf8(values[i].source);
+						log->source = zbx_strdup(log->source, values[i].source);
+					}
+					log->severity = values[i].severity;
+					log->logeventid = values[i].logeventid;
+					log->lastlogsize = values[i].lastlogsize;
+					log->mtime = values[i].mtime;
+
+					calc_timestamp(log->value, &log->timestamp, items[i].logtimefmt);
+				}
 
 				items[i].state = ITEM_STATE_NORMAL;
 				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &agent,
-						&values[i].ts, items[i].state, NULL, values[i].timestamp,
-						values[i].source, values[i].severity, values[i].logeventid,
-						values[i].lastlogsize, values[i].mtime);
+						&values[i].ts, items[i].state, NULL);
 
 				if (NULL != processed)
 					(*processed)++;
@@ -2026,7 +2121,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 
 				items[i].state = ITEM_STATE_NOTSUPPORTED;
 				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL,
-						&values[i].ts, items[i].state, agent.msg, 0, NULL, 0, 0, 0, 0);
+						&values[i].ts, items[i].state, agent.msg);
 			}
 			else
 				THIS_SHOULD_NEVER_HAPPEN; /* set_result_type() always sets MSG result if not SUCCEED */
@@ -2037,15 +2132,19 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 		itemids[num] = items[i].itemid;
 		states[num] = items[i].state;
 		lastclocks[num] = values[i].ts.sec;
+		lastlogsizes[num] = values[i].lastlogsize;
+		mtimes[num] = values[i].mtime;
 		errcodes2[num] = SUCCEED;
 		num++;
 	}
 
 	DCconfig_clean_items(items, errcodes, values_num);
 
-	DCrequeue_items(itemids, states, lastclocks, errcodes2, num);
+	DCrequeue_items(itemids, states, lastclocks, lastlogsizes, mtimes, errcodes2, num);
 
 	zbx_free(errcodes2);
+	zbx_free(mtimes);
+	zbx_free(lastlogsizes);
 	zbx_free(lastclocks);
 	zbx_free(states);
 	zbx_free(itemids);

@@ -208,12 +208,19 @@ var chkbxRange = {
 
 	// check if all checkboxes are selected and select main checkbox, else disable checkbox, select options and button
 	selectMainCheckbox: function() {
+		var mainCheckbox = jQuery('.tableinfo .header .checkbox:not(:disabled)');
+		if (!mainCheckbox.length) {
+			return;
+		}
+
 		var countAvailable = jQuery('.tableinfo tr:not(.header) .checkbox:not(:disabled)').length;
-		var countChecked = jQuery('.tableinfo tr:not(.header) .checkbox:not(:disabled):checked').length;
-		var mainCheckbox = jQuery('.tableinfo .header .checkbox:not(:disabled)')[0];
 
 		if (countAvailable > 0) {
+			var countChecked = jQuery('.tableinfo tr:not(.header) .checkbox:not(:disabled):checked').length;
+
+			mainCheckbox = mainCheckbox[0];
 			mainCheckbox.checked = (countChecked == countAvailable);
+
 			if (mainCheckbox.checked) {
 				jQuery('.tableinfo .header').addClass('selectedMain');
 			}
@@ -221,7 +228,7 @@ var chkbxRange = {
 				jQuery('.tableinfo .header').removeClass('selectedMain');
 			}
 		}
-		else if (typeof(mainCheckbox) !== 'undefined') {
+		else {
 			mainCheckbox.disabled = true;
 		}
 	},
@@ -383,8 +390,12 @@ var chkbxRange = {
 
 			cookie.createJSON(this.cookieName, this.selectedIds);
 
-			jQuery('#go')[0].disabled = (countChecked == 0);
-			jQuery('#goButton')[0].disabled = (countChecked == 0);
+			if (jQuery('#go').length) {
+				jQuery('#go')[0].disabled = (countChecked == 0);
+			}
+			if (jQuery('#goButton').length) {
+				jQuery('#goButton')[0].disabled = (countChecked == 0);
+			}
 
 			this.pageGoCount = countChecked;
 		}

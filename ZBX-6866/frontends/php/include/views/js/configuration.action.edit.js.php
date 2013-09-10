@@ -40,7 +40,7 @@
 <tr id="opmsgUserRow_#{userid}">
 	<td>
 		<input name="new_operation[opmessage_usr][#{userid}][userid]" type="hidden" value="#{userid}" />
-		<span>#{alias}</span>
+		<span>#{fullname}</span>
 	</td>
 	<td>
 		<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpmsgUserRow(#{userid});" />

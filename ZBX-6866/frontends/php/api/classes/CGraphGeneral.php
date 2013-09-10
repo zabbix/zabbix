@@ -56,16 +56,17 @@ abstract class CGraphGeneral extends CZBXAPI {
 			'selectGraphItems' => API_OUTPUT_EXTEND
 		));
 
+		$updateDiscoveredValidator = new CUpdateDiscoveredValidator(array(
+			'messageAllowed' => _('Cannot update a discovered graph.')
+		));
 		foreach ($graphs as &$graph) {
 			// check permissions
 			if (!isset($dbGraphs[$graph['graphid']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 
-			// discovered fields cannot be updated
-			if ($dbGraphs[$graph['graphid']]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update discovered graph.'));
-			}
+			// cannot update discovered graphs
+			$this->checkPartialValidator($graph, $updateDiscoveredValidator, $dbGraphs[$graph['graphid']]);
 
 			// validate items on set or pass existing items from DB
 			if (isset($graph['gitems'])) {
@@ -280,6 +281,8 @@ abstract class CGraphGeneral extends CZBXAPI {
 	 *
 	 * @param array $graph
 	 * @param bool $tpl
+	.*.
+	 * @return void
 	 */
 	protected function checkAxisItems(array $graph, $tpl = false) {
 		$axisItems = array();
