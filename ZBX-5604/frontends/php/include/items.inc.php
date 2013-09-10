@@ -741,7 +741,7 @@ function get_items_data_overview($hostids, $application, $view_style) {
 	$history = Manager::History()->getLast(zbx_toHash($db_items, 'itemid'));
 
 	$options = array(
-		'output' => array('name', 'hostid'),
+		'output' => array('name', 'hostid', 'status'),
 		'monitored_hosts' => true,
 		'hostids' => $hostids,
 		'with_monitored_items' => true,
@@ -1424,7 +1424,7 @@ function getParamFieldLabelByType($itemType) {
 		case ITEM_TYPE_JMX:
 			return _('Executed script');
 		case ITEM_TYPE_DB_MONITOR:
-			return _('Additional parameters');
+			return _('SQL query');
 		case ITEM_TYPE_CALCULATED:
 			return _('Formula');
 		default:

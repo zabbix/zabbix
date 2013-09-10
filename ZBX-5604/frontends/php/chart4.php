@@ -40,17 +40,16 @@ if (!isset($_REQUEST['triggerid'])) {
 	fatal_error(_('No triggers defined.'));
 }
 
-$db_data = API::Trigger()->get(array(
+$dbTrigger = API::Trigger()->get(array(
 	'triggerids' => $_REQUEST['triggerid'],
 	'output' => API_OUTPUT_EXTEND,
-	'nodeids' => get_current_nodeid(true),
 	'expandDescription' => true
 ));
-if (empty($db_data)) {
+if (!$dbTrigger) {
 	access_deny();
 }
 else {
-	$db_data = reset($db_data);
+	$dbTrigger = reset($dbTrigger);
 }
 
 /*
@@ -87,7 +86,7 @@ $y = imagesy($im);
 imagefilledrectangle($im, 0, 0, $x, $y, $white);
 imagerectangle($im, 0, 0, $x - 1, $y - 1, $black);
 
-$str = _s('%1$s (year %2$s)', $db_data['description'], zbx_date2str('Y'));
+$str = _s('%1$s (year %2$s)', $dbTrigger['description'], zbx_date2str('Y'));
 $x = imagesx($im) / 2 - imagefontwidth(4) * zbx_strlen($str) / 2;
 imageText($im, 10, 0, $x, 14, $darkred, $str);
 

@@ -462,7 +462,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			res = get_value_snmp(item, result);
 			alarm(0);
 #else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SNMP checks was not compiled in"));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SNMP checks was not compiled in."));
 			res = NOTSUPPORTED;
 #endif
 			break;
@@ -470,7 +470,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 #ifdef HAVE_OPENIPMI
 			res = get_value_ipmi(item, result);
 #else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for IPMI checks was not compiled in"));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for IPMI checks was not compiled in."));
 			res = NOTSUPPORTED;
 #endif
 			break;
@@ -482,9 +482,15 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			res = get_value_internal(item, result);
 			break;
 		case ITEM_TYPE_DB_MONITOR:
+#ifdef HAVE_UNIXODBC
 			alarm(CONFIG_TIMEOUT);
 			res = get_value_db(item, result);
 			alarm(0);
+#else
+			SET_MSG_RESULT(result,
+					zbx_strdup(NULL, "Support for Database monitor checks was not compiled in."));
+			res = NOTSUPPORTED;
+#endif
 			break;
 		case ITEM_TYPE_AGGREGATE:
 			res = get_value_aggregate(item, result);
@@ -499,7 +505,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			res = get_value_ssh(item, result);
 			alarm(0);
 #else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SSH checks was not compiled in"));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SSH checks was not compiled in."));
 			res = NOTSUPPORTED;
 #endif
 			break;
@@ -562,6 +568,7 @@ static int	get_values(unsigned char poller_type)
 	const char	*__function_name = "get_values";
 	DC_ITEM		items[MAX_BUNCH_ITEMS];
 	AGENT_RESULT	results[MAX_BUNCH_ITEMS];
+	zbx_uint64_t	lastlogsizes[MAX_BUNCH_ITEMS];
 	int		errcodes[MAX_BUNCH_ITEMS];
 	zbx_timespec_t	timespec;
 	int		i, num;
@@ -580,6 +587,7 @@ static int	get_values(unsigned char poller_type)
 	{
 		init_result(&results[i]);
 		errcodes[i] = SUCCEED;
+		lastlogsizes[i] = 0;
 
 		ZBX_STRDUP(items[i].key, items[i].key_orig);
 		if (SUCCEED != substitute_key_macros(&items[i].key, NULL, &items[i], NULL,
@@ -653,21 +661,14 @@ static int	get_values(unsigned char poller_type)
 						NULL, &items[i].privatekey, MACRO_TYPE_COMMON, NULL, 0);
 				/* break; is not missing here */
 			case ITEM_TYPE_TELNET:
-				ZBX_STRDUP(items[i].username, items[i].username_orig);
-				ZBX_STRDUP(items[i].password, items[i].password_orig);
-
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						NULL, &items[i].username, MACRO_TYPE_COMMON, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						NULL, &items[i].password, MACRO_TYPE_COMMON, NULL, 0);
-				/* break; is not missing here */
 			case ITEM_TYPE_DB_MONITOR:
 				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
 						NULL, &items[i].params, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
-				break;
+				/* break; is not missing here */
+			case ITEM_TYPE_SIMPLE:
 			case ITEM_TYPE_JMX:
-				ZBX_STRDUP(items[i].username, items[i].username_orig);
-				ZBX_STRDUP(items[i].password, items[i].password_orig);
+				items[i].username = zbx_strdup(items[i].username, items[i].username_orig);
+				items[i].password = zbx_strdup(items[i].password, items[i].password_orig);
 
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
 						NULL, &items[i].username, MACRO_TYPE_COMMON, NULL, 0);
@@ -690,7 +691,6 @@ static int	get_values(unsigned char poller_type)
 		alarm(CONFIG_TIMEOUT);
 		get_values_java(ZBX_JAVA_GATEWAY_REQUEST_JMX, items, results, errcodes, num);
 		alarm(0);
-
 	}
 
 	zbx_timespec(&timespec);
@@ -718,16 +718,18 @@ static int	get_values(unsigned char poller_type)
 		{
 			items[i].state = ITEM_STATE_NORMAL;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i], &timespec,
-					items[i].state, NULL, 0, NULL, 0, 0, 0, 0);
+					items[i].state, NULL);
+			lastlogsizes[i] = get_log_result_lastlogsize(&results[i]);
 		}
 		else if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i])
 		{
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &timespec,
-					items[i].state, results[i].msg, 0, NULL, 0, 0, 0, 0);
+					items[i].state, results[i].msg);
 		}
 
-		DCrequeue_items(&items[i].itemid, &items[i].state, &timespec.sec, &errcodes[i], 1);
+		DCrequeue_items(&items[i].itemid, &items[i].state, &timespec.sec, &lastlogsizes[i], NULL,
+				&errcodes[i], 1);
 
 		zbx_free(items[i].key);
 
@@ -749,9 +751,8 @@ static int	get_values(unsigned char poller_type)
 				zbx_free(items[i].privatekey);
 				/* break; is not missing here */
 			case ITEM_TYPE_TELNET:
-				zbx_free(items[i].username);
-				zbx_free(items[i].password);
-				break;
+			case ITEM_TYPE_DB_MONITOR:
+			case ITEM_TYPE_SIMPLE:
 			case ITEM_TYPE_JMX:
 				zbx_free(items[i].username);
 				zbx_free(items[i].password);

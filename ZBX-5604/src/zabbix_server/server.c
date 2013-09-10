@@ -353,7 +353,7 @@ static void	zbx_load_config()
 			PARM_OPT,	1,			SEC_PER_HOUR},
 		{"UnavailableDelay",		&CONFIG_UNAVAILABLE_DELAY,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
-		{"ListenIP",			&CONFIG_LISTEN_IP,			TYPE_STRING,
+		{"ListenIP",			&CONFIG_LISTEN_IP,			TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
 		{"ListenPort",			&CONFIG_LISTEN_PORT,			TYPE_INT,
 			PARM_OPT,	1024,			32767},
@@ -563,7 +563,7 @@ int	MAIN_ZABBIX_ENTRY()
 #else
 #	define JABBER_FEATURE_STATUS	" NO"
 #endif
-#ifdef	HAVE_ODBC
+#ifdef	HAVE_UNIXODBC
 #	define ODBC_FEATURE_STATUS	"YES"
 #else
 #	define ODBC_FEATURE_STATUS	" NO"
