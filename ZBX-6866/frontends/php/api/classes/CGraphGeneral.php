@@ -348,7 +348,11 @@ abstract class CGraphGeneral extends CZBXAPI {
 		if ($options['selectGraphItems'] !== null && $options['selectGraphItems'] !== API_OUTPUT_COUNT) {
 			$gitems = API::GraphItem()->get(array(
 				'nodeids' => $options['nodeids'],
-				'output' => $this->outputExtend('graphs_items', array('graphid', 'gitemid'), $options['selectGraphItems']),
+				'output' => $this->outputExtend(
+					'graphs_items',
+					array('graphid', 'gitemid'),
+					$options['selectGraphItems']
+				),
 				'graphids' => $graphids,
 				'nopermissions' => true,
 				'preservekeys' => true
@@ -365,8 +369,8 @@ abstract class CGraphGeneral extends CZBXAPI {
 			// discovered items
 			$dbRules = DBselect(
 				'SELECT gi.graphid,hg.groupid'.
-					' FROM graphs_items gi,items i,hosts_groups hg'.
-					' WHERE '.dbConditionInt('gi.graphid', $graphids).
+				' FROM graphs_items gi,items i,hosts_groups hg'.
+				' WHERE '.dbConditionInt('gi.graphid', $graphids).
 					' AND gi.itemid=i.itemid'.
 					' AND i.hostid=hg.hostid'
 			);
@@ -390,8 +394,8 @@ abstract class CGraphGeneral extends CZBXAPI {
 			// discovered items
 			$dbRules = DBselect(
 				'SELECT gi.graphid,i.hostid'.
-					' FROM graphs_items gi,items i'.
-					' WHERE '.dbConditionInt('gi.graphid', $graphids).
+				' FROM graphs_items gi,items i'.
+				' WHERE '.dbConditionInt('gi.graphid', $graphids).
 					' AND gi.itemid=i.itemid'
 			);
 			while ($relation = DBfetch($dbRules)) {
@@ -415,8 +419,8 @@ abstract class CGraphGeneral extends CZBXAPI {
 			// discovered items
 			$dbRules = DBselect(
 				'SELECT gi.graphid,i.hostid'.
-					' FROM graphs_items gi,items i'.
-					' WHERE '.dbConditionInt('gi.graphid', $graphids).
+				' FROM graphs_items gi,items i'.
+				' WHERE '.dbConditionInt('gi.graphid', $graphids).
 					' AND gi.itemid=i.itemid'
 			);
 			while ($relation = DBfetch($dbRules)) {
