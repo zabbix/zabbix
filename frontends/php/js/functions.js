@@ -947,9 +947,17 @@ function formatTimestamp(timestamp, isTsDouble, isExtend) {
 	return str;
 }
 
+/**
+ * makes all elements which are not supported for printing view to disappear
+ * by including css file
+ *
+ * @param bool show
+ *
+ * @return void
+ */
 function printLess(show) {
 	if (!jQuery("#printLess").length) {
-		jQuery('head').append('<link rel="stylesheet" href="./styles/printLess.css" type="text/css" id="printLess"/>');
+		jQuery('head').append('<link rel="stylesheet" href="./styles/print.css" type="text/css" id="printLess"/>');
 
 		jQuery('.header_l.left, .header_r.right').each(function(i, obj) {
 			if (jQuery(this).find('input, form, select, .menu_icon').length) {
@@ -960,9 +968,9 @@ function printLess(show) {
 	}
 
 	if (show) {
-		jQuery("#printLess").removeAttr("disabled");
+		jQuery("#printLess").prop("disabled", false);
 	}
 	else {
-		jQuery("#printLess").attr("disabled", "disabled");
+		jQuery("#printLess").prop("disabled", true);
 	}
 }
