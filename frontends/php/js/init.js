@@ -62,8 +62,9 @@ jQuery(function($) {
 		setTimeout(function () {$('[autofocus]').focus()}, 10);
 	}
 
-	$('.print-link').click(function () {
-		printLess(1);
+	$('.print-link').click(function() {
+		printLess(true);
+
 		return false;
 	});
 });
