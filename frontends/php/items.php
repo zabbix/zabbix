@@ -278,7 +278,7 @@ if (isset($_REQUEST['filter_set'])) {
 	foreach (array('subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'subfilter_status', 'subfilter_state',
 			'subfilter_templated_items', 'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval',
 			'subfilter_history', 'subfilter_trends') as $name) {
-		$_REQUEST[$name] = Array();
+		$_REQUEST[$name] = array();
 		CProfile::update('web.items.'.$name, '', PROFILE_TYPE_STR);
 	}
 }
@@ -312,15 +312,16 @@ else {
 			$_REQUEST[$name] = get_request($name, array());
 			CProfile::update('web.items.'.$name, implode(';', $_REQUEST[$name]), PROFILE_TYPE_STR);
 		}
-		else{
-			$_REQUEST[$name] = Array();
-			if ($tmpVal = CProfile::get('web.items.'.$name)) {
-				$_REQUEST[$name] = explode(";", $tmpVal);
+		else {
+			$_REQUEST[$name] = array();
+			$subfiltersVal = CProfile::get('web.items.'.$name);
+			if (!zbx_empty($subfiltersVal)) {
+				$_REQUEST[$name] = explode(';', $subfiltersVal);
+				$_REQUEST[$name] = array_combine($_REQUEST[$name], $_REQUEST[$name]);
 			}
 		}
 	}
 }
-
 
 if (!isset($_REQUEST['form']) && isset($_REQUEST['filter_hostid']) && !empty($_REQUEST['filter_hostid'])) {
 	if (!isset($host)) {
@@ -918,7 +919,7 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['group_itemid'])) {
 }
 // list of items
 else {
-	$_REQUEST['hostid'] = empty($_REQUEST['filter_hostid']) ? NULL : $_REQUEST['filter_hostid'];
+	$_REQUEST['hostid'] = empty($_REQUEST['filter_hostid']) ? null : $_REQUEST['filter_hostid'];
 
 	$data = array(
 		'form' => get_request('form'),
