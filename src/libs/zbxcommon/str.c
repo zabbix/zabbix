@@ -180,7 +180,7 @@ retry:
 		/* zbx_vsnprintf() returns bytes actually written instead of bytes to write, */
 		/* so we have to use the standard function                                   */
 		va_start(args, fmt);
-		*alloc_len = vsnprintf(NULL, 0, fmt, args) + 1;
+		*alloc_len = vsnprintf(NULL, 0, fmt, args) + 2;	/* '\0' + one byte to prevent the operation retry */
 		va_end(args);
 		*offset = 0;
 		*str = zbx_malloc(*str, *alloc_len);
