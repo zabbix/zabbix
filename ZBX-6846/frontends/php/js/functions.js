@@ -956,7 +956,7 @@ function printLess(show) {
 				jQuery(this).addClass('hide-all-children');
 			}
 		})
-		jQuery('body').prepend('<div class="printless" >«BACK</div>').click(printLess(0));
+		jQuery('body').prepend('<div class="printless" >«BACK</div>').click(function () { printLess(false); });
 	}
 
 	if (show) {
