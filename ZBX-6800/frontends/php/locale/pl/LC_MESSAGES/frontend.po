@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-03 18:47+0300\n"
+"POT-Creation-Date: 2013-09-06 01:17+0300\n"
 "PO-Revision-Date: 2013-08-30 07:07+0300\n"
 "Last-Translator: Łukasz <deejay1@srem.org>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -233,7 +233,7 @@ msgstr "Akceptowalne SLA"
 msgid "Access denied!"
 msgstr "Dostęp zabroniony!"
 
-#: include/func.inc.php:2039
+#: include/func.inc.php:2045
 msgid "Access denied."
 msgstr ""
 
@@ -1322,7 +1322,7 @@ msgstr "Nie można dodać proxy"
 msgid "Cannot add regular expression"
 msgstr "Nie można dodać wyrażenia regularnego"
 
-#: screenconf.php:174
+#: screenconf.php:172
 msgid "Cannot add screen"
 msgstr "Nie można dodać ekranu"
 
@@ -1585,7 +1585,7 @@ msgstr[0] "Nie można usunąć wyrażenia regularnego"
 msgstr[1] "Nie można usunąć wyrażenia regularnego"
 msgstr[2] "Nie można usunąć wyrażenia regularnego"
 
-#: screenconf.php:223
+#: screenconf.php:221
 msgid "Cannot delete screen"
 msgstr "Nie można usunąć ekranu"
 
@@ -2189,7 +2189,7 @@ msgstr ""
 msgid "Cannot update regular expression"
 msgstr "Nie można zaktualizować wyrażenia regularnego"
 
-#: screenconf.php:153
+#: screenconf.php:151
 msgid "Cannot update screen"
 msgstr "Nie można uaktualnić ekranu"
 
@@ -3751,7 +3751,7 @@ msgid "Description"
 msgstr "Opis"
 
 #: include/actions.inc.php:966 include/blocks.inc.php:719
-#: include/func.inc.php:2159
+#: include/func.inc.php:2165
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:44
 #: include/views/configuration.action.edit.php:328
@@ -4040,7 +4040,7 @@ msgstr "Status wykrycia"
 msgid "Display OK triggers for"
 msgstr "Wyświetlanie wyzwalaczy w stanie OK przez"
 
-#: include/func.inc.php:1842
+#: include/func.inc.php:1848
 msgid "Displaying"
 msgstr "Wyświetlanie"
 
@@ -4192,7 +4192,7 @@ msgctxt "Exa short"
 msgid "E"
 msgstr ""
 
-#: include/func.inc.php:2126
+#: include/func.inc.php:2132
 msgid "ERROR"
 msgstr "BŁĄD"
 
@@ -4834,7 +4834,7 @@ msgstr ""
 msgid "First"
 msgstr "Pierwszy"
 
-#: include/func.inc.php:1787
+#: include/func.inc.php:1793
 msgctxt "page navigation"
 msgid "First"
 msgstr ""
@@ -5006,7 +5006,7 @@ msgstr "Przejdź"
 msgid "Go to"
 msgstr "Przejdź do"
 
-#: include/func.inc.php:2057
+#: include/func.inc.php:2063
 msgid "Go to dashboard"
 msgstr ""
 
@@ -6054,7 +6054,7 @@ msgstr "Ikony"
 msgid "Identical expression already exists"
 msgstr ""
 
-#: include/func.inc.php:2047 include/func.inc.php:2067
+#: include/func.inc.php:2053 include/func.inc.php:2073
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "W przypadku, gdy ten komunikat jest błędny należy skontaktować się z administratorami celem nadania uprawnień."
 
@@ -7586,7 +7586,7 @@ msgstr "Język"
 msgid "Last"
 msgstr "Ostatnia"
 
-#: include/func.inc.php:1827
+#: include/func.inc.php:1833
 msgctxt "page navigation"
 msgid "Last"
 msgstr ""
@@ -7867,7 +7867,7 @@ msgstr "Logowanie niedopasowanych trapów SNMP"
 msgid "Logged in as"
 msgstr "Zalogowano jako"
 
-#: auditlogs.php:143 include/func.inc.php:2053 include/func.inc.php:2070
+#: auditlogs.php:143 include/func.inc.php:2059 include/func.inc.php:2076
 #: include/menu.inc.php:282 include/page_header.php:246
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:64
@@ -8213,7 +8213,7 @@ msgid "Max count of events per trigger to show"
 msgstr "Maksymalna pokazywana liczba zdarzeń na wyzwalacz"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2161
+#: include/func.inc.php:2167
 msgid "Maximize"
 msgstr "Zmaksymalizuj"
 
@@ -8389,7 +8389,7 @@ msgid "Middle"
 msgstr "Środek"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2161
+#: include/func.inc.php:2167
 msgid "Minimize"
 msgstr "Zminimalizuj"
 
@@ -8767,13 +8767,13 @@ msgstr "Nowy czas obsługi"
 msgid "Next"
 msgstr "Następna"
 
-#: include/func.inc.php:1820
+#: include/func.inc.php:1826
 msgctxt "page navigation"
 msgid "Next"
 msgstr ""
 
 #: events.php:756 include/events.inc.php:356 include/events.inc.php:374
-#: include/func.inc.php:2380 include/triggers.inc.php:1608
+#: include/func.inc.php:2386 include/triggers.inc.php:1608
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
 #: include/views/js/adm.regexprs.edit.js.php:142
@@ -9279,7 +9279,7 @@ msgstr "Brak uprawnień dla dostępu do systemu."
 #: api/classes/CTrigger.php:998 api/classes/CTrigger.php:1843
 #: api/classes/CTriggerPrototype.php:566 api/classes/CTriggerPrototype.php:669
 #: api/classes/CUserMacro.php:726 api/classes/CUserMacro.php:835
-#: api/classes/CUser.php:1156 include/func.inc.php:2026
+#: api/classes/CUser.php:1156 include/func.inc.php:2032
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Brak uprawnień dla tego obiektu lub obiekt nie istnieje."
 
@@ -10442,7 +10442,7 @@ msgstr "Podgląd"
 msgid "Previous"
 msgstr "Poprzednia"
 
-#: include/func.inc.php:1793
+#: include/func.inc.php:1799
 msgctxt "page navigation"
 msgid "Previous"
 msgstr ""
@@ -10702,11 +10702,11 @@ msgstr "Temat odzyskania"
 msgid "Refresh (in seconds)"
 msgstr "Odświeżanie (w sekundach)"
 
-#: include/func.inc.php:1901
+#: include/func.inc.php:1907
 msgid "Refresh time in seconds"
 msgstr "Czas odświeżania w sekundach"
 
-#: include/func.inc.php:1905
+#: include/func.inc.php:1911
 msgid "Refresh time multiplier"
 msgstr "Mnożnik czasu odświeżania"
 
@@ -11414,7 +11414,7 @@ msgstr ""
 msgid "Screen \"%1$s\" updated."
 msgstr ""
 
-#: screenconf.php:174
+#: screenconf.php:172
 msgid "Screen added"
 msgstr "Dodano ekran"
 
@@ -11422,7 +11422,7 @@ msgstr "Dodano ekran"
 msgid "Screen cell configuration"
 msgstr "Konfiguracja komórki ekranu"
 
-#: screenconf.php:223
+#: screenconf.php:221
 msgid "Screen deleted"
 msgstr "Usunięto ekran"
 
@@ -11434,7 +11434,7 @@ msgstr ""
 msgid "Screen should contain at least one row and column."
 msgstr ""
 
-#: screenconf.php:153
+#: screenconf.php:151
 msgid "Screen updated"
 msgstr "Uaktualniono ekran"
 
@@ -13119,7 +13119,7 @@ msgstr "USA (160 znaków)"
 msgid "USER PROFILE"
 msgstr "PROFIL UŻYTKOWNIKA"
 
-#: include/func.inc.php:2559
+#: include/func.inc.php:2565
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -14100,7 +14100,7 @@ msgstr "Rocznie"
 
 #: events.php:756 include/blocks.inc.php:727
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:359
-#: include/events.inc.php:377 include/func.inc.php:2380
+#: include/events.inc.php:377 include/func.inc.php:2386
 #: include/triggers.inc.php:1608
 #: include/views/administration.users.list.php:76
 #: include/views/js/adm.regexprs.edit.js.php:139
@@ -14120,7 +14120,7 @@ msgstr "Nie można wybrać niektórych języków, ponieważ nie zostały one zai
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "Brak praw do zmiany uprawnień użytkownika \"%s\"."
 
-#: include/func.inc.php:2063
+#: include/func.inc.php:2069
 msgid "You are not logged in."
 msgstr "Nie zalogowano."
 
@@ -14171,15 +14171,15 @@ msgstr "Nie masz uprawnień by aktualizować dane innych użytkowników."
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "Nie masz uprawnień by aktualizować dane użytkownika lub użytkownik nie istnieje."
 
-#: include/func.inc.php:2045
+#: include/func.inc.php:2051
 msgid "You have no permissions to access this page."
 msgstr ""
 
-#: include/func.inc.php:2065
+#: include/func.inc.php:2071
 msgid "You must login to view this page."
 msgstr "Należy się zalogować, aby zobaczyć tą stronę."
 
-#: include/func.inc.php:2041
+#: include/func.inc.php:2047
 msgid "Your are logged in as"
 msgstr ""
 
@@ -14496,7 +14496,7 @@ msgstr "wykonane"
 msgid "fixed"
 msgstr "naprawione"
 
-#: include/func.inc.php:1852
+#: include/func.inc.php:1858
 msgid "found"
 msgstr "znaleziony"
 
@@ -14675,7 +14675,7 @@ msgid "now"
 msgstr "teraz"
 
 #: include/blocks.inc.php:352 include/blocks.inc.php:696
-#: include/func.inc.php:1849
+#: include/func.inc.php:1855
 msgid "of"
 msgstr "z"
 
@@ -14753,7 +14753,7 @@ msgstr "pokaż mapowanie wartości"
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "szablon o ID \"%1$s\" został przekazany %2$s razy"
 
-#: include/func.inc.php:1845
+#: include/func.inc.php:1851
 msgid "to"
 msgstr "dla"
 
