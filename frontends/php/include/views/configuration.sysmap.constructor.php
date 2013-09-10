@@ -97,7 +97,9 @@ $sysmapWidget->addItem($container);
 zbx_add_post_js('ZABBIX.apps.map.run("sysmap_cnt", '.CJs::encodeJson(array(
 	'sysmap' => $this->data['sysmap'],
 	'iconList' => $this->data['iconList'],
-	'defaultAutoIconId' => $this->data['defaultAutoIconId']
+	'defaultAutoIconId' => $this->data['defaultAutoIconId'],
+	'defaultIconId' => $this->data['defaultIconId'],
+	'defaultIconName' => $this->data['defaultIconName']
 ), true).');');
 
 insert_show_color_picker_javascript();

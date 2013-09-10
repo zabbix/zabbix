@@ -501,7 +501,8 @@ class CEvent extends CZBXAPI {
 						' WHERE '.dbConditionInt('e.eventid', $eventIds).
 						' AND e.objectid=f.triggerid'.
 						' AND f.itemid=i.itemid'.
-						' AND e.object='.EVENT_OBJECT_TRIGGER
+						' AND e.object='.$options['object'].
+						' AND e.source='.$options['source']
 				);
 			}
 			// item and LLD rule events
@@ -511,7 +512,8 @@ class CEvent extends CZBXAPI {
 						' FROM events e,items i'.
 						' WHERE '.dbConditionInt('e.eventid', $eventIds).
 						' AND e.objectid=i.itemid'.
-						' AND e.object='.$options['object']
+						' AND e.object='.$options['object'].
+						' AND e.source='.$options['source']
 				);
 			}
 
@@ -640,16 +642,24 @@ class CEvent extends CZBXAPI {
 				));
 				$sqlParts['order'][] = 'a.clock DESC';
 
-				// if the user alias is requested, join the users table
-				if ($this->outputIsRequested('alias', $options['select_acknowledges'])) {
-					$sqlParts = $this->addQuerySelect('u.alias', $sqlParts);
+				// if the user data is requested via extended output or specified fields, join the users table
+				$userFields = array('alias', 'name', 'surname');
+				$requestUserData = array();
+				foreach ($userFields as $userField) {
+					if ($this->outputIsRequested($userField, $options['select_acknowledges'])) {
+						$requestUserData[] = $userField;
+					}
+				}
+				if ($requestUserData) {
+					foreach ($requestUserData as $userField) {
+						$sqlParts = $this->addQuerySelect('u.'.$userField, $sqlParts);
+					}
 					$sqlParts['from'][] = 'users u';
 					$sqlParts['where'][] = 'a.userid=u.userid';
 				}
 
 				$acknowledges = DBFetchArrayAssoc(DBselect($this->createSelectQueryFromParts($sqlParts)), 'acknowledgeid');
 				$relationMap = $this->createRelationMap($acknowledges, 'eventid', 'acknowledgeid');
-
 				$acknowledges = $this->unsetExtraFields($acknowledges, array('eventid', 'acknowledgeid', 'clock'),
 					$options['select_acknowledges']
 				);

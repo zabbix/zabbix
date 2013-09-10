@@ -81,7 +81,7 @@ function user_auth_type2str($authType) {
 
 	$authUserType = array(
 		GROUP_GUI_ACCESS_SYSTEM => _('System default'),
-		GROUP_GUI_ACCESS_INTERNAL => _('Internal'),
+		GROUP_GUI_ACCESS_INTERNAL => _x('Internal', 'user type'),
 		GROUP_GUI_ACCESS_DISABLED => _('Disabled')
 	);
 
@@ -272,4 +272,34 @@ function change_group_debug_mode($userGroupIds, $debugMode) {
 	return DBexecute(
 		'UPDATE usrgrp SET debug_mode='.$debugMode.' WHERE '.dbConditionInt('usrgrpid', $userGroupIds)
 	);
+}
+
+/**
+ * Gets user full name in format "alias (name surname)". If both name and surname exist, returns translated string.
+ *
+ * @param array $userData
+ *
+ * @return string
+ */
+function getUserFullname($userData) {
+	$fullname = '';
+	if (!zbx_empty($userData['name'])) {
+		$fullname = $userData['name'];
+	}
+
+	// return full name and surname
+	if (!zbx_empty($userData['surname'])) {
+		if (!zbx_empty($userData['name'])) {
+			return $userData['alias'].' '._x('(%1$s %2$s)', 'user fullname', $userData['name'], $userData['surname']);
+		}
+		$fullname = $userData['surname'];
+	}
+
+	// return alias with full name
+	if (!zbx_empty($fullname)) {
+		return $userData['alias'].' ('.$fullname.')';
+	}
+	else {
+		return $userData['alias'];
+	}
 }

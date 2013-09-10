@@ -437,6 +437,12 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 			if (SUCCEED == (ret = SUCCEED_OR_FAIL(zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE, 0))))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "got [%s]", buf);
+
+				if (SUCCEED != last_ret)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "active check configuration update from [%s:%hu]"
+							" is working again", host, port);
+				}
 				parse_list_of_checks(buf);
 			}
 		}
@@ -444,19 +450,11 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 		zbx_tcp_close(&s);
 	}
 
-	if (last_ret != ret)
+	if (SUCCEED != ret && SUCCEED == last_ret)
 	{
-		if (SUCCEED != ret)
-		{
-			zabbix_log(LOG_LEVEL_WARNING,
-					"active check configuration update from [%s:%u] started to fail (%s)",
-					host, port, zbx_tcp_strerror());
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "active check configuration update from [%s:%u] is working again",
-					host, port);
-		}
+		zabbix_log(LOG_LEVEL_WARNING,
+				"active check configuration update from [%s:%hu] started to fail (%s)",
+				host, port, zbx_tcp_strerror());
 	}
 
 	last_ret = ret;
@@ -636,7 +634,8 @@ static int	send_buffer(const char *host, unsigned short port)
 		buffer.lastsent = now;
 		if (0 != buffer.first_error)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "active check data upload to [%s:%u] is working again", host, port);
+			zabbix_log(LOG_LEVEL_WARNING, "active check data upload to [%s:%hu] is working again",
+					host, port);
 			buffer.first_error = 0;
 		}
 	}
@@ -644,7 +643,7 @@ static int	send_buffer(const char *host, unsigned short port)
 	{
 		if (0 == buffer.first_error)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "active check data upload to [%s:%u] started to fail (%s%s)",
+			zabbix_log(LOG_LEVEL_WARNING, "active check data upload to [%s:%hu] started to fail (%s%s)",
 					host, port, err_send_step, zbx_tcp_strerror());
 			buffer.first_error = now;
 		}
@@ -932,7 +931,7 @@ static void	process_active_checks(char *server, unsigned short port)
 			if (FAIL == ret)
 			{
 				active_metrics[i].state = ITEM_STATE_NOTSUPPORTED;
-				zabbix_log(LOG_LEVEL_WARNING, "Active check \"%s\" is not supported. Disabled.",
+				zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported",
 						active_metrics[i].key);
 
 				process_value(server, port, CONFIG_HOSTNAME,
@@ -1044,7 +1043,7 @@ static void	process_active_checks(char *server, unsigned short port)
 			if (FAIL == ret)
 			{
 				active_metrics[i].state = ITEM_STATE_NOTSUPPORTED;
-				zabbix_log(LOG_LEVEL_WARNING, "Active check \"%s\" is not supported. Disabled.",
+				zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported",
 						active_metrics[i].key);
 
 				process_value(server, port, CONFIG_HOSTNAME,
@@ -1188,7 +1187,7 @@ static void	process_active_checks(char *server, unsigned short port)
 			if (FAIL == ret)
 			{
 				active_metrics[i].state = ITEM_STATE_NOTSUPPORTED;
-				zabbix_log(LOG_LEVEL_WARNING, "Active check \"%s\" is not supported. Disabled.",
+				zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported",
 						active_metrics[i].key);
 
 				process_value(server, port, CONFIG_HOSTNAME,
@@ -1216,7 +1215,7 @@ static void	process_active_checks(char *server, unsigned short port)
 				if (0 == strcmp(*pvalue, ZBX_NOTSUPPORTED))
 				{
 					active_metrics[i].state = ITEM_STATE_NOTSUPPORTED;
-					zabbix_log(LOG_LEVEL_WARNING, "Active check \"%s\" is not supported. Disabled.",
+					zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported",
 							active_metrics[i].key);
 				}
 			}

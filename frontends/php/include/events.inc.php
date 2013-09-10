@@ -34,7 +34,7 @@ function eventSource($source = null) {
 		EVENT_SOURCE_TRIGGERS => _('trigger'),
 		EVENT_SOURCE_DISCOVERY => _('discovery'),
 		EVENT_SOURCE_AUTO_REGISTRATION => _('auto registration'),
-		EVENT_SOURCE_INTERNAL => _('internal')
+		EVENT_SOURCE_INTERNAL => _x('internal', 'event source')
 	);
 
 	if ($source === null) {
@@ -167,6 +167,7 @@ function get_next_event($currentEvent, array $eventList = array()) {
 			' WHERE e.objectid='.$currentEvent['objectid'].
 				' AND e.eventid>'.$currentEvent['eventid'].
 				' AND e.object='.$currentEvent['object'].
+				' AND e.source='.$currentEvent['source'].
 			' ORDER BY e.object,e.objectid,e.eventid';
 	return DBfetch(DBselect($sql, 1));
 }

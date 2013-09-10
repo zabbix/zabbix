@@ -196,11 +196,9 @@ $itemFormList->addRow(_('Executed script'),
 	new CTextArea('params_es', $this->data['params'], array('rows' => ZBX_TEXTAREA_STANDARD_ROWS, 'width' => ZBX_TEXTAREA_STANDARD_WIDTH)),
 	false, 'label_executed_script'
 );
-$itemFormList->addRow(_('Additional parameters'),
+$itemFormList->addRow(_('SQL query'),
 	new CTextArea('params_ap',
-		!empty($this->data['params'])
-			? $this->data['params']
-			: 'DSN=<database source name>'."\n".'user=<user name>'."\n".'password=<password>'."\n".'sql=<query>',
+		$this->data['params'],
 		array('rows' => ZBX_TEXTAREA_STANDARD_ROWS, 'width' => ZBX_TEXTAREA_STANDARD_WIDTH)
 	),
 	false,
@@ -566,6 +564,10 @@ if (!empty($this->data['interfaces'])) {
 	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPTRAP, 'interface_row');
 	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPTRAP, 'interfaceid');
 }
+zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SIMPLE, 'row_username');
+zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SIMPLE, 'username');
+zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SIMPLE, 'row_password');
+zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SIMPLE, 'password');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV1, 'snmp_oid');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV2C, 'snmp_oid');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV3, 'snmp_oid');
@@ -596,12 +598,16 @@ zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SSH, 'username');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SSH, 'row_username');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_TELNET, 'username');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_TELNET, 'row_username');
+zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_DB_MONITOR, 'username');
+zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_DB_MONITOR, 'row_username');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_JMX, 'username');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_JMX, 'row_username');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SSH, 'password');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SSH, 'row_password');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_TELNET, 'password');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_TELNET, 'row_password');
+zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_DB_MONITOR, 'password');
+zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_DB_MONITOR, 'row_password');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_JMX, 'password');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_JMX, 'row_password');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SSH, 'label_executed_script');
@@ -622,10 +628,6 @@ foreach ($this->data['types'] as $type => $label) {
 	switch ($type) {
 		case ITEM_TYPE_DB_MONITOR:
 			zbx_subarray_push($this->data['typeVisibility'], $type, array('id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_DB_MONITOR));
-			zbx_subarray_push($this->data['typeVisibility'], $type, array(
-				'id' => 'params_dbmonitor',
-				'defaultValue' => 'DSN=<database source name>\nuser=<user name>\npassword=<password>\nsql=<query>'
-			));
 			break;
 		case ITEM_TYPE_SSH:
 			zbx_subarray_push($this->data['typeVisibility'], $type, array('id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_SSH));

@@ -573,3 +573,4 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 
 /* Make checked checkboxes/radiobuttons have black label text */
 .originalblue .ui-button.ui-state-active .ui-button-text { color: #000000; }
+.originalblue .ui-button.ui-state-active.ui-state-disabled .ui-button-text { color: #777; }
