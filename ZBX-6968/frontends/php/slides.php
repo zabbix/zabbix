@@ -86,14 +86,14 @@ if (isset($_REQUEST['favobj'])) {
 			$result = CFavorite::add('web.favorite.screenids', $_REQUEST['favid'], $_REQUEST['favobj']);
 			if ($result) {
 				echo 'jQuery("#addrm_fav").title = "'._('Remove from').' '._('Favourites').'";'."\n".
-					'jQuery("#addrm_fav").click(function() { rm4favorites("'.$_REQUEST['favobj'].'", "'.$_REQUEST['favid'].'", 0); });'."\n";
+					'jQuery("#addrm_fav").onclick = function() { rm4favorites("'.$_REQUEST['favobj'].'", "'.$_REQUEST['favid'].'", 0); };'."\n";
 			}
 		}
 		elseif ($_REQUEST['favaction'] == 'remove') {
 			$result = CFavorite::remove('web.favorite.screenids', $_REQUEST['favid'], $_REQUEST['favobj']);
 			if ($result) {
 				echo 'jQuery("#addrm_fav").title = "'._('Add to').' '._('Favourites').'";'."\n".
-					'jQuery("#addrm_fav").click(function() { add2favorites("'.$_REQUEST['favobj'].'", "'.$_REQUEST['favid'].'"); });'."\n";
+					'jQuery("#addrm_fav").onclick = function() { add2favorites("'.$_REQUEST['favobj'].'", "'.$_REQUEST['favid'].'"); };'."\n";
 			}
 		}
 		if ($page['type'] == PAGE_TYPE_JS && $result) {
