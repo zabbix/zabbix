@@ -60,7 +60,9 @@ else {
 			$slideHeaderForm,
 			SPACE,
 			$favouriteIcon,
+			SPACE,
 			$refreshIcon,
+			SPACE,
 			get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))
 		)
 	);
