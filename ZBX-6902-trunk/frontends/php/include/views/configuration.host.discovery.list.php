@@ -33,7 +33,7 @@ $discoveryWidget->addHeaderRowNumber();
 $discoveryWidget->addItem(get_header_host_table('discoveries', $this->data['hostid']));
 
 // create form
-$discoveryForm = new CForm('get');
+$discoveryForm = new CForm();
 $discoveryForm->setName('discovery');
 $discoveryForm->addVar('hostid', $this->data['hostid']);
 
