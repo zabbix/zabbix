@@ -967,10 +967,5 @@ function printLess(show) {
 		jQuery('body').prepend('<div class="printless" >«BACK</div>').click(function() { printLess(false); });
 	}
 
-	if (show) {
-		jQuery("#printLess").prop("disabled", false);
-	}
-	else {
-		jQuery("#printLess").prop("disabled", true);
-	}
+	jQuery("#printLess").prop("disabled", !show);
 }
