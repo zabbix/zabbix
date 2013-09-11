@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-09-11 09:51+0300\n"
-"PO-Revision-Date: 2013-08-30 15:32+0300\n"
-"Last-Translator: richlv <richlv@nakts.net>\n"
+"PO-Revision-Date: 2013-09-11 11:08+0300\n"
+"Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1377869520.0\n"
+"X-POOTLE-MTIME: 1378890485.0\n"
 
 #: include/views/configuration.item.edit.php:389
 msgid " day"
@@ -1017,7 +1017,7 @@ msgstr "CONFIGURAÇÃO DE GRUPOS DE HOSTS"
 #: include/views/configuration.host.prototype.edit.php:29
 #: include/views/configuration.host.prototype.list.php:31
 msgid "CONFIGURATION OF HOST PROTOTYPES"
-msgstr ""
+msgstr "CONFIGURAÇÃO DOS PROTÓTIPOS DE HOST"
 
 #: hosts.php:634 hosts.php:699 hosts.php:747
 msgid "CONFIGURATION OF HOSTS"
@@ -1224,7 +1224,7 @@ msgstr "Não é possível adicionar o item não numérico \"%1$s\" ao gráfico \
 #: api/classes/CGraphPrototype.php:696 api/classes/CGraphPrototype.php:758
 #, php-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
-msgstr ""
+msgstr "Não foi possível adicionar o item não numérico \"%1$s\" ao protótipo de gráfico \"%2$s\"."
 
 #: actionconf.php:150
 msgid "Cannot add action"
@@ -1265,7 +1265,7 @@ msgstr "Host não foi incluído"
 
 #: host_prototypes.php:202
 msgid "Cannot add host prototype"
-msgstr ""
+msgstr "Não foi possível adicionar o protótipo de host"
 
 #: adm.images.php:62
 msgid "Cannot add image"
@@ -1303,7 +1303,7 @@ msgstr "Não é possível adicionar mais de um item do tipo \"Graph sum\" no gr�
 #: api/classes/CGraphPrototype.php:43
 #, php-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
-msgstr ""
+msgstr "Não é possível adicionar mais de um item com o tipo \"Sumário do gráfico\" no protótipo de gráfico \"%1$s\"."
 
 #: sysmaps.php:171
 msgid "Cannot add network map"
@@ -1393,7 +1393,7 @@ msgstr "Não foi possível clonar o protótipo de gráfico."
 
 #: api/classes/CDiscoveryRule.php:1000
 msgid "Cannot clone host prototypes."
-msgstr ""
+msgstr "Não é possível clonar protótipos de host."
 
 #: api/classes/CDiscoveryRule.php:836
 msgid "Cannot clone item prototypes."
@@ -1423,7 +1423,7 @@ msgstr "Não foi possível copiar a trigger \"%1$s:%2$s\", por que tem vários h
 #: api/classes/CHostPrototype.php:151
 #, php-format
 msgid "Cannot create a host prototype on a discovered host \"%1$s\"."
-msgstr ""
+msgstr "Não foi possível criar um protótipo de host em uma auto-busca do host \"%1$s\"."
 
 #: include/db.inc.php:34
 msgid "Cannot create another database connection."
@@ -1531,11 +1531,11 @@ msgstr "Grupo de host não foi removido."
 
 #: api/classes/CDiscoveryRule.php:412
 msgid "Cannot delete host prototype."
-msgstr ""
+msgstr "Não foi possível excluir o protótipo de host."
 
 #: host_prototypes.php:119 host_prototypes.php:232
 msgid "Cannot delete host prototypes"
-msgstr ""
+msgstr "Não é possível excluir protótipos de hosts"
 
 #: adm.iconmapping.php:97
 msgid "Cannot delete icon map"
@@ -1635,7 +1635,7 @@ msgstr "Não é possível excluir uma aplicação vinda do template."
 
 #: api/classes/CHostPrototype.php:1076
 msgid "Cannot delete templated host prototype."
-msgstr ""
+msgstr "Não é possível excluir protótipos de host baseados em templates."
 
 #: api/classes/CItem.php:691
 msgid "Cannot delete templated item."
@@ -2004,17 +2004,17 @@ msgstr "Não é possível desvincular a trigger \"%s\", tem itens do template qu
 #: api/classes/CHost.php:684
 #, php-format
 msgid "Cannot update \"%1$s\" for a discovered host."
-msgstr ""
+msgstr "Não é possível atualizar \"%1$s\" para a descoberta de host."
 
 #: api/classes/CItemGeneral.php:176
 #, php-format
 msgid "Cannot update \"%1$s\" for a discovered item."
-msgstr ""
+msgstr "Não é possível atualizar \"%1$s\" para o item descoberto."
 
 #: api/classes/CTrigger.php:647
 #, php-format
 msgid "Cannot update \"%1$s\" for a discovered trigger."
-msgstr ""
+msgstr "Não é possível atualizar \"%1$s\" para uma trigger descoberta."
 
 #: api/classes/CItemGeneral.php:205
 #, php-format
@@ -2039,7 +2039,7 @@ msgstr "Não foi possível atualizar o \"templateid\" para o gráfico \"%1$s\"."
 #: api/classes/CGraphPrototype.php:42
 #, php-format
 msgid "Cannot update \"templateid\" for graph prototype \"%1$s\"."
-msgstr ""
+msgstr "Não é possível atualizar o \"templateid\" para o protótipo de gráfico \"%1$s\"."
 
 #: api/classes/CScreen.php:447 api/classes/CTemplateScreen.php:667
 #, php-format
@@ -2053,11 +2053,11 @@ msgstr "Não foi possível atualizar o \"templateid\" para o protótipo de trigg
 
 #: api/classes/CGraphGeneral.php:60
 msgid "Cannot update a discovered graph."
-msgstr ""
+msgstr "Não é possível atualizar um gráfico descoberto."
 
 #: api/classes/CHostGroup.php:537
 msgid "Cannot update a discovered host group."
-msgstr ""
+msgstr "Não é possível atualizar um grupo de hosts descoberto."
 
 #: actionconf.php:146
 msgid "Cannot update action"
@@ -2105,7 +2105,7 @@ msgstr "Grupo não foi atualizado."
 #: api/classes/CHostGroup.php:908
 #, php-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
-msgstr ""
+msgstr "Não é possível atualizar os grupos para o host descoberto \"%1$s\"."
 
 #: hostgroups.php:222 hosts.php:363
 msgid "Cannot update host"
@@ -2113,7 +2113,7 @@ msgstr "Host não foi atualizado"
 
 #: host_prototypes.php:188
 msgid "Cannot update host prototype"
-msgstr ""
+msgstr "Não foi possível atualizar o protótipo de host"
 
 #: hosts.php:612
 msgid "Cannot update host status"
@@ -2138,7 +2138,7 @@ msgstr "Não foi possível atualizar a imagem."
 #: api/classes/CHostInterface.php:395
 #, php-format
 msgid "Cannot update interface for discovered host \"%1$s\"."
-msgstr ""
+msgstr "Não é possível atualizar a interface para o host descoberto \"%1$s\"."
 
 #: disc_prototypes.php:304 items.php:455 screenedit.php:176
 msgid "Cannot update item"
@@ -2184,7 +2184,7 @@ msgstr "Não foi possível atualizar proxy"
 #: api/classes/CProxy.php:298
 #, php-format
 msgid "Cannot update proxy for discovered host \"%1$s\"."
-msgstr ""
+msgstr "Não é possível atualizar o proxy para o host descoberto \"%1$s\"."
 
 #: adm.regexps.php:127
 msgid "Cannot update regular expression"
@@ -2225,7 +2225,7 @@ msgstr "Não é possível atualizar aplicações vindas de templates."
 #: api/classes/CTemplate.php:790 api/classes/CTemplate.php:1061
 #, php-format
 msgid "Cannot update templates on discovered host \"%1$s\"."
-msgstr ""
+msgstr "Não é possível atualizar templates no host descoberto \"%1$s\"."
 
 #: trigger_prototypes.php:163 trigger_prototypes.php:208 triggers.php:179
 #: triggers.php:237 tr_logform.php:114
@@ -2574,7 +2574,7 @@ msgstr "Configuração dos grupos de hosts"
 
 #: host_prototypes.php:27
 msgid "Configuration of host prototypes"
-msgstr ""
+msgstr "Configuração de protótipos de host"
 
 #: hosts.php:32
 msgid "Configuration of hosts"
@@ -2846,7 +2846,7 @@ msgstr "Criar grupo de hosts"
 
 #: include/views/configuration.host.prototype.list.php:30
 msgid "Create host prototype"
-msgstr ""
+msgstr "Criar protótipo de host"
 
 #: adm.iconmapping.php:126
 msgid "Create icon map"
@@ -2949,7 +2949,7 @@ msgstr "Criada: Regra de descoberta \"%1$s\" em \"%2$s\"."
 #: api/classes/CHostPrototype.php:364
 #, php-format
 msgid "Created: Host prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Criado: Protótipo de host \"%1$s\" em \"%2$s\"."
 
 #: api/classes/CItem.php:590
 #, php-format
@@ -3528,11 +3528,12 @@ msgstr "Excluir os grupos de hosts selecionados?"
 
 #: include/views/configuration.host.prototype.edit.php:321
 msgid "Delete selected host prototype?"
-msgstr ""
+msgstr "Excluir os protótipos de host selecionados?"
 
+# DUPLICATE !!!
 #: include/views/configuration.host.prototype.list.php:128
 msgid "Delete selected host prototypes?"
-msgstr ""
+msgstr "Excluir os protótipos de host selecionados?"
 
 #: include/views/configuration.host.edit.php:830
 msgid "Delete selected host?"
@@ -3669,7 +3670,7 @@ msgstr "Excluído: Host \"%1$s\"."
 #: api/classes/CHostPrototype.php:971
 #, php-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Excluído: Protótipo de host \"%1$s\" em \"%2$s\"."
 
 #: api/classes/CItem.php:782
 #, php-format
@@ -3891,7 +3892,7 @@ msgstr "Desabilitar grupos selecionados?"
 
 #: include/views/configuration.host.prototype.list.php:124
 msgid "Disable selected host prototypes?"
-msgstr ""
+msgstr "Desabilitar os protótipos de host selecionados?"
 
 #: hosts.php:993
 msgid "Disable selected hosts?"
@@ -3943,7 +3944,7 @@ msgstr "Descoberto"
 
 #: include/views/configuration.host.edit.php:158
 msgid "Discovered by"
-msgstr ""
+msgstr "Descoberto por"
 
 #: include/views/monitoring.discovery.php:41
 msgid "Discovered device"
@@ -4142,12 +4143,12 @@ msgstr "Dependências duplicadas na trigger \"%1$s\"."
 #: api/classes/CHostPrototype.php:197
 #, php-format
 msgid "Duplicate group prototype name \"%2$s\" for host prototype \"%1$s\"."
-msgstr ""
+msgstr "Nome de protótipo de grupo duplicado \"%2$s\" para o protótipo de host \"%1$s\"."
 
 #: api/classes/CHostPrototype.php:191
 #, php-format
 msgid "Duplicate host group ID \"%2$s\" for host prototype \"%1$s\"."
-msgstr ""
+msgstr "ID de grupo duplicado \"%2$s\" para o protótipo de host \"%1$s\"."
 
 #: api/classes/CHost.php:747
 #, php-format
@@ -4271,15 +4272,15 @@ msgstr "Ação com condição vazia."
 
 #: include/classes/validators/CColorValidator.php:33
 msgid "Empty color."
-msgstr ""
+msgstr "Cor nula."
 
 #: api/classes/CHostPrototype.php:458
 msgid "Empty host ID for host prototype."
-msgstr ""
+msgstr "Falta o ID para o protótipo de host."
 
 #: api/classes/CHostPrototype.php:173
 msgid "Empty host."
-msgstr ""
+msgstr "Host nulo."
 
 #: api/classes/CAction.php:1235 api/classes/CApplication.php:288
 #: api/classes/CApplication.php:495 api/classes/CDiscoveryRule.php:339
@@ -4308,12 +4309,12 @@ msgstr "Macro nula."
 
 #: api/classes/CHostPrototype.php:222
 msgid "Empty name for group prototype."
-msgstr ""
+msgstr "Falta o nome para o protótipo de grupo."
 
 #: api/classes/CHostPrototype.php:181
 #, php-format
 msgid "Empty name for host prototype \"%1$s\"."
-msgstr ""
+msgstr "Falta o nome para o protótipo de host \"%1$s\"."
 
 #: api/classes/CService.php:1109
 msgid "Empty name."
@@ -4410,7 +4411,7 @@ msgstr "Habilitar grupos selecionados?"
 
 #: include/views/configuration.host.prototype.list.php:120
 msgid "Enable selected host prototypes?"
-msgstr ""
+msgstr "Habilitar os protótipos de host selecionados?"
 
 #: hosts.php:990 include/views/configuration.hostgroups.list.php:162
 msgid "Enable selected hosts?"
@@ -5215,7 +5216,7 @@ msgstr "Grupo"
 #: api/classes/CHostGroup.php:613
 #, php-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
-msgstr ""
+msgstr "O grupo \"%1$s\" não pode ser excluído por ser utilizado em um protótipo de host."
 
 #: include/classes/import/importers/CTemplateImporter.php:233
 #, php-format
@@ -5250,16 +5251,16 @@ msgstr "Nome do grupo"
 
 #: api/classes/CHostPrototype.php:395 api/classes/CHostPrototype.php:402
 msgid "Group prototype ID cannot be empty."
-msgstr ""
+msgstr "O ID do grupo não pode ser nulo."
 
 #: api/classes/CHostPrototype.php:156 api/classes/CHostPrototype.php:434
 #, php-format
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
-msgstr ""
+msgstr "O protótipo de grupo não pode ser baseado em regra de auto-busca no host \"%1$s\"."
 
 #: include/views/configuration.host.prototype.edit.php:203
 msgid "Group prototypes"
-msgstr ""
+msgstr "Protótipos de grupo"
 
 #: hostgroups.php:124 usergrps.php:179
 msgid "Group updated"
@@ -5620,12 +5621,12 @@ msgstr "Nome do host"
 #: api/classes/CHostPrototype.php:174
 #, php-format
 msgid "Host name \"%1$s\" is too long, it must not be longer than %2$d characters."
-msgstr ""
+msgstr "O nome de host \"%1$s\" é muito grande, ele não deve ser maior que %2$s caracteres."
 
 #: api/classes/CHostPrototype.php:176
 #, php-format
 msgid "Host name for host prototype \"%1$s\" must contain macros."
-msgstr ""
+msgstr "O nome do protótipo de host \"%1$s\" deverá conter macros."
 
 #: include/hosts.inc.php:290
 msgid "Host networks"
@@ -5634,71 +5635,71 @@ msgstr "Redes do host"
 #: api/classes/CHostPrototype.php:785
 #, php-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
-msgstr ""
+msgstr "O protótipo de host \"%1$s\" já existe em \"%2$s\", herdado de outro template."
 
 #: api/classes/CHostPrototype.php:773
 #, php-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "O protótipo de host \"%1$s\" já existe em \"%2$s\"."
 
 #: api/classes/CHostPrototype.php:189
 #, php-format
 msgid "Host prototype \"%1$s\" must have at least one host group."
-msgstr ""
+msgstr "O protótipo de host \"%1$s\" deve possuir no mínimo um grupo de host."
 
 #: host_prototypes.php:202
 msgid "Host prototype added"
-msgstr ""
+msgstr "Protótipo de host adicionado"
 
 #: host_prototypes.php:119
 msgid "Host prototype deleted"
-msgstr ""
+msgstr "Protótipo de host foi excluído"
 
 #: host_prototypes.php:188
 msgid "Host prototype updated"
-msgstr ""
+msgstr "Protótipo de host foi atualizado"
 
 #: api/classes/CHostPrototype.php:1100
 #, php-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\"."
-msgstr ""
+msgstr "Já existe protótipo de host com o nome \"%1$s\" na auto-busca \"%2$s\"."
 
 #: api/classes/CHostPrototype.php:1096
 #, php-format
 msgid "Host prototype with host name \"%1$s\" already exists."
-msgstr ""
+msgstr "Já existe protótipo de host com o nome \"%1$s\"."
 
 #: api/classes/CHostPrototype.php:1108
 #, php-format
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
-msgstr ""
+msgstr "Já existe protótipo de host com o nome visível \"%1$s\" na auto-busca \"%2$s\"."
 
 #: api/classes/CHostPrototype.php:1105
 #, php-format
 msgid "Host prototype with visible name \"%1$s\" already exists."
-msgstr ""
+msgstr "Já existe protótipo de host com o nome visível \"%1$s\"."
 
 #: include/html.inc.php:519 include/html.inc.php:523
 #: include/views/configuration.host.discovery.list.php:93
 #: include/views/configuration.host.edit.php:620
 msgid "Host prototypes"
-msgstr ""
+msgstr "Protótipos de host"
 
 #: host_prototypes.php:225
 msgid "Host prototypes activated"
-msgstr ""
+msgstr "Protótipos de host ativados"
 
 #: host_prototypes.php:232
 msgid "Host prototypes deleted"
-msgstr ""
+msgstr "Protótipos de host excluídos"
 
 #: host_prototypes.php:225
 msgid "Host prototypes disabled"
-msgstr ""
+msgstr "Protótipos de host desabilitados"
 
 #: include/views/configuration.host.prototype.list.php:34
 msgid "Host prototypes of"
-msgstr ""
+msgstr "Protótipos de host de"
 
 #: include/hosts.inc.php:300
 msgid "Host router"
@@ -6389,7 +6390,7 @@ msgstr "Foram utilizados caracteres inválidos no nome do template [ %1$s ]"
 #: api/classes/CHostPrototype.php:175
 #, php-format
 msgid "Incorrect characters used for host \"%1$s\"."
-msgstr ""
+msgstr "Foram informados caracteres inválidos no host \"%1$s\"."
 
 #: api/classes/CHost.php:743 api/classes/CHost.php:1090
 #, php-format
@@ -6420,7 +6421,7 @@ msgstr "Atraso incorreto."
 #: api/classes/CHostPrototype.php:113
 #, php-format
 msgid "Incorrect discovery rule ID for host prototype \"%1$s\"."
-msgstr ""
+msgstr "Foi informado um ID de auto-busca inválido para o protótipo de host \"%1$s\"."
 
 #: include/classes/validators/event/CEventSourceObjectValidator.php:66
 #, php-format
@@ -6474,12 +6475,12 @@ msgstr "Foi informado um ID de gráfico \"%s\" inválido para o elemento da tela
 
 #: api/classes/CHostPrototype.php:396 api/classes/CHostPrototype.php:403
 msgid "Incorrect group prototype ID."
-msgstr ""
+msgstr "ID de protótipo de grupo inválido."
 
 #: api/classes/CHostPrototype.php:196
 #, php-format
 msgid "Incorrect group prototypes for host prototype \"%1$s\"."
-msgstr ""
+msgstr "Protótipos de grupo inválidos para o protótipo de host \"%1$s\"."
 
 #: api/classes/CScreenItem.php:500
 #, php-format
@@ -6493,7 +6494,7 @@ msgstr "Foi informado um ID de grupo \"%s\" inválido para o elemento da tela."
 
 #: api/classes/CHostPrototype.php:241
 msgid "Incorrect host group ID for group prototype."
-msgstr ""
+msgstr "Foi informado um ID de grupo de host inválido para o protótipo de grupo."
 
 #: include/profiles.inc.php:292
 msgid "Incorrect host group."
@@ -6502,11 +6503,11 @@ msgstr "Grupo de host inválido."
 #: api/classes/CHostPrototype.php:190
 #, php-format
 msgid "Incorrect host groups for host prototype \"%1$s\"."
-msgstr ""
+msgstr "Grupos de host inválidos para o protótipo de host \"%1$s\"."
 
 #: api/classes/CHostPrototype.php:459
 msgid "Incorrect host prototype ID."
-msgstr ""
+msgstr "Protótipo de host com ID inválido."
 
 #: image.php:46
 msgid "Incorrect image index."
@@ -6730,7 +6731,7 @@ msgstr "Valor de origem inválido."
 #: api/classes/CHostPrototype.php:185
 #, php-format
 msgid "Incorrect status for host prototype \"%1$s\"."
-msgstr ""
+msgstr "Status inválido para o protótipo de host \"%1$s\"."
 
 #: api/classes/CService.php:1232
 #, php-format
@@ -8720,7 +8721,7 @@ msgstr "Nome"
 #: api/classes/CHostPrototype.php:223
 #, php-format
 msgid "Name for group prototype \"%1$s\" must contain macros."
-msgstr ""
+msgstr "O nome do protótipo de grupo \"%1$s\" deve conter macros."
 
 #: sysmaps.php:171
 msgid "Network map added"
@@ -8828,12 +8829,12 @@ msgstr "Falta o dado \"%1$s\" para o gráfico."
 #: api/classes/CHostPrototype.php:457
 #, php-format
 msgid "No \"%1$s\" given for host prototype."
-msgstr ""
+msgstr "Não foi encontrado \"%1$s\" para o protótipo de host."
 
 #: api/classes/CHostPrototype.php:208
 #, php-format
 msgid "No \"%2$s\" given for host prototype \"%1$s\"."
-msgstr ""
+msgstr "Não foi encontrado \"%2$s\" para o protótipo de host \"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:1572
 #, php-format
@@ -8848,17 +8849,17 @@ msgstr "Falta o campo \"ymin_type\" para o gráfico \"%s\"."
 #: include/views/configuration.host.edit.php:366
 #: include/views/configuration.host.prototype.edit.php:143
 msgid "No IPMI interfaces defined."
-msgstr ""
+msgstr "Sem interfaces IPMI definidas."
 
 #: include/views/configuration.host.edit.php:353
 #: include/views/configuration.host.prototype.edit.php:130
 msgid "No JMX interfaces defined."
-msgstr ""
+msgstr "Sem interfaces JMX definidas."
 
 #: include/views/configuration.host.edit.php:340
 #: include/views/configuration.host.prototype.edit.php:117
 msgid "No SNMP interfaces defined."
-msgstr ""
+msgstr "Sem interfaces SNMP definidas."
 
 #: api/classes/CScreenItem.php:472
 msgid "No URL provided for screen element."
@@ -8889,7 +8890,7 @@ msgstr "Nenhuma ação localizada."
 #: include/views/configuration.host.edit.php:326
 #: include/views/configuration.host.prototype.edit.php:103
 msgid "No agent interfaces defined."
-msgstr ""
+msgstr "Sem interfaces de agente definidas."
 
 #: include/hosts.inc.php:588
 #, php-format
@@ -8982,7 +8983,7 @@ msgstr "Não foram definidas verificações de descoberta."
 #: api/classes/CHostPrototype.php:112
 #, php-format
 msgid "No discovery rule ID given for host prototype \"%1$s\"."
-msgstr ""
+msgstr "Não foi encontrado o ID da regra de auto-busca para o protótipo de host \"%1%s\"."
 
 #: api/classes/CDiscoveryRule.php:443
 msgid "No discovery rule IDs given."
@@ -9090,7 +9091,7 @@ msgstr "Não foi localizado host para a macro \"%1$s\"."
 
 #: api/classes/CHostPrototype.php:240
 msgid "No host group ID for group prototype."
-msgstr ""
+msgstr "Não foi encontrado grupo de host com o ID informado no protótipo."
 
 #: api/classes/CScreenItem.php:436
 msgid "No host group ID provided for screen element."
@@ -9107,7 +9108,7 @@ msgstr "Não existem grupos de hosts com o groupid \"%s\"."
 
 #: include/views/configuration.host.prototype.list.php:44
 msgid "No host prototypes defined."
-msgstr ""
+msgstr "Nenhum protótipo de host definido."
 
 #: include/hosts.inc.php:536
 #, php-format
@@ -9194,7 +9195,7 @@ msgstr "Nenhum protótipo de item definido."
 
 #: include/views/common.macros.php:26
 msgid "No macros defined."
-msgstr ""
+msgstr "Nenhuma macro definida."
 
 #: include/views/configuration.maintenance.list.php:41
 msgid "No maintenance defined."
@@ -9429,7 +9430,7 @@ msgstr "Nenhum template definido."
 
 #: include/views/configuration.host.prototype.edit.php:233
 msgid "No templates linked."
-msgstr ""
+msgstr "Nenhum template vinculado."
 
 #: include/views/configuration.services.edit.php:127
 msgid "No times defined. Work 24x7."
@@ -12587,12 +12588,12 @@ msgstr "A interface web não consegue se conectar ao banco de dados do Zabbix. V
 #: include/views/configuration.hostgroups.list.php:137
 #, php-format
 msgid "The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr ""
+msgstr "O grupo de host não foi mais descoberto e será excluído em %1$s (às %2$s de %3$s)."
 
 #: include/html.inc.php:627
 #, php-format
 msgid "The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr ""
+msgstr "O host não foi mais descoberto e será excluído em %1$s (às %2$s de %3$s)."
 
 #: api/classes/CImage.php:493
 #, php-format
@@ -13320,7 +13321,7 @@ msgstr "Desvinculado: Protótipo de gráfico \"%1$s\" em \"%2$s\"."
 #: api/classes/CHostGeneral.php:426
 #, php-format
 msgid "Unlinked: Host prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Desvinculado: Protótipo de host \"%1$s\" em \"%2$s\"."
 
 #: api/classes/CHostGeneral.php:378
 #, php-format
@@ -13364,17 +13365,17 @@ msgstr "O formato de arquivo \"%1$s\" não é suportado."
 #: api/classes/CHostPrototype.php:227 api/classes/CHostPrototype.php:245
 #, php-format
 msgid "Unsupported parameter \"%1$s\" for group prototype."
-msgstr ""
+msgstr "O parâmetro \"%1$s\" não é suportado para o protótipo de grupo."
 
 #: api/classes/CHostPrototype.php:209
 #, php-format
 msgid "Unsupported parameter \"%2$s\" for host prototype \"%1$s\"."
-msgstr ""
+msgstr "O parâmetro \"%2$s\" não é suportado para o protótipo de host \"%1$s\"."
 
 #: api/classes/CHostPrototype.php:203
 #, php-format
 msgid "Unsupported parameter \"%2$s\" for host prototype %1$s host inventory."
-msgstr ""
+msgstr "Parâmetro não suportado \"%2$s\" para o protótipo de host %1$s no inventário do host."
 
 #: include/blocks.inc.php:1135
 msgctxt "discovery results in dashboard"
@@ -13442,7 +13443,7 @@ msgstr "Atualizado: Regra de descoberta \"%1$s\" em \"%2$s\"."
 #: api/classes/CHostPrototype.php:615
 #, php-format
 msgid "Updated: Host prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Atualizado: Protótipo de host \"%1$s\" em \"%2$s\"."
 
 #: api/classes/CItem.php:642
 #, php-format
