@@ -744,7 +744,7 @@ INSERT INTO triggers (triggerid, expression, description, comments) VALUES (1400
 INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (14003, 30004, 14003, 'last', '0');
 
 -- testFormGraph.LayoutCheck testInheritanceGraph.SimpleUpdate testFormTrigger.SimpleUpdate testInheritanceTrigger.SimpleUpdate testInheritanceItem.SimpleUpdate
-INSERT INTO items (name, key_, hostid, delay, value_type, itemid, params, description) VALUES ('itemInheritance', 'key-item-inheritance', 30000, 30, 3, 24329, '', '');
+INSERT INTO items (name, key_, hostid, delay, value_type, itemid, params, description) VALUES ('itemInheritance', 'key-item-inheritance-test', 30000, 30, 3, 24329, '', '');
 INSERT INTO items (name, key_, hostid, delay, value_type, itemid, templateid, params, description) VALUES ('itemInheritance', 'key-item-inheritance', 30001, 30, 3, 24333, 30000, '', '');
 -- testFormDiscoveryRule.SimpleCreate testInheritanceDiscoveryRule.SimpleCreate
 INSERT INTO items (name, key_, hostid, delay, value_type, itemid, params, description, interfaceid) VALUES ('itemInheritanceTest', 'key-test-inheritance', 30001, 30, 3, 35000, '', '', 30000);
