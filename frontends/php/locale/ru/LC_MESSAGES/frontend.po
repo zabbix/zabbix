@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-11 09:51+0300\n"
-"PO-Revision-Date: 2013-09-02 13:11+0300\n"
+"POT-Creation-Date: 2013-09-11 09:56+0300\n"
+"PO-Revision-Date: 2013-09-09 11:14+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1378120275.0\n"
+"X-POOTLE-MTIME: 1378718046.0\n"
 
 #: include/views/configuration.item.edit.php:389
 msgid " day"
@@ -1023,7 +1023,7 @@ msgstr "НАСТРОЙКА ГРУПП УЗЛОВ СЕТИ"
 #: include/views/configuration.host.prototype.edit.php:29
 #: include/views/configuration.host.prototype.list.php:31
 msgid "CONFIGURATION OF HOST PROTOTYPES"
-msgstr ""
+msgstr "НАСТРОЙКА ПРОТОТИПОВ УЗЛОВ СЕТИ"
 
 #: hosts.php:634 hosts.php:699 hosts.php:747
 msgid "CONFIGURATION OF HOSTS"
@@ -1271,7 +1271,7 @@ msgstr "Не удалось добавить узел сети"
 
 #: host_prototypes.php:202
 msgid "Cannot add host prototype"
-msgstr ""
+msgstr "Не удалось добавить прототип узла сети"
 
 #: adm.images.php:62
 msgid "Cannot add image"
@@ -1399,7 +1399,7 @@ msgstr "Не удалось клонировать прототипы графи
 
 #: api/classes/CDiscoveryRule.php:1000
 msgid "Cannot clone host prototypes."
-msgstr ""
+msgstr "Не удалось клонировать прототипы узлов сети."
 
 #: api/classes/CDiscoveryRule.php:836
 msgid "Cannot clone item prototypes."
@@ -1429,7 +1429,7 @@ msgstr "Не удалось скопировать триггер \"%1$s:%2$s\",
 #: api/classes/CHostPrototype.php:151
 #, php-format
 msgid "Cannot create a host prototype on a discovered host \"%1$s\"."
-msgstr ""
+msgstr "Не удалось создать прототип узла сети от обнаруженного узла сети \"%1$s\"."
 
 #: include/db.inc.php:34
 msgid "Cannot create another database connection."
@@ -1537,11 +1537,11 @@ msgstr "Не удалось удалить группу узлов сети."
 
 #: api/classes/CDiscoveryRule.php:412
 msgid "Cannot delete host prototype."
-msgstr ""
+msgstr "Не удалось удалить прототип узла сети."
 
 #: host_prototypes.php:119 host_prototypes.php:232
 msgid "Cannot delete host prototypes"
-msgstr ""
+msgstr "Не удалось удалить прототипы узлов сети"
 
 #: adm.iconmapping.php:97
 msgid "Cannot delete icon map"
@@ -1642,7 +1642,7 @@ msgstr "Не удалось удалить шаблонные графики."
 
 #: api/classes/CHostPrototype.php:1076
 msgid "Cannot delete templated host prototype."
-msgstr ""
+msgstr "Не удалось удалить шаблонный прототип узла сети."
 
 #: api/classes/CItem.php:691
 msgid "Cannot delete templated item."
@@ -1716,7 +1716,7 @@ msgstr "Не удалось отобразить очередь элементо
 
 #: chart7.php:74
 msgid "Cannot display more than one item with type \"Graph sum\"."
-msgstr ""
+msgstr "Не удалось отобразить более одного элемента данных с типом \"Сумма графика\"."
 
 #: media_types.php:160
 msgid "Cannot enable media type"
@@ -2012,17 +2012,17 @@ msgstr "Не удалось отсоединить триггер \"%s\", он �
 #: api/classes/CHost.php:684
 #, php-format
 msgid "Cannot update \"%1$s\" for a discovered host."
-msgstr ""
+msgstr "Не удалось обновить \"%1$s\" для обнаруженного узла сети."
 
 #: api/classes/CItemGeneral.php:176
 #, php-format
 msgid "Cannot update \"%1$s\" for a discovered item."
-msgstr ""
+msgstr "Не удалось обновить \"%1$s\" для обнаруженного элемента данных."
 
 #: api/classes/CTrigger.php:647
 #, php-format
 msgid "Cannot update \"%1$s\" for a discovered trigger."
-msgstr ""
+msgstr "Не удалось обновить \"%1$s\" для обнаруженного триггера."
 
 #: api/classes/CItemGeneral.php:205
 #, php-format
@@ -2061,11 +2061,11 @@ msgstr "Не удалось обновить \"templateid\" для протот�
 
 #: api/classes/CGraphGeneral.php:60
 msgid "Cannot update a discovered graph."
-msgstr ""
+msgstr "Не удалось обновить обнаруженный график."
 
 #: api/classes/CHostGroup.php:537
 msgid "Cannot update a discovered host group."
-msgstr ""
+msgstr "Не удалось обновить обнаруженную группу узлов сети."
 
 #: actionconf.php:146
 msgid "Cannot update action"
@@ -2113,7 +2113,7 @@ msgstr "Не удалось обновить группу."
 #: api/classes/CHostGroup.php:908
 #, php-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
-msgstr ""
+msgstr "Не удалось обновить группы для обнаруженного узла сети \"%1$s\"."
 
 #: hostgroups.php:222 hosts.php:363
 msgid "Cannot update host"
@@ -2121,7 +2121,7 @@ msgstr "Не удалось обновить узел сети"
 
 #: host_prototypes.php:188
 msgid "Cannot update host prototype"
-msgstr ""
+msgstr "Не удалось обновить прототип узла сети"
 
 #: hosts.php:612
 msgid "Cannot update host status"
@@ -2146,7 +2146,7 @@ msgstr "Не удалось обновить изображение."
 #: api/classes/CHostInterface.php:395
 #, php-format
 msgid "Cannot update interface for discovered host \"%1$s\"."
-msgstr ""
+msgstr "Не удалось обновить интерфейс для обнаруженного узла сети \"%1$s\"."
 
 #: disc_prototypes.php:304 items.php:455 screenedit.php:176
 msgid "Cannot update item"
@@ -2192,7 +2192,7 @@ msgstr "Не удалось обновить прокси"
 #: api/classes/CProxy.php:298
 #, php-format
 msgid "Cannot update proxy for discovered host \"%1$s\"."
-msgstr ""
+msgstr "Не удалось обновить прокси для обнаруженного узла сети \"%1$s\"."
 
 #: adm.regexps.php:127
 msgid "Cannot update regular expression"
@@ -2233,7 +2233,7 @@ msgstr "Не удалось обновить шаблонные группы э�
 #: api/classes/CTemplate.php:790 api/classes/CTemplate.php:1061
 #, php-format
 msgid "Cannot update templates on discovered host \"%1$s\"."
-msgstr ""
+msgstr "Не удалось обновить шаблоны для обнаруженного узла сети \"%1$s\"."
 
 #: trigger_prototypes.php:163 trigger_prototypes.php:208 triggers.php:179
 #: triggers.php:237 tr_logform.php:114
@@ -2582,7 +2582,7 @@ msgstr "Настройка групп узлов сети"
 
 #: host_prototypes.php:27
 msgid "Configuration of host prototypes"
-msgstr ""
+msgstr "Настройка прототипов узлов сети"
 
 #: hosts.php:32
 msgid "Configuration of hosts"
@@ -2855,7 +2855,7 @@ msgstr "Создать группу узлов сети"
 
 #: include/views/configuration.host.prototype.list.php:30
 msgid "Create host prototype"
-msgstr ""
+msgstr "Создать прототип узла сети"
 
 #: adm.iconmapping.php:126
 msgid "Create icon map"
@@ -2958,7 +2958,7 @@ msgstr "Создано: Правило обнаружения \"%1$s\" в \"%2$s
 #: api/classes/CHostPrototype.php:364
 #, php-format
 msgid "Created: Host prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Создано: Прототип узла сети \"%1$s\" у \"%2$s\"."
 
 #: api/classes/CItem.php:590
 #, php-format
@@ -3537,11 +3537,11 @@ msgstr "Удалить выбранные группы узлов сети?"
 
 #: include/views/configuration.host.prototype.edit.php:321
 msgid "Delete selected host prototype?"
-msgstr ""
+msgstr "Удалить выбранный прототип узла сети?"
 
 #: include/views/configuration.host.prototype.list.php:128
 msgid "Delete selected host prototypes?"
-msgstr ""
+msgstr "Удалить выбранные прототипы узлов сети?"
 
 #: include/views/configuration.host.edit.php:830
 msgid "Delete selected host?"
@@ -3679,7 +3679,7 @@ msgstr "Удалено: Узел сети \"%1$s\"."
 #: api/classes/CHostPrototype.php:971
 #, php-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Удалено: Прототип узла сети \"%1$s\" из \"%2$s\"."
 
 #: api/classes/CItem.php:782
 #, php-format
@@ -3901,7 +3901,7 @@ msgstr "Деактивировать выбранные группы?"
 
 #: include/views/configuration.host.prototype.list.php:124
 msgid "Disable selected host prototypes?"
-msgstr ""
+msgstr "Деактивировать выбранные прототипы узлов сети?"
 
 #: hosts.php:993
 msgid "Disable selected hosts?"
@@ -3953,7 +3953,7 @@ msgstr "Обнаружен"
 
 #: include/views/configuration.host.edit.php:158
 msgid "Discovered by"
-msgstr ""
+msgstr "Обнаружено"
 
 #: include/views/monitoring.discovery.php:41
 msgid "Discovered device"
@@ -4281,7 +4281,7 @@ msgstr "Условие действия пустое."
 
 #: include/classes/validators/CColorValidator.php:33
 msgid "Empty color."
-msgstr ""
+msgstr "Пустой цвет."
 
 #: api/classes/CHostPrototype.php:458
 msgid "Empty host ID for host prototype."
