@@ -1429,7 +1429,7 @@ msgstr "Не удалось скопировать триггер \"%1$s:%2$s\",
 #: api/classes/CHostPrototype.php:151
 #, php-format
 msgid "Cannot create a host prototype on a discovered host \"%1$s\"."
-msgstr "Не удалось создать прототип узла сети от обнаруженного узла сети \"%1$s\"."
+msgstr "Не удалось создать прототип узла сети от обнаруженного узла сети \"%1$s\".Не удалось создать прототип узла сети от обнаруженного узла сети \"%1$s\"."
 
 #: include/db.inc.php:34
 msgid "Cannot create another database connection."
@@ -1716,7 +1716,7 @@ msgstr "Не удалось отобразить очередь элементо
 
 #: chart7.php:74
 msgid "Cannot display more than one item with type \"Graph sum\"."
-msgstr "Не удалось отобразить более одного элемента данных с типом \"Сумма графика\"."
+msgstr "Не удалось отобразить более одного элемента данных с типом \"Сумма графика\".Не удалось отобразить более одного элемента данных с типом \"Сумма графика\"."
 
 #: media_types.php:160
 msgid "Cannot enable media type"
