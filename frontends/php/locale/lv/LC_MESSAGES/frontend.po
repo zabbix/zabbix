@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-09-11 09:51+0300\n"
-"PO-Revision-Date: 2013-07-01 20:21+0200\n"
+"PO-Revision-Date: 2013-09-11 10:16+0300\n"
 "Last-Translator: Jaba <janis.jaunbalodis@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: lv\n"
@@ -11,8 +11,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);\n"
-"X-Generator: Pootle 2.1.6\n"
+"X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
+"X-POOTLE-MTIME: 1378887381.0\n"
 
 #: include/views/configuration.item.edit.php:389
 msgid " day"
@@ -113,7 +114,7 @@ msgstr "(dienas)"
 
 #: include/forms.inc.php:452
 msgid "(in sec)"
-msgstr "(sekundes)"
+msgstr "(sekundēs)"
 
 #: include/views/configuration.action.edit.php:446
 msgid "(minimum 60 seconds, 0 - use action default)"
