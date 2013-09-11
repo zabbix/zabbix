@@ -541,7 +541,7 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 	const char		*ins_triggers_sql =
 				"insert into triggers"
 				" (triggerid,description,expression,priority,status,"
-					"comments,url,type,value,value_flags,flags,error)"
+					"comments,url,type,value,state,flags,error)"
 				" values ";
 	const char		*ins_trigger_discovery_sql =
 				"insert into trigger_discovery"
