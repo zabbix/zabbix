@@ -1,122 +1,126 @@
+# Claudia <rmircea@birotec.ro>, 2013.
+# Mircea Rimbu <rmircea@birotec.ro>, 2013.
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-08-28 00:27+0300\n"
-"PO-Revision-Date: 2013-07-01 20:21+0200\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: Zabbix <info@zabbix.com>\n"
+"PO-Revision-Date: 2013-09-11 18:18+0300\n"
+"Last-Translator: altmir <rmircea@birotec.ro>\n"
+"Language-Team: Birotec\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2;\n"
-"X-Generator: Pootle 2.1.6\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2);;\n"
+"X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
+"X-POOTLE-MTIME: 1378916290.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
 #: maintenance.php:153 maintenance.php:165 services.php:193 services.php:207
 #, php-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
-msgstr ""
+msgstr "\"%s\" trebuie să fie între 1970.01.01 și 2038.01.18."
 
 #: include/profiles.inc.php:286
+#, fuzzy
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
-msgstr ""
+msgstr "\"Afișează triggeri OK\" trebuie să fie \"0\" sau o variabilă pozitivă de tip int."
 
 #: include/profiles.inc.php:291
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
-msgstr ""
+msgstr "\"Afișarea intermitentă a triggeri-lor la schimbarea statusului\" trebuie sa fie \"0\" sau o variabila pozitiva de tip int."
 
 #: include/func.inc.php:433
 #, php-format
 msgid "%1$d day, "
 msgid_plural "%1$d days, "
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$d zi, "
+msgstr[1] "%1$d zile, "
+msgstr[2] "%1$d zile, "
 
 #: httpmon.php:295 include/views/configuration.httpconf.list.php:116
 #, php-format
 msgid "%1$d scenario"
 msgid_plural "%1$d scenarios"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$d scenariu"
+msgstr[1] "%1$d scenarii"
+msgstr[2] "%1$d scenarii"
 
 #: chart4.php:90 chart5.php:83
 #, php-format
 msgid "%1$s (year %2$s)"
-msgstr ""
+msgstr "%1$s (anul %2$s)"
 
 #: latest.php:376 latest.php:552
 #, php-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s Element"
+msgstr[1] "%1$s Elemente"
+msgstr[2] "%1$s Elemente"
 
 #: include/page_header.php:480
 #, php-format
 msgid "%1$s failed login attempt logged. Last failed attempt was from %2$s on %3$s at %4$s."
 msgid_plural "%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s at %4$s."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s tentativa de logare eșuată înregistrată. Ultima tentativă eșuată a fost de la %2$s la %3$s la %4$s."
+msgstr[1] "%1$s tentative de logare eșuate înregistrate. Ultima tentativă eșuată a fost de la %2$s la %3$s la %4$s."
+msgstr[2] "%1$s tentative de logare eșuate înregistrate. Ultima tentativă eșuată a fost de la %2$s la %3$s la %4$s."
 
 #: include/blocks.inc.php:984
 #, php-format
 msgid "%2$d of %1$d issue is shown"
 msgid_plural "%2$d of %1$d issues are shown"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%2$d din %1$d probleme este afișată"
+msgstr[1] "%2$d din %1$d probleme sunt afișate"
+msgstr[2] "%2$d din %1$d probleme sunt afișate"
 
 #: include/views/monitoring.discovery.php:133
 #, php-format
 msgid "%d device"
 msgid_plural "%d devices"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%d echipament"
+msgstr[1] "%d echipamente"
+msgstr[2] "%d echipamente"
 
 #: include/views/configuration.action.edit.php:424
 msgid "(0 - infinitely)"
-msgstr ""
+msgstr "(0 - infinit)"
 
 #: include/views/configuration.host.edit.php:193
 #: include/views/configuration.hostgroups.list.php:31
 #: include/views/configuration.template.edit.php:143
 msgid "(Only super admins can create groups)"
-msgstr ""
+msgstr "(Numai super administratorii pot creea grupuri)"
 
 #: include/forms.inc.php:539 include/forms.inc.php:554
 msgid "(in days)"
-msgstr ""
+msgstr "(în zile)"
 
 #: include/forms.inc.php:436
 msgid "(in sec)"
-msgstr ""
+msgstr "(în sec)"
 
 #: include/views/configuration.action.edit.php:434
 msgid "(minimum 60 seconds, 0 - use action default)"
-msgstr ""
+msgstr "(minim 60 secunde, 0 - foloseste acțiunea default)"
 
 #: include/views/configuration.host.edit.php:284
 #: include/views/configuration.host.massupdate.php:60
 msgid "(no proxy)"
-msgstr ""
+msgstr "(fără proxy)"
 
 #: include/views/configuration.screen.constructor.edit.php:475 popup.php:1715
 #: popup.php:1716
 msgid "- all groups -"
-msgstr ""
+msgstr "- toate grupurile -"
 
 #: acknow.php:97
 msgid "----[BULK ACKNOWLEDGE]----"
-msgstr ""
+msgstr "----[CONFIRMARE MULTIPLĂ]----"
 
 #: include/triggers.inc.php:2223 include/triggers.inc.php:2224
 #: include/triggers.inc.php:2225 include/triggers.inc.php:2227
@@ -124,144 +128,144 @@ msgstr ""
 #: include/triggers.inc.php:2235 include/triggers.inc.php:2236
 #: include/triggers.inc.php:2247 include/triggers.inc.php:2254
 msgid "0 or 1"
-msgstr ""
+msgstr "0 sau 1"
 
 #: queue.php:162 queue.php:225
 msgid "1 minute"
-msgstr ""
+msgstr "1 minut"
 
 #: queue.php:160 queue.php:223
 msgid "10 seconds"
-msgstr ""
+msgstr "10 secunde"
 
 #: queue.php:161 queue.php:224
 msgid "30 seconds"
-msgstr ""
+msgstr "30 secunde"
 
 #: include/views/configuration.graph.edit.php:277
 msgid "3D view"
-msgstr ""
+msgstr "viziune 3D"
 
 #: queue.php:163 queue.php:226
 msgid "5 minutes"
-msgstr ""
+msgstr "5 minute"
 
 #: queue.php:159 queue.php:222
 msgid "5 seconds"
-msgstr ""
+msgstr "5 secunde"
 
 #: include/items.inc.php:794 include/views/monitoring.history.php:63
 msgid "500 latest values"
-msgstr ""
+msgstr "500 ultimele valori"
 
 #: include/views/configuration.sysmap.edit.php:67
 msgid "<manual>"
-msgstr ""
+msgstr "<manual>"
 
 #: acknow.php:146
 msgid "ALARM ACKNOWLEDGES"
-msgstr ""
+msgstr "CONFIRMARE ALARMĂ"
 
 #: include/triggers.inc.php:1662
 #: include/views/configuration.action.edit.php:114
 #: include/views/configuration.action.edit.php:880
 #: include/views/configuration.triggers.edit.php:104 tr_logform.php:290
 msgid "AND"
-msgstr ""
+msgstr "ȘI"
 
 #: include/views/configuration.action.edit.php:113
 #: include/views/configuration.action.edit.php:879
 msgid "AND / OR"
-msgstr ""
+msgstr "ȘI / SAU"
 
 #: include/views/administration.auditacts.list.php:31
 msgid "AUDIT ACTIONS"
-msgstr ""
+msgstr "ACȚIUNI AUDIT"
 
 #: include/views/administration.auditlogs.list.php:31
 msgid "AUDIT LOGS"
-msgstr ""
+msgstr "LOGURI AUDIT"
 
 #: report2.php:137
 msgid "AVAILABILITY REPORT"
-msgstr ""
+msgstr "RAPORT DE DISPONIBILITATE"
 
 #: popup_trexpr.php:122
 msgid "Absolute difference between last and previous value is < N"
-msgstr ""
+msgstr "Diferența absolută dintre ultima și prima valoare este < N"
 
 #: popup_trexpr.php:130
 msgid "Absolute difference between last and previous value is = N"
-msgstr ""
+msgstr "Diferența dintre ultima și prima valoare este = N"
 
 #: popup_trexpr.php:126
 msgid "Absolute difference between last and previous value is > N"
-msgstr ""
+msgstr "Diferența dintre ultima și prima valoare este > N"
 
 #: popup_trexpr.php:134
 msgid "Absolute difference between last and previous value is NOT N"
-msgstr ""
+msgstr "Diferența dintre ultima și prima valoare NU este N"
 
 #: report3.php:85 srv_status.php:160
 msgid "Acceptable SLA"
-msgstr ""
+msgstr "SLA acceptabil"
 
 #: sysmap.php:75
 msgid "Access denied!"
-msgstr ""
+msgstr "Acces interzis!"
 
 #: api/classes/CUser.php:916
 #, php-format
 msgid "Account is blocked for %s seconds"
-msgstr ""
+msgstr "Contul este blocat pentru %s secunde"
 
 #: events.php:565 events.php:578 include/actions.inc.php:245
 #: include/blocks.inc.php:903 include/blocks.inc.php:1420
 #: include/events.inc.php:137 include/events.inc.php:210
 #: include/views/configuration.action.edit.php:938
 msgid "Ack"
-msgstr ""
+msgstr "Ack"
 
 #: acknow.php:179 include/triggers.inc.php:1236 include/triggers.inc.php:1239
 #: tr_status.php:664
 msgid "Acknowledge"
-msgstr ""
+msgstr "Recunoaște"
 
 #: acknow.php:122
 msgid "Acknowledge added"
-msgstr ""
+msgstr "Recunoaștere adăugată"
 
 #: acknow.php:150 acknow.php:178
 msgid "Acknowledge alarm by"
-msgstr ""
+msgstr "Recunoaște alarma prin"
 
 #: acknow.php:151 acknow.php:180
 msgid "Acknowledge and return"
-msgstr ""
+msgstr "Recunoaște și returnează"
 
 #: tr_status.php:202
 msgid "Acknowledge status"
-msgstr ""
+msgstr "Recunoaște statusul"
 
 #: include/events.inc.php:122 tr_status.php:290 tr_status.php:667
 msgid "Acknowledged"
-msgstr ""
+msgstr "Recunoscut"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:83
 msgid "Acknowledged OK events"
-msgstr ""
+msgstr "Evenimente OK confirmate"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:49
 msgid "Acknowledged PROBLEM events"
-msgstr ""
+msgstr "Evenimente PROBLEMA confirmate"
 
 #: acknow.php:27 tr_events.php:123
 msgid "Acknowledges"
-msgstr ""
+msgstr "Confirmări"
 
 #: include/views/configuration.sysmap.edit.php:144
 msgid "Acknowledging disabled"
-msgstr ""
+msgstr "Confirmarea dezactivată"
 
 #: include/audit.inc.php:28 include/views/administration.auditlogs.list.php:62
 #: include/views/administration.auditlogs.list.php:89
@@ -287,39 +291,41 @@ msgstr ""
 #: include/views/configuration.triggers.massupdate.php:79 tr_logform.php:299
 #: tr_logform.php:303
 msgid "Action"
-msgstr ""
+msgstr "Acțiune"
 
 #: api/classes/CAction.php:774 api/classes/CAction.php:871
 #, php-format
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seconds)."
-msgstr ""
+msgstr "Acțiunea \"%1$s\" are valoarea incorectă pentru \"esc_period\" (minim %2$s secunde)."
 
 #: api/classes/CAction.php:777 api/classes/CAction.php:791
 #: api/classes/CAction.php:880 api/classes/CAction.php:899
 #, php-format
 msgid "Action \"%s\" already exists."
-msgstr ""
+msgstr "Acțiunea \"%s\" există deja."
 
 #: api/classes/CAction.php:926
-#, php-format
+#, fuzzy, php-format
 msgid "Action \"%s\" no operations defined."
-msgstr ""
+msgstr "Acțiunea \"%s\" nu are operațiuni definite."
 
 #: actionconf.php:149
+#, fuzzy
 msgid "Action added"
-msgstr ""
+msgstr "Acțiune adăugată"
 
 #: actionconf.php:170
 msgid "Action deleted"
-msgstr ""
+msgstr "Acțiune ștearsă"
 
 #: include/views/configuration.action.edit.php:399
 msgid "Action operations"
-msgstr ""
+msgstr "Operațiuni acțiune"
 
 #: actionconf.php:145
+#, fuzzy
 msgid "Action updated"
-msgstr ""
+msgstr "Acțiune actualizată"
 
 #: events.php:566 events.php:579 include/blocks.inc.php:904
 #: include/blocks.inc.php:1421 include/events.inc.php:138
@@ -327,35 +333,37 @@ msgstr ""
 #: include/views/administration.auditacts.list.php:32
 #: include/views/administration.auditlogs.list.php:29
 #: include/views/configuration.action.list.php:39
+#, fuzzy
 msgid "Actions"
-msgstr ""
+msgstr "Acțiuni"
 
 #: include/views/configuration.item.prototype.list.php:104
 msgid "Activate selected"
-msgstr ""
+msgstr "Activează selecțiile"
 
 #: include/views/administration.proxy.edit.php:40
 #: include/views/administration.proxy.list.php:84
 #: include/views/configuration.httpconf.edit.php:118
 msgid "Active"
-msgstr ""
+msgstr "Activ"
 
 #: include/views/configuration.maintenance.list.php:61
 msgctxt "maintenance status"
 msgid "Active"
-msgstr ""
+msgstr "Activ"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:571
 #: include/views/configuration.maintenance.edit.php:81 maintenance.php:147
 #: maintenance.php:153
+#, fuzzy
 msgid "Active since"
-msgstr ""
+msgstr "Activ din"
 
 #: api/classes/CMaintenance.php:463 api/classes/CMaintenance.php:576
 #: include/views/configuration.maintenance.edit.php:121 maintenance.php:161
 #: maintenance.php:165
 msgid "Active till"
-msgstr ""
+msgstr "Activ până la"
 
 #: dashconf.php:211 include/blocks.inc.php:1143 include/blocks.inc.php:1149
 #: include/blocks.inc.php:1263 include/blocks.inc.php:1308
@@ -406,114 +414,114 @@ msgstr ""
 #: popup_media.php:141 popup_period.php:183 tr_logform.php:289
 #: tr_status.php:717
 msgid "Add"
-msgstr ""
+msgstr "Adaugă"
 
 #: acknow.php:173
 msgid "Add comment by"
-msgstr ""
+msgstr "Adaugă comentariu de"
 
 #: sysmap.php:144
 msgid "Add element"
-msgstr ""
+msgstr "Adaugă element"
 
 #: include/views/configuration.graph.edit.php:209
 #: include/views/configuration.graph.edit.php:267
 msgid "Add graph items first"
-msgstr ""
+msgstr "Adaugă elemente grafice prima dată"
 
 #: include/actions.inc.php:338 include/actions.inc.php:553
 msgid "Add host"
-msgstr ""
+msgstr "Adaugă echipament"
 
 #: sysmap.php:150
 msgid "Add link"
-msgstr ""
+msgstr "Adaugă link"
 
 #: include/views/conf.import.php:23
 msgid "Add missing"
-msgstr ""
+msgstr "Adaugă lipsă"
 
 #: include/views/configuration.graph.edit.php:114
 msgid "Add prototype"
-msgstr ""
+msgstr "Adaugă prototip"
 
 #: jsLoader.php:181
 msgid "Add service"
-msgstr ""
+msgstr "Adaugă serviciu"
 
 #: slides.php:83
 msgid "Add to"
-msgstr ""
+msgstr "Adaugă la:"
 
 #: charts.php:93 history.php:94 host_screen.php:88 include/html.inc.php:249
 #: maps.php:70 screens.php:89
 msgid "Add to favourites"
-msgstr ""
+msgstr "Adaugă la favorite"
 
 #: include/actions.inc.php:557
 msgid "Add to host group"
-msgstr ""
+msgstr "Adaugă la Grupul de echipamente gazdă"
 
 #: include/actions.inc.php:364 include/views/configuration.action.edit.php:766
 msgid "Add to host groups"
-msgstr ""
+msgstr "Adaugă la grupurile de echipamente gazdă"
 
 #: auditlogs.php:134
 msgid "Added"
-msgstr ""
+msgstr "Adăugate"
 
 #: include/items.inc.php:1336 include/views/configuration.item.edit.php:190
 msgid "Additional parameters"
-msgstr ""
+msgstr "Parametri suplimentari"
 
 #: include/hosts.inc.php:69
 msgid "Admin"
-msgstr ""
+msgstr "Administrator"
 
 #: include/menu.inc.php:220
 msgid "Administration"
-msgstr ""
+msgstr "Administrație"
 
 #: include/views/configuration.sysmap.edit.php:84
 msgid "Advanced labels"
-msgstr ""
+msgstr "Etichete avansate"
 
 #: include/blocks.inc.php:901 include/blocks.inc.php:1418
 #: include/events.inc.php:136 include/events.inc.php:210
 #: include/events.inc.php:213 tr_status.php:288
 msgid "Age"
-msgstr ""
+msgstr "Vechime"
 
 #: tr_status.php:236
 msgid "Age less than"
-msgstr ""
+msgstr "Vechime mai mică decât"
 
 #: include/views/monitoring.overview.php:53
 #, php-format
 msgid "Age less than %s"
-msgstr ""
+msgstr "Vechime mai mică decât %s"
 
 #: include/items.inc.php:185 include/views/administration.script.list.php:64
 #: include/views/configuration.httpconf.edit.php:114 popup.php:1856
 msgid "Agent"
-msgstr ""
+msgstr "Agent"
 
 #: include/views/configuration.host.edit.php:233
 msgid "Agent interfaces"
-msgstr ""
+msgstr "Interfețe agent"
 
 #: hosts.php:56
 msgid "Agent or SNMP or JMX or IPMI interface"
-msgstr ""
+msgstr "Agent sau SNMP sau JMX sau interfață IPMI"
 
 #: include/hosts.inc.php:119 include/views/administration.users.edit.php:49
 #: include/views/administration.users.list.php:54 popup.php:896 users.php:43
 msgid "Alias"
-msgstr ""
+msgstr "Alias"
 
 #: sysmap.php:174
 msgid "Align icons"
-msgstr ""
+msgstr "Aliniază icoanele"
 
 #: dashconf.php:173 dashconf.php:254 include/blocks.inc.php:1242
 #: include/blocks.inc.php:1251 include/blocks.inc.php:1296
@@ -534,34 +542,34 @@ msgstr ""
 #: include/views/configuration.sysmap.edit.php:138 jsLoader.php:87
 #: popup_right.php:56 tr_status.php:215
 msgid "All"
-msgstr ""
+msgstr "Tot/Toți"
 
 #: include/classes/class.chostsinfo.php:115
 #: include/classes/class.ctriggersinfo.php:124
 msgid "All groups"
-msgstr ""
+msgstr "Toate grupurile"
 
 #: jsLoader.php:154
 msgid "All links should have \"Name\" and \"URL\" specified"
-msgstr ""
+msgstr "Toate linkurile trebuie sa aibă \"Nume\" și \"URL\" specificat"
 
 #: include/page_header.php:121
 msgid "All nodes"
-msgstr ""
+msgstr "Toate nodurile"
 
 #: include/views/configuration.item.edit.php:345
 #: include/views/configuration.item.edit.php:389
 #: include/views/configuration.item.massupdate.php:407
 msgid "Allowed hosts"
-msgstr ""
+msgstr "Echipamente gazde permise:"
 
 #: tr_status.php:193 tr_status.php:199
 msgid "Any"
-msgstr ""
+msgstr "Orice"
 
 #: include/regexp.inc.php:194
 msgid "Any character string included"
-msgstr ""
+msgstr "Orice caracter șir inclus"
 
 #: applications.php:136 httpconf.php:42 include/actions.inc.php:90
 #: include/audit.inc.php:32 include/forms.inc.php:526
@@ -569,43 +577,43 @@ msgstr ""
 #: include/views/configuration.application.list.php:54
 #: include/views/configuration.httpconf.edit.php:44
 msgid "Application"
-msgstr ""
+msgstr "Aplicație"
 
 #: api/classes/CApplication.php:799
 #, php-format
 msgid "Application \"%1$s\" already exists for host \"%2$s\"."
-msgstr ""
+msgstr "Aplicația \"%1$s\" deja există pentru echipamentul gazdă \"%2$s\"."
 
 #: api/classes/CApplication.php:489
 #, php-format
 msgid "Application \"%1$s\" already exists."
-msgstr ""
+msgstr "Aplicația \"%1$s\" deja există."
 
 #: api/classes/CApplication.php:633
 #, php-format
 msgid "Application \"%1$s\" used by scenario \"%2$s\" and can't be deleted."
-msgstr ""
+msgstr "Aplicația \"%1$s\" folosită de scenariul \"%2$s\" și nu poate fi stearsă."
 
 #: applications.php:128
 msgid "Application added"
-msgstr ""
+msgstr "Aplicație adăugată"
 
 #: applications.php:155 applications.php:186
 msgid "Application deleted"
-msgstr ""
+msgstr "Aplicație stearsă"
 
 #: api/rpc/class.cjsonrpc.php:206
 msgid "Application error."
-msgstr ""
+msgstr "Eroare a aplicației"
 
 #: applications.php:121
 msgid "Application updated"
-msgstr ""
+msgstr "Aplicație actualizată"
 
 #: api/classes/CItemGeneral.php:333
 #, php-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
-msgstr ""
+msgstr "Aplicația cu ID \"%1$s\" nu este disponibilă pe \"%2$s\"."
 
 #: hosts.php:683 hosts.php:759 include/forms.inc.php:823
 #: include/html.inc.php:390 include/html.inc.php:394
@@ -619,43 +627,43 @@ msgstr ""
 #: search.php:136 search.php:160 search.php:179 search.php:368 search.php:389
 #: search.php:412 templates.php:458 templates.php:521
 msgid "Applications"
-msgstr ""
+msgstr "Aplicații"
 
 #: include/views/js/configuration.sysmaps.js.php:184
 #: include/views/js/configuration.sysmaps.js.php:273
 #: include/views/js/configuration.sysmaps.js.php:374
 msgid "Apply"
-msgstr ""
+msgstr "Aplică"
 
 #: include/views/configuration.maintenance.list.php:58
 msgctxt "maintenance status"
 msgid "Approaching"
-msgstr ""
+msgstr "Abordare"
 
 #: include/func.inc.php:221
 msgid "Apr"
-msgstr ""
+msgstr "Apr"
 
 #: include/forms.inc.php:1556 include/func.inc.php:107
 #: include/func.inc.php:238 jsLoader.php:117
 msgid "April"
-msgstr ""
+msgstr "aprilie"
 
 #: include/classes/class.cbuttonqmessage.php:49
 msgid "Are you sure you want perform this action?"
-msgstr ""
+msgstr "Sunteti sigur că vreți sa efectuați această acțiune ?"
 
 #: include/views/js/common.macros.js.php:53
 msgid "Are you sure you want to delete"
-msgstr ""
+msgstr "Sunteți sigur că doriți să ștergeți"
 
 #: include/views/js/configuration.sysmaps.js.php:48
 msgid "Area size"
-msgstr ""
+msgstr "Mărimea suprafeței"
 
 #: include/views/js/configuration.sysmaps.js.php:36
 msgid "Area type"
-msgstr ""
+msgstr "Tipul suprafeței"
 
 #: include/views/configuration.item.edit.php:360
 #: include/views/configuration.item.edit.php:377
@@ -663,450 +671,455 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:374
 #: include/views/configuration.item.massupdate.php:388
 msgid "As is"
-msgstr ""
+msgstr "Ca și"
 
 #: include/views/monitoring.history.php:67
 msgid "As plain text"
-msgstr ""
+msgstr "Ca text simplu"
 
 #: include/hosts.inc.php:154
+#, fuzzy
 msgid "Asset tag"
-msgstr ""
+msgstr "Eticheta activului"
 
 #: include/maintenances.inc.php:54 include/maintenances.inc.php:57
 msgid "At"
-msgstr ""
+msgstr "La"
 
 #: include/forms.inc.php:1682
 msgid "At (hour:minute)"
-msgstr ""
+msgstr "La (oră:minute)"
 
 #: api/classes/CMaintenance.php:403 api/classes/CMaintenance.php:595
 msgid "At least one host or group should be selected."
-msgstr ""
+msgstr "Cel puțin un server sau un grup trebuie să fie selectat."
 
 #: api/classes/CMaintenance.php:473 api/classes/CMaintenance.php:586
 msgid "At least one maintenance period must be created."
-msgstr ""
+msgstr "Cel puțin o perioadă de mentenanță trebuie creată"
 
 #: include/classes/class.frontendsetup.php:292
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
-msgstr ""
+msgstr "Cel puțin una dintre bazele de date MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 trebuie să fie suportate"
 
 #: include/menu.inc.php:266
 msgid "Audit"
-msgstr ""
+msgstr "Audit"
 
 #: auditacts.php:27
 msgid "Audit actions"
-msgstr ""
+msgstr "Audit acțiuni"
 
 #: auditlogs.php:27
 msgid "Audit logs"
-msgstr ""
+msgstr "Audit loguri"
 
 #: include/func.inc.php:225
 msgid "Aug"
-msgstr ""
+msgstr "Aug"
 
 #: include/forms.inc.php:1548 include/func.inc.php:111
 #: include/func.inc.php:242 jsLoader.php:121
 msgid "August"
-msgstr ""
+msgstr "August"
 
 #: include/menu.inc.php:249 include/views/configuration.httpconf.edit.php:59
 msgid "Authentication"
-msgstr ""
+msgstr "Autentificare"
 
 #: include/views/configuration.host.edit.php:534
 msgid "Authentication algorithm"
-msgstr ""
+msgstr "Algoritm de autentificare"
 
 #: include/views/configuration.action.edit.php:673
 #: include/views/configuration.item.edit.php:173
 #: include/views/configuration.item.massupdate.php:200
 msgid "Authentication method"
-msgstr ""
+msgstr "Metodă de autentificare"
 
 #: authentication.php:158 authentication.php:159
 msgid "Authentication method changed to HTTP"
-msgstr ""
+msgstr "Metodă de autentificare schimbată la HTTP"
 
 #: authentication.php:121 authentication.php:122
 msgid "Authentication method changed to LDAP"
-msgstr ""
+msgstr "Metodă de autentificare schimbată la LDAP"
 
 #: authentication.php:83 authentication.php:84
 msgid "Authentication method changed to Zabbix internal"
-msgstr ""
+msgstr "Metodă de autentificare schimbată la Zabbix intern"
 
 #: include/views/configuration.action.list.php:35
 msgid "Auto registration"
-msgstr ""
+msgstr "Înregistrare proprie"
 
 #: include/views/administration.users.edit.php:119
+#, fuzzy
 msgid "Auto-login"
-msgstr ""
+msgstr "Autentificare"
 
 #: include/views/administration.users.edit.php:120 profile.php:47 users.php:60
 msgid "Auto-logout (min 90 seconds)"
-msgstr ""
+msgstr "Delogare (minim 90 de secunde)"
 
 #: include/views/configuration.host.edit.php:574
 #: include/views/configuration.host.massupdate.php:179
 msgid "Automatic"
-msgstr ""
+msgstr "Automat"
 
 #: include/views/configuration.sysmap.edit.php:78
 msgid "Automatic icon mapping"
-msgstr ""
+msgstr "Maparea icoanei automată"
 
 #: include/views/js/configuration.sysmaps.js.php:116
 #: include/views/js/configuration.sysmaps.js.php:238
 msgid "Automatic icon selection"
-msgstr ""
+msgstr "Selectarea automată a icoanei"
 
 #: hosts.php:691 popup.php:543
 msgid "Availability"
-msgstr ""
+msgstr "Disponibilitate"
 
 #: include/menu.inc.php:129 report2.php:26
 msgid "Availability report"
-msgstr ""
+msgstr "Raportul disponibilității"
 
 #: include/classes/class.chostsinfo.php:125 popup.php:586
 msgid "Available"
-msgstr ""
+msgstr "Disponibil"
 
 #: adm.triggerseverities.php:60
 #: include/views/administration.general.triggerSeverity.edit.php:52
 msgid "Average"
-msgstr ""
+msgstr "Mediu"
 
 #: include/reports.inc.php:677
 msgid "Average by"
-msgstr ""
+msgstr "Media"
 
 #: popup_trexpr.php:138
 msgid "Average value of a period T is < N"
-msgstr ""
+msgstr "Valoarea medie a unei perioade T este < N"
 
 #: popup_trexpr.php:148
 msgid "Average value of a period T is = N"
-msgstr ""
+msgstr "Valoarea medie a unei perioade T este = N"
 
 #: popup_trexpr.php:143
 msgid "Average value of a period T is > N"
-msgstr ""
+msgstr "Valoarea medie a unei perioade T este > N"
 
 #: popup_trexpr.php:153
 msgid "Average value of a period T is NOT N"
-msgstr ""
+msgstr "Valoarea medie a unei perioade T NU este N"
 
 #: popup_bitem.php:140
 msgid "Axis side"
-msgstr ""
+msgstr "Partea axei"
 
 #: include/func.inc.php:401
 msgctxt "Byte short"
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: include/page_header.php:224
 msgid "BACK"
-msgstr ""
+msgstr "Înapoi"
 
 #: include/views/administration.general.image.edit.php:29
 #: include/views/administration.general.image.list.php:25
 msgid "Background"
-msgstr ""
+msgstr "Fundal"
 
 #: include/views/configuration.sysmap.edit.php:63
 msgid "Background image"
-msgstr ""
+msgstr "Imagine de fundal"
 
 #: include/menu.inc.php:137 report6.php:25 report6.php:180
+#, fuzzy
 msgid "Bar reports"
-msgstr ""
+msgstr "Rapoarte de bară"
 
 #: authentication.php:39
 #: include/views/administration.authentication.edit.php:59
 msgid "Base DN"
-msgstr ""
+msgstr "Bază DN"
 
 #: include/httptest.inc.php:28
 msgid "Basic authentication"
-msgstr ""
+msgstr "Autentificare de bază"
 
 #: include/views/administration.authentication.edit.php:61
+#, fuzzy
 msgid "Bind DN"
-msgstr ""
+msgstr "Bind DN"
 
 #: authentication.php:49
 #: include/views/administration.authentication.edit.php:62
 msgid "Bind password"
-msgstr ""
+msgstr "Parolă asociată"
 
 #: include/classes/core/ZBase.php:137
 msgid "Black & Blue"
-msgstr ""
+msgstr "Negru & Albastru"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:28
 msgid "Blinking"
-msgstr ""
+msgstr "Intermitent"
 
 #: include/views/administration.users.list.php:83
 msgid "Blocked"
-msgstr ""
+msgstr "Blocat"
 
 #: include/graphs.inc.php:69 include/views/js/configuration.sysmaps.js.php:334
 #: include/views/js/configuration.sysmaps.js.php:410
 msgid "Bold line"
-msgstr ""
+msgstr "Linii îngroșate"
 
 #: include/items.inc.php:131
 msgid "Boolean"
-msgstr ""
+msgstr "Boolean"
 
 #: include/views/configuration.screen.constructor.edit.php:602
 #: include/views/configuration.sysmap.edit.php:132
 #: include/views/js/configuration.sysmaps.js.php:72
 #: include/views/js/configuration.sysmaps.js.php:228
 msgid "Bottom"
-msgstr ""
+msgstr "Bază"
 
 #: include/reports.inc.php:712
 msgid "Brighten"
-msgstr ""
+msgstr "Luminozitate"
 
 #: include/locales.inc.php:46
 msgid "Bulgarian (bg_BG)"
-msgstr ""
+msgstr "Bulgară (bg_BG)"
 
 #: tr_status.php:780
 msgid "Bulk acknowledge"
-msgstr ""
+msgstr "Confirmare globală"
 
 #: report2.php:180
 msgid "By host"
-msgstr ""
+msgstr "După server"
 
 #: report2.php:181
 msgid "By trigger template"
-msgstr ""
+msgstr "După șablonul trigger"
 
 #: include/views/configuration.action.edit.php:25
 #: include/views/configuration.action.list.php:29
 msgid "CONFIGURATION OF ACTIONS"
-msgstr ""
+msgstr "CONFIGURARE ACȚIUNI"
 
 #: include/views/configuration.application.edit.php:23
 #: include/views/configuration.application.list.php:33
 msgid "CONFIGURATION OF APPLICATIONS"
-msgstr ""
+msgstr "CONFIGURARE APLICAȚII"
 
 #: include/views/administration.authentication.edit.php:23
 msgid "CONFIGURATION OF AUTHENTICATION"
-msgstr ""
+msgstr "CONFIGURARE AUTENTIFICARE"
 
 #: include/views/configuration.discovery.edit.php:25
 #: include/views/configuration.discovery.list.php:28
+#, fuzzy
 msgid "CONFIGURATION OF DISCOVERY RULE"
-msgstr ""
+msgstr "CONFIGURARE REGULA DE DETECȚIE"
 
 #: host_discovery.php:263
 #: include/views/configuration.host.discovery.list.php:30
 msgid "CONFIGURATION OF DISCOVERY RULES"
-msgstr ""
+msgstr "CONFIGURARE REGULI DE DETECȚIE"
 
 #: include/views/configuration.graph.edit.php:25
 #: include/views/configuration.graph.list.php:31
 msgid "CONFIGURATION OF GRAPH PROTOTYPES"
-msgstr ""
+msgstr "CONFIGURARE PROTOTIPURI GRAFIC"
 
 #: include/views/configuration.graph.edit.php:29
 #: include/views/configuration.graph.list.php:50
 msgid "CONFIGURATION OF GRAPHS"
-msgstr ""
+msgstr "CONFIGURARE GRAFICE"
 
 #: adm.gui.php:107
 msgid "CONFIGURATION OF GUI"
-msgstr ""
+msgstr "CONFIGURARE GUI"
 
 #: include/views/configuration.hostgroups.edit.php:23
 #: include/views/configuration.hostgroups.list.php:36
 msgid "CONFIGURATION OF HOST GROUPS"
-msgstr ""
+msgstr "CONFIGURARE GRUPURI DE SERVERE"
 
 #: hosts.php:570 hosts.php:619 hosts.php:639
 msgid "CONFIGURATION OF HOSTS"
-msgstr ""
+msgstr "CONFIGURARE SERVERE"
 
 #: adm.housekeeper.php:86
 msgid "CONFIGURATION OF HOUSEKEEPER"
-msgstr ""
+msgstr "CONFIGURARE ÎNTREȚINERE"
 
 #: adm.iconmapping.php:127
 msgid "CONFIGURATION OF ICON MAPPING"
-msgstr ""
+msgstr "CONFIGURARE MAPARE ICOANE"
 
 #: adm.images.php:149
 msgid "CONFIGURATION OF IMAGES"
-msgstr ""
+msgstr "CONFIGURARE IMAGINI"
 
 #: include/views/configuration.services.edit.php:28
 #: include/views/configuration.services.list.php:25
 msgid "CONFIGURATION OF IT SERVICES"
-msgstr ""
+msgstr "CONFIGURARE SERVICII IT"
 
 #: disc_prototypes.php:313
 #: include/views/configuration.item.prototype.list.php:29
 msgid "CONFIGURATION OF ITEM PROTOTYPES"
-msgstr ""
+msgstr "CONFIGURARE PROTOTIPI DE ELEMENTE"
 
 #: include/views/configuration.item.copy.php:28
 #: include/views/configuration.item.list.php:31
 #: include/views/configuration.item.massupdate.php:28 items.php:664
 msgid "CONFIGURATION OF ITEMS"
-msgstr ""
+msgstr "CONFIGURARE ELEMENTE"
 
 #: adm.macros.php:173
 msgid "CONFIGURATION OF MACROS"
-msgstr ""
+msgstr "CONFIGURARE MACRO-URI"
 
 #: include/views/configuration.maintenance.edit.php:23
 #: include/views/configuration.maintenance.list.php:28
 msgid "CONFIGURATION OF MAINTENANCE PERIODS"
-msgstr ""
+msgstr "CONFIGURARE PERIOADE DE MENTENANȚĂ"
 
 #: include/views/administration.mediatypes.edit.php:23
 #: include/views/administration.mediatypes.list.php:27
 msgid "CONFIGURATION OF MEDIA TYPES"
-msgstr ""
+msgstr "CONFIGURARE TIPURI DE MEDIA"
 
 #: sysmap.php:121 sysmaps.php:215
 msgid "CONFIGURATION OF NETWORK MAPS"
-msgstr ""
+msgstr "CONFIGURARE HĂRȚI DE REȚEA"
 
 #: include/views/administration.node.edit.php:25
 #: include/views/administration.node.list.php:60
 msgid "CONFIGURATION OF NODES"
-msgstr ""
+msgstr "CONFIGURARE NODURI"
 
 #: include/views/administration.proxy.edit.php:23
 #: include/views/administration.proxy.list.php:33
 msgid "CONFIGURATION OF PROXIES"
-msgstr ""
+msgstr "CONFIGURARE PROXY-URI"
 
 #: adm.regexps.php:226
 msgid "CONFIGURATION OF REGULAR EXPRESSIONS"
-msgstr ""
+msgstr "CONFIGURARE EXPRESII REGULATE"
 
 #: include/views/configuration.screen.constructor.list.php:25
 msgid "CONFIGURATION OF SCREEN"
-msgstr ""
+msgstr "CONFIGURARE ECRAN"
 
 #: include/views/configuration.screen.edit.php:23
 #: include/views/configuration.screen.list.php:35
 msgid "CONFIGURATION OF SCREENS"
-msgstr ""
+msgstr "CONFIGURARE ECRANE"
 
 #: include/views/administration.script.edit.php:28
 #: include/views/administration.script.list.php:26
 msgid "CONFIGURATION OF SCRIPTS"
-msgstr ""
+msgstr "CONFIGURARE SCRIPTURI"
 
 #: include/views/configuration.slideconf.edit.php:25
 #: include/views/configuration.slideconf.list.php:28
 msgid "CONFIGURATION OF SLIDE SHOWS"
-msgstr ""
+msgstr "CONFIGURARE SLIDE SHOW-URI"
 
 #: templates.php:422 templates.php:442
 msgid "CONFIGURATION OF TEMPLATES"
-msgstr ""
+msgstr "CONFIGURAREA TEMPLATE-URILOR"
 
 #: include/views/configuration.triggers.edit.php:37
 #: include/views/configuration.triggers.list.php:41
 #: include/views/configuration.triggers.massupdate.php:37
 msgid "CONFIGURATION OF TRIGGER PROTOTYPES"
-msgstr ""
+msgstr "CONFIGURARE PROTOTIPURILOR DE TRIGGER"
 
 #: adm.triggerseverities.php:94
 msgid "CONFIGURATION OF TRIGGER SEVERITIES"
-msgstr ""
+msgstr "CONFIGURARE SEVERITĂȚII TRIGGERILOR"
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:45
 #: include/views/configuration.triggers.massupdate.php:40 triggers.php:376
 msgid "CONFIGURATION OF TRIGGERS"
-msgstr ""
+msgstr "CONFIGURARE TRIGGERI"
 
 #: include/views/administration.users.edit.php:30
 msgid "CONFIGURATION OF USER"
-msgstr ""
+msgstr "CONFIGURARE UTILIZATORI"
 
 #: include/views/administration.usergroups.edit.php:23
 msgid "CONFIGURATION OF USER GROUP"
-msgstr ""
+msgstr "CONFIGURARE GRUP UTILIZATORI"
 
 #: include/views/administration.usergroups.list.php:31
 #: include/views/administration.users.list.php:31
 msgid "CONFIGURATION OF USERS AND USER GROUPS"
-msgstr ""
+msgstr "CONFIGURARE GRUPURI DE UTILIZATORI"
 
 #: adm.valuemapping.php:143
 msgid "CONFIGURATION OF VALUE MAPPING"
-msgstr ""
+msgstr "CONFIGURARE MAPARE VALOARE"
 
 #: include/views/configuration.httpconf.edit.php:25
 #: include/views/configuration.httpconf.list.php:37
 msgid "CONFIGURATION OF WEB MONITORING"
-msgstr ""
+msgstr "CONFIGURARE MONITORIZARE WEB"
 
 #: adm.workingtime.php:76
 msgid "CONFIGURATION OF WORKING TIME"
-msgstr ""
+msgstr "CONFIGURARE TIMP DE LUCRU"
 
 #: adm.triggerdisplayoptions.php:89
 msgid "CONFIGURATION OF ZABBIX"
-msgstr ""
+msgstr "CONFIGURARE ZABBIX"
 
 #: include/views/configuration.services.edit.php:62 services.php:45
 msgid "Calculate SLA, acceptable SLA (in %)"
-msgstr ""
+msgstr "Calculul SLA, SLA acceptabil (în %)"
 
 #: include/items.inc.php:92 include/views/configuration.graph.edit.php:162
 #: include/views/configuration.graph.edit.php:220
 msgid "Calculated"
-msgstr ""
+msgstr "Calculat"
 
 #: include/views/administration.usergroups.edit.php:114
 msgid "Calculated permissions"
-msgstr ""
+msgstr "Permisiuni calculate"
 
 #: include/hosts.inc.php:66
 msgid "Callback"
-msgstr ""
+msgstr "Apelare inversă"
 
 #: api/classes/CTemplate.php:1410
 msgid "Can't add group"
-msgstr ""
+msgstr "Nu se poate adăuga grupul"
 
 #: api/classes/CTemplate.php:1486 api/classes/CTemplate.php:1496
 msgid "Can't link template"
-msgstr ""
+msgstr "Nu se poate face legătura la template"
 
 #: api/classes/CTemplate.php:1421
 msgid "Can't remove group"
-msgstr ""
+msgstr "Nu se poate șterge grupul"
 
 #: api/classes/CTemplate.php:1457 api/classes/CTemplate.php:1475
 msgid "Can't unlink template"
-msgstr ""
+msgstr "Nu se poate desface legătura la template"
 
 #: include/views/administration.mediatypes.edit.php:88
 msgid "Canada (136 characters)"
-msgstr ""
+msgstr "Canada (136 caractere)"
 
 #: include/classes/class.cbuttoncancel.php:25 include/config.inc.php:267
 #: include/forms.inc.php:1707 include/forms.inc.php:2010
@@ -1121,529 +1134,529 @@ msgstr ""
 #: include/views/js/configuration.discovery.edit.js.php:69
 #: include/views/js/general.script.confirm.js.php:41 tr_logform.php:372
 msgid "Cancel"
-msgstr ""
+msgstr "Anulează"
 
 #: acknow.php:119
 msgid "Cannot acknowledge event"
-msgstr ""
+msgstr "Nu se poate confirma evenimentul"
 
 #: actionconf.php:149
 msgid "Cannot add action"
-msgstr ""
+msgstr "Nu se poate adăuga acțiunea"
 
 #: applications.php:129
 msgid "Cannot add application"
-msgstr ""
+msgstr "Nu se poate adăuga aplicația"
 
 #: api/classes/CTrigger.php:1713
 msgid "Cannot add dependency from a host to a template."
-msgstr ""
+msgstr "Nu se poate adăuga dependința server - template"
 
 #: include/triggers.inc.php:501
 #, php-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
-msgstr ""
+msgstr "Nu se poate adăuga dependința trigger \"%1$s:%2$s\" la trigger nonexistent \"%3$s:%4$s\"."
 
 #: host_discovery.php:233
 msgid "Cannot add discovery rule"
-msgstr ""
+msgstr "Nu se poate adăuga regula de detecție"
 
 #: graphs.php:246
 msgid "Cannot add graph"
-msgstr ""
+msgstr "Nu se poate adăuga graficul"
 
 #: hostgroups.php:145 usergrps.php:173
 msgid "Cannot add group"
-msgstr ""
+msgstr "Nu se poate adăuga grupul"
 
 #: hosts.php:327
 msgid "Cannot add host"
-msgstr ""
+msgstr "Nu se poate adăuga serverul"
 
 #: adm.images.php:62
 msgid "Cannot add image"
-msgstr ""
+msgstr "Nu se poate adăuga imaginea"
 
 #: include/classes/import/CXmlImport18.php:632
 msgid "Cannot add image."
-msgstr ""
+msgstr "Nu se poate adăuga imaginea."
 
 #: disc_prototypes.php:277 items.php:450 screenedit.php:180
 msgid "Cannot add item"
-msgstr ""
+msgstr "Nu se poate adăuga elementul"
 
 #: adm.macros.php:120
 msgid "Cannot add macro."
-msgstr ""
+msgstr "Nu se poate adăuga macro-ul."
 
 #: maintenance.php:137
 msgid "Cannot add maintenance"
-msgstr ""
+msgstr "Nu se poate adăuga mentenanța"
 
 #: media_types.php:118
 msgid "Cannot add media type"
-msgstr ""
+msgstr "Nu se poate adăuga tipul de media"
 
 #: api/classes/CGraphGeneral.php:84
 #, php-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
-msgstr ""
+msgstr "Nu se pot adăuga mai mult de un element de tipul \"Sum grafic\" la graficul \"%1$s\"."
 
 #: sysmaps.php:170
 msgid "Cannot add network map"
-msgstr ""
+msgstr "Nu se poate adăuga harta rețea"
 
 #: httpconf.php:256
 msgid "Cannot add new application."
-msgstr ""
+msgstr "Nu se poate adăuga aplicație nouă"
 
 #: nodes.php:77
 msgid "Cannot add node"
-msgstr ""
+msgstr "Nu se poate adăuga nodul"
 
 #: proxies.php:111
 msgid "Cannot add proxy"
-msgstr ""
+msgstr "Nu se poate adăuga proxy"
 
 #: adm.regexps.php:105
 msgid "Cannot add regular expression"
-msgstr ""
+msgstr "Nu se poate adăuga expresia regulată"
 
 #: httpconf.php:210
 msgid "Cannot add scenario"
-msgstr ""
+msgstr "Nu se pate adăuga scenariul"
 
 #: screenconf.php:178
 msgid "Cannot add screen"
-msgstr ""
+msgstr "Nu se poate adăuga ecranul"
 
 #: scripts.php:87 scripts.php:91 scripts.php:117
 msgid "Cannot add script"
-msgstr ""
+msgstr "Nu se poate adăuga scriptul"
 
 #: services.php:163
 msgid "Cannot add service"
-msgstr ""
+msgstr "Nu se poate adăuga serviciul"
 
 #: slideconf.php:105
 msgid "Cannot add slide show"
-msgstr ""
+msgstr "Nu se poate adăuga slide show"
 
 #: templates.php:183
 msgid "Cannot add template"
-msgstr ""
+msgstr "Nu se poate adăuga template-ul"
 
 #: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
 #: tr_logform.php:147
 msgid "Cannot add trigger"
-msgstr ""
+msgstr "Nu se poate adăuga trigger-ul"
 
 #: users.php:196
 msgid "Cannot add user"
-msgstr ""
+msgstr "Nu se poate adăuga utilizatorul"
 
 #: users.php:150
 msgid "Cannot add user. Both passwords must be equal."
-msgstr ""
+msgstr "Nu se poate adăuga utilizatorul. Ambele parole trebuie să fie egale."
 
 #: api/classes/CUserGroup.php:363
 msgid "Cannot add users."
-msgstr ""
+msgstr "Nu se pot adăuga utilizatorii."
 
 #: adm.valuemapping.php:72
 msgid "Cannot add value map"
-msgstr ""
+msgstr "Nu se poate adăuga valoare hartă"
 
 #: authentication.php:163
 msgid "Cannot change authentication method to HTTP"
-msgstr ""
+msgstr "Nu se poate schimba metoda de autentificare la HTTP"
 
 #: authentication.php:126
 msgid "Cannot change authentication method to LDAP"
-msgstr ""
+msgstr "Nu se poate schimba metoda de autentificare la LDAP"
 
 #: authentication.php:88
 msgid "Cannot change authentication method to Zabbix internal"
-msgstr ""
+msgstr "Nu se poate schimba metoda de autentificare la Zabbix intern"
 
 #: items.php:472
 msgid "Cannot clear history"
-msgstr ""
+msgstr "Nu se poate șterge istoricul"
 
 #: api/classes/CDiscoveryRule.php:1163
 msgid "Cannot clone graph prototypes."
-msgstr ""
+msgstr "Nu se pot clona prototipurile de grafic."
 
 #: api/classes/CDiscoveryRule.php:1048
 msgid "Cannot clone item prototypes."
-msgstr ""
+msgstr "Nu se pot clona prototipurile de element."
 
 #: api/classes/CDiscoveryRule.php:805
 msgid "Cannot clone trigger prototypes."
-msgstr ""
+msgstr "Nu se pot clona prototipurile de trigger."
 
 #: scripts_exec.php:64
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
-msgstr ""
+msgstr "Nu se poate conecta la portul de trapp al demonului zabbix, dar ar trebui să fie disponibil pentru a putea rula scriptul."
 
 #: graphs.php:310
 msgid "Cannot copy graphs"
-msgstr ""
+msgstr "Nu se pot copia graficele"
 
 #: items.php:605
 msgid "Cannot copy items"
-msgstr ""
+msgstr "Nu se pot copia elementele"
 
 #: include/triggers.inc.php:408
 #, php-format
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
-msgstr ""
+msgstr "Nu se poate copia trigge-rul \"%1$s:%2$s\", deoarece are servere multiple in expresie."
 
 #: include/db.inc.php:54
 msgid "Cannot create another database connection."
-msgstr ""
+msgstr "Nu se poate crea o altă conexiune la baza de date."
 
 #: api/classes/CTrigger.php:1747
 msgid "Cannot create circular dependencies."
-msgstr ""
+msgstr "Nu se pot crea dependințe circulare."
 
 #: api/classes/CTrigger.php:1719
 msgid "Cannot create dependency on trigger itself."
-msgstr ""
+msgstr "Nu se poate crea dependința cu trigger-ul însuși."
 
 #: discoveryconf.php:151
 msgid "Cannot create discovery rule"
-msgstr ""
+msgstr "Nu se poate crea regula de detecție"
 
 #: api/classes/CHostGroup.php:647
 msgid "Cannot create group without name."
-msgstr ""
+msgstr "Nu se poate crea un grup fără nume."
 
 #: api/classes/CHost.php:1775
 msgid "Cannot create host group."
-msgstr ""
+msgstr "Nu se poate crea grupul de servere."
 
 #: adm.iconmapping.php:82
 msgid "Cannot create icon map"
-msgstr ""
+msgstr "Nu se poate crea harta icoane."
 
 #: api/classes/CIconMap.php:259 api/classes/CIconMap.php:319
 #, php-format
 msgid "Cannot create icon maps with identical name \"%s\"."
-msgstr ""
+msgstr "Nu se pot crea hărți de icoane cu nume identice \"%s\"."
 
 #: include/classes/import/CXmlImport18.php:816
 #, php-format
 msgid "Cannot create map \"%s\"."
-msgstr ""
+msgstr "Nu se poate crea harta \"%s\"."
 
 #: include/js.inc.php:265
 msgid "Cannot create new element"
-msgstr ""
+msgstr "Nu se poate crea un element nou"
 
 #: include/classes/import/CXmlImport18.php:1709
 msgid "Cannot create screen."
-msgstr ""
+msgstr "Nu se poate crea ecranul."
 
 #: api/classes/CUser.php:370
 #, php-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
-msgstr ""
+msgstr "Nu se poate șterge utilizatorul intern Zabbix \"%1$s\", încercați să dezactivați acest utilizator."
 
 #: actionconf.php:170
 msgid "Cannot delete action"
-msgstr ""
+msgstr "Nu se poate șterge acțiunea"
 
 #: applications.php:155 applications.php:186
 msgid "Cannot delete application"
-msgstr ""
+msgstr "Nu se poate șterge aplicația"
 
 #: api/classes/CTrigger.php:1441
 msgid "Cannot delete dependency"
-msgstr ""
+msgstr "Nu se poate șterge dependința"
 
 #: api/classes/CDiscoveryRule.php:628 discoveryconf.php:164
 #: host_discovery.php:166
 msgid "Cannot delete discovery rule"
-msgstr ""
+msgstr "Nu se poate șterge regula de detecție"
 
 #: host_discovery.php:250
 msgid "Cannot delete discovery rules"
-msgstr ""
+msgstr "Nu se pot șterge regulile de detecție"
 
 #: graphs.php:257
 msgid "Cannot delete graph"
-msgstr ""
+msgstr "Nu se poate șterge graficul"
 
 #: api/classes/CItemPrototype.php:768
 msgid "Cannot delete graph prototype"
-msgstr ""
+msgstr "Nu se poate șterge prototipul graficului"
 
 #: api/classes/CItem.php:985
 msgid "Cannot delete graph."
-msgstr ""
+msgstr "Nu se poate șterge graficul."
 
 #: graphs.php:264
 msgid "Cannot delete graphs"
-msgstr ""
+msgstr "Nu se pot șterge graficele"
 
 #: api/classes/CGraphPrototype.php:786
 msgid "Cannot delete graphs created by low level discovery."
-msgstr ""
+msgstr "Nu se pot șterge graficele create de detecția automată."
 
 #: hostgroups.php:155 hostgroups.php:166 usergrps.php:191 usergrps.php:219
 msgid "Cannot delete group"
-msgstr ""
+msgstr "Nu se poate șterge grupul"
 
 #: hosts.php:508 hosts.php:532
 msgid "Cannot delete host"
-msgstr ""
+msgstr "Nu se poate șterge serverul"
 
 #: api/classes/CHost.php:1786
 msgid "Cannot delete host group."
-msgstr ""
+msgstr "Nu se poate șterge grupul serverului."
 
 #: adm.iconmapping.php:95
 msgid "Cannot delete icon map"
-msgstr ""
+msgstr "Nu se poate șterge icon-ul hărții"
 
 #: adm.images.php:116
 msgid "Cannot delete image"
-msgstr ""
+msgstr "Nu se poate șterge imaginea"
 
 #: api/classes/CHost.php:1879
 msgid "Cannot delete inventory."
-msgstr ""
+msgstr "Nu se poate șterge inventarul."
 
 #: disc_prototypes.php:188 items.php:348 screenedit.php:199
 msgid "Cannot delete item"
-msgstr ""
+msgstr "Nu se poate șterge elementul"
 
 #: disc_prototypes.php:299 items.php:651
 msgid "Cannot delete items"
-msgstr ""
+msgstr "Nu se pot șterge elementele"
 
 #: api/classes/CItemPrototype.php:785
 msgid "Cannot delete items created by low level discovery."
-msgstr ""
+msgstr "Nu se pot șterge elementele create de detecția automată."
 
 #: maintenance.php:237
 msgid "Cannot delete maintenance"
-msgstr ""
+msgstr "Nu se poate șterge mentenanța"
 
 #: media_types.php:131 media_types.php:170
 msgid "Cannot delete media type"
-msgstr ""
+msgstr "Nu se poate șterge tipul media"
 
 #: sysmaps.php:191
 msgid "Cannot delete network map"
-msgstr ""
+msgstr "Nu se poate șterge harta rețea"
 
 #: nodes.php:93
 msgid "Cannot delete node"
-msgstr ""
+msgstr "Nu se poate șterge nodul"
 
 #: proxies.php:129 proxies.php:175
 msgid "Cannot delete proxy"
-msgstr ""
+msgstr "Nu se poate șterge proxy"
 
 #: adm.regexps.php:139
 msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nu se poate șterge expresia regulată"
+msgstr[1] "Nu se pot șterge expresile regulate"
+msgstr[2] "Nu se pot șterge expresile regulate"
 
 #: httpconf.php:185
 msgid "Cannot delete scenario"
-msgstr ""
+msgstr "Nu se poate șterge scenariul"
 
 #: screenconf.php:226
 msgid "Cannot delete screen"
-msgstr ""
+msgstr "Nu se poate șterge ecranul"
 
 #: scripts.php:139 scripts.php:155
 msgid "Cannot delete script"
-msgstr ""
+msgstr "Nu se poate șterge scriptul"
 
 #: api/classes/CScript.php:413
 msgid "Cannot delete scripts. Empty input parameter \"scriptids\"."
-msgstr ""
+msgstr "Nu se pot șterge scripturile. Parametrul \"scriptids\" este gol."
 
 #: api/classes/CScript.php:437
 #, php-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
-msgstr ""
+msgstr "Nu se pot șterge scripturile. Scriptul \"%1$s\" este folosit in acțiunea \"%2$s\"."
 
 #: api/classes/CScript.php:426
 #, php-format
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
-msgstr ""
+msgstr "Nu se pot șterge scripturile. Scriptul cu scriptid \"%s\" nu există."
 
 #: actionconf.php:308
 msgid "Cannot delete selected actions"
-msgstr ""
+msgstr "Nu se pot șterge acțiunile selectate"
 
 #: services.php:116
 msgid "Cannot delete service"
-msgstr ""
+msgstr "Nu se poate șterge serviciul"
 
 #: slideconf.php:118 slideconf.php:139
 msgid "Cannot delete slide show"
-msgstr ""
+msgstr "Nu se poate șterge slide show-ul"
 
 #: templates.php:353 templates.php:371 templates.php:396
 msgid "Cannot delete template"
-msgstr ""
+msgstr "Nu se poate șterge template-ul"
 
 #: api/classes/CGraph.php:713 api/classes/CGraphPrototype.php:761
 msgid "Cannot delete templated graphs."
-msgstr ""
+msgstr "Nu se pot șterge graficele bazate pe template-uri."
 
 #: api/classes/CItem.php:949
 msgid "Cannot delete templated item."
-msgstr ""
+msgstr "Nu se pote șterge un element bazat pe template."
 
 #: api/classes/CItemPrototype.php:729
 msgid "Cannot delete templated items"
-msgstr ""
+msgstr "Nu se pot șterge elementele bazate pe template-uri"
 
 #: api/classes/CDiscoveryRule.php:587
 msgid "Cannot delete templated items."
-msgstr ""
+msgstr "Nu se pot șterge elementele bazate pe template-uri."
 
 #: api/classes/CTrigger.php:1027 api/classes/CTriggerPrototype.php:925
 #, php-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
-msgstr ""
+msgstr "Nu se poate șterge trigger-ul \"%1$s:%2$s\" bazat pe template."
 
 #: trigger_prototypes.php:177 triggers.php:166
 msgid "Cannot delete trigger"
-msgstr ""
+msgstr "Nu se poate șterge trigger-ul"
 
 #: api/classes/CItemPrototype.php:800
 msgid "Cannot delete trigger prototype"
-msgstr ""
+msgstr "Nu se poate șterge prototipul trigger-ului"
 
 #: api/classes/CItem.php:1001
 msgid "Cannot delete trigger."
-msgstr ""
+msgstr "Nu se poate șterge trigger-ul."
 
 #: trigger_prototypes.php:287 triggers.php:353
 msgid "Cannot delete triggers"
-msgstr ""
+msgstr "Nu se pot șterge triggerii"
 
 #: api/classes/CTriggerPrototype.php:963
 msgid "Cannot delete triggers created by low level discovery."
-msgstr ""
+msgstr "Nu se pot șterge trigerii creați de detecția automată."
 
 #: users.php:232 users.php:318
 msgid "Cannot delete user"
-msgstr ""
+msgstr "Nu se poate șterge utilizatorul"
 
 #: api/classes/CUser.php:786
 msgid "Cannot delete user media."
-msgstr ""
+msgstr "Nu se poate șterge media utilizator."
 
 #: adm.valuemapping.php:88
 msgid "Cannot delete value map"
-msgstr ""
+msgstr "Nu se poate șterge valoare hartă"
 
 #: media_types.php:163
 msgid "Cannot disable media type"
-msgstr ""
+msgstr "Nu se poate dezactiva tipul media"
 
 #: media_types.php:147
 msgid "Cannot enable media type"
-msgstr ""
+msgstr "Nu se poate activa tipul media"
 
 #: include/classes/import/CXmlImport18.php:676
 #: include/classes/import/importers/CMapImporter.php:188
 #, php-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Nu se poate găsi imaginea de fundal \"%1$s\" folosită în harta \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:506
 #: include/classes/import/CXmlImport18.php:1666
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
 #, php-format
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "Nu se poate găsi graficul \"%1$s\" folosit în ecranul \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:723
 #: include/classes/import/importers/CMapImporter.php:210
 #, php-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Nu se poate găsi grupul \"%1$s\" folosit în harta \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:483
 #: include/classes/import/importers/CAbstractScreenImporter.php:53
 #, php-format
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "Nu se poate găsi grupul \"%1$s\" folosit în ecranul \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:734
 #: include/classes/import/importers/CMapImporter.php:218
 #, php-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Nu se poate găsi serverul \"%1$s\" folosit în harta \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:495
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
 #, php-format
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "Nu se poate găsi serverul \"%1$s\" folosit în ecranul \"%2$s\"."
 
 #: api/classes/CDiscoveryRule.php:964 api/classes/CDiscoveryRule.php:1036
 #: api/classes/CItemGeneral.php:584 include/items.inc.php:288
 #: include/items.inc.php:344
 #, php-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
-msgstr ""
+msgstr "Nu se poate găsi interfața serverului \"%1$s\" pentru elementul \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:767
 #: include/classes/import/importers/CMapImporter.php:247
 #, php-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Nu se poate găsi icon-ul \"%1$s\" folosit în harta \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:180
 #, php-format
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Nu se poate găsi icon-ul hartă \"%1$s\" folosit în harta \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:519
 #: include/classes/import/CXmlImport18.php:1679
 #: include/classes/import/importers/CAbstractScreenImporter.php:82
 #, php-format
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "Nu se poate găsi elementul \"%1$s\" folosit în ecranul \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:712
 #, php-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
-msgstr ""
+msgstr "Nu se poate găsi harta \"%1$s\" folosită în harta exportată \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:202
 #, php-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Nu se poate găsi harta \"%1$s\" folosită în harta \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:530
 #: include/classes/import/importers/CAbstractScreenImporter.php:90
 #, php-format
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "Nu se poate găsi harta \"%1$s\" folosită în ecranul \"%2$s\"."
 
 #: include/js.inc.php:248
 msgid "Cannot find objects with name"
-msgstr ""
+msgstr "Nu se pot găsi obiectele cu numele"
 
 #: include/classes/import/CXmlImport18.php:541
 #: include/classes/import/importers/CAbstractScreenImporter.php:98
 #, php-format
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "Nu se poate găsi ecranul \"%1$s\" folosit în ecranul \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:745
 #: include/classes/import/CXmlImport18.php:788
@@ -1651,514 +1664,514 @@ msgstr ""
 #: include/classes/import/importers/CMapImporter.php:268
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Nu se poate găsi trigger-ul \"%1$s\" folosit în harta \"%2$s\"."
 
 #: srv_status.php:186
 msgid "Cannot format Tree. Check logic structure in service links."
-msgstr ""
+msgstr "Nu se poate formata arborele. Verificați structura logică în legăturile cu serviciul."
 
 #: services.php:477
 msgid "Cannot format tree."
-msgstr ""
+msgstr "Nu se poate formata arborele."
 
 #: api/classes/CTemplate.php:1380
 msgid "Cannot have empty visible template name"
-msgstr ""
+msgstr "Numele vizibil al template-ului nu poate fi gol"
 
 #: api/classes/CTrigger.php:1472 api/classes/CTrigger.php:1547
 #: api/classes/CTriggerPrototype.php:1006
 #: api/classes/CTriggerPrototype.php:1064
 #, php-format
 msgid "Cannot implode expression \"%s\"."
-msgstr ""
+msgstr "Nu se poate compacta expresia \"%s\"."
 
 #: include/classes/import/importers/CScreenImporter.php:78
 #, php-format
 msgid "Cannot import screen \"%2$s\": subscreen \"%3$s\" does not exist."
 msgid_plural "Cannot import screen \"%2$s\": subscreens \"%3$s\" do not exist."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nu se poate importa ecranul \"%2$s\": subecranul \"%3$s\" nu există."
+msgstr[1] "Nu se poate importa ecranul \"%2$s\": subecranele \"%3$s\" nu există."
+msgstr[2] "Nu se poate importa ecranul \"%2$s\": subecranele \"%3$s\" nu există."
 
 #: include/classes/import/importers/CTemplateImporter.php:114
 #, php-format
 msgid "Cannot import template \"%2$s\", linked template \"%3$s\" does not exist."
 msgid_plural "Cannot import template \"%2$s\", linked templates \"%3$s\" does not exist."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nu se poate importa template-ul \"%2$s\", template-ul legat \"%3$s\" nu există."
+msgstr[1] "Nu se poate importa template-ul \"%2$s\", template-urile legate \"%3$s\" nu există."
+msgstr[2] "Nu se poate importa template-ul \"%2$s\", template-urile legate \"%3$s\" nu există."
 
 #: include/classes/class.cview.php:113
 #, php-format
 msgid "Cannot include view file \"%s\"."
-msgstr ""
+msgstr "Nu se poate include vezi fișier \"%s\"."
 
 #: api/classes/CUser.php:815
 msgid "Cannot insert user media."
-msgstr ""
+msgstr "Nu se poate insera media utilizator."
 
 #: api/classes/CHost.php:1858
 msgid "Cannot link template"
-msgstr ""
+msgstr "Nu se poate lega template-ul"
 
 #: api/classes/CUser.php:880
 msgid "Cannot logout."
-msgstr ""
+msgstr "Nu se poate face logout."
 
 #: api/classes/CHost.php:1682
 msgid "Cannot mass update host name."
-msgstr ""
+msgstr "Nu se poate face actualizare în masă a numelui serverului."
 
 #: api/classes/CTemplate.php:1339
 msgid "Cannot mass update template name"
-msgstr ""
+msgstr "Nu se poate face actualizare în masă a numelui template-ului."
 
 #: api/classes/CHost.php:1672
 msgid "Cannot mass update visible host name."
-msgstr ""
+msgstr "Nu se poate face actualizare în masă a numelui vizibil al serverului."
 
 #: api/classes/CTemplate.php:1312
 msgid "Cannot mass update visible template name"
-msgstr ""
+msgstr "Nu se poate face actualizare în masă a numelui vizibil al template-ului."
 
 #: api/classes/CHostGeneral.php:160
 #, php-format
 msgid "Cannot pass duplicate template IDs for the linkage: %s."
-msgstr ""
+msgstr "Nu se pot valida ID-urile duplicat pentru legatura: %s."
 
 #: include/classes/db/DB.php:614
 #, php-format
 msgid "Cannot perform delete statement on table \"%1$s\" without where condition."
-msgstr ""
+msgstr "Nu se poate efectua instrucțiunea de ștergere în tabela \"%1$s\" fără condiția \"where\"."
 
 #: include/classes/db/DB.php:437
 #, php-format
 msgid "Cannot perform update statement on table \"%1$s\" without values."
-msgstr ""
+msgstr "Nu se poate efectua instrucțiunea de actualizare în tabela \"%1$s\" fără valori."
 
 #: include/classes/db/DB.php:448
 #, php-format
 msgid "Cannot perform update statement on table \"%1$s\" without where condition."
-msgstr ""
+msgstr "Nu se poate efectua instrucțiunea de actualizare în tabela \"%1$s\" fără condiția \"where\"."
 
 #: adm.macros.php:104
 msgid "Cannot remove macro."
-msgstr ""
+msgstr "Nu se poate șterge macro-ul."
 
 #: api/classes/CUser.php:380
 msgid "Cannot rename guest user."
-msgstr ""
+msgstr "Nu se poate redenumi utilizatorul guest."
 
 #: api/classes/CDRule.php:445
 msgid "Cannot save discovery rule without checks."
-msgstr ""
+msgstr "Nu se poate salva regula de detecție fără verificări."
 
 #: api/classes/CApplication.php:459
 #, php-format
 msgid "Cannot set \"templateid\" for application \"%1$s\"."
-msgstr ""
+msgstr "Nu se poate seta \"templateid\" pentru aplicația \"%1$s\"."
 
 #: api/classes/CGraphGeneral.php:62
 #, php-format
 msgid "Cannot set \"templateid\" for graph \"%1$s\"."
-msgstr ""
+msgstr "Nu se poate seta \"templateid\" pentru graficul \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:223
 #, php-format
 msgid "Cannot set \"templateid\" for item \"%1$s\"."
-msgstr ""
+msgstr "Nu se poate seta \"templateid\" pentru elementul \"%1$s\"."
 
 #: api/classes/CScreen.php:437
 #, php-format
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
-msgstr ""
+msgstr "Nu se poate seta \"templateid\" pentru ecranul \"%1$s\"."
 
 #: api/classes/CTrigger.php:1012
 #, php-format
 msgid "Cannot set \"templateid\" for trigger \"%1$s\"."
-msgstr ""
+msgstr "Nu se poate seta \"templateid\" pentru trigger-ul \"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:759
 #, php-format
 msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
-msgstr ""
+msgstr "Nu se poate seta \"templateid\" pentru prototipul trigger-ului \"%1$s\"."
 
 #: api/classes/CHostInterface.php:510
 msgid "Cannot switch host for interface."
-msgstr ""
+msgstr "Nu se poate schimba serverul pentru interfață."
 
 #: users.php:294
 msgid "Cannot unblock users"
-msgstr ""
+msgstr "Nu se pot debloca utilizatorii"
 
 #: api/classes/CHostGeneral.php:704
 msgid "Cannot unlink and clear applications"
-msgstr ""
+msgstr "Nu se pot deconecta și șterge aplicațiile"
 
 #: api/classes/CHostGeneral.php:557
 msgid "Cannot unlink and clear discovery rules"
-msgstr ""
+msgstr "Nu se pot deconecta și șterge regulile de detecție"
 
 #: api/classes/CHostGeneral.php:646
 msgid "Cannot unlink and clear graph prototypes"
-msgstr ""
+msgstr "Nu se pot deconecta și șterge prototipurile graficului"
 
 #: api/classes/CHostGeneral.php:664
 msgid "Cannot unlink and clear graphs."
-msgstr ""
+msgstr "Nu se pot deconecta și șterge graficele"
 
 #: api/classes/CHostGeneral.php:593
 msgid "Cannot unlink and clear item prototypes"
-msgstr ""
+msgstr "Nu se pot deconecta și șterge prototipurile elementului"
 
 #: api/classes/CHostGeneral.php:575
 msgid "Cannot unlink and clear items"
-msgstr ""
+msgstr "Nu se pot deconecta și șterge elementele"
 
 #: api/classes/CHostGeneral.php:495 api/classes/CHostGeneral.php:512
 msgid "Cannot unlink and clear triggers"
-msgstr ""
+msgstr "Nu se pot deconecta și șterge trigerii"
 
 #: api/classes/CHost.php:1849
 msgid "Cannot unlink template"
-msgstr ""
+msgstr "Nu se poate deconecta template-ul"
 
 #: api/classes/CHostGeneral.php:449
 #, php-format
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
-msgstr ""
+msgstr "Nu se poate deconecta trigger-ul \"%s\", el are elemente din template-ul care este lăsat conectat la server."
 
 #: api/classes/CApplication.php:456
 #, php-format
 msgid "Cannot update \"templateid\" for application \"%1$s\"."
-msgstr ""
+msgstr "Nu se poate actualiza \"templateid\" pentru aplicația \"%1$s\"."
 
 #: api/classes/CGraphGeneral.php:59
 #, php-format
 msgid "Cannot update \"templateid\" for graph \"%1$s\"."
-msgstr ""
+msgstr "Nu se poate actualiza \"templateid\" pentru graficul \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:184
 #, php-format
 msgid "Cannot update \"templateid\" for item \"%1$s\"."
-msgstr ""
+msgstr "Nu se poate actualiza \"templateid\" pentru elementul \"%1$s\"."
 
 #: api/classes/CScreen.php:508 api/classes/CTemplateScreen.php:739
 #, php-format
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
-msgstr ""
+msgstr "Nu se poate actualiza \"templateid\" pentru ecranul \"%1$s\"."
 
 #: api/classes/CTrigger.php:1009
 #, php-format
 msgid "Cannot update \"templateid\" for trigger \"%1$s\"."
-msgstr ""
+msgstr "Nu se poate actualiza \"templateid\" pentru trigger-ul \"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:831
 #, php-format
 msgid "Cannot update \"templateid\" for trigger prototype \"%1$s\"."
-msgstr ""
+msgstr "Nu se poate actualiza \"templateid\" pentru prototipul trigger-ului \"%1$s\"."
 
 #: actionconf.php:145
 msgid "Cannot update action"
-msgstr ""
+msgstr "Nu se poate actualiza acțiunea"
 
 #: applications.php:122
 msgid "Cannot update application"
-msgstr ""
+msgstr "Nu se poate actualiza aplicația"
 
 #: tr_comments.php:63
 msgid "Cannot update comment"
-msgstr ""
+msgstr "Nu se poate actualiza comentariul"
 
 #: adm.gui.php:66 adm.housekeeper.php:53 adm.other.php:58
 #: adm.triggerdisplayoptions.php:65 adm.triggerseverities.php:69
 #: adm.workingtime.php:46
 msgid "Cannot update configuration"
-msgstr ""
+msgstr "Nu se poate actualiza configurația"
 
 #: usergrps.php:275
 msgid "Cannot update debug mode"
-msgstr ""
+msgstr "Nu se poate actualiza modul de depanare"
 
 #: discoveryconf.php:145 host_discovery.php:229
 msgid "Cannot update discovery rule"
-msgstr ""
+msgstr "Nu se poate actualiza regula de detecție"
 
 #: usergrps.php:246
 msgid "Cannot update frontend access"
-msgstr ""
+msgstr "Nu se poate actualiza accesul la frontend"
 
 #: graphs.php:243
 msgid "Cannot update graph"
-msgstr ""
+msgstr "Nu se poate actualiza graficul"
 
 #: hostgroups.php:115 usergrps.php:168
 msgid "Cannot update group"
-msgstr ""
+msgstr "Nu se poate actualiza grupul"
 
 #: api/classes/CUserGroup.php:397
 msgid "Cannot update group."
-msgstr ""
+msgstr "Nu se poate actualiza grupul."
 
 #: hostgroups.php:196 hosts.php:322
 msgid "Cannot update host"
-msgstr ""
+msgstr "Nu se poate actualiza serverul"
 
 #: hosts.php:521 hosts.php:544
 msgid "Cannot update host status"
-msgstr ""
+msgstr "Nu se poate actualiza status-ul serverului "
 
 #: hosts.php:302
 msgid "Cannot update hosts"
-msgstr ""
+msgstr "Nu se pot actualiza serverele"
 
 #: adm.iconmapping.php:77
 msgid "Cannot update icon map"
-msgstr ""
+msgstr "Nu se poate actualiza icon-ul hărții"
 
 #: adm.images.php:58
 msgid "Cannot update image"
-msgstr ""
+msgstr "Nu se poate actualiza imaginea"
 
 #: include/classes/import/CXmlImport18.php:639
 msgid "Cannot update image."
-msgstr ""
+msgstr "Nu se poate actualiza imaginea."
 
 #: disc_prototypes.php:273 items.php:447 screenedit.php:173
 msgid "Cannot update item"
-msgstr ""
+msgstr "Nu se poate actualiza elementul"
 
 #: items.php:555
 msgid "Cannot update items"
-msgstr ""
+msgstr "Nu se pot actualiza elementele"
 
 #: adm.macros.php:93
 msgid "Cannot update macro."
-msgstr ""
+msgstr "Nu se poate actualiza macro-ul."
 
 #: adm.macros.php:147
 msgid "Cannot update macros"
-msgstr ""
+msgstr "Nu se pot actualiza macro-urile"
 
 #: maintenance.php:133
 msgid "Cannot update maintenance"
-msgstr ""
+msgstr "Nu se poate actualiza mentenanța"
 
 #: include/classes/import/CXmlImport18.php:807
 #, php-format
 msgid "Cannot update map \"%s\"."
-msgstr ""
+msgstr "Nu se poate actualiza harta \"%s\"."
 
 #: media_types.php:113
 msgid "Cannot update media type"
-msgstr ""
+msgstr "Nu se poate actualiza tipul media"
 
 #: sysmaps.php:160
 msgid "Cannot update network map"
-msgstr ""
+msgstr "Nu se poate actualiza harta rețea"
 
 #: nodes.php:69
 msgid "Cannot update node"
-msgstr ""
+msgstr "Nu se poate actualiza nodul"
 
 #: proxies.php:104
 msgid "Cannot update proxy"
-msgstr ""
+msgstr "Nu se poate actualiza proxy-ul"
 
 #: adm.regexps.php:99
 msgid "Cannot update regular expression"
-msgstr ""
+msgstr "Nu se poate actualiza expresia regulată"
 
 #: httpconf.php:205
 msgid "Cannot update scenario"
-msgstr ""
+msgstr "Nu se poate actualiza scenariul"
 
 #: screenconf.php:153
 msgid "Cannot update screen"
-msgstr ""
+msgstr "Nu se poate actualiza ecranul"
 
 #: include/classes/import/CXmlImport18.php:1701
 msgid "Cannot update screen."
-msgstr ""
+msgstr "Nu se poate actualiza ecranul."
 
 #: scripts.php:110
 msgid "Cannot update script"
-msgstr ""
+msgstr "Nu se poate actualiza scriptul"
 
 #: services.php:157
 msgid "Cannot update service"
-msgstr ""
+msgstr "Nu se poate actualiza serviciul"
 
 #: slideconf.php:97
 msgid "Cannot update slide show"
-msgstr ""
+msgstr "Nu se poate actualiza slide show-ul"
 
 #: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
 msgid "Cannot update status"
-msgstr ""
+msgstr "Nu se poate actualiza status-ul"
 
 #: templates.php:179
 msgid "Cannot update template"
-msgstr ""
+msgstr "Nu se poate actualiza template-ul"
 
 #: trigger_prototypes.php:163 trigger_prototypes.php:202 triggers.php:152
 #: triggers.php:203 tr_logform.php:112
 msgid "Cannot update trigger"
-msgstr ""
+msgstr "Nu se poate actualiza trigger-ul"
 
 #: profile.php:173 users.php:189 users.php:251 users.php:271
 msgid "Cannot update user"
-msgstr ""
+msgstr "Nu se poate actualiza utilizatorul"
 
 #: api/classes/CUser.php:807
 msgid "Cannot update user media."
-msgstr ""
+msgstr "Nu se poate actualiza media utilizator."
 
 #: profile.php:110 users.php:147
 msgid "Cannot update user. Both passwords must be equal."
-msgstr ""
+msgstr "Nu se poate actualiza utilizatorul. Ambele parole trebuie să fie egale."
 
 #: usergrps.php:303
 msgid "Cannot update users status"
-msgstr ""
+msgstr "Nu se poate actualiza status-ul utilizatorului"
 
 #: adm.valuemapping.php:64
 msgid "Cannot update value map"
-msgstr ""
+msgstr "Nu se poate actualiza valoare hartă"
 
 #: popup_bitem.php:115 popup_period.php:114
 msgid "Caption"
-msgstr ""
+msgstr "Titlu"
 
 #: include/forms.inc.php:1908 include/forms.inc.php:2004
 msgid "Case sensitive"
-msgstr ""
+msgstr "Majuscule semnificative"
 
 #: include/views/configuration.screen.constructor.edit.php:586
 msgid "Center"
-msgstr ""
+msgstr "Centrat"
 
 #: include/classes/screens/CScreenBase.php:258
 #: include/classes/screens/CScreenBuilder.php:419
 #: include/classes/screens/CScreenMap.php:54
 #: include/views/configuration.services.edit.php:48
 msgid "Change"
-msgstr ""
+msgstr "Schimbă"
 
 #: latest.php:195
 msgctxt "noun in latest data"
 msgid "Change"
-msgstr ""
+msgstr "Schimbă"
 
 #: include/views/administration.mediatypes.edit.php:68
 #: include/views/administration.users.edit.php:64
 msgid "Change password"
-msgstr ""
+msgstr "Modifică parola"
 
 #: include/forms.inc.php:418 include/items.inc.php:120
 #: include/triggers.inc.php:2201 include/views/configuration.item.edit.php:217
 #: include/views/configuration.item.massupdate.php:160
 msgid "Character"
-msgstr ""
+msgstr "Caracter"
 
 #: include/regexp.inc.php:192
 msgid "Character string included"
-msgstr ""
+msgstr "Șir de caractere inclus"
 
 #: include/regexp.inc.php:196
 msgid "Character string not included"
-msgstr ""
+msgstr "Șir de caractere neinclus"
 
 #: include/hosts.inc.php:239
 msgid "Chassis"
-msgstr ""
+msgstr "Șasiu"
 
 #: include/views/js/configuration.discovery.edit.js.php:286
 msgid "Check already exists."
-msgstr ""
+msgstr "Verificarea există deja."
 
 #: include/classes/parsers/CTriggerExpression.php:248
 #, php-format
 msgid "Check expression part starting from \"%1$s\"."
-msgstr ""
+msgstr "Verifică partea din expresie care începe de la \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:262
 msgid "Check the key, please. Default example was passed."
-msgstr ""
+msgstr "Vă rugăm să verificați cheia. A fost folosit exemplul implicit. "
 
 #: include/views/js/configuration.discovery.edit.js.php:23
 msgid "Check type"
-msgstr ""
+msgstr "Verificați tipul"
 
 #: include/views/configuration.discovery.edit.php:61
 #: include/views/configuration.discovery.list.php:43
 msgid "Checks"
-msgstr ""
+msgstr "Verificări"
 
 #: api/classes/CDRule.php:558
 msgid "Checks should be unique."
-msgstr ""
+msgstr "Verificările trebuie să fie unice."
 
 #: include/nodes.inc.php:248
 msgid "Child"
-msgstr ""
+msgstr "Copil"
 
 #: include/locales.inc.php:47
 msgid "Chinese (zh_CN)"
-msgstr ""
+msgstr "Chineză (zh_CN)"
 
 #: include/locales.inc.php:48
 msgid "Chinese (zh_TW)"
-msgstr ""
+msgstr "Chineză (zh_TW)"
 
 #: api/classes/CMapElement.php:533
 #, php-format
 msgid "Circular link cannot be created for map element \"%s\"."
-msgstr ""
+msgstr "Legătura circulară nu poate fi creată pentru elementul de hartă \"%s\"."
 
 #: include/classes/import/importers/CMapImporter.php:89
 #, php-format
 msgid "Circular reference in maps: %1$s."
-msgstr ""
+msgstr "Refefință circulară în hărțile: %1$s."
 
 #: include/classes/import/importers/CScreenImporter.php:104
 #, php-format
 msgid "Circular reference in screens: %1$s."
-msgstr ""
+msgstr "Refefință circulară în ecranele: %1$s."
 
 #: include/classes/import/importers/CTemplateImporter.php:139
 #, php-format
 msgid "Circular reference in templates: %1$s."
-msgstr ""
+msgstr "Refefință circulară în template-urile: %1$s."
 
 #: api/classes/CHostGeneral.php:335 api/classes/CHostGeneral.php:767
 msgid "Circular template linkage is not allowed."
-msgstr ""
+msgstr "Legătura circulară în template-uri nu este permisă."
 
 #: include/classes/core/ZBase.php:135
 msgid "Classic"
-msgstr ""
+msgstr "Clasic"
 
 #: jsLoader.php:164
 msgid "Clear"
-msgstr ""
+msgstr "Anulează"
 
 #: include/views/configuration.item.edit.php:460
 msgid "Clear history and trends"
-msgstr ""
+msgstr "Anulează istoric și tendințe"
 
 #: include/views/configuration.httpconf.list.php:137
 #: include/views/configuration.item.list.php:251
 msgid "Clear history for selected"
-msgstr ""
+msgstr "Anulează istoric pentru selecția"
 
 #: include/views/configuration.host.massupdate.php:119
 msgid "Clear when unlinking"
-msgstr ""
+msgstr "Anulează la deconectare"
 
 #: include/screens.inc.php:28
 msgid "Clock"
-msgstr ""
+msgstr "Ceas"
 
 #: include/forms.inc.php:1872
 #: include/views/administration.general.iconmap.edit.php:141
@@ -2179,18 +2192,18 @@ msgstr ""
 #: include/views/configuration.template.edit.php:435
 #: include/views/configuration.triggers.edit.php:302
 msgid "Clone"
-msgstr ""
+msgstr "Clonă"
 
 #: include/views/js/configuration.sysmaps.js.php:186
 #: include/views/js/configuration.sysmaps.js.php:275
 #: include/views/js/configuration.sysmaps.js.php:376 jsLoader.php:148
 #: jsLoader.php:172 tr_testexpr.php:175
 msgid "Close"
-msgstr ""
+msgstr "Închide"
 
 #: include/views/configuration.triggers.edit.php:233
 msgid "Close expression constructor"
-msgstr ""
+msgstr "Închide constructorul de expresii"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:26
 #: include/views/administration.general.triggerSeverity.edit.php:28
@@ -2198,48 +2211,48 @@ msgstr ""
 #: include/views/js/configuration.sysmaps.js.php:356 popup_bitem.php:47
 #: popup_bitem.php:145 popup_period.php:178
 msgid "Colour"
-msgstr ""
+msgstr "Culoare"
 
 #: include/views/js/configuration.sysmaps.js.php:341
 msgid "Colour (OK)"
-msgstr ""
+msgstr "Culoare (OK)"
 
 #: include/profiles.inc.php:279
 msgid "Colour is not correct: expecting hexadecimal colour code (6 symbols)."
-msgstr ""
+msgstr "Culoarea nu este corectă: trebuie un cod hexadecimal (6 simboluri)."
 
 #: include/views/configuration.screen.constructor.edit.php:605
 #: screenedit.php:45
 msgid "Column span"
-msgstr ""
+msgstr "Expansiune coloană"
 
 #: api/classes/CScreenItem.php:613
 #, php-format
 msgid "Column span of screen element located at X - %1$s and Y - %2$s is too big."
-msgstr ""
+msgstr "Expansiunea coloanei elementului din ecran localizat la X - %1$s și Y - %2$s este prea mare."
 
 #: include/views/configuration.screen.edit.php:40 screenconf.php:51
 msgid "Columns"
-msgstr ""
+msgstr "Coloane"
 
 #: include/forms.inc.php:1844
 msgid "Combined result"
-msgstr ""
+msgstr "Rezultat combinat"
 
 #: include/actions.inc.php:811 include/actions.inc.php:845
 #: include/actions.inc.php:900
 #: include/views/administration.auditacts.list.php:106
 #: include/views/administration.script.edit.php:68
 msgid "Command"
-msgstr ""
+msgstr "Comandă"
 
 #: tr_events.php:134
 msgid "Command actions"
-msgstr ""
+msgstr "Acțiunile comenzii"
 
 #: scripts.php:90
 msgid "Command cannot be empty."
-msgstr ""
+msgstr "Comanda nu poate fi vidă."
 
 #: include/views/administration.script.edit.php:63
 #: include/views/administration.script.list.php:40
@@ -2247,230 +2260,230 @@ msgstr ""
 #: include/views/configuration.action.edit.php:727 popup.php:1808
 #: popup.php:1815
 msgid "Commands"
-msgstr ""
+msgstr "Comenzi"
 
 #: tr_comments.php:63
 msgid "Comment updated"
-msgstr ""
+msgstr "Comentariu actualizat"
 
 #: include/acknow.inc.php:54 tr_comments.php:70 tr_comments.php:88
 #: tr_comments.php:90 tr_logform.php:367 tr_status.php:294
 msgid "Comments"
-msgstr ""
+msgstr "Comentarii"
 
 #: include/views/administration.mediatypes.edit.php:44
 msgid "Commercial"
-msgstr ""
+msgstr "Comercial"
 
 #: report6.php:176
 msgid "Compare values for multiple periods"
-msgstr ""
+msgstr "Compară valori pentru perioade multiple"
 
 #: include/views/administration.usergroups.edit.php:113
 msgid "Composing permissions"
-msgstr ""
+msgstr "Permisiuni compuse"
 
 #: popup_trexpr.php:25
 msgid "Condition"
-msgstr ""
+msgstr "Condiție"
 
 #: include/views/configuration.action.edit.php:117
 #: include/views/configuration.action.edit.php:898
 #: include/views/configuration.action.edit.php:966
 #: include/views/configuration.action.list.php:51
 msgid "Conditions"
-msgstr ""
+msgstr "Condiții"
 
 #: include/menu.inc.php:149
 msgid "Configuration"
-msgstr ""
+msgstr "Configurare"
 
 #: conf.import.php:25
 msgid "Configuration import"
-msgstr ""
+msgstr "Import configurare"
 
 #: adm.gui.php:24
 msgid "Configuration of GUI"
-msgstr ""
+msgstr "Configurare GUI"
 
 #: services.php:27
 msgid "Configuration of IT services"
-msgstr ""
+msgstr "Configurarea serviciilor IT"
 
 #: include/audit.inc.php:25
 msgid "Configuration of Zabbix"
-msgstr ""
+msgstr "Configurare Zabbix"
 
 #: actionconf.php:25
 msgid "Configuration of actions"
-msgstr ""
+msgstr "Configurare acțiuni"
 
 #: applications.php:26
 msgid "Configuration of applications"
-msgstr ""
+msgstr "Configurare aplicații"
 
 #: authentication.php:24
 msgid "Configuration of authentication"
-msgstr ""
+msgstr "Configurare autentificare"
 
 #: discoveryconf.php:26
 msgid "Configuration of discovery"
-msgstr ""
+msgstr "Configurare detecție"
 
 #: host_discovery.php:27
 msgid "Configuration of discovery rules"
-msgstr ""
+msgstr "Configurare reguli de detecție"
 
 #: graphs.php:26
 msgid "Configuration of graphs"
-msgstr ""
+msgstr "Configurare a elementelor grafice"
 
 #: hostgroups.php:25
 msgid "Configuration of host groups"
-msgstr ""
+msgstr "Configurare a grupurilor de servere"
 
 #: hosts.php:32
 msgid "Configuration of hosts"
-msgstr ""
+msgstr "Configurare servere"
 
 #: adm.housekeeper.php:24
 msgid "Configuration of housekeeper"
-msgstr ""
+msgstr "Configurare administrator"
 
 #: adm.iconmapping.php:24
 msgid "Configuration of icon mapping"
-msgstr ""
+msgstr "Configurare mapare icoane"
 
 #: adm.images.php:25
 msgid "Configuration of images"
-msgstr ""
+msgstr "COnfigurare imagini"
 
 #: disc_prototypes.php:27
 msgid "Configuration of item prototypes"
-msgstr ""
+msgstr "Configurare prototipi de itemi"
 
 #: items.php:27
 msgid "Configuration of items"
-msgstr ""
+msgstr "Configurare itemi"
 
 #: adm.macros.php:24
 msgid "Configuration of macros"
-msgstr ""
+msgstr "Configurare macro-uri"
 
 #: maintenance.php:27
 msgid "Configuration of maintenance"
-msgstr ""
+msgstr "Configurare întreținere"
 
 #: media_types.php:26
 msgid "Configuration of media types"
-msgstr ""
+msgstr "Configurare tipuri de media"
 
 #: sysmap.php:26 sysmaps.php:34
 msgid "Configuration of network maps"
-msgstr ""
+msgstr "Configurare hărți de rețele"
 
 #: nodes.php:25
 msgid "Configuration of nodes"
-msgstr ""
+msgstr "Configurare noduri"
 
 #: proxies.php:25
 msgid "Configuration of proxies"
-msgstr ""
+msgstr "Configurare proxi-uri"
 
 #: adm.regexps.php:26
 msgid "Configuration of regular expressions"
-msgstr ""
+msgstr "Configurare expresii uzuale"
 
 #: screenconf.php:38 screenedit.php:27
 msgid "Configuration of screens"
-msgstr ""
+msgstr "Configurare ecrane"
 
 #: scripts.php:23
 msgid "Configuration of scripts"
-msgstr ""
+msgstr "Configurare scripturi"
 
 #: slideconf.php:27
 msgid "Configuration of slide shows"
-msgstr ""
+msgstr "Configurare prezentări"
 
 #: templates.php:38
 msgid "Configuration of templates"
-msgstr ""
+msgstr "Configurare șabloane"
 
 #: report5.php:167
 msgid "Configuration of trigger"
-msgstr ""
+msgstr "Configurare trigger"
 
 #: adm.triggerdisplayoptions.php:24
 msgid "Configuration of trigger displaying options"
-msgstr ""
+msgstr "Configurare opțiuni afișare trigger"
 
 #: trigger_prototypes.php:27
 msgid "Configuration of trigger prototypes"
-msgstr ""
+msgstr "Configurare prototipi de triggeri"
 
 #: adm.triggerseverities.php:24
 msgid "Configuration of trigger severities"
-msgstr ""
+msgstr "Configurare severități trigger"
 
 #: triggers.php:27 tr_status.php:513
 msgid "Configuration of triggers"
-msgstr ""
+msgstr "Configurare triggeri"
 
 #: usergrps.php:29
 msgid "Configuration of user groups"
-msgstr ""
+msgstr "Configurare grupuri de utilizatori"
 
 #: users.php:29
 msgid "Configuration of users"
-msgstr ""
+msgstr "Configurare utilizatori"
 
 #: adm.valuemapping.php:24
 msgid "Configuration of value mapping"
-msgstr ""
+msgstr "Configurare mapare valori"
 
 #: httpconf.php:27
 msgid "Configuration of web monitoring"
-msgstr ""
+msgstr "Configurare monitorizare web"
 
 #: adm.workingtime.php:24
 msgid "Configuration of working time"
-msgstr ""
+msgstr "Configurare timp de lucru"
 
 #: adm.gui.php:66 adm.housekeeper.php:53 adm.other.php:58
 #: adm.triggerdisplayoptions.php:65 adm.triggerseverities.php:69
 #: adm.workingtime.php:46
 msgid "Configuration updated"
-msgstr ""
+msgstr "Configurare actualizată"
 
 #: dashboard.php:227
 #, php-format
 msgid "Configure (Filter %s)"
-msgstr ""
+msgstr "Configurare (Filter %s)"
 
 #: include/views/administration.script.edit.php:109
 msgid "Confirmation text"
-msgstr ""
+msgstr "Text de confirmare"
 
 #: popup.php:616
 msgid "Conflict between selected templates."
-msgstr ""
+msgstr "Conflict între șabloanele selectate"
 
 #: include/views/administration.proxy.edit.php:54
 #: include/views/configuration.host.edit.php:217
 #: include/views/js/configuration.sysmaps.js.php:326
 msgid "Connect to"
-msgstr ""
+msgstr "Conectare la"
 
 #: include/page_footer.php:98
 #, php-format
 msgid "Connected as '%1$s'"
-msgstr ""
+msgstr "Conectat ca '%1$s'"
 
 #: include/page_footer.php:95
 #, php-format
 msgid "Connected as '%1$s' from '%2$s'"
-msgstr ""
+msgstr "Conectat ca '%1$s' din '%2$s'"
 
 #: api/classes/CScript.php:473
 #, php-format
@@ -2479,6 +2492,9 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Incorrect DNS server configuration.\n"
 msgstr ""
+"Conectarea la serverul Zabbix \"%s\" eșuată. Motive posibile:\n"
+"1. IP/DNS server incorect în \"zabbix.conf.php\";\n"
+"2. Configurare server DNS incorectă.\n"
 
 #: api/classes/CScript.php:464
 #, php-format
@@ -2489,6 +2505,11 @@ msgid ""
 "3. Zabbix server daemon not running;\n"
 "4. Firewall is blocking TCP connection.\n"
 msgstr ""
+"Conectare la serverul Zabbix \"%s\" refuzată. Motive posibi:\n"
+"1. IP/DNS server incorect în \"zabbix.conf.php\";\n"
+"2. Mediul de securitate (de exemplu, SELinux) blochează conexiunea;\n"
+"3. Daemonul serverului Zabbix nu funcționează;\n"
+"4. Firewallul blochează conexiunea TCP.\n"
 
 #: api/classes/CScript.php:470
 #, php-format
@@ -2497,580 +2518,583 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Firewall is blocking TCP connection.\n"
 msgstr ""
+"Conectarea la serverul Zabbix \"%s\" a expirat. Motive posibile:\n"
+"1. IP/DNS server incorect în \"zabbix.conf.php\";\n"
+"2. Firewallul blochează conexiunea TCP.\n"
 
 #: include/hosts.inc.php:214
 msgid "Contact"
-msgstr ""
+msgstr "Contact"
 
 #: include/hosts.inc.php:259
 msgid "Contract number"
-msgstr ""
+msgstr "Numărul contractului"
 
 #: include/views/js/configuration.sysmaps.js.php:151
 msgid "Coordinates"
-msgstr ""
+msgstr "Coordonate"
 
 #: include/views/configuration.copy.elements.php:102
 #: include/views/configuration.item.copy.php:82
 msgid "Copy"
-msgstr ""
+msgstr "Copiază"
 
 #: include/views/configuration.graph.list.php:138
 #: include/views/configuration.item.list.php:248
 #: include/views/configuration.triggers.list.php:234
 msgid "Copy selected to ..."
-msgstr ""
+msgstr "Copiază selecția în ..."
 
 #: api/classes/CUser.php:985
 #, php-format
 msgid "Correct login \"%s\"."
-msgstr ""
+msgstr "Corectează logarea \"%s\"."
 
 #: api/classes/CImage.php:493
 msgid "Could not save image!"
-msgstr ""
+msgstr "Nu s-a putut salva imaginea."
 
 #: include/graphs.inc.php:84
 #: include/views/configuration.triggers.expression.php:95 popup_bitem.php:131
 #: popup_trexpr.php:45
 msgid "Count"
-msgstr ""
+msgstr "Numărare"
 
 #: include/views/configuration.slideconf.list.php:42
 msgid "Count of slides"
-msgstr ""
+msgstr "Numărarea slide-urilor"
 
 #: include/views/configuration.action.list.php:28
 msgid "Create action"
-msgstr ""
+msgstr "Creează o acțiune"
 
 #: include/views/configuration.application.list.php:31
 msgid "Create application"
-msgstr ""
+msgstr "Creează o aplicație"
 
 #: include/views/configuration.discovery.list.php:27
 #: include/views/configuration.host.discovery.list.php:29
 msgid "Create discovery rule"
-msgstr ""
+msgstr "Creează regula de detecție"
 
 #: include/views/configuration.graph.list.php:42
 msgid "Create graph"
-msgstr ""
+msgstr "Creează element grafic"
 
 #: include/views/configuration.graph.list.php:45
 msgid "Create graph (select host first)"
-msgstr ""
+msgstr "Creează element grafic (selectați serverul prima data)"
 
 #: include/views/configuration.graph.list.php:29
 msgid "Create graph prototype"
-msgstr ""
+msgstr "Creează prototip de element grafic"
 
 #: hosts.php:633
 msgid "Create host"
-msgstr ""
+msgstr "Creează server"
 
 #: include/views/configuration.hostgroups.list.php:28
 #: include/views/configuration.hostgroups.list.php:31
 msgid "Create host group"
-msgstr ""
+msgstr "Creează grup de servere"
 
 #: adm.iconmapping.php:123
 msgid "Create icon map"
-msgstr ""
+msgstr "Creează harte de icoane"
 
 #: adm.images.php:145
 msgid "Create image"
-msgstr ""
+msgstr "Creează imagine"
 
 #: include/views/configuration.item.list.php:30 items.php:662
 msgid "Create item"
-msgstr ""
+msgstr "Creează item"
 
 #: include/views/configuration.item.prototype.list.php:28
 msgid "Create item prototype"
-msgstr ""
+msgstr "Creează prototip de item"
 
 #: include/views/configuration.maintenance.list.php:27
 msgid "Create maintenance period"
-msgstr ""
+msgstr "Creează perioadă de întreținere"
 
 #: sysmaps.php:211
 msgid "Create map"
-msgstr ""
+msgstr "Creează hartă"
 
 #: include/views/administration.mediatypes.list.php:26
 msgid "Create media type"
-msgstr ""
+msgstr "Creează tipul media"
 
 #: include/views/administration.node.list.php:36
 msgid "Create node"
-msgstr ""
+msgstr "Creează nod"
 
 #: include/views/administration.proxy.list.php:32
 msgid "Create proxy"
-msgstr ""
+msgstr "Creează proxy"
 
 #: include/views/configuration.httpconf.list.php:30
 msgid "Create scenario"
-msgstr ""
+msgstr "Creează scenariu"
 
 #: include/views/configuration.httpconf.list.php:33
 msgid "Create scenario (select host first)"
-msgstr ""
+msgstr "Creează scenariu (selectați serverul prima data)"
 
 #: include/views/configuration.screen.list.php:27
 msgid "Create screen"
-msgstr ""
+msgstr "Creează ecran"
 
 #: include/views/administration.script.list.php:24
 msgid "Create script"
-msgstr ""
+msgstr "Creează script"
 
 #: include/views/configuration.slideconf.list.php:27
 msgid "Create slide show"
-msgstr ""
+msgstr "Creează diapozitive"
 
 #: templates.php:436
 msgid "Create template"
-msgstr ""
+msgstr "Creează șablon"
 
 #: include/views/configuration.triggers.list.php:44 jsLoader.php:103
 msgid "Create trigger"
-msgstr ""
+msgstr "Creează trigger"
 
 #: include/views/configuration.triggers.list.php:39
 msgid "Create trigger prototype"
-msgstr ""
+msgstr "Creează prototip de trigger"
 
 #: include/views/administration.users.list.php:30
 msgid "Create user"
-msgstr ""
+msgstr "Creează utilizator"
 
 #: include/views/administration.usergroups.list.php:30
 msgid "Create user group"
-msgstr ""
+msgstr "Creează grup de utilizatori"
 
 #: adm.valuemapping.php:139
 msgid "Create value map"
-msgstr ""
+msgstr "Creează hartă de valori"
 
 #: api/classes/CApplication.php:548
 #, php-format
 msgid "Created: Application \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Creat: Aplicația \"%1$s\" pe \"%2$s\"."
 
 #: api/classes/CDiscoveryRule.php:827
 #, php-format
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Creat: Regulă de detecție \"%1$s\" pe \"%2$s\"."
 
 #: api/classes/CItem.php:850
 #, php-format
 msgid "Created: Item \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Creat: Item \"%1$s\" pe \"%2$s\"."
 
 #: api/classes/CItemPrototype.php:629
 #, php-format
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Creat: Prototip item \"%1$s\" pe \"%2$s\"."
 
 #: api/classes/CTrigger.php:1482
 #, php-format
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Creat: Trigger \"%1$s\" pe \"%2$s\"."
 
 #: api/classes/CTriggerPrototype.php:1013
 #, php-format
 msgid "Created: Trigger prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Creat: Prototip trigger \"%1$s\" pe \"%2$s\"."
 
 #: include/validate.inc.php:375
 #, php-format
 msgid "Critical error. Field \"%1$s\" contains Multibyte chars."
-msgstr ""
+msgstr "Eroare critică. Câmpul \"%1$s\" conține caractere multioctet."
 
 #: include/validate.inc.php:436
 #, php-format
 msgid "Critical error. Field \"%1$s\" is mandatory."
-msgstr ""
+msgstr "Eroare critică. Câmpul \"%1$s\" este obligatoriu."
 
 #: include/validate.inc.php:315
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not IP range."
-msgstr ""
+msgstr "Eroare critică. Câmpul \"%1$s\" nu este în registrul IP."
 
 #: include/validate.inc.php:301
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not IP."
-msgstr ""
+msgstr "Eroare critică. Câmpul \"%1$s\" nu este IP."
 
 #: include/validate.inc.php:387
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not a colour."
-msgstr ""
+msgstr "Eroare critică. Câmpul \"%1$s\" nu este o culoare."
 
 #: include/validate.inc.php:353
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not decimal number."
-msgstr ""
+msgstr "Eroare critică. Câmpul \"%1$s\" nu este un număr zecimal."
 
 #: include/validate.inc.php:329
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer list or range."
-msgstr ""
+msgstr "Eroare critică. Câmpul \"%1$s\" nu este un număr întreg sau șir."
 
 #: include/validate.inc.php:342
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer."
-msgstr ""
+msgstr "Eroare critică. Câmpul \"%1$s\" nu este întreg."
 
 #: include/validate.inc.php:364
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not string."
-msgstr ""
+msgstr "Eroare critică. Câmpul \"%1$s\" nu este șir."
 
 #: include/validate.inc.php:453
 #, php-format
 msgid "Critical error. Field \"%1$s\" must be missing."
-msgstr ""
+msgstr "Eroare critică. Câmpul \"%1$s\" trebuie să lipsească."
 
 #: include/validate.inc.php:507
 #, php-format
 msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field."
-msgstr ""
+msgstr "Eroare critică. Valoare incorectă \"%1$s\" pentru câmpul \"%2$s\"."
 
 #: include/validate.inc.php:497
 #, php-format
 msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
-msgstr ""
+msgstr "Eroare critică. Valoare incorectă \"%1$s\" pentru câmpul \"%2$s\": trebuie să fie între %3$s și %4$s."
 
 #: include/validate.inc.php:488
 #, php-format
 msgid "Critical error. Incorrect value for field \"%1$s\": cannot be empty."
-msgstr ""
+msgstr "Eroare critică. Valoare incorectă pentru câmpul \"%1$s\": nu poate fi vidă."
 
 #: popup_trexpr.php:348
 msgid "Current date is < N"
-msgstr ""
+msgstr "Data curentă este < N"
 
 #: popup_trexpr.php:356
 msgid "Current date is = N"
-msgstr ""
+msgstr "Data curentă este = N"
 
 #: popup_trexpr.php:352
 msgid "Current date is > N"
-msgstr ""
+msgstr "Data curentă este > N"
 
 #: popup_trexpr.php:360
 msgid "Current date is NOT N"
-msgstr ""
+msgstr "Data curentă NU este N"
 
 #: include/views/js/configuration.action.edit.js.php:87
 #: include/views/js/configuration.action.edit.js.php:217
 msgid "Current host"
-msgstr ""
+msgstr "Serverul curent"
 
 #: include/page_header.php:363
 msgid "Current node"
-msgstr ""
+msgstr "Nodul curent"
 
 #: popup_trexpr.php:478
 msgid "Current time is < N"
-msgstr ""
+msgstr "Timpul curent este < N"
 
 #: popup_trexpr.php:486
 msgid "Current time is = N"
-msgstr ""
+msgstr "Timpul curent este = N"
 
 #: popup_trexpr.php:482
 msgid "Current time is > N"
-msgstr ""
+msgstr "Timpul curent este > N"
 
 #: popup_trexpr.php:490
 msgid "Current time is NOT N"
-msgstr ""
+msgstr "Timpul curent NU este N"
 
 #: include/setup.inc.php:192
 msgid "Current value"
-msgstr ""
+msgstr "Valoare curentă"
 
 #: charts.php:26
 msgid "Custom graphs"
-msgstr ""
+msgstr "Grafice personalizate"
 
 #: include/maps.inc.php:50
 msgid "Custom label"
-msgstr ""
+msgstr "Etichetă personalizată"
 
 #: api/classes/CMap.php:593
 #, php-format
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
-msgstr ""
+msgstr "Eticheta personalizată \"%2$s\" pentru elementele de tipul \"%1$s\" nu poate fi vidă."
 
 #: disc_prototypes.php:103 include/views/configuration.item.massupdate.php:250
 #: items.php:134
 msgid "Custom multiplier"
-msgstr ""
+msgstr "Multiplicator personalizat"
 
 #: screens.php:27
 msgid "Custom screens"
-msgstr ""
+msgstr "Ecrane personalizate"
 
 #: include/views/configuration.action.edit.php:646
 msgid "Custom script"
-msgstr ""
+msgstr "Script personalizat"
 
 #: include/views/administration.general.triggerSeverity.edit.php:26
 msgid "Custom severity"
-msgstr ""
+msgstr "Severitate personalizată"
 
 #: include/views/administration.general.triggerSeverity.edit.php:67
 msgid "Custom severity names affect all locales and require manual translation!"
-msgstr ""
+msgstr "Nume severitate personalizată afectează toate localizările si cere traducere manuală!"
 
 #: include/views/js/configuration.sysmaps.js.php:43
 msgid "Custom size"
-msgstr ""
+msgstr "Dimensiune personalizată"
 
 #: slides.php:27
 msgid "Custom slides"
-msgstr ""
+msgstr "Slide-uri personalizate"
 
 #: include/locales.inc.php:49
 msgid "Czech (cs_CZ)"
-msgstr ""
+msgstr "Czech (cs_CZ)"
 
 #: include/classes/class.cchart.php:1227
 msgid "D"
-msgstr ""
+msgstr "D"
 
 #: include/translateDefines.inc.php:48
 msgid "D, d M Y H:i:s O"
-msgstr ""
+msgstr "D, d M Y H:i:s O"
 
 #: dashconf.php:112
 msgid "DASHBOARD CONFIGURATION"
-msgstr ""
+msgstr "Configurare tablou de bord "
 
 #: httpdetails.php:119
 msgid "DETAILS OF SCENARIO"
-msgstr ""
+msgstr "Detalii scenariu"
 
 #: include/maps.inc.php:646 include/maps.inc.php:738 include/maps.inc.php:833
 #: include/maps.inc.php:930
 msgid "DISABLED"
-msgstr ""
+msgstr "DEZACTIVAT"
 
 #: include/triggers.inc.php:180
 msgid "DISCOVERED"
-msgstr ""
+msgstr "DESCOPERIT"
 
 #: include/menu.inc.php:244
 msgid "DM"
-msgstr ""
+msgstr "DM"
 
 #: events.php:484 events.php:493 hosts.php:652
 #: include/views/administration.proxy.edit.php:60
 #: include/views/js/configuration.host.edit.js.php:18 popup.php:543
 #: search.php:131
 msgid "DNS"
-msgstr ""
+msgstr "DNS"
 
 #: include/views/administration.proxy.edit.php:53
 #: include/views/configuration.host.edit.php:216
 msgid "DNS name"
-msgstr ""
+msgstr "Nume DNS"
 
 #: include/triggers.inc.php:179
 msgid "DOWN"
-msgstr ""
+msgstr "OPRIT"
 
 #: include/forms.inc.php:1505 include/maintenances.inc.php:35
 #: include/reports.inc.php:219 include/reports.inc.php:665
 #: include/reports.inc.php:673 report3.php:60 report4.php:98
 msgid "Daily"
-msgstr ""
+msgstr "Zilnic"
 
 #: include/classes/core/ZBase.php:138
 msgid "Dark orange"
-msgstr ""
+msgstr "Portocaliu închis"
 
 #: include/reports.inc.php:711
 msgid "Darken"
-msgstr ""
+msgstr "Întunecare"
 
 #: dashboard.php:24 include/menu.inc.php:33 include/profiles.inc.php:353
 msgid "Dashboard"
-msgstr ""
+msgstr "Panou de lucru"
 
 #: dashconf.php:27
 msgid "Dashboard configuration"
-msgstr ""
+msgstr "Configurare panou de lucru"
 
 #: dashconf.php:168
 msgid "Dashboard filter"
-msgstr ""
+msgstr "Filtru panou de lucru"
 
 #: include/graphs.inc.php:73 include/views/js/configuration.sysmaps.js.php:336
 #: include/views/js/configuration.sysmaps.js.php:412
 msgid "Dashed line"
-msgstr ""
+msgstr "Linie panou de lucru"
 
 #: include/views/monitoring.overview.php:28
 msgid "Data"
-msgstr ""
+msgstr "Data"
 
 #: include/classes/class.cchart.php:2376 include/classes/class.cpie.php:702
 #, php-format
 msgid "Data from %1$s. Generated in %2$s sec."
-msgstr ""
+msgstr "Data din %1$s. Generată în %2$s sec."
 
 #: include/screens.inc.php:29
 msgid "Data overview"
-msgstr ""
+msgstr "Prezentare generala date"
 
 #: include/forms.inc.php:443 include/views/configuration.item.edit.php:232
 #: include/views/configuration.item.massupdate.php:177
 msgid "Data type"
-msgstr ""
+msgstr "Tip date"
 
 #: include/setup.inc.php:252 include/setup.inc.php:345
 msgid "Database file"
-msgstr ""
+msgstr "Fișier bază de date"
 
 #: include/setup.inc.php:256
 msgid "Database host"
-msgstr ""
+msgstr "Server bază de date"
 
 #: include/items.inc.php:87
 msgid "Database monitor"
-msgstr ""
+msgstr "Monitor bază de date"
 
 #: include/setup.inc.php:267 include/setup.inc.php:357 setup.php:41
 msgid "Database name"
-msgstr ""
+msgstr "Nume bază de date"
 
 #: include/setup.inc.php:359
 msgid "Database password"
-msgstr ""
+msgstr "Parolă bază de date"
 
 #: include/setup.inc.php:260 include/setup.inc.php:352
 #: include/setup.inc.php:355
 msgid "Database port"
-msgstr ""
+msgstr "Port bază de date"
 
 #: include/setup.inc.php:272 include/setup.inc.php:361
 msgid "Database schema"
-msgstr ""
+msgstr "Schema bazei de date"
 
 #: include/setup.inc.php:350
 msgid "Database server"
-msgstr ""
+msgstr "Server baze de date"
 
 #: include/setup.inc.php:249 include/setup.inc.php:338
 msgid "Database type"
-msgstr ""
+msgstr "Tipul bazei de date"
 
 #: include/setup.inc.php:358
 msgid "Database user"
-msgstr ""
+msgstr "Utilizator bază de date"
 
 #: include/forms.inc.php:1591 include/forms.inc.php:1676 jsrpc.php:137
 msgid "Date"
-msgstr ""
+msgstr "Dată"
 
 #: include/hosts.inc.php:334
 msgid "Date HW decommissioned"
-msgstr ""
+msgstr "Dată HW dezafectată"
 
 #: include/hosts.inc.php:324
 msgid "Date HW installed"
-msgstr ""
+msgstr "Dată HW instalată"
 
 #: include/hosts.inc.php:329
 msgid "Date HW maintenance expires"
-msgstr ""
+msgstr "Întreținerea datelor HW expiră"
 
 #: include/hosts.inc.php:319
 msgid "Date HW purchased"
-msgstr ""
+msgstr "Date HW achiziționate"
 
 #: include/forms.inc.php:1591 report3.php:126 report4.php:161 report5.php:45
 #: tr_status.php:207 tr_status.php:209
 msgid "Day"
-msgstr ""
+msgstr "Zi"
 
 #: include/forms.inc.php:1619
 msgid "Day of month"
-msgstr ""
+msgstr "Zi din lună"
 
 #: popup_trexpr.php:380
 msgid "Day of month is < N"
-msgstr ""
+msgstr "Zi din lună este < N"
 
 #: popup_trexpr.php:388
 msgid "Day of month is = N"
-msgstr ""
+msgstr "Zi din lună este = N"
 
 #: popup_trexpr.php:384
 msgid "Day of month is > N"
-msgstr ""
+msgstr "Zi din lună este > N"
 
 #: popup_trexpr.php:392
 msgid "Day of month is NOT N"
-msgstr ""
+msgstr "Zi din lună NU este N"
 
 #: include/forms.inc.php:1534 include/forms.inc.php:1591
 #: include/forms.inc.php:1615
 msgid "Day of week"
-msgstr ""
+msgstr "Ziua săptămânii"
 
 #: popup_trexpr.php:364
 msgid "Day of week is < N"
-msgstr ""
+msgstr "Ziua săptămânii este < N"
 
 #: popup_trexpr.php:372
 msgid "Day of week is = N"
-msgstr ""
+msgstr "Ziua săptămânii este = N"
 
 #: popup_trexpr.php:368
 msgid "Day of week is > N"
-msgstr ""
+msgstr "Ziua săptămânii este > N"
 
 #: popup_trexpr.php:376
 msgid "Day of week is NOT N"
-msgstr ""
+msgstr "Ziua săptămânii NU este N"
 
 #: include/forms.inc.php:1697 tr_status.php:207 tr_status.php:209
 msgid "Days"
-msgstr ""
+msgstr "Zile"
 
 #: include/page_header.php:249
 msgid "Debug"
-msgstr ""
+msgstr "Depanare"
 
 #: include/views/administration.usergroups.edit.php:71
 #: include/views/administration.usergroups.list.php:50
 #: include/views/administration.users.list.php:62
 msgid "Debug mode"
-msgstr ""
+msgstr "Mod  de depanare"
 
 #: usergrps.php:275
 msgid "Debug mode updated"
-msgstr ""
+msgstr "Modul de depanare a fost actualizat"
 
 #: include/func.inc.php:229
 msgid "Dec"
-msgstr ""
+msgstr "Dec"
 
 #: include/forms.inc.php:1568 include/func.inc.php:115
 #: include/func.inc.php:246 jsLoader.php:125
 msgid "December"
-msgstr ""
+msgstr "Decembrie"
 
 #: include/items.inc.php:133
 msgid "Decimal"
-msgstr ""
+msgstr "Zecimal"
 
 #: include/hosts.inc.php:37
 #: include/views/administration.general.iconmap.edit.php:127
@@ -3081,144 +3105,144 @@ msgstr ""
 #: include/views/monitoring.slides.php:85 jsLoader.php:147 popup_bitem.php:114
 #: popup_period.php:113
 msgid "Default"
-msgstr ""
+msgstr "Implicit"
 
 #: include/views/administration.authentication.edit.php:41
 msgid "Default authentication"
-msgstr ""
+msgstr "Autentificare implicită"
 
 #: include/views/configuration.slideconf.edit.php:39 slideconf.php:39
 msgid "Default delay (in seconds)"
-msgstr ""
+msgstr "Întârziere implicită (în secunde)"
 
 #: include/views/configuration.action.edit.php:51
 #: include/views/configuration.action.edit.php:534
 msgid "Default message"
-msgstr ""
+msgstr "Mesaj implicit"
 
 #: actionconf.php:37 include/views/configuration.action.edit.php:44
 msgid "Default operation step duration"
-msgstr ""
+msgstr "Durata etapei operației implicite"
 
 #: include/views/configuration.action.edit.php:50
 msgid "Default subject"
-msgstr ""
+msgstr "Subiect implicit"
 
 #: include/views/administration.general.gui.edit.php:31
 msgid "Default theme"
-msgstr ""
+msgstr "Tema implicită"
 
 #: adm.gui.php:70
 #, php-format
 msgid "Default theme \"%1$s\"."
-msgstr ""
+msgstr "Tema implicită \"%1$s\"."
 
 #: include/views/configuration.discovery.list.php:42
 #: include/views/configuration.slideconf.edit.php:49
 #: include/views/configuration.slideconf.list.php:41
 msgid "Delay"
-msgstr ""
+msgstr "Întârziere"
 
 #: include/views/configuration.discovery.edit.php:48
 msgid "Delay (in sec)"
-msgstr ""
+msgstr "Întârziere (în secunde):"
 
 #: queue.php:247
 msgid "Delayed by"
-msgstr ""
+msgstr "Întârziat de către"
 
 #: include/classes/class.cbuttondelete.php:25 include/forms.inc.php:1938
 #: include/views/administration.auditlogs.list.php:47
 #: include/views/configuration.triggers.edit.php:154 jsLoader.php:104
 #: tr_logform.php:332 tr_logform.php:349
 msgid "Delete"
-msgstr ""
+msgstr "Șterge"
 
 #: include/views/configuration.template.edit.php:438
 msgid "Delete and clear"
-msgstr ""
+msgstr "Șterge și curăță"
 
 #: templates.php:617
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
-msgstr ""
+msgstr "Ștergere si curățare șabloane selectate? (Avertizare: toate serverele conectate vor fi șterse!)"
 
 #: include/views/configuration.template.edit.php:438
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
-msgstr ""
+msgstr "Ștergere si curățare șablon? (Avertizare: toate serverele conectate vor fi șterse!)"
 
 #: include/views/configuration.application.edit.php:73
 msgid "Delete application?"
-msgstr ""
+msgstr "Ștergere aplicație?"
 
 #: include/views/configuration.action.edit.php:974
 msgid "Delete current action?"
-msgstr ""
+msgstr "Ștergere aplicație curentă?"
 
 #: include/views/configuration.discovery.edit.php:80
 #: include/views/configuration.item.edit.php:465
 msgid "Delete discovery rule?"
-msgstr ""
+msgstr "Ștergere regulă de detecție?"
 
 #: include/views/configuration.triggers.edit.php:156 jsLoader.php:106
 #: tr_logform.php:333
 msgid "Delete expression?"
-msgstr ""
+msgstr "Ștergere expresie?"
 
 #: include/views/configuration.graph.edit.php:304
 msgid "Delete graph?"
-msgstr ""
+msgstr "Ștergere element grafic?"
 
 #: include/views/configuration.httpconf.list.php:138
 msgid "Delete history of selected WEB scenarios?"
-msgstr ""
+msgstr "Ștergere istoric sau scenariu WEB selectat?"
 
 #: include/views/configuration.item.list.php:252
 msgid "Delete history of selected items?"
-msgstr ""
+msgstr "Ștergere istoric sau itemi selectați?"
 
 #: include/views/administration.general.iconmap.edit.php:142
 msgid "Delete icon map?"
-msgstr ""
+msgstr "Ștergere harta icoanei?"
 
 #: include/views/configuration.item.edit.php:470
 msgid "Delete item?"
-msgstr ""
+msgstr "Ștergere element?"
 
 #: jsLoader.php:105 tr_logform.php:349
 msgid "Delete keyword?"
-msgstr ""
+msgstr "Ștergere cuvânt cheie?"
 
 #: jsLoader.php:156
 msgid "Delete links between selected elements?"
-msgstr ""
+msgstr "Ștergere legătura între elementele selectate?"
 
 #: include/views/configuration.maintenance.edit.php:222
 msgid "Delete maintenance period?"
-msgstr ""
+msgstr "Ștergere perioadă de întreținere?"
 
 #: include/views/configuration.sysmap.edit.php:209
 msgid "Delete network map?"
-msgstr ""
+msgstr "Ștergere hartă de rețea?"
 
 #: include/views/administration.proxy.edit.php:95
 msgid "Delete proxy?"
-msgstr ""
+msgstr "Ștergere proxy?"
 
 #: include/forms.inc.php:1874
 msgid "Delete regular expression?"
-msgstr ""
+msgstr "Ștergere expresie uzuală?"
 
 #: include/views/configuration.httpconf.edit.php:219
 msgid "Delete scenario?"
-msgstr ""
+msgstr "Ștergere scenariu?"
 
 #: include/views/configuration.screen.edit.php:53
 msgid "Delete screen?"
-msgstr ""
+msgstr "Ștergere monitor?"
 
 #: include/views/administration.script.edit.php:122
 msgid "Delete script?"
-msgstr ""
+msgstr "Ștergere script?"
 
 #: dashconf.php:214 hosts.php:875 include/reports.inc.php:323
 #: include/reports.inc.php:417 include/reports.inc.php:459
@@ -3249,250 +3273,250 @@ msgstr ""
 #: include/views/configuration.triggers.list.php:237 sysmaps.php:290
 #: templates.php:612
 msgid "Delete selected"
-msgstr ""
+msgstr "Ștergere selectată"
 
 #: include/views/configuration.httpconf.list.php:142
 msgid "Delete selected WEB scenarios?"
-msgstr ""
+msgstr "Ștergere scenariu WEB selectat?"
 
 #: include/views/configuration.action.list.php:102
 msgid "Delete selected actions?"
-msgstr ""
+msgstr "Ștergere acțiuni selectate?"
 
 #: include/views/configuration.application.list.php:90
 msgid "Delete selected applications?"
-msgstr ""
+msgstr "Ștergere aplicații selectate?"
 
 #: include/views/configuration.discovery.list.php:76
 #: include/views/configuration.host.discovery.list.php:110
 msgid "Delete selected discovery rules?"
-msgstr ""
+msgstr "Ștergere regulă de detecție?"
 
 #: jsLoader.php:152
 msgid "Delete selected elements?"
-msgstr ""
+msgstr "Ștergere evenimente selectate?"
 
 #: include/views/configuration.graph.list.php:142
 msgid "Delete selected graphs?"
-msgstr ""
+msgstr "Ștergere elemente grafice selectate?"
 
 #: include/views/administration.usergroups.edit.php:136
 #: include/views/configuration.hostgroups.edit.php:74
 msgid "Delete selected group?"
-msgstr ""
+msgstr "Ștergere grup selectat?"
 
 #: include/views/administration.usergroups.list.php:146
 msgid "Delete selected groups?"
-msgstr ""
+msgstr "Ștergere grupuri selectate?"
 
 #: include/views/configuration.hostgroups.list.php:126
 msgid "Delete selected host groups?"
-msgstr ""
+msgstr "Ștergere grupuri de servere selectate?"
 
 #: include/views/configuration.host.edit.php:641
 msgid "Delete selected host?"
-msgstr ""
+msgstr "Ștergere server selectat?"
 
 #: hosts.php:876
 msgid "Delete selected hosts?"
-msgstr ""
+msgstr "Ștergere servere selectate?"
 
 #: include/views/administration.general.image.edit.php:52
 msgid "Delete selected image?"
-msgstr ""
+msgstr "Ștergere imagine selectată?"
 
 #: include/views/configuration.item.list.php:256
 #: include/views/configuration.item.prototype.list.php:113
 msgid "Delete selected items?"
-msgstr ""
+msgstr "Ștergere itemuri selectate?"
 
 #: include/views/configuration.maintenance.list.php:77
 msgid "Delete selected maintenance periods?"
-msgstr ""
+msgstr "Ștergere perioade de întreținere selectate?"
 
 #: sysmaps.php:291
 msgid "Delete selected maps?"
-msgstr ""
+msgstr "Ștergere hărți selectate?"
 
 #: include/views/administration.mediatypes.edit.php:109
 msgid "Delete selected media type?"
-msgstr ""
+msgstr "Ștergere element media selectat?"
 
 #: include/views/administration.mediatypes.list.php:118
 msgid "Delete selected media types?"
-msgstr ""
+msgstr "Ștergere elemente media selectate?"
 
 #: include/views/administration.node.edit.php:89
 msgid "Delete selected node?"
-msgstr ""
+msgstr "Ștergere nod selectat?"
 
 #: include/views/administration.proxy.list.php:104
 msgid "Delete selected proxies?"
-msgstr ""
+msgstr "Ștergere proxy-uri selectate?"
 
 #: include/views/administration.general.regularexpressions.list.php:58
 msgid "Delete selected regular expressions?"
-msgstr ""
+msgstr "Ștergere expresii uzuale selectate?"
 
 #: include/views/configuration.screen.list.php:69
 msgid "Delete selected screens?"
-msgstr ""
+msgstr "Ștergere ecrane selectate?"
 
 #: include/views/administration.script.list.php:90
 msgid "Delete selected scripts?"
-msgstr ""
+msgstr "Ștergere scripturi selectate?"
 
 #: include/views/configuration.slideconf.list.php:60
 msgid "Delete selected slide shows?"
-msgstr ""
+msgstr "Ștergere prezentări selectate?"
 
 #: templates.php:613
 msgid "Delete selected templates?"
-msgstr ""
+msgstr "Ștergere șabloane selectate?"
 
 #: include/views/configuration.triggers.list.php:238
 msgid "Delete selected triggers?"
-msgstr ""
+msgstr "Ștergere triggeri selectați?"
 
 #: include/views/administration.users.edit.php:331
 msgid "Delete selected user?"
-msgstr ""
+msgstr "Ștergere utilizator selectat?"
 
 #: include/views/administration.users.list.php:141
 msgid "Delete selected users?"
-msgstr ""
+msgstr "Ștergere utilizatori selectați?"
 
 #: adm.valuemapping.php:173
 msgid "Delete selected value mapping?"
-msgstr ""
+msgstr "Ștergere valoare de mapare selectată?"
 
 #: adm.valuemapping.php:170
 #, php-format
 msgid "Delete selected value mapping? It is used for %d item!"
 msgid_plural "Delete selected value mapping? It is used for %d items!"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Ștergere valoare de mapare selectată? Este utilizată pentru elementul %d!"
+msgstr[1] "Ștergere valoare de mapare selectată? Este utilizată pentru elementele %d!"
+msgstr[2] "Ștergere valoare de mapare selectată? Este utilizată pentru elementele %d!"
 
 #: templates.php:616
 msgid "Delete selected with linked elements"
-msgstr ""
+msgstr "Ștergere selecție cu elementele asociate"
 
 #: jsLoader.php:183
 msgid "Delete service"
-msgstr ""
+msgstr "Ștergere serviciu"
 
 #: include/views/configuration.slideconf.edit.php:115
 msgid "Delete slide show?"
-msgstr ""
+msgstr "Ștergere prezentare?"
 
 #: include/views/configuration.template.edit.php:437
 msgid "Delete template?"
-msgstr ""
+msgstr "Ștergere șablon?"
 
 #: jsLoader.php:184
 msgid "Delete the selected service?"
-msgstr ""
+msgstr "Ștergere serviciu selectat?"
 
 #: include/views/configuration.triggers.edit.php:304
 msgid "Delete trigger?"
-msgstr ""
+msgstr "Ștergere trigger?"
 
 #: auditlogs.php:140
 msgid "Deleted"
-msgstr ""
+msgstr "Șters"
 
 #: api/classes/CApplication.php:641
 #, php-format
 msgid "Deleted: Application \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Ștergere: Aplicația \"%1$s\" pe \"%2$s\"."
 
 #: api/classes/CDiscoveryRule.php:636
 #, php-format
 msgid "Deleted: Discovery rule \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Ștergere: Regulă de detecție \"%1$s\" pe \"%2$s\"."
 
 #: api/classes/CGraph.php:747
 #, php-format
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Ștergere: Elementul grafic \"%1$s\" pe \"%2$s\"."
 
 #: api/classes/CHost.php:2145
 #, php-format
 msgid "Deleted: Host \"%1$s\"."
-msgstr ""
+msgstr "Ștergere: Server \"%1$s\"."
 
 #: api/classes/CItem.php:1040
 #, php-format
 msgid "Deleted: Item \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Ștergere: Item \"%1$s\" pe \"%2$s\"."
 
 #: api/classes/CItemPrototype.php:812
 #, php-format
 msgid "Deleted: Item prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Ștergere: Prototip item \"%1$s\" pe \"%2$s\"."
 
 #: api/classes/CProxy.php:530
 #, php-format
 msgid "Deleted: Proxy \"%1$s\"."
-msgstr ""
+msgstr "Ștergere: Proxy \"%1$s\"."
 
 #: api/classes/CTemplate.php:1241
 #, php-format
 msgid "Deleted: Template \"%1$s\"."
-msgstr ""
+msgstr "Ștergere: Șablon \"%1$s\"."
 
 #: api/classes/CTriggerGeneral.php:86 api/classes/CTriggerGeneral.php:141
 #: api/classes/CTrigger.php:1246
 #, php-format
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Ștergere: Trigger \"%1$s\" pe \"%2$s\"."
 
 #: api/classes/CTriggerPrototype.php:969
 #, php-format
 msgid "Deleted: Trigger prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Ștergere: Prototip trigger \"%1$s\" pe \"%2$s\"."
 
 #: include/forms.inc.php:1835 include/forms.inc.php:1916
 #: include/forms.inc.php:1996
 msgid "Delimiter"
-msgstr ""
+msgstr "Delimitator"
 
 #: include/views/configuration.item.edit.php:362
 #: include/views/configuration.item.massupdate.php:376
 msgid "Delta (simple change)"
-msgstr ""
+msgstr "Delta (schimbare simplă)"
 
 #: include/views/configuration.item.edit.php:361
 #: include/views/configuration.item.massupdate.php:375
 msgid "Delta (speed per second)"
-msgstr ""
+msgstr "Delta (viteză pe secundă)"
 
 #: include/forms.inc.php:272 include/perm.inc.php:25
 #: include/views/administration.usergroups.edit.php:80
 msgid "Deny"
-msgstr ""
+msgstr "Interzicere"
 
 #: include/views/configuration.services.edit.php:308
 #: include/views/configuration.triggers.edit.php:284
 #: include/views/configuration.triggers.edit.php:293
 msgid "Dependencies"
-msgstr ""
+msgstr "Dependențe"
 
 #: include/triggers.inc.php:1355 tr_status.php:558
 msgid "Dependent"
-msgstr ""
+msgstr "Dependenţă"
 
 #: include/triggers.inc.php:1335
 #: include/views/configuration.services.edit.php:101
 #: include/views/configuration.triggers.list.php:140 popup.php:1032
 #: tr_status.php:542
 msgid "Depends on"
-msgstr ""
+msgstr "Depinde de"
 
 #: include/hosts.inc.php:269
 msgid "Deployment status"
-msgstr ""
+msgstr "Starea de desfășurare"
 
 #: events.php:485 events.php:494 events.php:561 events.php:574
 #: include/classes/screens/CScreenEvents.php:47
@@ -3507,7 +3531,7 @@ msgstr ""
 #: include/views/configuration.triggers.edit.php:243 popup.php:1344
 #: tr_logform.php:256
 msgid "Description"
-msgstr ""
+msgstr "Descriere"
 
 #: include/actions.inc.php:868 include/blocks.inc.php:716
 #: include/config.inc.php:349
@@ -3516,91 +3540,91 @@ msgstr ""
 #: include/views/configuration.action.edit.php:317
 #: include/views/configuration.action.edit.php:321 jsrpc.php:136 queue.php:50
 msgid "Details"
-msgstr ""
+msgstr "Detalii"
 
 #: httpdetails.php:27
 msgid "Details of scenario"
-msgstr ""
+msgstr "Detalii ale scenariului"
 
 #: include/actions.inc.php:101
 msgid "Device"
-msgstr ""
+msgstr "Echipament"
 
 #: discoveryconf.php:42 include/views/configuration.discovery.edit.php:67
 msgid "Device uniqueness criteria"
-msgstr ""
+msgstr "Criteriu unic al echipamentului"
 
 #: popup_trexpr.php:158
 msgid "Difference between MAX and MIN value of a period T is < N"
-msgstr ""
+msgstr "Diferența între valoarea MAX și MIN a perioadei T este < N"
 
 #: popup_trexpr.php:168
 msgid "Difference between MAX and MIN value of a period T is = N"
-msgstr ""
+msgstr "Diferența între valoarea MAX și MIN a perioadei T este = N"
 
 #: popup_trexpr.php:163
 msgid "Difference between MAX and MIN value of a period T is > N"
-msgstr ""
+msgstr "Diferența între valoarea MAX și MIN a perioadei T este > N"
 
 #: popup_trexpr.php:173
 msgid "Difference between MAX and MIN value of a period T is NOT N"
-msgstr ""
+msgstr "Diferența între valoarea MAX și MIN a perioadei T NU este N"
 
 #: popup_trexpr.php:214
 msgid "Difference between last and preceding values, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "Diferența între ultima valoare si valorile precedente, apoi N = 1, 0 - altfel"
 
 #: popup_trexpr.php:218
 msgid "Difference between last and preceding values, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "mod Diferența între ultima valoare si valorile precedente, apoi N NU 1, 0 - altfel"
 
 #: popup_trexpr.php:178
 msgid "Difference between last and previous value is < N"
-msgstr ""
+msgstr "Diferența dintre ultima valoare si valoarea anterioară este < N"
 
 #: popup_trexpr.php:186
 msgid "Difference between last and previous value is = N"
-msgstr ""
+msgstr "Diferența dintre ultima valoare si valoarea anterioară este = N"
 
 #: popup_trexpr.php:182
 msgid "Difference between last and previous value is > N"
-msgstr ""
+msgstr "Diferența dintre ultima valoare si valoarea anterioară este > N"
 
 #: popup_trexpr.php:190
 msgid "Difference between last and previous value is NOT N"
-msgstr ""
+msgstr "Diferența dintre ultima valoare si valoarea anterioară NU este N"
 
 #: include/views/configuration.screen.list.php:50
 msgid "Dimension (cols x rows)"
-msgstr ""
+msgstr "Dimensiune (coloane x rânduri)"
 
 #: include/views/administration.auditlogs.list.php:49
 msgid "Disable"
-msgstr ""
+msgstr "Dezactivează"
 
 #: include/views/administration.usergroups.list.php:141
 msgid "Disable DEBUG"
-msgstr ""
+msgstr "Dezactivează DEPANARE"
 
 #: include/views/administration.usergroups.list.php:142
 msgid "Disable debug mode in selected groups?"
-msgstr ""
+msgstr "Dezactivare modul de depanare în grupurile selectate?"
 
 #: include/actions.inc.php:347 include/actions.inc.php:556
 msgid "Disable host"
-msgstr ""
+msgstr "Dezactivare server"
 
 #: hosts.php:797 hosts.php:808
 msgid "Disable host?"
-msgstr ""
+msgstr "Dezactivare server?"
 
 #: include/views/configuration.hostgroups.list.php:123
 msgid "Disable hosts in the selected host groups?"
-msgstr ""
+msgstr "Dezactivare server în grupurile de servere selectate?"
 
 #: include/views/administration.proxy.list.php:100
 msgid "Disable hosts monitored by selected proxies?"
-msgstr ""
+msgstr "Dezactivare servere monitorizate de proxy-urile selectate?"
 
 #: hosts.php:871 include/views/administration.mediatypes.list.php:113
 #: include/views/administration.proxy.list.php:99
@@ -3615,45 +3639,45 @@ msgstr ""
 #: include/views/configuration.item.prototype.list.php:108
 #: include/views/configuration.triggers.list.php:228
 msgid "Disable selected"
-msgstr ""
+msgstr "Dezactivare selectată"
 
 #: include/views/configuration.httpconf.list.php:134
 msgid "Disable selected WEB scenarios?"
-msgstr ""
+msgstr "Dezactivare scenariu WEB selectat?"
 
 #: include/views/configuration.action.list.php:98
 msgid "Disable selected actions?"
-msgstr ""
+msgstr "Dezactivare acțiuni selectate?"
 
 #: include/views/configuration.application.list.php:86
 msgid "Disable selected applications?"
-msgstr ""
+msgstr "Dezactivare acțiuni selectate?"
 
 #: include/views/configuration.discovery.list.php:72
 #: include/views/configuration.host.discovery.list.php:106
 msgid "Disable selected discovery rules?"
-msgstr ""
+msgstr "Dezactivare reguli de detecție?"
 
 #: include/views/administration.usergroups.list.php:134
 msgid "Disable selected groups?"
-msgstr ""
+msgstr "Dezactivare grupuri selectate?"
 
 #: hosts.php:872
 msgid "Disable selected hosts?"
-msgstr ""
+msgstr "Dezactivare grupuri selectate?"
 
 #: include/views/configuration.item.list.php:242
 #: include/views/configuration.item.prototype.list.php:109
 msgid "Disable selected items?"
-msgstr ""
+msgstr "Dezactivare elemente selectate?"
 
 #: include/views/administration.mediatypes.list.php:114
 msgid "Disable selected media types?"
-msgstr ""
+msgstr "Dezactivare elemente media selectate?"
 
 #: include/views/configuration.triggers.list.php:229
 msgid "Disable selected triggers?"
-msgstr ""
+msgstr "Dezactivare triggeri selectați?"
 
 #: auditlogs.php:152 dashboard.php:227 dashconf.php:164
 #: include/discovery.inc.php:119 include/httptest.inc.php:46
@@ -3676,51 +3700,51 @@ msgstr ""
 #: include/views/monitoring.overview.php:40 popup_media.php:137 popup.php:1043
 #: tr_logform.php:369
 msgid "Disabled"
-msgstr ""
+msgstr "Dezactivat"
 
 #: include/views/monitoring.overview.php:59
 msgid "Disabled or no trigger"
-msgstr ""
+msgstr "Dezactivat sau fără trigger"
 
 #: adm.triggerseverities.php:64
 #: include/views/administration.general.triggerSeverity.edit.php:64
 msgid "Disaster"
-msgstr ""
+msgstr "Dezastru"
 
 #: include/discovery.inc.php:151
 msgid "Discovered"
-msgstr ""
+msgstr "Detecție"
 
 #: include/views/monitoring.discovery.php:43
 msgid "Discovered device"
-msgstr ""
+msgstr "Echipament detectat"
 
 #: events.php:310 hosts.php:687 hosts.php:767 include/events.inc.php:27
 #: include/html.inc.php:380 include/menu.inc.php:77 include/menu.inc.php:211
 #: include/views/configuration.action.list.php:34 templates.php:463
 #: templates.php:531
 msgid "Discovery"
-msgstr ""
+msgstr "Detectare"
 
 #: include/views/configuration.discovery.edit.php:46
 msgid "Discovery by proxy"
-msgstr ""
+msgstr "Detectat de către proxy"
 
 #: include/actions.inc.php:72
 msgid "Discovery check"
-msgstr ""
+msgstr "Verificare de detecț"
 
 #: popup.php:123
 msgid "Discovery checks"
-msgstr ""
+msgstr "Verificări de detec"
 
 #: include/html.inc.php:378
 msgid "Discovery list"
-msgstr ""
+msgstr "Listă de detecție"
 
 #: include/actions.inc.php:74
 msgid "Discovery object"
-msgstr ""
+msgstr "Obiect detectat"
 
 #: include/actions.inc.php:70 include/audit.inc.php:44
 #: include/blocks.inc.php:1114 include/forms.inc.php:1018
@@ -3728,39 +3752,39 @@ msgstr ""
 #: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:34
 msgid "Discovery rule"
-msgstr ""
+msgstr "Regulă de detecție"
 
 #: api/classes/CDiscoveryRule.php:894
 #, php-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
-msgstr ""
+msgstr "Regula de detecție \"%1$s\" există deja pe \"%2$s\", moștenită de la alt șablon."
 
 #: api/classes/CDiscoveryRule.php:881
 #, php-format
 msgid "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
-msgstr ""
+msgstr "Regulă de detecție \"%1$s:%2$s\" are perioadă de viață incorectă: \"%3$s\". (min: %4$d, max: %5$d, macro pentru utilizator permis)"
 
 #: api/classes/CDRule.php:596
 #, php-format
 msgid "Discovery rule \"%s\" already exists."
-msgstr ""
+msgstr "Regula de detecție \"%s\" există deja."
 
 #: api/classes/CDRule.php:664
 #, php-format
 msgid "Discovery rule [%s] already exists"
-msgstr ""
+msgstr "Regula de detecție [%s] există deja"
 
 #: discoveryconf.php:150 host_discovery.php:233
 msgid "Discovery rule created"
-msgstr ""
+msgstr "Regulă de detecție creată"
 
 #: discoveryconf.php:164 host_discovery.php:166
 msgid "Discovery rule deleted"
-msgstr ""
+msgstr "Regulă de detecție ștearsă"
 
 #: discoveryconf.php:144 host_discovery.php:229
 msgid "Discovery rule updated"
-msgstr ""
+msgstr "Regulă de detecție actualizată"
 
 #: include/html.inc.php:489 include/html.inc.php:493
 #: include/views/configuration.host.discovery.list.php:33
@@ -3769,215 +3793,215 @@ msgstr ""
 #: include/views/conf.import.php:32 include/views/monitoring.discovery.php:35
 #: popup.php:119
 msgid "Discovery rules"
-msgstr ""
+msgstr "Reguli de detecție"
 
 #: host_discovery.php:246
 msgid "Discovery rules activated"
-msgstr ""
+msgstr "Regulă de detecție activată"
 
 #: discoveryconf.php:192 host_discovery.php:250
 msgid "Discovery rules deleted"
-msgstr ""
+msgstr "Reguli de detecție șterse"
 
 #: host_discovery.php:246
 msgid "Discovery rules disabled"
-msgstr ""
+msgstr "Reguli de detecție dezactivate"
 
 #: discoveryconf.php:182
 msgid "Discovery rules updated"
-msgstr ""
+msgstr "Reguli de detecție actualizate"
 
 #: dashboard.php:334 include/actions.inc.php:82
 msgid "Discovery status"
-msgstr ""
+msgstr "Stare detecție"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:105
 msgid "Display OK triggers for"
-msgstr ""
+msgstr "Afiș triggeri OK pentru"
 
 #: include/func.inc.php:1711
 msgid "Displaying"
-msgstr ""
+msgstr "Afișare"
 
 #: search.php:219 search.php:321 search.php:446
 #, php-format
 msgid "Displaying %1$s of %2$s found"
-msgstr ""
+msgstr "Afișare %1$s din %2$s gasită"
 
 #: report6.php:175
 msgid "Distribution of values for multiple items"
-msgstr ""
+msgstr "Distribuția valorilor pentru itemi multipli"
 
 #: report6.php:174
 msgid "Distribution of values for multiple periods"
-msgstr ""
+msgstr "Distribuția valorilor pentru mai multe perioade"
 
 #: include/services.inc.php:60
 msgid "Do not calculate"
-msgstr ""
+msgstr "Nu calculeză"
 
 #: adm.housekeeper.php:33
 #: include/views/administration.general.housekeeper.edit.php:24
 msgid "Do not keep actions older than (in days)"
-msgstr ""
+msgstr "Nu păstra acțiuni mai vechi de (în zile)"
 
 #: adm.housekeeper.php:58
 #, php-format
 msgid "Do not keep actions older than (in days) \"%1$s\"."
-msgstr ""
+msgstr "Nu păstra acțiuni mai vechi de (în zile) \"%1$s\"."
 
 #: adm.housekeeper.php:35
 #: include/views/administration.general.housekeeper.edit.php:25
 msgid "Do not keep events older than (in days)"
-msgstr ""
+msgstr "Nu păstra evenimente mai vechi de (în zile)"
 
 #: adm.housekeeper.php:57
 #, php-format
 msgid "Do not keep events older than (in days) \"%1$s\"."
-msgstr ""
+msgstr "Nu păstra evenimente mai vechi de (în zile) \"%1$s\"."
 
 #: jsLoader.php:101
 msgid "Do you wish to replace the conditional expression?"
-msgstr ""
+msgstr "Vrei să înlocuiești expresia condițională?"
 
 #: jsLoader.php:134
 msgid "Done"
-msgstr ""
+msgstr "Gata"
 
 #: include/graphs.inc.php:71 include/views/js/configuration.sysmaps.js.php:335
 #: include/views/js/configuration.sysmaps.js.php:411 jsLoader.php:150
 msgid "Dot"
-msgstr ""
+msgstr "Punct"
 
 #: include/blocks.inc.php:1116
 msgctxt "discovery results in dashboard"
 msgid "Down"
-msgstr ""
+msgstr "Oprit"
 
 #: include/discovery.inc.php:150
 msgctxt "discovery status"
 msgid "Down"
-msgstr ""
+msgstr "Deconectat"
 
 #: api/classes/CWebCheck.php:619
 #, php-format
 msgid "Download speed for scenario \"%s\"."
-msgstr ""
+msgstr "Viteză de download pentru scenariul \"%s\"."
 
 #: api/classes/CWebCheck.php:718
 #, php-format
 msgid "Download speed for step \"%1$s\" of scenario \"%2$s\"."
-msgstr ""
+msgstr "Viteză de download pentru pasul \"%1$s\" al scenariului \"%2$s\"."
 
 #: include/views/configuration.services.edit.php:127
 #: include/views/configuration.services.edit.php:287
 #: include/views/monitoring.discovery.php:45
 #: include/views/monitoring.discovery.php:168 report3.php:85
 msgid "Downtime"
-msgstr ""
+msgstr "Avarie"
 
 #: include/views/configuration.host.edit.php:271
 msgid "Drag here to change the type of the interface to \"IPMI\" type."
-msgstr ""
+msgstr "Trage aici pentru schimbarea tipului de interfață la tipul \"IPMI\"."
 
 #: include/views/configuration.host.edit.php:256
 msgid "Drag here to change the type of the interface to \"JMX\" type."
-msgstr ""
+msgstr "Trage aici pentru schimbarea tipului de interfață la tipul \"JMX\"."
 
 #: include/views/configuration.host.edit.php:240
 msgid "Drag here to change the type of the interface to \"SNMP\" type."
-msgstr ""
+msgstr "Trage aici pentru schimbarea tipului de interfață la tipul \"SNMP\"."
 
 #: include/views/configuration.host.edit.php:223
 msgid "Drag here to change the type of the interface to \"agent\" type."
-msgstr ""
+msgstr "Trage aici pentru schimbarea tipului de interfață la tipul \"agent\"."
 
 #: include/views/configuration.graph.edit.php:72
 msgid "Draw style"
-msgstr ""
+msgstr "Stil de desen"
 
 #: include/views/administration.general.gui.edit.php:32
 msgid "Dropdown first entry"
-msgstr ""
+msgstr "Deconectare prima intrare"
 
 #: adm.gui.php:74
 #, php-format
 msgid "Dropdown first entry \"%1$s\"."
-msgstr ""
+msgstr "Deconectare prima intrare \"%1$s\"."
 
 #: adm.gui.php:75
 #, php-format
 msgid "Dropdown remember selected \"%1$s\"."
-msgstr ""
+msgstr "Mențiune de deconectare selectată \"%1$s\"."
 
 #: api/classes/CTrigger.php:1889
 #, php-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
-msgstr ""
+msgstr "Dublează dependențe în trigger \"%1$s\"."
 
 #: api/classes/CHost.php:1361
 #, php-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
-msgstr ""
+msgstr "Dublează server. Server cu același nume \"%s\" există deja in date."
 
 #: api/classes/CHost.php:1393
 #, php-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
-msgstr ""
+msgstr "Dublează server. Server cu același nume vizibil \"%s\" există deja in date."
 
 #: api/classes/CMap.php:561
 #, php-format
 msgid "Duplicate map name for map \"%s\"."
-msgstr ""
+msgstr "Dublează nume hartă pentru harta \"%s\"."
 
 #: api/classes/CScript.php:312 api/classes/CScript.php:363
 #, php-format
 msgid "Duplicate script name \"%s\"."
-msgstr ""
+msgstr "Dublează nume script \"%s\"."
 
 #: include/profiles.inc.php:311
 #, php-format
 msgid "Duplicate severity name \"%s\"."
-msgstr ""
+msgstr "Dublează nume severitate \"%s\"."
 
 #: api/classes/CUser.php:388
 #, php-format
 msgid "Duplicate user alias \"%s\"."
-msgstr ""
+msgstr "Dublează alias utilizator \"%s\"."
 
 #: events.php:564 events.php:577 include/events.inc.php:135
 #: include/events.inc.php:210 include/events.inc.php:213 tr_status.php:289
 msgid "Duration"
-msgstr ""
+msgstr "Durată"
 
 #: include/views/configuration.action.edit.php:317
 msgid "Duration (sec)"
-msgstr ""
+msgstr "Durată (secunde)"
 
 #: include/locales.inc.php:50
 msgid "Dutch (nl_NL)"
-msgstr ""
+msgstr "Olandeză (nl_NL)"
 
 #: include/views/configuration.screen.constructor.edit.php:610
 msgid "Dynamic item"
-msgstr ""
+msgstr "Item dinamic"
 
 #: include/func.inc.php:569
 msgctxt "Exa short"
 msgid "E"
-msgstr ""
+msgstr "E"
 
 #: include/config.inc.php:316
 msgid "ERROR"
-msgstr ""
+msgstr "EROARE"
 
 #: tr_events.php:101
 msgid "EVENTS"
-msgstr ""
+msgstr "EVENIMENT"
 
 #: jsLoader.php:155
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
-msgstr ""
+msgstr "Fiecare URL trebuie să aibă un nume unic. Vă rugăm să vă asigurați că există un singur URL cu numele"
 
 #: include/forms.inc.php:1909 include/forms.inc.php:1923
 #: include/views/administration.users.edit.php:164
@@ -3990,44 +4014,45 @@ msgstr ""
 #: include/views/js/configuration.sysmaps.js.php:394 sysmaps.php:260
 #: sysmaps.php:283
 msgid "Edit"
-msgstr ""
+msgstr "Editare"
 
 #: include/views/configuration.maintenance.edit.php:171
 msgid "Edit maintenance period"
-msgstr ""
+msgstr "Editează perioadă de întreținere"
 
 #: include/views/js/configuration.sysmaps.js.php:7
 msgid "Edit map element"
-msgstr ""
+msgstr "Editează elementul hărții"
 
 #: jsLoader.php:182
 msgid "Edit service"
-msgstr ""
+msgstr "Editează serviciu"
 
 #: include/views/configuration.item.list.php:181
 msgid "Edit trigger"
-msgstr ""
+msgstr "Editează triggerul"
 
 #: include/views/configuration.sysmap.edit.php:151
 msgid "Element"
-msgstr ""
+msgstr "Element"
 
 #: include/maps.inc.php:47 include/views/js/configuration.sysmaps.js.php:297
 msgid "Element name"
-msgstr ""
+msgstr "Nume element"
 
 #: include/media.inc.php:24
 #: include/views/administration.mediatypes.edit.php:39
 msgid "Email"
-msgstr ""
+msgstr "Email"
 
 #: popup.php:527
 msgid "Empty"
-msgstr ""
+msgstr "Gol"
 
 #: api/classes/CAction.php:1724
+#, fuzzy
 msgid "Empty action condition."
-msgstr ""
+msgstr "Golire condiția acțiunii."
 
 #: api/classes/CAction.php:1429 api/classes/CApplication.php:656
 #: api/classes/CDiscoveryRule.php:567 api/classes/CGraph.php:693
@@ -4043,23 +4068,23 @@ msgstr ""
 #: api/classes/CUserGroup.php:701 api/classes/CUserMacro.php:495
 #: api/classes/CUserMacro.php:647
 msgid "Empty input parameter."
-msgstr ""
+msgstr "Golire parametrul de intrare."
 
 #: api/classes/CDRule.php:418
 msgid "Empty input."
-msgstr ""
+msgstr "Golire intrare."
 
 #: api/classes/CUserMacro.php:885
 msgid "Empty macro."
-msgstr ""
+msgstr "Golire macro."
 
 #: api/classes/CService.php:1108
 msgid "Empty name."
-msgstr ""
+msgstr "Golire nume."
 
 #: api/classes/CImage.php:510 api/rpc/class.czbxrpc.php:38
 msgid "Empty parameters"
-msgstr ""
+msgstr "Golire parametri"
 
 #: include/classes/validators/CTimePeriodValidator.php:39
 msgid "Empty time period."
@@ -4067,35 +4092,35 @@ msgstr ""
 
 #: include/views/administration.auditlogs.list.php:48
 msgid "Enable"
-msgstr ""
+msgstr "Activează"
 
 #: include/views/administration.usergroups.list.php:137
 msgid "Enable DEBUG"
-msgstr ""
+msgstr "Activează DEPANARE"
 
 #: include/views/administration.script.edit.php:101
 msgid "Enable confirmation"
-msgstr ""
+msgstr "Activează confirmarea"
 
 #: include/views/administration.usergroups.list.php:138
 msgid "Enable debug mode in selected groups?"
-msgstr ""
+msgstr "Activează modul de depanare în grupurile selectate?"
 
 #: include/views/administration.general.gui.edit.php:41
 msgid "Enable event acknowledges"
-msgstr ""
+msgstr "Activează cunoștiințele evenimentului"
 
 #: include/actions.inc.php:344 include/actions.inc.php:555
 msgid "Enable host"
-msgstr ""
+msgstr "Activare server"
 
 #: hosts.php:803
 msgid "Enable host?"
-msgstr ""
+msgstr "Activare server?"
 
 #: include/views/administration.proxy.list.php:96
 msgid "Enable hosts monitored by selected proxies?"
-msgstr ""
+msgstr "Activare servere monitorizate de proxy-urile selectate?"
 
 #: hosts.php:867 include/views/administration.mediatypes.list.php:109
 #: include/views/administration.proxy.list.php:95
@@ -4109,45 +4134,45 @@ msgstr ""
 #: include/views/configuration.item.list.php:237
 #: include/views/configuration.triggers.list.php:225
 msgid "Enable selected"
-msgstr ""
+msgstr "Activare selectată"
 
 #: include/views/configuration.httpconf.list.php:130
 msgid "Enable selected WEB scenarios?"
-msgstr ""
+msgstr "Activare scenarii WEB selectate?"
 
 #: include/views/configuration.action.list.php:94
 msgid "Enable selected actions?"
-msgstr ""
+msgstr "Activare acțiuni selectate?"
 
 #: include/views/configuration.application.list.php:82
 msgid "Enable selected applications?"
-msgstr ""
+msgstr "Activare acțiuni selectate?"
 
 #: include/views/configuration.discovery.list.php:68
 #: include/views/configuration.host.discovery.list.php:102
 msgid "Enable selected discovery rules?"
-msgstr ""
+msgstr "Activare reguli de detecție?"
 
 #: include/views/administration.usergroups.list.php:130
 msgid "Enable selected groups?"
-msgstr ""
+msgstr "Activare grupuri selectate?"
 
 #: hosts.php:868 include/views/configuration.hostgroups.list.php:120
 msgid "Enable selected hosts?"
-msgstr ""
+msgstr "Activare servere selectate?"
 
 #: include/views/configuration.item.list.php:238
 #: include/views/configuration.item.prototype.list.php:105
 msgid "Enable selected items?"
-msgstr ""
+msgstr "Activare elemente selectate?"
 
 #: include/views/administration.mediatypes.list.php:110
 msgid "Enable selected media types?"
-msgstr ""
+msgstr "Activare elemente media selectate?"
 
 #: include/views/configuration.triggers.list.php:226
 msgid "Enable selected triggers?"
-msgstr ""
+msgstr "Activare triggeri selectați?"
 
 #: auditlogs.php:149 dashboard.php:227 dashconf.php:160
 #: include/discovery.inc.php:118 include/httptest.inc.php:45
@@ -4171,15 +4196,15 @@ msgstr ""
 #: include/views/configuration.triggers.list.php:192
 #: include/views/monitoring.overview.php:44 popup_media.php:136 popup.php:1046
 msgid "Enabled"
-msgstr ""
+msgstr "Activat"
 
 #: include/locales.inc.php:44
 msgid "English (en_GB)"
-msgstr ""
+msgstr "Engleză (en_GB)"
 
 #: include/locales.inc.php:45
 msgid "English (en_US)"
-msgstr ""
+msgstr "Engleză (en_US)"
 
 #: include/actions.inc.php:736 include/actions.inc.php:812
 #: include/classes/screens/CScreenActions.php:131 include/items.inc.php:35
@@ -4189,127 +4214,127 @@ msgstr ""
 #: include/views/configuration.triggers.edit.php:146
 #: include/views/configuration.triggers.list.php:98 popup.php:131
 msgid "Error"
-msgstr ""
+msgstr "Eroare"
 
 #: api/classes/CScript.php:478
 msgid "Error description"
-msgstr ""
+msgstr "Descriere eroare"
 
 #: api/classes/CScript.php:516
 msgid "Error description: can't read script response, check connection."
-msgstr ""
+msgstr "Descriere eroare: nu se poate citi scriptul de răspuns, verifică conexiunea."
 
 #: api/classes/CScript.php:493
 msgid "Error description: can't send command, check connection."
-msgstr ""
+msgstr "Descriere eroare: nu se poate trimite comanda, verifică conexiunea."
 
 #: api/classes/CScript.php:509
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value."
-msgstr ""
+msgstr "Descriere eroare: definit în \"include/defines.inc.php\" constanta ZBX_SCRIPT_BYTES_LIMIT limita de citire octeți a fost atinsă. Încearcă să mărești această valoare."
 
 #: api/classes/CScript.php:505
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value."
-msgstr ""
+msgstr "Descriere eroare: definit în \"include/defines.inc.php\" constanta ZBX_SCRIPT_TIMEOUT limita de timp a fost atinsă. Încearcă să mărești această valoare."
 
 #: api/classes/CScript.php:524
 msgid "Error description: empty response received."
-msgstr ""
+msgstr "Descriere eroare: răspuns gol primit."
 
 #: api/classes/CItemGeneral.php:267
 #, php-format
 msgid "Error in item key: \"%s\"."
-msgstr ""
+msgstr "Eroare în cheia itemului: \"%s\"."
 
 #: include/db.inc.php:940
 #, php-format
 msgid "Error in search request for table \"%1$s\"."
-msgstr ""
+msgstr "Eroare in cererea de căutare pentru tabelul \"%1$s\"."
 
 #: httpdetails.php:155 httpdetails.php:209
 #, php-format
 msgid "Error: %1$s"
-msgstr ""
+msgstr "Eroare: %1$s"
 
 #: include/events.inc.php:115
 msgid "Event"
-msgstr ""
+msgstr "Eveniment"
 
 #: include/classes/screens/CScreenHistory.php:167
 msgid "Event ID"
-msgstr ""
+msgstr "Eveniment ID"
 
 #: popup_trexpr.php:426
 msgid "Event ID of last log entry matching regular expression T, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "Evenimentul ID a ultimei logări se potrivește cu expresia uzuală T, atunci N = 1, 0 - altfel"
 
 #: popup_trexpr.php:431
 msgid "Event ID of last log entry matching regular expression T, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "Evenimentul ID a ultimei logări se potrivește cu expresia uzuală T, atunci N NU 1, 0 - altfel"
 
 #: acknow.php:119 include/actions.inc.php:88
 msgid "Event acknowledged"
-msgstr ""
+msgstr "Eveniment confirmat"
 
 #: adm.gui.php:71
 #, php-format
 msgid "Event acknowledges \"%1$s\"."
-msgstr ""
+msgstr "Evenimentul confirmă \"%1$s\"."
 
 #: dashconf.php:260
 msgid "Event acknowledging disabled"
-msgstr ""
+msgstr "Dezactivare confirmare eveniment "
 
 #: tr_events.php:30 tr_events.php:115
 msgid "Event details"
-msgstr ""
+msgstr "Detalii eveniment"
 
 #: include/triggers.inc.php:1607
 msgid "Event generation"
-msgstr ""
+msgstr "Generare eveniment"
 
 #: tr_events.php:139
 msgid "Event list [previous 20]"
-msgstr ""
+msgstr "Listă de evenimente [ultimele 20]"
 
 #: include/views/configuration.action.list.php:37
 msgid "Event source"
-msgstr ""
+msgstr "Sursă eveniment"
 
 #: tr_events.php:110
 msgid "Event source details"
-msgstr ""
+msgstr "Detalii sursă eveniment"
 
 #: events.php:317 include/menu.inc.php:57 include/triggers.inc.php:1267
 #: jsLoader.php:111 search.php:134 search.php:206 search.php:261
 #: search.php:313 tr_status.php:211
 msgid "Events"
-msgstr ""
+msgstr "Evenimente"
 
 #: include/forms.inc.php:1517
 msgid "Every day(s)"
-msgstr ""
+msgstr "Zilnic"
 
 #: include/forms.inc.php:1524
 msgid "Every week(s)"
-msgstr ""
+msgstr "Săptămânal"
 
 #: include/func.inc.php:569
 msgid "Exa"
-msgstr ""
+msgstr "Exa"
 
 #: tr_logform.php:283 tr_logform.php:335
 msgid "Exclude"
-msgstr ""
+msgstr "Exclude"
 
 #: include/views/js/administration.script.edit.js.php:66
 #: include/views/js/general.script.confirm.js.php:37
 msgid "Execute"
-msgstr ""
+msgstr "Execută"
 
 #: api/classes/CImage.php:339
 #, php-format
 msgid "Execute SQL error [%1$s] in [%2$s]."
-msgstr ""
+msgstr "Execută eroare SQL [%1$s] în [%2$s]."
 
 #: include/views/administration.script.edit.php:58
 #: include/views/administration.script.list.php:39
@@ -4317,50 +4342,50 @@ msgstr ""
 #: include/views/js/configuration.action.edit.js.php:114 popup.php:1807
 #: popup.php:1814
 msgid "Execute on"
-msgstr ""
+msgstr "Execută la"
 
 #: include/items.inc.php:1334 include/views/configuration.item.edit.php:186
 msgid "Executed script"
-msgstr ""
+msgstr "Execută script"
 
 #: include/views/js/general.script.confirm.js.php:16
 msgid "Execution confirmation"
-msgstr ""
+msgstr "Confirmare de executare"
 
 #: sysmap.php:190
 msgid "Expand macros"
-msgstr ""
+msgstr "Extinde macrouri"
 
 #: include/views/configuration.sysmap.edit.php:83
 msgid "Expand single problem"
-msgstr ""
+msgstr "Extinde problema unică"
 
 #: include/forms.inc.php:1776 include/forms.inc.php:1907
 msgid "Expected result"
-msgstr ""
+msgstr "Extinde rezultat"
 
 #: api/rpc/class.cjsonrpc.php:90
 #, php-format
 msgid "Expecting JSON-rpc version 2.0, \"%s\" is given."
-msgstr ""
+msgstr "Așteptare versiune 2,0 a JSON-rpc, \"%s\" este dată."
 
 #: include/views/configuration.maintenance.list.php:55
 msgctxt "maintenance status"
 msgid "Expired"
-msgstr ""
+msgstr "Expirat"
 
 #: include/graphs.inc.php:27 popup.php:1413
 msgid "Exploded"
-msgstr ""
+msgstr "Explodat"
 
 #: hosts.php:864 include/views/configuration.screen.list.php:66
 #: sysmaps.php:289 templates.php:610
 msgid "Export selected"
-msgstr ""
+msgstr "Selectează export"
 
 #: events.php:279
 msgid "Export to CSV"
-msgstr ""
+msgstr "Export în CSV"
 
 #: include/forms.inc.php:1775 include/forms.inc.php:1906
 #: include/forms.inc.php:1979 include/triggers.inc.php:1606
@@ -4371,132 +4396,132 @@ msgstr ""
 #: include/views/configuration.triggers.list.php:96 triggers.php:48
 #: tr_logform.php:295 tr_logform.php:303 tr_testexpr.php:135
 msgid "Expression"
-msgstr ""
+msgstr "Expresie"
 
 #: include/forms.inc.php:1341 include/forms.inc.php:1346
 #: include/forms.inc.php:1359
 msgid "Expression Syntax Error."
-msgstr ""
+msgstr "Expresie Eroare de Sintaxă."
 
 #: tr_testexpr.php:56
 msgid "Expression Variable Elements"
-msgstr ""
+msgstr "Expresie Elemente Variabile"
 
 #: include/triggers.inc.php:537
 msgid "Expression cannot be empty"
-msgstr ""
+msgstr "Expresia nu poate fi vidă"
 
 #: include/views/configuration.triggers.edit.php:126
 msgid "Expression constructor"
-msgstr ""
+msgstr "Constructor de expresii"
 
 #: include/forms.inc.php:1988
 msgid "Expression type"
-msgstr ""
+msgstr "Tip de expresie"
 
 #: include/views/administration.general.regularexpressions.edit.php:33
 #: include/views/administration.general.regularexpressions.list.php:29
 msgid "Expressions"
-msgstr ""
+msgstr "Expresii"
 
 #: include/items.inc.php:86
 msgid "External check"
-msgstr ""
+msgstr "Verificare externă"
 
 #: include/media.inc.php:28
 #: include/views/administration.mediatypes.edit.php:44
 msgid "Ez Texting"
-msgstr ""
+msgstr "Text de tip Ez"
 
 #: jsLoader.php:130
 msgctxt "Friday short"
 msgid "F"
-msgstr ""
+msgstr "F"
 
 #: include/forms.inc.php:1831 include/forms.inc.php:1851
 msgid "FALSE"
-msgstr ""
+msgstr "FALS"
 
 #: include/discovery.inc.php:60
 #: include/views/js/configuration.discovery.edit.js.php:120
 msgid "FTP"
-msgstr ""
+msgstr "FTP"
 
 #: include/setup.inc.php:203 include/setup.inc.php:297
 #: include/setup.inc.php:450
 msgid "Fail"
-msgstr ""
+msgstr "Greșeală"
 
 #: include/actions.inc.php:961 include/blocks.inc.php:1025
 msgid "Failed"
-msgstr ""
+msgstr "Eșuat"
 
 #: api/classes/CWebCheck.php:626
 #, php-format
 msgid "Failed step of scenario \"%s\"."
-msgstr ""
+msgstr "Pas greșit în scenariul \"%s\"."
 
 #: api/classes/CTemplate.php:1092
 msgid "Failed to update template"
-msgstr ""
+msgstr "Eroare la actualizarea șablonului"
 
 #: include/items.inc.php:37
 msgid "Failure Audit"
-msgstr ""
+msgstr "Audit greșit"
 
 #: dashboard.php:259 include/blocks.inc.php:1136
 msgid "Favourite graphs"
-msgstr ""
+msgstr "Elemente de grafică preferate"
 
 #: dashboard.php:273 include/blocks.inc.php:1261
 msgid "Favourite maps"
-msgstr ""
+msgstr "Hărți preferate"
 
 #: dashboard.php:266 include/blocks.inc.php:1306
 msgid "Favourite screens"
-msgstr ""
+msgstr "Ecrane preferate"
 
 #: include/views/monitoring.slides.php:43 slides.php:76 slides.php:83
 msgid "Favourites"
-msgstr ""
+msgstr "Favorite"
 
 #: include/func.inc.php:219
 msgid "Feb"
-msgstr ""
+msgstr "Feb"
 
 #: include/forms.inc.php:1546 include/func.inc.php:105
 #: include/func.inc.php:236 jsLoader.php:115
 msgid "February"
-msgstr ""
+msgstr "Februarie"
 
 #: hostinventoriesoverview.php:87
 msgid "Field"
-msgstr ""
+msgstr "Câmp"
 
 #: api/classes/CDRule.php:527
 msgid "Field \"druleid\" is required."
-msgstr ""
+msgstr "Câmpul \"druleid\" este obligatoriu."
 
 #: api/classes/CTemplate.php:991
 msgid "Field \"host\" is mandatory"
-msgstr ""
+msgstr "Câmpul \"server\" este opțional "
 
 #: api/classes/CDRule.php:534
 msgid "Field \"name\" is required."
-msgstr ""
+msgstr "Câmpul \"druleid\" este obligatoriu."
 
 #: hostinventories.php:126
 msgid "Field:"
-msgstr ""
+msgstr "Câmp:"
 
 #: api/classes/CImage.php:593
 msgid "File format is unsupported."
-msgstr ""
+msgstr "Formatul de fișier nu este suportat."
 
 #: include/classes/helpers/CUploadFile.php:153
 #, php-format
 msgid "File is too big, max upload size is %1$s bytes."
-msgstr ""
+msgstr "Fișierul este prea mare, mărimea de upload este %1$s octeți."
 
 #: include/classes/class.cview.php:68
 #, php-format
