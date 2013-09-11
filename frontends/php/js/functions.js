@@ -957,7 +957,7 @@ function formatTimestamp(timestamp, isTsDouble, isExtend) {
  */
 function printLess(show) {
 	if (!jQuery("#printLess").length) {
-		jQuery('head').append('<link rel="stylesheet" href="./styles/print.css" type="text/css" id="printLess"/>');
+		jQuery('<link rel="stylesheet" type="text/css" id="printLess">').appendTo('head').attr('href', './styles/print.css');
 
 		jQuery('.header_l.left, .header_r.right').each(function(i, obj) {
 			if (jQuery(this).find('input, form, select, .menu_icon').length) {
