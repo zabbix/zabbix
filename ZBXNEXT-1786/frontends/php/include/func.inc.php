@@ -2610,7 +2610,6 @@ function clearCookies($clear = false, $id = null) {
  * @param string $host['hostid']			host id
  * @param array  $host['inventory']			host inventory (optional)
  * @param array  $host['screens']			host screens (optional)
- * @param int    $host['status']			host status (optional)
  * @param array  $scripts					host scripts (optional)
  * @param string $scripts[]['name']			script name
  * @param string $scripts[]['scriptid']		script id
@@ -2625,10 +2624,6 @@ function getMenuPopupHost(array $host, array $scripts = null) {
 		'hasInventory' => (isset($host['inventory']) && $host['inventory']),
 		'hasScreens' => (isset($host['screens']) && $host['screens'])
 	);
-
-	if ($data['hasScreens'] && isset($host['status'])) {
-		$data['hasScreens'] = ($host['status'] == HOST_STATUS_MONITORED);
-	}
 
 	if ($scripts) {
 		CArrayHelper::sort($scripts, array('name'));
