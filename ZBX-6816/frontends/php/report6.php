@@ -218,7 +218,7 @@ else {
 			? array(array('itemid' => get_request('itemid')))
 			: get_request('items');
 
-		if ($isValid) {
+		if ($isValid && $items) {
 			$src = 'chart_bar.php?config='.$_REQUEST['config'].
 						url_param('title').
 						url_param('xlabel').
