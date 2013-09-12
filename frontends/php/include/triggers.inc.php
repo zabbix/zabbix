@@ -730,7 +730,7 @@ function explode_exp($expression, $html = false, $resolve_macro = false, $src_ho
 					if ($function_data['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $function_data['type'] == ITEM_TYPE_HTTPTEST) {
 						$link = new CSpan($function_data['host'].':'.$function_data['key_'], $style);
 					}
-					elseif ($function_data['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
+					elseif ($function_data['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 						$link = new CLink($function_data['host'].':'.$function_data['key_'],
 							'disc_prototypes.php?form=update&itemid='.$function_data['itemid'].'&parent_discoveryid='.
 							$trigger['discoveryRuleid'].'&switch_node='.id2nodeid($function_data['itemid']), $style);
@@ -851,7 +851,7 @@ function triggerExpression($trigger, $html = false) {
 					if ($function_data['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $function_data['type'] == ITEM_TYPE_HTTPTEST) {
 						$link = new CSpan($function_data['host'].':'.CHtml::encode($function_data['key_']), $style);
 					}
-					elseif ($function_data['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
+					elseif ($function_data['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 						$link = new CLink($function_data['host'].':'.CHtml::encode($function_data['key_']),
 							'disc_prototypes.php?form=update&itemid='.$function_data['itemid'].'&parent_discoveryid='.
 							$trigger['discoveryRuleid'], $style);
@@ -947,7 +947,7 @@ function implode_exp($expression, $triggerId, &$hostnames = array()) {
 				'SELECT i.itemid,i.value_type,h.name'.
 				' FROM items i,hosts h'.
 				' WHERE i.key_='.zbx_dbstr($exprPart['item']).
-					' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_CHILD)).
+					' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_PROTOTYPE)).
 					' AND h.host='.zbx_dbstr($exprPart['host']).
 					' AND h.hostid=i.hostid'.
 					andDbNode('i.itemid')
@@ -1026,7 +1026,7 @@ function getExpressionItems(CTriggerExpression $triggerExpression) {
 				' FROM items i,hosts h'.
 				' WHERE i.key_='.zbx_dbstr($expression['item']).
 					' AND '.dbConditionInt('i.flags', array(
-						ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_CHILD
+						ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_PROTOTYPE
 					)).
 					' AND h.host='.zbx_dbstr($expression['host']).
 					' AND h.hostid=i.hostid'.
@@ -1134,7 +1134,7 @@ function get_triggers_overview($hostids, $application, $view_style = null, $scre
 	}
 
 	$options = array(
-		'output' => array('name', 'hostid'),
+		'output' => array('name', 'hostid', 'status'),
 		'hostids' => $hostids,
 		'preservekeys' => true
 	);
@@ -1584,7 +1584,7 @@ function make_trigger_details($trigger) {
 	$expression = explode_exp($trigger['expression'], true, true);
 
 	$host = API::Host()->get(array(
-		'output' => array('name', 'hostid'),
+		'output' => array('name', 'hostid', 'status'),
 		'hostids' => $trigger['hosts'][0]['hostid'],
 		'selectScreens' => API_OUTPUT_COUNT,
 		'selectInventory' => array('hostid'),
@@ -2322,11 +2322,10 @@ function get_item_function_info($expr) {
  *
  * @param string $expression
  * @param array  $rplcts
- * @param bool   $oct
  *
  * @return array
  */
-function evalExpressionData($expression, $rplcts, $oct = false) {
+function evalExpressionData($expression, $rplcts) {
 	$result = false;
 
 	$evStr = str_replace(array_keys($rplcts), array_values($rplcts), $expression);
@@ -2340,9 +2339,7 @@ function evalExpressionData($expression, $rplcts, $oct = false) {
 		return 'FALSE';
 	}
 
-	if ($oct) {
-		$evStr = preg_replace('/([0-9]+) *(\=|\#|\!=|\<|\>) *([0-9]+)/', '((float)ltrim("$1","0") $2 (float)ltrim("$3","0"))', $evStr);
-	}
+	$evStr = preg_replace('/(-?[0-9]*\.?[0-9]+) *(\=|\#|\!=|\<|\>) *(-?[0-9]*\.?[0-9]+)/', '((float) "$1" $2 (float) "$3")', $evStr);
 
 	$switch = array('=' => '==', '#' => '!=', '&' => '&&', '|' => '||');
 	$evStr = str_replace(array_keys($switch), array_values($switch), $evStr);

@@ -77,12 +77,14 @@ typedef struct
 	zbx_uint64_t		itemid;
 	zbx_uint64_t		hostid;
 	zbx_uint64_t		interfaceid;
+	zbx_uint64_t		lastlogsize;
 	const char		*key;
 	const char		*port;
 	const ZBX_DC_TRIGGER	**triggers;
 	int			delay;
 	int			nextcheck;
 	int			lastclock;
+	int			mtime;
 	unsigned char		type;
 	unsigned char		data_type;
 	unsigned char		value_type;
@@ -173,6 +175,14 @@ typedef struct
 	const char	*params;
 }
 ZBX_DC_TELNETITEM;
+
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	const char	*username;
+	const char	*password;
+}
+ZBX_DC_SIMPLEITEM;
 
 typedef struct
 {
@@ -358,6 +368,7 @@ typedef struct
 	zbx_hashset_t		dbitems;
 	zbx_hashset_t		sshitems;
 	zbx_hashset_t		telnetitems;
+	zbx_hashset_t		simpleitems;
 	zbx_hashset_t		jmxitems;
 	zbx_hashset_t		calcitems;
 	zbx_hashset_t		deltaitems;		/* history data for delta value calculations */
@@ -404,7 +415,7 @@ static unsigned char	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_host
 		return ZBX_NO_POLLER;
 	}
 
-	if (0 != (ZBX_FLAG_DISCOVERY_CHILD & flags))
+	if (0 != (ZBX_FLAG_DISCOVERY_PROTOTYPE & flags))
 		return ZBX_NO_POLLER;
 
 	switch (item_type)
@@ -789,6 +800,7 @@ static void	DCsync_items(DB_RESULT result)
 	ZBX_DC_DBITEM		*dbitem;
 	ZBX_DC_SSHITEM		*sshitem;
 	ZBX_DC_TELNETITEM	*telnetitem;
+	ZBX_DC_SIMPLEITEM	*simpleitem;
 	ZBX_DC_JMXITEM		*jmxitem;
 	ZBX_DC_CALCITEM		*calcitem;
 	ZBX_DC_INTERFACE_ITEM	*interface_snmpitem;
@@ -870,7 +882,7 @@ static void	DCsync_items(DB_RESULT result)
 		item->flags = (unsigned char)atoi(row[26]);
 		ZBX_DBROW2UINT64(item->interfaceid, row[27]);
 
-		if (0 != (ZBX_FLAG_DISCOVERY & item->flags))
+		if (0 != (ZBX_FLAG_DISCOVERY_RULE & item->flags))
 			item->value_type = ITEM_VALUE_TYPE_TEXT;
 		else
 			item->value_type = (unsigned char)atoi(row[5]);
@@ -879,6 +891,8 @@ static void	DCsync_items(DB_RESULT result)
 		{
 			item->triggers = NULL;
 			item->lastclock = 0;
+			ZBX_STR2UINT64(item->lastlogsize, row[31]);
+			item->mtime = atoi(row[32]);
 		}
 		else if (NULL != item->triggers && NULL == item->triggers[0])
 		{
@@ -1115,6 +1129,25 @@ static void	DCsync_items(DB_RESULT result)
 			zbx_hashset_remove(&config->telnetitems, &itemid);
 		}
 
+		/* Simple items */
+
+		if (ITEM_TYPE_SIMPLE == item->type)
+		{
+			simpleitem = DCfind_id(&config->simpleitems, itemid, sizeof(ZBX_DC_SIMPLEITEM), &found);
+
+			DCstrpool_replace(found, &simpleitem->username, row[22]);
+			DCstrpool_replace(found, &simpleitem->password, row[23]);
+		}
+		else if (NULL != (simpleitem = zbx_hashset_search(&config->simpleitems, &itemid)))
+		{
+			/* remove Simple item parameters */
+
+			zbx_strpool_release(simpleitem->username);
+			zbx_strpool_release(simpleitem->password);
+
+			zbx_hashset_remove(&config->simpleitems, &itemid);
+		}
+
 		/* JMX items */
 
 		if (ITEM_TYPE_JMX == item->type)
@@ -1273,6 +1306,18 @@ static void	DCsync_items(DB_RESULT result)
 			zbx_strpool_release(telnetitem->params);
 
 			zbx_hashset_remove(&config->telnetitems, &itemid);
+		}
+
+		/* Simple items */
+
+		if (ITEM_TYPE_SIMPLE == item->type)
+		{
+			simpleitem = zbx_hashset_search(&config->simpleitems, &itemid);
+
+			zbx_strpool_release(simpleitem->username);
+			zbx_strpool_release(simpleitem->password);
+
+			zbx_hashset_remove(&config->simpleitems, &itemid);
 		}
 
 		/* JMX items */
@@ -2482,7 +2527,7 @@ void	DCsync_configuration()
 				"i.ipmi_sensor,i.delay,i.delay_flex,i.trapper_hosts,i.logtimefmt,i.params,"
 				"i.state,i.authtype,i.username,i.password,i.publickey,i.privatekey,"
 				"i.flags,i.interfaceid,i.snmpv3_authprotocol,i.snmpv3_privprotocol,"
-				"i.snmpv3_contextname"
+				"i.snmpv3_contextname,i.lastlogsize,i.mtime"
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
 				" and h.status=%d"
@@ -2509,7 +2554,7 @@ void	DCsync_configuration()
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE,
 			TRIGGER_STATUS_ENABLED,
-			ZBX_FLAG_DISCOVERY_CHILD,
+			ZBX_FLAG_DISCOVERY_PROTOTYPE,
 			DBand_node_local("h.hostid"));
 	tsec = zbx_time() - sec;
 
@@ -2537,7 +2582,7 @@ void	DCsync_configuration()
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE,
 			TRIGGER_STATUS_ENABLED,
-			ZBX_FLAG_DISCOVERY_CHILD,
+			ZBX_FLAG_DISCOVERY_PROTOTYPE,
 			DBand_node_local("h.hostid"));
 	fsec = zbx_time() - sec;
 
@@ -2551,8 +2596,10 @@ void	DCsync_configuration()
 				"status,name"
 			" from hosts"
 			" where status in (%d,%d,%d)"
+				" and flags<>%d"
 				ZBX_SQL_NODE,
 			HOST_STATUS_MONITORED, HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE,
+			ZBX_FLAG_DISCOVERY_PROTOTYPE,
 			DBand_node_local("hostid"));
 	hsec = zbx_time() - sec;
 
@@ -2692,6 +2739,8 @@ void	DCsync_configuration()
 			config->sshitems.num_data, config->sshitems.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() telnetitems: %d (%d slots)", __function_name,
 			config->telnetitems.num_data, config->telnetitems.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() simpleitems: %d (%d slots)", __function_name,
+			config->simpleitems.num_data, config->simpleitems.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() jmxitems   : %d (%d slots)", __function_name,
 			config->jmxitems.num_data, config->jmxitems.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() calcitems  : %d (%d slots)", __function_name,
@@ -3081,6 +3130,7 @@ void	init_configuration_cache()
 	CREATE_HASHSET(config->dbitems);
 	CREATE_HASHSET(config->sshitems);
 	CREATE_HASHSET(config->telnetitems);
+	CREATE_HASHSET(config->simpleitems);
 	CREATE_HASHSET(config->jmxitems);
 	CREATE_HASHSET(config->calcitems);
 	CREATE_HASHSET(config->deltaitems);
@@ -3320,6 +3370,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 	const ZBX_DC_FLEXITEM		*flexitem;
 	const ZBX_DC_SSHITEM		*sshitem;
 	const ZBX_DC_TELNETITEM		*telnetitem;
+	const ZBX_DC_SIMPLEITEM		*simpleitem;
 	const ZBX_DC_JMXITEM		*jmxitem;
 	const ZBX_DC_CALCITEM		*calcitem;
 	const ZBX_DC_INTERFACE		*dc_interface;
@@ -3335,6 +3386,8 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 	dst_item->state = src_item->state;
 	dst_item->lastclock = src_item->lastclock;
 	dst_item->flags = src_item->flags;
+	dst_item->lastlogsize = src_item->lastlogsize;
+	dst_item->mtime = src_item->mtime;
 
 	if (NULL != (flexitem = zbx_hashset_search(&config->flexitems, &src_item->itemid)))
 		strscpy(dst_item->delay_flex, flexitem->delay_flex);
@@ -3438,6 +3491,20 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 				*dst_item->username_orig = '\0';
 				*dst_item->password_orig = '\0';
 				dst_item->params = zbx_strdup(NULL, "");
+			}
+			dst_item->username = NULL;
+			dst_item->password = NULL;
+			break;
+		case ITEM_TYPE_SIMPLE:
+			if (NULL != (simpleitem = zbx_hashset_search(&config->simpleitems, &src_item->itemid)))
+			{
+				strscpy(dst_item->username_orig, simpleitem->username);
+				strscpy(dst_item->password_orig, simpleitem->password);
+			}
+			else
+			{
+				*dst_item->username_orig = '\0';
+				*dst_item->password_orig = '\0';
 			}
 			dst_item->username = NULL;
 			dst_item->password = NULL;
@@ -3779,7 +3846,7 @@ void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_
 
 				if ('}' == *q)
 				{
-					ZBX_STR2UINT64(functionid, p + 1);
+					sscanf(p + 1, ZBX_FS_UI64, &functionid);
 
 					if (NULL != (dc_function = zbx_hashset_search(&config->functions, &functionid)) &&
 							SUCCEED == is_time_function(dc_function->function) &&
@@ -4288,7 +4355,8 @@ static void	DCrequeue_unreachable_item(ZBX_DC_ITEM *dc_item)
 	DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 }
 
-void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastclocks, int *errcodes, size_t num)
+void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastclocks, zbx_uint64_t *lastlogsizes,
+		int *mtimes, int *errcodes, size_t num)
 {
 	size_t		i;
 	ZBX_DC_ITEM	*dc_item;
@@ -4305,6 +4373,10 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 
 		dc_item->state = states[i];
 		dc_item->lastclock = lastclocks[i];
+		if (NULL != lastlogsizes)
+			dc_item->lastlogsize = lastlogsizes[i];
+		if (NULL != mtimes)
+			dc_item->mtime = mtimes[i];
 
 		switch (errcodes[i])
 		{
@@ -4929,7 +5001,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 	{
 		ZBX_DC_HOST	*host = NULL;
 
-		if (0 != (item->flags & (ZBX_FLAG_DISCOVERY | ZBX_FLAG_DISCOVERY_CHILD)))
+		if (0 != (item->flags & (ZBX_FLAG_DISCOVERY_RULE | ZBX_FLAG_DISCOVERY_PROTOTYPE)))
 			continue;
 
 		switch (item->type)
