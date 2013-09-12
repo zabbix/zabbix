@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-06 01:17+0300\n"
-"PO-Revision-Date: 2013-08-30 07:07+0300\n"
+"POT-Creation-Date: 2013-09-11 09:56+0300\n"
+"PO-Revision-Date: 2013-09-07 20:38+0300\n"
 "Last-Translator: Łukasz <deejay1@srem.org>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -13,14 +13,14 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1377839266.0\n"
+"X-POOTLE-MTIME: 1378579083.0\n"
 
 #: include/views/configuration.item.edit.php:389
 msgid " day"
 msgid_plural " days"
-msgstr[0] "dzień"
-msgstr[1] "dni"
-msgstr[2] "dni"
+msgstr[0] " dzień"
+msgstr[1] " dni"
+msgstr[2] " dni"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -31,7 +31,7 @@ msgstr "„%s” musi zawierać się w przedziale pomiędzy 01.01.1970 a 18.01.2
 
 #: include/profiles.inc.php:321
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
-msgstr "Pole \"Wyświetlanie wyzwalaczy w stanie OK\" musi być wartością 0 lub dodatnią liczbą całkowitą."
+msgstr "Pole „Wyświetlanie wyzwalaczy w stanie OK” musi być wartością 0 lub dodatnią liczbą całkowitą."
 
 #: include/profiles.inc.php:326
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
@@ -233,7 +233,7 @@ msgstr "Akceptowalne SLA"
 msgid "Access denied!"
 msgstr "Dostęp zabroniony!"
 
-#: include/func.inc.php:2045
+#: include/func.inc.php:2047
 msgid "Access denied."
 msgstr ""
 
@@ -403,7 +403,7 @@ msgstr "Aktywne do"
 #: include/views/administration.usergroups.edit.php:111
 #: include/views/administration.usergroups.edit.php:115
 #: include/views/administration.users.edit.php:90
-#: include/views/administration.users.edit.php:194
+#: include/views/administration.users.edit.php:195
 #: include/views/common.macros.php:66
 #: include/views/configuration.action.edit.php:308
 #: include/views/configuration.action.edit.php:507
@@ -817,11 +817,11 @@ msgstr ""
 msgid "Auto registration"
 msgstr "Automatyczna rejestracja"
 
-#: include/views/administration.users.edit.php:142
+#: include/views/administration.users.edit.php:143
 msgid "Auto-login"
 msgstr "Automatyczne logowanie"
 
-#: include/views/administration.users.edit.php:143 profile.php:47 users.php:59
+#: include/views/administration.users.edit.php:144 profile.php:47 users.php:59
 msgid "Auto-logout (min 90 seconds)"
 msgstr "Automatyczne wylogowanie (przynajmniej 90 sek.)"
 
@@ -1222,9 +1222,14 @@ msgstr "Nie można potwierdzić zdarzenia"
 msgid "Cannot activate web scenario"
 msgstr ""
 
-#: api/classes/CGraph.php:654 api/classes/CGraphPrototype.php:685
+#: api/classes/CGraph.php:696
 #, php-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
+msgstr ""
+
+#: api/classes/CGraphPrototype.php:696 api/classes/CGraphPrototype.php:758
+#, php-format
+msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
 msgstr ""
 
 #: actionconf.php:150
@@ -1296,10 +1301,15 @@ msgstr "Nie można dodać okresu utrzymania"
 msgid "Cannot add media type"
 msgstr "Nie można dodać typu mediów"
 
-#: api/classes/CGraphGeneral.php:106
+#: api/classes/CGraph.php:43
 #, php-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
 msgstr "Nie można dodać więcej niż jednej pozycji typu \"Graph sum\" na wykresie \"%1$s\"."
+
+#: api/classes/CGraphPrototype.php:43
+#, php-format
+msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
+msgstr ""
 
 #: sysmaps.php:171
 msgid "Cannot add network map"
@@ -1509,7 +1519,7 @@ msgstr "Nie można usunąć wykresu."
 msgid "Cannot delete graphs"
 msgstr "Nie można usunąć wykresów"
 
-#: api/classes/CGraphPrototype.php:563
+#: api/classes/CGraphPrototype.php:577
 msgid "Cannot delete graphs created by low level discovery."
 msgstr ""
 
@@ -1627,7 +1637,7 @@ msgstr "Nie można usunąć szablonu"
 msgid "Cannot delete templated application."
 msgstr ""
 
-#: api/classes/CGraph.php:529 api/classes/CGraphPrototype.php:538
+#: api/classes/CGraph.php:535 api/classes/CGraphPrototype.php:552
 msgid "Cannot delete templated graphs."
 msgstr "Nie można usunąć wykresów z szablonu."
 
@@ -1937,11 +1947,6 @@ msgstr ""
 msgid "Cannot set \"templateid\" for application \"%1$s\"."
 msgstr ""
 
-#: api/classes/CGraphGeneral.php:57
-#, php-format
-msgid "Cannot set \"templateid\" for graph \"%1$s\"."
-msgstr ""
-
 #: api/classes/CScreen.php:376
 #, php-format
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
@@ -2035,9 +2040,14 @@ msgstr ""
 msgid "Cannot update \"templateid\" for application \"%1$s\"."
 msgstr ""
 
-#: api/classes/CGraphGeneral.php:54
+#: api/classes/CGraph.php:42
 #, php-format
 msgid "Cannot update \"templateid\" for graph \"%1$s\"."
+msgstr ""
+
+#: api/classes/CGraphPrototype.php:42
+#, php-format
+msgid "Cannot update \"templateid\" for graph prototype \"%1$s\"."
 msgstr ""
 
 #: api/classes/CScreen.php:447 api/classes/CTemplateScreen.php:667
@@ -2050,7 +2060,7 @@ msgstr ""
 msgid "Cannot update \"templateid\" for trigger prototype \"%1$s\"."
 msgstr ""
 
-#: api/classes/CGraphGeneral.php:192
+#: api/classes/CGraphGeneral.php:60
 msgid "Cannot update a discovered graph."
 msgstr ""
 
@@ -3458,7 +3468,7 @@ msgstr "Usunąć skrypt?"
 #: include/views/administration.usergroups.edit.php:116
 #: include/views/administration.usergroups.list.php:153
 #: include/views/administration.users.edit.php:94
-#: include/views/administration.users.edit.php:197
+#: include/views/administration.users.edit.php:198
 #: include/views/administration.users.list.php:138
 #: include/views/configuration.action.list.php:105
 #: include/views/configuration.application.list.php:120
@@ -3589,7 +3599,7 @@ msgstr "Usunąć wybrane szablony?"
 msgid "Delete selected triggers?"
 msgstr "Usunąć wybrane wyzwalacze?"
 
-#: include/views/administration.users.edit.php:365
+#: include/views/administration.users.edit.php:366
 msgid "Delete selected user?"
 msgstr "Usunąć wybranego użytkownika?"
 
@@ -3647,7 +3657,7 @@ msgstr "Usunięto: Program \"%1$s\" w \"%2$s\"."
 msgid "Deleted: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Usunięto: Reguła wykrywania \"%1$s\" w \"%2$s\"."
 
-#: api/classes/CGraph.php:563
+#: api/classes/CGraph.php:569
 #, php-format
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Usunięto: Wykres \"%1$s\" w \"%2$s\"."
@@ -3751,7 +3761,7 @@ msgid "Description"
 msgstr "Opis"
 
 #: include/actions.inc.php:966 include/blocks.inc.php:719
-#: include/func.inc.php:2165
+#: include/func.inc.php:2167
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:44
 #: include/views/configuration.action.edit.php:328
@@ -3909,7 +3919,7 @@ msgstr "Wyłączyć wybrane wyzwalacze?"
 #: include/views/administration.usergroups.list.php:59
 #: include/views/administration.usergroups.list.php:84
 #: include/views/administration.usergroups.list.php:88
-#: include/views/administration.users.edit.php:163
+#: include/views/administration.users.edit.php:164
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.list.php:73
@@ -4040,7 +4050,7 @@ msgstr "Status wykrycia"
 msgid "Display OK triggers for"
 msgstr "Wyświetlanie wyzwalaczy w stanie OK przez"
 
-#: include/func.inc.php:1848
+#: include/func.inc.php:1850
 msgid "Displaying"
 msgstr "Wyświetlanie"
 
@@ -4192,7 +4202,7 @@ msgctxt "Exa short"
 msgid "E"
 msgstr ""
 
-#: include/func.inc.php:2132
+#: include/func.inc.php:2134
 msgid "ERROR"
 msgstr "BŁĄD"
 
@@ -4204,7 +4214,7 @@ msgstr "ZDARZENIA"
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "Każdy adres URL powinien mieć unikalną nazwę. Należy się upewnić, że istnieje tylko jeden adres o tej nazwie."
 
-#: include/views/administration.users.edit.php:189
+#: include/views/administration.users.edit.php:190
 #: include/views/configuration.action.edit.php:376
 #: include/views/configuration.action.edit.php:389
 #: include/views/configuration.maintenance.edit.php:112
@@ -4274,7 +4284,7 @@ msgstr ""
 
 #: api/classes/CAction.php:1235 api/classes/CApplication.php:288
 #: api/classes/CApplication.php:495 api/classes/CDiscoveryRule.php:339
-#: api/classes/CGraph.php:509 api/classes/CGraphPrototype.php:519
+#: api/classes/CGraph.php:515 api/classes/CGraphPrototype.php:533
 #: api/classes/CHostGroup.php:509 api/classes/CHostGroup.php:580
 #: api/classes/CHostInterface.php:465 api/classes/CHost.php:1428
 #: api/classes/CHostPrototype.php:906 api/classes/CIconMap.php:316
@@ -4430,7 +4440,7 @@ msgstr "Włączyć wybrane wyzwalacze?"
 #: include/views/administration.usergroups.list.php:58
 #: include/views/administration.usergroups.list.php:83
 #: include/views/administration.usergroups.list.php:88
-#: include/views/administration.users.edit.php:159
+#: include/views/administration.users.edit.php:160
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.edit.php:59
@@ -4834,7 +4844,7 @@ msgstr ""
 msgid "First"
 msgstr "Pierwszy"
 
-#: include/func.inc.php:1793
+#: include/func.inc.php:1795
 msgctxt "page navigation"
 msgid "First"
 msgstr ""
@@ -4899,7 +4909,7 @@ msgstr "Dostęp do interfejsu użytkownika"
 msgid "Frontend access updated"
 msgstr "Zaktualizowano dostęp do interfejsu użytkownika"
 
-#: include/views/administration.users.edit.php:208
+#: include/views/administration.users.edit.php:209
 msgid "Frontend messaging"
 msgstr "Wiadomości interfejsu użytkownika"
 
@@ -5006,7 +5016,7 @@ msgstr "Przejdź"
 msgid "Go to"
 msgstr "Przejdź do"
 
-#: include/func.inc.php:2063
+#: include/func.inc.php:2065
 msgid "Go to dashboard"
 msgstr ""
 
@@ -5026,33 +5036,33 @@ msgstr "Linia gradientu"
 msgid "Graph"
 msgstr "Wykres"
 
-#: api/classes/CGraph.php:417 api/classes/CGraphPrototype.php:424
+#: api/classes/CGraph.php:422 api/classes/CGraphPrototype.php:438
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (inherited from another template)."
 msgstr ""
 
-#: api/classes/CGraph.php:438 api/classes/CGraph.php:445
-#: api/classes/CGraphPrototype.php:446 api/classes/CGraphPrototype.php:453
+#: api/classes/CGraph.php:443 api/classes/CGraph.php:450
+#: api/classes/CGraphPrototype.php:460 api/classes/CGraphPrototype.php:467
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (items are not identical)."
 msgstr ""
 
-#: api/classes/CGraph.php:396 api/classes/CGraphPrototype.php:403
+#: api/classes/CGraph.php:401 api/classes/CGraphPrototype.php:416
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CGraph.php:370 api/classes/CGraphPrototype.php:377
+#: api/classes/CGraph.php:375 api/classes/CGraphPrototype.php:382
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymax value item)."
 msgstr ""
 
-#: api/classes/CGraph.php:378 api/classes/CGraphPrototype.php:385
+#: api/classes/CGraph.php:383 api/classes/CGraphPrototype.php:391
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymin value item)."
 msgstr ""
 
-#: api/classes/CGraph.php:364 api/classes/CGraphPrototype.php:371
+#: api/classes/CGraph.php:369 api/classes/CGraphPrototype.php:376
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
 msgstr ""
@@ -5102,12 +5112,12 @@ msgstr ""
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
 msgstr ""
 
-#: api/classes/CGraphPrototype.php:570
+#: api/classes/CGraphPrototype.php:584
 #, php-format
 msgid "Graph prototype \"%s\" deleted."
 msgstr ""
 
-#: api/classes/CGraphPrototype.php:673
+#: api/classes/CGraphPrototype.php:685 api/classes/CGraphPrototype.php:746
 msgid "Graph prototype must have at least one prototype."
 msgstr ""
 
@@ -5136,13 +5146,13 @@ msgstr "Typ wykresu"
 msgid "Graph updated"
 msgstr "Uaktualniono wykres"
 
-#: api/classes/CGraphGeneral.php:148
+#: api/classes/CGraphGeneral.php:735
 #, php-format
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
 msgstr ""
 
-#: api/classes/CGraph.php:399 api/classes/CGraph.php:420
-#: api/classes/CGraphPrototype.php:406 api/classes/CGraphPrototype.php:427
+#: api/classes/CGraph.php:404 api/classes/CGraph.php:425
+#: api/classes/CGraphPrototype.php:420 api/classes/CGraphPrototype.php:441
 msgid "Graph with same name but other type exist."
 msgstr ""
 
@@ -6054,7 +6064,7 @@ msgstr "Ikony"
 msgid "Identical expression already exists"
 msgstr ""
 
-#: include/func.inc.php:2053 include/func.inc.php:2073
+#: include/func.inc.php:2055 include/func.inc.php:2075
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "W przypadku, gdy ten komunikat jest błędny należy skontaktować się z administratorami celem nadania uprawnień."
 
@@ -6526,7 +6536,7 @@ msgstr "Podano błędne pole inwentarzowe \"%s\"."
 msgid "Incorrect item ID \"%s\" provided for screen element."
 msgstr "Podano błędny identyfikator pozycji \"%s\" dla elementu ekranu."
 
-#: api/classes/CGraphGeneral.php:396
+#: api/classes/CGraphGeneral.php:314
 msgid "Incorrect item for axis value."
 msgstr ""
 
@@ -7578,7 +7588,7 @@ msgstr "Etykieta"
 msgid "Label location"
 msgstr "Położenie etykiety"
 
-#: include/views/administration.users.edit.php:129
+#: include/views/administration.users.edit.php:130
 msgid "Language"
 msgstr "Język"
 
@@ -7586,7 +7596,7 @@ msgstr "Język"
 msgid "Last"
 msgstr "Ostatnia"
 
-#: include/func.inc.php:1833
+#: include/func.inc.php:1835
 msgctxt "page navigation"
 msgid "Last"
 msgstr ""
@@ -7867,7 +7877,7 @@ msgstr "Logowanie niedopasowanych trapów SNMP"
 msgid "Logged in as"
 msgstr "Zalogowano jako"
 
-#: auditlogs.php:143 include/func.inc.php:2059 include/func.inc.php:2076
+#: auditlogs.php:143 include/func.inc.php:2061 include/func.inc.php:2078
 #: include/menu.inc.php:282 include/page_header.php:246
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:64
@@ -8213,7 +8223,7 @@ msgid "Max count of events per trigger to show"
 msgstr "Maksymalna pokazywana liczba zdarzeń na wyzwalacz"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2167
+#: include/func.inc.php:2169
 msgid "Maximize"
 msgstr "Zmaksymalizuj"
 
@@ -8280,8 +8290,8 @@ msgctxt "May short"
 msgid "May"
 msgstr ""
 
-#: include/views/administration.users.edit.php:193
-#: include/views/administration.users.edit.php:321 popup_media.php:27
+#: include/views/administration.users.edit.php:194
+#: include/views/administration.users.edit.php:322 popup_media.php:27
 msgid "Media"
 msgstr "Media"
 
@@ -8363,11 +8373,11 @@ msgstr "Działania komunikatu"
 msgid "Message text limit"
 msgstr "Ograniczenie długości komunikatu"
 
-#: include/views/administration.users.edit.php:214
+#: include/views/administration.users.edit.php:215
 msgid "Message timeout"
 msgstr "Czas wygaśniecia komunikatu"
 
-#: include/views/administration.users.edit.php:209
+#: include/views/administration.users.edit.php:210
 msgid "Message timeout (seconds)"
 msgstr "Czas wygaśnięcia komunikatu (w sekundach)"
 
@@ -8375,7 +8385,7 @@ msgstr "Czas wygaśnięcia komunikatu (w sekundach)"
 msgid "Messages"
 msgstr "Komunikaty"
 
-#: include/views/administration.users.edit.php:350
+#: include/views/administration.users.edit.php:351
 msgid "Messaging"
 msgstr "Komunikacja"
 
@@ -8389,7 +8399,7 @@ msgid "Middle"
 msgstr "Środek"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2167
+#: include/func.inc.php:2169
 msgid "Minimize"
 msgstr "Zminimalizuj"
 
@@ -8464,19 +8474,19 @@ msgstr "Minuty"
 msgid "Missing \"%1$s\" field for action condition."
 msgstr ""
 
-#: api/classes/CGraphGeneral.php:531
+#: api/classes/CGraphGeneral.php:75
 msgid "Missing \"gitemid\" field for item."
 msgstr ""
 
-#: api/classes/CGraph.php:603 api/classes/CGraphPrototype.php:611
+#: api/classes/CGraphGeneral.php:474 api/classes/CGraphGeneral.php:590
 msgid "Missing \"itemid\" field for item."
 msgstr ""
 
-#: api/classes/CGraphPrototype.php:593
+#: api/classes/CGraphPrototype.php:39
 msgid "Missing \"name\" field for graph prototype."
 msgstr ""
 
-#: api/classes/CGraph.php:586
+#: api/classes/CGraph.php:39
 msgid "Missing \"name\" field for graph."
 msgstr ""
 
@@ -8486,12 +8496,12 @@ msgstr ""
 msgid "Missing item \"%1$s\" for host \"%2$s\"."
 msgstr ""
 
-#: api/classes/CGraph.php:592
+#: api/classes/CGraph.php:40
 #, php-format
 msgid "Missing items for graph \"%1$s\"."
 msgstr ""
 
-#: api/classes/CGraphPrototype.php:600
+#: api/classes/CGraphPrototype.php:40
 #, php-format
 msgid "Missing items for graph prototype \"%1$s\"."
 msgstr ""
@@ -8561,7 +8571,7 @@ msgstr ""
 msgid "More than 10 minutes"
 msgstr "Ponad 10 minut"
 
-#: api/classes/CGraphGeneral.php:160
+#: api/classes/CGraphGeneral.php:747
 #, php-format
 msgid "More than one graph with name \"%1$s\" within host."
 msgstr ""
@@ -8767,25 +8777,25 @@ msgstr "Nowy czas obsługi"
 msgid "Next"
 msgstr "Następna"
 
-#: include/func.inc.php:1826
+#: include/func.inc.php:1828
 msgctxt "page navigation"
 msgid "Next"
 msgstr ""
 
 #: events.php:756 include/events.inc.php:356 include/events.inc.php:374
-#: include/func.inc.php:2386 include/triggers.inc.php:1608
+#: include/func.inc.php:2388 include/triggers.inc.php:1608
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
 #: include/views/js/adm.regexprs.edit.js.php:142
 msgid "No"
 msgstr "Nie"
 
-#: api/classes/CGraphPrototype.php:623 api/classes/CGraphPrototype.php:633
+#: api/classes/CGraphPrototype.php:41
 #, php-format
 msgid "No \"%1$s\" given for graph prototype."
 msgstr ""
 
-#: api/classes/CGraph.php:614 api/classes/CGraph.php:622
+#: api/classes/CGraph.php:41
 #, php-format
 msgid "No \"%1$s\" given for graph."
 msgstr ""
@@ -9171,7 +9181,7 @@ msgstr "Nie zdefiniowano żadnych map."
 msgid "No matches found"
 msgstr ""
 
-#: include/views/administration.users.edit.php:155
+#: include/views/administration.users.edit.php:156
 msgid "No media defined."
 msgstr "Nie zdefiniowano żadnych mediów."
 
@@ -9247,39 +9257,40 @@ msgstr "Brak uprawnień dla dostępu do systemu."
 #: api/classes/CApplication.php:533 api/classes/CDiscoveryRule.php:357
 #: api/classes/CDiscoveryRule.php:451 api/classes/CDiscoveryRule.php:456
 #: api/classes/CDRule.php:255 api/classes/CDRule.php:578
-#: api/classes/CEvent.php:732 api/classes/CGraphGeneral.php:197
-#: api/classes/CGraphGeneral.php:542 api/classes/CGraph.php:642
-#: api/classes/CGraphPrototype.php:654 api/classes/CHostBase.php:45
-#: api/classes/CHostGeneral.php:139 api/classes/CHostGroup.php:522
-#: api/classes/CHostGroup.php:595 api/classes/CHostGroup.php:778
-#: api/classes/CHostGroup.php:840 api/classes/CHostGroup.php:893
-#: api/classes/CHostGroup.php:902 api/classes/CHostGroup.php:924
-#: api/classes/CHostInterface.php:319 api/classes/CHostInterface.php:335
-#: api/classes/CHostInterface.php:476 api/classes/CHostInterface.php:674
-#: api/classes/CHost.php:688 api/classes/CHost.php:716
-#: api/classes/CHost.php:1813 api/classes/CHostPrototype.php:1020
-#: api/classes/CHostPrototype.php:1035 api/classes/CHostPrototype.php:1048
-#: api/classes/CHostPrototype.php:1061 api/classes/CHttpTest.php:393
-#: api/classes/CIconMap.php:319 api/classes/CImage.php:243
-#: api/classes/CImage.php:357 api/classes/CImage.php:474
-#: api/classes/CItemGeneral.php:182 api/classes/CItemGeneral.php:232
-#: api/classes/CItem.php:688 api/classes/CItemPrototype.php:508
-#: api/classes/CMaintenance.php:320 api/classes/CMaintenance.php:345
-#: api/classes/CMaintenance.php:358 api/classes/CMaintenance.php:466
-#: api/classes/CMaintenance.php:483 api/classes/CMaintenance.php:550
-#: api/classes/CMapElement.php:56 api/classes/CMapElement.php:145
-#: api/classes/CMap.php:389 api/classes/CProxy.php:171
-#: api/classes/CProxy.php:212 api/classes/CProxy.php:284
-#: api/classes/CProxy.php:550 api/classes/CScreenItem.php:328
-#: api/classes/CScreenItem.php:412 api/classes/CScreen.php:438
-#: api/classes/CScreen.php:518 api/classes/CService.php:1253
-#: api/classes/CService.php:1268 api/classes/CTemplateScreen.php:703
-#: api/classes/CTemplateScreen.php:724 api/classes/CTemplateScreen.php:730
-#: api/classes/CTrigger.php:652 api/classes/CTrigger.php:977
-#: api/classes/CTrigger.php:998 api/classes/CTrigger.php:1843
-#: api/classes/CTriggerPrototype.php:566 api/classes/CTriggerPrototype.php:669
-#: api/classes/CUserMacro.php:726 api/classes/CUserMacro.php:835
-#: api/classes/CUser.php:1156 include/func.inc.php:2032
+#: api/classes/CEvent.php:732 api/classes/CGraphGeneral.php:65
+#: api/classes/CGraphGeneral.php:86 api/classes/CGraph.php:686
+#: api/classes/CGraphPrototype.php:667 api/classes/CGraphPrototype.php:727
+#: api/classes/CHostBase.php:45 api/classes/CHostGeneral.php:139
+#: api/classes/CHostGroup.php:522 api/classes/CHostGroup.php:595
+#: api/classes/CHostGroup.php:778 api/classes/CHostGroup.php:840
+#: api/classes/CHostGroup.php:893 api/classes/CHostGroup.php:902
+#: api/classes/CHostGroup.php:924 api/classes/CHostInterface.php:319
+#: api/classes/CHostInterface.php:335 api/classes/CHostInterface.php:476
+#: api/classes/CHostInterface.php:674 api/classes/CHost.php:688
+#: api/classes/CHost.php:716 api/classes/CHost.php:1813
+#: api/classes/CHostPrototype.php:1020 api/classes/CHostPrototype.php:1035
+#: api/classes/CHostPrototype.php:1048 api/classes/CHostPrototype.php:1061
+#: api/classes/CHttpTest.php:393 api/classes/CIconMap.php:319
+#: api/classes/CImage.php:243 api/classes/CImage.php:357
+#: api/classes/CImage.php:474 api/classes/CItemGeneral.php:182
+#: api/classes/CItemGeneral.php:232 api/classes/CItem.php:688
+#: api/classes/CItemPrototype.php:508 api/classes/CMaintenance.php:320
+#: api/classes/CMaintenance.php:345 api/classes/CMaintenance.php:358
+#: api/classes/CMaintenance.php:466 api/classes/CMaintenance.php:483
+#: api/classes/CMaintenance.php:550 api/classes/CMapElement.php:56
+#: api/classes/CMapElement.php:145 api/classes/CMap.php:389
+#: api/classes/CProxy.php:171 api/classes/CProxy.php:212
+#: api/classes/CProxy.php:284 api/classes/CProxy.php:550
+#: api/classes/CScreenItem.php:328 api/classes/CScreenItem.php:412
+#: api/classes/CScreen.php:438 api/classes/CScreen.php:518
+#: api/classes/CService.php:1253 api/classes/CService.php:1268
+#: api/classes/CTemplateScreen.php:703 api/classes/CTemplateScreen.php:724
+#: api/classes/CTemplateScreen.php:730 api/classes/CTrigger.php:652
+#: api/classes/CTrigger.php:977 api/classes/CTrigger.php:998
+#: api/classes/CTrigger.php:1843 api/classes/CTriggerPrototype.php:566
+#: api/classes/CTriggerPrototype.php:669 api/classes/CUserMacro.php:726
+#: api/classes/CUserMacro.php:835 api/classes/CUser.php:1156
+#: include/func.inc.php:2034
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Brak uprawnień dla tego obiektu lub obiekt nie istnieje."
 
@@ -9762,7 +9773,7 @@ msgstr "WŁĄCZ"
 msgid "On status change triggers blink for"
 msgstr "Miganie wyzwalaczy o zmienionym stanie przez"
 
-#: include/views/administration.users.edit.php:212
+#: include/views/administration.users.edit.php:213
 msgid "Once"
 msgstr "Raz"
 
@@ -10330,11 +10341,11 @@ msgid "Periods"
 msgstr "Okresy"
 
 #: include/views/administration.usergroups.edit.php:129
-#: include/views/administration.users.edit.php:347
+#: include/views/administration.users.edit.php:348
 msgid "Permissions"
 msgstr "Uprawnienia"
 
-#: include/views/administration.users.edit.php:345
+#: include/views/administration.users.edit.php:346
 msgid "Permissions can be assigned for user groups only."
 msgstr "Uprawnienia mogą być nadawane wyłącznie dla grup użytkowników."
 
@@ -10358,12 +10369,12 @@ msgstr "Algorytm rozmieszczania"
 msgid "Plain text"
 msgstr "Zwykły tekst"
 
-#: include/views/administration.users.edit.php:227
-#: include/views/administration.users.edit.php:264
+#: include/views/administration.users.edit.php:228
+#: include/views/administration.users.edit.php:265
 msgid "Play"
 msgstr "Odtwórz"
 
-#: include/views/administration.users.edit.php:215
+#: include/views/administration.users.edit.php:216
 msgid "Play sound"
 msgstr "Odtwórz dźwięk"
 
@@ -10442,7 +10453,7 @@ msgstr "Podgląd"
 msgid "Previous"
 msgstr "Poprzednia"
 
-#: include/func.inc.php:1799
+#: include/func.inc.php:1801
 msgctxt "page navigation"
 msgid "Previous"
 msgstr ""
@@ -10685,7 +10696,7 @@ msgstr ""
 msgid "Recipient(s)"
 msgstr "Odbiorca(y)"
 
-#: include/views/administration.users.edit.php:224
+#: include/views/administration.users.edit.php:225
 msgid "Recovery"
 msgstr "Odzyskiwanie"
 
@@ -10698,15 +10709,15 @@ msgstr "Komunikat odzyskania"
 msgid "Recovery subject"
 msgstr "Temat odzyskania"
 
-#: include/views/administration.users.edit.php:144 profile.php:49 users.php:61
+#: include/views/administration.users.edit.php:145 profile.php:49 users.php:61
 msgid "Refresh (in seconds)"
 msgstr "Odświeżanie (w sekundach)"
 
-#: include/func.inc.php:1907
+#: include/func.inc.php:1909
 msgid "Refresh time in seconds"
 msgstr "Czas odświeżania w sekundach"
 
-#: include/func.inc.php:1911
+#: include/func.inc.php:1913
 msgid "Refresh time multiplier"
 msgstr "Mnożnik czasu odświeżania"
 
@@ -11063,7 +11074,7 @@ msgstr ""
 msgid "Rows"
 msgstr "Wiersze"
 
-#: include/views/administration.users.edit.php:145 profile.php:50 users.php:62
+#: include/views/administration.users.edit.php:146 profile.php:50 users.php:62
 msgid "Rows per page"
 msgstr "Wierszy na stronę"
 
@@ -11312,9 +11323,9 @@ msgstr "Sobota"
 #: include/views/administration.script.edit.php:119
 #: include/views/administration.usergroups.edit.php:137
 #: include/views/administration.usergroups.edit.php:143
-#: include/views/administration.users.edit.php:358
-#: include/views/administration.users.edit.php:362
-#: include/views/administration.users.edit.php:372
+#: include/views/administration.users.edit.php:359
+#: include/views/administration.users.edit.php:363
+#: include/views/administration.users.edit.php:373
 #: include/views/configuration.action.edit.php:1034
 #: include/views/configuration.application.edit.php:52
 #: include/views/configuration.application.edit.php:62
@@ -11545,7 +11556,7 @@ msgstr "Telefon B drugiego punktu kontaktu"
 msgid "Secondary POC screen name"
 msgstr "Pseudonim drugiego punktu kontaktu"
 
-#: include/views/administration.users.edit.php:213
+#: include/views/administration.users.edit.php:214
 msgid "Seconds"
 msgstr "Sekundy"
 
@@ -12213,8 +12224,8 @@ msgstr ""
 msgid "Steps"
 msgstr "Kroki"
 
-#: include/views/administration.users.edit.php:228
-#: include/views/administration.users.edit.php:265
+#: include/views/administration.users.edit.php:229
+#: include/views/administration.users.edit.php:266
 msgid "Stop"
 msgstr "Stop"
 
@@ -12293,7 +12304,7 @@ msgstr "Szwedzki (sv_SE)"
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr ""
 
-#: include/users.inc.php:83 include/views/administration.users.edit.php:132
+#: include/users.inc.php:83 include/views/administration.users.edit.php:133
 msgid "System default"
 msgstr "Domyślny systemowy"
 
@@ -12582,7 +12593,7 @@ msgstr "Żądana zdalna procedura nie istnieje lub nie jest dostępna"
 msgid "The web scenario application belongs to a different host than the web scenario host."
 msgstr ""
 
-#: include/views/administration.users.edit.php:134
+#: include/views/administration.users.edit.php:135
 msgid "Theme"
 msgstr "Motyw"
 
@@ -12896,7 +12907,7 @@ msgstr ""
 msgid "Trigger severities"
 msgstr "Poziomy wyzwalacza"
 
-#: include/actions.inc.php:54 include/views/administration.users.edit.php:272
+#: include/actions.inc.php:54 include/views/administration.users.edit.php:273
 msgid "Trigger severity"
 msgstr "Drastyczność wyzwalacza"
 
@@ -13081,7 +13092,7 @@ msgstr "DZIAŁA"
 msgid "URL"
 msgstr "URL"
 
-#: include/views/administration.users.edit.php:146
+#: include/views/administration.users.edit.php:147
 msgid "URL (after login)"
 msgstr "URL (po zalogowaniu)"
 
@@ -13119,7 +13130,7 @@ msgstr "USA (160 znaków)"
 msgid "USER PROFILE"
 msgstr "PROFIL UŻYTKOWNIKA"
 
-#: include/func.inc.php:2565
+#: include/func.inc.php:2567
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -13461,7 +13472,7 @@ msgstr "Wykorzystywane w akcjach"
 #: include/audit.inc.php:24 include/hosts.inc.php:67 include/setup.inc.php:274
 #: include/views/administration.auditlogs.list.php:56
 #: include/views/administration.auditlogs.list.php:86
-#: include/views/administration.users.edit.php:316
+#: include/views/administration.users.edit.php:317
 #: include/views/configuration.action.edit.php:512
 #: include/views/configuration.httpconf.edit.php:82
 msgid "User"
@@ -13476,7 +13487,7 @@ msgstr "Użytkownik \"%s\" musi znajdować się w grupie użytkowników."
 msgid "User added"
 msgstr "Dodano użytkownika"
 
-#: include/views/administration.users.edit.php:337
+#: include/views/administration.users.edit.php:338
 msgid "User can't change type for himself"
 msgstr "Użytkownik nie może zmienić typu dla siebie samego"
 
@@ -13576,8 +13587,8 @@ msgstr "Profil użytkownika"
 msgid "User sessions"
 msgstr ""
 
-#: include/views/administration.users.edit.php:337
-#: include/views/administration.users.edit.php:341
+#: include/views/administration.users.edit.php:338
+#: include/views/administration.users.edit.php:342
 #: include/views/administration.users.list.php:58
 msgid "User type"
 msgstr "Typ użytkownika"
@@ -14049,7 +14060,7 @@ msgstr ""
 msgid "Y axis MAX value"
 msgstr "MAX wartość osi Y"
 
-#: api/classes/CGraphGeneral.php:116
+#: api/classes/CGraphGeneral.php:338
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr ""
 
@@ -14100,7 +14111,7 @@ msgstr "Rocznie"
 
 #: events.php:756 include/blocks.inc.php:727
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:359
-#: include/events.inc.php:377 include/func.inc.php:2386
+#: include/events.inc.php:377 include/func.inc.php:2388
 #: include/triggers.inc.php:1608
 #: include/views/administration.users.list.php:76
 #: include/views/js/adm.regexprs.edit.js.php:139
@@ -14111,7 +14122,7 @@ msgstr "Tak"
 msgid "Yotta"
 msgstr "Yotta"
 
-#: include/views/administration.users.edit.php:127
+#: include/views/administration.users.edit.php:128
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Nie można wybrać niektórych języków, ponieważ nie zostały one zainstalowane na serwerze."
 
@@ -14120,7 +14131,7 @@ msgstr "Nie można wybrać niektórych języków, ponieważ nie zostały one zai
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "Brak praw do zmiany uprawnień użytkownika \"%s\"."
 
-#: include/func.inc.php:2069
+#: include/func.inc.php:2071
 msgid "You are not logged in."
 msgstr "Nie zalogowano."
 
@@ -14146,7 +14157,7 @@ msgstr "Nie sprecyzowano celów dla operacji akcji w komendzie \"%s\"."
 msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr "Nie określono celu dla akcji globalnego skryptu operacji \"%s\"."
 
-#: api/classes/CGraph.php:525 api/classes/CGraphPrototype.php:535
+#: api/classes/CGraph.php:531 api/classes/CGraphPrototype.php:549
 #: api/classes/CHost.php:1013 api/classes/CHost.php:1070
 #: api/classes/CHost.php:1394 api/classes/CHttpTest.php:503
 #: api/classes/CMaintenance.php:537 api/classes/CMaintenance.php:644
@@ -14171,15 +14182,15 @@ msgstr "Nie masz uprawnień by aktualizować dane innych użytkowników."
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "Nie masz uprawnień by aktualizować dane użytkownika lub użytkownik nie istnieje."
 
-#: include/func.inc.php:2051
+#: include/func.inc.php:2053
 msgid "You have no permissions to access this page."
 msgstr ""
 
-#: include/func.inc.php:2071
+#: include/func.inc.php:2073
 msgid "You must login to view this page."
 msgstr "Należy się zalogować, aby zobaczyć tą stronę."
 
-#: include/func.inc.php:2047
+#: include/func.inc.php:2049
 msgid "Your are logged in as"
 msgstr ""
 
@@ -14496,7 +14507,7 @@ msgstr "wykonane"
 msgid "fixed"
 msgstr "naprawione"
 
-#: include/func.inc.php:1858
+#: include/func.inc.php:1860
 msgid "found"
 msgstr "znaleziony"
 
@@ -14675,7 +14686,7 @@ msgid "now"
 msgstr "teraz"
 
 #: include/blocks.inc.php:352 include/blocks.inc.php:696
-#: include/func.inc.php:1855
+#: include/func.inc.php:1857
 msgid "of"
 msgstr "z"
 
@@ -14753,7 +14764,7 @@ msgstr "pokaż mapowanie wartości"
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "szablon o ID \"%1$s\" został przekazany %2$s razy"
 
-#: include/func.inc.php:1851
+#: include/func.inc.php:1853
 msgid "to"
 msgstr "dla"
 
