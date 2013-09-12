@@ -19,21 +19,28 @@
 **/
 
 
-function bar_report_form($items = array()) {
-	$config = get_request('config',1);
-	$scaletype = get_request('scaletype',TIMEPERIOD_TYPE_WEEKLY);
+/**
+ * Create bar report form for "Distribution of values for multiple periods".
+ *
+ * @param array $items
+ *
+ * @return object $reportForm
+ */
+function barReportForm($items = array()) {
+	$config = get_request('config', 1);
+	$scaletype = get_request('scaletype', TIMEPERIOD_TYPE_WEEKLY);
 
-	$title = get_request('title',_('Report 1'));
-	$xlabel = get_request('xlabel','');
-	$ylabel = get_request('ylabel','');
-	$showlegend = get_request('showlegend',0);
+	$title = get_request('title', _('Report 1'));
+	$xlabel = get_request('xlabel', '');
+	$ylabel = get_request('ylabel', '');
+	$showlegend = get_request('showlegend', 0);
 
 	$report_timesince = $_REQUEST['report_timesince'];
 	$report_timetill = $_REQUEST['report_timetill'];
 
-	$reportForm = new CFormTable(null,null,'get');//,'events.php?report_set=1','POST',null,'sform');
-	$reportForm->setAttribute('name','zbx_report');
-	$reportForm->setAttribute('id','zbx_report');
+	$reportForm = new CFormTable(null, null, 'get');
+	$reportForm->setAttribute('name', 'zbx_report');
+	$reportForm->setAttribute('id', 'zbx_report');
 
 	if (isset($_REQUEST['report_show']) && is_array($items) && $items) {
 		$reportForm->addVar('report_show', 'show');
@@ -42,22 +49,22 @@ function bar_report_form($items = array()) {
 	$reportForm->addVar('config', $config);
 
 	$reportForm->addVar('report_timesince', date(TIMESTAMP_FORMAT, $report_timesince));
-	$reportForm->addVar('report_timetill',  date(TIMESTAMP_FORMAT, $report_timetill));
+	$reportForm->addVar('report_timetill', date(TIMESTAMP_FORMAT, $report_timetill));
 
-	$reportForm->addRow(_('Title'), new CTextBox('title',$title,40));
-	$reportForm->addRow(_('X label'), new CTextBox('xlabel',$xlabel,40));
-	$reportForm->addRow(_('Y label'), new CTextBox('ylabel',$ylabel,40));
-	$reportForm->addRow(_('Legend'), new CCheckBox('showlegend',$showlegend,null,1));
+	$reportForm->addRow(_('Title'), new CTextBox('title', $title, 40));
+	$reportForm->addRow(_('X label'), new CTextBox('xlabel', $xlabel, 40));
+	$reportForm->addRow(_('Y label'), new CTextBox('ylabel', $ylabel, 40));
+	$reportForm->addRow(_('Legend'), new CCheckBox('showlegend', $showlegend, null, 1));
 
 	$scale = new CComboBox('scaletype', $scaletype);
-		$scale->addItem(TIMEPERIOD_TYPE_HOURLY, _('Hourly'));
-		$scale->addItem(TIMEPERIOD_TYPE_DAILY, 	_('Daily'));
-		$scale->addItem(TIMEPERIOD_TYPE_WEEKLY,	_('Weekly'));
-		$scale->addItem(TIMEPERIOD_TYPE_MONTHLY, _('Monthly'));
-		$scale->addItem(TIMEPERIOD_TYPE_YEARLY,	_('Yearly'));
+	$scale->addItem(TIMEPERIOD_TYPE_HOURLY, _('Hourly'));
+	$scale->addItem(TIMEPERIOD_TYPE_DAILY, 	_('Daily'));
+	$scale->addItem(TIMEPERIOD_TYPE_WEEKLY,	_('Weekly'));
+	$scale->addItem(TIMEPERIOD_TYPE_MONTHLY, _('Monthly'));
+	$scale->addItem(TIMEPERIOD_TYPE_YEARLY,	_('Yearly'));
 	$reportForm->addRow(_('Scale'), $scale);
 
-	$reporttimetab = new CTable(null,'calendar');
+	$reporttimetab = new CTable(null, 'calendar');
 
 	$timeSinceRow = createDateSelector('report_timesince', $report_timesince, 'report_timetill');
 	array_unshift($timeSinceRow, _('From'));
@@ -75,11 +82,14 @@ function bar_report_form($items = array()) {
 			$color = new CColorCell(null, $item['color']);
 
 			$caption = new CSpan($item['caption'], 'link');
-			$caption->onClick(
-					'return PopUp("popup_bitem.php?config=1&list_name=items&dstfrm='.$reportForm->GetName().
-					url_param($item, false).
-					url_param($id, false, 'gid').
-					'",550,400,"graph_item_form");');
+			$caption->onClick('return PopUp("popup_bitem.php?'.
+				'config=1'.
+				'&list_name=items'.
+				'&dstfrm='.$reportForm->GetName().
+				url_param($item, false).
+				url_param($id, false, 'gid').
+				'", 550, 400, "graph_item_form");'
+			);
 
 			$description = $item['host']['name'].NAME_DELIMITER.itemName($item);
 
@@ -95,6 +105,7 @@ function bar_report_form($items = array()) {
 			unset($item['value_type'], $item['host'], $item['name']);
 		}
 		unset($item);
+
 		$reportForm->addVar('items', $items);
 
 		$delete_button = new CSubmit('delete_item', _('Delete selected'));
@@ -103,45 +114,52 @@ function bar_report_form($items = array()) {
 		$items_table = $delete_button = null;
 	}
 
-	$reportForm->addRow(_('Items'),
-				array(
-					$items_table,
-					new CButton('add_item',_('Add'),
-						"return PopUp('popup_bitem.php?config=1&dstfrm=".$reportForm->getName().
-						"',800,400,'graph_item_form');"),
-					$delete_button
-				));
+	$reportForm->addRow(_('Items'), array(
+		$items_table,
+		new CButton('add_item', _('Add'),
+			'return PopUp("popup_bitem.php?config=1&dstfrm='.$reportForm->getName().
+			'",800,400,"graph_item_form");'),
+		$delete_button
+	));
 	unset($items_table, $delete_button);
 
-	$reportForm->addItemToBottomRow(new CSubmit('report_show',_('Show')));
+	$reportForm->addItemToBottomRow(new CSubmit('report_show', _('Show')));
 
-	$reset = new CButton('reset',_('Reset'));
+	$reset = new CButton('reset', _('Reset'));
 	$reset->setType('reset');
 	$reportForm->addItemToBottomRow($reset);
 
-return $reportForm;
+	return $reportForm;
 }
 
-function bar_report_form2($items = array(), $periods = array()){
-	$config = get_request('config',1);
+/**
+ * Create bar report form for "Distribution of values for multiple items".
+ *
+ * @param array $items
+ * @param array $periods
+ *
+ * @return object $reportForm
+ */
+function barReportForm2($items = array(), $periods = array()){
+	$config = get_request('config', 1);
 
-	$title = get_request('title',_('Report 2'));
-	$xlabel = get_request('xlabel','');
-	$ylabel = get_request('ylabel','');
+	$title = get_request('title', _('Report 2'));
+	$xlabel = get_request('xlabel', '');
+	$ylabel = get_request('ylabel', '');
 
-	$sorttype = get_request('sorttype',0);
+	$sorttype = get_request('sorttype', 0);
+	$showlegend = get_request('showlegend', 0);
 
+	$reportForm = new CFormTable(null, null, 'get');
+	$reportForm->setAttribute('name', 'zbx_report');
+	$reportForm->setAttribute('id', 'zbx_report');
 
-	$showlegend = get_request('showlegend',0);
-
-	$reportForm = new CFormTable(null,null,'get');//,'events.php?report_set=1','POST',null,'sform');
-	$reportForm->setAttribute('name','zbx_report');
-	$reportForm->setAttribute('id','zbx_report');
-
-	if (isset($_REQUEST['report_show']) &&
-			is_array($items) && $items &&
-			is_array($periods) && $periods) {
-		$reportForm->addVar('report_show','show');
+	if (isset($_REQUEST['report_show'])
+			&& is_array($items)
+			&& $items
+			&& is_array($periods)
+			&& $periods) {
+		$reportForm->addVar('report_show', 'show');
 	}
 
 	$reportForm->addVar('config',$config);
@@ -163,29 +181,30 @@ function bar_report_form2($items = array(), $periods = array()){
 		$reportForm->addVar('sortorder', 0);
 	}
 
-	if (is_array($periods) && $periods){
+	if (is_array($periods) && $periods) {
 		$periods_table = new CTableInfo();
-		foreach($periods as $pid => $period){
-			$color = new CColorCell(null,$period['color']);
+		foreach ($periods as $pid => $period) {
+			$color = new CColorCell(null, $period['color']);
 
-			$edit_link = 'popup_period.php?period_id='.$pid.
-							'&config=2'.
-							'&dstfrm='.$reportForm->getName().
-							'&caption='.$period['caption'].
-							'&report_timesince='.$period['report_timesince'].
-							'&report_timetill='.$period['report_timetill'].
-							'&color='.$period['color'];
+			$edit_link = 'popup_period.php?'.
+				'period_id='.$pid.
+				'&config=2'.
+				'&dstfrm='.$reportForm->getName().
+				'&caption='.$period['caption'].
+				'&report_timesince='.$period['report_timesince'].
+				'&report_timetill='.$period['report_timetill'].
+				'&color='.$period['color'];
 
 			$caption = new CSpan($period['caption'], 'link');
 			$caption->addAction('onclick', "return PopUp('".$edit_link."',840,340,'period_form');");
 
 			$periods_table->addRow(array(
-					new CCheckBox('group_pid['.$pid.']'),
-					$caption,
-					zbx_date2str(REPORTS_BAR_REPORT_DATE_FORMAT, $period['report_timesince']),
-					zbx_date2str(REPORTS_BAR_REPORT_DATE_FORMAT, $period['report_timetill']),
-					$color,
-				));
+				new CCheckBox('group_pid['.$pid.']'),
+				$caption,
+				zbx_date2str(REPORTS_BAR_REPORT_DATE_FORMAT, $period['report_timesince']),
+				zbx_date2str(REPORTS_BAR_REPORT_DATE_FORMAT, $period['report_timetill']),
+				$color
+			));
 		}
 
 		$reportForm->addVar('periods', $periods);
@@ -197,41 +216,40 @@ function bar_report_form2($items = array(), $periods = array()){
 		$periods_table = $delete_button = null;
 	}
 
-
-
-	$reportForm->addRow(_('Period'),
-				array(
-					$periods_table,
-					new CButton('add_period',_('Add'),
-						"return PopUp('popup_period.php?config=2&dstfrm=".$reportForm->getName()."',840,340,'period_form');"),
-					$delete_button
-				));
+	$reportForm->addRow(_('Period'), array(
+		$periods_table,
+		new CButton('add_period', _('Add'),
+			'return PopUp("popup_period.php?config=2&dstfrm='.$reportForm->getName().'", 840, 340, "period_form");'),
+		$delete_button
+	));
 	unset($periods_table, $delete_button);
-//-----------
 
-// ITEMS
 	if (is_array($items) && $items) {
 		$items_table = new CTableInfo();
 		foreach ($items as $id => &$item) {
 			$caption = new CSpan($item['caption'], 'link');
-			$caption->onClick(
-					'return PopUp("popup_bitem.php?config=2&list_name=items&dstfrm='.$reportForm->GetName().
-					url_param($item, false).
-					url_param($id,false,'gid').
-					'",550,400,"graph_item_form");');
+			$caption->onClick('return PopUp("popup_bitem.php?'.
+				'config=2'.
+				'&list_name=items'.
+				'&dstfrm='.$reportForm->GetName().
+				url_param($item, false).
+				url_param($id, false, 'gid').
+				'", 550, 400, "graph_item_form");'
+			);
 
 			$description = $item['host']['name'].NAME_DELIMITER.itemName($item);
 
 			$items_table->addRow(array(
-					new CCheckBox('group_gid['.$id.']', isset($group_gid[$id])),
-					$caption,
-					$description,
-					graph_item_calc_fnc2str($item['calc_fnc'], 0)
-				));
+				new CCheckBox('group_gid['.$id.']', isset($group_gid[$id])),
+				$caption,
+				$description,
+				graph_item_calc_fnc2str($item['calc_fnc'], 0)
+			));
 			// once used, unset unnecessary fields so they don't pass to URL. "color" goes in "periods" parameter.
 			unset($item['value_type'], $item['host'], $item['name'], $item['color']);
 		}
 		unset($item);
+
 		$reportForm->addVar('items', $items);
 
 		$delete_button = new CSubmit('delete_item', _('Delete selected'));
@@ -240,33 +258,35 @@ function bar_report_form2($items = array(), $periods = array()){
 		$items_table = $delete_button = null;
 	}
 
-	$reportForm->addRow(_('Items'),
-				array(
-					$items_table,
-					new CButton('add_item',_('Add'),
-						"return PopUp('popup_bitem.php?config=2&dstfrm=".$reportForm->getName().
-						"',550,400,'graph_item_form');"),
-					$delete_button
-				));
+	$reportForm->addRow(_('Items'), array(
+		$items_table,
+		new CButton('add_item',_('Add'),
+			"return PopUp('popup_bitem.php?config=2&dstfrm=".$reportForm->getName().
+			"', 550, 400, 'graph_item_form');"),
+		$delete_button
+	));
 	unset($items_table, $delete_button);
-//--------------
 
+	$reportForm->addItemToBottomRow(new CSubmit('report_show', _('Show')));
 
-	$reportForm->addItemToBottomRow(new CSubmit('report_show',_('Show')));
-
-	$reset = new CButton('reset',_('Reset'));
+	$reset = new CButton('reset', _('Reset'));
 	$reset->setType('reset');
 	$reportForm->addItemToBottomRow($reset);
 
-return $reportForm;
+	return $reportForm;
 }
 
-function bar_report_form3(){
-	$config = get_request('config',1);
+/**
+ * Create report bar for for "Compare values for multiple periods"
+ *
+ * @return object $reportForm
+ */
+function barReportForm3() {
+	$config = get_request('config', 1);
 
-	$title = get_request('title',_('Report 3'));
-	$xlabel = get_request('xlabel','');
-	$ylabel = get_request('ylabel','');
+	$title = get_request('title', _('Report 3'));
+	$xlabel = get_request('xlabel', '');
+	$ylabel = get_request('ylabel', '');
 
 	$scaletype = get_request('scaletype', TIMEPERIOD_TYPE_WEEKLY);
 	$avgperiod = get_request('avgperiod', TIMEPERIOD_TYPE_DAILY);
@@ -278,12 +298,12 @@ function bar_report_form3(){
 
 	$hostids = get_request('hostids', array());
 	$hostids = zbx_toHash($hostids);
-	$showlegend = get_request('showlegend',0);
+	$showlegend = get_request('showlegend', 0);
 
-	$palette = get_request('palette',0);
-	$palettetype = get_request('palettetype',0);
+	$palette = get_request('palette', 0);
+	$palettetype = get_request('palettetype', 0);
 
-	$reportForm = new CFormTable(null,null,'get');//,'events.php?report_set=1','POST',null,'sform');
+	$reportForm = new CFormTable(null,null,'get');
 	$reportForm->setAttribute('name','zbx_report');
 	$reportForm->setAttribute('id','zbx_report');
 
@@ -291,9 +311,9 @@ function bar_report_form3(){
 		$reportForm->addVar('report_show','show');
 	}
 
-	$reportForm->addVar('config',$config);
-	$reportForm->addVar('report_timesince',date(TIMESTAMP_FORMAT, $report_timesince));
-	$reportForm->addVar('report_timetill',date(TIMESTAMP_FORMAT, $report_timetill));
+	$reportForm->addVar('config', $config);
+	$reportForm->addVar('report_timesince', date(TIMESTAMP_FORMAT, $report_timesince));
+	$reportForm->addVar('report_timetill', date(TIMESTAMP_FORMAT, $report_timetill));
 
 	$reportForm->addRow(_('Title'), new CTextBox('title', $title, 40));
 	$reportForm->addRow(_('X label'), new CTextBox('xlabel', $xlabel, 40));
@@ -302,69 +322,68 @@ function bar_report_form3(){
 	$reportForm->addRow(_('Legend'), new CCheckBox('showlegend', $showlegend, null, 1));
 	$reportForm->addVar('sortorder', 0);
 
-// GROUPS
 	$groupids = get_request('groupids', array());
-	$group_tb = new CTweenBox($reportForm,'groupids',$groupids,10);
+	$group_tb = new CTweenBox($reportForm, 'groupids', $groupids, 10);
 
 	$options = array(
-		'real_hosts' => 1,
+		'real_hosts' => true,
 		'output' => 'extend'
 	);
 
 	$db_groups = API::HostGroup()->get($options);
 	order_result($db_groups, 'name');
-	foreach($db_groups as $gnum => $group){
+	foreach ($db_groups as $gnum => $group) {
 		$groupids[$group['groupid']] = $group['groupid'];
 		$group_tb->addItem($group['groupid'],$group['name']);
 	}
 
 	$reportForm->addRow(_('Groups'), $group_tb->Get(_('Selected groups'), _('Other groups')));
-// ----------
 
-// HOSTS
-	$groupid = get_request('groupid',0);
-	$cmbGroups = new CComboBox('groupid',$groupid,'submit()');
+	$groupid = get_request('groupid', 0);
+	$cmbGroups = new CComboBox('groupid', $groupid, 'submit()');
 	$cmbGroups->addItem(0, _('All'));
-	foreach($db_groups as $gnum => $group){
-		$cmbGroups->addItem($group['groupid'],$group['name']);
+	foreach ($db_groups as $gnum => $group) {
+		$cmbGroups->addItem($group['groupid'], $group['name']);
 	}
 
-	$td_groups = new CCol(array(_('Group'),SPACE,$cmbGroups));
-	$td_groups->setAttribute('style','text-align: right;');
+	$td_groups = new CCol(array(_('Group'), SPACE, $cmbGroups));
+	$td_groups->setAttribute('style', 'text-align: right;');
 
-	$host_tb = new CTweenBox($reportForm,'hostids',$hostids,10);
+	$host_tb = new CTweenBox($reportForm, 'hostids', $hostids, 10);
 
 	$options = array(
-		'real_hosts' => 1,
+		'real_hosts' => true,
 		'output' => array('hostid', 'name')
 	);
-	if($groupid > 0){
+	if ($groupid > 0){
 		$options['groupids'] = $groupid;
 	}
 	$db_hosts = API::Host()->get($options);
 	$db_hosts = zbx_toHash($db_hosts, 'hostid');
 	order_result($db_hosts, 'name');
 
-	foreach($db_hosts as $hnum => $host){
+	foreach ($db_hosts as $hnum => $host) {
 		$host_tb->addItem($host['hostid'],$host['name']);
 	}
 
 	$options = array(
-		'real_hosts' => 1,
+		'real_hosts' => true,
 		'output' => array('hostid', 'name'),
 		'hostids' => $hostids,
 	);
 	$db_hosts2 = API::Host()->get($options);
 	order_result($db_hosts2, 'name');
-	foreach($db_hosts2 as $hnum => $host){
-		if(!isset($db_hosts[$host['hostid']]))
-			$host_tb->addItem($host['hostid'],$host['name']);
+	foreach ($db_hosts2 as $hnum => $host) {
+		if (!isset($db_hosts[$host['hostid']])) {
+			$host_tb->addItem($host['hostid'], $host['name']);
+		}
 	}
 
-	$reportForm->addRow(_('Hosts'), $host_tb->Get(_('Selected hosts'), array(_('Other hosts | Group').SPACE, $cmbGroups)));
-// ----------
-//*/
-// PERIOD
+	$reportForm->addRow(_('Hosts'),
+		$host_tb->Get(_('Selected hosts'),
+		array(_('Other hosts | Group').SPACE, $cmbGroups)
+	));
+
 	$reporttimetab = new CTable(null,'calendar');
 
 	$timeSinceRow = createDateSelector('report_timesince', $report_timesince, 'report_timetill');
@@ -378,22 +397,21 @@ function bar_report_form3(){
 	$reportForm->addRow(_('Period'), $reporttimetab);
 
 	$scale = new CComboBox('scaletype', $scaletype);
-		$scale->addItem(TIMEPERIOD_TYPE_HOURLY, _('Hourly'));
-		$scale->addItem(TIMEPERIOD_TYPE_DAILY, 	_('Daily'));
-		$scale->addItem(TIMEPERIOD_TYPE_WEEKLY,	_('Weekly'));
-		$scale->addItem(TIMEPERIOD_TYPE_MONTHLY,_('Monthly'));
-		$scale->addItem(TIMEPERIOD_TYPE_YEARLY,	_('Yearly'));
+	$scale->addItem(TIMEPERIOD_TYPE_HOURLY, _('Hourly'));
+	$scale->addItem(TIMEPERIOD_TYPE_DAILY, 	_('Daily'));
+	$scale->addItem(TIMEPERIOD_TYPE_WEEKLY,	_('Weekly'));
+	$scale->addItem(TIMEPERIOD_TYPE_MONTHLY,_('Monthly'));
+	$scale->addItem(TIMEPERIOD_TYPE_YEARLY,	_('Yearly'));
 	$reportForm->addRow(_('Scale'), $scale);
 
 	$avgcmb = new CComboBox('avgperiod', $avgperiod);
-		$avgcmb->addItem(TIMEPERIOD_TYPE_HOURLY,	_('Hourly'));
-		$avgcmb->addItem(TIMEPERIOD_TYPE_DAILY, 	_('Daily'));
-		$avgcmb->addItem(TIMEPERIOD_TYPE_WEEKLY,	_('Weekly'));
-		$avgcmb->addItem(TIMEPERIOD_TYPE_MONTHLY, 	_('Monthly'));
-		$avgcmb->addItem(TIMEPERIOD_TYPE_YEARLY,	_('Yearly'));
+	$avgcmb->addItem(TIMEPERIOD_TYPE_HOURLY,	_('Hourly'));
+	$avgcmb->addItem(TIMEPERIOD_TYPE_DAILY, 	_('Daily'));
+	$avgcmb->addItem(TIMEPERIOD_TYPE_WEEKLY,	_('Weekly'));
+	$avgcmb->addItem(TIMEPERIOD_TYPE_MONTHLY, 	_('Monthly'));
+	$avgcmb->addItem(TIMEPERIOD_TYPE_YEARLY,	_('Yearly'));
 	$reportForm->addRow(_('Average by'), $avgcmb);
 
-	// items
 	$itemName = '';
 	if ($itemId) {
 		$itemName = get_item_by_itemid($itemId);
@@ -420,18 +438,18 @@ function bar_report_form3(){
 	$reportForm->addRow(_('Item'), array($txtCondVal, $btnSelect));
 
 	$paletteCmb = new CComboBox('palette', $palette);
-		$paletteCmb->addItem(0, _s('Palette #%1$s', 1));
-		$paletteCmb->addItem(1, _s('Palette #%1$s', 2));
-		$paletteCmb->addItem(2, _s('Palette #%1$s', 3));
-		$paletteCmb->addItem(3, _s('Palette #%1$s', 4));
+	$paletteCmb->addItem(0, _s('Palette #%1$s', 1));
+	$paletteCmb->addItem(1, _s('Palette #%1$s', 2));
+	$paletteCmb->addItem(2, _s('Palette #%1$s', 3));
+	$paletteCmb->addItem(3, _s('Palette #%1$s', 4));
 
 	$paletteTypeCmb = new CComboBox('palettetype', $palettetype);
-		$paletteTypeCmb->addItem(0, _('Middle'));
-		$paletteTypeCmb->addItem(1, _('Darken'));
-		$paletteTypeCmb->addItem(2, _('Brighten'));
+	$paletteTypeCmb->addItem(0, _('Middle'));
+	$paletteTypeCmb->addItem(1, _('Darken'));
+	$paletteTypeCmb->addItem(2, _('Brighten'));
 
-	$reportForm->addRow(_('Palette') , array($paletteCmb,$paletteTypeCmb));
-	$reportForm->addItemToBottomRow(new CSubmit('report_show',_('Show')));
+	$reportForm->addRow(_('Palette'), array($paletteCmb, $paletteTypeCmb));
+	$reportForm->addItemToBottomRow(new CSubmit('report_show', _('Show')));
 
 	$reset = new CButton('reset', _('Reset'));
 	$reset->setType('reset');

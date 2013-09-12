@@ -111,167 +111,169 @@ else {
 }
 
 
-/* AJAX */
-	if(isset($_REQUEST['favobj'])){
-		if('filter' == $_REQUEST['favobj']){
-			CProfile::update('web.report6.filter.state',$_REQUEST['favstate'], PROFILE_TYPE_INT);
-		}
+if (isset($_REQUEST['favobj'])) {
+	if ('filter' == $_REQUEST['favobj']) {
+		CProfile::update('web.report6.filter.state',$_REQUEST['favstate'], PROFILE_TYPE_INT);
 	}
+}
 
-	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		require_once dirname(__FILE__).'/include/page_footer.php';
-		exit();
-	}
-//--------
+if ((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])) {
+	require_once dirname(__FILE__).'/include/page_footer.php';
+	exit();
+}
 
-	if(isset($_REQUEST['new_graph_item'])){
-		$_REQUEST['items'] = get_request('items', array());
-		$new_gitem = get_request('new_graph_item', array());
+if (isset($_REQUEST['new_graph_item'])) {
+	$_REQUEST['items'] = get_request('items', array());
+	$new_gitem = get_request('new_graph_item', array());
 
-		foreach($_REQUEST['items'] as $gid => $data){
-			if(	(bccomp($new_gitem['itemid'] , $data['itemid'])==0) &&
-				$new_gitem['calc_fnc'] == $data['calc_fnc'] &&
-				$new_gitem['caption'] == $data['caption'])
-			{
-				$already_exist = true;
-				break;
-			}
-		}
-
-		if(!isset($already_exist)){
-			array_push($_REQUEST['items'], $new_gitem);
-		}
-	}
-	else if(isset($_REQUEST['delete_item']) && isset($_REQUEST['group_gid'])){
-
-		foreach($_REQUEST['items'] as $gid => $data){
-			if(!isset($_REQUEST['group_gid'][$gid])) continue;
-			unset($_REQUEST['items'][$gid]);
-		}
-		unset($_REQUEST['delete_item'], $_REQUEST['group_gid']);
-	}
-	else if(isset($_REQUEST['new_period'])){
-		$_REQUEST['periods'] = get_request('periods', array());
-		$new_period = get_request('new_period', array());
-
-		foreach($_REQUEST['periods'] as $pid => $data){
-			$data['report_timesince'] = zbxDateToTime($data['report_timesince']);
-			$data['report_timetill'] = zbxDateToTime($data['report_timetill']);
-
-			if(	$new_period['report_timesince'] == $data['report_timesince'] &&
-				$new_period['report_timetill'] == $data['report_timetill'])
-			{
-				$already_exist = true;
-				break;
-			}
-		}
-
-		if(!isset($already_exist)){
-			array_push($_REQUEST['periods'], $new_period);
-		}
-	}
-	else if(isset($_REQUEST['delete_period']) && isset($_REQUEST['group_pid'])){
-
-		foreach($_REQUEST['periods'] as $pid => $data){
-			if(!isset($_REQUEST['group_pid'][$pid])) continue;
-			unset($_REQUEST['periods'][$pid]);
-		}
-		unset($_REQUEST['delete_period'], $_REQUEST['group_pid']);
-	}
-
-	// item validation
-	$config = $_REQUEST['config'] = get_request('config', 1);
-
-	// items array validation
-	if ($config != 3) {
-		$items = get_request('items');
-		$validItems = validateBarReportItems($items);
-
-		if ($config == 2) {
-			$validPeriods = validateBarReportPeriods(get_request('periods'));
-		}
-	}
-
-	$_REQUEST['report_timesince'] = zbxDateToTime(get_request('report_timesince', date(TIMESTAMP_FORMAT, time() - SEC_PER_DAY)));
-	$_REQUEST['report_timetill'] = zbxDateToTime(get_request('report_timetill', date(TIMESTAMP_FORMAT)));
-
-	$rep6_wdgt = new CWidget();
-// Header
-	$r_form = new CForm();
-	$cnfCmb = new CComboBox('config', $config, 'submit();');
-		$cnfCmb->addItem(1, _('Distribution of values for multiple periods'));
-		$cnfCmb->addItem(2, _('Distribution of values for multiple items'));
-		$cnfCmb->addItem(3, _('Compare values for multiple periods'));
-
-	$r_form->addItem(array(_('Reports').SPACE,$cnfCmb));
-
-	$rep6_wdgt->addPageHeader(_('Bar reports'));
-	$rep6_wdgt->addHeader(_('Report'), $r_form);
-	$rep6_wdgt->addItem(BR());
-//-------------
-
-	$rep_tab = new CTable();
-	$rep_tab->setCellPadding(3);
-	$rep_tab->setCellSpacing(3);
-
-	$rep_tab->setAttribute('border',0);
-
-// --------------
-	switch ($config) {
-		default:
-		case 1:
-			$rep_form = bar_report_form($validItems);
+	foreach ($_REQUEST['items'] as $gid => $data) {
+		if ((bccomp($new_gitem['itemid'] , $data['itemid']) == 0)
+				&& $new_gitem['calc_fnc'] == $data['calc_fnc']
+				&& $new_gitem['caption'] == $data['caption']) {
+			$already_exist = true;
 			break;
-
-		case 2:
-			$rep_form = bar_report_form2($validItems, $validPeriods);
-			break;
-
-		case 3:
-			$rep_form = bar_report_form3();
-			break;
-	}
-
-	$rep6_wdgt->addFlicker($rep_form, CProfile::get('web.report6.filter.state', 1));
-
-	if(isset($_REQUEST['report_show'])){
-		$items = ($config == 3)
-			? array(array('itemid' => get_request('itemid')))
-			: get_request('items');
-
-		if ($isValid && (($config != 3) ? $validItems : true) && (($config == 2) ? $validPeriods : true)) {
-			$src = 'chart_bar.php?config='.$_REQUEST['config'].
-						url_param('title').
-						url_param('xlabel').
-						url_param('ylabel').
-						url_param('scaletype').
-						url_param('avgperiod').
-						url_param('showlegend').
-						url_param('sorttype').
-						url_param('report_timesince').
-						url_param('report_timetill').
-						url_param('periods').
-						url_param($items, false, 'items').
-						url_param('hostids').
-						url_param('groupids').
-						url_param('palette').
-						url_param('palettetype');
-
-			$rep_tab->addRow(new CImg($src, 'report'));
 		}
 	}
 
-	$outer_table = new CTable();
-	$outer_table->setAttribute('border',0);
-	$outer_table->setAttribute('width','100%');
+	if (!isset($already_exist)) {
+		array_push($_REQUEST['items'], $new_gitem);
+	}
+}
+elseif (isset($_REQUEST['delete_item']) && isset($_REQUEST['group_gid'])) {
+	foreach ($_REQUEST['items'] as $gid => $data) {
+		if (!isset($_REQUEST['group_gid'][$gid])) {
+			continue;
+		}
+		unset($_REQUEST['items'][$gid]);
+	}
+	unset($_REQUEST['delete_item'], $_REQUEST['group_gid']);
+}
+elseif (isset($_REQUEST['new_period'])) {
+	$_REQUEST['periods'] = get_request('periods', array());
+	$new_period = get_request('new_period', array());
 
-	$outer_table->setCellPadding(1);
-	$outer_table->setCellSpacing(1);
-	$tmp_row = new CRow($rep_tab);
-	$tmp_row->setAttribute('align','center');
-	$outer_table->addRow($tmp_row);
+	foreach ($_REQUEST['periods'] as $pid => $data) {
+		$data['report_timesince'] = zbxDateToTime($data['report_timesince']);
+		$data['report_timetill'] = zbxDateToTime($data['report_timetill']);
 
-	$rep6_wdgt->addItem($outer_table);
-	$rep6_wdgt->show();
+		if ($new_period['report_timesince'] == $data['report_timesince']
+				&& $new_period['report_timetill'] == $data['report_timetill']) {
+			$already_exist = true;
+			break;
+		}
+	}
+
+	if (!isset($already_exist)) {
+		array_push($_REQUEST['periods'], $new_period);
+	}
+}
+elseif (isset($_REQUEST['delete_period']) && isset($_REQUEST['group_pid'])) {
+	foreach ($_REQUEST['periods'] as $pid => $data) {
+		if (!isset($_REQUEST['group_pid'][$pid])) {
+			continue;
+		}
+		unset($_REQUEST['periods'][$pid]);
+	}
+	unset($_REQUEST['delete_period'], $_REQUEST['group_pid']);
+}
+
+// item validation
+$config = $_REQUEST['config'] = get_request('config', 1);
+
+// items array validation
+if ($config != 3) {
+	$items = get_request('items');
+	$validItems = validateBarReportItems($items);
+
+	if ($config == 2) {
+		$validPeriods = validateBarReportPeriods(get_request('periods'));
+	}
+}
+
+$_REQUEST['report_timesince'] = zbxDateToTime(
+	get_request('report_timesince', date(TIMESTAMP_FORMAT, time() - SEC_PER_DAY))
+);
+$_REQUEST['report_timetill'] = zbxDateToTime(get_request('report_timetill', date(TIMESTAMP_FORMAT)));
+
+$rep6_wdgt = new CWidget();
+
+$r_form = new CForm();
+$cnfCmb = new CComboBox('config', $config, 'submit();');
+$cnfCmb->addItem(1, _('Distribution of values for multiple periods'));
+$cnfCmb->addItem(2, _('Distribution of values for multiple items'));
+$cnfCmb->addItem(3, _('Compare values for multiple periods'));
+
+$r_form->addItem(array(_('Reports').SPACE, $cnfCmb));
+
+$rep6_wdgt->addPageHeader(_('Bar reports'));
+$rep6_wdgt->addHeader(_('Report'), $r_form);
+$rep6_wdgt->addItem(BR());
+
+$rep_tab = new CTable();
+$rep_tab->setCellPadding(3);
+$rep_tab->setCellSpacing(3);
+
+$rep_tab->setAttribute('border', 0);
+
+switch ($config) {
+	default:
+	case 1:
+		$rep_form = barReportForm($validItems);
+		break;
+
+	case 2:
+		$rep_form = barReportForm2($validItems, $validPeriods);
+		break;
+
+	case 3:
+		$rep_form = barReportForm3();
+		break;
+}
+
+$rep6_wdgt->addFlicker($rep_form, CProfile::get('web.report6.filter.state', 1));
+
+if (isset($_REQUEST['report_show'])) {
+	$items = ($config == 3)
+		? array(array('itemid' => get_request('itemid')))
+		: get_request('items');
+
+	if ($isValid && (($config != 3) ? $validItems : true) && (($config == 2) ? $validPeriods : true)) {
+		$src = 'chart_bar.php?'.
+			'config='.$config.
+			url_param('title').
+			url_param('xlabel').
+			url_param('ylabel').
+			url_param('scaletype').
+			url_param('avgperiod').
+			url_param('showlegend').
+			url_param('sorttype').
+			url_param('report_timesince').
+			url_param('report_timetill').
+			url_param('periods').
+			url_param($items, false, 'items').
+			url_param('hostids').
+			url_param('groupids').
+			url_param('palette').
+			url_param('palettetype');
+
+		$rep_tab->addRow(new CImg($src, 'report'));
+	}
+}
+
+$outer_table = new CTable();
+
+$outer_table->setAttribute('border', 0);
+$outer_table->setAttribute('width', '100%');
+
+$outer_table->setCellPadding(1);
+$outer_table->setCellSpacing(1);
+
+$tmp_row = new CRow($rep_tab);
+$tmp_row->setAttribute('align', 'center');
+
+$outer_table->addRow($tmp_row);
+
+$rep6_wdgt->addItem($outer_table);
+$rep6_wdgt->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
