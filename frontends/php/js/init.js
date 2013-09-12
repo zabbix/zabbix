@@ -82,4 +82,10 @@ jQuery(function($) {
 	if (IE || KQ) {
 		setTimeout(function () {$('[autofocus]').focus()}, 10);
 	}
+
+	$('.print-link').click(function() {
+		printLess(true);
+
+		return false;
+	});
 });

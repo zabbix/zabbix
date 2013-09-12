@@ -557,5 +557,8 @@ div.suggest { position: absolute; border: 1px #5C7099 solid; width: 162px; z-ind
 .multiselect .available ul li.hover { background: #7A9FC1; color: #FFFFFF; }
 .multiselect .available ul li.hover .prefix { color: #F1F1F1; }
 
+.printless { display: none; border: 1px #333 dotted; padding-left: 10px; cursor: pointer; font-weight: bold; color: #000000; background-color: #FFFFFF; }
+.printless:hover { text-decoration: underline; }
+
 /* tabs */
 .tabs { visibility: hidden; }
