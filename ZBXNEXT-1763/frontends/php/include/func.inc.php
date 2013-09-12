@@ -41,7 +41,7 @@ function jsRedirect($url, $timeout = null) {
 /**
  * Check if request exist.
  *
- * @param mixed		$name
+ * @param string	$name
  *
  * @return bool
  */
@@ -52,7 +52,7 @@ function hasRequest($name) {
 /**
  * Check request, if exist request - return request value, else return default value.
  *
- * @param mixed		$name
+ * @param string	$name
  * @param mixed		$def
  *
  * @return mixed
@@ -66,7 +66,7 @@ function getRequest($name, $def = null) {
  *
  * @deprecated function, use getRequest() instead
  *
- * @param mixed		$name
+ * @param string	$name
  * @param mixed		$def
  *
  * @return mixed
