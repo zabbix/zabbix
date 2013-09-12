@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-06 01:17+0300\n"
+"POT-Creation-Date: 2013-09-11 09:51+0300\n"
 "PO-Revision-Date: 2013-08-25 15:11+0200\n"
 "Last-Translator: solutionware <shiys@solutionware.com.cn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -221,7 +221,7 @@ msgstr "可接受的SLA"
 msgid "Access denied!"
 msgstr "存取被拒!"
 
-#: include/func.inc.php:2045
+#: include/func.inc.php:2047
 msgid "Access denied."
 msgstr "访问被拒绝."
 
@@ -391,7 +391,7 @@ msgstr "作用中直到"
 #: include/views/administration.usergroups.edit.php:111
 #: include/views/administration.usergroups.edit.php:115
 #: include/views/administration.users.edit.php:90
-#: include/views/administration.users.edit.php:194
+#: include/views/administration.users.edit.php:195
 #: include/views/common.macros.php:66
 #: include/views/configuration.action.edit.php:308
 #: include/views/configuration.action.edit.php:507
@@ -801,11 +801,11 @@ msgstr "验证协议"
 msgid "Auto registration"
 msgstr "自动注册"
 
-#: include/views/administration.users.edit.php:142
+#: include/views/administration.users.edit.php:143
 msgid "Auto-login"
 msgstr "自动登入"
 
-#: include/views/administration.users.edit.php:143 profile.php:47 users.php:59
+#: include/views/administration.users.edit.php:144 profile.php:47 users.php:59
 msgid "Auto-logout (min 90 seconds)"
 msgstr "自动退出(90秒)"
 
@@ -1206,10 +1206,15 @@ msgstr "无法知悉事件"
 msgid "Cannot activate web scenario"
 msgstr "不能激活web场景"
 
-#: api/classes/CGraph.php:654 api/classes/CGraphPrototype.php:685
+#: api/classes/CGraph.php:696
 #, php-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
 msgstr "不能添加一个非数字监控项 \"%1$s\" 到图表 \"%2$s\"."
+
+#: api/classes/CGraphPrototype.php:696 api/classes/CGraphPrototype.php:758
+#, php-format
+msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
+msgstr ""
 
 #: actionconf.php:150
 msgid "Cannot add action"
@@ -1280,10 +1285,15 @@ msgstr "无法添加维修"
 msgid "Cannot add media type"
 msgstr "无法添加示警媒介类型"
 
-#: api/classes/CGraphGeneral.php:106
+#: api/classes/CGraph.php:43
 #, php-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
 msgstr "无法添加超过一个 \"图形总计\" 类型的项目于图形 \"%1$s\"上."
+
+#: api/classes/CGraphPrototype.php:43
+#, php-format
+msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
+msgstr ""
 
 #: sysmaps.php:171
 msgid "Cannot add network map"
@@ -1493,7 +1503,7 @@ msgstr "无法删除图形."
 msgid "Cannot delete graphs"
 msgstr "无法删除图形"
 
-#: api/classes/CGraphPrototype.php:563
+#: api/classes/CGraphPrototype.php:577
 msgid "Cannot delete graphs created by low level discovery."
 msgstr "无法删除与底层发现创建的图标."
 
@@ -1608,7 +1618,7 @@ msgstr "无法删除模板"
 msgid "Cannot delete templated application."
 msgstr "无法删除模板的应用程序."
 
-#: api/classes/CGraph.php:529 api/classes/CGraphPrototype.php:538
+#: api/classes/CGraph.php:535 api/classes/CGraphPrototype.php:552
 msgid "Cannot delete templated graphs."
 msgstr "无法删除模板图形."
 
@@ -1914,11 +1924,6 @@ msgstr "无法设置 \"%1$s\" 为触发器 \"%2$s\"."
 msgid "Cannot set \"templateid\" for application \"%1$s\"."
 msgstr "无法设置 \"模板序列号\" 为应用 \"%1$s\"."
 
-#: api/classes/CGraphGeneral.php:57
-#, php-format
-msgid "Cannot set \"templateid\" for graph \"%1$s\"."
-msgstr "无法设置 \"模板序列号\" 为图表 \"%1$s\"."
-
 #: api/classes/CScreen.php:376
 #, php-format
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
@@ -2012,10 +2017,15 @@ msgstr "无法更新 \"%1$s\" 为触发器 \"%2$s\"."
 msgid "Cannot update \"templateid\" for application \"%1$s\"."
 msgstr "无法更新 \"模板序列号\" 为应用程序 \"%1$s\"."
 
-#: api/classes/CGraphGeneral.php:54
+#: api/classes/CGraph.php:42
 #, php-format
 msgid "Cannot update \"templateid\" for graph \"%1$s\"."
 msgstr "无法更新 \"模板序列号\" 为图表 \"%1$s\"."
+
+#: api/classes/CGraphPrototype.php:42
+#, php-format
+msgid "Cannot update \"templateid\" for graph prototype \"%1$s\"."
+msgstr ""
 
 #: api/classes/CScreen.php:447 api/classes/CTemplateScreen.php:667
 #, php-format
@@ -2027,7 +2037,7 @@ msgstr "无法更新 \"模板序列号\" 为屏幕 \"%1$s\"."
 msgid "Cannot update \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "无法更新 \"模板序列号\" 为触发器原型 \"%1$s\"."
 
-#: api/classes/CGraphGeneral.php:192
+#: api/classes/CGraphGeneral.php:60
 msgid "Cannot update a discovered graph."
 msgstr ""
 
@@ -3445,7 +3455,7 @@ msgstr "删除脚本?"
 #: include/views/administration.usergroups.edit.php:116
 #: include/views/administration.usergroups.list.php:153
 #: include/views/administration.users.edit.php:94
-#: include/views/administration.users.edit.php:197
+#: include/views/administration.users.edit.php:198
 #: include/views/administration.users.list.php:138
 #: include/views/configuration.action.list.php:105
 #: include/views/configuration.application.list.php:120
@@ -3576,7 +3586,7 @@ msgstr "删除所选的模板?"
 msgid "Delete selected triggers?"
 msgstr "删除所选的触发器?"
 
-#: include/views/administration.users.edit.php:365
+#: include/views/administration.users.edit.php:366
 msgid "Delete selected user?"
 msgstr "删除所选的用户?"
 
@@ -3632,7 +3642,7 @@ msgstr "已删除: 应用集 \"%1$s\" 于 \"%2$s\"."
 msgid "Deleted: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "已删除: 发现规则 \"%1$s\" 于 \"%2$s\"."
 
-#: api/classes/CGraph.php:563
+#: api/classes/CGraph.php:569
 #, php-format
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "已删除: 图表 \"%1$s\" 于 \"%2$s\"."
@@ -3736,7 +3746,7 @@ msgid "Description"
 msgstr "描述"
 
 #: include/actions.inc.php:966 include/blocks.inc.php:719
-#: include/func.inc.php:2165
+#: include/func.inc.php:2167
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:44
 #: include/views/configuration.action.edit.php:328
@@ -3894,7 +3904,7 @@ msgstr "停用所选的触发器?"
 #: include/views/administration.usergroups.list.php:59
 #: include/views/administration.usergroups.list.php:84
 #: include/views/administration.usergroups.list.php:88
-#: include/views/administration.users.edit.php:163
+#: include/views/administration.users.edit.php:164
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.list.php:73
@@ -4025,7 +4035,7 @@ msgstr "探索状态"
 msgid "Display OK triggers for"
 msgstr "显示OK触发器予"
 
-#: include/func.inc.php:1848
+#: include/func.inc.php:1850
 msgid "Displaying"
 msgstr "显示"
 
@@ -4177,7 +4187,7 @@ msgctxt "Exa short"
 msgid "E"
 msgstr "E"
 
-#: include/func.inc.php:2132
+#: include/func.inc.php:2134
 msgid "ERROR"
 msgstr "错误"
 
@@ -4189,7 +4199,7 @@ msgstr "事件"
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "每个URL必须是唯一的. 请确保仅有一个URL为名."
 
-#: include/views/administration.users.edit.php:189
+#: include/views/administration.users.edit.php:190
 #: include/views/configuration.action.edit.php:376
 #: include/views/configuration.action.edit.php:389
 #: include/views/configuration.maintenance.edit.php:112
@@ -4259,7 +4269,7 @@ msgstr ""
 
 #: api/classes/CAction.php:1235 api/classes/CApplication.php:288
 #: api/classes/CApplication.php:495 api/classes/CDiscoveryRule.php:339
-#: api/classes/CGraph.php:509 api/classes/CGraphPrototype.php:519
+#: api/classes/CGraph.php:515 api/classes/CGraphPrototype.php:533
 #: api/classes/CHostGroup.php:509 api/classes/CHostGroup.php:580
 #: api/classes/CHostInterface.php:465 api/classes/CHost.php:1428
 #: api/classes/CHostPrototype.php:906 api/classes/CIconMap.php:316
@@ -4415,7 +4425,7 @@ msgstr "启用所选的触发器?"
 #: include/views/administration.usergroups.list.php:58
 #: include/views/administration.usergroups.list.php:83
 #: include/views/administration.usergroups.list.php:88
-#: include/views/administration.users.edit.php:159
+#: include/views/administration.users.edit.php:160
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.edit.php:59
@@ -4819,7 +4829,7 @@ msgstr "芬兰语 (fi_FI)"
 msgid "First"
 msgstr "首"
 
-#: include/func.inc.php:1793
+#: include/func.inc.php:1795
 msgctxt "page navigation"
 msgid "First"
 msgstr "首"
@@ -4884,7 +4894,7 @@ msgstr "前端存取"
 msgid "Frontend access updated"
 msgstr "前端存取已更新"
 
-#: include/views/administration.users.edit.php:208
+#: include/views/administration.users.edit.php:209
 msgid "Frontend messaging"
 msgstr "前端信息中"
 
@@ -4991,7 +5001,7 @@ msgstr "确认"
 msgid "Go to"
 msgstr "到"
 
-#: include/func.inc.php:2063
+#: include/func.inc.php:2065
 msgid "Go to dashboard"
 msgstr "转到仪表板"
 
@@ -5011,33 +5021,33 @@ msgstr "梯度线"
 msgid "Graph"
 msgstr "图形"
 
-#: api/classes/CGraph.php:417 api/classes/CGraphPrototype.php:424
+#: api/classes/CGraph.php:422 api/classes/CGraphPrototype.php:438
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (inherited from another template)."
 msgstr "图形\"%1$s\"已存在于\"%2$s\"中 (继承自其它的模板)."
 
-#: api/classes/CGraph.php:438 api/classes/CGraph.php:445
-#: api/classes/CGraphPrototype.php:446 api/classes/CGraphPrototype.php:453
+#: api/classes/CGraph.php:443 api/classes/CGraph.php:450
+#: api/classes/CGraphPrototype.php:460 api/classes/CGraphPrototype.php:467
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (items are not identical)."
 msgstr "图形\"%1$s\"已存在于\"%2$s\"中 (项目不一致)."
 
-#: api/classes/CGraph.php:396 api/classes/CGraphPrototype.php:403
+#: api/classes/CGraph.php:401 api/classes/CGraphPrototype.php:416
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\"."
 msgstr "图形\"%1$s\"已存在于\"%2$s\"中."
 
-#: api/classes/CGraph.php:370 api/classes/CGraphPrototype.php:377
+#: api/classes/CGraph.php:375 api/classes/CGraphPrototype.php:382
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymax value item)."
 msgstr "图形\"%1$s\"不能继承. \"%2$s\"中并无所要的项目 (Ymax值项目)."
 
-#: api/classes/CGraph.php:378 api/classes/CGraphPrototype.php:385
+#: api/classes/CGraph.php:383 api/classes/CGraphPrototype.php:391
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymin value item)."
 msgstr "图形\"%1$s\"不能继承. \"%2$s\"中并无所要的项目 (Ymin值项目)."
 
-#: api/classes/CGraph.php:364 api/classes/CGraphPrototype.php:371
+#: api/classes/CGraph.php:369 api/classes/CGraphPrototype.php:376
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
 msgstr "图形\"%1$s\"不能继承. \"%2$s\"中并无所要的项目."
@@ -5087,12 +5097,12 @@ msgstr "图标原型"
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
 msgstr "含模板项目的图形原型\"%1$s\"不能包含其它主机的项目."
 
-#: api/classes/CGraphPrototype.php:570
+#: api/classes/CGraphPrototype.php:584
 #, php-format
 msgid "Graph prototype \"%s\" deleted."
 msgstr "图形原型\"%s\"已删除."
 
-#: api/classes/CGraphPrototype.php:673
+#: api/classes/CGraphPrototype.php:685 api/classes/CGraphPrototype.php:746
 msgid "Graph prototype must have at least one prototype."
 msgstr "图形原型必需至少有一个原型."
 
@@ -5121,13 +5131,13 @@ msgstr "图形类别"
 msgid "Graph updated"
 msgstr "图形已更新"
 
-#: api/classes/CGraphGeneral.php:148
+#: api/classes/CGraphGeneral.php:735
 #, php-format
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
 msgstr "图表名称 \"%1$s\" 已经存在在图表或者图表原型."
 
-#: api/classes/CGraph.php:399 api/classes/CGraph.php:420
-#: api/classes/CGraphPrototype.php:406 api/classes/CGraphPrototype.php:427
+#: api/classes/CGraph.php:404 api/classes/CGraph.php:425
+#: api/classes/CGraphPrototype.php:420 api/classes/CGraphPrototype.php:441
 msgid "Graph with same name but other type exist."
 msgstr "同名但不同类型的图形已存在."
 
@@ -6040,7 +6050,7 @@ msgstr "图示"
 msgid "Identical expression already exists"
 msgstr "相同的表达式已经存在"
 
-#: include/func.inc.php:2053 include/func.inc.php:2073
+#: include/func.inc.php:2055 include/func.inc.php:2075
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "假如您认为这个信息是错的, 请谘询您的管理者关于如何取得需要的许可权."
 
@@ -6512,7 +6522,7 @@ msgstr "不正确的资产纪录栏位\"%s\"."
 msgid "Incorrect item ID \"%s\" provided for screen element."
 msgstr "提供了不正确的项目ID\"%s\"给筛选组件."
 
-#: api/classes/CGraphGeneral.php:396
+#: api/classes/CGraphGeneral.php:314
 msgid "Incorrect item for axis value."
 msgstr "不正确的项目予轴值."
 
@@ -7564,7 +7574,7 @@ msgstr "标示"
 msgid "Label location"
 msgstr "标示位置"
 
-#: include/views/administration.users.edit.php:129
+#: include/views/administration.users.edit.php:130
 msgid "Language"
 msgstr "语言"
 
@@ -7572,7 +7582,7 @@ msgstr "语言"
 msgid "Last"
 msgstr "末"
 
-#: include/func.inc.php:1833
+#: include/func.inc.php:1835
 msgctxt "page navigation"
 msgid "Last"
 msgstr "末"
@@ -7851,7 +7861,7 @@ msgstr "日志与SNMP捉捕器不符"
 msgid "Logged in as"
 msgstr "登入为"
 
-#: auditlogs.php:143 include/func.inc.php:2059 include/func.inc.php:2076
+#: auditlogs.php:143 include/func.inc.php:2061 include/func.inc.php:2078
 #: include/menu.inc.php:282 include/page_header.php:246
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:64
@@ -8197,7 +8207,7 @@ msgid "Max count of events per trigger to show"
 msgstr "可展示的每触发器最多事件计数"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2167
+#: include/func.inc.php:2169
 msgid "Maximize"
 msgstr "最大化"
 
@@ -8256,8 +8266,8 @@ msgctxt "May short"
 msgid "May"
 msgstr "五月"
 
-#: include/views/administration.users.edit.php:193
-#: include/views/administration.users.edit.php:321 popup_media.php:27
+#: include/views/administration.users.edit.php:194
+#: include/views/administration.users.edit.php:322 popup_media.php:27
 msgid "Media"
 msgstr "示警媒介"
 
@@ -8339,11 +8349,11 @@ msgstr "信息动作"
 msgid "Message text limit"
 msgstr "信息文字限制"
 
-#: include/views/administration.users.edit.php:214
+#: include/views/administration.users.edit.php:215
 msgid "Message timeout"
 msgstr "信息逾时"
 
-#: include/views/administration.users.edit.php:209
+#: include/views/administration.users.edit.php:210
 msgid "Message timeout (seconds)"
 msgstr "信息逾时(秒)"
 
@@ -8351,7 +8361,7 @@ msgstr "信息逾时(秒)"
 msgid "Messages"
 msgstr "信息"
 
-#: include/views/administration.users.edit.php:350
+#: include/views/administration.users.edit.php:351
 msgid "Messaging"
 msgstr "信息中"
 
@@ -8365,7 +8375,7 @@ msgid "Middle"
 msgstr "居中"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2167
+#: include/func.inc.php:2169
 msgid "Minimize"
 msgstr "最小化"
 
@@ -8438,19 +8448,19 @@ msgstr "分"
 msgid "Missing \"%1$s\" field for action condition."
 msgstr "缺少了\"%1$s\" 字段对于动作条件"
 
-#: api/classes/CGraphGeneral.php:531
+#: api/classes/CGraphGeneral.php:75
 msgid "Missing \"gitemid\" field for item."
 msgstr ""
 
-#: api/classes/CGraph.php:603 api/classes/CGraphPrototype.php:611
+#: api/classes/CGraphGeneral.php:474 api/classes/CGraphGeneral.php:590
 msgid "Missing \"itemid\" field for item."
 msgstr "缺少项目的\"itemid\"栏位"
 
-#: api/classes/CGraphPrototype.php:593
+#: api/classes/CGraphPrototype.php:39
 msgid "Missing \"name\" field for graph prototype."
 msgstr ""
 
-#: api/classes/CGraph.php:586
+#: api/classes/CGraph.php:39
 msgid "Missing \"name\" field for graph."
 msgstr "缺少图形的\"名称\"栏位"
 
@@ -8460,12 +8470,12 @@ msgstr "缺少图形的\"名称\"栏位"
 msgid "Missing item \"%1$s\" for host \"%2$s\"."
 msgstr "主机 \"%2$s\"缺少了项目\"%1$s\"."
 
-#: api/classes/CGraph.php:592
+#: api/classes/CGraph.php:40
 #, php-format
 msgid "Missing items for graph \"%1$s\"."
 msgstr "缺少图形\"%1$s\"的项目."
 
-#: api/classes/CGraphPrototype.php:600
+#: api/classes/CGraphPrototype.php:40
 #, php-format
 msgid "Missing items for graph prototype \"%1$s\"."
 msgstr "缺少图原型项\"%1$s\"."
@@ -8535,7 +8545,7 @@ msgstr "更多匹配发现..."
 msgid "More than 10 minutes"
 msgstr "10分钟以上"
 
-#: api/classes/CGraphGeneral.php:160
+#: api/classes/CGraphGeneral.php:747
 #, php-format
 msgid "More than one graph with name \"%1$s\" within host."
 msgstr "于主机中多于一个名为\"%1$s\"的图形."
@@ -8741,25 +8751,25 @@ msgstr "新的服务时间"
 msgid "Next"
 msgstr "下一步"
 
-#: include/func.inc.php:1826
+#: include/func.inc.php:1828
 msgctxt "page navigation"
 msgid "Next"
 msgstr "次"
 
 #: events.php:756 include/events.inc.php:356 include/events.inc.php:374
-#: include/func.inc.php:2386 include/triggers.inc.php:1608
+#: include/func.inc.php:2388 include/triggers.inc.php:1608
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
 #: include/views/js/adm.regexprs.edit.js.php:142
 msgid "No"
 msgstr "不"
 
-#: api/classes/CGraphPrototype.php:623 api/classes/CGraphPrototype.php:633
+#: api/classes/CGraphPrototype.php:41
 #, php-format
 msgid "No \"%1$s\" given for graph prototype."
 msgstr "没有\"%1$s\"给予图原型."
 
-#: api/classes/CGraph.php:614 api/classes/CGraph.php:622
+#: api/classes/CGraph.php:41
 #, php-format
 msgid "No \"%1$s\" given for graph."
 msgstr "没有\"%1$s\"给予图."
@@ -9145,7 +9155,7 @@ msgstr "没有已定义的对应."
 msgid "No matches found"
 msgstr "没有找到匹配"
 
-#: include/views/administration.users.edit.php:155
+#: include/views/administration.users.edit.php:156
 msgid "No media defined."
 msgstr "没有已定义的示警媒介."
 
@@ -9221,39 +9231,40 @@ msgstr "没有系统存取的许可权"
 #: api/classes/CApplication.php:533 api/classes/CDiscoveryRule.php:357
 #: api/classes/CDiscoveryRule.php:451 api/classes/CDiscoveryRule.php:456
 #: api/classes/CDRule.php:255 api/classes/CDRule.php:578
-#: api/classes/CEvent.php:732 api/classes/CGraphGeneral.php:197
-#: api/classes/CGraphGeneral.php:542 api/classes/CGraph.php:642
-#: api/classes/CGraphPrototype.php:654 api/classes/CHostBase.php:45
-#: api/classes/CHostGeneral.php:139 api/classes/CHostGroup.php:522
-#: api/classes/CHostGroup.php:595 api/classes/CHostGroup.php:778
-#: api/classes/CHostGroup.php:840 api/classes/CHostGroup.php:893
-#: api/classes/CHostGroup.php:902 api/classes/CHostGroup.php:924
-#: api/classes/CHostInterface.php:319 api/classes/CHostInterface.php:335
-#: api/classes/CHostInterface.php:476 api/classes/CHostInterface.php:674
-#: api/classes/CHost.php:688 api/classes/CHost.php:716
-#: api/classes/CHost.php:1813 api/classes/CHostPrototype.php:1020
-#: api/classes/CHostPrototype.php:1035 api/classes/CHostPrototype.php:1048
-#: api/classes/CHostPrototype.php:1061 api/classes/CHttpTest.php:393
-#: api/classes/CIconMap.php:319 api/classes/CImage.php:243
-#: api/classes/CImage.php:357 api/classes/CImage.php:474
-#: api/classes/CItemGeneral.php:182 api/classes/CItemGeneral.php:232
-#: api/classes/CItem.php:688 api/classes/CItemPrototype.php:508
-#: api/classes/CMaintenance.php:320 api/classes/CMaintenance.php:345
-#: api/classes/CMaintenance.php:358 api/classes/CMaintenance.php:466
-#: api/classes/CMaintenance.php:483 api/classes/CMaintenance.php:550
-#: api/classes/CMapElement.php:56 api/classes/CMapElement.php:145
-#: api/classes/CMap.php:389 api/classes/CProxy.php:171
-#: api/classes/CProxy.php:212 api/classes/CProxy.php:284
-#: api/classes/CProxy.php:550 api/classes/CScreenItem.php:328
-#: api/classes/CScreenItem.php:412 api/classes/CScreen.php:438
-#: api/classes/CScreen.php:518 api/classes/CService.php:1253
-#: api/classes/CService.php:1268 api/classes/CTemplateScreen.php:703
-#: api/classes/CTemplateScreen.php:724 api/classes/CTemplateScreen.php:730
-#: api/classes/CTrigger.php:652 api/classes/CTrigger.php:977
-#: api/classes/CTrigger.php:998 api/classes/CTrigger.php:1843
-#: api/classes/CTriggerPrototype.php:566 api/classes/CTriggerPrototype.php:669
-#: api/classes/CUserMacro.php:726 api/classes/CUserMacro.php:835
-#: api/classes/CUser.php:1156 include/func.inc.php:2032
+#: api/classes/CEvent.php:732 api/classes/CGraphGeneral.php:65
+#: api/classes/CGraphGeneral.php:86 api/classes/CGraph.php:686
+#: api/classes/CGraphPrototype.php:667 api/classes/CGraphPrototype.php:727
+#: api/classes/CHostBase.php:45 api/classes/CHostGeneral.php:139
+#: api/classes/CHostGroup.php:522 api/classes/CHostGroup.php:595
+#: api/classes/CHostGroup.php:778 api/classes/CHostGroup.php:840
+#: api/classes/CHostGroup.php:893 api/classes/CHostGroup.php:902
+#: api/classes/CHostGroup.php:924 api/classes/CHostInterface.php:319
+#: api/classes/CHostInterface.php:335 api/classes/CHostInterface.php:476
+#: api/classes/CHostInterface.php:674 api/classes/CHost.php:688
+#: api/classes/CHost.php:716 api/classes/CHost.php:1813
+#: api/classes/CHostPrototype.php:1020 api/classes/CHostPrototype.php:1035
+#: api/classes/CHostPrototype.php:1048 api/classes/CHostPrototype.php:1061
+#: api/classes/CHttpTest.php:393 api/classes/CIconMap.php:319
+#: api/classes/CImage.php:243 api/classes/CImage.php:357
+#: api/classes/CImage.php:474 api/classes/CItemGeneral.php:182
+#: api/classes/CItemGeneral.php:232 api/classes/CItem.php:688
+#: api/classes/CItemPrototype.php:508 api/classes/CMaintenance.php:320
+#: api/classes/CMaintenance.php:345 api/classes/CMaintenance.php:358
+#: api/classes/CMaintenance.php:466 api/classes/CMaintenance.php:483
+#: api/classes/CMaintenance.php:550 api/classes/CMapElement.php:56
+#: api/classes/CMapElement.php:145 api/classes/CMap.php:389
+#: api/classes/CProxy.php:171 api/classes/CProxy.php:212
+#: api/classes/CProxy.php:284 api/classes/CProxy.php:550
+#: api/classes/CScreenItem.php:328 api/classes/CScreenItem.php:412
+#: api/classes/CScreen.php:438 api/classes/CScreen.php:518
+#: api/classes/CService.php:1253 api/classes/CService.php:1268
+#: api/classes/CTemplateScreen.php:703 api/classes/CTemplateScreen.php:724
+#: api/classes/CTemplateScreen.php:730 api/classes/CTrigger.php:652
+#: api/classes/CTrigger.php:977 api/classes/CTrigger.php:998
+#: api/classes/CTrigger.php:1843 api/classes/CTriggerPrototype.php:566
+#: api/classes/CTriggerPrototype.php:669 api/classes/CUserMacro.php:726
+#: api/classes/CUserMacro.php:835 api/classes/CUser.php:1156
+#: include/func.inc.php:2034
 msgid "No permissions to referred object or it does not exist!"
 msgstr "没有所说的物件的许可权或其不存在!"
 
@@ -9736,7 +9747,7 @@ msgstr "开"
 msgid "On status change triggers blink for"
 msgstr "于状态改变时, 触发器因此闪烁于"
 
-#: include/views/administration.users.edit.php:212
+#: include/views/administration.users.edit.php:213
 msgid "Once"
 msgstr "一次"
 
@@ -10304,11 +10315,11 @@ msgid "Periods"
 msgstr "期间"
 
 #: include/views/administration.usergroups.edit.php:129
-#: include/views/administration.users.edit.php:347
+#: include/views/administration.users.edit.php:348
 msgid "Permissions"
 msgstr "许可权"
 
-#: include/views/administration.users.edit.php:345
+#: include/views/administration.users.edit.php:346
 msgid "Permissions can be assigned for user groups only."
 msgstr "许可权只能被指派予用户群组"
 
@@ -10332,12 +10343,12 @@ msgstr "置入演算法"
 msgid "Plain text"
 msgstr "文本"
 
-#: include/views/administration.users.edit.php:227
-#: include/views/administration.users.edit.php:264
+#: include/views/administration.users.edit.php:228
+#: include/views/administration.users.edit.php:265
 msgid "Play"
 msgstr "播放"
 
-#: include/views/administration.users.edit.php:215
+#: include/views/administration.users.edit.php:216
 msgid "Play sound"
 msgstr "播放声音"
 
@@ -10416,7 +10427,7 @@ msgstr "预览"
 msgid "Previous"
 msgstr "前"
 
-#: include/func.inc.php:1799
+#: include/func.inc.php:1801
 msgctxt "page navigation"
 msgid "Previous"
 msgstr "前"
@@ -10659,7 +10670,7 @@ msgstr "接收者(降幂)"
 msgid "Recipient(s)"
 msgstr "收件人(s)"
 
-#: include/views/administration.users.edit.php:224
+#: include/views/administration.users.edit.php:225
 msgid "Recovery"
 msgstr "恢复"
 
@@ -10672,15 +10683,15 @@ msgstr "恢复信息"
 msgid "Recovery subject"
 msgstr "恢复主旨"
 
-#: include/views/administration.users.edit.php:144 profile.php:49 users.php:61
+#: include/views/administration.users.edit.php:145 profile.php:49 users.php:61
 msgid "Refresh (in seconds)"
 msgstr "刷新(秒计)"
 
-#: include/func.inc.php:1907
+#: include/func.inc.php:1909
 msgid "Refresh time in seconds"
 msgstr "以秒计的刷新时间"
 
-#: include/func.inc.php:1911
+#: include/func.inc.php:1913
 msgid "Refresh time multiplier"
 msgstr "刷新时间倍数"
 
@@ -11034,7 +11045,7 @@ msgstr "位于X的屏幕元素 X - %1$s 和Y - %2$s的行跨度太大."
 msgid "Rows"
 msgstr "行"
 
-#: include/views/administration.users.edit.php:145 profile.php:50 users.php:62
+#: include/views/administration.users.edit.php:146 profile.php:50 users.php:62
 msgid "Rows per page"
 msgstr "每页行数"
 
@@ -11283,9 +11294,9 @@ msgstr "週六"
 #: include/views/administration.script.edit.php:119
 #: include/views/administration.usergroups.edit.php:137
 #: include/views/administration.usergroups.edit.php:143
-#: include/views/administration.users.edit.php:358
-#: include/views/administration.users.edit.php:362
-#: include/views/administration.users.edit.php:372
+#: include/views/administration.users.edit.php:359
+#: include/views/administration.users.edit.php:363
+#: include/views/administration.users.edit.php:373
 #: include/views/configuration.action.edit.php:1034
 #: include/views/configuration.application.edit.php:52
 #: include/views/configuration.application.edit.php:62
@@ -11516,7 +11527,7 @@ msgstr "第二个POC电话B"
 msgid "Secondary POC screen name"
 msgstr "第二个POC筛选名称"
 
-#: include/views/administration.users.edit.php:213
+#: include/views/administration.users.edit.php:214
 msgid "Seconds"
 msgstr "秒"
 
@@ -12184,8 +12195,8 @@ msgstr "名字为\"%1$s\"的步骤已经存在."
 msgid "Steps"
 msgstr "步骤"
 
-#: include/views/administration.users.edit.php:228
-#: include/views/administration.users.edit.php:265
+#: include/views/administration.users.edit.php:229
+#: include/views/administration.users.edit.php:266
 msgid "Stop"
 msgstr "停止"
 
@@ -12264,7 +12275,7 @@ msgstr "瑞士(sv_SE)"
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "切换认证方法将重设除了此连线期之外的所有连线!继续吗?"
 
-#: include/users.inc.php:83 include/views/administration.users.edit.php:132
+#: include/users.inc.php:83 include/views/administration.users.edit.php:133
 msgid "System default"
 msgstr "系统预设"
 
@@ -12549,7 +12560,7 @@ msgstr "请求的远程程序不存在/不可用"
 msgid "The web scenario application belongs to a different host than the web scenario host."
 msgstr "web 场景应用属于一个不同的主机而不是 web 场景主机."
 
-#: include/views/administration.users.edit.php:134
+#: include/views/administration.users.edit.php:135
 msgid "Theme"
 msgstr "背景主题"
 
@@ -12861,7 +12872,7 @@ msgstr "触发器类型之于"
 msgid "Trigger severities"
 msgstr "触发器严重性"
 
-#: include/actions.inc.php:54 include/views/administration.users.edit.php:272
+#: include/actions.inc.php:54 include/views/administration.users.edit.php:273
 msgid "Trigger severity"
 msgstr "触发器示警度"
 
@@ -13046,7 +13057,7 @@ msgstr "上线"
 msgid "URL"
 msgstr "URL"
 
-#: include/views/administration.users.edit.php:146
+#: include/views/administration.users.edit.php:147
 msgid "URL (after login)"
 msgstr "URL (登陆后)"
 
@@ -13084,7 +13095,7 @@ msgstr "USA (160字元)"
 msgid "USER PROFILE"
 msgstr "用户基本资料"
 
-#: include/func.inc.php:2565
+#: include/func.inc.php:2567
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -13426,7 +13437,7 @@ msgstr "用于动作中"
 #: include/audit.inc.php:24 include/hosts.inc.php:67 include/setup.inc.php:274
 #: include/views/administration.auditlogs.list.php:56
 #: include/views/administration.auditlogs.list.php:86
-#: include/views/administration.users.edit.php:316
+#: include/views/administration.users.edit.php:317
 #: include/views/configuration.action.edit.php:512
 #: include/views/configuration.httpconf.edit.php:82
 msgid "User"
@@ -13441,7 +13452,7 @@ msgstr "用户\"%s\"不能没有用户群组."
 msgid "User added"
 msgstr "添加用户"
 
-#: include/views/administration.users.edit.php:337
+#: include/views/administration.users.edit.php:338
 msgid "User can't change type for himself"
 msgstr "用户不能自行改变类型"
 
@@ -13541,8 +13552,8 @@ msgstr "用户基本资料"
 msgid "User sessions"
 msgstr "用户会话"
 
-#: include/views/administration.users.edit.php:337
-#: include/views/administration.users.edit.php:341
+#: include/views/administration.users.edit.php:338
+#: include/views/administration.users.edit.php:342
 #: include/views/administration.users.list.php:58
 msgid "User type"
 msgstr "用户类型"
@@ -14014,7 +14025,7 @@ msgstr "Y"
 msgid "Y axis MAX value"
 msgstr "纵轴最大值"
 
-#: api/classes/CGraphGeneral.php:116
+#: api/classes/CGraphGeneral.php:338
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "Y axis MAX value must be greater than Y axis MIN value."
 
@@ -14065,7 +14076,7 @@ msgstr "每年"
 
 #: events.php:756 include/blocks.inc.php:727
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:359
-#: include/events.inc.php:377 include/func.inc.php:2386
+#: include/events.inc.php:377 include/func.inc.php:2388
 #: include/triggers.inc.php:1608
 #: include/views/administration.users.list.php:76
 #: include/views/js/adm.regexprs.edit.js.php:139
@@ -14076,7 +14087,7 @@ msgstr "是"
 msgid "Yotta"
 msgstr "Yotta"
 
-#: include/views/administration.users.edit.php:127
+#: include/views/administration.users.edit.php:128
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "您无法选择某些语言, 因为这些语系并未安装于web伺服器上."
 
@@ -14085,7 +14096,7 @@ msgstr "您无法选择某些语言, 因为这些语系并未安装于web伺服�
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "您未被允许来帮用户\"%s\"转换优先权."
 
-#: include/func.inc.php:2069
+#: include/func.inc.php:2071
 msgid "You are not logged in."
 msgstr "您尚未登入."
 
@@ -14111,7 +14122,7 @@ msgstr "您没有指定目标为动作操作的命令\"%s\"."
 msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr "您没有指定目标为动作操作的全域脚本\"%s\"."
 
-#: api/classes/CGraph.php:525 api/classes/CGraphPrototype.php:535
+#: api/classes/CGraph.php:531 api/classes/CGraphPrototype.php:549
 #: api/classes/CHost.php:1013 api/classes/CHost.php:1070
 #: api/classes/CHost.php:1394 api/classes/CHttpTest.php:503
 #: api/classes/CMaintenance.php:537 api/classes/CMaintenance.php:644
@@ -14136,15 +14147,15 @@ msgstr "您没有许可权来更新其它用户."
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "您没有许可权来来更新用户或用户不存在."
 
-#: include/func.inc.php:2051
+#: include/func.inc.php:2053
 msgid "You have no permissions to access this page."
 msgstr "你没有许可权来访问这个页面."
 
-#: include/func.inc.php:2071
+#: include/func.inc.php:2073
 msgid "You must login to view this page."
 msgstr "您必需登入才能浏览此页面."
 
-#: include/func.inc.php:2047
+#: include/func.inc.php:2049
 msgid "Your are logged in as"
 msgstr "你已经登录作为"
 
@@ -14464,7 +14475,7 @@ msgstr "已执行"
 msgid "fixed"
 msgstr "固定的"
 
-#: include/func.inc.php:1858
+#: include/func.inc.php:1860
 msgid "found"
 msgstr "已发现"
 
@@ -14643,7 +14654,7 @@ msgid "now"
 msgstr "现在"
 
 #: include/blocks.inc.php:352 include/blocks.inc.php:696
-#: include/func.inc.php:1855
+#: include/func.inc.php:1857
 msgid "of"
 msgstr "其"
 
@@ -14721,7 +14732,7 @@ msgstr "展示值对应"
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "模板ID\"%1$s\"已传送%2$s次"
 
-#: include/func.inc.php:1851
+#: include/func.inc.php:1853
 msgid "to"
 msgstr "到"
 

@@ -2322,11 +2322,10 @@ function get_item_function_info($expr) {
  *
  * @param string $expression
  * @param array  $rplcts
- * @param bool   $oct
  *
  * @return array
  */
-function evalExpressionData($expression, $rplcts, $oct = false) {
+function evalExpressionData($expression, $rplcts) {
 	$result = false;
 
 	$evStr = str_replace(array_keys($rplcts), array_values($rplcts), $expression);
@@ -2340,9 +2339,7 @@ function evalExpressionData($expression, $rplcts, $oct = false) {
 		return 'FALSE';
 	}
 
-	if ($oct) {
-		$evStr = preg_replace('/([0-9]+) *(\=|\#|\!=|\<|\>) *([0-9]+)/', '((float)ltrim("$1","0") $2 (float)ltrim("$3","0"))', $evStr);
-	}
+	$evStr = preg_replace('/(-?[0-9]*\.?[0-9]+) *(\=|\#|\!=|\<|\>) *(-?[0-9]*\.?[0-9]+)/', '((float) "$1" $2 (float) "$3")', $evStr);
 
 	$switch = array('=' => '==', '#' => '!=', '&' => '&&', '|' => '||');
 	$evStr = str_replace(array_keys($switch), array_values($switch), $evStr);
