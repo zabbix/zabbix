@@ -40,7 +40,8 @@ $fields = array(
 	'itemid' =>				array(T_ZBX_INT, O_OPT, null,			DB_ID.NOT_ZERO,
 		'isset({config})&&({config}==3)&&isset({report_show})'),
 	'items' =>				array(T_ZBX_STR, O_OPT,	null,			DB_ID,
-		'isset({report_show})&&(isset({config})&&({config}!=3)||!isset({config}))'),
+		'isset({report_show})&&!isset({delete_period})&&(isset({config})&&({config}!=3)||!isset({config}))',
+		_('Items')),
 	'new_graph_item' =>		array(T_ZBX_STR, O_OPT,	null,			null,			null),
 	'group_gid' =>			array(T_ZBX_STR, O_OPT,	null,			null,			null),
 	'title' =>				array(T_ZBX_STR, O_OPT,	null,			null,			null),
@@ -50,7 +51,9 @@ $fields = array(
 	'sorttype' =>			array(T_ZBX_INT, O_OPT,	null,			null,			null),
 	'scaletype' =>			array(T_ZBX_INT, O_OPT,	null,			null,			null),
 	'avgperiod' =>			array(T_ZBX_INT, O_OPT,	null,			null,			null),
-	'periods' =>			array(T_ZBX_STR, O_OPT,	null,			null,			null),
+	'periods' =>			array(T_ZBX_STR, O_OPT,	null,			null,
+		'isset({report_show})&&!isset({delete_item})&&(isset({config})&&({config}==2))',
+		_('Period')),
 	'new_period' =>			array(T_ZBX_STR, O_OPT,	null,			null,			null),
 	'group_pid' =>			array(T_ZBX_STR, O_OPT,	null,			null,			null),
 	'palette' =>			array(T_ZBX_INT, O_OPT,	null,			null,			null),
@@ -179,6 +182,16 @@ else {
 	// item validation
 	$config = $_REQUEST['config'] = get_request('config', 1);
 
+	// items array validation
+	if ($config != 3) {
+		$items = get_request('items');
+		$validItems = validateBarReportItems($items);
+
+		if ($config == 2) {
+			$validPeriods = validateBarReportPeriods(get_request('periods'));
+		}
+	}
+
 	$_REQUEST['report_timesince'] = zbxDateToTime(get_request('report_timesince', date(TIMESTAMP_FORMAT, time() - SEC_PER_DAY)));
 	$_REQUEST['report_timetill'] = zbxDateToTime(get_request('report_timetill', date(TIMESTAMP_FORMAT)));
 
@@ -204,21 +217,29 @@ else {
 	$rep_tab->setAttribute('border',0);
 
 // --------------
-	switch($config){
-		case 1: $rep_form = bar_report_form(); break;
-		case 2: $rep_form = bar_report_form2(); break;
-		case 3: $rep_form = bar_report_form3(); break;
-		default: $rep_form = bar_report_form();
+	switch ($config) {
+		default:
+		case 1:
+			$rep_form = bar_report_form($validItems);
+			break;
+
+		case 2:
+			$rep_form = bar_report_form2($validItems, $validPeriods);
+			break;
+
+		case 3:
+			$rep_form = bar_report_form3();
+			break;
 	}
 
 	$rep6_wdgt->addFlicker($rep_form, CProfile::get('web.report6.filter.state', 1));
 
 	if(isset($_REQUEST['report_show'])){
-		$items = (get_request('config') == 3)
+		$items = ($config == 3)
 			? array(array('itemid' => get_request('itemid')))
 			: get_request('items');
 
-		if ($isValid && $items) {
+		if ($isValid && (($config != 3) ? $validItems : true) && (($config == 2) ? $validPeriods : true)) {
 			$src = 'chart_bar.php?config='.$_REQUEST['config'].
 						url_param('title').
 						url_param('xlabel').

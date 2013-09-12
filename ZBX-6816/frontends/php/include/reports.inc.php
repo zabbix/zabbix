@@ -19,9 +19,8 @@
 **/
 
 
-function bar_report_form(){
+function bar_report_form($items = array()) {
 	$config = get_request('config',1);
-	$items = get_request('items',array());
 	$scaletype = get_request('scaletype',TIMEPERIOD_TYPE_WEEKLY);
 
 	$title = get_request('title',_('Report 1'));
@@ -36,11 +35,12 @@ function bar_report_form(){
 	$reportForm->setAttribute('name','zbx_report');
 	$reportForm->setAttribute('id','zbx_report');
 
-	if(isset($_REQUEST['report_show']) && !empty($items))
-		$reportForm->addVar('report_show','show');
+	if (isset($_REQUEST['report_show']) && is_array($items) && $items) {
+		$reportForm->addVar('report_show', 'show');
+	}
 
-	$reportForm->addVar('config',$config);
-	$reportForm->addVar('items',$items);
+	$reportForm->addVar('config', $config);
+
 	$reportForm->addVar('report_timesince', date(TIMESTAMP_FORMAT, $report_timesince));
 	$reportForm->addVar('report_timetill',  date(TIMESTAMP_FORMAT, $report_timetill));
 
@@ -57,8 +57,6 @@ function bar_report_form(){
 		$scale->addItem(TIMEPERIOD_TYPE_YEARLY,	_('Yearly'));
 	$reportForm->addRow(_('Scale'), $scale);
 
-//*
-
 	$reporttimetab = new CTable(null,'calendar');
 
 	$timeSinceRow = createDateSelector('report_timesince', $report_timesince, 'report_timetill');
@@ -70,39 +68,38 @@ function bar_report_form(){
 	$reporttimetab->addRow($timeTillRow);
 
 	$reportForm->addRow(_('Period'), $reporttimetab);
-//*/
 
-	if(count($items)){
-
+	if (is_array($items) && $items) {
 		$items_table = new CTableInfo();
-		foreach($items as $gid => $gitem){
+		foreach ($items as $id => &$item) {
+			$color = new CColorCell(null, $item['color']);
 
-			$host = get_host_by_itemid($gitem['itemid']);
-			$item = get_item_by_itemid($gitem['itemid']);
-
-			$color = new CColorCell(null,$gitem['color']);
-
-			$caption = new CSpan($gitem['caption'], 'link');
+			$caption = new CSpan($item['caption'], 'link');
 			$caption->onClick(
 					'return PopUp("popup_bitem.php?config=1&list_name=items&dstfrm='.$reportForm->GetName().
-					url_param($gitem, false).
-					url_param($gid,false,'gid').
+					url_param($item, false).
+					url_param($id, false, 'gid').
 					'",550,400,"graph_item_form");');
 
-			$description = $host['name'].NAME_DELIMITER.itemName($item);
+			$description = $item['host']['name'].NAME_DELIMITER.itemName($item);
 
 			$items_table->addRow(array(
-					new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
-					$caption,
-					$description,
-					graph_item_calc_fnc2str($gitem['calc_fnc'],0),
-					($gitem['axisside']==GRAPH_YAXIS_SIDE_LEFT)?_('Left'):_('Right'),
-					$color,
-				));
+				new CCheckBox('group_gid['.$id.']', isset($group_gid[$id])),
+				$caption,
+				$description,
+				graph_item_calc_fnc2str($item['calc_fnc'], 0),
+				($item['axisside'] == GRAPH_YAXIS_SIDE_LEFT) ? _('Left') : _('Right'),
+				$color,
+			));
+			// once used, unset unnecessary fields so they don't pass to URL
+			unset($item['value_type'], $item['host'], $item['name']);
 		}
+		unset($item);
+		$reportForm->addVar('items', $items);
+
 		$delete_button = new CSubmit('delete_item', _('Delete selected'));
 	}
-	else{
+	else {
 		$items_table = $delete_button = null;
 	}
 
@@ -125,7 +122,7 @@ function bar_report_form(){
 return $reportForm;
 }
 
-function bar_report_form2(){
+function bar_report_form2($items = array(), $periods = array()){
 	$config = get_request('config',1);
 
 	$title = get_request('title',_('Report 2'));
@@ -134,8 +131,6 @@ function bar_report_form2(){
 
 	$sorttype = get_request('sorttype',0);
 
-	$items = get_request('items',array());
-	$periods = get_request('periods',array());
 
 	$showlegend = get_request('showlegend',0);
 
@@ -143,13 +138,13 @@ function bar_report_form2(){
 	$reportForm->setAttribute('name','zbx_report');
 	$reportForm->setAttribute('id','zbx_report');
 
-//	$reportForm->setMethod('post');
-	if(isset($_REQUEST['report_show']) && !empty($items))
+	if (isset($_REQUEST['report_show']) &&
+			is_array($items) && $items &&
+			is_array($periods) && $periods) {
 		$reportForm->addVar('report_show','show');
+	}
 
 	$reportForm->addVar('config',$config);
-	$reportForm->addVar('items',$items);
-// periods add later
 
 	$reportForm->addRow(_('Title'), new CTextBox('title', $title, 40));
 	$reportForm->addRow(_('X label'), new CTextBox('xlabel', $xlabel, 40));
@@ -168,9 +163,7 @@ function bar_report_form2(){
 		$reportForm->addVar('sortorder', 0);
 	}
 
-//*/
-// PERIODS
-	if(count($periods)){
+	if (is_array($periods) && $periods){
 		$periods_table = new CTableInfo();
 		foreach($periods as $pid => $period){
 			$color = new CColorCell(null,$period['color']);
@@ -194,13 +187,17 @@ function bar_report_form2(){
 					$color,
 				));
 		}
+
+		$reportForm->addVar('periods', $periods);
+
 		$delete_button = new CSubmit('delete_period', _('Delete selected'));
+
 	}
-	else{
+	else {
 		$periods_table = $delete_button = null;
 	}
 
-	$reportForm->addVar('periods',$periods);
+
 
 	$reportForm->addRow(_('Period'),
 				array(
@@ -213,32 +210,33 @@ function bar_report_form2(){
 //-----------
 
 // ITEMS
-	if(count($items)){
+	if (is_array($items) && $items) {
 		$items_table = new CTableInfo();
-		foreach($items as $gid => $gitem){
-
-			$host = get_host_by_itemid($gitem['itemid']);
-			$item = get_item_by_itemid($gitem['itemid']);
-
-			$caption = new CSpan($gitem['caption'], 'link');
+		foreach ($items as $id => &$item) {
+			$caption = new CSpan($item['caption'], 'link');
 			$caption->onClick(
 					'return PopUp("popup_bitem.php?config=2&list_name=items&dstfrm='.$reportForm->GetName().
-					url_param($gitem, false).
-					url_param($gid,false,'gid').
+					url_param($item, false).
+					url_param($id,false,'gid').
 					'",550,400,"graph_item_form");');
 
-			$description = $host['name'].NAME_DELIMITER.itemName($item);
+			$description = $item['host']['name'].NAME_DELIMITER.itemName($item);
 
 			$items_table->addRow(array(
-					new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
+					new CCheckBox('group_gid['.$id.']', isset($group_gid[$id])),
 					$caption,
 					$description,
-					graph_item_calc_fnc2str($gitem['calc_fnc'],0)
+					graph_item_calc_fnc2str($item['calc_fnc'], 0)
 				));
+			// once used, unset unnecessary fields so they don't pass to URL. "color" goes in "periods" parameter.
+			unset($item['value_type'], $item['host'], $item['name'], $item['color']);
 		}
+		unset($item);
+		$reportForm->addVar('items', $items);
+
 		$delete_button = new CSubmit('delete_item', _('Delete selected'));
 	}
-	else{
+	else {
 		$items_table = $delete_button = null;
 	}
 
@@ -440,4 +438,155 @@ function bar_report_form3(){
 	$reportForm->addItemToBottomRow($reset);
 
 	return $reportForm;
+}
+
+/**
+ * Validate items array for bar reports - IDs, color, permissions, etc.
+ * Color validation for graph items is only for "Distribution of values for multiple periods" section ($config == 1).
+ * Automatically set caption like item name if none is set. If no axis side is set, set LEFT side as default.
+ *
+ * @param array $items
+ *
+ * @return mixed	valid items array on success or false on failure
+ */
+function validateBarReportItems($items = array()) {
+	$config = get_request('config', 1);
+
+	if (!isset($items) || empty($items)) {
+		return false;
+	}
+
+	$fields = array('itemid', 'calc_fnc');
+	if ($config == 1) {
+		array_push($fields, 'color');
+	}
+
+	foreach ($items as $item) {
+		foreach ($fields as $field) {
+			if (!isset($item[$field]) || $item[$field] === null) {
+				show_error_message(_s('Missing "%1$s" field for item.', $field));
+				return false;
+			}
+		}
+
+		$itemIds[$item['itemid']] = $item['itemid'];
+	}
+
+	$validItems = API::Item()->get(array(
+		'nodeids' => get_current_nodeid(true),
+		'itemids' => $itemIds,
+		'webitems' => true,
+		'editable' => true,
+		'output' => array('name', 'value_type'),
+		'preservekeys' => true,
+		'selectHosts' => array('name')
+	));
+
+	$items = zbx_toHash($items, 'itemid');
+
+	$allowedValueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
+
+	foreach ($validItems as &$item) {
+		if (!in_array($item['value_type'], $allowedValueTypes)) {
+			show_error_message(_s('Cannot add a non-numeric item "%1$s".', $item['name']));
+			return false;
+		}
+
+		// add host name and set caption like item name for valid items
+		$item['host'] = reset($item['hosts']);
+		unset($item['hosts']);
+
+		// if no caption set, set default caption like item name
+		if (!isset($items[$item['itemid']]['caption']) || zbx_empty($items[$item['itemid']]['caption'])) {
+			$item['caption'] = $item['name'];
+		}
+		else {
+			$validItems[$item['itemid']]['caption'] = $items[$item['itemid']]['caption'];
+		}
+
+		if (!isset($items[$item['itemid']]['axisside']) || zbx_empty($items[$item['itemid']]['axisside'])) {
+			$items[$item['itemid']]['axisside'] = GRAPH_YAXIS_SIDE_LEFT;
+		}
+	}
+	unset($item);
+
+	// check axis value. 0 = count
+	$calcFncValidator = new CSetValidator(array(
+		'values' => array(0, CALC_FNC_MIN, CALC_FNC_AVG, CALC_FNC_MAX)
+	));
+	$axisValidator = new CSetValidator(array(
+		'values' => array(GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT)
+	));
+
+	if ($config == 1) {
+		$colorValidator = new CColorValidator();
+	}
+	foreach ($items as $item) {
+		if (!$calcFncValidator->validate($item['calc_fnc'])) {
+			show_error_message(_s('Incorrect value for field "%1$s".', 'calc_fnc'));
+			return false;
+		}
+		if (!$axisValidator->validate($item['axisside'])) {
+			show_error_message(_s('Incorrect value for field "%1$s".', 'axisside'));
+			return false;
+		}
+		if ($config == 1) {
+			if (!$colorValidator->validate($item['color'])) {
+				show_error_message($colorValidator->getError());
+				return false;
+			}
+			$validItems[$item['itemid']]['color'] = $item['color'];
+		}
+
+		$validItems[$item['itemid']]['calc_fnc'] = $item['calc_fnc'];
+		$validItems[$item['itemid']]['axisside'] = $item['axisside'];
+	}
+
+	return $validItems;
+}
+
+/**
+ * Validate periods array for bar reports - time since, time till and color.
+ * Automatically set caption if none is set.
+ *
+ * @param array $periods
+ *
+ * @return mixed	valid periods array on success or false on failure
+ */
+function validateBarReportPeriods($periods = array()) {
+	if (!isset($periods) || empty($periods)) {
+		return false;
+	}
+	$fields = array('report_timesince', 'report_timetill', 'color');
+	$colorValidator = new CColorValidator();
+
+	foreach ($periods as &$period) {
+		foreach ($fields as $field) {
+			if (!isset($period[$field]) || $period[$field] === null) {
+				show_error_message(_s('Missing "%1$s" field for period.', $field));
+				return false;
+			}
+		}
+
+		if (!$colorValidator->validate($period['color'])) {
+			show_error_message($colorValidator->getError());
+			return false;
+		}
+		if (!validateUnixTime($period['report_timesince'])) {
+			show_error_message(_s('Invalid period for field "%1$s".', 'report_timesince'));
+			return false;
+		}
+		if (!validateUnixTime($period['report_timetill'])) {
+			show_error_message(_s('Invalid period for field "%1$s".', 'report_timetill'));
+			return false;
+		}
+		if (!isset($period['caption']) || zbx_empty($period['caption'])) {
+			$period['caption'] = zbx_date2str(REPORTS_BAR_REPORT_DATE_FORMAT, $period['report_timesince']).' - '.
+				zbx_date2str(REPORTS_BAR_REPORT_DATE_FORMAT, $period['report_timetill']);
+		}
+
+	}
+	unset($period);
+
+	return $periods;
 }

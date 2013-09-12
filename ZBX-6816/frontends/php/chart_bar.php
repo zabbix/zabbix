@@ -171,7 +171,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$graph_data['colors'] = array();
 		$graph_data['legend'] = array();
 		$db_values = array();
-		foreach($items as $num => $item){
+		foreach ($items as $item) {
 			$itemid = $item['itemid'];
 			$item_data = &$db_values[$itemid];
 
