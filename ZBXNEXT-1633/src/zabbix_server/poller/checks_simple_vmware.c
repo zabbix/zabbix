@@ -1710,7 +1710,7 @@ static void	vmware_datastores_add(CURL *easyhandle, zbx_vector_ptr_t *datastores
 			"<ns0:specSet>"								\
 				"<ns0:propSet>"							\
 					"<ns0:type>Datastore</ns0:type>"			\
-					"<ns0:pathSet>info</ns0:pathSet>"			\
+					"<ns0:pathSet>summary</ns0:pathSet>"			\
 				"</ns0:propSet>"						\
 				"<ns0:objectSet>"						\
 					"<ns0:obj type=\"Datastore\">%s</ns0:obj>"		\
@@ -1720,7 +1720,7 @@ static void	vmware_datastores_add(CURL *easyhandle, zbx_vector_ptr_t *datastores
 		"</ns0:RetrievePropertiesEx>"							\
 		ZBX_POST_VSPHERE_FOOTER
 
-	char		tmp[MAX_STRING_LEN], *uuid = NULL, *name = NULL;
+	char		tmp[MAX_STRING_LEN], *uuid = NULL, *name = NULL, *url;
 	zbx_datastore_t	*datastore;
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_DATASTORE_GET,
@@ -1734,8 +1734,26 @@ static void	vmware_datastores_add(CURL *easyhandle, zbx_vector_ptr_t *datastores
 	if (CURLE_OK != curl_easy_perform(easyhandle))
 		goto out;
 
-	uuid = read_xml_value(page.data, ZBX_XPATH_LN2("vmfs", "uuid"));
-	name = read_xml_value(page.data, ZBX_XPATH_LN2("vmfs", "name"));
+	name = read_xml_value(page.data, ZBX_XPATH_LN2("val", "name"));
+
+	if (NULL != (url = read_xml_value(page.data, ZBX_XPATH_LN2("val", "url"))))
+	{
+		if ('\0' != *url)
+		{
+			int	len = strlen(url);
+			char	*ptr;
+
+			if ('/' == url[len - 1])
+				url[len - 1] = '\0';
+
+			for (ptr = url + len - 2; *ptr != '/'; ptr--)
+				;
+
+			uuid = zbx_strdup(NULL, ptr + 1);
+		}
+		zbx_free(url);
+	}
+
 out:
 	datastore = zbx_malloc(NULL, sizeof(zbx_datastore_t));
 	if (NULL != name)
