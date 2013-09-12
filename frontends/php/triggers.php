@@ -428,8 +428,7 @@ else {
 	$_REQUEST['hostid'] = get_request('hostid', $data['pageFilter']->hostid);
 
 	// paging
-	$urlParams = array('hostid' => $_REQUEST['hostid']);
-	$data['paging'] = getPagingLine($data['triggers'], $urlParams);
+	$data['paging'] = getPagingLine($data['triggers'], array('hostid' => $_REQUEST['hostid']));
 
 	$data['triggers'] = API::Trigger()->get(array(
 		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid'),
