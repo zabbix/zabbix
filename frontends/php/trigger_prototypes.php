@@ -336,7 +336,12 @@ else {
 		$options['filter']['status'] = TRIGGER_STATUS_ENABLED;
 	}
 	$data['triggers'] = API::TriggerPrototype()->get($options);
-	$data['paging'] = getPagingLine($data['triggers']);
+
+	// paging
+	$data['paging'] = getPagingLine($data['triggers'], array(
+		'hostid' => get_request('hostid', $data['discovery_rule']['hostid']),
+		'parent_discoveryid' => get_request('parent_discoveryid')
+	));
 
 	$data['triggers'] = API::TriggerPrototype()->get(array(
 		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid'),
