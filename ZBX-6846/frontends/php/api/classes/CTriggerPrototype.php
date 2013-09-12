@@ -56,7 +56,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 		$sqlParts = array(
 			'select'	=> array('triggers' => 't.triggerid'),
 			'from'		=> array('t' => 'triggers t'),
-			'where'		=> array('t.flags='.ZBX_FLAG_DISCOVERY_CHILD),
+			'where'		=> array('t.flags='.ZBX_FLAG_DISCOVERY_PROTOTYPE),
 			'group'		=> array(),
 			'order'		=> array(),
 			'limit'		=> null
@@ -519,7 +519,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 			$hasPrototype = false;
 			foreach ($items as $item) {
-				if ($item['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
+				if ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 					$hasPrototype = true;
 					break;
 				}
@@ -594,7 +594,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 				$hasPrototype = false;
 				foreach ($items as $item) {
-					if ($item['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
+					if ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 						$hasPrototype = true;
 						break;
 					}
@@ -632,7 +632,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 		$this->updateReal($triggers);
 
 		foreach ($triggers as $trigger) {
-			$trigger['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
+			$trigger['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 			$this->inherit($trigger);
 		}
 
@@ -731,7 +731,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 		$triggers = zbx_toArray($triggers);
 
 		foreach ($triggers as $key => $trigger) {
-			$triggers[$key]['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
+			$triggers[$key]['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		}
 
 		// insert triggers without expression
