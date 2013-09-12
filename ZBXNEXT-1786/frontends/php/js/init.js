@@ -29,6 +29,27 @@ jQuery(function($) {
 	}
 
 	/**
+	 * Change combobox color according selected option.
+	 */
+	$('.input.select').each(function() {
+		var comboBox = $(this),
+			changeClass = function(obj) {
+				if (obj.find('option.not-monitored:selected').length > 0) {
+					obj.addClass('not-monitored');
+				}
+				else {
+					obj.removeClass('not-monitored');
+				}
+			};
+
+		comboBox.change(function() {
+			changeClass($(this));
+		});
+
+		changeClass(comboBox);
+	});
+
+	/**
 	 * Build menu popup for given elements.
 	 */
 	$(document).on('click', '[data-menu-popup]', function(event) {
@@ -54,6 +75,12 @@ jQuery(function($) {
 		}
 
 		obj.menuPopup(data, event);
+
+		return false;
+	});
+
+	$('.print-link').click(function() {
+		printLess(true);
 
 		return false;
 	});

@@ -743,7 +743,7 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 
 	// fetch data for the host JS menu
 	$hosts = API::Host()->get(array(
-		'output' => array('name', 'hostid'),
+		'output' => array('name', 'hostid', 'status'),
 		'monitored_hosts' => true,
 		'hostids' => $hostIds,
 		'with_monitored_items' => true,

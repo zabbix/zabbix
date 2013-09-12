@@ -186,43 +186,7 @@ function create_hat($caption, $items, $addicons = null, $id = null, $state = nul
 	return $table;
 }
 
-// searches items/objects for form tags like "<input"/form classes like CForm, and makes it empty
-function hide_form_items(&$obj) {
-	if (is_array($obj)) {
-		foreach ($obj as $id => $item) {
-			hide_form_items($obj[$id]); // attention recursion
-		}
-	}
-	elseif (is_object($obj)) {
-		$formObjects = array('cform', 'ccheckbox', 'cselect', 'cbutton', 'csubmit', 'cbuttonqmessage', 'cbuttondelete', 'cbuttoncancel');
-		if (is_object($obj) && str_in_array(zbx_strtolower(get_class($obj)), $formObjects)) {
-			$obj = SPACE;
-		}
-		if (isset($obj->items) && !empty($obj->items)) {
-			foreach ($obj->items as $id => $item) {
-				hide_form_items($obj->items[$id]); // attention recursion
-			}
-		}
-	}
-	else {
-		foreach (array('<form', '<input', '<select') as $item) {
-			if (zbx_strpos($obj, $item) !== false) {
-				$obj = SPACE;
-			}
-		}
-	}
-}
-
 function get_table_header($columnLeft, $columnRights = SPACE) {
-	if (isset($_REQUEST['print'])) {
-		hide_form_items($columnLeft);
-		hide_form_items($columnRights);
-
-		if ($columnLeft == SPACE && $columnRights == SPACE) {
-			return new CJSscript('');
-		}
-	}
-
 	$rights = array();
 
 	if ($columnRights) {
@@ -298,23 +262,33 @@ function get_icon($name, $params = array()) {
  * @return object
  */
 function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
-	$elements = array(
-		'items' => 'items',
-		'triggers' => 'triggers',
-		'graphs' => 'graphs',
-		'applications' => 'applications',
-		'screens' => 'screens',
-		'discoveries' => 'discoveries',
-		'web' => 'web'
-	);
-	if (!empty($discoveryid)) {
-		unset($elements['applications'], $elements['screens'], $elements['discoveries'], $elements['web']);
+	// LLD rule header
+	if ($discoveryid) {
+		$elements = array(
+			'items' => 'items',
+			'triggers' => 'triggers',
+			'graphs' => 'graphs',
+			'hosts' => 'hosts'
+		);
+	}
+	// host header
+	else {
+		$elements = array(
+			'items' => 'items',
+			'triggers' => 'triggers',
+			'graphs' => 'graphs',
+			'applications' => 'applications',
+			'screens' => 'screens',
+			'discoveries' => 'discoveries',
+			'web' => 'web'
+		);
 	}
 
 	$options = array(
 		'hostids' => $hostid,
 		'output' => API_OUTPUT_EXTEND,
-		'templated_hosts' => true
+		'templated_hosts' => true,
+		'selectHostDiscovery' => array('ts_delete')
 	);
 	if (isset($elements['items'])) {
 		$options['selectItems'] = API_OUTPUT_COUNT;
@@ -333,6 +307,9 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	}
 	if (isset($elements['web'])) {
 		$options['selectHttpTests'] = API_OUTPUT_COUNT;
+	}
+	if (isset($elements['hosts'])) {
+		$options['selectHostPrototypes'] = API_OUTPUT_COUNT;
 	}
 
 	// get hosts
@@ -501,6 +478,18 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 		}
 	}
 
+	if (isset($elements['hosts']) && $dbHost['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+		if ($currentElement == 'hosts') {
+			$list->addItem(_('Host prototypes').' ('.$dbDiscovery['hostPrototypes'].')');
+		}
+		else {
+			$list->addItem(array(
+				new CLink(_('Host prototypes'), 'host_prototypes.php?parent_discoveryid='.$dbDiscovery['itemid']),
+				' ('.$dbDiscovery['hostPrototypes'].')'
+			));
+		}
+	}
+
 	if (isset($elements['screens']) && $dbHost['status'] == HOST_STATUS_TEMPLATE) {
 		if ($currentElement == 'screens') {
 			$list->addItem(_('Screens').' ('.$dbHost['screens'].')');
@@ -564,7 +553,7 @@ function makeFormFooter($main = null, $others = null) {
 }
 
 /**
- * Returns zbx, snmp, jmx, ipmi availability status icons.
+ * Returns zbx, snmp, jmx, ipmi availability status icons and the discovered host lifetime indicator.
  *
  * @param type $host
  *
@@ -593,6 +582,17 @@ function getAvailabilityTable($host) {
 				break;
 		}
 		$ad->addItem($ai);
+	}
+
+	// discovered host lifetime indicator
+	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $host['hostDiscovery']['ts_delete']) {
+		$deleteError = new CDiv(SPACE, 'status_icon status_icon_extra iconwarning');
+		$deleteError->setHint(
+			_s('The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
+				zbx_date2age($host['hostDiscovery']['ts_delete']), zbx_date2str(_('d M Y'), $host['hostDiscovery']['ts_delete']),
+				zbx_date2str(_('H:i:s'), $host['hostDiscovery']['ts_delete'])
+			));
+		$ad->addItem($deleteError);
 	}
 
 	return $ad;

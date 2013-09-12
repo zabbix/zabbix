@@ -200,31 +200,13 @@ if (defined('ZBX_PAGE_NO_HEADER')) {
 	return null;
 }
 
-if (isset($_REQUEST['print'])) {
-	if (!defined('ZBX_PAGE_NO_MENU')) {
-		define('ZBX_PAGE_NO_MENU', 1);
-	}
-
-	$req = new CUrl();
-	$req->setArgument('print', null);
-
-	$link = new CLink(bold('&laquo;'._('BACK')), $req->getUrl(), 'small_font', null, 'nosid');
-	$link->setAttribute('style', 'padding-left: 10px;');
-
-	$printview = new CDiv($link, 'printless');
-	$printview->setAttribute('style', 'border: 1px #333 dotted;');
-	$printview->show();
-}
-
 if (!defined('ZBX_PAGE_NO_MENU')) {
 	$help = new CLink(_('Help'), 'http://www.zabbix.com/documentation/', 'small_font', null, 'nosid');
 	$help->setTarget('_blank');
 	$support = new CLink(_('Get support'), 'http://www.zabbix.com/support.php', 'small_font', null, 'nosid');
 	$support->setTarget('_blank');
 
-	$req = new CUrl();
-	$req->setArgument('print', 1);
-	$printview = new CLink(_('Print'), $req->getUrl(), 'small_font', null, 'nosid');
+	$printview = new CLink(_('Print'), '', 'small_font print-link', null, 'nosid');
 
 	$page_header_r_col = array($help, '|', $support, '|', $printview, '|');
 
@@ -338,6 +320,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 					'parentid' => $node['masterid']
 				);
 			}
+			unset($node);
 
 			$node_tree = new CTree('nodes', $node_tree, array('caption' => bold(_('Node')), 'combo_select_node' => SPACE));
 

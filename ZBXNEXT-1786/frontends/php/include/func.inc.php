@@ -1730,7 +1730,7 @@ function getPageNumber() {
 }
 
 /************* PAGING *************/
-function getPagingLine(&$items) {
+function getPagingLine(&$items, array $urlParams = array()) {
 	global $page;
 
 	$config = select_config();
@@ -1781,6 +1781,14 @@ function getPagingLine(&$items) {
 
 	if ($pagesCount > 1) {
 		$url = new Curl();
+
+		if (is_array($urlParams) && $urlParams) {
+			foreach ($urlParams as $key => $value) {
+				$url->setArgument($key, $value);
+			}
+		}
+
+		$url->removeArgument('go');
 
 		if ($startPage > 1) {
 			$url->setArgument('page', 1);

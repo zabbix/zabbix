@@ -1085,3 +1085,26 @@ function executeScript(hostId, scriptId, confirmation) {
 		execute();
 	}
 }
+
+/**
+ * makes all elements which are not supported for printing view to disappear
+ * by including css file
+ *
+ * @param bool show
+ *
+ * @return void
+ */
+function printLess(show) {
+	if (!jQuery("#printLess").length) {
+		jQuery('<link rel="stylesheet" type="text/css" id="printLess">').appendTo('head').attr('href', './styles/print.css');
+
+		jQuery('.header_l.left, .header_r.right').each(function(i, obj) {
+			if (jQuery(this).find('input, form, select, .menu_icon').length) {
+				jQuery(this).addClass('hide-all-children');
+			}
+		})
+		jQuery('body').prepend('<div class="printless" >«BACK</div>').click(function() { printLess(false); });
+	}
+
+	jQuery("#printLess").prop("disabled", !show);
+}
