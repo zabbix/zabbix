@@ -534,29 +534,14 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVE
 	DB_ROW		row;
 	zbx_uint64_t	alertid;
 	int		now, severity, medias = 0, macro_type;
-	char		*subject_dyn, *message_dyn, *sendto_esc, *subject_esc, *message_esc, *error_esc;
+	char		*sendto_esc, *error_esc, *subject_esc, *message_esc;
 	char		error[MAX_STRING_LEN];
 	DB_EVENT	*c_event;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	subject_dyn = zbx_strdup(NULL, subject);
-	message_dyn = zbx_strdup(NULL, message);
-
-	macro_type = (NULL != r_event ? MACRO_TYPE_MESSAGE_RECOVERY : MACRO_TYPE_MESSAGE_NORMAL);
 	c_event = (NULL != r_event ? r_event : event);
-
-	substitute_simple_macros(&action->actionid, event, r_event, &userid, NULL, NULL, NULL, NULL,
-			&subject_dyn, macro_type, NULL, 0);
-	substitute_simple_macros(&action->actionid, event, r_event, &userid, NULL, NULL, NULL, NULL,
-			&message_dyn, macro_type, NULL, 0);
-
 	now = time(NULL);
-	subject_esc = DBdyn_escape_string_len(subject_dyn, ALERT_SUBJECT_LEN);
-	message_esc = DBdyn_escape_string(message_dyn);
-
-	zbx_free(subject_dyn);
-	zbx_free(message_dyn);
 
 	if (0 == mediatypeid)
 	{
@@ -604,6 +589,8 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVE
 
 		alertid = DBget_maxid("alerts");
 		sendto_esc = DBdyn_escape_string_len(row[1], ALERT_SENDTO_LEN);
+		subject_esc = DBdyn_escape_string_len(subject, ALERT_SUBJECT_LEN);
+		message_esc = DBdyn_escape_string(message);
 
 		if (MEDIA_TYPE_STATUS_ACTIVE == atoi(row[4]))
 		{
@@ -839,7 +826,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 		if (SUCCEED == check_operation_conditions(event, operationid, evaltype))
 		{
 			unsigned char	default_msg;
-			char		*subject, *message;
+			char		*subject, *message, *subject_dyn, *message_dyn;
 			zbx_uint64_t	mediatypeid;
 
 			zabbix_log(LOG_LEVEL_DEBUG, "Conditions match our event. Execute operation.");
@@ -867,8 +854,19 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 						message = action->longdata;
 					}
 
-					add_object_msg(operationid, mediatypeid, &user_msg, subject, message,
+					subject_dyn = zbx_strdup(NULL, subject);
+					message_dyn = zbx_strdup(NULL, message);
+
+					substitute_simple_macros(&action->actionid, event, NULL, NULL, NULL, NULL,
+							NULL, NULL, &subject_dyn, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
+					substitute_simple_macros(&action->actionid, event, NULL, NULL, NULL, NULL,
+							NULL, NULL, &message_dyn, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
+
+					add_object_msg(operationid, mediatypeid, &user_msg, subject_dyn, message_dyn,
 							event->object, event->objectid);
+
+					zbx_free(subject_dyn);
+					zbx_free(message_dyn);
 					break;
 				case OPERATION_TYPE_COMMAND:
 					execute_commands(event, action->actionid, operationid, escalation->esc_step);
@@ -929,11 +927,20 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVENT *r_event, DB_ACTION *action)
 {
 	const char	*__function_name = "process_recovery_msg";
+	char		*subject_dyn, *message_dyn;
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	userid, mediatypeid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	subject_dyn = zbx_strdup(NULL, action->shortdata);
+	message_dyn = zbx_strdup(NULL, action->longdata);
+
+	substitute_simple_macros(&action->actionid, event, r_event, NULL, NULL, NULL, NULL, NULL,
+					&subject_dyn, MACRO_TYPE_MESSAGE_RECOVERY, NULL, 0);
+	substitute_simple_macros(&action->actionid, event, r_event, NULL, NULL, NULL, NULL, NULL,
+					&message_dyn, MACRO_TYPE_MESSAGE_RECOVERY, NULL, 0);
 
 	if (1 == action->recovery_msg)
 	{
@@ -952,9 +959,13 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *event, DB_
 			ZBX_STR2UINT64(mediatypeid, row[1]);
 
 			escalation->esc_step = 0;
-			add_message_alert(escalation, event, r_event, action, userid, mediatypeid, action->shortdata,
-					action->longdata);
+
+			add_message_alert(escalation, event, r_event, action, userid, mediatypeid, subject_dyn,
+					message_dyn);
 		}
+		zbx_free(subject_dyn);
+		zbx_free(message_dyn);
+
 		DBfree_result(result);
 	}
 	else
