@@ -274,6 +274,27 @@ class CDService extends CZBXAPI{
 	return !empty($objs);
 	}
 
+/**
+ * Add Service
+ */
+	public function create($dservices) {
+
+	}
+
+/**
+ * Update DService
+ */
+	public function update($dservices) {
+
+	}
+
+/**
+ * Delete Discovered Service
+ */
+	public function delete($dservices) {
+
+	}
+
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 

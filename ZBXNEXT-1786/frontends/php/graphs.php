@@ -83,6 +83,7 @@ if (isset($_REQUEST['yaxismin']) && zbx_empty($_REQUEST['yaxismin'])) {
 if (isset($_REQUEST['yaxismax']) && zbx_empty($_REQUEST['yaxismax'])) {
 	unset($_REQUEST['yaxismax']);
 }
+
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
@@ -215,7 +216,7 @@ elseif (isset($_REQUEST['save'])) {
 	);
 
 	if (!empty($_REQUEST['parent_discoveryid'])) {
-		$graph['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
+		$graph['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
 	}
 
 	if (isset($_REQUEST['graphid'])) {
@@ -584,12 +585,7 @@ else {
 	}
 
 	order_result($data['graphs'], $sortfield, $sortorder);
-
-	$urlParams = array('hostid' => $_REQUEST['hostid']);
-	if (isset($_REQUEST['parent_discoveryid'])) {
-		$urlParams['parent_discoveryid'] = $_REQUEST['parent_discoveryid'];
-	}
-	$data['paging'] = getPagingLine($data['graphs'], $urlParams);
+	$data['paging'] = getPagingLine($data['graphs']);
 
 	// get graphs after paging
 	$options = array(

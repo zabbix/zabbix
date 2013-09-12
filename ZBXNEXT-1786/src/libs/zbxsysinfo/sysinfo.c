@@ -185,18 +185,6 @@ void	free_metrics()
 	}
 }
 
-static void	zbx_log_init(zbx_log_t *log)
-{
-	log->value = NULL;
-	log->source = NULL;
-	log->lastlogsize = 0;
-	log->timestamp = 0;
-	log->severity = 0;
-	log->logeventid = 0;
-	log->mtime = 0;
-
-}
-
 void	init_result(AGENT_RESULT *result)
 {
 	result->type = 0;
@@ -205,23 +193,7 @@ void	init_result(AGENT_RESULT *result)
 	result->dbl = 0;
 	result->str = NULL;
 	result->text = NULL;
-	result->logs = NULL;
 	result->msg = NULL;
-}
-
-static void	zbx_log_clean(zbx_log_t *log)
-{
-	zbx_free(log->source);
-	zbx_free(log->value);
-}
-
-void	zbx_logs_free(zbx_log_t **logs)
-{
-	size_t	i;
-
-	for (i = 0; NULL != logs[i]; i++)
-		zbx_log_clean(logs[i]);
-	zbx_free(logs);
 }
 
 void	free_result(AGENT_RESULT *result)
@@ -230,7 +202,6 @@ void	free_result(AGENT_RESULT *result)
 	UNSET_DBL_RESULT(result);
 	UNSET_STR_RESULT(result);
 	UNSET_TEXT_RESULT(result);
-	UNSET_LOG_RESULT(result);
 	UNSET_MSG_RESULT(result);
 }
 
@@ -242,14 +213,14 @@ void	free_result(AGENT_RESULT *result)
  *                                                                            *
  * Parameters: request - pointer to the structure                             *
  *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
  ******************************************************************************/
 void	init_request(AGENT_REQUEST *request)
 {
 	request->key = NULL;
 	request->nparam = 0;
 	request->params = NULL;
-	request->lastlogsize = 0;
-	request->mtime = 0;
 }
 
 /******************************************************************************
@@ -259,6 +230,8 @@ void	init_request(AGENT_REQUEST *request)
  * Purpose: free memory used by the request                                   *
  *                                                                            *
  * Parameters: request - pointer to the request structure                     *
+ *                                                                            *
+ * Return value:                                                              *
  *                                                                            *
  ******************************************************************************/
 void	free_request(AGENT_REQUEST *request)
@@ -598,49 +571,6 @@ notsupported:
 	return ret;
 }
 
-void	set_log_result_empty(AGENT_RESULT *result)
-{
-	result->logs = zbx_malloc(result->logs, sizeof(zbx_log_t *));
-
-	result->logs[0] = NULL;
-	result->type |= AR_LOG;
-}
-
-zbx_log_t	*add_log_result(AGENT_RESULT *result, const char *value)
-{
-	zbx_log_t	*log;
-	size_t		i;
-
-	log = zbx_malloc(NULL, sizeof(zbx_log_t));
-
-	zbx_log_init(log);
-	log->value = zbx_strdup(log->value, value);
-
-	for (i = 0; NULL != result->logs && NULL != result->logs[i]; i++)
-		;
-
-	result->logs = zbx_realloc(result->logs, sizeof(zbx_log_t *) * (i + 2));
-
-	result->logs[i++] = log;
-	result->logs[i] = NULL;
-	result->type |= AR_LOG;
-
-	return log;
-}
-
-zbx_uint64_t	get_log_result_lastlogsize(AGENT_RESULT *result)
-{
-	size_t	i;
-
-	if (!ISSET_LOG(result) || NULL == result->logs[0])
-		return 0;
-
-	for (i = 1; NULL != result->logs[i]; i++)
-		;
-
-	return result->logs[i - 1]->lastlogsize;
-}
-
 int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c)
 {
 	int		ret = FAIL;
@@ -712,18 +642,14 @@ int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c
 			ret = SUCCEED;
 			break;
 		case ITEM_VALUE_TYPE_STR:
+		case ITEM_VALUE_TYPE_LOG:
 			zbx_replace_invalid_utf8(c);
-			SET_STR_RESULT(result, zbx_strdup(NULL, c));
+			SET_STR_RESULT(result, strdup(c));
 			ret = SUCCEED;
 			break;
 		case ITEM_VALUE_TYPE_TEXT:
 			zbx_replace_invalid_utf8(c);
-			SET_TEXT_RESULT(result, zbx_strdup(NULL, c));
-			ret = SUCCEED;
-			break;
-		case ITEM_VALUE_TYPE_LOG:
-			zbx_replace_invalid_utf8(c);
-			add_log_result(result, c);
+			SET_TEXT_RESULT(result, strdup(c));
 			ret = SUCCEED;
 			break;
 	}
@@ -901,43 +827,6 @@ static char	**get_result_text_value(AGENT_RESULT *result)
 	return NULL;
 }
 
-static zbx_log_t	**get_result_log_value(AGENT_RESULT *result)
-{
-	if (ISSET_LOG(result))
-		return result->logs;
-
-	if (ISSET_STR(result) || ISSET_TEXT(result) || ISSET_UI64(result) || ISSET_DBL(result))
-	{
-		zbx_log_t	*log;
-		size_t		i;
-
-		log = zbx_malloc(NULL, sizeof(zbx_log_t));
-
-		zbx_log_init(log);
-		if (ISSET_STR(result))
-			log->value = zbx_strdup(log->value, result->str);
-		else if (ISSET_TEXT(result))
-			log->value = zbx_strdup(log->value, result->text);
-		else if (ISSET_UI64(result))
-			log->value = zbx_dsprintf(log->value, ZBX_FS_UI64, result->ui64);
-		else if (ISSET_DBL(result))
-			log->value = zbx_dsprintf(log->value, ZBX_FS_DBL, result->dbl);
-
-		for (i = 0; NULL != result->logs && NULL != result->logs[i]; i++)
-			;
-
-		result->logs = zbx_realloc(result->logs, sizeof(zbx_log_t *) * (i + 2));
-
-		result->logs[i++] = log;
-		result->logs[i] = NULL;
-		result->type |= AR_LOG;
-
-		return result->logs;
-	}
-
-	return NULL;
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: get_result_value_by_type                                         *
@@ -955,7 +844,6 @@ static zbx_log_t	**get_result_log_value(AGENT_RESULT *result)
  *                GET_DBL_RESULT                                              *
  *                GET_STR_RESULT                                              *
  *                GET_TEXT_RESULT                                             *
- *                GET_LOG_RESULT                                              *
  *                GET_MSG_RESULT                                              *
  *                                                                            *
  *    AR_MESSAGE - skipped in conversion                                      *
@@ -975,8 +863,6 @@ void	*get_result_value_by_type(AGENT_RESULT *result, int require_type)
 			return (void *)get_result_str_value(result);
 		case AR_TEXT:
 			return (void *)get_result_text_value(result);
-		case AR_LOG:
-			return (void *)get_result_log_value(result);
 		case AR_MESSAGE:
 			if (ISSET_MSG(result))
 				return (void *)(&result->msg);

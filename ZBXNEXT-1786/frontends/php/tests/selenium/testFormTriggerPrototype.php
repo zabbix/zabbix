@@ -455,8 +455,8 @@ class testFormTriggerPrototype extends CWebTest {
 					'expected' => TRIGGER_BAD,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Name": cannot be empty.',
-						'Incorrect value for field "Expression": cannot be empty.'
+						'Warning. Incorrect value for field "Name": cannot be empty.',
+						'Warning. Incorrect value for field "Expression": cannot be empty.'
 					)
 				)
 			),
@@ -466,7 +466,7 @@ class testFormTriggerPrototype extends CWebTest {
 					'description' => 'MyTrigger',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Expression": cannot be empty.'
+						'Warning. Incorrect value for field "Expression": cannot be empty.'
 					)
 				)
 			),
@@ -476,7 +476,7 @@ class testFormTriggerPrototype extends CWebTest {
 					'expression' => '6 & 0 | 0',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Name": cannot be empty.'
+						'Warning. Incorrect value for field "Name": cannot be empty.'
 					)
 				)
 			),

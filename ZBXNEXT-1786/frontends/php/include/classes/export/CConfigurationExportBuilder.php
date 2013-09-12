@@ -286,8 +286,7 @@ class CConfigurationExportBuilder {
 				'description' => $discoveryRule['description'],
 				'item_prototypes' => $this->formatItems($discoveryRule['itemPrototypes']),
 				'trigger_prototypes' => $this->formatTriggers($discoveryRule['triggerPrototypes']),
-				'graph_prototypes' => $this->formatGraphs($discoveryRule['graphPrototypes']),
-				'host_prototypes' => $this->formatHostPrototypes($discoveryRule['hostPrototypes'])
+				'graph_prototypes' => $this->formatGraphs($discoveryRule['graphPrototypes'])
 			);
 			if (isset($discoveryRule['interface_ref'])) {
 				$data['interface_ref'] = $discoveryRule['interface_ref'];
@@ -340,69 +339,6 @@ class CConfigurationExportBuilder {
 				'ymin_item_1' => $graph['ymin_itemid'],
 				'ymax_item_1' => $graph['ymax_itemid'],
 				'graph_items' => $this->formatGraphItems($graph['gitems'])
-			);
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Format host prototypes.
-	 *
-	 * @param array $hostPrototypes
-	 *
-	 * @return array
-	 */
-	protected function formatHostPrototypes(array $hostPrototypes) {
-		$result = array();
-		order_result($hostPrototypes, 'host');
-
-		foreach ($hostPrototypes as $hostPrototype) {
-			$result[] = array(
-				'host' => $hostPrototype['host'],
-				'name' => $hostPrototype['name'],
-				'status' => $hostPrototype['status'],
-				'group_links' => $this->formatGroupLinks($hostPrototype['groupLinks']),
-				'group_prototypes' => $this->formatGroupPrototypes($hostPrototype['groupPrototypes']),
-				'templates' => $this->formatTemplateLinkage($hostPrototype['templates'])
-			);
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Format group links.
-	 *
-	 * @param array $groupLinks
-	 *
-	 * @return array
-	 */
-	protected function formatGroupLinks(array $groupLinks) {
-		$result = array();
-
-		foreach ($groupLinks as $groupLink) {
-			$result[] = array(
-				'group' => $groupLink['groupid'],
-			);
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Format group prototypes.
-	 *
-	 * @param array $groupPrototypes
-	 *
-	 * @return array
-	 */
-	protected function formatGroupPrototypes(array $groupPrototypes) {
-		$result = array();
-
-		foreach ($groupPrototypes as $groupPrototype) {
-			$result[] = array(
-				'name' => $groupPrototype['name']
 			);
 		}
 

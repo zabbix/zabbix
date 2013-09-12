@@ -35,16 +35,6 @@ $fields = array(
 );
 check_fields($fields);
 
-if (get_request('media_type')) {
-	$mediaTypeData = API::MediaType()->get(array(
-		'mediatypeids' => array($_REQUEST['media_type']),
-		'countOutput' => true
-	));
-	if (!$mediaTypeData) {
-		access_deny ();
-	}
-}
-
 $year = get_request('year', intval(date('Y')));
 $period = get_request('period', 'weekly');
 $media_type = get_request('media_type', 0);

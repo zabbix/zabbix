@@ -144,8 +144,8 @@ const char	*zbx_interface_type_string(zbx_interface_type_t type);
 extern const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT];
 
 #define ZBX_FLAG_DISCOVERY_NORMAL	0x00	/* normal item */
-#define ZBX_FLAG_DISCOVERY_RULE		0x01	/* low-level discovery rule */
-#define ZBX_FLAG_DISCOVERY_PROTOTYPE	0x02	/* low-level discovery host, item, trigger or graph prototypes */
+#define ZBX_FLAG_DISCOVERY		0x01	/* low-level discovery rule */
+#define ZBX_FLAG_DISCOVERY_CHILD	0x02	/* low-level discovery proto-item, proto-trigger or proto-graph */
 #define ZBX_FLAG_DISCOVERY_CREATED	0x04	/* auto-created item, trigger or graph */
 
 typedef enum
@@ -326,24 +326,6 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define EVENT_TYPE_TRIGGER_UNKNOWN		4
 #define EVENT_TYPE_TRIGGER_NORMAL		5
 
-#define SCREEN_RESOURCE_GRAPH			0
-#define SCREEN_RESOURCE_SIMPLE_GRAPH		1
-#define SCREEN_RESOURCE_MAP			2
-#define SCREEN_RESOURCE_PLAIN_TEXT		3
-#define SCREEN_RESOURCE_HOSTS_INFO		4
-#define SCREEN_RESOURCE_TRIGGERS_INFO		5
-#define SCREEN_RESOURCE_SERVER_INFO		6
-#define SCREEN_RESOURCE_CLOCK			7
-#define SCREEN_RESOURCE_SCREEN			8
-#define SCREEN_RESOURCE_TRIGGERS_OVERVIEW	9
-#define SCREEN_RESOURCE_DATA_OVERVIEW		10
-#define SCREEN_RESOURCE_URL			11
-#define SCREEN_RESOURCE_ACTIONS			12
-#define SCREEN_RESOURCE_EVENTS			13
-#define SCREEN_RESOURCE_HOSTGROUP_TRIGGERS	14
-#define SCREEN_RESOURCE_SYSTEM_STATUS		15
-#define SCREEN_RESOURCE_HOST_TRIGGERS		16
-
 typedef enum
 {
 	SYSMAP_ELEMENT_TYPE_HOST = 0,
@@ -469,9 +451,6 @@ typedef enum
 }
 zbx_group_status_type_t;
 
-/* group internal flag */
-#define ZBX_INTERNAL_GROUP		1
-
 /* daemon type */
 #define ZBX_DAEMON_TYPE_SERVER		0x01
 #define ZBX_DAEMON_TYPE_PROXY_ACTIVE	0x02
@@ -529,8 +508,6 @@ zbx_maintenance_type_t;
 #define HOST_MAINTENANCE_STATUS_ON	1
 
 /* host inventory mode */
-#define HOST_INVENTORY_DISABLED		-1	/* the host has no record in host_inventory */
-						/* only in server code, never in DB */
 #define HOST_INVENTORY_MANUAL		0
 #define HOST_INVENTORY_AUTOMATIC	1
 
@@ -983,7 +960,6 @@ int	zbx_is_utf8(const char *text);
 #define ZBX_UTF8_REPLACE_CHAR	'?'
 char	*zbx_replace_utf8(const char *text);
 void	zbx_replace_invalid_utf8(char *text);
-int	zbx_is_utf8(const char *text);
 
 void	dos2unix(char *str);
 int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value);

@@ -443,7 +443,7 @@ div.calendar input[type="button"] {
 	background-color: #2F2F2F;
 	color: #DFDFDF;
 }
-.input option { background: #2F2F2F; color: #FF5500; }
+.input option { background: #2F2F2F; }
 .input:focus, input.formlist[type="button"]:focus, div.calendar input[type="button"]:focus
 .input:hover, input.formlist[type="button"]:hover, div.calendar input[type="button"]:hover {
 	border-color: #FF5500; color: #FF5500;

@@ -205,7 +205,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestClickWait('save');
 
 		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI', 'Search/Filter elements limit'));
-		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Incorrect value for field "Search/Filter elements limit": must be between 1 and 999999.'));
+		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Search/Filter elements limit": must be between 1 and 999999.'));
 
 		// Check to enter -1 value
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
@@ -215,7 +215,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestClickWait('save');
 
 		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI', 'Search/Filter elements limit'));
-		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Incorrect value for field "Search/Filter elements limit": must be between 1 and 999999.'));
+		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Search/Filter elements limit": must be between 1 and 999999.'));
 
 		$newHash = DBhash($sqlHash);
 		$this->assertEquals($oldHash, $newHash, "Values in some DB fields changed, but shouldn't.");
@@ -259,7 +259,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI'));
 		$this->input_type('max_in_table', '-1');
 		$this->zbxTestClickWait('save');
-		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Incorrect value for field "Max count of elements to show inside table cell": must be between 1 and 99999.'));
+		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Max count of elements to show inside table cell": must be between 1 and 99999.'));
 
 		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI', 'Max count of elements to show inside table cell'));
 
@@ -333,7 +333,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI'));
 		$this->input_type('event_expire', '100000');
 		$this->zbxTestClickWait('save');
-		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Incorrect value for field "Show events not older than (in days)": must be between 1 and 99999.'));
+		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Show events not older than (in days)": must be between 1 and 99999.'));
 
 		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI', 'Show events not older than (in days)'));
 
@@ -342,7 +342,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI'));
 		$this->input_type('event_expire', '0');
 		$this->zbxTestClickWait('save');
-		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Incorrect value for field "Show events not older than (in days)": must be between 1 and 99999.'));
+		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Show events not older than (in days)": must be between 1 and 99999.'));
 
 		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI', 'Show events not older than (in days)'));
 
@@ -378,7 +378,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI'));
 		$this->input_type('event_show_max', '100000');
 		$this->zbxTestClickWait('save');
-		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Incorrect value for field "Max count of events per trigger to show": must be between 1 and 99999.'));
+		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Max count of events per trigger to show": must be between 1 and 99999.'));
 
 		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI', 'Max count of events per trigger to show'));
 
@@ -387,7 +387,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI'));
 		$this->input_type('event_show_max', '0');
 		$this->zbxTestClickWait('save');
-		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Incorrect value for field "Max count of events per trigger to show": must be between 1 and 99999.'));
+		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Max count of events per trigger to show": must be between 1 and 99999.'));
 
 		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI', 'Max count of events per trigger to show'));
 

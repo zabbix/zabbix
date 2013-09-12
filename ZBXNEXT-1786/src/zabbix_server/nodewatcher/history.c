@@ -74,7 +74,8 @@ static int	get_history_lastid(int master_nodeid, int nodeid, const ZBX_TABLE *ta
 			goto disconnect;
 		}
 
-		res = is_uint64(answer, lastid);
+		ZBX_STR2UINT64(*lastid, answer);
+		res = SUCCEED;
 disconnect:
 		disconnect_node(&sock);
 	}

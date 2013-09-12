@@ -186,10 +186,6 @@ $icons = DBselect(
 );
 while ($icon = DBfetch($icons)) {
 	$data['iconList'][] = array('imageid' => $icon['imageid'], 'name' => $icon['name']);
-	if ($icon['name'] == MAP_DEFAULT_ICON || !isset($data['defaultIconId'])) {
-		$data['defaultIconId'] = $icon['imageid'];
-		$data['defaultIconName'] = $icon['name'];
-	}
 }
 CArrayHelper::sort($data['iconList'], array('name'));
 $data['iconList'] = array_values($data['iconList']);

@@ -20,6 +20,6 @@
 #ifndef ZABBIX_UPGRADE_H
 #define ZABBIX_UPGRADE_H
 
-int	DBcheck_version(void);
+int	DBcheck_version();
 
 #endif

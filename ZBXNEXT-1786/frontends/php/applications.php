@@ -34,7 +34,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'applications' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
 	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO, 'isset({form})&&!isset({applicationid})'),
-	'groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
+	'groupid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,			null),
 	'applicationid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			'isset({form})&&{form}=="update"'),
 	'appname' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({save})', _('Name')),
 	// actions
@@ -56,7 +56,7 @@ if (isset($_REQUEST['applicationid'])) {
 		'applicationids' => array($_REQUEST['applicationid']),
 		'output' => array('name', 'hostid')
 	));
-	if (!$dbApplication) {
+	if (empty($dbApplication)) {
 		access_deny();
 	}
 }
@@ -74,11 +74,17 @@ if (isset($_REQUEST['go'])) {
 		}
 	}
 }
-if (get_request('groupid') && !API::HostGroup()->isWritable(array($_REQUEST['groupid']))) {
-	access_deny();
+if (get_request('groupid', 0) > 0) {
+	$groupIds = available_groups($_REQUEST['groupid'], 1);
+	if (empty($groupIds)) {
+		access_deny();
+	}
 }
-if (get_request('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid']))) {
-	access_deny();
+if (get_request('hostid', 0) > 0) {
+	$hostIds = available_hosts($_REQUEST['hostid'], 1);
+	if (empty($hostIds)) {
+		access_deny();
+	}
 }
 $_REQUEST['go'] = get_request('go', 'none');
 

@@ -20,7 +20,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT(src/zabbix_server/server.c)
-AM_INIT_AUTOMAKE([zabbix],[2.1.4])
+AM_INIT_AUTOMAKE([zabbix],[2.1.3])
 
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
@@ -1270,22 +1270,6 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 	PROXY_LDFLAGS="$PROXY_LDFLAGS $SSH2_LDFLAGS"
 	PROXY_LIBS="$PROXY_LIBS $SSH2_LIBS"
-
-	dnl Check for LIBXML2 [by default - skip]
-	LIBXML2_CHECK_CONFIG([no])
-	if test "x$want_libxml2" = "xyes"; then
-		if test "x$found_libxml2" != "xyes"; then
-			AC_MSG_ERROR([LIBXML2 library not found])
-		else
-			have_libxml2="yes"
-		fi
-	fi
-	CFLAGS="$CFLAGS $LIBXML2_CFLAGS"
-	SERVER_LDFLAGS="$SERVER_LDFLAGS $LIBXML2_LDFLAGS"
-	SERVER_LIBS="$SERVER_LIBS $LIBXML2_LIBS"
-
-	PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBXML2_LDFLAGS"
-	PROXY_LIBS="$PROXY_LIBS $LIBXML2_LIBS"
 
 	found_openipmi="no"
 	dnl Check for libOpenIPMI [by default - skip]

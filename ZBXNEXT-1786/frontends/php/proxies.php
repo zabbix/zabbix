@@ -86,15 +86,9 @@ if (isset($_REQUEST['save'])) {
 	$proxy = array(
 		'host' => get_request('host'),
 		'status' => get_request('status'),
-		'interface' => get_request('interfaces')
+		'hosts' => get_request('hosts', array()),
+		'interface' => get_request('interface', array())
 	);
-
-	// skip discovered hosts
-	$proxy['hosts'] = API::Host()->get(array(
-		'hostids' => get_request('hosts', array()),
-		'output' => array('hostid'),
-		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
-	));
 
 	DBstart();
 
@@ -222,13 +216,12 @@ if (isset($_REQUEST['form'])) {
 		);
 	}
 
-	// fetch available hosts, skip host prototypes
+	// hosts
 	$data['dbHosts'] = DBfetchArray(DBselect(
-		'SELECT h.hostid,h.proxy_hostid,h.name,h.flags'.
+		'SELECT h.hostid,h.proxy_hostid,h.name'.
 		' FROM hosts h'.
 		' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
-			andDbNode('h.hostid').
-			' AND h.flags<>'.ZBX_FLAG_DISCOVERY_PROTOTYPE
+			andDbNode('h.hostid')
 	));
 	order_result($data['dbHosts'], 'name');
 

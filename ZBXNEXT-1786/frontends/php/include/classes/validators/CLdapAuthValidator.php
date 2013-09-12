@@ -23,7 +23,7 @@
  */
 class CLdapAuthValidator extends CValidator {
 
-	public $conf = array(
+	protected $options = array(
 		'host' => null,
 		'port' => null,
 		'base_dn' => null,
@@ -44,7 +44,7 @@ class CLdapAuthValidator extends CValidator {
 	 * @return bool
 	 */
 	public function validate($value) {
-		$ldap = new CLdap($this->conf);
+		$ldap = new CLdap($this->options);
 		$ldap->connect();
 
 		return $ldap->checkPass($value['user'], $value['password']);

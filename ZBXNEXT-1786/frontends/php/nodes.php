@@ -30,7 +30,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'nodeid' =>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
+	'nodeid' =>			array(T_ZBX_INT, O_OPT,	null,	DB_ID,			'(isset({form})&&({form}=="update"))'),
 	'new_nodeid' =>		array(T_ZBX_STR, O_OPT, null,	DB_ID.NOT_ZERO,	'isset({save})', _('ID')),
 	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({save})'),
 	'ip' =>				array(T_ZBX_IP,	 O_OPT, null,	null,			'isset({save})'),
@@ -54,19 +54,12 @@ $available_nodes = get_accessible_nodes_by_user(CWebUser::$data, PERM_READ);
 if (count($available_nodes) == 0) {
 	access_deny();
 }
-$node = null;
-if (get_request('nodeid')) {
-	$node = get_node_by_nodeid($_REQUEST['nodeid']);
-	if (!$node) {
-		access_deny();
-	}
-}
 
 /*
  * Actions
  */
 if (isset($_REQUEST['save'])) {
-	if (get_request('nodeid')) {
+	if (isset($_REQUEST['nodeid'])) {
 		$nodeid = get_request('nodeid');
 
 		DBstart();
@@ -91,6 +84,8 @@ if (isset($_REQUEST['save'])) {
 	}
 }
 elseif (isset($_REQUEST['delete'])) {
+	$node = get_node_by_nodeid($_REQUEST['nodeid']);
+
 	DBstart();
 	$result = delete_node($_REQUEST['nodeid']);
 	$result = DBend($result);
@@ -111,7 +106,10 @@ if (isset($_REQUEST['form'])) {
 		'nodeid' => get_request('nodeid'),
 		'masterNode' => DBfetch(DBselect('SELECT n.name FROM nodes n WHERE n.masterid IS NULL AND n.nodetype='.ZBX_NODE_MASTER))
 	);
-	if (get_request('nodeid') && !isset($_REQUEST['form_refresh'])) {
+
+	if (isset($_REQUEST['nodeid']) && !isset($_REQUEST['form_refresh'])) {
+		$node = get_node_by_nodeid($data['nodeid']);
+
 		$data['new_nodeid'] = $node['nodeid'];
 		$data['name'] = $node['name'];
 		$data['ip'] = $node['ip'];

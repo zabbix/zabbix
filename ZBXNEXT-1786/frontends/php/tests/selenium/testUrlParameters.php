@@ -54,7 +54,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Configuration of host groups',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "groupid" is not integer.'
+						'Critical error. Field "groupid" is not integer.'
 					)
 				)
 			),
@@ -65,7 +65,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Configuration of host groups',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "groupid" is not integer.'
+						'Critical error. Field "groupid" is not integer.'
 					)
 				)
 			),
@@ -103,8 +103,8 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Configuration of templates',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "templateid" is not integer.',
-						'Field "groupid" is not integer.'
+						'Critical error. Field "templateid" is not integer.',
+						'Critical error. Field "groupid" is not integer.'
 					)
 				)
 			),
@@ -115,8 +115,8 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Configuration of templates',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "templateid" is not integer.',
-						'Field "groupid" is not integer.'
+						'Critical error. Field "templateid" is not integer.',
+						'Critical error. Field "groupid" is not integer.'
 					)
 				)
 			),
@@ -127,7 +127,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Configuration of templates',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "templateid" is mandatory.'
+						'Critical error. Field "templateid" is mandatory.'
 					)
 				)
 			),
@@ -167,8 +167,8 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Configuration of hosts',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "groupid" is not integer.',
-						'Field "hostid" is not integer.'
+						'Critical error. Field "groupid" is not integer.',
+						'Critical error. Field "hostid" is not integer.'
 					)
 				)
 			),
@@ -179,8 +179,8 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Configuration of hosts',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "groupid" is not integer.',
-						'Field "hostid" is not integer.'
+						'Critical error. Field "groupid" is not integer.',
+						'Critical error. Field "hostid" is not integer.'
 					)
 				)
 			),
@@ -191,7 +191,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Configuration of hosts',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "hostid" is mandatory.'
+						'Critical error. Field "hostid" is mandatory.'
 					)
 				)
 			),
@@ -221,7 +221,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Configuration of maintenance',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "maintenanceid" is not integer.'
+						'Critical error. Field "maintenanceid" is not integer.'
 					)
 				)
 			),
@@ -232,7 +232,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Configuration of maintenance',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "maintenanceid" is not integer.'
+						'Critical error. Field "maintenanceid" is not integer.'
 					)
 				)
 			),
@@ -243,7 +243,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Configuration of maintenance',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "maintenanceid" is mandatory.'
+						'Critical error. Field "maintenanceid" is mandatory.'
 					)
 				)
 			),
@@ -273,7 +273,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Configuration of actions',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "actionid" is not integer.'
+						'Critical error. Field "actionid" is not integer.'
 					)
 				)
 			),
@@ -284,7 +284,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Configuration of actions',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "actionid" is not integer.'
+						'Critical error. Field "actionid" is not integer.'
 					)
 				)
 			),
@@ -314,7 +314,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Configuration of screens',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "screenid" is not integer.'
+						'Critical error. Field "screenid" is not integer.'
 					)
 				)
 			),
@@ -325,7 +325,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Configuration of screens',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "screenid" is not integer.'
+						'Critical error. Field "screenid" is not integer.'
 					)
 				)
 			),
@@ -336,7 +336,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Configuration of screens',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "screenid" is mandatory.'
+						'Critical error. Field "screenid" is mandatory.'
 					)
 				)
 			),
@@ -366,7 +366,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Configuration of slide shows',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "slideshowid" is not integer.'
+						'Critical error. Field "slideshowid" is not integer.'
 					)
 				)
 			),
@@ -377,7 +377,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Configuration of slide shows',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "slideshowid" is not integer.'
+						'Critical error. Field "slideshowid" is not integer.'
 					)
 				)
 			),
@@ -388,7 +388,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Configuration of slide shows',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "slideshowid" is mandatory.'
+						'Critical error. Field "slideshowid" is mandatory.'
 					)
 				)
 			),
@@ -418,7 +418,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Configuration of network maps',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "sysmapid" is not integer.'
+						'Critical error. Field "sysmapid" is not integer.'
 					)
 				)
 			),
@@ -429,7 +429,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Configuration of network maps',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "sysmapid" is not integer.'
+						'Critical error. Field "sysmapid" is not integer.'
 					)
 				)
 			),
@@ -440,7 +440,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Configuration of network maps',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "sysmapid" is mandatory.'
+						'Critical error. Field "sysmapid" is mandatory.'
 					)
 				)
 			),
@@ -470,7 +470,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Configuration of discovery',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "druleid" is not integer.'
+						'Critical error. Field "druleid" is not integer.'
 					)
 				)
 			),
@@ -481,7 +481,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Configuration of discovery',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "druleid" is not integer.'
+						'Critical error. Field "druleid" is not integer.'
 					)
 				)
 			),
@@ -507,11 +507,21 @@ class testUrlParameters extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
+					'url' => 'overview.php?&form_refresh=1&groupid=4&application=SomeApplication&type=0',
+					'title' => 'Overview \[refreshed every 30 sec\]',
+					'errors' => array(
+						'ERROR: No permissions to referred object or it does not exist!'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
 					'url' => 'overview.php?&form_refresh=1&groupid=abc&application=Filesystems&type=0',
 					'title' => 'Overview \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "groupid" is not integer.'
+						'Critical error. Field "groupid" is not integer.'
 					)
 				)
 			),
@@ -522,7 +532,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Overview \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "groupid" is not integer.'
+						'Critical error. Field "groupid" is not integer.'
 					)
 				)
 			),
@@ -552,7 +562,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Details of scenario',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "httptestid" is not integer.'
+						'Critical error. Field "httptestid" is not integer.'
 					)
 				)
 			),
@@ -563,7 +573,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Details of scenario',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "httptestid" is not integer.'
+						'Critical error. Field "httptestid" is not integer.'
 					)
 				)
 			),
@@ -574,7 +584,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Details of scenario',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "httptestid" is mandatory.'
+						'Critical error. Field "httptestid" is mandatory.'
 					)
 				)
 			),
@@ -614,8 +624,8 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Latest data \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "groupid" is not integer.',
-						'Field "hostid" is not integer.'
+						'Critical error. Field "groupid" is not integer.',
+						'Critical error. Field "hostid" is not integer.'
 					)
 				)
 			),
@@ -626,8 +636,8 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Latest data \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "groupid" is not integer.',
-						'Field "hostid" is not integer.'
+						'Critical error. Field "groupid" is not integer.',
+						'Critical error. Field "hostid" is not integer.'
 					)
 				)
 			),
@@ -667,8 +677,8 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Status of triggers \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "groupid" is not integer.',
-						'Field "hostid" is not integer.'
+						'Critical error. Field "groupid" is not integer.',
+						'Critical error. Field "hostid" is not integer.'
 					)
 				)
 			),
@@ -679,8 +689,8 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Status of triggers \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "groupid" is not integer.',
-						'Field "hostid" is not integer.'
+						'Critical error. Field "groupid" is not integer.',
+						'Critical error. Field "hostid" is not integer.'
 					)
 				)
 			),
@@ -710,7 +720,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Latest events \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "triggerid" is not integer.'
+						'Critical error. Field "triggerid" is not integer.'
 					)
 				)
 			),
@@ -721,7 +731,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Latest events \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "triggerid" is not integer.'
+						'Critical error. Field "triggerid" is not integer.'
 					)
 				)
 			),
@@ -771,9 +781,9 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Custom graphs \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "groupid" is not integer.',
-						'Field "hostid" is not integer.',
-						'Field "graphid" is not integer.'
+						'Critical error. Field "groupid" is not integer.',
+						'Critical error. Field "hostid" is not integer.',
+						'Critical error. Field "graphid" is not integer.'
 					)
 				)
 			),
@@ -784,9 +794,9 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Custom graphs \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "groupid" is not integer.',
-						'Field "hostid" is not integer.',
-						'Field "graphid" is not integer.'
+						'Critical error. Field "groupid" is not integer.',
+						'Critical error. Field "hostid" is not integer.',
+						'Critical error. Field "graphid" is not integer.'
 					)
 				)
 			),
@@ -805,7 +815,7 @@ class testUrlParameters extends CWebTest {
 					'url' => 'screens.php?&form_refresh=1&fullscreen=0&elementid=1',
 					'title' => 'Custom screens \[refreshed every 30 sec\]',
 					'errors' => array(
-						'ERROR: No permissions to referred object or it does not exist!'
+						'ERROR: Screen with ID "1" does not exist.'
 					)
 				)
 			),
@@ -816,7 +826,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Custom screens \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "elementid" is not integer.'
+						'Critical error. Field "elementid" is not integer.'
 					)
 				)
 			),
@@ -827,7 +837,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Custom screens \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "elementid" is not integer.'
+						'Critical error. Field "elementid" is not integer.'
 					)
 				)
 			),
@@ -857,7 +867,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Network maps \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "sysmapid" is not integer.'
+						'Critical error. Field "sysmapid" is not integer.'
 					)
 				)
 			),
@@ -868,7 +878,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Network maps \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "sysmapid" is not integer.'
+						'Critical error. Field "sysmapid" is not integer.'
 					)
 				)
 			),
@@ -898,7 +908,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Status of discovery',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "druleid" is not integer.'
+						'Critical error. Field "druleid" is not integer.'
 					)
 				)
 			),
@@ -909,7 +919,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Status of discovery',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "druleid" is not integer.'
+						'Critical error. Field "druleid" is not integer.'
 					)
 				)
 			),
@@ -929,7 +939,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'IT services \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Incorrect value "1" for "period" field.'
+						'Critical error. Incorrect value "1" for "period" field.'
 					)
 				)
 			),
@@ -940,7 +950,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'IT services \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Incorrect value "abc" for "period" field.'
+						'Critical error. Incorrect value "abc" for "period" field.'
 					)
 				)
 			),
@@ -951,7 +961,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'IT services \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Incorrect value "" for "period" field.'
+						'Critical error. Incorrect value "" for "period" field.'
 					)
 				)
 			),
@@ -981,7 +991,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Host inventory overview',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "groupid" is not integer.'
+						'Critical error. Field "groupid" is not integer.'
 					)
 				)
 			),
@@ -992,7 +1002,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Host inventory overview',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "groupid" is not integer.'
+						'Critical error. Field "groupid" is not integer.'
 					)
 				)
 			),
@@ -1022,7 +1032,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Host inventories',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "groupid" is not integer.'
+						'Critical error. Field "groupid" is not integer.'
 					)
 				)
 			),
@@ -1033,7 +1043,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Host inventories',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "groupid" is not integer.'
+						'Critical error. Field "groupid" is not integer.'
 					)
 				)
 			),
@@ -1083,9 +1093,9 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Availability report',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "triggerid" is not integer.',
-						'Field "filter_groupid" is not integer.',
-						'Field "filter_hostid" is not integer.'
+						'Critical error. Field "triggerid" is not integer.',
+						'Critical error. Field "filter_groupid" is not integer.',
+						'Critical error. Field "filter_hostid" is not integer.'
 					)
 				)
 			),
@@ -1096,9 +1106,9 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Availability report',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Field "triggerid" is not integer.',
-						'Field "filter_groupid" is not integer.',
-						'Field "filter_hostid" is not integer.'
+						'Critical error. Field "triggerid" is not integer.',
+						'Critical error. Field "filter_groupid" is not integer.',
+						'Critical error. Field "filter_hostid" is not integer.'
 					)
 				)
 			),
@@ -1149,19 +1159,18 @@ class testUrlParameters extends CWebTest {
 	 */
 	public function testUrlParameters_UrlLoad($zbx_data) {
 		$this->zbxTestLogin($zbx_data['url']);
-
 		switch ($zbx_data['expected']) {
 			case LINK_GOOD:
 				$this->checkTitle($zbx_data['title']);
 				$this->zbxTestTextPresent($zbx_data['text']);
 				break;
-
 			case LINK_BAD:
 				$this->checkTitle($zbx_data['title']);
 				foreach ($zbx_data['errors'] as $msg) {
 					$this->zbxTestTextPresent($msg);
 				}
 				break;
-		}
+			}
+
 	}
 }

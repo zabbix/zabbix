@@ -331,13 +331,13 @@ class CScreenBase {
 		}
 		else {
 			if ($options['period'] < ZBX_MIN_PERIOD) {
-				show_message(_n('Minimum time period to display is %1$s hour.',
-						'Minimum time period to display is %1$s hours.', (int) ZBX_MIN_PERIOD / SEC_PER_HOUR));
+				show_message(_n('Warning. Minimum time period to display is %1$s hour.',
+						'Warning. Minimum time period to display is %1$s hours.', (int) ZBX_MIN_PERIOD / SEC_PER_HOUR));
 				$options['period'] = ZBX_MIN_PERIOD;
 			}
 			elseif ($options['period'] > ZBX_MAX_PERIOD) {
-				show_message(_n('Maximum time period to display is %1$s day.',
-						'Maximum time period to display is %1$s days.', (int) ZBX_MAX_PERIOD / SEC_PER_DAY));
+				show_message(_n('Warning. Maximum time period to display is %1$s day.',
+						'Warning. Maximum time period to display is %1$s days.', (int) ZBX_MAX_PERIOD / SEC_PER_DAY));
 				$options['period'] = ZBX_MAX_PERIOD;
 			}
 		}

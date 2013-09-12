@@ -702,8 +702,8 @@ class testFormDiscoveryRule extends CWebTest {
 					'expected' => DISCOVERY_BAD,
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Incorrect value for field "Name": cannot be empty.',
-							'Incorrect value for field "Key": cannot be empty.'
+							'Warning. Incorrect value for field "Name": cannot be empty.',
+							'Warning. Incorrect value for field "Key": cannot be empty.'
 					)
 				)
 			),
@@ -713,7 +713,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'name' => 'discoveryRuleError',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Incorrect value for field "Key": cannot be empty.'
+							'Warning. Incorrect value for field "Key": cannot be empty.'
 					)
 				)
 			),
@@ -723,7 +723,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'key' => 'discovery-rule-error',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Incorrect value for field "Name": cannot be empty.'
+							'Warning. Incorrect value for field "Name": cannot be empty.'
 					)
 				)
 			),
@@ -786,7 +786,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'delay' => '-30',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.'
+						'Warning. Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.'
 					)
 				)
 			),
@@ -799,7 +799,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'delay' => 86401,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.'
+						'Warning. Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.'
 					)
 				)
 			),
@@ -814,7 +814,7 @@ class testFormDiscoveryRule extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value for field "New flexible interval": cannot be empty.'
+						'Warning. Incorrect value for field "New flexible interval": cannot be empty.'
 					)
 				)
 			),
@@ -1410,7 +1410,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'key' => 'discovery-ipmi-agent-error',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Incorrect value for field "IPMI sensor": cannot be empty.'
+							'Warning. Incorrect value for field "IPMI sensor": cannot be empty.'
 					)
 				)
 			),
@@ -1422,8 +1422,8 @@ class testFormDiscoveryRule extends CWebTest {
 					'key' => 'discovery-ssh-agent-error',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Incorrect value for field "User name": cannot be empty.',
-							'Incorrect value for field "Executed script": cannot be empty.'
+							'Warning. Incorrect value for field "User name": cannot be empty.',
+							'Warning. Incorrect value for field "Executed script": cannot be empty.'
 					)
 				)
 			),
@@ -1435,8 +1435,8 @@ class testFormDiscoveryRule extends CWebTest {
 					'key' => 'discovery-telnet-agent-error',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Incorrect value for field "User name": cannot be empty.',
-							'Incorrect value for field "Executed script": cannot be empty.'
+							'Warning. Incorrect value for field "User name": cannot be empty.',
+							'Warning. Incorrect value for field "Executed script": cannot be empty.'
 					)
 				)
 			),

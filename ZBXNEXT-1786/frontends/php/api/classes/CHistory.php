@@ -276,6 +276,12 @@ class CHistory extends CZBXAPI {
 		return $result;
 	}
 
+	public function create($items = array()) {
+	}
+
+	public function delete($itemids = array()) {
+	}
+
 	protected function applyQuerySortOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$isIdFieldUsed = false;
 

@@ -177,7 +177,6 @@ $ZBX_MENU = array(
 					'host_discovery.php',
 					'disc_prototypes.php',
 					'trigger_prototypes.php',
-					'host_prototypes.php',
 					'httpconf.php',
 					'popup_httpstep.php'
 				)

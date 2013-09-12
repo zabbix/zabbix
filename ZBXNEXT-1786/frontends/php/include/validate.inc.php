@@ -287,76 +287,114 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 	if (is_null($caption)) {
 		$caption = $field;
 	}
-
 	if (is_array($var) && $type != T_ZBX_IP) {
 		$err = ZBX_VALID_OK;
-
-		foreach ($var as $v) {
-			$err |= check_type($field, $flags, $v, $type);
+		foreach ($var as $el) {
+			$err |= check_type($field, $flags, $el, $type);
 		}
-
 		return $err;
 	}
 
 	if ($type == T_ZBX_IP) {
 		if (!validate_ip($var, $arr)) {
-			info(_s('Field "%1$s" is not IP.', $caption));
-
-			return ($flags & P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
+			if ($flags&P_SYS) {
+				info(_s('Critical error. Field "%1$s" is not IP.', $caption));
+				return ZBX_VALID_ERROR;
+			}
+			else {
+				info(_s('Warning. Field "%1$s" is not IP.', $caption));
+				return ZBX_VALID_WARNING;
+			}
 		}
-
 		return ZBX_VALID_OK;
 	}
 
 	if ($type == T_ZBX_IP_RANGE) {
 		if (!validate_ip_range($var)) {
-			info(_s('Field "%1$s" is not IP range.', $caption));
-
-			return ($flags & P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
+			if ($flags&P_SYS) {
+				info(_s('Critical error. Field "%1$s" is not IP range.', $caption));
+				return ZBX_VALID_ERROR;
+			}
+			else{
+				info(_s('Warning. Field "%1$s" is not IP range.', $caption));
+				return ZBX_VALID_WARNING;
+			}
 		}
-
 		return ZBX_VALID_OK;
 	}
 
 	if ($type == T_ZBX_INT_RANGE) {
 		if (!is_int_range($var)) {
-			info(_s('Field "%1$s" is not integer list or range.', $caption));
-
-			return ($flags & P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
+			if ($flags&P_SYS) {
+				info(_s('Critical error. Field "%1$s" is not integer list or range.', $caption));
+				return ZBX_VALID_ERROR;
+			}
+			else {
+				info(_s('Warning. Field "%1$s" is not integer list or range.', $caption));
+				return ZBX_VALID_WARNING;
+			}
 		}
-
 		return ZBX_VALID_OK;
 	}
 
 	if ($type == T_ZBX_INT && !zbx_is_int($var)) {
-		info(_s('Field "%1$s" is not integer.', $caption));
-
-		return ($flags & P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
+		if ($flags&P_SYS) {
+			info(_s('Critical error. Field "%1$s" is not integer.', $caption));
+			return ZBX_VALID_ERROR;
+		}
+		else {
+			info(_s('Warning. Field "%1$s" is not integer.', $caption));
+			return ZBX_VALID_WARNING;
+		}
 	}
 
 	if ($type == T_ZBX_DBL && !is_numeric($var)) {
-		info(_s('Field "%1$s" is not decimal number.', $caption));
-
-		return ($flags & P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
+		if ($flags&P_SYS) {
+			info(_s('Critical error. Field "%1$s" is not decimal number.', $caption));
+			return ZBX_VALID_ERROR;
+		}
+		else {
+			info(_s('Warning. Field "%1$s" is not decimal number.', $caption));
+			return ZBX_VALID_WARNING;
+		}
 	}
 
 	if ($type == T_ZBX_STR && !is_string($var)) {
-		info(_s('Field "%1$s" is not string.', $caption));
+		if ($flags&P_SYS) {
+			info(_s('Critical error. Field "%1$s" is not string.', $caption));
+			return ZBX_VALID_ERROR;
+		}
+		else {
+			info(_s('Warning. Field "%1$s" is not string.', $caption));
+			return ZBX_VALID_WARNING;
+		}
+	}
 
-		return ($flags & P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
+	if ($type == T_ZBX_STR && !defined('ZBX_ALLOW_UNICODE') && zbx_strlen($var) != zbx_strlen($var)) {
+		if ($flags&P_SYS) {
+			info(_s('Critical error. Field "%1$s" contains Multibyte chars.', $caption));
+			return ZBX_VALID_ERROR;
+		}
+		else {
+			info(_s('Warning. Field "%1$s" multibyte chars are restricted.', $caption));
+			return ZBX_VALID_ERROR;
+		}
 	}
 
 	if ($type == T_ZBX_CLR) {
 		$colorValidator = new CColorValidator();
-
 		if (!$colorValidator->validate($var)) {
 			$var = 'FFFFFF';
-			info(_s('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).', $caption));
-
-			return ($flags & P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
+			if ($flags & P_SYS) {
+				info(_s('Critical error. Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).', $caption));
+				return ZBX_VALID_ERROR;
+			}
+			else {
+				info(_s('Warning. Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).', $caption));
+				return ZBX_VALID_WARNING;
+			}
 		}
 	}
-
 	return ZBX_VALID_OK;
 }
 
@@ -397,9 +435,14 @@ function check_field(&$fields, &$field, $checks) {
 
 	if ($opt == O_MAND) {
 		if (!isset($_REQUEST[$field])) {
-			info(_s('Field "%1$s" is mandatory.', $caption));
-
-			return ($flags & P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
+			if ($flags&P_SYS) {
+				info(_s('Critical error. Field "%1$s" is mandatory.', $caption));
+				return ZBX_VALID_ERROR;
+			}
+			else {
+				info(_s('Warning. Field "%1$s" is mandatory.', $caption));
+				return ZBX_VALID_WARNING;
+			}
 		}
 	}
 	elseif ($opt == O_NO) {
@@ -409,18 +452,23 @@ function check_field(&$fields, &$field, $checks) {
 
 		unset_request($field);
 
-		info(_s('Field "%1$s" must be missing.', $caption));
-
-		return ($flags & P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
+		if ($flags&P_SYS) {
+			info(_s('Critical error. Field "%1$s" must be missing.', $caption));
+			return ZBX_VALID_ERROR;
+		}
+		else {
+			info(_s('Warning. Field "%1$s" must be missing.', $caption));
+			return ZBX_VALID_WARNING;
+		}
 	}
 	elseif ($opt == O_OPT) {
 		if (!isset($_REQUEST[$field])) {
 			return ZBX_VALID_OK;
 		}
-		elseif ($flags & P_ACT) {
+		elseif ($flags&P_ACT) {
 			if (!isset($_REQUEST['sid'])
 					|| (isset($_COOKIE['zbx_sessionid'])
-							&& $_REQUEST['sid'] != substr($_COOKIE['zbx_sessionid'], 16, 16))) {
+					&& ($_REQUEST['sid'] != substr($_COOKIE['zbx_sessionid'], 16, 16)))) {
 				info(_('Operation cannot be performed due to unauthorized request.'));
 				return ZBX_VALID_ERROR;
 			}
@@ -439,19 +487,34 @@ function check_field(&$fields, &$field, $checks) {
 
 	if ((is_null($exception) || $except) && $validation && !calc_exp($fields, $field, $validation)) {
 		if ($validation == NOT_EMPTY) {
-			info(_s('Incorrect value for field "%1$s": cannot be empty.', $caption));
+			if ($flags&P_SYS) {
+				info(_s('Critical error. Incorrect value for field "%1$s": cannot be empty.', $caption));
+			}
+			else {
+				info(_s('Warning. Incorrect value for field "%1$s": cannot be empty.', $caption));
+			}
 		}
-
 		// check for BETWEEN() function pattern and extract numbers e.g. ({}>=0&&{}<=999)&&
 		elseif (preg_match('/\(\{\}\>=([0-9]*)\&\&\{\}\<=([0-9]*)\)\&\&/', $validation, $result)) {
-			info(_s('Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.',
-				$_REQUEST[$field], $caption, $result[1], $result[2]));
+			if ($flags&P_SYS) {
+				info(_s('Critical error. Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.',
+					$_REQUEST[$field], $caption, $result[1], $result[2]));
+			}
+			else {
+				info(_s('Warning. Incorrect value for field "%1$s": must be between %2$s and %3$s.',
+					$caption, $result[1], $result[2]));
+			}
 		}
 		else {
-			info(_s('Incorrect value "%1$s" for "%2$s" field.', $_REQUEST[$field], $caption));
+			if ($flags&P_SYS) {
+				info(_s('Critical error. Incorrect value "%1$s" for "%2$s" field.', $_REQUEST[$field], $caption));
+			}
+			else {
+				info(_s('Warning. Incorrect value for field "%1$s".', $caption));
+			}
 		}
 
-		return ($flags & P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
+		return ($flags&P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
 	}
 
 	return ZBX_VALID_OK;
@@ -500,7 +563,6 @@ function check_fields(&$fields, $show_messages = true) {
 
 	unset_not_in_list($fields);
 	unset_if_zero($fields);
-
 	if ($err != ZBX_VALID_OK) {
 		unset_action_vars($fields);
 	}
@@ -512,7 +574,7 @@ function check_fields(&$fields, $show_messages = true) {
 	}
 
 	if ($show_messages && $err != ZBX_VALID_OK) {
-		show_messages(($err == ZBX_VALID_OK), null, _('Page received incorrect data'));
+		show_messages($err == ZBX_VALID_OK, null, _('Page received incorrect data'));
 	}
 
 	return ($err == ZBX_VALID_OK);

@@ -86,7 +86,9 @@ if (isset($_REQUEST['screenid'])) {
 	}
 
 	if (empty($screens)) {
-		access_deny();
+		if (empty($screens)) {
+			access_deny();
+		}
 	}
 }
 
@@ -289,8 +291,7 @@ else {
 	order_result($data['screens'], $sortfield, getPageSortOrder());
 
 	// paging
-	$urlParams = isset($_REQUEST['templateid']) ? array('templateid' => $_REQUEST['templateid']) : array();
-	$data['paging'] = getPagingLine($data['screens'], $urlParams);
+	$data['paging'] = getPagingLine($data['screens']);
 
 	// nodes
 	if ($data['displayNodes'] = is_array(get_current_nodeid())) {

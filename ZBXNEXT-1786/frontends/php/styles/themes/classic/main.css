@@ -99,8 +99,6 @@ ul.favorites { margin: 0; padding: 4px 4px 4px 1em; border: 1px solid #AAAAAA; }
 	border-color: #9F9F9F;
 }
 
-.classic .ui-widget-content .ui-state-disabled { background: #EEEEEE; border-color: #D0D0D0; }
-
 .ui-tabs.ui-widget-content { background: #EEEEEE; }
 .ui-tabs .ui-tabs-nav { border: 0; border-bottom: 1px solid #9F9F9F; }
 .classic .ui-tabs .ui-tabs-nav .ui-state-default { background: none; border-color: #BBD1EC }

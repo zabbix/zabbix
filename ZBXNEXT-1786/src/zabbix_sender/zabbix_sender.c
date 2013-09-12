@@ -209,7 +209,7 @@ static void    zbx_load_config(const char *config_file)
 			MANDATORY,	MIN,			MAX */
 		{"SourceIP",			&cfg_source_ip,				TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"ServerActive",		&cfg_active_hosts,			TYPE_STRING_LIST,
+		{"ServerActive",		&cfg_active_hosts,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"Hostname",			&cfg_hostname,				TYPE_STRING,
 			PARM_OPT,	0,			0},

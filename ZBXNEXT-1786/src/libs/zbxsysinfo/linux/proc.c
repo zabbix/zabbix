@@ -296,7 +296,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			*p1++ = '\0';
 
-			sscanf(p, ZBX_FS_UI64, &value);
+			ZBX_STR2UINT64(value, p);
 
 			zbx_rtrim(p1, "\n");
 

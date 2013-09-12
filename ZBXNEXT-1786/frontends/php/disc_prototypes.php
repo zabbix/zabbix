@@ -37,6 +37,7 @@ $paramsFieldName = getParamFieldNameByType(get_request('type', 0));
 $fields = array(
 	'parent_discoveryid' =>		array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
 	'itemid' =>					array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))'),
+	'groupid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'hostid' =>					array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'interfaceid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')),
 	'name' =>					array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Name')),
@@ -183,7 +184,7 @@ if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
  * Actions
  */
 if (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
-	$timePeriodValidator = new CTimePeriodValidator(array('allowMultiple' => false));
+	$timePeriodValidator = new CTimePeriodValidator(array('allow_multiple' => false));
 	$_REQUEST['delay_flex'] = get_request('delay_flex', array());
 
 	if ($timePeriodValidator->validate($_REQUEST['new_delay_flex']['period'])) {
@@ -372,9 +373,7 @@ else {
 	if (!empty($data['items'])) {
 		order_result($data['items'], $sortfield, getPageSortOrder());
 	}
-
-	$urlParams = array('hostid' => $_REQUEST['hostid'], 'parent_discoveryid' => $_REQUEST['parent_discoveryid']);
-	$data['paging'] = getPagingLine($data['items'], $urlParams);
+	$data['paging'] = getPagingLine($data['items']);
 
 	// render view
 	$itemView = new CView('configuration.item.prototype.list', $data);

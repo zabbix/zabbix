@@ -26,6 +26,8 @@
  */
 class CTemplate extends CHostGeneral {
 
+	protected $tableName = 'hosts';
+	protected $tableAlias = 'h';
 	protected $sortColumns = array('hostid', 'host', 'name');
 
 	/**
@@ -783,14 +785,7 @@ class CTemplate extends CHostGeneral {
 
 		// link hosts to the given templates
 		if (isset($data['hosts']) && !empty($data['hosts'])) {
-			$hostIds = zbx_objectValues($data['hosts'], 'hostid');
-
-			// check if any of the hosts are discovered
-			$this->checkValidator($hostIds, new CHostNormalValidator(array(
-				'message' => _('Cannot update templates on discovered host "%1$s".')
-			)));
-
-			$this->link($templateids, $hostIds);
+			$this->link($templateids, zbx_objectValues($data['hosts'], 'hostid'));
 		}
 
 		$data['hosts'] = array();
@@ -962,8 +957,7 @@ class CTemplate extends CHostGeneral {
 		if (isset($data['hosts']) && !is_null($data['hosts'])) {
 			$templateHosts = API::Host()->get(array(
 				'templateids' => $templateids,
-				'templated_hosts' => 1,
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
+				'templated_hosts' => 1
 			));
 			$templateHostids = zbx_objectValues($templateHosts, 'hostid');
 			$newHostids = zbx_objectValues($data['hosts'], 'hostid');
@@ -1056,11 +1050,6 @@ class CTemplate extends CHostGeneral {
 		}
 
 		if (isset($data['hostids'])) {
-			// check if any of the hosts are discovered
-			$this->checkValidator($data['hostids'], new CHostNormalValidator(array(
-				'message' => _('Cannot update templates on discovered host "%1$s".')
-			)));
-
 			API::Template()->unlink($templateids, zbx_toArray($data['hostids']));
 		}
 
@@ -1068,20 +1057,9 @@ class CTemplate extends CHostGeneral {
 		return parent::massRemove($data);
 	}
 
-	/**
-	 * Check if user has read permissions for templates.
-	 *
-	 * @param array $ids
-	 *
-	 * @return bool
-	 */
-	public function isReadable(array $ids) {
-		if (!is_array($ids)) {
-			return false;
-		}
-		if (empty($ids)) {
-			return true;
-		}
+	public function isReadable($ids) {
+		if (!is_array($ids)) return false;
+		if (empty($ids)) return true;
 
 		$ids = array_unique($ids);
 
@@ -1094,20 +1072,9 @@ class CTemplate extends CHostGeneral {
 		return (count($ids) == $count);
 	}
 
-	/**
-	 * Check if user has write permissions for templates.
-	 *
-	 * @param array $ids
-	 *
-	 * @return bool
-	 */
-	public function isWritable(array $ids) {
-		if (!is_array($ids)) {
-			return false;
-		}
-		if (empty($ids)) {
-			return true;
-		}
+	public function isWritable($ids) {
+		if (!is_array($ids)) return false;
+		if (empty($ids)) return true;
 
 		$ids = array_unique($ids);
 

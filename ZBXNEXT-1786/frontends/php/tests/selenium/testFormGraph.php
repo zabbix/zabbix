@@ -613,17 +613,20 @@ class testFormGraph extends CWebTest {
 	 * @dataProvider update
 	 */
 	public function testFormGraph_SimpleUpdate($data) {
+		$name = $data['name'];
+
 		$sqlGraphs = "select * from graphs";
 		$oldHashGraphs = DBhash($sqlGraphs);
 
-		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&hostid=40001');
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestClickWait('link='.$this->host);
+		$this->zbxTestClickWait("//div[@class='w']//a[text()='Graphs']");
+		$this->zbxTestClickWait('link='.$name);
 		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of graphs');
-		$this->zbxTestTextPresent(array(
-			'Graph updated',
-			$data['name'],
-			'GRAPHS'
-		));
+		$this->zbxTestTextPresent('Graph updated');
+		$this->zbxTestTextPresent("$name");
+		$this->zbxTestTextPresent('GRAPHS');
 
 		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
 	}
@@ -636,7 +639,7 @@ class testFormGraph extends CWebTest {
 					'expected' => GRAPH_BAD,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Name": cannot be empty.'
+						'Warning. Incorrect value for field "Name": cannot be empty.'
 					)
 				)
 			),
@@ -774,7 +777,7 @@ class testFormGraph extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Cannot add graph',
-						'No permissions to referred object or it does not exist!'
+						'Incorrect item for axis value.'
 					)
 				)
 			),
@@ -794,10 +797,10 @@ class testFormGraph extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.',
-						'Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.',
-						'Field "yaxismin" is not decimal number.',
-						'Field "yaxismin" is not decimal number.'
+						'Warning. Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.',
+						'Warning. Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.',
+						'Warning. Field "yaxismin" is not decimal number.',
+						'Warning. Field "yaxismin" is not decimal number.'
 					)
 				)
 			),
@@ -815,8 +818,8 @@ class testFormGraph extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.',
-						'Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.'
+						'Warning. Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.',
+						'Warning. Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.'
 					)
 				)
 			),
@@ -859,7 +862,12 @@ class testFormGraph extends CWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormGraph_SimpleCreate($data) {
-		$this->zbxTestLogin('graphs.php?hostid=40001&form=Create+graph');
+
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestClickWait('link='.$this->host);
+		$this->zbxTestClickWait("//div[@class='w']//a[text()='Graphs']");
+
+		$this->zbxTestClickWait('form');
 		$this->checkTitle('Configuration of graphs');
 
 		if (isset($data['name'])) {

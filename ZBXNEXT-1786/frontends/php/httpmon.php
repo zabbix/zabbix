@@ -37,26 +37,16 @@ $fields = array(
 );
 check_fields($fields);
 
-/*
- * Permissions
- */
-if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
-	access_deny();
-}
-if (get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
-	access_deny();
-}
-
 validate_sort_and_sortorder('name', ZBX_SORT_DOWN);
 
 $options = array(
 	'groups' => array(
-		'real_hosts' => true,
-		'with_httptests' => true
+		'monitored_hosts' => 1,
+		'with_monitored_httptests' => 1,
 	),
 	'hosts' => array(
-		'with_monitored_items' => true,
-		'with_httptests' => true
+		'monitored_hosts' => 1,
+		'with_monitored_httptests' => 1,
 	),
 	'hostid' => get_request('hostid', null),
 	'groupid' => get_request('groupid', null),
@@ -97,6 +87,7 @@ if ($pageFilter->hostsSelected) {
 	$options = array(
 		'output' => array('httptestid'),
 		'templated' => false,
+		'monitored' => true,
 		'filter' => array('status' => HTTPTEST_STATUS_ACTIVE),
 		'limit' => $config['search_limit'] + 1
 	);
@@ -114,14 +105,13 @@ if ($pageFilter->hostsSelected) {
 		'httptestids' => zbx_objectValues($httpTests, 'httptestid'),
 		'preservekeys' => true,
 		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => array('name', 'status'),
+		'selectHosts' => API_OUTPUT_EXTEND,
 		'selectSteps' => API_OUTPUT_COUNT,
 	));
 
 	foreach ($httpTests as &$httpTest) {
-		$httpTest['host'] = reset($httpTest['hosts']);
-		$httpTest['hostname'] = $httpTest['host']['name'];
-		unset($httpTest['hosts']);
+		$host = reset($httpTest['hosts']);
+		$httpTest['hostname'] = $host['name'];
 	}
 	unset($httpTest);
 
@@ -157,12 +147,9 @@ if ($pageFilter->hostsSelected) {
 			$status['style'] = 'unknown';
 		}
 
-		$cpsan = new CSpan($httpTest['hostname'],
-			($httpTest['host']['status'] == HOST_STATUS_NOT_MONITORED) ? 'not-monitored' : ''
-		);
 		$table->addRow(new CRow(array(
 			$displayNodes ? get_node_name_by_elid($httpTest['httptestid'], true) : null,
-			($_REQUEST['hostid'] > 0) ? null : $cpsan,
+			($_REQUEST['hostid'] > 0) ? null : $httpTest['hostname'],
 			new CLink($httpTest['name'], 'httpdetails.php?httptestid='.$httpTest['httptestid']),
 			$httpTest['steps'],
 			$lastcheck,

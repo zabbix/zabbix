@@ -48,7 +48,7 @@ $applicationWidget->addHeader(_('Applications'), $filterForm);
 $applicationWidget->addHeaderRowNumber();
 
 // create form
-$applicationForm = new CForm();
+$applicationForm = new CForm('get');
 $applicationForm->setName('applicationForm');
 $applicationForm->addVar('groupid', $this->data['groupid']);
 $applicationForm->addVar('hostid', $this->data['hostid']);

@@ -30,7 +30,7 @@ $discoveryWidget->addHeader(_('Discovery rule'));
 $discoveryWidget->addHeaderRowNumber();
 
 // create form
-$discoveryForm = new CForm();
+$discoveryForm = new CForm('get');
 $discoveryForm->setName('druleForm');
 
 // create table

@@ -30,6 +30,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'graphid' =>		array(T_ZBX_INT, O_MAND, P_SYS,		DB_ID,		null),
+	'screenid' =>		array(T_ZBX_STR, O_OPT, P_SYS,		null,		null),
 	'period' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null),
 	'stime' =>			array(T_ZBX_STR, O_OPT, P_SYS,		null,		null),
 	'profileIdx' =>		array(T_ZBX_STR, O_OPT, null,		null,		null),
@@ -46,19 +47,23 @@ check_fields($fields);
 /*
  * Permissions
  */
-$dbGraph = API::Graph()->get(array(
+if (!DBfetch(DBselect('SELECT g.graphid FROM graphs g WHERE g.graphid='.$_REQUEST['graphid']))) {
+	show_error_message(_('No graphs defined.'));
+}
+
+$db_data = API::Graph()->get(array(
 	'graphids' => $_REQUEST['graphid'],
 	'selectHosts' => API_OUTPUT_EXTEND,
 	'output' => API_OUTPUT_EXTEND
 ));
-if (!$dbGraph) {
+if (empty($db_data)) {
 	access_deny();
 }
 else {
-	$dbGraph = reset($dbGraph);
+	$db_data = reset($db_data);
 }
 
-$host = reset($dbGraph['hosts']);
+$host = reset($db_data['hosts']);
 
 /*
  * Display
@@ -71,7 +76,7 @@ $timeline = CScreenBase::calculateTime(array(
 	'stime' => get_request('stime')
 ));
 
-$graph = new CPie($dbGraph['graphtype']);
+$graph = new CPie($db_data['graphtype']);
 $graph->setPeriod($timeline['period']);
 $graph->setSTime($timeline['stime']);
 
@@ -81,35 +86,35 @@ if (isset($_REQUEST['border'])) {
 
 $width = get_request('width', 0);
 if ($width <= 0) {
-	$width = $dbGraph['width'];
+	$width = $db_data['width'];
 }
 
 $height = get_request('height', 0);
 if ($height <= 0) {
-	$height = $dbGraph['height'];
+	$height = $db_data['height'];
 }
 
 $graph->setWidth($width);
 $graph->setHeight($height);
-$graph->setHeader($host['host'].NAME_DELIMITER.$dbGraph['name']);
+$graph->setHeader($host['host'].NAME_DELIMITER.$db_data['name']);
 
-if ($dbGraph['show_3d']) {
+if ($db_data['show_3d']) {
 	$graph->switchPie3D();
 }
-$graph->showLegend($dbGraph['show_legend']);
+$graph->showLegend($db_data['show_legend']);
 
 $result = DBselect(
 	'SELECT gi.*'.
 	' FROM graphs_items gi'.
-	' WHERE gi.graphid='.$dbGraph['graphid'].
+	' WHERE gi.graphid='.$db_data['graphid'].
 	' ORDER BY gi.sortorder,gi.itemid DESC'
 );
-while ($dbGraph = DBfetch($result)) {
+while ($db_data = DBfetch($result)) {
 	$graph->addItem(
-		$dbGraph['itemid'],
-		$dbGraph['calc_fnc'],
-		$dbGraph['color'],
-		$dbGraph['type']
+		$db_data['itemid'],
+		$db_data['calc_fnc'],
+		$db_data['color'],
+		$db_data['type']
 	);
 }
 $graph->draw();

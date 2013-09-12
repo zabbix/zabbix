@@ -235,6 +235,35 @@ class CDHost extends CZBXAPI {
 	return !empty($objs);
 	}
 
+/**
+ * Add Host
+ *
+ * @param _array $dhosts multidimensional array with Hosts data
+ */
+	public function create($dhosts) {
+
+	}
+
+/**
+ * Update DHost
+ *
+ * @param _array $dhosts multidimensional array with Hosts data
+ */
+	public function update($dhosts) {
+
+	}
+
+/**
+ * Delete Discovered Host
+ *
+ * @param array $dhosts
+ * @param array $dhosts[0, ...]['hostid'] Host ID to delete
+ * @return array|boolean
+ */
+	public function delete($dhostids) {
+
+	}
+
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 

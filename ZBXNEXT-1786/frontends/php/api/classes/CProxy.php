@@ -286,17 +286,6 @@ class CProxy extends CZBXAPI {
 			}
 		}
 		unset($proxy);
-
-		// check if any of the affected hosts are discovered
-		$hostIds = array();
-		foreach ($proxies as $proxy) {
-			if (isset($proxy['hosts'])) {
-				$hostIds = array_merge($hostIds, zbx_objectValues($proxy['hosts'], 'hostid'));
-			}
-		}
-		$this->checkValidator($hostIds, new CHostNormalValidator(array(
-			'message' => _('Cannot update proxy for discovered host "%1$s".')
-		)));
 	}
 
 	public function create($proxies) {
@@ -352,13 +341,9 @@ class CProxy extends CZBXAPI {
 			);
 
 			if (isset($proxy['hosts'])) {
-				// unset proxy for all hosts except for discovered hosts
 				$hostUpdate[] = array(
 					'values' => array('proxy_hostid' => 0),
-					'where' => array(
-						'proxy_hostid' => $proxy['proxyid'],
-						'flags' => ZBX_FLAG_DISCOVERY_NORMAL
-					)
+					'where' => array('proxy_hostid' => $proxy['proxyid'])
 				);
 
 				$hostUpdate[] = array(

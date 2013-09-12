@@ -276,7 +276,7 @@ function bar_report_form3(){
 	$report_timesince = get_request('report_timesince', date(TIMESTAMP_FORMAT, time() - SEC_PER_DAY));
 	$report_timetill = get_request('report_timetill', date(TIMESTAMP_FORMAT));
 
-	$itemId = get_request('itemid', 0);
+	$items = get_request('items',array());
 
 	$hostids = get_request('hostids', array());
 	$hostids = zbx_toHash($hostids);
@@ -289,13 +289,16 @@ function bar_report_form3(){
 	$reportForm->setAttribute('name','zbx_report');
 	$reportForm->setAttribute('id','zbx_report');
 
-	if (isset($_REQUEST['report_show']) && $itemId) {
+//	$reportForm->setMethod('post');
+	if(isset($_REQUEST['report_show']) && !empty($items))
 		$reportForm->addVar('report_show','show');
-	}
 
 	$reportForm->addVar('config',$config);
 	$reportForm->addVar('report_timesince',date(TIMESTAMP_FORMAT, $report_timesince));
 	$reportForm->addVar('report_timetill',date(TIMESTAMP_FORMAT, $report_timetill));
+
+//	$reportForm->addVar('items',$items); 				// params are set later!!
+//	$reportForm->addVar('periods',$periods);
 
 	$reportForm->addRow(_('Title'), new CTextBox('title', $title, 40));
 	$reportForm->addRow(_('X label'), new CTextBox('xlabel', $xlabel, 40));
@@ -396,30 +399,28 @@ function bar_report_form3(){
 	$reportForm->addRow(_('Average by'), $avgcmb);
 
 	// items
-	$itemName = '';
-	if ($itemId) {
-		$itemName = get_item_by_itemid($itemId);
-		$itemName = itemName($itemName);
+	$itemid = 0;
+	$description = '';
+	if(count($items) && ($items[0]['itemid'] > 0)){
+		$itemid = $items[0]['itemid'];
+		$description = get_item_by_itemid($itemid);
+		$description = itemName($description);
 	}
 
-	$itemidVar = new CVar('itemid', $itemId, 'itemid');
+	$itemidVar = new CVar('items[0][itemid]', $itemid, 'items_0_itemid');
 	$reportForm->addItem($itemidVar);
 
-	$txtCondVal = new CTextBox('item_name', $itemName, 50, 'yes');
-	$txtCondVal->setAttribute('id', 'item_name');
+	$txtCondVal = new CTextBox('items[0][description]',$description,50,'yes');
+	$txtCondVal->setAttribute('id', 'items_0_description');
 
 	$btnSelect = new CButton('btn1', _('Select'),
-		'return PopUp("popup.php?dstfrm='.$reportForm->GetName().
-			'&dstfld1=itemid'.
-			'&dstfld2=item_name'.
-			'&srctbl=items'.
-			'&srcfld1=itemid'.
-			'&srcfld2=name'.
-			'&monitored_hosts=1");',
-		'T'
-	);
+			"return PopUp('popup.php?dstfrm=".$reportForm->GetName().
+			"&dstfld1=items_0_itemid&dstfld2=items_0_description&".
+			"srctbl=items&srcfld1=itemid&srcfld2=name&monitored_hosts=1');",
+			'T');
 
 	$reportForm->addRow(_('Item'), array($txtCondVal, $btnSelect));
+
 
 	$paletteCmb = new CComboBox('palette', $palette);
 		$paletteCmb->addItem(0, _s('Palette #%1$s', 1));

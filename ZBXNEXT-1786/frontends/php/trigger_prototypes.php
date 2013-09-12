@@ -153,7 +153,7 @@ elseif (isset($_REQUEST['save'])) {
 		'status' => $_REQUEST['status'],
 		'comments' => $_REQUEST['comments'],
 		'url' => $_REQUEST['url'],
-		'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE
+		'flags' => ZBX_FLAG_DISCOVERY_CHILD
 	);
 
 	if (isset($_REQUEST['triggerid'])) {
@@ -336,12 +336,7 @@ else {
 		$options['filter']['status'] = TRIGGER_STATUS_ENABLED;
 	}
 	$data['triggers'] = API::TriggerPrototype()->get($options);
-
-	$_REQUEST['hostid'] = get_request('hostid', $data['discovery_rule']['hostid']);
-
-	// paging
-	$urlParams = array('hostid' => $_REQUEST['hostid'], 'parent_discoveryid' => $_REQUEST['parent_discoveryid']);
-	$data['paging'] = getPagingLine($data['triggers'], $urlParams);
+	$data['paging'] = getPagingLine($data['triggers']);
 
 	$data['triggers'] = API::TriggerPrototype()->get(array(
 		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid'),

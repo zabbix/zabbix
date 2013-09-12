@@ -298,33 +298,23 @@ function get_icon($name, $params = array()) {
  * @return object
  */
 function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
-	// LLD rule header
-	if ($discoveryid) {
-		$elements = array(
-			'items' => 'items',
-			'triggers' => 'triggers',
-			'graphs' => 'graphs',
-			'hosts' => 'hosts'
-		);
-	}
-	// host header
-	else {
-		$elements = array(
-			'items' => 'items',
-			'triggers' => 'triggers',
-			'graphs' => 'graphs',
-			'applications' => 'applications',
-			'screens' => 'screens',
-			'discoveries' => 'discoveries',
-			'web' => 'web'
-		);
+	$elements = array(
+		'items' => 'items',
+		'triggers' => 'triggers',
+		'graphs' => 'graphs',
+		'applications' => 'applications',
+		'screens' => 'screens',
+		'discoveries' => 'discoveries',
+		'web' => 'web'
+	);
+	if (!empty($discoveryid)) {
+		unset($elements['applications'], $elements['screens'], $elements['discoveries'], $elements['web']);
 	}
 
 	$options = array(
 		'hostids' => $hostid,
 		'output' => API_OUTPUT_EXTEND,
-		'templated_hosts' => true,
-		'selectHostDiscovery' => array('ts_delete')
+		'templated_hosts' => true
 	);
 	if (isset($elements['items'])) {
 		$options['selectItems'] = API_OUTPUT_COUNT;
@@ -343,9 +333,6 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	}
 	if (isset($elements['web'])) {
 		$options['selectHttpTests'] = API_OUTPUT_COUNT;
-	}
-	if (isset($elements['hosts'])) {
-		$options['selectHostPrototypes'] = API_OUTPUT_COUNT;
 	}
 
 	// get hosts
@@ -514,18 +501,6 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 		}
 	}
 
-	if (isset($elements['hosts']) && $dbHost['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-		if ($currentElement == 'hosts') {
-			$list->addItem(_('Host prototypes').' ('.$dbDiscovery['hostPrototypes'].')');
-		}
-		else {
-			$list->addItem(array(
-				new CLink(_('Host prototypes'), 'host_prototypes.php?parent_discoveryid='.$dbDiscovery['itemid']),
-				' ('.$dbDiscovery['hostPrototypes'].')'
-			));
-		}
-	}
-
 	if (isset($elements['screens']) && $dbHost['status'] == HOST_STATUS_TEMPLATE) {
 		if ($currentElement == 'screens') {
 			$list->addItem(_('Screens').' ('.$dbHost['screens'].')');
@@ -589,7 +564,7 @@ function makeFormFooter($main = null, $others = null) {
 }
 
 /**
- * Returns zbx, snmp, jmx, ipmi availability status icons and the discovered host lifetime indicator.
+ * Returns zbx, snmp, jmx, ipmi availability status icons.
  *
  * @param type $host
  *
@@ -618,17 +593,6 @@ function getAvailabilityTable($host) {
 				break;
 		}
 		$ad->addItem($ai);
-	}
-
-	// discovered host lifetime indicator
-	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $host['hostDiscovery']['ts_delete']) {
-		$deleteError = new CDiv(SPACE, 'status_icon status_icon_extra iconwarning');
-		$deleteError->setHint(
-			_s('The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-				zbx_date2age($host['hostDiscovery']['ts_delete']), zbx_date2str(_('d M Y'), $host['hostDiscovery']['ts_delete']),
-				zbx_date2str(_('H:i:s'), $host['hostDiscovery']['ts_delete'])
-			));
-		$ad->addItem($deleteError);
 	}
 
 	return $ad;

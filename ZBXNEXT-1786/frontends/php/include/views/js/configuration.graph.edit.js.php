@@ -156,11 +156,15 @@
 	}
 
 	function getOnlyHostParam() {
-		<?php if ($this->data['is_template']): ?>
-			return '&only_hostid=<?php echo $this->data['hostid']; ?>';
-		<?php else: ?>
-			return '&real_hosts=1';
-		<?php endif ?>
+		var param = '';
+
+		jQuery(document).ready(function() {
+			param = (<?php echo $this->data['is_template'] ? 'true' : 'false'; ?>)
+				? '&only_hostid=<?php echo $this->data['hostid']; ?>'
+				: '&real_hosts=1';
+		});
+
+		return param;
 	}
 
 	function rewriteNameLinks() {
@@ -168,7 +172,7 @@
 		for (var i = 0; i < size; i++) {
 			var nameLink = 'PopUp("popup.php?writeonly=1&dstfrm=graphForm'
 				+ '&dstfld1=items_' + i + '_itemid&dstfld2=items_' + i + '_name'
-				+ (jQuery('#items_' + i + '_flags').val() == <?php echo ZBX_FLAG_DISCOVERY_PROTOTYPE; ?>
+				+ (jQuery('#items_' + i + '_flags').val() == <?php echo ZBX_FLAG_DISCOVERY_CHILD; ?>
 					? '&srctbl=prototypes&parent_discoveryid=<?php echo $this->data['parent_discoveryid']; ?>'
 						+ '&srcfld3=flags&dstfld3=items_' + i + '_flags'
 					: '&srctbl=items')

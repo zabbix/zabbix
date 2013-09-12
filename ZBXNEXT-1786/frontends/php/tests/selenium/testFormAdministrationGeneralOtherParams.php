@@ -144,8 +144,8 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		$this->zbxTestTextPresent('Other parameters');
 		$this->input_type('refresh_unsupported', '65536');
 		$this->zbxTestClickWait('save');
-		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Incorrect value for field "Refresh unsupported items (in sec)": must be between 0 and 65535.'));
-		// $this->zbxTestTextPresent('Incorrect value for field "Refresh unsupported items (in sec)": must be between 0 and 65535.');
+		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Refresh unsupported items (in sec)": must be between 0 and 65535.'));
+		// $this->zbxTestTextPresent('Warning. Incorrect value for field "Refresh unsupported items (in sec)": must be between 0 and 65535.');
 	}
 
 }

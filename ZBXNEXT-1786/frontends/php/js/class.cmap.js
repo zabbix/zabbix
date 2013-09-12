@@ -133,8 +133,6 @@ ZABBIX.apps.map = (function($) {
 			this.data = mapData.sysmap;
 			this.iconList = mapData.iconList;
 			this.defaultAutoIconId = mapData.defaultAutoIconId;
-			this.defaultIconId = mapData.defaultIconId;
-			this.defaultIconName = mapData.defaultIconName;
 			this.container = $('#' + containerId);
 
 			if (this.container.length === 0) {
@@ -821,13 +819,13 @@ ZABBIX.apps.map = (function($) {
 					selementid: getUniqueId(),
 					elementtype: '4', // image
 					elementid: 0,
-					iconid_off: this.sysmap.defaultIconId, // first imageid
+					iconid_off: this.sysmap.iconList[0].imageid, // first imageid
 					label: locale['S_NEW_ELEMENT'],
 					label_location: -1, // set default map label location
 					x: 0,
 					y: 0,
 					urls: {},
-					elementName: this.sysmap.defaultIconName, // first image name
+					elementName: this.sysmap.iconList[0].name, // first image name
 					use_iconmap: '1'
 				};
 			}

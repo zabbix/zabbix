@@ -134,8 +134,7 @@ else {
 $data['discovery_groups'] = API::HostGroup()->get(array(
 	'sortfield' => 'name',
 	'editable' => true,
-	'output' => API_OUTPUT_EXTEND,
-	'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
+	'output' => API_OUTPUT_EXTEND
 ));
 $data['alert_usrgrps'] = DBfetchArray(DBselect(
 		'SELECT u.usrgrpid,u.name'.

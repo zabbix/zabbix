@@ -150,7 +150,7 @@ $triggersForm->addItem($triggersTab);
 // append buttons to form
 $triggersForm->addItem(makeFormFooter(
 	new CSubmit('mass_save', _('Save')),
-	new CButtonCancel(url_params(array('groupid', 'hostid', 'parent_discoveryid')))
+	new CButtonCancel(url_param('groupid').url_param('parent_discoveryid'))
 ));
 
 $triggersWidget->addItem($triggersForm);

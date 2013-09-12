@@ -303,13 +303,6 @@
 
 			setUseipForInterface: function(hostInterfaceId, useip) {
 				allHostInterfaces[hostInterfaceId].useip = useip;
-			},
-
-			disable: function() {
-				jQuery('.interface-drag-control, .interface-control').html('');
-				jQuery('.interfaceRow').find('input').attr('readonly', true);
-				jQuery('.interfaceRow').find('input[type="radio"]').attr('disabled', true);
-				jQuery('.interface-connect-to').find('input').button('disable');
 			}
 		}
 	}());
@@ -393,6 +386,8 @@
 					break;
 			}
 		});
+		jQuery('#name').focus();
+
 
 		/**
 		 * Mass update

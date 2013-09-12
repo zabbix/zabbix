@@ -407,13 +407,6 @@
 #	include <ucd-snmp/keytools.h>
 #endif
 
-/* LIBXML2 is used */
-#ifdef HAVE_LIBXML2
-#	include <libxml/parser.h>
-#	include <libxml/tree.h>
-#	include <libxml/xpath.h>
-#endif
-
 /* Required for advanced sigaction */
 #ifdef HAVE_SYS_UCONTEXT_H
 #	include <sys/ucontext.h>

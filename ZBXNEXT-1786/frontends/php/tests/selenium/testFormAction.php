@@ -182,7 +182,7 @@ class testFormAction extends CWebTest {
 		$this->selectWindow('null');
 		$this->select("new_operation_opmessage_mediatypeid", "label=Jabber");
 		$this->zbxTestClickWait('add_operation');
-		$this->zbxTestTextPresent("Send message to users: Admin (Zabbix Administrator) via Jabber");
+		$this->zbxTestTextPresent("Send message to users: Admin via Jabber");
 		$this->zbxTestTextPresent("Send message to user groups: Enabled debug mode, Zabbix administrators via Jabber");
 		$this->zbxTestClickWait('new_operation');
 		$this->select("new_operation_operationtype", "label=Remote command");
@@ -220,7 +220,7 @@ class testFormAction extends CWebTest {
 
 		$this->type("new_operation_opcommand_command", "command");
 		$this->zbxTestClickWait('add_operation');
-		$this->zbxTestTextPresent('Send message to users: Admin (Zabbix Administrator) via Jabber');
+		$this->zbxTestTextPresent('Send message to users: Admin via Jabber');
 		$this->zbxTestTextPresent("Send message to user groups: Enabled debug mode, Zabbix administrators via Jabber");
 		$this->zbxTestTextPresent("Run remote commands on current host");
 		$this->zbxTestTextPresent('Run remote commands on hosts: Simple form test host');
@@ -239,7 +239,7 @@ class testFormAction extends CWebTest {
 		$this->type("new_operation_opcommand_command", "command ssh");
 		$this->zbxTestClickWait('add_operation');
 
-		$this->zbxTestTextPresent('Send message to users: Admin (Zabbix Administrator) via Jabber');
+		$this->zbxTestTextPresent('Send message to users: Admin via Jabber');
 		$this->zbxTestTextPresent("Send message to user groups: Enabled debug mode, Zabbix administrators via Jabber");
 		$this->zbxTestTextPresent("Run remote commands on current host");
 		$this->zbxTestTextPresent('Run remote commands on hosts: Simple form test host');

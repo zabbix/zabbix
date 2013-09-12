@@ -29,7 +29,7 @@ class testPageDiscoveryRules extends CWebTest {
 			' FROM hosts h, items i'.
 			' WHERE i.hostid=h.hostid'.
 				' AND h.host LIKE '.zbx_dbstr('%-layout-test%').
-				' AND i.flags = '.ZBX_FLAG_DISCOVERY_RULE
+				' AND i.flags = '.ZBX_FLAG_DISCOVERY
 		);
 	}
 
@@ -138,7 +138,7 @@ class testPageDiscoveryRules extends CWebTest {
 			'SELECT distinct h.hostid, h.host from hosts h, items i'.
 			' WHERE h.host LIKE ' .zbx_dbstr('%-layout-test-%').
 				' AND h.hostid = i.hostid'.
-				' AND i.flags = '.ZBX_FLAG_DISCOVERY_RULE
+				' AND i.flags = '.ZBX_FLAG_DISCOVERY
 		);
 	}
 
@@ -149,12 +149,7 @@ class testPageDiscoveryRules extends CWebTest {
 	public function testPageDiscoveryRules_MassDelete($rule) {
 		$this->chooseOkOnNextConfirmation();
 
-		$hostids = DBdata(
-			'SELECT hostid'.
-			' FROM items'.
-			' WHERE hostid='.$rule['hostid'].
-				' AND flags = '.ZBX_FLAG_DISCOVERY_RULE
-		);
+		$hostids = DBdata('select hostid from items where hostid='.$rule['hostid'].' AND flags = '.ZBX_FLAG_DISCOVERY);
 		$hostids = zbx_objectValues($hostids, 'hostids');
 
 		$this->zbxTestLogin('host_discovery.php?&hostid='.$rule['hostid']);

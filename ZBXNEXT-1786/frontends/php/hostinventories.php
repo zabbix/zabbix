@@ -30,7 +30,7 @@ $page['hist_arg'] = array('groupid', 'hostid');
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-$fields = array(
+$fields=array(
 	'groupid' =>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
 	'hostid' =>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
 	// filter
@@ -43,27 +43,17 @@ $fields = array(
 	'favref'=>			array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 	'favstate'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})&&("filter"=={favobj})')
 );
+
 check_fields($fields);
-
-/*
- * Permissions
- */
-if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
-	access_deny();
-}
-if (get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
-	access_deny();
-}
-
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
-if (isset($_REQUEST['favobj'])) {
+if(isset($_REQUEST['favobj'])){
 	if('filter' == $_REQUEST['favobj']){
 		CProfile::update('web.hostinventories.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 	}
 }
 
-if ((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])) {
+if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
 	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit();
 }
@@ -78,6 +68,14 @@ $pageFilter = new CPageFilter($options);
 $_REQUEST['groupid'] = $pageFilter->groupid;
 
 $_REQUEST['hostid'] = get_request('hostid', 0);
+// permission check, imo should be removed in future.
+if($_REQUEST['hostid'] > 0){
+	$res = API::Host()->get(array(
+		'real_hosts' => 1,
+		'hostids' => $_REQUEST['hostid']
+	));
+	if(empty($res)) access_deny();
+}
 
 $hostinvent_wdgt = new CWidget();
 $hostinvent_wdgt->addPageHeader(_('HOST INVENTORIES'));

@@ -126,7 +126,7 @@ if (get_request('itemid', false)) {
 	$item = API::DiscoveryRule()->get(array(
 		'itemids' => $_REQUEST['itemid'],
 		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => array('status', 'flags'),
+		'selectHosts' => array('status'),
 		'editable' => true
 	));
 	$item = reset($item);
@@ -134,17 +134,16 @@ if (get_request('itemid', false)) {
 		access_deny();
 	}
 	$_REQUEST['hostid'] = $item['hostid'];
-	$host = reset($item['hosts']);
+	$hosts = $item['hosts'];
 }
 else {
 	$hosts = API::Host()->get(array(
 		'hostids' => $_REQUEST['hostid'],
-		'output' => array('status', 'flags'),
+		'output' => array('status'),
 		'templated_hosts' => true,
 		'editable' => true
 	));
-	$host = reset($hosts);
-	if (!$host) {
+	if (empty($hosts)) {
 		access_deny();
 	}
 }
@@ -167,7 +166,7 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  * Actions
  */
 if (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
-	$timePeriodValidator = new CTimePeriodValidator(array('allowMultiple' => false));
+	$timePeriodValidator = new CTimePeriodValidator(array('allow_multiple' => false));
 	$_REQUEST['delay_flex'] = get_request('delay_flex', array());
 
 	if ($timePeriodValidator->validate($_REQUEST['new_delay_flex']['period'])) {
@@ -308,10 +307,7 @@ if (isset($_REQUEST['form'])) {
 	$itemView->show();
 }
 else {
-	$data = array(
-		'hostid' => get_request('hostid', 0),
-		'host' => $host
-	);
+	$data = array('hostid' => get_request('hostid', 0));
 	$sortfield = getPageSortField('name');
 
 	// discoveries
@@ -322,12 +318,12 @@ else {
 		'selectItems' => API_OUTPUT_COUNT,
 		'selectGraphs' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,
-		'selectHostPrototypes' => API_OUTPUT_COUNT,
 		'sortfield' => $sortfield,
 		'limit' => $config['search_limit'] + 1
 	));
 
 	// determine, show or not column of errors
+	$host = reset($hosts);
 	$data['showErrorColumn'] = ($host['status'] != HOST_STATUS_TEMPLATE);
 
 	if (!empty($data['discoveries'])) {
@@ -335,8 +331,7 @@ else {
 	}
 
 	// paging
-	$urlParams = array('hostid' => $_REQUEST['hostid']);
-	$data['paging'] = getPagingLine($data['discoveries'], $urlParams);
+	$data['paging'] = getPagingLine($data['discoveries']);
 
 	// render view
 	$discoveryView = new CView('configuration.host.discovery.list', $data);

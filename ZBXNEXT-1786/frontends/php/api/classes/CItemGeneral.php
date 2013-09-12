@@ -171,10 +171,6 @@ abstract class CItemGeneral extends CZBXAPI {
 		));
 
 		if ($update) {
-			$updateDiscoveredValidator = new CUpdateDiscoveredValidator(array(
-				'allowed' => array('itemid', 'status'),
-				'messageAllowedField' => _('Cannot update "%1$s" for a discovered item.')
-			));
 			foreach ($items as $item) {
 				// check permissions
 				if (!isset($dbItems[$item['itemid']])) {
@@ -183,7 +179,13 @@ abstract class CItemGeneral extends CZBXAPI {
 				}
 
 				// discovered fields, except status, cannot be updated
-				$this->checkPartialValidator($item, $updateDiscoveredValidator, $dbItems[$item['itemid']]);
+				if ($dbItems[$item['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+					foreach ($item as $key => $value) {
+						if (!in_array($key, array('itemid', 'status'))) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update discovered item.'));
+						}
+					}
+				}
 			}
 
 			$items = $this->extendObjects($this->tableName(), $items, array('name'));
@@ -407,10 +409,10 @@ abstract class CItemGeneral extends CZBXAPI {
 			case ZBX_FLAG_DISCOVERY_NORMAL:
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on "%2$s" as an item.', $key, $host));
 				break;
-			case ZBX_FLAG_DISCOVERY_RULE:
+			case ZBX_FLAG_DISCOVERY:
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on "%2$s" as a discovery rule.', $key, $host));
 				break;
-			case ZBX_FLAG_DISCOVERY_PROTOTYPE:
+			case ZBX_FLAG_DISCOVERY_CHILD:
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on "%2$s" as an item prototype.', $key, $host));
 				break;
 			case ZBX_FLAG_DISCOVERY_CREATED:
@@ -552,7 +554,7 @@ abstract class CItemGeneral extends CZBXAPI {
 
 		// make it work for both graphs and graph prototypes
 		$filter['flags'] = array(
-			ZBX_FLAG_DISCOVERY_PROTOTYPE,
+			ZBX_FLAG_DISCOVERY_CHILD,
 			ZBX_FLAG_DISCOVERY_NORMAL,
 			ZBX_FLAG_DISCOVERY_CREATED
 		);

@@ -22,29 +22,6 @@
 class CEventSourceObjectValidator extends CValidator {
 
 	/**
-	 * Supported source-object pairs.
-	 *
-	 * @var array
-	 */
-	public $pairs = array(
-		EVENT_SOURCE_TRIGGERS => array(
-			EVENT_OBJECT_TRIGGER => 1
-		),
-		EVENT_SOURCE_DISCOVERY => array(
-			EVENT_OBJECT_DHOST => 1,
-			EVENT_OBJECT_DSERVICE => 1
-		),
-		EVENT_SOURCE_AUTO_REGISTRATION => array(
-			EVENT_OBJECT_AUTOREGHOST => 1
-		),
-		EVENT_SOURCE_INTERNAL => array(
-			EVENT_OBJECT_TRIGGER => 1,
-			EVENT_OBJECT_ITEM => 1,
-			EVENT_OBJECT_LLDRULE => 1
-		)
-	);
-
-	/**
 	 * Checks if the given source-object pair is valid.
 	 *
 	 * @param $value
@@ -53,7 +30,7 @@ class CEventSourceObjectValidator extends CValidator {
 	 */
 	public function validate($value)
 	{
-		$pairs = $this->pairs;
+		$pairs = $this->options['pairs'];
 
 		$objects = $pairs[$value['source']];
 		if (!isset($objects[$value['object']])) {
@@ -75,6 +52,31 @@ class CEventSourceObjectValidator extends CValidator {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Set default options.
+	 * Possible options:
+	 * - pairs		- supported source-object pairs
+	 */
+	protected function initOptions() {
+		$this->options['pairs'] = array(
+			EVENT_SOURCE_TRIGGERS => array(
+				EVENT_OBJECT_TRIGGER => 1
+			),
+			EVENT_SOURCE_DISCOVERY => array(
+				EVENT_OBJECT_DHOST => 1,
+				EVENT_OBJECT_DSERVICE => 1
+			),
+			EVENT_SOURCE_AUTO_REGISTRATION => array(
+				EVENT_OBJECT_AUTOREGHOST => 1
+			),
+			EVENT_SOURCE_INTERNAL => array(
+				EVENT_OBJECT_TRIGGER => 1,
+				EVENT_OBJECT_ITEM => 1,
+				EVENT_OBJECT_LLDRULE => 1
+			)
+		);
 	}
 
 }

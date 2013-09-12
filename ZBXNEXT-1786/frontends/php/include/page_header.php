@@ -338,7 +338,6 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 					'parentid' => $node['masterid']
 				);
 			}
-			unset($node);
 
 			$node_tree = new CTree('nodes', $node_tree, array('caption' => bold(_('Node')), 'combo_select_node' => SPACE));
 

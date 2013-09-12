@@ -19,19 +19,21 @@
 **/
 
 
-class CColorValidator extends CStringValidator {
+class CColorValidator extends CValidator {
 
 	/**
-	 * Hex color code regex.
+	 * Validate hex color number.
 	 *
-	 * @var string
+	 * @param $color
+	 *
+	 * @return bool
 	 */
-	public $regex = '/[0-9a-f]{6}/i';
+	public function validate($color) {
+		if (!preg_match('/[0-9a-f]{6}/i', $color)) {
+			$this->setError(_s('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).', $color));
+			return false;
+		}
 
-	public function __construct(array $options = array()) {
-		$this->messageRegex = _('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).');
-		$this->messageEmpty = _('Empty color.');
-
-		parent::__construct($options);
+		return true;
 	}
 }

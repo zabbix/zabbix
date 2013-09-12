@@ -646,55 +646,6 @@ function getApplicationSourceParentIds(array $applicationIds, array $templateApp
 }
 
 /**
- * Returns the farthest host prototype ancestor for each given host prototype.
- *
- * @param array $hostPrototypeIds
- * @param array $templateHostPrototypeIds	array with parent host prototype IDs as keys and arrays of child host
- * 											prototype IDs as values
- *
- * @return array	an array of child ID - ancestor ID pairs
- */
-function getHostPrototypeSourceParentIds(array $hostPrototypeIds, array $templateHostPrototypeIds = array()) {
-	$query = DBSelect(
-		'SELECT h.hostid,h.templateid'.
-		' FROM hosts h'.
-		' WHERE '.dbConditionInt('h.hostid', $hostPrototypeIds).
-			' AND h.templateid>0'
-	);
-
-	$hostPrototypeIds = array();
-	while ($hostPrototype = DBfetch($query)) {
-		// check if we already have host prototype inherited from the current host prototype
-		// if we do - move all of its child prototypes to the parent template
-		if (isset($templateHostPrototypeIds[$hostPrototype['hostid']])) {
-			$templateHostPrototypeIds[$hostPrototype['templateid']] = $templateHostPrototypeIds[$hostPrototype['hostid']];
-			unset($templateHostPrototypeIds[$hostPrototype['hostid']]);
-		}
-		// if no - just add the prototype
-		else {
-			$templateHostPrototypeIds[$hostPrototype['templateid']][] = $hostPrototype['hostid'];
-			$hostPrototypeIds[] = $hostPrototype['templateid'];
-		}
-	}
-
-	// continue while we still have new host prototypes to check
-	if ($hostPrototypeIds) {
-		return getHostPrototypeSourceParentIds($hostPrototypeIds, $templateHostPrototypeIds);
-	}
-	else {
-		// return an inverse hash with prototype IDs as keys and parent prototype IDs as values
-		$result = array();
-		foreach ($templateHostPrototypeIds as $templateId => $hostIds) {
-			foreach ($hostIds as $hostId) {
-				$result[$hostId] = $templateId;
-			}
-		}
-
-		return $result;
-	}
-}
-
-/**
  * Check collisions between templates.
  * $param int|array $templateid_list
  */

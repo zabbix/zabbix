@@ -148,7 +148,6 @@ form { margin: 0; }
 .input[disabled] { color: #ACA899; cursor: default; }
 .input[disabled]:focus { text-decoration: none; border-color: #ACA899; }
 .input[disabled]:hover { text-decoration: none; border-color: #ACA899; }
-.input option { color: #000000; }
 .select {
 	margin: 0 2px 0 0; height: 14px; line-height: 14px;
 	-moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box;
@@ -367,7 +366,7 @@ table.flicker tr td.flicker_c { height: 16px; padding-left: 4px; padding-right: 
 table.flicker tr td.flicker_l { text-align: left; height: 16px; padding-left: 4px; line-height: 12px; }
 table.flicker tr td.flicker_r {text-align: right; height: 16px; padding-right: 4px; line-height: 12px; }
 table.flicker a { color: #0BF; }
-td.flicker_c { cursor: pointer; }
+td.flicker_c { cursor: pointer; };
 
 /* acknowledgements */
 table.ack_msgs { width: 70%; background-color: #EEEEEE; padding: 0; border: 0 solid; }
@@ -456,14 +455,7 @@ table.filter .host-inventories .select,
 table.filter .host-inventories .text { vertical-align: middle; }
 table.filter tr.item-list-row { height: 26px; }
 
-.host-list table.filter tr td { width: 25%; }
-
-.item-list table.filter { text-align: left; min-width: 1024px; }
-.item-list table.filter tr td.label { text-align: right; }
-.item-list table.filter tr td.col1 { width: 18%; }
-.item-list table.filter tr td.label.col1 { width: 6%; }
-.item-list table.filter tr td.label.col4 { width: 8%; }
-
+/* filter sub filter */
 table.filter.sub-filter tr td { text-align: left; }
 table.filter.sub-filter tr td:first-child { width: 8%; }
 
@@ -565,6 +557,3 @@ div.suggest { position: absolute; border: 1px #5C7099 solid; width: 162px; z-ind
 .menuPopup .title { padding: 2px 2px 2px 6px; color: #ffffff; font-weight: bold; background: #5c9ccc url(themes/originalblue/images/bg_h-hard_55.png) 50% 50% repeat-x; }
 .menuPopup .ui-menu { width: 165px; }
 .menuPopup ul.ui-corner-all { border-radius: 0; }
-
-/* tabs */
-.tabs { visibility: hidden; }

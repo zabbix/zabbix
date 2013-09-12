@@ -100,7 +100,7 @@ elseif ($_REQUEST['config'] == ZBX_AUTH_LDAP) {
 		try {
 			$config['authentication_type'] = $_REQUEST['config'];
 
-			$ldapValidator = new CLdapAuthValidator(array('conf' => $ldap_cnf));
+			$ldapValidator = new CLdapAuthValidator($ldap_cnf);
 			$result = $ldapValidator->validate(array(
 				'user' => get_request('user', CWebUser::$data['alias']),
 				'password' => get_request('user_password', '')
@@ -128,7 +128,7 @@ elseif ($_REQUEST['config'] == ZBX_AUTH_LDAP) {
 		}
 	}
 	elseif (isset($_REQUEST['test'])) {
-		$ldapValidator = new CLdapAuthValidator(array('conf' => $ldap_cnf));
+		$ldapValidator = new CLdapAuthValidator($ldap_cnf);
 		$result = $ldapValidator->validate(array(
 			'user' => get_request('user', CWebUser::$data['alias']),
 			'password' => get_request('user_password', '')

@@ -84,9 +84,7 @@ foreach ($this->data['httpTests'] as $httpTestId => $httpTest) {
 		$httpTest['delay'],
 		new CLink(
 			httptest_status2str($httpTest['status']),
-			'?group_httptestid[]='.$httpTest['httptestid'].
-				'&hostid='.(isset($template['id']) ? $template['id'] : $httpTest['hostid']).
-				'&go='.($httpTest['status'] ? 'activate' : 'disable'),
+			'?group_httptestid[]='.$httpTest['httptestid'].'&go='.($httpTest['status'] ? 'activate' : 'disable'),
 			httptest_status2style($httpTest['status'])
 		)
 	));

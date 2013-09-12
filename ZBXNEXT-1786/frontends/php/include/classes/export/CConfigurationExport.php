@@ -159,63 +159,38 @@ class CConfigurationExport {
 	 * Gathers data required for export from database depends on $options passed to constructor.
 	 */
 	protected function gatherData() {
-		$options = $this->filterOptions($this->options);
-
-		if ($options['groups']) {
-			$this->gatherGroups($options['groups']);
+		if ($this->options['groups']) {
+			$this->gatherGroups();
 		}
 
-		if ($options['templates']) {
-			$this->gatherTemplates($options['templates']);
+		if ($this->options['templates']) {
+			$this->gatherTemplates();
 		}
 
-		if ($options['hosts']) {
-			$this->gatherHosts($options['hosts']);
+		if ($this->options['hosts']) {
+			$this->gatherHosts();
 		}
 
-		if ($options['templates'] || $options['hosts']) {
-			$this->gatherGraphs($options['hosts'], $options['templates']);
-			$this->gathertriggers($options['hosts'], $options['templates']);
+		if ($this->options['templates'] || $this->options['hosts']) {
+			$this->gatherGraphs();
+			$this->gathertriggers();
 		}
 
-		if ($options['screens']) {
-			$this->gatherScreens($options['screens']);
+		if ($this->options['screens']) {
+			$this->gatherScreens();
 		}
 
-		if ($options['maps']) {
-			$this->gatherMaps($options['maps']);
+		if ($this->options['maps']) {
+			$this->gatherMaps();
 		}
-	}
-
-	/**
-	 * Excludes objects that cannot be exported.
-	 *
-	 * @param array $options
-	 *
-	 * @return array
-	 */
-	protected function filterOptions(array $options) {
-		if ($options['hosts']) {
-			// exclude discovered hosts
-			$hosts = API::Host()->get(array(
-				'output' => array('hostid'),
-				'hostids' => $options['hosts'],
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
-			));
-			$options['hosts'] = zbx_objectValues($hosts, 'hostid');
-		}
-
-		return $options;
 	}
 
 	/**
 	 * Get groups for export from database.
-	 *
-	 * @param array $groupIds
 	 */
-	protected function gatherGroups(array $groupIds) {
+	protected function gatherGroups() {
 		$this->data['groups'] = API::HostGroup()->get(array(
-			'groupids' => $groupIds,
+			'groupids' => $this->options['groups'],
 			'preservekeys' => true,
 			'output' => API_OUTPUT_EXTEND
 		));
@@ -223,12 +198,10 @@ class CConfigurationExport {
 
 	/**
 	 * Get templates for export from database.
-	 *
-	 * @param array $templateIds
 	 */
-	protected function gatherTemplates(array $templateIds) {
+	protected function gatherTemplates() {
 		$templates = API::Template()->get(array(
-			'templateids' => $templateIds,
+			'templateids' => $this->options['templates'],
 			'output' => array('host', 'name'),
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectGroups' => API_OUTPUT_EXTEND,
@@ -251,7 +224,7 @@ class CConfigurationExport {
 
 		// applications
 		$applications = API::Application()->get(array(
-			'hostids' => $templateIds,
+			'hostids' => $this->options['templates'],
 			'output' => API_OUTPUT_EXTEND,
 			'inherited' => false,
 			'preservekeys' => true
@@ -266,7 +239,7 @@ class CConfigurationExport {
 
 		// screens
 		$screens = API::TemplateScreen()->get(array(
-			'templateids' => $templateIds,
+			'templateids' => $this->options['templates'],
 			'selectScreenItems' => API_OUTPUT_EXTEND,
 			'noInheritance' => true,
 			'output' => API_OUTPUT_EXTEND,
@@ -283,18 +256,16 @@ class CConfigurationExport {
 
 		$this->data['templates'] = $templates;
 
-		$this->gatherTemplateItems($templateIds);
-		$this->gatherTemplateDiscoveryRules($templateIds);
+		$this->gatherTemplateItems();
+		$this->gatherTemplateDiscoveryRules();
 	}
 
 	/**
 	 * Get Hosts for export from database.
-	 *
-	 * @param array $hostIds
 	 */
-	protected function gatherHosts(array $hostIds) {
+	protected function gatherHosts() {
 		$hosts = API::Host()->get(array(
-			'hostids' => $hostIds,
+			'hostids' => $this->options['hosts'],
 			'output' => array('proxy_hostid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
 				'ipmi_password', 'name'),
 			'selectInventory' => true,
@@ -318,7 +289,7 @@ class CConfigurationExport {
 
 		// applications
 		$applications = API::Application()->get(array(
-			'hostids' => $hostIds,
+			'hostids' => $this->options['hosts'],
 			'output' => API_OUTPUT_EXTEND,
 			'inherited' => false,
 			'preservekeys' => true
@@ -348,18 +319,16 @@ class CConfigurationExport {
 
 		$this->data['hosts'] = $hosts;
 
-		$this->gatherHostItems($hostIds);
-		$this->gatherHostDiscoveryRules($hostIds);
+		$this->gatherHostItems();
+		$this->gatherHostDiscoveryRules();
 	}
 
 	/**
 	 * Get hosts items from database.
-	 *
-	 * @param array $hostIds
 	 */
-	protected function gatherHostItems(array $hostIds) {
+	protected function gatherHostItems() {
 		$items = API::Item()->get(array(
-			'hostids' => $hostIds,
+			'hostids' => $this->options['hosts'],
 			'output' => $this->dataFields['item'],
 			'selectApplications' => API_OUTPUT_EXTEND,
 			'inherited' => false,
@@ -378,12 +347,10 @@ class CConfigurationExport {
 
 	/**
 	 * Get templates items from database.
-	 *
-	 * @param array $templateIds
 	 */
-	protected function gatherTemplateItems(array $templateIds) {
+	protected function gatherTemplateItems() {
 		$items = API::Item()->get(array(
-			'hostids' => $templateIds,
+			'hostids' => $this->options['templates'],
 			'output' => $this->dataFields['item'],
 			'selectApplications' => API_OUTPUT_EXTEND,
 			'inherited' => false,
@@ -431,12 +398,10 @@ class CConfigurationExport {
 
 	/**
 	 * Get hosts discovery rules from database.
-	 *
-	 * @param array $hostIds
 	 */
-	protected function gatherHostDiscoveryRules(array $hostIds) {
+	protected function gatherHostDiscoveryRules() {
 		$items = API::DiscoveryRule()->get(array(
-			'hostids' => $hostIds,
+			'hostids' => $this->options['hosts'],
 			'output' => $this->dataFields['drule'],
 			'inherited' => false,
 			'preservekeys' => true
@@ -454,12 +419,10 @@ class CConfigurationExport {
 
 	/**
 	 * Get templates discovery rules from database.
-	 *
-	 * @param array $templateIds
 	 */
-	protected function gatherTemplateDiscoveryRules(array $templateIds) {
+	protected function gatherTemplateDiscoveryRules() {
 		$items = API::DiscoveryRule()->get(array(
-			'hostids' => $templateIds,
+			'hostids' => $this->options['templates'],
 			'output' => $this->dataFields['drule'],
 			'inherited' => false,
 			'preservekeys' => true
@@ -487,7 +450,6 @@ class CConfigurationExport {
 			$item['itemPrototypes'] = array();
 			$item['graphPrototypes'] = array();
 			$item['triggerPrototypes'] = array();
-			$item['hostPrototypes'] = array();
 		}
 		unset($item);
 
@@ -554,49 +516,14 @@ class CConfigurationExport {
 			$items[$trigger['discoveryRule']['itemid']]['triggerPrototypes'][] = $trigger;
 		}
 
-		// gather host prototypes
-		$hostPrototypes = API::HostPrototype()->get(array(
-			'discoveryids' => zbx_objectValues($items, 'itemid'),
-			'output' => API_OUTPUT_EXTEND,
-			'selectGroupLinks' => API_OUTPUT_EXTEND,
-			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
-			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
-			'selectTemplates' => API_OUTPUT_EXTEND,
-			'inherited' => false,
-			'preservekeys' => true
-		));
-
-		// replace group prototype group IDs with references
-		$groupIds = array();
-		foreach ($hostPrototypes as $hostPrototype) {
-			foreach ($hostPrototype['groupLinks'] as $groupLink) {
-				$groupIds[$groupLink['groupid']] = $groupLink['groupid'];
-			}
-		}
-		$groups = $this->getGroupsReferences($groupIds);
-
-		// export the groups used in group prototypes
-		$this->data['groups'] += $groups;
-
-		foreach ($hostPrototypes as $hostPrototype) {
-			foreach ($hostPrototype['groupLinks'] as &$groupLink) {
-				$groupLink['groupid'] = $groups[$groupLink['groupid']];
-			}
-			unset($groupLink);
-			$items[$hostPrototype['discoveryRule']['itemid']]['hostPrototypes'][] = $hostPrototype;
-		}
-
 		return $items;
 	}
 
 	/**
 	 * Get graphs for export from database.
-	 *
-	 * @param array $hostIds
-	 * @param array $templateIds
 	 */
-	protected function gatherGraphs(array $hostIds, array $templateIds) {
-		$hostIds = array_merge($hostIds, $templateIds);
+	protected function gatherGraphs() {
+		$hostIds = array_merge($this->options['hosts'], $this->options['templates']);
 
 		$graphs = API::Graph()->get(array(
 			'hostids' => $hostIds,
@@ -691,12 +618,9 @@ class CConfigurationExport {
 
 	/**
 	 * Get triggers for export from database.
-	 *
-	 * @param array $hostIds
-	 * @param array $templateIds
 	 */
-	protected function gatherTriggers(array $hostIds, array $templateIds) {
-		$hostIds = array_merge($hostIds, $templateIds);
+	protected function gatherTriggers() {
+		$hostIds = array_merge($this->options['hosts'], $this->options['templates']);
 
 		$triggers = API::Trigger()->get(array(
 			'hostids' => $hostIds,
@@ -729,12 +653,10 @@ class CConfigurationExport {
 
 	/**
 	 * Get maps for export from database.
-	 *
-	 * @param array $mapIds
 	 */
-	protected function gatherMaps(array $mapIds) {
+	protected function gatherMaps() {
 		$sysmaps = API::Map()->get(array(
-			'sysmapids' => $mapIds,
+			'sysmapids' => $this->options['maps'],
 			'selectSelements' => API_OUTPUT_EXTEND,
 			'selectLinks' => API_OUTPUT_EXTEND,
 			'selectIconMap' => API_OUTPUT_EXTEND,
@@ -765,12 +687,10 @@ class CConfigurationExport {
 
 	/**
 	 * Get screens for export from database.
-	 *
-	 * @param array $screenIds
 	 */
-	protected function gatherScreens(array $screenIds) {
+	protected function gatherScreens() {
 		$screens = API::Screen()->get(array(
-			'screenids' => $screenIds,
+			'screenids' => $this->options['screens'],
 			'selectScreenItems' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND
 		));

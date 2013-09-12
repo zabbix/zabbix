@@ -139,7 +139,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 
 		$this->input_type('name', '1_regexp3');
 		$this->zbxTestClickWait('save');
-		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Field "expressions" is mandatory.'));
+		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Warning. Field "expressions" is mandatory.'));
 	}
 
 	public function testFormAdministrationGeneralRegexp_Test() {

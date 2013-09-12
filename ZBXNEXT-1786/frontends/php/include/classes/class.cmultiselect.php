@@ -22,8 +22,6 @@
 class CMultiSelect extends CTag {
 
 	/**
-	 * @param array $options['objectOptions'] 	an array of parameters to be added to the request URL
-	 *
 	 * @see jQuery.multiSelect()
 	 */
 	public function __construct(array $options = array()) {

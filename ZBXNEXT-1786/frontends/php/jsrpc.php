@@ -191,7 +191,7 @@ switch ($data['method']) {
 			'updateProfile' => isset($data['updateProfile']) ? $data['updateProfile'] : null
 		);
 		if ($options['resourcetype'] == SCREEN_RESOURCE_HISTORY) {
-			$options['itemids'] = !empty($data['itemids']) ? $data['itemids'] : null;
+			$options['itemid'] = !empty($data['itemid']) ? $data['itemid'] : null;
 			$options['action'] = !empty($data['action']) ? $data['action'] : null;
 			$options['filter'] = !empty($data['filter']) ? $data['filter'] : null;
 			$options['filter_task'] = !empty($data['filter_task']) ? $data['filter_task'] : null;
@@ -244,8 +244,7 @@ switch ($data['method']) {
 					'output' => array('groupid', 'name'),
 					'startSearch' => true,
 					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
-					'filter' => isset($data['filter']) ? $data['filter'] : null,
-					'limit' => isset($data['limit']) ? $data['limit'] : null
+					'limit' => $config['search_limit']
 				));
 
 				if ($hostGroups) {

@@ -594,14 +594,6 @@ function DBexecute($query, $skip_error_messages = 0) {
 	return (bool) $result;
 }
 
-/**
- * Returns the next data set from a DB resource or false if there are no more results.
- *
- * @param resource $cursor
- * @param bool $convertNulls	convert all null values to string zeroes
- *
- * @return array|bool
- */
 function DBfetch($cursor, $convertNulls = true) {
 	global $DB;
 
@@ -613,8 +605,7 @@ function DBfetch($cursor, $convertNulls = true) {
 
 	switch ($DB['TYPE']) {
 		case ZBX_DB_MYSQL:
-			$result = mysqli_fetch_assoc($cursor);
-			if (!$result) {
+			if (!$result = mysqli_fetch_assoc($cursor)) {
 				mysqli_free_result($cursor);
 			}
 			break;
@@ -675,19 +666,14 @@ function DBfetch($cursor, $convertNulls = true) {
 			break;
 	}
 
-	if ($result) {
-		if ($convertNulls) {
-			foreach ($result as $key => $val) {
-				if (is_null($val)) {
-					$result[$key] = '0';
-				}
+	if ($convertNulls && $result) {
+		foreach ($result as $key => $val) {
+			if (is_null($val)) {
+				$result[$key] = '0';
 			}
 		}
-
-		return $result;
 	}
-
-	return false;
+	return $result;
 }
 
 function zbx_dbconcat($params) {
@@ -1059,9 +1045,9 @@ function dbConditionInt($fieldName, array $values, $notIn = false, $sort = true)
 
 	if ($sort) {
 		natsort($values);
-
-		$values = array_values($values);
 	}
+
+	$values = array_values($values);
 
 	$betweens = array();
 	$data = array();

@@ -354,7 +354,7 @@ int     SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result)
 		else if (0 == strncmp(name, "cpu MHz", 7) && (HW_CPU_SHOW_ALL == filter || HW_CPU_SHOW_CURFREQ == filter))
 		{
 			ret = SYSINFO_RET_OK;
-			sscanf(tmp, ZBX_FS_UI64, &curfreq);
+			ZBX_STR2UINT64(curfreq, tmp);
 		}
 	}
 

@@ -58,24 +58,27 @@ class testInheritanceGraph extends CWebTest {
 
 	// Returns update data
 	public static function update() {
-		return DBdata("select * from graphs g left join graphs_items gi on gi.graphid=g.graphid where gi.itemid='24329' and g.name LIKE 'testInheritanceGraph%' and g.graphid < 699999");
+		return DBdata("select * from graphs g left join graphs_items gi on gi.graphid=g.graphid where gi.itemid='23329' and g.name LIKE 'testInheritanceGraph%'");
 	}
 
 	/**
 	 * @dataProvider update
 	 */
 	public function testInheritanceGraph_SimpleUpdate($data) {
+		$name = $data['name'];
+
 		$sqlGraphs = "select * from graphs";
 		$oldHashGraphs = DBhash($sqlGraphs);
 
-		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&hostid=30000');
+		$this->zbxTestLogin('templates.php');
+		$this->zbxTestClickWait('link='.$this->template);
+		$this->zbxTestClickWait("//div[@class='w']//a[text()='Graphs']");
+		$this->zbxTestClickWait('link='.$name);
 		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of graphs');
-		$this->zbxTestTextPresent(array(
-			'Graph updated',
-			$data['name'],
-			'GRAPHS'
-		));
+		$this->zbxTestTextPresent('Graph updated');
+		$this->zbxTestTextPresent("$name");
+		$this->zbxTestTextPresent('GRAPHS');
 
 		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
 	}
@@ -88,7 +91,7 @@ class testInheritanceGraph extends CWebTest {
 					'expected' => GRAPH_BAD,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Name": cannot be empty.'
+						'Warning. Incorrect value for field "Name": cannot be empty.'
 					)
 				)
 			),
@@ -200,7 +203,7 @@ class testInheritanceGraph extends CWebTest {
 					'ymax_type' => 'Fixed',
 					'errors' => array(
 						'ERROR: Cannot add graph',
-						'No permissions to referred object or it does not exist!'
+						'Incorrect item for axis value.'
 					)
 				)
 			),
@@ -217,10 +220,10 @@ class testInheritanceGraph extends CWebTest {
 					'yaxismax' => 'name',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.',
-						'Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.',
-						'Field "yaxismin" is not decimal number.',
-						'Field "yaxismin" is not decimal number.'
+						'Warning. Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.',
+						'Warning. Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.',
+						'Warning. Field "yaxismin" is not decimal number.',
+						'Warning. Field "yaxismin" is not decimal number.'
 					)
 				)
 			),
@@ -235,8 +238,8 @@ class testInheritanceGraph extends CWebTest {
 					'ymax_type' => 'Fixed',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.',
-						'Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.'
+						'Warning. Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.',
+						'Warning. Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.'
 					)
 				)
 			),
@@ -321,7 +324,12 @@ class testInheritanceGraph extends CWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceGraph_SimpleCreate($data) {
-		$this->zbxTestLogin('graphs.php?hostid=30000&form=Create+graph');
+		$this->zbxTestLogin('templates.php');
+
+
+		$this->zbxTestClickWait('link='.$this->template);
+		$this->zbxTestClickWait("//div[@class='w']//a[text()='Graphs']");
+		$this->zbxTestClickWait('form');
 
 		if (isset($data['name'])) {
 			$this->input_type('name', $data['name']);

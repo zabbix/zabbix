@@ -84,17 +84,12 @@ validate_sort_and_sortorder('alias', ZBX_SORT_UP);
 if (isset($_REQUEST['userid'])) {
 	$users = API::User()->get(array(
 		'userids' => get_request('userid'),
-		'output' => API_OUTPUT_EXTEND,
-		'editable' => true
+		'output' => API_OUTPUT_EXTEND
 	));
-	if (!$users) {
+	if (empty($users)) {
 		access_deny();
 	}
 }
-if (get_request('filter_usrgrpid') && !API::UserGroup()->isWritable(array($_REQUEST['filter_usrgrpid']))) {
-	access_deny();
-}
-
 if (isset($_REQUEST['go'])) {
 	if (!isset($_REQUEST['group_userid']) || !is_array($_REQUEST['group_userid'])) {
 		access_deny();
@@ -102,8 +97,7 @@ if (isset($_REQUEST['go'])) {
 	else {
 		$usersChk = API::User()->get(array(
 			'userids' => $_REQUEST['group_userid'],
-			'countOutput' => true,
-			'editable' => true
+			'countOutput' => true
 		));
 		if ($usersChk != count($_REQUEST['group_userid'])) {
 			access_deny();
