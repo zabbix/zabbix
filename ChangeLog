@@ -1,6 +1,9 @@
 Changes for 2.1.5
 
 New features:
+A.F.I..... [ZBXNEXT-1786] implemented script name tree in menu popups (Eduard, Sasha)
+..F....... [ZBXNEXT-1786] redesigned menu popups using jQuery Menu (Eduard)
+..F....... [ZBXNEXT-1786] updated jQuery-ui to latest (Eduard)
 ..F....... [ZBX-6976] changed minimal php version parameter (Vitalij)
 ..F....... [ZBX-6846] the print link work with javascript instead of reloading the whole page (Vitalij)
 
