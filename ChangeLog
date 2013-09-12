@@ -3,6 +3,7 @@ Changes for 2.1.5
 New features:
 
 Bug fixes:
+..F....... [ZBX-6968] fixed add/remove favorites icon javascript (Vitalij)
 ..F....... [ZBX-6946] fixed octal numbers problem in trigger expression test (Vitalij)
 ...G...... [ZBX-6902] reverting Solaris system.swap.size calculation from "swap -s" (used in 2.0.7, 2.0.8) to "swap -l"-like algorithm (as in 2.0.6) (Andris)
 ...GI..PS. [ZBX-6955] fixed library order in linking, fixed compiler warnings, improved performance of zbx_snprintf_alloc() function (Andris)
