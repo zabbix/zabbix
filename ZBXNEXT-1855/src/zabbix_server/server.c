@@ -55,6 +55,7 @@
 #include "selfmon/selfmon.h"
 
 #include "valuecache.h"
+#include "zbxsetproctitle.h"
 
 #define INIT_SERVER(type, count)								\
 	process_type = type;									\

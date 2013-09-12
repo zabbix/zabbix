@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "log.h"
+#include "zbxsetproctitle.h"
 
 #if defined(MAC_OS_X)
 #include <crt_externs.h>
@@ -31,30 +32,30 @@
 extern char **environ;
 
 #if defined(HAVE_FUNCTION_SETPROCTITLE)
-#	define PS_USE_SETPROCTITLE	/* use the function setproctitle() (newer BSD systems) */
+#	define PS_USE_SETPROCTITLE	/* use setproctitle() (newer BSD systems) */
 #elif defined(HAVE_SYS_PSTAT_H) && defined(PSTAT_SETCMD)
-#	define PS_USE_PSTAT		/* use the pstat() (HPUX)*/
+#	define PS_USE_PSTAT		/* use pstat() (HPUX) */
 #elif defined(__linux__) || defined(_AIX) || (defined(sun) && !defined(BSD)) || defined(__osf__) || defined(MAC_OS_X)
 #	define PS_USE_CLOBBER_ARGV	/* write over the argv and environment area (most SysV-like systems) */
 #else
-#	define PS_USE_NONE		/* do not update ps display (default) */
+#	define PS_USE_NONE		/* do not update 'ps' display (default) */
 #endif
 
-/* Different systems want the buffer padded differently */
+/* different systems use different padding in the buffer */
 #if defined(_AIX) || defined(__linux__) || defined(MAC_OS_X)
 #	define PS_PADDING	'\0'
 #else
 #	define PS_PADDING	' '
 #endif
 
-#ifndef PS_USE_CLOBBER_ARGV
-/* all but one options need a buffer to write their ps line in */
+#if defined(PS_USE_CLOBBER_ARGV)
+static size_t		ps_buffer_size;	/* size determined at run time */
+static char		*ps_buffer;	/* pointer to argv area */
+#else
+/* all but one options need a buffer to write their 'ps' line in */
 #define PS_BUFFER_SIZE 256
 static const size_t	ps_buffer_size = PS_BUFFER_SIZE;
 static char		ps_buffer[PS_BUFFER_SIZE];
-#else /* PS_USE_CLOBBER_ARGV */
-static char		*ps_buffer; /* will point to argv area */
-static size_t		ps_buffer_size; /* space determined at run time */
 #endif   /* PS_USE_CLOBBER_ARGV */
 
 static int		save_argc;
@@ -63,29 +64,35 @@ static char		**save_argv;
 static char		argv_full[MAX_STRING_LEN];
 static char		prog_prefix[MAX_STRING_LEN];
 
-/*
- * Call this early in startup to save the original argc/argv values.
- * If needed, we make a copy of the original argv[] array to preserve it
- * from being clobbered by subsequent ps_display actions.
- *
- * (The original argv[] will not be overwritten by this routine, but may be
- * overwritten during init_ps_display.    Also, the physical location of the
- * environment strings may be moved, so this should be called before any code
- * that might try to hang onto a getenv() result.)
- */
+/******************************************************************************
+ *                                                                            *
+ * Function: save_ps_display_args                                             *
+ *                                                                            *
+ * Comments: Call this function early in startup to save the original         *
+ *           argc/argv values. If needed, this function makes a copy of the   *
+ *           original argv[] array to preserve it from being clobbered by     *
+ *           subsequent actions of *ps_display*() functions.                  *
+ *                                                                            *
+ *           The original argv[] will not be overwritten by this function,    *
+ *           but may be overwritten during init_ps_display(). Also, the       *
+ *           physical location of the environment strings may be moved, so    *
+ *           this function should be called before any code that might try to *
+ *           hang onto a getenv() result.                                     *
+ *                                                                            *
+ ******************************************************************************/
 void save_ps_display_args(int argc, char **argv, char **new_environ, char **new_argv)
 {
 #if defined(PS_USE_CLOBBER_ARGV)
 	char	*end_of_area = NULL;
 	int	i;
-#endif /* PS_USE_CLOBBER_ARGV */
+#endif
 
 	save_argc = argc;
 	save_argv = argv;
 
 #if defined(PS_USE_CLOBBER_ARGV)
-	/* count the available space before overwriting argv area and move the environment to make additional room */
-	/* check for contiguous argv strings */
+	/* Count the available space before overwriting argv area and move the environment to make additional room. */
+	/* Check for contiguous argv strings. */
 	for (i = 0; i < argc; i++)
 	{
 		if (i == 0 || end_of_area + 1 == argv[i])
@@ -121,8 +128,8 @@ void save_ps_display_args(int argc, char **argv, char **new_environ, char **new_
 	new_environ[i] = NULL;
 	environ = new_environ;
 
-/* Before changing the original argv[] make a copy for argument parsing purposes. */
-/* Some platforms have various dependencies on argv[]. */
+	/* Before changing the original argv[] make a copy for argument parsing purposes. */
+	/* Some platforms have various dependencies on argv[]. */
 
 	new_argv = (char **) zbx_malloc(new_argv, (argc + 1) * sizeof(char *));
 	for (i = 0; i < argc; i++)
@@ -135,8 +142,6 @@ void save_ps_display_args(int argc, char **argv, char **new_environ, char **new_
 #endif
 	argv = new_argv;
 #endif /* PS_USE_CLOBBER_ARGV */
-
-	return;
 }
 
 /* Update the ps status display to a fixed prefix plus an activity indication */
@@ -155,12 +160,12 @@ void set_ps_display(const char *activity)
 
 	zbx_snprintf(ps_buffer, ps_buffer_size, "");
 
-	/* Update ps_buffer to contain both fixed part and activity */
+	/* update ps_buffer to contain both fixed part and activity */
 #ifdef PS_USE_SETPROCTITLE
 	zbx_strlcpy(ps_buffer + strlen(prog_prefix), activity, ps_buffer_size - strlen(prog_prefix));
 #elif defined(sun)
 	/* SUN requires new ps name to be longer than the initial one, */
-	/* therefore activity is added to the initial ps name*/
+	/* therefore activity is added to the initial "ps" name. */
 	zbx_snprintf(ps_buffer, ps_buffer_size, "%s: %s", argv_full, activity);
 #else
 	zbx_snprintf(ps_buffer, ps_buffer_size, "%s: %s", prog_prefix, activity);
@@ -175,7 +180,7 @@ void set_ps_display(const char *activity)
 
 	pst.pst_command = ps_buffer;
 	pstat(PSTAT_SETCMD, pst, strlen(ps_buffer), 0, 0);
-#endif /* PS_USE_PSTAT */
+#endif
 
 #ifdef PS_USE_CLOBBER_ARGV
 	/* pad unused memory */
@@ -186,7 +191,7 @@ void set_ps_display(const char *activity)
 #endif /* not PS_USE_NONE */
 }
 
-/* Call this once during subprocess startup to set the identification values */
+/* call this once during subprocess startup to set the identification values */
 void init_ps_display(void)
 {
 #ifndef PS_USE_NONE

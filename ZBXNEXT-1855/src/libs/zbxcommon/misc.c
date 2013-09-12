@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "log.h"
+#include "zbxsetproctitle.h"
 
 #ifdef _WINDOWS
 char	ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;

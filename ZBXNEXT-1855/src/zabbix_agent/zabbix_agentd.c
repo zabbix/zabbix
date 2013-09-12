@@ -47,6 +47,8 @@
 #	include "daemon.h"
 #endif
 
+#include "zbxsetproctitle.h"
+
 const char	*progname = NULL;
 
 /* default config file location */

@@ -49,6 +49,7 @@
 #include "datasender/datasender.h"
 #include "heart/heart.h"
 #include "../zabbix_server/selfmon/selfmon.h"
+#include "zbxsetproctitle.h"
 
 #define INIT_PROXY(type, count)									\
 	process_type = type;									\
