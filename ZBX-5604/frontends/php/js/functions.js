@@ -946,3 +946,165 @@ function formatTimestamp(timestamp, isTsDouble, isExtend) {
 
 	return str;
 }
+
+/**
+ * Splitting string using slashes with escape backslash support.
+ *
+ * @param string $path
+ *
+ * @return array
+ */
+function splitPath(path) {
+	var items = [],
+		s = '',
+		escapes = '';
+
+	for (var i = 0, size = path.length; i < size; i++) {
+		if (path[i] === '/') {
+			if (escapes === '') {
+				items[items.length] = s;
+				s = '';
+			}
+			else {
+				if (escapes.length % 2 == 0) {
+					s += stripslashes(escapes);
+					items[items.length] = s;
+					s = escapes = '';
+				}
+				else {
+					s += stripslashes(escapes) + path[i];
+					escapes = '';
+				}
+			}
+		}
+		else if (path[i] === '\\') {
+			escapes += path[i];
+		}
+		else {
+			s += stripslashes(escapes) + path[i];
+			escapes = '';
+		}
+	}
+
+	if (escapes !== '') {
+		s += stripslashes(escapes);
+	}
+
+	items[items.length] = s;
+
+	return items;
+}
+
+/**
+ * Removing unescaped backslashes from string.
+ * Analog of PHP stripslashes().
+ *
+ * @param string str
+ *
+ * @return string
+ */
+function stripslashes(str) {
+	return str.replace(/\\(.?)/g, function(s, chars) {
+		if (chars == '\\') {
+			return '\\';
+		}
+		else if (chars == '') {
+			return '';
+		}
+		else {
+			return chars;
+		}
+	});
+}
+
+/**
+ * Execute script.
+ *
+ * @param string hostId			host id
+ * @param string scriptId		script id
+ * @param string confirmation	confirmation text
+ */
+function executeScript(hostId, scriptId, confirmation) {
+	var execute = function() {
+		if (!empty(hostId)) {
+			openWinCentered('scripts_exec.php?execute=1&hostid=' + hostId + '&scriptid=' + scriptId, 'Tools', 560, 470,
+				'titlebar=no, resizable=yes, scrollbars=yes, dialog=no'
+			);
+		}
+	};
+
+	if (confirmation.length > 0) {
+		var scriptDialog = jQuery('#scriptDialog');
+
+		if (scriptDialog.length == 0) {
+			scriptDialog = jQuery('<div>', {
+				id: 'scriptDialog',
+				css: {
+					display: 'none',
+					'white-space': 'normal',
+					'z-index': 1000
+				}
+			});
+
+			jQuery('body').append(scriptDialog);
+		}
+
+		scriptDialog
+			.text(confirmation)
+			.dialog({
+				buttons: [
+					{text: t('Execute'), click: function() {
+						jQuery(this).dialog('destroy');
+						execute();
+					}},
+					{text: t('Cancel'), click: function() {
+						jQuery(this).dialog('destroy');
+					}}
+				],
+				draggable: false,
+				modal: true,
+				width: (scriptDialog.outerWidth() + 20 > 600) ? 600 : 'inherit',
+				resizable: false,
+				minWidth: 200,
+				minHeight: 100,
+				title: t('Execution confirmation'),
+				close: function() {
+					jQuery(this).dialog('destroy');
+				}
+			});
+
+		if (empty(hostId)) {
+			jQuery('.ui-dialog-buttonset button:first').prop('disabled', true).addClass('ui-state-disabled');
+			jQuery('.ui-dialog-buttonset button:last').addClass('main').focus();
+		}
+		else {
+			jQuery('.ui-dialog-buttonset button:first').addClass('main');
+		}
+	}
+	else {
+		execute();
+	}
+}
+
+/**
+ * makes all elements which are not supported for printing view to disappear
+ * by including css file
+ *
+ * @param bool show
+ *
+ * @return void
+ */
+function printLess(show) {
+	if (!jQuery("#printLess").length) {
+		jQuery('<link rel="stylesheet" type="text/css" id="printLess">').appendTo('head').attr('href', './styles/print.css');
+
+		jQuery('.header_l.left, .header_r.right').each(function(i, obj) {
+			if (jQuery(this).find('input, form, select, .menu_icon').length) {
+				jQuery(this).addClass('hide-all-children');
+			}
+		})
+		jQuery('body').prepend('<div class="printless" >«BACK</div>').click(function() { printLess(false); });
+	}
+
+	jQuery("#printLess").prop("disabled", !show);
+}

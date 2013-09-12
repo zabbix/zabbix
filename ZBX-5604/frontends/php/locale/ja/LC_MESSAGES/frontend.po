@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-06 01:19+0300\n"
+"POT-Creation-Date: 2013-09-11 09:51+0300\n"
 "PO-Revision-Date: 2013-08-31 11:02+0300\n"
 "Last-Translator: Kodai Terashima <kodai.terashima@zabbix.com>\n"
 "Language-Team: Zabbix\n"
@@ -219,7 +219,7 @@ msgstr "SLAの許容値"
 msgid "Access denied!"
 msgstr "アクセスは拒否されました！"
 
-#: include/func.inc.php:2045
+#: include/func.inc.php:2047
 msgid "Access denied."
 msgstr "アクセスは拒否されました。"
 
@@ -389,7 +389,7 @@ msgstr "終了日時"
 #: include/views/administration.usergroups.edit.php:111
 #: include/views/administration.usergroups.edit.php:115
 #: include/views/administration.users.edit.php:90
-#: include/views/administration.users.edit.php:194
+#: include/views/administration.users.edit.php:195
 #: include/views/common.macros.php:66
 #: include/views/configuration.action.edit.php:308
 #: include/views/configuration.action.edit.php:507
@@ -799,11 +799,11 @@ msgstr "認証プロトコル"
 msgid "Auto registration"
 msgstr "自動登録"
 
-#: include/views/administration.users.edit.php:142
+#: include/views/administration.users.edit.php:143
 msgid "Auto-login"
 msgstr "自動ログイン (1ヶ月)"
 
-#: include/views/administration.users.edit.php:143 profile.php:47 users.php:59
+#: include/views/administration.users.edit.php:144 profile.php:47 users.php:59
 msgid "Auto-logout (min 90 seconds)"
 msgstr "自動ログアウト (最低90秒)"
 
@@ -1204,10 +1204,15 @@ msgstr "イベントの障害対応コメントを入力できません"
 msgid "Cannot activate web scenario"
 msgstr "Webシナリオを有効化できません"
 
-#: api/classes/CGraph.php:654 api/classes/CGraphPrototype.php:685
+#: api/classes/CGraph.php:696
 #, php-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
 msgstr "数値型ではないアイテム\"%1$s\"はグラフ\"%2$s\"に追加できません。"
+
+#: api/classes/CGraphPrototype.php:696 api/classes/CGraphPrototype.php:758
+#, php-format
+msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
+msgstr ""
 
 #: actionconf.php:150
 msgid "Cannot add action"
@@ -1278,10 +1283,15 @@ msgstr "メンテナンスを追加できません"
 msgid "Cannot add media type"
 msgstr "メディアタイプを追加できません"
 
-#: api/classes/CGraphGeneral.php:106
+#: api/classes/CGraph.php:43
 #, php-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
 msgstr "グラフ\"%1$s\"にグラフの合計値は2つ以上設定できません。"
+
+#: api/classes/CGraphPrototype.php:43
+#, php-format
+msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
+msgstr ""
 
 #: sysmaps.php:171
 msgid "Cannot add network map"
@@ -1491,7 +1501,7 @@ msgstr "グラフを削除できません"
 msgid "Cannot delete graphs"
 msgstr "グラフを削除できません"
 
-#: api/classes/CGraphPrototype.php:563
+#: api/classes/CGraphPrototype.php:577
 msgid "Cannot delete graphs created by low level discovery."
 msgstr "ローレベルディスカバリによって作成されたグラフは削除できません。"
 
@@ -1606,7 +1616,7 @@ msgstr "テンプレートを削除できません"
 msgid "Cannot delete templated application."
 msgstr "テンプレートのアプリケーションを削除できません。"
 
-#: api/classes/CGraph.php:529 api/classes/CGraphPrototype.php:538
+#: api/classes/CGraph.php:535 api/classes/CGraphPrototype.php:552
 msgid "Cannot delete templated graphs."
 msgstr "テンプレートのグラフを削除できません。"
 
@@ -1912,11 +1922,6 @@ msgstr "トリガー\"%2$s\"に\"%1$s\"を設定できません。"
 msgid "Cannot set \"templateid\" for application \"%1$s\"."
 msgstr "アプリケーション\"%1$s\"に\"templateid\"を設定できません。"
 
-#: api/classes/CGraphGeneral.php:57
-#, php-format
-msgid "Cannot set \"templateid\" for graph \"%1$s\"."
-msgstr "グラフ\"%1$s\"に\"templateid\"を設定できません。"
-
 #: api/classes/CScreen.php:376
 #, php-format
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
@@ -2010,10 +2015,15 @@ msgstr "トリガー\"%2$s\"の\"%1$s\"を更新できません。"
 msgid "Cannot update \"templateid\" for application \"%1$s\"."
 msgstr "アプリケーション\"%1$s\"の\"templateid\"を更新できません。"
 
-#: api/classes/CGraphGeneral.php:54
+#: api/classes/CGraph.php:42
 #, php-format
 msgid "Cannot update \"templateid\" for graph \"%1$s\"."
 msgstr "グラフ\"%1$s\"の\"templateid\"を更新できません。"
+
+#: api/classes/CGraphPrototype.php:42
+#, php-format
+msgid "Cannot update \"templateid\" for graph prototype \"%1$s\"."
+msgstr ""
 
 #: api/classes/CScreen.php:447 api/classes/CTemplateScreen.php:667
 #, php-format
@@ -2025,7 +2035,7 @@ msgstr "スクリーン\"%1$s\"の\"templateid\"を更新できません。"
 msgid "Cannot update \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "トリガーのプロトタイプ\"%1$s\"の\"templateid\"を更新できません。"
 
-#: api/classes/CGraphGeneral.php:192
+#: api/classes/CGraphGeneral.php:60
 msgid "Cannot update a discovered graph."
 msgstr "発見されたグラフを更新できません"
 
@@ -3443,7 +3453,7 @@ msgstr "スクリプトを削除しますか？"
 #: include/views/administration.usergroups.edit.php:116
 #: include/views/administration.usergroups.list.php:153
 #: include/views/administration.users.edit.php:94
-#: include/views/administration.users.edit.php:197
+#: include/views/administration.users.edit.php:198
 #: include/views/administration.users.list.php:138
 #: include/views/configuration.action.list.php:105
 #: include/views/configuration.application.list.php:120
@@ -3574,7 +3584,7 @@ msgstr "選択したテンプレートを削除しますか？"
 msgid "Delete selected triggers?"
 msgstr "選択したトリガーを削除しますか？"
 
-#: include/views/administration.users.edit.php:365
+#: include/views/administration.users.edit.php:366
 msgid "Delete selected user?"
 msgstr "選択したユーザーを削除しますか？"
 
@@ -3630,7 +3640,7 @@ msgstr "削除: \"%2$s\"のアプリケーション\"%1$s\"。"
 msgid "Deleted: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "削除: \"%2$s\"のディスカバリルール\"%1$s\"。"
 
-#: api/classes/CGraph.php:563
+#: api/classes/CGraph.php:569
 #, php-format
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "削除: \"%2$s\"のグラフ\"%1$s\"。"
@@ -3734,7 +3744,7 @@ msgid "Description"
 msgstr "説明"
 
 #: include/actions.inc.php:966 include/blocks.inc.php:719
-#: include/func.inc.php:2165
+#: include/func.inc.php:2167
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:44
 #: include/views/configuration.action.edit.php:328
@@ -3892,7 +3902,7 @@ msgstr "選択したトリガーを無効にしますか？"
 #: include/views/administration.usergroups.list.php:59
 #: include/views/administration.usergroups.list.php:84
 #: include/views/administration.usergroups.list.php:88
-#: include/views/administration.users.edit.php:163
+#: include/views/administration.users.edit.php:164
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.list.php:73
@@ -4023,7 +4033,7 @@ msgstr "ディスカバリのステータス"
 msgid "Display OK triggers for"
 msgstr "復旧トリガーの表示期間"
 
-#: include/func.inc.php:1848
+#: include/func.inc.php:1850
 msgid "Displaying"
 msgstr "Displaying"
 
@@ -4175,7 +4185,7 @@ msgctxt "Exa short"
 msgid "E"
 msgstr "E"
 
-#: include/func.inc.php:2132
+#: include/func.inc.php:2134
 msgid "ERROR"
 msgstr "エラー"
 
@@ -4187,7 +4197,7 @@ msgstr "イベント"
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "各URLの名前は重複できません。同じURL名が利用されていないか確認してください"
 
-#: include/views/administration.users.edit.php:189
+#: include/views/administration.users.edit.php:190
 #: include/views/configuration.action.edit.php:376
 #: include/views/configuration.action.edit.php:389
 #: include/views/configuration.maintenance.edit.php:112
@@ -4257,7 +4267,7 @@ msgstr "ホストが空白です。"
 
 #: api/classes/CAction.php:1235 api/classes/CApplication.php:288
 #: api/classes/CApplication.php:495 api/classes/CDiscoveryRule.php:339
-#: api/classes/CGraph.php:509 api/classes/CGraphPrototype.php:519
+#: api/classes/CGraph.php:515 api/classes/CGraphPrototype.php:533
 #: api/classes/CHostGroup.php:509 api/classes/CHostGroup.php:580
 #: api/classes/CHostInterface.php:465 api/classes/CHost.php:1428
 #: api/classes/CHostPrototype.php:906 api/classes/CIconMap.php:316
@@ -4413,7 +4423,7 @@ msgstr "選択したトリガーを有効にしますか？"
 #: include/views/administration.usergroups.list.php:58
 #: include/views/administration.usergroups.list.php:83
 #: include/views/administration.usergroups.list.php:88
-#: include/views/administration.users.edit.php:159
+#: include/views/administration.users.edit.php:160
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.edit.php:59
@@ -4817,7 +4827,7 @@ msgstr "フィンランド語 (fi_FI)"
 msgid "First"
 msgstr "第1週"
 
-#: include/func.inc.php:1793
+#: include/func.inc.php:1795
 msgctxt "page navigation"
 msgid "First"
 msgstr "第1週"
@@ -4882,7 +4892,7 @@ msgstr "フロントエンドへのアクセス"
 msgid "Frontend access updated"
 msgstr "フロントエンドへのアクセスを更新しました"
 
-#: include/views/administration.users.edit.php:208
+#: include/views/administration.users.edit.php:209
 msgid "Frontend messaging"
 msgstr "フロントエンドメッセージング"
 
@@ -4989,7 +4999,7 @@ msgstr "実行"
 msgid "Go to"
 msgstr "次のページへ移動"
 
-#: include/func.inc.php:2063
+#: include/func.inc.php:2065
 msgid "Go to dashboard"
 msgstr "ダッシュボードへ移動"
 
@@ -5009,33 +5019,33 @@ msgstr "グラデーションライン"
 msgid "Graph"
 msgstr "グラフ"
 
-#: api/classes/CGraph.php:417 api/classes/CGraphPrototype.php:424
+#: api/classes/CGraph.php:422 api/classes/CGraphPrototype.php:438
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (inherited from another template)."
 msgstr "グラフ\"%1$s\"は\"%2$s\"にすでに存在します (他のテンプレートからの継承)。"
 
-#: api/classes/CGraph.php:438 api/classes/CGraph.php:445
-#: api/classes/CGraphPrototype.php:446 api/classes/CGraphPrototype.php:453
+#: api/classes/CGraph.php:443 api/classes/CGraph.php:450
+#: api/classes/CGraphPrototype.php:460 api/classes/CGraphPrototype.php:467
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (items are not identical)."
 msgstr "グラフ\"%1$s\"は\"%2$s\"にすでに存在します (アイテムは同一ではありません)。"
 
-#: api/classes/CGraph.php:396 api/classes/CGraphPrototype.php:403
+#: api/classes/CGraph.php:401 api/classes/CGraphPrototype.php:416
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\"."
 msgstr "グラフ\"%1$s\"は\"%2$s\"にすでに存在します。"
 
-#: api/classes/CGraph.php:370 api/classes/CGraphPrototype.php:377
+#: api/classes/CGraph.php:375 api/classes/CGraphPrototype.php:382
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymax value item)."
 msgstr "グラフ\"%1$s\"は継承できません。指定されたアイテムは\"%2$s\"に存在しません (Y軸の最大値用のアイテム)。"
 
-#: api/classes/CGraph.php:378 api/classes/CGraphPrototype.php:385
+#: api/classes/CGraph.php:383 api/classes/CGraphPrototype.php:391
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymin value item)."
 msgstr "グラフ\"%1$s\"は継承できません。指定されたアイテムは\"%2$s\"に存在しません (Y軸の最小値用のアイテム)。"
 
-#: api/classes/CGraph.php:364 api/classes/CGraphPrototype.php:371
+#: api/classes/CGraph.php:369 api/classes/CGraphPrototype.php:376
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
 msgstr "グラフ\"%1$s\"は継承できません。指定されたアイテムは\"%2$s\"に存在しません。"
@@ -5085,12 +5095,12 @@ msgstr "グラフのプロトタイプ"
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
 msgstr "テンプレートのアイテムを含むグラフのプロトタイプ\"%1$s\"には他のホストのアイテムを設定できません。"
 
-#: api/classes/CGraphPrototype.php:570
+#: api/classes/CGraphPrototype.php:584
 #, php-format
 msgid "Graph prototype \"%s\" deleted."
 msgstr "グラフのプロトタイプ\"%s\"を削除しました。"
 
-#: api/classes/CGraphPrototype.php:673
+#: api/classes/CGraphPrototype.php:685 api/classes/CGraphPrototype.php:746
 msgid "Graph prototype must have at least one prototype."
 msgstr "グラフのプロトタイプは少なくとも1つ以上のプロトタイプを設定する必要があります。"
 
@@ -5119,13 +5129,13 @@ msgstr "グラフのタイプ"
 msgid "Graph updated"
 msgstr "グラフを更新しました"
 
-#: api/classes/CGraphGeneral.php:148
+#: api/classes/CGraphGeneral.php:735
 #, php-format
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
 msgstr "\"%1$s\"の名前を持つグラフはグラフもしくはグラフのプロトタイプにすでに存在します。"
 
-#: api/classes/CGraph.php:399 api/classes/CGraph.php:420
-#: api/classes/CGraphPrototype.php:406 api/classes/CGraphPrototype.php:427
+#: api/classes/CGraph.php:404 api/classes/CGraph.php:425
+#: api/classes/CGraphPrototype.php:420 api/classes/CGraphPrototype.php:441
 msgid "Graph with same name but other type exist."
 msgstr "同じ名前で異なるタイプのグラフが存在します。"
 
@@ -6037,7 +6047,7 @@ msgstr "アイコン"
 msgid "Identical expression already exists"
 msgstr "同じ設定の正規表現がすでに存在します"
 
-#: include/func.inc.php:2053 include/func.inc.php:2073
+#: include/func.inc.php:2055 include/func.inc.php:2075
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "このメッセージが間違っている場合は、必要な権限を得るために管理者に問い合わせてください"
 
@@ -6509,7 +6519,7 @@ msgstr "インベントリのフィールド\"%s\"が正しくありません。
 msgid "Incorrect item ID \"%s\" provided for screen element."
 msgstr "スクリーンの要素のアイテムID\"%s\"が正しくありません。"
 
-#: api/classes/CGraphGeneral.php:396
+#: api/classes/CGraphGeneral.php:314
 msgid "Incorrect item for axis value."
 msgstr "軸に設定されたアイテムが正しくありません。"
 
@@ -7561,7 +7571,7 @@ msgstr "ラベル"
 msgid "Label location"
 msgstr "ラベルの位置"
 
-#: include/views/administration.users.edit.php:129
+#: include/views/administration.users.edit.php:130
 msgid "Language"
 msgstr "言語"
 
@@ -7569,7 +7579,7 @@ msgstr "言語"
 msgid "Last"
 msgstr "最新"
 
-#: include/func.inc.php:1833
+#: include/func.inc.php:1835
 msgctxt "page navigation"
 msgid "Last"
 msgstr "最新"
@@ -7848,7 +7858,7 @@ msgstr "マッチしないSNMPトラップをログに記録"
 msgid "Logged in as"
 msgstr "次のユーザーでログイン"
 
-#: auditlogs.php:143 include/func.inc.php:2059 include/func.inc.php:2076
+#: auditlogs.php:143 include/func.inc.php:2061 include/func.inc.php:2078
 #: include/menu.inc.php:282 include/page_header.php:246
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:64
@@ -8194,7 +8204,7 @@ msgid "Max count of events per trigger to show"
 msgstr "トリガーあたりのイベント表示の最大数"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2167
+#: include/func.inc.php:2169
 msgid "Maximize"
 msgstr "最大化"
 
@@ -8253,8 +8263,8 @@ msgctxt "May short"
 msgid "May"
 msgstr "5月"
 
-#: include/views/administration.users.edit.php:193
-#: include/views/administration.users.edit.php:321 popup_media.php:27
+#: include/views/administration.users.edit.php:194
+#: include/views/administration.users.edit.php:322 popup_media.php:27
 msgid "Media"
 msgstr "メディア"
 
@@ -8336,11 +8346,11 @@ msgstr "メッセージアクション"
 msgid "Message text limit"
 msgstr "メッセージの上限文字数"
 
-#: include/views/administration.users.edit.php:214
+#: include/views/administration.users.edit.php:215
 msgid "Message timeout"
 msgstr "メッセージタイムアウト"
 
-#: include/views/administration.users.edit.php:209
+#: include/views/administration.users.edit.php:210
 msgid "Message timeout (seconds)"
 msgstr "メッセージタイムアウト (秒)"
 
@@ -8348,7 +8358,7 @@ msgstr "メッセージタイムアウト (秒)"
 msgid "Messages"
 msgstr "メッセージ"
 
-#: include/views/administration.users.edit.php:350
+#: include/views/administration.users.edit.php:351
 msgid "Messaging"
 msgstr "メッセージング"
 
@@ -8362,7 +8372,7 @@ msgid "Middle"
 msgstr "中央"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2167
+#: include/func.inc.php:2169
 msgid "Minimize"
 msgstr "最小化"
 
@@ -8435,19 +8445,19 @@ msgstr "分"
 msgid "Missing \"%1$s\" field for action condition."
 msgstr "アクションの実行条件の\"%1$s\"フィールドが存在しません。"
 
-#: api/classes/CGraphGeneral.php:531
+#: api/classes/CGraphGeneral.php:75
 msgid "Missing \"gitemid\" field for item."
 msgstr "アイテムの\"gitemid\"フィールドが存在しません。"
 
-#: api/classes/CGraph.php:603 api/classes/CGraphPrototype.php:611
+#: api/classes/CGraphGeneral.php:474 api/classes/CGraphGeneral.php:590
 msgid "Missing \"itemid\" field for item."
 msgstr "アイテムの\"itemid\"フィールドが存在しません。"
 
-#: api/classes/CGraphPrototype.php:593
+#: api/classes/CGraphPrototype.php:39
 msgid "Missing \"name\" field for graph prototype."
 msgstr "グラフのプロトタイプの\"name\"フィールドが存在しません。"
 
-#: api/classes/CGraph.php:586
+#: api/classes/CGraph.php:39
 msgid "Missing \"name\" field for graph."
 msgstr "グラフの\"name\"フィールドが存在しません。"
 
@@ -8457,12 +8467,12 @@ msgstr "グラフの\"name\"フィールドが存在しません。"
 msgid "Missing item \"%1$s\" for host \"%2$s\"."
 msgstr "ホスト\"%2$s\"のアイテム\"%1$s\"が存在しません。"
 
-#: api/classes/CGraph.php:592
+#: api/classes/CGraph.php:40
 #, php-format
 msgid "Missing items for graph \"%1$s\"."
 msgstr "グラフ\"%1$s\"のアイテムが存在しません。"
 
-#: api/classes/CGraphPrototype.php:600
+#: api/classes/CGraphPrototype.php:40
 #, php-format
 msgid "Missing items for graph prototype \"%1$s\"."
 msgstr "グラフのプロトタイプ\"%1$s\"のアイテムが存在しません。"
@@ -8532,7 +8542,7 @@ msgstr "条件に一致するデータがさらに存在します..."
 msgid "More than 10 minutes"
 msgstr "10分以上"
 
-#: api/classes/CGraphGeneral.php:160
+#: api/classes/CGraphGeneral.php:747
 #, php-format
 msgid "More than one graph with name \"%1$s\" within host."
 msgstr "ホストに\"%1$s\"の名前を持つグラフが1つ以上存在します。"
@@ -8738,25 +8748,25 @@ msgstr "新規サービスタイム"
 msgid "Next"
 msgstr "次へ"
 
-#: include/func.inc.php:1826
+#: include/func.inc.php:1828
 msgctxt "page navigation"
 msgid "Next"
 msgstr "次へ"
 
 #: events.php:756 include/events.inc.php:356 include/events.inc.php:374
-#: include/func.inc.php:2386 include/triggers.inc.php:1608
+#: include/func.inc.php:2388 include/triggers.inc.php:1608
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
 #: include/views/js/adm.regexprs.edit.js.php:142
 msgid "No"
 msgstr "いいえ"
 
-#: api/classes/CGraphPrototype.php:623 api/classes/CGraphPrototype.php:633
+#: api/classes/CGraphPrototype.php:41
 #, php-format
 msgid "No \"%1$s\" given for graph prototype."
 msgstr "グラフのプロトタイプに\"%1$s\"が定義されていません。"
 
-#: api/classes/CGraph.php:614 api/classes/CGraph.php:622
+#: api/classes/CGraph.php:41
 #, php-format
 msgid "No \"%1$s\" given for graph."
 msgstr "グラフに\"%1$s\"が定義されていません。"
@@ -9142,7 +9152,7 @@ msgstr "マップが設定されていません。"
 msgid "No matches found"
 msgstr "条件に一致するデータはありません"
 
-#: include/views/administration.users.edit.php:155
+#: include/views/administration.users.edit.php:156
 msgid "No media defined."
 msgstr "メディアが設定されていません。"
 
@@ -9218,39 +9228,40 @@ msgstr "システムへのアクセス権がありません。"
 #: api/classes/CApplication.php:533 api/classes/CDiscoveryRule.php:357
 #: api/classes/CDiscoveryRule.php:451 api/classes/CDiscoveryRule.php:456
 #: api/classes/CDRule.php:255 api/classes/CDRule.php:578
-#: api/classes/CEvent.php:732 api/classes/CGraphGeneral.php:197
-#: api/classes/CGraphGeneral.php:542 api/classes/CGraph.php:642
-#: api/classes/CGraphPrototype.php:654 api/classes/CHostBase.php:45
-#: api/classes/CHostGeneral.php:139 api/classes/CHostGroup.php:522
-#: api/classes/CHostGroup.php:595 api/classes/CHostGroup.php:778
-#: api/classes/CHostGroup.php:840 api/classes/CHostGroup.php:893
-#: api/classes/CHostGroup.php:902 api/classes/CHostGroup.php:924
-#: api/classes/CHostInterface.php:319 api/classes/CHostInterface.php:335
-#: api/classes/CHostInterface.php:476 api/classes/CHostInterface.php:674
-#: api/classes/CHost.php:688 api/classes/CHost.php:716
-#: api/classes/CHost.php:1813 api/classes/CHostPrototype.php:1020
-#: api/classes/CHostPrototype.php:1035 api/classes/CHostPrototype.php:1048
-#: api/classes/CHostPrototype.php:1061 api/classes/CHttpTest.php:393
-#: api/classes/CIconMap.php:319 api/classes/CImage.php:243
-#: api/classes/CImage.php:357 api/classes/CImage.php:474
-#: api/classes/CItemGeneral.php:182 api/classes/CItemGeneral.php:232
-#: api/classes/CItem.php:688 api/classes/CItemPrototype.php:508
-#: api/classes/CMaintenance.php:320 api/classes/CMaintenance.php:345
-#: api/classes/CMaintenance.php:358 api/classes/CMaintenance.php:466
-#: api/classes/CMaintenance.php:483 api/classes/CMaintenance.php:550
-#: api/classes/CMapElement.php:56 api/classes/CMapElement.php:145
-#: api/classes/CMap.php:389 api/classes/CProxy.php:171
-#: api/classes/CProxy.php:212 api/classes/CProxy.php:284
-#: api/classes/CProxy.php:550 api/classes/CScreenItem.php:328
-#: api/classes/CScreenItem.php:412 api/classes/CScreen.php:438
-#: api/classes/CScreen.php:518 api/classes/CService.php:1253
-#: api/classes/CService.php:1268 api/classes/CTemplateScreen.php:703
-#: api/classes/CTemplateScreen.php:724 api/classes/CTemplateScreen.php:730
-#: api/classes/CTrigger.php:652 api/classes/CTrigger.php:977
-#: api/classes/CTrigger.php:998 api/classes/CTrigger.php:1843
-#: api/classes/CTriggerPrototype.php:566 api/classes/CTriggerPrototype.php:669
-#: api/classes/CUserMacro.php:726 api/classes/CUserMacro.php:835
-#: api/classes/CUser.php:1156 include/func.inc.php:2032
+#: api/classes/CEvent.php:732 api/classes/CGraphGeneral.php:65
+#: api/classes/CGraphGeneral.php:86 api/classes/CGraph.php:686
+#: api/classes/CGraphPrototype.php:667 api/classes/CGraphPrototype.php:727
+#: api/classes/CHostBase.php:45 api/classes/CHostGeneral.php:139
+#: api/classes/CHostGroup.php:522 api/classes/CHostGroup.php:595
+#: api/classes/CHostGroup.php:778 api/classes/CHostGroup.php:840
+#: api/classes/CHostGroup.php:893 api/classes/CHostGroup.php:902
+#: api/classes/CHostGroup.php:924 api/classes/CHostInterface.php:319
+#: api/classes/CHostInterface.php:335 api/classes/CHostInterface.php:476
+#: api/classes/CHostInterface.php:674 api/classes/CHost.php:688
+#: api/classes/CHost.php:716 api/classes/CHost.php:1813
+#: api/classes/CHostPrototype.php:1020 api/classes/CHostPrototype.php:1035
+#: api/classes/CHostPrototype.php:1048 api/classes/CHostPrototype.php:1061
+#: api/classes/CHttpTest.php:393 api/classes/CIconMap.php:319
+#: api/classes/CImage.php:243 api/classes/CImage.php:357
+#: api/classes/CImage.php:474 api/classes/CItemGeneral.php:182
+#: api/classes/CItemGeneral.php:232 api/classes/CItem.php:688
+#: api/classes/CItemPrototype.php:508 api/classes/CMaintenance.php:320
+#: api/classes/CMaintenance.php:345 api/classes/CMaintenance.php:358
+#: api/classes/CMaintenance.php:466 api/classes/CMaintenance.php:483
+#: api/classes/CMaintenance.php:550 api/classes/CMapElement.php:56
+#: api/classes/CMapElement.php:145 api/classes/CMap.php:389
+#: api/classes/CProxy.php:171 api/classes/CProxy.php:212
+#: api/classes/CProxy.php:284 api/classes/CProxy.php:550
+#: api/classes/CScreenItem.php:328 api/classes/CScreenItem.php:412
+#: api/classes/CScreen.php:438 api/classes/CScreen.php:518
+#: api/classes/CService.php:1253 api/classes/CService.php:1268
+#: api/classes/CTemplateScreen.php:703 api/classes/CTemplateScreen.php:724
+#: api/classes/CTemplateScreen.php:730 api/classes/CTrigger.php:652
+#: api/classes/CTrigger.php:977 api/classes/CTrigger.php:998
+#: api/classes/CTrigger.php:1843 api/classes/CTriggerPrototype.php:566
+#: api/classes/CTriggerPrototype.php:669 api/classes/CUserMacro.php:726
+#: api/classes/CUserMacro.php:835 api/classes/CUser.php:1156
+#: include/func.inc.php:2034
 msgid "No permissions to referred object or it does not exist!"
 msgstr "対象が存在しないか、アクセス権がありません！"
 
@@ -9733,7 +9744,7 @@ msgstr "ON"
 msgid "On status change triggers blink for"
 msgstr "ステータスが変化したトリガーの点滅期間"
 
-#: include/views/administration.users.edit.php:212
+#: include/views/administration.users.edit.php:213
 msgid "Once"
 msgstr "一度だけ"
 
@@ -10301,11 +10312,11 @@ msgid "Periods"
 msgstr "期間"
 
 #: include/views/administration.usergroups.edit.php:129
-#: include/views/administration.users.edit.php:347
+#: include/views/administration.users.edit.php:348
 msgid "Permissions"
 msgstr "権限"
 
-#: include/views/administration.users.edit.php:345
+#: include/views/administration.users.edit.php:346
 msgid "Permissions can be assigned for user groups only."
 msgstr "権限はユーザーグループにのみ割り当てることができます。"
 
@@ -10329,12 +10340,12 @@ msgstr "配置アルゴリズム"
 msgid "Plain text"
 msgstr "プレーンテキスト"
 
-#: include/views/administration.users.edit.php:227
-#: include/views/administration.users.edit.php:264
+#: include/views/administration.users.edit.php:228
+#: include/views/administration.users.edit.php:265
 msgid "Play"
 msgstr "再生"
 
-#: include/views/administration.users.edit.php:215
+#: include/views/administration.users.edit.php:216
 msgid "Play sound"
 msgstr "サウンド再生"
 
@@ -10413,7 +10424,7 @@ msgstr "プレビュー"
 msgid "Previous"
 msgstr "前"
 
-#: include/func.inc.php:1799
+#: include/func.inc.php:1801
 msgctxt "page navigation"
 msgid "Previous"
 msgstr "前"
@@ -10656,7 +10667,7 @@ msgstr "受信者 (降順)"
 msgid "Recipient(s)"
 msgstr "送信先"
 
-#: include/views/administration.users.edit.php:224
+#: include/views/administration.users.edit.php:225
 msgid "Recovery"
 msgstr "復旧"
 
@@ -10669,15 +10680,15 @@ msgstr "リカバリメッセージ"
 msgid "Recovery subject"
 msgstr "リカバリの件名"
 
-#: include/views/administration.users.edit.php:144 profile.php:49 users.php:61
+#: include/views/administration.users.edit.php:145 profile.php:49 users.php:61
 msgid "Refresh (in seconds)"
 msgstr "更新(秒)"
 
-#: include/func.inc.php:1907
+#: include/func.inc.php:1909
 msgid "Refresh time in seconds"
 msgstr "リフレッシュ間隔"
 
-#: include/func.inc.php:1911
+#: include/func.inc.php:1913
 msgid "Refresh time multiplier"
 msgstr "リフレッシュ間隔の乗数"
 
@@ -11031,7 +11042,7 @@ msgstr "X - %1$s、Y - %2$sに設定されているスクリーンの行の高�
 msgid "Rows"
 msgstr "行"
 
-#: include/views/administration.users.edit.php:145 profile.php:50 users.php:62
+#: include/views/administration.users.edit.php:146 profile.php:50 users.php:62
 msgid "Rows per page"
 msgstr "ベージあたりの表示行数"
 
@@ -11280,9 +11291,9 @@ msgstr "土曜"
 #: include/views/administration.script.edit.php:119
 #: include/views/administration.usergroups.edit.php:137
 #: include/views/administration.usergroups.edit.php:143
-#: include/views/administration.users.edit.php:358
-#: include/views/administration.users.edit.php:362
-#: include/views/administration.users.edit.php:372
+#: include/views/administration.users.edit.php:359
+#: include/views/administration.users.edit.php:363
+#: include/views/administration.users.edit.php:373
 #: include/views/configuration.action.edit.php:1034
 #: include/views/configuration.application.edit.php:52
 #: include/views/configuration.application.edit.php:62
@@ -11513,7 +11524,7 @@ msgstr "セカンダリPOC電話番号B"
 msgid "Secondary POC screen name"
 msgstr "セカンダリPOCスクリーン名"
 
-#: include/views/administration.users.edit.php:213
+#: include/views/administration.users.edit.php:214
 msgid "Seconds"
 msgstr "秒"
 
@@ -12181,8 +12192,8 @@ msgstr "\"%1$s\"の名前を持つステップがすでに存在します。"
 msgid "Steps"
 msgstr "ステップ"
 
-#: include/views/administration.users.edit.php:228
-#: include/views/administration.users.edit.php:265
+#: include/views/administration.users.edit.php:229
+#: include/views/administration.users.edit.php:266
 msgid "Stop"
 msgstr "停止"
 
@@ -12261,7 +12272,7 @@ msgstr "スウェーデン語 (sv_SE)"
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "認証方式の変更を行うと現在のセッション以外はリセットされます実行しますか？"
 
-#: include/users.inc.php:83 include/views/administration.users.edit.php:132
+#: include/users.inc.php:83 include/views/administration.users.edit.php:133
 msgid "System default"
 msgstr "システムデフォルト"
 
@@ -12546,7 +12557,7 @@ msgstr "受信したリモートプロシージャーは存在しないか利用
 msgid "The web scenario application belongs to a different host than the web scenario host."
 msgstr "Webシナリオが設定されているホストと異なるホストに所属するアプリケーションが利用されています。"
 
-#: include/views/administration.users.edit.php:134
+#: include/views/administration.users.edit.php:135
 msgid "Theme"
 msgstr "テーマ"
 
@@ -12858,7 +12869,7 @@ msgstr "トリガーのプロトタイプ:"
 msgid "Trigger severities"
 msgstr "トリガーの深刻度"
 
-#: include/actions.inc.php:54 include/views/administration.users.edit.php:272
+#: include/actions.inc.php:54 include/views/administration.users.edit.php:273
 msgid "Trigger severity"
 msgstr "トリガーの深刻度"
 
@@ -13043,7 +13054,7 @@ msgstr ""
 msgid "URL"
 msgstr ""
 
-#: include/views/administration.users.edit.php:146
+#: include/views/administration.users.edit.php:147
 msgid "URL (after login)"
 msgstr "ログイン後のURL"
 
@@ -13081,7 +13092,7 @@ msgstr "USA (160文字)"
 msgid "USER PROFILE"
 msgstr "ユーザープロファイル"
 
-#: include/func.inc.php:2565
+#: include/func.inc.php:2567
 msgid "UTF-8"
 msgstr ""
 
@@ -13423,7 +13434,7 @@ msgstr "アクションで利用"
 #: include/audit.inc.php:24 include/hosts.inc.php:67 include/setup.inc.php:274
 #: include/views/administration.auditlogs.list.php:56
 #: include/views/administration.auditlogs.list.php:86
-#: include/views/administration.users.edit.php:316
+#: include/views/administration.users.edit.php:317
 #: include/views/configuration.action.edit.php:512
 #: include/views/configuration.httpconf.edit.php:82
 msgid "User"
@@ -13438,7 +13449,7 @@ msgstr "ユーザー\"%s\"にユーザーグループを設定してください
 msgid "User added"
 msgstr "ユーザーを追加しました"
 
-#: include/views/administration.users.edit.php:337
+#: include/views/administration.users.edit.php:338
 msgid "User can't change type for himself"
 msgstr "ユーザーは自身のユーザータイプを変更できません"
 
@@ -13538,8 +13549,8 @@ msgstr "ユーザープロファイル"
 msgid "User sessions"
 msgstr "ユーザーセッション"
 
-#: include/views/administration.users.edit.php:337
-#: include/views/administration.users.edit.php:341
+#: include/views/administration.users.edit.php:338
+#: include/views/administration.users.edit.php:342
 #: include/views/administration.users.list.php:58
 msgid "User type"
 msgstr "ユーザーの種類"
@@ -14011,7 +14022,7 @@ msgstr ""
 msgid "Y axis MAX value"
 msgstr "Y軸の最大値"
 
-#: api/classes/CGraphGeneral.php:116
+#: api/classes/CGraphGeneral.php:338
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "Y軸の最大値はY軸の最小値よりも大きな値を設定してください。"
 
@@ -14062,7 +14073,7 @@ msgstr "毎年"
 
 #: events.php:756 include/blocks.inc.php:727
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:359
-#: include/events.inc.php:377 include/func.inc.php:2386
+#: include/events.inc.php:377 include/func.inc.php:2388
 #: include/triggers.inc.php:1608
 #: include/views/administration.users.list.php:76
 #: include/views/js/adm.regexprs.edit.js.php:139
@@ -14073,7 +14084,7 @@ msgstr "はい"
 msgid "Yotta"
 msgstr "ヨタ"
 
-#: include/views/administration.users.edit.php:127
+#: include/views/administration.users.edit.php:128
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Webサーバーにロケールがインストールされていないため、いくつかの言語は利用できません。"
 
@@ -14082,7 +14093,7 @@ msgstr "Webサーバーにロケールがインストールされていないた
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "ユーザー\"%s\"の権限変更は許可されていません。"
 
-#: include/func.inc.php:2069
+#: include/func.inc.php:2071
 msgid "You are not logged in."
 msgstr "ログインしていません"
 
@@ -14108,7 +14119,7 @@ msgstr "アクションのコマンド実行\"%s\"のターゲットが指定さ
 msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr "アクションのグローバルスクリプト\"%s\"のターゲットが指定されていません。"
 
-#: api/classes/CGraph.php:525 api/classes/CGraphPrototype.php:535
+#: api/classes/CGraph.php:531 api/classes/CGraphPrototype.php:549
 #: api/classes/CHost.php:1013 api/classes/CHost.php:1070
 #: api/classes/CHost.php:1394 api/classes/CHttpTest.php:503
 #: api/classes/CMaintenance.php:537 api/classes/CMaintenance.php:644
@@ -14133,15 +14144,15 @@ msgstr "他のユーザーを更新する権限がありません。"
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "ユーザーを更新する権限がないか、ユーザーが存在しません。"
 
-#: include/func.inc.php:2051
+#: include/func.inc.php:2053
 msgid "You have no permissions to access this page."
 msgstr "このページを表示する権限がありません。"
 
-#: include/func.inc.php:2071
+#: include/func.inc.php:2073
 msgid "You must login to view this page."
 msgstr "このページを表示するためにはログインする必要があります"
 
-#: include/func.inc.php:2047
+#: include/func.inc.php:2049
 msgid "Your are logged in as"
 msgstr "次のユーザーでログイン"
 
@@ -14461,7 +14472,7 @@ msgstr "実行"
 msgid "fixed"
 msgstr ""
 
-#: include/func.inc.php:1858
+#: include/func.inc.php:1860
 msgid "found"
 msgstr ""
 
@@ -14640,7 +14651,7 @@ msgid "now"
 msgstr "現在"
 
 #: include/blocks.inc.php:352 include/blocks.inc.php:696
-#: include/func.inc.php:1855
+#: include/func.inc.php:1857
 msgid "of"
 msgstr ""
 
@@ -14718,7 +14729,7 @@ msgstr "値のマッピングの表示"
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "テンプレートID\"%1$s\"が%2$s回利用されています"
 
-#: include/func.inc.php:1851
+#: include/func.inc.php:1853
 msgid "to"
 msgstr ""
 
