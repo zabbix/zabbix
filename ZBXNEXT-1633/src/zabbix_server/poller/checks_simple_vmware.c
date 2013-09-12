@@ -1746,7 +1746,7 @@ static void	vmware_datastores_add(CURL *easyhandle, zbx_vector_ptr_t *datastores
 			if ('/' == url[len - 1])
 				url[len - 1] = '\0';
 
-			for (ptr = url + len - 2; *ptr != '/'; ptr--)
+			for (ptr = url + len - 2; ptr > url && *ptr != '/'; ptr--)
 				;
 
 			uuid = zbx_strdup(NULL, ptr + 1);
