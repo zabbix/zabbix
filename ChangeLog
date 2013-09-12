@@ -2,6 +2,7 @@ Changes for 2.1.5
 
 New features:
 ..F....... [ZBX-6976] changed minimal php version parameter (Vitalij)
+..F....... [ZBX-6846] the print link work with javascript instead of reloading the whole page (Vitalij)
 
 Bug fixes:
 ..F....... [ZBX-6968] fixed add/remove favorites icon javascript (Vitalij)
