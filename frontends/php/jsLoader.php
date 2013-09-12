@@ -51,6 +51,7 @@ require_once dirname(__FILE__).'/include/translateDefines.inc.php';
 $availableJScripts = array(
 	'common.js' => '',
 	'menu.js' => '',
+	'menupopup.js' => '',
 	'gtlc.js' => '',
 	'functions.js' => '',
 	'main.js' => '',
@@ -98,17 +99,20 @@ $tranStrings = array(
 		'S_DATE_FORMAT' => FILTER_TIMEBAR_DATE_FORMAT
 	),
 	'functions.js' => array(
+		'Cancel' => _('Cancel'),
 		'DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q' => _('Do you wish to replace the conditional expression?'),
+		'Events' => _('Events'),
+		'Execute' => _('Execute'),
+		'Execution confirmation' => _('Execution confirmation'),
+		'History' => _('History'),
+		'History and simple graphs' => _('History and simple graphs'),
 		'S_INSERT_MACRO' => _('Insert macro'),
 		'S_CREATE_LOG_TRIGGER' => _('Create trigger'),
 		'S_DELETE' => _('Delete'),
 		'S_DELETE_KEYWORD_Q' => _('Delete keyword?'),
 		'S_DELETE_EXPRESSION_Q' => _('Delete expression?'),
 		'Simple graphs' => _('Simple graphs'),
-		'History' => _('History'),
-		'History and simple graphs' => _('History and simple graphs'),
-		'Triggers' => _('Triggers'),
-		'Events' => _('Events'),
+		'Triggers' => _('Triggers')
 	),
 	'class.calendar.js' => array(
 		'S_JANUARY' => _('January'),
@@ -189,6 +193,27 @@ $tranStrings = array(
 		'More matches found...' => _('More matches found...'),
 		'type here to search' => _('type here to search'),
 		'new' => _('new')
+	),
+	'menupopup.js' => array(
+		'Acknowledge' => _('Acknowledge'),
+		'Configuration' => _('Configuration'),
+		'Events' => _('Events'),
+		'Go to' => _('Go to'),
+		'History' => _('History'),
+		'Host inventories' => _('Host inventories'),
+		'Host screens' => _('Host screens'),
+		'Latest data' => _('Latest data'),
+		'Latest events' => _('Latest events'),
+		'Latest values' => _('Latest values'),
+		'Last hour graph' => _('Last hour graph'),
+		'Last month graph' => _('Last month graph'),
+		'Last week graph' => _('Last week graph'),
+		'Scripts' => _('Scripts'),
+		'Status of triggers' => _('Status of triggers'),
+		'Submap' => _('Submap'),
+		'Trigger' => _('Trigger'),
+		'URL' => _('URL'),
+		'URLs' => _('URLs')
 	)
 );
 
@@ -209,6 +234,7 @@ if (empty($_GET['files'])) {
 		'main.js',
 		'functions.js',
 		'menu.js',
+		'menupopup.js',
 		'init.js'
 	);
 	// load frontend messaging only for some pages

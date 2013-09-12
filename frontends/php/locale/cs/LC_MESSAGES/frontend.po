@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-06 01:17+0300\n"
+"POT-Creation-Date: 2013-09-11 09:51+0300\n"
 "PO-Revision-Date: 2012-04-05 23:44+0200\n"
 "Last-Translator: Jakub <lauda.jakub@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -232,7 +232,7 @@ msgstr ""
 msgid "Access denied!"
 msgstr "Přístup odepřen!"
 
-#: include/func.inc.php:2045
+#: include/func.inc.php:2047
 msgid "Access denied."
 msgstr ""
 
@@ -402,7 +402,7 @@ msgstr "Aktivní do"
 #: include/views/administration.usergroups.edit.php:111
 #: include/views/administration.usergroups.edit.php:115
 #: include/views/administration.users.edit.php:90
-#: include/views/administration.users.edit.php:194
+#: include/views/administration.users.edit.php:195
 #: include/views/common.macros.php:66
 #: include/views/configuration.action.edit.php:308
 #: include/views/configuration.action.edit.php:507
@@ -816,11 +816,11 @@ msgstr ""
 msgid "Auto registration"
 msgstr "Auto registrace"
 
-#: include/views/administration.users.edit.php:142
+#: include/views/administration.users.edit.php:143
 msgid "Auto-login"
 msgstr "Auto-login"
 
-#: include/views/administration.users.edit.php:143 profile.php:47 users.php:59
+#: include/views/administration.users.edit.php:144 profile.php:47 users.php:59
 msgid "Auto-logout (min 90 seconds)"
 msgstr "Automatické odhlášení (min 90 sekund)"
 
@@ -1221,9 +1221,14 @@ msgstr "Nelze potvrdit událost"
 msgid "Cannot activate web scenario"
 msgstr ""
 
-#: api/classes/CGraph.php:654 api/classes/CGraphPrototype.php:685
+#: api/classes/CGraph.php:696
 #, php-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
+msgstr ""
+
+#: api/classes/CGraphPrototype.php:696 api/classes/CGraphPrototype.php:758
+#, php-format
+msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
 msgstr ""
 
 #: actionconf.php:150
@@ -1295,10 +1300,15 @@ msgstr "Nelze přidat servisní okno"
 msgid "Cannot add media type"
 msgstr "Nelze přidat typ média"
 
-#: api/classes/CGraphGeneral.php:106
+#: api/classes/CGraph.php:43
 #, php-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
 msgstr "Nelze přidat více než jednu položku typu \"Souhrn grafu\" pro graf \"%1$s\"."
+
+#: api/classes/CGraphPrototype.php:43
+#, php-format
+msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
+msgstr ""
 
 #: sysmaps.php:171
 msgid "Cannot add network map"
@@ -1508,7 +1518,7 @@ msgstr ""
 msgid "Cannot delete graphs"
 msgstr "Nelze smazat grafy"
 
-#: api/classes/CGraphPrototype.php:563
+#: api/classes/CGraphPrototype.php:577
 msgid "Cannot delete graphs created by low level discovery."
 msgstr ""
 
@@ -1626,7 +1636,7 @@ msgstr "Nelze smazat šablonu"
 msgid "Cannot delete templated application."
 msgstr ""
 
-#: api/classes/CGraph.php:529 api/classes/CGraphPrototype.php:538
+#: api/classes/CGraph.php:535 api/classes/CGraphPrototype.php:552
 msgid "Cannot delete templated graphs."
 msgstr ""
 
@@ -1936,11 +1946,6 @@ msgstr ""
 msgid "Cannot set \"templateid\" for application \"%1$s\"."
 msgstr ""
 
-#: api/classes/CGraphGeneral.php:57
-#, php-format
-msgid "Cannot set \"templateid\" for graph \"%1$s\"."
-msgstr ""
-
 #: api/classes/CScreen.php:376
 #, php-format
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
@@ -2034,9 +2039,14 @@ msgstr ""
 msgid "Cannot update \"templateid\" for application \"%1$s\"."
 msgstr ""
 
-#: api/classes/CGraphGeneral.php:54
+#: api/classes/CGraph.php:42
 #, php-format
 msgid "Cannot update \"templateid\" for graph \"%1$s\"."
+msgstr ""
+
+#: api/classes/CGraphPrototype.php:42
+#, php-format
+msgid "Cannot update \"templateid\" for graph prototype \"%1$s\"."
 msgstr ""
 
 #: api/classes/CScreen.php:447 api/classes/CTemplateScreen.php:667
@@ -2049,7 +2059,7 @@ msgstr ""
 msgid "Cannot update \"templateid\" for trigger prototype \"%1$s\"."
 msgstr ""
 
-#: api/classes/CGraphGeneral.php:192
+#: api/classes/CGraphGeneral.php:60
 msgid "Cannot update a discovered graph."
 msgstr ""
 
@@ -3456,7 +3466,7 @@ msgstr "Smazat skript?"
 #: include/views/administration.usergroups.edit.php:116
 #: include/views/administration.usergroups.list.php:153
 #: include/views/administration.users.edit.php:94
-#: include/views/administration.users.edit.php:197
+#: include/views/administration.users.edit.php:198
 #: include/views/administration.users.list.php:138
 #: include/views/configuration.action.list.php:105
 #: include/views/configuration.application.list.php:120
@@ -3587,7 +3597,7 @@ msgstr "Smazat vybrané šablony?"
 msgid "Delete selected triggers?"
 msgstr "Smazat vybrané spouštěče?"
 
-#: include/views/administration.users.edit.php:365
+#: include/views/administration.users.edit.php:366
 msgid "Delete selected user?"
 msgstr "Smazat vybraného uživatele?"
 
@@ -3645,7 +3655,7 @@ msgstr ""
 msgid "Deleted: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CGraph.php:563
+#: api/classes/CGraph.php:569
 #, php-format
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -3749,7 +3759,7 @@ msgid "Description"
 msgstr "Popis"
 
 #: include/actions.inc.php:966 include/blocks.inc.php:719
-#: include/func.inc.php:2165
+#: include/func.inc.php:2167
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:44
 #: include/views/configuration.action.edit.php:328
@@ -3907,7 +3917,7 @@ msgstr "Zakázat vybrané spouštěče?"
 #: include/views/administration.usergroups.list.php:59
 #: include/views/administration.usergroups.list.php:84
 #: include/views/administration.usergroups.list.php:88
-#: include/views/administration.users.edit.php:163
+#: include/views/administration.users.edit.php:164
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.list.php:73
@@ -4038,7 +4048,7 @@ msgstr "Stav průzkumu"
 msgid "Display OK triggers for"
 msgstr ""
 
-#: include/func.inc.php:1848
+#: include/func.inc.php:1850
 msgid "Displaying"
 msgstr "Zobrazuji"
 
@@ -4190,7 +4200,7 @@ msgctxt "Exa short"
 msgid "E"
 msgstr ""
 
-#: include/func.inc.php:2132
+#: include/func.inc.php:2134
 msgid "ERROR"
 msgstr "CHYBA"
 
@@ -4202,7 +4212,7 @@ msgstr "UDÁLOSTI"
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr ""
 
-#: include/views/administration.users.edit.php:189
+#: include/views/administration.users.edit.php:190
 #: include/views/configuration.action.edit.php:376
 #: include/views/configuration.action.edit.php:389
 #: include/views/configuration.maintenance.edit.php:112
@@ -4272,7 +4282,7 @@ msgstr ""
 
 #: api/classes/CAction.php:1235 api/classes/CApplication.php:288
 #: api/classes/CApplication.php:495 api/classes/CDiscoveryRule.php:339
-#: api/classes/CGraph.php:509 api/classes/CGraphPrototype.php:519
+#: api/classes/CGraph.php:515 api/classes/CGraphPrototype.php:533
 #: api/classes/CHostGroup.php:509 api/classes/CHostGroup.php:580
 #: api/classes/CHostInterface.php:465 api/classes/CHost.php:1428
 #: api/classes/CHostPrototype.php:906 api/classes/CIconMap.php:316
@@ -4428,7 +4438,7 @@ msgstr "Povolit vybrané spouštěče?"
 #: include/views/administration.usergroups.list.php:58
 #: include/views/administration.usergroups.list.php:83
 #: include/views/administration.usergroups.list.php:88
-#: include/views/administration.users.edit.php:159
+#: include/views/administration.users.edit.php:160
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.edit.php:59
@@ -4832,7 +4842,7 @@ msgstr ""
 msgid "First"
 msgstr "první"
 
-#: include/func.inc.php:1793
+#: include/func.inc.php:1795
 msgctxt "page navigation"
 msgid "First"
 msgstr ""
@@ -4897,7 +4907,7 @@ msgstr ""
 msgid "Frontend access updated"
 msgstr ""
 
-#: include/views/administration.users.edit.php:208
+#: include/views/administration.users.edit.php:209
 msgid "Frontend messaging"
 msgstr ""
 
@@ -5004,7 +5014,7 @@ msgstr "Proveď"
 msgid "Go to"
 msgstr ""
 
-#: include/func.inc.php:2063
+#: include/func.inc.php:2065
 msgid "Go to dashboard"
 msgstr ""
 
@@ -5024,33 +5034,33 @@ msgstr "Přechod"
 msgid "Graph"
 msgstr "Graf"
 
-#: api/classes/CGraph.php:417 api/classes/CGraphPrototype.php:424
+#: api/classes/CGraph.php:422 api/classes/CGraphPrototype.php:438
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (inherited from another template)."
 msgstr ""
 
-#: api/classes/CGraph.php:438 api/classes/CGraph.php:445
-#: api/classes/CGraphPrototype.php:446 api/classes/CGraphPrototype.php:453
+#: api/classes/CGraph.php:443 api/classes/CGraph.php:450
+#: api/classes/CGraphPrototype.php:460 api/classes/CGraphPrototype.php:467
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (items are not identical)."
 msgstr ""
 
-#: api/classes/CGraph.php:396 api/classes/CGraphPrototype.php:403
+#: api/classes/CGraph.php:401 api/classes/CGraphPrototype.php:416
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CGraph.php:370 api/classes/CGraphPrototype.php:377
+#: api/classes/CGraph.php:375 api/classes/CGraphPrototype.php:382
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymax value item)."
 msgstr ""
 
-#: api/classes/CGraph.php:378 api/classes/CGraphPrototype.php:385
+#: api/classes/CGraph.php:383 api/classes/CGraphPrototype.php:391
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymin value item)."
 msgstr ""
 
-#: api/classes/CGraph.php:364 api/classes/CGraphPrototype.php:371
+#: api/classes/CGraph.php:369 api/classes/CGraphPrototype.php:376
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
 msgstr ""
@@ -5100,12 +5110,12 @@ msgstr ""
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
 msgstr ""
 
-#: api/classes/CGraphPrototype.php:570
+#: api/classes/CGraphPrototype.php:584
 #, php-format
 msgid "Graph prototype \"%s\" deleted."
 msgstr ""
 
-#: api/classes/CGraphPrototype.php:673
+#: api/classes/CGraphPrototype.php:685 api/classes/CGraphPrototype.php:746
 msgid "Graph prototype must have at least one prototype."
 msgstr ""
 
@@ -5134,13 +5144,13 @@ msgstr "Typ grafu"
 msgid "Graph updated"
 msgstr "Graf byl aktualizován"
 
-#: api/classes/CGraphGeneral.php:148
+#: api/classes/CGraphGeneral.php:735
 #, php-format
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
 msgstr ""
 
-#: api/classes/CGraph.php:399 api/classes/CGraph.php:420
-#: api/classes/CGraphPrototype.php:406 api/classes/CGraphPrototype.php:427
+#: api/classes/CGraph.php:404 api/classes/CGraph.php:425
+#: api/classes/CGraphPrototype.php:420 api/classes/CGraphPrototype.php:441
 msgid "Graph with same name but other type exist."
 msgstr ""
 
@@ -6052,7 +6062,7 @@ msgstr ""
 msgid "Identical expression already exists"
 msgstr ""
 
-#: include/func.inc.php:2053 include/func.inc.php:2073
+#: include/func.inc.php:2055 include/func.inc.php:2075
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "Pokud si myslíte, že tato zpráva je špatně, prosím kontaktuje vašeho administrátora pro přidělení potřebných oprávnění."
 
@@ -6524,7 +6534,7 @@ msgstr ""
 msgid "Incorrect item ID \"%s\" provided for screen element."
 msgstr ""
 
-#: api/classes/CGraphGeneral.php:396
+#: api/classes/CGraphGeneral.php:314
 msgid "Incorrect item for axis value."
 msgstr ""
 
@@ -7576,7 +7586,7 @@ msgstr "Popisek"
 msgid "Label location"
 msgstr "Umístění popisku"
 
-#: include/views/administration.users.edit.php:129
+#: include/views/administration.users.edit.php:130
 msgid "Language"
 msgstr "Jazyk"
 
@@ -7584,7 +7594,7 @@ msgstr "Jazyk"
 msgid "Last"
 msgstr "poslední"
 
-#: include/func.inc.php:1833
+#: include/func.inc.php:1835
 msgctxt "page navigation"
 msgid "Last"
 msgstr ""
@@ -7865,7 +7875,7 @@ msgstr ""
 msgid "Logged in as"
 msgstr ""
 
-#: auditlogs.php:143 include/func.inc.php:2059 include/func.inc.php:2076
+#: auditlogs.php:143 include/func.inc.php:2061 include/func.inc.php:2078
 #: include/menu.inc.php:282 include/page_header.php:246
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:64
@@ -8211,7 +8221,7 @@ msgid "Max count of events per trigger to show"
 msgstr "Největší zobrazovaný počet událostí spouštěče"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2167
+#: include/func.inc.php:2169
 msgid "Maximize"
 msgstr "Maximalizovat"
 
@@ -8278,8 +8288,8 @@ msgctxt "May short"
 msgid "May"
 msgstr ""
 
-#: include/views/administration.users.edit.php:193
-#: include/views/administration.users.edit.php:321 popup_media.php:27
+#: include/views/administration.users.edit.php:194
+#: include/views/administration.users.edit.php:322 popup_media.php:27
 msgid "Media"
 msgstr "Média"
 
@@ -8361,11 +8371,11 @@ msgstr "Akce zpráv"
 msgid "Message text limit"
 msgstr ""
 
-#: include/views/administration.users.edit.php:214
+#: include/views/administration.users.edit.php:215
 msgid "Message timeout"
 msgstr ""
 
-#: include/views/administration.users.edit.php:209
+#: include/views/administration.users.edit.php:210
 msgid "Message timeout (seconds)"
 msgstr ""
 
@@ -8373,7 +8383,7 @@ msgstr ""
 msgid "Messages"
 msgstr ""
 
-#: include/views/administration.users.edit.php:350
+#: include/views/administration.users.edit.php:351
 msgid "Messaging"
 msgstr ""
 
@@ -8387,7 +8397,7 @@ msgid "Middle"
 msgstr "Střed"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2167
+#: include/func.inc.php:2169
 msgid "Minimize"
 msgstr "Minimalizovat"
 
@@ -8462,19 +8472,19 @@ msgstr "minut"
 msgid "Missing \"%1$s\" field for action condition."
 msgstr ""
 
-#: api/classes/CGraphGeneral.php:531
+#: api/classes/CGraphGeneral.php:75
 msgid "Missing \"gitemid\" field for item."
 msgstr ""
 
-#: api/classes/CGraph.php:603 api/classes/CGraphPrototype.php:611
+#: api/classes/CGraphGeneral.php:474 api/classes/CGraphGeneral.php:590
 msgid "Missing \"itemid\" field for item."
 msgstr ""
 
-#: api/classes/CGraphPrototype.php:593
+#: api/classes/CGraphPrototype.php:39
 msgid "Missing \"name\" field for graph prototype."
 msgstr ""
 
-#: api/classes/CGraph.php:586
+#: api/classes/CGraph.php:39
 msgid "Missing \"name\" field for graph."
 msgstr ""
 
@@ -8484,12 +8494,12 @@ msgstr ""
 msgid "Missing item \"%1$s\" for host \"%2$s\"."
 msgstr ""
 
-#: api/classes/CGraph.php:592
+#: api/classes/CGraph.php:40
 #, php-format
 msgid "Missing items for graph \"%1$s\"."
 msgstr ""
 
-#: api/classes/CGraphPrototype.php:600
+#: api/classes/CGraphPrototype.php:40
 #, php-format
 msgid "Missing items for graph prototype \"%1$s\"."
 msgstr ""
@@ -8559,7 +8569,7 @@ msgstr ""
 msgid "More than 10 minutes"
 msgstr "Více jak 10 minut"
 
-#: api/classes/CGraphGeneral.php:160
+#: api/classes/CGraphGeneral.php:747
 #, php-format
 msgid "More than one graph with name \"%1$s\" within host."
 msgstr ""
@@ -8765,25 +8775,25 @@ msgstr "Nový servisní čas"
 msgid "Next"
 msgstr "Další"
 
-#: include/func.inc.php:1826
+#: include/func.inc.php:1828
 msgctxt "page navigation"
 msgid "Next"
 msgstr ""
 
 #: events.php:756 include/events.inc.php:356 include/events.inc.php:374
-#: include/func.inc.php:2386 include/triggers.inc.php:1608
+#: include/func.inc.php:2388 include/triggers.inc.php:1608
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
 #: include/views/js/adm.regexprs.edit.js.php:142
 msgid "No"
 msgstr "Ne"
 
-#: api/classes/CGraphPrototype.php:623 api/classes/CGraphPrototype.php:633
+#: api/classes/CGraphPrototype.php:41
 #, php-format
 msgid "No \"%1$s\" given for graph prototype."
 msgstr ""
 
-#: api/classes/CGraph.php:614 api/classes/CGraph.php:622
+#: api/classes/CGraph.php:41
 #, php-format
 msgid "No \"%1$s\" given for graph."
 msgstr ""
@@ -9169,7 +9179,7 @@ msgstr ""
 msgid "No matches found"
 msgstr ""
 
-#: include/views/administration.users.edit.php:155
+#: include/views/administration.users.edit.php:156
 msgid "No media defined."
 msgstr ""
 
@@ -9245,39 +9255,40 @@ msgstr ""
 #: api/classes/CApplication.php:533 api/classes/CDiscoveryRule.php:357
 #: api/classes/CDiscoveryRule.php:451 api/classes/CDiscoveryRule.php:456
 #: api/classes/CDRule.php:255 api/classes/CDRule.php:578
-#: api/classes/CEvent.php:732 api/classes/CGraphGeneral.php:197
-#: api/classes/CGraphGeneral.php:542 api/classes/CGraph.php:642
-#: api/classes/CGraphPrototype.php:654 api/classes/CHostBase.php:45
-#: api/classes/CHostGeneral.php:139 api/classes/CHostGroup.php:522
-#: api/classes/CHostGroup.php:595 api/classes/CHostGroup.php:778
-#: api/classes/CHostGroup.php:840 api/classes/CHostGroup.php:893
-#: api/classes/CHostGroup.php:902 api/classes/CHostGroup.php:924
-#: api/classes/CHostInterface.php:319 api/classes/CHostInterface.php:335
-#: api/classes/CHostInterface.php:476 api/classes/CHostInterface.php:674
-#: api/classes/CHost.php:688 api/classes/CHost.php:716
-#: api/classes/CHost.php:1813 api/classes/CHostPrototype.php:1020
-#: api/classes/CHostPrototype.php:1035 api/classes/CHostPrototype.php:1048
-#: api/classes/CHostPrototype.php:1061 api/classes/CHttpTest.php:393
-#: api/classes/CIconMap.php:319 api/classes/CImage.php:243
-#: api/classes/CImage.php:357 api/classes/CImage.php:474
-#: api/classes/CItemGeneral.php:182 api/classes/CItemGeneral.php:232
-#: api/classes/CItem.php:688 api/classes/CItemPrototype.php:508
-#: api/classes/CMaintenance.php:320 api/classes/CMaintenance.php:345
-#: api/classes/CMaintenance.php:358 api/classes/CMaintenance.php:466
-#: api/classes/CMaintenance.php:483 api/classes/CMaintenance.php:550
-#: api/classes/CMapElement.php:56 api/classes/CMapElement.php:145
-#: api/classes/CMap.php:389 api/classes/CProxy.php:171
-#: api/classes/CProxy.php:212 api/classes/CProxy.php:284
-#: api/classes/CProxy.php:550 api/classes/CScreenItem.php:328
-#: api/classes/CScreenItem.php:412 api/classes/CScreen.php:438
-#: api/classes/CScreen.php:518 api/classes/CService.php:1253
-#: api/classes/CService.php:1268 api/classes/CTemplateScreen.php:703
-#: api/classes/CTemplateScreen.php:724 api/classes/CTemplateScreen.php:730
-#: api/classes/CTrigger.php:652 api/classes/CTrigger.php:977
-#: api/classes/CTrigger.php:998 api/classes/CTrigger.php:1843
-#: api/classes/CTriggerPrototype.php:566 api/classes/CTriggerPrototype.php:669
-#: api/classes/CUserMacro.php:726 api/classes/CUserMacro.php:835
-#: api/classes/CUser.php:1156 include/func.inc.php:2032
+#: api/classes/CEvent.php:732 api/classes/CGraphGeneral.php:65
+#: api/classes/CGraphGeneral.php:86 api/classes/CGraph.php:686
+#: api/classes/CGraphPrototype.php:667 api/classes/CGraphPrototype.php:727
+#: api/classes/CHostBase.php:45 api/classes/CHostGeneral.php:139
+#: api/classes/CHostGroup.php:522 api/classes/CHostGroup.php:595
+#: api/classes/CHostGroup.php:778 api/classes/CHostGroup.php:840
+#: api/classes/CHostGroup.php:893 api/classes/CHostGroup.php:902
+#: api/classes/CHostGroup.php:924 api/classes/CHostInterface.php:319
+#: api/classes/CHostInterface.php:335 api/classes/CHostInterface.php:476
+#: api/classes/CHostInterface.php:674 api/classes/CHost.php:688
+#: api/classes/CHost.php:716 api/classes/CHost.php:1813
+#: api/classes/CHostPrototype.php:1020 api/classes/CHostPrototype.php:1035
+#: api/classes/CHostPrototype.php:1048 api/classes/CHostPrototype.php:1061
+#: api/classes/CHttpTest.php:393 api/classes/CIconMap.php:319
+#: api/classes/CImage.php:243 api/classes/CImage.php:357
+#: api/classes/CImage.php:474 api/classes/CItemGeneral.php:182
+#: api/classes/CItemGeneral.php:232 api/classes/CItem.php:688
+#: api/classes/CItemPrototype.php:508 api/classes/CMaintenance.php:320
+#: api/classes/CMaintenance.php:345 api/classes/CMaintenance.php:358
+#: api/classes/CMaintenance.php:466 api/classes/CMaintenance.php:483
+#: api/classes/CMaintenance.php:550 api/classes/CMapElement.php:56
+#: api/classes/CMapElement.php:145 api/classes/CMap.php:389
+#: api/classes/CProxy.php:171 api/classes/CProxy.php:212
+#: api/classes/CProxy.php:284 api/classes/CProxy.php:550
+#: api/classes/CScreenItem.php:328 api/classes/CScreenItem.php:412
+#: api/classes/CScreen.php:438 api/classes/CScreen.php:518
+#: api/classes/CService.php:1253 api/classes/CService.php:1268
+#: api/classes/CTemplateScreen.php:703 api/classes/CTemplateScreen.php:724
+#: api/classes/CTemplateScreen.php:730 api/classes/CTrigger.php:652
+#: api/classes/CTrigger.php:977 api/classes/CTrigger.php:998
+#: api/classes/CTrigger.php:1843 api/classes/CTriggerPrototype.php:566
+#: api/classes/CTriggerPrototype.php:669 api/classes/CUserMacro.php:726
+#: api/classes/CUserMacro.php:835 api/classes/CUser.php:1156
+#: include/func.inc.php:2034
 msgid "No permissions to referred object or it does not exist!"
 msgstr ""
 
@@ -9760,7 +9771,7 @@ msgstr "On"
 msgid "On status change triggers blink for"
 msgstr ""
 
-#: include/views/administration.users.edit.php:212
+#: include/views/administration.users.edit.php:213
 msgid "Once"
 msgstr ""
 
@@ -10328,11 +10339,11 @@ msgid "Periods"
 msgstr ""
 
 #: include/views/administration.usergroups.edit.php:129
-#: include/views/administration.users.edit.php:347
+#: include/views/administration.users.edit.php:348
 msgid "Permissions"
 msgstr ""
 
-#: include/views/administration.users.edit.php:345
+#: include/views/administration.users.edit.php:346
 msgid "Permissions can be assigned for user groups only."
 msgstr ""
 
@@ -10356,12 +10367,12 @@ msgstr ""
 msgid "Plain text"
 msgstr "Prostý text"
 
-#: include/views/administration.users.edit.php:227
-#: include/views/administration.users.edit.php:264
+#: include/views/administration.users.edit.php:228
+#: include/views/administration.users.edit.php:265
 msgid "Play"
 msgstr ""
 
-#: include/views/administration.users.edit.php:215
+#: include/views/administration.users.edit.php:216
 msgid "Play sound"
 msgstr ""
 
@@ -10440,7 +10451,7 @@ msgstr "Náhled"
 msgid "Previous"
 msgstr "Předchozí"
 
-#: include/func.inc.php:1799
+#: include/func.inc.php:1801
 msgctxt "page navigation"
 msgid "Previous"
 msgstr ""
@@ -10683,7 +10694,7 @@ msgstr ""
 msgid "Recipient(s)"
 msgstr "Příjemci"
 
-#: include/views/administration.users.edit.php:224
+#: include/views/administration.users.edit.php:225
 msgid "Recovery"
 msgstr ""
 
@@ -10696,15 +10707,15 @@ msgstr "Zpráva při obnovení"
 msgid "Recovery subject"
 msgstr "Předmět zprávy při obnovení"
 
-#: include/views/administration.users.edit.php:144 profile.php:49 users.php:61
+#: include/views/administration.users.edit.php:145 profile.php:49 users.php:61
 msgid "Refresh (in seconds)"
 msgstr "Automatická aktualizace (sekund)"
 
-#: include/func.inc.php:1907
+#: include/func.inc.php:1909
 msgid "Refresh time in seconds"
 msgstr "Automatická aktualizace v sekundách"
 
-#: include/func.inc.php:1911
+#: include/func.inc.php:1913
 msgid "Refresh time multiplier"
 msgstr "Multiplikátor času aktualizace"
 
@@ -11061,7 +11072,7 @@ msgstr ""
 msgid "Rows"
 msgstr "Řádky"
 
-#: include/views/administration.users.edit.php:145 profile.php:50 users.php:62
+#: include/views/administration.users.edit.php:146 profile.php:50 users.php:62
 msgid "Rows per page"
 msgstr "Počet řádků na stránku"
 
@@ -11310,9 +11321,9 @@ msgstr "sobota"
 #: include/views/administration.script.edit.php:119
 #: include/views/administration.usergroups.edit.php:137
 #: include/views/administration.usergroups.edit.php:143
-#: include/views/administration.users.edit.php:358
-#: include/views/administration.users.edit.php:362
-#: include/views/administration.users.edit.php:372
+#: include/views/administration.users.edit.php:359
+#: include/views/administration.users.edit.php:363
+#: include/views/administration.users.edit.php:373
 #: include/views/configuration.action.edit.php:1034
 #: include/views/configuration.application.edit.php:52
 #: include/views/configuration.application.edit.php:62
@@ -11543,7 +11554,7 @@ msgstr ""
 msgid "Secondary POC screen name"
 msgstr ""
 
-#: include/views/administration.users.edit.php:213
+#: include/views/administration.users.edit.php:214
 msgid "Seconds"
 msgstr "sekund"
 
@@ -12211,8 +12222,8 @@ msgstr ""
 msgid "Steps"
 msgstr "Kroky"
 
-#: include/views/administration.users.edit.php:228
-#: include/views/administration.users.edit.php:265
+#: include/views/administration.users.edit.php:229
+#: include/views/administration.users.edit.php:266
 msgid "Stop"
 msgstr ""
 
@@ -12291,7 +12302,7 @@ msgstr "Švédsky (sv_SE)"
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr ""
 
-#: include/users.inc.php:83 include/views/administration.users.edit.php:132
+#: include/users.inc.php:83 include/views/administration.users.edit.php:133
 msgid "System default"
 msgstr "Výchozí nastavení"
 
@@ -12580,7 +12591,7 @@ msgstr ""
 msgid "The web scenario application belongs to a different host than the web scenario host."
 msgstr ""
 
-#: include/views/administration.users.edit.php:134
+#: include/views/administration.users.edit.php:135
 msgid "Theme"
 msgstr "Téma"
 
@@ -12894,7 +12905,7 @@ msgstr ""
 msgid "Trigger severities"
 msgstr ""
 
-#: include/actions.inc.php:54 include/views/administration.users.edit.php:272
+#: include/actions.inc.php:54 include/views/administration.users.edit.php:273
 msgid "Trigger severity"
 msgstr "Závažnost spouštěče"
 
@@ -13079,7 +13090,7 @@ msgstr ""
 msgid "URL"
 msgstr "URL"
 
-#: include/views/administration.users.edit.php:146
+#: include/views/administration.users.edit.php:147
 msgid "URL (after login)"
 msgstr "URL po přihlášení"
 
@@ -13117,7 +13128,7 @@ msgstr ""
 msgid "USER PROFILE"
 msgstr "PROFIL UŽIVATELE"
 
-#: include/func.inc.php:2565
+#: include/func.inc.php:2567
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -13459,7 +13470,7 @@ msgstr ""
 #: include/audit.inc.php:24 include/hosts.inc.php:67 include/setup.inc.php:274
 #: include/views/administration.auditlogs.list.php:56
 #: include/views/administration.auditlogs.list.php:86
-#: include/views/administration.users.edit.php:316
+#: include/views/administration.users.edit.php:317
 #: include/views/configuration.action.edit.php:512
 #: include/views/configuration.httpconf.edit.php:82
 msgid "User"
@@ -13474,7 +13485,7 @@ msgstr ""
 msgid "User added"
 msgstr "Uživatel byl přidán"
 
-#: include/views/administration.users.edit.php:337
+#: include/views/administration.users.edit.php:338
 msgid "User can't change type for himself"
 msgstr ""
 
@@ -13574,8 +13585,8 @@ msgstr "Profil uživatele"
 msgid "User sessions"
 msgstr ""
 
-#: include/views/administration.users.edit.php:337
-#: include/views/administration.users.edit.php:341
+#: include/views/administration.users.edit.php:338
+#: include/views/administration.users.edit.php:342
 #: include/views/administration.users.list.php:58
 msgid "User type"
 msgstr "Typ uživatele"
@@ -14047,7 +14058,7 @@ msgstr ""
 msgid "Y axis MAX value"
 msgstr "Maximální hodnota na ose Y"
 
-#: api/classes/CGraphGeneral.php:116
+#: api/classes/CGraphGeneral.php:338
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr ""
 
@@ -14098,7 +14109,7 @@ msgstr "ročně"
 
 #: events.php:756 include/blocks.inc.php:727
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:359
-#: include/events.inc.php:377 include/func.inc.php:2386
+#: include/events.inc.php:377 include/func.inc.php:2388
 #: include/triggers.inc.php:1608
 #: include/views/administration.users.list.php:76
 #: include/views/js/adm.regexprs.edit.js.php:139
@@ -14109,7 +14120,7 @@ msgstr "Ano"
 msgid "Yotta"
 msgstr "yotta"
 
-#: include/views/administration.users.edit.php:127
+#: include/views/administration.users.edit.php:128
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr ""
 
@@ -14118,7 +14129,7 @@ msgstr ""
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr ""
 
-#: include/func.inc.php:2069
+#: include/func.inc.php:2071
 msgid "You are not logged in."
 msgstr "Nejste přihlášen(a)."
 
@@ -14144,7 +14155,7 @@ msgstr ""
 msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr ""
 
-#: api/classes/CGraph.php:525 api/classes/CGraphPrototype.php:535
+#: api/classes/CGraph.php:531 api/classes/CGraphPrototype.php:549
 #: api/classes/CHost.php:1013 api/classes/CHost.php:1070
 #: api/classes/CHost.php:1394 api/classes/CHttpTest.php:503
 #: api/classes/CMaintenance.php:537 api/classes/CMaintenance.php:644
@@ -14169,15 +14180,15 @@ msgstr ""
 msgid "You do not have permissions to update user or user does not exist."
 msgstr ""
 
-#: include/func.inc.php:2051
+#: include/func.inc.php:2053
 msgid "You have no permissions to access this page."
 msgstr ""
 
-#: include/func.inc.php:2071
+#: include/func.inc.php:2073
 msgid "You must login to view this page."
 msgstr "Pro zobrazení této stránky musíte být přihlášen(a)."
 
-#: include/func.inc.php:2047
+#: include/func.inc.php:2049
 msgid "Your are logged in as"
 msgstr ""
 
@@ -14494,7 +14505,7 @@ msgstr "vykonáno"
 msgid "fixed"
 msgstr "pevný"
 
-#: include/func.inc.php:1858
+#: include/func.inc.php:1860
 msgid "found"
 msgstr "nalezených"
 
@@ -14673,7 +14684,7 @@ msgid "now"
 msgstr "nyní"
 
 #: include/blocks.inc.php:352 include/blocks.inc.php:696
-#: include/func.inc.php:1855
+#: include/func.inc.php:1857
 msgid "of"
 msgstr "z"
 
@@ -14751,7 +14762,7 @@ msgstr "zobrazit mapování hodnot"
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr ""
 
-#: include/func.inc.php:1851
+#: include/func.inc.php:1853
 msgid "to"
 msgstr "do"
 

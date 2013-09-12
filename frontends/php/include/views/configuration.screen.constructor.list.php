@@ -19,8 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/js/general.script.confirm.js.php';
-
 $screenWidget = new CWidget();
 $screenWidget->addPageHeader(_('CONFIGURATION OF SCREEN'));
 $screenWidget->addHeader($this->data['screen']['name']);
