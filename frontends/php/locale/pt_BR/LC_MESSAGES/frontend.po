@@ -8997,7 +8997,7 @@ msgstr "Não foram definidas verificações de descoberta."
 #: api/classes/CHostPrototype.php:112
 #, php-format
 msgid "No discovery rule ID given for host prototype \"%1$s\"."
-msgstr "Não foi encontrado o ID da regra de auto-busca para o protótipo de host \"%1%s\"."
+msgstr "Não foi encontrado o ID da regra de auto-busca para o protótipo de host \"%1$s\"."
 
 #: api/classes/CDiscoveryRule.php:443
 msgid "No discovery rule IDs given."
