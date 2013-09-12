@@ -434,7 +434,7 @@ class testFormDiscoveryRule extends CWebTest {
 			$this->assertNotVisible('authtype');
 		}
 
-		if ($type == 'SSH agent' || $type == 'TELNET agent' || $type == 'JMX agent') {
+		if ($type == 'SSH agent' || $type == 'TELNET agent' || $type == 'JMX agent' || $type == 'Simple check') {
 			$this->zbxTestTextPresent('User name');
 			$this->assertVisible('username');
 			$this->assertAttribute("//input[@id='username']/@maxlength", 64);
@@ -786,7 +786,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'delay' => '-30',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.'
+						'Incorrect value "-30" for "Update interval (in sec)" field: must be between 0 and 86400.'
 					)
 				)
 			),
@@ -799,7 +799,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'delay' => 86401,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.'
+						'Incorrect value "86401" for "Update interval (in sec)" field: must be between 0 and 86400.'
 					)
 				)
 			),
