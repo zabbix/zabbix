@@ -262,7 +262,7 @@ int	check_service(const char *params, const char *default_addr, AGENT_RESULT *re
 	{
 		if ('\0' == *str_port)
 			port = ZBX_DEFAULT_SMTP_PORT;
-		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "220", "QUIT\n", &value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "220", "QUIT\r\n", &value_int);
 	}
 	else if (0 == strcmp(service, "ftp"))
 	{
