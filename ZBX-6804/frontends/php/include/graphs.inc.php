@@ -269,11 +269,13 @@ function get_min_itemclock_by_itemid($itemIds) {
 				$sqlFrom = 'history';
 		}
 
+		foreach ($itemIds as $itemId) {
+			$sqlUnions[] = 'SELECT MIN(ht.clock) AS item_min_clock FROM '.$sqlFrom.' ht WHERE ht.itemid='.$itemId;
+		}
+
 		$dbMin = DBfetch(DBselect(
-			'SELECT h.clock AS min_clock'.
-			' FROM '.$sqlFrom.' h'.
-			' WHERE '.dbConditionInt('h.itemid', $itemIds).
-			' ORDER BY h.clock', 1
+			'SELECT MIN(ht.item_min_clock) AS min_clock'.
+			' FROM ('.implode(' UNION ALL ', $sqlUnions).') as ht'
 		));
 
 		$min = $min ? min($min, $dbMin['min_clock']) : $dbMin['min_clock'];
