@@ -220,11 +220,9 @@ switch ($config) {
 	case 1:
 		$rep_form = barReportForm($validItems);
 		break;
-
 	case 2:
 		$rep_form = barReportForm2($validItems, $validPeriods);
 		break;
-
 	case 3:
 		$rep_form = barReportForm3();
 		break;
@@ -233,7 +231,7 @@ switch ($config) {
 $rep6_wdgt->addFlicker($rep_form, CProfile::get('web.report6.filter.state', 1));
 
 if (isset($_REQUEST['report_show'])) {
-	$items = $config == 3
+	$items = ($config == 3)
 		? array(array('itemid' => get_request('itemid')))
 		: get_request('items');
 
