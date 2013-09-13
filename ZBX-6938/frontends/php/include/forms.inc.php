@@ -314,7 +314,9 @@
 					$span->onClick(CHtml::encode(
 						'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
 						'create_var("zbx_filter", '.
-							CJs::encodeJson($subfilterName.'['.$id.']').', '.CJs::encodeJson($id).', true);'
+							CJs::encodeJson($subfilterName.'['.$id.']').', '.
+							CJs::encodeJson($id).', '.
+							'true);'
 					));
 
 					$output[] = $span;
