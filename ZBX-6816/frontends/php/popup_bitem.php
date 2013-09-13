@@ -54,9 +54,6 @@ $fields = array(
 );
 check_fields($fields);
 
-$host = get_request('host');
-$itemName = get_request('name');
-
 $_REQUEST['caption'] = get_request('caption', '');
 $_REQUEST['axisside'] = get_request('axisside',	GRAPH_YAXIS_SIDE_LEFT);
 
@@ -117,8 +114,7 @@ else {
 		_('Caption')), new CTextBox('caption', $caption, 50)
 	);
 
-
-	if ($host && $itemName) {
+	if ($host = get_request('host') && $itemName = get_request('name')) {
 		$caption = $host['name'].NAME_DELIMITER.$itemName;
 	}
 
