@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 require_once dirname(__FILE__).'/include/js.inc.php';
 
-$dstfrm	= get_request('dstfrm', 0);
+$dstfrm = get_request('dstfrm', 0);
 
 $page['title'] = _('Graph item');
 $page['file'] = 'popup_bitem.php';
@@ -31,8 +31,7 @@ $page['file'] = 'popup_bitem.php';
 define('ZBX_PAGE_NO_MENU', 1);
 
 require_once dirname(__FILE__).'/include/page_header.php';
-$host = get_request('host');
-$itemName = get_request('name');
+
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'dstfrm' =>			array(T_ZBX_STR, O_MAND, P_SYS,	NOT_EMPTY,			null),
@@ -49,9 +48,14 @@ $fields = array(
 	'save' =>			array(T_ZBX_STR, O_OPT,	 P_SYS|P_ACT,	null,	null),
 	// other
 	'form' =>			array(T_ZBX_STR, O_OPT,	 P_SYS,	null,	null),
-	'form_refresh' =>	array(T_ZBX_STR, O_OPT,	 null,	null,	null)
+	'form_refresh' =>	array(T_ZBX_STR, O_OPT,	 null,	null,	null),
+	'host' =>			array(T_ZBX_STR, O_OPT,	 null,	null,	null),
+	'name' =>			array(T_ZBX_STR, O_OPT,	 null,	null,	null)
 );
 check_fields($fields);
+
+$host = get_request('host');
+$itemName = get_request('name');
 
 $_REQUEST['caption'] = get_request('caption', '');
 $_REQUEST['axisside'] = get_request('axisside',	GRAPH_YAXIS_SIDE_LEFT);
