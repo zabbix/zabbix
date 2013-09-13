@@ -275,7 +275,7 @@ function get_min_itemclock_by_itemid($itemIds) {
 
 		$dbMin = DBfetch(DBselect(
 			'SELECT MIN(ht.item_min_clock) AS min_clock'.
-			' FROM ('.implode(' UNION ALL ', $sqlUnions).') as ht'
+			' FROM ('.implode(' UNION ALL ', $sqlUnions).') ht'
 		));
 
 		$min = $min ? min($min, $dbMin['min_clock']) : $dbMin['min_clock'];
