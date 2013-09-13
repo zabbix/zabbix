@@ -144,7 +144,8 @@ $params = array(
 	'groupids' => $twb_groupid,
 	'templated_hosts' => 1,
 	'editable' => 1,
-	'output' => API_OUTPUT_EXTEND
+	'output' => API_OUTPUT_EXTEND,
+	'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 );
 $db_hosts = API::Host()->get($params);
 order_result($db_hosts, 'name');
@@ -166,7 +167,7 @@ $params = array(
 $db_hosts = API::Host()->get($params);
 order_result($db_hosts, 'name');
 foreach ($db_hosts as $hnum => $db_host) {
-	$host_tb->addItem($db_host['hostid'], $db_host['name']);
+	$host_tb->addItem($db_host['hostid'], $db_host['name'], null, ($db_host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL));
 }
 
 $templateList->addRow(_('Hosts / templates'), $host_tb->Get(_('In'), array(
@@ -380,7 +381,7 @@ $linkedTemplateTable->setHeader(array(_('Name'), _('Action')));
 
 $ignoredTemplates = array();
 foreach ($this->data['linkedTemplates'] as $template) {
-	$tmplList->addVar('exist_templates[]', $template['templateid']);
+	$tmplList->addVar('templates[]', $template['templateid']);
 
 	$linkedTemplateTable->addRow(
 		array(
@@ -408,7 +409,7 @@ $newTemplateTable->attr('id', 'newTemplateTable');
 $newTemplateTable->attr('style', 'min-width: 400px;');
 
 $newTemplateTable->addRow(array(new CMultiSelect(array(
-	'name' => 'templates[]',
+	'name' => 'add_templates[]',
 	'objectName' => 'templates',
 	'ignored' => $ignoredTemplates
 ))));
