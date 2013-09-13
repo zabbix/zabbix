@@ -112,7 +112,7 @@ else {
 
 
 if (isset($_REQUEST['favobj'])) {
-	if ('filter' == $_REQUEST['favobj']) {
+	if ($_REQUEST['favobj'] == 'filter') {
 		CProfile::update('web.report6.filter.state',$_REQUEST['favstate'], PROFILE_TYPE_INT);
 	}
 }
@@ -233,7 +233,7 @@ switch ($config) {
 $rep6_wdgt->addFlicker($rep_form, CProfile::get('web.report6.filter.state', 1));
 
 if (isset($_REQUEST['report_show'])) {
-	$items = ($config == 3)
+	$items = $config == 3
 		? array(array('itemid' => get_request('itemid')))
 		: get_request('items');
 

@@ -17,20 +17,16 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
-	require_once dirname(__FILE__).'/include/config.inc.php';
-	require_once dirname(__FILE__).'/include/reports.inc.php';
-	require_once dirname(__FILE__).'/include/graphs.inc.php';
 
-	$page['file']	= 'chart_bar.php';
-	// $page['title']	= "S_CHART";
-	$page['type']	= PAGE_TYPE_IMAGE;
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/reports.inc.php';
+require_once dirname(__FILE__).'/include/graphs.inc.php';
+
+$page['file'] = 'chart_bar.php';
+$page['type'] = PAGE_TYPE_IMAGE;
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-?>
-<?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'config'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1,2,3'),		NULL),
@@ -81,7 +77,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$showlegend = get_request('showlegend', 0);
 	$sorttype = get_request('sorttype', 0);
 
-	if($config == 1){
+	if ($config == 1) {
 		$scaletype = get_request('scaletype', TIMEPERIOD_TYPE_WEEKLY);
 
 		$timesince = get_request('report_timesince', time() - SEC_PER_DAY);
@@ -90,7 +86,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$str_since['hour'] = date('H', $timesince);
 		$str_since['day'] = date('d', $timesince);
 		$str_since['weekday'] = date('w', $timesince);
-		if($str_since['weekday'] == 0) $str_since['weekday'] = 7;
+		if ($str_since['weekday'] == 0) {
+			$str_since['weekday'] = 7;
+		}
 
 		$str_since['mon'] = date('m', $timesince);
 		$str_since['year'] = date('Y', $timesince);
@@ -98,12 +96,14 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$str_till['hour'] = date('H', $timetill);
 		$str_till['day'] = date('d', $timetill);
 		$str_till['weekday'] = date('w', $timetill);
-		if($str_till['weekday'] == 0) $str_till['weekday'] = 7;
+		if ($str_till['weekday'] == 0) {
+			$str_till['weekday'] = 7;
+		}
 
 		$str_till['mon'] = date('m', $timetill);
 		$str_till['year'] = date('Y', $timetill);
 
-		switch($scaletype){
+		switch ($scaletype) {
 			case TIMEPERIOD_TYPE_HOURLY:
 				$scaleperiod = SEC_PER_HOUR;
 				$str = $str_since['year'].'-'.$str_since['mon'].'-'.$str_since['day'].' '.$str_since['hour'].':00:00';
@@ -132,7 +132,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 				$timetill = strtotime($str);
 				$timetill -= ($str_till['weekday'] - 1) * SEC_PER_DAY;
 
-				$timetill+= $scaleperiod;
+				$timetill += $scaleperiod;
 
 				break;
 			case TIMEPERIOD_TYPE_MONTHLY:
@@ -165,7 +165,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$period_step = $scaleperiod;
 
 		$graph = new CBar(GRAPH_TYPE_COLUMN);
-//		$graph = new CBar(GRAPH_TYPE_BAR);
 		$graph->setHeader($title);
 
 		$graph_data['colors'] = array();
@@ -201,15 +200,14 @@ require_once dirname(__FILE__).'/include/page_header.php';
 				' ORDER BY clock ASC'
 				);
 
-
 			foreach($sql_arr as $id => $sql){
-				$result=DBselect($sql);
-//SDI($sql);
+				$result = DBselect($sql);
+
 				$i = 0;
 				$start = 0;
 				$end = $timesince;
-				while($end < $timetill){
-					switch($scaletype){
+				while ($end < $timetill) {
+					switch ($scaletype) {
 						case TIMEPERIOD_TYPE_HOURLY:
 						case TIMEPERIOD_TYPE_DAILY:
 						case TIMEPERIOD_TYPE_WEEKLY:
@@ -239,25 +237,25 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 					if (!isset($row) || ($row['clock']<$start)) {
 						$row=DBfetch($result);
-//SDI($row['clock']);
 					}
 
-//SDI($start.' < '.$row['clock'].' < '.$end);
-					if (isset($row) && $row && ($row['clock']>=$start) && (($row['clock']<$end))) {
+					if (isset($row) && $row && ($row['clock'] >= $start) && (($row['clock'] < $end))) {
 						$item_data['count'][$i]	= $row['count'];
-						$item_data['min'][$i]		= $row['min'];
-						$item_data['avg'][$i]		= $row['avg'];
-						$item_data['max'][$i]		= $row['max'];
-						$item_data['clock'][$i]		= $start;
-						$item_data['type'][$i]		= true;
+						$item_data['min'][$i] = $row['min'];
+						$item_data['avg'][$i] = $row['avg'];
+						$item_data['max'][$i] = $row['max'];
+						$item_data['clock'][$i] = $start;
+						$item_data['type'][$i] = true;
 					}
 					else {
-						if(isset($item_data['type'][$i]) && $item_data['type'][$i]) continue;
+						if (isset($item_data['type'][$i]) && $item_data['type'][$i]) {
+							continue;
+						}
 
 						$item_data['count'][$i]	= 0;
-						$item_data['min'][$i]	= 0;
-						$item_data['avg'][$i]	= 0;
-						$item_data['max'][$i]	= 0;
+						$item_data['min'][$i] = 0;
+						$item_data['avg'][$i] = 0;
+						$item_data['max'][$i] = 0;
 						$item_data['clock'][$i]	= $start;
 						$item_data['type'][$i]	= false;
 					}
@@ -266,7 +264,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 				unset($row);
 			}
 
-			switch($item['calc_fnc']){
+			switch ($item['calc_fnc']) {
 				case 0:
 					$tmp_value = $item_data['count'];
 					break;
@@ -280,30 +278,29 @@ require_once dirname(__FILE__).'/include/page_header.php';
 					$tmp_value = $item_data['max'];
 					break;
 			}
-			$graph->addSeries($tmp_value,$item['axisside']);
+			$graph->addSeries($tmp_value, $item['axisside']);
 
 			$graph_data['colors'][] = $item['color'];
 
-			if($db_item = get_item_by_itemid($item['itemid'])){
-				$graph->setUnits($db_item['units'],$item['axisside']);
-				$graph->setSideValueType($db_item['value_type'],$item['axisside']);
+			if ($db_item = get_item_by_itemid($item['itemid'])) {
+				$graph->setUnits($db_item['units'], $item['axisside']);
+				$graph->setSideValueType($db_item['value_type'], $item['axisside']);
 			}
 
-			if(!isset($graph_data['captions'])){
-				$date_caption = ($scaletype == TIMEPERIOD_TYPE_HOURLY)?CHARTBAR_HOURLY_DATE_FORMAT:CHARTBAR_DAILY_DATE_FORMAT;
+			if (!isset($graph_data['captions'])) {
+				$date_caption = ($scaletype == TIMEPERIOD_TYPE_HOURLY) ? CHARTBAR_HOURLY_DATE_FORMAT : CHARTBAR_DAILY_DATE_FORMAT;
 
 				$graph_data['captions'] = array();
-				foreach($item_data['clock'] as $id => $clock){
-					$graph_data['captions'][$id] = zbx_date2str($date_caption,$clock);
+				foreach ($item_data['clock'] as $id => $clock) {
+					$graph_data['captions'][$id] = zbx_date2str($date_caption, $clock);
 				}
 			}
 		}
 	}
-	else if($config == 2){
-		$periods = get_request('periods',array());
+	else if ($config == 2) {
+		$periods = get_request('periods', array());
 
 		$graph = new CBar(GRAPH_TYPE_COLUMN);
-//		$graph = new CBar(GRAPH_TYPE_BAR);
 		$graph->setHeader('REPORT 1');
 
 		$graph_data = array();
@@ -313,12 +310,12 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$graph_data['values'] = array();
 		$graph_data['legend'] = array();
 
-		foreach($periods as $pid => $period){
+		foreach ($periods as $pid => $period) {
 			$graph_data['colors'][] = $period['color'];
 			$graph_data['legend'][] = $period['caption'];
 
 			$db_values[$pid] = array();
-			foreach($items as $num => $item){
+			foreach ($items as $num => $item) {
 				$itemid = $item['itemid'];
 				$item_data = &$db_values[$pid][$itemid];
 
@@ -329,13 +326,13 @@ require_once dirname(__FILE__).'/include/page_header.php';
 						' AND clock>='.$period['report_timesince'].
 						' AND clock<='.$period['report_timetill'].
 					' GROUP BY itemid';
-				$result=DBselect($sql);
-				if($row=DBfetch($result)){
-					$item_data['count']	= $row['count'];
-					$item_data['min']	= $row['min'];
-					$item_data['avg']	= $row['avg'];
-					$item_data['max']	= $row['max'];
-					$item_data['clock']	= $row['clock'];
+				$result = DBselect($sql);
+				if ($row = DBfetch($result)) {
+					$item_data['count'] = $row['count'];
+					$item_data['min'] = $row['min'];
+					$item_data['avg'] = $row['avg'];
+					$item_data['max'] = $row['max'];
+					$item_data['clock'] = $row['clock'];
 				}
 
 				$sql = 'SELECT itemid, sum(num) as count,avg(value_avg) as avg,min(value_min) as min,'.
@@ -345,21 +342,20 @@ require_once dirname(__FILE__).'/include/page_header.php';
 						' AND clock>='.$period['report_timesince'].
 						' AND clock<='.$period['report_timetill'].
 					' GROUP BY itemid';
-				$result=DBselect($sql);
-				if($row=DBfetch($result)){
-					if(!empty($item_data)){
+				$result = DBselect($sql);
+				if ($row = DBfetch($result)) {
+					if (!empty($item_data)) {
 						$item_data['count']	+= $row['count'];
-						$item_data['min']	= min($item_data['count'],$row['min']);
-						$item_data['avg']	= ($item_data['count']+$row['avg'])/2;
-						$item_data['max']	= max($item_data['count'],$row['max']);
-						$item_data['clock']	= max($item_data['count'],$row['clock']);
+						$item_data['min'] = min($item_data['count'],$row['min']);
+						$item_data['avg'] = ($item_data['count']+$row['avg'])/2;
+						$item_data['max'] = max($item_data['count'],$row['max']);
+						$item_data['clock'] = max($item_data['count'],$row['clock']);
 					}
 					else{
-//SDI($row);
-						$item_data['count']	= $row['count'];
-						$item_data['min']	= $row['min'];
-						$item_data['avg']	= $row['avg'];
-						$item_data['max']	= $row['max'];
+						$item_data['count'] = $row['count'];
+						$item_data['min'] = $row['min'];
+						$item_data['avg'] = $row['avg'];
+						$item_data['max'] = $row['max'];
 						$item_data['clock']	= $row['clock'];
 					}
 				}
@@ -367,7 +363,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // fixes bug #21788, due to Zend casting the array key as a numeric and then they are reassigned
 				$itemid = "0$itemid";
 //---
-				switch($item['calc_fnc']){
+				switch ($item['calc_fnc']) {
 					case 0:
 						$graph_data['values'][$itemid] = $item_data['count'];
 						break;
@@ -384,21 +380,23 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 				$graph_data['captions'][$itemid] = $item['caption'];
 
-				if($db_item = get_item_by_itemid($item['itemid'])){
+				if ($db_item = get_item_by_itemid($item['itemid'])) {
 					$graph->setUnits($db_item['units'],$item['axisside']);
 					$graph->setSideValueType($db_item['value_type'],$item['axisside']);
 				}
 			}
 
-			if(($sorttype == 0) || (count($periods) < 2))
+			if (($sorttype == 0) || (count($periods) < 2)) {
 				array_multisort($graph_data['captions'], $graph_data['values']);
-			else
+			}
+			else {
 				array_multisort($graph_data['values'], SORT_DESC, $graph_data['captions']);
+			}
 
 			$graph->addSeries($graph_data['values']);
 		}
 	}
-	else if($config == 3){
+	else if ($config == 3) {
 
 		$hostids = get_request('hostids',array());
 		$groupids = get_request('groupids',array());
@@ -418,14 +416,14 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$scaletype = get_request('scaletype', TIMEPERIOD_TYPE_WEEKLY);
 		$avgperiod = get_request('avgperiod', TIMEPERIOD_TYPE_DAILY);
 
-		if(!empty($groupids)){
+		if (!empty($groupids)) {
 			$sql = 'SELECT DISTINCT hg.hostid'.
 				' FROM hosts_groups hg,hosts h'.
 				' WHERE h.hostid=hg.hostid'.
 					' AND '.dbConditionInt('h.status', array(HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED)).
 					' AND '.dbConditionInt('hg.groupid', $groupids);
 			$res = DBselect($sql);
-			while($db_host = DBfetch($res)){
+			while ($db_host = DBfetch($res)) {
 				$hostids[$db_host['hostid']] = $db_host['hostid'];
 			}
 		}
@@ -439,7 +437,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		}
 
 		$graph = new CBar(GRAPH_TYPE_COLUMN);
-//		$graph = new CBar(GRAPH_TYPE_BAR);
 		$graph->setHeader('REPORT 3');
 
 		$graph_data = array();
@@ -453,11 +450,12 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$timesince = get_request('report_timesince',time()-SEC_PER_DAY);
 		$timetill = get_request('report_timetill',time());
 
-//SDI(date('Y.m.d H:i:s',$timesince).' - '.date('Y.m.d H:i:s',$timetill));
 		$str_since['hour'] = date('H',$timesince);
 		$str_since['day'] = date('d',$timesince);
 		$str_since['weekday'] = date('w',$timesince);
-		if($str_since['weekday'] == 0) $str_since['weekday'] = 7;
+		if ($str_since['weekday'] == 0) {
+			$str_since['weekday'] = 7;
+		}
 
 		$str_since['mon'] = date('m',$timesince);
 		$str_since['year'] = date('Y',$timesince);
@@ -465,12 +463,14 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$str_till['hour'] = date('H',$timetill);
 		$str_till['day'] = date('d',$timetill);
 		$str_till['weekday'] = date('w',$timetill);
-		if($str_till['weekday'] == 0) $str_till['weekday'] = 7;
+		if ($str_till['weekday'] == 0) {
+			$str_till['weekday'] = 7;
+		}
 
 		$str_till['mon'] = date('m',$timetill);
 		$str_till['year'] = date('Y',$timetill);
 
-		switch($scaletype){
+		switch ($scaletype) {
 			case TIMEPERIOD_TYPE_HOURLY:
 				$scaleperiod = SEC_PER_HOUR;
 				$str = $str_since['year'].'-'.$str_since['mon'].'-'.$str_since['day'].' '.$str_since['hour'].':00:00';
@@ -525,9 +525,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		}
 // updating
 
-//SDI(date('Y.m.d H:i:s',$timesince).' - '.date('Y.m.d H:i:s',$timetill));
-
-		switch($avgperiod){
+		switch ($avgperiod) {
 			case TIMEPERIOD_TYPE_HOURLY:
 				$period = SEC_PER_HOUR;
 				break;
@@ -550,13 +548,15 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$db_values = array();
 		foreach($itemids as $num => $itemid){
 			$count = 0;
-			if(!isset($db_values[$count])) $db_values[$count] = array();
+			if (!isset($db_values[$count])) {
+				$db_values[$count] = array();
+			}
 			$graph_data['captions'][$itemid] = $hosts[$itemid]['host'];
 
 			$start = 0;
 			$end = $timesince;
-			while($end < $timetill){
-				switch($scaletype){
+			while ($end < $timetill) {
+				switch ($scaletype) {
 					case TIMEPERIOD_TYPE_HOURLY:
 					case TIMEPERIOD_TYPE_DAILY:
 					case TIMEPERIOD_TYPE_WEEKLY:
@@ -610,24 +610,27 @@ require_once dirname(__FILE__).'/include/page_header.php';
 					' GROUP BY itemid,'.$calc_field
 					);
 
-				foreach($sql_arr as $id => $sql){
-					$result=DBselect($sql);
-					while($row=DBfetch($result)){
-						if($row['i'] == $x) continue;
-						if(!is_null($item_data))
+				foreach ($sql_arr as $id => $sql) {
+					$result = DBselect($sql);
+					while ($row=DBfetch($result)) {
+						if ($row['i'] == $x) {
+							continue;
+						}
+						if (!is_null($item_data)) {
 							$item_data = ($item_data + $row['avg']) / 2;
-						else
+						}
+						else {
 							$item_data = $row['avg'];
+						}
 					}
 
 				}
-//SDI($count.' : '.$itemid);
+
 				$db_values[$count][$itemid] = is_null($item_data)?0:$item_data;
 
-//				$tmp_color = get_next_color($palettetype);
 				$tmp_color = get_next_palette($palette,$palettetype);
 
-				if(!isset($graph_data['colors'][$count])){
+				if (!isset($graph_data['colors'][$count])) {
 					$graph_data['colors'][$count] = rgb2hex($tmp_color);
 				}
 
@@ -638,19 +641,23 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			}
 		}
 
-		foreach($db_values as $num => $item_data){
+		foreach ($db_values as $num => $item_data) {
 			$graph->addSeries($item_data);
 		}
 
-		if(isset($itemid) && ($db_item = get_item_by_itemid($itemid))){
+		if (isset($itemid) && ($db_item = get_item_by_itemid($itemid))) {
 			$graph->setUnits($db_item['units']);
 			$graph->setSideValueType($db_item['value_type']);
 		}
 //----
 	}
 
-	if(!isset($graph_data['captions'])) $graph_data['captions'] = array();
-	if(!isset($graph_data['legend'])) $graph_data['legend'] = '';
+	if (!isset($graph_data['captions'])) {
+		$graph_data['captions'] = array();
+	}
+	if (!isset($graph_data['legend'])) {
+		$graph_data['legend'] = '';
+	}
 
 	$graph->setSeriesLegend($graph_data['legend']);
 	$graph->setPeriodCaption($graph_data['captions']);
@@ -668,7 +675,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$graph->setHeight(400);
 
 	$graph->Draw();
-?>
-<?php
+
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>
+

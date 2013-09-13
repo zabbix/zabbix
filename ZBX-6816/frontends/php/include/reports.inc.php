@@ -118,7 +118,7 @@ function barReportForm($items = array()) {
 		$items_table,
 		new CButton('add_item', _('Add'),
 			'return PopUp("popup_bitem.php?config=1&dstfrm='.$reportForm->getName().
-			'",800,400,"graph_item_form");'),
+			'", 800, 400, "graph_item_form");'),
 		$delete_button
 	));
 	unset($items_table, $delete_button);
@@ -154,15 +154,11 @@ function barReportForm2($items = array(), $periods = array()){
 	$reportForm->setAttribute('name', 'zbx_report');
 	$reportForm->setAttribute('id', 'zbx_report');
 
-	if (isset($_REQUEST['report_show'])
-			&& is_array($items)
-			&& $items
-			&& is_array($periods)
-			&& $periods) {
+	if (isset($_REQUEST['report_show']) && is_array($items) && $items && is_array($periods) && $periods) {
 		$reportForm->addVar('report_show', 'show');
 	}
 
-	$reportForm->addVar('config',$config);
+	$reportForm->addVar('config', $config);
 
 	$reportForm->addRow(_('Title'), new CTextBox('title', $title, 40));
 	$reportForm->addRow(_('X label'), new CTextBox('xlabel', $xlabel, 40));
@@ -355,7 +351,7 @@ function barReportForm3() {
 		'real_hosts' => true,
 		'output' => array('hostid', 'name')
 	);
-	if ($groupid > 0){
+	if ($groupid > 0) {
 		$options['groupids'] = $groupid;
 	}
 	$db_hosts = API::Host()->get($options);
@@ -398,18 +394,18 @@ function barReportForm3() {
 
 	$scale = new CComboBox('scaletype', $scaletype);
 	$scale->addItem(TIMEPERIOD_TYPE_HOURLY, _('Hourly'));
-	$scale->addItem(TIMEPERIOD_TYPE_DAILY, 	_('Daily'));
-	$scale->addItem(TIMEPERIOD_TYPE_WEEKLY,	_('Weekly'));
-	$scale->addItem(TIMEPERIOD_TYPE_MONTHLY,_('Monthly'));
-	$scale->addItem(TIMEPERIOD_TYPE_YEARLY,	_('Yearly'));
+	$scale->addItem(TIMEPERIOD_TYPE_DAILY, _('Daily'));
+	$scale->addItem(TIMEPERIOD_TYPE_WEEKLY, _('Weekly'));
+	$scale->addItem(TIMEPERIOD_TYPE_MONTHLY, _('Monthly'));
+	$scale->addItem(TIMEPERIOD_TYPE_YEARLY, _('Yearly'));
 	$reportForm->addRow(_('Scale'), $scale);
 
 	$avgcmb = new CComboBox('avgperiod', $avgperiod);
-	$avgcmb->addItem(TIMEPERIOD_TYPE_HOURLY,	_('Hourly'));
-	$avgcmb->addItem(TIMEPERIOD_TYPE_DAILY, 	_('Daily'));
-	$avgcmb->addItem(TIMEPERIOD_TYPE_WEEKLY,	_('Weekly'));
-	$avgcmb->addItem(TIMEPERIOD_TYPE_MONTHLY, 	_('Monthly'));
-	$avgcmb->addItem(TIMEPERIOD_TYPE_YEARLY,	_('Yearly'));
+	$avgcmb->addItem(TIMEPERIOD_TYPE_HOURLY, _('Hourly'));
+	$avgcmb->addItem(TIMEPERIOD_TYPE_DAILY, _('Daily'));
+	$avgcmb->addItem(TIMEPERIOD_TYPE_WEEKLY, _('Weekly'));
+	$avgcmb->addItem(TIMEPERIOD_TYPE_MONTHLY, _('Monthly'));
+	$avgcmb->addItem(TIMEPERIOD_TYPE_YEARLY, _('Yearly'));
 	$reportForm->addRow(_('Average by'), $avgcmb);
 
 	$itemName = '';
@@ -470,7 +466,7 @@ function barReportForm3() {
 function validateBarReportItems($items = array()) {
 	$config = get_request('config', 1);
 
-	if (!isset($items) || empty($items)) {
+	if (!isset($items) || !$items) {
 		return false;
 	}
 
@@ -481,7 +477,7 @@ function validateBarReportItems($items = array()) {
 
 	foreach ($items as $item) {
 		foreach ($fields as $field) {
-			if (!isset($item[$field]) || $item[$field] === null) {
+			if (!isset($item[$field]) || !$item[$field]) {
 				show_error_message(_s('Missing "%1$s" field for item.', $field));
 				return false;
 			}
@@ -572,7 +568,7 @@ function validateBarReportItems($items = array()) {
  * @return mixed	valid periods array on success or false on failure
  */
 function validateBarReportPeriods($periods = array()) {
-	if (!isset($periods) || empty($periods)) {
+	if (!isset($periods) || !$periods) {
 		return false;
 	}
 	$fields = array('report_timesince', 'report_timetill', 'color');
@@ -580,7 +576,7 @@ function validateBarReportPeriods($periods = array()) {
 
 	foreach ($periods as &$period) {
 		foreach ($fields as $field) {
-			if (!isset($period[$field]) || $period[$field] === null) {
+			if (!isset($period[$field]) || !$period[$field]) {
 				show_error_message(_s('Missing "%1$s" field for period.', $field));
 				return false;
 			}
