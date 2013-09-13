@@ -187,7 +187,6 @@ $sortField = getPageSortField();
 $sortOrder = getPageSortOrder();
 
 // js templates
-require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php';
 require_once dirname(__FILE__).'/include/views/js/monitoring.latest.js.php';
 
 $link = new CCol(new CDiv(null, 'app-list-toggle-all icon-plus-9x9'));
@@ -409,9 +408,8 @@ foreach ($allItems as $key => $db_item){
 		$actions = new CLink(_('History'),'history.php?action=showvalues&itemid='.$db_item['itemid']);
 	}
 
+	$stateCss = ($db_item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown txt' : 'txt';
 	$itemName = array(SPACE, SPACE, $db_item['resolvedName']);
-	$item_status = $db_item['state'] == ITEM_STATE_NOTSUPPORTED ? 'unknown' : null;
-
 	if (getRequest('show_details')) {
 		$itemKey = new CLink($db_item['key_'], 'items.php?form=update&itemid='.$db_item['itemid']);
 		$itemName = array_merge($itemName, array(BR(), SPACE, SPACE, $itemKey));
@@ -444,14 +442,14 @@ foreach ($allItems as $key => $db_item){
 			SPACE,
 			is_show_all_nodes() ? SPACE : null,
 			($_REQUEST['hostid'] > 0) ? null : SPACE,
-			new CCol(new CDiv($itemName, $item_status)),
-			new CCol(new CDiv($db_item['delay'], $item_status)),
-			new CCol(new CDiv($db_item['history'], $item_status)),
-			new CCol(new CDiv($db_item['trends'], $item_status)),
-			new CCol(new CDiv(item_type2str($db_item['type']), $item_status)),
+			new CCol(new CDiv($itemName, $stateCss)),
+			new CCol(new CDiv($db_item['delay'], $stateCss)),
+			new CCol(new CDiv($db_item['history'], $stateCss)),
+			new CCol(new CDiv($db_item['trends'], $stateCss)),
+			new CCol(new CDiv(item_type2str($db_item['type']), $stateCss)),
 			new CCol($statusIcons),
-			new CCol(new CDiv($lastClock, $item_status)),
-			new CCol(new CDiv($lastValue, $item_status)),
+			new CCol(new CDiv($lastClock, $stateCss)),
+			new CCol(new CDiv($lastValue, $stateCss)),
 			$actions
 		)));
 	}
@@ -460,10 +458,10 @@ foreach ($allItems as $key => $db_item){
 			SPACE,
 			is_show_all_nodes() ? SPACE : null,
 			($_REQUEST['hostid'] > 0) ? null : SPACE,
-			new CCol(new CDiv($itemName, $item_status)),
-			new CCol(new CDiv($lastClock, $item_status)),
-			new CCol(new CDiv($lastValue, $item_status)),
-			new CCol(new CDiv($change, $item_status)),
+			new CCol(new CDiv($itemName, $stateCss)),
+			new CCol(new CDiv($lastClock, $stateCss)),
+			new CCol(new CDiv($lastValue, $stateCss)),
+			new CCol(new CDiv($change, $stateCss)),
 			$actions
 		)));
 	}
@@ -490,26 +488,25 @@ foreach ($applications as $appid => $dbApp) {
 	$toggle->setAttribute('data-app-id', $dbApp['applicationid']);
 	$toggle->setAttribute('data-open-state', $openState);
 
-	$col = new CCol(array(bold($dbApp['name']),SPACE.'('._n('%1$s Item', '%1$s Items', $dbApp['item_cnt']).')'));
-	$col->setColSpan(getRequest('show_details') ? 9 : 5);
+	$hostName = null;
 
-	// host JS menu link
-	$hostSpan = null;
 	if ($_REQUEST['hostid'] == 0) {
-		$hostSpan = new CSpan($host['name'],
+		$hostName = new CSpan($host['name'],
 			'link_menu menu-host'.(($host['status'] == HOST_STATUS_NOT_MONITORED) ? ' not-monitored' : '')
 		);
-		$scripts = $hostScripts[$host['hostid']];
-		$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
-		$hostSpan = new CDiv($hostSpan);
+		$hostName->setMenuPopup(getMenuPopupHost($host, $hostScripts[$host['hostid']]));
 	}
 
 	// add toggle row
 	$table->addRow(array(
 		$toggle,
 		get_node_name_by_elid($dbApp['applicationid']),
-		$hostSpan,
-		$col
+		$hostName,
+		new CCol(array(
+				bold($dbApp['name']),
+				SPACE.'('._n('%1$s Item', '%1$s Items', $dbApp['item_cnt']).')'
+			), null, (getRequest('show_details') ? 9 : 5
+		)
 	), 'odd_row');
 
 	// add toggle sub rows
@@ -583,7 +580,8 @@ foreach ($allItems as $db_item){
 		$actions = new CLink(_('History'), 'history.php?action=showvalues&itemid='.$db_item['itemid']);
 	}
 
-	$item_status = $db_item['state'] == ITEM_STATE_NOTSUPPORTED ? 'unknown' : null;
+	$stateCss = ($db_item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown txt' : 'txt';
+
 	$itemName = array(SPACE, SPACE, $db_item['resolvedName']);
 
 	if (getRequest('show_details')) {
@@ -618,14 +616,14 @@ foreach ($allItems as $db_item){
 			SPACE,
 			is_show_all_nodes() ? ($db_host['item_cnt'] ? SPACE : get_node_name_by_elid($db_item['itemid'])) : null,
 			$_REQUEST['hostid'] ? null : SPACE,
-			new CCol(new CDiv($itemName, $item_status)),
-			new CCol(new CDiv($db_item['delay'], $item_status)),
-			new CCol(new CDiv($db_item['history'], $item_status)),
-			new CCol(new CDiv($db_item['trends'], $item_status)),
-			new CCol(new CDiv(item_type2str($db_item['type']), $item_status)),
+			new CCol(new CDiv($itemName, $stateCss)),
+			new CCol(new CDiv($db_item['delay'], $stateCss)),
+			new CCol(new CDiv($db_item['history'], $stateCss)),
+			new CCol(new CDiv($db_item['trends'], $stateCss)),
+			new CCol(new CDiv(item_type2str($db_item['type']), $stateCss)),
 			new CCol($statusIcons),
-			new CCol(new CDiv($lastClock, $item_status)),
-			new CCol(new CDiv($lastValue, $item_status)),
+			new CCol(new CDiv($lastClock, $stateCss)),
+			new CCol(new CDiv($lastValue, $stateCss)),
 			$actions
 		)));
 	}
@@ -634,10 +632,10 @@ foreach ($allItems as $db_item){
 			SPACE,
 			is_show_all_nodes() ? ($db_host['item_cnt'] ? SPACE : get_node_name_by_elid($db_item['itemid'])) : null,
 			$_REQUEST['hostid'] ? null : SPACE,
-			new CCol(new CDiv($itemName, $item_status)),
-			new CCol(new CDiv($lastClock, $item_status)),
-			new CCol(new CDiv($lastValue, $item_status)),
-			new CCol(new CDiv($change, $item_status)),
+			new CCol(new CDiv($itemName, $stateCss)),
+			new CCol(new CDiv($lastClock, $stateCss)),
+			new CCol(new CDiv($lastValue, $stateCss)),
+			new CCol(new CDiv($change, $stateCss)),
 			$actions
 		)));
 	}
@@ -662,26 +660,27 @@ foreach ($hosts as $hostId => $dbHost) {
 	$toggle->setAttribute('data-app-id', '0_'.$host['hostid']);
 	$toggle->setAttribute('data-open-state', $openState);
 
-	$col = new CCol(array(bold('- '.('other').' -'), SPACE.'('._n('%1$s Item', '%1$s Items', $dbHost['item_cnt']).')'));
-	$col->setColSpan(getRequest('show_details') ? 9 : 5);
+	$hostName = null;
 
-	// host JS menu link
-	$hostSpan = null;
 	if ($_REQUEST['hostid'] == 0) {
-		$hostSpan = new CSpan($host['name'],
+		$hostName = new CSpan($host['name'],
 			'link_menu menu-host'.(($host['status'] == HOST_STATUS_NOT_MONITORED) ? ' not-monitored' : '')
 		);
-		$scripts = $hostScripts[$host['hostid']];
-		$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
-		$hostSpan = new CDiv($hostSpan);
+		$hostName->setMenuPopup(getMenuPopupHost($host, $hostScripts[$host['hostid']]));
 	}
 
 	// add toggle row
 	$table->addRow(array(
 		$toggle,
 		get_node_name_by_elid($dbHost['hostid']),
-		$hostSpan,
-		$col
+		$hostName,
+		new CCol(
+			array(
+				bold('- '.('other').' -'),
+				SPACE.'('._n('%1$s Item', '%1$s Items', $dbHost['item_cnt']).')'
+			),
+			null, getRequest('show_details') ? 9 : 5
+		)
 	), 'odd_row');
 
 	// add toggle sub rows

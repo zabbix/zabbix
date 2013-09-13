@@ -457,7 +457,14 @@ table.filter .host-inventories .select,
 table.filter .host-inventories .text { vertical-align: middle; }
 table.filter tr.item-list-row { height: 26px; }
 
-/* filter sub filter */
+.host-list table.filter tr td { width: 25%; }
+
+.item-list table.filter { text-align: left; min-width: 1024px; }
+.item-list table.filter tr td.label { text-align: right; }
+.item-list table.filter tr td.col1 { width: 18%; }
+.item-list table.filter tr td.label.col1 { width: 6%; }
+.item-list table.filter tr td.label.col4 { width: 8%; }
+
 table.filter.sub-filter tr td { text-align: left; }
 table.filter.sub-filter tr td:first-child { width: 8%; }
 
@@ -550,3 +557,18 @@ div.suggest { position: absolute; border: 1px #5C7099 solid; width: 162px; z-ind
 .multiselect .available ul li { padding: 3px 2px 3px 4px; list-style: none outside none; display: list-item; cursor: pointer; }
 .multiselect .available ul li.hover { background: #7A9FC1; color: #FFFFFF; }
 .multiselect .available ul li.hover .prefix { color: #F1F1F1; }
+
+/* menu popup */
+.menuPopup {
+	width: 170px; border: 1px solid #7E9AB4; text-align: left; position: absolute; z-index: 1000; display: none; white-space: pre-wrap;
+	-webkit-box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.2); box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.2);
+}
+.menuPopup .title { padding: 2px 2px 2px 6px; color: #ffffff; font-weight: bold; background: #5c9ccc url(themes/originalblue/images/bg_h-hard_55.png) 50% 50% repeat-x; }
+.menuPopup .ui-menu { width: 165px; }
+.menuPopup ul.ui-corner-all { border-radius: 0; }
+
+.printless { display: none; border: 1px #333 dotted; padding-left: 10px; cursor: pointer; font-weight: bold; color: #000000; background-color: #FFFFFF; }
+.printless:hover { text-decoration: underline; }
+
+/* tabs */
+.tabs { visibility: hidden; }

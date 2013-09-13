@@ -793,7 +793,7 @@ class CUser extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Probably php-ldap module is missing.'));
 		}
 
-		$ldapValidator = new CLdapAuthValidator($cnf);
+		$ldapValidator = new CLdapAuthValidator(array('conf' => $cnf));
 		if ($ldapValidator->validate($user)) {
 			return true;
 		}

@@ -708,27 +708,28 @@ function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
 /**
  * Retrieve overview table object for items.
  *
- * @param        $hostids
+ * @param array  $hostIds
  * @param string $application name of application to filter
- * @param null   $view_style
+ * @param int    $viewMode
  *
  * @return CTableInfo
  */
-function get_items_data_overview($hostids, $application, $view_style) {
+function getItemsDataOverview($hostIds, $application, $viewMode) {
 	$sqlFrom = '';
 	$sqlWhere = '';
+
 	if ($application !== '') {
 		$sqlFrom = 'applications a,items_applications ia,';
 		$sqlWhere = ' AND i.itemid=ia.itemid AND a.applicationid=ia.applicationid AND a.name='.zbx_dbstr($application);
 	}
 
-	$db_items = DBfetchArray(DBselect(
+	$dbItems = DBfetchArray(DBselect(
 		'SELECT DISTINCT h.hostid,h.name AS hostname,i.itemid,i.key_,i.value_type,i.units,'.
 			'i.name,t.priority,i.valuemapid,t.value AS tr_value,t.triggerid'.
 		' FROM hosts h,'.$sqlFrom.'items i'.
 			' LEFT JOIN functions f ON f.itemid=i.itemid'.
 			' LEFT JOIN triggers t ON t.triggerid=f.triggerid AND t.status='.TRIGGER_STATUS_ENABLED.
-		' WHERE '.dbConditionInt('h.hostid', $hostids).
+		' WHERE '.dbConditionInt('h.hostid', $hostIds).
 			' AND h.status='.HOST_STATUS_MONITORED.
 			' AND h.hostid=i.hostid'.
 			' AND i.status='.ITEM_STATUS_ACTIVE.
@@ -738,29 +739,24 @@ function get_items_data_overview($hostids, $application, $view_style) {
 	));
 
 	// fetch latest values
-	$history = Manager::History()->getLast(zbx_toHash($db_items, 'itemid'));
-
-	$options = array(
-		'output' => array('name', 'hostid', 'status'),
-		'monitored_hosts' => true,
-		'hostids' => $hostids,
-		'with_monitored_items' => true,
-		'preservekeys' => true
-	);
-
-	if ($view_style == STYLE_LEFT) {
-		$options['selectScreens'] = API_OUTPUT_COUNT;
-		$options['selectInventory'] = array('hostid');
-	}
+	$history = Manager::History()->getLast(zbx_toHash($dbItems, 'itemid'));
 
 	// fetch data for the host JS menu
-	$hosts = API::Host()->get($options);
+	$hosts = API::Host()->get(array(
+		'output' => array('name', 'hostid', 'status'),
+		'monitored_hosts' => true,
+		'hostids' => $hostIds,
+		'with_monitored_items' => true,
+		'preservekeys' => true,
+		'selectScreens' => ($viewMode == STYLE_LEFT) ? API_OUTPUT_COUNT : null,
+		'selectInventory' => ($viewMode == STYLE_LEFT) ? array('hostid') : null
+	));
 
 	$items = array();
-	foreach ($db_items as $row) {
+	foreach ($dbItems as $row) {
 		$descr = itemName($row);
 		$row['hostname'] = get_node_name_by_elid($row['hostid'], null, NAME_DELIMITER).$row['hostname'];
-		$hostnames[$row['hostid']] = $row['hostname'];
+		$hostNames[$row['hostid']] = $row['hostname'];
 
 		// a little tricky check for attempt to overwrite active trigger (value=1) with
 		// inactive or active trigger with lower priority.
@@ -784,48 +780,46 @@ function get_items_data_overview($hostids, $application, $view_style) {
 	}
 
 	$table = new CTableInfo(_('No items defined.'));
-	if (empty($hostnames)) {
+	if (empty($hostNames)) {
 		return $table;
 	}
 	$table->makeVerticalRotation();
-	order_result($hostnames);
 
-	if ($view_style == STYLE_TOP) {
+	order_result($hostNames);
+
+	if ($viewMode == STYLE_TOP) {
 		$header = array(new CCol(_('Items'), 'center'));
-		foreach ($hostnames as $hostname) {
-			$header[] = new CCol($hostname, 'vertical_rotation');
+		foreach ($hostNames as $hostName) {
+			$header[] = new CCol($hostName, 'vertical_rotation');
 		}
 		$table->setHeader($header, 'vertical_header');
 
 		foreach ($items as $descr => $ithosts) {
 			$tableRow = array(nbsp($descr));
-			foreach ($hostnames as $hostname) {
-				$tableRow = get_item_data_overview_cells($tableRow, $ithosts, $hostname);
+			foreach ($hostNames as $hostName) {
+				$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $hostName);
 			}
 			$table->addRow($tableRow);
 		}
 	}
 	else {
-		$hostScripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
-		foreach ($hostScripts as $hostid => $scripts) {
-			$hosts[$hostid]['scripts'] = $scripts;
-		}
+		$scripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
+
 		$header = array(new CCol(_('Hosts'), 'center'));
 		foreach ($items as $descr => $ithosts) {
 			$header[] = new CCol($descr, 'vertical_rotation');
 		}
 		$table->setHeader($header, 'vertical_header');
 
-		foreach ($hostnames as $hostid => $hostname) {
-			$host = $hosts[$hostid];
+		foreach ($hostNames as $hostId => $hostName) {
+			$host = $hosts[$hostId];
 
-			// host js menu link
-			$hostSpan = new CSpan(nbsp($host['name']), 'link_menu menu-host');
-			$hostSpan->setAttribute('data-menu', hostMenuData($host, $hostScripts[$host['hostid']]));
+			$name = new CSpan($host['name'], 'link_menu');
+			$name->setMenuPopup(getMenuPopupHost($host, $scripts[$hostId]));
 
-			$tableRow = array(new CCol($hostSpan));
+			$tableRow = array(new CCol($name));
 			foreach ($items as $ithosts) {
-				$tableRow = get_item_data_overview_cells($tableRow, $ithosts, $hostname);
+				$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $hostName);
 			}
 			$table->addRow($tableRow);
 		}
@@ -834,17 +828,16 @@ function get_items_data_overview($hostids, $application, $view_style) {
 	return $table;
 }
 
-function get_item_data_overview_cells(&$table_row, &$ithosts, $hostname) {
-	$css_class = '';
-	unset($it_ov_menu);
-
+function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
+	$css = '';
 	$value = '-';
 	$ack = null;
-	if (isset($ithosts[$hostname])) {
-		$item = $ithosts[$hostname];
+
+	if (isset($ithosts[$hostName])) {
+		$item = $ithosts[$hostName];
 
 		if ($item['tr_value'] == TRIGGER_VALUE_TRUE) {
-			$css_class = getSeverityStyle($item['severity']);
+			$css = getSeverityStyle($item['severity']);
 			$ack = get_last_event_by_triggerid($item['triggerid']);
 			$ack = ($ack['acknowledged'] == 1)
 				? array(SPACE, new CImg('images/general/tick.png', 'ack'))
@@ -852,43 +845,21 @@ function get_item_data_overview_cells(&$table_row, &$ithosts, $hostname) {
 		}
 
 		$value = ($item['value'] !== null) ? formatHistoryValue($item['value'], $item) : UNKNOWN_VALUE;
-
-		$it_ov_menu = array(
-			array(_('Values'), null, null, array('outer' => array('pum_oheader'), 'inner' => array('pum_iheader'))),
-			array(_('500 latest values'), 'history.php?action=showlatest&itemid='.$item['itemid'], array('tw' => '_blank'))
-		);
-
-		switch ($ithosts[$hostname]['value_type']) {
-			case ITEM_VALUE_TYPE_UINT64:
-			case ITEM_VALUE_TYPE_FLOAT:
-				$it_ov_menu = array_merge(array(
-					// name, url, (target [tw], statusbar [sb]), css, submenu
-					array(_('Graphs'), null, null,
-						array('outer' => array('pum_oheader'), 'inner' => array('pum_iheader'))
-					),
-					array(_('Last hour graph'), 'history.php?period=3600&action=showgraph&itemid='.$item['itemid'], array('tw' => '_blank')),
-					array(_('Last week graph'), 'history.php?period=604800&action=showgraph&itemid='.$item['itemid'], array('tw' => '_blank')),
-					array(_('Last month graph'), 'history.php?period=2678400&action=showgraph&itemid='.$item['itemid'], array('tw' => '_blank'))
-				), $it_ov_menu);
-				break;
-			default:
-				break;
-		}
 	}
 
 	if ($value != '-') {
 		$value = new CSpan($value, 'link');
 	}
-	$value_col = new CCol(array($value, $ack), $css_class);
 
-	if (isset($it_ov_menu)) {
-		$it_ov_menu = new CPUMenu($it_ov_menu, 170);
-		$value_col->onClick($it_ov_menu->getOnActionJS());
-		unset($it_ov_menu);
+	$column = new CCol(array($value, $ack), $css);
+
+	if (isset($ithosts[$hostName])) {
+		$column->setMenuPopup(getMenuPopupHistory($item));
 	}
-	array_push($table_row, $value_col);
 
-	return $table_row;
+	$tableRow[] = $column;
+
+	return $tableRow;
 }
 
 /******************************************************************************
