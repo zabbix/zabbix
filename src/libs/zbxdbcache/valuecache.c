@@ -2778,9 +2778,9 @@ int	zbx_vc_add_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *
 
 	if (NULL != (item = zbx_hashset_search(&vc_cache->items, &itemid)))
 	{
-		vc_item_addref(item);
-
 		zbx_history_record_t	record = {*timestamp, *value};
+
+		vc_item_addref(item);
 
 		if (item->value_type != value_type)
 			vc_item_change_value_type(item, value_type);
