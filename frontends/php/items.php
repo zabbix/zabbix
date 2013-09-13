@@ -134,7 +134,6 @@ $fields = array(
 	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
 	// filter
 	'filter_set' =>				array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'subfilter_set' =>				array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
 	'filter_groupid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'filter_hostid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'filter_application' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
@@ -159,6 +158,7 @@ $fields = array(
 	'filter_with_triggers' =>	array(T_ZBX_INT, O_OPT, null,	IN('-1,0,1'), null),
 	'filter_ipmi_sensor' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// subfilters
+	'subfilter_set' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
 	'subfilter_apps' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'subfilter_types' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'subfilter_value_types' =>	array(T_ZBX_INT, O_OPT, null,	null,		null),
@@ -180,6 +180,10 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 $_REQUEST['go'] = get_request('go', 'none');
 $_REQUEST['params'] = get_request($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);
+
+$subfiltersList = array('subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'subfilter_status',
+					'subfilter_state', 'subfilter_templated_items', 'subfilter_with_triggers', 'subfilter_hosts',
+					'subfilter_interval', 'subfilter_history', 'subfilter_trends');
 
 /*
  * Permissions
@@ -275,9 +279,7 @@ if (isset($_REQUEST['filter_set'])) {
 	CProfile::update('web.items.filter_ipmi_sensor', $_REQUEST['filter_ipmi_sensor'], PROFILE_TYPE_STR);
 
 	// subfilters
-	foreach (array('subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'subfilter_status', 'subfilter_state',
-			'subfilter_templated_items', 'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval',
-			'subfilter_history', 'subfilter_trends') as $name) {
+	foreach ($subfiltersList as $name) {
 		$_REQUEST[$name] = array();
 		CProfile::update('web.items.'.$name, '', PROFILE_TYPE_STR);
 	}
@@ -305,9 +307,7 @@ else {
 	$_REQUEST['filter_ipmi_sensor'] = CProfile::get('web.items.filter_ipmi_sensor');
 
 	// subfilters
-	foreach (array('subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'subfilter_status', 'subfilter_state',
-			'subfilter_templated_items', 'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval',
-			'subfilter_history', 'subfilter_trends') as $name) {
+	foreach ($subfiltersList as $name) {
 		if (isset($_REQUEST['subfilter_set'])) {
 			$_REQUEST[$name] = get_request($name, array());
 			CProfile::update('web.items.'.$name, implode(';', $_REQUEST[$name]), PROFILE_TYPE_STR);
@@ -1093,6 +1093,30 @@ else {
 			}
 		}
 		unset($item);
+	}
+
+	if (!empty($data['items'])) {
+		foreach ($data['items'] as $item) {
+			$atLeastOne = true;
+			foreach ($item['subfilters'] as $subfilter => $value) {
+				if (!$value) {
+					$atLeastOne = false;
+					break;
+				}
+			}
+			if ($atLeastOne) {
+				break;
+			}
+		}
+		if (!$atLeastOne) {
+			foreach ($subfiltersList as $name) {
+				$_REQUEST[$name] = array();
+				CProfile::update('web.items.'.$name, '', PROFILE_TYPE_STR);
+				foreach ($data['items'] as &$item) {
+					$item['subfilters'][$name] = 1;
+				}
+			}
+		}
 	}
 
 	$data['flicker'] = getItemFilterForm($data['items']);
