@@ -26,7 +26,7 @@
  *
  * @return object $reportForm
  */
-function barReportForm($items = array()) {
+function valueDistributionFormForMultiplePeriods($items = array()) {
 	$config = get_request('config', 1);
 	$scaletype = get_request('scaletype', TIMEPERIOD_TYPE_WEEKLY);
 
@@ -140,7 +140,7 @@ function barReportForm($items = array()) {
  *
  * @return object $reportForm
  */
-function barReportForm2($items = array(), $periods = array()){
+function valueDistributionFormForMultipleItems($items = array(), $periods = array()){
 	$config = get_request('config', 1);
 
 	$title = get_request('title', _('Report 2'));
@@ -277,7 +277,7 @@ function barReportForm2($items = array(), $periods = array()){
  *
  * @return object $reportForm
  */
-function barReportForm3() {
+function valueComparisonFormForMultiplePeriods() {
 	$config = get_request('config', 1);
 
 	$title = get_request('title', _('Report 3'));

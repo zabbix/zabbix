@@ -218,13 +218,13 @@ $rep_tab->setAttribute('border', 0);
 switch ($config) {
 	default:
 	case 1:
-		$rep_form = barReportForm($validItems);
+		$rep_form = valueDistributionFormForMultiplePeriods($validItems);
 		break;
 	case 2:
-		$rep_form = barReportForm2($validItems, $validPeriods);
+		$rep_form = valueDistributionFormForMultipleItems($validItems, $validPeriods);
 		break;
 	case 3:
-		$rep_form = barReportForm3();
+		$rep_form = valueComparisonFormForMultiplePeriods();
 		break;
 }
 
