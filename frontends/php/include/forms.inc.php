@@ -316,7 +316,8 @@
 						'create_var("zbx_filter", '.
 							CJs::encodeJson($subfilterName.'['.$id.']').', '.
 							CJs::encodeJson($id).', '.
-							'true);'
+							'true'.
+						');'
 					));
 
 					$output[] = $span;
