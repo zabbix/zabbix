@@ -114,7 +114,8 @@ else {
 		_('Caption')), new CTextBox('caption', $caption, 50)
 	);
 
-	if ($host = get_request('host') && $itemName = get_request('name')) {
+	$host = get_request('host');
+	if ($host && $itemName = get_request('name')) {
 		$caption = $host['name'].NAME_DELIMITER.$itemName;
 	}
 
