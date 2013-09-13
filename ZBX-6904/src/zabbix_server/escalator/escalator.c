@@ -934,14 +934,6 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *event, DB_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	subject_dyn = zbx_strdup(NULL, action->shortdata);
-	message_dyn = zbx_strdup(NULL, action->longdata);
-
-	substitute_simple_macros(&action->actionid, event, r_event, NULL, NULL, NULL, NULL, NULL,
-					&subject_dyn, MACRO_TYPE_MESSAGE_RECOVERY, NULL, 0);
-	substitute_simple_macros(&action->actionid, event, r_event, NULL, NULL, NULL, NULL, NULL,
-					&message_dyn, MACRO_TYPE_MESSAGE_RECOVERY, NULL, 0);
-
 	if (1 == action->recovery_msg)
 	{
 		result = DBselect(
@@ -952,6 +944,14 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *event, DB_
 					" and mediatypeid is not null"
 					" and alerttype=%d",
 				action->actionid, escalation->eventid, ALERT_TYPE_MESSAGE);
+
+		subject_dyn = zbx_strdup(NULL, action->shortdata);
+		message_dyn = zbx_strdup(NULL, action->longdata);
+
+		substitute_simple_macros(&action->actionid, event, r_event, NULL, NULL, NULL, NULL, NULL,
+						&subject_dyn, MACRO_TYPE_MESSAGE_RECOVERY, NULL, 0);
+		substitute_simple_macros(&action->actionid, event, r_event, NULL, NULL, NULL, NULL, NULL,
+						&message_dyn, MACRO_TYPE_MESSAGE_RECOVERY, NULL, 0);
 
 		while (NULL != (row = DBfetch(result)))
 		{
