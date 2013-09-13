@@ -166,7 +166,7 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat);
 #define PROCESS_MODULE_COMMAND	2
 
 void	init_metrics();
-int	add_metric(ZBX_METRIC *new, char *error, size_t max_error_len);
+int	add_metric(ZBX_METRIC *new_metric, char *error, size_t max_error_len);
 void	free_metrics();
 
 int	process(const char *in_command, unsigned flags, AGENT_RESULT *result);
@@ -240,6 +240,7 @@ int	SERVICE_STATE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PROC_INFO(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_IF_LIST(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
 #endif
 
 #ifdef _AIX
