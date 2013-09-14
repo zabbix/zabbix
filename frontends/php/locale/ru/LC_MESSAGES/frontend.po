@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-12 21:53+0300\n"
+"POT-Creation-Date: 2013-09-14 18:48+0300\n"
 "PO-Revision-Date: 2013-09-09 11:14+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -8272,7 +8272,7 @@ msgstr[2] "Максимальная длина имени узла сети %2$d
 msgid "Maximum number of flexible intervals added"
 msgstr "Добавлено максимальное количество переменных интервалов"
 
-#: include/classes/screens/CScreenBase.php:339 include/graphs.inc.php:401
+#: include/classes/screens/CScreenBase.php:339 include/graphs.inc.php:406
 #, php-format
 msgid "Maximum time period to display is %1$s day."
 msgid_plural "Maximum time period to display is %1$s days."
@@ -8461,7 +8461,7 @@ msgstr "Минимально требуемый размер PHP post - %s (ко
 msgid "Minimum severity"
 msgstr "Минимальная важность"
 
-#: include/classes/screens/CScreenBase.php:334 include/graphs.inc.php:394
+#: include/classes/screens/CScreenBase.php:334 include/graphs.inc.php:399
 #, php-format
 msgid "Minimum time period to display is %1$s hour."
 msgid_plural "Minimum time period to display is %1$s hours."
@@ -8530,7 +8530,7 @@ msgstr "Отсутствуют элементы данных у графика \
 msgid "Missing items for graph prototype \"%1$s\"."
 msgstr "Отсутствуют элементы данных для прототипа графика \"%1$s\"."
 
-#: include/graphs.inc.php:321
+#: include/graphs.inc.php:326
 #, php-format
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
 msgstr "Отсутствует ключ \"%1$s\" для узла сети \"%2$s\"."
@@ -9028,7 +9028,7 @@ msgstr "Переменные интервалы не заданы."
 msgid "No graph ID provided for screen element."
 msgstr "Для элемента комплексного экрана не указан ID графика."
 
-#: include/graphs.inc.php:289
+#: include/graphs.inc.php:294
 #, php-format
 msgid "No graph item with graphid \"%s\"."
 msgstr "Нет элемента графика с graphid \"%s\"."
@@ -10109,8 +10109,8 @@ msgstr "PHP gd"
 msgid "PHP gd FreeType support"
 msgstr "Поддержка PHP gd FreeType"
 
-#: include/classes/class.frontendsetup.php:462 include/graphs.inc.php:699
-#: include/graphs.inc.php:723
+#: include/classes/class.frontendsetup.php:462 include/graphs.inc.php:704
+#: include/graphs.inc.php:728
 msgid "PHP gd FreeType support missing"
 msgstr "Отсутствует поддержка PHP gd FreeType"
 
@@ -11998,7 +11998,7 @@ msgstr "Область / район"
 msgid "Size of the response received from Zabbix server \"%1$s\" exceeds the allowed size of %2$s bytes. This value can be increased in the ZBX_SOCKET_BYTES_LIMIT constant in include/defines.inc.php."
 msgstr "Размер полученного ответа от Zabbix сервера \"%1$s\" превышает допустимый размер в %2$s байт. Это значение можно увеличить с помощью ZBX_SOCKET_BYTES_LIMIT константы в include/defines.inc.php."
 
-#: include/graphs.inc.php:352
+#: include/graphs.inc.php:357
 #, php-format
 msgid "Skipped copying of graph \"%1$s\" to host \"%2$s\"."
 msgstr "Пропущено копирование графика \"%1$s\" в узел сети \"%2$s\"."
