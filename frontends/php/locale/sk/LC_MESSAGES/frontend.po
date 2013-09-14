@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-28 00:19+0300\n"
+"POT-Creation-Date: 2013-09-14 20:50+0300\n"
 "PO-Revision-Date: 2013-08-25 22:49+0200\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -7762,7 +7762,7 @@ msgstr "Chýbajúca položka \"%1$s\" pre host \"%2$s\"."
 msgid "Missing items for graph \"%1$s\"."
 msgstr "Chýbajúce položky pre graf \"%1$s\"."
 
-#: include/graphs.inc.php:321
+#: include/graphs.inc.php:326
 #, php-format
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
 msgstr "Chýbajúci kľúč \"%1$s\" pre host \"%2$s\"."
@@ -8205,7 +8205,7 @@ msgstr "Žiadne definované flexibilné intervaly."
 msgid "No graph ID provided for screen element."
 msgstr "Žiadne ID grafu nebolo poskytnuté pre element obrazovky."
 
-#: include/graphs.inc.php:289
+#: include/graphs.inc.php:294
 #, php-format
 msgid "No graph item with graphid \"%s\"."
 msgstr "Žiadna položka grafu s graphid \"%s\"."
@@ -11127,7 +11127,7 @@ msgstr "Umiestnenie polica"
 msgid "Site state / province"
 msgstr "Umiestnenie štát / provincia"
 
-#: include/graphs.inc.php:352
+#: include/graphs.inc.php:357
 #, php-format
 msgid "Skipped copying of graph \"%1$s\" to host \"%2$s\"."
 msgstr "Preskočené kopírovanie grafu \"%1$s\" na host \"%2$s\"."
@@ -12918,7 +12918,7 @@ msgstr "Varovanie. Neplatná hodnota pre pole \"%1$s\": nemôže byť prázdne."
 msgid "Warning. Incorrect value for field \"%1$s\": must be between %2$s and %3$s."
 msgstr "Varovanie. Neplatná hodnota pre pole \"%1$s\": musí byť medzi %2$s a %3$s."
 
-#: include/classes/screens/CScreenBase.php:339 include/graphs.inc.php:401
+#: include/classes/screens/CScreenBase.php:339 include/graphs.inc.php:406
 #, php-format
 msgid "Warning. Maximum time period to display is %1$s day."
 msgid_plural "Warning. Maximum time period to display is %1$s days."
@@ -12926,7 +12926,7 @@ msgstr[0] "Varovanie. Maximálna perióda zobrazenia je %1$s deň."
 msgstr[1] "Varovanie. Maximálna perióda zobrazenia je %1$s dni."
 msgstr[2] "Varovanie. Maximálna perióda zobrazenia je %1$s dní."
 
-#: include/classes/screens/CScreenBase.php:334 include/graphs.inc.php:394
+#: include/classes/screens/CScreenBase.php:334 include/graphs.inc.php:399
 #, php-format
 msgid "Warning. Minimum time period to display is %1$s hour."
 msgid_plural "Warning. Minimum time period to display is %1$s hours."

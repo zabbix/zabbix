@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-28 00:19+0300\n"
+"POT-Creation-Date: 2013-09-14 20:50+0300\n"
 "PO-Revision-Date: 2013-04-06 11:39+0200\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -7752,7 +7752,7 @@ msgstr "Απουσία συλλέκτη \"%1$s\" για ξενιστή \"%2$s\".
 msgid "Missing items for graph \"%1$s\"."
 msgstr "Απόντες συλλέκτες για γράφημα \"%1$s\"."
 
-#: include/graphs.inc.php:321
+#: include/graphs.inc.php:326
 #, php-format
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
 msgstr "Λείπει το κλειδί \"%1$s\" για τον ξενιστή \"%2$s\"."
@@ -8195,7 +8195,7 @@ msgstr "Δεν ορίσθηκαν εθέλικτα διαστήματα."
 msgid "No graph ID provided for screen element."
 msgstr "Δεν παρέχεται ID γραφήματος για στοιχείο οθόνης."
 
-#: include/graphs.inc.php:289
+#: include/graphs.inc.php:294
 #, php-format
 msgid "No graph item with graphid \"%s\"."
 msgstr "Χωρίς στοιχείο γραφήματος με αναγνωριστικό \"%s\"."
@@ -11117,7 +11117,7 @@ msgstr "Θέση ικριώματος"
 msgid "Site state / province"
 msgstr "Κράτος / Επαρχία"
 
-#: include/graphs.inc.php:352
+#: include/graphs.inc.php:357
 #, php-format
 msgid "Skipped copying of graph \"%1$s\" to host \"%2$s\"."
 msgstr "Παράλειψη αντιγραφής γραφήματος \"%1$s\" στον ξενιστή \"%2$s\"."
@@ -12906,14 +12906,14 @@ msgstr "Προειδοποίηση. Λανθασμένη τιμή για πεδ�
 msgid "Warning. Incorrect value for field \"%1$s\": must be between %2$s and %3$s."
 msgstr "Προειδοποίηση. Λανθασμένη τιμή για πεδίο \"%1$s\": πρέπει να είναι μεταξύ %2$s και %3$s."
 
-#: include/classes/screens/CScreenBase.php:339 include/graphs.inc.php:401
+#: include/classes/screens/CScreenBase.php:339 include/graphs.inc.php:406
 #, php-format
 msgid "Warning. Maximum time period to display is %1$s day."
 msgid_plural "Warning. Maximum time period to display is %1$s days."
 msgstr[0] "Προειδοποίηση. Μέγιστη χρονική περίοδος εμφάνισης είναι %1$s ημέρα."
 msgstr[1] "Προειδοποίηση. Μέγιστη χρονική περίοδος εμφάνισης είναι %1$s ημέρες."
 
-#: include/classes/screens/CScreenBase.php:334 include/graphs.inc.php:394
+#: include/classes/screens/CScreenBase.php:334 include/graphs.inc.php:399
 #, php-format
 msgid "Warning. Minimum time period to display is %1$s hour."
 msgid_plural "Warning. Minimum time period to display is %1$s hours."
