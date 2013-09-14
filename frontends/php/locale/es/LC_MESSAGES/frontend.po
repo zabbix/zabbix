@@ -2,17 +2,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-14 18:48+0300\n"
-"PO-Revision-Date: 2012-04-11 10:35+0200\n"
-"Last-Translator: Javier <jtlopez@gmail.com>\n"
+"POT-Creation-Date: 2013-09-14 20:02+0300\n"
+"PO-Revision-Date: 2013-09-13 10:08+0300\n"
+"Last-Translator: vins <piranesi@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.1.4\n"
+"X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
+"X-POOTLE-MTIME: 1379059698.0\n"
 
 #: include/views/configuration.item.edit.php:389
 msgid " day"
@@ -25,7 +26,7 @@ msgstr[1] ""
 #: maintenance.php:141 maintenance.php:153 services.php:184 services.php:198
 #, php-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
-msgstr ""
+msgstr "\"%s\" debe encontrarse entre 1970.01.01 y 2038.01.18."
 
 #: include/profiles.inc.php:321
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
@@ -60,8 +61,8 @@ msgstr[1] "%1$s Monitores"
 #, php-format
 msgid "%1$s day"
 msgid_plural "%1$s days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s día"
+msgstr[1] "%1$s días"
 
 #: include/page_header.php:447
 #, php-format
@@ -88,7 +89,7 @@ msgstr[1] "%d dispositivos"
 #, php-format
 msgctxt "user fullname"
 msgid "(%1$s %2$s)"
-msgstr ""
+msgstr "(%1$s %2$s)"
 
 #: include/views/configuration.action.edit.php:436
 msgid "(0 - infinitely)"
@@ -98,7 +99,7 @@ msgstr "(0 - infinito)"
 #: include/views/configuration.hostgroups.list.php:31
 #: include/views/configuration.template.edit.php:124
 msgid "(Only super admins can create groups)"
-msgstr ""
+msgstr "(Solo los super administradores pueden crear grupos)"
 
 #: include/forms.inc.php:592 include/forms.inc.php:607
 msgid "(in days)"
@@ -121,11 +122,11 @@ msgstr "(sin proxy)"
 
 #: include/blocks.inc.php:1467
 msgid "-"
-msgstr ""
+msgstr "-"
 
 #: acknow.php:131
 msgid "----[BULK ACKNOWLEDGE]----"
-msgstr ""
+msgstr "----[RECONOCIMIENTO MASIVO]----"
 
 #: include/triggers.inc.php:2184 include/triggers.inc.php:2185
 #: include/triggers.inc.php:2186 include/triggers.inc.php:2188
@@ -175,7 +176,7 @@ msgstr "<manual>"
 #: include/views/configuration.item.massupdate.php:172
 #: include/views/js/configuration.discovery.edit.js.php:95
 msgid "AES"
-msgstr ""
+msgstr "AES"
 
 #: acknow.php:183
 msgid "ALARM ACKNOWLEDGES"
@@ -207,23 +208,23 @@ msgstr "INFORME DE DISPONIBILIDAD"
 
 #: popup_trexpr.php:139
 msgid "Absolute difference between last and previous value is < N"
-msgstr ""
+msgstr "La diferencia absoluta entre el último valor y el anterior es < N"
 
 #: popup_trexpr.php:147
 msgid "Absolute difference between last and previous value is = N"
-msgstr ""
+msgstr "La diferencia absoluta entre el último valor y el anterior es = N"
 
 #: popup_trexpr.php:143
 msgid "Absolute difference between last and previous value is > N"
-msgstr ""
+msgstr "La diferencia absoluta entre el último valor y el anterior es > N"
 
 #: popup_trexpr.php:151
 msgid "Absolute difference between last and previous value is NOT N"
-msgstr ""
+msgstr "La diferencia absoluta entre el último valor y el anterior NO es N"
 
 #: report3.php:83 srv_status.php:143
 msgid "Acceptable SLA"
-msgstr ""
+msgstr "SLA aceptable"
 
 #: sysmap.php:77
 msgid "Access denied!"
@@ -231,7 +232,7 @@ msgstr "¡Acceso denegado!"
 
 #: include/func.inc.php:2047
 msgid "Access denied."
-msgstr ""
+msgstr "Acceso denegado."
 
 #: api/classes/CUser.php:872
 #, php-format
@@ -263,7 +264,7 @@ msgstr "Aceptar y volver"
 
 #: tr_status.php:280
 msgid "Acknowledge status"
-msgstr ""
+msgstr "Estado del reconocimiento"
 
 #: include/events.inc.php:186 tr_status.php:365 tr_status.php:719
 msgid "Acknowledged"
@@ -283,7 +284,7 @@ msgstr "Aceptadas"
 
 #: include/views/configuration.sysmap.edit.php:127
 msgid "Acknowledging disabled"
-msgstr ""
+msgstr "Reconocimiento desactivado"
 
 #: include/audit.inc.php:28 include/views/administration.auditlogs.list.php:62
 #: include/views/administration.auditlogs.list.php:89
@@ -733,11 +734,11 @@ msgstr "En (horas:minutos)"
 
 #: api/classes/CMaintenance.php:332 api/classes/CMaintenance.php:524
 msgid "At least one host or group should be selected."
-msgstr ""
+msgstr "Al menos debe seleccionarse un equipo o grupo."
 
 #: api/classes/CMaintenance.php:402 api/classes/CMaintenance.php:515
 msgid "At least one maintenance period must be created."
-msgstr ""
+msgstr "Al menos debe crearse un periodo de mantenimiento"
 
 #: include/classes/class.frontendsetup.php:294
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
@@ -783,7 +784,7 @@ msgstr "Método de autenticación"
 
 #: authentication.php:160 authentication.php:161
 msgid "Authentication method changed to HTTP"
-msgstr ""
+msgstr "Método de autenticación cambiado a HTTP"
 
 #: authentication.php:122 authentication.php:123
 msgid "Authentication method changed to LDAP"
@@ -797,7 +798,7 @@ msgstr "Método de autenticación cambiado a Zabbix interno"
 #: include/views/configuration.item.massupdate.php:159
 #: include/views/js/configuration.discovery.edit.js.php:83
 msgid "Authentication passphrase"
-msgstr ""
+msgstr "Clave de autenticación"
 
 #: include/views/configuration.item.edit.php:148
 #: include/views/configuration.item.massupdate.php:149
@@ -877,7 +878,7 @@ msgstr "Eje horizontal"
 #: include/func.inc.php:402
 msgctxt "Byte short"
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: include/views/administration.general.image.edit.php:29
 #: include/views/administration.general.image.list.php:25
@@ -912,11 +913,11 @@ msgstr "Bind passwd"
 
 #: popup_trexpr.php:521
 msgid "Bitwise AND of last (most recent) T value and mask is = N"
-msgstr ""
+msgstr "Operación Y binaria de los últimos (más recientes) T valores y la máscara es = N"
 
 #: popup_trexpr.php:526
 msgid "Bitwise AND of last (most recent) T value and mask is NOT N"
-msgstr ""
+msgstr "Operación Y binaria de los últimos (más recientes) T valores y la máscara NO es N"
 
 #: include/classes/core/ZBase.php:233
 msgid "Black & Blue"
@@ -952,11 +953,11 @@ msgstr "Aclarar"
 
 #: include/locales.inc.php:52
 msgid "Bulgarian (bg_BG)"
-msgstr ""
+msgstr "Búlgaro (bg_BG)"
 
 #: tr_status.php:850
 msgid "Bulk acknowledge"
-msgstr ""
+msgstr "Reconocer todos"
 
 #: report2.php:175
 msgid "By host"
@@ -1204,11 +1205,11 @@ msgstr "Cancelar"
 
 #: acknow.php:150
 msgid "Cannot acknowledge event"
-msgstr ""
+msgstr "No se pudo reconocer el evento"
 
 #: httpconf.php:268
 msgid "Cannot activate web scenario"
-msgstr ""
+msgstr "No se pudo activar el escenario web"
 
 #: api/classes/CGraph.php:696
 #, php-format
@@ -1267,7 +1268,7 @@ msgstr "No es posible añadir la imágen"
 
 #: include/classes/import/CXmlImport18.php:633
 msgid "Cannot add image."
-msgstr ""
+msgstr "No se pudo añadir la imágen."
 
 #: disc_prototypes.php:308 items.php:458 screenedit.php:183
 msgid "Cannot add item"
@@ -1275,11 +1276,11 @@ msgstr "No es posible añadir el monitor"
 
 #: api/classes/CApplication.php:576
 msgid "Cannot add items."
-msgstr ""
+msgstr "No se pudo añadir items."
 
 #: adm.macros.php:120
 msgid "Cannot add macro."
-msgstr ""
+msgstr "No se pudo añadir la macro."
 
 #: maintenance.php:125
 msgid "Cannot add maintenance"
@@ -1363,15 +1364,15 @@ msgstr "No es posible añadir la asignación"
 
 #: httpconf.php:146
 msgid "Cannot add web scenario"
-msgstr ""
+msgstr "No se pudo añadir escenario web"
 
 #: authentication.php:165
 msgid "Cannot change authentication method to HTTP"
-msgstr ""
+msgstr "No se pudo cambiar el método de autenticación a HTTP"
 
 #: authentication.php:127
 msgid "Cannot change authentication method to LDAP"
-msgstr ""
+msgstr "No se pudo cambiar el método de autenticación a LDAP"
 
 #: authentication.php:88
 msgid "Cannot change authentication method to Zabbix internal"
@@ -1463,7 +1464,7 @@ msgstr "No se puede crear un nuevo elemento"
 
 #: include/classes/import/CXmlImport18.php:1710
 msgid "Cannot create screen."
-msgstr ""
+msgstr "No se pudo crear la pantalla."
 
 #: api/classes/CUser.php:1189
 #, php-format

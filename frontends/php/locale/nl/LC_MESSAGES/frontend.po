@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-14 18:48+0300\n"
-"PO-Revision-Date: 2013-09-02 13:03+0300\n"
-"Last-Translator: open-future <patrik@open-future.be>\n"
+"POT-Creation-Date: 2013-09-14 20:02+0300\n"
+"PO-Revision-Date: 2013-09-14 16:34+0300\n"
+"Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: NL\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1378119820.0\n"
+"X-POOTLE-MTIME: 1379169264.0\n"
 
 #: include/views/configuration.item.edit.php:389
 msgid " day"
@@ -324,7 +324,7 @@ msgstr "Actie \"%1$s\" bestaat reeds."
 #: api/classes/CAction.php:540 api/classes/CAction.php:655
 #, php-format
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seconds)."
-msgstr "Actie \"%14s\" heeft verkeerde waare voor \"esc_period\" (minimum %2$s seconden)."
+msgstr "Actie \"%1$s\" heeft verkeerde waare voor \"esc_period\" (minimum %2$s seconden)."
 
 #: api/classes/CAction.php:726
 #, php-format
@@ -1015,7 +1015,7 @@ msgstr "CONFIGURATIE VAN HOST GROEPEN"
 #: include/views/configuration.host.prototype.edit.php:29
 #: include/views/configuration.host.prototype.list.php:31
 msgid "CONFIGURATION OF HOST PROTOTYPES"
-msgstr ""
+msgstr "CONFIGURATIE VAN HOST PROTOTYPES"
 
 #: hosts.php:634 hosts.php:699 hosts.php:747
 msgid "CONFIGURATION OF HOSTS"
@@ -1221,7 +1221,7 @@ msgstr "Kan geen niet-numeriek item \"%1$s\" aan grafiek \"%2$s\" toevoegen."
 #: api/classes/CGraphPrototype.php:696 api/classes/CGraphPrototype.php:758
 #, php-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
-msgstr ""
+msgstr "Kan een niet-numeriek item niet toevoegen \"%1$s\" in grafiek prototype \"%2$s\"."
 
 #: actionconf.php:150
 msgid "Cannot add action"
@@ -1229,7 +1229,7 @@ msgstr "kan actie niet toevoegen"
 
 #: actionconf.php:225
 msgid "Cannot add action condition"
-msgstr ""
+msgstr "Kan actie voorwaarde niet toevoegen"
 
 #: applications.php:109
 msgid "Cannot add application"
@@ -1242,7 +1242,7 @@ msgstr "Kan geen host afhankelijkheid toevoegen aan een template."
 #: include/triggers.inc.php:506
 #, php-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
-msgstr ""
+msgstr "Kan afhankelijkheid niet toevoegen van trigger \"%1$s:%2$s\" naar niet bestaande trigger \"%3$s:%4$s\"."
 
 #: host_discovery.php:267
 msgid "Cannot add discovery rule"
@@ -1262,7 +1262,7 @@ msgstr "Kan host niet toevoegen"
 
 #: host_prototypes.php:202
 msgid "Cannot add host prototype"
-msgstr ""
+msgstr "Kan gastheer prototype niet toevoegen"
 
 #: adm.images.php:62
 msgid "Cannot add image"
@@ -1300,7 +1300,7 @@ msgstr "Kan niet meer dan één item van het type \"Grafiek som\" toevoegen aan 
 #: api/classes/CGraphPrototype.php:43
 #, php-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
-msgstr ""
+msgstr "Kan meer dan een item niet toevoegen met type \"Graph sum\" op de grafiek prototype \"%1$s\"."
 
 #: sysmaps.php:171
 msgid "Cannot add network map"
@@ -1390,7 +1390,7 @@ msgstr "Kan grafiek prototypes niet klonen"
 
 #: api/classes/CDiscoveryRule.php:1000
 msgid "Cannot clone host prototypes."
-msgstr ""
+msgstr "Kan gastheer prototypes niet clonen."
 
 #: api/classes/CDiscoveryRule.php:836
 msgid "Cannot clone item prototypes."
@@ -1420,7 +1420,7 @@ msgstr "Kan trigger \"%1$s:%2$s\" niet kopiëren, omdat er meerde hosts in de ex
 #: api/classes/CHostPrototype.php:151
 #, php-format
 msgid "Cannot create a host prototype on a discovered host \"%1$s\"."
-msgstr ""
+msgstr "Kan een gastheer prototype op een ontdekte gastheer niet maken \"%1$s\"."
 
 #: include/db.inc.php:34
 msgid "Cannot create another database connection."
@@ -1428,11 +1428,11 @@ msgstr "Kan geen andere database verbinding opzetten."
 
 #: api/classes/CTrigger.php:1448
 msgid "Cannot create circular dependencies."
-msgstr ""
+msgstr "Kan geen circulaire afhankelijkheden maken."
 
 #: api/classes/CTrigger.php:1420
 msgid "Cannot create dependency on trigger itself."
-msgstr ""
+msgstr "Kan geen afhankelijkheid maken op de trigger zelf."
 
 #: discoveryconf.php:155
 msgid "Cannot create discovery rule"
@@ -1528,11 +1528,11 @@ msgstr "Kan host groep niet verwijderen."
 
 #: api/classes/CDiscoveryRule.php:412
 msgid "Cannot delete host prototype."
-msgstr ""
+msgstr "Kan gastheer prototype niet verwijderen."
 
 #: host_prototypes.php:119 host_prototypes.php:232
 msgid "Cannot delete host prototypes"
-msgstr ""
+msgstr "Kan gastheer prototypes niet verwijderen"
 
 #: adm.iconmapping.php:97
 msgid "Cannot delete icon map"
@@ -1632,7 +1632,7 @@ msgstr "Kan een template grafiek niet verwijderen."
 
 #: api/classes/CHostPrototype.php:1076
 msgid "Cannot delete templated host prototype."
-msgstr ""
+msgstr "Kan templated gastheer prototype niet verwijderen."
 
 #: api/classes/CItem.php:691
 msgid "Cannot delete templated item."
@@ -1702,11 +1702,11 @@ msgstr "Kan web scenario niet uitschakelen"
 
 #: queue.php:61
 msgid "Cannot display item queue."
-msgstr ""
+msgstr "Kan artikel wachtrij niet weergeven."
 
 #: chart7.php:74
 msgid "Cannot display more than one item with type \"Graph sum\"."
-msgstr ""
+msgstr "Kan niet meer dan één item weergeven met type \"Graph sum\"."
 
 #: media_types.php:160
 msgid "Cannot enable media type"
@@ -1814,7 +1814,7 @@ msgstr "Kan boom niet opmaken. Controleer de structuur van de service links."
 
 #: services.php:474
 msgid "Cannot format tree."
-msgstr ""
+msgstr "Kan structuur niet formatteren."
 
 #: api/classes/CTemplate.php:902
 msgid "Cannot have empty visible template name"
@@ -2109,7 +2109,7 @@ msgstr "Kan host niet bijwerken"
 
 #: host_prototypes.php:188
 msgid "Cannot update host prototype"
-msgstr ""
+msgstr "Kan gastheer prototype niet bijwerken"
 
 #: hosts.php:612
 msgid "Cannot update host status"
@@ -2134,7 +2134,7 @@ msgstr "Kan afbeelding niet bijwerken."
 #: api/classes/CHostInterface.php:395
 #, php-format
 msgid "Cannot update interface for discovered host \"%1$s\"."
-msgstr ""
+msgstr "Kan interface niet bijwerken voor ontdekte host \"%1$s\"."
 
 #: disc_prototypes.php:304 items.php:455 screenedit.php:176
 msgid "Cannot update item"
@@ -2180,7 +2180,7 @@ msgstr "Kan proxy niet bijwerken"
 #: api/classes/CProxy.php:298
 #, php-format
 msgid "Cannot update proxy for discovered host \"%1$s\"."
-msgstr ""
+msgstr "Kan proxy niet bijwerken voor ontdekte host \"%1$s\"."
 
 #: adm.regexps.php:127
 msgid "Cannot update regular expression"
@@ -2221,7 +2221,7 @@ msgstr "Kan applicatie in template niet bijwerken."
 #: api/classes/CTemplate.php:790 api/classes/CTemplate.php:1061
 #, php-format
 msgid "Cannot update templates on discovered host \"%1$s\"."
-msgstr ""
+msgstr "Kan geen sjablonen op ontdekte host \"%1$s\" bijwerken."
 
 #: trigger_prototypes.php:163 trigger_prototypes.php:208 triggers.php:179
 #: triggers.php:237 tr_logform.php:114
@@ -2311,7 +2311,7 @@ msgstr "Controleer stuk van expressie beginnend bij \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:277
 msgid "Check the key, please. Default example was passed."
-msgstr ""
+msgstr "Controleer de sleutel, aub. Standaard voorbeeld werd doorgegeven."
 
 #: include/views/js/configuration.discovery.edit.js.php:29
 msgid "Check type"
@@ -2446,7 +2446,7 @@ msgstr "Kolom breedte"
 #: api/classes/CScreenItem.php:611
 #, php-format
 msgid "Column span of screen element located at X - %1$s and Y - %2$s is too big."
-msgstr ""
+msgstr "Column overspanning van het scherm element gelegen op X -%1$s en Y -%2$s is te groot."
 
 #: include/views/configuration.screen.edit.php:42 screenconf.php:51
 msgid "Columns"
@@ -2570,7 +2570,7 @@ msgstr "Configuratie van host groepen"
 
 #: host_prototypes.php:27
 msgid "Configuration of host prototypes"
-msgstr ""
+msgstr "Configuratie van host prototypes"
 
 #: hosts.php:32
 msgid "Configuration of hosts"
@@ -2716,7 +2716,7 @@ msgstr "Geconnecteerd als '%1$s' vanaf '%2$s'"
 #: include/classes/server/CZabbixServer.php:208
 #, php-format
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
-msgstr ""
+msgstr "Time-out verbinding van %1$s seconden overschreden bij het verbinden met Zabbix server \"%2$s\"."
 
 #: include/classes/server/CZabbixServer.php:283
 #, php-format
@@ -2843,7 +2843,7 @@ msgstr "Maak hostgroep aan"
 
 #: include/views/configuration.host.prototype.list.php:30
 msgid "Create host prototype"
-msgstr ""
+msgstr "Maak gastheer prototype"
 
 #: adm.iconmapping.php:126
 msgid "Create icon map"
@@ -3941,7 +3941,7 @@ msgstr "Ontdekt"
 
 #: include/views/configuration.host.edit.php:158
 msgid "Discovered by"
-msgstr ""
+msgstr "Ontdekt door"
 
 #: include/views/monitoring.discovery.php:41
 msgid "Discovered device"
@@ -4120,12 +4120,12 @@ msgstr "Afbeelding stijl"
 
 #: include/views/administration.general.gui.edit.php:32
 msgid "Dropdown first entry"
-msgstr ""
+msgstr "Vervolgkeuzelijst eerste binnenkomst"
 
 #: adm.gui.php:74
 #, php-format
 msgid "Dropdown first entry \"%1$s\"."
-msgstr ""
+msgstr "Vervolgkeuzelijst eerste item \"%1$s\"."
 
 #: adm.gui.php:75
 #, php-format
