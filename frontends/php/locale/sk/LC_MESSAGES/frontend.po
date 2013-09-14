@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-14 18:48+0300\n"
-"PO-Revision-Date: 2013-08-25 22:42+0200\n"
+"POT-Creation-Date: 2013-09-14 20:02+0300\n"
+"PO-Revision-Date: 2013-09-12 06:54+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -11,8 +11,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Pootle 2.1.6\n"
+"X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
+"X-POOTLE-MTIME: 1378961678.0\n"
 
 #: include/views/configuration.item.edit.php:389
 msgid " day"
@@ -1021,7 +1022,7 @@ msgstr "NASTAVENIE SKUPÍN HOSTOV"
 #: include/views/configuration.host.prototype.edit.php:29
 #: include/views/configuration.host.prototype.list.php:31
 msgid "CONFIGURATION OF HOST PROTOTYPES"
-msgstr ""
+msgstr "NASTAVENIE PROTOTYPOV HOSTOV"
 
 #: hosts.php:634 hosts.php:699 hosts.php:747
 msgid "CONFIGURATION OF HOSTS"
@@ -1227,7 +1228,7 @@ msgstr "Nie je možné pridať nečíselnú položku \"%1$s\" do grafu \"%2$s\".
 #: api/classes/CGraphPrototype.php:696 api/classes/CGraphPrototype.php:758
 #, php-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
-msgstr ""
+msgstr "Nie je možné pridať nečíselnú položku \"%1$s\" k prototypu grafu \"%2$s\"."
 
 #: actionconf.php:150
 msgid "Cannot add action"
@@ -1268,7 +1269,7 @@ msgstr "Nie je možné pridať host"
 
 #: host_prototypes.php:202
 msgid "Cannot add host prototype"
-msgstr ""
+msgstr "Nie je možné pridať prototyp hosta"
 
 #: adm.images.php:62
 msgid "Cannot add image"
@@ -1301,12 +1302,12 @@ msgstr "Nie je možné pridať tento typ média"
 #: api/classes/CGraph.php:43
 #, php-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
-msgstr "Nie je možné pridať viac než jednu položku typu \"Súhrn grafu\" pre graf \"%1$s\"."
+msgstr "Nie je možné pridať viac než jednu položku typu \"Súhrn grafu\" k prototypu grafu \"%1$s\"."
 
 #: api/classes/CGraphPrototype.php:43
 #, php-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
-msgstr ""
+msgstr "Nie je možné pridať viac ako jednu položku \"Súhrn grafu\" k prototypu grafu \"%1$s\"."
 
 #: sysmaps.php:171
 msgid "Cannot add network map"
@@ -1396,7 +1397,7 @@ msgstr "Nie je možné klonovať prototypy grafov."
 
 #: api/classes/CDiscoveryRule.php:1000
 msgid "Cannot clone host prototypes."
-msgstr ""
+msgstr "Nie je možné klonovať prototypy hostov."
 
 #: api/classes/CDiscoveryRule.php:836
 msgid "Cannot clone item prototypes."
@@ -1426,7 +1427,7 @@ msgstr "Nie je možné skopírovať spúšťač \"%1$s:%2$s\", pretože jeho def
 #: api/classes/CHostPrototype.php:151
 #, php-format
 msgid "Cannot create a host prototype on a discovered host \"%1$s\"."
-msgstr ""
+msgstr "Nie je možné vytvoriť prototyp grafu pre zisteného hosta \"%1$s\"."
 
 #: include/db.inc.php:34
 msgid "Cannot create another database connection."
@@ -1534,11 +1535,11 @@ msgstr "Nie je možné zmazať skupinu hostov."
 
 #: api/classes/CDiscoveryRule.php:412
 msgid "Cannot delete host prototype."
-msgstr ""
+msgstr "Nie je možné zmazať prototyp hosta."
 
 #: host_prototypes.php:119 host_prototypes.php:232
 msgid "Cannot delete host prototypes"
-msgstr ""
+msgstr "Nie je možné zmazať prototypy hosta"
 
 #: adm.iconmapping.php:97
 msgid "Cannot delete icon map"
@@ -1639,7 +1640,7 @@ msgstr "Nie je možné zmazať grafy patriace šablóne."
 
 #: api/classes/CHostPrototype.php:1076
 msgid "Cannot delete templated host prototype."
-msgstr ""
+msgstr "Nie je možné zmazať prototyp hosta patriaci šablóne."
 
 #: api/classes/CItem.php:691
 msgid "Cannot delete templated item."
@@ -1714,7 +1715,7 @@ msgstr "Nie je možné zobraziť frontu položiek."
 
 #: chart7.php:74
 msgid "Cannot display more than one item with type \"Graph sum\"."
-msgstr ""
+msgstr "Nie je možné zobraziť viac ako jednu položku s typom \"Súhrn grafu\"."
 
 #: media_types.php:160
 msgid "Cannot enable media type"
@@ -2010,17 +2011,17 @@ msgstr "Nie je možné zrušiť prepojenie spúšťača \"%s\", pretože obsahuj
 #: api/classes/CHost.php:684
 #, php-format
 msgid "Cannot update \"%1$s\" for a discovered host."
-msgstr ""
+msgstr "Nie je možné aktualizovať \"%1$s\" pre zisteného hosta."
 
 #: api/classes/CItemGeneral.php:176
 #, php-format
 msgid "Cannot update \"%1$s\" for a discovered item."
-msgstr ""
+msgstr "Nie je možné aktualizovať \"%1$s\" pre zistenú položku."
 
 #: api/classes/CTrigger.php:647
 #, php-format
 msgid "Cannot update \"%1$s\" for a discovered trigger."
-msgstr ""
+msgstr "Nie je možné aktualizovať \"%1$s\" pre zistený spúšťač."
 
 #: api/classes/CItemGeneral.php:205
 #, php-format
@@ -2045,7 +2046,7 @@ msgstr "Nie je možné aktualizovať \"templateid\" pre graf \"%1$s\"."
 #: api/classes/CGraphPrototype.php:42
 #, php-format
 msgid "Cannot update \"templateid\" for graph prototype \"%1$s\"."
-msgstr ""
+msgstr "Nie je možné aktualizovať \"templateid\" pre prototyp grafu \"%1$s\"."
 
 #: api/classes/CScreen.php:447 api/classes/CTemplateScreen.php:667
 #, php-format
@@ -2059,11 +2060,11 @@ msgstr "Nie je možné aktualizovať \"templateid\" pre prototyp spúšťača \"
 
 #: api/classes/CGraphGeneral.php:60
 msgid "Cannot update a discovered graph."
-msgstr ""
+msgstr "Nie je možné aktualizovať zistený graf."
 
 #: api/classes/CHostGroup.php:537
 msgid "Cannot update a discovered host group."
-msgstr ""
+msgstr "Nie je možné aktualizovať zistenú skupinu hostov."
 
 #: actionconf.php:146
 msgid "Cannot update action"
@@ -2111,7 +2112,7 @@ msgstr "Nie je možné upraviť skupinu."
 #: api/classes/CHostGroup.php:908
 #, php-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
-msgstr ""
+msgstr "Nie je možné aktualizovať skupiny pre zisteného hosta \"%1$s\"."
 
 #: hostgroups.php:222 hosts.php:363
 msgid "Cannot update host"
@@ -2119,7 +2120,7 @@ msgstr "Nie je možné upraviť hosta"
 
 #: host_prototypes.php:188
 msgid "Cannot update host prototype"
-msgstr ""
+msgstr "Nie je možné aktualizovať prototyp hosta"
 
 #: hosts.php:612
 msgid "Cannot update host status"
@@ -2144,7 +2145,7 @@ msgstr "Nie je možné upraviť obrázok."
 #: api/classes/CHostInterface.php:395
 #, php-format
 msgid "Cannot update interface for discovered host \"%1$s\"."
-msgstr ""
+msgstr "Nie je možné aktualizovať rozhranie pre zisteného hosta \"%1$s\"."
 
 #: disc_prototypes.php:304 items.php:455 screenedit.php:176
 msgid "Cannot update item"
@@ -2190,7 +2191,7 @@ msgstr "Nie je možné upraviť proxy"
 #: api/classes/CProxy.php:298
 #, php-format
 msgid "Cannot update proxy for discovered host \"%1$s\"."
-msgstr ""
+msgstr "Nie je možné aktualizovať proxy pre zisteného hosta \"%1$s\"."
 
 #: adm.regexps.php:127
 msgid "Cannot update regular expression"
@@ -2231,7 +2232,7 @@ msgstr "Nie je možné aktualizovať aplikácie patriace šablóne."
 #: api/classes/CTemplate.php:790 api/classes/CTemplate.php:1061
 #, php-format
 msgid "Cannot update templates on discovered host \"%1$s\"."
-msgstr ""
+msgstr "Nie je možné aktualizovať šablóny pre zisteného hosta \"%1$s\"."
 
 #: trigger_prototypes.php:163 trigger_prototypes.php:208 triggers.php:179
 #: triggers.php:237 tr_logform.php:114
@@ -2580,7 +2581,7 @@ msgstr "Nastavenie skupín hostov"
 
 #: host_prototypes.php:27
 msgid "Configuration of host prototypes"
-msgstr ""
+msgstr "Nastavenie prototypov hostov"
 
 #: hosts.php:32
 msgid "Configuration of hosts"
@@ -2853,7 +2854,7 @@ msgstr "Vytvoriť skupinu hostov"
 
 #: include/views/configuration.host.prototype.list.php:30
 msgid "Create host prototype"
-msgstr ""
+msgstr "Vytvoriť prototyp hosta"
 
 #: adm.iconmapping.php:126
 msgid "Create icon map"
@@ -2956,7 +2957,7 @@ msgstr "Vytvorené: Zisťovacie pravidlo \"%1$s\" na \"%2$s\"."
 #: api/classes/CHostPrototype.php:364
 #, php-format
 msgid "Created: Host prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Vytvorené: Prototyp hosta \"%1$s\" na \"%2$s\"."
 
 #: api/classes/CItem.php:590
 #, php-format
@@ -3536,11 +3537,11 @@ msgstr "Zmazať označené skupiny?"
 
 #: include/views/configuration.host.prototype.edit.php:321
 msgid "Delete selected host prototype?"
-msgstr ""
+msgstr "Zmazať označený prototyp hosta?"
 
 #: include/views/configuration.host.prototype.list.php:128
 msgid "Delete selected host prototypes?"
-msgstr ""
+msgstr "Zmazať označené prototypy hosta?"
 
 #: include/views/configuration.host.edit.php:830
 msgid "Delete selected host?"
@@ -3678,7 +3679,7 @@ msgstr "Zmazané: Host \"%1$s\"."
 #: api/classes/CHostPrototype.php:971
 #, php-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Zmazané: Prototyp hosta \"%1$s\" na \"%2$s\"."
 
 #: api/classes/CItem.php:782
 #, php-format
@@ -3900,7 +3901,7 @@ msgstr "Zakázať označené skupiny?"
 
 #: include/views/configuration.host.prototype.list.php:124
 msgid "Disable selected host prototypes?"
-msgstr ""
+msgstr "Zakázať označené prototypy hosta?"
 
 #: hosts.php:993
 msgid "Disable selected hosts?"
@@ -3952,7 +3953,7 @@ msgstr "Zistené"
 
 #: include/views/configuration.host.edit.php:158
 msgid "Discovered by"
-msgstr ""
+msgstr "Zistené"
 
 #: include/views/monitoring.discovery.php:41
 msgid "Discovered device"
@@ -4151,12 +4152,12 @@ msgstr "Kopírovať závislosti v spúšťači \"%1$s\"."
 #: api/classes/CHostPrototype.php:197
 #, php-format
 msgid "Duplicate group prototype name \"%2$s\" for host prototype \"%1$s\"."
-msgstr ""
+msgstr "Duplicitné meno prototypu skupiny \"%2$s\" pre prototyp hosta \"%1$s\"."
 
 #: api/classes/CHostPrototype.php:191
 #, php-format
 msgid "Duplicate host group ID \"%2$s\" for host prototype \"%1$s\"."
-msgstr ""
+msgstr "Duplicitné ID skupiny hostov \"%2$s\" pre prototyp hosta \"%1$s\"."
 
 #: api/classes/CHost.php:747
 #, php-format
@@ -4280,15 +4281,15 @@ msgstr "Prázdna podmienka akcie."
 
 #: include/classes/validators/CColorValidator.php:33
 msgid "Empty color."
-msgstr ""
+msgstr "Prázdna farba."
 
 #: api/classes/CHostPrototype.php:458
 msgid "Empty host ID for host prototype."
-msgstr ""
+msgstr "Prázdne ID hosta pre prototyp hosta."
 
 #: api/classes/CHostPrototype.php:173
 msgid "Empty host."
-msgstr ""
+msgstr "Prázdny host."
 
 #: api/classes/CAction.php:1235 api/classes/CApplication.php:288
 #: api/classes/CApplication.php:495 api/classes/CDiscoveryRule.php:339
@@ -4317,12 +4318,12 @@ msgstr "Prázdne makro."
 
 #: api/classes/CHostPrototype.php:222
 msgid "Empty name for group prototype."
-msgstr ""
+msgstr "Prázdne meno pre prototyp skupiny."
 
 #: api/classes/CHostPrototype.php:181
 #, php-format
 msgid "Empty name for host prototype \"%1$s\"."
-msgstr ""
+msgstr "Prázdne meno pre prototyp hosta \"%1$s\"."
 
 #: api/classes/CScript.php:569
 #, php-format
@@ -4428,7 +4429,7 @@ msgstr "Povoliť označené skupiny?"
 
 #: include/views/configuration.host.prototype.list.php:120
 msgid "Enable selected host prototypes?"
-msgstr ""
+msgstr "Povoliť označené prototypy hostov?"
 
 #: hosts.php:990 include/views/configuration.hostgroups.list.php:162
 msgid "Enable selected hosts?"
@@ -4754,42 +4755,42 @@ msgstr "Pole \"%1$s\" nemôže byť nastavené na NULL."
 #: include/validate.inc.php:400
 #, php-format
 msgid "Field \"%1$s\" is mandatory."
-msgstr ""
+msgstr "Pole \"%1$s\" je povinné."
 
 #: include/validate.inc.php:313
 #, php-format
 msgid "Field \"%1$s\" is not IP range."
-msgstr ""
+msgstr "Pole \"%1$s\" nie je IP rozsah."
 
 #: include/validate.inc.php:303
 #, php-format
 msgid "Field \"%1$s\" is not IP."
-msgstr ""
+msgstr "Pole \"%1$s\" nie je IP."
 
 #: include/validate.inc.php:338
 #, php-format
 msgid "Field \"%1$s\" is not decimal number."
-msgstr ""
+msgstr "Pole \"%1$s\" nie je desiatkové číslo."
 
 #: include/validate.inc.php:323
 #, php-format
 msgid "Field \"%1$s\" is not integer list or range."
-msgstr ""
+msgstr "Pole \"%1$s\" nie je celé číslo alebo rozsah."
 
 #: include/validate.inc.php:332
 #, php-format
 msgid "Field \"%1$s\" is not integer."
-msgstr ""
+msgstr "Pole \"%1$s\" nie je desiatkové číslo."
 
 #: include/validate.inc.php:344
 #, php-format
 msgid "Field \"%1$s\" is not string."
-msgstr ""
+msgstr "Pole \"%1$s\" nie je reťazec."
 
 #: include/validate.inc.php:412
 #, php-format
 msgid "Field \"%1$s\" must be missing."
-msgstr ""
+msgstr "Pole \"%1$s\" musí chýbať."
 
 #: api/classes/CDRule.php:384
 msgid "Field \"druleid\" is required."
@@ -5231,7 +5232,7 @@ msgstr "Skupina"
 #: api/classes/CHostGroup.php:613
 #, php-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
-msgstr ""
+msgstr "Skupinu \"%1$s\" nie je možné zmazať, pretože je používaná prototypom hosta."
 
 #: include/classes/import/importers/CTemplateImporter.php:233
 #, php-format
@@ -5266,16 +5267,16 @@ msgstr "Meno skupiny"
 
 #: api/classes/CHostPrototype.php:395 api/classes/CHostPrototype.php:402
 msgid "Group prototype ID cannot be empty."
-msgstr ""
+msgstr "ID prototypu skupiny nemôže byť prázdne."
 
 #: api/classes/CHostPrototype.php:156 api/classes/CHostPrototype.php:434
 #, php-format
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
-msgstr ""
+msgstr "Prototyp skupiny nemôže byť založený na zistenej skupine hostov \"%1$s\"."
 
 #: include/views/configuration.host.prototype.edit.php:203
 msgid "Group prototypes"
-msgstr ""
+msgstr "Prototypy skupiny"
 
 #: hostgroups.php:124 usergrps.php:179
 msgid "Group updated"
@@ -5631,17 +5632,17 @@ msgstr "Hostove metaúdaje"
 #: include/views/configuration.host.edit.php:169
 #: include/views/configuration.host.prototype.edit.php:65
 msgid "Host name"
-msgstr "Meno hostu"
+msgstr "Meno hosta"
 
 #: api/classes/CHostPrototype.php:174
 #, php-format
 msgid "Host name \"%1$s\" is too long, it must not be longer than %2$d characters."
-msgstr ""
+msgstr "Meno hosta \"%1$s\" je príliš dlhé, nesmie byť dlhšie ako %2$d znakov."
 
 #: api/classes/CHostPrototype.php:176
 #, php-format
 msgid "Host name for host prototype \"%1$s\" must contain macros."
-msgstr ""
+msgstr "Meno hosta pre prototyp hosta \"%1$s\" musí obsahovať makrá."
 
 #: include/hosts.inc.php:290
 msgid "Host networks"
@@ -5650,29 +5651,29 @@ msgstr "Siete hosta"
 #: api/classes/CHostPrototype.php:785
 #, php-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
-msgstr ""
+msgstr "Prototyp hosta \"%1$s\" už existuje na \"%2$s\", zdedený z inej šablóny."
 
 #: api/classes/CHostPrototype.php:773
 #, php-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "Prototyp hosta \"%1$s\" už existuje na \"%2$s\"."
 
 #: api/classes/CHostPrototype.php:189
 #, php-format
 msgid "Host prototype \"%1$s\" must have at least one host group."
-msgstr ""
+msgstr "Prototyp hosta \"%1$s\" musí mať najmenej jednu skupinu hostov."
 
 #: host_prototypes.php:202
 msgid "Host prototype added"
-msgstr ""
+msgstr "Prototyp hosta pridaný"
 
 #: host_prototypes.php:119
 msgid "Host prototype deleted"
-msgstr ""
+msgstr "Prototyp hosta zmazaný"
 
 #: host_prototypes.php:188
 msgid "Host prototype updated"
-msgstr ""
+msgstr "Prototyp hosta aktualizovaný"
 
 #: api/classes/CHostPrototype.php:1100
 #, php-format
