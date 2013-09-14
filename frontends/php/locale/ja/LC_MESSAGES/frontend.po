@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-12 21:53+0300\n"
+"POT-Creation-Date: 2013-09-14 18:48+0300\n"
 "PO-Revision-Date: 2013-08-31 11:02+0300\n"
 "Last-Translator: Kodai Terashima <kodai.terashima@zabbix.com>\n"
 "Language-Team: Zabbix\n"
@@ -8239,7 +8239,7 @@ msgstr[0] "ホスト名は最大%2$d文字です。\"%3$s\"は%1$d文字あり�
 msgid "Maximum number of flexible intervals added"
 msgstr "例外の更新間隔の設定数が上限に達しました"
 
-#: include/classes/screens/CScreenBase.php:339 include/graphs.inc.php:401
+#: include/classes/screens/CScreenBase.php:339 include/graphs.inc.php:406
 #, php-format
 msgid "Maximum time period to display is %1$s day."
 msgid_plural "Maximum time period to display is %1$s days."
@@ -8424,7 +8424,7 @@ msgstr "PHPのpostサイズの最小値は%sです (\"post_max_size\"設定オ�
 msgid "Minimum severity"
 msgstr "最小の深刻度"
 
-#: include/classes/screens/CScreenBase.php:334 include/graphs.inc.php:394
+#: include/classes/screens/CScreenBase.php:334 include/graphs.inc.php:399
 #, php-format
 msgid "Minimum time period to display is %1$s hour."
 msgid_plural "Minimum time period to display is %1$s hours."
@@ -8491,7 +8491,7 @@ msgstr "グラフ\"%1$s\"のアイテムが存在しません。"
 msgid "Missing items for graph prototype \"%1$s\"."
 msgstr "グラフのプロトタイプ\"%1$s\"のアイテムが存在しません。"
 
-#: include/graphs.inc.php:321
+#: include/graphs.inc.php:326
 #, php-format
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
 msgstr "ホスト\"%2$s\"にはキー\"%1$s\"が設定されていません。"
@@ -8989,7 +8989,7 @@ msgstr "例外の更新間隔は設定されていません。"
 msgid "No graph ID provided for screen element."
 msgstr "スクリーンの要素にグラフIDが設定されていません。"
 
-#: include/graphs.inc.php:289
+#: include/graphs.inc.php:294
 #, php-format
 msgid "No graph item with graphid \"%s\"."
 msgstr "グラフID\"%s\"のグラフアイテムがありません。"
@@ -10070,8 +10070,8 @@ msgstr ""
 msgid "PHP gd FreeType support"
 msgstr "PHP gd FreeTypeのサポート"
 
-#: include/classes/class.frontendsetup.php:462 include/graphs.inc.php:699
-#: include/graphs.inc.php:723
+#: include/classes/class.frontendsetup.php:462 include/graphs.inc.php:704
+#: include/graphs.inc.php:728
 msgid "PHP gd FreeType support missing"
 msgstr "PHP gd FreeTypeがサポートされていません"
 
@@ -11956,7 +11956,7 @@ msgstr "県"
 msgid "Size of the response received from Zabbix server \"%1$s\" exceeds the allowed size of %2$s bytes. This value can be increased in the ZBX_SOCKET_BYTES_LIMIT constant in include/defines.inc.php."
 msgstr "Zabbixサーバー\"%1$s\"から受信したデータのサイズが上限値%2$sバイトを超えています。上限値はinclude/defines.inc.phpのZBX_SOCKET_BYTES_LIMITパラメータで変更することが可能です。"
 
-#: include/graphs.inc.php:352
+#: include/graphs.inc.php:357
 #, php-format
 msgid "Skipped copying of graph \"%1$s\" to host \"%2$s\"."
 msgstr "ホスト\"%2$s\"へのグラフ\"%1$s\"のコピーをスキップしました。"
