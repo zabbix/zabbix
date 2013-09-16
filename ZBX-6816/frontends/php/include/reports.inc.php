@@ -477,7 +477,7 @@ function validateBarReportItems($items = array()) {
 
 	foreach ($items as $item) {
 		foreach ($fields as $field) {
-			if (!isset($item[$field]) || !$item[$field]) {
+			if (!isset($item[$field])) {
 				show_error_message(_s('Missing "%1$s" field for item.', $field));
 				return false;
 			}
