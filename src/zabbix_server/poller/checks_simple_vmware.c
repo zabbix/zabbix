@@ -361,7 +361,6 @@ typedef struct
 }
 zbx_perfcounter_mapping_t;
 
-
 /******************************************************************************
  *                                                                            *
  * Function: vmware_get_group_perfcounters                                    *
@@ -433,18 +432,15 @@ static int	vmware_get_group_perfcounters(const char *data, int size, const char 
 	}
 
 	ret = SUCCEED;
-
 clean:
 	if (NULL != xpathObj)
 		xmlXPathFreeObject(xpathObj);
 
-	if (NULL != xpath)
-		zbx_free(xpath);
+	zbx_free(xpath);
 
 	xmlXPathFreeContext(xpathCtx);
 	xmlFreeDoc(doc);
 	xmlCleanupParser();
-
 out:
 	return ret;
 }
@@ -470,7 +466,7 @@ static int	vmware_init_perf_counters(CURL *easyhandle, zbx_counters_t *counters,
 #	define ZBX_POST_VMWARE_GET_PERFCOUTNER							\
 		ZBX_POST_VSPHERE_HEADER								\
 		"<ns0:RetrieveProperties>"							\
-			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"	\
+			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"			\
 			"<ns0:specSet>"								\
 				"<ns0:propSet>"							\
 					"<ns0:type>PerformanceManager</ns0:type>"		\
@@ -561,7 +557,6 @@ static int	vmware_init_perf_counters(CURL *easyhandle, zbx_counters_t *counters,
 
 		ret = SUCCEED;
 	}
-
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
@@ -607,11 +602,8 @@ static void	wmware_vm_populate_nic_devices(zbx_vm_t *vm)
 		char		*key;
 		zbx_dev_t	*dev;
 
-		if (NULL == (key = read_xml_node_value(doc, nodeset->nodeTab[i],
-				"*[local-name()='key']")))
-		{
+		if (NULL == (key = read_xml_node_value(doc, nodeset->nodeTab[i], "*[local-name()='key']")))
 			continue;
-		}
 
 		dev = zbx_malloc(NULL, sizeof(zbx_dev_t));
 		dev->type =  ZBX_DEV_TYPE_NIC;
@@ -621,7 +613,6 @@ static void	wmware_vm_populate_nic_devices(zbx_vm_t *vm)
 		zbx_vector_ptr_append(&vm->devs, dev);
 	}
 out:
-
 	if (NULL != xpathObj)
 		xmlXPathFreeObject(xpathObj);
 
@@ -671,11 +662,8 @@ static void	wmware_vm_populate_disk_devices_by_counterid(zbx_vm_t *vm, zbx_uint6
 		char		*instance;
 		zbx_dev_t	*dev;
 
-		if (NULL == (instance = read_xml_node_value(doc, nodeset->nodeTab[i],
-				"*[local-name()='instance']")))
-		{
+		if (NULL == (instance = read_xml_node_value(doc, nodeset->nodeTab[i], "*[local-name()='instance']")))
 			continue;
-		}
 
 		dev = zbx_malloc(NULL, sizeof(zbx_dev_t));
 		dev->type =  ZBX_DEV_TYPE_DISK;
@@ -685,7 +673,6 @@ static void	wmware_vm_populate_disk_devices_by_counterid(zbx_vm_t *vm, zbx_uint6
 		zbx_vector_ptr_append(&vm->devs, dev);
 	}
 out:
-
 	if (NULL != xpathObj)
 		xmlXPathFreeObject(xpathObj);
 
@@ -693,7 +680,6 @@ out:
 	xmlFreeDoc(doc);
 	xmlCleanupParser();
 }
-
 
 static int	vmware_set_powerstate_result(AGENT_RESULT *result)
 {
@@ -1374,7 +1360,7 @@ static void	add_perf_counter_stat_metric(char **tmp, size_t *tmp_alloc, size_t *
 static int	vmware_vm_perf_counter_stats_get(CURL *easyhandle, zbx_vm_t *vm, zbx_counters_t *counters, char **error,
 		unsigned flags)
 {
-	const char		*__function_name = "vmware_perf_counter_stats_get";
+	const char		*__function_name = "vmware_vm_perf_counter_stats_get";
 
 	int			i, err, o, ret = FAIL, refresh_rate;
 	char			*tmp = NULL;
@@ -1701,7 +1687,7 @@ out:
  *           If an error occured then id is used as datastore name.           *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_datastores_add(CURL *easyhandle, zbx_vector_ptr_t *datastores, char *id, unsigned flags)
+static void	vmware_datastores_add(CURL *easyhandle, zbx_vector_ptr_t *datastores, const char *id, unsigned flags)
 {
 #	define ZBX_POST_DATASTORE_GET								\
 		ZBX_POST_VSPHERE_HEADER								\
@@ -1740,8 +1726,10 @@ static void	vmware_datastores_add(CURL *easyhandle, zbx_vector_ptr_t *datastores
 	{
 		if ('\0' != *url)
 		{
-			int	len = strlen(url);
+			size_t	len;
 			char	*ptr;
+
+			len = strlen(url);
 
 			if ('/' == url[len - 1])
 				url[len - 1] = '\0';
@@ -1753,18 +1741,11 @@ static void	vmware_datastores_add(CURL *easyhandle, zbx_vector_ptr_t *datastores
 		}
 		zbx_free(url);
 	}
-
 out:
 	datastore = zbx_malloc(NULL, sizeof(zbx_datastore_t));
-	if (NULL != name)
-	{
-		datastore->name = name;
-		zbx_free(id);
-	}
-	else
-		datastore->name = id;
-
+	datastore->name = (NULL != name ? name : zbx_strdup(NULL, id));
 	datastore->uuid = uuid;
+
 	zbx_vector_ptr_append(datastores, datastore);
 }
 
@@ -1780,7 +1761,6 @@ out:
  *                                  ZBX_VMWARE_FLAG_VCENTER                   *
  *                                                                            *
  ******************************************************************************/
-
 static void	vmware_datastores_update(CURL *easyhandle, zbx_vector_ptr_t *datastores, const char *details,
 		unsigned flags)
 {
@@ -1791,11 +1771,12 @@ static void	vmware_datastores_update(CURL *easyhandle, zbx_vector_ptr_t *datasto
 
 	zbx_vector_str_create(&values);
 
-	read_xml_values(details,  "//*[@type='Datastore']", &values);
+	read_xml_values(details, "//*[@type='Datastore']", &values);
 
 	for (i = 0; i < values.values_num; i++)
 		vmware_datastores_add(easyhandle, datastores, values.values[i], flags);
 
+	zbx_vector_str_clean(&values);
 	zbx_vector_str_destroy(&values);
 }
 
@@ -2067,9 +2048,7 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 			wmware_vm_populate_disk_devices_by_counterid(vm, vcenter->counters.disk_read);
 		}
 
-		for (j = 0; j < guestvmids.values_num; j++)
-			zbx_free(guestvmids.values[j]);
-		guestvmids.values_num = 0;
+		zbx_vector_str_clean(&guestvmids);
 	}
 
 	if (SUCCEED != vmware_event_session_get(easyhandle, &event_session, error, ZBX_VMWARE_FLAG_VCENTER))
@@ -2119,12 +2098,10 @@ clean:
 	zbx_free(clusters);
 	zbx_free(event_session);
 
-	for (i = 0; i < clusterids.values_num; i++)
-		zbx_free(clusterids.values[i]);
+	zbx_vector_str_clean(&clusterids);
 	zbx_vector_str_destroy(&clusterids);
 
-	for (i = 0; i < guesthvids.values_num; i++)
-		zbx_free(guesthvids.values[i]);
+	zbx_vector_str_clean(&guesthvids);
 	zbx_vector_str_destroy(&guesthvids);
 
 	for (i = 0; i < guestvmids.values_num; i++)
@@ -2417,8 +2394,7 @@ static int	vsphere_update(const char *url, const char *username, const char *pas
 clean:
 	zbx_free(event_session);
 
-	for (i = 0; i < guestvmids.values_num; i++)
-		zbx_free(guestvmids.values[i]);
+	zbx_vector_str_clean(&guestvmids);
 	zbx_vector_str_destroy(&guestvmids);
 
 	curl_slist_free_all(headers);
@@ -2537,8 +2513,7 @@ int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, AGENT_RESULT
 	if (!ISSET_LOG(result))
 		set_log_result_empty(result);
 
-	for (i = 0; i < keys.values_num; i++)
-		zbx_free(keys.values[i]);
+	zbx_vector_str_clean(&keys);
 	zbx_vector_str_destroy(&keys);
 
 	return SYSINFO_RET_OK;
@@ -3926,13 +3901,12 @@ int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, const char *userna
 		zbx_json_addobject(&j, NULL);
 		zbx_json_addstring(&j, "{#FSNAME}", disks.values[i], ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&j);
-
-		zbx_free(disks.values[i]);
 	}
 
-	zbx_vector_str_destroy(&disks);
-
 	zbx_json_close(&j);
+
+	zbx_vector_str_clean(&disks);
+	zbx_vector_str_destroy(&disks);
 
 	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
 
@@ -5031,13 +5005,12 @@ int	check_vsphere_vm_vfs_fs_discovery(AGENT_REQUEST *request, const char *userna
 		zbx_json_addobject(&j, NULL);
 		zbx_json_addstring(&j, "{#FSNAME}", disks.values[i], ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&j);
-
-		zbx_free(disks.values[i]);
 	}
 
-	zbx_vector_str_destroy(&disks);
-
 	zbx_json_close(&j);
+
+	zbx_vector_str_clean(&disks);
+	zbx_vector_str_destroy(&disks);
 
 	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
 
