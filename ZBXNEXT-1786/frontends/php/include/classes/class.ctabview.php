@@ -74,9 +74,19 @@ class CTabView extends CDiv {
 			$this->addItem($headersList);
 			$this->addItem($this->tabs);
 
+			if ($this->selectedTab === null) {
+				$activeTab = get_cookie('tab', 0);
+				$createEvent = '';
+			}
+			else {
+				$activeTab = $this->selectedTab;
+				$createEvent = 'create: function() { jQuery.cookie("tab", '.$this->selectedTab.'); },';
+			}
+
 			zbx_add_post_js('
 				jQuery("#'.$this->id.'").tabs({
-					active: '.(is_null($this->selectedTab) ? get_cookie('tab', 0) : $this->selectedTab).',
+					'.$createEvent.'
+					active: '.$activeTab.',
 					activate: function(event, ui) {
 						jQuery.cookie("tab", ui.newTab.index().toString());
 					}
