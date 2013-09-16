@@ -25,14 +25,10 @@ class CTabView extends CDiv {
 	protected $tabs = array();
 	protected $headers = array();
 	protected $selectedTab = null;
-	protected $rememberTab = false;
 
 	public function __construct($data = array()) {
 		if (isset($data['id'])) {
 			$this->id = $data['id'];
-		}
-		if (isset($data['remember'])) {
-			$this->setRemember($data['remember']);
 		}
 		if (isset($data['selected'])) {
 			$this->setSelected($data['selected']);
@@ -40,10 +36,6 @@ class CTabView extends CDiv {
 		parent::__construct();
 		$this->attr('id', zbx_formatDomId($this->id));
 		$this->attr('class', 'tabs');
-	}
-
-	public function setRemember($remember) {
-		$this->rememberTab = $remember;
 	}
 
 	public function setSelected($selected) {
@@ -72,23 +64,27 @@ class CTabView extends CDiv {
 		}
 		else {
 			$headersList = new CList();
+
 			foreach ($this->headers as $id => $header) {
 				$tabLink = new CLink($header, '#'.$id, null, null, false);
 				$tabLink->setAttribute('id', 'tab_'.$id);
 				$headersList->addItem($tabLink);
 			}
+
 			$this->addItem($headersList);
 			$this->addItem($this->tabs);
 
-			$options = array();
-			if (!is_null($this->selectedTab)) {
-				$options['selected'] = $this->selectedTab;
-			}
-			if ($this->rememberTab) {
-				$options['cookie'] = array();
-			}
-			zbx_add_post_js('jQuery("#'.$this->id.'").tabs('.zbx_jsvalue($options, true).').css("visibility", "visible");');
+			zbx_add_post_js('
+				jQuery("#'.$this->id.'").tabs({
+					active: '.(is_null($this->selectedTab) ? get_cookie('tab', 0) : $this->selectedTab).',
+					activate: function(event, ui) {
+						jQuery.cookie("tab", ui.newTab.index().toString());
+					}
+				})
+				.css("visibility", "visible");'
+			);
 		}
+
 		return parent::toString($destroy);
 	}
 }
