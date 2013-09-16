@@ -73,6 +73,24 @@ $fields = array(
 );
 $isValid = check_fields($fields);
 
+if (isset($_REQUEST['new_graph_item'])) {
+	$_REQUEST['items'] = get_request('items', array());
+	$new_gitem = get_request('new_graph_item', array());
+
+	foreach ($_REQUEST['items'] as $data) {
+		if ((bccomp($new_gitem['itemid'], $data['itemid']) == 0)
+				&& $new_gitem['calc_fnc'] == $data['calc_fnc']
+				&& $new_gitem['caption'] == $data['caption']) {
+			$already_exist = true;
+			break;
+		}
+	}
+
+	if (!isset($already_exist)) {
+		array_push($_REQUEST['items'], $new_gitem);
+	}
+}
+
 // validate permissions
 if (get_request('config') == 3) {
 	if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
@@ -110,7 +128,6 @@ else {
 	}
 }
 
-
 if (isset($_REQUEST['favobj'])) {
 	if ($_REQUEST['favobj'] == 'filter') {
 		CProfile::update('web.report6.filter.state',$_REQUEST['favstate'], PROFILE_TYPE_INT);
@@ -122,24 +139,8 @@ if ((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])) 
 	exit();
 }
 
-if (isset($_REQUEST['new_graph_item'])) {
-	$_REQUEST['items'] = get_request('items', array());
-	$new_gitem = get_request('new_graph_item', array());
 
-	foreach ($_REQUEST['items'] as $gid => $data) {
-		if ((bccomp($new_gitem['itemid'] , $data['itemid']) == 0)
-				&& $new_gitem['calc_fnc'] == $data['calc_fnc']
-				&& $new_gitem['caption'] == $data['caption']) {
-			$already_exist = true;
-			break;
-		}
-	}
-
-	if (!isset($already_exist)) {
-		array_push($_REQUEST['items'], $new_gitem);
-	}
-}
-elseif (isset($_REQUEST['delete_item']) && isset($_REQUEST['group_gid'])) {
+if (isset($_REQUEST['delete_item']) && isset($_REQUEST['group_gid'])) {
 	foreach ($_REQUEST['items'] as $gid => $data) {
 		if (!isset($_REQUEST['group_gid'][$gid])) {
 			continue;
