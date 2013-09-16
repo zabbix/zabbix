@@ -8,6 +8,7 @@ A.F.I..... [ZBXNEXT-1786] implemented script name tree in menu popups (Eduard, S
 ..F....... [ZBX-6846] the print link work with javascript instead of reloading the whole page (Vitalij)
 
 Bug fixes:
+..F....... [ZBX-6984] resolved problem with list of host group on Configuration->Host groups page (Vitalij)
 ..F....... [ZBX-6967] added missing spaces between icons (Vitalij)
 ..F....... [ZBX-6804] optimized min item clock calculation for graph; thanks to Volker Fröhlich (Eduard)
 ..F....... [ZBX-6968] fixed add/remove favorites icon javascript (Vitalij)
