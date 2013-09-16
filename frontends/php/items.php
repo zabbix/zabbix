@@ -182,8 +182,9 @@ $_REQUEST['params'] = get_request($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);
 
 $subfiltersList = array('subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'subfilter_status',
-					'subfilter_state', 'subfilter_templated_items', 'subfilter_with_triggers', 'subfilter_hosts',
-					'subfilter_interval', 'subfilter_history', 'subfilter_trends');
+	'subfilter_state', 'subfilter_templated_items', 'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval',
+	'subfilter_history', 'subfilter_trends'
+);
 
 /*
  * Permissions
@@ -1093,12 +1094,11 @@ else {
 			}
 		}
 		unset($item);
-	}
 
-	if (!empty($data['items'])) {
+		// disable subfilters if list is empty
 		foreach ($data['items'] as $item) {
 			$atLeastOne = true;
-			foreach ($item['subfilters'] as $subfilter => $value) {
+			foreach ($item['subfilters'] as $value) {
 				if (!$value) {
 					$atLeastOne = false;
 					break;
@@ -1113,8 +1113,9 @@ else {
 				$_REQUEST[$name] = array();
 				CProfile::update('web.items.'.$name, '', PROFILE_TYPE_STR);
 				foreach ($data['items'] as &$item) {
-					$item['subfilters'][$name] = 1;
+					$item['subfilters'][$name] = true;
 				}
+				unset($item);
 			}
 		}
 	}
