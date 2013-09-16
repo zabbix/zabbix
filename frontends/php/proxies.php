@@ -86,7 +86,7 @@ if (isset($_REQUEST['save'])) {
 	$proxy = array(
 		'host' => get_request('host'),
 		'status' => get_request('status'),
-		'interface' => get_request('interfaces')
+		'interface' => get_request('interface')
 	);
 
 	// skip discovered hosts
