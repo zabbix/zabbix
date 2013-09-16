@@ -26,7 +26,6 @@
 .disabled	{ color: #DC0000; }
 .on			{ color: #DC0000; }
 .off		{ color: #00AA00; }
-.hidden		{ display: none; }
 
 .green	{ color: #00AA00; }
 .red	{ color: #DC0000; }
@@ -108,3 +107,4 @@ table.tableinfo a.disabled:active		{ color: #DC0000; }
 
 .input.select.not-monitored				{ color: #DC0000; }
 .input option.not-monitored				{ color: #DC0000; }
+.input option.disabled					{ color: #808080; }
