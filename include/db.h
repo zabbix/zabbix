@@ -47,28 +47,6 @@ zbx_graph_types;
 
 typedef enum
 {
-	SCREEN_RESOURCE_GRAPH = 0,
-	SCREEN_RESOURCE_SIMPLE_GRAPH,
-	SCREEN_RESOURCE_MAP,
-	SCREEN_RESOURCE_PLAIN_TEXT,
-	SCREEN_RESOURCE_HOSTS_INFO,
-	SCREEN_RESOURCE_TRIGGERS_INFO,
-	SCREEN_RESOURCE_SERVER_INFO,
-	SCREEN_RESOURCE_CLOCK,
-	SCREEN_RESOURCE_SCREEN,
-	SCREEN_RESOURCE_TRIGGERS_OVERVIEW,
-	SCREEN_RESOURCE_DATA_OVERVIEW,
-	SCREEN_RESOURCE_URL,
-	SCREEN_RESOURCE_ACTIONS,
-	SCREEN_RESOURCE_EVENTS,
-	SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,
-	SCREEN_RESOURCE_SYSTEM_STATUS,
-	SCREEN_RESOURCE_HOST_TRIGGERS
-}
-zbx_screen_resources;
-
-typedef enum
-{
 	CALC_FNC_MIN = 1,
 	CALC_FNC_AVG = 2,
 	CALC_FNC_MAX = 4,
@@ -97,8 +75,11 @@ zbx_graph_item_type;
 #	define TRIGGER_COMMENTS_LEN	65535
 #endif
 
+#define GROUP_NAME_LEN			64
+
 #define HOST_HOST_LEN			MAX_ZBX_HOSTNAME_LEN
 #define HOST_HOST_LEN_MAX		HOST_HOST_LEN+1
+#define HOST_NAME_LEN			64
 #define HOST_ERROR_LEN			128
 #define HOST_ERROR_LEN_MAX		HOST_ERROR_LEN+1
 #define HOST_IPMI_USERNAME_LEN		16
@@ -228,7 +209,7 @@ zbx_graph_item_type;
 #define ZBX_DBROW2UINT64(uint, row)	if (SUCCEED == DBis_null(row))		\
 						uint = 0;			\
 					else					\
-						sscanf(row, ZBX_FS_UI64, &uint)
+						is_uint64(row, &uint)
 
 #define ZBX_MAX_SQL_LEN		65535
 
@@ -536,7 +517,7 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_tem
 void	DBdelete_items(zbx_vector_uint64_t *itemids);
 void	DBdelete_triggers(zbx_vector_uint64_t *triggerids);
 void	DBdelete_graphs(zbx_vector_uint64_t *graphids);
-void	DBdelete_host(zbx_uint64_t hostid);
+void	DBdelete_hosts(zbx_vector_uint64_t *hostids);
 void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems, size_t *gitems_alloc, size_t *gitems_num);
 void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock);
 
@@ -579,6 +560,10 @@ void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vec
 
 void	zbx_create_services_lock();
 void	zbx_destroy_services_lock();
+
+void	DBdelete_groups(zbx_vector_uint64_t *groupids);
+
+void	DBselect_uint64(const char *sql, zbx_vector_uint64_t *ids);
 
 int	get_nodeid_by_id(zbx_uint64_t id);
 #endif
