@@ -115,7 +115,8 @@ else {
 	);
 
 	$host = get_request('host');
-	if ($host && $itemName = get_request('name')) {
+	$itemName = get_request('name');
+	if ($host && $itemName) {
 		$caption = $host['name'].NAME_DELIMITER.$itemName;
 	}
 
