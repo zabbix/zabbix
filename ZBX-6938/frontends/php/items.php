@@ -1125,7 +1125,7 @@ else {
 	// remove subfiltered items
 	if (!empty($data['items'])) {
 		foreach ($data['items'] as $number => $item) {
-			foreach ($item['subfilters'] as $subfilter => $value) {
+			foreach ($item['subfilters'] as $value) {
 				if (!$value) {
 					unset($data['items'][$number]);
 					break;
