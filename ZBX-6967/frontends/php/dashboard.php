@@ -247,9 +247,6 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	exit();
 }
 
-// js templates
-require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php';
-
 /*
  * Display
  */
