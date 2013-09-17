@@ -151,7 +151,7 @@ foreach ($this->data['groups'] as $group) {
 			BR(),
 			array(new CLink(_('Hosts'), 'hosts.php?groupid='.$group['groupid']), ' ('.$hostCount.')')
 		),
-		new CCol(empty($hosts_output) ? '-' : $hosts_output, 'wraptext'),
+		new CCol(empty($hostsOutput) ? '-' : $hostsOutput, 'wraptext'),
 		($showStatus) ? $status : null
 	));
 }
