@@ -1002,8 +1002,8 @@ class CService extends CZBXAPI {
 		// since multiple alarms can have the same timestamp, we only need to save the last one
 		$query = DBSelect(
 			'SELECT sa.serviceid,sa.value'.
-			' FROM (SELECT MAX(sa3.servicealarmid) servicealarmid'.
-					' FROM (SELECT sa2.serviceid,MAX(sa2.clock) clock'.
+			' FROM (SELECT MAX(sa3.servicealarmid) AS servicealarmid'.
+					' FROM (SELECT sa2.serviceid,MAX(sa2.clock) AS clock'.
 							' FROM service_alarms sa2'.
 							' WHERE sa2.clock<'.zbx_dbstr($beforeTime).
 								' AND '.dbConditionInt('sa2.serviceid', $serviceIds).
