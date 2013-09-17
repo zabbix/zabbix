@@ -49,7 +49,6 @@ $dataTable = new CTable(null, 'tableinfo');
 $dataTable->setAttribute('id', 'data_list');
 $dataTable->setHeader(array(_('Expression Variable Elements'), _('Result type'), _('Value')));
 
-$octet = false;
 $datas = array();
 $fields = array();
 $rplcts = array();
@@ -77,7 +76,6 @@ if ($expressionData->parse($expression)) {
 			$control->setAttribute('disabled', 'disabled');
 		}
 		else {
-			$octet = ($info['value_type'] == 'HHMMSS');
 			$validation = $info['validation'];
 
 			if (substr($validation, 0, COMBO_PATTERN_LENGTH) == COMBO_PATTERN) {
@@ -138,7 +136,7 @@ foreach ($eHTMLTree as $e) {
 	$result = array('result' => '-', 'error' => '');
 
 	if ($allowedTesting && $test && isset($e['expression'])) {
-		$result = evalExpressionData($e['expression']['value'], $macrosData, $octet);
+		$result = evalExpressionData($e['expression']['value'], $macrosData);
 	}
 
 	$style = 'text-align: center;';
@@ -157,7 +155,7 @@ foreach ($eHTMLTree as $e) {
 $result = array('result' => '-', 'error' => '');
 
 if ($allowedTesting && $test) {
-	$result = evalExpressionData($expression, $macrosData, $octet);
+	$result = evalExpressionData($expression, $macrosData);
 }
 
 $style = 'text-align: center;';
