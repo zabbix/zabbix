@@ -344,6 +344,15 @@ class CUser extends CZBXAPI {
 				}
 			}
 
+			if (isset($user['theme'])) {
+				$themes = array_keys(Z::getThemes());
+				array_push($themes, THEME_DEFAULT);
+				$themeValidator = new CSetValidator(array('values' => $themes));
+				if (!$themeValidator->validate($user['theme'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect value for user theme.'));
+				}
+			}
+
 			if (isset($user['type']) && (USER_TYPE_SUPER_ADMIN != self::$userData['type'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('You are not allowed to alter privileges for user "%s".', $dbUser['alias']));
 			}

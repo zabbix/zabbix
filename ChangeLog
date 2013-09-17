@@ -8,6 +8,7 @@ A.F.I..... [ZBXNEXT-1786] implemented script name tree in menu popups (Eduard, S
 ..F....... [ZBX-6846] the print link work with javascript instead of reloading the whole page (Vitalij)
 
 Bug fixes:
+A.F....... [ZBX-6952] fixed XSS vulnerability in user themes, thanks to Lincoln and Bernhard Schildendorfer for reporting (Ivo)
 ..F....... [ZBX-6992] fixed PostreSQL query errors due to missing "AS" keyword for aggregate functions in Monitoring > IT Services (Ivo)
 ..F....... [ZBXNEXT-1633] resolved problem with pasive proxy saving (Vitalij)
 ..F....... [ZBX-6938] fixed undefined hostid on delete, fixed filter parameters losing after returning from edit form (Vitalij)
@@ -413,6 +414,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Lithuanian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-6952] fixed XSS vulnerability in user themes, thanks to Lincoln and Bernhard Schildendorfer for reporting (Ivo)
 ..F....... [ZBX-6992] fixed PostreSQL query errors due to missing "AS" keyword for aggregate functions in Monitoring > IT Services (Ivo)
 ..F....... [ZBX-6804] optimized min item clock calculation for graph; thanks to Volker Fröhlich (Eduard)
 ...G...... [ZBX-6902] reverting Solaris system.swap.size calculation from "swap -s" (used in 2.0.7, 2.0.8) to "swap -l"-like algorithm (as in 2.0.6) (Andris)
