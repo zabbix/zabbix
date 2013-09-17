@@ -646,7 +646,7 @@ class testFormItem extends CWebTest {
 
 		if ($type == 'Database monitor' && !isset($data['form'])) {
 			$keyValue = $this->getValue('key');
-			$this->assertEquals($keyValue, "db.odbc.select[<unique short description>]");
+			$this->assertEquals($keyValue, "db.odbc.select[<unique short description>,<dsn>]");
 		}
 
 		if ($type == 'SSH agent' && !isset($data['form'])) {
@@ -698,11 +698,11 @@ class testFormItem extends CWebTest {
 		}
 
 		if ($type == 'Database monitor') {
-			$this->zbxTestTextPresent('Additional parameters');
+			$this->zbxTestTextPresent('SQL query');
 			$this->assertVisible('params_ap');
 			$this->assertAttribute("//textarea[@id='params_ap']/@rows", 7);
 			$addParams = $this->getValue('params_ap');
-			$this->assertEquals($addParams, "DSN=<database source name>\nuser=<user name>\npassword=<password>\nsql=<query>");
+			$this->assertEquals($addParams, "");
 		}
 		else {
 			$this->zbxTestTextNotPresent('Additional parameters');
@@ -784,7 +784,7 @@ class testFormItem extends CWebTest {
 			$this->assertNotVisible('authtype');
 		}
 
-		if ($type == 'SSH agent' || $type == 'TELNET agent' || $type == 'JMX agent') {
+		if ($type == 'SSH agent' || $type == 'TELNET agent' || $type == 'JMX agent' || $type == 'Simple check' || $type == 'Database monitor') {
 			$this->zbxTestTextPresent('User name');
 			$this->assertVisible('username');
 			$this->assertAttribute("//input[@id='username']/@maxlength", 64);
@@ -1497,7 +1497,7 @@ class testFormItem extends CWebTest {
 					'delay' => '-30',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.'
+						'Incorrect value "-30" for "Update interval (in sec)" field: must be between 0 and 86400.'
 					)
 				)
 			),
@@ -1510,7 +1510,7 @@ class testFormItem extends CWebTest {
 					'delay' => 86401,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.'
+						'Incorrect value "86401" for "Update interval (in sec)" field: must be between 0 and 86400.'
 					)
 				)
 			),
@@ -1964,7 +1964,7 @@ class testFormItem extends CWebTest {
 					'history' => 65536,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Keep history (in days)": must be between 0 and 65535.'
+						'Incorrect value "65536" for "Keep history (in days)" field: must be between 0 and 65535.'
 					)
 				)
 			),
@@ -1977,7 +1977,7 @@ class testFormItem extends CWebTest {
 					'history' => '-1',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Incorrect value for field "Keep history (in days)": must be between 0 and 65535.'
+							'Incorrect value "-1" for "Keep history (in days)" field: must be between 0 and 65535.'
 					)
 				)
 			),
@@ -2010,7 +2010,7 @@ class testFormItem extends CWebTest {
 					'trends' => '-1',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Incorrect value for field "Keep trends (in days)": must be between 0 and 65535.'
+							'Incorrect value "-1" for "Keep trends (in days)" field: must be between 0 and 65535.'
 					)
 				)
 			),
@@ -2023,7 +2023,7 @@ class testFormItem extends CWebTest {
 					'trends' => 65536,
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Incorrect value for field "Keep trends (in days)": must be between 0 and 65535.'
+							'Incorrect value "65536" for "Keep trends (in days)" field: must be between 0 and 65535.'
 					)
 				)
 			),
@@ -2176,6 +2176,7 @@ class testFormItem extends CWebTest {
 					'type' => 'Database monitor',
 					'name' => 'Database monitor',
 					'key' => 'item-database-monitor',
+					'params_ap' => 'query',
 					'dbCheck' => true,
 					'formCheck' => true
 				)
@@ -2304,6 +2305,7 @@ class testFormItem extends CWebTest {
 					'expected' => ITEM_BAD,
 					'type' => 'Database monitor',
 					'name' => 'Database monitor',
+					'params_ap' => 'query',
 					'errors' => array(
 							'ERROR: Cannot add item',
 							'Check the key, please. Default example was passed.'
@@ -2406,6 +2408,10 @@ class testFormItem extends CWebTest {
 
 		if (isset($data['params_es'])) {
 			$this->input_type('params_es', $data['params_es']);
+		}
+
+		if (isset($data['params_ap'])) {
+			$this->input_type('params_ap', $data['params_ap']);
 		}
 
 		if (isset($data['formula'])) {

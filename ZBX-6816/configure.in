@@ -20,7 +20,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT(src/zabbix_server/server.c)
-AM_INIT_AUTOMAKE([zabbix],[2.1.3])
+AM_INIT_AUTOMAKE([zabbix],[2.1.4])
 
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
@@ -1317,7 +1317,7 @@ if test "x$java" = "xyes"; then
 fi
 
 AM_CONDITIONAL(JABBER, test "x$found_jabber" = "xyes")
-AM_CONDITIONAL(WITH_ODBC, test "x$have_unixodbc" == "xyes")
+AM_CONDITIONAL(WITH_ODBC, test "x$have_unixodbc" = "xyes")
 
 found_ldap="no"
 dnl Check for libLDAP [by default - skip]

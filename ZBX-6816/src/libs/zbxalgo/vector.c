@@ -27,3 +27,24 @@ ZBX_VECTOR_IMPL(uint64, zbx_uint64_t);
 ZBX_VECTOR_IMPL(str, char *);
 ZBX_VECTOR_IMPL(ptr, void *);
 ZBX_VECTOR_IMPL(ptr_pair, zbx_ptr_pair_t);
+
+void	zbx_vector_str_clean(zbx_vector_str_t *vector)
+{
+	int	i;
+
+	for (i = 0; i < vector->values_num; i++)
+		zbx_free(vector->values[i]);
+
+	vector->values_num = 0;
+}
+
+void	zbx_vector_ptr_clean(zbx_vector_ptr_t *vector, zbx_mem_free_func_t free_func)
+{
+	int	i;
+
+	for (i = 0; i < vector->values_num; i++)
+		free_func(vector->values[i]);
+
+	memset(vector->values, 0, sizeof(*vector->values) * vector->values_num);
+	vector->values_num = 0;
+}
