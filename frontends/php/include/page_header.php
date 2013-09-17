@@ -172,6 +172,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 			}
 		}
 	}
+	$css = CHtml::encode($css);
 	echo '<link rel="stylesheet" type="text/css" href="styles/themes/'.$css.'/main.css" />'."\n";
 
 	if ($page['file'] == 'sysmap.php') {
