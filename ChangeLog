@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Lithuanian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-6992] fixed PostreSQL query errors due to missing "AS" keyword for aggregate functions in Monitoring > IT Services (Ivo)
 ..F....... [ZBX-6804] optimized min item clock calculation for graph; thanks to Volker Fröhlich (Eduard)
 ...G...... [ZBX-6902] reverting Solaris system.swap.size calculation from "swap -s" (used in 2.0.7, 2.0.8) to "swap -l"-like algorithm (as in 2.0.6) (Andris)
 .......P.. [ZBX-6936] fixed MySQL errors when updating configuration of the proxy (Sasha)
