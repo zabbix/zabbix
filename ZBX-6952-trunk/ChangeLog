@@ -1,6 +1,7 @@
 Changes for 2.1.5
 
 New features:
+.......PS. [ZBXNEXT-1633] added vSphere (vCenter hypervisor) datastore and network monitoring keys (wiper)
 A.F.I..... [ZBXNEXT-1786] implemented script name tree in menu popups (Eduard, Sasha)
 ..F....... [ZBXNEXT-1786] redesigned menu popups using jQuery Menu (Eduard)
 ..F....... [ZBXNEXT-1786] updated jQuery-ui to latest (Eduard)
@@ -9,6 +10,8 @@ A.F.I..... [ZBXNEXT-1786] implemented script name tree in menu popups (Eduard, S
 
 Bug fixes:
 A.F....... [ZBX-6952] fixed XSS vulnerability in user themes, thanks to Lincoln and Bernhard Schildendorfer for reporting (Ivo)
+..F....... [ZBX-6816] added URL parameter validation for graph items in bar reports page (Ivo)
+..F....... [ZBX-6937] fixed discovery check validation (Eduard)
 ..F....... [ZBX-6992] fixed PostreSQL query errors due to missing "AS" keyword for aggregate functions in Monitoring > IT Services (Ivo)
 ..F....... [ZBXNEXT-1633] resolved problem with pasive proxy saving (Vitalij)
 ..F....... [ZBX-6938] fixed undefined hostid on delete, fixed filter parameters losing after returning from edit form (Vitalij)
