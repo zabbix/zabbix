@@ -595,7 +595,7 @@
 					error: function() {
 						showModalWindow(
 							t(<?php echo CJs::encodeJson(_('Discovery check error')); ?>),
-							<?php echo CJs::encodeJson(_('Cannot validate discovery check: connection to Zabbix is fail.')); ?>,
+							<?php echo CJs::encodeJson(_('Cannot validate discovery check: invalid request or connection to Zabbix server failed.')); ?>,
 							[{text: t(<?php echo CJs::encodeJson(_('Close')); ?>), click: function() {
 								jQuery(this).dialog('destroy');
 							}}]
