@@ -38,7 +38,7 @@ if (CWebUser::$data['alias'] == ZBX_GUEST_USER) {
 }
 
 $themes = array_keys(Z::getThemes());
-array_push($themes, THEME_DEFAULT);
+$themes[] = THEME_DEFAULT;
 
 //	VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
