@@ -180,7 +180,7 @@ retry:
 		/* zbx_vsnprintf() returns bytes actually written instead of bytes to write, */
 		/* so we have to use the standard function                                   */
 		va_start(args, fmt);
-		*alloc_len = vsnprintf(NULL, 0, fmt, args) + 1;
+		*alloc_len = vsnprintf(NULL, 0, fmt, args) + 2;	/* '\0' + one byte to prevent the operation retry */
 		va_end(args);
 		*offset = 0;
 		*str = zbx_malloc(*str, *alloc_len);
@@ -221,20 +221,18 @@ retry:
  ******************************************************************************/
 size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
 {
-	size_t	written_len;
+	int	written_len = 0;
 
-	assert(str);
+	if (0 < count)
+	{
+		if (0 > (written_len = vsnprintf(str, count, fmt, args)))
+			written_len = (int)count - 1;		/* count an output error as a full buffer */
+		else
+			written_len = MIN(written_len, (int)count - 1);		/* result could be truncated */
+	}
+	str[written_len] = '\0';	/* always write '\0', even if buffer size is 0 or vsnprintf() error */
 
-	if (-1 == (written_len = vsnprintf(str, count, fmt, args)))
-		written_len = count - 1;	/* result was truncated */
-	else
-		written_len = MIN(written_len, count - 1);
-
-	written_len = MAX(written_len, 0);
-
-	str[written_len] = '\0';
-
-	return written_len;
+	return (size_t)written_len;
 }
 
 /******************************************************************************
@@ -1057,7 +1055,10 @@ succeed:
 		return SUCCEED;
 	}
 	else
-		goto fail;
+	{
+		*exp = s;
+		return FAIL;
+	}
 }
 
 /******************************************************************************
@@ -3542,6 +3543,3 @@ void	zbx_trim_str_list(char *list, char delimiter)
 	}
 	*out = '\0';
 }
-
-
-

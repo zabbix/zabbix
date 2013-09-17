@@ -20,6 +20,7 @@
 
 
 class CJSONrpc {
+
 	const VERSION = '2.0';
 
 	public $json;
@@ -38,25 +39,24 @@ class CJSONrpc {
 		$this->_multicall = false;
 		$this->_error = false;
 		$this->_response = array();
-
 		$this->_jsonDecoded = $this->json->decode($jsonData, true);
+
 		if (!$this->_jsonDecoded) {
 			$this->jsonError(null, '-32700', null, null, true);
 			return;
 		}
 
 		if (!isset($this->_jsonDecoded['jsonrpc'])) {
-			$this->multicall = true;
+			$this->_multicall = true;
 		}
 		else {
 			$this->_jsonDecoded = array($this->_jsonDecoded);
 		}
-
 	}
 
 	public function execute($encoded = true) {
 		foreach ($this->_jsonDecoded as $call) {
-			// Notification
+			// notification
 			if (!isset($call['id'])) {
 				$call['id'] = null;
 			}
@@ -117,7 +117,7 @@ class CJSONrpc {
 				'id' => $call['id']
 			);
 
-			if ($this->multicall) {
+			if ($this->_multicall) {
 				$this->_response[] = $formedResp;
 			}
 			else {
@@ -166,7 +166,7 @@ class CJSONrpc {
 			'id' => $id
 		);
 
-		if ($this->multicall) {
+		if ($this->_multicall) {
 			$this->_response[] = $formed_error;
 		}
 		else {
@@ -223,7 +223,7 @@ class CJSONrpc {
 			ZBX_API_ERROR_PARAMETERS => '-32602',
 			ZBX_API_ERROR_NO_AUTH => '-32602',
 			ZBX_API_ERROR_PERMISSIONS => '-32500',
-			ZBX_API_ERROR_INTERNAL => '-32500',
+			ZBX_API_ERROR_INTERNAL => '-32500'
 		);
 	}
 }
