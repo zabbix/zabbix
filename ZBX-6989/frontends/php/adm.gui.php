@@ -27,9 +27,12 @@ $page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
+$themes = array_keys(Z::getThemes());
+
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'default_theme'           => array(T_ZBX_STR, O_OPT, null,        NOT_EMPTY,          'isset({save})'),
+	'default_theme'           => array(T_ZBX_STR, O_OPT, null,        IN('"'.implode('","', $themes).'"'),
+		'isset({save})'),
 	'event_ack_enable'        => array(T_ZBX_INT, O_OPT, null,        IN('1'),            null),
 	'event_expire'            => array(T_ZBX_INT, O_OPT, null,        BETWEEN(1, 99999),  'isset({save})', _('Show events not older than (in days)')),
 	'event_show_max'          => array(T_ZBX_INT, O_OPT, null,        BETWEEN(1, 99999),  'isset({save})', _('Max count of events per trigger to show')),

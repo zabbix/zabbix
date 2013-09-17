@@ -67,6 +67,16 @@ int	check_vcenter_hv_version(AGENT_REQUEST *request, const char *username, const
 		AGENT_RESULT *result);
 int	check_vcenter_hv_vm_num(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
+int	check_vcenter_hv_network_in(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_hv_network_out(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_hv_datastore_read(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_hv_datastore_write(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
 
 int	check_vcenter_vm_cluster_name(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
@@ -154,6 +164,16 @@ int	check_vsphere_uptime(AGENT_REQUEST *request, const char *username, const cha
 int	check_vsphere_version(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vsphere_vm_num(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vsphere_hv_network_in(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vsphere_hv_network_out(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vsphere_hv_datastore_discovery(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vsphere_hv_datastore_read(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vsphere_hv_datastore_write(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 
 int	check_vsphere_vm_cpu_num(AGENT_REQUEST *request, const char *username, const char *password,
