@@ -1087,24 +1087,71 @@ function executeScript(hostId, scriptId, confirmation) {
 }
 
 /**
- * makes all elements which are not supported for printing view to disappear
- * by including css file
+ * Makes all elements which are not supported for printing view to disappear by including css file.
  *
  * @param bool show
- *
- * @return void
  */
 function printLess(show) {
-	if (!jQuery("#printLess").length) {
-		jQuery('<link rel="stylesheet" type="text/css" id="printLess">').appendTo('head').attr('href', './styles/print.css');
+	if (!jQuery('#printLess').length) {
+		jQuery('<link rel="stylesheet" type="text/css" id="printLess">')
+			.appendTo('head')
+			.attr('href', './styles/print.css');
 
 		jQuery('.header_l.left, .header_r.right').each(function(i, obj) {
 			if (jQuery(this).find('input, form, select, .menu_icon').length) {
 				jQuery(this).addClass('hide-all-children');
 			}
-		})
-		jQuery('body').prepend('<div class="printless" >«BACK</div>').click(function() { printLess(false); });
+		});
+
+		jQuery('body')
+			.prepend('<div class="printless">«BACK</div>')
+			.click(function() {
+				printLess(false);
+			});
 	}
 
-	jQuery("#printLess").prop("disabled", !show);
+	jQuery('#printLess').prop('disabled', !show);
+}
+
+/**
+ * Display jQuery model window.
+ *
+ * @param string title					modal window title
+ * @param string text					window message
+ * @param array  buttons				window buttons
+ * @param array  buttons[]['text']		button text
+ * @param object buttons[]['click']		button click action
+ */
+function showModalWindow(title, text, buttons) {
+	var modalWindow = jQuery('#modalWindow');
+
+	if (modalWindow.length == 0) {
+		modalWindow = jQuery('<div>', {
+			id: 'modalWindow',
+			css: {
+				padding: '10px',
+				display: 'none',
+				'white-space': 'normal',
+				'z-index': 1000
+			}
+		});
+
+		jQuery('body').append(modalWindow);
+	}
+
+	modalWindow
+		.text(text)
+		.dialog({
+			title: title,
+			buttons: buttons,
+			draggable: true,
+			modal: true,
+			resizable: false,
+			width: 'inherit',
+			minWidth: 200,
+			minHeight: 120,
+			close: function() {
+				jQuery(this).dialog('destroy');
+			}
+		});
 }
