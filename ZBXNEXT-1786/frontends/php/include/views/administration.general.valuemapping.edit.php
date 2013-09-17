@@ -47,8 +47,7 @@ if (empty($this->data['mappings'])) {
 	zbx_add_post_js('mappingsManager.addNew();');
 }
 else {
-	$json = new CJSON();
-	zbx_add_post_js('mappingsManager.addExisting('.$json->encode(array_values($this->data['mappings'])).');');
+	zbx_add_post_js('mappingsManager.addExisting('.CJs::encodeJson($this->data['mappings']).');');
 }
 
 // append tab
