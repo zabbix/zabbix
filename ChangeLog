@@ -1,6 +1,7 @@
 Changes for 2.1.5
 
 New features:
+.......PS. [ZBXNEXT-1633] added vSphere (vCenter hypervisor) datastore and network monitoring keys (wiper)
 A.F.I..... [ZBXNEXT-1786] implemented script name tree in menu popups (Eduard, Sasha)
 ..F....... [ZBXNEXT-1786] redesigned menu popups using jQuery Menu (Eduard)
 ..F....... [ZBXNEXT-1786] updated jQuery-ui to latest (Eduard)
