@@ -75,19 +75,19 @@ $isValid = check_fields($fields);
 
 if (isset($_REQUEST['new_graph_item'])) {
 	$_REQUEST['items'] = get_request('items', array());
-	$new_gitem = get_request('new_graph_item', array());
+	$newItem = get_request('new_graph_item', array());
 
-	foreach ($_REQUEST['items'] as $data) {
-		if ((bccomp($new_gitem['itemid'], $data['itemid']) == 0)
-				&& $new_gitem['calc_fnc'] == $data['calc_fnc']
-				&& $new_gitem['caption'] == $data['caption']) {
-			$already_exist = true;
+	foreach ($_REQUEST['items'] as $item) {
+		if ((bccomp($newItem['itemid'], $item['itemid']) == 0)
+				&& $newItem['calc_fnc'] == $item['calc_fnc']
+				&& $newItem['caption'] == $item['caption']) {
+			$itemExists = true;
 			break;
 		}
 	}
 
-	if (!isset($already_exist)) {
-		array_push($_REQUEST['items'], $new_gitem);
+	if (!isset($itemExists)) {
+		array_push($_REQUEST['items'], $newItem);
 	}
 }
 
@@ -141,7 +141,7 @@ if ((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])) 
 
 
 if (isset($_REQUEST['delete_item']) && isset($_REQUEST['group_gid'])) {
-	foreach ($_REQUEST['items'] as $gid => $data) {
+	foreach ($_REQUEST['items'] as $gid => $item) {
 		if (!isset($_REQUEST['group_gid'][$gid])) {
 			continue;
 		}
@@ -151,25 +151,25 @@ if (isset($_REQUEST['delete_item']) && isset($_REQUEST['group_gid'])) {
 }
 elseif (isset($_REQUEST['new_period'])) {
 	$_REQUEST['periods'] = get_request('periods', array());
-	$new_period = get_request('new_period', array());
+	$newPeriod = get_request('new_period', array());
 
-	foreach ($_REQUEST['periods'] as $pid => $data) {
-		$data['report_timesince'] = zbxDateToTime($data['report_timesince']);
-		$data['report_timetill'] = zbxDateToTime($data['report_timetill']);
+	foreach ($_REQUEST['periods'] as $period) {
+		$period['report_timesince'] = zbxDateToTime($period['report_timesince']);
+		$period['report_timetill'] = zbxDateToTime($period['report_timetill']);
 
-		if ($new_period['report_timesince'] == $data['report_timesince']
-				&& $new_period['report_timetill'] == $data['report_timetill']) {
-			$already_exist = true;
+		if ($newPeriod['report_timesince'] == $period['report_timesince']
+				&& $newPeriod['report_timetill'] == $period['report_timetill']) {
+			$periodExists = true;
 			break;
 		}
 	}
 
-	if (!isset($already_exist)) {
-		array_push($_REQUEST['periods'], $new_period);
+	if (!isset($periodExists)) {
+		array_push($_REQUEST['periods'], $newPeriod);
 	}
 }
 elseif (isset($_REQUEST['delete_period']) && isset($_REQUEST['group_pid'])) {
-	foreach ($_REQUEST['periods'] as $pid => $data) {
+	foreach ($_REQUEST['periods'] as $pid => $period) {
 		if (!isset($_REQUEST['group_pid'][$pid])) {
 			continue;
 		}
