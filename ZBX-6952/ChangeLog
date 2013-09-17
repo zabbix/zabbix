@@ -4,7 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Lithuanian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
-..F....... [ZBX-6952] added "default_theme" field validation in Administration > General (Ivo)
+..F....... [ZBX-6952] fixed XSS vulnerability in user themes, thanks to Lincoln and Bernhard Schildendorfer for reporting (Ivo)
 ..F....... [ZBX-6804] optimized min item clock calculation for graph; thanks to Volker Fröhlich (Eduard)
 ...G...... [ZBX-6902] reverting Solaris system.swap.size calculation from "swap -s" (used in 2.0.7, 2.0.8) to "swap -l"-like algorithm (as in 2.0.6) (Andris)
 .......P.. [ZBX-6936] fixed MySQL errors when updating configuration of the proxy (Sasha)
