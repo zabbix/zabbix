@@ -542,6 +542,8 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVE
 
 	c_event = (NULL != r_event ? r_event : event);
 	now = time(NULL);
+	subject_esc = DBdyn_escape_string_len(subject, ALERT_SUBJECT_LEN);
+	message_esc = DBdyn_escape_string(message);
 
 	if (0 == mediatypeid)
 	{
@@ -589,8 +591,6 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVE
 
 		alertid = DBget_maxid("alerts");
 		sendto_esc = DBdyn_escape_string_len(row[1], ALERT_SENDTO_LEN);
-		subject_esc = DBdyn_escape_string_len(subject, ALERT_SUBJECT_LEN);
-		message_esc = DBdyn_escape_string(message);
 
 		if (MEDIA_TYPE_STATUS_ACTIVE == atoi(row[4]))
 		{
