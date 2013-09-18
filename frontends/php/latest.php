@@ -191,6 +191,8 @@ $link = new CCol(new CDiv(null, 'app-list-toggle-all icon-plus-9x9'));
 $table = new CTableInfo(_('No values found.'));
 
 if (getRequest('show_details')) {
+	$config = select_config();
+
 	$table->setHeader(array(
 		$link,
 		is_show_all_nodes() ? make_sorting_header(_('Node'), 'h.hostid') : null,
@@ -200,10 +202,10 @@ if (getRequest('show_details')) {
 		_('History'),
 		_('Trends'),
 		_('Type'),
-		_('Error'),
 		make_sorting_header(_('Last check'), 'i.lastclock'),
 		_('Last value'),
-		_x('Change', 'noun in latest data')
+		_x('Change', 'noun in latest data'),
+		_('Error')
 	));
 }
 else {
@@ -445,13 +447,13 @@ foreach ($allItems as $key => $db_item){
 			($_REQUEST['hostid'] > 0) ? null : SPACE,
 			new CCol(new CDiv($itemName, $stateCss)),
 			new CCol(new CDiv($db_item['delay'], $stateCss)),
-			new CCol(new CDiv($db_item['history'], $stateCss)),
-			new CCol(new CDiv($db_item['trends'], $stateCss)),
+			new CCol(new CDiv($config['hk_history_global'] ? $config['hk_history'] : $db_item['history'], $stateCss)),
+			new CCol(new CDiv($config['hk_trends_global'] ? $config['hk_trends'] : $db_item['trends'], $stateCss)),
 			new CCol(new CDiv(item_type2str($db_item['type']), $stateCss)),
-			new CCol($statusIcons),
 			new CCol(new CDiv($lastClock, $stateCss)),
 			new CCol(new CDiv($lastValue, $stateCss)),
-			$actions
+			$actions,
+			new CCol($statusIcons)
 		)));
 	}
 	else {

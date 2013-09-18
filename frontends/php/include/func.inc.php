@@ -2649,16 +2649,17 @@ function clearCookies($clear = false, $id = null) {
  * @param string $scripts[]['name']			script name
  * @param string $scripts[]['scriptid']		script id
  * @param string $scripts[]['confirmation']	confirmation text
+ * @param bool   $hasGoTo					"Go to" block in popup
  *
  * @return array
  */
-function getMenuPopupHost(array $host, array $scripts = null, $goTo = true) {
+function getMenuPopupHost(array $host, array $scripts = null, $hasGoTo = true) {
 	$data = array(
 		'type' => 'host',
 		'hostid' => $host['hostid'],
 		'hasInventory' => (isset($host['inventory']) && $host['inventory']),
 		'hasScreens' => (isset($host['screens']) && $host['screens']),
-		'goTo' => $goTo
+		'hasGoTo' => $hasGoTo
 	);
 
 	if ($scripts) {

@@ -129,7 +129,7 @@ if ($hostid > 0) {
 	$hostinventoriesView->show();
 }
 else{
-	$data['config'] = $config;
+	$data['config'] = select_config();
 	$options = array(
 		'groups' => array(
 			'real_hosts' => 1,
@@ -137,6 +137,21 @@ else{
 		'groupid' => getRequest('groupid', null),
 	);
 	$data['pageFilter'] = new CPageFilter($options);
+
+	// host inventory filter
+	if (hasRequest('filter_set')) {
+		$data['filterField'] = getRequest('filter_field');
+		$data['filterFieldValue'] = getRequest('filter_field_value');
+		$data['filterExact'] = getRequest('filter_exact');
+		CProfile::update('web.hostinventories.filter_field', $data['filterField'], PROFILE_TYPE_STR);
+		CProfile::update('web.hostinventories.filter_field_value', $data['filterFieldValue'], PROFILE_TYPE_STR);
+		CProfile::update('web.hostinventories.filter_exact', $data['filterExact'], PROFILE_TYPE_INT);
+	}
+	else{
+		$data['filterField'] = CProfile::get('web.hostinventories.filter_field');
+		$data['filterFieldValue'] = CProfile::get('web.hostinventories.filter_field_value');
+		$data['filterExact'] = CProfile::get('web.hostinventories.filter_exact');
+	}
 
 	$hostinventoriesView = new CView('inventory.host.list', $data);
 	$hostinventoriesView->render();

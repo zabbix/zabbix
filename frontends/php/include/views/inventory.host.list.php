@@ -26,32 +26,17 @@ $r_form->addItem(array(_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB
 $hostInventoryWidget->addPageHeader(_('HOST INVENTORIES'), SPACE);
 $hostInventoryWidget->addHeader(_('Hosts'), $r_form);
 
-// host inventory filter
-if (hasRequest('filter_set')) {
-	$filterField = getRequest('filter_field');
-	$filterFieldValue = getRequest('filter_field_value');
-	$filterExact = getRequest('filter_exact');
-	CProfile::update('web.hostinventories.filter_field', $filterField, PROFILE_TYPE_STR);
-	CProfile::update('web.hostinventories.filter_field_value', $filterFieldValue, PROFILE_TYPE_STR);
-	CProfile::update('web.hostinventories.filter_exact', $filterExact, PROFILE_TYPE_INT);
-}
-else{
-	$filterField = CProfile::get('web.hostinventories.filter_field');
-	$filterFieldValue = CProfile::get('web.hostinventories.filter_field_value');
-	$filterExact = CProfile::get('web.hostinventories.filter_exact');
-}
-
 $filter_table = new CTable('', 'filter');
 // getting inventory fields to make a drop down
 $inventoryFields = getHostInventories(true); // 'true' means list should be ordered by title
-$inventoryFieldsComboBox = new CComboBox('filter_field', $filterField);
+$inventoryFieldsComboBox = new CComboBox('filter_field', $this->data['filterField']);
 foreach($inventoryFields as $inventoryField){
 	$inventoryFieldsComboBox->addItem(
 		$inventoryField['db_field'],
 		$inventoryField['title']
 	);
 }
-$exactComboBox = new CComboBox('filter_exact', $filterExact);
+$exactComboBox = new CComboBox('filter_exact', $this->data['filterExact']);
 $exactComboBox->addItem('0', _('like'));
 $exactComboBox->addItem('1', _('exactly'));
 $filter_table->addRow(array(
@@ -59,7 +44,7 @@ $filter_table->addRow(array(
 		array(bold(_('Field')), SPACE, $inventoryFieldsComboBox),
 		array(
 			$exactComboBox,
-			new CTextBox('filter_field_value', $filterFieldValue, 20)
+			new CTextBox('filter_field_value', $this->data['filterFieldValue'], 20)
 		),
 	),
 ), 'host-inventories');
@@ -116,15 +101,15 @@ if($this->data['pageFilter']->groupsSelected){
 	// checking if correct inventory field is specified for filter
 	$possibleInventoryFields = getHostInventories();
 	$possibleInventoryFields = zbx_toHash($possibleInventoryFields, 'db_field');
-	if(!empty($filterField)
-			&& !empty($filterFieldValue)
-			&& !isset($possibleInventoryFields[$filterField])){
-		error(_s('Impossible to filter by inventory field "%s", which does not exist.', $filterField));
+	if(!empty($this->data['filterField'])
+			&& !empty($this->data['filterFieldValue'])
+			&& !isset($possibleInventoryFields[$this->data['filterField']])){
+		error(_s('Impossible to filter by inventory field "%s", which does not exist.', $this->data['filterField']));
 	}
 	else{
 		// if we are filtering by field, this field is also required
-		if(!empty($filterField) && !empty($filterFieldValue)){
-			$requiredInventoryFields[] = $filterField;
+		if(!empty($this->data['filterField']) && !empty($this->data['filterFieldValue'])){
+			$requiredInventoryFields[] = $this->data['filterField'];
 		}
 
 		$options = array(
@@ -149,13 +134,13 @@ if($this->data['pageFilter']->groupsSelected){
 			$hosts[$num]['pr_tag'] = $host['inventory']['tag'];
 			$hosts[$num]['pr_macaddress_a'] = $host['inventory']['macaddress_a'];
 			// if we are filtering by inventory field
-			if(!empty($filterField) && !empty($filterFieldValue)){
+			if(!empty($this->data['filterField']) && !empty($this->data['filterFieldValue'])){
 				// must we filter exactly or using a substring (both are case insensitive)
-				$match = $filterExact
-					? zbx_strtolower($hosts[$num]['inventory'][$filterField]) === zbx_strtolower($filterFieldValue)
+				$match = $this->data['filterExact']
+					? zbx_strtolower($hosts[$num]['inventory'][$this->data['filterField']]) === zbx_strtolower($this->data['filterFieldValue'])
 						: zbx_strpos(
-						zbx_strtolower($hosts[$num]['inventory'][$filterField]),
-						zbx_strtolower($filterFieldValue)
+						zbx_strtolower($hosts[$num]['inventory'][$this->data['filterField']]),
+						zbx_strtolower($this->data['filterFieldValue'])
 					) !== false;
 				if(!$match){
 					unset($hosts[$num]);
