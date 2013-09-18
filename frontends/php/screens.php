@@ -38,6 +38,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'groupid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'hostid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'tr_groupid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'tr_hostid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'elementid' =>	array(T_ZBX_INT, O_OPT, P_SYS|P_NZERO, DB_ID, null),
 	'screenname' =>	array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'step' =>		array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 65535), null),
