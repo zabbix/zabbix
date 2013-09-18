@@ -1548,7 +1548,7 @@ static int	DBpatch_2010101(void)
 			error_message = zbx_dsprintf(error_message, "ODBC password \"%s\" is too long", password);
 		else
 		{
-			char	*param;
+			char	*param = NULL;
 			size_t	size = 0, offset = 0;
 
 			zbx_strncpy_alloc(&param, &size, &offset, row[1] + 15, key_len - 16);
