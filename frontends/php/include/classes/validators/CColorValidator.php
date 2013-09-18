@@ -26,7 +26,7 @@ class CColorValidator extends CStringValidator {
 	 *
 	 * @var string
 	 */
-	public $regex = '/[0-9a-f]{6}/i';
+	public $regex = '/^[0-9a-f]{6}$/i';
 
 	public function __construct(array $options = array()) {
 		$this->messageRegex = _('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).');
