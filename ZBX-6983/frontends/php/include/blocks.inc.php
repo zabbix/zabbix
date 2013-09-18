@@ -812,8 +812,9 @@ function make_latest_issues(array $filter = array()) {
 			'value' => TRIGGER_VALUE_TRUE
 		),
 		'selectHosts' => array('hostid', 'name'),
-		'output' => array('triggerid', 'state', 'error', 'url', 'expression', 'description', 'priority', 'type'),
+		'output' => array('triggerid', 'state', 'error', 'url', 'expression', 'description', 'priority', 'type', 'lastchange'),
 		'selectLastEvent' => API_OUTPUT_EXTEND,
+		'expandDescription' => true,
 		'sortfield' => isset($filter['sortfield']) ? $filter['sortfield'] : 'lastchange',
 		'sortorder' => isset($filter['sortorder']) ? $filter['sortorder'] : ZBX_SORT_DOWN,
 		'limit' => isset($filter['limit']) ? $filter['limit'] : DEFAULT_LATEST_ISSUES_CNT
@@ -906,10 +907,6 @@ function make_latest_issues(array $filter = array()) {
 
 	// triggers
 	foreach ($triggers as $trigger) {
-		if (!$trigger['lastEvent']) {
-			continue;
-		}
-
 		$host = $hosts[$trigger['hostid']];
 
 		$hostName = new CSpan($host['name'], 'link_menu');
@@ -953,26 +950,40 @@ function make_latest_issues(array $filter = array()) {
 			$unknown->setHint($trigger['error'], '', 'on');
 		}
 
-		$ack = getEventAckState($trigger['lastEvent'], empty($filter['backUrl']) ? true : $filter['backUrl'], true, $ackParams);
-		$clock = new CLink(zbx_date2str(_('d M Y H:i:s'), $trigger['lastEvent']['clock']), 'events.php?triggerid='.$trigger['triggerid'].'&source=0&show_unknown=1&nav_time='.$trigger['lastEvent']['clock']);
-
-		$description = CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, array('clock' => $trigger['lastEvent']['clock'], 'ns' => $trigger['lastEvent']['ns'])));
+		// description
 		$description = $trigger['url']
-			? new CLink($description, resolveTriggerUrl($trigger), null, null, true)
-			: new CSpan($description, 'pointer');
-
+			? new CLink($trigger['description'], resolveTriggerUrl($trigger), null, null, true)
+			: new CSpan($trigger['description'], 'pointer');
 		$description = new CCol($description, getSeverityStyle($trigger['priority']));
-		$description->setHint(make_popup_eventlist($trigger['triggerid'], $trigger['lastEvent']['eventid']), '', '', false);
+
+		if ($trigger['lastEvent']) {
+			$description->setHint(make_popup_eventlist($trigger['triggerid'], $trigger['lastEvent']['eventid']), '', '', false);
+
+			$ack = getEventAckState($trigger['lastEvent'], empty($filter['backUrl']) ? true : $filter['backUrl'], true, $ackParams);
+		}
+		else {
+			$ack = new CSpan(_('No events'), 'unknown');
+		}
+
+		// clock
+		$clock = new CLink(zbx_date2str(_('d M Y H:i:s'), $trigger['lastchange']),
+			'events.php?triggerid='.$trigger['triggerid'].'&source=0&show_unknown=1&nav_time='.$trigger['lastchange']
+		);
+
+		// actions
+		$actions = ($trigger['lastEvent'] && isset($actions[$trigger['lastEvent']['eventid']]))
+			? $actions[$trigger['lastEvent']['eventid']]
+			: SPACE;
 
 		$table->addRow(array(
 			get_node_name_by_elid($trigger['triggerid']),
 			$hostDiv,
 			$description,
 			$clock,
-			zbx_date2age($trigger['lastEvent']['clock']),
+			zbx_date2age($trigger['lastchange']),
 			$unknown,
 			$ack,
-			isset($actions[$trigger['lastEvent']['eventid']]) ? $actions[$trigger['lastEvent']['eventid']] : SPACE
+			$actions
 		));
 	}
 
