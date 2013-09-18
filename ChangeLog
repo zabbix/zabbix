@@ -9,6 +9,7 @@ A.F.I..... [ZBXNEXT-1786] implemented script name tree in menu popups (Eduard, S
 ..F....... [ZBX-6846] the print link work with javascript instead of reloading the whole page (Vitalij)
 
 Bug fixes:
+.......... [ZBXNEXT-1689] improved performance of the latest data page (Pavels)
 .......PS. [ZBX-6989] fixed write cache statistics to account for fragmentation when calculating free space (wiper)
 A.F....... [ZBX-6952] fixed XSS vulnerability in user themes, thanks to Lincoln and Bernhard Schildendorfer for reporting (Ivo)
 ..F....... [ZBX-6816] added URL parameter validation for graph items in bar reports page (Ivo)
