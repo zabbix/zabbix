@@ -104,8 +104,7 @@ if ($hostid > 0) {
 		'preservekeys' => true
 	));
 
-	$data['overview']['host'] = reset($host);
-	$data['overview']['host']['status'] = null;
+	$data['host'] = reset($host);
 
 	// get permissions
 	$userType = CWebUser::getType();
@@ -123,10 +122,6 @@ if ($hostid > 0) {
 	else {
 		$data['rwHost'] = false;
 	}
-
-
-	// js templates
-	require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php';
 
 	// view generation
 	$hostinventoriesView = new CView('inventory.host.view', $data);

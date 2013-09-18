@@ -32,7 +32,7 @@
  * @return array
  */
 function getMenuPopupHost(options) {
-	var sections = [], gotos = [];
+	var sections = [];
 
 	// scripts
 	if (typeof options.scripts !== 'undefined') {
@@ -60,34 +60,38 @@ function getMenuPopupHost(options) {
 		};
 	}
 
-	// latest
-	gotos[gotos.length] = {
-		label: t('Latest data'),
-		url: new Curl('latest.php?hostid=' + options.hostid).getUrl()
-	};
+	// go to section
+	if (options.goTo) {
+		var gotos = [];
 
-	// inventories
-	if (options.hasInventory) {
+		// latest
 		gotos[gotos.length] = {
-			label: t('Host inventories'),
-			url: new Curl('hostinventories.php?hostid=' + options.hostid).getUrl()
+			label: t('Latest data'),
+			url: new Curl('latest.php?hostid=' + options.hostid).getUrl()
+		};
+
+		// inventories
+		if (options.hasInventory) {
+			gotos[gotos.length] = {
+				label: t('Host inventories'),
+				url: new Curl('hostinventories.php?hostid=' + options.hostid).getUrl()
+			};
+		}
+
+		// screens
+		if (options.hasScreens) {
+			gotos[gotos.length] = {
+				label: t('Host screens'),
+				url: new Curl('host_screen.php?hostid=' + options.hostid).getUrl()
+			};
+		}
+
+		sections[sections.length] = {
+			type: 'links',
+			title: t('Go to'),
+			data: gotos
 		};
 	}
-
-	// screens
-	if (options.hasScreens) {
-		gotos[gotos.length] = {
-			label: t('Host screens'),
-			url: new Curl('host_screen.php?hostid=' + options.hostid).getUrl()
-		};
-	}
-
-	sections[sections.length] = {
-		type: 'links',
-		title: t('Go to'),
-		data: gotos
-	};
-
 	return sections;
 }
 
