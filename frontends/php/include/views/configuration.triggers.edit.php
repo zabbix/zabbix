@@ -256,7 +256,7 @@ else {
 $triggersFormList->addRow(_('Enabled'), new CCheckBox('status', $status, null, 1));
 
 // append tabs to form
-$triggersTab = new CTabView(array('remember' => true));
+$triggersTab = new CTabView();
 if (!$this->data['form_refresh']) {
 	$triggersTab->setSelected(0);
 }
