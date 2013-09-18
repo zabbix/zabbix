@@ -15,17 +15,17 @@
 .darkorange .ui-helper-reset { margin: 0; padding: 0; border: 0; outline: 0; line-height: 1.3; text-decoration: none; font-size: 100%; list-style: none; }
 .darkorange .ui-helper-clearfix:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }
 .darkorange .ui-helper-clearfix { display: inline-block; }
-/* required comment for clearfix to work in Opera \*/
+
+/* required comment for clearfix to work in Opera */
 * html .ui-helper-clearfix { height:1%; }
 .darkorange .ui-helper-clearfix { display:block; }
+
 /* end clearfix */
 .darkorange .ui-helper-zfix { width: 100%; height: 100%; top: 0; left: 0; position: absolute; opacity: 0; filter:Alpha(Opacity=0); }
-
 
 /* Interaction Cues
 ----------------------------------*/
 .darkorange .ui-state-disabled { cursor: default !important; }
-
 
 /* Icons
 ----------------------------------*/
@@ -33,13 +33,11 @@
 /* states and images */
 .darkorange .ui-icon { display: block; text-indent: -99999px; overflow: hidden; background-repeat: no-repeat; }
 
-
 /* Misc visuals
 ----------------------------------*/
 
 /* Overlays */
-.darkorange .ui-widget-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-
+.darkorange .ui-widget-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; }
 
 /*
  * jQuery UI CSS Framework 1.8.6
@@ -52,7 +50,6 @@
  *
  * To view and modify this theme, visit http://jqueryui.com/themeroller/?ffDefault=Verdana,%20Arial,%20sans-serif&fwDefault=bold&fsDefault=1.0em&cornerRadius=3px&bgColorHeader=4f4f4f&bgTextureHeader=04_highlight_hard.png&bgImgOpacityHeader=30&borderColorHeader=ff5500&fcHeader=dfdfdf&iconColorHeader=dfdfdf&bgColorContent=1f1f1f&bgTextureContent=01_flat.png&bgImgOpacityContent=25&borderColorContent=ff5500&fcContent=dfdfdf&iconColorContent=dfdfdf&bgColorDefault=2f2f2f&bgTextureDefault=02_glass.png&bgImgOpacityDefault=40&borderColorDefault=dfdfdf&fcDefault=dfdfdf&iconColorDefault=dfdfdf&bgColorHover=2f2f2f&bgTextureHover=02_glass.png&bgImgOpacityHover=40&borderColorHover=ff5500&fcHover=ff5500&iconColorHover=ff5500&bgColorActive=ff5500&bgTextureActive=02_glass.png&bgImgOpacityActive=40&borderColorActive=ff5500&fcActive=000000&iconColorActive=000000&bgColorHighlight=eeeeee&bgTextureHighlight=03_highlight_soft.png&bgImgOpacityHighlight=80&borderColorHighlight=ff5500&fcHighlight=ff5500&iconColorHighlight=ff5500&bgColorError=ffc73d&bgTextureError=02_glass.png&bgImgOpacityError=40&borderColorError=ffb73d&fcError=111111&iconColorError=a83300&bgColorOverlay=5c5c5c&bgTextureOverlay=01_flat.png&bgImgOpacityOverlay=50&opacityOverlay=80&bgColorShadow=cccccc&bgTextureShadow=01_flat.png&bgImgOpacityShadow=30&opacityShadow=60&thicknessShadow=3px&offsetTopShadow=-3px&offsetLeftShadow=-3px&cornerRadiusShadow=4px
  */
-
 
 /* Component containers
 ----------------------------------*/
@@ -235,6 +232,7 @@
 .darkorange .ui-icon-seek-prev { background-position: -48px -160px; }
 .darkorange .ui-icon-seek-end { background-position: -64px -160px; }
 .darkorange .ui-icon-seek-start { background-position: -80px -160px; }
+
 /* ui-icon-seek-first is deprecated, use ui-icon-seek-start instead */
 .darkorange .ui-icon-seek-first { background-position: -80px -160px; }
 .darkorange .ui-icon-stop { background-position: -96px -160px; }
@@ -275,7 +273,6 @@
 .darkorange .ui-icon-gripsmall-diagonal-se { background-position: -64px -224px; }
 .darkorange .ui-icon-grip-diagonal-se { background-position: -80px -224px; }
 
-
 /* Misc visuals
 ----------------------------------*/
 
@@ -291,8 +288,10 @@
 .darkorange .ui-corner-all { -moz-border-radius: 3px; -webkit-border-radius: 3px; border-radius: 3px; }
 
 /* Overlays */
-.darkorange .ui-widget-overlay { background: #5c5c5c url(images/bg_flat_50.png) 50% 50% repeat-x; opacity: .80;filter:Alpha(Opacity=80); }
-.darkorange .ui-widget-shadow { margin: -3px 0 0 -3px; padding: 3px; background: #cccccc url(images/bg_flat_30.png) 50% 50% repeat-x; opacity: .60;filter:Alpha(Opacity=60); -moz-border-radius: 4px; -webkit-border-radius: 4px; border-radius: 4px; }/*
+.darkorange .ui-widget-overlay { background: #5c5c5c url(images/bg_flat_50.png) 50% 50% repeat; opacity: .80;filter:Alpha(Opacity=80); }
+.darkorange .ui-widget-shadow { margin: -3px 0 0 -3px; padding: 3px; background: #cccccc url(images/bg_flat_30.png) 50% 50% repeat-x; opacity: .60;filter:Alpha(Opacity=60); -moz-border-radius: 4px; -webkit-border-radius: 4px; border-radius: 4px; }
+
+/*
  * jQuery UI Resizable 1.8.6
  *
  * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
@@ -311,7 +310,9 @@
 .darkorange .ui-resizable-se { cursor: se-resize; width: 12px; height: 12px; right: 1px; bottom: 1px; }
 .darkorange .ui-resizable-sw { cursor: sw-resize; width: 9px; height: 9px; left: -5px; bottom: -5px; }
 .darkorange .ui-resizable-nw { cursor: nw-resize; width: 9px; height: 9px; left: -5px; top: -5px; }
-.darkorange .ui-resizable-ne { cursor: ne-resize; width: 9px; height: 9px; right: -5px; top: -5px;}/*
+.darkorange .ui-resizable-ne { cursor: ne-resize; width: 9px; height: 9px; right: -5px; top: -5px;}
+
+/*
  * jQuery UI Selectable 1.8.6
  *
  * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
@@ -321,6 +322,7 @@
  * http://docs.jquery.com/UI/Selectable#theming
  */
 .darkorange .ui-selectable-helper { position: absolute; z-index: 100; border:1px dotted black; }
+
 /*
  * jQuery UI Accordion 1.8.6
  *
@@ -339,7 +341,9 @@
 .darkorange .ui-accordion-icons .ui-accordion-header a { padding-left: 2.2em; }
 .darkorange .ui-accordion .ui-accordion-header .ui-icon { position: absolute; left: .5em; top: 50%; margin-top: -8px; }
 .darkorange .ui-accordion .ui-accordion-content { padding: 1em 2.2em; border-top: 0; margin-top: -2px; position: relative; top: 1px; margin-bottom: 2px; overflow: auto; display: none; zoom: 1; }
-.darkorange .ui-accordion .ui-accordion-content-active { display: block; }/*
+.darkorange .ui-accordion .ui-accordion-content-active { display: block; }
+
+/*
  * jQuery UI Autocomplete 1.8.6
  *
  * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
@@ -362,36 +366,24 @@
  *
  * http://docs.jquery.com/UI/Menu#theming
  */
-.darkorange .ui-menu {
-	list-style:none;
-	padding: 2px;
-	margin: 0;
-	display:block;
-	float: left;
-}
-.darkorange .ui-menu .ui-menu {
-	margin-top: -3px;
-}
-.darkorange .ui-menu .ui-menu-item {
-	margin:0;
-	padding: 0;
-	zoom: 1;
-	float: left;
-	clear: left;
-	width: 100%;
-}
-.darkorange .ui-menu .ui-menu-item a {
-	text-decoration:none;
-	display:block;
-	padding:.2em .4em;
-	line-height:1.5;
-	zoom:1;
-}
-.darkorange .ui-menu .ui-menu-item a.ui-state-hover,
-.darkorange .ui-menu .ui-menu-item a.ui-state-active {
-	font-weight: normal;
-	margin: -1px;
-}
+.darkorange .ui-menu { list-style: none; padding: 2px; margin: 0; display: block; outline: none; }
+.darkorange .ui-menu[aria-expanded] { border: 1px solid #555; }
+.darkorange .ui-menu .ui-menu { margin-top: -3px; position: absolute; }
+.darkorange .ui-menu .ui-menu-item { margin: 0; padding: 0; width: 100%; }
+.darkorange .ui-menu .ui-menu-divider { margin: 5px -2px 5px -2px; height: 0; font-size: 0; line-height: 0; border-width: 1px 0 0 0; }
+.darkorange .ui-menu .ui-menu-item a { text-decoration: none; display: block; padding: 2px .4em; line-height: 1.5; min-height: 0; font-weight: normal; border: 1px solid #1F1F1F; cursor: pointer; }
+.darkorange .ui-menu .ui-menu-item a.ui-state-focus { color:#000000; background: #F50 url('images/bg_g_40_ff5500.png') 50% 50% repeat-x; }
+.darkorange .ui-menu .ui-menu-item a.ui-state-active { font-weight: normal; border: 1px solid #1F1F1F; }
+.darkorange .ui-menu .ui-menu-item a[aria-haspopup="true"] { cursor: default; }
+.darkorange .ui-menu .ui-state-disabled { font-weight: normal; margin: .4em 0 .2em; line-height: 1.5; }
+.darkorange .ui-menu .ui-state-disabled a { cursor: default; }
+.darkorange .ui-menu-icons { position: relative; }
+.darkorange .ui-menu-icons .ui-menu-item a { position: relative; padding-left: 2em; }
+.darkorange .ui-menu .ui-icon { position: absolute; top: .2em; left: .2em; }
+.darkorange .ui-menu .ui-menu-icon { position: static; float: right; background-image: url('images/icons_ff5500.png'); }
+.darkorange .ui-menu a.ui-state-focus .ui-menu-icon,
+.darkorange .ui-menu a.ui-state-active .ui-menu-icon { background-image: url('images/icons_000000.png'); }
+
 /*
  * jQuery UI Button 1.8.6
  *
@@ -414,6 +406,7 @@ button.ui-button-icons-only { width: 3.7em; }
 .darkorange .ui-button-text-icon-primary .ui-button-text, .darkorange .ui-button-text-icons .ui-button-text { padding: .4em 1em .4em 2.1em; }
 .darkorange .ui-button-text-icon-secondary .ui-button-text, .darkorange .ui-button-text-icons .ui-button-text { padding: .4em 2.1em .4em 1em; }
 .darkorange .ui-button-text-icons .ui-button-text { padding-left: 2.1em; padding-right: 2.1em; }
+
 /* no icon support for input elements, provide padding by default */
 input.ui-button { padding: .3em 1em; }
 
@@ -430,6 +423,7 @@ input.ui-button { padding: .3em 1em; }
 
 /* workarounds */
 button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra padding in Firefox */
+
 /*
  * jQuery UI Dialog 1.8.6
  *
@@ -439,19 +433,18 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
  *
  * http://docs.jquery.com/UI/Dialog#theming
  */
-.darkorange .ui-dialog { position: absolute; padding: .2em; width: 300px; overflow: hidden; }
-.darkorange .ui-dialog .ui-dialog-titlebar { padding: .5em 1em .3em; position: relative;  }
-.darkorange .ui-dialog .ui-dialog-title { float: left; margin: .1em 16px .2em 0; }
-.darkorange .ui-dialog .ui-dialog-titlebar-close { position: absolute; right: .3em; top: 50%; width: 19px; margin: -10px 0 0 0; padding: 1px; height: 18px; }
-.darkorange .ui-dialog .ui-dialog-titlebar-close span { display: block; margin: 1px; }
-.darkorange .ui-dialog .ui-dialog-titlebar-close:hover, .darkorange .ui-dialog .ui-dialog-titlebar-close:focus { padding: 0; }
-.darkorange .ui-dialog .ui-dialog-content { position: relative; border: 0; padding: .5em 1em; background: none; overflow: auto; zoom: 1; }
-.darkorange .ui-dialog .ui-dialog-buttonpane { text-align: left; border-width: 1px 0 0 0; background-image: none; margin: .5em 0 0 0; padding: .3em 1em .5em .4em; }
+.darkorange .ui-dialog { position: absolute; top: 0; left: 0; padding: .2em; outline: 0; }
+.darkorange .ui-dialog .ui-dialog-titlebar { padding: .4em 1em; position: relative; }
+.darkorange .ui-dialog .ui-dialog-title { float: left; margin: .1em 0; white-space: nowrap; width: 90%; overflow: hidden; text-overflow: ellipsis; }
+.darkorange .ui-dialog .ui-dialog-titlebar-close { position: absolute; right: .3em; top: 50%; width: 21px; margin: -10px 0 0 0; padding: 1px; height: 20px; }
+.darkorange .ui-dialog .ui-dialog-content { position: relative; border: 0; padding: .5em 1em; background: none; overflow: auto; }
+.darkorange .ui-dialog .ui-dialog-buttonpane { text-align: left; border-width: 1px 0 0 0; background-image: none; margin-top: .5em; padding: .3em 1em .5em .4em; }
 .darkorange .ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset { float: right; }
-.darkorange .ui-dialog .ui-dialog-buttonpane button { margin: .5em .8em .5em 0; cursor: pointer; }
-.darkorange .ui-dialog .ui-resizable-se { width: 14px; height: 14px; right: 3px; bottom: 3px; }
+.darkorange .ui-dialog .ui-dialog-buttonpane button { margin: .5em .4em .5em 0; cursor: pointer; }
+.darkorange .ui-dialog .ui-resizable-se { width: 12px; height: 12px; right: -5px; bottom: -5px; background-position: 16px 16px; }
 .darkorange .ui-draggable .ui-dialog-titlebar { cursor: move; }
 .darkorange .ui-sortable-placeholder { border: 1px dotted #dfdfdf;}
+
 /*
  * jQuery UI Slider 1.8.6
  *
@@ -475,24 +468,30 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 .darkorange .ui-slider-vertical .ui-slider-handle { left: -.3em; margin-left: 0; margin-bottom: -.6em; }
 .darkorange .ui-slider-vertical .ui-slider-range { left: 0; width: 100%; }
 .darkorange .ui-slider-vertical .ui-slider-range-min { bottom: 0; }
-.darkorange .ui-slider-vertical .ui-slider-range-max { top: 0; }/*
- * jQuery UI Tabs 1.8.6
+.darkorange .ui-slider-vertical .ui-slider-range-max { top: 0; }
+
+/*
+ * jQuery UI Tabs 1.10.3
+ * http://jqueryui.com
  *
- * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
- * Dual licensed under the MIT or GPL Version 2 licenses.
+ * Copyright 2013 jQuery Foundation and other contributors
+ * Released under the MIT license.
  * http://jquery.org/license
  *
  * http://docs.jquery.com/UI/Tabs#theming
  */
-.darkorange .ui-tabs { position: relative; padding: .2em; zoom: 1; } /* position: relative prevents IE scroll bug (element with position: relative inside container with overflow: auto appear as "fixed") */
-.darkorange .ui-tabs .ui-tabs-nav { margin: 0; padding: .2em .2em 0; border: 1px solid #999; }
-.darkorange .ui-tabs .ui-tabs-nav li { list-style: none; float: left; position: relative; top: 1px; margin: 0 .2em 1px 0; border-bottom: 0 !important; padding: 0; white-space: nowrap; }
+.darkorange .ui-tabs { position: relative; padding: .2em; }
+.darkorange .ui-tabs .ui-tabs-nav { margin: 0; padding: .2em .2em 0; }
+.darkorange .ui-tabs .ui-tabs-nav li { list-style: none; float: left; position: relative; top: 0; margin: 1px .2em 0 0; border-bottom-width: 0; padding: 0; white-space: nowrap; }
 .darkorange .ui-tabs .ui-tabs-nav li a { float: left; padding: .5em 1em; text-decoration: none; }
-.darkorange .ui-tabs .ui-tabs-nav li.ui-tabs-selected { margin-bottom: 0; padding-bottom: 1px; }
-.darkorange .ui-tabs .ui-tabs-nav li.ui-tabs-selected a, .darkorange .ui-tabs .ui-tabs-nav li.ui-state-disabled a, .darkorange .ui-tabs .ui-tabs-nav li.ui-state-processing a { cursor: text; }
-.darkorange .ui-tabs .ui-tabs-nav li a, .darkorange .ui-tabs.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-selected a { cursor: pointer; } /* first selector in group seems obsolete, but required to overcome bug in Opera applying cursor: text overall if defined elsewhere... */
+.darkorange .ui-tabs .ui-tabs-nav li.ui-tabs-active { margin-bottom: -1px; padding-bottom: 1px; }
+.darkorange .ui-tabs .ui-tabs-nav li.ui-tabs-active a,
+.darkorange .ui-tabs .ui-tabs-nav li.ui-state-disabled a,
+.darkorange .ui-tabs .ui-tabs-nav li.ui-tabs-loading a { cursor: text; }
+.darkorange .ui-tabs .ui-tabs-nav li a,
+.darkorange .ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-active a { cursor: pointer; }
 .darkorange .ui-tabs .ui-tabs-panel { display: block; border-width: 0; padding: 1em 1.4em; background: none; }
-.darkorange .ui-tabs .ui-tabs-hide { display: none !important; }
+
 /*
  * jQuery UI Datepicker 1.8.6
  *
@@ -560,7 +559,9 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
     left: -4px; /*must have*/
     width: 200px; /*must have*/
     height: 200px; /*must have*/
-}/*
+}
+
+/*
  * jQuery UI Progressbar 1.8.6
  *
  * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)

@@ -793,36 +793,6 @@ function getDeletableHostGroups($groupids = null) {
 	return $deletable_groupids;
 }
 
-/**
- * A helper function for building the value for the 'data-host-menu' attribute.
- *
- * @param array $host
- * @param int $host['hostid']
- * @param mixed $host['screens']
- * @param mixed $host['inventory']
- * @param array $scripts
- *
- * @return array
- */
-function hostMenuData(array $host, array $scripts = array()) {
-	$menuScripts = array();
-
-	foreach ($scripts as $script) {
-		$menuScripts[] = array(
-			'scriptid' => $script['scriptid'],
-			'confirmation' => $script['confirmation'],
-			'name' => $script['name']
-		);
-	}
-
-	return array(
-		'scripts' => $menuScripts,
-		'hostid' => $host['hostid'],
-		'hasScreens' => (bool) ($host['screens'] && $host['status'] == HOST_STATUS_MONITORED),
-		'hasInventory' => (bool) $host['inventory']
-	);
-}
-
 function isTemplate($hostId) {
 	$dbHost = DBfetch(DBselect('SELECT h.status FROM hosts h WHERE h.hostid='.$hostId));
 

@@ -19,8 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/js/general.script.confirm.js.php';
-
 $slideWidget = new CWidget('hat_slides');
 
 // create header form
@@ -60,7 +58,9 @@ else {
 			$slideHeaderForm,
 			SPACE,
 			$favouriteIcon,
+			SPACE,
 			$refreshIcon,
+			SPACE,
 			get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))
 		)
 	);

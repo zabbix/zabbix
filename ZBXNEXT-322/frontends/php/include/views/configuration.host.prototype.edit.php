@@ -29,7 +29,7 @@ $widget = new CWidget(null, 'hostprototype-edit');
 $widget->addPageHeader(_('CONFIGURATION OF HOST PROTOTYPES'));
 $widget->addItem(get_header_host_table('hosts', $discoveryRule['hostid'], $discoveryRule['itemid']));
 
-$divTabs = new CTabView(array('remember' => 1));
+$divTabs = new CTabView();
 if (!isset($_REQUEST['form_refresh'])) {
 	$divTabs->setSelected(0);
 }
