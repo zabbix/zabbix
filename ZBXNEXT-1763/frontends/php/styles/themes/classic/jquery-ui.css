@@ -381,19 +381,27 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; }
 .classic .ui-slider-vertical .ui-slider-range-min { bottom: 0; }
 .classic .ui-slider-vertical .ui-slider-range-max { top: 0; }
 
-.classic .ui-tabs { position: relative; padding: .2em; zoom: 1; }
-
-/* position: relative prevents IE scroll bug (element with position: relative inside container with overflow: auto appear as "fixed") */
+/*
+ * jQuery UI Tabs 1.10.3
+ * http://jqueryui.com
+ *
+ * Copyright 2013 jQuery Foundation and other contributors
+ * Released under the MIT license.
+ * http://jquery.org/license
+ *
+ * http://docs.jquery.com/UI/Tabs#theming
+ */
+.classic .ui-tabs { position: relative; padding: .2em; }
 .classic .ui-tabs .ui-tabs-nav { margin: 0; padding: .2em .2em 0; }
-.classic .ui-tabs .ui-tabs-nav li { list-style: none; float: left; position: relative; top: 1px; margin: 0 .2em 1px 0; border-bottom: 0 !important; padding: 0; white-space: nowrap; }
+.classic .ui-tabs .ui-tabs-nav li { list-style: none; float: left; position: relative; top: 0; margin: 1px .2em 0 0; border-bottom-width: 0; padding: 0; white-space: nowrap; }
 .classic .ui-tabs .ui-tabs-nav li a { float: left; padding: .5em 1em; text-decoration: none; }
-.classic .ui-tabs .ui-tabs-nav li.ui-tabs-selected { margin-bottom: 0; padding-bottom: 1px; }
-.classic .ui-tabs .ui-tabs-nav li.ui-tabs-selected a, .classic .ui-tabs .ui-tabs-nav li.ui-state-disabled a, .classic .ui-tabs .ui-tabs-nav li.ui-state-processing a { cursor: text; }
-.classic .ui-tabs .ui-tabs-nav li a, .classic .ui-tabs.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-selected a { cursor: pointer; }
-
-/* first selector in group seems obsolete, but required to overcome bug in Opera applying cursor: text overall if defined elsewhere... */
+.classic .ui-tabs .ui-tabs-nav li.ui-tabs-active { margin-bottom: -1px; padding-bottom: 1px; }
+.classic .ui-tabs .ui-tabs-nav li.ui-tabs-active a,
+.classic .ui-tabs .ui-tabs-nav li.ui-state-disabled a,
+.classic .ui-tabs .ui-tabs-nav li.ui-tabs-loading a { cursor: text; }
+.classic .ui-tabs .ui-tabs-nav li a,
+.classic .ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-active a { cursor: pointer; }
 .classic .ui-tabs .ui-tabs-panel { display: block; border-width: 0; padding: 1em 1.4em; background: none; }
-.classic .ui-tabs .ui-tabs-hide { display: none !important; }
 .classic .ui-tabs .ui-tabs-nav li.ui-state-disabled a { color: #A8BFD4; }
 
 .classic .ui-datepicker { width: 17em; padding: .2em .2em 0; display: none; }

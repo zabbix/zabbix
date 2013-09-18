@@ -74,6 +74,9 @@ $tabExp->setHeader(array(_('Expression'), _('Expression type'), _('Result')));
 $testTab->addRow(_('Result'), $tabExp);
 
 $regExpView = new CTabView();
+if (!$this->data['form_refresh']) {
+	$regExpView->setSelected(0);
+}
 $regExpView->addTab('expr', _('Expressions'), $exprTab);
 $regExpView->addTab('test', _('Test'), $testTab);
 $form->addItem($regExpView);
