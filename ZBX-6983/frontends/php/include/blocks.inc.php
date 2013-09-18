@@ -813,6 +813,7 @@ function make_latest_issues(array $filter = array()) {
 		),
 		'selectHosts' => array('hostid', 'name'),
 		'output' => array('triggerid', 'state', 'error', 'url', 'expression', 'description', 'priority', 'type'),
+		'selectLastEvent' => API_OUTPUT_EXTEND,
 		'sortfield' => isset($filter['sortfield']) ? $filter['sortfield'] : 'lastchange',
 		'sortorder' => isset($filter['sortorder']) ? $filter['sortorder'] : ZBX_SORT_DOWN,
 		'limit' => isset($filter['limit']) ? $filter['limit'] : DEFAULT_LATEST_ISSUES_CNT
@@ -825,18 +826,11 @@ function make_latest_issues(array $filter = array()) {
 	unset($options['limit'], $options['sortfield'], $options['sortorder'], $options['withLastEventUnacknowledged'], $options['skipDependent']);
 	$triggersTotalCount = API::Trigger()->get($options);
 
-	// get events
-	$events = API::Trigger()->get(array(
-		'triggerids' => zbx_objectValues($triggers, 'triggerid'),
-		'selectLastEvent' => API_OUTPUT_EXTEND,
-		'preservekeys' => true
-	));
-
 	// get acknowledges
 	$eventIds = array();
-	foreach ($events as $event) {
-		if ($event['lastEvent']) {
-			$eventIds[$event['lastEvent']['eventid']] = $event['lastEvent']['eventid'];
+	foreach ($triggers as $trigger) {
+		if ($trigger['lastEvent']) {
+			$eventIds[$trigger['lastEvent']['eventid']] = $trigger['lastEvent']['eventid'];
 		}
 	}
 	if ($eventIds) {
@@ -858,13 +852,9 @@ function make_latest_issues(array $filter = array()) {
 		$trigger['hostid'] = $host['hostid'];
 		$trigger['hostname'] = $host['name'];
 
-		// set events
-		if (isset($events[$trigger['triggerid']])) {
-			$trigger['event'] = $events[$trigger['triggerid']]['lastEvent'];
-		}
-		if (!empty($trigger['event'])) {
-			$trigger['event']['acknowledges'] = isset($eventAcknowledges[$trigger['event']['eventid']])
-				? $eventAcknowledges[$trigger['event']['eventid']]['acknowledges']
+		if (!empty($trigger['lastEvent'])) {
+			$trigger['lastEvent']['acknowledges'] = isset($eventAcknowledges[$trigger['lastEvent']['eventid']])
+				? $eventAcknowledges[$trigger['lastEvent']['eventid']]['acknowledges']
 				: null;
 		}
 
@@ -916,7 +906,7 @@ function make_latest_issues(array $filter = array()) {
 
 	// triggers
 	foreach ($triggers as $trigger) {
-		if (!isset($trigger['event']) || !$trigger['event']) {
+		if (!$trigger['lastEvent']) {
 			continue;
 		}
 
@@ -963,26 +953,26 @@ function make_latest_issues(array $filter = array()) {
 			$unknown->setHint($trigger['error'], '', 'on');
 		}
 
-		$ack = getEventAckState($trigger['event'], empty($filter['backUrl']) ? true : $filter['backUrl'], true, $ackParams);
-		$clock = new CLink(zbx_date2str(_('d M Y H:i:s'), $trigger['event']['clock']), 'events.php?triggerid='.$trigger['triggerid'].'&source=0&show_unknown=1&nav_time='.$trigger['event']['clock']);
+		$ack = getEventAckState($trigger['lastEvent'], empty($filter['backUrl']) ? true : $filter['backUrl'], true, $ackParams);
+		$clock = new CLink(zbx_date2str(_('d M Y H:i:s'), $trigger['lastEvent']['clock']), 'events.php?triggerid='.$trigger['triggerid'].'&source=0&show_unknown=1&nav_time='.$trigger['lastEvent']['clock']);
 
-		$description = CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, array('clock' => $trigger['event']['clock'], 'ns' => $trigger['event']['ns'])));
+		$description = CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, array('clock' => $trigger['lastEvent']['clock'], 'ns' => $trigger['lastEvent']['ns'])));
 		$description = $trigger['url']
 			? new CLink($description, resolveTriggerUrl($trigger), null, null, true)
 			: new CSpan($description, 'pointer');
 
 		$description = new CCol($description, getSeverityStyle($trigger['priority']));
-		$description->setHint(make_popup_eventlist($trigger['triggerid'], $trigger['event']['eventid']), '', '', false);
+		$description->setHint(make_popup_eventlist($trigger['triggerid'], $trigger['lastEvent']['eventid']), '', '', false);
 
 		$table->addRow(array(
 			get_node_name_by_elid($trigger['triggerid']),
 			$hostDiv,
 			$description,
 			$clock,
-			zbx_date2age($trigger['event']['clock']),
+			zbx_date2age($trigger['lastEvent']['clock']),
 			$unknown,
 			$ack,
-			isset($actions[$trigger['event']['eventid']]) ? $actions[$trigger['event']['eventid']] : SPACE
+			isset($actions[$trigger['lastEvent']['eventid']]) ? $actions[$trigger['lastEvent']['eventid']] : SPACE
 		));
 	}
 
