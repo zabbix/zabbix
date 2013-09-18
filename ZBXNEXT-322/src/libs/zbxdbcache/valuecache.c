@@ -123,7 +123,7 @@ typedef struct
 	unsigned char	state;
 
 	/* the flag indicating that all data from DB are cached  */
-	unsigned char		cached_all;
+	unsigned char	cached_all;
 
 	/* The total number of item values in cache.               */
 	/* Used to evaluate if the item must be dropped from cache */
@@ -491,12 +491,12 @@ out:
 static int	vc_db_read_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *ts,
 		zbx_history_record_t *value)
 {
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
-	int			ret = FAIL, i;
-	DB_RESULT		result;
-	DB_ROW			row;
-	zbx_vc_history_table_t	*table = &vc_history_tables[value_type];
+	char				*sql = NULL;
+	size_t				sql_alloc = 0, sql_offset = 0;
+	int				ret = FAIL, i;
+	DB_RESULT			result;
+	DB_ROW				row;
+	zbx_vc_history_table_t		*table = &vc_history_tables[value_type];
 	zbx_vector_history_record_t	values;
 
 	vc_try_unlock();
@@ -1229,7 +1229,7 @@ static void	vc_remove_item(zbx_vc_item_t *item)
  * Parameters: item       - [IN] the item to prepare                          *
  *             value_type - [IN] the new value type                           *
  *             seconds    - [IN] the time period to retrieve data for         *
- *             count      - [IN] the number of history values to retrieve.    *
+ *             count      - [IN] the number of history values to retrieve     *
  *             timestamp  - [IN] the period end timestamp                     *
  *             ts         - [IN] the value timestamp                          *
  *                                                                            *
@@ -1278,8 +1278,8 @@ out:
 static zbx_vc_item_t	*vc_add_item(zbx_uint64_t itemid, int value_type, int seconds, int count,
 		int timestamp, const zbx_timespec_t *ts, zbx_vector_history_record_t *values)
 {
-	int			ret = FAIL, now;
-	zbx_vc_item_t		*item = NULL;
+	int		ret = FAIL, now;
+	zbx_vc_item_t	*item = NULL;
 
 	now = ZBX_VC_TIME();
 
@@ -1457,8 +1457,8 @@ static int	vch_get_new_chunk_slot_count(int nslots)
  ******************************************************************************/
 static int	vch_item_add_chunk(zbx_vc_item_t *item, int nslots, zbx_vc_chunk_t *insert_before)
 {
-	zbx_vc_chunk_t		*chunk;
-	int			chunk_size;
+	zbx_vc_chunk_t	*chunk;
+	int		chunk_size;
 
 	chunk_size = sizeof(zbx_vc_chunk_t) + sizeof(zbx_history_record_t) * (nslots - 1);
 
@@ -1569,8 +1569,8 @@ static int	vch_chunk_find_last_value_before(const zbx_vc_chunk_t *chunk, int tim
 static int	vch_item_get_last_value(const zbx_vc_item_t *item, int end_timestamp, zbx_vc_chunk_t **pchunk,
 		int *pindex)
 {
-	zbx_vc_chunk_t			*chunk = item->head;
-	int				index;
+	zbx_vc_chunk_t	*chunk = item->head;
+	int		index;
 
 	if (NULL == chunk)
 		return FAIL;
@@ -1661,7 +1661,7 @@ out:
  ******************************************************************************/
 static int	vch_item_copy_values_at_end(zbx_vc_item_t *item, const zbx_history_record_t *values, int nvalues)
 {
-	int			i, ret = FAIL, last_value = item->head->last_value;
+	int	i, ret = FAIL, last_value = item->head->last_value;
 
 	switch (item->value_type)
 	{
@@ -1727,7 +1727,7 @@ out:
  ******************************************************************************/
 static int	vch_item_copy_values_at_beginning(zbx_vc_item_t *item, const zbx_history_record_t *values, int nvalues)
 {
-	int			i, ret = FAIL, first_value = item->tail->first_value;
+	int	i, ret = FAIL, first_value = item->tail->first_value;
 
 	switch (item->value_type)
 	{
@@ -1827,7 +1827,7 @@ static void	vch_item_get_values_from(const zbx_vc_item_t *item, const zbx_vc_chu
  ******************************************************************************/
 static void	vch_item_remove_values_from(zbx_vc_item_t *item, zbx_vc_chunk_t *chunk, int index)
 {
-	zbx_vc_chunk_t		*head;
+	zbx_vc_chunk_t	*head;
 
 	/* find the last value to keep in cache (the previous value of the specified chunk/index) */
 	if (--index < chunk->first_value)
@@ -1924,7 +1924,6 @@ static void	vch_item_remove_chunk(zbx_vc_item_t *item, zbx_vc_chunk_t *chunk)
  ******************************************************************************/
 static void	vch_item_clean_cache(zbx_vc_item_t *item)
 {
-
 	if (0 != item->range)
 	{
 		zbx_vc_chunk_t	*tail = item->tail;
@@ -1987,9 +1986,9 @@ static void	vch_item_clean_cache(zbx_vc_item_t *item)
  ******************************************************************************/
 static int	vch_item_add_values_at_end(zbx_vc_item_t *item, const zbx_history_record_t *values, int values_num)
 {
-	int			copied = 0, ret = FAIL, count = values_num;
+	int				copied = 0, ret = FAIL, count = values_num;
 	zbx_vector_history_record_t	values_ext = {NULL};
-	zbx_vc_chunk_t		*head = item->head;
+	zbx_vc_chunk_t			*head = item->head;
 
 	if (NULL != item->head && 0 < vc_history_record_compare_asc_func(&item->head->slots[item->head->last_value], values))
 	{
@@ -2122,7 +2121,7 @@ out:
 static int	vch_item_add_values_at_beginning(zbx_vc_item_t *item, const zbx_history_record_t *values,
 		int values_num)
 {
-	int 			count = values_num, ret = FAIL;
+	int 	count = values_num, ret = FAIL;
 
 	/* skip values already added to the item cache by another process */
 	if (NULL != item->tail)
@@ -2186,8 +2185,8 @@ out:
  ******************************************************************************/
 static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int timestamp)
 {
-	int			ret = SUCCEED, update_seconds = 0, update_end, now;
-	int			start = timestamp - seconds;
+	int	ret = SUCCEED, update_seconds = 0, update_end, now;
+	int	start = timestamp - seconds;
 
 	now = ZBX_VC_TIME();
 
@@ -2245,7 +2244,7 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int t
  ******************************************************************************/
 static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, const zbx_timespec_t *timestamp)
 {
-	int			ret = SUCCEED, cache_records = 0, update_end;
+	int	ret = SUCCEED, cache_records = 0, update_end;
 
 	/* find if the cache should be updated to cover the required count */
 	if (NULL != item->head)
@@ -2311,9 +2310,9 @@ static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, const 
 static int	vch_item_get_values_by_time(zbx_vc_item_t *item, zbx_vector_history_record_t *values, int seconds,
 		int timestamp)
 {
-	int			ret = SUCCEED, index, now;
-	int			start = timestamp - seconds;
-	zbx_vc_chunk_t		*chunk;
+	int		ret = SUCCEED, index, now;
+	int		start = timestamp - seconds;
+	zbx_vc_chunk_t	*chunk;
 
 	now = ZBX_VC_TIME();
 
@@ -2372,8 +2371,8 @@ out:
 static int	vch_item_get_values_by_count(zbx_vc_item_t *item,  zbx_vector_history_record_t *values, int count,
 		int timestamp)
 {
-	int			ret = SUCCEED, index, now;
-	zbx_vc_chunk_t		*chunk;
+	int		ret = SUCCEED, index, now;
+	zbx_vc_chunk_t	*chunk;
 
 	now = ZBX_VC_TIME();
 
@@ -2574,7 +2573,7 @@ out:
 static int	vch_init(zbx_vc_item_t *item, zbx_vector_history_record_t *values, int seconds, int count,
 		int timestamp, const zbx_timespec_t *ts)
 {
-	int			ret, now;
+	int	ret, now;
 
 	if (0 < values->values_num)
 	{
@@ -2632,7 +2631,7 @@ static int	vch_init(zbx_vc_item_t *item, zbx_vector_history_record_t *values, in
  ******************************************************************************/
 static size_t	vch_item_free_cache(zbx_vc_item_t *item)
 {
-	size_t		freed = 0;
+	size_t	freed = 0;
 
 	zbx_vc_chunk_t	*chunk = item->tail;
 
@@ -2981,7 +2980,7 @@ int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *
 	if (NULL == (item = zbx_hashset_search(&vc_cache->items, &itemid)))
 	{
 		zbx_vector_history_record_t	values;
-		int			i;
+		int				i;
 
 		zbx_vector_history_record_create(&values);
 
@@ -3089,7 +3088,7 @@ int	zbx_vc_get_statistics(zbx_vc_stats_t *stats)
  ******************************************************************************/
 void	zbx_history_record_vector_destroy(zbx_vector_history_record_t *vector, int value_type)
 {
-	int i;
+	int	i;
 
 	if (NULL != vector->values)
 	{
