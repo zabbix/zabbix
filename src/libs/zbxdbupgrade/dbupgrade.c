@@ -1549,8 +1549,9 @@ static int	DBpatch_2010101(void)
 		else
 		{
 			char	*param;
+			size_t	size = 0, offset = 0;
 
-			param = strndup(row[1] + 15, key_len - 16);
+			zbx_strncpy_alloc(&param, &size, &offset, row[1] + 15, key_len - 16);
 
 			quote_key_param(&param, 0);
 			quote_key_param(&dsn, 0);
