@@ -1014,7 +1014,7 @@ if (!empty($this->data['new_operation'])) {
 }
 
 // append tabs to form
-$actionTabs = new CTabView(array('remember' => 1));
+$actionTabs = new CTabView();
 if (!isset($_REQUEST['form_refresh'])) {
 	$actionTabs->setSelected(0);
 }

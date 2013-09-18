@@ -178,7 +178,7 @@ $groupTable->addRow($groupTweenBox->get(_('In maintenance'), _('Other groups')))
 $hostsAndGroupsFormList->addRow(_('Groups in maintenance'), $groupTable);
 
 // append tabs to form
-$maintenanceTab = new CTabView(array('remember' => true));
+$maintenanceTab = new CTabView();
 if (!$this->data['form_refresh']) {
 	$maintenanceTab->setSelected(0);
 }

@@ -34,7 +34,9 @@
 		'use strict';
 
 		jQuery('#paramtype').change(function() {
-			if (jQuery('#expr_type option:selected').val().substr(0, 4) == 'last' || jQuery('#expr_type option:selected').val().substr(0, 6) == 'strlen') {
+			if (jQuery('#expr_type option:selected').val().substr(0, 4) == 'last'
+					|| jQuery('#expr_type option:selected').val().substr(0, 6) == 'strlen'
+					|| jQuery('#expr_type option:selected').val().substr(0, 4) == 'band') {
 				if (jQuery('#paramtype option:selected').val() == <?php echo PARAM_TYPE_COUNTS; ?>) {
 					jQuery('#param_0').removeAttr('readonly');
 				}
@@ -45,7 +47,9 @@
 		});
 
 		jQuery(document).ready(function() {
-			if (jQuery('#expr_type option:selected').val().substr(0, 4) == 'last' || jQuery('#expr_type option:selected').val().substr(0, 6) == 'strlen') {
+			if (jQuery('#expr_type option:selected').val().substr(0, 4) == 'last'
+					|| jQuery('#expr_type option:selected').val().substr(0, 6) == 'strlen'
+					|| jQuery('#expr_type option:selected').val().substr(0, 4) == 'band') {
 				if (jQuery('#paramtype option:selected').val() == <?php echo PARAM_TYPE_COUNTS; ?>) {
 					jQuery('#param_0').removeAttr('readonly');
 				}
