@@ -191,9 +191,11 @@ static int	get_trigger_permission(zbx_uint64_t userid, zbx_uint64_t triggerid)
 }
 
 static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER_MSG **user_msg,
-		const char *subject, const char *message, unsigned char object, zbx_uint64_t triggerid)
+		const char *subject, const char *message, unsigned char object, zbx_uint64_t triggerid,
+		DB_EVENT *event, DB_ACTION *action)
 {
 	const char	*__function_name = "add_user_msg";
+	char		*subject_dyn, *message_dyn;
 	ZBX_USER_MSG	*p;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -206,10 +208,18 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 
 	p = *user_msg;
 
+	subject_dyn = zbx_strdup(NULL, subject);
+	message_dyn = zbx_strdup(NULL, message);
+
+	substitute_simple_macros(&action->actionid, event, NULL, &userid, NULL, NULL,
+			NULL, NULL, &subject_dyn, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
+	substitute_simple_macros(&action->actionid, event, NULL, &userid, NULL, NULL,
+			NULL, NULL, &message_dyn, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
+
 	while (NULL != p)
 	{
 		if (p->userid == userid && p->mediatypeid == mediatypeid &&
-				0 == strcmp(p->subject, subject) && 0 == strcmp(p->message, message))
+				0 == strcmp(p->subject, subject_dyn) && 0 == strcmp(p->message, message_dyn))
 			break;
 
 		p = p->next;
@@ -221,18 +231,22 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 
 		p->userid = userid;
 		p->mediatypeid = mediatypeid;
-		p->subject = zbx_strdup(NULL, subject);
-		p->message = zbx_strdup(NULL, message);
+		p->subject = zbx_strdup(NULL, subject_dyn);
+		p->message = zbx_strdup(NULL, message_dyn);
 		p->next = *user_msg;
 
 		*user_msg = p;
 	}
 
+	zbx_free(subject_dyn);
+	zbx_free(message_dyn);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 static void	add_object_msg(zbx_uint64_t operationid, zbx_uint64_t mediatypeid, ZBX_USER_MSG **user_msg,
-		const char *subject, const char *message, unsigned char object, zbx_uint64_t triggerid)
+		const char *subject, const char *message, unsigned char object, zbx_uint64_t triggerid,
+		DB_EVENT *event, DB_ACTION *action)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -252,7 +266,7 @@ static void	add_object_msg(zbx_uint64_t operationid, zbx_uint64_t mediatypeid, Z
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(userid, row[0]);
-		add_user_msg(userid, mediatypeid, user_msg, subject, message, object, triggerid);
+		add_user_msg(userid, mediatypeid, user_msg, subject, message, object, triggerid, event, action);
 	}
 	DBfree_result(result);
 }
@@ -826,7 +840,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 		if (SUCCEED == check_operation_conditions(event, operationid, evaltype))
 		{
 			unsigned char	default_msg;
-			char		*subject, *message, *subject_dyn, *message_dyn;
+			char		*subject, *message;
 			zbx_uint64_t	mediatypeid;
 
 			zabbix_log(LOG_LEVEL_DEBUG, "Conditions match our event. Execute operation.");
@@ -854,19 +868,8 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 						message = action->longdata;
 					}
 
-					subject_dyn = zbx_strdup(NULL, subject);
-					message_dyn = zbx_strdup(NULL, message);
-
-					substitute_simple_macros(&action->actionid, event, NULL, NULL, NULL, NULL,
-							NULL, NULL, &subject_dyn, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
-					substitute_simple_macros(&action->actionid, event, NULL, NULL, NULL, NULL,
-							NULL, NULL, &message_dyn, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
-
-					add_object_msg(operationid, mediatypeid, &user_msg, subject_dyn, message_dyn,
-							event->object, event->objectid);
-
-					zbx_free(subject_dyn);
-					zbx_free(message_dyn);
+					add_object_msg(operationid, mediatypeid, &user_msg, subject, message,
+							event->object, event->objectid, event, action);
 					break;
 				case OPERATION_TYPE_COMMAND:
 					execute_commands(event, action->actionid, operationid, escalation->esc_step);
