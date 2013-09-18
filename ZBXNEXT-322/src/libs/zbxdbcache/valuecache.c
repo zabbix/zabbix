@@ -94,7 +94,7 @@ typedef struct _zbx_vc_chunk_t
 	int			slots_num;
 
 	/* the item value data */
-	zbx_history_record_t		slots[1];
+	zbx_history_record_t	slots[1];
 }
 zbx_vc_chunk_t;
 
@@ -2585,7 +2585,7 @@ static int	vch_init(zbx_vc_item_t *item, zbx_vector_history_record_t *values, in
 		}
 		else if (0 != count)
 		{
-			int i;
+			int	i;
 
 			/* check if the init value vector contains the requested number of values before timestamp */
 			for (i = 0; i < values->values_num && 0 < count; i++)
