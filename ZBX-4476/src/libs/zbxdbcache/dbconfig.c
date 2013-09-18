@@ -85,6 +85,7 @@ typedef struct
 	int			nextcheck;
 	int			lastclock;
 	int			mtime;
+	int			time_added;
 	unsigned char		type;
 	unsigned char		data_type;
 	unsigned char		value_type;
@@ -893,6 +894,7 @@ static void	DCsync_items(DB_RESULT result)
 			item->lastclock = 0;
 			ZBX_STR2UINT64(item->lastlogsize, row[31]);
 			item->mtime = atoi(row[32]);
+			item->time_added = now;
 		}
 		else if (NULL != item->triggers && NULL == item->triggers[0])
 		{
@@ -5306,7 +5308,7 @@ void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * cons
  *                                                                            *
  * Function: DCget_expression                                                 *
  *                                                                            *
- * Purpose: retrieves g expression data from cache                       *
+ * Purpose: retrieves regular expression data from cache                      *
  *                                                                            *
  * Parameters: expressions  - [OUT] a vector of expression data pointers      *
  *             name         - [IN] the regular expression name                *
@@ -5318,4 +5320,37 @@ void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * cons
 void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name)
 {
 	DCget_expressions_by_names(expressions, &name, 1);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_item_nodata_seconds                                        *
+ *                                                                            *
+ * Purpose: retrieves time in seconds from the last item value update         *
+ *                                                                            *
+ * Parameters: itemid  - [IN] the item id                                     *
+ *             seconds - [OUT] the number of seconds since last item value    *
+ *                             update                                         *
+ *                                                                            *
+ * Comment: If the item value was not updated since server startup, then      *
+ *          time from the moment the item was added to configuration cache is *
+ *          returned instead.                                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	DCget_item_nodata_seconds(zbx_uint64_t itemid, int *seconds)
+{
+	ZBX_DC_ITEM	*item;
+	int		ret = FAIL;
+
+	LOCK_CACHE;
+
+	if (NULL != (item = zbx_hashset_search(&config->items, &itemid)))
+	{
+		*seconds = time(NULL) - ((0 == item->lastclock) ? item->time_added : item->lastclock);
+		ret = SUCCEED;
+	}
+
+	UNLOCK_CACHE;
+
+	return ret;
 }
