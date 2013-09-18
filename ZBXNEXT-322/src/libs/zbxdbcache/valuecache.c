@@ -3006,7 +3006,7 @@ int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *
 		goto finish;
 	}
 
-	item->refcount++;
+	vc_item_addref(item);
 
 	if (FAIL == vc_prepare_item(item, value_type, 0, 0, 0, ts))
 		goto out;
