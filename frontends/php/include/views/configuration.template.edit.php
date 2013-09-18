@@ -21,7 +21,7 @@
 // include JS + templates
 include('include/views/js/configuration.host.edit.macros.js.php');
 
-$divTabs = new CTabView(array('remember' => 1));
+$divTabs = new CTabView();
 if (!isset($_REQUEST['form_refresh'])) {
 	$divTabs->setSelected(0);
 }

@@ -1788,6 +1788,8 @@ function getPagingLine(&$items, array $urlParams = array()) {
 			}
 		}
 
+		$url->removeArgument('go');
+
 		if ($startPage > 1) {
 			$url->setArgument('page', 1);
 			$pageLine[] = new CLink('<< '._x('First', 'page navigation'), $url->getUrl(), null, null, true);
@@ -2601,4 +2603,208 @@ function clearCookies($clear = false, $id = null) {
 	if ($clear) {
 		insert_js('cookie.eraseArray("'.basename($_SERVER['SCRIPT_NAME'], '.php').($id ? '_'.$id : '').'")');
 	}
+}
+
+/**
+ * Prepare data for host menu popup.
+ *
+ * @param array  $host						host data
+ * @param string $host['hostid']			host id
+ * @param array  $host['inventory']			host inventory (optional)
+ * @param array  $host['screens']			host screens (optional)
+ * @param array  $scripts					host scripts (optional)
+ * @param string $scripts[]['name']			script name
+ * @param string $scripts[]['scriptid']		script id
+ * @param string $scripts[]['confirmation']	confirmation text
+ *
+ * @return array
+ */
+function getMenuPopupHost(array $host, array $scripts = null) {
+	$data = array(
+		'type' => 'host',
+		'hostid' => $host['hostid'],
+		'hasInventory' => (isset($host['inventory']) && $host['inventory']),
+		'hasScreens' => (isset($host['screens']) && $host['screens'])
+	);
+
+	if ($scripts) {
+		CArrayHelper::sort($scripts, array('name'));
+
+		foreach (array_values($scripts) as $script) {
+			$data['scripts'][] = array(
+				'name' => $script['name'],
+				'scriptid' => $script['scriptid'],
+				'confirmation' => $script['confirmation']
+			);
+		}
+	}
+
+	return $data;
+}
+
+/**
+ * Prepare data for host menu popup.
+ *
+ * @param string $hostId					host id
+ * @param array  $scripts					host scripts (optional)
+ * @param string $scripts[]['name']			script name
+ * @param string $scripts[]['scriptid']		script id
+ * @param string $scripts[]['confirmation']	confirmation text
+ * @param array  $gotos						goto links (optional)
+ * @param array  $gotos['screens']			link to host screen page with url parameters ("name" => "value") (optional)
+ * @param array  $gotos['triggerStatus']	link to trigger status page with url parameters ("name" => "value") (optional)
+ * @param array  $gotos['submap']			link to submap page with url parameters ("name" => "value") (optional)
+ * @param array  $gotos['events']			link to events page with url parameters ("name" => "value") (optional)
+ * @param array  $urls						local and global map urls (optional)
+ * @param string $urls[]['name']			url name
+ * @param string $urls[]['url']				url
+ *
+ * @return array
+ */
+function getMenuPopupMap($hostId, array $scripts = null, array $gotos = null, array $urls = null) {
+	$data = array(
+		'type' => 'map'
+	);
+
+	if ($scripts) {
+		CArrayHelper::sort($scripts, array('name'));
+
+		$data['hostid'] = $hostId;
+
+		foreach (array_values($scripts) as $script) {
+			$data['scripts'][] = array(
+				'name' => $script['name'],
+				'scriptid' => $script['scriptid'],
+				'confirmation' => $script['confirmation']
+			);
+		}
+	}
+
+	if ($gotos) {
+		$data['gotos'] = $gotos;
+	}
+
+	if ($urls) {
+		foreach ($urls as $url) {
+			$data['urls'][] = array(
+				'label' => $url['name'],
+				'url' => $url['url']
+			);
+		}
+	}
+
+	return $data;
+}
+
+/**
+ * Prepare data for item history menu popup.
+ *
+ * @param array $item				item data
+ * @param int   $item['itemid']		item id
+ * @param int   $item['value_type']	item value type
+ *
+ * @return array
+ */
+function getMenuPopupHistory(array $item) {
+	return array(
+		'type' => 'history',
+		'itemid' => $item['itemid'],
+		'hasLatestGraphs' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT))
+	);
+}
+
+/**
+ * Prepare data for trigger menu popup.
+ *
+ * @param array  $trigger						trigger data
+ * @param string $trigger['triggerid']			trigger id
+ * @param int    $trigger['flags']				trigger flags (TRIGGER_FLAG_DISCOVERY*)
+ * @param array  $trigger['hosts']				hosts, used by trigger expression
+ * @param string $trigger['hosts'][]['hostid']	host id
+ * @param string $trigger['url']				url
+ * @param array  $items							trigger items (optional)
+ * @param string $items[]['name']				item name
+ * @param array  $items[]['params']				item url parameters ("name" => "value")
+ * @param array  $acknowledge					acknowledge link parameters (optional)
+ * @param string $acknowledge['eventid']		event id
+ * @param string $acknowledge['screenid']		screen id (optional)
+ * @param string $acknowledge['backurl']		return url (optional)
+ * @param string $eventTime						event navigation time parameter (optional)
+ *
+ * @return array
+ */
+function getMenuPopupTrigger(array $trigger, array $items = null, array $acknowledge = null, $eventTime = null) {
+	if ($items) {
+		CArrayHelper::sort($items, array('name'));
+	}
+
+	$data = array(
+		'type' => 'trigger',
+		'triggerid' => $trigger['triggerid'],
+		'items' => $items,
+		'acknowledge' => $acknowledge,
+		'eventTime' => $eventTime,
+		'configuration' => null,
+		'url' => resolveTriggerUrl($trigger)
+	);
+
+	if ((CWebUser::$data['type'] == USER_TYPE_ZABBIX_ADMIN || CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN)
+			&& $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+		$host = reset($trigger['hosts']);
+
+		$data['configuration'] = array(
+			'hostid' => $host['hostid'],
+			'switchNode' => id2nodeid($trigger['triggerid'])
+		);
+	}
+
+	return $data;
+}
+
+/**
+ * Splitting string using slashes with escape backslash support.
+ *
+ * @param string $path				string path to parse
+ * @param bool   $stripSlashes		remove escaped slashes from the path pieces
+ *
+ * @return array
+ */
+function splitPath($path, $stripSlashes = true) {
+	$items = array();
+	$s = $escapes = '';
+
+	for ($i = 0, $size = strlen($path); $i < $size; $i++) {
+		if ($path[$i] === '/') {
+			if ($escapes === '') {
+				$items[] = $s;
+				$s = '';
+			}
+			else {
+				if (strlen($escapes) % 2 == 0) {
+					$s .= $stripSlashes ? stripslashes($escapes) : $escapes;
+					$items[] = $s;
+					$s = $escapes = '';
+				}
+				else {
+					$s .= $stripSlashes ? stripslashes($escapes).$path[$i] : $escapes.$path[$i];
+					$escapes = '';
+				}
+			}
+		}
+		elseif ($path[$i] === '\\') {
+			$escapes .= $path[$i];
+		}
+		else {
+			$s .= $stripSlashes ? stripslashes($escapes).$path[$i] : $escapes.$path[$i];
+			$escapes = '';
+		}
+	}
+
+	if ($escapes !== '') {
+		$s .= $stripSlashes ? stripslashes($escapes) : $escapes;
+	}
+
+	$items[] = $s;
+
+	return $items;
 }

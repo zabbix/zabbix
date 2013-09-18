@@ -124,6 +124,12 @@ $pageHeader->addCssInit();
 $pageHeader->addCssFile('styles/themes/originalblue/main.css');
 $pageHeader->addJsFile('js/jquery/jquery.js');
 $pageHeader->addJsFile('js/jquery/jquery-ui.js');
+
+// if init fails due to missing configuration, set user as guest with default en_GB language
+if (!CWebUser::$data) {
+	CWebUser::setDefault();
+}
+
 $path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.CWebUser::$data['lang'].'&amp;files[]=common.js&amp;files[]=main.js';
 $pageHeader->addJsFile($path);
 
