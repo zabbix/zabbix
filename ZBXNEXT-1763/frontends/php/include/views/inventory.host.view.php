@@ -28,7 +28,7 @@ $hostInventoriesForm = new CForm();
 /*
  * Overview tab
  */
-$overviewFormList = new CFormList('hostinventoriesOverviewFormList');
+$overviewFormList = new CFormList('host-inventories-overview-form-list');
 
 $hostSpan = new CSpan($this->data['host']['host'], 'link_menu menu-host');
 
@@ -45,7 +45,7 @@ $hostName = $this->data['host']['maintenance_status'] == HOST_MAINTENANCE_STATUS
 $overviewFormList->addRow(_('Host name'), $hostName);
 
 if ($this->data['host']['host'] != $this->data['host']['name']) {
-	$overviewFormList->addRow(_('Visible name'), new CSpan($this->data['host']['name'], 'textField'));
+	$overviewFormList->addRow(_('Visible name'), new CSpan($this->data['host']['name'], 'text-field'));
 }
 
 foreach ($this->data['host']['interfaces'] as $interface) {
@@ -154,7 +154,7 @@ if ($this->data['tableValues']) {
 	foreach ($this->data['tableValues'] as $key => $value) {
 		if (($this->data['tableTitles'][$key]['title'] == 'OS' || $this->data['tableTitles'][$key]['title'] == 'Hardware'
 				|| $this->data['tableTitles'][$key]['title'] == 'Software') && !zbx_empty($value)) {
-			$overviewFormList->addRow($this->data['tableTitles'][$key]['title'], new CSpan(zbx_str2links($value), 'textField'));
+			$overviewFormList->addRow($this->data['tableTitles'][$key]['title'], new CSpan(zbx_str2links($value), 'text-field'));
 		}
 	}
 }
@@ -246,14 +246,14 @@ $inventoryValues = false;
 if ($this->data['tableValues']) {
 	foreach ($this->data['tableValues'] as $key => $value) {
 		if (!zbx_empty($value)) {
-			$detailsFormList->addRow($this->data['tableTitles'][$key]['title'], new CSpan(zbx_str2links($value), 'textField'));
+			$detailsFormList->addRow($this->data['tableTitles'][$key]['title'], new CSpan(zbx_str2links($value), 'text-field'));
 			$inventoryValues = true;
 		}
 	}
 }
 
 if (!$inventoryValues) {
-	$hostInventoriesTab->setDisabled(1);
+	$hostInventoriesTab->setDisabled([1]);
 }
 
 $hostInventoriesTab->addTab('detailsTab', _('Details'), $detailsFormList);

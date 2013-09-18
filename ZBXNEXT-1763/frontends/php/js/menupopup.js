@@ -73,7 +73,7 @@ function getMenuPopupHost(options) {
 		// inventories
 		if (options.hasInventory) {
 			gotos[gotos.length] = {
-				label: t('Host inventories'),
+				label: t('Host inventory'),
 				url: new Curl('hostinventories.php?hostid=' + options.hostid).getUrl()
 			};
 		}
@@ -111,6 +111,7 @@ function getMenuPopupHost(options) {
  * @param array  options['urls']					local and global map urls (optional)
  * @param string options['url'][]['label']			url label
  * @param string options['url'][]['url']			url
+ * @param bool   options['hasGoTo']					"Go to" block in popup
  *
  * @return array
  */
@@ -144,7 +145,7 @@ function getMenuPopupMap(options) {
 	}
 
 	// gotos
-	if (typeof options.gotos !== 'undefined') {
+	if (typeof options.hasGoTo !== 'undefined') {
 		var gotos = [];
 
 		// screens
