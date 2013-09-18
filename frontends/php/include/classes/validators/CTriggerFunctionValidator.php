@@ -281,7 +281,7 @@ class CTriggerFunctionValidator extends CValidator {
 				continue;
 			}
 
-			if (isset($arg['can_be_empty']) && '' == $value['functionParamList'][$aNum]) {
+			if (isset($arg['can_be_empty']) && $value['functionParamList'][$aNum] == '') {
 				continue;
 			}
 
