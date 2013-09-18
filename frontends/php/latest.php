@@ -266,13 +266,13 @@ $allItems = DBfetchArray(DBselect(
 		' AND '.dbConditionInt('i.hostid', $hostIds)
 ));
 
-// check which items have history data
-$itemsWithData = Manager::History()->getItemsWithData(zbx_toHash($allItems, 'itemid'));
+// select history
+$history = Manager::History()->getLast($allItems, 2);
 
 // filter items
 foreach ($allItems as $key => &$item) {
 	// filter items without history
-	if (!get_request('show_without_data') && !isset($itemsWithData[$item['itemid']])) {
+	if (!get_request('show_without_data') && !isset($history[$item['itemid']])) {
 		unset($allItems[$key]);
 
 		continue;
@@ -283,13 +283,9 @@ foreach ($allItems as $key => &$item) {
 	// filter items by name
 	if (!zbx_empty($_REQUEST['select']) && !zbx_stristr($item['resolvedName'], $_REQUEST['select'])) {
 		unset($allItems[$key]);
-		unset($itemsWithData[$item['itemid']]);
 	}
 }
 unset($item);
-
-// select history
-$history = Manager::History()->getLast($itemsWithData, 2);
 
 // add item last update date for sorting
 foreach ($allItems as &$item) {
