@@ -64,10 +64,10 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
+if (getRequest('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
 	access_deny();
 }
-if (get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
+if (getRequest('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
 	access_deny();
 }
 
@@ -114,9 +114,6 @@ if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
 if (!hasRequest('show_without_data')) {
 	$_REQUEST['show_without_data'] = 0;
 }
-if (!hasRequest('show_details')) {
-	$_REQUEST['show_details'] = 0;
-}
 
 if(hasRequest('filter_rst')){
 	$_REQUEST['select'] = '';
@@ -126,8 +123,8 @@ if(hasRequest('filter_rst')){
 
 if(hasRequest('filter_set') || hasRequest('filter_rst')){
 	CProfile::update('web.latest.filter.select',$_REQUEST['select'], PROFILE_TYPE_STR);
-	CProfile::update('web.latest.filter.show_without_data',$_REQUEST['show_without_data'], PROFILE_TYPE_INT);
-	CProfile::update('web.latest.filter.show_details',$_REQUEST['show_details'], PROFILE_TYPE_INT);
+	CProfile::update('web.latest.filter.show_without_data', $_REQUEST['show_without_data'], PROFILE_TYPE_INT);
+	CProfile::update('web.latest.filter.show_details', getRequest('show_details', 0), PROFILE_TYPE_INT);
 }
 else {
 	$_REQUEST['select'] = CProfile::get('web.latest.filter.select', '');
@@ -151,8 +148,8 @@ $options = array(
 	'hosts' => array(
 		'with_monitored_items' => true
 	),
-	'hostid' => get_request('hostid', null),
-	'groupid' => get_request('groupid', null),
+	'hostid' => getRequest('hostid', null),
+	'groupid' => getRequest('groupid', null),
 );
 $pageFilter = new CPageFilter($options);
 $_REQUEST['groupid'] = $pageFilter->groupid;
@@ -171,7 +168,7 @@ $filterForm->setAttribute('id','zbx_filter');
 
 $filterForm->addRow(_('Show items with name like'), new CTextBox('select',$_REQUEST['select'],20));
 $filterForm->addRow(_('Show items without data'), new CCheckBox('show_without_data', $_REQUEST['show_without_data'], null, 1));
-$filterForm->addRow(_('Show details'), new CCheckBox('show_details', $_REQUEST['show_details'], null, 1));
+$filterForm->addRow(_('Show details'), new CCheckBox('show_details', getRequest('show_details', 0), null, 1));
 
 $reset = new CButton("filter_rst", _('Reset'), 'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
 
@@ -304,7 +301,7 @@ $itemsWithData = Manager::History()->getItemsWithData(zbx_toHash($allItems, 'ite
 // filter items
 foreach ($allItems as $key => &$item) {
 	// filter items without history
-	if (!get_request('show_without_data') && !isset($itemsWithData[$item['itemid']])) {
+	if (!getRequest('show_without_data') && !isset($itemsWithData[$item['itemid']])) {
 		unset($allItems[$key]);
 
 		continue;
@@ -356,11 +353,15 @@ foreach ($allItems as $key => $db_item){
 	$lastHistory = isset($history[$db_item['itemid']][0]) ? $history[$db_item['itemid']][0] : null;
 	$prevHistory = isset($history[$db_item['itemid']][1]) ? $history[$db_item['itemid']][1] : null;
 
-	if(strpos($db_item['units'], ',') !== false)
+	if (strpos($db_item['units'], ',') !== false) {
 		list($db_item['units'], $db_item['unitsLong']) = explode(',', $db_item['units']);
-	else
+	}
+	else {
 		$db_item['unitsLong'] = '';
-	$db_app = &$applications[reset($db_item['applications'])['applicationid']];
+	}
+
+	$itemApplications = reset($db_item['applications']);
+	$db_app = &$applications[$itemApplications['applicationid']];
 
 	if (!isset($tab_rows[$db_app['applicationid']])) {
 		$tab_rows[$db_app['applicationid']] = array();
@@ -507,7 +508,7 @@ foreach ($applications as $appid => $dbApp) {
 				SPACE.'('._n('%1$s Item', '%1$s Items', $dbApp['item_cnt']).')'
 			), null, (getRequest('show_details') ? 9 : 5
 		)
-	), 'odd_row');
+	)));
 
 	// add toggle sub rows
 	foreach ($appRows as $row) {
@@ -681,7 +682,7 @@ foreach ($hosts as $hostId => $dbHost) {
 			),
 			null, getRequest('show_details') ? 9 : 5
 		)
-	), 'odd_row');
+	));
 
 	// add toggle sub rows
 	foreach($appRows as $row) {

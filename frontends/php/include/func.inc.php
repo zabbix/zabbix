@@ -2652,12 +2652,13 @@ function clearCookies($clear = false, $id = null) {
  *
  * @return array
  */
-function getMenuPopupHost(array $host, array $scripts = null) {
+function getMenuPopupHost(array $host, array $scripts = null, $goTo = true) {
 	$data = array(
 		'type' => 'host',
 		'hostid' => $host['hostid'],
-		'hasInventory' => (isset($host['inventory']) && $host['inventory']),
-		'hasScreens' => (isset($host['screens']) && $host['screens'])
+		'hasInventory' => (!isset($host['inventory']) && $host['inventory']),
+		'hasScreens' => (!isset($host['screens']) && $host['screens']),
+		'goTo' => $goTo
 	);
 
 	if ($scripts) {
