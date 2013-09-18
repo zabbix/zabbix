@@ -508,7 +508,7 @@ foreach ($applications as $appid => $dbApp) {
 				SPACE.'('._n('%1$s Item', '%1$s Items', $dbApp['item_cnt']).')'
 			), null, (getRequest('show_details') ? 9 : 5
 		)
-	)));
+	)), 'odd_row');
 
 	// add toggle sub rows
 	foreach ($appRows as $row) {
@@ -682,7 +682,7 @@ foreach ($hosts as $hostId => $dbHost) {
 			),
 			null, getRequest('show_details') ? 9 : 5
 		)
-	));
+	), 'odd_row');
 
 	// add toggle sub rows
 	foreach($appRows as $row) {
