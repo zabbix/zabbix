@@ -134,3 +134,8 @@ div.preloader {
 /* multiselect */
 .multiselect .selected ul.active { border: 1px solid #6681B2; }
 .multiselect .available ul li.hover { background: #4F70A8; }
+
+/* menu popup */
+.menuPopup { border: 1px solid #314979; }
+.menuPopup .title { color: #ffffff; background: #4E6EA7 url(images/widget_header.gif) repeat-x top left; }
+.menuPopup .ui-menu { border: 1px solid #314979; }

@@ -64,6 +64,11 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"vcenter.hv.uptime", VMCHECK_FUNC(check_vcenter_hv_uptime)},
 	{"vcenter.hv.version", VMCHECK_FUNC(check_vcenter_hv_version)},
 	{"vcenter.hv.vm.num", VMCHECK_FUNC(check_vcenter_hv_vm_num)},
+	{"vcenter.hv.network.in", VMCHECK_FUNC(check_vcenter_hv_network_in)},
+	{"vcenter.hv.network.out", VMCHECK_FUNC(check_vcenter_hv_network_out)},
+	{"vcenter.hv.datastore.discovery", VMCHECK_FUNC(check_vcenter_hv_datastore_discovery)},
+	{"vcenter.hv.datastore.read", VMCHECK_FUNC(check_vcenter_hv_datastore_read)},
+	{"vcenter.hv.datastore.write", VMCHECK_FUNC(check_vcenter_hv_datastore_write)},
 
 	{"vcenter.vm.cluster.name", VMCHECK_FUNC(check_vcenter_vm_cluster_name)},
 	{"vcenter.vm.cpu.num", VMCHECK_FUNC(check_vcenter_vm_cpu_num)},
@@ -109,6 +114,11 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"vsphere.uptime", VMCHECK_FUNC(check_vsphere_uptime)},
 	{"vsphere.version", VMCHECK_FUNC(check_vsphere_version)},
 	{"vsphere.vm.num", VMCHECK_FUNC(check_vsphere_vm_num)},
+	{"vsphere.network.in", VMCHECK_FUNC(check_vsphere_hv_network_in)},
+	{"vsphere.network.out", VMCHECK_FUNC(check_vsphere_hv_network_out)},
+	{"vsphere.datastore.discovery", VMCHECK_FUNC(check_vsphere_hv_datastore_discovery)},
+	{"vsphere.datastore.read", VMCHECK_FUNC(check_vsphere_hv_datastore_read)},
+	{"vsphere.datastore.write", VMCHECK_FUNC(check_vsphere_hv_datastore_write)},
 
 	{"vsphere.vm.cpu.num", VMCHECK_FUNC(check_vsphere_vm_cpu_num)},
 	{"vsphere.vm.cpu.usage", VMCHECK_FUNC(check_vsphere_vm_cpu_usage)},
