@@ -5337,7 +5337,7 @@ void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name)
  *          returned instead.                                                 *
  *                                                                            *
  ******************************************************************************/
-int	DCget_item_nodata_seconds(zbx_uint64_t itemid, int *seconds)
+int	DCget_item_time_added(zbx_uint64_t itemid, int *time_added)
 {
 	ZBX_DC_ITEM	*item;
 	int		ret = FAIL;
@@ -5346,7 +5346,7 @@ int	DCget_item_nodata_seconds(zbx_uint64_t itemid, int *seconds)
 
 	if (NULL != (item = zbx_hashset_search(&config->items, &itemid)))
 	{
-		*seconds = time(NULL) - ((0 == item->lastclock) ? item->time_added : item->lastclock);
+		*time_added = item->time_added;
 		ret = SUCCEED;
 	}
 
