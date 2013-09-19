@@ -47,6 +47,8 @@
 #	include "daemon.h"
 #endif
 
+#include "setproctitle.h"
+
 const char	*progname = NULL;
 
 /* default config file location */
@@ -715,6 +717,10 @@ void	zbx_on_exit(void)
 
 	zbx_free_service_resources();
 
+#if defined(PS_OVERWRITE_ARGV)
+	setproctitle_free_env();
+#endif
+
 	exit(SUCCEED);
 }
 
@@ -737,7 +743,9 @@ int	main(int argc, char **argv)
 	/* Instead, the system sends the error to the calling process.*/
 	SetErrorMode(SEM_FAILCRITICALERRORS);
 #endif
-
+#if defined(PS_OVERWRITE_ARGV)
+	argv = setproctitle_save_env(argc, argv);
+#endif
 	memset(&t, 0, sizeof(t));
 	t.task = ZBX_TASK_START;
 

@@ -507,7 +507,7 @@ static int	sleep_remains;
  ******************************************************************************/
 void	zbx_sleep_loop(int sleeptime)
 {
-#ifdef HAVE_FUNCTION_SETPROCTITLE
+#if defined(HAVE_FUNCTION_SETPROCTITLE) || defined(PS_OVERWRITE_ARGV)
 	extern unsigned char	process_type;
 	const char		*process_type_string;
 #endif
@@ -521,13 +521,13 @@ void	zbx_sleep_loop(int sleeptime)
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
-#ifdef HAVE_FUNCTION_SETPROCTITLE
+#if defined(HAVE_FUNCTION_SETPROCTITLE) || defined(PS_OVERWRITE_ARGV)
 	process_type_string = get_process_type_string(process_type);
 #endif
 
 	do
 	{
-#ifdef HAVE_FUNCTION_SETPROCTITLE
+#if defined(HAVE_FUNCTION_SETPROCTITLE) || defined(PS_OVERWRITE_ARGV)
 		zbx_setproctitle("%s [sleeping for %d seconds]", process_type_string, sleep_remains);
 #endif
 		sleep(1);

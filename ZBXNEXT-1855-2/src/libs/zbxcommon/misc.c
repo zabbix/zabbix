@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "log.h"
+#include "setproctitle.h"
 
 #ifdef _WINDOWS
 char	ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
@@ -326,15 +327,19 @@ char    *zbx_strdup2(const char *filename, int line, char *old, const char *str)
  ******************************************************************************/
 void	__zbx_zbx_setproctitle(const char *fmt, ...)
 {
-#ifdef HAVE_FUNCTION_SETPROCTITLE
+#if defined(HAVE_FUNCTION_SETPROCTITLE) || defined(PS_OVERWRITE_ARGV)
 	char	title[MAX_STRING_LEN];
 	va_list	args;
 
 	va_start(args, fmt);
 	zbx_vsnprintf(title, sizeof(title), fmt, args);
 	va_end(args);
+#endif
 
+#if defined(HAVE_FUNCTION_SETPROCTITLE)
 	setproctitle(title);
+#elif defined(PS_OVERWRITE_ARGV)
+	setproctitle_set_status(title);
 #endif
 }
 
