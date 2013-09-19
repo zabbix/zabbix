@@ -60,7 +60,9 @@ check_fields($fields);
  * Permissions
  */
 if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))
-		|| get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
+		|| get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))
+		|| get_request('tr_groupid') && !API::HostGroup()->isReadable(array($_REQUEST['tr_groupid']))
+		|| get_request('tr_hostid') && !API::Host()->isReadable(array($_REQUEST['tr_hostid']))) {
 	access_deny();
 }
 if (get_request('elementid')) {
