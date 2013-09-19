@@ -1554,7 +1554,7 @@ static int	DBpatch_2010101(void)
 
 			zbx_strncpy_alloc(&param, &param_alloc, &param_offset, row[1] + 15, key_len - 16);
 
-			if (0 == (nparam = num_param(param)) || 1 < nparam)
+			if (1 != (nparam = num_param(param)))
 				quote_key_param(&param, 0);
 			quote_key_param(&dsn, 0);
 
