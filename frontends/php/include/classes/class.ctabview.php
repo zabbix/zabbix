@@ -34,6 +34,9 @@ class CTabView extends CDiv {
 		if (isset($data['selected'])) {
 			$this->setSelected($data['selected']);
 		}
+		if (isset($data['disabled'])) {
+			$this->setDisabled($data['disabled']);
+		}
 		parent::__construct();
 		$this->attr('id', zbx_formatDomId($this->id));
 		$this->attr('class', 'tabs');
@@ -43,6 +46,13 @@ class CTabView extends CDiv {
 		$this->selectedTab = $selected;
 	}
 
+	/**
+	 * Disable tabs
+	 *
+	 * @param array		$disabled
+	 *
+	 * @return void
+	 */
 	public function setDisabled($disabled) {
 		$this->disabledTabs = $disabled;
 	}
