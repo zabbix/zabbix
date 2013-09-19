@@ -54,14 +54,14 @@ static zbx_uint64_t	select_discovered_host(const DB_EVENT *event)
 		case EVENT_OBJECT_DHOST:
 			sql = zbx_dsprintf(sql,
 				"select h.hostid"
-				" from hosts h,interface i,dservices ds,drules dr,dchecks dc"
+				" from hosts h,interface i,dservices ds,dchecks dc,drules dr"
 				" where h.hostid=i.hostid"
-					" and i.useip=1"
 					" and i.ip=ds.ip"
-					" and ds.dhostid=" ZBX_FS_UI64
 					" and ds.dcheckid=dc.dcheckid"
-					" and dr.druleid=dc.druleid"
+					" and dc.druleid=dr.druleid"
 					" and " ZBX_SQL_NULLCMP("dr.proxy_hostid", "h.proxy_hostid")
+					" and i.useip=1"
+					" and ds.dhostid=" ZBX_FS_UI64
 					ZBX_SQL_NODE
 				" order by i.hostid",
 				event->objectid, DBand_node_local("i.interfaceid"));
@@ -69,14 +69,14 @@ static zbx_uint64_t	select_discovered_host(const DB_EVENT *event)
 		case EVENT_OBJECT_DSERVICE:
 			sql = zbx_dsprintf(sql,
 				"select h.hostid"
-				" from hosts h,interface i,dservices ds,drules dr,dchecks dc"
+				" from hosts h,interface i,dservices ds,dchecks dc,drules dr"
 				" where h.hostid=i.hostid"
-					" and i.useip=1"
 					" and i.ip=ds.ip"
-					" and ds.dserviceid =" ZBX_FS_UI64
 					" and ds.dcheckid=dc.dcheckid"
-					" and dr.druleid=dc.druleid"
+					" and dc.druleid=dr.druleid"
 					" and " ZBX_SQL_NULLCMP("dr.proxy_hostid", "h.proxy_hostid")
+					" and i.useip=1"
+					" and ds.dserviceid =" ZBX_FS_UI64
 					ZBX_SQL_NODE
 				" order by i.hostid",
 				event->objectid, DBand_node_local("i.interfaceid"));
@@ -277,8 +277,8 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 						"select distinct h.hostid"
 						" from hosts h,interface i,dservices ds"
 						" where h.hostid=i.hostid"
-							" and h.proxy_hostid%s"
 							" and i.ip=ds.ip"
+							" and h.proxy_hostid%s"
 							" and ds.dhostid=" ZBX_FS_UI64
 							ZBX_SQL_NODE
 						" order by h.hostid",
