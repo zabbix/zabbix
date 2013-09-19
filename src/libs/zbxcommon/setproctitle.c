@@ -124,7 +124,6 @@ char **	setproctitle_save_env(int argc, char **argv)
 void	setproctitle_set_status(const char *status)
 {
 	static int	initialized = 0;
-	static size_t	end_pos;
 
 	if (0 == initialized && NULL != ps_buf)
 	{
@@ -137,12 +136,10 @@ void	setproctitle_set_status(const char *status)
 			zbx_strlcpy(ps_buf + start_pos, ": ", (size_t)3);
 			ps_buf += start_pos + 2;
 			ps_buf_size -= start_pos + 2;
-			end_pos = 0;
 			memset(ps_buf, ' ', ps_buf_size - 1);
 			memset(ps_buf + ps_buf_size - 1, '\0', (size_t)1);
 			initialized = 1;
 		}
-
 	}
 
 	if (1 == initialized)

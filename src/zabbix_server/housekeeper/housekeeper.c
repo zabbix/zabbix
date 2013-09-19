@@ -806,6 +806,8 @@ void	main_housekeeper_loop(void)
 
 		DBclose();
 
+		zbx_setproctitle("%s [sleeping]", get_process_type_string(process_type));
+
 		zbx_sleep_loop(CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR);
 	}
 }

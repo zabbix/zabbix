@@ -191,6 +191,8 @@ void	main_nodewatcher_loop()
 
 		end = time(NULL);
 
+		zbx_setproctitle("%s [sleeping %d sec]", get_process_type_string(process_type), 10 - (end - start));
+
 		zbx_sleep_loop(10 - (end - start));
 	}
 }

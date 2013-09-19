@@ -229,6 +229,8 @@ void	main_watchdog_loop()
 
 		DBclose();
 
+		zbx_setproctitle("%s [sleeping]", get_process_type_string(process_type));
+
 		zbx_sleep_loop(DB_PING_FREQUENCY);
 	}
 }

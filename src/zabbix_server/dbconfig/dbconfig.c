@@ -70,6 +70,9 @@ void	main_dbconfig_loop()
 		DCsync_configuration();
 		sec = zbx_time() - sec;
 
+		zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, sleeping]",
+				get_process_type_string(process_type), sec);
+
 		zabbix_log(LOG_LEVEL_DEBUG, "%s spent " ZBX_FS_DBL " second while processing configuration data",
 				get_process_type_string(process_type), sec);
 

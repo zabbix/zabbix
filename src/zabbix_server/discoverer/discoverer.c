@@ -756,13 +756,13 @@ void	main_discoverer_loop()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_discoverer_loop() process_num:%d", process_num);
 
-	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
+	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
-		zbx_setproctitle("%s [performing discovery]", get_process_type_string(process_type));
+		zbx_setproctitle("%s #%d [performing discovery]", get_process_type_string(process_type), process_num);
 
 		now = time(NULL);
 		sec = zbx_time();
@@ -774,6 +774,9 @@ void	main_discoverer_loop()
 
 		nextcheck = get_minnextcheck(now);
 		sleeptime = calculate_sleeptime(nextcheck, DISCOVERER_DELAY);
+
+		zbx_setproctitle("%s #%d [discovered in " ZBX_FS_DBL " sec, sleeping]",
+				get_process_type_string(process_type), process_num, sec);
 
 		zbx_sleep_loop(sleeptime);
 	}

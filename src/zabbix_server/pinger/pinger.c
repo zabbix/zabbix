@@ -549,7 +549,7 @@ void	main_pinger_loop()
 
 	for (;;)
 	{
-		zbx_setproctitle("%s [getting values]", get_process_type_string(process_type));
+		zbx_setproctitle("%s #%d [getting values]", get_process_type_string(process_type), process_num);
 
 		sec = zbx_time();
 		get_pinger_hosts(&items, &items_alloc, &items_count);
@@ -563,6 +563,9 @@ void	main_pinger_loop()
 
 		nextcheck = DCconfig_get_poller_nextcheck(ZBX_POLLER_TYPE_PINGER);
 		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
+
+		zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, sleeping]",
+				get_process_type_string(process_type), process_num, items_count, sec);
 
 		zbx_sleep_loop(sleeptime);
 	}

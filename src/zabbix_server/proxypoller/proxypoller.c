@@ -343,13 +343,13 @@ void	main_proxypoller_loop()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() process_num:%d", __function_name, process_num);
 
-	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
+	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
-		zbx_setproctitle("%s [exchanging data]", get_process_type_string(process_type));
+		zbx_setproctitle("%s #%d [exchanging data]", get_process_type_string(process_type), process_num);
 
 		sec = zbx_time();
 		processed = process_proxy();
@@ -360,6 +360,9 @@ void	main_proxypoller_loop()
 
 		nextcheck = DCconfig_get_proxypoller_nextcheck();
 		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
+
+		zbx_setproctitle("%s #%d [exchanged data with %3d proxies in " ZBX_FS_DBL " sec, sleeping]",
+				get_process_type_string(process_type), process_num, processed, sec);
 
 		zbx_sleep_loop(sleeptime);
 	}
