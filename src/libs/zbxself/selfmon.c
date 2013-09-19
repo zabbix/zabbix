@@ -212,7 +212,7 @@ const char	*get_process_type_string(unsigned char process_type)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	init_selfmon_collector()
+void	init_selfmon_collector(void)
 {
 	const char	*__function_name = "init_selfmon_collector";
 	size_t		sz, sz_array, sz_process[ZBX_PROCESS_TYPE_COUNT], sz_total;
@@ -288,7 +288,7 @@ void	init_selfmon_collector()
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	free_selfmon_collector()
+void	free_selfmon_collector(void)
 {
 	const char	*__function_name = "free_selfmon_collector";
 
@@ -355,7 +355,7 @@ void	update_selfmon_counter(unsigned char state)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	collect_selfmon_stats()
+void	collect_selfmon_stats(void)
 {
 	const char		*__function_name = "collect_selfmon_stats";
 	zbx_stat_process_t	*process;
@@ -507,10 +507,7 @@ static int	sleep_remains;
  ******************************************************************************/
 void	zbx_sleep_loop(int sleeptime)
 {
-#if defined(HAVE_FUNCTION_SETPROCTITLE) || defined(PS_OVERWRITE_ARGV)
 	extern unsigned char	process_type;
-	const char		*process_type_string;
-#endif
 
 	if (0 >= sleeptime)
 		return;
@@ -521,23 +518,21 @@ void	zbx_sleep_loop(int sleeptime)
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
-#if defined(HAVE_FUNCTION_SETPROCTITLE) || defined(PS_OVERWRITE_ARGV)
-	process_type_string = get_process_type_string(process_type);
-#endif
-
-	do
+	if (ZBX_PROCESS_TYPE_CONFSYNCER == process_type)
 	{
-#if defined(HAVE_FUNCTION_SETPROCTITLE) || defined(PS_OVERWRITE_ARGV)
-		zbx_setproctitle("%s [sleeping for %d seconds]", process_type_string, sleep_remains);
-#endif
-		sleep(1);
+		do
+		{
+			sleep(1);
+		}
+		while (0 < --sleep_remains);
 	}
-	while (0 < --sleep_remains);
+	else
+		sleep(sleeptime);
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 }
 
-void	zbx_wakeup()
+void	zbx_wakeup(void)
 {
 	sleep_remains = 0;
 }
