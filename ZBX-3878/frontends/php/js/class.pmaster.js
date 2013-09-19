@@ -318,6 +318,8 @@ var CDoll = Class.create(CDebug,{
 		url.setArgument('upd_counter', this.counter());
 		url.setArgument('pmasterid', this.pmasterid());
 
+		jQuery('.flickerfreescreen').remove();
+
 		new Ajax.Request(url.getUrl(), {
 				'method': 'post',
 				'parameters': this._params,

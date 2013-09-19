@@ -168,6 +168,7 @@ var timeControl = {
 			$(obj.containerid).appendChild(img);
 		}
 
+		// apply sbox events to image
 		if (obj.loadSBox && empty(obj.sbox_listener)) {
 			obj.sbox_listener = this.addSBox.bindAsEventListener(this, id);
 			addListener(img, 'load', obj.sbox_listener);
