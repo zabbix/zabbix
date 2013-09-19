@@ -49,6 +49,7 @@
 #include "datasender/datasender.h"
 #include "heart/heart.h"
 #include "../zabbix_server/selfmon/selfmon.h"
+#include "setproctitle.h"
 
 #define INIT_PROXY(type, count)									\
 	process_type = type;									\
@@ -496,6 +497,9 @@ int	main(int argc, char **argv)
 	zbx_task_t	task = ZBX_TASK_START;
 	char		ch;
 
+#if defined(PS_OVERWRITE_ARGV)
+	argv = setproctitle_save_env(argc, argv);
+#endif
 	progname = get_program_name(argv[0]);
 
 	/* parse the command-line */
@@ -828,6 +832,10 @@ void	zbx_on_exit()
 			ZABBIX_VERSION, ZABBIX_REVISION);
 
 	zabbix_close_log();
+
+#if defined(PS_OVERWRITE_ARGV)
+	setproctitle_free_env();
+#endif
 
 	exit(SUCCEED);
 }

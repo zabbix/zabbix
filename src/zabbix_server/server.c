@@ -55,6 +55,7 @@
 #include "selfmon/selfmon.h"
 
 #include "valuecache.h"
+#include "setproctitle.h"
 
 #define INIT_SERVER(type, count)								\
 	process_type = type;									\
@@ -465,6 +466,9 @@ int	main(int argc, char **argv)
 	char		ch = '\0';
 	int		nodeid = 0;
 
+#if defined(PS_OVERWRITE_ARGV)
+	argv = setproctitle_save_env(argc, argv);
+#endif
 	progname = get_program_name(argv[0]);
 
 	/* parse the command-line */
@@ -892,6 +896,10 @@ void	zbx_on_exit()
 			ZABBIX_VERSION, ZABBIX_REVISION);
 
 	zabbix_close_log();
+
+#if defined(PS_OVERWRITE_ARGV)
+	setproctitle_free_env();
+#endif
 
 	exit(SUCCEED);
 }

@@ -51,6 +51,8 @@ void	main_dbconfig_loop()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_dbconfig_loop()");
 
+	zbx_setproctitle("%s [waiting for processes]", get_process_type_string(process_type));
+
 	/* the initial configuration sync is done by server before worker processes are forked */
 	zbx_sleep_loop(CONFIG_CONFSYNCER_FREQUENCY);
 
