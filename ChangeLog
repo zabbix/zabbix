@@ -1,6 +1,7 @@
 Changes for 2.1.5
 
 New features:
+........S. [ZBXNEXT-1267] changed network discovery to take in account proxies when identifying discovered hosts (wiper)
 ........S. [ZBXNEXT-322] improved value cache multi-process performance by unlocking it during database requests (wiper)
 ..F.....S. [ZBX-6883] added possibility to use empty parameters in the trigger functions (Sasha)
 .......PS. [ZBXNEXT-1633] added vSphere (vCenter hypervisor) datastore and network monitoring keys (wiper)
