@@ -48,6 +48,10 @@ if ($this->data['host']['host'] != $this->data['host']['name']) {
 	$overviewFormList->addRow(_('Visible name'), new CSpan($this->data['host']['name'], 'text-field'));
 }
 
+$snmpInterfaceRow = array();
+$ipmiInterfaceRow = array();
+$jmxInterfaceRow = array();
+
 foreach ($this->data['host']['interfaces'] as $interface) {
 	$spanClass = $interface['main'] ? ' default_interface' : null;
 
@@ -105,7 +109,7 @@ $overviewFormList->addRow(
 );
 
 // SNMP interface
-if (isset($snmpInterfaceRow)) {
+if ($snmpInterfaceRow) {
 	$snmpInterfacesTable = new CTable(null, 'formElementTable border_dotted objectgroup element-row');
 	$snmpInterfacesTable->setAttribute('style', 'min-width: 500;');
 
@@ -120,7 +124,7 @@ if (isset($snmpInterfaceRow)) {
 }
 
 // IPMI interface
-if (isset($ipmiInterfaceRow)) {
+if ($ipmiInterfaceRow) {
 	$ipmiInterfacesTable = new CTable(null, 'formElementTable border_dotted objectgroup element-row');
 	$ipmiInterfacesTable->setAttribute('style', 'min-width: 500;');
 
@@ -135,7 +139,7 @@ if (isset($ipmiInterfaceRow)) {
 }
 
 // JMX interface
-if (isset($jmxInterfaceRow)) {
+if ($jmxInterfaceRow) {
 	$jmxInterfacesTable = new CTable(null, 'formElementTable border_dotted objectgroup element-row');
 	$jmxInterfacesTable->setAttribute('style', 'min-width: 500;');
 
@@ -172,7 +176,7 @@ $latestArray = array(
 	SPACE.SPACE,
 	new CLink(_('Triggers status'),
 		'tr_status.php?show_triggers=2&ack_status=1&show_events=1&show_events=0&show_details=1'.
-		'&txt_select=&show_maintenance=0&hostid='.$this->data['host']['hostid'].url_param('groupid')),
+		'&txt_select=&hostid='.$this->data['host']['hostid'].url_param('groupid')),
 	SPACE.SPACE,
 	new CLink(_('Events'), 'events.php?hostid='.$this->data['host']['hostid'].url_param('groupid'))
 );

@@ -204,7 +204,8 @@ if (getRequest('show_details')) {
 		_('Type'),
 		make_sorting_header(_('Last check'), 'i.lastclock'),
 		_('Last value'),
-		_x('Change', 'noun in latest data'),
+		_('Change'),
+		SPACE,
 		_('Error')
 	));
 }
@@ -217,7 +218,7 @@ else {
 		make_sorting_header(_('Last check'), 'i.lastclock'),
 		_('Last value'),
 		_x('Change', 'noun in latest data'),
-		_('History')
+		SPACE
 	));
 }
 // fetch hosts
@@ -414,7 +415,7 @@ foreach ($allItems as $key => $db_item){
 	$stateCss = ($db_item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown txt' : 'txt';
 	$itemName = array(SPACE, SPACE, $db_item['resolvedName']);
 	if (getRequest('show_details')) {
-		$itemKey = new CLink($db_item['key_'], 'items.php?form=update&itemid='.$db_item['itemid']);
+		$itemKey = new CLink(resolveItemKeyMacros($db_item), 'items.php?form=update&itemid='.$db_item['itemid']);
 		$itemName = array_merge($itemName, array(BR(), SPACE, SPACE, $itemKey));
 
 		$statusIcons = array();
@@ -452,6 +453,7 @@ foreach ($allItems as $key => $db_item){
 			new CCol(new CDiv(item_type2str($db_item['type']), $stateCss)),
 			new CCol(new CDiv($lastClock, $stateCss)),
 			new CCol(new CDiv($lastValue, $stateCss)),
+			new CCol(new CDiv($change, $stateCss)),
 			$actions,
 			new CCol($statusIcons)
 		)));
@@ -508,7 +510,7 @@ foreach ($applications as $appid => $dbApp) {
 		new CCol(array(
 				bold($dbApp['name']),
 				SPACE.'('._n('%1$s Item', '%1$s Items', $dbApp['item_cnt']).')'
-			), null, (getRequest('show_details') ? 9 : 5
+			), null, (getRequest('show_details') ? 10 : 5
 		)
 	)), 'odd_row');
 
@@ -624,10 +626,11 @@ foreach ($allItems as $db_item){
 			new CCol(new CDiv($db_item['history'], $stateCss)),
 			new CCol(new CDiv($db_item['trends'], $stateCss)),
 			new CCol(new CDiv(item_type2str($db_item['type']), $stateCss)),
-			new CCol($statusIcons),
 			new CCol(new CDiv($lastClock, $stateCss)),
 			new CCol(new CDiv($lastValue, $stateCss)),
-			$actions
+			new CCol(new CDiv($change, $stateCss)),
+			$actions,
+			new CCol($statusIcons)
 		)));
 	}
 	else {
@@ -682,7 +685,7 @@ foreach ($hosts as $hostId => $dbHost) {
 				bold('- '.('other').' -'),
 				SPACE.'('._n('%1$s Item', '%1$s Items', $dbHost['item_cnt']).')'
 			),
-			null, getRequest('show_details') ? 9 : 5
+			null, getRequest('show_details') ? 10 : 5
 		)
 	), 'odd_row');
 

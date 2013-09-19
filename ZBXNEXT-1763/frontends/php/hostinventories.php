@@ -112,12 +112,12 @@ if ($hostid > 0) {
 		$data['rwHost'] = true;
 	}
 	else if ($userType == USER_TYPE_ZABBIX_ADMIN) {
-		$data['rwHost'] = API::Host()->get(array(
+		$rwHost = API::Host()->get(array(
 			'hostids' => $hostid,
 			'editable' => true
 		));
-		$data['rwHost'] = zbx_toHash($data['rwHost'], 'hostid');
-		$data['rwHost'] = isset($data['rwHost'][$hostid]) ? true : false;
+
+		$data['rwHost'] = $rwHost ? true : false;
 	}
 	else {
 		$data['rwHost'] = false;
