@@ -43,6 +43,7 @@
 
 extern unsigned char	daemon_type;
 extern unsigned char	process_type;
+extern int		process_num;
 
 /******************************************************************************
  *                                                                            *
@@ -674,13 +675,13 @@ void	main_trapper_loop(zbx_sock_t *s)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
+	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
-		zbx_setproctitle("%s [waiting for connection]", get_process_type_string(process_type));
+		zbx_setproctitle("%s #%d [waiting for connection]", get_process_type_string(process_type), process_num);
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
@@ -688,7 +689,8 @@ void	main_trapper_loop(zbx_sock_t *s)
 		{
 			update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
-			zbx_setproctitle("%s [processing data]", get_process_type_string(process_type));
+			zbx_setproctitle("%s #%d [processing data]", get_process_type_string(process_type),
+					process_num);
 
 			process_trapper_child(s);
 

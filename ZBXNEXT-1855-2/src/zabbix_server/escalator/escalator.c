@@ -1396,6 +1396,9 @@ void	main_escalator_loop()
 		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while processing escalations",
 				get_process_type_string(process_type), process_num, sec);
 
+		zbx_setproctitle("%s [processed escalations in " ZBX_FS_DBL " sec, sleeping %d sec]",
+				get_process_type_string(process_type), sec, CONFIG_ESCALATOR_FREQUENCY);
+
 		zbx_sleep_loop(CONFIG_ESCALATOR_FREQUENCY);
 	}
 }

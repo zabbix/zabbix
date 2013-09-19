@@ -228,6 +228,8 @@ void	main_alerter_loop()
 		}
 		DBfree_result(result);
 
+		zbx_setproctitle("%s [sleeping]", get_process_type_string(process_type));
+
 		zbx_sleep_loop(CONFIG_SENDER_FREQUENCY);
 	}
 }

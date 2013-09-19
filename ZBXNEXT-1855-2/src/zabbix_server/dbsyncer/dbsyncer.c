@@ -57,7 +57,7 @@ void	main_dbsyncer_loop()
 
 	for (;;)
 	{
-		zbx_setproctitle("%s [syncing history]", get_process_type_string(process_type));
+		zbx_setproctitle("%s #%d [syncing history]", get_process_type_string(process_type), process_num);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Syncing ...");
 
@@ -107,6 +107,9 @@ void	main_dbsyncer_loop()
 			sleeptime = CONFIG_HISTSYNCER_FREQUENCY;
 
 		last_sleeptime = sleeptime;
+
+		zbx_setproctitle("%s #%d [synced history in " ZBX_FS_DBL " sec, %d items, sleeping]",
+				get_process_type_string(process_type), process_num, sec, num);
 
 		zbx_sleep_loop(sleeptime);
 	}

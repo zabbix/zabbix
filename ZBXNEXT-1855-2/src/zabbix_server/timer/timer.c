@@ -783,7 +783,7 @@ void	main_timer_loop(void)
 {
 	int	now, nextcheck, sleeptime;
 
-	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
+	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
@@ -793,9 +793,12 @@ void	main_timer_loop(void)
 		nextcheck = now + TIMER_DELAY - (now % TIMER_DELAY);
 		sleeptime = nextcheck - now;
 
+		zbx_setproctitle("%s #%d [sleeping]", get_process_type_string(process_type), process_num);
+
 		zbx_sleep_loop(sleeptime);
 
-		zbx_setproctitle("%s [processing time functions]", get_process_type_string(process_type));
+		zbx_setproctitle("%s #%d [processing time functions]", get_process_type_string(process_type),
+				process_num);
 
 		process_time_functions();
 
@@ -807,7 +810,8 @@ void	main_timer_loop(void)
 		/* process time functions can take long time */
 		if (0 == nextcheck % SEC_PER_MIN || nextcheck + SEC_PER_MIN - (nextcheck % SEC_PER_MIN) <= time(NULL))
 		{
-			zbx_setproctitle("%s [processing maintenance periods]", get_process_type_string(process_type));
+			zbx_setproctitle("%s #%d [processing maintenance periods]",
+					get_process_type_string(process_type), process_num);
 
 			process_maintenance();
 		}
