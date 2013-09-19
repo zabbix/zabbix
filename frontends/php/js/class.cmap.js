@@ -482,7 +482,7 @@ ZABBIX.apps.map = (function($) {
 				 */
 				// delegate selements icons clicks
 				$(this.container).delegate('.sysmap_element', 'click', function(event) {
-					that.selectElements([$(this).data('id')], event.ctrlKey || event.metaKey);
+					that.selectElements([$(this).attr('data-id')], event.ctrlKey || event.metaKey);
 				});
 
 				/*
@@ -575,7 +575,7 @@ ZABBIX.apps.map = (function($) {
 
 				// open link form
 				$('.element-links').delegate('.openlink', 'click', function() {
-					that.currentLinkId = $(this).data('linkid');
+					that.currentLinkId = $(this).attr('data-linkid');
 					$('table.element-links tr').removeClass('selected');
 					$(this).parent().parent().addClass('selected');
 
@@ -610,7 +610,7 @@ ZABBIX.apps.map = (function($) {
 
 				this.linkForm.domNode.delegate('.triggerRemove', 'click', function() {
 					var triggerid,
-						tid = $(this).data('linktriggerid').toString();
+						tid = $(this).attr('data-linktriggerid').toString();
 
 					$('#linktrigger_' + tid).remove();
 
@@ -847,7 +847,7 @@ ZABBIX.apps.map = (function($) {
 			this.domNode = $('<div></div>')
 				.appendTo(this.sysmap.container)
 				.addClass('pointer sysmap_element')
-				.data('id', this.id);
+				.attr('data-id', this.id);
 
 			this.domNode.draggable({
 				containment: 'parent',
