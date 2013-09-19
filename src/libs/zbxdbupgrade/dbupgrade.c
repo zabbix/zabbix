@@ -1550,10 +1550,12 @@ static int	DBpatch_2010101(void)
 		{
 			char	*param = NULL;
 			size_t	size = 0, offset = 0;
+			int	nparam;
 
 			zbx_strncpy_alloc(&param, &size, &offset, row[1] + 15, key_len - 16);
 
-			quote_key_param(&param, 0);
+			if (0 == (nparam = num_param(param)) || 1 < nparam)
+				quote_key_param(&param, 0);
 			quote_key_param(&dsn, 0);
 
 			key_offset = 0;
