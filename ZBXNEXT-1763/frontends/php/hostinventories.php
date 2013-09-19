@@ -81,12 +81,6 @@ if ($hostid > 0) {
 	// inventory info
 	$data['tableTitles'] = getHostInventories();
 	$data['tableTitles'] = zbx_toHash($data['tableTitles'], 'db_field');
-	$sqlFields = implode(', ', array_keys($data['tableTitles']));
-
-	$sql = 'SELECT '.$sqlFields.' FROM host_inventory WHERE hostid='.$hostid;
-	$result = DBselect($sql);
-
-	$data['tableValues'] = DBfetch($result);
 
 	// overview tab
 	$host = API::Host()->get(array(
@@ -96,7 +90,7 @@ if ($hostid > 0) {
 		'selectItems' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,
 		'selectScreens' => API_OUTPUT_COUNT,
-		'selectInventory' => array('hostid'),
+		'selectInventory' => true,
 		'selectGraphs' => API_OUTPUT_COUNT,
 		'selectApplications' => API_OUTPUT_COUNT,
 		'selectDiscoveries' => API_OUTPUT_COUNT,

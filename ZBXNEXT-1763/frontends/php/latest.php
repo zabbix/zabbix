@@ -430,16 +430,11 @@ foreach ($allItems as $key => $db_item){
 			$statusIcons[] = $error;
 		}
 
-		// discovered item lifetime indicator
-		if ($db_item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $db_item['itemDiscovery']['ts_delete']) {
-			$deleteError = new CDiv(SPACE, 'status_icon iconwarning');
-			$deleteError->setHint(
-				_s('The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-					zbx_date2age($db_item['itemDiscovery']['ts_delete']),
-					zbx_date2str(_('d M Y'), $db_item['itemDiscovery']['ts_delete']),
-					zbx_date2str(_('H:i:s'), $db_item['itemDiscovery']['ts_delete'])
-			));
-			$statusIcons[] = $deleteError;
+		if ($db_item['value_type'] == ITEM_VALUE_TYPE_TEXT) {
+			$trendValue = null;
+		}
+		else {
+			$trendValue = $config['hk_trends_global'] ? $config['hk_trends'] : $db_item['trends'];
 		}
 
 		array_push($app_rows, new CRow(array(
@@ -447,9 +442,14 @@ foreach ($allItems as $key => $db_item){
 			is_show_all_nodes() ? SPACE : null,
 			($_REQUEST['hostid'] > 0) ? null : SPACE,
 			new CCol(new CDiv($itemName, $stateCss)),
-			new CCol(new CDiv($db_item['delay'], $stateCss)),
+			new CCol(new CDiv(
+				($db_item['type'] == ITEM_TYPE_SNMPTRAP || $db_item['type'] == ITEM_TYPE_TRAPPER)
+					? null
+					: $db_item['delay'],
+				$stateCss
+			)),
 			new CCol(new CDiv($config['hk_history_global'] ? $config['hk_history'] : $db_item['history'], $stateCss)),
-			new CCol(new CDiv($config['hk_trends_global'] ? $config['hk_trends'] : $db_item['trends'], $stateCss)),
+			new CCol(new CDiv($trendValue, $stateCss)),
 			new CCol(new CDiv(item_type2str($db_item['type']), $stateCss)),
 			new CCol(new CDiv($lastClock, $stateCss)),
 			new CCol(new CDiv($lastValue, $stateCss)),
@@ -605,16 +605,11 @@ foreach ($allItems as $db_item){
 			$statusIcons[] = $error;
 		}
 
-		// discovered item lifetime indicator
-		if ($db_item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $db_item['itemDiscovery']['ts_delete']) {
-			$deleteError = new CDiv(SPACE, 'status_icon iconwarning');
-			$deleteError->setHint(
-				_s('The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-					zbx_date2age($db_item['itemDiscovery']['ts_delete']),
-					zbx_date2str(_('d M Y'), $db_item['itemDiscovery']['ts_delete']),
-					zbx_date2str(_('H:i:s'), $db_item['itemDiscovery']['ts_delete'])
-			));
-			$statusIcons[] = $deleteError;
+		if ($db_item['value_type'] == ITEM_VALUE_TYPE_TEXT) {
+			$trendValue = null;
+		}
+		else {
+			$trendValue = $config['hk_trends_global'] ? $config['hk_trends'] : $db_item['trends'];
 		}
 
 		array_push($app_rows, new CRow(array(
@@ -622,8 +617,13 @@ foreach ($allItems as $db_item){
 			is_show_all_nodes() ? ($db_host['item_cnt'] ? SPACE : get_node_name_by_elid($db_item['itemid'])) : null,
 			$_REQUEST['hostid'] ? null : SPACE,
 			new CCol(new CDiv($itemName, $stateCss)),
-			new CCol(new CDiv($db_item['delay'], $stateCss)),
-			new CCol(new CDiv($db_item['history'], $stateCss)),
+			new CCol(new CDiv(
+				($db_item['type'] == ITEM_TYPE_SNMPTRAP || $db_item['type'] == ITEM_TYPE_TRAPPER)
+					? null
+					: $db_item['delay'],
+				$stateCss
+			)),
+			new CCol(new CDiv($config['hk_history_global'] ? $config['hk_history'] : $db_item['history'], $stateCss)),
 			new CCol(new CDiv($db_item['trends'], $stateCss)),
 			new CCol(new CDiv(item_type2str($db_item['type']), $stateCss)),
 			new CCol(new CDiv($lastClock, $stateCss)),

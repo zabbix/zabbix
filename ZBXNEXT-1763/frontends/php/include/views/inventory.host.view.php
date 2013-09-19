@@ -28,7 +28,7 @@ $hostInventoriesForm = new CForm();
 /*
  * Overview tab
  */
-$overviewFormList = new CFormList('host-inventories-overview-form-list');
+$overviewFormList = new CFormList(null, 'host-inventories-overview');
 
 $hostSpan = new CSpan($this->data['host']['host'], 'link_menu menu-host');
 
@@ -94,8 +94,7 @@ foreach ($this->data['host']['interfaces'] as $interface) {
 	}
 }
 
-$agentInterfacesTable = new CTable(null, 'formElementTable border_dotted objectgroup element-row-first');
-$agentInterfacesTable->setAttribute('style', 'min-width: 500;');
+$agentInterfacesTable = new CTable(null, 'formElementTable border_dotted objectgroup element-row-first interfaces');
 $agentInterfacesTable->setHeader(array(_('IP address'), _('DNS name'), _('Connect to'), _('Port')));
 
 // Agent interface
@@ -110,8 +109,7 @@ $overviewFormList->addRow(
 
 // SNMP interface
 if ($snmpInterfaceRow) {
-	$snmpInterfacesTable = new CTable(null, 'formElementTable border_dotted objectgroup element-row');
-	$snmpInterfacesTable->setAttribute('style', 'min-width: 500;');
+	$snmpInterfacesTable = new CTable(null, 'formElementTable border_dotted objectgroup element-row interfaces');
 
 	foreach ($snmpInterfaceRow as $interface) {
 		$snmpInterfacesTable->addRow($interface);
@@ -125,8 +123,7 @@ if ($snmpInterfaceRow) {
 
 // IPMI interface
 if ($ipmiInterfaceRow) {
-	$ipmiInterfacesTable = new CTable(null, 'formElementTable border_dotted objectgroup element-row');
-	$ipmiInterfacesTable->setAttribute('style', 'min-width: 500;');
+	$ipmiInterfacesTable = new CTable(null, 'formElementTable border_dotted objectgroup element-row interfaces');
 
 	foreach ($ipmiInterfaceRow as $interface) {
 		$ipmiInterfacesTable->addRow($interface);
@@ -140,8 +137,7 @@ if ($ipmiInterfaceRow) {
 
 // JMX interface
 if ($jmxInterfaceRow) {
-	$jmxInterfacesTable = new CTable(null, 'formElementTable border_dotted objectgroup element-row');
-	$jmxInterfacesTable->setAttribute('style', 'min-width: 500;');
+	$jmxInterfacesTable = new CTable(null, 'formElementTable border_dotted objectgroup element-row interfaces');
 
 	foreach ($jmxInterfaceRow as $interface) {
 		$jmxInterfacesTable->addRow($interface);
@@ -154,31 +150,37 @@ if ($jmxInterfaceRow) {
 }
 
 // inventory (OS, Hardware, Software)
-if ($this->data['tableValues']) {
-	foreach ($this->data['tableValues'] as $key => $value) {
-		if (($this->data['tableTitles'][$key]['title'] == 'OS' || $this->data['tableTitles'][$key]['title'] == 'Hardware'
-				|| $this->data['tableTitles'][$key]['title'] == 'Software') && !zbx_empty($value)) {
-			$overviewFormList->addRow($this->data['tableTitles'][$key]['title'], new CSpan(zbx_str2links($value), 'text-field'));
+unset($this->data['host']['inventory']['hostid'], $this->data['host']['inventory']['inventory_mode']);
+if ($this->data['host']['inventory']) {
+	foreach ($this->data['host']['inventory'] as $key => $value) {
+		if (($this->data['tableTitles'][$key]['db_field'] == 'os' || $this->data['tableTitles'][$key]['db_field'] == 'hardware'
+				|| $this->data['tableTitles'][$key]['db_field'] == 'software') && !zbx_empty($value)) {
+			$overviewFormList->addRow($this->data['tableTitles'][$key]['title'], new CSpan($value, 'text-field'));
 		}
 	}
 }
 
 // latest data
 $latestArray = array(
-	new CLink(_('Latest data'), 'latest.php?form=1&select=&show_details=1&filter_set=Filter&hostid='.
-		$this->data['host']['hostid'].url_param('groupid')),
-	SPACE.SPACE,
 	new CLink(_('Web'), 'httpmon.php?hostid='.$this->data['host']['hostid'].url_param('groupid')),
-	SPACE.SPACE,
-	new CLink(_('Graphs'), 'httpmon.php?hostid='.$this->data['host']['hostid'].url_param('groupid')),
-	SPACE.SPACE,
-	new CLink(_('Screens'), 'screens.php?hostid='.$this->data['host']['hostid'].url_param('groupid')),
-	SPACE.SPACE,
-	new CLink(_('Triggers status'),
+	new CSpan (
+		new CLink(_('Latest data'), 'latest.php?form=1&select=&show_details=1&filter_set=Filter&hostid='.
+		$this->data['host']['hostid'].url_param('groupid')),
+		'overview-link'),
+	new CSpan (
+		new CLink(_('Triggers status'),
 		'tr_status.php?show_triggers=2&ack_status=1&show_events=1&show_events=0&show_details=1'.
 		'&txt_select=&hostid='.$this->data['host']['hostid'].url_param('groupid')),
-	SPACE.SPACE,
-	new CLink(_('Events'), 'events.php?hostid='.$this->data['host']['hostid'].url_param('groupid'))
+		'overview-link'),
+	new CSpan (
+		new CLink(_('Events'), 'events.php?hostid='.$this->data['host']['hostid'].url_param('groupid')),
+		'overview-link'),
+	new CSpan (
+		new CLink(_('Graphs'), 'charts.php?hostid='.$this->data['host']['hostid'].url_param('groupid')),
+		'overview-link'),
+	new CSpan (
+		new CLink(_('Screens'), 'host_screen.php?hostid='.$this->data['host']['hostid'].url_param('groupid')),
+		'overview-link')
 );
 
 $overviewFormList->addRow(_('Latest data'), $latestArray);
@@ -208,30 +210,12 @@ else {
 
 $configurationArray = array(
 	$hostLink,
-	SPACE.SPACE,
-	$applicationsLink,
-	SPACE,
-	'('.$this->data['host']['applications'].')',
-	SPACE.SPACE,
-	$itemsLink,
-	SPACE,
-	'('.$this->data['host']['items'].')',
-	SPACE.SPACE,
-	$triggersLink,
-	SPACE,
-	'('.$this->data['host']['triggers'].')',
-	SPACE.SPACE,
-	$graphsLink,
-	SPACE,
-	'('.$this->data['host']['graphs'].')',
-	SPACE.SPACE,
-	$discoveryLink,
-	SPACE,
-	'('.$this->data['host']['discoveries'].')',
-	SPACE.SPACE,
-	$webLink,
-	SPACE,
-	'('.$this->data['host']['httpTests'].')'
+	new CSpan (array($applicationsLink, SPACE, '('.$this->data['host']['applications'].')'), 'overview-link'),
+	new CSpan (array($itemsLink, SPACE, '('.$this->data['host']['items'].')'), 'overview-link'),
+	new CSpan (array($triggersLink, SPACE, '('.$this->data['host']['triggers'].')'), 'overview-link'),
+	new CSpan (array($graphsLink, SPACE, '('.$this->data['host']['graphs'].')'), 'overview-link'),
+	new CSpan (array($discoveryLink, SPACE, '('.$this->data['host']['discoveries'].')'), 'overview-link'),
+	new CSpan (array($webLink, SPACE, '('.$this->data['host']['httpTests'].')'), 'overview-link')
 );
 
 $overviewFormList->addRow(_('Configuration'), $configurationArray);
@@ -247,10 +231,10 @@ $hostInventoriesTab->addTab('overviewTab', _('Overview'), $overviewFormList);
 $detailsFormList = new CFormList('hostinventoriesDetailsFormList');
 
 $inventoryValues = false;
-if ($this->data['tableValues']) {
-	foreach ($this->data['tableValues'] as $key => $value) {
+if ($this->data['host']['inventory']) {
+	foreach ($this->data['host']['inventory'] as $key => $value) {
 		if (!zbx_empty($value)) {
-			$detailsFormList->addRow($this->data['tableTitles'][$key]['title'], new CSpan(zbx_str2links($value), 'text-field'));
+			$detailsFormList->addRow($this->data['tableTitles'][$key]['title'], new CSpan($value, 'text-field'));
 			$inventoryValues = true;
 		}
 	}
