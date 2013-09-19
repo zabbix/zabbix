@@ -1122,9 +1122,12 @@ out:
 static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, const char *parameters)
 {
 	const char			*__function_name = "evaluate_NODATA";
-	int				arg1, flag, seconds, ret = FAIL;
+	int				arg1, flag, now, ret = FAIL;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_history_record_vector_create(&values);
 
 	if (1 < num_param(parameters))
 		goto out;
@@ -1135,18 +1138,32 @@ static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, con
 	if (ZBX_FLAG_SEC != flag)
 		goto out;
 
-	if (SUCCEED != DCget_item_nodata_seconds(item->itemid, &seconds))
-		goto out;
+	now = (int)time(NULL);
 
-	zbx_strlcpy(value, seconds < arg1 ? "0" : "1", MAX_BUFFER_LEN);
+	if (SUCCEED == zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) &&
+			1 == values.values_num)
+	{
+		zbx_strlcpy(value, values.values[0].timestamp.sec + arg1 > now ? "0" : "1", MAX_BUFFER_LEN);
+	}
+	else
+	{
+		int	time_added;
+
+		if (SUCCEED != DCget_item_time_added(item->itemid, &time_added) || time_added + arg1 > now)
+			goto out;
+
+		zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
+	}
 
 	ret = SUCCEED;
 out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
+
 
 /******************************************************************************
  *                                                                            *
