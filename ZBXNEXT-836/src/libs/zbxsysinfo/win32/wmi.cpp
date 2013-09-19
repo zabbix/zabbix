@@ -21,15 +21,15 @@
 
 extern "C"
 {
-	#include "common.h"
-	#include "sysinfo.h"
-	#include "log.h"
+#	include "common.h"
+#	include "sysinfo.h"
+#	include "log.h"
 }
 
 #include <comdef.h>
 #include <Wbemidl.h>
 
-# pragma comment(lib, "wbemuuid.lib")
+#pragma comment(lib, "wbemuuid.lib")
 
 static int	com_initialized = 0;
 
@@ -41,24 +41,17 @@ extern "C" int	zbx_co_initialize()
 	{
 		HRESULT	hres;
 
-		hres =  CoInitializeEx(0, COINIT_MULTITHREADED);
+		hres = CoInitializeEx(0, COINIT_MULTITHREADED);
+
 		if (FAILED(hres))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot initialized COM library");
 			return FAIL;
 		}
 
-		/* Initialize Security */
-		hres =  CoInitializeSecurity( NULL,
-			-1,				/* COM negotiates service */
-			NULL,				/* Authentication services */
-			NULL,				/* Reserved */
-			RPC_C_AUTHN_LEVEL_DEFAULT,	/* Authentication */
-			RPC_C_IMP_LEVEL_IMPERSONATE,	/* Impersonation */
-			NULL,				/* Authentication info */
-			EOAC_NONE,			/* Additional capabilities */
-			NULL				/* Reserved */
-			);
+		/* initialize security */
+		hres = CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_DEFAULT,
+				RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE, NULL);
 
 		if (FAILED(hres))
 		{
@@ -104,11 +97,7 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	VariantInit(&vtProp);
 
 	/* obtain the initial locator to Windows Management on a particular host computer */
-	hres = CoCreateInstance(
-		CLSID_WbemLocator,
-		0,
-		CLSCTX_INPROC_SERVER,
-		IID_IWbemLocator, (LPVOID *) &pLoc);
+	hres = CoCreateInstance(CLSID_WbemLocator, 0, CLSCTX_INPROC_SERVER, IID_IWbemLocator, (LPVOID *) &pLoc);
 
 	if (FAILED(hres))
 	{
@@ -116,16 +105,7 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto out;
 	}
 
-	hres = pLoc->ConnectServer(
-		_bstr_t(wmi_namespace),	/* WMI namespace */
-		NULL,		/* User name */
-		NULL,		/* User password */
-		0,		/* Locale */
-		NULL,		/* Security flags */
-		0,		/* Authority */
-		0,		/* Context object */
-		&pService	/* IWbemServices proxy */
-		);
+	hres = pLoc->ConnectServer(_bstr_t(wmi_namespace), NULL, NULL, 0, NULL, 0, 0, &pService);
 
 	if (FAILED(hres))
 	{
@@ -134,16 +114,8 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	/* set the IWbemServices proxy so that impersonation f the user (client) occurs */
-	hres = CoSetProxyBlanket(
-		pService,			/* the proxy to set */
-		RPC_C_AUTHN_WINNT,		/* authentication service */
-		RPC_C_AUTHZ_NONE,		/* authorization service */
-		NULL,				/* Server principal name */
-		RPC_C_AUTHN_LEVEL_CALL,		/* authentication level */
-		RPC_C_IMP_LEVEL_IMPERSONATE,	/* impersonation level */
-		NULL,				/* client identity */
-		EOAC_NONE			/* proxy capabilities */
-		);
+	hres = CoSetProxyBlanket(pService, RPC_C_AUTHN_WINNT, RPC_C_AUTHZ_NONE, NULL, RPC_C_AUTHN_LEVEL_CALL,
+			RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE);
 
 	if (FAILED(hres))
 	{
@@ -151,12 +123,8 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto out;
 	}
 
-	hres = pService->ExecQuery(
-		_bstr_t("WQL"),
-		_bstr_t(wmi_query),
-		WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY,
-		NULL,
-		&pEnumerator);
+	hres = pService->ExecQuery(_bstr_t("WQL"), _bstr_t(wmi_query),
+			WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, NULL, &pEnumerator);
 
 	if (FAILED(hres))
 	{
@@ -166,10 +134,11 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	hres = pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
 
-	if(0 == uReturn)
+	if (0 == uReturn)
 		goto out;
 
 	hres = pclsObj->BeginEnumeration(WBEM_FLAG_NONSYSTEM_ONLY);
+
 	if (FAILED(hres))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot start WMI query result enumeration");
@@ -207,47 +176,55 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		case VT_INT:
 		case VT_UINT:
 			hres = VariantChangeType(&vtProp, &vtProp, 0, VT_I8);
+
 			if (FAILED(hres))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "cannot convert WMI result of type %d to VT_I8", vtProp.vt);
 				goto out;
 			}
+
 			SET_UI64_RESULT(result, vtProp.llVal);
 			ret = SYSINFO_RET_OK;
+
 			break;
 		case VT_R4:
 		case VT_R8:
 			hres = VariantChangeType(&vtProp, &vtProp, 0, VT_R8);
+
 			if (FAILED(hres))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "cannot convert WMI result of type %d to VT_R8", vtProp.vt);
 				goto out;
 			}
+
 			SET_DBL_RESULT(result, vtProp.dblVal);
 			ret = SYSINFO_RET_OK;
+
 			break;
 		default:
 			hres = VariantChangeType(&vtProp, &vtProp, VARIANT_ALPHABOOL, VT_BSTR);
+
 			if (FAILED(hres))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "cannot convert WMI result of type %d to VT_BSTR", vtProp.vt);
 				goto out;
 			}
+
 			SET_TEXT_RESULT(result, zbx_strdup(NULL, (char*)_bstr_t(vtProp.bstrVal)));
 			ret = SYSINFO_RET_OK;
+
 			break;
 	}
-
 out:
 	VariantClear(&vtProp);
 
-	if(0 != pEnumerator)
+	if (0 != pEnumerator)
 		pEnumerator->Release();
 
-	if(0 != pService)
+	if( 0 != pService)
 		pService->Release();
 
-	if(0 != pLoc)
+	if (0 != pLoc)
 		pLoc->Release();
 
 	return ret;

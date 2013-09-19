@@ -166,7 +166,7 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat);
 #define PROCESS_MODULE_COMMAND	2
 
 void	init_metrics();
-int	add_metric(ZBX_METRIC *new_metric, char *error, size_t max_error_len);
+int	add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len);
 void	free_metrics();
 
 int	process(const char *in_command, unsigned flags, AGENT_RESULT *result);
