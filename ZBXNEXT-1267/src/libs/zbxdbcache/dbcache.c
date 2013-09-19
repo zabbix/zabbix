@@ -196,13 +196,15 @@ void	*DCget_stats(int request)
 			value_uint = CONFIG_HISTORY_CACHE_SIZE;
 			return &value_uint;
 		case ZBX_STATS_HISTORY_USED:
-			value_uint = cache->history_num * sizeof(ZBX_DC_HISTORY);
+			value_uint = (cache->history_num - cache->history_gap_num) * sizeof(ZBX_DC_HISTORY);
 			return &value_uint;
 		case ZBX_STATS_HISTORY_FREE:
-			value_uint = CONFIG_HISTORY_CACHE_SIZE - cache->history_num * sizeof(ZBX_DC_HISTORY);
+			value_uint = CONFIG_HISTORY_CACHE_SIZE - (cache->history_num - cache->history_gap_num) *
+					sizeof(ZBX_DC_HISTORY);
 			return &value_uint;
 		case ZBX_STATS_HISTORY_PFREE:
-			value_double = 100 * ((double)(ZBX_HISTORY_SIZE - cache->history_num) / ZBX_HISTORY_SIZE);
+			value_double = 100 * ((double)(ZBX_HISTORY_SIZE - cache->history_num + cache->history_gap_num) /
+					ZBX_HISTORY_SIZE);
 			return &value_double;
 		case ZBX_STATS_TREND_TOTAL:
 			value_uint = trend_mem->orig_size;
