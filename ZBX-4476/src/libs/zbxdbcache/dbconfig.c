@@ -5324,17 +5324,13 @@ void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCget_item_nodata_seconds                                        *
+ * Function: DCget_item_time_added                                            *
  *                                                                            *
- * Purpose: retrieves time in seconds from the last item value update         *
+ * Purpose: returns time of adding of an item into the configuration cache    *
  *                                                                            *
  * Parameters: itemid  - [IN] the item id                                     *
- *             seconds - [OUT] the number of seconds since last item value    *
- *                             update                                         *
- *                                                                            *
- * Comment: If the item value was not updated since server startup, then      *
- *          time from the moment the item was added to configuration cache is *
- *          returned instead.                                                 *
+ *             seconds - [OUT] the number of seconds of adding of an item     *
+ *                             into the configuration cache                   *
  *                                                                            *
  ******************************************************************************/
 int	DCget_item_time_added(zbx_uint64_t itemid, int *time_added)
