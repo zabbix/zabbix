@@ -1549,10 +1549,10 @@ static int	DBpatch_2010101(void)
 		else
 		{
 			char	*param = NULL;
-			size_t	size = 0, offset = 0;
+			size_t	param_alloc = 0, param_offset = 0;
 			int	nparam;
 
-			zbx_strncpy_alloc(&param, &size, &offset, row[1] + 15, key_len - 16);
+			zbx_strncpy_alloc(&param, &param_alloc, &param_offset, row[1] + 15, key_len - 16);
 
 			if (0 == (nparam = num_param(param)) || 1 < nparam)
 				quote_key_param(&param, 0);
