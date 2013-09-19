@@ -19,6 +19,7 @@ A.F.I..... [ZBXNEXT-1786] implemented script name tree in menu popups (Eduard, S
 ..F....... [ZBX-6846] the print link work with javascript instead of reloading the whole page (Vitalij)
 
 Bug fixes:
+........S. [ZBX-4476] fixed nodata() calculation for new items (wiper)
 ........S. [ZBX-6950] fixed termination character sequence for smtp connection termination (igors)
 .......... [ZBXNEXT-1689] improved performance of the latest data page (Pavels)
 .......PS. [ZBX-6989] fixed write cache statistics to account for fragmentation when calculating free space (wiper)
