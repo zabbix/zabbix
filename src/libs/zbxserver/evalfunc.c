@@ -1140,15 +1140,16 @@ static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, con
 
 	now = (int)time(NULL);
 
-	if (SUCCEED != zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) ||
-			1 > values.values_num)
-		goto out;
-
-	if (values.values[0].timestamp.sec + arg1 > now)
-		zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
+	if (SUCCEED == zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) &&
+			1 == values.values_num)
+	{
+		zbx_strlcpy(value, values.values[0].timestamp.sec + arg1 > now ? "0" : "1", MAX_BUFFER_LEN);
+	}
 	else
 	{
-		if (CONFIG_SERVER_STARTUP_TIME + arg1 > now)
+		int	time_added;
+
+		if (SUCCEED != DCget_item_time_added(item->itemid, &time_added) || time_added + arg1 > now)
 			goto out;
 
 		zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
