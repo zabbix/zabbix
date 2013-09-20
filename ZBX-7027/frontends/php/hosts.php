@@ -864,13 +864,12 @@ else {
 	$templates = zbx_toHash($templates, 'templateid');
 
 	// get proxy host IDs that that are not 0
-	$proxyHostIds = array_unique(zbx_objectValues($hosts, 'proxy_hostid'));
-	foreach ($proxyHostIds as $idx => $proxyHostId) {
-		if (!$proxyHostId) {
-			unset($proxyHostIds[$idx]);
+	$proxyHostIds = array();
+	foreach ($hosts as $host) {
+		if ($host['proxy_hostid']) {
+			$proxyHostIds[$host['proxy_hostid']] = $host['proxy_hostid'];
 		}
 	}
-
 	if ($proxyHostIds) {
 		$proxies = API::Proxy()->get(array(
 			'proxyids' => $proxyHostIds,
