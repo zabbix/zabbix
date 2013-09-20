@@ -431,7 +431,7 @@ foreach ($allItems as $key => $db_item){
 		}
 
 		if ($db_item['value_type'] == ITEM_VALUE_TYPE_TEXT) {
-			$trendValue = null;
+			$trendValue = UNKNOWN_VALUE;
 		}
 		else {
 			$trendValue = $config['hk_trends_global'] ? $config['hk_trends'] : $db_item['trends'];
@@ -444,7 +444,7 @@ foreach ($allItems as $key => $db_item){
 			new CCol(new CDiv($itemName, $stateCss)),
 			new CCol(new CDiv(
 				($db_item['type'] == ITEM_TYPE_SNMPTRAP || $db_item['type'] == ITEM_TYPE_TRAPPER)
-					? null
+					? UNKNOWN_VALUE
 					: $db_item['delay'],
 				$stateCss
 			)),
@@ -590,7 +590,7 @@ foreach ($allItems as $db_item){
 	$itemName = array(SPACE, SPACE, $db_item['resolvedName']);
 
 	if (getRequest('show_details')) {
-		$itemKey = new CLink($db_item['key_'], 'items.php?form=update&itemid='.$db_item['itemid']);
+		$itemKey = new CLink(resolveItemKeyMacros($db_item), 'items.php?form=update&itemid='.$db_item['itemid']);
 		$itemName = array_merge($itemName, array(BR(), SPACE, SPACE, $itemKey));
 
 		$statusIcons = array();
@@ -606,7 +606,7 @@ foreach ($allItems as $db_item){
 		}
 
 		if ($db_item['value_type'] == ITEM_VALUE_TYPE_TEXT) {
-			$trendValue = null;
+			$trendValue = UNKNOWN_VALUE;
 		}
 		else {
 			$trendValue = $config['hk_trends_global'] ? $config['hk_trends'] : $db_item['trends'];
@@ -619,12 +619,12 @@ foreach ($allItems as $db_item){
 			new CCol(new CDiv($itemName, $stateCss)),
 			new CCol(new CDiv(
 				($db_item['type'] == ITEM_TYPE_SNMPTRAP || $db_item['type'] == ITEM_TYPE_TRAPPER)
-					? null
+					? UNKNOWN_VALUE
 					: $db_item['delay'],
 				$stateCss
 			)),
 			new CCol(new CDiv($config['hk_history_global'] ? $config['hk_history'] : $db_item['history'], $stateCss)),
-			new CCol(new CDiv($db_item['trends'], $stateCss)),
+			new CCol(new CDiv($trendValue, $stateCss)),
 			new CCol(new CDiv(item_type2str($db_item['type']), $stateCss)),
 			new CCol(new CDiv($lastClock, $stateCss)),
 			new CCol(new CDiv($lastValue, $stateCss)),

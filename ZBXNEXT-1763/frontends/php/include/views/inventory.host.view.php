@@ -168,9 +168,9 @@ $latestArray = array(
 		$this->data['host']['hostid'].url_param('groupid')),
 		'overview-link'),
 	new CSpan (
-		new CLink(_('Triggers status'),
+		new CLink(_('Triggers'),
 		'tr_status.php?show_triggers=2&ack_status=1&show_events=1&show_events=0&show_details=1'.
-		'&txt_select=&hostid='.$this->data['host']['hostid'].url_param('groupid')),
+		'&txt_select=&show_maintenance=1&hostid='.$this->data['host']['hostid'].url_param('groupid')),
 		'overview-link'),
 	new CSpan (
 		new CLink(_('Events'), 'events.php?hostid='.$this->data['host']['hostid'].url_param('groupid')),
