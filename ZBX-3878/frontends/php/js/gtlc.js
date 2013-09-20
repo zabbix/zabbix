@@ -1570,7 +1570,6 @@ function sbox_init(id) {
 	addListener(document, 'mouseup', sboxGlobalMouseup);
 	addListener(document, 'mousemove', sboxGlobalMousemove);
 	ZBX_SBOX[id].addListeners();
-
 	return ZBX_SBOX[id];
 }
 
@@ -1626,8 +1625,10 @@ var sbox = Class.create(CDebug, {
 
 		if (IE) {
 			jQuery(this.grphobj).mousedown(jQuery.proxy(this.mouseDown, this));
-			this.grphobj.onmousemove = this.mouseMove.bindAsEventListener(this);
-			jQuery(this.containerId).find('a').attr('onclick', 'javascript: return ZBX_SBOX["' + this.sbox_id + '"].ieMouseClick();');
+			jQuery(this.grphobj).mousemove(jQuery.proxy(this.mouseMove, this));
+			jQuery('#flickerfreescreen_' + this.sbox_id + ' a').click(function() {
+				ZBX_SBOX[this.sbox_id].ieMouseClick();
+			});
 		}
 		else {
 			jQuery(this.dom_obj).mousedown(jQuery.proxy(this.mouseDown, this));
