@@ -806,7 +806,9 @@ void	main_housekeeper_loop(void)
 
 		DBclose();
 
-		zbx_setproctitle("%s [sleeping]", get_process_type_string(process_type));
+		zbx_setproctitle("%s [deleted %d hist/trends, %d items, %d events, %d sessions, %d alarms, %d audit "
+				"items, sleeping]", get_process_type_string(process_type), d_history_and_trends,
+				d_cleanup, d_events, d_sessions, d_services, d_audit);
 
 		zbx_sleep_loop(CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR);
 	}
