@@ -3,6 +3,7 @@ Changes for 2.1.6
 New features:
 
 Bug fixes:
+A.F....... [ZBX-7026] removed automatic changing of "error" field when trigger and trigger prototype expression is changed (Ivo)
 ..F....... [ZBX-7017] fixed problem with unwanted lists of services in IT services popup window (Vitalij)
 ..F....... [ZBX-6982] changed background color in user and user group edit form for select tags (Vitalij)
 ..F....... [ZBX-6973] fixed sql error in postgres database on saving host (Vitalij)
