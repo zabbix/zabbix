@@ -863,6 +863,22 @@ else {
 	));
 	$templates = zbx_toHash($templates, 'templateid');
 
+	// get proxy host IDs that that are not 0
+	$proxyHostIds = array_unique(zbx_objectValues($hosts, 'proxy_hostid'));
+	foreach ($proxyHostIds as $idx => $proxyHostId) {
+		if (!$proxyHostId) {
+			unset($proxyHostIds[$idx]);
+		}
+	}
+
+	if ($proxyHostIds) {
+		$proxies = API::Proxy()->get(array(
+			'proxyids' => $proxyHostIds,
+			'output' => array('host'),
+			'preservekeys' => true
+		));
+	}
+
 	foreach ($hosts as $host) {
 		$interface = reset($host['interfaces']);
 
@@ -881,14 +897,8 @@ else {
 
 		$description = array();
 
-		if ($host['proxy_hostid']) {
-			$proxy = API::Proxy()->get(array(
-				'proxyids' => $host['proxy_hostid'],
-				'output' => API_OUTPUT_EXTEND
-			));
-			$proxy = reset($proxy);
-
-			$description[] = $proxy['host'].NAME_DELIMITER;
+		if (isset($proxies[$host['proxy_hostid']])) {
+			$description[] = $proxies[$host['proxy_hostid']]['host'].NAME_DELIMITER;
 		}
 		if ($host['discoveryRule']) {
 			$description[] = new CLink($host['discoveryRule']['name'], 'host_prototypes.php?parent_discoveryid='.$host['discoveryRule']['itemid'], 'gold');
