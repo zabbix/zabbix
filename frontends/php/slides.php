@@ -130,6 +130,7 @@ if (isset($_REQUEST['favobj'])) {
 						'timeline' => $screenBuilder->timeline,
 						'profileIdx' => $screenBuilder->profileIdx
 					));
+
 					insertPagePostJs();
 
 					// insert slide show refresh js

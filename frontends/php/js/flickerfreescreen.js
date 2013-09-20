@@ -19,7 +19,6 @@
 
 
 jQuery(function($) {
-	'use strict';
 
 	window.flickerfreeScreen = {
 
@@ -41,7 +40,12 @@ jQuery(function($) {
 
 			// init refresh plan
 			if (screen.isFlickerfree && screen.interval > 0) {
-				this.screens[screen.id].timeoutHandler = window.setTimeout(function() { window.flickerfreeScreen.refresh(screen.id); }, this.screens[screen.id].interval);
+				this.screens[screen.id].timeoutHandler = window.setTimeout(
+					function() {
+						window.flickerfreeScreen.refresh(screen.id);
+					},
+					this.screens[screen.id].interval
+				);
 			}
 		},
 
@@ -70,10 +74,10 @@ jQuery(function($) {
 			ajaxUrl.setArgument('screenitemid', screen.screenitemid);
 			ajaxUrl.setArgument('groupid', screen.groupid);
 			ajaxUrl.setArgument('hostid', screen.hostid);
-			ajaxUrl.setArgument('profileIdx', !empty(screen.profileIdx) ? screen.profileIdx : null);
-			ajaxUrl.setArgument('profileIdx2', !empty(screen.profileIdx2) ? screen.profileIdx2 : null);
-			ajaxUrl.setArgument('updateProfile', !empty(screen.updateProfile) ? +screen.updateProfile : null);
-			ajaxUrl.setArgument('period', !empty(screen.timeline.period) ? screen.timeline.period : null);
+			ajaxUrl.setArgument('profileIdx', empty(screen.profileIdx) ? null : screen.profileIdx);
+			ajaxUrl.setArgument('profileIdx2', empty(screen.profileIdx2) ? null : screen.profileIdx2);
+			ajaxUrl.setArgument('updateProfile', empty(screen.updateProfile) ? null : +screen.updateProfile);
+			ajaxUrl.setArgument('period', empty(screen.timeline.period) ? null : screen.timeline.period);
 			ajaxUrl.setArgument('stime', this.getCalculatedSTime(screen));
 
 			// SCREEN_RESOURCE_GRAPH
@@ -81,11 +85,13 @@ jQuery(function($) {
 			if (screen.resourcetype == 0 || screen.resourcetype == 1) {
 				if (isSelfRefresh || this.isRefreshAllowed(screen)) {
 					this.refreshImg(id, function() {
-						$('#flickerfreescreen_' + id).find('a').each(function() {
-							var url = new Curl($(this).attr('href'));
-							url.setArgument('period', !empty(screen.timeline.period) ? screen.timeline.period : null);
+						$('#flickerfreescreen_' + id + ' a').each(function() {
+							var obj = $(this),
+								url = new Curl(obj.attr('href'));
+
+							url.setArgument('period', empty(screen.timeline.period) ? null : screen.timeline.period);
 							url.setArgument('stime', window.flickerfreeScreen.getCalculatedSTime(screen));
-							$(this).attr('href', url.getUrl());
+							obj.attr('href', url.getUrl());
 						});
 					});
 				}
@@ -110,12 +116,13 @@ jQuery(function($) {
 						this.refreshImg(id);
 					}
 					else {
-						ajaxUrl.setArgument('resourcetype', !empty(screen.resourcetype) ? screen.resourcetype : null);
-						ajaxUrl.setArgument('itemid', !empty(screen.data.itemid) ? screen.data.itemid : null);
-						ajaxUrl.setArgument('action', !empty(screen.data.action) ? screen.data.action : null);
-						ajaxUrl.setArgument('filter', !empty(screen.data.filter) ? screen.data.filter : null);
-						ajaxUrl.setArgument('filter_task', !empty(screen.data.filterTask) ? screen.data.filterTask : null);
-						ajaxUrl.setArgument('mark_color', !empty(screen.data.markColor) ? screen.data.markColor : null);
+						ajaxUrl.setArgument('resourcetype', empty(screen.resourcetype) ? null : screen.resourcetype);
+						ajaxUrl.setArgument('itemid', empty(screen.data.itemid) ? null : screen.data.itemid);
+						ajaxUrl.setArgument('action', empty(screen.data.action) ? null : screen.data.action);
+						ajaxUrl.setArgument('filter', empty(screen.data.filter) ? null : screen.data.filter);
+						ajaxUrl.setArgument('filter_task', empty(screen.data.filterTask)
+							? null : screen.data.filterTask);
+						ajaxUrl.setArgument('mark_color', empty(screen.data.markColor) ? null : screen.data.markColor);
 
 						this.refreshHtml(id, ajaxUrl);
 					}
@@ -147,7 +154,13 @@ jQuery(function($) {
 			// set next refresh execution time
 			if (screen.isFlickerfree && screen.interval > 0) {
 				clearTimeout(screen.timeoutHandler);
-				screen.timeoutHandler = window.setTimeout(function() { window.flickerfreeScreen.refresh(id); }, screen.interval);
+
+				screen.timeoutHandler = window.setTimeout(
+					function() {
+						window.flickerfreeScreen.refresh(id);
+					},
+					screen.interval
+				);
 
 				// refresh time control actual time
 				clearTimeout(timeControl.timeRefreshTimeoutHandler);
@@ -193,10 +206,10 @@ jQuery(function($) {
 						var htmlTimestamp = null;
 
 						$(html).each(function() {
-							var elem = $(this);
+							var obj = $(this);
 
-							if (elem.prop('nodeName') == 'DIV') {
-								htmlTimestamp = elem.data('timestamp');
+							if (obj.prop('nodeName') == 'DIV') {
+								htmlTimestamp = obj.data('timestamp');
 							}
 						});
 
@@ -239,28 +252,32 @@ jQuery(function($) {
 
 				window.flickerfreeScreenShadow.start(id);
 
-				$('#flickerfreescreen_' + id).find('img').each(function() {
-					var domImg = $(this);
+				$('#flickerfreescreen_' + id + ' img').each(function() {
+					var domImg = $(this),
+						url = new Curl(domImg.attr('src'));
 
-					var url = new Curl(domImg.attr('src'));
-					url.setArgument('screenid', !empty(screen.screenid) ? screen.screenid : null);
-					url.setArgument('updateProfile', (typeof(screen.updateProfile) != 'undefined') ? + screen.updateProfile : null);
-					url.setArgument('period', !empty(screen.timeline.period) ? screen.timeline.period : null);
+					url.setArgument('screenid', empty(screen.screenid) ? null : screen.screenid);
+					url.setArgument('updateProfile', (typeof screen.updateProfile === 'undefined')
+						? null : + screen.updateProfile);
+					url.setArgument('period', empty(screen.timeline.period) ? null : screen.timeline.period);
 					url.setArgument('stime', window.flickerfreeScreen.getCalculatedSTime(screen));
 					url.setArgument('curtime', new CDate().getTime());
 
 					// create temp image in buffer
-					$('<img />', {
-						id: domImg.attr('id') + '_tmp',
+					$('<img>', {
 						'class': domImg.attr('class'),
+						'data-timestamp': new CDate().getTime(),
+						id: domImg.attr('id') + '_tmp',
+						name: domImg.attr('name'),
 						border: domImg.attr('border'),
 						usemap: domImg.attr('usemap'),
 						alt: domImg.attr('alt'),
-						name: domImg.attr('name'),
-						'data-timestamp': new CDate().getTime()
+						src: url.getUrl(),
+						css: {
+							position: 'relative',
+							zIndex: 2
+						}
 					})
-					.attr('src', url.getUrl())
-					.css({position: 'relative', zIndex: 2})
 					.error(function() {
 						screen.error++;
 						window.flickerfreeScreen.calculateReRefresh(id);
@@ -344,10 +361,11 @@ jQuery(function($) {
 		},
 
 		calculateReRefresh: function(id) {
-			var screen = this.screens[id];
+			var screen = this.screens[id],
+				time = new CDate().getTime();
 
-			if (screen.timestamp + window.flickerfreeScreenShadow.responsiveness < new CDate().getTime()
-					&& screen.timestampResponsiveness + window.flickerfreeScreenShadow.responsiveness < new CDate().getTime()) {
+			if (screen.timestamp + window.flickerfreeScreenShadow.responsiveness < time
+					&& screen.timestampResponsiveness + window.flickerfreeScreenShadow.responsiveness < time) {
 				// take of busy flags
 				screen.isRefreshing = false;
 				screen.isReRefreshRequire = false;
@@ -361,7 +379,7 @@ jQuery(function($) {
 		},
 
 		isRefreshAllowed: function(screen) {
-			return !empty(timeControl.timeline) ? timeControl.timeline.isNow() : true;
+			return empty(timeControl.timeline) ? true : timeControl.timeline.isNow();
 		},
 
 		getCalculatedSTime: function(screen) {
@@ -370,7 +388,8 @@ jQuery(function($) {
 			}
 
 			return (screen.timeline.isNow || screen.timeline.isNow == 1)
-				? new CDate((new CDate().setZBXDate(screen.timeline.stime) / 1000 + 31536000) * 1000).getZBXDate() // 31536000 = 86400 * 365 = 1 year
+				// 31536000 = 86400 * 365 = 1 year
+				? new CDate((new CDate().setZBXDate(screen.timeline.stime) / 1000 + 31536000) * 1000).getZBXDate()
 				: screen.timeline.stime;
 		},
 
@@ -402,7 +421,12 @@ jQuery(function($) {
 
 			this.screens = [];
 			ZBX_SBOX = {};
-			timeControl.objectList = {};
+
+			for (var id in timeControl.objectList) {
+				if (id !== 'scrollbar' && timeControl.objectList.hasOwnProperty(id)) {
+					delete timeControl.objectList[id];
+				}
+			}
 
 			window.flickerfreeScreenShadow.cleanAll();
 		}
@@ -437,7 +461,12 @@ jQuery(function($) {
 			timer.inUpdate = true;
 
 			clearTimeout(timer.timeoutHandler);
-			timer.timeoutHandler = window.setTimeout(function() { window.flickerfreeScreenShadow.validate(id); }, this.timeout);
+			timer.timeoutHandler = window.setTimeout(
+				function() {
+					window.flickerfreeScreenShadow.validate(id);
+				},
+				this.timeout
+			);
 		},
 
 		end: function(id) {
@@ -469,14 +498,15 @@ jQuery(function($) {
 			var timer = this.timers[id];
 
 			if (!empty(timer) && !timer.isShadowed) {
-				var elem = $('#flickerfreescreen_' + id),
-					item = window.flickerfreeScreenShadow.findScreenItem(elem);
+				var obj = $('#flickerfreescreen_' + id),
+					item = window.flickerfreeScreenShadow.findScreenItem(obj);
+
 				if (empty(item)) {
 					return;
 				}
 
 				// don't show shadow if image not loaded first time with the page
-				if (item.prop('nodeName') == 'IMG' && !timer.ready && typeof(item.get(0).complete) == 'boolean') {
+				if (item.prop('nodeName') == 'IMG' && !timer.ready && typeof item.get(0).complete === 'boolean') {
 					if (!item.get(0).complete) {
 						return;
 					}
@@ -486,10 +516,10 @@ jQuery(function($) {
 				}
 
 				// create shadow
-				if (elem.find('.shadow').length == 0) {
+				if (obj.find('.shadow').length == 0) {
 					item.css({position: 'relative', zIndex: 2});
 
-					elem.append($('<div>', {'class': 'shadow'})
+					obj.append($('<div>', {'class': 'shadow'})
 						.html('&nbsp;')
 						.css({
 							top: item.position().top,
@@ -502,14 +532,14 @@ jQuery(function($) {
 					);
 
 					// fade screen
-					var itemNode = elem.find(item.prop('nodeName'));
+					var itemNode = obj.find(item.prop('nodeName'));
 					if (!empty(itemNode)) {
 						itemNode = (itemNode.length > 0) ? $(itemNode[0]) : itemNode;
 						itemNode.fadeTo(timer.fadeSpeed, 0.6);
 					}
 
 					// show loading indicator..
-					elem.append($('<div>', {'class': 'loading'})
+					obj.append($('<div>', {'class': 'loading'})
 						.css({
 							width: '24px',
 							height: '24px',
@@ -519,7 +549,7 @@ jQuery(function($) {
 							left: item.position().left + Math.round(item.width() / 2) - 12
 						})
 					);
-					elem.find('.loading').activity({
+					obj.find('.loading').activity({
 						segments: 12,
 						steps: 3,
 						opacity: 0.3,
@@ -538,15 +568,15 @@ jQuery(function($) {
 			var timer = this.timers[id];
 
 			if (!empty(timer) && timer.isShadowed) {
-				var elem = $('#flickerfreescreen_' + id),
-					item = window.flickerfreeScreenShadow.findScreenItem(elem);
+				var obj = $('#flickerfreescreen_' + id),
+					item = window.flickerfreeScreenShadow.findScreenItem(obj);
 				if (empty(item)) {
 					return;
 				}
 
-				elem.find('.loading').remove();
-				elem.find('.shadow').remove();
-				elem.find(item.prop('nodeName')).fadeTo(0, 1);
+				obj.find('.loading').remove();
+				obj.find('.shadow').remove();
+				obj.find(item.prop('nodeName')).fadeTo(0, 1);
 
 				timer.isShadowed = false;
 			}
@@ -554,14 +584,16 @@ jQuery(function($) {
 
 		moveShadows: function() {
 			$('.flickerfreescreen').each(function() {
-				var elem = $(this),
-					item = window.flickerfreeScreenShadow.findScreenItem(elem);
+				var obj = $(this),
+					item = window.flickerfreeScreenShadow.findScreenItem(obj);
+
 				if (empty(item)) {
 					return;
 				}
 
 				// shadow
-				var shadows = elem.find('.shadow');
+				var shadows = obj.find('.shadow');
+
 				if (shadows.length > 0) {
 					shadows.css({
 						top: item.position().top,
@@ -572,7 +604,8 @@ jQuery(function($) {
 				}
 
 				// loading indicator
-				var loading = elem.find('.loading');
+				var loading = obj.find('.loading');
+
 				if (loading.length > 0) {
 					loading.css({
 						top: item.position().top + Math.round(item.height() / 2) - 12,
@@ -582,15 +615,15 @@ jQuery(function($) {
 			});
 		},
 
-		findScreenItem: function(elem) {
-			var item = elem.children().eq(0),
+		findScreenItem: function(obj) {
+			var item = obj.children().eq(0),
 				tag;
 
 			if (!empty(item)) {
 				tag = item.prop('nodeName');
 
 				if (tag == 'MAP') {
-					item = elem.children().eq(1);
+					item = obj.children().eq(1);
 					tag = item.prop('nodeName');
 				}
 
@@ -621,7 +654,7 @@ jQuery(function($) {
 			var timer = this.timers[id];
 
 			if (!empty(timer)) {
-				if (typeof(isShadowed) != 'undefined') {
+				if (typeof isShadowed !== 'undefined') {
 					this.timers[id].isShadowed = isShadowed;
 				}
 
@@ -635,7 +668,7 @@ jQuery(function($) {
 			var timer = this.timers[id];
 
 			if (!empty(timer)) {
-				if (typeof(fadeSpeed) != 'undefined') {
+				if (typeof fadeSpeed !== 'undefined') {
 					this.timers[id].fadeSpeed = fadeSpeed;
 				}
 
