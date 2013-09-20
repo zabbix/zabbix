@@ -1282,8 +1282,8 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "sleeping for %d second(s)", 1);
-			zbx_setproctitle("poller [sleeping for %d second(s)]", 1);
+			zabbix_log(LOG_LEVEL_DEBUG, "sleeping for 1 second");
+			zbx_setproctitle("poller [sleeping for 1 second]");
 			zbx_sleep(1);
 		}
 	}

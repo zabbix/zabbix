@@ -438,7 +438,7 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 		if (1 == collector->vmstat.enabled)
 			collect_vmstat_data(&collector->vmstat);
 #endif
-		zbx_setproctitle("collector [sleeping for 1 seconds]");
+		zbx_setproctitle("collector [sleeping for 1 second]");
 		zbx_sleep(1);
 	}
 
