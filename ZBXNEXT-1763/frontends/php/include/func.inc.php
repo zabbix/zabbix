@@ -1586,7 +1586,7 @@ function zbx_array_mintersect($keys, $array) {
 
 function zbx_str2links($text) {
 	$result = array();
-	if (empty($text)) {
+	if (zbx_empty($text)) {
 		return $result;
 	}
 	preg_match_all('#https?://[^\n\t\r ]+#u', $text, $matches, PREG_OFFSET_CAPTURE);

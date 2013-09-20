@@ -155,7 +155,10 @@ if ($this->data['host']['inventory']) {
 	foreach ($this->data['host']['inventory'] as $key => $value) {
 		if (($this->data['tableTitles'][$key]['db_field'] == 'os' || $this->data['tableTitles'][$key]['db_field'] == 'hardware'
 				|| $this->data['tableTitles'][$key]['db_field'] == 'software') && !zbx_empty($value)) {
-			$overviewFormList->addRow($this->data['tableTitles'][$key]['title'], new CSpan($value, 'text-field'));
+			$overviewFormList->addRow(
+				$this->data['tableTitles'][$key]['title'],
+				new CSpan(zbx_str2links($value),
+				'text-field'));
 		}
 	}
 }
@@ -225,7 +228,10 @@ $inventoryValues = false;
 if ($this->data['host']['inventory']) {
 	foreach ($this->data['host']['inventory'] as $key => $value) {
 		if (!zbx_empty($value)) {
-			$detailsFormList->addRow($this->data['tableTitles'][$key]['title'], new CSpan($value, 'text-field'));
+			$detailsFormList->addRow(
+				$this->data['tableTitles'][$key]['title'],
+				new CSpan(zbx_str2links($value),
+				'text-field'));
 			$inventoryValues = true;
 		}
 	}
