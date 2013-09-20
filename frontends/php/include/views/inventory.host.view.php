@@ -163,23 +163,14 @@ if ($this->data['host']['inventory']) {
 // latest data
 $latestArray = array(
 	new CLink(_('Web'), 'httpmon.php?hostid='.$this->data['host']['hostid'].url_param('groupid')),
-	new CSpan (
-		new CLink(_('Latest data'), 'latest.php?form=1&select=&show_details=1&filter_set=Filter&hostid='.
-		$this->data['host']['hostid'].url_param('groupid')),
-		'overview-link'),
-	new CSpan (
-		new CLink(_('Triggers'),
+	new CLink(_('Latest data'), 'latest.php?form=1&select=&show_details=1&filter_set=Filter&hostid='.
+		$this->data['host']['hostid'].url_param('groupid'), 'overview-link'),
+	new CLink(_('Triggers'),
 		'tr_status.php?show_triggers=2&ack_status=1&show_events=1&show_events=0&show_details=1'.
-		'&txt_select=&show_maintenance=1&hostid='.$this->data['host']['hostid'].url_param('groupid')),
-		'overview-link'),
-	new CSpan (
-		new CLink(_('Events'), 'events.php?hostid='.$this->data['host']['hostid'].url_param('groupid')),
-		'overview-link'),
-	new CSpan (
-		new CLink(_('Graphs'), 'charts.php?hostid='.$this->data['host']['hostid'].url_param('groupid')),
-		'overview-link'),
-	new CSpan (
-		new CLink(_('Screens'), 'host_screen.php?hostid='.$this->data['host']['hostid'].url_param('groupid')),
+		'&txt_select=&show_maintenance=1&hostid='.$this->data['host']['hostid'].url_param('groupid'), 'overview-link'),
+	new CLink(_('Events'), 'events.php?hostid='.$this->data['host']['hostid'].url_param('groupid'), 'overview-link'),
+	new CLink(_('Graphs'), 'charts.php?hostid='.$this->data['host']['hostid'].url_param('groupid'), 'overview-link'),
+	new CLink(_('Screens'), 'host_screen.php?hostid='.$this->data['host']['hostid'].url_param('groupid'),
 		'overview-link')
 );
 
