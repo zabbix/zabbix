@@ -59,12 +59,30 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))
-		|| get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))
-		|| get_request('tr_groupid') && !API::HostGroup()->isReadable(array($_REQUEST['tr_groupid']))
-		|| get_request('tr_hostid') && !API::Host()->isReadable(array($_REQUEST['tr_hostid']))) {
+// validate group IDs
+$validateGroupIds = array();
+if (get_request('groupid')) {
+	$validateGroupIds[] = $_REQUEST['groupid'];
+}
+if (get_request('tr_groupid')) {
+	$validateGroupIds[] = $_REQUEST['tr_groupid'];
+}
+if ($validateGroupIds && !API::HostGroup()->isReadable(array($validateGroupIds))) {
 	access_deny();
 }
+
+// validate host IDs
+$validateHostIds = array();
+if (get_request('groupid')) {
+	$validateHostIds[] = $_REQUEST['hostid'];
+}
+if (get_request('tr_groupid')) {
+	$validateHostIds[] = $_REQUEST['tr_hostid'];
+}
+if ($validateHostIds && !API::Host()->isReadable(array($validateHostIds))) {
+	access_deny();
+}
+
 if (get_request('elementid')) {
 	$screens = API::Screen()->get(array(
 		'screenids' => array($_REQUEST['elementid']),
