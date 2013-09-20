@@ -166,7 +166,7 @@ CSS;
 			}
 		}
 	}
-
+	$css = CHtml::encode($css);
 	$pageHeader->addCssFile('styles/themes/'.$css.'/main.css');
 
 	if ($page['file'] == 'sysmap.php') {

@@ -1547,7 +1547,7 @@ zbx_uint64_t	multiply_item_value_uint64(DB_ITEM *item, zbx_uint64_t value)
  * Comments: NB! Do not use this function more than once in same SQL query    *
  *                                                                            *
  ******************************************************************************/
-static const char	*DBsql_id_cmp(zbx_uint64_t id)
+const char	*DBsql_id_cmp(zbx_uint64_t id)
 {
 	static char		buf[22];	/* 1 - '=', 20 - value size, 1 - '\0' */
 	static const char	is_null[9] = " is null";
