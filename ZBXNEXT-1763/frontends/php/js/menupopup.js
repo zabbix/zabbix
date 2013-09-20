@@ -28,6 +28,7 @@
  * @param string options[]['confirmation']	confirmation text
  * @param bool   options['hasScreens']		link to host screen page
  * @param bool   options['hasInventory']	link to host inventory page
+ * @param bool   options['hasGoTo']			"Go to" block in popup
  *
  * @return array
  */
@@ -61,7 +62,7 @@ function getMenuPopupHost(options) {
 	}
 
 	// go to section
-	if (options.goTo) {
+	if (options.hasGoTo) {
 		var gotos = [];
 
 		// latest
@@ -111,7 +112,6 @@ function getMenuPopupHost(options) {
  * @param array  options['urls']					local and global map urls (optional)
  * @param string options['url'][]['label']			url label
  * @param string options['url'][]['url']			url
- * @param bool   options['hasGoTo']					"Go to" block in popup
  *
  * @return array
  */
@@ -145,7 +145,7 @@ function getMenuPopupMap(options) {
 	}
 
 	// gotos
-	if (typeof options.hasGoTo !== 'undefined') {
+	if (typeof options.gotos !== 'undefined') {
 		var gotos = [];
 
 		// screens
