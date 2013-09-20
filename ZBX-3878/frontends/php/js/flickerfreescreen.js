@@ -127,7 +127,8 @@ jQuery(function($) {
 
 						ajaxUrl.setArgument('action', empty(screen.data.action) ? null : screen.data.action);
 						ajaxUrl.setArgument('filter', empty(screen.data.filter) ? null : screen.data.filter);
-						ajaxUrl.setArgument('filter_task', empty(screen.data.filterTask) ? null : screen.data.filterTask);
+						ajaxUrl.setArgument('filter_task', empty(screen.data.filterTask)
+							? null : screen.data.filterTask);
 						ajaxUrl.setArgument('mark_color', empty(screen.data.markColor) ? null : screen.data.markColor);
 
 						this.refreshHtml(id, ajaxUrl);
@@ -263,7 +264,8 @@ jQuery(function($) {
 						url = new Curl(domImg.attr('src'));
 
 					url.setArgument('screenid', empty(screen.screenid) ? null : screen.screenid);
-					url.setArgument('updateProfile', (typeof screen.updateProfile === 'undefined') ? null : + screen.updateProfile);
+					url.setArgument('updateProfile', (typeof screen.updateProfile === 'undefined')
+						? null : + screen.updateProfile);
 					url.setArgument('period', empty(screen.timeline.period) ? null : screen.timeline.period);
 					url.setArgument('stime', window.flickerfreeScreen.getCalculatedSTime(screen));
 					url.setArgument('curtime', new CDate().getTime());
@@ -366,10 +368,11 @@ jQuery(function($) {
 		},
 
 		calculateReRefresh: function(id) {
-			var screen = this.screens[id];
+			var screen = this.screens[id],
+				time = new CDate().getTime();
 
-			if (screen.timestamp + window.flickerfreeScreenShadow.responsiveness < new CDate().getTime()
-					&& screen.timestampResponsiveness + window.flickerfreeScreenShadow.responsiveness < new CDate().getTime()) {
+			if (screen.timestamp + window.flickerfreeScreenShadow.responsiveness < time
+					&& screen.timestampResponsiveness + window.flickerfreeScreenShadow.responsiveness < time) {
 				// take of busy flags
 				screen.isRefreshing = false;
 				screen.isReRefreshRequire = false;
@@ -392,7 +395,8 @@ jQuery(function($) {
 			}
 
 			return (screen.timeline.isNow || screen.timeline.isNow == 1)
-				? new CDate((new CDate().setZBXDate(screen.timeline.stime) / 1000 + 31536000) * 1000).getZBXDate() // 31536000 = 86400 * 365 = 1 year
+				// 31536000 = 86400 * 365 = 1 year
+				? new CDate((new CDate().setZBXDate(screen.timeline.stime) / 1000 + 31536000) * 1000).getZBXDate()
 				: screen.timeline.stime;
 		},
 
@@ -464,7 +468,12 @@ jQuery(function($) {
 			timer.inUpdate = true;
 
 			clearTimeout(timer.timeoutHandler);
-			timer.timeoutHandler = window.setTimeout(function() { window.flickerfreeScreenShadow.validate(id); }, this.timeout);
+			timer.timeoutHandler = window.setTimeout(
+				function() {
+					window.flickerfreeScreenShadow.validate(id);
+				},
+				this.timeout
+			);
 		},
 
 		end: function(id) {
