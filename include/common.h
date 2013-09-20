@@ -612,6 +612,8 @@ const char	*zbx_trigger_state_string(unsigned char state);
 #define ITEM_LOGTYPE_ERROR		4
 #define ITEM_LOGTYPE_FAILURE_AUDIT	7
 #define ITEM_LOGTYPE_SUCCESS_AUDIT	8
+#define ITEM_LOGTYPE_CRITICAL		9
+#define ITEM_LOGTYPE_VERBOSE		10
 const char	*zbx_item_logtype_string(unsigned char logtype);
 
 /* media statuses */

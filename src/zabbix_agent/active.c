@@ -1129,23 +1129,23 @@ static void	process_active_checks(char *server, unsigned short port)
 							{
 								case WINEVENT_LEVEL_LOG_ALWAYS:
 								case WINEVENT_LEVEL_INFO:
-									severity = 1;
+									severity = ITEM_LOGTYPE_INFORMATION;
 									zbx_snprintf(str_severity, sizeof(str_severity), INFORMATION_TYPE);
 									break;
 								case WINEVENT_LEVEL_WARNING:
-									severity = 2;
+									severity = ITEM_LOGTYPE_WARNING;
 									zbx_snprintf(str_severity, sizeof(str_severity), WARNING_TYPE);
 									break;
 								case WINEVENT_LEVEL_ERROR:
-									severity = 4;
+									severity = ITEM_LOGTYPE_ERROR;
 									zbx_snprintf(str_severity, sizeof(str_severity), ERROR_TYPE);
 									break;
 								case WINEVENT_LEVEL_CRITICAL:
-									severity = 9;
+									severity = ITEM_LOGTYPE_CRITICAL;
 									zbx_snprintf(str_severity, sizeof(str_severity), CRITICAL_TYPE);
 									break;
 								case WINEVENT_LEVEL_VERBOSE:
-									severity = 10;
+									severity = ITEM_LOGTYPE_VERBOSE;
 									zbx_snprintf(str_severity, sizeof(str_severity), VERBOSE_TYPE);
 									break;
 							}
@@ -1156,23 +1156,23 @@ static void	process_active_checks(char *server, unsigned short port)
 						{
 							case EVENTLOG_SUCCESS:
 							case EVENTLOG_INFORMATION_TYPE:
-								severity = 1;
+								severity = ITEM_LOGTYPE_INFORMATION;
 								zbx_snprintf(str_severity, sizeof(str_severity), INFORMATION_TYPE);
 								break;
 							case EVENTLOG_WARNING_TYPE:
-								severity = 2;
+								severity = ITEM_LOGTYPE_WARNING;
 								zbx_snprintf(str_severity, sizeof(str_severity), WARNING_TYPE);
 								break;
 							case EVENTLOG_ERROR_TYPE:
-								severity = 4;
+								severity = ITEM_LOGTYPE_ERROR;
 								zbx_snprintf(str_severity, sizeof(str_severity), ERROR_TYPE);
 								break;
 							case EVENTLOG_AUDIT_FAILURE:
-								severity = 7;
+								severity = ITEM_LOGTYPE_FAILURE_AUDIT;
 								zbx_snprintf(str_severity, sizeof(str_severity), AUDIT_FAILURE);
 								break;
 							case EVENTLOG_AUDIT_SUCCESS:
-								severity = 8;
+								severity = ITEM_LOGTYPE_SUCCESS_AUDIT;
 								zbx_snprintf(str_severity, sizeof(str_severity), AUDIT_SUCCESS);
 								break;
 						}
