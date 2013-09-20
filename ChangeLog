@@ -1,6 +1,17 @@
+Changes for 2.1.6
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-6973] fixed sql error in postgres database on saving host (Vitalij)
+
+--------------------------------------------------------------------------------
 Changes for 2.1.5
 
 New features:
+........S. [ZBXNEXT-1267] changed network discovery to take in account proxies when identifying discovered hosts (wiper)
+........S. [ZBXNEXT-322] improved value cache multi-process performance by unlocking it during database requests (wiper)
+..F.....S. [ZBX-6883] added possibility to use empty parameters in the trigger functions (Sasha)
 .......PS. [ZBXNEXT-1633] added vSphere (vCenter hypervisor) datastore and network monitoring keys (wiper)
 A.F.I..... [ZBXNEXT-1786] implemented script name tree in menu popups (Eduard, Sasha)
 ..F....... [ZBXNEXT-1786] redesigned menu popups using jQuery Menu (Eduard)
@@ -9,6 +20,8 @@ A.F.I..... [ZBXNEXT-1786] implemented script name tree in menu popups (Eduard, S
 ..F....... [ZBX-6846] the print link work with javascript instead of reloading the whole page (Vitalij)
 
 Bug fixes:
+........S. [ZBX-4476] fixed nodata() calculation for new items (wiper)
+........S. [ZBX-6950] fixed termination character sequence for smtp connection termination (igors)
 .......... [ZBXNEXT-1689] improved performance of the latest data page (Pavels)
 .......PS. [ZBX-6989] fixed write cache statistics to account for fragmentation when calculating free space (wiper)
 A.F....... [ZBX-6952] fixed XSS vulnerability in user themes, thanks to Lincoln and Bernhard Schildendorfer for reporting (Ivo)
@@ -419,6 +432,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Lithuanian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-6950] fixed termination character sequence for smtp connection termination (igors)
 ..F....... [ZBX-6952] fixed XSS vulnerability in user themes, thanks to Lincoln and Bernhard Schildendorfer for reporting (Ivo)
 ..F....... [ZBX-6992] fixed PostreSQL query errors due to missing "AS" keyword for aggregate functions in Monitoring > IT Services (Ivo)
 ..F....... [ZBX-6804] optimized min item clock calculation for graph; thanks to Volker Fröhlich (Eduard)
