@@ -262,6 +262,9 @@ class CUser extends CZBXAPI {
 			$userDBfields = array('alias' => null, 'passwd' => null, 'usrgrps' => null, 'user_medias' => array());
 		}
 
+		$themes = array_keys(Z::getThemes());
+		$themes[] = THEME_DEFAULT;
+		$themeValidator = new CSetValidator(array('values' => $themes));
 		$alias = array();
 		foreach ($users as &$user) {
 			if (!check_db_fields($userDBfields, $user)) {
@@ -342,6 +345,11 @@ class CUser extends CZBXAPI {
 						}
 					}
 				}
+			}
+
+			if (isset($user['theme'])) {
+				$themeValidator->messageInvalid = _s('Incorrect theme for user "%1$s".', $dbUser['alias']);
+				$this->checkValidator($user['theme'], $themeValidator);
 			}
 
 			if (isset($user['type']) && (USER_TYPE_SUPER_ADMIN != self::$userData['type'])) {
