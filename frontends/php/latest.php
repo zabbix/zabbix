@@ -204,7 +204,7 @@ if (getRequest('show_details')) {
 		_('Type'),
 		make_sorting_header(_('Last check'), 'i.lastclock'),
 		_('Last value'),
-		_('Change'),
+		_x('Change', 'noun in latest data'),
 		SPACE,
 		_('Error')
 	));
