@@ -430,11 +430,11 @@ foreach ($allItems as $key => $db_item){
 			$statusIcons[] = $error;
 		}
 
-		if ($db_item['value_type'] == ITEM_VALUE_TYPE_TEXT) {
-			$trendValue = UNKNOWN_VALUE;
+		if ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $db_item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
+			$trendValue = $config['hk_trends_global'] ? $config['hk_trends'] : $db_item['trends'];
 		}
 		else {
-			$trendValue = $config['hk_trends_global'] ? $config['hk_trends'] : $db_item['trends'];
+			$trendValue = UNKNOWN_VALUE;
 		}
 
 		array_push($app_rows, new CRow(array(
@@ -605,11 +605,11 @@ foreach ($allItems as $db_item){
 			$statusIcons[] = $error;
 		}
 
-		if ($db_item['value_type'] == ITEM_VALUE_TYPE_TEXT) {
-			$trendValue = UNKNOWN_VALUE;
+		if ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $db_item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
+			$trendValue = $config['hk_trends_global'] ? $config['hk_trends'] : $db_item['trends'];
 		}
 		else {
-			$trendValue = $config['hk_trends_global'] ? $config['hk_trends'] : $db_item['trends'];
+			$trendValue = UNKNOWN_VALUE;
 		}
 
 		array_push($app_rows, new CRow(array(
