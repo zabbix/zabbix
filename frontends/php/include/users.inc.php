@@ -81,7 +81,7 @@ function user_auth_type2str($authType) {
 
 	$authUserType = array(
 		GROUP_GUI_ACCESS_SYSTEM => _('System default'),
-		GROUP_GUI_ACCESS_INTERNAL => _('Internal'),
+		GROUP_GUI_ACCESS_INTERNAL => _x('Internal', 'user type'),
 		GROUP_GUI_ACCESS_DISABLED => _('Disabled')
 	);
 

@@ -362,9 +362,10 @@ static int	get_dynamic_hostid(DB_EVENT *event, DC_HOST *host, char *error, size_
 					" where " ZBX_SQL_NULLCMP("a.proxy_hostid", "h.proxy_hostid")
 						" and a.host=h.host"
 						" and h.status=%d"
+						" and h.flags<>%d"
 						" and a.autoreg_hostid=" ZBX_FS_UI64
 						ZBX_SQL_NODE,
-					HOST_STATUS_MONITORED, event->objectid,
+					HOST_STATUS_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE, event->objectid,
 					DBand_node_local("h.hostid"));
 			break;
 		default:
