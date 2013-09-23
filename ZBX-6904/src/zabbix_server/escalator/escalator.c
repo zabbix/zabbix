@@ -546,7 +546,7 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVE
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	alertid;
-	int		now, severity, medias = 0, macro_type;
+	int		now, severity, medias = 0;
 	char		*sendto_esc, *error_esc, *subject_esc, *message_esc;
 	char		error[MAX_STRING_LEN];
 	DB_EVENT	*c_event;
