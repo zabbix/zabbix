@@ -799,34 +799,34 @@ function make_latest_issues(array $filter = array()) {
 		$filter['sortorder'] = ZBX_SORT_DOWN;
 	}
 
-	// get triggers
 	$options = array(
 		'groupids' => $filter['groupids'],
 		'hostids' => isset($filter['hostids']) ? $filter['hostids'] : null,
 		'monitored' => true,
 		'maintenance' => $filter['maintenance'],
-		'withLastEventUnacknowledged' => (!empty($filter['extAck']) && $filter['extAck'] == EXTACK_OPTION_UNACK) ? true : null,
-		'skipDependent' => true,
 		'filter' => array(
 			'priority' => $filter['severity'],
 			'value' => TRIGGER_VALUE_TRUE
-		),
+		)
+	);
+
+	$triggers = API::Trigger()->get(array_merge($options, array(
+		'withLastEventUnacknowledged' => (isset($filter['extAck']) && $filter['extAck'] == EXTACK_OPTION_UNACK)
+			? true
+			: null,
+		'skipDependent' => true,
+		'output' => array('triggerid', 'state', 'error', 'url', 'expression', 'description', 'priority', 'lastchange'),
 		'selectHosts' => array('hostid', 'name'),
-		'output' => array(
-			'triggerid', 'state', 'error', 'url', 'expression', 'description', 'priority', 'type', 'lastchange'
-		),
-		'selectLastEvent' => API_OUTPUT_EXTEND,
+		'selectLastEvent' => array('eventid', 'acknowledged', 'objectid', 'clock', 'ns'),
 		'sortfield' => isset($filter['sortfield']) ? $filter['sortfield'] : 'lastchange',
 		'sortorder' => isset($filter['sortorder']) ? $filter['sortorder'] : ZBX_SORT_DOWN,
 		'limit' => isset($filter['limit']) ? $filter['limit'] : DEFAULT_LATEST_ISSUES_CNT
-	);
-	$triggers = API::Trigger()->get($options);
+	)));
 
-	// total trigger count
-	$options['countOutput'] = true;
-	// we unset withLastEventUnacknowledged and skipDependent because of performance issues
-	unset($options['limit'], $options['sortfield'], $options['sortorder'], $options['withLastEventUnacknowledged'], $options['skipDependent']);
-	$triggersTotalCount = API::Trigger()->get($options);
+	// don't use withLastEventUnacknowledged and skipDependent because of performance issues
+	$triggersTotalCount = API::Trigger()->get(array_merge($options, array(
+		'countOutput' => true
+	)));
 
 	// get acknowledges
 	$eventIds = array();
