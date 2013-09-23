@@ -23,6 +23,6 @@
 void	add_event(zbx_uint64_t eventid, unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
 		const char *trigger_expression, unsigned char trigger_priority, unsigned char trigger_type);
-void	process_events();
+int	process_events(void);
 
 #endif

@@ -147,7 +147,7 @@ static void	clean_events()
 	events_num = 0;
 }
 
-void	process_events()
+int	process_events(void)
 {
 	const char	*__function_name = "process_events";
 
@@ -174,4 +174,6 @@ void	process_events()
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return (int)events_num;		/* performance metric */
 }

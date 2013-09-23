@@ -3814,7 +3814,8 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
  *           and which does not have its host in no-data maintenance          *
  *                                                                            *
  ******************************************************************************/
-void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_t *trigger_order, int process_num)
+void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_t *trigger_order, int process_num,
+			int *trigger_count)
 {
 	int			i, found;
 	zbx_uint64_t		functionid;
@@ -3880,6 +3881,8 @@ void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_
 	UNLOCK_CACHE;
 
 	zbx_vector_ptr_sort(trigger_order, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+	*trigger_count = trigger_order->values_num;	/* performance metric */
 }
 
 void	DCfree_triggers(zbx_vector_ptr_t *triggers)
