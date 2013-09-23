@@ -854,7 +854,7 @@ function make_latest_issues(array $filter = array()) {
 		$trigger['hostid'] = $host['hostid'];
 		$trigger['hostname'] = $host['name'];
 
-		if (!empty($trigger['lastEvent'])) {
+		if ($trigger['lastEvent']) {
 			$trigger['lastEvent']['acknowledges'] = isset($eventAcknowledges[$trigger['lastEvent']['eventid']])
 				? $eventAcknowledges[$trigger['lastEvent']['eventid']]['acknowledges']
 				: null;
