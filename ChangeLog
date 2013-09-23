@@ -3,6 +3,7 @@ Changes for 2.1.6
 New features:
 
 Bug fixes:
+A.F....... [ZBX-7026] removed automatic changing of "error" field when trigger and trigger prototype expression is changed (Ivo)
 ..F....... [ZBX-7027] improved request of proxies in Configuration > Hosts list and request of hosts in Administration > DM > Proxies (Ivo)
 ..F....... [ZBX-3878] fixed memory leaks in slide shows (Eduard)
 ..F....... [ZBX-7017] fixed problem with unwanted lists of services in IT services popup window (Vitalij)
