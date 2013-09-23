@@ -140,14 +140,15 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	main_alerter_loop()
+void	main_alerter_loop(void)
 {
-	char			error[MAX_STRING_LEN], *error_esc;
-	int			res;
-	DB_RESULT		result;
-	DB_ROW			row;
-	DB_ALERT		alert;
-	DB_MEDIATYPE		mediatype;
+	char		error[MAX_STRING_LEN], *error_esc;
+	int		res, alerts_success, alerts_fail;
+	double		sec;
+	DB_RESULT	result;
+	DB_ROW		row;
+	DB_ALERT	alert;
+	DB_MEDIATYPE	mediatype;
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
@@ -156,6 +157,10 @@ void	main_alerter_loop()
 	for (;;)
 	{
 		zbx_setproctitle("%s [sending alerts]", get_process_type_string(process_type));
+
+		sec = zbx_time();
+
+		alerts_success = alerts_fail = 0;
 
 		result = DBselect(
 				"select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,mt.mediatypeid,"
@@ -202,6 +207,7 @@ void	main_alerter_loop()
 						alert.alertid);
 				DBexecute("update alerts set status=%d,error='' where alertid=" ZBX_FS_UI64,
 						ALERT_STATUS_SENT, alert.alertid);
+				alerts_success++;
 			}
 			else
 			{
@@ -223,12 +229,17 @@ void	main_alerter_loop()
 				}
 
 				zbx_free(error_esc);
+
+				alerts_fail++;
 			}
 
 		}
 		DBfree_result(result);
 
-		zbx_setproctitle("%s [sleeping]", get_process_type_string(process_type));
+		sec = zbx_time() - sec;
+
+		zbx_setproctitle("%s [sent alerts: %d success, %d fail in " ZBX_FS_DBL " sec, sleeping]",
+				get_process_type_string(process_type), alerts_success, alerts_fail, sec);
 
 		zbx_sleep_loop(CONFIG_SENDER_FREQUENCY);
 	}
