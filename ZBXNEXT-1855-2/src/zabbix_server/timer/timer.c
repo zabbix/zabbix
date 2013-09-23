@@ -785,6 +785,7 @@ static int	process_maintenance(void)
 void	main_timer_loop(void)
 {
 	int	now, nextcheck, sleeptime, triggers_count = 0, events_count = 0, hm_count = 0;
+	double	sec = 0.0, sec_maint = 0.0;
 
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
@@ -798,15 +799,16 @@ void	main_timer_loop(void)
 
 		if (1 != process_num)
 		{
-			zbx_setproctitle("%s #%d [processed %d triggers, %d events, sleeping]",
+			zbx_setproctitle("%s #%d [processed %d triggers, %d events in " ZBX_FS_DBL " sec, sleeping]",
 					get_process_type_string(process_type), process_num, triggers_count,
-					events_count);
+					events_count, sec);
 		}
 		else
 		{
-			zbx_setproctitle("%s #%d [processed %d triggers, %d events, %d maint.periods, sleeping]",
+			zbx_setproctitle("%s #%d [processed %d triggers, %d events in " ZBX_FS_DBL " sec, "
+					"%d maint.periods in " ZBX_FS_DBL " sec, sleeping]",
 					get_process_type_string(process_type), process_num, triggers_count,
-					events_count, hm_count);
+					events_count, sec, hm_count, sec_maint);
 		}
 
 		zbx_sleep_loop(sleeptime);
@@ -814,7 +816,11 @@ void	main_timer_loop(void)
 		zbx_setproctitle("%s #%d [processing time functions]", get_process_type_string(process_type),
 				process_num);
 
+		sec = zbx_time();
+
 		process_time_functions(&triggers_count, &events_count);
+
+		sec = zbx_time() - sec;
 
 		/* only the "timer #1" process evaluates the maintenance periods */
 		if (1 != process_num)
@@ -827,7 +833,11 @@ void	main_timer_loop(void)
 			zbx_setproctitle("%s #1 [processing maintenance periods]",
 					get_process_type_string(process_type));
 
+			sec_maint = zbx_time();
+
 			hm_count = process_maintenance();
+
+			sec_maint = zbx_time() - sec_maint;
 		}
 	}
 }
