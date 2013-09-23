@@ -814,7 +814,6 @@ function make_latest_issues(array $filter = array()) {
 		'selectHosts' => array('hostid', 'name'),
 		'output' => array('triggerid', 'state', 'error', 'url', 'expression', 'description', 'priority', 'type', 'lastchange'),
 		'selectLastEvent' => API_OUTPUT_EXTEND,
-		'expandDescription' => true,
 		'sortfield' => isset($filter['sortfield']) ? $filter['sortfield'] : 'lastchange',
 		'sortorder' => isset($filter['sortorder']) ? $filter['sortorder'] : ZBX_SORT_DOWN,
 		'limit' => isset($filter['limit']) ? $filter['limit'] : DEFAULT_LATEST_ISSUES_CNT
@@ -950,18 +949,31 @@ function make_latest_issues(array $filter = array()) {
 			$unknown->setHint($trigger['error'], '', 'on');
 		}
 
-		// description
-		$description = $trigger['url']
-			? new CLink($trigger['description'], resolveTriggerUrl($trigger), null, null, true)
-			: new CSpan($trigger['description'], 'pointer');
-		$description = new CCol($description, getSeverityStyle($trigger['priority']));
-
+		// trigger has events
 		if ($trigger['lastEvent']) {
+			// description
+			$description = CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, array(
+				'clock' => $trigger['lastEvent']['clock'],
+				'ns' => $trigger['lastEvent']['ns']
+			)));
+			$description = new CCol(
+				new CLink($description, resolveTriggerUrl($trigger), null, null, true),
+				getSeverityStyle($trigger['priority'])
+			);
 			$description->setHint(make_popup_eventlist($trigger['triggerid'], $trigger['lastEvent']['eventid']), '', '', false);
 
+			// ack
 			$ack = getEventAckState($trigger['lastEvent'], empty($filter['backUrl']) ? true : $filter['backUrl'], true, $ackParams);
 		}
+		// trigger has no events
 		else {
+			// description
+			$description = CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, array(
+				'clock' => $trigger['lastchange'],
+			)));
+			$description = new CSpan($description, 'pointer');
+
+			// ack
 			$ack = new CSpan(_('No events'), 'unknown');
 		}
 
