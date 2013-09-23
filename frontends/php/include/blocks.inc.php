@@ -971,7 +971,7 @@ function make_latest_issues(array $filter = array()) {
 		);
 
 		// actions
-		$actions = ($trigger['lastEvent'] && isset($actions[$trigger['lastEvent']['eventid']]))
+		$actionHint = ($trigger['lastEvent'] && isset($actions[$trigger['lastEvent']['eventid']]))
 			? $actions[$trigger['lastEvent']['eventid']]
 			: SPACE;
 
@@ -983,7 +983,7 @@ function make_latest_issues(array $filter = array()) {
 			zbx_date2age($trigger['lastchange']),
 			$unknown,
 			$ack,
-			$actions
+			$actionHint
 		));
 	}
 
