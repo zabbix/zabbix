@@ -96,9 +96,9 @@ static int	get_minnextcheck(int now)
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-void	main_httppoller_loop()
+void	main_httppoller_loop(void)
 {
-	int	now, nextcheck, sleeptime;
+	int	now, nextcheck, sleeptime, httptests_count;
 	double	sec;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_httppoller_loop() process_num:%d", process_num);
@@ -113,7 +113,7 @@ void	main_httppoller_loop()
 
 		now = time(NULL);
 		sec = zbx_time();
-		process_httptests(process_num, now);
+		httptests_count = process_httptests(process_num, now);
 		sec = zbx_time() - sec;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while updating HTTP tests",
@@ -122,8 +122,8 @@ void	main_httppoller_loop()
 		nextcheck = get_minnextcheck(now);
 		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
-		zbx_setproctitle("%s #%d [got values in " ZBX_FS_DBL " sec, sleeping]",
-				get_process_type_string(process_type), process_num, sec);
+		zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, sleeping %d sec]",
+				get_process_type_string(process_type), process_num, httptests_count, sec, sleeptime);
 
 		zbx_sleep_loop(sleeptime);
 	}

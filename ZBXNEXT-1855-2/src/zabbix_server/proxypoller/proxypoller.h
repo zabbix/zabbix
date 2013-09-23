@@ -23,7 +23,7 @@
 extern char	*CONFIG_SOURCE_IP;
 extern int	CONFIG_TRAPPER_TIMEOUT;
 
-void	main_proxypoller_loop();
+void	main_proxypoller_loop(void);
 
 #endif
 

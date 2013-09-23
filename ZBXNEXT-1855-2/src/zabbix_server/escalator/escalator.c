@@ -1210,7 +1210,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	process_escalations(int now)
+static int	process_escalations(int now)
 {
 	const char		*__function_name = "process_escalations";
 	DB_RESULT		result;
@@ -1219,6 +1219,7 @@ static void	process_escalations(int now)
 	zbx_vector_uint64_t	escalationids;
 	char			*sql = NULL;
 	size_t			sql_alloc = ZBX_KIBIBYTE, sql_offset;
+	int			res;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1343,6 +1344,8 @@ next:
 
 	zbx_free(sql);
 
+	res = escalationids.values_num;		/* performance metric */
+
 	/* delete completed escalations */
 	if (0 != escalationids.values_num)
 	{
@@ -1356,6 +1359,8 @@ next:
 	zbx_vector_uint64_destroy(&escalationids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return res;
 }
 
 /******************************************************************************
@@ -1373,9 +1378,9 @@ next:
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-void	main_escalator_loop()
+void	main_escalator_loop(void)
 {
-	int	now;
+	int	now, escalations_count;
 	double	sec;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_escalator_loop()");
@@ -1390,14 +1395,14 @@ void	main_escalator_loop()
 
 		now = time(NULL);
 		sec = zbx_time();
-		process_escalations(now);
+		escalations_count = process_escalations(now);
 		sec = zbx_time() - sec;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while processing escalations",
 				get_process_type_string(process_type), process_num, sec);
 
-		zbx_setproctitle("%s [processed escalations in " ZBX_FS_DBL " sec, sleeping %d sec]",
-				get_process_type_string(process_type), sec, CONFIG_ESCALATOR_FREQUENCY);
+		zbx_setproctitle("%s [processed %d escalations in " ZBX_FS_DBL " sec, sleeping %d sec]",
+				get_process_type_string(process_type), escalations_count, sec, CONFIG_ESCALATOR_FREQUENCY);
 
 		zbx_sleep_loop(CONFIG_ESCALATOR_FREQUENCY);
 	}

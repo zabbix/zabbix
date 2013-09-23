@@ -43,7 +43,7 @@ extern int		process_num;
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-void	main_dbsyncer_loop()
+void	main_dbsyncer_loop(void)
 {
 	int	sleeptime, last_sleeptime = -1, num;
 	double	sec;
@@ -108,8 +108,8 @@ void	main_dbsyncer_loop()
 
 		last_sleeptime = sleeptime;
 
-		zbx_setproctitle("%s #%d [synced %d items in " ZBX_FS_DBL " sec, sleeping]",
-				get_process_type_string(process_type), process_num, num, sec);
+		zbx_setproctitle("%s #%d [synced %d items in " ZBX_FS_DBL " sec, sleeping %d sec]",
+				get_process_type_string(process_type), process_num, num, sec, sleeptime);
 
 		zbx_sleep_loop(sleeptime);
 	}

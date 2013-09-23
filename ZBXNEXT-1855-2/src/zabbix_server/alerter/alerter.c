@@ -238,8 +238,9 @@ void	main_alerter_loop(void)
 
 		sec = zbx_time() - sec;
 
-		zbx_setproctitle("%s [sent alerts: %d success, %d fail in " ZBX_FS_DBL " sec, sleeping]",
-				get_process_type_string(process_type), alerts_success, alerts_fail, sec);
+		zbx_setproctitle("%s [sent alerts: %d success, %d fail in " ZBX_FS_DBL " sec, sleeping %d sec]",
+				get_process_type_string(process_type), alerts_success, alerts_fail, sec,
+				CONFIG_SENDER_FREQUENCY);
 
 		zbx_sleep_loop(CONFIG_SENDER_FREQUENCY);
 	}
