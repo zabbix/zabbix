@@ -86,7 +86,7 @@ if (isset($_REQUEST['save'])) {
 	$proxy = array(
 		'host' => get_request('host'),
 		'status' => get_request('status'),
-		'interface' => get_request('interfaces')
+		'interface' => get_request('interface')
 	);
 
 	// skip discovered hosts
@@ -246,7 +246,7 @@ else {
 
 	$data['proxies'] = API::Proxy()->get(array(
 		'editable' => true,
-		'selectHosts' => API_OUTPUT_EXTEND,
+		'selectHosts' => array('hostid', 'host', 'name', 'status'),
 		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => $sortfield,
 		'limit' => $config['search_limit'] + 1

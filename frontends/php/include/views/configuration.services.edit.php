@@ -271,7 +271,7 @@ $servicesTimeFormList->addRow(
 /*
  * Append tabs to form
  */
-$servicesTab = new CTabView(array('remember' => true));
+$servicesTab = new CTabView();
 if (!$this->data['form_refresh']) {
 	$servicesTab->setSelected(0);
 }

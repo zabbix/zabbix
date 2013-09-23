@@ -45,7 +45,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 		$graphIds = zbx_objectValues($graphs, 'graphid');
 
 		$graphs = $this->extendObjects($this->tableName(), $graphs,
-			array('name', 'graphtype', 'ymin_type', 'ymax_type', 'yaxismin', 'yaxismax')
+			array('name', 'graphtype', 'ymin_type', 'ymin_itemid', 'ymax_type', 'ymax_itemid', 'yaxismin', 'yaxismax')
 		);
 
 		$dbGraphs = $this->get(array(

@@ -313,11 +313,11 @@ if ($this->data['is_profile']) {
 }
 
 // append form lists to tab
-$userTab = new CTabView(array('remember' => 1));
-$userTab->addTab('userTab', _('User'), $userFormList);
+$userTab = new CTabView();
 if (!$this->data['form_refresh']) {
 	$userTab->setSelected(0);
 }
+$userTab->addTab('userTab', _('User'), $userFormList);
 if (isset($userMediaFormList)) {
 	$userTab->addTab('mediaTab', _('Media'), $userMediaFormList);
 }
