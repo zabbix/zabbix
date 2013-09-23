@@ -1,6 +1,27 @@
+Changes for 2.1.6
+
+New features:
+
+Bug fixes:
+........S. [ZBX-6904] now ESC.HISTORY macro creates the same message content whithin the same escalation step when notification is sent to multiple recipients (igors)
+........S. [ZBX-6987] fixed possible crash in value cache when freeing items with out of order values (wiper)
+..F....... [ZBX-7024] fixed filtering by application name "0" in Monitoring > Overview dropdown (Ivo)
+A.F....... [ZBX-7026] removed automatic changing of "error" field when trigger and trigger prototype expression is changed (Ivo)
+..F....... [ZBX-7027] improved request of proxies in Configuration > Hosts list and request of hosts in Administration > DM > Proxies (Ivo)
+..F....... [ZBX-3878] fixed memory leaks in slide shows (Eduard)
+..F....... [ZBX-7017] fixed problem with unwanted lists of services in IT services popup window (Vitalij)
+..F....... [ZBX-6982] changed background color in user and user group edit form for select tags (Vitalij)
+..F....... [ZBX-6973] fixed sql error in postgres database on saving host (Vitalij)
+
+--------------------------------------------------------------------------------
 Changes for 2.1.5
 
 New features:
+...G...... [ZBXNEXT-836] added windows agent wmi query support with wmi.get key (wiper)
+........S. [ZBXNEXT-1267] changed network discovery to take in account proxies when identifying discovered hosts (wiper)
+........S. [ZBXNEXT-322] improved value cache multi-process performance by unlocking it during database requests (wiper)
+..F.....S. [ZBX-6883] added possibility to use empty parameters in the trigger functions (Sasha)
+.......PS. [ZBXNEXT-1633] added vSphere (vCenter hypervisor) datastore and network monitoring keys (wiper)
 A.F.I..... [ZBXNEXT-1786] implemented script name tree in menu popups (Eduard, Sasha)
 ..F....... [ZBXNEXT-1786] redesigned menu popups using jQuery Menu (Eduard)
 ..F....... [ZBXNEXT-1786] updated jQuery-ui to latest (Eduard)
@@ -8,6 +29,17 @@ A.F.I..... [ZBXNEXT-1786] implemented script name tree in menu popups (Eduard, S
 ..F....... [ZBX-6846] the print link work with javascript instead of reloading the whole page (Vitalij)
 
 Bug fixes:
+........S. [ZBX-4476] fixed nodata() calculation for new items (wiper)
+........S. [ZBX-6950] fixed termination character sequence for smtp connection termination (igors)
+.......... [ZBXNEXT-1689] improved performance of the latest data page (Pavels)
+.......PS. [ZBX-6989] fixed write cache statistics to account for fragmentation when calculating free space (wiper)
+A.F....... [ZBX-6952] fixed XSS vulnerability in user themes, thanks to Lincoln and Bernhard Schildendorfer for reporting (Ivo)
+..F....... [ZBX-6816] added URL parameter validation for graph items in bar reports page (Ivo)
+..F....... [ZBX-6937] fixed discovery check validation (Eduard)
+..F....... [ZBX-6992] fixed PostreSQL query errors due to missing "AS" keyword for aggregate functions in Monitoring > IT Services (Ivo)
+..F....... [ZBXNEXT-1633] resolved problem with pasive proxy saving (Vitalij)
+..F....... [ZBX-6938] fixed undefined hostid on delete, fixed filter parameters losing after returning from edit form (Vitalij)
+..F....... [ZBX-6984] resolved problem with list of host group on Configuration->Host groups page (Vitalij)
 ..F....... [ZBX-6967] added missing spaces between icons (Vitalij)
 ..F....... [ZBX-6804] optimized min item clock calculation for graph; thanks to Volker Fröhlich (Eduard)
 ..F....... [ZBX-6968] fixed add/remove favorites icon javascript (Vitalij)
@@ -175,6 +207,7 @@ A.F.....S. [ZBXNEXT-1575] new triggers will now be created in OK state (Pavels, 
 ..F....PS. [ZBXNEXT-300] added support of IPMI discrete sensors (Andris, Sasha, Toms)
 ..F....... [ZBXNEXT-1659] added support of anti-aliased normal and bold lines for graphs and map connectors (Alexei)
 ..F....... [ZBXNEXT-1399] implemented multiselect in dashboard configuration (Eduard)
+..F....... [ZBX-6292] added support of time postfixes in trigger expression constructor (Eduard)
 ........S. [ZBXNEXT-354] added macro expansion for allowed hosts setting in trapper items (wiper)
 ..F....... [ZBXNEXT-109] implemented discovery rule check editing (Eduard)
 A......... [ZBXNEXT-109] improved discovery rule check deleting (Eduard)
@@ -309,7 +342,6 @@ A......... [ZBX-6530] formatted some exception messages in CImage.php which wher
 ..F....... [ZBX-6369] fixed "Use custom multiplier" field validation in items (Oleg)
 ..F....... [ZBX-6366] fixed "New flexible interval" field validation in item prototypes (Oleg)
 ..F....... [ZBX-6334] fixed naming inconsistency in triggers and graph prototypes (Eduard)
-..F....... [ZBX-6292] added support of time postfixes in trigger expression test page (Eduard)
 ..F....... [ZBX-6336] fixed "array to string conversion" error in triggers (Oleg)
 ..F....... [ZBX-6332] fixed button IDs in graph editing form (Eduard)
 ........S. [ZBX-6234] improved validation of command request (global scripts) tag values (wiper)
@@ -409,6 +441,10 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Lithuanian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-3878] fixed memory leaks in slide shows (Eduard)
+........S. [ZBX-6950] fixed termination character sequence for smtp connection termination (igors)
+..F....... [ZBX-6952] fixed XSS vulnerability in user themes, thanks to Lincoln and Bernhard Schildendorfer for reporting (Ivo)
+..F....... [ZBX-6992] fixed PostreSQL query errors due to missing "AS" keyword for aggregate functions in Monitoring > IT Services (Ivo)
 ..F....... [ZBX-6804] optimized min item clock calculation for graph; thanks to Volker Fröhlich (Eduard)
 ...G...... [ZBX-6902] reverting Solaris system.swap.size calculation from "swap -s" (used in 2.0.7, 2.0.8) to "swap -l"-like algorithm (as in 2.0.6) (Andris)
 .......P.. [ZBX-6936] fixed MySQL errors when updating configuration of the proxy (Sasha)
