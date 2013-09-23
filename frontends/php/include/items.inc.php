@@ -1051,7 +1051,11 @@ function getItemFunctionalValue($item, $function, $param) {
  *
  * @return string
  */
-function item_get_history($db_item, $clock, $ns) {
+function item_get_history($db_item, $clock, $ns = null) {
+	if ($ns === null) {
+		$ns = '999999999';
+	}
+
 	$value = null;
 
 	$table = CHistoryManager::getTableName($db_item['value_type']);
