@@ -812,7 +812,9 @@ function make_latest_issues(array $filter = array()) {
 			'value' => TRIGGER_VALUE_TRUE
 		),
 		'selectHosts' => array('hostid', 'name'),
-		'output' => array('triggerid', 'state', 'error', 'url', 'expression', 'description', 'priority', 'type', 'lastchange'),
+		'output' => array(
+			'triggerid', 'state', 'error', 'url', 'expression', 'description', 'priority', 'type', 'lastchange'
+		),
 		'selectLastEvent' => API_OUTPUT_EXTEND,
 		'sortfield' => isset($filter['sortfield']) ? $filter['sortfield'] : 'lastchange',
 		'sortorder' => isset($filter['sortorder']) ? $filter['sortorder'] : ZBX_SORT_DOWN,
@@ -830,7 +832,7 @@ function make_latest_issues(array $filter = array()) {
 	$eventIds = array();
 	foreach ($triggers as $trigger) {
 		if ($trigger['lastEvent']) {
-			$eventIds[$trigger['lastEvent']['eventid']] = $trigger['lastEvent']['eventid'];
+			$eventIds[] = $trigger['lastEvent']['eventid'];
 		}
 	}
 	if ($eventIds) {
@@ -960,10 +962,15 @@ function make_latest_issues(array $filter = array()) {
 				new CLink($description, resolveTriggerUrl($trigger), null, null, true),
 				getSeverityStyle($trigger['priority'])
 			);
-			$description->setHint(make_popup_eventlist($trigger['triggerid'], $trigger['lastEvent']['eventid']), '', '', false);
+			$description->setHint(
+				make_popup_eventlist($trigger['triggerid'], $trigger['lastEvent']['eventid']),
+				'', '', false
+			);
 
 			// ack
-			$ack = getEventAckState($trigger['lastEvent'], empty($filter['backUrl']) ? true : $filter['backUrl'], true, $ackParams);
+			$ack = getEventAckState($trigger['lastEvent'], empty($filter['backUrl']) ? true : $filter['backUrl'],
+				true, $ackParams
+			);
 		}
 		// trigger has no events
 		else {
