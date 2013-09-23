@@ -2035,18 +2035,21 @@ static int	vch_item_add_values_at_end(zbx_vc_item_t *item, const zbx_history_rec
 			int		iindex = index;
 			zbx_vc_chunk_t	*ichunk = chunk;
 
-			while (ichunk->slots[iindex].timestamp.sec == values[0].timestamp.sec)
+			while (0 < zbx_timespec_compare(&ichunk->slots[iindex].timestamp, &values[0].timestamp))
 			{
 				index = iindex--;
 				if (iindex < ichunk->first_value)
 				{
-					chunk = ichunk;
-					if (NULL == (ichunk = ichunk->prev))
+					if (NULL == (chunk = ichunk->prev))
+					{
+						chunk = ichunk;
 						break;
-
+					}
+					ichunk = chunk;
 					iindex = ichunk->last_value;
 				}
 			}
+
 		}
 		vch_item_get_values_from(item, chunk, index, &values_ext);
 		vch_item_remove_values_from(item, chunk, index);
