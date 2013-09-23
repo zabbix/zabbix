@@ -889,7 +889,7 @@ function make_latest_issues(array $filter = array()) {
 	$hostHeaderDiv->addStyle('float: left');
 	$issueHeaderDiv = new CDiv(array(_('Issue'), SPACE));
 	$issueHeaderDiv->addStyle('float: left');
-	$lastChangeHeaderDiv = new CDiv(array(_('Last change'), SPACE));
+	$lastChangeHeaderDiv = new CDiv(array(_('Time'), SPACE));
 	$lastChangeHeaderDiv->addStyle('float: left');
 
 	$table = new CTableInfo();
