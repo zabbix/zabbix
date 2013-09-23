@@ -282,7 +282,8 @@ void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions,
 void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num);
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, char **errors, int item_num);
-void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_t *trigger_order, int process_num);
+void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_t *trigger_order, int process_num,
+			int *trigger_count);
 void	DCfree_triggers(zbx_vector_ptr_t *triggers);
 int	DCconfig_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid, unsigned char type);
 int	DCconfig_get_poller_nextcheck(unsigned char poller_type);
