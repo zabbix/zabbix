@@ -145,6 +145,10 @@ ZBX_THREAD_ACTIVECHK_ARGS	*CONFIG_ACTIVE_ARGS = NULL;
 int				CONFIG_ACTIVE_FORKS = 0;
 int				CONFIG_PASSIVE_FORKS = 3;	/* number of listeners for processing passive checks */
 
+#ifdef _WINDOWS
+void zbx_co_uninitialize();
+#endif
+
 static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 {
 	char	ch = '\0';
@@ -706,6 +710,7 @@ void	zbx_free_service_resources(void)
 	free_collector_data();
 #ifdef _WINDOWS
 	free_perf_collector();
+	zbx_co_uninitialize();
 #endif
 }
 
