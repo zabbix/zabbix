@@ -749,7 +749,7 @@ static int	get_minnextcheck(int now)
  * Comments: executes once per 30 seconds (hardcoded)                         *
  *                                                                            *
  ******************************************************************************/
-void	main_discoverer_loop()
+void	main_discoverer_loop(void)
 {
 	int	now, nextcheck, sleeptime;
 	double	sec;
@@ -775,8 +775,8 @@ void	main_discoverer_loop()
 		nextcheck = get_minnextcheck(now);
 		sleeptime = calculate_sleeptime(nextcheck, DISCOVERER_DELAY);
 
-		zbx_setproctitle("%s #%d [discovered in " ZBX_FS_DBL " sec, sleeping]",
-				get_process_type_string(process_type), process_num, sec);
+		zbx_setproctitle("%s #%d [discovered in " ZBX_FS_DBL " sec, sleeping %d sec]",
+				get_process_type_string(process_type), process_num, sec, sleeptime);
 
 		zbx_sleep_loop(sleeptime);
 	}

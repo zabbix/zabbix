@@ -799,16 +799,16 @@ void	main_timer_loop(void)
 
 		if (1 != process_num)
 		{
-			zbx_setproctitle("%s #%d [processed %d triggers, %d events in " ZBX_FS_DBL " sec, sleeping]",
+			zbx_setproctitle("%s #%d [processed %d triggers, %d events in " ZBX_FS_DBL " sec, sleeping %d sec]",
 					get_process_type_string(process_type), process_num, triggers_count,
-					events_count, sec);
+					events_count, sec, sleeptime);
 		}
 		else
 		{
 			zbx_setproctitle("%s #%d [processed %d triggers, %d events in " ZBX_FS_DBL " sec, "
-					"%d maint.periods in " ZBX_FS_DBL " sec, sleeping]",
+					"%d maint.periods in " ZBX_FS_DBL " sec, sleeping %d sec]",
 					get_process_type_string(process_type), process_num, triggers_count,
-					events_count, sec, hm_count, sec_maint);
+					events_count, sec, hm_count, sec_maint, sleeptime);
 		}
 
 		zbx_sleep_loop(sleeptime);

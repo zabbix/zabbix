@@ -534,7 +534,7 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count)
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-void	main_pinger_loop()
+void	main_pinger_loop(void)
 {
 	int			nextcheck, sleeptime;
 	double			sec;
@@ -564,8 +564,8 @@ void	main_pinger_loop()
 		nextcheck = DCconfig_get_poller_nextcheck(ZBX_POLLER_TYPE_PINGER);
 		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
-		zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, sleeping]",
-				get_process_type_string(process_type), process_num, items_count, sec);
+		zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, sleeping %d sec]",
+				get_process_type_string(process_type), process_num, items_count, sec, sleeptime);
 
 		zbx_sleep_loop(sleeptime);
 	}
