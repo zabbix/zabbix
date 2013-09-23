@@ -19,7 +19,7 @@
 **/
 
 
-$hostInventoryWidget = new CWidget();
+$hostInventoryWidget = new CWidget(null, 'inventory-host');
 
 $hostInventoryWidget->addPageHeader(_('HOST INVENTORY'), SPACE);
 
@@ -28,7 +28,7 @@ $hostInventoriesForm = new CForm();
 /*
  * Overview tab
  */
-$overviewFormList = new CFormList(null, 'host-inventories-overview');
+$overviewFormList = new CFormList('inventory-host-form');
 
 $hostSpan = new CSpan($this->data['host']['host'], 'link_menu menu-host');
 
@@ -48,16 +48,16 @@ if ($this->data['host']['host'] != $this->data['host']['name']) {
 	$overviewFormList->addRow(_('Visible name'), new CSpan($this->data['host']['name'], 'text-field'));
 }
 
-$snmpInterfaceRow = array();
-$ipmiInterfaceRow = array();
-$jmxInterfaceRow = array();
+$snmpInterfaceRows = array();
+$ipmiInterfaceRows = array();
+$jmxInterfaceRows = array();
 
 foreach ($this->data['host']['interfaces'] as $interface) {
 	$spanClass = $interface['main'] ? ' default_interface' : null;
 
 	switch ($interface['type']) {
 		case INTERFACE_TYPE_AGENT:
-			$agentInterfaceRow[] = new CRow(array(
+			$agentInterfaceRows[] = new CRow(array(
 				new CDiv($interface['ip'], 'ip'.$spanClass),
 				new CDiv($interface['dns'], 'dns'.$spanClass),
 				new CDiv($interface['useip'] == 1 ? _('IP') : _('DNS'), 'useip'.$spanClass),
@@ -66,7 +66,7 @@ foreach ($this->data['host']['interfaces'] as $interface) {
 			break;
 
 		case INTERFACE_TYPE_SNMP:
-			$snmpInterfaceRow[] = new CRow(array(
+			$snmpInterfaceRows[] = new CRow(array(
 				new CDiv($interface['ip'], 'ip'.$spanClass),
 				new CDiv($interface['dns'], 'dns'.$spanClass),
 				new CDiv($interface['useip'] == 1 ? _('IP') : _('DNS'), 'useip'.$spanClass),
@@ -75,7 +75,7 @@ foreach ($this->data['host']['interfaces'] as $interface) {
 			break;
 
 		case INTERFACE_TYPE_IPMI:
-			$ipmiInterfaceRow[] = new CRow(array(
+			$ipmiInterfaceRows[] = new CRow(array(
 				new CDiv($interface['ip'], 'ip'.$spanClass),
 				new CDiv($interface['dns'], 'dns'.$spanClass),
 				new CDiv($interface['useip'] == 1 ? _('IP') : _('DNS'), 'useip'.$spanClass),
@@ -84,7 +84,7 @@ foreach ($this->data['host']['interfaces'] as $interface) {
 			break;
 
 		case INTERFACE_TYPE_JMX:
-			$jmxInterfaceRow[] = new CRow(array(
+			$jmxInterfaceRows[] = new CRow(array(
 				new CDiv($interface['ip'], 'ip'.$spanClass),
 				new CDiv($interface['dns'], 'dns'.$spanClass),
 				new CDiv($interface['useip'] == 1 ? _('IP') : _('DNS'), 'useip'.$spanClass),
@@ -98,7 +98,7 @@ $agentInterfacesTable = new CTable(null, 'formElementTable border_dotted objectg
 $agentInterfacesTable->setHeader(array(_('IP address'), _('DNS name'), _('Connect to'), _('Port')));
 
 // Agent interface
-foreach ($agentInterfaceRow as $interface) {
+foreach ($agentInterfaceRows as $interface) {
 	$agentInterfacesTable->addRow($interface);
 }
 
@@ -108,10 +108,10 @@ $overviewFormList->addRow(
 );
 
 // SNMP interface
-if ($snmpInterfaceRow) {
+if ($snmpInterfaceRows) {
 	$snmpInterfacesTable = new CTable(null, 'formElementTable border_dotted objectgroup element-row interfaces');
 
-	foreach ($snmpInterfaceRow as $interface) {
+	foreach ($snmpInterfaceRows as $interface) {
 		$snmpInterfacesTable->addRow($interface);
 	}
 
@@ -122,10 +122,10 @@ if ($snmpInterfaceRow) {
 }
 
 // IPMI interface
-if ($ipmiInterfaceRow) {
+if ($ipmiInterfaceRows) {
 	$ipmiInterfacesTable = new CTable(null, 'formElementTable border_dotted objectgroup element-row interfaces');
 
-	foreach ($ipmiInterfaceRow as $interface) {
+	foreach ($ipmiInterfaceRows as $interface) {
 		$ipmiInterfacesTable->addRow($interface);
 	}
 
@@ -136,10 +136,10 @@ if ($ipmiInterfaceRow) {
 }
 
 // JMX interface
-if ($jmxInterfaceRow) {
+if ($jmxInterfaceRows) {
 	$jmxInterfacesTable = new CTable(null, 'formElementTable border_dotted objectgroup element-row interfaces');
 
-	foreach ($jmxInterfaceRow as $interface) {
+	foreach ($jmxInterfaceRows as $interface) {
 		$jmxInterfacesTable->addRow($interface);
 	}
 
@@ -150,16 +150,24 @@ if ($jmxInterfaceRow) {
 }
 
 // inventory (OS, Hardware, Software)
-unset($this->data['host']['inventory']['hostid'], $this->data['host']['inventory']['inventory_mode']);
 if ($this->data['host']['inventory']) {
-	foreach ($this->data['host']['inventory'] as $key => $value) {
-		if (($this->data['tableTitles'][$key]['db_field'] == 'os' || $this->data['tableTitles'][$key]['db_field'] == 'hardware'
-				|| $this->data['tableTitles'][$key]['db_field'] == 'software') && !zbx_empty($value)) {
-			$overviewFormList->addRow(
-				$this->data['tableTitles'][$key]['title'],
-				new CSpan(zbx_str2links($value),
-				'text-field'));
-		}
+	if ($this->data['host']['inventory']['os']) {
+		$overviewFormList->addRow(
+			$this->data['tableTitles']['os']['title'],
+			new CSpan(zbx_str2links($this->data['host']['inventory']['os']), 'text-field')
+		);
+	}
+	if ($this->data['host']['inventory']['hardware']) {
+		$overviewFormList->addRow(
+			$this->data['tableTitles']['hardware']['title'],
+			new CSpan(zbx_str2links($this->data['host']['inventory']['hardware']), 'text-field')
+		);
+	}
+	if ($this->data['host']['inventory']['software']) {
+		$overviewFormList->addRow(
+			$this->data['tableTitles']['software']['title'],
+			new CSpan(zbx_str2links($this->data['host']['inventory']['software']), 'text-field')
+		);
 	}
 }
 

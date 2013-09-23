@@ -21,16 +21,16 @@
 
 $hostInventoryWidget = new CWidget();
 
-$r_form = new CForm('get');
-$r_form->addItem(array(_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB(true)));
+$rForm = new CForm('get');
+$rForm->addItem(array(_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB(true)));
 $hostInventoryWidget->addPageHeader(_('HOST INVENTORIES'), SPACE);
-$hostInventoryWidget->addHeader(_('Hosts'), $r_form);
+$hostInventoryWidget->addHeader(_('Hosts'), $rForm);
 
-$filter_table = new CTable('', 'filter');
+$filterTable = new CTable('', 'filter');
 // getting inventory fields to make a drop down
 $inventoryFields = getHostInventories(true); // 'true' means list should be ordered by title
 $inventoryFieldsComboBox = new CComboBox('filter_field', $this->data['filterField']);
-foreach($inventoryFields as $inventoryField){
+foreach ($inventoryFields as $inventoryField) {
 	$inventoryFieldsComboBox->addItem(
 		$inventoryField['db_field'],
 		$inventoryField['title']
@@ -39,7 +39,7 @@ foreach($inventoryFields as $inventoryField){
 $exactComboBox = new CComboBox('filter_exact', $this->data['filterExact']);
 $exactComboBox->addItem('0', _('like'));
 $exactComboBox->addItem('1', _('exactly'));
-$filter_table->addRow(array(
+$filterTable->addRow(array(
 	array(
 		array(bold(_('Field')), SPACE, $inventoryFieldsComboBox),
 		array(
@@ -57,18 +57,18 @@ $filter->useJQueryStyle('main');
 $reset = new CButton('reset', _('Reset'), "javascript: clearAllForm('zbx_filter');");
 $reset->useJQueryStyle();
 
-$div_buttons = new CDiv(array($filter, SPACE, $reset));
-$div_buttons->setAttribute('style', 'padding: 4px 0px;');
+$divButtons = new CDiv(array($filter, SPACE, $reset));
+$divButtons->setAttribute('style', 'padding: 4px 0px;');
 
-$footer_col = new CCol($div_buttons, 'controls');
+$footerCol = new CCol($divButtons, 'controls');
 
-$filter_table->addRow($footer_col);
+$filterTable->addRow($footerCol);
 
-$filter_form = new CForm('get');
-$filter_form->setAttribute('name','zbx_filter');
-$filter_form->setAttribute('id','zbx_filter');
-$filter_form->addItem($filter_table);
-$hostInventoryWidget->addFlicker($filter_form, CProfile::get('web.hostinventories.filter.state', 0));
+$filterForm = new CForm('get');
+$filterForm->setAttribute('name', 'zbx_filter');
+$filterForm->setAttribute('id', 'zbx_filter');
+$filterForm->addItem($filterTable);
+$hostInventoryWidget->addFlicker($filterForm, CProfile::get('web.hostinventories.filter.state', 0));
 $hostInventoryWidget->addHeaderRowNumber();
 
 $table = new CTableInfo(_('No hosts defined.'));
@@ -84,99 +84,30 @@ $table->setHeader(array(
 	make_sorting_header(_('MAC address A'), 'pr_macaddress_a'))
 );
 
-$hosts = array();
-$paging = getPagingLine($hosts);
+foreach ($this->data['hosts'] as $host) {
+	$hostGroups = array();
+	foreach ($host['groups'] as $group) {
+		$hostGroups[] = $group['name'];
+	}
+	natsort($hostGroups);
+	$hostGroups = implode(', ', $hostGroups);
 
-if($this->data['pageFilter']->groupsSelected){
-	// which inventory fields we will need for displaying
-	$requiredInventoryFields = array(
-		'name',
-		'type',
-		'os',
-		'serialno_a',
-		'tag',
-		'macaddress_a'
+	$row = array(
+		get_node_name_by_elid($host['hostid']),
+		new CLink($host['name'],'?hostid='.$host['hostid'].url_param('groupid')),
+		$hostGroups,
+		zbx_str2links($host['inventory']['name']),
+		zbx_str2links($host['inventory']['type']),
+		zbx_str2links($host['inventory']['os']),
+		zbx_str2links($host['inventory']['serialno_a']),
+		zbx_str2links($host['inventory']['tag']),
+		zbx_str2links($host['inventory']['macaddress_a'])
 	);
 
-	// checking if correct inventory field is specified for filter
-	$possibleInventoryFields = getHostInventories();
-	$possibleInventoryFields = zbx_toHash($possibleInventoryFields, 'db_field');
-	if(!empty($this->data['filterField'])
-			&& !empty($this->data['filterFieldValue'])
-			&& !isset($possibleInventoryFields[$this->data['filterField']])){
-		error(_s('Impossible to filter by inventory field "%s", which does not exist.', $this->data['filterField']));
-	}
-	else{
-		// if we are filtering by field, this field is also required
-		if(!empty($this->data['filterField']) && !empty($this->data['filterFieldValue'])){
-			$requiredInventoryFields[] = $this->data['filterField'];
-		}
-
-		$options = array(
-			'output' => array('hostid', 'name'),
-			'selectInventory' => $requiredInventoryFields,
-			'withInventory' => true,
-			'selectGroups' => API_OUTPUT_EXTEND,
-			'limit' => ($this->data['config']['search_limit'] + 1)
-		);
-		if($this->data['pageFilter']->groupid > 0)
-			$options['groupids'] = $this->data['pageFilter']->groupid;
-
-		$hosts = API::Host()->get($options);
-
-		// copy some inventory fields to the uppers array level for sorting
-		// and filter out hosts if we are using filter
-		foreach($hosts as $num => $host){
-			$hosts[$num]['pr_name'] = $host['inventory']['name'];
-			$hosts[$num]['pr_type'] = $host['inventory']['type'];
-			$hosts[$num]['pr_os'] = $host['inventory']['os'];
-			$hosts[$num]['pr_serialno_a'] = $host['inventory']['serialno_a'];
-			$hosts[$num]['pr_tag'] = $host['inventory']['tag'];
-			$hosts[$num]['pr_macaddress_a'] = $host['inventory']['macaddress_a'];
-			// if we are filtering by inventory field
-			if(!empty($this->data['filterField']) && !empty($this->data['filterFieldValue'])){
-				// must we filter exactly or using a substring (both are case insensitive)
-				$match = $this->data['filterExact']
-					? zbx_strtolower($hosts[$num]['inventory'][$this->data['filterField']]) === zbx_strtolower($this->data['filterFieldValue'])
-						: zbx_strpos(
-						zbx_strtolower($hosts[$num]['inventory'][$this->data['filterField']]),
-						zbx_strtolower($this->data['filterFieldValue'])
-					) !== false;
-				if(!$match){
-					unset($hosts[$num]);
-				}
-			}
-		}
-
-		order_result($hosts, getPageSortField('name'), getPageSortOrder());
-		$paging = getPagingLine($hosts);
-
-		foreach($hosts as $host){
-			$host_groups = array();
-			foreach($host['groups'] as $group){
-				$host_groups[] = $group['name'];
-			}
-			natsort($host_groups);
-			$host_groups = implode(', ', $host_groups);
-
-			$row = array(
-				get_node_name_by_elid($host['hostid']),
-				new CLink($host['name'],'?hostid='.$host['hostid'].url_param('groupid')),
-				$host_groups,
-				zbx_str2links($host['inventory']['name']),
-				zbx_str2links($host['inventory']['type']),
-				zbx_str2links($host['inventory']['os']),
-				zbx_str2links($host['inventory']['serialno_a']),
-				zbx_str2links($host['inventory']['tag']),
-				zbx_str2links($host['inventory']['macaddress_a'])
-			);
-
-			$table->addRow($row);
-		}
-	}
+	$table->addRow($row);
 }
 
-$table = array($paging, $table, $paging);
+$table = array($this->data['paging'], $table, $this->data['paging']);
 $hostInventoryWidget->addItem($table);
 
 return $hostInventoryWidget;

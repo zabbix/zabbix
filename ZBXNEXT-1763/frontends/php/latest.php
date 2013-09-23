@@ -108,30 +108,29 @@ if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
 	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit();
 }
-//--------
 
 /* FILTER */
-if (!hasRequest('show_without_data')) {
-	$_REQUEST['show_without_data'] = 0;
-}
+$filterSelect = getRequest('select');
+$filterShowWithoutData = getRequest('show_without_data', 0);
+$filterShowDetails = getRequest('show_details', 0);
 
 if(hasRequest('filter_rst')){
-	$_REQUEST['select'] = '';
-	$_REQUEST['show_without_data'] = 0;
-	$_REQUEST['show_details'] = 0;
+	$filterSelect = '';
+	$filterShowWithoutData = 0;
+	$filterShowDetails = 0;
 }
 
 if(hasRequest('filter_set') || hasRequest('filter_rst')){
-	CProfile::update('web.latest.filter.select',$_REQUEST['select'], PROFILE_TYPE_STR);
-	CProfile::update('web.latest.filter.show_without_data', $_REQUEST['show_without_data'], PROFILE_TYPE_INT);
-	CProfile::update('web.latest.filter.show_details', getRequest('show_details', 0), PROFILE_TYPE_INT);
+	CProfile::update('web.latest.filter.select',$filterSelect, PROFILE_TYPE_STR);
+	CProfile::update('web.latest.filter.show_without_data', $filterShowWithoutData, PROFILE_TYPE_INT);
+	CProfile::update('web.latest.filter.show_details', $filterShowDetails, PROFILE_TYPE_INT);
 }
 else {
-	$_REQUEST['select'] = CProfile::get('web.latest.filter.select', '');
-	$_REQUEST['show_without_data'] = CProfile::get('web.latest.filter.show_without_data', 0);
-	$_REQUEST['show_details'] = CProfile::get('web.latest.filter.show_details', 0);
+	$filterSelect = CProfile::get('web.latest.filter.select', '');
+	$filterShowWithoutData = CProfile::get('web.latest.filter.show_without_data', 0);
+	$filterShowDetails = CProfile::get('web.latest.filter.show_details', 0);
 }
-// --------------
+
 $latest_wdgt = new CWidget(null, 'latest-mon');
 
 // Header
@@ -166,9 +165,9 @@ $filterForm = new CFormTable(null, null, 'get');
 $filterForm->setAttribute('name','zbx_filter');
 $filterForm->setAttribute('id','zbx_filter');
 
-$filterForm->addRow(_('Show items with name like'), new CTextBox('select',$_REQUEST['select'],20));
-$filterForm->addRow(_('Show items without data'), new CCheckBox('show_without_data', $_REQUEST['show_without_data'], null, 1));
-$filterForm->addRow(_('Show details'), new CCheckBox('show_details', getRequest('show_details', 0), null, 1));
+$filterForm->addRow(_('Show items with name like'), new CTextBox('select',$filterSelect, 20));
+$filterForm->addRow(_('Show items without data'), new CCheckBox('show_without_data', $filterShowWithoutData, null, 1));
+$filterForm->addRow(_('Show details'), new CCheckBox('show_details', $filterShowDetails, null, 1));
 
 $reset = new CButton("filter_rst", _('Reset'), 'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
 
@@ -190,7 +189,7 @@ $link = new CCol(new CDiv(null, 'app-list-toggle-all icon-plus-9x9'));
 
 $table = new CTableInfo(_('No values found.'));
 
-if (getRequest('show_details')) {
+if ($filterShowDetails) {
 	$config = select_config();
 
 	$table->setHeader(array(
@@ -304,7 +303,7 @@ $itemsWithData = Manager::History()->getItemsWithData(zbx_toHash($allItems, 'ite
 // filter items
 foreach ($allItems as $key => &$item) {
 	// filter items without history
-	if (!getRequest('show_without_data') && !isset($itemsWithData[$item['itemid']])) {
+	if (!$filterShowWithoutData && !isset($itemsWithData[$item['itemid']])) {
 		unset($allItems[$key]);
 
 		continue;
@@ -313,7 +312,7 @@ foreach ($allItems as $key => &$item) {
 	$item['resolvedName'] = itemName($item);
 
 	// filter items by name
-	if (!zbx_empty($_REQUEST['select']) && !zbx_stristr($item['resolvedName'], $_REQUEST['select'])) {
+	if (!zbx_empty($filterSelect) && !zbx_stristr($item['resolvedName'], $filterSelect)) {
 		unset($allItems[$key]);
 		unset($itemsWithData[$item['itemid']]);
 	}
@@ -414,7 +413,7 @@ foreach ($allItems as $key => $db_item){
 
 	$stateCss = ($db_item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown txt' : 'txt';
 	$itemName = array(SPACE, SPACE, $db_item['resolvedName']);
-	if (getRequest('show_details')) {
+	if ($filterShowDetails) {
 		$itemKey = new CLink(resolveItemKeyMacros($db_item), 'items.php?form=update&itemid='.$db_item['itemid']);
 		$itemName = array_merge($itemName, array(BR(), SPACE, SPACE, $itemKey));
 
@@ -510,9 +509,8 @@ foreach ($applications as $appid => $dbApp) {
 		new CCol(array(
 				bold($dbApp['name']),
 				SPACE.'('._n('%1$s Item', '%1$s Items', $dbApp['item_cnt']).')'
-			), null, (getRequest('show_details') ? 10 : 5
-		)
-	)), 'odd_row');
+			), null, $filterShowDetails ? 10 : 5)
+	), 'odd_row');
 
 	// add toggle sub rows
 	foreach ($appRows as $row) {
@@ -589,7 +587,7 @@ foreach ($allItems as $db_item){
 
 	$itemName = array(SPACE, SPACE, $db_item['resolvedName']);
 
-	if (getRequest('show_details')) {
+	if ($filterShowDetails) {
 		$itemKey = new CLink(resolveItemKeyMacros($db_item), 'items.php?form=update&itemid='.$db_item['itemid']);
 		$itemName = array_merge($itemName, array(BR(), SPACE, SPACE, $itemKey));
 
@@ -685,7 +683,7 @@ foreach ($hosts as $hostId => $dbHost) {
 				bold('- '.('other').' -'),
 				SPACE.'('._n('%1$s Item', '%1$s Items', $dbHost['item_cnt']).')'
 			),
-			null, getRequest('show_details') ? 10 : 5
+			null, $filterShowDetails ? 10 : 5
 		)
 	), 'odd_row');
 

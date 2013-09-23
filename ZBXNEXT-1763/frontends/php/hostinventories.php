@@ -81,6 +81,7 @@ if ($hostid > 0) {
 	// inventory info
 	$data['tableTitles'] = getHostInventories();
 	$data['tableTitles'] = zbx_toHash($data['tableTitles'], 'db_field');
+	$inventoryFields = array_keys($data['tableTitles']);
 
 	// overview tab
 	$host = API::Host()->get(array(
@@ -90,7 +91,7 @@ if ($hostid > 0) {
 		'selectItems' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,
 		'selectScreens' => API_OUTPUT_COUNT,
-		'selectInventory' => true,
+		'selectInventory' => $inventoryFields,
 		'selectGraphs' => API_OUTPUT_COUNT,
 		'selectApplications' => API_OUTPUT_COUNT,
 		'selectDiscoveries' => API_OUTPUT_COUNT,
@@ -99,6 +100,7 @@ if ($hostid > 0) {
 	));
 
 	$data['host'] = reset($host);
+	unset($data['host']['inventory']['hostid']);
 
 	// get permissions
 	$userType = CWebUser::getType();
@@ -147,9 +149,79 @@ else{
 		$data['filterExact'] = CProfile::get('web.hostinventories.filter_exact');
 	}
 
-	$hostinventoriesView = new CView('inventory.host.list', $data);
-	$hostinventoriesView->render();
-	$hostinventoriesView->show();
+	$data['hosts'] = array();
+	$data['paging'] = getPagingLine($data['hosts']);
+
+	if ($data['pageFilter']->groupsSelected) {
+		// which inventory fields we will need for displaying
+		$requiredInventoryFields = array(
+			'name',
+			'type',
+			'os',
+			'serialno_a',
+			'tag',
+			'macaddress_a'
+		);
+
+		// checking if correct inventory field is specified for filter
+		$possibleInventoryFields = getHostInventories();
+		$possibleInventoryFields = zbx_toHash($possibleInventoryFields, 'db_field');
+		if (!empty($data['filterField'])
+				&& !empty($data['filterFieldValue'])
+				&& !isset($possibleInventoryFields[$data['filterField']])) {
+			error(_s('Impossible to filter by inventory field "%s", which does not exist.', $data['filterField']));
+		}
+		else {
+			// if we are filtering by field, this field is also required
+			if (!empty($data['filterField']) && !empty($data['filterFieldValue'])) {
+				$requiredInventoryFields[] = $data['filterField'];
+			}
+
+			$options = array(
+				'output' => array('hostid', 'name'),
+				'selectInventory' => $requiredInventoryFields,
+				'withInventory' => true,
+				'selectGroups' => API_OUTPUT_EXTEND,
+				'limit' => ($data['config']['search_limit'] + 1)
+			);
+			if ($data['pageFilter']->groupid > 0) {
+				$options['groupids'] = $data['pageFilter']->groupid;
+			}
+
+			$data['hosts'] = API::Host()->get($options);
+
+			// copy some inventory fields to the uppers array level for sorting
+			// and filter out hosts if we are using filter
+			foreach ($data['hosts'] as $num => $host) {
+				$data['hosts'][$num]['pr_name'] = $host['inventory']['name'];
+				$data['hosts'][$num]['pr_type'] = $host['inventory']['type'];
+				$data['hosts'][$num]['pr_os'] = $host['inventory']['os'];
+				$data['hosts'][$num]['pr_serialno_a'] = $host['inventory']['serialno_a'];
+				$data['hosts'][$num]['pr_tag'] = $host['inventory']['tag'];
+				$data['hosts'][$num]['pr_macaddress_a'] = $host['inventory']['macaddress_a'];
+				// if we are filtering by inventory field
+				if(!empty($data['filterField']) && !empty($data['filterFieldValue'])) {
+					// must we filter exactly or using a substring (both are case insensitive)
+					$match = $data['filterExact']
+						? zbx_strtolower($data['hosts'][$num]['inventory'][$data['filterField']]) === zbx_strtolower($data['filterFieldValue'])
+							: zbx_strpos(
+							zbx_strtolower($data['hosts'][$num]['inventory'][$data['filterField']]),
+							zbx_strtolower($data['filterFieldValue'])
+						) !== false;
+					if (!$match) {
+						unset($data['hosts'][$num]);
+					}
+				}
+			}
+
+			order_result($data['hosts'], getPageSortField('name'), getPageSortOrder());
+			$data['paging'] = getPagingLine($data['hosts']);
+		}
+
+		$hostinventoriesView = new CView('inventory.host.list', $data);
+		$hostinventoriesView->render();
+		$hostinventoriesView->show();
+	}
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

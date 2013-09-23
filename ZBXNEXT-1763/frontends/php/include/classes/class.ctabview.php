@@ -25,7 +25,13 @@ class CTabView extends CDiv {
 	protected $tabs = array();
 	protected $headers = array();
 	protected $selectedTab = null;
-	protected $disabledTabs = null;
+
+	/**
+	 * Disabled tabs IDs, tab option
+	 *
+	 * @var array
+	 */
+	protected $disabledTabs = array();
 
 	public function __construct($data = array()) {
 		if (isset($data['id'])) {
@@ -49,7 +55,7 @@ class CTabView extends CDiv {
 	/**
 	 * Disable tabs
 	 *
-	 * @param array		$disabled
+	 * @param array		$disabled	disabled tabs IDs (first tab - 0, second - 1...)
 	 *
 	 * @return void
 	 */
@@ -98,7 +104,7 @@ class CTabView extends CDiv {
 				$createEvent = 'create: function() { jQuery.cookie("tab", '.$this->selectedTab.'); },';
 			}
 
-			$disabledTabs = ($this->disabledTabs === null) ? '' : 'disabled: '.zbx_jsvalue($this->disabledTabs).',';
+			$disabledTabs = ($this->disabledTabs === null) ? '' : 'disabled: '.CJs::encodeJson($this->disabledTabs).',';
 
 			zbx_add_post_js('
 				jQuery("#'.$this->id.'").tabs({

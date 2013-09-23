@@ -89,15 +89,16 @@
 .hk .element-row label { width: 270px; text-align: right; display: block; }
 
 /* host inventory elements */
-.host-inventories-overview .formlist .formrow .element-row { margin-top: -3px; border-top-width: 0; }
-.host-inventories-overview .formlist .formrow .element-row-first { border-top-width: 1px; }
-.host-inventories-overview .formlist .formrow .default_interface { font-weight: bold; }
-.host-inventories-overview .formlist .formrow .ip { width: 100px; }
-.host-inventories-overview .formlist .formrow .dns { width: 200px; word-wrap:break-word; }
-.host-inventories-overview .formlist .formrow .useip { width: 100px; }
-.host-inventories-overview .formlist .formrow .port { width: 100px; }
-.host-inventories-overview .formlist .formrow .overview-link { margin-left: 10px; }
-.host-inventories-overview .formlist .formrow .interfaces { min-width: 500; }
+.inventory-host .formlist .formrow .element-row { margin-top: -3px; border-top-width: 0; }
+.inventory-host .formlist .formrow .element-row-first { border-top-width: 1px; }
+.inventory-host .formlist .formrow .default_interface { font-weight: bold; }
+.inventory-host .formlist .formrow .ip { width: 100px; }
+.inventory-host .formlist .formrow .dns { width: 200px; word-wrap:break-word; }
+.inventory-host .formlist .formrow .useip { width: 100px; }
+.inventory-host .formlist .formrow .port { width: 100px; }
+.inventory-host .formlist .formrow .overview-link { margin-top: 2px; margin-left: 10px; display: inline-block; }
+.inventory-host .formlist .formrow .link_menu { display: inline-block; }
+.inventory-host .formlist .formrow .interfaces { min-width: 500px; }
 
 /* icon mapping */
 #iconMapTable .sortable { height: 30px; }
