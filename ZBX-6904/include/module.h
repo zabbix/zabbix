@@ -46,11 +46,25 @@ ZBX_METRIC;
 /* agent request structure */
 typedef struct
 {
-	char	*key;
-	int	nparam;
-	char	**params;
+	char		*key;
+	int		nparam;
+	char		**params;
+	zbx_uint64_t	lastlogsize;
+	int		mtime;
 }
 AGENT_REQUEST;
+
+typedef struct
+{
+	char		*value;
+	char		*source;
+	zbx_uint64_t	lastlogsize;
+	int		timestamp;
+	int		severity;
+	int		logeventid;
+	int		mtime;
+}
+zbx_log_t;
 
 /* agent return structure */
 typedef struct
@@ -61,6 +75,9 @@ typedef struct
 	char		*str;
 	char		*text;
 	char		*msg;
+
+	/* null-terminated list of pointers */
+	zbx_log_t	**logs;
 }
 AGENT_RESULT;
 
@@ -69,7 +86,8 @@ AGENT_RESULT;
 #define AR_DOUBLE	0x02
 #define AR_STRING	0x04
 #define AR_TEXT		0x08
-#define AR_MESSAGE	0x10
+#define AR_LOG		0x10
+#define AR_MESSAGE	0x20
 
 /* SET RESULT */
 
@@ -97,6 +115,13 @@ AGENT_RESULT;
 (						\
 	(res)->type |= AR_TEXT,			\
 	(res)->text = (char *)(val)		\
+)
+
+/* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
+#define SET_LOG_RESULT(res, val)		\
+(						\
+	(res)->type |= AR_LOG,			\
+	(res)->logs = (zbx_log_t **)(val)	\
 )
 
 /* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
