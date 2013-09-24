@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-14 20:50+0300\n"
+"POT-Creation-Date: 2013-09-25 00:33+0300\n"
 "PO-Revision-Date: 2013-02-25 15:11+0200\n"
 "Last-Translator: halt <kisst@bgk.bme.hu>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -55,7 +55,7 @@ msgid_plural "%1$s Items"
 msgstr[0] "%1$s elem"
 msgstr[1] "%1$s elem"
 
-#: include/page_header.php:480
+#: include/page_header.php:481
 #, php-format
 msgid "%1$s failed login attempt logged. Last failed attempt was from %2$s on %3$s at %4$s."
 msgid_plural "%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s at %4$s."
@@ -501,7 +501,7 @@ msgid "Agent or SNMP or JMX or IPMI interface"
 msgstr "Ügynök vagy SNMP vagy JMX vagy IPMI intefész"
 
 #: include/hosts.inc.php:119 include/views/administration.users.edit.php:49
-#: include/views/administration.users.list.php:54 popup.php:896 users.php:43
+#: include/views/administration.users.list.php:54 popup.php:896 users.php:45
 msgid "Alias"
 msgstr "Másodlagos név"
 
@@ -512,7 +512,7 @@ msgstr "Ikonok igazítása"
 #: dashconf.php:173 dashconf.php:254 include/blocks.inc.php:1242
 #: include/blocks.inc.php:1251 include/blocks.inc.php:1296
 #: include/blocks.inc.php:1380 include/blocks.inc.php:1389
-#: include/nodes.inc.php:156 include/page_header.php:331
+#: include/nodes.inc.php:156 include/page_header.php:332
 #: include/reports.inc.php:554
 #: include/views/administration.auditlogs.list.php:42
 #: include/views/administration.auditlogs.list.php:52
@@ -742,7 +742,7 @@ msgstr "Automatikus regisztráció"
 msgid "Auto-login"
 msgstr "Autómatikus belépés"
 
-#: include/views/administration.users.edit.php:120 profile.php:47 users.php:60
+#: include/views/administration.users.edit.php:120 profile.php:50 users.php:62
 msgid "Auto-logout (min 90 seconds)"
 msgstr "Automatikus kijelentkezés (minimum 90 mp)"
 
@@ -807,7 +807,7 @@ msgctxt "Byte short"
 msgid "B"
 msgstr "B"
 
-#: include/page_header.php:224
+#: include/page_header.php:225
 msgid "BACK"
 msgstr "VISSZA"
 
@@ -924,7 +924,7 @@ msgstr "GRAFIKON PROTOTÍPUSOK KONFIGURÁCIÓJA"
 msgid "CONFIGURATION OF GRAPHS"
 msgstr "GRAFIKON KONFIGURÁCIÓ"
 
-#: adm.gui.php:107
+#: adm.gui.php:110
 msgid "CONFIGURATION OF GUI"
 msgstr ""
 
@@ -1233,11 +1233,11 @@ msgstr "A mintát nem lehet létrehozni"
 msgid "Cannot add trigger"
 msgstr "Triggerek létrehozása sikertelen"
 
-#: users.php:196
+#: users.php:198
 msgid "Cannot add user"
 msgstr "Felhasználó létrehozása sikertelen"
 
-#: users.php:150
+#: users.php:152
 msgid "Cannot add user. Both passwords must be equal."
 msgstr "Felhasználó létrehozása sikertelen. A beírt jelszavak nem azonosak."
 
@@ -1531,7 +1531,7 @@ msgstr "Triggerek törlése sikertelen"
 msgid "Cannot delete triggers created by low level discovery."
 msgstr ""
 
-#: users.php:232 users.php:318
+#: users.php:234 users.php:320
 msgid "Cannot delete user"
 msgstr "Felhasználó törlése sikertelen"
 
@@ -1779,7 +1779,7 @@ msgstr ""
 msgid "Cannot switch host for interface."
 msgstr ""
 
-#: users.php:294
+#: users.php:296
 msgid "Cannot unblock users"
 msgstr "Felhasználói-státusz engedélyezése sikertelen"
 
@@ -1862,7 +1862,7 @@ msgstr "Alkalmazás frissítése sikertelen"
 msgid "Cannot update comment"
 msgstr "Megyjegyzés frissítése sikertelen"
 
-#: adm.gui.php:66 adm.housekeeper.php:53 adm.other.php:58
+#: adm.gui.php:69 adm.housekeeper.php:53 adm.other.php:58
 #: adm.triggerdisplayoptions.php:65 adm.triggerseverities.php:69
 #: adm.workingtime.php:46
 msgid "Cannot update configuration"
@@ -1998,7 +1998,7 @@ msgstr "Minta frissítése sikertelen"
 msgid "Cannot update trigger"
 msgstr "A triggert nem lehet frissíteni"
 
-#: profile.php:173 users.php:189 users.php:251 users.php:271
+#: profile.php:176 users.php:191 users.php:253 users.php:273
 msgid "Cannot update user"
 msgstr "Felhasználó frissítése sikertelen"
 
@@ -2006,7 +2006,7 @@ msgstr "Felhasználó frissítése sikertelen"
 msgid "Cannot update user media."
 msgstr ""
 
-#: profile.php:110 users.php:147
+#: profile.php:113 users.php:149
 msgid "Cannot update user. Both passwords must be equal."
 msgstr "Felhasználó frissítése sikertelen. A beírt jelszavak nem azonosak."
 
@@ -2429,7 +2429,7 @@ msgstr ""
 msgid "Configuration of working time"
 msgstr ""
 
-#: adm.gui.php:66 adm.housekeeper.php:53 adm.other.php:58
+#: adm.gui.php:69 adm.housekeeper.php:53 adm.other.php:58
 #: adm.triggerdisplayoptions.php:65 adm.triggerseverities.php:69
 #: adm.workingtime.php:46
 msgid "Configuration updated"
@@ -2762,7 +2762,7 @@ msgstr ""
 msgid "Current host"
 msgstr ""
 
-#: include/page_header.php:363
+#: include/page_header.php:364
 msgid "Current node"
 msgstr "Kiválasztott csomópont"
 
@@ -3037,7 +3037,7 @@ msgstr ""
 msgid "Days"
 msgstr "Napok"
 
-#: include/page_header.php:249
+#: include/page_header.php:250
 msgid "Debug"
 msgstr "Hibakeresés"
 
@@ -3100,7 +3100,7 @@ msgstr "Alapértelmezett tárgy"
 msgid "Default theme"
 msgstr "Alapértelmezett téma"
 
-#: adm.gui.php:70
+#: adm.gui.php:73
 #, php-format
 msgid "Default theme \"%1$s\"."
 msgstr ""
@@ -3891,12 +3891,12 @@ msgstr "Rajz stílusa"
 msgid "Dropdown first entry"
 msgstr "Első érték kiválasztása"
 
-#: adm.gui.php:74
+#: adm.gui.php:77
 #, php-format
 msgid "Dropdown first entry \"%1$s\"."
 msgstr ""
 
-#: adm.gui.php:75
+#: adm.gui.php:78
 #, php-format
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr ""
@@ -4241,7 +4241,7 @@ msgstr ""
 msgid "Event acknowledged"
 msgstr "Esemény visszaigazolva"
 
-#: adm.gui.php:71
+#: adm.gui.php:74
 #, php-format
 msgid "Event acknowledges \"%1$s\"."
 msgstr ""
@@ -4555,7 +4555,7 @@ msgstr "Fix"
 msgid "Flexible intervals"
 msgstr ""
 
-#: profile.php:113 users.php:154
+#: profile.php:116 users.php:156
 msgid "For guest, password must be empty"
 msgstr "A vendég felhasználó (guest) jelszavának üresnek kell lennie"
 
@@ -4633,7 +4633,7 @@ msgstr ""
 msgid "GSM modem"
 msgstr "GSM modem"
 
-#: adm.gui.php:92 adm.housekeeper.php:71 adm.iconmapping.php:109
+#: adm.gui.php:95 adm.housekeeper.php:71 adm.iconmapping.php:109
 #: adm.images.php:131 adm.macros.php:158 adm.other.php:104 adm.regexps.php:208
 #: adm.triggerdisplayoptions.php:73 adm.triggerseverities.php:79
 #: adm.valuemapping.php:125 adm.workingtime.php:61
@@ -4658,7 +4658,7 @@ msgstr ""
 msgid "German (de_DE)"
 msgstr "Német (de_DE)"
 
-#: include/page_header.php:235
+#: include/page_header.php:236
 msgid "Get support"
 msgstr "Támogatás"
 
@@ -4969,7 +4969,7 @@ msgid "H.i"
 msgstr ""
 
 #: include/classes/class.cchart.php:1233 include/classes/class.cchart.php:1292
-#: include/page_header.php:485
+#: include/page_header.php:486
 msgid "H:i"
 msgstr ""
 
@@ -5029,7 +5029,7 @@ msgstr ""
 msgid "Height"
 msgstr "Magasság"
 
-#: include/page_header.php:233 include/views/general.login.php:38
+#: include/page_header.php:234 include/views/general.login.php:38
 msgid "Help"
 msgstr "Segítség"
 
@@ -5068,7 +5068,7 @@ msgstr "Választottak elrejtése"
 msgid "High"
 msgstr "Magas"
 
-#: history.php:27 include/forms.inc.php:853 include/page_header.php:455
+#: history.php:27 include/forms.inc.php:853 include/page_header.php:456
 #: include/views/configuration.item.list.php:59
 #: include/views/configuration.item.prototype.list.php:54 jsLoader.php:108
 #: latest.php:196 latest.php:321 latest.php:498
@@ -5383,7 +5383,7 @@ msgstr "Óránként"
 msgid "Hours"
 msgstr "Órák"
 
-#: adm.gui.php:93 adm.housekeeper.php:72 adm.iconmapping.php:110
+#: adm.gui.php:96 adm.housekeeper.php:72 adm.iconmapping.php:110
 #: adm.images.php:132 adm.macros.php:159 adm.other.php:105 adm.regexps.php:209
 #: adm.triggerdisplayoptions.php:74 adm.triggerseverities.php:80
 #: adm.valuemapping.php:126 adm.workingtime.php:62
@@ -5611,7 +5611,7 @@ msgstr ""
 msgid "Icon map with iconmapid \"%s\" does not exist."
 msgstr ""
 
-#: adm.gui.php:95 adm.housekeeper.php:74 adm.iconmapping.php:112
+#: adm.gui.php:98 adm.housekeeper.php:74 adm.iconmapping.php:112
 #: adm.iconmapping.php:168 adm.images.php:134 adm.macros.php:161
 #: adm.other.php:107 adm.regexps.php:211 adm.triggerdisplayoptions.php:76
 #: adm.triggerseverities.php:82 adm.valuemapping.php:128
@@ -5671,7 +5671,7 @@ msgstr ""
 msgid "Image updated"
 msgstr "Kép frissítve"
 
-#: adm.gui.php:94 adm.housekeeper.php:73 adm.iconmapping.php:111
+#: adm.gui.php:97 adm.housekeeper.php:73 adm.iconmapping.php:111
 #: adm.images.php:133 adm.macros.php:160 adm.other.php:106 adm.regexps.php:210
 #: adm.triggerdisplayoptions.php:75 adm.triggerseverities.php:81
 #: adm.valuemapping.php:127 adm.workingtime.php:63
@@ -6516,7 +6516,7 @@ msgstr "Eredmény"
 msgid "It is not possible to filter by user password."
 msgstr ""
 
-#: include/page_header.php:262
+#: include/page_header.php:263
 msgid "It is not possible to logout from HTTP authentication."
 msgstr ""
 
@@ -7161,7 +7161,7 @@ msgid "Logged in as"
 msgstr "Belépett mint"
 
 #: auditlogs.php:143 include/config.inc.php:266 include/menu.inc.php:285
-#: include/page_header.php:270
+#: include/page_header.php:271
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:64
 #: include/views/administration.users.list.php:60
@@ -7186,7 +7186,7 @@ msgstr "Bejelentkezési név vagy jelszó hiba"
 msgid "Login name or password is incorrect."
 msgstr "Bejelentkezési név vagy jelszó hiba"
 
-#: auditlogs.php:146 include/page_header.php:261 include/page_header.php:265
+#: auditlogs.php:146 include/page_header.php:262 include/page_header.php:266
 #: include/views/administration.auditlogs.list.php:44
 msgid "Logout"
 msgstr "Kilépés"
@@ -7279,7 +7279,7 @@ msgstr ""
 msgid "Macro with hostmacroid \"%1$s\" does not exist."
 msgstr ""
 
-#: adm.gui.php:97 adm.housekeeper.php:76 adm.iconmapping.php:114
+#: adm.gui.php:100 adm.housekeeper.php:76 adm.iconmapping.php:114
 #: adm.images.php:136 adm.macros.php:163 adm.other.php:109 adm.regexps.php:213
 #: adm.triggerdisplayoptions.php:78 adm.triggerseverities.php:84
 #: adm.valuemapping.php:130 adm.workingtime.php:66
@@ -7477,16 +7477,16 @@ msgstr ""
 msgid "Master node already exists."
 msgstr ""
 
-#: adm.gui.php:38 include/views/administration.general.gui.edit.php:39
+#: adm.gui.php:41 include/views/administration.general.gui.edit.php:39
 msgid "Max count of elements to show inside table cell"
 msgstr "A táblázat mezőiben maximálisan megjelenő elemek száma"
 
-#: adm.gui.php:76
+#: adm.gui.php:79
 #, php-format
 msgid "Max count of elements to show inside table cell \"%1$s\"."
 msgstr ""
 
-#: adm.gui.php:35 include/views/administration.general.gui.edit.php:45
+#: adm.gui.php:38 include/views/administration.general.gui.edit.php:45
 msgid "Max count of events per trigger to show"
 msgstr "Triggerenkénti maximálisan megjelenített eseményszám"
 
@@ -7906,7 +7906,7 @@ msgstr ""
 #: popup.php:1813 popup_right.php:75 popup_usrgrp.php:92 queue.php:250
 #: report2.php:236 screenconf.php:50 services.php:42 slideconf.php:38
 #: sysmaps.php:48 sysmaps.php:257 trigger_prototypes.php:41 triggers.php:41
-#: tr_status.php:293 users.php:44
+#: tr_status.php:293 users.php:46
 msgid "Name"
 msgstr "Név"
 
@@ -8512,7 +8512,7 @@ msgid "No scripts defined."
 msgstr ""
 
 #: include/views/configuration.slideconf.list.php:37
-#: include/views/monitoring.slides.php:38 slides.php:145
+#: include/views/monitoring.slides.php:38 slides.php:146
 msgid "No slide shows defined."
 msgstr ""
 
@@ -8591,7 +8591,7 @@ msgstr ""
 #: include/blocks.inc.php:184 include/blocks.inc.php:373
 #: include/blocks.inc.php:897 include/blocks.inc.php:1022
 #: include/blocks.inc.php:1113 include/blocks.inc.php:1415
-#: include/classes/screens/CScreenEvents.php:45 include/page_header.php:354
+#: include/classes/screens/CScreenEvents.php:45 include/page_header.php:355
 #: include/triggers.inc.php:1582 include/views/administration.node.edit.php:83
 #: include/views/configuration.httpconf.list.php:66
 #: include/views/monitoring.discovery.php:42 latest.php:190 popup.php:491
@@ -9086,7 +9086,7 @@ msgstr "Eredeti"
 msgid "Original blue"
 msgstr "Eredeti kék"
 
-#: adm.gui.php:102 adm.housekeeper.php:81 adm.iconmapping.php:119
+#: adm.gui.php:105 adm.housekeeper.php:81 adm.iconmapping.php:119
 #: adm.images.php:141 adm.macros.php:168 adm.other.php:114 adm.regexps.php:218
 #: adm.triggerdisplayoptions.php:83 adm.triggerseverities.php:89
 #: adm.valuemapping.php:135 adm.workingtime.php:71
@@ -9406,7 +9406,7 @@ msgstr "Jelszó (ismétlés)"
 msgid "Password required for media type."
 msgstr ""
 
-#: profile.php:116 users.php:157
+#: profile.php:119 users.php:159
 msgid "Password should not be empty"
 msgstr "A jelszó nem lehet üres"
 
@@ -9605,7 +9605,7 @@ msgstr ""
 msgid "Primary POC screen name"
 msgstr ""
 
-#: include/page_header.php:240
+#: include/page_header.php:241
 msgid "Print"
 msgstr "Nyomtatás"
 
@@ -9653,7 +9653,7 @@ msgstr "Számítás, ha legalább egy alárendelt elem állapota hibás"
 msgid "Problems"
 msgstr "Hibák"
 
-#: include/page_header.php:246
+#: include/page_header.php:247
 msgid "Profile"
 msgstr "Profil"
 
@@ -9798,7 +9798,7 @@ msgstr "Üzenet a helyreállásról"
 msgid "Recovery subject"
 msgstr "Visszaállás tárgya"
 
-#: include/views/administration.users.edit.php:121 profile.php:49 users.php:62
+#: include/views/administration.users.edit.php:121 profile.php:52 users.php:64
 msgid "Refresh (in seconds)"
 msgstr "Frissités (másodpercben)"
 
@@ -9868,7 +9868,7 @@ msgstr ""
 msgid "Regular expression updated"
 msgstr "Reguláris kifejezés frissítve"
 
-#: adm.gui.php:96 adm.housekeeper.php:75 adm.iconmapping.php:113
+#: adm.gui.php:99 adm.housekeeper.php:75 adm.iconmapping.php:113
 #: adm.images.php:135 adm.macros.php:162 adm.other.php:108 adm.regexps.php:212
 #: adm.triggerdisplayoptions.php:77 adm.triggerseverities.php:83
 #: adm.valuemapping.php:129 adm.workingtime.php:65
@@ -10157,7 +10157,7 @@ msgstr ""
 msgid "Rows"
 msgstr "Sorok"
 
-#: include/views/administration.users.edit.php:122 profile.php:50 users.php:63
+#: include/views/administration.users.edit.php:122 profile.php:53 users.php:65
 msgid "Rows per page"
 msgstr "Sorok oldalanként"
 
@@ -10651,7 +10651,7 @@ msgstr "Keresési tulajdonság"
 msgid "Search pattern is empty"
 msgstr "A keresési feltétel üres"
 
-#: adm.gui.php:39 include/views/administration.general.gui.edit.php:37
+#: adm.gui.php:42 include/views/administration.general.gui.edit.php:37
 msgid "Search/Filter elements limit"
 msgstr "Keresési/Szűrési limit"
 
@@ -10695,7 +10695,7 @@ msgid "Seconds"
 msgstr "Másodpercek"
 
 #: events.php:358 include/forms.inc.php:489 include/forms.inc.php:507
-#: include/forms.inc.php:529 include/page_header.php:358
+#: include/forms.inc.php:529 include/page_header.php:359
 #: include/reports.inc.php:694
 #: include/views/administration.auditacts.list.php:45
 #: include/views/administration.auditlogs.list.php:59
@@ -10744,7 +10744,7 @@ msgstr "Másodpercek"
 msgid "Select"
 msgstr "Kiválaszt"
 
-#: include/page_header.php:324
+#: include/page_header.php:325
 msgid "Select Nodes"
 msgstr "Csomópont kiválasztása"
 
@@ -10961,16 +10961,16 @@ msgstr "Letiltott scenario-k megjelenítése"
 msgid "Show disabled triggers"
 msgstr "Letiltott triggerek megjelenítése"
 
-#: adm.gui.php:73
+#: adm.gui.php:76
 #, php-format
 msgid "Show events max \"%1$s\"."
 msgstr ""
 
-#: adm.gui.php:34 include/views/administration.general.gui.edit.php:43
+#: adm.gui.php:37 include/views/administration.general.gui.edit.php:43
 msgid "Show events not older than (in days)"
 msgstr ""
 
-#: adm.gui.php:72
+#: adm.gui.php:75
 #, php-format
 msgid "Show events not older than (in days) \"%1$s\"."
 msgstr ""
@@ -11428,7 +11428,7 @@ msgid "Support"
 msgstr ""
 
 #: include/views/administration.users.edit.php:51
-#: include/views/administration.users.list.php:56 popup.php:898 users.php:45
+#: include/views/administration.users.list.php:56 popup.php:898 users.php:47
 msgid "Surname"
 msgstr "Vezetéknév"
 
@@ -11935,7 +11935,7 @@ msgstr "Trigger megjegyzései"
 msgid "Trigger deleted"
 msgstr "Trigger törölve"
 
-#: adm.gui.php:101 adm.housekeeper.php:80 adm.iconmapping.php:118
+#: adm.gui.php:104 adm.housekeeper.php:80 adm.iconmapping.php:118
 #: adm.images.php:140 adm.macros.php:167 adm.other.php:113 adm.regexps.php:217
 #: adm.triggerdisplayoptions.php:82 adm.triggerseverities.php:88
 #: adm.valuemapping.php:134 adm.workingtime.php:70
@@ -11992,7 +11992,7 @@ msgstr ""
 msgid "Trigger prototypes of"
 msgstr ""
 
-#: adm.gui.php:100 adm.housekeeper.php:79 adm.iconmapping.php:117
+#: adm.gui.php:103 adm.housekeeper.php:79 adm.iconmapping.php:117
 #: adm.images.php:139 adm.macros.php:166 adm.other.php:112 adm.regexps.php:216
 #: adm.triggerdisplayoptions.php:81 adm.triggerseverities.php:87
 #: adm.valuemapping.php:133 adm.workingtime.php:69
@@ -12536,7 +12536,7 @@ msgstr "Felhasználó"
 msgid "User \"%s\" cannot be without user group."
 msgstr ""
 
-#: users.php:196
+#: users.php:198
 msgid "User added"
 msgstr "Új felhasználó felvéve"
 
@@ -12561,7 +12561,7 @@ msgstr "A felhasználó nem módosíthatja saját státuszát"
 msgid "User cannot change status of himself."
 msgstr ""
 
-#: users.php:232 users.php:318
+#: users.php:234 users.php:320
 msgid "User deleted"
 msgstr "Felhasználó törölve"
 
@@ -12641,7 +12641,7 @@ msgstr "Felhasználói profil"
 msgid "User type"
 msgstr "Felhasználó típus"
 
-#: profile.php:173 users.php:189 users.php:251 users.php:271
+#: profile.php:176 users.php:191 users.php:253 users.php:273
 msgid "User updated"
 msgstr "Felhasználó frissítve"
 
@@ -12674,7 +12674,7 @@ msgstr "Felhasználók (bejelentkezve)"
 msgid "Users status updated"
 msgstr "Felhasználói-státusz frissítve"
 
-#: users.php:294
+#: users.php:296
 msgid "Users unblocked"
 msgstr "Felhasználói-zárolás megszüntetve"
 
@@ -12754,7 +12754,7 @@ msgstr "Érték-hozzárendelés frissítve"
 msgid "Value map with valuemapid \"%1$s\" does not exist."
 msgstr ""
 
-#: adm.gui.php:98 adm.housekeeper.php:77 adm.iconmapping.php:115
+#: adm.gui.php:101 adm.housekeeper.php:77 adm.iconmapping.php:115
 #: adm.images.php:137 adm.macros.php:164 adm.other.php:110 adm.regexps.php:214
 #: adm.triggerdisplayoptions.php:79 adm.triggerseverities.php:85
 #: adm.valuemapping.php:131 adm.valuemapping.php:187 adm.workingtime.php:67
@@ -12999,7 +12999,7 @@ msgstr "Triggerek nélkül"
 msgid "Wizard"
 msgstr "Varázsló"
 
-#: adm.gui.php:99 adm.housekeeper.php:78 adm.iconmapping.php:116
+#: adm.gui.php:102 adm.housekeeper.php:78 adm.iconmapping.php:116
 #: adm.images.php:138 adm.macros.php:165 adm.other.php:111 adm.regexps.php:215
 #: adm.triggerdisplayoptions.php:80 adm.triggerseverities.php:86
 #: adm.valuemapping.php:132 adm.workingtime.php:68
@@ -13374,7 +13374,7 @@ msgstr ""
 msgid "Zabbix server IP or port is not set!"
 msgstr ""
 
-#: adm.gui.php:40
+#: adm.gui.php:43
 msgid "Zabbix server activity check interval"
 msgstr ""
 
@@ -13390,7 +13390,7 @@ msgstr ""
 msgid "Zabbix server is running"
 msgstr "A Zabbix szerver fut"
 
-#: adm.gui.php:77
+#: adm.gui.php:80
 #, php-format
 msgid "Zabbix server is running check interval \"%1$s\"."
 msgstr ""
@@ -13488,7 +13488,7 @@ msgctxt "day short"
 msgid "d"
 msgstr "n"
 
-#: include/maintenances.inc.php:57 include/page_header.php:484
+#: include/maintenances.inc.php:57 include/page_header.php:485
 #: include/translateDefines.inc.php:42
 #: include/views/configuration.item.list.php:101 report3.php:134
 msgid "d M Y"
