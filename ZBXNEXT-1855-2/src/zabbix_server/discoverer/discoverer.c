@@ -669,11 +669,12 @@ static void	process_rule(DB_DRULE *drule)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	process_discovery(int now)
+static int	process_discovery(int now)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_DRULE	drule;
+	int		rule_count = 0;
 
 	result = DBselect(
 			"select distinct r.druleid,r.iprange,r.name,c.dcheckid"
@@ -706,8 +707,11 @@ static void	process_discovery(int now)
 
 		DBexecute("update drules set nextcheck=%d+delay where druleid=" ZBX_FS_UI64,
 				now, drule.druleid);
+		rule_count++;
 	}
 	DBfree_result(result);
+
+	return rule_count;	/* performance metric */
 }
 
 static int	get_minnextcheck(int now)
@@ -751,7 +755,7 @@ static int	get_minnextcheck(int now)
  ******************************************************************************/
 void	main_discoverer_loop(void)
 {
-	int	now, nextcheck, sleeptime;
+	int	now, nextcheck, sleeptime, rule_count;
 	double	sec;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_discoverer_loop() process_num:%d", process_num);
@@ -766,7 +770,7 @@ void	main_discoverer_loop(void)
 
 		now = time(NULL);
 		sec = zbx_time();
-		process_discovery(now);
+		rule_count = process_discovery(now);
 		sec = zbx_time() - sec;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while processing rules",
@@ -775,8 +779,8 @@ void	main_discoverer_loop(void)
 		nextcheck = get_minnextcheck(now);
 		sleeptime = calculate_sleeptime(nextcheck, DISCOVERER_DELAY);
 
-		zbx_setproctitle("%s #%d [discovered in " ZBX_FS_DBL " sec, sleeping %d sec]",
-				get_process_type_string(process_type), process_num, sec, sleeptime);
+		zbx_setproctitle("%s #%d [processed %d rules in " ZBX_FS_DBL " sec, sleeping %d sec]",
+				get_process_type_string(process_type), process_num, rule_count, sec, sleeptime);
 
 		zbx_sleep_loop(sleeptime);
 	}
