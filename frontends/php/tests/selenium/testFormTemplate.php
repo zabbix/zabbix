@@ -76,12 +76,12 @@ class testFormTemplate extends CWebTest {
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestClickWait('link='.$this->template_tmp);
 		$this->zbxTestClick('tab_macroTab');
-		$this->type('macros_0_macro', '{$TEST_MACRO}');
-		$this->type('macros_0_value', '1');
+		$this->input_type('macros_0_macro', '{$TEST_MACRO}');
+		$this->input_type('macros_0_value', '1');
 		$this->zbxTestClick('macro_add');
 		$this->verifyElementPresent('macros_1_macro');
-		$this->type('macros_1_macro', '{$TEST_MACRO2}');
-		$this->type('macros_1_value', '2');
+		$this->input_type('macros_1_macro', '{$TEST_MACRO2}');
+		$this->input_type('macros_1_value', '2');
 		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent('Template updated');
 	}
