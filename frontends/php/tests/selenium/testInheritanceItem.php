@@ -765,7 +765,7 @@ class testInheritanceItem extends CWebTest {
 					'key' =>'key-item-inheritance',
 					'errors' => array(
 						'ERROR: Cannot add item',
-						'Item with key "key-item-inheritance" already exists on "Inheritance test template".')
+						'Item with key "key-item-inheritance" already exists on "Template inheritance test host", inherited from another template.')
 				)
 			),
 			// List of all item types
@@ -1091,7 +1091,7 @@ class testInheritanceItem extends CWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceItem_SimpleCreate($data) {
-		$this->zbxTestLogin('items.php?hostid=30000');
+		$this->zbxTestLogin('items.php?groupid=0&hostid=30000');
 
 		if (isset($data['name'])) {
 			$itemName = $data['name'];
