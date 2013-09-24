@@ -138,7 +138,7 @@ static void	history_sender(struct zbx_json *j, int *records, const char *tag,
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-void	main_datasender_loop()
+void	main_datasender_loop(void)
 {
 	int		records, r;
 	double		sec;
@@ -183,8 +183,13 @@ retry_autoreg_host:
 		if (ZBX_MAX_HRECORDS == r)
 			goto retry_autoreg_host;
 
+		sec = zbx_time() - sec;
+
 		zabbix_log(LOG_LEVEL_DEBUG, "Datasender spent " ZBX_FS_DBL " seconds while processing %3d values.",
-				zbx_time() - sec, records);
+				sec, records);
+
+		zbx_setproctitle("%s [sent %d values in " ZBX_FS_DBL " sec, sleeping %d sec]",
+				get_process_type_string(process_type), records, sec, CONFIG_PROXYDATA_FREQUENCY);
 
 		zbx_sleep_loop(CONFIG_PROXYDATA_FREQUENCY);
 	}

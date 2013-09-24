@@ -78,7 +78,7 @@ static void	send_heartbeat()
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	main_heart_loop()
+void	main_heart_loop(void)
 {
 	int	start, sleeptime;
 
@@ -93,6 +93,8 @@ void	main_heart_loop()
 		send_heartbeat();
 
 		sleeptime = CONFIG_HEARTBEAT_FREQUENCY - (time(NULL) - start);
+
+		zbx_setproctitle("%s [sleeping %d sec]", get_process_type_string(process_type), sleeptime);
 
 		zbx_sleep_loop(sleeptime);
 	}

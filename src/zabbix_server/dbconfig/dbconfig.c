@@ -45,7 +45,7 @@ extern unsigned char	process_type;
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-void	main_dbconfig_loop()
+void	main_dbconfig_loop(void)
 {
 	double	sec;
 

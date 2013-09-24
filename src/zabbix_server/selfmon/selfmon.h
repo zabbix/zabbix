@@ -20,6 +20,6 @@
 #ifndef ZABBIX_SELFMON_H
 #define ZABBIX_SELFMON_H
 
-void	main_selfmon_loop();
+void	main_selfmon_loop(void);
 
 #endif
