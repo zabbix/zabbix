@@ -267,7 +267,7 @@ void	*DCget_stats(int request);
 
 zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 
-void	DCsync_configuration();
+void	DCsync_configuration(void);
 void	init_configuration_cache();
 void	free_configuration_cache();
 void	DCload_config();

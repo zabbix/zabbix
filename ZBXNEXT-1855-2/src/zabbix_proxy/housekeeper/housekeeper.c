@@ -159,8 +159,10 @@ void	main_housekeeper_loop(void)
 
 		records = housekeeping_history(start);
 
+		sec = zbx_time() - sec;
+
 		zabbix_log(LOG_LEVEL_WARNING, "housekeeper deleted %d records from history (spent " ZBX_FS_DBL " seconds)",
-				records, zbx_time() - sec);
+				records, sec);
 
 		DBclose();
 

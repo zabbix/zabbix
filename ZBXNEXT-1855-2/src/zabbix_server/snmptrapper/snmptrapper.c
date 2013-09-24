@@ -463,7 +463,7 @@ static int	get_latest_data()
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
-void	main_snmptrapper_loop()
+void	main_snmptrapper_loop(void)
 {
 	const char	*__function_name = "main_snmptrapper_loop";
 

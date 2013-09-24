@@ -24,7 +24,7 @@
 
 extern unsigned char	process_type;
 
-void	main_selfmon_loop()
+void	main_selfmon_loop(void)
 {
 	const char	*__function_name = "main_selfmon_loop";
 

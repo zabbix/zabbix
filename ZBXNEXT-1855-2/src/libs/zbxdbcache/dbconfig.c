@@ -2493,7 +2493,7 @@ static DB_RESULT	DCsync_config_select()
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
-void	DCsync_configuration()
+void	DCsync_configuration(void)
 {
 	const char		*__function_name = "DCsync_configuration";
 
