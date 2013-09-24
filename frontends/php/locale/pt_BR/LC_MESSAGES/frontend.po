@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-25 00:33+0300\n"
-"PO-Revision-Date: 2013-07-17 12:07+0200\n"
+"POT-Creation-Date: 2013-09-25 00:50+0300\n"
+"PO-Revision-Date: 2013-09-11 21:06+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -11,8 +11,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Pootle 2.1.6\n"
+"X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
+"X-POOTLE-MTIME: 1378926385.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -1511,7 +1512,7 @@ msgstr "Não é possível deletar itens do template."
 #: api/classes/CTrigger.php:1027 api/classes/CTriggerPrototype.php:925
 #, php-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
-msgstr "Não é possível excluir a trigger \"%1$s:%2$s\" do template."
+msgstr "Não é possível excluir a trigger \"%1$s:%2$s\", ela é oriunda de um template."
 
 #: trigger_prototypes.php:177 triggers.php:166
 msgid "Cannot delete trigger"
@@ -1668,6 +1669,7 @@ msgstr "Não pode ter espaço vazio no nome do template"
 msgid "Cannot implode expression \"%s\"."
 msgstr "Não foi possível agrupar a expressão \"%s\"."
 
+# The original translation dont have %1$s... so the translation too..
 #: include/classes/import/importers/CScreenImporter.php:78
 #, php-format
 msgid "Cannot import screen \"%2$s\": subscreen \"%3$s\" does not exist."
@@ -1760,22 +1762,22 @@ msgstr "Não foi possível definir o ID de template para o gráfico \"%1$s\"."
 #: api/classes/CItemGeneral.php:223
 #, php-format
 msgid "Cannot set \"templateid\" for item \"%1$s\"."
-msgstr "Não foi possível definir o \"ID de template\" para o item \"%1$s\"."
+msgstr "Não foi possível definir o \"templateid\" para o item \"%1$s\"."
 
 #: api/classes/CScreen.php:437
 #, php-format
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
-msgstr "Não foi possível definir o \"ID de template\" para a tela \"%1$s\"."
+msgstr "Não foi possível definir o \"templateid\" para a tela \"%1$s\"."
 
 #: api/classes/CTrigger.php:1012
 #, php-format
 msgid "Cannot set \"templateid\" for trigger \"%1$s\"."
-msgstr "Não foi possível definir o \"ID de template\" para a trigger \"%1$s\"."
+msgstr "Não foi possível definir o \"templateid\" para a trigger \"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:759
 #, php-format
 msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
-msgstr "Não foi possível definir o \"ID de template\" para o protótipo de trigger \"%1$s\"."
+msgstr "Não foi possível definir o \"templateid\" para o protótipo de trigger \"%1$s\"."
 
 #: api/classes/CHostInterface.php:510
 msgid "Cannot switch host for interface."
@@ -1825,32 +1827,32 @@ msgstr "Não é possível desvincular a trigger \"%s\", tem itens do template qu
 #: api/classes/CApplication.php:456
 #, php-format
 msgid "Cannot update \"templateid\" for application \"%1$s\"."
-msgstr "Não foi possível atualizar o \"ID de template\" para a aplicação \"%1$s\"."
+msgstr "Não foi possível atualizar o \"templateid\" para a aplicação \"%1$s\"."
 
 #: api/classes/CGraphGeneral.php:59
 #, php-format
 msgid "Cannot update \"templateid\" for graph \"%1$s\"."
-msgstr "Não foi possível atualizar o \"ID de template\" para o gráfico \"%1$s\"."
+msgstr "Não foi possível atualizar o \"templateid\" para o gráfico \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:184
 #, php-format
 msgid "Cannot update \"templateid\" for item \"%1$s\"."
-msgstr "Não foi possível atualizar o \"ID de template\" para o item \"%1$s\"."
+msgstr "Não foi possível atualizar o \"templateid\" para o item \"%1$s\"."
 
 #: api/classes/CScreen.php:508 api/classes/CTemplateScreen.php:739
 #, php-format
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
-msgstr "Não foi possível atualizar o \"ID de template\" para a tela \"%1$s\"."
+msgstr "Não foi possível atualizar o \"templateid\" para a tela \"%1$s\"."
 
 #: api/classes/CTrigger.php:1009
 #, php-format
 msgid "Cannot update \"templateid\" for trigger \"%1$s\"."
-msgstr "Não foi possível atualizar o \"ID de template\" para a trigger \"%1$s\"."
+msgstr "Não foi possível atualizar o \"templateid\" para a trigger \"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:831
 #, php-format
 msgid "Cannot update \"templateid\" for trigger prototype \"%1$s\"."
-msgstr "Não foi possível atualizar o \"ID de template\" para o protótipo de trigger \"%1$s\"."
+msgstr "Não foi possível atualizar o \"templateid\" para o protótipo de trigger \"%1$s\"."
 
 #: actionconf.php:145
 msgid "Cannot update action"
@@ -2742,12 +2744,12 @@ msgstr "Erro crítico. O campo \"%1$s\" deve estar faltando."
 #: include/validate.inc.php:507
 #, php-format
 msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field."
-msgstr "Erro crítico. Valor incorreto \"%1$s\" para o campo \"%2$s\"."
+msgstr "Erro crítico. O valor \"%1$s\" é inválido para o campo \"%2$s\"."
 
 #: include/validate.inc.php:497
 #, php-format
 msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
-msgstr "Erro crítico. Valor incorreto \"%1$s\" para o campo \"%2$s\": deve estar entre %3$s e %4$s."
+msgstr "Erro crítico. O valor \"%1$s\" é inválido para o campo \"%2$s\": deve estar entre %3$s e %4$s."
 
 #: include/validate.inc.php:488
 #, php-format
@@ -3897,7 +3899,7 @@ msgstr "Arraste para cá para mudar o tipo da interface para \"SNMP\"."
 
 #: include/views/configuration.host.edit.php:223
 msgid "Drag here to change the type of the interface to \"agent\" type."
-msgstr "Arraste para cá para mudar o tipo da interface para \"Agente Zabbix\"."
+msgstr "Arraste para cá para mudar o tipo da interface para \"agente\"."
 
 #: include/views/configuration.graph.edit.php:72
 msgid "Draw style"
@@ -3925,7 +3927,7 @@ msgstr "Dependência duplicada na trigger \"%1$s\"."
 #: api/classes/CHost.php:1361
 #, php-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
-msgstr "Host duplicado. Já existe registro de outro Host usando o hostname \"%s\"."
+msgstr "Host duplicado. Já existe registro de outro Host usando o nome \"%s\"."
 
 #: api/classes/CHost.php:1393
 #, php-format
@@ -4204,11 +4206,11 @@ msgstr "Descrição do erro"
 
 #: api/classes/CScript.php:516
 msgid "Error description: can't read script response, check connection."
-msgstr "Descrição do erro: Não foi possível receber a resposta do script, verifique as conexões."
+msgstr "Descrição do erro: não foi possível receber a resposta do script, verifique a conexão."
 
 #: api/classes/CScript.php:493
 msgid "Error description: can't send command, check connection."
-msgstr "Descrição do erro: Não foi possível enviar o comando, verifique as conexões."
+msgstr "Descrição do erro: não foi possível enviar o comando, verifique a conexão."
 
 #: api/classes/CScript.php:509
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value."
@@ -5576,7 +5578,7 @@ msgstr "O mapeamento de ícone \"%1$s\" não pode ser apagado. Ele é usado no m
 #: api/classes/CIconMap.php:528
 #, php-format
 msgid "Icon map \"%1$s\" has mapping with incorrect iconid \"%2$s\"."
-msgstr "O ícone do mapa \"%1$s\" possui um mapeamento com um ID de ícone incorreto \"%2$s\"."
+msgstr "O ícone do mapa \"%1$s\" possui um mapeamento com um iconid incorreto \"%2$s\"."
 
 #: api/classes/CIconMap.php:524
 #, php-format
@@ -5860,7 +5862,7 @@ msgstr "A ação possui condição com tipo inválido."
 
 #: api/classes/CAction.php:918
 msgid "Incorrect action conditionid."
-msgstr "A ação possui condição com ID inválido."
+msgstr "A ação possui conditionid inválido."
 
 #: api/classes/CAction.php:1543
 msgid "Incorrect action operation command type."
@@ -5909,7 +5911,7 @@ msgstr "A ação possui operação com usuário inválido. O usuário não exist
 
 #: api/classes/CAction.php:943
 msgid "Incorrect action operationid."
-msgstr "A ação possui uma operação com ID inválido."
+msgstr "A ação possui um operationid inválido."
 
 #: api/classes/CService.php:1123
 #, php-format
@@ -6191,7 +6193,7 @@ msgstr "Range de portas incorreto."
 
 #: api/classes/CDRule.php:463
 msgid "Incorrect proxyid."
-msgstr "O ID do proxy é inválido."
+msgstr "O proxyid é inválido."
 
 #: api/classes/CScreenItem.php:419
 msgid "Incorrect resource type provided for screen item."
@@ -6266,7 +6268,7 @@ msgstr "O horário \"%1$s\" é um período incorreto."
 #: api/classes/CService.php:1192
 #, php-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
-msgstr "O serviço \"%1$s\" possui um trigger ID inválido."
+msgstr "O serviço \"%1$s\" possui um ID de trigger inválido."
 
 #: include/triggers.inc.php:596
 msgid "Incorrect trigger expression"
@@ -6433,7 +6435,7 @@ msgstr "Erro interno no JSON-RPC."
 
 #: api/rpc/class.cjsonrpc.php:201
 msgid "Internal error."
-msgstr "Erro Interno."
+msgstr "Erro interno."
 
 #: include/views/configuration.httpconf.edit.php:69
 msgid "Internet Explorer"
@@ -6729,7 +6731,7 @@ msgstr "Interface JMX"
 #: api/rpc/class.cjsonrpc.php:149
 #, php-format
 msgid "JSON-rpc error generation failed. No such error \"%s\"."
-msgstr "Falha ao gerar o erro JSON-rpc. O erro \"%s\" não existe."
+msgstr "Falha ao gerar o erro JSON-RPC. O erro \"%s\" não existe."
 
 #: api/rpc/class.cjsonrpc.php:95
 msgid "JSON-rpc method is not defined."
@@ -7293,12 +7295,12 @@ msgstr "O nome da macro \"%1$s\" é muito longo, o valor não deve exceder 64 ca
 #: api/classes/CUserMacro.php:1072
 #, php-format
 msgid "Macro with globalmacroid \"%1$s\" does not exist."
-msgstr "Não existe macro com o ID global \"%1$s\"."
+msgstr "Não existe macro com o globalmacroid \"%1$s\"."
 
 #: api/classes/CUserMacro.php:1012
 #, php-format
 msgid "Macro with hostmacroid \"%1$s\" does not exist."
-msgstr "Não existe macro com o ID de host \"%1$s\"."
+msgstr "Não existe macro com o hostmacroid \"%1$s\"."
 
 #: adm.gui.php:100 adm.housekeeper.php:76 adm.iconmapping.php:114
 #: adm.images.php:136 adm.macros.php:163 adm.other.php:109 adm.regexps.php:213
@@ -7992,7 +7994,7 @@ msgstr "Novo grupo"
 #: include/views/configuration.host.edit.php:191
 #: include/views/configuration.host.massupdate.php:50
 msgid "New host group"
-msgstr "Novo grupo de Hosts"
+msgstr "Novo grupo de hosts"
 
 #: popup_bitem.php:94
 msgid "New item for the graph"
@@ -8203,7 +8205,7 @@ msgstr "Não foi informado o ID do gráfico para o elemento na tela."
 #: include/graphs.inc.php:294
 #, php-format
 msgid "No graph item with graphid \"%s\"."
-msgstr "Sem item de gráfico com o ID \"%s\"."
+msgstr "Sem item de gráfico com graphid \"%s\"."
 
 #: include/views/configuration.graph.list.php:73
 msgid "No graph prototypes defined."
@@ -8260,17 +8262,17 @@ msgstr "Sem grupos de host definidos."
 #: include/hosts.inc.php:490
 #, php-format
 msgid "No host groups with groupid \"%s\"."
-msgstr "Sem grupo de host com o ID \"%s\"."
+msgstr "Sem grupo de host com groupid \"%s\"."
 
 #: include/hosts.inc.php:1176
 #, php-format
 msgid "No host with applicationid \"%1$s\"."
-msgstr "Não foi localizado host com o ID de aplicação \"%1$s\"."
+msgstr "Não foi localizado host com applicationid \"%1$s\"."
 
 #: include/hosts.inc.php:530
 #, php-format
 msgid "No host with hostid \"%s\"."
-msgstr "Sem host com o ID \"%s\"."
+msgstr "Sem host com hostid \"%s\"."
 
 #: hostinventoriesoverview.php:84 hostinventories.php:154 hosts.php:679
 #: popup.php:542
@@ -8334,12 +8336,12 @@ msgstr "Não foram definidos protótipos de item."
 #: include/items.inc.php:443
 #, php-format
 msgid "No item with itemid \"%1$s\"."
-msgstr "Não existe item com o ID \"%1$s\"."
+msgstr "Não existe item com itemid \"%1$s\"."
 
 #: include/items.inc.php:427
 #, php-format
 msgid "No item with itemid=\"%1$s\"."
-msgstr "Sem item com o ID=\"%1$s\"."
+msgstr "Sem item com itemid=\"%1$s\"."
 
 #: chart.php:49 include/items.inc.php:725
 #: include/views/configuration.graph.edit.php:62
@@ -8570,7 +8572,7 @@ msgstr "Sem trigger"
 #: include/triggers.inc.php:266
 #, php-format
 msgid "No trigger with triggerid \"%1$s\"."
-msgstr "Sem trigger com o ID \"%1$s\"."
+msgstr "Sem trigger com triggerid \"%1$s\"."
 
 #: chart4.php:40 include/triggers.inc.php:1153
 #: include/views/configuration.triggers.list.php:90 popup.php:973
@@ -9718,7 +9720,7 @@ msgstr "Proxy removido"
 
 #: include/views/administration.proxy.edit.php:82
 msgid "Proxy hosts"
-msgstr "Hosts do Proxy"
+msgstr "Hosts do proxy"
 
 #: api/classes/CProxy.php:402
 msgid "Proxy interface creation failed."
@@ -11115,7 +11117,7 @@ msgstr "Observações"
 
 #: include/hosts.inc.php:374
 msgid "Site rack location"
-msgstr "Localização do Rack"
+msgstr "Localização do rack"
 
 #: include/hosts.inc.php:359
 msgid "Site state / province"
@@ -11991,15 +11993,15 @@ msgstr "A trigger foi adicionada. Ainda não exitem atualizações de status."
 
 #: include/views/configuration.sysmap.edit.php:108
 msgid "Trigger label type"
-msgstr "Tipo de rótulo da Trigger"
+msgstr "Tipo de rótulo da trigger"
 
 #: include/actions.inc.php:52
 msgid "Trigger name"
-msgstr "Nome da Trigger"
+msgstr "Nome da trigger"
 
 #: include/audit.inc.php:34
 msgid "Trigger prototype"
-msgstr "Protótipo de Trigger"
+msgstr "Protótipo de trigger"
 
 #: include/html.inc.php:428 include/html.inc.php:432
 #: include/views/configuration.host.discovery.list.php:89

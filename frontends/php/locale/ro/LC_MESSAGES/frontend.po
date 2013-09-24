@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-25 00:33+0300\n"
-"PO-Revision-Date: 2013-09-11 18:18+0300\n"
-"Last-Translator: altmir <rmircea@birotec.ro>\n"
+"POT-Creation-Date: 2013-09-25 00:50+0300\n"
+"PO-Revision-Date: 2013-09-24 21:26+0300\n"
+"Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: Birotec\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2);;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1378916290.0\n"
+"X-POOTLE-MTIME: 1380050797.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -25,7 +25,6 @@ msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
 msgstr "\"%s\" trebuie să fie între 1970.01.01 și 2038.01.18."
 
 #: include/profiles.inc.php:286
-#, fuzzy
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
 msgstr "\"Afișează triggeri OK\" trebuie să fie \"0\" sau o variabilă pozitivă de tip int."
 
@@ -1737,7 +1736,7 @@ msgstr "Nu se poate face actualizare în masă a numelui vizibil al template-ulu
 #: api/classes/CHostGeneral.php:160
 #, php-format
 msgid "Cannot pass duplicate template IDs for the linkage: %s."
-msgstr "Nu se pot valida ID-urile duplicat pentru legatura: %s."
+msgstr "Nu se poate face actualizare în masă a numelui vizibil al template-ului"
 
 #: include/classes/db/DB.php:614
 #, php-format
@@ -4526,11 +4525,11 @@ msgstr "Fișierul este prea mare, mărimea de upload este %1$s octeți."
 #: include/classes/class.cview.php:68
 #, php-format
 msgid "File provided to a view does not exist. Tried to find \"%s\"."
-msgstr ""
+msgstr "Fișierul prevăzut pentru vizualizare nu există. Încercare de a găsi \"%s\"."
 
 #: include/graphs.inc.php:67
 msgid "Filled region"
-msgstr ""
+msgstr "Zone pline"
 
 #: dashconf.php:265 events.php:373 hostinventories.php:134 hosts.php:657
 #: include/classes/class.cwidget.php:130 include/forms.inc.php:574
@@ -4540,79 +4539,79 @@ msgstr ""
 #: include/views/configuration.item.edit.php:334
 #: include/views/monitoring.history.php:124 latest.php:141 tr_status.php:248
 msgid "Filter"
-msgstr ""
+msgstr "Filtru"
 
 #: include/reports.inc.php:108
 msgid "Filter by host group"
-msgstr ""
+msgstr "Filtru de grup de servere"
 
 #: tr_status.php:244
 msgid "Filter by name"
-msgstr ""
+msgstr "Filtru după nume"
 
 #: popup_trexpr.php:298
 msgid "Find string V in last (most recent) value. N = 1 - if found, 0 - otherwise"
-msgstr ""
+msgstr "Găseste șirul V in ultima (cea mai recentă) valoare. N = 1 - dacă e găsit, 0 - altfel"
 
 #: popup_trexpr.php:303
 msgid "Find string V in last (most recent) value. N NOT 1 - if found, 0 - otherwise"
-msgstr ""
+msgstr "Găseste șirul V in ultima (cea mai recentă) valoare. N NU 1 - dacă e găsit, 0 - altfel"
 
 #: include/setup.inc.php:130
 msgid "Finish"
-msgstr ""
+msgstr "Sfârșit"
 
 #: include/locales.inc.php:51
 msgid "Finnish (fi_FI)"
-msgstr ""
+msgstr "Finlandeză (fi_FI)"
 
 #: include/forms.inc.php:1597 include/maintenances.inc.php:103
 msgid "First"
-msgstr ""
+msgstr "Primul"
 
 #: include/func.inc.php:1656
 msgctxt "page navigation"
 msgid "First"
-msgstr ""
+msgstr "Primul"
 
 #: include/views/js/configuration.sysmaps.js.php:40
 msgid "Fit to map"
-msgstr ""
+msgstr "Încadrează în hartă"
 
 #: include/views/configuration.graph.edit.php:163
 #: include/views/configuration.graph.edit.php:221
 msgid "Fixed"
-msgstr ""
+msgstr "Fixat"
 
 #: include/views/configuration.item.edit.php:296
 #: include/views/configuration.item.massupdate.php:298
 msgid "Flexible intervals"
-msgstr ""
+msgstr "Intervale flexibile"
 
 #: profile.php:116 users.php:156
 msgid "For guest, password must be empty"
-msgstr ""
+msgstr "Pentru musafir, parola trebuie să fie nulă"
 
 #: include/items.inc.php:1338 include/views/configuration.item.edit.php:200
 msgid "Formula"
-msgstr ""
+msgstr "Formulă"
 
 #: include/forms.inc.php:1600 include/maintenances.inc.php:106
 msgid "Fourth"
-msgstr ""
+msgstr "al patrulea"
 
 #: include/locales.inc.php:52
 msgid "French (fr_FR)"
-msgstr ""
+msgstr "Franceză (fr_FR)"
 
 #: include/func.inc.php:199
 msgid "Fri"
-msgstr ""
+msgstr "Fri"
 
 #: include/forms.inc.php:1531 include/forms.inc.php:1612
 #: include/func.inc.php:127 include/func.inc.php:211
 msgid "Friday"
-msgstr ""
+msgstr "Vineri"
 
 #: include/reports.inc.php:130 include/reports.inc.php:241
 #: include/reports.inc.php:610 include/views/configuration.action.edit.php:418
@@ -4621,51 +4620,51 @@ msgstr ""
 #: include/views/js/configuration.sysmaps.js.php:308 popup_period.php:130
 #: report3.php:145 report4.php:180 services.php:187 services.php:193
 msgid "From"
-msgstr ""
+msgstr "De la"
 
 #: include/views/administration.usergroups.edit.php:62
 #: include/views/administration.usergroups.edit.php:68
 #: include/views/administration.usergroups.list.php:49
 #: include/views/administration.users.list.php:61
 msgid "Frontend access"
-msgstr ""
+msgstr "Acces la interfață"
 
 #: usergrps.php:246
 msgid "Frontend access updated"
-msgstr ""
+msgstr "Acces la interfață actualizat"
 
 #: include/views/administration.users.edit.php:182
 msgid "Frontend messaging"
-msgstr ""
+msgstr "Mesaje de interfață"
 
 #: include/views/configuration.host.edit.php:640
 #: include/views/configuration.template.edit.php:436
 msgid "Full clone"
-msgstr ""
+msgstr "Clonă completă"
 
 #: include/html.inc.php:260
 msgid "Fullscreen"
-msgstr ""
+msgstr "Pe tot ecranul"
 
 #: include/views/configuration.graph.edit.php:71
 #: include/views/configuration.triggers.expression.php:66 popup_bitem.php:133
 msgid "Function"
-msgstr ""
+msgstr "Funcție"
 
 #: include/classes/validators/CTriggerFunctionValidator.php:71
 #, php-format
 msgid "Function supports \"%1$s\" parameters."
-msgstr ""
+msgstr "Funcția suportă parametri \"%1$s\"."
 
 #: include/func.inc.php:566
 msgctxt "Giga short"
 msgid "G"
-msgstr ""
+msgstr "G"
 
 #: include/views/administration.mediatypes.edit.php:60
 #: include/views/administration.mediatypes.list.php:57
 msgid "GSM modem"
-msgstr ""
+msgstr "Modem GSM"
 
 #: adm.gui.php:95 adm.housekeeper.php:71 adm.iconmapping.php:109
 #: adm.images.php:131 adm.macros.php:158 adm.other.php:104 adm.regexps.php:208
@@ -4673,48 +4672,48 @@ msgstr ""
 #: adm.valuemapping.php:125 adm.workingtime.php:61
 #: include/views/administration.general.gui.edit.php:51
 msgid "GUI"
-msgstr ""
+msgstr "Interfață grafică utilizator"
 
 #: include/classes/class.cwebuser.php:41 include/classes/class.cwebuser.php:99
 msgid "GUI access disabled."
-msgstr ""
+msgstr "Acces la interfața grafică utilizator dezactivată"
 
 #: include/menu.inc.php:228
 msgid "General"
-msgstr ""
+msgstr "General"
 
 #: chart4.php:180 chart5.php:200 include/classes/class.cbar.php:770
 #, php-format
 msgid "Generated in %s sec"
-msgstr ""
+msgstr "Generat în %s secunde"
 
 #: include/locales.inc.php:53
 msgid "German (de_DE)"
-msgstr ""
+msgstr "Germană (de_DE)"
 
 #: include/page_header.php:236
 msgid "Get support"
-msgstr ""
+msgstr "Cere suport"
 
 #: include/func.inc.php:566
 msgid "Giga"
-msgstr ""
+msgstr "Giga"
 
 #: include/triggers.inc.php:1738 tr_testexpr.php:36
 msgid "Given expression is not a macro"
-msgstr ""
+msgstr "Expresia dată nu este macro"
 
 #: include/classes/class.globalregexp.php:71
 msgid "Global expression does not exist."
-msgstr ""
+msgstr "Expresia globală nu există."
 
 #: include/views/configuration.action.edit.php:649
 msgid "Global script"
-msgstr ""
+msgstr "Script global"
 
 #: popup.php:127
 msgid "Global scripts"
-msgstr ""
+msgstr "Scripturi globale"
 
 #: hosts.php:879
 #: include/views/administration.general.regularexpressions.list.php:62
@@ -4738,19 +4737,19 @@ msgstr ""
 #: include/views/configuration.triggers.list.php:240 sysmaps.php:296
 #: templates.php:621 tr_status.php:783
 msgid "Go"
-msgstr ""
+msgstr "Start"
 
 #: include/views/js/monitoring.maps.js.php:51 jsLoader.php:177
 msgid "Go to"
-msgstr ""
+msgstr "Mergi la"
 
 #: include/views/configuration.httpconf.edit.php:97
 msgid "Google Chrome"
-msgstr ""
+msgstr "Google Chrome"
 
 #: include/graphs.inc.php:75
 msgid "Gradient line"
-msgstr ""
+msgstr "Linie în degrade"
 
 #: include/audit.inc.php:29 include/blocks.inc.php:1143
 #: include/screens.inc.php:30 include/views/configuration.graph.edit.php:287
@@ -4758,123 +4757,123 @@ msgstr ""
 #: include/views/monitoring.history.php:60 latest.php:318 latest.php:495
 #: report2.php:240
 msgid "Graph"
-msgstr ""
+msgstr "Grafic"
 
 #: api/classes/CGraph.php:601 api/classes/CGraphPrototype.php:648
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (inherited from another template)."
-msgstr ""
+msgstr "Graficul \"%1$s\" există deja pe \"%2$s\" (moștenit de la alt șablon)."
 
 #: api/classes/CGraph.php:622 api/classes/CGraph.php:629
 #: api/classes/CGraphPrototype.php:670 api/classes/CGraphPrototype.php:677
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (items are not identical)."
-msgstr ""
+msgstr "Graficul \"%1$s\" există deja pe \"%2$s\" (itemii nu sunt identici)."
 
 #: api/classes/CGraph.php:580 api/classes/CGraphPrototype.php:627
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "Graficul \"%1$s\" există deja pe \"%2$s\"."
 
 #: api/classes/CGraph.php:554 api/classes/CGraphPrototype.php:601
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymax value item)."
-msgstr ""
+msgstr "Graficul \"%1$s\" nu poate moșteni. Nu se cer itemi pe \"%2$s\" (valoare item Ymax)."
 
 #: api/classes/CGraph.php:562 api/classes/CGraphPrototype.php:609
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymin value item)."
-msgstr ""
+msgstr "Graficul \"%1$s\" nu poate moșteni. Nu se cer itemi pe \"%2$s\" (valoare item Ymin)."
 
 #: api/classes/CGraph.php:548 api/classes/CGraphPrototype.php:595
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
-msgstr ""
+msgstr "Graficul \"%1$s\" nu poate moșteni. Nu se cer itemi pe \"%2$s\"."
 
 #: api/classes/CTemplateScreen.php:658
 #, php-format
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
-msgstr ""
+msgstr "Graficul \"%1$s\" nu există pe șablonul \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:1558
 #: include/classes/import/CXmlImport18.php:1562
 #, php-format
 msgid "Graph \"%1$s\" skipped - user rule."
-msgstr ""
+msgstr "Graficul \"%1$s\" sărit - regulă de utilizator."
 
 #: api/classes/CGraph.php:38
 #, php-format
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
-msgstr ""
+msgstr "Graficul \"%1$s\" cu itemi șablon nu poate să conțină itemi de la alte servere."
 
 #: graphs.php:246
 msgid "Graph added"
-msgstr ""
+msgstr "Grafic adăugat"
 
 #: graphs.php:257
 msgid "Graph deleted"
-msgstr ""
+msgstr "Grafic șters"
 
 #: include/audit.inc.php:30
 msgid "Graph element"
-msgstr ""
+msgstr "Element grafic"
 
 #: popup_bitem.php:28
 msgid "Graph item"
-msgstr ""
+msgstr "Item grafic"
 
 #: include/views/configuration.screen.constructor.edit.php:140
 msgid "Graph name"
-msgstr ""
+msgstr "Nume grafic"
 
 #: api/classes/CGraphPrototype.php:34
 #, php-format
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
-msgstr ""
+msgstr "Prototip de grafic \"%1$s\" cu itemi șablon nu poate să conțină itemi de la alte servere."
 
 #: api/classes/CGraphPrototype.php:793
 #, php-format
 msgid "Graph prototype \"%s\" deleted."
-msgstr ""
+msgstr "Prototip grafic \"%s\" șters."
 
 #: api/classes/CGraphPrototype.php:856
 msgid "Graph prototype must have at least one prototype."
-msgstr ""
+msgstr "Prototipul grafic trebuie să aibă cel puțin un prototip."
 
 #: include/html.inc.php:453 include/html.inc.php:457
 #: include/views/configuration.host.discovery.list.php:90
 #: include/views/configuration.host.edit.php:494
 #: include/views/configuration.template.edit.php:365
 msgid "Graph prototypes"
-msgstr ""
+msgstr "Prototipi grafici"
 
 #: include/views/configuration.graph.list.php:32
 msgid "Graph prototypes of"
-msgstr ""
+msgstr "Prototipi grafici ai"
 
 #: include/graphs.inc.php:44
 #: include/views/js/configuration.graph.edit.js.php:28
 msgid "Graph sum"
-msgstr ""
+msgstr "Sumă grafică"
 
 #: include/views/configuration.graph.edit.php:59
 #: include/views/configuration.graph.list.php:80 popup.php:1345 popup.php:1351
 msgid "Graph type"
-msgstr ""
+msgstr "Tip grafic"
 
 #: graphs.php:243
 msgid "Graph updated"
-msgstr ""
+msgstr "Grafic actualizat"
 
 #: api/classes/CGraphGeneral.php:120
 #, php-format
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
-msgstr ""
+msgstr "Graficul cu numele \"%1$s\" există deja în grafic sau în prototipurile de grafic."
 
 #: api/classes/CGraph.php:583 api/classes/CGraph.php:604
 #: api/classes/CGraphPrototype.php:630 api/classes/CGraphPrototype.php:651
 msgid "Graph with same name but other type exist."
-msgstr ""
+msgstr "Există grafic cu același nume dar de alt tip."
 
 #: dashboard.php:260 hosts.php:686 hosts.php:765 include/blocks.inc.php:1242
 #: include/html.inc.php:464 include/html.inc.php:468 include/items.inc.php:802
@@ -4887,23 +4886,23 @@ msgstr ""
 #: popup.php:93 search.php:139 search.php:172 search.php:191 search.php:371
 #: search.php:401 search.php:424 templates.php:461 templates.php:527
 msgid "Graphs"
-msgstr ""
+msgstr "Grafice"
 
 #: graphs.php:310
 msgid "Graphs copied"
-msgstr ""
+msgstr "Grafice copiate"
 
 #: graphs.php:264
 msgid "Graphs deleted"
-msgstr ""
+msgstr "Grafice șterse"
 
 #: include/locales.inc.php:54
 msgid "Greek (el_GR)"
-msgstr ""
+msgstr "Greacă (el_GR)"
 
 #: include/views/js/configuration.sysmaps.js.php:60 sysmap.php:192
 msgid "Grid"
-msgstr ""
+msgstr "Grilă"
 
 #: events.php:298 hostinventoriesoverview.php:79 hostinventories.php:93
 #: hostinventories.php:158 hosts.php:642 httpmon.php:120
@@ -4929,61 +4928,61 @@ msgstr ""
 #: include/views/monitoring.slides.php:80 latest.php:124 popup.php:502
 #: templates.php:445 tr_status.php:172
 msgid "Group"
-msgstr ""
+msgstr "Grup"
 
 #: include/classes/import/importers/CTemplateImporter.php:233
 #, php-format
 msgid "Group \"%1$s\" does not exist."
-msgstr ""
+msgstr "Grupul \"%1$s\" nu există."
 
 #: include/classes/import/importers/CHostImporter.php:131
 #, php-format
 msgid "Group \"%1$s\" for host \"%2$s\" does not exist."
-msgstr ""
+msgstr "Grupul \"%1$s\" pentru serverul \"%2$s\" nu există."
 
 #: api/classes/CHostGroup.php:746
 #, php-format
 msgid "Group \"%1$s\" is internal and can not be deleted."
-msgstr ""
+msgstr "Grupul \"%1$s\" este intern și nu poate fi șters."
 
 #: api/classes/CHostGroup.php:769
 #, php-format
 msgid "Group \"%s\" cannot be deleted, because it is used in a global script."
-msgstr ""
+msgstr "Grupul \"%s\" nu poate fi șters, pentru că este utilizat într-un script global."
 
 #: api/classes/CHostGroup.php:754
 #, php-format
 msgid "Group \"%s\" cannot be deleted, because some hosts depend on it."
-msgstr ""
+msgstr "Grupul \"%s\" nu poate fi șters, pentru că unele servere depind de el."
 
 #: hostgroups.php:144 usergrps.php:173
 msgid "Group added"
-msgstr ""
+msgstr "Grup adăugat"
 
 #: hostgroups.php:155 hostgroups.php:166 usergrps.php:191 usergrps.php:219
 msgid "Group deleted"
-msgstr ""
+msgstr "Grup șters"
 
 #: include/views/administration.general.other.edit.php:37
 msgid "Group for discovered hosts"
-msgstr ""
+msgstr "Grup pentru servere detectate"
 
 #: adm.other.php:71
 msgid "Group for discovered hosts."
-msgstr ""
+msgstr "Grup pentru servere detectate."
 
 #: include/views/administration.usergroups.edit.php:39
 #: include/views/configuration.hostgroups.edit.php:35
 msgid "Group name"
-msgstr ""
+msgstr "Nume grup"
 
 #: hostgroups.php:114 usergrps.php:168
 msgid "Group updated"
-msgstr ""
+msgstr "Grup actualizat"
 
 #: hostinventoriesoverview.php:80
 msgid "Grouping by"
-msgstr ""
+msgstr "Grupare după"
 
 #: dashconf.php:217 include/reports.inc.php:546
 #: include/views/administration.users.edit.php:80
@@ -4992,20 +4991,20 @@ msgstr ""
 #: include/views/configuration.template.edit.php:135
 #: include/views/conf.import.php:26 popup_usrgrp.php:25 popup_usrgrp.php:49
 msgid "Groups"
-msgstr ""
+msgstr "Grupuri"
 
 #: include/views/configuration.maintenance.edit.php:198
 msgid "Groups in maintenance"
-msgstr ""
+msgstr "Grupuri în mentenanță"
 
 #: include/translateDefines.inc.php:50
 msgid "H.i"
-msgstr ""
+msgstr "H.i"
 
 #: include/classes/class.cchart.php:1233 include/classes/class.cchart.php:1292
 #: include/page_header.php:486
 msgid "H:i"
-msgstr ""
+msgstr "H:i"
 
 #: include/blocks.inc.php:365 include/blocks.inc.php:704
 #: include/blocks.inc.php:772 include/blocks.inc.php:982
@@ -5013,46 +5012,46 @@ msgstr ""
 #: include/classes/screens/CScreenSystemStatus.php:47
 #: include/views/configuration.item.list.php:102
 msgid "H:i:s"
-msgstr ""
+msgstr "H:i:s"
 
 #: events.php:282
 msgid "HISTORY OF EVENTS"
-msgstr ""
+msgstr "ISTORIC AL EVENIMENTELOR"
 
 #: hostinventories.php:84
 msgid "HOST INVENTORIES"
-msgstr ""
+msgstr "INVENTAR SERVER"
 
 #: hostinventoriesoverview.php:61
 msgid "HOST INVENTORY OVERVIEW"
-msgstr ""
+msgstr "PREZENTARE GENERALĂ INVENTAR SERVER"
 
 #: include/discovery.inc.php:61
 #: include/views/administration.authentication.edit.php:39
 #: include/views/js/configuration.discovery.edit.js.php:121
 msgid "HTTP"
-msgstr ""
+msgstr "HTTP"
 
 #: authentication.php:188
 msgid "HTTP authentication"
-msgstr ""
+msgstr "Autentificare HTTP"
 
 #: include/discovery.inc.php:72
 #: include/views/js/configuration.discovery.edit.js.php:122
 msgid "HTTPS"
-msgstr ""
+msgstr "HTTPS"
 
 #: include/hosts.inc.php:249
 msgid "HW architecture"
-msgstr ""
+msgstr "Arhitectură HW"
 
 #: include/hosts.inc.php:169
 msgid "Hardware"
-msgstr ""
+msgstr "Hardware"
 
 #: include/hosts.inc.php:174
 msgid "Hardware (Full details)"
-msgstr ""
+msgstr "Hardware (Detalii complete)"
 
 #: graphs.php:43 include/views/configuration.graph.edit.php:55
 #: include/views/configuration.graph.list.php:79
@@ -5061,82 +5060,82 @@ msgstr ""
 #: include/views/js/configuration.sysmaps.js.php:52 screenedit.php:44
 #: sysmaps.php:50 sysmaps.php:259
 msgid "Height"
-msgstr ""
+msgstr "Înălțime"
 
 #: include/page_header.php:234 include/views/general.login.php:38
 msgid "Help"
-msgstr ""
+msgstr "Ajutor"
 
 #: include/items.inc.php:134
 msgid "Hexadecimal"
-msgstr ""
+msgstr "Hexazecimal"
 
 #: jsLoader.php:140 sysmap.php:158
 msgid "Hidden"
-msgstr ""
+msgstr "Ascuns"
 
 #: include/classes/class.cuiwidget.php:58
 #: include/classes/class.cwidget.php:183 include/html.inc.php:146
 msgid "Hide"
-msgstr ""
+msgstr "Ascunde"
 
 #: tr_status.php:206
 msgid "Hide all"
-msgstr ""
+msgstr "Ascunde tot"
 
 #: include/views/configuration.httpconf.list.php:47
 msgid "Hide disabled scenarios"
-msgstr ""
+msgstr "Ascunde scenarii dezafecte"
 
 #: include/views/configuration.triggers.list.php:54
 #: include/views/configuration.triggers.list.php:69
 msgid "Hide disabled triggers"
-msgstr ""
+msgstr "Ascunde trigerii dezactivați"
 
 #: include/views/monitoring.history.php:108
 msgid "Hide selected"
-msgstr ""
+msgstr "Ascunde obiectul selectat"
 
 #: adm.triggerseverities.php:62
 #: include/views/administration.general.triggerSeverity.edit.php:58
 msgid "High"
-msgstr ""
+msgstr "Ridicat"
 
 #: history.php:27 include/forms.inc.php:853 include/page_header.php:456
 #: include/views/configuration.item.list.php:59
 #: include/views/configuration.item.prototype.list.php:54 jsLoader.php:108
 #: latest.php:196 latest.php:321 latest.php:498
 msgid "History"
-msgstr ""
+msgstr "Istoric"
 
 #: jsLoader.php:109
 msgid "History and simple graphs"
-msgstr ""
+msgstr "Istoric și grafice simple"
 
 #: httpconf.php:351 httpconf.php:354 items.php:469 items.php:472 items.php:624
 #: items.php:628
 msgid "History cleared"
-msgstr ""
+msgstr "Istoric șters"
 
 #: include/views/configuration.item.edit.php:460
 msgid "History clearing can take a long time. Continue?"
-msgstr ""
+msgstr "Golirea istoricului poate lua o perioadă lungă de timp. Continuare?"
 
 #: include/screens.inc.php:31
 msgid "History of actions"
-msgstr ""
+msgstr "Istoric al acțiunilor"
 
 #: include/screens.inc.php:32
 msgid "History of events"
-msgstr ""
+msgstr "Istoric al evenimentelor"
 
 #: include/views/configuration.screen.constructor.edit.php:546
 msgid "Horizontal"
-msgstr ""
+msgstr "Orizontal"
 
 #: include/views/configuration.screen.constructor.edit.php:590
 msgid "Horizontal align"
-msgstr ""
+msgstr "Aliniere orizontală"
 
 #: events.php:302 events.php:509 events.php:560 events.php:573
 #: hostinventories.php:157 httpconf.php:190 httpconf.php:289 httpconf.php:313
@@ -5177,60 +5176,60 @@ msgstr ""
 #: popup.php:476 popup.php:514 popup.php:1091 popup.php:1285 queue.php:249
 #: report2.php:235 report5.php:60 tr_status.php:173 tr_status.php:292
 msgid "Host"
-msgstr ""
+msgstr "Server"
 
 #: api/classes/CHost.php:1695
 #, php-format
 msgid "Host \"%1$s\" already exists."
-msgstr ""
+msgstr "Serverul „%1$s” există deja."
 
 #: api/classes/CProxy.php:643
 #, php-format
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
-msgstr ""
+msgstr "Serverul \"%1$s\" este monitorizat cu proxy \"%2$s\"."
 
 #: api/classes/CTemplate.php:1004
 #, php-format
 msgid "Host \"%s\" already exists."
-msgstr ""
+msgstr "Serverul „%s” există deja."
 
 #: include/classes/import/CXmlImport18.php:927
 #, php-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
-msgstr ""
+msgstr "Serverul \"%s\" are verificat parametrul \"useipmi\", dar nu are parametrul \"ipmi_ip\"! Utilizarea adresei IP a serverului ca o adresă pentru interfața IPMI"
 
 #: include/views/configuration.screen.constructor.edit.php:343
 msgid "Host (ascending)"
-msgstr ""
+msgstr "Server (ascendent)"
 
 #: include/actions.inc.php:76
 msgid "Host IP"
-msgstr ""
+msgstr "IP server"
 
 #: include/forms.inc.php:1717
 msgid "Host Inventory"
-msgstr ""
+msgstr "Inventar server"
 
 #: include/views/administration.script.list.php:43
 msgid "Host access"
-msgstr ""
+msgstr "Acces server"
 
 #: hosts.php:326
 msgid "Host added"
-msgstr ""
+msgstr "Server adăugat"
 
 #: api/classes/CHostInterface.php:1005
 msgid "Host cannot have more than one default interface of the same type."
-msgstr ""
+msgstr "Serverul nu poate avea mai mult de o interfață implicită de același tip."
 
 #: hostinventoriesoverview.php:88
 #: include/views/administration.proxy.list.php:48
 msgid "Host count"
-msgstr ""
+msgstr "Contor server"
 
 #: hosts.php:508 hosts.php:532
 msgid "Host deleted"
-msgstr ""
+msgstr "Server șters"
 
 #: include/actions.inc.php:60 include/audit.inc.php:35
 #: include/blocks.inc.php:185 include/blocks.inc.php:374
@@ -5245,20 +5244,20 @@ msgstr ""
 #: include/views/js/configuration.sysmaps.js.php:79 jsLoader.php:145
 #: search.php:258
 msgid "Host group"
-msgstr ""
+msgstr "Grup server"
 
 #: api/classes/CHostGroup.php:650 api/classes/CHostGroup.php:703
 #, php-format
 msgid "Host group \"%1$s\" already exists."
-msgstr ""
+msgstr "Grupul server \"%1$s\" există deja."
 
 #: include/views/js/configuration.sysmaps.js.php:31
 msgid "Host group elements"
-msgstr ""
+msgstr "Elementele grupului de servere"
 
 #: include/views/configuration.sysmap.edit.php:92
 msgid "Host group label type"
-msgstr ""
+msgstr "Tipul etichetei grupului server"
 
 #: dashconf.php:180 include/forms.inc.php:197 include/menu.inc.php:160
 #: include/views/administration.script.edit.php:91
@@ -5267,24 +5266,24 @@ msgstr ""
 #: include/views/configuration.item.copy.php:43 popup.php:57 popup.php:109
 #: search.php:320
 msgid "Host groups"
-msgstr ""
+msgstr "Grupuri de servere"
 
 #: include/views/configuration.item.edit.php:131
 #: include/views/configuration.item.massupdate.php:84
 msgid "Host interface"
-msgstr ""
+msgstr "Interfață server"
 
 #: hostinventories.php:26 jsLoader.php:180
 msgid "Host inventories"
-msgstr ""
+msgstr "Inventare server"
 
 #: include/views/configuration.host.edit.php:630
 msgid "Host inventory"
-msgstr ""
+msgstr "Inventar server"
 
 #: hostinventoriesoverview.php:26
 msgid "Host inventory overview"
-msgstr ""
+msgstr "Prezentare generală inventar server"
 
 #: include/views/configuration.sysmap.edit.php:100
 msgid "Host label type"
