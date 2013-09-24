@@ -167,6 +167,7 @@ frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/js/flickerfreescreen.js -text svneol=unset#text/plain
+frontends/php/js/menupopup.js -text svneol=unset#text/plain
 frontends/php/js/multiselect.js -text svneol=unset#text/plain
 frontends/php/js/servercheck.js -text
 frontends/php/js/vendors/activity-indicator.js -text svneol=unset#text/plain
@@ -190,6 +191,7 @@ frontends/php/locale/nl/LC_MESSAGES/frontend.po -text
 frontends/php/locale/pl/LC_MESSAGES/frontend.po -text
 frontends/php/locale/pt_BR/LC_MESSAGES/frontend.po -text
 frontends/php/locale/pt_PT/LC_MESSAGES/frontend.po -text
+frontends/php/locale/ro/LC_MESSAGES/frontend.po -text
 frontends/php/locale/ru/LC_MESSAGES/frontend.po -text
 frontends/php/locale/sk/LC_MESSAGES/frontend.po -text
 frontends/php/locale/sv/LC_MESSAGES/frontend.po -text
@@ -533,6 +535,7 @@ misc/init.d/fedora/core5/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
+src/libs/zbxsysinfo/win32/wmi.cpp -text
 src/zabbix_java/lib/logback-classic-0.9.27.jar -text
 src/zabbix_java/lib/logback-core-0.9.27.jar -text
 src/zabbix_java/lib/org-json-2010-12-28.jar -text
