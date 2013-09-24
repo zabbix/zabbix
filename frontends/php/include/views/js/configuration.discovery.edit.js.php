@@ -604,35 +604,35 @@
 						jQuery('#add_new_dcheck').prop('disabled', false);
 					}
 				});
-
-			jQuery.when(jqxhr).done(function() {
-				jQuery('#add_new_dcheck').prop('disabled', false);
-
-				if (validationErrors.length) {
-					showModalWindow(
-						t(<?php echo CJs::encodeJson(_('Discovery check error')); ?>),
-						validationErrors.join('\n'),
-						[{text: t(<?php echo CJs::encodeJson(_('Close')); ?>), click: function() {
-							jQuery(this).dialog('destroy');
-						}}]
-					);
-				}
-				else {
-					dCheck.name = jQuery('#type :selected').text();
-
-					if (typeof dCheck.ports !== 'undefined' && dCheck.ports != discoveryCheckDefaultPort(dCheck.type)) {
-						dCheck.name += ' (' + dCheck.ports + ')';
-					}
-					if (dCheck.key_) {
-						dCheck.name += ' "' + dCheck.key_ + '"';
-					}
-
-					addPopupValues([dCheck]);
-
-					jQuery('#new_check_form').remove();
-				}
-			});
 		}
+
+		jQuery.when(jqxhr).done(function() {
+			jQuery('#add_new_dcheck').prop('disabled', false);
+
+			if (validationErrors.length) {
+				showModalWindow(
+					t(<?php echo CJs::encodeJson(_('Discovery check error')); ?>),
+					validationErrors.join('\n'),
+					[{text: t(<?php echo CJs::encodeJson(_('Close')); ?>), click: function() {
+						jQuery(this).dialog('destroy');
+					}}]
+				);
+			}
+			else {
+				dCheck.name = jQuery('#type :selected').text();
+
+				if (typeof dCheck.ports !== 'undefined' && dCheck.ports != discoveryCheckDefaultPort(dCheck.type)) {
+					dCheck.name += ' (' + dCheck.ports + ')';
+				}
+				if (dCheck.key_) {
+					dCheck.name += ' "' + dCheck.key_ + '"';
+				}
+
+				addPopupValues([dCheck]);
+
+				jQuery('#new_check_form').remove();
+			}
+		});
 	}
 
 	function selectUniquenessCriteriaDefault() {
