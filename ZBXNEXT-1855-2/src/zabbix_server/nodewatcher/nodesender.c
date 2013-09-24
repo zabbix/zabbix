@@ -829,7 +829,7 @@ void node_sync_unlock(int nodeid)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void process_nodes()
+void process_nodes(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
