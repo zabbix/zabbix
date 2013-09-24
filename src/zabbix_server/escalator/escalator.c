@@ -934,6 +934,7 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *event, DB_
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	userid, mediatypeid;
+	ZBX_USER_MSG	*user_msg = NULL, *p;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -948,28 +949,39 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *event, DB_
 					" and alerttype=%d",
 				action->actionid, escalation->eventid, ALERT_TYPE_MESSAGE);
 
-		subject_dyn = zbx_strdup(NULL, action->shortdata);
-		message_dyn = zbx_strdup(NULL, action->longdata);
-
-		substitute_simple_macros(&action->actionid, event, r_event, NULL, NULL, NULL, NULL, NULL,
-						&subject_dyn, MACRO_TYPE_MESSAGE_RECOVERY, NULL, 0);
-		substitute_simple_macros(&action->actionid, event, r_event, NULL, NULL, NULL, NULL, NULL,
-						&message_dyn, MACRO_TYPE_MESSAGE_RECOVERY, NULL, 0);
-
 		while (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(userid, row[0]);
 			ZBX_STR2UINT64(mediatypeid, row[1]);
 
+			subject_dyn = zbx_strdup(NULL, action->shortdata);
+			message_dyn = zbx_strdup(NULL, action->longdata);
+
+			substitute_simple_macros(&action->actionid, event, r_event, &userid, NULL, NULL, NULL, NULL,
+					&subject_dyn, MACRO_TYPE_MESSAGE_RECOVERY, NULL, 0);
+			substitute_simple_macros(&action->actionid, event, r_event, &userid, NULL, NULL, NULL, NULL,
+					&message_dyn, MACRO_TYPE_MESSAGE_RECOVERY, NULL, 0);
+
 			escalation->esc_step = 0;
 
-			add_message_alert(escalation, event, r_event, action, userid, mediatypeid, subject_dyn,
-					message_dyn);
-		}
-		zbx_free(subject_dyn);
-		zbx_free(message_dyn);
+			add_user_msg(userid, mediatypeid, &user_msg, subject_dyn, message_dyn);
 
+			zbx_free(subject_dyn);
+			zbx_free(message_dyn);
+		}
 		DBfree_result(result);
+
+		while (NULL != user_msg)
+		{
+			p = user_msg;
+			user_msg = user_msg->next;
+
+			add_message_alert(escalation, event, r_event, action, p->userid, p->mediatypeid, p->subject, p->message);
+
+			zbx_free(p->subject);
+			zbx_free(p->message);
+			zbx_free(p);
+		}
 	}
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "escalation stopped: recovery message not defined (actionid:" ZBX_FS_UI64
