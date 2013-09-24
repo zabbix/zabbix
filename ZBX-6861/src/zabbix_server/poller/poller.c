@@ -25,6 +25,7 @@
 #include "zbxserver.h"
 #include "zbxself.h"
 #include "../events.h"
+#include "zbxalarm.h"
 
 #include "poller.h"
 
@@ -510,9 +511,9 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 #endif
 			break;
 		case ITEM_TYPE_TELNET:
-			alarm(CONFIG_TIMEOUT);
+			zbx_alarm_set(CONFIG_TIMEOUT);
 			res = get_value_telnet(item, result);
-			alarm(0);
+			zbx_alarm_remove();
 			break;
 		case ITEM_TYPE_JMX:
 			alarm(CONFIG_TIMEOUT);

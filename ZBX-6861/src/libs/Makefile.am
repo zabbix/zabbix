@@ -10,6 +10,7 @@ DIST_SUBDIRS = \
 	zbxmedia \
 	zbxcrypto \
 	zbxcommon \
+	zbxalarm \
 	zbxcomms \
 	zbxcommshigh \
 	zbxlog \
@@ -61,6 +62,7 @@ SUBDIRS = \
 	zbxconf \
 	zbxsysinfo \
 	zbxsys \
+	zbxalarm \
 	zbxcomms \
 	zbxjson \
 	zbxexec \

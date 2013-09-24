@@ -21,6 +21,7 @@
 #include "comms.h"
 #include "telnet.h"
 #include "log.h"
+#include "zbxalarm.h"
 
 static char	prompt_char = '\0';
 
@@ -65,7 +66,7 @@ static ssize_t	telnet_socket_read(ZBX_SOCKET socket_fd, void *buf, size_t count)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	while (ZBX_TCP_ERROR == (rc = ZBX_TCP_READ(socket_fd, buf, count)))
+	while (ZBX_TCP_ERROR == (rc = ZBX_TCP_READ(socket_fd, buf, count)) && 0 == zbx_alarm_check())
 	{
 		error = zbx_sock_last_error();	/* zabbix_log() resets the error code */
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d errno:%d error:[%s]",
@@ -106,7 +107,7 @@ static ssize_t	telnet_socket_write(ZBX_SOCKET socket_fd, const void *buf, size_t
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	while (ZBX_TCP_ERROR == (rc = ZBX_TCP_WRITE(socket_fd, buf, count)))
+	while (ZBX_TCP_ERROR == (rc = ZBX_TCP_WRITE(socket_fd, buf, count)) && 0 == zbx_alarm_check())
 	{
 		error = zbx_sock_last_error();	/* zabbix_log() resets the error code */
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d errno:%d error:[%s]",
