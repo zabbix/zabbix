@@ -25,25 +25,17 @@ class CTabView extends CDiv {
 	protected $tabs = array();
 	protected $headers = array();
 	protected $selectedTab = null;
-	protected $rememberTab = false;
 
 	public function __construct($data = array()) {
 		if (isset($data['id'])) {
 			$this->id = $data['id'];
-		}
-		if (isset($data['remember'])) {
-			$this->setRemember($data['remember']);
 		}
 		if (isset($data['selected'])) {
 			$this->setSelected($data['selected']);
 		}
 		parent::__construct();
 		$this->attr('id', zbx_formatDomId($this->id));
-		$this->attr('class', 'hidden');
-	}
-
-	public function setRemember($remember) {
-		$this->rememberTab = $remember;
+		$this->attr('class', 'tabs');
 	}
 
 	public function setSelected($selected) {
@@ -58,7 +50,7 @@ class CTabView extends CDiv {
 
 	public function toString($destroy = true) {
 		if (count($this->tabs) == 1) {
-			$this->setAttribute('class', 'ui-tabs ui-widget ui-widget-content ui-corner-all widget');
+			$this->setAttribute('class', 'min-width ui-tabs ui-widget ui-widget-content ui-corner-all widget');
 
 			$header = reset($this->headers);
 			$header = new CDiv($header);
@@ -72,23 +64,37 @@ class CTabView extends CDiv {
 		}
 		else {
 			$headersList = new CList();
+
 			foreach ($this->headers as $id => $header) {
 				$tabLink = new CLink($header, '#'.$id, null, null, false);
 				$tabLink->setAttribute('id', 'tab_'.$id);
 				$headersList->addItem($tabLink);
 			}
+
 			$this->addItem($headersList);
 			$this->addItem($this->tabs);
 
-			$options = array();
-			if (!is_null($this->selectedTab)) {
-				$options['selected'] = $this->selectedTab;
+			if ($this->selectedTab === null) {
+				$activeTab = get_cookie('tab', 0);
+				$createEvent = '';
 			}
-			if ($this->rememberTab) {
-				$options['cookie'] = array();
+			else {
+				$activeTab = $this->selectedTab;
+				$createEvent = 'create: function() { jQuery.cookie("tab", '.$this->selectedTab.'); },';
 			}
-			zbx_add_post_js('jQuery("#'.$this->id.'").tabs('.zbx_jsvalue($options, true).').show();');
+
+			zbx_add_post_js('
+				jQuery("#'.$this->id.'").tabs({
+					'.$createEvent.'
+					active: '.$activeTab.',
+					activate: function(event, ui) {
+						jQuery.cookie("tab", ui.newTab.index().toString());
+					}
+				})
+				.css("visibility", "visible");'
+			);
 		}
+
 		return parent::toString($destroy);
 	}
 }

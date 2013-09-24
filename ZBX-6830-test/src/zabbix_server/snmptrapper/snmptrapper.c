@@ -78,7 +78,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 	char			cmd[MAX_STRING_LEN], params[MAX_STRING_LEN], regex[MAX_STRING_LEN],
 				error[ITEM_ERROR_LEN_MAX];
 	size_t			num, i;
-	int			ret = FAIL, fb = -1, *lastclocks = NULL, *errcodes = NULL, timestamp;
+	int			ret = FAIL, fb = -1, *lastclocks = NULL, *errcodes = NULL;
 	zbx_uint64_t		*itemids = NULL;
 	unsigned char		*states = NULL;
 	AGENT_RESULT		*results = NULL;
@@ -153,14 +153,15 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 		switch (errcodes[i])
 		{
 			case SUCCEED:
-				timestamp = 0;
-
 				if (ITEM_VALUE_TYPE_LOG == items[i].value_type)
-					calc_timestamp(trap, &timestamp, items[i].logtimefmt);
+				{
+					calc_timestamp(results[i].logs[0]->value, &results[i].logs[0]->timestamp,
+							items[i].logtimefmt);
+				}
 
 				items[i].state = ITEM_STATE_NORMAL;
 				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i],
-						ts, items[i].state, NULL, timestamp, NULL, 0, 0, 0, 0);
+						ts, items[i].state, NULL);
 
 				itemids[i] = items[i].itemid;
 				states[i] = items[i].state;
@@ -169,7 +170,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 			case NOTSUPPORTED:
 				items[i].state = ITEM_STATE_NOTSUPPORTED;
 				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL,
-						ts, items[i].state, results[i].msg, 0, NULL, 0, 0, 0, 0);
+						ts, items[i].state, results[i].msg);
 
 				itemids[i] = items[i].itemid;
 				states[i] = items[i].state;
@@ -183,7 +184,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 
 	zbx_free(results);
 
-	DCrequeue_items(itemids, states, lastclocks, errcodes, num);
+	DCrequeue_items(itemids, states, lastclocks, NULL, NULL, errcodes, num);
 
 	zbx_free(errcodes);
 	zbx_free(lastclocks);
