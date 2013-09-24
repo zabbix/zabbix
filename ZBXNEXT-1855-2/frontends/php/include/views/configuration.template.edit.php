@@ -18,8 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-// include JS + templates
-include('include/views/js/configuration.host.edit.macros.js.php');
 
 $divTabs = new CTabView();
 if (!isset($_REQUEST['form_refresh'])) {
