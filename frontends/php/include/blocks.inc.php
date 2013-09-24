@@ -958,14 +958,6 @@ function make_latest_issues(array $filter = array()) {
 				'clock' => $trigger['lastEvent']['clock'],
 				'ns' => $trigger['lastEvent']['ns']
 			)));
-			$description = new CCol(
-				new CLink($description, resolveTriggerUrl($trigger), null, null, true),
-				getSeverityStyle($trigger['priority'])
-			);
-			$description->setHint(
-				make_popup_eventlist($trigger['triggerid'], $trigger['lastEvent']['eventid']),
-				'', '', false
-			);
 
 			// ack
 			$ack = getEventAckState($trigger['lastEvent'], empty($filter['backUrl']) ? true : $filter['backUrl'],
@@ -977,11 +969,26 @@ function make_latest_issues(array $filter = array()) {
 			// description
 			$description = CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, array(
 				'clock' => $trigger['lastchange'],
+				'ns' => '999999999'
 			)));
-			$description = new CSpan($description, 'pointer');
 
 			// ack
 			$ack = new CSpan(_('No events'), 'unknown');
+		}
+
+		// description
+		if (!zbx_empty($trigger['url'])) {
+			$description = new CLink($description, resolveTriggerUrl($trigger), null, null, true);
+		}
+		else {
+			$description = new CSpan($description, 'pointer');
+		}
+		$description = new CCol($description, getSeverityStyle($trigger['priority']));
+		if ($trigger['lastEvent']) {
+			$description->setHint(
+				make_popup_eventlist($trigger['triggerid'], $trigger['lastEvent']['eventid']),
+				'', '', false
+			);
 		}
 
 		// clock

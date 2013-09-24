@@ -665,7 +665,7 @@ class CMacrosResolver {
 	 */
 	private function resolveItemValueMacro($lastValue, array $item, array $trigger) {
 		if ($this->config == 'eventDescription') {
-			$value = item_get_history($item, $trigger['clock'], isset($trigger['ns']) ? $trigger['ns'] : null);
+			$value = item_get_history($item, $trigger['clock'], $trigger['ns']);
 
 			return ($value !== null) ? formatHistoryValue($value, $item) : UNRESOLVED_MACRO_STRING;
 		}
