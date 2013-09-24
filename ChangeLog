@@ -3,6 +3,7 @@ Changes for 2.1.6
 New features:
 
 Bug fixes:
+..F....... [ZBX-6978] fixed leading and trailing spaces for translatable strings (Ivo)
 ..F....... [ZBX-7033] replaced HTML special characters with corresponding entity names and unicode characters (Ivo)
 ........S. [ZBX-7013] strndup function was replaced to avoid compilation error when non-gnu compilers are used (igors)
 ........S. [ZBX-6904] now ESC.HISTORY macro creates the same message content whithin the same escalation step when notification is sent to multiple recipients (igors)
