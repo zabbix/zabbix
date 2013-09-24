@@ -1,7 +1,7 @@
 Changes for 2.0.9rc1
 
 New features:
-A.F....... [ZBX-1357] updated Chinese (China), Lithuanian and Slovak translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Italian, Lithuanian, Romanian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 ..F....... [ZBX-3878] fixed memory leaks in slide shows (Eduard)
