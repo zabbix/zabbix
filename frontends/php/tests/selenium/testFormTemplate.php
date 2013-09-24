@@ -74,18 +74,16 @@ class testFormTemplate extends CWebTest {
 	 */
 	public function testFormTemplate_AddMacros() {
 		$this->zbxTestLogin('templates.php');
-		$this->zbxTestClick('link='.$this->template_tmp);
-		$this->waitForPageToLoad("30000");
-		$this->tab_switch('Macros');
-		$this->type("name=macros[0][macro]", '{$TEST_MACRO}');
-		$this->type("name=macros[0][value]", "1");
-		$this->zbxTestClick("//table[@id='tbl_macros']//input[@id='macro_add']");
-		$this->verifyElementPresent("name=macros[1][macro]");
-		$this->type("name=macros[1][macro]", '{$TEST_MACRO2}');
-		$this->type("name=macros[1][value]", "2");
-		$this->zbxTestClick('save');
-		$this->waitForPageToLoad("30000");
-		$this->zbxTestTextPresent("Template updated");
+		$this->zbxTestClickWait('link='.$this->template_tmp);
+		$this->zbxTestClick('tab_macroTab');
+		$this->type('macros_0_macro', '{$TEST_MACRO}');
+		$this->type('macros_0_value', '1');
+		$this->zbxTestClick('macro_add');
+		$this->verifyElementPresent('macros_1_macro');
+		$this->type('macros_1_macro', '{$TEST_MACRO2}');
+		$this->type('macros_1_value', '2');
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('Template updated');
 	}
 
 	public function testFormTemplate_CreateExistingTemplateNoGroups() {
