@@ -82,9 +82,10 @@ class testInheritanceItem extends CWebTest {
 		$this->zbxTestTextPresent(array(
 			'Item updated',
 			$data['name'],
-			'ITEMS'
+			'Items'
 		));
 
+		$this->open('items.php?hostid=30000');
 		$this->assertEquals($oldHashItems, DBhash($sqlItems));
 	}
 
