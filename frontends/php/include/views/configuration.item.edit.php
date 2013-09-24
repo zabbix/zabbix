@@ -368,8 +368,8 @@ else {
 			$keepHistory[] = new CSpan('('._n('%1$s day', '%1$s days', $dataConfig['hk_history']).')');
 		}
 		else {
-			$keepHistory[] = new CSpan(
-				_('Overriden by global housekeeper settings').'('._n('%1$s day', '%1$s days', $dataConfig['hk_history']).')'
+			$keepHistory[] = new CSpan(_('Overriden by global housekeeper settings').
+				'('._n('%1$s day', '%1$s days', $dataConfig['hk_history']).')'
 			);
 		}
 	}
@@ -386,12 +386,11 @@ else {
 			$link->setAttribute('target', '_blank');
 			$keepTrend[] =  $link;
 			$keepTrend[] = SPACE;
-			$keepTrend[] = new CSpan('('. _n($dataConfig['hk_trends'].' day',
-				$dataConfig['hk_trends'].' days', $dataConfig['hk_trends']). ')');
+			$keepTrend[] = new CSpan('('._n('%1$s day', '%1$s days', $dataConfig['hk_trends']).')');
 		}
 		else {
-			$keepTrend[] = new CSpan(
-				_('Overriden by global housekeeper settings').'('._n('%1$s day', '%1$s days', $dataConfig['hk_trends']).')'
+			$keepTrend[] = new CSpan(_('Overriden by global housekeeper settings').
+				'('._n('%1$s day', '%1$s days', $dataConfig['hk_trends']).')'
 			);
 		}
 	}
@@ -564,6 +563,10 @@ if (!empty($this->data['interfaces'])) {
 	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPTRAP, 'interface_row');
 	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPTRAP, 'interfaceid');
 }
+zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SIMPLE, 'row_username');
+zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SIMPLE, 'username');
+zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SIMPLE, 'row_password');
+zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SIMPLE, 'password');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV1, 'snmp_oid');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV2C, 'snmp_oid');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV3, 'snmp_oid');

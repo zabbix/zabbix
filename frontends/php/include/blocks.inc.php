@@ -876,14 +876,11 @@ function make_latest_issues(array $filter = array()) {
 	// get hosts
 	$hosts = API::Host()->get(array(
 		'hostids' => $hostIds,
-		'output' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
+		'output' => array('hostid', 'name', 'status', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
 		'selectInventory' => array('hostid'),
 		'selectScreens' => API_OUTPUT_COUNT,
 		'preservekeys' => true
 	));
-
-	// get scripts
-	$scripts_by_hosts = API::Script()->getScriptsByHosts($hostIds);
 
 	// actions
 	$actions = getEventActionsStatHints($eventIds);
@@ -915,19 +912,24 @@ function make_latest_issues(array $filter = array()) {
 		_('Actions')
 	));
 
+	$scripts = API::Script()->getScriptsByHosts($hostIds);
+
 	// triggers
 	foreach ($triggers as $trigger) {
-		// check for dependencies
+		if (!isset($trigger['event']) || !$trigger['event']) {
+			continue;
+		}
+
 		$host = $hosts[$trigger['hostid']];
 
-		$hostSpan = new CDiv(null, 'maintenance-abs-cont');
-
-		$hostName = new CSpan($host['name'], 'link_menu menu-host');
-		$hostName->setAttribute('data-menu', hostMenuData($host, $scripts_by_hosts[$host['hostid']]));
+		$hostName = new CSpan($host['name'], 'link_menu');
+		$hostName->setMenuPopup(getMenuPopupHost($host, $scripts[$host['hostid']]));
 
 		// add maintenance icon with hint if host is in maintenance
+		$maintenanceIcon = null;
+
 		if ($host['maintenance_status']) {
-			$mntIco = new CDiv(null, 'icon-maintenance-abs');
+			$maintenanceIcon = new CDiv(null, 'icon-maintenance-abs');
 
 			// get maintenance
 			$maintenances = API::Maintenance()->get(array(
@@ -945,15 +947,14 @@ function make_latest_issues(array $filter = array()) {
 					$hint .= "\n".$maintenance['description'];
 				}
 
-				$mntIco->setHint($hint);
-				$mntIco->addClass('pointer');
+				$maintenanceIcon->setHint($hint);
+				$maintenanceIcon->addClass('pointer');
 			}
 
 			$hostName->addClass('left-to-icon-maintenance-abs');
-			$hostSpan->addItem($mntIco);
 		}
 
-		$hostSpan ->addItem($hostName);
+		$hostDiv = new CDiv(array($hostName, $maintenanceIcon), 'maintenance-abs-cont');
 
 		// unknown triggers
 		$unknown = SPACE;
@@ -962,29 +963,27 @@ function make_latest_issues(array $filter = array()) {
 			$unknown->setHint($trigger['error'], '', 'on');
 		}
 
-		if (!empty($trigger['event'])) {
-			$ack = getEventAckState($trigger['event'], empty($filter['backUrl']) ? true : $filter['backUrl'], true, $ackParams);
-			$clock = new CLink(zbx_date2str(_('d M Y H:i:s'), $trigger['event']['clock']), 'events.php?triggerid='.$trigger['triggerid'].'&source=0&show_unknown=1&nav_time='.$trigger['event']['clock']);
+		$ack = getEventAckState($trigger['event'], empty($filter['backUrl']) ? true : $filter['backUrl'], true, $ackParams);
+		$clock = new CLink(zbx_date2str(_('d M Y H:i:s'), $trigger['event']['clock']), 'events.php?triggerid='.$trigger['triggerid'].'&source=0&show_unknown=1&nav_time='.$trigger['event']['clock']);
 
-			$description = CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, array('clock' => $trigger['event']['clock'], 'ns' => $trigger['event']['ns'])));
-			$description = $trigger['url']
-				? new CLink($description, resolveTriggerUrl($trigger), null, null, true)
-				: new CSpan($description, 'pointer');
+		$description = CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, array('clock' => $trigger['event']['clock'], 'ns' => $trigger['event']['ns'])));
+		$description = $trigger['url']
+			? new CLink($description, resolveTriggerUrl($trigger), null, null, true)
+			: new CSpan($description, 'pointer');
 
-			$description = new CCol($description, getSeverityStyle($trigger['priority']));
-			$description->setHint(make_popup_eventlist($trigger['triggerid'], $trigger['event']['eventid']), '', '', false);
+		$description = new CCol($description, getSeverityStyle($trigger['priority']));
+		$description->setHint(make_popup_eventlist($trigger['triggerid'], $trigger['event']['eventid']), '', '', false);
 
-			$table->addRow(array(
-				get_node_name_by_elid($trigger['triggerid']),
-				$hostSpan,
-				$description,
-				$clock,
-				zbx_date2age($trigger['event']['clock']),
-				$unknown,
-				$ack,
-				isset($actions[$trigger['event']['eventid']]) ? $actions[$trigger['event']['eventid']] : SPACE
-			));
-		}
+		$table->addRow(array(
+			get_node_name_by_elid($trigger['triggerid']),
+			$hostDiv,
+			$description,
+			$clock,
+			zbx_date2age($trigger['event']['clock']),
+			$unknown,
+			$ack,
+			isset($actions[$trigger['event']['eventid']]) ? $actions[$trigger['event']['eventid']] : SPACE
+		));
 	}
 
 	// initialize blinking

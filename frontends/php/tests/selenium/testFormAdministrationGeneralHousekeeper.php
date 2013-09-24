@@ -395,11 +395,11 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'hk_trends' => '-900',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Keep trigger event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep internal event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep network discovery event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep auto-registration event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep IT service data for (in days)": must be between 1 and 99999.'
+						'Incorrect value for field "Keep trigger event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep internal event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep network discovery event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep auto-registration event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep IT service data for (in days)": must be between 1 and 99999.'
 					)
 				)
 			),
@@ -419,11 +419,11 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'hk_trends' => 'abc',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Keep trigger event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep internal event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep network discovery event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep auto-registration event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep IT service data for (in days)": must be between 1 and 99999.'
+						'Incorrect value for field "Keep trigger event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep internal event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep network discovery event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep auto-registration event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep IT service data for (in days)": must be between 1 and 99999.'
 					)
 				)
 			),
@@ -443,11 +443,11 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'hk_trends' => '',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Keep trigger event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep internal event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep network discovery event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep auto-registration event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep IT service data for (in days)": must be between 1 and 99999.'
+						'Incorrect value for field "Keep trigger event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep internal event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep network discovery event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep auto-registration event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep IT service data for (in days)": must be between 1 and 99999.'
 					)
 				)
 			),
@@ -467,11 +467,11 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'hk_trends' => ' ',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Keep trigger event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep internal event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep network discovery event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep auto-registration event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep IT service data for (in days)": must be between 1 and 99999.'
+						'Incorrect value for field "Keep trigger event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep internal event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep network discovery event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep auto-registration event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep IT service data for (in days)": must be between 1 and 99999.'
 					)
 				)
 			),
@@ -491,11 +491,11 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'hk_trends' => 0,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Keep trigger event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep internal event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep network discovery event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep auto-registration event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep IT service data for (in days)": must be between 1 and 99999.'
+						'Incorrect value for field "Keep trigger event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep internal event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep network discovery event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep auto-registration event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep IT service data for (in days)": must be between 1 and 99999.'
 					)
 				)
 			)
@@ -834,8 +834,8 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 
 		$this->zbxTestClick('resetDefaults');
 		sleep(1);
-		$this->assertVisible("//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all']");
-		$this->zbxTestClick("//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all']/div/div/button[1]");
+		$this->assertVisible("//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-dialog-buttons']");
+		$this->zbxTestClick("//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-dialog-buttons']/div/div/button[1]");
 		$this->zbxTestClickWait('save');
 
 		$this->zbxTestTextPresent('Configuration updated');
