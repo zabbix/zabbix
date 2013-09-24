@@ -19,46 +19,69 @@
 
 
 jQuery(function($) {
-	// search
+
 	if ($('#search').length) {
 		createSuggest('search');
 	}
 
+	if (IE || KQ) {
+		setTimeout(function () { $('[autofocus]').focus(); }, 10);
+	}
+
 	/**
-	 * Handles host pop up menus.
+	 * Change combobox color according selected option.
 	 */
-	$(document).on('click', '.menu-host', function(event) {
-		var menuData = $(this).data('menu');
-		var menu = [];
+	$('.input.select').each(function() {
+		var comboBox = $(this),
+			changeClass = function(obj) {
+				if (obj.find('option.not-monitored:selected').length > 0) {
+					obj.addClass('not-monitored');
+				}
+				else {
+					obj.removeClass('not-monitored');
+				}
+			};
 
-		// add scripts
-		if (menuData.scripts.length) {
-			menu.push(createMenuHeader(t('Scripts')));
-			$.each(menuData.scripts, function(i, script) {
-				menu.push(createMenuItem(script.name, function () {
-					executeScript(menuData.hostid, script.scriptid, script.confirmation);
-					return false;
-				}));
-			});
+		comboBox.change(function() {
+			changeClass($(this));
+		});
+
+		changeClass(comboBox);
+	});
+
+	/**
+	 * Build menu popup for given elements.
+	 */
+	$(document).on('click', '[data-menu-popup]', function(event) {
+		var obj = $(this),
+			data = obj.data('menu-popup');
+
+		switch (data.type) {
+			case 'host':
+				data = getMenuPopupHost(data);
+				break;
+
+			case 'trigger':
+				data = getMenuPopupTrigger(data);
+				break;
+
+			case 'history':
+				data = getMenuPopupHistory(data);
+				break;
+
+			case 'map':
+				data = getMenuPopupMap(data);
+				break;
 		}
 
-		// add go to links
-		menu.push(createMenuHeader(t('Go to')));
-		menu.push(createMenuItem(t('Latest data'), 'latest.php?hostid=' + menuData.hostid));
-		if (menuData.hasInventory) {
-			menu.push(createMenuItem(t('Host inventories'), 'hostinventories.php?hostid=' + menuData.hostid));
-		}
-		if (menuData.hasScreens) {
-			menu.push(createMenuItem(t('Host screens'), 'host_screen.php?hostid=' + menuData.hostid));
-		}
-
-		// render the menu
-		show_popup_menu(event, menu, 180);
+		obj.menuPopup(data, event);
 
 		return false;
 	});
 
-	if (IE || KQ) {
-		setTimeout(function () {$('[autofocus]').focus()}, 10);
-	}
+	$('.print-link').click(function() {
+		printLess(true);
+
+		return false;
+	});
 });

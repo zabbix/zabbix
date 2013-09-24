@@ -636,7 +636,7 @@ calendar.prototype = {
 		td.appendChild(this.clndr_yeardown);
 
 		this.clndr_yeardown.className = 'clndr_left_arrow';
-		this.clndr_yeardown.appendChild(document.createTextNode('«'));
+		this.clndr_yeardown.appendChild(document.createTextNode(String.fromCharCode(0x00AB)));
 
 		var td = document.createElement('td');
 		tr.appendChild(td);
@@ -655,7 +655,7 @@ calendar.prototype = {
 		td.appendChild(this.clndr_yearup);
 
 		this.clndr_yearup.className = 'clndr_right_arrow';
-		this.clndr_yearup.appendChild(document.createTextNode('»'));
+		this.clndr_yearup.appendChild(document.createTextNode(String.fromCharCode(0x00BB)));
 
 		// month
 		var tr = document.createElement('tr');
@@ -668,7 +668,7 @@ calendar.prototype = {
 		td.appendChild(this.clndr_monthdown);
 
 		this.clndr_monthdown.className = 'clndr_left_arrow';
-		this.clndr_monthdown.appendChild(document.createTextNode('«'));
+		this.clndr_monthdown.appendChild(document.createTextNode(String.fromCharCode(0x00AB)));
 
 		var td = document.createElement('td');
 		tr.appendChild(td);
@@ -689,7 +689,7 @@ calendar.prototype = {
 
 		this.clndr_monthup.className = 'clndr_right_arrow';
 
-		this.clndr_monthup.appendChild(document.createTextNode('»'));
+		this.clndr_monthup.appendChild(document.createTextNode(String.fromCharCode(0x00BB)));
 
 		// days heading
 		var table = document.createElement('table');

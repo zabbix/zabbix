@@ -324,6 +324,7 @@ function get_accessible_hosts_by_rights(&$rights, $user_type, $perm, $perm_res =
 	$where = array();
 
 	array_push($where, 'h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')');
+	array_push($where, dbConditionInt('h.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)));
 	if (!is_null($nodeid)) {
 		$where = sqlPartDbNode($where, 'h.hostid', $nodeid);
 	}

@@ -29,6 +29,7 @@
 #define ISSET_DBL(res)	((res)->type & AR_DOUBLE)
 #define ISSET_STR(res)	((res)->type & AR_STRING)
 #define ISSET_TEXT(res)	((res)->type & AR_TEXT)
+#define ISSET_LOG(res)	((res)->type & AR_LOG)
 #define ISSET_MSG(res)	((res)->type & AR_MESSAGE)
 
 /* UNSET RESULT */
@@ -69,6 +70,18 @@ do						\
 }						\
 while (0)
 
+#define UNSET_LOG_RESULT(res)			\
+						\
+do						\
+{						\
+	if ((res)->type & AR_LOG)		\
+	{					\
+		zbx_logs_free((res)->logs);	\
+		(res)->type &= ~AR_LOG;		\
+	}					\
+}						\
+while (0)
+
 #define UNSET_MSG_RESULT(res)			\
 						\
 do						\
@@ -89,6 +102,7 @@ do								\
 	if (!(exc_type & AR_DOUBLE))	UNSET_DBL_RESULT(res);	\
 	if (!(exc_type & AR_STRING))	UNSET_STR_RESULT(res);	\
 	if (!(exc_type & AR_TEXT))	UNSET_TEXT_RESULT(res);	\
+	if (!(exc_type & AR_LOG))	UNSET_LOG_RESULT(res);	\
 	if (!(exc_type & AR_MESSAGE))	UNSET_MSG_RESULT(res);	\
 }								\
 while (0)
@@ -99,6 +113,7 @@ while (0)
 #define GET_DBL_RESULT(res)	((double *)get_result_value_by_type(res, AR_DOUBLE))
 #define GET_STR_RESULT(res)	((char **)get_result_value_by_type(res, AR_STRING))
 #define GET_TEXT_RESULT(res)	((char **)get_result_value_by_type(res, AR_TEXT))
+#define GET_LOG_RESULT(res)	((zbx_log_t **)get_result_value_by_type(res, AR_LOG))
 #define GET_MSG_RESULT(res)	((char **)get_result_value_by_type(res, AR_MESSAGE))
 
 void    *get_result_value_by_type(AGENT_RESULT *result, int require_type);
@@ -151,7 +166,7 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat);
 #define PROCESS_MODULE_COMMAND	2
 
 void	init_metrics();
-int	add_metric(ZBX_METRIC *new, char *error, size_t max_error_len);
+int	add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len);
 void	free_metrics();
 
 int	process(const char *in_command, unsigned flags, AGENT_RESULT *result);
@@ -162,12 +177,17 @@ void	test_parameters();
 void	test_parameter(const char *key);
 
 void	init_result(AGENT_RESULT *result);
+void	zbx_logs_free(zbx_log_t **logs);
 void	free_result(AGENT_RESULT *result);
 
 void	init_request(AGENT_REQUEST *request);
 void	free_request(AGENT_REQUEST *request);
 
 int	parse_item_key(char *cmd, AGENT_REQUEST *request);
+
+zbx_log_t	*add_log_result(AGENT_RESULT *result, const char *value);
+void		set_log_result_empty(AGENT_RESULT *result);
+zbx_uint64_t	get_log_result_lastlogsize(AGENT_RESULT *result);
 
 void	quote_key_param(char **param, int forced);
 
@@ -220,6 +240,7 @@ int	SERVICE_STATE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PROC_INFO(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_IF_LIST(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
 #endif
 
 #ifdef _AIX

@@ -295,11 +295,10 @@ if (isset($_REQUEST['pservices'])) {
 	$servicesView->render();
 	$servicesView->show();
 }
-
 /*
  * Display child services list
  */
-if (isset($_REQUEST['cservices'])) {
+elseif (isset($_REQUEST['cservices'])) {
 	$childServices = API::Service()->get(array(
 		'output' => array('serviceid', 'name', 'algorithm'),
 		'selectTrigger' => array('triggerid', 'description', 'expression'),
@@ -337,11 +336,10 @@ if (isset($_REQUEST['cservices'])) {
 	$servicesView->render();
 	$servicesView->show();
 }
-
 /*
  * Display
  */
-if (isset($_REQUEST['form'])) {
+elseif (isset($_REQUEST['form'])) {
 	$data = array();
 	$data['form'] = get_request('form');
 	$data['form_refresh'] = get_request('form_refresh', 0);

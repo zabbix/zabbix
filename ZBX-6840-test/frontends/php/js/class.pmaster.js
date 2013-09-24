@@ -318,6 +318,9 @@ var CDoll = Class.create(CDebug,{
 		url.setArgument('upd_counter', this.counter());
 		url.setArgument('pmasterid', this.pmasterid());
 
+		jQuery(window).off('resize');
+		jQuery(document).off('mouseup mousemove');
+
 		new Ajax.Request(url.getUrl(), {
 				'method': 'post',
 				'parameters': this._params,

@@ -145,6 +145,10 @@ ZBX_THREAD_ACTIVECHK_ARGS	*CONFIG_ACTIVE_ARGS = NULL;
 int				CONFIG_ACTIVE_FORKS = 0;
 int				CONFIG_PASSIVE_FORKS = 3;	/* number of listeners for processing passive checks */
 
+#ifdef _WINDOWS
+void zbx_co_uninitialize();
+#endif
+
 static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 {
 	char	ch = '\0';
@@ -391,9 +395,9 @@ static void	zbx_load_config(int requirement)
 	{
 		/* PARAMETER,			VAR,					TYPE,
 			MANDATORY,	MIN,			MAX */
-		{"Server",			&CONFIG_HOSTS_ALLOWED,			TYPE_STRING,
+		{"Server",			&CONFIG_HOSTS_ALLOWED,			TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
-		{"ServerActive",		&active_hosts,				TYPE_STRING,
+		{"ServerActive",		&active_hosts,				TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
 		{"Hostname",			&CONFIG_HOSTNAME,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -419,7 +423,7 @@ static void	zbx_load_config(int requirement)
 			PARM_OPT,	1,			30},
 		{"ListenPort",			&CONFIG_LISTEN_PORT,			TYPE_INT,
 			PARM_OPT,	1024,			32767},
-		{"ListenIP",			&CONFIG_LISTEN_IP,			TYPE_STRING,
+		{"ListenIP",			&CONFIG_LISTEN_IP,			TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
 		{"SourceIP",			&CONFIG_SOURCE_IP,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -469,9 +473,6 @@ static void	zbx_load_config(int requirement)
 	parse_cfg_file(CONFIG_FILE, cfg, requirement, ZBX_CFG_STRICT);
 
 	set_defaults();
-
-	zbx_trim_str_list(CONFIG_HOSTS_ALLOWED, ',');
-	zbx_trim_str_list(active_hosts, ',');
 
 	if (ZBX_CFG_FILE_REQUIRED == requirement && NULL == CONFIG_HOSTS_ALLOWED && 0 != CONFIG_PASSIVE_FORKS)
 	{
@@ -709,6 +710,7 @@ void	zbx_free_service_resources(void)
 	free_collector_data();
 #ifdef _WINDOWS
 	free_perf_collector();
+	zbx_co_uninitialize();
 #endif
 }
 

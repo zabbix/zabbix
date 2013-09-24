@@ -41,6 +41,189 @@ class CTriggerFunctionValidator extends CValidator {
 	 */
 	private $allowed;
 
+	public function __construct(array $options = array()) {
+		parent::__construct($options);
+
+		$valueTypesAll = array(
+			ITEM_VALUE_TYPE_FLOAT => true,
+			ITEM_VALUE_TYPE_UINT64 => true,
+			ITEM_VALUE_TYPE_STR => true,
+			ITEM_VALUE_TYPE_TEXT => true,
+			ITEM_VALUE_TYPE_LOG => true
+		);
+		$valueTypesNum = array(
+			ITEM_VALUE_TYPE_FLOAT => true,
+			ITEM_VALUE_TYPE_UINT64 => true
+		);
+		$valueTypesChar = array(
+			ITEM_VALUE_TYPE_STR => true,
+			ITEM_VALUE_TYPE_TEXT => true,
+			ITEM_VALUE_TYPE_LOG => true
+		);
+		$valueTypesLog = array(
+			ITEM_VALUE_TYPE_LOG => true
+		);
+		$valueTypesInt = array(
+			ITEM_VALUE_TYPE_UINT64 => true
+		);
+
+		$argsIgnored = array(array('type' => 'str'));
+
+		$this->allowed = array(
+			'abschange' => array(
+				'args' => $argsIgnored,
+				'value_types' => $valueTypesAll
+			),
+			'avg' => array(
+				'args' => array(
+					array('type' => 'sec_num', 'mandat' => true),
+					array('type' => 'sec_zero', 'can_be_empty' => true)
+				),
+				'value_types' => $valueTypesNum
+			),
+			'band' => array(
+				'args' => array(
+					array('type' => 'sec_num_zero', 'mandat' => true, 'can_be_empty' => true),
+					array('type' => 'num', 'mandat' => true),
+					array('type' => 'sec_zero', 'can_be_empty' => true)
+				),
+				'value_types' => $valueTypesInt
+			),
+			'change' => array(
+				'args' => $argsIgnored,
+				'value_types' => $valueTypesAll
+			),
+			'count' => array(
+				'args' => array(
+					array('type' => 'sec_num', 'mandat' => true),
+					array('type' => 'str'),
+					array('type' => 'operation'),
+					array('type' => 'sec_zero', 'can_be_empty' => true)
+				),
+				'value_types' => $valueTypesAll
+			),
+			'date' => array(
+				'args' => $argsIgnored,
+				'value_types' => $valueTypesAll
+			),
+			'dayofmonth' => array(
+				'args' => $argsIgnored,
+				'value_types' => $valueTypesAll
+			),
+			'dayofweek' => array(
+				'args' => $argsIgnored,
+				'value_types' => $valueTypesAll
+			),
+			'delta' => array(
+				'args' => array(
+					array('type' => 'sec_num', 'mandat' => true),
+					array('type' => 'sec_zero', 'can_be_empty' => true)
+				),
+				'value_types' => $valueTypesNum
+			),
+			'diff' => array(
+				'args' => $argsIgnored,
+				'value_types' => $valueTypesAll
+			),
+			'fuzzytime' => array(
+				'args' => array(
+					array('type' => 'sec_zero', 'mandat' => true)
+				),
+				'value_types' => $valueTypesNum
+			),
+			'iregexp' => array(
+				'args' => array(
+					array('type' => 'str', 'mandat' => true),
+					array('type' => 'sec_num', 'can_be_empty' => true)
+				),
+				'value_types' => $valueTypesChar
+			),
+			'last' => array(
+				'args' => array(
+					array('type' => 'sec_num_zero', 'mandat' => true, 'can_be_empty' => true),
+					array('type' => 'sec_zero', 'can_be_empty' => true)
+				),
+				'value_types' => $valueTypesAll
+			),
+			'logeventid' => array(
+				'args' => array(
+					array('type' => 'str', 'mandat' => true)
+				),
+				'value_types' => $valueTypesLog
+			),
+			'logseverity' => array(
+				'args' => $argsIgnored,
+				'value_types' => $valueTypesLog
+			),
+			'logsource' => array(
+				'args' => array(
+					array('type' => 'str', 'mandat' => true)
+				),
+				'value_types' => $valueTypesLog
+			),
+			'max' => array(
+				'args' => array(
+					array('type' => 'sec_num', 'mandat' => true),
+					array('type' => 'sec_zero', 'can_be_empty' => true)
+				),
+				'value_types' => $valueTypesNum
+			),
+			'min' => array(
+				'args' => array(
+					array('type' => 'sec_num', 'mandat' => true),
+					array('type' => 'sec_zero', 'can_be_empty' => true)
+				),
+				'value_types' => $valueTypesNum
+			),
+			'nodata'=> array(
+				'args' => array(
+					array('type' => 'sec_zero', 'mandat' => true)
+				),
+				'value_types' => $valueTypesAll
+			),
+			'now' => array(
+				'args' => $argsIgnored,
+				'value_types' => $valueTypesAll
+			),
+			'prev' => array(
+				'args' => $argsIgnored,
+				'value_types' => $valueTypesAll
+			),
+			'regexp' => array(
+				'args' => array(
+					array('type' => 'str', 'mandat' => true),
+					array('type' => 'sec_num', 'can_be_empty' => true)
+				),
+				'value_types' => $valueTypesChar
+			),
+			'str' => array(
+				'args' => array(
+					array('type' => 'str', 'mandat' => true),
+					array('type' => 'sec_num', 'can_be_empty' => true)
+				),
+				'value_types' => $valueTypesChar
+			),
+			'strlen' => array(
+				'args' => array(
+					array('type' => 'sec_num_zero', 'mandat' => true, 'can_be_empty' => true),
+					array('type' => 'sec_zero', 'can_be_empty' => true)
+				),
+				'value_types' => $valueTypesChar
+			),
+			'sum' => array(
+				'args' => array(
+					array('type' => 'sec_num', 'mandat' => true),
+					array('type' => 'sec_zero', 'can_be_empty' => true)
+				),
+				'value_types' => $valueTypesNum
+			),
+			'time' => array(
+				'args' => $argsIgnored,
+				'value_types' => $valueTypesAll
+			)
+		);
+	}
+
 	/**
 	 * Validate trigger function like last(0), time(), etc.
 	 * Examples:
@@ -63,19 +246,19 @@ class CTriggerFunctionValidator extends CValidator {
 
 		if (!isset($this->allowed[$value['functionName']])) {
 			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['function']).' '.
-					_('Unknown function.'));
+				_('Unknown function.'));
 			return false;
 		}
 
 		if (!isset($this->allowed[$value['functionName']]['value_types'][$value['valueType']])) {
 			$this->setError(_s('Incorrect item value type "%1$s" provided for trigger function "%2$s".',
-					itemValueTypeString($value['valueType']), $value['function']));
+				itemValueTypeString($value['valueType']), $value['function']));
 			return false;
 		}
 
 		if (count($this->allowed[$value['functionName']]['args']) < count($value['functionParamList'])) {
 			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['function']).' '.
-					_('Invalid number of parameters.'));
+				_('Invalid number of parameters.'));
 			return false;
 		}
 
@@ -90,58 +273,57 @@ class CTriggerFunctionValidator extends CValidator {
 			// mandatory check
 			if (isset($arg['mandat']) && $arg['mandat'] && !isset($value['functionParamList'][$aNum])) {
 				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['function']).' '.
-						_('Mandatory parameter is missing.'));
+					_('Mandatory parameter is missing.'));
 				return false;
 			}
 
-			// type check
-			if (isset($arg['type']) && isset($value['functionParamList'][$aNum])) {
-				$userMacro = preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $value['functionParamList'][$aNum]);
-
-				if (!$userMacro) {
-					switch ($arg['type']) {
-						case 'sec_zero':
-							if (!$this->validateSecZero($value['functionParamList'][$aNum])) {
-								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['function']).
-									' '.$paramLabels[$aNum]);
-								return false;
-							}
-							break;
-
-						case 'sec_num':
-							if (!$this->validateSecNum($value['functionParamList'][$aNum])) {
-								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['function']).
-									' '.$paramLabels[$aNum]);
-								return false;
-							}
-							break;
-
-						case 'sec_num_zero':
-							if (!$this->validateSecNumZero($value['functionParamList'][$aNum])) {
-								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['function']).
-									' '.$paramLabels[$aNum]);
-								return false;
-							}
-							break;
-
-						case 'num':
-							if (!is_numeric($value['functionParamList'][$aNum])) {
-								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['function']).
-									' '.$paramLabels[$aNum]);
-								return false;
-							}
-							break;
-
-						case 'operation':
-							if (!$this->validateOperation($value['functionParamList'][$aNum])) {
-								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['function']).
-									' '.$paramLabels[$aNum]);
-								return false;
-							}
-							break;
-					}
-				}
+			if (!isset($value['functionParamList'][$aNum])) {
+				continue;
 			}
+
+			if (isset($arg['can_be_empty']) && $value['functionParamList'][$aNum] == '') {
+				continue;
+			}
+
+			// user macro
+			if (preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $value['functionParamList'][$aNum])) {
+				continue;
+			}
+
+			if (!$this->validateParameter($value['functionParamList'][$aNum], $arg['type'])) {
+				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.',
+					$value['function']).' '.$paramLabels[$aNum]);
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Validate trigger function parameter.
+	 *
+	 * @param string $param
+	 * @param string $type  a type of the parameter ('sec_zero', 'sec_num', 'sec_num_zero', 'num', 'operation')
+	 *
+	 * @return bool
+	 */
+	private function validateParameter($param, $type) {
+		switch ($type) {
+			case 'sec_zero':
+				return $this->validateSecZero($param);
+
+			case 'sec_num':
+				return $this->validateSecNum($param);
+
+			case 'sec_num_zero':
+				return $this->validateSecNumZero($param);
+
+			case 'num':
+				return is_numeric($param);
+
+			case 'operation':
+				return $this->validateOperation($param);
 		}
 
 		return true;
@@ -212,189 +394,5 @@ class CTriggerFunctionValidator extends CValidator {
 	 */
 	private function validateOperation($param) {
 		return preg_match('/^(eq|ne|gt|ge|lt|le|like|band|)$/', $param);
-	}
-
-	/**
-	 * Initialize validation rules.
-	 */
-	protected function initOptions() {
-		$valueTypesAll = array(
-			ITEM_VALUE_TYPE_FLOAT => true,
-			ITEM_VALUE_TYPE_UINT64 => true,
-			ITEM_VALUE_TYPE_STR => true,
-			ITEM_VALUE_TYPE_TEXT => true,
-			ITEM_VALUE_TYPE_LOG => true
-		);
-		$valueTypesNum = array(
-			ITEM_VALUE_TYPE_FLOAT => true,
-			ITEM_VALUE_TYPE_UINT64 => true
-		);
-		$valueTypesChar = array(
-			ITEM_VALUE_TYPE_STR => true,
-			ITEM_VALUE_TYPE_TEXT => true,
-			ITEM_VALUE_TYPE_LOG => true
-		);
-		$valueTypesLog = array(
-			ITEM_VALUE_TYPE_LOG => true
-		);
-		$valueTypesInt = array(
-			ITEM_VALUE_TYPE_UINT64 => true
-		);
-
-		$argsIgnored = array(array('type' => 'str'));
-
-		$this->allowed = array(
-			'abschange' => array(
-				'args' => $argsIgnored,
-				'value_types' => $valueTypesAll
-			),
-			'avg' => array(
-				'args' => array(
-					array('type' => 'sec_num', 'mandat' => true),
-					array('type' => 'sec_zero')
-				),
-				'value_types' => $valueTypesNum
-			),
-			'band' => array(
-				'args' => array(
-					array('type' => 'sec_num_zero', 'mandat' => true),
-					array('type' => 'num', 'mandat' => true),
-					array('type' => 'sec_zero')
-				),
-				'value_types' => $valueTypesInt
-			),
-			'change' => array(
-				'args' => $argsIgnored,
-				'value_types' => $valueTypesAll
-			),
-			'count' => array(
-				'args' => array(
-					array('type' => 'sec_num', 'mandat' => true),
-					array('type' => 'str'),
-					array('type' => 'operation'),
-					array('type' => 'sec_zero')
-				),
-				'value_types' => $valueTypesAll
-			),
-			'date' => array(
-				'args' => $argsIgnored,
-				'value_types' => $valueTypesAll
-			),
-			'dayofmonth' => array(
-				'args' => $argsIgnored,
-				'value_types' => $valueTypesAll
-			),
-			'dayofweek' => array(
-				'args' => $argsIgnored,
-				'value_types' => $valueTypesAll
-			),
-			'delta' => array(
-				'args' => array(
-					array('type' => 'sec_num', 'mandat' => true),
-					array('type' => 'sec_zero')
-				),
-				'value_types' => $valueTypesNum
-			),
-			'diff' => array(
-				'args' => $argsIgnored,
-				'value_types' => $valueTypesAll
-			),
-			'fuzzytime' => array(
-				'args' => array(
-					array('type' => 'sec_zero', 'mandat' => true)
-				),
-				'value_types' => $valueTypesNum
-			),
-			'iregexp' => array(
-				'args' => array(
-					array('type' => 'str', 'mandat' => true),
-					array('type' => 'sec_num')
-				),
-				'value_types' => $valueTypesChar
-			),
-			'last' => array(
-				'args' => array(
-					array('type' => 'sec_num_zero', 'mandat' => true),
-					array('type' => 'sec_zero')
-				),
-				'value_types' => $valueTypesAll
-			),
-			'logeventid' => array(
-				'args' => array(
-					array('type' => 'str', 'mandat' => true)
-				),
-				'value_types' => $valueTypesLog
-			),
-			'logseverity' => array(
-				'args' => $argsIgnored,
-				'value_types' => $valueTypesLog
-			),
-			'logsource' => array(
-				'args' => array(
-					array('type' => 'str', 'mandat' => true)
-				),
-				'value_types' => $valueTypesLog
-			),
-			'max' => array(
-				'args' => array(
-					array('type' => 'sec_num', 'mandat' => true),
-					array('type' => 'sec_zero')
-				),
-				'value_types' => $valueTypesNum
-			),
-			'min' => array(
-				'args' => array(
-					array('type' => 'sec_num', 'mandat' => true),
-					array('type' => 'sec_zero')
-				),
-				'value_types' => $valueTypesNum
-			),
-			'nodata'=> array(
-				'args' => array(
-					array('type' => 'sec_zero', 'mandat' => true)
-				),
-				'value_types' => $valueTypesAll
-			),
-			'now' => array(
-				'args' => $argsIgnored,
-				'value_types' => $valueTypesAll
-			),
-			'prev' => array(
-				'args' => $argsIgnored,
-				'value_types' => $valueTypesAll
-			),
-			'regexp' => array(
-				'args' => array(
-					array('type' => 'str', 'mandat' => true),
-					array('type' => 'sec_num')
-				),
-				'value_types' => $valueTypesChar
-			),
-			'str' => array(
-				'args' => array(
-					array('type' => 'str', 'mandat' => true),
-					array('type' => 'sec_num')
-				),
-				'value_types' => $valueTypesChar
-			),
-			'strlen' => array(
-				'args' => array(
-					array('type' => 'sec_num_zero', 'mandat' => true),
-					array('type' => 'sec_zero')
-				),
-				'value_types' => $valueTypesChar
-			),
-			'sum' => array(
-				'args' => array(
-					array('type' => 'sec_num', 'mandat' => true),
-					array('type' => 'sec_zero')
-				),
-				'value_types' => $valueTypesNum
-			),
-			'time' => array(
-				'args' => $argsIgnored,
-				'value_types' => $valueTypesAll
-			)
-		);
 	}
 }
