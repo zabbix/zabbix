@@ -27,7 +27,6 @@
  * @param string options[]['scriptid']		script id
  * @param string options[]['confirmation']	confirmation text
  * @param bool   options['hasScreens']		link to host screen page
- * @param bool   options['hasInventory']	link to host inventory page
  * @param bool   options['hasGoTo']			"Go to" block in popup
  *
  * @return array
