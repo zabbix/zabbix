@@ -319,7 +319,7 @@ var CDoll = Class.create(CDebug,{
 		url.setArgument('pmasterid', this.pmasterid());
 
 		jQuery(window).off('resize');
-		jQuery(document).off('mouseup mousemove');
+		jQuery(document).off('mousemove');
 
 		new Ajax.Request(url.getUrl(), {
 				'method': 'post',
@@ -435,6 +435,13 @@ var CDoll = Class.create(CDebug,{
 			});
 
 			var strPos = Object.toJSON(positions);
+
+			var params = {
+				'favaction': 'sort',
+				'favobj' : 'hat',
+				'favdata': strPos
+			}
+			send_params(params);
 			$.cookie(settings.name, strPos, {expires: 365});
 
 			return this;
@@ -446,22 +453,6 @@ var CDoll = Class.create(CDebug,{
 			};
 
 			$.extend(settings, options);
-
-			var strPos = $.cookie(settings.name);
-			var positions = $.parseJSON(strPos);
-
-			this.each(function(colNum, column) {
-				if (!isset(colNum, positions)) {
-					return;
-				}
-
-				for (var rowNum in positions[colNum]) {
-					if (empty(positions[colNum][rowNum])) {
-						continue;
-					}
-					$('#' + positions[colNum][rowNum]).appendTo(column);
-				}
-			});
 
 			return this;
 		}

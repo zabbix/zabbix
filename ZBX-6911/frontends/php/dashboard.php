@@ -43,8 +43,9 @@ $fields = array(
 	'favid' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
 	'favcnt' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'pmasterid' =>	array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'favaction' =>	array(T_ZBX_STR, O_OPT, P_ACT,	IN("'add','remove','refresh','flop'"), null),
-	'favstate' =>	array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favaction})&&("flop"=={favaction})')
+	'favaction' =>	array(T_ZBX_STR, O_OPT, P_ACT,	IN("'add','remove','refresh','flop','sort'"), null),
+	'favstate' =>	array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favaction})&&("flop"=={favaction})'),
+	'favdata' =>	array(T_ZBX_STR, O_OPT, null,	null,		null)
 );
 check_fields($fields);
 
@@ -123,6 +124,15 @@ if (isset($_REQUEST['favobj'])) {
 	if ($_REQUEST['favobj'] == 'hat') {
 		if ($_REQUEST['favaction'] == 'flop') {
 			CProfile::update('web.dashboard.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
+		}
+		elseif ($_REQUEST['favaction'] == 'sort') {
+			print_r($_REQUEST['favdata']);
+			$_REQUEST['favdata'] = json_decode($_REQUEST['favdata']);
+			foreach($_REQUEST['favdata'] as $xparam => $column){
+				foreach($column as $yparam => $name){
+					CProfile::update('web.dashboard.sort.'.$name, $xparam.":".$yparam, PROFILE_TYPE_STR);
+				}
+			}
 		}
 		elseif ($_REQUEST['favaction'] == 'refresh') {
 			switch ($_REQUEST['favref']) {
@@ -279,44 +289,57 @@ make_refresh_menu('mainpage', 'hat_dscvry', CProfile::get('web.dashboard.rf_rate
 insert_js('var page_menu='.zbx_jsvalue($menu).";\n".'var page_submenu='.zbx_jsvalue($submenu).";\n");
 
 /*
- * Left column
+ * Columns
  */
-$leftColumn = array();
+$columns = array_fill(0, 3, array());
+
+// refresh tab
+$refresh_tab = array(
+		array('id' => 'hat_syssum', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_syssum', 120)),
+		array('id' => 'hat_stszbx', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_stszbx', 120)),
+		array('id' => 'hat_lastiss', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_lastiss', 60)),
+		array('id' => 'hat_webovr', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_webovr', 60)),
+		array('id' => 'hat_hoststat', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_hoststat', 60))
+);
 
 // favorite graphs
 $graph_menu = get_icon('menu', array('menu' => 'graphs'));
 $fav_grph = new CUIWidget('hat_favgrph', make_favorite_graphs(), CProfile::get('web.dashboard.hats.hat_favgrph.state', 1));
 $fav_grph->setHeader(_('Favourite graphs'), array($graph_menu));
 $fav_grph->setFooter(new CLink(_('Graphs').' &raquo;', 'charts.php', 'highlight'), true);
-$leftColumn[] = $fav_grph;
+list($xparam, $yparam) = explode(":", CProfile::get('web.dashboard.sort.hat_favgrph_widget', '0:0'));
+if (!isset($columns[$xparam][$yparam])) {
+	$columns[$xparam][$yparam] = $fav_grph;
+}
+else {
+	$columns[$xparam][] = $fav_grph;
+}
 
 // favorite screens
 $screen_menu = get_icon('menu', array('menu' => 'screens'));
 $fav_scr = new CUIWidget('hat_favscr', make_favorite_screens(), CProfile::get('web.dashboard.hats.hat_favscr.state', 1));
 $fav_scr->setHeader(_('Favourite screens'), array($screen_menu));
 $fav_scr->setFooter(new CLink(_('Screens').' &raquo;', 'screens.php', 'highlight'), true);
-$leftColumn[] = $fav_scr;
+list($xparam, $yparam) = explode(":", CProfile::get('web.dashboard.sort.hat_favscr_widget', '0:1'));
+if (!isset($columns[$xparam][$yparam])) {
+	$columns[$xparam][$yparam] = $fav_scr;
+}
+else {
+	$columns[$xparam][] = $fav_scr;
+}
 
 // favorite sysmaps
 $sysmap_menu = get_icon('menu', array('menu' => 'sysmaps'));
 $fav_maps = new CUIWidget('hat_favmap', make_favorite_maps(), CProfile::get('web.dashboard.hats.hat_favmap.state', 1));
 $fav_maps->setHeader(_('Favourite maps'), array($sysmap_menu));
 $fav_maps->setFooter(new CLink(_('Maps').' &raquo;', 'maps.php', 'highlight'), true);
-$leftColumn[] = $fav_maps;
-
-// refresh tab
-$refresh_tab = array(
-	array('id' => 'hat_syssum', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_syssum', 120)),
-	array('id' => 'hat_stszbx', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_stszbx', 120)),
-	array('id' => 'hat_lastiss', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_lastiss', 60)),
-	array('id' => 'hat_webovr', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_webovr', 60)),
-	array('id' => 'hat_hoststat', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_hoststat', 60))
-);
-
-/*
- * Right column
- */
-$rightColumn = array();
+list($xparam, $yparam) = explode(":", CProfile::get('web.dashboard.sort.hat_favmap_widget', '0:2'));
+if (!isset($columns[$xparam][$yparam])) {
+	$columns[$xparam][$yparam] = $fav_maps;
+}
+else {
+	$columns[$xparam][] = $fav_maps;
+}
 
 // status of zbx
 if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
@@ -324,7 +347,13 @@ if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
 	$zbxStatus = new CUIWidget('hat_stszbx', new CSpan(_('Loading...'), 'textcolorstyles'), CProfile::get('web.dashboard.hats.hat_stszbx.state', 1));
 	$zbxStatus->setHeader(_('Status of Zabbix'), array($refresh_menu));
 	$zbxStatus->setFooter(new CDiv(SPACE, 'textwhite', 'hat_stszbx_footer'));
-	$rightColumn[] = $zbxStatus;
+	list($xparam, $yparam) = explode(":", CProfile::get('web.dashboard.sort.hat_stszbx_widget', '1:0'));
+	if (!isset($columns[$xparam][$yparam])) {
+		$columns[$xparam][$yparam] = $zbxStatus;
+	}
+	else {
+		$columns[$xparam][] = $zbxStatus;
+	}
 }
 
 // system status
@@ -332,28 +361,52 @@ $refresh_menu = new CIcon(_('Menu'), 'iconmenu', 'create_page_menu(event,"hat_sy
 $sys_stat = new CUIWidget('hat_syssum', new CSpan(_('Loading...'), 'textcolorstyles'), CProfile::get('web.dashboard.hats.hat_syssum.state', 1));
 $sys_stat->setHeader(_('System status'), array($refresh_menu));
 $sys_stat->setFooter(new CDiv(SPACE, 'textwhite', 'hat_syssum_footer'));
-$rightColumn[] = $sys_stat;
+list($xparam, $yparam) = explode(":", CProfile::get('web.dashboard.sort.hat_syssum_widget', '1:1'));
+if (!isset($columns[$xparam][$yparam])) {
+	$columns[$xparam][$yparam] = $sys_stat;
+}
+else {
+	$columns[$xparam][] = $sys_stat;
+}
 
 // host status
 $refresh_menu = get_icon('menu', array('menu' => 'hat_hoststat'));
 $hoststat = new CUIWidget('hat_hoststat', new CSpan(_('Loading...'), 'textcolorstyles'), CProfile::get('web.dashboard.hats.hat_hoststat.state', 1));
 $hoststat->setHeader(_('Host status'), array($refresh_menu));
 $hoststat->setFooter(new CDiv(SPACE, 'textwhite', 'hat_hoststat_footer'));
-$rightColumn[] = $hoststat;
+list($xparam, $yparam) = explode(":", CProfile::get('web.dashboard.sort.hat_hoststat_widget', '1:2'));
+if (!isset($columns[$xparam][$yparam])) {
+	$columns[$xparam][$yparam] = $hoststat;
+}
+else {
+	$columns[$xparam][] = $hoststat;
+}
 
 // last issues
 $refresh_menu = get_icon('menu', array('menu' => 'hat_lastiss'));
 $lastiss = new CUIWidget('hat_lastiss', new CSpan(_('Loading...'), 'textcolorstyles'), CProfile::get('web.dashboard.hats.hat_lastiss.state', 1));
 $lastiss->setHeader(_n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT), array($refresh_menu));
 $lastiss->setFooter(new CDiv(SPACE, 'textwhite', 'hat_lastiss_footer'));
-$rightColumn[] = $lastiss;
+list($xparam, $yparam) = explode(":", CProfile::get('web.dashboard.sort.hat_lastiss_widget', '1:3'));
+if (!isset($columns[$xparam][$yparam])) {
+	$columns[$xparam][$yparam] = $lastiss;
+}
+else {
+	$columns[$xparam][] = $lastiss;
+}
 
 // web monitoring
 $refresh_menu = get_icon('menu', array('menu' => 'hat_webovr'));
 $web_mon = new CUIWidget('hat_webovr', new CSpan(_('Loading...'), 'textcolorstyles'), CProfile::get('web.dashboard.hats.hat_webovr.state', 1));
 $web_mon->setHeader(_('Web monitoring'), array($refresh_menu));
 $web_mon->setFooter(new CDiv(SPACE, 'textwhite', 'hat_webovr_footer'));
-$rightColumn[] = $web_mon;
+list($xparam, $yparam) = explode(":", CProfile::get('web.dashboard.sort.hat_webovr_widget', '1:4'));
+if (!isset($columns[$xparam][$yparam])) {
+	$columns[$xparam][$yparam] = $web_mon;
+}
+else {
+	$columns[$xparam][] = $web_mon;
+}
 
 // discovery info
 $drules = DBfetch(DBselect(
@@ -364,17 +417,27 @@ $drules = DBfetch(DBselect(
 ));
 if ($drules['cnt'] > 0 && check_right_on_discovery(PERM_READ)) {
 	$refresh_tab[] = array('id' => 'hat_dscvry', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_dscvry', 60));
+
 	$refresh_menu = get_icon('menu', array('menu' => 'hat_dscvry'));
 	$dcvr_mon = new CUIWidget('hat_dscvry', new CSpan(_('Loading...'), 'textcolorstyles'), CProfile::get('web.dashboard.hats.hat_dscvry.state', 1));
 	$dcvr_mon->setHeader(_('Discovery status'), array($refresh_menu));
 	$dcvr_mon->setFooter(new CDiv(SPACE, 'textwhite', 'hat_dscvry_footer'));
-	$rightColumn[] = $dcvr_mon;
+	list($xparam, $yparam) = explode(":", CProfile::get('web.dashboard.sort.hat_dscvry_widget', '1:5'));
+	if (!isset($columns[$xparam][$yparam])) {
+		$columns[$xparam][$yparam] = $dcvr_mon;
+	}
+	else {
+		$columns[$xparam][] = $dcvr_mon;
+	}
 }
 
 add_doll_objects($refresh_tab);
+foreach($columns as $key => $val){
+	ksort($columns[$key]);
+}
 
 $dashboardTable = new CTable();
-$dashboardTable->addRow(array(new CDiv($leftColumn, 'column'), new CDiv($rightColumn, 'column'), new CDiv(null, 'column')), 'top');
+$dashboardTable->addRow(array(new CDiv($columns[0], 'column'), new CDiv($columns[1], 'column'), new CDiv($columns[2], 'column')), 'top');
 
 $dashboardWidget->addItem($dashboardTable);
 $dashboardWidget->show();
