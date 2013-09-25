@@ -23,7 +23,7 @@ $hostInventoryWidget = new CWidget();
 
 $rForm = new CForm('get');
 $rForm->addItem(array(_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB(true)));
-$hostInventoryWidget->addPageHeader(_('HOST INVENTORIES'), SPACE);
+$hostInventoryWidget->addPageHeader(_('HOST INVENTORY'), SPACE);
 $hostInventoryWidget->addHeader(_('Hosts'), $rForm);
 
 $filterTable = new CTable('', 'filter');
