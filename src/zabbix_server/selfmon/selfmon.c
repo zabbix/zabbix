@@ -36,7 +36,7 @@ void	main_selfmon_loop(void)
 
 		collect_selfmon_stats();
 
-		zbx_setproctitle("%s [sleeping 1 sec]", get_process_type_string(process_type));
+		zbx_setproctitle("%s [idle 1 sec]", get_process_type_string(process_type));
 
 		zbx_sleep_loop(1);
 	}

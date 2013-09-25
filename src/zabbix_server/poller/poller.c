@@ -797,7 +797,7 @@ void	main_poller_loop(unsigned char poller_type)
 		nextcheck = DCconfig_get_poller_nextcheck(poller_type);
 		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
-		zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, sleeping %d sec]",
+		zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), process_num, processed, sec, sleeptime);
 
 		zbx_sleep_loop(sleeptime);

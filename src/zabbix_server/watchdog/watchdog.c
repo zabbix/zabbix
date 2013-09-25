@@ -240,12 +240,12 @@ void	main_watchdog_loop(void)
 
 		if (1 == action)
 		{
-			zbx_setproctitle("%s [database is down, checking took " ZBX_FS_DBL " sec, sleeping %d sec]",
+			zbx_setproctitle("%s [database is down, checking took " ZBX_FS_DBL " sec, idle %d sec]",
 					get_process_type_string(process_type), sec, (int)DB_PING_FREQUENCY);
 		}
 		else if (2 == action)
 		{
-			zbx_setproctitle("%s [synced alerts config in " ZBX_FS_DBL " sec, sleeping %d sec]",
+			zbx_setproctitle("%s [synced alerts config in " ZBX_FS_DBL " sec, idle %d sec]",
 					get_process_type_string(process_type), sec, (int)DB_PING_FREQUENCY);
 		}
 

@@ -188,7 +188,7 @@ retry_autoreg_host:
 		zabbix_log(LOG_LEVEL_DEBUG, "Datasender spent " ZBX_FS_DBL " seconds while processing %3d values.",
 				sec, records);
 
-		zbx_setproctitle("%s [sent %d values in " ZBX_FS_DBL " sec, sleeping %d sec]",
+		zbx_setproctitle("%s [sent %d values in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), records, sec, CONFIG_PROXYDATA_FREQUENCY);
 
 		zbx_sleep_loop(CONFIG_PROXYDATA_FREQUENCY);

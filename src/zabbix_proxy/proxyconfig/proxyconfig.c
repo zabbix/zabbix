@@ -120,7 +120,7 @@ void	main_proxyconfig_loop(void)
 
 		sec = zbx_time() - sec;
 
-		zbx_setproctitle("%s [synced config " ZBX_FS_SIZE_T " bytes in " ZBX_FS_DBL " sec, sleeping %d sec]",
+		zbx_setproctitle("%s [synced config " ZBX_FS_SIZE_T " bytes in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), (zbx_fs_size_t)data_size, sec,
 				CONFIG_PROXYCONFIG_FREQUENCY);
 
