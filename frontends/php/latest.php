@@ -234,7 +234,6 @@ $hosts = API::Host()->get(array(
 	'hostids' => $availableHostIds,
 	'with_monitored_items' => true,
 	'selectScreens' => API_OUTPUT_COUNT,
-	'selectInventory' => array('hostid'),
 	'preservekeys' => true
 ));
 foreach ($hosts as &$host) {
