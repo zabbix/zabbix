@@ -2657,7 +2657,6 @@ function getMenuPopupHost(array $host, array $scripts = null, $hasGoTo = true) {
 	$data = array(
 		'type' => 'host',
 		'hostid' => $host['hostid'],
-		'hasInventory' => (isset($host['inventory']) && $host['inventory']),
 		'hasScreens' => (isset($host['screens']) && $host['screens']),
 		'hasGoTo' => $hasGoTo
 	);

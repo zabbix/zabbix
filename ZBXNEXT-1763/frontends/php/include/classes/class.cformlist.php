@@ -31,7 +31,10 @@ class CFormList extends CDiv {
 
 		parent::__construct();
 
-		$this->attr('id', zbx_formatDomId($id));
+		if ($id) {
+			$this->attr('id', zbx_formatDomId($id));
+		}
+
 		$this->attr('class', $class);
 	}
 
