@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-25 09:27+0300\n"
-"PO-Revision-Date: 2013-09-09 11:14+0300\n"
+"POT-Creation-Date: 2013-09-25 09:29+0300\n"
+"PO-Revision-Date: 2013-09-12 19:26+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1378718046.0\n"
+"X-POOTLE-MTIME: 1379006809.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -719,7 +719,7 @@ msgstr "В %1$s:%2$s с дня %3$s каждый %4$s"
 #, php-format
 msgid "At %2$s:%3$s on every %4$s of every week"
 msgid_plural "At %2$s:%3$s on every %4$s of every %1$s weeks"
-msgstr[0] "В %2$s:%3$s каждый %4$s каждую %1$s неделю"
+msgstr[0] "В %2$s:%3$s каждый %4$s каждую неделю"
 msgstr[1] "В %2$s:%3$s каждый %4$s каждые %1$s недели"
 msgstr[2] "В %2$s:%3$s каждый %4$s каждые %1$s недели"
 
@@ -727,7 +727,7 @@ msgstr[2] "В %2$s:%3$s каждый %4$s каждые %1$s недели"
 #, php-format
 msgid "At %2$s:%3$s on every day"
 msgid_plural "At %2$s:%3$s on every %1$s days"
-msgstr[0] "В %2$s:%3$s каждый %1$s день"
+msgstr[0] "В %2$s:%3$s каждый день"
 msgstr[1] "В %2$s:%3$s каждые %1$s дня"
 msgstr[2] "В %2$s:%3$s каждые %1$s дней"
 
@@ -1222,7 +1222,7 @@ msgstr "Не удалось добавить не числовой элемен�
 #: api/classes/CGraphPrototype.php:696 api/classes/CGraphPrototype.php:758
 #, php-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
-msgstr ""
+msgstr "Не удалось добавить не числовой элемент данных \"%1$s\" к прототипу графика \"%2$s\"."
 
 #: include/reports.inc.php:505
 #, php-format
@@ -1306,7 +1306,7 @@ msgstr "Невозможно добавить более одного элеме
 #: api/classes/CGraphPrototype.php:43
 #, php-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
-msgstr ""
+msgstr "Не удалось добавить более одного элемента данных с типом 'Суммарный график' к прототипу графика \"%1$s\"."
 
 #: sysmaps.php:171
 msgid "Cannot add network map"
@@ -1426,7 +1426,7 @@ msgstr "Не удалось скопировать триггер \"%1$s:%2$s\",
 #: api/classes/CHostPrototype.php:151
 #, php-format
 msgid "Cannot create a host prototype on a discovered host \"%1$s\"."
-msgstr "Не удалось создать прототип узла сети от обнаруженного узла сети \"%1$s\".Не удалось создать прототип узла сети от обнаруженного узла сети \"%1$s\"."
+msgstr "Не удалось создать прототип узла сети от обнаруженного узла сети \"%1$s\"."
 
 #: include/db.inc.php:34
 msgid "Cannot create another database connection."
@@ -2044,7 +2044,7 @@ msgstr "Не удалось обновить \"templateid\" для график�
 #: api/classes/CGraphPrototype.php:42
 #, php-format
 msgid "Cannot update \"templateid\" for graph prototype \"%1$s\"."
-msgstr ""
+msgstr "Не удалось обновить \"templateid\" у прототипа графика \"%1$s\"."
 
 #: api/classes/CScreen.php:447 api/classes/CTemplateScreen.php:667
 #, php-format
@@ -4160,12 +4160,12 @@ msgstr "Дублирующиеся зависимости в триггере \"
 #: api/classes/CHostPrototype.php:197
 #, php-format
 msgid "Duplicate group prototype name \"%2$s\" for host prototype \"%1$s\"."
-msgstr ""
+msgstr "Дубликат имени прототипа группы \"%2$s\" у прототипа узла сети \"%1$s\"."
 
 #: api/classes/CHostPrototype.php:191
 #, php-format
 msgid "Duplicate host group ID \"%2$s\" for host prototype \"%1$s\"."
-msgstr ""
+msgstr "Дубликат ID группы узлов сети \"%2$s\" у прототипа узла сети \"%1$s\"."
 
 #: api/classes/CHost.php:747
 #, php-format
@@ -4293,11 +4293,11 @@ msgstr "Пустой цвет."
 
 #: api/classes/CHostPrototype.php:458
 msgid "Empty host ID for host prototype."
-msgstr ""
+msgstr "Пустой ID узла сети у прототипа узла сети."
 
 #: api/classes/CHostPrototype.php:173
 msgid "Empty host."
-msgstr ""
+msgstr "Пустое имя узла сети."
 
 #: api/classes/CAction.php:1235 api/classes/CApplication.php:288
 #: api/classes/CApplication.php:495 api/classes/CDiscoveryRule.php:339
@@ -4326,12 +4326,12 @@ msgstr "Пустой макрос."
 
 #: api/classes/CHostPrototype.php:222
 msgid "Empty name for group prototype."
-msgstr ""
+msgstr "Пустое имя у прототипа группы."
 
 #: api/classes/CHostPrototype.php:181
 #, php-format
 msgid "Empty name for host prototype \"%1$s\"."
-msgstr ""
+msgstr "Пустое имя у прототипа узла сети \"%1$s\"."
 
 #: api/classes/CScript.php:569
 #, php-format
@@ -4437,7 +4437,7 @@ msgstr "Активировать выбранные группы?"
 
 #: include/views/configuration.host.prototype.list.php:120
 msgid "Enable selected host prototypes?"
-msgstr ""
+msgstr "Активировать выбранные прототипы узлов сети?"
 
 #: hosts.php:999 include/views/configuration.hostgroups.list.php:162
 msgid "Enable selected hosts?"
@@ -5240,7 +5240,7 @@ msgstr "Группа"
 #: api/classes/CHostGroup.php:613
 #, php-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
-msgstr ""
+msgstr "Группа \"%1$s\" не может быть удалена, так как используется прототипом узла сети."
 
 #: include/classes/import/importers/CTemplateImporter.php:233
 #, php-format
@@ -5275,20 +5275,20 @@ msgstr "Имя группы"
 
 #: api/classes/CHostPrototype.php:395 api/classes/CHostPrototype.php:402
 msgid "Group prototype ID cannot be empty."
-msgstr ""
+msgstr "ID прототипа группы не может быть пустым."
 
 #: api/classes/CHostPrototype.php:156 api/classes/CHostPrototype.php:434
 #, php-format
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
-msgstr ""
+msgstr "Прототип группы не может основываться на обнаруженной группе узлов сети \"%1$s\"."
 
 #: include/views/configuration.host.prototype.edit.php:203
 msgid "Group prototypes"
-msgstr ""
+msgstr "Прототипы групп"
 
 #: hostgroups.php:124 usergrps.php:179
 msgid "Group updated"
-msgstr "Группа обновлена"
+msgstr "Прототипы групп"
 
 #: hostinventoriesoverview.php:84
 msgid "Grouping by"
@@ -5645,12 +5645,12 @@ msgstr "Имя узла сети"
 #: api/classes/CHostPrototype.php:174
 #, php-format
 msgid "Host name \"%1$s\" is too long, it must not be longer than %2$d characters."
-msgstr ""
+msgstr "Имя узла сети \"%1$s\" слишком длинное, оно не должно быть длиннее чем %2$d символов."
 
 #: api/classes/CHostPrototype.php:176
 #, php-format
 msgid "Host name for host prototype \"%1$s\" must contain macros."
-msgstr ""
+msgstr "Имя узла сети для прототипа узла сети \"%1$s\" должно содержать макросы."
 
 #: include/hosts.inc.php:290
 msgid "Host networks"
@@ -5659,71 +5659,71 @@ msgstr "Сети узла сети"
 #: api/classes/CHostPrototype.php:785
 #, php-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
-msgstr ""
+msgstr "Прототип узла сети \"%1$s\" уже существует у \"%2$s\", унаследованный из другого шаблона."
 
 #: api/classes/CHostPrototype.php:773
 #, php-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "Прототип узла сети \"%1$s\" уже существует у \"%2$s\"."
 
 #: api/classes/CHostPrototype.php:189
 #, php-format
 msgid "Host prototype \"%1$s\" must have at least one host group."
-msgstr ""
+msgstr "Прототип узла сети \"%1$s\" должен иметь по крайней мере одну группу узлов сети."
 
 #: host_prototypes.php:202
 msgid "Host prototype added"
-msgstr ""
+msgstr "Прототип узла сети добавлен"
 
 #: host_prototypes.php:119
 msgid "Host prototype deleted"
-msgstr ""
+msgstr "Прототип узла сети удален"
 
 #: host_prototypes.php:188
 msgid "Host prototype updated"
-msgstr ""
+msgstr "Прототип узла сети обновлен"
 
 #: api/classes/CHostPrototype.php:1100
 #, php-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\"."
-msgstr ""
+msgstr "Прототип узла сети с именем узла сети \"%1$s\" уже существует в правиле обнаружения \"%2$s\"."
 
 #: api/classes/CHostPrototype.php:1096
 #, php-format
 msgid "Host prototype with host name \"%1$s\" already exists."
-msgstr ""
+msgstr "Прототип узла сети с именем узла сети \"%1$s\" уже существует."
 
 #: api/classes/CHostPrototype.php:1108
 #, php-format
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
-msgstr ""
+msgstr "Прототип узла сети с видимым именем \"%1$s\" уже существует в правиле обнаружения \"%2$s\"."
 
 #: api/classes/CHostPrototype.php:1105
 #, php-format
 msgid "Host prototype with visible name \"%1$s\" already exists."
-msgstr ""
+msgstr "Прототип узла сети с видимым именем \"%1$s\" уже существует."
 
 #: include/html.inc.php:483 include/html.inc.php:487
 #: include/views/configuration.host.discovery.list.php:93
 #: include/views/configuration.host.edit.php:620
 msgid "Host prototypes"
-msgstr ""
+msgstr "Прототипы узлов сети"
 
 #: host_prototypes.php:225
 msgid "Host prototypes activated"
-msgstr ""
+msgstr "Прототипы узлов сети активированы"
 
 #: host_prototypes.php:232
 msgid "Host prototypes deleted"
-msgstr ""
+msgstr "Прототипы узлов сети удалены"
 
 #: host_prototypes.php:225
 msgid "Host prototypes disabled"
-msgstr ""
+msgstr "Прототипы узлов сети деактивированы"
 
 #: include/views/configuration.host.prototype.list.php:34
 msgid "Host prototypes of"
-msgstr ""
+msgstr "Прототипы узлов сети"
 
 #: include/hosts.inc.php:300
 msgid "Host router"
@@ -6413,7 +6413,7 @@ msgstr "Использованы некорректные символы в им
 #: api/classes/CHostPrototype.php:175
 #, php-format
 msgid "Incorrect characters used for host \"%1$s\"."
-msgstr ""
+msgstr "Использованы некорректные символы в узле сети \"%1$s\"."
 
 #: api/classes/CHost.php:743 api/classes/CHost.php:1090
 #, php-format
@@ -6442,7 +6442,7 @@ msgstr "Некорректная задержка."
 #: api/classes/CHostPrototype.php:113
 #, php-format
 msgid "Incorrect discovery rule ID for host prototype \"%1$s\"."
-msgstr ""
+msgstr "Некорректный ID правила обнаружения для прототипа узла сети \"%1$s\"."
 
 #: include/classes/validators/event/CEventSourceObjectValidator.php:66
 #, php-format
@@ -6496,12 +6496,12 @@ msgstr "Указан некорректный ID графика \"%s\" для э
 
 #: api/classes/CHostPrototype.php:396 api/classes/CHostPrototype.php:403
 msgid "Incorrect group prototype ID."
-msgstr ""
+msgstr "Некорректный ID прототипа группы."
 
 #: api/classes/CHostPrototype.php:196
 #, php-format
 msgid "Incorrect group prototypes for host prototype \"%1$s\"."
-msgstr ""
+msgstr "Некорректные прототипы групп для прототипа узла сети \"%1$s\"."
 
 #: api/classes/CScreenItem.php:500
 #, php-format
@@ -6515,7 +6515,7 @@ msgstr "Указан некорректный ID группы узлов сет�
 
 #: api/classes/CHostPrototype.php:241
 msgid "Incorrect host group ID for group prototype."
-msgstr ""
+msgstr "Некорректный ID группы узлов сети для прототипа группы."
 
 #: include/profiles.inc.php:292
 msgid "Incorrect host group."
@@ -6524,11 +6524,11 @@ msgstr "Некорректная группа узлов сети."
 #: api/classes/CHostPrototype.php:190
 #, php-format
 msgid "Incorrect host groups for host prototype \"%1$s\"."
-msgstr ""
+msgstr "Некорректные группы узлов сети у прототипа узла сети \"%1$s\"."
 
 #: api/classes/CHostPrototype.php:459
 msgid "Incorrect host prototype ID."
-msgstr ""
+msgstr "Некорректный ID прототипа узла сети."
 
 #: image.php:46
 msgid "Incorrect image index."
@@ -6757,7 +6757,7 @@ msgstr "Некорректное значение источника."
 #: api/classes/CHostPrototype.php:185
 #, php-format
 msgid "Incorrect status for host prototype \"%1$s\"."
-msgstr ""
+msgstr "Некорректное состояние прототипа узла сети \"%1$s\"."
 
 #: api/classes/CService.php:1232
 #, php-format
@@ -8750,7 +8750,7 @@ msgstr "Имя"
 #: api/classes/CHostPrototype.php:223
 #, php-format
 msgid "Name for group prototype \"%1$s\" must contain macros."
-msgstr ""
+msgstr "Имя прототипа группы \"%1$s\" должно содержать макросы."
 
 #: sysmaps.php:171
 msgid "Network map added"
@@ -8858,12 +8858,12 @@ msgstr "Не задано \"%1$s\" для графика."
 #: api/classes/CHostPrototype.php:457
 #, php-format
 msgid "No \"%1$s\" given for host prototype."
-msgstr ""
+msgstr "Не задано \"%1$s\" для прототипа узла сети."
 
 #: api/classes/CHostPrototype.php:208
 #, php-format
 msgid "No \"%2$s\" given for host prototype \"%1$s\"."
-msgstr ""
+msgstr "Не задано \"%2$s\" для прототипа узла сети \"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:1572
 #, php-format
@@ -8878,17 +8878,17 @@ msgstr "Нет поля \"ymin_type\" для графика \"%s\"."
 #: include/views/configuration.host.edit.php:366
 #: include/views/configuration.host.prototype.edit.php:143
 msgid "No IPMI interfaces defined."
-msgstr ""
+msgstr "Не заданы IPMI интерфейсы."
 
 #: include/views/configuration.host.edit.php:353
 #: include/views/configuration.host.prototype.edit.php:130
 msgid "No JMX interfaces defined."
-msgstr ""
+msgstr "Не заданы JMX интерфейсы."
 
 #: include/views/configuration.host.edit.php:340
 #: include/views/configuration.host.prototype.edit.php:117
 msgid "No SNMP interfaces defined."
-msgstr ""
+msgstr "Не заданы SNMP интерфейсы."
 
 #: api/classes/CScreenItem.php:472
 msgid "No URL provided for screen element."
@@ -8919,7 +8919,7 @@ msgstr "Действия не найдены."
 #: include/views/configuration.host.edit.php:326
 #: include/views/configuration.host.prototype.edit.php:103
 msgid "No agent interfaces defined."
-msgstr ""
+msgstr "Не заданы интерфейсы агентов."
 
 #: include/hosts.inc.php:588
 #, php-format
@@ -9010,7 +9010,7 @@ msgstr "Проверки обнаружения не заданы."
 #: api/classes/CHostPrototype.php:112
 #, php-format
 msgid "No discovery rule ID given for host prototype \"%1$s\"."
-msgstr ""
+msgstr "Не задан ID правила обнаружения для прототипа узла сети \"%1$s\"."
 
 #: api/classes/CDiscoveryRule.php:443
 msgid "No discovery rule IDs given."
@@ -9113,7 +9113,7 @@ msgstr "Узел сети не задан для макроса \"%1$s\"."
 
 #: api/classes/CHostPrototype.php:240
 msgid "No host group ID for group prototype."
-msgstr ""
+msgstr "Не задан ID группы узлов сети для прототипа группы."
 
 #: api/classes/CScreenItem.php:436
 msgid "No host group ID provided for screen element."
@@ -9130,7 +9130,7 @@ msgstr "Нет групп узлов сети с groupid \"%s\"."
 
 #: include/views/configuration.host.prototype.list.php:44
 msgid "No host prototypes defined."
-msgstr ""
+msgstr "Прототипы узлов сети не заданы."
 
 #: include/hosts.inc.php:536
 #, php-format
@@ -9213,7 +9213,7 @@ msgstr "Прототипы элементов данных не заданы."
 
 #: include/views/common.macros.php:26
 msgid "No macros defined."
-msgstr ""
+msgstr "Прототипы макросов не заданы."
 
 #: include/views/configuration.maintenance.list.php:41
 msgid "No maintenance defined."
@@ -9448,7 +9448,7 @@ msgstr "Шаблоны не заданы."
 
 #: include/views/configuration.host.prototype.edit.php:233
 msgid "No templates linked."
-msgstr ""
+msgstr "Нет присоединенных шаблонов."
 
 #: include/views/configuration.services.edit.php:127
 msgid "No times defined. Work 24x7."
@@ -9456,7 +9456,7 @@ msgstr "Интервалы не заданы. Работа 24x7."
 
 #: include/views/monitoring.overview.php:67
 msgid "No trigger"
-msgstr "Триггера нет"
+msgstr "Без триггера"
 
 #: include/triggers.inc.php:271
 #, php-format
@@ -9753,7 +9753,7 @@ msgstr "OK"
 
 #: include/views/monitoring.overview.php:70
 msgid "OK or no trigger"
-msgstr "OK или без триггеров"
+msgstr "OK или без триггера"
 
 #: include/hosts.inc.php:305
 msgid "OOB IP address"
@@ -12604,12 +12604,12 @@ msgstr "Веб-интерфейс не соответствует базе да�
 #: include/views/configuration.hostgroups.list.php:137
 #, php-format
 msgid "The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr ""
+msgstr "Группа узлов сети более не обнаруживается и будет удалена в %1$s (через %2$s %3$s)."
 
 #: include/html.inc.php:591
 #, php-format
 msgid "The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr ""
+msgstr "Узел сети более не обнаруживается и будет удален в %1$s (через %2$s %3$s)."
 
 #: api/classes/CImage.php:493
 #, php-format
@@ -13336,7 +13336,7 @@ msgstr "Отсоединено: Прототип графика \"%1$s\" от \"
 #: api/classes/CHostGeneral.php:426
 #, php-format
 msgid "Unlinked: Host prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Отсоединено: Прототип узла сети \"%1$s\" от \"%2$s\"."
 
 #: api/classes/CHostGeneral.php:378
 #, php-format
@@ -13380,17 +13380,17 @@ msgstr "Неподдерживаемый формат импорта \"%1$s\"."
 #: api/classes/CHostPrototype.php:227 api/classes/CHostPrototype.php:245
 #, php-format
 msgid "Unsupported parameter \"%1$s\" for group prototype."
-msgstr ""
+msgstr "Неподдерживаемый параметр \"%1$s\" для прототипа группы."
 
 #: api/classes/CHostPrototype.php:209
 #, php-format
 msgid "Unsupported parameter \"%2$s\" for host prototype \"%1$s\"."
-msgstr ""
+msgstr "Неподдерживаемый параметр \"%1$s\" для прототипа узла сети \"%1$s\"."
 
 #: api/classes/CHostPrototype.php:203
 #, php-format
 msgid "Unsupported parameter \"%2$s\" for host prototype %1$s host inventory."
-msgstr ""
+msgstr "Неподдерживаемый параметр \"%1$s\" для прототипа узла сети \"%1$s\" инвентарных данных."
 
 #: include/blocks.inc.php:1134
 msgctxt "discovery results in dashboard"
@@ -13458,7 +13458,7 @@ msgstr "Обновлено: Правило обнаружения \"%1$s\" в \"
 #: api/classes/CHostPrototype.php:615
 #, php-format
 msgid "Updated: Host prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Обновлено: Прототип узла сети \"%1$s\" у \"%2$s\"."
 
 #: api/classes/CItem.php:642
 #, php-format
@@ -14605,7 +14605,7 @@ msgstr "внутреннее"
 #: include/events.inc.php:37
 msgctxt "event source"
 msgid "internal"
-msgstr ""
+msgstr "внутренний"
 
 #: include/classes/class.cserverinfo.php:44
 msgid "is"

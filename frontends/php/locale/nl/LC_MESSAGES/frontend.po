@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-25 09:27+0300\n"
+"POT-Creation-Date: 2013-09-25 09:29+0300\n"
 "PO-Revision-Date: 2013-09-14 16:34+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: NL\n"
@@ -1216,7 +1216,7 @@ msgstr "Kan geen niet-numeriek item \"%1$s\" aan grafiek \"%2$s\" toevoegen."
 #: api/classes/CGraphPrototype.php:696 api/classes/CGraphPrototype.php:758
 #, php-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
-msgstr "Kan een niet-numeriek item niet toevoegen \"%1$s\" in grafiek prototype \"%2$s\"."
+msgstr "Kan een niet-numeriek item niet toevoegen \"%1$s\" in grafiek prototype \"%2$s\".Kan een niet-numeriek item niet toevoegen \"%1$s\" in grafiek prototype \"%2$s\"."
 
 #: include/reports.inc.php:505
 #, php-format
@@ -1242,7 +1242,7 @@ msgstr "Kan geen host afhankelijkheid toevoegen aan een template."
 #: include/triggers.inc.php:506
 #, php-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
-msgstr "Kan afhankelijkheid niet toevoegen van trigger \"%1$s:%2$s\" naar niet bestaande trigger \"%3$s:%4$s\"."
+msgstr "Kan afhankelijkheid niet toevoegen van trigger \"%1$s:%2$s\" naar niet bestaande trigger \"%3$s:%4$s\".Kan afhankelijkheid niet toevoegen van trigger \"%1$s:%2$s\" naar niet bestaande trigger \"%3$s:%4$s\"."
 
 #: host_discovery.php:267
 msgid "Cannot add discovery rule"
@@ -1300,7 +1300,7 @@ msgstr "Kan niet meer dan één item van het type \"Grafiek som\" toevoegen aan 
 #: api/classes/CGraphPrototype.php:43
 #, php-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
-msgstr "Kan meer dan een item niet toevoegen met type \"Graph sum\" op de grafiek prototype \"%1$s\"."
+msgstr "Kan meer dan een item niet toevoegen met type \"Graph sum\" op de grafiek prototype \"%1$s\".Kan meer dan een item niet toevoegen met type \"Graph sum\" op de grafiek prototype \"%1$s\"."
 
 #: sysmaps.php:171
 msgid "Cannot add network map"
@@ -2453,7 +2453,7 @@ msgstr "Kolom breedte"
 #: api/classes/CScreenItem.php:611
 #, php-format
 msgid "Column span of screen element located at X - %1$s and Y - %2$s is too big."
-msgstr "Column overspanning van het scherm element gelegen op X -%1$s en Y -%2$s is te groot."
+msgstr "Column overspanning van het scherm element gelegen op X -%1$s en Y -%2$s is te groot.Column overspanning van het scherm element gelegen op X -%1$s en Y -%2$s is te groot."
 
 #: include/views/configuration.screen.edit.php:42 screenconf.php:51
 msgid "Columns"
@@ -2723,7 +2723,7 @@ msgstr "Geconnecteerd als '%1$s' vanaf '%2$s'"
 #: include/classes/server/CZabbixServer.php:208
 #, php-format
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
-msgstr "Time-out verbinding van %1$s seconden overschreden bij het verbinden met Zabbix server \"%2$s\"."
+msgstr "Time-out verbinding van %1$s seconden overschreden bij het verbinden met Zabbix server \"%2$s\".Time-out verbinding van %1$s seconden overschreden bij het verbinden met Zabbix server \"%2$s\"."
 
 #: include/classes/server/CZabbixServer.php:283
 #, php-format
