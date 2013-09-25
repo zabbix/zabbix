@@ -368,8 +368,8 @@ else {
 			$keepHistory[] = new CSpan('('._n('%1$s day', '%1$s days', $dataConfig['hk_history']).')');
 		}
 		else {
-			$keepHistory[] = new CSpan(
-				_('Overriden by global housekeeper settings').'('._n('%1$s day', '%1$s days', $dataConfig['hk_history']).')'
+			$keepHistory[] = new CSpan(_('Overriden by global housekeeper settings').
+				'('._n('%1$s day', '%1$s days', $dataConfig['hk_history']).')'
 			);
 		}
 	}
@@ -386,12 +386,11 @@ else {
 			$link->setAttribute('target', '_blank');
 			$keepTrend[] =  $link;
 			$keepTrend[] = SPACE;
-			$keepTrend[] = new CSpan('('. _n($dataConfig['hk_trends'].' day',
-				$dataConfig['hk_trends'].' days', $dataConfig['hk_trends']). ')');
+			$keepTrend[] = new CSpan('('._n('%1$s day', '%1$s days', $dataConfig['hk_trends']).')');
 		}
 		else {
-			$keepTrend[] = new CSpan(
-				_('Overriden by global housekeeper settings').'('._n('%1$s day', '%1$s days', $dataConfig['hk_trends']).')'
+			$keepTrend[] = new CSpan(_('Overriden by global housekeeper settings').
+				'('._n('%1$s day', '%1$s days', $dataConfig['hk_trends']).')'
 			);
 		}
 	}

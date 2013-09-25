@@ -431,7 +431,7 @@ function convertUnitsUptime($value) {
 	$secs -= $mins * SEC_PER_MIN;
 
 	if ($days != 0) {
-		$value .= _n('%1$d day, ', '%1$d days, ', $days);
+		$value .= _n('%1$d day', '%1$d days', $days).', ';
 	}
 	$value .= sprintf('%02d:%02d:%02d', $hours, $mins, $secs);
 
