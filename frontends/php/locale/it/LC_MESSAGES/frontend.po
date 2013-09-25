@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-25 09:27+0300\n"
-"PO-Revision-Date: 2013-09-14 16:46+0300\n"
+"POT-Creation-Date: 2013-09-25 09:29+0300\n"
+"PO-Revision-Date: 2013-09-25 06:05+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: it\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1379170012.0\n"
+"X-POOTLE-MTIME: 1380081938.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -24,11 +24,11 @@ msgstr "\"%s\" deve essere compresa tra 1970.01.01 e 2038.01.18."
 
 #: include/profiles.inc.php:321
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
-msgstr "\"I trigger lampeggiano al cambio di stato\" deve essere \"0\" o un intero positivo."
+msgstr "\"I trigger lampeggiano al cambio di stato\" deve essere \"0\" o un intero positivo.\"I trigger lampeggiano al cambio di stato\" deve essere \"0\" o un intero positivo."
 
 #: include/profiles.inc.php:326
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
-msgstr "\"I trigger lampeggiano al cambio di stato\" deve essere \"0\" o un intero positivo."
+msgstr "\"I trigger lampeggiano al cambio di stato\" deve essere \"0\" o un intero positivo.\"I trigger lampeggiano al cambio di stato\" deve essere \"0\" o un intero positivo."
 
 #: include/func.inc.php:434
 #, php-format
@@ -161,7 +161,7 @@ msgstr "ultimi 500 valori"
 
 #: include/views/administration.script.edit.php:41
 msgid "<Sub-menu/Sub-menu.../>Script"
-msgstr ""
+msgstr "<Sub-menu/Sub-menu.../>Script"
 
 #: include/views/configuration.sysmap.edit.php:55
 msgid "<manual>"
@@ -737,7 +737,7 @@ msgstr "Creare almeno un intervallo di manutenzione."
 
 #: include/classes/class.frontendsetup.php:294
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
-msgstr "Almeno uno tra MySQL, PostgreSQL, Oracle, SQLite3 o IBM DB2 deve essere supportato"
+msgstr "Almeno uno tra MySQL, PostgreSQL, Oracle, SQLite3 o IBM DB2 deve essere supportatoAlmeno uno tra MySQL, PostgreSQL, Oracle, SQLite3 o IBM DB2 deve essere supportato"
 
 #: include/menu.inc.php:264
 #: include/views/administration.general.housekeeper.edit.php:93
@@ -1400,7 +1400,7 @@ msgstr "Impossibile clonare prototipi di trigger."
 
 #: scripts_exec.php:65
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
-msgstr "Impossibile connettersi alla porta del trapper del demone Zabbix server, ma dovrebbe essere disponibile ad eseguire lo script."
+msgstr "Non è possibile connettersi alla porta del trapper del demone Zabbix server, ma dovrebbe essere disponibile per eseguire lo script."
 
 #: graphs.php:324
 msgid "Cannot copy graphs"
@@ -1456,7 +1456,7 @@ msgstr "Impossibile creare mappa \"%s\"."
 
 #: httpconf.php:150
 msgid "Cannot create new application, web scenario is already assigned to application."
-msgstr "Impossibile creare nuova applicazione, uno scenario web è già assegnato all'applicazione."
+msgstr "Impossibile creare nuova applicazione, uno scenario web è già assegnato all'applicazione.Impossibile creare nuova applicazione, uno scenario web è già assegnato all'applicazione."
 
 #: include/js.inc.php:265
 msgid "Cannot create new element"
@@ -1602,7 +1602,7 @@ msgstr "Impossibile rimuovere gli script. Lo script \"%1$s\" e' utilizzato nell'
 #: api/classes/CScript.php:529
 #, php-format
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
-msgstr ""
+msgstr "Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste."
 
 #: actionconf.php:331
 msgid "Cannot delete selected actions"
@@ -1808,7 +1808,7 @@ msgstr "Impossibile trovare trigger \"%1$s\" utilizzato nella mappa \"%2$s\"."
 
 #: srv_status.php:169
 msgid "Cannot format Tree. Check logic structure in service links."
-msgstr "Impossibile formattare Albero. Controlla la struttura logica nei collegamenti del servizio."
+msgstr "Impossibile formattare Albero. Controlla la struttura logica nei collegamenti del servizio.Impossibile formattare Albero. Controlla la struttura logica nei collegamenti del servizio."
 
 #: services.php:472
 msgid "Cannot format tree."
@@ -3053,7 +3053,7 @@ msgstr "Severity personalizzata"
 
 #: include/views/administration.general.triggerSeverity.edit.php:67
 msgid "Custom severity names affect all locales and require manual translation!"
-msgstr "I nomi delle severity personalizzate influiscono su tutti i locale e richiedono una traduzione manuale!"
+msgstr "I nomi delle severity personalizzate influiscono su tutti i locale e richiedono una traduzione manuale!I nomi delle severity personalizzate influiscono su tutti i locale e richiedono una traduzione manuale!"
 
 #: include/views/js/configuration.sysmaps.js.php:45
 msgid "Custom size"
@@ -3377,11 +3377,11 @@ msgstr "Rimuovi e pulisci"
 
 #: templates.php:648
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
-msgstr "Rimuovere e pulire template selezionati? (Attenzione: tutti gli host collegati saranno puliti!)"
+msgstr "Rimuovere e pulire template selezionati? (Attenzione: tutti gli host collegati saranno puliti!)Rimuovere e pulire template selezionati? (Attenzione: tutti gli host collegati saranno puliti!)"
 
 #: include/views/configuration.template.edit.php:443
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
-msgstr "Rimuovere e pulire il template? (Attenzione: tutti gli host collegati saranno puliti!)"
+msgstr "Rimuovere e pulire il template? (Attenzione: tutti gli host collegati saranno puliti!)Rimuovere e pulire il template? (Attenzione: tutti gli host collegati saranno puliti!)"
 
 #: include/views/configuration.application.edit.php:55
 msgid "Delete application?"
@@ -3798,11 +3798,11 @@ msgstr "La differenza tra i valori MAX e MIN del periodo T NON è N"
 
 #: popup_trexpr.php:231
 msgid "Difference between last and preceding values, then N = 1, 0 - otherwise"
-msgstr "Differenza tra l'ultimo valore e il precedente, allora N = 1, 0 - altrimenti"
+msgstr "Differenza tra l'ultimo valore e il precedente, allora N = 1, 0 - altrimentiDifferenza tra l'ultimo valore e il precedente, allora N = 1, 0 - altrimenti"
 
 #: popup_trexpr.php:235
 msgid "Difference between last and preceding values, then N NOT 1, 0 - otherwise"
-msgstr "Differenza tra l'ultimo valore e i precedenti, allora N NON 1, 0 - altrimenti"
+msgstr "Differenza tra l'ultimo valore e i precedenti, allora N NON 1, 0 - altrimentiDifferenza tra l'ultimo valore e i precedenti, allora N NON 1, 0 - altrimenti"
 
 #: popup_trexpr.php:195
 msgid "Difference between last and previous value is < N"
@@ -4057,12 +4057,12 @@ msgstr "Mostra trigger OK per"
 
 #: include/func.inc.php:1850
 msgid "Displaying"
-msgstr "Visualizzazione"
+msgstr "Visualizzati"
 
 #: search.php:232 search.php:334 search.php:470
 #, php-format
 msgid "Displaying %1$s of %2$s found"
-msgstr "Visualizzazione %1$s di %2$s trovate"
+msgstr "Visualizzati %1$s di %2$s trovate"
 
 #: report6.php:204
 msgid "Distribution of values for multiple items"
@@ -4173,7 +4173,7 @@ msgstr "Nome mappa duplicato per la mappa \"%s\"."
 #: api/classes/CScript.php:421 api/classes/CScript.php:477
 #, php-format
 msgid "Duplicate script name \"%1$s\"."
-msgstr ""
+msgstr "Nome script duplicato \"%s\"."
 
 #: include/profiles.inc.php:346
 #, php-format
@@ -4217,7 +4217,7 @@ msgstr "EVENTI"
 
 #: jsLoader.php:159
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
-msgstr "Ogni URL deve avere un nome univoco. Per favore assicurarsi che ci sia un solo URL con quel nome"
+msgstr "Ogni URL deve avere un nome univoco. Per favore assicurarsi che ci sia un solo URL con quel nomeOgni URL deve avere un nome univoco. Per favore assicurarsi che ci sia un solo URL con quel nome"
 
 #: include/views/administration.users.edit.php:190
 #: include/views/configuration.action.edit.php:376
@@ -4324,11 +4324,11 @@ msgstr "Nome vuoto per il prototipo host \"%1$s\"."
 #: api/classes/CScript.php:569
 #, php-format
 msgid "Empty name for script \"%1$s\"."
-msgstr ""
+msgstr "Campo nome assente per script \"%1$s\"."
 
 #: api/classes/CScript.php:418 api/classes/CScript.php:474
 msgid "Empty name for script."
-msgstr ""
+msgstr "Campo nome assente per script."
 
 #: api/classes/CService.php:1109
 msgid "Empty name."
@@ -4505,11 +4505,11 @@ msgstr "ID evento"
 
 #: popup_trexpr.php:443
 msgid "Event ID of last log entry matching regular expression T, then N = 1, 0 - otherwise"
-msgstr "L'ID evento dell'ultima voce nei log corrisponde all'espressione regolare T, quindi N = 1, 0 - altrimenti"
+msgstr "L'ID evento dell'ultima voce nei log corrisponde all'espressione regolare T, quindi N = 1, 0 - altrimentiL'ID evento dell'ultima voce nei log corrisponde all'espressione regolare T, quindi N = 1, 0 - altrimenti"
 
 #: popup_trexpr.php:448
 msgid "Event ID of last log entry matching regular expression T, then N NOT 1, 0 - otherwise"
-msgstr "L'ID evento dell'ultima voce nei log corrisponde all'espressione regolare T, quindi N NON è 1, 0 - altrimenti"
+msgstr "L'ID evento dell'ultima voce nei log corrisponde all'espressione regolare T, quindi N NON è 1, 0 - altrimentiL'ID evento dell'ultima voce nei log corrisponde all'espressione regolare T, quindi N NON è 1, 0 - altrimenti"
 
 #: acknow.php:150 include/actions.inc.php:88
 msgid "Event acknowledged"
@@ -4839,11 +4839,11 @@ msgstr "Filtra per nome"
 
 #: popup_trexpr.php:315
 msgid "Find string V in last (most recent) value. N = 1 - if found, 0 - otherwise"
-msgstr "Cerca stringa V nell'ultimo (più recente) valore. N = 1 - se trovato, 0 - altrimenti"
+msgstr "Cerca stringa V nell'ultimo (più recente) valore. N = 1 - se trovato, 0 - altrimentiCerca stringa V nell'ultimo (più recente) valore. N = 1 - se trovato, 0 - altrimenti"
 
 #: popup_trexpr.php:320
 msgid "Find string V in last (most recent) value. N NOT 1 - if found, 0 - otherwise"
-msgstr "Cerca stringa V nell'ultimo (più recente) valore. N NON è 1 - se trovato, 0 - altrimenti."
+msgstr "Cerca stringa V nell'ultimo (più recente) valore. N NON è 1 - se trovato, 0 - altrimenti.Cerca stringa V nell'ultimo (più recente) valore. N NON è 1 - se trovato, 0 - altrimenti."
 
 #: include/setup.inc.php:129
 msgid "Finish"
@@ -5378,7 +5378,7 @@ msgstr "Esadecimale"
 
 #: include/views/configuration.sysmap.constructor.php:41 jsLoader.php:144
 msgid "Hidden"
-msgstr "Nascosto"
+msgstr "Nascosta"
 
 #: include/classes/class.cuiwidget.php:58
 #: include/classes/class.cwidget.php:183 include/html.inc.php:162
@@ -5528,7 +5528,7 @@ msgstr "Host aggiunto"
 
 #: api/classes/CHostInterface.php:831
 msgid "Host cannot have more than one default interface of the same type."
-msgstr "Un host non può avere più di un'interfaccia predefinita dello stesso tipo."
+msgstr "Un host non può avere più di un'interfaccia predefinita dello stesso tipo.Un host non può avere più di un'interfaccia predefinita dello stesso tipo."
 
 #: hostinventoriesoverview.php:92
 #: include/views/administration.proxy.list.php:49
@@ -6077,7 +6077,7 @@ msgstr "Un'espressione identica esiste già"
 
 #: include/func.inc.php:2055 include/func.inc.php:2075
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
-msgstr "Se pensi che questo messaggio sia sbagliato, per favore contatta il tuo amministratore per ricevere i permessi necessari."
+msgstr "Se pensi che questo messaggio sia sbagliato, per favore contatta il tuo amministratore per ricevere i permessi necessari.Se pensi che questo messaggio sia sbagliato, per favore contatta il tuo amministratore per ricevere i permessi necessari."
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
 #: include/maps.inc.php:932
@@ -6232,7 +6232,7 @@ msgstr "Controllo discovery errato per la condizione dell'azione."
 
 #: api/classes/CAction.php:1665
 msgid "Incorrect action condition discovery check. Discovery check does not exist or you have no access to it."
-msgstr "Controllo discovery errato per la condizione dell'azione. Il controllo discovery non esiste o non hai accesso ad esso."
+msgstr "Controllo discovery errato per la condizione dell'azione. Il controllo discovery non esiste o non hai accesso ad esso.Controllo discovery errato per la condizione dell'azione. Il controllo discovery non esiste o non hai accesso ad esso."
 
 #: api/classes/CAction.php:1547
 msgid "Incorrect action condition discovery object."
@@ -6240,7 +6240,7 @@ msgstr "Oggetto discovery della condizione azione errato."
 
 #: api/classes/CAction.php:1662
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
-msgstr "Regola di discovery errata per la condizione dell'azione. La regola di discovery non esiste o non hai accesso ad essa."
+msgstr "Regola di discovery errata per la condizione dell'azione. La regola di discovery non esiste o non hai accesso ad essa.Regola di discovery errata per la condizione dell'azione. La regola di discovery non esiste o non hai accesso ad essa."
 
 #: api/classes/CAction.php:1592
 msgid "Incorrect action condition discovery status."
@@ -6252,11 +6252,11 @@ msgstr "Tipo evento errato per la condizione dell'azione."
 
 #: api/classes/CAction.php:1650
 msgid "Incorrect action condition host group. Host group does not exist or you have no access to it."
-msgstr "Gruppo host errato per la condizione dell'azione. Il gruppo host non esiste o non hai accesso ad esso."
+msgstr "Gruppo host errato per la condizione dell'azione. Il gruppo host non esiste o non hai accesso ad esso.Gruppo host errato per la condizione dell'azione. Il gruppo host non esiste o non hai accesso ad esso."
 
 #: api/classes/CAction.php:1653
 msgid "Incorrect action condition host. Host does not exist or you have no access to it."
-msgstr "Host errato per la condizione dell'azione. L'host non esiste o non hai accesso ad esso."
+msgstr "Host errato per la condizione dell'azione. L'host non esiste o non hai accesso ad esso.Host errato per la condizione dell'azione. L'host non esiste o non hai accesso ad esso."
 
 #: api/classes/CAction.php:1563
 #, php-format
@@ -6274,11 +6274,11 @@ msgstr "Porta della condizione azione \"%1$s\" errata."
 
 #: api/classes/CAction.php:1668
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
-msgstr "Proxy errato per la condizione dell'azione. Il proxy non esiste o non hai accesso ad esso."
+msgstr "Proxy errato per la condizione dell'azione. Il proxy non esiste o non hai accesso ad esso.Proxy errato per la condizione dell'azione. Il proxy non esiste o non hai accesso ad esso."
 
 #: api/classes/CAction.php:1656
 msgid "Incorrect action condition template. Template does not exist or you have no access to it."
-msgstr "Template errato per la condizione dell'azione. Il template non esiste o non hai accesso ad esso."
+msgstr "Template errato per la condizione dell'azione. Il template non esiste o non hai accesso ad esso.Template errato per la condizione dell'azione. Il template non esiste o non hai accesso ad esso."
 
 #: api/classes/CAction.php:1608
 msgid "Incorrect action condition trigger severity."
@@ -6290,7 +6290,7 @@ msgstr "Valore trigger nella condizione azione errato."
 
 #: api/classes/CAction.php:1659
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
-msgstr "Trigger errato per la condizione dell'azione. Il trigger non esiste o non hai accesso ad esso."
+msgstr "Trigger errato per la condizione dell'azione. Il trigger non esiste o non hai accesso ad esso.Trigger errato per la condizione dell'azione. Il trigger non esiste o non hai accesso ad esso."
 
 #: api/classes/CAction.php:1643
 msgid "Incorrect action condition type."
@@ -6323,11 +6323,11 @@ msgstr "Valori dei passi di escalation errati per l'operazione dell'azione."
 
 #: api/classes/CAction.php:1420
 msgid "Incorrect action operation host group. Host group does not exist or you have no access to this host group."
-msgstr "Gruppo host errato per l'operazione dell'azione. Il gruppo host non esiste o non hai accesso a questo gruppo host."
+msgstr "Gruppo host errato per l'operazione dell'azione. Il gruppo host non esiste o non hai accesso a questo gruppo host.Gruppo host errato per l'operazione dell'azione. Il gruppo host non esiste o non hai accesso a questo gruppo host."
 
 #: api/classes/CAction.php:1423
 msgid "Incorrect action operation host. Host does not exist or you have no access to this host."
-msgstr "Host errato per l'operazione dell'azione. L'host non esiste o non hai accesso a questo host."
+msgstr "Host errato per l'operazione dell'azione. L'host non esiste o non hai accesso a questo host.Host errato per l'operazione dell'azione. L'host non esiste o non hai accesso a questo host."
 
 #: api/classes/CAction.php:1355 api/classes/CAction.php:1359
 #, php-format
@@ -6344,11 +6344,11 @@ msgstr "Tipo errato per l'operazione dell'azione."
 
 #: api/classes/CAction.php:1429
 msgid "Incorrect action operation user group. User group does not exist or you have no access to this user group."
-msgstr "Gruppo utenti errato per l'operazione dell'azione. Il gruppo utenti non esiste o non hai accesso a questo gruppo utenti."
+msgstr "Gruppo utenti errato per l'operazione dell'azione. Il gruppo utenti non esiste o non hai accesso a questo gruppo utenti.Gruppo utenti errato per l'operazione dell'azione. Il gruppo utenti non esiste o non hai accesso a questo gruppo utenti."
 
 #: api/classes/CAction.php:1426
 msgid "Incorrect action operation user. User does not exist or you have no access to this user."
-msgstr "Utente errato per l'operazione dell'azione. L'utente non esiste o non accesso a questo utente."
+msgstr "Utente errato per l'operazione dell'azione. L'utente non esiste o non accesso a questo utente.Utente errato per l'operazione dell'azione. L'utente non esiste o non accesso a questo utente."
 
 #: api/classes/CAction.php:744
 msgid "Incorrect action operationid."
@@ -6625,7 +6625,7 @@ msgstr "Valore larghezza mappa per la mappa \"%s\" errato."
 #: api/classes/CScript.php:576
 #, php-format
 msgid "Incorrect menu path for script \"%1$s\"."
-msgstr ""
+msgstr "Errato percorso menu per script \"%1$s\"."
 
 #: include/nodes.inc.php:294
 msgid "Incorrect node type."
@@ -6813,7 +6813,7 @@ msgstr "Espressione trigger errata. L'host \"%s\" non esiste o non hai accesso a
 
 #: api/classes/CTrigger.php:735
 msgid "Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously."
-msgstr "Espressione trigger errata. Gli elementi dell'espressione trigger non devono appartenere ad un template e a un host contemporaneamente."
+msgstr "Espressione trigger errata. Gli elementi dell'espressione trigger non devono appartenere ad un template e a un host contemporaneamente.Espressione trigger errata. Gli elementi dell'espressione trigger non devono appartenere ad un template e a un host contemporaneamente."
 
 #: include/classes/validators/CTriggerFunctionValidator.php:248
 #: include/classes/validators/CTriggerFunctionValidator.php:260
@@ -6946,7 +6946,7 @@ msgstr "L'interfaccia è collegata all'item \"%1$s\" su \"%2$s\"."
 
 #: include/views/js/configuration.host.edit.js.php:135
 msgid "Interface is used by items that require this type of the interface."
-msgstr "L'interfaccia è usata dagli item che richiedono questo tipo di interfaccia."
+msgstr "L'interfaccia è usata dagli item che richiedono questo tipo di interfaccia.L'interfaccia è usata dagli item che richiedono questo tipo di interfaccia."
 
 #: api/classes/CHostInterface.php:351
 #, php-format
@@ -7007,7 +7007,7 @@ msgstr "Intervallo (in sec)"
 
 #: api/rpc/class.cjsonrpc.php:182
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
-msgstr "JSON non valido. Si è verificato un errore nel server durante l'analisi del testo JSON."
+msgstr "JSON non valido. Si è verificato un errore nel server durante l'analisi del testo JSON.JSON non valido. Si è verificato un errore nel server durante l'analisi del testo JSON."
 
 #: api/rpc/class.cjsonrpc.php:186
 msgid "Invalid Request."
@@ -7245,7 +7245,7 @@ msgstr "L'item utilizza un tipo di interfaccia errato."
 
 #: api/classes/CItemGeneral.php:318
 msgid "Item will not be refreshed. Please enter a correct update interval."
-msgstr "L'item non sarà aggiornato. Per favore inserire un intervallo di aggiornamento corretto."
+msgstr "L'item non sarà aggiornato. Per favore inserire un intervallo di aggiornamento corretto.L'item non sarà aggiornato. Per favore inserire un intervallo di aggiornamento corretto."
 
 #: api/classes/CItemGeneral.php:411
 #, php-format
@@ -7716,7 +7716,7 @@ msgstr "Ultimi eventi"
 
 #: jsLoader.php:207
 msgid "Latest values"
-msgstr ""
+msgstr "Ultimi valori"
 
 #: include/locales.inc.php:66
 msgid "Latvian (lv_LV)"
@@ -7889,11 +7889,11 @@ msgstr "La severity log dell'ultima voce log NON è N"
 
 #: popup_trexpr.php:469
 msgid "Log source of the last log entry matching parameter T, then N = 1, 0 - otherwise"
-msgstr "La sorgente log dell'ultima voce log corrisponde al parametro T, quindi N = 1, 0 - altrimenti"
+msgstr "La sorgente log dell'ultima voce log corrisponde al parametro T, quindi N = 1, 0 - altrimentiLa sorgente log dell'ultima voce log corrisponde al parametro T, quindi N = 1, 0 - altrimenti"
 
 #: popup_trexpr.php:474
 msgid "Log source of the last log entry matching parameter T, then N NOT 1, 0 - otherwise"
-msgstr "La sorgente log dell'ultima voce log corrisponde al parametro T, quindi N NON è 1, 0 - altrimenti"
+msgstr "La sorgente log dell'ultima voce log corrisponde al parametro T, quindi N NON è 1, 0 - altrimentiLa sorgente log dell'ultima voce log corrisponde al parametro T, quindi N NON è 1, 0 - altrimenti"
 
 #: include/views/configuration.item.edit.php:399
 #: include/views/configuration.item.massupdate.php:415
@@ -8062,7 +8062,7 @@ msgstr "La manutenzione \"%s\" esiste già."
 
 #: api/classes/CMaintenance.php:397 api/classes/CMaintenance.php:510
 msgid "Maintenance \"Active since\" value cannot be bigger than \"Active till\"."
-msgstr "Il valore della manutenzione \"Attivo da\" non può essere più grande di \"Attivo fino\"."
+msgstr "Il valore della manutenzione \"Attivo da\" non può essere più grande di \"Attivo fino\".Il valore della manutenzione \"Attivo da\" non può essere più grande di \"Attivo fino\"."
 
 #: api/classes/CAction.php:1598
 msgid "Maintenance action condition value must be empty."
@@ -8958,11 +8958,11 @@ msgstr "Nessun dato definito."
 
 #: popup_trexpr.php:511
 msgid "No data received during period of time T, then N = 1, 0 - otherwise"
-msgstr "Nessun dato ricevuto durante il periodo di tempo T, quindi N = 1, 0 - altrimenti"
+msgstr "Nessun dato ricevuto durante il periodo di tempo T, quindi N = 1, 0 - altrimentiNessun dato ricevuto durante il periodo di tempo T, quindi N = 1, 0 - altrimenti"
 
 #: popup_trexpr.php:516
 msgid "No data received during period of time T, then N NOT 1, 0 - otherwise"
-msgstr "Nessun dato ricevuto durante il periodo di tempo T, quindi N NON è 1, 0 - altrimenti"
+msgstr "Nessun dato ricevuto durante il periodo di tempo T, quindi N NON è 1, 0 - altrimentiNessun dato ricevuto durante il periodo di tempo T, quindi N NON è 1, 0 - altrimenti"
 
 #: api/classes/CHostInterface.php:827
 #, php-format
@@ -9680,19 +9680,19 @@ msgstr "Numero di passi"
 
 #: popup_trexpr.php:211
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is < N"
-msgstr "Numero di valori V recuperati con successo (che soddisfano l'operatore O) per il periodo T è < N"
+msgstr "Numero di valori V recuperati con successo (che soddisfano l'operatore O) per il periodo T è < NNumero di valori V recuperati con successo (che soddisfano l'operatore O) per il periodo T è < N"
 
 #: popup_trexpr.php:221
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is = N"
-msgstr "Numero di valori V recuperati con successo (che soddisfano l'operatore O) per il periodo T è = N"
+msgstr "Numero di valori V recuperati con successo (che soddisfano l'operatore O) per il periodo T è = NNumero di valori V recuperati con successo (che soddisfano l'operatore O) per il periodo T è = N"
 
 #: popup_trexpr.php:216
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is > N"
-msgstr "Numero di valori V recuperati con successo (che soddisfano l'operatore O) per il periodo T è > N"
+msgstr "Numero di valori V recuperati con successo (che soddisfano l'operatore O) per il periodo T è > NNumero di valori V recuperati con successo (che soddisfano l'operatore O) per il periodo T è > N"
 
 #: popup_trexpr.php:226
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is NOT N"
-msgstr "Numero di valori V recuperati con successo (che soddisfano l'operatore O) per il periodo T NON è N"
+msgstr "Numero di valori V recuperati con successo (che soddisfano l'operatore O) per il periodo T NON è NNumero di valori V recuperati con successo (che soddisfano l'operatore O) per il periodo T NON è N"
 
 #: include/blocks.inc.php:748
 msgid "Number of triggers (enabled/disabled) [problem/ok]"
@@ -9914,7 +9914,7 @@ msgstr "Solo gli eventi trigger possono avere acknowledge."
 
 #: include/blocks.inc.php:749
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
-msgstr "Solo i trigger assegnati agli host abilitati e dipendenti da item abilitati son conteggiati"
+msgstr "Solo i trigger assegnati agli host abilitati e dipendenti da item abilitati son conteggiatiSolo i trigger assegnati agli host abilitati e dipendenti da item abilitati son conteggiati"
 
 #: include/views/configuration.httpconf.edit.php:110
 msgid "Opera"
@@ -9927,7 +9927,7 @@ msgstr "L'operazione \"%s\" esiste già."
 
 #: include/validate.inc.php:424
 msgid "Operation cannot be performed due to unauthorized request."
-msgstr "L'operazione non può esser eseguita a causa di richiesta non autorizzata."
+msgstr "L'operazione non può esser eseguita a causa di richiesta non autorizzata.L'operazione non può esser eseguita a causa di richiesta non autorizzata."
 
 #: include/views/configuration.action.edit.php:1005
 msgid "Operation condition"
@@ -10099,7 +10099,7 @@ msgstr "PHP bcmath"
 
 #: include/classes/class.frontendsetup.php:322
 msgid "PHP bcmath extension missing (PHP configuration parameter --enable-bcmath)"
-msgstr "L'estensione PHP bcmath è assente (parametro di configurazione PHP --enable-bcmath)"
+msgstr "L'estensione PHP bcmath è assente (parametro di configurazione PHP --enable-bcmath)L'estensione PHP bcmath è assente (parametro di configurazione PHP --enable-bcmath)"
 
 #: include/classes/class.frontendsetup.php:549
 msgid "PHP ctype"
@@ -10107,7 +10107,7 @@ msgstr "PHP ctype"
 
 #: include/classes/class.frontendsetup.php:553
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)"
-msgstr "L'estensione PHP ctype è assente (parametro di configurazione PHP --enable-ctype)"
+msgstr "L'estensione PHP ctype è assente (parametro di configurazione PHP --enable-ctype)L'estensione PHP ctype è assente (parametro di configurazione PHP --enable-ctype)"
 
 #: include/classes/class.frontendsetup.php:290
 msgid "PHP databases support"
@@ -10152,7 +10152,7 @@ msgstr "PHP gettext"
 
 #: include/classes/class.frontendsetup.php:610
 msgid "PHP gettext extension missing (PHP configuration parameter --with-gettext)"
-msgstr "Estensione PHP gettext mancante (parametro di configurazione PHP --with-gettext)"
+msgstr "Estensione PHP gettext mancante (parametro di configurazione PHP --with-gettext)Estensione PHP gettext mancante (parametro di configurazione PHP --with-gettext)"
 
 #: include/classes/class.frontendsetup.php:482
 msgid "PHP libxml"
@@ -10168,7 +10168,7 @@ msgstr "PHP mbstring"
 
 #: include/classes/class.frontendsetup.php:341
 msgid "PHP mbstring extension missing (PHP configuration parameter --enable-mbstring)"
-msgstr "Estensione PHP mbstring mancante (parametro di configurazione PHP --enable-mbstring)"
+msgstr "Estensione PHP mbstring mancante (parametro di configurazione PHP --enable-mbstring)Estensione PHP mbstring mancante (parametro di configurazione PHP --enable-mbstring)"
 
 #: include/classes/class.frontendsetup.php:174
 msgid "PHP option max_execution_time"
@@ -10200,11 +10200,11 @@ msgstr "Auto-start sessione PHP"
 
 #: include/classes/class.frontendsetup.php:591
 msgid "PHP session auto start must be disabled (PHP directive \"session.auto_start\")"
-msgstr "L'auto-start della sessione PHP deve esser disabilitato (direttiva PHP \"session.auto_start\")"
+msgstr "L'auto-start della sessione PHP deve esser disabilitato (direttiva PHP \"session.auto_start\")L'auto-start della sessione PHP deve esser disabilitato (direttiva PHP \"session.auto_start\")"
 
 #: include/classes/class.frontendsetup.php:572
 msgid "PHP session extension missing (PHP configuration parameter --enable-session)"
-msgstr "Estensione sessione PHP mancante (parametro di configurazione PHP --enable-session)"
+msgstr "Estensione sessione PHP mancante (parametro di configurazione PHP --enable-session)Estensione sessione PHP mancante (parametro di configurazione PHP --enable-session)"
 
 #: include/classes/class.frontendsetup.php:356
 msgid "PHP sockets"
@@ -10212,7 +10212,7 @@ msgstr "Socket PHP"
 
 #: include/classes/class.frontendsetup.php:360
 msgid "PHP sockets extension missing (PHP configuration parameter --enable-sockets)"
-msgstr "Estensione socket PHP mancante (paramentro di configurazione PHP --enable-sockets)"
+msgstr "Estensione socket PHP mancante (paramentro di configurazione PHP --enable-sockets)Estensione socket PHP mancante (paramentro di configurazione PHP --enable-sockets)"
 
 #: include/classes/class.frontendsetup.php:212
 msgid "PHP time zone"
@@ -10416,7 +10416,7 @@ msgstr "Riproduci suono"
 
 #: include/nodes.inc.php:343
 msgid "Please be aware that database still contains data related to the deleted node."
-msgstr "Per favore sii consapevole che il database contiene ancora dati riferiti al nodo rimosso."
+msgstr "Per favore sii consapevole che il database contiene ancora dati riferiti al nodo rimosso.Per favore sii consapevole che il database contiene ancora dati riferiti al nodo rimosso."
 
 #: include/setup.inc.php:222
 msgid "Please correct all issues and press \"Retry\" button"
@@ -10781,19 +10781,19 @@ msgstr "L'espressione regolare \"%s\" esiste già."
 
 #: popup_trexpr.php:423
 msgid "Regular expression V matching last value in period T, then N = 1, 0 - otherwise"
-msgstr "L'espressione regolare V corrisponde all'ultimo valore nel periodo T, quindi N = 1, 0 - altrimenti"
+msgstr "L'espressione regolare V corrisponde all'ultimo valore nel periodo T, quindi N = 1, 0 - altrimentiL'espressione regolare V corrisponde all'ultimo valore nel periodo T, quindi N = 1, 0 - altrimenti"
 
 #: popup_trexpr.php:433
 msgid "Regular expression V matching last value in period T, then N = 1, 0 - otherwise (non case-sensitive)"
-msgstr "L'espressione regolare V corrisponde all'ultimo valore nel periodo T, quindi N = 1, 0 - altrimenti (non case-sensitive)"
+msgstr "L'espressione regolare V corrisponde all'ultimo valore nel periodo T, quindi N = 1, 0 - altrimenti (non case-sensitive)L'espressione regolare V corrisponde all'ultimo valore nel periodo T, quindi N = 1, 0 - altrimenti (non case-sensitive)"
 
 #: popup_trexpr.php:428
 msgid "Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise"
-msgstr "L'espressione regolare V corrisponde all'ultimo valore nel periodo T, quindi N NON è 1, 0 - altrimenti"
+msgstr "L'espressione regolare V corrisponde all'ultimo valore nel periodo T, quindi N NON è 1, 0 - altrimentiL'espressione regolare V corrisponde all'ultimo valore nel periodo T, quindi N NON è 1, 0 - altrimenti"
 
 #: popup_trexpr.php:438
 msgid "Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise (non case-sensitive)"
-msgstr "L'espressione regolare V corrisponde all'ultimo valore nel periodo T, quindi N NON è 1, 0 - altrimenti (non case-sensitive)"
+msgstr "L'espressione regolare V corrisponde all'ultimo valore nel periodo T, quindi N NON è 1, 0 - altrimenti (non case-sensitive)L'espressione regolare V corrisponde all'ultimo valore nel periodo T, quindi N NON è 1, 0 - altrimenti (non case-sensitive)"
 
 #: adm.regexps.php:132
 msgid "Regular expression added"
@@ -11507,7 +11507,7 @@ msgstr "Script"
 #: api/classes/CScript.php:617
 #, php-format
 msgid "Script \"%1$s\" already exists."
-msgstr ""
+msgstr "Lo script \"%s\" esiste già."
 
 #: scripts.php:126
 msgid "Script added"
@@ -11515,22 +11515,22 @@ msgstr "Script aggiunto"
 
 #: scripts.php:149 scripts.php:167
 msgid "Script deleted"
-msgstr "Script rimosso"
+msgstr "Percorso menu Script \"%1$s\" già utilizzato come nome script \"%2$s\"."
 
 #: api/classes/CScript.php:609
 #, php-format
 msgid "Script menu path \"%1$s\" already used in script name \"%2$s\"."
-msgstr ""
+msgstr "Percorso menu Script \"%1$s\" già utilizzato come nome script \"%2$s\"."
 
 #: include/views/administration.mediatypes.edit.php:65
 #: include/views/administration.mediatypes.list.php:57
 msgid "Script name"
-msgstr "Nome script"
+msgstr "Percorso menu Script \"%1$s\" già utilizzato come nome script \"%2$s\"."
 
 #: api/classes/CScript.php:596
 #, php-format
 msgid "Script name \"%1$s\" already used in menu path for script \"%2$s\"."
-msgstr ""
+msgstr "Nome Script \"%1$s\" già utilizzato come percorso script \"%2$s\"."
 
 #: include/classes/debug/CProfiler.php:125
 msgid "Script profiler"
@@ -11543,7 +11543,7 @@ msgstr "Script aggiornato"
 #: api/classes/CScript.php:469
 #, php-format
 msgid "Script with scriptid \"%1$s\" does not exist."
-msgstr ""
+msgstr "Lo script con scriptid \"%s\" non esiste."
 
 #: include/menu.inc.php:260 include/views/administration.script.list.php:28
 #: jsLoader.php:184 jsLoader.php:211 report5.php:160 scripts_exec.php:26
@@ -11943,7 +11943,7 @@ msgstr "Mostra orario di lavoro"
 
 #: include/views/configuration.sysmap.constructor.php:41 jsLoader.php:145
 msgid "Shown"
-msgstr "Mostrati"
+msgstr "Visibile"
 
 #: include/views/general.login.php:79 index.php:55 index.php:64
 msgid "Sign in"
@@ -12121,7 +12121,7 @@ msgstr "Spagnolo (es_ES)"
 
 #: api/classes/CAction.php:1345
 msgid "Specified script does not exist or you do not have rights on it for action operation command."
-msgstr "Lo script specificato non esiste o non hai i diritti su esso per il comando dell'operazione azione."
+msgstr "Lo script specificato non esiste o non hai i diritti su esso per il comando dell'operazione azione.Lo script specificato non esiste o non hai i diritti su esso per il comando dell'operazione azione."
 
 #: httpdetails.php:131 httpdetails.php:292
 msgid "Speed"
@@ -12336,7 +12336,7 @@ msgstr "Svedese (sv_SE)"
 
 #: include/views/administration.authentication.edit.php:78
 msgid "Switching authentication method will reset all except this session! Continue?"
-msgstr "Il cambio del metodo di autenticazione ripristinerà tutto eccetto questa sessione! Continuare?"
+msgstr "Il cambio del metodo di autenticazione ripristinerà tutto eccetto questa sessione! Continuare?Il cambio del metodo di autenticazione ripristinerà tutto eccetto questa sessione! Continuare?"
 
 #: include/users.inc.php:83 include/views/administration.users.edit.php:133
 msgid "System default"
@@ -12458,7 +12458,7 @@ msgstr "Template aggiunto"
 
 #: api/classes/CHostBase.php:292
 msgid "Template cannot be linked to another template more than once even through other templates."
-msgstr "Il template non può esser collegato a un altro template più di una volta anche attraverso altri template."
+msgstr "Il template non può esser collegato a un altro template più di una volta anche attraverso altri template.Il template non può esser collegato a un altro template più di una volta anche attraverso altri template."
 
 #: templates.php:354 templates.php:370 templates.php:398
 msgid "Template deleted"
@@ -12623,7 +12623,7 @@ msgstr "La procedura remota richiesta non esiste / non è disponibile"
 
 #: api/classes/CHttpTest.php:572
 msgid "The web scenario application belongs to a different host than the web scenario host."
-msgstr "L'applicazione dello scenario web appartiene a un host diverso dall'host dello scenario web."
+msgstr "L'applicazione dello scenario web appartiene a un host diverso dall'host dello scenario web.L'applicazione dello scenario web appartiene a un host diverso dall'host dello scenario web."
 
 #: include/views/administration.users.edit.php:135
 msgid "Theme"
@@ -12725,7 +12725,7 @@ msgstr "Tipo ora"
 
 #: include/classes/class.frontendsetup.php:216
 msgid "Time zone for PHP is not set (configuration parameter \"date.timezone\")"
-msgstr "Il fuso orario per PHP non è impostato (parametro di configurazione \"date.timezone\")"
+msgstr "Il fuso orario per PHP non è impostato (parametro di configurazione \"date.timezone\")Il fuso orario per PHP non è impostato (parametro di configurazione \"date.timezone\")"
 
 #: include/views/configuration.httpconf.edit.php:163
 #: include/views/configuration.httpconf.popup.php:81 popup_httpstep.php:40
@@ -12741,11 +12741,11 @@ msgstr "Data e ora"
 
 #: popup_trexpr.php:413
 msgid "Timestamp not different from Zabbix server time for more than T seconds, then N = 1, 0 - otherwise"
-msgstr "Data e ora non diversi dall'ora sul server Zabbix per più di T secondi, quindi N = 1, 0 - altrimenti"
+msgstr "Data e ora non diversi dall'ora sul server Zabbix per più di T secondi, quindi N = 1, 0 - altrimentiData e ora non diversi dall'ora sul server Zabbix per più di T secondi, quindi N = 1, 0 - altrimenti"
 
 #: popup_trexpr.php:418
 msgid "Timestamp not different from Zabbix server time for more than T seconds, then N NOT 1, 0 - otherwise"
-msgstr "Data e ora non diversi dall'ora sul server Zabbix per più di T secondi, quindi N NON è 1, 0 - altrimenti"
+msgstr "Data e ora non diversi dall'ora sul server Zabbix per più di T secondi, quindi N NON è 1, 0 - altrimentiData e ora non diversi dall'ora sul server Zabbix per più di T secondi, quindi N NON è 1, 0 - altrimenti"
 
 #: include/reports.inc.php:54 include/reports.inc.php:163
 #: include/reports.inc.php:314
@@ -12759,7 +12759,7 @@ msgstr "A"
 
 #: include/views/js/configuration.item.edit.js.php:51
 msgid "To set a host interface select a single item type for all items"
-msgstr "Per impostare un'interfaccia host seleziona un singolo tipo di item per tutti gli item"
+msgstr "Per impostare un'interfaccia host seleziona un singolo tipo di item per tutti gli itemPer impostare un'interfaccia host seleziona un singolo tipo di item per tutti gli item"
 
 #: srv_status.php:36
 msgid "Today"
@@ -13098,7 +13098,7 @@ msgstr "Il tipo di informazione deve essere \"Log\" per la chiave log."
 
 #: api/classes/CItemGeneral.php:306
 msgid "Type of information must be \"Numeric (float)\" for aggregate items."
-msgstr "Il tipo di informazione deve essere \"Numerico (float)\" per aggregare gli item."
+msgstr "Il tipo di informazione deve essere \"Numerico (float)\" per aggregare gli item.Il tipo di informazione deve essere \"Numerico (float)\" per aggregare gli item."
 
 #: include/forms.inc.php:904
 msgid "Types"
@@ -13522,7 +13522,7 @@ msgstr "L'utente non può cambiare tipo per se stesso"
 
 #: api/classes/CUserGroup.php:466
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
-msgstr "L'utente non può aggiungere se stesso ad un gruppo disabilitato o ad un gruppo con accesso alla GUI disabilitato."
+msgstr "L'utente non può aggiungere se stesso ad un gruppo disabilitato o ad un gruppo con accesso alla GUI disabilitato.L'utente non può aggiungere se stesso ad un gruppo disabilitato o ad un gruppo con accesso alla GUI disabilitato."
 
 #: include/users.inc.php:255
 msgid "User cannot change GUI access for himself."
@@ -13800,7 +13800,7 @@ msgstr "Bassa"
 
 #: jsLoader.php:174
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
-msgstr "Siamo spiacenti, il numero massimo possibile di elementi da conservare è stato raggiunto."
+msgstr "Siamo spiacenti, il numero massimo possibile di elementi da conservare è stato raggiunto.Siamo spiacenti, il numero massimo possibile di elementi da conservare è stato raggiunto."
 
 #: hosts.php:799 hosts.php:894 include/menu.inc.php:42 search.php:137
 #: search.php:142 search.php:179 search.php:202 search.php:219 search.php:387
@@ -13855,7 +13855,7 @@ msgstr "Il passo \"%1$s\" dello scenario web esiste già."
 
 #: api/classes/CHttpTest.php:589
 msgid "Web scenario step name should contain only printable characters."
-msgstr "Il nome del passo nello scenario web deve contenere solo caratteri stampabili."
+msgstr "Il nome del passo nello scenario web deve contenere solo caratteri stampabili.Il nome del passo nello scenario web deve contenere solo caratteri stampabili."
 
 #: api/classes/CHttpTest.php:594
 msgid "Web scenario step number cannot be less than 1."
@@ -14090,7 +14090,7 @@ msgstr "Valore MAX asse Y"
 
 #: api/classes/CGraphGeneral.php:338
 msgid "Y axis MAX value must be greater than Y axis MIN value."
-msgstr "Il valore MAX dell'asse Y dev'esser più grande del valore MIN dell'asse Y."
+msgstr "Il valore MAX dell'asse Y dev'esser più grande del valore MIN dell'asse Y.Il valore MAX dell'asse Y dev'esser più grande del valore MIN dell'asse Y."
 
 #: include/views/configuration.graph.edit.php:215
 msgid "Y axis MIN value"
@@ -14152,7 +14152,7 @@ msgstr "Yotta"
 
 #: include/views/administration.users.edit.php:128
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
-msgstr "Impossibile scegliere alcune delle lingue, in quanto i loro locale non sono installati sul server web."
+msgstr "Impossibile scegliere alcune delle lingue, in quanto i loro locale non sono installati sul server web.Impossibile scegliere alcune delle lingue, in quanto i loro locale non sono installati sul server web."
 
 #: api/classes/CUser.php:356
 #, php-format
@@ -14318,7 +14318,7 @@ msgstr "Info server Zabbix"
 
 #: jsrpc.php:174
 msgid "Zabbix server is not running: the information displayed may not be current."
-msgstr "Il server Zabbix non è in esecuzione: le informazioni visualizzate potrebbero non esser aggiornate."
+msgstr "Il server Zabbix non è in esecuzione: le informazioni visualizzate potrebbero non esser aggiornate.Il server Zabbix non è in esecuzione: le informazioni visualizzate potrebbero non esser aggiornate."
 
 #: include/blocks.inc.php:726
 msgid "Zabbix server is running"

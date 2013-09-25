@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-25 09:27+0300\n"
+"POT-Creation-Date: 2013-09-25 09:29+0300\n"
 "PO-Revision-Date: 2013-09-13 10:08+0300\n"
 "Last-Translator: vins <piranesi@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -908,11 +908,11 @@ msgstr "Bind passwd"
 
 #: popup_trexpr.php:521
 msgid "Bitwise AND of last (most recent) T value and mask is = N"
-msgstr "Operación Y binaria de los últimos (más recientes) T valores y la máscara es = N"
+msgstr "Operación Y binaria de los últimos (más recientes) T valores y la máscara es = NOperación Y binaria de los últimos (más recientes) T valores y la máscara es = N"
 
 #: popup_trexpr.php:526
 msgid "Bitwise AND of last (most recent) T value and mask is NOT N"
-msgstr "Operación Y binaria de los últimos (más recientes) T valores y la máscara NO es N"
+msgstr "Operación Y binaria de los últimos (más recientes) T valores y la máscara NO es NOperación Y binaria de los últimos (más recientes) T valores y la máscara NO es N"
 
 #: include/classes/core/ZBase.php:233
 msgid "Black & Blue"
