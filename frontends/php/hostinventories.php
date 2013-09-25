@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
-$page['title'] = _('Host inventories');
+$page['title'] = _('Host inventory');
 $page['file'] = 'hostinventories.php';
 $page['hist_arg'] = array('groupid', 'hostid');
 
@@ -150,7 +150,6 @@ else{
 	}
 
 	$data['hosts'] = array();
-	$data['paging'] = getPagingLine($data['hosts']);
 
 	if ($data['pageFilter']->groupsSelected) {
 		// which inventory fields we will need for displaying
@@ -215,13 +214,16 @@ else{
 			}
 
 			order_result($data['hosts'], getPageSortField('name'), getPageSortOrder());
-			$data['paging'] = getPagingLine($data['hosts']);
 		}
 
-		$hostinventoriesView = new CView('inventory.host.list', $data);
-		$hostinventoriesView->render();
-		$hostinventoriesView->show();
 	}
+
+	$data['paging'] = getPagingLine($data['hosts']);
+
+	$hostinventoriesView = new CView('inventory.host.list', $data);
+	$hostinventoriesView->render();
+	$hostinventoriesView->show();
+
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

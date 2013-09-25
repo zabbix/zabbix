@@ -28,7 +28,7 @@ $hostInventoriesForm = new CForm();
 /*
  * Overview tab
  */
-$overviewFormList = new CFormList('inventory-host-form');
+$overviewFormList = new CFormList();
 
 $hostSpan = new CSpan($this->data['host']['host'], 'link_menu menu-host');
 
@@ -230,7 +230,7 @@ $hostInventoriesTab->addTab('overviewTab', _('Overview'), $overviewFormList);
 /*
  * Details tab
  */
-$detailsFormList = new CFormList('hostinventoriesDetailsFormList');
+$detailsFormList = new CFormList();
 
 $inventoryValues = false;
 if ($this->data['host']['inventory']) {

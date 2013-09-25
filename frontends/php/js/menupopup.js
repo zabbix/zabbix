@@ -72,12 +72,10 @@ function getMenuPopupHost(options) {
 		};
 
 		// inventories
-		if (options.hasInventory) {
-			gotos[gotos.length] = {
-				label: t('Host inventory'),
-				url: new Curl('hostinventories.php?hostid=' + options.hostid).getUrl()
-			};
-		}
+		gotos[gotos.length] = {
+			label: t('Host inventory'),
+			url: new Curl('hostinventories.php?hostid=' + options.hostid).getUrl()
+		};
 
 		// screens
 		if (options.hasScreens) {
