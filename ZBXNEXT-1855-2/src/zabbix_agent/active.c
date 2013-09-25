@@ -1286,7 +1286,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		else
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "sleeping for 1 second");
-			zbx_setproctitle("active checks #%d [sleeping for 1 second]", thread_num2);
+			zbx_setproctitle("active checks #%d [idle 1 sec]", thread_num2);
 			zbx_sleep(1);
 		}
 	}

@@ -361,7 +361,7 @@ void	main_proxypoller_loop(void)
 		nextcheck = DCconfig_get_proxypoller_nextcheck();
 		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
-		zbx_setproctitle("%s #%d [exchanged data with %d proxies in " ZBX_FS_DBL " sec, sleeping %d sec]",
+		zbx_setproctitle("%s #%d [exchanged data with %d proxies in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), process_num, processed, sec, sleeptime);
 
 		zbx_sleep_loop(sleeptime);

@@ -779,7 +779,7 @@ void	main_discoverer_loop(void)
 		nextcheck = get_minnextcheck(now);
 		sleeptime = calculate_sleeptime(nextcheck, DISCOVERER_DELAY);
 
-		zbx_setproctitle("%s #%d [processed %d rules in " ZBX_FS_DBL " sec, sleeping %d sec]",
+		zbx_setproctitle("%s #%d [processed %d rules in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), process_num, rule_count, sec, sleeptime);
 
 		zbx_sleep_loop(sleeptime);

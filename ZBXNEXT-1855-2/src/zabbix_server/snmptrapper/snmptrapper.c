@@ -482,7 +482,7 @@ void	main_snmptrapper_loop(void)
 		while (SUCCEED == get_latest_data())
 			read_traps();
 
-		zbx_setproctitle("%s [sleeping 1 sec]", get_process_type_string(process_type));
+		zbx_setproctitle("%s [idle 1 sec]", get_process_type_string(process_type));
 
 		zbx_sleep_loop(1);
 	}

@@ -168,7 +168,7 @@ void	main_housekeeper_loop(void)
 
 		sleeptime = CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR - (time(NULL) - start);
 
-		zbx_setproctitle("%s [deleted %d records in " ZBX_FS_DBL " sec, sleeping %d sec]",
+		zbx_setproctitle("%s [deleted %d records in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), records, sec, sleeptime);
 
 		zbx_sleep_loop(sleeptime);

@@ -94,7 +94,7 @@ void	main_heart_loop(void)
 
 		sleeptime = CONFIG_HEARTBEAT_FREQUENCY - (time(NULL) - start);
 
-		zbx_setproctitle("%s [sleeping %d sec]", get_process_type_string(process_type), sleeptime);
+		zbx_setproctitle("%s [idle %d sec]", get_process_type_string(process_type), sleeptime);
 
 		zbx_sleep_loop(sleeptime);
 	}

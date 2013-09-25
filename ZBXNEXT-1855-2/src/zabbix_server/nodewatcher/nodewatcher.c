@@ -196,7 +196,7 @@ void	main_nodewatcher_loop(void)
 
 		end = time(NULL);
 
-		zbx_setproctitle("%s [synced with nodes in " ZBX_FS_DBL " sec, sleeping %d sec]",
+		zbx_setproctitle("%s [synced with nodes in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), sec, 10 - (end - start));
 
 		zbx_sleep_loop(10 - (end - start));

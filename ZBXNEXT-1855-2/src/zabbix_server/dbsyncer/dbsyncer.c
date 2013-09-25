@@ -108,7 +108,7 @@ void	main_dbsyncer_loop(void)
 
 		last_sleeptime = sleeptime;
 
-		zbx_setproctitle("%s #%d [synced %d items in " ZBX_FS_DBL " sec, sleeping %d sec]",
+		zbx_setproctitle("%s #%d [synced %d items in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), process_num, num, sec, sleeptime);
 
 		zbx_sleep_loop(sleeptime);
