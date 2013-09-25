@@ -1,6 +1,8 @@
 Changes for 2.1.6
 
 New features:
+..F....... [ZBX-6983] changed the "Status of host group triggers" and "Status of host triggers" screen elements and the "Latest 20 issues" to display triggers without events (Pavels)
+..F....... [ZBX-6983] renamed the "Status of host group triggers" screen element to "Latest host group issues" and "Status of host triggers" to "Latest host issues" (Pavels)
 
 Bug fixes:
 ..F....... [ZBX-6978] fixed leading and trailing spaces for translatable strings (Ivo)
