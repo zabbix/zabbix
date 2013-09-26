@@ -22,6 +22,13 @@
 class CTimePeriodValidator extends CValidator {
 
 	/**
+	 * Assume that period string contains multiple periods separated by ';'.
+	 *
+	 * @var bool
+	 */
+	public $allowMultiple = true;
+
+	/**
 	 * Validate multiple time periods.
 	 * Time periods is a string with format:
 	 *   'day1-day2,time1-time2;interval2;interval3;...' (day2 and last ';' are optional)
@@ -40,7 +47,7 @@ class CTimePeriodValidator extends CValidator {
 			return false;
 		}
 
-		if ($this->options['allow_multiple']) {
+		if ($this->allowMultiple) {
 			// remove one last ';'
 			if ($periods[strlen($periods) - 1] === ';') {
 				$periods = substr($periods, 0, strlen($periods) - 1);
@@ -100,14 +107,5 @@ class CTimePeriodValidator extends CValidator {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Set default options.
-	 * Possible options:
-	 *  - allow_multiple: assume that period string contains multiple periods separated by ';'
-	 */
-	protected function initOptions() {
-		$this->options['allow_multiple'] = true;
 	}
 }

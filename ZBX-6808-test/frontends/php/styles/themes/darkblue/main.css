@@ -488,7 +488,7 @@ div.calendar input[type="button"] {
 	background: #2F6487;
 	color: #FFF;
 }
-.input option { background: #2F6487; }
+.input option { background: #2F6487; color: #FFFFFF; }
 .input:focus, .input:hover { border-color: #77B7DA; }
 .input[readonly], .input[readonly]:hover {
 /* NOTE: Ignored by IE */
@@ -548,3 +548,8 @@ div.preloader {
 .multiselect .available .prefix { color: #77B7DA; }
 .multiselect .available ul li.hover { background: #4A7FA2; }
 .multiselect .available ul li.hover .prefix { color: #F1F1F1; }
+
+/* menu popup */
+.menuPopup { border: 1px solid #022744; }
+.menuPopup .title { color: #ffffff; background: #022744 url('../../../images/gradients/header_footer_blue.png') repeat-x top left; }
+.menuPopup .ui-menu { border: 1px solid #022744; }

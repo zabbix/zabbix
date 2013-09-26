@@ -30,7 +30,8 @@ class testPageHosts extends CWebTest {
 					' ON hg.hostid=h.hostid'.
 				' LEFT JOIN groups g'.
 					' ON g.groupid=hg.groupid'.
-			' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'
+			' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
+			" AND h.name NOT LIKE '%{#%'"
 		);
 	}
 
@@ -254,13 +255,15 @@ class testPageHosts extends CWebTest {
 
 		$this->zbxTestCheckboxSelect('all_hosts');
 		$this->zbxTestDropdownSelect('go', 'Enable selected');
+		$this->assertVisible('goButton');
 		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
 		$this->checkTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host status updated');
 
-		$sql = "select * from hosts where status=".HOST_STATUS_NOT_MONITORED;
+		$sql = "select host from hosts where status=".HOST_STATUS_NOT_MONITORED.
+			" and name NOT LIKE '%{#%'";
 		$this->assertEquals(0, DBcount($sql), "Chuck Norris: all hosts activated but DB does not match");
 	}
 
@@ -280,6 +283,7 @@ class testPageHosts extends CWebTest {
 
 		$this->zbxTestCheckboxSelect('hosts_'.$hostid);
 		$this->zbxTestDropdownSelect('go', 'Enable selected');
+		$this->assertVisible('goButton');
 		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
@@ -301,13 +305,15 @@ class testPageHosts extends CWebTest {
 
 		$this->zbxTestCheckboxSelect('all_hosts');
 		$this->zbxTestDropdownSelect('go', 'Disable selected');
+		$this->assertVisible('goButton');
 		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
 		$this->checkTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host status updated');
 
-		$sql = "select * from hosts where status=".HOST_STATUS_MONITORED;
+		$sql = "select * from hosts where status=".HOST_STATUS_MONITORED.
+			" and name NOT LIKE '%{#%'";
 		$this->assertEquals(0, DBcount($sql), "Chuck Norris: all hosts disabled but DB does not match");
 	}
 
@@ -327,6 +333,7 @@ class testPageHosts extends CWebTest {
 
 		$this->zbxTestCheckboxSelect('hosts_'.$hostid);
 		$this->zbxTestDropdownSelect('go', 'Disable selected');
+		$this->assertVisible('goButton');
 		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();

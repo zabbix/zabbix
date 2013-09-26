@@ -61,18 +61,7 @@
 
 		// test confirmation button
 		jQuery('#testConfirmation').click(function() {
-			var confirmation = jQuery('#confirmation').val(),
-				buttons = [
-					{text: <?php echo CJs::encodeJson(_('Execute')); ?>, click: function() {}},
-					{text: <?php echo CJs::encodeJson(_('Cancel')); ?>, click: function() {
-						jQuery(this).dialog('destroy');
-						jQuery('#testConfirmation').focus();
-					}}
-				],
-				dialogObj = showScriptDialog(confirmation, buttons);
-
-			jQuery(dialogObj).find('button:first').prop('disabled', true).addClass('ui-state-disabled');
-			jQuery(dialogObj).find('button:last').focus();
+			executeScript(null, null, jQuery('#confirmation').val());
 		});
 
 		// host group selection

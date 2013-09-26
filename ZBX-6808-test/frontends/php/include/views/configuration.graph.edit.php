@@ -276,7 +276,7 @@ else {
 $graphFormList->addRow(_('Items'), new CDiv($itemsTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
 
 // append tabs to form
-$graphTab = new CTabView(array('remember' => true));
+$graphTab = new CTabView();
 if (!$this->data['form_refresh']) {
 	$graphTab->setSelected(0);
 }

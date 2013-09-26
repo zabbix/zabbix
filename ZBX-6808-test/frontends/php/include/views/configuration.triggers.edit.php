@@ -256,7 +256,7 @@ else {
 $triggersFormList->addRow(_('Enabled'), new CCheckBox('status', $status, null, 1));
 
 // append tabs to form
-$triggersTab = new CTabView(array('remember' => true));
+$triggersTab = new CTabView();
 if (!$this->data['form_refresh']) {
 	$triggersTab->setSelected(0);
 }
@@ -321,7 +321,7 @@ if (!empty($this->data['triggerid'])) {
 	}
 	$buttons [] = $deleteButton;
 }
-$buttons[] = new CButtonCancel(url_param('groupid').url_param('hostid').url_param('parent_discoveryid'));
+$buttons[] = new CButtonCancel(url_params(array('groupid', 'hostid', 'parent_discoveryid')));
 $triggersForm->addItem(makeFormFooter(
 	new CSubmit('save', _('Save')),
 	array($buttons)

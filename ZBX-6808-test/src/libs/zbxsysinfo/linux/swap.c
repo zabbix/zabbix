@@ -160,12 +160,12 @@ static int	get_swap_pages(swap_stat_t *result)
 #else
 			if (0x00 == (0x01 & st) && 0 == strncmp(line, "pswpin ", 7))
 			{
-				ZBX_STR2UINT64(result->rpag, line + 7);
+				sscanf(line + 7, ZBX_FS_UI64, &result->rpag);
 				st |= 0x01;
 			}
 			else if (0x00 == (0x02 & st) && 0 == strncmp(line, "pswpout ", 8))
 			{
-				ZBX_STR2UINT64(result->wpag, line + 8);
+				sscanf(line + 8, ZBX_FS_UI64, &result->wpag);
 				st |= 0x02;
 			}
 

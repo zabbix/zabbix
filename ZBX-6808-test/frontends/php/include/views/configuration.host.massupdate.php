@@ -282,7 +282,10 @@ if ($this->data['inventory_mode'] != HOST_INVENTORY_DISABLED) {
 }
 
 // append tabs to form
-$hostTab = new CTabView(array('remember' => 1));
+$hostTab = new CTabView();
+if (!isset($_REQUEST['form_refresh'])) {
+	$hostTab->setSelected(0);
+}
 $hostTab->addTab('hostTab', _('Host'), $hostFormList);
 $hostTab->addTab('templatesTab', _('Templates'), $templatesFormList);
 $hostTab->addTab('ipmiTab', _('IPMI'), $ipmiFormList);

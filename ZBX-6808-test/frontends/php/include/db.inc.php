@@ -1059,9 +1059,9 @@ function dbConditionInt($fieldName, array $values, $notIn = false, $sort = true)
 
 	if ($sort) {
 		natsort($values);
-	}
 
-	$values = array_values($values);
+		$values = array_values($values);
+	}
 
 	$betweens = array();
 	$data = array();

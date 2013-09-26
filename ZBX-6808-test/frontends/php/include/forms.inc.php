@@ -173,10 +173,6 @@
 			$lists['node']['read_only']	= new CListBox('nodes_read', null, 10);
 			$lists['node']['deny']		= new CListBox('nodes_deny', null, 10);
 
-			$lists['node']['read_write']->setAttribute('style', 'background: #EBEFF2;');
-			$lists['node']['read_only']->setAttribute('style', 'background: #EBEFF2;');
-			$lists['node']['deny']->setAttribute('style', 'background: #EBEFF2;');
-
 			$nodes = get_accessible_nodes_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY);
 			foreach ($nodes as $node) {
 				switch($node['permission']) {
@@ -200,10 +196,6 @@
 		$lists['group']['read_only']	= new CListBox('groups_read', null, 15);
 		$lists['group']['deny']			= new CListBox('groups_deny', null, 15);
 
-		$lists['group']['read_write']->setAttribute('style', 'background: #EBEFF2;');
-		$lists['group']['read_only']->setAttribute('style', 'background: #EBEFF2;');
-		$lists['group']['deny']->setAttribute('style', 'background: #EBEFF2;');
-
 		$groups = get_accessible_groups_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY, get_current_nodeid(true));
 
 		foreach ($groups as $group) {
@@ -226,10 +218,6 @@
 		$lists['host']['read_write']= new CListBox('hosts_write', null, 15);
 		$lists['host']['read_only']	= new CListBox('hosts_read', null, 15);
 		$lists['host']['deny']		= new CListBox('hosts_deny', null, 15);
-
-		$lists['host']['read_write']->setAttribute('style', 'background: #EBEFF2;');
-		$lists['host']['read_only']->setAttribute('style', 'background: #EBEFF2;');
-		$lists['host']['deny']->setAttribute('style', 'background: #EBEFF2;');
 
 		$hosts = get_accessible_hosts_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY, get_current_nodeid(true));
 
@@ -290,8 +278,10 @@
 			// is activated
 			if (str_in_array($id, $subfilter)) {
 				$span = new CSpan($element['name'].SPACE.'('.$element['count'].')', 'subfilter_enabled');
-				$span->onClick(CHtml::encode('javascript: create_var("zbx_filter", '.
-					CJs::encodeJson($subfilterName.'['.$id.']').', null, true);'));
+				$span->onClick(CHtml::encode(
+					'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
+					'create_var("zbx_filter", '.CJs::encodeJson($subfilterName.'['.$id.']').', null, true);'
+				));
 				$output[] = $span;
 			}
 
@@ -309,8 +299,14 @@
 						: new CSpan(SPACE.'('.$element['count'].')', 'subfilter_active');
 
 					$span = new CSpan($element['name'], 'subfilter_disabled');
-					$span->onClick(CHtml::encode('javascript: create_var("zbx_filter", '.
-						CJs::encodeJson($subfilterName.'['.$id.']').', '.CJs::encodeJson($id).', true);'));
+					$span->onClick(CHtml::encode(
+						'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
+						'create_var("zbx_filter", '.
+							CJs::encodeJson($subfilterName.'['.$id.']').', '.
+							CJs::encodeJson($id).', '.
+							'true'.
+						');'
+					));
 
 					$output[] = $span;
 					$output[] = $nspan;

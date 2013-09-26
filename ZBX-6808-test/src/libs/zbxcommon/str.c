@@ -180,7 +180,7 @@ retry:
 		/* zbx_vsnprintf() returns bytes actually written instead of bytes to write, */
 		/* so we have to use the standard function                                   */
 		va_start(args, fmt);
-		*alloc_len = vsnprintf(NULL, 0, fmt, args) + 1;
+		*alloc_len = vsnprintf(NULL, 0, fmt, args) + 2;	/* '\0' + one byte to prevent the operation retry */
 		va_end(args);
 		*offset = 0;
 		*str = zbx_malloc(*str, *alloc_len);
@@ -221,20 +221,18 @@ retry:
  ******************************************************************************/
 size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
 {
-	size_t	written_len;
+	int	written_len = 0;
 
-	assert(str);
+	if (0 < count)
+	{
+		if (0 > (written_len = vsnprintf(str, count, fmt, args)))
+			written_len = (int)count - 1;		/* count an output error as a full buffer */
+		else
+			written_len = MIN(written_len, (int)count - 1);		/* result could be truncated */
+	}
+	str[written_len] = '\0';	/* always write '\0', even if buffer size is 0 or vsnprintf() error */
 
-	if (-1 == (written_len = vsnprintf(str, count, fmt, args)))
-		written_len = count - 1;	/* result was truncated */
-	else
-		written_len = MIN(written_len, count - 1);
-
-	written_len = MAX(written_len, 0);
-
-	str[written_len] = '\0';
-
-	return written_len;
+	return (size_t)written_len;
 }
 
 /******************************************************************************
@@ -1057,7 +1055,10 @@ succeed:
 		return SUCCEED;
 	}
 	else
-		goto fail;
+	{
+		*exp = s;
+		return FAIL;
+	}
 }
 
 /******************************************************************************
@@ -3031,6 +3032,60 @@ size_t	zbx_strlen_utf8_n(const char *text, size_t utf8_maxlen)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_replace_utf8                                                 *
+ *                                                                            *
+ * Purpose: replace non-ASCII UTF-8 characters with '?' character             *
+ *                                                                            *
+ * Parameters: text - [IN] pointer to the first char                          *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs                                               *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_replace_utf8(const char *text)
+{
+	int	n;
+	char	*out, *p;
+
+	out = p = zbx_malloc(NULL, strlen(text) + 1);
+
+	while ('\0' != *text)
+	{
+		if (0 == (*text & 0x80))		/* ASCII */
+			n = 1;
+		else if (0xc0 == (*text & 0xe0))	/* 11000010-11011111 is a start of 2-byte sequence */
+			n = 2;
+		else if (0xe0 == (*text & 0xf0))	/* 11100000-11101111 is a start of 3-byte sequence */
+			n = 3;
+		else if (0xf0 == (*text & 0xf8))	/* 11110000-11110100 is a start of 4-byte sequence */
+			n = 4;
+		else
+			goto bad;
+
+		if (1 == n)
+			*p++ = *text++;
+		else
+		{
+			*p++ = ZBX_UTF8_REPLACE_CHAR;
+
+			while (0 != n)
+			{
+				if ('\0' == *text)
+					goto bad;
+				n--;
+				text++;
+			}
+		}
+	}
+
+	*p = '\0';
+	return out;
+bad:
+	zbx_free(out);
+	return NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_is_utf8                                                      *
  *                                                                            *
  * Purpose: check UTF-8 sequences                                             *
@@ -3126,69 +3181,11 @@ int	zbx_is_utf8(const char *text)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_replace_utf8                                                 *
- *                                                                            *
- * Purpose: replace non-ASCII UTF-8 characters with '?' character             *
- *                                                                            *
- * Parameters: text - [IN] pointer to the first char                          *
- *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- ******************************************************************************/
-char	*zbx_replace_utf8(const char *text)
-{
-	int	n;
-	char	*out, *p;
-
-	out = p = zbx_malloc(NULL, strlen(text) + 1);
-
-	while ('\0' != *text)
-	{
-		if (0 == (*text & 0x80))		/* ASCII */
-			n = 1;
-		else if (0xc0 == (*text & 0xe0))	/* 11000010-11011111 is a start of 2-byte sequence */
-			n = 2;
-		else if (0xe0 == (*text & 0xf0))	/* 11100000-11101111 is a start of 3-byte sequence */
-			n = 3;
-		else if (0xf0 == (*text & 0xf8))	/* 11110000-11110100 is a start of 4-byte sequence */
-			n = 4;
-		else
-			goto bad;
-
-		if (1 == n)
-			*p++ = *text++;
-		else
-		{
-			*p++ = ZBX_UTF8_REPLACE_CHAR;
-
-			while (0 != n)
-			{
-				if ('\0' == *text)
-					goto bad;
-				n--;
-				text++;
-			}
-		}
-	}
-
-	*p = '\0';
-	return out;
-bad:
-	zbx_free(out);
-	return NULL;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_replace_invalid_utf8                                         *
  *                                                                            *
  * Purpose: replace invalid UTF-8 sequences of bytes with '?' character       *
  *                                                                            *
  * Parameters: text - [IN/OUT] pointer to the first char                      *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 void	zbx_replace_invalid_utf8(char *text)
@@ -3546,6 +3543,3 @@ void	zbx_trim_str_list(char *list, char delimiter)
 	}
 	*out = '\0';
 }
-
-
-

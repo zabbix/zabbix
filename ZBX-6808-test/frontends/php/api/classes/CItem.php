@@ -1101,7 +1101,7 @@ class CItem extends CItemGeneral {
 				$graphs = API::Graph()->get(array(
 					'output' => $options['selectGraphs'],
 					'nodeids' => $options['nodeids'],
-					'graphids' => $relationMap->getRelatedIds('graphs'),
+					'graphids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
 				));
 
@@ -1153,7 +1153,7 @@ class CItem extends CItemGeneral {
 					' FROM item_discovery id,items i'.
 					' WHERE '.dbConditionInt('id.itemid', $itemids).
 					' AND i.itemid=id.itemid'.
-					' AND i.flags='.ZBX_FLAG_DISCOVERY_CHILD
+					' AND i.flags='.ZBX_FLAG_DISCOVERY_PROTOTYPE
 			);
 			while ($rule = DBfetch($dbRules)) {
 				$relationMap->addRelation($rule['itemid'], $rule['parent_itemid']);
@@ -1162,7 +1162,7 @@ class CItem extends CItemGeneral {
 			$discoveryRules = API::DiscoveryRule()->get(array(
 				'output' => $options['selectDiscoveryRule'],
 				'nodeids' => $options['nodeids'],
-				'itemids' => $relationMap->getRelatedIds('discoveryRule'),
+				'itemids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
 				'preservekeys' => true
 			));

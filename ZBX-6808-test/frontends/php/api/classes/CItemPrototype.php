@@ -50,7 +50,7 @@ class CItemPrototype extends CItemGeneral {
 		$sqlParts = array(
 			'select'	=> array('items' => 'i.itemid'),
 			'from'		=> array('items' => 'items i'),
-			'where'		=> array('i.flags='.ZBX_FLAG_DISCOVERY_CHILD),
+			'where'		=> array('i.flags='.ZBX_FLAG_DISCOVERY_PROTOTYPE),
 			'group'		=> array(),
 			'order'		=> array(),
 			'limit'		=> null
@@ -346,7 +346,7 @@ class CItemPrototype extends CItemGeneral {
 
 		// set proper flags to divide normal and discovered items in future processing
 		foreach ($items as &$item) {
-			$item['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
+			$item['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		}
 		unset($item);
 	}
@@ -660,7 +660,7 @@ class CItemPrototype extends CItemGeneral {
 			else {
 				// set the corresponding discovery rule id for the new items
 				$newItem['ruleid'] = $ruleids[$newItem['templateid']][$newItem['hostid']];
-				$newItem['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
+				$newItem['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 				$insertItems[] = $newItem;
 			}
 		}
@@ -745,7 +745,7 @@ class CItemPrototype extends CItemGeneral {
 				$graphs = API::GraphPrototype()->get(array(
 					'output' => $options['selectGraphs'],
 					'nodeids' => $options['nodeids'],
-					'graphids' => $relationMap->getRelatedIds('graphs'),
+					'graphids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
 				));
 

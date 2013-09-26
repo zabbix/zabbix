@@ -353,7 +353,7 @@ static void	zbx_load_config()
 			PARM_OPT,	1,			SEC_PER_HOUR},
 		{"UnavailableDelay",		&CONFIG_UNAVAILABLE_DELAY,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
-		{"ListenIP",			&CONFIG_LISTEN_IP,			TYPE_STRING,
+		{"ListenIP",			&CONFIG_LISTEN_IP,			TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
 		{"ListenPort",			&CONFIG_LISTEN_PORT,			TYPE_INT,
 			PARM_OPT,	1024,			32767},
@@ -543,37 +543,42 @@ int	MAIN_ZABBIX_ENTRY()
 	else
 		zabbix_open_log(LOG_TYPE_FILE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
 
-#ifdef	HAVE_SNMP
+#ifdef HAVE_SNMP
 #	define SNMP_FEATURE_STATUS	"YES"
 #else
 #	define SNMP_FEATURE_STATUS	" NO"
 #endif
-#ifdef	HAVE_OPENIPMI
+#ifdef HAVE_OPENIPMI
 #	define IPMI_FEATURE_STATUS	"YES"
 #else
 #	define IPMI_FEATURE_STATUS	" NO"
 #endif
-#ifdef	HAVE_LIBCURL
+#ifdef HAVE_LIBCURL
 #	define LIBCURL_FEATURE_STATUS	"YES"
 #else
 #	define LIBCURL_FEATURE_STATUS	" NO"
 #endif
-#ifdef	HAVE_JABBER
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+#	define VMWARE_FEATURE_STATUS	"YES"
+#else
+#	define VMWARE_FEATURE_STATUS	" NO"
+#endif
+#ifdef HAVE_JABBER
 #	define JABBER_FEATURE_STATUS	"YES"
 #else
 #	define JABBER_FEATURE_STATUS	" NO"
 #endif
-#ifdef	HAVE_UNIXODBC
+#ifdef HAVE_UNIXODBC
 #	define ODBC_FEATURE_STATUS	"YES"
 #else
 #	define ODBC_FEATURE_STATUS	" NO"
 #endif
-#ifdef	HAVE_SSH2
+#ifdef HAVE_SSH2
 #	define SSH2_FEATURE_STATUS	"YES"
 #else
 #	define SSH2_FEATURE_STATUS	" NO"
 #endif
-#ifdef	HAVE_IPV6
+#ifdef HAVE_IPV6
 #	define IPV6_FEATURE_STATUS	"YES"
 #else
 #	define IPV6_FEATURE_STATUS	" NO"
@@ -586,6 +591,7 @@ int	MAIN_ZABBIX_ENTRY()
 	zabbix_log(LOG_LEVEL_INFORMATION, "SNMP monitoring:           " SNMP_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "IPMI monitoring:           " IPMI_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "WEB monitoring:            " LIBCURL_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_INFORMATION, "VMware monitoring:         " VMWARE_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "Jabber notifications:      " JABBER_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "Ez Texting notifications:  " LIBCURL_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "ODBC:                      " ODBC_FEATURE_STATUS);

@@ -79,20 +79,18 @@ class testInheritanceItemPrototype extends CWebTest {
 	 * @dataProvider update
 	 */
 	public function testInheritanceItemPrototype_SimpleUpdate($data) {
-		$name = $data['name'];
-
 		$sqlItems = "select itemid, hostid, name, key_, delay from items order by itemid";
 		$oldHashItems = DBhash($sqlItems);
 
-		$this->zbxTestLogin('templates.php');
-		$this->zbxTestClickWait('link='.$this->template);
-		$this->zbxTestClickWait('link=Discovery rules');
-		$this->zbxTestClickWait('link='.$this->discoveryRule);
-		$this->zbxTestClickWait('link=Item prototypes');
-		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestLogin('disc_prototypes.php?form=update&itemid='.$data['itemid'].'&parent_discoveryid=23500');
 		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of item prototypes');
-		$this->zbxTestTextPresent(array('Item updated', "$name", 'CONFIGURATION OF ITEM PROTOTYPES', 'Item prototypes of '.$this->discoveryRule));
+		$this->zbxTestTextPresent(array(
+			'Item updated',
+			$data['name'],
+			'CONFIGURATION OF ITEM PROTOTYPES',
+			'Item prototypes of '.$this->discoveryRule
+		));
 
 		$this->assertEquals($oldHashItems, DBhash($sqlItems));
 	}
@@ -129,7 +127,7 @@ class testInheritanceItemPrototype extends CWebTest {
 					'key' =>'item-name-missing',
 					'errors' => array(
 						'Page received incorrect data',
-						'Warning. Incorrect value for field "Name": cannot be empty.'
+						'Incorrect value for field "Name": cannot be empty.'
 					)
 				)
 			),
@@ -140,7 +138,7 @@ class testInheritanceItemPrototype extends CWebTest {
 					'name' => 'Item name',
 					'errors' => array(
 						'Page received incorrect data',
-						'Warning. Incorrect value for field "Key": cannot be empty.'
+						'Incorrect value for field "Key": cannot be empty.'
 					)
 				)
 			),
@@ -154,7 +152,7 @@ class testInheritanceItemPrototype extends CWebTest {
 					'formulaValue' => '',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Field "Custom multiplier" is not decimal number.'
+						'Field "Custom multiplier" is not decimal number.'
 					)
 				)
 			),
@@ -168,7 +166,7 @@ class testInheritanceItemPrototype extends CWebTest {
 					'formulaValue' => '',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Field "Custom multiplier" is not decimal number.'
+						'Field "Custom multiplier" is not decimal number.'
 					)
 				)
 			),
@@ -182,7 +180,7 @@ class testInheritanceItemPrototype extends CWebTest {
 					'formulaValue' => 'form ula',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Field "Custom multiplier" is not decimal number.'
+						'Field "Custom multiplier" is not decimal number.'
 					)
 				)
 			),
@@ -196,7 +194,7 @@ class testInheritanceItemPrototype extends CWebTest {
 					'formulaValue' => 'a1b2 c3',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Field "Custom multiplier" is not decimal number.'
+						'Field "Custom multiplier" is not decimal number.'
 					)
 				)
 			),
@@ -210,7 +208,7 @@ class testInheritanceItemPrototype extends CWebTest {
 					'formulaValue' => '32 1 abc',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Field "Custom multiplier" is not decimal number.'
+						'Field "Custom multiplier" is not decimal number.'
 					)
 				)
 			),
@@ -224,7 +222,7 @@ class testInheritanceItemPrototype extends CWebTest {
 					'formulaValue' => '32 1 abc',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Field "Custom multiplier" is not decimal number.'
+						'Field "Custom multiplier" is not decimal number.'
 					)
 				)
 			),
@@ -238,7 +236,7 @@ class testInheritanceItemPrototype extends CWebTest {
 					'formulaValue' => '321abc',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Field "Custom multiplier" is not decimal number.'
+						'Field "Custom multiplier" is not decimal number.'
 					)
 				)
 			),
@@ -274,7 +272,7 @@ class testInheritanceItemPrototype extends CWebTest {
 					'delay' => '-30',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.'
+						'Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.'
 					)
 				)
 			),
@@ -287,7 +285,7 @@ class testInheritanceItemPrototype extends CWebTest {
 					'delay' => 86401,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.'
+						'Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.'
 					)
 				)
 			),
@@ -302,7 +300,7 @@ class testInheritanceItemPrototype extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "New flexible interval": cannot be empty.'
+						'Incorrect value for field "New flexible interval": cannot be empty.'
 					)
 				)
 			),
@@ -761,7 +759,7 @@ class testInheritanceItemPrototype extends CWebTest {
 					'history' => 65536,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Keep history (in days)": must be between 0 and 65535.'
+						'Incorrect value for field "Keep history (in days)": must be between 0 and 65535.'
 					)
 				)
 			),
@@ -774,7 +772,7 @@ class testInheritanceItemPrototype extends CWebTest {
 					'history' => '-1',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "Keep history (in days)": must be between 0 and 65535.'
+							'Incorrect value for field "Keep history (in days)": must be between 0 and 65535.'
 					)
 				)
 			),
@@ -807,7 +805,7 @@ class testInheritanceItemPrototype extends CWebTest {
 					'trends' => '-1',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "Keep trends (in days)": must be between 0 and 65535.'
+							'Incorrect value for field "Keep trends (in days)": must be between 0 and 65535.'
 					)
 				)
 			),
@@ -820,7 +818,7 @@ class testInheritanceItemPrototype extends CWebTest {
 					'trends' => 65536,
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "Keep trends (in days)": must be between 0 and 65535.'
+							'Incorrect value for field "Keep trends (in days)": must be between 0 and 65535.'
 					)
 				)
 			),
@@ -1019,6 +1017,7 @@ class testInheritanceItemPrototype extends CWebTest {
 					'type' => 'Database monitor',
 					'name' => 'Database monitor',
 					'key' => 'item-database-monitor',
+					'params_ap' => 'SELECT * FROM items',
 					'dbCheck' => true,
 					'formCheck' => true
 				)
@@ -1078,7 +1077,7 @@ class testInheritanceItemPrototype extends CWebTest {
 					'key' => 'item-ipmi-agent-error',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "IPMI sensor": cannot be empty.'
+							'Incorrect value for field "IPMI sensor": cannot be empty.'
 					)
 				)
 			),
@@ -1090,8 +1089,8 @@ class testInheritanceItemPrototype extends CWebTest {
 					'key' => 'item-ssh-agent-error',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "User name": cannot be empty.',
-							'Warning. Incorrect value for field "Executed script": cannot be empty.'
+							'Incorrect value for field "User name": cannot be empty.',
+							'Incorrect value for field "Executed script": cannot be empty.'
 					)
 				)
 			),
@@ -1103,8 +1102,8 @@ class testInheritanceItemPrototype extends CWebTest {
 					'key' => 'item-telnet-agent-error',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "User name": cannot be empty.',
-							'Warning. Incorrect value for field "Executed script": cannot be empty.'
+							'Incorrect value for field "User name": cannot be empty.',
+							'Incorrect value for field "Executed script": cannot be empty.'
 					)
 				)
 			),
@@ -1137,7 +1136,20 @@ class testInheritanceItemPrototype extends CWebTest {
 					'key' => 'item-calculated',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "Formula": cannot be empty.'
+							'Incorrect value for field "Formula": cannot be empty.'
+					)
+				)
+			),
+			// SQL field empty
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'type' => 'Database monitor',
+					'name' => 'Database monitor',
+					'key' => 'item-database-error',
+					'errors' => array(
+							'ERROR: Page received incorrect data',
+							'Incorrect value for field "SQL query": cannot be empty.'
 					)
 				)
 			),
@@ -1147,6 +1159,7 @@ class testInheritanceItemPrototype extends CWebTest {
 					'expected' => ITEM_BAD,
 					'type' => 'Database monitor',
 					'name' => 'Database monitor',
+					'params_ap' => 'SELECT * FROM items',
 					'errors' => array(
 							'ERROR: Cannot add item',
 							'Check the key, please. Default example was passed.'
@@ -1237,6 +1250,10 @@ class testInheritanceItemPrototype extends CWebTest {
 
 		if (isset($data['ipmi_sensor'])) {
 			$this->input_type('ipmi_sensor', $data['ipmi_sensor']);
+		}
+
+		if (isset($data['params_ap'])) {
+			$this->input_type('params_ap', $data['params_ap']);
 		}
 
 		if (isset($data['params_es'])) {

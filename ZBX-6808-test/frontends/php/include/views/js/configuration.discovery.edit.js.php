@@ -183,7 +183,7 @@
 		defPorts[ZBX_SVC.telnet] = <?php echo CJs::encodeJson(_('Telnet')); ?>;
 		defPorts[ZBX_SVC.agent] = <?php echo CJs::encodeJson(_('Zabbix agent')); ?>;
 
-		if (typeof(svcPort) == 'undefined') {
+		if (typeof svcPort === 'undefined') {
 			return defPorts;
 		}
 
@@ -215,18 +215,18 @@
 
 			var value = list[i];
 
-			if (typeof(value.dcheckid) == 'undefined') {
+			if (typeof value.dcheckid === 'undefined') {
 				value.dcheckid = getUniqueId();
 			}
 
 			// add
-			if (typeof(ZBX_CHECKLIST[value.dcheckid]) == 'undefined') {
+			if (typeof ZBX_CHECKLIST[value.dcheckid] === 'undefined') {
 				ZBX_CHECKLIST[value.dcheckid] = value;
 
 				jQuery('#dcheckListFooter').before(dcheckRowTpl.evaluate(value));
 
 				for (var fieldName in value) {
-					if (typeof(value[fieldName]) == 'string') {
+					if (typeof value[fieldName] === 'string') {
 						var input = jQuery('<input>', {
 							name: 'dchecks[' + value.dcheckid + '][' + fieldName + ']',
 							type: 'hidden',
@@ -258,7 +258,7 @@
 
 				// set values
 				for (var fieldName in value) {
-					if (typeof(value[fieldName]) == 'string') {
+					if (typeof value[fieldName] === 'string') {
 						var obj = jQuery('input[name="dchecks[' + value.dcheckid + '][' + fieldName + ']"]');
 
 						if (obj.length) {
@@ -320,7 +320,7 @@
 	}
 
 	function showNewCheckForm(e, dcheckType, dcheckId) {
-		var isUpdate = (typeof(dcheckId) != 'undefined');
+		var isUpdate = (typeof dcheckId !== 'undefined');
 
 		// remove existing form
 		jQuery('#new_check_form').remove();
@@ -440,7 +440,7 @@
 		jQuery('#type').data('oldType', dcheckType);
 
 		// type is changed
-		if (ZBX_SVC.icmp != dcheckType && typeof(oldType) != 'undefined' && dcheckType != oldType) {
+		if (ZBX_SVC.icmp != dcheckType && typeof oldType !== 'undefined' && dcheckType != oldType) {
 			// reset values
 			var snmpTypes = [ZBX_SVC.snmpv1, ZBX_SVC.snmpv2, ZBX_SVC.snmpv3],
 				ignoreNames = ['druleid', 'name', 'ports', 'type'];
@@ -505,33 +505,39 @@
 		var dCheck = jQuery('#new_check_form :input:enabled').serializeJSON();
 
 		// get check id
-		dCheck.dcheckid = (typeof(dcheckId) == 'undefined') ? getUniqueId() : dcheckId;
+		dCheck.dcheckid = (typeof dcheckId === 'undefined') ? getUniqueId() : dcheckId;
 
 		// check for duplicates
 		for (var zbxDcheckId in ZBX_CHECKLIST) {
-			if (typeof(dcheckId) == 'undefined' || (typeof(dcheckId) != 'undefined') && dcheckId != zbxDcheckId) {
-				if ((typeof(dCheck['key_']) == 'undefined' || ZBX_CHECKLIST[zbxDcheckId]['key_'] === dCheck['key_'])
-						&& (typeof(dCheck['type']) == 'undefined'
+			if (typeof dcheckId === 'undefined' || (typeof dcheckId !== 'undefined') && dcheckId != zbxDcheckId) {
+				if ((typeof dCheck['key_'] === 'undefined' || ZBX_CHECKLIST[zbxDcheckId]['key_'] === dCheck['key_'])
+						&& (typeof dCheck['type'] === 'undefined'
 							|| ZBX_CHECKLIST[zbxDcheckId]['type'] === dCheck['type'])
-						&& (typeof(dCheck['ports']) == 'undefined'
+						&& (typeof dCheck['ports'] === 'undefined'
 							|| ZBX_CHECKLIST[zbxDcheckId]['ports'] === dCheck['ports'])
-						&& (typeof(dCheck['snmp_community']) == 'undefined'
+						&& (typeof dCheck['snmp_community'] === 'undefined'
 							|| ZBX_CHECKLIST[zbxDcheckId]['snmp_community'] === dCheck['snmp_community'])
-						&& (typeof(dCheck['snmpv3_authprotocol']) == 'undefined'
+						&& (typeof dCheck['snmpv3_authprotocol'] === 'undefined'
 							|| ZBX_CHECKLIST[zbxDcheckId]['snmpv3_authprotocol'] === dCheck['snmpv3_authprotocol'])
-						&& (typeof(dCheck['snmpv3_authpassphrase']) == 'undefined'
+						&& (typeof dCheck['snmpv3_authpassphrase'] === 'undefined'
 							|| ZBX_CHECKLIST[zbxDcheckId]['snmpv3_authpassphrase'] === dCheck['snmpv3_authpassphrase'])
-						&& (typeof(dCheck['snmpv3_privprotocol']) == 'undefined'
+						&& (typeof dCheck['snmpv3_privprotocol'] === 'undefined'
 							|| ZBX_CHECKLIST[zbxDcheckId]['snmpv3_privprotocol'] === dCheck['snmpv3_privprotocol'])
-						&& (typeof(dCheck['snmpv3_privpassphrase']) == 'undefined'
+						&& (typeof dCheck['snmpv3_privpassphrase'] === 'undefined'
 							|| ZBX_CHECKLIST[zbxDcheckId]['snmpv3_privpassphrase'] === dCheck['snmpv3_privpassphrase'])
-						&& (typeof(dCheck['snmpv3_securitylevel']) == 'undefined'
+						&& (typeof dCheck['snmpv3_securitylevel'] === 'undefined'
 							|| ZBX_CHECKLIST[zbxDcheckId]['snmpv3_securitylevel'] === dCheck['snmpv3_securitylevel'])
-						&& (typeof(dCheck['snmpv3_securityname']) == 'undefined'
+						&& (typeof dCheck['snmpv3_securityname'] === 'undefined'
 							|| ZBX_CHECKLIST[zbxDcheckId]['snmpv3_securityname'] === dCheck['snmpv3_securityname'])
-						&& (typeof(dCheck['snmpv3_contextname']) == 'undefined'
+						&& (typeof dCheck['snmpv3_contextname'] === 'undefined'
 							|| ZBX_CHECKLIST[zbxDcheckId]['snmpv3_contextname'] === dCheck['snmpv3_contextname'])) {
-					alert(<?php echo CJs::encodeJson(_('Check already exists.')); ?>);
+					showModalWindow(
+						t(<?php echo CJs::encodeJson(_('Discovery check error')); ?>),
+						<?php echo CJs::encodeJson(_('Check already exists.')); ?>,
+						[{text: t(<?php echo CJs::encodeJson(_('Close')); ?>), click: function() {
+							jQuery(this).dialog('destroy');
+						}}]
+					);
 
 					return null;
 				}
@@ -571,13 +577,11 @@
 			});
 		}
 
-		function ajaxValidation() {
-			if (ajaxChecks.ajaxdata.length) {
-				var url = new Curl();
+		if (ajaxChecks.ajaxdata.length > 0) {
+			jQuery('#add_new_dcheck').prop('disabled', true);
 
-				jQuery('#add_new_dcheck').prop('disabled', true);
-
-				return jQuery.ajax({
+			var url = new Curl(),
+				jqxhr = jQuery.ajax({
 					url: url.getPath() + '?output=ajax&sid=' + url.getArgument('sid'),
 					data: ajaxChecks,
 					dataType: 'json',
@@ -589,36 +593,46 @@
 						}
 					},
 					error: function() {
-						alert('AJAX request error');
+						showModalWindow(
+							t(<?php echo CJs::encodeJson(_('Discovery check error')); ?>),
+							<?php echo CJs::encodeJson(_('Cannot validate discovery check: invalid request or connection to Zabbix server failed.')); ?>,
+							[{text: t(<?php echo CJs::encodeJson(_('Close')); ?>), click: function() {
+								jQuery(this).dialog('destroy');
+							}}]
+						);
+
 						jQuery('#add_new_dcheck').prop('disabled', false);
 					}
 				});
-			}
-			else {
-				return true;
-			}
-		}
 
-		jQuery.when(ajaxValidation()).done(function() {
-			if (validationErrors.length) {
-				alert(validationErrors.join('\n'));
+			jQuery.when(jqxhr).done(function() {
 				jQuery('#add_new_dcheck').prop('disabled', false);
-			}
-			else {
-				dCheck.name = jQuery('#type :selected').text();
 
-				if (typeof(dCheck.ports) != 'undefined' && dCheck.ports != discoveryCheckDefaultPort(dCheck.type)) {
-					dCheck.name += ' (' + dCheck.ports + ')';
+				if (validationErrors.length) {
+					showModalWindow(
+						t(<?php echo CJs::encodeJson(_('Discovery check error')); ?>),
+						validationErrors.join('\n'),
+						[{text: t(<?php echo CJs::encodeJson(_('Close')); ?>), click: function() {
+							jQuery(this).dialog('destroy');
+						}}]
+					);
 				}
-				if (dCheck.key_) {
-					dCheck.name += ' "' + dCheck.key_ + '"';
+				else {
+					dCheck.name = jQuery('#type :selected').text();
+
+					if (typeof dCheck.ports !== 'undefined' && dCheck.ports != discoveryCheckDefaultPort(dCheck.type)) {
+						dCheck.name += ' (' + dCheck.ports + ')';
+					}
+					if (dCheck.key_) {
+						dCheck.name += ' "' + dCheck.key_ + '"';
+					}
+
+					addPopupValues([dCheck]);
+
+					jQuery('#new_check_form').remove();
 				}
-
-				addPopupValues([dCheck]);
-
-				jQuery('#new_check_form').remove();
-			}
-		});
+			});
+		}
 	}
 
 	function selectUniquenessCriteriaDefault() {

@@ -1547,7 +1547,7 @@ zbx_uint64_t	multiply_item_value_uint64(DB_ITEM *item, zbx_uint64_t value)
  * Comments: NB! Do not use this function more than once in same SQL query    *
  *                                                                            *
  ******************************************************************************/
-static const char	*DBsql_id_cmp(zbx_uint64_t id)
+const char	*DBsql_id_cmp(zbx_uint64_t id)
 {
 	static char		buf[22];	/* 1 - '=', 20 - value size, 1 - '\0' */
 	static const char	is_null[9] = " is null";
@@ -1761,9 +1761,11 @@ char	*DBget_unique_hostname_by_sample(const char *host_name_sample)
 			"select host"
 			" from hosts"
 			" where host like '%s%%' escape '%c'"
+				" and flags<>%d"
 				" and status in (%d,%d,%d)"
 				ZBX_SQL_NODE,
 			host_name_sample_esc, ZBX_SQL_LIKE_ESCAPE_CHAR,
+			ZBX_FLAG_DISCOVERY_PROTOTYPE,
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE,
 			DBand_node_local("hostid"));
 
@@ -2096,6 +2098,33 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 #endif
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBselect_uint64                                                  *
+ *                                                                            *
+ * Parameters: sql - [IN] sql statement                                       *
+ *             ids - [OUT] sorted list of selected uint64 values              *
+ *                                                                            *
+ ******************************************************************************/
+void	DBselect_uint64(const char *sql, zbx_vector_uint64_t *ids)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	id;
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(id, row[0]);
+
+		zbx_vector_uint64_append(ids, id);
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
 /******************************************************************************
