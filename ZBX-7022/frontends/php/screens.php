@@ -60,19 +60,19 @@ check_fields($fields);
  * Permissions
  */
 // validate group IDs
-$validateGroupIds = array();
-$validateGroupIds[] = get_request('groupid');
-$validateGroupIds[] = get_request('tr_groupid');
-$validateGroupIds = array_filter($validateGroupIds);
+$validateGroupIds = array_filter(array(
+	get_request('groupid'),
+	get_request('tr_groupid')
+));
 if ($validateGroupIds && !API::HostGroup()->isReadable($validateGroupIds)) {
 	access_deny();
 }
 
 // validate host IDs
-$validateHostIds = array();
-$validateHostIds[] = get_request('hostid');
-$validateHostIds[] = get_request('tr_hostid');
-$validateHostIds = array_filter($validateHostIds);
+$validateHostIds = array_filter(array(
+	get_request('hostid'),
+	get_request('tr_hostid')
+));
 if ($validateHostIds && !API::Host()->isReadable($validateHostIds)) {
 	access_deny();
 }
