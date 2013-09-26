@@ -213,6 +213,7 @@ $regExpWidget->addPageHeader(_('CONFIGURATION OF REGULAR EXPRESSIONS'), $regExpF
 
 if (isset($_REQUEST['form'])) {
 	$data = array(
+		'form_refresh' => get_request('form_refresh'),
 		'regexpid' => get_request('regexpid')
 	);
 

@@ -955,7 +955,8 @@ elseif ($srctbl == 'prototypes') {
 	foreach ($items as &$item) {
 		$host = reset($item['hosts']);
 
-		$description = new CSpan(itemName($item), 'link');
+		$item['name'] = itemName($item);
+		$description = new CSpan($item['name'], 'link');
 		$item['name'] = $host['name'].NAME_DELIMITER.$item['name'];
 
 		if ($multiselect) {

@@ -308,8 +308,6 @@ class testFormItem extends CWebTest {
 			array(
 				array(
 					'type' => 'Zabbix agent',
-					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Boolean',
 					'host' => 'Template inheritance test host',
 					'templatedHost' => 'Inheritance test template',
 					'form' => 'testInheritanceItem1'
@@ -326,8 +324,6 @@ class testFormItem extends CWebTest {
 			array(
 				array(
 					'type' => 'Zabbix agent',
-					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Hexadecimal',
 					'host' => 'Template inheritance test host',
 					'templatedHost' => 'Inheritance test template',
 					'form' => 'testInheritanceItem1'
@@ -646,7 +642,7 @@ class testFormItem extends CWebTest {
 
 		if ($type == 'Database monitor' && !isset($data['form'])) {
 			$keyValue = $this->getValue('key');
-			$this->assertEquals($keyValue, "db.odbc.select[<unique short description>]");
+			$this->assertEquals($keyValue, "db.odbc.select[<unique short description>,<dsn>]");
 		}
 
 		if ($type == 'SSH agent' && !isset($data['form'])) {
@@ -687,7 +683,12 @@ class testFormItem extends CWebTest {
 			if (isset($data['data_type'])) {
 				$this->zbxTestDropdownSelect('data_type', $data['data_type']);
 			}
-			$data_type = $this->getSelectedLabel('data_type');
+			if (isset($data['templatedHost'])) {
+				$data_type = $this->getValue('value_type_name');
+			}
+			else {
+				$data_type = $this->getSelectedLabel('data_type');
+			}
 		}
 
 		if ($type == 'SSH agent') {
@@ -698,11 +699,11 @@ class testFormItem extends CWebTest {
 		}
 
 		if ($type == 'Database monitor') {
-			$this->zbxTestTextPresent('Additional parameters');
+			$this->zbxTestTextPresent('SQL query');
 			$this->assertVisible('params_ap');
 			$this->assertAttribute("//textarea[@id='params_ap']/@rows", 7);
 			$addParams = $this->getValue('params_ap');
-			$this->assertEquals($addParams, "DSN=<database source name>\nuser=<user name>\npassword=<password>\nsql=<query>");
+			$this->assertEquals($addParams, "");
 		}
 		else {
 			$this->zbxTestTextNotPresent('Additional parameters');
@@ -784,7 +785,7 @@ class testFormItem extends CWebTest {
 			$this->assertNotVisible('authtype');
 		}
 
-		if ($type == 'SSH agent' || $type == 'TELNET agent' || $type == 'JMX agent') {
+		if ($type == 'SSH agent' || $type == 'TELNET agent' || $type == 'JMX agent' || $type == 'Simple check' || $type == 'Database monitor') {
 			$this->zbxTestTextPresent('User name');
 			$this->assertVisible('username');
 			$this->assertAttribute("//input[@id='username']/@maxlength", 64);
@@ -1366,7 +1367,7 @@ class testFormItem extends CWebTest {
 					'key' =>'item-name-missing',
 					'errors' => array(
 						'Page received incorrect data',
-						'Warning. Incorrect value for field "Name": cannot be empty.'
+						'Incorrect value for field "Name": cannot be empty.'
 					)
 				)
 			),
@@ -1377,7 +1378,7 @@ class testFormItem extends CWebTest {
 					'name' => 'Item name',
 					'errors' => array(
 						'Page received incorrect data',
-						'Warning. Incorrect value for field "Key": cannot be empty.'
+						'Incorrect value for field "Key": cannot be empty.'
 					)
 				)
 			),
@@ -1391,7 +1392,7 @@ class testFormItem extends CWebTest {
 					'formulaValue' => '',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Field "Custom multiplier" is not decimal number.'
+						'Field "Custom multiplier" is not decimal number.'
 					)
 				)
 			),
@@ -1405,7 +1406,7 @@ class testFormItem extends CWebTest {
 					'formulaValue' => 'form ula',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Field "Custom multiplier" is not decimal number.'
+						'Field "Custom multiplier" is not decimal number.'
 					)
 				)
 			),
@@ -1419,7 +1420,7 @@ class testFormItem extends CWebTest {
 					'formulaValue' => 'a1b2 c3',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Field "Custom multiplier" is not decimal number.'
+						'Field "Custom multiplier" is not decimal number.'
 					)
 				)
 			),
@@ -1433,7 +1434,7 @@ class testFormItem extends CWebTest {
 					'formulaValue' => '32 1 abc',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Field "Custom multiplier" is not decimal number.'
+						'Field "Custom multiplier" is not decimal number.'
 					)
 				)
 			),
@@ -1447,7 +1448,7 @@ class testFormItem extends CWebTest {
 					'formulaValue' => '32 1 abc',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Field "Custom multiplier" is not decimal number.'
+						'Field "Custom multiplier" is not decimal number.'
 					)
 				)
 			),
@@ -1461,7 +1462,7 @@ class testFormItem extends CWebTest {
 					'formulaValue' => '321abc',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Field "Custom multiplier" is not decimal number.'
+						'Field "Custom multiplier" is not decimal number.'
 					)
 				)
 			),
@@ -1497,7 +1498,7 @@ class testFormItem extends CWebTest {
 					'delay' => '-30',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.'
+						'Incorrect value "-30" for "Update interval (in sec)" field: must be between 0 and 86400.'
 					)
 				)
 			),
@@ -1510,7 +1511,7 @@ class testFormItem extends CWebTest {
 					'delay' => 86401,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.'
+						'Incorrect value "86401" for "Update interval (in sec)" field: must be between 0 and 86400.'
 					)
 				)
 			),
@@ -1525,7 +1526,7 @@ class testFormItem extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "New flexible interval": cannot be empty.'
+						'Incorrect value for field "New flexible interval": cannot be empty.'
 					)
 				)
 			),
@@ -1964,7 +1965,7 @@ class testFormItem extends CWebTest {
 					'history' => 65536,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Keep history (in days)": must be between 0 and 65535.'
+						'Incorrect value "65536" for "Keep history (in days)" field: must be between 0 and 65535.'
 					)
 				)
 			),
@@ -1977,7 +1978,7 @@ class testFormItem extends CWebTest {
 					'history' => '-1',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "Keep history (in days)": must be between 0 and 65535.'
+							'Incorrect value "-1" for "Keep history (in days)" field: must be between 0 and 65535.'
 					)
 				)
 			),
@@ -2010,7 +2011,7 @@ class testFormItem extends CWebTest {
 					'trends' => '-1',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "Keep trends (in days)": must be between 0 and 65535.'
+							'Incorrect value "-1" for "Keep trends (in days)" field: must be between 0 and 65535.'
 					)
 				)
 			),
@@ -2023,7 +2024,7 @@ class testFormItem extends CWebTest {
 					'trends' => 65536,
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "Keep trends (in days)": must be between 0 and 65535.'
+							'Incorrect value "65536" for "Keep trends (in days)" field: must be between 0 and 65535.'
 					)
 				)
 			),
@@ -2176,6 +2177,7 @@ class testFormItem extends CWebTest {
 					'type' => 'Database monitor',
 					'name' => 'Database monitor',
 					'key' => 'item-database-monitor',
+					'params_ap' => 'query',
 					'dbCheck' => true,
 					'formCheck' => true
 				)
@@ -2223,7 +2225,7 @@ class testFormItem extends CWebTest {
 					'key' => 'item-ipmi-agent-error',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "IPMI sensor": cannot be empty.'
+							'Incorrect value for field "IPMI sensor": cannot be empty.'
 					)
 				)
 			),
@@ -2247,8 +2249,8 @@ class testFormItem extends CWebTest {
 					'key' => 'item-ssh-agent-error',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "User name": cannot be empty.',
-							'Warning. Incorrect value for field "Executed script": cannot be empty.'
+							'Incorrect value for field "User name": cannot be empty.',
+							'Incorrect value for field "Executed script": cannot be empty.'
 					)
 				)
 			),
@@ -2260,8 +2262,8 @@ class testFormItem extends CWebTest {
 					'key' => 'item-telnet-agent-error',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "User name": cannot be empty.',
-							'Warning. Incorrect value for field "Executed script": cannot be empty.'
+							'Incorrect value for field "User name": cannot be empty.',
+							'Incorrect value for field "Executed script": cannot be empty.'
 					)
 				)
 			),
@@ -2294,7 +2296,7 @@ class testFormItem extends CWebTest {
 					'key' => 'item-calculated',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "Formula": cannot be empty.'
+							'Incorrect value for field "Formula": cannot be empty.'
 					)
 				)
 			),
@@ -2304,6 +2306,7 @@ class testFormItem extends CWebTest {
 					'expected' => ITEM_BAD,
 					'type' => 'Database monitor',
 					'name' => 'Database monitor',
+					'params_ap' => 'query',
 					'errors' => array(
 							'ERROR: Cannot add item',
 							'Check the key, please. Default example was passed.'
@@ -2406,6 +2409,10 @@ class testFormItem extends CWebTest {
 
 		if (isset($data['params_es'])) {
 			$this->input_type('params_es', $data['params_es']);
+		}
+
+		if (isset($data['params_ap'])) {
+			$this->input_type('params_ap', $data['params_ap']);
 		}
 
 		if (isset($data['formula'])) {

@@ -53,7 +53,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$sqlParts = array(
 			'select'	=> array('items' => 'i.itemid'),
 			'from'		=> array('items' => 'items i'),
-			'where'		=> array('i.flags='.ZBX_FLAG_DISCOVERY),
+			'where'		=> array('i.flags='.ZBX_FLAG_DISCOVERY_RULE),
 			'group'		=> array(),
 			'order'		=> array(),
 			'limit'		=> null
@@ -84,6 +84,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectItems'				=> null,
 			'selectTriggers'			=> null,
 			'selectGraphs'				=> null,
+			'selectHostPrototypes'		=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -399,6 +400,20 @@ class CDiscoveryRule extends CItemGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete discovery rule'));
 			}
 		}
+
+		// delete host prototypes
+		$hostPrototypeIds = DBfetchColumn(DBselect(
+			'SELECT hd.hostid'.
+			' FROM host_discovery hd'.
+			' WHERE '.dbConditionInt('hd.parent_itemid', $ruleids)
+		), 'hostid');
+		if ($hostPrototypeIds) {
+			if (!API::HostPrototype()->delete($hostPrototypeIds, true)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete host prototype.'));
+			}
+		}
+
+		// delete LLD rules
 		DB::delete('items', array('itemid' => $ruleids));
 
 		// TODO: remove info from API
@@ -638,7 +653,7 @@ class CDiscoveryRule extends CItemGeneral {
 	protected function checkInput(array &$items, $update = false) {
 		// add the values that cannot be changed, but are required for further processing
 		foreach ($items as &$item) {
-			$item['flags'] = ZBX_FLAG_DISCOVERY;
+			$item['flags'] = ZBX_FLAG_DISCOVERY_RULE;
 			$item['value_type'] = ITEM_VALUE_TYPE_TEXT;
 		}
 		unset($item);
@@ -673,7 +688,7 @@ class CDiscoveryRule extends CItemGeneral {
 				$updateItems[] = $newItem;
 			}
 			else {
-				$newItem['flags'] = ZBX_FLAG_DISCOVERY;
+				$newItem['flags'] = ZBX_FLAG_DISCOVERY_RULE;
 				$insertItems[] = $newItem;
 			}
 		}
@@ -762,6 +777,9 @@ class CDiscoveryRule extends CItemGeneral {
 			// copy triggers
 			$this->copyTriggerPrototypes($srcDiscovery, $dstDiscovery, $srcHost, $dstHost);
 		}
+
+		// copy host prototypes
+		$this->copyHostPrototypes($srcDiscovery, $dstDiscovery);
 
 		return true;
 	}
@@ -937,6 +955,54 @@ class CDiscoveryRule extends CItemGeneral {
 		return $rs;
 	}
 
+	/**
+	 * Copies all of the host prototypes from the source discovery to the target
+	 * discovery rule.
+	 *
+	 * @throws APIException if prototype saving fails
+	 *
+	 * @param array $srcDiscovery   The source discovery rule to copy from
+	 * @param array $dstDiscovery   The target discovery rule to copy to
+	 *
+	 * @return array
+	 */
+	protected function copyHostPrototypes(array $srcDiscovery, array $dstDiscovery) {
+		$prototypes = API::HostPrototype()->get(array(
+			'discoveryids' => $srcDiscovery['itemid'],
+			'output' => array('host', 'name', 'status'),
+			'selectGroupLinks' => array('groupid'),
+			'selectGroupPrototypes' => array('name'),
+			'selectInventory' => array('inventory_mode'),
+			'selectTemplates' => array('templateid'),
+			'preservekeys' => true
+		));
+
+		$rs = array();
+		if ($prototypes) {
+			foreach ($prototypes as &$prototype) {
+				$prototype['ruleid'] = $dstDiscovery['itemid'];
+				unset($prototype['hostid'], $prototype['inventory']['hostid']);
+
+				foreach ($prototype['groupLinks'] as &$groupLinks) {
+					unset($groupLinks['group_prototypeid']);
+				}
+				unset($groupLinks);
+
+				foreach ($prototype['groupPrototypes'] as &$groupPrototype) {
+					unset($groupPrototype['group_prototypeid']);
+				}
+				unset($groupPrototype);
+			}
+			unset($prototype);
+
+			$rs = API::HostPrototype()->create($prototypes);
+			if (!$rs) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot clone host prototypes.'));
+			}
+		}
+		return $rs;
+	}
+
 	private function validateLifetime($lifetime) {
 		return (validateNumber($lifetime, self::MIN_LIFETIME, self::MAX_LIFETIME) || validateUserMacro($lifetime));
 	}
@@ -965,7 +1031,7 @@ class CDiscoveryRule extends CItemGeneral {
 				$items = API::ItemPrototype()->get(array(
 					'output' => $options['selectItems'],
 					'nodeids' => $options['nodeids'],
-					'itemids' => $relationMap->getRelatedIds('items'),
+					'itemids' => $relationMap->getRelatedIds(),
 					'nopermissions' => true,
 					'preservekeys' => true
 				));
@@ -1059,6 +1125,35 @@ class CDiscoveryRule extends CItemGeneral {
 				$graphs = zbx_toHash($graphs, 'parent_itemid');
 				foreach ($result as $itemid => $item) {
 					$result[$itemid]['graphs'] = isset($graphs[$itemid]) ? $graphs[$itemid]['rowscount'] : 0;
+				}
+			}
+		}
+
+		// adding hosts
+		if ($options['selectHostPrototypes'] !== null) {
+			if ($options['selectHostPrototypes'] != API_OUTPUT_COUNT) {
+				$relationMap = $this->createRelationMap($result, 'parent_itemid', 'hostid', 'host_discovery');
+				$hostPrototypes = API::HostPrototype()->get(array(
+					'output' => $options['selectHostPrototypes'],
+					'nodeids' => $options['nodeids'],
+					'hostids' => $relationMap->getRelatedIds(),
+					'nopermissions' => true,
+					'preservekeys' => true
+				));
+				$result = $relationMap->mapMany($result, $hostPrototypes, 'hostPrototypes', $options['limitSelects']);
+			}
+			else {
+				$hostPrototypes = API::HostPrototype()->get(array(
+					'nodeids' => $options['nodeids'],
+					'discoveryids' => $itemIds,
+					'nopermissions' => true,
+					'countOutput' => true,
+					'groupCount' => true
+				));
+				$hostPrototypes = zbx_toHash($hostPrototypes, 'parent_itemid');
+
+				foreach ($result as $itemid => $item) {
+					$result[$itemid]['hostPrototypes'] = isset($hostPrototypes[$itemid]) ? $hostPrototypes[$itemid]['rowscount'] : 0;
 				}
 			}
 		}

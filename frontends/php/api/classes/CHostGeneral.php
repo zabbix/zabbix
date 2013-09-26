@@ -24,10 +24,7 @@
  *
  * @package API
  */
-abstract class CHostGeneral extends CZBXAPI {
-
-	protected $tableName = 'hosts';
-	protected $tableAlias = 'h';
+abstract class CHostGeneral extends CHostBase {
 
 	/**
 	 * Allows to:
@@ -137,245 +134,12 @@ abstract class CHostGeneral extends CZBXAPI {
 		return array($this->pkOption() => $data[$this->pkOption()]);
 	}
 
-	/**
-	 * Links the templates to the given hosts.
-	 *
-	 * @param array $templateIds
-	 * @param array $targetIds		an array of host IDs to link the templates to
-	 */
 	protected function link(array $templateIds, array $targetIds) {
-		if (empty($templateIds)) {
-			return;
-		}
-
-		// check if someone passed duplicate templates in the same query
-		$templateIdDuplicates = zbx_arrayFindDuplicates($templateIds);
-		if (!zbx_empty($templateIdDuplicates)) {
-			$duplicatesFound = array();
-			foreach ($templateIdDuplicates as $value => $count) {
-				$duplicatesFound[] = _s('template ID "%1$s" is passed %2$s times', $value, $count);
-			}
-			self::exception(
-				ZBX_API_ERROR_PARAMETERS,
-				_s('Cannot pass duplicate template IDs for the linkage: %s.', implode(', ', $duplicatesFound))
-			);
-		}
-
-		// check if any templates linked to targets have more than one unique item key/application
-		foreach ($targetIds as $targetId) {
-			$linkedTpls = API::Template()->get(array(
-				'nopermissions' => true,
-				'output' => array('templateid'),
-				'hostids' => $targetId
-			));
-
-			$templateIdsAll = array_merge($templateIds, zbx_objectValues($linkedTpls, 'templateid'));
-
-			$dbItems = DBselect(
-				'SELECT i.key_,i.flags'.
-				' FROM items i'.
-				' WHERE '.dbConditionInt('i.hostid', $templateIdsAll).
-				' GROUP BY i.key_,i.flags'.
-				' HAVING COUNT(i.itemid)>1'
-			);
-
-			if ($dbItem = DBfetch($dbItems)) {
-				if ($dbItem['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-					$dbItemHost = API::Item()->get(array(
-						'output' => array('hostid'),
-						'filter' => array('key_' => $dbItem['key_']),
-						'templateids' => $templateIdsAll
-					));
-				}
-				elseif ($dbItem['flags'] == ZBX_FLAG_DISCOVERY) {
-					$dbItemHost = API::DiscoveryRule()->get(array(
-						'output' => array('hostid'),
-						'filter' => array('key_' => $dbItem['key_']),
-						'templateids' => $templateIdsAll
-					));
-				}
-				else {
-					$dbItemHost = API::ItemPrototype()->get(array(
-						'output' => array('hostid'),
-						'filter' => array('key_' => $dbItem['key_']),
-						'templateids' => $templateIdsAll
-					));
-				}
-
-				$dbItemHost = reset($dbItemHost);
-
-				$template = API::Template()->get(array(
-					'output' => array('name'),
-					'templateids' => $dbItemHost['hostid']
-				));
-
-				$template = reset($template);
-
-				if ($dbItem['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Template "%1$s" with item key "%2$s" already linked to host.',
-							$template['name'], $dbItem['key_']));
-				}
-				elseif ($dbItem['flags'] == ZBX_FLAG_DISCOVERY) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Template "%1$s" with low level discovery rule key "%2$s" already linked to host.',
-							$template['name'], $dbItem['key_']));
-				}
-				else {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Template "%1$s" with item prototype key "%2$s" already linked to host.',
-							$template['name'], $dbItem['key_']));
-				}
-			}
-		}
-
-		// retrieve templates which exist in all targets
-		$res = DBselect('SELECT * FROM hosts_templates WHERE '.dbConditionInt('hostid', $targetIds));
-		$mas = array();
-		while ($row = DBfetch($res)) {
-			if (!isset($mas[$row['templateid']])) {
-				$mas[$row['templateid']] = array();
-			}
-			$mas[$row['templateid']][$row['hostid']] = 1;
-		}
-		$targetIdCount = count($targetIds);
-		$commonDBTemplateIds = array();
-		foreach ($mas as $templateId => $targetList) {
-			if (count($targetList) == $targetIdCount) {
-				$commonDBTemplateIds[] = $templateId;
-			}
-		}
-
-		// check if there are any templates with triggers which depend on triggers in templates which will not be not linked
-		$commonTemplateIds = array_unique(array_merge($commonDBTemplateIds, $templateIds));
-		foreach ($templateIds as $templateId) {
-			$triggerIds = array();
-			$dbTriggers = get_triggers_by_hostid($templateId);
-			while ($trigger = DBfetch($dbTriggers)) {
-				$triggerIds[$trigger['triggerid']] = $trigger['triggerid'];
-			}
-
-			$sql = 'SELECT DISTINCT h.host'.
-					' FROM trigger_depends td,functions f,items i,hosts h'.
-					' WHERE ('.
-						dbConditionInt('td.triggerid_down', $triggerIds).
-						' AND f.triggerid=td.triggerid_up'.
-					' )'.
-					' AND i.itemid=f.itemid'.
-					' AND h.hostid=i.hostid'.
-					' AND '.dbConditionInt('h.hostid', $commonTemplateIds, true).
-					' AND h.status='.HOST_STATUS_TEMPLATE;
-			if ($dbDepHost = DBfetch(DBselect($sql))) {
-				$tmpTpls = API::Template()->get(array(
-					'templateids' => $templateId,
-					'output'=> API_OUTPUT_EXTEND
-				));
-				$tmpTpl = reset($tmpTpls);
-
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Trigger in template "%1$s" has dependency with trigger in template "%2$s".', $tmpTpl['host'], $dbDepHost['host']));
-			}
-		}
-
-		$res = DBselect(
-			'SELECT ht.hostid,ht.templateid'.
-			' FROM hosts_templates ht'.
-			' WHERE '.dbConditionInt('ht.hostid', $targetIds).
-				' AND '.dbConditionInt('ht.templateid', $templateIds)
-		);
-		$linked = array();
-		while ($row = DBfetch($res)) {
-			if (!isset($linked[$row['hostid']])) {
-				$linked[$row['hostid']] = array();
-			}
-			$linked[$row['hostid']][$row['templateid']] = 1;
-		}
-
-		// add template linkages, if problems rollback later
-		$hostsLinkageInserts = array();
-		foreach ($targetIds as $targetId) {
-			foreach ($templateIds as $templateId) {
-				if (isset($linked[$targetId]) && isset($linked[$targetId][$templateId])) {
-					continue;
-				}
-				$hostsLinkageInserts[] = array('hostid' => $targetId, 'templateid' => $templateId);
-			}
-		}
-		DB::insert('hosts_templates', $hostsLinkageInserts);
-
-		// check if all trigger templates are linked to host.
-		// we try to find template that is not linked to hosts
-		// ($targetIds) and there is a trigger which references that
-		// template and template from ($templateIds)
-		$sql = 'SELECT DISTINCT h.host'.
-				' FROM functions f,items i,triggers t,hosts h'.
-				' WHERE f.itemid=i.itemid'.
-					' AND f.triggerid=t.triggerid'.
-					' AND i.hostid=h.hostid'.
-					' AND h.status='.HOST_STATUS_TEMPLATE.
-					' AND NOT EXISTS (SELECT 1 FROM hosts_templates ht WHERE ht.templateid=i.hostid AND '.dbConditionInt('ht.hostid', $targetIds).')'.
-					' AND EXISTS (SELECT 1 FROM functions ff,items ii WHERE ff.itemid=ii.itemid AND ff.triggerid=t.triggerid AND '.dbConditionInt('ii.hostid', $templateIds). ')';
-		if ($dbNotLinkedTpl = DBfetch(DBSelect($sql, 1))) {
-			self::exception(
-				ZBX_API_ERROR_PARAMETERS,
-				_s('Trigger has items from template "%1$s" that is not linked to host.', $dbNotLinkedTpl['host'])
-			);
-		}
-
-		// check template linkage circularity
-		$res = DBselect(
-			'SELECT ht.hostid,ht.templateid'.
-			' FROM hosts_templates ht,hosts h'.
-			' WHERE ht.hostid=h.hostid '.
-				' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'
-		);
-
-		// build linkage graph and prepare list for $rootList generation
-		$graph = array();
-		$hasParentList = array();
-		$hasChildList = array();
-		$all = array();
-		while ($row = DBfetch($res)) {
-			if (!isset($graph[$row['hostid']])) {
-				$graph[$row['hostid']] = array();
-			}
-
-			$graph[$row['hostid']][] = $row['templateid'];
-			$hasParentList[$row['templateid']] = $row['templateid'];
-			$hasChildList[$row['hostid']] = $row['hostid'];
-			$all[$row['templateid']] = $row['templateid'];
-			$all[$row['hostid']] = $row['hostid'];
-		}
-
-		// get list of templates without parents
-		$rootList = array();
-		foreach ($hasChildList as $parentId) {
-			if (!isset($hasParentList[$parentId])) {
-				$rootList[] = $parentId;
-			}
-		}
-
-		// search cycles and double linkages in rooted parts of graph
-		$visited = array();
-		foreach ($rootList as $root) {
-			$path = array();
-
-			// raise exception on cycle or double linkage
-			$this->checkCircularAndDoubleLinkage($graph, $root, $path, $visited);
-		}
-
-		// there are still possible cycles without root
-		if (count($visited) < count($all)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular template linkage is not allowed.'));
-		}
-
-		// permission check
 		if (!API::Host()->isWritable($targetIds)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
-		if (!API::Template()->isReadable($templateIds)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
+
+		parent::link($templateIds, $targetIds);
 
 		foreach ($targetIds as $targetId) {
 			foreach ($templateIds as $templateId) {
@@ -391,6 +155,11 @@ abstract class CHostGeneral extends CZBXAPI {
 				));
 
 				API::Itemprototype()->syncTemplates(array(
+					'hostids' => $targetId,
+					'templateids' => $templateId
+				));
+
+				API::HostPrototype()->syncTemplates(array(
 					'hostids' => $targetId,
 					'templateids' => $templateId
 				));
@@ -455,8 +224,8 @@ abstract class CHostGeneral extends CZBXAPI {
 	 */
 	protected function unlink($templateids, $targetids = null, $clear = false) {
 		$flags = ($clear)
-			? array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY)
-			: array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY, ZBX_FLAG_DISCOVERY_CHILD);
+			? array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE)
+			: array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
 		// check that all triggers on templates that we unlink, don't have items from another templates
 		$sql = 'SELECT DISTINCT t.description'.
@@ -502,7 +271,7 @@ abstract class CHostGeneral extends CZBXAPI {
 		$dbTriggers = DBSelect($sql);
 		$triggers = array(
 			ZBX_FLAG_DISCOVERY_NORMAL => array(),
-			ZBX_FLAG_DISCOVERY_CHILD => array()
+			ZBX_FLAG_DISCOVERY_PROTOTYPE => array()
 		);
 		$triggerids = array();
 		while ($trigger = DBfetch($dbTriggers)) {
@@ -534,18 +303,18 @@ abstract class CHostGeneral extends CZBXAPI {
 			}
 		}
 
-		if (!empty($triggers[ZBX_FLAG_DISCOVERY_CHILD])) {
+		if (!empty($triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE])) {
 			if ($clear) {
-				$result = API::TriggerPrototype()->delete(array_keys($triggers[ZBX_FLAG_DISCOVERY_CHILD]), true);
+				$result = API::TriggerPrototype()->delete(array_keys($triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]), true);
 				if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear triggers'));
 			}
 			else{
 				DB::update('triggers', array(
 					'values' => array('templateid' => 0),
-					'where' => array('triggerid' => array_keys($triggers[ZBX_FLAG_DISCOVERY_CHILD]))
+					'where' => array('triggerid' => array_keys($triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]))
 				));
 
-				foreach ($triggers[ZBX_FLAG_DISCOVERY_CHILD] as $trigger) {
+				foreach ($triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE] as $trigger) {
 					info(_s('Unlinked: Trigger prototype "%1$s" on "%2$s".', $trigger['description'], $trigger['host']));
 				}
 			}
@@ -567,8 +336,8 @@ abstract class CHostGeneral extends CZBXAPI {
 		$dbItems = DBSelect($sql);
 		$items = array(
 			ZBX_FLAG_DISCOVERY_NORMAL => array(),
-			ZBX_FLAG_DISCOVERY => array(),
-			ZBX_FLAG_DISCOVERY_CHILD => array(),
+			ZBX_FLAG_DISCOVERY_RULE => array(),
+			ZBX_FLAG_DISCOVERY_PROTOTYPE => array(),
 		);
 		while ($item = DBfetch($dbItems)) {
 			$items[$item['flags']][$item['itemid']] = array(
@@ -577,18 +346,18 @@ abstract class CHostGeneral extends CZBXAPI {
 			);
 		}
 
-		if (!empty($items[ZBX_FLAG_DISCOVERY])) {
+		if (!empty($items[ZBX_FLAG_DISCOVERY_RULE])) {
 			if ($clear) {
-				$result = API::DiscoveryRule()->delete(array_keys($items[ZBX_FLAG_DISCOVERY]), true);
+				$result = API::DiscoveryRule()->delete(array_keys($items[ZBX_FLAG_DISCOVERY_RULE]), true);
 				if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear discovery rules'));
 			}
 			else{
 				DB::update('items', array(
 					'values' => array('templateid' => 0),
-					'where' => array('itemid' => array_keys($items[ZBX_FLAG_DISCOVERY]))
+					'where' => array('itemid' => array_keys($items[ZBX_FLAG_DISCOVERY_RULE]))
 				));
 
-				foreach ($items[ZBX_FLAG_DISCOVERY] as $discoveryRule) {
+				foreach ($items[ZBX_FLAG_DISCOVERY_RULE] as $discoveryRule) {
 					info(_s('Unlinked: Discovery rule "%1$s" on "%2$s".', $discoveryRule['name'], $discoveryRule['host']));
 				}
 			}
@@ -611,23 +380,54 @@ abstract class CHostGeneral extends CZBXAPI {
 			}
 		}
 
-		if (!empty($items[ZBX_FLAG_DISCOVERY_CHILD])) {
+		if (!empty($items[ZBX_FLAG_DISCOVERY_PROTOTYPE])) {
 			if ($clear) {
-				$result = API::Itemprototype()->delete(array_keys($items[ZBX_FLAG_DISCOVERY_CHILD]), true);
+				$result = API::Itemprototype()->delete(array_keys($items[ZBX_FLAG_DISCOVERY_PROTOTYPE]), true);
 				if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear item prototypes'));
 			}
 			else{
 				DB::update('items', array(
 					'values' => array('templateid' => 0),
-					'where' => array('itemid' => array_keys($items[ZBX_FLAG_DISCOVERY_CHILD]))
+					'where' => array('itemid' => array_keys($items[ZBX_FLAG_DISCOVERY_PROTOTYPE]))
 				));
 
-				foreach ($items[ZBX_FLAG_DISCOVERY_CHILD] as $item) {
+				foreach ($items[ZBX_FLAG_DISCOVERY_PROTOTYPE] as $item) {
 					info(_s('Unlinked: Item prototype "%1$s" on "%2$s".', $item['name'], $item['host']));
 				}
 			}
 		}
 		/* }}} ITEMS, DISCOVERY RULES */
+
+		// host prototypes
+		// we need only to unlink host prototypes. in case of unlink and clear they will be deleted together with LLD rules.
+		if (!$clear && isset($items[ZBX_FLAG_DISCOVERY_RULE])) {
+			$discoveryRuleIds = array_keys($items[ZBX_FLAG_DISCOVERY_RULE]);
+
+			$hostPrototypes = DBfetchArrayAssoc(DBSelect(
+				'SELECT DISTINCT h.hostid,h.host,h3.host AS parent_host'.
+				' FROM hosts h'.
+					' INNER JOIN host_discovery hd ON h.hostid=hd.hostid'.
+					' INNER JOIN hosts h2 ON h.templateid=h2.hostid'.
+					' INNER JOIN host_discovery hd2 ON h.hostid=hd.hostid'.
+					' INNER JOIN items i ON hd.parent_itemid=i.itemid'.
+					' INNER JOIN hosts h3 ON i.hostid=h3.hostid'.
+				' WHERE '.dbConditionInt('hd.parent_itemid', $discoveryRuleIds)
+			), 'hostid');
+			if ($hostPrototypes) {
+				DB::update('hosts', array(
+					'values' => array('templateid' => 0),
+					'where' => array('hostid' => array_keys($hostPrototypes))
+				));
+				DB::update('group_prototype', array(
+					'values' => array('templateid' => 0),
+					'where' => array('hostid' => array_keys($hostPrototypes))
+				));
+				foreach ($hostPrototypes as $hostPrototype) {
+					info(_s('Unlinked: Host prototype "%1$s" on "%2$s".', $hostPrototype['host'], $hostPrototype['parent_host']));
+				}
+			}
+		}
+
 
 		/* GRAPHS {{{ */
 		$sqlFrom = ' graphs g,hosts h';
@@ -653,7 +453,7 @@ abstract class CHostGeneral extends CZBXAPI {
 		$dbGraphs = DBSelect($sql);
 		$graphs = array(
 			ZBX_FLAG_DISCOVERY_NORMAL => array(),
-			ZBX_FLAG_DISCOVERY_CHILD => array(),
+			ZBX_FLAG_DISCOVERY_PROTOTYPE => array(),
 		);
 		while ($graph = DBfetch($dbGraphs)) {
 			$graphs[$graph['flags']][$graph['graphid']] = array(
@@ -663,18 +463,18 @@ abstract class CHostGeneral extends CZBXAPI {
 			);
 		}
 
-		if (!empty($graphs[ZBX_FLAG_DISCOVERY_CHILD])) {
+		if (!empty($graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE])) {
 			if ($clear) {
-				$result = API::GraphPrototype()->delete(array_keys($graphs[ZBX_FLAG_DISCOVERY_CHILD]), true);
+				$result = API::GraphPrototype()->delete(array_keys($graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]), true);
 				if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear graph prototypes'));
 			}
 			else{
 				DB::update('graphs', array(
 					'values' => array('templateid' => 0),
-					'where' => array('graphid' => array_keys($graphs[ZBX_FLAG_DISCOVERY_CHILD]))
+					'where' => array('graphid' => array_keys($graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]))
 				));
 
-				foreach ($graphs[ZBX_FLAG_DISCOVERY_CHILD] as $graph) {
+				foreach ($graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE] as $graph) {
 					info(_s('Unlinked: Graph prototype "%1$s" on "%2$s".', $graph['name'], $graph['host']));
 				}
 			}
@@ -786,75 +586,7 @@ abstract class CHostGeneral extends CZBXAPI {
 		}
 		/* }}} APPLICATIONS */
 
-
-		$cond = array('templateid' => $templateids);
-		if (!is_null($targetids)) {
-			$cond['hostid'] =  $targetids;
-		}
-		DB::delete('hosts_templates', $cond);
-
-		if (!is_null($targetids)) {
-			$hosts = API::Host()->get(array(
-				'hostids' => $targetids,
-				'output' => array('hostid', 'host'),
-				'nopermissions' => true,
-			));
-		}
-		else{
-			$hosts = API::Host()->get(array(
-				'templateids' => $templateids,
-				'output' => array('hostid', 'host'),
-				'nopermissions' => true,
-			));
-		}
-
-		if (!empty($hosts)) {
-			$templates = API::Template()->get(array(
-				'templateids' => $templateids,
-				'output' => array('hostid', 'host'),
-				'nopermissions' => true,
-			));
-
-			$hosts = implode(', ', zbx_objectValues($hosts, 'host'));
-			$templates = implode(', ', zbx_objectValues($templates, 'host'));
-
-			info(_s('Templates "%1$s" unlinked from hosts "%2$s".', $templates, $hosts));
-		}
-	}
-
-	/**
-	 * Searches for cycles and double linkages in graph.
-	 *
-	 * @throw APIException rises exception if cycle or double linkage is found
-	 *
-	 * @param array $graph - array with keys as parent ids and values as arrays with child ids
-	 * @param int $current - cursor for recursive DFS traversal, starting point for algorithm
-	 * @param array $path - should be passed empty array for DFS
-	 * @param array $visited - there will be stored visited graph node ids
-	 *
-	 * @return boolean
-	 */
-	protected function checkCircularAndDoubleLinkage($graph, $current, &$path, &$visited) {
-		if (isset($path[$current])) {
-			if ($path[$current] == 1) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular template linkage is not allowed.'));
-			}
-			else {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Template cannot be linked to another template more than once even through other templates.'));
-			}
-		}
-		$path[$current] = 1;
-		$visited[$current] = 1;
-
-		if (isset($graph[$current])) {
-			foreach ($graph[$current] as $next) {
-				$this->checkCircularAndDoubleLinkage($graph, $next, $path, $visited);
-			}
-		}
-
-		$path[$current] = 2;
-
-		return false;
+		parent::unlink($templateids, $targetids);
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {

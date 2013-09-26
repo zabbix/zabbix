@@ -56,11 +56,6 @@ class CScreenMap extends CScreenBase {
 			$image->setMap($actionMap->getName());
 
 			$output = array($actionMap, $image);
-
-			// display map menus popup
-			$this->data['severity_min'] = $sysmap['severity_min'];
-
-			require_once dirname(__FILE__).'/../../views/js/monitoring.maps.js.php';
 		}
 		elseif ($this->mode == SCREEN_MODE_EDIT) {
 			$output = array($image, BR(), new CLink(_('Change'), $this->action));

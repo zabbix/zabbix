@@ -121,11 +121,11 @@ $permissionsFormList->addRow(_('Calculated permissions'), '');
 $permissionsFormList = getPermissionsFormList($this->data['group_rights'], null, $permissionsFormList);
 
 // append form lists to tab
-$userGroupTab = new CTabView(array('remember' => 1));
-$userGroupTab->addTab('userGroupTab', _('User group'), $userGroupFormList);
+$userGroupTab = new CTabView();
 if (!$this->data['form_refresh']) {
 	$userGroupTab->setSelected(0);
 }
+$userGroupTab->addTab('userGroupTab', _('User group'), $userGroupFormList);
 $userGroupTab->addTab('permissionsTab', _('Permissions'), $permissionsFormList);
 
 // append tab to form

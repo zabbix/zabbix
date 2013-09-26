@@ -443,7 +443,7 @@ div.calendar input[type="button"] {
 	background-color: #2F2F2F;
 	color: #DFDFDF;
 }
-.input option { background: #2F2F2F; }
+.input option { background: #2F2F2F; color: #FF5500; }
 .input:focus, input.formlist[type="button"]:focus, div.calendar input[type="button"]:focus
 .input:hover, input.formlist[type="button"]:hover, div.calendar input[type="button"]:hover {
 	border-color: #FF5500; color: #FF5500;
@@ -523,3 +523,8 @@ div.preloader {
 .multiselect .available .prefix { color: #838383; }
 .multiselect .available ul li.hover { background: #908E8E; }
 .multiselect .available ul li.hover .prefix { color: #F1F1F1; }
+
+/* menu popup */
+.menuPopup { border: 1px solid #1F1F1F; }
+.menuPopup .title { color: #ffffff; background: #1F1F1F url('../../../images/gradients/table_head_bb.gif') repeat-x top left; }
+.menuPopup .ui-menu { border: 1px solid #1F1F1F; }

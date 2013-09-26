@@ -99,8 +99,8 @@ class testInheritanceWeb extends CWebTest {
 					'expected' => WEB_BAD,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Name": cannot be empty.',
-						'Warning. Field "Steps" is mandatory.'
+						'Incorrect value for field "Name": cannot be empty.',
+						'Field "Steps" is mandatory.'
 					)
 				)
 			),
@@ -111,7 +111,7 @@ class testInheritanceWeb extends CWebTest {
 					'name' => 'Empty steps',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Field "Steps" is mandatory.'
+						'Field "Steps" is mandatory.'
 					)
 				)
 			),
@@ -124,7 +124,7 @@ class testInheritanceWeb extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Name": cannot be empty.'
+						'Incorrect value for field "Name": cannot be empty.'
 					)
 				)
 			),
@@ -137,7 +137,7 @@ class testInheritanceWeb extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Name": cannot be empty.'
+						'Incorrect value for field "Name": cannot be empty.'
 					)
 				)
 			),
@@ -230,8 +230,8 @@ class testInheritanceWeb extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "User": cannot be empty.',
-						'Warning. Incorrect value for field "Password": cannot be empty.'
+						'Incorrect value for field "User": cannot be empty.',
+						'Incorrect value for field "Password": cannot be empty.'
 					)
 				)
 			),
@@ -247,7 +247,7 @@ class testInheritanceWeb extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Password": cannot be empty.'
+						'Incorrect value for field "Password": cannot be empty.'
 					)
 				)
 			),
@@ -263,7 +263,7 @@ class testInheritanceWeb extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "User": cannot be empty.'
+						'Incorrect value for field "User": cannot be empty.'
 					)
 				)
 			),
@@ -330,7 +330,7 @@ class testInheritanceWeb extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Retries": must be between 1 and 10.'
+						'Incorrect value for field "Retries": must be between 1 and 10.'
 					)
 				)
 			),
@@ -356,7 +356,7 @@ class testInheritanceWeb extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Retries": must be between 1 and 10.'
+						'Incorrect value for field "Retries": must be between 1 and 10.'
 					)
 				)
 			),
@@ -371,7 +371,7 @@ class testInheritanceWeb extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Retries": must be between 1 and 10.'
+						'Incorrect value for field "Retries": must be between 1 and 10.'
 					)
 				)
 			),
@@ -397,7 +397,7 @@ class testInheritanceWeb extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Retries": must be between 1 and 10.'
+						'Incorrect value for field "Retries": must be between 1 and 10.'
 					)
 				)
 			),
@@ -412,7 +412,7 @@ class testInheritanceWeb extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Retries": must be between 1 and 10.'
+						'Incorrect value for field "Retries": must be between 1 and 10.'
 					)
 				)
 			),
@@ -427,7 +427,7 @@ class testInheritanceWeb extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Update interval (in sec)": must be between 1 and 86400.'
+						'Incorrect value for field "Update interval (in sec)": must be between 1 and 86400.'
 					)
 				)
 			),
@@ -453,7 +453,7 @@ class testInheritanceWeb extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Update interval (in sec)": must be between 1 and 86400.'
+						'Incorrect value for field "Update interval (in sec)": must be between 1 and 86400.'
 					)
 				)
 			),
@@ -468,7 +468,7 @@ class testInheritanceWeb extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Update interval (in sec)": must be between 1 and 86400.'
+						'Incorrect value for field "Update interval (in sec)": must be between 1 and 86400.'
 					)
 				)
 			),
@@ -494,7 +494,7 @@ class testInheritanceWeb extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Update interval (in sec)": must be between 1 and 86400.'
+						'Incorrect value for field "Update interval (in sec)": must be between 1 and 86400.'
 					)
 				)
 			),
@@ -509,7 +509,7 @@ class testInheritanceWeb extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Update interval (in sec)": must be between 1 and 86400.'
+						'Incorrect value for field "Update interval (in sec)": must be between 1 and 86400.'
 					)
 				)
 			),

@@ -70,7 +70,7 @@ class CHost extends CHostGeneral {
 		$sqlParts = array(
 			'select'	=> array('hosts' => 'h.hostid'),
 			'from'		=> array('hosts' => 'hosts h'),
-			'where'		=> array(),
+			'where'		=> array('flags' => 'h.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'),
 			'group'		=> array(),
 			'order'		=> array(),
 			'limit'		=> null
@@ -126,6 +126,8 @@ class CHost extends CHostGeneral {
 			'selectInterfaces'			=> null,
 			'selectInventory'			=> null,
 			'selectHttpTests'           => null,
+			'selectDiscoveryRule'		=> null,
+			'selectHostDiscovery'		=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -634,7 +636,7 @@ class CHost extends CHostGeneral {
 		if ($update) {
 			$hostDBfields = array('hostid' => null);
 			$dbHosts = $this->get(array(
-				'output' => array('hostid', 'host'),
+				'output' => array('hostid', 'host', 'flags'),
 				'hostids' => zbx_objectValues($hosts, 'hostid'),
 				'editable' => true,
 				'preservekeys' => true
@@ -677,10 +679,17 @@ class CHost extends CHostGeneral {
 				}
 			}
 
+			$updateDiscoveredValidator = new CUpdateDiscoveredValidator(array(
+				'allowed' => array('hostid', 'status', 'inventory'),
+				'messageAllowedField' => _('Cannot update "%1$s" for a discovered host.')
+			));
 			if ($update) {
 				if (!isset($dbHosts[$host['hostid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
+
+				// cannot update certain fields for discoverd hosts
+				$this->checkPartialValidator($host, $updateDiscoveredValidator, $dbHosts[$host['hostid']]);
 			}
 			else {
 				// if visible name is not given or empty it should be set to host name
@@ -932,8 +941,31 @@ class CHost extends CHostGeneral {
 
 		$this->checkInput($hosts, __FUNCTION__);
 
+		// fetch fields required to update host inventory
+		$inventories = array();
+		foreach ($hosts as $host) {
+			$inventory = $host['inventory'];
+			$inventory['hostid'] = $host['hostid'];
+
+			$inventories[] = $inventory;
+		}
+		$inventories = $this->extendObjects('host_inventory', $inventories, array('inventory_mode'));
+		$inventories = zbx_toHash($inventories, 'hostid');
+
 		$macros = array();
 		foreach ($hosts as $host) {
+			// extend host inventory with the required data
+			if (isset($host['inventory']) && $host['inventory']) {
+				$inventory = $inventories[$host['hostid']];
+
+				// if no host inventory record exists in the DB, it's disabled
+				if (!isset($inventory['inventory_mode'])) {
+					$inventory['inventory_mode'] = HOST_INVENTORY_DISABLED;
+				}
+
+				$host['inventory'] = $inventory;
+			}
+
 			API::HostInterface()->replaceHostInterfaces($host);
 			unset($host['interfaces']);
 
@@ -1387,25 +1419,29 @@ class CHost extends CHostGeneral {
 	 * @throws APIException if the input is invalid
 	 *
 	 * @param array $hostIds
+	 * @param bool 	$nopermissions
 	 *
 	 * @return void
 	 */
-	protected function validateDelete(array $hostIds) {
+	protected function validateDelete(array $hostIds, $nopermissions = false) {
 		if (empty($hostIds)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$this->checkPermissions($hostIds);
+		if (!$nopermissions) {
+			$this->checkPermissions($hostIds);
+		}
 	}
 
 	/**
 	 * Delete Host
 	 *
-	 * @param string|array $hostIds
+	 * @param string|array 	$hostIds
+	 * @param bool			$nopermissions
 	 *
 	 * @return array|boolean
 	 */
-	public function delete($hostIds) {
+	public function delete($hostIds, $nopermissions = false) {
 		$hostIds = zbx_toArray($hostIds);
 
 		// deprecated input support
@@ -1419,7 +1455,7 @@ class CHost extends CHostGeneral {
 			$hostIds = zbx_objectValues($hostIds, 'hostid');
 		}
 
-		$this->validateDelete($hostIds);
+		$this->validateDelete($hostIds, $nopermissions);
 
 		// delete the discovery rules first
 		$delRules = API::DiscoveryRule()->get(array(
@@ -1725,6 +1761,41 @@ class CHost extends CHostGeneral {
 					$result[$hostid]['screens'] = isset($screens[$hostid]) ? $screens[$hostid]['rowscount'] : 0;
 				}
 			}
+		}
+
+		// adding discovery rule
+		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
+			// discovered items
+			$discoveryRules = DBFetchArray(DBselect(
+				'SELECT hd.hostid,hd2.parent_itemid'.
+					' FROM host_discovery hd,host_discovery hd2'.
+					' WHERE '.dbConditionInt('hd.hostid', $hostids).
+					' AND hd.parent_hostid=hd2.hostid'
+			));
+			$relationMap = $this->createRelationMap($discoveryRules, 'hostid', 'parent_itemid');
+
+			$discoveryRules = API::DiscoveryRule()->get(array(
+				'output' => $options['selectDiscoveryRule'],
+				'nodeids' => $options['nodeids'],
+				'itemids' => $relationMap->getRelatedIds(),
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
+		}
+
+		// adding host discovery
+		if ($options['selectHostDiscovery'] !== null) {
+			$hostDiscoveries = API::getApi()->select('host_discovery', array(
+				'output' => $this->outputExtend('host_discovery', array('hostid'), $options['selectHostDiscovery']),
+				'filter' => array('hostid' => $hostids),
+				'preservekeys' => true
+			));
+			$relationMap = $this->createRelationMap($hostDiscoveries, 'hostid', 'hostid');
+
+			$hostDiscoveries = $this->unsetExtraFields($hostDiscoveries, array('hostid'),
+				$options['selectHostDiscovery']
+			);
+			$result = $relationMap->mapOne($result, $hostDiscoveries, 'hostDiscovery');
 		}
 
 		return $result;

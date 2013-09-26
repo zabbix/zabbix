@@ -522,7 +522,7 @@ class CApplication extends CZBXAPI {
 			'filter' => array(
 				'flags' => array(
 					ZBX_FLAG_DISCOVERY_NORMAL,
-					ZBX_FLAG_DISCOVERY_CHILD,
+					ZBX_FLAG_DISCOVERY_PROTOTYPE,
 					ZBX_FLAG_DISCOVERY_CREATED
 				)
 			)

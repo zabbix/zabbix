@@ -215,7 +215,7 @@ elseif (isset($_REQUEST['save'])) {
 	);
 
 	if (!empty($_REQUEST['parent_discoveryid'])) {
-		$graph['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
+		$graph['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 	}
 
 	if (isset($_REQUEST['graphid'])) {
@@ -584,7 +584,11 @@ else {
 	}
 
 	order_result($data['graphs'], $sortfield, $sortorder);
-	$data['paging'] = getPagingLine($data['graphs']);
+
+	$data['paging'] = getPagingLine($data['graphs'], array(
+		'hostid' => get_request('hostid'),
+		'parent_discoveryid' => get_request('parent_discoveryid')
+	));
 
 	// get graphs after paging
 	$options = array(

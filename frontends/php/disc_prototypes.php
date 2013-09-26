@@ -183,7 +183,7 @@ if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
  * Actions
  */
 if (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
-	$timePeriodValidator = new CTimePeriodValidator(array('allow_multiple' => false));
+	$timePeriodValidator = new CTimePeriodValidator(array('allowMultiple' => false));
 	$_REQUEST['delay_flex'] = get_request('delay_flex', array());
 
 	if ($timePeriodValidator->validate($_REQUEST['new_delay_flex']['period'])) {
@@ -372,7 +372,11 @@ else {
 	if (!empty($data['items'])) {
 		order_result($data['items'], $sortfield, getPageSortOrder());
 	}
-	$data['paging'] = getPagingLine($data['items']);
+
+	$data['paging'] = getPagingLine($data['items'], array(
+		'hostid' => get_request('hostid'),
+		'parent_discoveryid' => get_request('parent_discoveryid')
+	));
 
 	// render view
 	$itemView = new CView('configuration.item.prototype.list', $data);

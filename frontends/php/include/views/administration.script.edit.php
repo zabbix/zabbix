@@ -20,7 +20,6 @@
 
 
 include('include/views/js/administration.script.edit.js.php');
-include('include/views/js/general.script.confirm.js.php');
 
 $scriptsWidget = new CWidget();
 $scriptsWidget->addPageHeader(_('CONFIGURATION OF SCRIPTS'));
@@ -39,6 +38,7 @@ $scriptFormList = new CFormList('scriptsTab');
 // name
 $nameTextBox = new CTextBox('name', $this->get('name'), ZBX_TEXTBOX_STANDARD_SIZE);
 $nameTextBox->attr('autofocus', 'autofocus');
+$nameTextBox->attr('placeholder', _('<Sub-menu/Sub-menu.../>Script'));
 $scriptFormList->addRow(_('Name'), $nameTextBox);
 
 // type

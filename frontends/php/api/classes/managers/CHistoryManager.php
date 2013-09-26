@@ -57,37 +57,6 @@ class CHistoryManager {
 	}
 
 	/**
-	 * Returns those items from $items that have history data.
-	 *
-	 * @param array $items  an array of items with the 'itemid' and 'value_type' properties
-	 *
-	 * @return array    array of items with item IDs as keys
-	 */
-	public function getItemsWithData(array $items) {
-		$tableItems = array();
-		foreach ($items as $item) {
-			$table = self::getTableName($item['value_type']);
-			$tableItems[$table][] = $item['itemid'];
-		}
-
-		$items = zbx_toHash($items, 'itemid');
-		$rs = array();
-		foreach ($tableItems as $table => $itemIds) {
-			$query = DBselect(
-				'SELECT DISTINCT h.itemid'.
-				' FROM '.$table.' h'.
-				' WHERE '.dbConditionInt('h.itemid', $itemIds)
-			);
-
-			while ($item = DBfetch($query)) {
-				$rs[$item['itemid']] = $items[$item['itemid']];
-			}
-		}
-
-		return $rs;
-	}
-
-	/**
 	 * Return the name of the table where the data for the given value type is stored.
 	 *
 	 * @param int $valueType

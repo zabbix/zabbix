@@ -50,6 +50,7 @@ class API {
 		'graphprototype' => 'CGraphPrototype',
 		'host' => 'CHost',
 		'hostgroup' => 'CHostGroup',
+		'hostprototype' => 'CHostPrototype',
 		'history' => 'CHistory',
 		'hostinterface' => 'CHostInterface',
 		'image' => 'CImage',
@@ -248,6 +249,13 @@ class API {
 	 */
 	public static function Host() {
 		return self::getObject('host');
+	}
+
+	/**
+	 * @return CHostPrototype
+	 */
+	public static function HostPrototype() {
+		return self::getObject('hostprototype');
 	}
 
 	/**

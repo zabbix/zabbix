@@ -12,6 +12,7 @@ libzbxpoller_a_SOURCES = \
 	checks_agent.c checks_agent.h \
 	checks_internal.c checks_internal.h \
 	checks_simple.c checks_simple.h \
+	checks_simple_vmware.c checks_simple_vmware.h \
 	checks_snmp.c checks_snmp.h \
 	${CHECKS_DB_SRC} \
 	checks_aggregate.c checks_aggregate.h \

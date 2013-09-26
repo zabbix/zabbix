@@ -6,8 +6,9 @@
 		 */
 		var rebuildRowColoring = function() {
 			var a = 1;
-			$('.tableinfo tr:visible').each(function(){
+			$('.tableinfo tr:visible').each(function() {
 				a = a ? 0 : 1;
+
 				if (a) {
 					$(this).addClass('even_row');
 				}
@@ -15,7 +16,7 @@
 					$(this).removeClass('even_row');
 				}
 			});
-		}
+		};
 
 		var initialize = function() {
 			// if at least one toggle group is opened
@@ -24,12 +25,12 @@
 			}
 
 			rebuildRowColoring();
-		}
+		};
 
 		initialize();
 
 		// click event for main toggle (+-) button
-		$('.app-list-toggle-all').click(function(){
+		$('.app-list-toggle-all').click(function() {
 			// this is for Opera browser with large tables, which renders table layout while showing/hiding rows
 			$('.tableinfo').fadeTo(0, 0);
 
@@ -40,7 +41,7 @@
 			$(this).toggleClass('icon-minus-9x9');
 
 			if (openState) {
-				$('.app-list-toggle.icon-minus-9x9').each(function(){
+				$('.app-list-toggle.icon-minus-9x9').each(function() {
 					$(this).toggleClass('icon-minus-9x9');
 					$(this).data('openState', 0);
 					$('tr[parent_app_id=' + $(this).data('appId') + ']').hide();
@@ -48,7 +49,7 @@
 				});
 			}
 			else {
-				$('.app-list-toggle').not('.icon-minus-9x9').each(function(){
+				$('.app-list-toggle').not('.icon-minus-9x9').each(function() {
 					$(this).toggleClass('icon-minus-9x9');
 					$(this).data('openState', 1);
 					$('tr[parent_app_id=' + $(this).data('appId') + ']').show();
@@ -68,11 +69,15 @@
 			// store toggle state in DB
 			var url = new Curl('latest.php?output=ajax');
 			url.addSID();
-			$.post(url.getUrl(), { favobj: 'toggle', toggle_ids: appIdList, toggle_open_state: openState });
+			$.post(url.getUrl(), {
+				favobj: 'toggle',
+				toggle_ids: appIdList,
+				toggle_open_state: openState
+			});
 		});
 
 		// click event for every toggle (+-) button
-		$('.app-list-toggle').click(function(){
+		$('.app-list-toggle').click(function() {
 			var appId = $(this).data('appId'),
 				openState = $(this).data('openState');
 
@@ -100,8 +105,11 @@
 			// store toggle state in DB
 			var url = new Curl('latest.php?output=ajax');
 			url.addSID();
-			$.post(url.getUrl(), { favobj: 'toggle', toggle_ids: appId, toggle_open_state: openState });
-
+			$.post(url.getUrl(), {
+				favobj: 'toggle',
+				toggle_ids: appId,
+				toggle_open_state: openState
+			});
 		});
 	});
 </script>

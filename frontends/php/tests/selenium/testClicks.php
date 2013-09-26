@@ -39,14 +39,39 @@ class testClicks extends CWebTest {
 				'Group updated'
 			),
 			array('hostgroups.php',
-				array('link=ЗАББИКС Сервер','save'),
-				'Configuration of hosts',
-				'Host updated'
+				array('link=Hypervisors','save'),
+				'Configuration of host groups',
+				'Group updated'
 			),
 			array('hostgroups.php',
-				array('link=Template OS Linux','save'),
-				'Configuration of templates',
-				'Template updated'
+				array('link=Linux servers','save'),
+				'Configuration of host groups',
+				'Group updated'
+			),
+			array('hostgroups.php',
+				array('link=Virtual machines','save'),
+				'Configuration of host groups',
+				'Group updated'
+			),
+			array('hostgroups.php',
+				array('link=ZBX6648 All Triggers','save'),
+				'Configuration of host groups',
+				'Group updated'
+			),
+			array('hostgroups.php',
+				array('link=ZBX6648 Disabled Triggers','save'),
+				'Configuration of host groups',
+				'Group updated'
+			),
+			array('hostgroups.php',
+				array('link=ZBX6648 Enabled Triggers','save'),
+				'Configuration of host groups',
+				'Group updated'
+			),
+			array('hostgroups.php',
+				array('link=ZBX6648 Group No Hosts','save'),
+				'Configuration of host groups',
+				'Group updated'
 			),
 			array('templates.php',
 				array('link=Template OS Linux','save'),

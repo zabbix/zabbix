@@ -26,8 +26,6 @@
 #define ZBX_FLAG_SEC	0
 #define ZBX_FLAG_VALUES	1
 
-extern int     CONFIG_SERVER_STARTUP_TIME;
-
 int	cmp_double(double a, double b);
 
 int	evaluate_macro_function(char *value, const char *host, const char *key,

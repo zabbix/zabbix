@@ -799,44 +799,40 @@ function make_latest_issues(array $filter = array()) {
 		$filter['sortorder'] = ZBX_SORT_DOWN;
 	}
 
-	// get triggers
 	$options = array(
 		'groupids' => $filter['groupids'],
 		'hostids' => isset($filter['hostids']) ? $filter['hostids'] : null,
 		'monitored' => true,
 		'maintenance' => $filter['maintenance'],
-		'withLastEventUnacknowledged' => (!empty($filter['extAck']) && $filter['extAck'] == EXTACK_OPTION_UNACK) ? true : null,
-		'skipDependent' => true,
 		'filter' => array(
 			'priority' => $filter['severity'],
 			'value' => TRIGGER_VALUE_TRUE
-		),
+		)
+	);
+
+	$triggers = API::Trigger()->get(array_merge($options, array(
+		'withLastEventUnacknowledged' => (isset($filter['extAck']) && $filter['extAck'] == EXTACK_OPTION_UNACK)
+			? true
+			: null,
+		'skipDependent' => true,
+		'output' => array('triggerid', 'state', 'error', 'url', 'expression', 'description', 'priority', 'lastchange'),
 		'selectHosts' => array('hostid', 'name'),
-		'output' => array('triggerid', 'state', 'error', 'url', 'expression', 'description', 'priority', 'type'),
+		'selectLastEvent' => array('eventid', 'acknowledged', 'objectid', 'clock', 'ns'),
 		'sortfield' => isset($filter['sortfield']) ? $filter['sortfield'] : 'lastchange',
 		'sortorder' => isset($filter['sortorder']) ? $filter['sortorder'] : ZBX_SORT_DOWN,
 		'limit' => isset($filter['limit']) ? $filter['limit'] : DEFAULT_LATEST_ISSUES_CNT
-	);
-	$triggers = API::Trigger()->get($options);
+	)));
 
-	// total trigger count
-	$options['countOutput'] = true;
-	// we unset withLastEventUnacknowledged and skipDependent because of performance issues
-	unset($options['limit'], $options['sortfield'], $options['sortorder'], $options['withLastEventUnacknowledged'], $options['skipDependent']);
-	$triggersTotalCount = API::Trigger()->get($options);
-
-	// get events
-	$events = API::Trigger()->get(array(
-		'triggerids' => zbx_objectValues($triggers, 'triggerid'),
-		'selectLastEvent' => API_OUTPUT_EXTEND,
-		'preservekeys' => true
-	));
+	// don't use withLastEventUnacknowledged and skipDependent because of performance issues
+	$triggersTotalCount = API::Trigger()->get(array_merge($options, array(
+		'countOutput' => true
+	)));
 
 	// get acknowledges
 	$eventIds = array();
-	foreach ($events as $event) {
-		if ($event['lastEvent']) {
-			$eventIds[$event['lastEvent']['eventid']] = $event['lastEvent']['eventid'];
+	foreach ($triggers as $trigger) {
+		if ($trigger['lastEvent']) {
+			$eventIds[] = $trigger['lastEvent']['eventid'];
 		}
 	}
 	if ($eventIds) {
@@ -858,13 +854,9 @@ function make_latest_issues(array $filter = array()) {
 		$trigger['hostid'] = $host['hostid'];
 		$trigger['hostname'] = $host['name'];
 
-		// set events
-		if (isset($events[$trigger['triggerid']])) {
-			$trigger['event'] = $events[$trigger['triggerid']]['lastEvent'];
-		}
-		if (!empty($trigger['event'])) {
-			$trigger['event']['acknowledges'] = isset($eventAcknowledges[$trigger['event']['eventid']])
-				? $eventAcknowledges[$trigger['event']['eventid']]['acknowledges']
+		if ($trigger['lastEvent']) {
+			$trigger['lastEvent']['acknowledges'] = isset($eventAcknowledges[$trigger['lastEvent']['eventid']])
+				? $eventAcknowledges[$trigger['lastEvent']['eventid']]['acknowledges']
 				: null;
 		}
 
@@ -876,14 +868,11 @@ function make_latest_issues(array $filter = array()) {
 	// get hosts
 	$hosts = API::Host()->get(array(
 		'hostids' => $hostIds,
-		'output' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
+		'output' => array('hostid', 'name', 'status', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
 		'selectInventory' => array('hostid'),
 		'selectScreens' => API_OUTPUT_COUNT,
 		'preservekeys' => true
 	));
-
-	// get scripts
-	$scripts_by_hosts = API::Script()->getScriptsByHosts($hostIds);
 
 	// actions
 	$actions = getEventActionsStatHints($eventIds);
@@ -900,7 +889,7 @@ function make_latest_issues(array $filter = array()) {
 	$hostHeaderDiv->addStyle('float: left');
 	$issueHeaderDiv = new CDiv(array(_('Issue'), SPACE));
 	$issueHeaderDiv->addStyle('float: left');
-	$lastChangeHeaderDiv = new CDiv(array(_('Last change'), SPACE));
+	$lastChangeHeaderDiv = new CDiv(array(_('Time'), SPACE));
 	$lastChangeHeaderDiv->addStyle('float: left');
 
 	$table = new CTableInfo();
@@ -915,19 +904,20 @@ function make_latest_issues(array $filter = array()) {
 		_('Actions')
 	));
 
+	$scripts = API::Script()->getScriptsByHosts($hostIds);
+
 	// triggers
 	foreach ($triggers as $trigger) {
-		// check for dependencies
 		$host = $hosts[$trigger['hostid']];
 
-		$hostSpan = new CDiv(null, 'maintenance-abs-cont');
-
-		$hostName = new CSpan($host['name'], 'link_menu menu-host');
-		$hostName->setAttribute('data-menu', hostMenuData($host, $scripts_by_hosts[$host['hostid']]));
+		$hostName = new CSpan($host['name'], 'link_menu');
+		$hostName->setMenuPopup(getMenuPopupHost($host, $scripts[$host['hostid']]));
 
 		// add maintenance icon with hint if host is in maintenance
+		$maintenanceIcon = null;
+
 		if ($host['maintenance_status']) {
-			$mntIco = new CDiv(null, 'icon-maintenance-abs');
+			$maintenanceIcon = new CDiv(null, 'icon-maintenance-abs');
 
 			// get maintenance
 			$maintenances = API::Maintenance()->get(array(
@@ -945,15 +935,14 @@ function make_latest_issues(array $filter = array()) {
 					$hint .= "\n".$maintenance['description'];
 				}
 
-				$mntIco->setHint($hint);
-				$mntIco->addClass('pointer');
+				$maintenanceIcon->setHint($hint);
+				$maintenanceIcon->addClass('pointer');
 			}
 
 			$hostName->addClass('left-to-icon-maintenance-abs');
-			$hostSpan->addItem($mntIco);
 		}
 
-		$hostSpan ->addItem($hostName);
+		$hostDiv = new CDiv(array($hostName, $maintenanceIcon), 'maintenance-abs-cont');
 
 		// unknown triggers
 		$unknown = SPACE;
@@ -962,29 +951,66 @@ function make_latest_issues(array $filter = array()) {
 			$unknown->setHint($trigger['error'], '', 'on');
 		}
 
-		if (!empty($trigger['event'])) {
-			$ack = getEventAckState($trigger['event'], empty($filter['backUrl']) ? true : $filter['backUrl'], true, $ackParams);
-			$clock = new CLink(zbx_date2str(_('d M Y H:i:s'), $trigger['event']['clock']), 'events.php?triggerid='.$trigger['triggerid'].'&source=0&show_unknown=1&nav_time='.$trigger['event']['clock']);
+		// trigger has events
+		if ($trigger['lastEvent']) {
+			// description
+			$description = CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, array(
+				'clock' => $trigger['lastEvent']['clock'],
+				'ns' => $trigger['lastEvent']['ns']
+			)));
 
-			$description = CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, array('clock' => $trigger['event']['clock'], 'ns' => $trigger['event']['ns'])));
-			$description = $trigger['url']
-				? new CLink($description, resolveTriggerUrl($trigger), null, null, true)
-				: new CSpan($description, 'pointer');
-
-			$description = new CCol($description, getSeverityStyle($trigger['priority']));
-			$description->setHint(make_popup_eventlist($trigger['triggerid'], $trigger['event']['eventid']), '', '', false);
-
-			$table->addRow(array(
-				get_node_name_by_elid($trigger['triggerid']),
-				$hostSpan,
-				$description,
-				$clock,
-				zbx_date2age($trigger['event']['clock']),
-				$unknown,
-				$ack,
-				isset($actions[$trigger['event']['eventid']]) ? $actions[$trigger['event']['eventid']] : SPACE
-			));
+			// ack
+			$ack = getEventAckState($trigger['lastEvent'], empty($filter['backUrl']) ? true : $filter['backUrl'],
+				true, $ackParams
+			);
 		}
+		// trigger has no events
+		else {
+			// description
+			$description = CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, array(
+				'clock' => $trigger['lastchange'],
+				'ns' => '999999999'
+			)));
+
+			// ack
+			$ack = new CSpan(_('No events'), 'unknown');
+		}
+
+		// description
+		if (!zbx_empty($trigger['url'])) {
+			$description = new CLink($description, resolveTriggerUrl($trigger), null, null, true);
+		}
+		else {
+			$description = new CSpan($description, 'pointer');
+		}
+		$description = new CCol($description, getSeverityStyle($trigger['priority']));
+		if ($trigger['lastEvent']) {
+			$description->setHint(
+				make_popup_eventlist($trigger['triggerid'], $trigger['lastEvent']['eventid']),
+				'', '', false
+			);
+		}
+
+		// clock
+		$clock = new CLink(zbx_date2str(_('d M Y H:i:s'), $trigger['lastchange']),
+			'events.php?triggerid='.$trigger['triggerid'].'&source=0&show_unknown=1&nav_time='.$trigger['lastchange']
+		);
+
+		// actions
+		$actionHint = ($trigger['lastEvent'] && isset($actions[$trigger['lastEvent']['eventid']]))
+			? $actions[$trigger['lastEvent']['eventid']]
+			: SPACE;
+
+		$table->addRow(array(
+			get_node_name_by_elid($trigger['triggerid']),
+			$hostDiv,
+			$description,
+			$clock,
+			zbx_date2age($trigger['lastchange']),
+			$unknown,
+			$ack,
+			$actionHint
+		));
 	}
 
 	// initialize blinking

@@ -115,22 +115,18 @@ class testInheritanceGraphPrototype extends CWebTest {
 	 * @dataProvider update
 	 */
 	public function testInheritanceGraphPrototype_SimpleUpdate($data) {
-		$name = $data['name'];
-
 		$sqlGraphs = "select * from graphs ORDER BY graphid";
 		$oldHashGraphs = DBhash($sqlGraphs);
 
-		$this->zbxTestLogin('templates.php');
-		$this->zbxTestClickWait('link='.$this->template);
-		$this->zbxTestClickWait('link=Discovery rules');
-		$this->zbxTestClickWait('link='.$this->discoveryRule);
-		$this->zbxTestClickWait('link=Graph prototypes');
-		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&parent_discoveryid=23500&hostid=30000');
 		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of graph prototypes');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF GRAPH PROTOTYPES', "Graph prototypes of ".$this->discoveryRule));
-		$this->zbxTestTextPresent('Graph updated');
-		$this->zbxTestTextPresent("$name");
+		$this->zbxTestTextPresent(array(
+			'CONFIGURATION OF GRAPH PROTOTYPES',
+			'Graph prototypes of '.$this->discoveryRule,
+			'Graph updated',
+			$data['name']
+		));
 
 		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
 	}
@@ -333,7 +329,7 @@ class testInheritanceGraphPrototype extends CWebTest {
 					'noItem' => true,
 					'errors' => array(
 						'ERROR: Cannot add graph',
-						'Graph prototype must have at least one prototype.'
+						'Missing items for graph prototype "graphSaveCheck".'
 					)
 				)
 			),
@@ -342,7 +338,7 @@ class testInheritanceGraphPrototype extends CWebTest {
 					'expected' => GRAPH_BAD,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Name": cannot be empty.'
+						'Incorrect value for field "Name": cannot be empty.'
 					)
 				)
 			),
@@ -396,8 +392,8 @@ class testInheritanceGraphPrototype extends CWebTest {
 					'yaxismax' => 'name',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.',
-						'Warning. Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.'
+						'Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.',
+						'Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.'
 					)
 				)
 			),
@@ -412,8 +408,8 @@ class testInheritanceGraphPrototype extends CWebTest {
 					'ymax_type' => 'Fixed',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.',
-						'Warning. Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.'
+						'Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.',
+						'Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.'
 					)
 				)
 			)
@@ -424,20 +420,9 @@ class testInheritanceGraphPrototype extends CWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceGraphPrototype_SimpleCreate($data) {
-
-		$this->zbxTestLogin('templates.php');
-		$this->zbxTestClickWait('link='.$this->template);
-		$this->zbxTestClickWait('link=Discovery rules');
-		$this->zbxTestClickWait('link='.$this->discoveryRule);
-		$this->zbxTestClickWait('link=Graph prototypes');
-
 		$itemName = $this->item;
+		$this->zbxTestLogin('graphs.php?parent_discoveryid=23500&form=Create+graph+prototype');
 
-		$this->checkTitle('Configuration of graph prototypes');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF GRAPH PROTOTYPES', "Graph prototypes of "
-			.$this->discoveryRule));
-
-		$this->zbxTestClickWait('form');
 		$this->checkTitle('Configuration of graph prototypes');
 		$this->zbxTestTextPresent('CONFIGURATION OF GRAPH PROTOTYPES');
 		$this->assertElementPresent("//a[@id='tab_graphTab' and text()='Graph prototype']");
