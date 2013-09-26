@@ -246,7 +246,7 @@ else {
 
 	$data['proxies'] = API::Proxy()->get(array(
 		'editable' => true,
-		'selectHosts' => API_OUTPUT_EXTEND,
+		'selectHosts' => array('hostid', 'host', 'name', 'status'),
 		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => $sortfield,
 		'limit' => $config['search_limit'] + 1

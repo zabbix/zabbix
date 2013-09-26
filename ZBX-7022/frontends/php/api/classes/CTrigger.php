@@ -1187,7 +1187,6 @@ class CTrigger extends CTriggerGeneral {
 
 				$expressionChanged = true;
 				$expressionFull = $trigger['expression'];
-				$trigger['error'] = 'Trigger expression updated. No status update so far.';
 			}
 
 			if ($expressionChanged) {

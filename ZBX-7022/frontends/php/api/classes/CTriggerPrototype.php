@@ -788,7 +788,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 			if (isset($trigger['expression']) && strcmp($expressionFull, $trigger['expression']) != 0) {
 				$expressionChanged = true;
 				$expressionFull = $trigger['expression'];
-				$trigger['error'] = 'Trigger expression updated. No status update so far.';
 			}
 
 			if ($descriptionChanged || $expressionChanged) {

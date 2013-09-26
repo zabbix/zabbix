@@ -64,7 +64,7 @@ var CMessageList = Class.create(CDebug, {
 		addListener(this.dom.mute, 'click', this.mute.bindAsEventListener(this));
 
 		jQuery(this.dom.container).draggable({
-			handle: [this.dom.caption, this.dom.move],
+			handle: this.dom.header,
 			axis: 'y',
 			containment: [0, 0, 0, 1600]
 		});
