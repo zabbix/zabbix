@@ -251,8 +251,11 @@ static void	add_object_msg(zbx_uint64_t operationid, zbx_uint64_t mediatypeid, Z
 		if (SUCCEED != check_perm2system(userid))
 			return;
 
-		if (EVENT_OBJECT_TRIGGER == event->object && PERM_READ > get_trigger_permission(userid, event->objectid))
+		if (EVENT_OBJECT_TRIGGER == event->object &&
+				PERM_READ > get_trigger_permission(userid, event->objectid))
+		{
 			return;
+		}
 
 		subject_dyn = zbx_strdup(NULL, subject);
 		message_dyn = zbx_strdup(NULL, message);
@@ -976,7 +979,8 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *event, DB_
 			p = user_msg;
 			user_msg = user_msg->next;
 
-			add_message_alert(escalation, event, r_event, action, p->userid, p->mediatypeid, p->subject, p->message);
+			add_message_alert(escalation, event, r_event, action, p->userid, p->mediatypeid,
+					p->subject, p->message);
 
 			zbx_free(p->subject);
 			zbx_free(p->message);
