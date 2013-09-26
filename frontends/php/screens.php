@@ -38,6 +38,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'groupid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'hostid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'tr_groupid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'tr_hostid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'elementid' =>	array(T_ZBX_INT, O_OPT, P_SYS|P_NZERO, DB_ID, null),
 	'screenname' =>	array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'step' =>		array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 65535), null),
@@ -57,10 +59,24 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))
-		|| get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
+// validate group IDs
+$validateGroupIds = array_filter(array(
+	get_request('groupid'),
+	get_request('tr_groupid')
+));
+if ($validateGroupIds && !API::HostGroup()->isReadable($validateGroupIds)) {
 	access_deny();
 }
+
+// validate host IDs
+$validateHostIds = array_filter(array(
+	get_request('hostid'),
+	get_request('tr_hostid')
+));
+if ($validateHostIds && !API::Host()->isReadable($validateHostIds)) {
+	access_deny();
+}
+
 if (get_request('elementid')) {
 	$screens = API::Screen()->get(array(
 		'screenids' => array($_REQUEST['elementid']),
