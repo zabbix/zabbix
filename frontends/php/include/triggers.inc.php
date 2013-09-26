@@ -1137,8 +1137,7 @@ function getTriggersOverview($hostIds, $application, $viewMode = null, $screenId
 		'output' => array('name', 'hostid', 'status'),
 		'hostids' => $hostIds,
 		'preservekeys' => true,
-		'selectScreens' => ($viewMode == STYLE_LEFT) ? API_OUTPUT_COUNT : null,
-		'selectInventory' => ($viewMode == STYLE_LEFT) ? array('hostid') : null
+		'selectScreens' => ($viewMode == STYLE_LEFT) ? API_OUTPUT_COUNT : null
 	));
 
 	$triggers = array();
@@ -1543,7 +1542,6 @@ function make_trigger_details($trigger) {
 		'output' => array('name', 'hostid', 'status'),
 		'hostids' => $hostId,
 		'selectScreens' => API_OUTPUT_COUNT,
-		'selectInventory' => array('hostid'),
 		'preservekeys' => true
 	));
 	$host = reset($hosts);
