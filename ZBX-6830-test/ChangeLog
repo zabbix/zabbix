@@ -1,6 +1,8 @@
 Changes for 2.1.6
 
 New features:
+..F....... [ZBX-6983] changed the "Status of host group triggers" and "Status of host triggers" screen elements and the "Latest 20 issues" to display triggers without events (Pavels)
+..F....... [ZBX-6983] renamed the "Status of host group triggers" screen element to "Latest host group issues" and "Status of host triggers" to "Latest host issues" (Pavels)
 
 Bug fixes:
 ..F....... [ZBX-6978] fixed leading and trailing spaces for translatable strings (Ivo)
@@ -40,7 +42,7 @@ A.F....... [ZBX-6952] fixed XSS vulnerability in user themes, thanks to Lincoln 
 ..F....... [ZBX-6816] added URL parameter validation for graph items in bar reports page (Ivo)
 ..F....... [ZBX-6937] fixed discovery check validation (Eduard)
 ..F....... [ZBX-6992] fixed PostreSQL query errors due to missing "AS" keyword for aggregate functions in Monitoring > IT Services (Ivo)
-..F....... [ZBXNEXT-1633] resolved problem with pasive proxy saving (Vitalij)
+..F....... [ZBXNEXT-1633] resolved problem with passive proxy saving (Vitalij)
 ..F....... [ZBX-6938] fixed undefined hostid on delete, fixed filter parameters losing after returning from edit form (Vitalij)
 ..F....... [ZBX-6984] resolved problem with list of host group on Configuration->Host groups page (Vitalij)
 ..F....... [ZBX-6967] added missing spaces between icons (Vitalij)
@@ -441,7 +443,7 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.9rc1
 
 New features:
-A.F....... [ZBX-1357] updated Chinese (China), Lithuanian and Slovak translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Italian, Lithuanian, Romanian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 ..F....... [ZBX-3878] fixed memory leaks in slide shows (Eduard)
