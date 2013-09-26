@@ -70,7 +70,7 @@ function getMenuPopupHost(options) {
 			url: new Curl('latest.php?hostid=' + options.hostid).getUrl()
 		};
 
-		// inventories
+		// inventory
 		gotos[gotos.length] = {
 			label: t('Host inventory'),
 			url: new Curl('hostinventories.php?hostid=' + options.hostid).getUrl()
@@ -102,6 +102,7 @@ function getMenuPopupHost(options) {
  * @param string options[]['scriptid']				script id
  * @param string options[]['confirmation']			confirmation text
  * @param object options['gotos']					links section (optional)
+ * @param array  options['gotos']['inventory']		link to host inventory page
  * @param array  options['gotos']['screens']		link to host screen page with url parameters ("name" => "value")
  * @param array  options['gotos']['triggerStatus']	link to trigger status page with url parameters ("name" => "value")
  * @param array  options['gotos']['submap']			link to submap page with url parameters ("name" => "value")
@@ -141,9 +142,19 @@ function getMenuPopupMap(options) {
 		};
 	}
 
-	// gotos
+	/*
+	 * Gotos section
+	 */
 	if (typeof options.gotos !== 'undefined') {
 		var gotos = [];
+
+		// inventory
+		if (typeof options.gotos.inventory !== 'undefined') {
+			gotos[gotos.length] = {
+				label: t('Host inventory'),
+				url: new Curl(options.gotos.inventory).getUrl()
+			};
+		}
 
 		// screens
 		if (typeof options.gotos.screens !== 'undefined') {
