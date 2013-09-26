@@ -456,14 +456,6 @@ table.filter .host-inventories .select,
 table.filter .host-inventories .text { vertical-align: middle; }
 table.filter tr.item-list-row { height: 26px; }
 
-.host-list table.filter tr td { width: 25%; }
-
-.item-list table.filter { text-align: left; min-width: 1024px; }
-.item-list table.filter tr td.label { text-align: right; }
-.item-list table.filter tr td.col1 { width: 18%; }
-.item-list table.filter tr td.label.col1 { width: 6%; }
-.item-list table.filter tr td.label.col4 { width: 8%; }
-
 table.filter.sub-filter tr td { text-align: left; }
 table.filter.sub-filter tr td:first-child { width: 8%; }
 
