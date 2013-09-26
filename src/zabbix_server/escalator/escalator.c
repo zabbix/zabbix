@@ -225,8 +225,8 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	add_object_msg(zbx_uint64_t operationid, zbx_uint64_t mediatypeid, ZBX_USER_MSG **user_msg,
-		const char *subject, const char *message, DB_EVENT *event, DB_ACTION *action)
+static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, zbx_uint64_t mediatypeid,
+		ZBX_USER_MSG **user_msg, const char *subject, const char *message, DB_EVENT *event)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -260,9 +260,9 @@ static void	add_object_msg(zbx_uint64_t operationid, zbx_uint64_t mediatypeid, Z
 		subject_dyn = zbx_strdup(NULL, subject);
 		message_dyn = zbx_strdup(NULL, message);
 
-		substitute_simple_macros(&action->actionid, event, NULL, &userid, NULL, NULL,
+		substitute_simple_macros(&actionid, event, NULL, &userid, NULL, NULL,
 				NULL, NULL, &subject_dyn, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
-		substitute_simple_macros(&action->actionid, event, NULL, &userid, NULL, NULL,
+		substitute_simple_macros(&actionid, event, NULL, &userid, NULL, NULL,
 				NULL, NULL, &message_dyn, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
 
 		add_user_msg(userid, mediatypeid, user_msg, subject_dyn, message_dyn);
@@ -871,8 +871,8 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 						message = action->longdata;
 					}
 
-					add_object_msg(operationid, mediatypeid, &user_msg, subject, message,
-							event, action);
+					add_object_msg(action->actionid, operationid, mediatypeid, &user_msg,
+							subject, message, event);
 					break;
 				case OPERATION_TYPE_COMMAND:
 					execute_commands(event, action->actionid, operationid, escalation->esc_step);
