@@ -150,9 +150,15 @@ function getMenuPopupMap(options) {
 
 		// inventory
 		if (typeof options.gotos.inventory !== 'undefined') {
+			var url = new Curl('hostinventories.php');
+
+			jQuery.each(options.gotos.inventory, function(name, value) {
+				url.setArgument(name, value);
+			});
+
 			gotos[gotos.length] = {
-				label: t('Host inventory'),
-				url: new Curl(options.gotos.inventory).getUrl()
+			label: t('Host inventory'),
+				url: url.getUrl()
 			};
 		}
 
