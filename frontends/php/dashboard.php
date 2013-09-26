@@ -126,10 +126,9 @@ if (isset($_REQUEST['favobj'])) {
 			CProfile::update('web.dashboard.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 		}
 		elseif ($_REQUEST['favaction'] == 'sort') {
-			print_r($_REQUEST['favdata']);
 			$_REQUEST['favdata'] = json_decode($_REQUEST['favdata']);
-			foreach($_REQUEST['favdata'] as $xparam => $column){
-				foreach($column as $yparam => $name){
+			foreach ($_REQUEST['favdata'] as $xparam => $column) {
+				foreach ($column as $yparam => $name) {
 					CProfile::update('web.dashboard.sort.'.$name, $xparam.":".$yparam, PROFILE_TYPE_STR);
 				}
 			}
@@ -432,7 +431,7 @@ if ($drules['cnt'] > 0 && check_right_on_discovery(PERM_READ)) {
 }
 
 add_doll_objects($refresh_tab);
-foreach($columns as $key => $val){
+foreach ($columns as $key => $val) {
 	ksort($columns[$key]);
 }
 
