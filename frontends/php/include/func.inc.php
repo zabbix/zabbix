@@ -2643,7 +2643,6 @@ function clearCookies($clear = false, $id = null) {
  *
  * @param array  $host						host data
  * @param string $host['hostid']			host id
- * @param array  $host['inventory']			host inventory (optional)
  * @param array  $host['screens']			host screens (optional)
  * @param array  $scripts					host scripts (optional)
  * @param string $scripts[]['name']			script name
