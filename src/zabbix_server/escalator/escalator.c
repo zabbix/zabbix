@@ -148,14 +148,8 @@ out:
  *                                                                            *
  * Purpose: Return user permissions for access to trigger                     *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: PERM_DENY - if host or user not found,                       *
  *                   or permission otherwise                                  *
- *                                                                            *
- * Author:                                                                    *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	get_trigger_permission(zbx_uint64_t userid, zbx_uint64_t triggerid)
@@ -182,6 +176,40 @@ static int	get_trigger_permission(zbx_uint64_t userid, zbx_uint64_t triggerid)
 
 		if (perm < host_perm)
 			perm = host_perm;
+	}
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_permission_string(perm));
+
+	return perm;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_item_permission                                              *
+ *                                                                            *
+ * Purpose: Return user permissions for access to item                        *
+ *                                                                            *
+ * Return value: PERM_DENY - if host or user not found,                       *
+ *                   or permission otherwise                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid)
+{
+	const char	*__function_name = "get_item_permission";
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		perm = PERM_DENY;
+	zbx_uint64_t	hostid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	result = DBselect("select hostid from items where itemid=" ZBX_FS_UI64, itemid);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(hostid, row[0]);
+		perm = get_host_permission(userid, hostid);
 	}
 	DBfree_result(result);
 
@@ -251,10 +279,17 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, zbx_
 		if (SUCCEED != check_perm2system(userid))
 			continue;
 
-		if (EVENT_OBJECT_TRIGGER == event->object &&
-				PERM_READ > get_trigger_permission(userid, event->objectid))
+		switch (event->object)
 		{
-			continue;
+			case EVENT_OBJECT_TRIGGER:
+				if (PERM_READ > get_trigger_permission(userid, event->objectid))
+					continue;
+				break;
+			case EVENT_OBJECT_ITEM:
+			case EVENT_OBJECT_LLDRULE:
+				if (PERM_READ > get_item_permission(userid, event->objectid))
+					continue;
+				break;
 		}
 
 		subject_dyn = zbx_strdup(NULL, subject);
@@ -960,10 +995,17 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *event, DB_
 			if (SUCCEED != check_perm2system(userid))
 				continue;
 
-			if (EVENT_OBJECT_TRIGGER == r_event->object &&
-					PERM_READ > get_trigger_permission(userid, r_event->objectid))
+			switch (r_event->object)
 			{
-				continue;
+				case EVENT_OBJECT_TRIGGER:
+					if (PERM_READ > get_trigger_permission(userid, r_event->objectid))
+						continue;
+					break;
+				case EVENT_OBJECT_ITEM:
+				case EVENT_OBJECT_LLDRULE:
+					if (PERM_READ > get_item_permission(userid, r_event->objectid))
+						continue;
+					break;
 			}
 
 			subject_dyn = zbx_strdup(NULL, action->shortdata);
