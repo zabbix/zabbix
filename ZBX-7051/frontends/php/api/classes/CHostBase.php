@@ -233,6 +233,8 @@ abstract class CHostBase extends CZBXAPI {
 		if (count($visited) < count($all)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular template linkage is not allowed.'));
 		}
+
+		return $hostsLinkageInserts;
 	}
 
 	protected function unlink($templateids, $targetids = null) {
