@@ -9,7 +9,7 @@
 <div class="loginForm">
 	<div style="position: relative; color: #F0F0F0; height: 100%;">
 		<!-- Search Form -->
-		<div style="height: 100%; padding-top: 100px; padding-right: 40px; margin-left: 275px;">
+		<div style="display: table; height: 99%; width: 99%;">
 			<div style="float: right;">
 				<?php
 					$searchForm = new CView('general.search');

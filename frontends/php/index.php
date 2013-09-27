@@ -77,7 +77,6 @@ if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 			require_once dirname(__FILE__).'/include/page_header.php';
 			$searchForm = new CView('general.searchpage');
 			$searchForm->render();
-			$searchForm->show();
 			require_once dirname(__FILE__).'/include/page_footer.php';
 		}
 		else {
@@ -119,6 +118,5 @@ else {
 	require_once dirname(__FILE__).'/include/page_header.php';
 	$searchForm = new CView('general.searchpage');
 	$searchForm->render();
-	$searchForm->show();
 	require_once dirname(__FILE__).'/include/page_footer.php';
  }
