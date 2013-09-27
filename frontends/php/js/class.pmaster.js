@@ -442,7 +442,6 @@ var CDoll = Class.create(CDebug,{
 				'favdata': strPos
 			}
 			send_params(params);
-			$.cookie(settings.name, strPos, {expires: 365});
 
 			return this;
 		},
