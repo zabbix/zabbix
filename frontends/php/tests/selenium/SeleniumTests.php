@@ -110,9 +110,7 @@ class SeleniumTests {
 
 		$suite->addTestSuite('testGeneric');
 		$suite->addTestSuite('testClicks');
-		$suite->addTestSuite('testPageActionsAutoregistration');
-		$suite->addTestSuite('testPageActionsDiscovery');
-		$suite->addTestSuite('testPageActionsTriggers');
+		$suite->addTestSuite('testPageActions');
 		$suite->addTestSuite('testPageAdministrationAudit');
 		$suite->addTestSuite('testPageAdministrationDMProxies');
 		$suite->addTestSuite('testPageAdministrationGeneralImages');
