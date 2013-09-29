@@ -128,7 +128,13 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 
 	public function zbxTestCheckFatalErrors() {
 		foreach ($this->failIfExists as $str) {
-			$this->assertTextNotPresent($str, "Chuck Norris: I do not expect string '$str' here.");
+			$this->assertTextNotPresent($str, 'Chuck Norris: I do not expect string "'.$str.'" here.');
+		}
+	}
+
+	public function zbxTestCheckMandatoryStrings() {
+		foreach ($this->failIfNotExists as $str) {
+			$this->assertTextPresent($str, 'Chuck Norris: I expect string "'.$str.'" here.');
 		}
 	}
 
@@ -169,6 +175,11 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		$this->wait();
 	}
 
+	public function zbxTestHrefClickWait($href) {
+		$this->click("xpath=//a[contains(@href,'$href')]");
+		$this->wait();
+	}
+
 	public function href_click($a) {
 		$this->click("xpath=//a[contains(@href,'$a')]");
 	}
@@ -191,7 +202,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 
 	public function zbxTestDropdownHasOptions($id, array $strings) {
 		foreach ($strings as $string) {
-			$this->assertSelectHasOption($id, $string);
+			$this->assertElementPresent("//select[@name='".$id."']//option[text()='".$string."']");
 		}
 	}
 
@@ -207,6 +218,16 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		if ($selected != $str) {
 			$this->wait();
 		}
+	}
+
+	/**
+	 * Assert that the element with the given name contains a specific text.
+	 *
+	 * @param $name
+	 * @param $text
+	 */
+	public function zbxTestDrowpdownAssertSelected($name, $text) {
+		$this->assertElementPresent("//select[@name='".$name."']//option[text()='".$text."' and @selected]");
 	}
 
 	public function wait() {
@@ -266,16 +287,6 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 	 */
 	public function assertElementText($name, $text) {
 		$this->assertElementPresent("//*[@name='".$name."' and text()='".$text."']");
-	}
-
-	/**
-	 * Assert that the element with the given name contains a specific text.
-	 *
-	 * @param $name
-	 * @param $text
-	 */
-	public function assertDrowpdownValueText($name, $text) {
-		$this->assertElementPresent("//select[@name='".$name."']//option[text()='".$text."' and @selected]");
 	}
 
 	public function templateLink($host, $template) {
