@@ -364,7 +364,7 @@ if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
 }
 
 // system status
-$refresh_menu = new CIcon(_('Menu'), 'iconmenu', 'create_page_menu(event,"hat_syssum");');
+$refresh_menu = get_icon('menu', array('menu' => 'hat_syssum'));
 $sys_stat = new CUIWidget('hat_syssum', new CSpan(_('Loading...'), 'textcolorstyles'), CProfile::get('web.dashboard.widget.syssum.state', 1));
 $sys_stat->setHeader(_('System status'), array($refresh_menu));
 $sys_stat->setFooter(new CDiv(SPACE, 'textwhite', 'hat_syssum_footer'));
