@@ -577,33 +577,35 @@
 			});
 		}
 
+		var jqxhr;
+
 		if (ajaxChecks.ajaxdata.length > 0) {
 			jQuery('#add_new_dcheck').prop('disabled', true);
 
-			var url = new Curl(),
-				jqxhr = jQuery.ajax({
-					url: url.getPath() + '?output=ajax&sid=' + url.getArgument('sid'),
-					data: ajaxChecks,
-					dataType: 'json',
-					success: function(result) {
-						if (!result.result) {
-							jQuery.each(result.errors, function(i, val) {
-								validationErrors.push(val.error);
-							});
-						}
-					},
-					error: function() {
-						showModalWindow(
-							t(<?php echo CJs::encodeJson(_('Discovery check error')); ?>),
-							<?php echo CJs::encodeJson(_('Cannot validate discovery check: invalid request or connection to Zabbix server failed.')); ?>,
-							[{text: t(<?php echo CJs::encodeJson(_('Close')); ?>), click: function() {
-								jQuery(this).dialog('destroy');
-							}}]
-						);
-
-						jQuery('#add_new_dcheck').prop('disabled', false);
+			var url = new Curl();
+			jqxhr = jQuery.ajax({
+				url: url.getPath() + '?output=ajax&sid=' + url.getArgument('sid'),
+				data: ajaxChecks,
+				dataType: 'json',
+				success: function(result) {
+					if (!result.result) {
+						jQuery.each(result.errors, function(i, val) {
+							validationErrors.push(val.error);
+						});
 					}
-				});
+				},
+				error: function() {
+					showModalWindow(
+						t(<?php echo CJs::encodeJson(_('Discovery check error')); ?>),
+						<?php echo CJs::encodeJson(_('Cannot validate discovery check: invalid request or connection to Zabbix server failed.')); ?>,
+						[{text: t(<?php echo CJs::encodeJson(_('Close')); ?>), click: function() {
+							jQuery(this).dialog('destroy');
+						}}]
+					);
+
+					jQuery('#add_new_dcheck').prop('disabled', false);
+				}
+			});
 		}
 
 		jQuery.when(jqxhr).done(function() {
