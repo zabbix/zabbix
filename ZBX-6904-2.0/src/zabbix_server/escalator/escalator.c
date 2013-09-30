@@ -148,14 +148,8 @@ out:
  *                                                                            *
  * Purpose: Return user permissions for access to trigger                     *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: PERM_DENY - if host or user not found,                       *
  *                   or permission otherwise                                  *
- *                                                                            *
- * Author:                                                                    *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	get_trigger_permission(zbx_uint64_t userid, zbx_uint64_t triggerid)
@@ -182,6 +176,40 @@ static int	get_trigger_permission(zbx_uint64_t userid, zbx_uint64_t triggerid)
 
 		if (perm < host_perm)
 			perm = host_perm;
+	}
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_permission_string(perm));
+
+	return perm;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_item_permission                                              *
+ *                                                                            *
+ * Purpose: Return user permissions for access to item                        *
+ *                                                                            *
+ * Return value: PERM_DENY - if host or user not found,                       *
+ *                   or permission otherwise                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid)
+{
+	const char	*__function_name = "get_item_permission";
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		perm = PERM_DENY;
+	zbx_uint64_t	hostid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	result = DBselect("select hostid from items where itemid=" ZBX_FS_UI64, itemid);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(hostid, row[0]);
+		perm = get_host_permission(userid, hostid);
 	}
 	DBfree_result(result);
 
@@ -225,8 +253,8 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	add_object_msg(zbx_uint64_t operationid, zbx_uint64_t mediatypeid, ZBX_USER_MSG **user_msg,
-		const char *subject, const char *message, DB_EVENT *event, DB_ACTION *action)
+static void	add_object_msg(zbx_uint64_t operationid, zbx_uint64_t mediatypeid,
+		ZBX_USER_MSG **user_msg, const char *subject, const char *message, DB_EVENT *event)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -249,20 +277,27 @@ static void	add_object_msg(zbx_uint64_t operationid, zbx_uint64_t mediatypeid, Z
 		ZBX_STR2UINT64(userid, row[0]);
 
 		if (SUCCEED != check_perm2system(userid))
-			return;
+			continue;
 
-		if (EVENT_OBJECT_TRIGGER == event->object &&
-				PERM_READ_ONLY > get_trigger_permission(userid, event->objectid))
+		switch (event->object)
 		{
-			return;
+			case EVENT_OBJECT_TRIGGER:
+				if (PERM_READ > get_trigger_permission(userid, event->objectid))
+					continue;
+				break;
+			case EVENT_OBJECT_ITEM:
+			case EVENT_OBJECT_LLDRULE:
+				if (PERM_READ > get_item_permission(userid, event->objectid))
+					continue;
+				break;
 		}
 
 		subject_dyn = zbx_strdup(NULL, subject);
 		message_dyn = zbx_strdup(NULL, message);
 
-		substitute_simple_macros(event, &userid, NULL, NULL, NULL, NULL, &subject_dyn,
+		substitute_simple_macros(event, &userid, NULL, NULL, NULL, &subject_dyn,
 				MACRO_TYPE_MESSAGE, NULL, 0);
-		substitute_simple_macros(event, &userid, NULL, NULL, NULL, NULL, &message_dyn,
+		substitute_simple_macros(event, &userid, NULL, NULL, NULL, &message_dyn,
 				MACRO_TYPE_MESSAGE, NULL, 0);
 
 		add_user_msg(userid, mediatypeid, user_msg, subject_dyn, message_dyn);
@@ -501,7 +536,7 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 		if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT != script.type)
 		{
 			script.command = zbx_strdup(script.command, row[11]);
-			substitute_simple_macros(event, NULL, NULL, NULL, NULL, NULL,
+			substitute_simple_macros(event, NULL, NULL, NULL, NULL,
 					&script.command, MACRO_TYPE_MESSAGE, NULL, 0);
 		}
 
@@ -950,13 +985,30 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *r_event, D
 			ZBX_STR2UINT64(userid, row[0]);
 			ZBX_STR2UINT64(mediatypeid, row[1]);
 
+
+			if (SUCCEED != check_perm2system(userid))
+				continue;
+
+			switch (r_event->object)
+			{
+				case EVENT_OBJECT_TRIGGER:
+					if (PERM_READ > get_trigger_permission(userid, r_event->objectid))
+						continue;
+					break;
+				case EVENT_OBJECT_ITEM:
+				case EVENT_OBJECT_LLDRULE:
+					if (PERM_READ > get_item_permission(userid, r_event->objectid))
+						continue;
+					break;
+			}
+
 			subject_dyn = zbx_strdup(NULL, action->shortdata);
 			message_dyn = zbx_strdup(NULL, action->longdata);
 
-			substitute_simple_macros(r_event, &userid, NULL, NULL, NULL, NULL, &subject_dyn,
-					MACRO_TYPE_MESSAGE, NULL, 0);
-			substitute_simple_macros(r_event, &userid, NULL, NULL, NULL, NULL, &message_dyn,
-					MACRO_TYPE_MESSAGE, NULL, 0);
+			substitute_simple_macros(r_event, &userid, NULL, NULL, NULL,
+					&subject_dyn, MACRO_TYPE_MESSAGE, NULL, 0);
+			substitute_simple_macros(r_event, &userid, NULL, NULL, NULL,
+					&message_dyn, MACRO_TYPE_MESSAGE, NULL, 0);
 
 			escalation->esc_step = 0;
 

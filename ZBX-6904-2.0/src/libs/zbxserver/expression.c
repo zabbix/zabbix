@@ -2397,7 +2397,7 @@ fail:
  *                                                                            *
  ******************************************************************************/
 int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *userid, zbx_uint64_t *hostid, DC_HOST *dc_host,
-		DC_ITEM *dc_item, DB_ESCALATION *escalation, char **data, int macro_type, char *error, int maxerrlen)
+		DC_ITEM *dc_item, char **data, int macro_type, char *error, int maxerrlen)
 {
 	const char	*__function_name = "substitute_simple_macros";
 
