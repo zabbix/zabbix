@@ -130,10 +130,9 @@ if (isset($_REQUEST['favobj'])) {
 			$favdata = json_decode($_REQUEST['favdata']);
 			foreach ($favdata as $xparam => $column) {
 				foreach ($column as $yparam => $name) {
-					$widgetName = substr($name, 4);
-					$widgetName = substr($widgetName, 0, -7);
-					CProfile::update('web.dashboard.widget.'.$widgetName.'.row', $xparam, PROFILE_TYPE_INT);
-					CProfile::update('web.dashboard.widget.'.$widgetName.'.col', $yparam, PROFILE_TYPE_INT);
+					$name = substr($name, 4, -7);
+					CProfile::update('web.dashboard.widget.'.$name.'.row', $xparam, PROFILE_TYPE_INT);
+					CProfile::update('web.dashboard.widget.'.$name.'.col', $yparam, PROFILE_TYPE_INT);
 				}
 			}
 		}
