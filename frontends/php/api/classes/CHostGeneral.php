@@ -141,7 +141,7 @@ abstract class CHostGeneral extends CHostBase {
 
 		$hostsLinkageInserts = parent::link($templateIds, $targetIds);
 
-		foreach ($hostsLinkageInserts as $key => $hostTplIds){
+		foreach ($hostsLinkageInserts as $hostTplIds){
 			Manager::Application()->link($hostTplIds['templateid'], $hostTplIds['hostid']);
 
 			API::DiscoveryRule()->syncTemplates(array(
@@ -168,7 +168,7 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		// we do linkage in two separate loops because for triggers you need all items already created on host
-		foreach ($hostsLinkageInserts as $key => $hostTplIds){
+		foreach ($hostsLinkageInserts as $hostTplIds){
 			API::Trigger()->syncTemplates(array(
 				'hostids' => $hostTplIds['hostid'],
 				'templateids' => $hostTplIds['templateid']
@@ -190,7 +190,7 @@ abstract class CHostGeneral extends CHostBase {
 			));
 		}
 
-		foreach ($hostsLinkageInserts as $key => $hostTplIds){
+		foreach ($hostsLinkageInserts as $hostTplIds){
 			API::Trigger()->syncTemplateDependencies(array(
 				'templateids' => $hostTplIds['templateid'],
 				'hostids' => $hostTplIds['hostid']
