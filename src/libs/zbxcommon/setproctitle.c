@@ -17,13 +17,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+/*
+** Ideas from PostgreSQL implementation (src/backend/utils/misc/ps_status.c)
+** were used in development of this file. Thanks to PostgreSQL developers!
+**/
+
 #include "common.h"
 #include "setproctitle.h"
 
+#if defined(PS_OVERWRITE_ARGV)
 /* external environment we got on startup */
 extern char	**environ;
 static int	argc_ext = 0;
-static int	argc_ext_copied = 0, environ_ext_copied = 0;
+static int	argc_ext_copied_first = 0, argc_ext_copied_last = 0, environ_ext_copied = 0;
 static char	**argv_ext = NULL;
 
 /* internal copy of argv[] and environment variables */
@@ -48,7 +54,7 @@ static size_t	ps_buf_size = 0;
  ******************************************************************************/
 char **	setproctitle_save_env(int argc, char **argv)
 {
-	int	i, copy_arg;
+	int	i = 0, copy_first, copy_last;
 	char	*arg_end = NULL;
 
 	argc_ext = argc;
@@ -61,30 +67,44 @@ char **	setproctitle_save_env(int argc, char **argv)
 
 	argv_int = zbx_malloc(argv_int, ((unsigned int)argc + 1) * sizeof(char *));
 
-	for (copy_arg = 1, i = 0; i < argc; i++)
+#if defined(PS_APPEND_ARGV)
+	copy_first = argc - 1;
+#else
+	copy_first = 0;
+#endif
+	copy_last = argc - 1;
+
+	for (i = 0; i < copy_first; i++)
+		argv_int[i] = argv[i];
+
+	for (i = copy_first; i <= copy_last; i++)
 	{
-		if (1 == copy_arg && (0 == i || arg_end + 1 == argv[i]))
+		if (copy_first == i)
+			argc_ext_copied_first = i;
+
+		if (copy_first == i || arg_end + 1 == argv[i])
 		{
 			arg_end = argv[i] + strlen(argv[i]);
 			argv_int[i] = zbx_strdup(NULL, argv[i]);
-			argc_ext_copied++;
+			argc_ext_copied_last = i;
 
-			/* argv[0] will be used to display status messages. The rest of arguments can be */
+			/* argv[copy_first] will be used to display status messages. The rest of arguments can be */
 			/* overwritten and their argv[] pointers will point to wrong strings. */
-			if (0 < i)
+			if (copy_first < i)
 				argv[i] = empty_str;
 		}
 		else
-		{
-			copy_arg = 0;
-			argv_int[i] = argv[i];
-		}
+			break;
 	}
+
+	for (; i < argc; i++)
+		argv_int[i] = argv[i];
+
 	argv_int[argc] = NULL;	/* C standard: "argv[argc] shall be a null pointer" */
 
-	if (argc_ext_copied == argc)
+	if (argc_ext_copied_last == argc - 1)
 	{
-		int	envc = 0;
+		int	envc = 0, copy_arg = 1;
 
 		for (i = 0; NULL != environ[i]; i++)
 			envc++;
@@ -93,7 +113,7 @@ char **	setproctitle_save_env(int argc, char **argv)
 
 		environ_int = zbx_malloc(environ_int, ((unsigned int)envc + 1) * sizeof(char *));
 
-		for (copy_arg = 1, i = 0; i < envc; i++)
+		for (i = 0; i < envc; i++)
 		{
 			if (1 == copy_arg && arg_end + 1 == environ[i])
 			{
@@ -114,8 +134,8 @@ char **	setproctitle_save_env(int argc, char **argv)
 		environ_int[envc] = NULL;
 	}
 
-	ps_buf_size = (size_t)(arg_end - argv[0] + 1);
-	ps_buf = argv[0];
+	ps_buf_size = (size_t)(arg_end - argv[copy_first] + 1);
+	ps_buf = argv[copy_first];
 
 	environ = environ_int;		/* switch environment to internal copy */
 
@@ -129,31 +149,33 @@ char **	setproctitle_save_env(int argc, char **argv)
  * Purpose: set a process command line displayed by "ps" command.             *
  *                                                                            *
  * Comments: call this function when a process starts some interesting task.  *
+ *           Program name argv[0] will be displayed "as-is" followed by ": "  *
+ *           and a status message.                                            *
  *                                                                            *
  ******************************************************************************/
 void	setproctitle_set_status(const char *status)
 {
 	static int	initialized = 0;
 
-	if (0 == initialized && NULL != ps_buf)
+	if (1 == initialized)
 	{
-		size_t	start_pos;
+		zbx_strlcpy(ps_buf, status, ps_buf_size);
+	}
+	else if (NULL != ps_buf)
+	{
+		size_t	start_pos = strlen(ps_buf);	/* argv[copy_first] */
 
-		start_pos = strlen(ps_buf);	/* display argv[0] "as is" */
-
-		if (start_pos + 2 < ps_buf_size)
+		if (start_pos + 2 < ps_buf_size)	/* is there space for ": " ? */
 		{
 			zbx_strlcpy(ps_buf + start_pos, ": ", (size_t)3);
 			ps_buf += start_pos + 2;
-			ps_buf_size -= start_pos + 2;
+			ps_buf_size -= start_pos + 2;	/* space after "argv[copy_first]: " for status message */
 			memset(ps_buf, ' ', ps_buf_size - 1);
 			memset(ps_buf + ps_buf_size - 1, '\0', (size_t)1);
 			initialized = 1;
+			zbx_strlcpy(ps_buf, status, ps_buf_size);
 		}
 	}
-
-	if (1 == initialized)
-		zbx_strlcpy(ps_buf, status, ps_buf_size);
 }
 
 /******************************************************************************
@@ -170,7 +192,7 @@ void	setproctitle_free_env(void)
 {
 	int	i;
 
-	for (i = 0; i <= argc_ext_copied; i++)
+	for (i = argc_ext_copied_first; i <= argc_ext_copied_last; i++)
 		zbx_free(argv_int[i]);
 
 	for (i = 0; i <= environ_ext_copied; i++)
@@ -179,3 +201,4 @@ void	setproctitle_free_env(void)
 	zbx_free(argv_int);
 	zbx_free(environ_int);
 }
+#endif	/* PS_OVERWRITE_ARGV */
