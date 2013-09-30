@@ -273,7 +273,7 @@ else {
 
 		// sorting & paging
 		order_result($data['mediatypes'], getPageSortField('description'), getPageSortOrder());
-		$data['paging'] = getPagingLine($data['mediatypes']);
+		$data['paging'] = getPagingLine($data['mediatypes'], null, 'mediatypeid');
 
 		// nodes
 		if ($data['displayNodes']) {
@@ -284,7 +284,7 @@ else {
 	}
 	else {
 		$arr = array();
-		$data['paging'] = getPagingLine($arr);
+		$data['paging'] = getPagingLine($arr, null, 'mediatypeid');
 	}
 
 	// render view

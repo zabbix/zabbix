@@ -832,7 +832,7 @@ else {
 
 	// sorting && paging
 	order_result($hosts, $sortfield, $sortorder);
-	$paging = getPagingLine($hosts);
+	$paging = getPagingLine($hosts, null, 'hostid');
 
 	$hosts = API::Host()->get(array(
 		'hostids' => zbx_objectValues($hosts, 'hostid'),
