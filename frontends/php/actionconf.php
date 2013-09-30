@@ -485,7 +485,7 @@ else {
 
 	// sorting && paging
 	order_result($data['actions'], $sortfield, getPageSortOrder());
-	$data['paging'] = getPagingLine($data['actions']);
+	$data['paging'] = getPagingLine($data['actions'], null, 'actionid');
 
 	// nodes
 	if ($data['displayNodes']) {
