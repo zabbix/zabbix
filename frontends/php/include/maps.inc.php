@@ -143,6 +143,9 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 						'hostid' => $host['hostid']
 					);
 				}
+				$gotos['inventory'] = array(
+					'hostid' => $host['hostid']
+				);
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_MAP:
