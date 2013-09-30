@@ -56,6 +56,10 @@ extern int		CONFIG_VMWARE_FREQUENCY;
 extern zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE;
 
 /* */
+
+#define VMWARE_VECTOR_CREATE(ref, type)	zbx_vector_##type##_create_ext(ref,  __vm_mem_malloc_func, \
+		__vm_mem_realloc_func, __vm_mem_free_func)
+
 #define ZBX_VMWARE_CACHE_TTL	CONFIG_VMWARE_FREQUENCY
 #define ZBX_VMWARE_SERVICE_TTL	(SEC_PER_HOUR * 24)
 
@@ -65,10 +69,14 @@ static zbx_mem_info_t	*vmware_mem = NULL;
 
 ZBX_MEM_FUNC_IMPL(__vm, vmware_mem)
 
+static zbx_vmware_t	*vmware = NULL;
+
 /* vmware service types */
 #define ZBX_VMWARE_SERVICE_UNKNOWN	0
 #define ZBX_VMWARE_SERVICE_VSPHERE	1
 #define ZBX_VMWARE_SERVICE_VCENTER	2
+
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 /* VMWare service object name mapping for vcenter and vsphere installations */
 typedef struct
@@ -93,13 +101,6 @@ typedef struct
 	zbx_uint64_t	*pcounter;
 }
 zbx_perfcounter_mapping_t;
-
-
-static zbx_vmware_t	*vmware = NULL;
-
-#define VMWARE_VECTOR_CREATE(ref, type)	zbx_vector_##type##_create_ext(ref,  __vm_mem_malloc_func, \
-		__vm_mem_realloc_func, __vm_mem_free_func)
-
 
 /*
  * SOAP support
@@ -2274,156 +2275,6 @@ out:
  * Public API
  */
 
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_vmware_init                                                  *
- *                                                                            *
- * Purpose: initializes vmware collector service                              *
- *                                                                            *
- * Comments: This function must be called before worker threads are forked.   *
- *                                                                            *
- ******************************************************************************/
-void	zbx_vmware_init(void)
-{
-	const char	*__function_name = "zbx_vmware_init";
-	key_t		shm_key;
-	zbx_uint64_t	size_reserved;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	zbx_mutex_create(&vmware_lock, ZBX_MUTEX_VMWARE);
-
-	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_VMWARE_ID)))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC key for vmware cache");
-		exit(EXIT_FAILURE);
-	}
-
-	size_reserved = zbx_mem_required_size(1, "vmware cache size", "VMWareCacheSize");
-
-	CONFIG_VMWARE_CACHE_SIZE -= size_reserved;
-
-	zbx_mem_create(&vmware_mem, shm_key, ZBX_NO_MUTEX,  CONFIG_VMWARE_CACHE_SIZE, "vmware cache size",
-			"VMWareCacheSize", 1);
-
-	vmware = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_t));
-	memset(vmware, 0, sizeof(zbx_vmware_t));
-
-	VMWARE_VECTOR_CREATE(&vmware->services, ptr);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_vmware_destroy                                               *
- *                                                                            *
- * Purpose: destroys vmware collector service                                 *
- *                                                                            *
- ******************************************************************************/
-void	zbx_vmware_destroy(void)
-{
-	const char	*__function_name = "zbx_vmware_destroy";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	zbx_mem_destroy(vmware_mem);
-	zbx_mutex_destroy(&vmware_lock);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
-#define	ZBX_VMWARE_SERVICE_NONE		0
-#define	ZBX_VMWARE_SERVICE_IDLE		1
-#define	ZBX_VMWARE_SERVICE_UPDATE	2
-#define	ZBX_VMWARE_SERVICE_REMOVE	3
-
-/******************************************************************************
- *                                                                            *
- * Function: main_vmware_loop                                                 *
- *                                                                            *
- * Purpose: the vmware collector main loop                                    *
- *                                                                            *
- ******************************************************************************/
-void	main_vmware_loop(void)
-{
-	int			i, now, state = ZBX_VMWARE_SERVICE_NONE;
-	zbx_vmware_service_t	*service = NULL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In main_vmware_loop()");
-
-	for (;;)
-	{
-		zbx_setproctitle("%s [querying vmware services]", get_process_type_string(process_type));
-
-		now = time(NULL);
-
-		for (state = ZBX_VMWARE_SERVICE_NONE; ZBX_VMWARE_SERVICE_IDLE != state; )
-		{
-			state = ZBX_VMWARE_SERVICE_IDLE;
-
-			zbx_vmware_lock();
-
-			for (i = 0; i < vmware->services.values_num; i++)
-			{
-				service = vmware->services.values[i];
-
-				if (0 != (service->state & ZBX_VMWARE_STATE_UPDATING))
-					continue;
-
-				if (now - service->lastaccess > ZBX_VMWARE_SERVICE_TTL)
-				{
-					zbx_vector_ptr_remove(&vmware->services, i);
-					vmware_service_free(service);
-					state = ZBX_VMWARE_SERVICE_REMOVE;
-					break;
-				}
-
-				if (now - service->lastcheck > ZBX_VMWARE_CACHE_TTL)
-				{
-					service->state |= ZBX_VMWARE_STATE_UPDATING;
-					state = ZBX_VMWARE_SERVICE_UPDATE;
-					break;
-				}
-			}
-
-			zbx_vmware_unlock();
-
-			if (ZBX_VMWARE_SERVICE_UPDATE == state)
-				vmware_service_update(service);
-		}
-
-		zbx_setproctitle("%s [sleeping]", get_process_type_string(process_type));
-
-		zbx_sleep_loop(CONFIG_VMWARE_FREQUENCY);
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_vmware_lock                                                  *
- *                                                                            *
- * Purpose: locks vmware collector                                            *
- *                                                                            *
- ******************************************************************************/
-void	zbx_vmware_lock(void)
-{
-	zbx_mutex_lock(&vmware_lock);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_vmware_unlock                                                *
- *                                                                            *
- * Purpose: unlocks vmware collector                                          *
- *                                                                            *
- ******************************************************************************/
-void	zbx_vmware_unlock(void)
-{
-	zbx_mutex_unlock(&vmware_lock);
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: vmware_get_service                                               *
@@ -2501,6 +2352,159 @@ out:
 	return service;
 }
 
+#endif
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_vmware_init                                                  *
+ *                                                                            *
+ * Purpose: initializes vmware collector service                              *
+ *                                                                            *
+ * Comments: This function must be called before worker threads are forked.   *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_vmware_init(void)
+{
+	const char	*__function_name = "zbx_vmware_init";
+	key_t		shm_key;
+	zbx_uint64_t	size_reserved;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_mutex_create(&vmware_lock, ZBX_MUTEX_VMWARE);
+
+	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_VMWARE_ID)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC key for vmware cache");
+		exit(EXIT_FAILURE);
+	}
+
+	size_reserved = zbx_mem_required_size(1, "vmware cache size", "VMWareCacheSize");
+
+	CONFIG_VMWARE_CACHE_SIZE -= size_reserved;
+
+	zbx_mem_create(&vmware_mem, shm_key, ZBX_NO_MUTEX,  CONFIG_VMWARE_CACHE_SIZE, "vmware cache size",
+			"VMWareCacheSize", 1);
+
+	vmware = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_t));
+	memset(vmware, 0, sizeof(zbx_vmware_t));
+
+	VMWARE_VECTOR_CREATE(&vmware->services, ptr);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_vmware_destroy                                               *
+ *                                                                            *
+ * Purpose: destroys vmware collector service                                 *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_vmware_destroy(void)
+{
+	const char	*__function_name = "zbx_vmware_destroy";
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_mem_destroy(vmware_mem);
+	zbx_mutex_destroy(&vmware_lock);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+#define	ZBX_VMWARE_SERVICE_NONE		0
+#define	ZBX_VMWARE_SERVICE_IDLE		1
+#define	ZBX_VMWARE_SERVICE_UPDATE	2
+#define	ZBX_VMWARE_SERVICE_REMOVE	3
+
+/******************************************************************************
+ *                                                                            *
+ * Function: main_vmware_loop                                                 *
+ *                                                                            *
+ * Purpose: the vmware collector main loop                                    *
+ *                                                                            *
+ ******************************************************************************/
+void	main_vmware_loop(void)
+{
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+	int			i, now, state = ZBX_VMWARE_SERVICE_NONE;
+	zbx_vmware_service_t	*service = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In main_vmware_loop()");
+
+	for (;;)
+	{
+		zbx_setproctitle("%s [querying vmware services]", get_process_type_string(process_type));
+
+		now = time(NULL);
+
+		for (state = ZBX_VMWARE_SERVICE_NONE; ZBX_VMWARE_SERVICE_IDLE != state; )
+		{
+			state = ZBX_VMWARE_SERVICE_IDLE;
+
+			zbx_vmware_lock();
+
+			for (i = 0; i < vmware->services.values_num; i++)
+			{
+				service = vmware->services.values[i];
+
+				if (0 != (service->state & ZBX_VMWARE_STATE_UPDATING))
+					continue;
+
+				if (now - service->lastaccess > ZBX_VMWARE_SERVICE_TTL)
+				{
+					zbx_vector_ptr_remove(&vmware->services, i);
+					vmware_service_free(service);
+					state = ZBX_VMWARE_SERVICE_REMOVE;
+					break;
+				}
+
+				if (now - service->lastcheck > ZBX_VMWARE_CACHE_TTL)
+				{
+					service->state |= ZBX_VMWARE_STATE_UPDATING;
+					state = ZBX_VMWARE_SERVICE_UPDATE;
+					break;
+				}
+			}
+
+			zbx_vmware_unlock();
+
+			if (ZBX_VMWARE_SERVICE_UPDATE == state)
+				vmware_service_update(service);
+		}
+
+		zbx_setproctitle("%s [sleeping]", get_process_type_string(process_type));
+
+		zbx_sleep_loop(CONFIG_VMWARE_FREQUENCY);
+	}
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_vmware_lock                                                  *
+ *                                                                            *
+ * Purpose: locks vmware collector                                            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_vmware_lock(void)
+{
+	zbx_mutex_lock(&vmware_lock);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_vmware_unlock                                                *
+ *                                                                            *
+ * Purpose: unlocks vmware collector                                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_vmware_unlock(void)
+{
+	zbx_mutex_unlock(&vmware_lock);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_vmware_get_statistics                                        *
@@ -2527,6 +2531,8 @@ int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats)
 
 	return SUCCEED;
 }
+
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 /*
  * XML support
@@ -2570,9 +2576,11 @@ char	*zbx_xml_read_value(const char *data, const char *xpath)
 
 	nodeset = xpathObj->nodesetval;
 
-	val = xmlNodeListGetString(doc, nodeset->nodeTab[0]->xmlChildrenNode, 1);
-	value = zbx_strdup(NULL, (char *)val);
-	xmlFree(val);
+	if (NULL != (val = xmlNodeListGetString(doc, nodeset->nodeTab[0]->xmlChildrenNode, 1)))
+	{
+		value = zbx_strdup(NULL, (char *)val);
+		xmlFree(val);
+	}
 clean:
 	if (NULL != xpathObj)
 		xmlXPathFreeObject(xpathObj);
@@ -2619,9 +2627,11 @@ char	*zbx_xml_read_node_value(xmlDoc *doc, xmlNode *node, const char *xpath)
 
 	nodeset = xpathObj->nodesetval;
 
-	val = xmlNodeListGetString(doc, nodeset->nodeTab[0]->xmlChildrenNode, 1);
-	value = zbx_strdup(NULL, (char *)val);
-	xmlFree(val);
+	if (NULL != (val = xmlNodeListGetString(doc, nodeset->nodeTab[0]->xmlChildrenNode, 1)))
+	{
+		value = zbx_strdup(NULL, (char *)val);
+		xmlFree(val);
+	}
 clean:
 	if (NULL != xpathObj)
 		xmlXPathFreeObject(xpathObj);
@@ -2674,10 +2684,11 @@ int	zbx_xml_read_values(const char *data, const char *xpath, zbx_vector_str_t *v
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
-		val = xmlNodeListGetString(doc, nodeset->nodeTab[i]->xmlChildrenNode, 1);
-		if (NULL != val)
+		if (NULL != (val = xmlNodeListGetString(doc, nodeset->nodeTab[i]->xmlChildrenNode, 1)))
+		{
 			zbx_vector_str_append(values, zbx_strdup(NULL, (char *)val));
-		xmlFree(val);
+			xmlFree(val);
+		}
 	}
 
 	ret = SUCCEED;
@@ -2693,4 +2704,4 @@ out:
 	return ret;
 }
 
-
+#endif
