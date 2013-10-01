@@ -406,7 +406,7 @@ var CDoll = Class.create(CDebug,{
 				forcePlaceholderSize: true,
 				placeholder: 'widget ui-corner-all ui-sortable-placeholder',
 				opacity: '0.8',
-				update: function() { jQuery('.column').portletState('save', {'name': 'dashboard'}); }
+				receive: function() { jQuery('.column').portletState('save', {'name': 'dashboard'}); }
 			})
 			.portletState('load', {'name': 'dashboard'})
 			.children('div')
