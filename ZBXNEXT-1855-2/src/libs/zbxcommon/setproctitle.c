@@ -137,6 +137,25 @@ char **	setproctitle_save_env(int argc, char **argv)
 	ps_buf_size = (size_t)(arg_end - argv[copy_first] + 1);
 	ps_buf = argv[copy_first];
 
+#if defined(PS_CONCAT_ARGV)
+	do
+	{
+		char	*p = ps_buf;
+		size_t	size = ps_buf_size, len;
+
+		for (i = copy_first + 1; i < argc; i++)
+		{
+			len = strlen(argv_int[i - 1]);
+			p += len;
+			size -= len;
+			if (2 >= size)
+				break;
+			zbx_strlcpy(p++, " ", size--);
+			zbx_strlcpy(p, argv_int[i], size);
+		}
+	}
+	while (0);
+#endif
 	environ = environ_int;		/* switch environment to internal copy */
 
 	return argv_int;
@@ -163,8 +182,11 @@ void	setproctitle_set_status(const char *status)
 	}
 	else if (NULL != ps_buf)
 	{
-		size_t	start_pos = strlen(ps_buf);	/* argv[copy_first] */
-
+#if defined(PS_CONCAT_ARGV)
+		size_t	start_pos = strlen(argv_int[0]);
+#else
+		size_t	start_pos = strlen(ps_buf);
+#endif
 		if (start_pos + 2 < ps_buf_size)	/* is there space for ": " ? */
 		{
 			zbx_strlcpy(ps_buf + start_pos, ": ", (size_t)3);
