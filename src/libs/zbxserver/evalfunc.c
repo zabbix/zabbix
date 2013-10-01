@@ -42,7 +42,7 @@ static int	__get_function_parameter_uint31(zbx_uint64_t hostid, const char *para
 	if (NULL == (parameter = get_param_dyn(parameters, Nparam)))
 		goto out;
 
-	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL,
+	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL,
 			&parameter, MACRO_TYPE_COMMON, NULL, 0))
 	{
 		if (1 == defaults_on_empty && '\0' == *parameter)
@@ -98,7 +98,7 @@ static int	get_function_parameter_uint64(zbx_uint64_t hostid, const char *parame
 	if (NULL == (parameter = get_param_dyn(parameters, Nparam)))
 		goto out;
 
-	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL,
+	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL,
 			&parameter, MACRO_TYPE_COMMON, NULL, 0))
 	{
 		if (SUCCEED == is_uint64(parameter, value))
@@ -128,7 +128,7 @@ static int	get_function_parameter_str(zbx_uint64_t hostid, const char *parameter
 	if (NULL == (*value = get_param_dyn(parameters, Nparam)))
 		goto out;
 
-	ret = substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL,
+	ret = substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL,
 			value, MACRO_TYPE_COMMON, NULL, 0);
 
 	if (SUCCEED == ret)
@@ -1140,15 +1140,16 @@ static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, con
 
 	now = (int)time(NULL);
 
-	if (SUCCEED != zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) ||
-			1 > values.values_num)
-		goto out;
-
-	if (values.values[0].timestamp.sec + arg1 > now)
-		zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
+	if (SUCCEED == zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) &&
+			1 == values.values_num)
+	{
+		zbx_strlcpy(value, values.values[0].timestamp.sec + arg1 > now ? "0" : "1", MAX_BUFFER_LEN);
+	}
 	else
 	{
-		if (CONFIG_SERVER_STARTUP_TIME + arg1 > now)
+		int	time_added;
+
+		if (SUCCEED != DCget_item_time_added(item->itemid, &time_added) || time_added + arg1 > now)
 			goto out;
 
 		zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
