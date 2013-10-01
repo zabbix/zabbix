@@ -28,9 +28,9 @@
 #include "vmware.h"
 
 /*
- * The VMWare data (zbx_vmware_service_t structure) are stored in shared memory.
+ * The VMware data (zbx_vmware_service_t structure) are stored in shared memory.
  * This data can be accessed with zbx_vmware_get_service() function and is regularly
- * updated by VMWare collector processess.
+ * updated by VMware collector processess.
  *
  * When a new service is requested by poller the zbx_vmware_get_service() function
  * creates a new service object, marks it as new, but still returns NULL object.
@@ -40,7 +40,7 @@
  * as updating.
  *
  * The service object is updated by creating a new data object, initializing it
- * with the latest data from VMWare vCenter (or vSphere), destroying the old data
+ * with the latest data from VMware vCenter (or vSphere), destroying the old data
  * object and replacing it with the new one.
  *
  * The collector must be locked only when accessing service object list and working with
@@ -78,7 +78,7 @@ static zbx_vmware_t	*vmware = NULL;
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-/* VMWare service object name mapping for vcenter and vsphere installations */
+/* VMware service object name mapping for vcenter and vsphere installations */
 typedef struct
 {
 	const char	*performance_manager;
@@ -2379,12 +2379,12 @@ void	zbx_vmware_init(void)
 		exit(EXIT_FAILURE);
 	}
 
-	size_reserved = zbx_mem_required_size(1, "vmware cache size", "VMWareCacheSize");
+	size_reserved = zbx_mem_required_size(1, "vmware cache size", "VMwareCacheSize");
 
 	CONFIG_VMWARE_CACHE_SIZE -= size_reserved;
 
 	zbx_mem_create(&vmware_mem, shm_key, ZBX_NO_MUTEX,  CONFIG_VMWARE_CACHE_SIZE, "vmware cache size",
-			"VMWareCacheSize", 1);
+			"VMwareCacheSize", 1);
 
 	vmware = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_t));
 	memset(vmware, 0, sizeof(zbx_vmware_t));
