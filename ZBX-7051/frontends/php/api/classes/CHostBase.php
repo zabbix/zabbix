@@ -33,7 +33,7 @@ abstract class CHostBase extends CZBXAPI {
 	 * @param array $templateIds
 	 * @param array $targetIds		an array of host IDs to link the templates to
 	 *
-	 * @return array $hostsLinkageInserts		an array of added template linkages
+	 * @return array 	an array of added hosts_templates rows, with 'hostid' and 'templateid' set for each row
 	 */
 	protected function link(array $templateIds, array $targetIds) {
 		if (empty($templateIds)) {
