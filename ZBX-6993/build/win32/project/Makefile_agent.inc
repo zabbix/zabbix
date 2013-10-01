@@ -48,6 +48,7 @@ OBJS  = ..\..\..\src\libs\zbxalgo\algodefs.o \
 	..\..\..\src\libs\zbxsysinfo\win32\swap.o \
 	..\..\..\src\libs\zbxsysinfo\win32\uptime.o \
 	..\..\..\src\libs\zbxsysinfo\win32\win32.o \
+	..\..\..\src\libs\zbxsysinfo\win32\wmi.o \
 	..\..\..\src\libs\zbxsysinfo\sysinfo.o \
 	..\..\..\src\libs\zbxsysinfo\win32\software.o \
 	..\..\..\src\libs\zbxsysinfo\win32\system.o \
@@ -218,6 +219,9 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 
 ..\..\..\src\libs\zbxsysinfo\win32\win32.o: ..\..\..\src\libs\zbxsysinfo\win32\win32.c
 	$(CC) ..\..\..\src\libs\zbxsysinfo\win32\win32.c /Fo"..\..\..\src\libs\zbxsysinfo\win32\win32.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxsysinfo\win32\wmi.o: ..\..\..\src\libs\zbxsysinfo\win32\wmi.cpp
+	$(CC) ..\..\..\src\libs\zbxsysinfo\win32\wmi.cpp /Fo"..\..\..\src\libs\zbxsysinfo\win32\wmi.o" $(CPPFLAGS)
 
 ..\..\..\src\libs\zbxsysinfo\sysinfo.o: ..\..\..\src\libs\zbxsysinfo\sysinfo.c
 	$(CC) ..\..\..\src\libs\zbxsysinfo\sysinfo.c /Fo"..\..\..\src\libs\zbxsysinfo\sysinfo.o" $(CFLAGS)

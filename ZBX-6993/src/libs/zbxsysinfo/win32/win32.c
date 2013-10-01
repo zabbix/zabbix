@@ -59,5 +59,7 @@ ZBX_METRIC	parameters_specific[] =
 
 	{"__UserPerfCounter",	CF_HAVEPARAMS,	USER_PERF_COUNTER,	""},
 
+	{"wmi.get",		CF_HAVEPARAMS,	WMI_GET,		"root\\cimv2,select Caption from Win32_OperatingSystem"},
+
 	{NULL}
 };

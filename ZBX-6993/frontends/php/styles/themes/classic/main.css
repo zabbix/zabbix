@@ -106,8 +106,8 @@ ul.favorites { margin: 0; padding: 4px 4px 4px 1em; border: 1px solid #AAAAAA; }
 .classic .ui-tabs .ui-tabs-nav .ui-state-default { background: none; border-color: #BBD1EC }
 .classic .ui-tabs .ui-tabs-nav .ui-state-hover { border-color: #95A8C3 }
 .classic .ui-tabs .ui-tabs-nav .ui-state-default a { color: #FFF; }
-.classic .ui-tabs .ui-tabs-nav .ui-tabs-selected { background: #EEE; }
-.classic .ui-tabs .ui-tabs-nav .ui-tabs-selected a { color: #383838; }
+.classic .ui-tabs .ui-tabs-nav .ui-state-active { background: #EEE; }
+.classic .ui-tabs .ui-tabs-nav .ui-state-active a { color: #383838; }
 
 table.tableinfo tr.vertical_header td { background-color: #CCC; }
 

@@ -890,7 +890,12 @@ class CPageFilter {
 				$firstLabel = ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE) ? _('not selected') : _('all');
 			}
 
-			$items = array($firstLabel) + $items;
+			if ($name == 'application') {
+				$items = array('' => $firstLabel) + $items;
+			}
+			else {
+				$items = array($firstLabel) + $items;
+			}
 		}
 
 		foreach ($items as $id => $name) {
