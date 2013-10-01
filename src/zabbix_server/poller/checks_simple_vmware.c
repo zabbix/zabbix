@@ -276,7 +276,7 @@ int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, AGENT_RESULT
  *                SYSINFO_RET_FAIL.                                           *
  *             3) the vmware service has been updated successfully.           *
  *                In this case the service object is returned and result code *
- *                is note set.                                                *
+ *                is not set.                                                 *
  *                                                                            *
  ******************************************************************************/
 static zbx_vmware_service_t *get_vmware_service(const char *url, const char *username, const char *password,
