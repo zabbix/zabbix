@@ -3,6 +3,7 @@ Changes for 2.1.7
 New features:
 
 Bug fixes:
+..F....... [ZBX-6994] fixed logic of SQL creation, removed unneeded i.flags IN (0,4) from SQL, if i.flags is set from filter or is null (Vitalij)
 ..F....... [ZBX-6993] fixed JS errors in various pages having a child node with high ID value (Ivo)
 ..F....... [ZBX-7032] fixed possibility to add "ICMP ping" check in Configuration > Discovery (Ivo)
 ........S. [ZBX-6904] now ESC.HISTORY macro creates the same message content whithin the same escalation step when notification is sent to multiple recipients (igors)
