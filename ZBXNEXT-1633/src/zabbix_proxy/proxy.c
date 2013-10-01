@@ -317,7 +317,7 @@ static void	zbx_validate_config()
 #if !defined(HAVE_LIBXML2) || !defined(HAVE_LIBCURL)
 	if (0 != CONFIG_VMWARE_FORKS)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Cannot start vmware collector because Zabbix proxy is built without VMWare"
+		zabbix_log(LOG_LEVEL_CRIT, "Cannot start vmware collector because Zabbix proxy is built without VMware"
 				" support");
 		exit(EXIT_FAILURE);
 	}
@@ -454,11 +454,11 @@ static void	zbx_load_config()
 			PARM_OPT,	0,			0},
 		{"LoadModule",			&CONFIG_LOAD_MODULE,			TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
-		{"StartVMWareCollectors",	&CONFIG_VMWARE_FORKS,			TYPE_INT,
+		{"StartVMwareCollectors",	&CONFIG_VMWARE_FORKS,			TYPE_INT,
 			PARM_OPT,	0,			250},
-		{"WMWareFrequency",		&CONFIG_VMWARE_FREQUENCY,		TYPE_INT,
+		{"VMwareFrequency",		&CONFIG_VMWARE_FREQUENCY,		TYPE_INT,
 			PARM_OPT,	10,			SEC_PER_DAY},
-		{"VMWareCacheSize",		&CONFIG_VMWARE_CACHE_SIZE,		TYPE_UINT64,
+		{"VMwareCacheSize",		&CONFIG_VMWARE_CACHE_SIZE,		TYPE_UINT64,
 			PARM_OPT,	256 * ZBX_KIBIBYTE,	0x7fffffff},	/* just below 2GB */
 		{NULL}
 	};
