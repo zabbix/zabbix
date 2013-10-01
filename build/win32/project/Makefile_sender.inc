@@ -23,16 +23,16 @@ OBJS = ..\..\..\src\libs\zbxcommon\comms.o \
 	..\..\..\src\libs\zbxsys\mutexs.o \
 	..\..\..\src\libs\zbxsys\symbols.o \
 	..\..\..\src\libs\zbxsys\threads.o \
-	..\..\..\src\zabbix_sender\zabbix_sender.o
+	..\..\..\src\zabbix_sender\$(SENDER_MAIN_OBJ)
 
 LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib
 
-all: $(PROGNAME)
+all: $(PROGNAME) $(POSTBUILD)
 
 clean:
 	del $(OBJS) $(RESOURCE_RES) $(MESSAGES_H) $(PROGNAME) messages.rc MSG00001.bin zabbix_sender.exe.manifest
 
-$(PROGNAME): $(MESSAGES_H) $(OBJS) $(RESOURCE_RES)
+$(PROGNAME): $(MESSAGES_H) $(OBJS) $(RESOURCE_RES) 
 	$(LINKER) $(OBJS) $(RESOURCE_RES) /OUT:$(PROGNAME) $(LFLAGS) $(LIBS)
 	$(MT) /outputresource:"$(PROGNAME);#1" /manifest zabbix_sender.exe.manifest /nologo
 
@@ -92,3 +92,6 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 
 ..\..\..\src\zabbix_sender\zabbix_sender.o: ..\..\..\src\zabbix_sender\zabbix_sender.c
 	$(CC) ..\..\..\src\zabbix_sender\zabbix_sender.c /Fo"..\..\..\src\zabbix_sender\zabbix_sender.o" $(CFLAGS)
+
+..\..\..\src\zabbix_sender\win32\zabbix_sender.o: ..\..\..\src\zabbix_sender\win32\zabbix_sender.c
+	$(CC) ..\..\..\src\zabbix_sender\win32\zabbix_sender.c /Fo"..\..\..\src\zabbix_sender\win32\zabbix_sender.o" $(CFLAGS)
