@@ -30,7 +30,7 @@
 		foreach($nodeids as $nodeid){
 			$profileid = get_dbid('profiles', 'profileid');
 			$sql='INSERT INTO profiles (profileid, userid, idx, value_id, type)'.
-				' VALUES ('.$profileid.','.$USER_DETAILS['userid'].', '.zbx_dbstr('web.nodes.selected').','.$nodeid.', 4)';
+				' VALUES ('.$profileid.','.$USER_DETAILS['userid'].', '.zbx_dbstr('web.nodes.selected').','.zbx_dbstr($nodeid).', 4)';
 			DBexecute($sql);
 		}
 
@@ -287,19 +287,19 @@
 		}
 
 
-		if(DBfetch(DBselect('SELECT nodeid FROM nodes WHERE nodeid='.$new_nodeid))){
+		if(DBfetch(DBselect('SELECT nodeid FROM nodes WHERE nodeid='.zbx_dbstr($new_nodeid)))){
 			error(S_NODE_WITH_SAME_ID_ALREADY_EXISTS);
 			return false;
 		}
 
 		$nodetype = 0;
 		$sql = 'INSERT INTO nodes (nodeid,name,timezone,ip,port,slave_history,slave_trends, nodetype,masterid) '.
-			' VALUES ('.$new_nodeid.','.zbx_dbstr($name).','.$timezone.','.zbx_dbstr($ip).','.$port.','.$slave_history.','.
-			$slave_trends.','.$nodetype.','.$masterid.')';
+			' VALUES ('.zbx_dbstr($new_nodeid).','.zbx_dbstr($name).','.zbx_dbstr($timezone).','.zbx_dbstr($ip).','.zbx_dbstr($port).','.zbx_dbstr($slave_history).','.
+			zbx_dbstr($slave_trends).','.zbx_dbstr($nodetype).','.zbx_dbstr($masterid).')';
 		$result = DBexecute($sql);
 
 		if($result && $node_type == ZBX_NODE_MASTER){
-			DBexecute('UPDATE nodes SET masterid='.$new_nodeid.' WHERE nodeid='.$ZBX_LOCALNODEID);
+			DBexecute('UPDATE nodes SET masterid='.zbx_dbstr($new_nodeid).' WHERE nodeid='.$ZBX_LOCALNODEID);
 			$ZBX_CURMASTERID = $new_nodeid; /* apply Master node for this script */
 		}
 
@@ -313,16 +313,16 @@
 			return false;
 		}
 
-		$result = DBexecute('UPDATE nodes SET nodeid='.$new_nodeid.',name='.zbx_dbstr($name).','.
-			'timezone='.$timezone.',ip='.zbx_dbstr($ip).',port='.$port.','.
-			'slave_history='.$slave_history.',slave_trends='.$slave_trends.
-			' WHERE nodeid='.$nodeid);
+		$result = DBexecute('UPDATE nodes SET nodeid='.zbx_dbstr($new_nodeid).',name='.zbx_dbstr($name).','.
+			'timezone='.zbx_dbstr($timezone).',ip='.zbx_dbstr($ip).',port='.zbx_dbstr($port).','.
+			'slave_history='.zbx_dbstr($slave_history).',slave_trends='.zbx_dbstr($slave_trends).
+			' WHERE nodeid='.zbx_dbstr($nodeid));
 	return $result;
 	}
 
 	function delete_node($nodeid){
 		$result = false;
-		$node_data = DBfetch(DBselect('select * from nodes where nodeid='.$nodeid));
+		$node_data = DBfetch(DBselect('select * from nodes where nodeid='.zbx_dbstr($nodeid)));
 
 		$node_type = detect_node_type($node_data);
 
@@ -334,8 +334,8 @@
 			$result = (
 				// DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
 					// " values ($housekeeperid,'nodes','nodeid',$nodeid)") &&
-				DBexecute('delete from nodes where nodeid='.$nodeid) &&
-				DBexecute('update nodes set masterid=0 where masterid='.$nodeid)
+				DBexecute('delete from nodes where nodeid='.zbx_dbstr($nodeid)) &&
+				DBexecute('update nodes set masterid=0 where masterid='.zbx_dbstr($nodeid))
 				);
 			error(S_DATABASE_STILL_CONTAINS_DATA_RELATED_DELETED_NODE);
 		}
@@ -345,7 +345,7 @@
 
 	function get_node_by_nodeid($nodeid)
 	{
-		return DBfetch(DBselect('select * from nodes where nodeid='.$nodeid));
+		return DBfetch(DBselect('select * from nodes where nodeid='.zbx_dbstr($nodeid)));
 	}
 
 	function get_node_path($nodeid, $result='/')

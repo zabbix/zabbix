@@ -37,12 +37,12 @@
 		$new_step	= get_request('new_step', null);
 
 		if((isset($_REQUEST['slideshowid']) && !isset($_REQUEST['form_refresh']))){
-			$slideshow_data = DBfetch(DBselect('SELECT * FROM slideshows WHERE slideshowid='.$_REQUEST['slideshowid']));
+			$slideshow_data = DBfetch(DBselect('SELECT * FROM slideshows WHERE slideshowid='.zbx_dbstr($_REQUEST['slideshowid'])));
 
 			$name		= $slideshow_data['name'];
 			$delay		= $slideshow_data['delay'];
 			$steps		= array();
-			$db_steps = DBselect('SELECT * FROM slides WHERE slideshowid='.$_REQUEST['slideshowid'].' order by step');
+			$db_steps = DBselect('SELECT * FROM slides WHERE slideshowid='.zbx_dbstr($_REQUEST['slideshowid']).' order by step');
 
 			while($step_data = DBfetch($db_steps)){
 				$steps[$step_data['step']] = array(
@@ -233,7 +233,7 @@
 			$user_groups = zbx_objectValues($user_groups, 'usrgrpid');
 			$user_groups = zbx_toHash($user_groups);
 
-			$db_medias = DBselect('SELECT m.* FROM media m WHERE m.userid='.$userid);
+			$db_medias = DBselect('SELECT m.* FROM media m WHERE m.userid='.zbx_dbstr($userid));
 			while($db_media = DBfetch($db_medias)){
 				$user_medias[] = array(
 					'mediaid' => $db_media['mediaid'],
@@ -642,7 +642,7 @@
 			$sql = 'SELECT DISTINCT u.userid '.
 						' FROM users u,users_groups ug '.
 						' WHERE u.userid=ug.userid '.
-							' AND ug.usrgrpid='.$_REQUEST['usrgrpid'];
+							' AND ug.usrgrpid='.zbx_dbstr($_REQUEST['usrgrpid']);
 
 			$db_users=DBselect($sql);
 
@@ -654,7 +654,7 @@
 					' FROM groups g '.
 						' LEFT JOIN rights r on r.id=g.groupid '.
 						' LEFT JOIN nodes n on n.nodeid='.DBid2nodeid('g.groupid').
-					' WHERE r.groupid='.$_REQUEST['usrgrpid'];
+					' WHERE r.groupid='.zbx_dbstr($_REQUEST['usrgrpid']);
 
 			$db_rights = DBselect($sql);
 			while($db_right = DBfetch($db_rights)){
@@ -716,7 +716,7 @@
 	$sql_where = '';
 	if($selusrgrp > 0) {
 		$sql_from = ', users_groups g ';
-		$sql_where = ' AND u.userid=g.userid AND g.usrgrpid='.$selusrgrp;
+		$sql_where = ' AND u.userid=g.userid AND g.usrgrpid='.zbx_dbstr($selusrgrp);
 	}
 	$sql = 'SELECT DISTINCT u.userid, u.alias '.
 			' FROM users u '.$sql_from.
@@ -1670,7 +1670,7 @@
 			do{
 				$sql = 'SELECT i.itemid, i.templateid, h.host'.
 						' FROM items i, hosts h'.
-						' WHERE i.itemid='.$itemid.
+						' WHERE i.itemid='.zbx_dbstr($itemid).
 							' AND h.hostid=i.hostid';
 				$itemFromDb = DBfetch(DBselect($sql));
 				if($itemFromDb){
@@ -2096,7 +2096,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 		$sql = 'SELECT DISTINCT applicationid,name '.
 				' FROM applications '.
-				' WHERE hostid='.$hostid.
+				' WHERE hostid='.zbx_dbstr($hostid).
 				' ORDER BY name';
 		$db_applications = DBselect($sql);
 		while($db_app = DBfetch($db_applications)){
@@ -2368,7 +2368,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		if(isset($_REQUEST['hostid'])){
 			$sql = 'SELECT applicationid,name '.
 				' FROM applications '.
-				' WHERE hostid='.$_REQUEST['hostid'].
+				' WHERE hostid='.zbx_dbstr($_REQUEST['hostid']).
 				' ORDER BY name';
 			$db_applications = DBselect($sql);
 			while($db_app = DBfetch($db_applications)){
@@ -2578,7 +2578,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			do{
 				$sql = 'SELECT t.triggerid, t.templateid, h.host'.
 						' FROM triggers t, functions f, items i, hosts h'.
-						' WHERE t.triggerid='.$trigid.
+						' WHERE t.triggerid='.zbx_dbstr($trigid).
 							' AND h.hostid=i.hostid'.
 							' AND i.itemid=f.itemid'.
 							' AND f.triggerid=t.triggerid';
@@ -2627,7 +2627,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				$trigs=DBselect('SELECT t.triggerid,t.description,t.expression '.
 							' FROM triggers t,trigger_depends d '.
 							' WHERE t.triggerid=d.triggerid_up '.
-								' AND d.triggerid_down='.$_REQUEST['triggerid']);
+								' AND d.triggerid_down='.zbx_dbstr($_REQUEST['triggerid']));
 
 				while($trig=DBfetch($trigs)){
 					if(uint_in_array($trig['triggerid'],$dependencies))	continue;
@@ -3666,7 +3666,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		if(isset($_REQUEST['screenid'])){
 			$result=DBselect('SELECT screenid,name,hsize,vsize '.
 						' FROM screens g '.
-						' WHERE screenid='.$_REQUEST['screenid']);
+						' WHERE screenid='.zbx_dbstr($_REQUEST['screenid']));
 			$row=DBfetch($result);
 			$frm_title = S_SCREEN.' "'.$row['name'].'"';
 		}
@@ -4202,7 +4202,7 @@ JAVASCRIPT;
 			$host_groups = zbx_objectValues($host_groups, 'groupid');
 
 // read profile
-			$db_profiles = DBselect('SELECT * FROM hosts_profiles WHERE hostid='.$_REQUEST['hostid']);
+			$db_profiles = DBselect('SELECT * FROM hosts_profiles WHERE hostid='.zbx_dbstr($_REQUEST['hostid']));
 
 			$useprofile = 'no';
 			$db_profile = DBfetch($db_profiles);
@@ -4225,7 +4225,7 @@ JAVASCRIPT;
 // BEGIN: HOSTS PROFILE EXTENDED Section
 			$useprofile_ext = 'no';
 
-			$db_profiles_alt = DBselect('SELECT * FROM hosts_profiles_ext WHERE hostid='.$_REQUEST['hostid']);
+			$db_profiles_alt = DBselect('SELECT * FROM hosts_profiles_ext WHERE hostid='.zbx_dbstr($_REQUEST['hostid']));
 			if($ext_host_profiles = DBfetch($db_profiles_alt)){
 				$useprofile_ext = 'yes';
 			}
@@ -4648,7 +4648,7 @@ JAVASCRIPT;
 
 		$sql_fields = implode(', ', array_keys($table_titles)); //generate string of fields to get from DB
 
-		$sql = 'SELECT '.$sql_fields.' FROM hosts_profiles WHERE hostid='.$_REQUEST['hostid'];
+		$sql = 'SELECT '.$sql_fields.' FROM hosts_profiles WHERE hostid='.zbx_dbstr($_REQUEST['hostid']);
 		$result = DBselect($sql);
 
 		if($row = DBfetch($result)) {
@@ -4689,7 +4689,7 @@ JAVASCRIPT;
 				'poc_2_screen' => S_POC_2_SCREEN, 'poc_2_notes' => S_POC_2_NOTES);
 
 		$sql_fields = implode(', ', array_keys($table_titles)); //generate string of fields to get from DB
-		$result = DBselect('SELECT '.$sql_fields.' FROM hosts_profiles_ext WHERE hostid='.$_REQUEST['hostid']);
+		$result = DBselect('SELECT '.$sql_fields.' FROM hosts_profiles_ext WHERE hostid='.zbx_dbstr($_REQUEST['hostid']));
 
 		if($row = DBfetch($result)) {
 			foreach($row as $key => $value) {
@@ -4852,7 +4852,7 @@ JAVASCRIPT;
 			$sql = 'SELECT re.* '.
 				' FROM regexps re '.
 				' WHERE '.DBin_node('re.regexpid').
-					' AND re.regexpid='.$_REQUEST['regexpid'];
+					' AND re.regexpid='.zbx_dbstr($_REQUEST['regexpid']);
 			$regexp = DBfetch(DBSelect($sql));
 
 			$frm_title .= ' ['.$regexp['name'].']';
@@ -4864,7 +4864,7 @@ JAVASCRIPT;
 			$sql = 'SELECT e.* '.
 					' FROM expressions e '.
 					' WHERE '.DBin_node('e.expressionid').
-						' AND e.regexpid='.$regexp['regexpid'].
+						' AND e.regexpid='.zbx_dbstr($regexp['regexpid']).
 					' ORDER BY e.expression_type';
 
 			$db_exps = DBselect($sql);
@@ -5006,7 +5006,7 @@ JAVASCRIPT;
 			$sql = 'SELECT e.* '.
 					' FROM expressions e '.
 					' WHERE '.DBin_node('e.expressionid').
-						' AND e.regexpid='.$_REQUEST['regexpid'].
+						' AND e.regexpid='.zbx_dbstr($_REQUEST['regexpid']).
 					' ORDER BY e.expression_type';
 
 			$db_exps = DBselect($sql);

@@ -239,12 +239,12 @@ class CEvent extends CZBXAPI{
 
 // object
 		if(!is_null($options['object'])){
-			$sql_parts['where']['o'] = 'e.object='.$options['object'];
+			$sql_parts['where']['o'] = 'e.object='.zbx_dbstr($options['object']);
 		}
 
 // source
 		if(!is_null($options['source'])){
-			$sql_parts['where'][] = 'e.source='.$options['source'];
+			$sql_parts['where'][] = 'e.source='.zbx_dbstr($options['source']);
 		}
 // acknowledged
 		if(!is_null($options['acknowledged'])){
@@ -256,19 +256,19 @@ class CEvent extends CZBXAPI{
 		}
 // time_from
 		if(!is_null($options['time_from'])){
-			$sql_parts['where'][] = 'e.clock>='.$options['time_from'];
+			$sql_parts['where'][] = 'e.clock>='.zbx_dbstr($options['time_from']);
 		}
 // time_till
 		if(!is_null($options['time_till'])){
-			$sql_parts['where'][] = 'e.clock<='.$options['time_till'];
+			$sql_parts['where'][] = 'e.clock<='.zbx_dbstr($options['time_till']);
 		}
 // eventid_from
 		if(!is_null($options['eventid_from'])){
-			$sql_parts['where'][] = 'e.eventid>='.$options['eventid_from'];
+			$sql_parts['where'][] = 'e.eventid>='.zbx_dbstr($options['eventid_from']);
 		}
 // eventid_till
 		if(!is_null($options['eventid_till'])){
-			$sql_parts['where'][] = 'e.eventid<='.$options['eventid_till'];
+			$sql_parts['where'][] = 'e.eventid<='.zbx_dbstr($options['eventid_till']);
 		}
 // value
 		if(!is_null($options['value'])){
@@ -575,12 +575,12 @@ Copt::memoryPick();
 			$eventid = get_dbid('events','eventid');
 			$sql = 'INSERT INTO events (eventid, source, object, objectid, clock, value, acknowledged) '.
 					' VALUES ('.$eventid.','.
-								$event['source'].','.
-								$event['object'].','.
-								$event['objectid'].','.
-								$event['clock'].','.
-								$event['value'].','.
-								$event['acknowledged'].
+								zbx_dbstr($event['source']).','.
+								zbx_dbstr($event['object']).','.
+								zbx_dbstr($event['objectid']).','.
+								zbx_dbstr($event['clock']).','.
+								zbx_dbstr($event['value']).','.
+								zbx_dbstr($event['acknowledged']).
 							')';
 			$result = DBexecute($sql);
 			if(!$result) break;
@@ -716,26 +716,26 @@ Copt::memoryPick();
 					' WHERE e.object='.EVENT_OBJECT_TRIGGER.
 						' AND e.objectid='.$event['objectid'].
 						' AND e.value='.$val.
-						' AND e.eventid<'.$event['eventid'].
+						' AND e.eventid<'.zbx_dbstr($event['eventid']).
 					' ORDER BY e.object DESC,e.objectid DESC,e.eventid DESC';
 				$first = DBfetch(DBselect($sql, 1));
-				$first_sql = $first ? ' AND e.eventid>'.$first['eventid'] : '';
+				$first_sql = $first ? ' AND e.eventid>'.zbx_dbstr($first['eventid']) : '';
 
 				$sql = 'SELECT e.object,e.objectid,e.eventid'.
 					' FROM events e'.
 					' WHERE e.object='.EVENT_OBJECT_TRIGGER.
-						' AND e.objectid='.$event['objectid'].
-						' AND e.value='.$val.
-						' AND e.eventid>'.$event['eventid'].
+						' AND e.objectid='.zbx_dbstr($event['objectid']).
+						' AND e.value='.zbx_dbstr($val).
+						' AND e.eventid>'.zbx_dbstr($event['eventid']).
 					' ORDER BY e.object,e.objectid,e.eventid';
 				$last = DBfetch(DBselect($sql, 1));
-				$last_sql = $last ? ' AND e.eventid<'.$last['eventid'] : '';
+				$last_sql = $last ? ' AND e.eventid<'.zbx_dbstr($last['eventid']) : '';
 
 				$sql = 'SELECT e.eventid'.
 					' FROM events e'.
 					' WHERE e.object='.EVENT_OBJECT_TRIGGER.
-						' AND e.objectid='.$event['objectid'].
-						' AND e.value='.$event['value'].
+						' AND e.objectid='.zbx_dbstr($event['objectid']).
+						' AND e.value='.zbx_dbstr($event['value']).
 						$first_sql.
 						$last_sql;
 

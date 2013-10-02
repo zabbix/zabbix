@@ -29,7 +29,7 @@
 			$sql = 'SELECT i.imageid '.
 				' FROM images i '.
 				' WHERE '.DBin_node('i.imageid', false).
-					' AND imagetype='.$imagetype.
+					' AND imagetype='.zbx_dbstr($imagetype).
 				' ORDER BY name ASC';
 			$result = DBselect($sql,1);
 			if($image = DBfetch($result)) return $image;
@@ -44,7 +44,7 @@
 
 	function get_image_by_imageid($imageid){
 
-		$sql = 'SELECT * FROM images WHERE imageid='.$imageid;
+		$sql = 'SELECT * FROM images WHERE imageid='.zbx_dbstr($imageid);
 		$result = DBselect($sql);
 		if($row = DBfetch($result)){
 			$row['image'] = zbx_unescape_image($row['image']);

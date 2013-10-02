@@ -131,7 +131,7 @@ class CGraphItem extends CZBXAPI{
 
 // type
 		if(!is_null($options['type'] )){
-			$sql_parts['where'][] = 'gi.type='.$options['type'];
+			$sql_parts['where'][] = 'gi.type='.zbx_dbstr($options['type']);
 		}
 
 // output
@@ -274,8 +274,8 @@ class CGraphItem extends CZBXAPI{
 
 		$sql = 'SELECT gi.gitemid '.
 				' FROM graphs_items gi '.
-				' WHERE gi.itemid='.$gitem_data['itemid'].
-					' AND gi.graphid='.$gitem_data['graphid'].
+				' WHERE gi.itemid='.zbx_dbstr($gitem_data['itemid']).
+					' AND gi.graphid='.zbx_dbstr($gitem_data['graphid']);
 		$db_res = DBselect($sql);
 		while($gitem = DBfetch($db_res)){
 			$gitemids[$gitem['gitemid']] = $gitem['gitemid'];

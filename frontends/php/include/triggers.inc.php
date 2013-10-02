@@ -132,7 +132,7 @@ return $caption;
 	function get_service_status_of_trigger($triggerid){
 		$sql = 'SELECT triggerid, priority '.
 				' FROM triggers '.
-				' WHERE triggerid='.$triggerid.
+				' WHERE triggerid='.zbx_dbstr($triggerid).
 					' AND status='.TRIGGER_STATUS_ENABLED.
 					' AND value='.TRIGGER_VALUE_TRUE;
 
@@ -322,7 +322,7 @@ return $caption;
 	}
 
 	function get_functions_by_triggerid($triggerid){
-		return DBselect('select * from functions where triggerid='.$triggerid);
+		return DBselect('select * from functions where triggerid='.zbx_dbstr($triggerid));
 	}
 
 /*
@@ -340,7 +340,7 @@ return $caption;
 	function get_triggers_by_hostid($hostid){
 		$db_triggers = DBselect('SELECT DISTINCT t.* '.
 								' FROM triggers t, functions f, items i '.
-								' WHERE i.hostid='.$hostid.
+								' WHERE i.hostid='.zbx_dbstr($hostid).
 									' AND f.itemid=i.itemid '.
 									' AND f.triggerid=t.triggerid');
 	return $db_triggers;
@@ -550,8 +550,8 @@ function utf8RawUrlDecode($source){
 
 		$result = DBexecute('INSERT INTO triggers '.
 			'  (triggerid,description,type,priority,status,comments,url,value,error,templateid) '.
-			" values ($triggerid,".zbx_dbstr($description).",$type,$priority,$status,".zbx_dbstr($comments).','.
-			zbx_dbstr($url).",2,'Trigger just added. No status update so far.',$templateid)");
+			' values ('.$triggerid.','.zbx_dbstr($description).','.zbx_dbstr($type).','.zbx_dbstr($priority).','.zbx_dbstr($status).','.zbx_dbstr($comments).','.
+			zbx_dbstr($url).',2,\'Trigger just added. No status update so far.\','.zbx_dbstr($templateid).')');
 
 		if (!$result) {
 			return	$result;
@@ -564,7 +564,7 @@ function utf8RawUrlDecode($source){
 			return false;
 		}
 
-		DBexecute('update triggers set expression='.zbx_dbstr($expression).' where triggerid='.$triggerid);
+		DBexecute('update triggers set expression='.zbx_dbstr($expression).' where triggerid='.zbx_dbstr($triggerid));
 
 		$trig_hosts = get_hosts_by_triggerid($triggerid);
 		$trig_host = DBfetch($trig_hosts);
@@ -618,13 +618,13 @@ function utf8RawUrlDecode($source){
 					// $hostid);
 		$sql='SELECT t2.triggerid, t2.expression '.
 				' FROM triggers t2, functions f1, functions f2, items i1, items i2 '.
-				' WHERE f1.triggerid='.$triggerid.
+				' WHERE f1.triggerid='.zbx_dbstr($triggerid).
 					' AND i1.itemid=f1.itemid '.
 					' AND f2.function=f1.function '.
 					' AND f2.parameter=f1.parameter '.
 					' AND i2.itemid=f2.itemid '.
 					' AND i2.key_=i1.key_ '.
-					' AND i2.hostid='.$hostid.
+					' AND i2.hostid='.zbx_dbstr($hostid).
 					' AND t2.triggerid=f2.triggerid '.
 					' AND t2.description='.zbx_dbstr($trigger['description']).
 					' AND t2.templateid=0 ';
@@ -650,9 +650,9 @@ function utf8RawUrlDecode($source){
 
 		$result = DBexecute('INSERT INTO triggers '.
 					' (triggerid,description,type,priority,status,comments,url,value,expression,templateid)'.
-					' VALUES ('.$newtriggerid.','.zbx_dbstr($trigger['description']).','.$trigger['type'].','.$trigger['priority'].','.
-					$trigger['status'].','.zbx_dbstr($trigger['comments']).','.
-					zbx_dbstr($trigger['url']).",2,'0',".($copy_mode ? 0 : $triggerid).')');
+					' VALUES ('.$newtriggerid.','.zbx_dbstr($trigger['description']).','.zbx_dbstr($trigger['type']).','.zbx_dbstr($trigger['priority']).','.
+					zbx_dbstr($trigger['status']).','.zbx_dbstr($trigger['comments']).','.
+					zbx_dbstr($trigger['url']).",2,'0',".($copy_mode ? 0 : zbx_dbstr($triggerid)).')');
 
 		if(!$result)
 			return $result;
@@ -665,7 +665,7 @@ function utf8RawUrlDecode($source){
 		while($function = DBfetch($functions)){
 			$item = get_item_by_itemid($function['itemid']);
 
-			$host_items = DBselect('SELECT * FROM items WHERE key_='.zbx_dbstr($item['key_']).' AND hostid='.$host['hostid']);
+			$host_items = DBselect('SELECT * FROM items WHERE key_='.zbx_dbstr($item['key_']).' AND hostid='.zbx_dbstr($host['hostid']));
 			$host_item = DBfetch($host_items);
 			if(!$host_item){
 				error(S_MISSING_KEY.SPACE.'"'.$item['key_'].'"'.SPACE.S_FOR_HOST_SMALL.SPACE.'"'.$host['host'].'"');
@@ -675,7 +675,7 @@ function utf8RawUrlDecode($source){
 			$newfunctionid=get_dbid('functions','functionid');
 
 			$result = DBexecute('INSERT INTO functions (functionid,itemid,triggerid,function,parameter) '.
-				" values ($newfunctionid,".$host_item['itemid'].','.$newtriggerid.','.
+				' values ('.zbx_dbstr($newfunctionid).','.zbx_dbstr($host_item['itemid']).','.zbx_dbstr($newtriggerid).','.
 				zbx_dbstr($function['function']).','.zbx_dbstr($function['parameter']).')');
 
 			$newexpression = str_replace(
@@ -684,7 +684,7 @@ function utf8RawUrlDecode($source){
 				$newexpression);
 		}
 
-		DBexecute('UPDATE triggers SET expression='.zbx_dbstr($newexpression).' WHERE triggerid='.$newtriggerid);
+		DBexecute('UPDATE triggers SET expression='.zbx_dbstr($newexpression).' WHERE triggerid='.zbx_dbstr($newtriggerid));
 
 		info(S_ADDED_TRIGGER.SPACE.'"'.$host['host'].':'.$trigger['description'].'"');
 		add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TRIGGER, $newtriggerid, $host['host'].':'.$trigger['description'], NULL, NULL, NULL);
@@ -870,7 +870,7 @@ function utf8RawUrlDecode($source){
 				$state='';
 				$sql = 'SELECT h.host,i.itemid,i.key_,f.function,f.triggerid,f.parameter,i.itemid,i.status, i.type'.
 						' FROM items i,functions f,hosts h'.
-						' WHERE f.functionid='.$functionid.
+						' WHERE f.functionid='.zbx_dbstr($functionid).
 							' AND i.itemid=f.itemid '.
 							' AND h.hostid=i.hostid';
 
@@ -1243,7 +1243,7 @@ function expand_trigger_description_by_data($row, $flag = ZBX_FLAG_TRIGGER) {
 							' FROM functions f,items i,hosts h'.
 							' WHERE f.itemid=i.itemid'.
 								' AND i.hostid=h.hostid'.
-								' AND f.functionid='.$functionid;
+								' AND f.functionid='.zbx_dbstr($functionid);
 					$host = DBfetch(DBselect($sql));
 					if (is_null($host['host'])) {
 						$host['host'] = $macro;
@@ -1261,7 +1261,7 @@ function expand_trigger_description_by_data($row, $flag = ZBX_FLAG_TRIGGER) {
 					$sql = 'SELECT i.lastvalue,i.value_type,i.itemid,i.valuemapid,i.units'.
 							' FROM items i,functions f'.
 							' WHERE i.itemid=f.itemid'.
-							' AND f.functionid='.$functionid;
+							' AND f.functionid='.zbx_dbstr($functionid);
 					$itemData = DBfetch(DBselect($sql));
 					$description = str_replace($macro, format_lastvalue($itemData), $description);
 				}
@@ -1276,7 +1276,7 @@ function expand_trigger_description_by_data($row, $flag = ZBX_FLAG_TRIGGER) {
 						$sql = 'SELECT i.value_type,i.itemid,i.valuemapid,i.units'.
 								' FROM items i,functions f'.
 								' WHERE i.itemid=f.itemid'.
-								' AND f.functionid='.$functionid;
+								' AND f.functionid='.zbx_dbstr($functionid);
 						$itemData = DBfetch(DBselect($sql));
 					}
 
@@ -1309,7 +1309,7 @@ function expand_trigger_description_by_data($row, $flag = ZBX_FLAG_TRIGGER) {
 				' WHERE f.triggerid=t.triggerid '.
 					' AND i.itemid=f.itemid '.
 					' AND h.hostid=i.hostid '.
-					' AND t.triggerid='.$triggerid;
+					' AND t.triggerid='.zbx_dbstr($triggerid);
 		$trigger = DBfetch(DBselect($sql));
 
 	return expand_trigger_description_by_data($trigger);
@@ -1341,7 +1341,7 @@ function expand_trigger_description_by_data($row, $flag = ZBX_FLAG_TRIGGER) {
 		}
 
 		if(!empty($triggers)){
-			DBexecute('UPDATE triggers SET value='.TRIGGER_VALUE_UNKNOWN.', lastchange='.$now.' WHERE '.DBcondition('triggerid',$triggers));
+			DBexecute('UPDATE triggers SET value='.TRIGGER_VALUE_UNKNOWN.', lastchange='.zbx_dbstr($now).' WHERE '.DBcondition('triggerid',$triggers));
 		}
 	return true;
 	}
@@ -1660,7 +1660,7 @@ function check_right_on_trigger_by_expression($permission,$expression){
 	function get_trigger_dependencies_by_triggerid($triggerid){
 		$result = array();
 
-		$db_deps = DBselect('SELECT * FROM trigger_depends WHERE triggerid_down='.$triggerid);
+		$db_deps = DBselect('SELECT * FROM trigger_depends WHERE triggerid_down='.zbx_dbstr($triggerid));
 		while($db_dep = DBfetch($db_deps))
 			$result[] = $db_dep['triggerid_up'];
 
@@ -1742,7 +1742,7 @@ function check_right_on_trigger_by_expression($permission,$expression){
 	function insert_dependency($triggerid_down, $triggerid_up) {
 		$triggerdepid = get_dbid('trigger_depends', 'triggerdepid');
 		return DBexecute('INSERT INTO trigger_depends (triggerdepid,triggerid_down,triggerid_up)'.
-				' VALUES ('.$triggerdepid.','.$triggerid_down.','.$triggerid_up.')');
+				' VALUES ('.$triggerdepid.','.zbx_dbstr($triggerid_down).','.zbx_dbstr($triggerid_up).')');
 	}
 
 	function replace_triggers_depenedencies($new_triggerids){
@@ -1771,10 +1771,10 @@ function check_right_on_trigger_by_expression($permission,$expression){
 		foreach($deps as $id => $val){
 			$sql = 'SELECT t.triggerid '.
 				' FROM triggers t,functions f,items i '.
-				' WHERE t.templateid='.$val.
+				' WHERE t.templateid='.zbx_dbstr($val).
 					' AND f.triggerid=t.triggerid '.
 					' AND f.itemid=i.itemid '.
-					' AND i.hostid='.$hostid;
+					' AND i.hostid='.zbx_dbstr($hostid);
 			if($db_new_dep = DBfetch(DBselect($sql))){
 				$deps[$id] = $db_new_dep['triggerid'];
 			}
@@ -1810,7 +1810,7 @@ function check_right_on_trigger_by_expression($permission,$expression){
 		$level++;
 		$result = true;
 
-		$sql = 'SELECT triggerid_up FROM trigger_depends WHERE triggerid_down='.$triggerid_up;
+		$sql = 'SELECT triggerid_up FROM trigger_depends WHERE triggerid_down='.zbx_dbstr($triggerid_up);
 		$res = DBselect($sql);
 		while(($trig = DBfetch($res)) && $result){
 			$result &= check_dependency_by_triggerid($triggerid,$trig['triggerid_up'],$level);		// RECURSION!!!
@@ -2041,7 +2041,7 @@ function check_right_on_trigger_by_expression($permission,$expression){
 			}
 
 			if ($unlink_mode) {
-				if (DBexecute('UPDATE triggers SET templateid=0 WHERE triggerid='.$trigger['triggerid'])) {
+				if (DBexecute('UPDATE triggers SET templateid=0 WHERE triggerid='.zbx_dbstr($trigger['triggerid']))) {
 					info(sprintf(S_TRIGGER_UNLINKED, $host['host'].':'.$trigger['description']));
 				}
 			}
@@ -2296,7 +2296,7 @@ function copy_template_triggers($hostid, $templateid, $copy_mode = false) {
 			$dep_table->setAttribute('style', 'width: 200px;');
 			$dep_table->addRow(bold(S_DEPENDS_ON.':'));
 
-			$sql_dep = 'SELECT * FROM trigger_depends WHERE triggerid_down='.$triggerid;
+			$sql_dep = 'SELECT * FROM trigger_depends WHERE triggerid_down='.zbx_dbstr($triggerid);
 			$dep_res = DBselect($sql_dep);
 			while($dep_row = DBfetch($dep_res)){
 				$dep_table->addRow(SPACE.'-'.SPACE.expand_trigger_description($dep_row['triggerid_up']));
@@ -2318,7 +2318,7 @@ function copy_template_triggers($hostid, $templateid, $copy_mode = false) {
 			$dep_table->setAttribute('style', 'width: 200px;');
 			$dep_table->addRow(bold(S_DEPENDENT.':'));
 
-			$sql_dep = 'SELECT * FROM trigger_depends WHERE triggerid_up='.$triggerid;
+			$sql_dep = 'SELECT * FROM trigger_depends WHERE triggerid_up='.zbx_dbstr($triggerid);
 			$dep_res = DBselect($sql_dep);
 			while($dep_row = DBfetch($dep_res)){
 				$dep_table->addRow(SPACE.'-'.SPACE.expand_trigger_description($dep_row['triggerid_down']));
@@ -2363,9 +2363,9 @@ function copy_template_triggers($hostid, $templateid, $copy_mode = false) {
 		if(($period_start>0) && ($period_start <= time())){
 			$sql='SELECT e.eventid, e.value '.
 					' FROM events e '.
-					' WHERE e.objectid='.$triggerid.
+					' WHERE e.objectid='.zbx_dbstr($triggerid).
 						' AND e.object='.EVENT_OBJECT_TRIGGER.
-						' AND e.clock<'.$period_start.
+						' AND e.clock<'.zbx_dbstr($period_start).
 					' ORDER BY e.eventid DESC';
 			if($row = DBfetch(DBselect($sql,1))){
 				$start_value = $row['value'];
@@ -2375,11 +2375,11 @@ function copy_template_triggers($hostid, $templateid, $copy_mode = false) {
 
 		$sql='SELECT COUNT(*) as cnt, MIN(clock) as minn, MAX(clock) as maxx '.
 				' FROM events '.
-				' WHERE objectid='.$triggerid.
+				' WHERE objectid='.zbx_dbstr($triggerid).
 					' AND object='.EVENT_OBJECT_TRIGGER;
 
-		if($period_start!=0)	$sql .= ' AND clock>='.$period_start;
-		if($period_end!=0)		$sql .= ' AND clock<='.$period_end;
+		if($period_start!=0)	$sql .= ' AND clock>='.zbx_dbstr($period_start);
+		if($period_end!=0)		$sql .= ' AND clock<='.zbx_dbstr($period_end);
 //SDI($sql);
 
 		$row=DBfetch(DBselect($sql));
@@ -2419,10 +2419,10 @@ function copy_template_triggers($hostid, $templateid, $copy_mode = false) {
 		$rows=0;
 		$sql = 'SELECT eventid,clock,value '.
 				' FROM events '.
-				' WHERE objectid='.$triggerid.
+				' WHERE objectid='.zbx_dbstr($triggerid).
 					' AND object='.EVENT_OBJECT_TRIGGER.
-					' AND clock>='.$min.
-					' AND clock<='.$max.
+					' AND clock>='.zbx_dbstr($min).
+					' AND clock<='.zbx_dbstr($max).
 				' ORDER BY clock ASC, eventid ASC';
 		$result=DBselect($sql);
 		while($row=DBfetch($result)){
@@ -2506,7 +2506,7 @@ function copy_template_triggers($hostid, $templateid, $copy_mode = false) {
 
 		$sql = 'SELECT t.triggerid, t.value '.
 				' FROM trigger_depends d, triggers t '.
-				' WHERE d.triggerid_down='.$triggerid.
+				' WHERE d.triggerid_down='.zbx_dbstr($triggerid).
 					' AND d.triggerid_up=t.triggerid';
 
 		$result = DBselect($sql);
@@ -2589,7 +2589,7 @@ function copy_template_triggers($hostid, $templateid, $copy_mode = false) {
 		$functionid=trigger_get_N_functionid($expression,$function);
 		if(isset($functionid)){
 			$row=DBfetch(DBselect('select i.* from items i, functions f '.
-				' where i.itemid=f.itemid and f.functionid='.$functionid));
+				' where i.itemid=f.itemid and f.functionid='.zbx_dbstr($functionid)));
 			if($row)
 			{
 				$result=($flag == ZBX_FLAG_TRIGGER)?

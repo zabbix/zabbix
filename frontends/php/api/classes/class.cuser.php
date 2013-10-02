@@ -463,13 +463,13 @@ Copt::memoryPick();
 					zbx_dbstr($user['alias']).','.
 					zbx_dbstr(md5($user['passwd'])).','.
 					zbx_dbstr($user['url']).','.
-					$user['autologin'].','.
-					$user['autologout'].','.
+					zbx_dbstr($user['autologin']).','.
+					zbx_dbstr($user['autologout']).','.
 					zbx_dbstr($user['lang']).','.
 					zbx_dbstr($user['theme']).','.
-					$user['refresh'].','.
-					$user['rows_per_page'].','.
-					$user['type'].
+					zbx_dbstr($user['refresh']).','.
+					zbx_dbstr($user['rows_per_page']).','.
+					zbx_dbstr($user['type']).
 				')');
 
 			if($result){
@@ -478,7 +478,7 @@ Copt::memoryPick();
 					if(!$result) break;
 					$users_groups_id = get_dbid("users_groups","id");
 					$result = DBexecute('INSERT INTO users_groups (id,usrgrpid,userid)'.
-						'values('.$users_groups_id.','.$groupid.','.$userid.')');
+						'values('.$users_groups_id.','.zbx_dbstr($groupid).','.zbx_dbstr($userid).')');
 				}
 			}
 
@@ -487,8 +487,8 @@ Copt::memoryPick();
 					if(!$result) break;
 					$mediaid = get_dbid('media', 'mediaid');
 					$result = DBexecute('INSERT INTO media (mediaid,userid,mediatypeid,sendto,active,severity,period)'.
-						' VALUES ('.$mediaid.','.$userid.','.$media_data['mediatypeid'].','.
-						zbx_dbstr($media_data['sendto']).','.$media_data['active'].','.$media_data['severity'].','.
+						' VALUES ('.$mediaid.','.zbx_dbstr($userid).','.zbx_dbstr($media_data['mediatypeid']).','.
+						zbx_dbstr($media_data['sendto']).','.zbx_dbstr($media_data['active']).','.zbx_dbstr($media_data['severity']).','.
 						zbx_dbstr($media_data['period']).')');
 				}
 			}
@@ -613,14 +613,14 @@ Copt::memoryPick();
 						' alias='.zbx_dbstr($user['alias']).', '.
 						' passwd='.zbx_dbstr($user['passwd']).', '.
 						' url='.zbx_dbstr($user['url']).', '.
-						' autologin='.$user['autologin'].', '.
-						' autologout='.$user['autologout'].', '.
+						' autologin='.zbx_dbstr($user['autologin']).', '.
+						' autologout='.zbx_dbstr($user['autologout']).', '.
 						' lang='.zbx_dbstr($user['lang']).', '.
 						' theme='.zbx_dbstr($user['theme']).', '.
-						' refresh='.$user['refresh'].', '.
-						' rows_per_page='.$user['rows_per_page'].', '.
-						' type='.$user['type'].
-					' WHERE userid='.$user['userid'];
+						' refresh='.zbx_dbstr($user['refresh']).', '.
+						' rows_per_page='.zbx_dbstr($user['rows_per_page']).', '.
+						' type='.zbx_dbstr($user['type']).
+					' WHERE userid='.zbx_dbstr($user['userid']);
 
 			$result = DBexecute($sql);
 
@@ -644,7 +644,7 @@ Copt::memoryPick();
 
 
 			if($result && isset($user['usrgrps']) && !is_null($user['usrgrps'])){
-				DBexecute('DELETE FROM users_groups WHERE userid='.$user['userid']);
+				DBexecute('DELETE FROM users_groups WHERE userid='.zbx_dbstr($user['userid']));
 
 				$options = array(
 					'usrgrpids' => zbx_objectValues($user['usrgrps'], 'usrgrpid'),
@@ -669,7 +669,7 @@ Copt::memoryPick();
 					}
 
 					$users_groups_id = get_dbid('users_groups', 'id');
-					$result = DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES ('.$users_groups_id.','.$groupid.','.$user['userid'].')');
+					$result = DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES ('.$users_groups_id.','.zbx_dbstr($groupid).','.zbx_dbstr($user['userid']).')');
 				}
 			}
 /*
@@ -771,13 +771,13 @@ Copt::memoryPick();
 		$sql = 'UPDATE users SET '.
 					' passwd='.zbx_dbstr($user['passwd']).', '.
 					' url='.zbx_dbstr($user['url']).', '.
-					' autologin='.$user['autologin'].', '.
-					' autologout='.$user['autologout'].', '.
+					' autologin='.zbx_dbstr($user['autologin']).', '.
+					' autologout='.zbx_dbstr($user['autologout']).', '.
 					' lang='.zbx_dbstr($user['lang']).', '.
 					' theme='.zbx_dbstr($user['theme']).', '.
-					' refresh='.$user['refresh'].', '.
-					' rows_per_page='.$user['rows_per_page'].
-				' WHERE userid='.$user['userid'];
+					' refresh='.zbx_dbstr($user['refresh']).', '.
+					' rows_per_page='.zbx_dbstr($user['rows_per_page']).
+				' WHERE userid='.zbx_dbstr($user['userid']);
 
 		$result = DBexecute($sql);
 
@@ -912,8 +912,8 @@ Copt::memoryPick();
 				$mediaid = get_dbid('media','mediaid');
 
 				$sql='INSERT INTO media (mediaid,userid,mediatypeid,sendto,active,severity,period) '.
-						' VALUES ('.$mediaid.','.$user['userid'].','.$media['mediatypeid'].','.
-									zbx_dbstr($media['sendto']).','.$media['active'].','.$media['severity'].','.
+						' VALUES ('.$mediaid.','.zbx_dbstr($user['userid']).','.zbx_dbstr($media['mediatypeid']).','.
+									zbx_dbstr($media['sendto']).','.zbx_dbstr($media['active']).','.zbx_dbstr($media['severity']).','.
 									zbx_dbstr($media['period']).')';
 
 				$result = DBexecute($sql);
@@ -1039,12 +1039,12 @@ Copt::memoryPick();
 				}
 
 				$sql = 'UPDATE media '.
-						' SET mediatypeid='.$media['mediatypeid'].','.
+						' SET mediatypeid='.zbx_dbstr($media['mediatypeid']).','.
 							' sendto='.zbx_dbstr($media['sendto']).','.
-							' active='.$media['active'].','.
-							' severity='.$media['severity'].','.
+							' active='.zbx_dbstr($media['active']).','.
+							' severity='.zbx_dbstr($media['severity']).','.
 							' period='.zbx_dbstr($media['period']).
-						' WHERE mediaid='.$media['mediaid'];
+						' WHERE mediaid='.zbx_dbstr($media['mediaid']);
 				$result = DBexecute($sql);
 				if(!$result){
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_CANT_UPDATE_USER_MEDIAS);
@@ -1255,7 +1255,7 @@ Copt::memoryPick();
 							' SET attempt_failed='.$attempt['attempt_failed'].','.
 								' attempt_clock='.time().','.
 								' attempt_ip='.zbx_dbstr($ip).
-							' WHERE userid='.$attempt['userid'];
+							' WHERE userid='.zbx_dbstr($attempt['userid']);
 					DBexecute($sql);
 				}
 			}

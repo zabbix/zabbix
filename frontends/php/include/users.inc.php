@@ -91,11 +91,11 @@
 	function add_user_to_group($userid,$usrgrpid){
 		$result = false;
 		if(granted2move_user($userid,$usrgrpid)){
-			DBexecute('DELETE FROM users_groups WHERE userid='.$userid.' AND usrgrpid='.$usrgrpid);
+			DBexecute('DELETE FROM users_groups WHERE userid='.zbx_dbstr($userid).' AND usrgrpid='.zbx_dbstr($usrgrpid));
 
 			$users_groups_id = get_dbid("users_groups","id");
 			$result = DBexecute('INSERT INTO users_groups (id,usrgrpid,userid) '.
-									' VALUES ('.$users_groups_id.','.$usrgrpid.','.$userid.')');
+									' VALUES ('.$users_groups_id.','.zbx_dbstr($usrgrpid).','.zbx_dbstr($userid).')');
 		}
 		else{
 			error(S_USER_CANNOT_CHANGE_STATUS);
@@ -106,7 +106,7 @@
 	function remove_user_from_group($userid,$usrgrpid){
 		$result = false;
 		if(granted2move_user($userid,$usrgrpid)){
-			$result = DBexecute('DELETE FROM users_groups WHERE userid='.$userid.' AND usrgrpid='.$usrgrpid);
+			$result = DBexecute('DELETE FROM users_groups WHERE userid='.zbx_dbstr($userid).' AND usrgrpid='.zbx_dbstr($usrgrpid));
 		}
 		else{
 			error(S_USER_CANNOT_CHANGE_STATUS);
@@ -156,7 +156,7 @@
 		if($users_status == GROUP_STATUS_DISABLED) $grant = granted2update_group($usrgrpids);
 
 		if($grant)
-			$res = DBexecute('UPDATE usrgrp SET users_status='.$users_status.' WHERE '.DBcondition('usrgrpid',$usrgrpids));
+			$res = DBexecute('UPDATE usrgrp SET users_status='.zbx_dbstr($users_status).' WHERE '.DBcondition('usrgrpid',$usrgrpids));
 		else
 			error(S_USER_CANNOT_CHANGE_STATUS);
 
@@ -172,7 +172,7 @@
 		if($gui_access == GROUP_GUI_ACCESS_DISABLED) $grant = granted2update_group($usrgrpids);
 
 		if($grant)
-			$res = DBexecute('UPDATE usrgrp SET gui_access='.$gui_access.' WHERE '.DBcondition('usrgrpid',$usrgrpids));
+			$res = DBexecute('UPDATE usrgrp SET gui_access='.zbx_dbstr($gui_access).' WHERE '.DBcondition('usrgrpid',$usrgrpids));
 		else
 			error(S_USER_CANNOT_CHANGE_GUI_ACCESS);
 
@@ -182,14 +182,14 @@
 	function change_group_api_access($usrgrpids, $api_access){
 		zbx_value2array($usrgrpids);
 		$res = false;
-		$res = DBexecute('UPDATE usrgrp SET api_access='.$api_access.' WHERE '.DBcondition('usrgrpid',$usrgrpids));
+		$res = DBexecute('UPDATE usrgrp SET api_access='.zbx_dbstr($api_access).' WHERE '.DBcondition('usrgrpid',$usrgrpids));
 	return $res;
 	}
 
 	function change_group_debug_mode($usrgrpids, $debug_mode){
 		zbx_value2array($usrgrpids);
 		$res = false;
-		$res = DBexecute('UPDATE usrgrp SET debug_mode='.$debug_mode.' WHERE '.DBcondition('usrgrpid',$usrgrpids));
+		$res = DBexecute('UPDATE usrgrp SET debug_mode='.zbx_dbstr($debug_mode).' WHERE '.DBcondition('usrgrpid',$usrgrpids));
 	return $res;
 	}
 ?>

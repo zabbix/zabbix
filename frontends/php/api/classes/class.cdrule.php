@@ -588,7 +588,7 @@ COpt::memoryPick();
 		if($host["status"] == HOST_STATUS_TEMPLATE ){
 			$sql = 'SELECT DISTINCT count(i.hostid) as count
 					FROM checks i
-					WHERE i.hostid<>'.$host['hostid'].
+					WHERE i.hostid<>'.zbx_dbstr($host['hostid']).
 						' AND '.DBcondition('i.checkid', $checkids);
 
 			$host_count = DBfetch(DBselect($sql));
@@ -641,7 +641,7 @@ COpt::memoryPick();
 
 		$sql = 'SELECT curr.checkid
 				FROM drules_checks gi, checks curr, checks src
-				WHERE gi.druleid='.$druleid.
+				WHERE gi.druleid='.zbx_dbstr($druleid).
 					' AND gi.checkid=curr.checkid
 					AND curr.key_=src.key_
 					AND '.DBcondition('src.checkid', $checks);
@@ -653,7 +653,7 @@ COpt::memoryPick();
 
 		$sql = 'DELETE
 				FROM drules_checks
-				WHERE druleid='.$druleid.
+				WHERE druleid='.zbx_dbstr($druleid).
 					' AND '.DBcondition('checkid', $gchecks);
 		$result = DBselect($sql);
 

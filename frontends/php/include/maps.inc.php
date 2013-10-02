@@ -60,7 +60,7 @@
 	}
 
 	function get_sysmap_by_sysmapid($sysmapid){
-		$row = DBfetch(DBselect('SELECT * FROM sysmaps WHERE sysmapid='.$sysmapid));
+		$row = DBfetch(DBselect('SELECT * FROM sysmaps WHERE sysmapid='.zbx_dbstr($sysmapid)));
 		if($row){
 			return	$row;
 		}
@@ -99,9 +99,9 @@
 
 		$result&=DBexecute('INSERT INTO sysmaps_links '.
 			' (linkid,sysmapid,label,selementid1,selementid2,drawtype,color) '.
-			' VALUES ('.$linkid.','.$link['sysmapid'].','.zbx_dbstr($link['label']).','.
-						$link['selementid1'].','.$link['selementid2'].','.
-						$link['drawtype'].','.zbx_dbstr($link['color']).')');
+			' VALUES ('.$linkid.','.zbx_dbstr($link['sysmapid']).','.zbx_dbstr($link['label']).','.
+						zbx_dbstr($link['selementid1']).','.zbx_dbstr($link['selementid2']).','.
+						zbx_dbstr($link['drawtype']).','.zbx_dbstr($link['color']).')');
 
 		if(!$result)
 			return $result;
@@ -138,13 +138,13 @@
 		}
 
 		$result&=DBexecute('UPDATE sysmaps_links SET '.
-							' sysmapid='.$link['sysmapid'].', '.
+							' sysmapid='.zbx_dbstr($link['sysmapid']).', '.
 							' label='.zbx_dbstr($link['label']).', '.
-							' selementid1='.$link['selementid1'].', '.
-							' selementid2='.$link['selementid2'].', '.
-							' drawtype='.$link['drawtype'].', '.
+							' selementid1='.zbx_dbstr($link['selementid1']).', '.
+							' selementid2='.zbx_dbstr($link['selementid2']).', '.
+							' drawtype='.zbx_dbstr($link['drawtype']).', '.
 							' color='.zbx_dbstr($link['color']).
-						' WHERE linkid='.$link['linkid']);
+						' WHERE linkid='.zbx_dbstr($link['linkid']));
 	return	$result;
 	}
 
@@ -160,7 +160,7 @@
 	function add_link_trigger($linkid,$triggerid,$drawtype,$color){
 		$linktriggerid=get_dbid("sysmaps_link_triggers","linktriggerid");
 		$sql = 'INSERT INTO sysmaps_link_triggers (linktriggerid,linkid,triggerid,drawtype,color) '.
-					" VALUES ($linktriggerid,$linkid,$triggerid,$drawtype,".zbx_dbstr($color).')';
+					' VALUES ('.zbx_dbstr($linktriggerid).','.zbx_dbstr($linkid).','.zbx_dbstr($triggerid).','.zbx_dbstr($drawtype).','.zbx_dbstr($color).')';
 	return DBexecute($sql);
 	}
 
@@ -188,7 +188,7 @@
 
 		$db_elements = DBselect('SELECT elementid, elementtype '.
 						' FROM sysmaps_elements '.
-						' WHERE sysmapid='.$elementid);
+						' WHERE sysmapid='.zbx_dbstr($elementid));
 
 		while($element = DBfetch($db_elements)){
 			if(check_circle_elements_link($sysmapid,$element["elementid"],$element["elementtype"]))
@@ -564,14 +564,14 @@
 			$resolveHostMacros = true;
 
 			if($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
-				$sql = 'SELECT host, dns, ip, useip FROM hosts WHERE hostid='.$selement['elementid'];
+				$sql = 'SELECT host, dns, ip, useip FROM hosts WHERE hostid='.zbx_dbstr($selement['elementid']);
 			}
 			else{
 				$sql ='SELECT h.host, h.dns, h.ip, h.useip'.
 					' FROM hosts h, items i, functions f'.
 					' WHERE h.hostid=i.hostid'.
 					' AND i.itemid=f.itemid'.
-					' AND f.triggerid='.$selement['elementid'];
+					' AND f.triggerid='.zbx_dbstr($selement['elementid']);
 			}
 			$db_host = DBfetch(DBselect($sql));
 		}
@@ -716,7 +716,7 @@
 				$sql = 'SELECT '.$function.'(value) as value '.
 						' FROM '.$history_table.
 						' WHERE clock>'.(time() - $parameter).
-						' AND itemid='.$item['itemid'];
+						' AND itemid='.zbx_dbstr($item['itemid']);
 				$result = DBselect($sql);
 				if(null === ($row = DBfetch($result)) || null === $row['value'])
 					$label = str_replace($expr, '('.S_NO_DATA_SMALL.')', $label);
@@ -742,7 +742,7 @@
 			case SYSMAP_ELEMENT_TYPE_MAP:
 				$sql = 'SELECT DISTINCT elementtype,elementid'.
 						' FROM sysmaps_elements'.
-						' WHERE sysmapid='.$db_element['elementid'];
+						' WHERE sysmapid='.zbx_dbstr($db_element['elementid']);
 				$db_mapselements = DBselect($sql);
 				while($db_mapelement = DBfetch($db_mapselements)){
 					get_map_elements($db_mapelement, $elements);

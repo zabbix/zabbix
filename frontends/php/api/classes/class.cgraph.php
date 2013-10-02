@@ -225,7 +225,7 @@ class CGraph extends CZBXAPI{
 
 // type
 		if(!is_null($options['type'] )){
-			$sql_parts['where'][] = 'g.type='.$options['type'];
+			$sql_parts['where'][] = 'g.type='.zbx_dbstr($options['type']);
 		}
 
 // templated
@@ -719,22 +719,22 @@ COpt::memoryPick();
 			'graphid' => $graphid,
 			'name' => zbx_dbstr($graph['name'])
 		);
-		if(isset($graph['width'])) $values['width'] = $graph['width'];
-		if(isset($graph['height'])) $values['height'] = $graph['height'];
-		if(isset($graph['ymin_type'])) $values['ymin_type'] = $graph['ymin_type'];
-		if(isset($graph['ymax_type'])) $values['ymax_type'] = $graph['ymax_type'];
-		if(isset($graph['yaxismin'])) $values['yaxismin'] = $graph['yaxismin'];
-		if(isset($graph['yaxismax'])) $values['yaxismax'] = $graph['yaxismax'];
-		if(isset($graph['ymin_itemid'])) $values['ymin_itemid'] = $graph['ymin_itemid'];
-		if(isset($graph['ymax_itemid'])) $values['ymax_itemid'] = $graph['ymax_itemid'];
-		if(isset($graph['show_work_period'])) $values['show_work_period'] = $graph['show_work_period'];
-		if(isset($graph['show_triggers'])) $values['show_triggers'] = $graph['show_triggers'];
-		if(isset($graph['graphtype'])) $values['graphtype'] = $graph['graphtype'];
-		if(isset($graph['show_legend'])) $values['show_legend'] = $graph['show_legend'];
-		if(isset($graph['show_3d'])) $values['show_3d'] = $graph['show_3d'];
-		if(isset($graph['percent_left'])) $values['percent_left'] = $graph['percent_left'];
-		if(isset($graph['percent_right'])) $values['percent_right'] = $graph['percent_right'];
-		if(isset($graph['templateid'])) $values['templateid'] = $graph['templateid'];
+		if(isset($graph['width'])) $values['width'] = zbx_dbstr($graph['width']);
+		if(isset($graph['height'])) $values['height'] = zbx_dbstr($graph['height']);
+		if(isset($graph['ymin_type'])) $values['ymin_type'] = zbx_dbstr($graph['ymin_type']);
+		if(isset($graph['ymax_type'])) $values['ymax_type'] = zbx_dbstr($graph['ymax_type']);
+		if(isset($graph['yaxismin'])) $values['yaxismin'] = zbx_dbstr($graph['yaxismin']);
+		if(isset($graph['yaxismax'])) $values['yaxismax'] = zbx_dbstr($graph['yaxismax']);
+		if(isset($graph['ymin_itemid'])) $values['ymin_itemid'] = zbx_dbstr($graph['ymin_itemid']);
+		if(isset($graph['ymax_itemid'])) $values['ymax_itemid'] = zbx_dbstr($graph['ymax_itemid']);
+		if(isset($graph['show_work_period'])) $values['show_work_period'] = zbx_dbstr($graph['show_work_period']);
+		if(isset($graph['show_triggers'])) $values['show_triggers'] = zbx_dbstr($graph['show_triggers']);
+		if(isset($graph['graphtype'])) $values['graphtype'] = zbx_dbstr($graph['graphtype']);
+		if(isset($graph['show_legend'])) $values['show_legend'] = zbx_dbstr($graph['show_legend']);
+		if(isset($graph['show_3d'])) $values['show_3d'] = zbx_dbstr($graph['show_3d']);
+		if(isset($graph['percent_left'])) $values['percent_left'] = zbx_dbstr($graph['percent_left']);
+		if(isset($graph['percent_right'])) $values['percent_right'] = zbx_dbstr($graph['percent_right']);
+		if(isset($graph['templateid'])) $values['templateid'] = zbx_dbstr($graph['templateid']);
 
 		$sql = 'INSERT INTO graphs ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
 		if(!DBexecute($sql))
@@ -745,14 +745,14 @@ COpt::memoryPick();
 				'gitemid' => get_dbid('graphs_items', 'gitemid'),
 				'graphid' => $graphid,
 			);
-			if(isset($gitem['itemid'])) $values['itemid'] = $gitem['itemid'];
+			if(isset($gitem['itemid'])) $values['itemid'] = zbx_dbstr($gitem['itemid']);
 			if(isset($gitem['color'])) $values['color'] = zbx_dbstr($gitem['color']);
-			if(isset($gitem['drawtype'])) $values['drawtype'] = $gitem['drawtype'];
-			if(isset($gitem['sortorder'])) $values['sortorder'] = $gitem['sortorder'];
-			if(isset($gitem['yaxisside'])) $values['yaxisside'] = $gitem['yaxisside'];
-			if(isset($gitem['calc_fnc'])) $values['calc_fnc'] = $gitem['calc_fnc'];
-			if(isset($gitem['type'])) $values['type'] = $gitem['type'];
-			if(isset($gitem['periods_cnt'])) $values['periods_cnt'] = $gitem['periods_cnt'];
+			if(isset($gitem['drawtype'])) $values['drawtype'] = zbx_dbstr($gitem['drawtype']);
+			if(isset($gitem['sortorder'])) $values['sortorder'] = zbx_dbstr($gitem['sortorder']);
+			if(isset($gitem['yaxisside'])) $values['yaxisside'] = zbx_dbstr($gitem['yaxisside']);
+			if(isset($gitem['calc_fnc'])) $values['calc_fnc'] = zbx_dbstr($gitem['calc_fnc']);
+			if(isset($gitem['type'])) $values['type'] = zbx_dbstr($gitem['type']);
+			if(isset($gitem['periods_cnt'])) $values['periods_cnt'] = zbx_dbstr($gitem['periods_cnt']);
 
 			$sql = 'INSERT INTO graphs_items ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
 			DBexecute($sql) or self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
@@ -768,7 +768,7 @@ COpt::memoryPick();
 
 
 		if(isset($graph['gitems'])){
-			if(!DBexecute('DELETE FROM graphs_items WHERE graphid='.$graph['graphid']))
+			if(!DBexecute('DELETE FROM graphs_items WHERE graphid='.zbx_dbstr($graph['graphid'])))
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
 			foreach($graph['gitems'] as $inum => $gitem){

@@ -343,7 +343,7 @@ class CScript extends CZBXAPI{
 		$sql = 'SELECT scriptid '.
 				' FROM scripts '.
 				' WHERE '.DBin_node('scriptid').
-					' AND name='.$script['name'];
+					' AND name='.zbx_dbstr($script['name']);
 		$res = DBselect($sql);
 		while($script = DBfetch($res)){
 			$scriptids[$script['scriptid']] = $script['scriptid'];

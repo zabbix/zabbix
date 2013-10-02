@@ -146,11 +146,11 @@ require_once('include/perm.inc.php');
 	}
 
 	function get_discovery_rule_by_druleid($druleid){
-		return DBfetch(DBselect('select * from drules where druleid='.$druleid));
+		return DBfetch(DBselect('select * from drules where druleid='.zbx_dbstr($druleid)));
 	}
 
 	function set_discovery_rule_status($druleid, $status){
-		return DBexecute('update drules set status='.$status.' where druleid='.$druleid);
+		return DBexecute('update drules set status='.zbx_dbstr($status).' where druleid='.zbx_dbstr($druleid));
 	}
 
 	function add_discovery_check($druleid, $type, $ports, $key, $snmp_community,
@@ -168,9 +168,9 @@ require_once('include/perm.inc.php');
 		$dcheckid = get_dbid('dchecks', 'dcheckid');
 		$result = DBexecute('insert into dchecks (dcheckid,druleid,type,ports,key_,snmp_community'.
 				',snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase) '.
-				' values ('.$dcheckid.','.$druleid.','.$type.','.zbx_dbstr($ports).','.
+				' values ('.$dcheckid.','.zbx_dbstr($druleid).','.zbx_dbstr($type).','.zbx_dbstr($ports).','.
 				zbx_dbstr($key).','.zbx_dbstr($snmp_community).','.zbx_dbstr($snmpv3_securityname).','.
-				$snmpv3_securitylevel.','.zbx_dbstr($snmpv3_authpassphrase).','.zbx_dbstr($snmpv3_privpassphrase).')');
+				zbx_dbstr($snmpv3_securitylevel).','.zbx_dbstr($snmpv3_authpassphrase).','.zbx_dbstr($snmpv3_privpassphrase).')');
 
 		if(!$result)
 			return $result;
@@ -192,7 +192,7 @@ require_once('include/perm.inc.php');
 
 		$druleid = get_dbid('drules', 'druleid');
 		$result = DBexecute('insert into drules (druleid,proxy_hostid,name,iprange,delay,status) '.
-			' values ('.$druleid.','.$proxy_hostid.','.zbx_dbstr($name).','.zbx_dbstr($iprange).','.$delay.','.$status.')');
+			' values ('.$druleid.','.zbx_dbstr($proxy_hostid).','.zbx_dbstr($name).','.zbx_dbstr($iprange).','.zbx_dbstr($delay).','.zbx_dbstr($status).')');
 
 		if($result && isset($dchecks)){
 			$unique_dcheckid = 0;
@@ -204,8 +204,8 @@ require_once('include/perm.inc.php');
 					$unique_dcheckid = $data['dcheckid'];
 			}
 			DBexecute('UPDATE drules'.
-					' SET unique_dcheckid='.$unique_dcheckid.
-					' WHERE druleid='.$druleid);
+					' SET unique_dcheckid='.zbx_dbstr($unique_dcheckid).
+					' WHERE druleid='.zbx_dbstr($druleid));
 
 			$result = $druleid;
 		}
@@ -229,8 +229,8 @@ require_once('include/perm.inc.php');
 			}
 		}
 
-		$result = DBexecute('update drules set proxy_hostid='.$proxy_hostid.',name='.zbx_dbstr($name).',iprange='.zbx_dbstr($iprange).','.
-			'delay='.$delay.',status='.$status.' where druleid='.$druleid);
+		$result = DBexecute('update drules set proxy_hostid='.zbx_dbstr($proxy_hostid).',name='.zbx_dbstr($name).',iprange='.zbx_dbstr($iprange).','.
+			'delay='.zbx_dbstr($delay).',status='.zbx_dbstr($status).' where druleid='.zbx_dbstr($druleid));
 
 		if($result && isset($dchecks)){
 			$unique_dcheckid = 0;
@@ -245,8 +245,8 @@ require_once('include/perm.inc.php');
 			}
 
 			DBexecute('UPDATE drules'.
-					' SET unique_dcheckid='.$unique_dcheckid.
-					' WHERE druleid='.$druleid);
+					' SET unique_dcheckid='.zbx_dbstr($unique_dcheckid).
+					' WHERE druleid='.zbx_dbstr($druleid));
 		}
 
 		if($result && isset($dchecks_deleted) && !empty($dchecks_deleted))
@@ -292,7 +292,7 @@ require_once('include/perm.inc.php');
 		$sql = 'SELECT DISTINCT actionid '.
 				' FROM conditions '.
 				' WHERE conditiontype='.CONDITION_TYPE_DRULE.
-					" AND value='$druleid'";
+					' AND value='.zbx_dbstr($druleid);
 
 		$db_actions = DBselect($sql);
 		while($db_action = DBfetch($db_actions))
@@ -307,26 +307,26 @@ require_once('include/perm.inc.php');
 // delete action conditions
 			DBexecute('DELETE FROM conditions '.
 					' WHERE conditiontype='.CONDITION_TYPE_DRULE.
-					" AND value='$druleid'");
+					' AND value='.zbx_dbstr($druleid));
 		}
 
 		if($result){
 			$db_dhosts = DBselect('select dhostid from dhosts'.
-					' where druleid='.$druleid.' and '.DBin_node('dhostid'));
+					' where druleid='.zbx_dbstr($druleid).' and '.DBin_node('dhostid'));
 
 			while ($result && ($db_dhost = DBfetch($db_dhosts)))
 				$result = DBexecute('delete from dservices where'.
-						' dhostid='.$db_dhost['dhostid']);
+						' dhostid='.zbx_dbstr($db_dhost['dhostid']));
 		}
 
 		if ($result)
-			$result = DBexecute('delete from dhosts where druleid='.$druleid);
+			$result = DBexecute('delete from dhosts where druleid='.zbx_dbstr($druleid));
 
 		if ($result)
-			$result = DBexecute('delete from dchecks where druleid='.$druleid);
+			$result = DBexecute('delete from dchecks where druleid='.zbx_dbstr($druleid));
 
 		if ($result)
-			$result = DBexecute('delete from drules where druleid='.$druleid);
+			$result = DBexecute('delete from drules where druleid='.zbx_dbstr($druleid));
 
 		return $result;
 	}

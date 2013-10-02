@@ -95,7 +95,7 @@ function check_permission_for_action_conditions($conditions) {
 }
 
 function get_action_by_actionid($actionid){
-	$sql='select * from actions where actionid='.$actionid;
+	$sql='select * from actions where actionid='.zbx_dbstr($actionid);
 	$result=DBselect($sql);
 
 	if($row=DBfetch($result)){
@@ -220,7 +220,7 @@ function condition_value2str($conditiontype, $value){
 			break;
 		case CONDITION_TYPE_DCHECK:
 			$row = DBfetch(DBselect('SELECT DISTINCT r.name,c.dcheckid,c.type,c.key_,c.snmp_community,c.ports'.
-					' FROM drules r,dchecks c WHERE r.druleid=c.druleid AND c.dcheckid='.$value));
+					' FROM drules r,dchecks c WHERE r.druleid=c.druleid AND c.dcheckid='.zbx_dbstr($value)));
 			$str_val = $row['name'].':'.discovery_check2str($row['type'],
 					$row['snmp_community'], $row['key_'], $row['ports']);
 			break;
@@ -342,7 +342,7 @@ function get_operation_desc($type=SHORT_DESCRITION, $data){
 							$sql = 'SELECT a.def_shortdata,a.def_longdata '.
 									' FROM actions a, operations o '.
 									' WHERE a.actionid=o.actionid '.
-										' AND o.operationid='.$data['operationid'];
+										' AND o.operationid='.zbx_dbstr($data['operationid']);
 							if($rows = DBfetch(DBselect($sql,1))){
 								$temp = bold(S_SUBJECT.': ');
 								$result = $temp->ToString()."\n".$rows['def_shortdata']."\n";
@@ -583,7 +583,7 @@ function	get_operators_by_conditiontype($conditiontype)
 
 function	update_action_status($actionid, $status)
 {
-	return DBexecute("update actions set status=$status where actionid=$actionid");
+	return DBexecute('update actions set status='.zbx_dbstr($status).' where actionid='.zbx_dbstr($actionid));
 }
 
 function validate_condition($conditiontype, $value){
@@ -1037,7 +1037,7 @@ function get_actions_hint_by_eventid($eventid,$status=NULL){
 	$hostids = array();
 	$sql = 'SELECT DISTINCT i.hostid '.
 			' FROM events e, functions f, items i '.
-			' WHERE e.eventid='.$eventid.
+			' WHERE e.eventid='.zbx_dbstr($eventid).
 				' AND e.object='.EVENT_SOURCE_TRIGGERS.
 				' AND f.triggerid=e.objectid '.
 				' AND i.itemid=f.itemid';
@@ -1071,8 +1071,8 @@ function get_actions_hint_by_eventid($eventid,$status=NULL){
 			' FROM events e,alerts a '.
 				' LEFT JOIN users u ON u.userid=a.userid '.
 				' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid'.
-			' WHERE a.eventid='.$eventid.
-				(is_null($status)?'':' AND a.status='.$status).
+			' WHERE a.eventid='.zbx_dbstr($eventid).
+				(is_null($status)?'':' AND a.status='.zbx_dbstr($status)).
 				' AND e.eventid = a.eventid'.
 				' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
 				' AND '.DBcondition('e.objectid',$available_triggers).
@@ -1127,7 +1127,7 @@ function get_event_actions_status($eventid){
 
 	$sql='SELECT COUNT(a.alertid) as cnt_all'.
 			' FROM alerts a '.
-			' WHERE a.eventid='.$eventid.
+			' WHERE a.eventid='.zbx_dbstr($eventid).
 				' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')';
 
 	$alerts=DBfetch(DBselect($sql));
@@ -1137,7 +1137,7 @@ function get_event_actions_status($eventid){
 // Sent
 		$sql='SELECT COUNT(a.alertid) as sent '.
 				' FROM alerts a '.
-				' WHERE a.eventid='.$eventid.
+				' WHERE a.eventid='.zbx_dbstr($eventid).
 					' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
 					' AND a.status='.ALERT_STATUS_SENT;
 
@@ -1147,7 +1147,7 @@ function get_event_actions_status($eventid){
 // In progress
 		$sql='SELECT COUNT(a.alertid) as inprogress '.
 				' FROM alerts a '.
-				' WHERE a.eventid='.$eventid.
+				' WHERE a.eventid='.zbx_dbstr($eventid).
 					' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
 					' AND a.status='.ALERT_STATUS_NOT_SENT;
 
@@ -1156,7 +1156,7 @@ function get_event_actions_status($eventid){
 // Failed
 		$sql='SELECT COUNT(a.alertid) as failed '.
 				' FROM alerts a '.
-				' WHERE a.eventid='.$eventid.
+				' WHERE a.eventid='.zbx_dbstr($eventid).
 					' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
 					' AND a.status='.ALERT_STATUS_FAILED;
 
@@ -1194,7 +1194,7 @@ function get_event_actions_stat_hints($eventid){
 
 	$sql='SELECT COUNT(a.alertid) as cnt '.
 			' FROM alerts a '.
-			' WHERE a.eventid='.$eventid.
+			' WHERE a.eventid='.zbx_dbstr($eventid).
 				' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')';
 
 
@@ -1203,7 +1203,7 @@ function get_event_actions_stat_hints($eventid){
 	if(isset($alerts['cnt']) && ($alerts['cnt'] > 0)){
 		$sql='SELECT COUNT(a.alertid) as sent '.
 				' FROM alerts a '.
-				' WHERE a.eventid='.$eventid.
+				' WHERE a.eventid='.zbx_dbstr($eventid).
 					' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
 					' AND a.status='.ALERT_STATUS_SENT;
 
@@ -1219,7 +1219,7 @@ function get_event_actions_stat_hints($eventid){
 
 		$sql='SELECT COUNT(a.alertid) as inprogress '.
 				' FROM alerts a '.
-				' WHERE a.eventid='.$eventid.
+				' WHERE a.eventid='.zbx_dbstr($eventid).
 					' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
 					' AND a.status='.ALERT_STATUS_NOT_SENT;
 
@@ -1235,7 +1235,7 @@ function get_event_actions_stat_hints($eventid){
 
 		$sql='SELECT COUNT(a.alertid) as failed '.
 				' FROM alerts a '.
-				' WHERE a.eventid='.$eventid.
+				' WHERE a.eventid='.zbx_dbstr($eventid).
 					' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
 					' AND a.status='.ALERT_STATUS_FAILED;
 

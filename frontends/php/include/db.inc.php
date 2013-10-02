@@ -129,7 +129,7 @@ if(!isset($DB)){
 						);
 						db2_set_option($DB['DB'], $options, 1);
 						if(isset($DB['SCHEMA']) && ($DB['SCHEMA'] != '')){
-							DBexecute("SET CURRENT SCHEMA='".$DB['SCHEMA']."'");
+							DBexecute('SET CURRENT SCHEMA='.zbx_dbstr($DB['SCHEMA']));
 						}
 					}
 

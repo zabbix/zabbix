@@ -179,9 +179,9 @@ class CPie extends CGraphDraw{
 						' max(h.value) AS max,max(h.clock) AS clock, max(i.lastvalue) as lst '.
 					' FROM history h '.
 						' LEFT JOIN items i ON h.itemid = i.itemid'.
-					' WHERE h.itemid='.$this->items[$i]['itemid'].
-						' AND h.clock>='.$from_time.
-						' AND h.clock<='.$to_time.
+					' WHERE h.itemid='.zbx_dbstr($this->items[$i]['itemid']).
+						' AND h.clock>='.zbx_dbstr($from_time).
+						' AND h.clock<='.zbx_dbstr($to_time).
 					' GROUP BY h.itemid'
 					,
 
@@ -190,9 +190,9 @@ class CPie extends CGraphDraw{
 						' max(hu.value) AS max,max(hu.clock) AS clock, max(i.lastvalue) as lst'.
 					' FROM history_uint hu '.
 						' LEFT JOIN items i ON hu.itemid = i.itemid'.
-					' WHERE hu.itemid='.$this->items[$i]['itemid'].
-						' AND hu.clock>='.$from_time.
-						' AND hu.clock<='.$to_time.
+					' WHERE hu.itemid='.zbx_dbstr($this->items[$i]['itemid']).
+						' AND hu.clock>='.zbx_dbstr($from_time).
+						' AND hu.clock<='.zbx_dbstr($to_time).
 					' GROUP BY hu.itemid'
 					);
 			}
@@ -204,9 +204,9 @@ class CPie extends CGraphDraw{
 						' max(t.value_max) AS max,max(t.clock) AS clock, max(i.lastvalue) as lst'.
 					' FROM trends t '.
 						' LEFT JOIN items i ON t.itemid = i.itemid'.
-					' WHERE t.itemid='.$this->items[$i]['itemid'].
-						' AND t.clock>='.$from_time.
-						' AND t.clock<='.$to_time.
+					' WHERE t.itemid='.zbx_dbstr($this->items[$i]['itemid']).
+						' AND t.clock>='.zbx_dbstr($from_time).
+						' AND t.clock<='.zbx_dbstr($to_time).
 					' GROUP BY t.itemid'
 					,
 
@@ -215,9 +215,9 @@ class CPie extends CGraphDraw{
 						' max(t.value_max) AS max,max(t.clock) AS clock, max(i.lastvalue) as lst'.
 					' FROM trends_uint t '.
 						' LEFT JOIN items i ON t.itemid = i.itemid'.
-					' WHERE t.itemid='.$this->items[$i]['itemid'].
-						' AND t.clock>='.$from_time.
-						' AND t.clock<='.$to_time.
+					' WHERE t.itemid='.zbx_dbstr($this->items[$i]['itemid']).
+						' AND t.clock>='.zbx_dbstr($from_time).
+						' AND t.clock<='.zbx_dbstr($to_time).
 					' GROUP BY t.itemid'
 					);
 			}

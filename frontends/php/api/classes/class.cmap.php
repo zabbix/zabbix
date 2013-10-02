@@ -674,13 +674,13 @@ COpt::memoryPick();
 //----
 			$sql = 'UPDATE sysmaps '.
 					' SET name='.zbx_dbstr($map['name']).','.
-						' width='.$map['width'].','.
-						' height='.$map['height'].','.
-						' backgroundid='.$map['backgroundid'].','.
-						' highlight='.$map['highlight'].','.
-						' label_type='.$map['label_type'].','.
-						' label_location='.$map['label_location'].
-					' WHERE sysmapid='.$map['sysmapid'];
+						' width='.zbx_dbstr($map['width']).','.
+						' height='.zbx_dbstr($map['height']).','.
+						' backgroundid='.zbx_dbstr($map['backgroundid']).','.
+						' highlight='.zbx_dbstr($map['highlight']).','.
+						' label_type='.zbx_dbstr($map['label_type']).','.
+						' label_location='.zbx_dbstr($map['label_location']).
+					' WHERE sysmapid='.zbx_dbstr($map['sysmapid']);
 			$result = DBexecute($sql);
 
 			if(!$result) break;
@@ -901,18 +901,18 @@ COpt::memoryPick();
 
 				$values = array(
 					'selementid' => $selementid,
-					'sysmapid' => $selement['sysmapid'],
-					'elementid' => $selement['elementid'],
-					'elementtype' => $selement['elementtype'],
+					'sysmapid' => zbx_dbstr($selement['sysmapid']),
+					'elementid' => zbx_dbstr($selement['elementid']),
+					'elementtype' => zbx_dbstr($selement['elementtype']),
 					'label' => zbx_dbstr($selement['label']),
-					'label_location' => $selement['label_location'],
-					'iconid_off' => $selement['iconid_off'],
-					'iconid_on' => $selement['iconid_on'],
-					'iconid_unknown' => $selement['iconid_unknown'],
-					'iconid_maintenance' => $selement['iconid_maintenance'],
-					'iconid_disabled' => $selement['iconid_disabled'],
-					'x' => $selement['x'],
-					'y' => $selement['y'],
+					'label_location' => zbx_dbstr($selement['label_location']),
+					'iconid_off' => zbx_dbstr($selement['iconid_off']),
+					'iconid_on' => zbx_dbstr($selement['iconid_on']),
+					'iconid_unknown' => zbx_dbstr($selement['iconid_unknown']),
+					'iconid_maintenance' => zbx_dbstr($selement['iconid_maintenance']),
+					'iconid_disabled' => zbx_dbstr($selement['iconid_disabled']),
+					'x' => zbx_dbstr($selement['x']),
+					'y' => zbx_dbstr($selement['y']),
 					'url' => zbx_dbstr($selement['url'])
 				);
 
@@ -1006,19 +1006,19 @@ COpt::memoryPick();
 				}
 
 				$result = DBexecute('UPDATE sysmaps_elements '.
-						'SET elementid='.$selement['elementid'].', '.
-							' elementtype='.$selement['elementtype'].', '.
+						'SET elementid='.zbx_dbstr($selement['elementid']).', '.
+							' elementtype='.zbx_dbstr($selement['elementtype']).', '.
 							' label='.zbx_dbstr($selement['label']).', '.
-							' label_location='.$selement['label_location'].', '.
-							' x='.$selement['x'].', '.
-							' y='.$selement['y'].', '.
-							' iconid_off='.$selement['iconid_off'].', '.
-							' iconid_on='.$selement['iconid_on'].', '.
-							' iconid_unknown='.$selement['iconid_unknown'].', '.
-							' iconid_maintenance='.$selement['iconid_maintenance'].', '.
-							' iconid_disabled='.$selement['iconid_disabled'].', '.
+							' label_location='.zbx_dbstr($selement['label_location']).', '.
+							' x='.zbx_dbstr($selement['x']).', '.
+							' y='.zbx_dbstr($selement['y']).', '.
+							' iconid_off='.zbx_dbstr($selement['iconid_off']).', '.
+							' iconid_on='.zbx_dbstr($selement['iconid_on']).', '.
+							' iconid_unknown='.zbx_dbstr($selement['iconid_unknown']).', '.
+							' iconid_maintenance='.zbx_dbstr($selement['iconid_maintenance']).', '.
+							' iconid_disabled='.zbx_dbstr($selement['iconid_disabled']).', '.
 							' url='.zbx_dbstr($selement['url']).
-						' WHERE selementid='.$selement['selementid']);
+						' WHERE selementid='.zbx_dbstr($selement['selementid']));
 
 				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Map update elements failed');
 
@@ -1120,8 +1120,8 @@ COpt::memoryPick();
 
 			$linktriggerid = get_dbid('sysmaps_link_triggers', 'linktriggerid');
 			$sql = 'INSERT INTO sysmaps_link_triggers (linktriggerid, linkid, triggerid, drawtype, color) '.
-				' VALUES ('.$linktriggerid.','.$linktrigger['linkid'].','.$linktrigger['triggerid'].', '.
-					$linktrigger['drawtype'].','.zbx_dbstr($linktrigger['color']).')';
+				' VALUES ('.$linktriggerid.','.zbx_dbstr($linktrigger['linkid']).','.zbx_dbstr($linktrigger['triggerid']).', '.
+					zbx_dbstr($linktrigger['drawtype']).','.zbx_dbstr($linktrigger['color']).')';
 			$result = DBexecute($sql);
 			if(!$result){
 				$result = false;

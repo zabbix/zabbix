@@ -282,12 +282,12 @@ class CAlert extends CZBXAPI{
 
 // time_from
 		if(!is_null($options['time_from'])){
-			$sql_parts['where'][] = 'a.clock>'.$options['time_from'];
+			$sql_parts['where'][] = 'a.clock>'.zbx_dbstr($options['time_from']);
 		}
 
 // time_till
 		if(!is_null($options['time_till'])){
-			$sql_parts['where'][] = 'a.clock<'.$options['time_till'];
+			$sql_parts['where'][] = 'a.clock<'.zbx_dbstr($options['time_till']);
 		}
 
 // extendoutput
@@ -511,10 +511,10 @@ COpt::memoryPick();
 			$alertid = get_dbid('alerts', 'alertid');
 			$sql = 'INSERT INTO alerts '.
 					'(alertid, actionid, eventid, userid, mediatypeid, clock, sendto, subject, message, status, retries, error, nextcheck, esc_step, alerttype) '.
-					' VALUES ('.$alertid.','.$alert['actionid'].','.$alert['eventid'].','.$alert['userid'].','.$alert['mediatypeid'].','.
-								$alert['clock'].','.zbx_dbstr($alert['sendto']).','.zbx_dbstr($alert['subject']).','.zbx_dbstr($alert['message']).','.
-								$alert['status'].','.$alert['retries'].','.zbx_dbstr($alert['error']).','.$alert['nextcheck'].','.
-								$alert['esc_step'].','.$alert['alerttype'].' )';
+					' VALUES ('.$alertid.','.zbx_dbstr($alert['actionid']).','.zbx_dbstr($alert['eventid']).','.zbx_dbstr($alert['userid']).','.zbx_dbstr($alert['mediatypeid']).','.
+								zbx_dbstr($alert['clock']).','.zbx_dbstr($alert['sendto']).','.zbx_dbstr($alert['subject']).','.zbx_dbstr($alert['message']).','.
+								zbx_dbstr($alert['status']).','.zbx_dbstr($alert['retries']).','.zbx_dbstr($alert['error']).','.zbx_dbstr($alert['nextcheck']).','.
+								zbx_dbstr($alert['esc_step']).','.zbx_dbstr($alert['alerttype']).' )';
 			$result = DBexecute($sql);
 			if(!$result) break;
 

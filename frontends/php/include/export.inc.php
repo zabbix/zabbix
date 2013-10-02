@@ -756,7 +756,7 @@ class zbxXML{
 
 // Deleteing all selements (with links)
 					$db_selementids = array();
-					$res = DBselect('SELECT selementid FROM sysmaps_elements WHERE sysmapid='.$sysmap['sysmapid']);
+					$res = DBselect('SELECT selementid FROM sysmaps_elements WHERE sysmapid='.zbx_dbstr($sysmap['sysmapid']));
 					while($db_selement = DBfetch($res)){
 						$db_selementids[$db_selement['selementid']] = $db_selement['selementid'];
 					}

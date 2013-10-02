@@ -697,7 +697,7 @@ COpt::memoryPick();
 				$groupsNames[$group['name']] = array('groupid' => $group['groupid']);
 //---
 
-				$sql = 'UPDATE groups SET name='.zbx_dbstr($group['name']).' WHERE groupid='.$group['groupid'];
+				$sql = 'UPDATE groups SET name='.zbx_dbstr($group['name']).' WHERE groupid='.zbx_dbstr($group['groupid']);
 				if(!DBexecute($sql)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 				}
@@ -812,7 +812,7 @@ COpt::memoryPick();
 				foreach($objectids as $hostid){
 					if(isset($linked[$groupid][$hostid])) continue;
 					$hostgroupid = get_dbid('hosts_groups', 'hostgroupid');
-					$result = DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES ($hostgroupid, $hostid, $groupid)");
+					$result = DBexecute('INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES ('.zbx_dbstr($hostgroupid).','.zbx_dbstr($hostid).','.zbx_dbstr($groupid).')');
 					if(!$result){
 						self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 					}
@@ -984,7 +984,7 @@ COpt::memoryPick();
 			foreach($groupids as $gnum => $groupid){
 				foreach($objectids_to_link as $objectid){
 					$hostgroupid = get_dbid('hosts_groups', 'hostgroupid');
-					$result = DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES ($hostgroupid, $objectid, $groupid)");
+					$result = DBexecute('INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES ('.zbx_dbstr($hostgroupid).','.zbx_dbstr($objectid).','.zbx_dbstr($groupid).')');
 					if(!$result){
 						self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 					}

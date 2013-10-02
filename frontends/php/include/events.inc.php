@@ -30,7 +30,7 @@
 	function get_tr_event_by_eventid($eventid){
 		$sql = 'SELECT e.*,t.triggerid, t.description,t.priority,t.status,t.type,t.expression '.
 				' FROM events e,triggers t '.
-				' WHERE e.eventid='.$eventid.
+				' WHERE e.eventid='.zbx_dbstr($eventid).
 					' AND e.object='.EVENT_OBJECT_TRIGGER.
 					' AND t.triggerid=e.objectid';
 		$result = DBfetch(DBselect($sql));
@@ -116,7 +116,7 @@ function first_initial_eventid($row,$hide_unknown=0){
 	if(empty($events)){
 		$sql = 'SELECT e.eventid '.
 				' FROM events e '.
-				' WHERE e.objectid='.$row['triggerid'].$sql_cond.
+				' WHERE e.objectid='.zbx_dbstr($row['triggerid']).$sql_cond.
 					' AND e.object='.EVENT_OBJECT_TRIGGER.
 				' ORDER BY e.object, e.objectid, e.eventid';
 		$res = DBselect($sql,1);
@@ -127,8 +127,8 @@ function first_initial_eventid($row,$hide_unknown=0){
 		$eventid = $events[0]['eventid'];
 		$sql = 'SELECT e.eventid '.
 				' FROM events e '.
-				' WHERE e.eventid > '.$eventid.
-					' AND e.objectid='.$row['triggerid'].$sql_cond.
+				' WHERE e.eventid > '.zbx_dbstr($eventid).
+					' AND e.objectid='.zbx_dbstr($row['triggerid']).$sql_cond.
 					' AND e.object='.EVENT_OBJECT_TRIGGER.
 				' ORDER BY e.object, e.objectid, e.eventid';
 		$res = DBselect($sql,1);
@@ -147,10 +147,10 @@ function first_initial_eventid($row,$hide_unknown=0){
 
 		$sql = 'SELECT e.eventid,e.clock '.
 				' FROM events e '.
-				' WHERE e.eventid > '.$eventid.
-					' AND e.objectid='.$row['triggerid'].
+				' WHERE e.eventid > '.zbx_dbstr($eventid).
+					' AND e.objectid='.zbx_dbstr($row['triggerid']).
 					' AND e.object='.EVENT_OBJECT_TRIGGER.
-					' AND e.value='.$row['value'].
+					' AND e.value='.zbx_dbstr($row['value']).
 				' ORDER BY e.object, e.objectid, e.eventid';
 		$res = DBselect($sql,1);
 		$rows = DBfetch($res);
@@ -179,8 +179,8 @@ function get_latest_events($row,$hide_unknown=0){
 
 	$sql = 'SELECT e.eventid, e.clock, e.value '.
 			' FROM events e '.
-			' WHERE e.objectid='.$row['triggerid'].
-				' AND e.eventid < '.$row['eventid'].
+			' WHERE e.objectid='.zbx_dbstr($row['triggerid']).
+				' AND e.eventid < '.zbx_dbstr($row['eventid']).
 				' AND e.object='.EVENT_OBJECT_TRIGGER.
 				' AND e.value='.TRIGGER_VALUE_FALSE.
 			' ORDER BY e.object DESC, e.objectid DESC, e.eventid DESC';
@@ -188,8 +188,8 @@ function get_latest_events($row,$hide_unknown=0){
 
 	$sql = 'SELECT e.eventid, e.clock, e.value '.
 			' FROM events e'.
-			' WHERE e.objectid='.$row['triggerid'].
-				' AND e.eventid < '.$row['eventid'].
+			' WHERE e.objectid='.zbx_dbstr($row['triggerid']).
+				' AND e.eventid < '.zbx_dbstr($row['eventid']).
 				' AND e.object='.EVENT_OBJECT_TRIGGER.
 				' AND e.value='.TRIGGER_VALUE_TRUE.
 			' ORDER BY e.object DESC, e.objectid DESC, e.eventid DESC';
@@ -199,8 +199,8 @@ function get_latest_events($row,$hide_unknown=0){
 	if($hide_unknown == 0){
 		$sql = 'SELECT e.eventid, e.clock, e.value '.
 				' FROM events e'.
-				' WHERE e.objectid='.$row['triggerid'].
-					' AND e.eventid < '.$row['eventid'].
+				' WHERE e.objectid='.zbx_dbstr($row['triggerid']).
+					' AND e.eventid < '.zbx_dbstr($row['eventid']).
 					' AND e.object='.EVENT_OBJECT_TRIGGER.
 					' AND e.value='.TRIGGER_VALUE_UNKNOWN.
 				' ORDER BY e.object DESC, e.objectid DESC, e.eventid DESC';
@@ -239,8 +239,8 @@ function get_next_event($event, $evenList = array()) {
 
 	$sql = 'SELECT e.eventid, e.value, e.clock '.
 		' FROM events e'.
-		' WHERE e.objectid='.$event['objectid'].
-			' AND e.eventid>'.$event['eventid'].
+		' WHERE e.objectid='.zbx_dbstr($event['objectid']).
+			' AND e.eventid>'.zbx_dbstr($event['eventid']).
 			' AND e.object='.EVENT_OBJECT_TRIGGER.
 		' ORDER BY e.object, e.objectid, e.eventid';
 
@@ -405,9 +405,9 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 	$event_list = array();
 	$sql = 'SELECT * '.
 			' FROM events '.
-			' WHERE eventid<='.$eventid.
+			' WHERE eventid<='.zbx_dbstr($eventid).
 				' AND object='.EVENT_OBJECT_TRIGGER.
-				' AND objectid='.$triggerid.
+				' AND objectid='.zbx_dbstr($triggerid).
 			' ORDER BY eventid DESC';
 	$db_events = DBselect($sql, ZBX_WIDGET_ROWS);
 

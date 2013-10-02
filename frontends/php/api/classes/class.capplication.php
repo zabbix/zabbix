@@ -645,7 +645,7 @@ COpt::memoryPick();
 			DB::insert('items_applications', $apps_insert);
 
 			foreach($itemids as $inum => $itemid){
-				$db_childs = DBselect('SELECT itemid, hostid FROM items WHERE templateid=' . $itemid);
+				$db_childs = DBselect('SELECT itemid, hostid FROM items WHERE templateid='.zbx_dbstr($itemid));
 
 				while($child = DBfetch($db_childs)){
 					$sql = 'SELECT a1.applicationid ' .

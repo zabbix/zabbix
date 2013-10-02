@@ -81,7 +81,7 @@
 
 		if(($result = DBexecute('INSERT INTO auditlog (auditid,userid,clock,action,resourcetype,details,ip) '.
 			' VALUES ('.$auditid.','.$USER_DETAILS['userid'].','.time().','.
-						$action.','.$resourcetype.','.zbx_dbstr($details).','.
+						zbx_dbstr($action).','.zbx_dbstr($resourcetype).','.zbx_dbstr($details).','.
 						zbx_dbstr($ip).')')))
 		{
 			$result = $auditid;
@@ -120,7 +120,7 @@
 
 		$result = DBexecute('INSERT INTO auditlog (auditid,userid,clock,ip,action,resourcetype,resourceid,resourcename)'.
 				' values ('.$auditid.','.$USER_DETAILS['userid'].','.time().','.zbx_dbstr($ip).
-				','.$action.','.$resourcetype.','.$resourceid.','.zbx_dbstr($resourcename).')');
+				','.zbx_dbstr($action).','.zbx_dbstr($resourcetype).','.zbx_dbstr($resourceid).','.zbx_dbstr($resourcename).')');
 
 		if ($result && $action == AUDIT_ACTION_UPDATE) {
 			foreach ($values_diff as $id) {

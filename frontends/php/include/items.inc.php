@@ -192,7 +192,7 @@
 	function update_item_in_group($groupid,$itemid,$item){
 		$sql='SELECT i.itemid,i.hostid '.
 				' FROM hosts_groups hg,items i '.
-				' WHERE hg.groupid='.$groupid.
+				' WHERE hg.groupid='.zbx_dbstr($groupid).
 					' and i.key_='.zbx_dbstr($item['key_']).
 					' and hg.hostid=i.hostid';
 		$result=DBSelect($sql);
@@ -217,7 +217,7 @@
 		$del_items = array();
 		$sql='SELECT i.itemid '.
 			' FROM hosts_groups hg,items i'.
-			' WHERE hg.groupid='.$groupid.
+			' WHERE hg.groupid='.zbx_dbstr($groupid).
 				' AND i.key_='.zbx_dbstr($item["key_"]).
 				' AND hg.hostid=i.hostid';
 		$result=DBSelect($sql);
@@ -233,7 +233,7 @@
 	# Add Item definition to selected group
 
 	function add_item_to_group($groupid,$item){
-		$sql='SELECT hostid FROM hosts_groups WHERE groupid='.$groupid;
+		$sql='SELECT hostid FROM hosts_groups WHERE groupid='.zbx_dbstr($groupid);
 		$result=DBSelect($sql);
 		while($row=DBfetch($result)){
 			$item['hostid'] = $row['hostid'];
@@ -371,7 +371,7 @@
 
 		$sql = 'SELECT itemid, hostid, templateid '.
 				' FROM items '.
-				' WHERE hostid='.$item['hostid'].
+				' WHERE hostid='.zbx_dbstr($item['hostid']).
 					' AND key_='.zbx_dbstr($item['key_']);
 		$db_item = DBfetch(DBselect($sql));
 		if($db_item && (($item['templateid'] == 0) || (($db_item['templateid'] != 0) && ($item['templateid'] != 0) && ($item['templateid'] != $db_item['templateid'])))){
@@ -396,15 +396,15 @@
 					'delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,'.
 					'snmpv3_privpassphrase,formula,trends,logtimefmt,valuemapid,'.
 					'delay_flex,params,ipmi_sensor,templateid,authtype,username,password,publickey,privatekey)'.
-			' VALUES ('.$itemid.','.zbx_dbstr($item['description']).','.zbx_dbstr($item['key_']).','.(!$item['hostid']? '0':$item['hostid']).','.
-						(!$item['delay']? '0':$item['delay']).','.(!$item['history']? '0':$item['history']).','.(!$item['status']? '0':$item['status']).','.(!$item['type']? '0':$item['type']).','.
-						zbx_dbstr($item['snmp_community']).','.zbx_dbstr($item['snmp_oid']).','.(!$item['value_type']? '0':$item['value_type']).','.(!$item['data_type']? '0':$item['data_type']).','.
-						zbx_dbstr($item['trapper_hosts']).','.$item['snmp_port'].','.zbx_dbstr($item['units']).','.(!$item['multiplier'] ? '0':$item['multiplier']).','.
+			' VALUES ('.$itemid.','.zbx_dbstr($item['description']).','.zbx_dbstr($item['key_']).','.(!$item['hostid']? '0':zbx_dbstr($item['hostid'])).','.
+						(!$item['delay']? '0':zbx_dbstr($item['delay'])).','.(!$item['history']? '0':zbx_dbstr($item['history'])).','.(!$item['status']? '0':zbx_dbstr($item['status'])).','.(!$item['type']? '0':zbx_dbstr($item['type'])).','.
+						zbx_dbstr($item['snmp_community']).','.zbx_dbstr($item['snmp_oid']).','.(!$item['value_type']? '0':zbx_dbstr($item['value_type'])).','.(!$item['data_type']? '0':zbx_dbstr($item['data_type'])).','.
+						zbx_dbstr($item['trapper_hosts']).','.zbx_dbstr($item['snmp_port']).','.zbx_dbstr($item['units']).','.(!$item['multiplier'] ? '0':zbx_dbstr($item['multiplier'])).','.
 						intval($item['delta']).','.zbx_dbstr($item['snmpv3_securityname']).','.intval($item['snmpv3_securitylevel']).','.
 						zbx_dbstr($item['snmpv3_authpassphrase']).','.zbx_dbstr($item['snmpv3_privpassphrase']).','.
-						zbx_dbstr($item['formula']).','.(!$item['trends'] ? '0':$item['trends']).','.zbx_dbstr($item['logtimefmt']).','.(!$item['valuemapid'] ? '0':$item['valuemapid']).','.
+						zbx_dbstr($item['formula']).','.(!$item['trends'] ? '0':zbx_dbstr($item['trends'])).','.zbx_dbstr($item['logtimefmt']).','.(!$item['valuemapid'] ? '0':zbx_dbstr($item['valuemapid'])).','.
 						zbx_dbstr($item['delay_flex']).','.zbx_dbstr($item['params']).','.
-						zbx_dbstr($item['ipmi_sensor']).','.$item['templateid'].','.intval($item['authtype']).','.
+						zbx_dbstr($item['ipmi_sensor']).','.zbx_dbstr($item['templateid']).','.intval($item['authtype']).','.
 						zbx_dbstr($item['username']).','.zbx_dbstr($item['password']).','.
 						zbx_dbstr($item['publickey']).','.zbx_dbstr($item['privatekey']).')'
 			);
@@ -416,7 +416,7 @@
 
 		foreach($item['applications'] as $key => $appid){
 			$itemappid=get_dbid('items_applications','itemappid');
-			DBexecute('INSERT INTO items_applications (itemappid,itemid,applicationid) VALUES('.$itemappid.','.$itemid.','.$appid.')');
+			DBexecute('INSERT INTO items_applications (itemappid,itemid,applicationid) VALUES('.$itemappid.','.zbx_dbstr($itemid).','.zbx_dbstr($appid).')');
 		}
 
 		info(S_ADDED_NEW_ITEM.SPACE.'"'.$host['host'].':'.$item['key_'].'"');
@@ -457,11 +457,11 @@
 			if($status != $old_status){
 /*				unset($itemids[$row['itemid']]);*/
 				if ($status==ITEM_STATUS_ACTIVE)
-					$sql='UPDATE items SET status='.$status.",error='' ".
-						' WHERE itemid='.$row['itemid'];
+					$sql='UPDATE items SET status='.zbx_dbstr($status).",error='' ".
+						' WHERE itemid='.zbx_dbstr($row['itemid']);
 				else
-					$sql='UPDATE items SET status='.$status.
-						' WHERE itemid='.$row['itemid'];
+					$sql='UPDATE items SET status='.zbx_dbstr($status).
+						' WHERE itemid='.zbx_dbstr($row['itemid']);
 
 				$result &= DBexecute($sql);
 				if ($result){
@@ -526,8 +526,8 @@
 
 		$sql = 'SELECT itemid, hostid, templateid '.
 				' FROM items '.
-				' WHERE hostid='.$item['hostid'].
-					' AND itemid<>'.$itemid.
+				' WHERE hostid='.zbx_dbstr($item['hostid']).
+					' AND itemid<>'.zbx_dbstr($itemid).
 					' AND key_='.zbx_dbstr($item['key_']);
 		$db_item = DBfetch(DBselect($sql));
 		if($db_item && (($db_item['templateid'] != 0) || ($item['templateid'] == 0))){
@@ -535,7 +535,7 @@
 			return FALSE;
 		}
 // first update child items
-		$db_tmp_items = DBselect('SELECT itemid, hostid FROM items WHERE templateid='.$itemid);
+		$db_tmp_items = DBselect('SELECT itemid, hostid FROM items WHERE templateid='.zbx_dbstr($itemid));
 		while($db_tmp_item = DBfetch($db_tmp_items)){
 			$child_item_params = $item_in_params;
 
@@ -576,54 +576,54 @@
 		}
 
 		$item_old = get_item_by_itemid($itemid);
-		DBexecute('UPDATE items SET lastlogsize=0, mtime=0 WHERE itemid='.$itemid.' AND key_<>'.zbx_dbstr($item['key_']));
+		DBexecute('UPDATE items SET lastlogsize=0, mtime=0 WHERE itemid='.zbx_dbstr($itemid).' AND key_<>'.zbx_dbstr($item['key_']));
 
 		if($upd_app){
-			$result = DBexecute('DELETE FROM items_applications WHERE itemid='.$itemid);
+			$result = DBexecute('DELETE FROM items_applications WHERE itemid='.zbx_dbstr($itemid));
 			foreach($item['applications'] as $appid){
 				$itemappid=get_dbid('items_applications','itemappid');
-				DBexecute('INSERT INTO items_applications (itemappid,itemid,applicationid) VALUES ('.$itemappid.','.$itemid.','.$appid.')');
+				DBexecute('INSERT INTO items_applications (itemappid,itemid,applicationid) VALUES ('.$itemappid.','.zbx_dbstr($itemid).','.zbx_dbstr($appid).')');
 			}
 		}
 
 		if($item['status'] == ITEM_STATUS_ACTIVE)
-			DBexecute("UPDATE items SET error='' WHERE itemid=".$itemid.' and status<>'.$item['status']);
+			DBexecute("UPDATE items SET error='' WHERE itemid=".zbx_dbstr($itemid).' and status<>'.zbx_dbstr($item['status']));
 
 		$result=DBexecute(
 			'UPDATE items '.
 			' SET description='.zbx_dbstr($item['description']).','.
 				'key_='.zbx_dbstr($item['key_']).','.
-				'hostid='.$item['hostid'].','.
-				'delay='.$item['delay'].','.
-				'history='.$item['history'].','.
-				'type='.$item['type'].','.
+				'hostid='.zbx_dbstr($item['hostid']).','.
+				'delay='.zbx_dbstr($item['delay']).','.
+				'history='.zbx_dbstr($item['history']).','.
+				'type='.zbx_dbstr($item['type']).','.
 				'snmp_community='.zbx_dbstr($item['snmp_community']).','.
 				'snmp_oid='.zbx_dbstr($item['snmp_oid']).','.
-				'value_type='.$item['value_type'].','.
-				'data_type='.$item['data_type'].','.
+				'value_type='.zbx_dbstr($item['value_type']).','.
+				'data_type='.zbx_dbstr($item['data_type']).','.
 				'trapper_hosts='.zbx_dbstr($item['trapper_hosts']).','.
-				'snmp_port='.$item['snmp_port'].','.
+				'snmp_port='.zbx_dbstr($item['snmp_port']).','.
 				'units='.zbx_dbstr($item['units']).','.
-				'multiplier='.$item['multiplier'].','.
-				'delta='.$item['delta'].','.
+				'multiplier='.zbx_dbstr($item['multiplier']).','.
+				'delta='.zbx_dbstr($item['delta']).','.
 				'snmpv3_securityname='.zbx_dbstr($item['snmpv3_securityname']).','.
-				'snmpv3_securitylevel='.$item['snmpv3_securitylevel'].','.
+				'snmpv3_securitylevel='.zbx_dbstr($item['snmpv3_securitylevel']).','.
 				'snmpv3_authpassphrase='.($item['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV || $item['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV ? zbx_dbstr($item['snmpv3_authpassphrase']) : "''").','.
 				'snmpv3_privpassphrase='.($item['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV ? zbx_dbstr($item['snmpv3_privpassphrase']) : "''").','.
 				'formula='.zbx_dbstr($item['formula']).','.
-				'trends='.$item['trends'].','.
+				'trends='.zbx_dbstr($item['trends']).','.
 				'logtimefmt='.zbx_dbstr($item['logtimefmt']).','.
-				'valuemapid='.$item['valuemapid'].','.
+				'valuemapid='.zbx_dbstr($item['valuemapid']).','.
 				'delay_flex='.zbx_dbstr($item['delay_flex']).','.
 				'params='.zbx_dbstr($item['params']).','.
 				'ipmi_sensor='.zbx_dbstr($item['ipmi_sensor']).','.
-				'templateid='.$item['templateid'].','.
-				'authtype='.$item['authtype'].','.
+				'templateid='.zbx_dbstr($item['templateid']).','.
+				'authtype='.zbx_dbstr($item['authtype']).','.
 				'username='.zbx_dbstr($item['username']).','.
 				'password='.zbx_dbstr($item['password']).','.
 				'publickey='.zbx_dbstr($item['publickey']).','.
 				'privatekey='.zbx_dbstr($item['privatekey']).
-			' WHERE itemid='.$itemid);
+			' WHERE itemid='.zbx_dbstr($itemid));
 
 		if ($result){
 			$item_new = get_item_by_itemid($itemid);
@@ -735,7 +735,7 @@
 			}
 
 			if ($unlink_mode) {
-				if (DBexecute('UPDATE items SET templateid=0 WHERE itemid='.$db_item["itemid"])) {
+				if (DBexecute('UPDATE items SET templateid=0 WHERE itemid='.zbx_dbstr($db_item["itemid"]))) {
 					info(sprintf(S_ITEM_UNLINKED, $host['host'].':'.$db_item["key_"]));
 				}
 			}
@@ -861,7 +861,7 @@
 	}
 
 	function get_item_by_itemid($itemid){
-		$row = DBfetch(DBselect('select * from items where itemid='.$itemid));
+		$row = DBfetch(DBselect('select * from items where itemid='.zbx_dbstr($itemid)));
 		if($row){
 			return	$row;
 		}
@@ -876,7 +876,7 @@
 					'formula,trends,logtimefmt,valuemapid,delay_flex,params,ipmi_sensor,templateid,'.
 					'authtype,username,password,publickey,privatekey '.
 			' FROM items '.
-			' WHERE itemid='.$itemid;
+			' WHERE itemid='.zbx_dbstr($itemid);
 		$row = DBfetch(DBselect($sql));
 		if($row){
 			return	$row;
@@ -913,7 +913,7 @@
 		if(isset($itemid)){
 			$sql = 'SELECT src.* '.
 							' FROM items src, items dest '.
-							' WHERE dest.itemid='.$itemid.
+							' WHERE dest.itemid='.zbx_dbstr($itemid).
 								' AND src.key_=dest.key_ '.
 								' AND '.DBcondition('src.hostid',$dest_hostids);
 
@@ -1006,7 +1006,7 @@
 
 		foreach ($itemids as $id) {	/* The section should be improved */
 			$item_old = get_item_by_itemid($id);
-			$result = DBexecute('DELETE FROM items WHERE itemid='.$id);
+			$result = DBexecute('DELETE FROM items WHERE itemid='.zbx_dbstr($id));
 			if ($result)
 				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM, $id, $item_old['description'], 'items', NULL, NULL);
 			else
@@ -1292,7 +1292,7 @@
 
 		foreach($applications as $appid){
 			$db_apps = DBselect("select a1.applicationid from applications a1, applications a2".
-					" where a1.name=a2.name and a1.hostid=".$hostid." and a2.applicationid=".$appid);
+					" where a1.name=a2.name and a1.hostid=".zbx_dbstr($hostid)." and a2.applicationid=".zbx_dbstr($appid));
 			$db_app = DBfetch($db_apps);
 			if(!$db_app) continue;
 			array_push($child_applications,$db_app["applicationid"]);
@@ -1463,18 +1463,18 @@
 		}
 
 		if($last == 0){
-			$sql = 'select value from '.$table.' where itemid='.$db_item['itemid'].' and clock<='.$clock.
+			$sql = 'select value from '.$table.' where itemid='.zbx_dbstr($db_item['itemid']).' and clock<='.zbx_dbstr($clock).
 					' order by itemid,clock desc';
 			$row = DBfetch(DBselect($sql, 1));
 			if($row)
 				$value = $row["value"];
 		}
 		else{
-			$sql = "select max(clock) as clock from $table where itemid=".$db_item["itemid"];
+			$sql = "select max(clock) as clock from $table where itemid=".zbx_dbstr($db_item["itemid"]);
 			$row = DBfetch(DBselect($sql));
 			if($row && !is_null($row["clock"])){
 				$clock = $row["clock"];
-				$sql = "select value from $table where itemid=".$db_item["itemid"]." and clock=$clock";
+				$sql = "select value from $table where itemid=".zbx_dbstr($db_item["itemid"]).' and clock='.zbx_dbstr($clock);
 				$row = DBfetch(DBselect($sql, 1));
 				if($row)
 					$value = $row["value"];

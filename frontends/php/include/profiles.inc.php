@@ -134,8 +134,8 @@ class CProfile{
 			'userid' => $USER_DETAILS['userid'],
 			'idx' => zbx_dbstr($idx),
 			$value_type => ($value_type == 'value_str') ? zbx_dbstr($value) : $value,
-			'type' => $type,
-			'idx2' => $idx2
+			'type' => zbx_dbstr($type),
+			'idx2' => zbx_dbstr($idx2)
 		);
 
 		$sql = 'INSERT INTO profiles ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
@@ -156,8 +156,8 @@ class CProfile{
 		$value = ($value_type == 'value_str') ? zbx_dbstr($value) : $value;
 
 		$sql = 'UPDATE profiles SET '.
-					$value_type.'='.$value.','.
-					' type='.$type.
+					$value_type.'='.zbx_dbstr($value).','.
+					' type='.zbx_dbstr($type).
 				' WHERE userid='.$USER_DETAILS['userid'].
 					' AND idx='.zbx_dbstr($idx).
 					$sql_cond;
@@ -382,7 +382,7 @@ function add2favorites($favobj, $favid, $source=null){
 		'profileid' => get_dbid('profiles', 'profileid'),
 		'userid' => $USER_DETAILS['userid'],
 		'idx' => zbx_dbstr($favobj),
-		'value_id' =>  $favid,
+		'value_id' => zbx_dbstr($favid),
 		'type' => PROFILE_TYPE_ID
 	);
 	if(!is_null($source)) $values['source'] = zbx_dbstr($source);
@@ -402,7 +402,7 @@ function rm4favorites($favobj, $favid=0, $source=null){
 	$sql = 'DELETE FROM profiles '.
 		' WHERE userid='.$USER_DETAILS['userid'].
 			' AND idx='.zbx_dbstr($favobj).
-			(($favid > 0) ? ' AND value_id='.$favid : '').
+			(($favid > 0) ? ' AND value_id='.zbx_dbstr($favid) : '').
 			(is_null($source) ? '' : ' AND source='.zbx_dbstr($source));
 
 	return DBexecute($sql);

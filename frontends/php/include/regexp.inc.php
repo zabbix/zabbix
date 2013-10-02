@@ -23,7 +23,7 @@ function get_regexp_by_regexpid($regexpid){
 	$sql = 'SELECT re.* '.
 					' FROM regexps re '.
 					' WHERE '.DBin_node('re.regexpid').
-						' AND regexpid='.$regexpid;
+						' AND regexpid='.zbx_dbstr($regexpid);
 
 	$db_regexp = DBfetch(DBselect($sql));
 return $db_regexp;
@@ -80,7 +80,7 @@ function update_regexp($regexpid, $regexp=array()){
 	$sql = 'UPDATE regexps SET '.
 				' name='.zbx_dbstr($regexp['name']).','.
 				' test_string='.zbx_dbstr($regexp['test_string']).
-			' WHERE regexpid='.$regexpid;
+			' WHERE regexpid='.zbx_dbstr($regexpid);
 	$result = DBexecute($sql);
 return $result;
 }
@@ -117,8 +117,8 @@ function add_expression($regexpid, $expression = array()){
 				' VALUES ('.$expressionid.','.
 						$regexpid.','.
 						zbx_dbstr($expression['expression']).','.
-						$expression['expression_type'].','.
-						$expression['case_sensitive'].','.
+						zbx_dbstr($expression['expression_type']).','.
+						zbx_dbstr($expression['case_sensitive']).','.
 						zbx_dbstr($expression['exp_delimiter']).')');
 
 return $result?$expressionid:false;

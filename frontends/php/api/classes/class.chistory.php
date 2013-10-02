@@ -172,13 +172,13 @@ class CHistory extends CZBXAPI{
 // time_from
 		if(!is_null($options['time_from'])){
 			$sql_parts['select']['clock'] = 'h.clock';
-			$sql_parts['where']['clock_from'] = 'h.clock>='.$options['time_from'];
+			$sql_parts['where']['clock_from'] = 'h.clock>='.zbx_dbstr($options['time_from']);
 		}
 
 // time_till
 		if(!is_null($options['time_till'])){
 			$sql_parts['select']['clock'] = 'h.clock';
-			$sql_parts['where']['clock_till'] = 'h.clock<='.$options['time_till'];
+			$sql_parts['where']['clock_till'] = 'h.clock<='.zbx_dbstr($options['time_till']);
 		}
 
 // filter

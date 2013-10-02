@@ -58,10 +58,10 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 		$cmbHGrps->addItem(0,S_ALL_SMALL);
 
 		$sql_cond = ' AND h.hostid=ht.hostid ';
-		if($_REQUEST['hostid'] > 0)	$sql_cond.=' AND ht.templateid='.$_REQUEST['hostid'];
+		if($_REQUEST['hostid'] > 0)	$sql_cond.=' AND ht.templateid='.zbx_dbstr($_REQUEST['hostid']);
 
 		if(isset($_REQUEST['tpl_triggerid']) && ($_REQUEST['tpl_triggerid'] > 0))
-			$sql_cond.= ' AND t.templateid='.$_REQUEST['tpl_triggerid'];
+			$sql_cond.= ' AND t.templateid='.zbx_dbstr($_REQUEST['tpl_triggerid']);
 
 		$result = DBselect('SELECT DISTINCT g.groupid,g.name '.
 			' FROM triggers t,hosts h,items i,functions f, hosts_templates ht, groups g, hosts_groups hg '.
@@ -85,7 +85,7 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 				);
 		}
 
-		$sql_cond=($_REQUEST['hostid'] > 0)?' AND h.hostid='.$_REQUEST['hostid']:' AND '.DBcondition('h.hostid',$available_hosts);
+		$sql_cond=($_REQUEST['hostid'] > 0)?' AND h.hostid='.zbx_dbstr($_REQUEST['hostid']):' AND '.DBcondition('h.hostid',$available_hosts);
 		$sql = 'SELECT DISTINCT t.triggerid,t.description '.
 			' FROM triggers t,hosts h,items i,functions f '.
 			' WHERE f.itemid=i.itemid '.

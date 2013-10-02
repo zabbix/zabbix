@@ -70,14 +70,14 @@ require_once('include/items.inc.php');
 			return false;
 		}
 
-		if(!$httpstep_data = DBfetch(DBselect('select httpstepid from httpstep where httptestid='.$httptestid.' and name='.zbx_dbstr($name)))){
+		if(!$httpstep_data = DBfetch(DBselect('select httpstepid from httpstep where httptestid='.zbx_dbstr($httptestid).' and name='.zbx_dbstr($name)))){
 
 			$httpstepid = get_dbid("httpstep","httpstepid");
 
 			if (!DBexecute('insert into httpstep'.
 				' (httpstepid, httptestid, name, no, url, timeout, posts, required, status_codes) '.
-				' values ('.$httpstepid.','.$httptestid.','.zbx_dbstr($name).','.$no.','.
-				zbx_dbstr($url).','.$timeout.','.
+				' values ('.$httpstepid.','.$httptestid.','.zbx_dbstr($name).','.zbx_dbstr($no).','.
+				zbx_dbstr($url).','.zbx_dbstr($timeout).','.
 				zbx_dbstr($posts).','.zbx_dbstr($required).','.zbx_dbstr($status_codes).')'
 				)) return false;
 		}
@@ -85,9 +85,9 @@ require_once('include/items.inc.php');
 			$httpstepid = $httpstep_data['httpstepid'];
 
 			if (!DBexecute('update httpstep set '.
-				' name='.zbx_dbstr($name).', no='.$no.', url='.zbx_dbstr($url).', timeout='.$timeout.','.
+				' name='.zbx_dbstr($name).', no='.zbx_dbstr($no).', url='.zbx_dbstr($url).', timeout='.zbx_dbstr($timeout).','.
 				' posts='.zbx_dbstr($posts).', required='.zbx_dbstr($required).', status_codes='.zbx_dbstr($status_codes).
-				' where httpstepid='.$httpstepid)) return false;
+				' where httpstepid='.zbx_dbstr($httpstepid))) return false;
 		}
 
 		$monitored_items = array(
@@ -114,12 +114,12 @@ require_once('include/items.inc.php');
 		foreach($monitored_items as $item){
 			$item_data = DBfetch(DBselect('select i.itemid,i.history,i.trends,i.delta,i.valuemapid '.
 				' from items i, httpstepitem hi '.
-				' where hi.httpstepid='.$httpstepid.' and hi.itemid=i.itemid '.
-				' and hi.type='.$item['httpstepitemtype']));
+				' where hi.httpstepid='.zbx_dbstr($httpstepid).' and hi.itemid=i.itemid '.
+				' and hi.type='.zbx_dbstr($item['httpstepitemtype'])));
 
 			if(!$item_data){
 				$item_data = DBfetch(DBselect('select i.itemid,i.history,i.trends,i.delta,i.valuemapid '.
-					' from items i where i.key_='.zbx_dbstr($item['key_']).' and i.hostid='.$hostid));
+					' from items i where i.key_='.zbx_dbstr($item['key_']).' and i.hostid='.zbx_dbstr($hostid)));
 			}
 
 			$item_args = array(
@@ -178,11 +178,11 @@ require_once('include/items.inc.php');
 
 			$httpstepitemid = get_dbid('httpstepitem', 'httpstepitemid');
 
-			DBexecute('delete from httpstepitem where itemid='.$itemid);
+			DBexecute('delete from httpstepitem where itemid='.zbx_dbstr($itemid));
 
 			if (!DBexecute('insert into httpstepitem'.
 				' (httpstepitemid, httpstepid, itemid, type) '.
-				' values ('.$httpstepitemid.','.$httpstepid.','.$itemid.','.$item['httpstepitemtype'].')'
+				' values ('.$httpstepitemid.','.zbx_dbstr($httpstepid).','.zbx_dbstr($itemid).','.zbx_dbstr($item['httpstepitemtype']).')'
 				)) return false;
 
 		}
@@ -206,7 +206,7 @@ require_once('include/items.inc.php');
 			$sql = 'SELECT t.httptestid'.
 					' FROM httptest t, applications a'.
 					' WHERE t.applicationid=a.applicationid'.
-						' AND a.hostid='.$hostid.
+						' AND a.hostid='.zbx_dbstr($hostid).
 						' AND t.name='.zbx_dbstr($name);
 			$t = DBfetch(DBselect($sql));
 			if((isset($httptestid) && $t && ($t['httptestid'] != $httptestid)) || ($t && !isset($httptestid))){
@@ -214,7 +214,7 @@ require_once('include/items.inc.php');
 			}
 
 
-			$sql = 'SELECT applicationid FROM applications WHERE name='.zbx_dbstr($application).' AND hostid='.$hostid;
+			$sql = 'SELECT applicationid FROM applications WHERE name='.zbx_dbstr($application).' AND hostid='.zbx_dbstr($hostid);
 			if($applicationid = DBfetch(DBselect($sql))){
 				$applicationid = $applicationid['applicationid'];
 			}
@@ -232,16 +232,16 @@ require_once('include/items.inc.php');
 				$sql = 'UPDATE httptest SET '.
 					' applicationid='.$applicationid.', '.
 					' name='.zbx_dbstr($name).', '.
-					' authentication='.$authentication.', '.
+					' authentication='.zbx_dbstr($authentication).', '.
 					' http_user='.zbx_dbstr($http_user).', '.
 					' http_password='.zbx_dbstr($http_password).', '.
-					' delay='.$delay.', '.
-					' status='.$status.', '.
+					' delay='.zbx_dbstr($delay).', '.
+					' status='.zbx_dbstr($status).', '.
 					' agent='.zbx_dbstr($agent).', '.
 					' macros='.zbx_dbstr($macros).', '.
 					' error='.zbx_dbstr('').', '.
 					' curstate='.HTTPTEST_STATE_UNKNOWN.
-				' WHERE httptestid='.$httptestid;
+				' WHERE httptestid='.zbx_dbstr($httptestid);
 				if(!DBexecute($sql)){
 					throw new Exception('DBerror');
 				}
@@ -253,11 +253,11 @@ require_once('include/items.inc.php');
 					'httptestid' => $httptestid,
 					'applicationid' => $applicationid,
 					'name' => zbx_dbstr($name),
-					'authentication' => $authentication,
+					'authentication' => zbx_dbstr($authentication),
 					'http_user' => zbx_dbstr($http_user),
 					'http_password' => zbx_dbstr($http_password),
-					'delay' => $delay,
-					'status' => $status,
+					'delay' => zbx_dbstr($delay),
+					'status' => zbx_dbstr($status),
 					'agent' => zbx_dbstr($agent),
 					'macros' => zbx_dbstr($macros),
 					'curstate' => HTTPTEST_STATE_UNKNOWN,
@@ -288,7 +288,7 @@ require_once('include/items.inc.php');
 			}
 
 /* clean unneeded steps */
-			$sql = 'SELECT httpstepid FROM httpstep WHERE httptestid='.$httptestid;
+			$sql = 'SELECT httpstepid FROM httpstep WHERE httptestid='.zbx_dbstr($httptestid);
 			$db_steps = DBselect($sql);
 			while($step_data = DBfetch($db_steps)){
 				if(!isset($httpstepids[$step_data['httpstepid']])){
@@ -314,12 +314,12 @@ require_once('include/items.inc.php');
 			foreach($monitored_items as $item){
 				$item_data = DBfetch(DBselect('select i.itemid,i.history,i.trends,i.delta,i.valuemapid '.
 					' from items i, httptestitem hi '.
-					' where hi.httptestid='.$httptestid.' and hi.itemid=i.itemid '.
-					' and hi.type='.$item['httptestitemtype']));
+					' where hi.httptestid='.zbx_dbstr($httptestid).' and hi.itemid=i.itemid '.
+					' and hi.type='.zbx_dbstr($item['httptestitemtype'])));
 
 				if(!$item_data){
 					$item_data = DBfetch(DBselect('select i.itemid,i.history,i.trends,i.delta,i.valuemapid '.
-						' from items i where i.key_='.zbx_dbstr($item['key_']).' and i.hostid='.$hostid));
+						' from items i where i.key_='.zbx_dbstr($item['key_']).' and i.hostid='.zbx_dbstr($hostid)));
 				}
 
 				$item_args = array(
@@ -378,10 +378,10 @@ require_once('include/items.inc.php');
 
 				$httptestitemid = get_dbid('httptestitem', 'httptestitemid');
 
-				DBexecute('delete from httptestitem where itemid='.$itemid);
+				DBexecute('delete from httptestitem where itemid='.zbx_dbstr($itemid));
 
 				if(!DBexecute('insert into httptestitem (httptestitemid, httptestid, itemid, type) '.
-					' values ('.$httptestitemid.','.$httptestid.','.$itemid.','.$item['httptestitemtype'].')')){
+					' values ('.$httptestitemid.','.zbx_dbstr($httptestid).','.zbx_dbstr($itemid).','.zbx_dbstr($item['httptestitemtype']).')')){
 					throw new Exception('DBerror');
 				}
 			}
@@ -415,7 +415,7 @@ require_once('include/items.inc.php');
 
 		$db_httpstepitems = DBselect('SELECT DISTINCT * FROM httpstepitem WHERE '.DBcondition('httpstepid',$httpstepids));
 		while($httpstepitem_data = DBfetch($db_httpstepitems)){
-			if(!DBexecute('DELETE FROM httpstepitem WHERE httpstepitemid='.$httpstepitem_data['httpstepitemid'])) return false;
+			if(!DBexecute('DELETE FROM httpstepitem WHERE httpstepitemid='.zbx_dbstr($httpstepitem_data['httpstepitemid']))) return false;
 			if(!delete_item($httpstepitem_data['itemid'])) return false;
 		}
 
@@ -427,7 +427,7 @@ require_once('include/items.inc.php');
 
 		$httptests = array();
 		foreach($httptestids as $id => $httptestid){
-			$httptests[$httptestid] =  DBfetch(DBselect('SELECT * FROM httptest WHERE httptestid='.$httptestid));
+			$httptests[$httptestid] =  DBfetch(DBselect('SELECT * FROM httptest WHERE httptestid='.zbx_dbstr($httptestid)));
 		}
 
 		$db_httpstep = DBselect('SELECT DISTINCT s.httpstepid '.
@@ -464,17 +464,17 @@ require_once('include/items.inc.php');
 	}
 
 	function activate_httptest($httptestid){
-		$r = DBexecute('UPDATE httptest SET status='.HTTPTEST_STATUS_ACTIVE.' WHERE httptestid='.$httptestid);
+		$r = DBexecute('UPDATE httptest SET status='.HTTPTEST_STATUS_ACTIVE.' WHERE httptestid='.zbx_dbstr($httptestid));
 
 		$itemids = array();
-		$sql = 'SELECT hti.itemid FROM httptestitem hti WHERE hti.httptestid='.$httptestid;
+		$sql = 'SELECT hti.itemid FROM httptestitem hti WHERE hti.httptestid='.zbx_dbstr($httptestid);
 		$items_db = DBselect($sql);
 		while($itemid = Dbfetch($items_db)){
 			$itemids[] = $itemid['itemid'];
 		}
 
 		$sql = 'SELECT hsi.itemid FROM httpstep hs, httpstepitem hsi WHERE '.
-			' hs.httptestid='.$httptestid.' AND hs.httpstepid=hsi.httpstepid';
+			' hs.httptestid='.zbx_dbstr($httptestid).' AND hs.httpstepid=hsi.httpstepid';
 		$items_db = DBselect($sql);
 		while($itemid = Dbfetch($items_db)){
 			$itemids[] = $itemid['itemid'];
@@ -486,17 +486,17 @@ require_once('include/items.inc.php');
 	}
 
 	function disable_httptest($httptestid){
-		$r = DBexecute('UPDATE httptest SET status='.HTTPTEST_STATUS_DISABLED.' WHERE httptestid='.$httptestid);
+		$r = DBexecute('UPDATE httptest SET status='.HTTPTEST_STATUS_DISABLED.' WHERE httptestid='.zbx_dbstr($httptestid));
 
 		$itemids = array();
-		$sql = 'SELECT hti.itemid FROM httptestitem hti WHERE hti.httptestid='.$httptestid;
+		$sql = 'SELECT hti.itemid FROM httptestitem hti WHERE hti.httptestid='.zbx_dbstr($httptestid);
 		$items_db = DBselect($sql);
 		while($itemid = Dbfetch($items_db)){
 			$itemids[] = $itemid['itemid'];
 		}
 
 		$sql = 'SELECT hsi.itemid FROM httpstep hs, httpstepitem hsi WHERE '.
-			' hs.httptestid='.$httptestid.' AND hs.httpstepid=hsi.httpstepid';
+			' hs.httptestid='.zbx_dbstr($httptestid).' AND hs.httpstepid=hsi.httpstepid';
 		$items_db = DBselect($sql);
 		while($itemid = Dbfetch($items_db)){
 			$itemids[] = $itemid['itemid'];
@@ -510,7 +510,7 @@ require_once('include/items.inc.php');
 	function delete_history_by_httptestid($httptestid){
 		$db_items = DBselect('SELECT DISTINCT i.itemid '.
 							' FROM items i, httpstepitem si, httpstep s '.
-							' WHERE s.httptestid='.$httptestid.
+							' WHERE s.httptestid='.zbx_dbstr($httptestid).
 								' AND si.httpstepid=s.httpstepid '.
 								' AND i.itemid=si.itemid');
 		while($item_data = DBfetch($db_items)){
@@ -520,11 +520,11 @@ require_once('include/items.inc.php');
 	}
 
 	function get_httptest_by_httptestid($httptestid){
-		return DBfetch(DBselect('select * from httptest where httptestid='.$httptestid));
+		return DBfetch(DBselect('select * from httptest where httptestid='.zbx_dbstr($httptestid)));
 	}
 
 	function get_httpstep_by_no($httptestid, $no){
-		return DBfetch(DBselect('select * from httpstep where httptestid='.$httptestid.' and no='.$no));
+		return DBfetch(DBselect('select * from httpstep where httptestid='.zbx_dbstr($httptestid).' and no='.zbx_dbstr($no)));
 	}
 
 	function get_httptests_by_hostid($hostids){

@@ -24,7 +24,7 @@ function zbx_session_start($userid, $name, $password){
 	$sessionid = md5(time().$password.$name.rand(0,10000000));
 	zbx_setcookie('zbx_sessionid',$sessionid);
 
-	DBexecute('INSERT INTO sessions (sessionid,userid,lastaccess,status) VALUES ('.zbx_dbstr($sessionid).','.$userid.','.time().','.ZBX_SESSION_ACTIVE.')');
+	DBexecute('INSERT INTO sessions (sessionid,userid,lastaccess,status) VALUES ('.zbx_dbstr($sessionid).','.zbx_dbstr($userid).','.time().','.ZBX_SESSION_ACTIVE.')');
 
 return $sessionid;
 }
@@ -84,7 +84,7 @@ return $auth;
 function  check_perm2system($userid){
 	$sql = 'SELECT g.usrgrpid '.
 		' FROM usrgrp g, users_groups ug '.
-		' WHERE ug.userid = '.$userid.
+		' WHERE ug.userid = '.zbx_dbstr($userid).
 			' AND g.usrgrpid = ug.usrgrpid '.
 			' AND g.users_status = '.GROUP_STATUS_DISABLED;
 	if($res = DBfetch(DBselect($sql,1))){
@@ -128,7 +128,7 @@ function get_user_auth($userid){
 
 	$sql = 'SELECT MAX(g.gui_access) as gui_access '.
 		' FROM usrgrp g, users_groups ug '.
-		' WHERE ug.userid='.$userid.
+		' WHERE ug.userid='.zbx_dbstr($userid).
 			' AND g.usrgrpid=ug.usrgrpid ';
 	$acc = DBfetch(DBselect($sql));
 
@@ -142,7 +142,7 @@ return $result;
 function get_user_debug_mode($userid){
 	$sql = 'SELECT g.usrgrpid '.
 			' FROM usrgrp g, users_groups ug '.
-			' WHERE ug.userid = '.$userid.
+			' WHERE ug.userid = '.zbx_dbstr($userid).
 				' AND g.usrgrpid = ug.usrgrpid '.
 				' AND g.debug_mode = '.GROUP_DEBUG_MODE_ENABLED;
 	if($res = DBfetch(DBselect($sql,1))){
@@ -261,7 +261,7 @@ function get_accessible_hosts_by_user(&$user_data,$perm,$perm_res=null,$nodeid=n
 			' LEFT JOIN hosts_groups hg ON hg.hostid=h.hostid '.
 			' LEFT JOIN groups g ON g.groupid=hg.groupid '.
 			' LEFT JOIN rights r ON r.id=g.groupid '.
-			' LEFT JOIN users_groups ug ON ug.usrgrpid=r.groupid and ug.userid='.$userid.
+			' LEFT JOIN users_groups ug ON ug.usrgrpid=r.groupid and ug.userid='.zbx_dbstr($userid).
 			' LEFT JOIN nodes n ON '.DBid2nodeid('h.hostid').'=n.nodeid '.
 		$where.
 		' GROUP BY h.hostid,n.nodeid,n.name,h.host,ug.userid '.
@@ -444,7 +444,7 @@ function get_accessible_nodes_by_user(&$user_data,$perm,$perm_res=null,$nodeid=n
 	foreach($node_data as $nodeid => $node){
 		switch($perm_res){
 			case PERM_RES_DATA_ARRAY:
-				$db_node = DBfetch(DBselect('SELECT * FROM nodes WHERE nodeid='.$nodeid.' ORDER BY name'));
+				$db_node = DBfetch(DBselect('SELECT * FROM nodes WHERE nodeid='.zbx_dbstr($nodeid).' ORDER BY name'));
 
 				if(!ZBX_DISTRIBUTED){
 					if(!$node){
@@ -671,7 +671,7 @@ function get_accessible_nodes_by_rights(&$rights,$user_type,$perm,$perm_res=null
 	foreach($node_data as $nodeid => $node){
 		switch($perm_res){
 			case PERM_RES_DATA_ARRAY:
-				$db_node = DBfetch(DBselect('SELECT * FROM nodes WHERE nodeid='.$nodeid));
+				$db_node = DBfetch(DBselect('SELECT * FROM nodes WHERE nodeid='.zbx_dbstr($nodeid)));
 
 				if(!ZBX_DISTRIBUTED){
 					if(!$node){

@@ -982,7 +982,7 @@ function make_latest_issues($filter = array()){
 		$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged'.
 					' FROM events e'.
 					' WHERE e.object='.EVENT_OBJECT_TRIGGER.
-						' AND e.objectid='.$trigger['triggerid'].
+						' AND e.objectid='.zbx_dbstr($trigger['triggerid']).
 						' AND e.value='.TRIGGER_VALUE_TRUE.
 					' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
 		$res_events = DBSelect($event_sql,1);
@@ -1073,7 +1073,7 @@ function make_webmon_overview($filter){
 
 		$sql = 'SELECT DISTINCT ht.name, ht.httptestid, ht.curstate, ht.lastfailedstep '.
 				' FROM httptest ht, applications a, hosts_groups hg, groups g '.
-				' WHERE g.groupid='.$group['groupid'].
+				' WHERE g.groupid='.zbx_dbstr($group['groupid']).
 					' AND '.DBcondition('hg.hostid',$available_hosts).
 					' AND hg.groupid=g.groupid '.
 					' AND a.hostid=hg.hostid '.

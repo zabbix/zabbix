@@ -22,7 +22,7 @@
 	function setHostGroupInternal($groupids, $internal=ZBX_NOT_INTERNAL_GROUP){
 		zbx_value2array($groupids);
 
-		$sql = 'UPDATE groups SET internal='.$internal.' WHERE '.DBcondition('groupid', $groupids);
+		$sql = 'UPDATE groups SET internal='.zbx_dbstr($internal).' WHERE '.DBcondition('groupid', $groupids);
 		$result = DBexecute($sql);
 	return $result;
 	}
@@ -67,7 +67,7 @@
 		zbx_value2array($templateids);
 
 		$result = delete_template_elements($hostid, $templateids, $unlink_mode);
-		$result&= DBexecute('DELETE FROM hosts_templates WHERE hostid='.$hostid.' AND '.DBcondition('templateid',$templateids));
+		$result&= DBexecute('DELETE FROM hosts_templates WHERE hostid='.zbx_dbstr($hostid).' AND '.DBcondition('templateid',$templateids));
 	return $result;
 	}
 
@@ -274,7 +274,7 @@
 // delete host
 		foreach($hostids as $id){	/* The section should be improved */
 			$host_old = get_host_by_hostid($id);
-			$result = DBexecute('DELETE FROM hosts WHERE hostid='.$id);
+			$result = DBexecute('DELETE FROM hosts WHERE hostid='.zbx_dbstr($id));
 			if($result){
 				if($host_old['status'] == HOST_STATUS_TEMPLATE){
 					info(S_TEMPLATE.SPACE.$host_old['host'].SPACE.S_HOST_HAS_BEEN_DELETED_MSG_PART2);
@@ -389,7 +389,7 @@
 
 		foreach ($groupids as $id) {	/* The section should be improved */
 			$hostgroup_old = get_hostgroup_by_groupid($id);
-			$result = DBexecute('DELETE FROM groups WHERE groupid='.$id);
+			$result = DBexecute('DELETE FROM groups WHERE groupid='.zbx_dbstr($id));
 			if ($result)
 				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST_GROUP, $id, $hostgroup_old['name'], 'groups', NULL, NULL);
 			else
@@ -400,7 +400,7 @@
 	}
 
 	function get_hostgroup_by_groupid($groupid){
-		$result=DBselect("select * from groups where groupid=".$groupid);
+		$result=DBselect("select * from groups where groupid=".zbx_dbstr($groupid));
 		$row=DBfetch($result);
 		if($row){
 			return $row;
@@ -421,7 +421,7 @@
 		else
 			$result = DBselect('SELECT * FROM hosts WHERE status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'.
 					' and '.DBin_node('hostid').' AND host='.zbx_dbstr($name).
-					' and hostid<>'.$proxyid);
+					' and hostid<>'.zbx_dbstr($proxyid));
 
 		if(DBfetch($result)){
 			error(S_PROXY.SPACE."'$name'".SPACE.S_ALREADY_EXISTS_SMALL);
@@ -431,7 +431,7 @@
 		if(is_null($proxyid)){
 			$proxyid=get_dbid('hosts','hostid');
 			if(!DBexecute('INSERT INTO hosts (hostid,host,status,useip,dns,ip,port)'.
-				' values ('.$proxyid.','.zbx_dbstr($name).','.$status.','.$useip.','.zbx_dbstr($dns).','.zbx_dbstr($ip).','.$port.')'))
+				' values ('.$proxyid.','.zbx_dbstr($name).','.zbx_dbstr($status).','.zbx_dbstr($useip).','.zbx_dbstr($dns).','.zbx_dbstr($ip).','.zbx_dbstr($port).')'))
 			{
 				return false;
 			}
@@ -439,7 +439,7 @@
 			return $proxyid;
 		}
 		else
-			return DBexecute('update hosts set host='.zbx_dbstr($name).',status='.$status.',useip='.$useip.',dns='.zbx_dbstr($dns).',ip='.zbx_dbstr($ip).',port='.$port.' where hostid='.$proxyid);
+			return DBexecute('update hosts set host='.zbx_dbstr($name).',status='.zbx_dbstr($status).',useip='.zbx_dbstr($useip).',dns='.zbx_dbstr($dns).',ip='.zbx_dbstr($ip).',port='.zbx_dbstr($port).' where hostid='.zbx_dbstr($proxyid));
 	}
 
 	function delete_proxy($proxyids){
@@ -474,10 +474,10 @@
 	}
 
 	function update_hosts_by_proxyid($proxyid,$hosts=array()){
-		DBexecute('update hosts set proxy_hostid=0 where proxy_hostid='.$proxyid);
+		DBexecute('update hosts set proxy_hostid=0 where proxy_hostid='.zbx_dbstr($proxyid));
 
 		foreach($hosts as $hostid){
-			DBexecute('update hosts set proxy_hostid='.$proxyid.' where hostid='.$hostid);
+			DBexecute('update hosts set proxy_hostid='.zbx_dbstr($proxyid).' where hostid='.zbx_dbstr($hostid));
 		}
 	}
 
@@ -532,7 +532,7 @@
 	}
 
 	function get_host_by_hostid($hostid,$no_error_message=0){
-		$sql='SELECT * FROM hosts WHERE hostid='.$hostid;
+		$sql='SELECT * FROM hosts WHERE hostid='.zbx_dbstr($hostid);
 		$result=DBselect($sql);
 		$row=DBfetch($result);
 		if($row){
@@ -570,7 +570,7 @@
 			if($status != $host['status']){
 //				$hosts[$host['hostid']] = $host['hostid'];
 				update_trigger_value_to_unknown_by_hostid($host['hostid']);
-				$res = DBexecute('UPDATE hosts SET status='.$status.' WHERE hostid='.$host['hostid']);
+				$res = DBexecute('UPDATE hosts SET status='.zbx_dbstr($status).' WHERE hostid='.zbx_dbstr($host['hostid']));
 				if($res){
 					$host_new = $host;//get_host_by_hostid($host['hostid']);
 					$host_new['status'] = $status;
@@ -613,7 +613,7 @@
 		$db_templates = DBselect('SELECT DISTINCT h.hostid,h.host '.
 				' FROM hosts_templates ht '.
 					' LEFT JOIN hosts h ON h.hostid=ht.templateid '.
-				' WHERE ht.hostid='.$hostid.
+				' WHERE ht.hostid='.zbx_dbstr($hostid).
 				' ORDER BY h.host');
 
 		while($template_data = DBfetch($db_templates)){
@@ -1153,7 +1153,7 @@ return $result;
 
 		if($_REQUEST['groupid'] > 0){
 			if($_REQUEST['hostid'] > 0){
-				$sql = 'SELECT groupid FROM hosts_groups WHERE hostid='.$_REQUEST['hostid'].' AND groupid='.$_REQUEST['groupid'];
+				$sql = 'SELECT groupid FROM hosts_groups WHERE hostid='.zbx_dbstr($_REQUEST['hostid']).' AND groupid='.zbx_dbstr($_REQUEST['groupid']);
 				if(!DBfetch(DBselect($sql))){
 					$_REQUEST['hostid'] = 0;
 				}
@@ -1265,9 +1265,9 @@ return $result;
 		$sql = 'SELECT applicationid, templateid
 			FROM applications
 			WHERE name='.zbx_dbstr($name).'
-				AND hostid='.$hostid;
+				AND hostid='.zbx_dbstr($hostid);
 		if(!is_null($applicationid)){
-			$sql .= ' AND applicationid<>'.$applicationid;
+			$sql .= ' AND applicationid<>'.zbx_dbstr($applicationid);
 		}
 		$db_app = DBfetch(DBselect($sql));
 		if($db_app && (($templateid == 0) || ($templateid && $db_app['templateid'] && $templateid != $db_app['templateid']))){
@@ -1290,15 +1290,15 @@ return $result;
 			$applicationid_new = get_dbid('applications', 'applicationid');
 
 			$sql = 'INSERT INTO applications (applicationid, name, hostid, templateid) '.
-				" VALUES ($applicationid_new, ".zbx_dbstr($name).", $hostid, $templateid)";
+				' VALUES ('.zbx_dbstr($applicationid_new).','.zbx_dbstr($name).','.zbx_dbstr($hostid).','.zbx_dbstr($templateid).')';
 			if($result = DBexecute($sql)){
 				info(S_ADDED_NEW_APPLICATION.SPACE.'"'.$host['host'].':'.$name.'"');
 			}
 		}
 		else{
 			$old_app = get_application_by_applicationid($applicationid);
-			$result = DBexecute('UPDATE applications SET name='.zbx_dbstr($name).', hostid='.$hostid.', templateid='.$templateid.
-				' WHERE applicationid='.$applicationid);
+			$result = DBexecute('UPDATE applications SET name='.zbx_dbstr($name).', hostid='.zbx_dbstr($hostid).', templateid='.zbx_dbstr($templateid).
+				' WHERE applicationid='.zbx_dbstr($applicationid));
 			if($result)
 				info(S_APPLICATION.SPACE.'"'.$host['host'].':'.$old_app['name'].'"'.SPACE.S_UPDATED_SMALL);
 		}
@@ -1437,7 +1437,7 @@ return $result;
 	}
 
 	function get_application_by_applicationid($applicationid,$no_error_message=0){
-		$result = DBselect("select * from applications where applicationid=".$applicationid);
+		$result = DBselect('select * from applications where applicationid='.zbx_dbstr($applicationid));
 		$row=DBfetch($result);
 		if($row)
 		{
@@ -1450,7 +1450,7 @@ return $result;
 	}
 
 	function get_applications_by_templateid($applicationid){
-		return DBselect("select * from applications where templateid=".$applicationid);
+		return DBselect('select * from applications where templateid='.zbx_dbstr($applicationid));
 	}
 
 	function get_realhost_by_applicationid($applicationid){
@@ -1462,7 +1462,7 @@ return $result;
 	}
 
 	function get_host_by_applicationid($applicationid){
-		$sql="select h.* from hosts h, applications a where a.hostid=h.hostid and a.applicationid=$applicationid";
+		$sql='select h.* from hosts h, applications a where a.hostid=h.hostid and a.applicationid='.zbx_dbstr($applicationid);
 		$result=DBselect($sql);
 		$row=DBfetch($result);
 		if($row)
@@ -1474,7 +1474,7 @@ return $result;
 	}
 
 	function get_applications_by_hostid($hostid){
-		return DBselect('select * from applications where hostid='.$hostid);
+		return DBselect('select * from applications where hostid='.zbx_dbstr($hostid));
 	}
 
 	/*
@@ -1513,7 +1513,7 @@ return $result;
 			}
 
 			if ($unlink_mode) {
-				if (DBexecute("update applications set templateid=0 where applicationid=".$db_app["applicationid"])) {
+				if (DBexecute("update applications set templateid=0 where applicationid=".zbx_dbstr($db_app["applicationid"]))) {
 					info(S_APPLICATION.SPACE.'"'.$host["host"].':'.$db_app["name"].'"'.SPACE.S_UNLINKED_SMALL);
 				}
 			}
@@ -1612,7 +1612,7 @@ return $result;
 
 	function add_host_profile($hostid,$devicetype,$name,$os,$serialno,$tag,$macaddress,$hardware,$software,$contact,$location,$notes){
 
-		$result=DBselect('SELECT * FROM hosts_profiles WHERE hostid='.$hostid);
+		$result=DBselect('SELECT * FROM hosts_profiles WHERE hostid='.zbx_dbstr($hostid));
 		if(DBfetch($result)){
 			error(S_HOST_PROFILE.SPACE.S_ALREADY_EXISTS);
 			return 0;
@@ -1653,7 +1653,7 @@ return $result;
 			'poc_1_name','poc_1_email','poc_1_phone_1','poc_1_phone_2','poc_1_cell','poc_1_screen','poc_1_notes','poc_2_name',
 			'poc_2_email','poc_2_phone_1','poc_2_phone_2','poc_2_cell','poc_2_screen','poc_2_notes');
 
-		$result=DBselect('SELECT * FROM hosts_profiles_ext WHERE hostid='.$hostid);
+		$result=DBselect('SELECT * FROM hosts_profiles_ext WHERE hostid='.zbx_dbstr($hostid));
 		if(DBfetch($result)){
 			error(S_HOST_PROFILE.SPACE.S_ALREADY_EXISTS);
 			return false;

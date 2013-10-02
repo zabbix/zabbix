@@ -138,7 +138,7 @@
 
 		$sql = 'SELECT MAX(g.graphtype) as graphtype, MIN(gi.yaxisside) as yaxissidel, MAX(gi.yaxisside) as yaxissider, MAX(g.height) as height'.
 				' FROM graphs g, graphs_items gi '.
-				' WHERE g.graphid='.$graphid.
+				' WHERE g.graphid='.zbx_dbstr($graphid).
 					' AND gi.graphid=g.graphid ';
 		$res = DBselect($sql);
 		if($graph=DBfetch($res)){
@@ -172,7 +172,7 @@
 				' FROM graphs g, graphs_items gi, items i '.
 				' WHERE g.graphid=gi.graphid '.
 					' AND gi.itemid=i.itemid '.
-					' AND i.hostid='.$hostid;
+					' AND i.hostid='.zbx_dbstr($hostid);
 	return DBselect($sql);
 	}
 
@@ -189,13 +189,13 @@
 							' FROM graphs_items gi, items i, hosts h'.
 							' WHERE h.hostid=i.hostid '.
 								' AND gi.itemid=i.itemid '.
-								' AND gi.graphid='.$graphid);
+								' AND gi.graphid='.zbx_dbstr($graphid));
 	}
 
 	function get_graphitems_by_graphid($graphid){
 		return DBselect('SELECT * '.
 					' FROM graphs_items '.
-					' WHERE graphid='.$graphid.
+					' WHERE graphid='.zbx_dbstr($graphid).
 					' ORDER BY itemid,drawtype,sortorder,color,yaxisside');
 	}
 
@@ -216,7 +216,7 @@
 		$itemids = array();
 		$sql = 'SELECT DISTINCT gi.itemid '.
 				' FROM graphs_items gi '.
-				' WHERE gi.graphid='.$graphid;
+				' WHERE gi.graphid='.zbx_dbstr($graphid);
 		$res = DBselect($sql);
 		while($item = DBfetch($res)){
 			$itemids[$item['itemid']] = $item['itemid'];
@@ -310,7 +310,7 @@ function get_min_itemclock_by_itemid($itemids) {
 
 	function get_graph_by_graphid($graphid){
 
-		$result=DBselect("SELECT * FROM graphs WHERE graphid=$graphid");
+		$result=DBselect('SELECT * FROM graphs WHERE graphid='.zbx_dbstr($graphid));
 		$row=DBfetch($result);
 		if($row){
 			return	$row;
@@ -343,9 +343,9 @@ function get_min_itemclock_by_itemid($itemids) {
 		foreach($gitems as $gitem){
 			$sql = 'SELECT src.itemid, dest.key_ '.
 					' FROM items src, items dest '.
-					' WHERE dest.itemid='.$gitem['itemid'].
+					' WHERE dest.itemid='.zbx_dbstr($gitem['itemid']).
 						' AND src.key_=dest.key_ '.
-						' AND src.hostid='.$dest_hostid;
+						' AND src.hostid='.zbx_dbstr($dest_hostid);
 			$db_item = DBfetch(DBselect($sql));
 			if (!$db_item && $error){
 				$item = get_item_by_itemid($gitem['itemid']);
@@ -386,8 +386,11 @@ function get_min_itemclock_by_itemid($itemids) {
 
 		$result=DBexecute('INSERT INTO graphs '.
 			' (graphid,name,width,height,ymin_type,ymax_type,yaxismin,yaxismax,ymin_itemid,ymax_itemid,templateid,show_work_period,show_triggers,graphtype,show_legend,show_3d,percent_left,percent_right) '.
-			" VALUES ($graphid,".zbx_dbstr($name).",$width,$height,$ymin_type,$ymax_type,$yaxismin,$yaxismax,$ymin_itemid,$ymax_itemid,".
-			" $templateid,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d,$percent_left,$percent_right)");
+			' VALUES ('.$graphid.','.zbx_dbstr($name).','.zbx_dbstr($width).','.zbx_dbstr($height).','.
+				zbx_dbstr($ymin_type).','.zbx_dbstr($ymax_type).','.zbx_dbstr($yaxismin).','.zbx_dbstr($yaxismax).','.
+				zbx_dbstr($ymin_itemid).','.zbx_dbstr($ymax_itemid).','.zbx_dbstr($templateid).','.
+				zbx_dbstr($showworkperiod).','.zbx_dbstr($showtriggers).','.zbx_dbstr($graphtype).','.zbx_dbstr($legend).','.
+				zbx_dbstr($graph3d).','.zbx_dbstr($percent_left).','.zbx_dbstr($percent_right));
 
 		return ( $result ? $graphid : $result);
 	}
@@ -507,28 +510,28 @@ function get_min_itemclock_by_itemid($itemids) {
 
 		$sql = 'UPDATE graphs SET '.
 				'name='.zbx_dbstr($name).','.
-				'width='.$width.','.
-				'height='.$height.','.
-				'ymin_type='.$ymin_type.','.
-				'ymax_type='.$ymax_type.','.
-				'yaxismin='.$yaxismin.','.
-				'yaxismax='.$yaxismax.','.
-				'ymin_itemid='.$ymin_itemid.','.
-				'ymax_itemid='.$ymax_itemid.','.
-				'templateid='.$templateid.','.
-				'show_work_period='.$showworkperiod.','.
-				'show_triggers='.$showtriggers.','.
-				'graphtype='.$graphtype.','.
-				'show_legend='.$legend.','.
-				'show_3d='.$graph3d.','.
-				'percent_left='.$percent_left.','.
-				'percent_right='.$percent_right.
-			' WHERE graphid='.$graphid;
+				'width='.zbx_dbstr($width).','.
+				'height='.zbx_dbstr($height).','.
+				'ymin_type='.zbx_dbstr($ymin_type).','.
+				'ymax_type='.zbx_dbstr($ymax_type).','.
+				'yaxismin='.zbx_dbstr($yaxismin).','.
+				'yaxismax='.zbx_dbstr($yaxismax).','.
+				'ymin_itemid='.zbx_dbstr($ymin_itemid).','.
+				'ymax_itemid='.zbx_dbstr($ymax_itemid).','.
+				'templateid='.zbx_dbstr($templateid).','.
+				'show_work_period='.zbx_dbstr($showworkperiod).','.
+				'show_triggers='.zbx_dbstr($showtriggers).','.
+				'graphtype='.zbx_dbstr($graphtype).','.
+				'show_legend='.zbx_dbstr($legend).','.
+				'show_3d='.zbx_dbstr($graph3d).','.
+				'percent_left='.zbx_dbstr($percent_left).','.
+				'percent_right='.zbx_dbstr($percent_right).
+			' WHERE graphid='.zbx_dbstr($graphid);
 
 		if($result = DBexecute($sql)){
 			if($g_graph['graphtype'] != $graphtype && $graphtype == GRAPH_TYPE_STACKED){
 				$result = DBexecute('UPDATE graphs_items SET calc_fnc='.CALC_FNC_AVG.',drawtype=1,type='.GRAPH_ITEM_SIMPLE.
-					' WHERE graphid='.$graphid);
+					' WHERE graphid='.zbx_dbstr($graphid));
 			}
 		}
 		return $result;
@@ -600,7 +603,7 @@ function get_min_itemclock_by_itemid($itemids) {
 			}
 		}
 
-		DBexecute('DELETE FROM graphs_items WHERE graphid='.$graphid);
+		DBexecute('DELETE FROM graphs_items WHERE graphid='.zbx_dbstr($graphid));
 
 		foreach($gitems as $gitem){
 			if (!$result = add_item_to_graph(
@@ -740,8 +743,8 @@ function get_min_itemclock_by_itemid($itemids) {
 
 		$result = DBexecute('insert into graphs_items'.
 			' (gitemid,graphid,itemid,color,drawtype,sortorder,yaxisside,calc_fnc,type,periods_cnt)'.
-			' values ('.$gitemid.','.$graphid.','.$itemid.','.zbx_dbstr($color).','.$drawtype.','.
-			$sortorder.','.$yaxisside.','.$calc_fnc.','.$type.','.$periods_cnt.')');
+			' values ('.$gitemid.','.zbx_dbstr($graphid).','.zbx_dbstr($itemid).','.zbx_dbstr($color).','.zbx_dbstr($drawtype).','.
+			zbx_dbstr($sortorder).','.zbx_dbstr($yaxisside).','.zbx_dbstr($calc_fnc).','.zbx_dbstr($type).','.zbx_dbstr($periods_cnt).')');
 
 		return ( $result ? $gitemid : $result );
 	}
@@ -780,7 +783,7 @@ function get_min_itemclock_by_itemid($itemids) {
 			}
 
 			if ($unlink_mode) {
-				if (DBexecute('UPDATE graphs SET templateid=0 WHERE graphid='.$db_graph['graphid'])) {
+				if (DBexecute('UPDATE graphs SET templateid=0 WHERE graphid='.zbx_dbstr($db_graph['graphid']))) {
 					info(S_GRAPH.SPACE.'"'.$host['host'].':'.$db_graph['name'].'"'.SPACE.S_UNLINKED_SMALL);
 				}
 			}

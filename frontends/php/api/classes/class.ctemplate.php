@@ -998,7 +998,7 @@ COpt::memoryPick();
 
 				foreach($template['groups'] as $group){
 					$hostgroupid = get_dbid('hosts_groups', 'hostgroupid');
-					$result = DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES ($hostgroupid, $templateid, {$group['groupid']})");
+					$result = DBexecute('INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES ('.$hostgroupid.','.zbx_dbstr($templateid).','.zbx_dbstr($group['groupid']).')');
 					if(!$result){
 						self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 					}
@@ -1633,7 +1633,7 @@ COpt::memoryPick();
 					if(isset($link[$targetid]) && ($link[$targetid] == $templateid)) continue 2;
 				}
 
-				$values = array(get_dbid('hosts_templates', 'hosttemplateid'), $targetid, $templateid);
+				$values = array(get_dbid('hosts_templates', 'hosttemplateid'), zbx_dbstr($targetid), zbx_dbstr($templateid));
 				$sql = 'INSERT INTO hosts_templates VALUES ('. implode(', ', $values) .')';
 				$result = DBexecute($sql);
 

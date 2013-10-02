@@ -26,7 +26,7 @@ require_once('include/js.inc.php');
 <?php
 
 	function get_screen_by_screenid($screenid){
-		$result = DBselect("select * from screens where screenid=$screenid");
+		$result = DBselect('select * from screens where screenid='.zbx_dbstr($screenid));
 		$row=DBfetch($result);
 		if($row){
 			return	$row;
@@ -38,8 +38,7 @@ require_once('include/js.inc.php');
 	function check_screen_recursion($mother_screenid, $child_screenid){
 		if((bccomp($mother_screenid , $child_screenid)==0))	return TRUE;
 
-		$db_scr_items = DBselect("select resourceid from screens_items where".
-			" screenid=$child_screenid and resourcetype=".SCREEN_RESOURCE_SCREEN);
+		$db_scr_items = DBselect('select resourceid from screens_items where screenid='.zbx_dbstr($child_screenid).' and resourcetype='.SCREEN_RESOURCE_SCREEN);
 		while($scr_item = DBfetch($db_scr_items)){
 			if(check_screen_recursion($mother_screenid,$scr_item["resourceid"]))
 				return TRUE;
@@ -50,7 +49,7 @@ require_once('include/js.inc.php');
 	function get_slideshow($slideshowid, $step, $effectiveperiod=NULL){
 		$sql = 'SELECT min(step) as min_step, max(step) as max_step '.
 				' FROM slides '.
-				' WHERE slideshowid='.$slideshowid;
+				' WHERE slideshowid='.zbx_dbstr($slideshowid);
 		$slide_data = DBfetch(DBselect($sql));
 		if(!$slide_data || is_null($slide_data['min_step'])){
 			return false;
@@ -66,9 +65,9 @@ require_once('include/js.inc.php');
 
 		$sql = 'SELECT sl.* '.
 				' FROM slides sl, slideshows ss '.
-				' WHERE ss.slideshowid='.$slideshowid.
+				' WHERE ss.slideshowid='.zbx_dbstr($slideshowid).
 					' and sl.slideshowid=ss.slideshowid '.
-					' and sl.step='.$curr_step;
+					' and sl.step='.zbx_dbstr($curr_step);
 		$slide_data = DBfetch(DBselect($sql));
 
 	return $slide_data;
@@ -80,7 +79,7 @@ require_once('include/js.inc.php');
 
 		$sql = 'SELECT slideshowid '.
 				' FROM slideshows '.
-				' WHERE slideshowid='.$slideshowid.
+				' WHERE slideshowid='.zbx_dbstr($slideshowid).
 					' AND '.DBin_node('slideshowid', get_current_nodeid(null,$perm));
 		if(DBselect($sql)){
 			$result = true;
@@ -88,7 +87,7 @@ require_once('include/js.inc.php');
 			$screenids = array();
 			$sql = 'SELECT DISTINCT screenid '.
 					' FROM slides '.
-					' WHERE slideshowid='.$slideshowid;
+					' WHERE slideshowid='.zbx_dbstr($slideshowid);
 			$db_screens = DBselect($sql);
 			while($slide_data = DBfetch($db_screens)){
 				$screenids[$slide_data['screenid']] = $slide_data['screenid'];
@@ -111,7 +110,7 @@ require_once('include/js.inc.php');
 	}
 
 	function get_slideshow_by_slideshowid($slideshowid){
-		return DBfetch(DBselect('select * from slideshows where slideshowid='.$slideshowid));
+		return DBfetch(DBselect('select * from slideshows where slideshowid='.zbx_dbstr($slideshowid)));
 	}
 
 	function add_slideshow($name, $delay, $slides){
@@ -144,7 +143,7 @@ require_once('include/js.inc.php');
 
 // TODO: resulve conflict about regression of delay per slide
 			$result = DBexecute('INSERT INTO slides (slideid,slideshowid,screenid,step,delay) '.
-								' VALUES ('.$slideid.','.$slideshowid.','.$slide['screenid'].','.($i++).','.$slide['delay'].')');
+								' VALUES ('.$slideid.','.zbx_dbstr($slideshowid).','.zbx_dbstr($slide['screenid']).','.($i++).','.zbx_dbstr($slide['delay']).')');
 			if(!$result) return false;
 		}
 
@@ -171,17 +170,17 @@ require_once('include/js.inc.php');
 			if(!isset($slide['delay'])) $slide['delay'] = 0;
 		}
 
-		if(!$result = DBexecute('UPDATE slideshows SET name='.zbx_dbstr($name).',delay='.$delay.' WHERE slideshowid='.$slideshowid))
+		if(!$result = DBexecute('UPDATE slideshows SET name='.zbx_dbstr($name).',delay='.zbx_dbstr($delay).' WHERE slideshowid='.zbx_dbstr($slideshowid)))
 			return false;
 
-		DBexecute('DELETE FROM slides where slideshowid='.$slideshowid);
+		DBexecute('DELETE FROM slides where slideshowid='.zbx_dbstr($slideshowid));
 
 		$i = 0;
 		foreach($slides as $slide){
 			$slideid = get_dbid('slides','slideid');
 			if(!isset($slide['delay'])) $slide['delay'] = $delay;
 			$result = DBexecute('INSERT INTO slides (slideid,slideshowid,screenid,step,delay) '.
-				' VALUES ('.$slideid.','.$slideshowid.','.$slide['screenid'].','.($i++).','.$slide['delay'].')');
+				' VALUES ('.$slideid.','.zbx_dbstr($slideshowid).','.zbx_dbstr($slide['screenid']).','.($i++).','.zbx_dbstr($slide['delay']).')');
 			if(!$result){
 				return false;
 			}
@@ -192,9 +191,9 @@ require_once('include/js.inc.php');
 
 	function delete_slideshow($slideshowid){
 
-		$result = DBexecute('DELETE FROM slideshows where slideshowid='.$slideshowid);
-		$result &= DBexecute('DELETE FROM slides where slideshowid='.$slideshowid);
-		$result &= DBexecute("DELETE FROM profiles WHERE idx='web.favorite.screenids' AND source='slideshowid' AND value_id=$slideshowid");
+		$result = DBexecute('DELETE FROM slideshows where slideshowid='.zbx_dbstr($slideshowid));
+		$result &= DBexecute('DELETE FROM slides where slideshowid='.zbx_dbstr($slideshowid));
+		$result &= DBexecute('DELETE FROM profiles WHERE idx=\'web.favorite.screenids\' AND source=\'slideshowid\' AND value_id='.zbx_dbstr($slideshowid));
 
 		return $result;
 	}
@@ -282,13 +281,13 @@ require_once('include/js.inc.php');
 		if($config == 0){
 			$sql = 'SELECT screenitemid '.
 			' FROM screens_items '.
-			' WHERE screenid='.$elid.
+			' WHERE screenid='.zbx_dbstr($elid).
 				' AND dynamic='.SCREEN_DYNAMIC_ITEM;
 		}
 		else{
 			$sql = 'SELECT si.screenitemid '.
 			' FROM slides s, screens_items si '.
-			' WHERE s.slideshowid='.$elid.
+			' WHERE s.slideshowid='.zbx_dbstr($elid).
 				' AND si.screenid=s.screenid'.
 				' AND si.dynamic='.SCREEN_DYNAMIC_ITEM;
 		}
@@ -306,8 +305,8 @@ require_once('include/js.inc.php');
 		if(isset($_REQUEST['screenitemid'])){
 			$sql = 'SELECT * '.
 					' FROM screens_items'.
-					' WHERE screenid='.$_REQUEST['screenid'].
-						' AND screenitemid='.$_REQUEST['screenitemid'];
+					' WHERE screenid='.zbx_dbstr($_REQUEST['screenid']).
+						' AND screenitemid='.zbx_dbstr($_REQUEST['screenitemid']);
 			$iresult=DBSelect($sql);
 
 			$form->addVar('screenitemid',$_REQUEST['screenitemid']);
@@ -600,7 +599,7 @@ require_once('include/js.inc.php');
 				$result=DBselect('SELECT DISTINCT n.name as node_name,s.screenid,s.name '.
 							' FROM screens s '.
 								' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('s.screenid').
-							' WHERE s.screenid='.$resourceid);
+							' WHERE s.screenid='.zbx_dbstr($resourceid));
 
 				while($row=DBfetch($result)){
 					$r = CScreen::get(array(
@@ -635,7 +634,7 @@ require_once('include/js.inc.php');
 						' FROM hosts_groups hg, groups g '.
 							' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('g.groupid').
 						' WHERE '.DBcondition('g.groupid',$available_groups).
-							' AND g.groupid='.$resourceid);
+							' AND g.groupid='.zbx_dbstr($resourceid));
 
 				while($row=DBfetch($result)){
 					$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
@@ -770,11 +769,11 @@ require_once('include/js.inc.php');
 		if(is_null($effectiveperiod))
 			$effectiveperiod = ZBX_MIN_PERIOD;
 
-		$result=DBselect('SELECT name,hsize,vsize FROM screens WHERE screenid='.$screenid);
+		$result=DBselect('SELECT name,hsize,vsize FROM screens WHERE screenid='.zbx_dbstr($screenid));
 		$row=DBfetch($result);
 		if(!$row) return new CTableInfo(S_NO_SCREENS_DEFINED);
 
-		$sql = 'SELECT * FROM screens_items WHERE screenid='.$screenid;
+		$sql = 'SELECT * FROM screens_items WHERE screenid='.zbx_dbstr($screenid);
 		$iresult = DBSelect($sql);
 
 		$skip_field = array();

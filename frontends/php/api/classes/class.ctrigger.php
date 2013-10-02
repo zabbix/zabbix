@@ -384,12 +384,12 @@ class CTrigger extends CZBXAPI{
 
 // lastChangeSince
 		if(!is_null($options['lastChangeSince'])){
-			$sql_parts['where']['lastchangesince'] = 't.lastchange>'.$options['lastChangeSince'];
+			$sql_parts['where']['lastchangesince'] = 't.lastchange>'.zbx_dbstr($options['lastChangeSince']);
 		}
 
 // lastChangeTill
 		if(!is_null($options['lastChangeTill'])){
-			$sql_parts['where']['lastchangetill'] = 't.lastchange<'.$options['lastChangeTill'];
+			$sql_parts['where']['lastchangetill'] = 't.lastchange<'.zbx_dbstr($options['lastChangeTill']);
 		}
 
 // withUnacknowledgedEvents
@@ -517,7 +517,7 @@ class CTrigger extends CZBXAPI{
 
 // min_severity
 		if(!is_null($options['min_severity'])){
-			$sql_parts['where'][] = 't.priority>='.$options['min_severity'];
+			$sql_parts['where'][] = 't.priority>='.zbx_dbstr($options['min_severity']);
 		}
 
 // output

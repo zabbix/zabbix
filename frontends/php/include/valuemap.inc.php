@@ -26,9 +26,9 @@
 		foreach($mappings as $map){
 			$mappingid = get_dbid("mappings","mappingid");
 
-			$result = DBexecute("insert into mappings (mappingid,valuemapid, value, newvalue)".
-				" values (".$mappingid.",".$valuemapid.",".zbx_dbstr($map["value"]).",".
-				zbx_dbstr($map["newvalue"]).")");
+			$result = DBexecute('insert into mappings (mappingid,valuemapid, value, newvalue)'.
+				' values ('.zbx_dbstr($mappingid).','.zbx_dbstr($valuemapid).','.zbx_dbstr($map["value"]).','.
+				zbx_dbstr($map["newvalue"]).')');
 
 			if(!$result)
 				return $result;
@@ -41,7 +41,7 @@
 
 		$valuemapid = get_dbid("valuemaps","valuemapid");
 
-		$result = DBexecute("insert into valuemaps (valuemapid,name) values ($valuemapid,".zbx_dbstr($name).")");
+		$result = DBexecute('insert into valuemaps (valuemapid,name) values ('.zbx_dbstr($valuemapid).','.zbx_dbstr($name).')');
 		if(!$result)
 			return $result;
 
@@ -59,7 +59,7 @@
 		if(!is_array($mappings))	return FALSE;
 
 		$result = DBexecute('UPDATE valuemaps SET name='.zbx_dbstr($name).
-			' WHERE valuemapid='.$valuemapid);
+			' WHERE valuemapid='.zbx_dbstr($valuemapid));
 
 		if(!$result)
 			return $result;
@@ -72,8 +72,8 @@
 	}
 
 	function delete_valuemap($valuemapid){
-		DBexecute('DELETE FROM mappings WHERE valuemapid='.$valuemapid);
-		DBexecute('DELETE FROM valuemaps WHERE valuemapid='.$valuemapid);
+		DBexecute('DELETE FROM mappings WHERE valuemapid='.zbx_dbstr($valuemapid));
+		DBexecute('DELETE FROM valuemaps WHERE valuemapid='.zbx_dbstr($valuemapid));
 	return TRUE;
 	}
 
@@ -85,7 +85,7 @@
 
 		$sql = 'SELECT newvalue '.
 				' FROM mappings '.
-				' WHERE valuemapid='.$valuemapid.
+				' WHERE valuemapid='.zbx_dbstr($valuemapid).
 					' AND value='.zbx_dbstr($value);
 		$result = DBselect($sql);
 		if($row = DBfetch($result)){

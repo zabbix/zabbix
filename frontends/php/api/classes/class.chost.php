@@ -1102,19 +1102,19 @@ Copt::memoryPick();
 				$result = DBexecute('INSERT INTO hosts (hostid, proxy_hostid, host, port, status, useip, dns, ip, disable_until, available,'.
 					'useipmi,ipmi_port,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,ipmi_ip) VALUES ('.
 					$hostid.','.
-					$host['proxy_hostid'].','.
+					zbx_dbstr($host['proxy_hostid']).','.
 					zbx_dbstr($host['host']).','.
-					$host['port'].','.
-					$host['status'].','.
-					$host['useip'].','.
+					zbx_dbstr($host['port']).','.
+					zbx_dbstr($host['status']).','.
+					zbx_dbstr($host['useip']).','.
 					zbx_dbstr($host['dns']).','.
 					zbx_dbstr($host['ip']).
 					',0,'.
 					HOST_AVAILABLE_UNKNOWN.','.
-					$host['useipmi'].','.
-					$host['ipmi_port'].','.
-					$host['ipmi_authtype'].','.
-					$host['ipmi_privilege'].','.
+					zbx_dbstr($host['useipmi']).','.
+					zbx_dbstr($host['ipmi_port']).','.
+					zbx_dbstr($host['ipmi_authtype']).','.
+					zbx_dbstr($host['ipmi_privilege']).','.
 					zbx_dbstr($host['ipmi_username']).','.
 					zbx_dbstr($host['ipmi_password']).','.
 					zbx_dbstr($host['ipmi_ip']).')'
@@ -1125,7 +1125,7 @@ Copt::memoryPick();
 
 				foreach($host['groups'] as $group){
 					$hostgroupid = get_dbid('hosts_groups', 'hostgroupid');
-					$result = DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES ($hostgroupid, $hostid, {$group['groupid']})");
+					$result = DBexecute('INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES ('.zbx_dbstr($hostgroupid).','.zbx_dbstr($hostid).','.zbx_dbstr($group['groupid']).')');
 					if(!$result){
 						self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 					}
