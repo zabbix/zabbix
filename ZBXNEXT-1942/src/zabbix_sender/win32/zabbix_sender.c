@@ -29,8 +29,8 @@ const char	usage_message[] = "";
 
 const char	*help_message[] = {NULL};
 
-int zbx_sender_send_values(const char *address, unsigned short port, const char *source, const zbx_sender_value_t *values,
-		int count, char **result)
+int	zabbix_sender_send_values(const char *address, unsigned short port, const char *source,
+		const zabbix_sender_value_t *values, int count, char **result)
 {
 	zbx_sock_t	sock;
 	int		tcp_ret = SUCCEED, ret = FAIL, i;
@@ -66,16 +66,13 @@ int zbx_sender_send_values(const char *address, unsigned short port, const char 
 			if (SUCCEED == (tcp_ret = zbx_tcp_recv(&sock, &answer)))
 			{
 				if (NULL != result)
-					*result = answer;
-				else
-					zbx_free(answer);
+					*result = zbx_strdup(NULL, answer);
 			}
 		}
 
 		zbx_tcp_close(&sock);
 	}
 
-out:
 	if (FAIL == tcp_ret && NULL != result)
 		*result = zbx_strdup(NULL, zbx_tcp_strerror());
 
@@ -84,7 +81,39 @@ out:
 	return ret;
 }
 
-void zbx_sender_result_free(void *ptr)
+int	zabbix_sender_parse_result(const char *result, int *response, zabbix_sender_info_t *info)
+{
+	int			ret, processed;
+	struct zbx_json_parse	jp;
+	char			value[MAX_STRING_LEN];
+	double			time_spent;
+
+	if (SUCCEED != (ret = zbx_json_open(result, &jp)))
+		goto out;
+
+	if (SUCCEED != (ret = zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value))))
+		goto out;
+
+	*response = (0 == strcmp(value, ZBX_PROTO_VALUE_SUCCESS)) ? 0 : -1;
+
+	if (NULL == info)
+		goto out;
+
+	if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, value, sizeof(value)) ||
+			4 != sscanf(value, "Processed %d Failed %d Total %d Seconds spent %lf",
+					&processed, &info->failed, &info->total, &time_spent))
+	{
+		info->total = -1;
+		goto out;
+	}
+
+	info->time_spent = (int)(time_spent * 1000000);
+
+out:
+	return ret;
+}
+
+void	zabbix_sender_free_result(void *ptr)
 {
 	if (NULL != ptr)
 		free(ptr);
