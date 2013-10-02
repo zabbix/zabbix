@@ -1080,6 +1080,13 @@ class CAction extends CZBXAPI {
 						$opcommandHstCreate = array_merge($opcommandHstCreate, $operation['opcommand_hst']);
 					}
 					else {
+						if ($operation['opcommand']['type'] == ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT) {
+							$operation['opcommand']['command'] = '';
+						}
+						else {
+							$operation['opcommand']['scriptid'] = 0;
+						}
+
 						$opcommandUpdate[] = array(
 							'values' => $operation['opcommand'],
 							'where' => array('operationid' => $operation['operationid'])
