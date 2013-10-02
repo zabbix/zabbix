@@ -527,7 +527,7 @@ class CTemplate extends CHostGeneral {
 
 			foreach ($template['groups'] as $group) {
 				$hostgroupid = get_dbid('hosts_groups', 'hostgroupid');
-				$result = DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES ($hostgroupid, $templateid, {$group['groupid']})");
+				$result = DBexecute('INSERT INTO hosts_groups (hostgroupid,hostid,groupid) VALUES ('.zbx_dbstr($hostgroupid).','.zbx_dbstr($templateid).','.zbx_dbstr($group['groupid']).')');
 				if (!$result) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 				}

@@ -1104,7 +1104,7 @@ function printLess(show) {
 		});
 
 		jQuery('body')
-			.prepend('<div class="printless">«BACK</div>')
+			.prepend('<div class="printless">&laquo;BACK</div>')
 			.click(function() {
 				printLess(false);
 			});
