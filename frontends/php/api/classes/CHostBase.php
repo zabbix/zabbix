@@ -33,7 +33,7 @@ abstract class CHostBase extends CZBXAPI {
 	 * @param array $templateIds
 	 * @param array $targetIds		an array of host IDs to link the templates to
 	 *
-	 * @return bool
+	 * @return array 	an array of added hosts_templates rows, with 'hostid' and 'templateid' set for each row
 	 */
 	protected function link(array $templateIds, array $targetIds) {
 		if (empty($templateIds)) {
@@ -233,6 +233,8 @@ abstract class CHostBase extends CZBXAPI {
 		if (count($visited) < count($all)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular template linkage is not allowed.'));
 		}
+
+		return $hostsLinkageInserts;
 	}
 
 	protected function unlink($templateids, $targetids = null) {
