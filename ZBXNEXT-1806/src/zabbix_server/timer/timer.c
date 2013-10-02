@@ -642,7 +642,7 @@ static void	process_maintenance(void)
 	{
 		ZBX_STR2UINT64(db_maintenanceid, row[0]);
 		db_maintenance_type	= atoi(row[1]);
-		db_active_since		= (time_t)atoi(row[2]);
+		db_active_since		= atoi(row[2]);
 		db_timeperiod_type	= atoi(row[3]);
 		db_every		= atoi(row[4]);
 		db_month		= atoi(row[5]);
@@ -663,10 +663,7 @@ static void	process_maintenance(void)
 			if (db_start_date < db_active_since)
 				continue;
 
-			tm = localtime(&db_active_since);
-			active_since = db_active_since - (tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec);
-
-			day = (db_start_date - active_since) / SEC_PER_DAY + 1;
+			day = (db_start_date - db_active_since) / SEC_PER_DAY;
 			db_start_date -= SEC_PER_DAY * (day % db_every);
 			break;
 		case TIMEPERIOD_TYPE_WEEKLY:
@@ -679,13 +676,13 @@ static void	process_maintenance(void)
 
 			tm = localtime(&db_active_since);
 			wday = (0 == tm->tm_wday ? 7 : tm->tm_wday) - 1;
-			active_since = db_active_since - (wday * SEC_PER_DAY + tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec);
+			active_since = db_active_since - wday * SEC_PER_DAY;
 
 			for (; db_start_date >= db_active_since; db_start_date -= SEC_PER_DAY)
 			{
 				/* check for every x week(s) */
-				week = (db_start_date - active_since) / SEC_PER_WEEK + 1;
-				if (0 != (week % db_every))
+				week = (db_start_date - active_since) / SEC_PER_WEEK;
+				if (0 != week % db_every)
 					continue;
 
 				/* check for day of the week */
@@ -730,7 +727,9 @@ static void	process_maintenance(void)
 							continue;
 					}
 					else if (db_every != day)
+					{
 						continue;
+					}
 				}
 
 				break;
