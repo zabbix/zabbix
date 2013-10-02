@@ -2118,7 +2118,7 @@ static int	DBpatch_2010178(void)
 		if (ZBX_DB_OK > DBexecute(
 				"update profiles"
 				" set idx='web.dashboard.widget.%s.state'"
-				" where idx='web.dashboard.state.hat_%s'",
+				" where idx='web.dashboard.hats.hat_%s.state'",
 				state_strings[i], state_strings[i]))
 		{
 			return FAIL;
