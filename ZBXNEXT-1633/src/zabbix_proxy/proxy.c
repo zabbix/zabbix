@@ -293,36 +293,36 @@ static void	zbx_validate_config()
 	if ((NULL == CONFIG_JAVA_GATEWAY || '\0' == *CONFIG_JAVA_GATEWAY) && 0 < CONFIG_JAVAPOLLER_FORKS)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "JavaGateway not in config file or empty");
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 
 	if (ZBX_PROXYMODE_ACTIVE == CONFIG_PROXYMODE &&	NULL == CONFIG_SERVER)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "missing active proxy mandatory parameter [Server] in config file [%s]", CONFIG_FILE);
-		exit(FAIL);
+		zabbix_log(LOG_LEVEL_CRIT, "missing active proxy mandatory parameter [Server] in config file [%s]",
+				CONFIG_FILE);
+		exit(EXIT_FAILURE);
 	}
 
 	if (NULL == CONFIG_HOSTNAME)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "hostname is not defined");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	if (FAIL == zbx_check_hostname(CONFIG_HOSTNAME))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid host name: [%s]", CONFIG_HOSTNAME);
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 #if !defined(HAVE_LIBXML2) || !defined(HAVE_LIBCURL)
 	if (0 != CONFIG_VMWARE_FORKS)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Cannot start vmware collector because Zabbix proxy is built without VMware"
+		zabbix_log(LOG_LEVEL_CRIT, "cannot start vmware collector because Zabbix proxy is built without VMware"
 				" support");
 		exit(EXIT_FAILURE);
 	}
 #endif
-
 }
 
 /******************************************************************************

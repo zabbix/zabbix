@@ -143,7 +143,6 @@ int	CONFIG_CONFSYNCER_FREQUENCY	= 60;
 int	CONFIG_VMWARE_FORKS		= 0;
 int	CONFIG_VMWARE_FREQUENCY		= 60;
 
-
 zbx_uint64_t	CONFIG_CONF_CACHE_SIZE		= 8 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_HISTORY_CACHE_SIZE	= 8 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
@@ -269,14 +268,14 @@ static void	zbx_validate_config()
 	}
 	if (0 != CONFIG_VALUE_CACHE_SIZE && 128 * ZBX_KIBIBYTE > CONFIG_VALUE_CACHE_SIZE)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Value cache size must be either 0 or greater than 128KB");
+		zabbix_log(LOG_LEVEL_CRIT, "value cache size must be either 0 or greater than 128KB");
 		exit(EXIT_FAILURE);
 	}
 
 #if !defined(HAVE_LIBXML2) || !defined(HAVE_LIBCURL)
 	if (0 != CONFIG_VMWARE_FORKS)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Cannot start vmware collector because Zabbix server is built without VMware"
+		zabbix_log(LOG_LEVEL_CRIT, "cannot start vmware collector because Zabbix server is built without VMware"
 				" support");
 		exit(EXIT_FAILURE);
 	}
