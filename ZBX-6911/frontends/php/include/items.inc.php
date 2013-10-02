@@ -748,7 +748,8 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 		'hostids' => $hostIds,
 		'with_monitored_items' => true,
 		'preservekeys' => true,
-		'selectScreens' => ($viewMode == STYLE_LEFT) ? API_OUTPUT_COUNT : null
+		'selectScreens' => ($viewMode == STYLE_LEFT) ? API_OUTPUT_COUNT : null,
+		'selectInventory' => ($viewMode == STYLE_LEFT) ? array('hostid') : null
 	));
 
 	$items = array();

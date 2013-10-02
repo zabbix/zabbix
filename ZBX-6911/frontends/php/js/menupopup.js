@@ -27,12 +27,12 @@
  * @param string options[]['scriptid']		script id
  * @param string options[]['confirmation']	confirmation text
  * @param bool   options['hasScreens']		link to host screen page
- * @param bool   options['hasGoTo']			"Go to" block in popup
+ * @param bool   options['hasInventory']	link to host inventory page
  *
  * @return array
  */
 function getMenuPopupHost(options) {
-	var sections = [];
+	var sections = [], gotos = [];
 
 	// scripts
 	if (typeof options.scripts !== 'undefined') {
@@ -60,36 +60,34 @@ function getMenuPopupHost(options) {
 		};
 	}
 
-	// go to section
-	if (options.hasGoTo) {
-		var gotos = [];
+	// latest
+	gotos[gotos.length] = {
+		label: t('Latest data'),
+		url: new Curl('latest.php?hostid=' + options.hostid).getUrl()
+	};
 
-		// latest
+	// inventories
+	if (options.hasInventory) {
 		gotos[gotos.length] = {
-			label: t('Latest data'),
-			url: new Curl('latest.php?hostid=' + options.hostid).getUrl()
-		};
-
-		// inventory
-		gotos[gotos.length] = {
-			label: t('Host inventory'),
+			label: t('Host inventories'),
 			url: new Curl('hostinventories.php?hostid=' + options.hostid).getUrl()
 		};
+	}
 
-		// screens
-		if (options.hasScreens) {
-			gotos[gotos.length] = {
-				label: t('Host screens'),
-				url: new Curl('host_screen.php?hostid=' + options.hostid).getUrl()
-			};
-		}
-
-		sections[sections.length] = {
-			type: 'links',
-			title: t('Go to'),
-			data: gotos
+	// screens
+	if (options.hasScreens) {
+		gotos[gotos.length] = {
+			label: t('Host screens'),
+			url: new Curl('host_screen.php?hostid=' + options.hostid).getUrl()
 		};
 	}
+
+	sections[sections.length] = {
+		type: 'links',
+		title: t('Go to'),
+		data: gotos
+	};
+
 	return sections;
 }
 
@@ -102,7 +100,6 @@ function getMenuPopupHost(options) {
  * @param string options[]['scriptid']				script id
  * @param string options[]['confirmation']			confirmation text
  * @param object options['gotos']					links section (optional)
- * @param array  options['gotos']['inventory']		link to host inventory page
  * @param array  options['gotos']['screens']		link to host screen page with url parameters ("name" => "value")
  * @param array  options['gotos']['triggerStatus']	link to trigger status page with url parameters ("name" => "value")
  * @param array  options['gotos']['submap']			link to submap page with url parameters ("name" => "value")
@@ -142,25 +139,9 @@ function getMenuPopupMap(options) {
 		};
 	}
 
-	/*
-	 * Gotos section
-	 */
+	// gotos
 	if (typeof options.gotos !== 'undefined') {
 		var gotos = [];
-
-		// inventory
-		if (typeof options.gotos.inventory !== 'undefined') {
-			var url = new Curl('hostinventories.php');
-
-			jQuery.each(options.gotos.inventory, function(name, value) {
-				url.setArgument(name, value);
-			});
-
-			gotos[gotos.length] = {
-			label: t('Host inventory'),
-				url: url.getUrl()
-			};
-		}
 
 		// screens
 		if (typeof options.gotos.screens !== 'undefined') {
