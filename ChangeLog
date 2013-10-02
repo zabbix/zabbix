@@ -5,7 +5,7 @@ New features:
 
 Bug fixes:
 A.F....... [ZBX-7091] fixed SQL injection vulnerabilities in page filtering; thanks to Bernhard Schildendorfer from SEC Consult for the report (Eduard, Pavels)
-A.F....... [ZBX-7091] fixed SQL inection vulnerabilities dashboard favourite managing; thanks to Lincoln, a member of Corelan Team, for the report (Eduard, Pavels)
+A.F....... [ZBX-7091] fixed SQL inection vulnerabilities in dashboard favourite managing; thanks to Lincoln, a member of Corelan Team, for the report (Eduard, Pavels)
 ..F....... [ZBX-6994] fixed logic of SQL creation, removed unneeded i.flags IN (0,4) from SQL, if i.flags is set from filter or is null (Vitalij)
 ..F....... [ZBX-6993] fixed JS errors in various pages having a child node with high ID value (Ivo)
 ..F....... [ZBX-7032] fixed possibility to add "ICMP ping" check in Configuration > Discovery (Ivo)
@@ -469,7 +469,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Italian, Li
 
 Bug fixes:
 A.F....... [ZBX-7091] fixed SQL injection vulnerabilities in page filtering; thanks to Bernhard Schildendorfer from SEC Consult for the report (Eduard, Pavels)
-A.F....... [ZBX-7091] fixed SQL inection vulnerabilities dashboard favourite managing; thanks to Lincoln, a member of Corelan Team, for the report (Eduard, Pavels)
+A.F....... [ZBX-7091] fixed SQL inection vulnerabilities in dashboard favourite managing; thanks to Lincoln, a member of Corelan Team, for the report (Eduard, Pavels)
 ..F....... [ZBX-3878] fixed memory leaks in slide shows (Eduard)
 ........S. [ZBX-6950] fixed termination character sequence for smtp connection termination (igors)
 ..F....... [ZBX-6952] fixed XSS vulnerability in user themes, thanks to Lincoln and Bernhard Schildendorfer for reporting (Ivo)
@@ -1867,7 +1867,7 @@ Changes for 1.8.18
 Changes for 1.8.18rc1
 
 A.F....... [ZBX-7091] fixed SQL injection vulnerabilities in page filtering; thanks to Bernhard Schildendorfer from SEC Consult for the report (Eduard, Pavels)
-A.F....... [ZBX-7091] fixed SQL injection vulnerabilities dashboard favourite managing; thanks to Lincoln, a member of Corelan Team, for the report (Eduard, Pavels)
+A.F....... [ZBX-7091] fixed SQL injection vulnerabilities in dashboard favourite managing; thanks to Lincoln, a member of Corelan Team, for the report (Eduard, Pavels)
 .......P.. [ZBX-6249] fixed data loss in proxy "Data sender" process caused by unfinished transactions; thanks to MATSUDA Daiki for patch (Andris)
 ..F....... [ZBX-6830] fixed dynamic item checkbox in Configuration > Screens (Ivo)
 ........S. [ZBX-5924] fixed curl verify host option setting in ez texting (wiper)
