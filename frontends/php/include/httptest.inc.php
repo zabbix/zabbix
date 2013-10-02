@@ -77,7 +77,7 @@ function delete_history_by_httptestid($httptestid) {
 		' FROM items i,httpstepitem si,httpstep s'.
 		' WHERE i.itemid=si.itemid'.
 			' AND si.httpstepid=s.httpstepid'.
-			' AND s.httptestid='.$httptestid
+			' AND s.httptestid='.zbx_dbstr($httptestid)
 	);
 	while ($item_data = DBfetch($db_items)) {
 		if (!delete_history_by_itemid($item_data['itemid'])) {
@@ -89,11 +89,11 @@ function delete_history_by_httptestid($httptestid) {
 }
 
 function get_httptest_by_httptestid($httptestid) {
-	return DBfetch(DBselect('SELECT ht.* FROM httptest ht WHERE ht.httptestid='.$httptestid));
+	return DBfetch(DBselect('SELECT ht.* FROM httptest ht WHERE ht.httptestid='.zbx_dbstr($httptestid)));
 }
 
 function get_httpstep_by_no($httptestid, $no) {
-	return DBfetch(DBselect('SELECT hs.* FROM httpstep hs WHERE hs.httptestid='.$httptestid.' AND hs.no='.$no));
+	return DBfetch(DBselect('SELECT hs.* FROM httpstep hs WHERE hs.httptestid='.zbx_dbstr($httptestid).' AND hs.no='.zbx_dbstr($no)));
 }
 
 function get_httptests_by_hostid($hostids) {

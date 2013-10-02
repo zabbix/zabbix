@@ -26,7 +26,6 @@ require_once dirname(__FILE__).'/include/discovery.inc.php';
 $page['title'] = _('Configuration of discovery');
 $page['file'] = 'discoveryconf.php';
 $page['hist_arg'] = array();
-$page['scripts'] = array();
 $page['type'] = detect_page_type();
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -183,7 +182,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 
 	$goResult = false;
 	foreach ($_REQUEST['g_druleid'] as $drid) {
-		if (DBexecute('UPDATE drules SET status='.$status.' WHERE druleid='.$drid)) {
+		if (DBexecute('UPDATE drules SET status='.$status.' WHERE druleid='.zbx_dbstr($drid))) {
 			$rule_data = get_discovery_rule_by_druleid($drid);
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_DISCOVERY_RULE, '['.$drid.'] '.$rule_data['name']);
 			$goResult = true;

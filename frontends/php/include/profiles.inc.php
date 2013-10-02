@@ -178,7 +178,7 @@ class CProfile {
 			'profileid' => get_dbid('profiles', 'profileid'),
 			'userid' => self::$userDetails['userid'],
 			'idx' => zbx_dbstr($idx),
-			$value_type => ($value_type == 'value_str') ? zbx_dbstr($value) : $value,
+			$value_type => zbx_dbstr($value),
 			'type' => $type,
 			'idx2' => $idx2
 		);
@@ -197,11 +197,10 @@ class CProfile {
 		}
 
 		$value_type = self::getFieldByType($type);
-		$value = ($value_type == 'value_str') ? zbx_dbstr($value) : $value;
 
 		return DBexecute(
 			'UPDATE profiles SET '.
-				$value_type.'='.$value.','.
+				$value_type.'='.zbx_dbstr($value).','.
 				' type='.$type.
 			' WHERE userid='.self::$userDetails['userid'].
 				' AND idx='.zbx_dbstr($idx).
@@ -276,7 +275,7 @@ function update_config($configs) {
 		}
 	}
 	if (isset($configs['alert_usrgrpid'])) {
-		if ($configs['alert_usrgrpid'] != 0 && !DBfetch(DBselect('SELECT u.usrgrpid FROM usrgrp u WHERE u.usrgrpid='.$configs['alert_usrgrpid']))) {
+		if ($configs['alert_usrgrpid'] != 0 && !DBfetch(DBselect('SELECT u.usrgrpid FROM usrgrp u WHERE u.usrgrpid='.zbx_dbstr($configs['alert_usrgrpid'])))) {
 			error(_('Incorrect user group.'));
 			return false;
 		}

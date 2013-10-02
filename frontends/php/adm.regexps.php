@@ -84,7 +84,7 @@ if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
  * Permissions
  */
 if (isset($_REQUEST['regexpid'])) {
-	$regExp = DBfetch(DBSelect('SELECT re.regexpid FROM regexps re WHERE re.regexpid='.get_request('regexpid')));
+	$regExp = DBfetch(DBSelect('SELECT re.regexpid FROM regexps re WHERE re.regexpid='.zbx_dbstr(get_request('regexpid'))));
 	if (empty($regExp)) {
 		access_deny();
 	}
@@ -221,7 +221,7 @@ if (isset($_REQUEST['form'])) {
 		$regExp = DBfetch(DBSelect(
 			'SELECT re.name,re.test_string'.
 			' FROM regexps re'.
-			' WHERE re.regexpid='.$_REQUEST['regexpid'].
+			' WHERE re.regexpid='.zbx_dbstr($_REQUEST['regexpid']).
 				andDbNode('re.regexpid')
 		));
 
@@ -231,7 +231,7 @@ if (isset($_REQUEST['form'])) {
 		$dbExpressions = DBselect(
 			'SELECT e.expressionid,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive'.
 			' FROM expressions e'.
-			' WHERE e.regexpid='.$_REQUEST['regexpid'].
+			' WHERE e.regexpid='.zbx_dbstr($_REQUEST['regexpid']).
 				andDbNode('e.expressionid').
 			' ORDER BY e.expression_type'
 		);

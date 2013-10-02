@@ -319,7 +319,7 @@ var CDoll = Class.create(CDebug,{
 		url.setArgument('pmasterid', this.pmasterid());
 
 		jQuery(window).off('resize');
-		jQuery(document).off('mouseup mousemove');
+		jQuery(document).off('mousemove');
 
 		new Ajax.Request(url.getUrl(), {
 				'method': 'post',
@@ -406,7 +406,7 @@ var CDoll = Class.create(CDebug,{
 				forcePlaceholderSize: true,
 				placeholder: 'widget ui-corner-all ui-sortable-placeholder',
 				opacity: '0.8',
-				update: function() { jQuery('.column').portletState('save', {'name': 'dashboard'}); }
+				receive: function() { jQuery('.column').portletState('save', {'name': 'dashboard'}); }
 			})
 			.portletState('load', {'name': 'dashboard'})
 			.children('div')
@@ -435,7 +435,13 @@ var CDoll = Class.create(CDebug,{
 			});
 
 			var strPos = Object.toJSON(positions);
-			$.cookie(settings.name, strPos, {expires: 365});
+
+			var params = {
+				'favaction': 'sort',
+				'favobj' : 'hat',
+				'favdata': strPos
+			}
+			send_params(params);
 
 			return this;
 		},
@@ -446,22 +452,6 @@ var CDoll = Class.create(CDebug,{
 			};
 
 			$.extend(settings, options);
-
-			var strPos = $.cookie(settings.name);
-			var positions = $.parseJSON(strPos);
-
-			this.each(function(colNum, column) {
-				if (!isset(colNum, positions)) {
-					return;
-				}
-
-				for (var rowNum in positions[colNum]) {
-					if (empty(positions[colNum][rowNum])) {
-						continue;
-					}
-					$('#' + positions[colNum][rowNum]).appendTo(column);
-				}
-			});
 
 			return this;
 		}

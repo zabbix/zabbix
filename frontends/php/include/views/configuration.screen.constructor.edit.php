@@ -415,7 +415,7 @@ elseif ($resourceType == SCREEN_RESOURCE_SCREEN) {
 			'SELECT DISTINCT n.name AS node_name,s.screenid,s.name'.
 			' FROM screens s'.
 				' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('s.screenid').
-			' WHERE s.screenid='.$resourceId
+			' WHERE s.screenid='.zbx_dbstr($resourceId)
 		);
 		while ($row = DBfetch($db_screens)) {
 			$screen = API::Screen()->get(array(

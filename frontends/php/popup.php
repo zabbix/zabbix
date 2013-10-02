@@ -110,7 +110,6 @@ switch ($srctbl) {
 		break;
 }
 $page['file'] = 'popup.php';
-$page['scripts'] = array();
 
 define('ZBX_PAGE_NO_MENU', 1);
 
@@ -676,7 +675,7 @@ elseif ($srctbl == 'help_items') {
 	$table = new CTableInfo(_('No items defined.'));
 	$table->setHeader(array(_('Key'), _('Name')));
 
-	$result = DBselect('SELECT hi.* FROM help_items hi WHERE hi.itemtype='.$itemtype.' ORDER BY hi.key_');
+	$result = DBselect('SELECT hi.* FROM help_items hi WHERE hi.itemtype='.zbx_dbstr($itemtype).' ORDER BY hi.key_');
 	while ($row = DBfetch($result)) {
 		$action = get_window_opener($dstfrm, $dstfld1, html_entity_decode($row[$srcfld1])).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
 		$name = new CSpan($row['key_'], 'link');

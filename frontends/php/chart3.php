@@ -81,9 +81,9 @@ if ($httptestid = get_request('httptestid', false)) {
 		'SELECT i.itemid'.
 		' FROM httpstepitem hi,items i,httpstep hs'.
 		' WHERE i.itemid=hi.itemid'.
-			' AND hs.httptestid='.$httptestid.
+			' AND hs.httptestid='.zbx_dbstr($httptestid).
 			' AND hs.httpstepid=hi.httpstepid'.
-			' AND hi.type='.get_request('http_item_type', HTTPSTEP_ITEM_TYPE_TIME).
+			' AND hi.type='.zbx_dbstr(get_request('http_item_type', HTTPSTEP_ITEM_TYPE_TIME)).
 		' ORDER BY hs.no DESC'
 	);
 	while ($item = DBfetch($dbItems)) {
