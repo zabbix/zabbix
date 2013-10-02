@@ -137,12 +137,12 @@ function get_userid_by_usrgrpid($userGroupIds) {
  */
 function add_user_to_group($userId, $userGroupId) {
 	if (granted2move_user($userId, $userGroupId)) {
-		DBexecute('DELETE FROM users_groups WHERE userid='.$userId.' AND usrgrpid='.$userGroupId);
+		DBexecute('DELETE FROM users_groups WHERE userid='.zbx_dbstr($userId).' AND usrgrpid='.zbx_dbstr($userGroupId));
 
 		$usersGroupsId = get_dbid('users_groups', 'id');
 
 		return DBexecute(
-			'INSERT INTO users_groups (id,usrgrpid,userid) VALUES ('.$usersGroupsId.','.$userGroupId.','.$userId.')'
+			'INSERT INTO users_groups (id,usrgrpid,userid) VALUES ('.zbx_dbstr($usersGroupsId).','.zbx_dbstr($userGroupId).','.zbx_dbstr($userId).')'
 		);
 	}
 	else {
@@ -162,7 +162,7 @@ function add_user_to_group($userId, $userGroupId) {
  */
 function remove_user_from_group($userId, $userGroupId) {
 	if (granted2move_user($userId, $userGroupId)) {
-		return DBexecute('DELETE FROM users_groups WHERE userid='.$userId.' AND usrgrpid='.$userGroupId);
+		return DBexecute('DELETE FROM users_groups WHERE userid='.zbx_dbstr($userId).' AND usrgrpid='.zbx_dbstr($userGroupId));
 	}
 	else {
 		error(_('User cannot change status of himself.'));

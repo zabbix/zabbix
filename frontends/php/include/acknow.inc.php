@@ -23,7 +23,7 @@ function get_last_event_by_triggerid($triggerId) {
 	$dbEvents = DBfetch(DBselect(
 		'SELECT e.*'.
 		' FROM events e'.
-		' WHERE e.objectid='.$triggerId.
+		' WHERE e.objectid='.zbx_dbstr($triggerId).
 			' AND e.source='.EVENT_SOURCE_TRIGGERS.
 			' AND e.object='.EVENT_OBJECT_TRIGGER.
 		' ORDER BY e.objectid DESC,e.object DESC,e.eventid DESC',

@@ -29,7 +29,6 @@ require_once dirname(__FILE__).'/include/js.inc.php';
 $page['title'] = _('Configuration of user groups');
 $page['file'] = 'usergrps.php';
 $page['hist_arg'] = array('config');
-$page['scripts'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -365,7 +364,7 @@ if (isset($_REQUEST['form'])) {
 			'SELECT DISTINCT u.userid '.
 			' FROM users u,users_groups ug '.
 			' WHERE u.userid=ug.userid '.
-				' AND ug.usrgrpid='.$data['usrgrpid']
+				' AND ug.usrgrpid='.zbx_dbstr($data['usrgrpid'])
 		);
 		while ($dbUser = DBfetch($dbUsers)) {
 			$data['group_users'][$dbUser['userid']] = $dbUser['userid'];
@@ -379,7 +378,7 @@ if (isset($_REQUEST['form'])) {
 			' FROM groups g'.
 				' LEFT JOIN rights r ON r.id=g.groupid'.
 				' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('g.groupid').
-			' WHERE r.groupid='.$data['usrgrpid']
+			' WHERE r.groupid='.zbx_dbstr($data['usrgrpid'])
 		);
 		while ($dbRight = DBfetch($dbRights)) {
 			if (!empty($dbRight['nodename'])) {
@@ -412,7 +411,7 @@ if (isset($_REQUEST['form'])) {
 		$sqlFrom = ',users_groups g';
 		$sqlWhere =
 			' WHERE '.dbConditionInt('u.userid', $data['group_users']).
-				' OR (u.userid=g.userid AND g.usrgrpid='.$data['selected_usrgrp'].andDbNode('u.userid').')';
+				' OR (u.userid=g.userid AND g.usrgrpid='.zbx_dbstr($data['selected_usrgrp']).andDbNode('u.userid').')';
 	}
 	else {
 		$sqlFrom = '';

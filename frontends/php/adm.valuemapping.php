@@ -43,7 +43,7 @@ check_fields($fields);
  * Permissions
  */
 if (isset($_REQUEST['valuemapid'])) {
-	$dbValueMap = DBfetch(DBselect('SELECT v.name FROM valuemaps v WHERE v.valuemapid='.get_request('valuemapid')));
+	$dbValueMap = DBfetch(DBselect('SELECT v.name FROM valuemaps v WHERE v.valuemapid='.zbx_dbstr(get_request('valuemapid'))));
 	if (empty($dbValueMap)) {
 		access_deny();
 	}
@@ -91,7 +91,7 @@ try {
 
 		$sql = 'SELECT v.name,v.valuemapid'.
 				' FROM valuemaps v'.
-				' WHERE v.valuemapid='.$_REQUEST['valuemapid'].
+				' WHERE v.valuemapid='.zbx_dbstr($_REQUEST['valuemapid']).
 					andDbNode('v.valuemapid');
 		if ($valueMapToDelete = DBfetch(DBselect($sql))) {
 			deleteValueMap($_REQUEST['valuemapid']);
@@ -163,7 +163,7 @@ if (isset($_REQUEST['form'])) {
 
 		if (empty($data['form_refresh'])) {
 			$data['mappings'] = DBfetchArray(DBselect(
-				'SELECT m.mappingid,m.value,m.newvalue FROM mappings m WHERE m.valuemapid='.$data['valuemapid']
+				'SELECT m.mappingid,m.value,m.newvalue FROM mappings m WHERE m.valuemapid='.zbx_dbstr($data['valuemapid'])
 			));
 		}
 		else {
@@ -172,7 +172,7 @@ if (isset($_REQUEST['form'])) {
 		}
 
 		$valueMapCount = DBfetch(DBselect(
-			'SELECT COUNT(i.itemid) AS cnt FROM items i WHERE i.valuemapid='.$data['valuemapid']
+			'SELECT COUNT(i.itemid) AS cnt FROM items i WHERE i.valuemapid='.zbx_dbstr($data['valuemapid'])
 		));
 
 		$data['confirmMessage'] = $valueMapCount['cnt']

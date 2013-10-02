@@ -285,12 +285,12 @@ class CEvent extends CZBXAPI {
 
 		// object
 		if (!is_null($options['object'])) {
-			$sqlParts['where']['o'] = 'e.object='.$options['object'];
+			$sqlParts['where']['o'] = 'e.object='.zbx_dbstr($options['object']);
 		}
 
 		// source
 		if (!is_null($options['source'])) {
-			$sqlParts['where'][] = 'e.source='.$options['source'];
+			$sqlParts['where'][] = 'e.source='.zbx_dbstr($options['source']);
 		}
 
 		// acknowledged
@@ -300,22 +300,22 @@ class CEvent extends CZBXAPI {
 
 		// time_from
 		if (!is_null($options['time_from'])) {
-			$sqlParts['where'][] = 'e.clock>='.$options['time_from'];
+			$sqlParts['where'][] = 'e.clock>='.zbx_dbstr($options['time_from']);
 		}
 
 		// time_till
 		if (!is_null($options['time_till'])) {
-			$sqlParts['where'][] = 'e.clock<='.$options['time_till'];
+			$sqlParts['where'][] = 'e.clock<='.zbx_dbstr($options['time_till']);
 		}
 
 		// eventid_from
 		if (!is_null($options['eventid_from'])) {
-			$sqlParts['where'][] = 'e.eventid>='.$options['eventid_from'];
+			$sqlParts['where'][] = 'e.eventid>='.zbx_dbstr($options['eventid_from']);
 		}
 
 		// eventid_till
 		if (!is_null($options['eventid_till'])) {
-			$sqlParts['where'][] = 'e.eventid<='.$options['eventid_till'];
+			$sqlParts['where'][] = 'e.eventid<='.zbx_dbstr($options['eventid_till']);
 		}
 
 		// value
@@ -501,8 +501,8 @@ class CEvent extends CZBXAPI {
 						' WHERE '.dbConditionInt('e.eventid', $eventIds).
 						' AND e.objectid=f.triggerid'.
 						' AND f.itemid=i.itemid'.
-						' AND e.object='.$options['object'].
-						' AND e.source='.$options['source']
+						' AND e.object='.zbx_dbstr($options['object']).
+						' AND e.source='.zbx_dbstr($options['source'])
 				);
 			}
 			// item and LLD rule events
@@ -512,8 +512,8 @@ class CEvent extends CZBXAPI {
 						' FROM events e,items i'.
 						' WHERE '.dbConditionInt('e.eventid', $eventIds).
 						' AND e.objectid=i.itemid'.
-						' AND e.object='.$options['object'].
-						' AND e.source='.$options['source']
+						' AND e.object='.zbx_dbstr($options['object']).
+						' AND e.source='.zbx_dbstr($options['source'])
 				);
 			}
 

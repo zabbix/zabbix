@@ -278,8 +278,9 @@ function update_item_status($itemids, $status) {
 	while ($item = DBfetch($db_items)) {
 		$old_status = $item['status'];
 		if ($status != $old_status) {
-			$result &= DBexecute('UPDATE items SET status='.$status.
-				' WHERE itemid='.$item['itemid']);
+			$result &= DBexecute(
+				'UPDATE items SET status='.zbx_dbstr($status).' WHERE itemid='.zbx_dbstr($item['itemid'])
+			);
 			if ($result) {
 				$host = get_host_by_hostid($item['hostid']);
 				$item_new = get_item_by_itemid($item['itemid']);
@@ -469,7 +470,7 @@ function get_item_by_key($key, $host = '') {
 }
 
 function get_item_by_itemid($itemid) {
-	$db_items = DBfetch(DBselect('SELECT i.* FROM items i WHERE i.itemid='.$itemid));
+	$db_items = DBfetch(DBselect('SELECT i.* FROM items i WHERE i.itemid='.zbx_dbstr($itemid)));
 	if ($db_items) {
 		return $db_items;
 	}
@@ -486,7 +487,7 @@ function get_item_by_itemid_limited($itemid) {
 			'i.valuemapid,i.delay_flex,i.params,i.ipmi_sensor,i.templateid,i.authtype,i.username,i.password,'.
 			'i.publickey,i.privatekey,i.flags,i.filter,i.description,i.inventory_link'.
 		' FROM items i'.
-		' WHERE i.itemid='.$itemid));
+		' WHERE i.itemid='.zbx_dbstr($itemid)));
 	if ($row) {
 		return $row;
 	}
@@ -519,7 +520,7 @@ function get_same_item_for_host($item, $dest_hostids) {
 		$db_items = DBselect(
 			'SELECT src.*'.
 			' FROM items src,items dest'.
-			' WHERE dest.itemid='.$itemid.
+			' WHERE dest.itemid='.zbx_dbstr($itemid).
 				' AND src.key_=dest.key_'.
 				' AND '.dbConditionInt('src.hostid', $dest_hostids)
 		);
@@ -872,7 +873,7 @@ function get_same_applications_for_host($applications, $hostid) {
 		'SELECT a1.applicationid'.
 		' FROM applications a1,applications a2'.
 		' WHERE a1.name=a2.name'.
-			' AND a1.hostid='.$hostid.
+			' AND a1.hostid='.zbx_dbstr($hostid).
 			' AND '.dbConditionInt('a2.applicationid', $applications)
 	);
 	while ($app = DBfetch($db_apps)) {
@@ -1025,7 +1026,7 @@ function getItemFunctionalValue($item, $function, $param) {
 			'SELECT '.$function.'(value) AS value'.
 			' FROM '.$historyTables[$item['value_type']].
 			' WHERE clock>'.(time() - convertFunctionValue($param)).
-			' AND itemid='.$item['itemid'].
+			' AND itemid='.zbx_dbstr($item['itemid']).
 			' HAVING COUNT(*)>0' // necessary because DBselect() return 0 if empty data set, for graph templates
 		);
 		if ($row = DBfetch($result)) {
@@ -1057,9 +1058,9 @@ function item_get_history($db_item, $clock, $ns) {
 
 	$sql = 'SELECT value'.
 			' FROM '.$table.
-			' WHERE itemid='.$db_item['itemid'].
-				' AND clock='.$clock.
-				' AND ns='.$ns;
+			' WHERE itemid='.zbx_dbstr($db_item['itemid']).
+				' AND clock='.zbx_dbstr($clock).
+				' AND ns='.zbx_dbstr($ns);
 	if (null != ($row = DBfetch(DBselect($sql, 1)))) {
 		$value = $row['value'];
 	}
@@ -1071,17 +1072,17 @@ function item_get_history($db_item, $clock, $ns) {
 
 	$sql = 'SELECT DISTINCT clock'.
 			' FROM '.$table.
-			' WHERE itemid='.$db_item['itemid'].
-				' AND clock='.$clock.
-				' AND ns<'.$ns;
+			' WHERE itemid='.zbx_dbstr($db_item['itemid']).
+				' AND clock='.zbx_dbstr($clock).
+				' AND ns<'.zbx_dbstr($ns);
 	if (null != ($row = DBfetch(DBselect($sql)))) {
 		$max_clock = $row['clock'];
 	}
 	if ($max_clock == 0) {
 		$sql = 'SELECT MAX(clock) AS clock'.
 				' FROM '.$table.
-				' WHERE itemid='.$db_item['itemid'].
-					' AND clock<'.$clock;
+				' WHERE itemid='.zbx_dbstr($db_item['itemid']).
+					' AND clock<'.zbx_dbstr($clock);
 		if (null != ($row = DBfetch(DBselect($sql)))) {
 			$max_clock = $row['clock'];
 		}
@@ -1093,15 +1094,15 @@ function item_get_history($db_item, $clock, $ns) {
 	if ($clock == $max_clock) {
 		$sql = 'SELECT value'.
 				' FROM '.$table.
-				' WHERE itemid='.$db_item['itemid'].
-					' AND clock='.$clock.
-					' AND ns<'.$ns;
+				' WHERE itemid='.zbx_dbstr($db_item['itemid']).
+					' AND clock='.zbx_dbstr($clock).
+					' AND ns<'.zbx_dbstr($ns);
 	}
 	else {
 		$sql = 'SELECT value'.
 				' FROM '.$table.
-				' WHERE itemid='.$db_item['itemid'].
-					' AND clock='.$max_clock.
+				' WHERE itemid='.zbx_dbstr($db_item['itemid']).
+					' AND clock='.zbx_dbstr($max_clock).
 				' ORDER BY itemid,clock desc,ns desc';
 	}
 
