@@ -226,18 +226,18 @@ class CChart extends CGraphDraw {
 						'COUNT(*) AS count,AVG(value) AS avg,MIN(value) as min,'.
 						'MAX(value) AS max,MAX(clock) AS clock'.
 					' FROM history '.
-					' WHERE itemid='.$this->items[$i]['itemid'].
-						' AND clock>='.$from_time.
-						' AND clock<='.$to_time.
+					' WHERE itemid='.zbx_dbstr($this->items[$i]['itemid']).
+						' AND clock>='.zbx_dbstr($from_time).
+						' AND clock<='.zbx_dbstr($to_time).
 					' GROUP BY itemid,'.$calc_field
 					,
 					'SELECT itemid,'.$calc_field.' AS i,'.
 						'COUNT(*) AS count,AVG(value) AS avg,MIN(value) AS min,'.
 						'MAX(value) AS max,MAX(clock) AS clock'.
 					' FROM history_uint '.
-					' WHERE itemid='.$this->items[$i]['itemid'].
-						' AND clock>='.$from_time.
-						' AND clock<='.$to_time.
+					' WHERE itemid='.zbx_dbstr($this->items[$i]['itemid']).
+						' AND clock>='.zbx_dbstr($from_time).
+						' AND clock<='.zbx_dbstr($to_time).
 					' GROUP BY itemid,'.$calc_field
 				);
 			}
@@ -249,17 +249,17 @@ class CChart extends CGraphDraw {
 						'MAX(value_max) AS max,MAX(clock) AS clock'.
 					' FROM trends'.
 					' WHERE itemid='.$this->items[$i]['itemid'].
-						' AND clock>='.$from_time.
-						' AND clock<='.$to_time.
+						' AND clock>='.zbx_dbstr($from_time).
+						' AND clock<='.zbx_dbstr($to_time).
 					' GROUP BY itemid,'.$calc_field
 					,
 					'SELECT itemid,'.$calc_field.' AS i,'.
 						'SUM(num) AS count,AVG(value_avg) AS avg,MIN(value_min) AS min,'.
 						'MAX(value_max) AS max,MAX(clock) AS clock'.
 					' FROM trends_uint '.
-					' WHERE itemid='.$this->items[$i]['itemid'].
-						' AND clock>='.$from_time.
-						' AND clock<='.$to_time.
+					' WHERE itemid='.zbx_dbstr($this->items[$i]['itemid']).
+						' AND clock>='.zbx_dbstr($from_time).
+						' AND clock<='.zbx_dbstr($to_time).
 					' GROUP BY itemid,'.$calc_field
 				);
 
@@ -439,7 +439,7 @@ class CChart extends CGraphDraw {
 					' AND tr.status='.TRIGGER_STATUS_ENABLED.
 					' AND i.itemid=f.itemid'.
 					' AND h.hostid=i.hostid'.
-					' AND f.itemid='.$item['itemid'].
+					' AND f.itemid='.zbx_dbstr($item['itemid']).
 				' ORDER BY tr.priority'
 			);
 			while (($trigger = DBfetch($db_triggers)) && $cnt < $max) {
