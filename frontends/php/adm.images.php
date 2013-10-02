@@ -43,7 +43,7 @@ check_fields($fields);
  * Permissions
  */
 if (isset($_REQUEST['imageid'])) {
-	$dbImage = DBfetch(DBselect('SELECT i.imagetype,i.name FROM images i WHERE i.imageid='.get_request('imageid')));
+	$dbImage = DBfetch(DBselect('SELECT i.imagetype,i.name FROM images i WHERE i.imageid='.zbx_dbstr(get_request('imageid'))));
 	if (empty($dbImage)) {
 		access_deny();
 	}
