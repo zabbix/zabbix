@@ -27,12 +27,10 @@
 
 static int	vmware_set_powerstate_result(AGENT_RESULT *result)
 {
-	int	ret = SYSINFO_RET_FAIL;
+	int	ret = SYSINFO_RET_OK;
 
 	if (NULL != GET_STR_RESULT(result))
 	{
-		ret = SYSINFO_RET_OK;
-
 		if (0 == strcmp(result->str, "poweredOff"))
 			SET_UI64_RESULT(result, 0);
 		else if (0 == strcmp(result->str, "poweredOn"))
@@ -777,7 +775,7 @@ int	check_vcenter_hv_status(AGENT_REQUEST *request, const char *username, const 
 	ret = get_vcenter_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_LN2("val", "overallStatus"),
 			result);
 
-	if (SYSINFO_RET_OK == ret)
+	if (SYSINFO_RET_OK == ret && NULL != GET_STR_RESULT(result))
 	{
 		if (0 == strcmp(result->str, "gray"))
 			SET_UI64_RESULT(result, 0);
