@@ -457,6 +457,10 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
 
 --------------------------------------------------------------------------------
+Changes for 2.0.9
+
+
+--------------------------------------------------------------------------------
 Changes for 2.0.9rc1
 
 New features:
