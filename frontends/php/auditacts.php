@@ -140,7 +140,7 @@ if ($queryData) {
 		$firstAlert = DBfetch(DBselect(
 			'SELECT MIN(a.clock) AS clock'.
 			' FROM alerts a'.
-			' WHERE a.userid='.$user['userid']
+			' WHERE a.userid='.zbx_dbstr($user['userid'])
 		));
 	}
 }

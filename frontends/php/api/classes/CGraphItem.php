@@ -108,7 +108,7 @@ class CGraphItem extends CZBXAPI {
 
 		// type
 		if (!is_null($options['type'] )) {
-			$sqlParts['where'][] = 'gi.type='.$options['type'];
+			$sqlParts['where'][] = 'gi.type='.zbx_dbstr($options['type']);
 		}
 
 		// limit

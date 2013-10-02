@@ -834,8 +834,8 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 
 		$this->zbxTestClick('resetDefaults');
 		sleep(1);
-		$this->assertVisible("//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all']");
-		$this->zbxTestClick("//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all']/div/div/button[1]");
+		$this->assertVisible("//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-dialog-buttons']");
+		$this->zbxTestClick("//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-dialog-buttons']/div/div/button[1]");
 		$this->zbxTestClickWait('save');
 
 		$this->zbxTestTextPresent('Configuration updated');
