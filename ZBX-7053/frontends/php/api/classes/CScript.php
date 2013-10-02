@@ -538,15 +538,15 @@ class CScript extends CZBXAPI {
 		));
 
 		foreach ($actions as $action) {
-			if (isset($action['operations']) && $action['operations']) {
-				foreach ($action['operations'] as $operation) {
-					if (in_array($operation['opcommand']['scriptid'], $scriptIds)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Cannot delete scripts. Script "%1$s" is used in action operation "%2$s".',
-								$dbScripts[$operation['opcommand']['scriptid']]['name'], $action['name']
-							)
-						);
-					}
+			foreach ($action['operations'] as $operation) {
+				if (isset($operation['opcommand']['scriptid'])
+						&& $operation['opcommand']['scriptid']
+						&& in_array($operation['opcommand']['scriptid'], $scriptIds)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Cannot delete scripts. Script "%1$s" is used in action operation "%2$s".',
+							$dbScripts[$operation['opcommand']['scriptid']]['name'], $action['name']
+						)
+					);
 				}
 			}
 		}
