@@ -26,7 +26,6 @@
 #define ZBX_API __declspec(dllimport)
 #endif
 
-
 typedef struct
 {
 	/* host name, must match the name of target host in Zabbix */
@@ -36,11 +35,22 @@ typedef struct
 	/* the item value */
 	char	*value;
 }
-zbx_sender_value_t;
+zabbix_sender_value_t;
+
+typedef struct
+{
+	/* number of total values processed */
+	int total;
+	/* number of failed values */
+	int failed;
+	/* the time spent in milliseconds */
+	int time_spent;
+}
+zabbix_sender_info_t;
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_sender_send_values                                           *
+ * Function: zabbix_sender_send_values                                        *
  *                                                                            *
  * Purpose: send values to Zabbix server/proxy                                *
  *                                                                            *
@@ -49,29 +59,49 @@ zbx_sender_value_t;
  *             source    - [IN] source IP, optional - can be NULL             *
  *             values    - [IN] array of values to send                       *
  *             count     - [IN] number of items in values array               *
- *             result    - [OUT] the server response/error message. Optional, *
- *                         can be NULL.                                       *
+ *             result    - [OUT] the server response/error message, optional  *
  *                         If result is specified it must always be freed     *
- *                         afterwards with zbx_sender_result_free() function. *
+ *                         afterwards with zabbix_sender_result_free()        *
+ *                         function.                                          *
  *                                                                            *
- * Return value: SUCCEED - the values were sent successfully, result contains *
+ * Return value: 0 - the values were sent successfully, result contains       *
  *                         server response                                    *
- *               FAIL - an error occurred, rsult contains error message       *
+ *               -1 - an error occurred, rsult contains error message         *
  *                                                                            *
  ******************************************************************************/
-ZBX_API int zbx_sender_send_values(const char *address, unsigned short port, const char *source,
-		const zbx_sender_value_t *values, int count, char **result);
+ZBX_API int	zabbix_sender_send_values(const char *address, unsigned short port, const char *source,
+		const zabbix_sender_value_t *values, int count, char **result);
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_sender_result_free                                           *
+ * Function: zabbix_sender_parse_result                                       *
  *                                                                            *
- * Purpose: free data allocated by zbx_sender_send_values() function          *
+ * Purpose: parses the result returned from zabbix_sender_send_values()       *
+ *          function                                                          *
+ *                                                                            *
+ * Parameters: result   - [IN] result to parse                                *
+ *             response - [OUT] the operation response                        *
+ *                           0 - operation was successfull                    *
+ *                          -1 - operation failed                             *
+ *             info     - [OUT] the detailed information about processed      *
+ *                        values, optional.                                   *
+ *                                                                            *
+ * Return value:  0 - the result was parsed successfully                      *
+ *               -1 - the result parsing failed                               *
+ *                                                                            *
+ ******************************************************************************/
+ZBX_API int	zabbix_sender_parse_result(const char *result, int *response, zabbix_sender_info_t *info);
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zabbix_sender_result_free                                        *
+ *                                                                            *
+ * Purpose: free data allocated by zabbix_sender_send_values() function       *
  *                                                                            *
  * Parameters: ptr   - [IN] pointer to the data to free                       *
  *                                                                            *
  ******************************************************************************/
-ZBX_API void zbx_sender_result_free(void *ptr);
+ZBX_API void	zabbix_sender_free_result(void *ptr);
 
 
 #endif /* ZABBIXSENDER_H_ */
