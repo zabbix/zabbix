@@ -652,91 +652,92 @@ static void	process_maintenance(void)
 		db_period		= atoi(row[9]);
 		db_start_date		= atoi(row[10]);
 
-		switch (db_timeperiod_type) {
-		case TIMEPERIOD_TYPE_ONETIME:
-			break;
-		case TIMEPERIOD_TYPE_DAILY:
-			db_start_date = now - sec + db_start_time;
-			if (sec < db_start_time)
-				db_start_date -= SEC_PER_DAY;
-
-			if (db_start_date < db_active_since)
-				continue;
-
-			day = (db_start_date - db_active_since) / SEC_PER_DAY;
-			db_start_date -= SEC_PER_DAY * (day % db_every);
-			break;
-		case TIMEPERIOD_TYPE_WEEKLY:
-			db_start_date = now - sec + db_start_time;
-			if (sec < db_start_time)
-				db_start_date -= SEC_PER_DAY;
-
-			if (db_start_date < db_active_since)
-				continue;
-
-			tm = localtime(&db_active_since);
-			wday = (0 == tm->tm_wday ? 7 : tm->tm_wday) - 1;
-			active_since = db_active_since - wday * SEC_PER_DAY;
-
-			for (; db_start_date >= db_active_since; db_start_date -= SEC_PER_DAY)
-			{
-				/* check for every x week(s) */
-				week = (db_start_date - active_since) / SEC_PER_WEEK;
-				if (0 != week % db_every)
-					continue;
-
-				/* check for day of the week */
-				tm = localtime(&db_start_date);
-				wday = (0 == tm->tm_wday ? 7 : tm->tm_wday) - 1;
-				if (0 == (db_dayofweek & (1 << wday)))
-					continue;
-
+		switch (db_timeperiod_type)
+		{
+			case TIMEPERIOD_TYPE_ONETIME:
 				break;
-			}
-			break;
-		case TIMEPERIOD_TYPE_MONTHLY:
-			db_start_date = now - sec + db_start_time;
-			if (sec < db_start_time)
-				db_start_date -= SEC_PER_DAY;
+			case TIMEPERIOD_TYPE_DAILY:
+				db_start_date = now - sec + db_start_time;
+				if (sec < db_start_time)
+					db_start_date -= SEC_PER_DAY;
 
-			for (; db_start_date >= db_active_since; db_start_date -= SEC_PER_DAY)
-			{
-				/* check for month */
-				tm = localtime(&db_start_date);
-				if (0 == (db_month & (1 << tm->tm_mon)))
+				if (db_start_date < db_active_since)
 					continue;
 
-				if (0 != db_day)
+				day = (db_start_date - db_active_since) / SEC_PER_DAY;
+				db_start_date -= SEC_PER_DAY * (day % db_every);
+				break;
+			case TIMEPERIOD_TYPE_WEEKLY:
+				db_start_date = now - sec + db_start_time;
+				if (sec < db_start_time)
+					db_start_date -= SEC_PER_DAY;
+
+				if (db_start_date < db_active_since)
+					continue;
+
+				tm = localtime(&db_active_since);
+				wday = (0 == tm->tm_wday ? 7 : tm->tm_wday) - 1;
+				active_since = db_active_since - wday * SEC_PER_DAY;
+
+				for (; db_start_date >= db_active_since; db_start_date -= SEC_PER_DAY)
 				{
-					/* check for day of the month */
-					if (db_day != tm->tm_mday)
+					/* check for every x week(s) */
+					week = (db_start_date - active_since) / SEC_PER_WEEK;
+					if (0 != week % db_every)
 						continue;
-				}
-				else
-				{
+
 					/* check for day of the week */
+					tm = localtime(&db_start_date);
 					wday = (0 == tm->tm_wday ? 7 : tm->tm_wday) - 1;
 					if (0 == (db_dayofweek & (1 << wday)))
 						continue;
 
-					/* check for number of day (first, second, third, fourth or last) */
-					day = (tm->tm_mday - 1) / 7 + 1;
-					if (5 == db_every && 4 == day)
+					break;
+				}
+				break;
+			case TIMEPERIOD_TYPE_MONTHLY:
+				db_start_date = now - sec + db_start_time;
+				if (sec < db_start_time)
+					db_start_date -= SEC_PER_DAY;
+
+				for (; db_start_date >= db_active_since; db_start_date -= SEC_PER_DAY)
+				{
+					/* check for month */
+					tm = localtime(&db_start_date);
+					if (0 == (db_month & (1 << tm->tm_mon)))
+						continue;
+
+					if (0 != db_day)
 					{
-						if (tm->tm_mday + 7 <= day_in_month(tm->tm_year, tm->tm_mon))
+						/* check for day of the month */
+						if (db_day != tm->tm_mday)
 							continue;
 					}
-					else if (db_every != day)
+					else
 					{
-						continue;
-					}
-				}
+						/* check for day of the week */
+						wday = (0 == tm->tm_wday ? 7 : tm->tm_wday) - 1;
+						if (0 == (db_dayofweek & (1 << wday)))
+							continue;
 
+						/* check for number of day (first, second, third, fourth or last) */
+						day = (tm->tm_mday - 1) / 7 + 1;
+						if (5 == db_every && 4 == day)
+						{
+							if (tm->tm_mday + 7 <= day_in_month(tm->tm_year, tm->tm_mon))
+								continue;
+						}
+						else if (db_every != day)
+						{
+							continue;
+						}
+					}
+
+					break;
+				}
 				break;
-			}
-			break;
-		default:
-			continue;
+			default:
+				continue;
 		}
 
 		/* allow one time periods to start before active time */
