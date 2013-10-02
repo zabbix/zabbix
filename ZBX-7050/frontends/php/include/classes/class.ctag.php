@@ -71,6 +71,10 @@ class CTag extends CObject {
 	public function startToString() {
 		$res = $this->tag_start.'<'.$this->tagname;
 		foreach ($this->attributes as $key => $value) {
+			if ($value === null) {
+				continue;
+			}
+
 			// a special encoding strategy should be used for the "value", "name" and "id" attributes
 			$strategy = in_array($key, array('value', 'name', 'id'), true) ? $this->attrEncStrategy : $this->encStrategy;
 			$value = $this->encode($value, $strategy);
@@ -132,10 +136,6 @@ class CTag extends CObject {
 	}
 
 	public function addClass($cssClass) {
-		if (!$cssClass) {
-			return;
-		}
-
 		if (!isset($this->attributes['class']) || zbx_empty($this->attributes['class'])) {
 			$this->attributes['class'] = $cssClass;
 		}
