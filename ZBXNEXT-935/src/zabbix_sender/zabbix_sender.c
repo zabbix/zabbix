@@ -105,7 +105,7 @@ static void	send_signal_handler(int sig)
 		zabbix_log(LOG_LEVEL_WARNING, "timeout while executing operation");
 
 	/* Calling _exit() to terminate the process immediately is important. See ZBX-5732 for details. */
-	_exit(FAIL);
+	_exit(EXIT_FAILURE);
 }
 #endif
 
@@ -116,6 +116,8 @@ typedef struct
 	struct zbx_json	json;
 }
 ZBX_THREAD_SENDVAL_ARGS;
+
+#define SUCCEED_WITH_INFO	2
 
 /******************************************************************************
  *                                                                            *
@@ -157,7 +159,7 @@ static int	check_response(char *response)
 		fflush(stdout);
 
 		if (2 == sscanf(info, "Processed: %d; Failed: %d", &failed, &failed) && 0 < failed)
-			ret = failed;
+			ret = SUCCEED_WITH_INFO;
 	}
 
 	return ret;
@@ -323,7 +325,7 @@ static void	parse_commandline(int argc, char **argv)
 				break;
 			default:
 				usage();
-				exit(FAIL);
+				exit(EXIT_FAILURE);
 				break;
 		}
 	}
@@ -331,7 +333,7 @@ static void	parse_commandline(int argc, char **argv)
 	if (NULL == ZABBIX_SERVER && NULL == CONFIG_FILE)
 	{
 		usage();
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 }
 
@@ -401,8 +403,10 @@ int	main(int argc, char **argv)
 			goto exit;
 		}
 
-		while (NULL != fgets(in_line, sizeof(in_line), in) && SUCCEED == ret)	/* <hostname> <key> [<timestamp>] <value> */
+		while ((SUCCEED == ret || SUCCEED_WITH_INFO == ret) && NULL != fgets(in_line, sizeof(in_line), in))
 		{
+			/* line format: <hostname> <key> [<timestamp>] <value> */
+
 			total_count++; /* also used as inputline */
 
 			zbx_rtrim(in_line, "\r\n");
@@ -568,5 +572,9 @@ int	main(int argc, char **argv)
 exit:
 	zabbix_close_log();
 
-	return SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE;
+	/* convert FAIL (-1) or FAIL returned from thread (255) to EXIT_FAILURE */
+	if (SUCCEED_WITH_INFO < ret || 0 > ret)
+		ret = 1;
+
+	return ret;
 }
