@@ -26,7 +26,6 @@ require_once dirname(__FILE__).'/include/items.inc.php';
 
 $page['title'] = _('Trigger form');
 $page['file'] = 'tr_logform.php';
-$page['scripts'] = array();
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 define('ZBX_PAGE_NO_MENU', 1);
@@ -176,7 +175,7 @@ if(isset($_REQUEST['sform'])){
 		$sql = 'SELECT DISTINCT f.functionid, f.function, f.parameter, t.expression, '.
 								' t.description, t.priority, t.comments, t.url, t.status, t.type'.
 					' FROM functions f, triggers t, items i '.
-					' WHERE t.triggerid='.$_REQUEST['triggerid'].
+					' WHERE t.triggerid='.zbx_dbstr($_REQUEST['triggerid']).
 						' AND i.itemid=f.itemid '.
 						' AND f.triggerid = t.triggerid '.
 						' AND i.value_type IN ('.ITEM_VALUE_TYPE_LOG.' , '.ITEM_VALUE_TYPE_TEXT.', '.ITEM_VALUE_TYPE_STR.')';
@@ -258,7 +257,7 @@ if(isset($_REQUEST['sform'])){
 	$frmTRLog->addRow(_('Description'), new CTextBox('description', $description, 80));
 
 	$item = '';
-	$db_items = DBselect('SELECT DISTINCT * FROM items WHERE itemid='.$itemid);
+	$db_items = DBselect('SELECT DISTINCT * FROM items WHERE itemid='.zbx_dbstr($itemid));
 	while($db_item = DBfetch($db_items)){
 		if($db_item['templateid']){
 			$template_host = get_realhost_by_itemid($db_item['templateid']);

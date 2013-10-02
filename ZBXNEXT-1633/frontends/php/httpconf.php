@@ -295,7 +295,7 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'
 		}
 		if (delete_history_by_httptestid($id)) {
 			$goResult = true;
-			DBexecute('UPDATE httptest SET nextcheck=0 WHERE httptestid='.$id);
+			DBexecute('UPDATE httptest SET nextcheck=0 WHERE httptestid='.zbx_dbstr($id));
 			$host = DBfetch(DBselect(
 				'SELECT h.host FROM hosts h,httptest ht WHERE ht.hostid=h.hostid AND ht.httptestid='.zbx_dbstr($id)));
 
@@ -376,7 +376,7 @@ if (isset($_REQUEST['form'])) {
 		$data['http_password'] = $dbHttpTest['http_password'];
 		$data['http_proxy'] = $dbHttpTest['http_proxy'];
 		$data['templated'] = (bool) $dbHttpTest['templateid'];
-		$data['steps'] = DBfetchArray(DBselect('SELECT h.* FROM httpstep h WHERE h.httptestid='.$_REQUEST['httptestid'].' ORDER BY h.no'));
+		$data['steps'] = DBfetchArray(DBselect('SELECT h.* FROM httpstep h WHERE h.httptestid='.zbx_dbstr($_REQUEST['httptestid']).' ORDER BY h.no'));
 	}
 	else {
 		if (isset($_REQUEST['form_refresh'])) {

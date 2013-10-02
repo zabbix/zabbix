@@ -117,7 +117,7 @@ class CUserGroup extends CZBXAPI {
 
 		// status
 		if (!is_null($options['status'])) {
-			$sqlParts['where'][] = 'g.users_status='.$options['status'];
+			$sqlParts['where'][] = 'g.users_status='.zbx_dbstr($options['status']);
 		}
 
 		// with_gui_access

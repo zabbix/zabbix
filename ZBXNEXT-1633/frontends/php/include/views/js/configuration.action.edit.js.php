@@ -6,7 +6,7 @@
 		<span style="font-size: 1.1em; font-weight: bold;"> #{name} </span>
 	</td>
 	<td>
-		<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpGroupRow(#{groupid});" />
+		<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpGroupRow('#{groupid}');" />
 	</td>
 </tr>
 </script>
@@ -18,7 +18,7 @@
 		<span style="font-size: 1.1em; font-weight: bold;"> #{name} </span>
 	</td>
 	<td>
-		<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpTemplateRow(#{templateid});" />
+		<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpTemplateRow('#{templateid}');" />
 	</td>
 </tr>
 </script>
@@ -31,7 +31,7 @@
 		<span>#{name}</span>
 	</td>
 	<td>
-		<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpmsgUsrgrpRow(#{usrgrpid});" />
+		<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpmsgUsrgrpRow('#{usrgrpid}');" />
 	</td>
 </tr>
 </script>
@@ -43,7 +43,7 @@
 		<span>#{fullname}</span>
 	</td>
 	<td>
-		<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpmsgUserRow(#{userid});" />
+		<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpmsgUserRow('#{userid}');" />
 	</td>
 </tr>
 </script>
@@ -57,7 +57,7 @@
 		<span>#{name}</span>
 	</td>
 	<td>
-		<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpCmdRow(#{groupid}, 'groupid');" />
+		<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpCmdRow('#{groupid}', 'groupid');" />
 	</td>
 </tr>
 </script>
@@ -71,7 +71,7 @@
 		<span>#{name}</span>
 	</td>
 	<td>
-		<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpCmdRow(#{hostid}, 'hostid');" />
+		<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpCmdRow('#{hostid}', 'hostid');" />
 	</td>
 </tr>
 </script>
@@ -166,6 +166,7 @@
 					}
 
 					tpl = new Template(jQuery('#opmsgUsrgrpRowTPL').html());
+
 					container = jQuery('#opmsgUsrgrpListFooter');
 					container.before(tpl.evaluate(value));
 					break;

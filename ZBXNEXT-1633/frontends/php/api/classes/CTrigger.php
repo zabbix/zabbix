@@ -279,12 +279,12 @@ class CTrigger extends CTriggerGeneral {
 
 		// lastChangeSince
 		if (!is_null($options['lastChangeSince'])) {
-			$sqlParts['where']['lastchangesince'] = 't.lastchange>'.$options['lastChangeSince'];
+			$sqlParts['where']['lastchangesince'] = 't.lastchange>'.zbx_dbstr($options['lastChangeSince']);
 		}
 
 		// lastChangeTill
 		if (!is_null($options['lastChangeTill'])) {
-			$sqlParts['where']['lastchangetill'] = 't.lastchange<'.$options['lastChangeTill'];
+			$sqlParts['where']['lastchangetill'] = 't.lastchange<'.zbx_dbstr($options['lastChangeTill']);
 		}
 
 		// withUnacknowledgedEvents
@@ -420,7 +420,7 @@ class CTrigger extends CTriggerGeneral {
 
 		// min_severity
 		if (!is_null($options['min_severity'])) {
-			$sqlParts['where'][] = 't.priority>='.$options['min_severity'];
+			$sqlParts['where'][] = 't.priority>='.zbx_dbstr($options['min_severity']);
 		}
 
 		// limit
