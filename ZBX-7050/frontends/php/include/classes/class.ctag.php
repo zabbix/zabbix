@@ -132,6 +132,10 @@ class CTag extends CObject {
 	}
 
 	public function addClass($cssClass) {
+		if (!$cssClass) {
+			return;
+		}
+
 		if (!isset($this->attributes['class']) || zbx_empty($this->attributes['class'])) {
 			$this->attributes['class'] = $cssClass;
 		}
