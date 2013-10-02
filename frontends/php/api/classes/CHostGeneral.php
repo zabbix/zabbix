@@ -261,7 +261,7 @@ abstract class CHostGeneral extends CZBXAPI {
 					continue;
 				}
 
-				$values = array(get_dbid('hosts_templates', 'hosttemplateid'), $targetid, $templateid);
+				$values = array(get_dbid('hosts_templates', 'hosttemplateid'), zbx_dbstr($targetid), zbx_dbstr($templateid));
 				$sql = 'INSERT INTO hosts_templates VALUES ('.implode(', ', $values).')';
 				$result = DBexecute($sql);
 

@@ -46,7 +46,7 @@ function permission2str($group_permission) {
 function check_perm2system($userid) {
 	$sql = 'SELECT g.usrgrpid'.
 			' FROM usrgrp g,users_groups ug'.
-			' WHERE ug.userid='.$userid.
+			' WHERE ug.userid='.zbx_dbstr($userid).
 				' AND g.usrgrpid=ug.usrgrpid'.
 				' AND g.users_status='.GROUP_STATUS_DISABLED;
 	if ($res = DBfetch(DBselect($sql, 1))) {
@@ -91,7 +91,7 @@ function get_user_auth($userid) {
 
 	$sql = 'SELECT MAX(g.gui_access) AS gui_access'.
 			' FROM usrgrp g,users_groups ug'.
-			' WHERE ug.userid='.$userid.
+			' WHERE ug.userid='.zbx_dbstr($userid).
 				' AND g.usrgrpid=ug.usrgrpid';
 	$db_access = DBfetch(DBselect($sql));
 	if (!zbx_empty($db_access['gui_access'])) {
@@ -206,7 +206,7 @@ function get_accessible_groups_by_user($user_data, $perm, $perm_res = PERM_RES_I
 					' LEFT JOIN rights r ON r.id=hg.groupid'.
 					' LEFT JOIN users_groups g ON r.groupid=g.usrgrpid'.
 					' LEFT JOIN nodes n ON '.DBid2nodeid('hg.groupid').'=n.nodeid'.
-				' WHERE g.userid='.$userid.
+				' WHERE g.userid='.zbx_dbstr($userid).
 					' AND '.DBin_node('hg.groupid', $nodeid).
 				' GROUP BY n.nodeid,n.name,hg.groupid,hg.name,g.userid'.
 				' ORDER BY node_name,hg.name,permission';
@@ -306,7 +306,7 @@ function get_accessible_nodes_by_user(&$user_data, $perm, $perm_res = null, $nod
 	foreach ($node_data as $nodeid => $node) {
 		switch ($perm_res) {
 			case PERM_RES_DATA_ARRAY:
-				$db_node = DBfetch(DBselect('SELECT n.* FROM nodes n WHERE n.nodeid='.$nodeid.' ORDER BY n.name'));
+				$db_node = DBfetch(DBselect('SELECT n.* FROM nodes n WHERE n.nodeid='.zbx_dbstr($nodeid).' ORDER BY n.name'));
 
 				if (!ZBX_DISTRIBUTED) {
 					if (!$node) {
@@ -552,7 +552,7 @@ function getUserGroupsByUserId($userId) {
 	if (!isset($userGroups[$userId])) {
 		$userGroups[$userId] = array();
 
-		$result = DBselect('SELECT usrgrpid FROM users_groups WHERE userid='.$userId);
+		$result = DBselect('SELECT usrgrpid FROM users_groups WHERE userid='.zbx_dbstr($userId));
 		while ($row = DBfetch($result)) {
 			$userGroups[$userId][] = $row['usrgrpid'];
 		}

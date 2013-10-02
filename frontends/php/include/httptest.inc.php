@@ -72,10 +72,10 @@ function httptest_status2style($status) {
 }
 
 function activate_httptest($httptestid) {
-	$result = DBexecute('UPDATE httptest SET status='.HTTPTEST_STATUS_ACTIVE.' WHERE httptestid='.$httptestid);
+	$result = DBexecute('UPDATE httptest SET status='.HTTPTEST_STATUS_ACTIVE.' WHERE httptestid='.zbx_dbstr($httptestid));
 
 	$itemids = array();
-	$items_db = DBselect('SELECT hti.itemid FROM httptestitem hti WHERE hti.httptestid='.$httptestid);
+	$items_db = DBselect('SELECT hti.itemid FROM httptestitem hti WHERE hti.httptestid='.zbx_dbstr($httptestid));
 	while ($itemid = Dbfetch($items_db)) {
 		$itemids[] = $itemid['itemid'];
 	}
@@ -84,7 +84,7 @@ function activate_httptest($httptestid) {
 		'SELECT hsi.itemid'.
 		' FROM httpstep hs,httpstepitem hsi'.
 		' WHERE hs.httpstepid=hsi.httpstepid'.
-			' AND hs.httptestid='.$httptestid
+			' AND hs.httptestid='.zbx_dbstr($httptestid)
 	);
 	while ($itemid = Dbfetch($items_db)) {
 		$itemids[] = $itemid['itemid'];
@@ -96,10 +96,10 @@ function activate_httptest($httptestid) {
 }
 
 function disable_httptest($httptestid) {
-	$result = DBexecute('UPDATE httptest SET status='.HTTPTEST_STATUS_DISABLED.' WHERE httptestid='.$httptestid);
+	$result = DBexecute('UPDATE httptest SET status='.HTTPTEST_STATUS_DISABLED.' WHERE httptestid='.zbx_dbstr($httptestid));
 
 	$itemids = array();
-	$items_db = DBselect('SELECT hti.itemid FROM httptestitem hti WHERE hti.httptestid='.$httptestid);
+	$items_db = DBselect('SELECT hti.itemid FROM httptestitem hti WHERE hti.httptestid='.zbx_dbstr($httptestid));
 	while ($itemid = Dbfetch($items_db)) {
 		$itemids[] = $itemid['itemid'];
 	}
@@ -108,7 +108,7 @@ function disable_httptest($httptestid) {
 		'SELECT hsi.itemid'.
 		' FROM httpstep hs,httpstepitem hsi'.
 		' WHERE hs.httpstepid=hsi.httpstepid'.
-			' AND hs.httptestid='.$httptestid
+			' AND hs.httptestid='.zbx_dbstr($httptestid)
 	);
 	while ($itemid = Dbfetch($items_db)) {
 		$itemids[] = $itemid['itemid'];
@@ -125,7 +125,7 @@ function delete_history_by_httptestid($httptestid) {
 		' FROM items i,httpstepitem si,httpstep s'.
 		' WHERE i.itemid=si.itemid'.
 			' AND si.httpstepid=s.httpstepid'.
-			' AND s.httptestid='.$httptestid
+			' AND s.httptestid='.zbx_dbstr($httptestid)
 	);
 	while ($item_data = DBfetch($db_items)) {
 		if (!delete_history_by_itemid($item_data['itemid'])) {
@@ -137,11 +137,11 @@ function delete_history_by_httptestid($httptestid) {
 }
 
 function get_httptest_by_httptestid($httptestid) {
-	return DBfetch(DBselect('SELECT ht.* FROM httptest ht WHERE ht.httptestid='.$httptestid));
+	return DBfetch(DBselect('SELECT ht.* FROM httptest ht WHERE ht.httptestid='.zbx_dbstr($httptestid)));
 }
 
 function get_httpstep_by_no($httptestid, $no) {
-	return DBfetch(DBselect('SELECT hs.* FROM httpstep hs WHERE hs.httptestid='.$httptestid.' AND hs.no='.$no));
+	return DBfetch(DBselect('SELECT hs.* FROM httpstep hs WHERE hs.httptestid='.zbx_dbstr($httptestid).' AND hs.no='.zbx_dbstr($no)));
 }
 
 function get_httptests_by_hostid($hostids) {

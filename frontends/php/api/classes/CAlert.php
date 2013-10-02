@@ -237,12 +237,12 @@ class CAlert extends CZBXAPI {
 
 		// time_from
 		if (!is_null($options['time_from'])) {
-			$sqlParts['where'][] = 'a.clock>'.$options['time_from'];
+			$sqlParts['where'][] = 'a.clock>'.zbx_dbstr($options['time_from']);
 		}
 
 		// time_till
 		if (!is_null($options['time_till'])) {
-			$sqlParts['where'][] = 'a.clock<'.$options['time_till'];
+			$sqlParts['where'][] = 'a.clock<'.zbx_dbstr($options['time_till']);
 		}
 
 		// output

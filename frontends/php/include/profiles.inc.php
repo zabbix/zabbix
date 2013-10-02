@@ -148,9 +148,9 @@ class CProfile {
 			'profileid' => get_dbid('profiles', 'profileid'),
 			'userid' => self::$userDetails['userid'],
 			'idx' => zbx_dbstr($idx),
-			$value_type => ($value_type == 'value_str') ? zbx_dbstr($value) : $value,
-			'type' => $type,
-			'idx2' => $idx2
+			$value_type => zbx_dbstr($value),
+			'type' => zbx_dbstr($type),
+			'idx2' => zbx_dbstr($idx2)
 		);
 		return DBexecute('INSERT INTO profiles ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')');
 	}
@@ -163,16 +163,15 @@ class CProfile {
 		}
 
 		if ($idx2 > 0) {
-			$sql_cond .= ' AND idx2='.$idx2.' AND '.DBin_node('idx2', false);
+			$sql_cond .= ' AND idx2='.zbx_dbstr($idx2).' AND '.DBin_node('idx2', false);
 		}
 
 		$value_type = self::getFieldByType($type);
-		$value = ($value_type == 'value_str') ? zbx_dbstr($value) : $value;
 
 		return DBexecute(
 			'UPDATE profiles SET '.
-				$value_type.'='.$value.','.
-				' type='.$type.
+				$value_type.'='.zbx_dbstr($value).','.
+				' type='.zbx_dbstr($type).
 			' WHERE userid='.self::$userDetails['userid'].
 				' AND idx='.zbx_dbstr($idx).
 				$sql_cond
@@ -242,7 +241,7 @@ function update_config($configs) {
 		}
 	}
 	if (isset($configs['alert_usrgrpid'])) {
-		if ($configs['alert_usrgrpid'] != 0 && !DBfetch(DBselect('SELECT u.usrgrpid FROM usrgrp u WHERE u.usrgrpid='.$configs['alert_usrgrpid']))) {
+		if ($configs['alert_usrgrpid'] != 0 && !DBfetch(DBselect('SELECT u.usrgrpid FROM usrgrp u WHERE u.usrgrpid='.zbx_dbstr($configs['alert_usrgrpid'])))) {
 			error(_('Incorrect user group.'));
 			return false;
 		}
@@ -393,7 +392,7 @@ function add_user_history($page) {
 	$history5 = DBfetch(DBSelect(
 		'SELECT uh.title5,uh.url5'.
 		' FROM user_history uh'.
-		' WHERE uh.userid='.$userid
+		' WHERE uh.userid='.zbx_dbstr($userid)
 	));
 
 	if ($history5 && ($history5['title5'] == $title)) {
@@ -401,7 +400,7 @@ function add_user_history($page) {
 			// title same, url isnt, change only url
 			$sql = 'UPDATE user_history'.
 					' SET url5='.zbx_dbstr($url).
-					' WHERE userid='.$userid;
+					' WHERE userid='.zbx_dbstr($userid);
 		}
 		else {
 			// no need to change anything;
@@ -413,7 +412,7 @@ function add_user_history($page) {
 		if ($history5 === false) {
 			$userhistoryid = get_dbid('user_history', 'userhistoryid');
 			$sql = 'INSERT INTO user_history (userhistoryid, userid, title5, url5)'.
-					' VALUES('.$userhistoryid.', '.$userid.', '.zbx_dbstr($title).', '.zbx_dbstr($url).')';
+					' VALUES('.$userhistoryid.', '.zbx_dbstr($userid).', '.zbx_dbstr($title).', '.zbx_dbstr($url).')';
 		}
 		else {
 			$sql = 'UPDATE user_history'.
@@ -427,7 +426,7 @@ function add_user_history($page) {
 						' url4=url5,'.
 						' title5='.zbx_dbstr($title).','.
 						' url5='.zbx_dbstr($url).
-					' WHERE userid='.$userid;
+					' WHERE userid='.zbx_dbstr($userid);
 		}
 	}
 	return DBexecute($sql);
@@ -464,7 +463,7 @@ function add2favorites($favobj, $favid, $source = null) {
 		'profileid' => get_dbid('profiles', 'profileid'),
 		'userid' => CWebUser::$data['userid'],
 		'idx' => zbx_dbstr($favobj),
-		'value_id' => $favid,
+		'value_id' => zbx_dbstr($favid),
 		'type' => PROFILE_TYPE_ID
 	);
 	if (!is_null($source)) {
@@ -478,7 +477,7 @@ function rm4favorites($favobj, $favid = 0, $source = null) {
 		'DELETE FROM profiles'.
 		' WHERE userid='.CWebUser::$data['userid'].
 			' AND idx='.zbx_dbstr($favobj).
-			($favid > 0 ? ' AND value_id='.$favid : '').
+			($favid > 0 ? ' AND value_id='.zbx_dbstr($favid) : '').
 			(is_null($source) ? '' : ' AND source='.zbx_dbstr($source))
 	);
 }

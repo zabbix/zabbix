@@ -483,7 +483,7 @@ function hostInterfaceTypeNumToName($type) {
 }
 
 function get_hostgroup_by_groupid($groupid) {
-	$groups = DBfetch(DBselect('SELECT g.* FROM groups g WHERE g.groupid='.$groupid));
+	$groups = DBfetch(DBselect('SELECT g.* FROM groups g WHERE g.groupid='.zbx_dbstr($groupid)));
 	if (!empty($groups)) {
 		return $groups;
 	}
@@ -522,7 +522,7 @@ function get_host_by_itemid($itemids) {
 }
 
 function get_host_by_hostid($hostid, $no_error_message = 0) {
-	$row = DBfetch(DBselect('SELECT h.* FROM hosts h WHERE h.hostid='.$hostid));
+	$row = DBfetch(DBselect('SELECT h.* FROM hosts h WHERE h.hostid='.zbx_dbstr($hostid)));
 	if ($row) {
 		return $row;
 	}
@@ -1109,7 +1109,7 @@ function validate_group_with_host(&$PAGE_GROUPS, &$PAGE_HOSTS, $reset_host = tru
 
 	if ($_REQUEST['groupid'] > 0) {
 		if ($_REQUEST['hostid'] > 0) {
-			if (!DBfetch(DBselect('SELECT hg.groupid FROM hosts_groups hg WHERE hg.hostid='.$_REQUEST['hostid'].' AND hg.groupid='.$_REQUEST['groupid']))) {
+			if (!DBfetch(DBselect('SELECT hg.groupid FROM hosts_groups hg WHERE hg.hostid='.zbx_dbstr($_REQUEST['hostid']).' AND hg.groupid='.zbx_dbstr($_REQUEST['groupid'])))) {
 				$_REQUEST['hostid'] = 0;
 			}
 		}
@@ -1145,7 +1145,7 @@ function validate_group_with_host(&$PAGE_GROUPS, &$PAGE_HOSTS, $reset_host = tru
 }
 
 function get_application_by_applicationid($applicationid, $no_error_message = 0) {
-	$row = DBfetch(DBselect('SELECT a.* FROM applications a WHERE a.applicationid='.$applicationid));
+	$row = DBfetch(DBselect('SELECT a.* FROM applications a WHERE a.applicationid='.zbx_dbstr($applicationid)));
 	if ($row) {
 		return $row;
 	}
@@ -1157,7 +1157,7 @@ function get_application_by_applicationid($applicationid, $no_error_message = 0)
 }
 
 function get_applications_by_templateid($applicationid) {
-	return DBselect('SELECT a.* FROM applications a WHERE a.templateid='.$applicationid);
+	return DBselect('SELECT a.* FROM applications a WHERE a.templateid='.zbx_dbstr($applicationid));
 }
 
 function get_realhost_by_applicationid($applicationid) {
@@ -1169,7 +1169,7 @@ function get_realhost_by_applicationid($applicationid) {
 }
 
 function get_host_by_applicationid($applicationid) {
-	$row = DBfetch(DBselect('SELECT h.* FROM hosts h,applications a WHERE a.hostid=h.hostid AND a.applicationid='.$applicationid));
+	$row = DBfetch(DBselect('SELECT h.* FROM hosts h,applications a WHERE a.hostid=h.hostid AND a.applicationid='.zbx_dbstr($applicationid)));
 	if ($row) {
 		return $row;
 	}
@@ -1327,7 +1327,7 @@ function hostMenuData(array $host, array $scripts = array()) {
 }
 
 function isTemplate($hostid) {
-	$dbHost = DBfetch(DBselect('SELECT h.status FROM hosts h WHERE h.hostid='.$hostid));
+	$dbHost = DBfetch(DBselect('SELECT h.status FROM hosts h WHERE h.hostid='.zbx_dbstr($hostid)));
 
 	return !empty($dbHost) && $dbHost['status'] == HOST_STATUS_TEMPLATE;
 }

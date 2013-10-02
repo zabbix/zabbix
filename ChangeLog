@@ -1398,6 +1398,8 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.18rc1
 
+A.F....... [ZBX-7091] fixed SQL injection vulnerabilities in page filtering; thanks to Bernhard Schildendorfer from SEC Consult for the report (Eduard, Pavels)
+A.F....... [ZBX-7091] fixed SQL injection vulnerabilities dashboard favourite managing; thanks to Lincoln, a member of Corelan Team, for the report (Eduard, Pavels)
 .......P.. [ZBX-6249] fixed data loss in proxy "Data sender" process caused by unfinished transactions; thanks to MATSUDA Daiki for patch (Andris)
 ..F....... [ZBX-6830] fixed dynamic item checkbox in Configuration > Screens (Ivo)
 ........S. [ZBX-5924] fixed curl verify host option setting in ez texting (wiper)

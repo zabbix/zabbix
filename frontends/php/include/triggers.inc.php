@@ -107,7 +107,7 @@ function getSeverityCell($severity, $text = null, $force_normal = false) {
 function get_service_status_of_trigger($triggerid) {
 	$sql = 'SELECT t.triggerid,t.priority'.
 			' FROM triggers t'.
-			' WHERE t.triggerid='.$triggerid.
+			' WHERE t.triggerid='.zbx_dbstr($triggerid).
 				' AND t.status='.TRIGGER_STATUS_ENABLED.
 				' AND t.value='.TRIGGER_VALUE_TRUE;
 	$rows = DBfetch(DBselect($sql, 1));
@@ -259,7 +259,7 @@ function getParentHostsByTriggers($triggers) {
 }
 
 function get_trigger_by_triggerid($triggerid) {
-	$db_trigger = DBfetch(DBselect('SELECT t.* FROM triggers t WHERE t.triggerid='.$triggerid));
+	$db_trigger = DBfetch(DBselect('SELECT t.* FROM triggers t WHERE t.triggerid='.zbx_dbstr($triggerid)));
 	if (!empty($db_trigger)) {
 		return $db_trigger;
 	}
@@ -284,7 +284,7 @@ function get_triggers_by_hostid($hostid) {
 	return DBselect(
 		'SELECT DISTINCT t.*'.
 		' FROM triggers t,functions f,items i'.
-		' WHERE i.hostid='.$hostid.
+		' WHERE i.hostid='.zbx_dbstr($hostid).
 			' AND f.itemid=i.itemid'.
 			' AND f.triggerid=t.triggerid'
 	);
@@ -679,7 +679,7 @@ function explode_exp($expression, $html = false, $resolve_macro = false, $src_ho
 			$state = '';
 			$sql = 'SELECT h.host,i.itemid,i.key_,f.function,f.triggerid,f.parameter,i.itemid,i.status,i.type,i.flags'.
 					' FROM items i,functions f,hosts h'.
-					' WHERE f.functionid='.$functionid.
+					' WHERE f.functionid='.zbx_dbstr($functionid).
 						' AND i.itemid=f.itemid'.
 						' AND h.hostid=i.hostid';
 
@@ -1068,8 +1068,8 @@ function replace_template_dependencies($deps, $hostid) {
 				' FROM triggers t,functions f,items i'.
 				' WHERE t.triggerid=f.triggerid'.
 					' AND f.itemid=i.itemid'.
-					' AND t.templateid='.$val.
-					' AND i.hostid='.$hostid;
+					' AND t.templateid='.zbx_dbstr($val).
+					' AND i.hostid='.zbx_dbstr($hostid);
 		if ($db_new_dep = DBfetch(DBselect($sql))) {
 			$deps[$id] = $db_new_dep['triggerid'];
 		}
@@ -1395,9 +1395,9 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 	if ($period_start > 0 && $period_start <= time()) {
 		$sql = 'SELECT e.eventid,e.value'.
 				' FROM events e'.
-				' WHERE e.objectid='.$triggerid.
+				' WHERE e.objectid='.zbx_dbstr($triggerid).
 					' AND e.object='.EVENT_OBJECT_TRIGGER.
-					' AND e.clock<'.$period_start.
+					' AND e.clock<'.zbx_dbstr($period_start).
 				' ORDER BY e.eventid DESC';
 		if ($row = DBfetch(DBselect($sql, 1))) {
 			$start_value = $row['value'];
@@ -1407,13 +1407,13 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 
 	$sql = 'SELECT COUNT(e.eventid) AS cnt,MIN(e.clock) AS min_clock,MAX(e.clock) AS max_clock'.
 			' FROM events e'.
-			' WHERE e.objectid='.$triggerid.
+			' WHERE e.objectid='.zbx_dbstr($triggerid).
 				' AND e.object='.EVENT_OBJECT_TRIGGER;
 	if ($period_start != 0) {
-		$sql .= ' AND clock>='.$period_start;
+		$sql .= ' AND clock>='.zbx_dbstr($period_start);
 	}
 	if ($period_end != 0) {
-		$sql .= ' AND clock<='.$period_end;
+		$sql .= ' AND clock<='.zbx_dbstr($period_end);
 	}
 
 	$db_events = DBfetch(DBselect($sql));
@@ -1455,7 +1455,7 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 	$db_events = DBselect(
 		'SELECT e.eventid,e.clock,e.value'.
 		' FROM events e'.
-		' WHERE e.objectid='.$triggerid.
+		' WHERE e.objectid='.zbx_dbstr($triggerid).
 			' AND e.object='.EVENT_OBJECT_TRIGGER.
 			' AND e.clock BETWEEN '.$min.' AND '.$max.
 		' ORDER BY e.eventid'

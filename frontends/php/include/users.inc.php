@@ -90,9 +90,9 @@ function get_userid_by_usrgrpid($usrgrpids) {
 function add_user_to_group($userid, $usrgrpid) {
 	$result = false;
 	if (granted2move_user($userid,$usrgrpid)) {
-		DBexecute('DELETE FROM users_groups WHERE userid='.$userid.' AND usrgrpid='.$usrgrpid);
+		DBexecute('DELETE FROM users_groups WHERE userid='.zbx_dbstr($userid).' AND usrgrpid='.zbx_dbstr($usrgrpid));
 		$users_groups_id = get_dbid('users_groups', 'id');
-		$result = DBexecute('INSERT INTO users_groups (id,usrgrpid,userid) VALUES ('.$users_groups_id.','.$usrgrpid.','.$userid.')');
+		$result = DBexecute('INSERT INTO users_groups (id,usrgrpid,userid) VALUES ('.$users_groups_id.','.zbx_dbstr($usrgrpid).','.zbx_dbstr($userid).')');
 	}
 	else{
 		error(_('User cannot change status of himself.'));
@@ -103,7 +103,7 @@ function add_user_to_group($userid, $usrgrpid) {
 function remove_user_from_group($userid, $usrgrpid) {
 	$result = false;
 	if (granted2move_user($userid,$usrgrpid)) {
-		$result = DBexecute('DELETE FROM users_groups WHERE userid='.$userid.' AND usrgrpid='.$usrgrpid);
+		$result = DBexecute('DELETE FROM users_groups WHERE userid='.zbx_dbstr($userid).' AND usrgrpid='.zbx_dbstr($usrgrpid));
 	}
 	else {
 		error(_('User cannot change status of himself.'));
@@ -138,7 +138,7 @@ function change_group_status($usrgrpids, $users_status) {
 	}
 
 	if ($grant) {
-		$result = DBexecute('UPDATE usrgrp SET users_status='.$users_status.' WHERE '.dbConditionInt('usrgrpid', $usrgrpids));
+		$result = DBexecute('UPDATE usrgrp SET users_status='.zbx_dbstr($users_status).' WHERE '.dbConditionInt('usrgrpid', $usrgrpids));
 	}
 	else {
 		error(_('User cannot change status of himself.'));
@@ -154,7 +154,7 @@ function change_group_gui_access($usrgrpids, $gui_access) {
 		$grant = granted2update_group($usrgrpids);
 	}
 	if ($grant) {
-		$result = DBexecute('UPDATE usrgrp SET gui_access='.$gui_access.' WHERE '.dbConditionInt('usrgrpid',$usrgrpids));
+		$result = DBexecute('UPDATE usrgrp SET gui_access='.zbx_dbstr($gui_access).' WHERE '.dbConditionInt('usrgrpid',$usrgrpids));
 	}
 	else {
 		error(_('User cannot change GUI access for himself.'));
@@ -164,6 +164,6 @@ function change_group_gui_access($usrgrpids, $gui_access) {
 
 function change_group_debug_mode($usrgrpids, $debug_mode){
 	zbx_value2array($usrgrpids);
-	return DBexecute('UPDATE usrgrp SET debug_mode='.$debug_mode.' WHERE '.dbConditionInt('usrgrpid', $usrgrpids));
+	return DBexecute('UPDATE usrgrp SET debug_mode='.zbx_dbstr($debug_mode).' WHERE '.dbConditionInt('usrgrpid', $usrgrpids));
 }
 ?>

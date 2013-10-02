@@ -507,7 +507,8 @@ class CUser extends CZBXAPI {
 			$usrgrps = zbx_objectValues($user['usrgrps'], 'usrgrpid');
 			foreach ($usrgrps as $groupid) {
 				$usersGroupdId = get_dbid('users_groups', 'id');
-				$sql = 'INSERT INTO users_groups (id,usrgrpid,userid) VALUES ('.$usersGroupdId.','.$groupid.','.$userid.')';
+				$sql = 'INSERT INTO users_groups (id,usrgrpid,userid) VALUES ('.zbx_dbstr($usersGroupdId).','.zbx_dbstr($groupid).','.zbx_dbstr($userid).')';
+
 				if (!DBexecute($sql)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 				}
@@ -516,8 +517,8 @@ class CUser extends CZBXAPI {
 			foreach ($user['user_medias'] as $mediaData) {
 				$mediaid = get_dbid('media', 'mediaid');
 				$sql = 'INSERT INTO media (mediaid,userid,mediatypeid,sendto,active,severity,period)'.
-					' VALUES ('.$mediaid.','.$userid.','.$mediaData['mediatypeid'].','.
-					zbx_dbstr($mediaData['sendto']).','.$mediaData['active'].','.$mediaData['severity'].','.
+					' VALUES ('.zbx_dbstr($mediaid).','.zbx_dbstr($userid).','.zbx_dbstr($mediaData['mediatypeid']).','.
+					zbx_dbstr($mediaData['sendto']).','.zbx_dbstr($mediaData['active']).','.zbx_dbstr($mediaData['severity']).','.
 					zbx_dbstr($mediaData['period']).')';
 				if (!DBexecute($sql)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
@@ -577,10 +578,10 @@ class CUser extends CZBXAPI {
 				$newUsrgrpids = zbx_objectValues($user['usrgrps'], 'usrgrpid');
 
 				// deleting all relations with groups, but not touching those, where user still must be after update
-				DBexecute('DELETE FROM users_groups WHERE userid='.$user['userid'].' AND '.dbConditionInt('usrgrpid', $newUsrgrpids, true));
+				DBexecute('DELETE FROM users_groups WHERE userid='.zbx_dbstr($user['userid']).' AND '.dbConditionInt('usrgrpid', $newUsrgrpids, true));
 
 				// getting the list of groups user is currently in
-				$dbGroupsUserIn = DBSelect('SELECT usrgrpid FROM users_groups WHERE userid='.$user['userid']);
+				$dbGroupsUserIn = DBSelect('SELECT usrgrpid FROM users_groups WHERE userid='.zbx_dbstr($user['userid']));
 				$groupsUserIn = array();
 				while ($grp = DBfetch($dbGroupsUserIn)) {
 					$groupsUserIn[$grp['usrgrpid']] = $grp['usrgrpid'];
@@ -598,7 +599,7 @@ class CUser extends CZBXAPI {
 					}
 
 					$usersGroupdId = get_dbid('users_groups', 'id');
-					$sql = 'INSERT INTO users_groups (id,usrgrpid,userid) VALUES ('.$usersGroupdId.','.$groupid.','.$user['userid'].')';
+					$sql = 'INSERT INTO users_groups (id,usrgrpid,userid) VALUES ('.zbx_dbstr($usersGroupdId).','.zbx_dbstr($groupid).','.zbx_dbstr($user['userid']).')';
 
 					if (!DBexecute($sql)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
@@ -696,8 +697,8 @@ class CUser extends CZBXAPI {
 				$mediaid = get_dbid('media', 'mediaid');
 
 				$sql = 'INSERT INTO media (mediaid,userid,mediatypeid,sendto,active,severity,period)'.
-						' VALUES ('.$mediaid.','.$user['userid'].','.$media['mediatypeid'].','.
-									zbx_dbstr($media['sendto']).','.$media['active'].','.$media['severity'].','.
+						' VALUES ('.zbx_dbstr($mediaid).','.zbx_dbstr($user['userid']).','.zbx_dbstr($media['mediatypeid']).','.
+									zbx_dbstr($media['sendto']).','.zbx_dbstr($media['active']).','.zbx_dbstr($media['severity']).','.
 									zbx_dbstr($media['period']).')';
 				if (!DBexecute($sql)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
@@ -796,12 +797,12 @@ class CUser extends CZBXAPI {
 
 			$result = DBexecute(
 				'UPDATE media'.
-				' SET mediatypeid='.$media['mediatypeid'].','.
+				' SET mediatypeid='.zbx_dbstr($media['mediatypeid']).','.
 					' sendto='.zbx_dbstr($media['sendto']).','.
-					' active='.$media['active'].','.
-					' severity='.$media['severity'].','.
+					' active='.zbx_dbstr($media['active']).','.
+					' severity='.zbx_dbstr($media['severity']).','.
 					' period='.zbx_dbstr($media['period']).
-				' WHERE mediaid='.$media['mediaid']
+				' WHERE mediaid='.zbx_dbstr($media['mediaid'])
 			);
 			if (!$result) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update user media.'));
@@ -927,7 +928,7 @@ class CUser extends CZBXAPI {
 		$dbAccess = DBfetch(DBselect(
 			'SELECT MAX(g.gui_access) AS gui_access'.
 			' FROM usrgrp g,users_groups ug'.
-			' WHERE ug.userid='.$userInfo['userid'].
+			' WHERE ug.userid='.zbx_dbstr($userInfo['userid']).
 				' AND g.usrgrpid=ug.usrgrpid'
 		));
 		if (!zbx_empty($dbAccess['gui_access'])) {
@@ -968,7 +969,7 @@ class CUser extends CZBXAPI {
 
 			DBexecute(
 				'UPDATE users'.
-				' SET attempt_failed='.$userInfo['attempt_failed'].','.
+				' SET attempt_failed='.zbx_dbstr($userInfo['attempt_failed']).','.
 					' attempt_clock='.time().','.
 					' attempt_ip='.zbx_dbstr($ip).
 				' WHERE userid='.$userInfo['userid']
@@ -980,7 +981,7 @@ class CUser extends CZBXAPI {
 
 		// start session
 		$sessionid = md5(time().$password.$name.rand(0, 10000000));
-		DBexecute('INSERT INTO sessions (sessionid,userid,lastaccess,status) VALUES ('.zbx_dbstr($sessionid).','.$userInfo['userid'].','.time().','.ZBX_SESSION_ACTIVE.')');
+		DBexecute('INSERT INTO sessions (sessionid,userid,lastaccess,status) VALUES ('.zbx_dbstr($sessionid).','.zbx_dbstr($userInfo['userid']).','.time().','.ZBX_SESSION_ACTIVE.')');
 
 		add_audit(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, _s('Correct login "%s".', $name));
 
@@ -990,7 +991,7 @@ class CUser extends CZBXAPI {
 		$userData['userid'] = $userInfo['userid'];
 
 		if ($userInfo['attempt_failed']) {
-			DBexecute('UPDATE users SET attempt_failed=0 WHERE userid='.$userInfo['userid']);
+			DBexecute('UPDATE users SET attempt_failed=0 WHERE userid='.zbx_dbstr($userInfo['userid']));
 		}
 
 		CWebUser::$data = self::$userData = $userData;
@@ -1035,16 +1036,16 @@ class CUser extends CZBXAPI {
 			}
 
 			if ($userInfo['autologout'] > 0) {
-				DBexecute('DELETE FROM sessions WHERE userid='.$userInfo['userid'].' AND lastaccess<'.(time() - $userInfo['autologout']));
+				DBexecute('DELETE FROM sessions WHERE userid='.zbx_dbstr($userInfo['userid']).' AND lastaccess<'.(time() - $userInfo['autologout']));
 			}
 
-			DBexecute('UPDATE sessions SET lastaccess='.time().' WHERE userid='.$userInfo['userid'].' AND sessionid='.zbx_dbstr($sessionid));
+			DBexecute('UPDATE sessions SET lastaccess='.time().' WHERE userid='.zbx_dbstr($userInfo['userid']).' AND sessionid='.zbx_dbstr($sessionid));
 		}
 
 		$dbAccess = DBfetch(DBselect(
 			'SELECT MAX(g.gui_access) AS gui_access'.
 			' FROM usrgrp g,users_groups ug'.
-			' WHERE ug.userid='.$userInfo['userid'].
+			' WHERE ug.userid='.zbx_dbstr($userInfo['userid']).
 				' AND g.usrgrpid=ug.usrgrpid'
 		));
 		if (!zbx_empty($dbAccess['gui_access'])) {
@@ -1070,13 +1071,13 @@ class CUser extends CZBXAPI {
 			'SELECT u.userid,u.alias,u.name,u.surname,u.url,u.autologin,u.autologout,u.lang,u.refresh,u.type,'.
 			' u.theme,u.attempt_failed,u.attempt_ip,u.attempt_clock,u.rows_per_page'.
 			' FROM users u'.
-			' WHERE u.userid='.$userid
+			' WHERE u.userid='.zbx_dbstr($userid)
 		));
 
 		$userData['debug_mode'] = (bool) DBfetch(DBselect(
 			'SELECT ug.userid'.
 			' FROM usrgrp g,users_groups ug'.
-			' WHERE ug.userid='.$userid.
+			' WHERE ug.userid='.zbx_dbstr($userid).
 			' AND g.usrgrpid=ug.usrgrpid'.
 			' AND g.debug_mode='.GROUP_DEBUG_MODE_ENABLED
 		));
