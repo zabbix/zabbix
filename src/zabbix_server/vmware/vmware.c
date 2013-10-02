@@ -2303,7 +2303,7 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 {
 	const char		*__function_name = "zbx_vmware_get_service";
 	int			i, now;
-	zbx_vmware_service_t	*service;
+	zbx_vmware_service_t	*service = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %s@%s", __function_name, username, url);
 
