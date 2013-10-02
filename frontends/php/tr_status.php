@@ -532,7 +532,8 @@ foreach ($triggers as $tnum => $trigger) {
 $hosts = API::Host()->get(array(
 	'hostids' => $hostIds,
 	'preservekeys' => true,
-	'selectScreens' => API_OUTPUT_COUNT
+	'selectScreens' => API_OUTPUT_COUNT,
+	'selectInventory' => array('hostid')
 ));
 
 // get host scripts

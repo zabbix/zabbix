@@ -308,6 +308,8 @@ class testFormItem extends CWebTest {
 			array(
 				array(
 					'type' => 'Zabbix agent',
+					'value_type' => 'Numeric (unsigned)',
+					'data_type' => 'Boolean',
 					'host' => 'Template inheritance test host',
 					'templatedHost' => 'Inheritance test template',
 					'form' => 'testInheritanceItem1'
@@ -324,6 +326,8 @@ class testFormItem extends CWebTest {
 			array(
 				array(
 					'type' => 'Zabbix agent',
+					'value_type' => 'Numeric (unsigned)',
+					'data_type' => 'Hexadecimal',
 					'host' => 'Template inheritance test host',
 					'templatedHost' => 'Inheritance test template',
 					'form' => 'testInheritanceItem1'
@@ -683,12 +687,7 @@ class testFormItem extends CWebTest {
 			if (isset($data['data_type'])) {
 				$this->zbxTestDropdownSelect('data_type', $data['data_type']);
 			}
-			if (isset($data['templatedHost'])) {
-				$data_type = $this->getValue('value_type_name');
-			}
-			else {
-				$data_type = $this->getSelectedLabel('data_type');
-			}
+			$data_type = $this->getSelectedLabel('data_type');
 		}
 
 		if ($type == 'SSH agent') {
