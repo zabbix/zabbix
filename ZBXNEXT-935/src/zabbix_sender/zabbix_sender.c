@@ -127,6 +127,7 @@ ZBX_THREAD_SENDVAL_ARGS;
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
+ *                >0 - the number of failed values                            *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -150,8 +151,13 @@ static int	check_response(char *response)
 
 	if (SUCCEED == ret && SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, info, sizeof(info)))
 	{
+		int	failed;
+
 		printf("info from server: \"%s\"\n", info);
 		fflush(stdout);
+
+		if (2 == sscanf(info, "Processed: %d; Failed: %d", &failed, &failed) && 0 < failed)
+			ret = failed;
 	}
 
 	return ret;
@@ -183,10 +189,8 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 			if (SUCCEED == (tcp_ret = zbx_tcp_recv(&sock, &answer)))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "answer [%s]", answer);
-				if (NULL == answer || SUCCEED != check_response(answer))
+				if (NULL == answer || FAIL == (ret = check_response(answer)))
 					zabbix_log(LOG_LEVEL_WARNING, "incorrect answer from server [%s]", answer);
-				else
-					ret = SUCCEED;
 			}
 		}
 
@@ -554,7 +558,7 @@ int	main(int argc, char **argv)
 
 	zbx_json_free(&sentdval_args.json);
 
-	if (SUCCEED == ret)
+	if (FAIL != ret)
 		printf("sent: %d; skipped: %d; total: %d\n", succeed_count, (total_count - succeed_count), total_count);
 	else
 	{
@@ -564,5 +568,5 @@ int	main(int argc, char **argv)
 exit:
 	zabbix_close_log();
 
-	return ret;
+	return SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE;
 }
