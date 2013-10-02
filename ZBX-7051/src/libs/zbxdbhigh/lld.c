@@ -73,7 +73,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_time
 		db_error = zbx_strdup(db_error, row[4]);
 
 		lifetime_str = zbx_strdup(NULL, row[5]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL,
+		substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL,
 				&lifetime_str, MACRO_TYPE_COMMON, NULL, 0);
 		if (SUCCEED != is_ushort(lifetime_str, &lifetime))
 		{

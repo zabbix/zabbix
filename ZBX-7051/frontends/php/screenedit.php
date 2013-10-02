@@ -101,39 +101,39 @@ if (!empty($_REQUEST['ajaxAction']) && $_REQUEST['ajaxAction'] == 'sw_pos') {
 		$fitem = DBfetch(DBselect(
 			'SELECT s.screenitemid,s.colspan,s.rowspan'.
 			' FROM screens_items s'.
-			' WHERE s.y='.$sw_pos[0].
-				' AND s.x='.$sw_pos[1].
-				' AND s.screenid='.$screen['screenid']
+			' WHERE s.y='.zbx_dbstr($sw_pos[0]).
+				' AND s.x='.zbx_dbstr($sw_pos[1]).
+				' AND s.screenid='.zbx_dbstr($screen['screenid'])
 		));
 
 		$sitem = DBfetch(DBselect(
 			'SELECT s.screenitemid,s.colspan,s.rowspan'.
 			' FROM screens_items s'.
-			' WHERE s.y='.$sw_pos[2].
-				' AND s.x='.$sw_pos[3].
-				' AND s.screenid='.$screen['screenid']
+			' WHERE s.y='.zbx_dbstr($sw_pos[2]).
+				' AND s.x='.zbx_dbstr($sw_pos[3]).
+				' AND s.screenid='.zbx_dbstr($screen['screenid'])
 		));
 
 		if ($fitem) {
 			DBexecute('UPDATE screens_items'.
-						' SET y='.$sw_pos[2].',x='.$sw_pos[3].
-						',colspan='.(isset($sitem['colspan']) ? $sitem['colspan'] : 1).
-						',rowspan='.(isset($sitem['rowspan']) ? $sitem['rowspan'] : 1).
-						' WHERE y='.$sw_pos[0].
-							' AND x='.$sw_pos[1].
-							' AND screenid='.$screen['screenid'].
-							' AND screenitemid='.$fitem['screenitemid']
+						' SET y='.zbx_dbstr($sw_pos[2]).',x='.zbx_dbstr($sw_pos[3]).
+						',colspan='.(isset($sitem['colspan']) ? zbx_dbstr($sitem['colspan']) : 1).
+						',rowspan='.(isset($sitem['rowspan']) ? zbx_dbstr($sitem['rowspan']) : 1).
+						' WHERE y='.zbx_dbstr($sw_pos[0]).
+							' AND x='.zbx_dbstr($sw_pos[1]).
+							' AND screenid='.zbx_dbstr($screen['screenid']).
+							' AND screenitemid='.zbx_dbstr($fitem['screenitemid'])
 			);
 		}
 		if ($sitem) {
 			DBexecute('UPDATE screens_items '.
-						' SET y='.$sw_pos[0].',x='.$sw_pos[1].
-						',colspan='.(isset($fitem['colspan']) ? $fitem['colspan'] : 1).
-						',rowspan='.(isset($fitem['rowspan']) ? $fitem['rowspan'] : 1).
-						' WHERE y='.$sw_pos[2].
-							' AND x='.$sw_pos[3].
-							' AND screenid='.$screen['screenid'].
-							' AND screenitemid='.$sitem['screenitemid']
+						' SET y='.zbx_dbstr($sw_pos[0]).',x='.zbx_dbstr($sw_pos[1]).
+						',colspan='.(isset($fitem['colspan']) ? zbx_dbstr($fitem['colspan']) : 1).
+						',rowspan='.(isset($fitem['rowspan']) ? zbx_dbstr($fitem['rowspan']) : 1).
+						' WHERE y='.zbx_dbstr($sw_pos[2]).
+							' AND x='.zbx_dbstr($sw_pos[3]).
+							' AND screenid='.zbx_dbstr($screen['screenid']).
+							' AND screenitemid='.zbx_dbstr($sitem['screenitemid'])
 			);
 		}
 		add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'], 'Screen items switched');
@@ -208,20 +208,20 @@ elseif (isset($_REQUEST['delete'])) {
 	unset($_REQUEST['x']);
 }
 elseif (isset($_REQUEST['add_row'])) {
-	DBexecute('UPDATE screens SET vsize=(vsize+1) WHERE screenid='.$screen['screenid']);
+	DBexecute('UPDATE screens SET vsize=(vsize+1) WHERE screenid='.zbx_dbstr($screen['screenid']));
 
 	$add_row = get_request('add_row', 0);
 	if ($screen['vsize'] > $add_row) {
-		DBexecute('UPDATE screens_items SET y=(y+1) WHERE screenid='.$screen['screenid'].' AND y>='.$add_row);
+		DBexecute('UPDATE screens_items SET y=(y+1) WHERE screenid='.zbx_dbstr($screen['screenid']).' AND y>='.zbx_dbstr($add_row));
 	}
 	add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'], 'Row added');
 }
 elseif (isset($_REQUEST['add_col'])) {
-	DBexecute('UPDATE screens SET hsize=(hsize+1) WHERE screenid='.$screen['screenid']);
+	DBexecute('UPDATE screens SET hsize=(hsize+1) WHERE screenid='.zbx_dbstr($screen['screenid']));
 
 	$add_col = get_request('add_col', 0);
 	if ($screen['hsize'] > $add_col) {
-		DBexecute('UPDATE screens_items SET x=(x+1) WHERE screenid='.$screen['screenid'].' AND x>='.$add_col);
+		DBexecute('UPDATE screens_items SET x=(x+1) WHERE screenid='.zbx_dbstr($screen['screenid']).' AND x>='.zbx_dbstr($add_col));
 	}
 	add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'], 'Column added');
 }
@@ -229,9 +229,9 @@ elseif (isset($_REQUEST['rmv_row'])) {
 	if ($screen['vsize'] > 1) {
 		$rmv_row = get_request('rmv_row', 0);
 
-		DBexecute('UPDATE screens SET vsize=(vsize-1) WHERE screenid='.$screen['screenid']);
-		DBexecute('DELETE FROM screens_items WHERE screenid='.$screen['screenid'].' AND y='.$rmv_row);
-		DBexecute('UPDATE screens_items SET y=(y-1) WHERE screenid='.$screen['screenid'].' AND y>'.$rmv_row);
+		DBexecute('UPDATE screens SET vsize=(vsize-1) WHERE screenid='.zbx_dbstr($screen['screenid']));
+		DBexecute('DELETE FROM screens_items WHERE screenid='.zbx_dbstr($screen['screenid']).' AND y='.zbx_dbstr($rmv_row));
+		DBexecute('UPDATE screens_items SET y=(y-1) WHERE screenid='.zbx_dbstr($screen['screenid']).' AND y>'.zbx_dbstr($rmv_row));
 
 		add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'], 'Row deleted');
 	}
@@ -244,9 +244,9 @@ elseif (isset($_REQUEST['rmv_col'])) {
 	if ($screen['hsize'] > 1) {
 		$rmv_col = get_request('rmv_col', 0);
 
-		DBexecute('UPDATE screens SET hsize=(hsize-1) WHERE screenid='.$screen['screenid']);
-		DBexecute('DELETE FROM screens_items WHERE screenid='.$screen['screenid'].' AND x='.$rmv_col);
-		DBexecute('UPDATE screens_items SET x=(x-1) WHERE screenid='.$screen['screenid'].' AND x>'.$rmv_col);
+		DBexecute('UPDATE screens SET hsize=(hsize-1) WHERE screenid='.zbx_dbstr($screen['screenid']));
+		DBexecute('DELETE FROM screens_items WHERE screenid='.zbx_dbstr($screen['screenid']).' AND x='.zbx_dbstr($rmv_col));
+		DBexecute('UPDATE screens_items SET x=(x-1) WHERE screenid='.zbx_dbstr($screen['screenid']).' AND x>'.zbx_dbstr($rmv_col));
 
 		add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'], 'Column deleted');
 	}

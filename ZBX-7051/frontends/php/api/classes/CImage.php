@@ -267,7 +267,7 @@ class CImage extends CZBXAPI {
 			$values = array(
 				'imageid' => $imageid,
 				'name' => zbx_dbstr($image['name']),
-				'imagetype' => $image['imagetype']
+				'imagetype' => zbx_dbstr($image['imagetype'])
 			);
 
 			switch ($DB['TYPE']) {
@@ -401,7 +401,7 @@ class CImage extends CZBXAPI {
 						break;
 
 					case ZBX_DB_ORACLE:
-						$sql = 'SELECT i.image FROM images i WHERE i.imageid='.$image['imageid'].' FOR UPDATE';
+						$sql = 'SELECT i.image FROM images i WHERE i.imageid='.zbx_dbstr($image['imageid']).' FOR UPDATE';
 
 						if (!$stmt = oci_parse($DB['DB'], $sql)) {
 							$e = oci_error($DB['DB']);
@@ -423,7 +423,7 @@ class CImage extends CZBXAPI {
 						break;
 
 					case ZBX_DB_DB2:
-						$stmt = db2_prepare($DB['DB'], 'UPDATE images SET image=? WHERE imageid='.$image['imageid']);
+						$stmt = db2_prepare($DB['DB'], 'UPDATE images SET image=? WHERE imageid='.zbx_dbstr($image['imageid']));
 
 						if (!$stmt) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
@@ -445,7 +445,7 @@ class CImage extends CZBXAPI {
 			foreach ($values as $field => $value) {
 				$sqlUpd[] = $field.'='.$value;
 			}
-			$sql = 'UPDATE images SET '.implode(', ', $sqlUpd).' WHERE imageid='.$image['imageid'];
+			$sql = 'UPDATE images SET '.implode(', ', $sqlUpd).' WHERE imageid='.zbx_dbstr($image['imageid']);
 			$result = DBexecute($sql);
 
 			if (!$result) {

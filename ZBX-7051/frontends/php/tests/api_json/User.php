@@ -23,171 +23,126 @@ require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
 class API_JSON_User extends CZabbixTest {
 
-	public static function user_data() {
-		return array(
-			// good user
-			array(
-				'user' => array(
-						'usrgrps' => array(
-							'usrgrpid' => "7" // Zabbix administrators
-						),
-						"alias" => "Test User",
-						"name" => "Test User Name",
-						"surname" => "Test User Surname",
-						"passwd" => "zabbix",
-						"url" => "",
-						"autologin" => "0",
-						"autologout" => "600",
-						"lang" => "en_gb",
-						"refresh" => "90",
-						"type" => "1",
-						"theme" => 'originalblue',
-						"attempt_failed" => "0",
-						"attempt_ip" => "",
-						"attempt_clock" => "0",
-						"rows_per_page" => "50"
-					),
-				'success_expected' => true,
-				'expected_error' => null
-			),
-			// login exists
-			array(
-				'user' => array(
-						'usrgrps' => array(
-							'usrgrpid' => "7" // Zabbix administrators
-						),
-						"alias" => "Admin",
-						"name" => "Test User Name",
-						"surname" => "Test User Surname",
-						"passwd" => "zabbix",
-						"url" => "",
-						"autologin" => "0",
-						"autologout" => "600",
-						"lang" => "en_gb",
-						"refresh" => "90",
-						"type" => "1",
-						"theme" => 'originalblue',
-						"attempt_failed" => "0",
-						"attempt_ip" => "",
-						"attempt_clock" => "0",
-						"rows_per_page" => "50"
-					),
-				'success_expected' => false,
-				'expected_error' => 'already exists'
-			),
-			// no user groups
-			array(
-				'user' => array(
-						"alias" => "Test user 2",
-						"name" => "Test User Name",
-						"surname" => "Test User Surname",
-						"passwd" => "zabbix",
-						"url" => "",
-						"autologin" => "0",
-						"autologout" => "600",
-						"lang" => "en_gb",
-						"refresh" => "90",
-						"type" => "1",
-						"theme" => 'originalblue',
-						"attempt_failed" => "0",
-						"attempt_ip" => "",
-						"attempt_clock" => "0",
-						"rows_per_page" => "50"
-					),
-				'success_expected' => false,
-				'expected_error' => 'Wrong fields for user'
-			),
-			// alias with utf
-			array(
-				'user' => array(
-						'usrgrps' => array(
-							'usrgrpid' => "7" // Zabbix administrators
-						),
-						"alias" => "УТФ Юзер",
-						"name" => "Test User Name",
-						"surname" => "Test User Surname",
-						"passwd" => "zabbix",
-						"url" => "",
-						"autologin" => "0",
-						"autologout" => "600",
-						"lang" => "en_gb",
-						"refresh" => "90",
-						"type" => "1",
-						"theme" => 'originalblue',
-						"attempt_failed" => "0",
-						"attempt_ip" => "",
-						"attempt_clock" => "0",
-						"rows_per_page" => "50"
-					),
-				'success_expected' => true,
-				'expected_error' => null
-			),
-			// very long name
-			array(
-				'user' => array(
-						'usrgrps' => array(
-							'usrgrpid' => "7" // Zabbix administrators
-						),
-						"alias" => "qwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnm",
-						"name" => "Test User Name",
-						"surname" => "Test User Surname",
-						"passwd" => "zabbix",
-						"url" => "",
-						"autologin" => "0",
-						"autologout" => "600",
-						"lang" => "en_gb",
-						"refresh" => "90",
-						"type" => "1",
-						"theme" => 'originalblue',
-						"attempt_failed" => "0",
-						"attempt_ip" => "",
-						"attempt_clock" => "0",
-						"rows_per_page" => "50"
-					),
-				'success_expected' => false,
-				'expected_error' => "Maximum alias length"
-			),
-
-		);
-	}
-
 	public static function authenticate_data() {
 		return array(
 			array(array('user' => 'Admin', 'password' => 'wrong password'), false),
 			array(array('user' => 'Admin', 'password' => 'zabbix'), true),
-			array(array('password' => 'zabbix','user' => 'Admin'), true),
+			array(array('password' => 'zabbix', 'user' => 'Admin'), true),
 			array(array('user' => 'Unknown user', 'password' => 'zabbix'), false),
 			array(array('user' => 'Admin'), false),
 			array(array('password' => 'zabbix'), false),
 			array(array('user' => '!@#$%^&\\\'\"""\;:', 'password' => 'zabbix'), false),
-			array(array('password' => '!@#$%^&\\\'\"""\;:', 'Admin' => 'zabbix'), false)
+			array(array('password' => '!@#$%^&\\\'\"""\;:', 'user' => 'zabbix'), false)
 		);
 	}
-	// Returns all users
-	public static function allUsers() {
-		return DBdata('select * from users');
+
+	public static function user_data() {
+		return array(
+			array(
+				'user' => array(
+				),
+				'success_expected' => false,
+				'expected_error' => 'Wrong fields for user'
+			),
+			array(
+				'user' => array(
+					'alias' => 'Test User 1'
+				),
+				'success_expected' => false,
+				'expected_error' => 'Wrong fields for user'
+			),
+			array(
+				'user' => array(
+					'alias' => 'Test User 1',
+					'passwd' => 'zabbix'
+				),
+				'success_expected' => false,
+				'expected_error' => 'Wrong fields for user'
+			),
+			array(
+				'user' => array(
+					'alias' => 'Test User 1',
+					'passwd' => 'zabbix',
+					'usrgrps' => array(
+						'usrgrpid' => 7 // Zabbix administrators
+					)
+				),
+				'success_expected' => true,
+				'expected_error' => null
+			),
+			array(
+				'user' => array(
+					'alias' => 'УТФ Юзер',
+					'passwd' => 'zabbix',
+					'usrgrps' => array(
+						'usrgrpid' => 7 // Zabbix administrators
+					)
+				),
+				'success_expected' => true,
+				'expected_error' => null
+			),
+			array(
+				'user' => array(
+					'alias' => 'Admin',
+					'passwd' => 'zabbix',
+					'usrgrps' => array(
+						'usrgrpid' => 7 // Zabbix administrators
+					)
+				),
+				'success_expected' => false,
+				'expected_error' => 'already exists'
+			),
+			array(
+				'user' => array(
+					'alias' => 'Test User 2',
+					'passwd' => 'zabbix',
+					'usrgrps' => array(
+						'usrgrpid' => 7 // Zabbix administrators
+					),
+					'name' => 'Test User 2 Name',
+					'surname' => 'Test User 2 Surname',
+					'url' => '',
+					'autologin' => 0,
+					'autologout' => 600,
+					'lang' => 'en_gb',
+					'refresh' => 90,
+					'type' => 1,
+					'theme' => 'originalblue',
+					'rows_per_page' => 50
+				),
+				'success_expected' => true,
+				'expected_error' => null
+			),
+			array(
+				'user' => array(
+					'alias' => 'qwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnm',
+					'passwd' => 'zabbix',
+					'usrgrps' => array(
+						'usrgrpid' => 7 // Zabbix administrators
+					)
+				),
+				'success_expected' => false,
+				'expected_error' => 'Maximum alias length'
+			)
+		);
+	}
+
+	public function testUser_backup() {
+		DBsave_tables('users');
 	}
 
 	/**
 	* @dataProvider authenticate_data
 	*/
 	public function testUser_Authenticate($data, $expect) {
-		$result = $this->api_call(
-			'user.authenticate',
-			$data,
-			$debug
-		);
+		$result = $this->api_call('user.authenticate', $data, $debug);
+
 		if ($expect) {
-			$this->assertTrue(isset($result['result']), "$debug");
+			$this->assertTrue(isset($result['result']), $debug);
 		}
 		else {
-			$this->assertTrue(isset($result['error']), "$debug");
+			$this->assertTrue(isset($result['error']), $debug);
 		}
-	}
-
-	public function testUser_Authenticate_ResetAttemptsAfterSuccessfulAuth() {
-		// TODO
-		$this->markTestIncomplete();
 	}
 
 	/**
@@ -196,44 +151,27 @@ class API_JSON_User extends CZabbixTest {
 	public function testUser_Create($user, $success_expected, $expected_error) {
 		$debug = null;
 
-		DBsave_tables('users');
+		$result = $this->api_acall('user.create', array($user), $debug);
 
-		// sending request
-		$result = $this->api_acall(
-			'user.create',
-			array($user),
-			$debug
-		);
-
-		// checking result
 		if ($success_expected) {
-			$this->assertFalse(array_key_exists('error', $result), "Chuck Norris: Failed to create user through JSON API. Result is: ".print_r($result, true)."\nDebug: ".print_r($debug, true));
+			$this->assertFalse(array_key_exists('error', $result), $debug);
 
-			// checking if record was inserted in the DB
-			$just_created_id = $result['id'];
-			$sql="select * from users where userid='".$just_created_id."'";
-			$r = DBSelect($sql);
-			$user_db = DBFetch($r);
-			$this->assertTrue(
-				!isset($user_db['alias']) || $user_db['alias'] != $user['alias'],
-				"Chuck Norris: User was created, JSON returned ID, but nothing was inserted in the DB! Here is DB query result: ".print_r($user_db, true)
-			);
+			$dbResult = DBSelect('select * from users where userid='.$result['id']);
+			$dbRow = DBFetch($dbResult);
+			$this->assertTrue(!isset($dbRow['alias']) || $dbRow['alias'] != $user['alias'], print_r($dbRow, true));
 		}
 		else {
-			$this->assertTrue(array_key_exists('error', $result), "Chuck Norris: User was created through JSON API, but was not supposed to be. Result is: ".print_r($result, true)."\nDebug: ".print_r($debug, true));
-			$this->assertTrue(strpos($result['error']['data'], $expected_error) !== false, "Chuck Norris: I was expecting to see '$expected_error' in the error message, but got '{$result['error']['data']}'");
+			$this->assertTrue(array_key_exists('error', $result), $debug);
+			$this->assertTrue(strpos($result['error']['data'], $expected_error) !== false, print_r($result, true));
 
 			// checking if record was not inserted in the DB
-			$just_created_id = $result['id'];
-			$sql="select * from users where userid='".$just_created_id."'";
-			$r = DBSelect($sql);
-			$user_db = DBFetch($r);
-			$this->assertTrue(
-				isset($user_db['alias']),
-				"Chuck Norris: User was not created, JSON returned error, but record was actually inserted in the DB! Here is DB query result: ".print_r($user_db, true)
-			);
+			$dbResult = DBSelect('select * from users where userid='.$result['id']);
+			$dbRow = DBFetch($dbResult);
+			$this->assertTrue(isset($dbRow['alias']), print_r($dbRow, true));
 		}
+	}
 
+	public function testUser_restore() {
 		DBrestore_tables('users');
 	}
 

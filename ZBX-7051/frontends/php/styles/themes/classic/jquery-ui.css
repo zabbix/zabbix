@@ -402,6 +402,7 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; }
 .classic .ui-tabs .ui-tabs-nav li a,
 .classic .ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-active a { cursor: pointer; }
 .classic .ui-tabs .ui-tabs-panel { display: block; border-width: 0; padding: 1em 1.4em; background: none; }
+.classic .ui-tabs .ui-tabs-nav li.ui-state-disabled a { color: #A8BFD4; }
 
 .classic .ui-datepicker { width: 17em; padding: .2em .2em 0; display: none; }
 .classic .ui-datepicker .ui-datepicker-header { position: relative; padding: .2em 0; }

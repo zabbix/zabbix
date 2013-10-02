@@ -44,7 +44,7 @@ if (isset($_REQUEST['execute'])) {
 
 	$data = array(
 		'message' => '',
-		'info' => DBfetch(DBselect('SELECT s.name FROM scripts s WHERE s.scriptid='.$scriptid))
+		'info' => DBfetch(DBselect('SELECT s.name FROM scripts s WHERE s.scriptid='.zbx_dbstr($scriptid)))
 	);
 
 	$result = API::Script()->execute(array('hostid' => $hostid, 'scriptid' => $scriptid));
