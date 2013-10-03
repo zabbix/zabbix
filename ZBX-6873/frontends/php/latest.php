@@ -26,8 +26,6 @@ require_once dirname(__FILE__).'/include/items.inc.php';
 $page['title'] = _('Latest data');
 $page['file'] = 'latest.php';
 $page['hist_arg'] = array('groupid','hostid','show','select','open','applicationid');
-$page['scripts'] = array();
-
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 define('ZBX_PAGE_MAIN_HAT','hat_latest');

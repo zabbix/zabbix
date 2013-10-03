@@ -177,18 +177,18 @@ class CPie extends CGraphDraw {
 						'AVG(h.value) AS avg,MIN(h.value) AS min,'.
 						'MAX(h.value) AS max,MAX(h.clock) AS clock'.
 					' FROM history h'.
-					' WHERE h.itemid='.$this->items[$i]['itemid'].
-						' AND h.clock>='.$from_time.
-						' AND h.clock<='.$to_time.
+					' WHERE h.itemid='.zbx_dbstr($this->items[$i]['itemid']).
+						' AND h.clock>='.zbx_dbstr($from_time).
+						' AND h.clock<='.zbx_dbstr($to_time).
 					' GROUP BY h.itemid'
 					,
 					'SELECT hu.itemid,'.
 						'AVG(hu.value) AS avg,MIN(hu.value) AS min,'.
 						'MAX(hu.value) AS max,MAX(hu.clock) AS clock'.
 					' FROM history_uint hu'.
-					' WHERE hu.itemid='.$this->items[$i]['itemid'].
-						' AND hu.clock>='.$from_time.
-						' AND hu.clock<='.$to_time.
+					' WHERE hu.itemid='.zbx_dbstr($this->items[$i]['itemid']).
+						' AND hu.clock>='.zbx_dbstr($from_time).
+						' AND hu.clock<='.zbx_dbstr($to_time).
 					' GROUP BY hu.itemid'
 				);
 			}
@@ -199,18 +199,18 @@ class CPie extends CGraphDraw {
 						'AVG(t.value_avg) AS avg,MIN(t.value_min) AS min,'.
 						'MAX(t.value_max) AS max,MAX(t.clock) AS clock'.
 					' FROM trends t'.
-					' WHERE t.itemid='.$this->items[$i]['itemid'].
-						' AND t.clock>='.$from_time.
-						' AND t.clock<='.$to_time.
+					' WHERE t.itemid='.zbx_dbstr($this->items[$i]['itemid']).
+						' AND t.clock>='.zbx_dbstr($from_time).
+						' AND t.clock<='.zbx_dbstr($to_time).
 					' GROUP BY t.itemid'
 					,
 					'SELECT t.itemid,'.
 						'AVG(t.value_avg) AS avg,MIN(t.value_min) AS min,'.
 						'MAX(t.value_max) AS max,MAX(t.clock) AS clock'.
 					' FROM trends_uint t'.
-					' WHERE t.itemid='.$this->items[$i]['itemid'].
-						' AND t.clock>='.$from_time.
-						' AND t.clock<='.$to_time.
+					' WHERE t.itemid='.zbx_dbstr($this->items[$i]['itemid']).
+						' AND t.clock>='.zbx_dbstr($from_time).
+						' AND t.clock<='.zbx_dbstr($to_time).
 					' GROUP BY t.itemid'
 				);
 			}

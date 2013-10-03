@@ -311,7 +311,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 		' WHERE '.dbConditionInt('a.actionid', $_REQUEST['g_actionid'])
 	);
 	while ($row = DBfetch($goResult)) {
-		$res = DBexecute('UPDATE actions SET status='.$status.' WHERE actionid='.$row['actionid']);
+		$res = DBexecute('UPDATE actions SET status='.zbx_dbstr($status).' WHERE actionid='.zbx_dbstr($row['actionid']));
 		if ($res) {
 			$actionIds[] = $row['actionid'];
 		}

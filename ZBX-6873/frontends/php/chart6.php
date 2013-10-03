@@ -101,7 +101,7 @@ $graph->showLegend($dbGraph['show_legend']);
 $result = DBselect(
 	'SELECT gi.*'.
 	' FROM graphs_items gi'.
-	' WHERE gi.graphid='.$dbGraph['graphid'].
+	' WHERE gi.graphid='.zbx_dbstr($dbGraph['graphid']).
 	' ORDER BY gi.sortorder,gi.itemid DESC'
 );
 while ($dbGraph = DBfetch($result)) {
