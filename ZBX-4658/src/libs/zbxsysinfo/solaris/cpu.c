@@ -124,7 +124,7 @@ static int	get_kstat_system_misc(char *s, int *value)
 
 	kstat_close(kc);
 
-	*value = kn->value.ul;
+	*value = get_kstat_numeric_value(kn);
 
 	return SUCCEED;
 }

@@ -36,7 +36,7 @@ int	SYSTEM_BOOTTIME(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		{
 			if (NULL != (kn = (kstat_named_t*)kstat_data_lookup(kp, "boot_time")))
 			{
-				SET_UI64_RESULT(result, (zbx_uint64_t)kn->value.ul);
+				SET_UI64_RESULT(result, get_kstat_numeric_value(kn));
 				ret = SYSINFO_RET_OK;
 			}
 		}

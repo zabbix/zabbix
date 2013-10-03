@@ -84,7 +84,7 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	assert(hz);
 
 	kn = (kstat_named_t*)kstat_data_lookup(kp, "clk_intr");
-	secs = kn->value.ul / hz;
+	secs = get_kstat_numeric_value(kn) / hz;
 
 	/* close kstat */
 	kstat_close(kc);

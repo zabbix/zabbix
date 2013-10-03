@@ -64,11 +64,11 @@ static int	NET_IF_IN_BYTES(const char *cmd, const char *param, unsigned flags, A
 
     if( SYSINFO_RET_OK == (ret = get_kstat_named_field(if_name, "rbytes64", &kn)) )
     {
-	SET_UI64_RESULT(result, kn.value.ui64);
+	SET_UI64_RESULT(result, get_kstat_numeric_value(&kn));
     }
     else if( SYSINFO_RET_OK == (ret = get_kstat_named_field(if_name, "rbytes", &kn)) )
     {
-	SET_UI64_RESULT(result, kn.value.ui32);
+	SET_UI64_RESULT(result, get_kstat_numeric_value(&kn));
     }
 
     return ret;
@@ -92,11 +92,11 @@ static int	NET_IF_IN_PACKETS(const char *cmd, const char *param, unsigned flags,
 
     if ( SYSINFO_RET_OK == (ret = get_kstat_named_field(if_name, "ipackets64", &kn)) )
     {
-	SET_UI64_RESULT(result, kn.value.ui64);
+	SET_UI64_RESULT(result, get_kstat_numeric_value(&kn));
     }
     else if ( SYSINFO_RET_OK == (ret = get_kstat_named_field(if_name, "ipackets", &kn)) )
     {
-	SET_UI64_RESULT(result, kn.value.ui32);
+	SET_UI64_RESULT(result, get_kstat_numeric_value(&kn));
     }
 
     return ret;
@@ -119,7 +119,7 @@ static int	NET_IF_IN_ERRORS(const char *cmd, const char *param, unsigned flags, 
     }
 
     if( SYSINFO_RET_OK == (ret = get_kstat_named_field(if_name, "ierrors", &kn)) )
-	SET_UI64_RESULT(result, kn.value.ui32);
+	SET_UI64_RESULT(result, get_kstat_numeric_value(&kn));
 
     return ret;
 }
@@ -142,11 +142,11 @@ static int	NET_IF_OUT_BYTES(const char *cmd, const char *param, unsigned flags, 
 
     if( SYSINFO_RET_OK == (ret = get_kstat_named_field(if_name, "obytes64", &kn)) )
     {
-	SET_UI64_RESULT(result, kn.value.ui64);
+	SET_UI64_RESULT(result, get_kstat_numeric_value(&kn));
     }
     else if( SYSINFO_RET_OK == (ret = get_kstat_named_field(if_name, "obytes", &kn)) )
     {
-	SET_UI64_RESULT(result, kn.value.ui32);
+	SET_UI64_RESULT(result, get_kstat_numeric_value(&kn));
     }
 
     return ret;
@@ -170,11 +170,11 @@ static int	NET_IF_OUT_PACKETS(const char *cmd, const char *param, unsigned flags
 
     if( SYSINFO_RET_OK == (ret = get_kstat_named_field(if_name, "opackets64", &kn)) )
     {
-	SET_UI64_RESULT(result, kn.value.ui64);
+	SET_UI64_RESULT(result, get_kstat_numeric_value(&kn));
     }
     else if( SYSINFO_RET_OK == (ret = get_kstat_named_field(if_name, "opackets", &kn)) )
     {
-	SET_UI64_RESULT(result, kn.value.ui32);
+	SET_UI64_RESULT(result, get_kstat_numeric_value(&kn));
     }
 
     return ret;
@@ -197,7 +197,7 @@ static int	NET_IF_OUT_ERRORS(const char *cmd, const char *param, unsigned flags,
     }
 
     if ( SYSINFO_RET_OK == (ret = get_kstat_named_field(if_name, "oerrors", &kn)) )
-	SET_UI64_RESULT(result, kn.value.ui32);
+	SET_UI64_RESULT(result, get_kstat_numeric_value(&kn));
 
     return ret;
 }
@@ -222,12 +222,12 @@ static int	NET_IF_TOTAL_BYTES(const char *cmd, const char *param, unsigned flags
     if ( SYSINFO_RET_OK == (ret = get_kstat_named_field(if_name, "rbytes64", &ikn)) &&
 	SYSINFO_RET_OK == (ret = get_kstat_named_field(if_name, "obytes64", &okn)) )
     {
-	SET_UI64_RESULT(result, ikn.value.ui64 + okn.value.ui64);
+	SET_UI64_RESULT(result, get_kstat_numeric_value(&ikn) + get_kstat_numeric_value(&okn));
     }
     else if ( SYSINFO_RET_OK == (ret = get_kstat_named_field(if_name, "rbytes", &ikn)) &&
 	SYSINFO_RET_OK == (ret = get_kstat_named_field(if_name, "obytes", &okn)) )
     {
-	SET_UI64_RESULT(result, ikn.value.ui32 + okn.value.ui32);
+	SET_UI64_RESULT(result, get_kstat_numeric_value(&ikn) + get_kstat_numeric_value(&okn));
     }
 
     return ret;
@@ -253,12 +253,12 @@ static int	NET_IF_TOTAL_PACKETS(const char *cmd, const char *param, unsigned fla
     if ( SYSINFO_RET_OK == (ret = get_kstat_named_field(if_name, "ipackets64", &ikn)) &&
 	SYSINFO_RET_OK == (ret = get_kstat_named_field(if_name, "opackets64", &okn)) )
     {
-	SET_UI64_RESULT(result, ikn.value.ui64 + okn.value.ui64);
+	SET_UI64_RESULT(result, get_kstat_numeric_value(&ikn) + get_kstat_numeric_value(&okn));
     }
     else if ( SYSINFO_RET_OK == (ret = get_kstat_named_field(if_name, "ipackets", &ikn)) &&
 	SYSINFO_RET_OK == (ret = get_kstat_named_field(if_name, "opackets", &okn)) )
     {
-	SET_UI64_RESULT(result, ikn.value.ui32 + okn.value.ui32);
+	SET_UI64_RESULT(result, get_kstat_numeric_value(&ikn) + get_kstat_numeric_value(&okn));
     }
 
     return ret;
@@ -283,7 +283,7 @@ static int	NET_IF_TOTAL_ERRORS(const char *cmd, const char *param, unsigned flag
 
 	if ( SYSINFO_RET_OK == (ret = get_kstat_named_field(if_name, "ierrors", &ikn)) &&
 		SYSINFO_RET_OK == (ret = get_kstat_named_field(if_name, "oerrors", &okn)) )
-			SET_UI64_RESULT(result, ikn.value.ui32 + okn.value.ui32);
+			SET_UI64_RESULT(result, get_kstat_numeric_value(&ikn) + get_kstat_numeric_value(&okn));
 
     return ret;
 }
@@ -306,7 +306,7 @@ int	NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_
 
     if( SYSINFO_RET_OK == (ret = get_kstat_named_field(if_name, "collisions", &kn)) )
     {
-	SET_UI64_RESULT(result, kn.value.ui32);
+	SET_UI64_RESULT(result, get_kstat_numeric_value(&kn));
     }
 
     return ret;
