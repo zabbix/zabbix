@@ -1080,11 +1080,22 @@ class CAction extends CZBXAPI {
 						$opcommandHstCreate = array_merge($opcommandHstCreate, $operation['opcommand_hst']);
 					}
 					else {
-						if ($operation['opcommand']['type'] == ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT) {
-							$operation['opcommand']['command'] = '';
+						// reset fields on type change
+						if ($operation['opcommand']['type'] != ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT) {
+							$operation['opcommand']['scriptid'] = null;
 						}
-						else {
-							$operation['opcommand']['scriptid'] = 0;
+						elseif ($operation['opcommand']['type'] != ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT) {
+							$operation['opcommand']['execute_on'] = ZBX_SCRIPT_EXECUTE_ON_AGENT;
+						}
+						elseif ($operation['opcommand']['type'] != ZBX_SCRIPT_TYPE_SSH
+								&& $operation['opcommand']['type'] != ZBX_SCRIPT_TYPE_TELNET) {
+							$operation['opcommand']['port'] = '';
+							$operation['opcommand']['username'] = '';
+							$operation['opcommand']['password'] = '';
+						}
+						if ($operation['opcommand']['authtype'] == ITEM_AUTHTYPE_PASSWORD) {
+							$operation['opcommand']['publickey'] = '';
+							$operation['opcommand']['privatekey'] = '';
 						}
 
 						$opcommandUpdate[] = array(
