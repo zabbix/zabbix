@@ -1771,7 +1771,7 @@ function getPageNumber() {
  *
  * @return CTable
  */
-function getPagingLine(&$items, $urlParams = array(), $removeUrlParams = array()) {
+function getPagingLine(&$items, array $removeUrlParams = array(), array $urlParams = array()) {
 	global $page;
 
 	$config = select_config();
@@ -1827,13 +1827,6 @@ function getPagingLine(&$items, $urlParams = array(), $removeUrlParams = array()
 			foreach ($urlParams as $key => $value) {
 				$url->setArgument($key, $value);
 			}
-		}
-
-		if ($removeUrlParams !== null && !is_array($removeUrlParams)) {
-			$removeUrlParams = array($removeUrlParams);
-		}
-		elseif ($removeUrlParams === null) {
-			$removeUrlParams = array();
 		}
 
 		$removeUrlParams = array_merge($removeUrlParams, array('go', 'form', 'delete', 'cancel'));

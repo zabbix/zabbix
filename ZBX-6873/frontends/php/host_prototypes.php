@@ -356,8 +356,8 @@ else {
 
 	$data['paging'] = getPagingLine(
 		$data['hostPrototypes'],
-		array('parent_discoveryid' => get_request('parent_discoveryid')),
-		'hostid'
+		array('hostid'),
+		array('parent_discoveryid' => get_request('parent_discoveryid'))
 	);
 
 	// fetch templates linked to the prototypes

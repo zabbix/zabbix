@@ -295,7 +295,7 @@ else {
 	}
 
 	// get paging
-	$data['paging'] = getPagingLine($data['drules'], null, 'druleid');
+	$data['paging'] = getPagingLine($data['drules'], array('druleid'));
 
 	// nodes
 	if ($data['displayNodes'] = is_array(get_current_nodeid())) {
