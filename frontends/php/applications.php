@@ -26,7 +26,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('Configuration of applications');
 $page['file'] = 'applications.php';
 $page['hist_arg'] = array('groupid', 'hostid');
-$page['scripts'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -191,8 +190,8 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 			'SELECT ia.itemid,i.hostid,i.key_'.
 			' FROM items_applications ia'.
 				' LEFT JOIN items i ON ia.itemid=i.itemid'.
-			' WHERE ia.applicationid='.$appid.
-				' AND i.hostid='.$_REQUEST['hostid'].
+			' WHERE ia.applicationid='.zbx_dbstr($appid).
+				' AND i.hostid='.zbx_dbstr($_REQUEST['hostid']).
 				' AND i.type<>'.ITEM_TYPE_HTTPTEST.
 				andDbNode('ia.applicationid')
 		);

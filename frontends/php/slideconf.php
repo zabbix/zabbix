@@ -165,7 +165,7 @@ if (isset($_REQUEST['form'])) {
 		$data['delay'] = $dbSlideshow['delay'];
 
 		// get slides
-		$db_slides = DBselect('SELECT s.* FROM slides s WHERE s.slideshowid='.$data['slideshowid'].' ORDER BY s.step');
+		$db_slides = DBselect('SELECT s.* FROM slides s WHERE s.slideshowid='.zbx_dbstr($data['slideshowid']).' ORDER BY s.step');
 		while ($slide = DBfetch($db_slides)) {
 			$data['slides'][$slide['step']] = array(
 				'slideid' => $slide['slideid'],
