@@ -29,6 +29,7 @@ require_once dirname(__FILE__).'/include/js.inc.php';
 require_once dirname(__FILE__).'/include/discovery.inc.php';
 
 $srctbl = get_request('srctbl', ''); // source table name
+$showNodes = true; // show or not nodes select
 
 // set page title
 switch ($srctbl) {
@@ -47,10 +48,12 @@ switch ($srctbl) {
 	case 'usrgrp':
 		$page['title'] = _('User groups');
 		$min_user_type = USER_TYPE_ZABBIX_ADMIN;
+		$showNodes = false;
 		break;
 	case 'users':
 		$page['title'] = _('Users');
 		$min_user_type = USER_TYPE_ZABBIX_ADMIN;
+		$showNodes = false;
 		break;
 	case 'items':
 		$page['title'] = _('Items');
@@ -59,6 +62,7 @@ switch ($srctbl) {
 	case 'prototypes':
 		$page['title'] = _('Prototypes');
 		$min_user_type = USER_TYPE_ZABBIX_ADMIN;
+		$showNodes = false;
 		break;
 	case 'help_items':
 		$page['title'] = _('Standard items');
@@ -456,7 +460,7 @@ for ($i = 1; $i <= $srcfldCount; $i++) {
 /*
  * Nodes
  */
-if (ZBX_DISTRIBUTED) {
+if (ZBX_DISTRIBUTED && $showNodes) {
 	$isNodeSelected = false;
 
 	$nodeComboBox = new CComboBox('nodeid', $nodeId, 'submit()');
