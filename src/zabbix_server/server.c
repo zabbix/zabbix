@@ -466,7 +466,7 @@ int	main(int argc, char **argv)
 	char		ch = '\0';
 	int		nodeid = 0;
 
-#if defined(PS_OVERWRITE_ARGV)
+#if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
 #endif
 	progname = get_program_name(argv[0]);

@@ -25,6 +25,11 @@
 #include "common.h"
 #include "setproctitle.h"
 
+#if defined(PS_DARWIN_ARGV)
+#include <crt_externs.h>
+static size_t	prev_msg_size = 0;
+#endif
+
 #if defined(PS_OVERWRITE_ARGV)
 /* external environment we got on startup */
 extern char	**environ;
@@ -39,19 +44,28 @@ static char	*empty_str = '\0';
 /* ps display buffer */
 static char	*ps_buf = NULL;
 static size_t	ps_buf_size = 0;
+#elif defined(PS_PSTAT_ARGV)
+#define PS_BUF_SIZE	512
+static char	ps_buf[PS_BUF_SIZE], *p_msg = NULL;
+static size_t	ps_buf_size = PS_BUF_SIZE, ps_buf_size_msg = PS_BUF_SIZE;
+#endif
 
 /******************************************************************************
  *                                                                            *
  * Function: setproctitle_save_env                                            *
  *                                                                            *
- * Purpose: make a copy of argc, argv[] and environment variables to enable   *
- *          overwriting original argv[] with changing process status messages *
- *          (i.e. to emulate setproctitle()).                                 *
+ * Purpose: prepare for changing process commandline to display status        *
+ *          messages with "ps" command on platforms which do not support      *
+ *          setproctitle(). Depending on platform:                            *
+ *             - make a copy of argc, argv[] and environment variables to     *
+ *          enable overwriting original argv[].                               *
+ *             - prepare a buffer with common part of status message.         *
  *                                                                            *
  * Comments: call this function soon after main process start, before using   *
  *           argv[] and environment variables.                                *
  *                                                                            *
  ******************************************************************************/
+#if defined(PS_OVERWRITE_ARGV)
 char **	setproctitle_save_env(int argc, char **argv)
 {
 	int	i = 0, copy_first, copy_last;
@@ -138,7 +152,6 @@ char **	setproctitle_save_env(int argc, char **argv)
 	ps_buf = argv[copy_first];
 
 #if defined(PS_CONCAT_ARGV)
-	do
 	{
 		char	*p = ps_buf;
 		size_t	size = ps_buf_size, len;
@@ -154,12 +167,30 @@ char **	setproctitle_save_env(int argc, char **argv)
 			zbx_strlcpy(p, argv_int[i], size);
 		}
 	}
-	while (0);
+#endif
+
+#if defined(PS_DARWIN_ARGV)
+	*_NSGetArgv() = argv_int;
 #endif
 	environ = environ_int;		/* switch environment to internal copy */
 
 	return argv_int;
 }
+#elif defined(PS_PSTAT_ARGV)
+char **	setproctitle_save_env(int argc, char **argv)
+{
+	size_t	len0 = strlen(argv[0]);
+
+	if (len0 + 2 < ps_buf_size)	/* is there space for ": " ? */
+	{
+		zbx_strlcpy(ps_buf, argv[0], ps_buf_size);
+		zbx_strlcpy(ps_buf + len0, ": ", (size_t)3);
+		p_msg = ps_buf + len0 + 2;
+		ps_buf_size_msg = ps_buf_size - len0 - 2;	/* space after "argv[0]: " for status message */
+	}
+	return argv;
+}
+#endif	/* defined(PS_PSTAT_ARGV) */
 
 /******************************************************************************
  *                                                                            *
@@ -174,14 +205,28 @@ char **	setproctitle_save_env(int argc, char **argv)
  ******************************************************************************/
 void	setproctitle_set_status(const char *status)
 {
+#if defined(PS_OVERWRITE_ARGV)
 	static int	initialized = 0;
 
 	if (1 == initialized)
 	{
+#if defined(PS_DARWIN_ARGV)
+		size_t	msg_size = MIN(zbx_strlcpy(ps_buf, status, ps_buf_size), ps_buf_size);
+
+		if (prev_msg_size > msg_size)
+		{
+			memset(ps_buf + msg_size + 1, '\0', ps_buf_size - msg_size - 1);
+		}
+		prev_msg_size = msg_size;
+#else
 		zbx_strlcpy(ps_buf, status, ps_buf_size);
+#endif
 	}
 	else if (NULL != ps_buf)
 	{
+		/* Initialization has not been moved to setproctitle_save_env() because setproctitle_save_env()	*/
+		/* is called from the main process and we do not change its command line.			*/
+		/* argv[] changing takes place only in child processes.						*/
 #if defined(PS_CONCAT_ARGV)
 		size_t	start_pos = strlen(argv_int[0]);
 #else
@@ -192,12 +237,27 @@ void	setproctitle_set_status(const char *status)
 			zbx_strlcpy(ps_buf + start_pos, ": ", (size_t)3);
 			ps_buf += start_pos + 2;
 			ps_buf_size -= start_pos + 2;	/* space after "argv[copy_first]: " for status message */
+#if defined(PS_DARWIN_ARGV)
+			memset(ps_buf, '\0', ps_buf_size);
+			prev_msg_size = MIN(zbx_strlcpy(ps_buf, status, ps_buf_size), ps_buf_size);
+#else
 			memset(ps_buf, ' ', ps_buf_size - 1);
 			memset(ps_buf + ps_buf_size - 1, '\0', (size_t)1);
-			initialized = 1;
 			zbx_strlcpy(ps_buf, status, ps_buf_size);
+#endif
+			initialized = 1;
 		}
 	}
+#elif defined(PS_PSTAT_ARGV)
+	if (NULL != p_msg)
+	{
+		union pstun	pst;
+
+		zbx_strlcpy(p_msg, status, ps_buf_size_msg);
+		pst.pst_command = ps_buf;
+		pstat(PSTAT_SETCMD, pst, strlen(ps_buf), 0, 0);
+	}
+#endif
 }
 
 /******************************************************************************
@@ -210,6 +270,7 @@ void	setproctitle_set_status(const char *status)
  *           environment variables are not used anymore.                      *
  *                                                                            *
  ******************************************************************************/
+#if defined(PS_OVERWRITE_ARGV)
 void	setproctitle_free_env(void)
 {
 	int	i;
