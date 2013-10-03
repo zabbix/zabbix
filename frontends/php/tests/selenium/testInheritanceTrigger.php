@@ -20,9 +20,6 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-define('TRIGGER_GOOD', 0);
-define('TRIGGER_BAD', 1);
-
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  */
@@ -87,7 +84,7 @@ class testInheritanceTrigger extends CWebTest {
 	public static function create() {
 		return array(
 			array(
-				array('expected' => TRIGGER_GOOD,
+				array('expected' => TEST_GOOD,
 					'description' => 'triggerSimple',
 					'expression' => 'default',
 					'hostCheck' => true,
@@ -95,14 +92,14 @@ class testInheritanceTrigger extends CWebTest {
 				)
 			),
 			array(
-				array('expected' => TRIGGER_GOOD,
+				array('expected' => TEST_GOOD,
 					'description' => 'triggerName',
 					'expression' => 'default',
 					'hostCheck' => true
 				)
 			),
 			array(
-				array('expected' => TRIGGER_GOOD,
+				array('expected' => TEST_GOOD,
 					'description' => 'triggerRemove',
 					'expression' => 'default',
 					'hostCheck' => true,
@@ -111,7 +108,7 @@ class testInheritanceTrigger extends CWebTest {
 				)
 			),
 			array(
-				array('expected' => TRIGGER_GOOD,
+				array('expected' => TEST_GOOD,
 					'description' => 'triggerNotRemove',
 					'expression' => 'default',
 					'hostCheck' => true,
@@ -121,7 +118,7 @@ class testInheritanceTrigger extends CWebTest {
 				)
 			),
 			array(
-				array('expected' => TRIGGER_BAD,
+				array('expected' => TEST_BAD,
 					'description' => 'triggerSimple',
 					'expression' => 'default',
 					'errors' => array(
@@ -132,7 +129,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
 						'Incorrect value for field "Name": cannot be empty.',
@@ -142,7 +139,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
@@ -152,7 +149,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'expression' => '6 & 0 | 0',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
@@ -162,7 +159,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => '6 & 0 | 0',
 					'errors' => array(
@@ -173,7 +170,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => '{Inheritance test template}',
 					'errors' => array(
@@ -184,7 +181,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => 'MyTrigger_sysUptime',
 					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<0',
 					'expressionHost' => '{Template inheritance test host:key-item-inheritance.last(0)}<0',
@@ -193,7 +190,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => '1234567890',
 					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<0',
 					'expressionHost' => '{Template inheritance test host:key-item-inheritance.last(0)}<0',
@@ -202,7 +199,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => 'a?aa+',
 					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<0',
 					'expressionHost' => '{Template inheritance test host:key-item-inheritance.last(0)}<0',
@@ -211,7 +208,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => '}aa]a{',
 					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<0',
 					'expressionHost' => '{Template inheritance test host:key-item-inheritance.last(0)}<0',
@@ -220,7 +217,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => '-aaa=%',
 					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<0',
 					'expressionHost' => '{Template inheritance test host:key-item-inheritance.last(0)}<0',
@@ -229,7 +226,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => 'aaa,;:',
 					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<0',
 					'expressionHost' => '{Template inheritance test host:key-item-inheritance.last(0)}<0',
@@ -238,7 +235,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => 'aaa><.',
 					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<0',
 					'hostCheck' => true
@@ -246,7 +243,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => 'aaa*&_',
 					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<0',
 					'hostCheck' => true
@@ -254,7 +251,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => 'aaa#@!',
 					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<0',
 					'hostCheck' => true
@@ -262,7 +259,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => '([)$^',
 					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<0',
 					'hostCheck' => true
@@ -270,7 +267,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => 'MyTrigger_priority0',
 					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<5',
 					'type' => true,
@@ -282,7 +279,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => 'MyTrigger_priority1',
 					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<5',
 					'type' => true,
@@ -294,7 +291,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => 'MyTrigger_priority2',
 					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<5',
 					'type' => true,
@@ -306,7 +303,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => 'MyTrigger_priority3',
 					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<5',
 					'type' => true,
@@ -318,7 +315,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => 'MyTrigger_priority4',
 					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<5',
 					'type' => true,
@@ -330,7 +327,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => 'MyTrigger_priority5',
 					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<5',
 					'type' => true,
@@ -342,7 +339,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => '{Zabbix host:key-item-inheritance.last(0)}<0',
 					'errors' => array(
@@ -353,7 +350,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => '{Inheritance test template:someItem.uptime.last(0)}<0',
 					'errors' => array(
@@ -364,7 +361,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => '{Inheritance test template:key-item-inheritance.last(0)} | {#MACRO}',
 					'errors' => array(
@@ -375,7 +372,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => '{Inheritance test template:key-item-inheritance.last(0)} | {#MACRO}',
 					'constructor' => array(array(
@@ -387,7 +384,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => '{Zabbix host:key-item-inheritance.last(0)}<0 | 8 & 9',
 					'constructor' => array(array(
@@ -400,7 +397,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => '{Inheritance test template:someItem.uptime.last(0)}<0 | 8 & 9 + {Inheritance test template:key-item-inheritance.last(0)}',
 					'constructor' => array(array(
@@ -413,7 +410,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => '{Inheritance test template:key-item-inheritance.lasta(0)}<0 | 8 & 9 + {Inheritance test template:key-item-inheritance.last(0)}',
 					'constructor' => array(array(
@@ -426,7 +423,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => '{Inheritance test template@:key-item-inheritance.last(0)}',
 					'constructor' => array(array(
@@ -439,7 +436,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => '{Inheritance test template:system .uptime.last(0)}',
 					'constructor' => array(array(
@@ -452,7 +449,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => '{Inheritance test template:system .uptime.last(0)}',
 					'constructor' => array(array(
@@ -465,7 +462,7 @@ class testInheritanceTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => '{Inheritance test template:key-item-inheritance.lastA(0)}',
 					'constructor' => array(array(
@@ -588,12 +585,12 @@ class testInheritanceTrigger extends CWebTest {
 		if (!isset($data['constructor'])) {
 			$this->zbxTestClickWait('save');
 			switch ($data['expected']) {
-				case TRIGGER_GOOD:
+				case TEST_GOOD:
 				$this->zbxTestTextPresent('Trigger added');
 				$this->checkTitle('Configuration of triggers');
 				$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
 				break;
-				case TRIGGER_BAD:
+				case TEST_BAD:
 				$this->checkTitle('Configuration of triggers');
 				$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
 				foreach ($data['errors'] as $msg) {
