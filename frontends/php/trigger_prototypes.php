@@ -340,11 +340,11 @@ else {
 	// paging
 	$data['paging'] = getPagingLine(
 		$data['triggers'],
+		array('triggerid'),
 		array(
 			'hostid' => get_request('hostid', $data['discovery_rule']['hostid']),
 			'parent_discoveryid' => get_request('parent_discoveryid')
-		),
-		'triggerid'
+		)
 	);
 
 	$data['triggers'] = API::TriggerPrototype()->get(array(

@@ -375,11 +375,11 @@ else {
 
 	$data['paging'] = getPagingLine(
 		$data['items'],
+		array('itemid'),
 		array(
 			'hostid' => get_request('hostid'),
 			'parent_discoveryid' => get_request('parent_discoveryid')
-		),
-		'itemid'
+		)
 	);
 
 	// render view

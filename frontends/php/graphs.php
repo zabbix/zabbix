@@ -587,11 +587,11 @@ else {
 
 	$data['paging'] = getPagingLine(
 		$data['graphs'],
+		array('graphid'),
 		array(
 			'hostid' => get_request('hostid'),
 			'parent_discoveryid' => get_request('parent_discoveryid')
-		),
-		'graphid'
+		)
 	);
 
 	// get graphs after paging
