@@ -2128,6 +2128,45 @@ static int	DBpatch_2010178(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_2010179(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = SUCCEED;
+
+	result = DBselect("select maintenanceid,active_since,active_till from maintenances");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		time_t		sec, active_since, active_till;
+		struct tm	*tm;
+
+		active_since = atoi(row[1]);
+		active_till = atoi(row[2]);
+
+		tm = localtime(&active_since);
+		sec = tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec;
+		active_since -= sec;
+
+		tm = localtime(&active_till);
+		sec = tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec;
+		active_till += (SEC_PER_DAY - sec) % SEC_PER_DAY;
+
+		if (ZBX_DB_OK > DBexecute(
+					"update maintenances"
+					" set active_since=%d,"
+						"active_till=%d"
+					" where maintenanceid=%s",
+					(int)active_since, (int)active_till, row[0]))
+		{
+			ret = FAIL;
+		}
+	}
+	DBfree_result(result);
+
+	return ret;
+}
+
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 #define DBPATCH_END()					{NULL}};
@@ -2355,6 +2394,7 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010176, 0, 1)
 	DBPATCH_ADD(2010177, 0, 1)
 	DBPATCH_ADD(2010178, 0, 1)
+	DBPATCH_ADD(2010179, 0, 1)
 
 	DBPATCH_END()
 
