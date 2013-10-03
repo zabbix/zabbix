@@ -21,9 +21,6 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
 
-define('WEB_GOOD', 0);
-define('WEB_BAD', 1);
-
 class testInheritanceWeb extends CWebTest {
 
 
@@ -96,7 +93,7 @@ class testInheritanceWeb extends CWebTest {
 			// Empty name/steps
 			array(
 				array(
-					'expected' => WEB_BAD,
+					'expected' => TEST_BAD,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
 						'Incorrect value for field "Name": cannot be empty.',
@@ -107,7 +104,7 @@ class testInheritanceWeb extends CWebTest {
 			// Empty steps
 			array(
 				array(
-					'expected' => WEB_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Empty steps',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
@@ -118,7 +115,7 @@ class testInheritanceWeb extends CWebTest {
 			// Empty name/steps
 			array(
 				array(
-					'expected' => WEB_BAD,
+					'expected' => TEST_BAD,
 					'add_step' => array(
 						array('step' => 'Empty name')
 					),
@@ -131,7 +128,7 @@ class testInheritanceWeb extends CWebTest {
 			// Empty name/steps
 			array(
 				array(
-					'expected' => WEB_BAD,
+					'expected' => TEST_BAD,
 					'add_step' => array(
 						array('step' => 'Empty name')
 					),
@@ -145,7 +142,7 @@ class testInheritanceWeb extends CWebTest {
 			// Name -numbers only
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => '1234567890',
 					'add_step' => array(
 						array('step' => '1234567890')
@@ -155,7 +152,7 @@ class testInheritanceWeb extends CWebTest {
 			// Name -symbols only
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => '!@#$%^&*()_+{}:"|<>?,./',
 					'add_step' => array(
 						array('step' => '!@#$%^&*()_+{}:"|<>?,./')
@@ -165,7 +162,7 @@ class testInheritanceWeb extends CWebTest {
 			// Name-spaces
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => '   zabbix  123  ',
 					'add_step' => array(
 						array('step' => '   zabbix  123  ')
@@ -175,7 +172,7 @@ class testInheritanceWeb extends CWebTest {
 			// Max -64 symbols
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'qwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop1234',
 					'add_step' => array(
 						array('step' => 'qwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop')
@@ -185,7 +182,7 @@ class testInheritanceWeb extends CWebTest {
 			// Application -numbers
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Application numbers only',
 					'new_application' => '1234567890',
 					'add_step' => array(
@@ -196,7 +193,7 @@ class testInheritanceWeb extends CWebTest {
 			// Application -symbols
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Application symbols only',
 					'new_application' => '!@#$%^&*()_+{}:"|<>?,./',
 					'add_step' => array(
@@ -207,7 +204,7 @@ class testInheritanceWeb extends CWebTest {
 			// Application -max length
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Application max length',
 					'new_application' => 'qwertyuiopqwertyuiopqwertyuiopqwertyui'.
 						'opqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwe.'.
@@ -222,7 +219,7 @@ class testInheritanceWeb extends CWebTest {
 			// User/password empty
 			array(
 				array(
-					'expected' => WEB_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'User/password empty',
 					'authentication' => 'Basic authentication',
 					'add_step' => array(
@@ -238,7 +235,7 @@ class testInheritanceWeb extends CWebTest {
 			// User empty
 			array(
 				array(
-					'expected' => WEB_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Password empty',
 					'authentication' => 'Basic authentication',
 					'http_user' => 'zabbix',
@@ -254,7 +251,7 @@ class testInheritanceWeb extends CWebTest {
 			// Password empty
 			array(
 				array(
-					'expected' => WEB_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'User empty',
 					'authentication' => 'Basic authentication',
 					'http_password' => 'zabbix',
@@ -270,7 +267,7 @@ class testInheritanceWeb extends CWebTest {
 			// Username/password numbers only
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Username/password numbers only',
 					'authentication' => 'Basic authentication',
 					'http_user' => '12345',
@@ -283,7 +280,7 @@ class testInheritanceWeb extends CWebTest {
 			// Username/password symbols only
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Username/password symbols only',
 					'authentication' => 'Basic authentication',
 					'http_user' => '!@#$%^&*()_+{}:"|<>?,./',
@@ -296,7 +293,7 @@ class testInheritanceWeb extends CWebTest {
 			// Username/password with spaces
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Username/password with spaces',
 					'authentication' => 'Basic authentication',
 					'http_user' => '   zabbix  123  ',
@@ -309,7 +306,7 @@ class testInheritanceWeb extends CWebTest {
 			// Username/password -64 max allowed
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Username/password max allowed',
 					'authentication' => 'Basic authentication',
 					'http_user' => 'wertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop1234',
@@ -322,7 +319,7 @@ class testInheritanceWeb extends CWebTest {
 			// Retries-letters
 			array(
 				array(
-					'expected' => WEB_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Retries-letters only',
 					'retries' => 'Ab',
 					'add_step' => array(
@@ -337,7 +334,7 @@ class testInheritanceWeb extends CWebTest {
 			// Retries-number
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Retries-one',
 					'retries' => '1',
 					'add_step' => array(
@@ -348,7 +345,7 @@ class testInheritanceWeb extends CWebTest {
 			// Retries-eleven
 			array(
 				array(
-					'expected' => WEB_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Retries- eleven',
 					'retries' => '11',
 					'add_step' => array(
@@ -363,7 +360,7 @@ class testInheritanceWeb extends CWebTest {
 			// Retries-zero
 			array(
 				array(
-					'expected' => WEB_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Retries- zero',
 					'retries' => '0',
 					'add_step' => array(
@@ -378,7 +375,7 @@ class testInheritanceWeb extends CWebTest {
 			// Retries-ten
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Retries- ten',
 					'retries' => '10',
 					'add_step' => array(
@@ -389,7 +386,7 @@ class testInheritanceWeb extends CWebTest {
 			// Retries-minus one
 			array(
 				array(
-					'expected' => WEB_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Retries- minus one',
 					'retries' => '-1',
 					'add_step' => array(
@@ -404,7 +401,7 @@ class testInheritanceWeb extends CWebTest {
 			// Retries-99
 			array(
 				array(
-					'expected' => WEB_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Retries- 99',
 					'retries' => '99',
 					'add_step' => array(
@@ -419,7 +416,7 @@ class testInheritanceWeb extends CWebTest {
 			// Interval-letters
 			array(
 				array(
-					'expected' => WEB_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Interval-letters only',
 					'delay' => 'AbCdeF',
 					'add_step' => array(
@@ -434,7 +431,7 @@ class testInheritanceWeb extends CWebTest {
 			// Interval-number
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Interval-one',
 					'delay' => '1',
 					'add_step' => array(
@@ -445,7 +442,7 @@ class testInheritanceWeb extends CWebTest {
 			// Interval-86401
 			array(
 				array(
-					'expected' => WEB_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Interval- 86401',
 					'delay' => '86401',
 					'add_step' => array(
@@ -460,7 +457,7 @@ class testInheritanceWeb extends CWebTest {
 			// Interval-zero
 			array(
 				array(
-					'expected' => WEB_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Interval- zero',
 					'delay' => '0',
 					'add_step' => array(
@@ -475,7 +472,7 @@ class testInheritanceWeb extends CWebTest {
 			// Interval-86400
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Interval- 86400',
 					'delay' => '86400',
 					'add_step' => array(
@@ -486,7 +483,7 @@ class testInheritanceWeb extends CWebTest {
 			// Interval-minus one
 			array(
 				array(
-					'expected' => WEB_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Interval- minus one',
 					'delay' => '-1',
 					'add_step' => array(
@@ -501,7 +498,7 @@ class testInheritanceWeb extends CWebTest {
 			// Interval-99999
 			array(
 				array(
-					'expected' => WEB_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Interval- 99999',
 					'delay' => '99999',
 					'add_step' => array(
@@ -516,7 +513,7 @@ class testInheritanceWeb extends CWebTest {
 			// agent-remove from (other ...) then save (will be saved as internet explorer 10.0)
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => '(other ...) Remove agent',
 					'agent' => '(other ...)',
 					'removeAgent' => 'true',
@@ -528,7 +525,7 @@ class testInheritanceWeb extends CWebTest {
 			// Http proxy -just numbers
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Http proxy -just numbers',
 					'http_proxy' => '1234567890',
 					'add_step' => array(
@@ -539,7 +536,7 @@ class testInheritanceWeb extends CWebTest {
 			// Http proxy -symbols
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Http proxy -symbols',
 					'http_proxy' => '!@#$%^&*()_+{}:"|<>?,./',
 					'add_step' => array(
@@ -550,7 +547,7 @@ class testInheritanceWeb extends CWebTest {
 			// Http proxy -max allowed length
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Http proxy -max allowed length',
 					'http_proxy' => 'qwertyuiopqwertyuiopqwertyuiopqwertyui'.
 						'opqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwe.'.
@@ -565,7 +562,7 @@ class testInheritanceWeb extends CWebTest {
 			// Variables -just numbers
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Variables -just numbers',
 					'variables' => '1234567890',
 					'add_step' => array(
@@ -576,7 +573,7 @@ class testInheritanceWeb extends CWebTest {
 			// Variables -symbols
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Variables -symbols',
 					'variables' => '!@#$%^&*()_+{}:"|<>?,./',
 					'add_step' => array(
@@ -587,7 +584,7 @@ class testInheritanceWeb extends CWebTest {
 			// Variables -255 length-allowed more
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Variables -255 length',
 					'http_proxy' => 'qwertyuiopqwertyuiopqwertyuiopqwertyui'.
 						'opqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwe.'.
@@ -602,7 +599,7 @@ class testInheritanceWeb extends CWebTest {
 			// Dublicate web scenario
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Dublicate web test',
 					'add_step' => array(
 						array('step' => 'Dublicate web test')
@@ -611,7 +608,7 @@ class testInheritanceWeb extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => WEB_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Dublicate web test',
 					'add_step' => array(
 						array('step' => 'Dublicate web test')
@@ -625,7 +622,7 @@ class testInheritanceWeb extends CWebTest {
 			// testing created items using triggers
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Trigger create web test',
 					'add_step' => array(
 						array('step' => 'Trigger create web test')
@@ -643,7 +640,7 @@ class testInheritanceWeb extends CWebTest {
 			// testing created items using triggers -multiple steps added
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Trigger create multiple steps web test',
 					'add_step' => array(
 						array('step' => 'Trigger create multiple steps web test1'),
@@ -673,7 +670,7 @@ class testInheritanceWeb extends CWebTest {
 		// many steps added
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Many websteps added web test',
 					'add_step' => array(
 						array('step' => 'Many websteps added web test1'),
@@ -712,7 +709,7 @@ class testInheritanceWeb extends CWebTest {
 			// List of main agents
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Internet Explorer 10.0 None',
 					'agent' => 'Internet Explorer 10.0',
 					'authentication' => 'None',
@@ -727,7 +724,7 @@ class testInheritanceWeb extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Internet Explorer 10.0 Basic',
 					'agent' => 'Internet Explorer 10.0',
 					'authentication' => 'Basic authentication',
@@ -752,7 +749,7 @@ class testInheritanceWeb extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Internet Explorer 10.0 NTLM',
 					'agent' => 'Internet Explorer 10.0',
 					'authentication' => 'NTLM authentication',
@@ -769,7 +766,7 @@ class testInheritanceWeb extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Mozilla Firefox 8.0 None',
 					'agent' => 'Mozilla Firefox 8.0',
 					'authentication' => 'None',
@@ -784,7 +781,7 @@ class testInheritanceWeb extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Mozilla Firefox 8.0 Basic',
 					'agent' => 'Mozilla Firefox 8.0',
 					'authentication' => 'Basic authentication',
@@ -809,7 +806,7 @@ class testInheritanceWeb extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Mozilla Firefox 8.0 NTLM',
 					'agent' => 'Mozilla Firefox 8.0',
 					'authentication' => 'NTLM authentication',
@@ -826,7 +823,7 @@ class testInheritanceWeb extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Opera 12.00 None',
 					'agent' => 'Opera 12.00',
 					'authentication' => 'None',
@@ -841,7 +838,7 @@ class testInheritanceWeb extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Opera 12.00 Basic',
 					'agent' => 'Opera 12.00',
 					'authentication' => 'Basic authentication',
@@ -866,7 +863,7 @@ class testInheritanceWeb extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Opera 12.00 NTLM',
 					'agent' => 'Opera 12.00',
 					'authentication' => 'NTLM authentication',
@@ -883,7 +880,7 @@ class testInheritanceWeb extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Safari 5.0 None',
 					'agent' => 'Safari 5.0',
 					'authentication' => 'None',
@@ -894,7 +891,7 @@ class testInheritanceWeb extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Safari 5.0 Basic',
 					'agent' => 'Safari 5.0',
 					'authentication' => 'Basic authentication',
@@ -919,7 +916,7 @@ class testInheritanceWeb extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Safari 5.0 NTLM',
 					'agent' => 'Safari 5.0',
 					'authentication' => 'NTLM authentication',
@@ -937,7 +934,7 @@ class testInheritanceWeb extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Google Chrome 17 None',
 					'agent' => 'Google Chrome 17',
 					'authentication' => 'None',
@@ -952,7 +949,7 @@ class testInheritanceWeb extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Google Chrome 17 Basic',
 					'agent' => 'Google Chrome 17',
 					'authentication' => 'Basic authentication',
@@ -977,7 +974,7 @@ class testInheritanceWeb extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Google Chrome 17 NTLM',
 					'agent' => 'Google Chrome 17',
 					'authentication' => 'NTLM authentication',
@@ -994,7 +991,7 @@ class testInheritanceWeb extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => '(other ...) None',
 					'agent' => '(other ...)',
 					'authentication' => 'None',
@@ -1009,7 +1006,7 @@ class testInheritanceWeb extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => '(other ...) Basic',
 					'agent' => '(other ...)',
 					'authentication' => 'Basic authentication',
@@ -1034,7 +1031,7 @@ class testInheritanceWeb extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => WEB_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => '(other ...) NTLM',
 					'agent' => '(other ...)',
 					'authentication' => 'NTLM authentication',
@@ -1158,14 +1155,14 @@ class testInheritanceWeb extends CWebTest {
 		$this->zbxTestClickWait('save');
 		$expected = $data['expected'];
 		switch ($expected) {
-			case WEB_GOOD:
+			case TEST_GOOD:
 				$this->zbxTestTextPresent('Scenario added');
 				$this->checkTitle('Configuration of web monitoring');
 				$this->zbxTestTextPresent('CONFIGURATION OF WEB MONITORING');
 				$this->zbxTestTextPresent(array('Number of steps', 'Update interval', 'Status'));
 				break;
 
-			case WEB_BAD:
+			case TEST_BAD:
 				$this->checkTitle('Configuration of web monitoring');
 				$this->zbxTestTextPresent('CONFIGURATION OF WEB MONITORING');
 				foreach ($data['errors'] as $msg) {
