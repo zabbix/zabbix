@@ -511,7 +511,7 @@ else {
 
 	// sorting && paging
 	order_result($templates, $sortfield, $sortorder);
-	$paging = getPagingLine($templates);
+	$paging = getPagingLine($templates, array('templateid'));
 
 	$templates = API::Template()->get(array(
 		'templateids' => zbx_objectValues($templates, 'templateid'),

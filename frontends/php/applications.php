@@ -322,7 +322,7 @@ else {
 	}
 
 	// get paging
-	$data['paging'] = getPagingLine($data['applications']);
+	$data['paging'] = getPagingLine($data['applications'], array('applicationid'));
 
 	// render view
 	$applicationView = new CView('configuration.application.list', $data);
