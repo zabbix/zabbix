@@ -384,7 +384,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		// min_severity
 		if (!is_null($options['min_severity'])) {
-			$sqlParts['where'][] = 't.priority>='.$options['min_severity'];
+			$sqlParts['where'][] = 't.priority>='.zbx_dbstr($options['min_severity']);
 		}
 
 		// limit

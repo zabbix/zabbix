@@ -120,7 +120,7 @@ function getGraphDims($graphid = null) {
 	$dbGraphs = DBselect(
 		'SELECT MAX(g.graphtype) AS graphtype,MIN(gi.yaxisside) AS yaxissidel,MAX(gi.yaxisside) AS yaxissider,MAX(g.height) AS height'.
 		' FROM graphs g,graphs_items gi'.
-		' WHERE g.graphid='.$graphid.
+		' WHERE g.graphid='.zbx_dbstr($graphid).
 			' AND gi.graphid=g.graphid'
 	);
 	if ($graph = DBfetch($dbGraphs)) {
@@ -154,7 +154,7 @@ function get_graphs_by_hostid($hostid) {
 		' FROM graphs g,graphs_items gi,items i'.
 		' WHERE g.graphid=gi.graphid'.
 			' AND gi.itemid=i.itemid'.
-			' AND i.hostid='.$hostid
+			' AND i.hostid='.zbx_dbstr($hostid)
 	);
 }
 
@@ -172,7 +172,7 @@ function get_hosts_by_graphid($graphid) {
 		' FROM graphs_items gi,items i,hosts h'.
 		' WHERE h.hostid=i.hostid'.
 			' AND gi.itemid=i.itemid'.
-			' AND gi.graphid='.$graphid
+			' AND gi.graphid='.zbx_dbstr($graphid)
 	);
 }
 
@@ -187,7 +187,7 @@ function get_min_itemclock_by_graphid($graphid) {
 	$dbItems = DBselect(
 		'SELECT DISTINCT gi.itemid'.
 		' FROM graphs_items gi'.
-		' WHERE gi.graphid='.$graphid
+		' WHERE gi.graphid='.zbx_dbstr($graphid)
 	);
 	while ($item = DBfetch($dbItems)) {
 		$itemids[$item['itemid']] = $item['itemid'];
@@ -270,7 +270,7 @@ function get_min_itemclock_by_itemid($itemIds) {
 		}
 
 		foreach ($itemIds as $itemId) {
-			$sqlUnions[] = 'SELECT MIN(ht.clock) AS c FROM '.$sqlFrom.' ht WHERE ht.itemid='.$itemId;
+			$sqlUnions[] = 'SELECT MIN(ht.clock) AS c FROM '.$sqlFrom.' ht WHERE ht.itemid='.zbx_dbstr($itemId);
 		}
 
 		$dbMin = DBfetch(DBselect(
@@ -285,7 +285,7 @@ function get_min_itemclock_by_itemid($itemIds) {
 }
 
 function get_graph_by_graphid($graphid) {
-	$dbGraphs = DBselect('SELECT g.* FROM graphs g WHERE g.graphid='.$graphid);
+	$dbGraphs = DBselect('SELECT g.* FROM graphs g WHERE g.graphid='.zbx_dbstr($graphid));
 	$dbGraphs = DBfetch($dbGraphs);
 	if (!empty($dbGraphs)) {
 		return $dbGraphs;
@@ -312,8 +312,8 @@ function get_same_graphitems_for_host($gitems, $dest_hostid, $error = true) {
 			'SELECT dest.itemid,src.key_'.
 			' FROM items dest,items src'.
 			' WHERE dest.key_=src.key_'.
-				' AND dest.hostid='.$dest_hostid.
-				' AND src.itemid='.$gitem['itemid']
+				' AND dest.hostid='.zbx_dbstr($dest_hostid).
+				' AND src.itemid='.zbx_dbstr($gitem['itemid'])
 		));
 
 		if ($dbItem) {

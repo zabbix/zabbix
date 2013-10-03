@@ -64,7 +64,7 @@
 			$data['user_medias'] = array();
 			$dbMedia = DBselect('SELECT m.mediaid,m.mediatypeid,m.period,m.sendto,m.severity,m.active'.
 					' FROM media m'.
-					' WHERE m.userid='.$userid
+					' WHERE m.userid='.zbx_dbstr($userid)
 			);
 			while ($dbMedium = DBfetch($dbMedia)) {
 				$data['user_medias'][] = $dbMedium;
@@ -1206,7 +1206,7 @@
 		$data['db_applications'] = DBfetchArray(DBselect(
 			'SELECT DISTINCT a.applicationid,a.name'.
 			' FROM applications a'.
-			' WHERE a.hostid='.$data['hostid']
+			' WHERE a.hostid='.zbx_dbstr($data['hostid'])
 		));
 		order_result($data['db_applications'], 'name');
 
@@ -1219,7 +1219,7 @@
 		// valuemapid
 		if ($data['limited']) {
 			if (!empty($data['valuemapid'])) {
-				if ($map_data = DBfetch(DBselect('SELECT v.name FROM valuemaps v WHERE v.valuemapid='.$data['valuemapid']))) {
+				if ($map_data = DBfetch(DBselect('SELECT v.name FROM valuemaps v WHERE v.valuemapid='.zbx_dbstr($data['valuemapid'])))) {
 					$data['valuemaps'] = $map_data['name'];
 				}
 			}
@@ -1369,7 +1369,7 @@
 						' LEFT JOIN items i ON f.itemid=i.itemid'.
 						' LEFT JOIN hosts h ON i.hostid=h.hostid'.
 						' LEFT JOIN item_discovery id ON i.itemid=id.itemid'.
-					' WHERE t.triggerid='.$tmp_triggerid
+					' WHERE t.triggerid='.zbx_dbstr($tmp_triggerid)
 				));
 				if (bccomp($data['triggerid'], $tmp_triggerid) != 0) {
 					// parent trigger prototype link
@@ -1417,7 +1417,7 @@
 					'SELECT t.triggerid,t.description'.
 					' FROM triggers t,trigger_depends d'.
 					' WHERE t.triggerid=d.triggerid_up'.
-						' AND d.triggerid_down='.$data['triggerid']
+						' AND d.triggerid_down='.zbx_dbstr($data['triggerid'])
 				);
 				while ($trigger = DBfetch($db_triggers)) {
 					if (uint_in_array($trigger['triggerid'], $data['dependencies'])) {

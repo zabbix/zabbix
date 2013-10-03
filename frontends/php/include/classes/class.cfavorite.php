@@ -91,7 +91,7 @@ class CFavorite {
 			'profileid' => get_dbid('profiles', 'profileid'),
 			'userid' => CWebUser::$data['userid'],
 			'idx' => zbx_dbstr($idx),
-			'value_id' => $favid,
+			'value_id' => zbx_dbstr($favid),
 			'type' => PROFILE_TYPE_ID
 		);
 		if (!is_null($favobj)) {

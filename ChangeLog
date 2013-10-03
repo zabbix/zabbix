@@ -1,9 +1,15 @@
 Changes for 2.1.7
 
 New features:
+..F....... [ZBX-6911] added functionality to save positions of block on dashboard page in profiles table (Vitalij)
 
 Bug fixes:
-..F....... [ZBX-7050] fixed output of empty class attributes (Ivo)
+..F....... [ZBX-7050] fixed output of empty HTML attributes (Ivo)
+A.F....... [ZBX-7051] fixed bug, to not make updates to hosts applications, items, and triggers, if "Save" button was pressed in edit form, with no changes (Vitalij)
+A.F....... [ZBX-7091] fixed SQL injection vulnerabilities in page filtering; thanks to Bernhard Schildendorfer from SEC Consult for the report (Eduard, Pavels)
+A.F....... [ZBX-7091] fixed SQL injection vulnerabilities in dashboard favourite managing; thanks to Lincoln, a member of Corelan Team, for the report (Eduard, Pavels)
+..F....... [ZBX-6994] fixed logic of SQL creation, removed unneeded i.flags IN (0,4) from SQL, if i.flags is set from filter or is null (Vitalij)
+..F....... [ZBX-6993] fixed JS errors in various pages having a child node with high ID value (Ivo)
 ..F....... [ZBX-7032] fixed possibility to add "ICMP ping" check in Configuration > Discovery (Ivo)
 ........S. [ZBX-6904] now ESC.HISTORY macro creates the same message content whithin the same escalation step when notification is sent to multiple recipients (igors)
 
@@ -453,6 +459,10 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
 
 --------------------------------------------------------------------------------
+Changes for 2.0.9
+
+
+--------------------------------------------------------------------------------
 Changes for 2.0.9rc1
 
 New features:
@@ -460,6 +470,8 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Italian, Lithuanian, Romanian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A.F....... [ZBX-7091] fixed SQL injection vulnerabilities in page filtering; thanks to Bernhard Schildendorfer from SEC Consult for the report (Eduard, Pavels)
+A.F....... [ZBX-7091] fixed SQL injection vulnerabilities in dashboard favourite managing; thanks to Lincoln, a member of Corelan Team, for the report (Eduard, Pavels)
 ..F....... [ZBX-3878] fixed memory leaks in slide shows (Eduard)
 ........S. [ZBX-6950] fixed termination character sequence for smtp connection termination (igors)
 ..F....... [ZBX-6952] fixed XSS vulnerability in user themes, thanks to Lincoln and Bernhard Schildendorfer for reporting (Ivo)
@@ -1851,8 +1863,13 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.18
+
+
 Changes for 1.8.18rc1
 
+A.F....... [ZBX-7091] fixed SQL injection vulnerabilities in page filtering; thanks to Bernhard Schildendorfer from SEC Consult for the report (Eduard, Pavels)
+A.F....... [ZBX-7091] fixed SQL injection vulnerabilities in dashboard favourite managing; thanks to Lincoln, a member of Corelan Team, for the report (Eduard, Pavels)
 .......P.. [ZBX-6249] fixed data loss in proxy "Data sender" process caused by unfinished transactions; thanks to MATSUDA Daiki for patch (Andris)
 ..F....... [ZBX-6830] fixed dynamic item checkbox in Configuration > Screens (Ivo)
 ........S. [ZBX-5924] fixed curl verify host option setting in ez texting (wiper)
