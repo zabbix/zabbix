@@ -20,9 +20,6 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-define('TRIGGER_GOOD', 0);
-define('TRIGGER_BAD', 1);
-
 class testFormTrigger extends CWebTest {
 
 	/**
@@ -403,7 +400,7 @@ class testFormTrigger extends CWebTest {
 		return array(
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
 						'Incorrect value for field "Name": cannot be empty.',
@@ -413,7 +410,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
@@ -423,7 +420,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'expression' => '6 & 0 | 0',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
@@ -433,7 +430,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => '6 & 0 | 0',
 					'errors' => array(
@@ -444,7 +441,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => '{Simple form test host}',
 					'errors' => array(
@@ -455,7 +452,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => 'MyTrigger_simple',
 					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
 					'formCheck' => true
@@ -463,7 +460,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => 'HTML_symbols&#8704;&forall;&#8734;&ne;&sup;&Eta;&#937;&#958;&pi;&#8194;&mdash;&#8364;&loz;',
 					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
 					'formCheck' => true
@@ -471,7 +468,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => 'ASCII_characters&#33;&#40;&#51;&#101;&#10;&#25;',
 					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
 					'formCheck' => true
@@ -479,7 +476,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => 'MyTrigger_allFields',
 					'type' => true,
 					'comments' => 'MyTrigger_allFields -Description textbox for comments',
@@ -492,7 +489,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => '1234567890',
 					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
 					'formCheck' => true
@@ -500,7 +497,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => '0',
 					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
 					'formCheck' => true
@@ -508,7 +505,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => 'a?aa+',
 					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
 					'formCheck' => true
@@ -516,7 +513,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => '}aa]a{',
 					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
 					'formCheck' => true
@@ -524,7 +521,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => '-aaa=%',
 					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
 					'formCheck' => true
@@ -532,7 +529,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => 'aaa,;:',
 					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
 					'formCheck' => true
@@ -540,7 +537,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => 'aaa><.',
 					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
 					'formCheck' => true
@@ -548,7 +545,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => 'aaa*&_',
 					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
 					'formCheck' => true
@@ -556,7 +553,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => 'aaa#@!',
 					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
 					'formCheck' => true
@@ -564,7 +561,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => '([)$^',
 					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
 					'formCheck' => true
@@ -572,7 +569,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_GOOD,
+					'expected' => TEST_GOOD,
 					'description' => 'MyTrigger_generalCheck',
 					'expression' => '{Simple form test host:test-item-reuse.last(0)}<5',
 					'type' => true,
@@ -584,7 +581,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => '{Zabbix host:test-item-reuse.last(0)}<0',
 					'errors' => array(
@@ -595,7 +592,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => '{Simple form test host:someItem.uptime.last(0)}<0',
 					'errors' => array(
@@ -606,7 +603,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => '{Simple form test host:test-item-reuse.somefunc(0)}<0',
 					'errors' => array(
@@ -617,7 +614,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => '{Simple form test host:test-item-reuse.last(0)} | {#MACRO}',
 					'errors' => array(
@@ -628,7 +625,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => '{Simple form test host:test-item-reuse.last(0)} | {#MACRO}',
 					'constructor' => array(array(
@@ -640,7 +637,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => '{Zabbix host:test-item-reuse.last(0)}<0 | 8 & 9',
 					'constructor' => array(array(
@@ -653,7 +650,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => '{Simple form test host:someItem.uptime.last(0)}<0 | 8 & 9 + {Simple form test host:test-item-reuse.last(0)}',
 					'constructor' => array(array(
@@ -666,7 +663,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => '{Simple form test host:test-item-reuse.lasta(0)}<0 | 8 & 9 + {Simple form test host:test-item-reuse.last(0)}',
 					'constructor' => array(array(
@@ -679,7 +676,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => '{Simple form test host@:test-item-reuse.last(0)}',
 					'constructor' => array(array(
@@ -692,7 +689,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => '{Simple form test host:system .uptime.last(0)}',
 					'constructor' => array(array(
@@ -705,7 +702,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => '{Simple form test host:system .uptime.last(0)}',
 					'constructor' => array(array(
@@ -718,7 +715,7 @@ class testFormTrigger extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => TRIGGER_BAD,
+					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => '{Simple form test host:test-item-reuse.lastA(0)}',
 					'constructor' => array(array(
@@ -853,13 +850,13 @@ class testFormTrigger extends CWebTest {
 		if (!isset($data['constructor'])) {
 			$this->zbxTestClickWait('save');
 			switch ($data['expected']) {
-				case TRIGGER_GOOD:
+				case TEST_GOOD:
 					$this->zbxTestTextPresent('Trigger added');
 					$this->checkTitle('Configuration of triggers');
 					$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
 					$this->zbxTestTextPresent(array($description, $expression));
 					break;
-				case TRIGGER_BAD:
+				case TEST_BAD:
 					$this->checkTitle('Configuration of triggers');
 					$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
 					foreach ($data['errors'] as $msg) {

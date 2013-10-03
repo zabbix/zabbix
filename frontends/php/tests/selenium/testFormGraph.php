@@ -21,9 +21,6 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
 
-define('GRAPH_GOOD', 0);
-define('GRAPH_BAD', 1);
-
 class testFormGraph extends CWebTest {
 
 	/**
@@ -606,7 +603,12 @@ class testFormGraph extends CWebTest {
 
 	// Returns update data
 	public static function update() {
-		return DBdata("select * from graphs g left join graphs_items gi on gi.graphid=g.graphid where g.graphid LIKE '30000%' and g.name LIKE 'testFormGraph%'");
+		return DBdata(
+			'SELECT * FROM graphs g'.
+			' LEFT JOIN graphs_items gi'.
+				' ON gi.graphid=g.graphid'.
+			' WHERE g.graphid BETWEEN 300000 AND 300010'
+		);
 	}
 
 	/**
@@ -633,7 +635,7 @@ class testFormGraph extends CWebTest {
 		return array(
 			array(
 				array(
-					'expected' => GRAPH_BAD,
+					'expected' => TEST_BAD,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
 						'Incorrect value for field "Name": cannot be empty.'
@@ -642,7 +644,7 @@ class testFormGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphSaveCheck',
 					'addItems' => array(
 						array('itemName' => 'testFormItem', 'remove' => true),
@@ -654,7 +656,7 @@ class testFormGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'graphSaveCheck',
 					'addItems' => array(
 						array('itemName' => 'testFormItem')
@@ -667,7 +669,7 @@ class testFormGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'graphSaveCheck',
 					'errors' => array(
 						'ERROR: Cannot add graph',
@@ -677,7 +679,7 @@ class testFormGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphNormal1',
 					'addItems' => array(
 						array('itemName' => 'testFormItem')
@@ -691,7 +693,7 @@ class testFormGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphNormal2',
 					'addItems' => array(
 						array('itemName' => 'testFormItem')
@@ -706,7 +708,7 @@ class testFormGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphNormal3',
 					'addItems' => array(
 						array('itemName' => 'testFormItem')
@@ -720,7 +722,7 @@ class testFormGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphNormal4',
 					'graphtype' => 'Normal',
 					'addItems' => array(
@@ -730,7 +732,7 @@ class testFormGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphStacked1',
 					'graphtype' => 'Stacked',
 					'addItems' => array(
@@ -740,7 +742,7 @@ class testFormGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphStacked2',
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Fixed' ,
@@ -751,7 +753,7 @@ class testFormGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphStacked3',
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Item',
@@ -764,7 +766,7 @@ class testFormGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'graphStacked',
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Item',
@@ -780,7 +782,7 @@ class testFormGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'graphStacked',
 					'width' => 'name',
 					'height' => 'name',
@@ -803,7 +805,7 @@ class testFormGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'graphStacked',
 					'width' => '65536',
 					'height' => '-22',
@@ -822,7 +824,7 @@ class testFormGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphPie',
 					'graphtype' => 'Pie',
 					'addItems' => array(
@@ -832,7 +834,7 @@ class testFormGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphExploded',
 					'graphtype' => 'Exploded',
 					'addItems' => array(
@@ -842,7 +844,7 @@ class testFormGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graph!@#$%^&*()><>?:"|{},./;',
 					'graphtype' => 'Exploded',
 					'addItems' => array(
@@ -974,12 +976,12 @@ class testFormGraph extends CWebTest {
 		$this->zbxTestClickWait('save');
 		$expected = $data['expected'];
 		switch ($expected) {
-			case GRAPH_GOOD:
+			case TEST_GOOD:
 				$this->zbxTestTextPresent('Graph added');
 				$this->checkTitle('Configuration of graphs');
 				$this->zbxTestTextPresent('CONFIGURATION OF GRAPHS');
 				break;
-			case GRAPH_BAD:
+			case TEST_BAD:
 				$this->checkTitle('Configuration of graphs');
 				$this->zbxTestTextPresent('CONFIGURATION OF GRAPHS');
 				foreach ($data['errors'] as $msg) {
