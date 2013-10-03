@@ -1766,8 +1766,8 @@ function getPageNumber() {
  * Returns paging line.
  *
  * @param array $items				list of items
+ * @param array $removeUrlParams	params to remove from URL
  * @param array $urlParams			params to add in URL
- * @param array $removeUrlParams	params to remove from URL. Accepts array or string. String is converted to array.
  *
  * @return CTable
  */
