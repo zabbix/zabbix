@@ -497,7 +497,7 @@ int	main(int argc, char **argv)
 	zbx_task_t	task = ZBX_TASK_START;
 	char		ch;
 
-#if defined(PS_OVERWRITE_ARGV)
+#if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
 #endif
 	progname = get_program_name(argv[0]);
