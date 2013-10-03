@@ -44,16 +44,22 @@
 				$('.app-list-toggle.icon-minus-9x9').each(function() {
 					$(this).toggleClass('icon-minus-9x9');
 					$(this).data('openState', 0);
-					$('tr[parent_app_id=' + $(this).data('appId') + ']').hide();
-					appIdList.push($(this).data('appId'));
+
+					var appId = $(this).attr('data-app-id');
+					$('tr[parent_app_id=' + appId + ']').hide();
+
+					appIdList.push(appId);
 				});
 			}
 			else {
 				$('.app-list-toggle').not('.icon-minus-9x9').each(function() {
 					$(this).toggleClass('icon-minus-9x9');
 					$(this).data('openState', 1);
-					$('tr[parent_app_id=' + $(this).data('appId') + ']').show();
-					appIdList.push($(this).data('appId'));
+
+					var appId = $(this).attr('data-app-id');
+					$('tr[parent_app_id=' + appId + ']').show();
+
+					appIdList.push(appId);
 				});
 			}
 
@@ -78,7 +84,7 @@
 
 		// click event for every toggle (+-) button
 		$('.app-list-toggle').click(function() {
-			var appId = $(this).data('appId'),
+			var appId = $(this).attr('data-app-id'),
 				openState = $(this).data('openState');
 
 			// hide/show all corresponding toggle sub rows

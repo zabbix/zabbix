@@ -46,7 +46,7 @@ function permission2str($group_permission) {
 function check_perm2system($userid) {
 	$sql = 'SELECT g.usrgrpid'.
 			' FROM usrgrp g,users_groups ug'.
-			' WHERE ug.userid='.$userid.
+			' WHERE ug.userid='.zbx_dbstr($userid).
 				' AND g.usrgrpid=ug.usrgrpid'.
 				' AND g.users_status='.GROUP_STATUS_DISABLED;
 	if ($res = DBfetch(DBselect($sql, 1))) {
@@ -89,7 +89,7 @@ function get_user_auth($userid) {
 
 	$sql = 'SELECT MAX(g.gui_access) AS gui_access'.
 			' FROM usrgrp g,users_groups ug'.
-			' WHERE ug.userid='.$userid.
+			' WHERE ug.userid='.zbx_dbstr($userid).
 				' AND g.usrgrpid=ug.usrgrpid';
 	$db_access = DBfetch(DBselect($sql));
 	if (!zbx_empty($db_access['gui_access'])) {
@@ -173,7 +173,7 @@ function get_accessible_groups_by_user($userData, $perm, $permRes = PERM_RES_IDS
 					' LEFT JOIN rights r ON r.id=hg.groupid'.
 					' LEFT JOIN users_groups g ON r.groupid=g.usrgrpid'.
 					' LEFT JOIN nodes n ON '.DBid2nodeid('hg.groupid').'=n.nodeid'.
-				' WHERE g.userid='.$userId.
+				' WHERE g.userid='.zbx_dbstr($userId).
 					andDbNode('hg.groupid', $nodeId).
 				' GROUP BY n.nodeid,n.name,hg.groupid,hg.name,g.userid'.
 				' ORDER BY node_name,hg.name,permission';
@@ -522,7 +522,7 @@ function getUserGroupsByUserId($userId) {
 	if (!isset($userGroups[$userId])) {
 		$userGroups[$userId] = array();
 
-		$result = DBselect('SELECT usrgrpid FROM users_groups WHERE userid='.$userId);
+		$result = DBselect('SELECT usrgrpid FROM users_groups WHERE userid='.zbx_dbstr($userId));
 		while ($row = DBfetch($result)) {
 			$userGroups[$userId][] = $row['usrgrpid'];
 		}

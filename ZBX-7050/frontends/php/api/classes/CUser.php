@@ -431,7 +431,8 @@ class CUser extends CZBXAPI {
 			$usrgrps = zbx_objectValues($user['usrgrps'], 'usrgrpid');
 			foreach ($usrgrps as $groupid) {
 				$usersGroupdId = get_dbid('users_groups', 'id');
-				$sql = 'INSERT INTO users_groups (id,usrgrpid,userid) VALUES ('.$usersGroupdId.','.$groupid.','.$userid.')';
+				$sql = 'INSERT INTO users_groups (id,usrgrpid,userid) VALUES ('.zbx_dbstr($usersGroupdId).','.zbx_dbstr($groupid).','.zbx_dbstr($userid).')';
+
 				if (!DBexecute($sql)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 				}
@@ -440,8 +441,8 @@ class CUser extends CZBXAPI {
 			foreach ($user['user_medias'] as $mediaData) {
 				$mediaid = get_dbid('media', 'mediaid');
 				$sql = 'INSERT INTO media (mediaid,userid,mediatypeid,sendto,active,severity,period)'.
-					' VALUES ('.$mediaid.','.$userid.','.$mediaData['mediatypeid'].','.
-					zbx_dbstr($mediaData['sendto']).','.$mediaData['active'].','.$mediaData['severity'].','.
+					' VALUES ('.zbx_dbstr($mediaid).','.zbx_dbstr($userid).','.zbx_dbstr($mediaData['mediatypeid']).','.
+					zbx_dbstr($mediaData['sendto']).','.zbx_dbstr($mediaData['active']).','.zbx_dbstr($mediaData['severity']).','.
 					zbx_dbstr($mediaData['period']).')';
 				if (!DBexecute($sql)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
@@ -504,7 +505,7 @@ class CUser extends CZBXAPI {
 				DBexecute('DELETE FROM users_groups WHERE userid='.$user['userid'].' AND '.dbConditionInt('usrgrpid', $newUsrgrpids, true));
 
 				// getting the list of groups user is currently in
-				$dbGroupsUserIn = DBSelect('SELECT usrgrpid FROM users_groups WHERE userid='.$user['userid']);
+				$dbGroupsUserIn = DBSelect('SELECT usrgrpid FROM users_groups WHERE userid='.zbx_dbstr($user['userid']));
 				$groupsUserIn = array();
 				while ($grp = DBfetch($dbGroupsUserIn)) {
 					$groupsUserIn[$grp['usrgrpid']] = $grp['usrgrpid'];
@@ -522,7 +523,7 @@ class CUser extends CZBXAPI {
 					}
 
 					$usersGroupdId = get_dbid('users_groups', 'id');
-					$sql = 'INSERT INTO users_groups (id,usrgrpid,userid) VALUES ('.$usersGroupdId.','.$groupid.','.$user['userid'].')';
+					$sql = 'INSERT INTO users_groups (id,usrgrpid,userid) VALUES ('.zbx_dbstr($usersGroupdId).','.zbx_dbstr($groupid).','.zbx_dbstr($user['userid']).')';
 
 					if (!DBexecute($sql)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
@@ -650,8 +651,8 @@ class CUser extends CZBXAPI {
 				$mediaid = get_dbid('media', 'mediaid');
 
 				$sql = 'INSERT INTO media (mediaid,userid,mediatypeid,sendto,active,severity,period)'.
-						' VALUES ('.$mediaid.','.$user['userid'].','.$media['mediatypeid'].','.
-									zbx_dbstr($media['sendto']).','.$media['active'].','.$media['severity'].','.
+						' VALUES ('.zbx_dbstr($mediaid).','.zbx_dbstr($user['userid']).','.zbx_dbstr($media['mediatypeid']).','.
+									zbx_dbstr($media['sendto']).','.zbx_dbstr($media['active']).','.zbx_dbstr($media['severity']).','.
 									zbx_dbstr($media['period']).')';
 				if (!DBexecute($sql)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
@@ -750,12 +751,12 @@ class CUser extends CZBXAPI {
 
 			$result = DBexecute(
 				'UPDATE media'.
-				' SET mediatypeid='.$media['mediatypeid'].','.
+				' SET mediatypeid='.zbx_dbstr($media['mediatypeid']).','.
 					' sendto='.zbx_dbstr($media['sendto']).','.
-					' active='.$media['active'].','.
-					' severity='.$media['severity'].','.
+					' active='.zbx_dbstr($media['active']).','.
+					' severity='.zbx_dbstr($media['severity']).','.
 					' period='.zbx_dbstr($media['period']).
-				' WHERE mediaid='.$media['mediaid']
+				' WHERE mediaid='.zbx_dbstr($media['mediaid'])
 			);
 			if (!$result) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update user media.'));
@@ -1034,13 +1035,13 @@ class CUser extends CZBXAPI {
 			'SELECT u.userid,u.alias,u.name,u.surname,u.url,u.autologin,u.autologout,u.lang,u.refresh,u.type,'.
 			' u.theme,u.attempt_failed,u.attempt_ip,u.attempt_clock,u.rows_per_page'.
 			' FROM users u'.
-			' WHERE u.userid='.$userid
+			' WHERE u.userid='.zbx_dbstr($userid)
 		));
 
 		$userData['debug_mode'] = (bool) DBfetch(DBselect(
 			'SELECT ug.userid'.
 			' FROM usrgrp g,users_groups ug'.
-			' WHERE ug.userid='.$userid.
+			' WHERE ug.userid='.zbx_dbstr($userid).
 				' AND g.usrgrpid=ug.usrgrpid'.
 				' AND g.debug_mode='.GROUP_DEBUG_MODE_ENABLED
 		));

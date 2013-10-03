@@ -378,7 +378,7 @@
 
 	jQuery(function($) {
 		$('#exprTable').on('click', 'button.exprRemove', function() {
-			zabbixRegExp.removeExpression($(this).data('id'));
+			zabbixRegExp.removeExpression($(this).attr('data-id'));
 		});
 
 		$('#exprTable').on('click', 'input.exprAdd', function() {
@@ -386,7 +386,7 @@
 		});
 
 		$('#exprTable').on('click', 'button.exprEdit', function() {
-			zabbixRegExp.showForm($(this).data('id'));
+			zabbixRegExp.showForm($(this).attr('data-id'));
 		});
 
 		$('#saveExpression').click(function() {

@@ -20,9 +20,6 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-define('GRAPH_GOOD', 0);
-define('GRAPH_BAD', 1);
-
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  */
@@ -85,7 +82,7 @@ class testInheritanceGraph extends CWebTest {
 		return array(
 			array(
 				array(
-					'expected' => GRAPH_BAD,
+					'expected' => TEST_BAD,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
 						'Incorrect value for field "Name": cannot be empty.'
@@ -94,7 +91,7 @@ class testInheritanceGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphSaveCheck',
 					'addItems' => array(
 						array('itemName' => 'itemInheritance', 'remove' => true),
@@ -106,7 +103,7 @@ class testInheritanceGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'graphSaveCheck',
 					'errors' => array(
 						'ERROR: Cannot add graph',
@@ -116,7 +113,7 @@ class testInheritanceGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'graphSaveCheck',
 					'noItems' => true,
 					'errors' => array(
@@ -127,7 +124,7 @@ class testInheritanceGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphNormal1',
 					'ymin_type' => 'Fixed',
 					'ymax_type' => 'Item',
@@ -138,7 +135,7 @@ class testInheritanceGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphNormal2',
 					'ymin_type' => 'Item',
 					'ymin_name' => 'itemInheritance',
@@ -150,7 +147,7 @@ class testInheritanceGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphNormal3',
 					'ymin_type' => 'Fixed',
 					'ymax_type' => 'Item',
@@ -161,21 +158,21 @@ class testInheritanceGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphNormal4',
 					'graphtype' => 'Normal'
 				)
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphStacked1',
 					'graphtype' => 'Stacked'
 				)
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphStacked2',
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Fixed'
@@ -183,7 +180,7 @@ class testInheritanceGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphStacked3',
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Item',
@@ -193,7 +190,7 @@ class testInheritanceGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'graphStacked',
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Item',
@@ -206,7 +203,7 @@ class testInheritanceGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'graphStacked',
 					'width' => 'name',
 					'height' => 'name',
@@ -226,7 +223,7 @@ class testInheritanceGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'graphStacked',
 					'width' => '65536',
 					'height' => '-22',
@@ -242,21 +239,21 @@ class testInheritanceGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphPie',
 					'graphtype' => 'Pie'
 				)
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphExploded',
 					'graphtype' => 'Exploded'
 				)
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graph!@#$%^&*()><>?:"|{},./;',
 					'graphtype' => 'Exploded',
 					'dbCheck' => true,
@@ -265,21 +262,21 @@ class testInheritanceGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphSimple',
 					'hostCheck' => true,
 					'dbCheck' => true
 				)
 			),
 			array(
-				array('expected' => GRAPH_GOOD,
+				array('expected' => TEST_GOOD,
 					'name' => 'name',
 					'hostCheck' => true
 				)
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphRemove',
 					'hostCheck' => true,
 					'dbCheck' => true,
@@ -288,7 +285,7 @@ class testInheritanceGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphNotRemove',
 					'hostCheck' => true,
 					'dbCheck' => true,
@@ -297,7 +294,7 @@ class testInheritanceGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphSomeRemove',
 					'hostCheck' => true,
 					'dbCheck' => true,
@@ -307,7 +304,7 @@ class testInheritanceGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'graphSimple',
 					'errors' => array(
 						'ERROR: Cannot add graph',
@@ -430,13 +427,13 @@ class testInheritanceGraph extends CWebTest {
 		$this->zbxTestClickWait('save');
 		$expected = $data['expected'];
 		switch ($data['expected']) {
-			case GRAPH_GOOD:
+			case TEST_GOOD:
 				$this->zbxTestTextPresent('Graph added');
 				$this->checkTitle('Configuration of graphs');
 				$this->zbxTestTextPresent('CONFIGURATION OF GRAPHS');
 				break;
 
-			case GRAPH_BAD:
+			case TEST_BAD:
 				$this->checkTitle('Configuration of graphs');
 				$this->zbxTestTextPresent('CONFIGURATION OF GRAPHS');
 				foreach ($data['errors'] as $msg) {

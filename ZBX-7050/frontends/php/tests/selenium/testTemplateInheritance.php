@@ -20,9 +20,6 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-define('ITEM_GOOD', 0);
-define('ITEM_BAD', 1);
-
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  */
@@ -72,7 +69,7 @@ class testTemplateInheritance extends CWebTest {
 	// result, template, itemName, keyName, errorMsg
 		return array(
 			array(
-				ITEM_GOOD,
+				TEST_GOOD,
 				'Inheritance test template',
 				'Test LLD item1',
 				'test-general-item',
@@ -80,7 +77,7 @@ class testTemplateInheritance extends CWebTest {
 					),
 			// Dublicated item on Template inheritance test host
 			array(
-				ITEM_BAD,
+				TEST_BAD,
 				'Template App Zabbix Agent',
 				'Test LLD item1',
 				'test-general-item',
@@ -92,7 +89,7 @@ class testTemplateInheritance extends CWebTest {
 				),
 			// Item added to Template inheritance test host
 			array(
-				ITEM_GOOD,
+				TEST_GOOD,
 				'Template App Zabbix Agent',
 				'Test LLD item2',
 				'test-additional-item',
@@ -130,13 +127,13 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClickWait('save');
 
 		switch ($result) {
-			case ITEM_GOOD:
+			case TEST_GOOD:
 				$this->zbxTestTextPresent('Item added');
 				$this->checkTitle('Configuration of items');
 				$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
 				break;
 
-			case ITEM_BAD:
+			case TEST_BAD:
 				$this->checkTitle('Configuration of items');
 				$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
 				foreach ($errorMsgs as $msg) {
@@ -149,7 +146,7 @@ class testTemplateInheritance extends CWebTest {
 		}
 
 		switch ($result) {
-			case ITEM_GOOD:
+			case TEST_GOOD:
 				// check that the inherited item matches the original
 				$this->zbxTestOpenWait('hosts.php');
 				$this->zbxTestClickWait('link='.$this->hostName);
@@ -169,7 +166,7 @@ class testTemplateInheritance extends CWebTest {
 				$this->assertElementText('description', 'description');
 				$this->assertElementValue('delta_name', 'Delta (simple change)');
 				break;
-			case ITEM_BAD:
+			case TEST_BAD:
 				break;
 		}
 	}

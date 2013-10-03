@@ -172,7 +172,7 @@ function discovery_object_status2str($status = null) {
 }
 
 function get_discovery_rule_by_druleid($druleid) {
-	return DBfetch(DBselect('SELECT d.* FROM drules d WHERE d.druleid='.$druleid));
+	return DBfetch(DBselect('SELECT d.* FROM drules d WHERE d.druleid='.zbx_dbstr($druleid)));
 }
 
 function delete_discovery_rule($druleid) {
@@ -182,7 +182,7 @@ function delete_discovery_rule($druleid) {
 		'SELECT DISTINCT c.actionid'.
 		' FROM conditions c'.
 		' WHERE c.conditiontype='.CONDITION_TYPE_DRULE.
-			' AND c.value=\''.$druleid.'\''
+			' AND c.value='.zbx_dbstr($druleid)
 	);
 	while ($action = DBfetch($dbActions)) {
 		$actionids[] = $action['actionid'];
@@ -191,8 +191,8 @@ function delete_discovery_rule($druleid) {
 	// disabling actions with deleted conditions
 	if (!empty($actionids)) {
 		DBexecute('UPDATE actions SET status='.ACTION_STATUS_DISABLED.' WHERE '.dbConditionInt('actionid', $actionids));
-		DBexecute('DELETE FROM conditions WHERE conditiontype='.CONDITION_TYPE_DRULE.' AND value=\''.$druleid.'\'');
+		DBexecute('DELETE FROM conditions WHERE conditiontype='.CONDITION_TYPE_DRULE.' AND value='.zbx_dbstr($druleid));
 	}
 
-	return DBexecute('DELETE FROM drules WHERE druleid='.$druleid);
+	return DBexecute('DELETE FROM drules WHERE druleid='.zbx_dbstr($druleid));
 }
