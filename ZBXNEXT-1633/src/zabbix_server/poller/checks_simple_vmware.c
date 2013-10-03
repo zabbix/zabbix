@@ -530,7 +530,6 @@ int	check_vcenter_cluster_status(AGENT_REQUEST *request, const char *username, c
 		ret =  SYSINFO_RET_FAIL;
 
 	zbx_free(status);
-
 unlock:
 	zbx_vmware_unlock();
 
@@ -555,7 +554,6 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const char *username, const c
 		goto unlock;
 
 	ret = vmware_get_events(service->data->events, request->lastlogsize, result);
-
 unlock:
 	zbx_vmware_unlock();
 
@@ -1162,8 +1160,6 @@ unlock:
 	return ret;
 }
 
-
-
 int	check_vcenter_vm_hv_name(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
@@ -1202,7 +1198,6 @@ int	check_vcenter_vm_hv_name(AGENT_REQUEST *request, const char *username, const
 		SET_STR_RESULT(result, name);
 		ret = SYSINFO_RET_OK;
 	}
-
 unlock:
 	zbx_vmware_unlock();
 
@@ -1419,7 +1414,6 @@ int	check_vcenter_vm_net_if_in(AGENT_REQUEST *request, const char *username, con
 		goto unlock;
 
 	ret = vmware_service_get_vm_counter(service, uuid, instance, counterid, coeff, result);
-
 unlock:
 	zbx_vmware_unlock();
 
@@ -1464,7 +1458,6 @@ int	check_vcenter_vm_net_if_out(AGENT_REQUEST *request, const char *username, co
 		goto unlock;
 
 	ret = vmware_service_get_vm_counter(service, uuid, instance, counterid, coeff, result);
-
 unlock:
 	zbx_vmware_unlock();
 
@@ -1688,7 +1681,6 @@ int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, const char *userna
 
 	zbx_json_free(&json_data);
 
-
 	ret = SYSINFO_RET_OK;
 unlock:
 	zbx_vmware_unlock();
@@ -1705,7 +1697,7 @@ int	check_vcenter_vm_vfs_fs_size(AGENT_REQUEST *request, const char *username, c
 	zbx_uint64_t		value_total, value_free;
 	int			ret = SYSINFO_RET_FAIL;
 
-	if (4 != request->nparam)
+	if (3 > request->nparam || request->nparam > 4)
 		return SYSINFO_RET_FAIL;
 
 	url = get_rparam(request, 0);
@@ -1746,7 +1738,7 @@ int	check_vcenter_vm_vfs_fs_size(AGENT_REQUEST *request, const char *username, c
 
 	ret = SYSINFO_RET_OK;
 
-	if ('\0' == *mode || 0 == strcmp(mode, "total"))
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
 		SET_UI64_RESULT(result, value_total);
 	else if (0 == strcmp(mode, "free"))
 		SET_UI64_RESULT(result, value_free);
@@ -1766,5 +1758,4 @@ unlock:
 	return ret;
 }
 
-#endif
-
+#endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
