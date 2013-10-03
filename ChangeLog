@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBX-6911] added functionality to save positions of block on dashboard page in profiles table (Vitalij)
 
 Bug fixes:
+..F....... [ZBX-7050] fixed output of empty HTML attributes (Ivo)
 A.F....... [ZBX-7051] fixed bug, to not make updates to hosts applications, items, and triggers, if "Save" button was pressed in edit form, with no changes (Vitalij)
 A.F....... [ZBX-7091] fixed SQL injection vulnerabilities in page filtering; thanks to Bernhard Schildendorfer from SEC Consult for the report (Eduard, Pavels)
 A.F....... [ZBX-7091] fixed SQL injection vulnerabilities in dashboard favourite managing; thanks to Lincoln, a member of Corelan Team, for the report (Eduard, Pavels)
