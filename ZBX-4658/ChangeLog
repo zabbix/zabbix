@@ -1,3 +1,7 @@
+Changes for 1.8.19rc1
+
+...G...... [ZBX-4658] fixed system.boottime and system.uptime returning bogus values on Solaris when agent is compiled as a 64-bit binary (asaveljevs)
+
 Changes for 1.8.18
 
 

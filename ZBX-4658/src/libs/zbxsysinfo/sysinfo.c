@@ -820,7 +820,7 @@ void	*get_result_value_by_type(AGENT_RESULT *result, int require_type)
 #ifdef HAVE_KSTAT_H
 zbx_uint64_t	get_kstat_numeric_value(const kstat_named_t *kn)
 {
-	switch (kn->value)
+	switch (kn->data_type)
 	{
 		case KSTAT_DATA_INT32:
 			return kn->value.i32;
