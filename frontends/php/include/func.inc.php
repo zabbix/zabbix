@@ -1762,8 +1762,16 @@ function getPageNumber() {
 	return $pageNumber;
 }
 
-/************* PAGING *************/
-function getPagingLine(&$items, array $urlParams = array()) {
+/**
+ * Returns paging line.
+ *
+ * @param array $items				list of items
+ * @param array $removeUrlParams	params to remove from URL
+ * @param array $urlParams			params to add in URL
+ *
+ * @return CTable
+ */
+function getPagingLine(&$items, array $removeUrlParams = array(), array $urlParams = array()) {
 	global $page;
 
 	$config = select_config();
@@ -1821,7 +1829,10 @@ function getPagingLine(&$items, array $urlParams = array()) {
 			}
 		}
 
-		$url->removeArgument('go');
+		$removeUrlParams = array_merge($removeUrlParams, array('go', 'form', 'delete', 'cancel'));
+		foreach ($removeUrlParams as $param) {
+			$url->removeArgument($param);
+		}
 
 		if ($startPage > 1) {
 			$url->setArgument('page', 1);

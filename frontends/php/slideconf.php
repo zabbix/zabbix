@@ -196,7 +196,7 @@ else {
 	));
 	order_result($data['slides'], getPageSortField('name'), getPageSortOrder());
 
-	$data['paging'] = getPagingLine($data['slides']);
+	$data['paging'] = getPagingLine($data['slides'], array('slideshowid'));
 
 	// nodes
 	if ($data['displayNodes'] = is_array(get_current_nodeid())) {
