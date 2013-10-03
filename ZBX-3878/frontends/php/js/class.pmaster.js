@@ -319,7 +319,7 @@ var CDoll = Class.create(CDebug,{
 		url.setArgument('pmasterid', this.pmasterid());
 
 		jQuery(window).off('resize');
-		jQuery(document).off('mouseup mousemove');
+		jQuery(document).off('mousemove');
 
 		new Ajax.Request(url.getUrl(), {
 				'method': 'post',
