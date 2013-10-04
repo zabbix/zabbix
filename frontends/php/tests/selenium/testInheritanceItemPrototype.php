@@ -20,9 +20,6 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-define('ITEM_GOOD', 0);
-define('ITEM_BAD', 1);
-
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  */
@@ -100,7 +97,7 @@ class testInheritanceItemPrototype extends CWebTest {
 		return array(
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Checksum of $1',
 					'key' => 'vfs.file.cksum[/sbin/shutdown]',
 					'dbName' => 'Checksum of /sbin/shutdown',
@@ -111,7 +108,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Duplicate item
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Checksum of $1',
 					'key' => 'vfs.file.cksum[/sbin/shutdown]',
 					'errors' => array(
@@ -123,7 +120,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Item name is missing
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'key' =>'item-name-missing',
 					'errors' => array(
 						'Page received incorrect data',
@@ -134,7 +131,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Item key is missing
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item name',
 					'errors' => array(
 						'Page received incorrect data',
@@ -145,7 +142,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Empty formula
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item formula',
 					'key' => 'item-formula-test',
 					'formula' => '',
@@ -159,7 +156,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Incorrect formula
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item formula',
 					'key' => 'item-formula-test',
 					'formula' => ' ',
@@ -173,7 +170,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Incorrect formula
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item formula',
 					'key' => 'item-formula-test',
 					'formula' => 'form ula',
@@ -187,7 +184,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Incorrect formula
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item formula',
 					'key' => 'item-formula-test',
 					'formula' => ' a1b2 c3 ',
@@ -201,7 +198,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Incorrect formula
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item formula',
 					'key' => 'item-formula-test',
 					'formula' => ' 32 1 abc',
@@ -215,7 +212,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Incorrect formula
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item formula',
 					'key' => 'item-formula-test',
 					'formula' => '32 1 abc',
@@ -229,7 +226,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Incorrect formula
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item formula',
 					'key' => 'item-formula-test',
 					'formula' => '321abc',
@@ -242,7 +239,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item formula1',
 					'key' => 'item-formula-test',
 					'formula' => '5',
@@ -253,7 +250,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Empty timedelay
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item delay',
 					'key' => 'item-delay-test',
 					'delay' => 0,
@@ -266,7 +263,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Incorrect timedelay
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item delay',
 					'key' => 'item-delay-test',
 					'delay' => '-30',
@@ -279,7 +276,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Incorrect timedelay
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item delay',
 					'key' => 'item-delay-test',
 					'delay' => 86401,
@@ -292,7 +289,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Empty time flex period
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-test',
 					'flexPeriod' => array(
@@ -307,7 +304,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Incorrect flex period
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-test',
 					'flexPeriod' => array(
@@ -322,7 +319,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Incorrect flex period
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-test',
 					'flexPeriod' => array(
@@ -337,7 +334,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Incorrect flex period
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-test',
 					'flexPeriod' => array(
@@ -352,7 +349,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Incorrect flex period
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-test',
 					'flexPeriod' => array(
@@ -367,7 +364,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Multiple flex periods
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-test',
 					'flexPeriod' => array(
@@ -381,7 +378,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay',
 					'flexPeriod' => array(
@@ -402,7 +399,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item flex1',
 					'key' => 'item-flex-delay1',
 					'flexPeriod' => array(
@@ -419,7 +416,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay',
 					'delay' => 0,
@@ -441,7 +438,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item flex2',
 					'key' => 'item-flex-delay2',
 					'delay' => 0,
@@ -456,7 +453,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay',
 					'flexPeriod' => array(
@@ -472,7 +469,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay3',
 					'flexPeriod' => array(
@@ -484,7 +481,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay4',
 					'delay' => 0,
@@ -496,7 +493,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay',
 					'flexPeriod' => array(
@@ -511,7 +508,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay5',
 					'flexPeriod' => array(
@@ -522,7 +519,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay',
 					'flexPeriod' => array(
@@ -540,7 +537,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay',
 					'flexPeriod' => array(
@@ -558,7 +555,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay',
 					'flexPeriod' => array(
@@ -574,7 +571,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay',
 					'flexPeriod' => array(
@@ -590,7 +587,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay6',
 					'flexPeriod' => array(
@@ -614,7 +611,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay7',
 					'flexPeriod' => array(
@@ -626,7 +623,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item flex Check',
 					'key' => 'item-flex-delay8',
 					'flexPeriod' => array(
@@ -642,7 +639,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Maximum flexfields allowed reached- error
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex-maximum entries',
 					'key' => 'item-flex-maximum',
 					'flexPeriod' => array(
@@ -662,7 +659,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Maximum flexfields allowed reached- error
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex-maximum entries',
 					'key' => 'item-flex-maximum',
 					'flexPeriod' => array(
@@ -682,7 +679,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Maximum flexfields allowed reached- save OK
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item flex-maximum save OK',
 					'key' => 'item-flex-maximum-save',
 					'flexPeriod' => array(
@@ -701,7 +698,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Maximum flexfields allowed reached- remove one item
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex-maximum with remove',
 					'key' => 'item-flex-maximum-remove',
 					'flexPeriod' => array(
@@ -722,7 +719,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Flexfields with negative number in flexdelay
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item flex-negative flexdelay',
 					'key' => 'item-flex-negative-flexdelay',
 					'flexPeriod' => array(
@@ -733,7 +730,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Flexfields with symbols in flexdelay
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item flex-symbols in flexdelay',
 					'key' => 'item-flex-symbols-flexdelay',
 					'flexPeriod' => array(
@@ -744,7 +741,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// History
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item history',
 					'key' => 'item-history-empty',
 					'history' => ''
@@ -753,7 +750,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// History
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item history',
 					'key' => 'item-history-test',
 					'history' => 65536,
@@ -766,7 +763,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// History
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item history',
 					'key' => 'item-history-test',
 					'history' => '-1',
@@ -779,7 +776,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// History
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item history',
 					'key' => 'item-history-test',
 					'history' => 'days'
@@ -788,7 +785,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Trends
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item trends',
 					'key' => 'item-trends-empty',
 					'trends' => '',
@@ -799,7 +796,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Trends
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item trends',
 					'key' => 'item-trends-test',
 					'trends' => '-1',
@@ -812,7 +809,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Trends
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item trends',
 					'key' => 'item-trends-test',
 					'trends' => 65536,
@@ -825,7 +822,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Trends
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item trends Check',
 					'key' => 'item-trends-test',
 					'trends' => 'trends',
@@ -835,7 +832,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => '!@#$%^&*()_+-=[]{};:"|,./<>?',
 					'key' => 'item-symbols-test',
 					'dbCheck' => true,
@@ -844,7 +841,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'itemSimple',
 					'key' => 'key-template-simple',
 					'hostCheck' => true,
@@ -853,14 +850,14 @@ class testInheritanceItemPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'itemName',
 					'key' => 'key-template-item',
 					'hostCheck' => true)
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'itemTrigger',
 					'key' => 'key-template-trigger',
 					'hostCheck' => true,
@@ -870,7 +867,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'itemRemove',
 					'key' => 'key-template-remove',
 					'hostCheck' => true,
@@ -880,7 +877,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'itemInheritance',
 					'key' => 'key-item-inheritance',
 					'errors' => array(
@@ -891,7 +888,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// List of all item types
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'Zabbix agent',
 					'name' => 'Zabbix agent',
 					'key' => 'item-zabbix-agent',
@@ -901,7 +898,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'Zabbix agent (active)',
 					'name' => 'Zabbix agent (active)',
 					'key' => 'item-zabbix-agent-active',
@@ -911,7 +908,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'Simple check',
 					'name' => 'Simple check',
 					'key' => 'item-simple-check',
@@ -921,7 +918,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'SNMPv1 agent',
 					'name' => 'SNMPv1 agent',
 					'key' => 'item-snmpv1-agent',
@@ -931,7 +928,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'SNMPv2 agent',
 					'name' => 'SNMPv2 agent',
 					'key' => 'item-snmpv2-agent',
@@ -941,7 +938,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'SNMPv3 agent',
 					'name' => 'SNMPv3 agent',
 					'key' => 'item-snmpv3-agent',
@@ -951,7 +948,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'SNMP trap',
 					'name' => 'SNMP trap',
 					'key' => 'snmptrap.fallback',
@@ -961,7 +958,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'Zabbix internal',
 					'name' => 'Zabbix internal',
 					'key' => 'item-zabbix-internal',
@@ -971,7 +968,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'Zabbix trapper',
 					'name' => 'Zabbix trapper',
 					'key' => 'item-zabbix-trapper',
@@ -981,7 +978,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'Zabbix aggregate',
 					'name' => 'Zabbix aggregate',
 					'key' => 'grpmax[Zabbix servers group,some-item-key,last,0]',
@@ -991,7 +988,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'type' => 'Zabbix aggregate',
 					'name' => 'Zabbix aggregate',
 					'key' => 'item-zabbix-aggregate',
@@ -1003,7 +1000,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'External check',
 					'name' => 'External check',
 					'key' => 'item-external-check',
@@ -1013,7 +1010,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'Database monitor',
 					'name' => 'Database monitor',
 					'key' => 'item-database-monitor',
@@ -1024,7 +1021,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'IPMI agent',
 					'name' => 'IPMI agent',
 					'key' => 'item-ipmi-agent',
@@ -1035,7 +1032,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'IPMI agent',
 					'name' => 'IPMI agent with spaces',
 					'key' => 'item-ipmi-agent-spaces',
@@ -1047,7 +1044,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'SSH agent',
 					'name' => 'SSH agent',
 					'key' => 'item-ssh-agent',
@@ -1059,7 +1056,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'TELNET agent',
 					'name' => 'TELNET agent',
 					'key' => 'item-telnet-agent',
@@ -1071,7 +1068,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'type' => 'IPMI agent',
 					'name' => 'IPMI agent error',
 					'key' => 'item-ipmi-agent-error',
@@ -1083,7 +1080,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'type' => 'SSH agent',
 					'name' => 'SSH agent error',
 					'key' => 'item-ssh-agent-error',
@@ -1096,7 +1093,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'type' => 'TELNET agent',
 					'name' => 'TELNET agent error',
 					'key' => 'item-telnet-agent-error',
@@ -1109,7 +1106,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'JMX agent',
 					'name' => 'JMX agent',
 					'key' => 'proto-jmx-agent',
@@ -1119,7 +1116,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'Calculated',
 					'name' => 'Calculated',
 					'key' => 'item-calculated',
@@ -1130,7 +1127,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'type' => 'Calculated',
 					'name' => 'Calculated',
 					'key' => 'item-calculated',
@@ -1143,7 +1140,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// SQL field empty
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'type' => 'Database monitor',
 					'name' => 'Database monitor',
 					'key' => 'item-database-error',
@@ -1156,7 +1153,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Default
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'type' => 'Database monitor',
 					'name' => 'Database monitor',
 					'params_ap' => 'SELECT * FROM items',
@@ -1169,7 +1166,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Default
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'type' => 'SSH agent',
 					'name' => 'SSH agent',
 					'username' => 'zabbix',
@@ -1183,7 +1180,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Default
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'type' => 'TELNET agent',
 					'name' => 'TELNET agent',
 					'username' => 'zabbix',
@@ -1197,7 +1194,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			// Default
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'type' => 'JMX agent',
 					'name' => 'JMX agent',
 					'username' => 'zabbix',
@@ -1313,13 +1310,13 @@ class testInheritanceItemPrototype extends CWebTest {
 			$this->zbxTestClickWait('save');
 			$expected = $data['expected'];
 			switch ($expected) {
-				case ITEM_GOOD:
+				case TEST_GOOD:
 					$this->zbxTestTextPresent('Item added');
 					$this->checkTitle('Configuration of item prototypes');
 					$this->zbxTestTextPresent(array('CONFIGURATION OF ITEM PROTOTYPES', "Item prototypes of ".$this->discoveryRule));
 					break;
 
-				case ITEM_BAD:
+				case TEST_BAD:
 					$this->checkTitle('Configuration of item prototypes');
 					$this->zbxTestTextPresent(array('CONFIGURATION OF ITEM PROTOTYPES', 'Item prototype'));
 					foreach ($data['errors'] as $msg) {
