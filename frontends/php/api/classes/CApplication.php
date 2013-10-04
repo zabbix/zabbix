@@ -558,7 +558,7 @@ class CApplication extends CZBXAPI {
 		DB::insert('items_applications', $appsInsert);
 
 		foreach ($itemids as $inum => $itemid) {
-			$dbChilds = DBselect('SELECT i.itemid,i.hostid FROM items i WHERE i.templateid='.$itemid);
+			$dbChilds = DBselect('SELECT i.itemid,i.hostid FROM items i WHERE i.templateid='.zbx_dbstr($itemid));
 			while ($child = DBfetch($dbChilds)) {
 				$dbApps = DBselect(
 					'SELECT a1.applicationid'.

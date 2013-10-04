@@ -651,7 +651,7 @@ class CImportReferencer {
 			foreach ($this->applications as $host => $applications) {
 				$hostId = $this->resolveHostOrTemplate($host);
 				if ($hostId) {
-					$sqlWhere[] = '(hostid='.$hostId.' AND '.dbConditionString('name', $applications).')';
+					$sqlWhere[] = '(hostid='.zbx_dbstr($hostId).' AND '.dbConditionString('name', $applications).')';
 				}
 			}
 
@@ -682,7 +682,7 @@ class CImportReferencer {
 			foreach ($this->items as $host => $keys) {
 				$hostId = $this->resolveHostOrTemplate($host);
 				if ($hostId) {
-					$sqlWhere[] = '(i.hostid='.$hostId.' AND '.dbConditionString('i.key_', $keys).')';
+					$sqlWhere[] = '(i.hostid='.zbx_dbstr($hostId).' AND '.dbConditionString('i.key_', $keys).')';
 				}
 			}
 
@@ -834,7 +834,7 @@ class CImportReferencer {
 			foreach ($this->macros as $host => $macros) {
 				$hostId = $this->resolveHostOrTemplate($host);
 				if ($hostId) {
-					$sqlWhere[] = '(hm.hostid='.$hostId.' AND '.dbConditionString('hm.macro', $macros).')';
+					$sqlWhere[] = '(hm.hostid='.zbx_dbstr($hostId).' AND '.dbConditionString('hm.macro', $macros).')';
 				}
 			}
 
@@ -882,7 +882,7 @@ class CImportReferencer {
 				foreach ($discoveryRule as $discoveryRuleKey => $hostPrototypes) {
 					$discoveryRuleId = $this->resolveItem($hostId, $discoveryRuleKey);
 					if ($hostId) {
-						$sqlWhere[] = '(hd.parent_itemid='.$discoveryRuleId.' AND '.dbConditionString('h.host', $hostPrototypes).')';
+						$sqlWhere[] = '(hd.parent_itemid='.zbx_dbstr($discoveryRuleId).' AND '.dbConditionString('h.host', $hostPrototypes).')';
 					}
 				}
 			}

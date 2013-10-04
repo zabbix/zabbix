@@ -1035,14 +1035,14 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 					{
 						addr = zbx_strdup(addr, row[8]);	/* ip */
 						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &dc_item.host,
-								NULL, NULL, &addr, MACRO_TYPE_INTERFACE_ADDR_DB, NULL,
+								NULL, &addr, MACRO_TYPE_INTERFACE_ADDR_DB, NULL,
 								0);
 						strscpy(dc_item.interface.ip_orig, addr);
 						zbx_free(addr);
 
 						addr = zbx_strdup(addr, row[9]);	/* dns */
 						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &dc_item.host,
-								NULL, NULL, &addr, MACRO_TYPE_INTERFACE_ADDR_DB, NULL,
+								NULL, &addr, MACRO_TYPE_INTERFACE_ADDR_DB, NULL,
 								0);
 						strscpy(dc_item.interface.dns_orig, addr);
 						zbx_free(addr);
@@ -1586,14 +1586,8 @@ out:
  *                                                                            *
  * Purpose: retrieve escalation history                                       *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
-static void	get_escalation_history(const DB_EVENT *event, DB_ESCALATION *escalation, char **replace_to)
+static void	get_escalation_history(const DB_EVENT *event, const DB_EVENT *r_event, char **replace_to)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1602,31 +1596,13 @@ static void	get_escalation_history(const DB_EVENT *event, DB_ESCALATION *escalat
 	int		esc_step;
 	unsigned char	type, status;
 	time_t		now;
-	zbx_uint64_t	userid, eventid;
+	zbx_uint64_t	userid;
 
 	buf = zbx_malloc(buf, buf_alloc);
-	*buf = '\0';
 
-	eventid = (NULL != escalation ? escalation->eventid : event->eventid);
-
-	if (NULL != escalation && escalation->eventid == event->eventid)
-	{
-		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "Problem started: %s %s Age: %s\n",
-				zbx_date2str(event->clock), zbx_time2str(event->clock),
-				zbx_age2str(time(NULL) - event->clock));
-	}
-	else
-	{
-		result = DBselect("select clock from events where eventid=" ZBX_FS_UI64, eventid);
-
-		if (NULL != (row = DBfetch(result)))
-		{
-			now = (time_t)atoi(row[0]);
-			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "Problem started: %s %s Age: %s\n",
-					zbx_date2str(now), zbx_time2str(now), zbx_age2str(time(NULL) - now));
-		}
-		DBfree_result(result);
-	}
+	zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "Problem started: %s %s Age: %s\n",
+			zbx_date2str(event->clock), zbx_time2str(event->clock),
+			zbx_age2str(time(NULL) - event->clock));
 
 	result = DBselect("select a.clock,a.alerttype,a.status,mt.description,a.sendto"
 				",a.error,a.esc_step,a.userid,a.message"
@@ -1635,7 +1611,7 @@ static void	get_escalation_history(const DB_EVENT *event, DB_ESCALATION *escalat
 				" on mt.mediatypeid=a.mediatypeid"
 			" where a.eventid=" ZBX_FS_UI64
 			" order by a.clock",
-			eventid);
+			event->eventid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1677,13 +1653,10 @@ static void	get_escalation_history(const DB_EVENT *event, DB_ESCALATION *escalat
 	}
 	DBfree_result(result);
 
-	if (NULL != escalation && escalation->r_eventid == event->eventid)
+	if (NULL != r_event)
 	{
-		now = (time_t)event->clock;
-		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
-				"Problem ended: %s %s\n",
-				zbx_date2str(now),
-				zbx_time2str(now));
+		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "Problem ended: %s %s\n",
+				zbx_date2str(r_event->clock), zbx_time2str(r_event->clock));
 	}
 
 	if (0 != buf_offset)
@@ -2497,8 +2470,8 @@ static void	cache_trigger_hostids(zbx_vector_uint64_t *hostids, const char *expr
  *                                                                            *
  ******************************************************************************/
 int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_EVENT *r_event, zbx_uint64_t *userid,
-		zbx_uint64_t *hostid, DC_HOST *dc_host, DC_ITEM *dc_item, DB_ESCALATION *escalation, char **data,
-		int macro_type, char *error, int maxerrlen)
+		zbx_uint64_t *hostid, DC_HOST *dc_host, DC_ITEM *dc_item, char **data, int macro_type,
+		char *error, int maxerrlen)
 {
 	const char		*__function_name = "substitute_simple_macros";
 
@@ -2574,7 +2547,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				}
 				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
 				{
-					get_escalation_history(c_event, escalation, &replace_to);
+					get_escalation_history(event, r_event, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, sizeof(MVAR_EVENT_RECOVERY) - 1))
 				{
@@ -2721,8 +2694,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					replace_to = zbx_strdup(replace_to, c_event->trigger.comments);
 					substitute_simple_macros(actionid, event, r_event, userid, hostid, dc_host,
-							dc_item, escalation, &replace_to, MACRO_TYPE_TRIGGER_COMMENTS,
-							error, maxerrlen);
+							dc_item, &replace_to, MACRO_TYPE_TRIGGER_COMMENTS, error,
+							maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_EVENTS_ACK))
 				{
@@ -2757,8 +2730,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					replace_to = zbx_strdup(replace_to, c_event->trigger.description);
 					substitute_simple_macros(actionid, event, r_event, userid, hostid, dc_host,
-							dc_item, escalation, &replace_to,
-							MACRO_TYPE_TRIGGER_DESCRIPTION, error, maxerrlen);
+							dc_item, &replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION, error,
+							maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_NAME_ORIG))
 				{
@@ -2784,7 +2757,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					replace_to = zbx_strdup(replace_to, c_event->trigger.url);
 					substitute_simple_macros(actionid, event, r_event, userid, hostid, dc_host,
-							dc_item, escalation, &replace_to, MACRO_TYPE_TRIGGER_URL, error,
+							dc_item, &replace_to, MACRO_TYPE_TRIGGER_URL, error,
 							maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_VALUE))
@@ -2811,7 +2784,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				}
 				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
 				{
-					get_escalation_history(c_event, escalation, &replace_to);
+					get_escalation_history(event, r_event, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, sizeof(MVAR_EVENT_RECOVERY) - 1))
 				{
@@ -2907,8 +2880,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					replace_to = zbx_strdup(replace_to, c_event->trigger.comments);
 					substitute_simple_macros(actionid, event, r_event, userid, hostid, dc_host,
-							dc_item, escalation, &replace_to, MACRO_TYPE_TRIGGER_COMMENTS,
-							error, maxerrlen);
+							dc_item, &replace_to, MACRO_TYPE_TRIGGER_COMMENTS, error,
+							maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_EXPRESSION))
 				{
@@ -2927,8 +2900,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					replace_to = zbx_strdup(replace_to, c_event->trigger.description);
 					substitute_simple_macros(actionid, event, r_event, userid, hostid, dc_host,
-							dc_item, escalation, &replace_to,
-							MACRO_TYPE_TRIGGER_DESCRIPTION, error, maxerrlen);
+							dc_item, &replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION, error,
+							maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_NAME_ORIG))
 				{
@@ -2954,8 +2927,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					replace_to = zbx_strdup(replace_to, c_event->trigger.url);
 					substitute_simple_macros(actionid, event, r_event, userid, hostid, dc_host,
-							dc_item, escalation, &replace_to, MACRO_TYPE_TRIGGER_URL, error,
-							maxerrlen);
+							dc_item, &replace_to, MACRO_TYPE_TRIGGER_URL, error, maxerrlen);
 				}
 			}
 			else if (EVENT_SOURCE_DISCOVERY == c_event->source)
@@ -3135,7 +3107,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				}
 				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
 				{
-					get_escalation_history(c_event, escalation, &replace_to);
+					get_escalation_history(event, r_event, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, sizeof(MVAR_EVENT_RECOVERY) - 1))
 				{
@@ -3231,7 +3203,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				}
 				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
 				{
-					get_escalation_history(c_event, escalation, &replace_to);
+					get_escalation_history(event, r_event, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, sizeof(MVAR_EVENT_RECOVERY) - 1))
 				{
@@ -4020,7 +3992,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 
 		zbx_remove_whitespace(tr->expression);
 
-		if (SUCCEED != substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL,
+		if (SUCCEED != substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL,
 				&tr->expression, MACRO_TYPE_TRIGGER_EXPRESSION, err, sizeof(err)))
 		{
 			tr->new_error = zbx_strdup(tr->new_error, err);
@@ -4313,7 +4285,7 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 
 			if (NULL == jp_row)
 			{
-				substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, dc_item, NULL,
+				substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, dc_item,
 						&param, macro_type, NULL, 0);
 			}
 			else
@@ -4399,7 +4371,7 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 						if (NULL == jp_row)
 						{
 							substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL,
-									dc_item, NULL, &param, macro_type, NULL, 0);
+									dc_item, &param, macro_type, NULL, 0);
 						}
 						else
 						{
@@ -4434,7 +4406,7 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 						if (NULL == jp_row)
 						{
 							substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL,
-									dc_item, NULL, &param, macro_type, NULL, 0);
+									dc_item, &param, macro_type, NULL, 0);
 						}
 						else
 						{
