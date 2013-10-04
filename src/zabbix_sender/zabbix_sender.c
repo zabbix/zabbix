@@ -285,11 +285,11 @@ static void	parse_commandline(int argc, char **argv)
 				break;
 			case 'h':
 				help();
-				exit(-1);
+				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
 				version();
-				exit(-1);
+				exit(EXIT_SUCCESS);
 				break;
 			case 'I':
 				CONFIG_SOURCE_IP = zbx_strdup(CONFIG_SOURCE_IP, zbx_optarg);
@@ -347,7 +347,7 @@ int	main(int argc, char **argv)
 	FILE			*in;
 	char			in_line[MAX_BUFFER_LEN], hostname[MAX_STRING_LEN], key[MAX_STRING_LEN],
 				key_value[MAX_BUFFER_LEN], clock[32];
-	int			total_count = 0, succeed_count = 0, buffer_count = 0, read_more = 0, ret = SUCCEED;
+	int			total_count = 0, succeed_count = 0, buffer_count = 0, read_more = 0, ret = FAIL;
 	double			last_send = 0;
 	const char		*p;
 	zbx_thread_args_t	thread_args;
@@ -400,7 +400,6 @@ int	main(int argc, char **argv)
 		else if (NULL == (in = fopen(INPUT_FILE, "r")) )
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot open [%s]: %s", INPUT_FILE, zbx_strerror(errno));
-			ret = FAIL;
 			goto exit;
 		}
 
