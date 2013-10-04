@@ -81,7 +81,7 @@ if (isset($_REQUEST['save'])) {
 				$val = _('None');
 			}
 			else {
-				$val = DBfetch(DBselect('SELECT u.name FROM usrgrp u WHERE u.usrgrpid='.$val));
+				$val = DBfetch(DBselect('SELECT u.name FROM usrgrp u WHERE u.usrgrpid='.zbx_dbstr($val)));
 				$val = $val['name'];
 			}
 
