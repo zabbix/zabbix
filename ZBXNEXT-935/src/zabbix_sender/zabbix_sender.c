@@ -117,7 +117,7 @@ typedef struct
 }
 ZBX_THREAD_SENDVAL_ARGS;
 
-#define SUCCEED_WITH_INFO	2
+#define SUCCEED_PARTIAL	2
 
 /******************************************************************************
  *                                                                            *
@@ -129,7 +129,8 @@ ZBX_THREAD_SENDVAL_ARGS;
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
- *                >0 - the number of failed values                            *
+ *                SUCCEED_PARTIAL - the sending operation was completed       *
+ *                successfully, but processing of at least one value failed.  *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -159,7 +160,7 @@ static int	check_response(char *response)
 		fflush(stdout);
 
 		if (2 == sscanf(info, "Processed: %d; Failed: %d", &failed, &failed) && 0 < failed)
-			ret = SUCCEED_WITH_INFO;
+			ret = SUCCEED_PARTIAL;
 	}
 
 	return ret;
@@ -403,7 +404,7 @@ int	main(int argc, char **argv)
 			goto exit;
 		}
 
-		while ((SUCCEED == ret || SUCCEED_WITH_INFO == ret) && NULL != fgets(in_line, sizeof(in_line), in))
+		while ((SUCCEED == ret || SUCCEED_PARTIAL == ret) && NULL != fgets(in_line, sizeof(in_line), in))
 		{
 			/* line format: <hostname> <key> [<timestamp>] <value> */
 
@@ -573,7 +574,7 @@ exit:
 	zabbix_close_log();
 
 	/* convert FAIL (-1) or FAIL returned from thread (255) to EXIT_FAILURE */
-	if (SUCCEED_WITH_INFO < ret || 0 > ret)
+	if (SUCCEED_PARTIAL < ret || 0 > ret)
 		ret = 1;
 
 	return ret;
