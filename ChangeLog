@@ -24,6 +24,7 @@ New features:
 ..F....... [ZBX-6983] renamed the "Status of host group triggers" screen element to "Latest host group issues" and "Status of host triggers" to "Latest host issues" (Pavels)
 
 Bug fixes:
+...GI..PS. [ZBX-7061] fixed warnings produced by clang static analyzer (asaveljevs)
 ..F....... [ZBX-7022] fixed errors in Monitoring > Screens page when screen item has group and host dropdowns (Ivo)
 ..F....... [ZBX-6978] fixed leading and trailing spaces for translatable strings (Ivo)
 ..F....... [ZBX-7033] replaced HTML special characters with corresponding entity names and unicode characters (Ivo)
