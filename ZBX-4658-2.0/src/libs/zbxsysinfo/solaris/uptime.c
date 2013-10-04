@@ -38,7 +38,7 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 			if (NULL != (kn = (kstat_named_t*)kstat_data_lookup(kp, "boot_time")))
 			{
 				time(&now);
-				SET_UI64_RESULT(result, difftime(now, (time_t) kn->value.ul));
+				SET_UI64_RESULT(result, now - get_kstat_numeric_value(kn));
 				ret = SYSINFO_RET_OK;
 			}
 		}
