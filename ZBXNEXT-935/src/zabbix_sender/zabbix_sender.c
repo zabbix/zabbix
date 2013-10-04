@@ -320,10 +320,10 @@ static void	parse_commandline(int argc, char **argv)
 				REAL_TIME = 1;
 				break;
 			case 'v':
-				if (LOG_LEVEL_WARNING == CONFIG_LOG_LEVEL)
-					CONFIG_LOG_LEVEL = LOG_LEVEL_DEBUG;
-				else
+				if (LOG_LEVEL_WARNING > CONFIG_LOG_LEVEL)
 					CONFIG_LOG_LEVEL = LOG_LEVEL_WARNING;
+				else if (LOG_LEVEL_DEBUG > CONFIG_LOG_LEVEL)
+					CONFIG_LOG_LEVEL = LOG_LEVEL_DEBUG;
 				break;
 			default:
 				usage();
