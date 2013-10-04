@@ -193,7 +193,7 @@ else {
 		'SELECT a.*,u.alias,u.name,u.surname'.
 		' FROM acknowledges a'.
 			' LEFT JOIN users u ON u.userid=a.userid'.
-		' WHERE a.eventid='.$_REQUEST['eventid']
+		' WHERE a.eventid='.zbx_dbstr($_REQUEST['eventid'])
 	);
 
 	if ($acknowledges) {

@@ -148,14 +148,8 @@ out:
  *                                                                            *
  * Purpose: Return user permissions for access to trigger                     *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: PERM_DENY - if host or user not found,                       *
  *                   or permission otherwise                                  *
- *                                                                            *
- * Author:                                                                    *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	get_trigger_permission(zbx_uint64_t userid, zbx_uint64_t triggerid)
@@ -182,6 +176,40 @@ static int	get_trigger_permission(zbx_uint64_t userid, zbx_uint64_t triggerid)
 
 		if (perm < host_perm)
 			perm = host_perm;
+	}
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_permission_string(perm));
+
+	return perm;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_item_permission                                              *
+ *                                                                            *
+ * Purpose: Return user permissions for access to item                        *
+ *                                                                            *
+ * Return value: PERM_DENY - if host or user not found,                       *
+ *                   or permission otherwise                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid)
+{
+	const char	*__function_name = "get_item_permission";
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		perm = PERM_DENY;
+	zbx_uint64_t	hostid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	result = DBselect("select hostid from items where itemid=" ZBX_FS_UI64, itemid);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(hostid, row[0]);
+		perm = get_host_permission(userid, hostid);
 	}
 	DBfree_result(result);
 
@@ -225,8 +253,8 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	add_object_msg(zbx_uint64_t operationid, zbx_uint64_t mediatypeid, ZBX_USER_MSG **user_msg,
-		const char *subject, const char *message, DB_EVENT *event, DB_ACTION *action)
+static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, zbx_uint64_t mediatypeid,
+		ZBX_USER_MSG **user_msg, const char *subject, const char *message, DB_EVENT *event)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -249,18 +277,28 @@ static void	add_object_msg(zbx_uint64_t operationid, zbx_uint64_t mediatypeid, Z
 		ZBX_STR2UINT64(userid, row[0]);
 
 		if (SUCCEED != check_perm2system(userid))
-			return;
+			continue;
 
-		if (EVENT_OBJECT_TRIGGER == event->object && PERM_READ > get_trigger_permission(userid, event->objectid))
-			return;
+		switch (event->object)
+		{
+			case EVENT_OBJECT_TRIGGER:
+				if (PERM_READ > get_trigger_permission(userid, event->objectid))
+					continue;
+				break;
+			case EVENT_OBJECT_ITEM:
+			case EVENT_OBJECT_LLDRULE:
+				if (PERM_READ > get_item_permission(userid, event->objectid))
+					continue;
+				break;
+		}
 
 		subject_dyn = zbx_strdup(NULL, subject);
 		message_dyn = zbx_strdup(NULL, message);
 
-		substitute_simple_macros(&action->actionid, event, NULL, &userid, NULL, NULL,
-				NULL, NULL, &subject_dyn, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
-		substitute_simple_macros(&action->actionid, event, NULL, &userid, NULL, NULL,
-				NULL, NULL, &message_dyn, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
+		substitute_simple_macros(&actionid, event, NULL, &userid, NULL, NULL, NULL,
+				&subject_dyn, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
+		substitute_simple_macros(&actionid, event, NULL, &userid, NULL, NULL, NULL,
+				&message_dyn, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
 
 		add_user_msg(userid, mediatypeid, user_msg, subject_dyn, message_dyn);
 
@@ -499,7 +537,7 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 		if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT != script.type)
 		{
 			script.command = zbx_strdup(script.command, row[11]);
-			substitute_simple_macros(&actionid, event, NULL, NULL, NULL, NULL, NULL, NULL,
+			substitute_simple_macros(&actionid, event, NULL, NULL, NULL, NULL, NULL,
 					&script.command, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
 		}
 
@@ -868,8 +906,8 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 						message = action->longdata;
 					}
 
-					add_object_msg(operationid, mediatypeid, &user_msg, subject, message,
-							event, action);
+					add_object_msg(action->actionid, operationid, mediatypeid, &user_msg,
+							subject, message, event);
 					break;
 				case OPERATION_TYPE_COMMAND:
 					execute_commands(event, action->actionid, operationid, escalation->esc_step);
@@ -934,6 +972,7 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *event, DB_
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	userid, mediatypeid;
+	ZBX_USER_MSG	*user_msg = NULL, *p;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -948,28 +987,56 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *event, DB_
 					" and alerttype=%d",
 				action->actionid, escalation->eventid, ALERT_TYPE_MESSAGE);
 
-		subject_dyn = zbx_strdup(NULL, action->shortdata);
-		message_dyn = zbx_strdup(NULL, action->longdata);
-
-		substitute_simple_macros(&action->actionid, event, r_event, NULL, NULL, NULL, NULL, NULL,
-						&subject_dyn, MACRO_TYPE_MESSAGE_RECOVERY, NULL, 0);
-		substitute_simple_macros(&action->actionid, event, r_event, NULL, NULL, NULL, NULL, NULL,
-						&message_dyn, MACRO_TYPE_MESSAGE_RECOVERY, NULL, 0);
-
 		while (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(userid, row[0]);
 			ZBX_STR2UINT64(mediatypeid, row[1]);
 
+			if (SUCCEED != check_perm2system(userid))
+				continue;
+
+			switch (r_event->object)
+			{
+				case EVENT_OBJECT_TRIGGER:
+					if (PERM_READ > get_trigger_permission(userid, r_event->objectid))
+						continue;
+					break;
+				case EVENT_OBJECT_ITEM:
+				case EVENT_OBJECT_LLDRULE:
+					if (PERM_READ > get_item_permission(userid, r_event->objectid))
+						continue;
+					break;
+			}
+
+			subject_dyn = zbx_strdup(NULL, action->shortdata);
+			message_dyn = zbx_strdup(NULL, action->longdata);
+
+			substitute_simple_macros(&action->actionid, event, r_event, &userid, NULL, NULL, NULL,
+					&subject_dyn, MACRO_TYPE_MESSAGE_RECOVERY, NULL, 0);
+			substitute_simple_macros(&action->actionid, event, r_event, &userid, NULL, NULL, NULL,
+					&message_dyn, MACRO_TYPE_MESSAGE_RECOVERY, NULL, 0);
+
 			escalation->esc_step = 0;
 
-			add_message_alert(escalation, event, r_event, action, userid, mediatypeid, subject_dyn,
-					message_dyn);
-		}
-		zbx_free(subject_dyn);
-		zbx_free(message_dyn);
+			add_user_msg(userid, mediatypeid, &user_msg, subject_dyn, message_dyn);
 
+			zbx_free(subject_dyn);
+			zbx_free(message_dyn);
+		}
 		DBfree_result(result);
+
+		while (NULL != user_msg)
+		{
+			p = user_msg;
+			user_msg = user_msg->next;
+
+			add_message_alert(escalation, event, r_event, action, p->userid, p->mediatypeid,
+					p->subject, p->message);
+
+			zbx_free(p->subject);
+			zbx_free(p->message);
+			zbx_free(p);
+		}
 	}
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "escalation stopped: recovery message not defined (actionid:" ZBX_FS_UI64
