@@ -2270,6 +2270,38 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_get_update_time                                           *
+ *                                                                            *
+ * Purpose: get the time of next scheduled service update                     *
+ *                                                                            *
+ * Parameters: now      - [IN] the current time                               *
+ *                                                                            *
+ * Return value: the time of next service update                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	vmware_get_update_time(int now)
+{
+	int	next_update = now + ZBX_VMWARE_CACHE_TTL, i;
+
+	for (i = 0; i < vmware->services.values_num; i++)
+	{
+		zbx_vmware_service_t	*service = vmware->services.values[i];
+		int			service_update;
+
+		if (0 != (service->state & ZBX_VMWARE_STATE_UPDATING))
+			continue;
+
+		service_update = service->lastcheck + ZBX_VMWARE_CACHE_TTL;
+		if (now < service_update && service_update < next_update)
+			next_update = service_update;
+
+	}
+
+	return next_update;
+}
+
 
 /*
  * Public API
@@ -2384,7 +2416,7 @@ void	zbx_vmware_init(void)
 	CONFIG_VMWARE_CACHE_SIZE -= size_reserved;
 
 	zbx_mem_create(&vmware_mem, shm_key, ZBX_NO_MUTEX,  CONFIG_VMWARE_CACHE_SIZE, "vmware cache size",
-			"VMwareCacheSize", 1);
+			"VMwareCacheSize", 0);
 
 	vmware = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_t));
 	memset(vmware, 0, sizeof(zbx_vmware_t));
@@ -2460,7 +2492,7 @@ void	main_vmware_loop(void)
 					break;
 				}
 
-				if (now - service->lastcheck > ZBX_VMWARE_CACHE_TTL)
+				if (now - service->lastcheck >= ZBX_VMWARE_CACHE_TTL)
 				{
 					service->state |= ZBX_VMWARE_STATE_UPDATING;
 					state = ZBX_VMWARE_SERVICE_UPDATE;
@@ -2476,7 +2508,8 @@ void	main_vmware_loop(void)
 
 		zbx_setproctitle("%s [sleeping]", get_process_type_string(process_type));
 
-		zbx_sleep_loop(CONFIG_VMWARE_FREQUENCY);
+		now = time(NULL);
+		zbx_sleep_loop(vmware_get_update_time(now) - now);
 	}
 #endif
 }
