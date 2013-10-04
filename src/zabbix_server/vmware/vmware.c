@@ -61,7 +61,7 @@ extern zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE;
 		__vm_mem_realloc_func, __vm_mem_free_func)
 
 #define ZBX_VMWARE_CACHE_TTL	CONFIG_VMWARE_FREQUENCY
-#define ZBX_VMWARE_SERVICE_TTL	(SEC_PER_HOUR * 24)
+#define ZBX_VMWARE_SERVICE_TTL	SEC_PER_DAY
 
 static ZBX_MUTEX	vmware_lock;
 
@@ -122,7 +122,6 @@ zbx_perfcounter_mapping_t;
 			"</ns1:Body>"							\
 		"</SOAP-ENV:Envelope>"
 
-
 typedef struct
 {
 	char	*data;
@@ -164,7 +163,7 @@ static size_t	HEADERFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userda
 static char	*vmware_strdup(const char *source)
 {
 	char	*ptr = NULL;
-	int	len;
+	size_t	len;
 
 	if (NULL != source)
 	{
@@ -1064,8 +1063,11 @@ static void	wmware_vm_get_devices_by_counterid(zbx_vmware_vm_t *vm, zbx_uint64_t
 		char		*instance;
 		zbx_vmware_dev_t	*dev;
 
-		if (NULL == (instance = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], "*[local-name()='instance']")))
+		if (NULL == (instance = zbx_xml_read_node_value(doc, nodeset->nodeTab[i],
+				"*[local-name()='instance']")))
+		{
 			continue;
+		}
 
 		dev = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_dev_t));
 		dev->type =  ZBX_VMWARE_DEV_TYPE_DISK;
@@ -2416,7 +2418,7 @@ void	zbx_vmware_init(void)
 
 	CONFIG_VMWARE_CACHE_SIZE -= size_reserved;
 
-	zbx_mem_create(&vmware_mem, shm_key, ZBX_NO_MUTEX,  CONFIG_VMWARE_CACHE_SIZE, "vmware cache size",
+	zbx_mem_create(&vmware_mem, shm_key, ZBX_NO_MUTEX, CONFIG_VMWARE_CACHE_SIZE, "vmware cache size",
 			"VMwareCacheSize", 0);
 
 	vmware = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_t));
@@ -2506,8 +2508,6 @@ void	main_vmware_loop(void)
 			if (ZBX_VMWARE_SERVICE_UPDATE == state)
 				vmware_service_update(service);
 		}
-
-		zbx_setproctitle("%s [sleeping]", get_process_type_string(process_type));
 
 		now = time(NULL);
 
