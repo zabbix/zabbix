@@ -2294,12 +2294,12 @@ static int	vmware_get_update_time(int now)
 			continue;
 
 		service_update = service->lastcheck + ZBX_VMWARE_CACHE_TTL;
-		if (now < service_update && service_update < next_update)
+		if (service_update < next_update)
 			next_update = service_update;
 
 	}
 
-	return next_update;
+	return next_update > now ? next_update : now;
 }
 
 
