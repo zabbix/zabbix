@@ -1117,6 +1117,7 @@ static int	vmware_service_get_vm_data(const zbx_vmware_service_t *service, CURL 
 					"<ns0:type>VirtualMachine</ns0:type>"		\
 					"<ns0:pathSet>config</ns0:pathSet>"		\
 					"<ns0:pathSet>summary</ns0:pathSet>"		\
+					"<ns0:pathSet>guest</ns0:pathSet>"		\
 				"</ns0:propSet>"					\
 				"<ns0:objectSet>"					\
 					"<ns0:obj type=\"VirtualMachine\">%s</ns0:obj>"	\
@@ -2509,6 +2510,7 @@ void	main_vmware_loop(void)
 		zbx_setproctitle("%s [sleeping]", get_process_type_string(process_type));
 
 		now = time(NULL);
+
 		zbx_sleep_loop(vmware_get_update_time(now) - now);
 	}
 #endif
