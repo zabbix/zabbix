@@ -469,6 +469,9 @@ var CDoll = Class.create(CDebug,{
 
 			var strPos = $.cookie(settings.name);
 			var positions = $.parseJSON(strPos);
+			if (!positions) {
+				return this;
+			}
 
 			// if the discovery widget is not positioned, add it to the end of the second column
 			if (!widgedIsPositioned('hat_dscvry_widget', positions)) {
