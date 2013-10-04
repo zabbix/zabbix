@@ -196,12 +196,12 @@ void	str_base64_encode_dyn(const char *p_str, char **p_b64str, int in_size)
 	assert(p_b64str);
 	assert(!*p_b64str);	/* expect a pointer will NULL value, do not know whether allowed to free that memory */
 
-	*p_b64str = zbx_malloc(*p_b64str, in_size / 3 * 4 + (0 != in_size % 3 ? 4 + 1 : 1));
+	*p_b64str = zbx_malloc(*p_b64str, (in_size + 2) / 3 * 4 + 1);
 	c_per_block = (ZBX_MAX_B64_LEN - 1) / 4 * 3;
 	b_per_block = c_per_block / 3 * 4;
 	full_block_num = in_size / c_per_block;
 	bytes_left = in_size % c_per_block;
-	bytes_for_left = bytes_left / 3 * 4 + (0 != bytes_left % 3 ? 4 : 0);
+	bytes_for_left = (bytes_left + 2) / 3 * 4;
 
 	for (pc = p_str, pc_r = *p_b64str; 0 != full_block_num; pc += c_per_block, pc_r += b_per_block, full_block_num--)
 		str_base64_encode(pc, pc_r, c_per_block);
