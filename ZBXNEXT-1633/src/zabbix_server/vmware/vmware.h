@@ -164,10 +164,10 @@ int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats);
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-# define ZBX_XPATH_LN(LN)		"/*[local-name()='" LN "']"
-# define ZBX_XPATH_LN1(LN1)		"/" ZBX_XPATH_LN(LN1)
-# define ZBX_XPATH_LN2(LN1, LN2)		"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2)
-# define ZBX_XPATH_LN3(LN1, LN2, LN3)	"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2) ZBX_XPATH_LN(LN3)
+#	define ZBX_XPATH_LN(LN)			"/*[local-name()='" LN "']"
+#	define ZBX_XPATH_LN1(LN1)		"/" ZBX_XPATH_LN(LN1)
+#	define ZBX_XPATH_LN2(LN1, LN2)		"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2)
+#	define ZBX_XPATH_LN3(LN1, LN2, LN3)	"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2) ZBX_XPATH_LN(LN3)
 
 char	*zbx_xml_read_value(const char *data, const char *xpath);
 char	*zbx_xml_read_node_value(xmlDoc *doc, xmlNode *node, const char *xpath);
