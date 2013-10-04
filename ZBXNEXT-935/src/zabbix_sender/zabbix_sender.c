@@ -111,7 +111,8 @@ static void	send_signal_handler(int sig)
 
 typedef struct
 {
-	char		*source_ip, *server;
+	char		*source_ip;
+	char		*server;
 	unsigned short	port;
 	struct zbx_json	json;
 }
@@ -125,12 +126,12 @@ ZBX_THREAD_SENDVAL_ARGS;
  *                                                                            *
  * Purpose: Check whether JSON response is SUCCEED                            *
  *                                                                            *
- * Parameters: result SUCCEED or FAIL                                         *
+ * Parameters: JSON response from Zabbix trapper                              *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                SUCCEED_PARTIAL - the sending operation was completed       *
- *                successfully, but processing of at least one value failed.  *
+ *                successfully, but processing of at least one value failed   *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -159,7 +160,7 @@ static int	check_response(char *response)
 		printf("info from server: \"%s\"\n", info);
 		fflush(stdout);
 
-		if (2 == sscanf(info, "Processed: %d; Failed: %d", &failed, &failed) && 0 < failed)
+		if (1 == sscanf(info, "processed: %*d; failed: %d", &failed) && 0 < failed)
 			ret = SUCCEED_PARTIAL;
 	}
 
@@ -557,13 +558,15 @@ int	main(int argc, char **argv)
 
 			ret = zbx_thread_wait(zbx_thread_start(send_value, &thread_args));
 		}
-		while(0); /* try block simulation */
+		while (0); /* try block simulation */
 	}
 
 	zbx_json_free(&sentdval_args.json);
 
-	if (FAIL != ret)
-		printf("sent: %d; skipped: %d; total: %d\n", succeed_count, (total_count - succeed_count), total_count);
+	if (FAIL != ret && (unsigned char)FAIL != ret)
+	{
+		printf("sent: %d; skipped: %d; total: %d\n", succeed_count, total_count - succeed_count, total_count);
+	}
 	else
 	{
 		printf("Sending failed.%s\n", CONFIG_LOG_LEVEL != LOG_LEVEL_DEBUG ?
@@ -573,8 +576,8 @@ exit:
 	zabbix_close_log();
 
 	/* convert FAIL (-1) or FAIL returned from thread (255) to EXIT_FAILURE */
-	if (SUCCEED_PARTIAL < ret || 0 > ret)
-		ret = 1;
+	if (FAIL == ret || (unsigned char)FAIL == ret)
+		ret = EXIT_FAILURE;
 
 	return ret;
 }
