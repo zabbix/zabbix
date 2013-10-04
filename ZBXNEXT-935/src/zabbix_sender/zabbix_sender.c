@@ -404,7 +404,7 @@ int	main(int argc, char **argv)
 			goto exit;
 		}
 
-		while ((SUCCEED == ret || SUCCEED_PARTIAL == ret) && NULL != fgets(in_line, sizeof(in_line), in))
+		while (NULL != fgets(in_line, sizeof(in_line), in))
 		{
 			/* line format: <hostname> <key> [<timestamp>] <value> */
 
@@ -512,6 +512,9 @@ int	main(int argc, char **argv)
 						ZBX_JSON_TYPE_STRING);
 				zbx_json_addarray(&sentdval_args.json, ZBX_PROTO_TAG_DATA);
 			}
+
+			if (SUCCEED != ret && SUCCEED_PARTIAL != ret)
+				break;
 		}
 		zbx_json_close(&sentdval_args.json);
 
