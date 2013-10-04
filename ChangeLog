@@ -466,8 +466,6 @@ Changes for 2.0.9rc2
 Bug fixes:
 ..F....... [ZBX-7036] fixed "Discovery status" widget being displayed on top of a customized dashboard when enabling a discovery rule (Pavels)
 ..F....... [ZBX-3878] fixed not being able to move dashboard widget the second time (Ivo)
-A.F....... [ZBX-7091] fixed SQL injection vulnerabilities in page filtering; thanks to Bernhard Schildendorfer from SEC Consult for the report (Eduard, Pavels)
-A.F....... [ZBX-7091] fixed SQL injection vulnerabilities in dashboard favourite managing; thanks to Lincoln, a member of Corelan Team, for the report (Eduard, Pavels)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.9rc1
@@ -477,6 +475,8 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Italian, Lithuanian, Romanian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A.F....... [ZBX-7091] fixed SQL injection vulnerabilities in page filtering; thanks to Bernhard Schildendorfer from SEC Consult for the report (Eduard, Pavels)
+A.F....... [ZBX-7091] fixed SQL injection vulnerabilities in dashboard favourite managing; thanks to Lincoln, a member of Corelan Team, for the report (Eduard, Pavels)
 ..F....... [ZBX-3878] fixed memory leaks in slide shows (Eduard)
 ........S. [ZBX-6950] fixed termination character sequence for smtp connection termination (igors)
 ..F....... [ZBX-6952] fixed XSS vulnerability in user themes, thanks to Lincoln and Bernhard Schildendorfer for reporting (Ivo)
