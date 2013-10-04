@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBX-6911] added functionality to save positions of block on dashboard page in profiles table (Vitalij)
 
 Bug fixes:
+...GI..PS. [ZBX-7061] fixed warnings produced by clang static analyzer (asaveljevs)
 ..F....... [ZBX-6873] fixed pagination issue after deleting an object through form (Ivo)
 ..F....... [ZBX-7050] fixed output of empty HTML attributes (Ivo)
 A.F....... [ZBX-7051] fixed bug, to not make updates to hosts applications, items, and triggers, if "Save" button was pressed in edit form, with no changes (Vitalij)
@@ -24,7 +25,6 @@ New features:
 ..F....... [ZBX-6983] renamed the "Status of host group triggers" screen element to "Latest host group issues" and "Status of host triggers" to "Latest host issues" (Pavels)
 
 Bug fixes:
-...GI..PS. [ZBX-7061] fixed warnings produced by clang static analyzer (asaveljevs)
 ..F....... [ZBX-7022] fixed errors in Monitoring > Screens page when screen item has group and host dropdowns (Ivo)
 ..F....... [ZBX-6978] fixed leading and trailing spaces for translatable strings (Ivo)
 ..F....... [ZBX-7033] replaced HTML special characters with corresponding entity names and unicode characters (Ivo)
