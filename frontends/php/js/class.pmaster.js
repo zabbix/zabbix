@@ -440,6 +440,26 @@ var CDoll = Class.create(CDebug,{
 			return this;
 		},
 		load: function(method, options) {
+			/**
+			 * Returns true if the widgets position is set in the positions object.
+			 *
+			 * @param {string} name
+			 * @param {object} positions
+			 *
+			 * @returns {boolean}
+			 */
+			function widgedIsPositioned(name, positions) {
+				for (var colNum in positions) {
+					for (var rowNum in positions[colNum]) {
+						if (positions[colNum][rowNum] == name) {
+							return true;
+						}
+					}
+				}
+
+				return false;
+			}
+
 			var settings = {
 				'name': 'sortableOrder',
 				'sortable': '.widget'
@@ -449,6 +469,14 @@ var CDoll = Class.create(CDebug,{
 
 			var strPos = $.cookie(settings.name);
 			var positions = $.parseJSON(strPos);
+			if (!positions) {
+				return this;
+			}
+
+			// if the discovery widget is not positioned, add it to the end of the second column
+			if (!widgedIsPositioned('hat_dscvry_widget', positions)) {
+				positions[1][positions[1].length] = 'hat_dscvry_widget';
+			}
 
 			this.each(function(colNum, column) {
 				if (!isset(colNum, positions)) {
