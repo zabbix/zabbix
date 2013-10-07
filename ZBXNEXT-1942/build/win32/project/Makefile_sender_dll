@@ -18,4 +18,3 @@ $(TARGETDIR)\zabbix_sender.h: $(SOURCEDIR)\zabbix_sender.h
 
 post-build:  $(TARGETDIR)\zabbix_sender.h
 	@del /Q $(TARGETDIR)\zabbix_sender.exp 2>NUL
-
