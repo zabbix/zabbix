@@ -30,7 +30,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->zbxTestLogin('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Value mapping');
-		$this->checkTitle('Configuration of value mapping');
+		$this->zbxTestCheckTitle('Configuration of value mapping');
 		$this->zbxTestTextPresent('CONFIGURATION OF VALUE MAPPING');
 		$this->zbxTestTextPresent('Value mapping');
 		$this->assertElementPresent('form');

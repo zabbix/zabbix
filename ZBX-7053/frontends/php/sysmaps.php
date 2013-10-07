@@ -291,7 +291,7 @@ else {
 	order_result($data['maps'], $sortField, $sortOrder);
 
 	// paging
-	$data['paging'] = getPagingLine($data['maps']);
+	$data['paging'] = getPagingLine($data['maps'], array('sysmapid'));
 
 	// nodes
 	if ($data['displayNodes'] = is_array(get_current_nodeid())) {

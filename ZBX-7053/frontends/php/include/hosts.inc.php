@@ -484,7 +484,7 @@ function hostInterfaceTypeNumToName($type) {
 }
 
 function get_hostgroup_by_groupid($groupid) {
-	$groups = DBfetch(DBselect('SELECT g.* FROM groups g WHERE g.groupid='.$groupid));
+	$groups = DBfetch(DBselect('SELECT g.* FROM groups g WHERE g.groupid='.zbx_dbstr($groupid)));
 
 	if ($groups) {
 		return $groups;
@@ -526,7 +526,7 @@ function get_host_by_itemid($itemids) {
 }
 
 function get_host_by_hostid($hostid, $no_error_message = 0) {
-	$row = DBfetch(DBselect('SELECT h.* FROM hosts h WHERE h.hostid='.$hostid));
+	$row = DBfetch(DBselect('SELECT h.* FROM hosts h WHERE h.hostid='.zbx_dbstr($hostid)));
 
 	if ($row) {
 		return $row;
@@ -578,7 +578,7 @@ function updateHostStatus($hostids, $status) {
 }
 
 function get_application_by_applicationid($applicationid, $no_error_message = 0) {
-	$row = DBfetch(DBselect('SELECT a.* FROM applications a WHERE a.applicationid='.$applicationid));
+	$row = DBfetch(DBselect('SELECT a.* FROM applications a WHERE a.applicationid='.zbx_dbstr($applicationid)));
 
 	if ($row) {
 		return $row;
@@ -794,7 +794,7 @@ function getDeletableHostGroups($groupids = null) {
 }
 
 function isTemplate($hostId) {
-	$dbHost = DBfetch(DBselect('SELECT h.status FROM hosts h WHERE h.hostid='.$hostId));
+	$dbHost = DBfetch(DBselect('SELECT h.status FROM hosts h WHERE h.hostid='.zbx_dbstr($hostId)));
 
 	return ($dbHost && $dbHost['status'] == HOST_STATUS_TEMPLATE);
 }
