@@ -510,7 +510,7 @@ class testFormItemPrototype extends CWebTest {
 		$this->zbxTestClickWait('link=Discovery rules');
 		$this->zbxTestClickWait('link='.$discoveryRule);
 		$this->zbxTestClickWait("link=Item prototypes");
-		$this->checkTitle('Configuration of item prototypes');
+		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF ITEM PROTOTYPES', "Item prototypes of ".$discoveryRule));
 
 		if (isset($data['form'])) {
@@ -520,7 +520,7 @@ class testFormItemPrototype extends CWebTest {
 			$this->zbxTestClickWait('form');
 		}
 
-		$this->checkTitle('Configuration of item prototypes');
+		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF ITEM PROTOTYPES', 'Item prototype'));
 
 		if (isset($data['templatedHost'])) {
@@ -1183,7 +1183,7 @@ class testFormItemPrototype extends CWebTest {
 
 		$this->zbxTestLogin('disc_prototypes.php?form=update&itemid='.$data['itemid'].'&parent_discoveryid=33800');
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of item prototypes');
+		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestTextPresent(array(
 			'Item updated', $data['name'],
 			'CONFIGURATION OF ITEM PROTOTYPES',
@@ -2449,12 +2449,12 @@ class testFormItemPrototype extends CWebTest {
 			switch ($expected) {
 				case TEST_GOOD:
 					$this->zbxTestTextPresent('Item added');
-					$this->checkTitle('Configuration of item prototypes');
+					$this->zbxTestCheckTitle('Configuration of item prototypes');
 					$this->zbxTestTextPresent(array('CONFIGURATION OF ITEM PROTOTYPES', "Item prototypes of ".$this->discoveryRule));
 					break;
 
 				case TEST_BAD:
-					$this->checkTitle('Configuration of item prototypes');
+					$this->zbxTestCheckTitle('Configuration of item prototypes');
 					$this->zbxTestTextPresent(array('CONFIGURATION OF ITEM PROTOTYPES', 'Item prototype'));
 					foreach ($data['errors'] as $msg) {
 						$this->zbxTestTextPresent($msg);

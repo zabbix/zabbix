@@ -117,7 +117,7 @@ class testInheritanceGraphPrototype extends CWebTest {
 
 		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&parent_discoveryid=23500&hostid=30000');
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of graph prototypes');
+		$this->zbxTestCheckTitle('Configuration of graph prototypes');
 		$this->zbxTestTextPresent(array(
 			'CONFIGURATION OF GRAPH PROTOTYPES',
 			'Graph prototypes of '.$this->discoveryRule,
@@ -420,7 +420,7 @@ class testInheritanceGraphPrototype extends CWebTest {
 		$itemName = $this->item;
 		$this->zbxTestLogin('graphs.php?parent_discoveryid=23500&form=Create+graph+prototype');
 
-		$this->checkTitle('Configuration of graph prototypes');
+		$this->zbxTestCheckTitle('Configuration of graph prototypes');
 		$this->zbxTestTextPresent('CONFIGURATION OF GRAPH PROTOTYPES');
 		$this->assertElementPresent("//a[@id='tab_graphTab' and text()='Graph prototype']");
 
@@ -526,12 +526,12 @@ class testInheritanceGraphPrototype extends CWebTest {
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->zbxTestTextPresent('Graph added');
-				$this->checkTitle('Configuration of graph prototypes');
+				$this->zbxTestCheckTitle('Configuration of graph prototypes');
 				$this->zbxTestTextPresent(array('CONFIGURATION OF GRAPH PROTOTYPES', "Graph prototypes of ".$this->discoveryRule));
 				break;
 
 			case TEST_BAD:
-				$this->checkTitle('Configuration of graph prototypes');
+				$this->zbxTestCheckTitle('Configuration of graph prototypes');
 				$this->zbxTestTextPresent(array('CONFIGURATION OF GRAPH PROTOTYPES', 'Graph prototype'));
 				foreach ($data['errors'] as $msg) {
 					$this->zbxTestTextPresent($msg);

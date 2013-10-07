@@ -36,7 +36,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 	public function testFormAdministrationDMProxies_CheckLayout() {
 
 		$this->zbxTestLogin('proxies.php');
-		$this->checkTitle('Configuration of proxies');
+		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
 
 		$this->zbxTestClickWait('form');
@@ -189,7 +189,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 	public function testFormAdministrationDMProxies_Create($expected, $name, $mode, $hosts, $ip, $dns, $connect_to, $port, $errormsgs) {
 
 		$this->zbxTestLogin('proxies.php');
-		$this->checkTitle('Configuration of proxies');
+		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
 		$this->zbxTestTextPresent('PROXIES');
 		$this->zbxTestTextPresent('Name');
@@ -202,7 +202,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 
 		// create proxy
 		$this->zbxTestClickWait('form');
-		$this->checkTitle('Configuration of proxies');
+		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
 		$this->zbxTestTextPresent('Proxy');
 
@@ -234,7 +234,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		switch ($expected) {
 			case PROXY_GOOD:
 				$this->zbxTestTextPresent('Proxy added');
-				$this->checkTitle('Configuration of proxies');
+				$this->zbxTestCheckTitle('Configuration of proxies');
 				$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
 				$this->zbxTestTextPresent('PROXIES');
 				$this->zbxTestTextPresent(array('Mode', 'Name', 'Last seen (age)', 'Host count', 'Required performance (vps)', 'Hosts'));
@@ -257,7 +257,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 				break;
 
 			case PROXY_BAD:
-				$this->checkTitle('Configuration of proxies');
+				$this->zbxTestCheckTitle('Configuration of proxies');
 				$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
 				$this->zbxTestTextPresent('PROXIES');
 				$this->zbxTestTextPresent('Proxy name');
@@ -293,7 +293,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 	public function testFormAdministrationDMProxies_UpdateProxyName($name, $newname) {
 
 		$this->zbxTestLogin('proxies.php');
-		$this->checkTitle('Configuration of proxies');
+		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
 		$this->zbxTestTextPresent('PROXIES');
 		$this->zbxTestClickWait('link='.$name);
@@ -311,7 +311,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->input_type('host', $newname);
 		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent('Proxy updated');
-		$this->checkTitle('Configuration of proxies');
+		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
 		$this->zbxTestTextPresent('PROXIES');
 		$this->zbxTestTextPresent($newname);
@@ -340,7 +340,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 	public function testFormAdministrationDMProxies_Clone($name, $newname) {
 
 		$this->zbxTestLogin('proxies.php');
-		$this->checkTitle('Configuration of proxies');
+		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
 		$this->zbxTestTextPresent('PROXIES');
 		$this->zbxTestClickWait('link='.$name);
@@ -360,7 +360,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->input_type('host', $newname);
 		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent('Proxy added');
-		$this->checkTitle('Configuration of proxies');
+		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
 		$this->zbxTestTextPresent('PROXIES');
 		$this->zbxTestTextPresent($newname);
@@ -385,7 +385,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->chooseOkOnNextConfirmation();
 
 		$this->zbxTestLogin('proxies.php');
-		$this->checkTitle('Configuration of proxies');
+		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
 		$this->zbxTestTextPresent('PROXIES');
 
@@ -400,14 +400,14 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->waitForConfirmation();
 		$this->wait();
 
-		$this->checkTitle('Configuration of proxies');
+		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
 		$this->zbxTestTextPresent('Proxy deleted');
 
 		$sql = "SELECT * FROM hosts WHERE host='$name'";
 		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Proxy has not been deleted');
 
-		$this->checkTitle('Configuration of proxies');
+		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
 		$this->zbxTestTextPresent('PROXIES');
 

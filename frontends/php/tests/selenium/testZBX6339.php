@@ -58,7 +58,7 @@ class testZBX6339 extends CWebTest {
 		$this->zbxTestClickWait('link='.$host);
 
 		$this->zbxTestClickWait("//div[@class='w']//a[text()='Screens']");
-		$this->checkTitle('Configuration of screens');
+		$this->zbxTestCheckTitle('Configuration of screens');
 
 		$this->zbxTestCheckboxSelect('screens['.$screenid.']');
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
@@ -66,7 +66,7 @@ class testZBX6339 extends CWebTest {
 
 		$this->getConfirmation();
 
-		$this->checkTitle('Configuration of screens');
+		$this->zbxTestCheckTitle('Configuration of screens');
 		$this->zbxTestTextPresent(array('Screen deleted', 'CONFIGURATION OF SCREENS', $host));
 	}
 

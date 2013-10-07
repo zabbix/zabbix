@@ -189,7 +189,7 @@ class testFormTrigger extends CWebTest {
 		}
 
 		$this->zbxTestClickWait("//div[@class='w']//a[text()='Triggers']");
-		$this->checkTitle('Configuration of triggers');
+		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
 
 		if (isset($data['form'])) {
@@ -198,7 +198,7 @@ class testFormTrigger extends CWebTest {
 		else {
 			$this->zbxTestClickWait('form');
 		}
-		$this->checkTitle('Configuration of triggers');
+		$this->zbxTestCheckTitle('Configuration of triggers');
 
 		if (isset($data['constructor'])) {
 			switch ($data['constructor']) {
@@ -386,7 +386,7 @@ class testFormTrigger extends CWebTest {
 		$this->zbxTestClickWait("//div[@class='w']//a[text()='Triggers']");
 		$this->zbxTestClickWait('link='.$data['description']);
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of triggers');
+		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->zbxTestTextPresent('Trigger updated');
 		$this->zbxTestTextPresent($data['description']);
 		$this->zbxTestTextPresent('TRIGGERS');
@@ -737,12 +737,12 @@ class testFormTrigger extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickWait('link='.$this->host);
 		$this->zbxTestClickWait("//div[@class='w']//a[text()='Triggers']");
-		$this->checkTitle('Configuration of triggers');
+		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
 		$this->zbxTestClickWait('form');
-		$this->checkTitle('Configuration of triggers');
+		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
 
 		if (isset($data['description'])) {
@@ -852,12 +852,12 @@ class testFormTrigger extends CWebTest {
 			switch ($data['expected']) {
 				case TEST_GOOD:
 					$this->zbxTestTextPresent('Trigger added');
-					$this->checkTitle('Configuration of triggers');
+					$this->zbxTestCheckTitle('Configuration of triggers');
 					$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
 					$this->zbxTestTextPresent(array($description, $expression));
 					break;
 				case TEST_BAD:
-					$this->checkTitle('Configuration of triggers');
+					$this->zbxTestCheckTitle('Configuration of triggers');
 					$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
 					foreach ($data['errors'] as $msg) {
 						$this->zbxTestTextPresent($msg);

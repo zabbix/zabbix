@@ -29,14 +29,14 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 	public function testFormAdministrationGeneralRegexp_Layout() {
 		$this->zbxTestLogin('adm.gui.php');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Regular expressions');
-		$this->checkTitle('Configuration of regular expressions');
+		$this->zbxTestCheckTitle('Configuration of regular expressions');
 		$this->zbxTestTextPresent('CONFIGURATION OF REGULAR EXPRESSIONS');
 		$this->zbxTestTextPresent(array('Regular expressions', 'Name', 'Expressions'));
 
 		// clicking "New regular expression" button
 		$this->zbxTestClickWait('form');
 
-		$this->checkTitle('Configuration of regular expressions');
+		$this->zbxTestCheckTitle('Configuration of regular expressions');
 		$this->zbxTestTextPresent('CONFIGURATION OF REGULAR EXPRESSIONS');
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestTextPresent('Expressions');
