@@ -122,6 +122,31 @@ ZBX_THREAD_SENDVAL_ARGS;
 
 /******************************************************************************
  *                                                                            *
+ * Function: update_exit_status                                               *
+ *                                                                            *
+ * Purpose: manage exit status updates after batch sends                      *
+ *                                                                            *
+ * Comments: SUCCEED_PARTIAL status should be sticky in the sense that        *
+ *           SUCCEED statuses that come after should not overwrite it         *
+ *                                                                            *
+ ******************************************************************************/
+static int	update_exit_status(int old_status, int new_status)
+{
+	if (FAIL == old_status || FAIL == new_status || (unsigned char)FAIL == new_status)
+		return FAIL;
+
+	if (SUCCEED == old_status)
+		return new_status;
+
+	if (SUCCEED_PARTIAL == old_status)
+		return old_status;
+
+	THIS_SHOULD_NEVER_HAPPEN;
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: check_response                                                   *
  *                                                                            *
  * Purpose: Check whether JSON response is SUCCEED                            *
@@ -348,7 +373,7 @@ int	main(int argc, char **argv)
 	FILE			*in;
 	char			in_line[MAX_BUFFER_LEN], hostname[MAX_STRING_LEN], key[MAX_STRING_LEN],
 				key_value[MAX_BUFFER_LEN], clock[32];
-	int			total_count = 0, succeed_count = 0, buffer_count = 0, read_more = 0, ret = SUCCEED;
+	int			total_count = 0, succeed_count = 0, buffer_count = 0, read_more = 0, ret = FAIL;
 	double			last_send = 0;
 	const char		*p;
 	zbx_thread_args_t	thread_args;
@@ -401,9 +426,10 @@ int	main(int argc, char **argv)
 		else if (NULL == (in = fopen(INPUT_FILE, "r")) )
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot open [%s]: %s", INPUT_FILE, zbx_strerror(errno));
-			ret = FAIL;
 			goto exit;
 		}
+
+		ret = SUCCEED;
 
 		while ((SUCCEED == ret || SUCCEED_PARTIAL == ret) && NULL != fgets(in_line, sizeof(in_line), in))
 		{
@@ -418,25 +444,28 @@ int	main(int argc, char **argv)
 			if ('\0' == *p || NULL == (p = get_string(p, hostname, sizeof(hostname))) || '\0' == *hostname)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "[line %d] 'Hostname' required", total_count);
-				continue;
+				ret = FAIL;
+				break;
 			}
 
 			if (0 == strcmp(hostname, "-"))
 			{
-			       if (NULL == ZABBIX_HOSTNAME)
-			       {
-				       zabbix_log(LOG_LEVEL_WARNING, "[line %d] '-' encountered as 'Hostname', "
+				if (NULL == ZABBIX_HOSTNAME)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "[line %d] '-' encountered as 'Hostname', "
 							"but no default hostname was specified", total_count);
-				       continue;
-			       }
-			       else
-				       zbx_strlcpy(hostname, ZABBIX_HOSTNAME, sizeof(hostname));
+					ret = FAIL;
+					break;
+				}
+				else
+					zbx_strlcpy(hostname, ZABBIX_HOSTNAME, sizeof(hostname));
 			}
 
 			if ('\0' == *p || NULL == (p = get_string(p, key, sizeof(key))) || '\0' == *key)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "[line %d] 'Key' required", total_count);
-				continue;
+				ret = FAIL;
+				break;
 			}
 
 			if (1 == WITH_TIMESTAMPS)
@@ -444,16 +473,20 @@ int	main(int argc, char **argv)
 				if ('\0' == *p || NULL == (p = get_string(p, clock, sizeof(clock))) || '\0' == *clock)
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "[line %d] 'Timestamp' required", total_count);
-					continue;
+					ret = FAIL;
+					break;
 				}
 			}
 
 			if ('\0' != *p && '"' != *p)
+			{
 				zbx_strlcpy(key_value, p, sizeof(key_value));
+			}
 			else if ('\0' == *p || NULL == (p = get_string(p, key_value, sizeof(key_value))) || '\0' == *key_value)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "[line %d] 'Key value' required", total_count);
-				continue;
+				ret = FAIL;
+				break;
 			}
 
 			zbx_rtrim(key_value, "\r\n");
@@ -505,7 +538,7 @@ int	main(int argc, char **argv)
 
 				last_send = zbx_time();
 
-				ret = zbx_thread_wait(zbx_thread_start(send_value, &thread_args));
+				ret = update_exit_status(ret, zbx_thread_wait(zbx_thread_start(send_value, &thread_args)));
 
 				buffer_count = 0;
 				zbx_json_clean(&sentdval_args.json);
@@ -514,14 +547,15 @@ int	main(int argc, char **argv)
 				zbx_json_addarray(&sentdval_args.json, ZBX_PROTO_TAG_DATA);
 			}
 		}
-		zbx_json_close(&sentdval_args.json);
 
-		if (0 != buffer_count)
+		if (FAIL != ret && 0 != buffer_count)
 		{
+			zbx_json_close(&sentdval_args.json);
+
 			if (1 == WITH_TIMESTAMPS)
 				zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
 
-			ret = zbx_thread_wait(zbx_thread_start(send_value, &thread_args));
+			ret = update_exit_status(ret, zbx_thread_wait(zbx_thread_start(send_value, &thread_args)));
 		}
 
 		if (in != stdin)
@@ -549,6 +583,8 @@ int	main(int argc, char **argv)
 				break;
 			}
 
+			ret = SUCCEED;
+
 			zbx_json_addobject(&sentdval_args.json, NULL);
 			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_HOST, ZABBIX_HOSTNAME, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_KEY, ZABBIX_KEY, ZBX_JSON_TYPE_STRING);
@@ -557,14 +593,14 @@ int	main(int argc, char **argv)
 
 			succeed_count++;
 
-			ret = zbx_thread_wait(zbx_thread_start(send_value, &thread_args));
+			ret = update_exit_status(ret, zbx_thread_wait(zbx_thread_start(send_value, &thread_args)));
 		}
 		while (0); /* try block simulation */
 	}
 
 	zbx_json_free(&sentdval_args.json);
 
-	if (FAIL != ret && (unsigned char)FAIL != ret)
+	if (FAIL != ret)
 	{
 		printf("sent: %d; skipped: %d; total: %d\n", succeed_count, total_count - succeed_count, total_count);
 	}
@@ -576,8 +612,7 @@ int	main(int argc, char **argv)
 exit:
 	zabbix_close_log();
 
-	/* convert FAIL (-1) or FAIL returned from thread (255) to EXIT_FAILURE */
-	if (FAIL == ret || (unsigned char)FAIL == ret)
+	if (FAIL == ret)
 		ret = EXIT_FAILURE;
 
 	return ret;
