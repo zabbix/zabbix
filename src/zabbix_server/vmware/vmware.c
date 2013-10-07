@@ -693,6 +693,8 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 			goto out;
 		}
 
+		page.offset = 0;
+
 		if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 		{
 			*error = zbx_strdup(*error, curl_easy_strerror(err));
@@ -2686,7 +2688,7 @@ void	main_vmware_loop(void)
 			state = ZBX_VMWARE_SERVICE_IDLE;
 
 			now = time(NULL);
-			next_update = now + ZBX_VMWARE_CACHE_TTL;
+			next_update = now + POLLER_DELAY;
 
 			zbx_vmware_lock();
 
@@ -2723,9 +2725,7 @@ void	main_vmware_loop(void)
 
 		} while (ZBX_VMWARE_SERVICE_IDLE != state);
 
-		now = time(NULL);
-
-		if (next_update > now)
+		if (next_update > (now = time(NULL)))
 		{
 			zbx_setproctitle("%s [sleeping]", get_process_type_string(process_type));
 			zbx_sleep_loop(next_update - now);
