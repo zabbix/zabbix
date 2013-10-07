@@ -148,7 +148,7 @@ static size_t	HEADERFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userda
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_strdup                                                    *
+ * Function: vmware_shared_strdup                                             *
  *                                                                            *
  * Purpose: duplicates the specified string into shared memory                *
  *                                                                            *
@@ -160,7 +160,7 @@ static size_t	HEADERFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userda
  *           shared memory to duplicate the string                            *
  *                                                                            *
  ******************************************************************************/
-static char	*vmware_strdup(const char *source)
+static char	*vmware_shared_strdup(const char *source)
 {
 	char	*ptr = NULL;
 	size_t	len;
@@ -177,14 +177,14 @@ static char	*vmware_strdup(const char *source)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_datastore_free                                            *
+ * Function: vmware_datastore_shared_free                                     *
  *                                                                            *
  * Purpose: frees shared resources allocated to store datastore data          *
  *                                                                            *
  * Parameters: datastore   - [IN] the datastore                               *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_datastore_free(zbx_vmware_datastore_t *datastore)
+static void	vmware_datastore_shared_free(zbx_vmware_datastore_t *datastore)
 {
 	if (NULL != datastore->name)
 		__vm_mem_free_func(datastore->name);
@@ -197,14 +197,14 @@ static void	vmware_datastore_free(zbx_vmware_datastore_t *datastore)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_dev_free                                                  *
+ * Function: vmware_dev_shared_free                                           *
  *                                                                            *
  * Purpose: frees shared resources allocated to store vm device data          *
  *                                                                            *
  * Parameters: dev   - [IN] the vm device                                     *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_dev_free(zbx_vmware_dev_t *dev)
+static void	vmware_dev_shared_free(zbx_vmware_dev_t *dev)
 {
 	if (NULL != dev->instance)
 		__vm_mem_free_func(dev->instance);
@@ -214,16 +214,16 @@ static void	vmware_dev_free(zbx_vmware_dev_t *dev)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_vm_free                                                   *
+ * Function: vmware_vm_shared_free                                            *
  *                                                                            *
  * Purpose: frees shared resources allocated to store virtual machine         *
  *                                                                            *
  * Parameters: vm   - [IN] the virtual machine                                *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_vm_free(zbx_vmware_vm_t *vm)
+static void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
 {
-	zbx_vector_ptr_clean(&vm->devs, (zbx_mem_free_func_t)vmware_dev_free);
+	zbx_vector_ptr_clean(&vm->devs, (zbx_mem_free_func_t)vmware_dev_shared_free);
 	zbx_vector_ptr_destroy(&vm->devs);
 
 	if (NULL != vm->id)
@@ -243,19 +243,19 @@ static void	vmware_vm_free(zbx_vmware_vm_t *vm)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_hv_free                                                   *
+ * Function: vmware_hv_shared_free                                            *
  *                                                                            *
- * Purpose: frees shared resources allocated to store vmware hypervior        *
+ * Purpose: frees shared resources allocated to store vmware hypervisor       *
  *                                                                            *
  * Parameters: hv   - [IN] the vmware hypervisor                              *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_hv_free(zbx_vmware_hv_t *hv)
+static void	vmware_hv_shared_free(zbx_vmware_hv_t *hv)
 {
-	zbx_vector_ptr_clean(&hv->datastores, (zbx_mem_free_func_t)vmware_datastore_free);
+	zbx_vector_ptr_clean(&hv->datastores, (zbx_mem_free_func_t)vmware_datastore_shared_free);
 	zbx_vector_ptr_destroy(&hv->datastores);
 
-	zbx_vector_ptr_clean(&hv->vms, (zbx_mem_free_func_t)vmware_vm_free);
+	zbx_vector_ptr_clean(&hv->vms, (zbx_mem_free_func_t)vmware_vm_shared_free);
 	zbx_vector_ptr_destroy(&hv->vms);
 
 	if (NULL != hv->uuid)
@@ -278,14 +278,14 @@ static void	vmware_hv_free(zbx_vmware_hv_t *hv)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_cluster_free                                              *
+ * Function: vmware_cluster_shared_free                                       *
  *                                                                            *
  * Purpose: frees shared resources allocated to store vmware cluster          *
  *                                                                            *
  * Parameters: cluster   - [IN] the vmware cluster                            *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_cluster_free(zbx_vmware_cluster_t *cluster)
+static void	vmware_cluster_shared_free(zbx_vmware_cluster_t *cluster)
 {
 	if (NULL != cluster->name)
 		__vm_mem_free_func(cluster->name);
@@ -301,21 +301,21 @@ static void	vmware_cluster_free(zbx_vmware_cluster_t *cluster)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_data_free                                                 *
+ * Function: vmware_data_shared_free                                          *
  *                                                                            *
  * Purpose: frees shared resources allocated to store vmware service data     *
  *                                                                            *
  * Parameters: data   - [IN] the vmware service data                          *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_data_free(zbx_vmware_data_t *data)
+static void	vmware_data_shared_free(zbx_vmware_data_t *data)
 {
 	if (NULL != data)
 	{
-		zbx_vector_ptr_clean(&data->hvs, (zbx_mem_free_func_t)vmware_hv_free);
+		zbx_vector_ptr_clean(&data->hvs, (zbx_mem_free_func_t)vmware_hv_shared_free);
 		zbx_vector_ptr_destroy(&data->hvs);
 
-		zbx_vector_ptr_clean(&data->clusters, (zbx_mem_free_func_t)vmware_cluster_free);
+		zbx_vector_ptr_clean(&data->clusters, (zbx_mem_free_func_t)vmware_cluster_shared_free);
 		zbx_vector_ptr_destroy(&data->clusters);
 
 		if (NULL != data->events)
@@ -337,15 +337,298 @@ static void	vmware_data_free(zbx_vmware_data_t *data)
  * Parameters: data   - [IN] the vmware service data                          *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_service_free(zbx_vmware_service_t *service)
+static void	vmware_service_shared_free(zbx_vmware_service_t *service)
 {
 	__vm_mem_free_func(service->url);
 	__vm_mem_free_func(service->username);
 	__vm_mem_free_func(service->password);
 
-	vmware_data_free(service->data);
+	vmware_data_shared_free(service->data);
 
 	__vm_mem_free_func(service);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_cluster_shared_dup                                        *
+ *                                                                            *
+ * Purpose: copies vmware cluster object into shared memory                   *
+ *                                                                            *
+ * Parameters: src   - [IN] the vmware cluster object                         *
+ *                                                                            *
+ * Return value: a copied vmware cluster object                               *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_vmware_cluster_t	*vmware_cluster_shared_dup(const zbx_vmware_cluster_t *src)
+{
+	zbx_vmware_cluster_t	*cluster;
+
+	cluster = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_cluster_t));
+	cluster->id = vmware_shared_strdup(src->id);
+	cluster->name = vmware_shared_strdup(src->name);
+	cluster->status = vmware_shared_strdup(src->status);
+
+	return cluster;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_datastore_shared_dup                                      *
+ *                                                                            *
+ * Purpose: copies vmware hypervisor datastore object into shared memory      *
+ *                                                                            *
+ * Parameters: src   - [IN] the vmware datastore object                       *
+ *                                                                            *
+ * Return value: a duplicated vmware datastore object                         *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_vmware_datastore_t	*vmware_datastore_shared_dup(const zbx_vmware_datastore_t *src)
+{
+	zbx_vmware_datastore_t	*datastore;
+
+	datastore = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_datastore_t));
+	datastore->uuid = vmware_shared_strdup(src->uuid);
+	datastore->name = vmware_shared_strdup(src->name);
+
+	return datastore;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_dev_shared_dup                                            *
+ *                                                                            *
+ * Purpose: copies vmware virtual machine device object into shared memory    *
+ *                                                                            *
+ * Parameters: src   - [IN] the vmware device object                          *
+ *                                                                            *
+ * Return value: a duplicated vmware device object                            *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_vmware_dev_t	*vmware_dev_shared_dup(const zbx_vmware_dev_t *src)
+{
+	zbx_vmware_dev_t	*dev;
+
+	dev = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_dev_t));
+	dev->type = src->type;
+	dev->instance = vmware_shared_strdup(src->instance);
+
+	return dev;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_vm_shared_dup                                             *
+ *                                                                            *
+ * Purpose: copies vmware virtual machine object into shared memory           *
+ *                                                                            *
+ * Parameters: src   - [IN] the vmware virtual machine object                 *
+ *                                                                            *
+ * Return value: a duplicated vmware virtual machine object                   *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_vmware_vm_t	*vmware_vm_shared_dup(const zbx_vmware_vm_t *src)
+{
+	zbx_vmware_vm_t	*vm;
+	int		i;
+
+	vm = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_vm_t));
+
+	VMWARE_VECTOR_CREATE(&vm->devs, ptr);
+
+	vm->id = vmware_shared_strdup(src->id);
+	vm->uuid = vmware_shared_strdup(src->uuid);
+	vm->details = vmware_shared_strdup(src->details);
+	vm->stats = vmware_shared_strdup(src->stats);
+
+	for (i = 0; i < src->devs.values_num; i++)
+		zbx_vector_ptr_append(&vm->devs, vmware_dev_shared_dup(src->devs.values[i]));
+
+	return vm;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_hv_shared_dup                                             *
+ *                                                                            *
+ * Purpose: copies vmware hypervisor object into shared memory                *
+ *                                                                            *
+ * Parameters: src   - [IN] the vmware hypervisor object                      *
+ *                                                                            *
+ * Return value: a duplicated vmware hypervisor object                        *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_vmware_hv_t	*vmware_hv_shared_dup(const zbx_vmware_hv_t *src)
+{
+	zbx_vmware_hv_t	*hv;
+	int		i;
+
+	hv = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_hv_t));
+
+	VMWARE_VECTOR_CREATE(&hv->datastores, ptr);
+	VMWARE_VECTOR_CREATE(&hv->vms, ptr);
+
+	hv->uuid = vmware_shared_strdup(src->uuid);
+	hv->id = vmware_shared_strdup(src->id);
+	hv->details = vmware_shared_strdup(src->details);
+	hv->stats = vmware_shared_strdup(src->stats);
+	hv->clusterid = vmware_shared_strdup(src->clusterid);
+
+	for (i = 0; i < src->datastores.values_num; i++)
+		zbx_vector_ptr_append(&hv->datastores, vmware_datastore_shared_dup(src->datastores.values[i]));
+
+	for (i = 0; i < src->vms.values_num; i++)
+		zbx_vector_ptr_append(&hv->vms, vmware_vm_shared_dup(src->vms.values[i]));
+
+	return hv;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_data_shared_dup                                           *
+ *                                                                            *
+ * Purpose: copies vmware data object into shared memory                      *
+ *                                                                            *
+ * Parameters: src   - [IN] the vmware data object                      *
+ *                                                                            *
+ * Return value: a duplicated vmware data object                        *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_vmware_data_t	*vmware_data_shared_dup(const zbx_vmware_data_t *src)
+{
+	zbx_vmware_data_t	*data;
+	int			i;
+
+	data = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_data_t));
+
+	VMWARE_VECTOR_CREATE(&data->hvs, ptr);
+	VMWARE_VECTOR_CREATE(&data->clusters, ptr);
+
+	data->events = vmware_shared_strdup(src->events);
+	data->error =  vmware_shared_strdup(src->error);
+
+	for (i = 0; i < src->clusters.values_num; i++)
+		zbx_vector_ptr_append(&data->clusters, vmware_cluster_shared_dup(src->clusters.values[i]));
+
+	for (i = 0; i < src->hvs.values_num; i++)
+		zbx_vector_ptr_append(&data->hvs, vmware_hv_shared_dup(src->hvs.values[i]));
+
+	return data;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_datastore_free                                            *
+ *                                                                            *
+ * Purpose: resources allocated to store datastore data                       *
+ *                                                                            *
+ * Parameters: datastore   - [IN] the datastore                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_datastore_free(zbx_vmware_datastore_t *datastore)
+{
+	zbx_free(datastore->name);
+	zbx_free(datastore->uuid);
+	zbx_free(datastore);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_dev_free                                                  *
+ *                                                                            *
+ * Purpose: resources allocated to store vm device data                       *
+ *                                                                            *
+ * Parameters: dev   - [IN] the vm device                                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_dev_free(zbx_vmware_dev_t *dev)
+{
+	zbx_free(dev->instance);
+	zbx_free(dev);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_vm_free                                                   *
+ *                                                                            *
+ * Purpose: resources allocated to store virtual machine                      *
+ *                                                                            *
+ * Parameters: vm   - [IN] the virtual machine                                *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_vm_free(zbx_vmware_vm_t *vm)
+{
+	zbx_vector_ptr_clean(&vm->devs, (zbx_mem_free_func_t)vmware_dev_free);
+	zbx_vector_ptr_destroy(&vm->devs);
+
+	zbx_free(vm->id);
+	zbx_free(vm->uuid);
+	zbx_free(vm->stats);
+	zbx_free(vm->details);
+	zbx_free(vm);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_hv_free                                                   *
+ *                                                                            *
+ * Purpose: resources allocated to store vmware hypervior                     *
+ *                                                                            *
+ * Parameters: hv   - [IN] the vmware hypervisor                              *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_hv_free(zbx_vmware_hv_t *hv)
+{
+	zbx_vector_ptr_clean(&hv->datastores, (zbx_mem_free_func_t)vmware_datastore_free);
+	zbx_vector_ptr_destroy(&hv->datastores);
+
+	zbx_vector_ptr_clean(&hv->vms, (zbx_mem_free_func_t)vmware_vm_free);
+	zbx_vector_ptr_destroy(&hv->vms);
+
+	zbx_free(hv->uuid);
+	zbx_free(hv->id);
+	zbx_free(hv->details);
+	zbx_free(hv->clusterid);
+	zbx_free(hv->stats);
+	zbx_free(hv);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_cluster_free                                              *
+ *                                                                            *
+ * Purpose: resources allocated to store vmware cluster                       *
+ *                                                                            *
+ * Parameters: cluster   - [IN] the vmware cluster                            *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_cluster_free(zbx_vmware_cluster_t *cluster)
+{
+	zbx_free(cluster->name);
+	zbx_free(cluster->id);
+	zbx_free(cluster->status);
+	zbx_free(cluster);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_data_free                                                 *
+ *                                                                            *
+ * Purpose: resources allocated to store vmware service data                  *
+ *                                                                            *
+ * Parameters: data   - [IN] the vmware service data                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_data_free(zbx_vmware_data_t *data)
+{
+	zbx_vector_ptr_clean(&data->hvs, (zbx_mem_free_func_t)vmware_hv_free);
+	zbx_vector_ptr_destroy(&data->hvs);
+
+	zbx_vector_ptr_clean(&data->clusters, (zbx_mem_free_func_t)vmware_cluster_free);
+	zbx_vector_ptr_destroy(&data->clusters);
+
+	zbx_free(data->events);
+	zbx_free(data->error);
+	zbx_free(data);
 }
 
 /******************************************************************************
@@ -777,8 +1060,6 @@ out:
  * Return value: SUCCEED - the operation has completed successfully           *
  *               FAIL    - the operation has failed                           *
  *                                                                            *
- * Comments: The resulting data is allocated in shared memory.                *
- *                                                                            *
  ******************************************************************************/
 static int	 vmware_service_hv_get_stats (const zbx_vmware_service_t *service, CURL *easyhandle,
 		zbx_vmware_hv_t *hv, char **error)
@@ -836,7 +1117,7 @@ static int	 vmware_service_hv_get_stats (const zbx_vmware_service_t *service, CU
 	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
 		goto out;
 
-	hv->stats = vmware_strdup(page.data);
+	hv->stats = zbx_strdup(NULL, page.data);
 
 	ret = SUCCEED;
 out:
@@ -860,8 +1141,6 @@ out:
  *                                                                            *
  * Return value: SUCCEED - the operation has completed successfully           *
  *               FAIL    - the operation has failed                           *
- *                                                                            *
- * Comments: The resulting data is allocated in shared memory.                *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_vm_get_stats(const zbx_vmware_service_t *service, CURL *easyhandle, zbx_vmware_vm_t *vm,
@@ -939,7 +1218,7 @@ static int	vmware_service_vm_get_stats(const zbx_vmware_service_t *service, CURL
 	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
 		goto out;
 
-	vm->stats = vmware_strdup(page.data);
+	vm->stats = zbx_strdup(NULL, page.data);
 
 	ret = SUCCEED;
 out:
@@ -998,9 +1277,9 @@ static void	wmware_vm_get_nic_devices(zbx_vmware_vm_t *vm)
 		if (NULL == (key = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], "*[local-name()='key']")))
 			continue;
 
-		dev = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_dev_t));
+		dev = zbx_malloc(NULL, sizeof(zbx_vmware_dev_t));
 		dev->type =  ZBX_VMWARE_DEV_TYPE_NIC;
-		dev->instance = vmware_strdup(key);
+		dev->instance = zbx_strdup(NULL, key);
 
 		zbx_vector_ptr_append(&vm->devs, dev);
 		nics++;
@@ -1060,7 +1339,7 @@ static void	wmware_vm_get_devices_by_counterid(zbx_vmware_vm_t *vm, zbx_uint64_t
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
-		char		*instance;
+		char			*instance;
 		zbx_vmware_dev_t	*dev;
 
 		if (NULL == (instance = zbx_xml_read_node_value(doc, nodeset->nodeTab[i],
@@ -1069,9 +1348,9 @@ static void	wmware_vm_get_devices_by_counterid(zbx_vmware_vm_t *vm, zbx_uint64_t
 			continue;
 		}
 
-		dev = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_dev_t));
+		dev = zbx_malloc(NULL, sizeof(zbx_vmware_dev_t));
 		dev->type =  ZBX_VMWARE_DEV_TYPE_DISK;
-		dev->instance = vmware_strdup(instance);
+		dev->instance = zbx_strdup(NULL, instance);
 
 		zbx_vector_ptr_append(&vm->devs, dev);
 		nics++;
@@ -1103,8 +1382,6 @@ out:
  *                                                                            *
  * Return value: SUCCEED - the operation has completed successfully           *
  *               FAIL    - the operation has failed                           *
- *                                                                            *
- * Comments: The resulting data is allocated in shared memory.                *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_get_vm_data(const zbx_vmware_service_t *service, CURL *easyhandle, const char *vmid,
@@ -1156,7 +1433,7 @@ static int	vmware_service_get_vm_data(const zbx_vmware_service_t *service, CURL 
 	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
 		goto out;
 
-	*data = vmware_strdup(page.data);
+	*data = zbx_strdup(NULL, page.data);
 
 	ret = SUCCEED;
 out:
@@ -1179,9 +1456,6 @@ out:
  * Return value: The created virtual machine object or NULL if an error was   *
  *               detected.                                                    *
  *                                                                            *
- * Comments: The returned virtual machine object is allocated in shared       *
- *           memory and must be freed with vmware_vm_free() function.         *
- *                                                                            *
  ******************************************************************************/
 static zbx_vmware_vm_t	*vmware_service_create_vm(const zbx_vmware_service_t *service,  CURL *easyhandle,
 		const char *id, char **error)
@@ -1193,10 +1467,10 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(const zbx_vmware_service_t *ser
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() vmid:'%s'", __function_name, id);
 
-	vm = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_vm_t));
+	vm = zbx_malloc(NULL, sizeof(zbx_vmware_vm_t));
 	memset(vm, 0, sizeof(zbx_vmware_vm_t));
 
-	VMWARE_VECTOR_CREATE(&vm->devs, ptr);
+	zbx_vector_ptr_create(&vm->devs);
 
 	if (SUCCEED != vmware_service_get_vm_data(service, easyhandle, id, &vm->details, error))
 		goto out;
@@ -1204,10 +1478,9 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(const zbx_vmware_service_t *ser
 	if (NULL == (value = zbx_xml_read_value(vm->details, ZBX_XPATH_LN1("uuid"))))
 		goto out;
 
-	vm->uuid = vmware_strdup(value);
-	zbx_free(value);
+	vm->uuid = value;
 
-	vm->id = vmware_strdup(id);
+	vm->id = zbx_strdup(NULL, id);
 
 	wmware_vm_get_nic_devices(vm);
 
@@ -1220,7 +1493,7 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(const zbx_vmware_service_t *ser
 out:
 	if (SUCCEED != ret)
 	{
-		vmware_vm_free(vm);
+		vmware_vm_shared_free(vm);
 		vm = NULL;
 	}
 
@@ -1241,9 +1514,6 @@ out:
  *                                                                            *
  * Return value: The created datastore object or NULL if an error was         *
  *                detected                                                    *
- *                                                                            *
- * Comments: The returned datastore object is allocated in shared memory and  *
- *           must be freed with vmware_datastore_free() function.             *
  *                                                                            *
  ******************************************************************************/
 static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_service_t *service, CURL *easyhandle,
@@ -1305,16 +1575,13 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 		zbx_free(url);
 	}
 out:
-	datastore = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_datastore_t));
-
-	datastore->name = vmware_strdup(NULL != name ? name : id);
+	datastore = zbx_malloc(NULL, sizeof(zbx_vmware_datastore_t));
+	datastore->name = (NULL != name) ? name : zbx_strdup(NULL, id);
 
 	if (NULL != uuid)
 	{
-		datastore->uuid = vmware_strdup(uuid);
-		zbx_free(uuid);
+		datastore->uuid = uuid;
 	}
-	zbx_free(name);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name,
 			zbx_result_string(NULL != datastore ? SUCCEED : FAIL));
@@ -1336,8 +1603,6 @@ out:
  *                                                                            *
  * Return value: SUCCEED - the operation has completed successfully           *
  *               FAIL    - the operation has failed                           *
- *                                                                            *
- * Comments: The resulting data is allocated in shared memory.                *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL *easyhandle, const char *hvid,
@@ -1390,7 +1655,7 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
 		goto out;
 
-	*data = vmware_strdup(page.data);
+	*data = zbx_strdup(NULL, page.data);
 
 	ret = SUCCEED;
 out:
@@ -1413,9 +1678,6 @@ out:
  * Return value: The created vmware hypervisor object or NULL if an error was *
  *               detected.                                                    *
  *                                                                            *
- * Comments: The returned vmware hypervisor object is allocated in shared     *
- *           memory and must be freed with vmware_hv_free() function.         *
- *                                                                            *
  ******************************************************************************/
 static zbx_vmware_hv_t	*vmware_service_create_hv(const zbx_vmware_service_t *service, CURL *easyhandle,
 		const char *id, char **error)
@@ -1428,11 +1690,11 @@ static zbx_vmware_hv_t	*vmware_service_create_hv(const zbx_vmware_service_t *ser
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hvid:'%s'", __function_name, id);
 
-	hv = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_hv_t));
+	hv = zbx_malloc(NULL, sizeof(zbx_vmware_hv_t));
 	memset(hv, 0, sizeof(zbx_vmware_hv_t));
 
-	VMWARE_VECTOR_CREATE(&hv->datastores, ptr);
-	VMWARE_VECTOR_CREATE(&hv->vms, ptr);
+	zbx_vector_ptr_create(&hv->datastores);
+	zbx_vector_ptr_create(&hv->vms);
 
 	zbx_vector_str_create(&datastores);
 	zbx_vector_str_create(&vms);
@@ -1443,15 +1705,12 @@ static zbx_vmware_hv_t	*vmware_service_create_hv(const zbx_vmware_service_t *ser
 	if (NULL == (value = zbx_xml_read_value(hv->details, ZBX_XPATH_LN2("hardware", "uuid"))))
 		goto out;
 
-	hv->uuid = vmware_strdup(value);
-	zbx_free(value);
-
-	hv->id = vmware_strdup(id);
+	hv->uuid = value;
+	hv->id = zbx_strdup(NULL, id);
 
 	if (NULL != (value = zbx_xml_read_value(hv->details, "//*[@type='ClusterComputeResource']")))
 	{
-		hv->clusterid = vmware_strdup(value);
-		zbx_free(value);
+		hv->clusterid = value;
 	}
 
 	zbx_xml_read_values(hv->details, "//*[@type='Datastore']", &datastores);
@@ -1475,7 +1734,6 @@ static zbx_vmware_hv_t	*vmware_service_create_hv(const zbx_vmware_service_t *ser
 
 		if (NULL != (vm = vmware_service_create_vm(service, easyhandle, vms.values[i], error)))
 			zbx_vector_ptr_append(&hv->vms, vm);
-
 	}
 
 	ret = SUCCEED;
@@ -1756,8 +2014,6 @@ out:
  * Return value: SUCCEED - the operation has completed successfully           *
  *               FAIL    - the operation has failed                           *
  *                                                                            *
- * Comments: The resulting data is allocated in shared memory.                *
- *                                                                            *
  ******************************************************************************/
 static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CURL *easyhandle, char **events,
 		char **error)
@@ -1810,7 +2066,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
 		goto out;
 
-	*events = vmware_strdup(page.data);
+	*events = zbx_strdup(NULL, page.data);
 
 	ret = SUCCEED;
 out:
@@ -2077,8 +2333,6 @@ out:
  * Return value: SUCCEED - the operation has completed successfully           *
  *               FAIL    - the operation has failed                           *
  *                                                                            *
- * Comments: The restulting data is allocated in shared memory.               *
- *                                                                            *
  ******************************************************************************/
 static int	vmware_service_get_cluster_list(const zbx_vmware_service_t *service, CURL *easyhandle,
 		zbx_vector_ptr_t *clusters, char **error)
@@ -2115,15 +2369,12 @@ static int	vmware_service_get_cluster_list(const zbx_vmware_service_t *service, 
 			goto out;
 		}
 
-		cluster = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_cluster_t));
-		cluster->id = vmware_strdup(ids.values[i]);
-		cluster->name = vmware_strdup(name);
-		cluster->status = vmware_strdup(status);
+		cluster = zbx_malloc(NULL, sizeof(zbx_vmware_cluster_t));
+		cluster->id = zbx_strdup(NULL, ids.values[i]);
+		cluster->name = name;
+		cluster->status = status;
 
 		zbx_vector_ptr_append(clusters, cluster);
-
-		zbx_free(status);
-		zbx_free(name);
 	}
 
 	ret = SUCCEED;
@@ -2152,7 +2403,9 @@ out:
  * Return value: SUCCEED - the operation has completed successfully           *
  *               FAIL    - the operation has failed                           *
  *                                                                            *
- * Comments: The vmware service object is allocated in shared memory.         *
+ * Comments: While the service object can't be accessed from other processes  *
+ *           during initialization it's still processed outside vmware locks  *
+ *           and therefore must not allocate/free shared memory.              *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_initialize(zbx_vmware_service_t *service, CURL *easyhandle, char **error)
@@ -2175,11 +2428,6 @@ out:
  *                                                                            *
  * Parameters: service      - [IN] the vmware service                         *
  *                                                                            *
- * Comments: This function first creates a new data object in shared memory   *
- *           from the new data retrieved from vmware service, then locks      *
- *           vmware lock, swaps the old data with new, frees the old data and *
- *           unlocks vmware lock.                                             *
- *                                                                            *
  ******************************************************************************/
 static void	vmware_service_update(zbx_vmware_service_t *service)
 {
@@ -2188,17 +2436,16 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	CURL			*easyhandle = NULL;
 	struct curl_slist	*headers = NULL;
 	int			ret = FAIL, opt, err, i;
-	char			*error = NULL;
 	zbx_vmware_data_t	*data;
 	zbx_vector_str_t	hvs;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %s@%s", __function_name, service->username, service->url);
 
-	data = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_data_t));
+	data = zbx_malloc(NULL, sizeof(zbx_vmware_data_t));
 	memset(data, 0, sizeof(zbx_vmware_data_t));
 
-	VMWARE_VECTOR_CREATE(&data->hvs, ptr);
-	VMWARE_VECTOR_CREATE(&data->clusters, ptr);
+	zbx_vector_ptr_create(&data->hvs);
+	zbx_vector_ptr_create(&data->clusters);
 
 	zbx_vector_str_create(&hvs);
 
@@ -2217,29 +2464,29 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 		goto clean;
 	}
 
-	if (SUCCEED != vmware_service_authenticate(service, easyhandle, &error))
+	if (SUCCEED != vmware_service_authenticate(service, easyhandle, &data->error))
 		goto clean;
 
 	if (0 != (service->state & ZBX_VMWARE_STATE_NEW) &&
-			SUCCEED != vmware_service_initialize(service, easyhandle, &error))
+			SUCCEED != vmware_service_initialize(service, easyhandle, &data->error))
 		goto clean;
 
-	if (SUCCEED != vmware_service_get_hv_list(service, easyhandle, &hvs, &error))
+	if (SUCCEED != vmware_service_get_hv_list(service, easyhandle, &hvs, &data->error))
 		goto clean;
 
 	for (i = 0; i < hvs.values_num; i++)
 	{
 		zbx_vmware_hv_t	*hv;
 
-		if (NULL != (hv = vmware_service_create_hv(service, easyhandle, hvs.values[i], &error)))
+		if (NULL != (hv = vmware_service_create_hv(service, easyhandle, hvs.values[i], &data->error)))
 			zbx_vector_ptr_append(&data->hvs, hv);
 	}
 
-	if (SUCCEED != vmware_service_get_event_data(service, easyhandle, &data->events, &error))
+	if (SUCCEED != vmware_service_get_event_data(service, easyhandle, &data->events, &data->error))
 		goto clean;
 
 	if (ZBX_VMWARE_SERVICE_VCENTER == service->type &&
-			SUCCEED != vmware_service_get_cluster_list(service, easyhandle, &data->clusters, &error))
+			SUCCEED != vmware_service_get_cluster_list(service, easyhandle, &data->clusters, &data->error))
 	{
 		goto clean;
 	}
@@ -2253,18 +2500,13 @@ clean:
 	zbx_vector_str_clean(&hvs);
 	zbx_vector_str_destroy(&hvs);
 out:
-	if (NULL != error)
-	{
-		data->error = vmware_strdup(error);
-		zbx_free(error);
-	}
-
 	zbx_vmware_lock();
 
 	service->state = (SUCCEED == ret) ? ZBX_VMWARE_STATE_READY : ZBX_VMWARE_STATE_FAILED;
 
-	vmware_data_free(service->data);
-	service->data = data;
+	vmware_data_shared_free(service->data);
+	service->data = vmware_data_shared_dup(data);
+	vmware_data_free(data);
 
 	service->lastcheck = time(NULL);
 
@@ -2336,9 +2578,9 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 	service = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_service_t));
 	memset(service, 0, sizeof(zbx_vmware_service_t));
 
-	service->url = vmware_strdup(url);
-	service->username = vmware_strdup(username);
-	service->password = vmware_strdup(password);
+	service->url = vmware_shared_strdup(url);
+	service->username = vmware_shared_strdup(username);
+	service->password = vmware_shared_strdup(password);
 	service->type = ZBX_VMWARE_SERVICE_UNKNOWN;
 	service->state = ZBX_VMWARE_STATE_NEW;
 	service->lastaccess = now;
@@ -2458,7 +2700,7 @@ void	main_vmware_loop(void)
 				if (now - service->lastaccess > ZBX_VMWARE_SERVICE_TTL)
 				{
 					zbx_vector_ptr_remove(&vmware->services, i);
-					vmware_service_free(service);
+					vmware_service_shared_free(service);
 					state = ZBX_VMWARE_SERVICE_REMOVE;
 					break;
 				}
