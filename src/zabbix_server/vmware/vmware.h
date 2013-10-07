@@ -16,8 +16,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-#ifndef VMWARE_H_
-#define VMWARE_H_
+#ifndef ZABBIX_VMWARE_H
+#define ZABBIX_VMWARE_H
 
 #include "common.h"
 
