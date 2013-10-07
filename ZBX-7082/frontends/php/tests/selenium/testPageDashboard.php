@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 class testPageDashboard extends CWebTest {
 	public function testPageDashboard_CheckLayout() {
 		$this->zbxTestLogin('dashboard.php');
-		$this->checkTitle('Dashboard');
+		$this->zbxTestCheckTitle('Dashboard');
 		$this->zbxTestTextPresent('PERSONAL DASHBOARD');
 		$this->zbxTestTextPresent('Favourite graphs');
 		$this->zbxTestTextPresent('Favourite screens');
@@ -39,7 +39,7 @@ class testPageDashboard extends CWebTest {
 // Check that no real host or template names displayed
 	public function testPageDashboard_NoHostNames() {
 		$this->zbxTestLogin('dashboard.php');
-		$this->checkTitle('Dashboard');
+		$this->zbxTestCheckTitle('Dashboard');
 		$this->checkNoRealHostnames();
 	}
 }

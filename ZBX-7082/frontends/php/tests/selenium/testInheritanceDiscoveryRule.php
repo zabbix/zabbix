@@ -65,7 +65,7 @@ class testInheritanceDiscoveryRule extends CWebTest {
 		$this->zbxTestClickWait('link=Discovery rules');
 		$this->zbxTestClickWait('link='.$name);
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of discovery rules');
+		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rule updated');
 		$this->zbxTestTextPresent("$name");
 		$this->zbxTestTextPresent('DISCOVERY RULES');
@@ -827,7 +827,7 @@ class testInheritanceDiscoveryRule extends CWebTest {
 	public function testInheritanceDiscoveryRule_SimpleCreate($data) {
 		$this->zbxTestLogin('templates.php');
 
-		$this->checkTitle('Configuration of templates');
+		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestTextPresent('CONFIGURATION OF TEMPLATES');
 
 		// create a discovery rule on template
@@ -835,7 +835,7 @@ class testInheritanceDiscoveryRule extends CWebTest {
 		$this->zbxTestClickWait('link=Discovery rules');
 		$this->zbxTestClickWait('form');
 
-		$this->checkTitle('Configuration of discovery rules');
+		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
 		$this->zbxTestTextPresent('Discovery rule');
 
@@ -929,13 +929,13 @@ class testInheritanceDiscoveryRule extends CWebTest {
 			switch ($expected) {
 				case TEST_GOOD:
 					$this->zbxTestTextPresent('Discovery rule created');
-					$this->checkTitle('Configuration of discovery rules');
+					$this->zbxTestCheckTitle('Configuration of discovery rules');
 					$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
 					$this->zbxTestTextPresent(array('Item prototypes',  'Trigger prototypes', 'Graph prototypes'));
 					break;
 
 				case TEST_BAD:
-					$this->checkTitle('Configuration of discovery rules');
+					$this->zbxTestCheckTitle('Configuration of discovery rules');
 					$this->zbxTestTextPresent(array('CONFIGURATION OF DISCOVERY RULES','Discovery rule'));
 					foreach ($data['errors'] as $msg) {
 						$this->zbxTestTextPresent($msg);

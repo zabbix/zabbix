@@ -27,7 +27,7 @@ class testFormLogin extends CWebTest {
 
 	public function testFormLogin_LoginOK() {
 		$this->zbxTestLogin('dashboard.php');
-		$this->checkTitle('Dashboard');
+		$this->zbxTestCheckTitle('Dashboard');
 		$this->zbxTestClickWait('link=Logout');
 		$this->zbxTestTextPresent('Username');
 		$this->zbxTestTextPresent('Password');
@@ -44,7 +44,7 @@ class testFormLogin extends CWebTest {
 		DBsave_tables('users');
 
 		$this->zbxTestLogin('dashboard.php');
-		$this->checkTitle('Dashboard');
+		$this->zbxTestCheckTitle('Dashboard');
 		$this->zbxTestClickWait('link=Logout');
 		$this->zbxTestTextPresent('Username');
 		$this->zbxTestTextPresent('Password');
@@ -68,7 +68,7 @@ class testFormLogin extends CWebTest {
 		DBsave_tables('users');
 
 		$this->zbxTestLogin('dashboard.php');
-		$this->checkTitle('Dashboard');
+		$this->zbxTestCheckTitle('Dashboard');
 		$this->zbxTestClickWait('link=Logout');
 		$this->zbxTestTextPresent('Username');
 		$this->zbxTestTextPresent('Password');
@@ -99,7 +99,7 @@ class testFormLogin extends CWebTest {
 		DBsave_tables('users');
 
 		$this->zbxTestLogin('dashboard.php');
-		$this->checkTitle('Dashboard');
+		$this->zbxTestCheckTitle('Dashboard');
 		$this->zbxTestClickWait('link=Logout');
 		$this->zbxTestTextPresent('Username');
 		$this->zbxTestTextPresent('Password');
@@ -129,7 +129,7 @@ class testFormLogin extends CWebTest {
 		sleep(35);
 
 		$this->zbxTestLogin('dashboard.php');
-		$this->checkTitle('Dashboard');
+		$this->zbxTestCheckTitle('Dashboard');
 		$this->zbxTestClickWait('link=Logout');
 		$this->zbxTestTextPresent(array('Username', 'Password'));
 

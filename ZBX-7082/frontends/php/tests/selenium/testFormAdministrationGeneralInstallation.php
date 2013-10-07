@@ -75,7 +75,7 @@ class testFormAdministrationGeneralInstallation extends CWebTest {
 		$this->zbxTestLogin();
 		// Setup Welcome page
 		$this->zbxTestOpen($this->pageLink);
-		$this->checkTitle($this->pageName);
+		$this->zbxTestCheckTitle($this->pageName);
 
 		foreach ($this->failIfExists as $str) {
 			$this->zbxTestTextNotPresent($str, 'assertTextNotPresent('.$this->pageLink.','.$str.')');
@@ -91,7 +91,7 @@ class testFormAdministrationGeneralInstallation extends CWebTest {
 		$this->zbxTestClickWait('next_0');
 
 		// Setup Check of pre-requisites page
-		$this->checkTitle($this->pageName);
+		$this->zbxTestCheckTitle($this->pageName);
 
 		foreach ($this->failIfExists as $str) {
 			$this->zbxTestTextNotPresent($str, 'assertTextNotPresent('.$this->pageLink.','.$str.')');
@@ -112,7 +112,7 @@ class testFormAdministrationGeneralInstallation extends CWebTest {
 		$this->zbxTestClickWait('next_1');
 
 		// Setup Configure DB connection page
-		$this->checkTitle($this->pageName);
+		$this->zbxTestCheckTitle($this->pageName);
 		foreach ($this->failIfExists as $str) {
 			$this->zbxTestTextNotPresent($str, 'assertTextNotPresent('.$this->pageLink.','.$str.')');
 		}

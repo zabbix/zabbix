@@ -557,7 +557,7 @@ class testFormItem extends CWebTest {
 		}
 
 		$this->zbxTestClickWait("//div[@class='w']//a[text()='Items']");
-		$this->checkTitle('Configuration of items');
+		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
 
 		if (isset($data['form'])) {
@@ -567,7 +567,7 @@ class testFormItem extends CWebTest {
 			$this->zbxTestClickWait('form');
 		}
 
-		$this->checkTitle('Configuration of items');
+		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
 		$this->zbxTestTextPresent('Item');
 
@@ -1324,7 +1324,7 @@ class testFormItem extends CWebTest {
 		$this->zbxTestClickWait("//div[@class='w']//a[text()='Items']");
 		$this->zbxTestClickWait('link='.$name);
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of items');
+		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestTextPresent('Item updated');
 		$this->zbxTestTextPresent("$name");
 		$this->zbxTestTextPresent('ITEMS');
@@ -2363,11 +2363,11 @@ class testFormItem extends CWebTest {
 		$this->zbxTestClickWait('link='.$this->host);
 		$this->zbxTestClickWait("//div[@class='w']//a[text()='Items']");
 
-		$this->checkTitle('Configuration of items');
+		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
 
 		$this->zbxTestClickWait('form');
-		$this->checkTitle('Configuration of items');
+		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
 		$this->zbxTestTextPresent('Item');
 
@@ -2495,12 +2495,12 @@ class testFormItem extends CWebTest {
 			switch ($expected) {
 				case TEST_GOOD:
 					$this->zbxTestTextPresent('Item added');
-					$this->checkTitle('Configuration of items');
+					$this->zbxTestCheckTitle('Configuration of items');
 					$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
 					break;
 
 				case TEST_BAD:
-					$this->checkTitle('Configuration of items');
+					$this->zbxTestCheckTitle('Configuration of items');
 					$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
 					foreach ($data['errors'] as $msg) {
 						$this->zbxTestTextPresent($msg);

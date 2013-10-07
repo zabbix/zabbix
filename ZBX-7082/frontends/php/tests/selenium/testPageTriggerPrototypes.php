@@ -44,7 +44,7 @@ class testPageTriggerPrototypes extends CWebTest {
 		$drule = $data['d_name'];
 		$this->zbxTestLogin('trigger_prototypes.php?hostid='.$data['hostid'].'&parent_discoveryid='.$data['parent_itemid']);
 		// We are in the list of protos
-		$this->checkTitle('Configuration of trigger prototypes');
+		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGER PROTOTYPES');
 		$this->zbxTestTextPresent('Trigger prototypes of '.$drule);
 		$this->zbxTestTextPresent('Displaying');
@@ -91,7 +91,7 @@ class testPageTriggerPrototypes extends CWebTest {
 
 		$this->zbxTestLogin('trigger_prototypes.php?hostid='.$data['hostid'].'&parent_discoveryid='.$data['parent_itemid']);
 
-		$this->checkTitle('Configuration of trigger prototypes');
+		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestCheckboxSelect('g_triggerid_'.$triggerid);
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
 		sleep(1);
@@ -99,7 +99,7 @@ class testPageTriggerPrototypes extends CWebTest {
 
 		$this->getConfirmation();
 
-		$this->checkTitle('Configuration of trigger prototypes');
+		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGER PROTOTYPES');
 		$this->zbxTestTextPresent('Trigger prototypes of '.$data['d_name']);
 
@@ -146,7 +146,7 @@ class testPageTriggerPrototypes extends CWebTest {
 		$this->chooseOkOnNextConfirmation();
 
 		$this->zbxTestLogin('trigger_prototypes.php?hostid='.$rule['hostid'].'&parent_discoveryid='.$druleid);
-		$this->checkTitle('Configuration of trigger prototypes');
+		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestCheckboxSelect('all_triggers');
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
 		sleep(1);
@@ -154,7 +154,7 @@ class testPageTriggerPrototypes extends CWebTest {
 
 		$this->getConfirmation();
 
-		$this->checkTitle('Configuration of trigger prototypes');
+		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGER PROTOTYPES');
 		$this->zbxTestTextPresent('Trigger prototypes of '.$rule['d_name']);
 

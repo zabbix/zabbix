@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 class testPageAvailabilityReport extends CWebTest {
 	public function testPageAvailabilityReport_ByHost_CheckLayout() {
 		$this->zbxTestLogin('report2.php?config=0');
-		$this->checkTitle('Availability report');
+		$this->zbxTestCheckTitle('Availability report');
 		$this->zbxTestTextPresent('AVAILABILITY REPORT');
 		$this->zbxTestTextPresent('Mode');
 		$this->zbxTestTextPresent('Filter');
@@ -33,13 +33,13 @@ class testPageAvailabilityReport extends CWebTest {
 // Check that no real host or template names displayed
 	public function testPageAvailabilityReport_ByHost_NoHostNames() {
 		$this->zbxTestLogin('report2.php?config=0');
-		$this->checkTitle('Availability report');
+		$this->zbxTestCheckTitle('Availability report');
 		$this->checkNoRealHostnames();
 	}
 
 	public function testPageAvailabilityReport_ByTriggerTemplate_CheckLayout() {
 		$this->zbxTestLogin('report2.php?config=1');
-		$this->checkTitle('Availability report');
+		$this->zbxTestCheckTitle('Availability report');
 		$this->zbxTestTextPresent('AVAILABILITY REPORT');
 		$this->zbxTestTextPresent('Mode');
 		$this->zbxTestTextPresent('Filter');
