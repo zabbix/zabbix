@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 class testPageStatusOfZabbix extends CWebTest {
 	public function testPageStatusOfZabbix_CheckLayout() {
 		$this->zbxTestLogin('report1.php');
-		$this->checkTitle('Status of Zabbix');
+		$this->zbxTestCheckTitle('Status of Zabbix');
 		$this->zbxTestTextPresent('STATUS OF ZABBIX');
 
 		// header

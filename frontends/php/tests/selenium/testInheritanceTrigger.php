@@ -73,7 +73,7 @@ class testInheritanceTrigger extends CWebTest {
 
 		$this->zbxTestClickWait('link='.$description);
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of triggers');
+		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->zbxTestTextPresent('Trigger updated');
 		$this->zbxTestTextPresent("$description");
 		$this->zbxTestTextPresent('TRIGGERS');
@@ -587,11 +587,11 @@ class testInheritanceTrigger extends CWebTest {
 			switch ($data['expected']) {
 				case TEST_GOOD:
 				$this->zbxTestTextPresent('Trigger added');
-				$this->checkTitle('Configuration of triggers');
+				$this->zbxTestCheckTitle('Configuration of triggers');
 				$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
 				break;
 				case TEST_BAD:
-				$this->checkTitle('Configuration of triggers');
+				$this->zbxTestCheckTitle('Configuration of triggers');
 				$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
 				foreach ($data['errors'] as $msg) {
 					$this->zbxTestTextPresent($msg);

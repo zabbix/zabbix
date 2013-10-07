@@ -29,7 +29,7 @@ class testPagePopup extends CWebTest {
 	public function testPagePopupProxies_CheckLayout() {
 		$this->zbxTestLogin();
 		$this->zbxTestOpen($this->urlPopupProxies);
-		$this->checkTitle('Proxies');
+		$this->zbxTestCheckTitle('Proxies');
 		$this->zbxTestTextPresent('Proxies');
 		$this->zbxTestTextPresent(array('Name'));
 
@@ -46,7 +46,7 @@ class testPagePopup extends CWebTest {
 	public function testPagePopupApplications_CheckLayout() {
 		$this->zbxTestLogin();
 		$this->zbxTestOpen($this->urlPopupApplications);
-		$this->checkTitle('Applications');
+		$this->zbxTestCheckTitle('Applications');
 		$this->zbxTestTextPresent('Applications');
 		$this->zbxTestTextPresent(array('Group', 'Host'));
 		$this->zbxTestTextPresent('Name');

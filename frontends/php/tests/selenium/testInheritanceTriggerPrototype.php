@@ -98,7 +98,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 		$this->zbxTestClickWait('link='.$description);
 		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent('Trigger updated');
-		$this->checkTitle('Configuration of trigger prototypes');
+		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF TRIGGER PROTOTYPES', "Trigger prototypes of ".$this->discoveryRule));
 		$this->zbxTestTextPresent("$description");
 
@@ -518,11 +518,11 @@ class testInheritanceTriggerPrototype extends CWebTest {
 			switch ($data['expected']) {
 				case TEST_GOOD:
 					$this->zbxTestTextPresent('Trigger added');
-					$this->checkTitle('Configuration of trigger prototypes');
+					$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 					$this->zbxTestTextPresent(array('CONFIGURATION OF TRIGGER PROTOTYPES', "Trigger prototypes of ".$this->discoveryRule));
 					break;
 				case TEST_BAD:
-					$this->checkTitle('Configuration of trigger prototypes');
+					$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 					$this->zbxTestTextPresent('CONFIGURATION OF TRIGGER PROTOTYPES');
 					$this->assertElementPresent("//div[@id='tab_triggersTab' and text()='Trigger prototype']");
 					foreach ($data['errors'] as $msg) {
