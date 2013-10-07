@@ -348,7 +348,7 @@ int	main(int argc, char **argv)
 	FILE			*in;
 	char			in_line[MAX_BUFFER_LEN], hostname[MAX_STRING_LEN], key[MAX_STRING_LEN],
 				key_value[MAX_BUFFER_LEN], clock[32];
-	int			total_count = 0, succeed_count = 0, buffer_count = 0, read_more = 0, ret = FAIL;
+	int			total_count = 0, succeed_count = 0, buffer_count = 0, read_more = 0, ret = SUCCEED;
 	double			last_send = 0;
 	const char		*p;
 	zbx_thread_args_t	thread_args;
@@ -401,10 +401,11 @@ int	main(int argc, char **argv)
 		else if (NULL == (in = fopen(INPUT_FILE, "r")) )
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot open [%s]: %s", INPUT_FILE, zbx_strerror(errno));
+			ret = FAIL;
 			goto exit;
 		}
 
-		while (NULL != fgets(in_line, sizeof(in_line), in))
+		while ((SUCCEED == ret || SUCCEED_PARTIAL == ret) && NULL != fgets(in_line, sizeof(in_line), in))
 		{
 			/* line format: <hostname> <key> [<timestamp>] <value> */
 
@@ -507,21 +508,16 @@ int	main(int argc, char **argv)
 				ret = zbx_thread_wait(zbx_thread_start(send_value, &thread_args));
 
 				buffer_count = 0;
-
-				if (SUCCEED != ret && SUCCEED_PARTIAL != ret)
-					break;
-
 				zbx_json_clean(&sentdval_args.json);
 				zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA,
 						ZBX_JSON_TYPE_STRING);
 				zbx_json_addarray(&sentdval_args.json, ZBX_PROTO_TAG_DATA);
 			}
 		}
+		zbx_json_close(&sentdval_args.json);
 
 		if (0 != buffer_count)
 		{
-			zbx_json_close(&sentdval_args.json);
-
 			if (1 == WITH_TIMESTAMPS)
 				zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
 
