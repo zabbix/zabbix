@@ -81,7 +81,7 @@ class testInheritanceItemPrototype extends CWebTest {
 
 		$this->zbxTestLogin('disc_prototypes.php?form=update&itemid='.$data['itemid'].'&parent_discoveryid=23500');
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of item prototypes');
+		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestTextPresent(array(
 			'Item updated',
 			$data['name'],
@@ -1312,12 +1312,12 @@ class testInheritanceItemPrototype extends CWebTest {
 			switch ($expected) {
 				case TEST_GOOD:
 					$this->zbxTestTextPresent('Item added');
-					$this->checkTitle('Configuration of item prototypes');
+					$this->zbxTestCheckTitle('Configuration of item prototypes');
 					$this->zbxTestTextPresent(array('CONFIGURATION OF ITEM PROTOTYPES', "Item prototypes of ".$this->discoveryRule));
 					break;
 
 				case TEST_BAD:
-					$this->checkTitle('Configuration of item prototypes');
+					$this->zbxTestCheckTitle('Configuration of item prototypes');
 					$this->zbxTestTextPresent(array('CONFIGURATION OF ITEM PROTOTYPES', 'Item prototype'));
 					foreach ($data['errors'] as $msg) {
 						$this->zbxTestTextPresent($msg);

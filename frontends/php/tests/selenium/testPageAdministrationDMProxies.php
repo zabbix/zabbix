@@ -21,62 +21,79 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageAdministrationDMProxies extends CWebTest {
-	// Returns all proxies
-	public static function allProxies() {
-		return DBdata("select * from hosts where status in (".HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.") order by hostid");
+
+	private $sqlHashProxy = '';
+	private $oldHashProxy = '';
+	private $sqlHashInterface = '';
+	private $oldHashInterface = '';
+	private $sqlHashHosts = '';
+	private $oldHashHosts = '';
+	private $sqlHashDRules = '';
+	private $oldHashDRules = '';
+
+	private function calculateHash($proxy_hostid) {
+		$this->sqlHashProxy = 'SELECT * FROM hosts WHERE hostid='.$proxy_hostid;
+		$this->oldHashProxy = DBhash($this->sqlHashProxy);
+		$this->sqlHashInterface = 'SELECT * FROM interface WHERE hostid='.$proxy_hostid.' ORDER BY interfaceid';
+		$this->oldHashInterface = DBhash($this->sqlHashInterface);
+		$this->sqlHashHosts = 'SELECT hostid,proxy_hostid FROM hosts WHERE proxy_hostid='.$proxy_hostid.' ORDER BY hostid';
+		$this->oldHashHosts = DBhash($this->sqlHashHosts);
+		$this->sqlHashDRules = 'SELECT druleid,proxy_hostid FROM drules WHERE proxy_hostid='.$proxy_hostid.' ORDER BY druleid';
+		$this->oldHashDRules = DBhash($this->sqlHashDRules);
 	}
 
-	/**
-	* @dataProvider allProxies
-	*/
-	public function testPageAdministrationDMProxies_CheckLayout($proxy) {
+	private function verifyHash() {
+		$this->assertEquals($this->oldHashProxy, DBhash($this->sqlHashProxy));
+		$this->assertEquals($this->oldHashInterface, DBhash($this->sqlHashInterface));
+		$this->assertEquals($this->oldHashHosts, DBhash($this->sqlHashHosts));
+		$this->assertEquals($this->oldHashDRules, DBhash($this->sqlHashDRules));
+	}
+
+	public static function allProxies() {
+		return DBdata(
+			'SELECT hostid,host'.
+			' FROM hosts'.
+			' WHERE status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'
+		);
+	}
+
+	public function testPageAdministrationDMProxies_CheckLayout() {
 		$this->zbxTestLogin('proxies.php');
-		$this->checkTitle('Configuration of proxies');
+		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
+		$this->zbxTestTextPresent('Proxies');
 		$this->zbxTestTextPresent('Displaying');
-		$this->zbxTestTextNotPresent('Displaying 0');
 
-		// header
-		$this->zbxTestTextPresent(array('Name', 'Mode', 'Last seen (age)', 'Host count', 'Item count', 'Required performance (vps)', 'Hosts'));
+		$this->zbxTestTextPresent(array(
+			'Name', 'Mode', 'Last seen (age)', 'Host count', 'Item count', 'Required performance (vps)', 'Hosts'
+		));
 
-		// data
-		$this->zbxTestTextPresent(array($proxy['host']));
 		$this->zbxTestDropdownHasOptions('go', array('Enable selected', 'Disable selected', 'Delete selected'));
+		$this->assertElementValue('goButton', 'Go (0)');
 	}
 
 	/**
 	* @dataProvider allProxies
 	*/
 	public function testPageAdministrationDMProxies_SimpleUpdate($proxy) {
-		$proxyid=$proxy['hostid'];
-		$name=$proxy['host'];
-
-		$sqlProxy="select * from hosts where host='$name' order by hostid";
-		$oldHashProxy=DBhash($sqlProxy);
-		$sqlHosts="select proxy_hostid from hosts order by hostid";
-		$oldHashHosts=DBhash($sqlHosts);
+		$this->calculateHash($proxy['hostid']);
 
 		$this->zbxTestLogin('proxies.php');
-		$this->checkTitle('Configuration of proxies');
-		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestClickWait('link='.$proxy['host']);
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of proxies');
+		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestTextPresent('Proxy updated');
-		$this->zbxTestTextPresent("$name");
-		$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
+		$this->zbxTestTextPresent($proxy['host']);
 
-		$this->assertEquals($oldHashProxy, DBhash($sqlProxy), "Chuck Norris: no-change proxy update should not update data in table 'hosts'");
-		$this->assertEquals($oldHashHosts, DBhash($sqlHosts), "Chuck Norris: no-change proxy update should not update 'hosts.proxy_hostid'");
+		$this->verifyHash();
 	}
 
+/*
 	public function testPageAdministrationDMProxies_MassActivateAll() {
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	/**
-	* @dataProvider allProxies
-	*/
 	public function testPageAdministrationDMProxies_MassActivate($proxy) {
 // TODO
 		$this->markTestIncomplete();
@@ -87,9 +104,6 @@ class testPageAdministrationDMProxies extends CWebTest {
 		$this->markTestIncomplete();
 	}
 
-	/**
-	* @dataProvider allProxies
-	*/
 	public function testPageAdministrationDMProxies_MassDisable($proxy) {
 // TODO
 		$this->markTestIncomplete();
@@ -100,9 +114,6 @@ class testPageAdministrationDMProxies extends CWebTest {
 		$this->markTestIncomplete();
 	}
 
-	/**
-	* @dataProvider allProxies
-	*/
 	public function testPageAdministrationDMProxies_MassDelete($proxy) {
 // TODO
 		$this->markTestIncomplete();
@@ -112,4 +123,5 @@ class testPageAdministrationDMProxies extends CWebTest {
 // TODO
 		$this->markTestIncomplete();
 	}
+*/
 }

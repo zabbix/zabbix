@@ -42,7 +42,7 @@ class testPageItemPrototypes extends CWebTest {
 		$this->zbxTestLogin('disc_prototypes.php?hostid='.$data['hostid'].'&parent_discoveryid='.$data['parent_itemid']);
 
 		// We are in the list of protos
-		$this->checkTitle('Configuration of item prototypes');
+		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestTextPresent('CONFIGURATION OF ITEM PROTOTYPES');
 		$this->zbxTestTextPresent('Item prototypes of '.$drule);
 		$this->zbxTestTextPresent('Displaying');
@@ -85,7 +85,7 @@ class testPageItemPrototypes extends CWebTest {
 		$this->chooseOkOnNextConfirmation();
 
 		$this->zbxTestLogin('disc_prototypes.php?hostid='.$data['hostid'].'&parent_discoveryid='.$data['parent_itemid']);
-		$this->checkTitle('Configuration of item prototypes');
+		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestCheckboxSelect('group_itemid_'.$itemid);
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
 		sleep(1);
@@ -93,7 +93,7 @@ class testPageItemPrototypes extends CWebTest {
 
 		$this->getConfirmation();
 
-		$this->checkTitle('Configuration of item prototypes');
+		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestTextPresent('CONFIGURATION OF ITEM PROTOTYPES');
 		$this->zbxTestTextPresent('Item prototypes of '.$drule);
 
@@ -142,7 +142,7 @@ class testPageItemPrototypes extends CWebTest {
 		$this->chooseOkOnNextConfirmation();
 
 		$this->zbxTestLogin('disc_prototypes.php?hostid='.$hostid.'&parent_discoveryid='.$druleid);
-		$this->checkTitle('Configuration of item prototypes');
+		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestCheckboxSelect('all_items');
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
 		sleep(1);
@@ -150,7 +150,7 @@ class testPageItemPrototypes extends CWebTest {
 
 		$this->getConfirmation();
 
-		$this->checkTitle('Configuration of item prototypes');
+		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestTextPresent('CONFIGURATION OF ITEM PROTOTYPES');
 		$this->zbxTestTextPresent('Item prototypes of '.$drule);
 

@@ -31,7 +31,7 @@ class testPageUserGroups extends CWebTest {
 	*/
 	public function testPageUserGroups_CheckLayout($group) {
 		$this->zbxTestLogin('usergrps.php');
-		$this->checkTitle('Configuration of user groups');
+		$this->zbxTestCheckTitle('Configuration of user groups');
 		$this->zbxTestTextPresent('CONFIGURATION OF USERS AND USER GROUPS');
 		$this->zbxTestTextPresent('Displaying');
 		// Header
@@ -55,10 +55,10 @@ class testPageUserGroups extends CWebTest {
 		$oldHashUsersGroups = DBhash($sqlHashUsersGroups);
 
 		$this->zbxTestLogin('usergrps.php');
-		$this->checkTitle('Configuration of user groups');
+		$this->zbxTestCheckTitle('Configuration of user groups');
 		$this->zbxTestClickWait('link='.$name);
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of user groups');
+		$this->zbxTestCheckTitle('Configuration of user groups');
 		$this->zbxTestTextPresent('Group updated');
 		$this->zbxTestTextPresent("$name");
 		$this->zbxTestTextPresent('CONFIGURATION OF USERS AND USER GROUPS');
@@ -83,7 +83,7 @@ class testPageUserGroups extends CWebTest {
 		$oldHashGroups = DBhash($sqlHashGroups);
 
 		$this->zbxTestLogin('usergrps.php');
-		$this->checkTitle('Configuration of user groups');
+		$this->zbxTestCheckTitle('Configuration of user groups');
 
 		$this->zbxTestCheckboxSelect('group_groupid['.$usrgrpid.']');
 		$this->zbxTestDropdownSelect('go', 'Enable selected');
@@ -91,7 +91,7 @@ class testPageUserGroups extends CWebTest {
 
 		$this->getConfirmation();
 		$this->wait();
-		$this->checkTitle('Configuration of user groups');
+		$this->zbxTestCheckTitle('Configuration of user groups');
 		$this->zbxTestTextPresent('Users status updated');
 
 		$sql="select * from usrgrp where usrgrpid=$usrgrpid and users_status=".GROUP_STATUS_ENABLED;
@@ -118,7 +118,7 @@ class testPageUserGroups extends CWebTest {
 		$oldHashGroups = DBhash($sqlHashGroups);
 
 		$this->zbxTestLogin('usergrps.php');
-		$this->checkTitle('Configuration of user groups');
+		$this->zbxTestCheckTitle('Configuration of user groups');
 
 		$this->zbxTestCheckboxSelect('group_groupid['.$usrgrpid.']');
 		$this->zbxTestDropdownSelect('go', 'Disable selected');
@@ -126,7 +126,7 @@ class testPageUserGroups extends CWebTest {
 
 		$this->getConfirmation();
 		$this->wait();
-		$this->checkTitle('Configuration of user groups');
+		$this->zbxTestCheckTitle('Configuration of user groups');
 		if ($cannotDisable) {
 			$this->zbxTestTextPresent('Cannot update users status');
 		}
@@ -161,7 +161,7 @@ class testPageUserGroups extends CWebTest {
 		$oldHashGroups = DBhash($sqlHashGroups);
 
 		$this->zbxTestLogin('usergrps.php');
-		$this->checkTitle('Configuration of user groups');
+		$this->zbxTestCheckTitle('Configuration of user groups');
 
 		$this->zbxTestCheckboxSelect('group_groupid['.$usrgrpid.']');
 		$this->zbxTestDropdownSelect('go', 'Enable DEBUG');
@@ -169,7 +169,7 @@ class testPageUserGroups extends CWebTest {
 
 		$this->getConfirmation();
 		$this->wait();
-		$this->checkTitle('Configuration of user groups');
+		$this->zbxTestCheckTitle('Configuration of user groups');
 		$this->zbxTestTextPresent('Debug mode updated');
 
 		$sql="select * from usrgrp where usrgrpid=$usrgrpid and debug_mode=".GROUP_DEBUG_MODE_ENABLED;
@@ -194,7 +194,7 @@ class testPageUserGroups extends CWebTest {
 		$oldHashGroups = DBhash($sqlHashGroups);
 
 		$this->zbxTestLogin('usergrps.php');
-		$this->checkTitle('Configuration of user groups');
+		$this->zbxTestCheckTitle('Configuration of user groups');
 
 		$this->zbxTestCheckboxSelect('group_groupid['.$usrgrpid.']');
 		$this->zbxTestDropdownSelect('go', 'Disable DEBUG');
@@ -202,7 +202,7 @@ class testPageUserGroups extends CWebTest {
 
 		$this->getConfirmation();
 		$this->wait();
-		$this->checkTitle('Configuration of user groups');
+		$this->zbxTestCheckTitle('Configuration of user groups');
 		$this->zbxTestTextPresent('Debug mode updated');
 
 		$sql = "select * from usrgrp where usrgrpid=$usrgrpid and debug_mode=".GROUP_DEBUG_MODE_DISABLED;

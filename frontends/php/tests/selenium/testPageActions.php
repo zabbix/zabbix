@@ -159,7 +159,7 @@ class testPageActions extends CWebTest {
 	*/
 	public function testPageActions_CheckLayout($eventsource) {
 		$this->zbxTestLogin('actionconf.php?eventsource='.$eventsource);
-		$this->checkTitle('Configuration of actions');
+		$this->zbxTestCheckTitle('Configuration of actions');
 
 		$this->zbxTestTextPresent('CONFIGURATION OF ACTIONS');
 		$this->zbxTestTextPresent('Event source');
@@ -204,7 +204,7 @@ class testPageActions extends CWebTest {
 		$this->zbxTestLogin('actionconf.php?eventsource='.$action['eventsource']);
 		$this->zbxTestClickWait('link='.$action['name']);
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of actions');
+		$this->zbxTestCheckTitle('Configuration of actions');
 		$this->zbxTestTextPresent('Action updated');
 		$this->zbxTestTextPresent($action['name']);
 
@@ -219,7 +219,7 @@ class testPageActions extends CWebTest {
 		$this->oldHashAction = DBhash($this->sqlHashAction);
 
 		$this->zbxTestLogin('actionconf.php?eventsource='.$action['eventsource']);
-		$this->checkTitle('Configuration of actions');
+		$this->zbxTestCheckTitle('Configuration of actions');
 
 		switch ($action['status']) {
 			case ACTION_STATUS_ENABLED:
@@ -234,7 +234,7 @@ class testPageActions extends CWebTest {
 				$this->assertTrue(false);
 		}
 
-		$this->checkTitle('Configuration of actions');
+		$this->zbxTestCheckTitle('Configuration of actions');
 		$this->zbxTestTextPresent('Status updated');
 
 		$this->assertEquals(1, DBcount(
@@ -257,7 +257,7 @@ class testPageActions extends CWebTest {
 		$this->chooseOkOnNextConfirmation();
 
 		$this->zbxTestLogin('actionconf.php?eventsource='.$action['eventsource']);
-		$this->checkTitle('Configuration of actions');
+		$this->zbxTestCheckTitle('Configuration of actions');
 
 		$this->zbxTestCheckboxSelect('g_actionid['.$action['actionid'].']');
 		$this->zbxTestDropdownSelect('go', 'Disable selected');
@@ -265,7 +265,7 @@ class testPageActions extends CWebTest {
 
 		$this->getConfirmation();
 
-		$this->checkTitle('Configuration of actions');
+		$this->zbxTestCheckTitle('Configuration of actions');
 		$this->zbxTestTextPresent('Status updated');
 		$this->zbxTestTextPresent('Disabled');
 
@@ -289,7 +289,7 @@ class testPageActions extends CWebTest {
 		$this->chooseOkOnNextConfirmation();
 
 		$this->zbxTestLogin('actionconf.php?eventsource='.$action['eventsource']);
-		$this->checkTitle('Configuration of actions');
+		$this->zbxTestCheckTitle('Configuration of actions');
 
 		$this->zbxTestCheckboxSelect('g_actionid['.$action['actionid'].']');
 		$this->zbxTestDropdownSelect('go', 'Enable selected');
@@ -297,7 +297,7 @@ class testPageActions extends CWebTest {
 
 		$this->getConfirmation();
 
-		$this->checkTitle('Configuration of actions');
+		$this->zbxTestCheckTitle('Configuration of actions');
 		$this->zbxTestTextPresent('Status updated');
 		$this->zbxTestTextPresent('Enabled');
 
@@ -325,7 +325,7 @@ class testPageActions extends CWebTest {
 		$this->chooseOkOnNextConfirmation();
 
 		$this->zbxTestLogin('actionconf.php?eventsource='.$action['eventsource']);
-		$this->checkTitle('Configuration of actions');
+		$this->zbxTestCheckTitle('Configuration of actions');
 
 		$this->zbxTestCheckboxSelect('g_actionid['.$action['actionid'].']');
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
@@ -333,7 +333,7 @@ class testPageActions extends CWebTest {
 
 		$this->getConfirmation();
 
-		$this->checkTitle('Configuration of actions');
+		$this->zbxTestCheckTitle('Configuration of actions');
 		$this->zbxTestTextPresent('Selected actions deleted');
 
 		$this->assertEquals(0, DBcount('SELECT * FROM actions WHERE actionid='.$action['actionid']));

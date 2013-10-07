@@ -31,7 +31,7 @@ class testPageUsers extends CWebTest {
 	*/
 	public function testPageUsers_CheckLayout($user) {
 		$this->zbxTestLogin('users.php');
-		$this->checkTitle('Configuration of users');
+		$this->zbxTestCheckTitle('Configuration of users');
 
 		$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
 
@@ -67,12 +67,12 @@ class testPageUsers extends CWebTest {
 		$oldHashMedia = DBhash($sqlHashMedia);
 
 		$this->zbxTestLogin('users.php');
-		$this->checkTitle('Configuration of users');
+		$this->zbxTestCheckTitle('Configuration of users');
 		$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
 
 		$this->zbxTestClickWait('link='.$alias);
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of users');
+		$this->zbxTestCheckTitle('Configuration of users');
 		$this->zbxTestTextPresent('User updated');
 		$this->zbxTestTextPresent($alias);
 		$this->zbxTestTextPresent('CONFIGURATION OF USERS AND USER GROUPS');
@@ -98,7 +98,7 @@ class testPageUsers extends CWebTest {
 			$id = $user['userid'];
 
 			$this->zbxTestLogin('users.php');
-			$this->checkTitle('Configuration of users');
+			$this->zbxTestCheckTitle('Configuration of users');
 			$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
 
 			$this->zbxTestCheckboxSelect('group_userid['.$id.']');
@@ -106,7 +106,7 @@ class testPageUsers extends CWebTest {
 			$this->zbxTestClickWait('goButton');
 
 			$this->getConfirmation();
-			$this->checkTitle('Configuration of users');
+			$this->zbxTestCheckTitle('Configuration of users');
 			$this->zbxTestTextPresent('User deleted');
 
 			$sql = "select * from users where userid=$id";
@@ -131,7 +131,7 @@ class testPageUsers extends CWebTest {
 			$id = $user['userid'];
 
 			$this->zbxTestLogin('users.php');
-			$this->checkTitle('Configuration of users');
+			$this->zbxTestCheckTitle('Configuration of users');
 			$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
 
 			$this->zbxTestCheckboxSelect('group_userid['.$id.']');
@@ -139,7 +139,7 @@ class testPageUsers extends CWebTest {
 			$this->zbxTestClickWait('goButton');
 
 			$this->getConfirmation();
-			$this->checkTitle('Configuration of users');
+			$this->zbxTestCheckTitle('Configuration of users');
 			$this->zbxTestTextPresent('Cannot delete user');
 
 			$sql = "select * from users where userid=$id";

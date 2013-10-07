@@ -363,7 +363,7 @@ class testFormWeb extends CWebTest {
 
 		$this->zbxTestClickWait('link=Web scenarios');
 
-		$this->checkTitle('Configuration of web monitoring');
+		$this->zbxTestCheckTitle('Configuration of web monitoring');
 		$this->zbxTestTextPresent('CONFIGURATION OF WEB MONITORING');
 
 		if (isset($data['form'])) {
@@ -373,7 +373,7 @@ class testFormWeb extends CWebTest {
 			$this->zbxTestClickWait('form');
 		}
 
-		$this->checkTitle('Configuration of web monitoring');
+		$this->zbxTestCheckTitle('Configuration of web monitoring');
 		$this->zbxTestTextPresent('CONFIGURATION OF WEB MONITORING');
 		$this->zbxTestTextPresent('Scenario');
 
@@ -604,7 +604,7 @@ class testFormWeb extends CWebTest {
 
 		$this->zbxTestTextPresent('Scenario updated');
 		$this->zbxTestTextPresent("$name");
-		$this->checkTitle('Configuration of web monitoring');
+		$this->zbxTestCheckTitle('Configuration of web monitoring');
 		$this->zbxTestTextPresent('CONFIGURATION OF WEB MONITORING');
 
 		$this->assertEquals($oldHashItems, DBhash($sqlItems));
@@ -1516,11 +1516,11 @@ class testFormWeb extends CWebTest {
 		$this->zbxTestClickWait('link='.$this->host);
 		$this->zbxTestClickWait('link=Web scenarios');
 
-		$this->checkTitle('Configuration of web monitoring');
+		$this->zbxTestCheckTitle('Configuration of web monitoring');
 		$this->zbxTestTextPresent('CONFIGURATION OF WEB MONITORING');
 
 		$this->zbxTestClickWait('form');
-		$this->checkTitle('Configuration of web monitoring');
+		$this->zbxTestCheckTitle('Configuration of web monitoring');
 		$this->zbxTestTextPresent('CONFIGURATION OF WEB MONITORING');
 		$this->zbxTestTextPresent('Scenario');
 
@@ -1615,13 +1615,13 @@ class testFormWeb extends CWebTest {
 		switch ($expected) {
 			case TEST_GOOD:
 				$this->zbxTestTextPresent('Scenario added');
-				$this->checkTitle('Configuration of web monitoring');
+				$this->zbxTestCheckTitle('Configuration of web monitoring');
 				$this->zbxTestTextPresent('CONFIGURATION OF WEB MONITORING');
 				$this->zbxTestTextPresent(array('Number of steps', 'Update interval', 'Status'));
 				break;
 
 			case TEST_BAD:
-				$this->checkTitle('Configuration of web monitoring');
+				$this->zbxTestCheckTitle('Configuration of web monitoring');
 				$this->zbxTestTextPresent('CONFIGURATION OF WEB MONITORING');
 				foreach ($data['errors'] as $msg) {
 					$this->zbxTestTextPresent($msg);
@@ -1669,7 +1669,7 @@ class testFormWeb extends CWebTest {
 				$this->zbxTestClickWait('save');
 
 				$this->zbxTestTextPresent('Trigger added');
-				$this->checkTitle('Configuration of triggers');
+				$this->zbxTestCheckTitle('Configuration of triggers');
 				$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
 			}
 		}

@@ -28,7 +28,7 @@ class testFormUserProfile extends CWebTest {
 
 		$this->zbxTestLogin('profile.php');
 
-		$this->checkTitle('User profile');
+		$this->zbxTestCheckTitle('User profile');
 
 		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent('Copyright');
@@ -88,7 +88,7 @@ class testFormUserProfile extends CWebTest {
 
 		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent('ERROR: Password should not be empty');
-		$this->checkTitle('User profile');
+		$this->zbxTestCheckTitle('User profile');
 
 		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
 	}
@@ -105,7 +105,7 @@ class testFormUserProfile extends CWebTest {
 
 		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent('ERROR: Cannot update user. Both passwords must be equal.');
-		$this->checkTitle('User profile');
+		$this->zbxTestCheckTitle('User profile');
 
 		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
 	}

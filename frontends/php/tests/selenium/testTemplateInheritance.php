@@ -129,12 +129,12 @@ class testTemplateInheritance extends CWebTest {
 		switch ($result) {
 			case TEST_GOOD:
 				$this->zbxTestTextPresent('Item added');
-				$this->checkTitle('Configuration of items');
+				$this->zbxTestCheckTitle('Configuration of items');
 				$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
 				break;
 
 			case TEST_BAD:
-				$this->checkTitle('Configuration of items');
+				$this->zbxTestCheckTitle('Configuration of items');
 				$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
 				foreach ($errorMsgs as $msg) {
 					$this->zbxTestTextPresent($msg);

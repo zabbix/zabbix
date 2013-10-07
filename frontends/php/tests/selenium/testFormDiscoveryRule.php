@@ -261,7 +261,7 @@ class testFormDiscoveryRule extends CWebTest {
 			$this->zbxTestClickWait('form');
 		}
 
-		$this->checkTitle('Configuration of discovery rules');
+		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
 		$this->zbxTestTextPresent('Discovery rule');
 
@@ -683,7 +683,7 @@ class testFormDiscoveryRule extends CWebTest {
 		$this->zbxTestClickWait('link=Discovery rules');
 		$this->zbxTestClickWait('link='.$name);
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of discovery rules');
+		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rule updated');
 		$this->zbxTestTextPresent("$name");
 
@@ -1498,14 +1498,14 @@ class testFormDiscoveryRule extends CWebTest {
 	 */
 	public function testFormDiscoveryRule_SimpleCreate($data) {
 		$this->zbxTestLogin('hosts.php');
-		$this->checkTitle('Configuration of hosts');
+		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('CONFIGURATION OF HOSTS');
 
 		$this->zbxTestClickWait('link='.$this->host);
 		$this->zbxTestClickWait('link=Discovery rules');
 		$this->zbxTestClickWait('form');
 
-		$this->checkTitle('Configuration of discovery rules');
+		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
 		$this->zbxTestTextPresent('Discovery rule');
 
@@ -1621,13 +1621,13 @@ class testFormDiscoveryRule extends CWebTest {
 			switch ($expected) {
 				case TEST_GOOD:
 					$this->zbxTestTextPresent('Discovery rule created');
-					$this->checkTitle('Configuration of discovery rules');
+					$this->zbxTestCheckTitle('Configuration of discovery rules');
 					$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
 					$this->zbxTestTextPresent(array('Item prototypes',  'Trigger prototypes', 'Graph prototypes'));
 					break;
 
 				case TEST_BAD:
-					$this->checkTitle('Configuration of discovery rules');
+					$this->zbxTestCheckTitle('Configuration of discovery rules');
 					$this->zbxTestTextPresent(array('CONFIGURATION OF DISCOVERY RULES','Discovery rule'));
 					foreach ($data['errors'] as $msg) {
 						$this->zbxTestTextPresent($msg);
