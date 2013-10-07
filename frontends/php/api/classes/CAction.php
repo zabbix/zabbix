@@ -1080,6 +1080,30 @@ class CAction extends CZBXAPI {
 						$opcommandHstCreate = array_merge($opcommandHstCreate, $operation['opcommand_hst']);
 					}
 					else {
+						// clear and reset fields to default values on type change
+						if ($operation['opcommand']['type'] == ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT) {
+							$operation['opcommand']['command'] = '';
+						}
+						else {
+							$operation['opcommand']['scriptid'] = null;
+						}
+						if ($operation['opcommand']['type'] != ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT) {
+							$operation['opcommand']['execute_on'] = ZBX_SCRIPT_EXECUTE_ON_AGENT;
+						}
+						if ($operation['opcommand']['type'] != ZBX_SCRIPT_TYPE_SSH
+								&& $operation['opcommand']['type'] != ZBX_SCRIPT_TYPE_TELNET) {
+							$operation['opcommand']['port'] = '';
+							$operation['opcommand']['username'] = '';
+							$operation['opcommand']['password'] = '';
+						}
+						if (!isset($operation['opcommand']['authtype'])) {
+							$operation['opcommand']['authtype'] = ITEM_AUTHTYPE_PASSWORD;
+						}
+						if ($operation['opcommand']['authtype'] == ITEM_AUTHTYPE_PASSWORD) {
+							$operation['opcommand']['publickey'] = '';
+							$operation['opcommand']['privatekey'] = '';
+						}
+
 						$opcommandUpdate[] = array(
 							'values' => $operation['opcommand'],
 							'where' => array('operationid' => $operation['operationid'])
