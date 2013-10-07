@@ -533,9 +533,9 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 }
 
 /**
- * Function split trigger expresion by '&' and '|', that all elements from first level would be separated
+ * Function split trigger expresion by '&' and '|', that all elements from first level would be separated.
  *
- * @param $expresion             trigger expresion
+ * @param string $expresion		trigger expresion
  *
  * @return array
  */
@@ -545,18 +545,18 @@ function splitByFirstLevel($expresion) {
 
 	while (isset($expresion[$pos])) {
 		switch ($expresion[$pos]) {
-			case "(":
+			case '(':
 				++$level;
 				break;
-			case ")":
+			case ')':
 				--$level;
 				break;
-			case "&":
-			case "|":
+			case '&':
+			case '|':
 				if (!$level) {
 					$tmpArr[] = trim(substr($expresion, 0, $pos));
-					$expresion = substr($expresion, $pos+1);
-					$pos=-1;
+					$expresion = substr($expresion, $pos + 1);
+					$pos = -1;
 				}
 				break;
 			default:
@@ -564,6 +564,7 @@ function splitByFirstLevel($expresion) {
 		}
 		++$pos;
 	}
+
 	if ($expresion) {
 		$tmpArr[] = trim($expresion);
 	}
