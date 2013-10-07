@@ -94,7 +94,7 @@ $query = DBselect(
 	' FROM items i,httpstepitem hi,httpstep hs'.
 	' WHERE hi.itemid=i.itemid'.
 		' AND hi.httpstepid=hs.httpstepid'.
-		' AND hs.httptestid='.$httpTest['httptestid']
+		' AND hs.httptestid='.zbx_dbstr($httpTest['httptestid'])
 );
 $httpStepItems = array();
 $items = array();
@@ -134,7 +134,7 @@ $httpdetailsTable->setHeader(array(
 	_('Status')
 ));
 
-$db_httpsteps = DBselect('SELECT * FROM httpstep WHERE httptestid='.$httpTest['httptestid'].' ORDER BY no');
+$db_httpsteps = DBselect('SELECT * FROM httpstep WHERE httptestid='.zbx_dbstr($httpTest['httptestid']).' ORDER BY no');
 
 $totalTime = array(
 	'value' => 0,

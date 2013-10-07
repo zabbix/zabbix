@@ -26,6 +26,7 @@
 	<meta charset="utf-8" />
 	<link rel="shortcut icon" href="images/general/zabbix.ico" />
 	<link rel="stylesheet" type="text/css" href="styles/default.css" />
+	<link rel="stylesheet" type="text/css" href="styles/pages.css" />
 </head>
 <body class="originalblue browserwarningBG">
 	<div style="display: table; height: 99%; width: 99%;">

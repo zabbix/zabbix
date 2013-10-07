@@ -572,7 +572,7 @@ jQuery(function($) {
 					'data-id': item.id
 				})
 				.click(function() {
-					removeSelected($(this).data('id'), obj, values, options);
+					removeSelected(item.id, obj, values, options);
 				});
 
 				$('.selected ul', obj).append(li.append(arrow));
@@ -644,7 +644,7 @@ jQuery(function($) {
 					'data-id': item.id
 				})
 				.click(function() {
-					select($(this).data('id'), obj, values, options);
+					select(item.id, obj, values, options);
 				})
 				.hover(function() {
 					$('.available li.hover', obj).removeClass('hover');

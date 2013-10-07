@@ -25,6 +25,9 @@ require_once dirname(__FILE__).'/../../include/defines.inc.php';
 require_once dirname(__FILE__).'/../../include/hosts.inc.php';
 require_once dirname(__FILE__).'/dbfunc.php';
 
+define('TEST_GOOD', 0);
+define('TEST_BAD', 1);
+
 class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 
 	protected $captureScreenshotOnFailure = TRUE;
@@ -138,7 +141,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		}
 	}
 
-	public function checkTitle($title) {
+	public function zbxTestCheckTitle($title) {
 		global $ZBX_SERVER_NAME;
 
 		if ($ZBX_SERVER_NAME !== '') {
@@ -319,7 +322,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		$this->selectWindow();
 		$this->wait();
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of hosts');
+		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host updated');
 		// no entities should be deleted, they all should be updated
 		$this->zbxTestTextNotPresent('deleted');

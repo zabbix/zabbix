@@ -74,7 +74,7 @@ class testFormAdministrationScripts extends CWebTest {
 
 	public function testFormAdministrationScripts_testLayout() {
 		$this->zbxTestLogin('scripts.php?form=1');
-		$this->checkTitle('Configuration of scripts');
+		$this->zbxTestCheckTitle('Configuration of scripts');
 
 		$this->zbxTestTextPresent('Script');
 

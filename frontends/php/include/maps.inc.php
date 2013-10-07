@@ -289,7 +289,7 @@ function resolveMapLabelMacrosAll(array $selement) {
 			$res = DBselect('SELECT hi.ip,hi.dns,hi.useip,h.host,h.name,hi.type AS interfacetype'.
 					' FROM interface hi,hosts h'.
 					' WHERE hi.hostid=h.hostid'.
-						' AND hi.main=1 AND hi.hostid='.$selement['elementid']);
+						' AND hi.main=1 AND hi.hostid='.zbx_dbstr($selement['elementid']));
 
 			// process interface priorities
 			$tmpPriority = 0;
@@ -309,7 +309,7 @@ function resolveMapLabelMacrosAll(array $selement) {
 					' WHERE h.hostid=hi.hostid'.
 						' AND hi.hostid=i.hostid'.
 						' AND i.itemid=f.itemid'.
-						' AND hi.main=1 AND f.triggerid='.$selement['elementid'].
+						' AND hi.main=1 AND f.triggerid='.zbx_dbstr($selement['elementid']).
 					' ORDER BY f.functionid');
 
 			// process interface priorities, build $hostsByFunctionId array
@@ -496,7 +496,7 @@ function get_map_elements($db_element, &$elements) {
 			$db_mapselements = DBselect(
 				'SELECT DISTINCT se.elementtype,se.elementid'.
 				' FROM sysmaps_elements se'.
-				' WHERE se.sysmapid='.$db_element['elementid']
+				' WHERE se.sysmapid='.zbx_dbstr($db_element['elementid'])
 			);
 			while ($db_mapelement = DBfetch($db_mapselements)) {
 				get_map_elements($db_mapelement, $elements);

@@ -36,7 +36,7 @@ class testPageApplications extends CWebTest {
 		$this->zbxTestLogin('applications.php?groupid=0&hostid='.$hostid);
 
 		// We are in the list of applications
-		$this->checkTitle('Configuration of applications');
+		$this->zbxTestCheckTitle('Configuration of applications');
 		$this->zbxTestTextPresent('CONFIGURATION OF APPLICATIONS');
 		$this->zbxTestTextPresent('Displaying');
 		$this->zbxTestTextPresent('Host list');

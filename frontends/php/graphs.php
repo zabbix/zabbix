@@ -27,7 +27,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = isset($_REQUEST['parent_discoveryid']) ? _('Configuration of graph prototypes') : _('Configuration of graphs');
 $page['file'] = 'graphs.php';
 $page['hist_arg'] = array('hostid', 'parent_discoveryid');
-$page['scripts'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -585,10 +584,14 @@ else {
 
 	order_result($data['graphs'], $sortfield, $sortorder);
 
-	$data['paging'] = getPagingLine($data['graphs'], array(
-		'hostid' => get_request('hostid'),
-		'parent_discoveryid' => get_request('parent_discoveryid')
-	));
+	$data['paging'] = getPagingLine(
+		$data['graphs'],
+		array('graphid'),
+		array(
+			'hostid' => get_request('hostid'),
+			'parent_discoveryid' => get_request('parent_discoveryid')
+		)
+	);
 
 	// get graphs after paging
 	$options = array(
