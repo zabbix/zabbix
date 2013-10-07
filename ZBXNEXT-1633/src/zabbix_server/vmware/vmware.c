@@ -2273,39 +2273,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: vmware_get_update_time                                           *
- *                                                                            *
- * Purpose: get the time of next scheduled service update                     *
- *                                                                            *
- * Parameters: now      - [IN] the current time                               *
- *                                                                            *
- * Return value: the time of next service update                              *
- *                                                                            *
- ******************************************************************************/
-static int	vmware_get_update_time(int now)
-{
-	int	next_update = now + ZBX_VMWARE_CACHE_TTL, i;
-
-	for (i = 0; i < vmware->services.values_num; i++)
-	{
-		zbx_vmware_service_t	*service = vmware->services.values[i];
-		int			service_update;
-
-		if (0 != (service->state & ZBX_VMWARE_STATE_UPDATING))
-			continue;
-
-		service_update = service->lastcheck + ZBX_VMWARE_CACHE_TTL;
-		if (service_update < next_update)
-			next_update = service_update;
-
-	}
-
-	return next_update > now ? next_update : now;
-}
-
-
 /*
  * Public API
  */
@@ -2463,7 +2430,7 @@ void	zbx_vmware_destroy(void)
 void	main_vmware_loop(void)
 {
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-	int			i, now, state = ZBX_VMWARE_SERVICE_NONE;
+	int			i, now, state, next_update;
 	zbx_vmware_service_t	*service = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_vmware_loop()");
@@ -2472,11 +2439,12 @@ void	main_vmware_loop(void)
 	{
 		zbx_setproctitle("%s [querying vmware services]", get_process_type_string(process_type));
 
-		now = time(NULL);
-
-		for (state = ZBX_VMWARE_SERVICE_NONE; ZBX_VMWARE_SERVICE_IDLE != state; )
+		do
 		{
 			state = ZBX_VMWARE_SERVICE_IDLE;
+
+			now = time(NULL);
+			next_update = now + ZBX_VMWARE_CACHE_TTL;
 
 			zbx_vmware_lock();
 
@@ -2501,17 +2469,25 @@ void	main_vmware_loop(void)
 					state = ZBX_VMWARE_SERVICE_UPDATE;
 					break;
 				}
+
+				if (service->lastcheck + ZBX_VMWARE_CACHE_TTL < next_update)
+					next_update = service->lastcheck + ZBX_VMWARE_CACHE_TTL;
 			}
 
 			zbx_vmware_unlock();
 
 			if (ZBX_VMWARE_SERVICE_UPDATE == state)
 				vmware_service_update(service);
-		}
+
+		} while (ZBX_VMWARE_SERVICE_IDLE != state);
 
 		now = time(NULL);
 
-		zbx_sleep_loop(vmware_get_update_time(now) - now);
+		if (next_update > now)
+		{
+			zbx_setproctitle("%s [sleeping]", get_process_type_string(process_type));
+			zbx_sleep_loop(next_update - now);
+		}
 	}
 #endif
 }
