@@ -55,19 +55,16 @@ function get_item_logtype_description($logtype) {
 function get_item_logtype_style($logtype) {
 	switch ($logtype) {
 		case ITEM_LOGTYPE_INFORMATION:
+		case ITEM_LOGTYPE_SUCCESS_AUDIT:
+		case ITEM_LOGTYPE_VERBOSE:
 			return 'information';
 		case ITEM_LOGTYPE_WARNING:
 			return 'warning';
 		case ITEM_LOGTYPE_ERROR:
-			return 'high';
 		case ITEM_LOGTYPE_FAILURE_AUDIT:
 			return 'high';
-		case ITEM_LOGTYPE_SUCCESS_AUDIT:
-			return 'information';
 		case ITEM_LOGTYPE_CRITICAL:
 			return 'disaster';
-		case ITEM_LOGTYPE_VERBOSE:
-			return 'information';
 		default:
 			return 'normal';
 	}
