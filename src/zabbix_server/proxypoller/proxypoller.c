@@ -336,11 +336,8 @@ exit:
 
 void	main_proxypoller_loop(void)
 {
-	const char	*__function_name = "main_proxypoller_loop";
 	int		nextcheck, sleeptime, processed;
 	double		sec;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() process_num:%d", __function_name, process_num);
 
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
@@ -353,9 +350,6 @@ void	main_proxypoller_loop(void)
 		sec = zbx_time();
 		processed = process_proxy();
 		sec = zbx_time() - sec;
-
-		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while processing %3d proxies",
-				get_process_type_string(process_type), process_num, sec, processed);
 
 		nextcheck = DCconfig_get_proxypoller_nextcheck();
 		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);

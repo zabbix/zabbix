@@ -144,8 +144,6 @@ void	main_datasender_loop(void)
 	double		sec;
 	struct zbx_json	j;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In main_datasender_loop()");
-
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
@@ -184,9 +182,6 @@ retry_autoreg_host:
 			goto retry_autoreg_host;
 
 		sec = zbx_time() - sec;
-
-		zabbix_log(LOG_LEVEL_DEBUG, "Datasender spent " ZBX_FS_DBL " seconds while processing %3d values.",
-				sec, records);
 
 		zbx_setproctitle("%s [sent %d values in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), records, sec, CONFIG_PROXYDATA_FREQUENCY);

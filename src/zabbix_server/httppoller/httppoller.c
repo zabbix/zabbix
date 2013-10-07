@@ -101,8 +101,6 @@ void	main_httppoller_loop(void)
 	int	now, nextcheck, sleeptime, httptests_count;
 	double	sec;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In main_httppoller_loop() process_num:%d", process_num);
-
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
@@ -115,9 +113,6 @@ void	main_httppoller_loop(void)
 		sec = zbx_time();
 		httptests_count = process_httptests(process_num, now);
 		sec = zbx_time() - sec;
-
-		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while updating HTTP tests",
-				get_process_type_string(process_type), process_num, sec);
 
 		nextcheck = get_minnextcheck(now);
 		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);

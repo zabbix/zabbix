@@ -542,8 +542,6 @@ void	main_pinger_loop(void)
 	static int		items_alloc = 4;
 	int			items_count = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In main_pinger_loop() process_num:%d", process_num);
-
 	if (NULL == items)
 		items = zbx_malloc(items, sizeof(icmpitem_t) * items_alloc);
 
@@ -555,9 +553,6 @@ void	main_pinger_loop(void)
 		get_pinger_hosts(&items, &items_alloc, &items_count);
 		process_pinger_hosts(items, items_count);
 		sec = zbx_time() - sec;
-
-		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while processing %d items",
-				get_process_type_string(process_type), process_num, sec, items_count);
 
 		free_hosts(&items, &items_count);
 

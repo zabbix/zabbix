@@ -43,10 +43,11 @@ extern unsigned char	process_type;
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	send_heartbeat()
+static int	send_heartbeat()
 {
 	zbx_sock_t	sock;
 	struct zbx_json	j;
+	int		ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In send_heartbeat()");
 
@@ -55,12 +56,17 @@ static void	send_heartbeat()
 	zbx_json_addstring(&j, "host", CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
 
 	if (FAIL == connect_to_server(&sock, CONFIG_HEARTBEAT_FREQUENCY, 0)) /* do not retry */
-		return;
+		return FAIL;
 
 	if (FAIL == put_data_to_server(&sock, &j))
+	{
 		zabbix_log(LOG_LEVEL_WARNING, "Heartbeat message failed");
+		ret = FAIL;
+	}
 
 	disconnect_server(&sock);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -80,9 +86,8 @@ static void	send_heartbeat()
  ******************************************************************************/
 void	main_heart_loop(void)
 {
-	int	start, sleeptime;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In main_heart_loop()");
+	int	start, sleeptime, res;
+	double	sec;
 
 	for (;;)
 	{
@@ -90,11 +95,22 @@ void	main_heart_loop(void)
 
 		zbx_setproctitle("%s [sending heartbeat message]", get_process_type_string(process_type));
 
-		send_heartbeat();
+		sec = zbx_time();
+		res = send_heartbeat();
+		sec = zbx_time() - sec;
 
 		sleeptime = CONFIG_HEARTBEAT_FREQUENCY - (time(NULL) - start);
 
-		zbx_setproctitle("%s [idle %d sec]", get_process_type_string(process_type), sleeptime);
+		if (SUCCEED == res)
+		{
+			zbx_setproctitle("%s [sent heartbeat message in " ZBX_FS_DBL " sec, idle %d sec]",
+					get_process_type_string(process_type), sec, sleeptime);
+		}
+		else
+		{
+			zbx_setproctitle("%s [sending heartbeat message failed in " ZBX_FS_DBL " sec, idle %d sec]",
+					get_process_type_string(process_type), sec, sleeptime);
+		}
 
 		zbx_sleep_loop(sleeptime);
 	}

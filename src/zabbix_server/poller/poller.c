@@ -776,9 +776,6 @@ void	main_poller_loop(unsigned char poller_type)
 	int	nextcheck, sleeptime, processed;
 	double	sec;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In main_poller_loop() process_type:'%s' process_num:%d",
-			get_process_type_string(process_type), process_num);
-
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
@@ -790,9 +787,6 @@ void	main_poller_loop(unsigned char poller_type)
 		sec = zbx_time();
 		processed = get_values(poller_type);
 		sec = zbx_time() - sec;
-
-		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while updating %d values",
-				get_process_type_string(process_type), process_num, sec, processed);
 
 		nextcheck = DCconfig_get_poller_nextcheck(poller_type);
 		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);

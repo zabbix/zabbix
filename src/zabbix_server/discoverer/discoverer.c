@@ -758,8 +758,6 @@ void	main_discoverer_loop(void)
 	int	now, nextcheck, sleeptime, rule_count;
 	double	sec;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In main_discoverer_loop() process_num:%d", process_num);
-
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
@@ -772,9 +770,6 @@ void	main_discoverer_loop(void)
 		sec = zbx_time();
 		rule_count = process_discovery(now);
 		sec = zbx_time() - sec;
-
-		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while processing rules",
-				get_process_type_string(process_type), process_num, sec);
 
 		nextcheck = get_minnextcheck(now);
 		sleeptime = calculate_sleeptime(nextcheck, DISCOVERER_DELAY);

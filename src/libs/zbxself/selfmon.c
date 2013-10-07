@@ -511,8 +511,6 @@ void	zbx_sleep_loop(int sleeptime)
 
 	sleep_remains = sleeptime;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "sleeping for %d seconds", sleep_remains);
-
 	update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
 	if (ZBX_PROCESS_TYPE_CONFSYNCER == process_type)

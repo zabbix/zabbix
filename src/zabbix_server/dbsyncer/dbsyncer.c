@@ -45,13 +45,10 @@ extern int		process_num;
  ******************************************************************************/
 void	main_dbsyncer_loop(void)
 {
-	int	sleeptime, last_sleeptime = -1, num;
+	int	sleeptime, last_sleeptime = -1, num, retry_up = 0, retry_dn = 0;
 	double	sec;
-	int	retry_up = 0, retry_dn = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In main_dbsyncer_loop() process_num:%d", process_num);
-
-	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
+	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
@@ -59,14 +56,9 @@ void	main_dbsyncer_loop(void)
 	{
 		zbx_setproctitle("%s #%d [syncing history]", get_process_type_string(process_type), process_num);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Syncing ...");
-
 		sec = zbx_time();
 		num = DCsync_history(ZBX_SYNC_PARTIAL);
 		sec = zbx_time() - sec;
-
-		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while processing %d items",
-				get_process_type_string(process_type), process_num, sec, num);
 
 		if (-1 == last_sleeptime)
 		{

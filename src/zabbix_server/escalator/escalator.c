@@ -1463,8 +1463,6 @@ void	main_escalator_loop(void)
 	int	now, escalations_count;
 	double	sec;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In main_escalator_loop()");
-
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
@@ -1477,9 +1475,6 @@ void	main_escalator_loop(void)
 		sec = zbx_time();
 		escalations_count = process_escalations(now);
 		sec = zbx_time() - sec;
-
-		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while processing escalations",
-				get_process_type_string(process_type), process_num, sec);
 
 		zbx_setproctitle("%s [processed %d escalations in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), escalations_count, sec, CONFIG_ESCALATOR_FREQUENCY);
