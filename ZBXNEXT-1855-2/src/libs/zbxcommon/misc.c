@@ -341,6 +341,7 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...)
 #elif defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	setproctitle_set_status(title);
 #endif
+	zabbix_log(LOG_LEVEL_DEBUG, "%s", title);
 }
 
 /******************************************************************************

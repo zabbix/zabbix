@@ -671,10 +671,7 @@ static void	process_trapper_child(zbx_sock_t *sock)
 
 void	main_trapper_loop(zbx_sock_t *s)
 {
-	const char	*__function_name = "main_trapper_loop";
 	double		sec = 0.0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 

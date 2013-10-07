@@ -817,9 +817,7 @@ void	main_timer_loop(void)
 				process_num);
 
 		sec = zbx_time();
-
 		process_time_functions(&triggers_count, &events_count);
-
 		sec = zbx_time() - sec;
 
 		/* only the "timer #1" process evaluates the maintenance periods */
@@ -834,9 +832,7 @@ void	main_timer_loop(void)
 					get_process_type_string(process_type));
 
 			sec_maint = zbx_time();
-
 			hm_count = process_maintenance();
-
 			sec_maint = zbx_time() - sec_maint;
 		}
 	}

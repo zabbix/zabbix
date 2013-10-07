@@ -466,6 +466,7 @@ static int	get_latest_data()
 void	main_snmptrapper_loop(void)
 {
 	const char	*__function_name = "main_snmptrapper_loop";
+	double		sec;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trapfile:'%s'", __function_name, CONFIG_SNMPTRAP_FILE);
 
@@ -479,10 +480,13 @@ void	main_snmptrapper_loop(void)
 	{
 		zbx_setproctitle("%s [processing data]", get_process_type_string(process_type));
 
+		sec = zbx_time();
 		while (SUCCEED == get_latest_data())
 			read_traps();
+		sec = zbx_time() - sec;
 
-		zbx_setproctitle("%s [idle 1 sec]", get_process_type_string(process_type));
+		zbx_setproctitle("%s [processed data in " ZBX_FS_DBL " sec, idle 1 sec]",
+				get_process_type_string(process_type), sec);
 
 		zbx_sleep_loop(1);
 	}

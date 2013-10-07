@@ -49,9 +49,8 @@ void	main_dbconfig_loop(void)
 {
 	double	sec;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In main_dbconfig_loop()");
-
-	zbx_setproctitle("%s [waiting for processes]", get_process_type_string(process_type));
+	zbx_setproctitle("%s [waiting %d sec for processes]", get_process_type_string(process_type),
+			CONFIG_CONFSYNCER_FREQUENCY);
 
 	/* the initial configuration sync is done by server before worker processes are forked */
 	zbx_sleep_loop(CONFIG_CONFSYNCER_FREQUENCY);
@@ -64,17 +63,12 @@ void	main_dbconfig_loop(void)
 	{
 		zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Syncing ...");
-
 		sec = zbx_time();
 		DCsync_configuration();
 		sec = zbx_time() - sec;
 
 		zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), sec, CONFIG_CONFSYNCER_FREQUENCY);
-
-		zabbix_log(LOG_LEVEL_DEBUG, "%s spent " ZBX_FS_DBL " second while processing configuration data",
-				get_process_type_string(process_type), sec);
 
 		zbx_sleep_loop(CONFIG_CONFSYNCER_FREQUENCY);
 	}

@@ -104,8 +104,6 @@ void	main_proxyconfig_loop(void)
 	size_t	data_size;
 	double	sec;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In main_proxyconfig_loop()");
-
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
@@ -115,9 +113,7 @@ void	main_proxyconfig_loop(void)
 		zbx_setproctitle("%s [loading configuration]", get_process_type_string(process_type));
 
 		sec = zbx_time();
-
 		process_configuration_sync(&data_size);
-
 		sec = zbx_time() - sec;
 
 		zbx_setproctitle("%s [synced config " ZBX_FS_SIZE_T " bytes in " ZBX_FS_DBL " sec, idle %d sec]",

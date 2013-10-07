@@ -163,11 +163,8 @@ int	is_direct_slave_node(int slave_nodeid)
  ******************************************************************************/
 void	main_nodewatcher_loop(void)
 {
-	int	start, end;
-	int	lastrun = 0;
+	int	start, end, lastrun = 0;
 	double	sec;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In main_nodewatcher_loop()");
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
@@ -175,12 +172,9 @@ void	main_nodewatcher_loop(void)
 
 	for (;;)
 	{
-		zbx_setproctitle("%s [exchanging data]", get_process_type_string(process_type));
+		zbx_setproctitle("%s [syncing with nodes]", get_process_type_string(process_type));
 
 		start = time(NULL);
-
-		zabbix_log(LOG_LEVEL_DEBUG, "Starting sync with nodes");
-
 		sec = zbx_time();
 
 		if (lastrun + 120 < start)
@@ -193,7 +187,6 @@ void	main_nodewatcher_loop(void)
 		main_historysender();
 
 		sec = zbx_time() - sec;
-
 		end = time(NULL);
 
 		zbx_setproctitle("%s [synced with nodes in " ZBX_FS_DBL " sec, idle %d sec]",

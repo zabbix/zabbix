@@ -803,11 +803,10 @@ void	main_housekeeper_loop(void)
 
 		sec = zbx_time() - sec;
 
-		zabbix_log(LOG_LEVEL_WARNING, "housekeeper deleted: %d records from history and trends,"
-				" %d records of deleted items, %d events, %d sessions,"
-				" %d service alarms, %d audit items",
-				d_history_and_trends, d_cleanup, d_events, d_sessions, d_services, d_audit);
-
+		zabbix_log(LOG_LEVEL_WARNING, "%s [deleted %d hist/trends, %d items, %d events, %d sessions, %d alarms,"
+				" %d audit items in " ZBX_FS_DBL " sec, idle %d hour(s)]",
+				get_process_type_string(process_type), d_history_and_trends, d_cleanup, d_events,
+				d_sessions, d_services, d_audit, sec, CONFIG_HOUSEKEEPING_FREQUENCY);
 		DBclose();
 
 		zbx_setproctitle("%s [deleted %d hist/trends, %d items, %d events, %d sessions, %d alarms, %d audit "
