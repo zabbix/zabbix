@@ -4,4 +4,5 @@ CFLAGS = $(INCS) /O2 /Ob1 /GF /FD /EHsc /MT /Gy /W3 /c /TC /D _WINDOWS /D _WIN32
 LFLAGS = /INCREMENTAL:NO /MANIFEST /MANIFESTFILE:"zabbix_sender.exe.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /PDB:"zabbix_sender.pdb" /SUBSYSTEM:CONSOLE /DYNAMICBASE:NO /MACHINE:X86
 
 SENDER_MAIN_OBJ = zabbix_sender.o
+
 include Makefile_sender.inc

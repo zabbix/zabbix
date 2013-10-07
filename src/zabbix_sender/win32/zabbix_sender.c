@@ -40,7 +40,7 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 	if (1 > count)
 	{
 		if (NULL != result)
-			*result = zbx_strdup(NULL, "Values array must have at least one item");
+			*result = zbx_strdup(NULL, "values array must have at least one item");
 
 		return FAIL;
 	}
@@ -61,7 +61,7 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 
 	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, source, address, port, GET_SENDER_TIMEOUT)))
 	{
-		if (SUCCEED == (tcp_ret = zbx_tcp_send(&sock,json.buffer)))
+		if (SUCCEED == (tcp_ret = zbx_tcp_send(&sock, json.buffer)))
 		{
 			if (SUCCEED == (tcp_ret = zbx_tcp_recv(&sock, &answer)))
 			{
@@ -83,7 +83,7 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 
 int	zabbix_sender_parse_result(const char *result, int *response, zabbix_sender_info_t *info)
 {
-	int			ret, processed;
+	int			ret;
 	struct zbx_json_parse	jp;
 	char			value[MAX_STRING_LEN];
 	double			time_spent;
@@ -100,15 +100,14 @@ int	zabbix_sender_parse_result(const char *result, int *response, zabbix_sender_
 		goto out;
 
 	if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, value, sizeof(value)) ||
-			4 != sscanf(value, "Processed %d Failed %d Total %d Seconds spent %lf",
-					&processed, &info->failed, &info->total, &time_spent))
+			3 != sscanf(value, "Processed %*d Failed %d Total %d Seconds spent %lf",
+				&info->failed, &info->total, &time_spent))
 	{
 		info->total = -1;
 		goto out;
 	}
 
 	info->time_spent = (int)(time_spent * 1000000);
-
 out:
 	return ret;
 }
