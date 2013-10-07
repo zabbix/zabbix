@@ -75,7 +75,7 @@ class testInheritanceItem extends CWebTest {
 
 		$this->zbxTestLogin('items.php?form=update&hostid=30000&itemid='.$data['itemid']);
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of items');
+		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestTextPresent(array(
 			'Item updated',
 			$data['name'],
@@ -1184,12 +1184,12 @@ class testInheritanceItem extends CWebTest {
 			switch ($expected) {
 				case TEST_GOOD:
 					$this->zbxTestTextPresent('Item added');
-					$this->checkTitle('Configuration of items');
+					$this->zbxTestCheckTitle('Configuration of items');
 					$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
 					break;
 
 				case TEST_BAD:
-					$this->checkTitle('Configuration of items');
+					$this->zbxTestCheckTitle('Configuration of items');
 					$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
 					foreach ($data['errors'] as $msg) {
 						$this->zbxTestTextPresent($msg);
@@ -1347,12 +1347,12 @@ class testInheritanceItem extends CWebTest {
 		switch ($result) {
 			case TEST_GOOD:
 				$this->zbxTestTextPresent('Item added');
-				$this->checkTitle('Configuration of items');
+				$this->zbxTestCheckTitle('Configuration of items');
 				$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
 				break;
 
 			case TEST_BAD:
-				$this->checkTitle('Configuration of items');
+				$this->zbxTestCheckTitle('Configuration of items');
 				$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
 				foreach ($errorMsgs as $msg) {
 					$this->zbxTestTextPresent($msg);

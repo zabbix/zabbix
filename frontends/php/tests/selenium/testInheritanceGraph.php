@@ -67,7 +67,7 @@ class testInheritanceGraph extends CWebTest {
 
 		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&hostid=30000');
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of graphs');
+		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestTextPresent(array(
 			'Graph updated',
 			$data['name'],
@@ -429,12 +429,12 @@ class testInheritanceGraph extends CWebTest {
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->zbxTestTextPresent('Graph added');
-				$this->checkTitle('Configuration of graphs');
+				$this->zbxTestCheckTitle('Configuration of graphs');
 				$this->zbxTestTextPresent('CONFIGURATION OF GRAPHS');
 				break;
 
 			case TEST_BAD:
-				$this->checkTitle('Configuration of graphs');
+				$this->zbxTestCheckTitle('Configuration of graphs');
 				$this->zbxTestTextPresent('CONFIGURATION OF GRAPHS');
 				foreach ($data['errors'] as $msg) {
 					$this->zbxTestTextPresent($msg);
