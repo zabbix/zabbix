@@ -4,7 +4,8 @@ New features:
 ..F....... [ZBX-6911] added functionality to save positions of block on dashboard page in profiles table (Vitalij)
 
 Bug fixes:
-A.F....... [ZBX-7053] fixed errors when deleting a script linked to action operation and added unnecessary data clearing on action operation type change (Ivo)
+..F....... [ZBX-7082] fixed not being able to create dependencies between template triggers (Ivo)
+A.F....... [ZBX-7053] fixed errors when deleting a script linked to action operation and fixed type-specific operation command properties not being reset when changing type (Ivo)
 ..F....... [ZBX-7058] fixed repeated global search with same value (Eduard)
 ...GI..PS. [ZBX-7061] fixed warnings produced by clang static analyzer (asaveljevs)
 ..F....... [ZBX-6873] fixed pagination issue after deleting an object through form (Ivo)
