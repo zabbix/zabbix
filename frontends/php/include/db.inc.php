@@ -261,10 +261,10 @@ function DBstart() {
 
 	switch ($DB['TYPE']) {
 		case ZBX_DB_MYSQL:
-			$result = DBexecute('begin');
+			$result = DBexecute('BEGIN');
 			break;
 		case ZBX_DB_POSTGRESQL:
-			$result = DBexecute('begin');
+			$result = DBexecute('BEGIN');
 			break;
 		case ZBX_DB_ORACLE:
 			$result = true;
@@ -274,7 +274,7 @@ function DBstart() {
 			break;
 		case ZBX_DB_SQLITE3:
 			lock_sqlite3_access();
-			$result = DBexecute('begin');
+			$result = DBexecute('BEGIN');
 			break;
 	}
 	return $result;
@@ -322,10 +322,10 @@ function DBcommit() {
 
 	switch ($DB['TYPE']) {
 		case ZBX_DB_MYSQL:
-			$result = DBexecute('commit');
+			$result = DBexecute('COMMIT');
 			break;
 		case ZBX_DB_POSTGRESQL:
-			$result = DBexecute('commit');
+			$result = DBexecute('COMMIT');
 			break;
 		case ZBX_DB_ORACLE:
 			$result = oci_commit($DB['DB']);
@@ -337,7 +337,7 @@ function DBcommit() {
 			}
 			break;
 		case ZBX_DB_SQLITE3:
-			$result = DBexecute('commit');
+			$result = DBexecute('COMMIT');
 			unlock_sqlite3_access();
 			break;
 	}
