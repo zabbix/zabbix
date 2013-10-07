@@ -79,6 +79,7 @@ initialize: function($super, id, objid){
 //	addListener(window, 'keypress', this.searchFocus.bindAsEventListener(this));
 
 	this.timeoutNeedle = null;
+	this.userNeedle = this.dom.input.value;
 },
 
 needleChange: function(e){
