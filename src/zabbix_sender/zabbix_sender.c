@@ -507,19 +507,21 @@ int	main(int argc, char **argv)
 				ret = zbx_thread_wait(zbx_thread_start(send_value, &thread_args));
 
 				buffer_count = 0;
+
+				if (SUCCEED != ret && SUCCEED_PARTIAL != ret)
+					break;
+
 				zbx_json_clean(&sentdval_args.json);
 				zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA,
 						ZBX_JSON_TYPE_STRING);
 				zbx_json_addarray(&sentdval_args.json, ZBX_PROTO_TAG_DATA);
 			}
-
-			if (SUCCEED != ret && SUCCEED_PARTIAL != ret)
-				break;
 		}
-		zbx_json_close(&sentdval_args.json);
 
 		if (0 != buffer_count)
 		{
+			zbx_json_close(&sentdval_args.json);
+
 			if (1 == WITH_TIMESTAMPS)
 				zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
 
