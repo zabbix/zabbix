@@ -32,7 +32,7 @@ class testPageMaintenance extends CWebTest {
 	public function testPageMaintenance_CheckLayout($maintenance) {
 		$this->zbxTestLogin('maintenance.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->checkTitle('Configuration of maintenance');
+		$this->zbxTestCheckTitle('Configuration of maintenance');
 
 		$this->zbxTestTextPresent('Maintenance');
 		$this->zbxTestTextPresent('CONFIGURATION OF MAINTENANCE PERIODS');
@@ -65,10 +65,10 @@ class testPageMaintenance extends CWebTest {
 
 		$this->zbxTestLogin('maintenance.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->checkTitle('Configuration of maintenance');
+		$this->zbxTestCheckTitle('Configuration of maintenance');
 		$this->zbxTestClickWait('link='.$name);
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of maintenance');
+		$this->zbxTestCheckTitle('Configuration of maintenance');
 		$this->zbxTestTextPresent('Maintenance updated');
 		$this->zbxTestTextPresent("$name");
 		$this->zbxTestTextPresent('CONFIGURATION OF MAINTENANCE PERIODS');
@@ -78,11 +78,6 @@ class testPageMaintenance extends CWebTest {
 		$this->assertEquals($oldHashGroups, DBhash($sqlGroups), "Chuck Norris: Maintenance update changed data in table 'maintenances_groups'");
 		$this->assertEquals($oldHashWindows, DBhash($sqlWindows), "Chuck Norris: Maintenance update changed data in table 'maintenances_windows'");
 		$this->assertEquals($oldHashTimeperiods, DBhash($sqlTimeperiods), "Chuck Norris: Maintenance update changed data in table 'timeperiods'");
-	}
-
-	public function testPageMaintenance_MassDeleteAll() {
-// TODO
-		$this->markTestIncomplete();
 	}
 
 	/**
@@ -97,13 +92,13 @@ class testPageMaintenance extends CWebTest {
 
 		$this->zbxTestLogin('maintenance.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->checkTitle('Configuration of maintenance');
+		$this->zbxTestCheckTitle('Configuration of maintenance');
 		$this->zbxTestCheckboxSelect('maintenanceids['.$maintenanceid.']');
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
 		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
-		$this->checkTitle('Configuration of maintenance');
+		$this->zbxTestCheckTitle('Configuration of maintenance');
 		$this->zbxTestTextPresent('Maintenance deleted');
 
 		$sql = "select * from maintenances where maintenanceid=$maintenanceid";
@@ -120,38 +115,4 @@ class testPageMaintenance extends CWebTest {
 		DBrestore_tables('maintenances');
 	}
 
-	public function testPageMaintenance_SingleEnable() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageMaintenance_SingleDisable() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageMaintenance_MassEnableAll() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageMaintenance_MassEnable() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageMaintenance_MassDisableAll() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageMaintenance_MassDisable() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageMaintenance_Sorting() {
-// TODO
-		$this->markTestIncomplete();
-	}
 }

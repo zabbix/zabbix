@@ -63,7 +63,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->zbxTestLogin('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeper');
-		$this->checkTitle('Configuration of housekeeper');
+		$this->zbxTestCheckTitle('Configuration of housekeeper');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF HOUSEKEEPER', 'Housekeeper'));
 
 		if (isset($data['hk_events_mode'])) {
@@ -514,7 +514,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->zbxTestLogin('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeper');
-		$this->checkTitle('Configuration of housekeeper');
+		$this->zbxTestCheckTitle('Configuration of housekeeper');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF HOUSEKEEPER', 'Housekeeper'));
 
 		if (isset($data['hk_events_mode'])) {
@@ -633,13 +633,13 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		switch ($expected) {
 			case HOUSEKEEPER_GOOD:
 				$this->zbxTestTextPresent('Configuration updated');
-				$this->checkTitle('Configuration of housekeeper');
+				$this->zbxTestCheckTitle('Configuration of housekeeper');
 				$this->zbxTestTextPresent(array('CONFIGURATION OF HOUSEKEEPER', 'Housekeeper'));
 				break;
 
 			case HOUSEKEEPER_BAD:
 				$this->zbxTestTextNotPresent('Configuration updated');
-				$this->checkTitle('Configuration of housekeeper');
+				$this->zbxTestCheckTitle('Configuration of housekeeper');
 				foreach ($data['errors'] as $msg) {
 					$this->zbxTestTextPresent($msg);
 				}
@@ -826,7 +826,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->zbxTestLogin('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeper');
-		$this->checkTitle('Configuration of housekeeper');
+		$this->zbxTestCheckTitle('Configuration of housekeeper');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF HOUSEKEEPER', 'Housekeeper'));
 
 		$sqlConfig = "SELECT * FROM config ORDER BY configid";
@@ -839,7 +839,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->zbxTestClickWait('save');
 
 		$this->zbxTestTextPresent('Configuration updated');
-		$this->checkTitle('Configuration of housekeeper');
+		$this->zbxTestCheckTitle('Configuration of housekeeper');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF HOUSEKEEPER', 'Housekeeper'));
 
 		$this->assertElementPresent("//input[@id='hk_events_mode']/@checked");

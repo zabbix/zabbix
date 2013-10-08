@@ -406,7 +406,12 @@ var CDoll = Class.create(CDebug,{
 				forcePlaceholderSize: true,
 				placeholder: 'widget ui-corner-all ui-sortable-placeholder',
 				opacity: '0.8',
-				receive: function() { jQuery('.column').portletState('save', {'name': 'dashboard'}); }
+				update: function(e, ui) {
+					// prevent duplicate save requests when moving a widget from one column to another
+					if (!ui.sender) {
+						jQuery('.column').portletState('save', {'name': 'dashboard'});
+					}
+				}
 			})
 			.portletState('load', {'name': 'dashboard'})
 			.children('div')

@@ -48,7 +48,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestClickWait('form');
 		$this->input_type('host', $this->host);
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of hosts');
+		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host added');
 		$this->zbxTestTextPresent($this->host);
 	}
@@ -61,7 +61,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestClickWait('form');
 		$this->input_type('host', $host);
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of hosts');
+		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host added');
 		$this->zbxTestTextPresent($host);
 	}
@@ -71,7 +71,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 		$this->zbxTestClickWait('link='.$this->host);
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of hosts');
+		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host updated');
 		$this->zbxTestTextPresent($this->host);
 	}
@@ -106,7 +106,7 @@ class testFormHost extends CWebTest {
 
 		$this->zbxTestClickWait('save');
 
-		$this->checkTitle('Configuration of hosts');
+		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('ERROR: Cannot add host');
 		$this->zbxTestTextPresent('No groups for host "'.$host.'".');
 
@@ -125,7 +125,7 @@ class testFormHost extends CWebTest {
 		$this->input_type('host', $host);
 		$this->zbxTestClickWait('save');
 
-		$this->checkTitle('Configuration of hosts');
+		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('ERROR: Cannot add host');
 		$this->zbxTestTextPresent('Host with the same name "'.$host.'" already exists.');
 
@@ -146,7 +146,7 @@ class testFormHost extends CWebTest {
 		$this->input_type('visiblename', $hostVisible);
 		$this->zbxTestClickWait('save');
 
-		$this->checkTitle('Configuration of hosts');
+		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('ERROR: Cannot add host');
 		$this->zbxTestTextPresent('Host with the same visible name "'.$hostVisible.'" already exists.');
 
@@ -162,7 +162,7 @@ class testFormHost extends CWebTest {
 		$this->input_type('host', $this->host_cloned);
 		$this->input_type('visiblename', $this->host_cloned_visible);
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of hosts');
+		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host added');
 	}
 
@@ -175,7 +175,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestClickWait('link='.$this->host_cloned_visible);
 		$this->zbxTestClickWait('delete');
 		$this->getConfirmation();
-		$this->checkTitle('Configuration of hosts');
+		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host deleted');
 	}
 
@@ -188,7 +188,7 @@ class testFormHost extends CWebTest {
 		$this->input_type('host', $this->host_fullcloned);
 		$this->input_type('visiblename', $this->host_fullcloned_visible);
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of hosts');
+		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host added');
 	}
 
@@ -201,7 +201,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestClickWait('link='.$this->host_fullcloned_visible);
 		$this->zbxTestClickWait('delete');
 		$this->getConfirmation();
-		$this->checkTitle('Configuration of hosts');
+		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host deleted');
 	}
 
@@ -212,7 +212,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestClickWait('link='.$this->host);
 		$this->input_type('host', $this->host_tmp);
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of hosts');
+		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host updated');
 	}
 
@@ -230,7 +230,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestClick('delete');
 		$this->waitForConfirmation();
 		$this->wait();
-		$this->checkTitle('Configuration of hosts');
+		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host deleted');
 
 		// check if all records have been deleted
@@ -255,7 +255,7 @@ class testFormHost extends CWebTest {
 
 		$this->zbxTestTextPresent('Template OS Linux');
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of hosts');
+		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host updated');
 	}
 
@@ -287,7 +287,7 @@ class testFormHost extends CWebTest {
 
 		$this->zbxTestTextNotPresent($template);
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of hosts');
+		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host updated');
 
 		// this should be a separate test
@@ -321,7 +321,7 @@ class testFormHost extends CWebTest {
 
 		$this->zbxTestTextPresent('Template OS Linux');
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of hosts');
+		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host updated');
 	}
 
@@ -362,7 +362,7 @@ class testFormHost extends CWebTest {
 
 		$this->zbxTestTextNotPresent($template);
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of hosts');
+		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host updated');
 
 	}
