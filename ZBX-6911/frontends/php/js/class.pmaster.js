@@ -409,65 +409,25 @@ var CDoll = Class.create(CDebug,{
 				update: function(e, ui) {
 					// prevent duplicate save requests when moving a widget from one column to another
 					if (!ui.sender) {
-						jQuery('.column').portletState('save', {'name': 'dashboard'});
+						// save widget positions
+						var positions = {};
+						jQuery('.column').each(function(colNum, column) {
+							positions[colNum] = {};
+							jQuery(column).find('.widget').each(function(rowNum, widget) {
+								positions[colNum][rowNum] = widget.id;
+							});
+						});
+
+						send_params({
+							'favaction': 'sort',
+							'favobj' : 'hat',
+							'favdata': Object.toJSON(positions)
+						});
 					}
 				}
 			})
-			.portletState('load', {'name': 'dashboard'})
 			.children('div')
 			.children('div.header')
 			.addClass('move');
 	}
 });
-
-(function($) {
-	var methods = {
-		init: function(options) {},
-		save: function(method, options) {
-			var settings = {
-				'name': 'sortableOrder',
-				'sortable': '.widget'
-			};
-
-			$.extend(settings, options);
-
-			var positions = {};
-			this.each(function(colNum, column) {
-				positions[colNum] = {};
-				$(column).find(settings.sortable).each(function(rowNum, widget) {
-					positions[colNum][rowNum] = widget.id;
-				});
-			});
-
-			var strPos = Object.toJSON(positions);
-
-			var params = {
-				'favaction': 'sort',
-				'favobj' : 'hat',
-				'favdata': strPos
-			}
-			send_params(params);
-
-			return this;
-		},
-		load: function(method, options) {
-			var settings = {
-				'name': 'sortableOrder',
-				'sortable': '.widget'
-			};
-
-			$.extend(settings, options);
-
-			return this;
-		}
-	};
-
-	$.fn.portletState = function(method, options) {
-		if (isset(method, methods)) {
-			return methods[method].apply(this, arguments);
-		}
-		else {
-			$.error('Method ' +  method + ' does not exist on jQuery.portletState');
-		}
-	}
-})(jQuery);
