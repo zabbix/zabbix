@@ -175,4 +175,4 @@ int	zbx_xml_read_values(const char *data, const char *xpath, zbx_vector_str_t *v
 
 #endif
 
-#endif /* VMWARE_H_ */
+#endif	/* ZABBIX_VMWARE_H */
