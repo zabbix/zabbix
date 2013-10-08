@@ -29,11 +29,11 @@
 typedef struct
 {
 	/* host name, must match the name of target host in Zabbix */
-	char	*host;
+	const char	*host;
 	/* the item key */
-	char	*key;
+	const char	*key;
 	/* the item value */
-	char	*value;
+	const char	*value;
 }
 zabbix_sender_value_t;
 
