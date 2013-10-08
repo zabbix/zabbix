@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-08 23:08+0300\n"
-"PO-Revision-Date: 2013-09-12 19:26+0300\n"
+"POT-Creation-Date: 2013-10-08 23:10+0300\n"
+"PO-Revision-Date: 2013-10-08 19:37+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1379006809.0\n"
+"X-POOTLE-MTIME: 1381253834.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -34,9 +34,9 @@ msgstr "\"Мигание триггеров при изменении состо
 #, php-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$d день"
+msgstr[1] "%1$d дней"
+msgstr[2] "%1$d дня"
 
 #: chart4.php:89 chart5.php:83
 #, php-format
@@ -167,7 +167,7 @@ msgstr "500 последних значений"
 
 #: include/views/administration.script.edit.php:41
 msgid "<Sub-menu/Sub-menu.../>Script"
-msgstr ""
+msgstr "<Подменю/Подменю.../>Скрипт"
 
 #: include/views/configuration.sysmap.edit.php:55
 msgid "<manual>"
@@ -1230,7 +1230,7 @@ msgstr "Не удалось добавить не числовой элемен�
 #: include/reports.inc.php:505
 #, php-format
 msgid "Cannot add a non-numeric item \"%1$s\"."
-msgstr ""
+msgstr "Не удалось добавить не числовой элемент данных \"%1$s\" к прототипу графика \"%2$s\"."
 
 #: actionconf.php:150
 msgid "Cannot add action"
@@ -1309,7 +1309,7 @@ msgstr "Невозможно добавить более одного элеме
 #: api/classes/CGraphPrototype.php:43
 #, php-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
-msgstr "Не удалось добавить более одного элемента данных с типом 'Суммарный график' к прототипу графика \"%1$s\"."
+msgstr "Не удалось добавить более одного элемента данных с типом 'Суммарный график' к прототипу графика \"%1$s\".Не удалось добавить более одного элемента данных с типом 'Суммарный график' к прототипу графика \"%1$s\"."
 
 #: sysmaps.php:171
 msgid "Cannot add network map"
@@ -1614,7 +1614,7 @@ msgstr "Не удалось удалить скрипты. Скрипт \"%1$s\"
 #: api/classes/CScript.php:529
 #, php-format
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
-msgstr ""
+msgstr "Не удалось удалить скрипты. Скрипт с scriptid \"%1$s\" не существует."
 
 #: actionconf.php:331
 msgid "Cannot delete selected actions"
@@ -2266,7 +2266,7 @@ msgstr "Не удалось обновить веб-сценарий"
 
 #: include/views/js/configuration.discovery.edit.js.php:600
 msgid "Cannot validate discovery check: invalid request or connection to Zabbix server failed."
-msgstr ""
+msgstr "Не удалось проверить проверку обнаружения: ошибочный запрос или не удалось подключиться к Zabbix серверу."
 
 #: popup_bitem.php:114 popup_period.php:114
 msgid "Caption"
@@ -3993,7 +3993,7 @@ msgstr "Проверка обнаружения"
 #: include/views/js/configuration.discovery.edit.js.php:599
 #: include/views/js/configuration.discovery.edit.js.php:616
 msgid "Discovery check error"
-msgstr ""
+msgstr "Ошибка проверки обнаружения"
 
 #: popup.php:100
 msgid "Discovery checks"
@@ -4198,7 +4198,7 @@ msgstr "Дублированное имя карты сети для карты 
 #: api/classes/CScript.php:421 api/classes/CScript.php:477
 #, php-format
 msgid "Duplicate script name \"%1$s\"."
-msgstr ""
+msgstr "Дублированное имя скрипта \"%1$s\"."
 
 #: include/profiles.inc.php:345
 #, php-format
@@ -4349,11 +4349,11 @@ msgstr "Пустое имя у прототипа узла сети \"%1$s\"."
 #: api/classes/CScript.php:579
 #, php-format
 msgid "Empty name for script \"%1$s\"."
-msgstr ""
+msgstr "Пустое имя для скрипта \"%1$s\"."
 
 #: api/classes/CScript.php:418 api/classes/CScript.php:474
 msgid "Empty name for script."
-msgstr ""
+msgstr "Пустое имя для скрипта."
 
 #: api/classes/CService.php:1109
 msgid "Empty name."
@@ -5260,7 +5260,7 @@ msgstr "Группа"
 #: api/classes/CHostGroup.php:613
 #, php-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
-msgstr "Группа \"%1$s\" не может быть удалена, так как используется прототипом узла сети."
+msgstr "Группа \"%1$s\" не может быть удалена, так как используется прототипом узла сети.Группа \"%1$s\" не может быть удалена, так как используется прототипом узла сети."
 
 #: include/classes/import/importers/CTemplateImporter.php:233
 #, php-format
@@ -5300,7 +5300,7 @@ msgstr "ID прототипа группы не может быть пустым
 #: api/classes/CHostPrototype.php:156 api/classes/CHostPrototype.php:434
 #, php-format
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
-msgstr "Прототип группы не может основываться на обнаруженной группе узлов сети \"%1$s\"."
+msgstr "Прототип группы не может основываться на обнаруженной группе узлов сети \"%1$s\".Прототип группы не может основываться на обнаруженной группе узлов сети \"%1$s\"."
 
 #: include/views/configuration.host.prototype.edit.php:203
 msgid "Group prototypes"
@@ -5666,7 +5666,7 @@ msgstr "Имя узла сети"
 #: api/classes/CHostPrototype.php:174
 #, php-format
 msgid "Host name \"%1$s\" is too long, it must not be longer than %2$d characters."
-msgstr "Имя узла сети \"%1$s\" слишком длинное, оно не должно быть длиннее чем %2$d символов."
+msgstr "Имя узла сети \"%1$s\" слишком длинное, оно не должно быть длиннее чем %2$d символов.Имя узла сети \"%1$s\" слишком длинное, оно не должно быть длиннее чем %2$d символов."
 
 #: api/classes/CHostPrototype.php:176
 #, php-format
@@ -5680,7 +5680,7 @@ msgstr "Сети узла сети"
 #: api/classes/CHostPrototype.php:785
 #, php-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
-msgstr "Прототип узла сети \"%1$s\" уже существует у \"%2$s\", унаследованный из другого шаблона."
+msgstr "Прототип узла сети \"%1$s\" уже существует у \"%2$s\", унаследованный из другого шаблона.Прототип узла сети \"%1$s\" уже существует у \"%2$s\", унаследованный из другого шаблона."
 
 #: api/classes/CHostPrototype.php:773
 #, php-format
@@ -5690,7 +5690,7 @@ msgstr "Прототип узла сети \"%1$s\" уже существует 
 #: api/classes/CHostPrototype.php:189
 #, php-format
 msgid "Host prototype \"%1$s\" must have at least one host group."
-msgstr "Прототип узла сети \"%1$s\" должен иметь по крайней мере одну группу узлов сети."
+msgstr "Прототип узла сети \"%1$s\" должен иметь по крайней мере одну группу узлов сети.Прототип узла сети \"%1$s\" должен иметь по крайней мере одну группу узлов сети."
 
 #: host_prototypes.php:202
 msgid "Host prototype added"
@@ -5707,7 +5707,7 @@ msgstr "Прототип узла сети обновлен"
 #: api/classes/CHostPrototype.php:1100
 #, php-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\"."
-msgstr "Прототип узла сети с именем узла сети \"%1$s\" уже существует в правиле обнаружения \"%2$s\"."
+msgstr "Прототип узла сети с именем узла сети \"%1$s\" уже существует в правиле обнаружения \"%2$s\".Прототип узла сети с именем узла сети \"%1$s\" уже существует в правиле обнаружения \"%2$s\"."
 
 #: api/classes/CHostPrototype.php:1096
 #, php-format
@@ -5717,7 +5717,7 @@ msgstr "Прототип узла сети с именем узла сети \"%
 #: api/classes/CHostPrototype.php:1108
 #, php-format
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
-msgstr "Прототип узла сети с видимым именем \"%1$s\" уже существует в правиле обнаружения \"%2$s\"."
+msgstr "Прототип узла сети с видимым именем \"%1$s\" уже существует в правиле обнаружения \"%2$s\".Прототип узла сети с видимым именем \"%1$s\" уже существует в правиле обнаружения \"%2$s\"."
 
 #: api/classes/CHostPrototype.php:1105
 #, php-format
@@ -6664,7 +6664,7 @@ msgstr "Некорректное значение ширины для карты
 #: api/classes/CScript.php:586
 #, php-format
 msgid "Incorrect menu path for script \"%1$s\"."
-msgstr ""
+msgstr "Некорректный путь меню для скрипта \"%1$s\"."
 
 #: include/nodes.inc.php:293
 msgid "Incorrect node type."
@@ -6808,7 +6808,7 @@ msgstr "Некорректный синтаксис рядом с \"%1$s\"."
 #: api/classes/CUser.php:351
 #, php-format
 msgid "Incorrect theme for user \"%1$s\"."
-msgstr ""
+msgstr "Некорректная тема для пользователя \"%1$s\"."
 
 #: include/classes/validators/CTimePeriodValidator.php:99
 #, php-format
@@ -6912,7 +6912,7 @@ msgstr "Некорректное значение \"%1$s\" для поля це�
 #: include/reports.inc.php:540 include/reports.inc.php:544
 #, php-format
 msgid "Incorrect value for field \"%1$s\"."
-msgstr ""
+msgstr "Некорректное значение поля \"%1$s\"."
 
 #: include/validate.inc.php:442
 #, php-format
@@ -7098,7 +7098,7 @@ msgstr "Ошибочные параметры."
 #: include/reports.inc.php:590 include/reports.inc.php:594
 #, php-format
 msgid "Invalid period for field \"%1$s\"."
-msgstr ""
+msgstr "Некорректный период для поля \"%1$s\"."
 
 #: api/classes/CHttpTest.php:637
 #, php-format
@@ -7778,7 +7778,7 @@ msgstr ""
 
 #: jsLoader.php:207
 msgid "Latest values"
-msgstr ""
+msgstr "Последние значения"
 
 #: include/locales.inc.php:66
 msgid "Latvian (lv_LV)"
@@ -8569,12 +8569,12 @@ msgstr "Пропущено поле \"%1$s\" для условия действ�
 #: include/reports.inc.php:481
 #, php-format
 msgid "Missing \"%1$s\" field for item."
-msgstr ""
+msgstr "Пропущенное \"%1$s\" поле для элемента данных."
 
 #: include/reports.inc.php:580
 #, php-format
 msgid "Missing \"%1$s\" field for period."
-msgstr ""
+msgstr "Пропущенное \"%1$s\" поле для периода."
 
 #: api/classes/CGraphGeneral.php:75
 msgid "Missing \"gitemid\" field for item."
@@ -11582,7 +11582,7 @@ msgstr "Скрипт"
 #: api/classes/CScript.php:627
 #, php-format
 msgid "Script \"%1$s\" already exists."
-msgstr ""
+msgstr "Скрипт \"%1$s\" уже существует."
 
 #: scripts.php:126
 msgid "Script added"
@@ -11595,7 +11595,7 @@ msgstr "Скрипт удален"
 #: api/classes/CScript.php:619
 #, php-format
 msgid "Script menu path \"%1$s\" already used in script name \"%2$s\"."
-msgstr ""
+msgstr "Путь \"%1$s\" меню скрипта  уже используется в имени скрипта \"%2$s\"."
 
 #: include/views/administration.mediatypes.edit.php:65
 #: include/views/administration.mediatypes.list.php:57
@@ -11605,7 +11605,7 @@ msgstr "Имя скрипта"
 #: api/classes/CScript.php:606
 #, php-format
 msgid "Script name \"%1$s\" already used in menu path for script \"%2$s\"."
-msgstr ""
+msgstr "Имя скрипта \"%1$s\" уже используется в пути меню для скрипта \"%2$s\"."
 
 #: include/classes/debug/CProfiler.php:125
 msgid "Script profiler"
@@ -11618,7 +11618,7 @@ msgstr "Скрипт обновлен"
 #: api/classes/CScript.php:469
 #, php-format
 msgid "Script with scriptid \"%1$s\" does not exist."
-msgstr ""
+msgstr "Скрипт с scriptid \"%1$s\" не существует."
 
 #: include/menu.inc.php:260 include/views/administration.script.list.php:28
 #: jsLoader.php:184 jsLoader.php:211 report5.php:159 scripts_exec.php:26
@@ -12650,12 +12650,12 @@ msgstr "Веб-интерфейс не соответствует базе да�
 #: include/views/configuration.hostgroups.list.php:137
 #, php-format
 msgid "The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "Группа узлов сети более не обнаруживается и будет удалена в %1$s (через %2$s %3$s)."
+msgstr "Группа узлов сети более не обнаруживается и будет удалена в %1$s (через %2$s %3$s).Группа узлов сети более не обнаруживается и будет удалена в %1$s (через %2$s %3$s)."
 
 #: include/html.inc.php:591
 #, php-format
 msgid "The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "Узел сети более не обнаруживается и будет удален в %1$s (через %2$s %3$s)."
+msgstr "Узел сети более не обнаруживается и будет удален в %1$s (через %2$s %3$s).Узел сети более не обнаруживается и будет удален в %1$s (через %2$s %3$s)."
 
 #: api/classes/CImage.php:493
 #, php-format
@@ -13439,7 +13439,7 @@ msgstr "Неподдерживаемый параметр \"%1$s\" для про
 #: api/classes/CHostPrototype.php:203
 #, php-format
 msgid "Unsupported parameter \"%2$s\" for host prototype %1$s host inventory."
-msgstr "Неподдерживаемый параметр \"%1$s\" для прототипа узла сети \"%1$s\" инвентарных данных."
+msgstr "Неподдерживаемый параметр \"%1$s\" для прототипа узла сети \"%1$s\" инвентарных данных.Неподдерживаемый параметр \"%1$s\" для прототипа узла сети \"%1$s\" инвентарных данных."
 
 #: include/blocks.inc.php:1160
 msgctxt "discovery results in dashboard"

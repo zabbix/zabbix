@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-08 23:08+0300\n"
-"PO-Revision-Date: 2013-09-14 16:34+0300\n"
-"Last-Translator: richlv <richlv@nakts.net>\n"
+"POT-Creation-Date: 2013-10-08 23:10+0300\n"
+"PO-Revision-Date: 2013-10-08 14:28+0300\n"
+"Last-Translator: open-future <patrik@open-future.be>\n"
 "Language-Team: NL\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1379169264.0\n"
+"X-POOTLE-MTIME: 1381235293.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -36,8 +36,8 @@ msgstr "\"Triggers laten knipperen op status verandering\" moet \"0\" of meer zi
 #, php-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d dag"
+msgstr[1] "%1$d dagen"
 
 #: chart4.php:89 chart5.php:83
 #, php-format
@@ -163,7 +163,7 @@ msgstr "500 laatste waardes"
 
 #: include/views/administration.script.edit.php:41
 msgid "<Sub-menu/Sub-menu.../>Script"
-msgstr ""
+msgstr "<Sub-menu/Sub-menu.../>Script"
 
 #: include/views/configuration.sysmap.edit.php:55
 msgid "<manual>"
@@ -1224,7 +1224,7 @@ msgstr "Kan een niet-numeriek item niet toevoegen \"%1$s\" in grafiek prototype 
 #: include/reports.inc.php:505
 #, php-format
 msgid "Cannot add a non-numeric item \"%1$s\"."
-msgstr ""
+msgstr "Kan een niet-numeriek item \"%1$s\" niet toevoegen."
 
 #: actionconf.php:150
 msgid "Cannot add action"
@@ -1607,7 +1607,7 @@ msgstr "Kan de scripts niet verwijderen. Het script \"%1$s\" wordt gebruikt in e
 #: api/classes/CScript.php:529
 #, php-format
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
-msgstr ""
+msgstr "Kan scripts niet verwijderen. Scripts met scriptid \"%1$s\" bestaat niet."
 
 #: actionconf.php:331
 msgid "Cannot delete selected actions"
@@ -1825,7 +1825,7 @@ msgstr "Zichtbare template naam mag niet leeg zijn"
 
 #: api/classes/CTrigger.php:1116 api/classes/CTrigger.php:1255
 #: api/classes/CTriggerPrototype.php:755 api/classes/CTriggerPrototype.php:813
-#, fuzzy, php-format
+#, php-format
 msgid "Cannot implode expression \"%s\"."
 msgstr "Kan expressie \"%s\" niet imploderen."
 
@@ -1844,7 +1844,7 @@ msgstr[0] "Kan template \"%2$s\" niet importen, de gekoppelde template \"%3$s\" 
 msgstr[1] "Kan template \"%2$s\" niet importen, de gekoppelde templates \"%3$s\" bestaan niet."
 
 #: include/classes/class.cview.php:113
-#, fuzzy, php-format
+#, php-format
 msgid "Cannot include view file \"%s\"."
 msgstr "Kan view bestand \"%s\" niet invoegen."
 
@@ -1877,7 +1877,7 @@ msgid "Cannot mass update visible template name"
 msgstr "Kan de zichtbare templatenaam niet in bulk bijwerken"
 
 #: api/classes/CHostBase.php:57
-#, fuzzy, php-format
+#, php-format
 msgid "Cannot pass duplicate template IDs for the linkage: %s."
 msgstr "Kan dubbele template IDs niet verwerken bij koppelen: %s."
 
@@ -1899,7 +1899,7 @@ msgstr "Kan de update statement niet uitvoeren op tabel \"%1$s\" zonder where co
 #: include/classes/server/CZabbixServer.php:222
 #, php-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
-msgstr ""
+msgstr "Kan het antwoord niet lezen, controleer verbinding met de Zabbix server \"%1$s\"."
 
 #: include/views/js/monitoring.history.js.php:35
 msgid "Cannot remove all items, at least one item should remain."
@@ -1920,7 +1920,7 @@ msgstr "Kan de discovery regel niet opslaan zonder checks."
 #: include/classes/server/CZabbixServer.php:192
 #, php-format
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
-msgstr ""
+msgstr "Kan commando niet lezen, controleer verbinding met de Zabbix server \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:238
 #, php-format
@@ -2003,17 +2003,17 @@ msgstr "Kan de trigger \"%s\" niet onkopplen, er is een template aan de host gek
 #: api/classes/CHost.php:684
 #, php-format
 msgid "Cannot update \"%1$s\" for a discovered host."
-msgstr ""
+msgstr "Kan  \"%1$s\" niet updaten voor een ontdekt gastheer."
 
 #: api/classes/CItemGeneral.php:176
 #, php-format
 msgid "Cannot update \"%1$s\" for a discovered item."
-msgstr ""
+msgstr "Kan \"%1$s\" niet updaten voor een ontdekt item."
 
 #: api/classes/CTrigger.php:647
 #, php-format
 msgid "Cannot update \"%1$s\" for a discovered trigger."
-msgstr ""
+msgstr "Kan \"%1$s\" niet updaten voor een ontdekte trigger."
 
 #: api/classes/CItemGeneral.php:205
 #, php-format
@@ -2038,7 +2038,7 @@ msgstr "\"templateid\" kan niet bijgewerkt worden voor grafiek \"%1$s\"."
 #: api/classes/CGraphPrototype.php:42
 #, php-format
 msgid "Cannot update \"templateid\" for graph prototype \"%1$s\"."
-msgstr ""
+msgstr "Kan \"templateid\" voor graph prototype \"%1$s\" niet updaten."
 
 #: api/classes/CScreen.php:447 api/classes/CTemplateScreen.php:667
 #, php-format
@@ -2052,11 +2052,11 @@ msgstr "\"templateid\" kan niet bijgewerkt worden voor trigger prototype \"%1$s\
 
 #: api/classes/CGraphGeneral.php:60
 msgid "Cannot update a discovered graph."
-msgstr ""
+msgstr "Kan een ontdekte grafiek niet bijwerken."
 
 #: api/classes/CHostGroup.php:537
 msgid "Cannot update a discovered host group."
-msgstr ""
+msgstr "Kan een ontdekte gastheer groep niet bijwerken."
 
 #: actionconf.php:146
 msgid "Cannot update action"
@@ -2104,7 +2104,7 @@ msgstr "Kan groep niet bijwerken."
 #: api/classes/CHostGroup.php:908
 #, php-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
-msgstr ""
+msgstr "Kan geen groepen updaten voor ontdekte host \"%1$s\"."
 
 #: hostgroups.php:222 hosts.php:363
 msgid "Cannot update host"
@@ -2257,7 +2257,7 @@ msgstr "Kan web scenario niet bijwerken"
 
 #: include/views/js/configuration.discovery.edit.js.php:600
 msgid "Cannot validate discovery check: invalid request or connection to Zabbix server failed."
-msgstr ""
+msgstr "Kan ontdekking controleren niet valideren: ongeldig verzoek of aansluiting op Zabbix server is mislukt."
 
 #: popup_bitem.php:114 popup_period.php:114
 msgid "Caption"
@@ -2956,7 +2956,7 @@ msgstr "Aangemaakt: Discovery regel \"%1$s\" op \"%2$s\"."
 #: api/classes/CHostPrototype.php:364
 #, php-format
 msgid "Created: Host prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Gemaakt: Host prototype \"%1$s\" op \"%2$s\"."
 
 #: api/classes/CItem.php:591
 #, php-format
@@ -3540,11 +3540,11 @@ msgstr "Geselecteerde hostgroepen verwijderen?"
 
 #: include/views/configuration.host.prototype.edit.php:321
 msgid "Delete selected host prototype?"
-msgstr ""
+msgstr "Verwijder geselecteerde gastheer prototype?"
 
 #: include/views/configuration.host.prototype.list.php:128
 msgid "Delete selected host prototypes?"
-msgstr ""
+msgstr "Wis geselecteerde gastheer prototypes?"
 
 #: include/views/configuration.host.edit.php:830
 msgid "Delete selected host?"
@@ -3620,9 +3620,8 @@ msgid "Delete selected users?"
 msgstr "Geselecteerde gebruikers verwijderen?"
 
 #: adm.valuemapping.php:181
-#, fuzzy
 msgid "Delete selected value mapping?"
-msgstr "Geselecteerde value mapping verwijderen?"
+msgstr "Geselecteerde waarde mapping verwijderen?"
 
 #: adm.valuemapping.php:179
 #, php-format
@@ -3682,7 +3681,7 @@ msgstr "Verwijderd: Host %1$s\"."
 #: api/classes/CHostPrototype.php:971
 #, php-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Verwijderd: Host prototype \"%1$s\" op \"%2$s\"."
 
 #: api/classes/CItem.php:783
 #, php-format
@@ -3792,7 +3791,7 @@ msgstr "Apparaat"
 
 #: discoveryconf.php:41 include/views/configuration.discovery.edit.php:69
 msgid "Device uniqueness criteria"
-msgstr ""
+msgstr "Apparaat uniekheid criteria"
 
 #: popup_trexpr.php:175
 msgid "Difference between MAX and MIN value of a period T is < N"
@@ -3905,7 +3904,7 @@ msgstr "Geselecteerde groepen uitschakelen?"
 
 #: include/views/configuration.host.prototype.list.php:124
 msgid "Disable selected host prototypes?"
-msgstr ""
+msgstr "Uitschakelen geselecteerde gastheer prototypes?"
 
 #: hosts.php:1002
 msgid "Disable selected hosts?"
@@ -3983,8 +3982,9 @@ msgstr "Ontdekking controle"
 #: include/views/js/configuration.discovery.edit.js.php:535
 #: include/views/js/configuration.discovery.edit.js.php:599
 #: include/views/js/configuration.discovery.edit.js.php:616
+#, fuzzy
 msgid "Discovery check error"
-msgstr ""
+msgstr "Ontdekking controle fout"
 
 #: popup.php:100
 msgid "Discovery checks"
@@ -4154,7 +4154,7 @@ msgstr "Vervolgkeuzelijst eerste item \"%1$s\"."
 #: adm.gui.php:78
 #, php-format
 msgid "Dropdown remember selected \"%1$s\"."
-msgstr ""
+msgstr "Vervolgkeuzelijst herinner geselecteerd \"%1$s\"."
 
 #: api/classes/CTrigger.php:1589
 #, php-format
@@ -4164,12 +4164,12 @@ msgstr "Dupliceer afhankelijkheden in trigger \"%1$s\"."
 #: api/classes/CHostPrototype.php:197
 #, php-format
 msgid "Duplicate group prototype name \"%2$s\" for host prototype \"%1$s\"."
-msgstr ""
+msgstr "Dupliceren van groep prototype naam \"%2$s\" voor gastheer prototype \"%1$s\"."
 
 #: api/classes/CHostPrototype.php:191
 #, php-format
 msgid "Duplicate host group ID \"%2$s\" for host prototype \"%1$s\"."
-msgstr ""
+msgstr "Dupliceren gastheer groep ID \"%2$s\" voor gastheer prototype \"%1$s\"."
 
 #: api/classes/CHost.php:747
 #, php-format
@@ -4189,7 +4189,7 @@ msgstr "Dubbele mapnaam voor volgende map \"%s\"."
 #: api/classes/CScript.php:421 api/classes/CScript.php:477
 #, php-format
 msgid "Duplicate script name \"%1$s\"."
-msgstr ""
+msgstr "Dupliceer script naam \"%1$s\"."
 
 #: include/profiles.inc.php:345
 #, php-format
@@ -4293,7 +4293,7 @@ msgstr "Lege actie conditie"
 
 #: include/classes/validators/CColorValidator.php:33
 msgid "Empty color."
-msgstr ""
+msgstr "Lege kleur."
 
 #: api/classes/CHostPrototype.php:458
 msgid "Empty host ID for host prototype."
