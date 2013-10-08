@@ -158,12 +158,12 @@ void	main_housekeeper_loop(void)
 		records = housekeeping_history(start);
 		sec = zbx_time() - sec;
 
-		zabbix_log(LOG_LEVEL_WARNING, "%s [deleted %d records in " ZBX_FS_DBL " sec, idle %d sec]",
-				get_process_type_string(process_type), records, sec, sleeptime);
-
 		DBclose();
 
 		sleeptime = CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR - (time(NULL) - start);
+
+		zabbix_log(LOG_LEVEL_WARNING, "%s [deleted %d records in " ZBX_FS_DBL " sec, idle %d sec]",
+				get_process_type_string(process_type), records, sec, sleeptime);
 
 		zbx_setproctitle("%s [deleted %d records in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), records, sec, sleeptime);
