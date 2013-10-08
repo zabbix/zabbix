@@ -210,8 +210,7 @@ class CProfiler {
 	 * @param string $sql
 	 */
 	public function profileSql($time, $sql) {
-		if ((isset(CWebUser::$data['debug_mode']) && CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_DISABLED)
-				|| !CWebUser::$data) {
+		if (!isset(CWebUser::$data['debug_mode']) || CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_DISABLED) {
 			return;
 		}
 
@@ -234,8 +233,7 @@ class CProfiler {
 	 * @param array  $result
 	 */
 	public function profileApiCall($class, $method, $params, $result) {
-		if ((isset(CWebUser::$data['debug_mode']) && CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_DISABLED)
-				|| !CWebUser::$data) {
+		if (!isset(CWebUser::$data['debug_mode']) || CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_DISABLED) {
 			return;
 		}
 
