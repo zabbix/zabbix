@@ -33,7 +33,7 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 		const zabbix_sender_value_t *values, int count, char **result)
 {
 	zbx_sock_t	sock;
-	int		tcp_ret = SUCCEED, ret = FAIL, i;
+	int		ret, i;
 	struct zbx_json	json;
 	char		*answer = NULL;
 
@@ -59,11 +59,11 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 	}
 	zbx_json_close(&json);
 
-	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, source, address, port, GET_SENDER_TIMEOUT)))
+	if (SUCCEED == (ret = zbx_tcp_connect(&sock, source, address, port, GET_SENDER_TIMEOUT)))
 	{
-		if (SUCCEED == (tcp_ret = zbx_tcp_send(&sock, json.buffer)))
+		if (SUCCEED == (ret = zbx_tcp_send(&sock, json.buffer)))
 		{
-			if (SUCCEED == (tcp_ret = zbx_tcp_recv(&sock, &answer)))
+			if (SUCCEED == (ret = zbx_tcp_recv(&sock, &answer)))
 			{
 				if (NULL != result)
 					*result = zbx_strdup(NULL, answer);
@@ -73,7 +73,7 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 		zbx_tcp_close(&sock);
 	}
 
-	if (FAIL == tcp_ret && NULL != result)
+	if (FAIL == ret && NULL != result)
 		*result = zbx_strdup(NULL, zbx_tcp_strerror());
 
 	zbx_json_free(&json);

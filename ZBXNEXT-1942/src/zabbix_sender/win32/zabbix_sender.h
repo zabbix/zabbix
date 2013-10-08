@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIXSENDER_H_
-#define ZABBIXSENDER_H_
+#ifndef ZABBIX_SENDER_H
+#define ZABBIX_SENDER_H
 
 #ifdef ZBX_EXPORT
 #	define ZBX_API __declspec(dllexport)
