@@ -30,11 +30,11 @@ LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.l
 all: $(PROGNAME) $(POSTBUILD)
 
 clean:
-	del $(OBJS) $(RESOURCE_RES) $(MESSAGES_H) $(PROGNAME) messages.rc MSG00001.bin zabbix_sender.exe.manifest
+	del $(OBJS) $(RESOURCE_RES) $(MESSAGES_H) $(PROGNAME) messages.rc MSG00001.bin $(TARGETNAME).manifest
 
 $(PROGNAME): $(MESSAGES_H) $(OBJS) $(RESOURCE_RES)
 	$(LINKER) $(OBJS) $(RESOURCE_RES) /OUT:$(PROGNAME) $(LFLAGS) $(LIBS)
-	$(MT) /outputresource:"$(PROGNAME);#1" /manifest zabbix_sender.exe.manifest /nologo
+	$(MT) /outputresource:"$(PROGNAME);#1" /manifest $(TARGETNAME).manifest /nologo
 
 $(MESSAGES_H): messages.mc
 	$(MC) -U -h ".\\" -r ".\\" messages.mc
