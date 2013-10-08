@@ -31,7 +31,7 @@ class testPageAdministrationGeneralValuemap extends CWebTest {
 	*/
 	public function testPageAdministrationGeneralValuemap_CheckLayout($valuemap) {
 		$this->zbxTestLogin('adm.valuemapping.php');
-		$this->checkTitle('Configuration of value mapping');
+		$this->zbxTestCheckTitle('Configuration of value mapping');
 		$this->zbxTestTextPresent('CONFIGURATION OF VALUE MAPPING');
 		$this->zbxTestTextPresent('Value mapping');
 		$this->zbxTestTextPresent(array('Name', 'Value map'));
