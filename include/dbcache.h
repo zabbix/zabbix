@@ -311,7 +311,8 @@ int	DCconfig_check_trigger_dependencies(zbx_uint64_t triggerid);
 void	DCconfig_set_trigger_value(zbx_uint64_t triggerid, unsigned char value,
 		unsigned char state, const char *error, int *lastchange);
 void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
-		int maintenance_type, int maintenance_from);
+		int maintenance_type, int maintenance_from, int maintenance_until);
+int	DCconfig_get_maintenance_until(zbx_uint64_t hostid, int *maintenance_until);
 
 #define ZBX_CONFSTATS_BUFFER_TOTAL	1
 #define ZBX_CONFSTATS_BUFFER_USED	2
