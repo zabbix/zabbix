@@ -42,16 +42,6 @@ class testPageUsers extends CWebTest {
 		$this->zbxTestDropdownHasOptions('go', array('Unblock selected', 'Delete selected'));
 	}
 
-	public function testPageUsers_FilterByHostGroup() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageUsers_Sorting() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
 	/**
 	* @dataProvider allUsers
 	*/
@@ -80,11 +70,6 @@ class testPageUsers extends CWebTest {
 		$this->assertEquals($oldHashUser, DBhash($sqlHashUser));
 		$this->assertEquals($oldHashGroup, DBhash($sqlHashGroup), 'Chuck Norris: User update changed data in table users_groups');
 		$this->assertEquals($oldHashMedia, DBhash($sqlHashMedia), 'Chuck Norris: User update changed data in table medias');
-	}
-
-	public function testPageUsers_MassDeleteAll() {
-// TODO
-		$this->markTestIncomplete();
 	}
 
 	public function testPageUsers_MassDelete() {
@@ -154,13 +139,4 @@ class testPageUsers extends CWebTest {
 		DBrestore_tables('users');
 	}
 
-	public function testPageUsers_MassUnblockAll() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageUsers_MassUnblock() {
-// TODO
-		$this->markTestIncomplete();
-	}
 }

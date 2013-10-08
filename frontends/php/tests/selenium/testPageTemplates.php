@@ -80,48 +80,4 @@ class testPageTemplates extends CWebTest {
 		$this->assertEquals($oldHashTriggers, DBhash($sqlTriggers));
 	}
 
-	public function testPageTemplates_Create() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageTemplates_Import() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageTemplates_MassExportAll() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageTemplates_MassExport() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageTemplates_MassDeleteAll() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageTemplates_MassDelete() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageTemplates_MassDeleteWithLinkedElementsAll() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageTemplates_MassDeleteWithLinkedElements() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageTemplates_Sorting() {
-// TODO
-		$this->markTestIncomplete();
-	}
 }
