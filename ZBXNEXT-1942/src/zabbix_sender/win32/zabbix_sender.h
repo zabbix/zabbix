@@ -43,8 +43,8 @@ typedef struct
 	int	total;
 	/* number of failed values */
 	int	failed;
-	/* the time spent in milliseconds */
-	int	time_spent;
+	/* time in seconds the server spent processing the sent values */
+	double	time_spent;
 }
 zabbix_sender_info_t;
 
@@ -88,6 +88,9 @@ ZBX_API int	zabbix_sender_send_values(const char *address, unsigned short port, 
  *                                                                            *
  * Return value:  0 - the result was parsed successfully                      *
  *               -1 - the result parsing failed                               *
+ *                                                                            *
+ * Comments: If info parameter was specified but the function failed to parse *
+ *           the result info field, then -1 is set to info->total.            *
  *                                                                            *
  ******************************************************************************/
 ZBX_API int	zabbix_sender_parse_result(const char *result, int *response, zabbix_sender_info_t *info);
