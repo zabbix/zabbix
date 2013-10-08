@@ -265,7 +265,7 @@ class CAction extends CZBXAPI {
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
 				$sqlParts['select']['scriptid'] = 'oc.scriptid';
 			}
-			$sqlParts['from']['opmessage_usr'] = 'opcommand oc';
+			$sqlParts['from']['opcommand'] = 'opcommand oc';
 			$sqlParts['from']['operations'] = 'operations o';
 			$sqlParts['where'][] = '('.dbConditionInt('oc.scriptid', $options['scriptids']).' AND oc.type='.ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT.')' ;
 			$sqlParts['where']['ao'] = 'a.actionid=o.actionid';
