@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-08 21:54+0300\n"
-"PO-Revision-Date: 2013-09-24 21:27+0300\n"
-"Last-Translator: richlv <richlv@nakts.net>\n"
+"POT-Creation-Date: 2013-10-08 22:31+0300\n"
+"PO-Revision-Date: 2013-10-07 11:26+0300\n"
+"Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1380050862.0\n"
+"X-POOTLE-MTIME: 1381137980.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -733,7 +733,7 @@ msgstr "Metodo di autenticazione cambiato in LDAP"
 
 #: authentication.php:83 authentication.php:84
 msgid "Authentication method changed to Zabbix internal"
-msgstr "Metodo di autenticazione cambiato in Zabbix internal"
+msgstr "Metodo di autenticazione cambiato in interna Zabbix"
 
 #: include/views/configuration.action.list.php:35
 msgid "Auto registration"
@@ -1259,7 +1259,7 @@ msgstr "Impossibile cambiare metodo di autenticazione in LDAP"
 
 #: authentication.php:88
 msgid "Cannot change authentication method to Zabbix internal"
-msgstr "Impossibile cambiare metodo di autenticazione in Zabbix internal"
+msgstr "Impossibile cambiare metodo di autenticazione in interna Zabbix"
 
 #: items.php:472
 msgid "Cannot clear history"
@@ -1343,7 +1343,7 @@ msgstr "Impossibile creare schermata."
 #: api/classes/CUser.php:370
 #, php-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
-msgstr "Impossibile rimuovere utente Zabbix internal \"%1$s\", prova a disabilitare quell'utente."
+msgstr "Impossibile rimuovere utente interno Zabbix \"%1$s\", prova a disabilitare quell'utente."
 
 #: actionconf.php:170
 msgid "Cannot delete action"
@@ -2541,7 +2541,7 @@ msgstr "Conteggio"
 
 #: include/views/configuration.slideconf.list.php:42
 msgid "Count of slides"
-msgstr "Conteggio diapositive"
+msgstr "Numero diapositive"
 
 #: include/views/configuration.action.list.php:28
 msgid "Create action"
@@ -5203,7 +5203,7 @@ msgstr "Un host non può avere più di un'interfaccia predefinita dello stesso t
 #: hostinventoriesoverview.php:88
 #: include/views/administration.proxy.list.php:48
 msgid "Host count"
-msgstr "Conteggio host"
+msgstr "Numero host"
 
 #: hosts.php:508 hosts.php:532
 msgid "Host deleted"
@@ -5730,7 +5730,7 @@ msgstr "Impossibile rimuovere l'ultima riga e l'ultima colonna."
 #: include/classes/class.ctweenbox.php:101
 #: include/views/configuration.template.edit.php:195
 msgid "In"
-msgstr "In"
+msgstr "Inclusi"
 
 #: include/views/administration.usergroups.edit.php:53
 msgid "In group"
@@ -6590,7 +6590,7 @@ msgstr "Item aggiunto"
 
 #: include/views/administration.proxy.list.php:49
 msgid "Item count"
-msgstr "Conteggio item"
+msgstr "Numero item"
 
 #: disc_prototypes.php:188 items.php:348 screenedit.php:199
 msgid "Item deleted"
@@ -7490,12 +7490,12 @@ msgstr "Il nodo master esiste già."
 
 #: adm.gui.php:41 include/views/administration.general.gui.edit.php:39
 msgid "Max count of elements to show inside table cell"
-msgstr "Numero massimo di elementi da mostrare in una cella in tabella"
+msgstr "Numero massimo di elementi da visualizzare nella cella di una tabella"
 
 #: adm.gui.php:79
 #, php-format
 msgid "Max count of elements to show inside table cell \"%1$s\"."
-msgstr "Numero massimo di elementi da mostrare in una cella in tabella \"%1$s\"."
+msgstr "Numero massimo di elementi da visualizzare nella cella di una tabella \"%1$s\"."
 
 #: adm.gui.php:38 include/views/administration.general.gui.edit.php:45
 msgid "Max count of events per trigger to show"
@@ -9757,7 +9757,7 @@ msgstr "RMCP+"
 #: include/views/administration.script.edit.php:95
 #: include/views/administration.script.list.php:83
 msgid "Read"
-msgstr "Leggi"
+msgstr "Lettura"
 
 #: include/forms.inc.php:272 include/perm.inc.php:24
 #: include/views/administration.usergroups.edit.php:80
@@ -10151,7 +10151,7 @@ msgstr "Destra"
 
 #: include/locales.inc.php:66
 msgid "Romanian (ro_RO)"
-msgstr ""
+msgstr "Rumeno (ro_RO)"
 
 #: include/views/configuration.screen.constructor.edit.php:606
 #: screenedit.php:46
@@ -11044,7 +11044,7 @@ msgstr "Mostra valori dell'item"
 
 #: include/views/administration.general.gui.edit.php:47
 msgid "Show warning if Zabbix server is down"
-msgstr "Mostra avvertimento se il server Zabbix non risponde"
+msgstr "Mostra avvertimento se Zabbix Server non risponde"
 
 #: include/views/configuration.graph.edit.php:130
 msgid "Show working time"
@@ -11317,11 +11317,11 @@ msgstr "Stato di discovery"
 
 #: include/screens.inc.php:39
 msgid "Status of host group triggers"
-msgstr "Stato dei trigger dei gruppi host"
+msgstr "Stato dei trigger per gruppo host"
 
 #: include/screens.inc.php:40
 msgid "Status of host triggers"
-msgstr "Stato dei trigger degli host"
+msgstr "Stato dei trigger per host"
 
 #: include/views/js/monitoring.maps.js.php:24
 #: include/views/js/monitoring.maps.js.php:45 tr_status.php:25
@@ -11390,7 +11390,7 @@ msgstr "Stile"
 
 #: include/forms.inc.php:866
 msgid "Subfilter [affects only filtered data!]"
-msgstr "Sotto-filtro [ha impatto solo i dati filtrati!]"
+msgstr "Sotto-filtro [influenza solo i dati filtrati!]"
 
 #: include/actions.inc.php:405 include/actions.inc.php:414
 #: include/actions.inc.php:420 include/actions.inc.php:774
@@ -12528,7 +12528,7 @@ msgstr "Usa se severity"
 
 #: include/views/administration.mediatypes.list.php:42
 msgid "Used in actions"
-msgstr "Utilizza nelle azioni"
+msgstr "Utilizzato nelle azioni"
 
 #: httpconf.php:52 include/acknow.inc.php:54 include/actions.inc.php:867
 #: include/audit.inc.php:24 include/forms.inc.php:38 include/forms.inc.php:41
@@ -13354,11 +13354,11 @@ msgstr "Zabbix ha ricevuto una richiesta errata."
 
 #: include/items.inc.php:83
 msgid "Zabbix internal"
-msgstr "Zabbix internal"
+msgstr "Interna Zabbix"
 
 #: authentication.php:182
 msgid "Zabbix internal authentication"
-msgstr "Autenticazione Zabbix internal"
+msgstr "Autenticazione interna Zabbix"
 
 #: warning.php:54
 msgid "Zabbix is temporarily unavailable!"

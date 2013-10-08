@@ -4,18 +4,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-08 21:54+0300\n"
-"PO-Revision-Date: 2013-09-24 21:26+0300\n"
-"Last-Translator: richlv <richlv@nakts.net>\n"
+"POT-Creation-Date: 2013-10-08 22:31+0300\n"
+"PO-Revision-Date: 2013-09-25 18:17+0300\n"
+"Last-Translator: Claudia <rmircea@birotec.ro>\n"
 "Language-Team: Birotec\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2);;\n"
-"X-Generator: Pootle 2.5.0\n"
+"X-Generator: Virtaal 0.7.1\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1380050797.0\n"
+"X-POOTLE-MTIME: 1380104934.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -1736,7 +1736,7 @@ msgstr "Nu se poate face actualizare în masă a numelui vizibil al template-ulu
 #: api/classes/CHostGeneral.php:160
 #, php-format
 msgid "Cannot pass duplicate template IDs for the linkage: %s."
-msgstr "Nu se poate face actualizare în masă a numelui vizibil al template-ului"
+msgstr "Nu se pot valida ID-urile duplicate ale șablonului pentru legătura: %s."
 
 #: include/classes/db/DB.php:614
 #, php-format
@@ -5287,73 +5287,73 @@ msgstr "Prezentare generală inventar server"
 
 #: include/views/configuration.sysmap.edit.php:100
 msgid "Host label type"
-msgstr ""
+msgstr "Tipul etichetei serverului"
 
 #: include/html.inc.php:343
 msgid "Host list"
-msgstr ""
+msgstr "Listă servere"
 
 #: hosts.php:51 include/actions.inc.php:58
 #: include/views/configuration.host.edit.php:170
 msgid "Host name"
-msgstr ""
+msgstr "Nume server"
 
 #: include/hosts.inc.php:289
 msgid "Host networks"
-msgstr ""
+msgstr "Rețele server"
 
 #: include/hosts.inc.php:299
 msgid "Host router"
-msgstr ""
+msgstr "Router server"
 
 #: host_screen.php:27 include/views/js/monitoring.maps.js.php:28
 #: jsLoader.php:176
 msgid "Host screens"
-msgstr ""
+msgstr "Ecrane server"
 
 #: dashboard.php:310
 msgid "Host status"
-msgstr ""
+msgstr "Stare server"
 
 #: include/triggers.inc.php:980
 #, php-format
 msgid "Host status became \"%s\""
-msgstr ""
+msgstr "Stare server devine \"%s\""
 
 #: hostgroups.php:196 hosts.php:521 hosts.php:544 proxies.php:166
 msgid "Host status updated"
-msgstr ""
+msgstr "Stare server actualizată"
 
 #: include/hosts.inc.php:294
 msgid "Host subnet mask"
-msgstr ""
+msgstr "Mască subnet server"
 
 #: include/actions.inc.php:62
 msgid "Host template"
-msgstr ""
+msgstr "Șablon server"
 
 #: include/views/configuration.screen.constructor.edit.php:513
 msgid "Host time"
-msgstr ""
+msgstr "Timp server"
 
 #: api/classes/CHost.php:1573
 msgid "Host update failed."
-msgstr ""
+msgstr "Actualizare server nereușită."
 
 #: hosts.php:321
 msgid "Host updated"
-msgstr ""
+msgstr "Server actualizat"
 
 #: api/classes/CHost.php:1423 api/classes/CTemplate.php:1360
 #, php-format
 msgid "Host with the same name \"%s\" already exists."
-msgstr ""
+msgstr "Un server cu numele „%s” există deja."
 
 #: api/classes/CHost.php:1429 api/classes/CTemplate.php:1014
 #: api/classes/CTemplate.php:1333
 #, php-format
 msgid "Host with the same visible name \"%s\" already exists."
-msgstr ""
+msgstr "Un server cu numele vizibi „%s” există deja."
 
 #: dashconf.php:227 hostinventoriesoverview.php:81 hostinventories.php:94
 #: hosts.php:644 include/forms.inc.php:224 include/forms.inc.php:818
@@ -5368,53 +5368,54 @@ msgstr ""
 #: include/views/conf.import.php:27 popup.php:45 search.php:129 search.php:218
 #: search.php:262 search.php:282 search.php:287 search.php:303
 msgid "Hosts"
-msgstr ""
+msgstr "Servere"
 
 #: include/views/configuration.maintenance.edit.php:207
 msgid "Hosts & Groups"
-msgstr ""
+msgstr "Servere și grupuri"
 
 #: include/classes/class.cserverinfo.php:48
 msgid "Hosts (m/n/t)"
-msgstr ""
+msgstr "Servere (m/n/t)"
 
 #: include/views/configuration.template.edit.php:195
 msgid "Hosts / templates"
-msgstr ""
+msgstr "Servere / șabloane"
 
 #: popup.php:41
 msgid "Hosts and templates"
-msgstr ""
+msgstr "Servere și șabloane"
 
 #: include/views/configuration.hostgroups.edit.php:59
+#, fuzzy
 msgid "Hosts in"
-msgstr ""
+msgstr "Servere"
 
 #: include/views/configuration.maintenance.edit.php:189
 msgid "Hosts in maintenance"
-msgstr ""
+msgstr "Servere în mentenanță"
 
 #: include/classes/class.chostsinfo.php:104 include/screens.inc.php:33
 msgid "Hosts info"
-msgstr ""
+msgstr "Informații servere"
 
 #: include/views/configuration.screen.constructor.edit.php:559
 #: include/views/monitoring.overview.php:79
 msgid "Hosts location"
-msgstr ""
+msgstr "Locația serverelor"
 
 #: hosts.php:292
 msgid "Hosts updated"
-msgstr ""
+msgstr "Servere actualizate"
 
 #: include/reports.inc.php:218 include/reports.inc.php:664
 #: include/reports.inc.php:672
 msgid "Hourly"
-msgstr ""
+msgstr "În fiecare oră"
 
 #: include/forms.inc.php:1699
 msgid "Hours"
-msgstr ""
+msgstr "Ore"
 
 #: adm.gui.php:96 adm.housekeeper.php:72 adm.iconmapping.php:110
 #: adm.images.php:132 adm.macros.php:159 adm.other.php:105 adm.regexps.php:209
@@ -5422,11 +5423,11 @@ msgstr ""
 #: adm.valuemapping.php:126 adm.workingtime.php:62
 #: include/views/administration.general.housekeeper.edit.php:28
 msgid "Housekeeper"
-msgstr ""
+msgstr "Casnic"
 
 #: include/locales.inc.php:55
 msgid "Hungarian (hu_HU)"
-msgstr ""
+msgstr "Maghiară (hu_HU)"
 
 #: include/discovery.inc.php:70
 #: include/views/js/configuration.discovery.edit.js.php:123
@@ -5452,26 +5453,26 @@ msgstr ""
 #: include/views/js/configuration.host.edit.js.php:18 popup.php:543
 #: search.php:130
 msgid "IP"
-msgstr ""
+msgstr "IP Internet Protocol"
 
 #: include/maps.inc.php:46 include/views/administration.proxy.edit.php:52
 #: include/views/configuration.discovery.edit.php:66
 #: include/views/configuration.host.edit.php:215
 msgid "IP address"
-msgstr ""
+msgstr "Adresă IP"
 
 #: api/classes/CHostInterface.php:533
 msgid "IP and DNS cannot be empty for host interface."
-msgstr ""
+msgstr "IP-ul si DNS-ul nu pot fi nule pentru interfața serverului."
 
 #: include/views/configuration.discovery.edit.php:47
 #: include/views/configuration.discovery.list.php:41
 msgid "IP range"
-msgstr ""
+msgstr "Interval IP"
 
 #: api/classes/CDRule.php:430
 msgid "IP range cannot be empty."
-msgstr ""
+msgstr "Intervalul IP nu poate fi nul."
 
 #: include/hosts.inc.php:476 include/items.inc.php:188
 #: include/views/administration.script.edit.php:49
@@ -5479,52 +5480,52 @@ msgstr ""
 #: include/views/configuration.action.edit.php:645
 #: include/views/configuration.host.edit.php:543
 msgid "IPMI"
-msgstr ""
+msgstr "IPMI"
 
 #: include/items.inc.php:88
 msgid "IPMI agent"
-msgstr ""
+msgstr "Agent IPMI"
 
 #: include/views/configuration.host.massupdate.php:139
 msgid "IPMI authentication algorithm"
-msgstr ""
+msgstr "Algoritm de autentificare IMPI"
 
 #: include/views/configuration.host.edit.php:280
 msgid "IPMI interfaces"
-msgstr ""
+msgstr "Interfață IPMI"
 
 #: include/views/configuration.host.massupdate.php:168
 msgid "IPMI password"
-msgstr ""
+msgstr "Parolă IPMI"
 
 #: include/views/configuration.host.massupdate.php:150
 msgid "IPMI privilege level"
-msgstr ""
+msgstr "Nivel privilegiat IPMI"
 
 #: disc_prototypes.php:95 host_discovery.php:91
 #: include/views/configuration.item.edit.php:164 items.php:126
 msgid "IPMI sensor"
-msgstr ""
+msgstr "Senzor IPMI"
 
 #: include/views/configuration.host.massupdate.php:159
 msgid "IPMI username"
-msgstr ""
+msgstr "Nume de utilizator IPMI"
 
 #: srv_status.php:179
 msgid "IT SERVICES"
-msgstr ""
+msgstr "SERVICII IT"
 
 #: report3.php:76
 msgid "IT SERVICES AVAILABILITY REPORT"
-msgstr ""
+msgstr "RAPORT DE VALABILITATE SERVICII IT"
 
 #: include/audit.inc.php:39
 msgid "IT service"
-msgstr ""
+msgstr "Service IT"
 
 #: include/views/configuration.services.child.list.php:25
 msgid "IT service dependencies"
-msgstr ""
+msgstr "Dependențe service IT"
 
 #: include/views/configuration.services.parent.list.php:25
 msgid "IT service parent"
@@ -5534,64 +5535,64 @@ msgstr ""
 #: include/views/configuration.services.list.php:26 srv_status.php:26
 #: srv_status.php:180
 msgid "IT services"
-msgstr ""
+msgstr "Servicii IT"
 
 #: report3.php:25
 msgid "IT services availability report"
-msgstr ""
+msgstr "Raport de valabilitate servicii IT "
 
 #: include/views/monitoring.history.php:26
 msgid "ITEMS"
-msgstr ""
+msgstr "ITEMI"
 
 #: include/views/administration.general.iconmap.edit.php:41
 #: include/views/administration.general.image.edit.php:28
 #: include/views/administration.general.image.list.php:24 sysmap.php:186
 msgid "Icon"
-msgstr ""
+msgstr "Iconiță"
 
 #: include/views/js/configuration.sysmaps.js.php:245
 msgid "Icon (default)"
-msgstr ""
+msgstr "Iconiță (implicit)"
 
 #: include/views/js/configuration.sysmaps.js.php:266
 msgid "Icon (disabled)"
-msgstr ""
+msgstr "Iconiță (dezactivat)"
 
 #: include/views/js/configuration.sysmaps.js.php:259
 msgid "Icon (maintenance)"
-msgstr ""
+msgstr "Iconiță (mentenanță)"
 
 #: include/views/js/configuration.sysmaps.js.php:252
 msgid "Icon (problem)"
-msgstr ""
+msgstr "Iconiță (problemă)"
 
 #: include/views/configuration.sysmap.edit.php:81
 msgid "Icon highlight"
-msgstr ""
+msgstr "Iconiță selectată"
 
 #: include/views/configuration.sysmap.edit.php:133
 msgid "Icon label location"
-msgstr ""
+msgstr "Locație etichetă iconiță"
 
 #: include/views/configuration.sysmap.edit.php:128
 msgid "Icon label type"
-msgstr ""
+msgstr "Tipul etichetei iconiței"
 
 #: include/views/administration.general.iconmap.edit.php:134
 #: include/views/administration.general.iconmap.list.php:23
 msgid "Icon map"
-msgstr ""
+msgstr "Hartă iconiță"
 
 #: api/classes/CIconMap.php:421
 #, php-format
 msgid "Icon map \"%1$s\" cannot be deleted. Used in map \"%2$s\"."
-msgstr ""
+msgstr "Harta iconiței \"%1$s\" nu poate fi ștearsă. Folosită în harta \"%2$s\"."
 
 #: api/classes/CIconMap.php:528
 #, php-format
 msgid "Icon map \"%1$s\" has mapping with incorrect iconid \"%2$s\"."
-msgstr ""
+msgstr "Harta iconiței \"%1$s\" s-a mapat cu iconid incorect \"%2$s\"."
 
 #: api/classes/CIconMap.php:524
 #, php-format
