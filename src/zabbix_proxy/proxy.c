@@ -49,6 +49,7 @@
 #include "datasender/datasender.h"
 #include "heart/heart.h"
 #include "../zabbix_server/selfmon/selfmon.h"
+#include "../zabbix_server/vmware/vmware.h"
 
 #define INIT_PROXY(type, count)									\
 	process_type = type;									\
@@ -139,11 +140,15 @@ int	CONFIG_HISTSYNCER_FORKS		= 4;
 int	CONFIG_HISTSYNCER_FREQUENCY	= 5;
 int	CONFIG_CONFSYNCER_FORKS		= 1;
 
+int	CONFIG_VMWARE_FORKS		= 0;
+int	CONFIG_VMWARE_FREQUENCY		= 60;
+
 zbx_uint64_t	CONFIG_CONF_CACHE_SIZE		= 8 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_HISTORY_CACHE_SIZE	= 8 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE	= 0;
 zbx_uint64_t	CONFIG_TEXT_CACHE_SIZE		= 16 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE		= 0;
+zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE	= 8 * ZBX_MEBIBYTE;
 
 int	CONFIG_UNREACHABLE_PERIOD	= 45;
 int	CONFIG_UNREACHABLE_DELAY	= 15;
@@ -288,26 +293,36 @@ static void	zbx_validate_config()
 	if ((NULL == CONFIG_JAVA_GATEWAY || '\0' == *CONFIG_JAVA_GATEWAY) && 0 < CONFIG_JAVAPOLLER_FORKS)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "JavaGateway not in config file or empty");
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 
 	if (ZBX_PROXYMODE_ACTIVE == CONFIG_PROXYMODE &&	NULL == CONFIG_SERVER)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "missing active proxy mandatory parameter [Server] in config file [%s]", CONFIG_FILE);
-		exit(FAIL);
+		zabbix_log(LOG_LEVEL_CRIT, "missing active proxy mandatory parameter [Server] in config file [%s]",
+				CONFIG_FILE);
+		exit(EXIT_FAILURE);
 	}
 
 	if (NULL == CONFIG_HOSTNAME)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "hostname is not defined");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	if (FAIL == zbx_check_hostname(CONFIG_HOSTNAME))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid host name: [%s]", CONFIG_HOSTNAME);
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
+
+#if !defined(HAVE_LIBXML2) || !defined(HAVE_LIBCURL)
+	if (0 != CONFIG_VMWARE_FORKS)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot start vmware collector because Zabbix proxy is built without VMware"
+				" support");
+		exit(EXIT_FAILURE);
+	}
+#endif
 }
 
 /******************************************************************************
@@ -439,6 +454,12 @@ static void	zbx_load_config()
 			PARM_OPT,	0,			0},
 		{"LoadModule",			&CONFIG_LOAD_MODULE,			TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
+		{"StartVMwareCollectors",	&CONFIG_VMWARE_FORKS,			TYPE_INT,
+			PARM_OPT,	0,			250},
+		{"VMwareFrequency",		&CONFIG_VMWARE_FREQUENCY,		TYPE_INT,
+			PARM_OPT,	10,			SEC_PER_DAY},
+		{"VMwareCacheSize",		&CONFIG_VMWARE_CACHE_SIZE,		TYPE_UINT64,
+			PARM_OPT,	256 * ZBX_KIBIBYTE,	0x7fffffff},	/* just below 2GB */
 		{NULL}
 	};
 
@@ -626,6 +647,10 @@ int	MAIN_ZABBIX_ENTRY()
 	init_configuration_cache();
 	init_selfmon_collector();
 
+	/* initialize vmware support */
+	if (0 != CONFIG_VMWARE_FORKS)
+		zbx_vmware_init();
+
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	DCsync_configuration();
 	DBclose();
@@ -634,7 +659,8 @@ int	MAIN_ZABBIX_ENTRY()
 			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS
 			+ CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS
 			+ CONFIG_DISCOVERER_FORKS + CONFIG_HISTSYNCER_FORKS + CONFIG_IPMIPOLLER_FORKS
-			+ CONFIG_JAVAPOLLER_FORKS + CONFIG_SNMPTRAPPER_FORKS + CONFIG_SELFMON_FORKS;
+			+ CONFIG_JAVAPOLLER_FORKS + CONFIG_SNMPTRAPPER_FORKS + CONFIG_SELFMON_FORKS
+			+ CONFIG_VMWARE_FORKS;
 	threads = zbx_calloc(threads, threads_num, sizeof(pid_t));
 
 	if (0 < CONFIG_TRAPPER_FORKS)
@@ -779,6 +805,12 @@ int	MAIN_ZABBIX_ENTRY()
 
 		main_selfmon_loop();
 	}
+	else if (proxy_num <= (proxy_count += CONFIG_VMWARE_FORKS))
+	{
+		INIT_PROXY(ZBX_PROCESS_TYPE_VMWARE, CONFIG_VMWARE_FORKS);
+
+		main_vmware_loop();
+	}
 
 	return SUCCEED;
 }
@@ -825,6 +857,10 @@ void	zbx_on_exit()
 #ifdef HAVE_SQLITE3
 	zbx_remove_sqlite3_mutex();
 #endif
+
+	/* free vmware support */
+	if (0 != CONFIG_VMWARE_FORKS)
+		zbx_vmware_destroy();
 
 	free_selfmon_collector();
 
