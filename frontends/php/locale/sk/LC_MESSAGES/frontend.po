@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-25 00:33+0300\n"
+"POT-Creation-Date: 2013-10-08 21:54+0300\n"
 "PO-Revision-Date: 2013-08-25 22:49+0200\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -21,11 +21,11 @@ msgstr ""
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
 msgstr "\"%s\" musí byť v intervale od 1970.01.01 do 2038.01.18."
 
-#: include/profiles.inc.php:286
+#: include/profiles.inc.php:285
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
 msgstr "\"Ukáž OK spúšťače\" musí byť nastavené na \"0\" alebo akékoľvek iné kladné celé číslo."
 
-#: include/profiles.inc.php:291
+#: include/profiles.inc.php:290
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
 msgstr "\"Blikanie spúšťača pri zmene stavu\" musí byť \"0\" alebo kladné celé číslo."
 
@@ -210,7 +210,7 @@ msgstr "Akceptovateľná SLA"
 msgid "Access denied!"
 msgstr "Prístup zamietnutý!"
 
-#: api/classes/CUser.php:916
+#: api/classes/CUser.php:917
 #, php-format
 msgid "Account is blocked for %s seconds"
 msgstr "Konto je zablokované na %s sekúnd"
@@ -1542,7 +1542,7 @@ msgid "Cannot delete user"
 msgstr "Nie je možné zmazať používateľa"
 
 # užívateľ!=používateľ
-#: api/classes/CUser.php:786
+#: api/classes/CUser.php:787
 msgid "Cannot delete user media."
 msgstr "Nie je možné zmazať médium používateľa."
 
@@ -1694,7 +1694,7 @@ msgstr[2] "Nie je možné importovať šablónu \"%2$s\", pripojené šablóny \
 msgid "Cannot include view file \"%s\"."
 msgstr "Nie je možné vložiť view súbor \"%s\"."
 
-#: api/classes/CUser.php:815
+#: api/classes/CUser.php:816
 msgid "Cannot insert user media."
 msgstr "Nie je možné vložit médium používateľa."
 
@@ -1702,7 +1702,7 @@ msgstr "Nie je možné vložit médium používateľa."
 msgid "Cannot link template"
 msgstr "Nie je možné nalinkovať šablónu"
 
-#: api/classes/CUser.php:880
+#: api/classes/CUser.php:881
 msgid "Cannot logout."
 msgstr "Odhlásenie nie je možné."
 
@@ -2011,7 +2011,7 @@ msgstr "Nie je možné upraviť spúšťač"
 msgid "Cannot update user"
 msgstr "Nie je možné upraviť používateľa"
 
-#: api/classes/CUser.php:807
+#: api/classes/CUser.php:808
 msgid "Cannot update user media."
 msgstr "Nie je možné upraviť médiá používateľa."
 
@@ -2205,7 +2205,7 @@ msgstr "Farba"
 msgid "Colour (OK)"
 msgstr "Farba (OK)"
 
-#: include/profiles.inc.php:279
+#: include/profiles.inc.php:278
 msgid "Colour is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "Farba nie je v správnom formáte: očakávam kód farby v 16-kovej sústave (6 znakov)."
 
@@ -2533,7 +2533,7 @@ msgstr "Kopírovať"
 msgid "Copy selected to ..."
 msgstr "Kopírovať označené do ..."
 
-#: api/classes/CUser.php:985
+#: api/classes/CUser.php:986
 #, php-format
 msgid "Correct login \"%s\"."
 msgstr "Správny login \"%s\"."
@@ -2912,7 +2912,7 @@ msgstr "Tmavo oranžová"
 msgid "Darken"
 msgstr "Stmaviť"
 
-#: dashboard.php:24 include/menu.inc.php:33 include/profiles.inc.php:353
+#: dashboard.php:24 include/menu.inc.php:33 include/profiles.inc.php:352
 msgid "Dashboard"
 msgstr "Konzola"
 
@@ -3948,7 +3948,7 @@ msgstr "Kopírovanie mena mapy pre mapu \"%s\"."
 msgid "Duplicate script name \"%s\"."
 msgstr "Kopírovanie mena skriptu \"%s\"."
 
-#: include/profiles.inc.php:311
+#: include/profiles.inc.php:310
 #, php-format
 msgid "Duplicate severity name \"%s\"."
 msgstr "Kopírovanie mena závažnosti \"%s\"."
@@ -5937,7 +5937,7 @@ msgstr "Metóde boli predané neplatné argumenty."
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Neplatná hodnota SLA vypočítaná pre službu \"%1$s\"."
 
-#: include/nodes.inc.php:267 include/nodes.inc.php:309
+#: include/nodes.inc.php:267 include/nodes.inc.php:308
 msgid "Incorrect characters used for Node name."
 msgstr "Nepovolené znaky použité pre meno uzla."
 
@@ -6026,7 +6026,7 @@ msgstr "Neplatné ID hosta \"%s\" pre obrazovkový element."
 msgid "Incorrect host group ID \"%s\" provided for screen element."
 msgstr "Neplatné ID skupiny \"%s\" pre obrazovkový element."
 
-#: include/profiles.inc.php:258
+#: include/profiles.inc.php:257
 msgid "Incorrect host group."
 msgstr "Neplatná skupina."
 
@@ -6138,7 +6138,7 @@ msgstr "Neplatná výška mapy pre mapu \"%s\"."
 msgid "Incorrect map width value for map \"%s\"."
 msgstr "Neplatná šírka mapy pre mapu \"%s\"."
 
-#: include/nodes.inc.php:287
+#: include/nodes.inc.php:286
 msgid "Incorrect node type."
 msgstr "Neplatný typ uzla."
 
@@ -6322,7 +6322,7 @@ msgstr "Neplatné používateľské údaje v \"get_accessible_groups_by_user\"."
 msgid "Incorrect user data in \"get_accessible_nodes_by_user\"."
 msgstr "Neplatné používateľské údaje v \"get_accessible_nodes_by_user\"."
 
-#: include/profiles.inc.php:246
+#: include/profiles.inc.php:245
 msgid "Incorrect user group."
 msgstr "Neplatná používateľská skupina."
 
@@ -6351,7 +6351,7 @@ msgstr "Neplatná hodnota \"NULL\" pre NOT NULL pole \"%1$s\"."
 msgid "Incorrect value for setMessage(): \"%s\"."
 msgstr "Neplatná hodnota pre setMessage(): \"%s\"."
 
-#: include/profiles.inc.php:240
+#: include/profiles.inc.php:239
 msgid "Incorrect working time."
 msgstr "Neplatný pracovný čas."
 
@@ -6387,7 +6387,7 @@ msgstr "Vložiť"
 msgid "Insert macro"
 msgstr "Vložiť makro"
 
-#: include/menu.inc.php:279 include/profiles.inc.php:228 setup.php:25
+#: include/menu.inc.php:279 include/profiles.inc.php:227 setup.php:25
 msgid "Installation"
 msgstr "Inštalácia"
 
@@ -7195,7 +7195,7 @@ msgstr "Prihlásiť"
 msgid "Login as Guest"
 msgstr "Prihlásiť ako Hosť"
 
-#: api/classes/CUser.php:977
+#: api/classes/CUser.php:978
 #, php-format
 msgid "Login failed \"%s\"."
 msgstr "Prihlásenie zlyhalo \"%s\"."
@@ -7204,8 +7204,8 @@ msgstr "Prihlásenie zlyhalo \"%s\"."
 msgid "Login name or password is incorrect"
 msgstr "Nesprávne prihlasovacie meno alebo heslo"
 
-#: api/classes/CUser.php:845 api/classes/CUser.php:863
-#: api/classes/CUser.php:910
+#: api/classes/CUser.php:846 api/classes/CUser.php:864
+#: api/classes/CUser.php:911
 msgid "Login name or password is incorrect."
 msgstr "Nesprávne prihlasovacie meno alebo heslo."
 
@@ -8438,7 +8438,7 @@ msgstr "Žiadne oprávnenia pre mapu \"%1$s\"."
 msgid "No permissions for screen \"%1$s\"."
 msgstr "Žiadne oprávnenia pre obrazovku \"%1$s\"."
 
-#: api/classes/CUser.php:924 api/classes/CUser.php:1034
+#: api/classes/CUser.php:925 api/classes/CUser.php:1035
 msgid "No permissions for system access."
 msgstr "Žiadne oprávnenia pre prístup do systému."
 
@@ -8638,7 +8638,7 @@ msgstr "Uzol zmazaný"
 msgid "Node updated"
 msgstr "Uzol aktualizovaný"
 
-#: include/nodes.inc.php:292
+#: include/nodes.inc.php:291
 msgid "Node with same ID already exists."
 msgstr "Uzol s totožným ID už existuje."
 
@@ -8732,7 +8732,7 @@ msgstr "Poznámky"
 msgid "Nothing"
 msgstr "Nič"
 
-#: include/profiles.inc.php:331
+#: include/profiles.inc.php:330
 msgid "Nothing to do."
 msgstr "Nič na vykonanie."
 
@@ -8977,15 +8977,15 @@ msgstr "Len Super Admini môžu aktualizovať mapové ikony."
 msgid "Only Super Admins can update user groups."
 msgstr "Len Super Admini môžu aktualizovať používateľské skupiny."
 
-#: api/classes/CUser.php:684
+#: api/classes/CUser.php:685
 msgid "Only Zabbix Admins can add user media."
 msgstr "Len Zabbix Admini môžu pridať použivateľské médiá."
 
-#: api/classes/CUser.php:752
+#: api/classes/CUser.php:753
 msgid "Only Zabbix Admins can change user media."
 msgstr "Len Zabbix Admini môžu zmeniť použivateľské médiá."
 
-#: api/classes/CUser.php:722
+#: api/classes/CUser.php:723
 msgid "Only Zabbix Admins can remove user media."
 msgstr "Len Zabbix Admini môžu zmazať použivateľské médiá."
 
@@ -9509,7 +9509,7 @@ msgstr "Prehrať"
 msgid "Play sound"
 msgstr "Prehrať zvuk"
 
-#: include/nodes.inc.php:329
+#: include/nodes.inc.php:328
 msgid "Please be aware that database still contains data related to the deleted node."
 msgstr "Majte prosím na pamäti, že databáza stále obsahuje údaje vzťahujúce sa k odstránenému uzlu."
 
@@ -9645,7 +9645,7 @@ msgstr "Súbor so súkromným kľúčom"
 msgid "Privilege level"
 msgstr "Úroveň oprávnenia"
 
-#: api/classes/CUser.php:835
+#: api/classes/CUser.php:836
 msgid "Probably php-ldap module is missing."
 msgstr "Pravdepodobne chýba php-ldap modul."
 
@@ -10938,7 +10938,7 @@ msgstr "Služby"
 msgid "Services form a circular dependency."
 msgstr "Služby tvoria kruhovú závislosť."
 
-#: api/classes/CUser.php:1028
+#: api/classes/CUser.php:1029
 msgid "Session terminated, re-login, please."
 msgstr "Sedenie ukončené, prosím prihláste sa znovu."
 
@@ -10956,7 +10956,7 @@ msgstr "Závažnosť"
 msgid "Severity (descending)"
 msgstr "Závažnosť (vzostupne)"
 
-#: include/profiles.inc.php:306
+#: include/profiles.inc.php:305
 msgid "Severity name cannot be empty."
 msgstr "Meno závažnosti nemôže byť prázdne."
 
@@ -12256,11 +12256,11 @@ msgstr "UTF-8"
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukrajinsky (uk_UA)"
 
-#: include/nodes.inc.php:321
+#: include/nodes.inc.php:320
 msgid "Unable to remove local node."
 msgstr "Nie je možné odstrániť lokálny uzol."
 
-#: include/profiles.inc.php:229
+#: include/profiles.inc.php:228
 msgid "Unable to select configuration."
 msgstr "Nie je možné vybrať konfiguráciu."
 

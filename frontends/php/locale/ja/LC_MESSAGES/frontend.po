@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-25 00:33+0300\n"
+"POT-Creation-Date: 2013-10-08 21:54+0300\n"
 "PO-Revision-Date: 2013-04-05 18:38+0200\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -21,11 +21,11 @@ msgstr ""
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
 msgstr "\"%s\"は1970.01.01から2038.01.18の間で設定してください。"
 
-#: include/profiles.inc.php:286
+#: include/profiles.inc.php:285
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
 msgstr "\"復旧トリガーの表示期間\"は\"0\"かそれ以上の整数を設定してください。"
 
-#: include/profiles.inc.php:291
+#: include/profiles.inc.php:290
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
 msgstr "\"トリガー変化時の点滅期間\"は\"0\"かそれ以上の整数を設定してください。"
 
@@ -198,7 +198,7 @@ msgstr "SLAの許容値"
 msgid "Access denied!"
 msgstr "アクセスは拒否されました！"
 
-#: api/classes/CUser.php:916
+#: api/classes/CUser.php:917
 #, php-format
 msgid "Account is blocked for %s seconds"
 msgstr "アカウントは%s秒間ブロックされています"
@@ -1527,7 +1527,7 @@ msgstr "ローレベルディスカバリによって作成されたトリガー
 msgid "Cannot delete user"
 msgstr "ユーザーを削除できません"
 
-#: api/classes/CUser.php:786
+#: api/classes/CUser.php:787
 msgid "Cannot delete user media."
 msgstr "ユーザーのメディアを削除できません"
 
@@ -1675,7 +1675,7 @@ msgstr[0] "テンプレート\"%2$s\"をインポートできません。リン�
 msgid "Cannot include view file \"%s\"."
 msgstr "ビューファイル\"%s\"を読み込めません。"
 
-#: api/classes/CUser.php:815
+#: api/classes/CUser.php:816
 msgid "Cannot insert user media."
 msgstr "ユーザーメディアを追加できません"
 
@@ -1683,7 +1683,7 @@ msgstr "ユーザーメディアを追加できません"
 msgid "Cannot link template"
 msgstr "テンプレートをリンクできません"
 
-#: api/classes/CUser.php:880
+#: api/classes/CUser.php:881
 msgid "Cannot logout."
 msgstr "ログアウトできません。"
 
@@ -1992,7 +1992,7 @@ msgstr "トリガーを更新できません"
 msgid "Cannot update user"
 msgstr "ユーザーを更新できません"
 
-#: api/classes/CUser.php:807
+#: api/classes/CUser.php:808
 msgid "Cannot update user media."
 msgstr "ユーザーのメディアを更新できません"
 
@@ -2186,7 +2186,7 @@ msgstr "色"
 msgid "Colour (OK)"
 msgstr "色 (正常)"
 
-#: include/profiles.inc.php:279
+#: include/profiles.inc.php:278
 msgid "Colour is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "色の設定が正しくありません: 16進数のカラーコードを指定してください(6文字)。"
 
@@ -2514,7 +2514,7 @@ msgstr "コピー"
 msgid "Copy selected to ..."
 msgstr "選択をコピー..."
 
-#: api/classes/CUser.php:985
+#: api/classes/CUser.php:986
 #, php-format
 msgid "Correct login \"%s\"."
 msgstr "ユーザー\"%s\"のログイン"
@@ -2892,7 +2892,7 @@ msgstr "Dark orange"
 msgid "Darken"
 msgstr "暗く"
 
-#: dashboard.php:24 include/menu.inc.php:33 include/profiles.inc.php:353
+#: dashboard.php:24 include/menu.inc.php:33 include/profiles.inc.php:352
 msgid "Dashboard"
 msgstr "ダッシュボード"
 
@@ -3926,7 +3926,7 @@ msgstr "マップ\"%s\"のマップ名が重複しています"
 msgid "Duplicate script name \"%s\"."
 msgstr "スクリプト名が重複しています\"%s\"."
 
-#: include/profiles.inc.php:311
+#: include/profiles.inc.php:310
 #, php-format
 msgid "Duplicate severity name \"%s\"."
 msgstr "重要度名\"%s\"は重複しています"
@@ -5915,7 +5915,7 @@ msgstr "入力項目が正しくありません。"
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "サービス\"%1$s\"のSLAの値の計算が正しくありません。"
 
-#: include/nodes.inc.php:267 include/nodes.inc.php:309
+#: include/nodes.inc.php:267 include/nodes.inc.php:308
 msgid "Incorrect characters used for Node name."
 msgstr "ノード名に不正な文字列が利用されています。"
 
@@ -6004,7 +6004,7 @@ msgstr "スクリーンの要素のホストID\"%s\"が正しくありません�
 msgid "Incorrect host group ID \"%s\" provided for screen element."
 msgstr "スクリーンの要素のホストグループID\"%s\"が正しくありません。"
 
-#: include/profiles.inc.php:258
+#: include/profiles.inc.php:257
 msgid "Incorrect host group."
 msgstr "ホストグループが正しくありません。"
 
@@ -6116,7 +6116,7 @@ msgstr "マップ\"%s\"の高さの値が正しくありません。"
 msgid "Incorrect map width value for map \"%s\"."
 msgstr "マップ\"%s\"の幅の値が正しくありません。"
 
-#: include/nodes.inc.php:287
+#: include/nodes.inc.php:286
 msgid "Incorrect node type."
 msgstr "ノードタイプが正しくありません。"
 
@@ -6300,7 +6300,7 @@ msgstr "\"get_accessible_groups_by_user\"中のユーザーデータが正しく
 msgid "Incorrect user data in \"get_accessible_nodes_by_user\"."
 msgstr "\"get_accessible_nodes_by_user\"中のユーザーデータが正しくありません。"
 
-#: include/profiles.inc.php:246
+#: include/profiles.inc.php:245
 msgid "Incorrect user group."
 msgstr "ユーザーグループが正しくありません。"
 
@@ -6329,7 +6329,7 @@ msgstr "NOT NULLフィールド\"%1$s\"への\"NULL\"値は正しくありませ
 msgid "Incorrect value for setMessage(): \"%s\"."
 msgstr "setMessage()の値が正しくありません: \"%s\"."
 
-#: include/profiles.inc.php:240
+#: include/profiles.inc.php:239
 msgid "Incorrect working time."
 msgstr "ワーキングタイムの設定が正しくありません。"
 
@@ -6365,7 +6365,7 @@ msgstr "挿入"
 msgid "Insert macro"
 msgstr "マクロの挿入"
 
-#: include/menu.inc.php:279 include/profiles.inc.php:228 setup.php:25
+#: include/menu.inc.php:279 include/profiles.inc.php:227 setup.php:25
 msgid "Installation"
 msgstr "インストール"
 
@@ -7171,7 +7171,7 @@ msgstr "ログイン"
 msgid "Login as Guest"
 msgstr "ゲストとしてログイン"
 
-#: api/classes/CUser.php:977
+#: api/classes/CUser.php:978
 #, php-format
 msgid "Login failed \"%s\"."
 msgstr "ログイン失敗\"%s\""
@@ -7180,8 +7180,8 @@ msgstr "ログイン失敗\"%s\""
 msgid "Login name or password is incorrect"
 msgstr "ログイン名かパスワードが間違っています"
 
-#: api/classes/CUser.php:845 api/classes/CUser.php:863
-#: api/classes/CUser.php:910
+#: api/classes/CUser.php:846 api/classes/CUser.php:864
+#: api/classes/CUser.php:911
 msgid "Login name or password is incorrect."
 msgstr "ログイン名かパスワードが間違っています。"
 
@@ -8408,7 +8408,7 @@ msgstr "マップ\"%1$s\"への権限がありません。"
 msgid "No permissions for screen \"%1$s\"."
 msgstr "スクリーン\"%1$s\"への権限がありません。"
 
-#: api/classes/CUser.php:924 api/classes/CUser.php:1034
+#: api/classes/CUser.php:925 api/classes/CUser.php:1035
 msgid "No permissions for system access."
 msgstr "システムへのアクセス権がありません。"
 
@@ -8608,7 +8608,7 @@ msgstr "ノードを削除しました"
 msgid "Node updated"
 msgstr "ノードを更新しました"
 
-#: include/nodes.inc.php:292
+#: include/nodes.inc.php:291
 msgid "Node with same ID already exists."
 msgstr "同じIDを持つノードがすでに存在します。"
 
@@ -8702,7 +8702,7 @@ msgstr "備考"
 msgid "Nothing"
 msgstr "なし"
 
-#: include/profiles.inc.php:331
+#: include/profiles.inc.php:330
 msgid "Nothing to do."
 msgstr "実行するものがありません"
 
@@ -8947,15 +8947,15 @@ msgstr "特権管理者のみがアイコンのマッピングを更新できま
 msgid "Only Super Admins can update user groups."
 msgstr "特権管理者のみがユーザーグループを更新できます。"
 
-#: api/classes/CUser.php:684
+#: api/classes/CUser.php:685
 msgid "Only Zabbix Admins can add user media."
 msgstr "特権管理者のみがユーザーのメディアを追加できます。"
 
-#: api/classes/CUser.php:752
+#: api/classes/CUser.php:753
 msgid "Only Zabbix Admins can change user media."
 msgstr "特権管理者のみがユーザーのメディアを変更できます。"
 
-#: api/classes/CUser.php:722
+#: api/classes/CUser.php:723
 msgid "Only Zabbix Admins can remove user media."
 msgstr "特権管理者のみがユーザーのメディアを削除できます。"
 
@@ -9479,7 +9479,7 @@ msgstr "再生"
 msgid "Play sound"
 msgstr "サウンド再生"
 
-#: include/nodes.inc.php:329
+#: include/nodes.inc.php:328
 msgid "Please be aware that database still contains data related to the deleted node."
 msgstr "データベースにはまだ削除したノードに関するデータが残っていることに注意してください。"
 
@@ -9615,7 +9615,7 @@ msgstr "秘密鍵ファイル"
 msgid "Privilege level"
 msgstr "特権レベル"
 
-#: api/classes/CUser.php:835
+#: api/classes/CUser.php:836
 msgid "Probably php-ldap module is missing."
 msgstr "php-ldapモジュールが見つかりません。"
 
@@ -10906,7 +10906,7 @@ msgstr "サービス"
 msgid "Services form a circular dependency."
 msgstr "サービスの依存関係が循環設定されています。"
 
-#: api/classes/CUser.php:1028
+#: api/classes/CUser.php:1029
 msgid "Session terminated, re-login, please."
 msgstr "セッションが切断されました。再度ログインしてください。"
 
@@ -10924,7 +10924,7 @@ msgstr "深刻度"
 msgid "Severity (descending)"
 msgstr "深刻度(降順)"
 
-#: include/profiles.inc.php:306
+#: include/profiles.inc.php:305
 msgid "Severity name cannot be empty."
 msgstr "深刻度を設定してください。"
 
@@ -12218,11 +12218,11 @@ msgstr "UTF-8"
 msgid "Ukrainian (uk_UA)"
 msgstr "ウクライナ語 (uk_UA)"
 
-#: include/nodes.inc.php:321
+#: include/nodes.inc.php:320
 msgid "Unable to remove local node."
 msgstr "ローカルノードは削除できません。"
 
-#: include/profiles.inc.php:229
+#: include/profiles.inc.php:228
 msgid "Unable to select configuration."
 msgstr "選択した設定は行えません"
 
