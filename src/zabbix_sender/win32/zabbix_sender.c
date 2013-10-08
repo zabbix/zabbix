@@ -86,7 +86,6 @@ int	zabbix_sender_parse_result(const char *result, int *response, zabbix_sender_
 	int			ret;
 	struct zbx_json_parse	jp;
 	char			value[MAX_STRING_LEN];
-	double			time_spent;
 
 	if (SUCCEED != (ret = zbx_json_open(result, &jp)))
 		goto out;
@@ -101,13 +100,10 @@ int	zabbix_sender_parse_result(const char *result, int *response, zabbix_sender_
 
 	if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, value, sizeof(value)) ||
 			3 != sscanf(value, "Processed %*d Failed %d Total %d Seconds spent %lf",
-				&info->failed, &info->total, &time_spent))
+				&info->failed, &info->total, &info->time_spent))
 	{
 		info->total = -1;
-		goto out;
 	}
-
-	info->time_spent = (int)(time_spent * 1000000);
 out:
 	return ret;
 }
