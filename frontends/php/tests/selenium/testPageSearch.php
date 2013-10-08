@@ -68,8 +68,4 @@ class testPageSearch extends CWebTest {
 		$this->zbxTestTextPresent('...');
 	}
 
-	public function testPageHosts_Sorting() {
-// TODO
-		$this->markTestIncomplete();
-	}
 }

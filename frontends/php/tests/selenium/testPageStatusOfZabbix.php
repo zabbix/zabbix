@@ -38,8 +38,4 @@ class testPageStatusOfZabbix extends CWebTest {
 		$this->zbxTestTextPresent('Required server performance, new values per second');
 	}
 
-	public function testPageStatusOfZabbix_VerifyDisplayedNumbers() {
-// TODO
-		$this->markTestIncomplete();
-	}
 }
