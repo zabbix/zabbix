@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-08 23:08+0300\n"
-"PO-Revision-Date: 2013-09-25 06:05+0300\n"
-"Last-Translator: richlv <richlv@nakts.net>\n"
+"POT-Creation-Date: 2013-10-08 23:10+0300\n"
+"PO-Revision-Date: 2013-10-07 11:27+0300\n"
+"Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1380081938.0\n"
+"X-POOTLE-MTIME: 1381138027.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -34,8 +34,8 @@ msgstr "\"I trigger lampeggiano al cambio di stato\" deve essere \"0\" o un inte
 #, php-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d giorno"
+msgstr[1] "%1$d giorni"
 
 #: chart4.php:89 chart5.php:83
 #, php-format
@@ -790,7 +790,7 @@ msgstr "Metodo di autenticazione cambiato in LDAP"
 
 #: authentication.php:83 authentication.php:84
 msgid "Authentication method changed to Zabbix internal"
-msgstr "Metodo di autenticazione cambiato in Zabbix internal"
+msgstr "Metodo di autenticazione cambiato in interna Zabbix"
 
 #: include/views/configuration.item.edit.php:152
 #: include/views/configuration.item.massupdate.php:159
@@ -1222,7 +1222,7 @@ msgstr "Impossibile aggiungere un item non-numerico \"%1$s\" al prototipo di gra
 #: include/reports.inc.php:505
 #, php-format
 msgid "Cannot add a non-numeric item \"%1$s\"."
-msgstr ""
+msgstr "Impossibile aggiungere un item non-numerico \"%1$s\"."
 
 #: actionconf.php:150
 msgid "Cannot add action"
@@ -1379,7 +1379,7 @@ msgstr "Impossibile cambiare metodo di autenticazione in LDAP"
 
 #: authentication.php:88
 msgid "Cannot change authentication method to Zabbix internal"
-msgstr "Impossibile cambiare metodo di autenticazione in Zabbix internal"
+msgstr "Impossibile cambiare metodo di autenticazione in interna Zabbix"
 
 #: items.php:505
 msgid "Cannot clear history"
@@ -1472,7 +1472,7 @@ msgstr "Impossibile creare schermata."
 #: api/classes/CUser.php:1198
 #, php-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
-msgstr "Impossibile rimuovere utente Zabbix internal \"%1$s\", prova a disabilitare quell'utente."
+msgstr "Impossibile rimuovere utente interno Zabbix \"%1$s\", prova a disabilitare quell'utente."
 
 #: actionconf.php:169
 msgid "Cannot delete action"
@@ -1605,7 +1605,7 @@ msgstr "Impossibile rimuovere gli script. Lo script \"%1$s\" e' utilizzato nell'
 #: api/classes/CScript.php:529
 #, php-format
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
-msgstr "Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste."
+msgstr "Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste.Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste."
 
 #: actionconf.php:331
 msgid "Cannot delete selected actions"
@@ -2255,7 +2255,7 @@ msgstr "Impossibile aggiornare scenario web"
 
 #: include/views/js/configuration.discovery.edit.js.php:600
 msgid "Cannot validate discovery check: invalid request or connection to Zabbix server failed."
-msgstr ""
+msgstr "Impossibile validare controllo discovery: richiesta non valida o connessione al server Zabbix fallita."
 
 #: popup_bitem.php:114 popup_period.php:114
 msgid "Caption"
@@ -2809,7 +2809,7 @@ msgstr "Conteggio"
 
 #: include/views/configuration.slideconf.list.php:43
 msgid "Count of slides"
-msgstr "Conteggio diapositive"
+msgstr "Numero diapositive"
 
 #: include/views/configuration.action.list.php:28
 msgid "Create action"
@@ -3981,7 +3981,7 @@ msgstr "Controllo discovery"
 #: include/views/js/configuration.discovery.edit.js.php:599
 #: include/views/js/configuration.discovery.edit.js.php:616
 msgid "Discovery check error"
-msgstr ""
+msgstr "Errore di controllo discovery"
 
 #: popup.php:100
 msgid "Discovery checks"
@@ -5553,7 +5553,7 @@ msgstr "Un host non può avere più di un'interfaccia predefinita dello stesso t
 #: hostinventoriesoverview.php:92
 #: include/views/administration.proxy.list.php:49
 msgid "Host count"
-msgstr "Conteggio host"
+msgstr "Numero host"
 
 #: hosts.php:575 hosts.php:592
 msgid "Host deleted"
@@ -6195,7 +6195,7 @@ msgstr "Impossibile rimuovere l'ultima riga e l'ultima colonna."
 #: include/classes/class.ctweenbox.php:100
 #: include/views/configuration.template.edit.php:171
 msgid "In"
-msgstr "In"
+msgstr "Inclusi"
 
 #: include/views/administration.usergroups.edit.php:55
 msgid "In group"
@@ -6796,7 +6796,7 @@ msgstr "Sintassi errata vicino \"%1$s\"."
 #: api/classes/CUser.php:351
 #, php-format
 msgid "Incorrect theme for user \"%1$s\"."
-msgstr ""
+msgstr "Tema errato per l'utente \"%1$s\"."
 
 #: include/classes/validators/CTimePeriodValidator.php:99
 #, php-format
@@ -6900,7 +6900,7 @@ msgstr "Valore \"%1$s\" errato per il campo int senza segno \"%2$s\"."
 #: include/reports.inc.php:540 include/reports.inc.php:544
 #, php-format
 msgid "Incorrect value for field \"%1$s\"."
-msgstr ""
+msgstr "Valore errato per il campo \"%1$s\"."
 
 #: include/validate.inc.php:442
 #, php-format
@@ -7086,7 +7086,7 @@ msgstr "Parametri non validi"
 #: include/reports.inc.php:590 include/reports.inc.php:594
 #, php-format
 msgid "Invalid period for field \"%1$s\"."
-msgstr ""
+msgstr "Periodo errato per il campo \"%1$s\"."
 
 #: api/classes/CHttpTest.php:637
 #, php-format
@@ -7219,7 +7219,7 @@ msgstr "Item aggiunto"
 
 #: include/views/administration.proxy.list.php:50
 msgid "Item count"
-msgstr "Conteggio item"
+msgstr "Numero item"
 
 #: disc_prototypes.php:204 items.php:362 screenedit.php:202
 msgid "Item deleted"
@@ -8290,12 +8290,12 @@ msgstr "Il nodo master esiste già."
 
 #: adm.gui.php:41 include/views/administration.general.gui.edit.php:39
 msgid "Max count of elements to show inside table cell"
-msgstr "Numero massimo di elementi da mostrare in una cella in tabella"
+msgstr "Numero massimo di elementi da visualizzare nella cella di una tabella"
 
 #: adm.gui.php:79
 #, php-format
 msgid "Max count of elements to show inside table cell \"%1$s\"."
-msgstr "Numero massimo di elementi da mostrare in una cella in tabella \"%1$s\"."
+msgstr "Numero massimo di elementi da visualizzare nella cella di una tabella \"%1$s\"."
 
 #: adm.gui.php:38 include/views/administration.general.gui.edit.php:45
 msgid "Max count of events per trigger to show"
@@ -8550,12 +8550,12 @@ msgstr "Campo \"%1$s\" mancante per la condizione dell'azione."
 #: include/reports.inc.php:481
 #, php-format
 msgid "Missing \"%1$s\" field for item."
-msgstr ""
+msgstr "Campo \"%1$s\" mancante per l'item."
 
 #: include/reports.inc.php:580
 #, php-format
 msgid "Missing \"%1$s\" field for period."
-msgstr ""
+msgstr "Campo \"%1$s\" mancante per il periodo."
 
 #: api/classes/CGraphGeneral.php:75
 msgid "Missing \"gitemid\" field for item."
@@ -10746,7 +10746,7 @@ msgstr "RMCP+"
 #: include/views/administration.script.edit.php:94
 #: include/views/administration.script.list.php:84
 msgid "Read"
-msgstr "Leggi"
+msgstr "Lettura"
 
 #: include/forms.inc.php:261 include/perm.inc.php:24
 #: include/views/administration.usergroups.edit.php:82
@@ -11989,7 +11989,7 @@ msgstr "Mostra valore"
 
 #: include/views/administration.general.gui.edit.php:47
 msgid "Show warning if Zabbix server is down"
-msgstr "Mostra avvertimento se il server Zabbix non risponde"
+msgstr "Mostra avvertimento se Zabbix Server non risponde"
 
 #: include/views/configuration.graph.edit.php:132
 msgid "Show working time"
@@ -12324,7 +12324,7 @@ msgstr "Stile"
 
 #: include/forms.inc.php:947
 msgid "Subfilter [affects only filtered data!]"
-msgstr "Sotto-filtro [ha impatto solo i dati filtrati!]"
+msgstr "Sotto-filtro [influenza solo i dati filtrati!]"
 
 #: include/actions.inc.php:470 include/actions.inc.php:479
 #: include/actions.inc.php:485 include/actions.inc.php:872
@@ -13544,7 +13544,7 @@ msgstr "Usa se severity"
 
 #: include/views/administration.mediatypes.list.php:43
 msgid "Used in actions"
-msgstr "Utilizza nelle azioni"
+msgstr "Utilizzato nelle azioni"
 
 #: httpconf.php:53 include/acknow.inc.php:49 include/actions.inc.php:965
 #: include/audit.inc.php:24 include/hosts.inc.php:67 include/setup.inc.php:274
@@ -14332,11 +14332,11 @@ msgstr "Zabbix ha ricevuto una richiesta errata."
 
 #: include/items.inc.php:83
 msgid "Zabbix internal"
-msgstr "Zabbix internal"
+msgstr "Interna Zabbix"
 
 #: authentication.php:184
 msgid "Zabbix internal authentication"
-msgstr "Autenticazione Zabbix internal"
+msgstr "Autenticazione interna Zabbix"
 
 #: include/classes/class.cserverinfo.php:37
 #: include/classes/class.cserverinfo.php:38 include/setup.inc.php:374

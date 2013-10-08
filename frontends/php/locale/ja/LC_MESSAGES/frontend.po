@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-08 23:08+0300\n"
-"PO-Revision-Date: 2013-08-31 11:02+0300\n"
-"Last-Translator: Kodai Terashima <kodai.terashima@zabbix.com>\n"
+"POT-Creation-Date: 2013-10-08 23:10+0300\n"
+"PO-Revision-Date: 2013-10-07 09:40+0300\n"
+"Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1377939775.0\n"
+"X-POOTLE-MTIME: 1381131658.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -1940,7 +1940,7 @@ msgstr "無効の状態のインベントリのフィールドは設定できま
 
 #: api/classes/CHostInterface.php:324
 msgid "Cannot switch host for interface."
-msgstr "インターフェイスのためのホストを切り替えできません。"
+msgstr "インターフェースのためのホストを切り替えできません。"
 
 #: users.php:317
 msgid "Cannot unblock users"
@@ -4174,7 +4174,7 @@ msgstr "マップ\"%s\"のマップ名が重複しています"
 #: api/classes/CScript.php:421 api/classes/CScript.php:477
 #, php-format
 msgid "Duplicate script name \"%1$s\"."
-msgstr ""
+msgstr "スクリプト名\"%1$s\"は重複しています"
 
 #: include/profiles.inc.php:345
 #, php-format
@@ -4325,11 +4325,11 @@ msgstr "ホストのプロトタイプ\"%1$s\"の名前が空白です。"
 #: api/classes/CScript.php:579
 #, php-format
 msgid "Empty name for script \"%1$s\"."
-msgstr ""
+msgstr "スクリプト\"%1$s\"の名前が空白です。"
 
 #: api/classes/CScript.php:418 api/classes/CScript.php:474
 msgid "Empty name for script."
-msgstr ""
+msgstr "スクリプトの名前が空白です。"
 
 #: api/classes/CService.php:1109
 msgid "Empty name."
@@ -5698,7 +5698,7 @@ msgstr "ホストの表示名\"%1$s\"を持つホストのプロトタイプは�
 #: api/classes/CHostPrototype.php:1105
 #, php-format
 msgid "Host prototype with visible name \"%1$s\" already exists."
-msgstr "ホストの表示名\"%1$s\"を持つホストのプロトタイプはすでに孫z内しています。"
+msgstr "ホストの表示名\"%1$s\"を持つホストのプロトタイプはすでに存在しています。"
 
 #: include/html.inc.php:483 include/html.inc.php:487
 #: include/views/configuration.host.discovery.list.php:93
@@ -6888,7 +6888,7 @@ msgstr "符号なし整数フィールド\"%2$s\"の値\"%1$s\"が正しくあ�
 #: include/reports.inc.php:540 include/reports.inc.php:544
 #, php-format
 msgid "Incorrect value for field \"%1$s\"."
-msgstr ""
+msgstr "フィールド\"%1$s\"の値が正しくありません。"
 
 #: include/validate.inc.php:442
 #, php-format
@@ -7252,7 +7252,7 @@ msgstr "アイテムを更新しました"
 
 #: api/classes/CItemGeneral.php:261
 msgid "Item uses host interface from non-parent host."
-msgstr "アイテムが親ホストのものではないホストインターフェイスを利用しています。"
+msgstr "アイテムが親ホストのものではないホストインターフェースを利用しています。"
 
 #: api/classes/CItemGeneral.php:264
 msgid "Item uses incorrect interface type."
@@ -7751,7 +7751,7 @@ msgstr ""
 
 #: jsLoader.php:207
 msgid "Latest values"
-msgstr ""
+msgstr "最新の値"
 
 #: include/locales.inc.php:66
 msgid "Latvian (lv_LV)"
@@ -8532,12 +8532,12 @@ msgstr "アクションの実行条件の\"%1$s\"フィールドが存在しま�
 #: include/reports.inc.php:481
 #, php-format
 msgid "Missing \"%1$s\" field for item."
-msgstr ""
+msgstr "アイテムの\"%1$s\"フィールドが存在しません。"
 
 #: include/reports.inc.php:580
 #, php-format
 msgid "Missing \"%1$s\" field for period."
-msgstr ""
+msgstr "期間の\"%1$s\"フィールドが存在しません。"
 
 #: api/classes/CGraphGeneral.php:75
 msgid "Missing \"gitemid\" field for item."
@@ -8962,7 +8962,7 @@ msgstr "実行するアクションのコマンド\"%s\"に認証ユーザー名
 
 #: api/classes/CItemGeneral.php:324
 msgid "No authentication user name specified."
-msgstr "認証ユーザー名設定されていません。"
+msgstr "認証ユーザー名が設定されていません。"
 
 #: api/classes/CAction.php:1325
 msgid "No command specified for action operation."
@@ -8998,7 +8998,7 @@ msgstr "期間Tの間にデータが存在しない N NOT 1、それ以外 N NOT
 #: api/classes/CHostInterface.php:827
 #, php-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
-msgstr "\"%2$s\"上の\"%1$s\"タイプのデフォルトインターフェイスが設定されていません。"
+msgstr "\"%2$s\"上の\"%1$s\"タイプのデフォルトインターフェースが設定されていません。"
 
 #: include/views/configuration.services.edit.php:90
 #: include/views/configuration.triggers.edit.php:273
@@ -9022,7 +9022,7 @@ msgstr "ディスカバリチェックが設定されていません。"
 #: api/classes/CHostPrototype.php:112
 #, php-format
 msgid "No discovery rule ID given for host prototype \"%1$s\"."
-msgstr "ホストのプロトタイプ\"%1$s\"にディスカバリルールODが設定されていません。"
+msgstr "ホストのプロトタイプ\"%1$s\"にディスカバリルールIDが設定されていません。"
 
 #: api/classes/CDiscoveryRule.php:443
 msgid "No discovery rule IDs given."
@@ -10270,7 +10270,7 @@ msgstr "PHP xmlwriter"
 
 #: include/classes/class.frontendsetup.php:505
 msgid "PHP xmlwriter extension missing"
-msgstr "PHP xmlreaderモジュールが存在しません"
+msgstr "PHP xmlwriterモジュールが存在しません"
 
 #: include/discovery.inc.php:62
 #: include/views/js/configuration.discovery.edit.js.php:177
@@ -11143,7 +11143,7 @@ msgstr "行"
 
 #: include/views/administration.users.edit.php:146 profile.php:53 users.php:64
 msgid "Rows per page"
-msgstr "ベージあたりの表示行数"
+msgstr "ページあたりの表示行数"
 
 #: include/views/conf.import.php:65
 msgid "Rules"
@@ -11542,7 +11542,7 @@ msgstr "スクリプト"
 #: api/classes/CScript.php:627
 #, php-format
 msgid "Script \"%1$s\" already exists."
-msgstr ""
+msgstr "スクリプト\"%1$s\"はすでに存在します。"
 
 #: scripts.php:126
 msgid "Script added"
@@ -11578,7 +11578,7 @@ msgstr "スクリプトを更新しました"
 #: api/classes/CScript.php:469
 #, php-format
 msgid "Script with scriptid \"%1$s\" does not exist."
-msgstr ""
+msgstr "スクリプトID\"%1$s\"は存在しません。"
 
 #: include/menu.inc.php:260 include/views/administration.script.list.php:28
 #: jsLoader.php:184 jsLoader.php:211 report5.php:159 scripts_exec.php:26
@@ -12766,11 +12766,11 @@ msgstr "タイムスタンプ"
 
 #: popup_trexpr.php:413
 msgid "Timestamp not different from Zabbix server time for more than T seconds, then N = 1, 0 - otherwise"
-msgstr "タイムスタンプがZabbixサーバの時刻とT秒以上の差がある場合 N = 1、その他の場合 N =0 (=条件)"
+msgstr "タイムスタンプがZabbixサーバーの時刻とT秒以上の差がある場合 N = 1、その他の場合 N =0 (=条件)"
 
 #: popup_trexpr.php:418
 msgid "Timestamp not different from Zabbix server time for more than T seconds, then N NOT 1, 0 - otherwise"
-msgstr "タイムスタンプがZabbixサーバの時刻とT秒以上の差がある場合 N = 1、その他の場合 N =0 (#条件)"
+msgstr "タイムスタンプがZabbixサーバーの時刻とT秒以上の差がある場合 N = 1、その他の場合 N =0 (#条件)"
 
 #: include/reports.inc.php:54 include/reports.inc.php:163
 #: include/reports.inc.php:314
@@ -12784,7 +12784,7 @@ msgstr "終了"
 
 #: include/views/js/configuration.item.edit.js.php:51
 msgid "To set a host interface select a single item type for all items"
-msgstr "すべてのアイテムのため1つのホストインターフェイスを選択する必要があります"
+msgstr "すべてのアイテムのため1つのホストインターフェースを選択する必要があります"
 
 #: srv_status.php:35
 msgid "Today"
