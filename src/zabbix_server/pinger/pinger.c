@@ -501,7 +501,7 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count)
 		if (i == items_count - 1 || items[i].count != items[i + 1].count || items[i].interval != items[i + 1].interval ||
 				items[i].size != items[i + 1].size || items[i].timeout != items[i + 1].timeout)
 		{
-			zbx_setproctitle("%s [pinging hosts]", get_process_type_string(process_type));
+			zbx_setproctitle("%s #%d [pinging hosts]", get_process_type_string(process_type), process_num);
 
 			zbx_timespec(&ts);
 
