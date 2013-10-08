@@ -5,6 +5,7 @@ New features:
 ..F....... [ZBX-6911] added functionality to save positions of block on dashboard page in profiles table (Vitalij)
 
 Bug fixes:
+..F....... [ZBX-7111] fixed host importing from 1.8 to trunk (Eduard)
 ..F....... [ZBX-7074] fixed incorrectly parsed trigger expression in trigger wizard (Vitalij)
 ..F....... [ZBX-7082] fixed not being able to create dependencies between template triggers (Ivo)
 A.F....... [ZBX-7053] fixed errors when deleting a script linked to action operation and fixed type-specific operation command properties not being reset when changing type (Ivo)
