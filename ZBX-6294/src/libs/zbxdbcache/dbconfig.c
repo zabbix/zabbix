@@ -209,6 +209,7 @@ typedef struct
 	const char	*host;
 	const char	*name;
 	int		maintenance_from;
+	int		maintenance_until;
 	int		errors_from;
 	int		disable_until;
 	int		snmp_errors_from;
@@ -1760,13 +1761,15 @@ static void	DCsync_hosts(DB_RESULT result)
 		host->proxy_hostid = proxy_hostid;
 		DCstrpool_replace(found, &host->host, row[2]);
 		DCstrpool_replace(found, &host->name, row[23]);
-		host->maintenance_status = (unsigned char)atoi(row[7]);
-		host->maintenance_type = (unsigned char)atoi(row[8]);
-		host->maintenance_from = atoi(row[9]);
 		host->status = status;
 
 		if (0 == found)
 		{
+			host->maintenance_status = (unsigned char)atoi(row[7]);
+			host->maintenance_type = (unsigned char)atoi(row[8]);
+			host->maintenance_from = atoi(row[9]);
+			host->maintenance_until = 0;
+
 			host->errors_from = atoi(row[10]);
 			host->available = (unsigned char)atoi(row[11]);
 			host->disable_until = atoi(row[12]);
@@ -4562,7 +4565,7 @@ void	DCconfig_set_trigger_value(zbx_uint64_t triggerid, unsigned char value,
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
-				int maintenance_type, int maintenance_from)
+		int maintenance_type, int maintenance_from, int maintenance_until)
 {
 	ZBX_DC_HOST	*dc_host;
 
@@ -4570,15 +4573,51 @@ void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
 
 	if (NULL != (dc_host = zbx_hashset_search(&config->hosts, &hostid)))
 	{
-		if (HOST_MAINTENANCE_STATUS_OFF == dc_host->maintenance_status ||
-				HOST_MAINTENANCE_STATUS_OFF == maintenance_status)
+		if (dc_host->maintenance_status != maintenance_status)
 			dc_host->maintenance_from = maintenance_from;
+
+		/* store time at which host was taken out of maintenance for no-data */
+		/* maintenances only, this is needed for nodata() trigger function */
+		if (HOST_MAINTENANCE_STATUS_ON == dc_host->maintenance_status &&
+				MAINTENANCE_TYPE_NODATA == dc_host->maintenance_type &&
+				HOST_MAINTENANCE_STATUS_OFF == maintenance_status)
+			dc_host->maintenance_until = maintenance_until;
+		else
+			dc_host->maintenance_until = 0;
 
 		dc_host->maintenance_status = maintenance_status;
 		dc_host->maintenance_type = maintenance_type;
 	}
 
 	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_get_maintenance_until                                   *
+ *                                                                            *
+ * Purpose: returns time at which the last no-data maintenance ended          *
+ *                                                                            *
+ * Parameters: hostid            - [IN] the host id                           *
+ *             maintenance_until - [OUT] time host taken out of maintenance   *
+ *                                                                            *
+ ******************************************************************************/
+int	DCconfig_get_maintenance_until(zbx_uint64_t hostid, int *maintenance_until)
+{
+	ZBX_DC_HOST	*dc_host;
+	int		ret = FAIL;
+
+	LOCK_CACHE;
+
+	if (NULL != (dc_host = zbx_hashset_search(&config->hosts, &hostid)))
+	{
+		*maintenance_until = dc_host->maintenance_until;
+		ret = SUCCEED;
+	}
+
+	UNLOCK_CACHE;
+
+	return ret;
 }
 
 /******************************************************************************
@@ -5328,9 +5367,9 @@ void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name)
  *                                                                            *
  * Purpose: returns time of adding of an item into the configuration cache    *
  *                                                                            *
- * Parameters: itemid  - [IN] the item id                                     *
- *             seconds - [OUT] the number of seconds of adding of an item     *
- *                             into the configuration cache                   *
+ * Parameters: itemid     - [IN] the item id                                  *
+ *             time_added - [OUT] the number of seconds of adding of an item  *
+ *                                into the configuration cache                *
  *                                                                            *
  ******************************************************************************/
 int	DCget_item_time_added(zbx_uint64_t itemid, int *time_added)
