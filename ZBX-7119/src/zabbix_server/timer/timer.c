@@ -651,6 +651,9 @@ static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, i
 	{
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", ids, ids_num);
 		DBexecute("%s", sql);
+
+		for (i = 0; i < ids_num; i++)
+			DCconfig_set_maintenance(ids[i], HOST_MAINTENANCE_STATUS_OFF, 0, 0);
 	}
 
 	DBcommit();

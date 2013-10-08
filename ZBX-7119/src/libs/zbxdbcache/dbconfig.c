@@ -1022,13 +1022,13 @@ static void	DCsync_hosts(DB_RESULT result)
 		DCstrpool_replace(found, &host->ip, row[4]);
 		DCstrpool_replace(found, &host->dns, row[5]);
 		host->port = (unsigned short)atoi(row[6]);
-		host->maintenance_status = (unsigned char)atoi(row[14]);
-		host->maintenance_type = (unsigned char)atoi(row[15]);
-		host->maintenance_from = atoi(row[16]);
 		host->status = status;
 
 		if (0 == found)
 		{
+			host->maintenance_status = (unsigned char)atoi(row[14]);
+			host->maintenance_type = (unsigned char)atoi(row[15]);
+			host->maintenance_from = atoi(row[16]);
 			host->errors_from = atoi(row[17]);
 			host->available = (unsigned char)atoi(row[18]);
 			host->snmp_errors_from = atoi(row[20]);
