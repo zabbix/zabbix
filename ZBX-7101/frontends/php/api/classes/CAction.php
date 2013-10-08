@@ -234,7 +234,7 @@ class CAction extends CZBXAPI {
 			zbx_value2array($options['scriptids']);
 
 			$sqlParts['select']['scriptid'] = 'oc.scriptid';
-			$sqlParts['from']['opmessage_usr'] = 'opcommand oc';
+			$sqlParts['from']['opcommand'] = 'opcommand oc';
 			$sqlParts['from']['operations'] = 'operations o';
 			$sqlParts['where'][] = '('.dbConditionInt('oc.scriptid', $options['scriptids']).' AND oc.type='.ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT.')' ;
 			$sqlParts['where']['ao'] = 'a.actionid=o.actionid';
