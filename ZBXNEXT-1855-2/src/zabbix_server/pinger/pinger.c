@@ -540,7 +540,7 @@ void	main_pinger_loop(void)
 	double			sec;
 	static icmpitem_t	*items = NULL;
 	static int		items_alloc = 4;
-	int			items_count = 0;
+	int			items_count = 0, itc;
 
 	if (NULL == items)
 		items = zbx_malloc(items, sizeof(icmpitem_t) * items_alloc);
@@ -553,6 +553,7 @@ void	main_pinger_loop(void)
 		get_pinger_hosts(&items, &items_alloc, &items_count);
 		process_pinger_hosts(items, items_count);
 		sec = zbx_time() - sec;
+		itc = items_count;
 
 		free_hosts(&items, &items_count);
 
@@ -560,7 +561,7 @@ void	main_pinger_loop(void)
 		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
 		zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, idle %d sec]",
-				get_process_type_string(process_type), process_num, items_count, sec, sleeptime);
+				get_process_type_string(process_type), process_num, itc, sec, sleeptime);
 
 		zbx_sleep_loop(sleeptime);
 	}
