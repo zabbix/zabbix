@@ -488,9 +488,9 @@ static zbx_vmware_hv_t	*vmware_hv_shared_dup(const zbx_vmware_hv_t *src)
  *                                                                            *
  * Purpose: copies vmware data object into shared memory                      *
  *                                                                            *
- * Parameters: src   - [IN] the vmware data object                      *
+ * Parameters: src   - [IN] the vmware data object                            *
  *                                                                            *
- * Return value: a duplicated vmware data object                        *
+ * Return value: a duplicated vmware data object                              *
  *                                                                            *
  ******************************************************************************/
 static zbx_vmware_data_t	*vmware_data_shared_dup(const zbx_vmware_data_t *src)
@@ -519,7 +519,7 @@ static zbx_vmware_data_t	*vmware_data_shared_dup(const zbx_vmware_data_t *src)
  *                                                                            *
  * Function: vmware_datastore_free                                            *
  *                                                                            *
- * Purpose: resources allocated to store datastore data                       *
+ * Purpose: frees resources allocated to store datastore data                 *
  *                                                                            *
  * Parameters: datastore   - [IN] the datastore                               *
  *                                                                            *
@@ -535,7 +535,7 @@ static void	vmware_datastore_free(zbx_vmware_datastore_t *datastore)
  *                                                                            *
  * Function: vmware_dev_free                                                  *
  *                                                                            *
- * Purpose: resources allocated to store vm device data                       *
+ * Purpose: frees resources allocated to store vm device data                 *
  *                                                                            *
  * Parameters: dev   - [IN] the vm device                                     *
  *                                                                            *
@@ -550,7 +550,7 @@ static void	vmware_dev_free(zbx_vmware_dev_t *dev)
  *                                                                            *
  * Function: vmware_vm_free                                                   *
  *                                                                            *
- * Purpose: resources allocated to store virtual machine                      *
+ * Purpose: frees resources allocated to store virtual machine                *
  *                                                                            *
  * Parameters: vm   - [IN] the virtual machine                                *
  *                                                                            *
@@ -571,7 +571,7 @@ static void	vmware_vm_free(zbx_vmware_vm_t *vm)
  *                                                                            *
  * Function: vmware_hv_free                                                   *
  *                                                                            *
- * Purpose: resources allocated to store vmware hypervior                     *
+ * Purpose: frees resources allocated to store vmware hypervisor              *
  *                                                                            *
  * Parameters: hv   - [IN] the vmware hypervisor                              *
  *                                                                            *
@@ -596,7 +596,7 @@ static void	vmware_hv_free(zbx_vmware_hv_t *hv)
  *                                                                            *
  * Function: vmware_cluster_free                                              *
  *                                                                            *
- * Purpose: resources allocated to store vmware cluster                       *
+ * Purpose: frees resources allocated to store vmware cluster                 *
  *                                                                            *
  * Parameters: cluster   - [IN] the vmware cluster                            *
  *                                                                            *
@@ -613,7 +613,7 @@ static void	vmware_cluster_free(zbx_vmware_cluster_t *cluster)
  *                                                                            *
  * Function: vmware_data_free                                                 *
  *                                                                            *
- * Purpose: resources allocated to store vmware service data                  *
+ * Purpose: frees resources allocated to store vmware service data            *
  *                                                                            *
  * Parameters: data   - [IN] the vmware service data                          *
  *                                                                            *
@@ -1495,7 +1495,7 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(const zbx_vmware_service_t *ser
 out:
 	if (SUCCEED != ret)
 	{
-		vmware_vm_shared_free(vm);
+		vmware_vm_free(vm);
 		vm = NULL;
 	}
 
