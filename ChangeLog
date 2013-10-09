@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated German, Japanese, Italian, Romanian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A.F....... [ZBX-5735] fixed debug mode check condition to use less memory when debug is off (Ivo)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.9
