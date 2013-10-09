@@ -153,7 +153,7 @@ elseif (isset($_REQUEST['save'])) {
 		'status' => $_REQUEST['status'],
 		'comments' => $_REQUEST['comments'],
 		'url' => $_REQUEST['url'],
-		'flags' => ZBX_FLAG_DISCOVERY_CHILD
+		'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE
 	);
 
 	if (isset($_REQUEST['triggerid'])) {
@@ -314,10 +314,12 @@ elseif (isset($_REQUEST['form'])) {
 else {
 	$data = array(
 		'parent_discoveryid' => get_request('parent_discoveryid'),
+		'showErrorColumn' => false,
 		'discovery_rule' => $discovery_rule,
 		'hostid' => get_request('hostid'),
 		'showdisabled' => get_request('showdisabled', 1),
-		'triggers' => array()
+		'triggers' => array(),
+		'displayNodes' => false
 	);
 	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);
 
@@ -334,7 +336,16 @@ else {
 		$options['filter']['status'] = TRIGGER_STATUS_ENABLED;
 	}
 	$data['triggers'] = API::TriggerPrototype()->get($options);
-	$data['paging'] = getPagingLine($data['triggers']);
+
+	// paging
+	$data['paging'] = getPagingLine(
+		$data['triggers'],
+		array('triggerid'),
+		array(
+			'hostid' => get_request('hostid', $data['discovery_rule']['hostid']),
+			'parent_discoveryid' => get_request('parent_discoveryid')
+		)
+	);
 
 	$data['triggers'] = API::TriggerPrototype()->get(array(
 		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid'),

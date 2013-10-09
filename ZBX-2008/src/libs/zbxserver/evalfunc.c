@@ -22,34 +22,39 @@
 #include "log.h"
 #include "zbxserver.h"
 #include "valuecache.h"
-
 #include "evalfunc.h"
+#include "zbxregexp.h"
 
 int	cmp_double(double a, double b)
 {
 	return fabs(a - b) < TRIGGER_EPSILON ? SUCCEED : FAIL;
 }
 
-static int	get_function_parameter_uint31(zbx_uint64_t hostid, const char *parameters, int Nparam, int *value, int *flag)
+static int	__get_function_parameter_uint31(zbx_uint64_t hostid, const char *parameters, int Nparam,
+		int *value, int *flag, int defaults_on_empty, int def_value, int def_flag)
 {
-	const char	*__function_name = "get_function_parameter_uint31";
-	char		*parameter = NULL;
+	const char	*__function_name = "__get_function_parameter_uint31";
+	char		*parameter;
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() parameters:'%s' Nparam:%d", __function_name, parameters, Nparam);
 
-	parameter = zbx_malloc(parameter, FUNCTION_PARAMETER_LEN_MAX);
+	if (NULL == (parameter = get_param_dyn(parameters, Nparam)))
+		goto out;
 
-	if (0 != get_param(parameters, Nparam, parameter, FUNCTION_PARAMETER_LEN_MAX))
-		goto clean;
-
-	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL,
+	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL,
 			&parameter, MACRO_TYPE_COMMON, NULL, 0))
 	{
-		if ('#' == *parameter)
+		if (1 == defaults_on_empty && '\0' == *parameter)
+		{
+			*value = def_value;
+			*flag = def_flag;
+			ret = SUCCEED;
+		}
+		else if ('#' == *parameter)
 		{
 			*flag = ZBX_FLAG_VALUES;
-			if (SUCCEED == is_uint31(parameter + 1, (uint32_t*)value) && 0 < *value)
+			if (SUCCEED == is_uint31(parameter + 1, (uint32_t *)value) && 0 < *value)
 				ret = SUCCEED;
 		}
 		else if (SUCCEED == is_uint_suffix(parameter, (unsigned int *)value) && 0 <= *value)
@@ -61,28 +66,39 @@ static int	get_function_parameter_uint31(zbx_uint64_t hostid, const char *parame
 
 	if (SUCCEED == ret)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() flag:%d value:%d", __function_name, *flag, *value);
-clean:
-	zbx_free(parameter);
 
+	zbx_free(parameter);
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
 
-static int	get_function_parameter_uint64(zbx_uint64_t hostid, const char *parameters, int Nparam, zbx_uint64_t *value, int *flag)
+static int	get_function_parameter_uint31(zbx_uint64_t hostid, const char *parameters, int Nparam, int *value,
+		int *flag)
+{
+	return __get_function_parameter_uint31(hostid, parameters, Nparam, value, flag, 0, 0, ZBX_FLAG_SEC);
+}
+
+static int	get_function_parameter_uint31_default(zbx_uint64_t hostid, const char *parameters, int Nparam,
+		int *value, int *flag, int def_value, int def_flag)
+{
+	return __get_function_parameter_uint31(hostid, parameters, Nparam, value, flag, 1, def_value, def_flag);
+}
+
+static int	get_function_parameter_uint64(zbx_uint64_t hostid, const char *parameters, int Nparam,
+		zbx_uint64_t *value, int *flag)
 {
 	const char	*__function_name = "get_function_parameter_uint64";
-	char		*parameter = NULL;
+	char		*parameter;
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() parameters:'%s' Nparam:%d", __function_name, parameters, Nparam);
 
-	parameter = zbx_malloc(parameter, FUNCTION_PARAMETER_LEN_MAX);
+	if (NULL == (parameter = get_param_dyn(parameters, Nparam)))
+		goto out;
 
-	if (0 != get_param(parameters, Nparam, parameter, FUNCTION_PARAMETER_LEN_MAX))
-		goto clean;
-
-	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL,
+	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL,
 			&parameter, MACRO_TYPE_COMMON, NULL, 0))
 	{
 		if (SUCCEED == is_uint64(parameter, value))
@@ -94,9 +110,9 @@ static int	get_function_parameter_uint64(zbx_uint64_t hostid, const char *parame
 
 	if (SUCCEED == ret)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() flag:%d value:" ZBX_FS_UI64, __function_name, *flag, *value);
-clean:
-	zbx_free(parameter);
 
+	zbx_free(parameter);
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -109,19 +125,17 @@ static int	get_function_parameter_str(zbx_uint64_t hostid, const char *parameter
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() parameters:'%s' Nparam:%d", __function_name, parameters, Nparam);
 
-	*value = zbx_malloc(*value, FUNCTION_PARAMETER_LEN_MAX);
+	if (NULL == (*value = get_param_dyn(parameters, Nparam)))
+		goto out;
 
-	if (0 != get_param(parameters, Nparam, *value, FUNCTION_PARAMETER_LEN_MAX))
-		goto clean;
-
-	ret = substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL,
+	ret = substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL,
 			value, MACRO_TYPE_COMMON, NULL, 0);
-clean:
+
 	if (SUCCEED == ret)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() value:'%s'", __function_name, *value);
 	else
 		zbx_free(*value);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -144,14 +158,14 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 		time_t now)
 {
 	const char			*__function_name = "evaluate_LOGEVENTID";
-	char				*arg1 = NULL, *arg1_esc;
+	char				*arg1 = NULL;
 	int				ret = FAIL;
-	ZBX_REGEXP			*regexps = NULL;
-	int				regexps_alloc = 0, regexps_num = 0;
+	zbx_vector_ptr_t		regexps;
 	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	zbx_vector_ptr_create(&regexps);
 	zbx_history_record_vector_create(&values);
 
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
@@ -160,29 +174,11 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 	if (1 < num_param(parameters))
 		goto out;
 
-	if (FAIL == get_function_parameter_str(item->hostid, parameters, 1, &arg1))
+	if (SUCCEED != get_function_parameter_str(item->hostid, parameters, 1, &arg1))
 		goto out;
 
 	if ('@' == *arg1)
-	{
-		DB_RESULT	result;
-		DB_ROW		row;
-
-		arg1_esc = DBdyn_escape_string(arg1 + 1);
-		result = DBselect("select e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
-				" from regexps r,expressions e"
-				" where r.regexpid=e.regexpid"
-					" and r.name='%s'" ZBX_SQL_NODE,
-				arg1_esc, DBand_node_local("r.regexpid"));
-		zbx_free(arg1_esc);
-
-		while (NULL != (row = DBfetch(result)))
-		{
-			add_regexp_ex(&regexps, &regexps_alloc, &regexps_num,
-					arg1 + 1, row[0], atoi(row[1]), row[2][0], atoi(row[3]));
-		}
-		DBfree_result(result);
-	}
+		DCget_expressions_by_name(&regexps, arg1 + 1);
 
 	if (SUCCEED == zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) &&
 			0 < values.values_num)
@@ -191,7 +187,7 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 		size_t	size = 0, offset = 0;
 
 		zbx_snprintf_alloc(&logeventid, &size, &offset, "%d", values.values[0].value.log->logeventid);
-		if (SUCCEED == regexp_match_ex(regexps, regexps_num, logeventid, arg1, ZBX_CASE_SENSITIVE))
+		if (SUCCEED == regexp_match_ex(&regexps, logeventid, arg1, ZBX_CASE_SENSITIVE))
 			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 		else
 			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
@@ -203,13 +199,11 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGEVENTID is empty");
 
-	if ('@' == *arg1)
-	{
-		clean_regexps_ex(regexps, &regexps_num);
-		zbx_free(regexps);
-	}
 	zbx_free(arg1);
 out:
+	zbx_regexp_clean_expressions(&regexps);
+	zbx_vector_ptr_destroy(&regexps);
+
 	zbx_history_record_vector_destroy(&values, item->value_type);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
@@ -247,7 +241,7 @@ static int	evaluate_LOGSOURCE(char *value, DB_ITEM *item, const char *function, 
 	if (1 < num_param(parameters))
 		goto out;
 
-	if (FAIL == get_function_parameter_str(item->hostid, parameters, 1, &arg1))
+	if (SUCCEED != get_function_parameter_str(item->hostid, parameters, 1, &arg1))
 		goto out;
 
 	if (SUCCEED == zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) &&
@@ -483,7 +477,7 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 {
 	const char			*__function_name = "evaluate_COUNT";
 	int				arg1, flag, op, numeric_search, nparams, count = 0, i, ret = FAIL;
-	int				time_shift = 0, time_shift_flag, seconds = 0, nvalues = 0;
+	int				seconds = 0, nvalues = 0;
 	char				*arg2 = NULL, *arg2_2 = NULL, *arg3 = NULL;
 	zbx_vector_history_record_t	values;
 
@@ -496,17 +490,17 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 	if (4 < (nparams = num_param(parameters)))
 		goto out;
 
-	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || 0 >= arg1)
+	if (SUCCEED != get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || 0 == arg1)
 		goto out;
 
-	if (2 <= nparams && FAIL == get_function_parameter_str(item->hostid, parameters, 2, &arg2))
+	if (2 <= nparams && SUCCEED != get_function_parameter_str(item->hostid, parameters, 2, &arg2))
 		goto out;
 
 	if (3 <= nparams)
 	{
 		int	fail = 2;
 
-		if (FAIL == get_function_parameter_str(item->hostid, parameters, 3, &arg3))
+		if (SUCCEED != get_function_parameter_str(item->hostid, parameters, 3, &arg3))
 			goto out;
 
 		if ('\0' == *arg3)
@@ -557,8 +551,10 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 
 	if (4 <= nparams)
 	{
-		if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 4, &time_shift, &time_shift_flag) ||
-				ZBX_FLAG_SEC != time_shift_flag)
+		int	time_shift, time_shift_flag;
+
+		if (SUCCEED != get_function_parameter_uint31_default(item->hostid, parameters, 4, &time_shift,
+				&time_shift_flag, 0, ZBX_FLAG_SEC) || ZBX_FLAG_SEC != time_shift_flag)
 		{
 			goto out;
 		}
@@ -638,17 +634,18 @@ static int	evaluate_SUM(char *value, DB_ITEM *item, const char *function, const 
 	if (2 < (nparams = num_param(parameters)))
 		goto out;
 
-	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
+	if (SUCCEED != get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || 0 == arg1)
 		goto out;
 
 	if (2 == nparams)
 	{
 		int	time_shift, time_shift_flag;
 
-		if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 2, &time_shift, &time_shift_flag))
+		if (SUCCEED != get_function_parameter_uint31_default(item->hostid, parameters, 2, &time_shift,
+				&time_shift_flag, 0, ZBX_FLAG_SEC) || ZBX_FLAG_SEC != time_shift_flag)
+		{
 			goto out;
-		if (ZBX_FLAG_SEC != time_shift_flag)
-			goto out;
+		}
 
 		now -= time_shift;
 	}
@@ -718,17 +715,18 @@ static int	evaluate_AVG(char *value, DB_ITEM *item, const char *function, const 
 	if (2 < (nparams = num_param(parameters)))
 		goto out;
 
-	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || 0 >= arg1)
+	if (SUCCEED != get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || 0 == arg1)
 		goto out;
 
 	if (2 == nparams)
 	{
 		int	time_shift, time_shift_flag;
 
-		if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 2, &time_shift, &time_shift_flag))
+		if (SUCCEED != get_function_parameter_uint31_default(item->hostid, parameters, 2, &time_shift,
+				&time_shift_flag, 0, ZBX_FLAG_SEC) || ZBX_FLAG_SEC != time_shift_flag)
+		{
 			goto out;
-		if (ZBX_FLAG_SEC != time_shift_flag)
-			goto out;
+		}
 
 		now -= time_shift;
 	}
@@ -786,34 +784,34 @@ out:
 static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char			*__function_name = "evaluate_LAST";
-	int				arg1, flag, time_shift_flag, ret = FAIL, timeshift = 0;
+	int				arg1, flag, ret = FAIL;
 	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
+	if (SUCCEED != get_function_parameter_uint31_default(item->hostid, parameters, 1, &arg1, &flag,
+			1, ZBX_FLAG_VALUES))
+	{
 		goto out;
+	}
 
 	if (ZBX_FLAG_VALUES != flag)
 	{
 		arg1 = 1;
 		flag = ZBX_FLAG_VALUES;
 	}
-	else
-	{
-		if (1 > arg1)
-			goto out;
-	}
 
 	if (2 == num_param(parameters))
 	{
-		if (SUCCEED == get_function_parameter_uint31(item->hostid, parameters, 2, &timeshift, &time_shift_flag) &&
-				ZBX_FLAG_SEC == time_shift_flag)
+		int	time_shift, time_shift_flag;
+
+		if (SUCCEED != get_function_parameter_uint31_default(item->hostid, parameters, 2, &time_shift,
+				&time_shift_flag, 0, ZBX_FLAG_SEC) || ZBX_FLAG_SEC != time_shift_flag)
 		{
-			now -= timeshift;
-		}
-		else
 			goto out;
+		}
+
+		now -= time_shift;
 	}
 
 	zbx_history_record_vector_create(&values);
@@ -864,17 +862,18 @@ static int	evaluate_MIN(char *value, DB_ITEM *item, const char *function, const 
 	if (2 < (nparams = num_param(parameters)))
 		goto out;
 
-	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || 0 >= arg1)
+	if (SUCCEED != get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || 0 == arg1)
 		goto out;
 
 	if (2 == nparams)
 	{
 		int	time_shift, time_shift_flag;
 
-		if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 2, &time_shift, &time_shift_flag))
+		if (SUCCEED != get_function_parameter_uint31_default(item->hostid, parameters, 2, &time_shift,
+				&time_shift_flag, 0, ZBX_FLAG_SEC) || ZBX_FLAG_SEC != time_shift_flag)
+		{
 			goto out;
-		if (ZBX_FLAG_SEC != time_shift_flag)
-			goto out;
+		}
 
 		now -= time_shift;
 	}
@@ -950,17 +949,18 @@ static int	evaluate_MAX(char *value, DB_ITEM *item, const char *function, const 
 	if (2 < (nparams = num_param(parameters)))
 		goto out;
 
-	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || 0 >= arg1)
+	if (SUCCEED != get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || 0 == arg1)
 		goto out;
 
 	if (2 == nparams)
 	{
 		int	time_shift, time_shift_flag;
 
-		if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 2, &time_shift, &time_shift_flag))
+		if (SUCCEED != get_function_parameter_uint31_default(item->hostid, parameters, 2, &time_shift,
+				&time_shift_flag, 0, ZBX_FLAG_SEC) || ZBX_FLAG_SEC != time_shift_flag)
+		{
 			goto out;
-		if (ZBX_FLAG_SEC != time_shift_flag)
-			goto out;
+		}
 
 		now -= time_shift;
 	}
@@ -1036,17 +1036,18 @@ static int	evaluate_DELTA(char *value, DB_ITEM *item, const char *function, cons
 	if (2 < (nparams = num_param(parameters)))
 		goto out;
 
-	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || 0 >= arg1)
+	if (SUCCEED != get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || 0 == arg1)
 		goto out;
 
 	if (2 == nparams)
 	{
 		int	time_shift, time_shift_flag;
 
-		if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 2, &time_shift, &time_shift_flag))
+		if (SUCCEED != get_function_parameter_uint31_default(item->hostid, parameters, 2, &time_shift,
+				&time_shift_flag, 0, ZBX_FLAG_SEC) || ZBX_FLAG_SEC != time_shift_flag)
+		{
 			goto out;
-		if (ZBX_FLAG_SEC != time_shift_flag)
-			goto out;
+		}
 
 		now -= time_shift;
 	}
@@ -1131,7 +1132,7 @@ static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, con
 	if (1 < num_param(parameters))
 		goto out;
 
-	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
+	if (SUCCEED != get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
 		goto out;
 
 	if (ZBX_FLAG_SEC != flag)
@@ -1139,15 +1140,16 @@ static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, con
 
 	now = (int)time(NULL);
 
-	if (SUCCEED != zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) ||
-			1 > values.values_num)
-		goto out;
-
-	if (values.values[0].timestamp.sec + arg1 > now)
-		zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
+	if (SUCCEED == zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) &&
+			1 == values.values_num)
+	{
+		zbx_strlcpy(value, values.values[0].timestamp.sec + arg1 > now ? "0" : "1", MAX_BUFFER_LEN);
+	}
 	else
 	{
-		if (CONFIG_SERVER_STARTUP_TIME + arg1 > now)
+		int	time_added;
+
+		if (SUCCEED != DCget_item_time_added(item->itemid, &time_added) || time_added + arg1 > now)
 			goto out;
 
 		zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
@@ -1390,7 +1392,7 @@ out:
 #define ZBX_FUNC_REGEXP		2
 #define ZBX_FUNC_IREGEXP	3
 
-static int	evaluate_STR_one(int func, ZBX_REGEXP *regexps, int regexps_num, const char *value, const char *arg1)
+static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *value, const char *arg1)
 {
 	switch (func)
 	{
@@ -1399,9 +1401,9 @@ static int	evaluate_STR_one(int func, ZBX_REGEXP *regexps, int regexps_num, cons
 				return SUCCEED;
 			break;
 		case ZBX_FUNC_REGEXP:
-			return regexp_match_ex(regexps, regexps_num, value, arg1, ZBX_CASE_SENSITIVE);
+			return regexp_match_ex(regexps, value, arg1, ZBX_CASE_SENSITIVE);
 		case ZBX_FUNC_IREGEXP:
-			return regexp_match_ex(regexps, regexps_num, value, arg1, ZBX_IGNORE_CASE);
+			return regexp_match_ex(regexps, value, arg1, ZBX_IGNORE_CASE);
 	}
 
 	return FAIL;
@@ -1410,16 +1412,14 @@ static int	evaluate_STR_one(int func, ZBX_REGEXP *regexps, int regexps_num, cons
 static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char			*__function_name = "evaluate_STR";
-	DB_RESULT			result;
-	DB_ROW				row;
-	char				*arg1 = NULL, *arg1_esc;
-	int				arg2, flag, func, found = 0, i, ret = FAIL, seconds = 0, nvalues = 0;
-	ZBX_REGEXP			*regexps = NULL;
-	int				regexps_alloc = 0, regexps_num = 0;
+	char				*arg1 = NULL;
+	int				arg2, flag, func, found = 0, i, ret = FAIL, seconds = 0, nvalues = 0, nparams;
+	zbx_vector_ptr_t		regexps;
 	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	zbx_vector_ptr_create(&regexps);
 	zbx_history_record_vector_create(&values);
 
 	if (ITEM_VALUE_TYPE_STR != item->value_type && ITEM_VALUE_TYPE_TEXT != item->value_type &&
@@ -1437,35 +1437,28 @@ static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const 
 	else
 		goto out;
 
-	if (2 < num_param(parameters))
+	if (2 < (nparams = num_param(parameters)))
 		goto out;
 
-	if (FAIL == get_function_parameter_str(item->hostid, parameters, 1, &arg1))
+	if (SUCCEED != get_function_parameter_str(item->hostid, parameters, 1, &arg1))
 		goto out;
 
-	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 2, &arg2, &flag))
+	if (2 == nparams)
+	{
+		if (SUCCEED != get_function_parameter_uint31_default(item->hostid, parameters, 2, &arg2, &flag,
+				1, ZBX_FLAG_VALUES) || 0 == arg2)
+		{
+			goto out;
+		}
+	}
+	else
 	{
 		arg2 = 1;
 		flag = ZBX_FLAG_VALUES;
 	}
 
 	if ((ZBX_FUNC_REGEXP == func || ZBX_FUNC_IREGEXP == func) && '@' == *arg1)
-	{
-		arg1_esc = DBdyn_escape_string(arg1 + 1);
-		result = DBselect("select e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
-				" from regexps r,expressions e"
-				" where r.regexpid=e.regexpid"
-					" and r.name='%s'" ZBX_SQL_NODE,
-				arg1_esc, DBand_node_local("r.regexpid"));
-		zbx_free(arg1_esc);
-
-		while (NULL != (row = DBfetch(result)))
-		{
-			add_regexp_ex(&regexps, &regexps_alloc, &regexps_num,
-					arg1 + 1, row[0], atoi(row[1]), row[2][0], atoi(row[3]));
-		}
-		DBfree_result(result);
-	}
+		DCget_expressions_by_name(&regexps, arg1 + 1);
 
 	if (ZBX_FLAG_SEC == flag)
 		seconds = arg2;
@@ -1486,7 +1479,7 @@ static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const 
 	{
 		for (i = 0; i < values.values_num; i++)
 		{
-			if (SUCCEED == evaluate_STR_one(func, regexps, regexps_num, values.values[i].value.log->value, arg1))
+			if (SUCCEED == evaluate_STR_one(func, &regexps, values.values[i].value.log->value, arg1))
 			{
 				found = 1;
 				break;
@@ -1497,7 +1490,7 @@ static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const 
 	{
 		for (i = 0; i < values.values_num; i++)
 		{
-			if (SUCCEED == evaluate_STR_one(func, regexps, regexps_num, values.values[i].value.str, arg1))
+			if (SUCCEED == evaluate_STR_one(func, &regexps, values.values[i].value.str, arg1))
 			{
 				found = 1;
 				break;
@@ -1508,10 +1501,10 @@ static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const 
 	zbx_snprintf(value, MAX_BUFFER_LEN, "%d", found);
 	ret = SUCCEED;
 out:
-	zbx_history_record_vector_destroy(&values, item->value_type);
+	zbx_regexp_clean_expressions(&regexps);
+	zbx_vector_ptr_destroy(&regexps);
 
-	clean_regexps_ex(regexps, &regexps_num);
-	zbx_free(regexps);
+	zbx_history_record_vector_destroy(&values, item->value_type);
 
 	zbx_free(arg1);
 
@@ -1576,9 +1569,10 @@ clean:
 static int	evaluate_FUZZYTIME(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char			*__function_name = "evaluate_FUZZYTIME";
-	int				arg1, flag, fuzlow, fuzhig, ret = FAIL;
+	int				arg1, flag, ret = FAIL;
 	zbx_vector_history_record_t	values;
 	history_value_t			*lastvalue;
+	zbx_uint64_t			fuzlow, fuzhig;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1590,15 +1584,17 @@ static int	evaluate_FUZZYTIME(char *value, DB_ITEM *item, const char *function, 
 	if (1 < num_param(parameters))
 		goto out;
 
-	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
+	if (SUCCEED != get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
 		goto out;
 
-	if (ZBX_FLAG_SEC != flag)
+	if (ZBX_FLAG_SEC != flag || now <= arg1)
 		goto out;
 
 	if (SUCCEED != zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) ||
 			1 > values.values_num)
+	{
 		goto out;
+	}
 
 	fuzlow = (int)(now - arg1);
 	fuzhig = (int)(now + arg1);
@@ -1663,7 +1659,7 @@ static int	evaluate_BAND(char *value, DB_ITEM *item, const char *function, const
 	if (3 < (nparams = num_param(parameters)))
 		goto clean;
 
-	if (FAIL == get_function_parameter_uint64(item->hostid, parameters, 2, &mask, &mask_flag) ||
+	if (SUCCEED != get_function_parameter_uint64(item->hostid, parameters, 2, &mask, &mask_flag) ||
 			ZBX_FLAG_SEC != mask_flag)
 	{
 		goto clean;

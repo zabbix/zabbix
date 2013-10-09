@@ -38,7 +38,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'serviceid' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'group_serviceid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'name' => 							array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save_service})', _('Name')),
 	'algorithm' =>						array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'),'isset({save_service})'),
 	'showsla' =>						array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
@@ -73,7 +72,9 @@ $fields = array(
 );
 check_fields($fields);
 
-// check permissions
+/*
+ * Permissions
+ */
 if (!empty($_REQUEST['serviceid'])) {
 	$options = array(
 		'output' => API_OUTPUT_EXTEND,
@@ -90,7 +91,6 @@ if (!empty($_REQUEST['serviceid'])) {
 	}
 
 	$service = API::Service()->get($options);
-
 	$service = reset($service);
 	if (!$service) {
 		access_deny();
@@ -295,11 +295,10 @@ if (isset($_REQUEST['pservices'])) {
 	$servicesView->render();
 	$servicesView->show();
 }
-
 /*
  * Display child services list
  */
-if (isset($_REQUEST['cservices'])) {
+elseif (isset($_REQUEST['cservices'])) {
 	$childServices = API::Service()->get(array(
 		'output' => array('serviceid', 'name', 'algorithm'),
 		'selectTrigger' => array('triggerid', 'description', 'expression'),
@@ -337,11 +336,10 @@ if (isset($_REQUEST['cservices'])) {
 	$servicesView->render();
 	$servicesView->show();
 }
-
 /*
  * Display
  */
-if (isset($_REQUEST['form'])) {
+elseif (isset($_REQUEST['form'])) {
 	$data = array();
 	$data['form'] = get_request('form');
 	$data['form_refresh'] = get_request('form_refresh', 0);
@@ -431,10 +429,8 @@ if (isset($_REQUEST['form'])) {
 	$servicesView->render();
 	$servicesView->show();
 }
-// service list
 else {
-
-	// fetch services
+	// services
 	$services = API::Service()->get(array(
 		'output' => array('name', 'serviceid', 'algorithm'),
 		'selectParent' => array('serviceid'),
@@ -444,7 +440,8 @@ else {
 		'sortfield' => 'sortorder',
 		'sortorder' => ZBX_SORT_UP
 	));
-	// expand trigger descriptions
+
+	// triggers
 	$triggers = zbx_objectValues($services, 'trigger');
 
 	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
@@ -455,6 +452,14 @@ else {
 		}
 	}
 	unset($service);
+
+	// nodes
+	if ($data['displayNodes'] = is_array(get_current_nodeid())) {
+		foreach ($services as &$service) {
+			$service['name'] = get_node_name_by_elid($service['serviceid'], true, NAME_DELIMITER).$service['name'];
+		}
+		unset($service);
+	}
 
 	$treeData = array();
 	createServiceConfigurationTree($services, $treeData);

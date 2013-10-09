@@ -85,6 +85,8 @@ class CHostGroup extends CZBXAPI {
 			'output'					=> API_OUTPUT_REFER,
 			'selectHosts'				=> null,
 			'selectTemplates'			=> null,
+			'selectGroupDiscovery'		=> null,
+			'selectDiscoveryRule'		=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -479,7 +481,7 @@ class CHostGroup extends CZBXAPI {
 
 		foreach ($groups as $group) {
 			if (empty($group['name'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot create group without name.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Host group name cannot be empty.'));
 			}
 			if ($this->exists(array('name' => $group['name']))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host group "%1$s" already exists.', $group['name']));
@@ -511,12 +513,14 @@ class CHostGroup extends CZBXAPI {
 		$updGroups = $this->get(array(
 			'groupids' => $groupids,
 			'editable' => true,
-			'output' => array('groupid'),
+			'output' => array('groupid', 'flags'),
 			'preservekeys' => true
 		));
 		foreach ($groups as $group) {
 			if (!isset($updGroups[$group['groupid']])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
 			}
 		}
 
@@ -529,22 +533,33 @@ class CHostGroup extends CZBXAPI {
 		));
 		$groupsNames = zbx_toHash($groupsNames, 'name');
 
+		$updateDiscoveredValidator = new CUpdateDiscoveredValidator(array(
+			'messageAllowed' => _('Cannot update a discovered host group.')
+		));
+
 		$update = array();
 		foreach ($groups as $group) {
-			if (isset($group['name'])
-				&& isset($groupsNames[$group['name']])
-				&& !idcmp($groupsNames[$group['name']]['groupid'], $group['groupid'])
-			) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host group "%1$s" already exists.', $group['name']));
+			if (isset($group['name'])) {
+				if (zbx_empty($group['name'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Host group name cannot be empty.'));
+				}
+
+				// cannot update discovered host groups
+				$this->checkPartialValidator($group, $updateDiscoveredValidator, $updGroups[$group['groupid']]);
+
+				if (isset($groupsNames[$group['name']])
+						&& !idcmp($groupsNames[$group['name']]['groupid'], $group['groupid'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host group "%1$s" already exists.', $group['name']));
+				}
+
+				$update[] = array(
+					'values' => array('name' => $group['name']),
+					'where' => array('groupid' => $group['groupid'])
+				);
 			}
 
 			// prevents updating several groups with same name
 			$groupsNames[$group['name']] = array('groupid' => $group['groupid']);
-
-			$update[] = array(
-				'values' => array('name' => $group['name']),
-				'where' => array('groupid' => $group['groupid'])
-			);
 		}
 
 		DB::update('groups', $update);
@@ -556,37 +571,62 @@ class CHostGroup extends CZBXAPI {
 	 * Delete host groups.
 	 *
 	 * @param array $groupids
+	 * @param bool 	$nopermissions
 	 *
 	 * @return boolean
 	 */
-	public function delete($groupids) {
+	public function delete($groupids, $nopermissions = false) {
 		if (empty($groupids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 		$groupids = zbx_toArray($groupids);
+		sort($groupids);
 
-		$options = array(
+		$delGroups = $this->get(array(
 			'groupids' => $groupids,
 			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
-		);
-		$delGroups = $this->get($options);
+			'output' => array('groupid', 'name', 'internal'),
+			'preservekeys' => true,
+			'nopermissions' => $nopermissions
+		));
 		foreach ($groupids as $groupid) {
 			if (!isset($delGroups[$groupid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
 			}
 			if ($delGroups[$groupid]['internal'] == ZBX_INTERNAL_GROUP) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Group "%1$s" is internal and can not be deleted.', $delGroups[$groupid]['name']));
+					_s('Host group "%1$s" is internal and can not be deleted.', $delGroups[$groupid]['name']));
 			}
+		}
+
+		// check if a group is used in a group prototype
+		$groupPrototype = DBFetch(DBselect(
+			'SELECT groupid'.
+			' FROM group_prototype gp'.
+			' WHERE '.dbConditionInt('groupid', $groupids),
+			1
+		));
+		if ($groupPrototype) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Group "%1$s" cannot be deleted, because it is used by a host prototype.',
+					$delGroups[$groupPrototype['groupid']]['name']
+				)
+			);
 		}
 
 		$dltGroupids = getDeletableHostGroups($groupids);
 		if (count($groupids) != count($dltGroupids)) {
 			foreach ($groupids as $groupid) {
+				if (isset($dltGroupids[$groupid])) {
+					continue;
+				}
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Group "%s" cannot be deleted, because some hosts depend on it.', $delGroups[$groupid]['name']));
+					_s('Host group "%1$s" cannot be deleted, because some hosts depend on it.',
+						$delGroups[$groupid]['name']
+					)
+				);
 			}
 		}
 
@@ -601,22 +641,25 @@ class CHostGroup extends CZBXAPI {
 					continue;
 				}
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Group "%s" cannot be deleted, because it is used in a global script.', $delGroups[$script['groupid']]['name']));
-				}
+					_s('Host group "%1$s" cannot be deleted, because it is used in a global script.',
+						$delGroups[$script['groupid']]['name']
+					)
+				);
 			}
+		}
 
-			// delete screens items
-			$resources = array(
-				SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,
-				SCREEN_RESOURCE_HOSTS_INFO,
-				SCREEN_RESOURCE_TRIGGERS_INFO,
-				SCREEN_RESOURCE_TRIGGERS_OVERVIEW,
-				SCREEN_RESOURCE_DATA_OVERVIEW
-			);
-			DB::delete('screens_items', array(
-				'resourceid' => $groupids,
-				'resourcetype' => $resources
-			));
+		// delete screens items
+		$resources = array(
+			SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,
+			SCREEN_RESOURCE_HOSTS_INFO,
+			SCREEN_RESOURCE_TRIGGERS_INFO,
+			SCREEN_RESOURCE_TRIGGERS_OVERVIEW,
+			SCREEN_RESOURCE_DATA_OVERVIEW
+		);
+		DB::delete('screens_items', array(
+			'resourceid' => $groupids,
+			'resourcetype' => $resources
+		));
 
 		// delete sysmap element
 		if (!empty($groupids)) {
@@ -731,7 +774,9 @@ class CHostGroup extends CZBXAPI {
 		));
 		foreach ($groups as $group) {
 			if (!isset($updGroups[$group['groupid']])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
 			}
 		}
 
@@ -740,6 +785,11 @@ class CHostGroup extends CZBXAPI {
 		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : null;
 		$templateids = is_null($templates) ? array() : zbx_objectValues($templates, 'templateid');
 		$objectids = array_merge($hostids, $templateids);
+
+		// check if any of the hosts are discovered
+		$this->checkValidator($hostids, new CHostNormalValidator(array(
+			'message' => _('Cannot update groups for discovered host "%1$s".')
+		)));
 
 		$linked = array();
 		$linkedDb = DBselect(
@@ -786,16 +836,24 @@ class CHostGroup extends CZBXAPI {
 		));
 		foreach ($groupids as $groupid) {
 			if (!isset($updGroups[$groupid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
 			}
 		}
 		$hostids = isset($data['hostids']) ? zbx_toArray($data['hostids']) : array();
 		$templateids = isset($data['templateids']) ? zbx_toArray($data['templateids']) : array();
+
+		// check if any of the hosts are discovered
+		$this->checkValidator($hostids, new CHostNormalValidator(array(
+			'message' => _('Cannot update groups for discovered host "%1$s".')
+		)));
+
 		$objectidsToUnlink = array_merge($hostids, $templateids);
 		if (!empty($objectidsToUnlink)) {
 			$unlinkable = getUnlinkableHosts($groupids, $objectidsToUnlink);
 			if (count($objectidsToUnlink) != count($unlinkable)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'One of the objects is left without host group.');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('One of the objects is left without a host group.'));
 			}
 
 			DB::delete('hosts_groups', array(
@@ -831,24 +889,26 @@ class CHostGroup extends CZBXAPI {
 		));
 		foreach ($groupIds as $groupId) {
 			if (!isset($allowedGroups[$groupId])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
 			}
 		}
 
 		// validate allowed hosts
 		if (!empty($hostIds)) {
-			$allowedHosts = API::Host()->get(array(
-				'hostids' => $hostIds,
-				'editable' => true,
-				'preservekeys' => true
-			));
-			foreach ($hostIds as $hostId) {
-				if (!isset($allowedHosts[$hostId])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-				}
-
-				$workHostIds[$hostId] = $hostId;
+			if (!API::Host()->isWritable($hostIds)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
 			}
+
+			// check if any of the hosts are discovered
+			$this->checkValidator($hostIds, new CHostNormalValidator(array(
+				'message' => _('Cannot update groups for discovered host "%1$s".')
+			)));
+
+			$workHostIds = zbx_toHash($hostIds);
 		}
 
 		// validate allowed templates
@@ -860,7 +920,9 @@ class CHostGroup extends CZBXAPI {
 			));
 			foreach ($templateIds as $templateId) {
 				if (!isset($allowedTemplates[$templateId])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+					self::exception(ZBX_API_ERROR_PERMISSIONS,
+						_('No permissions to referred object or it does not exist!')
+					);
 				}
 
 				$workHostIds[$templateId] = $templateId;
@@ -868,10 +930,13 @@ class CHostGroup extends CZBXAPI {
 		}
 
 		// get old records
+		// skip discovered hosts
 		$oldRecords = DBfetchArray(DBselect(
 			'SELECT *'.
-			' FROM hosts_groups hg'.
-			' WHERE '.dbConditionInt('hg.groupid', $groupIds)
+			' FROM hosts_groups hg,hosts h'.
+			' WHERE '.dbConditionInt('hg.groupid', $groupIds).
+				' AND hg.hostid=h.hostid'.
+				' AND h.flags='.ZBX_FLAG_DISCOVERY_NORMAL
 		));
 
 		// calculate new records
@@ -920,7 +985,7 @@ class CHostGroup extends CZBXAPI {
 			$unlinkable = getUnlinkableHosts($groupIds, $hostIdsToValidate);
 
 			if (count($unlinkable) != count($hostIdsToValidate)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'One of the objects is left without host group.');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('One of the objects is left without a host group.'));
 			}
 		}
 
@@ -930,7 +995,14 @@ class CHostGroup extends CZBXAPI {
 		return array('groupids' => $groupIds);
 	}
 
-	public function isReadable($ids) {
+	/**
+	 * Check if user has read permissions for host groups.
+	 *
+	 * @param array $ids
+	 *
+	 * @return bool
+	 */
+	public function isReadable(array $ids) {
 		if (!is_array($ids)) {
 			return false;
 		}
@@ -948,7 +1020,14 @@ class CHostGroup extends CZBXAPI {
 		return count($ids) == $count;
 	}
 
-	public function isWritable($ids) {
+	/**
+	 * Check if user has write permissions for host groups.
+	 *
+	 * @param array $ids
+	 *
+	 * @return bool
+	 */
+	public function isWritable(array $ids) {
 		if (!is_array($ids)) {
 			return false;
 		}
@@ -986,6 +1065,7 @@ class CHostGroup extends CZBXAPI {
 		$result = parent::addRelatedObjects($options, $result);
 
 		$groupIds = array_keys($result);
+		sort($groupIds);
 
 		// adding hosts
 		if ($options['selectHosts'] !== null) {
@@ -1053,6 +1133,42 @@ class CHostGroup extends CZBXAPI {
 					}
 				}
 			}
+		}
+
+		// adding discovery rule
+		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
+			// discovered items
+			$discoveryRules = DBFetchArray(DBselect(
+				'SELECT gd.groupid,hd.parent_itemid'.
+					' FROM group_discovery gd,group_prototype gp,host_discovery hd'.
+					' WHERE '.dbConditionInt('gd.groupid', $groupIds).
+					' AND gd.parent_group_prototypeid=gp.group_prototypeid'.
+					' AND gp.hostid=hd.hostid'
+			));
+			$relationMap = $this->createRelationMap($discoveryRules, 'groupid', 'parent_itemid');
+
+			$discoveryRules = API::DiscoveryRule()->get(array(
+				'output' => $options['selectDiscoveryRule'],
+				'nodeids' => $options['nodeids'],
+				'itemids' => $relationMap->getRelatedIds(),
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
+		}
+
+		// adding group discovery
+		if ($options['selectGroupDiscovery'] !== null) {
+			$groupDiscoveries = API::getApi()->select('group_discovery', array(
+				'output' => $this->outputExtend('group_discovery', array('groupid'), $options['selectGroupDiscovery']),
+				'filter' => array('groupid' => $groupIds),
+				'preservekeys' => true
+			));
+			$relationMap = $this->createRelationMap($groupDiscoveries, 'groupid', 'groupid');
+
+			$groupDiscoveries = $this->unsetExtraFields($groupDiscoveries, array('groupid'),
+				$options['selectGroupDiscovery']
+			);
+			$result = $relationMap->mapOne($result, $groupDiscoveries, 'groupDiscovery');
 		}
 
 		return $result;

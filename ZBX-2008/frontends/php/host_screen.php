@@ -102,7 +102,7 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  */
 $data = array(
 	'hostid' => get_request('hostid', 0),
-	'fullscreen' => get_request('fullscreen', 0),
+	'fullscreen' => $_REQUEST['fullscreen'],
 	'screenid' => get_request('screenid', CProfile::get('web.hostscreen.screenid', null)),
 	'period' => get_request('period'),
 	'stime' => get_request('stime')

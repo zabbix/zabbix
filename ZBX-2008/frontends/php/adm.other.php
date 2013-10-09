@@ -81,7 +81,7 @@ if (isset($_REQUEST['save'])) {
 				$val = _('None');
 			}
 			else {
-				$val = DBfetch(DBselect('SELECT u.name FROM usrgrp u WHERE u.usrgrpid='.$val));
+				$val = DBfetch(DBselect('SELECT u.name FROM usrgrp u WHERE u.usrgrpid='.zbx_dbstr($val)));
 				$val = $val['name'];
 			}
 
@@ -134,7 +134,8 @@ else {
 $data['discovery_groups'] = API::HostGroup()->get(array(
 	'sortfield' => 'name',
 	'editable' => true,
-	'output' => API_OUTPUT_EXTEND
+	'output' => API_OUTPUT_EXTEND,
+	'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 ));
 $data['alert_usrgrps'] = DBfetchArray(DBselect(
 		'SELECT u.usrgrpid,u.name'.

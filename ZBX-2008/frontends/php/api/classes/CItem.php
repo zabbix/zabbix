@@ -308,7 +308,8 @@ class CItem extends CItemGeneral {
 				$sqlParts['where']['h'] = dbConditionString('h.host', $options['filter']['host'], false, true);
 			}
 
-			if (array_key_exists('flags', $options['filter']) && is_null($options['filter']['flags'])) {
+			if (array_key_exists('flags', $options['filter']) &&
+					(is_null($options['filter']['flags']) || !zbx_empty($options['filter']['flags']))) {
 				unset($sqlParts['where']['flags']);
 			}
 		}
@@ -500,21 +501,34 @@ class CItem extends CItemGeneral {
 	/**
 	 * Check item data and set flags field.
 	 *
-	 * @param array $items passed by reference
+	 * @param array $items
 	 * @param bool  $update
 	 *
 	 * @return void
 	 */
 	protected function checkInput(array &$items, $update = false) {
-		// add the values that cannot be changed, but are required for further processing
-		foreach ($items as &$item) {
-			$item['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
-		}
-		unset($item);
-
-		// validate if everything is ok with 'item->inventory fields' linkage
-		self::validateInventoryLinks($items, $update);
 		parent::checkInput($items, $update);
+		self::validateInventoryLinks($items, $update);
+
+		// set proper flags to divide normal and discovered items in future processing
+		if ($update) {
+			$dbItems = $this->get(array(
+				'itemids' => zbx_objectValues($items, 'itemid'),
+				'output' => array('itemid', 'flags'),
+				'editable' => true,
+				'preservekeys' => true
+			));
+			foreach ($items as &$item) {
+				$item['flags'] = $dbItems[$item['itemid']]['flags'];
+			}
+			unset($item);
+		}
+		else {
+			foreach ($items as &$item) {
+				$item['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
+			}
+			unset($item);
+		}
 	}
 
 	/**
@@ -526,6 +540,7 @@ class CItem extends CItemGeneral {
 	 */
 	public function create($items) {
 		$items = zbx_toArray($items);
+
 		$this->checkInput($items);
 		$this->createReal($items);
 		$this->inherit($items);
@@ -638,6 +653,7 @@ class CItem extends CItemGeneral {
 	 */
 	public function update($items) {
 		$items = zbx_toArray($items);
+
 		$this->checkInput($items, true);
 		$this->updateReal($items);
 		$this->inherit($items);
@@ -1086,7 +1102,7 @@ class CItem extends CItemGeneral {
 				$graphs = API::Graph()->get(array(
 					'output' => $options['selectGraphs'],
 					'nodeids' => $options['nodeids'],
-					'graphids' => $relationMap->getRelatedIds('graphs'),
+					'graphids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
 				));
 
@@ -1138,7 +1154,7 @@ class CItem extends CItemGeneral {
 					' FROM item_discovery id,items i'.
 					' WHERE '.dbConditionInt('id.itemid', $itemids).
 					' AND i.itemid=id.itemid'.
-					' AND i.flags='.ZBX_FLAG_DISCOVERY_CHILD
+					' AND i.flags='.ZBX_FLAG_DISCOVERY_PROTOTYPE
 			);
 			while ($rule = DBfetch($dbRules)) {
 				$relationMap->addRelation($rule['itemid'], $rule['parent_itemid']);
@@ -1147,7 +1163,7 @@ class CItem extends CItemGeneral {
 			$discoveryRules = API::DiscoveryRule()->get(array(
 				'output' => $options['selectDiscoveryRule'],
 				'nodeids' => $options['nodeids'],
-				'itemids' => $relationMap->getRelatedIds('discoveryRule'),
+				'itemids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
 				'preservekeys' => true
 			));
@@ -1184,7 +1200,7 @@ class CItem extends CItemGeneral {
 			$requestedOutput['prevvalue'] = true;
 		}
 		if ($requestedOutput) {
-			$history = Manager::History()->fetchLast($result, 2);
+			$history = Manager::History()->getLast($result, 2);
 			foreach ($result as &$item) {
 				$lastHistory = isset($history[$item['itemid']][0]) ? $history[$item['itemid']][0] : null;
 				$prevHistory = isset($history[$item['itemid']][1]) ? $history[$item['itemid']][1] : null;

@@ -30,7 +30,7 @@ function update_node_profile($nodeIds) {
 		DBexecute(
 			'INSERT INTO profiles (profileid,userid,idx,value_id,type)'.
 			' VALUES ('.get_dbid('profiles', 'profileid').','.CWebUser::$data['userid'].','.
-				zbx_dbstr('web.nodes.selected').','.$nodeId.',4)');
+				zbx_dbstr('web.nodes.selected').','.zbx_dbstr($nodeId).',4)');
 	}
 
 	DBend();
@@ -287,7 +287,6 @@ function add_node($nodeId, $name, $ip, $port, $nodeType, $masterId) {
 				error(_('Master node already exists.'));
 				return false;
 			}
-			$masterId = 'NULL';
 			break;
 
 		default:
@@ -295,13 +294,13 @@ function add_node($nodeId, $name, $ip, $port, $nodeType, $masterId) {
 			return false;
 	}
 
-	if (DBfetch(DBselect('SELECT n.nodeid FROM nodes n WHERE n.nodeid='.$nodeId))) {
+	if (DBfetch(DBselect('SELECT n.nodeid FROM nodes n WHERE n.nodeid='.zbx_dbstr($nodeId)))) {
 		error(_('Node with same ID already exists.'));
 		return false;
 	}
 
 	$result = DBexecute('INSERT INTO nodes (nodeid,name,ip,port,nodetype,masterid)'.
-		' VALUES ('.$nodeId.','.zbx_dbstr($name).','.zbx_dbstr($ip).','.$port.','.$nodeType.','.$masterId.')');
+		' VALUES ('.zbx_dbstr($nodeId).','.zbx_dbstr($name).','.zbx_dbstr($ip).','.zbx_dbstr($port).','.zbx_dbstr($nodeType).','.($masterId ? zbx_dbstr($masterId) : 'NULL').')');
 
 	if ($result && $nodeType == ZBX_NODE_MASTER) {
 		DBexecute('UPDATE nodes SET masterid='.$nodeId.' WHERE nodeid='.$ZBX_LOCALNODEID);
@@ -320,14 +319,14 @@ function update_node($nodeId, $name, $ip, $port) {
 	}
 
 	return DBexecute(
-		'UPDATE nodes SET name='.zbx_dbstr($name).',ip='.zbx_dbstr($ip).',port='.$port.' WHERE nodeid='.$nodeId
+		'UPDATE nodes SET name='.zbx_dbstr($name).',ip='.zbx_dbstr($ip).',port='.zbx_dbstr($port).' WHERE nodeid='.zbx_dbstr($nodeId)
 	);
 }
 
 function delete_node($nodeId) {
 	$result = false;
 
-	$node = DBfetch(DBselect('SELECT n.nodeid,n.masterid FROM nodes n WHERE n.nodeid='.$nodeId));
+	$node = DBfetch(DBselect('SELECT n.nodeid,n.masterid FROM nodes n WHERE n.nodeid='.zbx_dbstr($nodeId)));
 	$nodeType = detect_node_type($node['nodeid'], $node['masterid']);
 
 	if ($nodeType == ZBX_NODE_LOCAL) {
@@ -335,8 +334,8 @@ function delete_node($nodeId) {
 	}
 	else {
 		$result = (
-			DBexecute('UPDATE nodes SET masterid=NULL WHERE masterid='.$nodeId) &&
-			DBexecute('DELETE FROM nodes WHERE nodeid='.$nodeId)
+			DBexecute('UPDATE nodes SET masterid=NULL WHERE masterid='.zbx_dbstr($nodeId)) &&
+			DBexecute('DELETE FROM nodes WHERE nodeid='.zbx_dbstr($nodeId))
 		);
 
 		if ($nodeType != ZBX_NODE_MASTER) {
@@ -348,7 +347,7 @@ function delete_node($nodeId) {
 }
 
 function get_node_by_nodeid($nodeId) {
-	return DBfetch(DBselect('SELECT n.* FROM nodes n WHERE n.nodeid='.$nodeId));
+	return DBfetch(DBselect('SELECT n.* FROM nodes n WHERE n.nodeid='.zbx_dbstr($nodeId)));
 }
 
 function get_node_path($nodeId, $result = '') {

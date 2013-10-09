@@ -51,7 +51,7 @@ if ($druleid = get_request('druleid')) {
  * Display
  */
 $data = array(
-	'fullscreen' => get_request('fullscreen', 0),
+	'fullscreen' => $_REQUEST['fullscreen'],
 	'druleid' => get_request('druleid', 0),
 	'sort' => get_request('sort'),
 	'sortorder' => get_request('sortorder'),

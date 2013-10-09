@@ -28,6 +28,7 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/zabbix_server/nodewatcher/libzbxnodewatcher.a \
 	datasender/libzbxdatasender.a \
 	$(top_srcdir)/src/zabbix_server/selfmon/libzbxselfmon.a \
+	$(top_srcdir)/src/zabbix_server/vmware/libzbxvmware.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxproxysysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
@@ -35,6 +36,7 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
 	$(top_srcdir)/src/libs/zbxmemory/libzbxmemory.a \
+	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \

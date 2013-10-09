@@ -174,22 +174,52 @@ class CArrayHelper {
 	 * Checks if array $arrays contains arrays with duplicate values under the $uniqueField key. If a duplicate exists,
 	 * returns the first duplicate, otherwise returns null.
 	 *
+	 * Example 1:
+	 * $data = array(
+	 *     array('name' => 'CPU load'),
+	 * 	   array('name' => 'CPU load'),
+	 * 	   array('name' => 'Free memory')
+	 * );
+	 * var_dump(CArrayHelper::findDuplicate($data, 'name')); // returns array with index 1
+	 *
+	 * Example 2:
+	 * $data = array(
+	 *     array('host' => 'Zabbix server', 'name' => 'CPU load'),
+	 * 	   array('host' => 'Zabbix server', 'name' => 'Free memory'),
+	 * 	   array('host' => 'Linux server', 'name' => 'CPU load'),
+	 * 	   array('host' => 'Zabbix server', 'name' => 'CPU load')
+	 * );
+	 * var_dump(CArrayHelper::findDuplicate($data, 'name', 'host')); // returns array with index 3
+	 *
 	 * @param array $arrays         an array of arrays
 	 * @param string $uniqueField   key to be used as unique criteria
+	 * @param string $uniqueField2	second key to be used as unique criteria
 	 *
 	 * @return null|array           the first duplicate found or null if there are no duplicates
 	 */
-	public static function findDuplicate(array $arrays, $uniqueField) {
+	public static function findDuplicate(array $arrays, $uniqueField, $uniqueField2 = null) {
 		$uniqueValues = array();
 
 		foreach ($arrays as $array) {
 			$value = $array[$uniqueField];
 
-			if (isset($uniqueValues[$value])) {
-				return $array;
+			if ($uniqueField2 !== null) {
+				$uniqueByValue = $array[$uniqueField2];
+
+				if (isset($uniqueValues[$uniqueByValue]) && isset($uniqueValues[$uniqueByValue][$value])) {
+					return $array;
+				}
+				else {
+					$uniqueValues[$uniqueByValue][$value] = $value;
+				}
 			}
 			else {
-				$uniqueValues[$value] = $value;
+				if (isset($uniqueValues[$value])) {
+					return $array;
+				}
+				else {
+					$uniqueValues[$value] = $value;
+				}
 			}
 		}
 	}

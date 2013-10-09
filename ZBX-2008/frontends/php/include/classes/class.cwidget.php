@@ -131,7 +131,7 @@ class CWidget {
 
 			$thin_tab = $this->createFlicker($icons_row);
 			$thin_tab->attr('id', 'filter_icon');
-			$thin_tab->addAction('onclick', "javascript: change_flicker_state('".$flicker_domid."');");
+			$thin_tab->addAction('onclick', "javascript: changeFlickerState('".$flicker_domid."');");
 
 			$flicker_tab->addRow($thin_tab, 'textcolorstyles pointer');
 			$flicker_tab->addRow($div);
@@ -209,15 +209,6 @@ class CWidget {
 	}
 
 	private function createHeaderRow($col1, $col2 = SPACE) {
-		if (isset($_REQUEST['print'])) {
-			hide_form_items($col1);
-			hide_form_items($col2);
-
-			// if empty header, do not show it
-			if ($col1 === SPACE && $col2 === SPACE) {
-				return new CJSscript('');
-			}
-		}
 		$td_r = new CCol($col2, 'header_r right');
 		$row = array(new CCol($col1, 'header_l left'), $td_r);
 		return $row;

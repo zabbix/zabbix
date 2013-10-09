@@ -386,6 +386,14 @@ class CHostInterface extends CZBXAPI {
 			}
 		}
 		unset($interface);
+
+		// check if any of the affected hosts are discovered
+		if ($update) {
+			$interfaces = $this->extendObjects('interface', $interfaces, array('hostid'));
+		}
+		$this->checkValidator(zbx_objectValues($interfaces, 'hostid'), new CHostNormalValidator(array(
+			'message' => _('Cannot update interface for discovered host "%1$s".')
+		)));
 	}
 
 	/**
@@ -618,6 +626,19 @@ class CHostInterface extends CZBXAPI {
 	 * @param array $interface
 	 */
 	protected function checkDns(array $interface) {
+		if (zbx_strlen($interface['dns']) > 64) {
+			self::exception(
+				ZBX_API_ERROR_PARAMETERS,
+				_n(
+					'Maximum DNS name length is %2$d characters, "%3$s" is %1$d character.',
+					'Maximum DNS name length is %2$d characters, "%3$s" is %1$d characters.',
+					zbx_strlen($interface['dns']),
+					64,
+					$interface['dns']
+				)
+			);
+		}
+
 		if (!empty($interface['dns']) && !preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/', $interface['dns'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface DNS parameter "%s" provided.', $interface['dns']));
 		}

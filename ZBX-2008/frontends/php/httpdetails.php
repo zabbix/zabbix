@@ -85,7 +85,7 @@ $httpTest['lastfailedstep'] = 0;
 $httpTest['error'] = '';
 
 // fetch http test execution data
-$httpTestData = Manager::HttpTest()->fetchLastData(array($httpTest['httptestid']));
+$httpTestData = Manager::HttpTest()->getLastData(array($httpTest['httptestid']));
 $httpTestData = array_pop($httpTestData);
 
 // fetch HTTP step items
@@ -94,7 +94,7 @@ $query = DBselect(
 	' FROM items i,httpstepitem hi,httpstep hs'.
 	' WHERE hi.itemid=i.itemid'.
 		' AND hi.httpstepid=hs.httpstepid'.
-		' AND hs.httptestid='.$httpTest['httptestid']
+		' AND hs.httptestid='.zbx_dbstr($httpTest['httptestid'])
 );
 $httpStepItems = array();
 $items = array();
@@ -104,7 +104,7 @@ while ($item = DBfetch($query)) {
 }
 
 // fetch HTTP item history
-$itemHistory = Manager::History()->fetchLast($items);
+$itemHistory = Manager::History()->getLast($items);
 
 /*
  * Display
@@ -120,7 +120,7 @@ $httpdetailsWidget->addPageHeader(
 	array(_('DETAILS OF SCENARIO').SPACE, bold(CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpTest['name'])), $lastcheck),
 	array(
 		get_icon('reset', array('id' => get_request('httptestid'))),
-		get_icon('fullscreen', array('fullscreen' => get_request('fullscreen')))
+		get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']))
 	)
 );
 
@@ -134,7 +134,7 @@ $httpdetailsTable->setHeader(array(
 	_('Status')
 ));
 
-$db_httpsteps = DBselect('SELECT * FROM httpstep WHERE httptestid='.$httpTest['httptestid'].' ORDER BY no');
+$db_httpsteps = DBselect('SELECT * FROM httpstep WHERE httptestid='.zbx_dbstr($httpTest['httptestid']).' ORDER BY no');
 
 $totalTime = array(
 	'value' => 0,

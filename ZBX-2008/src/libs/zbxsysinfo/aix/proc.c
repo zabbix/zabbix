@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "zbxregexp.h"
 
 #if !defined(HAVE_SYS_PROCFS_H)
 #	include "../common/common.h"
@@ -197,7 +198,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 
 		value = procsinfo.pi_size;
-		value <<= 10;	/* kB to Byte */
+		value <<= 12;	/* number of pages to bytes */
 
 		if (0 == proccount++)
 			memsize = value;

@@ -71,8 +71,8 @@ if (!empty($this->data['parent_discoveryid'])) {
 }
 else {
 	$filterForm = new CForm('get');
-	$filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
-	$filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
+	$filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB(true)));
+	$filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB(true)));
 
 	$triggersWidget->addHeader(_('Triggers'), $filterForm);
 	$triggersWidget->addHeaderRowNumber(array(
@@ -104,12 +104,13 @@ $link = $link->getUrl();
 $triggersTable = new CTableInfo(_('No triggers defined.'));
 $triggersTable->setHeader(array(
 	new CCheckBox('all_triggers', null, "checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');"),
+	$this->data['displayNodes'] ? _('Node') : null,
 	make_sorting_header(_('Severity'), 'priority', $link),
 	empty($this->data['hostid']) ? _('Host') : null,
 	make_sorting_header(_('Name'), 'description', $link),
 	_('Expression'),
 	make_sorting_header(_('Status'), 'status', $link),
-	empty($this->data['parent_discoveryid']) ? _('Error') : null
+	$data['showErrorColumn'] ? _('Error') : null
 ));
 foreach ($this->data['triggers'] as $tnum => $trigger) {
 	$triggerid = $trigger['triggerid'];
@@ -193,15 +194,10 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		);
 	}
 
-	$templated = false;
-	foreach ($trigger['hosts'] as $hostid => $host) {
-		$templated |= (HOST_STATUS_TEMPLATE == $host['status']);
-	}
-
-	if (empty($this->data['parent_discoveryid'])) {
+	if ($data['showErrorColumn']) {
 		$error = '';
 		if ($trigger['status'] == TRIGGER_STATUS_ENABLED) {
-			if (!zbx_empty($trigger['error']) && !$templated) {
+			if (!zbx_empty($trigger['error'])) {
 				$error = new CDiv(SPACE, 'status_icon iconerror');
 				$error->setHint($trigger['error'], '', 'on');
 			}
@@ -209,9 +205,6 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 				$error = new CDiv(SPACE, 'status_icon iconok');
 			}
 		}
-	}
-	else {
-		$error = null;
 	}
 
 	$status = '';
@@ -255,12 +248,13 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 
 	$triggersTable->addRow(array(
 		$checkBox,
+		$this->data['displayNodes'] ? $trigger['nodename'] : null,
 		getSeverityCell($trigger['priority']),
 		$hosts,
 		$description,
 		$expressionColumn,
 		$status,
-		$error
+		$data['showErrorColumn'] ? $error : null
 	));
 	$triggers[$tnum] = $trigger;
 }

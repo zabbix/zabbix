@@ -34,7 +34,13 @@ class CGraph extends CGraphGeneral {
 		parent::__construct();
 
 		$this->errorMessages = array_merge($this->errorMessages, array(
-			self::ERROR_TEMPLATE_HOST_MIX => _('Graph "%1$s" with templated items cannot contain items from other hosts.')
+			self::ERROR_TEMPLATE_HOST_MIX =>
+				_('Graph "%1$s" with templated items cannot contain items from other hosts.'),
+			self::ERROR_MISSING_GRAPH_NAME => _('Missing "name" field for graph.'),
+			self::ERROR_MISSING_GRAPH_ITEMS => _('Missing items for graph "%1$s".'),
+			self::ERROR_MISSING_REQUIRED_VALUE => _('No "%1$s" given for graph.'),
+			self::ERROR_TEMPLATED_ID => _('Cannot update "templateid" for graph "%1$s".'),
+			self::ERROR_GRAPH_SUM => _('Cannot add more than one item with type "Graph sum" on graph "%1$s".')
 		));
 	}
 
@@ -382,7 +388,7 @@ class CGraph extends CGraphGeneral {
 
 			// check if templated graph exists
 			$chdGraphs = $this->get(array(
-				'filter' => array('templateid' => $tmpGraph['graphid'], 'flags' => array(ZBX_FLAG_DISCOVERY_CHILD, ZBX_FLAG_DISCOVERY_NORMAL)),
+				'filter' => array('templateid' => $tmpGraph['graphid'], 'flags' => array(ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_NORMAL)),
 				'output' => API_OUTPUT_EXTEND,
 				'selectGraphItems' => API_OUTPUT_EXTEND,
 				'preservekeys' => true,
@@ -497,10 +503,11 @@ class CGraph extends CGraphGeneral {
 	}
 
 	/**
-	 * Delete graphs
+	 * Delete graphs.
 	 *
 	 * @param array $graphids
 	 * @param bool $nopermissions
+	 *
 	 * @return array
 	 */
 	public function delete($graphids, $nopermissions = false) {
@@ -565,84 +572,6 @@ class CGraph extends CGraphGeneral {
 		return array('graphids' => $graphids);
 	}
 
-	/**
-	 * Check graph data
-	 *
-	 * @param array $graphs
-	 * @param boolean $update
-	 *
-	 * @return void
-	 */
-	protected function checkInput($graphs, $update = false) {
-		$itemids = array();
-		foreach ($graphs as $graph) {
-			// no items
-			if (!isset($graph['gitems']) || !is_array($graph['gitems']) || empty($graph['gitems'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Missing items for graph "%1$s".', $graph['name']));
-			}
-
-			$fields = array('itemid' => null);
-			foreach ($graph['gitems'] as $gitem) {
-				if (!check_db_fields($fields, $gitem)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "itemid" field for item.'));
-				}
-
-				// assigning with key preserves unique itemids
-				$itemids[$gitem['itemid']] = $gitem['itemid'];
-			}
-
-			// add Y axis item IDs for persmission validation
-			if (isset($graph['ymin_type']) && $graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-				if (!isset($graph['ymin_itemid']) || zbx_empty($graph['ymin_itemid'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No "%1$s" given for graph.', 'ymin_itemid'));
-				}
-				else {
-					$itemids[$graph['ymin_itemid']] = $graph['ymin_itemid'];
-				}
-			}
-			if (isset($graph['ymax_type']) && $graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-				if (!isset($graph['ymax_itemid']) || zbx_empty($graph['ymax_itemid'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No "%1$s" given for graph.', 'ymax_itemid'));
-				}
-				else {
-					$itemids[$graph['ymax_itemid']] = $graph['ymax_itemid'];
-				}
-			}
-		}
-
-		$allowedItems = API::Item()->get(array(
-			'nodeids' => get_current_nodeid(true),
-			'itemids' => $itemids,
-			'webitems' => true,
-			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
-		));
-
-		// check permissions only for non super admins
-		if (CUser::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			foreach ($itemids as $itemid) {
-				if (!isset($allowedItems[$itemid])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-				}
-			}
-		}
-
-		parent::checkInput($graphs, $update);
-
-		$allowedValueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
-
-		// get value type and name for these items
-		foreach ($allowedItems as $item) {
-			if (!in_array($item['value_type'], $allowedValueTypes)) {
-				self::exception(
-					ZBX_API_ERROR_PARAMETERS,
-					_s('Cannot add a non-numeric item "%1$s" to graph "%2$s".', $item['name'], $graph['name'])
-				);
-			}
-		}
-	}
-
 	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		// only apply the node option if no specific ids are given
 		if ($options['graphids'] === null &&
@@ -701,5 +630,72 @@ class CGraph extends CGraphGeneral {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Validate graph specific data on Create method.
+	 * Get allowed item ID's, check permissions, do all general validation and check for numeric item types.
+	 *
+	 * @param array $graphs
+	 *
+	 * @return void
+	 */
+	protected function validateCreate(array $graphs) {
+		$itemIds = $this->validateItemsCreate($graphs);
+		$this->validateItems($itemIds);
+
+		parent::validateCreate($graphs);
+	}
+
+	/**
+	 * Validate graph specific data on Update method.
+	 * Get allowed item ID's, check permissions, do all general validation and check for numeric item types.
+	 *
+	 * @param array $graphs
+	 * @param array $dbGraphs
+	 *
+	 * @return void
+	 */
+	protected function validateUpdate(array $graphs, array $dbGraphs) {
+		$itemIds = $this->validateItemsUpdate($graphs);
+		$this->validateItems($itemIds);
+
+		parent::validateUpdate($graphs, $dbGraphs);
+	}
+
+	/**
+	 * Validates graph item permissions
+	 *
+	 * @param array $itemIds
+	 *
+	 * @return void
+	 */
+	protected function validateItems(array $itemIds) {
+		$allowedItems = API::Item()->get(array(
+			'nodeids' => get_current_nodeid(true),
+			'itemids' => $itemIds,
+			'webitems' => true,
+			'editable' => true,
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
+		));
+
+		// check if items exist and user has permission to access those items
+		foreach ($itemIds as $itemid) {
+			if (!isset($allowedItems[$itemid])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+			}
+		}
+
+		$allowedValueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
+
+		// get value type and name for these items
+		foreach ($allowedItems as $item) {
+			if (!in_array($item['value_type'], $allowedValueTypes)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Cannot add a non-numeric item "%1$s" to graph "%2$s".', $item['name'], $graph['name'])
+				);
+			}
+		}
 	}
 }

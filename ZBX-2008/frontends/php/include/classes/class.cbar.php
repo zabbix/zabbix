@@ -556,7 +556,10 @@ class CBar extends CGraphDraw {
 
 			if ($this->column) {
 				for ($i = 0;$i <= $hstr_count; $i++) {
-					$str = convert_units(($this->sizeY * $i / $hstr_count * ($max - $min) / $this->sizeY + $min), $this->units[$axis]);
+					$str = convert_units(array(
+						'value' => $this->sizeY * $i / $hstr_count * ($max - $min) / $this->sizeY + $min,
+						'units' => $this->units[$axis]
+					));
 
 					$sideShift = 0;
 					if (GRAPH_YAXIS_SIDE_LEFT == $axis) {
@@ -584,7 +587,10 @@ class CBar extends CGraphDraw {
 				}
 
 				for ($i = 0; $i <= $hstr_count; $i++) {
-					$str = convert_units(($this->sizeX * $i / $hstr_count * ($max - $min) / $this->sizeX + $min), $this->units[$axis]);
+					$str = convert_units(array(
+						'value' => $this->sizeX * $i / $hstr_count * ($max - $min) / $this->sizeX + $min,
+						'units' => $this->units[$axis]
+					));
 
 					$sideShift = 0;
 					if (GRAPH_YAXIS_SIDE_LEFT == $axis) {

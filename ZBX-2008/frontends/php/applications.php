@@ -26,7 +26,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('Configuration of applications');
 $page['file'] = 'applications.php';
 $page['hist_arg'] = array('groupid', 'hostid');
-$page['scripts'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -34,7 +33,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'applications' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
 	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO, 'isset({form})&&!isset({applicationid})'),
-	'groupid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,			null),
+	'groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
 	'applicationid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			'isset({form})&&{form}=="update"'),
 	'appname' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({save})', _('Name')),
 	// actions
@@ -56,7 +55,7 @@ if (isset($_REQUEST['applicationid'])) {
 		'applicationids' => array($_REQUEST['applicationid']),
 		'output' => array('name', 'hostid')
 	));
-	if (empty($dbApplication)) {
+	if (!$dbApplication) {
 		access_deny();
 	}
 }
@@ -74,17 +73,11 @@ if (isset($_REQUEST['go'])) {
 		}
 	}
 }
-if (get_request('groupid', 0) > 0) {
-	$groupIds = available_groups($_REQUEST['groupid'], 1);
-	if (empty($groupIds)) {
-		access_deny();
-	}
+if (get_request('groupid') && !API::HostGroup()->isWritable(array($_REQUEST['groupid']))) {
+	access_deny();
 }
-if (get_request('hostid', 0) > 0) {
-	$hostIds = available_hosts($_REQUEST['hostid'], 1);
-	if (empty($hostIds)) {
-		access_deny();
-	}
+if (get_request('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid']))) {
+	access_deny();
 }
 $_REQUEST['go'] = get_request('go', 'none');
 
@@ -197,8 +190,8 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 			'SELECT ia.itemid,i.hostid,i.key_'.
 			' FROM items_applications ia'.
 				' LEFT JOIN items i ON ia.itemid=i.itemid'.
-			' WHERE ia.applicationid='.$appid.
-				' AND i.hostid='.$_REQUEST['hostid'].
+			' WHERE ia.applicationid='.zbx_dbstr($appid).
+				' AND i.hostid='.zbx_dbstr($_REQUEST['hostid']).
 				' AND i.type<>'.ITEM_TYPE_HTTPTEST.
 				andDbNode('ia.applicationid')
 		);
@@ -259,11 +252,12 @@ else {
 			'hosts' => array('editable' => true, 'templated_hosts' => true),
 			'hostid' => get_request('hostid'),
 			'groupid' => get_request('groupid')
-		)),
-		'displayNodes' => is_array(get_current_nodeid())
+		))
 	);
 	$data['groupid'] = $data['pageFilter']->groupid;
 	$data['hostid'] = $data['pageFilter']->hostid;
+	$data['displayNodes'] = (is_array(get_current_nodeid())
+		&& $data['pageFilter']->groupid == 0 && $data['pageFilter']->hostid == 0);
 
 	if ($data['pageFilter']->hostsSelected) {
 		// get application ids
@@ -328,7 +322,7 @@ else {
 	}
 
 	// get paging
-	$data['paging'] = getPagingLine($data['applications']);
+	$data['paging'] = getPagingLine($data['applications'], array('applicationid'));
 
 	// render view
 	$applicationView = new CView('configuration.application.list', $data);

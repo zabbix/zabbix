@@ -42,8 +42,8 @@ else {
 }
 
 $chartsWidget->addHeader(
-	isset($this->data['pageFilter']->graphs[$this->data['graphid']])
-		? $this->data['pageFilter']->graphs[$this->data['graphid']]
+	isset($this->data['pageFilter']->graphs[$this->data['graphid']]['name'])
+		? $this->data['pageFilter']->graphs[$this->data['graphid']]['name']
 		: null,
 	$chartForm
 );

@@ -19,8 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/js/general.script.confirm.js.php';
-
 $slideWidget = new CWidget('hat_slides');
 
 // create header form
@@ -33,7 +31,14 @@ $configComboBox->addItem('slides.php', _('Slide shows'));
 $slideHeaderForm->addItem($configComboBox);
 
 if (empty($this->data['slideshows'])) {
-	$slideWidget->addPageHeader(_('SLIDE SHOWS'), $slideHeaderForm);
+	$slideWidget->addPageHeader(
+		_('SLIDE SHOWS'),
+		array(
+			$slideHeaderForm,
+			SPACE,
+			get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))
+		)
+	);
 	$slideWidget->addItem(BR());
 	$slideWidget->addItem(new CTableInfo(_('No slide shows defined.')));
 }
@@ -53,7 +58,9 @@ else {
 			$slideHeaderForm,
 			SPACE,
 			$favouriteIcon,
+			SPACE,
 			$refreshIcon,
+			SPACE,
 			get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))
 		)
 	);

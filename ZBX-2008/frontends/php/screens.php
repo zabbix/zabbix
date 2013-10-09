@@ -57,6 +57,38 @@ $fields = array(
 check_fields($fields);
 
 /*
+ * Permissions
+ */
+// validate group IDs
+$validateGroupIds = array_filter(array(
+	get_request('groupid'),
+	get_request('tr_groupid')
+));
+if ($validateGroupIds && !API::HostGroup()->isReadable($validateGroupIds)) {
+	access_deny();
+}
+
+// validate host IDs
+$validateHostIds = array_filter(array(
+	get_request('hostid'),
+	get_request('tr_hostid')
+));
+if ($validateHostIds && !API::Host()->isReadable($validateHostIds)) {
+	access_deny();
+}
+
+if (get_request('elementid')) {
+	$screens = API::Screen()->get(array(
+		'screenids' => array($_REQUEST['elementid']),
+		'output' => array('screenid')
+	));
+	if (!$screens) {
+		access_deny();
+	}
+}
+
+
+/*
  * Filter
  */
 if (isset($_REQUEST['favobj'])) {
@@ -109,7 +141,7 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  * Display
  */
 $data = array(
-	'fullscreen' => get_request('fullscreen'),
+	'fullscreen' => $_REQUEST['fullscreen'],
 	'period' => get_request('period'),
 	'stime' => get_request('stime'),
 	'elementid' => get_request('elementid', false),
@@ -122,12 +154,6 @@ $data = array(
 if (empty($data['elementid']) && !$data['use_screen_name']) {
 	// get element id saved in profile from the last visit
 	$data['elementid'] = CProfile::get('web.screens.elementid', null);
-
-	// this flag will be used in case this element does not exist
-	$data['id_has_been_fetched_from_profile'] = true;
-}
-else {
-	$data['id_has_been_fetched_from_profile'] = false;
 }
 
 $data['screens'] = API::Screen()->get(array(

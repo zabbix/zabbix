@@ -51,9 +51,7 @@ asort_by_key($items, 'sortorder');
  */
 $dbItems = API::Item()->get(array(
 	'webitems' => true,
-	'itemids' => zbx_objectValues($items, 'itemid'),
-	'nodeids' => get_current_nodeid(true),
-	'filter' => array('flags' => null)
+	'itemids' => zbx_objectValues($items, 'itemid')
 ));
 
 $dbItems = zbx_toHash($dbItems, 'itemid');
@@ -73,7 +71,7 @@ foreach ($items as $item) {
 			array_push($types, $item['type']);
 		}
 		else {
-			show_error_message(_('Warning. Cannot display more than one item with type "Graph sum".'));
+			show_error_message(_('Cannot display more than one item with type "Graph sum".'));
 			break;
 		}
 	}

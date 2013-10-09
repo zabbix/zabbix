@@ -19,8 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/js/general.script.confirm.js.php';
-
 $screenWidget = new CWidget();
 $screenWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.screens.filter.state', 1));
 
@@ -40,13 +38,6 @@ if (empty($this->data['screens'])) {
 	CScreenBuilder::insertScreenStandardJs(array(
 		'timeline' => $screenBuilder->timeline
 	));
-}
-elseif (!isset($this->data['screens'][$this->data['elementIdentifier']]) && !$this->data['id_has_been_fetched_from_profile']) {
-	// if screen we are searching for does not exist and was not fetched from profile
-	$error_msg = $this->data['use_screen_name']
-		? _s('Screen with name "%s" does not exist.', $this->data['elementIdentifier'])
-		: _s('Screen with ID "%s" does not exist.', $this->data['elementIdentifier']);
-	show_error_message($error_msg);
 }
 else {
 	if (!isset($this->data['screens'][$this->data['elementIdentifier']])) {

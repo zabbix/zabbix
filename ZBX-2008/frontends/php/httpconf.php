@@ -214,7 +214,7 @@ elseif (isset($_REQUEST['save'])) {
 			$dbHttpTest = reset($dbHttpTest);
 			$dbHttpSteps = zbx_toHash($dbHttpTest['steps'], 'httpstepid');
 
-			$httpTest = CArrayHelper::unsetEqualValues($httpTest, $dbHttpTest);
+			$httpTest = CArrayHelper::unsetEqualValues($httpTest, $dbHttpTest, array('applicationid'));
 			foreach ($httpTest['steps'] as $snum => $step) {
 				if (isset($step['httpstepid'])) {
 					$newStep = CArrayHelper::unsetEqualValues($step, $dbHttpSteps[$step['httpstepid']], array('httpstepid'));
@@ -228,7 +228,7 @@ elseif (isset($_REQUEST['save'])) {
 				throw new Exception();
 			}
 			else {
-				clearCookies($result);
+				clearCookies($result, $_REQUEST['hostid']);
 			}
 
 		}
@@ -238,7 +238,7 @@ elseif (isset($_REQUEST['save'])) {
 				throw new Exception();
 			}
 			else {
-				clearCookies($result);
+				clearCookies($result, $_REQUEST['hostid']);
 			}
 			$httptestid = reset($result['httptestids']);
 		}
@@ -284,7 +284,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 	}
 
 	show_messages($goResult, $msg_ok, $msg_problem);
-	clearCookies($goResult);
+	clearCookies($goResult, $_REQUEST['hostid']);
 }
 elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'])) {
 	$goResult = false;
@@ -295,7 +295,7 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'
 		}
 		if (delete_history_by_httptestid($id)) {
 			$goResult = true;
-			DBexecute('UPDATE httptest SET nextcheck=0 WHERE httptestid='.$id);
+			DBexecute('UPDATE httptest SET nextcheck=0 WHERE httptestid='.zbx_dbstr($id));
 			$host = DBfetch(DBselect(
 				'SELECT h.host FROM hosts h,httptest ht WHERE ht.hostid=h.hostid AND ht.httptestid='.zbx_dbstr($id)));
 
@@ -305,13 +305,13 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'
 	}
 
 	show_messages($goResult, _('History cleared'), null);
-	clearCookies($goResult);
+	clearCookies($goResult, $_REQUEST['hostid']);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_httptestid'])) {
 	$goResult = API::HttpTest()->delete($_REQUEST['group_httptestid']);
 
 	show_messages($goResult, _('Web scenario deleted'), _('Cannot delete web scenario'));
-	clearCookies($goResult);
+	clearCookies($goResult, $_REQUEST['hostid']);
 }
 
 show_messages();
@@ -376,7 +376,7 @@ if (isset($_REQUEST['form'])) {
 		$data['http_password'] = $dbHttpTest['http_password'];
 		$data['http_proxy'] = $dbHttpTest['http_proxy'];
 		$data['templated'] = (bool) $dbHttpTest['templateid'];
-		$data['steps'] = DBfetchArray(DBselect('SELECT h.* FROM httpstep h WHERE h.httptestid='.$_REQUEST['httptestid'].' ORDER BY h.no'));
+		$data['steps'] = DBfetchArray(DBselect('SELECT h.* FROM httpstep h WHERE h.httptestid='.zbx_dbstr($_REQUEST['httptestid']).' ORDER BY h.no'));
 	}
 	else {
 		if (isset($_REQUEST['form_refresh'])) {
@@ -432,7 +432,8 @@ else {
 		'pageFilter' => $pageFilter,
 		'showDisabled' => $showDisabled,
 		'httpTests' => array(),
-		'paging' => null
+		'paging' => null,
+		'displayNodes' => (is_array(get_current_nodeid()) && empty($_REQUEST['groupid']) && empty($_REQUEST['hostid']))
 	);
 
 	if ($data['pageFilter']->hostsSelected) {
@@ -456,7 +457,7 @@ else {
 
 		order_result($httpTests, $sortfield, getPageSortOrder());
 
-		$data['paging'] = getPagingLine($httpTests);
+		$data['paging'] = getPagingLine($httpTests, array('httptestid'));
 
 		$dbHttpTests = DBselect(
 			'SELECT ht.httptestid,ht.name,ht.delay,ht.status,ht.hostid,ht.templateid,h.name AS hostname'.
@@ -484,6 +485,14 @@ else {
 		$data['parentTemplates'] = getHttpTestsParentTemplates($httpTests);
 
 		$data['httpTests'] = $httpTests;
+	}
+
+	// nodes
+	if ($data['displayNodes']) {
+		foreach ($data['httpTests'] as &$httpTest) {
+			$httpTest['nodename'] = get_node_name_by_elid($httpTest['httptestid'], true);
+		}
+		unset($httpTest);
 	}
 
 	// render view

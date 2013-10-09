@@ -28,7 +28,7 @@ class CEditableComboBox extends CComboBox {
 		parent::addAction('onchange', 'CEditableComboBoxOnChange(this, '.$size.');');
 	}
 
-	public function addItem($value, $caption = '', $selected = null, $enabled = 'yes') {
+	public function addItem($value, $caption = '', $selected = null, $enabled = 'yes', $class = null) {
 		if (is_null($selected)) {
 			if (is_array($this->value)) {
 				if (str_in_array($value, $this->value)) {
@@ -39,7 +39,7 @@ class CEditableComboBox extends CComboBox {
 				$this->value_exist = 1;
 			}
 		}
-		parent::addItem($value, $caption, $selected, $enabled);
+		parent::addItem($value, $caption, $selected, $enabled, $class);
 	}
 
 	public function toString($destroy = true) {

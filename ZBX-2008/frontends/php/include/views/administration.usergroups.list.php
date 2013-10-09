@@ -110,7 +110,10 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 				$userStatusStyle = 'disabled';
 			}
 
-			$users[] = new CLink($user['alias'],'users.php?form=update&userid='.$user['userid'], $userStatusStyle);
+			$users[] = new CLink(getUserFullname($user),
+				'users.php?form=update&userid='.$user['userid'],
+				$userStatusStyle
+			);
 			$users[] = ', ';
 		}
 		array_pop($users);

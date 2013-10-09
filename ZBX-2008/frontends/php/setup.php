@@ -78,8 +78,8 @@ if (!isset($ZBX_CONFIG['step'])) {
 
 $ZBX_CONFIG['allowed_db'] = array();
 // MYSQL
-if (zbx_is_callable(array('mysql_pconnect', 'mysql_select_db', 'mysql_error', 'mysql_select_db', 'mysql_query',
-		'mysql_fetch_array', 'mysql_fetch_row', 'mysql_data_seek', 'mysql_insert_id'))) {
+if (zbx_is_callable(array('mysqli_connect', 'mysqli_connect_error', 'mysqli_error', 'mysqli_query',
+		'mysqli_fetch_assoc', 'mysqli_free_result', 'mysqli_real_escape_string', 'mysqli_close'))) {
 	$ZBX_CONFIG['allowed_db']['MYSQL'] = 'MySQL';
 }
 // POSTGRESQL
@@ -124,6 +124,12 @@ $pageHeader->addCssInit();
 $pageHeader->addCssFile('styles/themes/originalblue/main.css');
 $pageHeader->addJsFile('js/jquery/jquery.js');
 $pageHeader->addJsFile('js/jquery/jquery-ui.js');
+
+// if init fails due to missing configuration, set user as guest with default en_GB language
+if (!CWebUser::$data) {
+	CWebUser::setDefault();
+}
+
 $path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.CWebUser::$data['lang'].'&amp;files[]=common.js&amp;files[]=main.js';
 $pageHeader->addJsFile($path);
 

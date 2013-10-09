@@ -683,65 +683,70 @@ if ($itemId) {
 	if ($selectedItem = reset($selectedItems)) {
 		$data['itemValueType'] = $selectedItem['value_type'];
 	}
+}
 
-	// create and validate trigger expression
-	if (!empty($data['insert'])) {
-		if ($data['paramtype'] == PARAM_TYPE_COUNTS) {
-			$paramNumber = in_array($data['function'], array('regexp', 'iregexp', 'str')) ? 1 : 0;
-			$data['param'][$paramNumber] = '#'.$data['param'][$paramNumber];
-		}
+// create and validate trigger expression
+if (isset($data['insert'])) {
+	if ($data['paramtype'] == PARAM_TYPE_COUNTS) {
+		$paramNumber = in_array($data['function'], array('regexp', 'iregexp', 'str')) ? 1 : 0;
+		$data['param'][$paramNumber] = '#'.$data['param'][$paramNumber];
+	}
 
-		// quote function param
-		$params = array();
-		foreach ($data['param'] as $param) {
-			$params[] = quoteFunctionParam($param);
-		}
+	if ($data['paramtype'] == PARAM_TYPE_TIME && in_array($data['function'], array('last', 'band', 'strlen'))) {
+		$data['param'][0] = '';
+	}
 
-		$data['expression'] = sprintf('{%s:%s.%s(%s)}%s%s',
-			$data['item_host'],
-			$data['item_key'],
-			$data['function'],
-			rtrim(implode(',', $params), ','),
-			$data['operator'],
-			$data['value']
-		);
+	// quote function param
+	$params = array();
+	foreach ($data['param'] as $param) {
+		$params[] = quoteFunctionParam($param);
+	}
 
-		// validate trigger expression
-		$triggerExpression = new CTriggerExpression();
+	$data['expression'] = sprintf('{%s:%s.%s(%s)}%s%s',
+		$data['item_host'],
+		$data['item_key'],
+		$data['function'],
+		rtrim(implode(',', $params), ','),
+		$data['operator'],
+		$data['value']
+	);
 
-		if ($triggerExpression->parse($data['expression'])) {
-			$expressionData = reset($triggerExpression->expressions);
+	// validate trigger expression
+	$triggerExpression = new CTriggerExpression();
 
-			// validate trigger function
-			$triggerFunctionValidator = new CTriggerFunctionValidator();
-			$isValid = $triggerFunctionValidator->validate(array(
-				'function' => $expressionData['function'],
-				'functionName' => $expressionData['functionName'],
-				'functionParamList' => $expressionData['functionParamList'],
-				'valueType' => $data['itemValueType']
-			));
-			if (!$isValid) {
-				error($triggerFunctionValidator->getError());
-				show_messages();
+	if ($triggerExpression->parse($data['expression'])) {
+		$expressionData = reset($triggerExpression->expressions);
 
-				unset($data['insert']);
-			}
-		}
-		else {
-			error($triggerExpression->error);
+		// validate trigger function
+		$triggerFunctionValidator = new CTriggerFunctionValidator();
+		$isValid = $triggerFunctionValidator->validate(array(
+			'function' => $expressionData['function'],
+			'functionName' => $expressionData['functionName'],
+			'functionParamList' => $expressionData['functionParamList'],
+			'valueType' => $data['itemValueType']
+		));
+		if (!$isValid) {
+			error($triggerFunctionValidator->getError());
 			show_messages();
 
 			unset($data['insert']);
 		}
+	}
+	else {
+		error($triggerExpression->error);
+		show_messages();
 
-		// quote function param
-		if (isset($data['insert'])) {
-			foreach ($data['param'] as $pnum => $param) {
-				$data['param'][$pnum] = quoteFunctionParam($param);
-			}
+		unset($data['insert']);
+	}
+
+	// quote function param
+	if (isset($data['insert'])) {
+		foreach ($data['param'] as $pnum => $param) {
+			$data['param'][$pnum] = quoteFunctionParam($param);
 		}
 	}
 }
+
 
 // render view
 $expressionView = new CView('configuration.triggers.expression', $data);

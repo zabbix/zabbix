@@ -467,3 +467,20 @@
 		<td><span class="link_menu" onclick="jQuery('#urlrow_#{selementurlid}').remove();"><?php echo _('Remove'); ?></span></td>
 	</tr>
 </script>
+
+<script type="text/javascript">
+jQuery(document).ready(function() {
+	jQuery('.print-link').click(function () {
+		ZABBIX.apps.map.object.updateImage();
+
+		jQuery('div.printless').unbind('click').click(function () {
+			printLess(false);
+			ZABBIX.apps.map.object.updateImage();
+
+			return false;
+		});
+
+		return false;
+	});
+})
+</script>

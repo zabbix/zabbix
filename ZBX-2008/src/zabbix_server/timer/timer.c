@@ -509,9 +509,9 @@ static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, i
 			"select hostid,host,maintenance_type,maintenance_from"
 			" from hosts"
 			" where status=%d"
+				" and flags<>%d"
 				" and maintenance_status=%d",
-			HOST_STATUS_MONITORED,
-			HOST_MAINTENANCE_STATUS_ON);
+			HOST_STATUS_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE, HOST_MAINTENANCE_STATUS_ON);
 
 	if (NULL != ids && 0 != ids_num)
 	{

@@ -55,6 +55,10 @@ $fields = array(
 $isDataValid = check_fields($fields);
 
 if ($httptestid = get_request('httptestid', false)) {
+	if (!API::HttpTest()->isReadable(array($_REQUEST['httptestid']))) {
+		access_deny();
+	}
+
 	$color = array(
 		'current' => 0,
 		0 => array('next' => '1'),
@@ -77,9 +81,9 @@ if ($httptestid = get_request('httptestid', false)) {
 		'SELECT i.itemid'.
 		' FROM httpstepitem hi,items i,httpstep hs'.
 		' WHERE i.itemid=hi.itemid'.
-			' AND hs.httptestid='.$httptestid.
+			' AND hs.httptestid='.zbx_dbstr($httptestid).
 			' AND hs.httpstepid=hi.httpstepid'.
-			' AND hi.type='.get_request('http_item_type', HTTPSTEP_ITEM_TYPE_TIME).
+			' AND hi.type='.zbx_dbstr(get_request('http_item_type', HTTPSTEP_ITEM_TYPE_TIME)).
 		' ORDER BY hs.no DESC'
 	);
 	while ($item = DBfetch($dbItems)) {
@@ -100,8 +104,7 @@ elseif ($items = get_request('items', array())) {
 		'itemids' => zbx_objectValues($items, 'itemid'),
 		'nodeids' => get_current_nodeid(true),
 		'output' => array('itemid'),
-		'preservekeys' => true,
-		'filter' => array('flags' => null)
+		'preservekeys' => true
 	));
 
 	$dbItems = zbx_toHash($dbItems, 'itemid');

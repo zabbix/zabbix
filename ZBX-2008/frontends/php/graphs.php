@@ -27,7 +27,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = isset($_REQUEST['parent_discoveryid']) ? _('Configuration of graph prototypes') : _('Configuration of graphs');
 $page['file'] = 'graphs.php';
 $page['hist_arg'] = array('hostid', 'parent_discoveryid');
-$page['scripts'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -83,7 +82,6 @@ if (isset($_REQUEST['yaxismin']) && zbx_empty($_REQUEST['yaxismin'])) {
 if (isset($_REQUEST['yaxismax']) && zbx_empty($_REQUEST['yaxismax'])) {
 	unset($_REQUEST['yaxismax']);
 }
-
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
@@ -187,6 +185,14 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['graphid'])) {
 elseif (isset($_REQUEST['save'])) {
 	$items = get_request('items', array());
 
+	// remove passing "gitemid" to API if new items added via pop-up
+	foreach ($items as &$item) {
+		if (!$item['gitemid']) {
+			unset($item['gitemid']);
+		}
+	}
+	unset($item);
+
 	$graph = array(
 		'name' => $_REQUEST['name'],
 		'width' => $_REQUEST['width'],
@@ -208,7 +214,7 @@ elseif (isset($_REQUEST['save'])) {
 	);
 
 	if (!empty($_REQUEST['parent_discoveryid'])) {
-		$graph['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
+		$graph['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 	}
 
 	if (isset($_REQUEST['graphid'])) {
@@ -549,7 +555,8 @@ else {
 		'hostid' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : get_request('hostid'),
 		'parent_discoveryid' => get_request('parent_discoveryid'),
 		'graphs' => array(),
-		'discovery_rule' => empty($_REQUEST['parent_discoveryid']) ? null : $discovery_rule
+		'discovery_rule' => empty($_REQUEST['parent_discoveryid']) ? null : $discovery_rule,
+		'displayNodes' => (is_array(get_current_nodeid()) && $pageFilter->groupid == 0 && $pageFilter->hostid == 0)
 	);
 
 	$sortfield = getPageSortField('name');
@@ -576,7 +583,15 @@ else {
 	}
 
 	order_result($data['graphs'], $sortfield, $sortorder);
-	$data['paging'] = getPagingLine($data['graphs']);
+
+	$data['paging'] = getPagingLine(
+		$data['graphs'],
+		array('graphid'),
+		array(
+			'hostid' => get_request('hostid'),
+			'parent_discoveryid' => get_request('parent_discoveryid')
+		)
+	);
 
 	// get graphs after paging
 	$options = array(
@@ -593,6 +608,13 @@ else {
 
 	foreach ($data['graphs'] as $gnum => $graph) {
 		$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
+	}
+
+	// nodes
+	if ($data['displayNodes']) {
+		foreach ($data['graphs'] as $key => $graph) {
+			$data['graphs'][$key]['nodename'] = get_node_name_by_elid($graph['graphid'], true);
+		}
 	}
 
 	order_result($data['graphs'], $sortfield, $sortorder);

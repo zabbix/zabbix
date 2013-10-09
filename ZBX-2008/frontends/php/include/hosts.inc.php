@@ -484,7 +484,7 @@ function hostInterfaceTypeNumToName($type) {
 }
 
 function get_hostgroup_by_groupid($groupid) {
-	$groups = DBfetch(DBselect('SELECT g.* FROM groups g WHERE g.groupid='.$groupid));
+	$groups = DBfetch(DBselect('SELECT g.* FROM groups g WHERE g.groupid='.zbx_dbstr($groupid)));
 
 	if ($groups) {
 		return $groups;
@@ -526,7 +526,7 @@ function get_host_by_itemid($itemids) {
 }
 
 function get_host_by_hostid($hostid, $no_error_message = 0) {
-	$row = DBfetch(DBselect('SELECT h.* FROM hosts h WHERE h.hostid='.$hostid));
+	$row = DBfetch(DBselect('SELECT h.* FROM hosts h WHERE h.hostid='.zbx_dbstr($hostid)));
 
 	if ($row) {
 		return $row;
@@ -578,7 +578,7 @@ function updateHostStatus($hostids, $status) {
 }
 
 function get_application_by_applicationid($applicationid, $no_error_message = 0) {
-	$row = DBfetch(DBselect('SELECT a.* FROM applications a WHERE a.applicationid='.$applicationid));
+	$row = DBfetch(DBselect('SELECT a.* FROM applications a WHERE a.applicationid='.zbx_dbstr($applicationid)));
 
 	if ($row) {
 		return $row;
@@ -638,6 +638,55 @@ function getApplicationSourceParentIds(array $applicationIds, array $templateApp
 		foreach ($templateApplicationIds as $templateId => $applicationIds) {
 			foreach ($applicationIds as $applicationId) {
 				$result[$applicationId][] = $templateId;
+			}
+		}
+
+		return $result;
+	}
+}
+
+/**
+ * Returns the farthest host prototype ancestor for each given host prototype.
+ *
+ * @param array $hostPrototypeIds
+ * @param array $templateHostPrototypeIds	array with parent host prototype IDs as keys and arrays of child host
+ * 											prototype IDs as values
+ *
+ * @return array	an array of child ID - ancestor ID pairs
+ */
+function getHostPrototypeSourceParentIds(array $hostPrototypeIds, array $templateHostPrototypeIds = array()) {
+	$query = DBSelect(
+		'SELECT h.hostid,h.templateid'.
+		' FROM hosts h'.
+		' WHERE '.dbConditionInt('h.hostid', $hostPrototypeIds).
+			' AND h.templateid>0'
+	);
+
+	$hostPrototypeIds = array();
+	while ($hostPrototype = DBfetch($query)) {
+		// check if we already have host prototype inherited from the current host prototype
+		// if we do - move all of its child prototypes to the parent template
+		if (isset($templateHostPrototypeIds[$hostPrototype['hostid']])) {
+			$templateHostPrototypeIds[$hostPrototype['templateid']] = $templateHostPrototypeIds[$hostPrototype['hostid']];
+			unset($templateHostPrototypeIds[$hostPrototype['hostid']]);
+		}
+		// if no - just add the prototype
+		else {
+			$templateHostPrototypeIds[$hostPrototype['templateid']][] = $hostPrototype['hostid'];
+			$hostPrototypeIds[] = $hostPrototype['templateid'];
+		}
+	}
+
+	// continue while we still have new host prototypes to check
+	if ($hostPrototypeIds) {
+		return getHostPrototypeSourceParentIds($hostPrototypeIds, $templateHostPrototypeIds);
+	}
+	else {
+		// return an inverse hash with prototype IDs as keys and parent prototype IDs as values
+		$result = array();
+		foreach ($templateHostPrototypeIds as $templateId => $hostIds) {
+			foreach ($hostIds as $hostId) {
+				$result[$hostId] = $templateId;
 			}
 		}
 
@@ -744,38 +793,8 @@ function getDeletableHostGroups($groupids = null) {
 	return $deletable_groupids;
 }
 
-/**
- * A helper function for building the value for the 'data-host-menu' attribute.
- *
- * @param array $host
- * @param int $host['hostid']
- * @param mixed $host['screens']
- * @param mixed $host['inventory']
- * @param array $scripts
- *
- * @return array
- */
-function hostMenuData(array $host, array $scripts = array()) {
-	$menuScripts = array();
-
-	foreach ($scripts as $script) {
-		$menuScripts[] = array(
-			'scriptid' => $script['scriptid'],
-			'confirmation' => $script['confirmation'],
-			'name' => $script['name']
-		);
-	}
-
-	return array(
-		'scripts' => $menuScripts,
-		'hostid' => $host['hostid'],
-		'hasScreens' => (bool) $host['screens'],
-		'hasInventory' => (bool) $host['inventory']
-	);
-}
-
 function isTemplate($hostId) {
-	$dbHost = DBfetch(DBselect('SELECT h.status FROM hosts h WHERE h.hostid='.$hostId));
+	$dbHost = DBfetch(DBselect('SELECT h.status FROM hosts h WHERE h.hostid='.zbx_dbstr($hostId)));
 
 	return ($dbHost && $dbHost['status'] == HOST_STATUS_TEMPLATE);
 }

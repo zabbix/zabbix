@@ -21,9 +21,6 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
 
-define('GRAPH_GOOD', 0);
-define('GRAPH_BAD', 1);
-
 class testFormGraph extends CWebTest {
 
 	/**
@@ -212,7 +209,7 @@ class testFormGraph extends CWebTest {
 
 		$this->zbxTestClickWait("//div[@class='w']//a[text()='Graphs']");
 
-		$this->checkTitle('Configuration of graphs');
+		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestTextPresent('CONFIGURATION OF GRAPHS');
 
 		if (isset($data['form'])) {
@@ -222,7 +219,7 @@ class testFormGraph extends CWebTest {
 			$this->zbxTestClickWait('form');
 		}
 
-		$this->checkTitle('Configuration of graphs');
+		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestTextPresent('CONFIGURATION OF GRAPHS');
 		$this->zbxTestTextPresent('Graph');
 
@@ -606,27 +603,29 @@ class testFormGraph extends CWebTest {
 
 	// Returns update data
 	public static function update() {
-		return DBdata("select * from graphs g left join graphs_items gi on gi.graphid=g.graphid where g.graphid LIKE '30000%' and g.name LIKE 'testFormGraph%'");
+		return DBdata(
+			'SELECT * FROM graphs g'.
+			' LEFT JOIN graphs_items gi'.
+				' ON gi.graphid=g.graphid'.
+			' WHERE g.graphid BETWEEN 300000 AND 300010'
+		);
 	}
 
 	/**
 	 * @dataProvider update
 	 */
 	public function testFormGraph_SimpleUpdate($data) {
-		$name = $data['name'];
-
 		$sqlGraphs = "select * from graphs";
 		$oldHashGraphs = DBhash($sqlGraphs);
 
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickWait('link='.$this->host);
-		$this->zbxTestClickWait("//div[@class='w']//a[text()='Graphs']");
-		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&hostid=40001');
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of graphs');
-		$this->zbxTestTextPresent('Graph updated');
-		$this->zbxTestTextPresent("$name");
-		$this->zbxTestTextPresent('GRAPHS');
+		$this->zbxTestCheckTitle('Configuration of graphs');
+		$this->zbxTestTextPresent(array(
+			'Graph updated',
+			$data['name'],
+			'GRAPHS'
+		));
 
 		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
 	}
@@ -636,16 +635,16 @@ class testFormGraph extends CWebTest {
 		return array(
 			array(
 				array(
-					'expected' => GRAPH_BAD,
+					'expected' => TEST_BAD,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Name": cannot be empty.'
+						'Incorrect value for field "Name": cannot be empty.'
 					)
 				)
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphSaveCheck',
 					'addItems' => array(
 						array('itemName' => 'testFormItem', 'remove' => true),
@@ -657,7 +656,7 @@ class testFormGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'graphSaveCheck',
 					'addItems' => array(
 						array('itemName' => 'testFormItem')
@@ -670,7 +669,7 @@ class testFormGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'graphSaveCheck',
 					'errors' => array(
 						'ERROR: Cannot add graph',
@@ -680,7 +679,7 @@ class testFormGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphNormal1',
 					'addItems' => array(
 						array('itemName' => 'testFormItem')
@@ -694,7 +693,7 @@ class testFormGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphNormal2',
 					'addItems' => array(
 						array('itemName' => 'testFormItem')
@@ -709,7 +708,7 @@ class testFormGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphNormal3',
 					'addItems' => array(
 						array('itemName' => 'testFormItem')
@@ -723,7 +722,7 @@ class testFormGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphNormal4',
 					'graphtype' => 'Normal',
 					'addItems' => array(
@@ -733,7 +732,7 @@ class testFormGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphStacked1',
 					'graphtype' => 'Stacked',
 					'addItems' => array(
@@ -743,7 +742,7 @@ class testFormGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphStacked2',
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Fixed' ,
@@ -754,7 +753,7 @@ class testFormGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphStacked3',
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Item',
@@ -767,7 +766,7 @@ class testFormGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'graphStacked',
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Item',
@@ -777,13 +776,13 @@ class testFormGraph extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Cannot add graph',
-						'Incorrect item for axis value.'
+						'No permissions to referred object or it does not exist!'
 					)
 				)
 			),
 			array(
 				array(
-					'expected' => GRAPH_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'graphStacked',
 					'width' => 'name',
 					'height' => 'name',
@@ -797,16 +796,16 @@ class testFormGraph extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.',
-						'Warning. Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.',
-						'Warning. Field "yaxismin" is not decimal number.',
-						'Warning. Field "yaxismin" is not decimal number.'
+						'Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.',
+						'Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.',
+						'Field "yaxismin" is not decimal number.',
+						'Field "yaxismin" is not decimal number.'
 					)
 				)
 			),
 			array(
 				array(
-					'expected' => GRAPH_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'graphStacked',
 					'width' => '65536',
 					'height' => '-22',
@@ -818,14 +817,14 @@ class testFormGraph extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.',
-						'Warning. Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.'
+						'Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.',
+						'Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.'
 					)
 				)
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphPie',
 					'graphtype' => 'Pie',
 					'addItems' => array(
@@ -835,7 +834,7 @@ class testFormGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graphExploded',
 					'graphtype' => 'Exploded',
 					'addItems' => array(
@@ -845,7 +844,7 @@ class testFormGraph extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'graph!@#$%^&*()><>?:"|{},./;',
 					'graphtype' => 'Exploded',
 					'addItems' => array(
@@ -862,13 +861,8 @@ class testFormGraph extends CWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormGraph_SimpleCreate($data) {
-
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickWait('link='.$this->host);
-		$this->zbxTestClickWait("//div[@class='w']//a[text()='Graphs']");
-
-		$this->zbxTestClickWait('form');
-		$this->checkTitle('Configuration of graphs');
+		$this->zbxTestLogin('graphs.php?hostid=40001&form=Create+graph');
+		$this->zbxTestCheckTitle('Configuration of graphs');
 
 		if (isset($data['name'])) {
 			$this->input_type('name', $data['name']);
@@ -982,13 +976,13 @@ class testFormGraph extends CWebTest {
 		$this->zbxTestClickWait('save');
 		$expected = $data['expected'];
 		switch ($expected) {
-			case GRAPH_GOOD:
+			case TEST_GOOD:
 				$this->zbxTestTextPresent('Graph added');
-				$this->checkTitle('Configuration of graphs');
+				$this->zbxTestCheckTitle('Configuration of graphs');
 				$this->zbxTestTextPresent('CONFIGURATION OF GRAPHS');
 				break;
-			case GRAPH_BAD:
-				$this->checkTitle('Configuration of graphs');
+			case TEST_BAD:
+				$this->zbxTestCheckTitle('Configuration of graphs');
 				$this->zbxTestTextPresent('CONFIGURATION OF GRAPHS');
 				foreach ($data['errors'] as $msg) {
 				$this->zbxTestTextPresent($msg);

@@ -117,7 +117,7 @@ class CUserGroup extends CZBXAPI {
 
 		// status
 		if (!is_null($options['status'])) {
-			$sqlParts['where'][] = 'g.users_status='.$options['status'];
+			$sqlParts['where'][] = 'g.users_status='.zbx_dbstr($options['status']);
 		}
 
 		// with_gui_access
@@ -387,7 +387,6 @@ class CUserGroup extends CZBXAPI {
 		return array('usrgrpids' => $usrgrpids);
 	}
 
-
 	/**
 	 * Mass update user group.
 	 * Checks for permissions - only super admins can change user groups.
@@ -582,12 +581,7 @@ class CUserGroup extends CZBXAPI {
 			}
 		}
 
-
 		return array('usrgrpids' => $usrgrpids);
-	}
-
-	public function massRemove($data) {
-
 	}
 
 	/**

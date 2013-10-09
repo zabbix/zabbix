@@ -33,9 +33,6 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-// js templates
-require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php';
-
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
@@ -60,6 +57,16 @@ $fields = array(
 	'favstate' =>			array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})')
 );
 check_fields($fields);
+
+/*
+ * Permissions
+ */
+if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
+	access_deny();
+}
+if (get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
+	access_deny();
+}
 
 /*
  * Ajax
@@ -108,12 +115,7 @@ if (isset($_REQUEST['filter_rst'])) {
 }
 
 // show triggers
-if (isset($_REQUEST['show_triggers'])) {
-	CProfile::update('web.tr_status.filter.show_triggers', $_REQUEST['show_triggers'], PROFILE_TYPE_INT);
-}
-else {
-	$_REQUEST['show_triggers'] = CProfile::get('web.tr_status.filter.show_triggers', TRIGGERS_OPTION_ONLYTRUE);
-}
+$_REQUEST['show_triggers'] = isset($_REQUEST['show_triggers']) ? $_REQUEST['show_triggers'] : TRIGGERS_OPTION_ONLYTRUE;
 
 // show events
 if (isset($_REQUEST['show_events'])) {
@@ -234,6 +236,8 @@ if (isset($audio) && !$mute) {
 /*
  * Display
  */
+$displayNodes = (is_show_all_nodes() && $pageFilter->groupid == 0 && $pageFilter->hostid == 0);
+
 $showTriggers = $_REQUEST['show_triggers'];
 $showEvents = $_REQUEST['show_events'];
 $showSeverity = $_REQUEST['show_severity'];
@@ -295,7 +299,7 @@ $severityComboBox->addItems(array(
 ));
 $filterForm->addRow(_('Minimum trigger severity'), $severityComboBox);
 
-$statusChangeDays = new CNumericBox('status_change_days', $_REQUEST['status_change_days'], 4);
+$statusChangeDays = new CNumericBox('status_change_days', $_REQUEST['status_change_days'], 4, false, false, false);
 if (!$_REQUEST['status_change']) {
 	$statusChangeDays->setAttribute('disabled', 'disabled');
 }
@@ -332,7 +336,6 @@ $triggerForm->addVar('backurl', $page['file']);
 /*
  * Table
  */
-$showAdminLinks = (CWebUser::$data['type'] == USER_TYPE_ZABBIX_ADMIN || CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN);
 $showEventColumn = ($config['event_ack_enable'] && $_REQUEST['show_events'] != EVENTS_OPTION_NOEVENT);
 
 $switcherName = 'trigger_switchers';
@@ -360,7 +363,7 @@ $triggerTable->setHeader(array(
 	_('Age'),
 	$showEventColumn ? _('Duration') : null,
 	$config['event_ack_enable'] ? _('Acknowledged') : null,
-	is_show_all_nodes() ? _('Node') : null,
+	$displayNodes ? _('Node') : null,
 	_('Host'),
 	make_sorting_header(_('Name'), 'description'),
 	_('Comments')
@@ -529,8 +532,7 @@ foreach ($triggers as $tnum => $trigger) {
 $hosts = API::Host()->get(array(
 	'hostids' => $hostIds,
 	'preservekeys' => true,
-	'selectScreens' => API_OUTPUT_COUNT,
-	'selectInventory' => array('hostid')
+	'selectScreens' => API_OUTPUT_COUNT
 ));
 
 // get host scripts
@@ -548,49 +550,34 @@ while ($row = DBfetch($dbTriggerDependencies)) {
 }
 
 foreach ($triggers as $trigger) {
-	$items = array();
-
 	$usedHosts = array();
 	foreach ($trigger['hosts'] as $host) {
 		$usedHosts[$host['hostid']] = $host['name'];
 	}
 	$usedHostCount = count($usedHosts);
 
-	foreach ($trigger['items'] as $inum => $item) {
-		$itemName = itemName($item);
+	$triggerItems = array();
+
+	foreach ($trigger['items'] as $item) {
+		$itemName = htmlspecialchars(itemName($item));
 
 		// if we have items from different hosts, we must prefix a host name
 		if ($usedHostCount > 1) {
 			$itemName = $usedHosts[$item['hostid']].NAME_DELIMITER.$itemName;
 		}
 
-		$items[$inum]['itemid'] = $item['itemid'];
-		$items[$inum]['value_type'] = $item['value_type'];
-		$items[$inum]['action'] = str_in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64)) ? 'showgraph' : 'showvalues';
-		$items[$inum]['name'] = htmlspecialchars($itemName);
-	}
-	$trigger['items'] = $items;
-
-	// trigger js menu
-	$menuTriggerConfiguration = 'null';
-	if ($showAdminLinks && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-		$configurationUrl = 'triggers.php?form=update&triggerid='.$trigger['triggerid'].'&hostid='.$pageFilter->hostid.'&switch_node='.id2nodeid($trigger['triggerid']);
-		$menuTriggerConfiguration = "['"._('Configuration of triggers')."', ".CJs::encodeJson($configurationUrl).
-			", null, {'outer': ['pum_o_item'], 'inner': ['pum_i_item']}]";
-	}
-	$menu_trigger_url = 'null';
-	if (!zbx_empty($trigger['url'])) {
-		// double CHtml::encode is required to prevent XSS attacks
-		$menu_trigger_url = "['"._('URL')."', ".CJs::encodeJson(CHtml::encode(CHtml::encode(resolveTriggerUrl($trigger)))).
-			", null, {'outer': ['pum_o_item'], 'inner': ['pum_i_item']}]";
+		$triggerItems[] = array(
+			'name' => $itemName,
+			'params' => array(
+				'itemid' => $item['itemid'],
+				'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
+					? 'showgraph' : 'showvalues'
+			)
+		);
 	}
 
 	$description = new CSpan($trigger['description'], 'link_menu');
-	$description->addAction('onclick',
-		"javascript: create_mon_trigger_menu(event, [{'triggerid': '".$trigger['triggerid'].
-			"', 'lastchange': '".$trigger['lastchange']."'}, ".$menuTriggerConfiguration.", ".$menu_trigger_url."],".
-		zbx_jsvalue($items, true).");"
-	);
+	$description->setMenuPopup(getMenuPopupTrigger($trigger, $triggerItems));
 
 	if ($_REQUEST['show_details']) {
 		$font = new CTag('font', 'yes');
@@ -600,7 +587,6 @@ foreach ($triggers as $trigger) {
 		$description = array($description, BR(), $font);
 	}
 
-	// dependencies
 	if (!empty($trigger['dependencies'])) {
 		$dependenciesTable = new CTableInfo();
 		$dependenciesTable->setAttribute('style', 'width: 200px;');
@@ -639,36 +625,23 @@ foreach ($triggers as $trigger) {
 	}
 	unset($img, $dependenciesTable, $dependency);
 
-	$triggerDescription = new CSpan($description);
+	$triggerDescription = new CSpan($description, 'pointer');
 
 	// host js menu
 	$hostList = array();
 	foreach ($trigger['hosts'] as $triggerHost) {
-		$host = $hosts[$triggerHost['hostid']];
-
-		$hostsSpan = new CDiv(null, 'floatleft');
-
 		// fetch scripts for the host js menu
-		$menuScripts = array();
+		$scripts = array();
 		if (isset($scriptsByHosts[$triggerHost['hostid']])) {
 			foreach ($scriptsByHosts[$triggerHost['hostid']] as $script) {
-				$menuScripts[] = array(
-					'scriptid' => $script['scriptid'],
-					'confirmation' => $script['confirmation'],
-					'name' => $script['name']
-				);
+				$scripts[] = $script;
 			}
 		}
 
-		$hostsName = new CSpan($triggerHost['name'], 'link_menu menu-host');
-		$hostsName->setAttribute('data-menu', array(
-			'scripts' => $menuScripts,
-			'hostid' => $triggerHost['hostid'],
-			'hasScreens' => (bool) $host['screens'],
-			'hasInventory' => (bool) $host['inventory']
-		));
+		$hostName = new CSpan($triggerHost['name'], 'link_menu');
+		$hostName->setMenuPopup(getMenuPopupHost($hosts[$triggerHost['hostid']], $scripts));
 
-		$hostsSpan->addItem($hostsName);
+		$hostDiv = new CDiv($hostName);
 
 		// add maintenance icon with hint if host is in maintenance
 		if ($triggerHost['maintenance_status']) {
@@ -694,15 +667,15 @@ foreach ($triggers as $trigger) {
 				$maintenanceIcon->addClass('pointer');
 			}
 
-			$hostsSpan->addItem($maintenanceIcon);
+			$hostDiv->addItem($maintenanceIcon);
 		}
 
 		// add comma after hosts, except last
 		if (next($trigger['hosts'])) {
-			$hostsSpan->addItem(','.SPACE);
+			$hostDiv->addItem(','.SPACE);
 		}
 
-		$hostList[] = $hostsSpan;
+		$hostList[] = $hostDiv;
 	}
 
 	// host
@@ -805,7 +778,7 @@ foreach ($triggers as $trigger) {
 		empty($trigger['lastchange']) ? '-' : zbx_date2age($trigger['lastchange']),
 		$showEventColumn ? SPACE : null,
 		$ackColumn,
-		get_node_name_by_elid($trigger['triggerid']),
+		$displayNodes ? get_node_name_by_elid($trigger['triggerid']) : null,
 		$hostColumn,
 		$triggerDescription,
 		$comments
@@ -853,7 +826,7 @@ foreach ($triggers as $trigger) {
 				zbx_date2age($event['clock']),
 				zbx_date2age($nextClock, $event['clock']),
 				($config['event_ack_enable']) ? $ack : null,
-				is_show_all_nodes() ? SPACE : null,
+				$displayNodes ? SPACE : null,
 				$emptyColumn
 			), 'odd_row');
 			$row->setAttribute('data-parentid', $trigger['triggerid']);

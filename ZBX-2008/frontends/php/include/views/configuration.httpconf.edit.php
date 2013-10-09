@@ -234,7 +234,7 @@ if (!$this->data['templated']) {
 $httpStepFormList->addRow(_('Steps'), new CDiv($stepsTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
 
 // append tabs to form
-$httpTab = new CTabView(array('remember' => true));
+$httpTab = new CTabView();
 if (!$this->data['form_refresh']) {
 	$httpTab->setSelected(0);
 }

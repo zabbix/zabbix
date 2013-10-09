@@ -154,7 +154,7 @@ class CHttpTestManager {
 			$dbCheckItems = DBselect(
 				'SELECT i.itemid,hi.type'.
 				' FROM items i,httptestitem hi'.
-				' WHERE hi.httptestid='.$httpTest['httptestid'].
+				' WHERE hi.httptestid='.zbx_dbstr($httpTest['httptestid']).
 					' AND hi.itemid=i.itemid'
 			);
 			while ($checkitem = DBfetch($dbCheckItems)) {
@@ -318,11 +318,11 @@ class CHttpTestManager {
 	protected function getChildHostsFromHttpTests(array $httpTests, array $hostIds = array()) {
 		$hostsTemaplatesMap = array();
 
-		$sqlWhere = empty($hostIds) ? '' : ' AND '.dbConditionInt('ht.hostid', $hostIds);
+		$sqlWhere = $hostIds ? ' AND '.dbConditionInt('ht.hostid', $hostIds) : '';
 		$dbCursor = DBselect(
 			'SELECT ht.templateid,ht.hostid'.
 			' FROM hosts_templates ht'.
-			' WHERE '.dbConditionInt('ht.templateid', array_unique(zbx_objectValues($httpTests, 'hostid'))).
+			' WHERE '.dbConditionInt('ht.templateid', zbx_objectValues($httpTests, 'hostid')).
 				$sqlWhere
 		);
 		while ($dbHost = DBfetch($dbCursor)) {
@@ -661,7 +661,7 @@ class CHttpTestManager {
 				'SELECT i.itemid,i.key_'.
 					' FROM items i,httptestitem hti'.
 					' WHERE i.itemid=hti.itemid'.
-					' AND hti.httptestid='.$httpTest['templateid']
+					' AND hti.httptestid='.zbx_dbstr($httpTest['templateid'])
 			), 'key_');
 		}
 
@@ -755,7 +755,7 @@ class CHttpTestManager {
 				' FROM items i,httpstepitem hsi,httpstep hs'.
 				' WHERE i.itemid=hsi.itemid'.
 					' AND hsi.httpstepid=hs.httpstepid'.
-					' AND hs.httptestid='.$httpTest['templateid']
+					' AND hs.httptestid='.zbx_dbstr($httpTest['templateid'])
 			), 'key_');
 		}
 
@@ -895,7 +895,7 @@ class CHttpTestManager {
 			$dbStepItems = DBselect(
 				'SELECT i.itemid,i.key_,hi.type'.
 				' FROM items i,httpstepitem hi'.
-				' WHERE hi.httpstepid='.$webstep['httpstepid'].
+				' WHERE hi.httpstepid='.zbx_dbstr($webstep['httpstepid']).
 					' AND hi.itemid=i.itemid'
 			);
 			while ($stepitem = DBfetch($dbStepItems)) {
@@ -1046,7 +1046,7 @@ class CHttpTestManager {
 	 *
 	 * @return array    an array with HTTP test IDs as keys and arrays of data as values
 	 */
-	public function fetchLastData(array $httpTestIds) {
+	public function getLastData(array $httpTestIds) {
 		$httpItems = DBfetchArray(DBselect(
 			'SELECT hti.httptestid,hti.type,i.itemid,i.value_type'.
 			' FROM httptestitem hti,items i'.
@@ -1055,7 +1055,7 @@ class CHttpTestManager {
 				' AND '.dbConditionInt('hti.httptestid', $httpTestIds)
 		));
 
-		$history = Manager::History()->fetchLast($httpItems);
+		$history = Manager::History()->getLast($httpItems);
 
 		$data = array();
 		foreach ($httpItems as $httpItem) {

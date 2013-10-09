@@ -21,9 +21,6 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
 
-define('DISCOVERY_GOOD', 0);
-define('DISCOVERY_BAD', 1);
-
 class testFormDiscoveryRule extends CWebTest {
 
 	/**
@@ -264,7 +261,7 @@ class testFormDiscoveryRule extends CWebTest {
 			$this->zbxTestClickWait('form');
 		}
 
-		$this->checkTitle('Configuration of discovery rules');
+		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
 		$this->zbxTestTextPresent('Discovery rule');
 
@@ -434,7 +431,7 @@ class testFormDiscoveryRule extends CWebTest {
 			$this->assertNotVisible('authtype');
 		}
 
-		if ($type == 'SSH agent' || $type == 'TELNET agent' || $type == 'JMX agent') {
+		if ($type == 'SSH agent' || $type == 'TELNET agent' || $type == 'JMX agent' || $type == 'Simple check') {
 			$this->zbxTestTextPresent('User name');
 			$this->assertVisible('username');
 			$this->assertAttribute("//input[@id='username']/@maxlength", 64);
@@ -686,7 +683,7 @@ class testFormDiscoveryRule extends CWebTest {
 		$this->zbxTestClickWait('link=Discovery rules');
 		$this->zbxTestClickWait('link='.$name);
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of discovery rules');
+		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rule updated');
 		$this->zbxTestTextPresent("$name");
 
@@ -699,37 +696,37 @@ class testFormDiscoveryRule extends CWebTest {
 		return array(
 			array(
 				array(
-					'expected' => DISCOVERY_BAD,
+					'expected' => TEST_BAD,
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "Name": cannot be empty.',
-							'Warning. Incorrect value for field "Key": cannot be empty.'
+							'Incorrect value for field "Name": cannot be empty.',
+							'Incorrect value for field "Key": cannot be empty.'
 					)
 				)
 			),
 			array(
 				array(
-					'expected' => DISCOVERY_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'discoveryRuleError',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "Key": cannot be empty.'
+							'Incorrect value for field "Key": cannot be empty.'
 					)
 				)
 			),
 			array(
 				array(
-					'expected' => DISCOVERY_BAD,
+					'expected' => TEST_BAD,
 					'key' => 'discovery-rule-error',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "Name": cannot be empty.'
+							'Incorrect value for field "Name": cannot be empty.'
 					)
 				)
 			),
 			array(
 				array(
-					'expected' => DISCOVERY_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'discoveryRuleNo1',
 					'key' => 'discovery-key-no1',
 					'formCheck' =>true,
@@ -738,7 +735,7 @@ class testFormDiscoveryRule extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => DISCOVERY_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'discoveryRuleNo2',
 					'key' => 'discovery-key-no2',
 					'formCheck' =>true,
@@ -747,7 +744,7 @@ class testFormDiscoveryRule extends CWebTest {
 				)
 			),
 			array(
-				array('expected' => DISCOVERY_BAD,
+				array('expected' => TEST_BAD,
 					'name' => 'discoveryRuleNo1',
 					'key' => 'discovery-key-no1',
 					'errors' => array(
@@ -756,7 +753,7 @@ class testFormDiscoveryRule extends CWebTest {
 				)
 			),
 			array(
-				array('expected' => DISCOVERY_BAD,
+				array('expected' => TEST_BAD,
 					'name' => 'discoveryRuleError',
 					'key' => 'discovery-key-no1',
 					'errors' => array(
@@ -767,7 +764,7 @@ class testFormDiscoveryRule extends CWebTest {
 			// Empty timedelay
 			array(
 				array(
-					'expected' => DISCOVERY_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Discovery delay',
 					'key' => 'discovery-delay-test',
 					'delay' => 0,
@@ -780,33 +777,33 @@ class testFormDiscoveryRule extends CWebTest {
 			// Incorrect timedelay
 			array(
 				array(
-					'expected' => DISCOVERY_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Discovery delay',
 					'key' => 'discovery-delay-test',
 					'delay' => '-30',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.'
+						'Incorrect value "-30" for "Update interval (in sec)" field: must be between 0 and 86400.'
 					)
 				)
 			),
 			// Incorrect timedelay
 			array(
 				array(
-					'expected' => DISCOVERY_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Discovery delay',
 					'key' => 'discovery-delay-test',
 					'delay' => 86401,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.'
+						'Incorrect value "86401" for "Update interval (in sec)" field: must be between 0 and 86400.'
 					)
 				)
 			),
 			// Empty time flex period
 			array(
 				array(
-					'expected' => DISCOVERY_BAD,
+					'expected' => TEST_BAD,
 					'name' =>'Discovery flex',
 					'key' =>'discovery-flex-test',
 					'flexPeriod' => array(
@@ -814,14 +811,14 @@ class testFormDiscoveryRule extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "New flexible interval": cannot be empty.'
+						'Incorrect value for field "New flexible interval": cannot be empty.'
 					)
 				)
 			),
 			// Incorrect flex period
 			array(
 				array(
-					'expected' => DISCOVERY_BAD,
+					'expected' => TEST_BAD,
 					'name' =>'Discovery flex',
 					'key' =>'discovery-flex-test',
 					'flexPeriod' => array(
@@ -836,7 +833,7 @@ class testFormDiscoveryRule extends CWebTest {
 			// Incorrect flex period
 			array(
 				array(
-					'expected' => DISCOVERY_BAD,
+					'expected' => TEST_BAD,
 					'name' =>'Discovery flex',
 					'key' =>'discovery-flex-test',
 					'flexPeriod' => array(
@@ -851,7 +848,7 @@ class testFormDiscoveryRule extends CWebTest {
 			// Incorrect flex period
 			array(
 				array(
-					'expected' => DISCOVERY_BAD,
+					'expected' => TEST_BAD,
 					'name' =>'Discovery flex',
 					'key' =>'discovery-flex-test',
 					'flexPeriod' => array(
@@ -866,7 +863,7 @@ class testFormDiscoveryRule extends CWebTest {
 			// Incorrect flex period
 			array(
 				array(
-					'expected' => DISCOVERY_BAD,
+					'expected' => TEST_BAD,
 					'name' =>'Discovery flex',
 					'key' =>'discovery-flex-test',
 					'flexPeriod' => array(
@@ -881,7 +878,7 @@ class testFormDiscoveryRule extends CWebTest {
 			// Multiple flex periods
 			array(
 				array(
-					'expected' => DISCOVERY_GOOD,
+					'expected' => TEST_GOOD,
 					'name' =>'Discovery flex',
 					'key' =>'discovery-flex-test',
 					'flexPeriod' => array(
@@ -895,7 +892,7 @@ class testFormDiscoveryRule extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => DISCOVERY_BAD,
+					'expected' => TEST_BAD,
 					'name' =>'Discovery flex',
 					'key' =>'discovery-flex-delay',
 					'flexPeriod' => array(
@@ -916,7 +913,7 @@ class testFormDiscoveryRule extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => DISCOVERY_GOOD,
+					'expected' => TEST_GOOD,
 					'name' =>'Discovery flex1',
 					'key' =>'discovery-flex-delay1',
 					'flexPeriod' => array(
@@ -933,7 +930,7 @@ class testFormDiscoveryRule extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => DISCOVERY_BAD,
+					'expected' => TEST_BAD,
 					'name' =>'Discovery flex',
 					'key' =>'discovery-flex-delay',
 					'delay' => 0,
@@ -955,7 +952,7 @@ class testFormDiscoveryRule extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => DISCOVERY_GOOD,
+					'expected' => TEST_GOOD,
 					'name' =>'Discovery flex2',
 					'key' =>'discovery-flex-delay2',
 					'delay' => 0,
@@ -970,7 +967,7 @@ class testFormDiscoveryRule extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => DISCOVERY_BAD,
+					'expected' => TEST_BAD,
 					'name' =>'Discovery flex',
 					'key' =>'discovery-flex-delay',
 					'flexPeriod' => array(
@@ -986,7 +983,7 @@ class testFormDiscoveryRule extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => DISCOVERY_GOOD,
+					'expected' => TEST_GOOD,
 					'name' =>'Discovery flex',
 					'key' =>'discovery-flex-delay3',
 					'flexPeriod' => array(
@@ -998,7 +995,7 @@ class testFormDiscoveryRule extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => DISCOVERY_GOOD,
+					'expected' => TEST_GOOD,
 					'name' =>'Discovery flex',
 					'key' =>'discovery-flex-delay4',
 					'delay' => 0,
@@ -1010,7 +1007,7 @@ class testFormDiscoveryRule extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => DISCOVERY_BAD,
+					'expected' => TEST_BAD,
 					'name' =>'Discovery flex',
 					'key' =>'discovery-flex-delay',
 					'flexPeriod' => array(
@@ -1025,7 +1022,7 @@ class testFormDiscoveryRule extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => DISCOVERY_GOOD,
+					'expected' => TEST_GOOD,
 					'name' =>'Discovery flex',
 					'key' =>'discovery-flex-delay5',
 					'flexPeriod' => array(
@@ -1036,7 +1033,7 @@ class testFormDiscoveryRule extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => DISCOVERY_BAD,
+					'expected' => TEST_BAD,
 					'name' =>'Discovery flex',
 					'key' =>'discovery-flex-delay',
 					'flexPeriod' => array(
@@ -1054,7 +1051,7 @@ class testFormDiscoveryRule extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => DISCOVERY_BAD,
+					'expected' => TEST_BAD,
 					'name' =>'Discovery flex',
 					'key' =>'discovery-flex-delay',
 					'flexPeriod' => array(
@@ -1072,7 +1069,7 @@ class testFormDiscoveryRule extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => DISCOVERY_BAD,
+					'expected' => TEST_BAD,
 					'name' =>'Discovery flex',
 					'key' =>'discovery-flex-delay',
 					'flexPeriod' => array(
@@ -1088,7 +1085,7 @@ class testFormDiscoveryRule extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => DISCOVERY_BAD,
+					'expected' => TEST_BAD,
 					'name' =>'Discovery flex',
 					'key' =>'discovery-flex-delay',
 					'flexPeriod' => array(
@@ -1104,7 +1101,7 @@ class testFormDiscoveryRule extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => DISCOVERY_GOOD,
+					'expected' => TEST_GOOD,
 					'name' =>'Discovery flex',
 					'key' =>'discovery-flex-delay6',
 					'flexPeriod' => array(
@@ -1128,7 +1125,7 @@ class testFormDiscoveryRule extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => DISCOVERY_GOOD,
+					'expected' => TEST_GOOD,
 					'name' =>'Discovery flex',
 					'key' =>'discovery-flex-delay7',
 					'flexPeriod' => array(
@@ -1140,7 +1137,7 @@ class testFormDiscoveryRule extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => DISCOVERY_GOOD,
+					'expected' => TEST_GOOD,
 					'name' =>'Discovery flex Check',
 					'key' =>'discovery-flex-delay8',
 					'flexPeriod' => array(
@@ -1156,7 +1153,7 @@ class testFormDiscoveryRule extends CWebTest {
 			// Maximum flexfields allowed reached- error
 			array(
 				array(
-					'expected' => DISCOVERY_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Discovery flex-maximum entries',
 					'key' => 'discovery-flex-maximum',
 					'flexPeriod' => array(
@@ -1176,7 +1173,7 @@ class testFormDiscoveryRule extends CWebTest {
 			// Maximum flexfields allowed reached- save OK
 			array(
 				array(
-					'expected' => DISCOVERY_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Discovery flex-maximum save OK',
 					'key' => 'discovery-flex-maximum-save',
 					'flexPeriod' => array(
@@ -1195,7 +1192,7 @@ class testFormDiscoveryRule extends CWebTest {
 			// Maximum flexfields allowed reached- remove one item
 			array(
 				array(
-					'expected' => DISCOVERY_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Discovery flex-maximum with remove',
 					'key' => 'discovery-flex-maximum-remove',
 					'flexPeriod' => array(
@@ -1216,7 +1213,7 @@ class testFormDiscoveryRule extends CWebTest {
 			// Flexfields with negative number in flexdelay
 			array(
 				array(
-					'expected' => DISCOVERY_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item flex-negative flexdelay',
 					'key' => 'item-flex-negative-flexdelay',
 					'flexPeriod' => array(
@@ -1227,7 +1224,7 @@ class testFormDiscoveryRule extends CWebTest {
 			// Flexfields with symbols in flexdelay
 			array(
 				array(
-					'expected' => DISCOVERY_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item flex-symbols in flexdelay',
 					'key' => 'item-flex-symbols-flexdelay',
 					'flexPeriod' => array(
@@ -1237,7 +1234,7 @@ class testFormDiscoveryRule extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => DISCOVERY_GOOD,
+					'expected' => TEST_GOOD,
 					'name' =>'!@#$%^&*()_+-=[]{};:"|,./<>?',
 					'key' =>'discovery-symbols-test',
 					'dbCheck' => true,
@@ -1247,7 +1244,7 @@ class testFormDiscoveryRule extends CWebTest {
 			// List of all item types
 			array(
 				array(
-					'expected' => DISCOVERY_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'Zabbix agent',
 					'name' => 'Zabbix agent',
 					'key' => 'discovery-zabbix-agent',
@@ -1256,7 +1253,7 @@ class testFormDiscoveryRule extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => DISCOVERY_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'Zabbix agent (active)',
 					'name' => 'Zabbix agent (active)',
 					'key' => 'discovery-zabbix-agent-active',
@@ -1266,7 +1263,7 @@ class testFormDiscoveryRule extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => DISCOVERY_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'Simple check',
 					'name' => 'Simple check',
 					'key' => 'discovery-simple-check',
@@ -1275,7 +1272,7 @@ class testFormDiscoveryRule extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => DISCOVERY_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'SNMPv1 agent',
 					'name' => 'SNMPv1 agent',
 					'key' => 'discovery-snmpv1-agent',
@@ -1284,7 +1281,7 @@ class testFormDiscoveryRule extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => DISCOVERY_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'SNMPv2 agent',
 					'name' => 'SNMPv2 agent',
 					'key' => 'discovery-snmpv2-agent',
@@ -1294,7 +1291,7 @@ class testFormDiscoveryRule extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => DISCOVERY_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'SNMPv3 agent',
 					'name' => 'SNMPv3 agent',
 					'key' => 'discovery-snmpv3-agent',
@@ -1303,7 +1300,7 @@ class testFormDiscoveryRule extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => DISCOVERY_BAD,
+					'expected' => TEST_BAD,
 					'type' => 'SNMPv1 agent',
 					'name' => 'SNMPv1 agent',
 					'key' => 'test-item-reuse',
@@ -1315,7 +1312,7 @@ class testFormDiscoveryRule extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => DISCOVERY_BAD,
+					'expected' => TEST_BAD,
 					'type' => 'SNMPv1 agent',
 					'name' => 'SNMPv1 agent',
 					'key' => 'test-item-form1',
@@ -1327,7 +1324,7 @@ class testFormDiscoveryRule extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => DISCOVERY_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'Zabbix internal',
 					'name' => 'Zabbix internal',
 					'key' => 'discovery-zabbix-internal',
@@ -1336,7 +1333,7 @@ class testFormDiscoveryRule extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => DISCOVERY_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'Zabbix trapper',
 					'name' => 'Zabbix trapper',
 					'key' => 'snmptrap.fallback',
@@ -1347,7 +1344,7 @@ class testFormDiscoveryRule extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => DISCOVERY_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'External check',
 					'name' => 'External check',
 					'key' => 'discovery-external-check',
@@ -1356,7 +1353,7 @@ class testFormDiscoveryRule extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => DISCOVERY_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'IPMI agent',
 					'name' => 'IPMI agent',
 					'key' => 'discovery-ipmi-agent',
@@ -1368,7 +1365,7 @@ class testFormDiscoveryRule extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => DISCOVERY_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'IPMI agent',
 					'name' => 'IPMI agent with spaces',
 					'key' => 'item-ipmi-agent-spaces',
@@ -1380,7 +1377,7 @@ class testFormDiscoveryRule extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => DISCOVERY_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'SSH agent',
 					'name' => 'SSH agent',
 					'key' => 'discovery-ssh-agent',
@@ -1392,7 +1389,7 @@ class testFormDiscoveryRule extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => DISCOVERY_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'TELNET agent',
 					'name' => 'TELNET agent',
 					'key' => 'discovery-telnet-agent',
@@ -1404,45 +1401,45 @@ class testFormDiscoveryRule extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => DISCOVERY_BAD,
+					'expected' => TEST_BAD,
 					'type' => 'IPMI agent',
 					'name' => 'IPMI agent error',
 					'key' => 'discovery-ipmi-agent-error',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "IPMI sensor": cannot be empty.'
+							'Incorrect value for field "IPMI sensor": cannot be empty.'
 					)
 				)
 			),
 			array(
 				array(
-					'expected' => DISCOVERY_BAD,
+					'expected' => TEST_BAD,
 					'type' => 'SSH agent',
 					'name' => 'SSH agent error',
 					'key' => 'discovery-ssh-agent-error',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "User name": cannot be empty.',
-							'Warning. Incorrect value for field "Executed script": cannot be empty.'
+							'Incorrect value for field "User name": cannot be empty.',
+							'Incorrect value for field "Executed script": cannot be empty.'
 					)
 				)
 			),
 			array(
 				array(
-					'expected' => DISCOVERY_BAD,
+					'expected' => TEST_BAD,
 					'type' => 'TELNET agent',
 					'name' => 'TELNET agent error',
 					'key' => 'discovery-telnet-agent-error',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "User name": cannot be empty.',
-							'Warning. Incorrect value for field "Executed script": cannot be empty.'
+							'Incorrect value for field "User name": cannot be empty.',
+							'Incorrect value for field "Executed script": cannot be empty.'
 					)
 				)
 			),
 			array(
 				array(
-					'expected' => DISCOVERY_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'JMX agent',
 					'name' => 'JMX agent',
 					'key' => 'discovery-jmx-agent',
@@ -1454,7 +1451,7 @@ class testFormDiscoveryRule extends CWebTest {
 			// Default
 			array(
 				array(
-					'expected' => DISCOVERY_BAD,
+					'expected' => TEST_BAD,
 					'type' => 'SSH agent',
 					'name' => 'SSH agent',
 					'username' => 'zabbix',
@@ -1468,7 +1465,7 @@ class testFormDiscoveryRule extends CWebTest {
 			// Default
 			array(
 				array(
-					'expected' => DISCOVERY_BAD,
+					'expected' => TEST_BAD,
 					'type' => 'TELNET agent',
 					'name' => 'TELNET agent',
 					'username' => 'zabbix',
@@ -1482,7 +1479,7 @@ class testFormDiscoveryRule extends CWebTest {
 			// Default
 			array(
 				array(
-					'expected' => DISCOVERY_BAD,
+					'expected' => TEST_BAD,
 					'type' => 'JMX agent',
 					'name' => 'JMX agent',
 					'username' => 'zabbix',
@@ -1501,14 +1498,14 @@ class testFormDiscoveryRule extends CWebTest {
 	 */
 	public function testFormDiscoveryRule_SimpleCreate($data) {
 		$this->zbxTestLogin('hosts.php');
-		$this->checkTitle('Configuration of hosts');
+		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('CONFIGURATION OF HOSTS');
 
 		$this->zbxTestClickWait('link='.$this->host);
 		$this->zbxTestClickWait('link=Discovery rules');
 		$this->zbxTestClickWait('form');
 
-		$this->checkTitle('Configuration of discovery rules');
+		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
 		$this->zbxTestTextPresent('Discovery rule');
 
@@ -1622,15 +1619,15 @@ class testFormDiscoveryRule extends CWebTest {
 			$this->zbxTestClickWait('save');
 			$expected = $data['expected'];
 			switch ($expected) {
-				case DISCOVERY_GOOD:
+				case TEST_GOOD:
 					$this->zbxTestTextPresent('Discovery rule created');
-					$this->checkTitle('Configuration of discovery rules');
+					$this->zbxTestCheckTitle('Configuration of discovery rules');
 					$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
 					$this->zbxTestTextPresent(array('Item prototypes',  'Trigger prototypes', 'Graph prototypes'));
 					break;
 
-				case DISCOVERY_BAD:
-					$this->checkTitle('Configuration of discovery rules');
+				case TEST_BAD:
+					$this->zbxTestCheckTitle('Configuration of discovery rules');
 					$this->zbxTestTextPresent(array('CONFIGURATION OF DISCOVERY RULES','Discovery rule'));
 					foreach ($data['errors'] as $msg) {
 						$this->zbxTestTextPresent($msg);

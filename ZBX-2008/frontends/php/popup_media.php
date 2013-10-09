@@ -107,15 +107,14 @@ $frmMedia->addVar('media', $media);
 $frmMedia->addVar('dstfrm', $_REQUEST['dstfrm']);
 
 $cmbType = new CComboBox('mediatypeid', $mediatypeid);
-$types = DBselect(
-		'SELECT mt.mediatypeid,mt.description'.
-		' FROM media_type mt'.
-		whereDbNode('mt.mediatypeid').
-		' ORDER BY mt.type'
-);
-while ($type = DBfetch($types)) {
-	$cmbType->addItem(
-		$type['mediatypeid'],
+$types = DBfetchArrayAssoc(DBselect(
+	'SELECT mt.mediatypeid,mt.description'.
+	' FROM media_type mt'.
+	whereDbNode('mt.mediatypeid')
+), 'mediatypeid');
+CArrayHelper::sort($types, array('description'));
+foreach ($types as $mediaTypeId => $type) {
+	$cmbType->addItem($mediaTypeId,
 		get_node_name_by_elid($type['mediatypeid'], null, NAME_DELIMITER).$type['description']
 	);
 }

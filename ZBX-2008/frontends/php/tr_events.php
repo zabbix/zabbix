@@ -30,7 +30,6 @@ require_once dirname(__FILE__).'/include/html.inc.php';
 $page['title'] = _('Event details');
 $page['file'] = 'tr_events.php';
 $page['hist_arg'] = array('triggerid', 'eventid');
-$page['scripts'] = array();
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -65,9 +64,6 @@ if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit();
 }
-
-// js templates
-require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php';
 
 // get triggers
 $options = array(

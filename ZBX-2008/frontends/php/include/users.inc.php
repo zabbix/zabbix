@@ -81,7 +81,7 @@ function user_auth_type2str($authType) {
 
 	$authUserType = array(
 		GROUP_GUI_ACCESS_SYSTEM => _('System default'),
-		GROUP_GUI_ACCESS_INTERNAL => _('Internal'),
+		GROUP_GUI_ACCESS_INTERNAL => _x('Internal', 'user type'),
 		GROUP_GUI_ACCESS_DISABLED => _('Disabled')
 	);
 
@@ -137,12 +137,12 @@ function get_userid_by_usrgrpid($userGroupIds) {
  */
 function add_user_to_group($userId, $userGroupId) {
 	if (granted2move_user($userId, $userGroupId)) {
-		DBexecute('DELETE FROM users_groups WHERE userid='.$userId.' AND usrgrpid='.$userGroupId);
+		DBexecute('DELETE FROM users_groups WHERE userid='.zbx_dbstr($userId).' AND usrgrpid='.zbx_dbstr($userGroupId));
 
 		$usersGroupsId = get_dbid('users_groups', 'id');
 
 		return DBexecute(
-			'INSERT INTO users_groups (id,usrgrpid,userid) VALUES ('.$usersGroupsId.','.$userGroupId.','.$userId.')'
+			'INSERT INTO users_groups (id,usrgrpid,userid) VALUES ('.zbx_dbstr($usersGroupsId).','.zbx_dbstr($userGroupId).','.zbx_dbstr($userId).')'
 		);
 	}
 	else {
@@ -162,7 +162,7 @@ function add_user_to_group($userId, $userGroupId) {
  */
 function remove_user_from_group($userId, $userGroupId) {
 	if (granted2move_user($userId, $userGroupId)) {
-		return DBexecute('DELETE FROM users_groups WHERE userid='.$userId.' AND usrgrpid='.$userGroupId);
+		return DBexecute('DELETE FROM users_groups WHERE userid='.zbx_dbstr($userId).' AND usrgrpid='.zbx_dbstr($userGroupId));
 	}
 	else {
 		error(_('User cannot change status of himself.'));
@@ -272,4 +272,34 @@ function change_group_debug_mode($userGroupIds, $debugMode) {
 	return DBexecute(
 		'UPDATE usrgrp SET debug_mode='.$debugMode.' WHERE '.dbConditionInt('usrgrpid', $userGroupIds)
 	);
+}
+
+/**
+ * Gets user full name in format "alias (name surname)". If both name and surname exist, returns translated string.
+ *
+ * @param array $userData
+ *
+ * @return string
+ */
+function getUserFullname($userData) {
+	$fullname = '';
+	if (!zbx_empty($userData['name'])) {
+		$fullname = $userData['name'];
+	}
+
+	// return full name and surname
+	if (!zbx_empty($userData['surname'])) {
+		if (!zbx_empty($userData['name'])) {
+			return $userData['alias'].' '._x('(%1$s %2$s)', 'user fullname', $userData['name'], $userData['surname']);
+		}
+		$fullname = $userData['surname'];
+	}
+
+	// return alias with full name
+	if (!zbx_empty($fullname)) {
+		return $userData['alias'].' ('.$fullname.')';
+	}
+	else {
+		return $userData['alias'];
+	}
 }
