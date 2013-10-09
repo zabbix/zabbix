@@ -106,7 +106,7 @@ function validate_ip($str, &$arr) {
 		return true;
 	}
 
-	if (defined('ZBX_HAVE_IPV6')) {
+	if (ZBX_HAVE_IPV6) {
 		return validate_ipv6($str);
 	}
 
@@ -134,7 +134,7 @@ function validate_ip_range_mask($ip_range) {
 	if (validate_ipv4($ip, $arr)) {
 		return preg_match('/^\d{1,2}$/', $bits) && $bits >= 16 && $bits <= 32;
 	}
-	elseif (defined('ZBX_HAVE_IPV6') && validate_ipv6($ip, $arr)) {
+	elseif (ZBX_HAVE_IPV6 && validate_ipv6($ip, $arr)) {
 		return preg_match('/^\d{1,3}$/', $bits) && $bits >= 112 && $bits <= 128;
 	}
 	else {
@@ -166,7 +166,7 @@ function validate_ip_range_range($ip_range) {
 			}
 		}
 	}
-	elseif (defined('ZBX_HAVE_IPV6') && validate_ipv6($parts[0])) {
+	elseif (ZBX_HAVE_IPV6 && validate_ipv6($parts[0])) {
 		$ip_parts = explode(':', $parts[0]);
 		$ip_parts_count = count($ip_parts);
 

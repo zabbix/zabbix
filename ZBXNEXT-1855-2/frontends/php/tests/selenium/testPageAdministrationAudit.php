@@ -67,7 +67,7 @@ class testPageAdministrationAudit extends CWebTest {
 
 	public function testPageAdministrationAudit_CheckLayout() {
 		$this->zbxTestLogin('auditlogs.php?stime=1328684400&period=63072000');
-		$this->checkTitle('Audit logs');
+		$this->zbxTestCheckTitle('Audit logs');
 		$this->assertElementPresent('config');
 
 		$this->zbxTestTextPresent('AUDIT LOGS');
@@ -172,7 +172,7 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_Filter($action, $resourcetype) {
 		$this->zbxTestLogin('auditlogs.php');
-		$this->checkTitle('Audit logs');
+		$this->zbxTestCheckTitle('Audit logs');
 		$this->assertElementPresent('config');
 
 		$this->zbxTestClick('flicker_icon_l');

@@ -57,7 +57,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	*/
 	public function testFormAdministrationMediaTypes_CheckLayout($allMediaTypes) {
 		$this->zbxTestLogin('media_types.php');
-		$this->checkTitle('Configuration of media types');
+		$this->zbxTestCheckTitle('Configuration of media types');
 
 		$this->zbxTestClickWait('form');
 
@@ -103,7 +103,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 
 		$this->zbxTestClickWait('cancel');
 
-		$this->checkTitle('Configuration of media types');
+		$this->zbxTestCheckTitle('Configuration of media types');
 	}
 
 	/**
@@ -111,7 +111,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	*/
 	public function testFormAdministrationMediaTypes_Create($type, $data) {
 		$this->zbxTestLogin('media_types.php');
-		$this->checkTitle('Configuration of media types');
+		$this->zbxTestCheckTitle('Configuration of media types');
 		$this->zbxTestClickWait('form');
 
 		switch ($type) {
@@ -148,7 +148,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 
 		$this->zbxTestClickWait('save');
 
-		$this->checkTitle('Configuration of media types');
+		$this->zbxTestCheckTitle('Configuration of media types');
 		$this->zbxTestTextNotPresent('ERROR');
 		$this->zbxTestTextPresent($data['Description']);
 		$this->zbxTestTextPresent('CONFIGURATION OF MEDIA TYPES');
@@ -164,10 +164,10 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$oldHashMediaType = DBhash($sql);
 
 		$this->zbxTestLogin('media_types.php');
-		$this->checkTitle('Configuration of media types');
+		$this->zbxTestCheckTitle('Configuration of media types');
 		$this->zbxTestClickWait('link='.$name);
 		$this->zbxTestClickWait('cancel');
-		$this->checkTitle('Configuration of media types');
+		$this->zbxTestCheckTitle('Configuration of media types');
 		$this->zbxTestTextPresent("$name");
 		$this->zbxTestTextPresent('CONFIGURATION OF MEDIA TYPES');
 
@@ -184,7 +184,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$oldHashMediaType=DBhash($sqlMediaType);
 
 		$this->zbxTestLogin('media_types.php');
-		$this->checkTitle('Configuration of media types');
+		$this->zbxTestCheckTitle('Configuration of media types');
 		$this->zbxTestTextPresent('CONFIGURATION OF MEDIA TYPES');
 		$this->zbxTestClickWait('link='.$name);
 		$this->zbxTestClickWait('save');
@@ -209,7 +209,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		DBsave_tables('media_type');
 
 		$this->zbxTestLogin('media_types.php');
-		$this->checkTitle('Configuration of media types');
+		$this->zbxTestCheckTitle('Configuration of media types');
 		$this->zbxTestClick('link='.$name);
 		$this->chooseOkOnNextConfirmation();
 		$this->wait();
@@ -218,7 +218,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 
 		$this->getConfirmation();
 		$this->wait();
-		$this->checkTitle('Configuration of media types');
+		$this->zbxTestCheckTitle('Configuration of media types');
 		if ($used_by_operations) {
 				$this->zbxTestTextNotPresent('Media type deleted');
 				$this->zbxTestTextPresent('Cannot delete media type');

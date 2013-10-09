@@ -209,7 +209,7 @@ class testFormGraph extends CWebTest {
 
 		$this->zbxTestClickWait("//div[@class='w']//a[text()='Graphs']");
 
-		$this->checkTitle('Configuration of graphs');
+		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestTextPresent('CONFIGURATION OF GRAPHS');
 
 		if (isset($data['form'])) {
@@ -219,7 +219,7 @@ class testFormGraph extends CWebTest {
 			$this->zbxTestClickWait('form');
 		}
 
-		$this->checkTitle('Configuration of graphs');
+		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestTextPresent('CONFIGURATION OF GRAPHS');
 		$this->zbxTestTextPresent('Graph');
 
@@ -620,7 +620,7 @@ class testFormGraph extends CWebTest {
 
 		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&hostid=40001');
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of graphs');
+		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestTextPresent(array(
 			'Graph updated',
 			$data['name'],
@@ -862,7 +862,7 @@ class testFormGraph extends CWebTest {
 	 */
 	public function testFormGraph_SimpleCreate($data) {
 		$this->zbxTestLogin('graphs.php?hostid=40001&form=Create+graph');
-		$this->checkTitle('Configuration of graphs');
+		$this->zbxTestCheckTitle('Configuration of graphs');
 
 		if (isset($data['name'])) {
 			$this->input_type('name', $data['name']);
@@ -978,11 +978,11 @@ class testFormGraph extends CWebTest {
 		switch ($expected) {
 			case TEST_GOOD:
 				$this->zbxTestTextPresent('Graph added');
-				$this->checkTitle('Configuration of graphs');
+				$this->zbxTestCheckTitle('Configuration of graphs');
 				$this->zbxTestTextPresent('CONFIGURATION OF GRAPHS');
 				break;
 			case TEST_BAD:
-				$this->checkTitle('Configuration of graphs');
+				$this->zbxTestCheckTitle('Configuration of graphs');
 				$this->zbxTestTextPresent('CONFIGURATION OF GRAPHS');
 				foreach ($data['errors'] as $msg) {
 				$this->zbxTestTextPresent($msg);

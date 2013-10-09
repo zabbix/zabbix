@@ -141,7 +141,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		}
 	}
 
-	public function checkTitle($title) {
+	public function zbxTestCheckTitle($title) {
 		global $ZBX_SERVER_NAME;
 
 		if ($ZBX_SERVER_NAME !== '') {
@@ -322,7 +322,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		$this->selectWindow();
 		$this->wait();
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of hosts');
+		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host updated');
 		// no entities should be deleted, they all should be updated
 		$this->zbxTestTextNotPresent('deleted');
