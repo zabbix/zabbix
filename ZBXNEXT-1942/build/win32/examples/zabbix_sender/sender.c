@@ -59,8 +59,8 @@ int main(int argc, char *argv[])
 			if (0 == zabbix_sender_parse_result(result, &response, &info))
 			{
 				printf("  response: %s\n", 0 == response ? "success" : "failed");
-				printf("  info from server: \"processed: %d; total: %d; failed: %d; time spent: %lf\"\n",
-						info.total - info.failed, info.total, info.failed, info.time_spent);
+				printf("  info from server: \"processed: %d; failed: %d; total: %d; seconds spent: %lf\"\n",
+						info.total - info.failed, info.failed, info.total, info.time_spent);
 			}
 			else
 				printf("  failed to parse server response\n");
