@@ -426,7 +426,7 @@ int	main(int argc, char **argv)
 		else if (NULL == (in = fopen(INPUT_FILE, "r")) )
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot open [%s]: %s", INPUT_FILE, zbx_strerror(errno));
-			goto exit;
+			goto free;
 		}
 
 		ret = SUCCEED;
@@ -597,9 +597,9 @@ int	main(int argc, char **argv)
 		}
 		while (0); /* try block simulation */
 	}
-
+free:
 	zbx_json_free(&sentdval_args.json);
-
+exit:
 	if (FAIL != ret)
 	{
 		printf("sent: %d; skipped: %d; total: %d\n", succeed_count, total_count - succeed_count, total_count);
@@ -609,7 +609,7 @@ int	main(int argc, char **argv)
 		printf("Sending failed.%s\n", CONFIG_LOG_LEVEL != LOG_LEVEL_DEBUG ?
 				" Use option -vv for more detailed output." : "");
 	}
-exit:
+
 	zabbix_close_log();
 
 	if (FAIL == ret)
