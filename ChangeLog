@@ -1,7 +1,9 @@
 Changes for 2.1.7
 
 New features:
-...G...PS. [ZBXNEXT-935] zabbix sender exit status now better reflects the operation result - success:0, partial success:2, failure:1. Improved readability of server response to sender/agent data  (wiper, asaveljevs)
+...G...... [ZBXNEXT-1942] added zabbix sender dynamic link library for windows (wiper)
+...G...... [ZBXNEXT-935] zabbix sender exit status now better reflects the operation result - success:0, partial success:2, failure:1 (asaveljevs, wiper)
+.......PS. [ZBXNEXT-935] improved readability of server response to sender/agent data (asaveljevs, wiper)
 .......PS. [ZBXNEXT-1633] improved VMware virtual machine monitoring performance (wiper)
 ..F....... [ZBX-6911] added functionality to save positions of block on dashboard page in profiles table (Vitalij)
 
