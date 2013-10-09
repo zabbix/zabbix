@@ -1,7 +1,7 @@
 CC = cl.exe /nologo
 LINKER = link.exe /NOLOGO
 
-CFLAGS = /I ..\..\..\..\bin\win32\dev
+CFLAGS = /I ..\..\..\..\bin\win32\dev /c
 LFLAGS = /LIBPATH:..\..\..\..\bin\win32\dev /DEFAULTLIB:zabbix_sender.lib
 
 PROGNAME = sender.exe
@@ -16,5 +16,5 @@ clean:
 sender.exe: $(OBJS)
 	$(LINKER) $(OBJS) /OUT:$(PROGNAME) $(LFLAGS)
 
-sender.o: sender.c
-	$(CC) sender.c /Fo "sender.o" $(CFLAGS)
+sender.obj: sender.c
+	$(CC) sender.c $(CFLAGS)
