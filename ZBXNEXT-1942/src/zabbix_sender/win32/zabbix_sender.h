@@ -90,7 +90,7 @@ ZBX_API int	zabbix_sender_send_values(const char *address, unsigned short port, 
  *               -1 - the result parsing failed                               *
  *                                                                            *
  * Comments: If info parameter was specified but the function failed to parse *
- *           the result info field, then -1 is set to info->total.            *
+ *           the result info field, then info->total is set to -1.            *
  *                                                                            *
  ******************************************************************************/
 ZBX_API int	zabbix_sender_parse_result(const char *result, int *response, zabbix_sender_info_t *info);
@@ -106,4 +106,4 @@ ZBX_API int	zabbix_sender_parse_result(const char *result, int *response, zabbix
  ******************************************************************************/
 ZBX_API void	zabbix_sender_free_result(void *ptr);
 
-#endif /* ZABBIXSENDER_H_ */
+#endif	/* ZABBIX_SENDER_H */

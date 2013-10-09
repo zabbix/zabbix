@@ -16,6 +16,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -23,7 +24,7 @@
 
 /*
  * This is a simple Zabbix sender utility implemented with
- * Zabbix sender dynamic link library dll to illustrate the
+ * Zabbix sender dynamic link library to illustrate the
  * library usage.
  *
  * See zabbix_sender.h header file for API specifications.
@@ -61,8 +62,8 @@ int main(int argc, const char *argv[])
 			{
 				printf("\tFailed to parse server response\n");
 			}
-
 		}
+
 		/* free the server response */
 		zabbix_sender_free_result(result);
 	}
@@ -74,9 +75,7 @@ int main(int argc, const char *argv[])
 		printf("\t\t<host> - host name\n");
 		printf("\t\t<key> - item key\n");
 		printf("\t\t<value> - item value\n");
-
 	}
-
 
 	return EXIT_SUCCESS;
 }
