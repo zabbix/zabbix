@@ -18,5 +18,3 @@ sender.exe: $(OBJS)
 
 sender.o: sender.c
 	$(CC) sender.c /Fo "sender.o" $(CFLAGS)
-
-
