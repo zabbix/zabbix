@@ -454,7 +454,7 @@ else {
 
 	// sorting & paging
 	order_result($data['usergroups'], $sortfield, getPageSortOrder());
-	$data['paging'] = getPagingLine($data['usergroups']);
+	$data['paging'] = getPagingLine($data['usergroups'], array('usrgrpid'));
 
 	// nodes
 	if ($data['displayNodes']) {

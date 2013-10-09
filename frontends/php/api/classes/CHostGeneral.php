@@ -139,79 +139,65 @@ abstract class CHostGeneral extends CHostBase {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		parent::link($templateIds, $targetIds);
+		$hostsLinkageInserts = parent::link($templateIds, $targetIds);
 
-		foreach ($targetIds as $targetId) {
-			foreach ($templateIds as $templateId) {
-				if (isset($linked[$targetId]) && isset($linked[$targetId][$templateId])) {
-					continue;
-				}
+		foreach ($hostsLinkageInserts as $hostTplIds){
+			Manager::Application()->link($hostTplIds['templateid'], $hostTplIds['hostid']);
 
-				Manager::Application()->link($templateId, $targetId);
+			API::DiscoveryRule()->syncTemplates(array(
+				'hostids' => $hostTplIds['hostid'],
+				'templateids' => $hostTplIds['templateid']
+			));
 
-				API::DiscoveryRule()->syncTemplates(array(
-					'hostids' => $targetId,
-					'templateids' => $templateId
-				));
+			API::Itemprototype()->syncTemplates(array(
+				'hostids' => $hostTplIds['hostid'],
+				'templateids' => $hostTplIds['templateid']
+			));
 
-				API::Itemprototype()->syncTemplates(array(
-					'hostids' => $targetId,
-					'templateids' => $templateId
-				));
+			API::HostPrototype()->syncTemplates(array(
+				'hostids' => $hostTplIds['hostid'],
+				'templateids' => $hostTplIds['templateid']
+			));
 
-				API::HostPrototype()->syncTemplates(array(
-					'hostids' => $targetId,
-					'templateids' => $templateId
-				));
+			API::Item()->syncTemplates(array(
+				'hostids' => $hostTplIds['hostid'],
+				'templateids' => $hostTplIds['templateid']
+			));
 
-				API::Item()->syncTemplates(array(
-					'hostids' => $targetId,
-					'templateids' => $templateId
-				));
-
-				Manager::HttpTest()->link($templateId, $targetId);
-			}
-
-			// we do linkage in two separate loops because for triggers you need all items already created on host
-			foreach ($templateIds as $templateId) {
-				if (isset($linked[$targetId]) && isset($linked[$targetId][$templateId])) {
-					continue;
-				}
-
-				API::Trigger()->syncTemplates(array(
-					'hostids' => $targetId,
-					'templateids' => $templateId
-				));
-
-				API::TriggerPrototype()->syncTemplates(array(
-					'hostids' => $targetId,
-					'templateids' => $templateId
-				));
-
-				API::GraphPrototype()->syncTemplates(array(
-					'hostids' => $targetId,
-					'templateids' => $templateId
-				));
-
-				API::Graph()->syncTemplates(array(
-					'hostids' => $targetId,
-					'templateids' => $templateId
-				));
-			}
+			Manager::HttpTest()->link($hostTplIds['templateid'], $hostTplIds['hostid']);
 		}
 
-		foreach ($targetIds as $targetId) {
-			foreach ($templateIds as $templateId) {
-				if (isset($linked[$targetId]) && isset($linked[$targetId][$templateId])) {
-					continue;
-				}
+		// we do linkage in two separate loops because for triggers you need all items already created on host
+		foreach ($hostsLinkageInserts as $hostTplIds){
+			API::Trigger()->syncTemplates(array(
+				'hostids' => $hostTplIds['hostid'],
+				'templateids' => $hostTplIds['templateid']
+			));
 
-				API::Trigger()->syncTemplateDependencies(array(
-					'templateids' => $templateId,
-					'hostids' => $targetId
-				));
-			}
+			API::TriggerPrototype()->syncTemplates(array(
+				'hostids' => $hostTplIds['hostid'],
+				'templateids' => $hostTplIds['templateid']
+			));
+
+			API::GraphPrototype()->syncTemplates(array(
+				'hostids' => $hostTplIds['hostid'],
+				'templateids' => $hostTplIds['templateid']
+			));
+
+			API::Graph()->syncTemplates(array(
+				'hostids' => $hostTplIds['hostid'],
+				'templateids' => $hostTplIds['templateid']
+			));
 		}
+
+		foreach ($hostsLinkageInserts as $hostTplIds){
+			API::Trigger()->syncTemplateDependencies(array(
+				'templateids' => $hostTplIds['templateid'],
+				'hostids' => $hostTplIds['hostid']
+			));
+		}
+
+		return $hostsLinkageInserts;
 	}
 
 	/**

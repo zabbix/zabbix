@@ -53,6 +53,7 @@
 #include "escalator/escalator.h"
 #include "proxypoller/proxypoller.h"
 #include "selfmon/selfmon.h"
+#include "vmware/vmware.h"
 
 #include "valuecache.h"
 
@@ -139,11 +140,15 @@ int	CONFIG_HISTSYNCER_FREQUENCY	= 5;
 int	CONFIG_CONFSYNCER_FORKS		= 1;
 int	CONFIG_CONFSYNCER_FREQUENCY	= 60;
 
+int	CONFIG_VMWARE_FORKS		= 0;
+int	CONFIG_VMWARE_FREQUENCY		= 60;
+
 zbx_uint64_t	CONFIG_CONF_CACHE_SIZE		= 8 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_HISTORY_CACHE_SIZE	= 8 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_TEXT_CACHE_SIZE		= 16 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE		= 8 * ZBX_MEBIBYTE;
+zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE	= 8 * ZBX_MEBIBYTE;
 
 int	CONFIG_UNREACHABLE_PERIOD	= 45;
 int	CONFIG_UNREACHABLE_DELAY	= 15;
@@ -263,9 +268,18 @@ static void	zbx_validate_config()
 	}
 	if (0 != CONFIG_VALUE_CACHE_SIZE && 128 * ZBX_KIBIBYTE > CONFIG_VALUE_CACHE_SIZE)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Value cache size must be either 0 or greater than 128KB");
+		zabbix_log(LOG_LEVEL_CRIT, "value cache size must be either 0 or greater than 128KB");
 		exit(EXIT_FAILURE);
 	}
+
+#if !defined(HAVE_LIBXML2) || !defined(HAVE_LIBCURL)
+	if (0 != CONFIG_VMWARE_FORKS)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot start vmware collector because Zabbix server is built without VMware"
+				" support");
+		exit(EXIT_FAILURE);
+	}
+#endif
 }
 
 /******************************************************************************
@@ -407,6 +421,12 @@ static void	zbx_load_config()
 			PARM_OPT,	0,			0},
 		{"LoadModule",			&CONFIG_LOAD_MODULE,			TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
+		{"StartVMwareCollectors",	&CONFIG_VMWARE_FORKS,			TYPE_INT,
+			PARM_OPT,	0,			250},
+		{"VMwareFrequency",		&CONFIG_VMWARE_FREQUENCY,		TYPE_INT,
+			PARM_OPT,	10,			SEC_PER_DAY},
+		{"VMwareCacheSize",		&CONFIG_VMWARE_CACHE_SIZE,		TYPE_UINT64,
+			PARM_OPT,	256 * ZBX_KIBIBYTE,	0x7fffffff},	/* just below 2GB */
 		{NULL}
 	};
 
@@ -637,6 +657,10 @@ int	MAIN_ZABBIX_ENTRY()
 	init_configuration_cache();
 	init_selfmon_collector();
 
+	/* initialize vmware support */
+	if (0 != CONFIG_VMWARE_FORKS)
+		zbx_vmware_init();
+
 	/* initialize history value cache */
 	zbx_vc_init();
 
@@ -661,7 +685,7 @@ int	MAIN_ZABBIX_ENTRY()
 			+ CONFIG_NODEWATCHER_FORKS + CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS
 			+ CONFIG_HISTSYNCER_FORKS + CONFIG_ESCALATOR_FORKS + CONFIG_IPMIPOLLER_FORKS
 			+ CONFIG_JAVAPOLLER_FORKS + CONFIG_SNMPTRAPPER_FORKS + CONFIG_PROXYPOLLER_FORKS
-			+ CONFIG_SELFMON_FORKS;
+			+ CONFIG_SELFMON_FORKS + CONFIG_VMWARE_FORKS;
 	threads = zbx_calloc(threads, threads_num, sizeof(pid_t));
 
 	if (0 < CONFIG_TRAPPER_FORKS)
@@ -830,6 +854,12 @@ int	MAIN_ZABBIX_ENTRY()
 
 		main_selfmon_loop();
 	}
+	else if (server_num <= (server_count += CONFIG_VMWARE_FORKS))
+	{
+		INIT_SERVER(ZBX_PROCESS_TYPE_VMWARE, CONFIG_VMWARE_FORKS);
+
+		main_vmware_loop();
+	}
 
 	return SUCCEED;
 }
@@ -889,6 +919,10 @@ void	zbx_on_exit()
 #ifdef HAVE_SQLITE3
 	zbx_remove_sqlite3_mutex();
 #endif
+
+	/* free vmware support */
+	if (0 != CONFIG_VMWARE_FORKS)
+		zbx_vmware_destroy();
 
 	free_selfmon_collector();
 

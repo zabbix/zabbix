@@ -26,6 +26,8 @@
 #include "valuecache.h"
 #include "proxy.h"
 
+#include "../vmware/vmware.h"
+
 extern unsigned char	daemon_type;
 
 /******************************************************************************
@@ -508,6 +510,55 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			goto notsupported;
 
 		SET_UI64_RESULT(result, proxy_get_history_count());
+	}
+	else if (0 == strcmp(tmp, "vmware"))
+	{
+		zbx_vmware_stats_t	stats;
+
+		if (FAIL == zbx_vmware_get_statistics(&stats))
+		{
+			error = zbx_dsprintf(error, "No \"%s\" processes started",
+					get_process_type_string(ZBX_PROCESS_TYPE_VMWARE));
+			goto notsupported;
+		}
+
+		if (3 < nparams)
+			goto notsupported;
+
+		if (0 != get_param(params, 2, tmp, sizeof(tmp)))
+			goto notsupported;
+
+		if (0 != get_param(params, 3, tmp1, sizeof(tmp1)))
+			*tmp1 = '\0';
+
+		if (0 == strcmp(tmp, "buffer"))
+		{
+			if (0 == strcmp(tmp1, "free"))
+			{
+				SET_UI64_RESULT(result, stats.memory_total - stats.memory_used);
+			}
+			else if (0 == strcmp(tmp1, "pfree"))
+			{
+				SET_DBL_RESULT(result, (double)(stats.memory_total - stats.memory_used) /
+						stats.memory_total * 100);
+			}
+			else if (0 == strcmp(tmp1, "total"))
+			{
+				SET_UI64_RESULT(result, stats.memory_total);
+			}
+			else if (0 == strcmp(tmp1, "used"))
+			{
+				SET_UI64_RESULT(result, stats.memory_used);
+			}
+			else if (0 == strcmp(tmp1, "pused"))
+			{
+				SET_DBL_RESULT(result, (double)stats.memory_used / stats.memory_total * 100);
+			}
+			else
+				goto notsupported;
+		}
+		else
+			goto notsupported;
 	}
 	else
 		goto notsupported;
