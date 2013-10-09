@@ -1234,10 +1234,10 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 				for (current_ai = ai; NULL != current_ai; current_ai = current_ai->ai_next)
 				{
 					if (SUCCEED == zbx_ip_cmp(current_ai, name))
-						{
-							freeaddrinfo(ai);
-							return SUCCEED;
-						}
+					{
+						freeaddrinfo(ai);
+						return SUCCEED;
+					}
 				}
 				freeaddrinfo(ai);
 			}
