@@ -29,8 +29,12 @@
  *
  * See zabbix_sender.h header file for API specifications.
  *
- * This utility can be built in Microsoft Windows build
+ * This utility can be built in Microsoft Windows 32 bit build
  * environment with the following command: nmake /f Makefile
+ *
+ * To run this utility ensure that zabbix_sender.dll is
+ * available (either in current directory or in windows/system
+ * directories or in a directory defined in PATH variable)
  */
 
 int main(int argc, char *argv[])
