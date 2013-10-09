@@ -29,7 +29,6 @@ require_once dirname(__FILE__).'/include/js.inc.php';
 require_once dirname(__FILE__).'/include/discovery.inc.php';
 
 $srctbl = get_request('srctbl', ''); // source table name
-$showNodes = true; // show or not nodes select
 
 // set page title
 switch ($srctbl) {
@@ -48,12 +47,10 @@ switch ($srctbl) {
 	case 'usrgrp':
 		$page['title'] = _('User groups');
 		$min_user_type = USER_TYPE_ZABBIX_ADMIN;
-		$showNodes = false;
 		break;
 	case 'users':
 		$page['title'] = _('Users');
 		$min_user_type = USER_TYPE_ZABBIX_ADMIN;
-		$showNodes = false;
 		break;
 	case 'items':
 		$page['title'] = _('Items');
@@ -62,7 +59,6 @@ switch ($srctbl) {
 	case 'prototypes':
 		$page['title'] = _('Prototypes');
 		$min_user_type = USER_TYPE_ZABBIX_ADMIN;
-		$showNodes = false;
 		break;
 	case 'help_items':
 		$page['title'] = _('Standard items');
@@ -273,6 +269,20 @@ elseif (get_request('numeric')) {
 	$value_types = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
 }
 
+// choose nodes
+// if an LLD rule is selected, use its node
+if (hasRequest('parent_discoveryid')) {
+	$nodeId = id2nodeid(getRequest('parent_discoveryid'));
+}
+// if a host is selected, use its node
+elseif (hasRequest('only_hostid')) {
+	$nodeId = id2nodeid(getRequest('only_hostid'));
+}
+// if nothing specific is selected, use the chosen node or fall back to the local node
+else {
+	$nodeId = get_request('nodeid', get_current_nodeid(false));
+}
+
 clearCookies(true);
 
 function get_window_opener($frame, $field, $value) {
@@ -459,9 +469,7 @@ for ($i = 1; $i <= $srcfldCount; $i++) {
 /*
  * Nodes
  */
-if (ZBX_DISTRIBUTED && $showNodes) {
-	$isNodeSelected = false;
-
+if (ZBX_DISTRIBUTED) {
 	$nodeComboBox = new CComboBox('nodeid', $nodeId, 'submit()');
 
 	$dbNodes = DBselect(
@@ -471,17 +479,10 @@ if (ZBX_DISTRIBUTED && $showNodes) {
 	);
 	while ($dbNode = DBfetch($dbNodes)) {
 		$nodeComboBox->addItem($dbNode['nodeid'], $dbNode['name']);
-
-		if (bccomp($nodeId , $dbNode['nodeid']) == 0) {
-			$isNodeSelected = true;
-		}
 	}
 
-	if (!$isNodeSelected) {
-		$nodeId = get_current_nodeid();
-	}
-
-	if (isset($onlyHostid)) {
+	// disable node selection if we show objects from only one host or LLD rule
+	if (hasRequest('only_hostid') || hasRequest('parent_discoveryid')) {
 		$nodeComboBox->setEnabled('disabled');
 	}
 
