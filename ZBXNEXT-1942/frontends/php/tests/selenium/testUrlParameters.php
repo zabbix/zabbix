@@ -1152,12 +1152,12 @@ class testUrlParameters extends CWebTest {
 
 		switch ($zbx_data['expected']) {
 			case LINK_GOOD:
-				$this->checkTitle($zbx_data['title']);
+				$this->zbxTestCheckTitle($zbx_data['title']);
 				$this->zbxTestTextPresent($zbx_data['text']);
 				break;
 
 			case LINK_BAD:
-				$this->checkTitle($zbx_data['title']);
+				$this->zbxTestCheckTitle($zbx_data['title']);
 				foreach ($zbx_data['errors'] as $msg) {
 					$this->zbxTestTextPresent($msg);
 				}

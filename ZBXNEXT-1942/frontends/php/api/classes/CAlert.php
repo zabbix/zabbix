@@ -143,8 +143,8 @@ class CAlert extends CZBXAPI {
 
 		$sqlParts['from']['e'] = 'events e';
 		$sqlParts['where']['ae'] = 'a.eventid=e.eventid';
-		$sqlParts['where'][] = 'e.source='.$options['eventsource'];
-		$sqlParts['where'][] = 'e.object='.$options['eventobject'];
+		$sqlParts['where'][] = 'e.source='.zbx_dbstr($options['eventsource']);
+		$sqlParts['where'][] = 'e.object='.zbx_dbstr($options['eventobject']);
 
 		// groupids
 		if (!is_null($options['groupids'])) {
@@ -263,12 +263,12 @@ class CAlert extends CZBXAPI {
 
 		// time_from
 		if (!is_null($options['time_from'])) {
-			$sqlParts['where'][] = 'a.clock>'.$options['time_from'];
+			$sqlParts['where'][] = 'a.clock>'.zbx_dbstr($options['time_from']);
 		}
 
 		// time_till
 		if (!is_null($options['time_till'])) {
-			$sqlParts['where'][] = 'a.clock<'.$options['time_till'];
+			$sqlParts['where'][] = 'a.clock<'.zbx_dbstr($options['time_till']);
 		}
 
 		// limit
@@ -396,8 +396,8 @@ class CAlert extends CZBXAPI {
 						' AND a.eventid=e.eventid'.
 						' AND e.objectid=f.triggerid'.
 						' AND f.itemid=i.itemid'.
-						' AND e.object='.$options['eventobject'].
-						' AND e.source='.$options['eventsource']
+						' AND e.object='.zbx_dbstr($options['eventobject']).
+						' AND e.source='.zbx_dbstr($options['eventsource'])
 				);
 			}
 			// item and LLD rule events
@@ -408,8 +408,8 @@ class CAlert extends CZBXAPI {
 						' WHERE '.dbConditionInt('a.alertid', $alertIds).
 						' AND a.eventid=e.eventid'.
 						' AND e.objectid=i.itemid'.
-						' AND e.object='.$options['eventobject'].
-						' AND e.source='.$options['eventsource']
+						' AND e.object='.zbx_dbstr($options['eventobject']).
+						' AND e.source='.zbx_dbstr($options['eventsource'])
 				);
 			}
 

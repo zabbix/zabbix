@@ -29,7 +29,7 @@ class testPageEvents extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestDropdownSelectWait('hostid', 'all');
 
-		$this->checkTitle('Latest events');
+		$this->zbxTestCheckTitle('Latest events \[refreshed every 30 sec\]');
 		$this->zbxTestTextPresent('HISTORY OF EVENTS');
 		$this->zbxTestTextPresent('Group');
 		$this->zbxTestTextPresent('Host');
@@ -50,7 +50,7 @@ class testPageEvents extends CWebTest {
 
 		$this->zbxTestDropdownSelectWait('source', 'Discovery');
 
-		$this->checkTitle('Latest events');
+		$this->zbxTestCheckTitle('Latest events \[refreshed every 30 sec\]');
 		$this->zbxTestTextPresent('HISTORY OF EVENTS');
 		$this->zbxTestTextPresent('Source');
 		$this->zbxTestTextPresent('Filter');
@@ -64,25 +64,18 @@ class testPageEvents extends CWebTest {
 		}
 	}
 
-	public function testPageEvents_Triggers_Sorting() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-// Check that no real host or template names displayed
 	public function testPageEvents_Triggers_NoHostNames() {
 		$this->zbxTestLogin('events.php');
 		$this->zbxTestDropdownSelectWait('source', 'Trigger');
-		$this->checkTitle('Latest events');
+		$this->zbxTestCheckTitle('Latest events \[refreshed every 30 sec\]');
 
 		$this->checkNoRealHostnames();
 	}
 
-// Check that no real host or template names displayed
 	public function testPageEvents_Discovery_NoHostNames() {
 		$this->zbxTestLogin('events.php');
 		$this->zbxTestDropdownSelectWait('source', 'Discovery');
-		$this->checkTitle('Latest events');
+		$this->zbxTestCheckTitle('Latest events \[refreshed every 30 sec\]');
 
 		$this->checkNoRealHostnames();
 	}

@@ -113,10 +113,10 @@ if (!empty($data['alias'])) {
 	$sqlWhere['alias'] = ' AND u.alias='.zbx_dbstr($data['alias']);
 }
 if ($data['action'] > -1) {
-	$sqlWhere['action'] = ' AND a.action='.$data['action'];
+	$sqlWhere['action'] = ' AND a.action='.zbx_dbstr($data['action']);
 }
 if ($data['resourcetype'] > -1) {
-	$sqlWhere['resourcetype'] = ' AND a.resourcetype='.$data['resourcetype'];
+	$sqlWhere['resourcetype'] = ' AND a.resourcetype='.zbx_dbstr($data['resourcetype']);
 }
 $sqlWhere['from'] = ' AND a.clock>'.$from;
 $sqlWhere['till'] = ' AND a.clock<'.$till;

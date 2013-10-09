@@ -127,7 +127,7 @@ class testGeneric extends CWebTest {
 	*/
 	public function testGeneric_Pages($a, $b) {
 		$this->zbxTestLogin($a);
-		$this->checkTitle($b);
+		$this->zbxTestCheckTitle($b);
 		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestCheckMandatoryStrings();
 	}

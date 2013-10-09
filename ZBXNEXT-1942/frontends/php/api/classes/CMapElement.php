@@ -162,7 +162,7 @@ abstract class CMapElement extends CZBXAPI {
 		$dbElements = DBselect(
 			'SELECT se.elementid,se.elementtype'.
 			' FROM sysmaps_elements se'.
-			' WHERE se.sysmapid='.$elementId.
+			' WHERE se.sysmapid='.zbx_dbstr($elementId).
 				' AND se.elementtype='.SYSMAP_ELEMENT_TYPE_MAP
 		);
 		while ($element = DBfetch($dbElements)) {

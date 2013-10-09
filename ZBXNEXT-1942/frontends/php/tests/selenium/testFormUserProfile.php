@@ -28,7 +28,7 @@ class testFormUserProfile extends CWebTest {
 
 		$this->zbxTestLogin('profile.php');
 
-		$this->checkTitle('User profile');
+		$this->zbxTestCheckTitle('User profile');
 
 		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent('Copyright');
@@ -88,7 +88,7 @@ class testFormUserProfile extends CWebTest {
 
 		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent('ERROR: Password should not be empty');
-		$this->checkTitle('User profile');
+		$this->zbxTestCheckTitle('User profile');
 
 		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
 	}
@@ -105,7 +105,7 @@ class testFormUserProfile extends CWebTest {
 
 		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent('ERROR: Cannot update user. Both passwords must be equal.');
-		$this->checkTitle('User profile');
+		$this->zbxTestCheckTitle('User profile');
 
 		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
 	}
@@ -126,27 +126,4 @@ class testFormUserProfile extends CWebTest {
 		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
 	}
 
-	public function testFormProfile_GlobalMessagingEnable() {
-// TODO
-		$this->markTestIncomplete();
-/*
-		$this->zbxTestLogin('profile.php');
-		$this->click('messages[enabled]');
-		// we wait for the first element after messaging checkbox to appear
-		$this->waitForVisible('timeout_row');
-		// and then check that the remaining elements are there as well
-		$this->zbxTestTextPresent('Play sound');
-		$this->zbxTestTextPresent('Trigger severity');
-		$this->zbxTestTextPresent('Recovery');
-		$this->zbxTestTextPresent('Not classified');
-		$this->zbxTestTextPresent('Information');
-		$this->zbxTestTextPresent('Warning');
-		$this->zbxTestTextPresent('Average');
-		$this->zbxTestTextPresent('High');
-		$this->zbxTestTextPresent('Disaster');
-		// should also save profile & revisit to check that it's still the same
-		// probably also should check in the db saved data
-		// and maybe individually toggle priority checkboxes and check in the db...
-*/
-	}
 }
