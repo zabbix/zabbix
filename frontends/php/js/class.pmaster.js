@@ -409,19 +409,20 @@ var CDoll = Class.create(CDebug,{
 				update: function(e, ui) {
 					// prevent duplicate save requests when moving a widget from one column to another
 					if (!ui.sender) {
-						// save widget positions
-						var positions = {};
+						var widgetPositions = {};
+
 						jQuery('.column').each(function(colNum, column) {
-							positions[colNum] = {};
-							jQuery(column).find('.widget').each(function(rowNum, widget) {
-								positions[colNum][rowNum] = widget.id;
+							widgetPositions[colNum] = {};
+
+							jQuery('.widget', column).each(function(rowNum, widget) {
+								widgetPositions[colNum][rowNum] = widget.id;
 							});
 						});
 
 						send_params({
-							'favaction': 'sort',
-							'favobj' : 'hat',
-							'favdata': Object.toJSON(positions)
+							favaction: 'sort',
+							favobj : 'hat',
+							favdata: Object.toJSON(widgetPositions)
 						});
 					}
 				}
