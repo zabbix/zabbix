@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-25 00:33+0300\n"
+"POT-Creation-Date: 2013-10-08 22:31+0300\n"
 "PO-Revision-Date: 2013-04-04 11:00+0200\n"
 "Last-Translator: Sébastien <sebastien@tiramiseb.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -21,11 +21,11 @@ msgstr ""
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
 msgstr "\"%s\" doit être entre 1970.01.01 et 2038.01.18."
 
-#: include/profiles.inc.php:286
+#: include/profiles.inc.php:285
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
 msgstr "\"Afficher les déclencheurs OK\" doit être \"0\" ou un entier positif."
 
-#: include/profiles.inc.php:291
+#: include/profiles.inc.php:290
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
 msgstr "\"Les déclencheurs clignotent au changement d'état\"doit être \"0\" ou un entier positif."
 
@@ -204,7 +204,7 @@ msgstr "SLA acceptable"
 msgid "Access denied!"
 msgstr "Accès refusé !"
 
-#: api/classes/CUser.php:916
+#: api/classes/CUser.php:917
 #, php-format
 msgid "Account is blocked for %s seconds"
 msgstr "Compte bloqué pendant %s secondes"
@@ -1534,7 +1534,7 @@ msgstr "Impossible de supprimer des déclencheurs créés par la découverte de 
 msgid "Cannot delete user"
 msgstr "Impossible de supprimer l'utilisateur"
 
-#: api/classes/CUser.php:786
+#: api/classes/CUser.php:787
 msgid "Cannot delete user media."
 msgstr "Impossible de supprimer le média utilisateur."
 
@@ -1684,7 +1684,7 @@ msgstr[1] "Impossible d'importer le modèle \"%2$s\" : les modèles liés \"%3$s
 msgid "Cannot include view file \"%s\"."
 msgstr "Impossible d'inclure le fichier de vue \"%s\"."
 
-#: api/classes/CUser.php:815
+#: api/classes/CUser.php:816
 msgid "Cannot insert user media."
 msgstr "Impossible d'ajouter le média utilisateur."
 
@@ -1692,7 +1692,7 @@ msgstr "Impossible d'ajouter le média utilisateur."
 msgid "Cannot link template"
 msgstr "Impossible de lier le modèle"
 
-#: api/classes/CUser.php:880
+#: api/classes/CUser.php:881
 msgid "Cannot logout."
 msgstr "Impossible de se déconnecter."
 
@@ -2003,7 +2003,7 @@ msgstr "Impossible de mettre à jour le déclencheur"
 msgid "Cannot update user"
 msgstr "Impossible de mettre à jour l'utilisateur"
 
-#: api/classes/CUser.php:807
+#: api/classes/CUser.php:808
 msgid "Cannot update user media."
 msgstr "Impossible de mettre à jour le média utilisateur."
 
@@ -2197,7 +2197,7 @@ msgstr "Couleur"
 msgid "Colour (OK)"
 msgstr "Couleur (OK)"
 
-#: include/profiles.inc.php:279
+#: include/profiles.inc.php:278
 msgid "Colour is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "Couleur incorrecte : code couleur hexadécimal attendu (6 caractères)."
 
@@ -2525,7 +2525,7 @@ msgstr "Copier"
 msgid "Copy selected to ..."
 msgstr "Copier les éléments sélectionnés sur ..."
 
-#: api/classes/CUser.php:985
+#: api/classes/CUser.php:986
 #, php-format
 msgid "Correct login \"%s\"."
 msgstr "Connexion correcte \"%s\"."
@@ -2903,7 +2903,7 @@ msgstr "Orange foncé"
 msgid "Darken"
 msgstr "Assombrir"
 
-#: dashboard.php:24 include/menu.inc.php:33 include/profiles.inc.php:353
+#: dashboard.php:24 include/menu.inc.php:33 include/profiles.inc.php:352
 msgid "Dashboard"
 msgstr "Tableau de bord"
 
@@ -3938,7 +3938,7 @@ msgstr "Nom de carte dupliqué pour la carte \"%s\"."
 msgid "Duplicate script name \"%s\"."
 msgstr "Nom de script \"%s\" dupliqué."
 
-#: include/profiles.inc.php:311
+#: include/profiles.inc.php:310
 #, php-format
 msgid "Duplicate severity name \"%s\"."
 msgstr "Nom de sévérité \"%s\" dupliqué."
@@ -5927,7 +5927,7 @@ msgstr "Arguments incorrects passés à la méthode."
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Valeur de calcul de SLA incorrect pour le service \"%1$s\"."
 
-#: include/nodes.inc.php:267 include/nodes.inc.php:309
+#: include/nodes.inc.php:267 include/nodes.inc.php:308
 msgid "Incorrect characters used for Node name."
 msgstr "Caractères incorrects dans le nom du Nœud."
 
@@ -6016,7 +6016,7 @@ msgstr "ID d'hôte incorrect \"%s\" pour un élément d'écran."
 msgid "Incorrect host group ID \"%s\" provided for screen element."
 msgstr "ID de groupe d'hôtes incorrect \"%s\" pour un élément d'écran."
 
-#: include/profiles.inc.php:258
+#: include/profiles.inc.php:257
 msgid "Incorrect host group."
 msgstr "Groupe d'hôtes incorrect."
 
@@ -6128,7 +6128,7 @@ msgstr "Hauteur de carte incorrecte pour la carte \"%s\"."
 msgid "Incorrect map width value for map \"%s\"."
 msgstr "Largeur de carte incorrecte pour la carte \"%s\"."
 
-#: include/nodes.inc.php:287
+#: include/nodes.inc.php:286
 msgid "Incorrect node type."
 msgstr "Type de nœud incorrect."
 
@@ -6312,7 +6312,7 @@ msgstr "Donnée utilisateur incorrecte dans \"get_accessible_groups_by_user\"."
 msgid "Incorrect user data in \"get_accessible_nodes_by_user\"."
 msgstr "Donnée utilisateur incorrecte dans \"get_accessible_nodes_by_user\"."
 
-#: include/profiles.inc.php:246
+#: include/profiles.inc.php:245
 msgid "Incorrect user group."
 msgstr "Groupe d'utilisateurs incorrect."
 
@@ -6341,7 +6341,7 @@ msgstr "Valeur \"NULL\" incorrecte pour le champ non nul \"%1$s\"."
 msgid "Incorrect value for setMessage(): \"%s\"."
 msgstr "Valeur incorrecte pour setMessage() : \"%s\"."
 
-#: include/profiles.inc.php:240
+#: include/profiles.inc.php:239
 msgid "Incorrect working time."
 msgstr "Heures ouvrées incorrectes."
 
@@ -6377,7 +6377,7 @@ msgstr "Insertion"
 msgid "Insert macro"
 msgstr "Insérer une macro"
 
-#: include/menu.inc.php:279 include/profiles.inc.php:228 setup.php:25
+#: include/menu.inc.php:279 include/profiles.inc.php:227 setup.php:25
 msgid "Installation"
 msgstr "Installation"
 
@@ -7184,7 +7184,7 @@ msgstr "Connexion"
 msgid "Login as Guest"
 msgstr "Connexion en tant qu'Invité"
 
-#: api/classes/CUser.php:977
+#: api/classes/CUser.php:978
 #, php-format
 msgid "Login failed \"%s\"."
 msgstr "Connexion échouée \"%s\"."
@@ -7193,8 +7193,8 @@ msgstr "Connexion échouée \"%s\"."
 msgid "Login name or password is incorrect"
 msgstr "Nom ou mot de passe incorrect"
 
-#: api/classes/CUser.php:845 api/classes/CUser.php:863
-#: api/classes/CUser.php:910
+#: api/classes/CUser.php:846 api/classes/CUser.php:864
+#: api/classes/CUser.php:911
 msgid "Login name or password is incorrect."
 msgstr "Nom ou mot de passe incorrect."
 
@@ -8424,7 +8424,7 @@ msgstr "Aucune permission pour la carte \"%1$s\"."
 msgid "No permissions for screen \"%1$s\"."
 msgstr "Aucune permission pour l'écran \"%1$s\"."
 
-#: api/classes/CUser.php:924 api/classes/CUser.php:1034
+#: api/classes/CUser.php:925 api/classes/CUser.php:1035
 msgid "No permissions for system access."
 msgstr "Aucune permission pour l'accès au système."
 
@@ -8624,7 +8624,7 @@ msgstr "Nœud supprimé"
 msgid "Node updated"
 msgstr "Nœud mis à jour"
 
-#: include/nodes.inc.php:292
+#: include/nodes.inc.php:291
 msgid "Node with same ID already exists."
 msgstr "Un nœud avec le même identifiant existe déjà."
 
@@ -8718,7 +8718,7 @@ msgstr "Notes"
 msgid "Nothing"
 msgstr "Rien"
 
-#: include/profiles.inc.php:331
+#: include/profiles.inc.php:330
 msgid "Nothing to do."
 msgstr "Rien à faire."
 
@@ -8963,15 +8963,15 @@ msgstr "Seuls les super administrateurs peuvent mettre à jour les correspondanc
 msgid "Only Super Admins can update user groups."
 msgstr "Seuls les super administrateurs peuvent mettre à jour les groupes d'utilisateurs."
 
-#: api/classes/CUser.php:684
+#: api/classes/CUser.php:685
 msgid "Only Zabbix Admins can add user media."
 msgstr "Seuls les administrateurs Zabbix peuvent ajouter des médias utilisateurs."
 
-#: api/classes/CUser.php:752
+#: api/classes/CUser.php:753
 msgid "Only Zabbix Admins can change user media."
 msgstr "Seuls les administrateurs Zabbix peuvent changer les médias utilisateurs."
 
-#: api/classes/CUser.php:722
+#: api/classes/CUser.php:723
 msgid "Only Zabbix Admins can remove user media."
 msgstr "Seuls les administrateurs Zabbix peuvent supprimer des médias utilisateurs."
 
@@ -9495,7 +9495,7 @@ msgstr "Jouer"
 msgid "Play sound"
 msgstr "Jouer un son"
 
-#: include/nodes.inc.php:329
+#: include/nodes.inc.php:328
 msgid "Please be aware that database still contains data related to the deleted node."
 msgstr "Veuillez noter que la base de données contient toujours des données liées au nœud effacé."
 
@@ -9631,7 +9631,7 @@ msgstr "Fichier de clé privée"
 msgid "Privilege level"
 msgstr "Niveau de privilège"
 
-#: api/classes/CUser.php:835
+#: api/classes/CUser.php:836
 msgid "Probably php-ldap module is missing."
 msgstr "Le module php-ldap est probablement manquant."
 
@@ -10923,7 +10923,7 @@ msgstr "Services"
 msgid "Services form a circular dependency."
 msgstr "Les services forment une dépendance circulaire."
 
-#: api/classes/CUser.php:1028
+#: api/classes/CUser.php:1029
 msgid "Session terminated, re-login, please."
 msgstr "Session terminée, veuillez vous reconnecter."
 
@@ -10941,7 +10941,7 @@ msgstr "Sévérité"
 msgid "Severity (descending)"
 msgstr "Sévérité (descendante)"
 
-#: include/profiles.inc.php:306
+#: include/profiles.inc.php:305
 msgid "Severity name cannot be empty."
 msgstr "Le nom de la sévérité ne peut pas ête vide."
 
@@ -12238,11 +12238,11 @@ msgstr "UTF-8"
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukrainien (uk_UA)"
 
-#: include/nodes.inc.php:321
+#: include/nodes.inc.php:320
 msgid "Unable to remove local node."
 msgstr "Impossible de supprimer le nœud local."
 
-#: include/profiles.inc.php:229
+#: include/profiles.inc.php:228
 msgid "Unable to select configuration."
 msgstr "Impossible de sélectionner la configuration."
 
