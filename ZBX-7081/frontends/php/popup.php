@@ -469,7 +469,9 @@ for ($i = 1; $i <= $srcfldCount; $i++) {
 /*
  * Nodes
  */
-if (ZBX_DISTRIBUTED) {
+// only display the node dropdown for DM setups
+// don't display it for help item pop ups
+if (ZBX_DISTRIBUTED && $srctbl != 'help_items') {
 	$nodeComboBox = new CComboBox('nodeid', $nodeId, 'submit()');
 
 	$dbNodes = DBselect(
