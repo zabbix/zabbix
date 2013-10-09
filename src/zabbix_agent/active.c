@@ -472,7 +472,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
  *                                                                            *
  * Purpose: Check whether JSON response is SUCCEED                            *
  *                                                                            *
- * Parameters: result SUCCEED or FAIL                                         *
+ * Parameters: JSON response from Zabbix trapper                              *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
@@ -502,7 +502,7 @@ static int	check_response(char *response)
 		ret = FAIL;
 
 	if (SUCCEED == ret && SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, info, sizeof(info)))
-		zabbix_log(LOG_LEVEL_DEBUG, "Info from server: %s", info);
+		zabbix_log(LOG_LEVEL_DEBUG, "info from server: '%s'", info);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
