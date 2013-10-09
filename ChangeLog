@@ -1,6 +1,7 @@
 Changes for 2.1.7
 
 New features:
+..FG...... [ZBX-2008] added support of Windows Eventing 6.0 (igors, Ivo)
 ...G...... [ZBXNEXT-1942] added zabbix sender dynamic link library for windows (wiper)
 ...G...... [ZBXNEXT-935] zabbix sender exit status now better reflects the operation result - success:0, partial success:2, failure:1 (asaveljevs, wiper)
 .......PS. [ZBXNEXT-935] improved readability of server response to sender/agent data (asaveljevs, wiper)
