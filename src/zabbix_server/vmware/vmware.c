@@ -50,6 +50,7 @@
 
 /* external variables */
 extern unsigned char	process_type;
+extern int		process_num;
 
 extern char		*CONFIG_FILE;
 extern int		CONFIG_VMWARE_FREQUENCY;
@@ -2674,14 +2675,18 @@ void	zbx_vmware_destroy(void)
 void	main_vmware_loop(void)
 {
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-	int			i, now, state, next_update;
+	int			i, now, state, next_update, updated_services, removed_services;
 	zbx_vmware_service_t	*service = NULL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In main_vmware_loop()");
+	double	sec;
 
 	for (;;)
 	{
-		zbx_setproctitle("%s [querying vmware services]", get_process_type_string(process_type));
+		zbx_setproctitle("%s #%d [querying VMware services]", get_process_type_string(process_type),
+				process_num);
+
+		sec = zbx_time();
+		updated_services = 0;
+		removed_services = 0;
 
 		do
 		{
@@ -2704,6 +2709,7 @@ void	main_vmware_loop(void)
 					zbx_vector_ptr_remove(&vmware->services, i);
 					vmware_service_shared_free(service);
 					state = ZBX_VMWARE_SERVICE_REMOVE;
+					removed_services++;
 					break;
 				}
 
@@ -2711,6 +2717,7 @@ void	main_vmware_loop(void)
 				{
 					service->state |= ZBX_VMWARE_STATE_UPDATING;
 					state = ZBX_VMWARE_SERVICE_UPDATE;
+					updated_services++;
 					break;
 				}
 
@@ -2725,11 +2732,15 @@ void	main_vmware_loop(void)
 
 		} while (ZBX_VMWARE_SERVICE_IDLE != state);
 
-		if (next_update > (now = time(NULL)))
-		{
-			zbx_setproctitle("%s [sleeping]", get_process_type_string(process_type));
+		sec = zbx_time() - sec;
+		now = time(NULL);
+
+		zbx_setproctitle("%s #%d [updated %d, removed %d VMware services in " ZBX_FS_DBL " sec, idle %d sec]",
+				get_process_type_string(process_type), process_num, updated_services, removed_services,
+				sec, 0 < next_update - now ? next_update - now : 0);
+
+		if (next_update > now)
 			zbx_sleep_loop(next_update - now);
-		}
 	}
 #endif
 }
