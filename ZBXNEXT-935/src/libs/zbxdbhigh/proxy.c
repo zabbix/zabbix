@@ -562,7 +562,7 @@ static int	compare_nth_field(const ZBX_FIELD **fields, const char *rec_data, int
 	int		i = *last_n, null_in_db = 0;
 	const char	*p = rec_data + *last_pos, *field_start = NULL;
 
-	while (n >= i)		/* find starting position of the n-th field */
+	do	/* find starting position of the n-th field */
 	{
 		field_start = p;
 		while ('\0' != *p++)
@@ -591,11 +591,12 @@ static int	compare_nth_field(const ZBX_FIELD **fields, const char *rec_data, int
 			}
 		}
 	}
+	while (n >= i);
 
 	*last_n = i;				/* Preserve number of field and its start position */
 	*last_pos = (size_t)(p - rec_data);	/* across calls to avoid searching from start. */
 
-	if (0 == is_null)	/* value in JSON is not NULL*/
+	if (0 == is_null)	/* value in JSON is not NULL */
 	{
 		if (0 == null_in_db)
 			return strcmp(field_start, str);

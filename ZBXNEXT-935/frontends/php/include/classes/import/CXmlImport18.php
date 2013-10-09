@@ -1056,11 +1056,12 @@ class CXmlImport18 {
 
 				// host inventory
 				if ($old_version_input) {
+					if (!isset($host_db['inventory'])) {
+						$host_db['inventory'] = array();
+					}
+
 					$inventoryNode = $xpath->query('host_profile/*', $host);
 					if ($inventoryNode->length > 0) {
-						if (!isset($host_db['inventory'])) {
-							$host_db['inventory'] = array();
-						}
 						foreach ($inventoryNode as $field) {
 							$newInventoryName = self::mapInventoryName($field->nodeName);
 							$host_db['inventory'][$newInventoryName] = $field->nodeValue;
@@ -1069,9 +1070,6 @@ class CXmlImport18 {
 
 					$inventoryNodeExt = $xpath->query('host_profiles_ext/*', $host);
 					if ($inventoryNodeExt->length > 0) {
-						if (!isset($host_db['inventory'])) {
-							$host_db['inventory'] = array();
-						}
 						foreach ($inventoryNodeExt as $field) {
 							$newInventoryName = self::mapInventoryName($field->nodeName);
 							if (isset($host_db['inventory'][$newInventoryName]) && $field->nodeValue !== '') {
@@ -1150,12 +1148,14 @@ class CXmlImport18 {
 						$templateLinkage[] = $current_template;
 					}
 
-					$result = API::Template()->massAdd(array(
-						'hosts' => array('hostid' => $current_hostid),
-						'templates' => $templateLinkage
-					));
-					if (!$result) {
-						throw new Exception();
+					if ($templateLinkage) {
+						$result = API::Template()->massAdd(array(
+							'hosts' => array('hostid' => $current_hostid),
+							'templates' => $templateLinkage
+						));
+						if (!$result) {
+							throw new Exception();
+						}
 					}
 				}
 // }}} TEMPLATES

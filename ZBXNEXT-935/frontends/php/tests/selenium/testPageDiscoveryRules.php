@@ -40,7 +40,7 @@ class testPageDiscoveryRules extends CWebTest {
 	public function testPageDiscoveryRules_CheckLayout($data) {
 		$this->zbxTestLogin('host_discovery.php?&hostid='.$data['hostid']);
 		// We are in the list of drules
-		$this->checkTitle('Configuration of discovery rules');
+		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
 		$this->zbxTestTextPresent('Discovery rules');
 		$this->zbxTestTextPresent('Displaying');
@@ -102,7 +102,7 @@ class testPageDiscoveryRules extends CWebTest {
 		$this->chooseOkOnNextConfirmation();
 
 		$this->zbxTestLogin('host_discovery.php?&hostid='.$data['hostid']);
-		$this->checkTitle('Configuration of discovery rules');
+		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckboxSelect('g_hostdruleid_'.$itemid);
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
 		sleep(1);
@@ -110,7 +110,7 @@ class testPageDiscoveryRules extends CWebTest {
 
 		$this->getConfirmation();
 
-		$this->checkTitle('Configuration of discovery rules');
+		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rules deleted');
 		$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
 
@@ -158,7 +158,7 @@ class testPageDiscoveryRules extends CWebTest {
 		$hostids = zbx_objectValues($hostids, 'hostids');
 
 		$this->zbxTestLogin('host_discovery.php?&hostid='.$rule['hostid']);
-		$this->checkTitle('Configuration of discovery rules');
+		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckboxSelect('all_items');
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
 		sleep(1);
@@ -166,7 +166,7 @@ class testPageDiscoveryRules extends CWebTest {
 
 		$this->getConfirmation();
 
-		$this->checkTitle('Configuration of discovery rules');
+		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rules deleted');
 		$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
 
