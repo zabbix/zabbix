@@ -25,6 +25,9 @@ require_once dirname(__FILE__).'/../../include/defines.inc.php';
 require_once dirname(__FILE__).'/../../include/hosts.inc.php';
 require_once dirname(__FILE__).'/dbfunc.php';
 
+define('TEST_GOOD', 0);
+define('TEST_BAD', 1);
+
 class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 
 	protected $captureScreenshotOnFailure = TRUE;
@@ -128,11 +131,17 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 
 	public function zbxTestCheckFatalErrors() {
 		foreach ($this->failIfExists as $str) {
-			$this->assertTextNotPresent($str, "Chuck Norris: I do not expect string '$str' here.");
+			$this->assertTextNotPresent($str, 'Chuck Norris: I do not expect string "'.$str.'" here.');
 		}
 	}
 
-	public function checkTitle($title) {
+	public function zbxTestCheckMandatoryStrings() {
+		foreach ($this->failIfNotExists as $str) {
+			$this->assertTextPresent($str, 'Chuck Norris: I expect string "'.$str.'" here.');
+		}
+	}
+
+	public function zbxTestCheckTitle($title) {
 		global $ZBX_SERVER_NAME;
 
 		if ($ZBX_SERVER_NAME !== '') {
@@ -169,6 +178,11 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		$this->wait();
 	}
 
+	public function zbxTestHrefClickWait($href) {
+		$this->click("xpath=//a[contains(@href,'$href')]");
+		$this->wait();
+	}
+
 	public function href_click($a) {
 		$this->click("xpath=//a[contains(@href,'$a')]");
 	}
@@ -191,7 +205,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 
 	public function zbxTestDropdownHasOptions($id, array $strings) {
 		foreach ($strings as $string) {
-			$this->assertSelectHasOption($id, $string);
+			$this->assertElementPresent("//select[@name='".$id."']//option[text()='".$string."']");
 		}
 	}
 
@@ -207,6 +221,16 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		if ($selected != $str) {
 			$this->wait();
 		}
+	}
+
+	/**
+	 * Assert that the element with the given name contains a specific text.
+	 *
+	 * @param $name
+	 * @param $text
+	 */
+	public function zbxTestDrowpdownAssertSelected($name, $text) {
+		$this->assertElementPresent("//select[@name='".$name."']//option[text()='".$text."' and @selected]");
 	}
 
 	public function wait() {
@@ -268,16 +292,6 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		$this->assertElementPresent("//*[@name='".$name."' and text()='".$text."']");
 	}
 
-	/**
-	 * Assert that the element with the given name contains a specific text.
-	 *
-	 * @param $name
-	 * @param $text
-	 */
-	public function assertDrowpdownValueText($name, $text) {
-		$this->assertElementPresent("//select[@name='".$name."']//option[text()='".$text."' and @selected]");
-	}
-
 	public function templateLink($host, $template) {
 		// $template = "Template_Linux";
 		// $host = "Zabbix server";
@@ -308,7 +322,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		$this->selectWindow();
 		$this->wait();
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of hosts');
+		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host updated');
 		// no entities should be deleted, they all should be updated
 		$this->zbxTestTextNotPresent('deleted');

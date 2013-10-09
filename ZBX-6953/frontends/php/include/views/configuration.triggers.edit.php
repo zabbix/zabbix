@@ -294,7 +294,6 @@ if (empty($this->data['parent_discoveryid'])) {
 					'return PopUp("popup.php?'.
 						'srctbl=triggers'.
 						'&srcfld1=triggerid'.
-						'&monitored_hosts=1'.
 						'&reference=deptrigger'.
 						'&multiselect=1'.
 						'&with_triggers=1", 1000, 700);',

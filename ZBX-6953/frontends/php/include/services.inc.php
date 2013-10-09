@@ -43,7 +43,7 @@ function get_service_status($serviceid, $algorithm, $triggerid = null, $status =
 		$result = DBselect(
 			'SELECT s.status'.
 			' FROM services s,services_links l'.
-			' WHERE l.serviceupid='.$serviceid.
+			' WHERE l.serviceupid='.zbx_dbstr($serviceid).
 				' AND s.serviceid=l.servicedownid'.
 			' ORDER BY s.status'.$sort_order
 		);
@@ -78,7 +78,7 @@ function get_service_childs($serviceid, $soft = 0) {
 	$result = DBselect(
 		'SELECT sl.servicedownid'.
 		' FROM services_links sl'.
-		' WHERE sl.serviceupid='.$serviceid.
+		' WHERE sl.serviceupid='.zbx_dbstr($serviceid).
 			($soft ? '' : ' AND sl.soft=0')
 	);
 	while ($row = DBfetch($result)) {
@@ -355,7 +355,7 @@ function update_services_rec($serviceid) {
 		'SELECT l.serviceupid,s.algorithm'.
 		' FROM services_links l,services s'.
 		' WHERE s.serviceid=l.serviceupid'.
-			' AND l.servicedownid='.$serviceid
+			' AND l.servicedownid='.zbx_dbstr($serviceid)
 	);
 	while ($row = DBfetch($result)) {
 		$serviceupid = $row['serviceupid'];
@@ -364,7 +364,7 @@ function update_services_rec($serviceid) {
 		if ($algorithm == SERVICE_ALGORITHM_MAX || $algorithm == SERVICE_ALGORITHM_MIN) {
 			$status = get_service_status($serviceupid, $algorithm);
 			add_service_alarm($serviceupid, $status, time());
-			DBexecute('UPDATE services SET status='.$status.' WHERE serviceid='.$serviceupid);
+			DBexecute('UPDATE services SET status='.$status.' WHERE serviceid='.zbx_dbstr($serviceupid));
 		}
 		elseif ($algorithm != SERVICE_ALGORITHM_NONE) {
 			error(_('Unknown calculation algorithm of service status').SPACE.'['.$algorithm.']');
@@ -372,7 +372,7 @@ function update_services_rec($serviceid) {
 		}
 	}
 
-	$result = DBselect('SELECT sl.serviceupid FROM services_links sl WHERE sl.servicedownid='.$serviceid);
+	$result = DBselect('SELECT sl.serviceupid FROM services_links sl WHERE sl.servicedownid='.zbx_dbstr($serviceid));
 	while ($row = DBfetch($result)) {
 		$serviceupid = $row['serviceupid'];
 		update_services_rec($serviceupid); // ATTENTION: recursion!!!
@@ -387,9 +387,9 @@ function update_services_rec($serviceid) {
  * @param $status
  */
 function update_services($triggerid, $status) {
-	DBexecute('UPDATE services SET status='.$status.' WHERE triggerid='.$triggerid);
+	DBexecute('UPDATE services SET status='.$status.' WHERE triggerid='.zbx_dbstr($triggerid));
 
-	$result = DBselect('SELECT s.serviceid FROM services s WHERE s.triggerid='.$triggerid);
+	$result = DBselect('SELECT s.serviceid FROM services s WHERE s.triggerid='.zbx_dbstr($triggerid));
 	while ($row = DBfetch($result)) {
 		add_service_alarm($row['serviceid'], $status, time());
 		update_services_rec($row['serviceid']);
@@ -442,7 +442,7 @@ function latest_service_alarm($serviceid, $status) {
 	$result = DBselect(
 		'SELECT sa.servicealarmid,sa.value'.
 		' FROM service_alarms sa'.
-		' WHERE sa.serviceid='.$serviceid.
+		' WHERE sa.serviceid='.zbx_dbstr($serviceid).
 		' ORDER BY sa.servicealarmid DESC', 1
 	);
 	$row = DBfetch($result);
@@ -458,7 +458,7 @@ function add_service_alarm($serviceid, $status, $clock) {
 	if (latest_service_alarm($serviceid, $status)) {
 		return true;
 	}
-	return DBexecute('INSERT INTO service_alarms (servicealarmid,serviceid,clock,value) VALUES ('.get_dbid('service_alarms', 'servicealarmid').','.$serviceid.','.$clock.','.$status.')');
+	return DBexecute('INSERT INTO service_alarms (servicealarmid,serviceid,clock,value) VALUES ('.get_dbid('service_alarms', 'servicealarmid').','.zbx_dbstr($serviceid).','.zbx_dbstr($clock).','.zbx_dbstr($status).')');
 }
 
 /**

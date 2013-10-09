@@ -33,6 +33,7 @@
 #define ZBX_IPC_COLLECTOR_DISKSTAT	'm'
 #define ZBX_IPC_SELFMON_ID		'S'
 #define ZBX_IPC_VALUECACHE_ID		'v'
+#define ZBX_IPC_VMWARE_ID		'w'
 
 key_t	zbx_ftok(char *path, int id);
 int	zbx_shmget(key_t key, size_t size);
