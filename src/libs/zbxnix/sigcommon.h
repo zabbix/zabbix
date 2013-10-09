@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef SIGCOMMON_H_
-#define SIGCOMMON_H_
+#ifndef ZABBIX_SIGCOMMON_H
+#define ZABBIX_SIGCOMMON_H
 
 extern int	sig_parent_pid;
 extern int	sig_exiting;
@@ -33,4 +33,4 @@ extern int	sig_exiting;
 		if (NULL == context)												\
 			zabbix_log(LOG_LEVEL_DEBUG, "received [signal:%d(%s)] with NULL context", sig, get_signal_name(sig))
 
-#endif	/* SIGCOMMON_H_ */
+#endif	/* ZABBIX_SIGCOMMON_H */
