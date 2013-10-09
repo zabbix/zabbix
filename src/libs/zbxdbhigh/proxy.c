@@ -562,7 +562,7 @@ static int	compare_nth_field(const ZBX_FIELD **fields, const char *rec_data, int
 	int		i = *last_n, null_in_db = 0;
 	const char	*p = rec_data + *last_pos, *field_start = NULL;
 
-	while (n >= i)		/* find starting position of the n-th field */
+	do	/* find starting position of the n-th field */
 	{
 		field_start = p;
 		while ('\0' != *p++)
@@ -591,11 +591,12 @@ static int	compare_nth_field(const ZBX_FIELD **fields, const char *rec_data, int
 			}
 		}
 	}
+	while (n >= i);
 
 	*last_n = i;				/* Preserve number of field and its start position */
 	*last_pos = (size_t)(p - rec_data);	/* across calls to avoid searching from start. */
 
-	if (0 == is_null)	/* value in JSON is not NULL*/
+	if (0 == is_null)	/* value in JSON is not NULL */
 	{
 		if (0 == null_in_db)
 			return strcmp(field_start, str);
@@ -2159,7 +2160,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 
 static void	clean_agent_values(AGENT_VALUE *values, size_t values_num)
 {
-	int	i;
+	size_t	i;
 
 	for (i = 0; i < values_num; i++)
 	{
@@ -2313,7 +2314,7 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 
 	if (NULL != info)
 	{
-		zbx_snprintf(info, max_info_size, "Processed %d Failed %d Total %d Seconds spent " ZBX_FS_DBL,
+		zbx_snprintf(info, max_info_size, "processed: %d; failed: %d; total: %d; seconds spent: " ZBX_FS_DBL,
 				processed, total_num - processed, total_num, zbx_time() - sec);
 	}
 

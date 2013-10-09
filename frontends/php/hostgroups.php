@@ -331,7 +331,7 @@ else {
 		'limit' => $config['search_limit'] + 1
 	));
 
-	$data['paging'] = getPagingLine($groups);
+	$data['paging'] = getPagingLine($groups, array('groupid'));
 
 	// get hosts and templates count
 	$data['groupCounts'] = API::HostGroup()->get(array(

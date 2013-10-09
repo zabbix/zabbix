@@ -291,6 +291,9 @@ src/zabbix_server/trapper/Makefile.in
 src/zabbix_server/utils/.deps
 src/zabbix_server/utils/Makefile
 src/zabbix_server/utils/Makefile.in
+src/zabbix_server/vmware/.deps
+src/zabbix_server/vmware/Makefile
+src/zabbix_server/vmware/Makefile.in
 src/zabbix_server/watchdog/.deps
 src/zabbix_server/watchdog/Makefile
 src/zabbix_server/watchdog/Makefile.in

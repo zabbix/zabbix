@@ -541,7 +541,7 @@ else {
 		}
 	}
 	order_result($data['maintenances'], $sortfield, $sortorder);
-	$data['paging'] = getPagingLine($data['maintenances']);
+	$data['paging'] = getPagingLine($data['maintenances'], array('maintenanceid'));
 	$data['pageFilter'] = $pageFilter;
 
 	// nodes

@@ -154,7 +154,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 		$dbHosts = DBselect(
 			'SELECT h.hostid,h.status'.
 			' FROM hosts h'.
-			' WHERE h.proxy_hostid='.$hostId.
+			' WHERE h.proxy_hostid='.zbx_dbstr($hostId).
 				andDbNode('h.hostid')
 		);
 		while ($dbHost = DBfetch($dbHosts)) {
@@ -257,7 +257,7 @@ else {
 
 	// sorting & paging
 	order_result($data['proxies'], $sortfield, getPageSortOrder());
-	$data['paging'] = getPagingLine($data['proxies']);
+	$data['paging'] = getPagingLine($data['proxies'], array('proxyid'));
 
 	// nodes
 	foreach ($data['proxies'] as &$proxy) {

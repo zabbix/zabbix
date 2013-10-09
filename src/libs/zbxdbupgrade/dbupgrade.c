@@ -2087,6 +2087,47 @@ static int	DBpatch_2010176(void)
 	return ret;
 }
 
+static int	DBpatch_2010177(void)
+{
+	const char	*rf_rate_strings[] = {"syssum", "hoststat", "stszbx", "lastiss", "webovr", "dscvry", NULL};
+	int		i;
+
+	for (i = 0; NULL != rf_rate_strings[i]; i++)
+	{
+		if (ZBX_DB_OK > DBexecute(
+				"update profiles"
+				" set idx='web.dashboard.widget.%s.rf_rate'"
+				" where idx='web.dashboard.rf_rate.hat_%s'",
+				rf_rate_strings[i], rf_rate_strings[i]))
+		{
+			return FAIL;
+		}
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_2010178(void)
+{
+	const char	*state_strings[] = {"favgrph", "favscr", "favmap", "syssum", "hoststat", "stszbx", "lastiss",
+			"webovr", "dscvry", NULL};
+	int		i;
+
+	for (i = 0; NULL != state_strings[i]; i++)
+	{
+		if (ZBX_DB_OK > DBexecute(
+				"update profiles"
+				" set idx='web.dashboard.widget.%s.state'"
+				" where idx='web.dashboard.hats.hat_%s.state'",
+				state_strings[i], state_strings[i]))
+		{
+			return FAIL;
+		}
+	}
+
+	return SUCCEED;
+}
+
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 #define DBPATCH_END()					{NULL}};
@@ -2312,6 +2353,8 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010174, 0, 1)
 	DBPATCH_ADD(2010175, 0, 1)
 	DBPATCH_ADD(2010176, 0, 1)
+	DBPATCH_ADD(2010177, 0, 1)
+	DBPATCH_ADD(2010178, 0, 1)
 
 	DBPATCH_END()
 
