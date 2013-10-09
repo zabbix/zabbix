@@ -29,7 +29,6 @@ require_once dirname(__FILE__).'/include/js.inc.php';
 $page['title'] = _('Configuration of users');
 $page['file'] = 'users.php';
 $page['hist_arg'] = array();
-$page['scripts'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -393,7 +392,7 @@ else {
 
 	// sorting & apging
 	order_result($data['users'], getPageSortField('alias'), getPageSortOrder());
-	$data['paging'] = getPagingLine($data['users']);
+	$data['paging'] = getPagingLine($data['users'], array('userid'));
 
 	foreach ($data['users'] as $key => $user) {
 		// nodes
