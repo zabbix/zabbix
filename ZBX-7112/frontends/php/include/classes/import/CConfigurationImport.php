@@ -870,7 +870,10 @@ class CConfigurationImport {
 			}
 
 			foreach ($graph['gitems'] as &$gitem) {
-				$gitemHostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host']);
+				if (!$gitemHostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host'])) {
+					throw new Exception(_s('Host or template "%1$s" does not exist is graph item "%2$s".',
+						$gitem['item']['host'], $gitem['item']['key']));
+				}
 
 				$gitem['itemid'] = $this->referencer->resolveItem($gitemHostId, $gitem['item']['key']);
 
