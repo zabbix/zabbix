@@ -81,7 +81,7 @@ function DBconnect(&$error) {
 				elseif (false !== ($pgsql_version = pg_parameter_status('server_version'))) {
 					if ((int) $pgsql_version >= 9) {
 						// change the output format for values of type bytea from hex (the default) to escape
-						DBexecute('set bytea_output = escape');
+						DBexecute('SET bytea_output = escape');
 					}
 				}
 
@@ -134,8 +134,8 @@ function DBconnect(&$error) {
 						'db2_attr_case' => DB2_CASE_LOWER,
 					);
 					db2_set_option($DB['DB'], $options, 1);
-					if (isset($DB['SCHEMA']) && ($DB['SCHEMA'] != '')) {
-						DBexecute("SET CURRENT SCHEMA='".$DB['SCHEMA']."'");
+					if (isset($DB['SCHEMA']) && $DB['SCHEMA'] != '') {
+						DBexecute('SET CURRENT SCHEMA='.zbx_dbstr($DB['SCHEMA']));
 					}
 				}
 
@@ -261,10 +261,10 @@ function DBstart() {
 
 	switch ($DB['TYPE']) {
 		case ZBX_DB_MYSQL:
-			$result = DBexecute('begin');
+			$result = DBexecute('BEGIN');
 			break;
 		case ZBX_DB_POSTGRESQL:
-			$result = DBexecute('begin');
+			$result = DBexecute('BEGIN');
 			break;
 		case ZBX_DB_ORACLE:
 			$result = true;
@@ -274,7 +274,7 @@ function DBstart() {
 			break;
 		case ZBX_DB_SQLITE3:
 			lock_sqlite3_access();
-			$result = DBexecute('begin');
+			$result = DBexecute('BEGIN');
 			break;
 	}
 	return $result;
@@ -322,10 +322,10 @@ function DBcommit() {
 
 	switch ($DB['TYPE']) {
 		case ZBX_DB_MYSQL:
-			$result = DBexecute('commit');
+			$result = DBexecute('COMMIT');
 			break;
 		case ZBX_DB_POSTGRESQL:
-			$result = DBexecute('commit');
+			$result = DBexecute('COMMIT');
 			break;
 		case ZBX_DB_ORACLE:
 			$result = oci_commit($DB['DB']);
@@ -337,7 +337,7 @@ function DBcommit() {
 			}
 			break;
 		case ZBX_DB_SQLITE3:
-			$result = DBexecute('commit');
+			$result = DBexecute('COMMIT');
 			unlock_sqlite3_access();
 			break;
 	}
@@ -351,10 +351,10 @@ function DBrollback() {
 
 	switch ($DB['TYPE']) {
 		case ZBX_DB_MYSQL:
-			$result = DBexecute('rollback');
+			$result = DBexecute('ROLLBACK');
 			break;
 		case ZBX_DB_POSTGRESQL:
-			$result = DBexecute('rollback');
+			$result = DBexecute('ROLLBACK');
 			break;
 		case ZBX_DB_ORACLE:
 			$result = oci_rollback($DB['DB']);
@@ -364,7 +364,7 @@ function DBrollback() {
 			db2_autocommit($DB['DB'], DB2_AUTOCOMMIT_ON);
 			break;
 		case ZBX_DB_SQLITE3:
-			$result = DBexecute('rollback');
+			$result = DBexecute('ROLLBACK');
 			unlock_sqlite3_access();
 			break;
 	}
@@ -607,7 +607,7 @@ function DBfetch($cursor, $convertNulls = true) {
 
 	$result = false;
 
-	if (!isset($DB['DB']) || empty($DB['DB'])) {
+	if (!isset($DB['DB']) || empty($DB['DB']) || is_bool($cursor)) {
 		return $result;
 	}
 

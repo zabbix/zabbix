@@ -138,10 +138,19 @@ if (isset($_REQUEST['sysmapid'])) {
 /*
  * Display
  */
-$data = array('sysmap' => $sysmap);
+$data = array(
+	'sysmap' => $sysmap,
+	'iconList' => array(),
+	'defaultAutoIconId' => null,
+	'defaultIconId' => null,
+	'defaultIconName' => null
+);
 
 // get selements
 add_elementNames($data['sysmap']['selements']);
+
+$data['sysmap']['selements'] = zbx_toHash($data['sysmap']['selements'], 'selementid');
+$data['sysmap']['links'] = zbx_toHash($data['sysmap']['links'], 'linkid');
 
 // get links
 foreach ($data['sysmap']['links'] as &$link) {
@@ -172,12 +181,8 @@ if ($data['sysmap']['iconmapid']) {
 	$iconMap = reset($iconMap);
 	$data['defaultAutoIconId'] = $iconMap['default_iconid'];
 }
-else {
-	$data['defaultAutoIconId'] = null;
-}
 
 // get icon list
-$data['iconList'] = array();
 $icons = DBselect(
 	'SELECT i.imageid,i.name'.
 	' FROM images i'.
@@ -185,17 +190,20 @@ $icons = DBselect(
 		andDbNode('i.imageid')
 );
 while ($icon = DBfetch($icons)) {
-	$data['iconList'][] = array('imageid' => $icon['imageid'], 'name' => $icon['name']);
+	$data['iconList'][] = array(
+		'imageid' => $icon['imageid'],
+		'name' => $icon['name']
+	);
+
 	if ($icon['name'] == MAP_DEFAULT_ICON || !isset($data['defaultIconId'])) {
 		$data['defaultIconId'] = $icon['imageid'];
 		$data['defaultIconName'] = $icon['name'];
 	}
 }
-CArrayHelper::sort($data['iconList'], array('name'));
-$data['iconList'] = array_values($data['iconList']);
-
-$data['sysmap']['selements'] = zbx_toHash($data['sysmap']['selements'], 'selementid');
-$data['sysmap']['links'] = zbx_toHash($data['sysmap']['links'], 'linkid');
+if ($data['iconList']) {
+	CArrayHelper::sort($data['iconList'], array('name'));
+	$data['iconList'] = array_values($data['iconList']);
+}
 
 // render view
 $sysmapView = new CView('configuration.sysmap.constructor', $data);

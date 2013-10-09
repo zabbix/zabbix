@@ -146,7 +146,7 @@ class testClicks extends CWebTest {
 		foreach ($this->failIfNotExists as $str) {
 			$this->zbxTestTextPresent($str);
 		}
-		$this->checkTitle($title);
+		$this->zbxTestCheckTitle($title);
 		$this->zbxTestTextPresent($expected);
 		$this->zbxTestLogout();
 	}

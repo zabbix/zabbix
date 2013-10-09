@@ -38,8 +38,41 @@ function jsRedirect($url, $timeout = null) {
 	insert_js($script);
 }
 
+/**
+ * Check if request exist.
+ *
+ * @param string	$name
+ *
+ * @return bool
+ */
+function hasRequest($name) {
+	return isset($_REQUEST[$name]);
+}
+
+/**
+ * Check request, if exist request - return request value, else return default value.
+ *
+ * @param string	$name
+ * @param mixed		$def
+ *
+ * @return mixed
+ */
+function getRequest($name, $def = null) {
+	return hasRequest($name) ? $_REQUEST[$name] : $def;
+}
+
+/**
+ * Check request, if exist request - return request value, else return default value.
+ *
+ * @deprecated function, use getRequest() instead
+ *
+ * @param string	$name
+ * @param mixed		$def
+ *
+ * @return mixed
+ */
 function get_request($name, $def = null) {
-	return isset($_REQUEST[$name]) ? $_REQUEST[$name] : $def;
+	return getRequest($name, $def);
 }
 
 function countRequest($str = null) {
@@ -1553,7 +1586,7 @@ function zbx_array_mintersect($keys, $array) {
 
 function zbx_str2links($text) {
 	$result = array();
-	if (empty($text)) {
+	if (zbx_empty($text)) {
 		return $result;
 	}
 	preg_match_all('#https?://[^\n\t\r ]+#u', $text, $matches, PREG_OFFSET_CAPTURE);
@@ -1729,8 +1762,16 @@ function getPageNumber() {
 	return $pageNumber;
 }
 
-/************* PAGING *************/
-function getPagingLine(&$items, array $urlParams = array()) {
+/**
+ * Returns paging line.
+ *
+ * @param array $items				list of items
+ * @param array $removeUrlParams	params to remove from URL
+ * @param array $urlParams			params to add in URL
+ *
+ * @return CTable
+ */
+function getPagingLine(&$items, array $removeUrlParams = array(), array $urlParams = array()) {
 	global $page;
 
 	$config = select_config();
@@ -1788,7 +1829,10 @@ function getPagingLine(&$items, array $urlParams = array()) {
 			}
 		}
 
-		$url->removeArgument('go');
+		$removeUrlParams = array_merge($removeUrlParams, array('go', 'form', 'delete', 'cancel'));
+		foreach ($removeUrlParams as $param) {
+			$url->removeArgument($param);
+		}
 
 		if ($startPage > 1) {
 			$url->setArgument('page', 1);
@@ -2610,21 +2654,21 @@ function clearCookies($clear = false, $id = null) {
  *
  * @param array  $host						host data
  * @param string $host['hostid']			host id
- * @param array  $host['inventory']			host inventory (optional)
  * @param array  $host['screens']			host screens (optional)
  * @param array  $scripts					host scripts (optional)
  * @param string $scripts[]['name']			script name
  * @param string $scripts[]['scriptid']		script id
  * @param string $scripts[]['confirmation']	confirmation text
+ * @param bool   $hasGoTo					"Go to" block in popup
  *
  * @return array
  */
-function getMenuPopupHost(array $host, array $scripts = null) {
+function getMenuPopupHost(array $host, array $scripts = null, $hasGoTo = true) {
 	$data = array(
 		'type' => 'host',
 		'hostid' => $host['hostid'],
-		'hasInventory' => (isset($host['inventory']) && $host['inventory']),
-		'hasScreens' => (isset($host['screens']) && $host['screens'])
+		'hasScreens' => (isset($host['screens']) && $host['screens']),
+		'hasGoTo' => $hasGoTo
 	);
 
 	if ($scripts) {

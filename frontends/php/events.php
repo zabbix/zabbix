@@ -662,7 +662,6 @@ else {
 				'output' => array('name', 'hostid', 'status'),
 				'hostids' => $hostids,
 				'selectScreens' => API_OUTPUT_COUNT,
-				'selectInventory' => array('hostid'),
 				'preservekeys' => true
 			));
 

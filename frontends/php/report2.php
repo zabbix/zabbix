@@ -262,7 +262,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 
 		$sqlCondition = empty($_REQUEST['filter_hostid'])
 			? ' AND '.dbConditionInt('h.hostid', $templateIds)
-			: ' AND h.hostid='.$_REQUEST['filter_hostid'];
+			: ' AND h.hostid='.zbx_dbstr($_REQUEST['filter_hostid']);
 
 		$sql =
 			'SELECT DISTINCT t.triggerid,t.description,h.name'.
