@@ -501,77 +501,86 @@ void	zbx_remove_chars(register char *str, const char *charlist)
  ******************************************************************************/
 void	compress_signs(char *str)
 {
-	int	i,j,len;
+	int	i, j, len, loop = 1;
 	char	cur, next, prev;
-	int	loop = 1;
 
-	/* Compress '--' '+-' '++' '-+' */
-	while(loop == 1)
+	/* compress '--' '+-' '++' '-+' */
+	while (1 == loop)
 	{
-		loop=0;
-		for(i=0;str[i]!='\0';i++)
+		loop = 0;
+
+		for (i = 0; '\0' != str[i]; i++)
 		{
-			cur=str[i];
-			next=str[i+1];
-			if(	(cur=='-' && next=='-') ||
-				(cur=='+' && next=='+'))
+			cur = str[i];
+			next = str[i + 1];
+
+			if (('-' == cur && '-' == next) || ('+' == cur && '+' == next))
 			{
-				str[i]='+';
-				for(j=i+1;str[j]!='\0';j++)	str[j]=str[j+1];
-				loop=1;
+				str[i] = '+';
+				for (j = i + 1; '\0' != str[j]; j++)
+					str[j] = str[j + 1];
+				loop = 1;
 			}
-			if(	(cur=='-' && next=='+') ||
-				(cur=='+' && next=='-'))
+
+			if (('-' == cur && '+' == next) || ('+' == cur && '-' == next))
 			{
-				str[i]='-';
-				for(j=i+1;str[j]!='\0';j++)	str[j]=str[j+1];
-				loop=1;
+				str[i] = '-';
+				for (j = i + 1; '\0' != str[j]; j++)
+					str[j] = str[j + 1];
+				loop = 1;
 			}
 		}
 	}
 
-	/* Remove '-', '+' where needed, Convert -123 to +D123 */
-	for(i=0;str[i]!='\0';i++)
+	/* remove '-', '+' where needed, convert -123 to +N123 */
+	for (i = 0; '\0' != str[i]; i++)
 	{
-		cur=str[i];
-		next=str[i+1];
-		if(cur == '+')
+		cur = str[i];
+
+		if ('+' == cur)
 		{
-			/* Plus is the first sign in the expression */
-			if(i==0)
+			/* plus is the first sign in the expression */
+			if (0 == i)
 			{
-				for(j=i;str[j]!='\0';j++)	str[j]=str[j+1];
+				for (j = i; '\0' != str[j]; j++)
+					str[j] = str[j + 1];
 			}
 			else
 			{
-				prev=str[i-1];
-				if(!isdigit(prev) && prev!='.')
+				prev = str[i - 1];
+
+				if (0 == isdigit(prev) && '.' != prev)
 				{
-					for(j=i;str[j]!='\0';j++)	str[j]=str[j+1];
+					for (j = i; '\0' != str[j]; j++)
+						str[j] = str[j + 1];
 				}
 			}
 		}
-		else if(cur == '-')
+		else if ('-' == cur)
 		{
-			/* Minus is the first sign in the expression */
-			if(i==0)
+			/* minus is the first sign in the expression */
+			if (0 == i)
 			{
-				str[i]='N';
+				str[i] = 'N';
 			}
 			else
 			{
-				prev=str[i-1];
-				if(!isdigit(prev) && prev!='.')
+				prev = str[i - 1];
+
+				if (0 == isdigit(prev) && '.' != prev)
 				{
-					str[i]='N';
+					str[i] = 'N';
 				}
 				else
 				{
 					len = (int)strlen(str);
-					for(j=len;j>i;j--)	str[j]=str[j-1];
-					str[i]='+';
-					str[i+1]='N';
-					str[len+1]='\0';
+
+					for (j = len; j > i; j--)
+						str[j] = str[j - 1];
+
+					str[i] = '+';
+					str[i + 1] = 'N';
+					str[len + 1] = '\0';
 					i++;
 				}
 			}
@@ -611,9 +620,9 @@ void	compress_signs(char *str)
  ******************************************************************************/
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz)
 {
-	char *d = dst;
-	const char *s = src;
-	size_t n = siz;
+	char		*d = dst;
+	const char	*s = src;
+	size_t		n = siz;
 
 	/* copy as many bytes as will fit */
 	if (0 != n)
@@ -654,29 +663,33 @@ size_t	zbx_strlcpy(char *dst, const char *src, size_t siz)
  ******************************************************************************/
 size_t	zbx_strlcat(char *dst, const char *src, size_t siz)
 {
-	char *d = dst;
-	const char *s = src;
-	size_t n = siz;
-	size_t dlen;
+	char		*d = dst;
+	const char	*s = src;
+	size_t		n = siz;
+	size_t		dlen;
 
-	/* Find the end of dst and adjust bytes left but don't go past end */
-	while (n-- != 0 && *d != '\0')
+	/* find the end of dst and adjust bytes left but don't go past end */
+	while (0 != n-- && '\0' != *d)
 		d++;
 	dlen = d - dst;
 	n = siz - dlen;
 
-	if (n == 0)
-		return(dlen + strlen(s));
-	while (*s != '\0') {
-		if (n != 1) {
+	if (0 == n)
+		return dlen + strlen(s);
+
+	while ('\0' != *s)
+	{
+		if (1 != n)
+		{
 			*d++ = *s;
 			n--;
 		}
 		s++;
 	}
+
 	*d = '\0';
 
-	return(dlen + (s - src));	/* count does not include NUL */
+	return dlen + (s - src);	/* count does not include NUL */
 }
 
 /******************************************************************************

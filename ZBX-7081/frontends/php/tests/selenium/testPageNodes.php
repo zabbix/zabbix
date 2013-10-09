@@ -31,7 +31,7 @@ class testPageNodes extends CWebTest {
 	public function testPageNodes_StandaloneSetup() {
 
 		$this->zbxTestLogin('nodes.php');
-		$this->checkTitle('Configuration of nodes');
+		$this->zbxTestCheckTitle('Configuration of nodes');
 		$this->zbxTestTextPresent('DM');
 		$this->zbxTestTextPresent('CONFIGURATION OF NODES');
 		if (0 == DBcount("select * from nodes order by nodeid")) {
@@ -45,7 +45,7 @@ class testPageNodes extends CWebTest {
 	public function testPageNodes_CheckLayout($node) {
 
 		$this->zbxTestLogin('nodes.php');
-		$this->checkTitle('Configuration of nodes');
+		$this->zbxTestCheckTitle('Configuration of nodes');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF NODES', 'NODES', 'ID', 'Name', 'IP:Port'));
 		$this->assertElementPresent('config');
 		$this->assertElementPresent('form');

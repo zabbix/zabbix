@@ -33,7 +33,7 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 		$this->zbxTestLogin('adm.workingtime.php');
 		$this->assertElementPresent('configDropDown');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Working time');
-		$this->checkTitle('Configuration of working time');
+		$this->zbxTestCheckTitle('Configuration of working time');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF WORKING TIME', 'Working time', 'Working time'));
 		$this->assertElementPresent('work_period');
 		$this->assertAttribute("//input[@id='work_period']/@maxlength", '255');
@@ -47,7 +47,7 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 		$this->zbxTestLogin('adm.workingtime.php');
 		$this->assertElementPresent('configDropDown');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Working time');
-		$this->checkTitle('Configuration of working time');
+		$this->zbxTestCheckTitle('Configuration of working time');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF WORKING TIME', 'Working time'));
 
 		$sqlHash = 'SELECT configid,refresh_unsupported,alert_usrgrpid,'.
@@ -76,7 +76,7 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 
 		// checking also for the following error: ERROR: Configuration was not updated | Incorrect working time: "1-8,09:00-25:00".
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Working time');
-		$this->checkTitle('Configuration of working time');
+		$this->zbxTestCheckTitle('Configuration of working time');
 		$this->zbxTestTextPresent('CONFIGURATION OF WORKING TIME');
 		$this->zbxTestTextPresent('Working time');
 		$this->input_type('work_period', '1-8,09:00-25:00');
@@ -85,7 +85,7 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 
 		// trying to save empty work period
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Working time');
-		$this->checkTitle('Configuration of working time');
+		$this->zbxTestCheckTitle('Configuration of working time');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF WORKING TIME', 'Working time'));
 		$this->input_type('work_period', '');
 		$this->zbxTestClickWait('save');

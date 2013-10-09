@@ -37,7 +37,7 @@ class testPageAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestLogin('adm.images.php');
 		$this->assertElementPresent('configDropDown');
 		$this->assertElementPresent('form');
-		$this->checkTitle('Configuration of images');
+		$this->zbxTestCheckTitle('Configuration of images');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF IMAGES', 'Images', 'Type'));
 		$this->assertElementPresent('imagetype');
 		$this->assertElementPresent("//select[@id='imagetype']/option[text()='Icon']");
@@ -60,7 +60,7 @@ class testPageAdministrationGeneralImages extends CWebTest {
 				$this->assertElementPresent('configDropDown');
 				$this->zbxTestDropdownSelectWait('imagetype', 'Background');
 				$this->assertElementPresent('form');
-				$this->checkTitle('Configuration of Zabbix');
+				$this->zbxTestCheckTitle('Configuration of Zabbix');
 				$this->zbxTestTextPresent(array('CONFIGURATION OF IMAGES', 'Images', 'Type'));
 				$this->assertElementPresent('imagetype');
 				$this->assertElementPresent("//select[@id='imagetype']/option[text()='Icon']");
