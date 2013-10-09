@@ -55,7 +55,8 @@
 #	define ZBX_MUTEX_DISKSTATS	8
 #	define ZBX_MUTEX_SERVICES	9
 #	define ZBX_MUTEX_VALUECACHE	10
-#	define ZBX_MUTEX_COUNT		11
+#	define ZBX_MUTEX_VMWARE		11
+#	define ZBX_MUTEX_COUNT		12
 
 #	define ZBX_MUTEX_MAX_TRIES	20	/* seconds */
 

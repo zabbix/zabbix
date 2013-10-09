@@ -236,7 +236,7 @@ class testFormTriggerPrototype extends CWebTest {
 		$this->zbxTestClickWait('link='.$discoveryRule);
 		$this->zbxTestClickWait('link=Trigger prototypes');
 
-		$this->checkTitle('Configuration of trigger prototypes');
+		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF TRIGGER PROTOTYPES', "Trigger prototypes of ".$discoveryRule));
 
 		if (isset($data['form'])) {
@@ -246,7 +246,7 @@ class testFormTriggerPrototype extends CWebTest {
 			$this->zbxTestClickWait('form');
 		}
 
-		$this->checkTitle('Configuration of trigger prototypes');
+		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGER PROTOTYPES');
 		$this->assertElementPresent("//div[@id='tab_triggersTab' and text()='Trigger prototype']");
 
@@ -437,7 +437,7 @@ class testFormTriggerPrototype extends CWebTest {
 		$this->zbxTestClickWait('link='.$description);
 		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent('Trigger updated');
-		$this->checkTitle('Configuration of trigger prototypes');
+		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF TRIGGER PROTOTYPES', "Trigger prototypes of ".$this->discoveryRule));
 		$this->zbxTestTextPresent("$description");
 
@@ -832,11 +832,11 @@ class testFormTriggerPrototype extends CWebTest {
 			switch ($data['expected']) {
 				case TEST_GOOD:
 					$this->zbxTestTextPresent('Trigger added');
-					$this->checkTitle('Configuration of trigger prototypes');
+					$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 					$this->zbxTestTextPresent(array('CONFIGURATION OF TRIGGER PROTOTYPES', "Trigger prototypes of ".$this->discoveryRule));
 					break;
 				case TEST_BAD:
-					$this->checkTitle('Configuration of trigger prototypes');
+					$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 					$this->zbxTestTextPresent('CONFIGURATION OF TRIGGER PROTOTYPES');
 					$this->assertElementPresent("//div[@id='tab_triggersTab' and text()='Trigger prototype']");
 					foreach ($data['errors'] as $msg) {

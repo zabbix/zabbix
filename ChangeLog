@@ -1,9 +1,17 @@
 Changes for 2.1.7
 
 New features:
+.......PS. [ZBXNEXT-1633] improved VMware virtual machine monitoring performance (wiper)
 ..F....... [ZBX-6911] added functionality to save positions of block on dashboard page in profiles table (Vitalij)
 
 Bug fixes:
+A.F....... [ZBX-6953] fixed Apache server crashing on Windows due to huge memory consumption when using preg_match() function in Configuration > Host > edit (Ivo)
+..F....... [ZBX-7079] fixed undefined index in map configuration page for map without icon mapping (Eduard)
+..F....... [ZBX-7111] fixed host importing from 1.8 to trunk (Eduard)
+..F....... [ZBX-7074] fixed incorrectly parsed trigger expression in trigger wizard (Vitalij)
+..F....... [ZBX-7082] fixed not being able to create dependencies between template triggers (Ivo)
+A.F....... [ZBX-7053] fixed errors when deleting a script linked to action operation and fixed type-specific operation command properties not being reset when changing type (Ivo)
+..F....... [ZBX-7058] fixed repeated global search with same value (Eduard)
 ...GI..PS. [ZBX-7061] fixed warnings produced by clang static analyzer (asaveljevs)
 ..F....... [ZBX-6873] fixed pagination issue after deleting an object through form (Ivo)
 ..F....... [ZBX-7050] fixed output of empty HTML attributes (Ivo)
@@ -459,6 +467,19 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-5142] changed media type field label from 'Description' to 'Name' (Vedmak)
 ....I..... [ZBX-5314] increased size of autoincrement fields for PostgreSQL database (Sasha)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.10rc1
+
+New features:
+A.F....... [ZBX-1357] updated German, Japanese, Italian, Romanian and Slovak translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 2.0.9
+
+2.0.9rc2 was released as 2.0.9 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.0.9rc2
@@ -1868,8 +1889,12 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.19rc1
+
+
 Changes for 1.8.18
 
+1.8.18rc1 was released as 1.8.18 without any changes
 
 Changes for 1.8.18rc1
 

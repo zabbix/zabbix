@@ -493,7 +493,7 @@ class testFormAction extends CWebTest {
 		}
 
 
-		$this->checkTitle('Configuration of actions');
+		$this->zbxTestCheckTitle('Configuration of actions');
 		$this->zbxTestTextPresent(array(
 				'CONFIGURATION OF ACTIONS',
 				'Action', 'Conditions', 'Operations'
@@ -1671,7 +1671,7 @@ class testFormAction extends CWebTest {
 
 		$this->zbxTestClickWait('link='.$name);
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of actions');
+		$this->zbxTestCheckTitle('Configuration of actions');
 		$this->zbxTestTextPresent(array(
 				'Action updated',
 				'CONFIGURATION OF ACTIONS',
@@ -1845,7 +1845,7 @@ class testFormAction extends CWebTest {
 	 */
 	public function testFormAction_SimpleCreate($data) {
 		$this->zbxTestLogin('actionconf.php?form=1&eventsource='.$data['eventsource']);
-		$this->checkTitle('Configuration of actions');
+		$this->zbxTestCheckTitle('Configuration of actions');
 
 		if (isset($data['name'])){
 			$this->input_type('name', $data['name']);
@@ -1959,12 +1959,12 @@ class testFormAction extends CWebTest {
 		switch ($expected) {
 			case ACTION_GOOD:
 				$this->zbxTestTextPresent('Action added');
-				$this->checkTitle('Configuration of actions');
+				$this->zbxTestCheckTitle('Configuration of actions');
 				$this->zbxTestTextPresent('CONFIGURATION OF ACTIONS');
 				break;
 
 			case ACTION_BAD:
-				$this->checkTitle('Configuration of actions');
+				$this->zbxTestCheckTitle('Configuration of actions');
 				$this->zbxTestTextPresent('CONFIGURATION OF ACTIONS');
 				foreach ($data['errors'] as $msg) {
 					$this->zbxTestTextPresent($msg);
@@ -1972,7 +1972,7 @@ class testFormAction extends CWebTest {
 				break;
 			}
 		$this->zbxTestLogin('actionconf.php?form=1&eventsource=0');
-		$this->checkTitle('Configuration of actions');
+		$this->zbxTestCheckTitle('Configuration of actions');
 
 		$this->type("name", "action test");
 		$this->type("def_shortdata", "subject");
