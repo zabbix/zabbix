@@ -199,8 +199,8 @@ out:
 static int	parse_list_of_checks(char *str)
 {
 	const char		*p;
-	char			name[MAX_STRING_LEN], key_orig[MAX_STRING_LEN], expression[MAX_STRING_LEN], tmp[MAX_STRING_LEN],
-				exp_delimiter;
+	char			name[MAX_STRING_LEN], key_orig[MAX_STRING_LEN], expression[MAX_STRING_LEN],
+				tmp[MAX_STRING_LEN], exp_delimiter;
 	int			delay, mtime, expression_type, case_sensitive;
 	zbx_uint64_t		lastlogsize;
 	struct zbx_json_parse	jp;
@@ -315,7 +315,8 @@ static int	parse_list_of_checks(char *str)
 
 			exp_delimiter = tmp[0];
 
-			if (SUCCEED != zbx_json_value_by_name(&jp_row, "case_sensitive", tmp, sizeof(tmp)) || '\0' == *tmp)
+			if (SUCCEED != zbx_json_value_by_name(&jp_row, "case_sensitive", tmp,
+					sizeof(tmp)) || '\0' == *tmp)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve value of tag \"%s\"", "case_sensitive");
 				continue;
@@ -844,8 +845,11 @@ static void	process_active_checks(char *server, unsigned short port)
 			do
 			{
 				/* simple try realization */
-				if (ZBX_COMMAND_WITH_PARAMS != parse_command(active_metrics[i].key, NULL, 0, params, sizeof(params)))
+				if (ZBX_COMMAND_WITH_PARAMS != parse_command(active_metrics[i].key, NULL, 0,
+						params, sizeof(params)))
+				{
 					break;
+				}
 
 				if (6 < num_param(params))
 					break;
@@ -950,8 +954,11 @@ static void	process_active_checks(char *server, unsigned short port)
 			do
 			{
 				/* simple try realization */
-				if (ZBX_COMMAND_WITH_PARAMS != parse_command(active_metrics[i].key, NULL, 0, params, sizeof(params)))
+				if (ZBX_COMMAND_WITH_PARAMS != parse_command(active_metrics[i].key, NULL, 0,
+						params, sizeof(params)))
+				{
 					break;
+				}
 
 				if (6 < num_param(params))
 					break;
@@ -990,8 +997,8 @@ static void	process_active_checks(char *server, unsigned short port)
 				lastlogsize = active_metrics[i].lastlogsize;
 				mtime = active_metrics[i].mtime;
 
-				while (SUCCEED == (ret = process_logrt(filename, &lastlogsize, &mtime, &value, encoding,
-						active_metrics[i].skip_old_data)))
+				while (SUCCEED == (ret = process_logrt(filename, &lastlogsize, &mtime, &value,
+						encoding, active_metrics[i].skip_old_data)))
 				{
 					active_metrics[i].skip_old_data = 0;
 
@@ -1063,8 +1070,11 @@ static void	process_active_checks(char *server, unsigned short port)
 			do
 			{
 				/* simple try realization */
-				if (ZBX_COMMAND_WITH_PARAMS != parse_command(active_metrics[i].key, NULL, 0, params, sizeof(params)))
+				if (ZBX_COMMAND_WITH_PARAMS != parse_command(active_metrics[i].key, NULL, 0,
+						params, sizeof(params)))
+				{
 					break;
+				}
 
 				if (7 < num_param(params))
 					break;
@@ -1119,30 +1129,30 @@ static void	process_active_checks(char *server, unsigned short port)
 					versionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 					GetVersionEx(&versionInfo);
 
-					if (versionInfo.dwMajorVersion >= 6)    /* Windows Vista, Windows 7 or Windows Server 2008 */
+					if (versionInfo.dwMajorVersion >= 6)    /* Windows Vista, 7 or Server 2008 */
 					{
 						switch (severity)
 						{
 							case WINEVENT_LEVEL_LOG_ALWAYS:
 							case WINEVENT_LEVEL_INFO:
 								severity = ITEM_LOGTYPE_INFORMATION;
-								zbx_snprintf(str_severity, sizeof(str_severity), INFORMATION_TYPE);
+								strscpy(str_severity, INFORMATION_TYPE);
 								break;
 							case WINEVENT_LEVEL_WARNING:
 								severity = ITEM_LOGTYPE_WARNING;
-								zbx_snprintf(str_severity, sizeof(str_severity), WARNING_TYPE);
+								strscpy(str_severity, WARNING_TYPE);
 								break;
 							case WINEVENT_LEVEL_ERROR:
 								severity = ITEM_LOGTYPE_ERROR;
-								zbx_snprintf(str_severity, sizeof(str_severity), ERROR_TYPE);
+								strscpy(str_severity, ERROR_TYPE);
 								break;
 							case WINEVENT_LEVEL_CRITICAL:
 								severity = ITEM_LOGTYPE_CRITICAL;
-								zbx_snprintf(str_severity, sizeof(str_severity), CRITICAL_TYPE);
+								strscpy(str_severity, CRITICAL_TYPE);
 								break;
 							case WINEVENT_LEVEL_VERBOSE:
 								severity = ITEM_LOGTYPE_VERBOSE;
-								zbx_snprintf(str_severity, sizeof(str_severity), VERBOSE_TYPE);
+								strscpy(str_severity, VERBOSE_TYPE);
 								break;
 						}
 					}
@@ -1153,23 +1163,23 @@ static void	process_active_checks(char *server, unsigned short port)
 							case EVENTLOG_SUCCESS:
 							case EVENTLOG_INFORMATION_TYPE:
 								severity = ITEM_LOGTYPE_INFORMATION;
-								zbx_snprintf(str_severity, sizeof(str_severity), INFORMATION_TYPE);
+								strscpy(str_severity, INFORMATION_TYPE);
 								break;
 							case EVENTLOG_WARNING_TYPE:
 								severity = ITEM_LOGTYPE_WARNING;
-								zbx_snprintf(str_severity, sizeof(str_severity), WARNING_TYPE);
+								strscpy(str_severity, WARNING_TYPE);
 								break;
 							case EVENTLOG_ERROR_TYPE:
 								severity = ITEM_LOGTYPE_ERROR;
-								zbx_snprintf(str_severity, sizeof(str_severity), ERROR_TYPE);
+								strscpy(str_severity, ERROR_TYPE);
 								break;
 							case EVENTLOG_AUDIT_FAILURE:
 								severity = ITEM_LOGTYPE_FAILURE_AUDIT;
-								zbx_snprintf(str_severity, sizeof(str_severity), AUDIT_FAILURE);
+								strscpy(str_severity, AUDIT_FAILURE);
 								break;
 							case EVENTLOG_AUDIT_SUCCESS:
 								severity = ITEM_LOGTYPE_SUCCESS_AUDIT;
-								zbx_snprintf(str_severity, sizeof(str_severity), AUDIT_SUCCESS);
+								strscpy(str_severity, AUDIT_SUCCESS);
 								break;
 						}
 					}
@@ -1239,7 +1249,8 @@ static void	process_active_checks(char *server, unsigned short port)
 
 			if (NULL != pvalue)
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "for key [%s] received value [%s]", active_metrics[i].key, *pvalue);
+				zabbix_log(LOG_LEVEL_DEBUG, "for key [%s] received value [%s]",
+						active_metrics[i].key, *pvalue);
 				item_value = zbx_strdup(NULL, *pvalue);
 				process_value(server, port, CONFIG_HOSTNAME,
 						active_metrics[i].key_orig, &item_value, NULL,

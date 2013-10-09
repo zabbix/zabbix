@@ -270,8 +270,8 @@ static long	zbx_get_eventlog_message_xpath(LPCTSTR wsource, long which, char **o
 
 		zbx_snprintf_alloc(out_message, &msg_alloc, &msg_offset, "The description for Event ID (%lu) from"
 				" source (%s) cannot be found. Either the component that raises this event is not"
-				" installed on your local computer or the installation is corrupted. You can install or"
-				" repair the component on the local computer.",
+				" installed on your local computer or the installation is corrupted. You can install"
+				" or repair the component on the local computer.",
 				*out_eventid, NULL == *out_source ? "" : *out_source);
 
 		if (EvtVarTypeNull != eventlog_array[5].Type)
@@ -348,7 +348,8 @@ finish:
 }
 
 /* open event logger and return number of records */
-static int    zbx_open_eventlog(LPCTSTR wsource, HANDLE *eventlog_handle, zbx_uint64_t *pNumRecords, zbx_uint64_t *pLatestRecord)
+static int	zbx_open_eventlog(LPCTSTR wsource, HANDLE *eventlog_handle, zbx_uint64_t *pNumRecords,
+		zbx_uint64_t *pLatestRecord)
 {
 	const char	*__function_name = "zbx_open_eventlog";
 	TCHAR		reg_path[MAX_PATH];
@@ -402,8 +403,9 @@ static int	zbx_close_eventlog(HANDLE eventlog_handle)
 }
 
 /* get Nth error from event log. 1 is the first. */
-static int	zbx_get_eventlog_message(LPCTSTR wsource, HANDLE eventlog_handle, long which, char **out_source, char **out_message,
-		unsigned short *out_severity, unsigned long *out_timestamp, unsigned long *out_eventid)
+static int	zbx_get_eventlog_message(LPCTSTR wsource, HANDLE eventlog_handle, long which, char **out_source,
+		char **out_message, unsigned short *out_severity, unsigned long *out_timestamp,
+		unsigned long *out_eventid)
 {
 	const char	*__function_name = "zbx_get_eventlog_message";
 	int		buffer_size = 512;
@@ -472,8 +474,11 @@ retry:
 		if (ERROR_SUCCESS == RegQueryValueEx(hk, TEXT("EventMessageFile"), NULL, &Type, NULL, &szData))
 		{
 			buf = zbx_malloc(buf, szData);
-			if (ERROR_SUCCESS == RegQueryValueEx(hk, TEXT("EventMessageFile"), NULL, &Type, (LPBYTE)buf, &szData))
+			if (ERROR_SUCCESS == RegQueryValueEx(hk, TEXT("EventMessageFile"), NULL, &Type,
+					(LPBYTE)buf, &szData))
+			{
 				pFile = (LPTSTR)buf;
+			}
 		}
 
 		RegCloseKey(hk);
@@ -522,9 +527,10 @@ retry:
 
 	if (SUCCEED != err)
 	{
-		*out_message = zbx_strdcatf(*out_message, "The description for Event ID (%lu) in Source (%s) cannot be found."
-				" The local computer may not have the necessary registry information or message DLL files to"
-				" display messages from a remote computer.", *out_eventid, NULL == *out_source ? "" : *out_source);
+		*out_message = zbx_strdcatf(*out_message, "The description for Event ID (%lu) in Source (%s)"
+				" cannot be found. The local computer may not have the necessary registry"
+				" information or message DLL files to display messages from a remote computer.",
+				*out_eventid, NULL == *out_source ? "" : *out_source);
 		if (pELR->NumStrings)
 			*out_message = zbx_strdcatf(*out_message, " The following information is part of the event: ");
 		for (i = 0; i < pELR->NumStrings && i < MAX_INSERT_STRS; i++)
@@ -549,8 +555,9 @@ out:
 	return ret;
 }
 
-int	process_eventlog(const char *source, zbx_uint64_t *lastlogsize, unsigned long *out_timestamp, char **out_source,
-		unsigned short *out_severity, char **out_message, unsigned long	*out_eventid, unsigned char skip_old_data)
+int	process_eventlog(const char *source, zbx_uint64_t *lastlogsize, unsigned long *out_timestamp,
+		char **out_source, unsigned short *out_severity, char **out_message,
+		unsigned long *out_eventid, unsigned char skip_old_data)
 {
 	const char	*__function_name = "process_eventlog";
 	int		ret = FAIL;
@@ -607,7 +614,8 @@ int	process_eventlog(const char *source, zbx_uint64_t *lastlogsize, unsigned lon
 			(FARPROC)EvtCloseFunc = GetProcAddress(hmod_wevtapi, "EvtClose");
 			(FARPROC)EvtOpenLogFunc = GetProcAddress(hmod_wevtapi, "EvtOpenLog");
 			(FARPROC)EvtGetLogInfoFunc = GetProcAddress(hmod_wevtapi, "EvtGetLogInfo");
-			(FARPROC)EvtOpenPublisherMetadataFunc = GetProcAddress(hmod_wevtapi, "EvtOpenPublisherMetadata");
+			(FARPROC)EvtOpenPublisherMetadataFunc = GetProcAddress(hmod_wevtapi,
+					"EvtOpenPublisherMetadata");
 			(FARPROC)EvtFormatMessageFunc = GetProcAddress(hmod_wevtapi, "EvtFormatMessage");
 
 			if (NULL == EvtQueryFunc ||
@@ -659,7 +667,8 @@ int	process_eventlog(const char *source, zbx_uint64_t *lastlogsize, unsigned lon
 			}
 		ret = SUCCEED;
 	}
-	else if (versionInfo.dwMajorVersion < 6 && SUCCEED == zbx_open_eventlog(wsource, &eventlog_handle, &LastID /* number */, &FirstID /* oldest */))
+	else if (versionInfo.dwMajorVersion < 6 && SUCCEED == zbx_open_eventlog(wsource, &eventlog_handle,
+			&LastID /* number */, &FirstID /* oldest */))
 	{
 		LastID += FirstID;
 
@@ -688,7 +697,8 @@ int	process_eventlog(const char *source, zbx_uint64_t *lastlogsize, unsigned lon
 		ret = SUCCEED;
 	}
 	else
-		zabbix_log(LOG_LEVEL_ERR, "cannot open eventlog '%s': %s", source, strerror_from_system(GetLastError()));
+		zabbix_log(LOG_LEVEL_ERR, "cannot open eventlog '%s': %s", source,
+				strerror_from_system(GetLastError()));
 
 out:
 	zbx_free(wsource);
