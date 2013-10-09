@@ -377,7 +377,7 @@ sub process_field
 			}
 			elsif ($output{"database"} eq "mysql")
 			{
-				$row = sprintf("%-*s auto_increment unique", $szcol4, $row);
+				$row = sprintf("%-*s auto_increment", $szcol4, $row);
 			}
 			elsif ($output{"database"} eq "oracle")
 			{

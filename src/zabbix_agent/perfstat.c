@@ -338,8 +338,8 @@ void	collect_perfstat()
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() counterpath:'%s' old first:%I64d second:%I64d",
 					__function_name, cptr->counterpath,
-					cptr->rawValues[(cptr->olderRawValue + 1) % 2].FirstValue,
-					cptr->rawValues[(cptr->olderRawValue + 1) % 2].SecondValue);
+					cptr->rawValues[(cptr->olderRawValue + 1) & 1].FirstValue,
+					cptr->rawValues[(cptr->olderRawValue + 1) & 1].SecondValue);
 
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() counterpath:'%s' new first:%I64d second:%I64d",
 					__function_name, cptr->counterpath,
@@ -347,15 +347,18 @@ void	collect_perfstat()
 					cptr->rawValues[cptr->olderRawValue].SecondValue);
 		}
 
-		cptr->olderRawValue = (cptr->olderRawValue + 1) % 2;
+		cptr->olderRawValue = (cptr->olderRawValue + 1) & 1;
 
-		pdh_status = PdhCalculateCounterFromRawValue(cptr->handle, PDH_FMT_DOUBLE,
-				&cptr->rawValues[(cptr->olderRawValue + 1) % 2],						/* the new value */
-				(PERF_COUNTER_INITIALIZED < cptr->status ? &cptr->rawValues[cptr->olderRawValue] : NULL),	/* the older value */
+		pdh_status = PdhCalculateCounterFromRawValue(cptr->handle, PDH_FMT_DOUBLE | PDH_FMT_NOCAP100,
+				&cptr->rawValues[(cptr->olderRawValue + 1) & 1],
+				(PERF_COUNTER_INITIALIZED < cptr->status ? &cptr->rawValues[cptr->olderRawValue] : NULL),
 				&value);
 
-		if (ERROR_SUCCESS == pdh_status && PDH_CSTATUS_VALID_DATA != value.CStatus && PDH_CSTATUS_NEW_DATA != value.CStatus)
+		if (ERROR_SUCCESS == pdh_status && PDH_CSTATUS_VALID_DATA != value.CStatus &&
+				PDH_CSTATUS_NEW_DATA != value.CStatus)
+		{
 			pdh_status = value.CStatus;
+		}
 
 		if (PDH_CSTATUS_INVALID_DATA == pdh_status)
 		{

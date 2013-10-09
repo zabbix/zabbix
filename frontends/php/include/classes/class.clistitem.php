@@ -17,19 +17,14 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 class CListItem extends CTag {
 
 	public function __construct($value, $class = null, $id = null) {
 		parent::__construct('li', 'yes');
-
 		$this->addItem($value);
 		$this->addClass($class);
-		if (!empty($id)) {
-			$this->setAttribute('id', $id);
-		}
+		$this->attr('id', $id);
 	}
 }
-?>

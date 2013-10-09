@@ -31,7 +31,7 @@ function DBconnect(&$error) {
 	global $DB;
 
 	if (isset($DB['DB'])) {
-		$error=_('Cannot create another database connection.');
+		$error = _('Cannot create another database connection.');
 		return false;
 	}
 
@@ -52,20 +52,13 @@ function DBconnect(&$error) {
 
 		switch ($DB['TYPE']) {
 			case ZBX_DB_MYSQL:
-				$mysql_server = $DB['SERVER'].(!empty($DB['PORT']) ? ':'.$DB['PORT'] : '');
-
-				if (!$DB['DB'] = @mysql_connect($mysql_server, $DB['USER'], $DB['PASSWORD'])) {
-					$error = 'Error connecting to database ['.trim(mysql_error()).']';
+				$DB['DB'] = @mysqli_connect($DB['SERVER'], $DB['USER'], $DB['PASSWORD'], $DB['DATABASE'], $DB['PORT']);
+				if (!$DB['DB']) {
+					$error = 'Error connecting to database ['.trim(mysqli_connect_error()).']';
 					$result = false;
 				}
 				else {
-					if (!mysql_select_db($DB['DATABASE'])) {
-						$error = 'Error database in selection ['.trim(mysql_error()).']';
-						$result = false;
-					}
-					else {
-						DBexecute('SET NAMES utf8');
-					}
+					DBexecute('SET NAMES utf8');
 				}
 
 				if ($result) {
@@ -88,7 +81,7 @@ function DBconnect(&$error) {
 				elseif (false !== ($pgsql_version = pg_parameter_status('server_version'))) {
 					if ((int) $pgsql_version >= 9) {
 						// change the output format for values of type bytea from hex (the default) to escape
-						DBexecute('set bytea_output = escape');
+						DBexecute('SET bytea_output = escape');
 					}
 				}
 
@@ -141,8 +134,8 @@ function DBconnect(&$error) {
 						'db2_attr_case' => DB2_CASE_LOWER,
 					);
 					db2_set_option($DB['DB'], $options, 1);
-					if (isset($DB['SCHEMA']) && ($DB['SCHEMA'] != '')) {
-						DBexecute("SET CURRENT SCHEMA='".$DB['SCHEMA']."'");
+					if (isset($DB['SCHEMA']) && $DB['SCHEMA'] != '') {
+						DBexecute('SET CURRENT SCHEMA='.zbx_dbstr($DB['SCHEMA']));
 					}
 				}
 
@@ -198,7 +191,7 @@ function DBclose() {
 	if (isset($DB['DB']) && !empty($DB['DB'])) {
 		switch ($DB['TYPE']) {
 			case ZBX_DB_MYSQL:
-				$result = mysql_close($DB['DB']);
+				$result = mysqli_close($DB['DB']);
 				break;
 			case ZBX_DB_POSTGRESQL:
 				$result = pg_close($DB['DB']);
@@ -268,10 +261,10 @@ function DBstart() {
 
 	switch ($DB['TYPE']) {
 		case ZBX_DB_MYSQL:
-			$result = DBexecute('begin');
+			$result = DBexecute('BEGIN');
 			break;
 		case ZBX_DB_POSTGRESQL:
-			$result = DBexecute('begin');
+			$result = DBexecute('BEGIN');
 			break;
 		case ZBX_DB_ORACLE:
 			$result = true;
@@ -281,7 +274,7 @@ function DBstart() {
 			break;
 		case ZBX_DB_SQLITE3:
 			lock_sqlite3_access();
-			$result = DBexecute('begin');
+			$result = DBexecute('BEGIN');
 			break;
 	}
 	return $result;
@@ -329,10 +322,10 @@ function DBcommit() {
 
 	switch ($DB['TYPE']) {
 		case ZBX_DB_MYSQL:
-			$result = DBexecute('commit');
+			$result = DBexecute('COMMIT');
 			break;
 		case ZBX_DB_POSTGRESQL:
-			$result = DBexecute('commit');
+			$result = DBexecute('COMMIT');
 			break;
 		case ZBX_DB_ORACLE:
 			$result = oci_commit($DB['DB']);
@@ -344,7 +337,7 @@ function DBcommit() {
 			}
 			break;
 		case ZBX_DB_SQLITE3:
-			$result = DBexecute('commit');
+			$result = DBexecute('COMMIT');
 			unlock_sqlite3_access();
 			break;
 	}
@@ -358,10 +351,10 @@ function DBrollback() {
 
 	switch ($DB['TYPE']) {
 		case ZBX_DB_MYSQL:
-			$result = DBexecute('rollback');
+			$result = DBexecute('ROLLBACK');
 			break;
 		case ZBX_DB_POSTGRESQL:
-			$result = DBexecute('rollback');
+			$result = DBexecute('ROLLBACK');
 			break;
 		case ZBX_DB_ORACLE:
 			$result = oci_rollback($DB['DB']);
@@ -371,7 +364,7 @@ function DBrollback() {
 			db2_autocommit($DB['DB'], DB2_AUTOCOMMIT_ON);
 			break;
 		case ZBX_DB_SQLITE3:
-			$result = DBexecute('rollback');
+			$result = DBexecute('ROLLBACK');
 			unlock_sqlite3_access();
 			break;
 	}
@@ -386,8 +379,8 @@ function DBrollback() {
  * DBselect('select * from users',50,200)
  *
  * @param string $query
- * @param integer $limit    max number of record to return
- * @param integer $offset   return starting from $offset record
+ * @param int $limit    max number of record to return
+ * @param int $offset   return starting from $offset record
  *
  * @return resource or object, False if failed
  */
@@ -410,8 +403,8 @@ function DBselect($query, $limit = null, $offset = 0) {
 
 	switch ($DB['TYPE']) {
 		case ZBX_DB_MYSQL:
-			if (!$result = mysql_query($query, $DB['DB'])) {
-				error('Error in query ['.$query.'] ['.mysql_error().']');
+			if (!$result = mysqli_query($DB['DB'], $query)) {
+				error('Error in query ['.$query.'] ['.mysqli_error($DB['DB']).']');
 			}
 			break;
 		case ZBX_DB_POSTGRESQL:
@@ -487,8 +480,8 @@ function DBselect($query, $limit = null, $offset = 0) {
  * SELECT * FROM (SELECT * FROM tbl) WHERE rownum BETWEEN 6 AND 15
  *
  * @param $query
- * @param integer $limit    max number of record to return
- * @param integer $offset   return starting from $offset record
+ * @param int $limit    max number of record to return
+ * @param int $offset   return starting from $offset record
  *
  * @return bool|string
  */
@@ -546,8 +539,8 @@ function DBexecute($query, $skip_error_messages = 0) {
 
 	switch ($DB['TYPE']) {
 		case ZBX_DB_MYSQL:
-			if (!$result = mysql_query($query, $DB['DB'])) {
-				error('Error in query ['.$query.'] ['.mysql_error().']');
+			if (!$result = mysqli_query($DB['DB'], $query)) {
+				error('Error in query ['.$query.'] ['.mysqli_error($DB['DB']).']');
 			}
 			break;
 		case ZBX_DB_POSTGRESQL:
@@ -601,19 +594,28 @@ function DBexecute($query, $skip_error_messages = 0) {
 	return (bool) $result;
 }
 
+/**
+ * Returns the next data set from a DB resource or false if there are no more results.
+ *
+ * @param resource $cursor
+ * @param bool $convertNulls	convert all null values to string zeroes
+ *
+ * @return array|bool
+ */
 function DBfetch($cursor, $convertNulls = true) {
 	global $DB;
 
 	$result = false;
 
-	if (!isset($DB['DB']) || empty($DB['DB'])) {
+	if (!isset($DB['DB']) || empty($DB['DB']) || is_bool($cursor)) {
 		return $result;
 	}
 
 	switch ($DB['TYPE']) {
 		case ZBX_DB_MYSQL:
-			if (!$result = mysql_fetch_assoc($cursor)) {
-				mysql_free_result($cursor);
+			$result = mysqli_fetch_assoc($cursor);
+			if (!$result) {
+				mysqli_free_result($cursor);
 			}
 			break;
 		case ZBX_DB_POSTGRESQL:
@@ -673,14 +675,19 @@ function DBfetch($cursor, $convertNulls = true) {
 			break;
 	}
 
-	if ($convertNulls && $result) {
-		foreach ($result as $key => $val) {
-			if (is_null($val)) {
-				$result[$key] = '0';
+	if ($result) {
+		if ($convertNulls) {
+			foreach ($result as $key => $val) {
+				if (is_null($val)) {
+					$result[$key] = '0';
+				}
 			}
 		}
+
+		return $result;
 	}
-	return $result;
+
+	return false;
 }
 
 function zbx_dbconcat($params) {
@@ -1052,9 +1059,9 @@ function dbConditionInt($fieldName, array $values, $notIn = false, $sort = true)
 
 	if ($sort) {
 		natsort($values);
-	}
 
-	$values = array_values($values);
+		$values = array_values($values);
+	}
 
 	$betweens = array();
 	$data = array();
@@ -1160,10 +1167,6 @@ function dbConditionString($fieldName, array $values, $notIn = false) {
 	}
 
 	return '('.$fieldName.$in.'('.$condition.'))';
-}
-
-function zero2null($val) {
-	return ($val == '0') ? 'NULL' : $val; // string 0 because ('any string' == 0) = true
 }
 
 /**
@@ -1303,11 +1306,11 @@ function zbx_dbstr($var) {
 		case ZBX_DB_MYSQL:
 			if (is_array($var)) {
 				foreach ($var as $vnum => $value) {
-					$var[$vnum] = "'".mysql_real_escape_string($value)."'";
+					$var[$vnum] = "'".mysqli_real_escape_string($DB['DB'], $value)."'";
 				}
 				return $var;
 			}
-			return "'".mysql_real_escape_string($var)."'";
+			return "'".mysqli_real_escape_string($DB['DB'], $var)."'";
 
 		case ZBX_DB_ORACLE:
 			if (is_array($var)) {

@@ -120,7 +120,7 @@ function getGraphDims($graphid = null) {
 	$dbGraphs = DBselect(
 		'SELECT MAX(g.graphtype) AS graphtype,MIN(gi.yaxisside) AS yaxissidel,MAX(gi.yaxisside) AS yaxissider,MAX(g.height) AS height'.
 		' FROM graphs g,graphs_items gi'.
-		' WHERE g.graphid='.$graphid.
+		' WHERE g.graphid='.zbx_dbstr($graphid).
 			' AND gi.graphid=g.graphid'
 	);
 	if ($graph = DBfetch($dbGraphs)) {
@@ -154,7 +154,7 @@ function get_graphs_by_hostid($hostid) {
 		' FROM graphs g,graphs_items gi,items i'.
 		' WHERE g.graphid=gi.graphid'.
 			' AND gi.itemid=i.itemid'.
-			' AND i.hostid='.$hostid
+			' AND i.hostid='.zbx_dbstr($hostid)
 	);
 }
 
@@ -172,7 +172,7 @@ function get_hosts_by_graphid($graphid) {
 		' FROM graphs_items gi,items i,hosts h'.
 		' WHERE h.hostid=i.hostid'.
 			' AND gi.itemid=i.itemid'.
-			' AND gi.graphid='.$graphid
+			' AND gi.graphid='.zbx_dbstr($graphid)
 	);
 }
 
@@ -187,7 +187,7 @@ function get_min_itemclock_by_graphid($graphid) {
 	$dbItems = DBselect(
 		'SELECT DISTINCT gi.itemid'.
 		' FROM graphs_items gi'.
-		' WHERE gi.graphid='.$graphid
+		' WHERE gi.graphid='.zbx_dbstr($graphid)
 	);
 	while ($item = DBfetch($dbItems)) {
 		$itemids[$item['itemid']] = $item['itemid'];
@@ -199,18 +199,19 @@ function get_min_itemclock_by_graphid($graphid) {
 /**
  * Return the time of the 1st appearance of item in trends.
  *
- * @param array|int $itemids
+ * @param array $itemIds
  *
  * @return int (unixtime)
  */
-function get_min_itemclock_by_itemid($itemids) {
-	zbx_value2array($itemids);
+function get_min_itemclock_by_itemid($itemIds) {
+	zbx_value2array($itemIds);
+
 	$min = null;
 	$result = time() - SEC_PER_YEAR;
 
-	$items_by_type = array(
+	$itemTypes = array(
 		ITEM_VALUE_TYPE_FLOAT => array(),
-		ITEM_VALUE_TYPE_STR =>  array(),
+		ITEM_VALUE_TYPE_STR => array(),
 		ITEM_VALUE_TYPE_LOG => array(),
 		ITEM_VALUE_TYPE_UINT64 => array(),
 		ITEM_VALUE_TYPE_TEXT => array()
@@ -219,68 +220,72 @@ function get_min_itemclock_by_itemid($itemids) {
 	$dbItems = DBselect(
 		'SELECT i.itemid,i.value_type'.
 		' FROM items i'.
-		' WHERE '.dbConditionInt('i.itemid', $itemids)
+		' WHERE '.dbConditionInt('i.itemid', $itemIds)
 	);
 
 	while ($item = DBfetch($dbItems)) {
-		$items_by_type[$item['value_type']][$item['itemid']] = $item['itemid'];
+		$itemTypes[$item['value_type']][$item['itemid']] = $item['itemid'];
 	}
 
 	// data for ITEM_VALUE_TYPE_FLOAT and ITEM_VALUE_TYPE_UINT64 can be stored in trends tables or history table
 	// get max trends and history values for such type items to find out in what tables to look for data
-	$sql_from = 'history';
-	$sql_from_num = '';
+	$sqlFrom = 'history';
+	$sqlFromNum = '';
 
-	if (!empty($items_by_type[ITEM_VALUE_TYPE_FLOAT]) || !empty($items_by_type[ITEM_VALUE_TYPE_UINT64])) {
-		$itemids_numeric = zbx_array_merge($items_by_type[ITEM_VALUE_TYPE_FLOAT], $items_by_type[ITEM_VALUE_TYPE_UINT64]);
+	if (!empty($itemTypes[ITEM_VALUE_TYPE_FLOAT]) || !empty($itemTypes[ITEM_VALUE_TYPE_UINT64])) {
+		$itemIdsNumeric = zbx_array_merge($itemTypes[ITEM_VALUE_TYPE_FLOAT], $itemTypes[ITEM_VALUE_TYPE_UINT64]);
 
 		$sql = 'SELECT MAX(i.history) AS history,MAX(i.trends) AS trends'.
 				' FROM items i'.
-				' WHERE '.dbConditionInt('i.itemid', $itemids_numeric);
-		if ($table_for_numeric = DBfetch(DBselect($sql))) {
-			$sql_from_num = ($table_for_numeric['history'] > $table_for_numeric['trends']) ? 'history' : 'trends';
-			$result = time() - (SEC_PER_DAY * max($table_for_numeric['history'], $table_for_numeric['trends']));
+				' WHERE '.dbConditionInt('i.itemid', $itemIdsNumeric);
+		if ($tableForNumeric = DBfetch(DBselect($sql))) {
+			$sqlFromNum = ($tableForNumeric['history'] > $tableForNumeric['trends']) ? 'history' : 'trends';
+			$result = time() - (SEC_PER_DAY * max($tableForNumeric['history'], $tableForNumeric['trends']));
 		}
 	}
 
-	foreach ($items_by_type as $type => $items) {
+	foreach ($itemTypes as $type => $items) {
 		if (empty($items)) {
 			continue;
 		}
 
-		switch($type) {
+		switch ($type) {
 			case ITEM_VALUE_TYPE_FLOAT:
-				$sql_from = $sql_from_num;
+				$sqlFrom = $sqlFromNum;
 				break;
 			case ITEM_VALUE_TYPE_STR:
-				$sql_from = 'history_str';
+				$sqlFrom = 'history_str';
 				break;
 			case ITEM_VALUE_TYPE_LOG:
-				$sql_from = 'history_log';
+				$sqlFrom = 'history_log';
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
-				$sql_from = $sql_from_num.'_uint';
+				$sqlFrom = $sqlFromNum.'_uint';
 				break;
 			case ITEM_VALUE_TYPE_TEXT:
-				$sql_from = 'history_text';
+				$sqlFrom = 'history_text';
 				break;
 			default:
-				$sql_from = 'history';
+				$sqlFrom = 'history';
+		}
+
+		foreach ($itemIds as $itemId) {
+			$sqlUnions[] = 'SELECT MIN(ht.clock) AS c FROM '.$sqlFrom.' ht WHERE ht.itemid='.zbx_dbstr($itemId);
 		}
 
 		$dbMin = DBfetch(DBselect(
-			'SELECT MIN(ht.clock) AS min_clock'.
-			' FROM '.$sql_from.' ht'.
-			' WHERE '.dbConditionInt('ht.itemid', $itemids)
+			'SELECT MIN(ht.c) AS min_clock'.
+			' FROM ('.implode(' UNION ALL ', $sqlUnions).') ht'
 		));
-		$min = empty($min) ? $dbMin['min_clock'] : min($min, $dbMin['min_clock']);
+
+		$min = $min ? min($min, $dbMin['min_clock']) : $dbMin['min_clock'];
 	}
 
-	return empty($min) ? $result : $min;
+	return $min ? $min: $result;
 }
 
 function get_graph_by_graphid($graphid) {
-	$dbGraphs = DBselect('SELECT g.* FROM graphs g WHERE g.graphid='.$graphid);
+	$dbGraphs = DBselect('SELECT g.* FROM graphs g WHERE g.graphid='.zbx_dbstr($graphid));
 	$dbGraphs = DBfetch($dbGraphs);
 	if (!empty($dbGraphs)) {
 		return $dbGraphs;
@@ -307,8 +312,8 @@ function get_same_graphitems_for_host($gitems, $dest_hostid, $error = true) {
 			'SELECT dest.itemid,src.key_'.
 			' FROM items dest,items src'.
 			' WHERE dest.key_=src.key_'.
-				' AND dest.hostid='.$dest_hostid.
-				' AND src.itemid='.$gitem['itemid']
+				' AND dest.hostid='.zbx_dbstr($dest_hostid).
+				' AND src.itemid='.zbx_dbstr($gitem['itemid'])
 		));
 
 		if ($dbItem) {
@@ -391,15 +396,15 @@ function navigation_bar_calc($idx = null, $idx2 = 0, $update = false) {
 	$_REQUEST['stime'] = get_request('stime', null);
 
 	if ($_REQUEST['period'] < ZBX_MIN_PERIOD) {
-		show_message(_n('Warning. Minimum time period to display is %1$s hour.',
-			'Warning. Minimum time period to display is %1$s hours.',
+		show_message(_n('Minimum time period to display is %1$s hour.',
+			'Minimum time period to display is %1$s hours.',
 			(int) ZBX_MIN_PERIOD / SEC_PER_HOUR
 		));
 		$_REQUEST['period'] = ZBX_MIN_PERIOD;
 	}
 	elseif ($_REQUEST['period'] > ZBX_MAX_PERIOD) {
-		show_message(_n('Warning. Maximum time period to display is %1$s day.',
-			'Warning. Maximum time period to display is %1$s days.',
+		show_message(_n('Maximum time period to display is %1$s day.',
+			'Maximum time period to display is %1$s days.',
 			(int) ZBX_MAX_PERIOD / SEC_PER_DAY
 		));
 		$_REQUEST['period'] = ZBX_MAX_PERIOD;
@@ -886,26 +891,23 @@ function convertToBase1024 ($value, $step = false) {
 		}
 	}
 
-	if (round($valData['value'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) > 0) {
-		if ($valData['pow'] >= 0) {
-			$valData['value'] = bcdiv(sprintf('%.6f',$value), sprintf('%.6f', $valData['value']),
-				ZBX_UNITS_ROUNDOFF_LOWER_LIMIT);
+	if ($valData['pow'] >= 0) {
+		if ($valData['value'] != 0) {
+			$valData['value'] = bcdiv(sprintf('%.10f',$value), sprintf('%.10f', $valData['value']),
+				ZBX_PRECISION_10);
 
-			$valData['value'] = sprintf('%.6f', round(bcmul($valData['value'], bcpow(1024, $valData['pow'])),
-				ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
-		}
-		else {
-			$valData['value'] = bcmul(sprintf('%.10f',$value), sprintf('%.10f', $valData['value']), ZBX_PRECISION_10);
-
-			for ($i = 0; $i > $valData['pow']; $i--) {
-				$valData['value'] = bcdiv(bcmul($valData['value'], 1000, ZBX_PRECISION_10), 1.024, ZBX_PRECISION_10);
-			}
-
-			$valData['value'] = sprintf('%.10f', $valData['value']);
+			$valData['value'] = sprintf('%.10f', round(bcmul($valData['value'], bcpow(1024, $valData['pow'])),
+				ZBX_PRECISION_10));
 		}
 	}
 	else {
-		$valData['value'] = 0;
+		$valData['pow'] = 0;
+		if (round($valData['value'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) > 0) {
+			$valData['value'] = $value;
+		}
+		else {
+			$valData['value'] = 0;
+		}
 	}
 
 	return $valData;
@@ -958,4 +960,27 @@ function getBase1024Interval($interval, $minY, $maxY) {
 	}
 
 	return $interval;
+}
+
+/**
+ * Returns digit count for the item with most digit after point in given array.
+ * Example:
+ *	Input: array(0, 0.1, 0.25, 0.005)
+ *	Return 3
+ *
+ * @param array $calcValues
+ *
+ * @return int
+ */
+function calcMaxLengthAfterDot($calcValues) {
+	$maxLength = 0;
+
+	foreach ($calcValues as $calcValue) {
+		preg_match('/^-?[0-9].?([0-9]*)\s?/', $calcValue, $matches);
+		if ($matches['1'] != 0 && strlen($matches['1']) > $maxLength) {
+			$maxLength = strlen($matches['1']);
+		}
+	}
+
+	return $maxLength;
 }

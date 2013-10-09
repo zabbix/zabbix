@@ -20,9 +20,6 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-define('GRAPH_GOOD', 0);
-define('GRAPH_BAD', 1);
-
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  */
@@ -337,7 +334,7 @@ class testFormGraphPrototype extends CWebTest {
 		$this->zbxTestClickWait('link='.$discoveryRule);
 		$this->zbxTestClickWait('link=Graph prototypes');
 
-		$this->checkTitle('Configuration of graph prototypes');
+		$this->zbxTestCheckTitle('Configuration of graph prototypes');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF GRAPH PROTOTYPES', "Graph prototypes of ".$discoveryRule));
 
 		if (isset($data['form'])) {
@@ -347,7 +344,7 @@ class testFormGraphPrototype extends CWebTest {
 			$this->zbxTestClickWait('form');
 		}
 
-		$this->checkTitle('Configuration of graph prototypes');
+		$this->zbxTestCheckTitle('Configuration of graph prototypes');
 		$this->zbxTestTextPresent('CONFIGURATION OF GRAPH PROTOTYPES');
 		$this->assertElementPresent("//a[@id='tab_graphTab' and text()='Graph prototype']");
 
@@ -760,22 +757,18 @@ class testFormGraphPrototype extends CWebTest {
 	 * @dataProvider update
 	 */
 	public function testFormGraphPrototype_SimpleUpdate($data) {
-		$name = $data['name'];
-
 		$sqlGraphs = "select * from graphs ORDER BY graphid";
 		$oldHashGraphs = DBhash($sqlGraphs);
 
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickWait('link='.$this->host);
-		$this->zbxTestClickWait('link=Discovery rules');
-		$this->zbxTestClickWait('link='.$this->discoveryRule);
-		$this->zbxTestClickWait('link=Graph prototypes');
-		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&parent_discoveryid=33800&hostid=40001');
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of graph prototypes');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF GRAPH PROTOTYPES', "Graph prototypes of ".$this->discoveryRule));
-		$this->zbxTestTextPresent('Graph updated');
-		$this->zbxTestTextPresent("$name");
+		$this->zbxTestCheckTitle('Configuration of graph prototypes');
+		$this->zbxTestTextPresent(array(
+			'CONFIGURATION OF GRAPH PROTOTYPES',
+			'Graph prototypes of '.$this->discoveryRule,
+			'Graph updated',
+			$data['name']
+		));
 
 		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
 	}
@@ -785,7 +778,7 @@ class testFormGraphPrototype extends CWebTest {
 		return array(
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'graphName' => 'graphSimple',
 					'hostCheck' => true,
 					'dbCheck' => true
@@ -793,14 +786,14 @@ class testFormGraphPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'graphName' => 'graphName',
 					'hostCheck' => true
 				)
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'graphName' => 'graphRemove',
 					'formCheck' => true,
 					'dbCheck' => true,
@@ -809,7 +802,7 @@ class testFormGraphPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'graphName' => 'graphNotRemove',
 					'formCheck' => true,
 					'dbCheck' => true,
@@ -818,7 +811,7 @@ class testFormGraphPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'graphName' => 'graphNormal1',
 					'graphtype' => 'Normal',
 					'formCheck' => true,
@@ -828,7 +821,7 @@ class testFormGraphPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'graphName' => 'graphNormal2',
 					'graphtype' => 'Normal',
 					'ymin_type' => 'Fixed',
@@ -840,7 +833,7 @@ class testFormGraphPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'graphName' => 'graphNormal3',
 					'ymin_type' => 'Item',
 					'ymax_type' => 'Fixed',
@@ -851,7 +844,7 @@ class testFormGraphPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'graphName' => 'graphNormal4',
 					'ymin_type' => 'Fixed',
 					'ymax_type' => 'Item',
@@ -862,7 +855,7 @@ class testFormGraphPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'graphName' => 'graphNormal5',
 					'ymin_type' => 'Item',
 					'ymax_type' => 'Item',
@@ -873,7 +866,7 @@ class testFormGraphPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'graphName' => 'graphStacked1',
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Item',
@@ -885,7 +878,7 @@ class testFormGraphPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'graphName' => 'graphStacked2',
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Fixed',
@@ -897,7 +890,7 @@ class testFormGraphPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'graphName' => 'graphStacked3',
 					'graphtype' => 'Stacked',
 					'ymax_type' => 'Fixed',
@@ -908,7 +901,7 @@ class testFormGraphPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'graphName' => 'graphStacked4',
 					'graphtype' => 'Stacked',
 					'ymax_type' => 'Item',
@@ -919,7 +912,7 @@ class testFormGraphPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'graphName' => 'graphStacked5',
 					'graphtype' => 'Stacked',
 					'formCheck' => true,
@@ -929,7 +922,7 @@ class testFormGraphPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'graphName' => 'graphPie',
 					'graphtype' => 'Pie',
 					'formCheck' => true,
@@ -939,7 +932,7 @@ class testFormGraphPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'graphName' => 'graphExploded',
 					'graphtype' => 'Exploded',
 					'formCheck' => true,
@@ -949,7 +942,7 @@ class testFormGraphPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'graphName' => 'graphSomeRemove',
 					'formCheck' => true,
 					'dbCheck' => true,
@@ -958,7 +951,7 @@ class testFormGraphPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_BAD,
+					'expected' => TEST_BAD,
 					'graphName' => 'graphSimple',
 					'errors' => array(
 						'ERROR: Cannot add graph',
@@ -968,7 +961,7 @@ class testFormGraphPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'graphName' => 'graph!@#$%^&*()><>?:"|{},./;',
 					'graphtype' => 'Exploded',
 					'formCheck' => true,
@@ -977,27 +970,27 @@ class testFormGraphPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_BAD,
+					'expected' => TEST_BAD,
 					'graphName' => 'graphSaveCheck',
 					'noItem' => true,
 					'errors' => array(
 						'ERROR: Cannot add graph',
-						'Missing items for graph "graphSaveCheck".'
+						'Missing items for graph prototype "graphSaveCheck".'
 					)
 				)
 			),
 			array(
 				array(
-					'expected' => GRAPH_BAD,
+					'expected' => TEST_BAD,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Name": cannot be empty.'
+						'Incorrect value for field "Name": cannot be empty.'
 					)
 				)
 			),
 			array(
 				array(
-					'expected' => GRAPH_GOOD,
+					'expected' => TEST_GOOD,
 					'graphName' => 'graphRemoveAddItem',
 					'removeItem' => true,
 					'dbCheck' => true,
@@ -1006,7 +999,7 @@ class testFormGraphPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_BAD,
+					'expected' => TEST_BAD,
 					'graphName' => 'graphStackedNoMinAxisItem',
 					'graphtype' => 'Stacked',
 					'noAxisItem' => true,
@@ -1020,7 +1013,7 @@ class testFormGraphPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_BAD,
+					'expected' => TEST_BAD,
 					'graphName' => 'graphStackedNoMaxAxisItem',
 					'graphtype' => 'Stacked',
 					'noAxisItem' => true,
@@ -1034,7 +1027,7 @@ class testFormGraphPrototype extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => GRAPH_BAD,
+					'expected' => TEST_BAD,
 					'graphName' => 'graphStackedMore',
 					'width' => 'name',
 					'height' => 'name',
@@ -1045,14 +1038,14 @@ class testFormGraphPrototype extends CWebTest {
 					'yaxismax' => 'name',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.',
-						'Warning. Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.'
+						'Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.',
+						'Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.'
 					)
 				)
 			),
 			array(
 				array(
-					'expected' => GRAPH_BAD,
+					'expected' => TEST_BAD,
 					'graphName' => 'graphStackedError',
 					'width' => '65536',
 					'height' => '-22',
@@ -1061,8 +1054,8 @@ class testFormGraphPrototype extends CWebTest {
 					'ymax_type' => 'Fixed',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.',
-						'Warning. Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.'
+						'Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.',
+						'Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.'
 					)
 				)
 			)
@@ -1073,20 +1066,10 @@ class testFormGraphPrototype extends CWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormGraphPrototype_SimpleCreate($data) {
-
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickWait('link='.$this->host);
-		$this->zbxTestClickWait('link=Discovery rules');
-		$this->zbxTestClickWait('link='.$this->discoveryRule);
-		$this->zbxTestClickWait('link=Graph prototypes');
-
 		$itemName = $this->item;
+		$this->zbxTestLogin('graphs.php?parent_discoveryid=33800&form=Create+graph+prototype');
 
-		$this->checkTitle('Configuration of graph prototypes');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF GRAPH PROTOTYPES', "Graph prototypes of ".$this->discoveryRule));
-
-		$this->zbxTestClickWait('form');
-		$this->checkTitle('Configuration of graph prototypes');
+		$this->zbxTestCheckTitle('Configuration of graph prototypes');
 		$this->zbxTestTextPresent('CONFIGURATION OF GRAPH PROTOTYPES');
 		$this->assertElementPresent("//a[@id='tab_graphTab' and text()='Graph prototype']");
 
@@ -1196,14 +1179,14 @@ class testFormGraphPrototype extends CWebTest {
 		$this->zbxTestClickWait('save');
 
 		switch ($data['expected']) {
-			case GRAPH_GOOD:
+			case TEST_GOOD:
 				$this->zbxTestTextPresent('Graph added');
-				$this->checkTitle('Configuration of graph prototypes');
+				$this->zbxTestCheckTitle('Configuration of graph prototypes');
 				$this->zbxTestTextPresent(array('CONFIGURATION OF GRAPH PROTOTYPES', "Graph prototypes of ".$this->discoveryRule));
 				break;
 
-			case GRAPH_BAD:
-				$this->checkTitle('Configuration of graph prototypes');
+			case TEST_BAD:
+				$this->zbxTestCheckTitle('Configuration of graph prototypes');
 				$this->zbxTestTextPresent(array('CONFIGURATION OF GRAPH PROTOTYPES', 'Graph prototype'));
 				foreach ($data['errors'] as $msg) {
 					$this->zbxTestTextPresent($msg);

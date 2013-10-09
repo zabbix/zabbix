@@ -21,6 +21,7 @@
 #include "sysinfo.h"
 #include "md5.h"
 #include "file.h"
+#include "zbxregexp.h"
 
 #define ZBX_MAX_DB_FILE_SIZE	64 * ZBX_KIBIBYTE	/* files larger than 64 KB cannot be stored in the database */
 

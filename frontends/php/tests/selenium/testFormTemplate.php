@@ -30,7 +30,7 @@ class testFormTemplate extends CWebTest {
 		$this->zbxTestClickWait('form');
 		$this->input_type('template_name', $this->template);
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of templates');
+		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestTextPresent('Template added');
 		$this->zbxTestTextPresent($this->template);
 	}
@@ -43,7 +43,7 @@ class testFormTemplate extends CWebTest {
 		$this->zbxTestClickWait('form');
 		$this->input_type('template_name', $template);
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of templates');
+		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestTextPresent('Template added');
 		$this->zbxTestTextPresent($template);
 	}
@@ -53,7 +53,7 @@ class testFormTemplate extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 		$this->zbxTestClickWait('link=Template OS Linux');
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of templates');
+		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestTextPresent('Template updated');
 		$this->zbxTestTextPresent($this->template);
 	}
@@ -65,7 +65,7 @@ class testFormTemplate extends CWebTest {
 		$this->zbxTestClickWait('link='.$this->template);
 		$this->input_type('template_name', $this->template_tmp);
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of templates');
+		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestTextPresent('Template updated');
 	}
 
@@ -74,18 +74,16 @@ class testFormTemplate extends CWebTest {
 	 */
 	public function testFormTemplate_AddMacros() {
 		$this->zbxTestLogin('templates.php');
-		$this->zbxTestClick('link='.$this->template_tmp);
-		$this->waitForPageToLoad("30000");
-		$this->tab_switch('Macros');
-		$this->type("name=macros[0][macro]", '{$TEST_MACRO}');
-		$this->type("name=macros[0][value]", "1");
-		$this->zbxTestClick("//table[@id='tbl_macros']//input[@id='macro_add']");
-		$this->verifyElementPresent("name=macros[1][macro]");
-		$this->type("name=macros[1][macro]", '{$TEST_MACRO2}');
-		$this->type("name=macros[1][value]", "2");
-		$this->zbxTestClick('save');
-		$this->waitForPageToLoad("30000");
-		$this->zbxTestTextPresent("Template updated");
+		$this->zbxTestClickWait('link='.$this->template_tmp);
+		$this->zbxTestClick('tab_macroTab');
+		$this->input_type('macros_0_macro', '{$TEST_MACRO}');
+		$this->input_type('macros_0_value', '1');
+		$this->zbxTestClick('macro_add');
+		$this->verifyElementPresent('macros_1_macro');
+		$this->input_type('macros_1_macro', '{$TEST_MACRO2}');
+		$this->input_type('macros_1_value', '2');
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('Template updated');
 	}
 
 	public function testFormTemplate_CreateExistingTemplateNoGroups() {
@@ -96,7 +94,7 @@ class testFormTemplate extends CWebTest {
 		$this->zbxTestClickWait('form');
 		$this->input_type('template_name', 'Template OS Linux');
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of templates');
+		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestTextPresent('No groups for template');
 		$this->assertEquals(1, DBcount("select * from hosts where host='Template OS Linux'"));
 	}
@@ -114,7 +112,7 @@ class testFormTemplate extends CWebTest {
 		$this->zbxTestClick('delete');
 		$this->waitForConfirmation();
 		$this->wait();
-		$this->checkTitle('Configuration of templates');
+		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestTextPresent('Template deleted');
 
 		// check if the macros have been deleted
@@ -130,7 +128,7 @@ class testFormTemplate extends CWebTest {
 		$this->zbxTestClickWait('clone');
 		$this->input_type('template_name', $this->template_tmp);
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of templates');
+		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestTextPresent('Template added');
 	}
 
@@ -143,7 +141,7 @@ class testFormTemplate extends CWebTest {
 		$this->zbxTestClickWait('link='.$this->template_tmp);
 		$this->zbxTestClickWait('delete');
 		$this->getConfirmation();
-		$this->checkTitle('Configuration of templates');
+		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestTextPresent('Template deleted');
 	}
 
@@ -155,7 +153,7 @@ class testFormTemplate extends CWebTest {
 		$this->zbxTestClickWait('full_clone');
 		$this->input_type('template_name', $this->template.'_fullclone');
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of templates');
+		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestTextPresent('Template added');
 	}
 
@@ -168,7 +166,7 @@ class testFormTemplate extends CWebTest {
 		$this->zbxTestClickWait('link='.$this->template.'_fullclone');
 		$this->zbxTestClickWait('delete');
 		$this->getConfirmation();
-		$this->checkTitle('Configuration of templates');
+		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestTextPresent('Template deleted');
 	}
 }

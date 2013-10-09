@@ -309,27 +309,23 @@ class DB {
 				continue;
 			}
 
+			if (isset($tableSchema['fields'][$field]['ref_table'])) {
+				if ($tableSchema['fields'][$field]['null']) {
+					$values[$field] = ($values[$field] == '0') ? NULL : $values[$field];
+				}
+			}
+
 			if (is_null($values[$field])) {
 				if ($tableSchema['fields'][$field]['null']) {
 					$values[$field] = 'NULL';
 				}
 				elseif (isset($tableSchema['fields'][$field]['default'])) {
-					$values[$field] = $tableSchema['fields'][$field]['default'];
+					$values[$field] = zbx_dbstr($tableSchema['fields'][$field]['default']);
 				}
 				else {
-					self::exception(self::DBEXECUTE_ERROR, _s('Mandatory field "%1$s" is missing in table "%2$s".', $field, $table));
-				}
-			}
-
-			if (isset($tableSchema['fields'][$field]['ref_table'])) {
-				if ($tableSchema['fields'][$field]['null']) {
-					$values[$field] = zero2null($values[$field]);
-				}
-			}
-
-			if ($values[$field] === 'NULL') {
-				if (!$tableSchema['fields'][$field]['null']) {
-					self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "NULL" for NOT NULL field "%1$s".', $field));
+					self::exception(self::DBEXECUTE_ERROR,
+						_s('Field "%1$s" cannot be set to NULL.', $field)
+					);
 				}
 			}
 			else {

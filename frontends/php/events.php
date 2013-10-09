@@ -80,8 +80,20 @@ $fields = array(
 	'favstate'=>		array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})&&"filter"=={favobj}'),
 	'favid'=>			array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
 );
-
 check_fields($fields);
+
+/*
+ * Permissions
+ */
+if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
+	access_deny();
+}
+if (get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
+	access_deny();
+}
+if (get_request('triggerid') && !API::Trigger()->isReadable(array($_REQUEST['triggerid']))) {
+	access_deny();
+}
 
 /*
  * Ajax
@@ -636,7 +648,7 @@ else {
 				'triggerids' => zbx_objectValues($events, 'objectid'),
 				'selectHosts' => array('hostid'),
 				'selectItems' => array('name', 'value_type', 'key_'),
-				'output' => array('description', 'expression', 'priority')
+				'output' => array('description', 'expression', 'priority', 'flags', 'url')
 			));
 			$triggers = zbx_toHash($triggers, 'triggerid');
 
@@ -647,16 +659,15 @@ else {
 			}
 			$hostids = zbx_objectValues($hosts, 'hostid');
 			$hosts = API::Host()->get(array(
-				'output' => array('name', 'hostid'),
+				'output' => array('name', 'hostid', 'status'),
 				'hostids' => $hostids,
 				'selectScreens' => API_OUTPUT_COUNT,
-				'selectInventory' => array('hostid'),
 				'preservekeys' => true
 			));
 
 			// fetch scripts for the host JS menu
 			if ($_REQUEST['hostid'] == 0) {
-				$hostScripts = API::Script()->getScriptsByHosts($hostids);
+				$scripts = API::Script()->getScriptsByHosts($hostids);
 			}
 
 			// actions
@@ -665,31 +676,33 @@ else {
 			// events
 			foreach ($events as $event) {
 				$trigger = $triggers[$event['objectid']];
+
 				$host = reset($trigger['hosts']);
 				$host = $hosts[$host['hostid']];
 
-				$items = array();
-				foreach ($trigger['items'] as $item) {
-					$i = array();
-					$i['itemid'] = $item['itemid'];
-					$i['value_type'] = $item['value_type'];
-					$i['action'] = str_in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
-						? 'showgraph' : 'showvalues';
-					$i['name'] = itemName($item);
-					$items[] = $i;
-				}
+				$triggerItems = array();
 
-				$ack = getEventAckState($event, true);
+				foreach ($trigger['items'] as $item) {
+					$triggerItems[] = array(
+						'name' => htmlspecialchars(itemName($item)),
+						'params' => array(
+							'itemid' => $item['itemid'],
+							'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
+								? 'showgraph' : 'showvalues'
+						)
+					);
+				}
 
 				$description = CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, array(
 					'clock' => $event['clock'],
 					'ns' => $event['ns']
 				)));
 
-				$tr_desc = new CSpan($description, 'pointer');
-				$tr_desc->addAction('onclick', "create_mon_trigger_menu(event, ".
-						" [{'triggerid': '".$trigger['triggerid']."', 'lastchange': '".$event['clock']."'}],".
-						zbx_jsvalue($items, true).");");
+				$triggerDescription = new CSpan($description, 'pointer link_menu');
+				$triggerDescription->setMenuPopup(getMenuPopupTrigger($trigger, $triggerItems, null, $event['clock']));
+
+				// acknowledge
+				$ack = getEventAckState($event, true);
 
 				// duration
 				$event['duration'] = ($nextEvent = get_next_event($event, $events))
@@ -707,11 +720,11 @@ else {
 				);
 
 				// host JS menu link
-				$hostSpan = null;
+				$hostName = null;
+
 				if ($_REQUEST['hostid'] == 0) {
-					$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
-					$scripts = $hostScripts[$host['hostid']];
-					$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+					$hostName = new CSpan($host['name'], 'link_menu');
+					$hostName->setMenuPopup(getMenuPopupHost($host, $scripts[$host['hostid']]));
 				}
 
 				// action
@@ -723,8 +736,8 @@ else {
 						'action'
 					),
 					is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
-					$hostSpan,
-					new CSpan($tr_desc, 'link_menu'),
+					$hostName,
+					$triggerDescription,
 					$statusSpan,
 					getSeverityCell($trigger['priority'], null, !$event['value']),
 					$event['duration'],
@@ -783,9 +796,6 @@ $objData = array(
 zbx_add_post_js('jqBlink.blink();');
 zbx_add_post_js('timeControl.addObject("scroll_events_id", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($objData).');');
 zbx_add_post_js('timeControl.processObjects();');
-
-// js templates
-require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php';
 
 $eventsWidget->show();
 

@@ -180,7 +180,7 @@ retry:
 		/* zbx_vsnprintf() returns bytes actually written instead of bytes to write, */
 		/* so we have to use the standard function                                   */
 		va_start(args, fmt);
-		*alloc_len = vsnprintf(NULL, 0, fmt, args) + 1;
+		*alloc_len = vsnprintf(NULL, 0, fmt, args) + 2;	/* '\0' + one byte to prevent the operation retry */
 		va_end(args);
 		*offset = 0;
 		*str = zbx_malloc(*str, *alloc_len);
@@ -221,20 +221,18 @@ retry:
  ******************************************************************************/
 size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
 {
-	size_t	written_len;
+	int	written_len = 0;
 
-	assert(str);
+	if (0 < count)
+	{
+		if (0 > (written_len = vsnprintf(str, count, fmt, args)))
+			written_len = (int)count - 1;		/* count an output error as a full buffer */
+		else
+			written_len = MIN(written_len, (int)count - 1);		/* result could be truncated */
+	}
+	str[written_len] = '\0';	/* always write '\0', even if buffer size is 0 or vsnprintf() error */
 
-	if (-1 == (written_len = vsnprintf(str, count, fmt, args)))
-		written_len = count - 1;	/* result was truncated */
-	else
-		written_len = MIN(written_len, count - 1);
-
-	written_len = MAX(written_len, 0);
-
-	str[written_len] = '\0';
-
-	return written_len;
+	return (size_t)written_len;
 }
 
 /******************************************************************************
@@ -503,77 +501,86 @@ void	zbx_remove_chars(register char *str, const char *charlist)
  ******************************************************************************/
 void	compress_signs(char *str)
 {
-	int	i,j,len;
+	int	i, j, len, loop = 1;
 	char	cur, next, prev;
-	int	loop = 1;
 
-	/* Compress '--' '+-' '++' '-+' */
-	while(loop == 1)
+	/* compress '--' '+-' '++' '-+' */
+	while (1 == loop)
 	{
-		loop=0;
-		for(i=0;str[i]!='\0';i++)
+		loop = 0;
+
+		for (i = 0; '\0' != str[i]; i++)
 		{
-			cur=str[i];
-			next=str[i+1];
-			if(	(cur=='-' && next=='-') ||
-				(cur=='+' && next=='+'))
+			cur = str[i];
+			next = str[i + 1];
+
+			if (('-' == cur && '-' == next) || ('+' == cur && '+' == next))
 			{
-				str[i]='+';
-				for(j=i+1;str[j]!='\0';j++)	str[j]=str[j+1];
-				loop=1;
+				str[i] = '+';
+				for (j = i + 1; '\0' != str[j]; j++)
+					str[j] = str[j + 1];
+				loop = 1;
 			}
-			if(	(cur=='-' && next=='+') ||
-				(cur=='+' && next=='-'))
+
+			if (('-' == cur && '+' == next) || ('+' == cur && '-' == next))
 			{
-				str[i]='-';
-				for(j=i+1;str[j]!='\0';j++)	str[j]=str[j+1];
-				loop=1;
+				str[i] = '-';
+				for (j = i + 1; '\0' != str[j]; j++)
+					str[j] = str[j + 1];
+				loop = 1;
 			}
 		}
 	}
 
-	/* Remove '-', '+' where needed, Convert -123 to +D123 */
-	for(i=0;str[i]!='\0';i++)
+	/* remove '-', '+' where needed, convert -123 to +N123 */
+	for (i = 0; '\0' != str[i]; i++)
 	{
-		cur=str[i];
-		next=str[i+1];
-		if(cur == '+')
+		cur = str[i];
+
+		if ('+' == cur)
 		{
-			/* Plus is the first sign in the expression */
-			if(i==0)
+			/* plus is the first sign in the expression */
+			if (0 == i)
 			{
-				for(j=i;str[j]!='\0';j++)	str[j]=str[j+1];
+				for (j = i; '\0' != str[j]; j++)
+					str[j] = str[j + 1];
 			}
 			else
 			{
-				prev=str[i-1];
-				if(!isdigit(prev) && prev!='.')
+				prev = str[i - 1];
+
+				if (0 == isdigit(prev) && '.' != prev)
 				{
-					for(j=i;str[j]!='\0';j++)	str[j]=str[j+1];
+					for (j = i; '\0' != str[j]; j++)
+						str[j] = str[j + 1];
 				}
 			}
 		}
-		else if(cur == '-')
+		else if ('-' == cur)
 		{
-			/* Minus is the first sign in the expression */
-			if(i==0)
+			/* minus is the first sign in the expression */
+			if (0 == i)
 			{
-				str[i]='N';
+				str[i] = 'N';
 			}
 			else
 			{
-				prev=str[i-1];
-				if(!isdigit(prev) && prev!='.')
+				prev = str[i - 1];
+
+				if (0 == isdigit(prev) && '.' != prev)
 				{
-					str[i]='N';
+					str[i] = 'N';
 				}
 				else
 				{
 					len = (int)strlen(str);
-					for(j=len;j>i;j--)	str[j]=str[j-1];
-					str[i]='+';
-					str[i+1]='N';
-					str[len+1]='\0';
+
+					for (j = len; j > i; j--)
+						str[j] = str[j - 1];
+
+					str[i] = '+';
+					str[i + 1] = 'N';
+					str[len + 1] = '\0';
 					i++;
 				}
 			}
@@ -613,9 +620,9 @@ void	compress_signs(char *str)
  ******************************************************************************/
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz)
 {
-	char *d = dst;
-	const char *s = src;
-	size_t n = siz;
+	char		*d = dst;
+	const char	*s = src;
+	size_t		n = siz;
 
 	/* copy as many bytes as will fit */
 	if (0 != n)
@@ -656,29 +663,33 @@ size_t	zbx_strlcpy(char *dst, const char *src, size_t siz)
  ******************************************************************************/
 size_t	zbx_strlcat(char *dst, const char *src, size_t siz)
 {
-	char *d = dst;
-	const char *s = src;
-	size_t n = siz;
-	size_t dlen;
+	char		*d = dst;
+	const char	*s = src;
+	size_t		n = siz;
+	size_t		dlen;
 
-	/* Find the end of dst and adjust bytes left but don't go past end */
-	while (n-- != 0 && *d != '\0')
+	/* find the end of dst and adjust bytes left but don't go past end */
+	while (0 != n-- && '\0' != *d)
 		d++;
 	dlen = d - dst;
 	n = siz - dlen;
 
-	if (n == 0)
-		return(dlen + strlen(s));
-	while (*s != '\0') {
-		if (n != 1) {
+	if (0 == n)
+		return dlen + strlen(s);
+
+	while ('\0' != *s)
+	{
+		if (1 != n)
+		{
 			*d++ = *s;
 			n--;
 		}
 		s++;
 	}
+
 	*d = '\0';
 
-	return(dlen + (s - src));	/* count does not include NUL */
+	return dlen + (s - src);	/* count does not include NUL */
 }
 
 /******************************************************************************
@@ -1057,7 +1068,10 @@ succeed:
 		return SUCCEED;
 	}
 	else
-		goto fail;
+	{
+		*exp = s;
+		return FAIL;
+	}
 }
 
 /******************************************************************************
@@ -3031,6 +3045,60 @@ size_t	zbx_strlen_utf8_n(const char *text, size_t utf8_maxlen)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_replace_utf8                                                 *
+ *                                                                            *
+ * Purpose: replace non-ASCII UTF-8 characters with '?' character             *
+ *                                                                            *
+ * Parameters: text - [IN] pointer to the first char                          *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs                                               *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_replace_utf8(const char *text)
+{
+	int	n;
+	char	*out, *p;
+
+	out = p = zbx_malloc(NULL, strlen(text) + 1);
+
+	while ('\0' != *text)
+	{
+		if (0 == (*text & 0x80))		/* ASCII */
+			n = 1;
+		else if (0xc0 == (*text & 0xe0))	/* 11000010-11011111 is a start of 2-byte sequence */
+			n = 2;
+		else if (0xe0 == (*text & 0xf0))	/* 11100000-11101111 is a start of 3-byte sequence */
+			n = 3;
+		else if (0xf0 == (*text & 0xf8))	/* 11110000-11110100 is a start of 4-byte sequence */
+			n = 4;
+		else
+			goto bad;
+
+		if (1 == n)
+			*p++ = *text++;
+		else
+		{
+			*p++ = ZBX_UTF8_REPLACE_CHAR;
+
+			while (0 != n)
+			{
+				if ('\0' == *text)
+					goto bad;
+				n--;
+				text++;
+			}
+		}
+	}
+
+	*p = '\0';
+	return out;
+bad:
+	zbx_free(out);
+	return NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_is_utf8                                                      *
  *                                                                            *
  * Purpose: check UTF-8 sequences                                             *
@@ -3126,69 +3194,11 @@ int	zbx_is_utf8(const char *text)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_replace_utf8                                                 *
- *                                                                            *
- * Purpose: replace non-ASCII UTF-8 characters with '?' character             *
- *                                                                            *
- * Parameters: text - [IN] pointer to the first char                          *
- *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- ******************************************************************************/
-char	*zbx_replace_utf8(const char *text)
-{
-	int	n;
-	char	*out, *p;
-
-	out = p = zbx_malloc(NULL, strlen(text) + 1);
-
-	while ('\0' != *text)
-	{
-		if (0 == (*text & 0x80))		/* ASCII */
-			n = 1;
-		else if (0xc0 == (*text & 0xe0))	/* 11000010-11011111 is a start of 2-byte sequence */
-			n = 2;
-		else if (0xe0 == (*text & 0xf0))	/* 11100000-11101111 is a start of 3-byte sequence */
-			n = 3;
-		else if (0xf0 == (*text & 0xf8))	/* 11110000-11110100 is a start of 4-byte sequence */
-			n = 4;
-		else
-			goto bad;
-
-		if (1 == n)
-			*p++ = *text++;
-		else
-		{
-			*p++ = ZBX_UTF8_REPLACE_CHAR;
-
-			while (0 != n)
-			{
-				if ('\0' == *text)
-					goto bad;
-				n--;
-				text++;
-			}
-		}
-	}
-
-	*p = '\0';
-	return out;
-bad:
-	zbx_free(out);
-	return NULL;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_replace_invalid_utf8                                         *
  *                                                                            *
  * Purpose: replace invalid UTF-8 sequences of bytes with '?' character       *
  *                                                                            *
  * Parameters: text - [IN/OUT] pointer to the first char                      *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 void	zbx_replace_invalid_utf8(char *text)
@@ -3546,6 +3556,3 @@ void	zbx_trim_str_list(char *list, char delimiter)
 	}
 	*out = '\0';
 }
-
-
-

@@ -36,8 +36,8 @@ function screen_resources($resource = null) {
 		SCREEN_RESOURCE_SCREEN => _('Screen'),
 		SCREEN_RESOURCE_SERVER_INFO => _('Server info'),
 		SCREEN_RESOURCE_SIMPLE_GRAPH => _('Simple graph'),
-		SCREEN_RESOURCE_HOSTGROUP_TRIGGERS => _('Status of host group triggers'),
-		SCREEN_RESOURCE_HOST_TRIGGERS => _('Status of host triggers'),
+		SCREEN_RESOURCE_HOSTGROUP_TRIGGERS => _('Latest host group issues'),
+		SCREEN_RESOURCE_HOST_TRIGGERS => _('Latest host issues'),
 		SCREEN_RESOURCE_SYSTEM_STATUS => _('System status'),
 		SCREEN_RESOURCE_TRIGGERS_INFO => _('Triggers info'),
 		SCREEN_RESOURCE_TRIGGERS_OVERVIEW => _('Triggers overview'),
@@ -57,7 +57,7 @@ function screen_resources($resource = null) {
 }
 
 function get_screen_by_screenid($screenid) {
-	$dbScreen = DBfetch(DBselect('SELECT s.* FROM screens s WHERE s.screenid='.$screenid));
+	$dbScreen = DBfetch(DBselect('SELECT s.* FROM screens s WHERE s.screenid='.zbx_dbstr($screenid)));
 
 	return empty($dbScreen) ? false : $dbScreen;
 }
@@ -70,7 +70,7 @@ function check_screen_recursion($mother_screenid, $child_screenid) {
 	$db_scr_items = DBselect(
 		'SELECT si.resourceid'.
 		' FROM screens_items si'.
-		' WHERE si.screenid='.$child_screenid.
+		' WHERE si.screenid='.zbx_dbstr($child_screenid).
 		' AND si.resourcetype='.SCREEN_RESOURCE_SCREEN
 	);
 	while ($scr_item = DBfetch($db_scr_items)) {
@@ -86,7 +86,7 @@ function get_slideshow($slideshowid, $step) {
 	$db_slides = DBfetch(DBselect(
 		'SELECT MIN(s.step) AS min_step,MAX(s.step) AS max_step'.
 		' FROM slides s'.
-		' WHERE s.slideshowid='.$slideshowid
+		' WHERE s.slideshowid='.zbx_dbstr($slideshowid)
 	));
 	if (!$db_slides || is_null($db_slides['min_step'])) {
 		return false;
@@ -103,9 +103,9 @@ function get_slideshow($slideshowid, $step) {
 	return DBfetch(DBselect(
 		'SELECT sl.*'.
 		' FROM slides sl,slideshows ss'.
-		' WHERE ss.slideshowid='.$slideshowid.
+		' WHERE ss.slideshowid='.zbx_dbstr($slideshowid).
 			' AND sl.slideshowid=ss.slideshowid'.
-			' AND sl.step='.$curr_step
+			' AND sl.step='.zbx_dbstr($curr_step)
 	));
 }
 
@@ -114,7 +114,7 @@ function slideshow_accessible($slideshowid, $perm) {
 
 	$sql = 'SELECT s.slideshowid'.
 			' FROM slideshows s'.
-			' WHERE s.slideshowid='.$slideshowid.
+			' WHERE s.slideshowid='.zbx_dbstr($slideshowid).
 				andDbNode('s.slideshowid', get_current_nodeid(null, $perm));
 	if (DBselect($sql)) {
 		$result = true;
@@ -123,7 +123,7 @@ function slideshow_accessible($slideshowid, $perm) {
 		$db_screens = DBselect(
 			'SELECT DISTINCT s.screenid'.
 			' FROM slides s'.
-			' WHERE s.slideshowid='.$slideshowid
+			' WHERE s.slideshowid='.zbx_dbstr($slideshowid)
 		);
 		while ($slide_data = DBfetch($db_screens)) {
 			$screenids[$slide_data['screenid']] = $slide_data['screenid'];
@@ -149,7 +149,7 @@ function slideshow_accessible($slideshowid, $perm) {
 }
 
 function get_slideshow_by_slideshowid($slideshowid) {
-	return DBfetch(DBselect('SELECT s.* FROM slideshows s WHERE s.slideshowid='.$slideshowid));
+	return DBfetch(DBselect('SELECT s.* FROM slideshows s WHERE s.slideshowid='.zbx_dbstr($slideshowid)));
 }
 
 function add_slideshow($name, $delay, $slides) {
@@ -174,8 +174,9 @@ function add_slideshow($name, $delay, $slides) {
 	}
 
 	// validate slide name
-	$sql = 'SELECT s.slideshowid FROM slideshows s WHERE s.name='.zbx_dbstr($name);
-	$db_slideshow = DBfetch(DBselect($sql, 1));
+	$db_slideshow = DBfetch(DBselect(
+		'SELECT s.slideshowid FROM slideshows s WHERE s.name='.zbx_dbstr($name).' '.andDbNode('s.slideshowid')
+	));
 	if (!empty($db_slideshow)) {
 		error(_s('Slide show "%s" already exists.', $name));
 		return false;
@@ -184,7 +185,7 @@ function add_slideshow($name, $delay, $slides) {
 	$slideshowid = get_dbid('slideshows', 'slideshowid');
 	$result = DBexecute(
 		'INSERT INTO slideshows (slideshowid,name,delay)'.
-		' VALUES ('.$slideshowid.','.zbx_dbstr($name).','.$delay.')'
+		' VALUES ('.zbx_dbstr($slideshowid).','.zbx_dbstr($name).','.zbx_dbstr($delay).')'
 	);
 
 	// create slides
@@ -199,7 +200,7 @@ function add_slideshow($name, $delay, $slides) {
 
 		$result = DBexecute(
 			'INSERT INTO slides (slideid,slideshowid,screenid,step,delay)'.
-			' VALUES ('.$slideid.','.$slideshowid.','.$slide['screenid'].','.($i++).','.$slide['delay'].')'
+			' VALUES ('.zbx_dbstr($slideid).','.zbx_dbstr($slideshowid).','.zbx_dbstr($slide['screenid']).','.($i++).','.zbx_dbstr($slide['delay']).')'
 		);
 		if (!$result) {
 			return false;
@@ -231,14 +232,19 @@ function update_slideshow($slideshowid, $name, $delay, $slides) {
 	}
 
 	// validate slide name
-	$sql = 'SELECT s.slideshowid FROM slideshows s WHERE s.name='.zbx_dbstr($name).' AND s.slideshowid<>'.$slideshowid;
-	$db_slideshow = DBfetch(DBselect($sql, 1));
+	$db_slideshow = DBfetch(DBselect(
+		'SELECT s.slideshowid'.
+		' FROM slideshows s'.
+		' WHERE s.name='.zbx_dbstr($name).
+			' AND s.slideshowid<>'.zbx_dbstr($slideshowid).
+			' '.andDbNode('s.slideshowid')
+	));
 	if (!empty($db_slideshow)) {
 		error(_s('Slide show "%s" already exists.', $name));
 		return false;
 	}
 
-	$db_slideshow = DBfetchArray(DBselect('SELECT * FROM slideshows WHERE slideshowid='.$slideshowid));
+	$db_slideshow = DBfetchArray(DBselect('SELECT * FROM slideshows WHERE slideshowid='.zbx_dbstr($slideshowid)));
 	$db_slideshow = $db_slideshow[0];
 	$changed = false;
 	$slideshow = array('name' => $name, 'delay' => $delay);
@@ -249,13 +255,13 @@ function update_slideshow($slideshowid, $name, $delay, $slides) {
 		}
 	}
 	if ($changed) {
-		if (!$result = DBexecute('UPDATE slideshows SET name='.zbx_dbstr($name).',delay='.$delay.' WHERE slideshowid='.$slideshowid)) {
+		if (!$result = DBexecute('UPDATE slideshows SET name='.zbx_dbstr($name).',delay='.zbx_dbstr($delay).' WHERE slideshowid='.zbx_dbstr($slideshowid))) {
 			return false;
 		}
 	}
 
 	// get slides
-	$db_slides = DBfetchArrayAssoc(DBselect('SELECT s.* FROM slides s WHERE s.slideshowid='.$slideshowid), 'slideid');
+	$db_slides = DBfetchArrayAssoc(DBselect('SELECT s.* FROM slides s WHERE s.slideshowid='.zbx_dbstr($slideshowid)), 'slideid');
 
 	$slidesToDel = zbx_objectValues($db_slides, 'slideid');
 	$slidesToDel = zbx_toHash($slidesToDel);
@@ -265,7 +271,7 @@ function update_slideshow($slideshowid, $name, $delay, $slides) {
 		if (isset($db_slides[$slide['slideid']])) {
 			// update slide
 			if ($db_slides[$slide['slideid']]['delay'] != $slide['delay'] || $db_slides[$slide['slideid']]['step'] != $step) {
-				$result = DBexecute('UPDATE slides SET  step='.$step.', delay='.$slide['delay'].' WHERE slideid='.$slide['slideid']);
+				$result = DBexecute('UPDATE slides SET step='.zbx_dbstr($step).', delay='.zbx_dbstr($slide['delay']).' WHERE slideid='.zbx_dbstr($slide['slideid']));
 			}
 			// do nothing with slide
 			else {
@@ -278,7 +284,7 @@ function update_slideshow($slideshowid, $name, $delay, $slides) {
 			$slideid = get_dbid('slides', 'slideid');
 			$result = DBexecute(
 				'INSERT INTO slides (slideid,slideshowid,screenid,step,delay)'.
-				' VALUES ('.$slideid.','.$slideshowid.','.$slide['screenid'].','.$step.','.$slide['delay'].')'
+				' VALUES ('.zbx_dbstr($slideid).','.zbx_dbstr($slideshowid).','.zbx_dbstr($slide['screenid']).','.zbx_dbstr($step).','.zbx_dbstr($slide['delay']).')'
 			);
 		}
 		$step ++;
@@ -296,9 +302,9 @@ function update_slideshow($slideshowid, $name, $delay, $slides) {
 }
 
 function delete_slideshow($slideshowid) {
-	$result = DBexecute('DELETE FROM slideshows where slideshowid='.$slideshowid);
-	$result &= DBexecute('DELETE FROM slides where slideshowid='.$slideshowid);
-	$result &= DBexecute('DELETE FROM profiles WHERE idx=\'web.favorite.screenids\' AND source=\'slideshowid\' AND value_id='.$slideshowid);
+	$result = DBexecute('DELETE FROM slideshows where slideshowid='.zbx_dbstr($slideshowid));
+	$result &= DBexecute('DELETE FROM slides where slideshowid='.zbx_dbstr($slideshowid));
+	$result &= DBexecute('DELETE FROM profiles WHERE idx=\'web.favorite.screenids\' AND source=\'slideshowid\' AND value_id='.zbx_dbstr($slideshowid));
 
 	return $result;
 }
@@ -308,15 +314,17 @@ function check_dynamic_items($elid, $config = 0) {
 	if ($config == 0) {
 		$sql = 'SELECT si.screenitemid'.
 				' FROM screens_items si'.
-				' WHERE si.screenid='.$elid.
-					' AND si.dynamic='.SCREEN_DYNAMIC_ITEM;
+				' WHERE si.screenid='.zbx_dbstr($elid).
+					' AND si.dynamic='.SCREEN_DYNAMIC_ITEM.
+					' '.andDbNode('si.screenitemid');
 	}
 	else {
 		$sql = 'SELECT si.screenitemid'.
 				' FROM slides s,screens_items si'.
-				' WHERE s.slideshowid='.$elid.
+				' WHERE s.slideshowid='.zbx_dbstr($elid).
 					' AND si.screenid=s.screenid'.
-					' AND si.dynamic='.SCREEN_DYNAMIC_ITEM;
+					' AND si.dynamic='.SCREEN_DYNAMIC_ITEM.
+					' '.andDbNode('si.screenitemid');
 	}
 	if (DBfetch(DBselect($sql, 1))) {
 		return true;

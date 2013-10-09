@@ -86,9 +86,15 @@ if (isset($_REQUEST['save'])) {
 	$proxy = array(
 		'host' => get_request('host'),
 		'status' => get_request('status'),
-		'hosts' => get_request('hosts', array()),
-		'interface' => get_request('interface', array())
+		'interface' => get_request('interface')
 	);
+
+	// skip discovered hosts
+	$proxy['hosts'] = API::Host()->get(array(
+		'hostids' => get_request('hosts', array()),
+		'output' => array('hostid'),
+		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
+	));
 
 	DBstart();
 
@@ -148,7 +154,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 		$dbHosts = DBselect(
 			'SELECT h.hostid,h.status'.
 			' FROM hosts h'.
-			' WHERE h.proxy_hostid='.$hostId.
+			' WHERE h.proxy_hostid='.zbx_dbstr($hostId).
 				andDbNode('h.hostid')
 		);
 		while ($dbHost = DBfetch($dbHosts)) {
@@ -216,12 +222,13 @@ if (isset($_REQUEST['form'])) {
 		);
 	}
 
-	// hosts
+	// fetch available hosts, skip host prototypes
 	$data['dbHosts'] = DBfetchArray(DBselect(
-		'SELECT h.hostid,h.proxy_hostid,h.name'.
+		'SELECT h.hostid,h.proxy_hostid,h.name,h.flags'.
 		' FROM hosts h'.
 		' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
-			andDbNode('h.hostid')
+			andDbNode('h.hostid').
+			' AND h.flags<>'.ZBX_FLAG_DISCOVERY_PROTOTYPE
 	));
 	order_result($data['dbHosts'], 'name');
 
@@ -239,7 +246,7 @@ else {
 
 	$data['proxies'] = API::Proxy()->get(array(
 		'editable' => true,
-		'selectHosts' => API_OUTPUT_EXTEND,
+		'selectHosts' => array('hostid', 'host', 'name', 'status'),
 		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => $sortfield,
 		'limit' => $config['search_limit'] + 1
@@ -250,7 +257,7 @@ else {
 
 	// sorting & paging
 	order_result($data['proxies'], $sortfield, getPageSortOrder());
-	$data['paging'] = getPagingLine($data['proxies']);
+	$data['paging'] = getPagingLine($data['proxies'], array('proxyid'));
 
 	// nodes
 	foreach ($data['proxies'] as &$proxy) {

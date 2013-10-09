@@ -101,20 +101,23 @@ if (!$this->data['is_profile']) {
 $languageComboBox = new CComboBox('lang', $this->data['lang']);
 $languagesUnableSet = 0;
 
-foreach (getLocales() as $localeId => $localeName) {
-	// checking if this locale exists in the system. The only way of doing it is to try and set one
-	// trying to set only the LC_MONETARY locale to avoid changing LC_NUMERIC
-	$localeExists = (setlocale(LC_MONETARY , zbx_locale_variants($localeId)) || $localeId == 'en_GB') ? 'yes' : 'no';
+foreach (getLocales() as $localeId => $locale) {
+	if ($locale['display']) {
+		// checking if this locale exists in the system. The only way of doing it is to try and set one
+		// trying to set only the LC_MONETARY locale to avoid changing LC_NUMERIC
+		$localeExists = (setlocale(LC_MONETARY , zbx_locale_variants($localeId)) || $localeId == 'en_GB') ? 'yes' : 'no';
 
-	$languageComboBox->addItem(
-		$localeId,
-		$localeName,
-		($localeId == $this->data['lang']) ? true : null,
-		$localeExists
-	);
+		$languageComboBox->addItem(
+			$localeId,
+			$locale['name'],
+			($localeId == $this->data['lang']) ? true : null,
+			$localeExists,
+			$localeExists == 'yes' ? '' : 'disabled'
+		);
 
-	if ($localeExists != 'yes') {
-		$languagesUnableSet++;
+		if ($localeExists != 'yes') {
+			$languagesUnableSet++;
+		}
 	}
 }
 
@@ -310,11 +313,11 @@ if ($this->data['is_profile']) {
 }
 
 // append form lists to tab
-$userTab = new CTabView(array('remember' => 1));
-$userTab->addTab('userTab', _('User'), $userFormList);
+$userTab = new CTabView();
 if (!$this->data['form_refresh']) {
 	$userTab->setSelected(0);
 }
+$userTab->addTab('userTab', _('User'), $userFormList);
 if (isset($userMediaFormList)) {
 	$userTab->addTab('mediaTab', _('Media'), $userMediaFormList);
 }

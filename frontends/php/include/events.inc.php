@@ -34,7 +34,7 @@ function eventSource($source = null) {
 		EVENT_SOURCE_TRIGGERS => _('trigger'),
 		EVENT_SOURCE_DISCOVERY => _('discovery'),
 		EVENT_SOURCE_AUTO_REGISTRATION => _('auto registration'),
-		EVENT_SOURCE_INTERNAL => _('internal')
+		EVENT_SOURCE_INTERNAL => _x('internal', 'event source')
 	);
 
 	if ($source === null) {
@@ -99,7 +99,7 @@ function eventSourceObjects() {
 function get_tr_event_by_eventid($eventid) {
 	$sql = 'SELECT e.*,t.triggerid,t.description,t.expression,t.priority,t.status,t.type'.
 			' FROM events e,triggers t'.
-			' WHERE e.eventid='.$eventid.
+			' WHERE e.eventid='.zbx_dbstr($eventid).
 				' AND e.object='.EVENT_OBJECT_TRIGGER.
 				' AND t.triggerid=e.objectid';
 	return DBfetch(DBselect($sql));
@@ -164,9 +164,10 @@ function get_next_event($currentEvent, array $eventList = array()) {
 
 	$sql = 'SELECT e.*'.
 			' FROM events e'.
-			' WHERE e.objectid='.$currentEvent['objectid'].
-				' AND e.eventid>'.$currentEvent['eventid'].
-				' AND e.object='.$currentEvent['object'].
+			' WHERE e.objectid='.zbx_dbstr($currentEvent['objectid']).
+				' AND e.eventid>'.zbx_dbstr($currentEvent['eventid']).
+				' AND e.object='.zbx_dbstr($currentEvent['object']).
+				' AND e.source='.zbx_dbstr($currentEvent['source']).
 			' ORDER BY e.object,e.objectid,e.eventid';
 	return DBfetch(DBselect($sql, 1));
 }

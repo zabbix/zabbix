@@ -86,9 +86,7 @@ if (isset($_REQUEST['screenid'])) {
 	}
 
 	if (empty($screens)) {
-		if (empty($screens)) {
-			access_deny();
-		}
+		access_deny();
 	}
 }
 
@@ -291,8 +289,19 @@ else {
 	order_result($data['screens'], $sortfield, getPageSortOrder());
 
 	// paging
-	$data['paging'] = getPagingLine($data['screens']);
+	$data['paging'] = getPagingLine(
+		$data['screens'],
+		array('screenid'),
+		array('templateid' => get_request('templateid'))
+	);
 
+	// nodes
+	if ($data['displayNodes'] = is_array(get_current_nodeid())) {
+		foreach ($data['screens'] as &$screen) {
+			$screen['nodename'] = get_node_name_by_elid($screen['screenid'], true);
+		}
+		unset($screen);
+	}
 
 	// render view
 	$screenView = new CView('configuration.screen.list', $data);

@@ -38,8 +38,41 @@ function jsRedirect($url, $timeout = null) {
 	insert_js($script);
 }
 
+/**
+ * Check if request exist.
+ *
+ * @param string	$name
+ *
+ * @return bool
+ */
+function hasRequest($name) {
+	return isset($_REQUEST[$name]);
+}
+
+/**
+ * Check request, if exist request - return request value, else return default value.
+ *
+ * @param string	$name
+ * @param mixed		$def
+ *
+ * @return mixed
+ */
+function getRequest($name, $def = null) {
+	return hasRequest($name) ? $_REQUEST[$name] : $def;
+}
+
+/**
+ * Check request, if exist request - return request value, else return default value.
+ *
+ * @deprecated function, use getRequest() instead
+ *
+ * @param string	$name
+ * @param mixed		$def
+ *
+ * @return mixed
+ */
 function get_request($name, $def = null) {
-	return isset($_REQUEST[$name]) ? $_REQUEST[$name] : $def;
+	return getRequest($name, $def);
 }
 
 function countRequest($str = null) {
@@ -431,7 +464,7 @@ function convertUnitsUptime($value) {
 	$secs -= $mins * SEC_PER_MIN;
 
 	if ($days != 0) {
-		$value .= _n('%1$d day, ', '%1$d days, ', $days);
+		$value .= _n('%1$d day', '%1$d days', $days).', ';
 	}
 	$value .= sprintf('%02d:%02d:%02d', $hours, $mins, $secs);
 
@@ -544,68 +577,93 @@ function convertUnitsS($value, $ignoreMillisec = false) {
  * Example:
  * 	6442450944 B convert to 6 GB
  *
- * @param string $value
- * @param string $units
- * @param string $convert
- * @param string $byteStep
- * @param string $pow
- * @param bool $ignoreMillisec
+ * @param array  $options
+ * @param string $options['value']
+ * @param string $options['units']
+ * @param string $options['convert']
+ * @param string $options['byteStep']
+ * @param string $options['pow']
+ * @param bool   $options['ignoreMillisec']
+ * @param string $options['length']
  *
  * @return string
  */
-function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byteStep = false, $pow = false, $ignoreMillisec = false) {
+function convert_units($options = array()) {
+	$defOptions = array(
+		'value' => null,
+		'units' => null,
+		'convert' => ITEM_CONVERT_WITH_UNITS,
+		'byteStep' => false,
+		'pow' => false,
+		'ignoreMillisec' => false,
+		'length' => false
+	);
+
+	$options = zbx_array_merge($defOptions, $options);
+
 	// special processing for unix timestamps
-	if ($units == 'unixtime') {
-		return zbx_date2str(_('Y.m.d H:i:s'), $value);
+	if ($options['units'] == 'unixtime') {
+		return zbx_date2str(_('Y.m.d H:i:s'), $options['value']);
 	}
 
 	// special processing of uptime
-	if ($units == 'uptime') {
-		return convertUnitsUptime($value);
+	if ($options['units'] == 'uptime') {
+		return convertUnitsUptime($options['value']);
 	}
 
 	// special processing for seconds
-	if ($units == 's') {
-		return convertUnitsS($value, $ignoreMillisec);
+	if ($options['units'] == 's') {
+		return convertUnitsS($options['value'], $options['ignoreMillisec']);
 	}
 
 	// any other unit
 	// black list wich do not require units metrics..
 	$blackList = array('%', 'ms', 'rpm', 'RPM');
 
-	if (in_array($units, $blackList) || (zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS))) {
-		if (abs($value) >= ZBX_UNITS_ROUNDOFF_THRESHOLD) {
-			$value = round($value, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
+	if (in_array($options['units'], $blackList) || (zbx_empty($options['units'])
+			&& ($options['convert'] == ITEM_CONVERT_WITH_UNITS))) {
+		if (abs($options['value']) >= ZBX_UNITS_ROUNDOFF_THRESHOLD) {
+			$options['value'] = round($options['value'], ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
 		}
-		$value = sprintf('%.'.ZBX_UNITS_ROUNDOFF_LOWER_LIMIT.'f', $value);
-		$value = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U', '$1$2$3', $value);
-		$value = rtrim($value, '.');
+		$options['value'] = sprintf('%.'.ZBX_UNITS_ROUNDOFF_LOWER_LIMIT.'f', $options['value']);
+		$options['value'] = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U', '$1$2$3', $options['value']);
+		$options['value'] = rtrim($options['value'], '.');
 
-		if (zbx_empty($units)) {
-			return $value;
-		}
-		else {
-			return $value.' '.$units;
-		}
+		return trim($options['value'].' '.$options['units']);
 	}
 
 	// if one or more items is B or Bps, then Y-scale use base 8 and calculated in bytes
-	if ($byteStep) {
+	if ($options['byteStep']) {
 		$step = 1024;
 	}
 	else {
-		switch ($units) {
+		switch ($options['units']) {
 			case 'Bps':
 			case 'B':
 				$step = 1024;
-				$convert = $convert ? $convert : ITEM_CONVERT_NO_UNITS;
+				$options['convert'] = $options['convert'] ? $options['convert'] : ITEM_CONVERT_NO_UNITS;
 				break;
 			case 'b':
 			case 'bps':
-				$convert = $convert ? $convert : ITEM_CONVERT_NO_UNITS;
+				$options['convert'] = $options['convert'] ? $options['convert'] : ITEM_CONVERT_NO_UNITS;
 			default:
 				$step = 1000;
 		}
+	}
+
+	if ($options['value'] < 0) {
+		$abs = bcmul($options['value'], '-1');
+	}
+	else {
+		$abs = $options['value'];
+	}
+
+	if (bccomp($abs, 1) == -1) {
+		$options['value'] = round($options['value'], ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT);
+		$options['value'] = ($options['length'] && $options['value'] != 0)
+			? sprintf('%.'.$options['length'].'f',$options['value']) : $options['value'];
+
+		return trim($options['value'].' '.$options['units']);
 	}
 
 	// init intervals
@@ -616,8 +674,6 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byte
 
 	if (!isset($digitUnits[$step])) {
 		$digitUnits[$step] = array(
-			array('pow' => -2, 'short' => _x('µ', 'Micro short'), 'long' => _('Micro')),
-			array('pow' => -1, 'short' => _x('m', 'Milli short'), 'long' => _('Milli')),
 			array('pow' => 0, 'short' => '', 'long' => ''),
 			array('pow' => 1, 'short' => _x('K', 'Kilo short'), 'long' => _('Kilo')),
 			array('pow' => 2, 'short' => _x('M', 'Mega short'), 'long' => _('Mega')),
@@ -635,16 +691,10 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byte
 		}
 	}
 
-	if ($value < 0) {
-		$abs = bcmul($value, '-1');
-	}
-	else {
-		$abs = $value;
-	}
 
-	$valUnit = array('pow' => 0, 'short' => '', 'long' => '', 'value' => $value);
+	$valUnit = array('pow' => 0, 'short' => '', 'long' => '', 'value' => $options['value']);
 
-	if ($pow === false || $value == 0) {
+	if ($options['pow'] === false || $options['value'] == 0) {
 		foreach ($digitUnits[$step] as $dnum => $data) {
 			if (bccomp($abs, $data['value']) > -1) {
 				$valUnit = $data;
@@ -656,41 +706,40 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byte
 	}
 	else {
 		foreach ($digitUnits[$step] as $data) {
-			if ($pow == $data['pow']) {
+			if ($options['pow'] == $data['pow']) {
 				$valUnit = $data;
 				break;
 			}
 		}
 	}
 
-	if (round($valUnit['value'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) > 0) {
-		if ($valUnit['pow'] >= 0) {
-			$valUnit['value'] = bcdiv(sprintf('%.6f',$value), sprintf('%.6f', $valUnit['value']),
-				ZBX_UNITS_ROUNDOFF_LOWER_LIMIT);
-		}
-		else {
-			$valUnit['value'] = bcdiv(sprintf('%.10f',$value), sprintf('%.10f', $valUnit['value']), ZBX_PRECISION_10);
-		}
+	if (round($valUnit['value'], ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT) > 0) {
+		$valUnit['value'] = bcdiv(sprintf('%.10f',$options['value']), sprintf('%.10f', $valUnit['value'])
+			, ZBX_PRECISION_10);
 	}
 	else {
 		$valUnit['value'] = 0;
 	}
 
-	switch ($convert) {
-		case 0: $units = trim($units);
+	switch ($options['convert']) {
+		case 0: $options['units'] = trim($options['units']);
 		case 1: $desc = $valUnit['short']; break;
 		case 2: $desc = $valUnit['long']; break;
 	}
 
-	$value = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', round($valUnit['value'], ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
-	$value = rtrim($value, '.');
+	$options['value'] = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', round($valUnit['value'],
+		ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
+
+	$options['value'] = rtrim($options['value'], '.');
 
 	// fix negative zero
-	if (bccomp($value, 0) == 0) {
-		$value = 0;
+	if (bccomp($options['value'], 0) == 0) {
+		$options['value'] = 0;
 	}
 
-	return rtrim(sprintf('%s %s%s', $value, $desc, $units));
+	return trim(sprintf('%s %s%s', $options['length']
+		? sprintf('%.'.$options['length'].'f',$options['value'])
+		: $options['value'], $desc, $options['units']));
 }
 
 /**
@@ -1537,7 +1586,7 @@ function zbx_array_mintersect($keys, $array) {
 
 function zbx_str2links($text) {
 	$result = array();
-	if (empty($text)) {
+	if (zbx_empty($text)) {
 		return $result;
 	}
 	preg_match_all('#https?://[^\n\t\r ]+#u', $text, $matches, PREG_OFFSET_CAPTURE);
@@ -1713,8 +1762,16 @@ function getPageNumber() {
 	return $pageNumber;
 }
 
-/************* PAGING *************/
-function getPagingLine(&$items) {
+/**
+ * Returns paging line.
+ *
+ * @param array $items				list of items
+ * @param array $removeUrlParams	params to remove from URL
+ * @param array $urlParams			params to add in URL
+ *
+ * @return CTable
+ */
+function getPagingLine(&$items, array $removeUrlParams = array(), array $urlParams = array()) {
 	global $page;
 
 	$config = select_config();
@@ -1765,6 +1822,17 @@ function getPagingLine(&$items) {
 
 	if ($pagesCount > 1) {
 		$url = new Curl();
+
+		if (is_array($urlParams) && $urlParams) {
+			foreach ($urlParams as $key => $value) {
+				$url->setArgument($key, $value);
+			}
+		}
+
+		$removeUrlParams = array_merge($removeUrlParams, array('go', 'form', 'delete', 'cancel'));
+		foreach ($removeUrlParams as $param) {
+			$url->removeArgument($param);
+		}
 
 		if ($startPage > 1) {
 			$url->setArgument('page', 1);
@@ -2366,13 +2434,14 @@ function get_status() {
 	// triggers
 	$dbTriggers = DBselect(
 		'SELECT COUNT(DISTINCT t.triggerid) AS cnt,t.status,t.value'.
-				' FROM triggers t'.
-				' INNER JOIN functions f ON t.triggerid=f.triggerid'.
-				' INNER JOIN items i ON f.itemid=i.itemid'.
-				' INNER JOIN hosts h ON i.hostid=h.hostid'.
-				' WHERE i.status='.ITEM_STATUS_ACTIVE.
+			' FROM triggers t'.
+			' INNER JOIN functions f ON t.triggerid=f.triggerid'.
+			' INNER JOIN items i ON f.itemid=i.itemid'.
+			' INNER JOIN hosts h ON i.hostid=h.hostid'.
+			' WHERE i.status='.ITEM_STATUS_ACTIVE.
 				' AND h.status='.HOST_STATUS_MONITORED.
-				' GROUP BY t.status,t.value');
+				' AND t.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
+			' GROUP BY t.status,t.value');
 	while ($dbTrigger = DBfetch($dbTriggers)) {
 		switch ($dbTrigger['status']) {
 			case TRIGGER_STATUS_ENABLED:
@@ -2399,6 +2468,8 @@ function get_status() {
 				' FROM items i'.
 				' INNER JOIN hosts h ON i.hostid=h.hostid'.
 				' WHERE h.status='.HOST_STATUS_MONITORED.
+					' AND i.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
+					' AND i.type<>'.ITEM_TYPE_HTTPTEST.
 				' GROUP BY i.status,i.state');
 	while ($dbItem = DBfetch($dbItems)) {
 		if ($dbItem['status'] == ITEM_STATUS_ACTIVE) {
@@ -2574,7 +2645,210 @@ function checkRequiredKeys(array $array, array $keys) {
  */
 function clearCookies($clear = false, $id = null) {
 	if ($clear) {
-		$url = new CUrl();
-		insert_js('cookie.eraseArray("'.basename($url->getPath(), '.php').($id ? '_'.$id : '').'")');
+		insert_js('cookie.eraseArray("'.basename($_SERVER['SCRIPT_NAME'], '.php').($id ? '_'.$id : '').'")');
 	}
+}
+
+/**
+ * Prepare data for host menu popup.
+ *
+ * @param array  $host						host data
+ * @param string $host['hostid']			host id
+ * @param array  $host['screens']			host screens (optional)
+ * @param array  $scripts					host scripts (optional)
+ * @param string $scripts[]['name']			script name
+ * @param string $scripts[]['scriptid']		script id
+ * @param string $scripts[]['confirmation']	confirmation text
+ * @param bool   $hasGoTo					"Go to" block in popup
+ *
+ * @return array
+ */
+function getMenuPopupHost(array $host, array $scripts = null, $hasGoTo = true) {
+	$data = array(
+		'type' => 'host',
+		'hostid' => $host['hostid'],
+		'hasScreens' => (isset($host['screens']) && $host['screens']),
+		'hasGoTo' => $hasGoTo
+	);
+
+	if ($scripts) {
+		CArrayHelper::sort($scripts, array('name'));
+
+		foreach (array_values($scripts) as $script) {
+			$data['scripts'][] = array(
+				'name' => $script['name'],
+				'scriptid' => $script['scriptid'],
+				'confirmation' => $script['confirmation']
+			);
+		}
+	}
+
+	return $data;
+}
+
+/**
+ * Prepare data for host menu popup.
+ *
+ * @param string $hostId					host id
+ * @param array  $scripts					host scripts (optional)
+ * @param string $scripts[]['name']			script name
+ * @param string $scripts[]['scriptid']		script id
+ * @param string $scripts[]['confirmation']	confirmation text
+ * @param array  $gotos						goto links (optional)
+ * @param array  $gotos['screens']			link to host screen page with url parameters ("name" => "value") (optional)
+ * @param array  $gotos['triggerStatus']	link to trigger status page with url parameters ("name" => "value") (optional)
+ * @param array  $gotos['submap']			link to submap page with url parameters ("name" => "value") (optional)
+ * @param array  $gotos['events']			link to events page with url parameters ("name" => "value") (optional)
+ * @param array  $urls						local and global map urls (optional)
+ * @param string $urls[]['name']			url name
+ * @param string $urls[]['url']				url
+ *
+ * @return array
+ */
+function getMenuPopupMap($hostId, array $scripts = null, array $gotos = null, array $urls = null) {
+	$data = array(
+		'type' => 'map'
+	);
+
+	if ($scripts) {
+		CArrayHelper::sort($scripts, array('name'));
+
+		$data['hostid'] = $hostId;
+
+		foreach (array_values($scripts) as $script) {
+			$data['scripts'][] = array(
+				'name' => $script['name'],
+				'scriptid' => $script['scriptid'],
+				'confirmation' => $script['confirmation']
+			);
+		}
+	}
+
+	if ($gotos) {
+		$data['gotos'] = $gotos;
+	}
+
+	if ($urls) {
+		foreach ($urls as $url) {
+			$data['urls'][] = array(
+				'label' => $url['name'],
+				'url' => $url['url']
+			);
+		}
+	}
+
+	return $data;
+}
+
+/**
+ * Prepare data for item history menu popup.
+ *
+ * @param array $item				item data
+ * @param int   $item['itemid']		item id
+ * @param int   $item['value_type']	item value type
+ *
+ * @return array
+ */
+function getMenuPopupHistory(array $item) {
+	return array(
+		'type' => 'history',
+		'itemid' => $item['itemid'],
+		'hasLatestGraphs' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT))
+	);
+}
+
+/**
+ * Prepare data for trigger menu popup.
+ *
+ * @param array  $trigger						trigger data
+ * @param string $trigger['triggerid']			trigger id
+ * @param int    $trigger['flags']				trigger flags (TRIGGER_FLAG_DISCOVERY*)
+ * @param array  $trigger['hosts']				hosts, used by trigger expression
+ * @param string $trigger['hosts'][]['hostid']	host id
+ * @param string $trigger['url']				url
+ * @param array  $items							trigger items (optional)
+ * @param string $items[]['name']				item name
+ * @param array  $items[]['params']				item url parameters ("name" => "value")
+ * @param array  $acknowledge					acknowledge link parameters (optional)
+ * @param string $acknowledge['eventid']		event id
+ * @param string $acknowledge['screenid']		screen id (optional)
+ * @param string $acknowledge['backurl']		return url (optional)
+ * @param string $eventTime						event navigation time parameter (optional)
+ *
+ * @return array
+ */
+function getMenuPopupTrigger(array $trigger, array $items = null, array $acknowledge = null, $eventTime = null) {
+	if ($items) {
+		CArrayHelper::sort($items, array('name'));
+	}
+
+	$data = array(
+		'type' => 'trigger',
+		'triggerid' => $trigger['triggerid'],
+		'items' => $items,
+		'acknowledge' => $acknowledge,
+		'eventTime' => $eventTime,
+		'configuration' => null,
+		'url' => resolveTriggerUrl($trigger)
+	);
+
+	if ((CWebUser::$data['type'] == USER_TYPE_ZABBIX_ADMIN || CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN)
+			&& $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+		$host = reset($trigger['hosts']);
+
+		$data['configuration'] = array(
+			'hostid' => $host['hostid'],
+			'switchNode' => id2nodeid($trigger['triggerid'])
+		);
+	}
+
+	return $data;
+}
+
+/**
+ * Splitting string using slashes with escape backslash support.
+ *
+ * @param string $path				string path to parse
+ * @param bool   $stripSlashes		remove escaped slashes from the path pieces
+ *
+ * @return array
+ */
+function splitPath($path, $stripSlashes = true) {
+	$items = array();
+	$s = $escapes = '';
+
+	for ($i = 0, $size = strlen($path); $i < $size; $i++) {
+		if ($path[$i] === '/') {
+			if ($escapes === '') {
+				$items[] = $s;
+				$s = '';
+			}
+			else {
+				if (strlen($escapes) % 2 == 0) {
+					$s .= $stripSlashes ? stripslashes($escapes) : $escapes;
+					$items[] = $s;
+					$s = $escapes = '';
+				}
+				else {
+					$s .= $stripSlashes ? stripslashes($escapes).$path[$i] : $escapes.$path[$i];
+					$escapes = '';
+				}
+			}
+		}
+		elseif ($path[$i] === '\\') {
+			$escapes .= $path[$i];
+		}
+		else {
+			$s .= $stripSlashes ? stripslashes($escapes).$path[$i] : $escapes.$path[$i];
+			$escapes = '';
+		}
+	}
+
+	if ($escapes !== '') {
+		$s .= $stripSlashes ? stripslashes($escapes) : $escapes;
+	}
+
+	$items[] = $s;
+
+	return $items;
 }

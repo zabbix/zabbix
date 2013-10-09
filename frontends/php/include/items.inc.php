@@ -111,7 +111,7 @@ function item_type2str($type = null) {
 /**
  * Returns human readable an item value type
  *
- * @param integer $valueType
+ * @param int $valueType
  *
  * @return string
  */
@@ -283,8 +283,9 @@ function update_item_status($itemids, $status) {
 	while ($item = DBfetch($db_items)) {
 		$old_status = $item['status'];
 		if ($status != $old_status) {
-			$result &= DBexecute('UPDATE items SET status='.$status.
-				' WHERE itemid='.$item['itemid']);
+			$result &= DBexecute(
+				'UPDATE items SET status='.zbx_dbstr($status).' WHERE itemid='.zbx_dbstr($item['itemid'])
+			);
 			if ($result) {
 				$host = get_host_by_hostid($item['hostid']);
 				$item_new = get_item_by_itemid($item['itemid']);
@@ -474,7 +475,7 @@ function get_item_by_key($key, $host = '') {
 }
 
 function get_item_by_itemid($itemid) {
-	$db_items = DBfetch(DBselect('SELECT i.* FROM items i WHERE i.itemid='.$itemid));
+	$db_items = DBfetch(DBselect('SELECT i.* FROM items i WHERE i.itemid='.zbx_dbstr($itemid)));
 	if ($db_items) {
 		return $db_items;
 	}
@@ -491,7 +492,7 @@ function get_item_by_itemid_limited($itemid) {
 			'i.valuemapid,i.delay_flex,i.params,i.ipmi_sensor,i.templateid,i.authtype,i.username,i.password,'.
 			'i.publickey,i.privatekey,i.flags,i.filter,i.description,i.inventory_link'.
 		' FROM items i'.
-		' WHERE i.itemid='.$itemid));
+		' WHERE i.itemid='.zbx_dbstr($itemid)));
 	if ($row) {
 		return $row;
 	}
@@ -524,7 +525,7 @@ function get_same_item_for_host($item, $dest_hostids) {
 		$db_items = DBselect(
 			'SELECT src.*'.
 			' FROM items src,items dest'.
-			' WHERE dest.itemid='.$itemid.
+			' WHERE dest.itemid='.zbx_dbstr($itemid).
 				' AND src.key_=dest.key_'.
 				' AND '.dbConditionInt('src.hostid', $dest_hostids)
 		);
@@ -713,27 +714,28 @@ function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
 /**
  * Retrieve overview table object for items.
  *
- * @param        $hostids
+ * @param array  $hostIds
  * @param string $application name of application to filter
- * @param null   $view_style
+ * @param int    $viewMode
  *
  * @return CTableInfo
  */
-function get_items_data_overview($hostids, $application, $view_style) {
+function getItemsDataOverview($hostIds, $application, $viewMode) {
 	$sqlFrom = '';
 	$sqlWhere = '';
+
 	if ($application !== '') {
 		$sqlFrom = 'applications a,items_applications ia,';
 		$sqlWhere = ' AND i.itemid=ia.itemid AND a.applicationid=ia.applicationid AND a.name='.zbx_dbstr($application);
 	}
 
-	$db_items = DBfetchArray(DBselect(
+	$dbItems = DBfetchArray(DBselect(
 		'SELECT DISTINCT h.hostid,h.name AS hostname,i.itemid,i.key_,i.value_type,i.units,'.
 			'i.name,t.priority,i.valuemapid,t.value AS tr_value,t.triggerid'.
 		' FROM hosts h,'.$sqlFrom.'items i'.
 			' LEFT JOIN functions f ON f.itemid=i.itemid'.
 			' LEFT JOIN triggers t ON t.triggerid=f.triggerid AND t.status='.TRIGGER_STATUS_ENABLED.
-		' WHERE '.dbConditionInt('h.hostid', $hostids).
+		' WHERE '.dbConditionInt('h.hostid', $hostIds).
 			' AND h.status='.HOST_STATUS_MONITORED.
 			' AND h.hostid=i.hostid'.
 			' AND i.status='.ITEM_STATUS_ACTIVE.
@@ -743,29 +745,23 @@ function get_items_data_overview($hostids, $application, $view_style) {
 	));
 
 	// fetch latest values
-	$history = Manager::History()->fetchLast(zbx_toHash($db_items, 'itemid'));
-
-	$options = array(
-		'output' => array('name', 'hostid'),
-		'monitored_hosts' => true,
-		'hostids' => $hostids,
-		'with_monitored_items' => true,
-		'preservekeys' => true
-	);
-
-	if ($view_style == STYLE_LEFT) {
-		$options['selectScreens'] = API_OUTPUT_COUNT;
-		$options['selectInventory'] = array('hostid');
-	}
+	$history = Manager::History()->getLast(zbx_toHash($dbItems, 'itemid'));
 
 	// fetch data for the host JS menu
-	$hosts = API::Host()->get($options);
+	$hosts = API::Host()->get(array(
+		'output' => array('name', 'hostid', 'status'),
+		'monitored_hosts' => true,
+		'hostids' => $hostIds,
+		'with_monitored_items' => true,
+		'preservekeys' => true,
+		'selectScreens' => ($viewMode == STYLE_LEFT) ? API_OUTPUT_COUNT : null
+	));
 
 	$items = array();
-	foreach ($db_items as $row) {
+	foreach ($dbItems as $row) {
 		$descr = itemName($row);
 		$row['hostname'] = get_node_name_by_elid($row['hostid'], null, NAME_DELIMITER).$row['hostname'];
-		$hostnames[$row['hostid']] = $row['hostname'];
+		$hostNames[$row['hostid']] = $row['hostname'];
 
 		// a little tricky check for attempt to overwrite active trigger (value=1) with
 		// inactive or active trigger with lower priority.
@@ -789,48 +785,46 @@ function get_items_data_overview($hostids, $application, $view_style) {
 	}
 
 	$table = new CTableInfo(_('No items defined.'));
-	if (empty($hostnames)) {
+	if (empty($hostNames)) {
 		return $table;
 	}
 	$table->makeVerticalRotation();
-	order_result($hostnames);
 
-	if ($view_style == STYLE_TOP) {
+	order_result($hostNames);
+
+	if ($viewMode == STYLE_TOP) {
 		$header = array(new CCol(_('Items'), 'center'));
-		foreach ($hostnames as $hostname) {
-			$header[] = new CCol($hostname, 'vertical_rotation');
+		foreach ($hostNames as $hostName) {
+			$header[] = new CCol($hostName, 'vertical_rotation');
 		}
 		$table->setHeader($header, 'vertical_header');
 
 		foreach ($items as $descr => $ithosts) {
 			$tableRow = array(nbsp($descr));
-			foreach ($hostnames as $hostname) {
-				$tableRow = get_item_data_overview_cells($tableRow, $ithosts, $hostname);
+			foreach ($hostNames as $hostName) {
+				$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $hostName);
 			}
 			$table->addRow($tableRow);
 		}
 	}
 	else {
-		$hostScripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
-		foreach ($hostScripts as $hostid => $scripts) {
-			$hosts[$hostid]['scripts'] = $scripts;
-		}
+		$scripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
+
 		$header = array(new CCol(_('Hosts'), 'center'));
 		foreach ($items as $descr => $ithosts) {
 			$header[] = new CCol($descr, 'vertical_rotation');
 		}
 		$table->setHeader($header, 'vertical_header');
 
-		foreach ($hostnames as $hostid => $hostname) {
-			$host = $hosts[$hostid];
+		foreach ($hostNames as $hostId => $hostName) {
+			$host = $hosts[$hostId];
 
-			// host js menu link
-			$hostSpan = new CSpan(nbsp($host['name']), 'link_menu menu-host');
-			$hostSpan->setAttribute('data-menu', hostMenuData($host, $hostScripts[$host['hostid']]));
+			$name = new CSpan($host['name'], 'link_menu');
+			$name->setMenuPopup(getMenuPopupHost($host, $scripts[$hostId]));
 
-			$tableRow = array(new CCol($hostSpan));
+			$tableRow = array(new CCol($name));
 			foreach ($items as $ithosts) {
-				$tableRow = get_item_data_overview_cells($tableRow, $ithosts, $hostname);
+				$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $hostName);
 			}
 			$table->addRow($tableRow);
 		}
@@ -839,17 +833,16 @@ function get_items_data_overview($hostids, $application, $view_style) {
 	return $table;
 }
 
-function get_item_data_overview_cells(&$table_row, &$ithosts, $hostname) {
-	$css_class = '';
-	unset($it_ov_menu);
-
+function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
+	$css = '';
 	$value = '-';
 	$ack = null;
-	if (isset($ithosts[$hostname])) {
-		$item = $ithosts[$hostname];
+
+	if (isset($ithosts[$hostName])) {
+		$item = $ithosts[$hostName];
 
 		if ($item['tr_value'] == TRIGGER_VALUE_TRUE) {
-			$css_class = getSeverityStyle($item['severity']);
+			$css = getSeverityStyle($item['severity']);
 			$ack = get_last_event_by_triggerid($item['triggerid']);
 			$ack = ($ack['acknowledged'] == 1)
 				? array(SPACE, new CImg('images/general/tick.png', 'ack'))
@@ -857,43 +850,21 @@ function get_item_data_overview_cells(&$table_row, &$ithosts, $hostname) {
 		}
 
 		$value = ($item['value'] !== null) ? formatHistoryValue($item['value'], $item) : UNKNOWN_VALUE;
-
-		$it_ov_menu = array(
-			array(_('Values'), null, null, array('outer' => array('pum_oheader'), 'inner' => array('pum_iheader'))),
-			array(_('500 latest values'), 'history.php?action=showlatest&itemid='.$item['itemid'], array('tw' => '_blank'))
-		);
-
-		switch ($ithosts[$hostname]['value_type']) {
-			case ITEM_VALUE_TYPE_UINT64:
-			case ITEM_VALUE_TYPE_FLOAT:
-				$it_ov_menu = array_merge(array(
-					// name, url, (target [tw], statusbar [sb]), css, submenu
-					array(_('Graphs'), null, null,
-						array('outer' => array('pum_oheader'), 'inner' => array('pum_iheader'))
-					),
-					array(_('Last hour graph'), 'history.php?period=3600&action=showgraph&itemid='.$item['itemid'], array('tw' => '_blank')),
-					array(_('Last week graph'), 'history.php?period=604800&action=showgraph&itemid='.$item['itemid'], array('tw' => '_blank')),
-					array(_('Last month graph'), 'history.php?period=2678400&action=showgraph&itemid='.$item['itemid'], array('tw' => '_blank'))
-				), $it_ov_menu);
-				break;
-			default:
-				break;
-		}
 	}
 
 	if ($value != '-') {
 		$value = new CSpan($value, 'link');
 	}
-	$value_col = new CCol(array($value, $ack), $css_class);
 
-	if (isset($it_ov_menu)) {
-		$it_ov_menu = new CPUMenu($it_ov_menu, 170);
-		$value_col->onClick($it_ov_menu->getOnActionJS());
-		unset($it_ov_menu);
+	$column = new CCol(array($value, $ack), $css);
+
+	if (isset($ithosts[$hostName])) {
+		$column->setMenuPopup(getMenuPopupHistory($item));
 	}
-	array_push($table_row, $value_col);
 
-	return $table_row;
+	$tableRow[] = $column;
+
+	return $tableRow;
 }
 
 /******************************************************************************
@@ -907,7 +878,7 @@ function get_same_applications_for_host($applications, $hostid) {
 		'SELECT a1.applicationid'.
 		' FROM applications a1,applications a2'.
 		' WHERE a1.name=a2.name'.
-			' AND a1.hostid='.$hostid.
+			' AND a1.hostid='.zbx_dbstr($hostid).
 			' AND '.dbConditionInt('a2.applicationid', $applications)
 	);
 	while ($app = DBfetch($db_apps)) {
@@ -995,7 +966,10 @@ function formatHistoryValue($value, array $item, $trim = true) {
 
 	// format value
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-		$value = convert_units($value, $item['units']);
+		$value = convert_units(array(
+				'value' => $value,
+				'units' => $item['units']
+		));
 	}
 	elseif ($item['value_type'] != ITEM_VALUE_TYPE_STR
 		&& $item['value_type'] != ITEM_VALUE_TYPE_TEXT
@@ -1057,11 +1031,11 @@ function getItemFunctionalValue($item, $function, $param) {
 			'SELECT '.$function.'(value) AS value'.
 			' FROM '.$historyTables[$item['value_type']].
 			' WHERE clock>'.(time() - convertFunctionValue($param)).
-			' AND itemid='.$item['itemid'].
+			' AND itemid='.zbx_dbstr($item['itemid']).
 			' HAVING COUNT(*)>0' // necessary because DBselect() return 0 if empty data set, for graph templates
 		);
 		if ($row = DBfetch($result)) {
-			return convert_units($row['value'], $item['units']);
+			return convert_units(array('value' => $row['value'], 'units' => $item['units']));
 		}
 		// no data in history
 		else {
@@ -1070,96 +1044,75 @@ function getItemFunctionalValue($item, $function, $param) {
 	}
 }
 
-/*
- * Parameters:
- *     itemid - item ID
- *     last  - 0 - last value (clock is used), 1 - last value
+/**
+ * Returns the history value of the item at the given time. If no value exists at the given time, the function
+ * will return the previous value.
+ *
+ * The $db_item parameter must have the value_type and itemid properties set.
+ *
+ * @param array $db_item
+ * @param int $clock
+ * @param int $ns
+ *
+ * @return string
  */
-function item_get_history($db_item, $last = 1, $clock = 0, $ns = 0) {
+function item_get_history($db_item, $clock, $ns) {
 	$value = null;
 
-	switch ($db_item['value_type']) {
-		case ITEM_VALUE_TYPE_FLOAT:
-			$table = 'history';
-			break;
-		case ITEM_VALUE_TYPE_UINT64:
-			$table = 'history_uint';
-			break;
-		case ITEM_VALUE_TYPE_TEXT:
-			$table = 'history_text';
-			break;
-		case ITEM_VALUE_TYPE_STR:
-			$table = 'history_str';
-			break;
-		case ITEM_VALUE_TYPE_LOG:
-		default:
-			$table = 'history_log';
-			break;
+	$table = CHistoryManager::getTableName($db_item['value_type']);
+
+	$sql = 'SELECT value'.
+			' FROM '.$table.
+			' WHERE itemid='.zbx_dbstr($db_item['itemid']).
+				' AND clock='.zbx_dbstr($clock).
+				' AND ns='.zbx_dbstr($ns);
+	if (null != ($row = DBfetch(DBselect($sql, 1)))) {
+		$value = $row['value'];
+	}
+	if ($value != null) {
+		return $value;
 	}
 
-	if ($last == 0) {
-		$sql = 'SELECT value'.
-				' FROM '.$table.
-				' WHERE itemid='.$db_item['itemid'].
-					' AND clock='.$clock.
-					' AND ns='.$ns;
-		if (null != ($row = DBfetch(DBselect($sql, 1)))) {
-			$value = $row['value'];
-		}
-		if ($value != null) {
-			return $value;
-		}
+	$max_clock = 0;
 
-		$max_clock = 0;
-
-		$sql = 'SELECT DISTINCT clock'.
+	$sql = 'SELECT DISTINCT clock'.
+			' FROM '.$table.
+			' WHERE itemid='.zbx_dbstr($db_item['itemid']).
+				' AND clock='.zbx_dbstr($clock).
+				' AND ns<'.zbx_dbstr($ns);
+	if (null != ($row = DBfetch(DBselect($sql)))) {
+		$max_clock = $row['clock'];
+	}
+	if ($max_clock == 0) {
+		$sql = 'SELECT MAX(clock) AS clock'.
 				' FROM '.$table.
-				' WHERE itemid='.$db_item['itemid'].
-					' AND clock='.$clock.
-					' AND ns<'.$ns;
+				' WHERE itemid='.zbx_dbstr($db_item['itemid']).
+					' AND clock<'.zbx_dbstr($clock);
 		if (null != ($row = DBfetch(DBselect($sql)))) {
 			$max_clock = $row['clock'];
 		}
-		if ($max_clock == 0) {
-			$sql = 'SELECT MAX(clock) AS clock'.
-					' FROM '.$table.
-					' WHERE itemid='.$db_item['itemid'].
-						' AND clock<'.$clock;
-			if (null != ($row = DBfetch(DBselect($sql)))) {
-				$max_clock = $row['clock'];
-			}
-		}
-		if ($max_clock == 0) {
-			return $value;
-		}
+	}
+	if ($max_clock == 0) {
+		return $value;
+	}
 
-		if ($clock == $max_clock) {
-			$sql = 'SELECT value'.
-					' FROM '.$table.
-					' WHERE itemid='.$db_item['itemid'].
-						' AND clock='.$clock.
-						' AND ns<'.$ns;
-		}
-		else {
-			$sql = 'SELECT value'.
-					' FROM '.$table.
-					' WHERE itemid='.$db_item['itemid'].
-						' AND clock='.$max_clock.
-					' ORDER BY itemid,clock desc,ns desc';
-		}
-
-		if (null != ($row = DBfetch(DBselect($sql, 1)))) {
-			$value = $row['value'];
-		}
+	if ($clock == $max_clock) {
+		$sql = 'SELECT value'.
+				' FROM '.$table.
+				' WHERE itemid='.zbx_dbstr($db_item['itemid']).
+					' AND clock='.zbx_dbstr($clock).
+					' AND ns<'.zbx_dbstr($ns);
 	}
 	else {
-		$row = DBfetch(DBselect('SELECT MAX(clock) AS clock FROM '.$table.' WHERE itemid='.$db_item['itemid']));
-		if (!empty($row['clock'])) {
-			$row = DBfetch(DBselect('SELECT value FROM '.$table.' WHERE itemid='.$db_item['itemid'].' AND clock='.$row['clock'].' ORDER BY ns DESC', 1));
-			if (!empty($row['value'])) {
-				$value = $row['value'];
-			}
-		}
+		$sql = 'SELECT value'.
+				' FROM '.$table.
+				' WHERE itemid='.zbx_dbstr($db_item['itemid']).
+					' AND clock='.zbx_dbstr($max_clock).
+				' ORDER BY itemid,clock desc,ns desc';
+	}
+
+	if (null != ($row = DBfetch(DBselect($sql, 1)))) {
+		$value = $row['value'];
 	}
 
 	return $value;
@@ -1447,7 +1400,7 @@ function getParamFieldLabelByType($itemType) {
 		case ITEM_TYPE_JMX:
 			return _('Executed script');
 		case ITEM_TYPE_DB_MONITOR:
-			return _('Additional parameters');
+			return _('SQL query');
 		case ITEM_TYPE_CALCULATED:
 			return _('Formula');
 		default:

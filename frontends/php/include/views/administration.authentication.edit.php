@@ -32,7 +32,7 @@ $authenticationFormList = new CFormList('authenticationList');
 // append config radio buttons to form list
 $configTypeRadioButton = array(
 	new CRadioButton('config', ZBX_AUTH_INTERNAL, null, 'config_'.ZBX_AUTH_INTERNAL, $this->data['config'] == ZBX_AUTH_INTERNAL, 'submit()'),
-	new CLabel(_('Internal'), 'config_'.ZBX_AUTH_INTERNAL),
+	new CLabel(_x('Internal', 'authentication'), 'config_'.ZBX_AUTH_INTERNAL),
 	new CRadioButton('config', ZBX_AUTH_LDAP, null, 'config_'.ZBX_AUTH_LDAP, $this->data['config'] == ZBX_AUTH_LDAP, 'submit()'),
 	new CLabel(_('LDAP'), 'config_'.ZBX_AUTH_LDAP),
 	new CRadioButton('config', ZBX_AUTH_HTTP, null, 'config_'.ZBX_AUTH_HTTP, $this->data['config'] == ZBX_AUTH_HTTP, 'submit()'),

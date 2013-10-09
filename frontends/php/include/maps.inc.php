@@ -78,34 +78,33 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 	$mapInfo = getSelementsInfo($sysmap, $options);
 	processAreasCoordinates($sysmap, $areas, $mapInfo);
 
-	$hostids = array();
-	foreach ($sysmap['selements'] as $sid => &$selement) {
+	$hostIds = array();
+	foreach ($sysmap['selements'] as $id => &$selement) {
 		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
-			$hostids[$selement['elementid']] = $selement['elementid'];
+			$hostIds[$selement['elementid']] = $selement['elementid'];
 
 			// expanding hosts url macros again as some hosts were added from hostgroup areeas
 			// and automatic expanding only happens for elements that are defined for map in db
-			foreach ($selement['urls'] as $urlid => $url) {
-				$selement['urls'][$urlid]['url'] = str_replace('{HOST.ID}', $selement['elementid'], $url['url']);
+			foreach ($selement['urls'] as $urlId => $url) {
+				$selement['urls'][$urlId]['url'] = str_replace('{HOST.ID}', $selement['elementid'], $url['url']);
 			}
 		}
+
 		if ($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
-			unset($sysmap['selements'][$sid]);
+			unset($sysmap['selements'][$id]);
 		}
 	}
 	unset($selement);
 
-	if (count($hostids)) {
-		$scripts_by_hosts = API::Script()->getScriptsByHosts($hostids);
-	}
+	$hostScripts = API::Script()->getScriptsByHosts($hostIds);
 
 	$hosts = API::Host()->get(array(
 		'nodeids' => get_current_nodeid(true),
-		'hostids' => $hostids,
+		'hostids' => $hostIds,
 		'output' => array('status'),
 		'nopermissions' => true,
 		'preservekeys' => true,
-		'selectScreens' => API_OUTPUT_COUNT,
+		'selectScreens' => API_OUTPUT_COUNT
 	));
 
 	foreach ($sysmap['selements'] as $elem) {
@@ -121,24 +120,60 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 		);
 		$area->addClass('menu-map');
 
-		// pop up menu
+		$hostId = null;
+		$scripts = null;
+		$gotos = null;
+
+		switch ($elem['elementtype']) {
+			case SYSMAP_ELEMENT_TYPE_HOST:
+				$host = $hosts[$elem['elementid']];
+
+				if ($hostScripts[$elem['elementid']]) {
+					$hostId = $elem['elementid'];
+					$scripts = $hostScripts[$elem['elementid']];
+				}
+				if ($hosts[$elem['elementid']]['status'] == HOST_STATUS_MONITORED) {
+					$gotos['triggerStatus'] = array(
+						'hostid' => $elem['elementid'],
+						'show_severity' => isset($options['severity_min']) ? $options['severity_min'] : null
+					);
+				}
+				if ($host['screens']) {
+					$gotos['screens'] = array(
+						'hostid' => $host['hostid']
+					);
+				}
+				$gotos['inventory'] = array(
+					'hostid' => $host['hostid']
+				);
+				break;
+
+			case SYSMAP_ELEMENT_TYPE_MAP:
+				$gotos['submap'] = array(
+					'sysmapid' => $elem['elementid'],
+					'severity_min' => isset($options['severity_min']) ? $options['severity_min'] : null
+				);
+				break;
+
+			case SYSMAP_ELEMENT_TYPE_TRIGGER:
+				$gotos['events'] = array(
+					'triggerid' => $elem['elementid'],
+					'nav_time' => time() - SEC_PER_WEEK
+				);
+				break;
+
+			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+				$gotos['triggerStatus'] = array(
+					'groupid' => $elem['elementid'],
+					'hostid' => 0,
+					'show_severity' => isset($options['severity_min']) ? $options['severity_min'] : null
+				);
+				break;
+		}
+
 		order_result($elem['urls'], 'name');
 
-		$menuData = array(
-			'urls' => array_values($elem['urls']),
-			'elementId' => $elem['elementid'],
-			'elementType' => $elem['elementtype'],
-			'scripts' => array(),
-			'hasScreens' => false,
-			'isMonitored' => false
-		);
-		if ($elem['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
-			$host = $hosts[$elem['elementid']];
-			$menuData['scripts'] = $scripts_by_hosts[$elem['elementid']];
-			$menuData['hasScreens'] = (bool) $host['screens'];
-			$menuData['isMonitored'] = $hosts[$elem['elementid']]['status'] == HOST_STATUS_MONITORED;
-		}
-		$area->setAttribute('data-menu', $menuData);
+		$area->setMenuPopup(getMenuPopupMap($hostId, $scripts, $gotos, $elem['urls']));
 
 		$actionMap->addItem($area);
 	}
@@ -254,7 +289,7 @@ function resolveMapLabelMacrosAll(array $selement) {
 			$res = DBselect('SELECT hi.ip,hi.dns,hi.useip,h.host,h.name,hi.type AS interfacetype'.
 					' FROM interface hi,hosts h'.
 					' WHERE hi.hostid=h.hostid'.
-						' AND hi.main=1 AND hi.hostid='.$selement['elementid']);
+						' AND hi.main=1 AND hi.hostid='.zbx_dbstr($selement['elementid']));
 
 			// process interface priorities
 			$tmpPriority = 0;
@@ -274,7 +309,7 @@ function resolveMapLabelMacrosAll(array $selement) {
 					' WHERE h.hostid=hi.hostid'.
 						' AND hi.hostid=i.hostid'.
 						' AND i.itemid=f.itemid'.
-						' AND hi.main=1 AND f.triggerid='.$selement['elementid'].
+						' AND hi.main=1 AND f.triggerid='.zbx_dbstr($selement['elementid']).
 					' ORDER BY f.functionid');
 
 			// process interface priorities, build $hostsByFunctionId array
@@ -461,7 +496,7 @@ function get_map_elements($db_element, &$elements) {
 			$db_mapselements = DBselect(
 				'SELECT DISTINCT se.elementtype,se.elementid'.
 				' FROM sysmaps_elements se'.
-				' WHERE se.sysmapid='.$db_element['elementid']
+				' WHERE se.sysmapid='.zbx_dbstr($db_element['elementid'])
 			);
 			while ($db_mapelement = DBfetch($db_mapselements)) {
 				get_map_elements($db_mapelement, $elements);

@@ -56,7 +56,7 @@ class testFormHostGroup extends CWebTest {
 
 		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent('ERROR: Page received incorrect data');
-		$this->zbxTestTextPresent('Warning. Incorrect value for field "name": cannot be empty.');
+		$this->zbxTestTextPresent('Incorrect value for field "name": cannot be empty.');
 	}
 
 	public function testFormHostGroup_Create() {
@@ -85,7 +85,7 @@ class testFormHostGroup extends CWebTest {
 		$this->input_type('name', '');
 		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent('ERROR: Page received incorrect data');
-		$this->zbxTestTextPresent('Warning. Incorrect value for field "name": cannot be empty.');
+		$this->zbxTestTextPresent('Incorrect value for field "name": cannot be empty.');
 	}
 
 	public function testFormHostGroup_UpdateDuplicate() {

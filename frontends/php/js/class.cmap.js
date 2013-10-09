@@ -133,6 +133,8 @@ ZABBIX.apps.map = (function($) {
 			this.data = mapData.sysmap;
 			this.iconList = mapData.iconList;
 			this.defaultAutoIconId = mapData.defaultAutoIconId;
+			this.defaultIconId = mapData.defaultIconId;
+			this.defaultIconName = mapData.defaultIconName;
 			this.container = $('#' + containerId);
 
 			if (this.container.length === 0) {
@@ -480,7 +482,7 @@ ZABBIX.apps.map = (function($) {
 				 */
 				// delegate selements icons clicks
 				$(this.container).delegate('.sysmap_element', 'click', function(event) {
-					that.selectElements([$(this).data('id')], event.ctrlKey || event.metaKey);
+					that.selectElements([$(this).attr('data-id')], event.ctrlKey || event.metaKey);
 				});
 
 				/*
@@ -573,7 +575,7 @@ ZABBIX.apps.map = (function($) {
 
 				// open link form
 				$('.element-links').delegate('.openlink', 'click', function() {
-					that.currentLinkId = $(this).data('linkid');
+					that.currentLinkId = $(this).attr('data-linkid');
 					$('table.element-links tr').removeClass('selected');
 					$(this).parent().parent().addClass('selected');
 
@@ -608,7 +610,7 @@ ZABBIX.apps.map = (function($) {
 
 				this.linkForm.domNode.delegate('.triggerRemove', 'click', function() {
 					var triggerid,
-						tid = $(this).data('linktriggerid').toString();
+						tid = $(this).attr('data-linktriggerid').toString();
 
 					$('#linktrigger_' + tid).remove();
 
@@ -819,13 +821,13 @@ ZABBIX.apps.map = (function($) {
 					selementid: getUniqueId(),
 					elementtype: '4', // image
 					elementid: 0,
-					iconid_off: this.sysmap.iconList[0].imageid, // first imageid
+					iconid_off: this.sysmap.defaultIconId, // first imageid
 					label: locale['S_NEW_ELEMENT'],
 					label_location: -1, // set default map label location
 					x: 0,
 					y: 0,
 					urls: {},
-					elementName: this.sysmap.iconList[0].name, // first image name
+					elementName: this.sysmap.defaultIconName, // first image name
 					use_iconmap: '1'
 				};
 			}
@@ -845,7 +847,7 @@ ZABBIX.apps.map = (function($) {
 			this.domNode = $('<div></div>')
 				.appendTo(this.sysmap.container)
 				.addClass('pointer sysmap_element')
-				.data('id', this.id);
+				.attr('data-id', this.id);
 
 			this.domNode.draggable({
 				containment: 'parent',

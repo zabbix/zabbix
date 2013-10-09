@@ -176,35 +176,33 @@ class CZabbixServer {
 	 *
 	 * @param array $params
 	 *
-	 * @return bool|mixed
+	 * @return mixed    the output of the script if it has been executed successfully or false otherwise
 	 */
 	protected function request(array $params) {
 		// connect to the server
-		if (!$socket = $this->connect()) {
+		if (!$this->connect()) {
 			return false;
 		}
 
 		// set timeout
-		stream_set_timeout($socket, $this->timeout);
+		stream_set_timeout($this->socket, $this->timeout);
 
 		// send the command
-		if (fwrite($socket, CJs::encodeJson($params)) === false) {
+		if (fwrite($this->socket, CJs::encodeJson($params)) === false) {
 			$this->error = _s('Cannot send command, check connection with Zabbix server "%1$s".', $this->host);
 
 			return false;
 		}
 
 		// read the response
-		if ($this->totalBytesLimit && $this->totalBytesLimit < $this->readBytesLimit) {
-			$readBytesLimit = $this->totalBytesLimit;
-		}
-		else {
-			$readBytesLimit = $this->readBytesLimit;
-		}
+		$readBytesLimit = ($this->totalBytesLimit && $this->totalBytesLimit < $this->readBytesLimit)
+			? $this->totalBytesLimit
+			: $this->readBytesLimit;
+
 		$response = '';
 		$now = time();
 		$i = 0;
-		while (!feof($socket)) {
+		while (!feof($this->socket)) {
 			$i++;
 			if ((time() - $now) >= $this->timeout) {
 				$this->error = _s('Connection timeout of %1$s seconds exceeded when connecting to Zabbix server "%2$s".', $this->timeout, $this->host);
@@ -217,7 +215,7 @@ class CZabbixServer {
 				return false;
 			}
 
-			if (($out = fread($socket, $readBytesLimit)) !== false) {
+			if (($out = fread($this->socket, $readBytesLimit)) !== false) {
 				$response .= $out;
 			}
 			else {
@@ -227,7 +225,7 @@ class CZabbixServer {
 			}
 		}
 
-		fclose($socket);
+		fclose($this->socket);
 
 		// check if the response is empty
 		if (!strlen($response)) {

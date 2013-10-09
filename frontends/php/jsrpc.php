@@ -191,7 +191,7 @@ switch ($data['method']) {
 			'updateProfile' => isset($data['updateProfile']) ? $data['updateProfile'] : null
 		);
 		if ($options['resourcetype'] == SCREEN_RESOURCE_HISTORY) {
-			$options['itemid'] = !empty($data['itemid']) ? $data['itemid'] : null;
+			$options['itemids'] = !empty($data['itemids']) ? $data['itemids'] : null;
 			$options['action'] = !empty($data['action']) ? $data['action'] : null;
 			$options['filter'] = !empty($data['filter']) ? $data['filter'] : null;
 			$options['filter_task'] = !empty($data['filter_task']) ? $data['filter_task'] : null;
@@ -234,6 +234,8 @@ switch ($data['method']) {
 	 */
 	case 'multiselect.get':
 		$config = select_config();
+		$displayNodes = is_array(get_current_nodeid());
+		$sortFields = $displayNodes ? array(array('field' => 'nodename', 'order' => ZBX_SORT_UP)) : array();
 
 		switch ($data['objectName']) {
 			case 'hostGroup':
@@ -242,19 +244,20 @@ switch ($data['method']) {
 					'output' => array('groupid', 'name'),
 					'startSearch' => true,
 					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
-					'limit' => $config['search_limit']
+					'filter' => isset($data['filter']) ? $data['filter'] : null,
+					'limit' => isset($data['limit']) ? $data['limit'] : null
 				));
 
 				if ($hostGroups) {
-					foreach ($hostGroups as &$hostGroup) {
-						$hostGroup['nodename'] = get_node_name_by_elid($hostGroup['groupid'], true, NAME_DELIMITER);
+					if ($displayNodes) {
+						foreach ($hostGroups as &$hostGroup) {
+							$hostGroup['nodename'] = get_node_name_by_elid($hostGroup['groupid'], true, NAME_DELIMITER);
+						}
+						unset($hostGroup);
 					}
-					unset($hostGroup);
 
-					CArrayHelper::sort($hostGroups, array(
-						array('field' => 'nodename', 'order' => ZBX_SORT_UP),
-						array('field' => 'name', 'order' => ZBX_SORT_UP)
-					));
+					$sortFields[] = array('field' => 'name', 'order' => ZBX_SORT_UP);
+					CArrayHelper::sort($hostGroups, $sortFields);
 
 					if (isset($data['limit'])) {
 						$hostGroups = array_slice($hostGroups, 0, $data['limit']);
@@ -263,7 +266,7 @@ switch ($data['method']) {
 					foreach ($hostGroups as $hostGroup) {
 						$result[] = array(
 							'id' => $hostGroup['groupid'],
-							'prefix' => (string) $hostGroup['nodename'],
+							'prefix' => $displayNodes ? $hostGroup['nodename'] : '',
 							'name' => $hostGroup['name']
 						);
 					}
@@ -274,15 +277,22 @@ switch ($data['method']) {
 				$hosts = API::Host()->get(array(
 					'editable' => isset($data['editable']) ? $data['editable'] : null,
 					'output' => array('hostid', 'name'),
+					'templated_hosts' => isset($data['templated_hosts']) ? $data['templated_hosts'] : null,
 					'startSearch' => true,
 					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
 					'limit' => $config['search_limit']
 				));
 
 				if ($hosts) {
-					CArrayHelper::sort($hosts, array(
-						array('field' => 'name', 'order' => ZBX_SORT_UP)
-					));
+					if ($displayNodes) {
+						foreach ($hosts as &$host) {
+							$host['nodename'] = get_node_name_by_elid($host['hostid'], true, NAME_DELIMITER);
+						}
+						unset($host);
+					}
+
+					$sortFields[] = array('field' => 'name', 'order' => ZBX_SORT_UP);
+					CArrayHelper::sort($hosts, $sortFields);
 
 					if (isset($data['limit'])) {
 						$hosts = array_slice($hosts, 0, $data['limit']);
@@ -291,7 +301,7 @@ switch ($data['method']) {
 					foreach ($hosts as $host) {
 						$result[] = array(
 							'id' => $host['hostid'],
-							'prefix' => '',
+							'prefix' => $displayNodes ? $host['nodename'] : '',
 							'name' => $host['name']
 						);
 					}
@@ -308,9 +318,15 @@ switch ($data['method']) {
 				));
 
 				if ($templates) {
-					CArrayHelper::sort($templates, array(
-						array('field' => 'name', 'order' => ZBX_SORT_UP)
-					));
+					if ($displayNodes) {
+						foreach ($templates as &$template) {
+							$template['nodename'] = get_node_name_by_elid($template['templateid'], true, NAME_DELIMITER);
+						}
+						unset($template);
+					}
+
+					$sortFields[] = array('field' => 'name', 'order' => ZBX_SORT_UP);
+					CArrayHelper::sort($templates, $sortFields);
 
 					if (isset($data['limit'])) {
 						$templates = array_slice($templates, 0, $data['limit']);
@@ -319,7 +335,7 @@ switch ($data['method']) {
 					foreach ($templates as $template) {
 						$result[] = array(
 							'id' => $template['templateid'],
-							'prefix' => '',
+							'prefix' => $displayNodes ? $template['nodename'] : '',
 							'name' => $template['name']
 						);
 					}
@@ -336,9 +352,15 @@ switch ($data['method']) {
 				));
 
 				if ($applications) {
-					CArrayHelper::sort($applications, array(
-						array('field' => 'name', 'order' => ZBX_SORT_UP)
-					));
+					if ($displayNodes) {
+						foreach ($applications as &$application) {
+							$application['nodename'] = get_node_name_by_elid($application['applicationid'], true, NAME_DELIMITER);
+						}
+						unset($application);
+					}
+
+					$sortFields[] = array('field' => 'name', 'order' => ZBX_SORT_UP);
+					CArrayHelper::sort($applications, $sortFields);
 
 					if (isset($data['limit'])) {
 						$applications = array_slice($applications, 0, $data['limit']);
@@ -347,7 +369,7 @@ switch ($data['method']) {
 					foreach ($applications as $application) {
 						$result[] = array(
 							'id' => $application['applicationid'],
-							'prefix' => '',
+							'prefix' => $displayNodes ? $application['nodename'] : '',
 							'name' => $application['name']
 						);
 					}
@@ -365,9 +387,15 @@ switch ($data['method']) {
 				));
 
 				if ($triggers) {
-					CArrayHelper::sort($triggers, array(
-						array('field' => 'description', 'order' => ZBX_SORT_UP)
-					));
+					if ($displayNodes) {
+						foreach ($triggers as &$trigger) {
+							$trigger['nodename'] = get_node_name_by_elid($trigger['triggerid'], true, NAME_DELIMITER);
+						}
+						unset($trigger);
+					}
+
+					$sortFields[] = array('field' => 'description', 'order' => ZBX_SORT_UP);
+					CArrayHelper::sort($triggers, $sortFields);
 
 					if (isset($data['limit'])) {
 						$triggers = array_slice($triggers, 0, $data['limit']);
@@ -384,7 +412,7 @@ switch ($data['method']) {
 
 						$result[] = array(
 							'id' => $trigger['triggerid'],
-							'prefix' => $hostName,
+							'prefix' => ($displayNodes ? $trigger['nodename'] : '').$hostName,
 							'name' => $trigger['description']
 						);
 					}

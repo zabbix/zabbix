@@ -29,7 +29,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'itemid' =>			array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
-	'screenid' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'period' =>			array(T_ZBX_INT, O_OPT, P_NZERO, BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null),
 	'stime' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'profileIdx' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
@@ -45,18 +44,11 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (!DBfetch(DBselect('SELECT i.itemid FROM items i WHERE i.itemid='.$_REQUEST['itemid']))) {
-	show_error_message(_('No items defined.'));
-}
-
 $dbItems = API::Item()->get(array(
 	'itemids' => $_REQUEST['itemid'],
 	'webitems' => true,
-	'nodeids' => get_current_nodeid(true),
-	'filter' => array('flags' => null)
 ));
-
-if (empty($dbItems)) {
+if (!$dbItems) {
 	access_deny();
 }
 

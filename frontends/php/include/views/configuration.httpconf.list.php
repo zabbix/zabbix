@@ -40,8 +40,8 @@ $httpWidget->addPageHeader(_('CONFIGURATION OF WEB MONITORING'), $createForm);
 
 // header
 $filterForm = new CForm('get');
-$filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
-$filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
+$filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB(true)));
+$filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB(true)));
 
 $httpWidget->addHeader(_('Scenarios'), $filterForm);
 $httpWidget->addHeaderRowNumber(array(
@@ -58,6 +58,7 @@ $httpForm->addVar('hostid', $this->data['hostid']);
 $httpTable = new CTableInfo(_('No web scenarios defined.'));
 $httpTable->setHeader(array(
 	new CCheckBox('all_httptests', null, "checkAll('".$httpForm->getName()."', 'all_httptests', 'group_httptestid');"),
+	$this->data['displayNodes'] ? _('Node') : null,
 	($this->data['hostid'] == 0) ? make_sorting_header(_('Host'), 'hostname') : null,
 	make_sorting_header(_('Name'), 'name'),
 	_('Number of steps'),
@@ -76,13 +77,16 @@ foreach ($this->data['httpTests'] as $httpTestId => $httpTest) {
 
 	$httpTable->addRow(array(
 		new CCheckBox('group_httptestid['.$httpTest['httptestid'].']', null, null, $httpTest['httptestid']),
+		$this->data['displayNodes'] ? $httpTest['nodename'] : null,
 		($this->data['hostid'] > 0) ? null : $httpTest['hostname'],
 		$name,
 		$httpTest['stepscnt'],
 		$httpTest['delay'],
 		new CLink(
 			httptest_status2str($httpTest['status']),
-			'?group_httptestid[]='.$httpTest['httptestid'].'&go='.($httpTest['status'] ? 'activate' : 'disable'),
+			'?group_httptestid[]='.$httpTest['httptestid'].
+				'&hostid='.(isset($template['id']) ? $template['id'] : $httpTest['hostid']).
+				'&go='.($httpTest['status'] ? 'activate' : 'disable'),
 			httptest_status2style($httpTest['status'])
 		)
 	));
@@ -109,6 +113,8 @@ $goComboBox->addItem($goOption);
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "group_httptestid";');
+zbx_add_post_js('chkbxRange.prefix = "'.$this->data['hostid'].'";');
+zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
 
 // append table to form
 $httpForm->addItem(array($this->data['paging'], $httpTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));

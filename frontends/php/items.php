@@ -158,6 +158,7 @@ $fields = array(
 	'filter_with_triggers' =>	array(T_ZBX_INT, O_OPT, null,	IN('-1,0,1'), null),
 	'filter_ipmi_sensor' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// subfilters
+	'subfilter_set' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
 	'subfilter_apps' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'subfilter_types' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'subfilter_value_types' =>	array(T_ZBX_INT, O_OPT, null,	null,		null),
@@ -180,6 +181,11 @@ $_REQUEST['go'] = get_request('go', 'none');
 $_REQUEST['params'] = get_request($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);
 
+$subfiltersList = array('subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'subfilter_status',
+	'subfilter_state', 'subfilter_templated_items', 'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval',
+	'subfilter_history', 'subfilter_trends'
+);
+
 /*
  * Permissions
  */
@@ -188,17 +194,20 @@ if (get_request('itemid', false)) {
 		'itemids' => $_REQUEST['itemid'],
 		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
 		'output' => array('itemid'),
+		'selectHosts' => array('status'),
 		'editable' => true,
 		'preservekeys' => true
 	));
 	if (empty($item)) {
 		access_deny();
 	}
+	$item = reset($item);
+	$hosts = $item['hosts'];
 }
 elseif (get_request('hostid', 0) > 0) {
 	$hosts = API::Host()->get(array(
 		'hostids' => $_REQUEST['hostid'],
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('status'),
 		'templated_hosts' => true,
 		'editable' => true
 	));
@@ -269,6 +278,12 @@ if (isset($_REQUEST['filter_set'])) {
 	CProfile::update('web.items.filter_templated_items', $_REQUEST['filter_templated_items'], PROFILE_TYPE_INT);
 	CProfile::update('web.items.filter_with_triggers', $_REQUEST['filter_with_triggers'], PROFILE_TYPE_INT);
 	CProfile::update('web.items.filter_ipmi_sensor', $_REQUEST['filter_ipmi_sensor'], PROFILE_TYPE_STR);
+
+	// subfilters
+	foreach ($subfiltersList as $name) {
+		$_REQUEST[$name] = array();
+		CProfile::update('web.items.'.$name, '', PROFILE_TYPE_STR);
+	}
 }
 else {
 	$_REQUEST['filter_groupid'] = CProfile::get('web.items.filter_groupid');
@@ -291,6 +306,22 @@ else {
 	$_REQUEST['filter_templated_items'] = CProfile::get('web.items.filter_templated_items', -1);
 	$_REQUEST['filter_with_triggers'] = CProfile::get('web.items.filter_with_triggers', -1);
 	$_REQUEST['filter_ipmi_sensor'] = CProfile::get('web.items.filter_ipmi_sensor');
+
+	// subfilters
+	foreach ($subfiltersList as $name) {
+		if (isset($_REQUEST['subfilter_set'])) {
+			$_REQUEST[$name] = get_request($name, array());
+			CProfile::update('web.items.'.$name, implode(';', $_REQUEST[$name]), PROFILE_TYPE_STR);
+		}
+		else {
+			$_REQUEST[$name] = array();
+			$subfiltersVal = CProfile::get('web.items.'.$name);
+			if (!zbx_empty($subfiltersVal)) {
+				$_REQUEST[$name] = explode(';', $subfiltersVal);
+				$_REQUEST[$name] = array_combine($_REQUEST[$name], $_REQUEST[$name]);
+			}
+		}
+	}
 }
 
 if (!isset($_REQUEST['form']) && isset($_REQUEST['filter_hostid']) && !empty($_REQUEST['filter_hostid'])) {
@@ -306,19 +337,12 @@ if (!isset($_REQUEST['form']) && isset($_REQUEST['filter_hostid']) && !empty($_R
 	}
 }
 
-// subfilters
-foreach (array('subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'subfilter_status', 'subfilter_state',
-			'subfilter_templated_items', 'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval',
-			'subfilter_history', 'subfilter_trends') as $name) {
-	$_REQUEST[$name] = isset($_REQUEST['filter_set']) ? array() : get_request($name, array());
-}
-
 /*
  * Actions
  */
 $result = false;
 if (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
-	$timePeriodValidator = new CTimePeriodValidator(array('allow_multiple' => false));
+	$timePeriodValidator = new CTimePeriodValidator(array('allowMultiple' => false));
 	$_REQUEST['delay_flex'] = get_request('delay_flex', array());
 
 	if ($timePeriodValidator->validate($_REQUEST['new_delay_flex']['period'])) {
@@ -337,7 +361,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 	}
 	show_messages($result, _('Item deleted'), _('Cannot delete item'));
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
-	clearCookies($result, $_REQUEST['hostid']);
+	clearCookies($result, get_request('hostid'));
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])) {
 	unset($_REQUEST['itemid']);
@@ -457,7 +481,7 @@ elseif (isset($_REQUEST['save'])) {
 
 	if ($result) {
 		unset($_REQUEST['itemid'], $_REQUEST['form']);
-		clearCookies($result, $_REQUEST['hostid']);
+		clearCookies($result, get_request('hostid'));
 	}
 }
 // cleaning history for one item
@@ -479,7 +503,7 @@ elseif (isset($_REQUEST['del_history']) && isset($_REQUEST['itemid'])) {
 	$result = DBend($result);
 
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
-	clearCookies($result, $_REQUEST['hostid']);
+	clearCookies($result, get_request('hostid'));
 }
 // mass update
 elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])) {
@@ -637,7 +661,7 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 
 	if ($result) {
 		unset($_REQUEST['group_itemid'], $_REQUEST['massupdate'], $_REQUEST['update'], $_REQUEST['form']);
-		clearCookies($result, $_REQUEST['hostid']);
+		clearCookies($result, get_request('hostid'));
 	}
 }
 elseif ($_REQUEST['go'] == 'activate' && isset($_REQUEST['group_itemid'])) {
@@ -649,7 +673,7 @@ elseif ($_REQUEST['go'] == 'activate' && isset($_REQUEST['group_itemid'])) {
 	$goResult = DBend($goResult);
 
 	show_messages($goResult, _('Items activated'), null);
-	clearCookies($goResult, $_REQUEST['hostid']);
+	clearCookies($goResult, get_request('hostid'));
 }
 elseif ($_REQUEST['go'] == 'disable' && isset($_REQUEST['group_itemid'])) {
 	$group_itemid = $_REQUEST['group_itemid'];
@@ -660,7 +684,7 @@ elseif ($_REQUEST['go'] == 'disable' && isset($_REQUEST['group_itemid'])) {
 	$goResult = DBend($goResult);
 
 	show_messages($goResult, _('Items disabled'), null);
-	clearCookies($goResult, $_REQUEST['hostid']);
+	clearCookies($goResult, get_request('hostid'));
 }
 elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQUEST['group_itemid'])) {
 	if (isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])) {
@@ -690,7 +714,7 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQU
 		$goResult = DBend($goResult);
 
 		show_messages($goResult, _('Items copied'), _('Cannot copy items'));
-		clearCookies($goResult, $_REQUEST['hostid']);
+		clearCookies($goResult, get_request('hostid'));
 
 		$_REQUEST['go'] = 'none2';
 	}
@@ -718,7 +742,7 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_itemid'])) 
 	$goResult = DBend($goResult);
 
 	show_messages($goResult, _('History cleared'), $goResult);
-	clearCookies($goResult, $_REQUEST['hostid']);
+	clearCookies($goResult, get_request('hostid'));
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
 	DBstart();
@@ -743,7 +767,7 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
 	}
 
 	show_messages(DBend($goResult), _('Items deleted'), _('Cannot delete items'));
-	clearCookies($goResult, $_REQUEST['hostid']);
+	clearCookies($goResult, get_request('hostid'));
 }
 
 /*
@@ -831,7 +855,7 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 		$data['db_applications'] = DBfetchArray(DBselect(
 			'SELECT a.applicationid,a.name'.
 			' FROM applications a'.
-			' WHERE a.hostid='.$data['hostid'].
+			' WHERE a.hostid='.zbx_dbstr($data['hostid']).
 			' ORDER BY a.name'
 		));
 	}
@@ -896,10 +920,13 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['group_itemid'])) {
 }
 // list of items
 else {
+	$_REQUEST['hostid'] = empty($_REQUEST['filter_hostid']) ? null : $_REQUEST['filter_hostid'];
+
 	$data = array(
 		'form' => get_request('form'),
 		'hostid' => get_request('hostid'),
-		'sortfield' => getPageSortField('name')
+		'sortfield' => getPageSortField('name'),
+		'displayNodes' => (is_array(get_current_nodeid()) && empty($_REQUEST['filter_groupid']) && empty($_REQUEST['filter_hostid']))
 	);
 
 	// items
@@ -1067,6 +1094,30 @@ else {
 			}
 		}
 		unset($item);
+
+		// disable subfilters if list is empty
+		foreach ($data['items'] as $item) {
+			$atLeastOne = true;
+			foreach ($item['subfilters'] as $value) {
+				if (!$value) {
+					$atLeastOne = false;
+					break;
+				}
+			}
+			if ($atLeastOne) {
+				break;
+			}
+		}
+		if (!$atLeastOne) {
+			foreach ($subfiltersList as $name) {
+				$_REQUEST[$name] = array();
+				CProfile::update('web.items.'.$name, '', PROFILE_TYPE_STR);
+				foreach ($data['items'] as &$item) {
+					$item['subfilters'][$name] = true;
+				}
+				unset($item);
+			}
+		}
 	}
 
 	$data['flicker'] = getItemFilterForm($data['items']);
@@ -1074,7 +1125,7 @@ else {
 	// remove subfiltered items
 	if (!empty($data['items'])) {
 		foreach ($data['items'] as $number => $item) {
-			foreach ($item['subfilters'] as $subfilter => $value) {
+			foreach ($item['subfilters'] as $value) {
 				if (!$value) {
 					unset($data['items'][$number]);
 					break;
@@ -1084,7 +1135,7 @@ else {
 	}
 
 	order_result($data['items'], $data['sortfield'], getPageSortOrder());
-	$data['paging'] = getPagingLine($data['items']);
+	$data['paging'] = getPagingLine($data['items'], array('itemid'));
 
 	$itemTriggerIds = array();
 	foreach ($data['items'] as $item) {
@@ -1099,6 +1150,22 @@ else {
 		'preservekeys' => true
 	));
 	$data['triggerRealHosts'] = getParentHostsByTriggers($data['itemTriggers']);
+
+	// nodes
+	if ($data['displayNodes']) {
+		foreach ($data['items'] as $key => $item) {
+			$data['items'][$key]['nodename'] = get_node_name_by_elid($item['itemid'], true);
+		}
+	}
+
+	// determine, show or not column of errors
+	if (isset($hosts)) {
+		$host = reset($hosts);
+		$data['showErrorColumn'] = ($host['status'] != HOST_STATUS_TEMPLATE);
+	}
+	else {
+		$data['showErrorColumn'] = true;
+	}
 
 	// render view
 	$itemView = new CView('configuration.item.list', $data);

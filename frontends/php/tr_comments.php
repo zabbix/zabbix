@@ -63,7 +63,7 @@ if (isset($_REQUEST['save'])) {
 	$result = DBexecute(
 		'UPDATE triggers'.
 		' SET comments='.zbx_dbstr($_REQUEST['comments']).
-		' WHERE triggerid='.$_REQUEST['triggerid']
+		' WHERE triggerid='.zbx_dbstr($_REQUEST['triggerid'])
 	);
 	show_messages($result, _('Comment updated'), _('Cannot update comment'));
 

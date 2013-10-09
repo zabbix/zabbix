@@ -25,7 +25,6 @@ require_once dirname(__FILE__).'/include/maps.inc.php';
 $page['title'] = _('Network maps');
 $page['file'] = 'maps.php';
 $page['hist_arg'] = array('sysmapid');
-$page['scripts'] = array();
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 if ($page['type'] == PAGE_TYPE_HTML) {
@@ -120,7 +119,7 @@ CProfile::update('web.maps.sysmapid', $_REQUEST['sysmapid'], PROFILE_TYPE_ID);
  * Display
  */
 $data = array(
-	'fullscreen' => get_request('fullscreen'),
+	'fullscreen' => $_REQUEST['fullscreen'],
 	'sysmapid' => $_REQUEST['sysmapid'],
 	'maps' => $maps
 );

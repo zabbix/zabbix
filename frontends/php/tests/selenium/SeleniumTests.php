@@ -20,9 +20,7 @@
 
 require_once dirname(__FILE__).'/testGeneric.php';
 require_once dirname(__FILE__).'/testClicks.php';
-require_once dirname(__FILE__).'/testPageActionsAutoregistration.php';
-require_once dirname(__FILE__).'/testPageActionsDiscovery.php';
-require_once dirname(__FILE__).'/testPageActionsTriggers.php';
+require_once dirname(__FILE__).'/testPageActions.php';
 require_once dirname(__FILE__).'/testPageAdministrationAudit.php';
 require_once dirname(__FILE__).'/testPageAdministrationDMProxies.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralImages.php';
@@ -33,11 +31,15 @@ require_once dirname(__FILE__).'/testPageAdministrationScripts.php';
 require_once dirname(__FILE__).'/testPageAvailabilityReport.php';
 require_once dirname(__FILE__).'/testPageDashboard.php';
 require_once dirname(__FILE__).'/testPageDiscovery.php';
+require_once dirname(__FILE__).'/testPageDiscoveryRules.php';
 require_once dirname(__FILE__).'/testPageEvents.php';
 require_once dirname(__FILE__).'/testPageHistory.php';
 require_once dirname(__FILE__).'/testPageHosts.php';
 require_once dirname(__FILE__).'/testPageInventory.php';
 require_once dirname(__FILE__).'/testPageItems.php';
+require_once dirname(__FILE__).'/testPageItemPrototypes.php';
+require_once dirname(__FILE__).'/testPageTriggers.php';
+require_once dirname(__FILE__).'/testPageTriggerPrototypes.php';
 require_once dirname(__FILE__).'/testPageLatestData.php';
 require_once dirname(__FILE__).'/testPageMaintenance.php';
 require_once dirname(__FILE__).'/testPageMaps.php';
@@ -100,6 +102,7 @@ require_once dirname(__FILE__).'/testInheritanceGraphPrototype.php';
 require_once dirname(__FILE__).'/testZBX6339.php';
 require_once dirname(__FILE__).'/testZBX6648.php';
 require_once dirname(__FILE__).'/testZBX6663.php';
+require_once dirname(__FILE__).'/testUrlParameters.php';
 
 class SeleniumTests {
 	public static function suite() {
@@ -107,9 +110,7 @@ class SeleniumTests {
 
 		$suite->addTestSuite('testGeneric');
 		$suite->addTestSuite('testClicks');
-		$suite->addTestSuite('testPageActionsAutoregistration');
-		$suite->addTestSuite('testPageActionsDiscovery');
-		$suite->addTestSuite('testPageActionsTriggers');
+		$suite->addTestSuite('testPageActions');
 		$suite->addTestSuite('testPageAdministrationAudit');
 		$suite->addTestSuite('testPageAdministrationDMProxies');
 		$suite->addTestSuite('testPageAdministrationGeneralImages');
@@ -120,11 +121,15 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageAvailabilityReport');
 		$suite->addTestSuite('testPageDashboard');
 		$suite->addTestSuite('testPageDiscovery');
+		$suite->addTestSuite('testPageDiscoveryRules');
 		$suite->addTestSuite('testPageEvents');
 		$suite->addTestSuite('testPageHistory');
 		$suite->addTestSuite('testPageHosts');
 		$suite->addTestSuite('testPageInventory');
 		$suite->addTestSuite('testPageItems');
+		$suite->addTestSuite('testPageItemPrototypes');
+		$suite->addTestSuite('testPageTriggers');
+		$suite->addTestSuite('testPageTriggerPrototypes');
 		$suite->addTestSuite('testPageLatestData');
 		$suite->addTestSuite('testPageMaintenance');
 		$suite->addTestSuite('testPageMaps');
@@ -186,6 +191,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testZBX6339');
 		$suite->addTestSuite('testZBX6648');
 		$suite->addTestSuite('testZBX6663');
+		$suite->addTestSuite('testUrlParameters');
 
 		return $suite;
 	}

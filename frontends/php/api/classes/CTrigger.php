@@ -279,12 +279,12 @@ class CTrigger extends CTriggerGeneral {
 
 		// lastChangeSince
 		if (!is_null($options['lastChangeSince'])) {
-			$sqlParts['where']['lastchangesince'] = 't.lastchange>'.$options['lastChangeSince'];
+			$sqlParts['where']['lastchangesince'] = 't.lastchange>'.zbx_dbstr($options['lastChangeSince']);
 		}
 
 		// lastChangeTill
 		if (!is_null($options['lastChangeTill'])) {
-			$sqlParts['where']['lastchangetill'] = 't.lastchange<'.$options['lastChangeTill'];
+			$sqlParts['where']['lastchangetill'] = 't.lastchange<'.zbx_dbstr($options['lastChangeTill']);
 		}
 
 		// withUnacknowledgedEvents
@@ -420,7 +420,7 @@ class CTrigger extends CTriggerGeneral {
 
 		// min_severity
 		if (!is_null($options['min_severity'])) {
-			$sqlParts['where'][] = 't.priority>='.$options['min_severity'];
+			$sqlParts['where'][] = 't.priority>='.zbx_dbstr($options['min_severity']);
 		}
 
 		// limit
@@ -623,8 +623,8 @@ class CTrigger extends CTriggerGeneral {
 	/**
 	 * Check input.
 	 *
-	 * @param $triggers
-	 * @param $method
+	 * @param array  $triggers
+	 * @param string $method
 	 */
 	public function checkInput(array &$triggers, $method) {
 		$create = ($method == 'create');
@@ -641,6 +641,22 @@ class CTrigger extends CTriggerGeneral {
 				'preservekeys' => true,
 				'selectDependencies' => API_OUTPUT_REFER
 			));
+
+			$updateDiscoveredValidator = new CUpdateDiscoveredValidator(array(
+				'allowed' => array('triggerid', 'status'),
+				'messageAllowedField' => _('Cannot update "%1$s" for a discovered trigger.')
+			));
+			foreach ($triggers as $trigger) {
+				// check permissions
+				if (!isset($dbTriggers[$trigger['triggerid']])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+				}
+
+				// discovered fields, except status, cannot be updated
+				$this->checkPartialValidator($trigger, $updateDiscoveredValidator, $dbTriggers[$trigger['triggerid']]);
+			}
+
+			$triggers = $this->extendObjects($this->tableName(), $triggers, array('description'));
 		}
 		else {
 			$triggerDbFields = array(
@@ -650,16 +666,8 @@ class CTrigger extends CTriggerGeneral {
 			);
 		}
 
-		if ($update) {
-			$triggers = $this->extendObjects($this->tableName(), $triggers, array('description'));
-		}
-
 		foreach ($triggers as $tnum => &$trigger) {
 			$currentTrigger = $triggers[$tnum];
-
-			if ($update && !isset($dbTriggers[$trigger['triggerid']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-			}
 
 			if ($update) {
 				$error = _s('Cannot update "%1$s" for trigger "%2$s".', '%1$s', $trigger['description']);
@@ -1179,7 +1187,6 @@ class CTrigger extends CTriggerGeneral {
 
 				$expressionChanged = true;
 				$expressionFull = $trigger['expression'];
-				$trigger['error'] = 'Trigger expression updated. No status update so far.';
 			}
 
 			if ($expressionChanged) {
@@ -1631,6 +1638,8 @@ class CTrigger extends CTriggerGeneral {
 	}
 
 	/**
+	 * Check if user has read permissions for triggers.
+	 *
 	 * @param $ids
 	 *
 	 * @return bool
@@ -1651,6 +1660,8 @@ class CTrigger extends CTriggerGeneral {
 	}
 
 	/**
+	 *  Check if user has write permissions for triggers.
+	 *
 	 * @param $ids
 	 *
 	 * @return bool

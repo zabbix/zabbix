@@ -33,16 +33,10 @@ class testPageApplications extends CWebTest {
 	public function testPageApplications_CheckLayout($host) {
 		$hostid = $host['hostid'];
 
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestDropdownSelectWait('groupid', 'all');
+		$this->zbxTestLogin('applications.php?groupid=0&hostid='.$hostid);
 
-		$this->checkTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('HOSTS');
-		// Go to the list of applications
-		$this->href_click("applications.php?groupid=0&hostid=$hostid&sid=");
-		$this->wait();
 		// We are in the list of applications
-		$this->checkTitle('Configuration of applications');
+		$this->zbxTestCheckTitle('Configuration of applications');
 		$this->zbxTestTextPresent('CONFIGURATION OF APPLICATIONS');
 		$this->zbxTestTextPresent('Displaying');
 		$this->zbxTestTextPresent('Host list');

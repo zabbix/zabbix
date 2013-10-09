@@ -65,7 +65,7 @@ $discoveryFormList->addRow(_('Checks'),
 
 // append uniqueness criteria to form list
 $uniquenessCriteriaRadio = new CRadioButtonList('uniqueness_criteria', $this->data['drule']['uniqueness_criteria']);
-$uniquenessCriteriaRadio->addValue(' '._('IP address'), -1, true, zbx_formatDomId('uniqueness_criteria_ip'));
+$uniquenessCriteriaRadio->addValue(SPACE._('IP address'), -1, true, zbx_formatDomId('uniqueness_criteria_ip'));
 $discoveryFormList->addRow(_('Device uniqueness criteria'),
 	new CDiv($uniquenessCriteriaRadio, 'objectgroup inlineblock border_dotted ui-corner-all', 'uniqList'));
 

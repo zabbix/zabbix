@@ -37,16 +37,26 @@ $fields = array(
 );
 check_fields($fields);
 
+/*
+ * Permissions
+ */
+if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
+	access_deny();
+}
+if (get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
+	access_deny();
+}
+
 validate_sort_and_sortorder('name', ZBX_SORT_DOWN);
 
 $options = array(
 	'groups' => array(
-		'monitored_hosts' => 1,
-		'with_monitored_httptests' => 1,
+		'real_hosts' => true,
+		'with_httptests' => true
 	),
 	'hosts' => array(
-		'monitored_hosts' => 1,
-		'with_monitored_httptests' => 1,
+		'with_monitored_items' => true,
+		'with_httptests' => true
 	),
 	'hostid' => get_request('hostid', null),
 	'groupid' => get_request('groupid', null),
@@ -55,9 +65,10 @@ $pageFilter = new CPageFilter($options);
 $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = $pageFilter->hostid;
 
+$displayNodes = (is_array(get_current_nodeid()) && $pageFilter->groupid == 0 && $pageFilter->hostid == 0);
 
 $r_form = new CForm('get');
-$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
+$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
 $r_form->addItem(array(_('Group').SPACE,$pageFilter->getGroupsCB(true)));
 $r_form->addItem(array(SPACE._('Host').SPACE,$pageFilter->getHostsCB(true)));
 
@@ -72,6 +83,7 @@ $httpmon_wdgt->addHeaderRowNumber();
 // TABLE
 $table = new CTableInfo(_('No web checks defined.'));
 $table->SetHeader(array(
+	$displayNodes ? _('Node') : null,
 	$_REQUEST['hostid'] == 0 ? make_sorting_header(_('Host'), 'hostname') : null,
 	make_sorting_header(_('Name'), 'name'),
 	_('Number of steps'),
@@ -85,7 +97,6 @@ if ($pageFilter->hostsSelected) {
 	$options = array(
 		'output' => array('httptestid'),
 		'templated' => false,
-		'monitored' => true,
 		'filter' => array('status' => HTTPTEST_STATUS_ACTIVE),
 		'limit' => $config['search_limit'] + 1
 	);
@@ -103,13 +114,14 @@ if ($pageFilter->hostsSelected) {
 		'httptestids' => zbx_objectValues($httpTests, 'httptestid'),
 		'preservekeys' => true,
 		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => API_OUTPUT_EXTEND,
+		'selectHosts' => array('name', 'status'),
 		'selectSteps' => API_OUTPUT_COUNT,
 	));
 
 	foreach ($httpTests as &$httpTest) {
-		$host = reset($httpTest['hosts']);
-		$httpTest['hostname'] = $host['name'];
+		$httpTest['host'] = reset($httpTest['hosts']);
+		$httpTest['hostname'] = $httpTest['host']['name'];
+		unset($httpTest['hosts']);
 	}
 	unset($httpTest);
 
@@ -118,7 +130,7 @@ if ($pageFilter->hostsSelected) {
 	order_result($httpTests, getPageSortField('name'), getPageSortOrder());
 
 	// fetch the latest results of the web scenario
-	$lastHttpTestData = Manager::HttpTest()->fetchLastData(array_keys($httpTests));
+	$lastHttpTestData = Manager::HttpTest()->getLastData(array_keys($httpTests));
 
 	foreach($httpTests as $httpTest) {
 		$lastData = isset($lastHttpTestData[$httpTest['httptestid']]) ? $lastHttpTestData[$httpTest['httptestid']] : null;
@@ -145,8 +157,12 @@ if ($pageFilter->hostsSelected) {
 			$status['style'] = 'unknown';
 		}
 
+		$cpsan = new CSpan($httpTest['hostname'],
+			($httpTest['host']['status'] == HOST_STATUS_NOT_MONITORED) ? 'not-monitored' : ''
+		);
 		$table->addRow(new CRow(array(
-			($_REQUEST['hostid'] > 0) ? null : $httpTest['hostname'],
+			$displayNodes ? get_node_name_by_elid($httpTest['httptestid'], true) : null,
+			($_REQUEST['hostid'] > 0) ? null : $cpsan,
 			new CLink($httpTest['name'], 'httpdetails.php?httptestid='.$httpTest['httptestid']),
 			$httpTest['steps'],
 			$lastcheck,

@@ -63,7 +63,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->zbxTestLogin('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeper');
-		$this->checkTitle('Configuration of housekeeper');
+		$this->zbxTestCheckTitle('Configuration of housekeeper');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF HOUSEKEEPER', 'Housekeeper'));
 
 		if (isset($data['hk_events_mode'])) {
@@ -395,11 +395,11 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'hk_trends' => '-900',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Keep trigger event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep internal event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep network discovery event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep auto-registration event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep IT service data for (in days)": must be between 1 and 99999.'
+						'Incorrect value for field "Keep trigger event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep internal event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep network discovery event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep auto-registration event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep IT service data for (in days)": must be between 1 and 99999.'
 					)
 				)
 			),
@@ -419,11 +419,11 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'hk_trends' => 'abc',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Keep trigger event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep internal event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep network discovery event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep auto-registration event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep IT service data for (in days)": must be between 1 and 99999.'
+						'Incorrect value for field "Keep trigger event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep internal event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep network discovery event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep auto-registration event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep IT service data for (in days)": must be between 1 and 99999.'
 					)
 				)
 			),
@@ -443,11 +443,11 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'hk_trends' => '',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Keep trigger event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep internal event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep network discovery event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep auto-registration event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep IT service data for (in days)": must be between 1 and 99999.'
+						'Incorrect value for field "Keep trigger event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep internal event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep network discovery event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep auto-registration event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep IT service data for (in days)": must be between 1 and 99999.'
 					)
 				)
 			),
@@ -467,11 +467,11 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'hk_trends' => ' ',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Keep trigger event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep internal event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep network discovery event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep auto-registration event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep IT service data for (in days)": must be between 1 and 99999.'
+						'Incorrect value for field "Keep trigger event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep internal event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep network discovery event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep auto-registration event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep IT service data for (in days)": must be between 1 and 99999.'
 					)
 				)
 			),
@@ -491,11 +491,11 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'hk_trends' => 0,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Keep trigger event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep internal event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep network discovery event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep auto-registration event and alert data for (in days)": must be between 1 and 99999.',
-						'Warning. Incorrect value for field "Keep IT service data for (in days)": must be between 1 and 99999.'
+						'Incorrect value for field "Keep trigger event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep internal event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep network discovery event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep auto-registration event and alert data for (in days)": must be between 1 and 99999.',
+						'Incorrect value for field "Keep IT service data for (in days)": must be between 1 and 99999.'
 					)
 				)
 			)
@@ -514,7 +514,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->zbxTestLogin('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeper');
-		$this->checkTitle('Configuration of housekeeper');
+		$this->zbxTestCheckTitle('Configuration of housekeeper');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF HOUSEKEEPER', 'Housekeeper'));
 
 		if (isset($data['hk_events_mode'])) {
@@ -633,13 +633,13 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		switch ($expected) {
 			case HOUSEKEEPER_GOOD:
 				$this->zbxTestTextPresent('Configuration updated');
-				$this->checkTitle('Configuration of housekeeper');
+				$this->zbxTestCheckTitle('Configuration of housekeeper');
 				$this->zbxTestTextPresent(array('CONFIGURATION OF HOUSEKEEPER', 'Housekeeper'));
 				break;
 
 			case HOUSEKEEPER_BAD:
 				$this->zbxTestTextNotPresent('Configuration updated');
-				$this->checkTitle('Configuration of housekeeper');
+				$this->zbxTestCheckTitle('Configuration of housekeeper');
 				foreach ($data['errors'] as $msg) {
 					$this->zbxTestTextPresent($msg);
 				}
@@ -826,7 +826,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->zbxTestLogin('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeper');
-		$this->checkTitle('Configuration of housekeeper');
+		$this->zbxTestCheckTitle('Configuration of housekeeper');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF HOUSEKEEPER', 'Housekeeper'));
 
 		$sqlConfig = "SELECT * FROM config ORDER BY configid";
@@ -834,12 +834,12 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 
 		$this->zbxTestClick('resetDefaults');
 		sleep(1);
-		$this->assertVisible("//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all']");
-		$this->zbxTestClick("//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all']/div/div/button[1]");
+		$this->assertVisible("//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-dialog-buttons']");
+		$this->zbxTestClick("//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-dialog-buttons']/div/div/button[1]");
 		$this->zbxTestClickWait('save');
 
 		$this->zbxTestTextPresent('Configuration updated');
-		$this->checkTitle('Configuration of housekeeper');
+		$this->zbxTestCheckTitle('Configuration of housekeeper');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF HOUSEKEEPER', 'Housekeeper'));
 
 		$this->assertElementPresent("//input[@id='hk_events_mode']/@checked");

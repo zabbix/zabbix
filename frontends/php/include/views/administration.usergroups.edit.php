@@ -50,7 +50,7 @@ foreach ($this->data['usergroups'] as $group) {
 // append user tweenbox to form list
 $usersTweenBox = new CTweenBox($userGroupForm, 'group_users', $this->data['group_users'], 10);
 foreach ($this->data['users'] as $user) {
-	$usersTweenBox->addItem($user['userid'], $user['alias']);
+	$usersTweenBox->addItem($user['userid'], getUserFullname($user));
 }
 $userGroupFormList->addRow(_('Users'), $usersTweenBox->get(_('In group'), array(_('Other groups'), SPACE, $groupsComboBox)));
 
@@ -67,8 +67,8 @@ if ($isGranted) {
 else {
 	$userGroupForm->addVar('gui_access', $this->data['gui_access']);
 	$userGroupForm->addVar('users_status', GROUP_STATUS_ENABLED);
-	$userGroupFormList->addRow(_('Frontend access'), new CSpan(user_auth_type2str($this->data['gui_access']), 'green'));
-	$userGroupFormList->addRow(_('Enabled'), new CSpan(_('Enabled'), 'green'));
+	$userGroupFormList->addRow(_('Frontend access'), new CSpan(user_auth_type2str($this->data['gui_access']), 'text-field green'));
+	$userGroupFormList->addRow(_('Enabled'), new CSpan(_('Enabled'), 'text-field green'));
 }
 $userGroupFormList->addRow(_('Debug mode'), new CCheckBox('debug_mode', $this->data['debug_mode'], null, 1));
 
@@ -121,11 +121,11 @@ $permissionsFormList->addRow(_('Calculated permissions'), '');
 $permissionsFormList = getPermissionsFormList($this->data['group_rights'], null, $permissionsFormList);
 
 // append form lists to tab
-$userGroupTab = new CTabView(array('remember' => 1));
-$userGroupTab->addTab('userGroupTab', _('User group'), $userGroupFormList);
+$userGroupTab = new CTabView();
 if (!$this->data['form_refresh']) {
 	$userGroupTab->setSelected(0);
 }
+$userGroupTab->addTab('userGroupTab', _('User group'), $userGroupFormList);
 $userGroupTab->addTab('permissionsTab', _('Permissions'), $permissionsFormList);
 
 // append tab to form

@@ -99,14 +99,20 @@ function condition_type2str($conditionType) {
 	}
 }
 
-function discovery_object2str($object) {
-	switch ($object) {
-		case EVENT_OBJECT_DHOST:
-			return _('Device');
-		case EVENT_OBJECT_DSERVICE:
-			return _('Service');
-		default:
-			return _('Unknown');
+function discovery_object2str($object = null) {
+	$discoveryObjects = array(
+		EVENT_OBJECT_DHOST => _('Device'),
+		EVENT_OBJECT_DSERVICE => _('Service')
+	);
+
+	if ($object === null) {
+		return $discoveryObjects;
+	}
+	elseif (isset($discoveryObjects[$object])) {
+		return $discoveryObjects[$object];
+	}
+	else {
+		return _('Unknown');
 	}
 }
 
@@ -208,7 +214,7 @@ function condition_value2str($conditiontype, $value) {
 					'SELECT dr.name,c.dcheckid,c.type,c.key_,c.ports'.
 					' FROM drules dr,dchecks c'.
 					' WHERE dr.druleid=c.druleid'.
-						' AND c.dcheckid='.$value
+						' AND c.dcheckid='.zbx_dbstr($value)
 			));
 			if ($row) {
 				$str_val = $row['name'].NAME_DELIMITER.discovery_check2str($row['type'], $row['key_'], $row['ports']);
@@ -327,12 +333,16 @@ function get_operation_descr($type, $data) {
 				if (!empty($data['opmessage_usr'])) {
 					$users = API::User()->get(array(
 						'userids' => zbx_objectValues($data['opmessage_usr'], 'userid'),
-						'output' => array('userid', 'alias')
+						'output' => array('userid', 'alias', 'name', 'surname')
 					));
 					order_result($users, 'alias');
 
+					foreach ($users as $user) {
+						$fullnames[] = getUserFullname($user);
+					}
+
 					$result[] = bold(_('Send message to users').NAME_DELIMITER);
-					$result[] = array(implode(', ', zbx_objectValues($users, 'alias')), SPACE, _('via'), SPACE, $mediatype);
+					$result[] = array(implode(', ', $fullnames), SPACE, _('via'), SPACE, $mediatype);
 					$result[] = BR();
 				}
 
@@ -464,7 +474,7 @@ function get_operation_descr($type, $data) {
 						$sql = 'SELECT a.def_shortdata,a.def_longdata '.
 								' FROM actions a,operations o '.
 								' WHERE a.actionid=o.actionid '.
-									' AND o.operationid='.$data['operationid'];
+									' AND o.operationid='.zbx_dbstr($data['operationid']);
 						if ($rows = DBfetch(DBselect($sql, 1))) {
 							$result[] = array(bold(_('Subject').NAME_DELIMITER), BR(), zbx_nl2br($rows['def_shortdata']));
 							$result[] = array(bold(_('Message').NAME_DELIMITER), BR(), zbx_nl2br($rows['def_longdata']));
@@ -957,11 +967,11 @@ function get_actions_hint_by_eventid($eventid, $status = null) {
 		_('Status')
 	));
 
-	$sql = 'SELECT DISTINCT a.alertid,mt.description,u.alias,a.subject,a.message,a.sendto,a.status,a.retries,a.alerttype'.
+	$sql = 'SELECT DISTINCT a.alertid,mt.description,u.alias,u.name,u.surname,a.subject,a.message,a.sendto,a.status,a.retries,a.alerttype'.
 			' FROM events e,alerts a'.
 				' LEFT JOIN users u ON u.userid=a.userid'.
 				' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid'.
-			' WHERE a.eventid='.$eventid.
+			' WHERE a.eventid='.zbx_dbstr($eventid).
 				(is_null($status)?'':' AND a.status='.$status).
 				' AND e.eventid=a.eventid'.
 				' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
@@ -995,9 +1005,25 @@ function get_actions_hint_by_eventid($eventid, $status = null) {
 				$message = '-';
 		}
 
+		if (!$row['alias']) {
+			$row['alias'] = ' - ';
+		}
+		else {
+			$fullname = '';
+			if ($row['name']) {
+				$fullname = $row['name'];
+			}
+			if ($row['surname']) {
+				$fullname .= $fullname ? ' '.$row['surname'] : $row['surname'];
+			}
+			if ($fullname) {
+				$row['alias'] .= ' ('.$fullname.')';
+			}
+		}
+
 		$tab_hint->addRow(array(
 			get_node_name_by_elid($row['alertid']),
-			empty($row['alias']) ? ' - ' : $row['alias'],
+			$row['alias'],
 			$message,
 			$status
 		));

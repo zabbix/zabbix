@@ -291,7 +291,15 @@ else {
 	order_result($data['maps'], $sortField, $sortOrder);
 
 	// paging
-	$data['paging'] = getPagingLine($data['maps']);
+	$data['paging'] = getPagingLine($data['maps'], array('sysmapid'));
+
+	// nodes
+	if ($data['displayNodes'] = is_array(get_current_nodeid())) {
+		foreach ($data['maps'] as &$map) {
+			$map['nodename'] = get_node_name_by_elid($map['sysmapid'], true);
+		}
+		unset($map);
+	}
 
 	// render view
 	$mapView = new CView('configuration.sysmap.list', $data);

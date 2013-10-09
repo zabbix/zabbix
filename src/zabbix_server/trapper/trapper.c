@@ -48,16 +48,7 @@ extern unsigned char	process_type;
  *                                                                            *
  * Function: recv_agenthistory                                                *
  *                                                                            *
- * Purpose: process values sent by proxy servers                              *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
+ * Purpose: processes the received values from active agents and senders      *
  *                                                                            *
  ******************************************************************************/
 static void	recv_agenthistory(zbx_sock_t *sock, struct zbx_json_parse *jp)
@@ -79,15 +70,7 @@ static void	recv_agenthistory(zbx_sock_t *sock, struct zbx_json_parse *jp)
  *                                                                            *
  * Function: recv_proxyhistory                                                *
  *                                                                            *
- * Purpose: process values sent by proxy servers                              *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
+ * Purpose: processes the received values from active proxies                 *
  *                                                                            *
  ******************************************************************************/
 static void	recv_proxyhistory(zbx_sock_t *sock, struct zbx_json_parse *jp)

@@ -89,9 +89,9 @@ class CHistory extends CZBXAPI {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
-		$tableName = CHistoryManager::getTableName($options['history'])
-			? CHistoryManager::getTableName($options['history'])
-			: 'history';
+		if (!$tableName = CHistoryManager::getTableName($options['history'])) {
+			$tableName = 'history';
+		}
 		$sqlParts['from']['history'] = $tableName.' h';
 
 		// editable + PERMISSION CHECK
@@ -147,13 +147,13 @@ class CHistory extends CZBXAPI {
 		// time_from
 		if (!is_null($options['time_from'])) {
 			$sqlParts['select']['clock'] = 'h.clock';
-			$sqlParts['where']['clock_from'] = 'h.clock>='.$options['time_from'];
+			$sqlParts['where']['clock_from'] = 'h.clock>='.zbx_dbstr($options['time_from']);
 		}
 
 		// time_till
 		if (!is_null($options['time_till'])) {
 			$sqlParts['select']['clock'] = 'h.clock';
-			$sqlParts['where']['clock_till'] = 'h.clock<='.$options['time_till'];
+			$sqlParts['where']['clock_till'] = 'h.clock<='.zbx_dbstr($options['time_till']);
 		}
 
 		// filter
@@ -274,12 +274,6 @@ class CHistory extends CZBXAPI {
 			$result = zbx_cleanHashes($result);
 		}
 		return $result;
-	}
-
-	public function create($items = array()) {
-	}
-
-	public function delete($itemids = array()) {
 	}
 
 	protected function applyQuerySortOptions($tableName, $tableAlias, array $options, array $sqlParts) {

@@ -21,9 +21,6 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
 
-define('ITEM_GOOD', 0);
-define('ITEM_BAD', 1);
-
 class testFormItem extends CWebTest {
 
 	/**
@@ -308,8 +305,6 @@ class testFormItem extends CWebTest {
 			array(
 				array(
 					'type' => 'Zabbix agent',
-					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Boolean',
 					'host' => 'Template inheritance test host',
 					'templatedHost' => 'Inheritance test template',
 					'form' => 'testInheritanceItem1'
@@ -326,8 +321,6 @@ class testFormItem extends CWebTest {
 			array(
 				array(
 					'type' => 'Zabbix agent',
-					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Hexadecimal',
 					'host' => 'Template inheritance test host',
 					'templatedHost' => 'Inheritance test template',
 					'form' => 'testInheritanceItem1'
@@ -564,7 +557,7 @@ class testFormItem extends CWebTest {
 		}
 
 		$this->zbxTestClickWait("//div[@class='w']//a[text()='Items']");
-		$this->checkTitle('Configuration of items');
+		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
 
 		if (isset($data['form'])) {
@@ -574,7 +567,7 @@ class testFormItem extends CWebTest {
 			$this->zbxTestClickWait('form');
 		}
 
-		$this->checkTitle('Configuration of items');
+		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
 		$this->zbxTestTextPresent('Item');
 
@@ -646,7 +639,7 @@ class testFormItem extends CWebTest {
 
 		if ($type == 'Database monitor' && !isset($data['form'])) {
 			$keyValue = $this->getValue('key');
-			$this->assertEquals($keyValue, "db.odbc.select[<unique short description>]");
+			$this->assertEquals($keyValue, "db.odbc.select[<unique short description>,<dsn>]");
 		}
 
 		if ($type == 'SSH agent' && !isset($data['form'])) {
@@ -687,7 +680,12 @@ class testFormItem extends CWebTest {
 			if (isset($data['data_type'])) {
 				$this->zbxTestDropdownSelect('data_type', $data['data_type']);
 			}
-			$data_type = $this->getSelectedLabel('data_type');
+			if (isset($data['templatedHost'])) {
+				$data_type = $this->getValue('value_type_name');
+			}
+			else {
+				$data_type = $this->getSelectedLabel('data_type');
+			}
 		}
 
 		if ($type == 'SSH agent') {
@@ -698,11 +696,11 @@ class testFormItem extends CWebTest {
 		}
 
 		if ($type == 'Database monitor') {
-			$this->zbxTestTextPresent('Additional parameters');
+			$this->zbxTestTextPresent('SQL query');
 			$this->assertVisible('params_ap');
 			$this->assertAttribute("//textarea[@id='params_ap']/@rows", 7);
 			$addParams = $this->getValue('params_ap');
-			$this->assertEquals($addParams, "DSN=<database source name>\nuser=<user name>\npassword=<password>\nsql=<query>");
+			$this->assertEquals($addParams, "");
 		}
 		else {
 			$this->zbxTestTextNotPresent('Additional parameters');
@@ -784,7 +782,7 @@ class testFormItem extends CWebTest {
 			$this->assertNotVisible('authtype');
 		}
 
-		if ($type == 'SSH agent' || $type == 'TELNET agent' || $type == 'JMX agent') {
+		if ($type == 'SSH agent' || $type == 'TELNET agent' || $type == 'JMX agent' || $type == 'Simple check' || $type == 'Database monitor') {
 			$this->zbxTestTextPresent('User name');
 			$this->assertVisible('username');
 			$this->assertAttribute("//input[@id='username']/@maxlength", 64);
@@ -1326,7 +1324,7 @@ class testFormItem extends CWebTest {
 		$this->zbxTestClickWait("//div[@class='w']//a[text()='Items']");
 		$this->zbxTestClickWait('link='.$name);
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of items');
+		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestTextPresent('Item updated');
 		$this->zbxTestTextPresent("$name");
 		$this->zbxTestTextPresent('ITEMS');
@@ -1339,7 +1337,7 @@ class testFormItem extends CWebTest {
 		return array(
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Checksum of $1',
 					'key' => 'vfs.file.cksum[/sbin/shutdown]',
 					'dbName' => 'Checksum of /sbin/shutdown',
@@ -1350,7 +1348,7 @@ class testFormItem extends CWebTest {
 			// Duplicate item
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Checksum of $1',
 					'key' => 'vfs.file.cksum[/sbin/shutdown]',
 					'errors' => array(
@@ -1362,112 +1360,112 @@ class testFormItem extends CWebTest {
 			// Item name is missing
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'key' =>'item-name-missing',
 					'errors' => array(
 						'Page received incorrect data',
-						'Warning. Incorrect value for field "Name": cannot be empty.'
+						'Incorrect value for field "Name": cannot be empty.'
 					)
 				)
 			),
 			// Item key is missing
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item name',
 					'errors' => array(
 						'Page received incorrect data',
-						'Warning. Incorrect value for field "Key": cannot be empty.'
+						'Incorrect value for field "Key": cannot be empty.'
 					)
 				)
 			),
 			// Empty formula
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item formula',
 					'key' => 'item-formula-test',
 					'formula' => ' ',
 					'formulaValue' => '',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Field "Custom multiplier" is not decimal number.'
+						'Field "Custom multiplier" is not decimal number.'
 					)
 				)
 			),
 			// Incorrect formula
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item formula',
 					'key' => 'item-formula-test',
 					'formula' => 'form ula',
 					'formulaValue' => 'form ula',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Field "Custom multiplier" is not decimal number.'
+						'Field "Custom multiplier" is not decimal number.'
 					)
 				)
 			),
 			// Incorrect formula
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item formula',
 					'key' => 'item-formula-test',
 					'formula' => ' a1b2 c3 ',
 					'formulaValue' => 'a1b2 c3',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Field "Custom multiplier" is not decimal number.'
+						'Field "Custom multiplier" is not decimal number.'
 					)
 				)
 			),
 			// Incorrect formula
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item formula',
 					'key' => 'item-formula-test',
 					'formula' => ' 32 1 abc',
 					'formulaValue' => '32 1 abc',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Field "Custom multiplier" is not decimal number.'
+						'Field "Custom multiplier" is not decimal number.'
 					)
 				)
 			),
 			// Incorrect formula
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item formula',
 					'key' => 'item-formula-test',
 					'formula' => '32 1 abc',
 					'formulaValue' => '32 1 abc',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Field "Custom multiplier" is not decimal number.'
+						'Field "Custom multiplier" is not decimal number.'
 					)
 				)
 			),
 			// Incorrect formula
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item formula',
 					'key' => 'item-formula-test',
 					'formula' => '321abc',
 					'formulaValue' => '321abc',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Field "Custom multiplier" is not decimal number.'
+						'Field "Custom multiplier" is not decimal number.'
 					)
 				)
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item formula1',
 					'key' => 'item-formula-test',
 					'formula' => '5',
@@ -1478,7 +1476,7 @@ class testFormItem extends CWebTest {
 			// Empty timedelay
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item delay',
 					'key' => 'item-delay-test',
 					'delay' => 0,
@@ -1491,33 +1489,33 @@ class testFormItem extends CWebTest {
 			// Incorrect timedelay
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item delay',
 					'key' => 'item-delay-test',
 					'delay' => '-30',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.'
+						'Incorrect value "-30" for "Update interval (in sec)" field: must be between 0 and 86400.'
 					)
 				)
 			),
 			// Incorrect timedelay
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item delay',
 					'key' => 'item-delay-test',
 					'delay' => 86401,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.'
+						'Incorrect value "86401" for "Update interval (in sec)" field: must be between 0 and 86400.'
 					)
 				)
 			),
 			// Empty time flex period
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-test',
 					'flexPeriod' => array(
@@ -1525,14 +1523,14 @@ class testFormItem extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "New flexible interval": cannot be empty.'
+						'Incorrect value for field "New flexible interval": cannot be empty.'
 					)
 				)
 			),
 			// Incorrect flex period
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-test',
 					'flexPeriod' => array(
@@ -1547,7 +1545,7 @@ class testFormItem extends CWebTest {
 			// Incorrect flex period
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-test',
 					'flexPeriod' => array(
@@ -1562,7 +1560,7 @@ class testFormItem extends CWebTest {
 			// Incorrect flex period
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-test',
 					'flexPeriod' => array(
@@ -1577,7 +1575,7 @@ class testFormItem extends CWebTest {
 			// Incorrect flex period
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-test',
 					'flexPeriod' => array(
@@ -1592,7 +1590,7 @@ class testFormItem extends CWebTest {
 			// Multiple flex periods
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-test',
 					'flexPeriod' => array(
@@ -1606,7 +1604,7 @@ class testFormItem extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay',
 					'flexPeriod' => array(
@@ -1627,7 +1625,7 @@ class testFormItem extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay1',
 					'flexPeriod' => array(
@@ -1644,7 +1642,7 @@ class testFormItem extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay',
 					'delay' => 0,
@@ -1666,7 +1664,7 @@ class testFormItem extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item flex combined with flex periods',
 					'key' => 'item-flex-delay2',
 					'delay' => 0,
@@ -1681,7 +1679,7 @@ class testFormItem extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay',
 					'flexPeriod' => array(
@@ -1697,7 +1695,7 @@ class testFormItem extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay3',
 					'flexPeriod' => array(
@@ -1709,7 +1707,7 @@ class testFormItem extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay4',
 					'delay' => 0,
@@ -1721,7 +1719,7 @@ class testFormItem extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay',
 					'flexPeriod' => array(
@@ -1736,7 +1734,7 @@ class testFormItem extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay5',
 					'flexPeriod' => array(
@@ -1747,7 +1745,7 @@ class testFormItem extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay',
 					'flexPeriod' => array(
@@ -1765,7 +1763,7 @@ class testFormItem extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay',
 					'flexPeriod' => array(
@@ -1783,7 +1781,7 @@ class testFormItem extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay',
 					'flexPeriod' => array(
@@ -1799,7 +1797,7 @@ class testFormItem extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay',
 					'flexPeriod' => array(
@@ -1815,7 +1813,7 @@ class testFormItem extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay6',
 					'flexPeriod' => array(
@@ -1839,7 +1837,7 @@ class testFormItem extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay7',
 					'flexPeriod' => array(
@@ -1851,7 +1849,7 @@ class testFormItem extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item flex Check',
 					'key' => 'item-flex-delay8',
 					'flexPeriod' => array(
@@ -1867,7 +1865,7 @@ class testFormItem extends CWebTest {
 			// Maximum flexfields allowed reached- error
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex-maximum entries',
 					'key' => 'item-flex-maximum',
 					'flexPeriod' => array(
@@ -1887,7 +1885,7 @@ class testFormItem extends CWebTest {
 			// Maximum flexfields allowed reached- save OK
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item flex-maximum save OK',
 					'key' => 'item-flex-maximum-save',
 					'flexPeriod' => array(
@@ -1906,7 +1904,7 @@ class testFormItem extends CWebTest {
 			// Maximum flexfields allowed reached- remove one item
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item flex-maximum with remove',
 					'key' => 'item-flex-maximum-remove',
 					'flexPeriod' => array(
@@ -1927,7 +1925,7 @@ class testFormItem extends CWebTest {
 			// Flexfields with negative number in flexdelay
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item flex-negative flexdelay',
 					'key' => 'item-flex-negative-flexdelay',
 					'flexPeriod' => array(
@@ -1938,7 +1936,7 @@ class testFormItem extends CWebTest {
 			// Flexfields with symbols in flexdelay
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item flex-symbols in flexdelay',
 					'key' => 'item-flex-symbols-flexdelay',
 					'flexPeriod' => array(
@@ -1949,7 +1947,7 @@ class testFormItem extends CWebTest {
 			// History
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item history',
 					'key' => 'item-history-empty',
 					'history' => ''
@@ -1958,33 +1956,33 @@ class testFormItem extends CWebTest {
 			// History
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item history',
 					'key' => 'item-history-test',
 					'history' => 65536,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Keep history (in days)": must be between 0 and 65535.'
+						'Incorrect value "65536" for "Keep history (in days)" field: must be between 0 and 65535.'
 					)
 				)
 			),
 			// History
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item history',
 					'key' => 'item-history-test',
 					'history' => '-1',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "Keep history (in days)": must be between 0 and 65535.'
+							'Incorrect value "-1" for "Keep history (in days)" field: must be between 0 and 65535.'
 					)
 				)
 			),
 			// History
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item history',
 					'key' => 'item-history-test',
 					'history' => 'days'
@@ -1993,7 +1991,7 @@ class testFormItem extends CWebTest {
 			// Trends
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item trends',
 					'key' => 'item-trends-empty',
 					'trends' => '',
@@ -2004,33 +2002,33 @@ class testFormItem extends CWebTest {
 			// Trends
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item trends',
 					'key' => 'item-trends-test',
 					'trends' => '-1',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "Keep trends (in days)": must be between 0 and 65535.'
+							'Incorrect value "-1" for "Keep trends (in days)" field: must be between 0 and 65535.'
 					)
 				)
 			),
 			// Trends
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'name' => 'Item trends',
 					'key' => 'item-trends-test',
 					'trends' => 65536,
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "Keep trends (in days)": must be between 0 and 65535.'
+							'Incorrect value "65536" for "Keep trends (in days)" field: must be between 0 and 65535.'
 					)
 				)
 			),
 			// Trends
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => 'Item trends Check',
 					'key' => 'item-trends-test',
 					'trends' => 'trends',
@@ -2040,7 +2038,7 @@ class testFormItem extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'name' => '!@#$%^&*()_+-=[]{};:"|,./<>?',
 					'key' => 'item-symbols-test',
 					'dbCheck' => true,
@@ -2050,7 +2048,7 @@ class testFormItem extends CWebTest {
 			// List of all item types
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'Zabbix agent',
 					'name' => 'Zabbix agent',
 					'key' => 'item-zabbix-agent',
@@ -2060,7 +2058,7 @@ class testFormItem extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'Zabbix agent (active)',
 					'name' => 'Zabbix agent (active)',
 					'key' => 'item-zabbix-agent-active',
@@ -2070,7 +2068,7 @@ class testFormItem extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'Simple check',
 					'name' => 'Simple check',
 					'key' => 'item-simple-check',
@@ -2080,7 +2078,7 @@ class testFormItem extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'SNMPv1 agent',
 					'name' => 'SNMPv1 agent',
 					'key' => 'item-snmpv1-agent',
@@ -2090,7 +2088,7 @@ class testFormItem extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'SNMPv2 agent',
 					'name' => 'SNMPv2 agent',
 					'key' => 'item-snmpv2-agent',
@@ -2100,7 +2098,7 @@ class testFormItem extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'SNMPv3 agent',
 					'name' => 'SNMPv3 agent',
 					'key' => 'item-snmpv3-agent',
@@ -2110,7 +2108,7 @@ class testFormItem extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'SNMP trap',
 					'name' => 'SNMP trap',
 					'key' => 'snmptrap.fallback',
@@ -2120,7 +2118,7 @@ class testFormItem extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'Zabbix internal',
 					'name' => 'Zabbix internal',
 					'key' => 'item-zabbix-internal',
@@ -2130,7 +2128,7 @@ class testFormItem extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'Zabbix trapper',
 					'name' => 'Zabbix trapper',
 					'key' => 'item-zabbix-trapper',
@@ -2140,7 +2138,7 @@ class testFormItem extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'Zabbix aggregate',
 					'name' => 'Zabbix aggregate',
 					'key' => 'grpmax[Zabbix servers group,some-item-key,last,0]',
@@ -2150,7 +2148,7 @@ class testFormItem extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'type' => 'Zabbix aggregate',
 					'name' => 'Zabbix aggregate',
 					'key' => 'item-zabbix-aggregate',
@@ -2162,7 +2160,7 @@ class testFormItem extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'External check',
 					'name' => 'External check',
 					'key' => 'item-external-check',
@@ -2172,17 +2170,18 @@ class testFormItem extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'Database monitor',
 					'name' => 'Database monitor',
 					'key' => 'item-database-monitor',
+					'params_ap' => 'query',
 					'dbCheck' => true,
 					'formCheck' => true
 				)
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'IPMI agent',
 					'name' => 'IPMI agent',
 					'key' => 'item-ipmi-agent',
@@ -2193,7 +2192,7 @@ class testFormItem extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'SSH agent',
 					'name' => 'SSH agent',
 					'key' => 'item-ssh-agent',
@@ -2205,7 +2204,7 @@ class testFormItem extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'TELNET agent',
 					'name' => 'TELNET agent',
 					'key' => 'item-telnet-agent',
@@ -2217,19 +2216,19 @@ class testFormItem extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'type' => 'IPMI agent',
 					'name' => 'IPMI agent error',
 					'key' => 'item-ipmi-agent-error',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "IPMI sensor": cannot be empty.'
+							'Incorrect value for field "IPMI sensor": cannot be empty.'
 					)
 				)
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'IPMI agent',
 					'name' => 'IPMI agent with spaces',
 					'key' => 'item-ipmi-agent-spaces',
@@ -2241,33 +2240,33 @@ class testFormItem extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'type' => 'SSH agent',
 					'name' => 'SSH agent error',
 					'key' => 'item-ssh-agent-error',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "User name": cannot be empty.',
-							'Warning. Incorrect value for field "Executed script": cannot be empty.'
+							'Incorrect value for field "User name": cannot be empty.',
+							'Incorrect value for field "Executed script": cannot be empty.'
 					)
 				)
 			),
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'type' => 'TELNET agent',
 					'name' => 'TELNET agent error',
 					'key' => 'item-telnet-agent-error',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "User name": cannot be empty.',
-							'Warning. Incorrect value for field "Executed script": cannot be empty.'
+							'Incorrect value for field "User name": cannot be empty.',
+							'Incorrect value for field "Executed script": cannot be empty.'
 					)
 				)
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'JMX agent',
 					'name' => 'JMX agent',
 					'key' => 'item-jmx-agent',
@@ -2277,7 +2276,7 @@ class testFormItem extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => TEST_GOOD,
 					'type' => 'Calculated',
 					'name' => 'Calculated',
 					'key' => 'item-calculated',
@@ -2288,22 +2287,23 @@ class testFormItem extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'type' => 'Calculated',
 					'name' => 'Calculated',
 					'key' => 'item-calculated',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "Formula": cannot be empty.'
+							'Incorrect value for field "Formula": cannot be empty.'
 					)
 				)
 			),
 			// Default
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'type' => 'Database monitor',
 					'name' => 'Database monitor',
+					'params_ap' => 'query',
 					'errors' => array(
 							'ERROR: Cannot add item',
 							'Check the key, please. Default example was passed.'
@@ -2313,7 +2313,7 @@ class testFormItem extends CWebTest {
 			// Default
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'type' => 'SSH agent',
 					'name' => 'SSH agent',
 					'username' => 'zabbix',
@@ -2327,7 +2327,7 @@ class testFormItem extends CWebTest {
 			// Default
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'type' => 'TELNET agent',
 					'name' => 'TELNET agent',
 					'username' => 'zabbix',
@@ -2341,7 +2341,7 @@ class testFormItem extends CWebTest {
 			// Default
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => TEST_BAD,
 					'type' => 'JMX agent',
 					'name' => 'JMX agent',
 					'username' => 'zabbix',
@@ -2363,11 +2363,11 @@ class testFormItem extends CWebTest {
 		$this->zbxTestClickWait('link='.$this->host);
 		$this->zbxTestClickWait("//div[@class='w']//a[text()='Items']");
 
-		$this->checkTitle('Configuration of items');
+		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
 
 		$this->zbxTestClickWait('form');
-		$this->checkTitle('Configuration of items');
+		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
 		$this->zbxTestTextPresent('Item');
 
@@ -2406,6 +2406,10 @@ class testFormItem extends CWebTest {
 
 		if (isset($data['params_es'])) {
 			$this->input_type('params_es', $data['params_es']);
+		}
+
+		if (isset($data['params_ap'])) {
+			$this->input_type('params_ap', $data['params_ap']);
 		}
 
 		if (isset($data['formula'])) {
@@ -2489,14 +2493,14 @@ class testFormItem extends CWebTest {
 			$this->zbxTestClickWait('save');
 			$expected = $data['expected'];
 			switch ($expected) {
-				case ITEM_GOOD:
+				case TEST_GOOD:
 					$this->zbxTestTextPresent('Item added');
-					$this->checkTitle('Configuration of items');
+					$this->zbxTestCheckTitle('Configuration of items');
 					$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
 					break;
 
-				case ITEM_BAD:
-					$this->checkTitle('Configuration of items');
+				case TEST_BAD:
+					$this->zbxTestCheckTitle('Configuration of items');
 					$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
 					foreach ($data['errors'] as $msg) {
 						$this->zbxTestTextPresent($msg);

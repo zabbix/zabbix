@@ -29,9 +29,11 @@ require_once dirname(__FILE__).'/include/js.inc.php';
 $page['title'] = _('Configuration of users');
 $page['file'] = 'users.php';
 $page['hist_arg'] = array();
-$page['scripts'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
+
+$themes = array_keys(Z::getThemes());
+$themes[] = THEME_DEFAULT;
 
 //	VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
@@ -40,8 +42,8 @@ $fields = array(
 	'group_userid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'filter_usrgrpid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'alias' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Alias')),
-	'name' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Name')),
-	'surname' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Surname')),
+	'name' =>				array(T_ZBX_STR, O_OPT, null,	null,		null, _('Name')),
+	'surname' =>			array(T_ZBX_STR, O_OPT, null,	null,		null, _('Surname')),
 	'password1' =>			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})&&isset({form})&&{form}!="update"&&isset({change_password})'),
 	'password2' =>			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})&&isset({form})&&{form}!="update"&&isset({change_password})'),
 	'user_type' =>			array(T_ZBX_INT, O_OPT, null,	IN('1,2,3'),'isset({save})'),
@@ -54,7 +56,7 @@ $fields = array(
 	'enable_media' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'disable_media' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'lang' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})'),
-	'theme' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})'),
+	'theme' =>				array(T_ZBX_STR, O_OPT, null,	IN('"'.implode('","', $themes).'"'), 'isset({save})'),
 	'autologin' =>			array(T_ZBX_INT, O_OPT, null,	IN('1'),	null),
 	'autologout' => 		array(T_ZBX_INT, O_OPT, null,	BETWEEN(90, 10000), null, _('Auto-logout (min 90 seconds)')),
 	'url' =>				array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
@@ -84,12 +86,17 @@ validate_sort_and_sortorder('alias', ZBX_SORT_UP);
 if (isset($_REQUEST['userid'])) {
 	$users = API::User()->get(array(
 		'userids' => get_request('userid'),
-		'output' => API_OUTPUT_EXTEND
+		'output' => API_OUTPUT_EXTEND,
+		'editable' => true
 	));
-	if (empty($users)) {
+	if (!$users) {
 		access_deny();
 	}
 }
+if (get_request('filter_usrgrpid') && !API::UserGroup()->isWritable(array($_REQUEST['filter_usrgrpid']))) {
+	access_deny();
+}
+
 if (isset($_REQUEST['go'])) {
 	if (!isset($_REQUEST['group_userid']) || !is_array($_REQUEST['group_userid'])) {
 		access_deny();
@@ -97,7 +104,8 @@ if (isset($_REQUEST['go'])) {
 	else {
 		$usersChk = API::User()->get(array(
 			'userids' => $_REQUEST['group_userid'],
-			'countOutput' => true
+			'countOutput' => true,
+			'editable' => true
 		));
 		if ($usersChk != count($_REQUEST['group_userid'])) {
 			access_deny();
@@ -384,7 +392,7 @@ else {
 
 	// sorting & apging
 	order_result($data['users'], getPageSortField('alias'), getPageSortOrder());
-	$data['paging'] = getPagingLine($data['users']);
+	$data['paging'] = getPagingLine($data['users'], array('userid'));
 
 	foreach ($data['users'] as $key => $user) {
 		// nodes

@@ -23,7 +23,6 @@
 		$config = select_config();
 		$data = array('is_profile' => $isProfile);
 
-		// get title
 		if (isset($userid)) {
 			$options = array(
 				'userids' => $userid,
@@ -32,16 +31,15 @@
 			if ($data['is_profile']) {
 				$options['nodeids'] = id2nodeid($userid);
 			}
-			$users = API::User()->get($options);
 
+			$users = API::User()->get($options);
 			$user = reset($users);
-			$data['title'] = _('User').' "'.$user['alias'].'"';
+
+			$data['auth_type'] = get_user_system_auth($userid);
 		}
 		else {
-			$data['title'] = _('User');
+			$data['auth_type'] = $config['authentication_type'];
 		}
-
-		$data['auth_type'] = isset($userid) ? get_user_system_auth($userid) : $config['authentication_type'];
 
 		if (isset($userid) && (!isset($_REQUEST['form_refresh']) || isset($_REQUEST['register']))) {
 			$data['alias']			= $user['alias'];
@@ -66,7 +64,7 @@
 			$data['user_medias'] = array();
 			$dbMedia = DBselect('SELECT m.mediaid,m.mediatypeid,m.period,m.sendto,m.severity,m.active'.
 					' FROM media m'.
-					' WHERE m.userid='.$userid
+					' WHERE m.userid='.zbx_dbstr($userid)
 			);
 			while ($dbMedium = DBfetch($dbMedia)) {
 				$data['user_medias'][] = $dbMedium;
@@ -175,10 +173,6 @@
 			$lists['node']['read_only']	= new CListBox('nodes_read', null, 10);
 			$lists['node']['deny']		= new CListBox('nodes_deny', null, 10);
 
-			$lists['node']['read_write']->setAttribute('style', 'background: #EBEFF2;');
-			$lists['node']['read_only']->setAttribute('style', 'background: #EBEFF2;');
-			$lists['node']['deny']->setAttribute('style', 'background: #EBEFF2;');
-
 			$nodes = get_accessible_nodes_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY);
 			foreach ($nodes as $node) {
 				switch($node['permission']) {
@@ -202,10 +196,6 @@
 		$lists['group']['read_only']	= new CListBox('groups_read', null, 15);
 		$lists['group']['deny']			= new CListBox('groups_deny', null, 15);
 
-		$lists['group']['read_write']->setAttribute('style', 'background: #EBEFF2;');
-		$lists['group']['read_only']->setAttribute('style', 'background: #EBEFF2;');
-		$lists['group']['deny']->setAttribute('style', 'background: #EBEFF2;');
-
 		$groups = get_accessible_groups_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY, get_current_nodeid(true));
 
 		foreach ($groups as $group) {
@@ -228,10 +218,6 @@
 		$lists['host']['read_write']= new CListBox('hosts_write', null, 15);
 		$lists['host']['read_only']	= new CListBox('hosts_read', null, 15);
 		$lists['host']['deny']		= new CListBox('hosts_deny', null, 15);
-
-		$lists['host']['read_write']->setAttribute('style', 'background: #EBEFF2;');
-		$lists['host']['read_only']->setAttribute('style', 'background: #EBEFF2;');
-		$lists['host']['deny']->setAttribute('style', 'background: #EBEFF2;');
 
 		$hosts = get_accessible_hosts_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY, get_current_nodeid(true));
 
@@ -292,8 +278,10 @@
 			// is activated
 			if (str_in_array($id, $subfilter)) {
 				$span = new CSpan($element['name'].SPACE.'('.$element['count'].')', 'subfilter_enabled');
-				$span->onClick(CHtml::encode('javascript: create_var("zbx_filter", '.
-					CJs::encodeJson($subfilterName.'['.$id.']').', null, true);'));
+				$span->onClick(CHtml::encode(
+					'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
+					'create_var("zbx_filter", '.CJs::encodeJson($subfilterName.'['.$id.']').', null, true);'
+				));
 				$output[] = $span;
 			}
 
@@ -311,8 +299,14 @@
 						: new CSpan(SPACE.'('.$element['count'].')', 'subfilter_active');
 
 					$span = new CSpan($element['name'], 'subfilter_disabled');
-					$span->onClick(CHtml::encode('javascript: create_var("zbx_filter", '.
-						CJs::encodeJson($subfilterName.'['.$id.']').', '.CJs::encodeJson($id).', true);'));
+					$span->onClick(CHtml::encode(
+						'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
+						'create_var("zbx_filter", '.
+							CJs::encodeJson($subfilterName.'['.$id.']').', '.
+							CJs::encodeJson($id).', '.
+							'true'.
+						');'
+					));
 
 					$output[] = $span;
 					$output[] = $nspan;
@@ -328,6 +322,8 @@
 	}
 
 	function getItemFilterForm(&$items) {
+		$displayNodes = is_array(get_current_nodeid());
+
 		$filter_groupId				= $_REQUEST['filter_groupid'];
 		$filter_hostId				= $_REQUEST['filter_hostid'];
 		$filter_application			= $_REQUEST['filter_application'];
@@ -508,7 +504,8 @@
 			if (!empty($getHostInfo)) {
 				$groupFilter[] = array(
 					'id' => $getHostInfo['groupid'],
-					'name' => $getHostInfo['name']
+					'name' => $getHostInfo['name'],
+					'prefix' => $displayNodes ? get_node_name_by_elid($getHostInfo['groupid'], true, NAME_DELIMITER) : ''
 				);
 			}
 		}
@@ -517,13 +514,13 @@
 			new CCol(bold(_('Host group').NAME_DELIMITER), 'label col1'),
 			new CCol(array(
 				new CMultiSelect(array(
-						'name' => 'filter_groupid',
-						'selectedLimit' => 1,
-						'objectName' => 'hostGroup',
-						'objectOptions' => array(
-							'editable' => true
-						),
-						'data' => $groupFilter
+					'name' => 'filter_groupid',
+					'selectedLimit' => 1,
+					'objectName' => 'hostGroup',
+					'objectOptions' => array(
+						'editable' => true
+					),
+					'data' => $groupFilter
 				))
 			), 'col1'),
 			new CCol(bold(_('Type').NAME_DELIMITER), 'label col2'),
@@ -538,13 +535,15 @@
 		if (!empty($filter_hostId)) {
 			$getHostInfo = API::Host()->get(array(
 				'hostids' => $filter_hostId,
+				'templated_hosts' => true,
 				'output' => array('name')
 			));
 			$getHostInfo = reset($getHostInfo);
 			if (!empty($getHostInfo)) {
 				$hostFilterData[] = array(
 					'id' => $getHostInfo['hostid'],
-					'name' => $getHostInfo['name']
+					'name' => $getHostInfo['name'],
+					'prefix' => $displayNodes ? get_node_name_by_elid($filter_hostId, true, NAME_DELIMITER) : ''
 				);
 			}
 		}
@@ -553,13 +552,14 @@
 			new CCol(bold(_('Host').NAME_DELIMITER), 'label'),
 			new CCol(array(
 				new CMultiSelect(array(
-						'name' => 'filter_hostid',
-						'selectedLimit' => 1,
-						'objectName' => 'hosts',
-						'objectOptions' => array(
-							'editable' => true
-						),
-						'data' => $hostFilterData
+					'name' => 'filter_hostid',
+					'selectedLimit' => 1,
+					'objectName' => 'hosts',
+					'objectOptions' => array(
+						'editable' => true,
+						'templated_hosts' => true
+					),
+					'data' => $hostFilterData
 				))
 			), 'col1'),
 			new CCol($updateIntervalLabel, 'label'),
@@ -577,7 +577,8 @@
 				new CButton('btn_app', _('Select'),
 					'return PopUp("popup.php?srctbl=applications&srcfld1=name'.
 						'&dstfrm='.$form->getName().'&dstfld1=filter_application'.
-						'&with_applications=1&hostid=" + jQuery("input[name=\'filter_hostid\']").val()'
+						'&with_applications=1'.
+						'" + (jQuery("input[name=\'filter_hostid\']").length > 0 ? "&hostid="+jQuery("input[name=\'filter_hostid\']").val() : "")'
 						.', 550, 450, "application");',
 					'filter-select-button'
 				)
@@ -1036,8 +1037,10 @@
 		$data['types'] = item_type2str();
 		unset($data['types'][ITEM_TYPE_HTTPTEST]);
 		if (!empty($options['is_discovery_rule'])) {
-			unset($data['types'][ITEM_TYPE_AGGREGATE], $data['types'][ITEM_TYPE_CALCULATED],
-					$data['types'][ITEM_TYPE_SNMPTRAP], $data['types'][ITEM_TYPE_DB_MONITOR]);
+			unset($data['types'][ITEM_TYPE_AGGREGATE],
+				$data['types'][ITEM_TYPE_CALCULATED],
+				$data['types'][ITEM_TYPE_SNMPTRAP]
+			);
 		}
 
 		// item
@@ -1203,7 +1206,7 @@
 		$data['db_applications'] = DBfetchArray(DBselect(
 			'SELECT DISTINCT a.applicationid,a.name'.
 			' FROM applications a'.
-			' WHERE a.hostid='.$data['hostid']
+			' WHERE a.hostid='.zbx_dbstr($data['hostid'])
 		));
 		order_result($data['db_applications'], 'name');
 
@@ -1216,7 +1219,7 @@
 		// valuemapid
 		if ($data['limited']) {
 			if (!empty($data['valuemapid'])) {
-				if ($map_data = DBfetch(DBselect('SELECT v.name FROM valuemaps v WHERE v.valuemapid='.$data['valuemapid']))) {
+				if ($map_data = DBfetch(DBselect('SELECT v.name FROM valuemaps v WHERE v.valuemapid='.zbx_dbstr($data['valuemapid'])))) {
 					$data['valuemaps'] = $map_data['name'];
 				}
 			}
@@ -1366,7 +1369,7 @@
 						' LEFT JOIN items i ON f.itemid=i.itemid'.
 						' LEFT JOIN hosts h ON i.hostid=h.hostid'.
 						' LEFT JOIN item_discovery id ON i.itemid=id.itemid'.
-					' WHERE t.triggerid='.$tmp_triggerid
+					' WHERE t.triggerid='.zbx_dbstr($tmp_triggerid)
 				));
 				if (bccomp($data['triggerid'], $tmp_triggerid) != 0) {
 					// parent trigger prototype link
@@ -1392,10 +1395,11 @@
 
 			$data['limited'] = $data['trigger']['templateid'] ? 'yes' : null;
 
-			// if no host has been selected for the navigation panel, use the first trigger host
-			if (!$data['hostid']) {
-				$hosts = reset($data['trigger']['hosts']);
-				$data['hostid'] = $hosts['hostid'];
+			// select first host from triggers if gived not match
+			$hosts = $data['trigger']['hosts'];
+			if (count($hosts) > 0 && !in_array(array('hostid' => $data['hostid']), $hosts)) {
+				$host = reset($hosts);
+				$data['hostid'] = $host['hostid'];
 			}
 		}
 
@@ -1413,7 +1417,7 @@
 					'SELECT t.triggerid,t.description'.
 					' FROM triggers t,trigger_depends d'.
 					' WHERE t.triggerid=d.triggerid_up'.
-						' AND d.triggerid_down='.$data['triggerid']
+						' AND d.triggerid_down='.zbx_dbstr($data['triggerid'])
 				);
 				while ($trigger = DBfetch($db_triggers)) {
 					if (uint_in_array($trigger['triggerid'], $data['dependencies'])) {
@@ -1753,27 +1757,5 @@
 		)));
 
 		return $tblPeriod;
-	}
-
-	function insert_host_inventory_form(){
-		$frmHostP = new CFormTable(_('Host Inventory'));
-
-		$table_titles = getHostInventories();
-		$table_titles = zbx_toHash($table_titles, 'db_field');
-		$sql_fields = implode(', ', array_keys($table_titles));
-
-		$sql = 'SELECT '.$sql_fields.' FROM host_inventory WHERE hostid='.$_REQUEST['hostid'];
-		$result = DBselect($sql);
-
-		$row = DBfetch($result);
-		foreach($row as $key => $value){
-			if(!zbx_empty($value)){
-				$frmHostP->addRow($table_titles[$key]['title'], new CSpan(zbx_str2links($value), 'pre'));
-			}
-		}
-
-		$frmHostP->addItemToBottomRow(new CButtonCancel(url_param('groupid')));
-
-		return $frmHostP;
 	}
 

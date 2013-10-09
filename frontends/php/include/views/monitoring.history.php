@@ -41,6 +41,9 @@ if (count($this->data['items']) == 1) {
 	}
 }
 
+$header['right'][] = SPACE;
+$header['right'][] = get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']));
+
 // append action form to header
 $actionForm = new CForm('get');
 $actionForm->addVar('itemid', $_REQUEST['itemid']);
@@ -137,9 +140,9 @@ $screen = CScreenBuilder::getScreen(array(
 	'action' => $this->data['action'],
 	'items' => $this->data['items'],
 	'item' => $this->data['item'],
-	'itemid' => $this->data['itemid'],
+	'itemids' => $this->data['itemids'],
 	'profileIdx' => 'web.item.graph',
-	'profileIdx2' => $this->data['itemid'],
+	'profileIdx2' => reset($this->data['itemids']),
 	'period' => $this->data['period'],
 	'stime' => $this->data['stime'],
 	'filter' => get_request('filter'),

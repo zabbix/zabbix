@@ -119,7 +119,7 @@ class CTimePeriodValidatorTest extends PHPUnit_Framework_TestCase {
 	* @dataProvider provider
 	*/
 	public function test_parseTimePeriod($period, $allowMultiple, $expectedResult) {
-		$validator = new CTimePeriodValidator(array('allow_multiple' => $allowMultiple));
+		$validator = new CTimePeriodValidator(array('allowMultiple' => $allowMultiple));
 
 		$resultPeriod = $validator->validate($period);
 		if ($expectedResult === false) {

@@ -29,14 +29,14 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 	public function testFormAdministrationGeneralRegexp_Layout() {
 		$this->zbxTestLogin('adm.gui.php');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Regular expressions');
-		$this->checkTitle('Configuration of regular expressions');
+		$this->zbxTestCheckTitle('Configuration of regular expressions');
 		$this->zbxTestTextPresent('CONFIGURATION OF REGULAR EXPRESSIONS');
 		$this->zbxTestTextPresent(array('Regular expressions', 'Name', 'Expressions'));
 
 		// clicking "New regular expression" button
 		$this->zbxTestClickWait('form');
 
-		$this->checkTitle('Configuration of regular expressions');
+		$this->zbxTestCheckTitle('Configuration of regular expressions');
 		$this->zbxTestTextPresent('CONFIGURATION OF REGULAR EXPRESSIONS');
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestTextPresent('Expressions');
@@ -139,7 +139,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 
 		$this->input_type('name', '1_regexp3');
 		$this->zbxTestClickWait('save');
-		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Warning. Field "expressions" is mandatory.'));
+		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Field "expressions" is mandatory.'));
 	}
 
 	public function testFormAdministrationGeneralRegexp_Test() {

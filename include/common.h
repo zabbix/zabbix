@@ -24,62 +24,6 @@
 #include "zbxtypes.h"
 #include "version.h"
 
-#ifdef DEBUG
-#	include "threads.h"
-
-#	define SDI(msg)		fprintf(stderr, "%6li:DEBUG INFO: %s\n", zbx_get_thread_id(), msg); fflush(stderr)
-#	define SDI2(msg,p1)	fprintf(stderr, "%6li:DEBUG INFO: " msg "\n", zbx_get_thread_id(), p1); fflush(stderr)
-#	define zbx_dbg_assert(exp)	assert(exp)
-#else
-#	define SDI(msg)			((void)(0))
-#	define SDI2(msg,p1)		((void)(0))
-#	define zbx_dbg_assert(exp)	((void)(0))
-#endif
-
-#if defined(ENABLE_CHECK_MEMOTY)
-#	include "crtdbg.h"
-
-#	define REINIT_CHECK_MEMORY() \
-		_CrtMemCheckpoint(&oldMemState)
-
-#	define INIT_CHECK_MEMORY() \
-		char DumpMessage[0x1FF]; \
-		_CrtMemState  oldMemState, newMemState, diffMemState; \
-		REINIT_CHECK_MEMORY()
-
-#	define CHECK_MEMORY(fncname, msg) \
-		DumpMessage[0] = '\0'; \
-		_CrtMemCheckpoint(&newMemState); \
-		if(_CrtMemDifference(&diffMemState, &oldMemState, &newMemState)) \
-		{ \
-			zbx_snprintf(DumpMessage, sizeof(DumpMessage), \
-				"%s\n" \
-				"free:  %10li bytes in %10li blocks\n" \
-				"normal:%10li bytes in %10li blocks\n" \
-				"CRT:   %10li bytes in %10li blocks\n", \
-				 \
-				fncname ": Memory changed! (" msg ")\n", \
-				 \
-				(long) diffMemState.lSizes[_FREE_BLOCK], \
-				(long) diffMemState.lCounts[_FREE_BLOCK], \
-				 \
-				(long) diffMemState.lSizes[_NORMAL_BLOCK], \
-				(long) diffMemState.lCounts[_NORMAL_BLOCK], \
-				 \
-				(long) diffMemState.lSizes[_CRT_BLOCK], \
-				(long) diffMemState.lCounts[_CRT_BLOCK]); \
-		} \
-		else \
-		{ \
-			zbx_snprintf(DumpMessage, sizeof(DumpMessage), \
-					"%s: Memory OK! (%s)", fncname, msg); \
-		} \
-		SDI2("MEMORY_LEAK: %s", DumpMessage)
-#else
-#	define INIT_CHECK_MEMORY() ((void)0)
-#	define CHECK_MEMORY(fncname, msg) ((void)0)
-#endif
-
 #ifndef va_copy
 #	if defined(__va_copy)
 #		define va_copy(d, s) __va_copy(d, s)
@@ -199,8 +143,9 @@ const char	*zbx_interface_type_string(zbx_interface_type_t type);
 #define INTERFACE_TYPE_COUNT	4	/* number of interface types */
 extern const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT];
 
-#define ZBX_FLAG_DISCOVERY		0x01	/* low-level discovery rule */
-#define ZBX_FLAG_DISCOVERY_CHILD	0x02	/* low-level discovery proto-item, proto-trigger or proto-graph */
+#define ZBX_FLAG_DISCOVERY_NORMAL	0x00	/* normal item */
+#define ZBX_FLAG_DISCOVERY_RULE		0x01	/* low-level discovery rule */
+#define ZBX_FLAG_DISCOVERY_PROTOTYPE	0x02	/* low-level discovery host, item, trigger or graph prototypes */
 #define ZBX_FLAG_DISCOVERY_CREATED	0x04	/* auto-created item, trigger or graph */
 
 typedef enum
@@ -381,6 +326,24 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define EVENT_TYPE_TRIGGER_UNKNOWN		4
 #define EVENT_TYPE_TRIGGER_NORMAL		5
 
+#define SCREEN_RESOURCE_GRAPH			0
+#define SCREEN_RESOURCE_SIMPLE_GRAPH		1
+#define SCREEN_RESOURCE_MAP			2
+#define SCREEN_RESOURCE_PLAIN_TEXT		3
+#define SCREEN_RESOURCE_HOSTS_INFO		4
+#define SCREEN_RESOURCE_TRIGGERS_INFO		5
+#define SCREEN_RESOURCE_SERVER_INFO		6
+#define SCREEN_RESOURCE_CLOCK			7
+#define SCREEN_RESOURCE_SCREEN			8
+#define SCREEN_RESOURCE_TRIGGERS_OVERVIEW	9
+#define SCREEN_RESOURCE_DATA_OVERVIEW		10
+#define SCREEN_RESOURCE_URL			11
+#define SCREEN_RESOURCE_ACTIONS			12
+#define SCREEN_RESOURCE_EVENTS			13
+#define SCREEN_RESOURCE_HOSTGROUP_TRIGGERS	14
+#define SCREEN_RESOURCE_SYSTEM_STATUS		15
+#define SCREEN_RESOURCE_HOST_TRIGGERS		16
+
 typedef enum
 {
 	SYSMAP_ELEMENT_TYPE_HOST = 0,
@@ -506,6 +469,9 @@ typedef enum
 }
 zbx_group_status_type_t;
 
+/* group internal flag */
+#define ZBX_INTERNAL_GROUP		1
+
 /* daemon type */
 #define ZBX_DAEMON_TYPE_SERVER		0x01
 #define ZBX_DAEMON_TYPE_PROXY_ACTIVE	0x02
@@ -532,22 +498,14 @@ typedef enum
 zbx_maintenance_type_t;
 
 /* regular expressions */
-typedef enum
-{
-	EXPRESSION_TYPE_INCLUDED = 0,
-	EXPRESSION_TYPE_ANY_INCLUDED,
-	EXPRESSION_TYPE_NOT_INCLUDED,
-	EXPRESSION_TYPE_TRUE,
-	EXPRESSION_TYPE_FALSE
-}
-zbx_expression_type_t;
+#define EXPRESSION_TYPE_INCLUDED	0
+#define EXPRESSION_TYPE_ANY_INCLUDED	1
+#define EXPRESSION_TYPE_NOT_INCLUDED	2
+#define EXPRESSION_TYPE_TRUE		3
+#define EXPRESSION_TYPE_FALSE		4
 
-typedef enum
-{
-	ZBX_IGNORE_CASE = 0,
-	ZBX_CASE_SENSITIVE
-}
-zbx_case_sensitive_t;
+#define ZBX_IGNORE_CASE			0
+#define ZBX_CASE_SENSITIVE		1
 
 /* HTTP tests statuses */
 #define HTTPTEST_STATUS_MONITORED	0
@@ -571,6 +529,8 @@ zbx_case_sensitive_t;
 #define HOST_MAINTENANCE_STATUS_ON	1
 
 /* host inventory mode */
+#define HOST_INVENTORY_DISABLED		-1	/* the host has no record in host_inventory */
+						/* only in server code, never in DB */
 #define HOST_INVENTORY_MANUAL		0
 #define HOST_INVENTORY_AUTOMATIC	1
 
@@ -966,30 +926,6 @@ int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size
 #define ZBX_COMMAND_WITH_PARAMS		2
 int 	parse_command(const char *command, char *cmd, size_t cmd_max_len, char *param, size_t param_max_len);
 
-typedef struct
-{
-	char			*name;
-	char			*expression;
-	int			expression_type;
-	char			exp_delimiter;
-	zbx_case_sensitive_t	case_sensitive;
-}
-ZBX_REGEXP;
-
-/* regular expressions */
-char	*zbx_regexp_match(const char *string, const char *pattern, int *len);
-char	*zbx_iregexp_match(const char *string, const char *pattern, int *len);
-char	*zbx_regexp_sub(const char *string, const char *pattern, const char *output_template);
-char	*zbx_mregexp_sub(const char *string, const char *pattern, const char *output_template);
-
-void	clean_regexps_ex(ZBX_REGEXP *regexps, int *regexps_num);
-void	add_regexp_ex(ZBX_REGEXP **regexps, int *regexps_alloc, int *regexps_num,
-		const char *name, const char *expression, int expression_type, char exp_delimiter, int case_sensitive);
-int	regexp_match_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, const char *pattern,
-		zbx_case_sensitive_t cs);
-int	regexp_sub_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, const char *pattern,
-		zbx_case_sensitive_t cs, const char *output_template, char **output);
-
 /* misc functions */
 #ifdef HAVE_IPV6
 int	is_ip6(const char *ip);
@@ -1049,6 +985,7 @@ int	zbx_is_utf8(const char *text);
 #define ZBX_UTF8_REPLACE_CHAR	'?'
 char	*zbx_replace_utf8(const char *text);
 void	zbx_replace_invalid_utf8(char *text);
+int	zbx_is_utf8(const char *text);
 
 void	dos2unix(char *str);
 int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value);

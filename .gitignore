@@ -68,6 +68,7 @@ frontends/php/locale/nl/LC_MESSAGES/frontend.mo
 frontends/php/locale/pl/LC_MESSAGES/frontend.mo
 frontends/php/locale/pt_BR/LC_MESSAGES/frontend.mo
 frontends/php/locale/pt_PT/LC_MESSAGES/frontend.mo
+frontends/php/locale/ro/LC_MESSAGES/frontend.mo
 frontends/php/locale/ru/LC_MESSAGES/frontend.mo
 frontends/php/locale/sk/LC_MESSAGES/frontend.mo
 frontends/php/locale/sv/LC_MESSAGES/frontend.mo
@@ -148,6 +149,9 @@ src/libs/zbxmodules/Makefile.in
 src/libs/zbxnix/.deps
 src/libs/zbxnix/Makefile
 src/libs/zbxnix/Makefile.in
+src/libs/zbxregexp/.deps
+src/libs/zbxregexp/Makefile
+src/libs/zbxregexp/Makefile.in
 src/libs/zbxself/.deps
 src/libs/zbxself/Makefile
 src/libs/zbxself/Makefile.in
@@ -284,6 +288,9 @@ src/zabbix_server/trapper/Makefile.in
 src/zabbix_server/utils/.deps
 src/zabbix_server/utils/Makefile
 src/zabbix_server/utils/Makefile.in
+src/zabbix_server/vmware/.deps
+src/zabbix_server/vmware/Makefile
+src/zabbix_server/vmware/Makefile.in
 src/zabbix_server/watchdog/.deps
 src/zabbix_server/watchdog/Makefile
 src/zabbix_server/watchdog/Makefile.in
