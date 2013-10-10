@@ -16,4 +16,10 @@ $ZBX_SERVER_PORT		= '10051';
 $ZBX_SERVER_NAME		= '';
 
 $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
+
+// // LLNW Super-admin role DB bypass
+// // LLNW_RW_ROLE: Role number that grants read-write access.
+// // LLNW_RO_ROLE: Role number for read-only access. (e.g. local-ug_read-only-users)
+// global $LLNW_RW_ROLE, $LLNW_RO_ROLE;
+// $LLNW_RO_ROLE='100100000000049';
 ?>

@@ -51,3 +51,38 @@ CProfiler::getInstance()->start();
 global $ZBX_PAGE_POST_JS, $page;
 global $ZBX_SERVER, $ZBX_SERVER_PORT;
 $page = array();
+
+
+/**
+ * Use the global user details to check if the user is in a RW or RO group.
+ * @return boolean
+ */
+function _llnw_is_user_rw() {
+	global $USER_DETAILS;
+	// Consider CWebUser::getType() in place of USER_DETAILS...
+	global $LLNW_RW_ROLE, $LLNW_RO_ROLE; // Global configuration role information
+
+	if (empty($USER_DETAILS['userid'])) {
+		return true; // consider the lack of a userid as anonymous
+	}
+	else {
+		static $groups; // cache the groups per request - we only need to call the API once.
+		$userid = $USER_DETAILS['userid'];
+		if (empty($groups)) {
+			$groups = array();
+			$apigroups = API::UserGroup()->get(array('userids' => $userid, 'output' => API_OUTPUT_SHORTEN));
+			foreach ($apigroups as $group) {
+				$groups[] = $group['usrgrpid'];
+			}
+		}
+
+		// Return status based on RO,RW Role config.
+		if (in_array($LLNW_RO_ROLE, $groups)) {
+			return false;
+		}
+		if (in_array($LLNW_RW_ROLE, $groups)) {
+			return true;
+		}
+	}
+	return false; // catchall
+}

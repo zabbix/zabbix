@@ -520,6 +520,18 @@ function DBaddLimit($query, $limit = 0, $offset = 0) {
  * @return boolean
  */
 function _llnw_allow_DBexecute($query) {
+	global $page;
+
+	// First check if we should be white/blacklisting
+	// If we have a RW user just bypass this altogether
+	if (_llnw_is_user_rw()) {
+		return true;
+	}
+	// HACK: Bypass checks on profile.php
+	if (!empty($page['file']) && ($page['file']=='profile.php')) {
+		return true;
+	}
+
 	$whitelist = array(
 		"UPDATE sessions",
 		"INSERT INTO sessions",
