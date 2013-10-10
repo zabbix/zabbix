@@ -284,13 +284,11 @@ static void	get_trigger_values(zbx_uint64_t triggerid, int maintenance_from, int
 				" and object=%d"
 				" and objectid=" ZBX_FS_UI64
 				" and clock<%d"
-				" and value in (%d,%d)"
 			" order by object desc,objectid desc,eventid desc",
 			EVENT_SOURCE_TRIGGERS,
 			EVENT_OBJECT_TRIGGER,
 			triggerid,
-			maintenance_to,
-			TRIGGER_VALUE_OK, TRIGGER_VALUE_PROBLEM);
+			maintenance_to);
 
 	result = DBselectN(sql, 1);
 
@@ -322,13 +320,11 @@ static void	get_trigger_values(zbx_uint64_t triggerid, int maintenance_from, int
 				" and object=%d"
 				" and objectid=" ZBX_FS_UI64
 				" and clock<%d"
-				" and value in (%d,%d)"
 			" order by object desc,objectid desc,eventid desc",
 			EVENT_SOURCE_TRIGGERS,
 			EVENT_OBJECT_TRIGGER,
 			triggerid,
-			maintenance_from,
-			TRIGGER_VALUE_OK, TRIGGER_VALUE_PROBLEM);
+			maintenance_from);
 
 	result = DBselectN(sql, 1);
 
@@ -352,7 +348,7 @@ static void	get_trigger_values(zbx_uint64_t triggerid, int maintenance_from, int
 				" and object=%d"
 				" and objectid=" ZBX_FS_UI64
 				" and clock between %d and %d"
-				" and value in (%d)"
+				" and value=%d"
 			" order by object desc,objectid desc,eventid desc",
 			EVENT_SOURCE_TRIGGERS,
 			EVENT_OBJECT_TRIGGER,
