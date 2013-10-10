@@ -1909,6 +1909,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.19rc1
 
+........S. [ZBX-7119] fixed data collection stopping after no data maintenance until configuration cache is updated (asaveljevs)
 ..F....... [ZBX-7074] fixed incorrectly parsed trigger expression in trigger wizard (Vitalij)
 
 Changes for 1.8.18

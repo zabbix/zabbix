@@ -1760,13 +1760,14 @@ static void	DCsync_hosts(DB_RESULT result)
 		host->proxy_hostid = proxy_hostid;
 		DCstrpool_replace(found, &host->host, row[2]);
 		DCstrpool_replace(found, &host->name, row[23]);
-		host->maintenance_status = (unsigned char)atoi(row[7]);
-		host->maintenance_type = (unsigned char)atoi(row[8]);
-		host->maintenance_from = atoi(row[9]);
 		host->status = status;
 
 		if (0 == found)
 		{
+			host->maintenance_status = (unsigned char)atoi(row[7]);
+			host->maintenance_type = (unsigned char)atoi(row[8]);
+			host->maintenance_from = atoi(row[9]);
+
 			host->errors_from = atoi(row[10]);
 			host->available = (unsigned char)atoi(row[11]);
 			host->disable_until = atoi(row[12]);
@@ -4561,15 +4562,19 @@ void	DCconfig_set_trigger_value(zbx_uint64_t triggerid, unsigned char value,
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
-void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
-				int maintenance_type, int maintenance_from)
+void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int maintenance_status,
+		int maintenance_type, int maintenance_from)
 {
+	int		i;
 	ZBX_DC_HOST	*dc_host;
 
 	LOCK_CACHE;
 
-	if (NULL != (dc_host = zbx_hashset_search(&config->hosts, &hostid)))
+	for (i = 0; i < hostids_num; i++)
 	{
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &hostids[i])))
+			continue;
+
 		if (HOST_MAINTENANCE_STATUS_OFF == dc_host->maintenance_status ||
 				HOST_MAINTENANCE_STATUS_OFF == maintenance_status)
 			dc_host->maintenance_from = maintenance_from;
