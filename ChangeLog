@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Dutch, Finnish, Indonesian, Italian, Lithuanian, Persian, Portuguese (Portugal), Russian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F.I..... [ZBX-7066] corrected downloadable configuration file name in setup step 6 (Ivo)
 A......... [ZBX-7101] fixed generated SQL queries in action.get method when simultaneously selecting more than one condition and operation (Ivo)
 
 --------------------------------------------------------------------------------
