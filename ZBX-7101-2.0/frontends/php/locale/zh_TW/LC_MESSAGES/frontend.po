@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-25 00:33+0300\n"
+"POT-Creation-Date: 2013-10-08 22:31+0300\n"
 "PO-Revision-Date: 2012-11-06 15:57+0800\n"
 "Last-Translator: Yaochiu Huang <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -24,11 +24,11 @@ msgstr ""
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
 msgstr "\"%s\"必須是在1970.01.01和2038.01.18之間."
 
-#: include/profiles.inc.php:286
+#: include/profiles.inc.php:285
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
 msgstr "\"顯示[正常]的觸發器\" 必須為 \"0\" 或正整數."
 
-#: include/profiles.inc.php:291
+#: include/profiles.inc.php:290
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
 msgstr "\"觸發器閃爍狀態改變時\" 必須為 \"0\" 或正整數."
 
@@ -201,7 +201,7 @@ msgstr "可接受的SLA"
 msgid "Access denied!"
 msgstr "存取被拒!"
 
-#: api/classes/CUser.php:916
+#: api/classes/CUser.php:917
 #, php-format
 msgid "Account is blocked for %s seconds"
 msgstr "帳號被封鎖%s秒"
@@ -1530,7 +1530,7 @@ msgstr "無法刪除由低階層發現所創建的觸發器."
 msgid "Cannot delete user"
 msgstr "無法删除用户"
 
-#: api/classes/CUser.php:786
+#: api/classes/CUser.php:787
 msgid "Cannot delete user media."
 msgstr "無法刪除用戶示警媒介."
 
@@ -1678,7 +1678,7 @@ msgstr[0] "不能輸模板 \"%2$s\", 連結的模板 \"%3$s\" 不存在."
 msgid "Cannot include view file \"%s\"."
 msgstr "不能包含檢視檔案\"%s\"."
 
-#: api/classes/CUser.php:815
+#: api/classes/CUser.php:816
 msgid "Cannot insert user media."
 msgstr "不能插入用戶示警媒介"
 
@@ -1686,7 +1686,7 @@ msgstr "不能插入用戶示警媒介"
 msgid "Cannot link template"
 msgstr "無法連結模板"
 
-#: api/classes/CUser.php:880
+#: api/classes/CUser.php:881
 msgid "Cannot logout."
 msgstr "不能登出"
 
@@ -1995,7 +1995,7 @@ msgstr "無法更新觸發器"
 msgid "Cannot update user"
 msgstr "無法更新用户"
 
-#: api/classes/CUser.php:807
+#: api/classes/CUser.php:808
 msgid "Cannot update user media."
 msgstr "無法更新用戶媒介."
 
@@ -2189,7 +2189,7 @@ msgstr "顏色"
 msgid "Colour (OK)"
 msgstr "顏色 (OK)"
 
-#: include/profiles.inc.php:279
+#: include/profiles.inc.php:278
 msgid "Colour is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "顏色是不正確的:預期是十六進位顏色碼(6個記號)."
 
@@ -2517,7 +2517,7 @@ msgstr "複製"
 msgid "Copy selected to ..."
 msgstr "複製所選的到 ..."
 
-#: api/classes/CUser.php:985
+#: api/classes/CUser.php:986
 #, php-format
 msgid "Correct login \"%s\"."
 msgstr "正確登入\"%s\"."
@@ -2895,7 +2895,7 @@ msgstr "暗橘色"
 msgid "Darken"
 msgstr "轉暗"
 
-#: dashboard.php:24 include/menu.inc.php:33 include/profiles.inc.php:353
+#: dashboard.php:24 include/menu.inc.php:33 include/profiles.inc.php:352
 msgid "Dashboard"
 msgstr "儀表板"
 
@@ -3929,7 +3929,7 @@ msgstr "重複的拓墣圖\"%s\"的拓墣圖名稱."
 msgid "Duplicate script name \"%s\"."
 msgstr "重複的腳本名稱\"%s\"."
 
-#: include/profiles.inc.php:311
+#: include/profiles.inc.php:310
 #, php-format
 msgid "Duplicate severity name \"%s\"."
 msgstr "重複的嚴重性名稱\"%s\"."
@@ -5918,7 +5918,7 @@ msgstr "不正確的自變數傳給方法."
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "不正確的計算SLA值予服務\"%1$s\"."
 
-#: include/nodes.inc.php:267 include/nodes.inc.php:309
+#: include/nodes.inc.php:267 include/nodes.inc.php:308
 msgid "Incorrect characters used for Node name."
 msgstr "不正確的字元用於節點名稱."
 
@@ -6007,7 +6007,7 @@ msgstr "提供了不正確的主機ID\"%s\"給篩選組件"
 msgid "Incorrect host group ID \"%s\" provided for screen element."
 msgstr "提供了不正確的主機群組ID\"%s\"給篩選組件"
 
-#: include/profiles.inc.php:258
+#: include/profiles.inc.php:257
 msgid "Incorrect host group."
 msgstr "不正確的主機群組."
 
@@ -6119,7 +6119,7 @@ msgstr "予拓墣圖\"%s\"不正確的拓墣圖高度."
 msgid "Incorrect map width value for map \"%s\"."
 msgstr "予拓墣圖\"%s\"不正確的拓墣圖寬度."
 
-#: include/nodes.inc.php:287
+#: include/nodes.inc.php:286
 msgid "Incorrect node type."
 msgstr "不正確的節點類型."
 
@@ -6303,7 +6303,7 @@ msgstr "於\"get_accessible_groups_by_user\"中不正確的用戶資料."
 msgid "Incorrect user data in \"get_accessible_nodes_by_user\"."
 msgstr "於\"get_accessible_nodes_by_user\"中不正確的用戶資料."
 
-#: include/profiles.inc.php:246
+#: include/profiles.inc.php:245
 msgid "Incorrect user group."
 msgstr "不正確的用戶群組."
 
@@ -6332,7 +6332,7 @@ msgstr "不正確的值\"NULL\"於NOT NULL欄位\"%1$s\"中."
 msgid "Incorrect value for setMessage(): \"%s\"."
 msgstr "不正確的值於setMessage(): \"%s\"."
 
-#: include/profiles.inc.php:240
+#: include/profiles.inc.php:239
 msgid "Incorrect working time."
 msgstr "不正確的工作時間."
 
@@ -6368,7 +6368,7 @@ msgstr "插入"
 msgid "Insert macro"
 msgstr "插入巨集"
 
-#: include/menu.inc.php:279 include/profiles.inc.php:228 setup.php:25
+#: include/menu.inc.php:279 include/profiles.inc.php:227 setup.php:25
 msgid "Installation"
 msgstr "安装"
 
@@ -7174,7 +7174,7 @@ msgstr "登入"
 msgid "Login as Guest"
 msgstr "登入為訪客"
 
-#: api/classes/CUser.php:977
+#: api/classes/CUser.php:978
 #, php-format
 msgid "Login failed \"%s\"."
 msgstr "登入失敗\"%s\"."
@@ -7183,8 +7183,8 @@ msgstr "登入失敗\"%s\"."
 msgid "Login name or password is incorrect"
 msgstr ""
 
-#: api/classes/CUser.php:845 api/classes/CUser.php:863
-#: api/classes/CUser.php:910
+#: api/classes/CUser.php:846 api/classes/CUser.php:864
+#: api/classes/CUser.php:911
 msgid "Login name or password is incorrect."
 msgstr "登入名稱或密碼是不正確的."
 
@@ -8411,7 +8411,7 @@ msgstr "不具拓墣圖\"%1$s\"的許可權."
 msgid "No permissions for screen \"%1$s\"."
 msgstr "不具篩選 \"%1$s\"的許可權."
 
-#: api/classes/CUser.php:924 api/classes/CUser.php:1034
+#: api/classes/CUser.php:925 api/classes/CUser.php:1035
 msgid "No permissions for system access."
 msgstr "沒有系統存取的許可權"
 
@@ -8611,7 +8611,7 @@ msgstr "節點已刪除"
 msgid "Node updated"
 msgstr "節點已更新"
 
-#: include/nodes.inc.php:292
+#: include/nodes.inc.php:291
 msgid "Node with same ID already exists."
 msgstr "具有相同ID的節點已存在."
 
@@ -8705,7 +8705,7 @@ msgstr "備註"
 msgid "Nothing"
 msgstr "空無"
 
-#: include/profiles.inc.php:331
+#: include/profiles.inc.php:330
 msgid "Nothing to do."
 msgstr "無事需做"
 
@@ -8950,15 +8950,15 @@ msgstr "只有超級管理員可以更新圖示對應."
 msgid "Only Super Admins can update user groups."
 msgstr "只有超級管理員可以更新用戶群組."
 
-#: api/classes/CUser.php:684
+#: api/classes/CUser.php:685
 msgid "Only Zabbix Admins can add user media."
 msgstr "只有超級管理員可以新增用戶示警媒介."
 
-#: api/classes/CUser.php:752
+#: api/classes/CUser.php:753
 msgid "Only Zabbix Admins can change user media."
 msgstr "只有超級管理員可以用改變戶示警媒介."
 
-#: api/classes/CUser.php:722
+#: api/classes/CUser.php:723
 msgid "Only Zabbix Admins can remove user media."
 msgstr "只有超級管理員可以移除用戶示警媒介."
 
@@ -9482,7 +9482,7 @@ msgstr "播放"
 msgid "Play sound"
 msgstr "播放聲音"
 
-#: include/nodes.inc.php:329
+#: include/nodes.inc.php:328
 msgid "Please be aware that database still contains data related to the deleted node."
 msgstr "請注意, 資料庫依然含有和刪除的節點關聯的資料."
 
@@ -9618,7 +9618,7 @@ msgstr "私有金鑰檔"
 msgid "Privilege level"
 msgstr "優先權層級"
 
-#: api/classes/CUser.php:835
+#: api/classes/CUser.php:836
 msgid "Probably php-ldap module is missing."
 msgstr "可能的php-ldap模組不存在."
 
@@ -10909,7 +10909,7 @@ msgstr "服務"
 msgid "Services form a circular dependency."
 msgstr "服務形成了一個循環式迴圈."
 
-#: api/classes/CUser.php:1028
+#: api/classes/CUser.php:1029
 msgid "Session terminated, re-login, please."
 msgstr "連線期已中斷, 請重連."
 
@@ -10927,7 +10927,7 @@ msgstr "嚴重性"
 msgid "Severity (descending)"
 msgstr "嚴重性(降冪)"
 
-#: include/profiles.inc.php:306
+#: include/profiles.inc.php:305
 msgid "Severity name cannot be empty."
 msgstr "嚴重性的名稱不能是空白."
 
@@ -12221,11 +12221,11 @@ msgstr "UTF-8"
 msgid "Ukrainian (uk_UA)"
 msgstr "烏克蘭語 (uk_UA)"
 
-#: include/nodes.inc.php:321
+#: include/nodes.inc.php:320
 msgid "Unable to remove local node."
 msgstr "不能移除本地節點."
 
-#: include/profiles.inc.php:229
+#: include/profiles.inc.php:228
 msgid "Unable to select configuration."
 msgstr "不能選擇組態."
 

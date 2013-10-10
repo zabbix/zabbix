@@ -1,3 +1,18 @@
+Changes for 2.0.10rc1
+
+New features:
+A.F....... [ZBX-1357] updated German, Japanese, Italian, Romanian and Slovak translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+..F....... [ZBX-7074] fixed incorrectly parsed trigger expression in trigger wizard (Vitalij)
+A.F....... [ZBX-5735] fixed debug mode check condition to use less memory when debug is off (Ivo)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.9
+
+2.0.9rc2 was released as 2.0.9 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.0.9rc2
 
 Bug fixes:
@@ -1405,8 +1420,13 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.19rc1
+
+..F....... [ZBX-7074] fixed incorrectly parsed trigger expression in trigger wizard (Vitalij)
+
 Changes for 1.8.18
 
+1.8.18rc1 was released as 1.8.18 without any changes
 
 Changes for 1.8.18rc1
 

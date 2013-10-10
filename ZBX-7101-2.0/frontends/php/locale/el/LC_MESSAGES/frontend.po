@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-25 00:33+0300\n"
+"POT-Creation-Date: 2013-10-08 22:31+0300\n"
 "PO-Revision-Date: 2013-04-06 11:39+0200\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -25,11 +25,11 @@ msgstr ""
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
 msgstr "\"%s\" πρέπει να είναι μεταξύ 01/01/1970 και 18/01/2038."
 
-#: include/profiles.inc.php:286
+#: include/profiles.inc.php:285
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
 msgstr "Το Πεδίο \"Εμφάνιση εναυσμάτων OK\" πρέπει να είναι \"0\" ή θετικός ακέραιος."
 
-#: include/profiles.inc.php:291
+#: include/profiles.inc.php:290
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
 msgstr "Το Πεδίο \"Αναβόσβημα εναυσμάτων επί αλλαγής κατάστασης\" πρέπει να είναι \"0\" ή θετικός ακέραιος."
 
@@ -208,7 +208,7 @@ msgstr "Αποδεκτό SLA"
 msgid "Access denied!"
 msgstr "Απαγορευμένη πρόσβαση!"
 
-#: api/classes/CUser.php:916
+#: api/classes/CUser.php:917
 #, php-format
 msgid "Account is blocked for %s seconds"
 msgstr "Αποκλεισμένος λογαριασμός για %s δευτερόλεπτα"
@@ -1538,7 +1538,7 @@ msgstr "Αδύνατη η διαγραφή εναυσμάτων δημιουργ
 msgid "Cannot delete user"
 msgstr "Αδύνατη η διαγραφή χρήστη"
 
-#: api/classes/CUser.php:786
+#: api/classes/CUser.php:787
 msgid "Cannot delete user media."
 msgstr "Αδύνατη η διαγραφή μέσου χρήστη."
 
@@ -1688,7 +1688,7 @@ msgstr[1] "Αδύνατη η εισαγωγή σχεδιότυπου \"%2$s\", �
 msgid "Cannot include view file \"%s\"."
 msgstr "Δεν περιέχει προβολή αρχείου \"%s\"."
 
-#: api/classes/CUser.php:815
+#: api/classes/CUser.php:816
 msgid "Cannot insert user media."
 msgstr "Αδύνατη η εισαγωγή μέσου χρήστη."
 
@@ -1696,7 +1696,7 @@ msgstr "Αδύνατη η εισαγωγή μέσου χρήστη."
 msgid "Cannot link template"
 msgstr "Αδύνατη η συσχέτιση σχεδιότυπου"
 
-#: api/classes/CUser.php:880
+#: api/classes/CUser.php:881
 msgid "Cannot logout."
 msgstr "Αδύνατη η αποσύνδεση."
 
@@ -2005,7 +2005,7 @@ msgstr "Αδύνατη η ενημέρωση εναύσματος"
 msgid "Cannot update user"
 msgstr "Αδύνατη η ενημέρωση χρήστη"
 
-#: api/classes/CUser.php:807
+#: api/classes/CUser.php:808
 msgid "Cannot update user media."
 msgstr "Αδύνατη η ενημέρωση μέσου χρήστη."
 
@@ -2199,7 +2199,7 @@ msgstr "Χρώμα"
 msgid "Colour (OK)"
 msgstr "Χρώμα (OK)"
 
-#: include/profiles.inc.php:279
+#: include/profiles.inc.php:278
 msgid "Colour is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "Λάθος χρώμα: περιμένω δεκαεξαδικό κώδικα χρώματος (6 σύμβολα)."
 
@@ -2527,7 +2527,7 @@ msgstr "Αντιγραφή"
 msgid "Copy selected to ..."
 msgstr "Αντιγραφή επιλεγμένων σε ..."
 
-#: api/classes/CUser.php:985
+#: api/classes/CUser.php:986
 #, php-format
 msgid "Correct login \"%s\"."
 msgstr "Σωστή σύνδεση \"%s\"."
@@ -2906,7 +2906,7 @@ msgstr "Σκοτεινό πορτοκαλί"
 msgid "Darken"
 msgstr "Σκοτεινό"
 
-#: dashboard.php:24 include/menu.inc.php:33 include/profiles.inc.php:353
+#: dashboard.php:24 include/menu.inc.php:33 include/profiles.inc.php:352
 msgid "Dashboard"
 msgstr "Πίνακας ελέγχου"
 
@@ -3941,7 +3941,7 @@ msgstr "Διπλό όνομα χάρτη για χάρτη \"%s\"."
 msgid "Duplicate script name \"%s\"."
 msgstr "Διπλότυπο όνομα δέσμης ενεργειών \"%s\"."
 
-#: include/profiles.inc.php:311
+#: include/profiles.inc.php:310
 #, php-format
 msgid "Duplicate severity name \"%s\"."
 msgstr "Διπλό όνομα σοβαρότητας \"%s\"."
@@ -5931,7 +5931,7 @@ msgstr "Λανθασμένα ορίσματα πέρασαν στη μέθοδο
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Λανθασμένη τιμή υπολογισμού SLA για υπηρεσία \"%1$s\"."
 
-#: include/nodes.inc.php:267 include/nodes.inc.php:309
+#: include/nodes.inc.php:267 include/nodes.inc.php:308
 msgid "Incorrect characters used for Node name."
 msgstr "Λανθασμένοι χαρακτήρες σε χρήση για όνομα Κόμβου"
 
@@ -6020,7 +6020,7 @@ msgstr "Λανθασμένο αναγνωριστικό ξενιστή \"%s\" π
 msgid "Incorrect host group ID \"%s\" provided for screen element."
 msgstr "Λανθασμένο ID ομάδος ξενιστών \"%s\" παρέχεται για στοιχείο οθόνης."
 
-#: include/profiles.inc.php:258
+#: include/profiles.inc.php:257
 msgid "Incorrect host group."
 msgstr "Λανθασμένη ομάδα ξενιστών."
 
@@ -6132,7 +6132,7 @@ msgstr "Λανθασμένη τιμή ύψους για χάρτη \"%s\"."
 msgid "Incorrect map width value for map \"%s\"."
 msgstr "Λανθασμένη τιμή πλάτους για χάρτη \"%s\"."
 
-#: include/nodes.inc.php:287
+#: include/nodes.inc.php:286
 msgid "Incorrect node type."
 msgstr "Λανθασμένος τύπος κόμβου."
 
@@ -6316,7 +6316,7 @@ msgstr "Λανθασμένα δεδομένα χρήστη σε \"get_accessible
 msgid "Incorrect user data in \"get_accessible_nodes_by_user\"."
 msgstr "Λανθασμένα δεδομένα χρήστη σε \"get_accessible_nodes_by_user\"."
 
-#: include/profiles.inc.php:246
+#: include/profiles.inc.php:245
 msgid "Incorrect user group."
 msgstr "Λανθασμένη ομάδα χρήστη."
 
@@ -6345,7 +6345,7 @@ msgstr "Λανθασμένη τιμή \"NULL\" για NOT NULL πεδίο \"%1$s
 msgid "Incorrect value for setMessage(): \"%s\"."
 msgstr "Λανθασμένη τιμή για setMessage(): \"%s\"."
 
-#: include/profiles.inc.php:240
+#: include/profiles.inc.php:239
 msgid "Incorrect working time."
 msgstr "Λανθασμένος χρόνος εργασίας."
 
@@ -6381,7 +6381,7 @@ msgstr "Εισαγωγή"
 msgid "Insert macro"
 msgstr "Εισαγωγή μακροεντολής"
 
-#: include/menu.inc.php:279 include/profiles.inc.php:228 setup.php:25
+#: include/menu.inc.php:279 include/profiles.inc.php:227 setup.php:25
 msgid "Installation"
 msgstr "Εγκατάσταση"
 
@@ -7188,7 +7188,7 @@ msgstr "Σύνδεση"
 msgid "Login as Guest"
 msgstr "Σύνδεση ως φιλοξενούμενος"
 
-#: api/classes/CUser.php:977
+#: api/classes/CUser.php:978
 #, php-format
 msgid "Login failed \"%s\"."
 msgstr "Σύνδεση απέτυχε \"%s\"."
@@ -7197,8 +7197,8 @@ msgstr "Σύνδεση απέτυχε \"%s\"."
 msgid "Login name or password is incorrect"
 msgstr "Λανθασμένος κωδικός ή όνομα"
 
-#: api/classes/CUser.php:845 api/classes/CUser.php:863
-#: api/classes/CUser.php:910
+#: api/classes/CUser.php:846 api/classes/CUser.php:864
+#: api/classes/CUser.php:911
 msgid "Login name or password is incorrect."
 msgstr "Εσφαλμένο όνομα σύνδεσης είτε κωδικός."
 
@@ -8428,7 +8428,7 @@ msgstr "Χωρίς δικαιώματα για χάρτη \"%1$s\"."
 msgid "No permissions for screen \"%1$s\"."
 msgstr "Χωρίς δικαιώματα για οθόνη \"%1$s\"."
 
-#: api/classes/CUser.php:924 api/classes/CUser.php:1034
+#: api/classes/CUser.php:925 api/classes/CUser.php:1035
 msgid "No permissions for system access."
 msgstr "Χωρίς δικαιώματα για πρόσβαση συστήματος."
 
@@ -8628,7 +8628,7 @@ msgstr "Κόμβος διεγράφη"
 msgid "Node updated"
 msgstr "Κόμβος ενημερώθηκε"
 
-#: include/nodes.inc.php:292
+#: include/nodes.inc.php:291
 msgid "Node with same ID already exists."
 msgstr "Κόμβος με ίδιο ID υπάρχει ήδη."
 
@@ -8722,7 +8722,7 @@ msgstr "Σημειώσεις"
 msgid "Nothing"
 msgstr "Τίποτα"
 
-#: include/profiles.inc.php:331
+#: include/profiles.inc.php:330
 msgid "Nothing to do."
 msgstr "Καμμία ενέργεια."
 
@@ -8967,15 +8967,15 @@ msgstr "Μόνο Υπερ Διαχειριστές ενημερώνουν αντ
 msgid "Only Super Admins can update user groups."
 msgstr "Μόνο Υπερ Διαχειριστές ενημερώνουν ομάδες χρηστών."
 
-#: api/classes/CUser.php:684
+#: api/classes/CUser.php:685
 msgid "Only Zabbix Admins can add user media."
 msgstr "Μόνο Διαχειριστές Zabbix προσθέτουν μέσο χρήστη."
 
-#: api/classes/CUser.php:752
+#: api/classes/CUser.php:753
 msgid "Only Zabbix Admins can change user media."
 msgstr "Μόνο Διαχειριστές Zabbix μεταβάλλουν μέσο χρήστη."
 
-#: api/classes/CUser.php:722
+#: api/classes/CUser.php:723
 msgid "Only Zabbix Admins can remove user media."
 msgstr "Μόνο Διαχειριστές Zabbix αφαιρούν μέσο χρήστη."
 
@@ -9499,7 +9499,7 @@ msgstr "Παίξε"
 msgid "Play sound"
 msgstr "Παίξε ήχο"
 
-#: include/nodes.inc.php:329
+#: include/nodes.inc.php:328
 msgid "Please be aware that database still contains data related to the deleted node."
 msgstr "Παρακαλώ προσέξτε ότι η βάση δεδομένων περιέχει ακόμη δεδομένα αναφορικά με διεγραμμένο κόμβο."
 
@@ -9636,7 +9636,7 @@ msgstr "Αρχείο ιδιωτικού κλειδιού"
 msgid "Privilege level"
 msgstr "Επίπεδο δικαιωμάτων"
 
-#: api/classes/CUser.php:835
+#: api/classes/CUser.php:836
 msgid "Probably php-ldap module is missing."
 msgstr "Πιθανώς απουσία ενότητας php-ldap."
 
@@ -10928,7 +10928,7 @@ msgstr "Υπηρεσίες"
 msgid "Services form a circular dependency."
 msgstr "Οι υπηρεσίες σχηματίζουν κυκλική εξάρτηση."
 
-#: api/classes/CUser.php:1028
+#: api/classes/CUser.php:1029
 msgid "Session terminated, re-login, please."
 msgstr "Τερματισμός συνεδρίας. Επανασυνδεθείτε."
 
@@ -10946,7 +10946,7 @@ msgstr "Σοβαρότητα"
 msgid "Severity (descending)"
 msgstr "Σοβαρότητα (φθίνουσα)"
 
-#: include/profiles.inc.php:306
+#: include/profiles.inc.php:305
 msgid "Severity name cannot be empty."
 msgstr "Το Όνομα σοβαρότητας δεν μπορεί να είναι κενό."
 
@@ -12243,11 +12243,11 @@ msgstr "UTF-8"
 msgid "Ukrainian (uk_UA)"
 msgstr "Ουκρανικά (uk_UA)"
 
-#: include/nodes.inc.php:321
+#: include/nodes.inc.php:320
 msgid "Unable to remove local node."
 msgstr "Αδύνατη η διαγραφή τοπικού κόμβου."
 
-#: include/profiles.inc.php:229
+#: include/profiles.inc.php:228
 msgid "Unable to select configuration."
 msgstr "Αδύνατη η επιλογή διαμόρφωσης."
 

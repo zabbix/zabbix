@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-25 00:33+0300\n"
+"POT-Creation-Date: 2013-10-08 22:31+0300\n"
 "PO-Revision-Date: 2013-01-12 23:52+0200\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -21,11 +21,11 @@ msgstr ""
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
 msgstr "\"%s\" трябва да бъде между 1970.01.01 и 2038.01.18"
 
-#: include/profiles.inc.php:286
+#: include/profiles.inc.php:285
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
 msgstr "\"Покажи ОК тригерите\" трябва да е \"0\" или положително число."
 
-#: include/profiles.inc.php:291
+#: include/profiles.inc.php:290
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
 msgstr "\"Мигане на тригерите при промяна в състоянието\" трябва да е \"0\" или положително число."
 
@@ -204,7 +204,7 @@ msgstr "Допустимо ниво SLA"
 msgid "Access denied!"
 msgstr "Достъпът отказан!"
 
-#: api/classes/CUser.php:916
+#: api/classes/CUser.php:917
 #, php-format
 msgid "Account is blocked for %s seconds"
 msgstr "Акаунтът е блокиран за %s секунди"
@@ -1538,7 +1538,7 @@ msgstr "Не може да се изтрият тригерите, създад�
 msgid "Cannot delete user"
 msgstr "Не може да се изтрие потребителя"
 
-#: api/classes/CUser.php:786
+#: api/classes/CUser.php:787
 msgid "Cannot delete user media."
 msgstr "Не може да се изтрие потребителско уведомление."
 
@@ -1688,7 +1688,7 @@ msgstr[1] "Не може да се импортира шаблон \"%2$s\", с�
 msgid "Cannot include view file \"%s\"."
 msgstr "Неуспешно свързване с \"view file\" \"%s\"."
 
-#: api/classes/CUser.php:815
+#: api/classes/CUser.php:816
 msgid "Cannot insert user media."
 msgstr "Не може да вмъкне потребителско уведомление."
 
@@ -1696,7 +1696,7 @@ msgstr "Не може да вмъкне потребителско уведом�
 msgid "Cannot link template"
 msgstr "Не може да се върже шаблона"
 
-#: api/classes/CUser.php:880
+#: api/classes/CUser.php:881
 msgid "Cannot logout."
 msgstr "Неуспешно излизане от системата."
 
@@ -2006,7 +2006,7 @@ msgstr "Не може да се актуализира тригера"
 msgid "Cannot update user"
 msgstr "Не може да се актуализира потребителя"
 
-#: api/classes/CUser.php:807
+#: api/classes/CUser.php:808
 msgid "Cannot update user media."
 msgstr "Не може да се актуализира потребителското уведомление."
 
@@ -2201,7 +2201,7 @@ msgstr "Цвят"
 msgid "Colour (OK)"
 msgstr "Цвят (OK)"
 
-#: include/profiles.inc.php:279
+#: include/profiles.inc.php:278
 msgid "Colour is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "Цвета не е коректен: очаква шестнадесетичен код на цвят (6 символа)."
 
@@ -2531,7 +2531,7 @@ msgstr "Копирай"
 msgid "Copy selected to ..."
 msgstr "Копиране на избраните в ..."
 
-#: api/classes/CUser.php:985
+#: api/classes/CUser.php:986
 #, php-format
 msgid "Correct login \"%s\"."
 msgstr "Неправилен вход \"%s\"."
@@ -2910,7 +2910,7 @@ msgstr "Тъмно оранжево"
 msgid "Darken"
 msgstr "Тъмен"
 
-#: dashboard.php:24 include/menu.inc.php:33 include/profiles.inc.php:353
+#: dashboard.php:24 include/menu.inc.php:33 include/profiles.inc.php:352
 msgid "Dashboard"
 msgstr "Табло"
 
@@ -3946,7 +3946,7 @@ msgstr "Дублиране име на карта за карта \"%s\"."
 msgid "Duplicate script name \"%s\"."
 msgstr "Дублиране име на скрипт \"%s\"."
 
-#: include/profiles.inc.php:311
+#: include/profiles.inc.php:310
 #, php-format
 msgid "Duplicate severity name \"%s\"."
 msgstr "Дублиране име на важност \"%s\"."
@@ -5942,7 +5942,7 @@ msgstr "Подадени са неправилни аргументи за ме�
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Неправилно изчислена стойност SLA за услуга \"%1$s\"."
 
-#: include/nodes.inc.php:267 include/nodes.inc.php:309
+#: include/nodes.inc.php:267 include/nodes.inc.php:308
 msgid "Incorrect characters used for Node name."
 msgstr "Използвани са неправилни символи за името на възловата точка."
 
@@ -6031,7 +6031,7 @@ msgstr "Зададено е неправилно ID на хост \"%s\" за е
 msgid "Incorrect host group ID \"%s\" provided for screen element."
 msgstr "Зададено е неправилно ID на хост група \"%s\" за елемент от екрана."
 
-#: include/profiles.inc.php:258
+#: include/profiles.inc.php:257
 msgid "Incorrect host group."
 msgstr "Неправилна хост група."
 
@@ -6143,7 +6143,7 @@ msgstr "Неправилна стойност височина за карта \
 msgid "Incorrect map width value for map \"%s\"."
 msgstr "Неправилна стойност ширина за карта \"%s\"."
 
-#: include/nodes.inc.php:287
+#: include/nodes.inc.php:286
 msgid "Incorrect node type."
 msgstr "Неправилен тип възлова точка."
 
@@ -6327,7 +6327,7 @@ msgstr "Неправилни потребителски данни в \"get_acce
 msgid "Incorrect user data in \"get_accessible_nodes_by_user\"."
 msgstr "Неправилни потребителски данни в \"get_accessible_nodes_by_user\"."
 
-#: include/profiles.inc.php:246
+#: include/profiles.inc.php:245
 msgid "Incorrect user group."
 msgstr "Неправилна потребителска група."
 
@@ -6356,7 +6356,7 @@ msgstr "Неправилна стойност \"NULL\" за NOT NULL поле \"
 msgid "Incorrect value for setMessage(): \"%s\"."
 msgstr "Неправилна стойност за setMessage(): \"%s\"."
 
-#: include/profiles.inc.php:240
+#: include/profiles.inc.php:239
 msgid "Incorrect working time."
 msgstr "Неправилно работно време."
 
@@ -6392,7 +6392,7 @@ msgstr "Вмъкване"
 msgid "Insert macro"
 msgstr "Вмъкване макро"
 
-#: include/menu.inc.php:279 include/profiles.inc.php:228 setup.php:25
+#: include/menu.inc.php:279 include/profiles.inc.php:227 setup.php:25
 msgid "Installation"
 msgstr "Инсталация"
 
@@ -7199,7 +7199,7 @@ msgstr "Вход в системата"
 msgid "Login as Guest"
 msgstr "Вход като гост"
 
-#: api/classes/CUser.php:977
+#: api/classes/CUser.php:978
 #, php-format
 msgid "Login failed \"%s\"."
 msgstr "Неуспешно влизане \"%s\"."
@@ -7208,8 +7208,8 @@ msgstr "Неуспешно влизане \"%s\"."
 msgid "Login name or password is incorrect"
 msgstr "Неправилно въведено потребителско име или парола."
 
-#: api/classes/CUser.php:845 api/classes/CUser.php:863
-#: api/classes/CUser.php:910
+#: api/classes/CUser.php:846 api/classes/CUser.php:864
+#: api/classes/CUser.php:911
 msgid "Login name or password is incorrect."
 msgstr "Неправилно въведено потребителско име или парола."
 
@@ -8442,7 +8442,7 @@ msgstr "Нямате право на достъп до карта на мреж�
 msgid "No permissions for screen \"%1$s\"."
 msgstr "Нямате право на достъп до екран \"%1$s\"."
 
-#: api/classes/CUser.php:924 api/classes/CUser.php:1034
+#: api/classes/CUser.php:925 api/classes/CUser.php:1035
 msgid "No permissions for system access."
 msgstr "Нямате право на достъп до системата."
 
@@ -8642,7 +8642,7 @@ msgstr "Възлова точка изтрита"
 msgid "Node updated"
 msgstr "Възлова точка актуализирана"
 
-#: include/nodes.inc.php:292
+#: include/nodes.inc.php:291
 msgid "Node with same ID already exists."
 msgstr "Възлова точка със същото ID вече съществува."
 
@@ -8736,7 +8736,7 @@ msgstr "Бележки"
 msgid "Nothing"
 msgstr "Нищо"
 
-#: include/profiles.inc.php:331
+#: include/profiles.inc.php:330
 msgid "Nothing to do."
 msgstr "Нищо общо."
 
@@ -8983,15 +8983,15 @@ msgstr "Само Супер Администраторите могат да а�
 msgid "Only Super Admins can update user groups."
 msgstr "Само Супер Администраторите могат да актуализират потребителски групи."
 
-#: api/classes/CUser.php:684
+#: api/classes/CUser.php:685
 msgid "Only Zabbix Admins can add user media."
 msgstr "Само Zabbix Администраторите могат да добавят потребителско уведомление."
 
-#: api/classes/CUser.php:752
+#: api/classes/CUser.php:753
 msgid "Only Zabbix Admins can change user media."
 msgstr "Само Zabbix Администраторите могат да променят потребителско уведомление."
 
-#: api/classes/CUser.php:722
+#: api/classes/CUser.php:723
 msgid "Only Zabbix Admins can remove user media."
 msgstr "Само Zabbix Администраторите могат да премахват потребителско уведомление."
 
@@ -9515,7 +9515,7 @@ msgstr "Възпроизвеждане"
 msgid "Play sound"
 msgstr "Възпроизвеждане на звук"
 
-#: include/nodes.inc.php:329
+#: include/nodes.inc.php:328
 msgid "Please be aware that database still contains data related to the deleted node."
 msgstr "Моля, имайте в предвид, че базата данни все още съдържа данни, свързани с изтрити възлови точки."
 
@@ -9651,7 +9651,7 @@ msgstr "Файл с личен ключ"
 msgid "Privilege level"
 msgstr "Ниво на привилегия"
 
-#: api/classes/CUser.php:835
+#: api/classes/CUser.php:836
 msgid "Probably php-ldap module is missing."
 msgstr "Може би липсва php-ldap модула."
 
@@ -10946,7 +10946,7 @@ msgstr "Услуги"
 msgid "Services form a circular dependency."
 msgstr "Услугите образуват кръгова зависимост."
 
-#: api/classes/CUser.php:1028
+#: api/classes/CUser.php:1029
 msgid "Session terminated, re-login, please."
 msgstr "Сесията е прекратена, моля влезте повторно в системата."
 
@@ -10964,7 +10964,7 @@ msgstr "Важност"
 msgid "Severity (descending)"
 msgstr "Важност (низходящ)"
 
-#: include/profiles.inc.php:306
+#: include/profiles.inc.php:305
 msgid "Severity name cannot be empty."
 msgstr "Името важност не може да бъде празно."
 
@@ -12261,11 +12261,11 @@ msgstr "UTF-8"
 msgid "Ukrainian (uk_UA)"
 msgstr "Украински (uk_UA)"
 
-#: include/nodes.inc.php:321
+#: include/nodes.inc.php:320
 msgid "Unable to remove local node."
 msgstr "Локалната възлова точка не може да се премахне."
 
-#: include/profiles.inc.php:229
+#: include/profiles.inc.php:228
 msgid "Unable to select configuration."
 msgstr "Не може да изберете конфигурация."
 

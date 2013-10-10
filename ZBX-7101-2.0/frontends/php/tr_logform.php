@@ -203,15 +203,11 @@ if(isset($_REQUEST['sform'])){
 		$expr_v = preg_replace('/\(\(\((.+?)\)\) &/i', '(($1) &', $expr_v);
 		$expr_v = preg_replace('/\(\(\((.+?)\)\)$/i', '(($1)', $expr_v);
 
-		$expression = preg_split('/ [&|] /',$expression);
-		$expr_v = preg_split('/ [&|] /',$expr_v);
+		$expression = splitByFirstLevel($expression);
+		$expr_v = splitByFirstLevel($expr_v);
 
 		foreach($expression as $id => $expr){
 			$expr = preg_replace('/^\((.*)\)$/u','$1',$expr);
-
-			if(preg_match('/\([regexp|iregexp].+\)[=|#]0/U',$expr, $rr)){
-				$value = preg_replace('/(\(([regexp|iregexp].*)\)[=|#]0)/U','$2',$expr);
-			}
 
 			$value = preg_replace('/([=|#]0)/','',$expr);
 			$value = preg_replace('/^\((.*)\)$/u','$1',$value); // removing wrapping parentheses

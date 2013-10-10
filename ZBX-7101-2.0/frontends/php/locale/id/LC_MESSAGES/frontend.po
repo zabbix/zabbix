@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-25 00:33+0300\n"
+"POT-Creation-Date: 2013-10-08 22:31+0300\n"
 "PO-Revision-Date: 2012-10-30 11:01+0200\n"
 "Last-Translator: busel7 <bonny.useful@gmail.com>\n"
 "Language-Team: none\n"
@@ -20,11 +20,11 @@ msgstr ""
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
 msgstr "\"%s\" harus antara 1970.01.01 dan 2038.01.18."
 
-#: include/profiles.inc.php:286
+#: include/profiles.inc.php:285
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
 msgstr "\"Tampilan OK memicu\" harus \"0\" atau bilangan bulat positif."
 
-#: include/profiles.inc.php:291
+#: include/profiles.inc.php:290
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
 msgstr "\"Pemicu berkedip pada perubahan status\" harus \"0\" atau bilangan bulat positif."
 
@@ -197,7 +197,7 @@ msgstr "SLA yang dapat diterima"
 msgid "Access denied!"
 msgstr "Akses ditolak!"
 
-#: api/classes/CUser.php:916
+#: api/classes/CUser.php:917
 #, php-format
 msgid "Account is blocked for %s seconds"
 msgstr "Akun diblokir selama %s detik"
@@ -1526,7 +1526,7 @@ msgstr "Tidak dapat menghapus trigger yang dibuat oleh discovery tingkat bawah."
 msgid "Cannot delete user"
 msgstr "Tidak dapat menghapus user"
 
-#: api/classes/CUser.php:786
+#: api/classes/CUser.php:787
 msgid "Cannot delete user media."
 msgstr "Tidak dapat menghapus media user."
 
@@ -1674,7 +1674,7 @@ msgstr[0] "Tidak bisa mengimpor template \"%2$s\", template \"%3$s\" yang terhub
 msgid "Cannot include view file \"%s\"."
 msgstr "Tidak dapat menyertakan tampilan file \"%s\"."
 
-#: api/classes/CUser.php:815
+#: api/classes/CUser.php:816
 msgid "Cannot insert user media."
 msgstr "Tidak bisa memasukkan media pengguna."
 
@@ -1682,7 +1682,7 @@ msgstr "Tidak bisa memasukkan media pengguna."
 msgid "Cannot link template"
 msgstr "Tidak dapat menghubungkan template"
 
-#: api/classes/CUser.php:880
+#: api/classes/CUser.php:881
 msgid "Cannot logout."
 msgstr "Tidak bisa logout."
 
@@ -1991,7 +1991,7 @@ msgstr "Tidak dapat perbarui trigger"
 msgid "Cannot update user"
 msgstr "Tidak dapat perbarui user"
 
-#: api/classes/CUser.php:807
+#: api/classes/CUser.php:808
 msgid "Cannot update user media."
 msgstr "Tidak dapat perbarui media user."
 
@@ -2185,7 +2185,7 @@ msgstr "Warna"
 msgid "Colour (OK)"
 msgstr "Warna (OK)"
 
-#: include/profiles.inc.php:279
+#: include/profiles.inc.php:278
 msgid "Colour is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "Warna salah: Gunakan kode warna heksadesimal (6 simbol)."
 
@@ -2512,7 +2512,7 @@ msgstr "Salin"
 msgid "Copy selected to ..."
 msgstr "Salin yang dipilih ke ..."
 
-#: api/classes/CUser.php:985
+#: api/classes/CUser.php:986
 #, php-format
 msgid "Correct login \"%s\"."
 msgstr "Login yang bernar \"%s\"."
@@ -2890,7 +2890,7 @@ msgstr "Orange gelap"
 msgid "Darken"
 msgstr "Lebih gelap"
 
-#: dashboard.php:24 include/menu.inc.php:33 include/profiles.inc.php:353
+#: dashboard.php:24 include/menu.inc.php:33 include/profiles.inc.php:352
 msgid "Dashboard"
 msgstr "Dashboard"
 
@@ -3924,7 +3924,7 @@ msgstr "Duplikasi nama peta untuk peta \"%s\"."
 msgid "Duplicate script name \"%s\"."
 msgstr "Duplikasi nama script \"%s\"."
 
-#: include/profiles.inc.php:311
+#: include/profiles.inc.php:310
 #, php-format
 msgid "Duplicate severity name \"%s\"."
 msgstr "Duplikasi nama severity \"%s\"."
@@ -5913,7 +5913,7 @@ msgstr "Kesalahan pelolosan argumen ke metode."
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Kesalahan hitung nilai SLA untuk service \"%1$s\"."
 
-#: include/nodes.inc.php:267 include/nodes.inc.php:309
+#: include/nodes.inc.php:267 include/nodes.inc.php:308
 msgid "Incorrect characters used for Node name."
 msgstr "Kesalahan karakter yang digunakan untuk nama Node."
 
@@ -6002,7 +6002,7 @@ msgstr "Kesalahan ID host \"%s\" disediakan untuk elemen layar."
 msgid "Incorrect host group ID \"%s\" provided for screen element."
 msgstr "Kesalahan ID grup host \"%s\" disediakan untuk elemen layar."
 
-#: include/profiles.inc.php:258
+#: include/profiles.inc.php:257
 msgid "Incorrect host group."
 msgstr "Kesalahan grup host."
 
@@ -6114,7 +6114,7 @@ msgstr "Kesalahan nilai tinggi peta untuk peta \"%s\"."
 msgid "Incorrect map width value for map \"%s\"."
 msgstr "Kesalahan nilai lebar peta untuk peta \"%s\"."
 
-#: include/nodes.inc.php:287
+#: include/nodes.inc.php:286
 msgid "Incorrect node type."
 msgstr "Kesalahan tipe node."
 
@@ -6298,7 +6298,7 @@ msgstr "Kesalahan data user dalam \"get_accessible_groups_by_user\"."
 msgid "Incorrect user data in \"get_accessible_nodes_by_user\"."
 msgstr "Kesalahan data user dalam \"get_accessible_nodes_by_user\"."
 
-#: include/profiles.inc.php:246
+#: include/profiles.inc.php:245
 msgid "Incorrect user group."
 msgstr "Kesalahan grup user."
 
@@ -6327,7 +6327,7 @@ msgstr "Kesalahan nilai \"NULL\" untuk field BUKAN NULL \"%1$s\"."
 msgid "Incorrect value for setMessage(): \"%s\"."
 msgstr "Kesalahan nilai untuk setMessage(): \"%s\"."
 
-#: include/profiles.inc.php:240
+#: include/profiles.inc.php:239
 msgid "Incorrect working time."
 msgstr "Kesalahan waktu kerja."
 
@@ -6363,7 +6363,7 @@ msgstr "Sisipkan"
 msgid "Insert macro"
 msgstr "Sisipkan makro"
 
-#: include/menu.inc.php:279 include/profiles.inc.php:228 setup.php:25
+#: include/menu.inc.php:279 include/profiles.inc.php:227 setup.php:25
 msgid "Installation"
 msgstr "Instalasi"
 
@@ -7169,7 +7169,7 @@ msgstr "Login"
 msgid "Login as Guest"
 msgstr "Login sebagai Guest"
 
-#: api/classes/CUser.php:977
+#: api/classes/CUser.php:978
 #, php-format
 msgid "Login failed \"%s\"."
 msgstr "Login gagal \"%s\"."
@@ -7178,8 +7178,8 @@ msgstr "Login gagal \"%s\"."
 msgid "Login name or password is incorrect"
 msgstr ""
 
-#: api/classes/CUser.php:845 api/classes/CUser.php:863
-#: api/classes/CUser.php:910
+#: api/classes/CUser.php:846 api/classes/CUser.php:864
+#: api/classes/CUser.php:911
 msgid "Login name or password is incorrect."
 msgstr "Login nama atau passwordk salah."
 
@@ -8406,7 +8406,7 @@ msgstr "Tidak ada izin untuk peta \"%1$s\"."
 msgid "No permissions for screen \"%1$s\"."
 msgstr "Tidak ada izin untuk layar \"%1$s\"."
 
-#: api/classes/CUser.php:924 api/classes/CUser.php:1034
+#: api/classes/CUser.php:925 api/classes/CUser.php:1035
 msgid "No permissions for system access."
 msgstr "Tidak ada izin untuk akses sistem."
 
@@ -8606,7 +8606,7 @@ msgstr "Node dihapus"
 msgid "Node updated"
 msgstr "Node diperbarui"
 
-#: include/nodes.inc.php:292
+#: include/nodes.inc.php:291
 msgid "Node with same ID already exists."
 msgstr "Node dengan ID yang sama sudah ada."
 
@@ -8700,7 +8700,7 @@ msgstr "Catatan"
 msgid "Nothing"
 msgstr "Tidak ada"
 
-#: include/profiles.inc.php:331
+#: include/profiles.inc.php:330
 msgid "Nothing to do."
 msgstr "Tidak ada yang dilakukan."
 
@@ -8945,15 +8945,15 @@ msgstr "Hanya Super admin yang bisa perbarui peta ikon."
 msgid "Only Super Admins can update user groups."
 msgstr "Hanya Super admin yang bisa perbarui grup user."
 
-#: api/classes/CUser.php:684
+#: api/classes/CUser.php:685
 msgid "Only Zabbix Admins can add user media."
 msgstr "Hanya Zabbix Admin yang bisa menambah media user."
 
-#: api/classes/CUser.php:752
+#: api/classes/CUser.php:753
 msgid "Only Zabbix Admins can change user media."
 msgstr "Hanya Zabbix Admin yang dapat merubah media user."
 
-#: api/classes/CUser.php:722
+#: api/classes/CUser.php:723
 msgid "Only Zabbix Admins can remove user media."
 msgstr "Hanya Zabbix Admin yang dapat menghapus media user."
 
@@ -9477,7 +9477,7 @@ msgstr "Mainkan"
 msgid "Play sound"
 msgstr "Mainkan suara"
 
-#: include/nodes.inc.php:329
+#: include/nodes.inc.php:328
 msgid "Please be aware that database still contains data related to the deleted node."
 msgstr "Perlu diketahui bahwa database masih mengandung data yang terkait dengan node yang dihapus."
 
@@ -9613,7 +9613,7 @@ msgstr "File kunci pribadi"
 msgid "Privilege level"
 msgstr "Tingkatan hak"
 
-#: api/classes/CUser.php:835
+#: api/classes/CUser.php:836
 msgid "Probably php-ldap module is missing."
 msgstr "Kemungkinan modul php-ldap hilang."
 
@@ -10904,7 +10904,7 @@ msgstr "Service"
 msgid "Services form a circular dependency."
 msgstr "Form service dependensi melingkar."
 
-#: api/classes/CUser.php:1028
+#: api/classes/CUser.php:1029
 msgid "Session terminated, re-login, please."
 msgstr "Sesi dimatikan, mohon login kembali."
 
@@ -10922,7 +10922,7 @@ msgstr "Keparahan"
 msgid "Severity (descending)"
 msgstr "Keparahan (descending)"
 
-#: include/profiles.inc.php:306
+#: include/profiles.inc.php:305
 msgid "Severity name cannot be empty."
 msgstr "Nama keparahan tidak boleh kosong."
 
@@ -12216,11 +12216,11 @@ msgstr "UTF-8"
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukrainian (uk_UA)"
 
-#: include/nodes.inc.php:321
+#: include/nodes.inc.php:320
 msgid "Unable to remove local node."
 msgstr "Tidak dapat menghapus node lokal."
 
-#: include/profiles.inc.php:229
+#: include/profiles.inc.php:228
 msgid "Unable to select configuration."
 msgstr "Tidak dapat memilih konfigurasi."
 

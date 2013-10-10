@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-25 00:33+0300\n"
+"POT-Creation-Date: 2013-10-08 22:31+0300\n"
 "PO-Revision-Date: 2013-04-29 23:58+0200\n"
 "Last-Translator: Murat <murat@profelis.com.tr>\n"
 "Language-Team: Zabbix translation team\n"
@@ -22,12 +22,12 @@ msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
 msgstr "\"%s\" 01.01.1970 ve 18.01.2038 aralığında olmalıdır."
 
 # "Display OK triggers" daha baska bir yerde cevrilmis mi?
-#: include/profiles.inc.php:286
+#: include/profiles.inc.php:285
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
 msgstr "\"Display OK triggers\", \"0\" ya da pozitif bir tamsayı olması gerekir."
 
 # "Triggers blink on status change"  daha önce çevrilmiş mi?
-#: include/profiles.inc.php:291
+#: include/profiles.inc.php:290
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
 msgstr "\"Triggers blink on status change\", \"0\" yada pozitif bir tamsayı olması gerekir."
 
@@ -206,7 +206,7 @@ msgstr "Kabul edilebilir HSA"
 msgid "Access denied!"
 msgstr "Erişim reddedildi!"
 
-#: api/classes/CUser.php:916
+#: api/classes/CUser.php:917
 #, php-format
 msgid "Account is blocked for %s seconds"
 msgstr "Hesap %s saniye için bloklandı"
@@ -1536,7 +1536,7 @@ msgstr "Düşük seviyeli keşifle oluşturulmuş tetikleyiciler silinemiyor."
 msgid "Cannot delete user"
 msgstr "Kullanıcı silinemedi"
 
-#: api/classes/CUser.php:786
+#: api/classes/CUser.php:787
 msgid "Cannot delete user media."
 msgstr "Kullanıcı iletişim aracı silinemiyor."
 
@@ -1686,7 +1686,7 @@ msgstr[1] " \"%2$s\" şablonu içe aktarılamıyor,  \"%3$s\" bağlı şablonlar
 msgid "Cannot include view file \"%s\"."
 msgstr "\"%s\" görünüm dosyası içerilemiyor."
 
-#: api/classes/CUser.php:815
+#: api/classes/CUser.php:816
 msgid "Cannot insert user media."
 msgstr "Kullanıcı iletişim aracı eklenemiyor."
 
@@ -1694,7 +1694,7 @@ msgstr "Kullanıcı iletişim aracı eklenemiyor."
 msgid "Cannot link template"
 msgstr "Şablon bağlantılanamadı"
 
-#: api/classes/CUser.php:880
+#: api/classes/CUser.php:881
 msgid "Cannot logout."
 msgstr "Oturum kapatılamadı."
 
@@ -2003,7 +2003,7 @@ msgstr "Tetik güncellenemedi"
 msgid "Cannot update user"
 msgstr "Kullanıcı güncellenemedi"
 
-#: api/classes/CUser.php:807
+#: api/classes/CUser.php:808
 msgid "Cannot update user media."
 msgstr "Kullanıcı iletişim aracı güncellenemiyor."
 
@@ -2197,7 +2197,7 @@ msgstr "Renk"
 msgid "Colour (OK)"
 msgstr "Renk(TAMAM)"
 
-#: include/profiles.inc.php:279
+#: include/profiles.inc.php:278
 msgid "Colour is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "Renk doğru değil: onaltılık renk kodu bekleniyor (6 sembol)."
 
@@ -2525,7 +2525,7 @@ msgstr "Kopyala"
 msgid "Copy selected to ..."
 msgstr "Seçilenleri kopyalanacağı ..."
 
-#: api/classes/CUser.php:985
+#: api/classes/CUser.php:986
 #, php-format
 msgid "Correct login \"%s\"."
 msgstr "Başarılı oturum açımı \"%s\"."
@@ -2903,7 +2903,7 @@ msgstr "Koyu portakal"
 msgid "Darken"
 msgstr "Koyulaştır"
 
-#: dashboard.php:24 include/menu.inc.php:33 include/profiles.inc.php:353
+#: dashboard.php:24 include/menu.inc.php:33 include/profiles.inc.php:352
 msgid "Dashboard"
 msgstr "Pano"
 
@@ -3938,7 +3938,7 @@ msgstr "\"%s\" haritası için mükerrer harita ismi."
 msgid "Duplicate script name \"%s\"."
 msgstr "Mükerrer betik ismi \"%s\"."
 
-#: include/profiles.inc.php:311
+#: include/profiles.inc.php:310
 #, php-format
 msgid "Duplicate severity name \"%s\"."
 msgstr "Mükerrer önem derecesi ismi \"%s\"."
@@ -5927,7 +5927,7 @@ msgstr "Yönteme geçersiz değişkenler geçirildi."
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "\"%1s\" servisi için geçersiz HSA değeri hesaplandı."
 
-#: include/nodes.inc.php:267 include/nodes.inc.php:309
+#: include/nodes.inc.php:267 include/nodes.inc.php:308
 msgid "Incorrect characters used for Node name."
 msgstr "Düğüm ismi için geçersiz karakterler kullanıldı."
 
@@ -6016,7 +6016,7 @@ msgstr "Ekran elemanı için geçersiz konak ID'si  \"%s\" sağlanmış."
 msgid "Incorrect host group ID \"%s\" provided for screen element."
 msgstr "Ekran elemanı için geçersiz konak grup ID'si \"%s\" sağlanmış."
 
-#: include/profiles.inc.php:258
+#: include/profiles.inc.php:257
 msgid "Incorrect host group."
 msgstr "Geçersiz konak grubu."
 
@@ -6128,7 +6128,7 @@ msgstr "\"%s\" haritası için geçersiz harita yükseklik değeri."
 msgid "Incorrect map width value for map \"%s\"."
 msgstr "\"%s\" haritası için geçersiz harita genişlik değeri."
 
-#: include/nodes.inc.php:287
+#: include/nodes.inc.php:286
 msgid "Incorrect node type."
 msgstr "Geçersiz düğüm tipi."
 
@@ -6312,7 +6312,7 @@ msgstr ""
 msgid "Incorrect user data in \"get_accessible_nodes_by_user\"."
 msgstr ""
 
-#: include/profiles.inc.php:246
+#: include/profiles.inc.php:245
 msgid "Incorrect user group."
 msgstr ""
 
@@ -6341,7 +6341,7 @@ msgstr ""
 msgid "Incorrect value for setMessage(): \"%s\"."
 msgstr ""
 
-#: include/profiles.inc.php:240
+#: include/profiles.inc.php:239
 msgid "Incorrect working time."
 msgstr ""
 
@@ -6377,7 +6377,7 @@ msgstr "Ekle"
 msgid "Insert macro"
 msgstr "Makro ekle"
 
-#: include/menu.inc.php:279 include/profiles.inc.php:228 setup.php:25
+#: include/menu.inc.php:279 include/profiles.inc.php:227 setup.php:25
 msgid "Installation"
 msgstr "Kurulum"
 
@@ -7184,7 +7184,7 @@ msgstr "Oturum aç"
 msgid "Login as Guest"
 msgstr "Misafir Olarak Oturum Aç"
 
-#: api/classes/CUser.php:977
+#: api/classes/CUser.php:978
 #, php-format
 msgid "Login failed \"%s\"."
 msgstr "Oturum açma başarısız \"%s\"."
@@ -7193,8 +7193,8 @@ msgstr "Oturum açma başarısız \"%s\"."
 msgid "Login name or password is incorrect"
 msgstr "Oturum açma ismi veya parola doğru değil"
 
-#: api/classes/CUser.php:845 api/classes/CUser.php:863
-#: api/classes/CUser.php:910
+#: api/classes/CUser.php:846 api/classes/CUser.php:864
+#: api/classes/CUser.php:911
 msgid "Login name or password is incorrect."
 msgstr "Oturum açma ismi veya parola doğru değil."
 
@@ -8424,7 +8424,7 @@ msgstr ""
 msgid "No permissions for screen \"%1$s\"."
 msgstr ""
 
-#: api/classes/CUser.php:924 api/classes/CUser.php:1034
+#: api/classes/CUser.php:925 api/classes/CUser.php:1035
 msgid "No permissions for system access."
 msgstr "Sistem erişimi için izin yok."
 
@@ -8624,7 +8624,7 @@ msgstr "Düğüm silindi"
 msgid "Node updated"
 msgstr "Düğüm güncellendi"
 
-#: include/nodes.inc.php:292
+#: include/nodes.inc.php:291
 msgid "Node with same ID already exists."
 msgstr ""
 
@@ -8718,7 +8718,7 @@ msgstr "Notlar"
 msgid "Nothing"
 msgstr "Hiçbirşey"
 
-#: include/profiles.inc.php:331
+#: include/profiles.inc.php:330
 msgid "Nothing to do."
 msgstr ""
 
@@ -8963,15 +8963,15 @@ msgstr "Yalnızca Süper Adminler simge haritalarını güncelleyebilir."
 msgid "Only Super Admins can update user groups."
 msgstr "Yalnızca Süper Adminler kullanıcı gruplarını güncelleyebilir."
 
-#: api/classes/CUser.php:684
+#: api/classes/CUser.php:685
 msgid "Only Zabbix Admins can add user media."
 msgstr "Yalnızca Zabbix Yöneticileri kullanıcı iletişim aracını ekleyebilir."
 
-#: api/classes/CUser.php:752
+#: api/classes/CUser.php:753
 msgid "Only Zabbix Admins can change user media."
 msgstr "Yalnızca Zabbix Yöneticileri kullanıcı iletişim aracını değiştirebilir."
 
-#: api/classes/CUser.php:722
+#: api/classes/CUser.php:723
 msgid "Only Zabbix Admins can remove user media."
 msgstr "Yalnızca Zabbix Yöneticileri kullanıcı iletişim aracını kaldırabilir."
 
@@ -9495,7 +9495,7 @@ msgstr "Oynat"
 msgid "Play sound"
 msgstr "Ses Oynat"
 
-#: include/nodes.inc.php:329
+#: include/nodes.inc.php:328
 msgid "Please be aware that database still contains data related to the deleted node."
 msgstr ""
 
@@ -9631,7 +9631,7 @@ msgstr "Özel anahtar dosyası"
 msgid "Privilege level"
 msgstr "Öncelik seviyesi"
 
-#: api/classes/CUser.php:835
+#: api/classes/CUser.php:836
 msgid "Probably php-ldap module is missing."
 msgstr "Büyük ihtimalle php-ldap modülü eksik."
 
@@ -10924,7 +10924,7 @@ msgstr "Servisler"
 msgid "Services form a circular dependency."
 msgstr ""
 
-#: api/classes/CUser.php:1028
+#: api/classes/CUser.php:1029
 msgid "Session terminated, re-login, please."
 msgstr "Oturum sonlandı, lütfen tekrar oturum açın."
 
@@ -10942,7 +10942,7 @@ msgstr "Önem Derecesi"
 msgid "Severity (descending)"
 msgstr ""
 
-#: include/profiles.inc.php:306
+#: include/profiles.inc.php:305
 msgid "Severity name cannot be empty."
 msgstr "Önem derecesi ismi boş olamaz."
 
@@ -12239,11 +12239,11 @@ msgstr "UTF-8"
 msgid "Ukrainian (uk_UA)"
 msgstr ""
 
-#: include/nodes.inc.php:321
+#: include/nodes.inc.php:320
 msgid "Unable to remove local node."
 msgstr ""
 
-#: include/profiles.inc.php:229
+#: include/profiles.inc.php:228
 msgid "Unable to select configuration."
 msgstr "Yapılandırma seçilemiyor."
 
