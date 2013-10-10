@@ -34,6 +34,7 @@ static size_t	prev_msg_size = 0;
 /* external environment we got on startup */
 extern char	**environ;
 static int	argc_ext_copied_first = 0, argc_ext_copied_last = 0, environ_ext_copied = 0;
+static char	**environ_ext = NULL;
 
 /* internal copy of argv[] and environment variables */
 static char	**argv_int = NULL, **environ_int = NULL;
@@ -153,6 +154,7 @@ char **	setproctitle_save_env(int argc, char **argv)
 #if defined(PS_DARWIN_ARGV)
 	*_NSGetArgv() = argv_int;
 #endif
+	environ_ext = environ;
 	environ = environ_int;		/* switch environment to internal copy */
 
 	return argv_int;
@@ -260,6 +262,10 @@ void	setproctitle_set_status(const char *status)
 void	setproctitle_free_env(void)
 {
 	int	i;
+
+	/* restore the original environment variable to safely free our internally allocated environ array */
+	if (NULL != environ_ext)
+		environ = environ_ext;
 
 	for (i = argc_ext_copied_first; i <= argc_ext_copied_last; i++)
 		zbx_free(argv_int[i]);
