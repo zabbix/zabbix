@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-10 12:09+0300\n"
+"POT-Creation-Date: 2013-10-10 12:12+0300\n"
 "PO-Revision-Date: 2013-09-29 12:56+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -2267,7 +2267,7 @@ msgstr "Nie je možné upraviť web scenár"
 
 #: include/views/js/configuration.discovery.edit.js.php:600
 msgid "Cannot validate discovery check: invalid request or connection to Zabbix server failed."
-msgstr "Nie je možné skontrolovať zisťovaciu kontrolu: neplatná požiadavka alebo problémové pripojenie k Zabbix serveru."
+msgstr "Nie je možné skontrolovať zisťovaciu kontrolu: neplatná požiadavka alebo problémové pripojenie k Zabbix serveru.Nie je možné skontrolovať zisťovaciu kontrolu: neplatná požiadavka alebo problémové pripojenie k Zabbix serveru."
 
 #: popup_bitem.php:114 popup_period.php:114
 msgid "Caption"
@@ -5723,7 +5723,7 @@ msgstr "Prototyp hosta s menom \"%1$s\" už existuje."
 #: api/classes/CHostPrototype.php:1108
 #, php-format
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
-msgstr "Prototyp hosta so zobrazovaným menom \"%1$s\" už existuje v zisťovacom pravidle \"%2$s\"."
+msgstr "Prototyp hosta so zobrazovaným menom \"%1$s\" už existuje v zisťovacom pravidle \"%2$s\".Prototyp hosta so zobrazovaným menom \"%1$s\" už existuje v zisťovacom pravidle \"%2$s\"."
 
 #: api/classes/CHostPrototype.php:1105
 #, php-format
