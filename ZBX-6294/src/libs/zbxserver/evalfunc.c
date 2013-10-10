@@ -1149,10 +1149,7 @@ static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, con
 	{
 		int	seconds;
 
-		if (SUCCEED != DCconfig_get_maintenance_until(item->hostid, &seconds) || seconds + arg1 > now)
-			goto out;
-
-		if (SUCCEED != DCget_item_time_added(item->itemid, &seconds) || seconds + arg1 > now)
+		if (SUCCEED != DCget_time_data_is_expected(item->itemid, &seconds) || seconds + arg1 > now)
 			goto out;
 
 		zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
