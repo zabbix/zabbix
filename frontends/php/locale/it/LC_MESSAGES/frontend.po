@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-10 12:09+0300\n"
-"PO-Revision-Date: 2013-10-07 11:27+0300\n"
+"POT-Creation-Date: 2013-10-10 12:12+0300\n"
+"PO-Revision-Date: 2013-10-09 13:41+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: it\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1381138027.0\n"
+"X-POOTLE-MTIME: 1381318884.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -63,8 +63,8 @@ msgstr[1] "%1$s giorni"
 #, php-format
 msgid "%1$s failed login attempt logged. Last failed attempt was from %2$s on %3$s at %4$s."
 msgid_plural "%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s at %4$s."
-msgstr[0] "%1$s tentativo di accesso fallito registrato. L'ultimo tentativo fallito proveniva da %2$s su %3$s alle %4$s."
-msgstr[1] "%1$s tentativi di accesso fallito registrati. L'ultimo tentativo fallito proveniva da %2$s su %3$s alle %4$s."
+msgstr[0] "Registrato %1$s tentativo di accesso fallito. L'ultimo tentativo fallito proveniva da %2$s il %3$s alle %4$s."
+msgstr[1] "Registrati %1$s tentativi di accesso fallito. L'ultimo tentativo fallito proveniva da %2$s il %3$s alle %4$s."
 
 #: include/blocks.inc.php:1020
 #, php-format
@@ -1605,7 +1605,7 @@ msgstr "Impossibile rimuovere gli script. Lo script \"%1$s\" e' utilizzato nell'
 #: api/classes/CScript.php:529
 #, php-format
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
-msgstr "Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste.Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste."
+msgstr "Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste.Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste.Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste."
 
 #: actionconf.php:331
 msgid "Cannot delete selected actions"
@@ -2255,7 +2255,7 @@ msgstr "Impossibile aggiornare scenario web"
 
 #: include/views/js/configuration.discovery.edit.js.php:600
 msgid "Cannot validate discovery check: invalid request or connection to Zabbix server failed."
-msgstr "Impossibile validare controllo discovery: richiesta non valida o connessione al server Zabbix fallita."
+msgstr "Impossibile validare controllo discovery: richiesta non valida o connessione al server Zabbix fallita.Impossibile validare controllo discovery: richiesta non valida o connessione al server Zabbix fallita."
 
 #: popup_bitem.php:114 popup_period.php:114
 msgid "Caption"
@@ -5346,7 +5346,7 @@ msgstr "STORICO DEGLI EVENTI"
 #: include/views/inventory.host.list.php:26
 #: include/views/inventory.host.view.php:24
 msgid "HOST INVENTORY"
-msgstr ""
+msgstr "INVENTARIO HOST"
 
 #: hostinventoriesoverview.php:65
 msgid "HOST INVENTORY OVERVIEW"
@@ -7608,11 +7608,11 @@ msgstr "ULTIMI DATI"
 
 #: include/classes/screens/CScreenHostgroupTriggers.php:127
 msgid "LATEST HOST GROUP ISSUES"
-msgstr ""
+msgstr "ULTIMI PROBLEMI GRUPPO HOST"
 
 #: include/classes/screens/CScreenHostTriggers.php:127
 msgid "LATEST HOST ISSUES"
-msgstr ""
+msgstr "ULTIMI PROBLEMI HOST"
 
 #: include/discovery.inc.php:58
 #: include/views/administration.authentication.edit.php:37
@@ -7760,11 +7760,11 @@ msgstr "Ultimi eventi"
 
 #: include/screens.inc.php:39
 msgid "Latest host group issues"
-msgstr ""
+msgstr "Ultimi problemi gruppo host"
 
 #: include/screens.inc.php:40
 msgid "Latest host issues"
-msgstr ""
+msgstr "Ultimi problemi host"
 
 #: jsLoader.php:207
 msgid "Latest values"
