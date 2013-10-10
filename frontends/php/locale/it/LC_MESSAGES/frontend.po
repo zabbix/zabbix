@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-08 23:10+0300\n"
+"POT-Creation-Date: 2013-10-10 12:09+0300\n"
 "PO-Revision-Date: 2013-10-07 11:27+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -520,7 +520,7 @@ msgstr "Periodo inferiore a"
 msgid "Age less than %s"
 msgstr "Periodo inferiore a %s"
 
-#: include/items.inc.php:239 include/views/administration.script.list.php:64
+#: include/items.inc.php:244 include/views/administration.script.list.php:64
 #: include/views/configuration.httpconf.edit.php:139 popup.php:1540
 msgid "Agent"
 msgstr "Agente"
@@ -934,7 +934,7 @@ msgstr "Bloccato"
 msgid "Bold line"
 msgstr "Linea in grassetto"
 
-#: include/items.inc.php:131
+#: include/items.inc.php:136
 msgid "Boolean"
 msgstr "Booleano"
 
@@ -1152,7 +1152,7 @@ msgstr "CONFIGURAZIONE ZABBIX"
 msgid "Calculate SLA, acceptable SLA (in %)"
 msgstr "Calcola SLA, SLA accettabile (in %)"
 
-#: include/items.inc.php:92 include/views/configuration.graph.edit.php:164
+#: include/items.inc.php:97 include/views/configuration.graph.edit.php:164
 #: include/views/configuration.graph.edit.php:219
 msgid "Calculated"
 msgstr "Calculated"
@@ -1751,8 +1751,8 @@ msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "Impossibile trovare host \"%1$s\" utilizzato nella schermata \"%2$s\"."
 
 #: api/classes/CDiscoveryRule.php:748 api/classes/CDiscoveryRule.php:824
-#: api/classes/CItemGeneral.php:101 include/items.inc.php:339
-#: include/items.inc.php:390
+#: api/classes/CItemGeneral.php:101 include/items.inc.php:344
+#: include/items.inc.php:395
 #, php-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
 msgstr "Impossibile trovare interfaccia host su \"%1$s\" per la chiave item \"%2$s\"."
@@ -2287,7 +2287,7 @@ msgstr "Variazione"
 msgid "Change password"
 msgstr "Cambia password"
 
-#: include/forms.inc.php:423 include/items.inc.php:120
+#: include/forms.inc.php:423 include/items.inc.php:125
 #: include/triggers.inc.php:2199 include/views/configuration.item.edit.php:224
 #: include/views/configuration.item.massupdate.php:210
 msgid "Character"
@@ -2981,6 +2981,10 @@ msgstr "Creato: Prototipo di trigger \"%1$s\" su \"%2$s\"."
 msgid "Created: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "Creato: Scenario web \"%1$s\" su \"%2$s\"."
 
+#: include/items.inc.php:41
+msgid "Critical"
+msgstr ""
+
 #: popup_trexpr.php:365
 msgid "Current date is < N"
 msgstr "La data corrente è < N"
@@ -3186,7 +3190,7 @@ msgstr "File di database"
 msgid "Database host"
 msgstr "Host del database"
 
-#: include/items.inc.php:87
+#: include/items.inc.php:92
 msgid "Database monitor"
 msgstr "Database monitor"
 
@@ -3312,7 +3316,7 @@ msgstr "Dic"
 msgid "December"
 msgstr "Dicembre"
 
-#: include/items.inc.php:133
+#: include/items.inc.php:138
 msgid "Decimal"
 msgstr "Decimale"
 
@@ -3922,8 +3926,8 @@ msgid "Disable selected triggers?"
 msgstr "Disabilitare trigger selezionati?"
 
 #: auditlogs.php:152 dashboard.php:270 include/discovery.inc.php:123
-#: include/httptest.inc.php:46 include/items.inc.php:150
-#: include/items.inc.php:204 include/triggers.inc.php:1606
+#: include/httptest.inc.php:46 include/items.inc.php:155
+#: include/items.inc.php:209 include/triggers.inc.php:1606
 #: include/triggers.inc.php:2455 include/users.inc.php:85
 #: include/views/administration.mediatypes.list.php:97
 #: include/views/administration.usergroups.list.php:59
@@ -4458,8 +4462,8 @@ msgid "Enable selected triggers?"
 msgstr "Abilitare trigger selezionati?"
 
 #: auditlogs.php:149 dashboard.php:270 include/discovery.inc.php:122
-#: include/httptest.inc.php:45 include/items.inc.php:149
-#: include/items.inc.php:201 include/triggers.inc.php:2452
+#: include/httptest.inc.php:45 include/items.inc.php:154
+#: include/items.inc.php:206 include/triggers.inc.php:2452
 #: include/views/administration.mediatypes.edit.php:96
 #: include/views/administration.mediatypes.list.php:96
 #: include/views/administration.usergroups.edit.php:65
@@ -4606,7 +4610,7 @@ msgstr "Esegui errore SQL [%1$s] in [%2$s]."
 msgid "Execute on"
 msgstr "Esegui su"
 
-#: include/items.inc.php:1396 include/views/configuration.item.edit.php:195
+#: include/items.inc.php:1401 include/views/configuration.item.edit.php:195
 msgid "Executed script"
 msgstr "Script eseguito"
 
@@ -4688,7 +4692,7 @@ msgstr "Tipo di espressione"
 msgid "Expressions"
 msgstr "Espressioni"
 
-#: include/items.inc.php:86
+#: include/items.inc.php:91
 msgid "External check"
 msgstr "External check"
 
@@ -4896,7 +4900,7 @@ msgstr "Intervalli flessibili"
 msgid "For guest, password must be empty"
 msgstr "Per l'account guest, la password deve essere vuota"
 
-#: include/items.inc.php:1400 include/views/configuration.item.edit.php:207
+#: include/items.inc.php:1405 include/views/configuration.item.edit.php:207
 msgid "Formula"
 msgstr "Formula"
 
@@ -5393,7 +5397,7 @@ msgstr "Altezza"
 msgid "Help"
 msgstr "Aiuto"
 
-#: include/items.inc.php:134
+#: include/items.inc.php:139
 msgid "Hexadecimal"
 msgstr "Esadecimale"
 
@@ -5546,7 +5550,7 @@ msgstr "Accesso host"
 msgid "Host added"
 msgstr "Host aggiunto"
 
-#: api/classes/CHostInterface.php:831
+#: api/classes/CHostInterface.php:844
 msgid "Host cannot have more than one default interface of the same type."
 msgstr "Un host non può avere più di un'interfaccia predefinita dello stesso tipo.Un host non può avere più di un'interfaccia predefinita dello stesso tipo."
 
@@ -5778,7 +5782,7 @@ msgid "Host with the same visible name \"%s\" already exists."
 msgstr "Un host con lo stesso nome visibile \"%s\" esiste già."
 
 #: hostinventoriesoverview.php:85 hosts.php:752 include/forms.inc.php:217
-#: include/forms.inc.php:894 include/items.inc.php:808
+#: include/forms.inc.php:894 include/items.inc.php:813
 #: include/menu.inc.php:112 include/menu.inc.php:168
 #: include/reports.inc.php:378 include/views/administration.proxy.edit.php:88
 #: include/views/administration.proxy.list.php:52
@@ -5899,7 +5903,7 @@ msgstr "Intervallo IP"
 msgid "IP range cannot be empty."
 msgstr "L'intervallo IP non può essere vuoto."
 
-#: include/hosts.inc.php:477 include/items.inc.php:242
+#: include/hosts.inc.php:477 include/items.inc.php:247
 #: include/views/administration.script.edit.php:46
 #: include/views/administration.script.list.php:54
 #: include/views/configuration.action.edit.php:681
@@ -5909,7 +5913,7 @@ msgstr "L'intervallo IP non può essere vuoto."
 msgid "IPMI"
 msgstr "IPMI"
 
-#: include/items.inc.php:88
+#: include/items.inc.php:93
 msgid "IPMI agent"
 msgstr "Agente IPMI"
 
@@ -6549,17 +6553,17 @@ msgstr "ID prototipo host errato."
 msgid "Incorrect image index."
 msgstr "Indice immagine errato."
 
-#: api/classes/CHostInterface.php:630
+#: api/classes/CHostInterface.php:643
 #, php-format
 msgid "Incorrect interface DNS parameter \"%s\" provided."
 msgstr "Fornito paramentro interfaccia DNS \"%s\" errato."
 
-#: api/classes/CHostInterface.php:645
+#: api/classes/CHostInterface.php:658
 #, php-format
 msgid "Incorrect interface IP parameter \"%s\" provided."
 msgstr "Fornito parametro interfaccia IP \"%s\" errato."
 
-#: api/classes/CHostInterface.php:661
+#: api/classes/CHostInterface.php:674
 #, php-format
 msgid "Incorrect interface port \"%s\" provided."
 msgstr "Fornita porta interfaccia \"%s\" errata."
@@ -6966,7 +6970,7 @@ msgstr "Nome installatore"
 msgid "Interface"
 msgstr "Interfaccia"
 
-#: api/classes/CHostInterface.php:851
+#: api/classes/CHostInterface.php:864
 #, php-format
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
 msgstr "L'interfaccia è collegata all'item \"%1$s\" su \"%2$s\"."
@@ -7311,7 +7315,7 @@ msgid "Item with key \"%1$s\" already exists."
 msgstr "Item con chiave \"%1$s\" già esistente."
 
 #: hosts.php:795 hosts.php:886 include/html.inc.php:420
-#: include/html.inc.php:424 include/items.inc.php:791
+#: include/html.inc.php:424 include/items.inc.php:796
 #: include/reports.inc.php:117 include/reports.inc.php:257
 #: include/views/configuration.application.list.php:99
 #: include/views/configuration.graph.edit.php:276
@@ -7355,11 +7359,11 @@ msgstr "Lista item"
 msgid "Items updated"
 msgstr "Item aggiornati"
 
-#: include/hosts.inc.php:474 include/items.inc.php:241
+#: include/hosts.inc.php:474 include/items.inc.php:246
 msgid "JMX"
 msgstr "JMX"
 
-#: include/items.inc.php:91
+#: include/items.inc.php:96
 msgid "JMX agent"
 msgstr "Agente JMX"
 
@@ -7913,7 +7917,7 @@ msgstr "Latitudine della posizione"
 msgid "Location longitude"
 msgstr "Longitudine della posizione"
 
-#: include/forms.inc.php:424 include/items.inc.php:122
+#: include/forms.inc.php:424 include/items.inc.php:127
 #: include/triggers.inc.php:2200 include/views/configuration.item.edit.php:225
 #: include/views/configuration.item.massupdate.php:211
 msgid "Log"
@@ -8305,6 +8309,13 @@ msgstr "Numero massimo di eventi per trigger da visualizzare"
 #: include/func.inc.php:2213
 msgid "Maximize"
 msgstr "Massimizza"
+
+#: api/classes/CHostInterface.php:633
+#, php-format
+msgid "Maximum DNS name length is %2$d characters, \"%3$s\" is %1$d character."
+msgid_plural "Maximum DNS name length is %2$d characters, \"%3$s\" is %1$d characters."
+msgstr[0] ""
+msgstr[1] ""
 
 #: api/classes/CUser.php:315
 #, php-format
@@ -9013,7 +9024,7 @@ msgstr "Nessun dato ricevuto durante il periodo di tempo T, quindi N = 1, 0 - al
 msgid "No data received during period of time T, then N NOT 1, 0 - otherwise"
 msgstr "Nessun dato ricevuto durante il periodo di tempo T, quindi N NON è 1, 0 - altrimentiNessun dato ricevuto durante il periodo di tempo T, quindi N NON è 1, 0 - altrimenti"
 
-#: api/classes/CHostInterface.php:827
+#: api/classes/CHostInterface.php:840
 #, php-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "Nessuna interfaccia di default per tipo \"%1$s\" su \"%2$s\"."
@@ -9221,17 +9232,17 @@ msgstr "Nessun ID item fornito per l'elemento della schermata."
 msgid "No item prototypes defined."
 msgstr "Nessun prototipo di item definito."
 
-#: include/items.inc.php:494
+#: include/items.inc.php:499
 #, php-format
 msgid "No item with itemid \"%1$s\"."
 msgstr "Nessun item con itemid \"%1$s\"."
 
-#: include/items.inc.php:477
+#: include/items.inc.php:482
 #, php-format
 msgid "No item with itemid=\"%1$s\"."
 msgstr "Nessun item con itemid=\"%1$s\"."
 
-#: chart3.php:119 include/items.inc.php:782
+#: chart3.php:119 include/items.inc.php:787
 #: include/views/configuration.graph.edit.php:64
 #: include/views/configuration.item.list.php:58
 #: include/views/monitoring.overview.php:111 popup.php:675 popup.php:808
@@ -9352,7 +9363,7 @@ msgstr "Nessun permesso per l'accesso al sistema."
 #: api/classes/CHostGroup.php:893 api/classes/CHostGroup.php:902
 #: api/classes/CHostGroup.php:924 api/classes/CHostInterface.php:319
 #: api/classes/CHostInterface.php:335 api/classes/CHostInterface.php:476
-#: api/classes/CHostInterface.php:674 api/classes/CHost.php:688
+#: api/classes/CHostInterface.php:687 api/classes/CHost.php:688
 #: api/classes/CHost.php:716 api/classes/CHost.php:1813
 #: api/classes/CHostPrototype.php:1020 api/classes/CHostPrototype.php:1035
 #: api/classes/CHostPrototype.php:1048 api/classes/CHostPrototype.php:1061
@@ -9604,7 +9615,7 @@ msgstr "Nodi"
 msgid "None"
 msgstr "Nessuno"
 
-#: include/graphs.inc.php:24 include/items.inc.php:175
+#: include/graphs.inc.php:24 include/items.inc.php:180
 #: include/triggers.inc.php:1604 popup.php:1139
 msgid "Normal"
 msgstr "Normale"
@@ -9654,7 +9665,7 @@ msgstr "Non connesso"
 msgid "Not monitored"
 msgstr "Non monitorato"
 
-#: include/items.inc.php:176 include/items.inc.php:201
+#: include/items.inc.php:181 include/items.inc.php:206
 msgid "Not supported"
 msgstr "Non supportato"
 
@@ -9753,7 +9764,7 @@ msgstr "Numero di trigger (abilitati/disabilitati) [problema/ok]"
 msgid "Number of users (online)"
 msgstr "Numero di utenti (online)"
 
-#: include/forms.inc.php:422 include/items.inc.php:118
+#: include/forms.inc.php:422 include/items.inc.php:123
 #: include/triggers.inc.php:2198 include/views/configuration.item.edit.php:223
 #: include/views/configuration.item.massupdate.php:209
 msgid "Numeric (float)"
@@ -9765,7 +9776,7 @@ msgstr "Numerico (float)"
 msgid "Numeric (integer 64bit)"
 msgstr "Numerico (intero 64bit)"
 
-#: include/forms.inc.php:421 include/items.inc.php:116
+#: include/forms.inc.php:421 include/items.inc.php:121
 #: include/views/configuration.item.edit.php:222
 #: include/views/configuration.item.massupdate.php:208
 msgid "Numeric (unsigned)"
@@ -9830,7 +9841,7 @@ msgstr "PANORAMICA"
 msgid "Oct"
 msgstr "Ott"
 
-#: include/items.inc.php:132
+#: include/items.inc.php:137
 msgid "Octal"
 msgstr "Ottale"
 
@@ -10507,7 +10518,7 @@ msgstr "Popola campo inventario host"
 msgid "Port"
 msgstr "Porta"
 
-#: api/classes/CHostInterface.php:658
+#: api/classes/CHostInterface.php:671
 msgid "Port cannot be empty for host interface."
 msgstr "La porta non può esser vuota per l'interfaccia host."
 
@@ -11277,7 +11288,7 @@ msgstr "SMTP helo"
 msgid "SMTP server"
 msgstr "Server SMTP"
 
-#: include/hosts.inc.php:471 include/items.inc.php:240
+#: include/hosts.inc.php:471 include/items.inc.php:245
 msgid "SNMP"
 msgstr "SNMP"
 
@@ -11305,7 +11316,7 @@ msgstr "SNMP community"
 msgid "SNMP interfaces"
 msgstr "Interfacce SNMP"
 
-#: include/items.inc.php:82
+#: include/items.inc.php:87
 msgid "SNMP trap"
 msgstr "Trap SNMP"
 
@@ -11313,17 +11324,17 @@ msgstr "Trap SNMP"
 msgid "SNMP trap key is invalid."
 msgstr "La chiave della trap SNMP non è valida."
 
-#: include/discovery.inc.php:67 include/items.inc.php:79
+#: include/discovery.inc.php:67 include/items.inc.php:84
 #: include/views/js/configuration.discovery.edit.js.php:178
 msgid "SNMPv1 agent"
 msgstr "Agente SNMPv1"
 
-#: include/discovery.inc.php:68 include/items.inc.php:80
+#: include/discovery.inc.php:68 include/items.inc.php:85
 #: include/views/js/configuration.discovery.edit.js.php:179
 msgid "SNMPv2 agent"
 msgstr "Agente SNMPv2"
 
-#: include/discovery.inc.php:69 include/items.inc.php:81
+#: include/discovery.inc.php:69 include/items.inc.php:86
 #: include/views/js/configuration.discovery.edit.js.php:180
 msgid "SNMPv3 agent"
 msgstr "Agente SNMPv3"
@@ -11333,7 +11344,7 @@ msgstr "Agente SNMPv3"
 msgid "SQL count: %s (selects: %s | executes: %s)"
 msgstr "Conteggio SQL: %s (selezioni: %s | esecuzioni: %s)"
 
-#: include/items.inc.php:1398 include/views/configuration.item.edit.php:199
+#: include/items.inc.php:1403 include/views/configuration.item.edit.php:199
 msgid "SQL query"
 msgstr "Query SQL"
 
@@ -11354,7 +11365,7 @@ msgstr "L'esecuzione dello statement SQL è fallita \"%1$s\"."
 msgid "SSH"
 msgstr "SSH"
 
-#: include/items.inc.php:89
+#: include/items.inc.php:94
 msgid "SSH agent"
 msgstr "Agente SSH"
 
@@ -12008,7 +12019,7 @@ msgstr "Accedi"
 msgid "Simple"
 msgstr "Semplice"
 
-#: include/items.inc.php:78
+#: include/items.inc.php:83
 msgid "Simple check"
 msgstr "Simple check"
 
@@ -12416,7 +12427,7 @@ msgstr "M"
 msgid "TCP"
 msgstr "TCP"
 
-#: include/items.inc.php:90
+#: include/items.inc.php:95
 msgid "TELNET agent"
 msgstr "Agente TELNET"
 
@@ -12607,7 +12618,7 @@ msgstr "Espressioni di test"
 msgid "Test string"
 msgstr "Stringa di test"
 
-#: include/forms.inc.php:425 include/items.inc.php:124
+#: include/forms.inc.php:425 include/items.inc.php:129
 #: include/triggers.inc.php:2201 include/views/configuration.item.edit.php:226
 #: include/views/configuration.item.massupdate.php:212
 msgid "Text"
@@ -13272,10 +13283,10 @@ msgstr "Unità"
 #: include/events.inc.php:78 include/graphs.inc.php:37
 #: include/graphs.inc.php:77 include/hosts.inc.php:53 include/hosts.inc.php:80
 #: include/html.inc.php:374 include/httptest.inc.php:39
-#: include/httptest.inc.php:56 include/items.inc.php:41
-#: include/items.inc.php:102 include/items.inc.php:126
-#: include/items.inc.php:143 include/items.inc.php:159
-#: include/items.inc.php:186 include/items.inc.php:207
+#: include/httptest.inc.php:56 include/items.inc.php:45
+#: include/items.inc.php:107 include/items.inc.php:131
+#: include/items.inc.php:148 include/items.inc.php:164
+#: include/items.inc.php:191 include/items.inc.php:212
 #: include/maintenances.inc.php:42 include/maps.inc.php:39
 #: include/media.inc.php:40 include/nodes.inc.php:265 include/perm.inc.php:30
 #: include/regexp.inc.php:206 include/screens.inc.php:55
@@ -13315,7 +13326,7 @@ msgstr "Tipo di interfaccia sconosciuto."
 msgid "Unknown resource"
 msgstr "Risorsa sconosciuta"
 
-#: include/items.inc.php:973
+#: include/items.inc.php:978
 msgid "Unknown value type"
 msgstr "Tipo valore sconosciuto"
 
@@ -13815,6 +13826,10 @@ msgstr "Variabili"
 msgid "Vendor"
 msgstr "Fornitore"
 
+#: include/items.inc.php:43
+msgid "Verbose"
+msgstr ""
+
 #: include/views/configuration.screen.constructor.edit.php:543
 msgid "Vertical"
 msgstr "Verticale"
@@ -13865,7 +13880,7 @@ msgstr "Web"
 msgid "Web checks"
 msgstr "Controlli web"
 
-#: dashboard.php:411 include/items.inc.php:93
+#: dashboard.php:411 include/items.inc.php:98
 msgid "Web monitoring"
 msgstr "Monitoraggio web"
 
@@ -14310,7 +14325,7 @@ msgstr "Super Amministratore Zabbix"
 msgid "Zabbix User"
 msgstr "Utente Zabbix"
 
-#: include/discovery.inc.php:66 include/items.inc.php:76
+#: include/discovery.inc.php:66 include/items.inc.php:81
 #: include/views/administration.script.edit.php:53
 #: include/views/configuration.action.edit.php:698
 #: include/views/js/configuration.action.edit.js.php:118
@@ -14318,11 +14333,11 @@ msgstr "Utente Zabbix"
 msgid "Zabbix agent"
 msgstr "Agente Zabbix"
 
-#: include/items.inc.php:77
+#: include/items.inc.php:82
 msgid "Zabbix agent (active)"
 msgstr "Agente Zabbix (attivo)"
 
-#: include/items.inc.php:85
+#: include/items.inc.php:90
 msgid "Zabbix aggregate"
 msgstr "Aggregato Zabbix"
 
@@ -14330,7 +14345,7 @@ msgstr "Aggregato Zabbix"
 msgid "Zabbix has received an incorrect request."
 msgstr "Zabbix ha ricevuto una richiesta errata."
 
-#: include/items.inc.php:83
+#: include/items.inc.php:88
 msgid "Zabbix internal"
 msgstr "Interna Zabbix"
 
@@ -14390,7 +14405,7 @@ msgstr "Nome server Zabbix"
 msgid "Zabbix server port"
 msgstr "Porta server Zabbix"
 
-#: include/items.inc.php:84
+#: include/items.inc.php:89
 msgid "Zabbix trapper"
 msgstr "Trapper Zabbix"
 
