@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-08 23:08+0300\n"
+"POT-Creation-Date: 2013-10-10 12:09+0300\n"
 "PO-Revision-Date: 2013-09-11 10:16+0300\n"
 "Last-Translator: Jaba <janis.jaunbalodis@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -528,7 +528,7 @@ msgstr "Vecums mazāks par"
 msgid "Age less than %s"
 msgstr ""
 
-#: include/items.inc.php:239 include/views/administration.script.list.php:64
+#: include/items.inc.php:244 include/views/administration.script.list.php:64
 #: include/views/configuration.httpconf.edit.php:139 popup.php:1540
 msgid "Agent"
 msgstr "Aģents"
@@ -944,7 +944,7 @@ msgstr "Bloķēts"
 msgid "Bold line"
 msgstr "Treknraksta līnija"
 
-#: include/items.inc.php:131
+#: include/items.inc.php:136
 msgid "Boolean"
 msgstr "Loģiskais"
 
@@ -1162,7 +1162,7 @@ msgstr "ZABBIX KONFIGURĀCIJA"
 msgid "Calculate SLA, acceptable SLA (in %)"
 msgstr ""
 
-#: include/items.inc.php:92 include/views/configuration.graph.edit.php:164
+#: include/items.inc.php:97 include/views/configuration.graph.edit.php:164
 #: include/views/configuration.graph.edit.php:219
 msgid "Calculated"
 msgstr "Izskaitļots"
@@ -1762,8 +1762,8 @@ msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr ""
 
 #: api/classes/CDiscoveryRule.php:748 api/classes/CDiscoveryRule.php:824
-#: api/classes/CItemGeneral.php:101 include/items.inc.php:339
-#: include/items.inc.php:390
+#: api/classes/CItemGeneral.php:101 include/items.inc.php:344
+#: include/items.inc.php:395
 #, php-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
 msgstr ""
@@ -2300,7 +2300,7 @@ msgstr ""
 msgid "Change password"
 msgstr "Mainīt paroli"
 
-#: include/forms.inc.php:423 include/items.inc.php:120
+#: include/forms.inc.php:423 include/items.inc.php:125
 #: include/triggers.inc.php:2199 include/views/configuration.item.edit.php:224
 #: include/views/configuration.item.massupdate.php:210
 msgid "Character"
@@ -2983,6 +2983,10 @@ msgstr ""
 msgid "Created: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr ""
 
+#: include/items.inc.php:41
+msgid "Critical"
+msgstr ""
+
 #: popup_trexpr.php:365
 msgid "Current date is < N"
 msgstr ""
@@ -3188,7 +3192,7 @@ msgstr "Datubāzes fails"
 msgid "Database host"
 msgstr ""
 
-#: include/items.inc.php:87
+#: include/items.inc.php:92
 msgid "Database monitor"
 msgstr ""
 
@@ -3314,7 +3318,7 @@ msgstr "Dec"
 msgid "December"
 msgstr "Decembris"
 
-#: include/items.inc.php:133
+#: include/items.inc.php:138
 msgid "Decimal"
 msgstr "Decimāls"
 
@@ -3925,8 +3929,8 @@ msgid "Disable selected triggers?"
 msgstr ""
 
 #: auditlogs.php:152 dashboard.php:270 include/discovery.inc.php:123
-#: include/httptest.inc.php:46 include/items.inc.php:150
-#: include/items.inc.php:204 include/triggers.inc.php:1606
+#: include/httptest.inc.php:46 include/items.inc.php:155
+#: include/items.inc.php:209 include/triggers.inc.php:1606
 #: include/triggers.inc.php:2455 include/users.inc.php:85
 #: include/views/administration.mediatypes.list.php:97
 #: include/views/administration.usergroups.list.php:59
@@ -4461,8 +4465,8 @@ msgid "Enable selected triggers?"
 msgstr ""
 
 #: auditlogs.php:149 dashboard.php:270 include/discovery.inc.php:122
-#: include/httptest.inc.php:45 include/items.inc.php:149
-#: include/items.inc.php:201 include/triggers.inc.php:2452
+#: include/httptest.inc.php:45 include/items.inc.php:154
+#: include/items.inc.php:206 include/triggers.inc.php:2452
 #: include/views/administration.mediatypes.edit.php:96
 #: include/views/administration.mediatypes.list.php:96
 #: include/views/administration.usergroups.edit.php:65
@@ -4609,7 +4613,7 @@ msgstr ""
 msgid "Execute on"
 msgstr ""
 
-#: include/items.inc.php:1396 include/views/configuration.item.edit.php:195
+#: include/items.inc.php:1401 include/views/configuration.item.edit.php:195
 msgid "Executed script"
 msgstr "Palaist skriptu"
 
@@ -4691,7 +4695,7 @@ msgstr "Izteiksmes tips"
 msgid "Expressions"
 msgstr "Izteiksmes"
 
-#: include/items.inc.php:86
+#: include/items.inc.php:91
 msgid "External check"
 msgstr "Ārēja pārbaude"
 
@@ -4899,7 +4903,7 @@ msgstr ""
 msgid "For guest, password must be empty"
 msgstr ""
 
-#: include/items.inc.php:1400 include/views/configuration.item.edit.php:207
+#: include/items.inc.php:1405 include/views/configuration.item.edit.php:207
 msgid "Formula"
 msgstr "Formula"
 
@@ -5396,7 +5400,7 @@ msgstr "Augstums"
 msgid "Help"
 msgstr "Palīdzība"
 
-#: include/items.inc.php:134
+#: include/items.inc.php:139
 msgid "Hexadecimal"
 msgstr "Heksadecimāls"
 
@@ -5549,7 +5553,7 @@ msgstr "Iekārtas piekļuve"
 msgid "Host added"
 msgstr "Iekārta pievienota"
 
-#: api/classes/CHostInterface.php:831
+#: api/classes/CHostInterface.php:844
 msgid "Host cannot have more than one default interface of the same type."
 msgstr ""
 
@@ -5781,7 +5785,7 @@ msgid "Host with the same visible name \"%s\" already exists."
 msgstr ""
 
 #: hostinventoriesoverview.php:85 hosts.php:752 include/forms.inc.php:217
-#: include/forms.inc.php:894 include/items.inc.php:808
+#: include/forms.inc.php:894 include/items.inc.php:813
 #: include/menu.inc.php:112 include/menu.inc.php:168
 #: include/reports.inc.php:378 include/views/administration.proxy.edit.php:88
 #: include/views/administration.proxy.list.php:52
@@ -5902,7 +5906,7 @@ msgstr "IP apgabals"
 msgid "IP range cannot be empty."
 msgstr ""
 
-#: include/hosts.inc.php:477 include/items.inc.php:242
+#: include/hosts.inc.php:477 include/items.inc.php:247
 #: include/views/administration.script.edit.php:46
 #: include/views/administration.script.list.php:54
 #: include/views/configuration.action.edit.php:681
@@ -5912,7 +5916,7 @@ msgstr ""
 msgid "IPMI"
 msgstr "IPMI"
 
-#: include/items.inc.php:88
+#: include/items.inc.php:93
 msgid "IPMI agent"
 msgstr "IPMI aģents"
 
@@ -6552,17 +6556,17 @@ msgstr ""
 msgid "Incorrect image index."
 msgstr ""
 
-#: api/classes/CHostInterface.php:630
+#: api/classes/CHostInterface.php:643
 #, php-format
 msgid "Incorrect interface DNS parameter \"%s\" provided."
 msgstr ""
 
-#: api/classes/CHostInterface.php:645
+#: api/classes/CHostInterface.php:658
 #, php-format
 msgid "Incorrect interface IP parameter \"%s\" provided."
 msgstr ""
 
-#: api/classes/CHostInterface.php:661
+#: api/classes/CHostInterface.php:674
 #, php-format
 msgid "Incorrect interface port \"%s\" provided."
 msgstr ""
@@ -6969,7 +6973,7 @@ msgstr ""
 msgid "Interface"
 msgstr "Interfeiss"
 
-#: api/classes/CHostInterface.php:851
+#: api/classes/CHostInterface.php:864
 #, php-format
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -7314,7 +7318,7 @@ msgid "Item with key \"%1$s\" already exists."
 msgstr ""
 
 #: hosts.php:795 hosts.php:886 include/html.inc.php:420
-#: include/html.inc.php:424 include/items.inc.php:791
+#: include/html.inc.php:424 include/items.inc.php:796
 #: include/reports.inc.php:117 include/reports.inc.php:257
 #: include/views/configuration.application.list.php:99
 #: include/views/configuration.graph.edit.php:276
@@ -7358,11 +7362,11 @@ msgstr "Rādītāju saraksts"
 msgid "Items updated"
 msgstr "Rādītāji atjaunoti"
 
-#: include/hosts.inc.php:474 include/items.inc.php:241
+#: include/hosts.inc.php:474 include/items.inc.php:246
 msgid "JMX"
 msgstr "JMX"
 
-#: include/items.inc.php:91
+#: include/items.inc.php:96
 msgid "JMX agent"
 msgstr "JMX aģents"
 
@@ -7917,7 +7921,7 @@ msgstr "Atrašanās vietas ģeogrāfiskais platums"
 msgid "Location longitude"
 msgstr "Atrašanās vietas ģeogrāfiskais garums"
 
-#: include/forms.inc.php:424 include/items.inc.php:122
+#: include/forms.inc.php:424 include/items.inc.php:127
 #: include/triggers.inc.php:2200 include/views/configuration.item.edit.php:225
 #: include/views/configuration.item.massupdate.php:211
 msgid "Log"
@@ -8309,6 +8313,14 @@ msgstr ""
 #: include/func.inc.php:2213
 msgid "Maximize"
 msgstr "Maksimizēt"
+
+#: api/classes/CHostInterface.php:633
+#, php-format
+msgid "Maximum DNS name length is %2$d characters, \"%3$s\" is %1$d character."
+msgid_plural "Maximum DNS name length is %2$d characters, \"%3$s\" is %1$d characters."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: api/classes/CUser.php:315
 #, php-format
@@ -9022,7 +9034,7 @@ msgstr ""
 msgid "No data received during period of time T, then N NOT 1, 0 - otherwise"
 msgstr ""
 
-#: api/classes/CHostInterface.php:827
+#: api/classes/CHostInterface.php:840
 #, php-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr ""
@@ -9230,17 +9242,17 @@ msgstr ""
 msgid "No item prototypes defined."
 msgstr ""
 
-#: include/items.inc.php:494
+#: include/items.inc.php:499
 #, php-format
 msgid "No item with itemid \"%1$s\"."
 msgstr ""
 
-#: include/items.inc.php:477
+#: include/items.inc.php:482
 #, php-format
 msgid "No item with itemid=\"%1$s\"."
 msgstr ""
 
-#: chart3.php:119 include/items.inc.php:782
+#: chart3.php:119 include/items.inc.php:787
 #: include/views/configuration.graph.edit.php:64
 #: include/views/configuration.item.list.php:58
 #: include/views/monitoring.overview.php:111 popup.php:675 popup.php:808
@@ -9361,7 +9373,7 @@ msgstr ""
 #: api/classes/CHostGroup.php:893 api/classes/CHostGroup.php:902
 #: api/classes/CHostGroup.php:924 api/classes/CHostInterface.php:319
 #: api/classes/CHostInterface.php:335 api/classes/CHostInterface.php:476
-#: api/classes/CHostInterface.php:674 api/classes/CHost.php:688
+#: api/classes/CHostInterface.php:687 api/classes/CHost.php:688
 #: api/classes/CHost.php:716 api/classes/CHost.php:1813
 #: api/classes/CHostPrototype.php:1020 api/classes/CHostPrototype.php:1035
 #: api/classes/CHostPrototype.php:1048 api/classes/CHostPrototype.php:1061
@@ -9613,7 +9625,7 @@ msgstr "Mezgli"
 msgid "None"
 msgstr ""
 
-#: include/graphs.inc.php:24 include/items.inc.php:175
+#: include/graphs.inc.php:24 include/items.inc.php:180
 #: include/triggers.inc.php:1604 popup.php:1139
 msgid "Normal"
 msgstr ""
@@ -9663,7 +9675,7 @@ msgstr ""
 msgid "Not monitored"
 msgstr "Netiek uzraudzīts"
 
-#: include/items.inc.php:176 include/items.inc.php:201
+#: include/items.inc.php:181 include/items.inc.php:206
 msgid "Not supported"
 msgstr "Netiek atbalstīts"
 
@@ -9762,7 +9774,7 @@ msgstr ""
 msgid "Number of users (online)"
 msgstr "Lietotāju skaits (tiešsaistē)"
 
-#: include/forms.inc.php:422 include/items.inc.php:118
+#: include/forms.inc.php:422 include/items.inc.php:123
 #: include/triggers.inc.php:2198 include/views/configuration.item.edit.php:223
 #: include/views/configuration.item.massupdate.php:209
 msgid "Numeric (float)"
@@ -9774,7 +9786,7 @@ msgstr "Numurs (peldošais)"
 msgid "Numeric (integer 64bit)"
 msgstr "Numurs (vesels skaitlis 64bit)"
 
-#: include/forms.inc.php:421 include/items.inc.php:116
+#: include/forms.inc.php:421 include/items.inc.php:121
 #: include/views/configuration.item.edit.php:222
 #: include/views/configuration.item.massupdate.php:208
 msgid "Numeric (unsigned)"
@@ -9839,7 +9851,7 @@ msgstr "PĀRSKATS"
 msgid "Oct"
 msgstr ""
 
-#: include/items.inc.php:132
+#: include/items.inc.php:137
 msgid "Octal"
 msgstr "Oktāls"
 
@@ -10516,7 +10528,7 @@ msgstr ""
 msgid "Port"
 msgstr "Ports"
 
-#: api/classes/CHostInterface.php:658
+#: api/classes/CHostInterface.php:671
 msgid "Port cannot be empty for host interface."
 msgstr ""
 
@@ -11287,7 +11299,7 @@ msgstr "SMTP helo"
 msgid "SMTP server"
 msgstr "SMTP serveris"
 
-#: include/hosts.inc.php:471 include/items.inc.php:240
+#: include/hosts.inc.php:471 include/items.inc.php:245
 msgid "SNMP"
 msgstr "SNMP"
 
@@ -11315,7 +11327,7 @@ msgstr ""
 msgid "SNMP interfaces"
 msgstr "SNMP interfeiss"
 
-#: include/items.inc.php:82
+#: include/items.inc.php:87
 msgid "SNMP trap"
 msgstr ""
 
@@ -11323,17 +11335,17 @@ msgstr ""
 msgid "SNMP trap key is invalid."
 msgstr ""
 
-#: include/discovery.inc.php:67 include/items.inc.php:79
+#: include/discovery.inc.php:67 include/items.inc.php:84
 #: include/views/js/configuration.discovery.edit.js.php:178
 msgid "SNMPv1 agent"
 msgstr "SNMPv1 aģents"
 
-#: include/discovery.inc.php:68 include/items.inc.php:80
+#: include/discovery.inc.php:68 include/items.inc.php:85
 #: include/views/js/configuration.discovery.edit.js.php:179
 msgid "SNMPv2 agent"
 msgstr "SNMPv2 aģents"
 
-#: include/discovery.inc.php:69 include/items.inc.php:81
+#: include/discovery.inc.php:69 include/items.inc.php:86
 #: include/views/js/configuration.discovery.edit.js.php:180
 msgid "SNMPv3 agent"
 msgstr "SNMPv3 aģents"
@@ -11343,7 +11355,7 @@ msgstr "SNMPv3 aģents"
 msgid "SQL count: %s (selects: %s | executes: %s)"
 msgstr ""
 
-#: include/items.inc.php:1398 include/views/configuration.item.edit.php:199
+#: include/items.inc.php:1403 include/views/configuration.item.edit.php:199
 msgid "SQL query"
 msgstr ""
 
@@ -11364,7 +11376,7 @@ msgstr ""
 msgid "SSH"
 msgstr "SSH"
 
-#: include/items.inc.php:89
+#: include/items.inc.php:94
 msgid "SSH agent"
 msgstr "SSH aģents"
 
@@ -12018,7 +12030,7 @@ msgstr "Pierakstīties"
 msgid "Simple"
 msgstr "Vienkāršs"
 
-#: include/items.inc.php:78
+#: include/items.inc.php:83
 msgid "Simple check"
 msgstr "Vienkārša pārbaude"
 
@@ -12426,7 +12438,7 @@ msgstr ""
 msgid "TCP"
 msgstr "TCP"
 
-#: include/items.inc.php:90
+#: include/items.inc.php:95
 msgid "TELNET agent"
 msgstr "TELNET aģents"
 
@@ -12617,7 +12629,7 @@ msgstr ""
 msgid "Test string"
 msgstr ""
 
-#: include/forms.inc.php:425 include/items.inc.php:124
+#: include/forms.inc.php:425 include/items.inc.php:129
 #: include/triggers.inc.php:2201 include/views/configuration.item.edit.php:226
 #: include/views/configuration.item.massupdate.php:212
 msgid "Text"
@@ -13285,10 +13297,10 @@ msgstr "Vienības"
 #: include/events.inc.php:78 include/graphs.inc.php:37
 #: include/graphs.inc.php:77 include/hosts.inc.php:53 include/hosts.inc.php:80
 #: include/html.inc.php:374 include/httptest.inc.php:39
-#: include/httptest.inc.php:56 include/items.inc.php:41
-#: include/items.inc.php:102 include/items.inc.php:126
-#: include/items.inc.php:143 include/items.inc.php:159
-#: include/items.inc.php:186 include/items.inc.php:207
+#: include/httptest.inc.php:56 include/items.inc.php:45
+#: include/items.inc.php:107 include/items.inc.php:131
+#: include/items.inc.php:148 include/items.inc.php:164
+#: include/items.inc.php:191 include/items.inc.php:212
 #: include/maintenances.inc.php:42 include/maps.inc.php:39
 #: include/media.inc.php:40 include/nodes.inc.php:265 include/perm.inc.php:30
 #: include/regexp.inc.php:206 include/screens.inc.php:55
@@ -13328,7 +13340,7 @@ msgstr "Nezināms interfeisa tips."
 msgid "Unknown resource"
 msgstr "Nezināms resurss"
 
-#: include/items.inc.php:973
+#: include/items.inc.php:978
 msgid "Unknown value type"
 msgstr "Nezināms vērtības tips"
 
@@ -13828,6 +13840,10 @@ msgstr "Mainīgie"
 msgid "Vendor"
 msgstr "Piegādātājs"
 
+#: include/items.inc.php:43
+msgid "Verbose"
+msgstr ""
+
 #: include/views/configuration.screen.constructor.edit.php:543
 msgid "Vertical"
 msgstr "Vertikāli"
@@ -13878,7 +13894,7 @@ msgstr "Tīmeklis"
 msgid "Web checks"
 msgstr "Tīmekļa pārbaudes"
 
-#: dashboard.php:411 include/items.inc.php:93
+#: dashboard.php:411 include/items.inc.php:98
 msgid "Web monitoring"
 msgstr "Tīmekļa uzraudzība"
 
@@ -14323,7 +14339,7 @@ msgstr "Zabbix superadministrators"
 msgid "Zabbix User"
 msgstr "Zabbix lietotājs"
 
-#: include/discovery.inc.php:66 include/items.inc.php:76
+#: include/discovery.inc.php:66 include/items.inc.php:81
 #: include/views/administration.script.edit.php:53
 #: include/views/configuration.action.edit.php:698
 #: include/views/js/configuration.action.edit.js.php:118
@@ -14331,11 +14347,11 @@ msgstr "Zabbix lietotājs"
 msgid "Zabbix agent"
 msgstr "Zabbix aģents"
 
-#: include/items.inc.php:77
+#: include/items.inc.php:82
 msgid "Zabbix agent (active)"
 msgstr "Zabbix aģents (aktīvs)"
 
-#: include/items.inc.php:85
+#: include/items.inc.php:90
 msgid "Zabbix aggregate"
 msgstr ""
 
@@ -14343,7 +14359,7 @@ msgstr ""
 msgid "Zabbix has received an incorrect request."
 msgstr ""
 
-#: include/items.inc.php:83
+#: include/items.inc.php:88
 msgid "Zabbix internal"
 msgstr ""
 
@@ -14400,7 +14416,7 @@ msgstr ""
 msgid "Zabbix server port"
 msgstr "Zabbix servera ports"
 
-#: include/items.inc.php:84
+#: include/items.inc.php:89
 msgid "Zabbix trapper"
 msgstr ""
 

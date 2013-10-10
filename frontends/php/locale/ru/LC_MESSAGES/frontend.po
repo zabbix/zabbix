@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-08 23:10+0300\n"
+"POT-Creation-Date: 2013-10-10 12:09+0300\n"
 "PO-Revision-Date: 2013-10-08 19:37+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -526,7 +526,7 @@ msgstr "Возраст менее чем"
 msgid "Age less than %s"
 msgstr "Возраст менее чем %s"
 
-#: include/items.inc.php:239 include/views/administration.script.list.php:64
+#: include/items.inc.php:244 include/views/administration.script.list.php:64
 #: include/views/configuration.httpconf.edit.php:139 popup.php:1540
 msgid "Agent"
 msgstr "Агент"
@@ -942,7 +942,7 @@ msgstr "Заблокирован"
 msgid "Bold line"
 msgstr "Жирная линия"
 
-#: include/items.inc.php:131
+#: include/items.inc.php:136
 msgid "Boolean"
 msgstr "Логический"
 
@@ -1160,7 +1160,7 @@ msgstr "НАСТРОЙКА ZABBIX"
 msgid "Calculate SLA, acceptable SLA (in %)"
 msgstr "Вычислять SLA, допустимый уровень SLA (в %)"
 
-#: include/items.inc.php:92 include/views/configuration.graph.edit.php:164
+#: include/items.inc.php:97 include/views/configuration.graph.edit.php:164
 #: include/views/configuration.graph.edit.php:219
 msgid "Calculated"
 msgstr "Вычисляемое"
@@ -1760,8 +1760,8 @@ msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не удалось найти узел сети \"%1$s\" используемый в комплексном экране \"%2$s\"."
 
 #: api/classes/CDiscoveryRule.php:748 api/classes/CDiscoveryRule.php:824
-#: api/classes/CItemGeneral.php:101 include/items.inc.php:339
-#: include/items.inc.php:390
+#: api/classes/CItemGeneral.php:101 include/items.inc.php:344
+#: include/items.inc.php:395
 #, php-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
 msgstr "Не удалось найти интерфейс у узла сети \"%1$s\" для ключа элемента данных \"%2$s\"."
@@ -2298,7 +2298,7 @@ msgstr "Изменение"
 msgid "Change password"
 msgstr "Изменить пароль"
 
-#: include/forms.inc.php:423 include/items.inc.php:120
+#: include/forms.inc.php:423 include/items.inc.php:125
 #: include/triggers.inc.php:2199 include/views/configuration.item.edit.php:224
 #: include/views/configuration.item.massupdate.php:210
 msgid "Character"
@@ -2992,6 +2992,10 @@ msgstr "Создано: Прототип триггера \"%1$s\" в \"%2$s\"."
 msgid "Created: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "Создано: Веб-сценарий \"%1$s\" в \"%2$s\"."
 
+#: include/items.inc.php:41
+msgid "Critical"
+msgstr ""
+
 #: popup_trexpr.php:365
 msgid "Current date is < N"
 msgstr "Текущая дата < N"
@@ -3197,7 +3201,7 @@ msgstr "Файл базы данных"
 msgid "Database host"
 msgstr "Хост базы данных"
 
-#: include/items.inc.php:87
+#: include/items.inc.php:92
 msgid "Database monitor"
 msgstr "Монитор баз данных"
 
@@ -3323,7 +3327,7 @@ msgstr "Дек"
 msgid "December"
 msgstr "Декабрь"
 
-#: include/items.inc.php:133
+#: include/items.inc.php:138
 msgid "Decimal"
 msgstr "Десятичный"
 
@@ -3934,8 +3938,8 @@ msgid "Disable selected triggers?"
 msgstr "Деактивировать выбранные триггеры?"
 
 #: auditlogs.php:152 dashboard.php:270 include/discovery.inc.php:123
-#: include/httptest.inc.php:46 include/items.inc.php:150
-#: include/items.inc.php:204 include/triggers.inc.php:1606
+#: include/httptest.inc.php:46 include/items.inc.php:155
+#: include/items.inc.php:209 include/triggers.inc.php:1606
 #: include/triggers.inc.php:2455 include/users.inc.php:85
 #: include/views/administration.mediatypes.list.php:97
 #: include/views/administration.usergroups.list.php:59
@@ -4470,8 +4474,8 @@ msgid "Enable selected triggers?"
 msgstr "Активировать выбранные триггеры?"
 
 #: auditlogs.php:149 dashboard.php:270 include/discovery.inc.php:122
-#: include/httptest.inc.php:45 include/items.inc.php:149
-#: include/items.inc.php:201 include/triggers.inc.php:2452
+#: include/httptest.inc.php:45 include/items.inc.php:154
+#: include/items.inc.php:206 include/triggers.inc.php:2452
 #: include/views/administration.mediatypes.edit.php:96
 #: include/views/administration.mediatypes.list.php:96
 #: include/views/administration.usergroups.edit.php:65
@@ -4618,7 +4622,7 @@ msgstr "Ошибка выполнения SQL [%1$s] в [%2$s]."
 msgid "Execute on"
 msgstr "Выполнять на"
 
-#: include/items.inc.php:1396 include/views/configuration.item.edit.php:195
+#: include/items.inc.php:1401 include/views/configuration.item.edit.php:195
 msgid "Executed script"
 msgstr "Выполняемый скрипт"
 
@@ -4700,7 +4704,7 @@ msgstr "Тип выражения"
 msgid "Expressions"
 msgstr "Выражения"
 
-#: include/items.inc.php:86
+#: include/items.inc.php:91
 msgid "External check"
 msgstr "Внешняя проверка"
 
@@ -4908,7 +4912,7 @@ msgstr "Переменные интервалы"
 msgid "For guest, password must be empty"
 msgstr "Пароль для Гостя должен быть пустым"
 
-#: include/items.inc.php:1400 include/views/configuration.item.edit.php:207
+#: include/items.inc.php:1405 include/views/configuration.item.edit.php:207
 msgid "Formula"
 msgstr "Формула"
 
@@ -5405,7 +5409,7 @@ msgstr "Высота"
 msgid "Help"
 msgstr "Помощь"
 
-#: include/items.inc.php:134
+#: include/items.inc.php:139
 msgid "Hexadecimal"
 msgstr "Шестнадцатеричный"
 
@@ -5558,7 +5562,7 @@ msgstr "Доступ к узлу сети"
 msgid "Host added"
 msgstr "Узел сети добавлен"
 
-#: api/classes/CHostInterface.php:831
+#: api/classes/CHostInterface.php:844
 msgid "Host cannot have more than one default interface of the same type."
 msgstr "У узла сети не может быть более одного интерфейса по умолчанию с одинаковым типом."
 
@@ -5790,7 +5794,7 @@ msgid "Host with the same visible name \"%s\" already exists."
 msgstr "Узел сети с таким же видимым именем \"%s\" уже существует."
 
 #: hostinventoriesoverview.php:85 hosts.php:752 include/forms.inc.php:217
-#: include/forms.inc.php:894 include/items.inc.php:808
+#: include/forms.inc.php:894 include/items.inc.php:813
 #: include/menu.inc.php:112 include/menu.inc.php:168
 #: include/reports.inc.php:378 include/views/administration.proxy.edit.php:88
 #: include/views/administration.proxy.list.php:52
@@ -5911,7 +5915,7 @@ msgstr "Диапазон IP адресов"
 msgid "IP range cannot be empty."
 msgstr "Диапазон IP адресов не может быть пустым."
 
-#: include/hosts.inc.php:477 include/items.inc.php:242
+#: include/hosts.inc.php:477 include/items.inc.php:247
 #: include/views/administration.script.edit.php:46
 #: include/views/administration.script.list.php:54
 #: include/views/configuration.action.edit.php:681
@@ -5921,7 +5925,7 @@ msgstr "Диапазон IP адресов не может быть пустым
 msgid "IPMI"
 msgstr "IPMI"
 
-#: include/items.inc.php:88
+#: include/items.inc.php:93
 msgid "IPMI agent"
 msgstr "IPMI агент"
 
@@ -6561,17 +6565,17 @@ msgstr "Некорректный ID прототипа узла сети."
 msgid "Incorrect image index."
 msgstr "Некорректный номер изображения."
 
-#: api/classes/CHostInterface.php:630
+#: api/classes/CHostInterface.php:643
 #, php-format
 msgid "Incorrect interface DNS parameter \"%s\" provided."
 msgstr "Для интерфейса указан некорректный параметр DNS \"%s\"."
 
-#: api/classes/CHostInterface.php:645
+#: api/classes/CHostInterface.php:658
 #, php-format
 msgid "Incorrect interface IP parameter \"%s\" provided."
 msgstr "Указан некорректный параметр IP адреса \"%s\" для интерфейса."
 
-#: api/classes/CHostInterface.php:661
+#: api/classes/CHostInterface.php:674
 #, php-format
 msgid "Incorrect interface port \"%s\" provided."
 msgstr "Для интерфейса указан некорректный порт \"%s\"."
@@ -6978,7 +6982,7 @@ msgstr "Имя установщика"
 msgid "Interface"
 msgstr "Интерфейс"
 
-#: api/classes/CHostInterface.php:851
+#: api/classes/CHostInterface.php:864
 #, php-format
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
 msgstr "Интерфейс связан с элементом данных \"%1$s\" в \"%2$s\"."
@@ -7323,7 +7327,7 @@ msgid "Item with key \"%1$s\" already exists."
 msgstr "Элемент данных с ключем \"%1$s\" уже существует."
 
 #: hosts.php:795 hosts.php:886 include/html.inc.php:420
-#: include/html.inc.php:424 include/items.inc.php:791
+#: include/html.inc.php:424 include/items.inc.php:796
 #: include/reports.inc.php:117 include/reports.inc.php:257
 #: include/views/configuration.application.list.php:99
 #: include/views/configuration.graph.edit.php:276
@@ -7367,11 +7371,11 @@ msgstr "Список элементов данных"
 msgid "Items updated"
 msgstr "Элементы данных обновлены"
 
-#: include/hosts.inc.php:474 include/items.inc.php:241
+#: include/hosts.inc.php:474 include/items.inc.php:246
 msgid "JMX"
 msgstr "JMX"
 
-#: include/items.inc.php:91
+#: include/items.inc.php:96
 msgid "JMX agent"
 msgstr "JMX агент"
 
@@ -7927,7 +7931,7 @@ msgstr "Размещение (широта)"
 msgid "Location longitude"
 msgstr "Размещение (долгота)"
 
-#: include/forms.inc.php:424 include/items.inc.php:122
+#: include/forms.inc.php:424 include/items.inc.php:127
 #: include/triggers.inc.php:2200 include/views/configuration.item.edit.php:225
 #: include/views/configuration.item.massupdate.php:211
 msgid "Log"
@@ -8319,6 +8323,14 @@ msgstr "Макс. количество отображаемых событий �
 #: include/func.inc.php:2213
 msgid "Maximize"
 msgstr "Развернуть"
+
+#: api/classes/CHostInterface.php:633
+#, php-format
+msgid "Maximum DNS name length is %2$d characters, \"%3$s\" is %1$d character."
+msgid_plural "Maximum DNS name length is %2$d characters, \"%3$s\" is %1$d characters."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: api/classes/CUser.php:315
 #, php-format
@@ -9032,7 +9044,7 @@ msgstr "Не получено данных в течении T периода в
 msgid "No data received during period of time T, then N NOT 1, 0 - otherwise"
 msgstr "Не получено данных в течении T периода времени, тогда N NOT 1, 0 - в противном случае"
 
-#: api/classes/CHostInterface.php:827
+#: api/classes/CHostInterface.php:840
 #, php-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "Нет интерфейса по умолчанию для \"%1$s\" типа у \"%2$s\"."
@@ -9240,17 +9252,17 @@ msgstr "Не указан ID элемента данных для элемент
 msgid "No item prototypes defined."
 msgstr "Прототипы элементов данных не заданы."
 
-#: include/items.inc.php:494
+#: include/items.inc.php:499
 #, php-format
 msgid "No item with itemid \"%1$s\"."
 msgstr "Нет элемента данных с itemid \"%1$s\"."
 
-#: include/items.inc.php:477
+#: include/items.inc.php:482
 #, php-format
 msgid "No item with itemid=\"%1$s\"."
 msgstr "Нет элемента данных с itemid=\"%1$s\"."
 
-#: chart3.php:119 include/items.inc.php:782
+#: chart3.php:119 include/items.inc.php:787
 #: include/views/configuration.graph.edit.php:64
 #: include/views/configuration.item.list.php:58
 #: include/views/monitoring.overview.php:111 popup.php:675 popup.php:808
@@ -9371,7 +9383,7 @@ msgstr "Нет прав доступа в систему."
 #: api/classes/CHostGroup.php:893 api/classes/CHostGroup.php:902
 #: api/classes/CHostGroup.php:924 api/classes/CHostInterface.php:319
 #: api/classes/CHostInterface.php:335 api/classes/CHostInterface.php:476
-#: api/classes/CHostInterface.php:674 api/classes/CHost.php:688
+#: api/classes/CHostInterface.php:687 api/classes/CHost.php:688
 #: api/classes/CHost.php:716 api/classes/CHost.php:1813
 #: api/classes/CHostPrototype.php:1020 api/classes/CHostPrototype.php:1035
 #: api/classes/CHostPrototype.php:1048 api/classes/CHostPrototype.php:1061
@@ -9623,7 +9635,7 @@ msgstr "Нода"
 msgid "None"
 msgstr "Пусто"
 
-#: include/graphs.inc.php:24 include/items.inc.php:175
+#: include/graphs.inc.php:24 include/items.inc.php:180
 #: include/triggers.inc.php:1604 popup.php:1139
 msgid "Normal"
 msgstr "Нормальный"
@@ -9673,7 +9685,7 @@ msgstr "Не подключен"
 msgid "Not monitored"
 msgstr "Без наблюдения"
 
-#: include/items.inc.php:176 include/items.inc.php:201
+#: include/items.inc.php:181 include/items.inc.php:206
 msgid "Not supported"
 msgstr "Не поддерживается"
 
@@ -9772,7 +9784,7 @@ msgstr "Количество триггеров (активированных/д
 msgid "Number of users (online)"
 msgstr "Количество пользователей (в сети)"
 
-#: include/forms.inc.php:422 include/items.inc.php:118
+#: include/forms.inc.php:422 include/items.inc.php:123
 #: include/triggers.inc.php:2198 include/views/configuration.item.edit.php:223
 #: include/views/configuration.item.massupdate.php:209
 msgid "Numeric (float)"
@@ -9784,7 +9796,7 @@ msgstr "Числовой (с плавающей точкой)"
 msgid "Numeric (integer 64bit)"
 msgstr "Числовой (целое 64бит)"
 
-#: include/forms.inc.php:421 include/items.inc.php:116
+#: include/forms.inc.php:421 include/items.inc.php:121
 #: include/views/configuration.item.edit.php:222
 #: include/views/configuration.item.massupdate.php:208
 msgid "Numeric (unsigned)"
@@ -9849,7 +9861,7 @@ msgstr "ОБЗОР"
 msgid "Oct"
 msgstr "Окт"
 
-#: include/items.inc.php:132
+#: include/items.inc.php:137
 msgid "Octal"
 msgstr "Восьмеричный"
 
@@ -10526,7 +10538,7 @@ msgstr "Заполнение поля инвентаря узла сети"
 msgid "Port"
 msgstr "Порт"
 
-#: api/classes/CHostInterface.php:658
+#: api/classes/CHostInterface.php:671
 msgid "Port cannot be empty for host interface."
 msgstr "Порт не может быть пустым у интерфейса узла сети."
 
@@ -11298,7 +11310,7 @@ msgstr "SMTP helo"
 msgid "SMTP server"
 msgstr "SMTP сервер"
 
-#: include/hosts.inc.php:471 include/items.inc.php:240
+#: include/hosts.inc.php:471 include/items.inc.php:245
 msgid "SNMP"
 msgstr "SNMP"
 
@@ -11326,7 +11338,7 @@ msgstr "SNMP community"
 msgid "SNMP interfaces"
 msgstr "Интерфейсы SNMP"
 
-#: include/items.inc.php:82
+#: include/items.inc.php:87
 msgid "SNMP trap"
 msgstr "SNMP trap"
 
@@ -11334,17 +11346,17 @@ msgstr "SNMP trap"
 msgid "SNMP trap key is invalid."
 msgstr "Ключ SNMP trap ошибочный."
 
-#: include/discovery.inc.php:67 include/items.inc.php:79
+#: include/discovery.inc.php:67 include/items.inc.php:84
 #: include/views/js/configuration.discovery.edit.js.php:178
 msgid "SNMPv1 agent"
 msgstr "SNMPv1 агент"
 
-#: include/discovery.inc.php:68 include/items.inc.php:80
+#: include/discovery.inc.php:68 include/items.inc.php:85
 #: include/views/js/configuration.discovery.edit.js.php:179
 msgid "SNMPv2 agent"
 msgstr "SNMPv2 агент"
 
-#: include/discovery.inc.php:69 include/items.inc.php:81
+#: include/discovery.inc.php:69 include/items.inc.php:86
 #: include/views/js/configuration.discovery.edit.js.php:180
 msgid "SNMPv3 agent"
 msgstr "SNMPv3 агент"
@@ -11354,7 +11366,7 @@ msgstr "SNMPv3 агент"
 msgid "SQL count: %s (selects: %s | executes: %s)"
 msgstr "Количество SQL: %s (selects: %s | executes: %s)"
 
-#: include/items.inc.php:1398 include/views/configuration.item.edit.php:199
+#: include/items.inc.php:1403 include/views/configuration.item.edit.php:199
 msgid "SQL query"
 msgstr "SQL запрос"
 
@@ -11375,7 +11387,7 @@ msgstr "Ошибка при выполнении SQL запроса \"%1$s\"."
 msgid "SSH"
 msgstr "SSH"
 
-#: include/items.inc.php:89
+#: include/items.inc.php:94
 msgid "SSH agent"
 msgstr "SSH агент"
 
@@ -12029,7 +12041,7 @@ msgstr "Войти"
 msgid "Simple"
 msgstr "Простой"
 
-#: include/items.inc.php:78
+#: include/items.inc.php:83
 msgid "Simple check"
 msgstr "Простая проверка"
 
@@ -12437,7 +12449,7 @@ msgstr "Вт"
 msgid "TCP"
 msgstr "TCP"
 
-#: include/items.inc.php:90
+#: include/items.inc.php:95
 msgid "TELNET agent"
 msgstr "TELNET агент"
 
@@ -12628,7 +12640,7 @@ msgstr "Тест выражений"
 msgid "Test string"
 msgstr "Тестовая строка"
 
-#: include/forms.inc.php:425 include/items.inc.php:124
+#: include/forms.inc.php:425 include/items.inc.php:129
 #: include/triggers.inc.php:2201 include/views/configuration.item.edit.php:226
 #: include/views/configuration.item.massupdate.php:212
 msgid "Text"
@@ -13296,10 +13308,10 @@ msgstr "Единица измерения"
 #: include/events.inc.php:78 include/graphs.inc.php:37
 #: include/graphs.inc.php:77 include/hosts.inc.php:53 include/hosts.inc.php:80
 #: include/html.inc.php:374 include/httptest.inc.php:39
-#: include/httptest.inc.php:56 include/items.inc.php:41
-#: include/items.inc.php:102 include/items.inc.php:126
-#: include/items.inc.php:143 include/items.inc.php:159
-#: include/items.inc.php:186 include/items.inc.php:207
+#: include/httptest.inc.php:56 include/items.inc.php:45
+#: include/items.inc.php:107 include/items.inc.php:131
+#: include/items.inc.php:148 include/items.inc.php:164
+#: include/items.inc.php:191 include/items.inc.php:212
 #: include/maintenances.inc.php:42 include/maps.inc.php:39
 #: include/media.inc.php:40 include/nodes.inc.php:265 include/perm.inc.php:30
 #: include/regexp.inc.php:206 include/screens.inc.php:55
@@ -13339,7 +13351,7 @@ msgstr "Неизвестный тип интерфейса."
 msgid "Unknown resource"
 msgstr "Неизвестный ресурс"
 
-#: include/items.inc.php:973
+#: include/items.inc.php:978
 msgid "Unknown value type"
 msgstr "Неизвестный тип значения"
 
@@ -13839,6 +13851,10 @@ msgstr "Переменные"
 msgid "Vendor"
 msgstr "Поставщик"
 
+#: include/items.inc.php:43
+msgid "Verbose"
+msgstr ""
+
 #: include/views/configuration.screen.constructor.edit.php:543
 msgid "Vertical"
 msgstr "Вертикальный"
@@ -13889,7 +13905,7 @@ msgstr "Веб"
 msgid "Web checks"
 msgstr "Веб-проверки"
 
-#: dashboard.php:411 include/items.inc.php:93
+#: dashboard.php:411 include/items.inc.php:98
 msgid "Web monitoring"
 msgstr "Веб-мониторинг"
 
@@ -14334,7 +14350,7 @@ msgstr "Zabbix Супер-Администратор"
 msgid "Zabbix User"
 msgstr "Zabbix Пользователь"
 
-#: include/discovery.inc.php:66 include/items.inc.php:76
+#: include/discovery.inc.php:66 include/items.inc.php:81
 #: include/views/administration.script.edit.php:53
 #: include/views/configuration.action.edit.php:698
 #: include/views/js/configuration.action.edit.js.php:118
@@ -14342,11 +14358,11 @@ msgstr "Zabbix Пользователь"
 msgid "Zabbix agent"
 msgstr "Zabbix агент"
 
-#: include/items.inc.php:77
+#: include/items.inc.php:82
 msgid "Zabbix agent (active)"
 msgstr "Zabbix агент (активный)"
 
-#: include/items.inc.php:85
+#: include/items.inc.php:90
 msgid "Zabbix aggregate"
 msgstr "Zabbix агрегированный"
 
@@ -14354,7 +14370,7 @@ msgstr "Zabbix агрегированный"
 msgid "Zabbix has received an incorrect request."
 msgstr "Zabbix получил некорректный запрос."
 
-#: include/items.inc.php:83
+#: include/items.inc.php:88
 msgid "Zabbix internal"
 msgstr "Внутренний Zabbix"
 
@@ -14414,7 +14430,7 @@ msgstr "Имя сервера Zabbix"
 msgid "Zabbix server port"
 msgstr "Порт Zabbix сервера"
 
-#: include/items.inc.php:84
+#: include/items.inc.php:89
 msgid "Zabbix trapper"
 msgstr "Zabbix траппер"
 
