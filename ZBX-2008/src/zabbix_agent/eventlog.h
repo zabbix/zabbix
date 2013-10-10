@@ -43,8 +43,8 @@ typedef struct _EVT_VARIANT
 		float		SingleVal;
 		double		DoubleVal;
 		ULONGLONG	FileTimeVal;
-		SYSTEMTIME*	SysTimeVal;
-		GUID*		GuidVal;
+		SYSTEMTIME	*SysTimeVal;
+		GUID		*GuidVal;
 		LPCWSTR		StringVal;
 		LPCSTR		AnsiStringVal;
 		PBYTE		BinaryVal;
@@ -52,29 +52,29 @@ typedef struct _EVT_VARIANT
 		size_t		SizeTVal;
 
         	/* array fields */
-		BOOL*		BooleanArr;
-		INT8*		SByteArr;
-		INT16*		Int16Arr;
-		INT32*		Int32Arr;
-		INT64*		Int64Arr;
-		UINT8*		ByteArr;
-		UINT16*		UInt16Arr;
-		UINT32*		UInt32Arr;
-		UINT64*		UInt64Arr;
-		float*		SingleArr;
-		double*		DoubleArr;
-		FILETIME*	FileTimeArr;
-		SYSTEMTIME*	SysTimeArr;
-		GUID*		GuidArr;
-		LPWSTR*		StringArr;
-		LPSTR*		AnsiStringArr;
-		PSID*		SidArr;
-		size_t*		SizeTArr;
+		BOOL		*BooleanArr;
+		INT8		*SByteArr;
+		INT16		*Int16Arr;
+		INT32		*Int32Arr;
+		INT64		*Int64Arr;
+		UINT8		*ByteArr;
+		UINT16		*UInt16Arr;
+		UINT32		*UInt32Arr;
+		UINT64		*UInt64Arr;
+		float		*SingleArr;
+		double		*DoubleArr;
+		FILETIME	*FileTimeArr;
+		SYSTEMTIME	*SysTimeArr;
+		GUID		*GuidArr;
+		LPWSTR		*StringArr;
+		LPSTR		*AnsiStringArr;
+		PSID		*SidArr;
+		size_t		*SizeTArr;
 
 		/* internal fields */
 		EVT_HANDLE	EvtHandleVal;
 		LPCWSTR		XmlVal;
-		LPCWSTR*	XmlValArr;
+		LPCWSTR		*XmlValArr;
 	};
 
 	DWORD	Count;   /* number of elements (not length) in bytes */
