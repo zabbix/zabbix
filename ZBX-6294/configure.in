@@ -20,7 +20,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT(src/zabbix_server/server.c)
-AM_INIT_AUTOMAKE([zabbix],[2.1.7])
+AM_INIT_AUTOMAKE([zabbix],[2.1.8])
 
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
@@ -1445,6 +1445,7 @@ AC_OUTPUT([
 	src/zabbix_server/escalator/Makefile
 	src/zabbix_server/proxypoller/Makefile
 	src/zabbix_server/selfmon/Makefile
+	src/zabbix_server/vmware/Makefile
 	src/zabbix_proxy/Makefile
 	src/zabbix_proxy/heart/Makefile
 	src/zabbix_proxy/housekeeper/Makefile

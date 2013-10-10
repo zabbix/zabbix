@@ -4564,15 +4564,19 @@ void	DCconfig_set_trigger_value(zbx_uint64_t triggerid, unsigned char value,
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
-void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
+void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int maintenance_status,
 		int maintenance_type, int maintenance_from, int maintenance_until)
 {
+	int		i;
 	ZBX_DC_HOST	*dc_host;
 
 	LOCK_CACHE;
 
-	if (NULL != (dc_host = zbx_hashset_search(&config->hosts, &hostid)))
+	for (i = 0; i < hostids_num; i++)
 	{
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &hostids[i])))
+			continue;
+
 		if (dc_host->maintenance_status != maintenance_status)
 			dc_host->maintenance_from = maintenance_from;
 

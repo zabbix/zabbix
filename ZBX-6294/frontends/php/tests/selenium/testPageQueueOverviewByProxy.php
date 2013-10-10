@@ -51,8 +51,4 @@ class testPageQueueOverviewByProxy extends CWebTest {
 		$this->zbxTestTextPresent('Server');
 	}
 
-	public function testPageQueueOverviewByProxy_VerifyDisplayedNumbers() {
-// TODO
-		$this->markTestIncomplete();
-	}
 }

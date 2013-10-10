@@ -204,7 +204,8 @@ static const char	*get_register_name(int reg)
 		default:	return "unknown";
 	}
 }
-#endif	/* defned(HAVE_SYS_UCONTEXT_H) && (defined(REG_EIP) || defined(REG_RIP)) */
+
+#endif	/* defined(HAVE_SYS_UCONTEXT_H) && (defined(REG_EIP) || defined(REG_RIP)) */
 
 void	print_fatal_info(int sig, siginfo_t *siginfo, void *context)
 {

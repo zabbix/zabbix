@@ -38,6 +38,12 @@ Verbose mode, -vv for more details.
 Display this help and exit.
 .IP "-V, --version"
 Output version information and exit.
+
+.SH "EXIT STATUS"
+The exit status is 0 if the values were sent and all of them were successfully processed by server.
+If data was sent, but processing of at least one of the values failed, the exit status is 2.
+If data sending failed, the exit status is 1.
+
 .SH "EXAMPLES"
 .B zabbix_sender -c /usr/local/etc/zabbix_agentd.conf -s """Monitored Host""" -k mysql.queries -o 342.45
 

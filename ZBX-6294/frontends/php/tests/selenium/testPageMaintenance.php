@@ -80,11 +80,6 @@ class testPageMaintenance extends CWebTest {
 		$this->assertEquals($oldHashTimeperiods, DBhash($sqlTimeperiods), "Chuck Norris: Maintenance update changed data in table 'timeperiods'");
 	}
 
-	public function testPageMaintenance_MassDeleteAll() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
 	/**
 	* @dataProvider allMaintenances
 	*/
@@ -120,38 +115,4 @@ class testPageMaintenance extends CWebTest {
 		DBrestore_tables('maintenances');
 	}
 
-	public function testPageMaintenance_SingleEnable() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageMaintenance_SingleDisable() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageMaintenance_MassEnableAll() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageMaintenance_MassEnable() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageMaintenance_MassDisableAll() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageMaintenance_MassDisable() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageMaintenance_Sorting() {
-// TODO
-		$this->markTestIncomplete();
-	}
 }
