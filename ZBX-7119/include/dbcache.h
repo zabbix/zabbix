@@ -166,7 +166,7 @@ void	DCrequeue_unreachable_item(zbx_uint64_t itemid);
 int	DCconfig_activate_host(DC_ITEM *item);
 int	DCconfig_deactivate_host(DC_ITEM *item, int now);
 
-void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
+void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int host_num, int maintenance_status,
 		int maintenance_type, int maintenance_from);
 
 #define ZBX_CONFSTATS_BUFFER_TOTAL	1
