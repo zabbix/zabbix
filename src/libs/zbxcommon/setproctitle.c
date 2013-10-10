@@ -33,9 +33,7 @@ static size_t	prev_msg_size = 0;
 #if defined(PS_OVERWRITE_ARGV)
 /* external environment we got on startup */
 extern char	**environ;
-static int	argc_ext = 0;
 static int	argc_ext_copied_first = 0, argc_ext_copied_last = 0, environ_ext_copied = 0;
-static char	**argv_ext = NULL;
 
 /* internal copy of argv[] and environment variables */
 static char	**argv_int = NULL, **environ_int = NULL;
@@ -71,9 +69,6 @@ char **	setproctitle_save_env(int argc, char **argv)
 	int	i = 0, copy_first, copy_last;
 	char	*arg_end = NULL;
 
-	argc_ext = argc;
-	argv_ext = argv;
-
 	if (NULL == argv || 0 == argc)
 		return argv;
 
@@ -108,7 +103,9 @@ char **	setproctitle_save_env(int argc, char **argv)
 				argv[i] = empty_str;
 		}
 		else
+		{
 			break;
+		}
 	}
 
 	for (; i < argc; i++)
@@ -179,7 +176,9 @@ char **	setproctitle_save_env(int argc, char **argv)
 #elif defined(PS_PSTAT_ARGV)
 char **	setproctitle_save_env(int argc, char **argv)
 {
-	size_t	len0 = strlen(argv[0]);
+	size_t	len0;
+
+	len0 = strlen(argv[0]);
 
 	if (len0 + 2 < ps_buf_size)	/* is there space for ": " ? */
 	{
@@ -211,12 +210,13 @@ void	setproctitle_set_status(const char *status)
 	if (1 == initialized)
 	{
 #if defined(PS_DARWIN_ARGV)
-		size_t	msg_size = MIN(zbx_strlcpy(ps_buf, status, ps_buf_size), ps_buf_size);
+		size_t	msg_size;
+
+		msg_size = MIN(zbx_strlcpy(ps_buf, status, ps_buf_size), ps_buf_size);
 
 		if (prev_msg_size > msg_size)
-		{
 			memset(ps_buf + msg_size + 1, '\0', ps_buf_size - msg_size - 1);
-		}
+
 		prev_msg_size = msg_size;
 #else
 		zbx_strlcpy(ps_buf, status, ps_buf_size);
@@ -224,13 +224,15 @@ void	setproctitle_set_status(const char *status)
 	}
 	else if (NULL != ps_buf)
 	{
+		size_t	start_pos;
+
 		/* Initialization has not been moved to setproctitle_save_env() because setproctitle_save_env()	*/
 		/* is called from the main process and we do not change its command line.			*/
 		/* argv[] changing takes place only in child processes.						*/
 #if defined(PS_CONCAT_ARGV)
-		size_t	start_pos = strlen(argv_int[0]);
+		start_pos = strlen(argv_int[0]);
 #else
-		size_t	start_pos = strlen(ps_buf);
+		start_pos = strlen(ps_buf);
 #endif
 		if (start_pos + 2 < ps_buf_size)	/* is there space for ": " ? */
 		{
