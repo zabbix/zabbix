@@ -483,12 +483,13 @@ class CApplication extends CZBXAPI {
 	}
 
 	/**
-	 * Add Items to applications
+	 * Add Items to applications.
 	 *
 	 * @param array $data
 	 * @param array $data['applications']
 	 * @param array $data['items']
-	 * @return boolean
+	 *
+	 * @return bool
 	 */
 	public function massAdd($data) {
 		if (empty($data['applications'])) {
@@ -496,28 +497,38 @@ class CApplication extends CZBXAPI {
 		}
 
 		$applications = zbx_toArray($data['applications']);
-		$items = zbx_toArray($data['items']);
-		$applicationids = zbx_objectValues($applications, 'applicationid');
-		$itemids = zbx_objectValues($items, 'itemid');
+		$applicationIds = zbx_objectValues($applications, 'applicationid');
+		$hostId = null;
 
 		// validate permissions
-		$appOptions = array(
-			'applicationids' => $applicationids,
-			'editable' => 1,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => 1
-		);
-		$allowedApplications = $this->get($appOptions);
+		$allowedApplications = $this->get(array(
+			'applicationids' => $applicationIds,
+			'output' => array('applicationid', 'hostid'),
+			'editable' => true,
+			'preservekeys' => true
+		));
 		foreach ($applications as $application) {
 			if (!isset($allowedApplications[$application['applicationid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
+
+			if ($hostId) {
+				if ($hostId != $allowedApplications[$application['applicationid']]['hostid']) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot process applications from different hosts or templates!'));
+				}
+			}
+			else {
+				$hostId = $allowedApplications[$application['applicationid']]['hostid'];
+			}
 		}
 
+		$items = zbx_toArray($data['items']);
+		$itemIds = zbx_objectValues($items, 'itemid');
+
 		$allowedItems = API::Item()->get(array(
-			'itemids' => $itemids,
+			'itemids' => $itemIds,
 			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('itemid', 'hostid'),
 			'preservekeys' => true,
 			'filter' => array(
 				'flags' => array(
@@ -527,57 +538,69 @@ class CApplication extends CZBXAPI {
 				)
 			)
 		));
-
-		foreach ($items as $num => $item) {
+		foreach ($items as $item) {
 			if (!isset($allowedItems[$item['itemid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+			}
+
+			if ($allowedItems[$item['itemid']]['hostid'] != $hostId) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot process items from different hosts or templates!'));
 			}
 		}
 
 		$linkedDb = DBselect(
 			'SELECT ia.itemid,ia.applicationid'.
 			' FROM items_applications ia'.
-			' WHERE '.dbConditionInt('ia.itemid', $itemids).
-				' AND '.dbConditionInt('ia.applicationid', $applicationids)
+			' WHERE '.dbConditionInt('ia.itemid', $itemIds).
+				' AND '.dbConditionInt('ia.applicationid', $applicationIds)
 		);
 		while ($pair = DBfetch($linkedDb)) {
 			$linked[$pair['applicationid']][$pair['itemid']] = true;
 		}
-		$appsInsert = array();
-		foreach ($applicationids as $applicationid) {
-			foreach ($itemids as $inum => $itemid) {
-				if (isset($linked[$applicationid]) && isset($linked[$applicationid][$itemid])) {
+
+		$createApplications = array();
+
+		foreach ($applicationIds as $applicationId) {
+			foreach ($itemIds as $itemId) {
+				if (isset($linked[$applicationId]) && isset($linked[$applicationId][$itemId])) {
 					continue;
 				}
-				$appsInsert[] = array(
-					'itemid' => $itemid,
-					'applicationid' => $applicationid
+
+				$createApplications[] = array(
+					'itemid' => $itemId,
+					'applicationid' => $applicationId
 				);
 			}
 		}
-		DB::insert('items_applications', $appsInsert);
 
-		foreach ($itemids as $inum => $itemid) {
-			$dbChilds = DBselect('SELECT i.itemid,i.hostid FROM items i WHERE i.templateid='.zbx_dbstr($itemid));
+		DB::insert('items_applications', $createApplications);
+
+		// mass add applications for childs
+		foreach ($itemIds as $itemId) {
+			$dbChilds = DBselect('SELECT i.itemid,i.hostid FROM items i WHERE i.templateid='.zbx_dbstr($itemId));
+
 			while ($child = DBfetch($dbChilds)) {
-				$dbApps = DBselect(
+				$dbApplications = DBselect(
 					'SELECT a1.applicationid'.
 					' FROM applications a1,applications a2'.
 					' WHERE a1.name=a2.name'.
 						' AND a1.hostid='.$child['hostid'].
-						' AND '.dbConditionInt('a2.applicationid', $applicationids)
+						' AND '.dbConditionInt('a2.applicationid', $applicationIds)
 				);
+
 				$childApplications = array();
-				while ($app = DBfetch($dbApps)) {
-					$childApplications[] = $app;
+
+				while ($dbApplication = DBfetch($dbApplications)) {
+					$childApplications[] = $dbApplication;
 				}
-				$result = $this->massAdd(array('items' => $child, 'applications' => $childApplications));
-				if (!$result) {
+
+				if (!$result = $this->massAdd(array('items' => $child, 'applications' => $childApplications))) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add items.'));
 				}
 			}
 		}
-		return array('applicationids'=> $applicationids);
+
+		return array('applicationids' => $applicationIds);
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
