@@ -200,6 +200,10 @@ if (defined('ZBX_PAGE_NO_HEADER')) {
 }
 
 if (!defined('ZBX_PAGE_NO_MENU')) {
+	$ro_info = new CLink(_('READ ONLY MODE'), 'https://confluence.atlas.llnw.com/display/CDNENG/M3+-+Zabbix+Permissions', 'small_font', null, 'nosid');
+	$ro_info->setTarget('_blank');
+	// Style inline to avoid patch sprawl
+	$ro_info->setAttribute("style", "color: #F00; background: yellow; font-weight: bold;");
 	$help = new CLink(_('Help'), 'http://www.zabbix.com/documentation/', 'small_font', null, 'nosid');
 	$help->setTarget('_blank');
 	$support = new CLink(_('Get support'), 'http://www.zabbix.com/support.php', 'small_font', null, 'nosid');
@@ -207,7 +211,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 
 	$printview = new CLink(_('Print'), '', 'small_font print-link', null, 'nosid');
 
-	$page_header_r_col = array($help, '|', $support, '|', $printview, '|');
+	$page_header_r_col = array($ro_info, '|', $help, '|', $support, '|', $printview);
 
 	if (!CWebUser::isGuest()) {
 		array_push($page_header_r_col, new CLink(_('Profile'), 'profile.php', 'small_font', null, 'nosid'), '|');

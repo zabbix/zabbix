@@ -514,10 +514,42 @@ function DBaddLimit($query, $limit = 0, $offset = 0) {
 	return $query;
 }
 
+/**
+ * Whitelist and blacklist configuration for read-only mode at the database level.
+ * @param String $query
+ * @return boolean
+ */
+function _llnw_allow_DBexecute($query) {
+	$whitelist = array(
+		"UPDATE sessions",
+		"INSERT INTO sessions",
+		"DELETE FROM sessions", // Allow session changes
+		"UPDATE ids SET nextid=nextid+1 WHERE nodeid=0 AND table_name='profiles' AND field_name='profileid'", // needed for footer:
+		// page_footer.php:46:CProfile::flush()
+	);
+	foreach ($whitelist as $allow) {
+		if (stripos($query, $allow) !== FALSE) {
+			return true;
+		}
+	}
+
+	$blacklist = array("INSERT", "UPDATE", "DELETE");
+	foreach ($blacklist as $deny) {
+		if (stripos($query, $deny) !== FALSE) {
+			return false;
+		}
+	}
+
+	return true; // catchall
+}
+
 function DBexecute($query, $skip_error_messages = 0) {
 	global $DB;
 
 	if (!isset($DB['DB']) || empty($DB['DB'])) {
+		return false;
+	}
+	if (!_llnw_allow_DBexecute($query)) {
 		return false;
 	}
 
