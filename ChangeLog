@@ -1,5 +1,6 @@
 Changes for 1.8.19rc1
 
+..F....... [ZBX-7074] fixed incorrectly parsed trigger expression in trigger wizard (Vitalij)
 
 Changes for 1.8.18
 
