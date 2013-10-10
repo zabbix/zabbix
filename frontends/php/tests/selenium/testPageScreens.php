@@ -114,29 +114,6 @@ class testPageScreens extends CWebTest {
 		$this->zbxTestTextNotPresent('Columns');
 	}
 
-	public function testPageScreens_Import() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageScreens_MassExportAll() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	/**
-	* @dataProvider allScreens
-	*/
-	public function testPageScreens_MassExport($action) {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageScreens_MassDeleteAll() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
 	/**
 	* @dataProvider allScreens
 	*/
@@ -170,8 +147,4 @@ class testPageScreens extends CWebTest {
 		DBrestore_tables('screens');
 	}
 
-	public function testPageScreens_Sorting() {
-// TODO
-		$this->markTestIncomplete();
-	}
 }

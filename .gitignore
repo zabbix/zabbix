@@ -5,8 +5,11 @@
 /Makefile.in
 /aclocal.m4
 /autom4te.cache
+build/win32/examples/zabbix_sender/sender.exe
+build/win32/examples/zabbix_sender/sender.obj
 build/win32/project/*.idb
 build/win32/project/*.manifest
+build/win32/project/*.res
 build/win32/project/MSG00001.bin
 build/win32/project/messages.h
 build/win32/project/messages.rc
@@ -288,6 +291,9 @@ src/zabbix_server/trapper/Makefile.in
 src/zabbix_server/utils/.deps
 src/zabbix_server/utils/Makefile
 src/zabbix_server/utils/Makefile.in
+src/zabbix_server/vmware/.deps
+src/zabbix_server/vmware/Makefile
+src/zabbix_server/vmware/Makefile.in
 src/zabbix_server/watchdog/.deps
 src/zabbix_server/watchdog/Makefile
 src/zabbix_server/watchdog/Makefile.in

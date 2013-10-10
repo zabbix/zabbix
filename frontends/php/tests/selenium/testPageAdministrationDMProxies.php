@@ -88,40 +88,4 @@ class testPageAdministrationDMProxies extends CWebTest {
 		$this->verifyHash();
 	}
 
-/*
-	public function testPageAdministrationDMProxies_MassActivateAll() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageAdministrationDMProxies_MassActivate($proxy) {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageAdministrationDMProxies_MassDisableAll() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageAdministrationDMProxies_MassDisable($proxy) {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageAdministrationDMProxies_MassDeleteAll() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageAdministrationDMProxies_MassDelete($proxy) {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageAdministrationDMProxies_Sorting() {
-// TODO
-		$this->markTestIncomplete();
-	}
-*/
 }

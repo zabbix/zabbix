@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef JSON_PARSER_H_
-#define JSON_PARSER_H_
+#ifndef ZABBIX_JSON_PARSER_H
+#define ZABBIX_JSON_PARSER_H
 
 #define SKIP_WHITESPACE(src)	\
-	while ('\0' != *src && NULL != strchr(ZBX_WHITESPACE, *src)) src++;
+	while ('\0' != *src && NULL != strchr(ZBX_WHITESPACE, *src)) src++
 
 int	zbx_json_validate(const char *start, char **error);
 

@@ -31,8 +31,4 @@ class testPageQueueDetails extends CWebTest {
 		$this->zbxTestTextPresent('Total:');
 	}
 
-	public function testPageQeueOverviewDetails_VerifyDisplayedNumbers() {
-// TODO
-		$this->markTestIncomplete();
-	}
 }
