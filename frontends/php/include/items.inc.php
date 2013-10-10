@@ -37,6 +37,10 @@ function get_item_logtype_description($logtype) {
 			return _('Failure Audit');
 		case ITEM_LOGTYPE_SUCCESS_AUDIT:
 			return _('Success Audit');
+		case ITEM_LOGTYPE_CRITICAL:
+			return _('Critical');
+		case ITEM_LOGTYPE_VERBOSE:
+			return _('Verbose');
 		default:
 			return _('Unknown');
 	}
@@ -51,15 +55,16 @@ function get_item_logtype_description($logtype) {
 function get_item_logtype_style($logtype) {
 	switch ($logtype) {
 		case ITEM_LOGTYPE_INFORMATION:
+		case ITEM_LOGTYPE_SUCCESS_AUDIT:
+		case ITEM_LOGTYPE_VERBOSE:
 			return 'information';
 		case ITEM_LOGTYPE_WARNING:
 			return 'warning';
 		case ITEM_LOGTYPE_ERROR:
-			return 'high';
 		case ITEM_LOGTYPE_FAILURE_AUDIT:
 			return 'high';
-		case ITEM_LOGTYPE_SUCCESS_AUDIT:
-			return 'information';
+		case ITEM_LOGTYPE_CRITICAL:
+			return 'disaster';
 		default:
 			return 'normal';
 	}
