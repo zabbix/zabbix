@@ -792,11 +792,14 @@ class CConfigurationImport {
 
 
 					foreach ($graph['gitems'] as &$gitem) {
-						$gitemhostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host']);
+						if (!$gitemHostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host'])) {
+							throw new Exception(_s('Cannot find host or template "%1$s" used in graph "%2$s".',
+								$gitem['item']['host'], $graph['name']));
+						}
 
-						$gitem['itemid'] = $this->referencer->resolveItem($gitemhostId, $gitem['item']['key']);
+						$gitem['itemid'] = $this->referencer->resolveItem($gitemHostId, $gitem['item']['key']);
 
-						$graphHostIds[$gitemhostId] = $gitemhostId;
+						$graphHostIds[$gitemHostId] = $gitemHostId;
 					}
 					unset($gitem);
 
@@ -871,8 +874,8 @@ class CConfigurationImport {
 
 			foreach ($graph['gitems'] as &$gitem) {
 				if (!$gitemHostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host'])) {
-					throw new Exception(_s('Host or template "%1$s" does not exist is graph item "%2$s".',
-						$gitem['item']['host'], $gitem['item']['key']));
+					throw new Exception(_s('Cannot find host or template "%1$s" used in graph "%2$s".',
+						$gitem['item']['host'], $graph['name']));
 				}
 
 				$gitem['itemid'] = $this->referencer->resolveItem($gitemHostId, $gitem['item']['key']);
