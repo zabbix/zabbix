@@ -246,7 +246,7 @@ if ($this->data['host']['inventory']) {
 }
 
 if (!$inventoryValues) {
-	$hostInventoriesTab->setDisabled([1]);
+	$hostInventoriesTab->setDisabled(array(1));
 }
 
 $hostInventoriesTab->addTab('detailsTab', _('Details'), $detailsFormList);
