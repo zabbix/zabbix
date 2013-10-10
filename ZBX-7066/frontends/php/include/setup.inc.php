@@ -570,7 +570,7 @@ class CsetupWizard extends CForm {
 			if (isset($_REQUEST['save_config'])) {
 				// make zabbix.conf.php downloadable
 				header('Content-Type: application/x-httpd-php');
-				header('Content-Disposition: attachment; filename="'.basename(Z::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH).'"');
+				header('Content-Disposition: attachment; filename="'.basename(CConfigFile::CONFIG_FILE_PATH).'"');
 				$config = new CConfigFile(Z::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH);
 				$config->config = array(
 					'DB' => array(
