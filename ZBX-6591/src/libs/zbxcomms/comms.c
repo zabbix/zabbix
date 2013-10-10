@@ -1101,18 +1101,19 @@ char	*get_ip_by_socket(zbx_sock_t *s)
 	return buffer;
 }
 
-static int	zbx_ip_cmp(struct addrinfo *current_ai, ZBX_SOCKADDR name)
+#if defined(HAVE_IPV6)
+static int	zbx_ip_cmp(const struct addrinfo *current_ai, ZBX_SOCKADDR name)
 {
 	/* Network Byte Order is ensured */
-	/* IPv4-Compatible, the first 96 bits are zeros */
-	unsigned char	ipv4_cmp_mask[12] = {0};
-	/* IPv4-Mapped, the first 80 bits are zeros, 16 next - ones */
-	unsigned char	ipv4_mpd_mask[12] = {0,0,0,0,0,0,0,0,0,0,255,255};
+	/* IPv4-compatible, the first 96 bits are zeros */
+	const unsigned char	ipv4_compat_mask[12] = {0};
+	/* IPv4-mapped, the first 80 bits are zeros, 16 next - ones */
+	const unsigned char	ipv4_mapped_mask[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255};
 
-	struct sockaddr_in	*name4 = (struct sockaddr_in*)&name,
-				*ai_addr4 = (struct sockaddr_in*)current_ai->ai_addr;
+	struct sockaddr_in	*name4 = (struct sockaddr_in *)&name,
+				*ai_addr4 = (struct sockaddr_in *)current_ai->ai_addr;
 	struct sockaddr_in6	*name6 = (struct sockaddr_in6 *)&name,
-				*ai_addr6 = (struct sockaddr_in6*)current_ai->ai_addr;
+				*ai_addr6 = (struct sockaddr_in6 *)current_ai->ai_addr;
 
 #ifdef HAVE_SOCKADDR_STORAGE_SS_FAMILY
 	if (current_ai->ai_family == name.ss_family)
@@ -1122,13 +1123,13 @@ static int	zbx_ip_cmp(struct addrinfo *current_ai, ZBX_SOCKADDR name)
 	{
 		switch (current_ai->ai_family)
 		{
-			case AF_INET  :
+			case AF_INET:
 				if (name4->sin_addr.s_addr == ai_addr4->sin_addr.s_addr)
 				{
 					return SUCCEED;
 				}
 				break;
-			case AF_INET6 :
+			case AF_INET6:
 				if (0 == memcmp(name6->sin6_addr.s6_addr, ai_addr6->sin6_addr.s6_addr,
 						sizeof(struct in6_addr)))
 				{
@@ -1141,30 +1142,32 @@ static int	zbx_ip_cmp(struct addrinfo *current_ai, ZBX_SOCKADDR name)
 	{
 		switch (current_ai->ai_family)
 		{
-			case AF_INET  :
-				/* incoming AF_INET6, must see whether it is comp or mapped */
-				if ((0 == memcmp(name6->sin6_addr.s6_addr, ipv4_cmp_mask, 12) ||
-						0 == memcmp(name6->sin6_addr.s6_addr, ipv4_mpd_mask, 12)) &&
+			case AF_INET:
+				/* incoming AF_INET6, must see whether it is compatible or mapped */
+				if ((0 == memcmp(name6->sin6_addr.s6_addr, ipv4_compat_mask, 12) ||
+						0 == memcmp(name6->sin6_addr.s6_addr, ipv4_mapped_mask, 12)) &&
 						0 == memcmp(&name6->sin6_addr.s6_addr[12],
-						(unsigned char*)&ai_addr4->sin_addr.s_addr, 4))
+						(unsigned char *)&ai_addr4->sin_addr.s_addr, 4))
 				{
 					return SUCCEED;
 				}
 				break;
-			case AF_INET6 :
-				/* incoming AF_INET, must see whether the given is comp or mapped */
-				if ((0 == memcmp(ai_addr6->sin6_addr.s6_addr, ipv4_cmp_mask, 12) ||
-						0 == memcmp(ai_addr6->sin6_addr.s6_addr, ipv4_mpd_mask, 12)) &&
+			case AF_INET6:
+				/* incoming AF_INET, must see whether the given is compatible or mapped */
+				if ((0 == memcmp(ai_addr6->sin6_addr.s6_addr, ipv4_compat_mask, 12) ||
+						0 == memcmp(ai_addr6->sin6_addr.s6_addr, ipv4_mapped_mask, 12)) &&
 						0 == memcmp(&ai_addr6->sin6_addr.s6_addr[12],
-						(unsigned char*)&name4->sin_addr.s_addr, 4))
+						(unsigned char *)&name4->sin_addr.s_addr, 4))
 				{
 					return SUCCEED;
 				}
 				break;
 		}
 	}
+
 	return FAIL;
 }
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -1188,7 +1191,7 @@ static int	zbx_ip_cmp(struct addrinfo *current_ai, ZBX_SOCKADDR name)
 int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empty)
 {
 #if defined(HAVE_IPV6)
-	struct addrinfo	hints, *ai = NULL, *current_ai = NULL;
+	struct addrinfo	hints, *ai = NULL, *current_ai;
 #else
 	struct hostent	*hp;
 	char		*sip;
