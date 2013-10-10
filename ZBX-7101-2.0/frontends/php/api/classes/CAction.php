@@ -184,7 +184,7 @@ class CAction extends CZBXAPI {
 			}
 			$sqlParts['from']['conditions_groups'] = 'conditions cg';
 			$sqlParts['where'][] = dbConditionString('cg.value', $options['groupids']);
-			$sqlParts['where']['ctg'] = 'c.conditiontype='.CONDITION_TYPE_HOST_GROUP;
+			$sqlParts['where']['ctg'] = 'cg.conditiontype='.CONDITION_TYPE_HOST_GROUP;
 			$sqlParts['where']['acg'] = 'a.actionid=cg.actionid';
 		}
 
