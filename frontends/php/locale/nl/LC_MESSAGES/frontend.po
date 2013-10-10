@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-10 12:09+0300\n"
+"POT-Creation-Date: 2013-10-10 12:12+0300\n"
 "PO-Revision-Date: 2013-10-08 14:28+0300\n"
 "Last-Translator: open-future <patrik@open-future.be>\n"
 "Language-Team: NL\n"
@@ -1899,7 +1899,7 @@ msgstr "Kan de update statement niet uitvoeren op tabel \"%1$s\" zonder where co
 #: include/classes/server/CZabbixServer.php:222
 #, php-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
-msgstr "Kan het antwoord niet lezen, controleer verbinding met de Zabbix server \"%1$s\"."
+msgstr "Kan het antwoord niet lezen, controleer verbinding met de Zabbix server \"%1$s\".Kan het antwoord niet lezen, controleer verbinding met de Zabbix server \"%1$s\"."
 
 #: include/views/js/monitoring.history.js.php:35
 msgid "Cannot remove all items, at least one item should remain."
@@ -1920,7 +1920,7 @@ msgstr "Kan de discovery regel niet opslaan zonder checks."
 #: include/classes/server/CZabbixServer.php:192
 #, php-format
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
-msgstr "Kan commando niet lezen, controleer verbinding met de Zabbix server \"%1$s\"."
+msgstr "Kan commando niet lezen, controleer verbinding met de Zabbix server \"%1$s\".Kan commando niet lezen, controleer verbinding met de Zabbix server \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:238
 #, php-format
@@ -2257,7 +2257,7 @@ msgstr "Kan web scenario niet bijwerken"
 
 #: include/views/js/configuration.discovery.edit.js.php:600
 msgid "Cannot validate discovery check: invalid request or connection to Zabbix server failed."
-msgstr "Kan ontdekking controleren niet valideren: ongeldig verzoek of aansluiting op Zabbix server is mislukt."
+msgstr "Kan ontdekking controleren niet valideren: ongeldig verzoek of aansluiting op Zabbix server is mislukt.Kan ontdekking controleren niet valideren: ongeldig verzoek of aansluiting op Zabbix server is mislukt."
 
 #: popup_bitem.php:114 popup_period.php:114
 msgid "Caption"
@@ -4168,7 +4168,7 @@ msgstr "Dupliceer afhankelijkheden in trigger \"%1$s\"."
 #: api/classes/CHostPrototype.php:197
 #, php-format
 msgid "Duplicate group prototype name \"%2$s\" for host prototype \"%1$s\"."
-msgstr "Dupliceren van groep prototype naam \"%2$s\" voor gastheer prototype \"%1$s\"."
+msgstr "Dupliceren van groep prototype naam \"%2$s\" voor gastheer prototype \"%1$s\".Dupliceren van groep prototype naam \"%2$s\" voor gastheer prototype \"%1$s\"."
 
 #: api/classes/CHostPrototype.php:191
 #, php-format
