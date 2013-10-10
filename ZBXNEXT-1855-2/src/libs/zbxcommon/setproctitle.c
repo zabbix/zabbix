@@ -264,7 +264,7 @@ void	setproctitle_free_env(void)
 	int	i;
 
 	/* restore the original environment variable to safely free our internally allocated environ array */
-	if (NULL != environ_ext)
+	if (environ == environ_int)
 		environ = environ_ext;
 
 	for (i = argc_ext_copied_first; i <= argc_ext_copied_last; i++)
