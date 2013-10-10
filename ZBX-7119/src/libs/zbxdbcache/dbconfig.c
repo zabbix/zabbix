@@ -2186,7 +2186,7 @@ unlock:
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
-void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int host_num, int maintenance_status,
+void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int maintenance_status,
 		int maintenance_type, int maintenance_from)
 {
 	int		i;
@@ -2194,17 +2194,17 @@ void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int host_num, int mai
 
 	LOCK_CACHE;
 
-	for (i = 0; i < host_num; i++)
+	for (i = 0; i < hostids_num; i++)
 	{
-		if (NULL != (dc_host = zbx_hashset_search(&config->hosts, &hostids[i])))
-		{
-			if (HOST_MAINTENANCE_STATUS_OFF == dc_host->maintenance_status ||
-					HOST_MAINTENANCE_STATUS_OFF == maintenance_status)
-				dc_host->maintenance_from = maintenance_from;
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &hostids[i])))
+			continue;
 
-			dc_host->maintenance_status = maintenance_status;
-			dc_host->maintenance_type = maintenance_type;
-		}
+		if (HOST_MAINTENANCE_STATUS_OFF == dc_host->maintenance_status ||
+				HOST_MAINTENANCE_STATUS_OFF == maintenance_status)
+			dc_host->maintenance_from = maintenance_from;
+
+		dc_host->maintenance_status = maintenance_status;
+		dc_host->maintenance_type = maintenance_type;
 	}
 
 	UNLOCK_CACHE;
