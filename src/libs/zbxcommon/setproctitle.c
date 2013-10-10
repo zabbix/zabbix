@@ -85,7 +85,7 @@ char **	setproctitle_save_env(int argc, char **argv)
 	for (i = 0; i < argc_ext_copied_first; i++)
 		argv_int[i] = argv[i];
 
-	for (i = argc_ext_copied_first, arg_next = argv[argc_ext_copied_first]; i < argc && arg_next == argv[i]; i++)
+	for (i = argc_ext_copied_first, arg_next = argv[argc_ext_copied_first]; arg_next == argv[i]; i++)
 	{
 		arg_next = argv[i] + strlen(argv[i]) + 1;
 		argv_int[i] = zbx_strdup(NULL, argv[i]);
@@ -113,7 +113,7 @@ char **	setproctitle_save_env(int argc, char **argv)
 
 		environ_int = zbx_malloc(environ_int, ((unsigned int)envc + 1) * sizeof(char *));
 
-		for (i = 0; i < envc && arg_next == environ[i]; i++)
+		for (i = 0; arg_next == environ[i]; i++)
 		{
 			arg_next = environ[i] + strlen(environ[i]) + 1;
 			environ_int[i] = zbx_strdup(NULL, environ[i]);
