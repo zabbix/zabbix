@@ -4576,11 +4576,10 @@ void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
 		if (dc_host->maintenance_status != maintenance_status)
 			dc_host->maintenance_from = maintenance_from;
 
-		/* store time at which host was taken out of maintenance for no-data */
-		/* maintenances only, this is needed for nodata() trigger function */
-		if (HOST_MAINTENANCE_STATUS_ON == dc_host->maintenance_status &&
-				MAINTENANCE_TYPE_NODATA == dc_host->maintenance_type &&
-				HOST_MAINTENANCE_STATUS_OFF == maintenance_status)
+		/* store time at which no-data maintenance ended for the host (either */
+		/* because no-data maintenance ended or because maintenance type was */
+		/* changed to normal), this is needed for nodata() trigger function */
+		if (MAINTENANCE_TYPE_NODATA == dc_host->maintenance_type && MAINTENANCE_TYPE_NODATA != maintenance_type)
 			dc_host->maintenance_until = maintenance_until;
 		else
 			dc_host->maintenance_until = 0;
@@ -4590,34 +4589,6 @@ void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
 	}
 
 	UNLOCK_CACHE;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DCconfig_get_maintenance_until                                   *
- *                                                                            *
- * Purpose: returns time at which the last no-data maintenance ended          *
- *                                                                            *
- * Parameters: hostid            - [IN] the host id                           *
- *             maintenance_until - [OUT] time host taken out of maintenance   *
- *                                                                            *
- ******************************************************************************/
-int	DCconfig_get_maintenance_until(zbx_uint64_t hostid, int *maintenance_until)
-{
-	ZBX_DC_HOST	*dc_host;
-	int		ret = FAIL;
-
-	LOCK_CACHE;
-
-	if (NULL != (dc_host = zbx_hashset_search(&config->hosts, &hostid)))
-	{
-		*maintenance_until = dc_host->maintenance_until;
-		ret = SUCCEED;
-	}
-
-	UNLOCK_CACHE;
-
-	return ret;
 }
 
 /******************************************************************************
@@ -5363,25 +5334,28 @@ void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCget_item_time_added                                            *
+ * Function: DCget_time_data_is_expected                                      *
  *                                                                            *
- * Purpose: returns time of adding of an item into the configuration cache    *
+ * Purpose: Returns time since which data is expected for the given item. We  *
+ *          would not mind not having data for the item before that time, but *
+ *          since that time we expect data to be coming.                      *
  *                                                                            *
- * Parameters: itemid     - [IN] the item id                                  *
- *             time_added - [OUT] the number of seconds of adding of an item  *
- *                                into the configuration cache                *
+ * Parameters: itemid  - [IN] the item id                                     *
+ *             seconds - [OUT] the time data is expected as a Unix timestamp  *
  *                                                                            *
  ******************************************************************************/
-int	DCget_item_time_added(zbx_uint64_t itemid, int *time_added)
+int	DCget_time_data_is_expected(zbx_uint64_t itemid, int *seconds)
 {
 	ZBX_DC_ITEM	*item;
+	ZBX_DC_HOST	*host;
 	int		ret = FAIL;
 
 	LOCK_CACHE;
 
-	if (NULL != (item = zbx_hashset_search(&config->items, &itemid)))
+	if (NULL != (item = zbx_hashset_search(&config->items, &itemid)) &&
+			NULL != (host = zbx_hashset_search(&config->hosts, &item->hostid)))
 	{
-		*time_added = item->time_added;
+		*seconds = MAX(item->time_added, host->maintenance_until);
 		ret = SUCCEED;
 	}
 

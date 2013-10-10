@@ -312,7 +312,6 @@ void	DCconfig_set_trigger_value(zbx_uint64_t triggerid, unsigned char value,
 		unsigned char state, const char *error, int *lastchange);
 void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
 		int maintenance_type, int maintenance_from, int maintenance_until);
-int	DCconfig_get_maintenance_until(zbx_uint64_t hostid, int *maintenance_until);
 
 #define ZBX_CONFSTATS_BUFFER_TOTAL	1
 #define ZBX_CONFSTATS_BUFFER_USED	2
@@ -345,5 +344,6 @@ void	DCget_functions_hostids(zbx_vector_uint64_t *hosts, const zbx_vector_uint64
 void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * const *names, int names_num);
 void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name);
 
-int	DCget_item_time_added(zbx_uint64_t itemid, int *time_added);
+int	DCget_time_data_is_expected(zbx_uint64_t itemid, int *seconds);
+
 #endif
