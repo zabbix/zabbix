@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-08 23:10+0300\n"
+"POT-Creation-Date: 2013-10-10 12:09+0300\n"
 "PO-Revision-Date: 2013-10-07 09:40+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -514,7 +514,7 @@ msgstr "表示期間"
 msgid "Age less than %s"
 msgstr "表示期間 %s"
 
-#: include/items.inc.php:239 include/views/administration.script.list.php:64
+#: include/items.inc.php:244 include/views/administration.script.list.php:64
 #: include/views/configuration.httpconf.edit.php:139 popup.php:1540
 msgid "Agent"
 msgstr "エージェント"
@@ -926,7 +926,7 @@ msgstr "ブロックしました"
 msgid "Bold line"
 msgstr "太線"
 
-#: include/items.inc.php:131
+#: include/items.inc.php:136
 msgid "Boolean"
 msgstr "ブール型"
 
@@ -1144,7 +1144,7 @@ msgstr "Zabbixの設定"
 msgid "Calculate SLA, acceptable SLA (in %)"
 msgstr "SLAの計算、SLAの許容値(%)"
 
-#: include/items.inc.php:92 include/views/configuration.graph.edit.php:164
+#: include/items.inc.php:97 include/views/configuration.graph.edit.php:164
 #: include/views/configuration.graph.edit.php:219
 msgid "Calculated"
 msgstr "計算"
@@ -1742,8 +1742,8 @@ msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "スクリーン\"%2$s\"で利用されているホスト\"%1$s\"が見つかりません。"
 
 #: api/classes/CDiscoveryRule.php:748 api/classes/CDiscoveryRule.php:824
-#: api/classes/CItemGeneral.php:101 include/items.inc.php:339
-#: include/items.inc.php:390
+#: api/classes/CItemGeneral.php:101 include/items.inc.php:344
+#: include/items.inc.php:395
 #, php-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
 msgstr "アイテムのキー\"%2$s\"のインターフェースは\"%1$s\"に存在しません"
@@ -2276,7 +2276,7 @@ msgstr "変更"
 msgid "Change password"
 msgstr "パスワード変更"
 
-#: include/forms.inc.php:423 include/items.inc.php:120
+#: include/forms.inc.php:423 include/items.inc.php:125
 #: include/triggers.inc.php:2199 include/views/configuration.item.edit.php:224
 #: include/views/configuration.item.massupdate.php:210
 msgid "Character"
@@ -2970,6 +2970,10 @@ msgstr "作成: \"%2$s\"のトリガーのプロトタイプ\"%1$s\"。"
 msgid "Created: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "作成: \"%2$s\"のWebシナリオ\"%1$s\"."
 
+#: include/items.inc.php:41
+msgid "Critical"
+msgstr ""
+
 #: popup_trexpr.php:365
 msgid "Current date is < N"
 msgstr "現在の年月日 < N"
@@ -3175,7 +3179,7 @@ msgstr "データベースファイル"
 msgid "Database host"
 msgstr "データベースホスト"
 
-#: include/items.inc.php:87
+#: include/items.inc.php:92
 msgid "Database monitor"
 msgstr "データベースモニタ"
 
@@ -3301,7 +3305,7 @@ msgstr "12月"
 msgid "December"
 msgstr "12月"
 
-#: include/items.inc.php:133
+#: include/items.inc.php:138
 msgid "Decimal"
 msgstr "10進数"
 
@@ -3910,8 +3914,8 @@ msgid "Disable selected triggers?"
 msgstr "選択したトリガーを無効にしますか？"
 
 #: auditlogs.php:152 dashboard.php:270 include/discovery.inc.php:123
-#: include/httptest.inc.php:46 include/items.inc.php:150
-#: include/items.inc.php:204 include/triggers.inc.php:1606
+#: include/httptest.inc.php:46 include/items.inc.php:155
+#: include/items.inc.php:209 include/triggers.inc.php:1606
 #: include/triggers.inc.php:2455 include/users.inc.php:85
 #: include/views/administration.mediatypes.list.php:97
 #: include/views/administration.usergroups.list.php:59
@@ -4446,8 +4450,8 @@ msgid "Enable selected triggers?"
 msgstr "選択したトリガーを有効にしますか？"
 
 #: auditlogs.php:149 dashboard.php:270 include/discovery.inc.php:122
-#: include/httptest.inc.php:45 include/items.inc.php:149
-#: include/items.inc.php:201 include/triggers.inc.php:2452
+#: include/httptest.inc.php:45 include/items.inc.php:154
+#: include/items.inc.php:206 include/triggers.inc.php:2452
 #: include/views/administration.mediatypes.edit.php:96
 #: include/views/administration.mediatypes.list.php:96
 #: include/views/administration.usergroups.edit.php:65
@@ -4594,7 +4598,7 @@ msgstr "SQL実行エラー [%2$s]内の[%1$s]。"
 msgid "Execute on"
 msgstr "次で実行"
 
-#: include/items.inc.php:1396 include/views/configuration.item.edit.php:195
+#: include/items.inc.php:1401 include/views/configuration.item.edit.php:195
 msgid "Executed script"
 msgstr "実行するスクリプト"
 
@@ -4676,7 +4680,7 @@ msgstr "条件式の形式"
 msgid "Expressions"
 msgstr "条件式"
 
-#: include/items.inc.php:86
+#: include/items.inc.php:91
 msgid "External check"
 msgstr "外部チェック"
 
@@ -4884,7 +4888,7 @@ msgstr "例外の更新間隔"
 msgid "For guest, password must be empty"
 msgstr "ゲストのパスワードは空白である必要があります"
 
-#: include/items.inc.php:1400 include/views/configuration.item.edit.php:207
+#: include/items.inc.php:1405 include/views/configuration.item.edit.php:207
 msgid "Formula"
 msgstr "式"
 
@@ -5381,7 +5385,7 @@ msgstr "高さ"
 msgid "Help"
 msgstr "ヘルプ"
 
-#: include/items.inc.php:134
+#: include/items.inc.php:139
 msgid "Hexadecimal"
 msgstr "16進数"
 
@@ -5534,7 +5538,7 @@ msgstr "ホストアクセス"
 msgid "Host added"
 msgstr "ホストを追加しました"
 
-#: api/classes/CHostInterface.php:831
+#: api/classes/CHostInterface.php:844
 msgid "Host cannot have more than one default interface of the same type."
 msgstr "ホストに同じタイプのデフォルトインターフェースは2つ以上設定できません。"
 
@@ -5766,7 +5770,7 @@ msgid "Host with the same visible name \"%s\" already exists."
 msgstr "同じホストの表示名\"%s\"を持つホストがすでに存在します。"
 
 #: hostinventoriesoverview.php:85 hosts.php:752 include/forms.inc.php:217
-#: include/forms.inc.php:894 include/items.inc.php:808
+#: include/forms.inc.php:894 include/items.inc.php:813
 #: include/menu.inc.php:112 include/menu.inc.php:168
 #: include/reports.inc.php:378 include/views/administration.proxy.edit.php:88
 #: include/views/administration.proxy.list.php:52
@@ -5887,7 +5891,7 @@ msgstr "IPアドレスの範囲"
 msgid "IP range cannot be empty."
 msgstr "IPレンジは必須項目です"
 
-#: include/hosts.inc.php:477 include/items.inc.php:242
+#: include/hosts.inc.php:477 include/items.inc.php:247
 #: include/views/administration.script.edit.php:46
 #: include/views/administration.script.list.php:54
 #: include/views/configuration.action.edit.php:681
@@ -5897,7 +5901,7 @@ msgstr "IPレンジは必須項目です"
 msgid "IPMI"
 msgstr "IPMI"
 
-#: include/items.inc.php:88
+#: include/items.inc.php:93
 msgid "IPMI agent"
 msgstr "IPMIエージェント"
 
@@ -6537,17 +6541,17 @@ msgstr "ホストのプロトタイプIDが正しくありません。"
 msgid "Incorrect image index."
 msgstr "イメージのインデックスが正しくありません。"
 
-#: api/classes/CHostInterface.php:630
+#: api/classes/CHostInterface.php:643
 #, php-format
 msgid "Incorrect interface DNS parameter \"%s\" provided."
 msgstr "インターフェースのDNSパラメータ\"%s\"が正しくありません。"
 
-#: api/classes/CHostInterface.php:645
+#: api/classes/CHostInterface.php:658
 #, php-format
 msgid "Incorrect interface IP parameter \"%s\" provided."
 msgstr "インターフェースのIPパラメータ\"%s\"が正しくありません。"
 
-#: api/classes/CHostInterface.php:661
+#: api/classes/CHostInterface.php:674
 #, php-format
 msgid "Incorrect interface port \"%s\" provided."
 msgstr "インターフェースのポート\"%s\"が正しくありません。"
@@ -6954,7 +6958,7 @@ msgstr "インストーラ名"
 msgid "Interface"
 msgstr "インターフェース"
 
-#: api/classes/CHostInterface.php:851
+#: api/classes/CHostInterface.php:864
 #, php-format
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
 msgstr "インターフェースは\"%2$s\"のアイテム\"%1$s\"にリンクされています。"
@@ -7299,7 +7303,7 @@ msgid "Item with key \"%1$s\" already exists."
 msgstr "キー\"%1$s\"が設定されたアイテムがすでに存在します。"
 
 #: hosts.php:795 hosts.php:886 include/html.inc.php:420
-#: include/html.inc.php:424 include/items.inc.php:791
+#: include/html.inc.php:424 include/items.inc.php:796
 #: include/reports.inc.php:117 include/reports.inc.php:257
 #: include/views/configuration.application.list.php:99
 #: include/views/configuration.graph.edit.php:276
@@ -7343,11 +7347,11 @@ msgstr "アイテムのリスト"
 msgid "Items updated"
 msgstr "アイテムを更新しました"
 
-#: include/hosts.inc.php:474 include/items.inc.php:241
+#: include/hosts.inc.php:474 include/items.inc.php:246
 msgid "JMX"
 msgstr "JMX"
 
-#: include/items.inc.php:91
+#: include/items.inc.php:96
 msgid "JMX agent"
 msgstr "JMXエージェント"
 
@@ -7900,7 +7904,7 @@ msgstr "緯度"
 msgid "Location longitude"
 msgstr "経度"
 
-#: include/forms.inc.php:424 include/items.inc.php:122
+#: include/forms.inc.php:424 include/items.inc.php:127
 #: include/triggers.inc.php:2200 include/views/configuration.item.edit.php:225
 #: include/views/configuration.item.massupdate.php:211
 msgid "Log"
@@ -8292,6 +8296,12 @@ msgstr "トリガーあたりのイベント表示の最大数"
 #: include/func.inc.php:2213
 msgid "Maximize"
 msgstr "最大化"
+
+#: api/classes/CHostInterface.php:633
+#, php-format
+msgid "Maximum DNS name length is %2$d characters, \"%3$s\" is %1$d character."
+msgid_plural "Maximum DNS name length is %2$d characters, \"%3$s\" is %1$d characters."
+msgstr[0] ""
 
 #: api/classes/CUser.php:315
 #, php-format
@@ -8995,7 +9005,7 @@ msgstr "期間Tの間にデータが存在しない N= 1、それ以外 N = 0"
 msgid "No data received during period of time T, then N NOT 1, 0 - otherwise"
 msgstr "期間Tの間にデータが存在しない N NOT 1、それ以外 N NOT 0"
 
-#: api/classes/CHostInterface.php:827
+#: api/classes/CHostInterface.php:840
 #, php-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "\"%2$s\"上の\"%1$s\"タイプのデフォルトインターフェースが設定されていません。"
@@ -9203,17 +9213,17 @@ msgstr "スクリーンの要素にアイテムIDが設定されていません�
 msgid "No item prototypes defined."
 msgstr "アイテムのプロトタイプが設定されていません。"
 
-#: include/items.inc.php:494
+#: include/items.inc.php:499
 #, php-format
 msgid "No item with itemid \"%1$s\"."
 msgstr "アイテムID\"%1$s\"を持つアイテムは存在しません。"
 
-#: include/items.inc.php:477
+#: include/items.inc.php:482
 #, php-format
 msgid "No item with itemid=\"%1$s\"."
 msgstr "アイテムID\"%1$s\"を持つアイテムは存在しません。"
 
-#: chart3.php:119 include/items.inc.php:782
+#: chart3.php:119 include/items.inc.php:787
 #: include/views/configuration.graph.edit.php:64
 #: include/views/configuration.item.list.php:58
 #: include/views/monitoring.overview.php:111 popup.php:675 popup.php:808
@@ -9334,7 +9344,7 @@ msgstr "システムへのアクセス権がありません。"
 #: api/classes/CHostGroup.php:893 api/classes/CHostGroup.php:902
 #: api/classes/CHostGroup.php:924 api/classes/CHostInterface.php:319
 #: api/classes/CHostInterface.php:335 api/classes/CHostInterface.php:476
-#: api/classes/CHostInterface.php:674 api/classes/CHost.php:688
+#: api/classes/CHostInterface.php:687 api/classes/CHost.php:688
 #: api/classes/CHost.php:716 api/classes/CHost.php:1813
 #: api/classes/CHostPrototype.php:1020 api/classes/CHostPrototype.php:1035
 #: api/classes/CHostPrototype.php:1048 api/classes/CHostPrototype.php:1061
@@ -9586,7 +9596,7 @@ msgstr "ノード"
 msgid "None"
 msgstr "なし"
 
-#: include/graphs.inc.php:24 include/items.inc.php:175
+#: include/graphs.inc.php:24 include/items.inc.php:180
 #: include/triggers.inc.php:1604 popup.php:1139
 msgid "Normal"
 msgstr "ノーマル"
@@ -9636,7 +9646,7 @@ msgstr "未ログイン"
 msgid "Not monitored"
 msgstr "無効"
 
-#: include/items.inc.php:176 include/items.inc.php:201
+#: include/items.inc.php:181 include/items.inc.php:206
 msgid "Not supported"
 msgstr "取得不可"
 
@@ -9735,7 +9745,7 @@ msgstr "トリガー数 (有効/無効) [障害/正常]"
 msgid "Number of users (online)"
 msgstr "ユーザー数 (オンライン)"
 
-#: include/forms.inc.php:422 include/items.inc.php:118
+#: include/forms.inc.php:422 include/items.inc.php:123
 #: include/triggers.inc.php:2198 include/views/configuration.item.edit.php:223
 #: include/views/configuration.item.massupdate.php:209
 msgid "Numeric (float)"
@@ -9747,7 +9757,7 @@ msgstr "数値 (浮動小数)"
 msgid "Numeric (integer 64bit)"
 msgstr "数値 (整数)"
 
-#: include/forms.inc.php:421 include/items.inc.php:116
+#: include/forms.inc.php:421 include/items.inc.php:121
 #: include/views/configuration.item.edit.php:222
 #: include/views/configuration.item.massupdate.php:208
 msgid "Numeric (unsigned)"
@@ -9812,7 +9822,7 @@ msgstr "概要"
 msgid "Oct"
 msgstr "10月"
 
-#: include/items.inc.php:132
+#: include/items.inc.php:137
 msgid "Octal"
 msgstr "8進数"
 
@@ -10489,7 +10499,7 @@ msgstr "ホストインベントリフィールドの自動設定"
 msgid "Port"
 msgstr "ポート"
 
-#: api/classes/CHostInterface.php:658
+#: api/classes/CHostInterface.php:671
 msgid "Port cannot be empty for host interface."
 msgstr "ホストインターフェースのポートは必須項目です。"
 
@@ -11258,7 +11268,7 @@ msgstr ""
 msgid "SMTP server"
 msgstr "SMTPサーバー"
 
-#: include/hosts.inc.php:471 include/items.inc.php:240
+#: include/hosts.inc.php:471 include/items.inc.php:245
 msgid "SNMP"
 msgstr ""
 
@@ -11286,7 +11296,7 @@ msgstr "SNMPコミュニティ"
 msgid "SNMP interfaces"
 msgstr "SNMPインターフェース"
 
-#: include/items.inc.php:82
+#: include/items.inc.php:87
 msgid "SNMP trap"
 msgstr "SNMPトラップ"
 
@@ -11294,17 +11304,17 @@ msgstr "SNMPトラップ"
 msgid "SNMP trap key is invalid."
 msgstr "SNMPトラップのキーが正しくありません。"
 
-#: include/discovery.inc.php:67 include/items.inc.php:79
+#: include/discovery.inc.php:67 include/items.inc.php:84
 #: include/views/js/configuration.discovery.edit.js.php:178
 msgid "SNMPv1 agent"
 msgstr "SNMPv1エージェント"
 
-#: include/discovery.inc.php:68 include/items.inc.php:80
+#: include/discovery.inc.php:68 include/items.inc.php:85
 #: include/views/js/configuration.discovery.edit.js.php:179
 msgid "SNMPv2 agent"
 msgstr "SNMPv2エージェント"
 
-#: include/discovery.inc.php:69 include/items.inc.php:81
+#: include/discovery.inc.php:69 include/items.inc.php:86
 #: include/views/js/configuration.discovery.edit.js.php:180
 msgid "SNMPv3 agent"
 msgstr "SNMPv3エージェント"
@@ -11314,7 +11324,7 @@ msgstr "SNMPv3エージェント"
 msgid "SQL count: %s (selects: %s | executes: %s)"
 msgstr "SQLカウント: %s (selects: %s | executes: %s)"
 
-#: include/items.inc.php:1398 include/views/configuration.item.edit.php:199
+#: include/items.inc.php:1403 include/views/configuration.item.edit.php:199
 msgid "SQL query"
 msgstr "SQLクエリ"
 
@@ -11335,7 +11345,7 @@ msgstr "SQLの実行に失敗しました\"%1$s\"。"
 msgid "SSH"
 msgstr ""
 
-#: include/items.inc.php:89
+#: include/items.inc.php:94
 msgid "SSH agent"
 msgstr "SSHエージェント"
 
@@ -11989,7 +11999,7 @@ msgstr "サインイン"
 msgid "Simple"
 msgstr "標準"
 
-#: include/items.inc.php:78
+#: include/items.inc.php:83
 msgid "Simple check"
 msgstr "シンプルチェック"
 
@@ -12397,7 +12407,7 @@ msgstr ""
 msgid "TCP"
 msgstr ""
 
-#: include/items.inc.php:90
+#: include/items.inc.php:95
 msgid "TELNET agent"
 msgstr "TELNETエージェント"
 
@@ -12588,7 +12598,7 @@ msgstr "テスト条件式"
 msgid "Test string"
 msgstr "テスト文字列"
 
-#: include/forms.inc.php:425 include/items.inc.php:124
+#: include/forms.inc.php:425 include/items.inc.php:129
 #: include/triggers.inc.php:2201 include/views/configuration.item.edit.php:226
 #: include/views/configuration.item.massupdate.php:212
 msgid "Text"
@@ -13250,10 +13260,10 @@ msgstr "単位"
 #: include/events.inc.php:78 include/graphs.inc.php:37
 #: include/graphs.inc.php:77 include/hosts.inc.php:53 include/hosts.inc.php:80
 #: include/html.inc.php:374 include/httptest.inc.php:39
-#: include/httptest.inc.php:56 include/items.inc.php:41
-#: include/items.inc.php:102 include/items.inc.php:126
-#: include/items.inc.php:143 include/items.inc.php:159
-#: include/items.inc.php:186 include/items.inc.php:207
+#: include/httptest.inc.php:56 include/items.inc.php:45
+#: include/items.inc.php:107 include/items.inc.php:131
+#: include/items.inc.php:148 include/items.inc.php:164
+#: include/items.inc.php:191 include/items.inc.php:212
 #: include/maintenances.inc.php:42 include/maps.inc.php:39
 #: include/media.inc.php:40 include/nodes.inc.php:265 include/perm.inc.php:30
 #: include/regexp.inc.php:206 include/screens.inc.php:55
@@ -13293,7 +13303,7 @@ msgstr "不明なインターフェースのタイプ。"
 msgid "Unknown resource"
 msgstr "不明なリソース"
 
-#: include/items.inc.php:973
+#: include/items.inc.php:978
 msgid "Unknown value type"
 msgstr "不明な値のタイプ"
 
@@ -13793,6 +13803,10 @@ msgstr "変数"
 msgid "Vendor"
 msgstr "ベンダー"
 
+#: include/items.inc.php:43
+msgid "Verbose"
+msgstr ""
+
 #: include/views/configuration.screen.constructor.edit.php:543
 msgid "Vertical"
 msgstr "縦"
@@ -13843,7 +13857,7 @@ msgstr "ウェブ"
 msgid "Web checks"
 msgstr "ウェブ監視"
 
-#: dashboard.php:411 include/items.inc.php:93
+#: dashboard.php:411 include/items.inc.php:98
 msgid "Web monitoring"
 msgstr "ウェブ監視"
 
@@ -14288,7 +14302,7 @@ msgstr "Zabbix特権管理者"
 msgid "Zabbix User"
 msgstr "Zabbixユーザー"
 
-#: include/discovery.inc.php:66 include/items.inc.php:76
+#: include/discovery.inc.php:66 include/items.inc.php:81
 #: include/views/administration.script.edit.php:53
 #: include/views/configuration.action.edit.php:698
 #: include/views/js/configuration.action.edit.js.php:118
@@ -14296,11 +14310,11 @@ msgstr "Zabbixユーザー"
 msgid "Zabbix agent"
 msgstr "Zabbixエージェント"
 
-#: include/items.inc.php:77
+#: include/items.inc.php:82
 msgid "Zabbix agent (active)"
 msgstr "Zabbixエージェント(アクティブ)"
 
-#: include/items.inc.php:85
+#: include/items.inc.php:90
 msgid "Zabbix aggregate"
 msgstr "Zabbixアグリゲート"
 
@@ -14308,7 +14322,7 @@ msgstr "Zabbixアグリゲート"
 msgid "Zabbix has received an incorrect request."
 msgstr "不正なURLパラメータ"
 
-#: include/items.inc.php:83
+#: include/items.inc.php:88
 msgid "Zabbix internal"
 msgstr "Zabbixインターナル"
 
@@ -14368,7 +14382,7 @@ msgstr "Zabbixサーバー名"
 msgid "Zabbix server port"
 msgstr "Zabbixサーバーのポート"
 
-#: include/items.inc.php:84
+#: include/items.inc.php:89
 msgid "Zabbix trapper"
 msgstr "Zabbixトラッパー"
 
