@@ -67,7 +67,7 @@ static size_t	ps_buf_size = PS_BUF_SIZE, ps_buf_size_msg = PS_BUF_SIZE;
 char **	setproctitle_save_env(int argc, char **argv)
 {
 	int	i = 0;
-	char	*arg_end = NULL;
+	char	*arg_next = NULL;
 
 	if (NULL == argv || 0 == argc)
 		return argv;
@@ -84,23 +84,16 @@ char **	setproctitle_save_env(int argc, char **argv)
 	for (i = 0; i < argc_ext_copied_first; i++)
 		argv_int[i] = argv[i];
 
-	for (i = argc_ext_copied_first; i < argc; i++)
+	for (i = argc_ext_copied_first, arg_next = argv[argc_ext_copied_first]; i < argc && arg_next == argv[i]; i++)
 	{
-		if (argc_ext_copied_first == i || arg_end + 1 == argv[i])
-		{
-			arg_end = argv[i] + strlen(argv[i]);
-			argv_int[i] = zbx_strdup(NULL, argv[i]);
-			argc_ext_copied_last = i;
+		arg_next = argv[i] + strlen(argv[i]) + 1;
+		argv_int[i] = zbx_strdup(NULL, argv[i]);
+		argc_ext_copied_last = i;
 
-			/* argv[copy_first] will be used to display status messages. The rest of arguments can be */
-			/* overwritten and their argv[] pointers will point to wrong strings. */
-			if (argc_ext_copied_first < i)
-				argv[i] = empty_str;
-		}
-		else
-		{
-			break;
-		}
+		/* argv[copy_first] will be used to display status messages. The rest of arguments can be */
+		/* overwritten and their argv[] pointers will point to wrong strings. */
+		if (argc_ext_copied_first < i)
+			argv[i] = empty_str;
 	}
 
 	for (; i < argc; i++)
@@ -110,37 +103,33 @@ char **	setproctitle_save_env(int argc, char **argv)
 
 	if (argc_ext_copied_last == argc - 1)
 	{
-		int	envc = 0, copy_arg = 1;
+		int	envc = 0;
 
-		for (i = 0; NULL != environ[i]; i++)
+		while (NULL != environ[envc])
 			envc++;
 
 		/* measure a size of continuous environment area and make a copy */
 
 		environ_int = zbx_malloc(environ_int, ((unsigned int)envc + 1) * sizeof(char *));
 
-		for (i = 0; i < envc; i++)
+		for (i = 0; i < envc && arg_next == environ[i]; i++)
 		{
-			if (1 == copy_arg && arg_end + 1 == environ[i])
-			{
-				arg_end = environ[i] + strlen(environ[i]);
-				environ_int[i] = zbx_strdup(NULL, environ[i]);
-				environ_ext_copied++;
+			arg_next = environ[i] + strlen(environ[i]) + 1;
+			environ_int[i] = zbx_strdup(NULL, environ[i]);
+			environ_ext_copied++;
 
-				/* environment variables can be overwritten by status messages in argv[0] */
-				/* and environ[] pointers will point to wrong strings */
-				environ[i] = empty_str;
-			}
-			else
-			{
-				copy_arg = 0;
-				environ_int[i] = environ[i];
-			}
+			/* environment variables can be overwritten by status messages in argv[0] */
+			/* and environ[] pointers will point to wrong strings */
+			environ[i] = empty_str;
 		}
+
+		for (;  i < envc; i++)
+			environ_int[i] = environ[i];
+
 		environ_int[envc] = NULL;
 	}
 
-	ps_buf_size = (size_t)(arg_end - argv[argc_ext_copied_first] + 1);
+	ps_buf_size = (size_t)(arg_next - argv[argc_ext_copied_first]);
 	ps_buf = argv[argc_ext_copied_first];
 
 #if defined(PS_CONCAT_ARGV)
