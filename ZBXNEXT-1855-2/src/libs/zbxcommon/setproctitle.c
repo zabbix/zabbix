@@ -66,7 +66,7 @@ static size_t	ps_buf_size = PS_BUF_SIZE, ps_buf_size_msg = PS_BUF_SIZE;
 #if defined(PS_OVERWRITE_ARGV)
 char **	setproctitle_save_env(int argc, char **argv)
 {
-	int	i = 0, copy_first, copy_last;
+	int	i = 0;
 	char	*arg_end = NULL;
 
 	if (NULL == argv || 0 == argc)
@@ -77,21 +77,16 @@ char **	setproctitle_save_env(int argc, char **argv)
 	argv_int = zbx_malloc(argv_int, ((unsigned int)argc + 1) * sizeof(char *));
 
 #if defined(PS_APPEND_ARGV)
-	copy_first = argc - 1;
+	argc_ext_copied_first = argc - 1;
 #else
-	copy_first = 0;
+	argc_ext_copied_first = 0;
 #endif
-	copy_last = argc - 1;
-
-	for (i = 0; i < copy_first; i++)
+	for (i = 0; i < argc_ext_copied_first; i++)
 		argv_int[i] = argv[i];
 
-	for (i = copy_first; i <= copy_last; i++)
+	for (i = argc_ext_copied_first; i < argc; i++)
 	{
-		if (copy_first == i)
-			argc_ext_copied_first = i;
-
-		if (copy_first == i || arg_end + 1 == argv[i])
+		if (argc_ext_copied_first == i || arg_end + 1 == argv[i])
 		{
 			arg_end = argv[i] + strlen(argv[i]);
 			argv_int[i] = zbx_strdup(NULL, argv[i]);
@@ -99,7 +94,7 @@ char **	setproctitle_save_env(int argc, char **argv)
 
 			/* argv[copy_first] will be used to display status messages. The rest of arguments can be */
 			/* overwritten and their argv[] pointers will point to wrong strings. */
-			if (copy_first < i)
+			if (argc_ext_copied_first < i)
 				argv[i] = empty_str;
 		}
 		else
@@ -145,15 +140,15 @@ char **	setproctitle_save_env(int argc, char **argv)
 		environ_int[envc] = NULL;
 	}
 
-	ps_buf_size = (size_t)(arg_end - argv[copy_first] + 1);
-	ps_buf = argv[copy_first];
+	ps_buf_size = (size_t)(arg_end - argv[argc_ext_copied_first] + 1);
+	ps_buf = argv[argc_ext_copied_first];
 
 #if defined(PS_CONCAT_ARGV)
 	{
 		char	*p = ps_buf;
 		size_t	size = ps_buf_size, len;
 
-		for (i = copy_first + 1; i < argc; i++)
+		for (i = argc_ext_copied_first + 1; i < argc; i++)
 		{
 			len = strlen(argv_int[i - 1]);
 			p += len;
