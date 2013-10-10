@@ -347,38 +347,36 @@ class CHostInterface extends CZBXAPI {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('IP and DNS cannot be empty for host interface.'));
 			}
 
-			if ($interface['useip'] == INTERFACE_USE_IP) {
-				if (zbx_empty($interface['ip'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface with DNS "%1$s" cannot have empty IP address.', $interface['dns']));
-				}
-
-				$this->checkIp($interface);
+			if ($interface['useip'] == INTERFACE_USE_IP && zbx_empty($interface['ip'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface with DNS "%1$s" cannot have empty IP address.', $interface['dns']));
 			}
 
-			if ($interface['useip'] == INTERFACE_USE_DNS) {
-				if (zbx_empty($interface['dns'])) {
-					if ($dbHosts && !empty($dbHosts[$interface['hostid']]['host'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Interface with IP "%1$s" cannot have empty DNS name while having "Use DNS" property on "%2$s".',
-								$interface['ip'],
-								$dbHosts[$interface['hostid']]['host']
-						));
-					}
-					elseif ($dbProxies && !empty($dbProxies[$interface['hostid']]['host'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Interface with IP "%1$s" cannot have empty DNS name while having "Use DNS" property on "%2$s".',
-								$interface['ip'],
-								$dbProxies[$interface['hostid']]['host']
-						));
-					}
-					else {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface with IP "%1$s" cannot have empty DNS name.', $interface['ip']));
-					}
+			if ($interface['useip'] == INTERFACE_USE_DNS && zbx_empty($interface['dns'])) {
+				if ($dbHosts && !empty($dbHosts[$interface['hostid']]['host'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Interface with IP "%1$s" cannot have empty DNS name while having "Use DNS" property on "%2$s".',
+							$interface['ip'],
+							$dbHosts[$interface['hostid']]['host']
+					));
 				}
+				elseif ($dbProxies && !empty($dbProxies[$interface['hostid']]['host'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Interface with IP "%1$s" cannot have empty DNS name while having "Use DNS" property on "%2$s".',
+							$interface['ip'],
+							$dbProxies[$interface['hostid']]['host']
+					));
+				}
+				else {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface with IP "%1$s" cannot have empty DNS name.', $interface['ip']));
+				}
+			}
 
+			if (isset($interface['dns'])) {
 				$this->checkDns($interface);
 			}
-
+			if (isset($interface['ip'])) {
+				$this->checkIp($interface);
+			}
 			if (isset($interface['port']) || $method == 'create') {
 				$this->checkPort($interface);
 			}
@@ -654,7 +652,7 @@ class CHostInterface extends CZBXAPI {
 	 * @param array $interface
 	 */
 	protected function checkIp(array $interface) {
-		if (isset($interface['ip']) && !validate_ip($interface['ip'], $arr)
+		if (!zbx_empty($interface['ip']) && !validate_ip($interface['ip'], $arr)
 				&& !preg_match('/^'.ZBX_PREG_MACRO_NAME_FORMAT.'$/i', $interface['ip'])
 				&& !preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/i', $interface['ip'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface IP parameter "%s" provided.', $interface['ip']));
