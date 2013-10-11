@@ -1,10 +1,27 @@
+Changes for 2.1.8
+
+New features:
+A.F....... [ZBX-1357] updated Dutch, Finnish, Indonesian, Italian, Lithuanian, Persian, Portuguese (Portugal), Russian and Slovak translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+..F....... [ZBX-7134] fixed host inventory interface table when no agent interfaces are set (Ivo)
+..F....... [ZBX-7126] fixed host inventories details tab displaying (Eduard)
+..F.I..... [ZBX-7066] corrected downloadable configuration file name in setup step 6 (Ivo)
+A......... [ZBX-7101] fixed generated SQL queries in action.get method when simultaneously selecting more than one condition and operation (Ivo)
+
+--------------------------------------------------------------------------------
 Changes for 2.1.7
 
 New features:
+..FG...... [ZBX-2008] added support of Windows Eventing 6.0 (igors, Ivo)
+...G...... [ZBXNEXT-1942] added zabbix sender dynamic link library for windows (wiper)
+...G...... [ZBXNEXT-935] zabbix sender exit status now better reflects the operation result - success:0, partial success:2, failure:1 (asaveljevs, wiper)
+.......PS. [ZBXNEXT-935] improved readability of server response to sender/agent data (asaveljevs, wiper)
 .......PS. [ZBXNEXT-1633] improved VMware virtual machine monitoring performance (wiper)
 ..F....... [ZBX-6911] added functionality to save positions of block on dashboard page in profiles table (Vitalij)
 
 Bug fixes:
+A.F....... [ZBX-6953] fixed Apache server crashing on Windows due to huge memory consumption when using preg_match() function in Configuration > Host > edit (Ivo)
 ..F....... [ZBX-7079] fixed undefined index in map configuration page for map without icon mapping (Eduard)
 ..F....... [ZBX-7111] fixed host importing from 1.8 to trunk (Eduard)
 ..F....... [ZBX-7074] fixed incorrectly parsed trigger expression in trigger wizard (Vitalij)
@@ -471,8 +488,12 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.10rc1
 
 New features:
+A.F....... [ZBX-1357] updated German, Japanese, Italian, Romanian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-7101] fixed generated SQL queries in action.get method when simultaneously selecting more than one condition and operation (Ivo)
+..F....... [ZBX-7074] fixed incorrectly parsed trigger expression in trigger wizard (Vitalij)
+A.F....... [ZBX-5735] fixed debug mode check condition to use less memory when debug is off (Ivo)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.9
@@ -1889,6 +1910,9 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.19rc1
 
+...G...... [ZBX-4658] fixed system.boottime and system.uptime returning bogus values on Solaris when agent is compiled as a 64-bit binary (asaveljevs)
+........S. [ZBX-7119] fixed data collection stopping after no data maintenance until configuration cache is updated (asaveljevs)
+..F....... [ZBX-7074] fixed incorrectly parsed trigger expression in trigger wizard (Vitalij)
 
 Changes for 1.8.18
 

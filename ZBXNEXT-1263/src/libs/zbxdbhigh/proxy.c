@@ -2160,7 +2160,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 
 static void	clean_agent_values(AGENT_VALUE *values, size_t values_num)
 {
-	int	i;
+	size_t	i;
 
 	for (i = 0; i < values_num; i++)
 	{
@@ -2314,7 +2314,7 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 
 	if (NULL != info)
 	{
-		zbx_snprintf(info, max_info_size, "Processed %d Failed %d Total %d Seconds spent " ZBX_FS_DBL,
+		zbx_snprintf(info, max_info_size, "processed: %d; failed: %d; total: %d; seconds spent: " ZBX_FS_DBL,
 				processed, total_num - processed, total_num, zbx_time() - sec);
 	}
 
