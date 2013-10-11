@@ -560,7 +560,7 @@ FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|width		|t_integer	|'900'	|NOT NULL	|ZBX_SYNC
 FIELD		|height		|t_integer	|'200'	|NOT NULL	|ZBX_SYNC
 FIELD		|yaxismin	|t_double	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|yaxismax	|t_double	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|yaxismax	|t_double	|'100'	|NOT NULL	|ZBX_SYNC
 FIELD		|templateid	|t_id		|	|NULL		|ZBX_SYNC		|1|graphs	|graphid
 FIELD		|show_work_period|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|show_triggers	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
@@ -586,7 +586,7 @@ FIELD		|itemid		|t_id		|	|NOT NULL	|ZBX_SYNC		|2|items
 FIELD		|drawtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|sortorder	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|color		|t_varchar(6)	|'009600'|NOT NULL	|ZBX_SYNC
-FIELD		|yaxisside	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
+FIELD		|yaxisside	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|calc_fnc	|t_integer	|'2'	|NOT NULL	|ZBX_SYNC
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|itemid
@@ -1308,4 +1308,4 @@ INDEX		|2		|templateid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2010178	|2010178
+ROW		|2010180	|2010180
