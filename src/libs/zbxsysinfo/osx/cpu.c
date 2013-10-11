@@ -144,7 +144,7 @@ static int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, 
 	{
 		return SYSINFO_RET_FAIL;
 	}
-	SET_DBL_RESULT(result, ((double)kn->value.ul)/256.0);
+	SET_DBL_RESULT(result, get_kstat_numeric_value(kn)/256.0);
 	return SYSINFO_RET_OK;
 #else
 #ifdef HAVE_KNLIST_H
@@ -212,7 +212,7 @@ static int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, 
 	{
 		return SYSINFO_RET_FAIL;
 	}
-	SET_DBL_RESULT(result, ((double)kn->value.ul)/256.0);
+	SET_DBL_RESULT(result, get_kstat_numeric_value(kn)/256.0);
 	return SYSINFO_RET_OK;
 #else
 #ifdef HAVE_KNLIST_H
@@ -280,7 +280,7 @@ static int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags,
 	{
 		return SYSINFO_RET_FAIL;
 	}
-	SET_DBL_RESULT(result, ((double)kn->value.ul)/256.0);
+	SET_DBL_RESULT(result, get_kstat_numeric_value(kn)/256.0);
 	return SYSINFO_RET_OK;
 #else
 #ifdef HAVE_KNLIST_H
