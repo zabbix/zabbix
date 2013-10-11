@@ -1022,6 +1022,7 @@ have_snmp="no"
 have_ipmi="no"
 have_ipv6="no"
 have_ssh2="no"
+have_ssl="no"
 
 if test "x$ipv6" = "xyes"; then
 	AC_DEFINE(HAVE_IPV6,1,[Define to 1 if IPv6 should be enabled.])
@@ -1287,6 +1288,24 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBXML2_LDFLAGS"
 	PROXY_LIBS="$PROXY_LIBS $LIBXML2_LIBS"
 
+	dnl Check for LIBSSL [by default - skip]
+	LIBSSL_CHECK_CONFIG([no])
+	if test "x$want_ssl" = "xyes"; then
+		if test "x$found_ssl" != "xyes"; then
+			AC_MSG_ERROR([SSL library not found])
+		elif test "x$accept_ssl_version" != "xyes"; then
+			AC_MSG_ERROR([SSL library version requirement not met (>= 1.0.0)])
+		else
+			have_ssl="yes"
+		fi
+	fi
+	CFLAGS="$CFLAGS $SSL_CFLAGS"
+	SERVER_LDFLAGS="$SERVER_LDFLAGS $SSL_LDFLAGS"
+	SERVER_LIBS="$SERVER_LIBS $SSL_LIBS"
+
+	PROXY_LDFLAGS="$PROXY_LDFLAGS $SSL_LDFLAGS"
+	PROXY_LIBS="$PROXY_LIBS $SSL_LIBS"
+
 	found_openipmi="no"
 	dnl Check for libOpenIPMI [by default - skip]
 	LIBOPENIPMI_CHECK_CONFIG([no])
@@ -1478,6 +1497,7 @@ echo "  Server details:
     SNMP:                  ${have_snmp}
     IPMI:                  ${have_ipmi}
     SSH:                   ${have_ssh2}
+    SSL:                   ${have_ssl}
     ODBC:                  ${have_unixodbc}
     Linker flags:          ${LDFLAGS} ${SERVER_LDFLAGS}
     Libraries:             ${LIBS} ${SERVER_LIBS}"
@@ -1495,6 +1515,7 @@ echo "  Proxy details:
     SNMP:                  ${have_snmp}
     IPMI:                  ${have_ipmi}
     SSH:                   ${have_ssh2}
+    SSL:                   ${have_ssl}
     ODBC:                  ${have_unixodbc}
     Linker flags:          ${LDFLAGS} ${PROXY_LDFLAGS}
     Libraries:             ${LIBS} ${PROXY_LIBS}"
