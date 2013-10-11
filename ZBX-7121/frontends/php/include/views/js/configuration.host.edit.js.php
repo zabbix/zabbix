@@ -6,7 +6,7 @@
 		<input type="hidden" id="interface_type_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][type]" value="#{iface.type}" />
 	</td>
 	<td class="interface-ip">
-		<input class="input text" name="interfaces[#{iface.interfaceid}][ip]" type="text" size="24" maxlength="39" value="#{iface.ip}" />
+		<input class="input text" name="interfaces[#{iface.interfaceid}][ip]" type="text" size="24" maxlength="64" value="#{iface.ip}" />
 	</td>
 	<td class="interface-dns">
 		<input class="input text" name="interfaces[#{iface.interfaceid}][dns]" type="text" size="30" maxlength="64" value="#{iface.dns}" />

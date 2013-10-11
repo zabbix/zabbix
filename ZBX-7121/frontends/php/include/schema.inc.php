@@ -914,7 +914,7 @@ return array(
 			'ip' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 39,
+				'length' => 64,
 				'default' => '127.0.0.1',
 			),
 			'dns' => array(
