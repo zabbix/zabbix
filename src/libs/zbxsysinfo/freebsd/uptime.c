@@ -83,7 +83,7 @@ int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	/* make sure we do not divide by 0 */
 	assert(hz);
 
-	secs = kn->value.ul / hz;
+	secs = get_kstat_numeric_value(kn) / hz;
 
 	/* close kstat */
 	kstat_close(kc);
