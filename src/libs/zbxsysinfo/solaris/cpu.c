@@ -101,7 +101,7 @@ static int	get_kstat_system_misc(char *key, int *value)
 	if (NULL == (kn = (kstat_named_t *)kstat_data_lookup(ksp, key)))
 		goto close;
 
-	*value = kn->value.ul;
+	*value = get_kstat_numeric_value(kn);
 
 	ret = SUCCEED;
 close:
