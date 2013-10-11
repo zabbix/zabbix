@@ -575,7 +575,7 @@ class CApplication extends CZBXAPI {
 
 		DB::insert('items_applications', $createApplications);
 
-		// mass add applications for childs
+		// mass add applications for children
 		foreach ($itemIds as $itemId) {
 			$dbChilds = DBselect('SELECT i.itemid,i.hostid FROM items i WHERE i.templateid='.zbx_dbstr($itemId));
 
