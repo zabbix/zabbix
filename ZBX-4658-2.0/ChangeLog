@@ -1,5 +1,24 @@
+Changes for 2.0.10rc1
+
+New features:
+A.F....... [ZBX-1357] updated German, Japanese, Italian, Romanian and Slovak translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+A......... [ZBX-7101] fixed generated SQL queries in action.get method when simultaneously selecting more than one condition and operation (Ivo)
+..F....... [ZBX-7074] fixed incorrectly parsed trigger expression in trigger wizard (Vitalij)
+A.F....... [ZBX-5735] fixed debug mode check condition to use less memory when debug is off (Ivo)
+
+--------------------------------------------------------------------------------
 Changes for 2.0.9
 
+2.0.9rc2 was released as 2.0.9 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.0.9rc2
+
+Bug fixes:
+..F....... [ZBX-7036] fixed "Discovery status" widget being displayed on top of a customized dashboard when enabling a discovery rule (Pavels)
+..F....... [ZBX-3878] fixed not being able to move dashboard widget the second time (Ivo)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.9rc1
@@ -1405,9 +1424,12 @@ New features:
 Changes for 1.8.19rc1
 
 ...G...... [ZBX-4658] fixed system.boottime and system.uptime returning bogus values on Solaris when agent is compiled as a 64-bit binary (asaveljevs)
+........S. [ZBX-7119] fixed data collection stopping after no data maintenance until configuration cache is updated (asaveljevs)
+..F....... [ZBX-7074] fixed incorrectly parsed trigger expression in trigger wizard (Vitalij)
 
 Changes for 1.8.18
 
+1.8.18rc1 was released as 1.8.18 without any changes
 
 Changes for 1.8.18rc1
 

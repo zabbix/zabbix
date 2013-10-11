@@ -559,7 +559,7 @@ static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, i
 
 			DBexecute("%s", sql);
 
-			DCconfig_set_maintenance(hm[i].hostid, HOST_MAINTENANCE_STATUS_ON,
+			DCconfig_set_maintenance(&hm[i].hostid, 1, HOST_MAINTENANCE_STATUS_ON,
 					hm[i].maintenance_type, hm[i].maintenance_from);
 		}
 
@@ -618,6 +618,8 @@ static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, i
 	{
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", ids, ids_num);
 		DBexecute("%s", sql);
+
+		DCconfig_set_maintenance(ids, ids_num, HOST_MAINTENANCE_STATUS_OFF, 0, 0);
 	}
 
 	DBcommit();
