@@ -2128,6 +2128,13 @@ static int	DBpatch_2010178(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_2010181(void)
+{
+	const ZBX_FIELD	field = {"ip", "127.0.0.1", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("interface", &field);
+}
+
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 #define DBPATCH_END()					{NULL}};
@@ -2355,6 +2362,7 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010176, 0, 1)
 	DBPATCH_ADD(2010177, 0, 1)
 	DBPATCH_ADD(2010178, 0, 1)
+	DBPATCH_ADD(2010181, 0, 1)
 
 	DBPATCH_END()
 
