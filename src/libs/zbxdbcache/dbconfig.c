@@ -85,7 +85,7 @@ typedef struct
 	int			nextcheck;
 	int			lastclock;
 	int			mtime;
-	int			time_added;
+	int			data_expected_from;
 	unsigned char		type;
 	unsigned char		data_type;
 	unsigned char		value_type;
@@ -209,7 +209,7 @@ typedef struct
 	const char	*host;
 	const char	*name;
 	int		maintenance_from;
-	int		maintenance_until;
+	int		data_expected_from;
 	int		errors_from;
 	int		disable_until;
 	int		snmp_errors_from;
@@ -895,7 +895,7 @@ static void	DCsync_items(DB_RESULT result)
 			item->lastclock = 0;
 			ZBX_STR2UINT64(item->lastlogsize, row[31]);
 			item->mtime = atoi(row[32]);
-			item->time_added = now;
+			item->data_expected_from = now;
 		}
 		else if (NULL != item->triggers && NULL == item->triggers[0])
 		{
@@ -1768,7 +1768,7 @@ static void	DCsync_hosts(DB_RESULT result)
 			host->maintenance_status = (unsigned char)atoi(row[7]);
 			host->maintenance_type = (unsigned char)atoi(row[8]);
 			host->maintenance_from = atoi(row[9]);
-			host->maintenance_until = 0;
+			host->data_expected_from = 0;
 
 			host->errors_from = atoi(row[10]);
 			host->available = (unsigned char)atoi(row[11]);
@@ -4564,13 +4564,15 @@ void	DCconfig_set_trigger_value(zbx_uint64_t triggerid, unsigned char value,
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
-void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int maintenance_status,
-		int maintenance_type, int maintenance_from, int maintenance_until)
+void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num,
+		int maintenance_status, int maintenance_type, int maintenance_from)
 {
-	int		i;
+	int		i, now;
 	ZBX_DC_HOST	*dc_host;
 
 	LOCK_CACHE;
+
+	now = time(NULL);
 
 	for (i = 0; i < hostids_num; i++)
 	{
@@ -4584,9 +4586,7 @@ void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int 
 		/* because no-data maintenance ended or because maintenance type was */
 		/* changed to normal), this is needed for nodata() trigger function */
 		if (MAINTENANCE_TYPE_NODATA == dc_host->maintenance_type && MAINTENANCE_TYPE_NODATA != maintenance_type)
-			dc_host->maintenance_until = maintenance_until;
-		else
-			dc_host->maintenance_until = 0;
+			dc_host->data_expected_from = now;
 
 		dc_host->maintenance_status = maintenance_status;
 		dc_host->maintenance_type = maintenance_type;
@@ -5338,7 +5338,7 @@ void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCget_time_data_is_expected                                      *
+ * Function: DCget_data_expected_from                                         *
  *                                                                            *
  * Purpose: Returns time since which data is expected for the given item. We  *
  *          would not mind not having data for the item before that time, but *
@@ -5348,7 +5348,7 @@ void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name)
  *             seconds - [OUT] the time data is expected as a Unix timestamp  *
  *                                                                            *
  ******************************************************************************/
-int	DCget_time_data_is_expected(zbx_uint64_t itemid, int *seconds)
+int	DCget_data_expected_from(zbx_uint64_t itemid, int *seconds)
 {
 	ZBX_DC_ITEM	*item;
 	ZBX_DC_HOST	*host;
@@ -5359,7 +5359,7 @@ int	DCget_time_data_is_expected(zbx_uint64_t itemid, int *seconds)
 	if (NULL != (item = zbx_hashset_search(&config->items, &itemid)) &&
 			NULL != (host = zbx_hashset_search(&config->hosts, &item->hostid)))
 	{
-		*seconds = MAX(item->time_added, host->maintenance_until);
+		*seconds = MAX(item->data_expected_from, host->data_expected_from);
 		ret = SUCCEED;
 	}
 

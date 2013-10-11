@@ -1149,7 +1149,7 @@ static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, con
 	{
 		int	seconds;
 
-		if (SUCCEED != DCget_time_data_is_expected(item->itemid, &seconds) || seconds + arg1 > now)
+		if (SUCCEED != DCget_data_expected_from(item->itemid, &seconds) || seconds + arg1 > now)
 			goto out;
 
 		zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
