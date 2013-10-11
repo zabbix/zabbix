@@ -84,7 +84,7 @@ int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	assert(hz);
 
 	kn = (kstat_named_t*)kstat_data_lookup(kp, "clk_intr");
-	secs = kn->value.ul / hz;
+	secs = get_kstat_numeric_value(kn) / hz;
 
 	/* close kstat */
 	kstat_close(kc);
