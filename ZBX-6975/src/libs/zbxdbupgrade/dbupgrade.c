@@ -71,12 +71,16 @@
 #endif
 
 #if defined(HAVE_IBM_DB2)
+#	define ZBX_TYPE_FLOAT_STR	"decfloat(16)"
 #	define ZBX_TYPE_UINT_STR	"bigint"
 #elif defined(HAVE_MYSQL)
+#	define ZBX_TYPE_FLOAT_STR	"double(16,4)"
 #	define ZBX_TYPE_UINT_STR	"bigint unsigned"
 #elif defined(HAVE_ORACLE)
+#	define ZBX_TYPE_FLOAT_STR	"number(20,4)"
 #	define ZBX_TYPE_UINT_STR	"number(20)"
 #elif defined(HAVE_POSTGRESQL)
+#	define ZBX_TYPE_FLOAT_STR	"numeric(16,4)"
 #	define ZBX_TYPE_UINT_STR	"numeric(20)"
 #endif
 
@@ -204,6 +208,9 @@ static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offse
 			break;
 		case ZBX_TYPE_CHAR:
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s(%hu)", ZBX_TYPE_CHAR_STR, field->length);
+			break;
+		case ZBX_TYPE_FLOAT:
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_FLOAT_STR);
 			break;
 		case ZBX_TYPE_UINT:
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_UINT_STR);
@@ -2128,6 +2135,20 @@ static int	DBpatch_2010178(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_2010179(void)
+{
+	const ZBX_FIELD	field = {"yaxismax", "100", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	return DBset_default("graphs", &field);
+}
+
+static int	DBpatch_2010180(void)
+{
+	const ZBX_FIELD	field = {"yaxisside", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("graphs_items", &field);
+}
+
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 #define DBPATCH_END()					{NULL}};
@@ -2355,6 +2376,8 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010176, 0, 1)
 	DBPATCH_ADD(2010177, 0, 1)
 	DBPATCH_ADD(2010178, 0, 1)
+	DBPATCH_ADD(2010179, 0, 1)
+	DBPATCH_ADD(2010180, 0, 1)
 
 	DBPATCH_END()
 

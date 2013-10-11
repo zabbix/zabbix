@@ -2605,7 +2605,7 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
 				'length' => 16,
-				'default' => '0',
+				'default' => '100',
 			),
 			'templateid' => array(
 				'null' => true,
@@ -2735,7 +2735,7 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '1',
+				'default' => '0',
 			),
 			'calc_fnc' => array(
 				'null' => false,
