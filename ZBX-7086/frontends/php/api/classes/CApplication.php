@@ -520,7 +520,10 @@ class CApplication extends CZBXAPI {
 			'selectHosts' => array('hostid', 'name'),
 			'output' => array('itemid', 'hostid', 'name'),
 			'filter' => array(
-				'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)
+				'flags' => array(
+					ZBX_FLAG_DISCOVERY_NORMAL,
+					ZBX_FLAG_DISCOVERY_CREATED
+				)
 			),
 			'editable' => true,
 			'preservekeys' => true
@@ -532,29 +535,23 @@ class CApplication extends CZBXAPI {
 		}
 
 		// validate hosts
-		$applicationHost = array('hostid' => null, 'name' => null);
-
+		$dbApplication = reset($allowedApplications);
+		$dbApplicationHost = reset($dbApplication['hosts']);
 		foreach ($applications as $application) {
-			if ($applicationHost['hostid']) {
-				if ($applicationHost['hostid'] != $allowedApplications[$application['applicationid']]['hostid']) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot process applications from different hosts or templates!'));
-				}
-			}
-			else {
-				$applicationHost = reset($allowedApplications[$application['applicationid']]['hosts']);
+			if ($dbApplicationHost['hostid'] != $allowedApplications[$application['applicationid']]['hostid']) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot process applications from different hosts or templates!'));
 			}
 		}
 
 		foreach ($items as $item) {
 			$dbItem = $allowedItems[$item['itemid']];
 
-			if ($dbItem['hostid'] != $applicationHost['hostid']) {
+			if ($dbItem['hostid'] != $dbApplicationHost['hostid']) {
 				$dbItem['host'] = reset($dbItem['hosts']);
-				$application = reset($allowedApplications);
 
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_s('Cannot add item "%1$s" from "%2$s" to application "%3$s" from "%4$s".',
-						$dbItem['name'], $dbItem['host']['name'], $application['name'], $applicationHost['name']));
+						$dbItem['name'], $dbItem['host']['name'], $dbApplication['name'], $dbApplicationHost['name']));
 			}
 		}
 
