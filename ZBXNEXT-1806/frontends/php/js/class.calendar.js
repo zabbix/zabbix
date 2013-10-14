@@ -21,13 +21,25 @@
 var CLNDR = new Array();
 var calendar = Class.create();
 
-function create_calendar(time, timeobjects, id, utime_field_id, parentNodeid) {
+/**
+ * Create a new calendar object.
+ *
+ * @param {int} time						currently selected time
+ * @param {(string|string[])} timeobjects	single or array of element names to store the selected date in
+ * @param {string} id						unique calendar ID
+ * @param {string} utime_field_id
+ * @param {string} parentNodeid
+ * @param {bool} showTime					whether to allow to select time in the calendar
+ *
+ * @returns calendar
+ */
+function create_calendar(time, timeobjects, id, utime_field_id, parentNodeid, showTime) {
 	id = id || CLNDR.length;
 	if ('undefined' == typeof(utime_field_id)) {
 		utime_field_id = null;
 	}
 	CLNDR[id] = new Object;
-	CLNDR[id].clndr = new calendar(id, time, timeobjects, utime_field_id, parentNodeid);
+	CLNDR[id].clndr = new calendar(id, time, timeobjects, utime_field_id, parentNodeid, showTime);
 	return CLNDR[id];
 }
 
@@ -57,10 +69,12 @@ calendar.prototype = {
 	timeobjects: new Array(),	// object list where will be saved date
 	status: false,				// status of timeobjects
 	visible: 0,					// GMenu style state
+	showTime: true,				// if set to true, time selection will also be enabled
 	monthname: new Array(locale['S_JANUARY'], locale['S_FEBRUARY'], locale['S_MARCH'], locale['S_APRIL'], locale['S_MAY'], locale['S_JUNE'], locale['S_JULY'], locale['S_AUGUST'], locale['S_SEPTEMBER'], locale['S_OCTOBER'], locale['S_NOVEMBER'], locale['S_DECEMBER']),
 
-	initialize: function(id, stime, timeobjects, utime_field_id, parentNodeid) {
+	initialize: function(id, stime, timeobjects, utime_field_id, parentNodeid, showTime) {
 		this.id = id;
+		this.showTime = showTime;
 		this.timeobjects = new Array();
 		if (!(this.status = this.checkOuterObj(timeobjects))) {
 			throw 'Calendar: constructor expects second parameter to be list of DOM nodes [d,M,Y,H,i].';
@@ -72,10 +86,12 @@ calendar.prototype = {
 		addListener(this.clndr_monthup, 'click', this.monthup.bindAsEventListener(this));
 		addListener(this.clndr_yeardown, 'click', this.yeardown.bindAsEventListener(this));
 		addListener(this.clndr_yearup, 'click', this.yearup.bindAsEventListener(this));
-		addListener(this.clndr_hour, 'blur', this.sethour.bindAsEventListener(this));
-		addListener(this.clndr_minute, 'blur', this.setminute.bindAsEventListener(this));
 		addListener(this.clndr_now, 'click', this.setNow.bindAsEventListener(this));
 		addListener(this.clndr_done, 'click', this.setDone.bindAsEventListener(this));
+		if (this.showTime) {
+			addListener(this.clndr_hour, 'blur', this.sethour.bindAsEventListener(this));
+			addListener(this.clndr_minute, 'blur', this.setminute.bindAsEventListener(this));
+		}
 
 		for (var i = 0; i < this.timeobjects.length; i++) {
 			if (typeof(this.timeobjects[i]) != 'undefined' && !empty(this.timeobjects[i])) {
@@ -283,9 +299,13 @@ calendar.prototype = {
 				result = true;
 			}
 		}
-		this.sdt.setHours(00);
-		this.sdt.setMinutes(00);
-		this.sdt.setSeconds(00);
+
+		if (this.showTime) {
+			this.sdt.setHours(00);
+			this.sdt.setMinutes(00);
+			this.sdt.setSeconds(00);
+		}
+
 		return result;
 	},
 
@@ -480,16 +500,20 @@ calendar.prototype = {
 	},
 
 	setSDT: function(d, m, y, h, i) {
-		this.sdt.setMinutes(i);
-		this.sdt.setHours(h);
+		if (this.showTime) {
+			this.sdt.setMinutes(i);
+			this.sdt.setHours(h);
+		}
 		this.sdt.setDate(d);
 		this.sdt.setMonth(m);
 		this.sdt.setFullYear(y);
 	},
 
 	setCDT: function(d, m, y, h, i) {
-		this.cdt.setMinutes(i);
-		this.cdt.setHours(h);
+		if (this.showTime) {
+			this.cdt.setMinutes(i);
+			this.cdt.setHours(h);
+		}
 		this.cdt.setDate(d);
 		this.cdt.setMonth(m);
 		this.cdt.setFullYear(y);
@@ -512,8 +536,10 @@ calendar.prototype = {
 	},
 
 	setCDate: function() {
-		this.clndr_minute.value = this.minute;
-		this.clndr_hour.value = this.hour;
+		if (this.showTime) {
+			this.clndr_minute.value = this.minute;
+			this.clndr_hour.value = this.hour;
+		}
 		if (IE) {
 			this.clndr_month.innerHTML = this.monthname[this.month].toString();
 			this.clndr_year.innerHTML = this.year;
@@ -602,7 +628,7 @@ calendar.prototype = {
 		this.clndr_calendar.className = 'calendar';
 		this.clndr_calendar.hide();
 
-		if (typeof(parentNodeid) == 'undefined') {
+		if (!parentNodeid) {
 			document.body.appendChild(this.clndr_calendar);
 		}
 		else {
@@ -750,49 +776,51 @@ calendar.prototype = {
 		var line_div = document.createElement('div');
 		line_div.className = 'calendartime';
 
-		// hour
-		this.clndr_hour = document.createElement('input');
-		this.clndr_hour.setAttribute('type', 'text');
-		this.clndr_hour.setAttribute('name', 'hour');
-		this.clndr_hour.setAttribute('value', 'hh');
-		this.clndr_hour.setAttribute('maxlength', '2');
-		this.clndr_hour.className = 'calendar_textbox';
+		if (this.showTime) {
+			// hour
+			this.clndr_hour = document.createElement('input');
+			this.clndr_hour.setAttribute('type', 'text');
+			this.clndr_hour.setAttribute('name', 'hour');
+			this.clndr_hour.setAttribute('value', 'hh');
+			this.clndr_hour.setAttribute('maxlength', '2');
+			this.clndr_hour.className = 'calendar_textbox';
 
-		// minutes
-		this.clndr_minute = document.createElement('input');
-		this.clndr_minute.setAttribute('type', 'text');
-		this.clndr_minute.setAttribute('name', 'minute');
-		this.clndr_minute.setAttribute('value', 'mm');
-		this.clndr_minute.setAttribute('maxlength', '2');
-		this.clndr_minute.className = 'calendar_textbox';
+			// minutes
+			this.clndr_minute = document.createElement('input');
+			this.clndr_minute.setAttribute('type', 'text');
+			this.clndr_minute.setAttribute('name', 'minute');
+			this.clndr_minute.setAttribute('value', 'mm');
+			this.clndr_minute.setAttribute('maxlength', '2');
+			this.clndr_minute.className = 'calendar_textbox';
 
-		// column 1
-		var column1 = document.createElement('td');
-		column1.setAttribute('width', '27%');
-		column1.setAttribute('align', 'right');
-		column1.appendChild(document.createTextNode(locale['S_TIME']));
-		// column 2
-		var column2 = document.createElement('td');
-		column2.setAttribute('width', '46%');
-		column2.setAttribute('align', 'center');
-		column2.appendChild(this.clndr_hour);
-		column2.appendChild(document.createTextNode(' : '));
-		column2.appendChild(this.clndr_minute);
-		// column 3
-		var column3 = document.createElement('td');
-		column3.setAttribute('width', '27%');
-		column3.appendChild(document.createTextNode(' '));
-		// table
-		var row = document.createElement('tr');
-		row.appendChild(column1);
-		row.appendChild(column2);
-		row.appendChild(column3);
-		var table = document.createElement('table');
-		table.setAttribute('width', '100%');
-		var tbody = document.createElement('tbody');
-		table.appendChild(tbody);
-		tbody.appendChild(row);
-		line_div.appendChild(table);
+			// column 1
+			var column1 = document.createElement('td');
+			column1.setAttribute('width', '27%');
+			column1.setAttribute('align', 'right');
+			column1.appendChild(document.createTextNode(locale['S_TIME']));
+			// column 2
+			var column2 = document.createElement('td');
+			column2.setAttribute('width', '46%');
+			column2.setAttribute('align', 'center');
+			column2.appendChild(this.clndr_hour);
+			column2.appendChild(document.createTextNode(' : '));
+			column2.appendChild(this.clndr_minute);
+			// column 3
+			var column3 = document.createElement('td');
+			column3.setAttribute('width', '27%');
+			column3.appendChild(document.createTextNode(' '));
+			// table
+			var row = document.createElement('tr');
+			row.appendChild(column1);
+			row.appendChild(column2);
+			row.appendChild(column3);
+			var table = document.createElement('table');
+			table.setAttribute('width', '100%');
+			var tbody = document.createElement('tbody');
+			table.appendChild(tbody);
+			tbody.appendChild(row);
+			line_div.appendChild(table);
+		}
 
 		// now
 		this.clndr_now = document.createElement('input');

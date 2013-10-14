@@ -47,16 +47,12 @@ if (isset($_REQUEST['active_since'])) {
 	$fromYear = get_request('active_since_year');
 	$fromMonth = get_request('active_since_month');
 	$fromDay = get_request('active_since_day');
-	$fromHours = get_request('active_since_hour');
-	$fromMinutes = get_request('active_since_minute');
 	$fromDate = array(
 		'y' => $fromYear,
 		'm' => $fromMonth,
-		'd' => $fromDay,
-		'h' => $fromHours,
-		'i' => $fromMinutes
+		'd' => $fromDay
 	);
-	$activeSince = $fromYear.$fromMonth.$fromDay.$fromHours.$fromMinutes;
+	$activeSince = $fromYear.$fromMonth.$fromDay;
 }
 else {
 	$fromDate = zbxDateToTime($this->data['active_since']);
@@ -69,16 +65,12 @@ if (isset($_REQUEST['active_till'])) {
 	$toYear = get_request('active_till_year');
 	$toMonth = get_request('active_till_month');
 	$toDay = get_request('active_till_day');
-	$toHours = get_request('active_till_hour');
-	$toMinutes = get_request('active_till_minute');
 	$toDate = array(
 		'y' => $toYear,
 		'm' => $toMonth,
-		'd' => $toDay,
-		'h' => $toHours,
-		'i' => $toMinutes,
+		'd' => $toDay
 	);
-	$activeTill = $toYear.$toMonth.$toDay.$toHours.$toMinutes;
+	$activeTill = $toYear.$toMonth.$toDay;
 }
 else {
 	$toDate = zbxDateToTime($this->data['active_till']);
@@ -86,8 +78,8 @@ else {
 }
 $maintenanceForm->addVar('active_till', $activeTill);
 
-$maintenanceFormList->addRow(_('Active since'), createDateSelector('active_since', $fromDate, 'active_till'));
-$maintenanceFormList->addRow(_('Active till'), createDateSelector('active_till', $toDate, 'active_since'));
+$maintenanceFormList->addRow(_('Active since'), createDateSelector('active_since', $fromDate, 'active_till', false));
+$maintenanceFormList->addRow(_('Active till'), createDateSelector('active_till', $toDate, 'active_since', false));
 
 $maintenanceFormList->addRow(_('Description'), new CTextArea('description', $this->data['description']));
 

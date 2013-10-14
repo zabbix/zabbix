@@ -563,18 +563,19 @@ function validateUnixTime($time) {
  * @param int $year
  * @param int $month
  * @param int $day
+ * @param int $hours
  * @param int $minutes
  * @param int $seconds
  *
  * @return bool
  */
-function validateDateTime($year, $month, $day, $hours, $minutes, $seconds = null) {
+function validateDateTime($year, $month, $day, $hours = null, $minutes = null, $seconds = null) {
 	return !($month < 1 || $month > 12
 			|| $day < 1  || $day > 31 || (($month == 4 || $month == 6 || $month == 9 || $month == 11) && $day > 30)
 			|| ($month == 2 && ((($year % 4) == 0 && $day > 29) || (($year % 4) != 0 && $day > 28)))
-			|| $hours < 0 || $hours > 23
-			|| $minutes < 0 || $minutes > 59
-			|| (!is_null($seconds) && ($seconds < 0 || $seconds > 59)));
+			|| ($hours !== null && ($hours < 0 || $hours > 23))
+			|| ($minutes !== null && ($minutes < 0 || $minutes > 59))
+			|| ($seconds !== null && ($seconds < 0 || $seconds > 59)));
 }
 
 /**

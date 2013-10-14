@@ -601,13 +601,14 @@ function getAvailabilityTable($host) {
 /**
  * Create array with all inputs required for date selection and calendar.
  *
- * @param string      $name
- * @param int|array   $date unix timestamp/date array(Y,m,d,H,i)
- * @param string|null $relatedCalendar name of the calendar which must be closed when this calendar opens
+ * @param string      		$name
+ * @param int|array   		$date unix timestamp/date array(Y,m,d,H,i)
+ * @param string 			$relatedCalendar name of the calendar which must be closed when this calendar opens
+ * @param bool displayTime	whether to enable time input
  *
  * @return array
  */
-function createDateSelector($name, $date, $relatedCalendar = null) {
+function createDateSelector($name, $date, $relatedCalendar = null, $displayTime = true) {
 	$calendarIcon = new CImg('images/general/bar/cal.gif', 'calendar', 16, 12, 'pointer');
 	$onClick = 'var pos = getPosition(this); pos.top += 10; pos.left += 16; CLNDR["'.$name.
 		'_calendar"].clndr.clndrshow(pos.top, pos.left);';
@@ -621,15 +622,11 @@ function createDateSelector($name, $date, $relatedCalendar = null) {
 		$y = $date['y'];
 		$m = $date['m'];
 		$d = $date['d'];
-		$h = $date['h'];
-		$i = $date['i'];
 	}
 	else {
 		$y = date('Y', $date);
 		$m = date('m', $date);
 		$d = date('d', $date);
-		$h = date('H', $date);
-		$i = date('i', $date);
 	}
 
 	$day = new CNumericBox($name.'_day', $d, 2);
@@ -638,17 +635,43 @@ function createDateSelector($name, $date, $relatedCalendar = null) {
 	$month->attr('placeholder', _('mm'));
 	$year = new CNumericBox($name.'_year', $y, 4);
 	$year->attr('placeholder', _('yyyy'));
-	$hour = new CNumericBox($name.'_hour', $h, 2);
-	$hour->attr('placeholder', _('hh'));
-	$minute = new CNumericBox($name.'_minute', $i, 2);
-	$minute->attr('placeholder', _('mm'));
 
-	$fields = array($day, '/', $month, '/', $year, SPACE, $hour, ':', $minute, $calendarIcon);
+	$fields = array($day, '/', $month, '/', $year);
 
+	// fields to store values in
+	$valueFields = array($name.'_day', $name.'_month', $name.'_year');
+
+	if ($displayTime) {
+		if (is_array($date)) {
+			$h = $date['h'];
+			$i = $date['i'];
+		}
+		else {
+			$h = date('H', $date);
+			$i = date('i', $date);
+		}
+
+		$hour = new CNumericBox($name.'_hour', $h, 2);
+		$hour->attr('placeholder', _('hh'));
+		$minute = new CNumericBox($name.'_minute', $i, 2);
+		$minute->attr('placeholder', _('mm'));
+
+		$fields[] = SPACE;
+		$fields[] = $hour;
+		$fields[] = ':';
+		$fields[] = $minute;
+
+		$valueFields[] = $name.'_hour';
+		$valueFields[] = $name.'_minute';
+	}
+
+	$fields[] = $calendarIcon;
 	zbx_add_post_js('create_calendar(null,'.
-		'["'.$name.'_day","'.$name.'_month","'.$name.'_year","'.$name.'_hour","'.$name.'_minute"],'.
-		'"'.$name.'_calendar",'.
-		'"'.$name.'");'
+		CJs::encodeJson($valueFields).','.
+		CJs::encodeJson($name.'_calendar').','.
+		CJs::encodeJson($name).','.
+		'null,'.
+		CJs::encodeJson($displayTime).')'
 	);
 
 	return $fields;

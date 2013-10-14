@@ -49,13 +49,9 @@ $fields = array(
 	'active_since_day' =>					array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
 	'active_since_month' =>					array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
 	'active_since_year' =>					array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
-	'active_since_hour' =>					array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
-	'active_since_minute' =>				array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
 	'active_till_day' =>					array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
 	'active_till_month' =>					array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
 	'active_till_year' =>					array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
-	'active_till_hour' =>					array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
-	'active_till_minute' =>					array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
 	'new_timeperiod_start_date_day' =>		array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
 	'new_timeperiod_start_date_month' =>	array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
 	'new_timeperiod_start_date_year' =>		array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
@@ -127,11 +123,9 @@ elseif (isset($_REQUEST['save'])) {
 
 	$result = true;
 
-	if (!validateDateTime($_REQUEST['active_since_year'],
-			$_REQUEST['active_since_month'],
-			$_REQUEST['active_since_day'],
-			$_REQUEST['active_since_hour'],
-			$_REQUEST['active_since_minute'])) {
+	if (!validateDateTime(getRequest('active_since_year'),
+			getRequest('active_since_month'),
+			getRequest('active_since_day'))) {
 		info(_s('Invalid date "%s".', _('Active since')));
 		$result = false;
 	}
@@ -141,11 +135,9 @@ elseif (isset($_REQUEST['save'])) {
 		info(_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Active since')));
 		$result = false;
 	}
-	if (!validateDateTime($_REQUEST['active_till_year'],
-				$_REQUEST['active_till_month'],
-				$_REQUEST['active_till_day'],
-				$_REQUEST['active_till_hour'],
-				$_REQUEST['active_till_minute'])) {
+	if (!validateDateTime(getRequest('active_till_year'),
+			getRequest('active_till_month'),
+			getRequest('active_till_day'))) {
 		info(_s('Invalid date "%s".', _('Active till')));
 		$result = false;
 	}
@@ -156,23 +148,17 @@ elseif (isset($_REQUEST['save'])) {
 
 	if ($result) {
 		if (isset($_REQUEST['active_since'])) {
-			$activeSince = mktime(
-				$_REQUEST['active_since_hour'],
-				$_REQUEST['active_since_minute'],
-				0,
-				$_REQUEST['active_since_month'],
-				$_REQUEST['active_since_day'],
-				$_REQUEST['active_since_year']
+			$activeSince = mktime(0, 0, 0,
+				getRequest('active_since_month'),
+				getRequest('active_since_day'),
+				getRequest('active_since_year')
 			);
 		}
 		if (isset($_REQUEST['active_till'])) {
-			$activeTill = mktime(
-				$_REQUEST['active_till_hour'],
-				$_REQUEST['active_till_minute'],
-				0,
-				$_REQUEST['active_till_month'],
-				$_REQUEST['active_till_day'],
-				$_REQUEST['active_till_year']
+			$activeTill = mktime(0, 0, 0,
+				getRequest('active_till_month'),
+				getRequest('active_till_day'),
+				getRequest('active_till_year')
 			);
 		}
 
@@ -428,23 +414,21 @@ if (!empty($data['form'])) {
 		$data['mname'] = get_request('mname', '');
 		$data['maintenance_type'] = get_request('maintenance_type', 0);
 		if (isset($_REQUEST['active_since'])) {
-			$data['active_since'] = mktime($_REQUEST['active_since_hour'],
-					$_REQUEST['active_since_minute'],
-					0,
-					$_REQUEST['active_since_month'],
-					$_REQUEST['active_since_day'],
-					$_REQUEST['active_since_year']);
+			$data['active_since'] = mktime(0, 0, 0,
+				getRequest('active_since_month'),
+				getRequest('active_since_day'),
+				getRequest('active_since_year')
+			);
 		}
 		else {
 			$data['active_since'] = time();
 		}
 		if (isset($_REQUEST['active_till'])) {
-			$data['active_till'] = mktime($_REQUEST['active_till_hour'],
-					$_REQUEST['active_till_minute'],
-					0,
-					$_REQUEST['active_till_month'],
-					$_REQUEST['active_till_day'],
-					$_REQUEST['active_till_year']);
+			$data['active_till'] = mktime(0, 0, 0,
+				getRequest('active_till_month'),
+				getRequest('active_till_day'),
+				getRequest('active_till_year')
+			);
 		}
 		else {
 			$data['active_till'] = time() + SEC_PER_DAY;
