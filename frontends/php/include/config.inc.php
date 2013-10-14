@@ -61,6 +61,13 @@ function _llnw_is_user_rw() {
 	global $USER_DETAILS;
 	// Consider CWebUser::getType() in place of USER_DETAILS...
 	global $LLNW_RW_ROLE, $LLNW_RO_ROLE; // Global configuration role information
+	// Inititalize the config...
+	if (empty($LLNW_RO_ROLE)) {
+		$LLNW_RO_ROLE = -1; // Assume no default role assignment.
+	}
+	if (empty($LLNW_RW_ROLE)) {
+		$LLNW_RW_ROLE = -1;
+	}
 
 	if (empty($USER_DETAILS['userid'])) {
 		return true; // consider the lack of a userid as anonymous

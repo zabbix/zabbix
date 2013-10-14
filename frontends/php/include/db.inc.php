@@ -536,7 +536,8 @@ function _llnw_allow_DBexecute($query) {
 		"UPDATE sessions",
 		"INSERT INTO sessions",
 		"DELETE FROM sessions", // Allow session changes
-		"UPDATE ids SET nextid=nextid+1 WHERE nodeid=0 AND table_name='profiles' AND field_name='profileid'", // needed for footer:
+		"UPDATE ids SET nextid=nextid+1 WHERE nodeid=0 AND table_name='profiles' AND field_name='profileid'", // Allow node: 0,1,??
+		"UPDATE ids SET nextid=nextid+1 WHERE nodeid=1 AND table_name='profiles' AND field_name='profileid'", // needed for footer:
 		// page_footer.php:46:CProfile::flush()
 	);
 	foreach ($whitelist as $allow) {
