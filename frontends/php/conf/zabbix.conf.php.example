@@ -16,4 +16,8 @@ $ZBX_SERVER_PORT		= '10051';
 $ZBX_SERVER_NAME		= '';
 
 $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
+
+// // LLNW Override (see: general.searchpage.php) for Performance link ID
+// global $LLNW_PERFORMANCE_LINK_ID;
+// $LLNW_PERFORMANCE_LINK_ID='100100000000107';
 ?>
