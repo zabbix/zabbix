@@ -489,21 +489,23 @@ class CApplication extends CZBXAPI {
 	 * @param array $data['applications']
 	 * @param array $data['items']
 	 *
-	 * @return bool
+	 * @return array
 	 */
 	public function massAdd($data) {
-		if (empty($data['applications'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		if (empty($data['applications']) || empty($data['items'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameters.'));
 		}
 
 		$applications = zbx_toArray($data['applications']);
 		$applicationIds = zbx_objectValues($applications, 'applicationid');
-		$hostId = null;
+		$items = zbx_toArray($data['items']);
+		$itemIds = zbx_objectValues($items, 'itemid');
 
 		// validate permissions
 		$allowedApplications = $this->get(array(
 			'applicationids' => $applicationIds,
-			'output' => array('applicationid', 'hostid'),
+			'output' => array('applicationid', 'hostid', 'name'),
+			'selectHosts' => array('hostid', 'name'),
 			'editable' => true,
 			'preservekeys' => true
 		));
@@ -511,43 +513,52 @@ class CApplication extends CZBXAPI {
 			if (!isset($allowedApplications[$application['applicationid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
-
-			if ($hostId) {
-				if ($hostId != $allowedApplications[$application['applicationid']]['hostid']) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot process applications from different hosts or templates!'));
-				}
-			}
-			else {
-				$hostId = $allowedApplications[$application['applicationid']]['hostid'];
-			}
 		}
-
-		$items = zbx_toArray($data['items']);
-		$itemIds = zbx_objectValues($items, 'itemid');
 
 		$allowedItems = API::Item()->get(array(
 			'itemids' => $itemIds,
-			'editable' => true,
-			'output' => array('itemid', 'hostid'),
-			'preservekeys' => true,
+			'selectHosts' => array('hostid', 'name'),
+			'output' => array('itemid', 'hostid', 'name'),
 			'filter' => array(
-				'flags' => array(
-					ZBX_FLAG_DISCOVERY_NORMAL,
-					ZBX_FLAG_DISCOVERY_PROTOTYPE,
-					ZBX_FLAG_DISCOVERY_CREATED
-				)
-			)
+				'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)
+			),
+			'editable' => true,
+			'preservekeys' => true
 		));
 		foreach ($items as $item) {
 			if (!isset($allowedItems[$item['itemid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
+		}
 
-			if ($allowedItems[$item['itemid']]['hostid'] != $hostId) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot process items from different hosts or templates!'));
+		// validate hosts
+		$applicationHost = array('hostid' => null, 'name' => null);
+
+		foreach ($applications as $application) {
+			if ($applicationHost['hostid']) {
+				if ($applicationHost['hostid'] != $allowedApplications[$application['applicationid']]['hostid']) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot process applications from different hosts or templates!'));
+				}
+			}
+			else {
+				$applicationHost = reset($allowedApplications[$application['applicationid']]['hosts']);
 			}
 		}
 
+		foreach ($items as $item) {
+			$dbItem = $allowedItems[$item['itemid']];
+
+			if ($dbItem['hostid'] != $applicationHost['hostid']) {
+				$dbItem['host'] = reset($dbItem['hosts']);
+				$application = reset($allowedApplications);
+
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_s('Cannot add item "%1$s" from "%2$s" to application "%3$s" from "%4$s".',
+						$dbItem['name'], $dbItem['host']['name'], $application['name'], $applicationHost['name']));
+			}
+		}
+
+		// link application with item
 		$linkedDb = DBselect(
 			'SELECT ia.itemid,ia.applicationid'.
 			' FROM items_applications ia'.
