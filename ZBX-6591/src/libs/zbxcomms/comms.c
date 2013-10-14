@@ -1195,7 +1195,7 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 #else
 	struct hostent	*hp;
 	char		*sip;
-	int		i[4], j[4];
+	int		i[4], j[4], k;
 #endif
 	ZBX_SOCKADDR	name;
 	ZBX_SOCKLEN_T	nlen;
@@ -1247,12 +1247,15 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 #else
 			if (NULL != (hp = gethostbyname(start)))
 			{
-				sip = inet_ntoa(*((struct in_addr *)hp->h_addr));
-
-				if (4 == sscanf(sip, "%d.%d.%d.%d", &j[0], &j[1], &j[2], &j[3]) &&
-						i[0] == j[0] && i[1] == j[1] && i[2] == j[2] && i[3] == j[3])
+				for (k = 0; hp->h_addr_list[k] != NULL; k++)
 				{
-					return SUCCEED;
+					sip = inet_ntoa(*(struct in_addr *)hp->h_addr_list[k]);
+
+					if (4 == sscanf(sip, "%d.%d.%d.%d", &j[0], &j[1], &j[2], &j[3]) &&
+							i[0] == j[0] && i[1] == j[1] && i[2] == j[2] && i[3] == j[3])
+					{
+						return SUCCEED;
+					}
 				}
 			}
 #endif	/* HAVE_IPV6 */
