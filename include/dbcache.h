@@ -344,5 +344,6 @@ void	DCget_functions_hostids(zbx_vector_uint64_t *hosts, const zbx_vector_uint64
 void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * const *names, int names_num);
 void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name);
 
-int	DCget_item_time_added(zbx_uint64_t itemid, int *time_added);
+int	DCget_data_expected_from(zbx_uint64_t itemid, int *seconds);
+
 #endif
