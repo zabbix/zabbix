@@ -91,7 +91,7 @@ char **	setproctitle_save_env(int argc, char **argv)
 		argv_int[i] = zbx_strdup(NULL, argv[i]);
 		argc_ext_copied_last = i;
 
-		/* argv[copy_first] will be used to display status messages. The rest of arguments can be */
+		/* argv[argc_ext_copied_first] will be used to display status messages. The rest of arguments can be */
 		/* overwritten and their argv[] pointers will point to wrong strings. */
 		if (argc_ext_copied_first < i)
 			argv[i] = empty_str;
