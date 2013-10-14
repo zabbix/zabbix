@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated German, Japanese, Italian, Romanian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7112] improved file import validation for graph items (Eduard)
 A......... [ZBX-7101] fixed generated SQL queries in action.get method when simultaneously selecting more than one condition and operation (Ivo)
 ..F....... [ZBX-7074] fixed incorrectly parsed trigger expression in trigger wizard (Vitalij)
 A.F....... [ZBX-5735] fixed debug mode check condition to use less memory when debug is off (Ivo)
