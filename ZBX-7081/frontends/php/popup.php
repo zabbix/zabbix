@@ -1451,7 +1451,7 @@ elseif ($srctbl == 'dchecks') {
 	));
 	foreach ($dRules as $dRule) {
 		foreach ($dRule['dchecks'] as $dCheck) {
-			$name = $dRule['name'].NAME_DELIMITER.' '.discovery_check2str($dCheck['type'], $dCheck['key_'], $dCheck['ports']);
+			$name = $dRule['name'].NAME_DELIMITER.discovery_check2str($dCheck['type'], $dCheck['key_'], $dCheck['ports']);
 			$action = get_window_opener($dstfrm, $dstfld1, $dCheck[$srcfld1]).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $name) : '');
 			$name = new CSpan($name, 'link');
