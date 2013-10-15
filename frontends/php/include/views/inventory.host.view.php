@@ -48,6 +48,7 @@ if ($this->data['host']['host'] != $this->data['host']['name']) {
 	$overviewFormList->addRow(_('Visible name'), new CSpan($this->data['host']['name'], 'text-field'));
 }
 
+$agentInterfaceRows = array();
 $snmpInterfaceRows = array();
 $ipmiInterfaceRows = array();
 $jmxInterfaceRows = array();
@@ -94,22 +95,36 @@ foreach ($this->data['host']['interfaces'] as $interface) {
 	}
 }
 
-$agentInterfacesTable = new CTable(null, 'formElementTable border_dotted objectgroup element-row-first interfaces');
-$agentInterfacesTable->setHeader(array(_('IP address'), _('DNS name'), _('Connect to'), _('Port')));
+$interfaceTableHeaderSet = false;
 
 // Agent interface
-foreach ($agentInterfaceRows as $interface) {
-	$agentInterfacesTable->addRow($interface);
+if ($agentInterfaceRows) {
+	$agentInterfacesTable = new CTable(null, 'formElementTable border_dotted objectgroup element-row-first interfaces');
+	$agentInterfacesTable->setHeader(array(_('IP address'), _('DNS name'), _('Connect to'), _('Port')));
+	$interfaceTableHeaderSet = true;
+
+	foreach ($agentInterfaceRows as $interface) {
+		$agentInterfacesTable->addRow($interface);
+	}
+
+	$overviewFormList->addRow(
+		_('Agent interfaces'),
+		new CDiv($agentInterfacesTable)
+	);
 }
 
-$overviewFormList->addRow(
-	_('Agent interfaces'),
-	new CDiv($agentInterfacesTable)
-);
 
 // SNMP interface
 if ($snmpInterfaceRows) {
-	$snmpInterfacesTable = new CTable(null, 'formElementTable border_dotted objectgroup element-row interfaces');
+	$snmpInterfacesTable = new CTable(null, 'formElementTable border_dotted objectgroup interfaces');
+	if ($interfaceTableHeaderSet) {
+		$snmpInterfacesTable->addClass('element-row');
+	}
+	else {
+		$snmpInterfacesTable->addClass('element-row-first');
+		$snmpInterfacesTable->setHeader(array(_('IP address'), _('DNS name'), _('Connect to'), _('Port')));
+		$interfaceTableHeaderSet = true;
+	}
 
 	foreach ($snmpInterfaceRows as $interface) {
 		$snmpInterfacesTable->addRow($interface);
@@ -123,7 +138,15 @@ if ($snmpInterfaceRows) {
 
 // IPMI interface
 if ($ipmiInterfaceRows) {
-	$ipmiInterfacesTable = new CTable(null, 'formElementTable border_dotted objectgroup element-row interfaces');
+	$ipmiInterfacesTable = new CTable(null, 'formElementTable border_dotted objectgroup interfaces');
+	if ($interfaceTableHeaderSet) {
+		$ipmiInterfacesTable->addClass('element-row');
+	}
+	else {
+		$ipmiInterfacesTable->addClass('element-row-first');
+		$ipmiInterfacesTable->setHeader(array(_('IP address'), _('DNS name'), _('Connect to'), _('Port')));
+		$interfaceTableHeaderSet = true;
+	}
 
 	foreach ($ipmiInterfaceRows as $interface) {
 		$ipmiInterfacesTable->addRow($interface);
@@ -137,7 +160,14 @@ if ($ipmiInterfaceRows) {
 
 // JMX interface
 if ($jmxInterfaceRows) {
-	$jmxInterfacesTable = new CTable(null, 'formElementTable border_dotted objectgroup element-row interfaces');
+	$jmxInterfacesTable = new CTable(null, 'formElementTable border_dotted objectgroup interfaces');
+	if ($interfaceTableHeaderSet) {
+		$jmxInterfacesTable->addClass('element-row');
+	}
+	else {
+		$jmxInterfacesTable->addClass('element-row-first');
+		$jmxInterfacesTable->setHeader(array(_('IP address'), _('DNS name'), _('Connect to'), _('Port')));
+	}
 
 	foreach ($jmxInterfaceRows as $interface) {
 		$jmxInterfacesTable->addRow($interface);
