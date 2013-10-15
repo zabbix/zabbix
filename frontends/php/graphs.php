@@ -197,42 +197,21 @@ elseif (isset($_REQUEST['save'])) {
 		'name' => $_REQUEST['name'],
 		'width' => $_REQUEST['width'],
 		'height' => $_REQUEST['height'],
+		'ymin_type' => get_request('ymin_type', 0),
+		'ymax_type' => get_request('ymax_type', 0),
+		'yaxismin' => get_request('yaxismin', 0),
+		'yaxismax' => get_request('yaxismax', 0),
 		'ymin_itemid' => $_REQUEST['ymin_itemid'],
 		'ymax_itemid' => $_REQUEST['ymax_itemid'],
+		'show_work_period' => get_request('show_work_period', 0),
+		'show_triggers' => get_request('show_triggers', 0),
 		'graphtype' => $_REQUEST['graphtype'],
+		'show_legend' => get_request('show_legend', 1),
+		'show_3d' => get_request('show_3d', 0),
+		'percent_left' => get_request('percent_left', 0),
+		'percent_right' => get_request('percent_right', 0),
 		'gitems' => $items
 	);
-
-	if (hasRequest('ymin_type')) {
-		$graph['ymin_type'] = $_REQUEST['ymin_type'];
-	}
-	if (hasRequest('ymax_type')) {
-		$graph['ymax_type'] = $_REQUEST['ymax_type'];
-	}
-	if (hasRequest('yaxismin')) {
-		$graph['yaxismin'] = $_REQUEST['yaxismin'];
-	}
-	if (hasRequest('yaxismax')) {
-		$graph['yaxismax'] = $_REQUEST['yaxismax'];
-	}
-	if (hasRequest('show_work_period')) {
-		$graph['show_work_period'] = $_REQUEST['show_work_period'];
-	}
-	if (hasRequest('show_triggers')) {
-		$graph['show_triggers'] = $_REQUEST['show_triggers'];
-	}
-	if (hasRequest('show_legend')) {
-		$graph['show_legend'] = $_REQUEST['show_legend'];
-	}
-	if (hasRequest('show_3d')) {
-		$graph['show_3d'] = $_REQUEST['show_3d'];
-	}
-	if (hasRequest('percent_left')) {
-		$graph['percent_left'] = $_REQUEST['percent_left'];
-	}
-	if (hasRequest('percent_right')) {
-		$graph['percent_right'] = $_REQUEST['percent_right'];
-	}
 
 	if (!empty($_REQUEST['parent_discoveryid'])) {
 		$graph['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
