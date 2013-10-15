@@ -1,10 +1,20 @@
 Changes for 2.1.8
 
 New features:
+........S. [ZBX-6294] fixed nodata() trigger firing immediately after no data maintenance (asaveljevs, Sasha)
 A.F....... [ZBX-1357] updated Dutch, Finnish, Indonesian, Italian, Lithuanian, Persian, Portuguese (Portugal), Russian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 ....I..... [ZBX-7130] fixed makefiles to build zabbix_proxy only (Sasha)
+..F....... [ZBX-7055] fixed displaing OK trigger status in maps (Eduard)
+..F....... [ZBX-7081] fixed node drop down being displayed incorrectly in several pop ups (Pavels)
+A......... [ZBX-7086] fixed application mass add from different hosts or templates validation (Eduard)
+........S. [ZBX-7133] fixed processing of zabbix[host,*,available] item; fixed proxy's hosts availability data on server (Sasha)
+..F....... [ZBX-7099] fixed IT services tree icons alignment (Eduard)
+A.F.I..... [ZBX-7121] increased size of interface.ip field (Sasha)
+A...I..... [ZBX-6975] fixed default values for graphs.yaxismax and graphs_items.yaxisside fields (Sasha)
+A......... [ZBX-7131] fixed host interface IP validation (Eduard)
+..F....... [ZBX-7112] improved file import validation for graph items (Eduard)
 ..F....... [ZBX-7134] fixed host inventory interface table when no agent interfaces are set (Ivo)
 ..F....... [ZBX-7126] fixed host inventories details tab displaying (Eduard)
 ..F.I..... [ZBX-7066] corrected downloadable configuration file name in setup step 6 (Ivo)
@@ -492,6 +502,8 @@ New features:
 A.F....... [ZBX-1357] updated German, Japanese, Italian, Romanian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-7133] fixed processing of zabbix[host,*,available] item; fixed proxy's hosts availability data on server (Sasha)
+..F....... [ZBX-7112] improved file import validation for graph items (Eduard)
 A......... [ZBX-7101] fixed generated SQL queries in action.get method when simultaneously selecting more than one condition and operation (Ivo)
 ..F....... [ZBX-7074] fixed incorrectly parsed trigger expression in trigger wizard (Vitalij)
 A.F....... [ZBX-5735] fixed debug mode check condition to use less memory when debug is off (Ivo)
