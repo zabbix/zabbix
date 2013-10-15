@@ -336,27 +336,56 @@ exit:
 
 void	main_proxypoller_loop(void)
 {
-	int		nextcheck, sleeptime, processed;
-	double		sec;
+	int	nextcheck, sleeptime = -1, processed = 0, old_processed = 0;
+	double	sec, total_sec = 0.0, old_total_sec = 0.0;
+	time_t	last_stat_time;
+
+#define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
+				/* once in STAT_INTERVAL seconds */
 
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
+	last_stat_time = time(NULL);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
-		zbx_setproctitle("%s #%d [exchanging data]", get_process_type_string(process_type), process_num);
+		if (0 != sleeptime)
+		{
+			zbx_setproctitle("%s #%d [exchanged data with %d proxies in " ZBX_FS_DBL " sec,"
+					" exchanging data]", get_process_type_string(process_type), process_num,
+					old_processed, old_total_sec);
+		}
 
 		sec = zbx_time();
-		processed = process_proxy();
-		sec = zbx_time() - sec;
+		processed += process_proxy();
+		total_sec += zbx_time() - sec;
 
 		nextcheck = DCconfig_get_proxypoller_nextcheck();
 		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
-		zbx_setproctitle("%s #%d [exchanged data with %d proxies in " ZBX_FS_DBL " sec, idle %d sec]",
-				get_process_type_string(process_type), process_num, processed, sec, sleeptime);
+		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
+		{
+			if (0 == sleeptime)
+			{
+				zbx_setproctitle("%s #%d [exchanged data with %d proxies in " ZBX_FS_DBL " sec,"
+						" exchanging data]", get_process_type_string(process_type), process_num,
+						processed, total_sec);
+			}
+			else
+			{
+				zbx_setproctitle("%s #%d [exchanged data with %d proxies in " ZBX_FS_DBL " sec,"
+						" idle %d sec]", get_process_type_string(process_type), process_num,
+						processed, total_sec, sleeptime);
+				old_processed = processed;
+				old_total_sec = total_sec;
+			}
+			processed = 0;
+			total_sec = 0.0;
+			last_stat_time = time(NULL);
+		}
 
 		zbx_sleep_loop(sleeptime);
 	}
+#undef STAT_INTERVAL
 }
