@@ -519,12 +519,6 @@ class CApplication extends CZBXAPI {
 			'itemids' => $itemIds,
 			'selectHosts' => array('hostid', 'name'),
 			'output' => array('itemid', 'hostid', 'name'),
-			'filter' => array(
-				'flags' => array(
-					ZBX_FLAG_DISCOVERY_NORMAL,
-					ZBX_FLAG_DISCOVERY_CREATED
-				)
-			),
 			'editable' => true,
 			'preservekeys' => true
 		));
