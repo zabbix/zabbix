@@ -539,7 +539,7 @@ class CApplication extends CZBXAPI {
 		$dbApplicationHost = reset($dbApplication['hosts']);
 		foreach ($applications as $application) {
 			if ($dbApplicationHost['hostid'] != $allowedApplications[$application['applicationid']]['hostid']) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot process applications from different hosts or templates!'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot process applications from different hosts or templates.'));
 			}
 		}
 
