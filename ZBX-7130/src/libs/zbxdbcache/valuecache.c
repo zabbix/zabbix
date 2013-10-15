@@ -2811,7 +2811,7 @@ int	zbx_vc_add_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *
  *             values     - [OUT] the item history data stored time/value     *
  *                          pairs in descending order                         *
  *             seconds    - [IN] the time period to retrieve data for         *
- *             count      - [IN] the number of history values to retrieve.    *
+ *             count      - [IN] the number of history values to retrieve     *
  *             timestamp  - [IN] the period end timestamp                     *
  *                                                                            *
  * Return value:  SUCCEED - the item history data was retrieved successfully  *
