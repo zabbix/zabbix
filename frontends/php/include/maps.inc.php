@@ -654,7 +654,6 @@ function getTriggersInfo($selement, $i, $showUnack) {
 
 	if ($i['problem'] && ($i['problem_unack'] && $showUnack == EXTACK_OPTION_UNACK
 			|| in_array($showUnack, array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH)))) {
-
 		$info['iconid'] = $selement['iconid_on'];
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
 		$info['info']['unack'] = array(
@@ -673,6 +672,10 @@ function getTriggersInfo($selement, $i, $showUnack) {
 	else {
 		$info['iconid'] = $selement['iconid_off'];
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
+		$info['info']['ok'] = array(
+			'msg' => _('OK'),
+			'color' => $colors['Dark Green']
+		);
 	}
 
 	return $info;
@@ -697,7 +700,7 @@ function getHostsInfo($selement, $i, $show_unack) {
 		'info' => array(),
 		'iconid' => $selement['iconid_off']
 	);
-	$has_problem = false;
+	$hasProblem = false;
 
 	if ($i['problem']) {
 		if (in_array($show_unack, array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH))) {
@@ -728,7 +731,7 @@ function getHostsInfo($selement, $i, $show_unack) {
 		if ($info['info']) {
 			$info['iconid'] = $selement['iconid_on'];
 			$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
-			$has_problem = true;
+			$hasProblem = true;
 		}
 	}
 
@@ -748,9 +751,13 @@ function getHostsInfo($selement, $i, $show_unack) {
 			'color' => $colors['Dark Red']
 		);
 	}
-	elseif (!$has_problem) {
+	elseif (!$hasProblem) {
 		$info['iconid'] = $selement['iconid_off'];
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
+		$info['info']['ok'] = array(
+			'msg' => _('OK'),
+			'color' => $colors['Dark Green']
+		);
 	}
 
 	return $info;
@@ -775,8 +782,8 @@ function getHostGroupsInfo($selement, $i, $show_unack) {
 		'info' => array(),
 		'iconid' => $selement['iconid_off']
 	);
-	$has_problem = false;
-	$has_status = false;
+	$hasProblem = false;
+	$hasStatus = false;
 
 	if ($i['problem']) {
 		if (in_array($show_unack, array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH))) {
@@ -807,12 +814,12 @@ function getHostGroupsInfo($selement, $i, $show_unack) {
 		if ($info['info']) {
 			$info['iconid'] = $selement['iconid_on'];
 			$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
-			$has_problem = true;
+			$hasProblem = true;
 		}
 	}
 
 	if ($i['maintenance']) {
-		if (!$has_problem) {
+		if (!$hasProblem) {
 			$info['iconid'] = $selement['iconid_maintenance'];
 			$info['icon_type'] = SYSMAP_ELEMENT_ICON_MAINTENANCE;
 		}
@@ -820,10 +827,10 @@ function getHostGroupsInfo($selement, $i, $show_unack) {
 			'msg' => $i['maintenance'].' '._('Maintenance'),
 			'color' => $colors['Orange']
 		);
-		$has_status = true;
+		$hasStatus = true;
 	}
 	elseif ($i['disabled']) {
-		if (!$has_problem) {
+		if (!$hasProblem) {
 			$info['icon_type'] = SYSMAP_ELEMENT_ICON_DISABLED;
 			$info['iconid'] = $selement['iconid_disabled'];
 		}
@@ -831,12 +838,16 @@ function getHostGroupsInfo($selement, $i, $show_unack) {
 			'msg' => _('DISABLED'),
 			'color' => $colors['Dark Red']
 		);
-		$has_status = true;
+		$hasStatus = true;
 	}
 
-	if (!$has_status && !$has_problem) {
+	if (!$hasStatus && !$hasProblem) {
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
 		$info['iconid'] = $selement['iconid_off'];
+		$info['info']['ok'] = array(
+			'msg' => _('OK'),
+			'color' => $colors['Dark Green']
+		);
 	}
 
 	return $info;
@@ -862,8 +873,8 @@ function getMapsInfo($selement, $i, $show_unack) {
 		'iconid' => $selement['iconid_off']
 	);
 
-	$has_problem = false;
-	$has_status = false;
+	$hasProblem = false;
+	$hasStatus = false;
 
 	if ($i['problem']) {
 		if (in_array($show_unack, array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH))) {
@@ -893,12 +904,12 @@ function getMapsInfo($selement, $i, $show_unack) {
 		if ($info['info']) {
 			$info['iconid'] = $selement['iconid_on'];
 			$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
-			$has_problem = true;
+			$hasProblem = true;
 		}
 	}
 
 	if ($i['maintenance']) {
-		if (!$has_problem) {
+		if (!$hasProblem) {
 			$info['iconid'] = $selement['iconid_maintenance'];
 			$info['icon_type'] = SYSMAP_ELEMENT_ICON_MAINTENANCE;
 		}
@@ -906,10 +917,10 @@ function getMapsInfo($selement, $i, $show_unack) {
 			'msg' => $i['maintenance'].' '._('Maintenance'),
 			'color' => $colors['Orange']
 		);
-		$has_status = true;
+		$hasStatus = true;
 	}
 	elseif ($i['disabled']) {
-		if (!$has_problem) {
+		if (!$hasProblem) {
 			$info['icon_type'] = SYSMAP_ELEMENT_ICON_DISABLED;
 			$info['iconid'] = $selement['iconid_disabled'];
 		}
@@ -917,12 +928,16 @@ function getMapsInfo($selement, $i, $show_unack) {
 			'msg' => _('DISABLED'),
 			'color' => $colors['Dark Red']
 		);
-		$has_status = true;
+		$hasStatus = true;
 	}
 
-	if (!$has_status && !$has_problem) {
+	if (!$hasStatus && !$hasProblem) {
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
 		$info['iconid'] = $selement['iconid_off'];
+		$info['info']['ok'] = array(
+			'msg' => _('OK'),
+			'color' => $colors['Dark Green']
+		);
 	}
 
 	return $info;
