@@ -1446,7 +1446,7 @@ elseif ($srctbl == 'dchecks') {
 
 	$dRules = API::DRule()->get(array(
 		'selectDChecks' => array('dcheckid', 'type', 'key_', 'ports'),
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('name'),
 		'nodeids' => $nodeId
 	));
 	foreach ($dRules as $dRule) {
