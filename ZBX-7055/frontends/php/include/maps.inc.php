@@ -672,7 +672,7 @@ function getTriggersInfo($selement, $i, $showUnack) {
 	else {
 		$info['iconid'] = $selement['iconid_off'];
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
-		$info['info']['unknown'] = array(
+		$info['info']['ok'] = array(
 			'msg' => _('OK'),
 			'color' => $colors['Dark Green']
 		);
@@ -754,7 +754,7 @@ function getHostsInfo($selement, $i, $show_unack) {
 	elseif (!$hasProblem) {
 		$info['iconid'] = $selement['iconid_off'];
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
-		$info['info']['unknown'] = array(
+		$info['info']['ok'] = array(
 			'msg' => _('OK'),
 			'color' => $colors['Dark Green']
 		);
@@ -844,7 +844,7 @@ function getHostGroupsInfo($selement, $i, $show_unack) {
 	if (!$has_status && !$hasProblem) {
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
 		$info['iconid'] = $selement['iconid_off'];
-		$info['info']['unknown'] = array(
+		$info['info']['ok'] = array(
 			'msg' => _('OK'),
 			'color' => $colors['Dark Green']
 		);
@@ -934,7 +934,7 @@ function getMapsInfo($selement, $i, $show_unack) {
 	if (!$has_status && !$hasProblem) {
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
 		$info['iconid'] = $selement['iconid_off'];
-		$info['info']['unknown'] = array(
+		$info['info']['ok'] = array(
 			'msg' => _('OK'),
 			'color' => $colors['Dark Green']
 		);
@@ -1188,7 +1188,6 @@ function getSelementsInfo($sysmap, array $options = array()) {
 			'maintenance' => 0,
 			'problem' => 0,
 			'problem_unack' => 0,
-			'unknown' => 0,
 			'priority' => 0,
 			'trigger_disabled' => 0,
 			'latelyChanged' => false,
@@ -1870,7 +1869,7 @@ function drawMapLabels(&$im, $map, $mapInfo, $resolveMacros = true) {
 
 		$elementInfo = $mapInfo[$selementId];
 
-		foreach (array('problem', 'unack', 'maintenance', 'unknown', 'ok', 'status') as $caption) {
+		foreach (array('problem', 'unack', 'maintenance', 'ok', 'status') as $caption) {
 			if (!isset($elementInfo['info'][$caption]) || zbx_empty($elementInfo['info'][$caption]['msg'])) {
 				continue;
 			}
