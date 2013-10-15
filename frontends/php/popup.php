@@ -269,6 +269,20 @@ elseif (get_request('numeric')) {
 	$value_types = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
 }
 
+// choose nodes
+// if an LLD rule is selected, use its node
+if (hasRequest('parent_discoveryid')) {
+	$nodeId = id2nodeid(getRequest('parent_discoveryid'));
+}
+// if a host is selected, use its node
+elseif (hasRequest('only_hostid')) {
+	$nodeId = id2nodeid(getRequest('only_hostid'));
+}
+// if nothing specific is selected, use the chosen node or fall back to the local node
+else {
+	$nodeId = getRequest('nodeid', get_current_nodeid(false));
+}
+
 clearCookies(true);
 
 function get_window_opener($frame, $field, $value) {
@@ -455,9 +469,9 @@ for ($i = 1; $i <= $srcfldCount; $i++) {
 /*
  * Nodes
  */
-if (ZBX_DISTRIBUTED) {
-	$isNodeSelected = false;
-
+// only display the node dropdown for DM setups
+// don't display it for help item pop ups
+if (ZBX_DISTRIBUTED && $srctbl != 'help_items' && $srctbl != 'nodes') {
 	$nodeComboBox = new CComboBox('nodeid', $nodeId, 'submit()');
 
 	$dbNodes = DBselect(
@@ -467,17 +481,10 @@ if (ZBX_DISTRIBUTED) {
 	);
 	while ($dbNode = DBfetch($dbNodes)) {
 		$nodeComboBox->addItem($dbNode['nodeid'], $dbNode['name']);
-
-		if (bccomp($nodeId , $dbNode['nodeid']) == 0) {
-			$isNodeSelected = true;
-		}
 	}
 
-	if (!$isNodeSelected) {
-		$nodeId = get_current_nodeid();
-	}
-
-	if (isset($onlyHostid)) {
+	// disable node selection if we show objects from only one host or LLD rule
+	if (hasRequest('only_hostid') || hasRequest('parent_discoveryid')) {
 		$nodeComboBox->setEnabled('disabled');
 	}
 
@@ -1439,11 +1446,12 @@ elseif ($srctbl == 'dchecks') {
 
 	$dRules = API::DRule()->get(array(
 		'selectDChecks' => array('dcheckid', 'type', 'key_', 'ports'),
-		'output' => API_OUTPUT_EXTEND
+		'output' => array('name'),
+		'nodeids' => $nodeId
 	));
 	foreach ($dRules as $dRule) {
 		foreach ($dRule['dchecks'] as $dCheck) {
-			$name = $dRule['name'].':'.discovery_check2str($dCheck['type'], $dCheck['key_'], $dCheck['ports']);
+			$name = $dRule['name'].NAME_DELIMITER.discovery_check2str($dCheck['type'], $dCheck['key_'], $dCheck['ports']);
 			$action = get_window_opener($dstfrm, $dstfld1, $dCheck[$srcfld1]).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $name) : '');
 			$name = new CSpan($name, 'link');

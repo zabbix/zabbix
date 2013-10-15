@@ -6,6 +6,7 @@ A.F....... [ZBX-1357] updated Dutch, Finnish, Indonesian, Italian, Lithuanian, P
 
 Bug fixes:
 ..F....... [ZBX-7055] fixed displaing OK trigger status in maps (Eduard)
+..F....... [ZBX-7081] fixed node drop down being displayed incorrectly in several pop ups (Pavels)
 A......... [ZBX-7086] fixed application mass add from different hosts or templates validation (Eduard)
 ........S. [ZBX-7133] fixed processing of zabbix[host,*,available] item; fixed proxy's hosts availability data on server (Sasha)
 ..F....... [ZBX-7099] fixed IT services tree icons alignment (Eduard)
