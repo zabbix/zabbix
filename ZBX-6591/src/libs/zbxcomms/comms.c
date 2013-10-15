@@ -1247,7 +1247,7 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 #else
 			if (NULL != (hp = gethostbyname(start)))
 			{
-				for (k = 0; hp->h_addr_list[k] != NULL; k++)
+				for (k = 0; NULL != hp->h_addr_list[k]; k++)
 				{
 					sip = inet_ntoa(*(struct in_addr *)hp->h_addr_list[k]);
 
