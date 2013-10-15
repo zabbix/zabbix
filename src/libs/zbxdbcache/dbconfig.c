@@ -4425,32 +4425,32 @@ int	DCconfig_update_host_availability(const zbx_host_availability_t *availabilit
 
 	for (i = 0; i < availability_num; i++)
 	{
-		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &availability->hostid)))
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &availability[i].hostid)))
 			continue;
 
-		switch (availability->type)
+		switch (availability[i].type)
 		{
 			case ITEM_TYPE_ZABBIX:
-				dc_host->errors_from = availability->errors_from;
-				dc_host->available = availability->available;
-				dc_host->disable_until = availability->disable_until;
+				dc_host->errors_from = availability[i].errors_from;
+				dc_host->available = availability[i].available;
+				dc_host->disable_until = availability[i].disable_until;
 				break;
 			case ITEM_TYPE_SNMPv1:
 			case ITEM_TYPE_SNMPv2c:
 			case ITEM_TYPE_SNMPv3:
-				dc_host->snmp_errors_from = availability->errors_from;
-				dc_host->snmp_available = availability->available;
-				dc_host->snmp_disable_until = availability->disable_until;
+				dc_host->snmp_errors_from = availability[i].errors_from;
+				dc_host->snmp_available = availability[i].available;
+				dc_host->snmp_disable_until = availability[i].disable_until;
 				break;
 			case ITEM_TYPE_IPMI:
-				dc_host->ipmi_errors_from = availability->errors_from;
-				dc_host->ipmi_available = availability->available;
-				dc_host->ipmi_disable_until = availability->disable_until;
+				dc_host->ipmi_errors_from = availability[i].errors_from;
+				dc_host->ipmi_available = availability[i].available;
+				dc_host->ipmi_disable_until = availability[i].disable_until;
 				break;
 			case ITEM_TYPE_JMX:
-				dc_host->jmx_errors_from = availability->errors_from;
-				dc_host->jmx_available = availability->available;
-				dc_host->jmx_disable_until = availability->disable_until;
+				dc_host->jmx_errors_from = availability[i].errors_from;
+				dc_host->jmx_available = availability[i].available;
+				dc_host->jmx_disable_until = availability[i].disable_until;
 				break;
 			default:
 				continue;
