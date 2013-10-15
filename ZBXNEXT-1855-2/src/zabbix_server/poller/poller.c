@@ -773,27 +773,54 @@ exit:
 
 void	main_poller_loop(unsigned char poller_type)
 {
-	int	nextcheck, sleeptime, processed;
-	double	sec;
+	int	nextcheck, sleeptime, processed = 0, new_statistics = 0;
+	double	sec, total_sec = 0.0;
+	time_t	last_stat_time;
+
+#define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
+				/* once in STAT_INTERVAL seconds */
 
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
+	last_stat_time = time(NULL);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
-		zbx_setproctitle("%s #%d [getting values]", get_process_type_string(process_type), process_num);
+		if (0 == new_statistics)
+		{
+			zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, getting values]",
+					get_process_type_string(process_type), process_num, processed, total_sec);
+		}
+		else if (STAT_INTERVAL <= time(NULL) - last_stat_time)
+		{
+			zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, getting values]",
+					get_process_type_string(process_type), process_num, processed, total_sec);
+			processed = 0;
+			total_sec = 0.0;
+			new_statistics = 0;
+			last_stat_time = time(NULL);
+		}
 
 		sec = zbx_time();
-		processed = get_values(poller_type);
-		sec = zbx_time() - sec;
+		processed += get_values(poller_type);
+		total_sec += zbx_time() - sec;
+		new_statistics = 1;
 
 		nextcheck = DCconfig_get_poller_nextcheck(poller_type);
 		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
-		zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, idle %d sec]",
-				get_process_type_string(process_type), process_num, processed, sec, sleeptime);
-
-		zbx_sleep_loop(sleeptime);
+		if (0 != sleeptime)
+		{
+			zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, idle %d sec]",
+					get_process_type_string(process_type), process_num, processed, total_sec,
+					sleeptime);
+			processed = 0;
+			total_sec = 0.0;
+			new_statistics = 0;
+			last_stat_time = time(NULL);
+			zbx_sleep_loop(sleeptime);
+		}
 	}
+#undef STAT_INTERVAL
 }
