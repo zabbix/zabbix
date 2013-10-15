@@ -773,7 +773,7 @@ exit:
 
 void	main_poller_loop(unsigned char poller_type)
 {
-	int	nextcheck, sleeptime, processed = 0, new_statistics = 0;
+	int	nextcheck, sleeptime = -1, processed = 0;
 	double	sec, total_sec = 0.0;
 	time_t	last_stat_time;
 
@@ -787,40 +787,39 @@ void	main_poller_loop(unsigned char poller_type)
 
 	for (;;)
 	{
-		if (0 == new_statistics)
+		if (0 != sleeptime)
 		{
 			zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, getting values]",
 					get_process_type_string(process_type), process_num, processed, total_sec);
-		}
-		else if (STAT_INTERVAL <= time(NULL) - last_stat_time)
-		{
-			zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, getting values]",
-					get_process_type_string(process_type), process_num, processed, total_sec);
-			processed = 0;
-			total_sec = 0.0;
-			new_statistics = 0;
-			last_stat_time = time(NULL);
 		}
 
 		sec = zbx_time();
 		processed += get_values(poller_type);
 		total_sec += zbx_time() - sec;
-		new_statistics = 1;
 
 		nextcheck = DCconfig_get_poller_nextcheck(poller_type);
 		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
-		if (0 != sleeptime)
+		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{
-			zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, idle %d sec]",
+			if (0 == sleeptime)
+			{
+				zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, getting values]",
+					get_process_type_string(process_type), process_num, processed, total_sec);
+			}
+			else
+			{
+				zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, idle %d sec]",
 					get_process_type_string(process_type), process_num, processed, total_sec,
 					sleeptime);
+			}
 			processed = 0;
 			total_sec = 0.0;
-			new_statistics = 0;
 			last_stat_time = time(NULL);
-			zbx_sleep_loop(sleeptime);
 		}
+
+		zbx_sleep_loop(sleeptime);
 	}
+
 #undef STAT_INTERVAL
 }
