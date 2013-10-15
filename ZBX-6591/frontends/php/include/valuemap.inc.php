@@ -59,7 +59,7 @@ function updateValueMap(array $valueMap, array $mappings) {
 	unset($valueMap['valuemapid']);
 
 	// check existence
-	if (!DBfetch(DBselect('SELECT v.valuemapid FROM valuemaps v WHERE v.valuemapid='.$valueMapId))) {
+	if (!DBfetch(DBselect('SELECT v.valuemapid FROM valuemaps v WHERE v.valuemapid='.zbx_dbstr($valueMapId)))) {
 		throw new Exception(_s('Value map with valuemapid "%1$s" does not exist.', $valueMapId));
 	}
 
@@ -228,7 +228,7 @@ function getValueMapMappings($valueMapId) {
 	$dbMappings = DBselect(
 		'SELECT m.mappingid,m.value,m.newvalue'.
 		' FROM mappings m'.
-		' WHERE m.valuemapid='.$valueMapId
+		' WHERE m.valuemapid='.zbx_dbstr($valueMapId)
 	);
 	while ($mapping = DBfetch($dbMappings)) {
 		$mappings[$mapping['mappingid']] = $mapping;
@@ -260,7 +260,7 @@ function getMappedValue($value, $valueMapId) {
 	$dbMappings = DBselect(
 		'SELECT m.newvalue'.
 			' FROM mappings m'.
-			' WHERE m.valuemapid='.$valueMapId.
+			' WHERE m.valuemapid='.zbx_dbstr($valueMapId).
 			' AND m.value='.zbx_dbstr($value)
 	);
 	if ($mapping = DBfetch($dbMappings)) {

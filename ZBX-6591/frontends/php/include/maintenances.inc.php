@@ -23,7 +23,7 @@ function get_maintenance_by_maintenanceid($maintenanceid) {
 	$sql = 'SELECT m.*'.
 			' FROM maintenances m'.
 			' WHERE '.DBin_node('m.maintenanceid').
-				' AND maintenanceid='.$maintenanceid;
+				' AND maintenanceid='.zbx_dbstr($maintenanceid);
 	return DBfetch(DBselect($sql));
 }
 

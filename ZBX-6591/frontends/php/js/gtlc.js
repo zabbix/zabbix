@@ -32,30 +32,32 @@ var timeControl = {
 	timeRefreshTimeoutHandler: null,
 
 	addObject: function(id, time, objData) {
-		this.objectList[id] = {
-			id: id,
-			containerid: null,
-			refresh: false,
-			processed: 0,
-			time: {},
-			objDims: {},
-			src: location.href,
-			dynamic: 1,
-			periodFixed: 1,
-			loadSBox: 0,
-			loadImage: 0,
-			loadScroll: 0,
-			mainObject: 0, // object on changing will reflect on all others
-			sliderMaximumTimePeriod: null // max period in seconds
-		};
+		if (typeof this.objectList[id] === 'undefined') {
+			this.objectList[id] = {
+				id: id,
+				containerid: null,
+				refresh: false,
+				processed: 0,
+				time: {},
+				objDims: {},
+				src: location.href,
+				dynamic: 1,
+				periodFixed: 1,
+				loadSBox: 0,
+				loadImage: 0,
+				loadScroll: 0,
+				mainObject: 0, // object on changing will reflect on all others
+				sliderMaximumTimePeriod: null // max period in seconds
+			};
 
-		for (var key in this.objectList[id]) {
-			if (isset(key, objData)) {
-				this.objectList[id][key] = objData[key];
+			for (var key in this.objectList[id]) {
+				if (isset(key, objData)) {
+					this.objectList[id][key] = objData[key];
+				}
 			}
-		}
 
-		this.objectList[id].time = time;
+			this.objectList[id].time = time;
+		}
 	},
 
 	processObjects: function() {
@@ -166,6 +168,7 @@ var timeControl = {
 			$(obj.containerid).appendChild(img);
 		}
 
+		// apply sbox events to image
 		if (obj.loadSBox && empty(obj.sbox_listener)) {
 			obj.sbox_listener = this.addSBox.bindAsEventListener(this, id);
 			addListener(img, 'load', obj.sbox_listener);
@@ -1563,7 +1566,6 @@ function sbox_init(id) {
 	addListener(document, 'mouseup', sboxGlobalMouseup);
 	addListener(document, 'mousemove', sboxGlobalMousemove);
 	ZBX_SBOX[id].addListeners();
-
 	return ZBX_SBOX[id];
 }
 
@@ -1619,8 +1621,10 @@ var sbox = Class.create(CDebug, {
 
 		if (IE) {
 			jQuery(this.grphobj).mousedown(jQuery.proxy(this.mouseDown, this));
-			this.grphobj.onmousemove = this.mouseMove.bindAsEventListener(this);
-			jQuery(this.containerId).find('a').attr('onclick', 'javascript: return ZBX_SBOX["' + this.sbox_id + '"].ieMouseClick();');
+			jQuery(this.grphobj).mousemove(jQuery.proxy(this.mouseMove, this));
+			jQuery('#flickerfreescreen_' + this.sbox_id + ' a').click(function() {
+				ZBX_SBOX[this.sbox_id].ieMouseClick();
+			});
 		}
 		else {
 			jQuery(this.dom_obj).mousedown(jQuery.proxy(this.mouseDown, this));

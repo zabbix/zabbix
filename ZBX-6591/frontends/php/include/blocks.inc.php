@@ -1043,7 +1043,7 @@ function make_webmon_overview($filter) {
 				' AND hti.type='.HTTPSTEP_ITEM_TYPE_LASTSTEP.
 				' AND ht.status='.HTTPTEST_STATUS_ACTIVE.
 				' AND '.dbConditionInt('hg.hostid', $availableHostIds).
-				' AND hg.groupid='.$group['groupid']
+				' AND hg.groupid='.zbx_dbstr($group['groupid'])
 		);
 		while ($row = DBfetch($result)) {
 			$showGroup = true;

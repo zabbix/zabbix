@@ -23,7 +23,7 @@ function get_last_event_by_triggerid($triggerid) {
 	$dbEvents = DBfetch(DBselect(
 		'SELECT e.*'.
 		' FROM events e'.
-		' WHERE e.objectid='.$triggerid.
+		' WHERE e.objectid='.zbx_dbstr($triggerid).
 			' AND e.object='.EVENT_OBJECT_TRIGGER.
 			' AND e.value<>'.TRIGGER_VALUE_UNKNOWN.
 			' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
@@ -35,7 +35,7 @@ function get_last_event_by_triggerid($triggerid) {
 }
 
 function get_acknowledges_by_eventid($eventid) {
-	return DBselect('SELECT a.*,u.alias FROM acknowledges a LEFT JOIN users u ON u.userid=a.userid WHERE a.eventid='.$eventid);
+	return DBselect('SELECT a.*,u.alias FROM acknowledges a LEFT JOIN users u ON u.userid=a.userid WHERE a.eventid='.zbx_dbstr($eventid));
 }
 
 /**

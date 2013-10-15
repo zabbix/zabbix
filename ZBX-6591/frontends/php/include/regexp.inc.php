@@ -24,7 +24,7 @@ function getRegexp($regexpId) {
 		'SELECT re.*'.
 		' FROM regexps re'.
 		' WHERE '.DBin_node('re.regexpid').
-			' AND regexpid='.$regexpId
+			' AND regexpid='.zbx_dbstr($regexpId)
 	));
 }
 
@@ -35,7 +35,7 @@ function getRegexpExpressions($regexpId) {
 		'SELECT e.expressionid,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive'.
 		' FROM expressions e'.
 		' WHERE '.DBin_node('e.expressionid').
-			' AND regexpid='.$regexpId
+			' AND regexpid='.zbx_dbstr($regexpId)
 	);
 	while ($expression = DBfetch($dbExpressions)) {
 		$expressions[$expression['expressionid']] = $expression;

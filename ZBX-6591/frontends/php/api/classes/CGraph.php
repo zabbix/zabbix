@@ -209,7 +209,7 @@ class CGraph extends CGraphGeneral {
 
 		// type
 		if (!is_null($options['type'])) {
-			$sqlParts['where'][] = 'g.type='.$options['type'];
+			$sqlParts['where'][] = 'g.type='.zbx_dbstr($options['type']);
 		}
 
 		// templated

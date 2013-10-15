@@ -59,7 +59,7 @@ class CTriggerDescription {
 		$trigger = DBfetch(DBselect(
 			'SELECT DISTINCT t.description,t.expression,t.triggerid'.
 					' FROM triggers t'.
-					' WHERE t.triggerid='.$triggerId
+					' WHERE t.triggerid='.zbx_dbstr($triggerId)
 		));
 		$triggers = $this->expandDescriptions(array($trigger['triggerid'] => $trigger));
 		$trigger = reset($triggers);

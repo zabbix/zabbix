@@ -347,7 +347,7 @@ class CWebCheck extends CZBXAPI {
 			$dbCheckItems = DBselect(
 				'SELECT i.itemid,hi.type'.
 				' FROM items i,httptestitem hi'.
-				' WHERE hi.httptestid='.$httpTest['httptestid'].
+				' WHERE hi.httptestid='.zbx_dbstr($httpTest['httptestid']).
 					' AND hi.itemid=i.itemid'
 			);
 			while ($checkitem = DBfetch($dbCheckItems)) {
@@ -696,7 +696,7 @@ class CWebCheck extends CZBXAPI {
 
 		$sql = 'SELECT h.httpstepid,h.name'.
 				' FROM httpstep h'.
-				' WHERE h.httptestid='.$httpTest['httptestid'].
+				' WHERE h.httptestid='.zbx_dbstr($httpTest['httptestid']).
 					' AND '.dbConditionString('h.name', $webstepsNames);
 		if ($httpstepData = DBfetch(DBselect($sql))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Step "%s" already exists.', $httpstepData['name']));
@@ -820,7 +820,7 @@ class CWebCheck extends CZBXAPI {
 			$dbStepItems = DBselect(
 				'SELECT i.itemid,hi.type'.
 				' FROM items i,httpstepitem hi'.
-				' WHERE hi.httpstepid='.$webstep['webstepid'].
+				' WHERE hi.httpstepid='.zbx_dbstr($webstep['webstepid']).
 					' AND hi.itemid=i.itemid'
 			);
 			while ($stepitem = DBfetch($dbStepItems)) {

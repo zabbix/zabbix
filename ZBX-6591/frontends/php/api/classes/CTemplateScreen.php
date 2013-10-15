@@ -618,7 +618,7 @@ class CTemplateScreen extends CScreen {
 				'SELECT src.itemid as srcid,dest.itemid as destid'.
 						' FROM items dest,items src'.
 						' WHERE dest.key_=src.key_'.
-						' AND dest.hostid='.$templateId.
+						' AND dest.hostid='.zbx_dbstr($templateId).
 						' AND '.dbConditionInt('src.itemid', $resourceItemIds)
 			);
 			while ($dbItem = DBfetch($dbItems)) {
@@ -633,7 +633,7 @@ class CTemplateScreen extends CScreen {
 						' WHERE dest.name=src.name'.
 						' AND destgi.graphid=dest.graphid'.
 						' AND destgi.itemid=desti.itemid'.
-						' AND desti.hostid='.$templateId.
+						' AND desti.hostid='.zbx_dbstr($templateId).
 						' AND '.dbConditionInt('src.graphid', $resourceGraphIds)
 			);
 			while ($dbItem = DBfetch($dbItems)) {
