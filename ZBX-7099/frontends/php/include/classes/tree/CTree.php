@@ -121,19 +121,18 @@ class CTree {
 
 			switch ($this->tree[$id]['nodeimg'][$i]) {
 				case 'O':
-					$td->setAttribute('style', 'width: 22px;');
 					$img = new CImg('images/general/tree/zero.gif', 'o', '22', '14');
 					break;
 
 				case 'I':
-					$td->setAttribute('style', 'width: 22px; background-image: url(images/general/tree/pointc.gif);');
+					$td->setAttribute('style', 'background-image: url(images/general/tree/pointc.gif);');
 					$img = new CImg('images/general/tree/zero.gif', 'i', '22', '14');
 					break;
 
 				case 'L':
 					$td->setAttribute('valign', 'top');
 					$div = new CTag('div', 'yes');
-					$div->setAttribute('style', 'height: 10px; width: 22px; background-image: url(images/general/tree/pointc.gif);');
+					$div->setAttribute('style', 'height: 10px; background-image: url(images/general/tree/pointc.gif);');
 
 					if ($this->tree[$id]['nodetype'] == 2) {
 						$img = new CImg('images/general/tree/plus.gif', 'y', '22', '14');
@@ -151,7 +150,7 @@ class CTree {
 				case 'T':
 					$td->setAttribute('valign', 'top');
 					if ($this->tree[$id]['nodetype'] == 2) {
-						$td->setAttribute('style', 'width: 22px; background-image: url(images/general/tree/pointc.gif);');
+						$td->setAttribute('style', 'background-image: url(images/general/tree/pointc.gif);');
 						$img = new CImg('images/general/tree/plus.gif', 't', '22', '14');
 						$img->setAttribute('onclick', $this->treename.'.closeSNodeX("'.$id.'", this);');
 						$img->setAttribute('id', 'idi_'.$id);
@@ -159,7 +158,7 @@ class CTree {
 						$img->setAttribute('style', 'top: 1px; position: relative;');
 					}
 					else {
-						$td->setAttribute('style', 'width: 22px; background-image: url(images/general/tree/pointc.gif);');
+						$td->setAttribute('style', 'background-image: url(images/general/tree/pointc.gif);');
 						$img = new CImg('images/general/tree/pointl.gif', 't', '22', '14');
 					}
 					break;
