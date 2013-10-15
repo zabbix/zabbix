@@ -5,6 +5,7 @@ New features:
 A.F....... [ZBX-1357] updated Dutch, Finnish, Indonesian, Italian, Lithuanian, Persian, Portuguese (Portugal), Russian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A...I..... [ZBX-6975] fixed default values for graphs.yaxismax and graphs_items.yaxisside fields (Sasha)
 A......... [ZBX-7131] fixed host interface IP validation (Eduard)
 ..F....... [ZBX-7112] improved file import validation for graph items (Eduard)
 ..F....... [ZBX-7134] fixed host inventory interface table when no agent interfaces are set (Ivo)
