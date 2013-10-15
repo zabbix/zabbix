@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-08 23:08+0300\n"
+"POT-Creation-Date: 2013-10-10 12:09+0300\n"
 "PO-Revision-Date: 2012-11-06 15:57+0800\n"
 "Last-Translator: Yaochiu Huang <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -516,7 +516,7 @@ msgstr "歷時少於"
 msgid "Age less than %s"
 msgstr "歷時少於%s"
 
-#: include/items.inc.php:239 include/views/administration.script.list.php:64
+#: include/items.inc.php:244 include/views/administration.script.list.php:64
 #: include/views/configuration.httpconf.edit.php:139 popup.php:1540
 msgid "Agent"
 msgstr "端點代理程式"
@@ -928,7 +928,7 @@ msgstr "封鎖的"
 msgid "Bold line"
 msgstr "粗線"
 
-#: include/items.inc.php:131
+#: include/items.inc.php:136
 msgid "Boolean"
 msgstr "二元邏輯"
 
@@ -1146,7 +1146,7 @@ msgstr "Zabbix的組態"
 msgid "Calculate SLA, acceptable SLA (in %)"
 msgstr "計算SLA, 可接受的SAL(%計)"
 
-#: include/items.inc.php:92 include/views/configuration.graph.edit.php:164
+#: include/items.inc.php:97 include/views/configuration.graph.edit.php:164
 #: include/views/configuration.graph.edit.php:219
 msgid "Calculated"
 msgstr "計算的"
@@ -1744,8 +1744,8 @@ msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "無法找到用在篩選\"%2$s\"中的主機\"%1$s\"."
 
 #: api/classes/CDiscoveryRule.php:748 api/classes/CDiscoveryRule.php:824
-#: api/classes/CItemGeneral.php:101 include/items.inc.php:339
-#: include/items.inc.php:390
+#: api/classes/CItemGeneral.php:101 include/items.inc.php:344
+#: include/items.inc.php:395
 #, php-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
 msgstr "找不到用於項目鍵\"%2$s\"的主機介面於 \"%1$s\" ."
@@ -2278,7 +2278,7 @@ msgstr "更改"
 msgid "Change password"
 msgstr "修改密碼"
 
-#: include/forms.inc.php:423 include/items.inc.php:120
+#: include/forms.inc.php:423 include/items.inc.php:125
 #: include/triggers.inc.php:2199 include/views/configuration.item.edit.php:224
 #: include/views/configuration.item.massupdate.php:210
 msgid "Character"
@@ -2972,6 +2972,10 @@ msgstr "已創建: 觸發器原型 \"%1$s\" 於 \"%2$s\"."
 msgid "Created: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr ""
 
+#: include/items.inc.php:41
+msgid "Critical"
+msgstr ""
+
 #: popup_trexpr.php:365
 msgid "Current date is < N"
 msgstr "當前日期是 < N"
@@ -3177,7 +3181,7 @@ msgstr "資料庫檔案"
 msgid "Database host"
 msgstr "資料庫主機"
 
-#: include/items.inc.php:87
+#: include/items.inc.php:92
 msgid "Database monitor"
 msgstr "資料庫監視"
 
@@ -3303,7 +3307,7 @@ msgstr "十二"
 msgid "December"
 msgstr "十二"
 
-#: include/items.inc.php:133
+#: include/items.inc.php:138
 msgid "Decimal"
 msgstr "十進位數字"
 
@@ -3912,8 +3916,8 @@ msgid "Disable selected triggers?"
 msgstr "停用所選的觸發器?"
 
 #: auditlogs.php:152 dashboard.php:270 include/discovery.inc.php:123
-#: include/httptest.inc.php:46 include/items.inc.php:150
-#: include/items.inc.php:204 include/triggers.inc.php:1606
+#: include/httptest.inc.php:46 include/items.inc.php:155
+#: include/items.inc.php:209 include/triggers.inc.php:1606
 #: include/triggers.inc.php:2455 include/users.inc.php:85
 #: include/views/administration.mediatypes.list.php:97
 #: include/views/administration.usergroups.list.php:59
@@ -4448,8 +4452,8 @@ msgid "Enable selected triggers?"
 msgstr "啟用所選的觸發器?"
 
 #: auditlogs.php:149 dashboard.php:270 include/discovery.inc.php:122
-#: include/httptest.inc.php:45 include/items.inc.php:149
-#: include/items.inc.php:201 include/triggers.inc.php:2452
+#: include/httptest.inc.php:45 include/items.inc.php:154
+#: include/items.inc.php:206 include/triggers.inc.php:2452
 #: include/views/administration.mediatypes.edit.php:96
 #: include/views/administration.mediatypes.list.php:96
 #: include/views/administration.usergroups.edit.php:65
@@ -4596,7 +4600,7 @@ msgstr "執行SQL錯誤[%1$s]於[%2$s]."
 msgid "Execute on"
 msgstr "執行在"
 
-#: include/items.inc.php:1396 include/views/configuration.item.edit.php:195
+#: include/items.inc.php:1401 include/views/configuration.item.edit.php:195
 msgid "Executed script"
 msgstr "已執行的腳本"
 
@@ -4678,7 +4682,7 @@ msgstr "表示式類型"
 msgid "Expressions"
 msgstr "表示式"
 
-#: include/items.inc.php:86
+#: include/items.inc.php:91
 msgid "External check"
 msgstr "外在檢查"
 
@@ -4886,7 +4890,7 @@ msgstr "彈性區間"
 msgid "For guest, password must be empty"
 msgstr "訪客的密碼必須為空"
 
-#: include/items.inc.php:1400 include/views/configuration.item.edit.php:207
+#: include/items.inc.php:1405 include/views/configuration.item.edit.php:207
 msgid "Formula"
 msgstr "公式"
 
@@ -5383,7 +5387,7 @@ msgstr "高"
 msgid "Help"
 msgstr "說明"
 
-#: include/items.inc.php:134
+#: include/items.inc.php:139
 msgid "Hexadecimal"
 msgstr "十六進位數字"
 
@@ -5536,7 +5540,7 @@ msgstr "主機存取"
 msgid "Host added"
 msgstr "已新增主機"
 
-#: api/classes/CHostInterface.php:831
+#: api/classes/CHostInterface.php:844
 msgid "Host cannot have more than one default interface of the same type."
 msgstr "主機不能有超過一個同類型的預設介面."
 
@@ -5768,7 +5772,7 @@ msgid "Host with the same visible name \"%s\" already exists."
 msgstr "可視名稱同樣為 \"%s\" 的主機已存在."
 
 #: hostinventoriesoverview.php:85 hosts.php:752 include/forms.inc.php:217
-#: include/forms.inc.php:894 include/items.inc.php:808
+#: include/forms.inc.php:894 include/items.inc.php:813
 #: include/menu.inc.php:112 include/menu.inc.php:168
 #: include/reports.inc.php:378 include/views/administration.proxy.edit.php:88
 #: include/views/administration.proxy.list.php:52
@@ -5889,7 +5893,7 @@ msgstr "IP範圍"
 msgid "IP range cannot be empty."
 msgstr "IP範圍不能為空白."
 
-#: include/hosts.inc.php:477 include/items.inc.php:242
+#: include/hosts.inc.php:477 include/items.inc.php:247
 #: include/views/administration.script.edit.php:46
 #: include/views/administration.script.list.php:54
 #: include/views/configuration.action.edit.php:681
@@ -5899,7 +5903,7 @@ msgstr "IP範圍不能為空白."
 msgid "IPMI"
 msgstr "IPMI"
 
-#: include/items.inc.php:88
+#: include/items.inc.php:93
 msgid "IPMI agent"
 msgstr "IPMI端點代理程式"
 
@@ -6539,17 +6543,17 @@ msgstr ""
 msgid "Incorrect image index."
 msgstr "不正確的圖片索引"
 
-#: api/classes/CHostInterface.php:630
+#: api/classes/CHostInterface.php:643
 #, php-format
 msgid "Incorrect interface DNS parameter \"%s\" provided."
 msgstr "給予了不正確的介面DNS參數\"%s\"."
 
-#: api/classes/CHostInterface.php:645
+#: api/classes/CHostInterface.php:658
 #, php-format
 msgid "Incorrect interface IP parameter \"%s\" provided."
 msgstr "給予了不正確的介面IP參數\"%s\"."
 
-#: api/classes/CHostInterface.php:661
+#: api/classes/CHostInterface.php:674
 #, php-format
 msgid "Incorrect interface port \"%s\" provided."
 msgstr "給予了不正確的介面埠參數\"%s\"."
@@ -6956,7 +6960,7 @@ msgstr "安裝名稱"
 msgid "Interface"
 msgstr "介面"
 
-#: api/classes/CHostInterface.php:851
+#: api/classes/CHostInterface.php:864
 #, php-format
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
 msgstr "介面是連結到\"%2$s\"上的項目\"%1$s\"."
@@ -7301,7 +7305,7 @@ msgid "Item with key \"%1$s\" already exists."
 msgstr ""
 
 #: hosts.php:795 hosts.php:886 include/html.inc.php:420
-#: include/html.inc.php:424 include/items.inc.php:791
+#: include/html.inc.php:424 include/items.inc.php:796
 #: include/reports.inc.php:117 include/reports.inc.php:257
 #: include/views/configuration.application.list.php:99
 #: include/views/configuration.graph.edit.php:276
@@ -7345,11 +7349,11 @@ msgstr "項目清單"
 msgid "Items updated"
 msgstr "監控項已更新"
 
-#: include/hosts.inc.php:474 include/items.inc.php:241
+#: include/hosts.inc.php:474 include/items.inc.php:246
 msgid "JMX"
 msgstr "JMX"
 
-#: include/items.inc.php:91
+#: include/items.inc.php:96
 msgid "JMX agent"
 msgstr "JMX 端點代理程式"
 
@@ -7902,7 +7906,7 @@ msgstr "位置緯度"
 msgid "Location longitude"
 msgstr "位置經度"
 
-#: include/forms.inc.php:424 include/items.inc.php:122
+#: include/forms.inc.php:424 include/items.inc.php:127
 #: include/triggers.inc.php:2200 include/views/configuration.item.edit.php:225
 #: include/views/configuration.item.massupdate.php:211
 msgid "Log"
@@ -8294,6 +8298,12 @@ msgstr "可展示的每觸發器最多事件計數"
 #: include/func.inc.php:2213
 msgid "Maximize"
 msgstr "最大化"
+
+#: api/classes/CHostInterface.php:633
+#, php-format
+msgid "Maximum DNS name length is %2$d characters, \"%3$s\" is %1$d character."
+msgid_plural "Maximum DNS name length is %2$d characters, \"%3$s\" is %1$d characters."
+msgstr[0] ""
 
 #: api/classes/CUser.php:315
 #, php-format
@@ -8997,7 +9007,7 @@ msgstr ""
 msgid "No data received during period of time T, then N NOT 1, 0 - otherwise"
 msgstr ""
 
-#: api/classes/CHostInterface.php:827
+#: api/classes/CHostInterface.php:840
 #, php-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "\"%2$s\"上之\"%1$s\"類型無預設介面."
@@ -9205,17 +9215,17 @@ msgstr "沒有提供項目給篩選組件."
 msgid "No item prototypes defined."
 msgstr "沒有已定義的項目類型"
 
-#: include/items.inc.php:494
+#: include/items.inc.php:499
 #, php-format
 msgid "No item with itemid \"%1$s\"."
 msgstr "沒有含項目ID\"%1$s\"的項目."
 
-#: include/items.inc.php:477
+#: include/items.inc.php:482
 #, php-format
 msgid "No item with itemid=\"%1$s\"."
 msgstr "沒有含項目ID\"%1$s\"的項目."
 
-#: chart3.php:119 include/items.inc.php:782
+#: chart3.php:119 include/items.inc.php:787
 #: include/views/configuration.graph.edit.php:64
 #: include/views/configuration.item.list.php:58
 #: include/views/monitoring.overview.php:111 popup.php:675 popup.php:808
@@ -9336,7 +9346,7 @@ msgstr "沒有系統存取的許可權"
 #: api/classes/CHostGroup.php:893 api/classes/CHostGroup.php:902
 #: api/classes/CHostGroup.php:924 api/classes/CHostInterface.php:319
 #: api/classes/CHostInterface.php:335 api/classes/CHostInterface.php:476
-#: api/classes/CHostInterface.php:674 api/classes/CHost.php:688
+#: api/classes/CHostInterface.php:687 api/classes/CHost.php:688
 #: api/classes/CHost.php:716 api/classes/CHost.php:1813
 #: api/classes/CHostPrototype.php:1020 api/classes/CHostPrototype.php:1035
 #: api/classes/CHostPrototype.php:1048 api/classes/CHostPrototype.php:1061
@@ -9588,7 +9598,7 @@ msgstr "節點"
 msgid "None"
 msgstr "無"
 
-#: include/graphs.inc.php:24 include/items.inc.php:175
+#: include/graphs.inc.php:24 include/items.inc.php:180
 #: include/triggers.inc.php:1604 popup.php:1139
 msgid "Normal"
 msgstr "正常"
@@ -9638,7 +9648,7 @@ msgstr "未連接"
 msgid "Not monitored"
 msgstr "未受監測"
 
-#: include/items.inc.php:176 include/items.inc.php:201
+#: include/items.inc.php:181 include/items.inc.php:206
 msgid "Not supported"
 msgstr "不支持的"
 
@@ -9737,7 +9747,7 @@ msgstr ""
 msgid "Number of users (online)"
 msgstr "用戶數(線上)"
 
-#: include/forms.inc.php:422 include/items.inc.php:118
+#: include/forms.inc.php:422 include/items.inc.php:123
 #: include/triggers.inc.php:2198 include/views/configuration.item.edit.php:223
 #: include/views/configuration.item.massupdate.php:209
 msgid "Numeric (float)"
@@ -9749,7 +9759,7 @@ msgstr "數字的 (浮點)"
 msgid "Numeric (integer 64bit)"
 msgstr "數字的(64位元整數)"
 
-#: include/forms.inc.php:421 include/items.inc.php:116
+#: include/forms.inc.php:421 include/items.inc.php:121
 #: include/views/configuration.item.edit.php:222
 #: include/views/configuration.item.massupdate.php:208
 msgid "Numeric (unsigned)"
@@ -9814,7 +9824,7 @@ msgstr "概覽"
 msgid "Oct"
 msgstr "十月"
 
-#: include/items.inc.php:132
+#: include/items.inc.php:137
 msgid "Octal"
 msgstr "八進位"
 
@@ -10491,7 +10501,7 @@ msgstr "填入主機資產紀錄欄位"
 msgid "Port"
 msgstr "埠"
 
-#: api/classes/CHostInterface.php:658
+#: api/classes/CHostInterface.php:671
 msgid "Port cannot be empty for host interface."
 msgstr "主機介面的埠不能是空白."
 
@@ -11260,7 +11270,7 @@ msgstr "SMTP HELO"
 msgid "SMTP server"
 msgstr "SMTP伺服器"
 
-#: include/hosts.inc.php:471 include/items.inc.php:240
+#: include/hosts.inc.php:471 include/items.inc.php:245
 msgid "SNMP"
 msgstr "SNMP"
 
@@ -11288,7 +11298,7 @@ msgstr "SNMP community"
 msgid "SNMP interfaces"
 msgstr "SNMP介面"
 
-#: include/items.inc.php:82
+#: include/items.inc.php:87
 msgid "SNMP trap"
 msgstr "SNMP捉捕"
 
@@ -11296,17 +11306,17 @@ msgstr "SNMP捉捕"
 msgid "SNMP trap key is invalid."
 msgstr "SNMP捉捕鍵值是無效的"
 
-#: include/discovery.inc.php:67 include/items.inc.php:79
+#: include/discovery.inc.php:67 include/items.inc.php:84
 #: include/views/js/configuration.discovery.edit.js.php:178
 msgid "SNMPv1 agent"
 msgstr "SNMPv1 端點代理程式"
 
-#: include/discovery.inc.php:68 include/items.inc.php:80
+#: include/discovery.inc.php:68 include/items.inc.php:85
 #: include/views/js/configuration.discovery.edit.js.php:179
 msgid "SNMPv2 agent"
 msgstr "SNMPv2 端點代理程式"
 
-#: include/discovery.inc.php:69 include/items.inc.php:81
+#: include/discovery.inc.php:69 include/items.inc.php:86
 #: include/views/js/configuration.discovery.edit.js.php:180
 msgid "SNMPv3 agent"
 msgstr "SNMPv3 端點代理程式"
@@ -11316,7 +11326,7 @@ msgstr "SNMPv3 端點代理程式"
 msgid "SQL count: %s (selects: %s | executes: %s)"
 msgstr "SQL計數: %s (selects: %s | 執行: %s)"
 
-#: include/items.inc.php:1398 include/views/configuration.item.edit.php:199
+#: include/items.inc.php:1403 include/views/configuration.item.edit.php:199
 msgid "SQL query"
 msgstr ""
 
@@ -11337,7 +11347,7 @@ msgstr "SQL陳述式執行已失敗: \"%1$s\"."
 msgid "SSH"
 msgstr "SSH"
 
-#: include/items.inc.php:89
+#: include/items.inc.php:94
 msgid "SSH agent"
 msgstr "SSH 端點代理程式"
 
@@ -11991,7 +12001,7 @@ msgstr "簽入"
 msgid "Simple"
 msgstr "簡單"
 
-#: include/items.inc.php:78
+#: include/items.inc.php:83
 msgid "Simple check"
 msgstr "簡單檢查"
 
@@ -12399,7 +12409,7 @@ msgstr "T"
 msgid "TCP"
 msgstr "TCP"
 
-#: include/items.inc.php:90
+#: include/items.inc.php:95
 msgid "TELNET agent"
 msgstr "TELNET端點代理程式"
 
@@ -12590,7 +12600,7 @@ msgstr ""
 msgid "Test string"
 msgstr "測試字串"
 
-#: include/forms.inc.php:425 include/items.inc.php:124
+#: include/forms.inc.php:425 include/items.inc.php:129
 #: include/triggers.inc.php:2201 include/views/configuration.item.edit.php:226
 #: include/views/configuration.item.massupdate.php:212
 msgid "Text"
@@ -13252,10 +13262,10 @@ msgstr "單位"
 #: include/events.inc.php:78 include/graphs.inc.php:37
 #: include/graphs.inc.php:77 include/hosts.inc.php:53 include/hosts.inc.php:80
 #: include/html.inc.php:374 include/httptest.inc.php:39
-#: include/httptest.inc.php:56 include/items.inc.php:41
-#: include/items.inc.php:102 include/items.inc.php:126
-#: include/items.inc.php:143 include/items.inc.php:159
-#: include/items.inc.php:186 include/items.inc.php:207
+#: include/httptest.inc.php:56 include/items.inc.php:45
+#: include/items.inc.php:107 include/items.inc.php:131
+#: include/items.inc.php:148 include/items.inc.php:164
+#: include/items.inc.php:191 include/items.inc.php:212
 #: include/maintenances.inc.php:42 include/maps.inc.php:39
 #: include/media.inc.php:40 include/nodes.inc.php:265 include/perm.inc.php:30
 #: include/regexp.inc.php:206 include/screens.inc.php:55
@@ -13295,7 +13305,7 @@ msgstr "未知的界面類型."
 msgid "Unknown resource"
 msgstr "未知的資源"
 
-#: include/items.inc.php:973
+#: include/items.inc.php:978
 msgid "Unknown value type"
 msgstr "未知的值類型"
 
@@ -13795,6 +13805,10 @@ msgstr "變數"
 msgid "Vendor"
 msgstr "賣方"
 
+#: include/items.inc.php:43
+msgid "Verbose"
+msgstr ""
+
 #: include/views/configuration.screen.constructor.edit.php:543
 msgid "Vertical"
 msgstr "垂直的"
@@ -13845,7 +13859,7 @@ msgstr "Web"
 msgid "Web checks"
 msgstr "Web檢查"
 
-#: dashboard.php:411 include/items.inc.php:93
+#: dashboard.php:411 include/items.inc.php:98
 msgid "Web monitoring"
 msgstr "Web監測"
 
@@ -14290,7 +14304,7 @@ msgstr "超級管理員"
 msgid "Zabbix User"
 msgstr "用戶"
 
-#: include/discovery.inc.php:66 include/items.inc.php:76
+#: include/discovery.inc.php:66 include/items.inc.php:81
 #: include/views/administration.script.edit.php:53
 #: include/views/configuration.action.edit.php:698
 #: include/views/js/configuration.action.edit.js.php:118
@@ -14298,11 +14312,11 @@ msgstr "用戶"
 msgid "Zabbix agent"
 msgstr "Zabbix端點代理程式(被動式)"
 
-#: include/items.inc.php:77
+#: include/items.inc.php:82
 msgid "Zabbix agent (active)"
 msgstr "Zabbix端點代理程式(主動式)"
 
-#: include/items.inc.php:85
+#: include/items.inc.php:90
 msgid "Zabbix aggregate"
 msgstr "Zabbix整合"
 
@@ -14310,7 +14324,7 @@ msgstr "Zabbix整合"
 msgid "Zabbix has received an incorrect request."
 msgstr "Zabbix已接收到一個不正確的請求."
 
-#: include/items.inc.php:83
+#: include/items.inc.php:88
 msgid "Zabbix internal"
 msgstr "Zabbix自身"
 
@@ -14370,7 +14384,7 @@ msgstr "Zabbix主機名稱"
 msgid "Zabbix server port"
 msgstr "Zabbix主機埠"
 
-#: include/items.inc.php:84
+#: include/items.inc.php:89
 msgid "Zabbix trapper"
 msgstr "Zabbix捉捕器"
 

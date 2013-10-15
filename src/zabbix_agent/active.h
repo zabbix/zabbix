@@ -57,6 +57,12 @@ extern int	CONFIG_LISTEN_PORT;
 #	ifndef AUDIT_SUCCESS
 #		define AUDIT_SUCCESS	"Success Audit"
 #	endif
+#	ifndef CRITICAL_TYPE
+#		define CRITICAL_TYPE	"Critical"
+#	endif
+#	ifndef VERBOSE_TYPE
+#		define VERBOSE_TYPE	"Verbose"
+#	endif
 #endif	/* _WINDOWS */
 
 typedef struct

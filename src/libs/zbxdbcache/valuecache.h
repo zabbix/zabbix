@@ -39,7 +39,7 @@
  * Adding data
  *
  *   Whenever a new item value is added to system (history tables) the item value must be
- *   also added added to Value Cache with zbx_add_value() function to keep it up to date.
+ *   also added added to Value Cache with zbx_dc_add_value() function to keep it up to date.
  *
  * Retrieving data
  *
@@ -110,4 +110,4 @@ void	zbx_vc_history_value2str(char *buffer, size_t size, history_value_t *value,
 /* mirrors the vector creation function to vector destroying function.                    */
 #define zbx_history_record_vector_create(vector)	zbx_vector_history_record_create(vector);
 
-#endif /* HISTORY_CACHE_H_ */
+#endif	/* ZABBIX_VALUECACHE_H */
