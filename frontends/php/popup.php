@@ -280,7 +280,7 @@ elseif (hasRequest('only_hostid')) {
 }
 // if nothing specific is selected, use the chosen node or fall back to the local node
 else {
-	$nodeId = get_request('nodeid', get_current_nodeid(false));
+	$nodeId = getRequest('nodeid', get_current_nodeid(false));
 }
 
 clearCookies(true);
@@ -471,7 +471,7 @@ for ($i = 1; $i <= $srcfldCount; $i++) {
  */
 // only display the node dropdown for DM setups
 // don't display it for help item pop ups
-if (ZBX_DISTRIBUTED && $srctbl != 'help_items') {
+if (ZBX_DISTRIBUTED && $srctbl != 'help_items' && $srctbl != 'nodes') {
 	$nodeComboBox = new CComboBox('nodeid', $nodeId, 'submit()');
 
 	$dbNodes = DBselect(
