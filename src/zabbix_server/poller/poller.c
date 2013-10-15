@@ -773,8 +773,8 @@ exit:
 
 void	main_poller_loop(unsigned char poller_type)
 {
-	int	nextcheck, sleeptime = -1, processed = 0;
-	double	sec, total_sec = 0.0;
+	int	nextcheck, sleeptime = -1, processed = 0, old_processed = 0;
+	double	sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t	last_stat_time;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
@@ -790,7 +790,8 @@ void	main_poller_loop(unsigned char poller_type)
 		if (0 != sleeptime)
 		{
 			zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, getting values]",
-					get_process_type_string(process_type), process_num, processed, total_sec);
+					get_process_type_string(process_type), process_num, old_processed,
+					old_total_sec);
 		}
 
 		sec = zbx_time();
@@ -812,6 +813,8 @@ void	main_poller_loop(unsigned char poller_type)
 				zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, idle %d sec]",
 					get_process_type_string(process_type), process_num, processed, total_sec,
 					sleeptime);
+				old_processed = processed;
+				old_total_sec = total_sec;
 			}
 			processed = 0;
 			total_sec = 0.0;
