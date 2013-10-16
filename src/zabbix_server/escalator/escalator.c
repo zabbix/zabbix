@@ -547,7 +547,7 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 
 	now = time(NULL);
 	subject_esc = DBdyn_escape_string_len(subject_dyn, ALERT_SUBJECT_LEN);
-	message_esc = DBdyn_escape_string(message_dyn);
+	message_esc = DBdyn_escape_string_len(message_dyn, ALERT_MESSAGE_LEN);
 
 	zbx_free(subject_dyn);
 	zbx_free(message_dyn);
