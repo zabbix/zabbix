@@ -27,7 +27,6 @@
 
 #if defined(PS_DARWIN_ARGV)
 #include <crt_externs.h>
-static size_t	prev_msg_size = 0;
 #endif
 
 #if defined(PS_OVERWRITE_ARGV)
@@ -42,7 +41,7 @@ static char	*empty_str = '\0';
 
 /* ps display buffer */
 static char	*ps_buf = NULL;
-static size_t	ps_buf_size = 0;
+static size_t	ps_buf_size = 0, prev_msg_size = 0;
 #elif defined(PS_PSTAT_ARGV)
 #define PS_BUF_SIZE	512
 static char	ps_buf[PS_BUF_SIZE], *p_msg = NULL;
@@ -195,7 +194,6 @@ void	setproctitle_set_status(const char *status)
 
 	if (1 == initialized)
 	{
-#if defined(PS_DARWIN_ARGV)
 		size_t	msg_size;
 
 		msg_size = MIN(zbx_strlcpy(ps_buf, status, ps_buf_size), ps_buf_size);
@@ -204,9 +202,6 @@ void	setproctitle_set_status(const char *status)
 			memset(ps_buf + msg_size + 1, '\0', ps_buf_size - msg_size - 1);
 
 		prev_msg_size = msg_size;
-#else
-		zbx_strlcpy(ps_buf, status, ps_buf_size);
-#endif
 	}
 	else if (NULL != ps_buf)
 	{
@@ -215,6 +210,7 @@ void	setproctitle_set_status(const char *status)
 		/* Initialization has not been moved to setproctitle_save_env() because setproctitle_save_env()	*/
 		/* is called from the main process and we do not change its command line.			*/
 		/* argv[] changing takes place only in child processes.						*/
+
 #if defined(PS_CONCAT_ARGV)
 		start_pos = strlen(argv_int[0]);
 #else
@@ -225,14 +221,10 @@ void	setproctitle_set_status(const char *status)
 			zbx_strlcpy(ps_buf + start_pos, ": ", (size_t)3);
 			ps_buf += start_pos + 2;
 			ps_buf_size -= start_pos + 2;	/* space after "argv[copy_first]: " for status message */
-#if defined(PS_DARWIN_ARGV)
+
 			memset(ps_buf, '\0', ps_buf_size);
 			prev_msg_size = MIN(zbx_strlcpy(ps_buf, status, ps_buf_size), ps_buf_size);
-#else
-			memset(ps_buf, ' ', ps_buf_size - 1);
-			memset(ps_buf + ps_buf_size - 1, '\0', (size_t)1);
-			zbx_strlcpy(ps_buf, status, ps_buf_size);
-#endif
+
 			initialized = 1;
 		}
 	}
