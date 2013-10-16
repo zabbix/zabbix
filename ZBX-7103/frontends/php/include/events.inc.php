@@ -141,6 +141,7 @@ function make_small_eventlist($startEvent) {
 	$clock = $startEvent['clock'];
 
 	$options = array(
+		'object' => EVENT_OBJECT_TRIGGER,
 		'triggerids' => $startEvent['objectid'],
 		'eventid_till' => $startEvent['eventid'],
 		'output' => API_OUTPUT_EXTEND,
