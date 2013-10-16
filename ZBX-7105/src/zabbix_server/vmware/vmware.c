@@ -35,7 +35,7 @@
  * When a new service is requested by poller the zbx_vmware_get_service() function
  * creates a new service object, marks it as new, but still returns NULL object.
  *
- * The collectors checks the service object list for new services or services not updated
+ * The collectors check the service object list for new services or services not updated
  * during last CONFIG_VMWARE_FREQUENCY seconds. If such service is found it is marked
  * as updating.
  *
@@ -54,8 +54,6 @@ extern unsigned char	process_type;
 extern char		*CONFIG_FILE;
 extern int		CONFIG_VMWARE_FREQUENCY;
 extern zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE;
-
-/* */
 
 #define VMWARE_VECTOR_CREATE(ref, type)	zbx_vector_##type##_create_ext(ref,  __vm_mem_malloc_func, \
 		__vm_mem_realloc_func, __vm_mem_free_func)
@@ -88,7 +86,8 @@ typedef struct
 }
 zbx_vmware_service_objects_t;
 
-static zbx_vmware_service_objects_t	vmware_service_objects[3] = {
+static zbx_vmware_service_objects_t	vmware_service_objects[3] =
+{
 	{NULL, NULL, NULL, NULL},
 	{"ha-perfmgr", "ha-sessionmgr", "ha-eventmgr", "ha-property-collector"},
 	{"PerfMgr", "SessionManager", "EventManager", "propertyCollector"}
@@ -704,14 +703,14 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 		if (NULL == (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
 		{
 			/* Successfully authenticated with vcenter service manager. */
-			/* Set the service type and return with success             */
+			/* Set the service type and return with success.            */
 			service->type = ZBX_VMWARE_SERVICE_VCENTER;
 			ret = SUCCEED;
 			goto out;
 		}
 
-		/* Tf the wrong service manager was used, set the service type as vsphere and */
-		/* try again with vsphere service manager. Otherwiser return with failure.    */
+		/* If the wrong service manager was used, set the service type as vsphere and */
+		/* try again with vsphere service manager. Otherwise return with failure.     */
 		if (NULL == (error_object = zbx_xml_read_value(page.data,
 				ZBX_XPATH_LN3("detail", "NotAuthenticatedFault", "object"))))
 		{
@@ -2845,7 +2844,6 @@ out:
 	return value;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_xml_read_node_value                                          *
@@ -2894,7 +2892,6 @@ clean:
 
 	return value;
 }
-
 
 /******************************************************************************
  *                                                                            *

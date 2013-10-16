@@ -118,6 +118,19 @@ function init_nodes() {
 	}
 }
 
+/**
+ * Returns the ID of the currently selected node(s).
+ *
+ * Supported $forceAllNodes values:
+ * - null 	- return the currently visible nodes;
+ * - true 	- return all nodes that the user has read permissions to, including the master node;
+ * - false	- return the currently selected node or the local node if all nodes are selected.
+ *
+ * @param bool 	$forceAllNodes	which nodes to return
+ * @param int 	$permission		required node permissions
+ *
+ * @return array|int
+ */
 function get_current_nodeid($forceAllNodes = null, $permission = null) {
 	global $ZBX_CURRENT_NODEID, $ZBX_AVAILABLE_NODES, $ZBX_VIEWED_NODES;
 
