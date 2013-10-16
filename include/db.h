@@ -156,7 +156,11 @@ zbx_graph_item_type;
 
 #define ALERT_SENDTO_LEN		100
 #define ALERT_SUBJECT_LEN		255
-#define ALERT_MESSAGE_LEN		65535
+#if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE)
+#	define ALERT_MESSAGE_LEN		2048
+#else
+#	define ALERT_MESSAGE_LEN		65535
+#endif
 #define ALERT_ERROR_LEN			128
 #define ALERT_ERROR_LEN_MAX		ALERT_ERROR_LEN+1
 
