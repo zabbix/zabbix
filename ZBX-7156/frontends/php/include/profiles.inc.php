@@ -133,7 +133,7 @@ class CProfile{
 			'profileid' => get_dbid('profiles', 'profileid'),
 			'userid' => $USER_DETAILS['userid'],
 			'idx' => zbx_dbstr($idx),
-			$value_type => ($value_type == 'value_str') ? zbx_dbstr($value) : $value,
+			$value_type => zbx_dbstr($value),
 			'type' => zbx_dbstr($type),
 			'idx2' => zbx_dbstr($idx2)
 		);
@@ -153,7 +153,6 @@ class CProfile{
 		if($idx2 > 0) $sql_cond.= ' AND idx2='.$idx2.' AND '.DBin_node('idx2', false);
 
 		$value_type = self::getFieldByType($type);
-		$value = ($value_type == 'value_str') ? zbx_dbstr($value) : $value;
 
 		$sql = 'UPDATE profiles SET '.
 					$value_type.'='.zbx_dbstr($value).','.
