@@ -535,7 +535,7 @@ class CZBXAPI {
 
 		// if no specific ids are given, apply the node filter
 		if (!isset($options[$pkOption])) {
-			$nodeIds = isset($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
+			$nodeIds = get_current_nodeid(true);
 			$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], $pkFieldId, $nodeIds);
 		}
 
