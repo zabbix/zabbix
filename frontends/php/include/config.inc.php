@@ -69,12 +69,20 @@ function _llnw_is_user_rw() {
 		$LLNW_RW_ROLE = -1;
 	}
 
-	if (empty($USER_DETAILS['userid'])) {
+	// Find/populate our user's ID
+	$userid='';
+	if (!empty($USER_DETAILS['userid'])) {
+		$userid = $USER_DETAILS['userid'];
+	}
+	else if (!empty(CZBXAPI::$userData['userid'])) {
+		$userid = CZBXAPI::$userData['userid'];
+	}
+
+	if (empty($userid)) {
 		return true; // consider the lack of a userid as anonymous
 	}
 	else {
 		static $groups; // cache the groups per request - we only need to call the API once.
-		$userid = $USER_DETAILS['userid'];
 		if (empty($groups)) {
 			$groups = array();
 			$apigroups = API::UserGroup()->get(array('userids' => $userid, 'output' => API_OUTPUT_SHORTEN));
