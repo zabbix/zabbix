@@ -1101,6 +1101,74 @@ char	*get_ip_by_socket(zbx_sock_t *s)
 	return buffer;
 }
 
+#if defined(HAVE_IPV6)
+static int	zbx_ip_cmp(const struct addrinfo *current_ai, ZBX_SOCKADDR name)
+{
+	/* Network Byte Order is ensured */
+	/* IPv4-compatible, the first 96 bits are zeros */
+	const unsigned char	ipv4_compat_mask[12] = {0};
+	/* IPv4-mapped, the first 80 bits are zeros, 16 next - ones */
+	const unsigned char	ipv4_mapped_mask[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255};
+
+	struct sockaddr_in	*name4 = (struct sockaddr_in *)&name,
+				*ai_addr4 = (struct sockaddr_in *)current_ai->ai_addr;
+	struct sockaddr_in6	*name6 = (struct sockaddr_in6 *)&name,
+				*ai_addr6 = (struct sockaddr_in6 *)current_ai->ai_addr;
+
+#ifdef HAVE_SOCKADDR_STORAGE_SS_FAMILY
+	if (current_ai->ai_family == name.ss_family)
+#else
+	if (current_ai->ai_family == name.__ss_family)
+#endif
+	{
+		switch (current_ai->ai_family)
+		{
+			case AF_INET:
+				if (name4->sin_addr.s_addr == ai_addr4->sin_addr.s_addr)
+				{
+					return SUCCEED;
+				}
+				break;
+			case AF_INET6:
+				if (0 == memcmp(name6->sin6_addr.s6_addr, ai_addr6->sin6_addr.s6_addr,
+						sizeof(struct in6_addr)))
+				{
+					return SUCCEED;
+				}
+				break;
+		}
+	}
+	else
+	{
+		switch (current_ai->ai_family)
+		{
+			case AF_INET:
+				/* incoming AF_INET6, must see whether it is compatible or mapped */
+				if ((0 == memcmp(name6->sin6_addr.s6_addr, ipv4_compat_mask, 12) ||
+						0 == memcmp(name6->sin6_addr.s6_addr, ipv4_mapped_mask, 12)) &&
+						0 == memcmp(&name6->sin6_addr.s6_addr[12],
+						(unsigned char *)&ai_addr4->sin_addr.s_addr, 4))
+				{
+					return SUCCEED;
+				}
+				break;
+			case AF_INET6:
+				/* incoming AF_INET, must see whether the given is compatible or mapped */
+				if ((0 == memcmp(ai_addr6->sin6_addr.s6_addr, ipv4_compat_mask, 12) ||
+						0 == memcmp(ai_addr6->sin6_addr.s6_addr, ipv4_mapped_mask, 12)) &&
+						0 == memcmp(&ai_addr6->sin6_addr.s6_addr[12],
+						(unsigned char *)&name4->sin_addr.s_addr, 4))
+				{
+					return SUCCEED;
+				}
+				break;
+		}
+	}
+
+	return FAIL;
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: check_security                                                   *
@@ -1123,14 +1191,11 @@ char	*get_ip_by_socket(zbx_sock_t *s)
 int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empty)
 {
 #if defined(HAVE_IPV6)
-	struct addrinfo	hints, *ai = NULL;
-	/* Network Byte Order is ensured */
-	unsigned char	ipv4_cmp_mask[12] = {0};				/* IPv4-Compatible, the first 96 bits are zeros */
-	unsigned char	ipv4_mpd_mask[12] = {0,0,0,0,0,0,0,0,0,0,255,255};	/* IPv4-Mapped, the first 80 bits are zeros, 16 next - ones */
+	struct addrinfo	hints, *ai = NULL, *current_ai;
 #else
 	struct hostent	*hp;
 	char		*sip;
-	int		i[4], j[4];
+	int		i[4], j[4], k;
 #endif
 	ZBX_SOCKADDR	name;
 	ZBX_SOCKLEN_T	nlen;
@@ -1144,7 +1209,8 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 
 	if (ZBX_TCP_ERROR == getpeername(s->socket, (struct sockaddr *)&name, &nlen))
 	{
-		zbx_set_tcp_strerror("connection rejected, getpeername() failed: %s", strerror_from_system(zbx_sock_last_error()));
+		zbx_set_tcp_strerror("connection rejected, getpeername() failed: %s",
+				strerror_from_system(zbx_sock_last_error()));
 		return FAIL;
 	}
 	else
@@ -1168,58 +1234,12 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 			hints.ai_family = PF_UNSPEC;
 			if (0 == getaddrinfo(start, NULL, &hints, &ai))
 			{
-#ifdef HAVE_SOCKADDR_STORAGE_SS_FAMILY
-				if (ai->ai_family == name.ss_family)
-#else
-				if (ai->ai_family == name.__ss_family)
-#endif
+				for (current_ai = ai; NULL != current_ai; current_ai = current_ai->ai_next)
 				{
-					switch (ai->ai_family)
+					if (SUCCEED == zbx_ip_cmp(current_ai, name))
 					{
-						case AF_INET  :
-							if (((struct sockaddr_in*)&name)->sin_addr.s_addr == ((struct sockaddr_in*)ai->ai_addr)->sin_addr.s_addr)
-							{
-								freeaddrinfo(ai);
-								return SUCCEED;
-							}
-							break;
-						case AF_INET6 :
-							if (0 == memcmp(((struct sockaddr_in6*)&name)->sin6_addr.s6_addr,
-									((struct sockaddr_in6*)ai->ai_addr)->sin6_addr.s6_addr,
-									sizeof(struct in6_addr)))
-							{
-								freeaddrinfo(ai);
-								return SUCCEED;
-							}
-							break;
-					}
-				}
-				else
-				{
-					switch (ai->ai_family)
-					{
-						case AF_INET  :
-							/* incoming AF_INET6, must see whether it is comp or mapped */
-							if((0 == memcmp(((struct sockaddr_in6*)&name)->sin6_addr.s6_addr, ipv4_cmp_mask, 12) ||
-								0 == memcmp(((struct sockaddr_in6*)&name)->sin6_addr.s6_addr, ipv4_mpd_mask, 12)) &&
-								0 == memcmp(&((struct sockaddr_in6*)&name)->sin6_addr.s6_addr[12],
-									(unsigned char*)&((struct sockaddr_in*)ai->ai_addr)->sin_addr.s_addr, 4))
-							{
-								freeaddrinfo(ai);
-								return SUCCEED;
-							}
-							break;
-						case AF_INET6 :
-							/* incoming AF_INET, must see whether the given is comp or mapped */
-							if((0 == memcmp(((struct sockaddr_in6*)ai->ai_addr)->sin6_addr.s6_addr, ipv4_cmp_mask, 12) ||
-								0 == memcmp(((struct sockaddr_in6*)ai->ai_addr)->sin6_addr.s6_addr, ipv4_mpd_mask, 12)) &&
-								0 == memcmp(&((struct sockaddr_in6*)ai->ai_addr)->sin6_addr.s6_addr[12],
-									(unsigned char*)&((struct sockaddr_in*)&name)->sin_addr.s_addr, 4))
-							{
-								freeaddrinfo(ai);
-								return SUCCEED;
-							}
-							break;
+						freeaddrinfo(ai);
+						return SUCCEED;
 					}
 				}
 				freeaddrinfo(ai);
@@ -1227,12 +1247,15 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 #else
 			if (NULL != (hp = gethostbyname(start)))
 			{
-				sip = inet_ntoa(*((struct in_addr *)hp->h_addr));
-
-				if (4 == sscanf(sip, "%d.%d.%d.%d", &j[0], &j[1], &j[2], &j[3]) &&
-						i[0] == j[0] && i[1] == j[1] && i[2] == j[2] && i[3] == j[3])
+				for (k = 0; NULL != hp->h_addr_list[k]; k++)
 				{
-					return SUCCEED;
+					sip = inet_ntoa(*(struct in_addr *)hp->h_addr_list[k]);
+
+					if (4 == sscanf(sip, "%d.%d.%d.%d", &j[0], &j[1], &j[2], &j[3]) &&
+							i[0] == j[0] && i[1] == j[1] && i[2] == j[2] && i[3] == j[3])
+					{
+						return SUCCEED;
+					}
 				}
 			}
 #endif	/* HAVE_IPV6 */
