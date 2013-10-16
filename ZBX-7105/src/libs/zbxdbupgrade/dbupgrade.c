@@ -1019,16 +1019,6 @@ static int	DBpatch_2010040(void)
 	return DBrename_field("triggers", "value_flags", &field);
 }
 
-static int	DBpatch_2010041(void)
-{
-	return DBdrop_index("events", "events_1");
-}
-
-static int	DBpatch_2010042(void)
-{
-	return DBcreate_index("events", "events_1", "source,object,objectid,eventid", 1);
-}
-
 static int	DBpatch_2010043(void)
 {
 	const ZBX_FIELD field = {"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
@@ -2156,6 +2146,26 @@ static int	DBpatch_2010181(void)
 	return DBmodify_field_type("interface", &field);
 }
 
+static int	DBpatch_2010182(void)
+{
+	return DBdrop_index("events", "events_1");
+}
+
+static int	DBpatch_2010183(void)
+{
+	return DBdrop_index("events", "events_2");
+}
+
+static int	DBpatch_2010184(void)
+{
+	return DBcreate_index("events", "events_1", "source,object,objectid,clock", 0);
+}
+
+static int	DBpatch_2010185(void)
+{
+	return DBcreate_index("events", "events_2", "source,clock", 0);
+}
+
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 #define DBPATCH_END()					{NULL}};
@@ -2245,8 +2255,6 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010038, 0, 0)
 	DBPATCH_ADD(2010039, 0, 0)
 	DBPATCH_ADD(2010040, 0, 1)
-	DBPATCH_ADD(2010041, 0, 0)
-	DBPATCH_ADD(2010042, 0, 0)
 	DBPATCH_ADD(2010043, 0, 1)
 	DBPATCH_ADD(2010044, 0, 1)
 	DBPATCH_ADD(2010045, 0, 1)
@@ -2386,6 +2394,10 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010179, 0, 1)
 	DBPATCH_ADD(2010180, 0, 1)
 	DBPATCH_ADD(2010181, 0, 1)
+	DBPATCH_ADD(2010182, 0, 1)
+	DBPATCH_ADD(2010183, 0, 1)
+	DBPATCH_ADD(2010184, 0, 1)
+	DBPATCH_ADD(2010185, 0, 1)
 
 	DBPATCH_END()
 

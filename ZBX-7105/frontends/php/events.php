@@ -374,9 +374,11 @@ if ($source == EVENT_OBJECT_TRIGGER) {
 	$sourceName = 'trigger';
 
 	$firstEvent = API::Event()->get(array(
+		'source' => EVENT_SOURCE_TRIGGERS,
+		'object' => EVENT_OBJECT_TRIGGER,
 		'output' => API_OUTPUT_EXTEND,
 		'objectids' => !empty($_REQUEST['triggerid']) ? $_REQUEST['triggerid'] : null,
-		'sortfield' => 'eventid',
+		'sortfield' => array('clock'),
 		'sortorder' => ZBX_SORT_UP,
 		'limit' => 1
 	));
@@ -391,7 +393,7 @@ else {
 		'output' => API_OUTPUT_EXTEND,
 		'source' => EVENT_SOURCE_DISCOVERY,
 		'object' => EVENT_OBJECT_DHOST,
-		'sortfield' => 'eventid',
+		'sortfield' => array('clock'),
 		'sortorder' => ZBX_SORT_UP,
 		'limit' => 1
 	));
@@ -401,7 +403,7 @@ else {
 		'output' => API_OUTPUT_EXTEND,
 		'source' => EVENT_SOURCE_DISCOVERY,
 		'object' => EVENT_OBJECT_DSERVICE,
-		'sortfield' => 'eventid',
+		'sortfield' => array('clock'),
 		'sortorder' => ZBX_SORT_UP,
 		'limit' => 1
 	));
@@ -618,12 +620,14 @@ else {
 
 			// query event with short data
 			$events = API::Event()->get(array(
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER,
 				'nodeids' => get_current_nodeid(),
 				'objectids' => zbx_objectValues($triggers, 'triggerid'),
 				'time_from' => $from,
 				'time_till' => $till,
 				'output' => array('eventid'),
-				'sortfield' => 'eventid',
+				'sortfield' => array('clock', 'eventid'),
 				'sortorder' => ZBX_SORT_DOWN,
 				'limit' => $config['search_limit'] + 1
 			));
@@ -633,11 +637,13 @@ else {
 
 			// query event with extend data
 			$events = API::Event()->get(array(
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER,
 				'nodeids' => get_current_nodeid(),
 				'eventids' => zbx_objectValues($events, 'eventid'),
 				'output' => API_OUTPUT_EXTEND,
 				'select_acknowledges' => API_OUTPUT_COUNT,
-				'sortfield' => 'eventid',
+				'sortfield' => array('clock', 'eventid'),
 				'sortorder' => ZBX_SORT_DOWN,
 				'nopermissions' => true
 			));
