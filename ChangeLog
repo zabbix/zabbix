@@ -5,6 +5,7 @@ New features:
 A.F....... [ZBX-1357] updated Dutch, Finnish, Indonesian, Italian, Lithuanian, Persian, Portuguese (Portugal), Russian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A.F.I...S. [ZBX-7105] fixed performance of housekeeper; improved indexes for table "events"; fixed SQL statements to use the new indexes (Sasha)
 ....I..... [ZBX-7130] fixed makefiles to build zabbix_proxy only (Sasha)
 ..F....... [ZBX-7055] fixed displaing OK trigger status in maps (Eduard)
 ..F....... [ZBX-7081] fixed node drop down being displayed incorrectly in several pop ups (Pavels)

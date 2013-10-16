@@ -467,11 +467,12 @@ class CTrigger extends CTriggerGeneral {
 		if (!is_null($options['selectLastEvent'])) {
 			foreach ($result as $triggerId => $trigger) {
 				$lastEvent = API::Event()->get(array(
-					'object' => EVENT_SOURCE_TRIGGERS,
+					'source' => EVENT_SOURCE_TRIGGERS,
+					'object' => EVENT_OBJECT_TRIGGER,
 					'objectids' => $triggerId,
 					'output' => $options['selectLastEvent'],
 					'nopermissions' => true,
-					'sortfield' => array('eventid'),
+					'sortfield' => array('clock', 'eventid'),
 					'sortorder' => ZBX_SORT_DOWN,
 					'limit' => 1
 				));
