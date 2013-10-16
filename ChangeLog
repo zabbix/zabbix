@@ -6,6 +6,7 @@ New features:
 A.F....... [ZBX-1357] updated Dutch, Finnish, Indonesian, Italian, Lithuanian, Persian, Portuguese (Portugal), Russian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+....I..... [ZBX-5374] removed ONLY directive from PostgreSQL upgrade statements (Sasha)
 ..F....... [ZBX-7097] fixed dashboard drag'n'drop widget placeholder not being displayed in the classic theme (Pavels)
 ....I..... [ZBX-7130] fixed makefiles to build zabbix_proxy only (Sasha)
 ..F....... [ZBX-7055] fixed displaing OK trigger status in maps (Eduard)
