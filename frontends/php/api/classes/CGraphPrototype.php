@@ -106,25 +106,51 @@ class CGraphPrototype extends CGraphGeneral {
 
 			$userGroups = getUserGroupsByUserId($userid);
 
+			// check permissions by graph items
 			$sqlParts['where'][] = 'NOT EXISTS ('.
-					'SELECT NULL'.
-					' FROM graphs_items gi,items i,hosts_groups hgg'.
-						' LEFT JOIN rights r'.
-							' ON r.id=hgg.groupid'.
-								' AND '.dbConditionInt('r.groupid', $userGroups).
-					' WHERE (g.graphid=gi.graphid'.
-							' AND gi.itemid=i.itemid'.
-							' OR g.ymin_type='.GRAPH_YAXIS_TYPE_ITEM_VALUE.
-							' AND g.ymin_itemid=i.itemid'.
-							' OR g.ymax_type='.GRAPH_YAXIS_TYPE_ITEM_VALUE.
-							' AND g.ymax_itemid=i.itemid'.
-						')'.
-						' AND i.hostid=hgg.hostid'.
-					' GROUP BY i.hostid'.
-					' HAVING MAX(permission)<'.$permission.
-						' OR MIN(permission) IS NULL'.
-						' OR MIN(permission)='.PERM_DENY.
-					')';
+				'SELECT NULL'.
+				' FROM graphs_items gi,items i,hosts_groups hgg'.
+					' LEFT JOIN rights r'.
+						' ON r.id=hgg.groupid'.
+							' AND '.dbConditionInt('r.groupid', $userGroups).
+				' WHERE g.graphid=gi.graphid'.
+					' AND gi.itemid=i.itemid'.
+					' AND i.hostid=hgg.hostid'.
+				' GROUP BY i.hostid'.
+				' HAVING MAX(permission)<'.$permission.
+					' OR MIN(permission) IS NULL'.
+					' OR MIN(permission)='.PERM_DENY.
+				')';
+			// check permissions by Y min item
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+				'SELECT NULL'.
+				' FROM items i,hosts_groups hgg'.
+					' LEFT JOIN rights r'.
+						' ON r.id=hgg.groupid'.
+							' AND '.dbConditionInt('r.groupid', $userGroups).
+				' WHERE g.ymin_type='.GRAPH_YAXIS_TYPE_ITEM_VALUE.
+					' AND g.ymin_itemid=i.itemid'.
+					' AND i.hostid=hgg.hostid'.
+				' GROUP BY i.hostid'.
+				' HAVING MAX(permission)<'.$permission.
+					' OR MIN(permission) IS NULL'.
+					' OR MIN(permission)='.PERM_DENY.
+				')';
+			// check permissions by Y max item
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+				'SELECT NULL'.
+				' FROM items i,hosts_groups hgg'.
+					' LEFT JOIN rights r'.
+						' ON r.id=hgg.groupid'.
+							' AND '.dbConditionInt('r.groupid', $userGroups).
+				' WHERE g.ymax_type='.GRAPH_YAXIS_TYPE_ITEM_VALUE.
+					' AND g.ymax_itemid=i.itemid'.
+					' AND i.hostid=hgg.hostid'.
+				' GROUP BY i.hostid'.
+				' HAVING MAX(permission)<'.$permission.
+					' OR MIN(permission) IS NULL'.
+					' OR MIN(permission)='.PERM_DENY.
+				')';
 		}
 
 		// groupids
