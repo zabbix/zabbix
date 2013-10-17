@@ -1427,6 +1427,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.19rc1
 
+..F....... [ZBX-7156] fixed string value escaping in profiles (Eduard)
 ...G...... [ZBX-4658] fixed system.boottime and system.uptime returning bogus values on Solaris when agent is compiled as a 64-bit binary (asaveljevs)
 ........S. [ZBX-7119] fixed data collection stopping after no data maintenance until configuration cache is updated (asaveljevs)
 ..F....... [ZBX-7074] fixed incorrectly parsed trigger expression in trigger wizard (Vitalij)
