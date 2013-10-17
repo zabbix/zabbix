@@ -100,7 +100,15 @@ function get_cookie($name, $default_value = null) {
 }
 
 function zbx_setcookie($name, $value, $time = null) {
-	setcookie($name, $value, isset($time) ? $time : 0);
+	$url = new Curl;
+	setcookie(
+		$name,
+		$value,
+		isset($time) ? $time : 0,
+		$url->getPath(),
+		$_SERVER['SERVER_NAME'],
+		isset($_SERVER['HTTPS'])
+	);
 	$_COOKIE[$name] = $value;
 }
 
