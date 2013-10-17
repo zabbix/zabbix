@@ -1196,7 +1196,7 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 	struct addrinfo	hints, *ai = NULL, *current_ai;
 #else
 	struct hostent	*hp;
-	int		k;
+	int		i;
 #endif
 	ZBX_SOCKADDR	name;
 	ZBX_SOCKLEN_T	nlen;
@@ -1242,13 +1242,10 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 #else
 			if (NULL != (hp = gethostbyname(start)))
 			{
-				for (k = 0; NULL != hp->h_addr_list[k]; k++)
+				for (i = 0; NULL != hp->h_addr_list[i]; i++)
 				{
-					if (name.sin_addr.s_addr == ((struct in_addr*)hp->h_addr_list[k])->s_addr)
-
-					{
+					if (name.sin_addr.s_addr == ((struct in_addr *)hp->h_addr_list[i])->s_addr)
 						return SUCCEED;
-					}
 				}
 			}
 #endif	/* HAVE_IPV6 */
