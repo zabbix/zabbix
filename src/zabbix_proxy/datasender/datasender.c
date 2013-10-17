@@ -140,8 +140,8 @@ static void	history_sender(struct zbx_json *j, int *records, const char *tag,
  ******************************************************************************/
 void	main_datasender_loop(void)
 {
-	int		records, r;
-	double		sec;
+	int		records = 0, r;
+	double		sec = 0.0;
 	struct zbx_json	j;
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
@@ -152,10 +152,10 @@ void	main_datasender_loop(void)
 
 	for (;;)
 	{
+		zbx_setproctitle("%s [sent %d values in " ZBX_FS_DBL " sec, sending data]",
+				get_process_type_string(process_type), records, sec);
+
 		sec = zbx_time();
-
-		zbx_setproctitle("%s [sending data]", get_process_type_string(process_type));
-
 		host_availability_sender(&j);
 
 		records = 0;
