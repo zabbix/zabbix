@@ -5,7 +5,7 @@ A.F....... [ZBX-1357] updated German, Japanese, Italian, Romanian and Slovak tra
 
 Bug fixes:
 ........S. [ZBX-7151] limited alert message and items parameter length to 2048 characters when working with Oracle and DB2 databases (wiper)
-...G...... [ZBX-6591] fixed resolution of IPv4 and IPv6 addresses if DNS hostname is specified as server parameter in configuration file (igors)
+...G...... [ZBX-6591] fixed resolution of IPv4 and IPv6 addresses if DNS hostname is specified as server parameter in configuration file; thanks to Trever L. Adams for patch (igors)
 ........S. [ZBX-7133] fixed processing of zabbix[host,*,available] item; fixed proxy's hosts availability data on server (Sasha)
 ..F....... [ZBX-7112] improved file import validation for graph items (Eduard)
 A......... [ZBX-7101] fixed generated SQL queries in action.get method when simultaneously selecting more than one condition and operation (Ivo)
