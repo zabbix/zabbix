@@ -1,10 +1,13 @@
 Changes for 2.1.8
 
 New features:
+..F....... [ZBX-7097] changed dashboard drag'n'drop widget placeholder color in the dark orange and dark blue themes (Pavels)
 ........S. [ZBX-6294] fixed nodata() trigger firing immediately after no data maintenance (asaveljevs, Sasha)
 A.F....... [ZBX-1357] updated Dutch, Finnish, Indonesian, Italian, Lithuanian, Persian, Portuguese (Portugal), Russian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+....I..... [ZBX-5374] removed ONLY directive from PostgreSQL upgrade statements (Sasha)
+..F....... [ZBX-7097] fixed dashboard drag'n'drop widget placeholder not being displayed in the classic theme (Pavels)
 ....I..... [ZBX-7130] fixed makefiles to build zabbix_proxy only (Sasha)
 ..F....... [ZBX-7055] fixed displaing OK trigger status in maps (Eduard)
 ..F....... [ZBX-7081] fixed node drop down being displayed incorrectly in several pop ups (Pavels)
@@ -1925,6 +1928,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.19rc1
 
+..F....... [ZBX-7156] fixed string value escaping in profiles (Eduard)
 ...G...... [ZBX-4658] fixed system.boottime and system.uptime returning bogus values on Solaris when agent is compiled as a 64-bit binary (asaveljevs)
 ........S. [ZBX-7119] fixed data collection stopping after no data maintenance until configuration cache is updated (asaveljevs)
 ..F....... [ZBX-7074] fixed incorrectly parsed trigger expression in trigger wizard (Vitalij)
