@@ -1269,6 +1269,13 @@ class CTrigger extends CTriggerGeneral {
 				unset($triggerUpdate['expression']);
 			}
 
+			// skip updating read only values
+			unset($triggerUpdate['state'],
+				$triggerUpdate['value'],
+				$triggerUpdate['lastchange'],
+				$triggerUpdate['error']
+			);
+
 			DB::update('triggers', array(
 				'values' => $triggerUpdate,
 				'where' => array('triggerid' => $trigger['triggerid'])
