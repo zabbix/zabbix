@@ -1461,8 +1461,8 @@ next:
  ******************************************************************************/
 void	main_escalator_loop(void)
 {
-	int	now, escalations_count;
-	double	sec;
+	int	now, escalations_count = 0;
+	double	sec = 0.0;
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
@@ -1470,7 +1470,8 @@ void	main_escalator_loop(void)
 
 	for (;;)
 	{
-		zbx_setproctitle("%s [processing escalations]", get_process_type_string(process_type));
+		zbx_setproctitle("%s [processed %d escalations in " ZBX_FS_DBL " sec, processing escalations]",
+				get_process_type_string(process_type), escalations_count, sec);
 
 		now = time(NULL);
 		sec = zbx_time();
@@ -1478,7 +1479,8 @@ void	main_escalator_loop(void)
 		sec = zbx_time() - sec;
 
 		zbx_setproctitle("%s [processed %d escalations in " ZBX_FS_DBL " sec, idle %d sec]",
-				get_process_type_string(process_type), escalations_count, sec, CONFIG_ESCALATOR_FREQUENCY);
+				get_process_type_string(process_type), escalations_count, sec,
+				CONFIG_ESCALATOR_FREQUENCY);
 
 		zbx_sleep_loop(CONFIG_ESCALATOR_FREQUENCY);
 	}
