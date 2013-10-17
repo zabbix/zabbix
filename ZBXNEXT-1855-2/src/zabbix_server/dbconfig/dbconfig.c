@@ -20,7 +20,6 @@
 #include "common.h"
 
 #include "db.h"
-#include "log.h"
 #include "daemon.h"
 #include "zbxself.h"
 
@@ -47,7 +46,7 @@ extern unsigned char	process_type;
  ******************************************************************************/
 void	main_dbconfig_loop(void)
 {
-	double	sec;
+	double	sec = 0.0;
 
 	zbx_setproctitle("%s [waiting %d sec for processes]", get_process_type_string(process_type),
 			CONFIG_CONFSYNCER_FREQUENCY);
@@ -61,7 +60,8 @@ void	main_dbconfig_loop(void)
 
 	for (;;)
 	{
-		zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
+		zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, syncing configuration]",
+				get_process_type_string(process_type), sec);
 
 		sec = zbx_time();
 		DCsync_configuration();
