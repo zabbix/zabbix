@@ -594,8 +594,9 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVE
 
 	c_event = (NULL != r_event ? r_event : event);
 	now = time(NULL);
+
 	subject_esc = DBdyn_escape_string_len(subject, ALERT_SUBJECT_LEN);
-	message_esc = DBdyn_escape_string(message);
+	message_esc = DBdyn_escape_string_len(message, ALERT_MESSAGE_LEN);
 
 	if (0 == mediatypeid)
 	{

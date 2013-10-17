@@ -17,60 +17,16 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 
-# SYNOPSIS
-#
-#   LIBXML2_CHECK_CONFIG([MINIMUM-VERSION])
-#
-# DESCRIPTION
-#
-#   This macro provides tests of availability of MySQL client library
-#   of particular version or newer.
-#
-#   AX_LIB_MYSQL macro takes only one argument which is optional. If
-#   there is no required version passed, then macro does not run
-#   version test.
-#
-#   The --with-mysql option takes one of three possible values:
-#
-#   no - do not check for MySQL client library
-#
-#   yes - do check for MySQL library in standard locations
-#   (mysql_config should be in the PATH)
-#
-#   path - complete path to mysql_config utility, use this option if
-#   mysql_config can't be found in the PATH
-#
-#   This macro calls:
-#
-#     AC_SUBST(MYSQL_CFLAGS)
-#     AC_SUBST(MYSQL_LDFLAGS)
-#     AC_SUBST(MYSQL_LIBS)
-#     AC_SUBST(MYSQL_VERSION)
-#
-#   And sets:
-#
-#     HAVE_MYSQL
-#
-# LAST MODIFICATION
-#
-#   2006-07-16
-#
-# COPYLEFT
-#
-#   Copyright (c) 2006 Mateusz Loskot <mateusz@loskot.net>
-#
-#   Copying and distribution of this file, with or without
-#   modification, are permitted in any medium without royalty provided
-#   the copyright notice and this notice are preserved.
-
 AC_DEFUN([LIBXML2_CHECK_CONFIG],
 [
     LIBXML2_CONFIG="no"
 
-    AC_ARG_WITH([libxml2],
-        AC_HELP_STRING([--with-libxml2@<:@=ARG@:>@],
-            [use libxml2 client library @<:@default=no@:>@, optionally specify path to xml2-config]
-        ),
+    AC_ARG_WITH(libxml2,
+        [
+If you want to use XML library:
+AC_HELP_STRING([--with-libxml2@<:@=ARG@:>@],
+    [use libxml2 client library @<:@default=no@:>@, optionally specify path to xml2-config]
+        )],
         [
         if test "$withval" = "no"; then
             want_libxml2="no"
@@ -105,55 +61,54 @@ AC_DEFUN([LIBXML2_CHECK_CONFIG],
 
             for i in $_full_libxml2_libs; do
                 case $i in
-                -lxml2)
-             ;;
+                   -lxml2)
+                        ;;
                    -L*)
                         LIBXML2_LDFLAGS="${LIBXML2_LDFLAGS} $i"
-                ;;
+                        ;;
                 esac
             done
 
             if test "x$enable_static" = "xyes"; then
-               for i in $_full_libxml2_libs; do
-                   case $i in
-           	      -lxml2)
-           	    ;;
-                      -l*)
-				_lib_name="`echo "$i" | cut -b3-`"
-				AC_CHECK_LIB($_lib_name, main, [
-						LIBXML2_LIBS="$LIBXML2_LIBS $i"
-					],[
-						AC_MSG_ERROR([Not found $_lib_name library])
-					])
-                   ;;
-                   esac
-               done
+                for i in $_full_libxml2_libs; do
+                    case $i in
+                        -lxml2)
+                            ;;
+                        -l*)
+                            _lib_name="`echo "$i" | cut -b3-`"
+                            AC_CHECK_LIB($_lib_name, main, [
+                                    LIBXML2_LIBS="$LIBXML2_LIBS $i"
+                                    ],[
+                                    AC_MSG_ERROR([Not found $_lib_name library])
+                                    ])
+                            ;;
+                    esac
+                done
             fi
 
-		_save_libxml2_libs="${LIBS}"
-		_save_libxml2_ldflags="${LDFLAGS}"
-		_save_libxml2_cflags="${CFLAGS}"
-		LIBS="${LIBS} ${LIBXML2_LIBS}"
-		LDFLAGS="${LDFLAGS} ${LIBXML2_LDFLAGS}"
-		CFLAGS="${CFLAGS} ${LIBXML2_CFLAGS}"
+            _save_libxml2_libs="${LIBS}"
+            _save_libxml2_ldflags="${LDFLAGS}"
+            _save_libxml2_cflags="${CFLAGS}"
+            LIBS="${LIBS} ${LIBXML2_LIBS}"
+            LDFLAGS="${LDFLAGS} ${LIBXML2_LDFLAGS}"
+            CFLAGS="${CFLAGS} ${LIBXML2_CFLAGS}"
 
-		AC_CHECK_LIB(xml2, xmlReadMemory, [
-			LIBXML2_LIBS="-lxml2 ${LIBXML2_LIBS}"
-			],[
-			AC_MSG_ERROR([Not found libxml2 library])
-			])
+            AC_CHECK_LIB(xml2, xmlReadMemory, [
+                    LIBXML2_LIBS="-lxml2 ${LIBXML2_LIBS}"
+                    ],[
+                    AC_MSG_ERROR([Not found libxml2 library])
+                    ])
 
-		LIBS="${_save_libxml2_libs}"
-		LDFLAGS="${_save_libxml2_ldflags}"
-		CFLAGS="${_save_libxml2_cflags}"
-		unset _save_libxml2_libs
-		unset _save_libxml2_ldflags
-		unset _save_libxml2_cflags
+            LIBS="${_save_libxml2_libs}"
+            LDFLAGS="${_save_libxml2_ldflags}"
+            CFLAGS="${_save_libxml2_cflags}"
+            unset _save_libxml2_libs
+            unset _save_libxml2_ldflags
+            unset _save_libxml2_cflags
 
-		LIBXML2_VERSION=`$LIBXML2_CONFIG --version`
+            LIBXML2_VERSION=`$LIBXML2_CONFIG --version`
 
-		AC_DEFINE([HAVE_LIBXML2], [1],
-			[Define to 1 if libxml2 libraries are available])
+            AC_DEFINE([HAVE_LIBXML2], [1], [Define to 1 if libxml2 libraries are available])
 
             found_libxml2="yes"
         else

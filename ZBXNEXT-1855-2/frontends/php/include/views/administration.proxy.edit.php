@@ -63,7 +63,7 @@ if ($this->data['status'] == HOST_STATUS_PROXY_PASSIVE) {
 	$connectByComboBox->useJQueryStyle();
 
 	$interfaceTable->addRow(array(
-		new CTextBox('interface[ip]', $this->data['interface']['ip'], ZBX_TEXTBOX_SMALL_SIZE, 'no', 39),
+		new CTextBox('interface[ip]', $this->data['interface']['ip'], ZBX_TEXTBOX_SMALL_SIZE, 'no', 64),
 		new CTextBox('interface[dns]', $this->data['interface']['dns'], ZBX_TEXTBOX_SMALL_SIZE, 'no', 64),
 		$connectByComboBox,
 		new CTextBox('interface[port]', $this->data['interface']['port'], 18, 'no', 64)
