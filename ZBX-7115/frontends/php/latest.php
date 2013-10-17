@@ -117,14 +117,14 @@ $filterSelect = getRequest('select');
 $filterShowWithoutData = getRequest('show_without_data', 0);
 $filterShowDetails = getRequest('show_details', 0);
 
-if(hasRequest('filter_rst')){
+if (hasRequest('filter_rst')) {
 	$filterSelect = '';
 	$filterShowWithoutData = 0;
 	$filterShowDetails = 0;
 }
 
-if(hasRequest('filter_set') || hasRequest('filter_rst')){
-	CProfile::update('web.latest.filter.select',$filterSelect, PROFILE_TYPE_STR);
+if (hasRequest('filter_set') || hasRequest('filter_rst')) {
+	CProfile::update('web.latest.filter.select', $filterSelect, PROFILE_TYPE_STR);
 	CProfile::update('web.latest.filter.show_without_data', $filterShowWithoutData, PROFILE_TYPE_INT);
 	CProfile::update('web.latest.filter.show_details', $filterShowDetails, PROFILE_TYPE_INT);
 }
@@ -133,15 +133,6 @@ else {
 	$filterShowWithoutData = CProfile::get('web.latest.filter.show_without_data', 0);
 	$filterShowDetails = CProfile::get('web.latest.filter.show_details', 0);
 }
-
-$latest_wdgt = new CWidget(null, 'latest-mon');
-
-// Header
-$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
-$latest_wdgt->addPageHeader(_('LATEST DATA'), $fs_icon);
-
-// 2nd header
-$r_form = new CForm('get');
 
 $pageFilter = new CPageFilter(array(
 	'groups' => array(
@@ -156,36 +147,168 @@ $pageFilter = new CPageFilter(array(
 $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = $pageFilter->hostid;
 
-$r_form->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB(true)));
-$r_form->addItem(array(SPACE._('Host').SPACE, $pageFilter->getHostsCB(true)));
-
-$latest_wdgt->addHeader(_('Items'), $r_form);
-
-$filterForm = new CFormTable(null, null, 'get');
-$filterForm->setAttribute('name','zbx_filter');
-$filterForm->setAttribute('id','zbx_filter');
-$filterForm->addRow(_('Show items with name like'), new CTextBox('select',$filterSelect, 20));
-$filterForm->addRow(_('Show items without data'), new CCheckBox('show_without_data', $filterShowWithoutData, null, 1));
-$filterForm->addRow(_('Show details'), new CCheckBox('show_details', $filterShowDetails, null, 1));
-
-$reset = new CButton("filter_rst", _('Reset'), 'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
-
-$filterForm->addItemToBottomRow(new CSubmit("filter_set", _('Filter')));
-$filterForm->addItemToBottomRow($reset);
-
-$latest_wdgt->addFlicker($filterForm, CProfile::get('web.latest.filter.state', 1));
-
-/*
- * Table header
- */
 validate_sort_and_sortorder('i.name', ZBX_SORT_UP);
 
 $sortField = getPageSortField();
 $sortOrder = getPageSortOrder();
 
-$link = new CCol(new CDiv(null, 'app-list-toggle-all icon-plus-9x9'));
+$applications = $items = $hostScripts = array();
+
+// get hosts
+if ($_REQUEST['hostid']) {
+	$availableHostIds = array($_REQUEST['hostid']);
+}
+elseif ($pageFilter->hostsSelected) {
+	$availableHostIds = array_keys($pageFilter->hosts);
+}
+else {
+	$availableHostIds = array();
+}
+
+$hosts = API::Host()->get(array(
+	'output' => array('name', 'hostid', 'status'),
+	'hostids' => $availableHostIds,
+	'with_monitored_items' => true,
+	'preservekeys' => true
+));
+if ($hosts) {
+	foreach ($hosts as &$host) {
+		$host['item_cnt'] = 0;
+	}
+	unset($host);
+
+	if (count($hosts) > 1) {
+		$sortFields = ($sortField == 'h.name') ? array(array('field' => 'name', 'order' => $sortOrder)) : array('name');
+		CArrayHelper::sort($hosts, $sortFields);
+	}
+}
+
+// get items
+if ($hosts) {
+	$items = API::Item()->get(array(
+		'hostids' => array_keys($hosts),
+		'output' => API_OUTPUT_EXTEND,
+		'selectApplications' => array('applicationid'),
+		'selectItemDiscovery' => array('ts_delete'),
+		'filter' => array(
+			'status' => array(ITEM_STATUS_ACTIVE)
+		),
+		'preservekeys' => true
+	));
+}
+if ($items) {
+	// filter items by name
+	foreach ($items as $key => &$item) {
+		$item['resolvedName'] = itemName($item);
+
+		if (!zbx_empty($filterSelect) && !zbx_stristr($item['resolvedName'], $filterSelect)) {
+			unset($items[$key]);
+		}
+	}
+	unset($item);
+
+	if ($items) {
+		// get history
+		$history = Manager::History()->getLast($items, 2);
+
+		// filter items without history
+		if (!$filterShowWithoutData) {
+			foreach ($items as $key => $item) {
+				if (!isset($history[$item['itemid']])) {
+					unset($items[$key]);
+				}
+			}
+		}
+	}
+
+	if ($items) {
+		$hostIds = array_keys(array_flip(zbx_objectValues($items, 'hostid')));
+
+		// add item last update date for sorting
+		foreach ($items as &$item) {
+			if (isset($history[$item['itemid']])) {
+				$item['lastclock'] = $history[$item['itemid']][0]['clock'];
+			}
+		}
+		unset($item);
+
+		// sort
+		if ($sortField == 'i.name') {
+			$sortFields = array(array('field' => 'resolvedName', 'order' => $sortOrder), 'itemid');
+		}
+		elseif ($sortField == 'i.lastclock') {
+			$sortFields = array(array('field' => 'lastclock', 'order' => $sortOrder), 'resolvedName', 'itemid');
+		}
+		else {
+			$sortFields = array('resolvedName', 'itemid');
+		}
+		CArrayHelper::sort($items, $sortFields);
+
+		// get applications
+		$applications = API::Application()->get(array(
+			'output' => API_OUTPUT_EXTEND,
+			'hostids' => $hostIds,
+			'preservekeys' => true
+		));
+		if ($applications) {
+			foreach ($applications as &$application) {
+				$application['hostname'] = $hosts[$application['hostid']]['name'];
+				$application['item_cnt'] = 0;
+			}
+			unset($application);
+
+			// by default order by application name and application id
+			$sortFields = ($sortField == 'h.name') ? array(array('field' => 'hostname', 'order' => $sortOrder)) : array();
+			array_push($sortFields, 'name', 'applicationid');
+			CArrayHelper::sort($applications, $sortFields);
+		}
+
+		// get host scripts
+		if ($_REQUEST['hostid'] == 0) {
+			$hostScripts = API::Script()->getScriptsByHosts($hostIds);
+		}
+
+		// get templates screen count
+		$screens = API::TemplateScreen()->get(array(
+			'hostids' => $hostIds,
+			'nopermissions' => true,
+			'countOutput' => true,
+			'groupCount' => true
+		));
+		if ($screens) {
+			foreach ($screens as $screen) {
+				$hosts[$screen['hostid']]['screens'] = $screen['rowscount'];
+			}
+		}
+	}
+}
+
+/*
+ * Display
+ */
+$latestWidget = new CWidget(null, 'latest-mon');
+
+$form = new CForm('get');
+$form->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB(true)));
+$form->addItem(array(SPACE._('Host').SPACE, $pageFilter->getHostsCB(true)));
+
+$latestWidget->addHeader(_('Items'), $form);
+
+$filterForm = new CFormTable(null, null, 'get');
+$filterForm->setAttribute('name',' zbx_filter');
+$filterForm->setAttribute('id', 'zbx_filter');
+$filterForm->addRow(_('Show items with name like'), new CTextBox('select', $filterSelect, 20));
+$filterForm->addRow(_('Show items without data'), new CCheckBox('show_without_data', $filterShowWithoutData, null, 1));
+$filterForm->addRow(_('Show details'), new CCheckBox('show_details', $filterShowDetails, null, 1));
+$filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter')));
+$filterForm->addItemToBottomRow(new CButton('filter_rst', _('Reset'), 'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst", 1); location.href = uri.getUrl();'));
+
+$latestWidget->addFlicker($filterForm, CProfile::get('web.latest.filter.state', 1));
+$latestWidget->addPageHeader(_('LATEST DATA'), get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
 
 $table = new CTableInfo(_('No values found.'));
+
+$link = new CCol(new CDiv(null, 'app-list-toggle-all icon-plus-9x9'));
 
 if ($filterShowDetails) {
 	$config = select_config();
@@ -219,130 +342,9 @@ else {
 	));
 }
 
-// get hosts
-if ($_REQUEST['hostid']) {
-	$availableHostIds = array($_REQUEST['hostid']);
-}
-elseif ($pageFilter->hostsSelected) {
-	$availableHostIds = array_keys($pageFilter->hosts);
-}
-else {
-	$availableHostIds = array();
-}
-
-$hosts = API::Host()->get(array(
-	'output' => array('name', 'hostid', 'status'),
-	'hostids' => $availableHostIds,
-	'with_monitored_items' => true,
-	'selectScreens' => API_OUTPUT_COUNT,
-	'preservekeys' => true
-));
-foreach ($hosts as &$host) {
-	$host['item_cnt'] = 0;
-}
-unset($host);
-
-$sortFields = ($sortField == 'h.name') ? array(array('field' => 'name', 'order' => $sortOrder)) : array('name');
-CArrayHelper::sort($hosts, $sortFields);
-
-$hostIds = array_keys($hosts);
-
-$applications = array();
-
-// get items
-$allItems = API::Item()->get(array(
-	'hostids' => $hostIds,
-	'output' => API_OUTPUT_EXTEND,
-	'preservekeys' => true,
-	'selectApplications' => array('applicationid'),
-	'selectItemDiscovery' => array('ts_delete'),
-	'filter' => array(
-		'flags' => array(
-			ZBX_FLAG_DISCOVERY_NORMAL,
-			ZBX_FLAG_DISCOVERY_CREATED
-		),
-		'status' => array(ITEM_STATUS_ACTIVE)
-	)
-));
-if ($allItems) {
-	// get history
-	$history = Manager::History()->getLast($allItems, 2);
-
-	$hostIds = array();
-
-	// filter items
-	foreach ($allItems as $key => &$item) {
-		// filter items without history
-		if (!$filterShowWithoutData && !isset($history[$item['itemid']])) {
-			unset($allItems[$key]);
-
-			continue;
-		}
-
-		$item['resolvedName'] = itemName($item);
-
-		// filter items by name
-		if (!zbx_empty($filterSelect) && !zbx_stristr($item['resolvedName'], $filterSelect)) {
-			unset($allItems[$key]);
-		}
-
-		$hostIds[$item['hostid']] = $item['hostid'];
-	}
-	unset($item);
-
-	// add item last update date for sorting
-	foreach ($allItems as &$item) {
-		if (isset($history[$item['itemid']])) {
-			$item['lastclock'] = $history[$item['itemid']][0]['clock'];
-		}
-	}
-	unset($item);
-
-	if ($allItems) {
-		// sort
-		if ($sortField == 'i.name') {
-			$sortFields = array(array('field' => 'resolvedName', 'order' => $sortOrder), 'itemid');
-		}
-		elseif ($sortField == 'i.lastclock') {
-			$sortFields = array(array('field' => 'lastclock', 'order' => $sortOrder), 'resolvedName', 'itemid');
-		}
-		else {
-			$sortFields = array('resolvedName', 'itemid');
-		}
-		CArrayHelper::sort($allItems, $sortFields);
-
-		// get applications
-		$applications = API::Application()->get(array(
-			'output' => API_OUTPUT_EXTEND,
-			'hostids' => $hostIds,
-			'preservekeys' => true
-		));
-		if ($applications) {
-			foreach ($applications as &$application) {
-				$application['hostname'] = $hosts[$application['hostid']]['name'];
-				$application['item_cnt'] = 0;
-			}
-			unset($application);
-
-			// by default order by application name and application id
-			$sortFields = ($sortField == 'h.name') ? array(array('field' => 'hostname', 'order' => $sortOrder)) : array();
-			array_push($sortFields, 'name', 'applicationid');
-			CArrayHelper::sort($applications, $sortFields);
-		}
-
-		// fetch scripts for the host JS menu
-		if ($_REQUEST['hostid'] == 0) {
-			$hostScripts = API::Script()->getScriptsByHosts($hostIds);
-		}
-	}
-}
-
-/*
- * Display
- */
 $tab_rows = array();
 
-foreach ($allItems as $key => $db_item){
+foreach ($items as $key => $db_item){
 	if (!$db_item['applications']) {
 		continue;
 	}
@@ -466,7 +468,7 @@ foreach ($allItems as $key => $db_item){
 	}
 
 	// remove items with applications from the collection
-	unset($allItems[$key]);
+	unset($items[$key]);
 }
 unset($app_rows, $db_app);
 
@@ -521,7 +523,7 @@ foreach ($applications as $appid => $dbApp) {
  * Display OTHER ITEMS (which are not linked to application)
  */
 $tab_rows = array();
-foreach ($allItems as $db_item){
+foreach ($items as $db_item){
 	$lastHistory = isset($history[$db_item['itemid']][0]) ? $history[$db_item['itemid']][0] : null;
 	$prevHistory = isset($history[$db_item['itemid']][1]) ? $history[$db_item['itemid']][1] : null;
 
@@ -692,7 +694,7 @@ foreach ($hosts as $hostId => $dbHost) {
 	}
 }
 
-$latest_wdgt->addItem($table);
-$latest_wdgt->show();
+$latestWidget->addItem($table);
+$latestWidget->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
