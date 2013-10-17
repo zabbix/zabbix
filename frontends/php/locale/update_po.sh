@@ -20,6 +20,7 @@ xgettext --files-from=locale/POTFILES.in --from-code=UTF-8 \
 cd $directory/locale
 #--sort-by-file
 
+sed -i 's/^#, php-format/#, c-format/' frontend.pot
 echo "Merging new strings in po files..."
 
 for translation in */LC_MESSAGES/frontend.po; do
