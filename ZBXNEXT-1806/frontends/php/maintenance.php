@@ -436,7 +436,7 @@ if (!empty($data['form'])) {
 					$_REQUEST['active_since_year']);
 		}
 		else {
-			$data['active_since'] = time();
+			$data['active_since'] = strtotime('today');
 		}
 		if (isset($_REQUEST['active_till'])) {
 			$data['active_till'] = mktime($_REQUEST['active_till_hour'],
@@ -447,7 +447,7 @@ if (!empty($data['form'])) {
 					$_REQUEST['active_till_year']);
 		}
 		else {
-			$data['active_till'] = time() + SEC_PER_DAY;
+			$data['active_till'] = strtotime('tomorrow');
 		}
 		$data['description'] = get_request('description', '');
 		$data['timeperiods'] = get_request('timeperiods', array());
