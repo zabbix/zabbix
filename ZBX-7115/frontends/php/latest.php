@@ -187,7 +187,8 @@ if ($hosts) {
 if ($hosts) {
 	$items = API::Item()->get(array(
 		'hostids' => array_keys($hosts),
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('itemid', 'name', 'type', 'value_type', 'units', 'hostid', 'state', 'valuemapid', 'status',
+			'error', 'trends', 'history', 'delay', 'key_'),
 		'selectApplications' => array('applicationid'),
 		'selectItemDiscovery' => array('ts_delete'),
 		'filter' => array(
@@ -263,19 +264,16 @@ if ($items) {
 			CArrayHelper::sort($applications, $sortFields);
 		}
 
-		// get host scripts
-		if ($_REQUEST['hostid'] == 0) {
+		if ($_REQUEST['hostid'] == 0 || count($hostIds) > 1) {
+			// get host scripts
 			$hostScripts = API::Script()->getScriptsByHosts($hostIds);
-		}
 
-		// get templates screen count
-		$screens = API::TemplateScreen()->get(array(
-			'hostids' => $hostIds,
-			'nopermissions' => true,
-			'countOutput' => true,
-			'groupCount' => true
-		));
-		if ($screens) {
+			// get templates screen count
+			$screens = API::TemplateScreen()->get(array(
+				'hostids' => $hostIds,
+				'countOutput' => true,
+				'groupCount' => true
+			));
 			foreach ($screens as $screen) {
 				$hosts[$screen['hostid']]['screens'] = $screen['rowscount'];
 			}
@@ -344,22 +342,22 @@ else {
 
 $tab_rows = array();
 
-foreach ($items as $key => $db_item){
-	if (!$db_item['applications']) {
+foreach ($items as $key => $item){
+	if (!$item['applications']) {
 		continue;
 	}
 
-	$lastHistory = isset($history[$db_item['itemid']][0]) ? $history[$db_item['itemid']][0] : null;
-	$prevHistory = isset($history[$db_item['itemid']][1]) ? $history[$db_item['itemid']][1] : null;
+	$lastHistory = isset($history[$item['itemid']][0]) ? $history[$item['itemid']][0] : null;
+	$prevHistory = isset($history[$item['itemid']][1]) ? $history[$item['itemid']][1] : null;
 
-	if (strpos($db_item['units'], ',') !== false) {
-		list($db_item['units'], $db_item['unitsLong']) = explode(',', $db_item['units']);
+	if (strpos($item['units'], ',') !== false) {
+		list($item['units'], $item['unitsLong']) = explode(',', $item['units']);
 	}
 	else {
-		$db_item['unitsLong'] = '';
+		$item['unitsLong'] = '';
 	}
 
-	$itemApplications = reset($db_item['applications']);
+	$itemApplications = reset($item['applications']);
 	$db_app = &$applications[$itemApplications['applicationid']];
 
 	if (!isset($tab_rows[$db_app['applicationid']])) {
@@ -372,7 +370,7 @@ foreach ($items as $key => $db_item){
 	// last check time and last value
 	if ($lastHistory) {
 		$lastClock = zbx_date2str(_('d M Y H:i:s'), $lastHistory['clock']);
-		$lastValue = formatHistoryValue($lastHistory['value'], $db_item, false);
+		$lastValue = formatHistoryValue($lastHistory['value'], $item, false);
 	}
 	else {
 		$lastClock = UNKNOWN_VALUE;
@@ -380,9 +378,9 @@ foreach ($items as $key => $db_item){
 	}
 
 	// change
-	$digits = ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? 2 : 0;
+	$digits = ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? 2 : 0;
 	if ($lastHistory && $prevHistory
-			&& ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $db_item['value_type'] == ITEM_VALUE_TYPE_UINT64)
+			&& ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
 			&& (bcsub($lastHistory['value'], $prevHistory['value'], $digits) != 0)) {
 
 		$change = '';
@@ -393,7 +391,7 @@ foreach ($items as $key => $db_item){
 		// for 'unixtime' change should be calculated as uptime
 		$change .= convert_units(array(
 			'value' => bcsub($lastHistory['value'], $prevHistory['value'], $digits),
-			'units' => $db_item['units'] == 'unixtime' ? 'uptime' : $db_item['units']
+			'units' => $item['units'] == 'unixtime' ? 'uptime' : $item['units']
 		));
 		$change = nbsp($change);
 	}
@@ -401,33 +399,33 @@ foreach ($items as $key => $db_item){
 		$change = UNKNOWN_VALUE;
 	}
 
-	if(($db_item['value_type']==ITEM_VALUE_TYPE_FLOAT) || ($db_item['value_type']==ITEM_VALUE_TYPE_UINT64)){
-		$actions = new CLink(_('Graph'),'history.php?action=showgraph&itemid='.$db_item['itemid']);
+	if(($item['value_type']==ITEM_VALUE_TYPE_FLOAT) || ($item['value_type']==ITEM_VALUE_TYPE_UINT64)){
+		$actions = new CLink(_('Graph'),'history.php?action=showgraph&itemid='.$item['itemid']);
 	}
 	else{
-		$actions = new CLink(_('History'),'history.php?action=showvalues&itemid='.$db_item['itemid']);
+		$actions = new CLink(_('History'),'history.php?action=showvalues&itemid='.$item['itemid']);
 	}
 
-	$stateCss = ($db_item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown txt' : 'txt';
-	$itemName = array(SPACE, SPACE, $db_item['resolvedName']);
+	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown txt' : 'txt';
+	$itemName = array(SPACE, SPACE, $item['resolvedName']);
 	if ($filterShowDetails) {
-		$itemKey = new CLink(resolveItemKeyMacros($db_item), 'items.php?form=update&itemid='.$db_item['itemid']);
+		$itemKey = new CLink(resolveItemKeyMacros($item), 'items.php?form=update&itemid='.$item['itemid']);
 		$itemName = array_merge($itemName, array(BR(), SPACE, SPACE, $itemKey));
 
 		$statusIcons = array();
-		if ($db_item['status'] == ITEM_STATUS_ACTIVE) {
-			if (zbx_empty($db_item['error'])) {
+		if ($item['status'] == ITEM_STATUS_ACTIVE) {
+			if (zbx_empty($item['error'])) {
 				$error = new CDiv(SPACE, 'status_icon iconok');
 			}
 			else {
 				$error = new CDiv(SPACE, 'status_icon iconerror');
-				$error->setHint($db_item['error'], '', 'on');
+				$error->setHint($item['error'], '', 'on');
 			}
 			$statusIcons[] = $error;
 		}
 
-		if ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $db_item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-			$trendValue = $config['hk_trends_global'] ? $config['hk_trends'] : $db_item['trends'];
+		if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
+			$trendValue = $config['hk_trends_global'] ? $config['hk_trends'] : $item['trends'];
 		}
 		else {
 			$trendValue = UNKNOWN_VALUE;
@@ -439,14 +437,14 @@ foreach ($items as $key => $db_item){
 			($_REQUEST['hostid'] > 0) ? null : SPACE,
 			new CCol(new CDiv($itemName, $stateCss)),
 			new CCol(new CDiv(
-				($db_item['type'] == ITEM_TYPE_SNMPTRAP || $db_item['type'] == ITEM_TYPE_TRAPPER)
+				($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER)
 					? UNKNOWN_VALUE
-					: $db_item['delay'],
+					: $item['delay'],
 				$stateCss
 			)),
-			new CCol(new CDiv($config['hk_history_global'] ? $config['hk_history'] : $db_item['history'], $stateCss)),
+			new CCol(new CDiv($config['hk_history_global'] ? $config['hk_history'] : $item['history'], $stateCss)),
 			new CCol(new CDiv($trendValue, $stateCss)),
-			new CCol(new CDiv(item_type2str($db_item['type']), $stateCss)),
+			new CCol(new CDiv(item_type2str($item['type']), $stateCss)),
 			new CCol(new CDiv($lastClock, $stateCss)),
 			new CCol(new CDiv($lastValue, $stateCss)),
 			new CCol(new CDiv($change, $stateCss)),
@@ -523,26 +521,26 @@ foreach ($applications as $appid => $dbApp) {
  * Display OTHER ITEMS (which are not linked to application)
  */
 $tab_rows = array();
-foreach ($items as $db_item){
-	$lastHistory = isset($history[$db_item['itemid']][0]) ? $history[$db_item['itemid']][0] : null;
-	$prevHistory = isset($history[$db_item['itemid']][1]) ? $history[$db_item['itemid']][1] : null;
+foreach ($items as $item) {
+	$lastHistory = isset($history[$item['itemid']][0]) ? $history[$item['itemid']][0] : null;
+	$prevHistory = isset($history[$item['itemid']][1]) ? $history[$item['itemid']][1] : null;
 
-	if (strpos($db_item['units'], ',') !== false)
-		list($db_item['units'], $db_item['unitsLong']) = explode(',', $db_item['units']);
+	if (strpos($item['units'], ',') !== false)
+		list($item['units'], $item['unitsLong']) = explode(',', $item['units']);
 	else
-		$db_item['unitsLong'] = '';
+		$item['unitsLong'] = '';
 
-	$db_host = &$hosts[$db_item['hostid']];
+	$host = &$hosts[$item['hostid']];
 
-	if (!isset($tab_rows[$db_host['hostid']])) $tab_rows[$db_host['hostid']] = array();
-	$app_rows = &$tab_rows[$db_host['hostid']];
+	if (!isset($tab_rows[$host['hostid']])) $tab_rows[$host['hostid']] = array();
+	$app_rows = &$tab_rows[$host['hostid']];
 
-	$db_host['item_cnt']++;
+	$host['item_cnt']++;
 
 	// last check time and last value
 	if ($lastHistory) {
 		$lastClock = zbx_date2str(_('d M Y H:i:s'), $lastHistory['clock']);
-		$lastValue = formatHistoryValue($lastHistory['value'], $db_item, false);
+		$lastValue = formatHistoryValue($lastHistory['value'], $item, false);
 	}
 	else {
 		$lastClock = UNKNOWN_VALUE;
@@ -550,9 +548,9 @@ foreach ($items as $db_item){
 	}
 
 	// column "change"
-	$digits = ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? 2 : 0;
+	$digits = ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? 2 : 0;
 	if (isset($lastHistory['value']) && isset($prevHistory['value'])
-			&& ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $db_item['value_type'] == ITEM_VALUE_TYPE_UINT64)
+			&& ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
 			&& (bcsub($lastHistory['value'], $prevHistory['value'], $digits) != 0)) {
 
 		$change = '';
@@ -563,7 +561,7 @@ foreach ($items as $db_item){
 		// for 'unixtime' change should be calculated as uptime
 		$change .= convert_units(array(
 			'value' => bcsub($lastHistory['value'], $prevHistory['value'], $digits),
-			'units' => $db_item['units'] == 'unixtime' ? 'uptime' : $db_item['units']
+			'units' => $item['units'] == 'unixtime' ? 'uptime' : $item['units']
 		));
 		$change = nbsp($change);
 	}
@@ -572,35 +570,35 @@ foreach ($items as $db_item){
 	}
 
 	// column "action"
-	if (($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT) || ($db_item['value_type'] == ITEM_VALUE_TYPE_UINT64)) {
-		$actions = new CLink(_('Graph'), 'history.php?action=showgraph&itemid='.$db_item['itemid']);
+	if (($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) || ($item['value_type'] == ITEM_VALUE_TYPE_UINT64)) {
+		$actions = new CLink(_('Graph'), 'history.php?action=showgraph&itemid='.$item['itemid']);
 	}
 	else{
-		$actions = new CLink(_('History'), 'history.php?action=showvalues&itemid='.$db_item['itemid']);
+		$actions = new CLink(_('History'), 'history.php?action=showvalues&itemid='.$item['itemid']);
 	}
 
-	$stateCss = ($db_item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown txt' : 'txt';
+	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown txt' : 'txt';
 
-	$itemName = array(SPACE, SPACE, $db_item['resolvedName']);
+	$itemName = array(SPACE, SPACE, $item['resolvedName']);
 
 	if ($filterShowDetails) {
-		$itemKey = new CLink(resolveItemKeyMacros($db_item), 'items.php?form=update&itemid='.$db_item['itemid']);
+		$itemKey = new CLink(resolveItemKeyMacros($item), 'items.php?form=update&itemid='.$item['itemid']);
 		$itemName = array_merge($itemName, array(BR(), SPACE, SPACE, $itemKey));
 
 		$statusIcons = array();
-		if ($db_item['status'] == ITEM_STATUS_ACTIVE) {
-			if (zbx_empty($db_item['error'])) {
+		if ($item['status'] == ITEM_STATUS_ACTIVE) {
+			if (zbx_empty($item['error'])) {
 				$error = new CDiv(SPACE, 'status_icon iconok');
 			}
 			else {
 				$error = new CDiv(SPACE, 'status_icon iconerror');
-				$error->setHint($db_item['error'], '', 'on');
+				$error->setHint($item['error'], '', 'on');
 			}
 			$statusIcons[] = $error;
 		}
 
-		if ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $db_item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-			$trendValue = $config['hk_trends_global'] ? $config['hk_trends'] : $db_item['trends'];
+		if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
+			$trendValue = $config['hk_trends_global'] ? $config['hk_trends'] : $item['trends'];
 		}
 		else {
 			$trendValue = UNKNOWN_VALUE;
@@ -608,18 +606,18 @@ foreach ($items as $db_item){
 
 		array_push($app_rows, new CRow(array(
 			SPACE,
-			is_show_all_nodes() ? ($db_host['item_cnt'] ? SPACE : get_node_name_by_elid($db_item['itemid'])) : null,
+			is_show_all_nodes() ? ($host['item_cnt'] ? SPACE : get_node_name_by_elid($item['itemid'])) : null,
 			$_REQUEST['hostid'] ? null : SPACE,
 			new CCol(new CDiv($itemName, $stateCss)),
 			new CCol(new CDiv(
-				($db_item['type'] == ITEM_TYPE_SNMPTRAP || $db_item['type'] == ITEM_TYPE_TRAPPER)
+				($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER)
 					? UNKNOWN_VALUE
-					: $db_item['delay'],
+					: $item['delay'],
 				$stateCss
 			)),
-			new CCol(new CDiv($config['hk_history_global'] ? $config['hk_history'] : $db_item['history'], $stateCss)),
+			new CCol(new CDiv($config['hk_history_global'] ? $config['hk_history'] : $item['history'], $stateCss)),
 			new CCol(new CDiv($trendValue, $stateCss)),
-			new CCol(new CDiv(item_type2str($db_item['type']), $stateCss)),
+			new CCol(new CDiv(item_type2str($item['type']), $stateCss)),
 			new CCol(new CDiv($lastClock, $stateCss)),
 			new CCol(new CDiv($lastValue, $stateCss)),
 			new CCol(new CDiv($change, $stateCss)),
@@ -630,7 +628,7 @@ foreach ($items as $db_item){
 	else {
 		array_push($app_rows, new CRow(array(
 			SPACE,
-			is_show_all_nodes() ? ($db_host['item_cnt'] ? SPACE : get_node_name_by_elid($db_item['itemid'])) : null,
+			is_show_all_nodes() ? ($host['item_cnt'] ? SPACE : get_node_name_by_elid($item['itemid'])) : null,
 			$_REQUEST['hostid'] ? null : SPACE,
 			new CCol(new CDiv($itemName, $stateCss)),
 			new CCol(new CDiv($lastClock, $stateCss)),
@@ -640,8 +638,7 @@ foreach ($items as $db_item){
 		)));
 	}
 }
-unset($app_rows);
-unset($db_host);
+unset($host, $app_rows);
 
 foreach ($hosts as $hostId => $dbHost) {
 	$host = $hosts[$dbHost['hostid']];
