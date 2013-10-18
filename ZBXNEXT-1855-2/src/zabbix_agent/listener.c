@@ -91,7 +91,6 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 			local_request_failed = 0;     /* reset consecutive errors counter */
 
 			zbx_setproctitle("listener #%d [processing request]", thread_num2);
-			zabbix_log(LOG_LEVEL_DEBUG, "Processing request.");
 
 			if (SUCCEED == (ret = zbx_tcp_check_security(&s, CONFIG_HOSTS_ALLOWED, 0)))
 				process_listener(&s);
