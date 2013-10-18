@@ -45,7 +45,7 @@ extern int		process_num;
  ******************************************************************************/
 void	main_dbsyncer_loop(void)
 {
-	int	sleeptime, last_sleeptime = -1, num = 0, old_num = 0, retry_up = 0, retry_dn = 0;
+	int	sleeptime = -1, num = 0, old_num = 0, retry_up = 0, retry_dn = 0;
 	double	sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t	last_stat_time;
 
@@ -59,7 +59,7 @@ void	main_dbsyncer_loop(void)
 
 	for (;;)
 	{
-		if (0 != last_sleeptime)
+		if (0 != sleeptime)
 		{
 			zbx_setproctitle("%s #%d [synced %d items in " ZBX_FS_DBL " sec, syncing history]",
 					get_process_type_string(process_type), process_num, old_num, old_total_sec);
@@ -69,13 +69,12 @@ void	main_dbsyncer_loop(void)
 		num += DCsync_history(ZBX_SYNC_PARTIAL);
 		total_sec += zbx_time() - sec;
 
-		if (-1 == last_sleeptime)
+		if (-1 == sleeptime)
 		{
 			sleeptime = num ? ZBX_SYNC_MAX / num : CONFIG_HISTSYNCER_FREQUENCY;
 		}
 		else
 		{
-			sleeptime = last_sleeptime;
 			if (ZBX_SYNC_MAX < num)
 			{
 				retry_up = 0;
@@ -106,8 +105,6 @@ void	main_dbsyncer_loop(void)
 			sleeptime = 0;
 		else if (CONFIG_HISTSYNCER_FREQUENCY < sleeptime)
 			sleeptime = CONFIG_HISTSYNCER_FREQUENCY;
-
-		last_sleeptime = sleeptime;
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{
