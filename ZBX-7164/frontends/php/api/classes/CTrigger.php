@@ -1316,7 +1316,7 @@ class CTrigger extends CTriggerGeneral {
 			'preservekeys' => true,
 			'output' => array(
 				'triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type'
-			),
+			)
 		));
 
 		foreach ($triggers as $trigger) {

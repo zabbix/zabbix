@@ -851,8 +851,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			'preservekeys' => true,
 			'output' => array(
 				'triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type'
-			),
-			'selectDependencies' => true
+			)
 		));
 
 		foreach ($triggers as $trigger) {
