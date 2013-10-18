@@ -10,7 +10,7 @@ Bug fixes:
 ....I..... [ZBX-5374] removed ONLY directive from PostgreSQL upgrade statements (Sasha)
 ..F....... [ZBX-7097] fixed dashboard drag'n'drop widget placeholder not being displayed in the classic theme (Pavels)
 ....I..... [ZBX-7130] fixed makefiles to build zabbix_proxy only (Sasha)
-..F....... [ZBX-7055] fixed displayng OK trigger status in maps (Eduard)
+..F....... [ZBX-7055] fixed displaying OK trigger status in maps (Eduard)
 ..F....... [ZBX-7081] fixed node drop down being displayed incorrectly in several pop ups (Pavels)
 A......... [ZBX-7086] fixed application mass add from different hosts or templates validation (Eduard)
 ........S. [ZBX-7133] fixed processing of zabbix[host,*,available] item; fixed proxy's hosts availability data on server (Sasha)
