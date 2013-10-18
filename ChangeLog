@@ -1,6 +1,7 @@
 Changes for 2.1.8
 
 New features:
+..F.....S. [ZBXNEXT-1806] changed the way nth day and nth week are calculated in maintenances (asaveljevs, Pavels)
 ..F....... [ZBX-7097] changed dashboard drag'n'drop widget placeholder color in the dark orange and dark blue themes (Pavels)
 A.F....... [ZBX-1357] updated Dutch, Finnish, Indonesian, Italian, Lithuanian, Persian, Portuguese (Portugal), Russian and Slovak translations; thanks to Zabbix translators (Richlv)
 
