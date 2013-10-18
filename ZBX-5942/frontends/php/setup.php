@@ -30,14 +30,7 @@ catch (Exception $e) {
 	exit;
 }
 
-// only super admins can access the setup
-if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN) {
-	access_deny(ACCESS_DENY_PAGE);
-	exit;
-}
-
 require_once dirname(__FILE__).'/include/setup.inc.php';
-
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
@@ -63,11 +56,23 @@ $fields = array(
 	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,				null)
 );
 
-if (isset($_REQUEST['cancel']) || isset($_REQUEST['finish'])) {
+if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN) {
+	zbx_unsetcookie('ZBX_CONFIG');
+	zbx_unsetcookie('zbx_sessionid');
+
+	if (isset($_REQUEST['cancel']) || isset($_REQUEST['back']) || isset($_REQUEST['next']) || isset($_REQUEST['finish'])) {
+		redirect('index.php');
+	}
+	else {
+		access_deny(ACCESS_DENY_PAGE);
+	}
+}
+elseif (isset($_REQUEST['cancel']) || isset($_REQUEST['finish'])) {
 	zbx_unsetcookie('ZBX_CONFIG');
 	redirect('index.php');
 }
 
+// config
 $ZBX_CONFIG = get_cookie('ZBX_CONFIG', null);
 $ZBX_CONFIG = isset($ZBX_CONFIG) ? unserialize($ZBX_CONFIG) : array();
 $ZBX_CONFIG['check_fields_result'] = check_fields($fields, false);
@@ -90,7 +95,6 @@ if (zbx_is_callable(array('pg_pconnect', 'pg_fetch_array', 'pg_fetch_row', 'pg_e
 if (zbx_is_callable(array('oci_connect', 'oci_error', 'oci_parse', 'oci_execute', 'oci_fetch_assoc',
 		'oci_commit', 'oci_close', 'oci_rollback', 'oci_field_type', 'oci_new_descriptor',
 		'oci_bind_by_name', 'oci_free_statement'))) {
-
 	$ZBX_CONFIG['allowed_db']['ORACLE'] = 'Oracle';
 }
 // IBM_DB2
