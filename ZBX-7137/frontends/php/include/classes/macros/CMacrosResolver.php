@@ -62,8 +62,12 @@ class CMacrosResolver {
 			'types' => array('host', 'ip', 'user'),
 			'method' => 'resolveTexts'
 		),
-		'hostInterface' => array(
+		'hostInterfaceIpDns' => array(
 			'types' => array('host', 'ip', 'user'),
+			'method' => 'resolveTexts'
+		),
+		'hostInterfacePort' => array(
+			'types' => array('user'),
 			'method' => 'resolveTexts'
 		),
 		'triggerName' => array(

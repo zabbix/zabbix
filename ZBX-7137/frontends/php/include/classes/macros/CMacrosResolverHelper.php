@@ -80,6 +80,7 @@ class CMacrosResolverHelper {
 	public static function resolveHostInterfaces(array $interfaces) {
 		self::init();
 
+		// ip, dns
 		$data = array();
 		foreach ($interfaces as $interface) {
 			$data[$interface['hostid']][] = $interface['ip'];
@@ -87,7 +88,7 @@ class CMacrosResolverHelper {
 		}
 
 		$resolvedData = self::$macrosResolver->resolve(array(
-			'config' => 'hostInterface',
+			'config' => 'hostInterfaceIpDns',
 			'data' => $data
 		));
 
@@ -98,6 +99,28 @@ class CMacrosResolverHelper {
 				if ($interface['hostid'] == $hostId) {
 					$interface['ip'] = $texts[$n++];
 					$interface['dns'] = $texts[$n++];
+				}
+			}
+		}
+		unset($interface);
+
+		// port
+		$data = array();
+		foreach ($interfaces as $interface) {
+			$data[$interface['hostid']][] = $interface['port'];
+		}
+
+		$resolvedData = self::$macrosResolver->resolve(array(
+			'config' => 'hostInterfacePort',
+			'data' => $data
+		));
+
+		foreach ($resolvedData as $hostId => $texts) {
+			$n = 0;
+
+			foreach ($interfaces as &$interface) {
+				if ($interface['hostid'] == $hostId) {
+					$interface['port'] = $texts[$n++];
 				}
 			}
 		}
