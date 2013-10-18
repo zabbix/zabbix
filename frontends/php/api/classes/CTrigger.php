@@ -1270,7 +1270,8 @@ class CTrigger extends CTriggerGeneral {
 			}
 
 			// skip updating read only values
-			unset($triggerUpdate['state'],
+			unset(
+				$triggerUpdate['state'],
 				$triggerUpdate['value'],
 				$triggerUpdate['lastchange'],
 				$triggerUpdate['error']
@@ -1313,7 +1314,9 @@ class CTrigger extends CTriggerGeneral {
 		$triggers = $this->get(array(
 			'hostids' => $data['templateids'],
 			'preservekeys' => true,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array(
+				'triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type'
+			),
 		));
 
 		foreach ($triggers as $trigger) {
