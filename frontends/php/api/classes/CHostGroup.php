@@ -757,6 +757,7 @@ class CHostGroup extends CZBXAPI {
 
 		$dbScripts = API::Script()->get(array(
 			'groupids' => $groupids,
+			'output' => array('scriptid', 'groupid'),
 			'nopermissions' => true
 		));
 
