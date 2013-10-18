@@ -86,7 +86,7 @@ static int	send_heartbeat(void)
  ******************************************************************************/
 void	main_heart_loop(void)
 {
-	int	start, sleeptime = -1, res = NOTSUPPORTED;
+	int	start, sleeptime = 0, res;
 	double	sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t	last_stat_time;
 
@@ -95,27 +95,16 @@ void	main_heart_loop(void)
 
 	last_stat_time = time(NULL);
 
+	zbx_setproctitle("%s [sending heartbeat message]", get_process_type_string(process_type));
+
 	for (;;)
 	{
 		if (0 != sleeptime)
 		{
-			if (SUCCEED == res)
-			{
-				zbx_setproctitle("%s [sending heartbeat message success in " ZBX_FS_DBL " sec, "
-						"sending heartbeat message]",
-						get_process_type_string(process_type), old_total_sec);
-			}
-			else if (FAIL == res)
-			{
-				zbx_setproctitle("%s [sending heartbeat message failed in " ZBX_FS_DBL " sec, "
-						"sending heartbeat message]",
-						get_process_type_string(process_type), old_total_sec);
-			}
-			else
-			{
-				zbx_setproctitle("%s [sending heartbeat message]",
-						get_process_type_string(process_type));
-			}
+			zbx_setproctitle("%s [sending heartbeat message %s in " ZBX_FS_DBL " sec, "
+					"sending heartbeat message]",
+					get_process_type_string(process_type),
+					SUCCEED == res ? "success" : "failed", old_total_sec);
 		}
 
 		start = time(NULL);
@@ -129,33 +118,19 @@ void	main_heart_loop(void)
 		{
 			if (0 == sleeptime)
 			{
-				if (SUCCEED == res)
-				{
-					zbx_setproctitle("%s [sending heartbeat message success in " ZBX_FS_DBL " sec, "
-							"sending heartbeat message]",
-							get_process_type_string(process_type), total_sec);
-				}
-				else
-				{
-					zbx_setproctitle("%s [sending heartbeat message failed in " ZBX_FS_DBL " sec, "
-							"sending heartbeat message]",
-							get_process_type_string(process_type), total_sec);
-				}
+				zbx_setproctitle("%s [sending heartbeat message %s in " ZBX_FS_DBL " sec, "
+						"sending heartbeat message]",
+						get_process_type_string(process_type),
+						SUCCEED == res ? "success" : "failed", total_sec);
+
 			}
 			else
 			{
-				if (SUCCEED == res)
-				{
-					zbx_setproctitle("%s [sending heartbeat message success in " ZBX_FS_DBL " sec, "
-							"idle %d sec]",
-							get_process_type_string(process_type), total_sec, sleeptime);
-				}
-				else
-				{
-					zbx_setproctitle("%s [sending heartbeat message failed in " ZBX_FS_DBL " sec, "
-							"idle %d sec]",
-							get_process_type_string(process_type), total_sec, sleeptime);
-				}
+				zbx_setproctitle("%s [sending heartbeat message %s in " ZBX_FS_DBL " sec, "
+						"idle %d sec]",
+						get_process_type_string(process_type),
+						SUCCEED == res ? "success" : "failed", total_sec, sleeptime);
+
 				old_total_sec = total_sec;
 			}
 			total_sec = 0.0;
