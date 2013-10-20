@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-20 19:23+0300\n"
-"PO-Revision-Date: 2013-02-25 15:11+0200\n"
+"POT-Creation-Date: 2013-10-20 19:32+0300\n"
+"PO-Revision-Date: 2013-10-14 13:57+0300\n"
 "Last-Translator: halt <kisst@bgk.bme.hu>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: hu\n"
@@ -11,8 +11,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.1.6\n"
+"X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
+"X-POOTLE-MTIME: 1381751841.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -693,11 +694,11 @@ msgstr "Audit"
 
 #: auditacts.php:27
 msgid "Audit actions"
-msgstr ""
+msgstr "Műveletek ellenőrzése"
 
 #: auditlogs.php:27
 msgid "Audit logs"
-msgstr ""
+msgstr "Naplózás ellenőrzése"
 
 #: include/func.inc.php:225
 msgid "Aug"
@@ -840,7 +841,7 @@ msgstr "Bind DN"
 #: authentication.php:49
 #: include/views/administration.authentication.edit.php:62
 msgid "Bind password"
-msgstr ""
+msgstr "BIND jelszó"
 
 #: include/classes/core/ZBase.php:137
 msgid "Black & Blue"
@@ -926,7 +927,7 @@ msgstr "GRAFIKON KONFIGURÁCIÓ"
 
 #: adm.gui.php:110
 msgid "CONFIGURATION OF GUI"
-msgstr ""
+msgstr "A GUI KONFIGURÁCIÓJA"
 
 #: include/views/configuration.hostgroups.edit.php:23
 #: include/views/configuration.hostgroups.list.php:36
@@ -1068,7 +1069,7 @@ msgstr "ZABBIX KONFIGURÁLÁSA"
 
 #: include/views/configuration.services.edit.php:62 services.php:45
 msgid "Calculate SLA, acceptable SLA (in %)"
-msgstr ""
+msgstr "SLA SZÁMÍTÁS, ELFOGATHATÓ SLA (%-ban)"
 
 #: include/items.inc.php:92 include/views/configuration.graph.edit.php:162
 #: include/views/configuration.graph.edit.php:220

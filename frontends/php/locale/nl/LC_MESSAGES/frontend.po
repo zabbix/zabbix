@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-20 19:23+0300\n"
-"PO-Revision-Date: 2013-08-08 15:09+0200\n"
+"POT-Creation-Date: 2013-10-20 19:32+0300\n"
+"PO-Revision-Date: 2013-10-11 14:13+0300\n"
 "Last-Translator: open-future <patrik@open-future.be>\n"
 "Language-Team: NL\n"
 "Language: nl\n"
@@ -13,8 +13,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.1.6\n"
+"X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
+"X-POOTLE-MTIME: 1381493584.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -4449,15 +4450,15 @@ msgstr "Mislukte stap van scenario \"%s\"."
 
 #: api/classes/CTemplate.php:1092
 msgid "Failed to update template"
-msgstr ""
+msgstr "Mislukt om template  te actualiseren."
 
 #: include/items.inc.php:37
 msgid "Failure Audit"
-msgstr ""
+msgstr "Mislukkingscontrole"
 
 #: dashboard.php:259 include/blocks.inc.php:1136
 msgid "Favourite graphs"
-msgstr ""
+msgstr "Favoriete grafieken"
 
 #: dashboard.php:273 include/blocks.inc.php:1261
 msgid "Favourite maps"
@@ -4465,49 +4466,49 @@ msgstr "Favoriete kaarten"
 
 #: dashboard.php:266 include/blocks.inc.php:1306
 msgid "Favourite screens"
-msgstr ""
+msgstr "Favoriete schermen"
 
 #: include/views/monitoring.slides.php:43 slides.php:76 slides.php:83
 msgid "Favourites"
-msgstr ""
+msgstr "Favorieten"
 
 #: include/func.inc.php:219
 msgid "Feb"
-msgstr ""
+msgstr "Feb"
 
 #: include/forms.inc.php:1546 include/func.inc.php:105
 #: include/func.inc.php:236 jsLoader.php:115
 msgid "February"
-msgstr ""
+msgstr "Februari"
 
 #: hostinventoriesoverview.php:87
 msgid "Field"
-msgstr ""
+msgstr "Veld"
 
 #: api/classes/CDRule.php:527
 msgid "Field \"druleid\" is required."
-msgstr ""
+msgstr "Veld \"druleid\" is vereist."
 
 #: api/classes/CTemplate.php:991
 msgid "Field \"host\" is mandatory"
-msgstr ""
+msgstr "Veld \"host\" is verplicht"
 
 #: api/classes/CDRule.php:534
 msgid "Field \"name\" is required."
-msgstr ""
+msgstr "Veld \"naam\" is verplicht"
 
 #: hostinventories.php:126
 msgid "Field:"
-msgstr ""
+msgstr "Veld:"
 
 #: api/classes/CImage.php:593
 msgid "File format is unsupported."
-msgstr ""
+msgstr "Bestandsformaat wordt niet ondersteund."
 
 #: include/classes/helpers/CUploadFile.php:153
 #, php-format
 msgid "File is too big, max upload size is %1$s bytes."
-msgstr ""
+msgstr "Bestand is te groot, max upload grootte is %1$s bytes."
 
 #: include/classes/class.cview.php:68
 #, php-format
@@ -4516,7 +4517,7 @@ msgstr ""
 
 #: include/graphs.inc.php:67
 msgid "Filled region"
-msgstr ""
+msgstr "Ingevulde regio"
 
 #: dashconf.php:265 events.php:373 hostinventories.php:134 hosts.php:657
 #: include/classes/class.cwidget.php:130 include/forms.inc.php:574
@@ -4530,36 +4531,36 @@ msgstr "Filter"
 
 #: include/reports.inc.php:108
 msgid "Filter by host group"
-msgstr ""
+msgstr "Filteren op hostgroep"
 
 #: tr_status.php:244
 msgid "Filter by name"
-msgstr ""
+msgstr "Filteren op naam"
 
 #: popup_trexpr.php:298
 msgid "Find string V in last (most recent) value. N = 1 - if found, 0 - otherwise"
-msgstr ""
+msgstr "Vind reeks V in de laatste (meest recente) waarde. N = 1 - indien gevonden, 0 - anders"
 
 #: popup_trexpr.php:303
 msgid "Find string V in last (most recent) value. N NOT 1 - if found, 0 - otherwise"
-msgstr ""
+msgstr "Vind reeks V in de laatste (meest recente) waarde. N is niet 1 - indien gevonden, 0 - anders"
 
 #: include/setup.inc.php:130
 msgid "Finish"
-msgstr ""
+msgstr "Einde"
 
 #: include/locales.inc.php:51
 msgid "Finnish (fi_FI)"
-msgstr ""
+msgstr "Fins (fi_FI)"
 
 #: include/forms.inc.php:1597 include/maintenances.inc.php:103
 msgid "First"
-msgstr ""
+msgstr "Eerste"
 
 #: include/func.inc.php:1656
 msgctxt "page navigation"
 msgid "First"
-msgstr ""
+msgstr "Eerst"
 
 #: include/views/js/configuration.sysmaps.js.php:40
 msgid "Fit to map"
@@ -4573,19 +4574,19 @@ msgstr "Statisch"
 #: include/views/configuration.item.edit.php:296
 #: include/views/configuration.item.massupdate.php:298
 msgid "Flexible intervals"
-msgstr ""
+msgstr "Flexibele intervallen"
 
 #: profile.php:116 users.php:156
 msgid "For guest, password must be empty"
-msgstr ""
+msgstr "Voor de gasten, moet het wachtwoord leeg zijn"
 
 #: include/items.inc.php:1338 include/views/configuration.item.edit.php:200
 msgid "Formula"
-msgstr ""
+msgstr "Formule"
 
 #: include/forms.inc.php:1600 include/maintenances.inc.php:106
 msgid "Fourth"
-msgstr ""
+msgstr "Vierde"
 
 #: include/locales.inc.php:52
 msgid "French (fr_FR)"
@@ -4593,12 +4594,12 @@ msgstr "French (fr_FR)"
 
 #: include/func.inc.php:199
 msgid "Fri"
-msgstr ""
+msgstr "Vrij"
 
 #: include/forms.inc.php:1531 include/forms.inc.php:1612
 #: include/func.inc.php:127 include/func.inc.php:211
 msgid "Friday"
-msgstr ""
+msgstr "Vrijdag"
 
 #: include/reports.inc.php:130 include/reports.inc.php:241
 #: include/reports.inc.php:610 include/views/configuration.action.edit.php:418
@@ -4614,24 +4615,24 @@ msgstr "Van"
 #: include/views/administration.usergroups.list.php:49
 #: include/views/administration.users.list.php:61
 msgid "Frontend access"
-msgstr ""
+msgstr "Toegang hoofdpagina"
 
 #: usergrps.php:246
 msgid "Frontend access updated"
-msgstr ""
+msgstr "Toegang hoofdpagina bijgewerkt"
 
 #: include/views/administration.users.edit.php:182
 msgid "Frontend messaging"
-msgstr ""
+msgstr "Hoofdpagina berichten"
 
 #: include/views/configuration.host.edit.php:640
 #: include/views/configuration.template.edit.php:436
 msgid "Full clone"
-msgstr ""
+msgstr "Volledige kloon"
 
 #: include/html.inc.php:260
 msgid "Fullscreen"
-msgstr ""
+msgstr "Volledig scherm"
 
 #: include/views/configuration.graph.edit.php:71
 #: include/views/configuration.triggers.expression.php:66 popup_bitem.php:133
@@ -4641,12 +4642,12 @@ msgstr "Functie"
 #: include/classes/validators/CTriggerFunctionValidator.php:71
 #, php-format
 msgid "Function supports \"%1$s\" parameters."
-msgstr ""
+msgstr "Functie ondersteunt \"%1$s\" parameters."
 
 #: include/func.inc.php:566
 msgctxt "Giga short"
 msgid "G"
-msgstr ""
+msgstr "G"
 
 #: include/views/administration.mediatypes.edit.php:60
 #: include/views/administration.mediatypes.list.php:57
@@ -4659,11 +4660,11 @@ msgstr "GSM modem"
 #: adm.valuemapping.php:125 adm.workingtime.php:61
 #: include/views/administration.general.gui.edit.php:51
 msgid "GUI"
-msgstr ""
+msgstr "GUI"
 
 #: include/classes/class.cwebuser.php:41 include/classes/class.cwebuser.php:99
 msgid "GUI access disabled."
-msgstr ""
+msgstr "GUI toegang uitgeschakeld"
 
 #: include/menu.inc.php:228
 msgid "General"
@@ -4672,7 +4673,7 @@ msgstr "Algemeen"
 #: chart4.php:180 chart5.php:200 include/classes/class.cbar.php:770
 #, php-format
 msgid "Generated in %s sec"
-msgstr ""
+msgstr "Gegenereerd in %s sec"
 
 #: include/locales.inc.php:53
 msgid "German (de_DE)"
@@ -4680,27 +4681,27 @@ msgstr "German (de_DE)"
 
 #: include/page_header.php:236
 msgid "Get support"
-msgstr ""
+msgstr "Ontvang ondersteuning"
 
 #: include/func.inc.php:566
 msgid "Giga"
-msgstr ""
+msgstr "Giga"
 
 #: include/triggers.inc.php:1778 tr_testexpr.php:36
 msgid "Given expression is not a macro"
-msgstr ""
+msgstr "Gegeven uitdrukking is geen macro"
 
 #: include/classes/class.globalregexp.php:71
 msgid "Global expression does not exist."
-msgstr ""
+msgstr "Globale uitdrukking bestaat niet."
 
 #: include/views/configuration.action.edit.php:649
 msgid "Global script"
-msgstr ""
+msgstr "Globaal script"
 
 #: popup.php:127
 msgid "Global scripts"
-msgstr ""
+msgstr "Globale scripts"
 
 #: hosts.php:879
 #: include/views/administration.general.regularexpressions.list.php:62
@@ -4724,19 +4725,19 @@ msgstr ""
 #: include/views/configuration.triggers.list.php:240 sysmaps.php:296
 #: templates.php:621 tr_status.php:783
 msgid "Go"
-msgstr ""
+msgstr "Ga"
 
 #: include/views/js/monitoring.maps.js.php:51 jsLoader.php:177
 msgid "Go to"
-msgstr ""
+msgstr "Ga naar"
 
 #: include/views/configuration.httpconf.edit.php:97
 msgid "Google Chrome"
-msgstr ""
+msgstr "Google Chrome"
 
 #: include/graphs.inc.php:75
 msgid "Gradient line"
-msgstr ""
+msgstr "Verlooplijn"
 
 #: include/audit.inc.php:29 include/blocks.inc.php:1143
 #: include/screens.inc.php:30 include/views/configuration.graph.edit.php:287
@@ -4749,49 +4750,49 @@ msgstr "Grafiek"
 #: api/classes/CGraph.php:601 api/classes/CGraphPrototype.php:648
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (inherited from another template)."
-msgstr ""
+msgstr "Grafiek \"%1$s\" bestaat al op \"%2$s\" (overgenomen van een ander sjabloon)."
 
 #: api/classes/CGraph.php:622 api/classes/CGraph.php:629
 #: api/classes/CGraphPrototype.php:670 api/classes/CGraphPrototype.php:677
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (items are not identical)."
-msgstr ""
+msgstr "Grafiek \"%1$s\" bestaat al op \"%2$s\" (items zijn niet identiek)."
 
 #: api/classes/CGraph.php:580 api/classes/CGraphPrototype.php:627
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "Grafiek \"%1$s\" bestaat al op \"%2$s\"."
 
 #: api/classes/CGraph.php:554 api/classes/CGraphPrototype.php:601
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymax value item)."
-msgstr ""
+msgstr "Grafiek \"%1$s\" kan niet erven. Geen vereiste items op \"%2$s\" (Ymax waarde item)."
 
 #: api/classes/CGraph.php:562 api/classes/CGraphPrototype.php:609
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymin value item)."
-msgstr ""
+msgstr "Grafiek \"%1$s\" kan niet erven. Geen vereiste items op \"%2$s\" (Ymin waarde item)."
 
 #: api/classes/CGraph.php:548 api/classes/CGraphPrototype.php:595
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
-msgstr ""
+msgstr "Grafiek \"%1$s\" kan niet erven. Geen vereiste items op \"%2$s\"."
 
 #: api/classes/CTemplateScreen.php:658
 #, php-format
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
-msgstr ""
+msgstr "Grafiek \"%1$s\" bestaat niet op template '%2$s \"."
 
 #: include/classes/import/CXmlImport18.php:1558
 #: include/classes/import/CXmlImport18.php:1562
 #, php-format
 msgid "Graph \"%1$s\" skipped - user rule."
-msgstr ""
+msgstr "Grafiek \"%1$s\" overgeslagen - user regel."
 
 #: api/classes/CGraph.php:38
 #, php-format
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
-msgstr ""
+msgstr "Grafiek \"%1$s\" met templated items kan geen items van andere hosts bevatten."
 
 #: graphs.php:246
 msgid "Graph added"
@@ -4807,7 +4808,7 @@ msgstr "Grafiek element"
 
 #: popup_bitem.php:28
 msgid "Graph item"
-msgstr ""
+msgstr "Grafiek item"
 
 #: include/views/configuration.screen.constructor.edit.php:140
 msgid "Graph name"
@@ -4816,37 +4817,37 @@ msgstr "Grafiek naam"
 #: api/classes/CGraphPrototype.php:34
 #, php-format
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
-msgstr ""
+msgstr "Grafiek prototype \"%1$s\" met templated items kunnen geen items van andere hosts bevatten."
 
 #: api/classes/CGraphPrototype.php:793
 #, php-format
 msgid "Graph prototype \"%s\" deleted."
-msgstr ""
+msgstr "Grafiek prototype \"%s\" verwijderd."
 
 #: api/classes/CGraphPrototype.php:856
 msgid "Graph prototype must have at least one prototype."
-msgstr ""
+msgstr "Grafiek prototype moet ten minste een prototype bevatten."
 
 #: include/html.inc.php:453 include/html.inc.php:457
 #: include/views/configuration.host.discovery.list.php:90
 #: include/views/configuration.host.edit.php:494
 #: include/views/configuration.template.edit.php:365
 msgid "Graph prototypes"
-msgstr ""
+msgstr "Grafiek prototypes"
 
 #: include/views/configuration.graph.list.php:32
 msgid "Graph prototypes of"
-msgstr ""
+msgstr "Grafiek prototypes van"
 
 #: include/graphs.inc.php:44
 #: include/views/js/configuration.graph.edit.js.php:28
 msgid "Graph sum"
-msgstr ""
+msgstr "Grafiek som"
 
 #: include/views/configuration.graph.edit.php:59
 #: include/views/configuration.graph.list.php:80 popup.php:1345 popup.php:1351
 msgid "Graph type"
-msgstr ""
+msgstr "Grafiektype"
 
 #: graphs.php:243
 msgid "Graph updated"
@@ -4855,12 +4856,12 @@ msgstr "Grafiek bijgewerkt"
 #: api/classes/CGraphGeneral.php:120
 #, php-format
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
-msgstr ""
+msgstr "Grafiek met de naam \"%1$s\" bestaat al in grafieken of grafiek prototypes."
 
 #: api/classes/CGraph.php:583 api/classes/CGraph.php:604
 #: api/classes/CGraphPrototype.php:630 api/classes/CGraphPrototype.php:651
 msgid "Graph with same name but other type exist."
-msgstr ""
+msgstr "Grafiek met dezelfde naam maar andere type bestaat reeds."
 
 #: dashboard.php:260 hosts.php:686 hosts.php:765 include/blocks.inc.php:1242
 #: include/html.inc.php:464 include/html.inc.php:468 include/items.inc.php:802
@@ -4877,15 +4878,15 @@ msgstr "Grafieken"
 
 #: graphs.php:310
 msgid "Graphs copied"
-msgstr ""
+msgstr "Grafieken gekopieerd"
 
 #: graphs.php:264
 msgid "Graphs deleted"
-msgstr ""
+msgstr "grafieken verwijderd"
 
 #: include/locales.inc.php:54
 msgid "Greek (el_GR)"
-msgstr ""
+msgstr "Grieks (el_GR)"
 
 #: include/views/js/configuration.sysmaps.js.php:60 sysmap.php:192
 msgid "Grid"
@@ -4952,11 +4953,11 @@ msgstr "Groep verwijderd"
 
 #: include/views/administration.general.other.edit.php:37
 msgid "Group for discovered hosts"
-msgstr ""
+msgstr "Groep voor ontdekte gastheren"
 
 #: adm.other.php:71
 msgid "Group for discovered hosts."
-msgstr ""
+msgstr "Groep voor ontdekte gastheren."
 
 #: include/views/administration.usergroups.edit.php:39
 #: include/views/configuration.hostgroups.edit.php:35
@@ -4969,7 +4970,7 @@ msgstr "Groep bijgewerkt"
 
 #: hostinventoriesoverview.php:80
 msgid "Grouping by"
-msgstr ""
+msgstr "Groeperen op"
 
 #: dashconf.php:217 include/reports.inc.php:546
 #: include/views/administration.users.edit.php:80
@@ -4982,16 +4983,16 @@ msgstr "Groepen"
 
 #: include/views/configuration.maintenance.edit.php:198
 msgid "Groups in maintenance"
-msgstr ""
+msgstr "Groepen in onderhoud"
 
 #: include/translateDefines.inc.php:50
 msgid "H.i"
-msgstr ""
+msgstr "H.I"
 
 #: include/classes/class.cchart.php:1233 include/classes/class.cchart.php:1292
 #: include/page_header.php:486
 msgid "H:i"
-msgstr ""
+msgstr "H:i"
 
 #: include/blocks.inc.php:365 include/blocks.inc.php:704
 #: include/blocks.inc.php:772 include/blocks.inc.php:982
@@ -4999,7 +5000,7 @@ msgstr ""
 #: include/classes/screens/CScreenSystemStatus.php:47
 #: include/views/configuration.item.list.php:102
 msgid "H:i:s"
-msgstr ""
+msgstr "H:i:s"
 
 #: events.php:282
 msgid "HISTORY OF EVENTS"
