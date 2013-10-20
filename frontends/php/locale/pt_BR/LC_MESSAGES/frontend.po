@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-20 19:23+0300\n"
+"POT-Creation-Date: 2013-10-20 20:08+0300\n"
 "PO-Revision-Date: 2013-09-11 21:06+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1463,16 +1463,16 @@ msgstr "Não foi possível excluir a tela"
 msgid "Cannot delete script"
 msgstr "Não foi possível remover script"
 
-#: api/classes/CScript.php:413
+#: api/classes/CScript.php:371
 msgid "Cannot delete scripts. Empty input parameter \"scriptids\"."
 msgstr "Não é possível excluir scripts. Parâmetro \"scriptids\" vazio."
 
-#: api/classes/CScript.php:437
+#: api/classes/CScript.php:395
 #, php-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
 msgstr "Não foi possível excluir os scripts. Script \"%1$s\" é usado na operação de ação \"%2$s\"."
 
-#: api/classes/CScript.php:426
+#: api/classes/CScript.php:384
 #, php-format
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
 msgstr "Scripts não foram excluídos. Script com scriptid \"%s\" não existe."
@@ -2474,7 +2474,7 @@ msgstr "Conectado como '%1$s'"
 msgid "Connected as '%1$s' from '%2$s'"
 msgstr "Conectado como '%1$s' de '%2$s'"
 
-#: api/classes/CScript.php:473
+#: api/classes/CScript.php:431
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" failed. Possible reasons:\n"
@@ -2485,7 +2485,7 @@ msgstr ""
 "1. Configuração incorreta de IP/DNS no arquivo \"zabbix.conf.php\";\n"
 "2. Configuração incorreta no servidor de DNS.\n"
 
-#: api/classes/CScript.php:464
+#: api/classes/CScript.php:422
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" refused. Possible reasons:\n"
@@ -2500,7 +2500,7 @@ msgstr ""
 "3. Processo do Zabbix server não está em execução;\n"
 "4. Firewall bloqueando a conexão TCP.\n"
 
-#: api/classes/CScript.php:470
+#: api/classes/CScript.php:428
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" timed out. Possible reasons:\n"
@@ -3945,7 +3945,7 @@ msgstr "Host duplicado. Já existe registro de outro Host usando o nome de exibi
 msgid "Duplicate map name for map \"%s\"."
 msgstr "Nome de mapa duplicado para o mapa \"%s\"."
 
-#: api/classes/CScript.php:312 api/classes/CScript.php:363
+#: api/classes/CScript.php:270 api/classes/CScript.php:321
 #, php-format
 msgid "Duplicate script name \"%s\"."
 msgstr "Nome de script duplicado \"%s\"."
@@ -4206,27 +4206,27 @@ msgstr "Inglês (en_US)"
 msgid "Error"
 msgstr "Erro"
 
-#: api/classes/CScript.php:478
+#: api/classes/CScript.php:436
 msgid "Error description"
 msgstr "Descrição do erro"
 
-#: api/classes/CScript.php:516
+#: api/classes/CScript.php:474
 msgid "Error description: can't read script response, check connection."
 msgstr "Descrição do erro: não foi possível receber a resposta do script, verifique a conexão."
 
-#: api/classes/CScript.php:493
+#: api/classes/CScript.php:451
 msgid "Error description: can't send command, check connection."
 msgstr "Descrição do erro: não foi possível enviar o comando, verifique a conexão."
 
-#: api/classes/CScript.php:509
+#: api/classes/CScript.php:467
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value."
 msgstr "Descrição do erro: O limite definido para a constante ZBX_SCRIPT_BYTES_LIMIT no arquivo \"include/defines.inc.php\" foi alcançado. Você pode tentar aumentar este valor."
 
-#: api/classes/CScript.php:505
+#: api/classes/CScript.php:463
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value."
 msgstr "Descrição do erro: O limite definido para a constante ZBX_SCRIPT_TIMEOUT no arquivo \"include/defines.inc.php\" foi alcançado. Você pode tentar aumentar este valor."
 
-#: api/classes/CScript.php:524
+#: api/classes/CScript.php:482
 msgid "Error description: empty response received."
 msgstr "Descrição do erro: a resposta recebida estava vazia."
 
@@ -4938,7 +4938,7 @@ msgstr "O grupo \"%1$s\" informado no host \"%2$s\" não existe."
 msgid "Group \"%1$s\" is internal and can not be deleted."
 msgstr "O grupo \"%1$s\" é de uso interno e não pode ser excluído."
 
-#: api/classes/CHostGroup.php:769
+#: api/classes/CHostGroup.php:770
 #, php-format
 msgid "Group \"%s\" cannot be deleted, because it is used in a global script."
 msgstr "O grupo \"%s\" não pode ser excluído por ser utilizado em um script global."
@@ -10629,7 +10629,7 @@ msgstr "Telas"
 msgid "Script"
 msgstr "Script"
 
-#: api/classes/CScript.php:325 api/classes/CScript.php:377
+#: api/classes/CScript.php:283 api/classes/CScript.php:335
 #, php-format
 msgid "Script \"%s\" already exists."
 msgstr "O script \"%s\" já existe."
@@ -10655,7 +10655,7 @@ msgstr "Perfil de script"
 msgid "Script updated"
 msgstr "Script atualizado"
 
-#: api/classes/CScript.php:358
+#: api/classes/CScript.php:316
 #, php-format
 msgid "Script with scriptid \"%s\" does not exist."
 msgstr "Não existe script com o scriptid \"%s\"."
@@ -13097,7 +13097,7 @@ msgstr "Campos errados para o proxy \"%s\"."
 msgid "Wrong fields for screen \"%1$s\"."
 msgstr "Campos errados para a tela \"%1$s\"."
 
-#: api/classes/CScript.php:308
+#: api/classes/CScript.php:266
 msgid "Wrong fields for script."
 msgstr "Campos errados para o script."
 
@@ -13276,14 +13276,14 @@ msgstr "Não foi especificado nenhum destino para a operação de script para a 
 
 #: api/classes/CGraph.php:709 api/classes/CGraphPrototype.php:758
 #: api/classes/CHostGroup.php:684 api/classes/CHostGroup.php:742
-#: api/classes/CHostGroup.php:894 api/classes/CHostGroup.php:949
-#: api/classes/CHostGroup.php:994 api/classes/CHostGroup.php:1007
-#: api/classes/CHostGroup.php:1023 api/classes/CHost.php:1604
+#: api/classes/CHostGroup.php:895 api/classes/CHostGroup.php:950
+#: api/classes/CHostGroup.php:995 api/classes/CHostGroup.php:1008
+#: api/classes/CHostGroup.php:1024 api/classes/CHost.php:1604
 #: api/classes/CHost.php:1658 api/classes/CHost.php:1972
 #: api/classes/CMaintenance.php:608 api/classes/CMaintenance.php:715
-#: api/classes/CMaintenance.php:727 api/classes/CScript.php:300
-#: api/classes/CScript.php:347 api/classes/CScript.php:409
-#: api/classes/CScript.php:459 api/classes/CTemplate.php:974
+#: api/classes/CMaintenance.php:727 api/classes/CScript.php:258
+#: api/classes/CScript.php:305 api/classes/CScript.php:367
+#: api/classes/CScript.php:417 api/classes/CTemplate.php:974
 #: api/classes/CTemplate.php:1066 api/classes/CTemplate.php:1126
 #: api/classes/CTemplate.php:1266 api/classes/CTemplate.php:1298
 #: api/classes/CTemplate.php:1532 api/classes/CTemplateScreen.php:734
@@ -13391,7 +13391,7 @@ msgstr "Zabbix está temporariamente indisponível!"
 msgid "Zabbix server"
 msgstr "Servidor Zabbix"
 
-#: api/classes/CScript.php:467
+#: api/classes/CScript.php:425
 #, php-format
 msgid ""
 "Zabbix server \"%s\" can not be reached. Possible reasons:\n"

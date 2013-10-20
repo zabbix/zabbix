@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-20 19:23+0300\n"
+"POT-Creation-Date: 2013-10-20 20:08+0300\n"
 "PO-Revision-Date: 2013-04-04 12:23+0200\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1466,16 +1466,16 @@ msgstr "Не вдалося видалити комплексний екран"
 msgid "Cannot delete script"
 msgstr "Не вдалося видалити скрипт"
 
-#: api/classes/CScript.php:413
+#: api/classes/CScript.php:371
 msgid "Cannot delete scripts. Empty input parameter \"scriptids\"."
 msgstr "Не вдалося видалити скрипти. Вхідний параметр \"scriptids\" пустий."
 
-#: api/classes/CScript.php:437
+#: api/classes/CScript.php:395
 #, php-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
 msgstr "Не вдалося видалити скрипт. Скрипт \"%1$s\" використовується в операції дії \"%2$s\"."
 
-#: api/classes/CScript.php:426
+#: api/classes/CScript.php:384
 #, php-format
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
 msgstr "Не вдалося видалити скрипт. Скрипт з scriptid \"%s\" не існує."
@@ -2478,7 +2478,7 @@ msgstr "В системі як '%1$s'"
 msgid "Connected as '%1$s' from '%2$s'"
 msgstr "В системі як '%1$s' із '%2$s'"
 
-#: api/classes/CScript.php:473
+#: api/classes/CScript.php:431
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" failed. Possible reasons:\n"
@@ -2489,7 +2489,7 @@ msgstr ""
 "1. Некоректні IP/DNS сервера в \"zabbix.conf.php\";\n"
 "2. Некоректне налаштування DNS сервера.\n"
 
-#: api/classes/CScript.php:464
+#: api/classes/CScript.php:422
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" refused. Possible reasons:\n"
@@ -2504,7 +2504,7 @@ msgstr ""
 "3. Демон Zabbix сервера не запущено;\n"
 "4. Фаєрвол блокує TCP з'єднання.\n"
 
-#: api/classes/CScript.php:470
+#: api/classes/CScript.php:428
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" timed out. Possible reasons:\n"
@@ -3947,7 +3947,7 @@ msgstr "Дублікат вузла мережі. Вузел мережі з т�
 msgid "Duplicate map name for map \"%s\"."
 msgstr "Дублікат імені карти мережі для карти \"%s\"."
 
-#: api/classes/CScript.php:312 api/classes/CScript.php:363
+#: api/classes/CScript.php:270 api/classes/CScript.php:321
 #, php-format
 msgid "Duplicate script name \"%s\"."
 msgstr "Дублікат імені скрипта \"%s\"."
@@ -4208,27 +4208,27 @@ msgstr "Англійська (en_US)"
 msgid "Error"
 msgstr "Помилка"
 
-#: api/classes/CScript.php:478
+#: api/classes/CScript.php:436
 msgid "Error description"
 msgstr "Опис помилки"
 
-#: api/classes/CScript.php:516
+#: api/classes/CScript.php:474
 msgid "Error description: can't read script response, check connection."
 msgstr "Опис помилки: не вдалось прочитати відповідь скрипта, перевірте з'єднання."
 
-#: api/classes/CScript.php:493
+#: api/classes/CScript.php:451
 msgid "Error description: can't send command, check connection."
 msgstr "Опис помилки: не вдалось відправити команду, перевірте з'єднання."
 
-#: api/classes/CScript.php:509
+#: api/classes/CScript.php:467
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value."
 msgstr "Опис помилки: константа ZBX_SCRIPT_BYTES_LIMIT встановлена у \"include/defines.inc.php\" перевищує допустиму межу. Ви можете спробувати збільшити це значення."
 
-#: api/classes/CScript.php:505
+#: api/classes/CScript.php:463
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value."
 msgstr "Опис помилки: константа ZBX_SCRIPT_TIMEOUT таймауту встановлена у \"include/defines.inc.php\" перевищена. Ви можете спробувати збільшити це значення."
 
-#: api/classes/CScript.php:524
+#: api/classes/CScript.php:482
 msgid "Error description: empty response received."
 msgstr "Опис помилки: отримано пусту відповідь."
 
@@ -4938,7 +4938,7 @@ msgstr "Група \"%1$s\" для вузла мережі \"%2$s\" не існ�
 msgid "Group \"%1$s\" is internal and can not be deleted."
 msgstr "Група \"%1$s\" є внутрішньою і не може бути видалена."
 
-#: api/classes/CHostGroup.php:769
+#: api/classes/CHostGroup.php:770
 #, php-format
 msgid "Group \"%s\" cannot be deleted, because it is used in a global script."
 msgstr "Групу \"%s\" не може бути видалено, бо вона використовується в глобальному скрипті."
@@ -10631,7 +10631,7 @@ msgstr "Комплексні екрани"
 msgid "Script"
 msgstr "Скрипт"
 
-#: api/classes/CScript.php:325 api/classes/CScript.php:377
+#: api/classes/CScript.php:283 api/classes/CScript.php:335
 #, php-format
 msgid "Script \"%s\" already exists."
 msgstr "Скрипт \"%s\" вже існує."
@@ -10657,7 +10657,7 @@ msgstr "Профілювання скрипта"
 msgid "Script updated"
 msgstr "Скрипт оновлено"
 
-#: api/classes/CScript.php:358
+#: api/classes/CScript.php:316
 #, php-format
 msgid "Script with scriptid \"%s\" does not exist."
 msgstr "Скрипт з scriptid \"%s\" не існує."
@@ -13104,7 +13104,7 @@ msgstr "Помилкові поля для проксі \"%s\"."
 msgid "Wrong fields for screen \"%1$s\"."
 msgstr "Помилкові поля для комплексного екрану \"%1$s\"."
 
-#: api/classes/CScript.php:308
+#: api/classes/CScript.php:266
 msgid "Wrong fields for script."
 msgstr "Помилкові поля для скрипта."
 
@@ -13283,14 +13283,14 @@ msgstr "Ви не вказали цілі глобального скрипта 
 
 #: api/classes/CGraph.php:709 api/classes/CGraphPrototype.php:758
 #: api/classes/CHostGroup.php:684 api/classes/CHostGroup.php:742
-#: api/classes/CHostGroup.php:894 api/classes/CHostGroup.php:949
-#: api/classes/CHostGroup.php:994 api/classes/CHostGroup.php:1007
-#: api/classes/CHostGroup.php:1023 api/classes/CHost.php:1604
+#: api/classes/CHostGroup.php:895 api/classes/CHostGroup.php:950
+#: api/classes/CHostGroup.php:995 api/classes/CHostGroup.php:1008
+#: api/classes/CHostGroup.php:1024 api/classes/CHost.php:1604
 #: api/classes/CHost.php:1658 api/classes/CHost.php:1972
 #: api/classes/CMaintenance.php:608 api/classes/CMaintenance.php:715
-#: api/classes/CMaintenance.php:727 api/classes/CScript.php:300
-#: api/classes/CScript.php:347 api/classes/CScript.php:409
-#: api/classes/CScript.php:459 api/classes/CTemplate.php:974
+#: api/classes/CMaintenance.php:727 api/classes/CScript.php:258
+#: api/classes/CScript.php:305 api/classes/CScript.php:367
+#: api/classes/CScript.php:417 api/classes/CTemplate.php:974
 #: api/classes/CTemplate.php:1066 api/classes/CTemplate.php:1126
 #: api/classes/CTemplate.php:1266 api/classes/CTemplate.php:1298
 #: api/classes/CTemplate.php:1532 api/classes/CTemplateScreen.php:734
@@ -13397,7 +13397,7 @@ msgstr "Zabbix тимчасово недоступний!"
 msgid "Zabbix server"
 msgstr "Zabbix сервер"
 
-#: api/classes/CScript.php:467
+#: api/classes/CScript.php:425
 #, php-format
 msgid ""
 "Zabbix server \"%s\" can not be reached. Possible reasons:\n"

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-20 19:23+0300\n"
+"POT-Creation-Date: 2013-10-20 20:08+0300\n"
 "PO-Revision-Date: 2012-11-06 15:57+0800\n"
 "Last-Translator: Yaochiu Huang <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1455,16 +1455,16 @@ msgstr "無法刪除篩選"
 msgid "Cannot delete script"
 msgstr "無法删除脚本"
 
-#: api/classes/CScript.php:413
+#: api/classes/CScript.php:371
 msgid "Cannot delete scripts. Empty input parameter \"scriptids\"."
 msgstr "無法刪除腳本.空白的輸入參數\"scriptids\"."
 
-#: api/classes/CScript.php:437
+#: api/classes/CScript.php:395
 #, php-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
 msgstr "無法刪除腳本. 腳本 \"%1$s\" 用於動作操作\"%2$s\"."
 
-#: api/classes/CScript.php:426
+#: api/classes/CScript.php:384
 #, php-format
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
 msgstr "無法刪除腳本. 腳本ID為 \"%s\"的腳本不存在."
@@ -2463,7 +2463,7 @@ msgstr "連接為'%1$s'"
 msgid "Connected as '%1$s' from '%2$s'"
 msgstr "連接為'%1$s', 來自'%2$s'"
 
-#: api/classes/CScript.php:473
+#: api/classes/CScript.php:431
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" failed. Possible reasons:\n"
@@ -2474,7 +2474,7 @@ msgstr ""
 "1. 不正確的IP/DNS設於\"zabbix.conf.php\";\n"
 "2. 不正確的DNS主機的組態.\n"
 
-#: api/classes/CScript.php:464
+#: api/classes/CScript.php:422
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" refused. Possible reasons:\n"
@@ -2489,7 +2489,7 @@ msgstr ""
 "3. Zabbix主機的服務未運作;\n"
 "4. 防火牆阻斷了TCP連線.\n"
 
-#: api/classes/CScript.php:470
+#: api/classes/CScript.php:428
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" timed out. Possible reasons:\n"
@@ -3930,7 +3930,7 @@ msgstr "重複的主機. 有相同主機可視名稱\"%s\"的主機已存於資�
 msgid "Duplicate map name for map \"%s\"."
 msgstr "重複的拓墣圖\"%s\"的拓墣圖名稱."
 
-#: api/classes/CScript.php:312 api/classes/CScript.php:363
+#: api/classes/CScript.php:270 api/classes/CScript.php:321
 #, php-format
 msgid "Duplicate script name \"%s\"."
 msgstr "重複的腳本名稱\"%s\"."
@@ -4191,27 +4191,27 @@ msgstr "英語(en_US)"
 msgid "Error"
 msgstr "錯誤"
 
-#: api/classes/CScript.php:478
+#: api/classes/CScript.php:436
 msgid "Error description"
 msgstr "錯誤描述"
 
-#: api/classes/CScript.php:516
+#: api/classes/CScript.php:474
 msgid "Error description: can't read script response, check connection."
 msgstr "錯誤描述: 無法讀取腳本回應, 檢查連線."
 
-#: api/classes/CScript.php:493
+#: api/classes/CScript.php:451
 msgid "Error description: can't send command, check connection."
 msgstr "錯誤描述: 無法傳送命令, 檢查連線."
 
-#: api/classes/CScript.php:509
+#: api/classes/CScript.php:467
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value."
 msgstr "錯誤描述:  已達到定義於 \"include/defines.inc.php\"的常數ZBX_SCRIPT_BYTES_LIMIT讀取位元限制. 您可以試著去增加這個值."
 
-#: api/classes/CScript.php:505
+#: api/classes/CScript.php:463
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value."
 msgstr "錯誤描述:  已達到定義於 \"include/defines.inc.php\"的常數ZBX_SCRIPT_TIMEOUT時限. 您可以試著去增加這個值."
 
-#: api/classes/CScript.php:524
+#: api/classes/CScript.php:482
 msgid "Error description: empty response received."
 msgstr "錯誤描述:  收到空回應."
 
@@ -4921,7 +4921,7 @@ msgstr "主機 \"%2$s\" 的群組 \"%1$s\" 不存在."
 msgid "Group \"%1$s\" is internal and can not be deleted."
 msgstr "群組 \"%1$s\" 為內建的且不能被刪除."
 
-#: api/classes/CHostGroup.php:769
+#: api/classes/CHostGroup.php:770
 #, php-format
 msgid "Group \"%s\" cannot be deleted, because it is used in a global script."
 msgstr "群組 \"%s\"不能被刪除, 因為它是用於一個全域腳本."
@@ -10604,7 +10604,7 @@ msgstr "篩選"
 msgid "Script"
 msgstr "脚本"
 
-#: api/classes/CScript.php:325 api/classes/CScript.php:377
+#: api/classes/CScript.php:283 api/classes/CScript.php:335
 #, php-format
 msgid "Script \"%s\" already exists."
 msgstr "腳本\"%s\"已存在."
@@ -10630,7 +10630,7 @@ msgstr "腳本探查器"
 msgid "Script updated"
 msgstr "脚本已更新"
 
-#: api/classes/CScript.php:358
+#: api/classes/CScript.php:316
 #, php-format
 msgid "Script with scriptid \"%s\" does not exist."
 msgstr "腳本ID為\"%s\"的腳本不存在."
@@ -13067,7 +13067,7 @@ msgstr "錯誤的系統代理程式欄位\"%s\"."
 msgid "Wrong fields for screen \"%1$s\"."
 msgstr "錯誤的篩選欄位\"%1$s\"."
 
-#: api/classes/CScript.php:308
+#: api/classes/CScript.php:266
 msgid "Wrong fields for script."
 msgstr "錯誤的腳本欄位."
 
@@ -13246,14 +13246,14 @@ msgstr "您沒有指定目標為動作操作的全域腳本\"%s\"."
 
 #: api/classes/CGraph.php:709 api/classes/CGraphPrototype.php:758
 #: api/classes/CHostGroup.php:684 api/classes/CHostGroup.php:742
-#: api/classes/CHostGroup.php:894 api/classes/CHostGroup.php:949
-#: api/classes/CHostGroup.php:994 api/classes/CHostGroup.php:1007
-#: api/classes/CHostGroup.php:1023 api/classes/CHost.php:1604
+#: api/classes/CHostGroup.php:895 api/classes/CHostGroup.php:950
+#: api/classes/CHostGroup.php:995 api/classes/CHostGroup.php:1008
+#: api/classes/CHostGroup.php:1024 api/classes/CHost.php:1604
 #: api/classes/CHost.php:1658 api/classes/CHost.php:1972
 #: api/classes/CMaintenance.php:608 api/classes/CMaintenance.php:715
-#: api/classes/CMaintenance.php:727 api/classes/CScript.php:300
-#: api/classes/CScript.php:347 api/classes/CScript.php:409
-#: api/classes/CScript.php:459 api/classes/CTemplate.php:974
+#: api/classes/CMaintenance.php:727 api/classes/CScript.php:258
+#: api/classes/CScript.php:305 api/classes/CScript.php:367
+#: api/classes/CScript.php:417 api/classes/CTemplate.php:974
 #: api/classes/CTemplate.php:1066 api/classes/CTemplate.php:1126
 #: api/classes/CTemplate.php:1266 api/classes/CTemplate.php:1298
 #: api/classes/CTemplate.php:1532 api/classes/CTemplateScreen.php:734
@@ -13360,7 +13360,7 @@ msgstr "Zabbix暫時不存在!"
 msgid "Zabbix server"
 msgstr "網路監測主機"
 
-#: api/classes/CScript.php:467
+#: api/classes/CScript.php:425
 #, php-format
 msgid ""
 "Zabbix server \"%s\" can not be reached. Possible reasons:\n"
