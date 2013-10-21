@@ -334,6 +334,8 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...)
 	va_start(args, fmt);
 	zbx_vsnprintf(title, sizeof(title), fmt, args);
 	va_end(args);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s", title);
 #endif
 
 #if defined(HAVE_FUNCTION_SETPROCTITLE)
@@ -341,7 +343,6 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...)
 #elif defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	setproctitle_set_status(title);
 #endif
-	zabbix_log(LOG_LEVEL_DEBUG, "%s", title);
 }
 
 /******************************************************************************
