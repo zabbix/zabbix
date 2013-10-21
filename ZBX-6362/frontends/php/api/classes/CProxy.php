@@ -76,6 +76,7 @@ class CProxy extends CZBXAPI {
 			'preservekeys'				=> null,
 			'selectHosts'				=> null,
 			'selectInterface'			=> null,
+			'selectInterfaces'			=> null, // deprecated
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
