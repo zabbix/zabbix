@@ -320,7 +320,8 @@ class CZBXAPI {
 		if ($table) {
 			$res = DBselect(API::getApi()->createSelectQuery($table, array(
 				'output' => array($baseField, $foreignField),
-				'filter' => array($baseField => array_keys($objects))
+				'filter' => array($baseField => array_keys($objects)),
+				'nodeids' => get_current_nodeid(true)
 			)));
 			while ($relation = DBfetch($res)) {
 				$relationMap->addRelation($relation[$baseField], $relation[$foreignField]);
@@ -535,7 +536,7 @@ class CZBXAPI {
 
 		// if no specific ids are given, apply the node filter
 		if (!isset($options[$pkOption])) {
-			$nodeIds = get_current_nodeid(true);
+			$nodeIds = isset($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 			$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], $pkFieldId, $nodeIds);
 		}
 
