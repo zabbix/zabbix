@@ -6,6 +6,7 @@ New features:
 A.F....... [ZBX-1357] updated Dutch, Finnish, Indonesian, Italian, Lithuanian, Persian, Portuguese (Portugal), Russian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-6362] fixed proxy select interfaces (Eduard)
 ..F....... [ZBX-7115] improved data filtering in latest data page (Eduard)
 .......PS. [ZBX-6835] fixed bug when agent/proxy connection error could have resulted in a wrong warning about message size (wiper)
 A......... [ZBX-7164] fixed trigger and trigger prototype read only fields to no longer change when linking template to host (Ivo)
