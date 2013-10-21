@@ -1,6 +1,7 @@
 Changes for 2.1.8
 
 New features:
+.......PS. [ZBXNEXT-78] added support for scientific notation for received values and item multipliers for items of type "Numeric (float)" (asaveljevs)
 ...G...PS. [ZBXNEXT-1855] dynamic display of process current activity and statistics in "ps" and "top" (Igors, Andris, wiper)
 ..F.....S. [ZBXNEXT-1806] changed the way nth day and nth week are calculated in maintenances (asaveljevs, Pavels)
 ..F....... [ZBX-7097] changed dashboard drag'n'drop widget placeholder color in the dark orange and dark blue themes (Pavels)
