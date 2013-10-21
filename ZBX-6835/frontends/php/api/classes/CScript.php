@@ -103,31 +103,29 @@ class CScript extends CZBXAPI {
 		}
 
 		// editable + permission check
-		if (USER_TYPE_SUPER_ADMIN == $userType) {
-		}
-		elseif (!is_null($options['editable'])) {
-			return $result;
-		}
-		else {
-			$sqlParts['from']['rights'] = 'rights r';
-			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where'][] = 'hg.groupid=r.id';
-			$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sqlParts['where'][] = 'ug.userid='.zbx_dbstr($userid);
-			$sqlParts['where'][] = '(hg.groupid=s.groupid OR s.groupid IS NULL)';
-			$sqlParts['where'][] = '(ug.usrgrpid=s.usrgrpid OR s.usrgrpid IS NULL)';
+		if ($userType != USER_TYPE_SUPER_ADMIN) {
+			if (!is_null($options['editable'])) {
+				return $result;
+			}
+
+			$userGroups = getUserGroupsByUserId($userid);
+
+			$sqlParts['where'][] = '(s.usrgrpid IS NULL OR '.dbConditionInt('s.usrgrpid', $userGroups).')';
+			$sqlParts['where'][] = '(s.groupid IS NULL OR EXISTS ('.
+					'SELECT NULL'.
+					' FROM rights r'.
+					' WHERE s.groupid=r.id'.
+						' AND '.dbConditionInt('r.groupid', $userGroups).
+					' GROUP BY r.id'.
+					' HAVING MIN(r.permission)>'.PERM_DENY.
+					'))';
 		}
 
 		// groupids
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
-			$options['groupids'][] = 0; // include all groups scripts
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['scripts'] = 's.scriptid,s.groupid';
-			}
-			$sqlParts['where'][] = '('.dbConditionInt('s.groupid', $options['groupids']).' OR s.groupid IS NULL)';
+			$sqlParts['where'][] = '(s.groupid IS NULL OR '.dbConditionInt('s.groupid', $options['groupids']).')';
 		}
 
 		// hostids
@@ -149,24 +147,15 @@ class CScript extends CZBXAPI {
 			));
 			$hostGroupIds = zbx_objectValues($hostGroups, 'groupid');
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['hostid'] = 'hg.hostid';
-			}
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where'][] = '(('.dbConditionInt('hg.groupid', $hostGroupIds).' AND hg.groupid=s.groupid)'.
-				' OR '.
+			$sqlParts['where'][] = '('.dbConditionInt('s.groupid', $hostGroupIds).' OR '.
 				'(s.groupid IS NULL AND '.DBin_node('scriptid', $hostNodeIds).'))';
 		}
 
 		// usrgrpids
 		if (!is_null($options['usrgrpids'])) {
 			zbx_value2array($options['usrgrpids']);
-			$options['usrgrpids'][] = 0; // include all usrgrps scripts
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['usrgrpid'] = 's.usrgrpid';
-			}
-			$sqlParts['where'][] = '('.dbConditionInt('s.usrgrpid', $options['usrgrpids']).' OR s.usrgrpid IS NULL)';
+			$sqlParts['where'][] = '(s.usrgrpid IS NULL OR '.dbConditionInt('s.usrgrpid', $options['usrgrpids']).')';
 		}
 
 		// scriptids
@@ -219,17 +208,14 @@ class CScript extends CZBXAPI {
 					$result[$script['scriptid']] = array('scriptid' => $script['scriptid']);
 				}
 				else {
-					if (!isset($result[$script['scriptid']])) {
-						$result[$script['scriptid']] = array();
-					}
+					$result[$script['scriptid']] = $script;
+
 					if (!is_null($options['selectGroups']) && !isset($result[$script['scriptid']]['groups'])) {
 						$result[$script['scriptid']]['groups'] = array();
 					}
 					if (!is_null($options['selectHosts']) && !isset($result[$script['scriptid']]['hosts'])) {
 						$result[$script['scriptid']]['hosts'] = array();
 					}
-
-					$result[$script['scriptid']] += $script;
 				}
 			}
 		}
@@ -246,34 +232,6 @@ class CScript extends CZBXAPI {
 			$result = zbx_cleanHashes($result);
 		}
 
-		return $result;
-	}
-
-	/**
-	 * Get Script ID by host.name and item.key
-	 *
-	 * @param array $script
-	 * @param array $script['name']
-	 * @param array $script['hostid']
-	 * @return int|boolean
-	 */
-	public function getObjects($script) {
-		$result = array();
-		$scriptids = array();
-
-		$dbScripts = DBselect(
-			'SELECT s.scriptid'.
-				' FROM scripts s'.
-				' WHERE '.DBin_node('s.scriptid').
-				' AND s.name='.zbx_dbstr($script['name'])
-		);
-		while ($script = DBfetch($dbScripts)) {
-			$scriptids[$script['scriptid']] = $script['scriptid'];
-		}
-
-		if (!empty($scriptids)) {
-			$result = $this->get(array('scriptids' => $scriptids, 'output' => API_OUTPUT_EXTEND));
-		}
 		return $result;
 	}
 
@@ -539,6 +497,11 @@ class CScript extends CZBXAPI {
 		zbx_value2array($hostIds);
 
 		$scriptsByHost = array();
+
+		if (!$hostIds) {
+			return $scriptsByHost;
+		}
+
 		foreach ($hostIds as $hostid) {
 			$scriptsByHost[$hostid] = array();
 		}
