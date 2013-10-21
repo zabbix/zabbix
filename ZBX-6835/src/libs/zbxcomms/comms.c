@@ -1060,7 +1060,6 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 
 		*data = s->buf_dyn;
 	}
-
 out:
 	if (ZBX_TCP_ERROR == nbytes)
 	{
@@ -1080,11 +1079,10 @@ cleanup:
 char	*get_ip_by_socket(zbx_sock_t *s)
 {
 	ZBX_SOCKADDR	sa;
-	ZBX_SOCKLEN_T	sz;
+	ZBX_SOCKLEN_T	sz = sizeof(sa);
 	static char	buffer[64];
 	char		*error_message = NULL;
 
-	sz = sizeof(sa);
 	if (ZBX_TCP_ERROR == getpeername(s->socket, (struct sockaddr*)&sa, &sz))
 	{
 		error_message = strerror_from_system(zbx_sock_last_error());
@@ -1106,7 +1104,7 @@ out:
 	if (NULL != error_message)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot get socket IP address: %s", error_message);
-		zbx_strlcpy(buffer, "unknown IP", sizeof(buffer));
+		strscpy(buffer, "unknown IP");
 	}
 
 	return buffer;
