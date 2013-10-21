@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Dutch, German, Hungarian, Japanese, Italian, Romanian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-6835] fixed bug when agent/proxy connection error could have resulted in a wrong warning about message size (wiper)
 A.F....... [ZBX-6760] improved performance of getting global scripts (Sasha)
 ........S. [ZBX-7151] limited alert message and items parameter length to 2048 characters when working with Oracle and DB2 databases (wiper)
 ...G...... [ZBX-6591] fixed resolution of IPv4 and IPv6 addresses if DNS hostname is specified as server parameter in configuration file; thanks to Trever L. Adams for patch (igors)
