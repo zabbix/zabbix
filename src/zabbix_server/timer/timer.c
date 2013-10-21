@@ -45,7 +45,7 @@ extern int		process_num;
  * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
  *                                                                            *
  ******************************************************************************/
-static void	process_time_functions(void)
+static void	process_time_functions(int *triggers_count, int *events_count)
 {
 	const char		*__function_name = "process_time_functions";
 	DC_TRIGGER		*trigger_info = NULL;
@@ -55,7 +55,7 @@ static void	process_time_functions(void)
 
 	zbx_vector_ptr_create(&trigger_order);
 
-	DCconfig_get_time_based_triggers(&trigger_info, &trigger_order, process_num);
+	DCconfig_get_time_based_triggers(&trigger_info, &trigger_order, process_num, triggers_count);
 
 	if (0 == trigger_order.values_num)
 		goto clean;
@@ -68,7 +68,7 @@ static void	process_time_functions(void)
 
 	DCfree_triggers(&trigger_order);
 
-	process_events();
+	*events_count = process_events();
 
 	DBcommit();
 clean:
@@ -600,7 +600,7 @@ static int	day_in_month(int year, int mon)
 		return month[mon];
 }
 
-static void	process_maintenance(void)
+static int	process_maintenance(void)
 {
 	const char			*__function_name = "process_maintenance";
 	DB_RESULT			result;
@@ -614,7 +614,7 @@ static void	process_maintenance(void)
 					db_period, db_maintenance_type;
 	static zbx_host_maintenance_t	*hm = NULL;
 	static int			hm_alloc = 4;
-	int				hm_count = 0;
+	int				hm_count = 0, res;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -761,10 +761,13 @@ static void	process_maintenance(void)
 
 	update_maintenance_hosts(hm, hm_count, (int)now);
 
+	res = hm_count;
+
 	while (0 != hm_count--)
 		zbx_free(hm[hm_count].host);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	return res;
 }
 
 /******************************************************************************
@@ -784,9 +787,22 @@ static void	process_maintenance(void)
  ******************************************************************************/
 void	main_timer_loop(void)
 {
-	int	now, nextcheck, sleeptime;
+	int	now, nextcheck, sleeptime = -1,
+		triggers_count = 0, events_count = 0, hm_count = 0,
+		old_triggers_count = 0, old_events_count = 0, old_hm_count = 0,
+		tr_count, ev_count;
 
-	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
+	double	sec = 0.0, sec_maint = 0.0,
+		total_sec = 0.0, total_sec_maint = 0.0,
+		old_total_sec = 0.0, old_total_sec_maint = 0.0;
+
+	time_t	last_stat_time;
+
+#define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
+				/* once in STAT_INTERVAL seconds */
+
+	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
+	last_stat_time = time(NULL);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
@@ -796,11 +812,88 @@ void	main_timer_loop(void)
 		nextcheck = now + TIMER_DELAY - (now % TIMER_DELAY);
 		sleeptime = nextcheck - now;
 
+		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
+		{
+			if (0 == sleeptime)
+			{
+				if (1 != process_num)
+				{
+					zbx_setproctitle("%s #%d [processed %d triggers, %d events in " ZBX_FS_DBL
+							" sec, processing time functions]",
+							get_process_type_string(process_type), process_num,
+							triggers_count, events_count, total_sec);
+				}
+				else
+				{
+					zbx_setproctitle("%s #1 [processed %d triggers, %d events in " ZBX_FS_DBL
+							" sec, %d maint.periods in " ZBX_FS_DBL " sec, processing time "
+							"functions]",
+							get_process_type_string(process_type),
+							triggers_count, events_count, total_sec, hm_count,
+							total_sec_maint);
+				}
+			}
+			else
+			{
+				if (1 != process_num)
+				{
+					zbx_setproctitle("%s #%d [processed %d triggers, %d events in " ZBX_FS_DBL
+							" sec, idle %d sec]",
+							get_process_type_string(process_type), process_num,
+							triggers_count, events_count, total_sec, sleeptime);
+				}
+				else
+				{
+					zbx_setproctitle("%s #1 [processed %d triggers, %d events in " ZBX_FS_DBL
+							" sec, %d maint.periods in " ZBX_FS_DBL " sec, idle %d sec]",
+							get_process_type_string(process_type),
+							triggers_count, events_count, total_sec, hm_count,
+							total_sec_maint, sleeptime);
+					old_hm_count = hm_count;
+					old_total_sec_maint = total_sec_maint;
+				}
+				old_triggers_count = triggers_count;
+				old_events_count = events_count;
+				old_total_sec = total_sec;
+			}
+
+			triggers_count = 0;
+			events_count = 0;
+			hm_count = 0;
+			total_sec = 0.0;
+			total_sec_maint = 0.0;
+			last_stat_time = time(NULL);
+		}
+
 		zbx_sleep_loop(sleeptime);
 
-		zbx_setproctitle("%s [processing time functions]", get_process_type_string(process_type));
+		if (0 != sleeptime)
+		{
+			if (1 != process_num)
+			{
+				zbx_setproctitle("%s #%d [processed %d triggers, %d events in " ZBX_FS_DBL
+						" sec, processing time functions]",
+						get_process_type_string(process_type), process_num,
+						old_triggers_count, old_events_count, old_total_sec);
+			}
+			else
+			{
+				zbx_setproctitle("%s #1 [processed %d triggers, %d events in " ZBX_FS_DBL
+						" sec, %d maint.periods in " ZBX_FS_DBL " sec, processing time "
+						"functions]",
+						get_process_type_string(process_type),
+						old_triggers_count, old_events_count, old_total_sec, old_hm_count,
+						old_total_sec_maint);
+			}
+		}
 
-		process_time_functions();
+		sec = zbx_time();
+		tr_count = 0;
+		ev_count = 0;
+		process_time_functions(&tr_count, &ev_count);
+		triggers_count += tr_count;
+		events_count += ev_count;
+		total_sec += zbx_time() - sec;
 
 		/* only the "timer #1" process evaluates the maintenance periods */
 		if (1 != process_num)
@@ -810,9 +903,17 @@ void	main_timer_loop(void)
 		/* process time functions can take long time */
 		if (0 == nextcheck % SEC_PER_MIN || nextcheck + SEC_PER_MIN - (nextcheck % SEC_PER_MIN) <= time(NULL))
 		{
-			zbx_setproctitle("%s [processing maintenance periods]", get_process_type_string(process_type));
+			zbx_setproctitle("%s #1 [processed %d triggers, %d events in " ZBX_FS_DBL
+					" sec, %d maint.periods in " ZBX_FS_DBL " sec, processing maintenance periods]",
+					get_process_type_string(process_type),
+					triggers_count, events_count, total_sec, old_hm_count,
+					old_total_sec_maint);
 
-			process_maintenance();
+			sec_maint = zbx_time();
+			hm_count += process_maintenance();
+			total_sec_maint += zbx_time() - sec_maint;
 		}
 	}
+
+#undef STAT_INTERVAL
 }

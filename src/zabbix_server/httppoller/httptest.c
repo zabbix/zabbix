@@ -589,7 +589,7 @@ clean:
  * Comments: always SUCCEED                                                   *
  *                                                                            *
  ******************************************************************************/
-void	process_httptests(int httppoller_num, int now)
+int	process_httptests(int httppoller_num, int now)
 {
 	const char	*__function_name = "process_httptests";
 
@@ -597,6 +597,7 @@ void	process_httptests(int httppoller_num, int now)
 	DB_ROW		row;
 	zbx_httptest_t	httptest;
 	DC_HOST		host;
+	int		httptests_count = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -672,6 +673,8 @@ void	process_httptests(int httppoller_num, int now)
 
 		/* clear the macro cache used in this http test */
 		httptest_remove_macros(&httptest);
+
+		httptests_count++;	/* performance metric */
 	}
 	/* destroy the macro cache used in http tests */
 	zbx_vector_ptr_pair_destroy(&httptest.macros);
@@ -679,4 +682,6 @@ void	process_httptests(int httppoller_num, int now)
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return httptests_count;
 }
