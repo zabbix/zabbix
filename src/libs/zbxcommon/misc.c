@@ -1302,48 +1302,55 @@ int	is_double_suffix(const char *str)
  * Return value:  SUCCEED - the string is double                              *
  *                FAIL - otherwise                                            *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
  *                                                                            *
  ******************************************************************************/
 int	is_double(const char *str)
 {
-	size_t	i, len;
-	char	dot = 0;
+	int	i = 0, digits = 0;
 
-	for (i = 0; ' ' == str[i] && '\0' != str[i]; i++)	/* trim left spaces */
-		;
+	while (' ' == str[i])				/* trim left spaces */
+		i++;
 
-	for (len = 0; '\0' != str[i]; i++, len++)
+	if ('-' == str[i] || '+' == str[i])		/* check leading sign */
+		i++;
+
+	while (0 != isdigit(str[i]))			/* check digits before dot */
 	{
-		/* negative number? */
-		if ('-' == str[i] && 0 == i)
-			continue;
-
-		if (0 != isdigit(str[i]))
-			continue;
-
-		if ('.' == str[i] && 0 == dot)
-		{
-			dot = 1;
-			continue;
-		}
-
-		if (' ' == str[i])	/* check right spaces */
-		{
-			for (; ' ' == str[i] && '\0' != str[i]; i++)	/* trim right spaces */
-				;
-
-			if ('\0' == str[i])
-				break;	/* SUCCEED */
-		}
-
-		return FAIL;
+		i++;
+		digits = 1;
 	}
 
-	if (0 == len || (1 == len && 0 != dot))
+	if ('.' == str[i])				/* check decimal dot */
+		i++;
+
+	while (0 != isdigit(str[i]))			/* check digits after dot */
+	{
+		i++;
+		digits = 1;
+	}
+
+	if (0 == digits)				/* 1., .1, and 1.1 are good, just . is not */
 		return FAIL;
 
-	return SUCCEED;
+	if ('e' == str[i] || 'E' == str[i])		/* check exponential part */
+	{
+		i++;
+
+		if ('-' == str[i] || '+' == str[i])	/* check exponent sign */
+			i++;
+
+		if (0 == isdigit(str[i]))		/* check exponent */
+			return FAIL;
+
+		while (0 != isdigit(str[i]))
+			i++;
+	}
+
+	while (' ' == str[i])				/* trim right spaces */
+		i++;
+
+	return '\0' == str[i] ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
