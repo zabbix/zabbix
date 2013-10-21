@@ -264,7 +264,7 @@ if ($items) {
 			CArrayHelper::sort($applications, $sortFields);
 		}
 
-		if ($_REQUEST['hostid'] == 0 || count($hostIds) > 1) {
+		if ($_REQUEST['hostid'] == 0) {
 			// get host scripts
 			$hostScripts = API::Script()->getScriptsByHosts($hostIds);
 
