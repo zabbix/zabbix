@@ -690,7 +690,7 @@ class CGraph extends CGraphGeneral {
 	}
 
 	/**
-	 * Validates graph item permissions
+	 * Validates graph item permissions.
 	 *
 	 * @param array $itemIds
 	 *
@@ -702,7 +702,7 @@ class CGraph extends CGraphGeneral {
 			'itemids' => $itemIds,
 			'webitems' => true,
 			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('name', 'value_type'),
 			'preservekeys' => true
 		));
 

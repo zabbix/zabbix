@@ -517,8 +517,8 @@ class CApplication extends CZBXAPI {
 
 		$allowedItems = API::Item()->get(array(
 			'itemids' => $itemIds,
-			'selectHosts' => array('hostid', 'name'),
-			'output' => array('itemid', 'hostid', 'name'),
+			'selectHosts' => array('name'),
+			'output' => array('hostid', 'name'),
 			'editable' => true,
 			'preservekeys' => true
 		));

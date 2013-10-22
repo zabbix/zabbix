@@ -893,7 +893,7 @@ class CDiscoveryRule extends CItemGeneral {
 		// fetch source items
 		$items = API::Item()->get(array(
 			'itemids' => $srcItemIds,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('key_'),
 			'preservekeys' => true,
 			'filter' => array('flags' => null)
 		));
@@ -912,7 +912,7 @@ class CDiscoveryRule extends CItemGeneral {
 				'key_' => $itemKeys,
 				'flags' => null
 			),
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('key_'),
 			'preservekeys' => true
 		));
 
