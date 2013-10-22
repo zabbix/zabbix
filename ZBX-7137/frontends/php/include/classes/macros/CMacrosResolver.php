@@ -25,8 +25,8 @@ class CMacrosResolver {
 	const PATTERN_HOST_INTERNAL = 'HOST\.HOST|HOSTNAME';
 	const PATTERN_MACRO_PARAM = '[1-9]?';
 	const PATTERN_HOST_FUNCTION = '{(HOSTNAME|HOST\.HOST|HOST\.NAME)([1-9]?)}';
-	const PATTERN_IP = '{(IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN)}';
-	const PATTERN_IP_FUNCTION = '{(IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN)([1-9]?)}';
+	const PATTERN_INTERFACE = '{(IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN)}';
+	const PATTERN_INTERFACE_FUNCTION = '{(IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN)([1-9]?)}';
 	const PATTERN_ITEM_FUNCTION = '{(ITEM\.LASTVALUE|ITEM\.VALUE)([1-9]?)}';
 
 	/**
@@ -55,15 +55,15 @@ class CMacrosResolver {
 	 */
 	private $configs = array(
 		'scriptConfirmation' => array(
-			'types' => array('host', 'ip', 'user'),
+			'types' => array('host', 'interfaceWithPriorities', 'user'),
 			'method' => 'resolveTexts'
 		),
 		'httpTestName' => array(
-			'types' => array('host', 'ip', 'user'),
+			'types' => array('host', 'interfaceWithPriorities', 'user'),
 			'method' => 'resolveTexts'
 		),
 		'hostInterfaceIpDns' => array(
-			'types' => array('host', 'ip', 'user'),
+			'types' => array('host', 'interface', 'user'),
 			'method' => 'resolveTexts'
 		),
 		'hostInterfacePort' => array(
@@ -71,17 +71,17 @@ class CMacrosResolver {
 			'method' => 'resolveTexts'
 		),
 		'triggerName' => array(
-			'types' => array('host', 'ip', 'user', 'item', 'reference'),
+			'types' => array('host', 'interfaceWithPriorities', 'user', 'item', 'reference'),
 			'source' => 'description',
 			'method' => 'resolveTrigger'
 		),
 		'triggerDescription' => array(
-			'types' => array('host', 'ip', 'user', 'item'),
+			'types' => array('host', 'interfaceWithPriorities', 'user', 'item'),
 			'source' => 'comments',
 			'method' => 'resolveTrigger'
 		),
 		'eventDescription' => array(
-			'types' => array('host', 'ip', 'user', 'item', 'reference'),
+			'types' => array('host', 'interfaceWithPriorities', 'user', 'item', 'reference'),
 			'source' => 'description',
 			'method' => 'resolveTrigger'
 		),
@@ -146,15 +146,28 @@ class CMacrosResolver {
 			}
 		}
 
-		$isIpMacrosAvailable = false;
-		if ($this->isTypeAvailable('ip')) {
+		$isInterfaceMacrosAvailable = false;
+		if ($this->isTypeAvailable('interface')) {
 			foreach ($data as $hostId => $texts) {
-				if ($ipMacros = $this->findMacros(self::PATTERN_IP, $texts)) {
-					foreach ($ipMacros as $ipMacro) {
-						$macros[$hostId][$ipMacro] = UNRESOLVED_MACRO_STRING;
+				if ($interfaceMacros = $this->findMacros(self::PATTERN_INTERFACE, $texts)) {
+					foreach ($interfaceMacros as $interfaceMacro) {
+						$macros[$hostId][$interfaceMacro] = UNRESOLVED_MACRO_STRING;
 					}
 
-					$isIpMacrosAvailable = true;
+					$isInterfaceMacrosAvailable = true;
+				}
+			}
+		}
+
+		$isInterfaceWithPrioritiesMacrosAvailable = false;
+		if ($this->isTypeAvailable('interfaceWithPriorities')) {
+			foreach ($data as $hostId => $texts) {
+				if ($interfaceMacros = $this->findMacros(self::PATTERN_INTERFACE, $texts)) {
+					foreach ($interfaceMacros as $interfaceMacro) {
+						$macros[$hostId][$interfaceMacro] = UNRESOLVED_MACRO_STRING;
+					}
+
+					$isInterfaceWithPrioritiesMacrosAvailable = true;
 				}
 			}
 		}
@@ -181,14 +194,42 @@ class CMacrosResolver {
 			}
 		}
 
-		// ip macros, macro should be resolved to interface with highest priority
-		if ($isIpMacrosAvailable) {
+		// interface macros, macro should be resolved to main agent interface
+		if ($isInterfaceMacrosAvailable) {
+			$dbInterface = DBfetch(DBselect(
+				'SELECT i.hostid,i.ip,i.dns,i.useip'.
+				' FROM interface i'.
+				' WHERE i.main='.INTERFACE_PRIMARY.
+					' AND i.type='.INTERFACE_TYPE_AGENT.
+					' AND '.dbConditionInt('i.hostid', $hostIds)
+			));
+
+			if ($interfaceMacros = $this->findMacros(self::PATTERN_INTERFACE, $data[$hostId])) {
+				foreach ($interfaceMacros as $interfaceMacro) {
+					switch ($interfaceMacro) {
+						case '{IPADDRESS}':
+						case '{HOST.IP}':
+							$macros[$hostId][$interfaceMacro] = $dbInterface['ip'];
+							break;
+						case '{HOST.DNS}':
+							$macros[$hostId][$interfaceMacro] = $dbInterface['dns'];
+							break;
+						case '{HOST.CONN}':
+							$macros[$hostId][$interfaceMacro] = $dbInterface['useip'] ? $dbInterface['ip'] : $dbInterface['dns'];
+							break;
+					}
+				}
+			}
+		}
+
+		// interface macros, macro should be resolved to interface with highest priority
+		if ($isInterfaceWithPrioritiesMacrosAvailable) {
 			$interfaces = array();
 
 			$dbInterfaces = DBselect(
 				'SELECT i.hostid,i.ip,i.dns,i.useip,i.type'.
 				' FROM interface i'.
-				' WHERE i.main=1'.
+				' WHERE i.main='.INTERFACE_PRIMARY.
 					' AND '.dbConditionInt('i.hostid', $hostIds).
 					' AND '.dbConditionInt('i.type', $this->interfacePriorities)
 			);
@@ -202,31 +243,31 @@ class CMacrosResolver {
 
 			if ($interfaces) {
 				foreach ($interfaces as $hostId => $interface) {
-					if ($ipMacros = $this->findMacros(self::PATTERN_IP, $data[$hostId])) {
-						foreach ($ipMacros as $ipMacro) {
-							switch ($ipMacro) {
+					if ($interfaceMacros = $this->findMacros(self::PATTERN_INTERFACE, $data[$hostId])) {
+						foreach ($interfaceMacros as $interfaceMacro) {
+							switch ($interfaceMacro) {
 								case '{IPADDRESS}':
 								case '{HOST.IP}':
-									$macros[$hostId][$ipMacro] = $interface['ip'];
+									$macros[$hostId][$interfaceMacro] = $interface['ip'];
 									break;
 								case '{HOST.DNS}':
-									$macros[$hostId][$ipMacro] = $interface['dns'];
+									$macros[$hostId][$interfaceMacro] = $interface['dns'];
 									break;
 								case '{HOST.CONN}':
-									$macros[$hostId][$ipMacro] = $interface['useip'] ? $interface['ip'] : $interface['dns'];
+									$macros[$hostId][$interfaceMacro] = $interface['useip'] ? $interface['ip'] : $interface['dns'];
 									break;
 							}
 
-							// Resolving macros in macros. If interface is AGENT macros stay unresolved.
+							// Resolving macros to AGENT main interface. If interface is AGENT macros stay unresolved.
 							if ($interface['type'] != INTERFACE_TYPE_AGENT) {
-								if ($this->findMacros(self::PATTERN_HOST, array($macros[$hostId][$ipMacro]))
-										|| $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, array($macros[$hostId][$ipMacro]))) {
+								if ($this->findMacros(self::PATTERN_HOST, array($macros[$hostId][$interfaceMacro]))
+										|| $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, array($macros[$hostId][$interfaceMacro]))) {
 									// attention recursion!
-									$macrosInMacros = $this->resolveTexts(array($hostId => array($macros[$hostId][$ipMacro])));
-									$macros[$hostId][$ipMacro] = $macrosInMacros[$hostId][0];
+									$macrosInMacros = $this->resolveTexts(array($hostId => array($macros[$hostId][$interfaceMacro])));
+									$macros[$hostId][$interfaceMacro] = $macrosInMacros[$hostId][0];
 								}
-								elseif ($this->findMacros(self::PATTERN_IP, array($macros[$hostId][$ipMacro]))) {
-									$macros[$hostId][$ipMacro] = UNRESOLVED_MACRO_STRING;
+								elseif ($this->findMacros(self::PATTERN_INTERFACE, array($macros[$hostId][$interfaceMacro]))) {
+									$macros[$hostId][$interfaceMacro] = UNRESOLVED_MACRO_STRING;
 								}
 							}
 						}
@@ -249,7 +290,7 @@ class CMacrosResolver {
 			foreach ($data as $hostId => $texts) {
 				if (isset($macros[$hostId])) {
 					foreach ($texts as $tnum => $text) {
-						preg_match_all('/'.self::PATTERN_HOST.'|'.self::PATTERN_IP.'|'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $text, $matches, PREG_OFFSET_CAPTURE);
+						preg_match_all('/'.self::PATTERN_HOST.'|'.self::PATTERN_INTERFACE.'|'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $text, $matches, PREG_OFFSET_CAPTURE);
 
 						for ($i = count($matches[0]) - 1; $i >= 0; $i--) {
 							$matche = $matches[0][$i];
@@ -278,7 +319,7 @@ class CMacrosResolver {
 	 * @return array
 	 */
 	private function resolveTrigger(array $data) {
-		$macros = array('host' => array(), 'ip' => array(), 'item' => array());
+		$macros = array('host' => array(), 'interfaceWithPriorities' => array(), 'item' => array());
 		$macroValues = array();
 
 		// get source field
@@ -286,7 +327,7 @@ class CMacrosResolver {
 
 		// get available functions
 		$isHostMacrosAvailable = $this->isTypeAvailable('host');
-		$isIpMacrosAvailable = $this->isTypeAvailable('ip');
+		$isInterfaceWithPrioritiesMacrosAvailable = $this->isTypeAvailable('interfaceWithPriorities');
 		$isItemMacrosAvailable = $this->isTypeAvailable('item');
 		$isUserMacrosAvailable = $this->isTypeAvailable('user');
 		$isReferenceMacrosAvailable = $this->isTypeAvailable('reference');
@@ -311,13 +352,13 @@ class CMacrosResolver {
 				}
 			}
 
-			if ($isIpMacrosAvailable) {
-				foreach ($this->findFunctionMacros(self::PATTERN_IP_FUNCTION, $trigger[$source]) as $macro => $fNums) {
+			if ($isInterfaceWithPrioritiesMacrosAvailable) {
+				foreach ($this->findFunctionMacros(self::PATTERN_INTERFACE_FUNCTION, $trigger[$source]) as $macro => $fNums) {
 					foreach ($fNums as $fNum) {
 						$macroValues[$triggerId][$this->getFunctionMacroName($macro, $fNum)] = UNRESOLVED_MACRO_STRING;
 
 						if (isset($functions[$fNum])) {
-							$macros['ip'][$functions[$fNum]][$macro][] = $fNum;
+							$macros['interfaceWithPriorities'][$functions[$fNum]][$macro][] = $fNum;
 						}
 					}
 				}
@@ -346,8 +387,8 @@ class CMacrosResolver {
 		if ($isHostMacrosAvailable) {
 			$macroValues = $this->resolveHostMacros($macros['host'], $macroValues);
 		}
-		if ($isIpMacrosAvailable) {
-			$macroValues = $this->resolveIpMacros($macros['ip'], $macroValues);
+		if ($isInterfaceWithPrioritiesMacrosAvailable) {
+			$macroValues = $this->resolveIpMacros($macros['interfaceWithPriorities'], $macroValues);
 		}
 		if ($isItemMacrosAvailable) {
 			$macroValues = $this->resolveItemMacros($macros['item'], $data, $macroValues);
@@ -356,7 +397,7 @@ class CMacrosResolver {
 		// replace macros to value
 		foreach ($data as $triggerId => $trigger) {
 			preg_match_all('/'.self::PATTERN_HOST_FUNCTION.
-								'|'.self::PATTERN_IP_FUNCTION.
+								'|'.self::PATTERN_INTERFACE_FUNCTION.
 								'|'.self::PATTERN_ITEM_FUNCTION.
 								'|'.ZBX_PREG_EXPRESSION_USER_MACROS.
 								'|\$([1-9])/', $trigger[$source], $matches, PREG_OFFSET_CAPTURE);
