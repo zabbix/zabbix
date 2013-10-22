@@ -141,7 +141,7 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
 		'countOutput' => true,
 		'objectids' => zbx_objectValues($triggerids, 'triggerid'),
 		'filter' => array(
-			'value' => is_null($value_event) ? NULL : $value_event,
+			'value' => $value_event,
 			'acknowledged' => $ack ? 1 : 0
 		)
 	));
@@ -214,7 +214,7 @@ function make_small_eventlist($startEvent) {
 		'eventid_till' => $startEvent['eventid'],
 		'output' => API_OUTPUT_EXTEND,
 		'select_acknowledges' => API_OUTPUT_COUNT,
-		'sortfield' => 'eventid',
+		'sortfield' => array('clock', 'eventid'),
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => 20
 	));
@@ -289,7 +289,7 @@ function make_popup_eventlist($triggerId, $eventId) {
 		'objectids' => $triggerId,
 		'eventid_till' => $eventId,
 		'select_acknowledges' => API_OUTPUT_COUNT,
-		'sortfield' => 'eventid',
+		'sortfield' => array('clock', 'eventid'),
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => ZBX_WIDGET_ROWS
 	));

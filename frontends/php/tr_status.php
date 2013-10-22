@@ -500,7 +500,9 @@ if ($showEvents != EVENTS_OPTION_NOEVENT) {
 		'output' => API_OUTPUT_EXTEND,
 		'select_acknowledges' => API_OUTPUT_COUNT,
 		'time_from' => time() - $config['event_expire'] * SEC_PER_DAY,
-		'time_till' => time()
+		'time_till' => time(),
+		'sortfield' => array('clock', 'eventid'),
+		'sortorder' => ZBX_SORT_DOWN
 	);
 
 	switch ($showEvents) {
@@ -512,11 +514,6 @@ if ($showEvents != EVENTS_OPTION_NOEVENT) {
 			break;
 	}
 	$events = API::Event()->get($options);
-
-	CArrayHelper::sort($events, array(
-		array('field' => 'clock', 'order' => ZBX_SORT_DOWN),
-		array('field' => 'eventid', 'order' => ZBX_SORT_DOWN)
-	));
 
 	foreach ($events as $event) {
 		$triggers[$event['objectid']]['events'][] = $event;
