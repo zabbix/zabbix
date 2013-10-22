@@ -395,6 +395,8 @@ table.suggest tr td{
 	color: #77B7DA;
 }
 
+table.right_table.calculated select, table.right_table.calculated option { background: #0B1823; }
+
 /*////////////////	DIVS	////////////////////*/
 /* calendar */
 div.calendar{
