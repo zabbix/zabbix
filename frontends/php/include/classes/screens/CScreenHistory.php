@@ -104,7 +104,7 @@ class CScreenHistory extends CScreenBase {
 				'itemids' => $this->itemids,
 				'webitems' => true,
 				'selectHosts' => array('hostid', 'name'),
-				'output' => API_OUTPUT_EXTEND,
+				'output' => array('key_', 'value_type', 'valuemapid'),
 				'preservekeys' => true
 			));
 

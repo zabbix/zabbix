@@ -662,7 +662,7 @@ class CItem extends CItemGeneral {
 	}
 
 	/**
-	 * Delete items
+	 * Delete items.
 	 *
 	 * @param array $itemids
 	 */
@@ -678,7 +678,7 @@ class CItem extends CItemGeneral {
 			'itemids' => $itemids,
 			'editable' => true,
 			'preservekeys' => true,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('name', 'templateid'),
 			'selectHosts' => array('name')
 		));
 

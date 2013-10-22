@@ -683,7 +683,7 @@ class CGraphPrototype extends CGraphGeneral {
 			'itemids' => $itemIds,
 			'webitems' => true,
 			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('name', 'value_type', 'flags'),
 			'preservekeys' => true,
 			'filter' => array('flags' => null)
 		));
@@ -743,7 +743,7 @@ class CGraphPrototype extends CGraphGeneral {
 			'itemids' => $itemIds,
 			'webitems' => true,
 			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('name', 'value_type', 'flags'),
 			'preservekeys' => true,
 			'filter' => array('flags' => null)
 		));
