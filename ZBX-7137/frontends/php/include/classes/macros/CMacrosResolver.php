@@ -66,6 +66,10 @@ class CMacrosResolver {
 			'types' => array('host', 'interface', 'user'),
 			'method' => 'resolveTexts'
 		),
+		'hostInterfaceIpDnsAgentPrimary' => array(
+			'types' => array('host', 'user'),
+			'method' => 'resolveTexts'
+		),
 		'hostInterfacePort' => array(
 			'types' => array('user'),
 			'method' => 'resolveTexts'
@@ -217,6 +221,13 @@ class CMacrosResolver {
 						case '{HOST.CONN}':
 							$macros[$hostId][$interfaceMacro] = $dbInterface['useip'] ? $dbInterface['ip'] : $dbInterface['dns'];
 							break;
+					}
+
+					if ($this->findMacros(self::PATTERN_HOST, array($macros[$hostId][$interfaceMacro]))
+							|| $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, array($macros[$hostId][$interfaceMacro]))) {
+						// attention recursion!
+						$macrosInMacros = $this->resolveTexts(array($hostId => array($macros[$hostId][$interfaceMacro])));
+						$macros[$hostId][$interfaceMacro] = $macrosInMacros[$hostId][0];
 					}
 				}
 			}

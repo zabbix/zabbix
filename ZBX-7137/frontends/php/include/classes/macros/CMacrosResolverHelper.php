@@ -72,6 +72,8 @@ class CMacrosResolverHelper {
 	 *
 	 * @param array  $interfaces
 	 * @param string $interfaces[n]['hostid']
+	 * @param string $interfaces[n]['type']
+	 * @param string $interfaces[n]['main']
 	 * @param string $interfaces[n]['ip']
 	 * @param string $interfaces[n]['dns']
 	 *
@@ -80,11 +82,40 @@ class CMacrosResolverHelper {
 	public static function resolveHostInterfaces(array $interfaces) {
 		self::init();
 
-		// ip, dns
+		// agent primary ip and dns
 		$data = array();
 		foreach ($interfaces as $interface) {
-			$data[$interface['hostid']][] = $interface['ip'];
-			$data[$interface['hostid']][] = $interface['dns'];
+			if ($interface['type'] == INTERFACE_TYPE_AGENT && $interface['main'] == INTERFACE_PRIMARY) {
+				$data[$interface['hostid']][] = $interface['ip'];
+				$data[$interface['hostid']][] = $interface['dns'];
+			}
+		}
+
+		$resolvedData = self::$macrosResolver->resolve(array(
+			'config' => 'hostInterfaceIpDnsAgentPrimary',
+			'data' => $data
+		));
+
+		foreach ($resolvedData as $hostId => $texts) {
+			$n = 0;
+
+			foreach ($interfaces as &$interface) {
+				if ($interface['type'] == INTERFACE_TYPE_AGENT && $interface['main'] == INTERFACE_PRIMARY
+						&& $interface['hostid'] == $hostId) {
+					$interface['ip'] = $texts[$n++];
+					$interface['dns'] = $texts[$n++];
+				}
+			}
+		}
+		unset($interface);
+
+		// others ip and dns
+		$data = array();
+		foreach ($interfaces as $interface) {
+			if (!($interface['type'] == INTERFACE_TYPE_AGENT && $interface['main'] == INTERFACE_PRIMARY)) {
+				$data[$interface['hostid']][] = $interface['ip'];
+				$data[$interface['hostid']][] = $interface['dns'];
+			}
 		}
 
 		$resolvedData = self::$macrosResolver->resolve(array(
@@ -96,7 +127,8 @@ class CMacrosResolverHelper {
 			$n = 0;
 
 			foreach ($interfaces as &$interface) {
-				if ($interface['hostid'] == $hostId) {
+				if (!($interface['type'] == INTERFACE_TYPE_AGENT && $interface['main'] == INTERFACE_PRIMARY)
+						&& $interface['hostid'] == $hostId) {
 					$interface['ip'] = $texts[$n++];
 					$interface['dns'] = $texts[$n++];
 				}
