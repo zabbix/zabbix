@@ -249,7 +249,8 @@ class CTemplateScreen extends CScreen {
 					array('screenid', 'screenitemid', 'resourcetype', 'resourceid'), $options['selectScreenItems']
 				),
 				'filter' => array('screenid' => $screenIds),
-				'preservekeys' => true
+				'preservekeys' => true,
+				'nodeids' => get_current_nodeid(true)
 			));
 			$relationMap = $this->createRelationMap($screenItems, 'screenid', 'screenitemid');
 
