@@ -2163,7 +2163,7 @@ static int	DBpatch_2010184(void)
 
 static int	DBpatch_2010185(void)
 {
-	return DBcreate_index("events", "events_2", "source,clock", 0);
+	return DBcreate_index("events", "events_2", "source,object,clock", 0);
 }
 
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
