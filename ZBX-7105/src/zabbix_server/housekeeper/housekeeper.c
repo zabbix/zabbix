@@ -748,10 +748,20 @@ static int	housekeeping_audit(int now)
 static int	housekeeping_events(int now)
 {
 	static zbx_hk_rule_t 	rules[] = {
-		{"events", "source="ZBX_STR(EVENT_SOURCE_TRIGGERS), 0, &hk_config.events_trigger},
-		{"events", "source="ZBX_STR(EVENT_SOURCE_DISCOVERY), 0, &hk_config.events_discovery},
-		{"events", "source="ZBX_STR(EVENT_SOURCE_AUTO_REGISTRATION), 0, &hk_config.events_autoreg},
-		{"events", "source="ZBX_STR(EVENT_SOURCE_INTERNAL), 0, &hk_config.events_internal},
+		{"events", "source=" ZBX_STR(EVENT_SOURCE_TRIGGERS)
+			" and object=" ZBX_STR(EVENT_OBJECT_TRIGGER), 0, &hk_config.events_trigger},
+		{"events", "source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
+			" and object=" ZBX_STR(EVENT_OBJECT_DHOST), 0, &hk_config.events_discovery},
+		{"events", "source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
+			" and object=" ZBX_STR(EVENT_OBJECT_DSERVICE), 0, &hk_config.events_discovery},
+		{"events", "source=" ZBX_STR(EVENT_SOURCE_AUTO_REGISTRATION)
+			" and object=" ZBX_STR(EVENT_OBJECT_ZABBIX_ACTIVE), 0, &hk_config.events_autoreg},
+		{"events", "source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
+			" and object=" ZBX_STR(EVENT_OBJECT_TRIGGER), 0, &hk_config.events_internal},
+		{"events", "source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
+			" and object=" ZBX_STR(EVENT_OBJECT_ITEM), 0, &hk_config.events_internal},
+		{"events", "source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
+			" and object=" ZBX_STR(EVENT_OBJECT_LLDRULE), 0, &hk_config.events_internal},
 		{NULL}
 	};
 
