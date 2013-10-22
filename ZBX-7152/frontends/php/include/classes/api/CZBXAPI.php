@@ -351,7 +351,6 @@ class CZBXAPI {
 	 */
 	protected function select($tableName, array $options) {
 		$limit = isset($options['limit']) ? $options['limit'] : null;
-		$options['nodeids'] = get_current_nodeid(true);
 		$sql = $this->createSelectQuery($tableName, $options);
 
 		$objects = DBfetchArray(DBSelect($sql, $limit));

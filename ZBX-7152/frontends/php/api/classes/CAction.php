@@ -1737,7 +1737,8 @@ class CAction extends CZBXAPI {
 			$conditions = API::getApi()->select('conditions', array(
 				'output' => $this->outputExtend('conditions', array('actionid', 'conditionid'), $options['selectConditions']),
 				'filter' => array('actionid' => $actionIds),
-				'preservekeys' => true
+				'preservekeys' => true,
+				'nodeids' => get_current_nodeid(true)
 			));
 			$relationMap = $this->createRelationMap($conditions, 'actionid', 'conditionid');
 
@@ -1752,7 +1753,8 @@ class CAction extends CZBXAPI {
 					array('operationid', 'actionid', 'operationtype'), $options['selectOperations']
 				),
 				'filter' => array('actionid' => $actionIds),
-				'preservekeys' => true
+				'preservekeys' => true,
+				'nodeids' => get_current_nodeid(true)
 			));
 			$relationMap = $this->createRelationMap($operations, 'actionid', 'operationid');
 			$operationIds = $relationMap->getRelatedIds();
