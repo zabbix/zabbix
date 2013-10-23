@@ -409,8 +409,11 @@ foreach ($items as $key => $item){
 
 	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown txt' : 'txt';
 	$itemName = array(SPACE, SPACE, $item['resolvedName']);
+
 	if ($filterShowDetails) {
-		$itemKey = new CLink(resolveItemKeyMacros($item), 'items.php?form=update&itemid='.$item['itemid']);
+		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST)
+			? resolveItemKeyMacros($item)
+			: new CLink(resolveItemKeyMacros($item), 'items.php?form=update&itemid='.$item['itemid']);
 		$itemName = array_merge($itemName, array(BR(), SPACE, SPACE, $itemKey));
 
 		$statusIcons = array();
