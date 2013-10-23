@@ -615,7 +615,7 @@ if (!isset($function)) {
 
 if ($itemId) {
 	$items = API::Item()->get(array(
-		'output' => array('key_', 'name'),
+		'output' => array('itemid', 'key_', 'name'),
 		'itemids' => $itemId,
 		'webitems' => true,
 		'selectHosts' => array('host'),
