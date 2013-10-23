@@ -1639,7 +1639,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num)
 		zbx_vector_uint64_sort(&rec_actionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&rec_actionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		/* list of ongoing escalations macthing actionids collected before */
+		/* list of ongoing escalations matching actionids collected before */
 		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset,
 				"select actionid,triggerid,itemid"
 				" from escalations"
