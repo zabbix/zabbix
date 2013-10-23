@@ -28,7 +28,7 @@ class CEvent extends CZBXAPI {
 
 	protected $tableName = 'events';
 	protected $tableAlias = 'e';
-	protected $sortColumns = array('eventid', 'clock');
+	protected $sortColumns = array('eventid', 'object', 'objectid', 'clock');
 
 	/**
 	 * Array of supported objects where keys are object IDs and values are translated object names.
