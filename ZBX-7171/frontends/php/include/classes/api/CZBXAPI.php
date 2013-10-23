@@ -799,14 +799,17 @@ class CZBXAPI {
 	 *
 	 * @throws APIException		if any of the parameters are present in the object
 	 *
-	 * @param array  $object
-	 * @param array  $params
-	 * @param string $error
+	 * @param array		$object
+	 * @param array		$params
+	 * @param string	$error
+	 * @param array		$errorParams
 	 */
-	protected function checkNoParameters(array $object, array $params, $error) {
+	protected function checkNoParameters(array $object, array $params, $error, array $errorParams) {
 		foreach ($params as $param) {
 			if (array_key_exists($param, $object)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s($error, $param));
+				array_unshift($errorParams, $error, $param);
+				$error = call_user_func_array('_s', $errorParams);
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 		}
 	}
