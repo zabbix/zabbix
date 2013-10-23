@@ -1702,6 +1702,8 @@ void	process_actions(const DB_EVENT *events, size_t events_num)
 				}
 
 				get_escalation_sql(&sql, &sql_alloc, &sql_offset, actionid, event, 1);
+
+				break;
 			}
 		}
 		DBfree_result(result);
