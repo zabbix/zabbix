@@ -729,7 +729,7 @@ FIELD		|width		|t_integer	|'600'	|NOT NULL	|ZBX_SYNC
 FIELD		|height		|t_integer	|'400'	|NOT NULL	|ZBX_SYNC
 FIELD		|backgroundid	|t_id		|	|NULL		|ZBX_SYNC		|1|images	|imageid	|RESTRICT
 FIELD		|label_type	|t_integer	|'2'	|NOT NULL	|ZBX_SYNC
-FIELD		|label_location	|t_integer	|'3'	|NOT NULL	|ZBX_SYNC
+FIELD		|label_location	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|highlight	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|expandproblem	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|markelements	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
@@ -763,7 +763,7 @@ FIELD		|elementtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|iconid_off	|t_id		|	|NULL		|ZBX_SYNC		|2|images	|imageid	|RESTRICT
 FIELD		|iconid_on	|t_id		|	|NULL		|ZBX_SYNC		|3|images	|imageid	|RESTRICT
 FIELD		|label		|t_varchar(2048)|''	|NOT NULL	|ZBX_SYNC
-FIELD		|label_location	|t_integer	|	|NULL		|ZBX_SYNC
+FIELD		|label_location	|t_integer	|'-1'	|NOT NULL	|ZBX_SYNC
 FIELD		|x		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|y		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|iconid_disabled|t_id		|	|NULL		|ZBX_SYNC		|4|images	|imageid	|RESTRICT
@@ -1308,4 +1308,4 @@ INDEX		|2		|templateid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2010183	|2010183
+ROW		|2010187	|2010187
