@@ -154,7 +154,7 @@ if ($_REQUEST['triggerid'] > 0 && isset($_REQUEST['hostid'])) {
 		$newTriggers = API::Trigger()->get(array(
 			'output' => array('triggerid', 'description', 'expression'),
 			'selectHosts' => array('hostid', 'host'),
-			'selectItems' =>  array('itemid', 'hostid', 'key_'),
+			'selectItems' => array('itemid', 'key_'),
 			'selectFunctions' => API_OUTPUT_EXTEND,
 			'filter' => array('description' => $oldTrigger['description']),
 			'hostids' => $hostid

@@ -531,7 +531,7 @@ elseif (isset($_REQUEST['save'])) {
 
 			$graphs = API::Graph()->get(array(
 				'hostids' => $srcHostId,
-				'selectItems' => array('itemid', 'type'),
+				'selectItems' => array('type'),
 				'output' => API_OUTPUT_EXTEND,
 				'inherited' => false,
 				'selectHosts' => array('hostid'),
