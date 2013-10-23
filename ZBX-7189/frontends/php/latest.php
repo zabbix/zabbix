@@ -191,6 +191,7 @@ if ($hosts) {
 			'error', 'trends', 'history', 'delay', 'key_'),
 		'selectApplications' => array('applicationid'),
 		'selectItemDiscovery' => array('ts_delete'),
+		'webitems' => true,
 		'filter' => array(
 			'status' => array(ITEM_STATUS_ACTIVE)
 		),
