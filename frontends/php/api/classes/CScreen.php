@@ -573,7 +573,8 @@ class CScreen extends CZBXAPI {
 			$screenItems = API::getApi()->select('screens_items', array(
 				'output' => $this->outputExtend('screens_items', array('screenid', 'screenitemid'), $options['selectScreenItems']),
 				'filter' => array('screenid' => $screenIds),
-				'preservekeys' => true
+				'preservekeys' => true,
+				'nodeids' => get_current_nodeid(true)
 			));
 
 			$relationMap = $this->createRelationMap($screenItems, 'screenid', 'screenitemid');
