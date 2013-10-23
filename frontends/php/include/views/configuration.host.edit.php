@@ -409,9 +409,10 @@ if ($_REQUEST['form'] == 'full_clone') {
 	$hostApps = API::Application()->get(array(
 		'hostids' => $_REQUEST['hostid'],
 		'inherited' => false,
-		'output' => array('applicationid', 'name'),
+		'output' => array('name'),
 		'preservekeys' => true
 	));
+
 	if (!empty($hostApps)) {
 		$applicationsList = array();
 		foreach ($hostApps as $hostAppId => $hostApp) {
@@ -450,7 +451,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 		'inherited' => false,
 		'hostids' => $_REQUEST['hostid'],
 		'output' => array('triggerid', 'description'),
-		'selectItems' => array('itemid', 'type'),
+		'selectItems' => array('type'),
 		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL))
 	));
 	if (!empty($hostTriggers)) {
@@ -479,7 +480,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 		'hostids' => $_REQUEST['hostid'],
 		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
 		'selectHosts' => array('hostid'),
-		'selectItems' => array('itemid', 'type'),
+		'selectItems' => array('type'),
 		'output' => array('graphid', 'name')
 	));
 	if (!empty($hostGraphs)) {
@@ -552,7 +553,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 		'discoveryids' => $hostDiscoveryRuleids,
 		'inherited' => false,
 		'output' => array('triggerid', 'description'),
-		'selectItems' => array('itemid', 'type')
+		'selectItems' => array('type')
 	));
 	if (!empty($hostTriggerPrototypes)) {
 		$prototypeList = array();
