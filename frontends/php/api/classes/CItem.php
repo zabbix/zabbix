@@ -1175,7 +1175,8 @@ class CItem extends CItemGeneral {
 			$itemDiscoveries = API::getApi()->select('item_discovery', array(
 				'output' => $this->outputExtend('item_discovery', array('itemdiscoveryid', 'itemid'), $options['selectItemDiscovery']),
 				'filter' => array('itemid' => array_keys($result)),
-				'preservekeys' => true
+				'preservekeys' => true,
+				'nodeids' => get_current_nodeid(true)
 			));
 			$relationMap = $this->createRelationMap($itemDiscoveries, 'itemid', 'itemdiscoveryid');
 

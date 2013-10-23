@@ -1685,7 +1685,8 @@ class CHost extends CHostGeneral {
 			$relationMap = $this->createRelationMap($result, 'hostid', 'hostid');
 			$inventory = API::getApi()->select('host_inventory', array(
 				'output' => $options['selectInventory'],
-				'filter' => array('hostid' => $hostids)
+				'filter' => array('hostid' => $hostids),
+				'nodeids' => get_current_nodeid(true)
 			));
 			$result = $relationMap->mapOne($result, zbx_toHash($inventory, 'hostid'), 'inventory');
 		}
@@ -1788,7 +1789,8 @@ class CHost extends CHostGeneral {
 			$hostDiscoveries = API::getApi()->select('host_discovery', array(
 				'output' => $this->outputExtend('host_discovery', array('hostid'), $options['selectHostDiscovery']),
 				'filter' => array('hostid' => $hostids),
-				'preservekeys' => true
+				'preservekeys' => true,
+				'nodeids' => get_current_nodeid(true)
 			));
 			$relationMap = $this->createRelationMap($hostDiscoveries, 'hostid', 'hostid');
 
