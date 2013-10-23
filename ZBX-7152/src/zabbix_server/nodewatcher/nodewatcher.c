@@ -161,24 +161,30 @@ int	is_direct_slave_node(int slave_nodeid)
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-void	main_nodewatcher_loop()
+void	main_nodewatcher_loop(void)
 {
-	int	start, end;
-	int	lastrun = 0;
+	int	start, end, lastrun = 0, sleeptime = -1;
+	double	sec, total_sec = 0.0, old_total_sec = 0.0;
+	time_t	last_stat_time;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In main_nodewatcher_loop()");
+#define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
+				/* once in STAT_INTERVAL seconds */
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
+	last_stat_time = time(NULL);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
-		zbx_setproctitle("%s [exchanging data]", get_process_type_string(process_type));
+		if (0 != sleeptime)
+		{
+			zbx_setproctitle("%s [synced with nodes in " ZBX_FS_DBL " sec, syncing with nodes]",
+					get_process_type_string(process_type), old_total_sec);
+		}
 
 		start = time(NULL);
-
-		zabbix_log(LOG_LEVEL_DEBUG, "Starting sync with nodes");
+		sec = zbx_time();
 
 		if (lastrun + 120 < start)
 		{
@@ -189,8 +195,30 @@ void	main_nodewatcher_loop()
 		/* send new history data to master node */
 		main_historysender();
 
+		total_sec += zbx_time() - sec;
 		end = time(NULL);
 
-		zbx_sleep_loop(10 - (end - start));
+		sleeptime = 10 - (end - start) > 0 ? 10 - (end - start) : 0;
+
+		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
+		{
+			if (0 == sleeptime)
+			{
+				zbx_setproctitle("%s [synced with nodes in " ZBX_FS_DBL " sec, syncing with nodes]",
+						get_process_type_string(process_type), total_sec);
+			}
+			else
+			{
+				zbx_setproctitle("%s [synced with nodes in " ZBX_FS_DBL " sec, idle %d sec]",
+						get_process_type_string(process_type), total_sec, sleeptime);
+				old_total_sec = total_sec;
+			}
+			total_sec = 0.0;
+			last_stat_time = time(NULL);
+		}
+
+		zbx_sleep_loop(sleeptime);
 	}
+
+#undef STAT_INTERVAL
 }

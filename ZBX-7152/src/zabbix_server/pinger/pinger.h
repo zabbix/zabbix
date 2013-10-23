@@ -20,6 +20,6 @@
 #ifndef ZABBIX_PINGER_H
 #define ZABBIX_PINGER_H
 
-void	main_pinger_loop();
+void	main_pinger_loop(void);
 
 #endif

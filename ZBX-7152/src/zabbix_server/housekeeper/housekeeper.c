@@ -770,6 +770,7 @@ static int	housekeeping_events(int now)
 void	main_housekeeper_loop(void)
 {
 	int	now, d_history_and_trends, d_cleanup, d_events, d_sessions, d_services, d_audit;
+	double	sec;
 
 	for (;;)
 	{
@@ -782,6 +783,7 @@ void	main_housekeeper_loop(void)
 		DCconfig_get_config_hk(&hk_config);
 
 		zbx_setproctitle("%s [removing old history and trends]", get_process_type_string(process_type));
+		sec = zbx_time();
 		d_history_and_trends = housekeeping_history_and_trends(now);
 
 		zbx_setproctitle("%s [removing deleted items data]", get_process_type_string(process_type));
@@ -799,12 +801,18 @@ void	main_housekeeper_loop(void)
 		zbx_setproctitle("%s [removing old audit log items]", get_process_type_string(process_type));
 		d_audit = housekeeping_audit(now);
 
-		zabbix_log(LOG_LEVEL_WARNING, "housekeeper deleted: %d records from history and trends,"
-				" %d records of deleted items, %d events, %d sessions,"
-				" %d service alarms, %d audit items",
-				d_history_and_trends, d_cleanup, d_events, d_sessions, d_services, d_audit);
+		sec = zbx_time() - sec;
 
+		zabbix_log(LOG_LEVEL_WARNING, "%s [deleted %d hist/trends, %d items, %d events, %d sessions, %d alarms,"
+				" %d audit items in " ZBX_FS_DBL " sec, idle %d hour(s)]",
+				get_process_type_string(process_type), d_history_and_trends, d_cleanup, d_events,
+				d_sessions, d_services, d_audit, sec, CONFIG_HOUSEKEEPING_FREQUENCY);
 		DBclose();
+
+		zbx_setproctitle("%s [deleted %d hist/trends, %d items, %d events, %d sessions, %d alarms, %d audit "
+				"items in " ZBX_FS_DBL " sec, idle %d hour(s)]",
+				get_process_type_string(process_type), d_history_and_trends, d_cleanup, d_events,
+				d_sessions, d_services, d_audit, sec, CONFIG_HOUSEKEEPING_FREQUENCY);
 
 		zbx_sleep_loop(CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR);
 	}
