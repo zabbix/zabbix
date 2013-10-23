@@ -111,9 +111,9 @@ class CTemplateImporter extends CImporter {
 					$unresolvedReferences[] = $linkedTemplate['name'];
 				}
 			}
-			throw new Exception(_n('Cannot import template "%2$s", linked template "%3$s" does not exist.',
-				'Cannot import template "%2$s", linked templates "%3$s" does not exist.',
-				count($unresolvedReferences), $template['host'], implode(', ', $unresolvedReferences)));
+			throw new Exception(_n('Cannot import template "%1$s", linked template "%2$s" does not exist.',
+				'Cannot import template "%1$s", linked templates "%2$s" does not exist.',
+				$template['host'], implode(', ', $unresolvedReferences), count($unresolvedReferences)));
 		}
 	}
 
