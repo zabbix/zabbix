@@ -83,6 +83,13 @@ typedef struct
 }
 zbx_ptr_pair_t;
 
+typedef struct
+{
+	zbx_uint64_t	first;
+	zbx_uint64_t	second;
+}
+zbx_uint64_pair_t;
+
 /* hashset */
 
 #define ZBX_HASHSET_ENTRY_T	struct zbx_hashset_entry_s
@@ -275,6 +282,7 @@ ZBX_VECTOR_DECL(uint64, zbx_uint64_t);
 ZBX_VECTOR_DECL(str, char *);
 ZBX_VECTOR_DECL(ptr, void *);
 ZBX_VECTOR_DECL(ptr_pair, zbx_ptr_pair_t);
+ZBX_VECTOR_DECL(uint64_pair, zbx_uint64_pair_t);
 
 void	zbx_vector_str_clean(zbx_vector_str_t *vector);
 void	zbx_vector_ptr_clean(zbx_vector_ptr_t *vector, zbx_mem_free_func_t free_func);
