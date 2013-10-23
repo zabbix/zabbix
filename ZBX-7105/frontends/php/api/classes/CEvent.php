@@ -128,6 +128,7 @@ class CEvent extends CZBXAPI {
 
 		$this->checkDeprecatedParam($options, 'selectTriggers');
 		$this->checkDeprecatedParam($options, 'selectItems');
+		$this->checkDeprecatedParam($options, 'sortfield', 'object');
 		$options = $this->convertDeprecatedParam($options, 'triggerids', 'objectids');
 		$this->validateGet($options);
 
