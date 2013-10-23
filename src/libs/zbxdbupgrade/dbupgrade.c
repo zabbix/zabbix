@@ -2145,14 +2145,28 @@ static int	DBpatch_2010181(void)
 	return DBmodify_field_type("interface", &field);
 }
 
-static int	DBpatch_2010186(void)
+static int	DBpatch_2010182(void)
+{
+	const ZBX_FIELD	field = {"label", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("sysmaps_elements", &field);
+}
+
+static int	DBpatch_2010183(void)
+{
+	const ZBX_FIELD	field = {"label", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("sysmaps_links", &field);
+}
+
+static int	DBpatch_2010184(void)
 {
 	const ZBX_FIELD	field = {"label_location", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBset_default("sysmaps", &field);
 }
 
-static int	DBpatch_2010187(void)
+static int	DBpatch_2010185(void)
 {
 	if (ZBX_DB_OK > DBexecute("update sysmaps_elements set label_location=-1 where label_location is null"))
 		return FAIL;
@@ -2160,14 +2174,14 @@ static int	DBpatch_2010187(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_2010188(void)
+static int	DBpatch_2010186(void)
 {
 	const ZBX_FIELD	field = {"label_location", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBset_default("sysmaps_elements", &field);
 }
 
-static int	DBpatch_2010189(void)
+static int	DBpatch_2010187(void)
 {
 	const ZBX_FIELD	field = {"label_location", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
@@ -2404,10 +2418,12 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010179, 0, 1)
 	DBPATCH_ADD(2010180, 0, 1)
 	DBPATCH_ADD(2010181, 0, 1)
+	DBPATCH_ADD(2010182, 0, 1)
+	DBPATCH_ADD(2010183, 0, 1)
+	DBPATCH_ADD(2010184, 0, 1)
+	DBPATCH_ADD(2010185, 0, 1)
 	DBPATCH_ADD(2010186, 0, 1)
 	DBPATCH_ADD(2010187, 0, 1)
-	DBPATCH_ADD(2010188, 0, 1)
-	DBPATCH_ADD(2010189, 0, 1)
 
 	DBPATCH_END()
 
