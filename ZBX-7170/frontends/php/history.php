@@ -127,7 +127,7 @@ $items = API::Item()->get(array(
 	'itemids' => $_REQUEST['itemid'],
 	'webitems' => true,
 	'selectHosts' => array('name'),
-	'output' =>  array('itemid', 'key_', 'name', 'value_type', 'hostid', 'valuemapid'),
+	'output' => array('itemid', 'key_', 'name', 'value_type', 'hostid', 'valuemapid'),
 	'preservekeys' => true
 ));
 
