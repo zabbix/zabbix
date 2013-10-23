@@ -32,12 +32,6 @@
 #	define ZBX_DROP_FK		" drop constraint"
 #endif
 
-#ifdef HAVE_POSTGRESQL
-#	define ZBX_DB_ONLY		" only"
-#else
-#	define ZBX_DB_ONLY		""
-#endif
-
 #if defined(HAVE_IBM_DB2)
 #	define ZBX_DB_ALTER_COLUMN	" alter column"
 #elif defined(HAVE_POSTGRESQL)
@@ -292,8 +286,7 @@ static void	DBcreate_table_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 static void	DBmodify_field_type_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, const ZBX_FIELD *field)
 {
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s" ZBX_DB_ALTER_COLUMN " ",
-			table_name);
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table %s" ZBX_DB_ALTER_COLUMN " ", table_name);
 
 #ifdef HAVE_MYSQL
 	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
@@ -306,8 +299,7 @@ static void	DBmodify_field_type_sql(char **sql, size_t *sql_alloc, size_t *sql_o
 static void	DBdrop_not_null_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, const ZBX_FIELD *field)
 {
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s" ZBX_DB_ALTER_COLUMN " ",
-			table_name);
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table %s" ZBX_DB_ALTER_COLUMN " ", table_name);
 
 #if defined(HAVE_MYSQL)
 	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
@@ -321,8 +313,7 @@ static void	DBdrop_not_null_sql(char **sql, size_t *sql_alloc, size_t *sql_offse
 static void	DBset_not_null_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, const ZBX_FIELD *field)
 {
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s" ZBX_DB_ALTER_COLUMN " ",
-			table_name);
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table %s" ZBX_DB_ALTER_COLUMN " ", table_name);
 
 #if defined(HAVE_MYSQL)
 	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
@@ -336,8 +327,7 @@ static void	DBset_not_null_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 static void	DBset_default_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, const ZBX_FIELD *field)
 {
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s" ZBX_DB_ALTER_COLUMN " ",
-			table_name);
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table %s" ZBX_DB_ALTER_COLUMN " ", table_name);
 
 #if defined(HAVE_MYSQL)
 	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
@@ -351,14 +341,14 @@ static void	DBset_default_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 static void	DBadd_field_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, const ZBX_FIELD *field)
 {
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s add ", table_name);
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table %s add ", table_name);
 	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
 }
 
 static void	DBrename_field_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, const char *field_name, const ZBX_FIELD *field)
 {
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s ", table_name);
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table %s ", table_name);
 
 #ifdef HAVE_MYSQL
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "change column %s ", field_name);
@@ -371,8 +361,7 @@ static void	DBrename_field_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 static void	DBdrop_field_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, const char *field_name)
 {
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s drop column %s",
-			table_name, field_name);
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table %s drop column %s", table_name, field_name);
 }
 
 static void	DBcreate_index_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
@@ -411,8 +400,8 @@ static void	DBrename_index_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 static void	DBadd_foreign_key_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, int id, const ZBX_FIELD *field)
 {
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s"
-			" add constraint c_%s_%d foreign key (%s) references %s (%s)",
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset,
+			"alter table %s add constraint c_%s_%d foreign key (%s) references %s (%s)",
 			table_name, table_name, id, field->name, field->fk_table, field->fk_field);
 	if (0 != (field->fk_flags & ZBX_FK_CASCADE_DELETE))
 		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " on delete cascade");
@@ -421,7 +410,7 @@ static void	DBadd_foreign_key_sql(char **sql, size_t *sql_alloc, size_t *sql_off
 static void	DBdrop_foreign_key_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, int id)
 {
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s" ZBX_DROP_FK " c_%s_%d",
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table %s" ZBX_DROP_FK " c_%s_%d",
 			table_name, table_name, id);
 }
 
@@ -2156,6 +2145,49 @@ static int	DBpatch_2010181(void)
 	return DBmodify_field_type("interface", &field);
 }
 
+static int	DBpatch_2010182(void)
+{
+	const ZBX_FIELD	field = {"label", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("sysmaps_elements", &field);
+}
+
+static int	DBpatch_2010183(void)
+{
+	const ZBX_FIELD	field = {"label", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("sysmaps_links", &field);
+}
+
+static int	DBpatch_2010184(void)
+{
+	const ZBX_FIELD	field = {"label_location", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("sysmaps", &field);
+}
+
+static int	DBpatch_2010185(void)
+{
+	if (ZBX_DB_OK > DBexecute("update sysmaps_elements set label_location=-1 where label_location is null"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_2010186(void)
+{
+	const ZBX_FIELD	field = {"label_location", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("sysmaps_elements", &field);
+}
+
+static int	DBpatch_2010187(void)
+{
+	const ZBX_FIELD	field = {"label_location", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_not_null("sysmaps_elements", &field);
+}
+
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 #define DBPATCH_END()					{NULL}};
@@ -2386,6 +2418,12 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010179, 0, 1)
 	DBPATCH_ADD(2010180, 0, 1)
 	DBPATCH_ADD(2010181, 0, 1)
+	DBPATCH_ADD(2010182, 0, 1)
+	DBPATCH_ADD(2010183, 0, 1)
+	DBPATCH_ADD(2010184, 0, 1)
+	DBPATCH_ADD(2010185, 0, 1)
+	DBPATCH_ADD(2010186, 0, 1)
+	DBPATCH_ADD(2010187, 0, 1)
 
 	DBPATCH_END()
 

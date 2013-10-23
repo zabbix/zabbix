@@ -76,14 +76,12 @@ abstract class CTriggerGeneral extends CZBXAPI {
 		}
 
 		if (!isset($trigger['expression']) || !isset($trigger['description'])) {
-			$options = array(
+			$dbTriggers = $this->get(array(
 				'triggerids' => $trigger['triggerid'],
-				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => true,
+				'output' => array('expression', 'description'),
 				'nopermissions' => true
-			);
-			$dbTrigger = $this->get($options);
-			$dbTrigger = reset($dbTrigger);
+			));
+			$dbTrigger = reset($dbTriggers);
 
 			if (!isset($trigger['description'])) {
 				$trigger['description'] = $dbTrigger['description'];
@@ -157,8 +155,7 @@ abstract class CTriggerGeneral extends CZBXAPI {
 		// check if a child trigger already exists on the host
 		$childTriggers = $this->get(array(
 			'filter' => array('templateid' => $newTrigger['templateid']),
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true,
+			'output' => array('triggerid'),
 			'hostids' => $chdHost['hostid']
 		));
 
@@ -174,8 +171,7 @@ abstract class CTriggerGeneral extends CZBXAPI {
 					'description' => $newTrigger['description'],
 					'flags' => null
 				),
-				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => true,
+				'output' => array('triggerid', 'expression'),
 				'nopermissions' => true,
 				'hostids' => $chdHost['hostid']
 			));
