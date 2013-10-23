@@ -1277,6 +1277,7 @@ ROW   |13539    |{12969}>({12970}*0.7)             |70% mem Heap Memory used on 
 ROW   |13540    |{12971}>({12972}*0.7)             |70% mem Non-Heap Memory used on {HOST.NAME}                         |   |0     |3       |                                                                                                                                      |NULL      |0   |0    |
 ROW   |13541    |{12973}={12974}                   |mem Heap Memory fully committed on {HOST.NAME}                      |   |0     |2       |                                                                                                                                      |NULL      |0   |0    |
 ROW   |13542    |{12975}={12976}                   |mem Non-Heap Memory fully committed on {HOST.NAME}                  |   |0     |2       |                                                                                                                                      |NULL      |0   |0    |
+ROW   |13543    |{12977}#1                         |{HOST.NAME} runs suboptimal VM type                                 |   |0     |1       |                                                                                                                                      |NULL      |0   |0    |
 ROW   |10045    |{12927}>0                         |Version of zabbix_agent(d) was changed on {HOST.NAME}               |   |0     |1       |                                                                                                                                      |13026     |0   |0    |
 ROW   |10047    |{12550}=1                         |Zabbix agent on {HOST.NAME} is unreachable for 5 minutes            |   |0     |3       |                                                                                                                                      |13025     |0   |0    |
 ROW   |13075    |{12648}<5                         |Less than 5% free in the value cache                                |   |0     |3       |                                                                                                                                      |13074     |0   |0    |
@@ -1710,6 +1711,7 @@ ROW   |12973     |23639 |13541    |last    |0        |
 ROW   |12974     |23640 |13541    |last    |0        |
 ROW   |12975     |23641 |13542    |last    |0        |
 ROW   |12976     |23643 |13542    |last    |0        |
+ROW   |12977     |23636 |13543    |str     |Server   |
 
 TABLE |graphs
 FIELDS|graphid|name                                    |width|height|yaxismin|yaxismax|templateid|show_work_period|show_triggers|graphtype|show_legend|show_3d|percent_left|percent_right|ymin_type|ymax_type|ymin_itemid|ymax_itemid|flags|
