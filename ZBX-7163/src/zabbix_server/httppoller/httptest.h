@@ -20,6 +20,6 @@
 #ifndef ZABBIX_HTTPTEST_H
 #define ZABBIX_HTTPTEST_H
 
-void	process_httptests(int httppoller_num, int now);
+int	process_httptests(int httppoller_num, int now);
 
 #endif

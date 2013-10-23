@@ -43,6 +43,7 @@
 
 extern unsigned char	daemon_type;
 extern unsigned char	process_type;
+extern int		process_num;
 
 /******************************************************************************
  *                                                                            *
@@ -670,17 +671,16 @@ static void	process_trapper_child(zbx_sock_t *sock)
 
 void	main_trapper_loop(zbx_sock_t *s)
 {
-	const char	*__function_name = "main_trapper_loop";
+	double		sec = 0.0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
+	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
-		zbx_setproctitle("%s [waiting for connection]", get_process_type_string(process_type));
+		zbx_setproctitle("%s #%d [processed data in " ZBX_FS_DBL " sec, waiting for connection]",
+				get_process_type_string(process_type), process_num, sec);
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
@@ -688,9 +688,12 @@ void	main_trapper_loop(zbx_sock_t *s)
 		{
 			update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
-			zbx_setproctitle("%s [processing data]", get_process_type_string(process_type));
+			zbx_setproctitle("%s #%d [processing data]", get_process_type_string(process_type),
+					process_num);
 
+			sec = zbx_time();
 			process_trapper_child(s);
+			sec = zbx_time() - sec;
 
 			zbx_tcp_unaccept(s);
 		}

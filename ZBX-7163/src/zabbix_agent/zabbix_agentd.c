@@ -47,6 +47,8 @@
 #	include "daemon.h"
 #endif
 
+#include "setproctitle.h"
+
 const char	*progname = NULL;
 
 /* default config file location */
@@ -593,6 +595,7 @@ int	MAIN_ZABBIX_ENTRY()
 	/* start the collector thread */
 	thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
 	thread_args->thread_num = thread_num;
+	thread_args->thread_num2 = 1;
 	thread_args->args = NULL;
 	threads[thread_num++] = zbx_thread_start(collector_thread, thread_args);
 
@@ -601,6 +604,7 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 		thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
 		thread_args->thread_num = thread_num;
+		thread_args->thread_num2 = i + 1;
 		thread_args->args = &listen_sock;
 		threads[thread_num++] = zbx_thread_start(listener_thread, thread_args);
 	}
@@ -610,6 +614,7 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 		thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
 		thread_args->thread_num = thread_num;
+		thread_args->thread_num2 = i + 1;
 		thread_args->args = &CONFIG_ACTIVE_ARGS[i];
 		threads[thread_num++] = zbx_thread_start(active_checks_thread, thread_args);
 	}
@@ -720,6 +725,10 @@ void	zbx_on_exit(void)
 
 	zbx_free_service_resources();
 
+#if defined(PS_OVERWRITE_ARGV)
+	setproctitle_free_env();
+#endif
+
 	exit(SUCCEED);
 }
 
@@ -742,7 +751,9 @@ int	main(int argc, char **argv)
 	/* Instead, the system sends the error to the calling process.*/
 	SetErrorMode(SEM_FAILCRITICALERRORS);
 #endif
-
+#if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
+	argv = setproctitle_save_env(argc, argv);
+#endif
 	memset(&t, 0, sizeof(t));
 	t.task = ZBX_TASK_START;
 
