@@ -195,15 +195,15 @@ if ($filterShowDetails) {
 		is_show_all_nodes() ? make_sorting_header(_('Node'), 'h.hostid') : null,
 		($_REQUEST['hostid'] == 0) ? make_sorting_header(_('Host'), 'h.name') : NULL,
 		make_sorting_header(_('Name'), 'i.name'),
-		_('Interval'),
-		_('History'),
-		_('Trends'),
-		_('Type'),
+		new CSpan(_('Interval')),
+		new CSpan(_('History')),
+		new CSpan(_('Trends')),
+		new CSpan(_('Type')),
 		make_sorting_header(_('Last check'), 'i.lastclock'),
-		_('Last value'),
-		_x('Change', 'noun in latest data'),
+		new CSpan(_('Last value')),
+		new CSpan(_x('Change', 'noun in latest data')),
 		SPACE,
-		_('Error')
+		new CSpan(_('Error'))
 	));
 }
 else {
@@ -213,8 +213,8 @@ else {
 		($_REQUEST['hostid'] == 0) ? make_sorting_header(_('Host'), 'h.name') : NULL,
 		make_sorting_header(_('Name'), 'i.name'),
 		make_sorting_header(_('Last check'), 'i.lastclock'),
-		_('Last value'),
-		_x('Change', 'noun in latest data'),
+		new CSpan(_('Last value')),
+		new CSpan(_x('Change', 'noun in latest data')),
 		SPACE
 	));
 }
