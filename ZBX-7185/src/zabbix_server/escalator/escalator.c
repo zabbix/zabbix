@@ -1150,7 +1150,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 	DB_ACTION	action;
 	DB_EVENT	event, r_event;
 	char		*error = NULL;
-	unsigned char	source = 0, object = 0;
+	unsigned char	source = 0xff, object = 0xff;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
 			__function_name, escalation->escalationid, zbx_escalation_status_string(escalation->status));
