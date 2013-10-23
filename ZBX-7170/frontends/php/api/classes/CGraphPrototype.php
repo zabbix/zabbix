@@ -388,7 +388,6 @@ class CGraphPrototype extends CGraphGeneral {
 			'graphids' => $graph['graphid'],
 			'nopermissions' => true,
 			'filter' => array('flags' => null),
-			'selectItems' => API_OUTPUT_EXTEND,
 			'selectGraphItems' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND
 		));

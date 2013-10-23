@@ -381,7 +381,6 @@ class CGraph extends CGraphGeneral {
 		$graph = $this->get(array(
 			'graphids' => $graph['graphid'],
 			'nopermissions' => true,
-			'selectItems' => API_OUTPUT_EXTEND,
 			'selectGraphItems' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND
 		));
