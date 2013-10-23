@@ -539,6 +539,10 @@ function _llnw_allow_DBexecute($query) {
 		"UPDATE ids SET nextid=nextid+1 WHERE nodeid=0 AND table_name='profiles' AND field_name='profileid'", // Allow node: 0,1,??
 		"UPDATE ids SET nextid=nextid+1 WHERE nodeid=1 AND table_name='profiles' AND field_name='profileid'", // needed for footer:
 		// page_footer.php:46:CProfile::flush()
+		"UPDATE users SET  autologin",
+		"table_name='auditlog' AND field_name='auditid'",
+		"INSERT INTO profiles",
+		// login related queries that drop into infinite look on failure.
 	);
 	foreach ($whitelist as $allow) {
 		if (stripos($query, $allow) !== FALSE) {
