@@ -730,11 +730,11 @@ class CHost extends CHostGeneral {
 					self::exception(
 						ZBX_API_ERROR_PARAMETERS,
 						_n(
-							'Maximum host name length is %2$d characters, "%3$s" is %1$d character.',
-							'Maximum host name length is %2$d characters, "%3$s" is %1$d characters.',
-							zbx_strlen($host['host']),
+							'Maximum host name length is %1$d characters, "%2$s" is %3$d character.',
+							'Maximum host name length is %1$d characters, "%2$s" is %3$d characters.',
 							64,
-							$host['host']
+							$host['host'],
+							zbx_strlen($host['host'])
 						)
 					);
 				}
@@ -766,11 +766,11 @@ class CHost extends CHostGeneral {
 					self::exception(
 						ZBX_API_ERROR_PARAMETERS,
 						_n(
-							'Maximum visible host name length is %2$d characters, "%3$s" is %1$d character.',
-							'Maximum visible host name length is %2$d characters, "%3$s" is %1$d characters.',
-							zbx_strlen($host['name']),
+							'Maximum visible host name length is %1$d characters, "%2$s" is %3$d character.',
+							'Maximum visible host name length is %1$d characters, "%2$s" is %3$d characters.',
 							64,
-							$host['name']
+							$host['name'],
+							zbx_strlen($host['name'])
 						)
 					);
 				}
