@@ -366,7 +366,6 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 		'triggerids' => $srcTriggerIds,
 		'output' => array('triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type'),
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
-		'selectItems' => API_OUTPUT_EXTEND,
 		'selectDependencies' => API_OUTPUT_REFER
 	);
 	if ($srcHostId) {

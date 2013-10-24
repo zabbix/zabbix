@@ -1146,7 +1146,7 @@ else {
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => array('hostid', 'name', 'host'),
 		'selectFunctions' => API_OUTPUT_EXTEND,
-		'selectItems' => API_OUTPUT_EXTEND,
+		'selectItems' => array('itemid', 'hostid', 'key_', 'type', 'flags', 'status'),
 		'preservekeys' => true
 	));
 	$data['triggerRealHosts'] = getParentHostsByTriggers($data['itemTriggers']);
