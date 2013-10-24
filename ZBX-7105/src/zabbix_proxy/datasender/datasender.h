@@ -22,6 +22,6 @@
 
 extern int	CONFIG_PROXYDATA_FREQUENCY;
 
-void	main_datasender_loop();
+void	main_datasender_loop(void);
 
 #endif
