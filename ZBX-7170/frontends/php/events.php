@@ -135,7 +135,7 @@ if ($_REQUEST['triggerid'] > 0 && isset($_REQUEST['hostid'])) {
 	$oldTriggers = API::Trigger()->get(array(
 		'output' => array('triggerid', 'description', 'expression'),
 		'selectHosts' => array('hostid', 'host'),
-		'selectItems' => array('itemid', 'hostid', 'key_'),
+		'selectItems' => array('itemid', 'hostid', 'key_', 'type', 'flags', 'status'),
 		'selectFunctions' => API_OUTPUT_EXTEND,
 		'triggerids' => $_REQUEST['triggerid']
 	));
