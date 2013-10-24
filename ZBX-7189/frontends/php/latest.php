@@ -412,8 +412,8 @@ foreach ($items as $key => $item){
 
 	if ($filterShowDetails) {
 		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST)
-			? resolveItemKeyMacros($item)
-			: new CLink(resolveItemKeyMacros($item), 'items.php?form=update&itemid='.$item['itemid']);
+			? new CSpan(resolveItemKeyMacros($item), 'enabled')
+			: new CLink(resolveItemKeyMacros($item), 'items.php?form=update&itemid='.$item['itemid'], 'enabled');
 		$itemName = array_merge($itemName, array(BR(), SPACE, SPACE, $itemKey));
 
 		$statusIcons = array();
@@ -587,8 +587,8 @@ foreach ($items as $item) {
 
 	if ($filterShowDetails) {
 		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST)
-			? resolveItemKeyMacros($item)
-			: new CLink(resolveItemKeyMacros($item), 'items.php?form=update&itemid='.$item['itemid']);
+			? new CSpan(resolveItemKeyMacros($item), 'enabled')
+			: new CLink(resolveItemKeyMacros($item), 'items.php?form=update&itemid='.$item['itemid'], 'enabled');
 		$itemName = array_merge($itemName, array(BR(), SPACE, SPACE, $itemKey));
 
 		$statusIcons = array();
