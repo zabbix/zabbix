@@ -638,17 +638,6 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 			API::Application()->massAdd($linkApp);
 		}
 
-		// unset snmpv3 fields
-		if (isset($item['type']) && $item['type'] != ITEM_TYPE_SNMPV3) {
-			$item['snmpv3_contextname'] = '';
-			$item['snmpv3_securityname'] = '';
-			$item['snmpv3_securitylevel'] = ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV;
-			$item['snmpv3_authprotocol'] = ITEM_AUTHPROTOCOL_MD5;
-			$item['snmpv3_authpassphrase'] = '';
-			$item['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
-			$item['snmpv3_privpassphrase'] = '';
-		}
-
 		foreach ($item as $key => $field) {
 			if ($field === null) {
 				unset($item[$key]);

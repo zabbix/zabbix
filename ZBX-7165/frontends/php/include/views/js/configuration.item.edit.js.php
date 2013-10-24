@@ -39,10 +39,10 @@
 	}
 
 	function organizeInterfaces(interfaceType) {
-		var selectedInterfaceId = +jQuery('#selectedInterfaceId').val();
-		var matchingInterfaces = jQuery('#interfaceid option[data-interfacetype="' + interfaceType + '"]');
+		var selectedInterfaceId = +jQuery('#selectedInterfaceId').val(),
+			matchingInterfaces = jQuery('#interfaceid option[data-interfacetype="' + interfaceType + '"]'),
+			selectedInterfaceOption;
 
-		var selectedInterfaceOption;
 		if (selectedInterfaceId) {
 			selectedInterfaceOption = jQuery('#interfaceid option[value="' + selectedInterfaceId + '"]');
 		}
@@ -60,6 +60,7 @@
 						.prop('selected', false)
 						.prop('disabled', true)
 						.filter('[value="0"]').remove();
+
 					matchingInterfaces.prop('disabled', false);
 
 					// select the interface by interfaceid, if it's available
@@ -95,6 +96,7 @@
 					jQuery('#interfaceid option')
 						.prop('disabled', true)
 						.filter('[value="0"]').prop('disabled', false);
+
 					jQuery('#interfaceid').val(0);
 				}
 				// any interface
@@ -102,6 +104,7 @@
 					jQuery('#interfaceid option')
 						.prop('disabled', false)
 						.filter('[value="0"]').remove();
+
 					if (selectedInterfaceId) {
 						selectedInterfaceOption.prop('selected', true);
 					}
@@ -140,27 +143,27 @@
 	}
 
 	jQuery(document).ready(function() {
-		<?php if (!empty($this->data['dataTypeVisibility'])) { ?>
-		var dataTypeSwitcher = new CViewSwitcher('data_type', 'change',
-			<?php echo zbx_jsvalue($this->data['dataTypeVisibility'], true); ?>);
-		<?php } ?>
 		<?php
-		if (!empty($this->data['valueTypeVisibility'])) { ?>
-			var valueTypeSwitcher = new CViewSwitcher('value_type', 'change',
-				<?php echo zbx_jsvalue($this->data['valueTypeVisibility'], true); ?>);
+			if (!empty($this->data['typeVisibility'])) { ?>
+				new CViewSwitcher('type', 'change',
+					<?php echo zbx_jsvalue($this->data['typeVisibility'], true); ?>,
+					<?php echo zbx_jsvalue($this->data['typeDisable'], true); ?>);
 		<?php }
-		if (!empty($this->data['authTypeVisibility'])) { ?>
-			var authTypeSwitcher = new CViewSwitcher('authtype', 'change',
-				<?php echo zbx_jsvalue($this->data['authTypeVisibility'], true); ?>);
+			if (!empty($this->data['valueTypeVisibility'])) { ?>
+				new CViewSwitcher('value_type', 'change',
+					<?php echo zbx_jsvalue($this->data['valueTypeVisibility'], true); ?>);
 		<?php }
-		if (!empty($this->data['typeVisibility'])) { ?>
-			var typeSwitcher = new CViewSwitcher('type', 'change',
-				<?php echo zbx_jsvalue($this->data['typeVisibility'], true); ?>,
-				<?php echo zbx_jsvalue($this->data['typeDisable'], true); ?>);
+			if (!empty($this->data['dataTypeVisibility'])) { ?>
+				new CViewSwitcher('data_type', 'change',
+					<?php echo zbx_jsvalue($this->data['dataTypeVisibility'], true); ?>);
 		<?php }
-		if (!empty($this->data['securityLevelVisibility'])) { ?>
-			var securityLevelSwitcher = new CViewSwitcher('snmpv3_securitylevel', 'change',
-				<?php echo zbx_jsvalue($this->data['securityLevelVisibility'], true); ?>);
+			if (!empty($this->data['authTypeVisibility'])) { ?>
+				new CViewSwitcher('authtype', 'change',
+					<?php echo zbx_jsvalue($this->data['authTypeVisibility'], true); ?>);
+		<?php }
+			if (!empty($this->data['securityLevelVisibility'])) { ?>
+				new CViewSwitcher('snmpv3_securitylevel', 'change',
+					<?php echo zbx_jsvalue($this->data['securityLevelVisibility'], true); ?>);
 		<?php } ?>
 
 		var multpStat = document.getElementById('multiplier');
@@ -176,6 +179,7 @@
 				setAuthTypeLabel();
 			})
 			.trigger('change');
+
 		jQuery('#visible_type, #visible_interface').click(function() {
 			// if no item type is selected, reset the interfaces to default
 			if (!jQuery('#visible_type').is(':checked')) {
@@ -187,7 +191,7 @@
 			displayKeyButton();
 		});
 
-		jQuery('#authtype').bind('change', function() {
+		jQuery('#authtype').change(function() {
 			setAuthTypeLabel();
 		});
 
@@ -210,8 +214,7 @@
 			jQuery('#privprotocol_div').buttonset();
 		});
 
-		var maxReached = <?php echo $this->data['maxReached'] ? 'true' : 'false'; ?>;
-		if (maxReached) {
+		if (<?php echo $this->data['maxReached'] ? 'true' : 'false'; ?>) {
 			jQuery('#row-new-delay-flex-fields').hide();
 			jQuery('#row-new-delay-flex-max-reached').show();
 		}

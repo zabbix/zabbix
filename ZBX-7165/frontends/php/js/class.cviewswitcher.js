@@ -24,6 +24,7 @@ var CViewSwitcher = Class.create({
 	mainObj: null,
 	depObjects: {},
 	lastValue: null,
+	disableDDItems: null,
 
 	initialize : function(objId, objAction, confData, disableDDItems) {
 		this.mainObj = $(objId);
@@ -58,15 +59,22 @@ var CViewSwitcher = Class.create({
 			}
 		}
 
-		jQuery(this.mainObj).on(objAction, this.rebuildView.bindAsEventListener(this));
+		jQuery(this.mainObj)
+			.on(objAction, this.rebuildView.bindAsEventListener(this))
+			.on(objAction, this.rebuildChildObjects.bindAsEventListener(this));
+
 		globalAllObjForViewSwitcher[objId] = this;
 
 		this.hideAllObjs();
 		this.rebuildView();
 	},
 
-	rebuildView: function(e) {
+	rebuildView: function() {
 		var myValue = this.objValue(this.mainObj);
+
+		if (!jQuery(this.mainObj).is(':visible')) {
+			return;
+		}
 
 		// enable previously disabled dropdown items
 		if (this.disableDDItems && this.disableDDItems[this.lastValue]) {
@@ -79,9 +87,11 @@ var CViewSwitcher = Class.create({
 		if (this.disableDDItems && this.disableDDItems[myValue]) {
 			for (var DDi in this.disableDDItems[myValue]) {
 				var DD = jQuery('#' + DDi);
+
 				for (var Oi in this.disableDDItems[myValue][DDi]) {
-					DD.find('[value='+this.disableDDItems[myValue][DDi][Oi]+']').attr('disabled', true);
+					DD.find('[value=' + this.disableDDItems[myValue][DDi][Oi] + ']').attr('disabled', true);
 				}
+
 				// if selected option unavailable set to first available
 				if (DD.find('option:selected').attr('disabled')) {
 					DD.find('option:not(:disabled):first').attr('selected', true);
@@ -90,11 +100,13 @@ var CViewSwitcher = Class.create({
 			}
 		}
 
+		// hide
 		if (isset(this.lastValue, this.depObjects)) {
 			for (var key in this.depObjects[this.lastValue]) {
 				if (empty(this.depObjects[this.lastValue][key])) {
 					continue;
 				}
+
 				this.hideObj(this.depObjects[this.lastValue][key]);
 
 				if (isset(this.depObjects[this.lastValue][key].id, globalAllObjForViewSwitcher)) {
@@ -107,11 +119,13 @@ var CViewSwitcher = Class.create({
 			}
 		}
 
+		// show
 		if (isset(myValue, this.depObjects)) {
 			for (var key in this.depObjects[myValue]) {
 				if (empty(this.depObjects[myValue][key])) {
 					continue;
 				}
+
 				this.showObj(this.depObjects[myValue][key]);
 
 				if (isset(this.depObjects[myValue][key].id, globalAllObjForViewSwitcher)) {
@@ -119,6 +133,7 @@ var CViewSwitcher = Class.create({
 				}
 			}
 		}
+
 		this.lastValue = myValue;
 	},
 
@@ -126,6 +141,7 @@ var CViewSwitcher = Class.create({
 		if (is_null(obj)) {
 			return null;
 		}
+
 		var aValue = null;
 
 		switch (obj.tagName.toLowerCase()) {
@@ -142,10 +158,11 @@ var CViewSwitcher = Class.create({
 			default:
 				aValue = obj.value;
 		}
+
 		return aValue;
 	},
 
-	setObjValue : function (obj, value) {
+	setObjValue : function(obj, value) {
 		if (is_null(obj) || !isset('tagName', obj)) {
 			return null;
 		}
@@ -176,6 +193,7 @@ var CViewSwitcher = Class.create({
 		if (is_null(obj) || !isset('tagName', obj)) {
 			return null;
 		}
+
 		switch (obj.tagName.toLowerCase()) {
 			case 'th':
 			case 'td':
@@ -198,7 +216,9 @@ var CViewSwitcher = Class.create({
 		if (is_null(obj) || !isset('tagName', obj)) {
 			return null;
 		}
+
 		obj.disabled = disable;
+
 		if (obj == this.mainObj) {
 			this.rebuildView();
 		}
@@ -208,7 +228,9 @@ var CViewSwitcher = Class.create({
 		if (is_null($(data.id))) {
 			return true;
 		}
+
 		this.disableObj($(data.id), true);
+
 		$(data.id).style.display = 'none';
 	},
 
@@ -216,35 +238,40 @@ var CViewSwitcher = Class.create({
 		if (is_null($(data.id))) {
 			return true;
 		}
+
 		this.disableObj($(data.id), false);
 
 		if (!is_null(data)) {
-			var objValue = this.objValue($(data.id));
-			var defaultValue = false;
+			var objValue = this.objValue($(data.id)),
+				defaultValue = false;
 
 			for (var i in this.depObjects) {
 				for (var j in this.depObjects[i]) {
 					if (this.depObjects[i][j]['id'] == data.id
-						&& isset('defaultValue', this.depObjects[i][j])
-						&& this.depObjects[i][j]['defaultValue'] != ''
-						&& this.depObjects[i][j]['defaultValue'] == objValue) {
+							&& isset('defaultValue', this.depObjects[i][j])
+							&& this.depObjects[i][j]['defaultValue'] != ''
+							&& this.depObjects[i][j]['defaultValue'] == objValue) {
 						defaultValue = true;
 					}
 				}
 			}
+
 			if ((objValue == '' || defaultValue) && isset('defaultValue', data)) {
 				this.setObjValue($(data.id), data.defaultValue);
 			}
 		}
+
 		this.objDisplay($(data.id));
 	},
 
 	hideAllObjs: function() {
 		var hidden = {};
+
 		for (var i in this.depObjects) {
 			if (empty(this.depObjects[i])) {
 				continue;
 			}
+
 			for (var a in this.depObjects[i]) {
 				if (empty(this.depObjects[i][a])) {
 					continue;
@@ -259,7 +286,24 @@ var CViewSwitcher = Class.create({
 				if (is_null(elm)) {
 					continue;
 				}
+
 				this.hideObj(this.depObjects[i][a]);
+			}
+		}
+	},
+
+	rebuildChildObjects: function() {
+		for (var i in this.depObjects) {
+			if (empty(this.depObjects[i])) {
+				continue;
+			}
+
+			for (var a in this.depObjects[i]) {
+				if (empty(this.depObjects[i][a])) {
+					continue;
+				}
+
+				jQuery('#' + this.depObjects[i][a].id).trigger('change');
 			}
 		}
 	}
