@@ -351,6 +351,10 @@ table.suggest tr td{
 	color: #FF5500;
 }
 
+table.right_table.calculated select, table.right_table.calculated option { background: #444; }
+table.right_table .read_write option { color: #00AD00; }
+table.right_table .deny option { color: #F20000; }
+
 /*////////////////	DIVS	////////////////////*/
 /* calendar */
 div.calendar{
