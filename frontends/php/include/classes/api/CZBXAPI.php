@@ -800,15 +800,14 @@ class CZBXAPI {
 	 * @throws APIException		if any of the parameters are present in the object
 	 *
 	 * @param array		$object
-	 * @param array		$params
-	 * @param string	$error
-	 * @param array		$errorParams
+	 * @param array		$params			array of parameters to check
+	 * @param string	$error			translated error message with format
+	 * @param string	$objectName
 	 */
-	protected function checkNoParameters(array $object, array $params, $error, array $errorParams) {
+	protected function checkNoParameters(array $object, array $params, $error, $objectName) {
 		foreach ($params as $param) {
 			if (array_key_exists($param, $object)) {
-				array_unshift($errorParams, $error, $param);
-				$error = call_user_func_array('_s', $errorParams);
+				$error = _params($error, array($param, $objectName));
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 		}
