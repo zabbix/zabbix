@@ -381,7 +381,6 @@ class CGraph extends CGraphGeneral {
 		$graph = $this->get(array(
 			'graphids' => $graph['graphid'],
 			'nopermissions' => true,
-			'selectItems' => API_OUTPUT_EXTEND,
 			'selectGraphItems' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND
 		));
@@ -690,7 +689,7 @@ class CGraph extends CGraphGeneral {
 	}
 
 	/**
-	 * Validates graph item permissions
+	 * Validates graph item permissions.
 	 *
 	 * @param array $itemIds
 	 *
@@ -702,7 +701,7 @@ class CGraph extends CGraphGeneral {
 			'itemids' => $itemIds,
 			'webitems' => true,
 			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('name', 'value_type'),
 			'preservekeys' => true
 		));
 

@@ -1,11 +1,36 @@
+Changes for 2.1.9
+
+New features:
+.....J.... [ZBXNEXT-1776] added support for java.math.BigDecimal, java.math.BigInteger and some other open types (asaveljevs)
+..F.I..... [ZBXNEXT-715] increased the size of sysmaps_elements.label and sysmaps_links.label fields to 2048 characters (Sasha)
+
+Bug fixes:
+....I..... [ZBX-5590] fixed item multiplier for jmx["java.lang:type=Compilation",TotalCompilationTime] (asaveljevs)
+....I..... [ZBX-6577] improved "Template JMX Generic" by adding some interesting items and triggers (asaveljevs)
+..F....... [ZBX-7189] fixed web monitoring items not being displayed in Monitoring -> Latest data (Eduard)
+A.F....... [ZBX-7170] improved performance of item.get method and other API requests with "selectItems" option (Ivo)
+..F....... [ZBX-7144] fixed table column widths in Monitoring -> Latest data (Ivo)
+A......... [ZBX-7152] fixed get method subselects not working correctly if a specific node is selected (Ivo)
+..F....... [ZBX-7180] fixed table colours in user right assignment lists (Eduard)
+..F....... [ZBX-7085] fixed gettext errors when omitting the number placeholder in singular form translations (Pavels)
+
+--------------------------------------------------------------------------------
 Changes for 2.1.8
 
 New features:
+.....J.... [ZBX-6404] added support for values of type java.lang.Double when toString() returns them in scientific format (asaveljevs)
+.......PS. [ZBXNEXT-78] added support for scientific notation for received values and item multipliers for items of type "Numeric (float)" (asaveljevs)
+...G...PS. [ZBXNEXT-1855] dynamic display of process current activity and statistics in "ps" and "top" (Igors, Andris, wiper)
 ..F.....S. [ZBXNEXT-1806] changed the way nth day and nth week are calculated in maintenances (asaveljevs, Pavels)
 ..F....... [ZBX-7097] changed dashboard drag'n'drop widget placeholder color in the dark orange and dark blue themes (Pavels)
 A.F....... [ZBX-1357] updated Dutch, Finnish, Indonesian, Italian, Lithuanian, Persian, Portuguese (Portugal), Russian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A.F.I...S. [ZBX-7105] fixed performance of housekeeper; improved indexes for table "events"; fixed SQL statements to use the new indexes (Sasha)
+A...I..... [ZBX-7163] fixed default values for sysmaps.label_location and sysmaps_elements.label_location fields; added NOT NULL constraint to sysmaps_elements.label_location field (Sasha)
+...G...PS. [ZBXNEXT-1179] fixed inconsistency in process activity time logging (Andris)
+A......... [ZBX-6362] fixed proxy select interfaces (Eduard)
+..F....... [ZBX-7115] improved data filtering in latest data page (Eduard)
 .......PS. [ZBX-6835] fixed bug when agent/proxy connection error could have resulted in a wrong warning about message size (wiper)
 A......... [ZBX-7164] fixed trigger and trigger prototype read only fields to no longer change when linking template to host (Ivo)
 A.F....... [ZBX-6760] improved performance of getting global scripts (Sasha)
@@ -508,6 +533,7 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.10rc1
 
 New features:
+..F....... [ZBX-7103] improved loading speed of tr_events.php page (Sasha)
 A.F....... [ZBX-1357] updated Dutch, German, Hungarian, Japanese, Italian, Romanian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:

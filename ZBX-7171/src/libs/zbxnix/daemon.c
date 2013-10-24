@@ -218,8 +218,6 @@ int	daemon_start(int allow_root)
 	/* other cases, SIGCHLD is set to SIG_DFL in zbx_child_fork(). */
 	zbx_set_child_signal_handler();
 
-	zbx_setproctitle("main process");
-
 	return MAIN_ZABBIX_ENTRY();
 }
 

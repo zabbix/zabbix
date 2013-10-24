@@ -157,23 +157,23 @@ int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	mode = get_rparam(request, 0);
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
-		ret = VM_MEMORY_TOTAL(mode);
+		ret = VM_MEMORY_TOTAL(result);
 	else if (0 == strcmp(mode, "active"))
-		ret = VM_MEMORY_ACTIVE(mode);
+		ret = VM_MEMORY_ACTIVE(result);
 	else if (0 == strcmp(mode, "inactive"))
-		ret = VM_MEMORY_INACTIVE(mode);
+		ret = VM_MEMORY_INACTIVE(result);
 	else if (0 == strcmp(mode, "wired"))
-		ret = VM_MEMORY_WIRED(mode);
+		ret = VM_MEMORY_WIRED(result);
 	else if (0 == strcmp(mode, "free"))
-		ret = VM_MEMORY_FREE(mode);
+		ret = VM_MEMORY_FREE(result);
 	else if (0 == strcmp(mode, "used"))
-		ret = VM_MEMORY_USED(mode);
+		ret = VM_MEMORY_USED(result);
 	else if (0 == strcmp(mode, "pused"))
-		ret = VM_MEMORY_PUSED(mode);
+		ret = VM_MEMORY_PUSED(result);
 	else if (0 == strcmp(mode, "available"))
-		ret = VM_MEMORY_AVAILABLE(mode);
+		ret = VM_MEMORY_AVAILABLE(result);
 	else if (0 == strcmp(mode, "pavailable"))
-		ret = VM_MEMORY_PAVAILABLE(mode);
+		ret = VM_MEMORY_PAVAILABLE(result);
 
 	return ret;
 }

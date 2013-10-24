@@ -320,7 +320,8 @@ class CZBXAPI {
 		if ($table) {
 			$res = DBselect(API::getApi()->createSelectQuery($table, array(
 				'output' => array($baseField, $foreignField),
-				'filter' => array($baseField => array_keys($objects))
+				'filter' => array($baseField => array_keys($objects)),
+				'nodeids' => get_current_nodeid(true)
 			)));
 			while ($relation = DBfetch($res)) {
 				$relationMap->addRelation($relation[$baseField], $relation[$foreignField]);
