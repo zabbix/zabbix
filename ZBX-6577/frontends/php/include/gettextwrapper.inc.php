@@ -111,25 +111,25 @@ function _s($string) {
 }
 
 /**
- * Translates the string in the correct form with respect to the given numeric parameter.
+ * Translates the string in the correct form with respect to the given numeric parameter. According to gettext
+ * standards the numeric parameter must be passed last.
  * Supports unlimited parameters; placeholders must be defined as %1$s, %2$s etc.
  *
  * Examples:
- * _n('%1$s item on host %2$s', '%1$s items on host %2$s', 1, 'Zabbix server') // 1 item on host Zabbix server
- * _n('%1$s item on host %2$s', '%1$s items on host %2$s', 2, 'Zabbix server') // 2 items on host Zabbix server
+ * _n('%2$s item on host %1$s', '%2$s items on host %1$s', 'Zabbix server', 1) // 1 item on host Zabbix server
+ * _n('%2$s item on host %1$s', '%2$s items on host %1$s', 'Zabbix server', 2) // 2 items on host Zabbix server
  *
  * @param string $string1		singular string
  * @param string $string2		plural string
- * @param string $param			numeric parameter that will be used to choose the correct form, also gets replaced as
- *								the first parameter
+ * @param string $param			parameter to replace the first placeholder
  * @param string $param,...		unlimited number of optional parameters
  *
  * @return string
  */
-function _n($string1, $string2, $value) {
+function _n($string1, $string2) {
 	$arguments = array_slice(func_get_args(), 2);
 
-	return vsprintf(ngettext($string1, $string2, $value), $arguments);
+	return vsprintf(ngettext($string1, $string2, end($arguments)), $arguments);
 }
 
 /**

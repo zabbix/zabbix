@@ -22,6 +22,6 @@
 
 extern int	CONFIG_HEARTBEAT_FREQUENCY;
 
-void	main_heart_loop();
+void	main_heart_loop(void);
 
 #endif
