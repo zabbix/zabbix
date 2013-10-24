@@ -580,11 +580,7 @@ foreach ($triggers as $trigger) {
 	$description->setMenuPopup(getMenuPopupTrigger($trigger, $triggerItems));
 
 	if ($_REQUEST['show_details']) {
-		$font = new CTag('font', 'yes');
-		$font->setAttribute('color', '#000');
-		$font->setAttribute('size', '-2');
-		$font->addItem(explode_exp($trigger['expression'], true, true));
-		$description = array($description, BR(), $font);
+		$description = array($description, BR(), explode_exp($trigger['expression'], true, true));
 	}
 
 	if (!empty($trigger['dependencies'])) {
