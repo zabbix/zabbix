@@ -630,11 +630,11 @@ class CHostInterface extends CZBXAPI {
 			self::exception(
 				ZBX_API_ERROR_PARAMETERS,
 				_n(
-					'Maximum DNS name length is %2$d characters, "%3$s" is %1$d character.',
-					'Maximum DNS name length is %2$d characters, "%3$s" is %1$d characters.',
-					zbx_strlen($interface['dns']),
+					'Maximum DNS name length is %1$d characters, "%2$s" is %3$d character.',
+					'Maximum DNS name length is %1$d characters, "%2$s" is %3$d characters.',
 					64,
-					$interface['dns']
+					$interface['dns'],
+					zbx_strlen($interface['dns'])
 				)
 			);
 		}

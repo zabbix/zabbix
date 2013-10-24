@@ -20,7 +20,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT(src/zabbix_server/server.c)
-AM_INIT_AUTOMAKE([zabbix],[2.1.8])
+AM_INIT_AUTOMAKE([zabbix],[2.1.9])
 
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
@@ -872,12 +872,12 @@ aix*)
 	;;
 darwin*|rhapsody*)
 	ARCH="osx"
-	AC_DEFINE([MAC_OS_X], 1, [Define to 1 if you are using Mac OS X])
+	AC_DEFINE([MAC_OS_X], 1, [Define to 1 if you are using Mac OS X.])
 	;;
 *solaris*)
 	ARCH="solaris"
 	dnl Forcing a 64-bit application for a 64-bit Solaris
-	dnl A 32-bit program that uses /proc is able to look at 32-bit processes, 
+	dnl A 32-bit program that uses /proc is able to look at 32-bit processes,
 	dnl but is not able to understand all attributes of a 64-bit process.
 	AC_MSG_CHECKING(for -m64 compilation flag)
 	saved_CFLAGS="$CFLAGS"
@@ -887,7 +887,7 @@ darwin*|rhapsody*)
 	CFLAGS="-m64 $saved_CFLAGS"
 	AC_MSG_RESULT(yes),
 	CFLAGS="$saved_CFLAGS"
-	AC_MSG_RESULT(no))	
+	AC_MSG_RESULT(no))
 	;;
 hpux*)
 	ARCH="hpux"
@@ -1181,6 +1181,22 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	SERVER_LDFLAGS="$SERVER_LDFLAGS $JABBER_LDFLAGS"
 	SERVER_LIBS="$SERVER_LIBS $JABBER_LIBS"
 
+	dnl Check for LIBXML2 [by default - skip]
+	LIBXML2_CHECK_CONFIG([no])
+	if test "x$want_libxml2" = "xyes"; then
+		if test "x$found_libxml2" != "xyes"; then
+			AC_MSG_ERROR([LIBXML2 library not found])
+		else
+			have_libxml2="yes"
+		fi
+	fi
+	CFLAGS="$CFLAGS $LIBXML2_CFLAGS"
+	SERVER_LDFLAGS="$SERVER_LDFLAGS $LIBXML2_LDFLAGS"
+	SERVER_LIBS="$SERVER_LIBS $LIBXML2_LIBS"
+
+	PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBXML2_LDFLAGS"
+	PROXY_LIBS="$PROXY_LIBS $LIBXML2_LIBS"
+
 	dnl Checking for libCurl [default - yes]
 	LIBCURL_CHECK_CONFIG(, [7.13.1], [],[])
 	if test "x$want_curl" = "xyes"; then
@@ -1270,22 +1286,6 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 	PROXY_LDFLAGS="$PROXY_LDFLAGS $SSH2_LDFLAGS"
 	PROXY_LIBS="$PROXY_LIBS $SSH2_LIBS"
-
-	dnl Check for LIBXML2 [by default - skip]
-	LIBXML2_CHECK_CONFIG([no])
-	if test "x$want_libxml2" = "xyes"; then
-		if test "x$found_libxml2" != "xyes"; then
-			AC_MSG_ERROR([LIBXML2 library not found])
-		else
-			have_libxml2="yes"
-		fi
-	fi
-	CFLAGS="$CFLAGS $LIBXML2_CFLAGS"
-	SERVER_LDFLAGS="$SERVER_LDFLAGS $LIBXML2_LDFLAGS"
-	SERVER_LIBS="$SERVER_LIBS $LIBXML2_LIBS"
-
-	PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBXML2_LDFLAGS"
-	PROXY_LIBS="$PROXY_LIBS $LIBXML2_LIBS"
 
 	found_openipmi="no"
 	dnl Check for libOpenIPMI [by default - skip]

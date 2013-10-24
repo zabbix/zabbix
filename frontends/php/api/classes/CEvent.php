@@ -638,7 +638,8 @@ class CEvent extends CZBXAPI {
 					'output' => $this->outputExtend('acknowledges',
 						array('acknowledgeid', 'eventid', 'clock'), $options['select_acknowledges']
 					),
-					'filter' => array('eventid' => $eventIds)
+					'filter' => array('eventid' => $eventIds),
+					'nodeids' => get_current_nodeid(true)
 				));
 				$sqlParts['order'][] = 'a.clock DESC';
 

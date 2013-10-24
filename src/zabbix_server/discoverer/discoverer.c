@@ -669,11 +669,12 @@ static void	process_rule(DB_DRULE *drule)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	process_discovery(int now)
+static int	process_discovery(int now)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_DRULE	drule;
+	int		rule_count = 0;
 
 	result = DBselect(
 			"select distinct r.druleid,r.iprange,r.name,c.dcheckid"
@@ -706,8 +707,11 @@ static void	process_discovery(int now)
 
 		DBexecute("update drules set nextcheck=%d+delay where druleid=" ZBX_FS_UI64,
 				now, drule.druleid);
+		rule_count++;
 	}
 	DBfree_result(result);
+
+	return rule_count;	/* performance metric */
 }
 
 static int	get_minnextcheck(int now)
@@ -749,32 +753,60 @@ static int	get_minnextcheck(int now)
  * Comments: executes once per 30 seconds (hardcoded)                         *
  *                                                                            *
  ******************************************************************************/
-void	main_discoverer_loop()
+void	main_discoverer_loop(void)
 {
-	int	now, nextcheck, sleeptime;
-	double	sec;
+	int	now, nextcheck, sleeptime = -1, rule_count = 0, old_rule_count = 0;
+	double	sec, total_sec = 0.0, old_total_sec = 0.0;
+	time_t	last_stat_time;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In main_discoverer_loop() process_num:%d", process_num);
+#define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
+				/* once in STAT_INTERVAL seconds */
 
-	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
+	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
+	last_stat_time = time(NULL);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
-		zbx_setproctitle("%s [performing discovery]", get_process_type_string(process_type));
+		if (0 != sleeptime)
+		{
+			zbx_setproctitle("%s #%d [processed %d rules in " ZBX_FS_DBL " sec, performing discovery]",
+					get_process_type_string(process_type), process_num, old_rule_count,
+					old_total_sec);
+		}
 
 		now = time(NULL);
 		sec = zbx_time();
-		process_discovery(now);
-		sec = zbx_time() - sec;
-
-		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while processing rules",
-				get_process_type_string(process_type), process_num, sec);
+		rule_count += process_discovery(now);
+		total_sec += zbx_time() - sec;
 
 		nextcheck = get_minnextcheck(now);
 		sleeptime = calculate_sleeptime(nextcheck, DISCOVERER_DELAY);
 
+		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
+		{
+			if (0 == sleeptime)
+			{
+				zbx_setproctitle("%s #%d [processed %d rules in " ZBX_FS_DBL " sec, performing "
+						"discovery]", get_process_type_string(process_type), process_num,
+						rule_count, total_sec);
+			}
+			else
+			{
+				zbx_setproctitle("%s #%d [processed %d rules in " ZBX_FS_DBL " sec, idle %d sec]",
+						get_process_type_string(process_type), process_num, rule_count,
+						total_sec, sleeptime);
+				old_rule_count = rule_count;
+				old_total_sec = total_sec;
+			}
+			rule_count = 0;
+			total_sec = 0.0;
+			last_stat_time = time(NULL);
+		}
+
 		zbx_sleep_loop(sleeptime);
 	}
+
+#undef STAT_INTERVAL
 }
