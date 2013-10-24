@@ -97,14 +97,7 @@ function get_cookie($name, $default_value = null) {
 }
 
 function zbx_setcookie($name, $value, $time = null) {
-	setcookie(
-		$name,
-		$value,
-		isset($time) ? $time : 0,
-		null,
-		null,
-		isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on'
-	);
+	setcookie($name, $value, isset($time) ? $time : 0, null, null, HTTPS);
 	$_COOKIE[$name] = $value;
 }
 
