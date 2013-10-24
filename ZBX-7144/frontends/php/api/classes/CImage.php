@@ -490,8 +490,8 @@ class CImage extends CZBXAPI {
 
 		if (!empty($usedInIconmaps)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_n('The image is used in icon map %2$s.', 'The image is used in icon maps %2$s.',
-					count($usedInIconmaps), '"'.implode('", "', $usedInIconmaps).'"')
+				_n('The image is used in icon map %1$s.', 'The image is used in icon maps %1$s.',
+					'"'.implode('", "', $usedInIconmaps).'"', count($usedInIconmaps))
 			);
 		}
 
@@ -516,8 +516,8 @@ class CImage extends CZBXAPI {
 
 		if (!empty($usedInMaps)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_n('The image is used in map %2$s.', 'The image is used in maps %2$s.',
-				count($usedInMaps), '"'.implode('", "', $usedInMaps).'"')
+				_n('The image is used in map %1$s.', 'The image is used in maps %1$s.',
+				'"'.implode('", "', $usedInMaps).'"', count($usedInMaps))
 			);
 		}
 

@@ -28,7 +28,6 @@
 
 #define ZBX_VMWARE_STATE_UPDATING	0x100
 
-
 typedef struct
 {
 	zbx_uint64_t	nic_packets_rx;

@@ -25,7 +25,7 @@
 extern int	CONFIG_SENDER_FREQUENCY;
 extern char	*CONFIG_ALERT_SCRIPTS_PATH;
 
-void	main_alerter_loop();
+void	main_alerter_loop(void);
 
 int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int max_error_len);
 

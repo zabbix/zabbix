@@ -256,7 +256,7 @@
 				}
 			}
 
-			$table = new CTable(_('No accessible resources'), 'right_table');
+			$table = new CTable(_('No accessible resources'), 'right_table calculated');
 			if (!$isHeaderDisplayed) {
 				$table->setHeader(array(_('Read-write'), _('Read only'), _('Deny')), 'header');
 				$isHeaderDisplayed = true;

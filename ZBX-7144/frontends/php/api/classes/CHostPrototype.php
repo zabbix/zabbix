@@ -1325,7 +1325,8 @@ class CHostPrototype extends CHostBase {
 			}
 			$inventory = API::getApi()->select('host_inventory', array(
 				'output' => $output,
-				'filter' => array('hostid' => $hostPrototypeIds)
+				'filter' => array('hostid' => $hostPrototypeIds),
+				'nodeids' => get_current_nodeid(true)
 			));
 			$result = $relationMap->mapOne($result, zbx_toHash($inventory, 'hostid'), 'inventory');
 		}

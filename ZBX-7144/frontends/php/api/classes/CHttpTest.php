@@ -748,7 +748,8 @@ class CHttpTest extends CZBXAPI {
 				$httpSteps = API::getApi()->select('httpstep', array(
 					'output' => $this->outputExtend('httpstep', array('httptestid', 'httpstepid'), $options['selectSteps']),
 					'filters' => array('httptestid' => $httpTestIds),
-					'preservekeys' => true
+					'preservekeys' => true,
+					'nodeids' => get_current_nodeid(true)
 				));
 				$relationMap = $this->createRelationMap($httpSteps, 'httptestid', 'httpstepid');
 
