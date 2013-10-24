@@ -152,8 +152,8 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 
 	$items = API::Item()->get(array(
 		'itemids' => $resourceId,
-		'selectHosts' => array('hostid', 'name', 'status'),
-		'output' => API_OUTPUT_EXTEND
+		'selectHosts' => array('name'),
+		'output' => array('itemid', 'key_', 'name')
 	));
 	if (!empty($items)) {
 		$id = $resourceId;
@@ -234,8 +234,8 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 
 	$items = API::Item()->get(array(
 		'itemids' => $resourceId,
-		'selectHosts' => array('hostid', 'name'),
-		'output' => API_OUTPUT_EXTEND
+		'selectHosts' => array('name'),
+		'output' => array('itemid', 'key_', 'name')
 	));
 	if (!empty($items)) {
 		$id = $resourceId;
@@ -488,7 +488,7 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 		$items = API::Item()->get(array(
 			'itemids' => $resourceId,
 			'selectHosts' => array('name'),
-			'output' => API_OUTPUT_EXTEND
+			'output' => array('itemid', 'key_', 'name')
 		));
 		if ($items) {
 			$item = reset($items);

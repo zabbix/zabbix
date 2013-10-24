@@ -531,10 +531,10 @@ elseif (isset($_REQUEST['save'])) {
 
 			$graphs = API::Graph()->get(array(
 				'hostids' => $srcHostId,
-				'selectItems' => API_OUTPUT_EXTEND,
+				'selectItems' => array('type'),
 				'output' => API_OUTPUT_EXTEND,
 				'inherited' => false,
-				'selectHosts' => API_OUTPUT_REFER,
+				'selectHosts' => array('hostid'),
 				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 			));
 			foreach ($graphs as $graph) {
