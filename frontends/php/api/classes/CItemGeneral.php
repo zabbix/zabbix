@@ -201,8 +201,11 @@ abstract class CItemGeneral extends CZBXAPI {
 			if ($update) {
 				check_db_fields($dbItems[$item['itemid']], $fullItem);
 
-				$this->checkNoParameters($item, array('templateid', 'state'),
-					_s('Cannot update "%1$s" for item "%2$s".', '%1$s', $item['name'])
+				$this->checkNoParameters(
+					$item,
+					array('templateid', 'state'),
+					_('Cannot update "%1$s" for item "%2$s".'),
+					$item['name']
 				);
 
 				// apply rules
@@ -234,8 +237,11 @@ abstract class CItemGeneral extends CZBXAPI {
 
 				check_db_fields($itemDbFields, $fullItem);
 
-				$this->checkNoParameters($item, array('templateid', 'state'),
-					_s('Cannot set "%1$s" for item "%2$s".', '%1$s', $item['name'])
+				$this->checkNoParameters(
+					$item,
+					array('templateid', 'state'),
+					_('Cannot set "%1$s" for item "%2$s".'),
+					$item['name']
 				);
 			}
 
