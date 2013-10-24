@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-24 18:19+0300\n"
+"POT-Creation-Date: 2013-10-24 18:31+0300\n"
 "PO-Revision-Date: 2013-10-09 19:40+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -18,7 +18,7 @@ msgstr ""
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
 #: maintenance.php:141 maintenance.php:153 services.php:184 services.php:198
-#, c-format
+#, php-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
 msgstr "\"%s\" должно быть между 1970.01.01 и 2038.01.18."
 
@@ -31,7 +31,7 @@ msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integ
 msgstr "\"Мигание триггеров при изменении состояния\" должно быть \"0\" или положительным целым числом."
 
 #: include/func.inc.php:467
-#, c-format
+#, php-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
 msgstr[0] "%1$d день"
@@ -39,7 +39,7 @@ msgstr[1] "%1$d дней"
 msgstr[2] "%1$d дня"
 
 #: include/blocks.inc.php:1020
-#, c-format
+#, php-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
 msgstr[0] ""
@@ -47,12 +47,12 @@ msgstr[1] ""
 msgstr[2] ""
 
 #: chart4.php:89 chart5.php:83
-#, c-format
+#, php-format
 msgid "%1$s (year %2$s)"
 msgstr "%1$s (год %2$s)"
 
 #: latest.php:509 latest.php:683
-#, c-format
+#, php-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
 msgstr[0] "%1$s элемент данных"
@@ -63,7 +63,7 @@ msgstr[2] "%1$s элементов данных"
 #: include/views/configuration.item.edit.php:372
 #: include/views/configuration.item.edit.php:389
 #: include/views/configuration.item.edit.php:393
-#, c-format
+#, php-format
 msgid "%1$s day"
 msgid_plural "%1$s days"
 msgstr[0] "%1$s день"
@@ -71,7 +71,7 @@ msgstr[1] "%1$s дня"
 msgstr[2] "%1$s дней"
 
 #: include/page_header.php:447
-#, c-format
+#, php-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgstr[0] ""
@@ -79,7 +79,7 @@ msgstr[1] ""
 msgstr[2] ""
 
 #: include/views/monitoring.discovery.php:131
-#, c-format
+#, php-format
 msgid "%d device"
 msgid_plural "%d devices"
 msgstr[0] "%d устройство"
@@ -87,7 +87,7 @@ msgstr[1] "%d устройства"
 msgstr[2] "%d устройств"
 
 #: include/users.inc.php:293
-#, c-format
+#, php-format
 msgctxt "user fullname"
 msgid "(%1$s %2$s)"
 msgstr "(%1$s %2$s)"
@@ -236,7 +236,7 @@ msgid "Access denied."
 msgstr "Доступ запрещен."
 
 #: api/classes/CUser.php:881
-#, c-format
+#, php-format
 msgid "Account is blocked for %s seconds"
 msgstr "Аккаунт заблокирован на %s секунд"
 
@@ -316,22 +316,22 @@ msgstr "Действие"
 
 #: api/classes/CAction.php:544 api/classes/CAction.php:558
 #: api/classes/CAction.php:685
-#, c-format
+#, php-format
 msgid "Action \"%1$s\" already exists."
 msgstr "Действие \"%1$s\" уже существует."
 
 #: api/classes/CAction.php:541 api/classes/CAction.php:656
-#, c-format
+#, php-format
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seconds)."
 msgstr "В действии \"%1$s\" задано некорректное значение для \"esc_period\" (минимально %2$s секунд)."
 
 #: api/classes/CAction.php:727
-#, c-format
+#, php-format
 msgid "Action \"%1$s\" no operations defined."
 msgstr "В действии \"%1$s\" нет заданных операций."
 
 #: api/classes/CAction.php:665
-#, c-format
+#, php-format
 msgid "Action \"%s\" already exists."
 msgstr "Действие \"%s\" уже существует."
 
@@ -522,7 +522,7 @@ msgid "Age less than"
 msgstr "Возраст менее чем"
 
 #: include/views/monitoring.overview.php:64
-#, c-format
+#, php-format
 msgid "Age less than %s"
 msgstr "Возраст менее чем %s"
 
@@ -612,7 +612,7 @@ msgid "Application"
 msgstr "Группа элементов данных"
 
 #: api/classes/CApplication.php:375
-#, c-format
+#, php-format
 msgid "Application \"%1$s\" already exists."
 msgstr "Группа элементов данных \"%1$s\" уже существует."
 
@@ -633,7 +633,7 @@ msgid "Application updated"
 msgstr "Группа элементов данных обновлена"
 
 #: api/classes/CItemGeneral.php:368
-#, c-format
+#, php-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Группа элементов данных с ID \"%1$s\" недоступна для \"%2$s\"."
 
@@ -704,22 +704,22 @@ msgid "Asset tag"
 msgstr "Этикетка владельца"
 
 #: include/maintenances.inc.php:56
-#, c-format
+#, php-format
 msgid "At %1$s:%2$s on %3$s"
 msgstr "В %1$s:%2$s с %3$s"
 
 #: include/maintenances.inc.php:125
-#, c-format
+#, php-format
 msgid "At %1$s:%2$s on %3$s %4$s of every %5$s"
 msgstr "В %1$s:%2$s с %3$s %4$s каждый %5$s"
 
 #: include/maintenances.inc.php:134
-#, c-format
+#, php-format
 msgid "At %1$s:%2$s on day %3$s of every %4$s"
 msgstr "В %1$s:%2$s с дня %3$s каждый %4$s"
 
 #: include/maintenances.inc.php:83
-#, c-format
+#, php-format
 msgid "At %1$s:%2$s on every %3$s of every week"
 msgid_plural "At %1$s:%2$s on every %3$s of every %4$s weeks"
 msgstr[0] ""
@@ -727,7 +727,7 @@ msgstr[1] ""
 msgstr[2] ""
 
 #: include/maintenances.inc.php:63
-#, c-format
+#, php-format
 msgid "At %1$s:%2$s on every day"
 msgid_plural "At %1$s:%2$s on every %3$s days"
 msgstr[0] ""
@@ -1218,17 +1218,17 @@ msgid "Cannot activate web scenario"
 msgstr "Не удалось активировать веб-сценарий"
 
 #: api/classes/CGraph.php:721
-#, c-format
+#, php-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
 msgstr "Не удалось добавить не числовой элемент данных \"%1$s\" на график \"%2$s\"."
 
 #: api/classes/CGraphPrototype.php:721 api/classes/CGraphPrototype.php:783
-#, c-format
+#, php-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
 msgstr "Не удалось добавить не числовой элемент данных \"%1$s\" к прототипу графика \"%2$s\"."
 
 #: include/reports.inc.php:505
-#, c-format
+#, php-format
 msgid "Cannot add a non-numeric item \"%1$s\"."
 msgstr "Не удалось добавить не числовой элемент данных \"%1$s\"."
 
@@ -1249,7 +1249,7 @@ msgid "Cannot add dependency from a host to a template."
 msgstr "Не удалось добавить зависимость от узла сети к шаблону."
 
 #: include/triggers.inc.php:505
-#, c-format
+#, php-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
 msgstr "Не удалось добавить зависимость от триггера \"%1$s:%2$s\" к несуществующему триггеру \"%3$s:%4$s\"."
 
@@ -1286,7 +1286,7 @@ msgid "Cannot add item"
 msgstr "Не удалось добавить элемент данных"
 
 #: api/classes/CApplication.php:547
-#, c-format
+#, php-format
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
 msgstr ""
 
@@ -1307,12 +1307,12 @@ msgid "Cannot add media type"
 msgstr "Не удалось добавить способ оповещения"
 
 #: api/classes/CGraph.php:43
-#, c-format
+#, php-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
 msgstr "Невозможно добавить более одного элемента данных с типом \"Сумма графика\" в график \"%1$s\"."
 
 #: api/classes/CGraphPrototype.php:43
-#, c-format
+#, php-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
 msgstr "Не удалось добавить более одного элемента данных с типом 'Суммарный график' к прототипу графика \"%1$s\"."
 
@@ -1321,7 +1321,7 @@ msgid "Cannot add network map"
 msgstr "Не удалось добавить карту сети"
 
 #: httpconf.php:193
-#, c-format
+#, php-format
 msgid "Cannot add new application \"%1$s\"."
 msgstr "Не удалось добавить новую группу элементов данных \"%1$s\"."
 
@@ -1427,12 +1427,12 @@ msgid "Cannot copy items"
 msgstr "Не удалось скопировать элементы данных"
 
 #: include/triggers.inc.php:412
-#, c-format
+#, php-format
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
 msgstr "Не удалось скопировать триггер \"%1$s:%2$s\", потому что он содержит несколько узлов сети в выражении."
 
 #: api/classes/CHostPrototype.php:151
-#, c-format
+#, php-format
 msgid "Cannot create a host prototype on a discovered host \"%1$s\"."
 msgstr "Не удалось создать прототип узла сети от обнаруженного узла сети \"%1$s\"."
 
@@ -1461,12 +1461,12 @@ msgid "Cannot create icon map"
 msgstr "Не удалось создать соответствие иконок"
 
 #: api/classes/CIconMap.php:181 api/classes/CIconMap.php:241
-#, c-format
+#, php-format
 msgid "Cannot create icon maps with identical name \"%s\"."
 msgstr "Невозможно создать соответствие иконок с таким же именем \"%s\"."
 
 #: include/classes/import/CXmlImport18.php:817
-#, c-format
+#, php-format
 msgid "Cannot create map \"%s\"."
 msgstr "Не удалось создать карту сети \"%s\"."
 
@@ -1483,7 +1483,7 @@ msgid "Cannot create screen."
 msgstr "Не удалось создать комплексный экран."
 
 #: api/classes/CUser.php:1198
-#, c-format
+#, php-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Не удалось удалить внутреннего пользователя Zabbix \"%1$s\", попробуйте отключить его."
 
@@ -1612,12 +1612,12 @@ msgid "Cannot delete scripts. Empty input parameter \"scriptids\"."
 msgstr "Не удалось удалить скрипты. Пустой входящий параметр \"scriptids\"."
 
 #: api/classes/CScript.php:542
-#, c-format
+#, php-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
 msgstr "Не удалось удалить скрипты. Скрипт \"%1$s\" используется в операции действия \"%2$s\"."
 
 #: api/classes/CScript.php:525
-#, c-format
+#, php-format
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr "Не удалось удалить скрипты. Скрипт с scriptid \"%1$s\" не существует."
 
@@ -1662,12 +1662,12 @@ msgid "Cannot delete templated items."
 msgstr "Не удалось удалить шаблонные элементы данных."
 
 #: api/classes/CTrigger.php:1875 api/classes/CTriggerPrototype.php:674
-#, c-format
+#, php-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Не удалось удалить шаблонный триггер \"%1$s:%2$s\"."
 
 #: api/classes/CHttpTest.php:390
-#, c-format
+#, php-format
 msgid "Cannot delete templated web scenario \"%1$s\"."
 msgstr "Не удалось удалить шаблонный веб-сценарий \"%1$s\"."
 
@@ -1729,85 +1729,85 @@ msgstr "Не удалось включить способ оповещения"
 
 #: include/classes/import/CXmlImport18.php:677
 #: include/classes/import/importers/CMapImporter.php:188
-#, c-format
+#, php-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
 msgstr "Не удалось найти фоновое изображение \"%1$s\" используемое на карте сети \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:508
 #: include/classes/import/CXmlImport18.php:1667
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
-#, c-format
+#, php-format
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не удалось найти график \"%1$s\" используемый в комплексном экране \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:724
 #: include/classes/import/importers/CMapImporter.php:210
-#, c-format
+#, php-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
 msgstr "Не удалось найти группу \"%1$s\" используемую на карте сети \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:485
 #: include/classes/import/importers/CAbstractScreenImporter.php:53
-#, c-format
+#, php-format
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не удалось найти группу \"%1$s\" используемую в комплексном экране \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:735
 #: include/classes/import/importers/CMapImporter.php:218
-#, c-format
+#, php-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
 msgstr "Не удалось найти узел сети \"%1$s\" используемый на карте сети \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:497
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
-#, c-format
+#, php-format
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не удалось найти узел сети \"%1$s\" используемый в комплексном экране \"%2$s\"."
 
 #: api/classes/CDiscoveryRule.php:748 api/classes/CDiscoveryRule.php:824
 #: api/classes/CItemGeneral.php:101 include/items.inc.php:344
 #: include/items.inc.php:395
-#, c-format
+#, php-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
 msgstr "Не удалось найти интерфейс у узла сети \"%1$s\" для ключа элемента данных \"%2$s\"."
 
 #: include/classes/import/CConfigurationImport.php:853
 #: include/classes/import/CConfigurationImport.php:934
-#, c-format
+#, php-format
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
 msgstr ""
 
 #: include/classes/import/CXmlImport18.php:768
 #: include/classes/import/importers/CMapImporter.php:247
-#, c-format
+#, php-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
 msgstr "Не удалось найти иконку \"%1$s\" используемую на карте сети \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:180
-#, c-format
+#, php-format
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "Не удалось найти иконку \"%1$s\" используемую на карте сети \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:521
 #: include/classes/import/CXmlImport18.php:1680
 #: include/classes/import/importers/CAbstractScreenImporter.php:82
-#, c-format
+#, php-format
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не удалось найти элемент данных \"%1$s\" используемый в комплексном экране \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:713
-#, c-format
+#, php-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
 msgstr "Не удалось найти карту сети \"%1$s\" используемую в экспортированной карте сети \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:202
-#, c-format
+#, php-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "Не удалось найти карту сети \"%1$s\" используемую на карте сети \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:532
 #: include/classes/import/importers/CAbstractScreenImporter.php:90
-#, c-format
+#, php-format
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не удалось найти карту сети \"%1$s\" используемую в комплексном экране \"%2$s\"."
 
@@ -1817,7 +1817,7 @@ msgstr "Не удалось найти объекты с именем"
 
 #: include/classes/import/CXmlImport18.php:543
 #: include/classes/import/importers/CAbstractScreenImporter.php:98
-#, c-format
+#, php-format
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не удалось найти комплексный экран \"%1$s\" используемый в комплексном экране \"%2$s\"."
 
@@ -1825,7 +1825,7 @@ msgstr "Не удалось найти комплексный экран \"%1$s\
 #: include/classes/import/CXmlImport18.php:789
 #: include/classes/import/importers/CMapImporter.php:227
 #: include/classes/import/importers/CMapImporter.php:268
-#, c-format
+#, php-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Не удалось найти триггер \"%1$s\" используемый на карте сети \"%2$s\"."
 
@@ -1843,12 +1843,12 @@ msgstr "Видимое имя шаблона не может быть пусты
 
 #: api/classes/CTrigger.php:1100 api/classes/CTrigger.php:1239
 #: api/classes/CTriggerPrototype.php:755 api/classes/CTriggerPrototype.php:813
-#, c-format
+#, php-format
 msgid "Cannot implode expression \"%s\"."
 msgstr "Не удалось раскрыть выражение \"%s\"."
 
 #: include/classes/import/importers/CScreenImporter.php:78
-#, c-format
+#, php-format
 msgid "Cannot import screen \"%1$s\": subscreen \"%2$s\" does not exist."
 msgid_plural "Cannot import screen \"%1$s\": subscreens \"%2$s\" do not exist."
 msgstr[0] ""
@@ -1856,7 +1856,7 @@ msgstr[1] ""
 msgstr[2] ""
 
 #: include/classes/import/importers/CTemplateImporter.php:114
-#, c-format
+#, php-format
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" does not exist."
 msgstr[0] ""
@@ -1864,7 +1864,7 @@ msgstr[1] ""
 msgstr[2] ""
 
 #: include/classes/class.cview.php:113
-#, c-format
+#, php-format
 msgid "Cannot include view file \"%s\"."
 msgstr "Не удалось подключить \"view file\" \"%s\"."
 
@@ -1897,22 +1897,22 @@ msgid "Cannot mass update visible template name"
 msgstr "Невозможно массово обновить видимое имя шаблона"
 
 #: api/classes/CHostBase.php:57
-#, c-format
+#, php-format
 msgid "Cannot pass duplicate template IDs for the linkage: %s."
 msgstr "Невозможно передать одинаковые ID шаблонов для присоединения: %s."
 
 #: include/classes/db/DB.php:699
-#, c-format
+#, php-format
 msgid "Cannot perform delete statement on table \"%1$s\" without where condition."
 msgstr "Невозможно выполнить запрос удаления из таблицы \"%1$s\" без выражения where."
 
 #: include/classes/db/DB.php:521
-#, c-format
+#, php-format
 msgid "Cannot perform update statement on table \"%1$s\" without values."
 msgstr "Невозможно выполнить запрос обновления таблицы \"%1$s\" без значений."
 
 #: include/classes/db/DB.php:532
-#, c-format
+#, php-format
 msgid "Cannot perform update statement on table \"%1$s\" without where condition."
 msgstr "Невозможно выполнить запрос обновления таблицы \"%1$s\" без выражения where."
 
@@ -1921,7 +1921,7 @@ msgid "Cannot process applications from different hosts or templates."
 msgstr ""
 
 #: include/classes/server/CZabbixServer.php:222
-#, c-format
+#, php-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
 msgstr "Не удалось прочитать ответ, проверьте соединение с Zabbix сервером \"%1$s\"."
 
@@ -1942,32 +1942,32 @@ msgid "Cannot save discovery rule without checks."
 msgstr "Невозможно сохранить правило обнаружения без проверок."
 
 #: include/classes/server/CZabbixServer.php:192
-#, c-format
+#, php-format
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Не удалось отправить команду, проверьте соединение с Zabbix сервером \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:238
-#, c-format
+#, php-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "Не удалось установить \"%1$s\" для элемента данных \"%2$s\"."
 
 #: api/classes/CTrigger.php:660
-#, c-format
+#, php-format
 msgid "Cannot set \"%1$s\" for trigger \"%2$s\"."
 msgstr "Не удалось установить \"%1$s\" для триггера \"%2$s\"."
 
 #: api/classes/CApplication.php:345
-#, c-format
+#, php-format
 msgid "Cannot set \"templateid\" for application \"%1$s\"."
 msgstr "Не удалось установить \"templateid\" для группы элементов данных \"%1$s\"."
 
 #: api/classes/CScreen.php:376
-#, c-format
+#, php-format
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
 msgstr "Не удалось установить \"templateid\" для комплексного экрана \"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:507
-#, c-format
+#, php-format
 msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "Не удалось установить \"templateid\" для прототипа триггера \"%1$s\"."
 
@@ -2020,57 +2020,57 @@ msgid "Cannot unlink template"
 msgstr "Не удалось отсоединить шаблон"
 
 #: api/classes/CHostGeneral.php:233
-#, c-format
+#, php-format
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
 msgstr "Не удалось отсоединить триггер \"%s\", он содержит элементы данных из шаблона, который остается присоединенным к узлу сети."
 
 #: api/classes/CHost.php:684
-#, c-format
+#, php-format
 msgid "Cannot update \"%1$s\" for a discovered host."
 msgstr "Не удалось обновить \"%1$s\" для обнаруженного узла сети."
 
 #: api/classes/CItemGeneral.php:176
-#, c-format
+#, php-format
 msgid "Cannot update \"%1$s\" for a discovered item."
 msgstr "Не удалось обновить \"%1$s\" для обнаруженного элемента данных."
 
 #: api/classes/CTrigger.php:631
-#, c-format
+#, php-format
 msgid "Cannot update \"%1$s\" for a discovered trigger."
 msgstr "Не удалось обновить \"%1$s\" для обнаруженного триггера."
 
 #: api/classes/CItemGeneral.php:205
-#, c-format
+#, php-format
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
 msgstr "Не удалось обновить \"%1$s\" для элемента данных \"%2$s\"."
 
 #: api/classes/CTrigger.php:657
-#, c-format
+#, php-format
 msgid "Cannot update \"%1$s\" for trigger \"%2$s\"."
 msgstr "Не удалось обновить \"%1$s\" для триггера \"%2$s\"."
 
 #: api/classes/CApplication.php:342
-#, c-format
+#, php-format
 msgid "Cannot update \"templateid\" for application \"%1$s\"."
 msgstr "Не удалось обновить \"templateid\" для группы элементов данных \"%1$s\"."
 
 #: api/classes/CGraph.php:42
-#, c-format
+#, php-format
 msgid "Cannot update \"templateid\" for graph \"%1$s\"."
 msgstr "Не удалось обновить \"templateid\" для графика \"%1$s\"."
 
 #: api/classes/CGraphPrototype.php:42
-#, c-format
+#, php-format
 msgid "Cannot update \"templateid\" for graph prototype \"%1$s\"."
 msgstr "Не удалось обновить \"templateid\" у прототипа графика \"%1$s\"."
 
 #: api/classes/CScreen.php:447 api/classes/CTemplateScreen.php:668
-#, c-format
+#, php-format
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
 msgstr "Не удалось обновить \"templateid\" для комплексного экрана \"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:576
-#, c-format
+#, php-format
 msgid "Cannot update \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "Не удалось обновить \"templateid\" для прототипа триггера \"%1$s\"."
 
@@ -2126,7 +2126,7 @@ msgstr "Не удалось обновить группу."
 
 #: api/classes/CHostGroup.php:792 api/classes/CHostGroup.php:850
 #: api/classes/CHostGroup.php:909
-#, c-format
+#, php-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Не удалось обновить группы для обнаруженного узла сети \"%1$s\"."
 
@@ -2159,7 +2159,7 @@ msgid "Cannot update image."
 msgstr "Не удалось обновить изображение."
 
 #: api/classes/CHostInterface.php:395
-#, c-format
+#, php-format
 msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr "Не удалось обновить интерфейс для обнаруженного узла сети \"%1$s\"."
 
@@ -2184,7 +2184,7 @@ msgid "Cannot update maintenance"
 msgstr "Не удалось обновить обслуживание"
 
 #: include/classes/import/CXmlImport18.php:808
-#, c-format
+#, php-format
 msgid "Cannot update map \"%s\"."
 msgstr "Не удалось обновить карту сети \"%s\"."
 
@@ -2205,7 +2205,7 @@ msgid "Cannot update proxy"
 msgstr "Не удалось обновить прокси"
 
 #: api/classes/CProxy.php:299
-#, c-format
+#, php-format
 msgid "Cannot update proxy for discovered host \"%1$s\"."
 msgstr "Не удалось обновить прокси для обнаруженного узла сети \"%1$s\"."
 
@@ -2246,7 +2246,7 @@ msgid "Cannot update templated applications."
 msgstr "Не удалось обновить шаблонные группы элементов данных."
 
 #: api/classes/CTemplate.php:790 api/classes/CTemplate.php:1061
-#, c-format
+#, php-format
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr "Не удалось обновить шаблоны для обнаруженного узла сети \"%1$s\"."
 
@@ -2281,7 +2281,7 @@ msgstr "Не удалось обновить веб-сценарий"
 
 #: include/views/js/configuration.discovery.edit.js.php:600
 msgid "Cannot validate discovery check: invalid request or connection to Zabbix server failed."
-msgstr "Не удалось проверить проверку обнаружения: ошибочный запрос или не удалось подключиться к Zabbix серверу.Не удалось проверить проверку обнаружения: ошибочный запрос или не удалось подключиться к Zabbix серверу."
+msgstr "Не удалось проверить проверку обнаружения: ошибочный запрос или не удалось подключиться к Zabbix серверу.Не удалось проверить проверку обнаружения: ошибочный запрос или не удалось подключиться к Zabbix серверу.Не удалось проверить проверку обнаружения: ошибочный запрос или не удалось подключиться к Zabbix серверу."
 
 #: popup_bitem.php:114 popup_period.php:114
 msgid "Caption"
@@ -2336,7 +2336,7 @@ msgid "Check already exists."
 msgstr "Проверка уже существует."
 
 #: include/classes/parsers/CTriggerExpression.php:290
-#, c-format
+#, php-format
 msgid "Check expression part starting from \"%1$s\"."
 msgstr "Проверьте часть выражения начиная с \"%1$s\"."
 
@@ -2370,22 +2370,22 @@ msgid "Chinese (zh_TW)"
 msgstr "Китайский (zh_TW)"
 
 #: api/classes/CMapElement.php:70
-#, c-format
+#, php-format
 msgid "Circular link cannot be created for map element \"%s\"."
 msgstr "Закольцовывающая связь не может быть создана для элемента карты сети \"%s\"."
 
 #: include/classes/import/importers/CMapImporter.php:89
-#, c-format
+#, php-format
 msgid "Circular reference in maps: %1$s."
 msgstr "Закольцованная ссылка в картах сети: %1$s."
 
 #: include/classes/import/importers/CScreenImporter.php:104
-#, c-format
+#, php-format
 msgid "Circular reference in screens: %1$s."
 msgstr "Закольцованная ссылка в комплексных экранах: %1$s."
 
 #: include/classes/import/importers/CTemplateImporter.php:139
-#, c-format
+#, php-format
 msgid "Circular reference in templates: %1$s."
 msgstr "Закольцованная ссылка в шаблонах: %1$s."
 
@@ -2464,7 +2464,7 @@ msgstr "Цвет"
 
 #: include/classes/validators/CColorValidator.php:32
 #: include/validate.inc.php:354 jsLoader.php:163
-#, c-format
+#, php-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "Цвет \"%1$s\" не корректный: ожидается шестнадцатеричный код цвета (6 символов)."
 
@@ -2478,7 +2478,7 @@ msgid "Column span"
 msgstr "Объединение столбцов"
 
 #: api/classes/CScreenItem.php:611
-#, c-format
+#, php-format
 msgid "Column span of screen element located at X - %1$s and Y - %2$s is too big."
 msgstr "Объединение колонок у элемента комплексного экрана размещенного в X - %1$s и Y - %2$s слишком большое."
 
@@ -2523,7 +2523,7 @@ msgid "Comments"
 msgstr "Комментарии"
 
 #: include/views/monitoring.triggerComment.php:43
-#, c-format
+#, php-format
 msgid "Comments for \"%s\"."
 msgstr "Комментарии по \"%s\"."
 
@@ -2722,7 +2722,7 @@ msgid "Configuration updated"
 msgstr "Настройки обновлены"
 
 #: dashboard.php:270
-#, c-format
+#, php-format
 msgid "Configure (Filter %s)"
 msgstr "Настройка (Фильтр %s)"
 
@@ -2743,22 +2743,22 @@ msgid "Connect to"
 msgstr "Подключаться через"
 
 #: include/page_footer.php:98
-#, c-format
+#, php-format
 msgid "Connected as '%1$s'"
 msgstr "Подключен как '%1$s'"
 
 #: include/page_footer.php:95
-#, c-format
+#, php-format
 msgid "Connected as '%1$s' from '%2$s'"
 msgstr "Подключен как '%1$s' с '%2$s'"
 
 #: include/classes/server/CZabbixServer.php:208
-#, c-format
+#, php-format
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "Превышено время ожидания %1$s секунд при подключении к Zabbix серверу \"%2$s\"."
 
 #: include/classes/server/CZabbixServer.php:283
-#, c-format
+#, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" failed. Possible reasons:\n"
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
@@ -2769,7 +2769,7 @@ msgstr ""
 "2. Некорректная настройка DNS сервера.\n"
 
 #: include/classes/server/CZabbixServer.php:271
-#, c-format
+#, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" refused. Possible reasons:\n"
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
@@ -2784,7 +2784,7 @@ msgstr ""
 "4. Фаервол блокирует TCP подключение.\n"
 
 #: include/classes/server/CZabbixServer.php:279
-#, c-format
+#, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" timed out. Possible reasons:\n"
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
@@ -2824,7 +2824,7 @@ msgid "Copy selected to ..."
 msgstr "Копировать выбранное в..."
 
 #: api/classes/CUser.php:950
-#, c-format
+#, php-format
 msgid "Correct login \"%s\"."
 msgstr "Корректный вход \"%s\"."
 
@@ -2971,42 +2971,42 @@ msgid "Create value map"
 msgstr "Создать преобразование значения"
 
 #: api/classes/managers/CApplicationManager.php:73
-#, c-format
+#, php-format
 msgid "Created: Application \"%1$s\" on \"%2$s\"."
 msgstr "Создано: Группа элементов данных \"%1$s\" в \"%2$s\"."
 
 #: api/classes/CDiscoveryRule.php:615
-#, c-format
+#, php-format
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Создано: Правило обнаружения \"%1$s\" в \"%2$s\"."
 
 #: api/classes/CHostPrototype.php:364
-#, c-format
+#, php-format
 msgid "Created: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Создано: Прототип узла сети \"%1$s\" у \"%2$s\"."
 
 #: api/classes/CItem.php:591
-#, c-format
+#, php-format
 msgid "Created: Item \"%1$s\" on \"%2$s\"."
 msgstr "Создано: Элемент данных \"%1$s\" в \"%2$s\"."
 
 #: api/classes/CItemPrototype.php:409
-#, c-format
+#, php-format
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Создано: Прототип элемента данных \"%1$s\" в \"%2$s\"."
 
 #: api/classes/CTrigger.php:1134
-#, c-format
+#, php-format
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Создано: Триггер \"%1$s\" в \"%2$s\"."
 
 #: api/classes/CTriggerPrototype.php:763
-#, c-format
+#, php-format
 msgid "Created: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Создано: Прототип триггера \"%1$s\" в \"%2$s\"."
 
 #: api/classes/managers/CHttpTestManager.php:124
-#, c-format
+#, php-format
 msgid "Created: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "Создано: Веб-сценарий \"%1$s\" в \"%2$s\"."
 
@@ -3068,7 +3068,7 @@ msgid "Custom label"
 msgstr "Пользовательская подпись"
 
 #: api/classes/CMap.php:441
-#, c-format
+#, php-format
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
 msgstr "Пользовательская подпись для карты сети \"%2$s\" у элементов с типом \"%1$s\" не может быть пустой."
 
@@ -3201,7 +3201,7 @@ msgid "Data"
 msgstr "Данные"
 
 #: include/classes/class.cchart.php:2462 include/classes/class.cpie.php:720
-#, c-format
+#, php-format
 msgid "Data from %1$s. Generated in %2$s sec."
 msgstr "Данные из %1$s. Сгенерировано за %2$s сек."
 
@@ -3392,7 +3392,7 @@ msgid "Default theme"
 msgstr "Тема по умолчанию"
 
 #: adm.gui.php:73
-#, c-format
+#, php-format
 msgid "Default theme \"%1$s\"."
 msgstr "Тема по умолчанию \"%1$s\"."
 
@@ -3658,7 +3658,7 @@ msgid "Delete selected value mapping?"
 msgstr "Удалить выбранное преобразование значений?"
 
 #: adm.valuemapping.php:179
-#, c-format
+#, php-format
 msgid "Delete selected value mapping? It is used for %d item!"
 msgid_plural "Delete selected value mapping? It is used for %d items!"
 msgstr[0] "Удалить выбранное преобразование значений? Оно используется для %d элемента данных!"
@@ -3694,62 +3694,62 @@ msgid "Deleted"
 msgstr "Удален"
 
 #: api/classes/CApplication.php:479
-#, c-format
+#, php-format
 msgid "Deleted: Application \"%1$s\" on \"%2$s\"."
 msgstr "Удалено: Группа элементов данных \"%1$s\" из \"%2$s\"."
 
 #: api/classes/CDiscoveryRule.php:422
-#, c-format
+#, php-format
 msgid "Deleted: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Удалено: Правило обнаружения \"%1$s\" из \"%2$s\"."
 
 #: api/classes/CGraph.php:594
-#, c-format
+#, php-format
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Удалено: График \"%1$s\" из \"%2$s\"."
 
 #: api/classes/CHost.php:1592
-#, c-format
+#, php-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Удалено: Узел сети \"%1$s\"."
 
 #: api/classes/CHostPrototype.php:971
-#, c-format
+#, php-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Удалено: Прототип узла сети \"%1$s\" из \"%2$s\"."
 
 #: api/classes/CItem.php:783
-#, c-format
+#, php-format
 msgid "Deleted: Item \"%1$s\" on \"%2$s\"."
 msgstr "Удалено: Элемент данных \"%1$s\" из \"%2$s\"."
 
 #: api/classes/CItemPrototype.php:594
-#, c-format
+#, php-format
 msgid "Deleted: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Удалено: Прототип элемента данных \"%1$s\" из \"%2$s\"."
 
 #: api/classes/CProxy.php:470
-#, c-format
+#, php-format
 msgid "Deleted: Proxy \"%1$s\"."
 msgstr "Удалено: Прокси \"%1$s\"."
 
 #: api/classes/CTemplate.php:756
-#, c-format
+#, php-format
 msgid "Deleted: Template \"%1$s\"."
 msgstr "Удалено: Шаблон \"%1$s\"."
 
 #: api/classes/CTrigger.php:854
-#, c-format
+#, php-format
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Удалено: Триггер \"%1$s\" из \"%2$s\"."
 
 #: api/classes/CTriggerPrototype.php:718
-#, c-format
+#, php-format
 msgid "Deleted: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Удалено: Прототип триггера \"%1$s\" из \"%2$s\"."
 
 #: api/classes/CHttpTest.php:450
-#, c-format
+#, php-format
 msgid "Deleted: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "Удалено: Веб-сценарий \"%1$s\" из \"%2$s\"."
 
@@ -4041,22 +4041,22 @@ msgid "Discovery rule"
 msgstr "Правило обнаружения"
 
 #: api/classes/CDiscoveryRule.php:41
-#, c-format
+#, php-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\""
 msgstr "Правило обнаружения \"%1$s\" уже существует у \"%2$s\""
 
 #: api/classes/CDiscoveryRule.php:40
-#, c-format
+#, php-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Правило обнаружения \"%1$s\" уже существует у \"%2$s\", наследуется из другого шаблона."
 
 #: api/classes/CDiscoveryRule.php:667
-#, c-format
+#, php-format
 msgid "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
 msgstr "У правила обнаружения \"%1$s:%2$s\" некорректный период хранения потерянных ресурсов: \"%3$s\". (мин: %4$d, макс: %5$d, допускается пользовательский макрос)"
 
 #: api/classes/CDRule.php:455 api/classes/CDRule.php:524
-#, c-format
+#, php-format
 msgid "Discovery rule \"%s\" already exists."
 msgstr "Правило обнаружения \"%s\" уже существует."
 
@@ -4110,7 +4110,7 @@ msgid "Displaying"
 msgstr "Отображено"
 
 #: search.php:232 search.php:334 search.php:470
-#, c-format
+#, php-format
 msgid "Displaying %1$s of %2$s found"
 msgstr "Отображено %1$s из %2$s найденых"
 
@@ -4181,57 +4181,57 @@ msgid "Dropdown first entry"
 msgstr "Первая запись в выпадающем меню"
 
 #: adm.gui.php:77
-#, c-format
+#, php-format
 msgid "Dropdown first entry \"%1$s\"."
 msgstr "Первая запись в выпадающем меню \"%1$s\"."
 
 #: adm.gui.php:78
-#, c-format
+#, php-format
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr "Запоминать выбранное в выпадающем списке \"%1$s\"."
 
 #: api/classes/CTrigger.php:1583
-#, c-format
+#, php-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Дублирующиеся зависимости в триггере \"%1$s\"."
 
 #: api/classes/CHostPrototype.php:197
-#, c-format
+#, php-format
 msgid "Duplicate group prototype name \"%2$s\" for host prototype \"%1$s\"."
 msgstr "Дубликат имени прототипа группы \"%2$s\" у прототипа узла сети \"%1$s\"."
 
 #: api/classes/CHostPrototype.php:191
-#, c-format
+#, php-format
 msgid "Duplicate host group ID \"%2$s\" for host prototype \"%1$s\"."
 msgstr "Дубликат ID группы узлов сети \"%2$s\" у прототипа узла сети \"%1$s\"."
 
 #: api/classes/CHost.php:747
-#, c-format
+#, php-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
 msgstr "Дубликат узла сети. Узел сети с таким же именем \"%s\" уже существует в данных."
 
 #: api/classes/CHost.php:779
-#, c-format
+#, php-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr "Дубликат узла сети. Узел сети с таким же видимым именем \"%s\" уже существует в данных."
 
 #: api/classes/CMap.php:400
-#, c-format
+#, php-format
 msgid "Duplicate map name for map \"%s\"."
 msgstr "Дублированное имя карты сети для карты сети \"%s\"."
 
 #: api/classes/CScript.php:417 api/classes/CScript.php:473
-#, c-format
+#, php-format
 msgid "Duplicate script name \"%1$s\"."
 msgstr "Дублированное имя скрипта \"%1$s\"."
 
 #: include/profiles.inc.php:345
-#, c-format
+#, php-format
 msgid "Duplicate severity name \"%s\"."
 msgstr "Дублированное имя важности \"%s\"."
 
 #: api/classes/CUser.php:307
-#, c-format
+#, php-format
 msgid "Duplicate user alias \"%s\"."
 msgstr "Дубликат псевдонима пользователя \"%s\"."
 
@@ -4371,12 +4371,12 @@ msgid "Empty name for group prototype."
 msgstr "Пустое имя у прототипа группы."
 
 #: api/classes/CHostPrototype.php:181
-#, c-format
+#, php-format
 msgid "Empty name for host prototype \"%1$s\"."
 msgstr "Пустое имя у прототипа узла сети \"%1$s\"."
 
 #: api/classes/CScript.php:575
-#, c-format
+#, php-format
 msgid "Empty name for script \"%1$s\"."
 msgstr "Пустое имя для скрипта \"%1$s\"."
 
@@ -4393,7 +4393,7 @@ msgid "Empty parameters"
 msgstr "Пустые параметры"
 
 #: include/classes/server/CZabbixServer.php:232
-#, c-format
+#, php-format
 msgid "Empty response received from Zabbix server \"%1$s\"."
 msgstr "Получен пустой ответ от Zabbix сервера \"%1$s\"."
 
@@ -4541,12 +4541,12 @@ msgid "Error"
 msgstr "Ошибка"
 
 #: include/db.inc.php:951
-#, c-format
+#, php-format
 msgid "Error in search request for table \"%1$s\"."
 msgstr "Ошибка в запросе поиска в таблице \"%1$s\"."
 
 #: httpdetails.php:159 httpdetails.php:230
-#, c-format
+#, php-format
 msgid "Error: %1$s"
 msgstr "Ошибка: %1$s"
 
@@ -4571,7 +4571,7 @@ msgid "Event acknowledged"
 msgstr "Событие подтверждено"
 
 #: adm.gui.php:74
-#, c-format
+#, php-format
 msgid "Event acknowledges \"%1$s\"."
 msgstr "Подтверждение событий \"%1$s\"."
 
@@ -4635,7 +4635,7 @@ msgid "Execute"
 msgstr "Выполнить"
 
 #: api/classes/CImage.php:290
-#, c-format
+#, php-format
 msgid "Execute SQL error [%1$s] in [%2$s]."
 msgstr "Ошибка выполнения SQL [%1$s] в [%2$s]."
 
@@ -4664,7 +4664,7 @@ msgid "Expand single problem"
 msgstr "Развертывание одиночной проблемы"
 
 #: api/rpc/class.cjsonrpc.php:90
-#, c-format
+#, php-format
 msgid "Expecting JSON-rpc version 2.0, \"%s\" is given."
 msgstr "Ожидался JSON-rpc версии 2.0, а получена \"%s\"."
 
@@ -4800,47 +4800,47 @@ msgid "Field"
 msgstr "Поле"
 
 #: include/classes/db/DB.php:327
-#, c-format
+#, php-format
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr "Поле \"%1$s\" не может быть NULL."
 
 #: include/validate.inc.php:400
-#, c-format
+#, php-format
 msgid "Field \"%1$s\" is mandatory."
 msgstr "Поле \"%1$s\" обязательно."
 
 #: include/validate.inc.php:313
-#, c-format
+#, php-format
 msgid "Field \"%1$s\" is not IP range."
 msgstr "Поле \"%1$s\" не диапазон IP адресов."
 
 #: include/validate.inc.php:303
-#, c-format
+#, php-format
 msgid "Field \"%1$s\" is not IP."
 msgstr "Поле \"%1$s\" не IP адрес."
 
 #: include/validate.inc.php:338
-#, c-format
+#, php-format
 msgid "Field \"%1$s\" is not decimal number."
 msgstr "Поле \"%1$s\" не десятичное число."
 
 #: include/validate.inc.php:323
-#, c-format
+#, php-format
 msgid "Field \"%1$s\" is not integer list or range."
 msgstr "Поле \"%1$s\" не список и не диапазон чисел."
 
 #: include/validate.inc.php:332
-#, c-format
+#, php-format
 msgid "Field \"%1$s\" is not integer."
 msgstr "Поле \"%1$s\" не число."
 
 #: include/validate.inc.php:344
-#, c-format
+#, php-format
 msgid "Field \"%1$s\" is not string."
 msgstr "Поле \"%1$s\" не строка."
 
 #: include/validate.inc.php:412
-#, c-format
+#, php-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "Поле \"%1$s\" должно быть пропущено."
 
@@ -4861,12 +4861,12 @@ msgid "File format is unsupported."
 msgstr "Формат файла не поддерживается."
 
 #: include/classes/helpers/CUploadFile.php:153
-#, c-format
+#, php-format
 msgid "File is too big, max upload size is %1$s bytes."
 msgstr "Файл слишком большой, максимальный размер загружаемого файла %1$s байт."
 
 #: include/classes/class.cview.php:68
-#, c-format
+#, php-format
 msgid "File provided to a view does not exist. Tried to find \"%s\"."
 msgstr "Файл указанный как представление не существует. Была попытка найти \"%s\"."
 
@@ -5024,7 +5024,7 @@ msgid "General"
 msgstr "Общие"
 
 #: chart4.php:168 chart5.php:200 include/classes/class.cbar.php:779
-#, c-format
+#, php-format
 msgid "Generated in %s sec"
 msgstr "Сгенерировано за %s сек."
 
@@ -5107,49 +5107,49 @@ msgid "Graph"
 msgstr "График"
 
 #: api/classes/CGraph.php:447 api/classes/CGraphPrototype.php:463
-#, c-format
+#, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (inherited from another template)."
 msgstr "График \"%1$s\" уже существует в \"%2$s\" (унаследован из другого шаблона)."
 
 #: api/classes/CGraph.php:468 api/classes/CGraph.php:475
 #: api/classes/CGraphPrototype.php:485 api/classes/CGraphPrototype.php:492
-#, c-format
+#, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (items are not identical)."
 msgstr "График \"%1$s\" уже существует в \"%2$s\" (элементы данных не идентичны)."
 
 #: api/classes/CGraph.php:426 api/classes/CGraphPrototype.php:441
-#, c-format
+#, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\"."
 msgstr "График \"%1$s\" уже существует в \"%2$s\"."
 
 #: api/classes/CGraph.php:400 api/classes/CGraphPrototype.php:407
-#, c-format
+#, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymax value item)."
 msgstr "График \"%1$s\" не может быть унаследован. Не хватает обязательных элементов данных у \"%2$s\" (элемента данных для макс значения оси Y)."
 
 #: api/classes/CGraph.php:408 api/classes/CGraphPrototype.php:416
-#, c-format
+#, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymin value item)."
 msgstr "График \"%1$s\" не может быть унаследован. Не хватает обязательных элементов данных у \"%2$s\" (элемента данных для мин значения оси Y)."
 
 #: api/classes/CGraph.php:394 api/classes/CGraphPrototype.php:401
-#, c-format
+#, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
 msgstr "График \"%1$s\" не может быть унаследован. Не хватает обязательных элементов данных у \"%2$s\"."
 
 #: api/classes/CTemplateScreen.php:587
-#, c-format
+#, php-format
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "График \"%1$s\" не существует у шаблона \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:1559
 #: include/classes/import/CXmlImport18.php:1563
-#, c-format
+#, php-format
 msgid "Graph \"%1$s\" skipped - user rule."
 msgstr "График \"%1$s\" пропущен - правило пользователя."
 
 #: api/classes/CGraph.php:38
-#, c-format
+#, php-format
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
 msgstr "График \"%1$s\" с элементами данных из шаблона не может содержать элементы данных из других узлов сети."
 
@@ -5178,12 +5178,12 @@ msgid "Graph prototype"
 msgstr "Прототип графиков"
 
 #: api/classes/CGraphPrototype.php:38
-#, c-format
+#, php-format
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
 msgstr "Прототип графика \"%1$s\" с элементами данных из шаблона не может содержать элементы данных из других узлов сети."
 
 #: api/classes/CGraphPrototype.php:609
-#, c-format
+#, php-format
 msgid "Graph prototype \"%s\" deleted."
 msgstr "Прототип графика \"%s\" удален."
 
@@ -5217,7 +5217,7 @@ msgid "Graph updated"
 msgstr "График обновлен"
 
 #: api/classes/CGraphGeneral.php:735
-#, c-format
+#, php-format
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
 msgstr "График с именем \"%1$s\" уже существует в графиках или в прототипах графиков."
 
@@ -5287,17 +5287,17 @@ msgid "Group"
 msgstr "Группа"
 
 #: api/classes/CHostGroup.php:613
-#, c-format
+#, php-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
 msgstr "Группа \"%1$s\" не может быть удалена, так как используется прототипом узла сети."
 
 #: include/classes/import/importers/CTemplateImporter.php:233
-#, c-format
+#, php-format
 msgid "Group \"%1$s\" does not exist."
 msgstr "Группа \"%1$s\" не существует."
 
 #: include/classes/import/importers/CHostImporter.php:131
-#, c-format
+#, php-format
 msgid "Group \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Группа \"%1$s\" для узла сети \"%2$s\" не существует."
 
@@ -5327,7 +5327,7 @@ msgid "Group prototype ID cannot be empty."
 msgstr "ID прототипа группы не может быть пустым."
 
 #: api/classes/CHostPrototype.php:156 api/classes/CHostPrototype.php:434
-#, c-format
+#, php-format
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
 msgstr "Прототип группы не может основываться на обнаруженной группе узлов сети \"%1$s\"."
 
@@ -5552,22 +5552,22 @@ msgid "Host"
 msgstr "Узел сети"
 
 #: api/classes/CHost.php:1107
-#, c-format
+#, php-format
 msgid "Host \"%1$s\" already exists."
 msgstr "Узел сети \"%1$s\" уже существует."
 
 #: api/classes/CProxy.php:591
-#, c-format
+#, php-format
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
 msgstr "Узел сети \"%1$s\" наблюдается через прокси \"%2$s\"."
 
 #: api/classes/CTemplate.php:510
-#, c-format
+#, php-format
 msgid "Host \"%s\" already exists."
 msgstr "Узел сети \"%s\" уже существует."
 
 #: include/classes/import/CXmlImport18.php:928
-#, c-format
+#, php-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
 msgstr "У узла сети \"%s\" выбран параметр \"useipmi\", но не указан параметр \"ipmi_ip\"! Будет использован IP адрес узла сети, как адрес для IPMI интерфейса."
 
@@ -5615,22 +5615,22 @@ msgid "Host group"
 msgstr "Группа узлов сети"
 
 #: api/classes/CHostGroup.php:487 api/classes/CHostGroup.php:552
-#, c-format
+#, php-format
 msgid "Host group \"%1$s\" already exists."
 msgstr "Группа узлов сети \"%1$s\" уже существует."
 
 #: api/classes/CHostGroup.php:645
-#, c-format
+#, php-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
 msgstr "Группа узлов сети \"%1$s\" не может быть удалена, так как используется в глобальном скрипте."
 
 #: api/classes/CHostGroup.php:626
-#, c-format
+#, php-format
 msgid "Host group \"%1$s\" cannot be deleted, because some hosts depend on it."
 msgstr "Группа узлов сети \"%1$s\" не может быть удалена, так как некоторые узлы сети принадлежат этой группе."
 
 #: api/classes/CHostGroup.php:600
-#, c-format
+#, php-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
 msgstr "Группа узлов сети \"%1$s\" является внутренней и не может быть удалена."
 
@@ -5693,12 +5693,12 @@ msgid "Host name"
 msgstr "Имя узла сети"
 
 #: api/classes/CHostPrototype.php:174
-#, c-format
+#, php-format
 msgid "Host name \"%1$s\" is too long, it must not be longer than %2$d characters."
 msgstr "Имя узла сети \"%1$s\" слишком длинное, оно не должно быть длиннее чем %2$d символов."
 
 #: api/classes/CHostPrototype.php:176
-#, c-format
+#, php-format
 msgid "Host name for host prototype \"%1$s\" must contain macros."
 msgstr "Имя узла сети для прототипа узла сети \"%1$s\" должно содержать макросы."
 
@@ -5707,17 +5707,17 @@ msgid "Host networks"
 msgstr "Сети узла сети"
 
 #: api/classes/CHostPrototype.php:785
-#, c-format
+#, php-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Прототип узла сети \"%1$s\" уже существует у \"%2$s\", унаследованный из другого шаблона."
 
 #: api/classes/CHostPrototype.php:773
-#, c-format
+#, php-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "Прототип узла сети \"%1$s\" уже существует у \"%2$s\"."
 
 #: api/classes/CHostPrototype.php:189
-#, c-format
+#, php-format
 msgid "Host prototype \"%1$s\" must have at least one host group."
 msgstr "Прототип узла сети \"%1$s\" должен иметь по крайней мере одну группу узлов сети."
 
@@ -5734,22 +5734,22 @@ msgid "Host prototype updated"
 msgstr "Прототип узла сети обновлен"
 
 #: api/classes/CHostPrototype.php:1100
-#, c-format
+#, php-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "Прототип узла сети с именем узла сети \"%1$s\" уже существует в правиле обнаружения \"%2$s\"."
 
 #: api/classes/CHostPrototype.php:1096
-#, c-format
+#, php-format
 msgid "Host prototype with host name \"%1$s\" already exists."
 msgstr "Прототип узла сети с именем узла сети \"%1$s\" уже существует."
 
 #: api/classes/CHostPrototype.php:1108
-#, c-format
+#, php-format
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "Прототип узла сети с видимым именем \"%1$s\" уже существует в правиле обнаружения \"%2$s\"."
 
 #: api/classes/CHostPrototype.php:1105
-#, c-format
+#, php-format
 msgid "Host prototype with visible name \"%1$s\" already exists."
 msgstr "Прототип узла сети с видимым именем \"%1$s\" уже существует."
 
@@ -5808,13 +5808,13 @@ msgid "Host updated"
 msgstr "Узел сети обновлен"
 
 #: api/classes/CHost.php:809 api/classes/CTemplate.php:882
-#, c-format
+#, php-format
 msgid "Host with the same name \"%s\" already exists."
 msgstr "Узел сети с таким же именем \"%s\" уже существует."
 
 #: api/classes/CHost.php:815 api/classes/CTemplate.php:520
 #: api/classes/CTemplate.php:855
-#, c-format
+#, php-format
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "Узел сети с таким же видимым именем \"%s\" уже существует."
 
@@ -6061,42 +6061,42 @@ msgid "Icon map"
 msgstr "Соответствие иконок"
 
 #: api/classes/CIconMap.php:328
-#, c-format
+#, php-format
 msgid "Icon map \"%1$s\" cannot be deleted. Used in map \"%2$s\"."
 msgstr "Соответствие иконок \"%1$s\" не может быть удалено. Используется в карте сети \"%2$s\"."
 
 #: api/classes/CIconMap.php:433
-#, c-format
+#, php-format
 msgid "Icon map \"%1$s\" has mapping with incorrect iconid \"%2$s\"."
 msgstr "Соответствие иконок \"%1$s\" ссылается на некорректный iconid \"%2$s\"."
 
 #: api/classes/CIconMap.php:429
-#, c-format
+#, php-format
 msgid "Icon map \"%1$s\" has mapping with incorrect inventory link \"%2$s\"."
 msgstr "Соответствие иконок \"%1$s\" ссылается на некорректную связь \"%2$s\" с инвентарными данными."
 
 #: api/classes/CIconMap.php:198 api/classes/CIconMap.php:276
-#, c-format
+#, php-format
 msgid "Icon map \"%s\" already exists."
 msgstr "Соответствие иконок \"%s\" уже существует."
 
 #: api/classes/CIconMap.php:443
-#, c-format
+#, php-format
 msgid "Icon map \"%s\" cannot have mapping with empty expression."
 msgstr "Соответствие иконок \"%s\" не может ссылаться на пустое выражение."
 
 #: api/classes/CIconMap.php:447
-#, c-format
+#, php-format
 msgid "Icon map \"%s\" cannot have mapping with global expression that does not exist."
 msgstr "Соответствие иконок \"%s\" не может ссылаться на глобальное выражение которого не существует."
 
 #: api/classes/CIconMap.php:451
-#, c-format
+#, php-format
 msgid "Icon map \"%s\" has incorrect expression."
 msgstr "Соответствие иконок \"%s\" имеет некорректное выражение."
 
 #: api/classes/CIconMap.php:404 api/classes/CIconMap.php:409
-#, c-format
+#, php-format
 msgid "Icon map \"%s\" must have at least one mapping."
 msgstr "У соответствия иконок \"%s\" должно быть по крайней мере одно соответствие."
 
@@ -6117,7 +6117,7 @@ msgid "Icon map updated"
 msgstr "Соответствие иконок обновлено"
 
 #: api/classes/CIconMap.php:263
-#, c-format
+#, php-format
 msgid "Icon map with iconmapid \"%s\" does not exist."
 msgstr "Соответствия иконок с iconmapid \"%s\" не существует."
 
@@ -6130,7 +6130,7 @@ msgid "Icon mapping"
 msgstr "Сответствия иконок"
 
 #: api/classes/CIconMap.php:457
-#, c-format
+#, php-format
 msgid "Icon mapping entry \"%1$s\" against \"%2$s\" already exists."
 msgstr "В соответствии иконок запись \"%1$s\" для \"%2$s\" уже существует."
 
@@ -6161,7 +6161,7 @@ msgid "Image"
 msgstr "Изображение"
 
 #: api/classes/CImage.php:257 api/classes/CImage.php:373
-#, c-format
+#, php-format
 msgid "Image \"%1$s\" already exists."
 msgstr "Изображение \"%1$s\" уже существует."
 
@@ -6178,7 +6178,7 @@ msgid "Image label type"
 msgstr "Тип подписи к изображению"
 
 #: api/classes/CImage.php:294
-#, c-format
+#, php-format
 msgid "Image load error [%1$s] in [%2$s]."
 msgstr "Ошибка при загрузке изображения [%1$s] в [%2$s]."
 
@@ -6227,7 +6227,7 @@ msgid "Imported successfully"
 msgstr "Импортировано успешно"
 
 #: hostinventories.php:171
-#, c-format
+#, php-format
 msgid "Impossible to filter by inventory field \"%s\", which does not exist."
 msgstr "Невозможно отфильтровать по несуществующему полю инвентарных данных \"%s\"."
 
@@ -6267,18 +6267,18 @@ msgid "Include"
 msgstr "Включено"
 
 #: api/classes/CService.php:1333
-#, c-format
+#, php-format
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr "Некорректное значение поля \"нежесткая\" для зависимости у услуги \"%1$s\"."
 
 #: api/classes/CMap.php:432 api/classes/CMap.php:437 api/classes/CMap.php:446
 #: api/classes/CMap.php:454
-#, c-format
+#, php-format
 msgid "Incorrect %1$s label type value for map \"%2$s\"."
 msgstr "Некорректное значение %1$s типа подписи для карты сети \"%2$s\"."
 
 #: api/classes/CDRule.php:265
-#, c-format
+#, php-format
 msgid "Incorrect IP range \"%s\"."
 msgstr "Некорректный диапазон IP адресов \"%s\"."
 
@@ -6293,7 +6293,7 @@ msgid "Incorrect SNMP community."
 msgstr "Некорректное SNMP community."
 
 #: api/classes/CService.php:1163
-#, c-format
+#, php-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr "Некорректное допустимое SLA для услуги \"%1$s\"."
 
@@ -6330,7 +6330,7 @@ msgid "Incorrect action condition host. Host does not exist or you have no acces
 msgstr "Некорректный узел сети в условии действия. Узел сети не существует или у вас нет прав доступа к нему."
 
 #: api/classes/CAction.php:1588
-#, c-format
+#, php-format
 msgid "Incorrect action condition ip \"%1$s\"."
 msgstr "Некорректный ip \"%1$s\" в условии действия."
 
@@ -6339,7 +6339,7 @@ msgid "Incorrect action condition operator."
 msgstr "Некорректный оператор в условии действия."
 
 #: api/classes/CAction.php:1607
-#, c-format
+#, php-format
 msgid "Incorrect action condition port \"%1$s\"."
 msgstr "Некорректный порт \"%1$s\" в условии действия."
 
@@ -6372,7 +6372,7 @@ msgid "Incorrect action conditionid."
 msgstr "Некорректный conditionid действия."
 
 #: api/classes/CAction.php:569 api/classes/CAction.php:692
-#, c-format
+#, php-format
 msgid "Incorrect action conditions for action \"%1$s\"."
 msgstr "Некорректные условия действия для действия \"%1$s\"."
 
@@ -6401,7 +6401,7 @@ msgid "Incorrect action operation host. Host does not exist or you have no acces
 msgstr "Некорректный узел сети для операции действия. Узел сети не существует или у вас нет к нему доступа."
 
 #: api/classes/CAction.php:1380 api/classes/CAction.php:1384
-#, c-format
+#, php-format
 msgid "Incorrect action operation port \"%s\"."
 msgstr "Некорректный порт \"%s\" в операции действия."
 
@@ -6426,7 +6426,7 @@ msgid "Incorrect action operationid."
 msgstr "Некорректный operationid действия."
 
 #: api/classes/CService.php:1126
-#, c-format
+#, php-format
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr "Некорректный алгоритм для услуги \"%1$s\"."
 
@@ -6446,17 +6446,17 @@ msgid "Incorrect arguments passed to method."
 msgstr "Для метода предоставлены некорректные аргументы."
 
 #: api/classes/CDRule.php:358
-#, c-format
+#, php-format
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr "Некорректный протокол аутентификации для правила обнаружения \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:349
-#, c-format
+#, php-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr "Некорректный протокол аутентификации для элемента данных \"%1$s\"."
 
 #: api/classes/CService.php:1145
-#, c-format
+#, php-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Некорректное вычисляемое значение SLA для услуги \"%1$s\"."
 
@@ -6465,32 +6465,32 @@ msgid "Incorrect characters used for Node name."
 msgstr "Использованы некорректные символы в имени Ноды."
 
 #: api/classes/CTemplate.php:501
-#, c-format
+#, php-format
 msgid "Incorrect characters used for Template name [ %1$s ]"
 msgstr "Использованы некорректные символы в имени шаблона [ %1$s ]"
 
 #: api/classes/CHostPrototype.php:175
-#, c-format
+#, php-format
 msgid "Incorrect characters used for host \"%1$s\"."
 msgstr "Использованы некорректные символы в узле сети \"%1$s\"."
 
 #: api/classes/CHost.php:743 api/classes/CHost.php:1090
-#, c-format
+#, php-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "Использованы некорректные символы в имени узла сети \"%s\"."
 
 #: api/classes/CProxy.php:241
-#, c-format
+#, php-format
 msgid "Incorrect characters used for proxy name \"%1$s\"."
 msgstr "Использованы некорректные символы в имени прокси \"%1$s\"."
 
 #: api/classes/CTemplate.php:887
-#, c-format
+#, php-format
 msgid "Incorrect characters used for template name \"%s\"."
 msgstr "Использованы некорректные символы в имени шаблона \"%s\"."
 
 #: api/classes/CScreenItem.php:588
-#, c-format
+#, php-format
 msgid "Incorrect column span provided for screen element located at X - %1$s and Y - %2$s."
 msgstr "Указано некорректное объединение колонок у элемента комплексного экрана размещенного в X - %1$s и Y - %2$s."
 
@@ -6499,12 +6499,12 @@ msgid "Incorrect delay."
 msgstr "Некорректная задержка."
 
 #: api/classes/CHostPrototype.php:113
-#, c-format
+#, php-format
 msgid "Incorrect discovery rule ID for host prototype \"%1$s\"."
 msgstr "Некорректный ID правила обнаружения для прототипа узла сети \"%1$s\"."
 
 #: include/classes/validators/event/CEventSourceObjectValidator.php:66
-#, c-format
+#, php-format
 msgid "Incorrect event object \"%1$s\" (%2$s) for event source \"%3$s\" (%4$s), only the following objects are supported: %5$s."
 msgstr "Некорректный \"%1$s\" (%2$s) объект события для \"%3$s\" (%4$s) источника события, поддерживаются только следующие объекты: %5$s."
 
@@ -6517,7 +6517,7 @@ msgid "Incorrect eventsource value."
 msgstr "Некорректное значение eventsource."
 
 #: include/classes/db/DB.php:539 include/classes/db/DB.php:706
-#, c-format
+#, php-format
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
 msgstr "Некорректное имя поля \"%1$s\" или значение в выражении where для таблицы \"%2$s\"."
 
@@ -6534,12 +6534,12 @@ msgid "Incorrect file upload."
 msgstr "Некорректный загружаемый файл."
 
 #: api/classes/CItemGeneral.php:805
-#, c-format
+#, php-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "Некорректный переменный интервал \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:794
-#, c-format
+#, php-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Некорректный переменный интервал у элемента данных \"%1$s\". Переменный интервал должен быть строкой."
 
@@ -6549,7 +6549,7 @@ msgid "Incorrect function is used"
 msgstr "Использована некорректная функция"
 
 #: api/classes/CScreenItem.php:514
-#, c-format
+#, php-format
 msgid "Incorrect graph ID \"%s\" provided for screen element."
 msgstr "Указан некорректный ID графика \"%s\" для элемента комплексного экрана."
 
@@ -6558,17 +6558,17 @@ msgid "Incorrect group prototype ID."
 msgstr "Некорректный ID прототипа группы."
 
 #: api/classes/CHostPrototype.php:196
-#, c-format
+#, php-format
 msgid "Incorrect group prototypes for host prototype \"%1$s\"."
 msgstr "Некорректные прототипы групп для прототипа узла сети \"%1$s\"."
 
 #: api/classes/CScreenItem.php:500
-#, c-format
+#, php-format
 msgid "Incorrect host ID \"%s\" provided for screen element."
 msgstr "Указан некорректный ID узла сети \"%s\" для элемента комплексного экрана."
 
 #: api/classes/CScreenItem.php:486
-#, c-format
+#, php-format
 msgid "Incorrect host group ID \"%s\" provided for screen element."
 msgstr "Указан некорректный ID группы узлов сети \"%s\" для элемента комплексного экрана."
 
@@ -6581,7 +6581,7 @@ msgid "Incorrect host group."
 msgstr "Некорректная группа узлов сети."
 
 #: api/classes/CHostPrototype.php:190
-#, c-format
+#, php-format
 msgid "Incorrect host groups for host prototype \"%1$s\"."
 msgstr "Некорректные группы узлов сети у прототипа узла сети \"%1$s\"."
 
@@ -6594,27 +6594,27 @@ msgid "Incorrect image index."
 msgstr "Некорректный номер изображения."
 
 #: api/classes/CHostInterface.php:643
-#, c-format
+#, php-format
 msgid "Incorrect interface DNS parameter \"%s\" provided."
 msgstr "Для интерфейса указан некорректный параметр DNS \"%s\"."
 
 #: api/classes/CHostInterface.php:658
-#, c-format
+#, php-format
 msgid "Incorrect interface IP parameter \"%s\" provided."
 msgstr "Указан некорректный параметр IP адреса \"%s\" для интерфейса."
 
 #: api/classes/CHostInterface.php:674
-#, c-format
+#, php-format
 msgid "Incorrect interface port \"%s\" provided."
 msgstr "Для интерфейса указан некорректный порт \"%s\"."
 
 #: api/classes/CHost.php:677
-#, c-format
+#, php-format
 msgid "Incorrect inventory field \"%s\"."
 msgstr "Некорректное поле \"%s\" инвентарных данных."
 
 #: api/classes/CScreenItem.php:529
-#, c-format
+#, php-format
 msgid "Incorrect item ID \"%s\" provided for screen element."
 msgstr "Указан некорректный ID элемент данных \"%s\" для элемента комплексного экрана."
 
@@ -6623,12 +6623,12 @@ msgid "Incorrect item for axis value."
 msgstr "Некорректный элемент данных для значения оси."
 
 #: api/classes/CTrigger.php:733 include/triggers.inc.php:1002
-#, c-format
+#, php-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
 msgstr "В выражении триггера \"%2$s\" указан некорректный ключ элемента данных \"%1$s\"."
 
 #: include/classes/validators/CTriggerFunctionValidator.php:254
-#, c-format
+#, php-format
 msgid "Incorrect item value type \"%1$s\" provided for trigger function \"%2$s\"."
 msgstr "Указан некорректный тип элемента данных \"%1$s\" для функции триггера \"%2$s\"."
 
@@ -6638,7 +6638,7 @@ msgstr "Некорректный ключ."
 
 #: api/classes/CDRule.php:319 api/classes/CItemGeneral.php:282
 #: discoveryconf.php:110
-#, c-format
+#, php-format
 msgid "Incorrect key: \"%1$s\"."
 msgstr "Некорректный ключ: \"%1$s\"."
 
@@ -6679,22 +6679,22 @@ msgid "Incorrect maintenance week period"
 msgstr "Некорректная неделя периода обслуживания"
 
 #: api/classes/CScreenItem.php:543
-#, c-format
+#, php-format
 msgid "Incorrect map ID \"%s\" provided for screen element."
 msgstr "Указан некорректный ID карты сети \"%s\" для элемента комплексного экрана."
 
 #: api/classes/CMap.php:412
-#, c-format
+#, php-format
 msgid "Incorrect map height value for map \"%s\"."
 msgstr "Некорректное значение высоты для карты сети \"%s\"."
 
 #: api/classes/CMap.php:408
-#, c-format
+#, php-format
 msgid "Incorrect map width value for map \"%s\"."
 msgstr "Некорректное значение ширины для карты сети \"%s\"."
 
 #: api/classes/CScript.php:582
-#, c-format
+#, php-format
 msgid "Incorrect menu path for script \"%1$s\"."
 msgstr "Некорректный путь меню для скрипта \"%1$s\"."
 
@@ -6707,7 +6707,7 @@ msgid "Incorrect object value."
 msgstr "Некорректное значение объекта."
 
 #: api/classes/CAction.php:538 api/classes/CAction.php:589
-#, c-format
+#, php-format
 msgid "Incorrect parameter for action \"%1$s\"."
 msgstr "Некорректный параметр для действия \"%1$s\"."
 
@@ -6716,12 +6716,12 @@ msgid "Incorrect parameter for operations."
 msgstr "Некорректный параметр для операций."
 
 #: api/classes/CIconMap.php:175
-#, c-format
+#, php-format
 msgid "Incorrect parameter is used for icon map \"%s\"."
 msgstr "Использован некорректный параметр для соответствия иконок \"%s\"."
 
 #: api/classes/CAction.php:647
-#, c-format
+#, php-format
 msgid "Incorrect parameters for action update method \"%s\"."
 msgstr "Некорректные параметры для метода обновления действия \"%s\"."
 
@@ -6730,7 +6730,7 @@ msgid "Incorrect parameters for condition."
 msgstr "Некорректные параметры для условии."
 
 #: api/classes/CIconMap.php:233
-#, c-format
+#, php-format
 msgid "Incorrect parameters for icon map update method \"%s\"."
 msgstr "Некорректные параметры для метода обновления соответствия иконок \"%s\"."
 
@@ -6743,7 +6743,7 @@ msgid "Incorrect parameters for user group."
 msgstr "Некорректные параметры для группы пользователей."
 
 #: api/classes/CService.php:1211
-#, c-format
+#, php-format
 msgid "Incorrect parent for service \"%1$s\"."
 msgstr "Некорректный родитель для услуги \"%1$s\"."
 
@@ -6756,12 +6756,12 @@ msgid "Incorrect port range."
 msgstr "Некорректный диапазон портов."
 
 #: api/classes/CDRule.php:367
-#, c-format
+#, php-format
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr "Некорректный приватный протокол для правила обнаружения \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:358
-#, c-format
+#, php-format
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr "Некорректный приватный протокол для элемента данных \"%1$s\"."
 
@@ -6774,17 +6774,17 @@ msgid "Incorrect resource type provided for screen item."
 msgstr "Указан некорректный тип ресурса для элемента комплексного экрана."
 
 #: include/classes/server/CZabbixServer.php:239
-#, c-format
+#, php-format
 msgid "Incorrect response received from Zabbix server \"%1$s\"."
 msgstr "Получен некорректный ответ от Zabbix сервера \"%1$s\"."
 
 #: api/classes/CScreenItem.php:583
-#, c-format
+#, php-format
 msgid "Incorrect row span provided for screen element located at X - %1$s and Y - %2$s."
 msgstr "Указано некорректное объединение строк у элемента комплексного экрана размещенного в X - %1$s и Y - %2$s."
 
 #: api/classes/CScreenItem.php:556
-#, c-format
+#, php-format
 msgid "Incorrect screen ID \"%s\" provided for screen element."
 msgstr "Указан некорректный ID комплексного экрана \"%s\" для элемента комплексного экрана."
 
@@ -6805,7 +6805,7 @@ msgid "Incorrect service time type."
 msgstr "Некорректный тип времени услуги."
 
 #: api/classes/CService.php:1180
-#, c-format
+#, php-format
 msgid "Incorrect sorder order for service \"%1$s\"."
 msgstr "Некорректный порядок сортировки для услуги \"%1$s\"."
 
@@ -6814,12 +6814,12 @@ msgid "Incorrect source value."
 msgstr "Некорректное значение источника."
 
 #: api/classes/CHostPrototype.php:185
-#, c-format
+#, php-format
 msgid "Incorrect status for host prototype \"%1$s\"."
 msgstr "Некорректное состояние прототипа узла сети \"%1$s\"."
 
 #: api/classes/CService.php:1234
-#, c-format
+#, php-format
 msgid "Incorrect status for service \"%1$s\"."
 msgstr "Некорректное состояние для услуги \"%1$s\"."
 
@@ -6828,38 +6828,38 @@ msgid "Incorrect status."
 msgstr "Некорректное состояние."
 
 #: api/classes/CItemKey.php:222
-#, c-format
+#, php-format
 msgid "Incorrect syntax near \"%1$s\" at position \"%2$s\""
 msgstr "Некорректный синтаксис рядом с \"%1$s\" с позиции \"%2$s\""
 
 #: api/classes/CItemKey.php:166
-#, c-format
+#, php-format
 msgid "Incorrect syntax near \"%1$s\"."
 msgstr "Некорректный синтаксис рядом с \"%1$s\"."
 
 #: api/classes/CUser.php:351
-#, c-format
+#, php-format
 msgid "Incorrect theme for user \"%1$s\"."
 msgstr "Некорректная тема для пользователя \"%1$s\"."
 
 #: include/classes/validators/CTimePeriodValidator.php:99
-#, c-format
+#, php-format
 msgid "Incorrect time period \"%1$s\" start day must be less or equal to end day."
 msgstr "Некорректный период времени \"%1$s\". День начала должен быть меньше или равным дню окончания."
 
 #: include/classes/validators/CTimePeriodValidator.php:105
-#, c-format
+#, php-format
 msgid "Incorrect time period \"%1$s\" start time must be less than end time."
 msgstr "Некорректный период времени \"%1$s\". Время начала должно быть меньше или равным времени окончания."
 
 #: include/classes/validators/CTimePeriodValidator.php:89
 #: include/classes/validators/CTimePeriodValidator.php:94
-#, c-format
+#, php-format
 msgid "Incorrect time period \"%1$s\"."
 msgstr "Некорректный период времени \"%1$s\"."
 
 #: api/classes/CService.php:1195
-#, c-format
+#, php-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
 msgstr "Некорректный ID триггера для услуги \"%1$s\"."
 
@@ -6873,12 +6873,12 @@ msgid "Incorrect trigger expression."
 msgstr "Некорректное выражение триггера."
 
 #: include/triggers.inc.php:1105
-#, c-format
+#, php-format
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr "Некорректное выражение триггера. Узел сети \"%1$s\" не существует или у вас нет прав доступа к этому узлу сети."
 
 #: api/classes/CTrigger.php:713
-#, c-format
+#, php-format
 msgid "Incorrect trigger expression. Host \"%s\" does not exist or you have no access to this host."
 msgstr "Некорректное выражение триггера. Узел сети \"%s\" не существует или у вас нет прав доступа к этому узлу сети."
 
@@ -6890,7 +6890,7 @@ msgstr "Некорректное выражение у триггера. Эле�
 #: include/classes/validators/CTriggerFunctionValidator.php:260
 #: include/classes/validators/CTriggerFunctionValidator.php:275
 #: include/classes/validators/CTriggerFunctionValidator.php:294
-#, c-format
+#, php-format
 msgid "Incorrect trigger function \"%1$s\" provided in expression."
 msgstr "В выражении указана некорректная функция триггера \"%1$s\"."
 
@@ -6900,7 +6900,7 @@ msgstr "Некорректный тип asort_by_key."
 
 #: api/classes/CItemKey.php:178 api/classes/CItemKey.php:214
 #: api/classes/CItemKey.php:256
-#, c-format
+#, php-format
 msgid "Incorrect usage of bracket symbols. \"%1$s\" found after final bracket."
 msgstr "Некорректное использование скобок. \"%1$s\" найден после последней скобки."
 
@@ -6917,47 +6917,47 @@ msgid "Incorrect user group."
 msgstr "Некорректная группа пользователей."
 
 #: include/validate.inc.php:451
-#, c-format
+#, php-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "Некорректное значение \"%1$s\" для \"%2$s\" поля."
 
 #: include/validate.inc.php:447
-#, c-format
+#, php-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr "Некорректное значение \"%1$s\" для \"%2$s\" поля: должно быть между %3$s и %4$s."
 
 #: include/classes/db/DB.php:357
-#, c-format
+#, php-format
 msgid "Incorrect value \"%1$s\" for float field \"%2$s\"."
 msgstr "Некорректное значение \"%1$s\" для поля с плавающей точкой \"%2$s\"."
 
 #: include/classes/db/DB.php:351
-#, c-format
+#, php-format
 msgid "Incorrect value \"%1$s\" for int field \"%2$s\"."
 msgstr "Некорректное значение \"%1$s\" для поля целого числа \"%2$s\"."
 
 #: include/classes/db/DB.php:345
-#, c-format
+#, php-format
 msgid "Incorrect value \"%1$s\" for unsigned int field \"%2$s\"."
 msgstr "Некорректное значение \"%1$s\" для поля целого положительного числа \"%2$s\"."
 
 #: include/reports.inc.php:540 include/reports.inc.php:544
-#, c-format
+#, php-format
 msgid "Incorrect value for field \"%1$s\"."
 msgstr "Некорректное значение поля \"%1$s\"."
 
 #: include/validate.inc.php:442
-#, c-format
+#, php-format
 msgid "Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "Некорректное значение для поля \"%1$s\": не может быть пустым."
 
 #: include/classes/class.cbuttonqmessage.php:52
-#, c-format
+#, php-format
 msgid "Incorrect value for setMessage(): \"%s\"."
 msgstr "Некорректное значение для setMessage(): \"%s\"."
 
 #: api/classes/CProxy.php:220 api/classes/CProxy.php:231
-#, c-format
+#, php-format
 msgid "Incorrect value used for proxy status \"%1$s\"."
 msgstr "Использовано некорректное значение для состояния прокси \"%1$s\"."
 
@@ -6966,12 +6966,12 @@ msgid "Incorrect working time."
 msgstr "Некорректное рабочее время."
 
 #: include/classes/import/CXmlImport18.php:1591
-#, c-format
+#, php-format
 msgid "Incorrect y max item for graph \"%1$s\"."
 msgstr "Некорректный y макс элемент данных для графика \"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:1578
-#, c-format
+#, php-format
 msgid "Incorrect y min item for graph \"%1$s\"."
 msgstr "Некорректный y мин элемент данных для графика \"%1$s\"."
 
@@ -7011,7 +7011,7 @@ msgid "Interface"
 msgstr "Интерфейс"
 
 #: api/classes/CHostInterface.php:864
-#, c-format
+#, php-format
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
 msgstr "Интерфейс связан с элементом данных \"%1$s\" в \"%2$s\"."
 
@@ -7020,17 +7020,17 @@ msgid "Interface is used by items that require this type of the interface."
 msgstr "Интерфейс используется элементами данных, которые требуют этот тип интерфейса."
 
 #: api/classes/CHostInterface.php:351
-#, c-format
+#, php-format
 msgid "Interface with DNS \"%1$s\" cannot have empty IP address."
 msgstr "У интерфейса с DNS именем \"%1$s\" не может быть пустого IP адреса."
 
 #: api/classes/CHostInterface.php:357 api/classes/CHostInterface.php:364
-#, c-format
+#, php-format
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name while having \"Use DNS\" property on \"%2$s\"."
 msgstr "У интерфейса с IP адресом \"%1$s\" не может быть пустого DNS имени, при наличии свойства \"Использовать DNS\" у \"%2$s\"."
 
 #: api/classes/CHostInterface.php:370
-#, c-format
+#, php-format
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name."
 msgstr "У интерфейса с IP адресом \"%1$s\" не может быть пустого DNS имени."
 
@@ -7085,7 +7085,7 @@ msgid "Invalid Request."
 msgstr "Ошибочный запрос."
 
 #: maintenance.php:135 maintenance.php:149 services.php:178 services.php:192
-#, c-format
+#, php-format
 msgid "Invalid date \"%s\"."
 msgstr "Ошибочная дата \"%s\"."
 
@@ -7098,7 +7098,7 @@ msgid "Invalid fourth parameter."
 msgstr "Ошибочный четвертый параметр."
 
 #: api/classes/CUserMacro.php:822
-#, c-format
+#, php-format
 msgid "Invalid hostid for macro \"%1$s\"."
 msgstr "Ошибочный hostid для макроса \"%1$s\"."
 
@@ -7128,17 +7128,17 @@ msgid "Invalid params."
 msgstr "Ошибочные параметры."
 
 #: include/reports.inc.php:590 include/reports.inc.php:594
-#, c-format
+#, php-format
 msgid "Invalid period for field \"%1$s\"."
 msgstr "Некорректный период для поля \"%1$s\"."
 
 #: api/classes/CHttpTest.php:637
-#, c-format
+#, php-format
 msgid "Invalid response code \"%1$s\"."
 msgstr "Ошибочный код ответа \"%1$s\"."
 
 #: api/classes/CHttpTest.php:632
-#, c-format
+#, php-format
 msgid "Invalid response code range \"%1$s\"."
 msgstr "Ошибочный диапазон кода ответа \"%1$s\"."
 
@@ -7155,7 +7155,7 @@ msgid "Invalid time period"
 msgstr "Ошибочный период времени"
 
 #: include/classes/class.cview.php:62
-#, c-format
+#, php-format
 msgid "Invalid view name given \"%s\". Allowed chars: \"a-z\" and \".\"."
 msgstr "Получено ошибочное имя представления \"%s\". Разрешенные символы : \"a-z\" и \".\"."
 
@@ -7165,7 +7165,7 @@ msgid "Inventory"
 msgstr "Инвентаризация"
 
 #: api/classes/CHost.php:1303
-#, c-format
+#, php-format
 msgid "Inventory disabled for host \"%s\"."
 msgstr "Инвентарные данные деактивированы для узла сети \"%s\"."
 
@@ -7212,48 +7212,48 @@ msgid "Item"
 msgstr "Элемент данных"
 
 #: api/classes/CItemGeneral.php:100
-#, c-format
+#, php-format
 msgid "Item \"%1$s\" already exists on \"%2$s\""
 msgstr "Элемент данных \"%1$s\" уже существует у \"%2$s\""
 
 #: api/classes/CItemGeneral.php:99 api/classes/CItem.php:37
-#, c-format
+#, php-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Элемент данных \"%1$s\" уже существует у \"%2$s\", унаследован из другого шаблона."
 
 #: api/classes/CItem.php:38
-#, c-format
+#, php-format
 msgid "Item \"%1$s\" already exists on \"%2$s\"."
 msgstr "Элемент данных \"%1$s\" уже существует у \"%2$s\"."
 
 #: api/classes/CItem.php:959
-#, c-format
+#, php-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "Элемент данных \"%1$s\" не может заполнять отсутствующее поле под номером \"%2$d\" инвентарных данных узла сети. Выберите из: от 0 (не заполнять) до %3$d."
 
 #: api/classes/CTemplateScreen.php:597
-#, c-format
+#, php-format
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Элемент данных \"%1$s\" не существует у шаблона \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:1526
-#, c-format
+#, php-format
 msgid "Item \"%1$s\" does not exist."
 msgstr "Элемент данных \"%1$s\" не существует."
 
 #: include/classes/import/CConfigurationImport.php:578
-#, c-format
+#, php-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Элемент данных \"%1$s\" в \"%2$s\": группа элементов данных \"%3$s\" не существует."
 
 #: include/classes/import/CXmlImport18.php:1274
 #: include/classes/import/CXmlImport18.php:1278
-#, c-format
+#, php-format
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Элемент данных \"%1$s\" пропущен - правило пользователя."
 
 #: api/classes/CItemGeneral.php:340
-#, c-format
+#, php-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "У элемента данных \"%1$s:%2$s\" ошибочный порт \"%3$s\"."
 
@@ -7282,12 +7282,12 @@ msgid "Item prototype"
 msgstr "Прототип элемента данных"
 
 #: api/classes/CItemPrototype.php:38
-#, c-format
+#, php-format
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\""
 msgstr "Прототип элемента данных \"%1$s\" уже существует у \"%2$s\""
 
 #: api/classes/CItemPrototype.php:37
-#, c-format
+#, php-format
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Прототип элемента данных \"%1$s\" уже существует у \"%2$s\", унаследован из другого шаблона."
 
@@ -7319,38 +7319,38 @@ msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Элемент данных не обновлен. Пожалуйста, введите корректный интервал обновления."
 
 #: api/classes/CItemGeneral.php:411
-#, c-format
+#, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как правило обнаружения."
 
 #: api/classes/CItemGeneral.php:417
-#, c-format
+#, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как элемент данных созданный из прототипа элемента данных."
 
 #: api/classes/CItemGeneral.php:414
-#, c-format
+#, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как прототип элемента данных."
 
 #: api/classes/CItemGeneral.php:408
-#, c-format
+#, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как элемент данных."
 
 #: api/classes/CItemGeneral.php:420
-#, c-format
+#, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как неизвестный элемент данных."
 
 #: api/classes/CItemGeneral.php:771
-#, c-format
+#, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Элемент данных с ключом \"%1$s\" уже существует у \"%2$s\"."
 
 #: api/classes/managers/CHttpTestManager.php:693
 #: api/classes/managers/CHttpTestManager.php:824
-#, c-format
+#, php-format
 msgid "Item with key \"%1$s\" already exists."
 msgstr "Элемент данных с ключем \"%1$s\" уже существует."
 
@@ -7415,7 +7415,7 @@ msgid "JMX interfaces"
 msgstr "Интерфейсы JMX"
 
 #: api/rpc/class.cjsonrpc.php:149
-#, c-format
+#, php-format
 msgid "JSON-rpc error generation failed. No such error \"%s\"."
 msgstr "Не удалось сгенерировать JSON-rpc ошибку. Нет такой ошибки \"%s\"."
 
@@ -7482,7 +7482,7 @@ msgid "Keep IT service data for (in days)"
 msgstr "Хранить данные Услуг IT (в днях)"
 
 #: adm.housekeeper.php:103
-#, c-format
+#, php-format
 msgid "Keep IT service data for (in days) \"%1$s\"."
 msgstr "Хранение данных Услуг IT за (в днях) \"%1$s\"."
 
@@ -7491,7 +7491,7 @@ msgid "Keep audit data for (in days)"
 msgstr "Хранить данные аудита (в днях)"
 
 #: adm.housekeeper.php:104
-#, c-format
+#, php-format
 msgid "Keep audit data for (in days) \"%1$s\"."
 msgstr "Хранение данные аудита за (в днях) \"%1$s\"."
 
@@ -7504,7 +7504,7 @@ msgid "Keep auto-registration event and alert data for (in days)"
 msgstr "Хранить события авторегистрации и данных оповещений (в днях)"
 
 #: adm.housekeeper.php:102
-#, c-format
+#, php-format
 msgid "Keep auto-registration event and alert data for (in days) \"%1$s\"."
 msgstr "Хранение событий авторегистрации и данные оповещений за (в днях) \"%1$s\"."
 
@@ -7531,7 +7531,7 @@ msgid "Keep history data for (in days)"
 msgstr "Хранить данные истории (дней)"
 
 #: adm.housekeeper.php:106
-#, c-format
+#, php-format
 msgid "Keep history data for (in days) \"%1$s\"."
 msgstr "Хранение данных истории за (дней) \"%1$s\"."
 
@@ -7544,7 +7544,7 @@ msgid "Keep internal event and alert data for (in days)"
 msgstr "Хранение внутренних данных о событиях и оповещениях (дней)"
 
 #: adm.housekeeper.php:100
-#, c-format
+#, php-format
 msgid "Keep internal event and alert data for (in days) \"%1$s\"."
 msgstr "Хранение внутренних данных о событиях и оповещениях (дней) \"%1$s\"."
 
@@ -7561,7 +7561,7 @@ msgid "Keep network discovery event and alert data for (in days)"
 msgstr "Хранение данных событий и оповещений на сетевые обнаружения за (дней)"
 
 #: adm.housekeeper.php:101
-#, c-format
+#, php-format
 msgid "Keep network discovery event and alert data for (in days) \"%1$s\"."
 msgstr "Хранение данных событий и оповещений на сетевые обнаружения за (дней) \"%1$s\"."
 
@@ -7570,7 +7570,7 @@ msgid "Keep trend data for (in days)"
 msgstr "Хранение данных динамики изменений за (дней)"
 
 #: adm.housekeeper.php:107
-#, c-format
+#, php-format
 msgid "Keep trend data for (in days) \"%1$s\"."
 msgstr "Хранение данных динамики изменений за (дней) \"%1$s\"."
 
@@ -7593,7 +7593,7 @@ msgid "Keep trigger event and alert data for (in days)"
 msgstr "Хранение данных триггеров о событиях и оповещениях за (дней)"
 
 #: adm.housekeeper.php:99
-#, c-format
+#, php-format
 msgid "Keep trigger event and alert data for (in days) \"%1$s\"."
 msgstr "Хранение данных триггеров о событиях и оповещениях за (дней) \"%1$s\"."
 
@@ -7602,7 +7602,7 @@ msgid "Keep user session data for (in days)"
 msgstr "Хранить данные о сессиях пользователей за (дней)"
 
 #: adm.housekeeper.php:105
-#, c-format
+#, php-format
 msgid "Keep user session data for (in days) \"%1$s\"."
 msgstr "Хранение данных о сессиях пользователей за (дней) \"%1$s\"."
 
@@ -7617,7 +7617,7 @@ msgid "Key"
 msgstr "Ключ"
 
 #: api/classes/CItemGeneral.php:292
-#, c-format
+#, php-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Ключ \"%1$s\" не совпадает с <grpmax|grpmin|grpsum|grpavg>[\"Группы узлов сети\", \"Ключ элемента данных\", \"<last|min|max|avg|sum|count>\", \"параметр\"]."
 
@@ -7713,7 +7713,7 @@ msgid "Last"
 msgstr "Последняя"
 
 #: dashboard.php:397
-#, c-format
+#, php-format
 msgid "Last %1$d issue"
 msgid_plural "Last %1$d issues"
 msgstr[0] "Последнее %1$d событие"
@@ -7864,7 +7864,7 @@ msgid "Link indicators"
 msgstr "Индикаторы связи"
 
 #: api/classes/CMap.php:488
-#, c-format
+#, php-format
 msgid "Link name should be unique for map \"%s\"."
 msgstr "Имя ссылки должно быть уникальным для карты сети \"%s\"."
 
@@ -7875,17 +7875,17 @@ msgid "Link new templates"
 msgstr "Соединить с новыми шаблонами"
 
 #: api/classes/CMap.php:502
-#, c-format
+#, php-format
 msgid "Link selementid1 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
 msgstr "Поле связи selementid1 указывает на не существующий selement ID \"%1$s\" для карты сети \"%2$s\"."
 
 #: api/classes/CMap.php:509
-#, c-format
+#, php-format
 msgid "Link selementid2 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
 msgstr "Поле связи selementid2 указывает на не существующий selement ID \"%1$s\" для карты сети \"%2$s\"."
 
 #: api/classes/CMap.php:484
-#, c-format
+#, php-format
 msgid "Link should have both \"name\" and \"url\" fields for map \"%s\"."
 msgstr "У связи должны быть заполнены оба поля \"имя\" и \"url\" для карты сети \"%s\"."
 
@@ -8015,7 +8015,7 @@ msgid "Login as Guest"
 msgstr "Войти как Гость"
 
 #: api/classes/CUser.php:942
-#, c-format
+#, php-format
 msgid "Login failed \"%s\"."
 msgstr "Ошибка входа \"%s\"."
 
@@ -8093,37 +8093,37 @@ msgid "Macro"
 msgstr "Макрос"
 
 #: api/classes/CUserMacro.php:894
-#, c-format
+#, php-format
 msgid "Macro \"%1$s\" already exists on \"%2$s\"."
 msgstr "Макрос \"%1$s\" уже существует у \"%2$s\"."
 
 #: api/classes/CUserMacro.php:939
-#, c-format
+#, php-format
 msgid "Macro \"%1$s\" already exists."
 msgstr "Макрос \"%1$s\" уже существует."
 
 #: api/classes/CUserMacro.php:855
-#, c-format
+#, php-format
 msgid "Macro \"%1$s\" is not unique."
 msgstr "Макрос \"%1$s\" не уникален."
 
 #: api/classes/CUserMacro.php:806
-#, c-format
+#, php-format
 msgid "Macro \"%1$s\" value is too long, it should not exceed 255 chars."
 msgstr "Значение макроса \"%1$s\" слишком длинное, оно не должно превышать 255 символов."
 
 #: api/classes/CUserMacro.php:790
-#, c-format
+#, php-format
 msgid "Macro name \"%1$s\" is too long, it should not exceed 64 chars."
 msgstr "Имя макроса \"%1$s\" слишком длинное, оно не должно превышать 64 символа."
 
 #: api/classes/CUserMacro.php:974
-#, c-format
+#, php-format
 msgid "Macro with globalmacroid \"%1$s\" does not exist."
 msgstr "Макрос с globalmacroid \"%1$s\" не существует."
 
 #: api/classes/CUserMacro.php:914
-#, c-format
+#, php-format
 msgid "Macro with hostmacroid \"%1$s\" does not exist."
 msgstr "Макроса с hostmacroid \"%1$s\" не существует."
 
@@ -8150,7 +8150,7 @@ msgid "Maintenance"
 msgstr "Обслуживание"
 
 #: api/classes/CMaintenance.php:382 api/classes/CMaintenance.php:494
-#, c-format
+#, php-format
 msgid "Maintenance \"%s\" already exists."
 msgstr "Обслуживание \"%s\" уже существует."
 
@@ -8226,22 +8226,22 @@ msgid "Map"
 msgstr "Карта сети"
 
 #: include/classes/import/CXmlImport18.php:668
-#, c-format
+#, php-format
 msgid "Map \"%1$s\" skipped - user rule."
 msgstr "Карта сети \"%1$s\" пропущена - правило пользователя."
 
 #: include/views/configuration.sysmap.constructor.php:67
-#, c-format
+#, php-format
 msgid "Map \"%s\""
 msgstr "Карта сети \"%s\""
 
 #: include/classes/import/CXmlImport18.php:820
-#, c-format
+#, php-format
 msgid "Map \"%s\" created."
 msgstr "Карта сети \"%s\" создана."
 
 #: include/classes/import/CXmlImport18.php:811
-#, c-format
+#, php-format
 msgid "Map \"%s\" updated."
 msgstr "Карта сети \"%s\" обновлена."
 
@@ -8258,7 +8258,7 @@ msgid "Map save operation failed."
 msgstr "Не удалось выполнить операцию сохранения карты сети."
 
 #: api/classes/CMap.php:527
-#, c-format
+#, php-format
 msgid "Map with name \"%s\" already exists."
 msgstr "Карта сети с именем \"%s\" уже существует."
 
@@ -8267,7 +8267,7 @@ msgid "Mapped to"
 msgstr "Преобразуется в"
 
 #: include/valuemap.inc.php:141
-#, c-format
+#, php-format
 msgid "Mapping value \"%1$s\" is not unique."
 msgstr "Преобразование значения \"%1$s\" не уникально."
 
@@ -8339,7 +8339,7 @@ msgid "Max count of elements to show inside table cell"
 msgstr "Макс. количество элементов в ячейке таблицы"
 
 #: adm.gui.php:79
-#, c-format
+#, php-format
 msgid "Max count of elements to show inside table cell \"%1$s\"."
 msgstr "Макс. количество элементов для отображения в ячейке таблицы \"%1$s\"."
 
@@ -8353,7 +8353,7 @@ msgid "Maximize"
 msgstr "Развернуть"
 
 #: api/classes/CHostInterface.php:633
-#, c-format
+#, php-format
 msgid "Maximum DNS name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum DNS name length is %1$d characters, \"%2$s\" is %3$d characters."
 msgstr[0] ""
@@ -8361,7 +8361,7 @@ msgstr[1] ""
 msgstr[2] ""
 
 #: api/classes/CUser.php:315
-#, c-format
+#, php-format
 msgid "Maximum alias length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum alias length is %1$d characters, \"%2$s\" is %3$d characters."
 msgstr[0] ""
@@ -8369,7 +8369,7 @@ msgstr[1] ""
 msgstr[2] ""
 
 #: api/classes/CHost.php:733
-#, c-format
+#, php-format
 msgid "Maximum host name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum host name length is %1$d characters, \"%2$s\" is %3$d characters."
 msgstr[0] ""
@@ -8382,7 +8382,7 @@ msgid "Maximum number of flexible intervals added"
 msgstr "Добавлено максимальное количество переменных интервалов"
 
 #: include/classes/screens/CScreenBase.php:339 include/graphs.inc.php:406
-#, c-format
+#, php-format
 msgid "Maximum time period to display is %1$s day."
 msgid_plural "Maximum time period to display is %1$s days."
 msgstr[0] "Максимальный период времени отображения %1$s день."
@@ -8406,7 +8406,7 @@ msgid "Maximum value for period T is NOT N"
 msgstr "Максимальное значение за период T NOT N"
 
 #: api/classes/CHost.php:769
-#, c-format
+#, php-format
 msgid "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d characters."
 msgstr[0] ""
@@ -8434,7 +8434,7 @@ msgid "Media type"
 msgstr "Способ оповещений"
 
 #: api/classes/CMediatype.php:245 api/classes/CMediatype.php:296
-#, c-format
+#, php-format
 msgid "Media type \"%s\" already exists."
 msgstr "Способ оповещения \"%s\" уже существует."
 
@@ -8464,7 +8464,7 @@ msgid "Media types"
 msgstr "Способы оповещений"
 
 #: api/classes/CMediatype.php:346
-#, c-format
+#, php-format
 msgid "Media types used by action \"%s\"."
 msgstr "Способы оповещения используются в действии \"%s\"."
 
@@ -8478,7 +8478,7 @@ msgid "Members"
 msgstr "Члены группы"
 
 #: include/classes/debug/CProfiler.php:146
-#, c-format
+#, php-format
 msgid "Memory limit: %s"
 msgstr "Лимит памяти: %s"
 
@@ -8536,32 +8536,32 @@ msgid "Minimize"
 msgstr "Свернуть"
 
 #: include/classes/class.frontendsetup.php:121
-#, c-format
+#, php-format
 msgid "Minimum required PHP memory limit is %s (configuration option \"memory_limit\")"
 msgstr "Минимально требуемый лимит памяти в PHP - %s (конфигурационный параметр \"memory_limit\")"
 
 #: include/classes/class.frontendsetup.php:159
-#, c-format
+#, php-format
 msgid "Minimum required PHP upload filesize is %s (configuration option \"upload_max_filesize\")"
 msgstr "Минимально требуемый размер загружаемого файла в PHP - %s (конфигурационный параметр \"upload_max_filesize\")"
 
 #: include/classes/class.frontendsetup.php:102
-#, c-format
+#, php-format
 msgid "Minimum required PHP version is %s"
 msgstr "Минимально требуемая версия PHP - %s"
 
 #: include/classes/class.frontendsetup.php:178
-#, c-format
+#, php-format
 msgid "Minimum required limit on execution time of PHP scripts is %s (configuration option \"max_execution_time\")"
 msgstr "Минимально требуемый лимит времени выполнения скриптов в PHP - %s (конфигурационный параметр \"max_execution_time\")"
 
 #: include/classes/class.frontendsetup.php:197
-#, c-format
+#, php-format
 msgid "Minimum required limit on input parse time for PHP scripts is %s (configuration option \"max_input_time\")"
 msgstr "Минимально требуемый лимит времени обработки ввода для PHP скриптов - %s (конфигурационный параметр \"max_input_time\")"
 
 #: include/classes/class.frontendsetup.php:140
-#, c-format
+#, php-format
 msgid "Minimum required size of PHP post is %s (configuration option \"post_max_size\")"
 msgstr "Минимально требуемый размер PHP post - %s (конфигурационный параметр \"post_max_size\")"
 
@@ -8570,7 +8570,7 @@ msgid "Minimum severity"
 msgstr "Минимальная важность"
 
 #: include/classes/screens/CScreenBase.php:334 include/graphs.inc.php:399
-#, c-format
+#, php-format
 msgid "Minimum time period to display is %1$s hour."
 msgid_plural "Minimum time period to display is %1$s hours."
 msgstr[0] "Максимальный период времени отображения %1$s час."
@@ -8602,17 +8602,17 @@ msgid "Minutes"
 msgstr "Минут"
 
 #: api/classes/CAction.php:575
-#, c-format
+#, php-format
 msgid "Missing \"%1$s\" field for action condition."
 msgstr "Пропущено поле \"%1$s\" для условия действия."
 
 #: include/reports.inc.php:481
-#, c-format
+#, php-format
 msgid "Missing \"%1$s\" field for item."
 msgstr "Пропущенное \"%1$s\" поле для элемента данных."
 
 #: include/reports.inc.php:580
-#, c-format
+#, php-format
 msgid "Missing \"%1$s\" field for period."
 msgstr "Пропущенное \"%1$s\" поле для периода."
 
@@ -8634,22 +8634,22 @@ msgstr "Пропущено поле \"name\" для графика."
 
 #: include/classes/import/CXmlImport18.php:1582
 #: include/classes/import/CXmlImport18.php:1595
-#, c-format
+#, php-format
 msgid "Missing item \"%1$s\" for host \"%2$s\"."
 msgstr "Отсутствует элемент данных \"%1$s\" для узла сети \"%2$s\"."
 
 #: api/classes/CGraph.php:40
-#, c-format
+#, php-format
 msgid "Missing items for graph \"%1$s\"."
 msgstr "Отсутствуют элементы данных у графика \"%1$s\"."
 
 #: api/classes/CGraphPrototype.php:40
-#, c-format
+#, php-format
 msgid "Missing items for graph prototype \"%1$s\"."
 msgstr "Отсутствуют элементы данных для прототипа графика \"%1$s\"."
 
 #: include/graphs.inc.php:326
-#, c-format
+#, php-format
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
 msgstr "Отсутствует ключ \"%1$s\" для узла сети \"%2$s\"."
 
@@ -8714,7 +8714,7 @@ msgid "More than 10 minutes"
 msgstr "Более 10 минут"
 
 #: api/classes/CGraphGeneral.php:747
-#, c-format
+#, php-format
 msgid "More than one graph with name \"%1$s\" within host."
 msgstr "Более чем один график с именем \"%1$s\" у узла сети."
 
@@ -8837,7 +8837,7 @@ msgid "Name"
 msgstr "Имя"
 
 #: api/classes/CHostPrototype.php:223
-#, c-format
+#, php-format
 msgid "Name for group prototype \"%1$s\" must contain macros."
 msgstr "Имя прототипа группы \"%1$s\" должно содержать макросы."
 
@@ -8935,32 +8935,32 @@ msgid "No"
 msgstr "Нет"
 
 #: api/classes/CGraphPrototype.php:41
-#, c-format
+#, php-format
 msgid "No \"%1$s\" given for graph prototype."
 msgstr "Не задано \"%1$s\" для прототипа графика."
 
 #: api/classes/CGraph.php:41
-#, c-format
+#, php-format
 msgid "No \"%1$s\" given for graph."
 msgstr "Не задано \"%1$s\" для графика."
 
 #: api/classes/CHostPrototype.php:457
-#, c-format
+#, php-format
 msgid "No \"%1$s\" given for host prototype."
 msgstr "Не задано \"%1$s\" для прототипа узла сети."
 
 #: api/classes/CHostPrototype.php:208
-#, c-format
+#, php-format
 msgid "No \"%2$s\" given for host prototype \"%1$s\"."
 msgstr "Не задано \"%2$s\" для прототипа узла сети \"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:1572
-#, c-format
+#, php-format
 msgid "No \"ymax_type\" field for graph \"%s\"."
 msgstr "Нет поля \"ymax_type\" для графика \"%s\"."
 
 #: include/classes/import/CXmlImport18.php:1568
-#, c-format
+#, php-format
 msgid "No \"ymin_type\" field for graph \"%s\"."
 msgstr "Нет поля \"ymin_type\" для графика \"%s\"."
 
@@ -9011,7 +9011,7 @@ msgid "No agent interfaces defined."
 msgstr "Не заданы интерфейсы агентов."
 
 #: include/hosts.inc.php:588
-#, c-format
+#, php-format
 msgid "No application with ID \"%1$s\"."
 msgstr "Нет группы элементов данных с ID \"%1$s\"."
 
@@ -9028,12 +9028,12 @@ msgid "No audit defined."
 msgstr "Записи в аудите не найдены."
 
 #: api/classes/CAction.php:1339
-#, c-format
+#, php-format
 msgid "No authentication type specified for action operation command \"%s\"."
 msgstr "В операции действия для команды \"%s\" не указан тип аутентификации."
 
 #: api/classes/CAction.php:1343 api/classes/CAction.php:1357
-#, c-format
+#, php-format
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "В операции действия для команды \"%s\" не указано имя пользователя для аутентификации."
 
@@ -9073,7 +9073,7 @@ msgid "No data received during period of time T, then N NOT 1, 0 - otherwise"
 msgstr "Не получено данных в течении T периода времени, тогда N NOT 1, 0 - в противном случае"
 
 #: api/classes/CHostInterface.php:840
-#, c-format
+#, php-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "Нет интерфейса по умолчанию для \"%1$s\" типа у \"%2$s\"."
 
@@ -9097,7 +9097,7 @@ msgid "No discovery checks defined."
 msgstr "Проверки обнаружения не заданы."
 
 #: api/classes/CHostPrototype.php:112
-#, c-format
+#, php-format
 msgid "No discovery rule ID given for host prototype \"%1$s\"."
 msgstr "Не задан ID правила обнаружения для прототипа узла сети \"%1$s\"."
 
@@ -9131,7 +9131,7 @@ msgid "No events to acknowledge"
 msgstr "Нет событий для подтверждения"
 
 #: api/classes/CAction.php:1334
-#, c-format
+#, php-format
 msgid "No execution target specified for action operation command \"%s\"."
 msgstr "Не указана цель выполнения для команды \"%s\" в операции действия."
 
@@ -9149,7 +9149,7 @@ msgid "No graph ID provided for screen element."
 msgstr "Для элемента комплексного экрана не указан ID графика."
 
 #: include/graphs.inc.php:294
-#, c-format
+#, php-format
 msgid "No graph item with graphid \"%s\"."
 msgstr "Нет элемента графика с graphid \"%s\"."
 
@@ -9165,7 +9165,7 @@ msgid "No graphs defined."
 msgstr "Графики не заданы."
 
 #: api/classes/CHost.php:701 api/classes/CHost.php:711
-#, c-format
+#, php-format
 msgid "No groups for host \"%s\"."
 msgstr "Нет групп для узла сети \"%s\"."
 
@@ -9178,7 +9178,7 @@ msgid "No groups for template"
 msgstr "Группы для шаблона не заданы"
 
 #: api/classes/CTemplate.php:460
-#, c-format
+#, php-format
 msgid "No groups for template [ %s ]"
 msgstr "Группы для шаблона [ %s ] не заданы"
 
@@ -9196,7 +9196,7 @@ msgid "No host IDs given."
 msgstr "Не указаны ID узлов сети."
 
 #: api/classes/CUserMacro.php:819
-#, c-format
+#, php-format
 msgid "No host given for macro \"%1$s\"."
 msgstr "Узел сети не задан для макроса \"%1$s\"."
 
@@ -9213,7 +9213,7 @@ msgid "No host groups defined."
 msgstr "Группы узлов сети не заданы."
 
 #: include/hosts.inc.php:493
-#, c-format
+#, php-format
 msgid "No host groups with groupid \"%s\"."
 msgstr "Нет групп узлов сети с groupid \"%s\"."
 
@@ -9222,7 +9222,7 @@ msgid "No host prototypes defined."
 msgstr "Прототипы узлов сети не заданы."
 
 #: include/hosts.inc.php:536
-#, c-format
+#, php-format
 msgid "No host with hostid \"%s\"."
 msgstr "Нет узла сети с hostid \"%s\"."
 
@@ -9232,7 +9232,7 @@ msgid "No hosts defined."
 msgstr "Узлы сети не заданы."
 
 #: api/classes/CMapElement.php:66
-#, c-format
+#, php-format
 msgid "No icon for map element \"%s\"."
 msgstr "Нет иконки для элемента карты сети \"%s\"."
 
@@ -9263,12 +9263,12 @@ msgid "No interface found."
 msgstr "Интерфейс не найден."
 
 #: api/classes/CProxy.php:258 api/classes/CProxy.php:264
-#, c-format
+#, php-format
 msgid "No interface provided for proxy \"%s\"."
 msgstr "Не указан интерфейс для прокси \"%s\"."
 
 #: api/classes/CHost.php:705 api/classes/CHost.php:723
-#, c-format
+#, php-format
 msgid "No interfaces for host \"%s\"."
 msgstr "Нет интерфейсов для узла сети \"%s\"."
 
@@ -9281,12 +9281,12 @@ msgid "No item prototypes defined."
 msgstr "Прототипы элементов данных не заданы."
 
 #: include/items.inc.php:499
-#, c-format
+#, php-format
 msgid "No item with itemid \"%1$s\"."
 msgstr "Нет элемента данных с itemid \"%1$s\"."
 
 #: include/items.inc.php:482
-#, c-format
+#, php-format
 msgid "No item with itemid=\"%1$s\"."
 msgstr "Нет элемента данных с itemid=\"%1$s\"."
 
@@ -9345,27 +9345,27 @@ msgstr "Операции не заданы."
 #: include/classes/import/CConfigurationImport.php:880
 #: include/classes/import/CConfigurationImport.php:960
 #: include/classes/import/CXmlImport18.php:1553
-#, c-format
+#, php-format
 msgid "No permission for graph \"%1$s\"."
 msgstr "Нет прав доступа к графику \"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:963
-#, c-format
+#, php-format
 msgid "No permission for host \"%1$s\"."
 msgstr "Нет прав доступа к узлу сети \"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:1517
-#, c-format
+#, php-format
 msgid "No permission for item \"%1$s\"."
 msgstr "Нет прав доступа к элементу данных \"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:1144
-#, c-format
+#, php-format
 msgid "No permission for template \"%1$s\"."
 msgstr "Нет прав доступа к шаблону \"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:1428
-#, c-format
+#, php-format
 msgid "No permission for trigger \"%s\"."
 msgstr "Нет прав доступа к триггеру \"%1$s\"."
 
@@ -9378,17 +9378,17 @@ msgid "No permissions defined."
 msgstr "Права доступа не заданы."
 
 #: include/classes/import/CXmlImport18.php:1024
-#, c-format
+#, php-format
 msgid "No permissions for group \"%1$s\"."
 msgstr "Нет прав доступа к группе \"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:661
-#, c-format
+#, php-format
 msgid "No permissions for map \"%1$s\"."
 msgstr "Нет прав доступа к карте сети \"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:452
-#, c-format
+#, php-format
 msgid "No permissions for screen \"%1$s\"."
 msgstr "Нет прав доступа к комплексному экрану \"%1$s\"."
 
@@ -9440,7 +9440,7 @@ msgid "No permissions to referred object or it does not exist!"
 msgstr "Нет прав доступа к запрашиваемому объекту или он не существует!"
 
 #: api/classes/CAction.php:1351
-#, c-format
+#, php-format
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "Не указан файл приватного ключа для команды \"%s\" в операции действия."
 
@@ -9461,7 +9461,7 @@ msgid "No proxy ID given."
 msgstr "ID прокси не задан."
 
 #: api/classes/CAction.php:1348
-#, c-format
+#, php-format
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "Не указан файл публичного ключа для команды \"%s\" в операции действия."
 
@@ -9549,7 +9549,7 @@ msgid "No trigger"
 msgstr "Без триггера"
 
 #: include/triggers.inc.php:271
-#, c-format
+#, php-format
 msgid "No trigger with triggerid \"%1$s\"."
 msgstr "Нет триггера с triggerid \"%1$s\"."
 
@@ -9681,7 +9681,7 @@ msgid "Not Templated items"
 msgstr "Без элементов данных из шаблона"
 
 #: api/classes/CTrigger.php:1486
-#, c-format
+#, php-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr "Не все шаблоны соединены с \"%s\"."
 
@@ -10016,7 +10016,7 @@ msgid "Only one user group name can be changed at a time."
 msgstr "Только одно имя группы пользователей может быть изменено единовременно."
 
 #: include/services.inc.php:299
-#, c-format
+#, php-format
 msgid "Only the last 20%% of the indicator is displayed."
 msgstr "Индикатор отображает только последние 20%%."
 
@@ -10033,7 +10033,7 @@ msgid "Opera"
 msgstr "Opera"
 
 #: actionconf.php:272
-#, c-format
+#, php-format
 msgid "Operation \"%s\" already exists."
 msgstr "Операция \"%s\" уже существует."
 
@@ -10371,7 +10371,7 @@ msgstr "Палитра"
 
 #: include/reports.inc.php:437 include/reports.inc.php:438
 #: include/reports.inc.php:439 include/reports.inc.php:440
-#, c-format
+#, php-format
 msgid "Palette #%1$s"
 msgstr "Палитра #%1$s"
 
@@ -10411,7 +10411,7 @@ msgid "Parent web scenarios"
 msgstr "Родительские веб-сценарии"
 
 #: api/classes/CImage.php:284
-#, c-format
+#, php-format
 msgid "Parse SQL error [%1$s] in [%2$s]."
 msgstr "Ошибка анализа SQL [%1$s] в [%2$s]."
 
@@ -10456,7 +10456,7 @@ msgid "Password should not be empty"
 msgstr "Пароль не может быть пустым"
 
 #: include/classes/debug/CProfiler.php:145
-#, c-format
+#, php-format
 msgid "Peak memory usage: %s"
 msgstr "Пик использования памяти: %s"
 
@@ -10737,17 +10737,17 @@ msgid "Proxy"
 msgstr "Прокси"
 
 #: include/classes/import/importers/CHostImporter.php:143
-#, c-format
+#, php-format
 msgid "Proxy \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Прокси \"%1$s\" для узла сети \"%2$s\" не существует."
 
 #: api/classes/CProxy.php:571
-#, c-format
+#, php-format
 msgid "Proxy \"%1$s\" is used by discovery rule \"%2$s\"."
 msgstr "Прокси \"%1$s\" используется в правиле обнаружения \"%2$s\"."
 
 #: api/classes/CProxy.php:249
-#, c-format
+#, php-format
 msgid "Proxy \"%s\" already exists."
 msgstr "Прокси \"%s\" уже существует."
 
@@ -10880,7 +10880,7 @@ msgid "Refresh unsupported items (in sec)"
 msgstr "Обновление неподдерживаемых элементов данных (в сек)"
 
 #: adm.other.php:61
-#, c-format
+#, php-format
 msgid "Refresh unsupported items (in sec) \"%1$s\"."
 msgstr "Обновлять неподдерживаемые элементы данных (в сек) \"%1$s\"."
 
@@ -10893,7 +10893,7 @@ msgid "Regular expression"
 msgstr "Регулярное выражение"
 
 #: include/regexp.inc.php:62 include/regexp.inc.php:102
-#, c-format
+#, php-format
 msgid "Regular expression \"%s\" already exists."
 msgstr "Регулярное выражение \"%s\" уже существует."
 
@@ -11167,7 +11167,7 @@ msgid "Result is TRUE"
 msgstr "Результат ИСТИНА"
 
 #: include/views/general.script.execute.php:30
-#, c-format
+#, php-format
 msgid "Result of \"%s\""
 msgstr "Результат для \"%s\""
 
@@ -11218,7 +11218,7 @@ msgid "Row span"
 msgstr "Объединение строк"
 
 #: api/classes/CScreenItem.php:606
-#, c-format
+#, php-format
 msgid "Row span of screen element located at X - %1$s and Y - %2$s is too big."
 msgstr "Объединение строк элемента комплексного экрана, размещенного по X - %1$s и Y - %2$s слишком большое."
 
@@ -11395,7 +11395,7 @@ msgid "SNMPv3 agent"
 msgstr "SNMPv3 агент"
 
 #: include/classes/debug/CProfiler.php:141
-#, c-format
+#, php-format
 msgid "SQL count: %s (selects: %s | executes: %s)"
 msgstr "Количество SQL: %s (selects: %s | executes: %s)"
 
@@ -11404,13 +11404,13 @@ msgid "SQL query"
 msgstr "SQL запрос"
 
 #: include/classes/db/DB.php:716
-#, c-format
+#, php-format
 msgid "SQL statement execution has failed \"%1$s\""
 msgstr "Ошибка при выполнении SQL запроса \"%1$s\""
 
 #: include/classes/db/DB.php:446 include/classes/db/DB.php:493
 #: include/classes/db/DB.php:550
-#, c-format
+#, php-format
 msgid "SQL statement execution has failed \"%1$s\"."
 msgstr "Ошибка при выполнении SQL запроса \"%1$s\"."
 
@@ -11550,7 +11550,7 @@ msgstr "Комплексный экран"
 
 #: include/classes/import/CXmlImport18.php:577
 #: include/classes/import/CXmlImport18.php:1713
-#, c-format
+#, php-format
 msgid "Screen \"%1$s\" added."
 msgstr "Комплексный экран \"%1$s\" добавлен."
 
@@ -11560,20 +11560,20 @@ msgstr "Комплексный экран \"%1$s\" уже существует �
 
 #: api/classes/CScreen.php:386 api/classes/CScreen.php:460
 #: api/classes/CTemplateScreen.php:640 api/classes/CTemplateScreen.php:691
-#, c-format
+#, php-format
 msgid "Screen \"%1$s\" already exists."
 msgstr "Комплексный экран \"%1$s\" уже существует."
 
 #: include/classes/import/CXmlImport18.php:460
 #: include/classes/import/CXmlImport18.php:1644
 #: include/classes/import/CXmlImport18.php:1648
-#, c-format
+#, php-format
 msgid "Screen \"%1$s\" skipped - user rule."
 msgstr "Комплексный экран \"%1$s\" пропущен - правило пользователя."
 
 #: include/classes/import/CXmlImport18.php:574
 #: include/classes/import/CXmlImport18.php:1705
-#, c-format
+#, php-format
 msgid "Screen \"%1$s\" updated."
 msgstr "Комплексный экран \"%1$s\" обновлен."
 
@@ -11625,7 +11625,7 @@ msgstr "Скрипт"
 
 #: api/classes/CScript.php:430 api/classes/CScript.php:491
 #: api/classes/CScript.php:623
-#, c-format
+#, php-format
 msgid "Script \"%1$s\" already exists."
 msgstr "Скрипт \"%1$s\" уже существует."
 
@@ -11638,7 +11638,7 @@ msgid "Script deleted"
 msgstr "Скрипт удален"
 
 #: api/classes/CScript.php:615
-#, c-format
+#, php-format
 msgid "Script menu path \"%1$s\" already used in script name \"%2$s\"."
 msgstr "Путь \"%1$s\" меню скрипта  уже используется в имени скрипта \"%2$s\"."
 
@@ -11648,7 +11648,7 @@ msgid "Script name"
 msgstr "Имя скрипта"
 
 #: api/classes/CScript.php:602
-#, c-format
+#, php-format
 msgid "Script name \"%1$s\" already used in menu path for script \"%2$s\"."
 msgstr "Имя скрипта \"%1$s\" уже используется в пути меню для скрипта \"%2$s\"."
 
@@ -11661,7 +11661,7 @@ msgid "Script updated"
 msgstr "Скрипт обновлен"
 
 #: api/classes/CScript.php:465
-#, c-format
+#, php-format
 msgid "Script with scriptid \"%1$s\" does not exist."
 msgstr "Скрипт с scriptid \"%1$s\" не существует."
 
@@ -11882,22 +11882,22 @@ msgid "Service"
 msgstr "Услуга"
 
 #: api/classes/CService.php:1301
-#, c-format
+#, php-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
 msgstr "Услуга \"%1$s\" не может быть удалена, потому что другая услуга зависит от неё."
 
 #: api/classes/CService.php:1322
-#, c-format
+#, php-format
 msgid "Service \"%1$s\" cannot be dependent on itself."
 msgstr "Услуга \"%1$s\" не может зависеть сама от себя."
 
 #: api/classes/CService.php:1401
-#, c-format
+#, php-format
 msgid "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
 msgstr "Услуга \"%1$s\" не может быть связана с триггером и быть подчиненной одновременно."
 
 #: api/classes/CService.php:1376
-#, c-format
+#, php-format
 msgid "Service \"%1$s\" is already hardlinked to a different service."
 msgstr "Услуга \"%1$s\" уже жестко связана с другой услугой."
 
@@ -11991,7 +11991,7 @@ msgid "Show disabled triggers"
 msgstr "Показывать деактивированные триггеры"
 
 #: adm.gui.php:76
-#, c-format
+#, php-format
 msgid "Show events max \"%1$s\"."
 msgstr "Отображаются макс \"%1$s\" событий."
 
@@ -12000,7 +12000,7 @@ msgid "Show events not older than (in days)"
 msgstr "Отображать события не старше чем (в днях)"
 
 #: adm.gui.php:75
-#, c-format
+#, php-format
 msgid "Show events not older than (in days) \"%1$s\"."
 msgstr "Отображать события не старше чем (в днях) \"%1$s\"."
 
@@ -12123,12 +12123,12 @@ msgid "Site state / province"
 msgstr "Область / район"
 
 #: include/classes/server/CZabbixServer.php:213
-#, c-format
+#, php-format
 msgid "Size of the response received from Zabbix server \"%1$s\" exceeds the allowed size of %2$s bytes. This value can be increased in the ZBX_SOCKET_BYTES_LIMIT constant in include/defines.inc.php."
 msgstr "Размер полученного ответа от Zabbix сервера \"%1$s\" превышает допустимый размер в %2$s байт. Это значение можно увеличить с помощью ZBX_SOCKET_BYTES_LIMIT константы в include/defines.inc.php."
 
 #: include/graphs.inc.php:357
-#, c-format
+#, php-format
 msgid "Skipped copying of graph \"%1$s\" to host \"%2$s\"."
 msgstr "Пропущено копирование графика \"%1$s\" в узел сети \"%2$s\"."
 
@@ -12142,7 +12142,7 @@ msgid "Slide show"
 msgstr "Слайд-шоу"
 
 #: include/screens.inc.php:181 include/screens.inc.php:243
-#, c-format
+#, php-format
 msgid "Slide show \"%s\" already exists."
 msgstr "Слайд-шоу \"%s\" уже существует."
 
@@ -12227,7 +12227,7 @@ msgid "Sort triggers by"
 msgstr "Сортировать триггеры по"
 
 #: include/classes/api/CZBXAPI.php:566
-#, c-format
+#, php-format
 msgid "Sorting by field \"%1$s\" not allowed."
 msgstr "Сортировка по полю \"%1$s\" не разрешена."
 
@@ -12347,7 +12347,7 @@ msgid "Step"
 msgstr "Шаг"
 
 #: httpmon.php:144
-#, c-format
+#, php-format
 msgid "Step \"%1$s\" [%2$s of %3$s] failed: %4$s"
 msgstr "Шаг \"%1$s\" [%2$s из %3$s] ошибочный: %4$s"
 
@@ -12360,7 +12360,7 @@ msgid "Step of scenario"
 msgstr "Шаг сценария"
 
 #: include/views/configuration.httpconf.popup.php:32
-#, c-format
+#, php-format
 msgid "Step with name \"%1$s\" already exists."
 msgstr "Шаг с именем \"%1$s\" уже существует."
 
@@ -12500,12 +12500,12 @@ msgid "TRUE"
 msgstr "ИСТИНА"
 
 #: include/classes/db/DB.php:236
-#, c-format
+#, php-format
 msgid "Table \"%1$s\" does not exist."
 msgstr "Таблица \"%1$s\" не существует."
 
 #: include/classes/db/DB.php:394
-#, c-format
+#, php-format
 msgid "Table \"%1$s\" doesn't have a field named \"%2$s\"."
 msgstr "У таблицы \"%1$s\" нет поля с именем \"%2$s\"."
 
@@ -12545,22 +12545,22 @@ msgid "Template"
 msgstr "Шаблон"
 
 #: api/classes/CHost.php:1112
-#, c-format
+#, php-format
 msgid "Template \"%1$s\" already exists."
 msgstr "Шаблон \"%1$s\" уже существует."
 
 #: include/classes/import/importers/CHostImporter.php:33
-#, c-format
+#, php-format
 msgid "Template \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Шаблон \"%1$s\" для узла сети \"%2$s\" не существует."
 
 #: api/classes/CHostBase.php:94
-#, c-format
+#, php-format
 msgid "Template \"%1$s\" with item key \"%2$s\" already linked to host."
 msgstr "Шаблон \"%1$s\" с ключем элемента данных \"%2$s\" уже присоединен к узлу сети."
 
 #: api/classes/CTemplate.php:506
-#, c-format
+#, php-format
 msgid "Template \"%s\" already exists."
 msgstr "Шаблон \"%s\" уже существует."
 
@@ -12605,18 +12605,18 @@ msgid "Template updated"
 msgstr "Шаблон обновлен"
 
 #: include/hosts.inc.php:724
-#, c-format
+#, php-format
 msgid "Template with item key \"%1$s\" already linked to host."
 msgstr "Шаблон с ключем элемента данных \"%1$s\" уже соединен с узлом сети."
 
 #: api/classes/CHost.php:825 api/classes/CTemplate.php:877
-#, c-format
+#, php-format
 msgid "Template with the same name \"%s\" already exists."
 msgstr "Шаблон с таким же именем \"%s\" уже существует."
 
 #: api/classes/CHost.php:831 api/classes/CTemplate.php:516
 #: api/classes/CTemplate.php:850
-#, c-format
+#, php-format
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr "Шаблон с таким же видимым именем \"%s\" уже существует."
 
@@ -12637,7 +12637,7 @@ msgid "Templates"
 msgstr "Шаблоны"
 
 #: api/classes/CHostBase.php:272
-#, c-format
+#, php-format
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "Шаблоны \"%1$s\" отсоединены от узлов сети \"%2$s\"."
 
@@ -12688,22 +12688,22 @@ msgid "The frontend does not match Zabbix database."
 msgstr "Веб-интерфейс не соответствует базе данных Zabbix."
 
 #: include/classes/db/DbBackend.php:48
-#, c-format
+#, php-format
 msgid "The frontend does not match Zabbix database. Current database version (mandatory/optional): %d/%d. Required mandatory version: %d. Contact your system administrator."
 msgstr "Веб-интерфейс не соответствует базе данных Zabbix. Текущая версия базы данных (обязательная/опциональная): %d/%d. Требуется обязательная версия: %d. Свяжитесь с вашим системным администратором."
 
 #: include/views/configuration.hostgroups.list.php:137
-#, c-format
+#, php-format
 msgid "The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr "Группа узлов сети более не обнаруживается и будет удалена в %1$s (через %2$s %3$s)."
 
 #: include/html.inc.php:591
-#, c-format
+#, php-format
 msgid "The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr "Узел сети более не обнаруживается и будет удален в %1$s (через %2$s %3$s)."
 
 #: api/classes/CImage.php:493
-#, c-format
+#, php-format
 msgid "The image is used in icon map %1$s."
 msgid_plural "The image is used in icon maps %1$s."
 msgstr[0] ""
@@ -12711,7 +12711,7 @@ msgstr[1] ""
 msgstr[2] ""
 
 #: api/classes/CImage.php:519
-#, c-format
+#, php-format
 msgid "The image is used in map %1$s."
 msgid_plural "The image is used in maps %1$s."
 msgstr[0] ""
@@ -12719,7 +12719,7 @@ msgstr[1] ""
 msgstr[2] ""
 
 #: include/views/configuration.item.list.php:126
-#, c-format
+#, php-format
 msgid "The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr "Элемент данных более не обнаруживается и будет удален в %1$s (из %2$s в %3$s)."
 
@@ -12744,7 +12744,7 @@ msgid "Theme"
 msgstr "Тема"
 
 #: authentication.php:150
-#, c-format
+#, php-format
 msgid "There is \"%1$d\" group with Internal GUI access."
 msgid_plural "There are \"%1$d\" groups with Internal GUI access."
 msgstr[0] "Существует \"%1$d\" группа с внутренним доступом к GUI."
@@ -12756,7 +12756,7 @@ msgid "Third"
 msgstr "Третий"
 
 #: include/views/configuration.host.edit.php:791
-#, c-format
+#, php-format
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "Это поле автоматически заполняется элементом данных \"%s\"."
 
@@ -12896,12 +12896,12 @@ msgid "Total"
 msgstr "Всего"
 
 #: include/classes/debug/CProfiler.php:134
-#, c-format
+#, php-format
 msgid "Total SQL time: %s"
 msgstr "Всего затрачено времени на SQL: %s"
 
 #: include/classes/debug/CProfiler.php:128
-#, c-format
+#, php-format
 msgid "Total time: %s"
 msgstr "Всего затрачено времени: %s"
 
@@ -12936,24 +12936,24 @@ msgid "Trigger"
 msgstr "Триггер"
 
 #: api/classes/CTriggerGeneral.php:283
-#, c-format
+#, php-format
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr "Триггер \"%1$s\" уже существует у \"%2$s\"."
 
 #: include/classes/import/CConfigurationImport.php:998
 #: include/classes/import/CConfigurationImport.php:1034
-#, c-format
+#, php-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Триггер \"%1$s\" зависит от триггера \"%2$s\", который не существует."
 
 #: include/classes/import/CXmlImport18.php:1435
 #: include/classes/import/CXmlImport18.php:1439
-#, c-format
+#, php-format
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "Триггер \"%1$s\" пропущен - правило пользователя."
 
 #: api/classes/CTrigger.php:1625
-#, c-format
+#, php-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Триггер \"%s\" принадлежит шаблонам с разными связями."
 
@@ -12995,7 +12995,7 @@ msgid "Trigger form"
 msgstr "Форма триггера для журнала"
 
 #: api/classes/CHostBase.php:187
-#, c-format
+#, php-format
 msgid "Trigger has items from template \"%1$s\" that is not linked to host."
 msgstr "У триггера есть элементы данных из шаблона \"%1$s\", которые не соединены с узлом сети."
 
@@ -13008,7 +13008,7 @@ msgid "Trigger in \"unknown\" state"
 msgstr "Триггер в \"неизвестном\" состоянии"
 
 #: api/classes/CHostBase.php:143
-#, c-format
+#, php-format
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "У триггера из шаблона \"%1$s\" есть зависимость от триггера из шаблона \"%2$s\"."
 
@@ -13029,7 +13029,7 @@ msgid "Trigger prototype"
 msgstr "Прототип триггера"
 
 #: api/classes/CTriggerPrototype.php:530 api/classes/CTriggerPrototype.php:605
-#, c-format
+#, php-format
 msgid "Trigger prototype expression \"%1$s\" must contain at least one item prototype."
 msgstr "Выражение прототипа триггера \"%1$s\" должно содержать по крайней мере один прототип элемента данных."
 
@@ -13123,7 +13123,7 @@ msgid "Truncated"
 msgstr "Укорочено"
 
 #: include/classes/class.cpagefilter.php:198
-#, c-format
+#, php-format
 msgid "Try to read inaccessible property \"%s\"."
 msgstr "Попытка чтения недоступного свойства \"%s\"."
 
@@ -13145,7 +13145,7 @@ msgid "Two elements should be selected"
 msgstr "Должны быть выбраны два элемента"
 
 #: api/classes/CItem.php:1020
-#, c-format
+#, php-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "Два элемента данных (\"%1$s\" и \"%2$s\") не могут заполнять одно поле \"%3$s\" инвентарных данных узла сети, это может привести к конфликту."
 
@@ -13408,52 +13408,52 @@ msgid "Unlink from templates"
 msgstr "Отсоединить от шаблонов"
 
 #: api/classes/CHostGeneral.php:569
-#, c-format
+#, php-format
 msgid "Unlinked: Application \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: Группа элементов данных \"%1$s\" от \"%2$s\"."
 
 #: api/classes/CHostGeneral.php:347
-#, c-format
+#, php-format
 msgid "Unlinked: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: Правило обнаружения \"%1$s\" от \"%2$s\"."
 
 #: api/classes/CHostGeneral.php:481
-#, c-format
+#, php-format
 msgid "Unlinked: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: График \"%1$s\" от \"%2$s\"."
 
 #: api/classes/CHostGeneral.php:464
-#, c-format
+#, php-format
 msgid "Unlinked: Graph prototype \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: Прототип графика \"%1$s\" от \"%2$s\"."
 
 #: api/classes/CHostGeneral.php:412
-#, c-format
+#, php-format
 msgid "Unlinked: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: Прототип узла сети \"%1$s\" от \"%2$s\"."
 
 #: api/classes/CHostGeneral.php:364
-#, c-format
+#, php-format
 msgid "Unlinked: Item \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: Элемент данных \"%1$s\" от \"%2$s\"."
 
 #: api/classes/CHostGeneral.php:381
-#, c-format
+#, php-format
 msgid "Unlinked: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: Прототип элемента данных \"%1$s\" от \"%2$s\"."
 
 #: api/classes/CHostGeneral.php:287
-#, c-format
+#, php-format
 msgid "Unlinked: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: Триггер \"%1$s\" от \"%2$s\"."
 
 #: api/classes/CHostGeneral.php:304
-#, c-format
+#, php-format
 msgid "Unlinked: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: Прототип триггера \"%1$s\" от \"%2$s\"."
 
 #: api/classes/CHostGeneral.php:520
-#, c-format
+#, php-format
 msgid "Unlinked: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: Веб-сценарий \"%1$s\" от \"%2$s\"."
 
@@ -13462,27 +13462,27 @@ msgid "Unmute"
 msgstr "Включить звук"
 
 #: include/classes/import/readers/CImportReaderFactory.php:65
-#, c-format
+#, php-format
 msgid "Unsupported import file extension \"%1$s\"."
 msgstr "Неподдерживаемое расширение файла импорта \"%1$s\"."
 
 #: include/classes/import/readers/CImportReaderFactory.php:44
-#, c-format
+#, php-format
 msgid "Unsupported import format \"%1$s\"."
 msgstr "Неподдерживаемый формат импорта \"%1$s\"."
 
 #: api/classes/CHostPrototype.php:227 api/classes/CHostPrototype.php:245
-#, c-format
+#, php-format
 msgid "Unsupported parameter \"%1$s\" for group prototype."
 msgstr "Неподдерживаемый параметр \"%1$s\" для прототипа группы."
 
 #: api/classes/CHostPrototype.php:209
-#, c-format
+#, php-format
 msgid "Unsupported parameter \"%2$s\" for host prototype \"%1$s\"."
 msgstr "Неподдерживаемый параметр \"%2$s\" для прототипа узла сети \"%1$s\"."
 
 #: api/classes/CHostPrototype.php:203
-#, c-format
+#, php-format
 msgid "Unsupported parameter \"%2$s\" for host prototype %1$s host inventory."
 msgstr "Неподдерживаемый параметр \"%2$s\" для прототипа узла сети %1$s инвентарных данных."
 
@@ -13535,47 +13535,47 @@ msgstr "Состояние узла сети обновлено"
 #: include/blocks.inc.php:774 include/blocks.inc.php:1018
 #: include/blocks.inc.php:1117 include/blocks.inc.php:1175
 #: include/classes/screens/CScreenSystemStatus.php:47
-#, c-format
+#, php-format
 msgid "Updated: %s"
 msgstr "Обновлено: %s"
 
 #: api/classes/managers/CApplicationManager.php:122
-#, c-format
+#, php-format
 msgid "Updated: Application \"%1$s\" on \"%2$s\"."
 msgstr "Обновлено: Группа элементов данных \"%1$s\" в \"%2$s\"."
 
 #: api/classes/CDiscoveryRule.php:643
-#, c-format
+#, php-format
 msgid "Updated: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Обновлено: Правило обнаружения \"%1$s\" в \"%2$s\"."
 
 #: api/classes/CHostPrototype.php:615
-#, c-format
+#, php-format
 msgid "Updated: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Обновлено: Прототип узла сети \"%1$s\" у \"%2$s\"."
 
 #: api/classes/CItem.php:643
-#, c-format
+#, php-format
 msgid "Updated: Item \"%1$s\" on \"%2$s\"."
 msgstr "Обновлено: Элемент данных \"%1$s\" в \"%2$s\"."
 
 #: api/classes/CItemPrototype.php:459
-#, c-format
+#, php-format
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Обновлено: Прототип элемента данных \"%1$s\" в \"%2$s\"."
 
 #: api/classes/CTrigger.php:1278
-#, c-format
+#, php-format
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Обновлено: Триггер \"%1$s\" в \"%2$s\"."
 
 #: api/classes/CTriggerPrototype.php:840
-#, c-format
+#, php-format
 msgid "Updated: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Обновлено: Прототип триггера \"%1$s\" в \"%2$s\"."
 
 #: api/classes/managers/CHttpTestManager.php:247
-#, c-format
+#, php-format
 msgid "Updated: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "Обновлено: Веб-сценарий \"%1$s\" в \"%2$s\"."
 
@@ -13626,7 +13626,7 @@ msgid "User"
 msgstr "Пользователь"
 
 #: api/classes/CUser.php:327
-#, c-format
+#, php-format
 msgid "User \"%s\" cannot be without user group."
 msgstr "Пользователь \"%s\" не может существовать без группы пользователей."
 
@@ -13668,17 +13668,17 @@ msgid "User group"
 msgstr "Группа пользователей"
 
 #: api/classes/CUserGroup.php:619
-#, c-format
+#, php-format
 msgid "User group \"%1$s\" is used in script \"%2$s\"."
 msgstr "Группа пользователей \"%1$s\" используется в скрипте \"%2$s\"."
 
 #: api/classes/CUserGroup.php:434
-#, c-format
+#, php-format
 msgid "User group \"%s\" already exists."
 msgstr "Группа пользователей \"%s\" уже существует."
 
 #: api/classes/CUserGroup.php:626
-#, c-format
+#, php-format
 msgid "User group [%s] is used in configuration for database down messages."
 msgstr "Группа пользователей [%s] используется в настройках для оповещения о недоступности базы данных."
 
@@ -13702,12 +13702,12 @@ msgid "User is not allowed to delete himself."
 msgstr "Пользователю не разрешается удалять самого себя."
 
 #: api/classes/CUser.php:340
-#, c-format
+#, php-format
 msgid "User may not modify GUI access for himself by becoming a member of user group \"%s\"."
 msgstr "Пользователь не может изменять доступ к GUI для самого себя путем введения в группу пользователей \"%s\"."
 
 #: api/classes/CUser.php:344
-#, c-format
+#, php-format
 msgid "User may not modify system status for himself by becoming a member of user group \"%s\"."
 msgstr "Пользователь не может изменять системный статус для самого себя путем введения в группу пользователей \"%s\"."
 
@@ -13745,7 +13745,7 @@ msgid "User updated"
 msgstr "Пользователь обновлен"
 
 #: api/classes/CUser.php:389
-#, c-format
+#, php-format
 msgid "User with alias \"%s\" already exists."
 msgstr "Пользователь с псевдонимом \"%s\" уже существует."
 
@@ -13784,32 +13784,32 @@ msgstr "Разблокированные пользователи"
 #: include/classes/screens/CScreenHistory.php:266 include/reports.inc.php:172
 #: include/views/administration.general.valuemapping.edit.php:41
 #: include/views/common.macros.php:37 tr_testexpr.php:50
-#, c-format
+#, php-format
 msgid "Value"
 msgstr "Значение"
 
 #: api/classes/CMap.php:469
-#, c-format
+#, php-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_align\". Choices are: \"%2$s\" and \"%3$s\""
 msgstr "Значение \"%1$s\" является недопустимым для параметра \"grid_align\". Варианты: \"%2$s\" и \"%3$s\""
 
 #: api/classes/CMap.php:474
-#, c-format
+#, php-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\" and \"%3$s\"."
 msgstr "Значение \"%1$s\" является недопустимым для параметра \"grid_show\". Варианты: \"%2$s\" и \"%3$s\"."
 
 #: api/classes/CMap.php:464
-#, c-format
+#, php-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\"."
 msgstr "Значение \"%1$s\" является недопустимым для параметра \"grid_show\". Варианты: \"%2$s\"."
 
 #: include/classes/db/DB.php:338
-#, c-format
+#, php-format
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr "Значение \"%1$s\" является чересчур длинным для поля \"%2$s\" - %3$d символов. Допустимая длина %4$d символов."
 
 #: include/classes/db/DB.php:367
-#, c-format
+#, php-format
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is 2048 characters."
 msgstr "Значение \"%1$s\" слишком длинное для поля \"%2$s\" - %3$d символов. Допустимая длина 2048 символов."
 
@@ -13823,17 +13823,17 @@ msgid "Value map"
 msgstr "Преобразование значений"
 
 #: adm.valuemapping.php:106
-#, c-format
+#, php-format
 msgid "Value map \"%1$s\" \"%2$s\"."
 msgstr "Преобразование значений \"%1$s\" \"%2$s\"."
 
 #: include/valuemap.inc.php:40 include/valuemap.inc.php:78
-#, c-format
+#, php-format
 msgid "Value map \"%1$s\" already exists."
 msgstr "Преобразование значений \"%1$s\" уже существует."
 
 #: adm.valuemapping.php:80
-#, c-format
+#, php-format
 msgid "Value map \"%1$s\"."
 msgstr "Преобразование значений \"%1$s\"."
 
@@ -13850,7 +13850,7 @@ msgid "Value map updated"
 msgstr "Преобразование значений обновлено"
 
 #: adm.valuemapping.php:100 include/valuemap.inc.php:67
-#, c-format
+#, php-format
 msgid "Value map with valuemapid \"%1$s\" does not exist."
 msgstr "Преобразования значений с valuemapid \"%1$s\" не существует."
 
@@ -13867,7 +13867,7 @@ msgid "Value mapping must have at least one mapping."
 msgstr "У преобразования значений должно быть по крайней мере одно преобразование."
 
 #: include/classes/class.cpie.php:332
-#, c-format
+#, php-format
 msgid "Value: no data"
 msgstr "Значение: нет данных"
 
@@ -13944,12 +13944,12 @@ msgstr "Веб-мониторинг"
 
 #: api/classes/managers/CHttpTestManager.php:366
 #: api/classes/managers/CHttpTestManager.php:374
-#, c-format
+#, php-format
 msgid "Web scenario \"%1$s\" already exists on host \"%2$s\"."
 msgstr "Веб-сценарий \"%1$s\" уже существует у узла сети \"%2$s\"."
 
 #: api/classes/CHttpTest.php:478 api/classes/CHttpTest.php:530
-#, c-format
+#, php-format
 msgid "Web scenario \"%1$s\" already exists."
 msgstr "Веб-сценарий \"%1$s\" уже существует."
 
@@ -13966,7 +13966,7 @@ msgid "Web scenario disabled"
 msgstr "Веб-сценарий деактивирован"
 
 #: api/classes/CHttpTest.php:471 api/classes/CHttpTest.php:511
-#, c-format
+#, php-format
 msgid "Web scenario missing parameters: %1$s"
 msgstr "У веб-сценария отсутствуют параметры: %1$s"
 
@@ -13975,7 +13975,7 @@ msgid "Web scenario must have at least one step."
 msgstr "Веб-сценарий должен иметь по крайней мере один шаг."
 
 #: api/classes/CHttpTest.php:609
-#, c-format
+#, php-format
 msgid "Web scenario step \"%1$s\" already exists."
 msgstr "Шаг веб-сценария \"%1$s\" уже существует."
 
@@ -14068,7 +14068,7 @@ msgid "Working time"
 msgstr "Рабочее время"
 
 #: adm.workingtime.php:48
-#, c-format
+#, php-format
 msgid "Working time \"%1$s\"."
 msgstr "Рабочее время \"%1$s\"."
 
@@ -14078,7 +14078,7 @@ msgid "Write"
 msgstr "Запись"
 
 #: api/classes/CService.php:397
-#, c-format
+#, php-format
 msgid "Wrong fields for dependency for service \"%1$s\"."
 msgstr "Ошибочные поля для зависимости услуги \"%1$s\"."
 
@@ -14087,12 +14087,12 @@ msgid "Wrong fields for element."
 msgstr "Ошибочные поля для элемента."
 
 #: api/classes/CHost.php:665
-#, c-format
+#, php-format
 msgid "Wrong fields for host \"%s\"."
 msgstr "Ошибочные поля для узла сети \"%s\"."
 
 #: api/classes/CImage.php:254
-#, c-format
+#, php-format
 msgid "Wrong fields for image \"%1$s\"."
 msgstr "Ошибочные поля для изображения \"%1$s\"."
 
@@ -14114,7 +14114,7 @@ msgstr "Ошибочные поля для linktrigger."
 
 #: api/classes/CUserMacro.php:303 api/classes/CUserMacro.php:349
 #: api/classes/CUserMacro.php:438 api/classes/CUserMacro.php:498
-#, c-format
+#, php-format
 msgid "Wrong fields for macro \"%1$s\"."
 msgstr "Ошибочные поля для макроса \"%1$s\"."
 
@@ -14127,13 +14127,13 @@ msgid "Wrong fields for media type."
 msgstr "Ошибочные поля для способа оповещения."
 
 #: api/classes/CProxy.php:207
-#, c-format
+#, php-format
 msgid "Wrong fields for proxy \"%1$s\"."
 msgstr "Ошибочные поля для прокси \"%1$s\"."
 
 #: api/classes/CScreen.php:371 api/classes/CTemplateScreen.php:635
 #: api/classes/CTemplateScreen.php:673
-#, c-format
+#, php-format
 msgid "Wrong fields for screen \"%1$s\"."
 msgstr "Ошибочные поля для комплексного экрана \"%1$s\"."
 
@@ -14142,12 +14142,12 @@ msgid "Wrong fields for script."
 msgstr "Ошибочные поля для скрипта."
 
 #: api/classes/CService.php:127 api/classes/CService.php:238
-#, c-format
+#, php-format
 msgid "Wrong fields for service \"%1$s\"."
 msgstr "Ошибочные поля для услуги \"%1$s\"."
 
 #: api/classes/CService.php:481
-#, c-format
+#, php-format
 msgid "Wrong fields for time for service \"%1$s\"."
 msgstr "Ошибочные поля для времени услуги \"%1$s\"."
 
@@ -14156,12 +14156,12 @@ msgid "Wrong fields for trigger."
 msgstr "Ошибочные поля для триггера."
 
 #: api/classes/CUser.php:271
-#, c-format
+#, php-format
 msgid "Wrong fields for user \"%s\"."
 msgstr "Ошибочные поля для пользователя \"%s\"."
 
 #: api/classes/CUserMacro.php:793
-#, c-format
+#, php-format
 msgid "Wrong macro \"%1$s\"."
 msgstr "Ошибочный макрос \"%1$s\"."
 
@@ -14175,7 +14175,7 @@ msgid "X label"
 msgstr "Подпись к оси X"
 
 #: include/classes/import/readers/CXmlImportReader.php:48
-#, c-format
+#, php-format
 msgid "XML file contains error %1$s:"
 msgstr "Файл XML содержит ошибку %1$s:"
 
@@ -14186,12 +14186,12 @@ msgid "XML file contains errors"
 msgstr "XML файл содержит ошибки"
 
 #: include/classes/import/readers/CXmlImportReader.php:51
-#, c-format
+#, php-format
 msgid "XML file contains fatal error %1$s:"
 msgstr "XML файл содержит фатальную ошибку %1$s:"
 
 #: include/classes/import/readers/CXmlImportReader.php:45
-#, c-format
+#, php-format
 msgid "XML file contains warning %1$s:"
 msgstr "XML файл содержит предупреждение %1$s:"
 
@@ -14281,7 +14281,7 @@ msgid "You are not able to choose some of the languages, because locales for the
 msgstr "Вы не можете выбрать некоторые языки, т.к. локали для них не установлены на вашем веб-сервере."
 
 #: api/classes/CUser.php:356
-#, c-format
+#, php-format
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "Вам не разрешено менять привилегии пользователя \"%s\"."
 
@@ -14302,12 +14302,12 @@ msgid "You did not specify host group for operation."
 msgstr "Вы не указали группу узлов сети для операции."
 
 #: api/classes/CAction.php:1411
-#, c-format
+#, php-format
 msgid "You did not specify targets for action operation command \"%s\"."
 msgstr "Вы не указали цели для команды \"%s\" в операции действия."
 
 #: api/classes/CAction.php:1408
-#, c-format
+#, php-format
 msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr "Вы не указали цели глобального скрипта \"%s\" в операции действия."
 
@@ -14367,7 +14367,7 @@ msgstr "Zabbix"
 
 #: include/page_footer.php:103 include/views/general.browserwarning.php:60
 #: include/views/general.login.php:50
-#, c-format
+#, php-format
 msgid "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
 msgstr "Zabbix %1$s Все права защищены %2$s-%3$s SIA Zabbix"
 
@@ -14420,7 +14420,7 @@ msgid "Zabbix server"
 msgstr "Zabbix сервер"
 
 #: include/classes/server/CZabbixServer.php:275
-#, c-format
+#, php-format
 msgid ""
 "Zabbix server \"%s\" can not be reached. Possible reasons:\n"
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
@@ -14451,7 +14451,7 @@ msgid "Zabbix server is running"
 msgstr "Zabbix сервер запущен"
 
 #: adm.gui.php:80
-#, c-format
+#, php-format
 msgid "Zabbix server is running check interval \"%1$s\"."
 msgstr "Интервал проверки работы Zabbix сервера составляет \"%1$s\"."
 
@@ -14481,12 +14481,12 @@ msgid "[H:i:s]"
 msgstr "[H:i:s]"
 
 #: include/func.inc.php:166
-#, c-format
+#, php-format
 msgid "[Wrong value for day: \"%s\" ]"
 msgstr "[Неправильное значение дня: \"%s\" ]"
 
 #: include/func.inc.php:151
-#, c-format
+#, php-format
 msgid "[Wrong value for month: \"%s\" ]"
 msgstr "[Неправильное значение месяца: \"%s\" ]"
 
@@ -14811,7 +14811,7 @@ msgid "no"
 msgstr "нет"
 
 #: include/classes/class.cchart.php:1886 include/classes/class.cpie.php:333
-#, c-format
+#, php-format
 msgid "no data"
 msgstr "нет данных"
 
@@ -14917,7 +14917,7 @@ msgid "show value mappings"
 msgstr "преобразования значений"
 
 #: api/classes/CHostBase.php:53
-#, c-format
+#, php-format
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "шаблон с ID \"%1$s\" был встречен %2$s раз"
 
