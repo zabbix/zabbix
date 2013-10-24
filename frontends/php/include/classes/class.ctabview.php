@@ -101,7 +101,11 @@ class CTabView extends CDiv {
 			}
 			else {
 				$activeTab = $this->selectedTab;
-				$createEvent = 'create: function() { jQuery.cookie("tab", '.$this->selectedTab.'); },';
+				$createEvent = 'create: function() {
+					jQuery.cookie("tab", '.$this->selectedTab.
+						((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? ', {secure : true}' : '').
+					');
+				},';
 			}
 
 			$disabledTabs = ($this->disabledTabs === null) ? '' : 'disabled: '.CJs::encodeJson($this->disabledTabs).',';
@@ -112,7 +116,9 @@ class CTabView extends CDiv {
 					'.$disabledTabs.'
 					active: '.$activeTab.',
 					activate: function(event, ui) {
-						jQuery.cookie("tab", ui.newTab.index().toString());
+						jQuery.cookie("tab", ui.newTab.index().toString()'.
+							((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? ', {secure : true}' : '').
+						');
 					}
 				})
 				.css("visibility", "visible");'
