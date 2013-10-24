@@ -107,7 +107,7 @@ if (!function_exists('npgettext')) {
 function _s($string) {
 	$arguments = array_slice(func_get_args(), 1);
 
-	return vsprintf(_($string), $arguments);
+	return _params(_($string), $arguments);
 }
 
 /**
@@ -129,7 +129,7 @@ function _s($string) {
 function _n($string1, $string2) {
 	$arguments = array_slice(func_get_args(), 2);
 
-	return vsprintf(ngettext($string1, $string2, end($arguments)), $arguments);
+	return _params(ngettext($string1, $string2, end($arguments)), $arguments);
 }
 
 /**
@@ -151,8 +151,8 @@ function _x($message, $context) {
 	$arguments = array_slice(func_get_args(), 2);
 
 	return ($context == '')
-		? vsprintf($message, $arguments)
-		: vsprintf(pgettext($context, $message), $arguments);
+		? _params($message, $arguments)
+		: _params(pgettext($context, $message), $arguments);
 }
 
 /**
@@ -177,6 +177,18 @@ function _xn($message, $messagePlural, $num, $context) {
 	array_unshift($arguments, $num);
 
 	return ($context == '')
-		? vsprintf(ngettext($message, $messagePlural, $num), $arguments)
-		: vsprintf(npgettext($context, $message, $messagePlural, $num), $arguments);
+		? _params(ngettext($message, $messagePlural, $num), $arguments)
+		: _params(npgettext($context, $message, $messagePlural, $num), $arguments);
+}
+
+/**
+ * Returns a formatted string.
+ *
+ * @param string $format		recieves already stranlated string with format
+ * @param array  $arguments		arguments to replace according to given format
+ *
+ * @return string
+ */
+function _params($format, array $arguments) {
+	return vsprintf($format, $arguments);
 }
