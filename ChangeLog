@@ -23,6 +23,7 @@ New features:
 A.F....... [ZBX-1357] updated Dutch, Finnish, Indonesian, Italian, Lithuanian, Persian, Portuguese (Portugal), Russian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A.F.I...S. [ZBX-7105] fixed performance of housekeeper; improved indexes for table "events"; fixed SQL statements to use the new indexes (Sasha)
 A...I..... [ZBX-7163] fixed default values for sysmaps.label_location and sysmaps_elements.label_location fields; added NOT NULL constraint to sysmaps_elements.label_location field (Sasha)
 ...G...PS. [ZBXNEXT-1179] fixed inconsistency in process activity time logging (Andris)
 A......... [ZBX-6362] fixed proxy select interfaces (Eduard)
