@@ -205,7 +205,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 
 	public function zbxTestDropdownHasOptions($id, array $strings) {
 		foreach ($strings as $string) {
-			$this->assertElementPresent("//select[@name='".$id."']//option[text()='".$string."']");
+			$this->assertElementPresent("//select[@id='".$id."']//option[text()='".$string."']");
 		}
 	}
 
