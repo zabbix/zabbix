@@ -20,9 +20,11 @@
 var cookie = {
 	cookies: [],
 	prefix:	null,
+	protocol: '',
 
 	init: function() {
 		var path = new Curl();
+		this.protocol = path.protocol;
 		var filename = basename(path.getPath(), '.php');
 		var cookieName = 'cb_' + filename + (this.prefix ? '_' + this.prefix : '');
 		var allCookies = document.cookie.split('; ');
@@ -47,7 +49,7 @@ var cookie = {
 			expires = '; expires=' + date.toGMTString();
 		}
 
-		document.cookie = name + '=' + value + expires;
+		document.cookie = name + '=' + value + expires + (this.protocol == 'https' ? '; secure' : '');
 
 		// apache header size limit
 		if (document.cookie.length > 8000) {

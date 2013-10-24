@@ -23,17 +23,14 @@ class Curl {
 
 	private $url;
 	protected $reference;
-	protected $path;
 	protected $query;
 	protected $arguments = array();
 
 	public function __construct($url = null) {
-		$filename = basename($_SERVER['SCRIPT_NAME']);
-
 		if (empty($url)) {
 			$this->formatGetArguments();
-			$this->url = $filename;
-			$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+			$this->url = basename($_SERVER['SCRIPT_NAME']);
 		}
 		else {
 			$this->url = $url;
@@ -52,12 +49,8 @@ class Curl {
 				$this->url = $url = zbx_substring($url, 0, $tmp_pos);
 			}
 
-			$path = parse_url($this->url, PHP_URL_PATH);
-
 			$this->formatArguments();
 		}
-
-		$this->path = str_replace($filename, '', $path);
 
 		if (isset($_COOKIE['zbx_sessionid'])) {
 			$this->setArgument('sid', substr($_COOKIE['zbx_sessionid'], 16, 16));
@@ -166,14 +159,5 @@ class Curl {
 
 	public function toString() {
 		return $this->getUrl();
-	}
-
-	/**
-	 * returns relative path, i.e. from url http://server/path/to/file.html returns path /server/path/to/
-	 *
-	 * @return string
-	 */
-	public function getPath() {
-		return $this->path;
 	}
 }
