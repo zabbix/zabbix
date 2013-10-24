@@ -797,12 +797,17 @@ class CZBXAPI {
 	/**
 	 * Checks if an objects contains any of the given parameters.
 	 *
-	 * @throws APIException		if any of the parameters are present in the object
+	 * Example:
+	 * checkNoParameters($item, array('templateid', 'state'), _('Cannot set "%1$s" for item "%2$s".'), $item['name']);
+	 * If any of the parameters 'templateid' or 'state' are present in the object, it will be placed in "%1$s"
+	 * and $item['name'] will be placed in "%2$s".
 	 *
-	 * @param array		$object
-	 * @param array		$params			array of parameters to check
-	 * @param string	$error			translated error message with format
-	 * @param string	$objectName
+	 * @throws APIException			if any of the parameters are present in the object
+	 *
+	 * @param array  $object
+	 * @param array  $params		array of parameters to check
+	 * @param string $error
+	 * @param string $objectName
 	 */
 	protected function checkNoParameters(array $object, array $params, $error, $objectName) {
 		foreach ($params as $param) {
