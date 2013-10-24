@@ -132,7 +132,6 @@ $main_menu = array();
 $sub_menus = array();
 
 $denied_page_requested = zbx_construct_menu($main_menu, $sub_menus, $page);
-zbx_flush_post_cookies($denied_page_requested);
 
 // render the "Deny access" page
 if ($denied_page_requested) {
