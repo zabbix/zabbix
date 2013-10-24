@@ -1218,7 +1218,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 		if (NULL == error && (EVENT_OBJECT_ITEM == object || EVENT_OBJECT_LLDRULE == object))
 		{
 			/* item disabled? */
-			result = DBselect("select i.name from items i where i.itemid=" ZBX_FS_UI64 " and i.status=%d",
+			result = DBselect("select name from items where itemid=" ZBX_FS_UI64 " and status=%d",
 					escalation->itemid, ITEM_STATUS_DISABLED);
 			if (NULL != (row = DBfetch(result)))
 				error = zbx_dsprintf(error, "item '%s' disabled.", row[0]);
