@@ -4411,48 +4411,92 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
  *                                                                            *
  * Purpose: update hosts availability in configuration cache                  *
  *                                                                            *
- * Parameters: availability     - [IN] an array containing host availability  *
+ * Parameters: availability     - [IN/OUT] an array containing host           *
+ *                                availability                                *
  *                                data                                        *
  *             availability_num - [IN] the number of items in availability    *
  *                                array                                       *
+ *             old_availability - [OUT] the old availability data, optional.  *
+ *                                If hostid is 0 it means that the host       *
+ *                                availability data was not changed.          *
  *                                                                            *
  * Return value: The number of updates performed.                             *
  *                                                                            *
  ******************************************************************************/
-int	DCconfig_update_host_availability(const zbx_host_availability_t *availability, int availability_num)
+int	DCconfig_update_host_availability(const zbx_host_availability_t *availability, int availability_num,
+		zbx_host_availability_t *availability_old)
 {
-	int		update_count = 0, i;
+	int		update_count = 0, i, now;
 	ZBX_DC_HOST	*dc_host;
 
 	LOCK_CACHE;
 
 	for (i = 0; i < availability_num; i++)
 	{
+		if (NULL != availability_old)
+			availability_old[i].hostid = 0;
+
 		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &availability[i].hostid)))
 			continue;
 
 		switch (availability[i].type)
 		{
 			case ITEM_TYPE_ZABBIX:
+				if (NULL != availability_old)
+				{
+					availability_old[i].available = dc_host->available;
+					availability_old[i].errors_from = dc_host->errors_from;
+					availability_old[i].disable_until = dc_host->disable_until;
+				}
+
+				if (dc_host->available != availability[i].available)
+					dc_host->available = availability[i].available;
+
 				dc_host->errors_from = availability[i].errors_from;
-				dc_host->available = availability[i].available;
 				dc_host->disable_until = availability[i].disable_until;
 				break;
 			case ITEM_TYPE_SNMPv1:
 			case ITEM_TYPE_SNMPv2c:
 			case ITEM_TYPE_SNMPv3:
+				if (NULL != availability_old)
+				{
+					availability_old[i].available = dc_host->snmp_available;
+					availability_old[i].errors_from = dc_host->snmp_errors_from;
+					availability_old[i].disable_until = dc_host->snmp_disable_until;
+				}
+
+				if (dc_host->snmp_available != availability[i].available)
+					dc_host->snmp_available = availability[i].available;
+
 				dc_host->snmp_errors_from = availability[i].errors_from;
-				dc_host->snmp_available = availability[i].available;
 				dc_host->snmp_disable_until = availability[i].disable_until;
 				break;
 			case ITEM_TYPE_IPMI:
+				if (NULL != availability_old)
+				{
+					availability_old[i].available = dc_host->ipmi_available;
+					availability_old[i].errors_from = dc_host->ipmi_errors_from;
+					availability_old[i].disable_until = dc_host->ipmi_disable_until;
+				}
+
+				if (dc_host->ipmi_available != availability[i].available)
+					dc_host->ipmi_available = availability[i].available;
+
 				dc_host->ipmi_errors_from = availability[i].errors_from;
-				dc_host->ipmi_available = availability[i].available;
 				dc_host->ipmi_disable_until = availability[i].disable_until;
 				break;
 			case ITEM_TYPE_JMX:
+				if (NULL != availability_old)
+				{
+					availability_old[i].available = dc_host->jmx_available;
+					availability_old[i].errors_from = dc_host->jmx_errors_from;
+					availability_old[i].disable_until = dc_host->jmx_disable_until;
+				}
+
+				if (dc_host->jmx_available != availability[i].available)
+					dc_host->jmx_available = availability[i].available;
+
 				dc_host->jmx_errors_from = availability[i].errors_from;
-				dc_host->jmx_available = availability[i].available;
 				dc_host->jmx_disable_until = availability[i].disable_until;
 				break;
 			default:

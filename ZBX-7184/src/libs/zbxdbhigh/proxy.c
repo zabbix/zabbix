@@ -1563,7 +1563,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 
 	DBcommit();
 
-	DCconfig_update_host_availability(availability, availability_num);
+	DCconfig_update_host_availability(availability, availability_num, NULL);
 out:
 	zbx_free(availability);
 	zbx_free(sql);
