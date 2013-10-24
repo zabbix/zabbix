@@ -4,11 +4,11 @@ New features:
 ..F.I..... [ZBXNEXT-715] increased the size of sysmaps_elements.label and sysmaps_links.label fields to 2048 characters (Sasha)
 
 Bug fixes:
-..F....... [ZBX-7189] fixed displaing web items in latest (Eduard)
+..F....... [ZBX-7189] fixed web monitoring items not being displayed in Monitoring -> Latest data (Eduard)
 A.F....... [ZBX-7170] improved performance of item.get method and other API requests with "selectItems" option (Ivo)
-..F....... [ZBX-7144] fixed latest data table column widths (Ivo)
+..F....... [ZBX-7144] fixed table column widths in Monitoring -> Latest data (Ivo)
 A......... [ZBX-7152] fixed get method subselects not working correctly if a specific node is selected (Ivo)
-..F....... [ZBX-7180] fixed right table colors (Eduard)
+..F....... [ZBX-7180] fixed table colours in user right assignment lists (Eduard)
 ..F....... [ZBX-7085] fixed gettext errors when omitting the number placeholder in singular form translations (Pavels)
 
 --------------------------------------------------------------------------------
