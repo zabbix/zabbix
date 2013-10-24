@@ -31,6 +31,7 @@ LONG WINAPI	DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS pExcPointers)
 {
 	LONG		lDisposition = EXCEPTION_EXECUTE_HANDLER;
 	PDelayLoadInfo	pDelayLoadInfo = (PDelayLoadInfo)(pExcPointers->ExceptionRecord->ExceptionInformation[0]);
+
 	switch (pExcPointers->ExceptionRecord->ExceptionCode)
 	{
 		case VcppException(ERROR_SEVERITY_ERROR, ERROR_MOD_NOT_FOUND):
@@ -51,6 +52,7 @@ LONG WINAPI	DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS pExcPointers)
 			break;
 		default:
 			zabbix_log(LOG_LEVEL_DEBUG, "unexpected exception in process_eventlog()");
+			lDisposition = EXCEPTION_CONTINUE_EXECUTION;
 			break;
 	}
 	return(lDisposition);
@@ -613,7 +615,7 @@ int	process_eventlog(const char *source, zbx_uint64_t *lastlogsize, unsigned lon
 	versionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 	GetVersionEx(&versionInfo);
 
-	if (versionInfo.dwMajorVersion >= 6)    /* Windows Vista, Windows 7 or Windows Server 2008 */
+	if (versionInfo.dwMajorVersion >= 6)	/* Windows Vista, Windows 7 or Windows Server 2008 */
 	{
 		__try
 		{
