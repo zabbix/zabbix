@@ -144,15 +144,13 @@ class CSetupWizard extends CForm {
 			$next->setEnabled(false);
 		}
 
-		if (CWebUser::$data && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-			$back = $this->getStep()
-				? new CSubmit('back['.$this->getStep().']', '&laquo;'.SPACE._('Previous'))
-				: null;
+		// if the user is not logged in (first setup run) hide the "previous" button on the final step
+		if ($this->getStep()
+				&& ((CWebUser::$data && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) || $this->getStep() < 5)) {
+			$back = new CSubmit('back['.$this->getStep().']', '&laquo;'.SPACE._('Previous'));
 		}
 		else {
-			$back = ($this->getStep() && $this->getStep() < 5)
-				? new CSubmit('back['.$this->getStep().']', '&laquo;'.SPACE._('Previous'))
-				: null;
+			$back = null;
 		}
 
 		$footer = new CDiv(array($cancel, new CDiv(array($back, $next), 'footer_right')), 'footer');

@@ -56,20 +56,16 @@ $fields = array(
 	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,				null)
 );
 
-if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN) {
-	zbx_unsetcookie('ZBX_CONFIG');
-	zbx_unsetcookie('zbx_sessionid');
+// redirect the user to the login page when we finish or cancel the setup
+if ((hasRequest('cancel') && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) ||
+		(hasRequest('finish') && (CWebUser::isGuest() || CWebUser::getType() == USER_TYPE_SUPER_ADMIN))) {
 
-	if (isset($_REQUEST['cancel']) || isset($_REQUEST['back']) || isset($_REQUEST['next']) || isset($_REQUEST['finish'])) {
-		redirect('index.php');
-	}
-	else {
-		access_deny(ACCESS_DENY_PAGE);
-	}
-}
-elseif (isset($_REQUEST['cancel']) || isset($_REQUEST['finish'])) {
 	zbx_unsetcookie('ZBX_CONFIG');
 	redirect('index.php');
+}
+// check setup permissions, skip the check when pressing "Retry"
+elseif (!hasRequest('retry') && CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN) {
+	access_deny(ACCESS_DENY_PAGE);
 }
 
 // config
