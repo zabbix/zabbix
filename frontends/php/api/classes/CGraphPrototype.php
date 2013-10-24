@@ -388,7 +388,6 @@ class CGraphPrototype extends CGraphGeneral {
 			'graphids' => $graph['graphid'],
 			'nopermissions' => true,
 			'filter' => array('flags' => null),
-			'selectItems' => API_OUTPUT_EXTEND,
 			'selectGraphItems' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND
 		));
@@ -683,7 +682,7 @@ class CGraphPrototype extends CGraphGeneral {
 			'itemids' => $itemIds,
 			'webitems' => true,
 			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('name', 'value_type', 'flags'),
 			'preservekeys' => true,
 			'filter' => array('flags' => null)
 		));
@@ -743,7 +742,7 @@ class CGraphPrototype extends CGraphGeneral {
 			'itemids' => $itemIds,
 			'webitems' => true,
 			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('name', 'value_type', 'flags'),
 			'preservekeys' => true,
 			'filter' => array('flags' => null)
 		));
