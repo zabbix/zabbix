@@ -204,21 +204,32 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 	}
 
 	public function zbxTestDropdownHasOptions($id, array $strings) {
+		$attribute = $this->isElementPresent("//select[@id='".$id."']") ? 'id' : 'name';
+		$this->assertElementPresent("//select[@".$attribute."='".$id."']");
+
 		foreach ($strings as $string) {
-			$this->assertElementPresent("//select[@id='".$id."']//option[text()='".$string."']");
+			$this->assertElementPresent("//select[@".$attribute."='".$id."']//option[text()='".$string."']");
 		}
 	}
 
-	public function zbxTestDropdownSelect($id, $str) {
-		$this->zbxTestDropdownHasOptions($id, array($str));
-		$this->select($id, $str);
+	public function zbxTestDropdownSelect($id, $string) {
+		$attribute = $this->isElementPresent("//select[@id='".$id."']") ? 'id' : 'name';
+		$this->assertElementPresent("//select[@".$attribute."='".$id."']");
+
+		$this->assertElementPresent("//select[@".$attribute."='".$id."']//option[text()='".$string."']");
+		$this->select("//select[@".$attribute."='".$id."']", $string);
 	}
 
-	public function zbxTestDropdownSelectWait($id, $str) {
-		$selected = $this->getSelectedLabel($id);
-		$this->zbxTestDropdownSelect($id, $str);
-		// Wait only if drop down selection was changed
-		if ($selected != $str) {
+	public function zbxTestDropdownSelectWait($id, $string) {
+		$attribute = $this->isElementPresent("//select[@id='".$id."']") ? 'id' : 'name';
+		$this->assertElementPresent("//select[@".$attribute."='".$id."']");
+		$this->assertElementPresent("//select[@".$attribute."='".$id."']//option[text()='".$string."']");
+
+		$selected = $this->getSelectedLabel("//select[@".$attribute."='".$id."']");
+
+		// select and wait if drop down selection should be changed
+		if ($selected != $string) {
+			$this->select("//select[@".$attribute."='".$id."']", $string);
 			$this->wait();
 		}
 	}
