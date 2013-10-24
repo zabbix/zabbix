@@ -180,3 +180,15 @@ function _xn($message, $messagePlural, $num, $context) {
 		? vsprintf(ngettext($message, $messagePlural, $num), $arguments)
 		: vsprintf(npgettext($context, $message, $messagePlural, $num), $arguments);
 }
+
+/**
+ * Returns a formatted string.
+ *
+ * @param string	$format		recieves already stranlated string with format
+ * @param array		$args		arguments to replace according to given format
+ *
+ * @return string
+ */
+function _params($format, array $args) {
+	return vsprintf($format, $args);
+}

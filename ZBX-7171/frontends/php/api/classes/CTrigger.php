@@ -669,10 +669,11 @@ class CTrigger extends CTriggerGeneral {
 		foreach ($triggers as $tnum => &$trigger) {
 			$currentTrigger = $triggers[$tnum];
 
-			$this->checkNoParameters($trigger,
+			$this->checkNoParameters(
+				$trigger,
 				array('templateid', 'state', 'value', 'value_flag'),
-				($update ? 'Cannot update "%1$s" for trigger "%2$s".' : 'Cannot set "%1$s" for trigger "%2$s".'),
-				array($trigger['description'])
+				($update ? _('Cannot update "%1$s" for trigger "%2$s".') : _('Cannot set "%1$s" for trigger "%2$s".')),
+				$trigger['description']
 			);
 
 			if (!check_db_fields($triggerDbFields, $trigger)) {
