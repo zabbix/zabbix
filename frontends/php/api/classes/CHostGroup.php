@@ -1162,7 +1162,8 @@ class CHostGroup extends CZBXAPI {
 			$groupDiscoveries = API::getApi()->select('group_discovery', array(
 				'output' => $this->outputExtend('group_discovery', array('groupid'), $options['selectGroupDiscovery']),
 				'filter' => array('groupid' => $groupIds),
-				'preservekeys' => true
+				'preservekeys' => true,
+				'nodeids' => get_current_nodeid(true)
 			));
 			$relationMap = $this->createRelationMap($groupDiscoveries, 'groupid', 'groupid');
 

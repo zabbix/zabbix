@@ -473,7 +473,8 @@ class CIconMap extends CZBXAPI {
 			$mappings = API::getApi()->select('icon_mapping', array(
 				'output' => $this->outputExtend('icon_mapping', array('iconmapid', 'iconmappingid'), $options['selectMappings']),
 				'filter' => array('iconmapid' => $iconMapIds),
-				'preservekeys' => true
+				'preservekeys' => true,
+				'nodeids' => get_current_nodeid(true)
 			));
 			$relationMap = $this->createRelationMap($mappings, 'iconmapid', 'iconmappingid');
 
