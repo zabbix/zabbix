@@ -443,7 +443,7 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 .darkorange .ui-dialog .ui-dialog-buttonpane button { margin: .5em .4em .5em 0; cursor: pointer; }
 .darkorange .ui-dialog .ui-resizable-se { width: 12px; height: 12px; right: -5px; bottom: -5px; background-position: 16px 16px; }
 .darkorange .ui-draggable .ui-dialog-titlebar { cursor: move; }
-.darkorange .ui-sortable-placeholder { border: 1px dotted #dfdfdf;}
+.darkorange .ui-sortable-placeholder { border: 1px dotted #6F6F6F;}
 
 /*
  * jQuery UI Slider 1.8.6
