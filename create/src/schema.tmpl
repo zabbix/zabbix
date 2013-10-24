@@ -1017,8 +1017,8 @@ FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|value		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|acknowledged	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|0
-UNIQUE		|1		|source,object,objectid,eventid
-INDEX		|2		|clock
+INDEX		|1		|source,object,objectid,clock
+INDEX		|2		|source,object,clock
 
 TABLE|trends|itemid,clock|0
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|-|items
@@ -1308,4 +1308,4 @@ INDEX		|2		|templateid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2010187	|2010187
+ROW		|2010191	|2010191

@@ -28,7 +28,7 @@ class CEvent extends CZBXAPI {
 
 	protected $tableName = 'events';
 	protected $tableAlias = 'e';
-	protected $sortColumns = array('eventid', 'object', 'objectid');
+	protected $sortColumns = array('eventid', 'object', 'objectid', 'clock');
 
 	/**
 	 * Array of supported objects where keys are object IDs and values are translated object names.
@@ -128,6 +128,7 @@ class CEvent extends CZBXAPI {
 
 		$this->checkDeprecatedParam($options, 'selectTriggers');
 		$this->checkDeprecatedParam($options, 'selectItems');
+		$this->checkDeprecatedParam($options, 'sortfield', 'object');
 		$options = $this->convertDeprecatedParam($options, 'triggerids', 'objectids');
 		$this->validateGet($options);
 
