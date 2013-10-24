@@ -45,7 +45,7 @@ ul.favorites { margin: 0; padding: 4px 4px 4px 1em; border: 1px solid #AAAAAA; }
 .pum_oheader { background: #1A1A1A url('images/bg_h-hard_55.gif') repeat-x top left; }
 
 .header { margin-bottom: 0; }
-.column .widget, #search_wdgt .widget { padding: 0; border-radius: 0; border: 0; }
+.column .widget, #search_wdgt .widget { padding: 0; border-radius: 0; }
 .widget .footer { margin-top: 0; border-top: 0; }
 .classic .ui-corner-all { border-radius: 0; }
 .classic #dashboard_wdgt .ui-widget-content { background: #EEE; }

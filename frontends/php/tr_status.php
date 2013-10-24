@@ -423,7 +423,7 @@ $options = array(
 	'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 	'output' => API_OUTPUT_EXTEND,
 	'selectHosts' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid', 'description'),
-	'selectItems' => API_OUTPUT_EXTEND,
+	'selectItems' => array('itemid', 'key_', 'name', 'value_type'),
 	'selectDependencies' => API_OUTPUT_EXTEND,
 	'selectLastEvent' => true,
 	'expandDescription' => true,
@@ -580,11 +580,7 @@ foreach ($triggers as $trigger) {
 	$description->setMenuPopup(getMenuPopupTrigger($trigger, $triggerItems));
 
 	if ($_REQUEST['show_details']) {
-		$font = new CTag('font', 'yes');
-		$font->setAttribute('color', '#000');
-		$font->setAttribute('size', '-2');
-		$font->addItem(explode_exp($trigger['expression'], true, true));
-		$description = array($description, BR(), $font);
+		$description = array($description, BR(), explode_exp($trigger['expression'], true, true));
 	}
 
 	if (!empty($trigger['dependencies'])) {

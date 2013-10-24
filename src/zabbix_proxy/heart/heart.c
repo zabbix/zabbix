@@ -43,10 +43,11 @@ extern unsigned char	process_type;
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	send_heartbeat()
+static int	send_heartbeat(void)
 {
 	zbx_sock_t	sock;
 	struct zbx_json	j;
+	int		ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In send_heartbeat()");
 
@@ -55,12 +56,17 @@ static void	send_heartbeat()
 	zbx_json_addstring(&j, "host", CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
 
 	if (FAIL == connect_to_server(&sock, CONFIG_HEARTBEAT_FREQUENCY, 0)) /* do not retry */
-		return;
+		return FAIL;
 
 	if (FAIL == put_data_to_server(&sock, &j))
+	{
 		zabbix_log(LOG_LEVEL_WARNING, "Heartbeat message failed");
+		ret = FAIL;
+	}
 
 	disconnect_server(&sock);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -78,22 +84,61 @@ static void	send_heartbeat()
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	main_heart_loop()
+void	main_heart_loop(void)
 {
-	int	start, sleeptime;
+	int	start, sleeptime = 0, res;
+	double	sec, total_sec = 0.0, old_total_sec = 0.0;
+	time_t	last_stat_time;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In main_heart_loop()");
+#define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
+				/* once in STAT_INTERVAL seconds */
+
+	last_stat_time = time(NULL);
+
+	zbx_setproctitle("%s [sending heartbeat message]", get_process_type_string(process_type));
 
 	for (;;)
 	{
+		if (0 != sleeptime)
+		{
+			zbx_setproctitle("%s [sending heartbeat message %s in " ZBX_FS_DBL " sec, "
+					"sending heartbeat message]",
+					get_process_type_string(process_type),
+					SUCCEED == res ? "success" : "failed", old_total_sec);
+		}
+
 		start = time(NULL);
-
-		zbx_setproctitle("%s [sending heartbeat message]", get_process_type_string(process_type));
-
-		send_heartbeat();
+		sec = zbx_time();
+		res = send_heartbeat();
+		total_sec += zbx_time() - sec;
 
 		sleeptime = CONFIG_HEARTBEAT_FREQUENCY - (time(NULL) - start);
 
+		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
+		{
+			if (0 == sleeptime)
+			{
+				zbx_setproctitle("%s [sending heartbeat message %s in " ZBX_FS_DBL " sec, "
+						"sending heartbeat message]",
+						get_process_type_string(process_type),
+						SUCCEED == res ? "success" : "failed", total_sec);
+
+			}
+			else
+			{
+				zbx_setproctitle("%s [sending heartbeat message %s in " ZBX_FS_DBL " sec, "
+						"idle %d sec]",
+						get_process_type_string(process_type),
+						SUCCEED == res ? "success" : "failed", total_sec, sleeptime);
+
+				old_total_sec = total_sec;
+			}
+			total_sec = 0.0;
+			last_stat_time = time(NULL);
+		}
+
 		zbx_sleep_loop(sleeptime);
 	}
+
+#undef STAT_INTERVAL
 }
