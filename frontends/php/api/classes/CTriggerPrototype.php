@@ -822,6 +822,14 @@ class CTriggerPrototype extends CTriggerGeneral {
 				unset($triggerUpdate['expression']);
 			}
 
+			// skip updating read only values
+			unset(
+				$triggerUpdate['state'],
+				$triggerUpdate['value'],
+				$triggerUpdate['lastchange'],
+				$triggerUpdate['error']
+			);
+
 			DB::update('triggers', array(
 				'values' => $triggerUpdate,
 				'where' => array('triggerid' => $trigger['triggerid'])
@@ -841,8 +849,9 @@ class CTriggerPrototype extends CTriggerGeneral {
 		$triggers = $this->get(array(
 			'hostids' => $data['templateids'],
 			'preservekeys' => true,
-			'output' => API_OUTPUT_EXTEND,
-			'selectDependencies' => true
+			'output' => array(
+				'triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type'
+			)
 		));
 
 		foreach ($triggers as $trigger) {

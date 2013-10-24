@@ -934,19 +934,26 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 	*data = s->buf_stat;
 
 	left = ZBX_TCP_HEADER_LEN;
-	nbytes = ZBX_TCP_READ(s->socket, s->buf_stat, left);
+
+	if (ZBX_TCP_ERROR == (nbytes = ZBX_TCP_READ(s->socket, s->buf_stat, left)))
+		goto out;
 
 	if (ZBX_TCP_HEADER_LEN == nbytes && 0 == strncmp(s->buf_stat, ZBX_TCP_HEADER, ZBX_TCP_HEADER_LEN))
 	{
 		total_bytes += nbytes;
 
 		left = sizeof(zbx_uint64_t);
-		nbytes = ZBX_TCP_READ(s->socket, (void *)&expected_len, left);
+		if (left != (nbytes = ZBX_TCP_READ(s->socket, (void *)&expected_len, left)))
+		{
+			total_bytes = FAIL;
+			goto out;
+		}
+
 		expected_len = zbx_letoh_uint64(expected_len);
 
 		if (ZBX_MAX_RECV_DATA_SIZE < expected_len)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Message size " ZBX_FS_UI64 " from IP %s"
+			zabbix_log(LOG_LEVEL_WARNING, "Message size " ZBX_FS_UI64 " from %s"
 					" exceeds the maximum size " ZBX_FS_UI64 " bytes. Message ignored.",
 					expected_len, get_ip_by_socket(s), (zbx_uint64_t)ZBX_MAX_RECV_DATA_SIZE);
 			total_bytes = FAIL;
@@ -955,110 +962,107 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 
 		flags |= ZBX_TCP_READ_UNTIL_CLOSE;
 	}
-	else if (ZBX_TCP_ERROR != nbytes)
+	else
 	{
 		read_bytes = nbytes;
 		expected_len = 16 * ZBX_MEBIBYTE;
 	}
 
-	if (ZBX_TCP_ERROR != nbytes)
+	s->buf_stat[read_bytes] = '\0';
+
+	if (0 != (flags & ZBX_TCP_READ_UNTIL_CLOSE))
 	{
-		s->buf_stat[read_bytes] = '\0';
+		if (0 == nbytes)
+			goto cleanup;
+	}
+	else
+	{
+		if (nbytes < left)
+			goto cleanup;
+	}
 
-		if (0 != (flags & ZBX_TCP_READ_UNTIL_CLOSE))
-		{
-			if (0 == nbytes)
-				goto cleanup;
-		}
-		else
-		{
-			if (nbytes < left)
-				goto cleanup;
-		}
+	left = sizeof(s->buf_stat) - read_bytes - 1;
 
-		left = sizeof(s->buf_stat) - read_bytes - 1;
-
-		/* check for an empty socket if exactly ZBX_TCP_HEADER_LEN bytes (without a header) were sent */
-		if (0 == read_bytes || '\n' != s->buf_stat[read_bytes - 1])	/* requests to passive agents end with '\n' */
+	/* check for an empty socket if exactly ZBX_TCP_HEADER_LEN bytes (without a header) were sent */
+	if (0 == read_bytes || '\n' != s->buf_stat[read_bytes - 1])	/* requests to passive agents end with '\n' */
+	{
+		/* fill static buffer */
+		while (read_bytes < expected_len && 0 < left &&
+				ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ(s->socket, s->buf_stat + read_bytes, left)))
 		{
-			/* fill static buffer */
-			while (read_bytes < expected_len && 0 < left &&
-					ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ(s->socket, s->buf_stat + read_bytes, left)))
+			read_bytes += nbytes;
+
+			if (0 != (flags & ZBX_TCP_READ_UNTIL_CLOSE))
 			{
-				read_bytes += nbytes;
-
-				if (0 != (flags & ZBX_TCP_READ_UNTIL_CLOSE))
-				{
-					if (0 == nbytes)
-						break;
-				}
-				else
-				{
-					if (nbytes < left)	/* should we stop reading? */
-					{
-						/* XML protocol? */
-						if (0 == strncmp(s->buf_stat, "<req>", sizeof("<req>") - 1))
-						{
-							/* closing tag received in the last 10 bytes? */
-							s->buf_stat[read_bytes] = '\0';
-							if (NULL != strstr(s->buf_stat + read_bytes -
-									(10 > read_bytes ? read_bytes : 10), "</req>"))
-								break;
-						}
-						else
-							break;
-					}
-				}
-
-				left -= nbytes;
+				if (0 == nbytes)
+					break;
 			}
-		}
-
-		s->buf_stat[read_bytes] = '\0';
-
-		if (sizeof(s->buf_stat) - 1 == read_bytes)	/* static buffer is full */
-		{
-			allocated = ZBX_BUF_LEN;
-			s->buf_type = ZBX_BUF_TYPE_DYN;
-			s->buf_dyn = zbx_malloc(s->buf_dyn, allocated);
-
-			memcpy(s->buf_dyn, s->buf_stat, sizeof(s->buf_stat));
-
-			offset = read_bytes;
-
-			/* fill dynamic buffer */
-			while (read_bytes < expected_len &&
-					ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ(s->socket, s->buf_stat, sizeof(s->buf_stat))))
+			else
 			{
-				zbx_strncpy_alloc(&s->buf_dyn, &allocated, &offset, s->buf_stat, nbytes);
-				read_bytes += nbytes;
-
-				if (0 != (flags & ZBX_TCP_READ_UNTIL_CLOSE))
+				if (nbytes < left)	/* should we stop reading? */
 				{
-					if (0 == nbytes)
-						break;
-				}
-				else
-				{
-					if ((size_t)nbytes < sizeof(s->buf_stat) - 1)	/* should we stop reading? */
+					/* XML protocol? */
+					if (0 == strncmp(s->buf_stat, "<req>", sizeof("<req>") - 1))
 					{
-						/* XML protocol? */
-						if (0 == strncmp(s->buf_dyn, "<req>", sizeof("<req>") - 1))
-						{
-							/* closing tag received in the last 10 bytes? */
-							if (NULL != strstr(s->buf_dyn + read_bytes - 10, "</req>"))
-								break;
-						}
-						else
+						/* closing tag received in the last 10 bytes? */
+						s->buf_stat[read_bytes] = '\0';
+						if (NULL != strstr(s->buf_stat + read_bytes -
+								(10 > read_bytes ? read_bytes : 10), "</req>"))
 							break;
 					}
+					else
+						break;
 				}
 			}
 
-			*data = s->buf_dyn;
+			left -= nbytes;
 		}
 	}
 
+	s->buf_stat[read_bytes] = '\0';
+
+	if (sizeof(s->buf_stat) - 1 == read_bytes)	/* static buffer is full */
+	{
+		allocated = ZBX_BUF_LEN;
+		s->buf_type = ZBX_BUF_TYPE_DYN;
+		s->buf_dyn = zbx_malloc(s->buf_dyn, allocated);
+
+		memcpy(s->buf_dyn, s->buf_stat, sizeof(s->buf_stat));
+
+		offset = read_bytes;
+
+		/* fill dynamic buffer */
+		while (read_bytes < expected_len &&
+				ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ(s->socket, s->buf_stat, sizeof(s->buf_stat))))
+		{
+			zbx_strncpy_alloc(&s->buf_dyn, &allocated, &offset, s->buf_stat, nbytes);
+			read_bytes += nbytes;
+
+			if (0 != (flags & ZBX_TCP_READ_UNTIL_CLOSE))
+			{
+				if (0 == nbytes)
+					break;
+			}
+			else
+			{
+				if ((size_t)nbytes < sizeof(s->buf_stat) - 1)	/* should we stop reading? */
+				{
+					/* XML protocol? */
+					if (0 == strncmp(s->buf_dyn, "<req>", sizeof("<req>") - 1))
+					{
+						/* closing tag received in the last 10 bytes? */
+						if (NULL != strstr(s->buf_dyn + read_bytes - 10, "</req>"))
+							break;
+					}
+					else
+						break;
+				}
+			}
+		}
+
+		*data = s->buf_dyn;
+	}
+out:
 	if (ZBX_TCP_ERROR == nbytes)
 	{
 		zbx_set_tcp_strerror("ZBX_TCP_READ() failed: %s", strerror_from_system(zbx_sock_last_error()));
@@ -1077,28 +1081,33 @@ cleanup:
 char	*get_ip_by_socket(zbx_sock_t *s)
 {
 	ZBX_SOCKADDR	sa;
-	ZBX_SOCKLEN_T	sz;
+	ZBX_SOCKLEN_T	sz = sizeof(sa);
 	static char	buffer[64];
+	char		*error_message = NULL;
 
-	*buffer = '\0';
-
-	sz = sizeof(sa);
 	if (ZBX_TCP_ERROR == getpeername(s->socket, (struct sockaddr*)&sa, &sz))
 	{
-		zbx_set_tcp_strerror("connection rejected, getpeername() failed: %s",
-				strerror_from_system(zbx_sock_last_error()));
-		return buffer;
+		error_message = strerror_from_system(zbx_sock_last_error());
+		zbx_set_tcp_strerror("connection rejected, getpeername() failed: %s", error_message);
+		goto out;
 	}
 
 #if defined(HAVE_IPV6)
 	if (0 != getnameinfo((struct sockaddr*)&sa, sizeof(sa), buffer, sizeof(buffer), NULL, 0, NI_NUMERICHOST))
 	{
-		zbx_set_tcp_strerror("connection rejected, getnameinfo() failed: %s",
-				strerror_from_system(zbx_sock_last_error()));
+		error_message = strerror_from_system(zbx_sock_last_error());
+		zbx_set_tcp_strerror("connection rejected, getnameinfo() failed: %s", error_message);
 	}
 #else
 	zbx_snprintf(buffer, sizeof(buffer), "%s", inet_ntoa(sa.sin_addr));
 #endif
+
+out:
+	if (NULL != error_message)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot get socket IP address: %s", error_message);
+		strscpy(buffer, "unknown IP");
+	}
 
 	return buffer;
 }

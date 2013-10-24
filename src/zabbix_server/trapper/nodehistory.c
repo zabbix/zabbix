@@ -405,7 +405,7 @@ error:
 static int	process_items(int sender_nodeid, int nodeid,  const ZBX_TABLE *table, const char *record,
 		int lastrecord)
 {
-	int		f, clock;
+	int		f, clock = 0;
 	const char	*r;
 	zbx_uint64_t	itemid = 0;
 	int		value_type = -1;

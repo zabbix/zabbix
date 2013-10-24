@@ -662,7 +662,7 @@ class CItem extends CItemGeneral {
 	}
 
 	/**
-	 * Delete items
+	 * Delete items.
 	 *
 	 * @param array $itemids
 	 */
@@ -678,7 +678,7 @@ class CItem extends CItemGeneral {
 			'itemids' => $itemids,
 			'editable' => true,
 			'preservekeys' => true,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('name', 'templateid'),
 			'selectHosts' => array('name')
 		));
 
@@ -1175,7 +1175,8 @@ class CItem extends CItemGeneral {
 			$itemDiscoveries = API::getApi()->select('item_discovery', array(
 				'output' => $this->outputExtend('item_discovery', array('itemdiscoveryid', 'itemid'), $options['selectItemDiscovery']),
 				'filter' => array('itemid' => array_keys($result)),
-				'preservekeys' => true
+				'preservekeys' => true,
+				'nodeids' => get_current_nodeid(true)
 			));
 			$relationMap = $this->createRelationMap($itemDiscoveries, 'itemid', 'itemdiscoveryid');
 
