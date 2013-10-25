@@ -817,6 +817,7 @@ static void	process_active_checks(char *server, unsigned short port)
 	char		key_source[MAX_STRING_LEN], *source = NULL;
 	char		key_logeventid[MAX_STRING_LEN], str_logeventid[8] /* for `regex_match_ex' */;
 	OSVERSIONINFO	versionInfo;
+	zbx_uint64_t	keyword;
 #endif
 	char		encoding[32];
 	char		tmp[16];
@@ -1115,7 +1116,7 @@ static void	process_active_checks(char *server, unsigned short port)
 
 				while (SUCCEED == (ret = process_eventlog(filename, &lastlogsize,
 						&timestamp, &source, &severity, &value, &logeventid,
-						active_metrics[i].skip_old_data)))
+						active_metrics[i].skip_old_data, &keyword)))
 				{
 					active_metrics[i].skip_old_data = 0;
 
@@ -1134,6 +1135,18 @@ static void	process_active_checks(char *server, unsigned short port)
 						switch (severity)
 						{
 							case WINEVENT_LEVEL_LOG_ALWAYS:
+								if (0 != (keyword & WINEVENT_KEYWORD_AUDIT_FAILURE))
+								{
+									severity = ITEM_LOGTYPE_FAILURE_AUDIT;
+									strscpy(str_severity, AUDIT_FAILURE);
+									break;
+								}
+								else if (0 != (keyword & WINEVENT_KEYWORD_AUDIT_SUCCESS))
+								{
+									severity = ITEM_LOGTYPE_SUCCESS_AUDIT;
+									strscpy(str_severity, AUDIT_SUCCESS);
+									break;
+								}
 							case WINEVENT_LEVEL_INFO:
 								severity = ITEM_LOGTYPE_INFORMATION;
 								strscpy(str_severity, INFORMATION_TYPE);

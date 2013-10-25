@@ -183,7 +183,8 @@ finish:
 }
 
 static long	zbx_get_eventlog_message_xpath(LPCTSTR wsource, long which, char **out_source, char **out_message,
-		unsigned short *out_severity, unsigned long *out_timestamp, unsigned long *out_eventid)
+		unsigned short *out_severity, unsigned long *out_timestamp, unsigned long *out_eventid,
+		zbx_uint64_t *keyword)
 {
 	const char	*__function_name = "zbx_get_eventlog_message_xpath";
 	long		ret = FAIL;
@@ -202,7 +203,8 @@ static long	zbx_get_eventlog_message_xpath(LPCTSTR wsource, long which, char **o
 			L"/Event/System/Level",
 			L"/Event/System/TimeCreated/@SystemTime",
 			L"Event/System/EventID",
-			L"Event/EventData/Data"};
+			L"Event/EventData/Data",
+			L"Event/System/Keywords"};
 	DWORD		dwReturned = 0, dwValuesCount = 0, dwBufferSize = 0;
 	const ULONGLONG	sec_1970 = 116444736000000000;
 
@@ -279,6 +281,11 @@ static long	zbx_get_eventlog_message_xpath(LPCTSTR wsource, long which, char **o
 	*out_eventid = (unsigned long)(eventlog_array[4].UInt16Val);
 	*out_timestamp = (unsigned long)((eventlog_array[3].FileTimeVal - sec_1970) / 10000000);
 	*out_severity = eventlog_array[2].ByteVal;
+
+	/* all events in the Security log appear to have the Information level,
+	keyword specifies Audit Failure or Audit Success */
+	*keyword = (EvtVarTypeNull == eventlog_array[6].Type) ? 0 : eventlog_array[6].UInt64Val;
+
 
 	if (NULL == (eventlog_providermetadata_handle = EvtOpenPublisherMetadata(NULL,
 			eventlog_array[0].StringVal, NULL, 0, 0)))
@@ -577,7 +584,7 @@ out:
 
 int	process_eventlog(const char *source, zbx_uint64_t *lastlogsize, unsigned long *out_timestamp,
 		char **out_source, unsigned short *out_severity, char **out_message,
-		unsigned long *out_eventid, unsigned char skip_old_data)
+		unsigned long *out_eventid, unsigned char skip_old_data, zbx_uint64_t *keyword)
 {
 	const char	*__function_name = "process_eventlog";
 	int		ret = FAIL;
@@ -642,7 +649,7 @@ int	process_eventlog(const char *source, zbx_uint64_t *lastlogsize, unsigned lon
 			for (i = (long)FirstID; i <= LastID; i++)
 			{
 				if (SUCCEED == zbx_get_eventlog_message_xpath(wsource, i, out_source, out_message,
-						out_severity, out_timestamp, out_eventid))
+						out_severity, out_timestamp, out_eventid, keyword))
 				{
 					*lastlogsize = i;
 					break;
