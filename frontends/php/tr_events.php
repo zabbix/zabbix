@@ -80,6 +80,8 @@ $trigger = reset($triggers);
 
 // get events
 $options = array(
+	'source' => EVENT_SOURCE_TRIGGERS,
+	'object' => EVENT_OBJECT_TRIGGER,
 	'eventids' => $_REQUEST['eventid'],
 	'objectids' => $_REQUEST['triggerid'],
 	'select_alerts' => API_OUTPUT_EXTEND,

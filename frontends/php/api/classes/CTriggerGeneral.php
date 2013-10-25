@@ -345,7 +345,8 @@ abstract class CTriggerGeneral extends CZBXAPI {
 			$functions = API::getApi()->select('functions', array(
 				'output' => $this->outputExtend('functions', array('triggerid', 'functionid'), $options['selectFunctions']),
 				'filter' => array('triggerid' => $triggerids),
-				'preservekeys' => true
+				'preservekeys' => true,
+				'nodeids' => get_current_nodeid(true)
 			));
 			$relationMap = $this->createRelationMap($functions, 'triggerid', 'functionid');
 
