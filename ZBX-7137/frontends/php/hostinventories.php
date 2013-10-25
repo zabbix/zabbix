@@ -102,9 +102,7 @@ if ($hostid > 0) {
 	unset($data['host']['inventory']['hostid']);
 
 	// resolve macros
-	if ($data['host']['interfaces']) {
-		$data['host']['interfaces'] = CMacrosResolverHelper::resolveHostInterfaces($data['host']['interfaces']);
-	}
+	$data['host']['interfaces'] = CMacrosResolverHelper::resolveHostInterfaces($data['host']['interfaces']);
 
 	// get permissions
 	$userType = CWebUser::getType();
