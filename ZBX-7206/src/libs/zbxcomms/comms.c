@@ -915,7 +915,7 @@ void	zbx_tcp_free(zbx_sock_t *s)
  ******************************************************************************/
 ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeout)
 {
-#define ZBX_BUF_LEN	ZBX_STAT_BUF_LEN * 8
+#define ZBX_BUF_LEN	(ZBX_STAT_BUF_LEN * 8)
 	ssize_t		nbytes, left, total_bytes;
 	size_t		allocated, offset, read_bytes;
 	zbx_uint64_t	expected_len;
