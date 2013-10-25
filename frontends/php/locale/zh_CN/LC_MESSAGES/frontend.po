@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-24 18:19+0300\n"
+"POT-Creation-Date: 2013-10-25 16:42+0300\n"
 "PO-Revision-Date: 2013-08-25 15:11+0200\n"
 "Last-Translator: solutionware <shiys@solutionware.com.cn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -32,7 +32,7 @@ msgstr "\"显示 正常 的触发器\" 必须为 \"0\" 或一个正整数."
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
 msgstr "\"触发器闪烁状态改变时\" 必须为 \"0\" 或一个正整数."
 
-#: include/func.inc.php:467
+#: include/func.inc.php:442
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
@@ -64,7 +64,7 @@ msgid "%1$s day"
 msgid_plural "%1$s days"
 msgstr[0] "%1$s 天"
 
-#: include/page_header.php:447
+#: include/page_header.php:446
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
@@ -221,7 +221,7 @@ msgstr "可接受的SLA"
 msgid "Access denied!"
 msgstr "存取被拒!"
 
-#: include/func.inc.php:2091
+#: include/func.inc.php:2066
 msgid "Access denied."
 msgstr "访问被拒绝."
 
@@ -544,7 +544,7 @@ msgstr "对齐图示"
 #: include/blocks.inc.php:1288 include/blocks.inc.php:1297
 #: include/blocks.inc.php:1342 include/blocks.inc.php:1426
 #: include/blocks.inc.php:1435 include/nodes.inc.php:174
-#: include/page_header.php:301 include/reports.inc.php:340
+#: include/page_header.php:300 include/reports.inc.php:340
 #: include/views/administration.auditlogs.list.php:42
 #: include/views/administration.auditlogs.list.php:52
 #: include/views/administration.general.gui.edit.php:28
@@ -622,7 +622,7 @@ msgstr "应用集 错误."
 msgid "Application updated"
 msgstr "应用集已更新"
 
-#: api/classes/CItemGeneral.php:368
+#: api/classes/CItemGeneral.php:374
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "ID为 \"%1$s\"的应用集不在 \"%2$s\" 之中."
@@ -652,12 +652,12 @@ msgctxt "maintenance status"
 msgid "Approaching"
 msgstr "接近中"
 
-#: include/func.inc.php:254
+#: include/func.inc.php:229
 msgid "Apr"
 msgstr "四月"
 
-#: include/forms.inc.php:1660 include/func.inc.php:140
-#: include/func.inc.php:271 jsLoader.php:121
+#: include/forms.inc.php:1660 include/func.inc.php:115
+#: include/func.inc.php:246 jsLoader.php:121
 msgid "April"
 msgstr "四月"
 
@@ -749,12 +749,12 @@ msgstr "审计动作"
 msgid "Audit logs"
 msgstr "审计纪录"
 
-#: include/func.inc.php:258
+#: include/func.inc.php:233
 msgid "Aug"
 msgstr "八月"
 
-#: include/forms.inc.php:1652 include/func.inc.php:144
-#: include/func.inc.php:275 jsLoader.php:125
+#: include/forms.inc.php:1652 include/func.inc.php:119
+#: include/func.inc.php:250 jsLoader.php:125
 msgid "August"
 msgstr "八月"
 
@@ -867,7 +867,7 @@ msgstr "一个期间T的平均值不是 N"
 msgid "Axis side"
 msgstr "轴侧"
 
-#: include/func.inc.php:435
+#: include/func.inc.php:410
 msgctxt "Byte short"
 msgid "B"
 msgstr "B"
@@ -1230,7 +1230,7 @@ msgstr "不能添加动作条件"
 msgid "Cannot add application"
 msgstr "无法添加应用集"
 
-#: api/classes/CTrigger.php:1407
+#: api/classes/CTrigger.php:1406
 msgid "Cannot add dependency from a host to a template."
 msgstr "无法添加自主机到模板的相依关係"
 
@@ -1426,11 +1426,11 @@ msgstr ""
 msgid "Cannot create another database connection."
 msgstr "无法创建另外资料库连线."
 
-#: api/classes/CTrigger.php:1441
+#: api/classes/CTrigger.php:1440
 msgid "Cannot create circular dependencies."
 msgstr "不能创建循环依赖关系。"
 
-#: api/classes/CTrigger.php:1413
+#: api/classes/CTrigger.php:1412
 msgid "Cannot create dependency on trigger itself."
 msgstr "不能创建触发器本身的依赖."
 
@@ -1481,7 +1481,7 @@ msgstr "无法删除动作"
 msgid "Cannot delete application"
 msgstr "无法删除应用集"
 
-#: api/classes/CTrigger.php:1067
+#: api/classes/CTrigger.php:1066
 msgid "Cannot delete dependency"
 msgstr "无法删除相依关係"
 
@@ -1645,7 +1645,7 @@ msgstr "无法删除模板的监控项"
 msgid "Cannot delete templated items."
 msgstr "无法删除模板项目."
 
-#: api/classes/CTrigger.php:1875 api/classes/CTriggerPrototype.php:674
+#: api/classes/CTrigger.php:1874 api/classes/CTriggerPrototype.php:674
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "无法删除模板化触发器 \"%1$s:%2$s\"."
@@ -1825,7 +1825,7 @@ msgstr "无法形成树状格式"
 msgid "Cannot have empty visible template name"
 msgstr "不能有空白的可见模板名称"
 
-#: api/classes/CTrigger.php:1100 api/classes/CTrigger.php:1239
+#: api/classes/CTrigger.php:1099 api/classes/CTrigger.php:1238
 #: api/classes/CTriggerPrototype.php:755 api/classes/CTriggerPrototype.php:813
 #, c-format
 msgid "Cannot implode expression \"%s\"."
@@ -1926,12 +1926,12 @@ msgstr "无法储存未检验的探索规则"
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "无法发送命令, 检查于Zabbix 服务器 \"%1$s\" 的连接."
 
-#: api/classes/CItemGeneral.php:238
+#: api/classes/CItemGeneral.php:243
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "无法设置 \"%1$s\" 为监控项 \"%2$s\"."
 
-#: api/classes/CTrigger.php:660
+#: api/classes/CTrigger.php:659
 #, c-format
 msgid "Cannot set \"%1$s\" for trigger \"%2$s\"."
 msgstr "无法设置 \"%1$s\" 为触发器 \"%2$s\"."
@@ -2019,12 +2019,12 @@ msgstr ""
 msgid "Cannot update \"%1$s\" for a discovered trigger."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:205
+#: api/classes/CItemGeneral.php:207
 #, c-format
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
 msgstr "无法更新 \"%1$s\" 为监控项 \"%2$s\"."
 
-#: api/classes/CTrigger.php:657
+#: api/classes/CTrigger.php:659
 #, c-format
 msgid "Cannot update \"%1$s\" for trigger \"%2$s\"."
 msgstr "无法更新 \"%1$s\" 为触发器 \"%2$s\"."
@@ -2320,7 +2320,7 @@ msgstr "检查已存在."
 msgid "Check expression part starting from \"%1$s\"."
 msgstr "检查开始于\"%1$s\"的表示式部份."
 
-#: api/classes/CItemGeneral.php:277
+#: api/classes/CItemGeneral.php:283
 msgid "Check the key, please. Default example was passed."
 msgstr "检查键值, 请. 用的是预设的例子."
 
@@ -2975,7 +2975,7 @@ msgstr "已创建: 监控项 \"%1$s\" 于 \"%2$s\"."
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "已创建: 监控项原型 \"%1$s\" 于 \"%2$s\"."
 
-#: api/classes/CTrigger.php:1134
+#: api/classes/CTrigger.php:1133
 #, c-format
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "已创建: 触发器 \"%1$s\" 于 \"%2$s\"."
@@ -3015,7 +3015,7 @@ msgstr "当前日期不是 N"
 msgid "Current host"
 msgstr "当前主机"
 
-#: include/page_header.php:334
+#: include/page_header.php:333
 msgid "Current node"
 msgstr "当前节点"
 
@@ -3305,7 +3305,7 @@ msgstr "星期中第几日不是 N"
 msgid "Days"
 msgstr "天数"
 
-#: include/page_header.php:218
+#: include/page_header.php:217
 msgid "Debug"
 msgstr "调试"
 
@@ -3319,12 +3319,12 @@ msgstr "调试模式"
 msgid "Debug mode updated"
 msgstr "调试模式已更新"
 
-#: include/func.inc.php:262
+#: include/func.inc.php:237
 msgid "Dec"
 msgstr "十二"
 
-#: include/forms.inc.php:1672 include/func.inc.php:148
-#: include/func.inc.php:279 jsLoader.php:129
+#: include/forms.inc.php:1672 include/func.inc.php:123
+#: include/func.inc.php:254 jsLoader.php:129
 msgid "December"
 msgstr "十二"
 
@@ -3716,7 +3716,7 @@ msgstr "已删除: 代理 \"%1$s\"."
 msgid "Deleted: Template \"%1$s\"."
 msgstr "已删除: 模板 \"%1$s\"."
 
-#: api/classes/CTrigger.php:854
+#: api/classes/CTrigger.php:853
 #, c-format
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "已删除: 触发器 \"%1$s\" 于 \"%2$s\"."
@@ -3785,7 +3785,7 @@ msgid "Description"
 msgstr "描述"
 
 #: include/actions.inc.php:966 include/blocks.inc.php:719
-#: include/func.inc.php:2211
+#: include/func.inc.php:2186
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:44
 #: include/views/configuration.action.edit.php:328
@@ -4083,7 +4083,7 @@ msgstr "探索状态"
 msgid "Display OK triggers for"
 msgstr "显示OK触发器予"
 
-#: include/func.inc.php:1894
+#: include/func.inc.php:1869
 msgid "Displaying"
 msgstr "显示"
 
@@ -4168,7 +4168,7 @@ msgstr "下拉的第一个输入项 \"%1$s\"."
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr "下拉记住所选的 \"%1$s\"."
 
-#: api/classes/CTrigger.php:1583
+#: api/classes/CTrigger.php:1582
 #, c-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "重复依赖关系在触发器 \"%1$s\" 中."
@@ -4230,12 +4230,12 @@ msgstr "荷兰(nl_NL)"
 msgid "Dynamic item"
 msgstr "动态监控项"
 
-#: include/func.inc.php:683
+#: include/func.inc.php:658
 msgctxt "Exa short"
 msgid "E"
 msgstr "E"
 
-#: include/func.inc.php:2178
+#: include/func.inc.php:2153
 msgid "ERROR"
 msgstr "错误"
 
@@ -4324,8 +4324,8 @@ msgstr ""
 #: api/classes/CItemPrototype.php:489 api/classes/CProxy.php:487
 #: api/classes/CService.php:341 api/classes/CService.php:377
 #: api/classes/CService.php:443 api/classes/CService.php:515
-#: api/classes/CTemplate.php:617 api/classes/CTrigger.php:878
-#: api/classes/CTrigger.php:942 api/classes/CTrigger.php:1032
+#: api/classes/CTemplate.php:617 api/classes/CTrigger.php:877
+#: api/classes/CTrigger.php:941 api/classes/CTrigger.php:1031
 #: api/classes/CTriggerPrototype.php:652 api/classes/CUserGroup.php:602
 #: api/classes/CUserMacro.php:394 api/classes/CUserMacro.php:546
 #: api/classes/CUser.php:554
@@ -4600,7 +4600,7 @@ msgstr "每日"
 msgid "Every week(s)"
 msgstr "每週"
 
-#: include/func.inc.php:683
+#: include/func.inc.php:658
 msgid "Exa"
 msgstr "千兆兆"
 
@@ -4764,12 +4764,12 @@ msgstr "常用的筛选"
 msgid "Favourites"
 msgstr "常用的"
 
-#: include/func.inc.php:252
+#: include/func.inc.php:227
 msgid "Feb"
 msgstr "二月"
 
-#: include/forms.inc.php:1650 include/func.inc.php:138
-#: include/func.inc.php:269 jsLoader.php:119
+#: include/forms.inc.php:1650 include/func.inc.php:113
+#: include/func.inc.php:244 jsLoader.php:119
 msgid "February"
 msgstr "二月"
 
@@ -4892,7 +4892,7 @@ msgstr "芬兰语 (fi_FI)"
 msgid "First"
 msgstr "首"
 
-#: include/func.inc.php:1839
+#: include/func.inc.php:1814
 msgctxt "page navigation"
 msgid "First"
 msgstr "首"
@@ -4927,12 +4927,12 @@ msgstr "第四"
 msgid "French (fr_FR)"
 msgstr "法语 (fr_FR)"
 
-#: include/func.inc.php:232
+#: include/func.inc.php:207
 msgid "Fri"
 msgstr "週五"
 
 #: include/forms.inc.php:1635 include/forms.inc.php:1703
-#: include/func.inc.php:160 include/func.inc.php:244
+#: include/func.inc.php:135 include/func.inc.php:219
 msgid "Friday"
 msgstr "週五"
 
@@ -4975,7 +4975,7 @@ msgstr "全屏"
 msgid "Function"
 msgstr "功能"
 
-#: include/func.inc.php:680
+#: include/func.inc.php:655
 msgctxt "Giga short"
 msgid "G"
 msgstr "G"
@@ -5010,11 +5010,11 @@ msgstr "产生于%s秒"
 msgid "German (de_DE)"
 msgstr "德语 (de_DE)"
 
-#: include/page_header.php:206
+#: include/page_header.php:205
 msgid "Get support"
 msgstr "获取支援"
 
-#: include/func.inc.php:680
+#: include/func.inc.php:655
 msgid "Giga"
 msgstr "千兆"
 
@@ -5064,7 +5064,7 @@ msgstr "确认"
 msgid "Go to"
 msgstr "到"
 
-#: include/func.inc.php:2109
+#: include/func.inc.php:2084
 msgid "Go to dashboard"
 msgstr "转到仪表板"
 
@@ -5342,7 +5342,7 @@ msgid "H.i"
 msgstr "H.i"
 
 #: include/classes/class.cchart.php:1334 include/classes/class.cchart.php:1393
-#: include/page_header.php:451
+#: include/page_header.php:450
 msgid "H:i"
 msgstr "H:i"
 
@@ -5409,7 +5409,7 @@ msgstr "硬体(全细节)"
 msgid "Height"
 msgstr "高"
 
-#: include/page_header.php:204 include/views/general.login.php:40
+#: include/page_header.php:203 include/views/general.login.php:40
 msgid "Help"
 msgstr "帮助"
 
@@ -5452,7 +5452,7 @@ msgstr "隐藏所选的组"
 msgid "High"
 msgstr "严重"
 
-#: history.php:27 include/forms.inc.php:934 include/page_header.php:426
+#: history.php:27 include/forms.inc.php:934 include/page_header.php:425
 #: include/views/administration.general.housekeeper.edit.php:133
 #: include/views/configuration.item.list.php:68
 #: include/views/configuration.item.prototype.list.php:54 jsLoader.php:107
@@ -6125,7 +6125,7 @@ msgstr "图示"
 msgid "Identical expression already exists"
 msgstr "相同的表达式已经存在"
 
-#: include/func.inc.php:2099 include/func.inc.php:2119
+#: include/func.inc.php:2074 include/func.inc.php:2094
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "假如您认为这个信息是错的, 请谘询您的管理者关于如何取得需要的许可权."
 
@@ -6429,7 +6429,7 @@ msgstr "不正确的自变数传给方法."
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr "不正确的身份验证协议对于发现规则\"%1$s\"."
 
-#: api/classes/CItemGeneral.php:349
+#: api/classes/CItemGeneral.php:355
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr "不正确的身份验证协议监控项\"%1$s\"."
@@ -6504,7 +6504,7 @@ msgstr "不正确的栏位名称\"%1$s\"或用于资料表\"%2$s\"的where陈述
 msgid "Incorrect fields for sysmap."
 msgstr "不正确的sysmap字段."
 
-#: api/classes/CTrigger.php:665
+#: api/classes/CTrigger.php:664
 msgid "Incorrect fields for trigger."
 msgstr "不正确的触发器栏位."
 
@@ -6512,12 +6512,12 @@ msgstr "不正确的触发器栏位."
 msgid "Incorrect file upload."
 msgstr "不正确的档桉上传."
 
-#: api/classes/CItemGeneral.php:805
+#: api/classes/CItemGeneral.php:811
 #, c-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "不正确的弹性间隔\"%1$s\"."
 
-#: api/classes/CItemGeneral.php:794
+#: api/classes/CItemGeneral.php:800
 #, c-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "在项目\"%1$s\"中不正确的弹性间隔. 弹性间隔必须是一个字串."
@@ -6601,7 +6601,7 @@ msgstr "提供了不正确的项目ID\"%s\"给筛选组件."
 msgid "Incorrect item for axis value."
 msgstr "不正确的项目予轴值."
 
-#: api/classes/CTrigger.php:733 include/triggers.inc.php:1002
+#: api/classes/CTrigger.php:732 include/triggers.inc.php:1002
 #, c-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
 msgstr "提供不正确的项目键值\"%1$s\"给\"%2$s\"上的触发器表示式."
@@ -6615,7 +6615,7 @@ msgstr "提供不正确的项目值类型\"%1$s\"给触发器函数\"%2$s\"."
 msgid "Incorrect key."
 msgstr "不正确的键值."
 
-#: api/classes/CDRule.php:319 api/classes/CItemGeneral.php:282
+#: api/classes/CDRule.php:319 api/classes/CItemGeneral.php:288
 #: discoveryconf.php:110
 #, c-format
 msgid "Incorrect key: \"%1$s\"."
@@ -6739,7 +6739,7 @@ msgstr "不正确的埠范围."
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr "错误的隐私协议对于发现规则\"%1$s\"."
 
-#: api/classes/CItemGeneral.php:358
+#: api/classes/CItemGeneral.php:364
 #, c-format
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr "错误的隐私协议对于监控项\"%1$s\"."
@@ -6856,12 +6856,12 @@ msgstr "不正确的触发器表示式."
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr "不正确的触发器表示式. 主机 \"%1$s\"不存在或您不能存取此主机."
 
-#: api/classes/CTrigger.php:713
+#: api/classes/CTrigger.php:712
 #, c-format
 msgid "Incorrect trigger expression. Host \"%s\" does not exist or you have no access to this host."
 msgstr "不正确的触发器表示式. 主机 \"%s\"不存在或您不能存取此主机."
 
-#: api/classes/CTrigger.php:719
+#: api/classes/CTrigger.php:718
 msgid "Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously."
 msgstr "不正确的触发器表示式. 触发器表示式组件不该同时属于一个模板和一个主机."
 
@@ -6873,7 +6873,7 @@ msgstr "不正确的触发器表示式. 触发器表示式组件不该同时属�
 msgid "Incorrect trigger function \"%1$s\" provided in expression."
 msgstr "用了不正确的触发器方程式\"%1$s\"于表示式中."
 
-#: include/func.inc.php:1184
+#: include/func.inc.php:1159
 msgid "Incorrect type of asort_by_key."
 msgstr "不正确的asort_by_key类型."
 
@@ -7169,7 +7169,7 @@ msgstr "议题"
 msgid "It is not possible to filter by user password."
 msgstr "以用户密码过滤是不可能的."
 
-#: include/page_header.php:235
+#: include/page_header.php:234
 msgid "It is not possible to logout from HTTP authentication."
 msgstr "不可能于HTTP认证中登出."
 
@@ -7231,7 +7231,7 @@ msgstr "\"%2$s\"上的项目\"%1$s\" : 应用集\"%3$s\"不存在."
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "略过项目\"%1$s\"-用户规则."
 
-#: api/classes/CItemGeneral.php:340
+#: api/classes/CItemGeneral.php:346
 #, c-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "项目\"%1$s:%2$s\"有无效的埠: \"%3$s\"."
@@ -7285,44 +7285,44 @@ msgstr "项目原型之于"
 msgid "Item updated"
 msgstr "项目已更新"
 
-#: api/classes/CItemGeneral.php:261
+#: api/classes/CItemGeneral.php:267
 msgid "Item uses host interface from non-parent host."
 msgstr "项目使用来自非上层主机的主机介面."
 
-#: api/classes/CItemGeneral.php:264
+#: api/classes/CItemGeneral.php:270
 msgid "Item uses incorrect interface type."
 msgstr "项目使用不正确的介面类型."
 
-#: api/classes/CItemGeneral.php:318
+#: api/classes/CItemGeneral.php:324
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "项目将不会被刷新. 请输入正确的更新区间."
 
-#: api/classes/CItemGeneral.php:411
+#: api/classes/CItemGeneral.php:417
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "键值为 \"%1$s\"的项目已存在于\"%2$s\" 为探索规则."
 
-#: api/classes/CItemGeneral.php:417
+#: api/classes/CItemGeneral.php:423
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "键值为 \"%1$s\"的项目已存在于\"%2$s\" 为创建自项目原型的项目."
 
-#: api/classes/CItemGeneral.php:414
+#: api/classes/CItemGeneral.php:420
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "键值为 \"%1$s\"的项目已存在于\"%2$s\" 为项目原型."
 
-#: api/classes/CItemGeneral.php:408
+#: api/classes/CItemGeneral.php:414
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "键值为 \"%1$s\"的项目已存在于\"%2$s\" 为项目."
 
-#: api/classes/CItemGeneral.php:420
+#: api/classes/CItemGeneral.php:426
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "键值为 \"%1$s\"的项目已存在于\"%2$s\" 为未知的项目组件."
 
-#: api/classes/CItemGeneral.php:771
+#: api/classes/CItemGeneral.php:777
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "键值为 \"%1$s\"的项目已存在于\"%2$s\" ."
@@ -7420,12 +7420,12 @@ msgstr "Jabber"
 msgid "Jabber identifier"
 msgstr "Jabber 标识符"
 
-#: include/func.inc.php:251
+#: include/func.inc.php:226
 msgid "Jan"
 msgstr "一月"
 
-#: include/forms.inc.php:1645 include/func.inc.php:137
-#: include/func.inc.php:268 jsLoader.php:118
+#: include/forms.inc.php:1645 include/func.inc.php:112
+#: include/func.inc.php:243 jsLoader.php:118
 msgid "January"
 msgstr "一月"
 
@@ -7433,25 +7433,25 @@ msgstr "一月"
 msgid "Japanese (ja_JP)"
 msgstr "日语 (ja_JP)"
 
-#: include/func.inc.php:257
+#: include/func.inc.php:232
 msgid "Jul"
 msgstr "七月"
 
-#: include/forms.inc.php:1647 include/func.inc.php:143
-#: include/func.inc.php:274 jsLoader.php:124
+#: include/forms.inc.php:1647 include/func.inc.php:118
+#: include/func.inc.php:249 jsLoader.php:124
 msgid "July"
 msgstr "七月"
 
-#: include/func.inc.php:256
+#: include/func.inc.php:231
 msgid "Jun"
 msgstr "六月"
 
-#: include/forms.inc.php:1670 include/func.inc.php:142
-#: include/func.inc.php:273 jsLoader.php:123
+#: include/forms.inc.php:1670 include/func.inc.php:117
+#: include/func.inc.php:248 jsLoader.php:123
 msgid "June"
 msgstr "六月"
 
-#: include/func.inc.php:442 include/func.inc.php:678
+#: include/func.inc.php:417 include/func.inc.php:653
 msgctxt "Kilo short"
 msgid "K"
 msgstr "K"
@@ -7595,7 +7595,7 @@ msgstr "保持用户会话数据(天)\"%1$s\"."
 msgid "Key"
 msgstr "键值"
 
-#: api/classes/CItemGeneral.php:292
+#: api/classes/CItemGeneral.php:298
 #, c-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "键值\"%1$s\"不符 <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
@@ -7613,7 +7613,7 @@ msgstr "键值通行短语"
 msgid "Keyword"
 msgstr "关键字"
 
-#: include/func.inc.php:678
+#: include/func.inc.php:653
 msgid "Kilo"
 msgstr "Kilo"
 
@@ -7685,7 +7685,7 @@ msgstr "语言"
 msgid "Last"
 msgstr "末"
 
-#: include/func.inc.php:1879
+#: include/func.inc.php:1854
 msgctxt "page navigation"
 msgid "Last"
 msgstr "末"
@@ -7978,8 +7978,8 @@ msgstr "日志与SNMP捉捕器不符"
 msgid "Logged in as"
 msgstr "登入为"
 
-#: auditlogs.php:143 include/func.inc.php:2105 include/func.inc.php:2122
-#: include/menu.inc.php:282 include/page_header.php:228
+#: auditlogs.php:143 include/func.inc.php:2080 include/func.inc.php:2097
+#: include/menu.inc.php:282 include/page_header.php:227
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:64
 #: include/views/administration.users.list.php:61
@@ -8000,7 +8000,7 @@ msgstr "登入失败\"%s\"."
 msgid "Login name or password is incorrect."
 msgstr "登入名称或密码是不正确的."
 
-#: auditlogs.php:146 include/page_header.php:234 include/page_header.php:238
+#: auditlogs.php:146 include/page_header.php:233 include/page_header.php:237
 #: include/views/administration.auditlogs.list.php:44
 msgid "Logout"
 msgstr "登出"
@@ -8023,7 +8023,7 @@ msgstr "低级发现规则在“正常”状态"
 msgid "Low-level discovery rule in \"not supported\" state"
 msgstr "低级发现规则在“不支持”状态"
 
-#: include/func.inc.php:438 include/func.inc.php:679
+#: include/func.inc.php:413 include/func.inc.php:654
 msgctxt "Mega short"
 msgid "M"
 msgstr "M"
@@ -8259,12 +8259,12 @@ msgstr "对应"
 msgid "Maps"
 msgstr "拓墣图"
 
-#: include/func.inc.php:253
+#: include/func.inc.php:228
 msgid "Mar"
 msgstr "三月"
 
-#: include/forms.inc.php:1655 include/func.inc.php:139
-#: include/func.inc.php:270 jsLoader.php:120
+#: include/forms.inc.php:1655 include/func.inc.php:114
+#: include/func.inc.php:245 jsLoader.php:120
 msgid "March"
 msgstr "三月"
 
@@ -8324,7 +8324,7 @@ msgid "Max count of events per trigger to show"
 msgstr "可展示的每触发器最多事件计数"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2213
+#: include/func.inc.php:2188
 msgid "Maximize"
 msgstr "最大化"
 
@@ -8379,12 +8379,12 @@ msgid "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d cha
 msgid_plural "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d characters."
 msgstr[0] ""
 
-#: include/forms.inc.php:1665 include/func.inc.php:141
-#: include/func.inc.php:272 jsLoader.php:122
+#: include/forms.inc.php:1665 include/func.inc.php:116
+#: include/func.inc.php:247 jsLoader.php:122
 msgid "May"
 msgstr "五月"
 
-#: include/func.inc.php:255
+#: include/func.inc.php:230
 msgctxt "May short"
 msgid "May"
 msgstr "五月"
@@ -8434,7 +8434,7 @@ msgstr "示警媒介类型"
 msgid "Media types used by action \"%s\"."
 msgstr "示警媒介类型用于动作\"%s\"."
 
-#: include/func.inc.php:679
+#: include/func.inc.php:654
 msgid "Mega"
 msgstr "Mega"
 
@@ -8497,7 +8497,7 @@ msgid "Middle"
 msgstr "居中"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2213
+#: include/func.inc.php:2188
 msgid "Minimize"
 msgstr "最小化"
 
@@ -8629,12 +8629,12 @@ msgstr "节点"
 msgid "Model"
 msgstr "模型"
 
-#: include/func.inc.php:228
+#: include/func.inc.php:203
 msgid "Mon"
 msgstr "一"
 
 #: include/forms.inc.php:1631 include/forms.inc.php:1699
-#: include/func.inc.php:156 include/func.inc.php:240
+#: include/func.inc.php:131 include/func.inc.php:215
 msgid "Monday"
 msgstr "週一"
 
@@ -8821,7 +8821,7 @@ msgstr "网路拓墣图已添加"
 msgid "Network maps"
 msgstr "网络结拓墣图"
 
-#: httpmon.php:155 include/func.inc.php:222
+#: httpmon.php:155 include/func.inc.php:197
 msgid "Never"
 msgstr "从未"
 
@@ -8885,13 +8885,13 @@ msgstr "新的服务时间"
 msgid "Next"
 msgstr "下一步"
 
-#: include/func.inc.php:1872
+#: include/func.inc.php:1847
 msgctxt "page navigation"
 msgid "Next"
 msgstr "次"
 
 #: events.php:761 include/events.inc.php:362 include/events.inc.php:380
-#: include/func.inc.php:2432 include/triggers.inc.php:1606
+#: include/func.inc.php:2407 include/triggers.inc.php:1606
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
 #: include/views/js/adm.regexprs.edit.js.php:142
@@ -9001,7 +9001,7 @@ msgstr "没有指定给动作操作命令\"%s\"的认证类型."
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "没有指定给动作操作命令\"%s\"的认证用户名称."
 
-#: api/classes/CItemGeneral.php:324
+#: api/classes/CItemGeneral.php:330
 msgid "No authentication user name specified."
 msgstr "没有指定的认证用户名称"
 
@@ -9222,7 +9222,7 @@ msgstr "没有定义的接口."
 msgid "No interface found"
 msgstr "没有找到介面"
 
-#: api/classes/CItemGeneral.php:258
+#: api/classes/CItemGeneral.php:264
 msgid "No interface found."
 msgstr "没有找到介面."
 
@@ -9382,7 +9382,7 @@ msgstr "没有系统存取的许可权"
 #: api/classes/CHttpTest.php:393 api/classes/CIconMap.php:319
 #: api/classes/CImage.php:243 api/classes/CImage.php:357
 #: api/classes/CImage.php:474 api/classes/CItemGeneral.php:182
-#: api/classes/CItemGeneral.php:232 api/classes/CItem.php:689
+#: api/classes/CItemGeneral.php:235 api/classes/CItem.php:689
 #: api/classes/CItemPrototype.php:508 api/classes/CMaintenance.php:320
 #: api/classes/CMaintenance.php:345 api/classes/CMaintenance.php:358
 #: api/classes/CMaintenance.php:466 api/classes/CMaintenance.php:483
@@ -9395,11 +9395,11 @@ msgstr "没有系统存取的许可权"
 #: api/classes/CService.php:1255 api/classes/CService.php:1270
 #: api/classes/CTemplateScreen.php:704 api/classes/CTemplateScreen.php:725
 #: api/classes/CTemplateScreen.php:731 api/classes/CTrigger.php:636
-#: api/classes/CTrigger.php:961 api/classes/CTrigger.php:982
-#: api/classes/CTrigger.php:1854 api/classes/CTriggerPrototype.php:566
+#: api/classes/CTrigger.php:960 api/classes/CTrigger.php:981
+#: api/classes/CTrigger.php:1853 api/classes/CTriggerPrototype.php:566
 #: api/classes/CTriggerPrototype.php:669 api/classes/CUserMacro.php:726
 #: api/classes/CUserMacro.php:835 api/classes/CUser.php:1165
-#: include/func.inc.php:2078
+#: include/func.inc.php:2053
 msgid "No permissions to referred object or it does not exist!"
 msgstr "没有所说的物件的许可权或其不存在!"
 
@@ -9408,7 +9408,7 @@ msgstr "没有所说的物件的许可权或其不存在!"
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "没有指定给动作操作命令\"%s\"的私有金钥."
 
-#: api/classes/CItemGeneral.php:332
+#: api/classes/CItemGeneral.php:338
 msgid "No private key file specified."
 msgstr "没有指定的私有金钥."
 
@@ -9429,7 +9429,7 @@ msgstr "没有给定代理ID."
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "没有指定给动作操作命令\"%s\"的公开金钥档."
 
-#: api/classes/CItemGeneral.php:329
+#: api/classes/CItemGeneral.php:335
 msgid "No public key file specified."
 msgstr "没有指定的公开金钥档"
 
@@ -9561,7 +9561,7 @@ msgstr "没有定义的web方桉"
 #: include/blocks.inc.php:185 include/blocks.inc.php:375
 #: include/blocks.inc.php:896 include/blocks.inc.php:1069
 #: include/blocks.inc.php:1158 include/blocks.inc.php:1461
-#: include/classes/screens/CScreenEvents.php:40 include/page_header.php:325
+#: include/classes/screens/CScreenEvents.php:40 include/page_header.php:324
 #: include/triggers.inc.php:1596
 #: include/views/administration.general.iconmap.list.php:24
 #: include/views/administration.general.regularexpressions.list.php:31
@@ -9644,7 +9644,7 @@ msgstr "非知悉"
 msgid "Not Templated items"
 msgstr "非模板项目"
 
-#: api/classes/CTrigger.php:1486
+#: api/classes/CTrigger.php:1485
 #, c-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr "并非所有的模板都连结到\"%s\"."
@@ -9707,12 +9707,12 @@ msgstr "警报汇总"
 msgid "Notifications"
 msgstr "警报"
 
-#: include/func.inc.php:261
+#: include/func.inc.php:236
 msgid "Nov"
 msgstr "十一"
 
-#: include/forms.inc.php:1667 include/func.inc.php:147
-#: include/func.inc.php:278 jsLoader.php:128
+#: include/forms.inc.php:1667 include/func.inc.php:122
+#: include/func.inc.php:253 jsLoader.php:128
 msgid "November"
 msgstr "十一月"
 
@@ -9851,7 +9851,7 @@ msgstr "其它组态参数"
 msgid "OVERVIEW"
 msgstr "概览"
 
-#: include/func.inc.php:260
+#: include/func.inc.php:235
 msgid "Oct"
 msgstr "十月"
 
@@ -9859,8 +9859,8 @@ msgstr "十月"
 msgid "Octal"
 msgstr "八进位"
 
-#: include/forms.inc.php:1662 include/func.inc.php:146
-#: include/func.inc.php:277 jsLoader.php:127
+#: include/forms.inc.php:1662 include/func.inc.php:121
+#: include/func.inc.php:252 jsLoader.php:127
 msgid "October"
 msgstr "十月"
 
@@ -10161,7 +10161,7 @@ msgstr "总览"
 msgid "Overview by proxy"
 msgstr "依系统代理程式概览"
 
-#: include/func.inc.php:682
+#: include/func.inc.php:657
 msgctxt "Peta short"
 msgid "P"
 msgstr "P"
@@ -10466,7 +10466,7 @@ msgstr "许可权只能被指派予用户群组"
 msgid "Persian (fa_IR)"
 msgstr "波斯语 (fa_IR)"
 
-#: include/func.inc.php:682
+#: include/func.inc.php:657
 msgid "Peta"
 msgstr "Peta"
 
@@ -10570,7 +10570,7 @@ msgstr "预览"
 msgid "Previous"
 msgstr "前"
 
-#: include/func.inc.php:1845
+#: include/func.inc.php:1820
 msgctxt "page navigation"
 msgid "Previous"
 msgstr "前"
@@ -10619,7 +10619,7 @@ msgstr "主要的POC电话B"
 msgid "Primary POC screen name"
 msgstr "主要的POC代称"
 
-#: include/page_header.php:209
+#: include/page_header.php:208
 msgid "Print"
 msgstr "打印"
 
@@ -10681,7 +10681,7 @@ msgstr "问题, 如果至少一个下层有一个问题"
 msgid "Problems"
 msgstr "问题"
 
-#: include/page_header.php:214
+#: include/page_header.php:213
 msgid "Profile"
 msgstr "基本资料"
 
@@ -10830,11 +10830,11 @@ msgstr "恢复主旨"
 msgid "Refresh (in seconds)"
 msgstr "刷新(秒计)"
 
-#: include/func.inc.php:1953
+#: include/func.inc.php:1928
 msgid "Refresh time in seconds"
 msgstr "以秒计的刷新时间"
 
-#: include/func.inc.php:1957
+#: include/func.inc.php:1932
 msgid "Refresh time multiplier"
 msgstr "刷新时间倍数"
 
@@ -11336,7 +11336,7 @@ msgstr "SNMP介面"
 msgid "SNMP trap"
 msgstr "SNMP捉捕"
 
-#: api/classes/CItemGeneral.php:300
+#: api/classes/CItemGeneral.php:306
 msgid "SNMP trap key is invalid."
 msgstr "SNMP捉捕键值是无效的"
 
@@ -11405,12 +11405,12 @@ msgstr "ZABBIX 状态"
 msgid "Safari"
 msgstr "Safari"
 
-#: include/func.inc.php:233
+#: include/func.inc.php:208
 msgid "Sat"
 msgstr "六"
 
 #: include/forms.inc.php:1636 include/forms.inc.php:1704
-#: include/func.inc.php:161 include/func.inc.php:245
+#: include/func.inc.php:136 include/func.inc.php:220
 msgid "Saturday"
 msgstr "週六"
 
@@ -11697,7 +11697,7 @@ msgid "Security name"
 msgstr "安全名称"
 
 #: events.php:340 include/classes/html/CButtonPopup.php:52
-#: include/forms.inc.php:577 include/page_header.php:329
+#: include/forms.inc.php:577 include/page_header.php:328
 #: include/reports.inc.php:423
 #: include/views/administration.auditacts.list.php:45
 #: include/views/administration.auditlogs.list.php:59
@@ -11731,7 +11731,7 @@ msgstr "安全名称"
 msgid "Select"
 msgstr "选择"
 
-#: include/page_header.php:294
+#: include/page_header.php:293
 msgid "Select Nodes"
 msgstr "选择节点"
 
@@ -11799,7 +11799,7 @@ msgstr "送到用户"
 msgid "Sent"
 msgstr "已送"
 
-#: include/func.inc.php:259
+#: include/func.inc.php:234
 msgid "Sep"
 msgstr "九月"
 
@@ -11808,8 +11808,8 @@ msgstr "九月"
 msgid "Separated"
 msgstr "分开的"
 
-#: include/forms.inc.php:1657 include/func.inc.php:145
-#: include/func.inc.php:276 jsLoader.php:126
+#: include/forms.inc.php:1657 include/func.inc.php:120
+#: include/func.inc.php:251 jsLoader.php:126
 msgid "September"
 msgstr "九月"
 
@@ -12385,12 +12385,12 @@ msgstr "期间的总时间是 T > N"
 msgid "Sum of values of a period T is NOT N"
 msgstr "期间 T 的值总数不是 N"
 
-#: include/func.inc.php:227
+#: include/func.inc.php:202
 msgid "Sun"
 msgstr "日"
 
 #: include/forms.inc.php:1637 include/forms.inc.php:1705
-#: include/func.inc.php:163 include/func.inc.php:239
+#: include/func.inc.php:138 include/func.inc.php:214
 msgid "Sunday"
 msgstr "日"
 
@@ -12423,7 +12423,7 @@ msgstr "系统错误."
 msgid "System status"
 msgstr "系统状态"
 
-#: include/func.inc.php:681
+#: include/func.inc.php:656
 msgctxt "Tera short"
 msgid "T"
 msgstr "T"
@@ -12602,7 +12602,7 @@ msgstr "模板"
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "模板\"%1$s\"自主机\"%2$s\"断连."
 
-#: include/func.inc.php:681
+#: include/func.inc.php:656
 msgid "Tera"
 msgstr "Tera"
 
@@ -12735,12 +12735,12 @@ msgstr "本周"
 msgid "This year"
 msgstr "本年"
 
-#: include/func.inc.php:231
+#: include/func.inc.php:206
 msgid "Thu"
 msgstr "四"
 
 #: include/forms.inc.php:1634 include/forms.inc.php:1702
-#: include/func.inc.php:159 include/func.inc.php:243
+#: include/func.inc.php:134 include/func.inc.php:218
 msgid "Thursday"
 msgstr "週四"
 
@@ -12907,7 +12907,7 @@ msgstr "触发器\"%1$s\"相依于一个不存在的触发器\"%2$s\"."
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "略过触发器\"%1$s\"-用户规则."
 
-#: api/classes/CTrigger.php:1625
+#: api/classes/CTrigger.php:1624
 #, c-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "触发器\"%s\"属于有不同连结的模板."
@@ -12917,7 +12917,7 @@ msgstr "触发器\"%s\"属于有不同连结的模板."
 msgid "Trigger added"
 msgstr "触发器已添加"
 
-#: api/classes/CTrigger.php:1529
+#: api/classes/CTrigger.php:1528
 msgid "Trigger cannot be dependent on a trigger that is inherited from it."
 msgstr "触发器不能依赖从它继承的一个触发器."
 
@@ -12941,7 +12941,7 @@ msgstr "触发器显示选项"
 msgid "Trigger expression condition"
 msgstr "触发器表示式条件"
 
-#: api/classes/CTrigger.php:693 api/classes/CTriggerPrototype.php:801
+#: api/classes/CTrigger.php:692 api/classes/CTriggerPrototype.php:801
 msgid "Trigger expression must contain at least one host:key reference."
 msgstr "触发器表示式必需包含至少一个 主机:键值 参照."
 
@@ -13082,12 +13082,12 @@ msgstr "删短的"
 msgid "Try to read inaccessible property \"%s\"."
 msgstr "尝试读取不能存取的属性\"%s\"."
 
-#: include/func.inc.php:229
+#: include/func.inc.php:204
 msgid "Tue"
 msgstr "二"
 
 #: include/forms.inc.php:1632 include/forms.inc.php:1700
-#: include/func.inc.php:157 include/func.inc.php:241
+#: include/func.inc.php:132 include/func.inc.php:216
 msgid "Tuesday"
 msgstr "週二"
 
@@ -13165,11 +13165,11 @@ msgstr "计算方式"
 msgid "Type of information"
 msgstr "数据类型"
 
-#: api/classes/CItemGeneral.php:310
+#: api/classes/CItemGeneral.php:316
 msgid "Type of information must be \"Log\" for log key."
 msgstr "日志键值的资讯类型必须是\"Log\" ."
 
-#: api/classes/CItemGeneral.php:306
+#: api/classes/CItemGeneral.php:312
 msgid "Type of information must be \"Numeric (float)\" for aggregate items."
 msgstr "整合性项目的资讯的类型必须是\"Numeric (float)\"."
 
@@ -13232,7 +13232,7 @@ msgstr "USA (160字元)"
 msgid "USER PROFILE"
 msgstr "用户基本资料"
 
-#: include/func.inc.php:2611
+#: include/func.inc.php:2586
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -13519,7 +13519,7 @@ msgstr "已更新: 项目\"%1$s\"于\"%2$s\"."
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "已更新: 项目原型\"%1$s\"于\"%2$s\"."
 
-#: api/classes/CTrigger.php:1278
+#: api/classes/CTrigger.php:1277
 #, c-format
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "已更新: 触发器\"%1$s\"于\"%2$s\"."
@@ -13946,12 +13946,12 @@ msgstr "Web 场景 步骤数量不能少于1."
 msgid "Web scenarios"
 msgstr "Web 场景"
 
-#: include/func.inc.php:230
+#: include/func.inc.php:205
 msgid "Wed"
 msgstr "三"
 
 #: include/forms.inc.php:1633 include/forms.inc.php:1701
-#: include/func.inc.php:158 include/func.inc.php:242
+#: include/func.inc.php:133 include/func.inc.php:217
 msgid "Wednesday"
 msgstr "週三"
 
@@ -14154,7 +14154,7 @@ msgstr "XML档含有警告 %1$s:"
 msgid "Y"
 msgstr "Y"
 
-#: include/func.inc.php:685
+#: include/func.inc.php:660
 msgctxt "Yotta short"
 msgid "Y"
 msgstr "Y"
@@ -14204,7 +14204,7 @@ msgstr "Y.m.d"
 msgid "Y.m.d H:i"
 msgstr "Y.m.d H:i"
 
-#: include/func.inc.php:606 include/translateDefines.inc.php:47
+#: include/func.inc.php:581 include/translateDefines.inc.php:47
 msgid "Y.m.d H:i:s"
 msgstr "Y.m.d H:i:s"
 
@@ -14220,14 +14220,14 @@ msgstr "每年"
 
 #: events.php:761 include/blocks.inc.php:727
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:365
-#: include/events.inc.php:383 include/func.inc.php:2432
+#: include/events.inc.php:383 include/func.inc.php:2407
 #: include/triggers.inc.php:1606
 #: include/views/administration.users.list.php:76
 #: include/views/js/adm.regexprs.edit.js.php:139
 msgid "Yes"
 msgstr "是"
 
-#: include/func.inc.php:685
+#: include/func.inc.php:660
 msgid "Yotta"
 msgstr "Yotta"
 
@@ -14240,7 +14240,7 @@ msgstr "您无法选择某些语言, 因为这些语系并未安装于web伺服�
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "您未被允许来帮用户\"%s\"转换优先权."
 
-#: include/func.inc.php:2115
+#: include/func.inc.php:2090
 msgid "You are not logged in."
 msgstr "您尚未登入."
 
@@ -14291,15 +14291,15 @@ msgstr "您没有许可权来更新其它用户."
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "您没有许可权来来更新用户或用户不存在."
 
-#: include/func.inc.php:2097
+#: include/func.inc.php:2072
 msgid "You have no permissions to access this page."
 msgstr "你没有许可权来访问这个页面."
 
-#: include/func.inc.php:2117
+#: include/func.inc.php:2092
 msgid "You must login to view this page."
 msgstr "您必需登入才能浏览此页面."
 
-#: include/func.inc.php:2093
+#: include/func.inc.php:2068
 msgid "Your are logged in as"
 msgstr "你已经登录作为"
 
@@ -14307,7 +14307,7 @@ msgstr "你已经登录作为"
 msgid "Your setup is not configured for distributed monitoring."
 msgstr "您的设定并未组态为分散式监测."
 
-#: include/func.inc.php:684
+#: include/func.inc.php:659
 msgctxt "Zetta short"
 msgid "Z"
 msgstr "Z"
@@ -14422,7 +14422,7 @@ msgstr "Zabbix主机埠"
 msgid "Zabbix trapper"
 msgstr "Zabbix捉捕器"
 
-#: include/func.inc.php:684
+#: include/func.inc.php:659
 msgid "Zetta"
 msgstr "Zetta"
 
@@ -14435,12 +14435,12 @@ msgstr "缩放"
 msgid "[H:i:s]"
 msgstr "[H:i:s]"
 
-#: include/func.inc.php:166
+#: include/func.inc.php:141
 #, c-format
 msgid "[Wrong value for day: \"%s\" ]"
 msgstr "[错误的日计数: \"%s\" ]"
 
-#: include/func.inc.php:151
+#: include/func.inc.php:126
 #, c-format
 msgid "[Wrong value for month: \"%s\" ]"
 msgstr "[错误的月计数: \"%s\" ]"
@@ -14508,13 +14508,13 @@ msgstr "自动被注册的主机"
 msgid "avg"
 msgstr "平均"
 
-#: include/func.inc.php:566 jsLoader.php:97
+#: include/func.inc.php:541 jsLoader.php:97
 msgctxt "day short"
 msgid "d"
 msgstr "d"
 
 #: include/html.inc.php:592 include/maintenances.inc.php:59
-#: include/page_header.php:450 include/translateDefines.inc.php:42
+#: include/page_header.php:449 include/translateDefines.inc.php:42
 #: include/views/configuration.hostgroups.list.php:138
 #: include/views/configuration.item.list.php:127 report3.php:132
 msgid "d M Y"
@@ -14619,7 +14619,7 @@ msgstr "已执行"
 msgid "fixed"
 msgstr "固定的"
 
-#: include/func.inc.php:1904
+#: include/func.inc.php:1879
 msgid "found"
 msgstr "已发现"
 
@@ -14629,7 +14629,7 @@ msgctxt "item_form"
 msgid "global housekeeper settings"
 msgstr "全局的清除器设置"
 
-#: include/func.inc.php:567 jsLoader.php:98
+#: include/func.inc.php:542 jsLoader.php:98
 msgctxt "hour short"
 msgid "h"
 msgstr "h"
@@ -14690,12 +14690,12 @@ msgstr "似"
 msgid "low-level discovery rule"
 msgstr "底层发现规则"
 
-#: include/func.inc.php:568
+#: include/func.inc.php:543
 msgctxt "minute short"
 msgid "m"
 msgstr "m"
 
-#: include/func.inc.php:565 jsLoader.php:96
+#: include/func.inc.php:540 jsLoader.php:96
 msgctxt "month short"
 msgid "m"
 msgstr "m"
@@ -14736,7 +14736,7 @@ msgstr "最少60秒"
 msgid "mm"
 msgstr "mm"
 
-#: include/func.inc.php:570
+#: include/func.inc.php:545
 msgctxt "millisecond short"
 msgid "ms"
 msgstr "毫秒"
@@ -14798,7 +14798,7 @@ msgid "now"
 msgstr "现在"
 
 #: include/blocks.inc.php:352 include/blocks.inc.php:696
-#: include/func.inc.php:1901
+#: include/func.inc.php:1876
 msgid "of"
 msgstr "其"
 
@@ -14838,7 +14838,7 @@ msgstr "root"
 msgid "running"
 msgstr "运作中"
 
-#: include/func.inc.php:569
+#: include/func.inc.php:544
 msgctxt "second short"
 msgid "s"
 msgstr "s"
@@ -14876,7 +14876,7 @@ msgstr "展示值对应"
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "模板ID\"%1$s\"已传送%2$s次"
 
-#: include/func.inc.php:1897
+#: include/func.inc.php:1872
 msgid "to"
 msgstr "到"
 
@@ -14903,7 +14903,7 @@ msgstr "值"
 msgid "via"
 msgstr "通过"
 
-#: include/func.inc.php:564 jsLoader.php:95
+#: include/func.inc.php:539 jsLoader.php:95
 msgctxt "year short"
 msgid "y"
 msgstr "y"
