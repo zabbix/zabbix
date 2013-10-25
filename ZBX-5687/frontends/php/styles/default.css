@@ -748,6 +748,7 @@ table.header_wide tr.first td.header_l { font-size: 1.3em; font-weight: bold; te
 table.header_wide tr.first td.header_r { background: none; text-align: right; height: 24px; padding-right: 5px; border-width: 0; }
 table.header_wide tr.next td.header_l { background: none; text-align: left; height: 20px; padding-left: 5px; border-width: 0; }
 table.header_wide tr.next td.header_r { background: none; text-align: right; height: 20px; padding-right: 5px; border-width: 0; }
+table.header_wide .selectShorten { width: auto; }
 
 /* suggest */
 table.suggest { width: 100%; margin: 0; border-spacing: 0; background-color: #FEFEFE; }
