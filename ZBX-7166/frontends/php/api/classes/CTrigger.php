@@ -464,22 +464,6 @@ class CTrigger extends CTriggerGeneral {
 			$result[$trigger['triggerid']] += $trigger;
 		}
 
-		if (!is_null($options['selectLastEvent'])) {
-			foreach ($result as $triggerId => $trigger) {
-				$lastEvent = API::Event()->get(array(
-					'object' => EVENT_SOURCE_TRIGGERS,
-					'objectids' => $triggerId,
-					'output' => $options['selectLastEvent'],
-					'nopermissions' => true,
-					'sortfield' => array('eventid'),
-					'sortorder' => ZBX_SORT_DOWN,
-					'limit' => 1
-				));
-
-				$result[$triggerId]['lastEvent'] = $lastEvent ? reset($lastEvent) : array();
-			}
-		}
-
 		if ($options['groupids'] !== null && $options['selectGroups'] === null) {
 			$options['selectGroups'] = API_OUTPUT_REFER;
 		}
@@ -669,13 +653,12 @@ class CTrigger extends CTriggerGeneral {
 		foreach ($triggers as $tnum => &$trigger) {
 			$currentTrigger = $triggers[$tnum];
 
-			if ($update) {
-				$error = _s('Cannot update "%1$s" for trigger "%2$s".', '%1$s', $trigger['description']);
-			}
-			else {
-				$error = _s('Cannot set "%1$s" for trigger "%2$s".', '%1$s', $trigger['description']);
-			}
-			$this->checkNoParameters($trigger, array('templateid', 'state', 'value', 'value_flag'), $error);
+			$this->checkNoParameters(
+				$trigger,
+				array('templateid', 'state', 'value', 'value_flag'),
+				($update ? _('Cannot update "%1$s" for trigger "%2$s".') : _('Cannot set "%1$s" for trigger "%2$s".')),
+				$trigger['description']
+			);
 
 			if (!check_db_fields($triggerDbFields, $trigger)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect fields for trigger.'));
@@ -1807,6 +1790,24 @@ class CTrigger extends CTriggerGeneral {
 				'preservekeys' => true,
 			));
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
+		}
+
+		// adding last event
+		if ($options['selectLastEvent'] !== null) {
+			foreach ($result as $triggerId => $trigger) {
+				$lastEvent = API::Event()->get(array(
+					'source' => EVENT_SOURCE_TRIGGERS,
+					'object' => EVENT_OBJECT_TRIGGER,
+					'objectids' => $triggerId,
+					'output' => $options['selectLastEvent'],
+					'nopermissions' => true,
+					'sortfield' => array('clock', 'eventid'),
+					'sortorder' => ZBX_SORT_DOWN,
+					'limit' => 1
+				));
+
+				$result[$triggerId]['lastEvent'] = $lastEvent ? reset($lastEvent) : array();
+			}
 		}
 
 		return $result;

@@ -442,7 +442,8 @@ class CAlert extends CZBXAPI {
 			$mediatypes = API::getApi()->select('media_type', array(
 				'output' => $options['selectMediatypes'],
 				'filter' => array('mediatypeid' => $relationMap->getRelatedIds()),
-				'preservekeys' => true
+				'preservekeys' => true,
+				'nodeids' => get_current_nodeid(true)
 			));
 			$result = $relationMap->mapMany($result, $mediatypes, 'mediatypes');
 		}

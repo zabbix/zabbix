@@ -13,7 +13,8 @@ class CSession implements ArrayAccess {
 		// remove file name from path
 		$path = substr($path, 0, strrpos($path, '/') + 1);
 
-		session_set_cookie_params(0, $path);
+		session_set_cookie_params(0, $path, null, HTTPS);
+
 		if (!session_start()) {
 			throw new Exception('Cannot start session.');
 		}

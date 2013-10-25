@@ -191,6 +191,7 @@ if ($hosts) {
 			'error', 'trends', 'history', 'delay', 'key_'),
 		'selectApplications' => array('applicationid'),
 		'selectItemDiscovery' => array('ts_delete'),
+		'webitems' => true,
 		'filter' => array(
 			'status' => array(ITEM_STATUS_ACTIVE)
 		),
@@ -316,15 +317,15 @@ if ($filterShowDetails) {
 		is_show_all_nodes() ? make_sorting_header(_('Node'), 'h.hostid') : null,
 		($_REQUEST['hostid'] == 0) ? make_sorting_header(_('Host'), 'h.name') : null,
 		make_sorting_header(_('Name'), 'i.name'),
-		_('Interval'),
-		_('History'),
-		_('Trends'),
-		_('Type'),
+		new CSpan(_('Interval')),
+		new CSpan(_('History')),
+		new CSpan(_('Trends')),
+		new CSpan(_('Type')),
 		make_sorting_header(_('Last check'), 'i.lastclock'),
-		_('Last value'),
-		_x('Change', 'noun in latest data'),
+		new CSpan(_('Last value')),
+		new CSpan(_x('Change', 'noun in latest data')),
 		SPACE,
-		_('Error')
+		new CSpan(_('Error'))
 	));
 }
 else {
@@ -334,8 +335,8 @@ else {
 		($_REQUEST['hostid'] == 0) ? make_sorting_header(_('Host'), 'h.name') : null,
 		make_sorting_header(_('Name'), 'i.name'),
 		make_sorting_header(_('Last check'), 'i.lastclock'),
-		_('Last value'),
-		_x('Change', 'noun in latest data'),
+		new CSpan(_('Last value')),
+		new CSpan(_x('Change', 'noun in latest data')),
 		SPACE
 	));
 }
@@ -408,8 +409,11 @@ foreach ($items as $key => $item){
 
 	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown txt' : 'txt';
 	$itemName = array(SPACE, SPACE, $item['resolvedName']);
+
 	if ($filterShowDetails) {
-		$itemKey = new CLink(resolveItemKeyMacros($item), 'items.php?form=update&itemid='.$item['itemid']);
+		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST)
+			? new CSpan(resolveItemKeyMacros($item), 'enabled')
+			: new CLink(resolveItemKeyMacros($item), 'items.php?form=update&itemid='.$item['itemid'], 'enabled');
 		$itemName = array_merge($itemName, array(BR(), SPACE, SPACE, $itemKey));
 
 		$statusIcons = array();
@@ -582,7 +586,9 @@ foreach ($items as $item) {
 	$itemName = array(SPACE, SPACE, $item['resolvedName']);
 
 	if ($filterShowDetails) {
-		$itemKey = new CLink(resolveItemKeyMacros($item), 'items.php?form=update&itemid='.$item['itemid']);
+		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST)
+			? new CSpan(resolveItemKeyMacros($item), 'enabled')
+			: new CLink(resolveItemKeyMacros($item), 'items.php?form=update&itemid='.$item['itemid'], 'enabled');
 		$itemName = array_merge($itemName, array(BR(), SPACE, SPACE, $itemKey));
 
 		$statusIcons = array();
