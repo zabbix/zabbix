@@ -2198,6 +2198,24 @@ static int	DBpatch_2010191(void)
 	return DBcreate_index("events", "events_2", "source,object,clock", 0);
 }
 
+static int	DBpatch_2010192(void)
+{
+	const char	*sql =
+			"update triggers"
+			" set state=0,value=0,lastchange=0,error=''"
+			" where exists (select null"
+					" from functions,items,hosts"
+					" where hosts.status=3"
+						" and items.hostid = hosts.hostid"
+						" and functions.itemid = items.itemid"
+						" and triggers.triggerid = functions.triggerid)";
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 #define DBPATCH_END()					{NULL}};
@@ -2436,6 +2454,7 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010189, 0, 1)
 	DBPATCH_ADD(2010190, 0, 1)
 	DBPATCH_ADD(2010191, 0, 1)
+	DBPATCH_ADD(2010192, 0, 0)
 
 	DBPATCH_END()
 
