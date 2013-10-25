@@ -200,34 +200,47 @@ class CMacrosResolver {
 
 		// interface macros, macro should be resolved to main agent interface
 		if ($isInterfaceMacrosAvailable) {
-			$dbInterface = DBfetch(DBselect(
-				'SELECT i.hostid,i.ip,i.dns,i.useip'.
-				' FROM interface i'.
-				' WHERE i.main='.INTERFACE_PRIMARY.
-					' AND i.type='.INTERFACE_TYPE_AGENT.
-					' AND '.dbConditionInt('i.hostid', $hostIds)
-			));
+			foreach ($data as $hostId => $texts) {
+				if ($interfaceMacros = $this->findMacros(self::PATTERN_INTERFACE, $texts)) {
+					$dbInterface = DBfetch(DBselect(
+						'SELECT i.hostid,i.ip,i.dns,i.useip'.
+						' FROM interface i'.
+						' WHERE i.main='.INTERFACE_PRIMARY.
+							' AND i.type='.INTERFACE_TYPE_AGENT.
+							' AND i.hostid='.zbx_dbstr($hostId)
+					));
 
-			if ($interfaceMacros = $this->findMacros(self::PATTERN_INTERFACE, $data[$hostId])) {
-				foreach ($interfaceMacros as $interfaceMacro) {
-					switch ($interfaceMacro) {
-						case '{IPADDRESS}':
-						case '{HOST.IP}':
-							$macros[$hostId][$interfaceMacro] = $dbInterface['ip'];
-							break;
-						case '{HOST.DNS}':
-							$macros[$hostId][$interfaceMacro] = $dbInterface['dns'];
-							break;
-						case '{HOST.CONN}':
-							$macros[$hostId][$interfaceMacro] = $dbInterface['useip'] ? $dbInterface['ip'] : $dbInterface['dns'];
-							break;
+					$dbInterfaceTexts = array($dbInterface['ip'], $dbInterface['dns']);
+
+					if ($this->findMacros(self::PATTERN_HOST, $dbInterfaceTexts)
+							|| $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, $dbInterfaceTexts)) {
+						$saveCurrentConfig = $this->config;
+
+						$dbInterfaceMacros = $this->resolve(array(
+							'config' => 'hostInterfaceIpDnsAgentPrimary',
+							'data' => array($hostId => $dbInterfaceTexts)
+						));
+
+						$dbInterfaceMacros = reset($dbInterfaceMacros);
+						$dbInterface['ip'] = $dbInterfaceMacros[0];
+						$dbInterface['dns'] = $dbInterfaceMacros[1];
+
+						$this->config = $saveCurrentConfig;
 					}
 
-					if ($this->findMacros(self::PATTERN_HOST, array($macros[$hostId][$interfaceMacro]))
-							|| $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, array($macros[$hostId][$interfaceMacro]))) {
-						// attention recursion!
-						$macrosInMacros = $this->resolveTexts(array($hostId => array($macros[$hostId][$interfaceMacro])));
-						$macros[$hostId][$interfaceMacro] = $macrosInMacros[$hostId][0];
+					foreach ($interfaceMacros as $interfaceMacro) {
+						switch ($interfaceMacro) {
+							case '{IPADDRESS}':
+							case '{HOST.IP}':
+								$macros[$hostId][$interfaceMacro] = $dbInterface['ip'];
+								break;
+							case '{HOST.DNS}':
+								$macros[$hostId][$interfaceMacro] = $dbInterface['dns'];
+								break;
+							case '{HOST.CONN}':
+								$macros[$hostId][$interfaceMacro] = $dbInterface['useip'] ? $dbInterface['ip'] : $dbInterface['dns'];
+								break;
+						}
 					}
 				}
 			}

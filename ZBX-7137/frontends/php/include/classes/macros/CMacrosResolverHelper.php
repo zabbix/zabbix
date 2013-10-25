@@ -102,12 +102,14 @@ class CMacrosResolverHelper {
 			foreach ($interfaces as &$interface) {
 				if ($interface['type'] == INTERFACE_TYPE_AGENT && $interface['main'] == INTERFACE_PRIMARY
 						&& $interface['hostid'] == $hostId) {
-					$interface['ip'] = $texts[$n++];
-					$interface['dns'] = $texts[$n++];
+					$interface['ip'] = $texts[$n];
+					$n++;
+					$interface['dns'] = $texts[$n];
+					$n++;
 				}
 			}
+			unset($interface);
 		}
-		unset($interface);
 
 		// others ip and dns
 		$data = array();
@@ -129,12 +131,14 @@ class CMacrosResolverHelper {
 			foreach ($interfaces as &$interface) {
 				if (!($interface['type'] == INTERFACE_TYPE_AGENT && $interface['main'] == INTERFACE_PRIMARY)
 						&& $interface['hostid'] == $hostId) {
-					$interface['ip'] = $texts[$n++];
-					$interface['dns'] = $texts[$n++];
+					$interface['ip'] = $texts[$n];
+					$n++;
+					$interface['dns'] = $texts[$n];
+					$n++;
 				}
 			}
+			unset($interface);
 		}
-		unset($interface);
 
 		// port
 		$data = array();
@@ -152,11 +156,12 @@ class CMacrosResolverHelper {
 
 			foreach ($interfaces as &$interface) {
 				if ($interface['hostid'] == $hostId) {
-					$interface['port'] = $texts[$n++];
+					$interface['port'] = $texts[$n];
+					$n++;
 				}
 			}
+			unset($interface);
 		}
-		unset($interface);
 
 		return $interfaces;
 	}
