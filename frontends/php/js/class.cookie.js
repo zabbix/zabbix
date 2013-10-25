@@ -47,7 +47,7 @@ var cookie = {
 			expires = '; expires=' + date.toGMTString();
 		}
 
-		document.cookie = name + '=' + value + expires;
+		document.cookie = name + '=' + value + expires + (location.protocol == 'https:' ? '; secure' : '');
 
 		// apache header size limit
 		if (document.cookie.length > 8000) {
@@ -264,7 +264,7 @@ jQuery.cookie = function (key, value, options) {
 			options.expires ? '; expires=' + options.expires.toUTCString() : '', // use expires attribute, max-age is not supported by IE
 			options.path ? '; path=' + options.path : '',
 			options.domain ? '; domain=' + options.domain : '',
-			options.secure ? '; secure' : ''
+			(location.protocol == 'https:') ? '; secure' : ''
 		].join(''));
 	}
 
