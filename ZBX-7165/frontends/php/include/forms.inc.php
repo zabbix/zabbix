@@ -951,7 +951,7 @@
 	}
 
 	/**
-	 * Get data for item view.
+	 * Get data for item edit page.
 	 *
 	 * @param bool $options['is_discovery_rule']
 	 *
@@ -1108,6 +1108,7 @@
 					break;
 				}
 			} while ($itemid != 0);
+
 			$data['templates'] = array_reverse($data['templates']);
 			array_shift($data['templates']);
 		}
@@ -1248,6 +1249,24 @@
 
 		// template
 		$data['is_template'] = isTemplate($data['hostid']);
+
+		// unset snmpv3 fields
+		if ($data['type'] != ITEM_TYPE_SNMPV3) {
+			$data['snmpv3_contextname'] = '';
+			$data['snmpv3_securityname'] = '';
+			$data['snmpv3_securitylevel'] = ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV;
+			$data['snmpv3_authprotocol'] = ITEM_AUTHPROTOCOL_MD5;
+			$data['snmpv3_authpassphrase'] = '';
+			$data['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
+			$data['snmpv3_privpassphrase'] = '';
+		}
+
+		// unset ssh auth fields
+		if ($data['type'] != ITEM_TYPE_SSH) {
+			$data['authtype'] = ITEM_AUTHTYPE_PASSWORD;
+			$data['publickey'] = '';
+			$data['privatekey'] = '';
+		}
 
 		return $data;
 	}

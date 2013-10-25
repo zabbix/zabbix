@@ -336,19 +336,19 @@ abstract class CItemGeneral extends CZBXAPI {
 			if ($fullItem['type'] == ITEM_TYPE_SNMPTRAP
 					&& strcmp($fullItem['key_'], 'snmptrap.fallback') != 0
 					&& strcmp($itemKey->getKeyId(), 'snmptrap') != 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('SNMP trap key is invalid.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No SNMP trap key specified.'));
 			}
 
 			// snmp oid
 			if ((in_array($fullItem['type'], array(ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3)))
 					&& zbx_empty($fullItem['snmp_oid'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('SNMP OID field cannot be empty.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No SNMP OID specified.'));
 			}
 
 			// snmp community
 			if (in_array($fullItem['type'], array(ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C))
 					&& zbx_empty($fullItem['snmp_community'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('SNMP community field cannot be empty.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No SNMP community specified.'));
 			}
 
 			// snmp port
