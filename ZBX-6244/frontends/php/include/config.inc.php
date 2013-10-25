@@ -18,7 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
-
 require_once dirname(__FILE__).'/classes/core/Z.php';
 
 try {
