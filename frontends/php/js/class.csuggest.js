@@ -489,16 +489,14 @@ newSugTab: function(needle){
 		var td = document.createElement('td');
 		tr.appendChild(td);
 
-		td.appendChild(document.createTextNode(needle));
+		var bold = document.createElement('b');
+		bold.appendChild(document.createTextNode(needle));
+		td.appendChild(bold);
+		td.appendChild(document.createTextNode(list[key].substr(needle.length)));
+
 		addListener(td, 'mouseover', this.mouseOver.bindAsEventListener(this), true);
 		addListener(td, 'mouseup', this.selectSuggest.bindAsEventListener(this), true);
 		addListener(td, 'mouseout', this.mouseOut.bindAsEventListener(this), true);
-
-// text
-		var bold = document.createElement('b');
-		td.appendChild(bold);
-
-		bold.appendChild(document.createTextNode(list[key].substr(needle.length)));
 
 		if(count >= this.suggestLimit) break;
 	}
