@@ -7,7 +7,7 @@ No SQL scripts are provided anymore.
 ----------------
 
 Starting with 2.2.0, manual database patching is not required anymore. Zabbix
- server and proxy prcesses automatically check and upgrade the database schema
+ server and proxy processes automatically check and upgrade the database schema
  and relevant data.
 
 Patching status and progress is visible in the logfile.

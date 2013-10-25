@@ -20,6 +20,6 @@
 #ifndef ZABBIX_HTTPPOLLER_H
 #define ZABBIX_HTTPPOLLER_H
 
-void	main_httppoller_loop();
+void	main_httppoller_loop(void);
 
 #endif

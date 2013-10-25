@@ -76,6 +76,7 @@ class CProxy extends CZBXAPI {
 			'preservekeys'				=> null,
 			'selectHosts'				=> null,
 			'selectInterface'			=> null,
+			'selectInterfaces'			=> null, // deprecated
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
@@ -83,7 +84,7 @@ class CProxy extends CZBXAPI {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// deprecated
-		$options = $this->convertDeprecatedParam($options, 'selectInterfaces', 'selectInterface');
+		$this->checkDeprecatedParam($options, 'selectInterfaces');
 
 		// editable + PERMISSION CHECK
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -637,6 +638,27 @@ class CProxy extends CZBXAPI {
 			foreach ($result as $key => $proxy) {
 				if (!empty($proxy['interface'])) {
 					$result[$key]['interface'] = $proxy['interface'];
+				}
+			}
+		}
+
+		// adding host interfaces (deprecated)
+		if ($options['selectInterfaces'] !== null && $options['selectInterfaces'] != API_OUTPUT_COUNT) {
+			$interfaces = API::HostInterface()->get(array(
+				'output' => $this->outputExtend('interface', array('interfaceid', 'hostid'), $options['selectInterfaces']),
+				'nodeids' => $options['nodeids'],
+				'hostids' => $proxyIds,
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+
+			$relationMap = $this->createRelationMap($interfaces, 'hostid', 'interfaceid');
+			$interfaces = $this->unsetExtraFields($interfaces, array('hostid', 'interfaceid'), $options['selectInterfaces']);
+			$result = $relationMap->mapOne($result, $interfaces, 'interfaces');
+
+			foreach ($result as $key => $proxy) {
+				if (!empty($proxy['interfaces'])) {
+					$result[$key]['interfaces'] = array($proxy['interfaces']);
 				}
 			}
 		}

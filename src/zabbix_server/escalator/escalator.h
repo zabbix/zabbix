@@ -20,6 +20,6 @@
 #ifndef ZABBIX_ESCALATOR_H
 #define ZABBIX_ESCALATOR_H
 
-void	main_escalator_loop();
+void	main_escalator_loop(void);
 
 #endif

@@ -1,13 +1,11 @@
 * text=auto !eol
 /ChangeLog.legend -text
 bin/win32/dev/zabbix_sender.dll -text
-bin/win32/dev/zabbix_sender.h -text
 bin/win32/dev/zabbix_sender.lib -text
 bin/win32/zabbix_agentd.exe -text
 bin/win32/zabbix_get.exe -text
 bin/win32/zabbix_sender.exe -text
 bin/win64/dev/zabbix_sender.dll -text
-bin/win64/dev/zabbix_sender.h -text
 bin/win64/dev/zabbix_sender.lib -text
 bin/win64/zabbix_agentd.exe -text
 bin/win64/zabbix_get.exe -text
@@ -549,9 +547,6 @@ src/zabbix_java/lib/logback-core-0.9.27.jar -text
 src/zabbix_java/lib/org-json-2010-12-28.jar -text
 src/zabbix_java/lib/slf4j-api-1.6.1.jar -text
 src/zabbix_java/tests/junit-4.8.2.jar -text
-src/zabbix_server/vmware/Makefile.am -text
-src/zabbix_server/vmware/vmware.c -text
-src/zabbix_server/vmware/vmware.h -text
 tests/data/README -text
 tests/templates/sqlite3.init -text
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub.png -text svneol=unset#image/png
