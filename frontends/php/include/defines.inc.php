@@ -20,7 +20,7 @@
 
 define('ZABBIX_VERSION',     '2.1.9');
 define('ZABBIX_API_VERSION', '2.1.9');
-define('ZABBIX_DB_VERSION',	 2010187);
+define('ZABBIX_DB_VERSION',	 2010195);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
 define('ZABBIX_COPYRIGHT_TO',   '2013');
@@ -970,6 +970,9 @@ define('QUEUE_DETAIL_ITEM_COUNT', 500);
 
 // configuration -> maps default add icon name
 define('MAP_DEFAULT_ICON', 'Server_(96)');
+
+// server variables
+define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] != 'off');
 
 // if magic quotes on, then get rid of them
 if (get_magic_quotes_gpc()) {

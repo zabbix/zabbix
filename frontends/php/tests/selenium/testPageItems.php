@@ -35,7 +35,7 @@ class testPageItems extends CWebTest {
 	*/
 	public function testPageItems_CheckLayout($data) {
 		// Go to the list of items
-		$this->zbxTestLogin('items.php?hostid='.$data['hostid']);
+		$this->zbxTestLogin('items.php?filter_set=1&groupid=0&hostid='.$data['hostid']);
 		// We are in the list of items
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
