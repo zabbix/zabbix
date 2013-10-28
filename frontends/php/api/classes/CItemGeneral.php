@@ -283,11 +283,13 @@ abstract class CItemGeneral extends CZBXAPI {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Check the key, please. Default example was passed.'));
 			}
 
+			// key
 			$itemKey = new CItemKey($fullItem['key_']);
 			if (!$itemKey->isValid()) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect key: "%1$s".', $itemKey->getError()));
 			}
 
+			// parameters
 			if ($fullItem['type'] == ITEM_TYPE_AGGREGATE) {
 				$params = $itemKey->getParameters();
 
@@ -300,18 +302,13 @@ abstract class CItemGeneral extends CZBXAPI {
 				}
 			}
 
-			if ($fullItem['type'] == ITEM_TYPE_SNMPTRAP
-					&& strcmp($fullItem['key_'], 'snmptrap.fallback') != 0
-					&& strcmp($itemKey->getKeyId(), 'snmptrap') != 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('SNMP trap key is invalid.'));
-			}
-
 			// type of information
 			if ($fullItem['type'] == ITEM_TYPE_AGGREGATE && $fullItem['value_type'] != ITEM_VALUE_TYPE_FLOAT
 					&& $fullItem['value_type'] != ITEM_VALUE_TYPE_UINT64) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Type of information must be "Numeric (float)" for aggregate items.'));
 			}
 
+			// log
 			if ($fullItem['value_type'] != ITEM_VALUE_TYPE_LOG && str_in_array($itemKey->getKeyId(), array('log', 'logrt', 'eventlog'))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Type of information must be "Log" for log key.'));
 			}
@@ -325,6 +322,7 @@ abstract class CItemGeneral extends CZBXAPI {
 				}
 			}
 
+			// ssh, telnet
 			if ($fullItem['type'] == ITEM_TYPE_SSH || $fullItem['type'] == ITEM_TYPE_TELNET) {
 				if (zbx_empty($fullItem['username'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No authentication user name specified.'));
@@ -338,6 +336,25 @@ abstract class CItemGeneral extends CZBXAPI {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('No private key file specified.'));
 					}
 				}
+			}
+
+			// snmp trap
+			if ($fullItem['type'] == ITEM_TYPE_SNMPTRAP
+					&& strcmp($fullItem['key_'], 'snmptrap.fallback') != 0
+					&& strcmp($itemKey->getKeyId(), 'snmptrap') != 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('SNMP trap key is invalid.'));
+			}
+
+			// snmp oid
+			if ((in_array($fullItem['type'], array(ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3)))
+					&& zbx_empty($fullItem['snmp_oid'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No SNMP OID specified.'));
+			}
+
+			// snmp community
+			if (in_array($fullItem['type'], array(ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C))
+					&& zbx_empty($fullItem['snmp_community'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No SNMP community specified.'));
 			}
 
 			// snmp port

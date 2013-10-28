@@ -1024,7 +1024,7 @@ static void	process_active_checks(char *server, unsigned short port)
 					}
 					else
 					{
-						/* buffer is full, stop processing active checks*/
+						/* buffer is full, stop processing active checks */
 						/* till the buffer is cleared */
 						lastlogsize = active_metrics[i].lastlogsize;
 						mtime = active_metrics[i].mtime;
@@ -1198,7 +1198,7 @@ static void	process_active_checks(char *server, unsigned short port)
 						active_metrics[i].lastlogsize = lastlogsize;
 					else
 					{
-						/* buffer is full, stop processing active checks*/
+						/* buffer is full, stop processing active checks */
 						/* till the buffer is cleared */
 						lastlogsize = active_metrics[i].lastlogsize;
 						goto ret;

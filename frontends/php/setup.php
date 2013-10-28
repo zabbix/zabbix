@@ -30,14 +30,7 @@ catch (Exception $e) {
 	exit;
 }
 
-// only super admins can access the setup
-if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN) {
-	access_deny(ACCESS_DENY_PAGE);
-	exit;
-}
-
 require_once dirname(__FILE__).'/include/setup.inc.php';
-
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
@@ -63,17 +56,32 @@ $fields = array(
 	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,				null)
 );
 
-if (isset($_REQUEST['cancel']) || isset($_REQUEST['finish'])) {
-	zbx_unsetcookie('ZBX_CONFIG');
-	redirect('index.php');
-}
-
+// config
 $ZBX_CONFIG = get_cookie('ZBX_CONFIG', null);
 $ZBX_CONFIG = isset($ZBX_CONFIG) ? unserialize($ZBX_CONFIG) : array();
 $ZBX_CONFIG['check_fields_result'] = check_fields($fields, false);
-
 if (!isset($ZBX_CONFIG['step'])) {
 	$ZBX_CONFIG['step'] = 0;
+}
+
+// if a guest or a non-super admin user is logged in
+if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN) {
+	// on the last step of the setup we always have a guest user logged in;
+	// when he presses the "Finish" button he must be redirected to the login screen
+	if (CWebUser::isGuest() && $ZBX_CONFIG['step'] == 5 && hasRequest('finish')) {
+		zbx_unsetcookie('ZBX_CONFIG');
+		redirect('index.php');
+	}
+	// the guest user can also view the last step of the setup
+	// all other user types must not have access to the setup
+	elseif (!(CWebUser::isGuest() && $ZBX_CONFIG['step'] == 5)) {
+		access_deny(ACCESS_DENY_PAGE);
+	}
+}
+// if a super admin or a non-logged in user presses the "Finish" or "Login" button - redirect him to the login screen
+elseif (hasRequest('cancel') || hasRequest('finish')) {
+	zbx_unsetcookie('ZBX_CONFIG');
+	redirect('index.php');
 }
 
 $ZBX_CONFIG['allowed_db'] = array();
@@ -90,7 +98,6 @@ if (zbx_is_callable(array('pg_pconnect', 'pg_fetch_array', 'pg_fetch_row', 'pg_e
 if (zbx_is_callable(array('oci_connect', 'oci_error', 'oci_parse', 'oci_execute', 'oci_fetch_assoc',
 		'oci_commit', 'oci_close', 'oci_rollback', 'oci_field_type', 'oci_new_descriptor',
 		'oci_bind_by_name', 'oci_free_statement'))) {
-
 	$ZBX_CONFIG['allowed_db']['ORACLE'] = 'Oracle';
 }
 // IBM_DB2
