@@ -145,7 +145,7 @@ serverRespond: function(needle, respond){
 
 	for(var i=0; i < respond.length; i++){
 		if(!isset(i, respond) || empty(respond[i])) continue;
-		params.list[i] = respond[i].name.toLowerCase();
+		params.list[i] = respond[i].name;
 	}
 	this.needles[params.needle].list = params.list;
 
@@ -490,7 +490,7 @@ newSugTab: function(needle){
 		tr.appendChild(td);
 
 		var bold = document.createElement('b');
-		bold.appendChild(document.createTextNode(needle));
+		bold.appendChild(document.createTextNode(list[key].substr(0, needle.length)));
 		td.appendChild(bold);
 		td.appendChild(document.createTextNode(list[key].substr(needle.length)));
 
