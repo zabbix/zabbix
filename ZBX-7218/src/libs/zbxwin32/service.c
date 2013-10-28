@@ -231,7 +231,7 @@ static int	svc_install_event_source(const char *path)
 
 int	ZabbixCreateService(const char *path, int multiple_agents)
 {
-#define MAX_CMD_LEN	MAX_PATH * 2
+#define MAX_CMD_LEN	(MAX_PATH * 2)
 
 	SC_HANDLE		mgr, service;
 	SERVICE_DESCRIPTION	sd;

@@ -24,7 +24,7 @@ function redirect($url) {
 	$curl = new Curl($url);
 	$curl->setArgument('sid', null);
 	header('Location: '.$curl->getUrl());
-	exit();
+	exit;
 }
 
 function jsRedirect($url, $timeout = null) {
@@ -2055,7 +2055,6 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 	}
 	// deny access to a page
 	else {
-
 		// url to redirect the user to after he loggs in
 		$url = new CUrl(!empty($_REQUEST['request']) ? $_REQUEST['request'] : '');
 		$url->setArgument('sid', null);

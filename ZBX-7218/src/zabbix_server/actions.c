@@ -1579,20 +1579,22 @@ static void	get_escalation_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
  ******************************************************************************/
 void	process_actions(const DB_EVENT *events, size_t events_num)
 {
-	const char		*__function_name = "process_actions";
+	const char			*__function_name = "process_actions";
 
-	DB_RESULT		result;
-	DB_ROW			row;
-	zbx_uint64_t		actionid;
-	unsigned char		evaltype;
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0, i;
-	zbx_vector_uint64_t	rec_actionids;	/* actionids of possible recovery events */
-	const DB_EVENT		*event;
+	DB_RESULT			result;
+	DB_ROW				row;
+	zbx_uint64_t			actionid;
+	unsigned char			evaltype;
+	char				*sql = NULL;
+	size_t				sql_alloc = 0, sql_offset = 0, i;
+	zbx_vector_uint64_t		rec_actionids;	/* actionids of possible recovery events */
+	zbx_vector_uint64_pair_t	rec_mapping;	/* which action is possibly recovered by which event */
+	const DB_EVENT			*event;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)events_num);
 
 	zbx_vector_uint64_create(&rec_actionids);
+	zbx_vector_uint64_pair_create(&rec_mapping);
 
 	for (i = 0; i < events_num; i++)
 	{
@@ -1622,8 +1624,16 @@ void	process_actions(const DB_EVENT *events, size_t events_num)
 			}
 			else if (EVENT_SOURCE_TRIGGERS == event->source || EVENT_SOURCE_INTERNAL == event->source)
 			{
-				/* Action conditions evaluated to false but it could be a recovery event */
-				/* for an action already in "escalations" table. Check later. */
+				/* Action conditions evaluated to false, but it could be a recovery */
+				/* event for this action. Remember this and check escalations later. */
+
+				zbx_uint64_pair_t	pair;
+
+				pair.first = actionid;
+				pair.second = (zbx_uint64_t)i;
+
+				zbx_vector_uint64_pair_append(&rec_mapping, pair);
+
 				zbx_vector_uint64_append(&rec_actionids, actionid);
 			}
 		}
@@ -1639,7 +1649,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num)
 		zbx_vector_uint64_sort(&rec_actionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&rec_actionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		/* list of ongoing escalations macthing actionids collected before */
+		/* list of ongoing escalations matching actionids collected before */
 		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset,
 				"select actionid,triggerid,itemid"
 				" from escalations"
@@ -1656,9 +1666,12 @@ void	process_actions(const DB_EVENT *events, size_t events_num)
 			ZBX_DBROW2UINT64(triggerid, row[1]);
 			ZBX_DBROW2UINT64(itemid, row[2]);
 
-			for (i = 0; i < events_num; i++)
+			for (i = 0; i < rec_mapping.values_num; i++)
 			{
-				event = &events[i];
+				if (actionid != rec_mapping.values[i].first)
+					continue;
+
+				event = &events[(int)rec_mapping.values[i].second];
 
 				/* only add recovery if it matches event */
 				switch (event->source)
@@ -1689,11 +1702,14 @@ void	process_actions(const DB_EVENT *events, size_t events_num)
 				}
 
 				get_escalation_sql(&sql, &sql_alloc, &sql_offset, actionid, event, 1);
+
+				break;
 			}
 		}
 		DBfree_result(result);
 	}
 
+	zbx_vector_uint64_pair_destroy(&rec_mapping);
 	zbx_vector_uint64_destroy(&rec_actionids);
 
 	if (NULL != sql)

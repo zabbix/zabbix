@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-24 18:19+0300\n"
+"POT-Creation-Date: 2013-10-25 16:42+0300\n"
 "PO-Revision-Date: 2013-09-07 20:38+0300\n"
 "Last-Translator: Łukasz <deejay1@srem.org>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -30,7 +30,7 @@ msgstr "Pole „Wyświetlanie wyzwalaczy w stanie OK” musi być wartością 0 
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
 msgstr "Pole \"Miganie wyzwalaczy o zmienionym stanie\" musi być wartością 0 lub dodatnią liczbą całkowitą."
 
-#: include/func.inc.php:467
+#: include/func.inc.php:442
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
@@ -70,7 +70,7 @@ msgstr[0] "%1$s dzień"
 msgstr[1] "%1$s dni"
 msgstr[2] "%1$s dni"
 
-#: include/page_header.php:447
+#: include/page_header.php:446
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
@@ -231,7 +231,7 @@ msgstr "Akceptowalne SLA"
 msgid "Access denied!"
 msgstr "Dostęp zabroniony!"
 
-#: include/func.inc.php:2091
+#: include/func.inc.php:2066
 msgid "Access denied."
 msgstr ""
 
@@ -554,7 +554,7 @@ msgstr "Wyrównaj ikony"
 #: include/blocks.inc.php:1288 include/blocks.inc.php:1297
 #: include/blocks.inc.php:1342 include/blocks.inc.php:1426
 #: include/blocks.inc.php:1435 include/nodes.inc.php:174
-#: include/page_header.php:301 include/reports.inc.php:340
+#: include/page_header.php:300 include/reports.inc.php:340
 #: include/views/administration.auditlogs.list.php:42
 #: include/views/administration.auditlogs.list.php:52
 #: include/views/administration.general.gui.edit.php:28
@@ -632,7 +632,7 @@ msgstr "Błąd programu."
 msgid "Application updated"
 msgstr "Program został zaktualizowany"
 
-#: api/classes/CItemGeneral.php:368
+#: api/classes/CItemGeneral.php:374
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Program o ID \"%1$s\" nie jest dostępny na \"%2$s\"."
@@ -662,12 +662,12 @@ msgctxt "maintenance status"
 msgid "Approaching"
 msgstr ""
 
-#: include/func.inc.php:254
+#: include/func.inc.php:229
 msgid "Apr"
 msgstr "Kw."
 
-#: include/forms.inc.php:1660 include/func.inc.php:140
-#: include/func.inc.php:271 jsLoader.php:121
+#: include/forms.inc.php:1660 include/func.inc.php:115
+#: include/func.inc.php:246 jsLoader.php:121
 msgid "April"
 msgstr "Kwiecień"
 
@@ -763,12 +763,12 @@ msgstr "Akcje audytowe"
 msgid "Audit logs"
 msgstr "Logi audytu"
 
-#: include/func.inc.php:258
+#: include/func.inc.php:233
 msgid "Aug"
 msgstr "Sie."
 
-#: include/forms.inc.php:1652 include/func.inc.php:144
-#: include/func.inc.php:275 jsLoader.php:125
+#: include/forms.inc.php:1652 include/func.inc.php:119
+#: include/func.inc.php:250 jsLoader.php:125
 msgid "August"
 msgstr "Sierpień"
 
@@ -881,7 +881,7 @@ msgstr ""
 msgid "Axis side"
 msgstr "Oś strony"
 
-#: include/func.inc.php:435
+#: include/func.inc.php:410
 msgctxt "Byte short"
 msgid "B"
 msgstr ""
@@ -1244,7 +1244,7 @@ msgstr ""
 msgid "Cannot add application"
 msgstr "Nie można dodać programu"
 
-#: api/classes/CTrigger.php:1407
+#: api/classes/CTrigger.php:1406
 msgid "Cannot add dependency from a host to a template."
 msgstr "Nie można utworzyć zależności szablonu od hosta."
 
@@ -1440,11 +1440,11 @@ msgstr ""
 msgid "Cannot create another database connection."
 msgstr "Nie można utworzyć kolejnego połączenia do bazy."
 
-#: api/classes/CTrigger.php:1441
+#: api/classes/CTrigger.php:1440
 msgid "Cannot create circular dependencies."
 msgstr ""
 
-#: api/classes/CTrigger.php:1413
+#: api/classes/CTrigger.php:1412
 msgid "Cannot create dependency on trigger itself."
 msgstr ""
 
@@ -1495,7 +1495,7 @@ msgstr "Nie można usunąć działania"
 msgid "Cannot delete application"
 msgstr "Nie można usunąć programu"
 
-#: api/classes/CTrigger.php:1067
+#: api/classes/CTrigger.php:1066
 msgid "Cannot delete dependency"
 msgstr "Nie można usunąć zależności"
 
@@ -1662,7 +1662,7 @@ msgstr ""
 msgid "Cannot delete templated items."
 msgstr "Nie można usunąć pozycji z szablonu."
 
-#: api/classes/CTrigger.php:1875 api/classes/CTriggerPrototype.php:674
+#: api/classes/CTrigger.php:1874 api/classes/CTriggerPrototype.php:674
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Nie można usunąć szablonu wyzwalacza \"%1$s:%2$s\"."
@@ -1842,7 +1842,7 @@ msgstr ""
 msgid "Cannot have empty visible template name"
 msgstr "Nie można mieć pustej widocznej nazwy szablonu"
 
-#: api/classes/CTrigger.php:1100 api/classes/CTrigger.php:1239
+#: api/classes/CTrigger.php:1099 api/classes/CTrigger.php:1238
 #: api/classes/CTriggerPrototype.php:755 api/classes/CTriggerPrototype.php:813
 #, c-format
 msgid "Cannot implode expression \"%s\"."
@@ -1947,12 +1947,12 @@ msgstr "Nie można zapisać reguły wykrywania bez testów."
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:238
+#: api/classes/CItemGeneral.php:243
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTrigger.php:660
+#: api/classes/CTrigger.php:659
 #, c-format
 msgid "Cannot set \"%1$s\" for trigger \"%2$s\"."
 msgstr ""
@@ -2040,12 +2040,12 @@ msgstr ""
 msgid "Cannot update \"%1$s\" for a discovered trigger."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:205
+#: api/classes/CItemGeneral.php:207
 #, c-format
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTrigger.php:657
+#: api/classes/CTrigger.php:659
 #, c-format
 msgid "Cannot update \"%1$s\" for trigger \"%2$s\"."
 msgstr ""
@@ -2341,7 +2341,7 @@ msgstr "Test już istnieje."
 msgid "Check expression part starting from \"%1$s\"."
 msgstr "Proszę sprawdzić część wyrażenia zaczynającą się od \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:277
+#: api/classes/CItemGeneral.php:283
 msgid "Check the key, please. Default example was passed."
 msgstr "Należy sprawdzić klucz, gdyż została przekazana domyślna wartość."
 
@@ -2986,7 +2986,7 @@ msgstr "Utworzono: Pozycja \"%1$s\" w \"%2$s\"."
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Utworzono: Prototyp pozycji \"%1$s\" w \"%2$s\"."
 
-#: api/classes/CTrigger.php:1134
+#: api/classes/CTrigger.php:1133
 #, c-format
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Utworzono: Wyzwalacz \"%1$s\" w \"%2$s\"."
@@ -3026,7 +3026,7 @@ msgstr ""
 msgid "Current host"
 msgstr "Bieżący host"
 
-#: include/page_header.php:334
+#: include/page_header.php:333
 msgid "Current node"
 msgstr "Bieżący węzeł"
 
@@ -3316,7 +3316,7 @@ msgstr ""
 msgid "Days"
 msgstr "Dni"
 
-#: include/page_header.php:218
+#: include/page_header.php:217
 msgid "Debug"
 msgstr "Debugowanie"
 
@@ -3330,12 +3330,12 @@ msgstr "Tryb debugowania"
 msgid "Debug mode updated"
 msgstr "Zaktualizowano tryb debugowania"
 
-#: include/func.inc.php:262
+#: include/func.inc.php:237
 msgid "Dec"
 msgstr "Gru."
 
-#: include/forms.inc.php:1672 include/func.inc.php:148
-#: include/func.inc.php:279 jsLoader.php:129
+#: include/forms.inc.php:1672 include/func.inc.php:123
+#: include/func.inc.php:254 jsLoader.php:129
 msgid "December"
 msgstr "Grudzień"
 
@@ -3729,7 +3729,7 @@ msgstr ""
 msgid "Deleted: Template \"%1$s\"."
 msgstr ""
 
-#: api/classes/CTrigger.php:854
+#: api/classes/CTrigger.php:853
 #, c-format
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Usunięto: Wyzwalacz \"%1$s\" w \"%2$s\"."
@@ -3798,7 +3798,7 @@ msgid "Description"
 msgstr "Opis"
 
 #: include/actions.inc.php:966 include/blocks.inc.php:719
-#: include/func.inc.php:2211
+#: include/func.inc.php:2186
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:44
 #: include/views/configuration.action.edit.php:328
@@ -4096,7 +4096,7 @@ msgstr "Status wykrycia"
 msgid "Display OK triggers for"
 msgstr "Wyświetlanie wyzwalaczy w stanie OK przez"
 
-#: include/func.inc.php:1894
+#: include/func.inc.php:1869
 msgid "Displaying"
 msgstr "Wyświetlanie"
 
@@ -4181,7 +4181,7 @@ msgstr ""
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr ""
 
-#: api/classes/CTrigger.php:1583
+#: api/classes/CTrigger.php:1582
 #, c-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr ""
@@ -4243,12 +4243,12 @@ msgstr "Holenderski (nl_NL)"
 msgid "Dynamic item"
 msgstr "Pozycja dynamiczna"
 
-#: include/func.inc.php:683
+#: include/func.inc.php:658
 msgctxt "Exa short"
 msgid "E"
 msgstr ""
 
-#: include/func.inc.php:2178
+#: include/func.inc.php:2153
 msgid "ERROR"
 msgstr "BŁĄD"
 
@@ -4337,8 +4337,8 @@ msgstr ""
 #: api/classes/CItemPrototype.php:489 api/classes/CProxy.php:487
 #: api/classes/CService.php:341 api/classes/CService.php:377
 #: api/classes/CService.php:443 api/classes/CService.php:515
-#: api/classes/CTemplate.php:617 api/classes/CTrigger.php:878
-#: api/classes/CTrigger.php:942 api/classes/CTrigger.php:1032
+#: api/classes/CTemplate.php:617 api/classes/CTrigger.php:877
+#: api/classes/CTrigger.php:941 api/classes/CTrigger.php:1031
 #: api/classes/CTriggerPrototype.php:652 api/classes/CUserGroup.php:602
 #: api/classes/CUserMacro.php:394 api/classes/CUserMacro.php:546
 #: api/classes/CUser.php:554
@@ -4613,7 +4613,7 @@ msgstr "Codziennie"
 msgid "Every week(s)"
 msgstr "Każdego tygodnia"
 
-#: include/func.inc.php:683
+#: include/func.inc.php:658
 msgid "Exa"
 msgstr "Exa"
 
@@ -4777,12 +4777,12 @@ msgstr "Ulubione ekrany"
 msgid "Favourites"
 msgstr "Ulubione"
 
-#: include/func.inc.php:252
+#: include/func.inc.php:227
 msgid "Feb"
 msgstr "Luty"
 
-#: include/forms.inc.php:1650 include/func.inc.php:138
-#: include/func.inc.php:269 jsLoader.php:119
+#: include/forms.inc.php:1650 include/func.inc.php:113
+#: include/func.inc.php:244 jsLoader.php:119
 msgid "February"
 msgstr "Luty"
 
@@ -4905,7 +4905,7 @@ msgstr ""
 msgid "First"
 msgstr "Pierwszy"
 
-#: include/func.inc.php:1839
+#: include/func.inc.php:1814
 msgctxt "page navigation"
 msgid "First"
 msgstr ""
@@ -4940,12 +4940,12 @@ msgstr "Czwarty"
 msgid "French (fr_FR)"
 msgstr "Francuski (fr_FR)"
 
-#: include/func.inc.php:232
+#: include/func.inc.php:207
 msgid "Fri"
 msgstr "Pi."
 
 #: include/forms.inc.php:1635 include/forms.inc.php:1703
-#: include/func.inc.php:160 include/func.inc.php:244
+#: include/func.inc.php:135 include/func.inc.php:219
 msgid "Friday"
 msgstr "Piątek"
 
@@ -4988,7 +4988,7 @@ msgstr "Pełny ekran"
 msgid "Function"
 msgstr "Funkcja"
 
-#: include/func.inc.php:680
+#: include/func.inc.php:655
 msgctxt "Giga short"
 msgid "G"
 msgstr ""
@@ -5023,11 +5023,11 @@ msgstr "Wygenerowano w %s sek"
 msgid "German (de_DE)"
 msgstr "Niemiecki (de_DE)"
 
-#: include/page_header.php:206
+#: include/page_header.php:205
 msgid "Get support"
 msgstr "Uzyskaj pomoc"
 
-#: include/func.inc.php:680
+#: include/func.inc.php:655
 msgid "Giga"
 msgstr "Giga"
 
@@ -5077,7 +5077,7 @@ msgstr "Przejdź"
 msgid "Go to"
 msgstr "Przejdź do"
 
-#: include/func.inc.php:2109
+#: include/func.inc.php:2084
 msgid "Go to dashboard"
 msgstr ""
 
@@ -5354,7 +5354,7 @@ msgid "H.i"
 msgstr "H:i"
 
 #: include/classes/class.cchart.php:1334 include/classes/class.cchart.php:1393
-#: include/page_header.php:451
+#: include/page_header.php:450
 msgid "H:i"
 msgstr "H:i"
 
@@ -5421,7 +5421,7 @@ msgstr "Sprzęt (wszystkie informacje)"
 msgid "Height"
 msgstr "Wysokość"
 
-#: include/page_header.php:204 include/views/general.login.php:40
+#: include/page_header.php:203 include/views/general.login.php:40
 msgid "Help"
 msgstr "Pomoc"
 
@@ -5464,7 +5464,7 @@ msgstr ""
 msgid "High"
 msgstr "Wysoki"
 
-#: history.php:27 include/forms.inc.php:934 include/page_header.php:426
+#: history.php:27 include/forms.inc.php:934 include/page_header.php:425
 #: include/views/administration.general.housekeeper.edit.php:133
 #: include/views/configuration.item.list.php:68
 #: include/views/configuration.item.prototype.list.php:54 jsLoader.php:107
@@ -6137,7 +6137,7 @@ msgstr "Ikony"
 msgid "Identical expression already exists"
 msgstr ""
 
-#: include/func.inc.php:2099 include/func.inc.php:2119
+#: include/func.inc.php:2074 include/func.inc.php:2094
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "W przypadku, gdy ten komunikat jest błędny należy skontaktować się z administratorami celem nadania uprawnień."
 
@@ -6441,7 +6441,7 @@ msgstr "Błędne argumenty przekazane do metody."
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:349
+#: api/classes/CItemGeneral.php:355
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr ""
@@ -6516,7 +6516,7 @@ msgstr "Błędna nazwa lub wartośc pola \"%1$s\" w warunku WHERE dla tabeli \"%
 msgid "Incorrect fields for sysmap."
 msgstr ""
 
-#: api/classes/CTrigger.php:665
+#: api/classes/CTrigger.php:664
 msgid "Incorrect fields for trigger."
 msgstr ""
 
@@ -6524,12 +6524,12 @@ msgstr ""
 msgid "Incorrect file upload."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:805
+#: api/classes/CItemGeneral.php:811
 #, c-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:794
+#: api/classes/CItemGeneral.php:800
 #, c-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr ""
@@ -6613,7 +6613,7 @@ msgstr "Podano błędny identyfikator pozycji \"%s\" dla elementu ekranu."
 msgid "Incorrect item for axis value."
 msgstr ""
 
-#: api/classes/CTrigger.php:733 include/triggers.inc.php:1002
+#: api/classes/CTrigger.php:732 include/triggers.inc.php:1002
 #, c-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
 msgstr ""
@@ -6627,7 +6627,7 @@ msgstr ""
 msgid "Incorrect key."
 msgstr "Błędny klucz."
 
-#: api/classes/CDRule.php:319 api/classes/CItemGeneral.php:282
+#: api/classes/CDRule.php:319 api/classes/CItemGeneral.php:288
 #: discoveryconf.php:110
 #, c-format
 msgid "Incorrect key: \"%1$s\"."
@@ -6751,7 +6751,7 @@ msgstr "Błędny zakres portów."
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:358
+#: api/classes/CItemGeneral.php:364
 #, c-format
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr ""
@@ -6868,12 +6868,12 @@ msgstr ""
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr ""
 
-#: api/classes/CTrigger.php:713
+#: api/classes/CTrigger.php:712
 #, c-format
 msgid "Incorrect trigger expression. Host \"%s\" does not exist or you have no access to this host."
 msgstr "Błędne wyrażenie wyzwalacza. Urządzenie \"%s\" nie istnieje lub nie posiadasz uprawnień dla tego urządzenia."
 
-#: api/classes/CTrigger.php:719
+#: api/classes/CTrigger.php:718
 msgid "Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously."
 msgstr "Błędne wyrażenie wyzwalacza. Elementy wyrażenia nie powinny należeć jednocześnie do szablonu i konkretnego urządzenia."
 
@@ -6885,7 +6885,7 @@ msgstr "Błędne wyrażenie wyzwalacza. Elementy wyrażenia nie powinny należe�
 msgid "Incorrect trigger function \"%1$s\" provided in expression."
 msgstr ""
 
-#: include/func.inc.php:1184
+#: include/func.inc.php:1159
 msgid "Incorrect type of asort_by_key."
 msgstr ""
 
@@ -7181,7 +7181,7 @@ msgstr "Problem"
 msgid "It is not possible to filter by user password."
 msgstr ""
 
-#: include/page_header.php:235
+#: include/page_header.php:234
 msgid "It is not possible to logout from HTTP authentication."
 msgstr ""
 
@@ -7243,7 +7243,7 @@ msgstr ""
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:340
+#: api/classes/CItemGeneral.php:346
 #, c-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "Pozycja \"%1$s:%2$s\" posiada nieprawidłowy port: \"%3$s\"."
@@ -7297,44 +7297,44 @@ msgstr ""
 msgid "Item updated"
 msgstr "Uaktualniono pozycję"
 
-#: api/classes/CItemGeneral.php:261
+#: api/classes/CItemGeneral.php:267
 msgid "Item uses host interface from non-parent host."
 msgstr "Pozycja wykorzystuje interfejs hosta z hosta, który nie jest nadrzędny."
 
-#: api/classes/CItemGeneral.php:264
+#: api/classes/CItemGeneral.php:270
 msgid "Item uses incorrect interface type."
 msgstr "Pozycja wykorzystuje niepoprawny rodzaj interfejsu."
 
-#: api/classes/CItemGeneral.php:318
+#: api/classes/CItemGeneral.php:324
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Pozycja nie zostanie odświeżona. Należy podać poprawny interwał odświeżania."
 
-#: api/classes/CItemGeneral.php:411
+#: api/classes/CItemGeneral.php:417
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:417
+#: api/classes/CItemGeneral.php:423
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:414
+#: api/classes/CItemGeneral.php:420
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:408
+#: api/classes/CItemGeneral.php:414
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:420
+#: api/classes/CItemGeneral.php:426
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:771
+#: api/classes/CItemGeneral.php:777
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
@@ -7432,12 +7432,12 @@ msgstr "Jabber"
 msgid "Jabber identifier"
 msgstr "Identyfikator Jabbera"
 
-#: include/func.inc.php:251
+#: include/func.inc.php:226
 msgid "Jan"
 msgstr "Sty."
 
-#: include/forms.inc.php:1645 include/func.inc.php:137
-#: include/func.inc.php:268 jsLoader.php:118
+#: include/forms.inc.php:1645 include/func.inc.php:112
+#: include/func.inc.php:243 jsLoader.php:118
 msgid "January"
 msgstr "Styczeń"
 
@@ -7445,25 +7445,25 @@ msgstr "Styczeń"
 msgid "Japanese (ja_JP)"
 msgstr "Japoński (ja_JP)"
 
-#: include/func.inc.php:257
+#: include/func.inc.php:232
 msgid "Jul"
 msgstr "Lip."
 
-#: include/forms.inc.php:1647 include/func.inc.php:143
-#: include/func.inc.php:274 jsLoader.php:124
+#: include/forms.inc.php:1647 include/func.inc.php:118
+#: include/func.inc.php:249 jsLoader.php:124
 msgid "July"
 msgstr "Lipiec"
 
-#: include/func.inc.php:256
+#: include/func.inc.php:231
 msgid "Jun"
 msgstr "Czer."
 
-#: include/forms.inc.php:1670 include/func.inc.php:142
-#: include/func.inc.php:273 jsLoader.php:123
+#: include/forms.inc.php:1670 include/func.inc.php:117
+#: include/func.inc.php:248 jsLoader.php:123
 msgid "June"
 msgstr "Czerwiec"
 
-#: include/func.inc.php:442 include/func.inc.php:678
+#: include/func.inc.php:417 include/func.inc.php:653
 msgctxt "Kilo short"
 msgid "K"
 msgstr ""
@@ -7607,7 +7607,7 @@ msgstr ""
 msgid "Key"
 msgstr "Klucz"
 
-#: api/classes/CItemGeneral.php:292
+#: api/classes/CItemGeneral.php:298
 #, c-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Klucz \"%1$s\" nie pasuje do wyrażenia <grpmax|grpmin|grpsum|grpavg>[\"grupa hostów\", \"klucz pozycji\", \"<last|min|max|avg|sum|count>\", \"parametr\"]."
@@ -7625,7 +7625,7 @@ msgstr ""
 msgid "Keyword"
 msgstr "Słowo kluczowe"
 
-#: include/func.inc.php:678
+#: include/func.inc.php:653
 msgid "Kilo"
 msgstr "Kilo"
 
@@ -7697,7 +7697,7 @@ msgstr "Język"
 msgid "Last"
 msgstr "Ostatnia"
 
-#: include/func.inc.php:1879
+#: include/func.inc.php:1854
 msgctxt "page navigation"
 msgid "Last"
 msgstr ""
@@ -7992,8 +7992,8 @@ msgstr "Logowanie niedopasowanych trapów SNMP"
 msgid "Logged in as"
 msgstr "Zalogowano jako"
 
-#: auditlogs.php:143 include/func.inc.php:2105 include/func.inc.php:2122
-#: include/menu.inc.php:282 include/page_header.php:228
+#: auditlogs.php:143 include/func.inc.php:2080 include/func.inc.php:2097
+#: include/menu.inc.php:282 include/page_header.php:227
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:64
 #: include/views/administration.users.list.php:61
@@ -8014,7 +8014,7 @@ msgstr ""
 msgid "Login name or password is incorrect."
 msgstr ""
 
-#: auditlogs.php:146 include/page_header.php:234 include/page_header.php:238
+#: auditlogs.php:146 include/page_header.php:233 include/page_header.php:237
 #: include/views/administration.auditlogs.list.php:44
 msgid "Logout"
 msgstr "Wylogowanie"
@@ -8037,7 +8037,7 @@ msgstr ""
 msgid "Low-level discovery rule in \"not supported\" state"
 msgstr ""
 
-#: include/func.inc.php:438 include/func.inc.php:679
+#: include/func.inc.php:413 include/func.inc.php:654
 msgctxt "Mega short"
 msgid "M"
 msgstr ""
@@ -8273,12 +8273,12 @@ msgstr "Mapowania"
 msgid "Maps"
 msgstr "Mapy"
 
-#: include/func.inc.php:253
+#: include/func.inc.php:228
 msgid "Mar"
 msgstr "Mar."
 
-#: include/forms.inc.php:1655 include/func.inc.php:139
-#: include/func.inc.php:270 jsLoader.php:120
+#: include/forms.inc.php:1655 include/func.inc.php:114
+#: include/func.inc.php:245 jsLoader.php:120
 msgid "March"
 msgstr "Marzec"
 
@@ -8338,7 +8338,7 @@ msgid "Max count of events per trigger to show"
 msgstr "Maksymalna pokazywana liczba zdarzeń na wyzwalacz"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2213
+#: include/func.inc.php:2188
 msgid "Maximize"
 msgstr "Zmaksymalizuj"
 
@@ -8403,12 +8403,12 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: include/forms.inc.php:1665 include/func.inc.php:141
-#: include/func.inc.php:272 jsLoader.php:122
+#: include/forms.inc.php:1665 include/func.inc.php:116
+#: include/func.inc.php:247 jsLoader.php:122
 msgid "May"
 msgstr "Maj"
 
-#: include/func.inc.php:255
+#: include/func.inc.php:230
 msgctxt "May short"
 msgid "May"
 msgstr ""
@@ -8458,7 +8458,7 @@ msgstr "Rodzaje mediów"
 msgid "Media types used by action \"%s\"."
 msgstr ""
 
-#: include/func.inc.php:679
+#: include/func.inc.php:654
 msgid "Mega"
 msgstr "Mega"
 
@@ -8521,7 +8521,7 @@ msgid "Middle"
 msgstr "Środek"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2213
+#: include/func.inc.php:2188
 msgid "Minimize"
 msgstr "Zminimalizuj"
 
@@ -8655,12 +8655,12 @@ msgstr "Tryb"
 msgid "Model"
 msgstr "Model"
 
-#: include/func.inc.php:228
+#: include/func.inc.php:203
 msgid "Mon"
 msgstr "Pon."
 
 #: include/forms.inc.php:1631 include/forms.inc.php:1699
-#: include/func.inc.php:156 include/func.inc.php:240
+#: include/func.inc.php:131 include/func.inc.php:215
 msgid "Monday"
 msgstr "Poniedziałek"
 
@@ -8847,7 +8847,7 @@ msgstr "Uaktualniono mapę sieci"
 msgid "Network maps"
 msgstr "Mapy sieci"
 
-#: httpmon.php:155 include/func.inc.php:222
+#: httpmon.php:155 include/func.inc.php:197
 msgid "Never"
 msgstr "Nigdy"
 
@@ -8911,13 +8911,13 @@ msgstr "Nowy czas obsługi"
 msgid "Next"
 msgstr "Następna"
 
-#: include/func.inc.php:1872
+#: include/func.inc.php:1847
 msgctxt "page navigation"
 msgid "Next"
 msgstr ""
 
 #: events.php:761 include/events.inc.php:362 include/events.inc.php:380
-#: include/func.inc.php:2432 include/triggers.inc.php:1606
+#: include/func.inc.php:2407 include/triggers.inc.php:1606
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
 #: include/views/js/adm.regexprs.edit.js.php:142
@@ -9027,7 +9027,7 @@ msgstr ""
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:324
+#: api/classes/CItemGeneral.php:330
 msgid "No authentication user name specified."
 msgstr ""
 
@@ -9248,7 +9248,7 @@ msgstr ""
 msgid "No interface found"
 msgstr ""
 
-#: api/classes/CItemGeneral.php:258
+#: api/classes/CItemGeneral.php:264
 msgid "No interface found."
 msgstr ""
 
@@ -9408,7 +9408,7 @@ msgstr "Brak uprawnień dla dostępu do systemu."
 #: api/classes/CHttpTest.php:393 api/classes/CIconMap.php:319
 #: api/classes/CImage.php:243 api/classes/CImage.php:357
 #: api/classes/CImage.php:474 api/classes/CItemGeneral.php:182
-#: api/classes/CItemGeneral.php:232 api/classes/CItem.php:689
+#: api/classes/CItemGeneral.php:235 api/classes/CItem.php:689
 #: api/classes/CItemPrototype.php:508 api/classes/CMaintenance.php:320
 #: api/classes/CMaintenance.php:345 api/classes/CMaintenance.php:358
 #: api/classes/CMaintenance.php:466 api/classes/CMaintenance.php:483
@@ -9421,11 +9421,11 @@ msgstr "Brak uprawnień dla dostępu do systemu."
 #: api/classes/CService.php:1255 api/classes/CService.php:1270
 #: api/classes/CTemplateScreen.php:704 api/classes/CTemplateScreen.php:725
 #: api/classes/CTemplateScreen.php:731 api/classes/CTrigger.php:636
-#: api/classes/CTrigger.php:961 api/classes/CTrigger.php:982
-#: api/classes/CTrigger.php:1854 api/classes/CTriggerPrototype.php:566
+#: api/classes/CTrigger.php:960 api/classes/CTrigger.php:981
+#: api/classes/CTrigger.php:1853 api/classes/CTriggerPrototype.php:566
 #: api/classes/CTriggerPrototype.php:669 api/classes/CUserMacro.php:726
 #: api/classes/CUserMacro.php:835 api/classes/CUser.php:1165
-#: include/func.inc.php:2078
+#: include/func.inc.php:2053
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Brak uprawnień dla tego obiektu lub obiekt nie istnieje."
 
@@ -9434,7 +9434,7 @@ msgstr "Brak uprawnień dla tego obiektu lub obiekt nie istnieje."
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:332
+#: api/classes/CItemGeneral.php:338
 msgid "No private key file specified."
 msgstr ""
 
@@ -9455,7 +9455,7 @@ msgstr ""
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:329
+#: api/classes/CItemGeneral.php:335
 msgid "No public key file specified."
 msgstr ""
 
@@ -9587,7 +9587,7 @@ msgstr ""
 #: include/blocks.inc.php:185 include/blocks.inc.php:375
 #: include/blocks.inc.php:896 include/blocks.inc.php:1069
 #: include/blocks.inc.php:1158 include/blocks.inc.php:1461
-#: include/classes/screens/CScreenEvents.php:40 include/page_header.php:325
+#: include/classes/screens/CScreenEvents.php:40 include/page_header.php:324
 #: include/triggers.inc.php:1596
 #: include/views/administration.general.iconmap.list.php:24
 #: include/views/administration.general.regularexpressions.list.php:31
@@ -9670,7 +9670,7 @@ msgstr "Nie zatw."
 msgid "Not Templated items"
 msgstr "Brak pozycji szablonowych"
 
-#: api/classes/CTrigger.php:1486
+#: api/classes/CTrigger.php:1485
 #, c-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr ""
@@ -9733,12 +9733,12 @@ msgstr "Raport powiadomień"
 msgid "Notifications"
 msgstr "Powiadomienia"
 
-#: include/func.inc.php:261
+#: include/func.inc.php:236
 msgid "Nov"
 msgstr "Lis."
 
-#: include/forms.inc.php:1667 include/func.inc.php:147
-#: include/func.inc.php:278 jsLoader.php:128
+#: include/forms.inc.php:1667 include/func.inc.php:122
+#: include/func.inc.php:253 jsLoader.php:128
 msgid "November"
 msgstr "Listopad"
 
@@ -9877,7 +9877,7 @@ msgstr ""
 msgid "OVERVIEW"
 msgstr "PRZEGLĄD"
 
-#: include/func.inc.php:260
+#: include/func.inc.php:235
 msgid "Oct"
 msgstr "Paź."
 
@@ -9885,8 +9885,8 @@ msgstr "Paź."
 msgid "Octal"
 msgstr "Ósemkowo"
 
-#: include/forms.inc.php:1662 include/func.inc.php:146
-#: include/func.inc.php:277 jsLoader.php:127
+#: include/forms.inc.php:1662 include/func.inc.php:121
+#: include/func.inc.php:252 jsLoader.php:127
 msgid "October"
 msgstr "Październik"
 
@@ -10187,7 +10187,7 @@ msgstr "Przegląd"
 msgid "Overview by proxy"
 msgstr "Przegląd wg proxy"
 
-#: include/func.inc.php:682
+#: include/func.inc.php:657
 msgctxt "Peta short"
 msgid "P"
 msgstr ""
@@ -10492,7 +10492,7 @@ msgstr "Uprawnienia mogą być nadawane wyłącznie dla grup użytkowników."
 msgid "Persian (fa_IR)"
 msgstr ""
 
-#: include/func.inc.php:682
+#: include/func.inc.php:657
 msgid "Peta"
 msgstr "Peta"
 
@@ -10596,7 +10596,7 @@ msgstr "Podgląd"
 msgid "Previous"
 msgstr "Poprzednia"
 
-#: include/func.inc.php:1845
+#: include/func.inc.php:1820
 msgctxt "page navigation"
 msgid "Previous"
 msgstr ""
@@ -10645,7 +10645,7 @@ msgstr "Telefon A głównego punktu kontaktu"
 msgid "Primary POC screen name"
 msgstr "Pseudonim głównego punktu kontaktu"
 
-#: include/page_header.php:209
+#: include/page_header.php:208
 msgid "Print"
 msgstr "Drukuj"
 
@@ -10707,7 +10707,7 @@ msgstr "Problem, jeśli przynajmniej jeden potomek ma problem"
 msgid "Problems"
 msgstr "Problemy"
 
-#: include/page_header.php:214
+#: include/page_header.php:213
 msgid "Profile"
 msgstr "Profil"
 
@@ -10856,11 +10856,11 @@ msgstr "Temat odzyskania"
 msgid "Refresh (in seconds)"
 msgstr "Odświeżanie (w sekundach)"
 
-#: include/func.inc.php:1953
+#: include/func.inc.php:1928
 msgid "Refresh time in seconds"
 msgstr "Czas odświeżania w sekundach"
 
-#: include/func.inc.php:1957
+#: include/func.inc.php:1932
 msgid "Refresh time multiplier"
 msgstr "Mnożnik czasu odświeżania"
 
@@ -11365,7 +11365,7 @@ msgstr "Interfejsy SNMP"
 msgid "SNMP trap"
 msgstr "Trap SNMP"
 
-#: api/classes/CItemGeneral.php:300
+#: api/classes/CItemGeneral.php:306
 msgid "SNMP trap key is invalid."
 msgstr ""
 
@@ -11434,12 +11434,12 @@ msgstr "STAN ZABBIXA"
 msgid "Safari"
 msgstr "Safari"
 
-#: include/func.inc.php:233
+#: include/func.inc.php:208
 msgid "Sat"
 msgstr "Sob."
 
 #: include/forms.inc.php:1636 include/forms.inc.php:1704
-#: include/func.inc.php:161 include/func.inc.php:245
+#: include/func.inc.php:136 include/func.inc.php:220
 msgid "Saturday"
 msgstr "Sobota"
 
@@ -11726,7 +11726,7 @@ msgid "Security name"
 msgstr ""
 
 #: events.php:340 include/classes/html/CButtonPopup.php:52
-#: include/forms.inc.php:577 include/page_header.php:329
+#: include/forms.inc.php:577 include/page_header.php:328
 #: include/reports.inc.php:423
 #: include/views/administration.auditacts.list.php:45
 #: include/views/administration.auditlogs.list.php:59
@@ -11760,7 +11760,7 @@ msgstr ""
 msgid "Select"
 msgstr "Wybierz"
 
-#: include/page_header.php:294
+#: include/page_header.php:293
 msgid "Select Nodes"
 msgstr "Wybierz węzły"
 
@@ -11828,7 +11828,7 @@ msgstr "Wyślij do użytkowników"
 msgid "Sent"
 msgstr ""
 
-#: include/func.inc.php:259
+#: include/func.inc.php:234
 msgid "Sep"
 msgstr "Wrze."
 
@@ -11837,8 +11837,8 @@ msgstr "Wrze."
 msgid "Separated"
 msgstr "Rozdzielone"
 
-#: include/forms.inc.php:1657 include/func.inc.php:145
-#: include/func.inc.php:276 jsLoader.php:126
+#: include/forms.inc.php:1657 include/func.inc.php:120
+#: include/func.inc.php:251 jsLoader.php:126
 msgid "September"
 msgstr "Wrzesień"
 
@@ -12414,12 +12414,12 @@ msgstr ""
 msgid "Sum of values of a period T is NOT N"
 msgstr ""
 
-#: include/func.inc.php:227
+#: include/func.inc.php:202
 msgid "Sun"
 msgstr "Nie."
 
 #: include/forms.inc.php:1637 include/forms.inc.php:1705
-#: include/func.inc.php:163 include/func.inc.php:239
+#: include/func.inc.php:138 include/func.inc.php:214
 msgid "Sunday"
 msgstr "Niedziela"
 
@@ -12452,7 +12452,7 @@ msgstr "Błąd systemowy"
 msgid "System status"
 msgstr "Stan systemu"
 
-#: include/func.inc.php:681
+#: include/func.inc.php:656
 msgctxt "Tera short"
 msgid "T"
 msgstr ""
@@ -12631,7 +12631,7 @@ msgstr "Szablony"
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr ""
 
-#: include/func.inc.php:681
+#: include/func.inc.php:656
 msgid "Tera"
 msgstr "Tera"
 
@@ -12770,12 +12770,12 @@ msgstr "Ten tydzień"
 msgid "This year"
 msgstr "Ten rok"
 
-#: include/func.inc.php:231
+#: include/func.inc.php:206
 msgid "Thu"
 msgstr "Czw."
 
 #: include/forms.inc.php:1634 include/forms.inc.php:1702
-#: include/func.inc.php:159 include/func.inc.php:243
+#: include/func.inc.php:134 include/func.inc.php:218
 msgid "Thursday"
 msgstr "Czwartek"
 
@@ -12942,7 +12942,7 @@ msgstr ""
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr ""
 
-#: api/classes/CTrigger.php:1625
+#: api/classes/CTrigger.php:1624
 #, c-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Wyzwalacz \"%s\" należy do szablonów z różnymi połączeniami."
@@ -12952,7 +12952,7 @@ msgstr "Wyzwalacz \"%s\" należy do szablonów z różnymi połączeniami."
 msgid "Trigger added"
 msgstr "Dodano wyzwalacz"
 
-#: api/classes/CTrigger.php:1529
+#: api/classes/CTrigger.php:1528
 msgid "Trigger cannot be dependent on a trigger that is inherited from it."
 msgstr ""
 
@@ -12976,7 +12976,7 @@ msgstr "Wyświetlanie wyzwalaczy"
 msgid "Trigger expression condition"
 msgstr ""
 
-#: api/classes/CTrigger.php:693 api/classes/CTriggerPrototype.php:801
+#: api/classes/CTrigger.php:692 api/classes/CTriggerPrototype.php:801
 msgid "Trigger expression must contain at least one host:key reference."
 msgstr ""
 
@@ -13117,12 +13117,12 @@ msgstr "Obcięto"
 msgid "Try to read inaccessible property \"%s\"."
 msgstr ""
 
-#: include/func.inc.php:229
+#: include/func.inc.php:204
 msgid "Tue"
 msgstr "Wto."
 
 #: include/forms.inc.php:1632 include/forms.inc.php:1700
-#: include/func.inc.php:157 include/func.inc.php:241
+#: include/func.inc.php:132 include/func.inc.php:216
 msgid "Tuesday"
 msgstr "Wtorek"
 
@@ -13200,11 +13200,11 @@ msgstr "Typ obliczeń"
 msgid "Type of information"
 msgstr "Typ informacji"
 
-#: api/classes/CItemGeneral.php:310
+#: api/classes/CItemGeneral.php:316
 msgid "Type of information must be \"Log\" for log key."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:306
+#: api/classes/CItemGeneral.php:312
 msgid "Type of information must be \"Numeric (float)\" for aggregate items."
 msgstr ""
 
@@ -13267,7 +13267,7 @@ msgstr "USA (160 znaków)"
 msgid "USER PROFILE"
 msgstr "PROFIL UŻYTKOWNIKA"
 
-#: include/func.inc.php:2611
+#: include/func.inc.php:2586
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -13554,7 +13554,7 @@ msgstr ""
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTrigger.php:1278
+#: api/classes/CTrigger.php:1277
 #, c-format
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -13981,12 +13981,12 @@ msgstr ""
 msgid "Web scenarios"
 msgstr ""
 
-#: include/func.inc.php:230
+#: include/func.inc.php:205
 msgid "Wed"
 msgstr "Śro."
 
 #: include/forms.inc.php:1633 include/forms.inc.php:1701
-#: include/func.inc.php:158 include/func.inc.php:242
+#: include/func.inc.php:133 include/func.inc.php:217
 msgid "Wednesday"
 msgstr "Środa"
 
@@ -14189,7 +14189,7 @@ msgstr ""
 msgid "Y"
 msgstr "Y"
 
-#: include/func.inc.php:685
+#: include/func.inc.php:660
 msgctxt "Yotta short"
 msgid "Y"
 msgstr ""
@@ -14239,7 +14239,7 @@ msgstr "R.m.d"
 msgid "Y.m.d H:i"
 msgstr "R.m.d G:m"
 
-#: include/func.inc.php:606 include/translateDefines.inc.php:47
+#: include/func.inc.php:581 include/translateDefines.inc.php:47
 msgid "Y.m.d H:i:s"
 msgstr "R.m.d G:m:s"
 
@@ -14255,14 +14255,14 @@ msgstr "Rocznie"
 
 #: events.php:761 include/blocks.inc.php:727
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:365
-#: include/events.inc.php:383 include/func.inc.php:2432
+#: include/events.inc.php:383 include/func.inc.php:2407
 #: include/triggers.inc.php:1606
 #: include/views/administration.users.list.php:76
 #: include/views/js/adm.regexprs.edit.js.php:139
 msgid "Yes"
 msgstr "Tak"
 
-#: include/func.inc.php:685
+#: include/func.inc.php:660
 msgid "Yotta"
 msgstr "Yotta"
 
@@ -14275,7 +14275,7 @@ msgstr "Nie można wybrać niektórych języków, ponieważ nie zostały one zai
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "Brak praw do zmiany uprawnień użytkownika \"%s\"."
 
-#: include/func.inc.php:2115
+#: include/func.inc.php:2090
 msgid "You are not logged in."
 msgstr "Nie zalogowano."
 
@@ -14326,15 +14326,15 @@ msgstr "Nie masz uprawnień by aktualizować dane innych użytkowników."
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "Nie masz uprawnień by aktualizować dane użytkownika lub użytkownik nie istnieje."
 
-#: include/func.inc.php:2097
+#: include/func.inc.php:2072
 msgid "You have no permissions to access this page."
 msgstr ""
 
-#: include/func.inc.php:2117
+#: include/func.inc.php:2092
 msgid "You must login to view this page."
 msgstr "Należy się zalogować, aby zobaczyć tą stronę."
 
-#: include/func.inc.php:2093
+#: include/func.inc.php:2068
 msgid "Your are logged in as"
 msgstr ""
 
@@ -14342,7 +14342,7 @@ msgstr ""
 msgid "Your setup is not configured for distributed monitoring."
 msgstr ""
 
-#: include/func.inc.php:684
+#: include/func.inc.php:659
 msgctxt "Zetta short"
 msgid "Z"
 msgstr ""
@@ -14454,7 +14454,7 @@ msgstr "Port serwera Zabbix"
 msgid "Zabbix trapper"
 msgstr "Trapper Zabbixa"
 
-#: include/func.inc.php:684
+#: include/func.inc.php:659
 msgid "Zetta"
 msgstr "Zetta"
 
@@ -14467,12 +14467,12 @@ msgstr "Powiększenie"
 msgid "[H:i:s]"
 msgstr "[G:m:s]"
 
-#: include/func.inc.php:166
+#: include/func.inc.php:141
 #, c-format
 msgid "[Wrong value for day: \"%s\" ]"
 msgstr "[Błedna wartość dla dnia: \"%s\"]"
 
-#: include/func.inc.php:151
+#: include/func.inc.php:126
 #, c-format
 msgid "[Wrong value for month: \"%s\" ]"
 msgstr "[Błędna wartość dla miesiąca: \"%s\"]"
@@ -14540,13 +14540,13 @@ msgstr ""
 msgid "avg"
 msgstr "śr."
 
-#: include/func.inc.php:566 jsLoader.php:97
+#: include/func.inc.php:541 jsLoader.php:97
 msgctxt "day short"
 msgid "d"
 msgstr ""
 
 #: include/html.inc.php:592 include/maintenances.inc.php:59
-#: include/page_header.php:450 include/translateDefines.inc.php:42
+#: include/page_header.php:449 include/translateDefines.inc.php:42
 #: include/views/configuration.hostgroups.list.php:138
 #: include/views/configuration.item.list.php:127 report3.php:132
 msgid "d M Y"
@@ -14651,7 +14651,7 @@ msgstr "wykonane"
 msgid "fixed"
 msgstr "naprawione"
 
-#: include/func.inc.php:1904
+#: include/func.inc.php:1879
 msgid "found"
 msgstr "znaleziony"
 
@@ -14661,7 +14661,7 @@ msgctxt "item_form"
 msgid "global housekeeper settings"
 msgstr ""
 
-#: include/func.inc.php:567 jsLoader.php:98
+#: include/func.inc.php:542 jsLoader.php:98
 msgctxt "hour short"
 msgid "h"
 msgstr ""
@@ -14722,12 +14722,12 @@ msgstr "podobne"
 msgid "low-level discovery rule"
 msgstr ""
 
-#: include/func.inc.php:568
+#: include/func.inc.php:543
 msgctxt "minute short"
 msgid "m"
 msgstr ""
 
-#: include/func.inc.php:565 jsLoader.php:96
+#: include/func.inc.php:540 jsLoader.php:96
 msgctxt "month short"
 msgid "m"
 msgstr ""
@@ -14768,7 +14768,7 @@ msgstr ""
 msgid "mm"
 msgstr "mm"
 
-#: include/func.inc.php:570
+#: include/func.inc.php:545
 msgctxt "millisecond short"
 msgid "ms"
 msgstr ""
@@ -14830,7 +14830,7 @@ msgid "now"
 msgstr "teraz"
 
 #: include/blocks.inc.php:352 include/blocks.inc.php:696
-#: include/func.inc.php:1901
+#: include/func.inc.php:1876
 msgid "of"
 msgstr "z"
 
@@ -14870,7 +14870,7 @@ msgstr "root"
 msgid "running"
 msgstr "działa"
 
-#: include/func.inc.php:569
+#: include/func.inc.php:544
 msgctxt "second short"
 msgid "s"
 msgstr ""
@@ -14908,7 +14908,7 @@ msgstr "pokaż mapowanie wartości"
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "szablon o ID \"%1$s\" został przekazany %2$s razy"
 
-#: include/func.inc.php:1897
+#: include/func.inc.php:1872
 msgid "to"
 msgstr "dla"
 
@@ -14935,7 +14935,7 @@ msgstr "wartość"
 msgid "via"
 msgstr ""
 
-#: include/func.inc.php:564 jsLoader.php:95
+#: include/func.inc.php:539 jsLoader.php:95
 msgctxt "year short"
 msgid "y"
 msgstr ""

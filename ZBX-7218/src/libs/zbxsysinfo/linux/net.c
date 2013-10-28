@@ -63,7 +63,7 @@ static int	get_net_stat(const char *if_name, net_stat_t *result)
 					&(result->ierr),	/* errs */
 					&(result->idrop),	/* drop */
 					&(result->obytes),	/* bytes */
-					&(result->opackets),	/* packets*/
+					&(result->opackets),	/* packets */
 					&(result->oerr),	/* errs */
 					&(result->odrop),	/* drop */
 					&(result->colls)))	/* icolls */

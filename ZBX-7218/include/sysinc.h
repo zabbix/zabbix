@@ -396,7 +396,7 @@
 #	include <net-snmp/net-snmp-includes.h>
 #endif
 
-/* Required for SNMP support*/
+/* Required for SNMP support */
 #ifdef HAVE_UCDSNMP
 #	include <ucd-snmp/ucd-snmp-config.h>
 #	include <ucd-snmp/ucd-snmp-includes.h>
