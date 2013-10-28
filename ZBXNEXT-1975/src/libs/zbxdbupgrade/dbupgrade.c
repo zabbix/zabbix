@@ -1019,16 +1019,6 @@ static int	DBpatch_2010040(void)
 	return DBrename_field("triggers", "value_flags", &field);
 }
 
-static int	DBpatch_2010041(void)
-{
-	return DBdrop_index("events", "events_1");
-}
-
-static int	DBpatch_2010042(void)
-{
-	return DBcreate_index("events", "events_1", "source,object,objectid,eventid", 1);
-}
-
 static int	DBpatch_2010043(void)
 {
 	const ZBX_FIELD field = {"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
@@ -2172,6 +2162,55 @@ static int	DBpatch_2010183(void)
 
 static int	DBpatch_2010184(void)
 {
+	const ZBX_FIELD	field = {"label_location", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("sysmaps", &field);
+}
+
+static int	DBpatch_2010185(void)
+{
+	if (ZBX_DB_OK > DBexecute("update sysmaps_elements set label_location=-1 where label_location is null"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_2010186(void)
+{
+	const ZBX_FIELD	field = {"label_location", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("sysmaps_elements", &field);
+}
+
+static int	DBpatch_2010187(void)
+{
+	const ZBX_FIELD	field = {"label_location", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_not_null("sysmaps_elements", &field);
+}
+
+static int	DBpatch_2010188(void)
+{
+	return DBdrop_index("events", "events_1");
+}
+
+static int	DBpatch_2010189(void)
+{
+	return DBdrop_index("events", "events_2");
+}
+
+static int	DBpatch_2010190(void)
+{
+	return DBcreate_index("events", "events_1", "source,object,objectid,clock", 0);
+}
+
+static int	DBpatch_2010191(void)
+{
+	return DBcreate_index("events", "events_2", "source,object,clock", 0);
+}
+
+static int	DBpatch_2010192(void)
+{
 #ifdef HAVE_ORACLE
 	const ZBX_FIELD	field = {"message_tmp", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
@@ -2181,7 +2220,7 @@ static int	DBpatch_2010184(void)
 #endif
 }
 
-static int	DBpatch_2010185(void)
+static int	DBpatch_2010193(void)
 {
 #ifdef HAVE_ORACLE
 	return ZBX_DB_OK > DBexecute("update alerts set message_tmp=message") ? FAIL : SUCCEED;
@@ -2190,7 +2229,7 @@ static int	DBpatch_2010185(void)
 #endif
 }
 
-static int	DBpatch_2010186(void)
+static int	DBpatch_2010194(void)
 {
 #ifdef HAVE_ORACLE
 	return DBdrop_field("alerts", "message");
@@ -2199,7 +2238,7 @@ static int	DBpatch_2010186(void)
 #endif
 }
 
-static int	DBpatch_2010187(void)
+static int	DBpatch_2010195(void)
 {
 #ifdef HAVE_ORACLE
 	const ZBX_FIELD	field = {"message", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
@@ -2299,8 +2338,6 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010038, 0, 0)
 	DBPATCH_ADD(2010039, 0, 0)
 	DBPATCH_ADD(2010040, 0, 1)
-	DBPATCH_ADD(2010041, 0, 0)
-	DBPATCH_ADD(2010042, 0, 0)
 	DBPATCH_ADD(2010043, 0, 1)
 	DBPATCH_ADD(2010044, 0, 1)
 	DBPATCH_ADD(2010045, 0, 1)
@@ -2446,6 +2483,14 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010185, 0, 1)
 	DBPATCH_ADD(2010186, 0, 1)
 	DBPATCH_ADD(2010187, 0, 1)
+	DBPATCH_ADD(2010188, 0, 1)
+	DBPATCH_ADD(2010189, 0, 1)
+	DBPATCH_ADD(2010190, 0, 1)
+	DBPATCH_ADD(2010191, 0, 1)
+	DBPATCH_ADD(2010192, 0, 1)
+	DBPATCH_ADD(2010193, 0, 1)
+	DBPATCH_ADD(2010194, 0, 1)
+	DBPATCH_ADD(2010195, 0, 1)
 
 	DBPATCH_END()
 

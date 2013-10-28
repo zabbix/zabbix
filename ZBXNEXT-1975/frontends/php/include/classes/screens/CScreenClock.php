@@ -35,8 +35,8 @@ class CScreenClock extends CScreenBase {
 			case TIME_TYPE_HOST:
 				$items = API::Item()->get(array(
 					'itemids' => $this->screenitem['resourceid'],
-					'selectHosts' => API_OUTPUT_EXTEND,
-					'output' => API_OUTPUT_EXTEND
+					'selectHosts' => array('host'),
+					'output' => array('lastvalue', 'lastclock')
 				));
 				$item = reset($items);
 				$host = reset($item['hosts']);

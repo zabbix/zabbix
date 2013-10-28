@@ -385,10 +385,11 @@ table.ack_msgs tr.msg td { padding: 5px; text-align: left; vertical-align: top; 
 table.right_table { border-width: 0; margin: 0; padding: 0; }
 table.right_table tr.header td { font-weight: bold; text-align: left; }
 table.right_table td { margin: 0; padding: 0; text-align: left; white-space: nowrap; word-spacing: 0; }
-table.right_table select { width: 200px; }
-table.right_table tr td.read_write select { color: #008800; width: 250px; }
-table.right_table tr td.read_only select { color: #CC8800; width: 250px; }
-table.right_table tr td.deny select { color: #CC0000; width: 250px; }
+table.right_table select { width: 250px; }
+table.right_table.calculated select { background: #EBEFF2; }
+table.right_table .read_write option { color: #008800; }
+table.right_table .read_only option { color: #CC8800; }
+table.right_table .deny option { color: #CC0000; }
 
 /* graph */
 table.graph { width: 100%; text-align: center; }

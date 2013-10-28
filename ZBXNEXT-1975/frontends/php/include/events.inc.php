@@ -136,13 +136,14 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
 	$triggerids = API::Trigger()->get($options);
 
 	return API::Event()->get(array(
-		'countOutput' => 1,
+		'source' => EVENT_SOURCE_TRIGGERS,
+		'object' => EVENT_OBJECT_TRIGGER,
+		'countOutput' => true,
 		'objectids' => zbx_objectValues($triggerids, 'triggerid'),
 		'filter' => array(
-			'value' => is_null($value_event) ? array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE) : $value_event,
+			'value' => $value_event,
 			'acknowledged' => $ack ? 1 : 0
-		),
-		'nopermissions' => true
+		)
 	));
 }
 
@@ -164,11 +165,13 @@ function get_next_event($currentEvent, array $eventList = array()) {
 
 	$sql = 'SELECT e.*'.
 			' FROM events e'.
-			' WHERE e.objectid='.zbx_dbstr($currentEvent['objectid']).
-				' AND e.eventid>'.zbx_dbstr($currentEvent['eventid']).
+			' WHERE e.source='.zbx_dbstr($currentEvent['source']).
 				' AND e.object='.zbx_dbstr($currentEvent['object']).
-				' AND e.source='.zbx_dbstr($currentEvent['source']).
-			' ORDER BY e.object,e.objectid,e.eventid';
+				' AND e.objectid='.zbx_dbstr($currentEvent['objectid']).
+				' AND e.clock>='.zbx_dbstr($currentEvent['clock']).
+				' AND ((e.clock='.zbx_dbstr($currentEvent['clock']).' AND e.ns>'.$currentEvent['ns'].')'.
+					' OR e.clock>'.zbx_dbstr($currentEvent['clock']).')'.
+			' ORDER BY e.clock,e.eventid';
 	return DBfetch(DBselect($sql, 1));
 }
 
@@ -204,16 +207,18 @@ function make_small_eventlist($startEvent) {
 
 	$clock = $startEvent['clock'];
 
-	$options = array(
+	$events = API::Event()->get(array(
+		'source' => EVENT_SOURCE_TRIGGERS,
+		'object' => EVENT_OBJECT_TRIGGER,
 		'objectids' => $startEvent['objectid'],
 		'eventid_till' => $startEvent['eventid'],
 		'output' => API_OUTPUT_EXTEND,
 		'select_acknowledges' => API_OUTPUT_COUNT,
-		'sortfield' => 'eventid',
+		'sortfield' => array('clock', 'eventid'),
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => 20
-	);
-	$events = API::Event()->get($options);
+	));
+
 	$sortFields = array(
 		array('field' => 'clock', 'order' => ZBX_SORT_DOWN),
 		array('field' => 'eventid', 'order' => ZBX_SORT_DOWN)
@@ -278,12 +283,13 @@ function make_popup_eventlist($triggerId, $eventId) {
 	}
 
 	$events = API::Event()->get(array(
+		'source' => EVENT_SOURCE_TRIGGERS,
+		'object' => EVENT_OBJECT_TRIGGER,
 		'output' => API_OUTPUT_EXTEND,
 		'objectids' => $triggerId,
 		'eventid_till' => $eventId,
-		'nopermissions' => true,
 		'select_acknowledges' => API_OUTPUT_COUNT,
-		'sortfield' => 'eventid',
+		'sortfield' => array('clock', 'eventid'),
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => ZBX_WIDGET_ROWS
 	));
@@ -397,8 +403,10 @@ function getLastEvents($options) {
 	);
 
 	$eventOptions = array(
+		'source' => EVENT_SOURCE_TRIGGERS,
+		'object' => EVENT_OBJECT_TRIGGER,
 		'output' => API_OUTPUT_EXTEND,
-		'sortfield' => 'eventid',
+		'sortfield' => array('clock', 'eventid'),
 		'sortorder' => ZBX_SORT_DOWN
 	);
 

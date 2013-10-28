@@ -263,23 +263,14 @@ Please, locate Oracle directories using --with-oracle or \
             fi
 
             dnl Add -lnnz1x flag to Oracle >= 10.x
-            AC_MSG_CHECKING([for Oracle version >= 11.x to use -lnnz11 flag])
-            oracle_nnz11_check=`expr $oracle_version_number \>\= 11 \* 1000000`
-            if test "$oracle_nnz11_check" = "1"; then
-				oci_libs="$oci_libs -lnnz11"
-                LIBS="$LIBS -lnnz11"
-                AC_MSG_RESULT([yes])
+            AC_MSG_CHECKING([for Oracle OCI version >= 10.x to use -lnnz1x flag])
+            oracle_nnz1x_flag=`expr $oracle_version_number / 1000000`
+            if test "$oracle_nnz1x_flag" -ge 10; then
+                oci_libs="$oci_libs -lnnz$oracle_nnz1x_flag"
+                LIBS="$LIBS -lnnz$oracle_nnz1x_flag"
+                AC_MSG_RESULT([-lnnz$oracle_nnz1x_flag])
             else
                 AC_MSG_RESULT([no])
-                AC_MSG_CHECKING([for Oracle version >= 10.x to use -lnnz10 flag])
-                oracle_nnz10_check=`expr $oracle_version_number \>\= 10 \* 1000000`
-                if test "$oracle_nnz10_check" = "1"; then
-			        oci_libs="$oci_libs -lnnz10"
-                    LIBS="$LIBS -lnnz10"
-                    AC_MSG_RESULT([yes])
-                else
-                    AC_MSG_RESULT([no])
-                fi
             fi
         fi
 
@@ -316,7 +307,7 @@ if (envh) OCIHandleFree(envh, OCI_HTYPE_ENV);
         LIBS="$saved_LIBS"
     fi
 
-    AC_MSG_CHECKING([if Oracle support is enabled])
+    AC_MSG_CHECKING([for Oracle support])
 
     if test "$oci_header_found" = "yes" -a "$oci_lib_found" = "yes"; then
 

@@ -88,8 +88,8 @@ static zbx_hk_cleanup_table_t	hk_cleanup_tables[] = {
 };
 
 /* trends table offsets in the hk_cleanup_tables[] mapping  */
-#define HK_UPADTE_CACHE_OFFSET_TREND_FLOAT	ITEM_VALUE_TYPE_MAX
-#define HK_UPADTE_CACHE_OFFSET_TREND_UINT	(HK_UPADTE_CACHE_OFFSET_TREND_FLOAT + 1)
+#define HK_UPDATE_CACHE_OFFSET_TREND_FLOAT	ITEM_VALUE_TYPE_MAX
+#define HK_UPDATE_CACHE_OFFSET_TREND_UINT	(HK_UPDATE_CACHE_OFFSET_TREND_FLOAT + 1)
 
 /* the oldest record timestamp cache for items in history tables */
 typedef struct
@@ -371,14 +371,14 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 		}
 		if (value_type == ITEM_VALUE_TYPE_FLOAT)
 		{
-			rule = rules + HK_UPADTE_CACHE_OFFSET_TREND_FLOAT;
+			rule = rules + HK_UPDATE_CACHE_OFFSET_TREND_FLOAT;
 			if (ZBX_HK_OPTION_ENABLED == *rule->poption_global)
 				trends = *rule->poption;
 			hk_history_item_update(rule, now, itemid, trends);
 		}
 		else if (value_type == ITEM_VALUE_TYPE_UINT64)
 		{
-			rule = rules + HK_UPADTE_CACHE_OFFSET_TREND_UINT;
+			rule = rules + HK_UPDATE_CACHE_OFFSET_TREND_UINT;
 
 			if (ZBX_HK_OPTION_ENABLED == *rule->poption_global)
 				trends = *rule->poption;
@@ -748,10 +748,20 @@ static int	housekeeping_audit(int now)
 static int	housekeeping_events(int now)
 {
 	static zbx_hk_rule_t 	rules[] = {
-		{"events", "source="ZBX_STR(EVENT_SOURCE_TRIGGERS), 0, &hk_config.events_trigger},
-		{"events", "source="ZBX_STR(EVENT_SOURCE_DISCOVERY), 0, &hk_config.events_discovery},
-		{"events", "source="ZBX_STR(EVENT_SOURCE_AUTO_REGISTRATION), 0, &hk_config.events_autoreg},
-		{"events", "source="ZBX_STR(EVENT_SOURCE_INTERNAL), 0, &hk_config.events_internal},
+		{"events", "source=" ZBX_STR(EVENT_SOURCE_TRIGGERS)
+			" and object=" ZBX_STR(EVENT_OBJECT_TRIGGER), 0, &hk_config.events_trigger},
+		{"events", "source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
+			" and object=" ZBX_STR(EVENT_OBJECT_DHOST), 0, &hk_config.events_discovery},
+		{"events", "source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
+			" and object=" ZBX_STR(EVENT_OBJECT_DSERVICE), 0, &hk_config.events_discovery},
+		{"events", "source=" ZBX_STR(EVENT_SOURCE_AUTO_REGISTRATION)
+			" and object=" ZBX_STR(EVENT_OBJECT_ZABBIX_ACTIVE), 0, &hk_config.events_autoreg},
+		{"events", "source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
+			" and object=" ZBX_STR(EVENT_OBJECT_TRIGGER), 0, &hk_config.events_internal},
+		{"events", "source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
+			" and object=" ZBX_STR(EVENT_OBJECT_ITEM), 0, &hk_config.events_internal},
+		{"events", "source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
+			" and object=" ZBX_STR(EVENT_OBJECT_LLDRULE), 0, &hk_config.events_internal},
 		{NULL}
 	};
 
