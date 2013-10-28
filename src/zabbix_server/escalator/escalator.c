@@ -1150,16 +1150,19 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 	DB_ACTION	action;
 	DB_EVENT	event, r_event;
 	char		*error = NULL;
-	unsigned char	object = 0;
+	unsigned char	source = 0xff, object = 0xff;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
 			__function_name, escalation->escalationid, zbx_escalation_status_string(escalation->status));
 
-	result = DBselect("select object from events where eventid=" ZBX_FS_UI64, escalation->eventid);
-	if (NULL == (row = DBfetch(result)))
-		error = zbx_dsprintf(error, "event [" ZBX_FS_UI64 "] deleted.", escalation->eventid);
+	result = DBselect("select source,object from events where eventid=" ZBX_FS_UI64, escalation->eventid);
+	if (NULL != (row = DBfetch(result)))
+	{
+		source = (unsigned char)atoi(row[0]);
+		object = (unsigned char)atoi(row[1]);
+	}
 	else
-		object = (unsigned char)atoi(row[0]);
+		error = zbx_dsprintf(error, "event [" ZBX_FS_UI64 "] deleted.", escalation->eventid);
 	DBfree_result(result);
 
 	if (NULL == error && EVENT_OBJECT_TRIGGER == object)
@@ -1175,37 +1178,67 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 		DBfree_result(result);
 	}
 
-	if (NULL == error && EVENT_OBJECT_TRIGGER == object)
+	if (EVENT_SOURCE_TRIGGERS == source)
 	{
-		/* item disabled? */
-		result = DBselect(
-				"select i.name"
-				" from items i,functions f,triggers t"
-				" where i.itemid=f.itemid"
-					" and f.triggerid=t.triggerid"
-					" and t.triggerid=" ZBX_FS_UI64
-					" and i.status=%d",
-				escalation->triggerid, ITEM_STATUS_DISABLED);
-		if (NULL != (row = DBfetch(result)))
-			error = zbx_dsprintf(error, "item '%s' disabled.", row[0]);
-		DBfree_result(result);
-	}
+		if (NULL == error && EVENT_OBJECT_TRIGGER == object)
+		{
+			/* item disabled? */
+			result = DBselect(
+					"select i.name"
+					" from items i,functions f,triggers t"
+					" where i.itemid=f.itemid"
+						" and f.triggerid=t.triggerid"
+						" and t.triggerid=" ZBX_FS_UI64
+						" and i.status=%d",
+					escalation->triggerid, ITEM_STATUS_DISABLED);
+			if (NULL != (row = DBfetch(result)))
+				error = zbx_dsprintf(error, "item '%s' disabled.", row[0]);
+			DBfree_result(result);
+		}
 
-	if (NULL == error && EVENT_OBJECT_TRIGGER == object)
+		if (NULL == error && EVENT_OBJECT_TRIGGER == object)
+		{
+			/* host disabled? */
+			result = DBselect(
+					"select h.host"
+					" from hosts h,items i,functions f,triggers t"
+					" where h.hostid=i.hostid"
+						" and i.itemid=f.itemid"
+						" and f.triggerid=t.triggerid"
+						" and t.triggerid=" ZBX_FS_UI64
+						" and h.status=%d",
+					escalation->triggerid, HOST_STATUS_NOT_MONITORED);
+			if (NULL != (row = DBfetch(result)))
+				error = zbx_dsprintf(error, "host '%s' disabled.", row[0]);
+			DBfree_result(result);
+		}
+	}
+	else if (EVENT_SOURCE_INTERNAL == source)
 	{
-		/* host disabled? */
-		result = DBselect(
-				"select h.host"
-				" from hosts h,items i,functions f,triggers t"
-				" where h.hostid=i.hostid"
-					" and i.itemid=f.itemid"
-					" and f.triggerid=t.triggerid"
-					" and t.triggerid=" ZBX_FS_UI64
-					" and h.status=%d",
-				escalation->triggerid, HOST_STATUS_NOT_MONITORED);
-		if (NULL != (row = DBfetch(result)))
-			error = zbx_dsprintf(error, "host '%s' disabled.", row[0]);
-		DBfree_result(result);
+		if (NULL == error && (EVENT_OBJECT_ITEM == object || EVENT_OBJECT_LLDRULE == object))
+		{
+			/* item disabled? */
+			result = DBselect("select name from items where itemid=" ZBX_FS_UI64 " and status=%d",
+					escalation->itemid, ITEM_STATUS_DISABLED);
+			if (NULL != (row = DBfetch(result)))
+				error = zbx_dsprintf(error, "item '%s' disabled.", row[0]);
+			DBfree_result(result);
+		}
+
+		if (NULL == error && (EVENT_OBJECT_ITEM == object || EVENT_OBJECT_LLDRULE == object))
+		{
+			/* host disabled? */
+			result = DBselect(
+					"select h.host"
+					" from hosts h,items i"
+					" where h.hostid=i.hostid"
+						" and i.itemid=" ZBX_FS_UI64
+						" and h.status=%d",
+					escalation->itemid, HOST_STATUS_NOT_MONITORED);
+			if (NULL != (row = DBfetch(result)))
+				error = zbx_dsprintf(error, "host '%s' disabled.", row[0]);
+			DBfree_result(result);
+		}
 	}
 
 	switch (escalation->status)
@@ -1243,7 +1276,8 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 		if (ACTION_STATUS_ACTIVE != atoi(row[6]))
 			error = zbx_dsprintf(error, "action '%s' disabled.", row[7]);
 
-		if (NULL != error) {
+		if (NULL != error)
+		{
 			action.longdata = zbx_dsprintf(action.longdata, "NOTE: Escalation cancelled: %s\n%s",
 					error, row[4]);
 		}
@@ -1308,10 +1342,10 @@ static int	process_escalations(int now)
 	sql = zbx_malloc(sql, sql_alloc);
 
 	result = DBselect(
-			"select escalationid,actionid,triggerid,eventid,r_eventid,esc_step,status,nextcheck"
+			"select escalationid,actionid,triggerid,eventid,r_eventid,nextcheck,esc_step,status,itemid"
 			" from escalations"
 			ZBX_SQL_NODE
-			" order by actionid,triggerid,escalationid",
+			" order by actionid,triggerid,itemid,escalationid",
 			DBwhere_node_local("escalationid"));
 
 	memset(&escalation, 0, sizeof(escalation));
@@ -1327,9 +1361,10 @@ static int	process_escalations(int now)
 			ZBX_DBROW2UINT64(last_escalation.triggerid, row[2]);
 			ZBX_DBROW2UINT64(last_escalation.eventid, row[3]);
 			ZBX_DBROW2UINT64(last_escalation.r_eventid, row[4]);
-			last_escalation.esc_step = atoi(row[5]);
-			last_escalation.status = atoi(row[6]);
-			last_escalation.nextcheck = atoi(row[7]);
+			last_escalation.nextcheck = atoi(row[5]);
+			last_escalation.esc_step = atoi(row[6]);
+			last_escalation.status = atoi(row[7]);
+			ZBX_DBROW2UINT64(last_escalation.itemid, row[8]);
 
 			/* just delete on the next cycle */
 			if (0 != last_escalation.r_eventid)
@@ -1350,7 +1385,8 @@ static int	process_escalations(int now)
 			if (0 != last_escalation.escalationid)
 			{
 				esc_superseded = (escalation.actionid == last_escalation.actionid &&
-						escalation.triggerid == last_escalation.triggerid);
+						escalation.triggerid == last_escalation.triggerid &&
+						escalation.itemid == last_escalation.itemid);
 
 				if (0 != esc_superseded)
 				{
