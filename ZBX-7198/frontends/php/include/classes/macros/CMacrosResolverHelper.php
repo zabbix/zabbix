@@ -40,6 +40,7 @@ class CMacrosResolverHelper {
 	 */
 	public static function resolve(array $options) {
 		self::init();
+
 		return self::$macrosResolver->resolve($options);
 	}
 
@@ -48,18 +49,121 @@ class CMacrosResolverHelper {
 	 *
 	 * @static
 	 *
-	 * @param int $hostId
+	 * @param int    $hostId
 	 * @param string $name
 	 *
 	 * @return string
 	 */
 	public static function resolveHttpTestName($hostId, $name) {
 		self::init();
+
 		$macros = self::$macrosResolver->resolve(array(
 			'config' => 'httpTestName',
 			'data' => array($hostId => array($name))
 		));
+
 		return $macros[$hostId][0];
+	}
+
+	/**
+	 * Resolve macros in host interfaces.
+	 *
+	 * @static
+	 *
+	 * @param array  $interfaces
+	 * @param string $interfaces[n]['hostid']
+	 * @param string $interfaces[n]['type']
+	 * @param string $interfaces[n]['main']
+	 * @param string $interfaces[n]['ip']
+	 * @param string $interfaces[n]['dns']
+	 *
+	 * @return array
+	 */
+	public static function resolveHostInterfaces(array $interfaces) {
+		self::init();
+
+		// agent primary ip and dns
+		$data = array();
+		foreach ($interfaces as $interface) {
+			if ($interface['type'] == INTERFACE_TYPE_AGENT && $interface['main'] == INTERFACE_PRIMARY) {
+				$data[$interface['hostid']][] = $interface['ip'];
+				$data[$interface['hostid']][] = $interface['dns'];
+			}
+		}
+
+		$resolvedData = self::$macrosResolver->resolve(array(
+			'config' => 'hostInterfaceIpDnsAgentPrimary',
+			'data' => $data
+		));
+
+		foreach ($resolvedData as $hostId => $texts) {
+			$n = 0;
+
+			foreach ($interfaces as &$interface) {
+				if ($interface['type'] == INTERFACE_TYPE_AGENT && $interface['main'] == INTERFACE_PRIMARY
+						&& $interface['hostid'] == $hostId) {
+					$interface['ip'] = $texts[$n];
+					$n++;
+					$interface['dns'] = $texts[$n];
+					$n++;
+				}
+			}
+			unset($interface);
+		}
+
+		// others ip and dns
+		$data = array();
+		foreach ($interfaces as $interface) {
+			if (!($interface['type'] == INTERFACE_TYPE_AGENT && $interface['main'] == INTERFACE_PRIMARY)) {
+				$data[$interface['hostid']][] = $interface['ip'];
+				$data[$interface['hostid']][] = $interface['dns'];
+			}
+		}
+
+		$resolvedData = self::$macrosResolver->resolve(array(
+			'config' => 'hostInterfaceIpDns',
+			'data' => $data
+		));
+
+		foreach ($resolvedData as $hostId => $texts) {
+			$n = 0;
+
+			foreach ($interfaces as &$interface) {
+				if (!($interface['type'] == INTERFACE_TYPE_AGENT && $interface['main'] == INTERFACE_PRIMARY)
+						&& $interface['hostid'] == $hostId) {
+					$interface['ip'] = $texts[$n];
+					$n++;
+					$interface['dns'] = $texts[$n];
+					$n++;
+				}
+			}
+			unset($interface);
+		}
+
+		// port
+		$data = array();
+		foreach ($interfaces as $interface) {
+			$data[$interface['hostid']][] = $interface['port'];
+		}
+
+		$resolvedData = self::$macrosResolver->resolve(array(
+			'config' => 'hostInterfacePort',
+			'data' => $data
+		));
+
+		foreach ($resolvedData as $hostId => $texts) {
+			$n = 0;
+
+			foreach ($interfaces as &$interface) {
+				if ($interface['hostid'] == $hostId) {
+					$interface['port'] = $texts[$n];
+					$n++;
+				}
+			}
+			unset($interface);
+		}
+
+		return $interfaces;
 	}
 
 	/**
@@ -74,6 +178,7 @@ class CMacrosResolverHelper {
 	public static function resolveTriggerName(array $trigger) {
 		$macros = self::resolveTriggerNames(array($trigger));
 		$macros = reset($macros);
+
 		return $macros['description'];
 	}
 
@@ -88,6 +193,7 @@ class CMacrosResolverHelper {
 	 */
 	public static function resolveTriggerNames(array $triggers) {
 		self::init();
+
 		return self::$macrosResolver->resolve(array(
 			'config' => 'triggerName',
 			'data' => zbx_toHash($triggers, 'triggerid')
@@ -106,6 +212,7 @@ class CMacrosResolverHelper {
 	public static function resolveTriggerDescription(array $trigger) {
 		$macros = self::resolveTriggerDescriptions(array($trigger));
 		$macros = reset($macros);
+
 		return $macros['comments'];
 	}
 
@@ -120,6 +227,7 @@ class CMacrosResolverHelper {
 	 */
 	public static function resolveTriggerDescriptions(array $triggers) {
 		self::init();
+
 		return self::$macrosResolver->resolve(array(
 			'config' => 'triggerDescription',
 			'data' => zbx_toHash($triggers, 'triggerid')
@@ -138,6 +246,7 @@ class CMacrosResolverHelper {
 	public static function resolveTriggerNameById($triggerId) {
 		$macros = self::resolveTriggerNameByIds(array($triggerId));
 		$macros = reset($macros);
+
 		return $macros['description'];
 	}
 
@@ -152,11 +261,13 @@ class CMacrosResolverHelper {
 	 */
 	public static function resolveTriggerNameByIds(array $triggerIds) {
 		self::init();
+
 		$triggers = DBfetchArray(DBselect(
 			'SELECT DISTINCT t.description,t.expression,t.triggerid'.
 			' FROM triggers t'.
 			' WHERE '.dbConditionInt('t.triggerid', $triggerIds)
 		));
+
 		return self::$macrosResolver->resolve(array(
 			'config' => 'triggerName',
 			'data' => zbx_toHash($triggers, 'triggerid')
@@ -175,6 +286,7 @@ class CMacrosResolverHelper {
 	 */
 	public static function resolveTriggerReference($expression, $text) {
 		self::init();
+
 		return self::$macrosResolver->resolveTriggerReference($expression, $text);
 	}
 
@@ -189,26 +301,29 @@ class CMacrosResolverHelper {
 	 */
 	public static function resolveEventDescription(array $event) {
 		self::init();
+
 		$macros = self::$macrosResolver->resolve(array(
 			'config' => 'eventDescription',
 			'data' => array($event['triggerid'] => $event)
 		));
 		$macros = reset($macros);
+
 		return $macros['description'];
 	}
 
 	/**
 	 * Resolve positional macros and functional item macros, for example, {{HOST.HOST1}:key.func(param)}.
 	 *
-	 * @param type	    $name				string in which macros should be resolved
-	 * @param array     $items				list of graph items
-	 * @param int       $items[n]['hostid'] graph n-th item corresponding host Id
-	 * @param string    $items[n]['host']   graph n-th item corresponding host name
+	 * @param type   $name					string in which macros should be resolved
+	 * @param array  $items					list of graph items
+	 * @param int    $items[n]['hostid']	graph n-th item corresponding host Id
+	 * @param string $items[n]['host']		graph n-th item corresponding host name
 	 *
 	 * @return string	string with macros replaced with corresponding values
 	 */
 	public static function resolveGraphName($name, $items) {
 		self::init();
+
 		$graph = self::$macrosResolver->resolve(array(
 			'config' => 'graphName',
 			'data' => array(array('name' => $name, 'items' => $items))
@@ -223,9 +338,9 @@ class CMacrosResolverHelper {
 	 *
 	 *  ! if same graph will be passed more than once only name for first entry will be resolved.
 	 *
-	 * @param array		$data				list or hashmap of graphs
-	 * @param int		$data[]['graphid']	id of graph
-	 * @param string	$data[]['name']		name of graph
+	 * @param array  $data					list or hashmap of graphs
+	 * @param int    $data[n]['graphid']	id of graph
+	 * @param string $data[n]['name']		name of graph
 	 *
 	 * @return array	inputted data with resolved names
 	 */
@@ -242,11 +357,10 @@ class CMacrosResolverHelper {
 					'name' => $graph['name'],
 					'items' => array()
 				);
-				$graphIds[] = $graph['graphid'];
+				$graphIds[$graph['graphid']] = $graph['graphid'];
 			}
 		}
 
-		sort($graphIds, SORT_NUMERIC);
 		$items = DBfetchArray(DBselect(
 			'SELECT i.hostid,gi.graphid,h.host'.
 			' FROM graphs_items gi,items i,hosts h'.

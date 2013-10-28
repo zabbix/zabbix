@@ -971,6 +971,9 @@ define('QUEUE_DETAIL_ITEM_COUNT', 500);
 // configuration -> maps default add icon name
 define('MAP_DEFAULT_ICON', 'Server_(96)');
 
+// server variables
+define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] != 'off');
+
 // if magic quotes on, then get rid of them
 if (get_magic_quotes_gpc()) {
 	function zbx_stripslashes($value) {

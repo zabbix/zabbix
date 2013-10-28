@@ -653,13 +653,12 @@ class CTrigger extends CTriggerGeneral {
 		foreach ($triggers as $tnum => &$trigger) {
 			$currentTrigger = $triggers[$tnum];
 
-			if ($update) {
-				$error = _s('Cannot update "%1$s" for trigger "%2$s".', '%1$s', $trigger['description']);
-			}
-			else {
-				$error = _s('Cannot set "%1$s" for trigger "%2$s".', '%1$s', $trigger['description']);
-			}
-			$this->checkNoParameters($trigger, array('templateid', 'state', 'value', 'value_flag'), $error);
+			$this->checkNoParameters(
+				$trigger,
+				array('templateid', 'state', 'value', 'value_flag'),
+				($update ? _('Cannot update "%1$s" for trigger "%2$s".') : _('Cannot set "%1$s" for trigger "%2$s".')),
+				$trigger['description']
+			);
 
 			if (!check_db_fields($triggerDbFields, $trigger)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect fields for trigger.'));
