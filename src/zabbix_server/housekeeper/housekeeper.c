@@ -88,8 +88,8 @@ static zbx_hk_cleanup_table_t	hk_cleanup_tables[] = {
 };
 
 /* trends table offsets in the hk_cleanup_tables[] mapping  */
-#define HK_UPADTE_CACHE_OFFSET_TREND_FLOAT	ITEM_VALUE_TYPE_MAX
-#define HK_UPADTE_CACHE_OFFSET_TREND_UINT	(HK_UPADTE_CACHE_OFFSET_TREND_FLOAT + 1)
+#define HK_UPDATE_CACHE_OFFSET_TREND_FLOAT	ITEM_VALUE_TYPE_MAX
+#define HK_UPDATE_CACHE_OFFSET_TREND_UINT	(HK_UPDATE_CACHE_OFFSET_TREND_FLOAT + 1)
 
 /* the oldest record timestamp cache for items in history tables */
 typedef struct
@@ -371,14 +371,14 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 		}
 		if (value_type == ITEM_VALUE_TYPE_FLOAT)
 		{
-			rule = rules + HK_UPADTE_CACHE_OFFSET_TREND_FLOAT;
+			rule = rules + HK_UPDATE_CACHE_OFFSET_TREND_FLOAT;
 			if (ZBX_HK_OPTION_ENABLED == *rule->poption_global)
 				trends = *rule->poption;
 			hk_history_item_update(rule, now, itemid, trends);
 		}
 		else if (value_type == ITEM_VALUE_TYPE_UINT64)
 		{
-			rule = rules + HK_UPADTE_CACHE_OFFSET_TREND_UINT;
+			rule = rules + HK_UPDATE_CACHE_OFFSET_TREND_UINT;
 
 			if (ZBX_HK_OPTION_ENABLED == *rule->poption_global)
 				trends = *rule->poption;
