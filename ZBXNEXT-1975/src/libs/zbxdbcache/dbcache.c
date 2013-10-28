@@ -1790,7 +1790,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	{
 		/* the history values were written into database, now add to value cache */
 		zbx_log_value_t	log;
-		history_value_t		value, *pvalue;
+		history_value_t	value, *pvalue;
 
 		value.log = &log;
 
