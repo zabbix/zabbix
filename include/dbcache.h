@@ -182,7 +182,7 @@ typedef struct
 }
 zbx_host_key_t;
 
-/* housekeeping related configuration data*/
+/* housekeeping related configuration data */
 typedef struct
 {
 	int		events_trigger;

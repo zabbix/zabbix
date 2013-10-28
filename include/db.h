@@ -408,11 +408,12 @@ typedef struct
 	zbx_uint64_t		escalationid;
 	zbx_uint64_t		actionid;
 	zbx_uint64_t		triggerid;
+	zbx_uint64_t		itemid;
 	zbx_uint64_t		eventid;
 	zbx_uint64_t		r_eventid;
+	int			nextcheck;
 	int			esc_step;
 	zbx_escalation_status_t	status;
-	int			nextcheck;
 }
 DB_ESCALATION;
 
