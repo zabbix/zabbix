@@ -56,29 +56,32 @@ $fields = array(
 	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,				null)
 );
 
-// redirect the user to the login page when we finish or cancel the setup
-if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN) {
-	zbx_unsetcookie('ZBX_CONFIG');
-
-	if (hasRequest('cancel') || hasRequest('next') || hasRequest('finish')) {
-		redirect('index.php');
-	}
-	else {
-		access_deny(ACCESS_DENY_PAGE);
-	}
-}
-elseif (hasRequest('cancel') || hasRequest('finish')) {
-	zbx_unsetcookie('ZBX_CONFIG');
-	redirect('index.php');
-}
-
 // config
 $ZBX_CONFIG = get_cookie('ZBX_CONFIG', null);
 $ZBX_CONFIG = isset($ZBX_CONFIG) ? unserialize($ZBX_CONFIG) : array();
 $ZBX_CONFIG['check_fields_result'] = check_fields($fields, false);
-
 if (!isset($ZBX_CONFIG['step'])) {
 	$ZBX_CONFIG['step'] = 0;
+}
+
+// if a guest or a non-super admin user is logged in
+if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN) {
+	// on the last step of the setup we always have a guest user logged in;
+	// when he presses the "Finish" button he must be redirected to the login screen
+	if (CWebUser::isGuest() && $ZBX_CONFIG['step'] == 5 && hasRequest('finish')) {
+		zbx_unsetcookie('ZBX_CONFIG');
+		redirect('index.php');
+	}
+	// the guest user can also view the last step of the setup
+	// all other user types must not have access to the setup
+	elseif (!(CWebUser::isGuest() && $ZBX_CONFIG['step'] == 5)) {
+		access_deny(ACCESS_DENY_PAGE);
+	}
+}
+// if a super admin or a non-logged in user presses the "Finish" or "Login" button - redirect him to the login screen
+elseif (hasRequest('cancel') || hasRequest('finish')) {
+	zbx_unsetcookie('ZBX_CONFIG');
+	redirect('index.php');
 }
 
 $ZBX_CONFIG['allowed_db'] = array();
