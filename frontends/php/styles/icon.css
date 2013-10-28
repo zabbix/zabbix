@@ -57,6 +57,8 @@
 .iconclose		{ background-image: url('../images/general/bttn/close.png'); }
 .iconmove		{ background-image: url('../images/general/bttn/move.png'); cursor: move; }
 
+.app-list-toggle, .app-list-toggle-all { margin-left: 3px; }
+
 .icon-plus-9x9, .filterclosed	{ background-image: url('../images/general/plus.png'); }
 .icon-minus-9x9, .filteropened	{ background-image: url('../images/general/minus.png'); }
 .icon-plus-9x9, .filterclosed, .icon-minus-9x9, .filteropened {

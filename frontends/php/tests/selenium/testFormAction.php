@@ -481,13 +481,13 @@ class testFormAction extends CWebTest {
 		}
 
 		if (isset($data['new_condition_conditiontype'])) {
-			$this->zbxTestDropdownSelectWait('//select[@id=\'new_condition_conditiontype\']', $data['new_condition_conditiontype']);
+			$this->zbxTestDropdownSelectWait('new_condition_conditiontype', $data['new_condition_conditiontype']);
 		}
 		$new_condition_conditiontype = $this->getSelectedLabel('//select[@id=\'new_condition_conditiontype\']');
 
 		if ($eventsource == 'Triggers') {
 			if (isset($data['evaltype'])) {
-				$this->zbxTestDropdownSelectWait('//select[@id=\'evaltype\']', $data['evaltype']);
+				$this->zbxTestDropdownSelectWait('evaltype', $data['evaltype']);
 			}
 			$evaltype = $this->getSelectedLabel('//select[@id=\'evaltype\']');
 		}
@@ -1238,11 +1238,7 @@ class testFormAction extends CWebTest {
 		if ($opCmdTarget != null) {
 			$this->assertVisible('//*[@id=\'opcmdEditForm\']');
 			$this->assertVisible('//select[@name=\'opCmdTarget\']');
-			$this->zbxTestDropdownHasOptions("//select[@name='opCmdTarget']", array(
-					'Current host',
-					'Host',
-					'Host group'
-			));
+			$this->zbxTestDropdownHasOptions('opCmdTarget', array('Current host', 'Host', 'Host group'));
 
 			$this->assertVisible('//input[@value=\'Add\' and @name=\'save\']');
 			$this->assertVisible('//input[@value=\'Cancel\' and @name=\'cancel\']');
@@ -1656,16 +1652,16 @@ class testFormAction extends CWebTest {
 		$this->zbxTestLogin('actionconf.php');
 		switch ($eventsource) {
 			case EVENT_SOURCE_TRIGGERS:
-				$this->zbxTestDropdownSelectWait('//select[@id=\'eventsource\']', 'Triggers');
+				$this->zbxTestDropdownSelectWait('eventsource', 'Triggers');
 				break;
 			case EVENT_SOURCE_DISCOVERY:
-				$this->zbxTestDropdownSelectWait('//select[@id=\'eventsource\']', 'Discovery');
+				$this->zbxTestDropdownSelectWait('eventsource', 'Discovery');
 				break;
 			case EVENT_SOURCE_AUTO_REGISTRATION:
-				$this->zbxTestDropdownSelectWait('//select[@id=\'eventsource\']', 'Auto registration');
+				$this->zbxTestDropdownSelectWait('eventsource', 'Auto registration');
 				break;
 			case EVENT_SOURCE_INTERNAL;
-				$this->zbxTestDropdownSelectWait('//select[@id=\'eventsource\']', 'Internal');
+				$this->zbxTestDropdownSelectWait('eventsource', 'Internal');
 				break;
 		}
 
@@ -1862,7 +1858,7 @@ class testFormAction extends CWebTest {
 		if (isset($data['conditions'])) {
 			$this->zbxTestClick('link=Conditions');
 			foreach ($data['conditions'] as $condition) {
-				$this->zbxTestDropdownSelectWait("new_condition_conditiontype", $condition['type']);
+				$this->zbxTestDropdownSelectWait('new_condition_conditiontype', $condition['type']);
 				switch ($condition['type']) {
 					case 'Application':
 					case 'Host name':

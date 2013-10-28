@@ -775,7 +775,8 @@ class CMaintenance extends CZBXAPI {
 			$timeperiods = API::getApi()->select('timeperiods', array(
 				'output' => $options['selectTimeperiods'],
 				'filter' => array('timeperiodid' => $relationMap->getRelatedIds()),
-				'preservekeys' => true
+				'preservekeys' => true,
+				'nodeids' => get_current_nodeid(true)
 			));
 			$result = $relationMap->mapMany($result, $timeperiods, 'timeperiods');
 		}

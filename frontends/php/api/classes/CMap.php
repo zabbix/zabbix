@@ -946,7 +946,8 @@ class CMap extends CMapElement {
 			$selements = API::getApi()->select('sysmaps_elements', array(
 				'output' => $this->outputExtend('sysmaps_elements', array('selementid', 'sysmapid'), $options['selectSelements']),
 				'filter' => array('sysmapid' => $sysmapIds),
-				'preservekeys' => true
+				'preservekeys' => true,
+				'nodeids' => get_current_nodeid(true)
 			));
 			$relationMap = $this->createRelationMap($selements, 'sysmapid', 'selementid');
 
@@ -1013,7 +1014,8 @@ class CMap extends CMapElement {
 			$links = API::getApi()->select('sysmaps_links', array(
 				'output' => $this->outputExtend('sysmaps_links', array('sysmapid', 'linkid'), $options['selectLinks']),
 				'filter' => array('sysmapid' => $sysmapIds),
-				'preservekeys' => true
+				'preservekeys' => true,
+				'nodeids' => get_current_nodeid(true)
 			));
 			$relationMap = $this->createRelationMap($links, 'sysmapid', 'linkid');
 
@@ -1037,7 +1039,8 @@ class CMap extends CMapElement {
 			$links = API::getApi()->select('sysmap_url', array(
 				'output' => $this->outputExtend('sysmap_url', array('sysmapid', 'sysmapurlid'), $options['selectUrls']),
 				'filter' => array('sysmapid' => $sysmapIds),
-				'preservekeys' => true
+				'preservekeys' => true,
+				'nodeids' => get_current_nodeid(true)
 			));
 			$relationMap = $this->createRelationMap($links, 'sysmapid', 'sysmapurlid');
 
