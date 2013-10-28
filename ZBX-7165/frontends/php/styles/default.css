@@ -145,8 +145,7 @@ form { margin: 0; }
 .input:focus { border-color: #6e8ab4; }
 .input:hover { border-color: #6e8ab4; }
 .input[readonly] { border-color: #D0D0D0; background-color: #EEEEEE; }
-.input[disabled],
-.input option[disabled] { color: #ACA899; cursor: default; }
+.input[disabled] { color: #ACA899; cursor: default; }
 .input[disabled]:focus { text-decoration: none; border-color: #ACA899; }
 .input[disabled]:hover { text-decoration: none; border-color: #ACA899; }
 .input option { color: #000000; }
