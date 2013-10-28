@@ -268,7 +268,7 @@ Please, locate Oracle directories using --with-oracle or \
             if test "$oracle_nnz1x_flag" -ge 10; then
                 oci_libs="$oci_libs -lnnz$oracle_nnz1x_flag"
                 LIBS="$LIBS -lnnz$oracle_nnz1x_flag"
-                AC_MSG_RESULT([yes])
+                AC_MSG_RESULT([-lnnz$oracle_nnz1x_flag])
             else
                 AC_MSG_RESULT([no])
             fi
@@ -307,7 +307,7 @@ if (envh) OCIHandleFree(envh, OCI_HTYPE_ENV);
         LIBS="$saved_LIBS"
     fi
 
-    AC_MSG_CHECKING([if Oracle support is enabled])
+    AC_MSG_CHECKING([for Oracle support])
 
     if test "$oci_header_found" = "yes" -a "$oci_lib_found" = "yes"; then
 
