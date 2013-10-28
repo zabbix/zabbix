@@ -336,7 +336,7 @@ abstract class CItemGeneral extends CZBXAPI {
 			if ($fullItem['type'] == ITEM_TYPE_SNMPTRAP
 					&& strcmp($fullItem['key_'], 'snmptrap.fallback') != 0
 					&& strcmp($itemKey->getKeyId(), 'snmptrap') != 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No SNMP trap key specified.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('SNMP trap key is invalid.'));
 			}
 
 			// snmp oid
