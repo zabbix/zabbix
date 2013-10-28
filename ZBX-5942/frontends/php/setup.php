@@ -61,7 +61,6 @@ if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN) {
 	zbx_unsetcookie('ZBX_CONFIG');
 
 	if (hasRequest('cancel') || hasRequest('next') || hasRequest('finish')) {
-		CWebUser::logout();
 		redirect('index.php');
 	}
 	else {
