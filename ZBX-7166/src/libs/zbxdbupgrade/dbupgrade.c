@@ -2200,18 +2200,40 @@ static int	DBpatch_2010191(void)
 
 static int	DBpatch_2010192(void)
 {
-	const char	*sql =
+	if (ZBX_DB_OK <= DBexecute(
 			"update triggers"
-			" set state=0,value=0,lastchange=0,error=''"
-			" where exists (select null"
-					" from functions,items,hosts"
-					" where hosts.status=3"
-						" and items.hostid = hosts.hostid"
-						" and functions.itemid = items.itemid"
-						" and triggers.triggerid = functions.triggerid)";
-
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+			" set state=%d,value=%d,lastchange=0,error=''"
+			" where exists ("
+				"select null"
+				" from functions f,items i,hosts h"
+				" where triggers.triggerid=f.triggerid"
+					" and f.itemid=i.itemid"
+					" and i.hostid=h.hostid"
+					" and h.status=%d"
+			")",
+			TRIGGER_STATE_NORMAL, TRIGGER_VALUE_OK, HOST_STATUS_TEMPLATE))
+	{
 		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_2010193(void)
+{
+	if (ZBX_DB_OK <= DBexecute(
+			"update items"
+			" set state=%d,error=''"
+			" where exists ("
+				"select null"
+				" from hosts h"
+				" where items.hostid=h.hostid"
+					" and h.status=%d"
+			")",
+			ITEM_STATE_NORMAL, HOST_STATUS_TEMPLATE))
+	{
+		return SUCCEED;
+	}
 
 	return FAIL;
 }
@@ -2455,6 +2477,7 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010190, 0, 1)
 	DBPATCH_ADD(2010191, 0, 1)
 	DBPATCH_ADD(2010192, 0, 0)
+	DBPATCH_ADD(2010193, 0, 0)
 
 	DBPATCH_END()
 
