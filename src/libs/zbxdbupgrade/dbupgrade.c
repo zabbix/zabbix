@@ -94,7 +94,6 @@
 #	define ZBX_TYPE_TEXT_STR	"text"
 #endif
 
-
 #define ZBX_FIRST_DB_VERSION		2010000
 
 typedef struct
@@ -2210,7 +2209,6 @@ static int	DBpatch_2010187(void)
 	return SUCCEED;
 #endif
 }
-
 
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
