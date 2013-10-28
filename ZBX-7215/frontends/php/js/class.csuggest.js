@@ -457,7 +457,7 @@ positionSuggests: function(){
 
 	if(is_null(this.dom.suggest)) return true;
 
-	var pos = getPosition(this.dom.input);
+	var pos = jQuery(this.dom.input).offset();
 	var dims = getDimensions(this.dom.input);
 
 	this.dom.suggest.style.top = (pos.top+dims.height)+'px';
