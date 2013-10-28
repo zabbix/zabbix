@@ -409,9 +409,10 @@ if ($_REQUEST['form'] == 'full_clone') {
 	$hostApps = API::Application()->get(array(
 		'hostids' => $_REQUEST['hostid'],
 		'inherited' => false,
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('name'),
 		'preservekeys' => true
 	));
+
 	if (!empty($hostApps)) {
 		$applicationsList = array();
 		foreach ($hostApps as $hostAppId => $hostApp) {
@@ -430,7 +431,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 		'hostids' => $_REQUEST['hostid'],
 		'inherited' => false,
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
-		'output' => API_OUTPUT_EXTEND
+		'output' => array('itemid', 'key_', 'name')
 	));
 	if (!empty($hostItems)) {
 		$itemsList = array();
@@ -449,14 +450,10 @@ if ($_REQUEST['form'] == 'full_clone') {
 	$hostTriggers = API::Trigger()->get(array(
 		'inherited' => false,
 		'hostids' => $_REQUEST['hostid'],
-		'output' => array(
-			'triggerid',
-			'description'
-		),
-		'selectItems' => API_OUTPUT_EXTEND,
+		'output' => array('triggerid', 'description'),
+		'selectItems' => array('type'),
 		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL))
 	));
-
 	if (!empty($hostTriggers)) {
 		$triggersList = array();
 
@@ -482,9 +479,9 @@ if ($_REQUEST['form'] == 'full_clone') {
 		'inherited' => false,
 		'hostids' => $_REQUEST['hostid'],
 		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
-		'selectHosts' => API_OUTPUT_REFER,
-		'selectItems' => API_OUTPUT_EXTEND,
-		'output' => API_OUTPUT_EXTEND
+		'selectHosts' => array('hostid'),
+		'selectItems' => array('type'),
+		'output' => array('graphid', 'name')
 	));
 	if (!empty($hostGraphs)) {
 		$graphsList = array();
@@ -514,7 +511,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 	$hostDiscoveryRules = API::DiscoveryRule()->get(array(
 		'inherited' => false,
 		'hostids' => $_REQUEST['hostid'],
-		'output' => API_OUTPUT_EXTEND
+		'output' => array('itemid', 'key_', 'name')
 	));
 	if (!empty($hostDiscoveryRules)) {
 		$discoveryRuleList = array();
@@ -535,7 +532,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 		'hostids' => $_REQUEST['hostid'],
 		'discoveryids' => $hostDiscoveryRuleids,
 		'inherited' => false,
-		'output' => API_OUTPUT_EXTEND
+		'output' => array('itemid', 'key_', 'name')
 	));
 	if (!empty($hostItemPrototypes)) {
 		$prototypeList = array();
@@ -555,8 +552,8 @@ if ($_REQUEST['form'] == 'full_clone') {
 		'hostids' => $_REQUEST['hostid'],
 		'discoveryids' => $hostDiscoveryRuleids,
 		'inherited' => false,
-		'output' => API_OUTPUT_EXTEND,
-		'selectItems' => API_OUTPUT_EXTEND
+		'output' => array('triggerid', 'description'),
+		'selectItems' => array('type')
 	));
 	if (!empty($hostTriggerPrototypes)) {
 		$prototypeList = array();
@@ -583,8 +580,8 @@ if ($_REQUEST['form'] == 'full_clone') {
 		'hostids' => $_REQUEST['hostid'],
 		'discoveryids' => $hostDiscoveryRuleids,
 		'inherited' => false,
-		'selectHosts' => API_OUTPUT_EXTEND,
-		'output' => API_OUTPUT_EXTEND
+		'selectHosts' => array('hostid'),
+		'output' => array('graphid', 'name')
 	));
 	if (!empty($hostGraphPrototypes)) {
 		$prototypeList = array();

@@ -21,7 +21,6 @@
 
 /************ REQUEST ************/
 function redirect($url) {
-	zbx_flush_post_cookies();
 	$curl = new Curl($url);
 	$curl->setArgument('sid', null);
 	header('Location: '.$curl->getUrl());
@@ -29,8 +28,6 @@ function redirect($url) {
 }
 
 function jsRedirect($url, $timeout = null) {
-	zbx_flush_post_cookies();
-
 	$script = is_numeric($timeout)
 		? 'setTimeout(\'window.location="'.$url.'"\', '.($timeout * 1000).')'
 		: 'window.location.replace("'.$url.'");';
@@ -100,35 +97,13 @@ function get_cookie($name, $default_value = null) {
 }
 
 function zbx_setcookie($name, $value, $time = null) {
-	setcookie($name, $value, isset($time) ? $time : 0);
+	setcookie($name, $value, isset($time) ? $time : 0, null, null, HTTPS);
 	$_COOKIE[$name] = $value;
 }
 
 function zbx_unsetcookie($name) {
 	zbx_setcookie($name, null, -99999);
 	unset($_COOKIE[$name]);
-}
-
-function zbx_flush_post_cookies($unset = false) {
-	global $ZBX_PAGE_COOKIES;
-
-	if (isset($ZBX_PAGE_COOKIES)) {
-		foreach ($ZBX_PAGE_COOKIES as $cookie) {
-			if ($unset) {
-				zbx_unsetcookie($cookie[0]);
-			}
-			else {
-				zbx_setcookie($cookie[0], $cookie[1], $cookie[2]);
-			}
-		}
-		unset($ZBX_PAGE_COOKIES);
-	}
-}
-
-function zbx_set_post_cookie($name, $value, $time = null) {
-	global $ZBX_PAGE_COOKIES;
-
-	$ZBX_PAGE_COOKIES[] = array($name, $value, isset($time) ? $time : 0);
 }
 
 /************* DATE *************/
