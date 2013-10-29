@@ -666,9 +666,9 @@ if ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['hosts'])) {
 		'SELECT h.hostid,h.host'.
 		' FROM hosts h'.
 		' WHERE h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'.
-			andDbNode('h.hostid').
-		' ORDER BY h.host'
+			andDbNode('h.hostid')
 	));
+	order_result($data['proxies'], 'host');
 
 	// get inventories
 	if ($data['inventory_mode'] != HOST_INVENTORY_DISABLED) {

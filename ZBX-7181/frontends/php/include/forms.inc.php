@@ -135,7 +135,10 @@
 
 		// set user rights
 		if (!$data['is_profile']) {
-			$data['groups'] = API::UserGroup()->get(array('usrgrpids' => $data['user_groups'], 'output' => API_OUTPUT_EXTEND));
+			$data['groups'] = API::UserGroup()->get(array(
+				'usrgrpids' => $data['user_groups'],
+				'output' => array('usrgrpid', 'name')
+			));
 			order_result($data['groups'], 'name');
 
 			$group_ids = array_values($data['user_groups']);

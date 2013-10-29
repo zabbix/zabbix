@@ -740,8 +740,12 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 			' AND h.hostid=i.hostid'.
 			' AND i.status='.ITEM_STATUS_ACTIVE.
 			' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
-				$sqlWhere.
-		' ORDER BY i.name,i.itemid'
+				$sqlWhere
+	));
+
+	CArrayHelper::sort($dbItems, array(
+		array('field' => 'name', 'order' => ZBX_SORT_UP),
+		array('field' => 'itemid', 'order' => ZBX_SORT_UP)
 	));
 
 	// fetch latest values
