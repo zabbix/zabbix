@@ -2198,6 +2198,46 @@ static int	DBpatch_2010191(void)
 	return DBcreate_index("events", "events_2", "source,object,clock", 0);
 }
 
+static int	DBpatch_2010192(void)
+{
+	if (ZBX_DB_OK <= DBexecute(
+			"update triggers"
+			" set state=%d,value=%d,lastchange=0,error=''"
+			" where exists ("
+				"select null"
+				" from functions f,items i,hosts h"
+				" where triggers.triggerid=f.triggerid"
+					" and f.itemid=i.itemid"
+					" and i.hostid=h.hostid"
+					" and h.status=%d"
+			")",
+			TRIGGER_STATE_NORMAL, TRIGGER_VALUE_OK, HOST_STATUS_TEMPLATE))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_2010193(void)
+{
+	if (ZBX_DB_OK <= DBexecute(
+			"update items"
+			" set state=%d,error=''"
+			" where exists ("
+				"select null"
+				" from hosts h"
+				" where items.hostid=h.hostid"
+					" and h.status=%d"
+			")",
+			ITEM_STATE_NORMAL, HOST_STATUS_TEMPLATE))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 #define DBPATCH_END()					{NULL}};
@@ -2436,6 +2476,8 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010189, 0, 1)
 	DBPATCH_ADD(2010190, 0, 1)
 	DBPATCH_ADD(2010191, 0, 1)
+	DBPATCH_ADD(2010192, 0, 0)
+	DBPATCH_ADD(2010193, 0, 0)
 
 	DBPATCH_END()
 
