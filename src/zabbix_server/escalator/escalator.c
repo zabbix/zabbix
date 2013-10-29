@@ -1167,14 +1167,20 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 
 	if (NULL == error && EVENT_OBJECT_TRIGGER == object)
 	{
-		/* trigger disabled? */
+		/* trigger disabled or deleted? */
+
 		result = DBselect("select description,status from triggers where triggerid=" ZBX_FS_UI64,
 				escalation->triggerid);
+
 		if (NULL == (row = DBfetch(result)))
+		{
 			error = zbx_dsprintf(error, "trigger [" ZBX_FS_UI64 "] deleted.",
 					escalation->triggerid);
+		}
 		else if (TRIGGER_STATUS_DISABLED == atoi(row[1]))
+		{
 			error = zbx_dsprintf(error, "trigger '%s' disabled.", row[0]);
+		}
 		DBfree_result(result);
 	}
 
@@ -1183,6 +1189,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 		if (NULL == error && EVENT_OBJECT_TRIGGER == object)
 		{
 			/* item disabled? */
+
 			result = DBselect(
 					"select i.name"
 					" from items i,functions f,triggers t"
@@ -1191,6 +1198,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 						" and t.triggerid=" ZBX_FS_UI64
 						" and i.status=%d",
 					escalation->triggerid, ITEM_STATUS_DISABLED);
+
 			if (NULL != (row = DBfetch(result)))
 				error = zbx_dsprintf(error, "item '%s' disabled.", row[0]);
 			DBfree_result(result);
@@ -1199,6 +1207,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 		if (NULL == error && EVENT_OBJECT_TRIGGER == object)
 		{
 			/* host disabled? */
+
 			result = DBselect(
 					"select h.host"
 					" from hosts h,items i,functions f,triggers t"
@@ -1208,6 +1217,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 						" and t.triggerid=" ZBX_FS_UI64
 						" and h.status=%d",
 					escalation->triggerid, HOST_STATUS_NOT_MONITORED);
+
 			if (NULL != (row = DBfetch(result)))
 				error = zbx_dsprintf(error, "host '%s' disabled.", row[0]);
 			DBfree_result(result);
@@ -1217,17 +1227,27 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 	{
 		if (NULL == error && (EVENT_OBJECT_ITEM == object || EVENT_OBJECT_LLDRULE == object))
 		{
-			/* item disabled? */
-			result = DBselect("select name from items where itemid=" ZBX_FS_UI64 " and status=%d",
-					escalation->itemid, ITEM_STATUS_DISABLED);
-			if (NULL != (row = DBfetch(result)))
+			/* item disabled or deleted? */
+
+			result = DBselect("select name,status from items where itemid=" ZBX_FS_UI64,
+					escalation->itemid);
+
+			if (NULL == (row = DBfetch(result)))
+			{
+				error = zbx_dsprintf(error, "item [" ZBX_FS_UI64 "] deleted.",
+						escalation->itemid);
+			}
+			else if (ITEM_STATUS_DISABLED == atoi(row[1]))
+			{
 				error = zbx_dsprintf(error, "item '%s' disabled.", row[0]);
+			}
 			DBfree_result(result);
 		}
 
 		if (NULL == error && (EVENT_OBJECT_ITEM == object || EVENT_OBJECT_LLDRULE == object))
 		{
 			/* host disabled? */
+
 			result = DBselect(
 					"select h.host"
 					" from hosts h,items i"
@@ -1235,6 +1255,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 						" and i.itemid=" ZBX_FS_UI64
 						" and h.status=%d",
 					escalation->itemid, HOST_STATUS_NOT_MONITORED);
+
 			if (NULL != (row = DBfetch(result)))
 				error = zbx_dsprintf(error, "host '%s' disabled.", row[0]);
 			DBfree_result(result);
@@ -1423,7 +1444,9 @@ static int	process_escalations(int now)
 				execute_escalation(&escalation);
 			}
 			else if (0 != esc_superseded)
+			{
 				escalation.status = ESCALATION_STATUS_COMPLETED;
+			}
 
 			sql_offset = 0;
 
