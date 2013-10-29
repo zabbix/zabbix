@@ -5,6 +5,7 @@ New features:
 ..F.I..... [ZBXNEXT-715] increased the size of sysmaps_elements.label and sysmaps_links.label fields to 2048 characters (Sasha)
 
 Bug fixes:
+....I..... [ZBX-7166] added database upgrade patches to set status of template triggers to Enabled and state of template items to normal (Andris, Sasha)
 ..F....... [ZBX-7198] fixed displaying trigger popup menu relative to mouse cursor in Monitoring > Overview page (Ivo)
 ....I..... [ZBX-7218] fixed configuration failing with Oracle 12.1 instant client libraries (asaveljevs, Sasha)
 A.F....... [ZBX-7165] fixed snmp fields validation in item configuration (Eduard)
