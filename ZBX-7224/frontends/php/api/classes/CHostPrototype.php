@@ -1336,17 +1336,17 @@ class CHostPrototype extends CHostBase {
 
 	/**
 	 * Deletes the given group prototype and all discovered groups.
-	 * Deletes also group prototype childs.
+	 * Deletes also group prototype children.
 	 *
 	 * @param array $groupPrototypeIds
 	 */
 	protected function deleteGroupPrototypes(array $groupPrototypeIds) {
 		// delete child group prototypes
-		$groupPrototypesChilds = DBfetchArray(DBselect(
+		$groupPrototypeChildren = DBfetchArray(DBselect(
 			'SELECT gp.group_prototypeid FROM group_prototype gp WHERE '.dbConditionInt('templateid', $groupPrototypeIds)
 		));
-		if ($groupPrototypesChilds) {
-			$this->deleteGroupPrototypes(zbx_objectValues($groupPrototypesChilds, 'group_prototypeid'));
+		if ($groupPrototypeChildren) {
+			$this->deleteGroupPrototypes(zbx_objectValues($groupPrototypeChildren, 'group_prototypeid'));
 		}
 
 		// delete discovered groups
