@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-30 15:09+0200\n"
+"POT-Creation-Date: 2013-10-30 16:14+0200\n"
 "PO-Revision-Date: 2013-08-25 15:11+0200\n"
 "Last-Translator: solutionware <shiys@solutionware.com.cn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1213,7 +1213,7 @@ msgstr "不能添加一个非数字监控项 \"%1$s\" 到图表 \"%2$s\"."
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
 msgstr ""
 
-#: include/reports.inc.php:505
+#: include/reports.inc.php:504
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\"."
 msgstr ""
@@ -6920,7 +6920,7 @@ msgstr "不正确的值\"%1$s\"于整数栏位\"%2$s\"中."
 msgid "Incorrect value \"%1$s\" for unsigned int field \"%2$s\"."
 msgstr "不正确的值\"%1$s\"于无正负整数栏位\"%2$s\"中."
 
-#: include/reports.inc.php:540 include/reports.inc.php:544
+#: include/reports.inc.php:539 include/reports.inc.php:543
 #, c-format
 msgid "Incorrect value for field \"%1$s\"."
 msgstr ""
@@ -7106,7 +7106,7 @@ msgstr "无效的参数个数."
 msgid "Invalid params."
 msgstr "无效的参数."
 
-#: include/reports.inc.php:590 include/reports.inc.php:594
+#: include/reports.inc.php:589 include/reports.inc.php:593
 #, c-format
 msgid "Invalid period for field \"%1$s\"."
 msgstr ""
@@ -8575,7 +8575,7 @@ msgstr "缺少了\"%1$s\" 字段对于动作条件"
 msgid "Missing \"%1$s\" field for item."
 msgstr ""
 
-#: include/reports.inc.php:580
+#: include/reports.inc.php:579
 #, c-format
 msgid "Missing \"%1$s\" field for period."
 msgstr ""

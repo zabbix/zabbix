@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-30 15:09+0200\n"
+"POT-Creation-Date: 2013-10-30 16:14+0200\n"
 "PO-Revision-Date: 2013-09-12 19:01+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1220,7 +1220,7 @@ msgstr "Não é possível adicionar o item não numérico \"%1$s\" ao gráfico \
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
 msgstr "Não foi possível adicionar o item não numérico \"%1$s\" ao protótipo de gráfico \"%2$s\"."
 
-#: include/reports.inc.php:505
+#: include/reports.inc.php:504
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\"."
 msgstr ""
@@ -6933,7 +6933,7 @@ msgstr "O valor \"%1$s\" é inválido para o campo \"%2$s\" - espera-se um núme
 msgid "Incorrect value \"%1$s\" for unsigned int field \"%2$s\"."
 msgstr "O valor \"%1$s\" é inválido para o campo \"%2$s\" - espera-se um número inteiro positivo."
 
-#: include/reports.inc.php:540 include/reports.inc.php:544
+#: include/reports.inc.php:539 include/reports.inc.php:543
 #, c-format
 msgid "Incorrect value for field \"%1$s\"."
 msgstr ""
@@ -7121,7 +7121,7 @@ msgstr "Quantidade de parâmetros inválida."
 msgid "Invalid params."
 msgstr "Parâmetros inválidos."
 
-#: include/reports.inc.php:590 include/reports.inc.php:594
+#: include/reports.inc.php:589 include/reports.inc.php:593
 #, c-format
 msgid "Invalid period for field \"%1$s\"."
 msgstr ""
@@ -8624,7 +8624,7 @@ msgstr "O campo \"%1$s\" está faltando na condição da ação."
 msgid "Missing \"%1$s\" field for item."
 msgstr ""
 
-#: include/reports.inc.php:580
+#: include/reports.inc.php:579
 #, c-format
 msgid "Missing \"%1$s\" field for period."
 msgstr ""
