@@ -20,7 +20,7 @@
 
 
 $mapWidget = new CWidget('hat_maps');
-$mapTable = new CTable(_('No maps defined.'), 'map map-container');
+$mapTable = new CTable(_('No maps found.'), 'map map-container');
 $mapTable->setAttribute('style', 'margin-top: 4px;');
 
 $icon = $fsIcon = null;

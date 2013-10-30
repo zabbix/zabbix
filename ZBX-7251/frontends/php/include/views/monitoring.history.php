@@ -181,7 +181,7 @@ else {
 		$historyWidget->addFlicker($filterForm, CProfile::get('web.history.filter.state', 1));
 	}
 
-	$historyTable = new CTable(_('No graphs defined.'), 'maxwidth');
+	$historyTable = new CTable(null, 'maxwidth');
 	$historyTable->addRow($screen->get());
 
 	$historyWidget->addItem($historyTable);
