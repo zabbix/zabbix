@@ -39,7 +39,7 @@ $userGroupsForm = new CForm();
 $userGroupsForm->setName('userGroupsForm');
 
 // create user group table
-$userGroupTable = new CTableInfo(_('No user groups defined.'));
+$userGroupTable = new CTableInfo(_('No user groups found.'));
 $userGroupTable->setHeader(array(
 	new CCheckBox('all_groups', null, "checkAll('".$userGroupsForm->getName()."','all_groups','group_groupid');"),
 	$this->data['displayNodes'] ? _('Node') : null,

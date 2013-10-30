@@ -786,7 +786,7 @@ else {
 	$form = new CForm();
 	$form->setName('hosts');
 
-	$table = new CTableInfo(_('No hosts defined.'));
+	$table = new CTableInfo(_('No hosts found.'));
 	$table->setHeader(array(
 		new CCheckBox('all_hosts', null, "checkAll('".$form->getName()."', 'all_hosts', 'hosts');"),
 		$displayNodes ? _('Node') : null,

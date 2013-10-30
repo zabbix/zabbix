@@ -180,7 +180,7 @@ function make_system_status($filter) {
 		$ackParams['screenid'] = $filter['screenid'];
 	}
 
-	$table = new CTableInfo();
+	$table = new CTableInfo(_('No host groups found.'));
 	$table->setHeader(array(
 		is_show_all_nodes() ? _('Node') : null,
 		_('Host group'),
@@ -370,7 +370,7 @@ function make_system_status($filter) {
 }
 
 function make_hoststat_summary($filter) {
-	$table = new CTableInfo();
+	$table = new CTableInfo(_('No host groups found.'));
 	$table->setHeader(array(
 		is_show_all_nodes() ? _('Node') : null,
 		_('Host group'),
@@ -891,7 +891,7 @@ function make_latest_issues(array $filter = array()) {
 	$lastChangeHeaderDiv = new CDiv(array(_('Time'), SPACE));
 	$lastChangeHeaderDiv->addStyle('float: left');
 
-	$table = new CTableInfo();
+	$table = new CTableInfo(_('No events found.'));
 	$table->setHeader(array(
 		is_show_all_nodes() ? _('Node') : null,
 		($filter['sortfield'] === 'hostname') ? array($hostHeaderDiv, $sortDiv) : _('Host'),
@@ -1064,7 +1064,7 @@ function make_webmon_overview($filter) {
 	));
 	$availableHostIds = array_keys($availableHosts);
 
-	$table = new CTableInfo();
+	$table = new CTableInfo(_('No web scenarios found.'));
 	$table->setHeader(array(
 		is_show_all_nodes() ? _('Node') : null,
 		_('Host group'),

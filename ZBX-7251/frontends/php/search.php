@@ -124,7 +124,7 @@ $params = array(
 $overalCount = API::Host()->get($params);
 $viewCount = count($hosts);
 
-$table = new CTableInfo();
+$table = new CTableInfo(_('No hosts found.'));
 $table->setHeader(array(
 	ZBX_DISTRIBUTED ? new CCol(_('Node')) : null,
 	new CCol(_('Hosts')),
@@ -276,7 +276,7 @@ $header = array(
 	$admin ? new CCol(_('Templates')) : null,
 );
 
-$table = new CTableInfo();
+$table = new CTableInfo(_('No host groups found.'));
 $table->setHeader($header);
 
 foreach ($hostGroups as $hnum => $group) {
@@ -387,7 +387,7 @@ if ($admin) {
 		new CCol(_('Web')),
 	);
 
-	$table = new CTableInfo();
+	$table = new CTableInfo(_('No templates found.'));
 	$table->setHeader($header);
 
 	foreach ($templates as $tnum => $template) {
