@@ -23,14 +23,22 @@ class CList extends CTag {
 
 	public $emptyList;
 
-	public function __construct($value = null, $class = null) {
+	/**
+	 * Creates a UL list.
+	 *
+	 * @param mixed $value			a single or an array of values to add to the list
+	 * @param string $class			HTML class
+	 * @param string $emptyString	text to display if the list is empty
+	 */
+	public function __construct($value = null, $class = null, $emptyString = null) {
 		parent::__construct('ul', 'yes');
 		$this->tag_end = '';
 		$this->addItem($value);
 		$this->addClass($class);
 
 		if (is_null($value)) {
-			$this->addItem(_('List is empty'), 'empty');
+			$emptyString = (!zbx_empty($emptyString)) ? $emptyString : _('List is empty');
+			$this->addItem($emptyString, 'empty');
 			$this->emptyList = true;
 		}
 	}
