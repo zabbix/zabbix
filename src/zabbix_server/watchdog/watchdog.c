@@ -32,7 +32,7 @@
 
 #define STR_REPLACE(str1, str2)	if (NULL == str1 || 0 != strcmp(str1, str2)) str1 = zbx_strdup(str1, str2)
 
-#define ALERT_FREQUENCY		15 * SEC_PER_MIN
+#define ALERT_FREQUENCY		(15 * SEC_PER_MIN)
 #define DB_PING_FREQUENCY	SEC_PER_MIN
 
 typedef struct
