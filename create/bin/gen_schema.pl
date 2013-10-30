@@ -203,7 +203,18 @@ sub newstate
 
 	if ($state ne "bof")
 	{
-		if ($output{"type"} eq "code" && $new eq "table") { print ",\n\t\t{0}\n\t\t}${uniq}\n\t},\n"; $uniq = ""; }
+		if ($output{"type"} eq "code" && $new eq "table")
+		{
+			if ($uniq ne "")
+			{
+				print ",\n\t\t{0}\n\t\t}${uniq}\n\t},\n";
+				$uniq = "";
+			}
+			else
+			{
+				print ",\n\t\t{0}\n\t\t},\n\t\tNULL\n\t},\n";
+			}
+		}
 	}
 
 	$state = $new;
