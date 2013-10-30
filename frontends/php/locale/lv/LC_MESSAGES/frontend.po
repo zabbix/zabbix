@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-30 15:09+0200\n"
+"POT-Creation-Date: 2013-10-30 16:14+0200\n"
 "PO-Revision-Date: 2013-10-15 07:19+0300\n"
 "Last-Translator: Jaba <janis.jaunbalodis@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1229,7 +1229,7 @@ msgstr ""
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
 msgstr ""
 
-#: include/reports.inc.php:505
+#: include/reports.inc.php:504
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\"."
 msgstr ""
@@ -6932,7 +6932,7 @@ msgstr ""
 msgid "Incorrect value \"%1$s\" for unsigned int field \"%2$s\"."
 msgstr ""
 
-#: include/reports.inc.php:540 include/reports.inc.php:544
+#: include/reports.inc.php:539 include/reports.inc.php:543
 #, c-format
 msgid "Incorrect value for field \"%1$s\"."
 msgstr ""
@@ -7118,7 +7118,7 @@ msgstr ""
 msgid "Invalid params."
 msgstr ""
 
-#: include/reports.inc.php:590 include/reports.inc.php:594
+#: include/reports.inc.php:589 include/reports.inc.php:593
 #, c-format
 msgid "Invalid period for field \"%1$s\"."
 msgstr ""
@@ -8601,7 +8601,7 @@ msgstr ""
 msgid "Missing \"%1$s\" field for item."
 msgstr ""
 
-#: include/reports.inc.php:580
+#: include/reports.inc.php:579
 #, c-format
 msgid "Missing \"%1$s\" field for period."
 msgstr ""
@@ -10210,7 +10210,7 @@ msgstr "PHP bcmath"
 
 #: include/classes/class.frontendsetup.php:322
 msgid "PHP bcmath extension missing (PHP configuration parameter --enable-bcmath)"
-msgstr "Trūkst PHP bcmath paplašinājums (PHP konfigurācija parameters --enable-bcmath)"
+msgstr "Trūkst PHP bcmath paplašinājums (PHP konfigurācija parameters --enable-bcmath)Trūkst PHP bcmath paplašinājums (PHP konfigurācija parameters --enable-bcmath)"
 
 #: include/classes/class.frontendsetup.php:549
 msgid "PHP ctype"
@@ -10218,7 +10218,7 @@ msgstr "PHP ctype"
 
 #: include/classes/class.frontendsetup.php:553
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)"
-msgstr "Trūkst PHP ctype paplašinājums (PHP konfigurācija parameters --enable-ctype)"
+msgstr "Trūkst PHP ctype paplašinājums (PHP konfigurācija parameters --enable-ctype)Trūkst PHP ctype paplašinājums (PHP konfigurācija parameters --enable-ctype)"
 
 #: include/classes/class.frontendsetup.php:290
 msgid "PHP databases support"
@@ -10263,7 +10263,7 @@ msgstr "PHP gettext"
 
 #: include/classes/class.frontendsetup.php:610
 msgid "PHP gettext extension missing (PHP configuration parameter --with-gettext)"
-msgstr "Trūkst PHP gettext paplašinājums (PHP konfigurācija parameters --with-gettext)"
+msgstr "Trūkst PHP gettext paplašinājums (PHP konfigurācija parameters --with-gettext)Trūkst PHP gettext paplašinājums (PHP konfigurācija parameters --with-gettext)"
 
 #: include/classes/class.frontendsetup.php:482
 msgid "PHP libxml"
@@ -10279,7 +10279,7 @@ msgstr "PHP mbstring"
 
 #: include/classes/class.frontendsetup.php:341
 msgid "PHP mbstring extension missing (PHP configuration parameter --enable-mbstring)"
-msgstr "Trūkst mbstring paplašinājums (PHP konfigurācijas parametrs --enable-mbstring)"
+msgstr "Trūkst mbstring paplašinājums (PHP konfigurācijas parametrs --enable-mbstring)Trūkst mbstring paplašinājums (PHP konfigurācijas parametrs --enable-mbstring)"
 
 #: include/classes/class.frontendsetup.php:174
 msgid "PHP option max_execution_time"
