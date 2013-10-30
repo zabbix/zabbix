@@ -143,7 +143,6 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 			*value++ = '\0';
 
 			zbx_rtrim(parameter, ZBX_CFG_RTRIM_CHARS);
-
 			zbx_ltrim(value, ZBX_CFG_LTRIM_CHARS);
 
 			zabbix_log(LOG_LEVEL_DEBUG, "cfg: para: [%s] val [%s]", parameter, value);
@@ -156,16 +155,8 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 				continue;
 			}
 
-			for (i = 0; '\0' != value[i]; i++)
-			{
-				if ('\n' == value[i])
-				{
-					value[i] = '\0';
-					break;
-				}
-			}
-
 			param_valid = 0;
+
 			for (i = 0; NULL != cfg[i].parameter; i++)
 			{
 				if (0 != strcmp(cfg[i].parameter, parameter))
@@ -173,7 +164,8 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 
 				param_valid = 1;
 
-				zabbix_log(LOG_LEVEL_DEBUG, "accepted configuration parameter: '%s' = '%s'",parameter, value);
+				zabbix_log(LOG_LEVEL_DEBUG, "accepted configuration parameter: '%s' = '%s'",
+						parameter, value);
 
 				switch (cfg[i].type)
 				{
