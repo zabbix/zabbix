@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "log.h"
+#include "setproctitle.h"
 
 #ifdef _WINDOWS
 char	ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
@@ -326,7 +327,7 @@ char    *zbx_strdup2(const char *filename, int line, char *old, const char *str)
  ******************************************************************************/
 void	__zbx_zbx_setproctitle(const char *fmt, ...)
 {
-#ifdef HAVE_FUNCTION_SETPROCTITLE
+#if defined(HAVE_FUNCTION_SETPROCTITLE) || defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	char	title[MAX_STRING_LEN];
 	va_list	args;
 
@@ -334,7 +335,13 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...)
 	zbx_vsnprintf(title, sizeof(title), fmt, args);
 	va_end(args);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "%s", title);
+#endif
+
+#if defined(HAVE_FUNCTION_SETPROCTITLE)
 	setproctitle(title);
+#elif defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
+	setproctitle_set_status(title);
 #endif
 }
 
@@ -1295,48 +1302,55 @@ int	is_double_suffix(const char *str)
  * Return value:  SUCCEED - the string is double                              *
  *                FAIL - otherwise                                            *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
  *                                                                            *
  ******************************************************************************/
 int	is_double(const char *str)
 {
-	size_t	i, len;
-	char	dot = 0;
+	int	i = 0, digits = 0;
 
-	for (i = 0; ' ' == str[i] && '\0' != str[i]; i++)	/* trim left spaces */
-		;
+	while (' ' == str[i])				/* trim left spaces */
+		i++;
 
-	for (len = 0; '\0' != str[i]; i++, len++)
+	if ('-' == str[i] || '+' == str[i])		/* check leading sign */
+		i++;
+
+	while (0 != isdigit(str[i]))			/* check digits before dot */
 	{
-		/* negative number? */
-		if ('-' == str[i] && 0 == i)
-			continue;
-
-		if (0 != isdigit(str[i]))
-			continue;
-
-		if ('.' == str[i] && 0 == dot)
-		{
-			dot = 1;
-			continue;
-		}
-
-		if (' ' == str[i])	/* check right spaces */
-		{
-			for (; ' ' == str[i] && '\0' != str[i]; i++)	/* trim right spaces */
-				;
-
-			if ('\0' == str[i])
-				break;	/* SUCCEED */
-		}
-
-		return FAIL;
+		i++;
+		digits = 1;
 	}
 
-	if (0 == len || (1 == len && 0 != dot))
+	if ('.' == str[i])				/* check decimal dot */
+		i++;
+
+	while (0 != isdigit(str[i]))			/* check digits after dot */
+	{
+		i++;
+		digits = 1;
+	}
+
+	if (0 == digits)				/* 1., .1, and 1.1 are good, just . is not */
 		return FAIL;
 
-	return SUCCEED;
+	if ('e' == str[i] || 'E' == str[i])		/* check exponential part */
+	{
+		i++;
+
+		if ('-' == str[i] || '+' == str[i])	/* check exponent sign */
+			i++;
+
+		if (0 == isdigit(str[i]))		/* check exponent */
+			return FAIL;
+
+		while (0 != isdigit(str[i]))
+			i++;
+	}
+
+	while (' ' == str[i])				/* trim right spaces */
+		i++;
+
+	return '\0' == str[i] ? SUCCEED : FAIL;
 }
 
 /******************************************************************************

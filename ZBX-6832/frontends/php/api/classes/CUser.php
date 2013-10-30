@@ -312,11 +312,11 @@ class CUser extends CZBXAPI {
 					self::exception(
 						ZBX_API_ERROR_PARAMETERS,
 						_n(
-							'Maximum alias length is %2$d characters, "%3$s" is %1$d character.',
-							'Maximum alias length is %2$d characters, "%3$s" is %1$d characters.',
-							zbx_strlen($user['alias']),
+							'Maximum alias length is %1$d characters, "%2$s" is %3$d character.',
+							'Maximum alias length is %1$d characters, "%2$s" is %3$d characters.',
 							64,
-							$user['alias']
+							$user['alias'],
+							zbx_strlen($user['alias'])
 						)
 					);
 				}

@@ -3352,7 +3352,7 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '3',
+				'default' => '0',
 			),
 			'highlight' => array(
 				'null' => false,
@@ -3528,13 +3528,14 @@ return array(
 			'label' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 2048,
 				'default' => '',
 			),
 			'label_location' => array(
-				'null' => true,
+				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
+				'default' => '-1',
 			),
 			'x' => array(
 				'null' => false,
@@ -3645,7 +3646,7 @@ return array(
 			'label' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 2048,
 				'default' => '',
 			),
 		),

@@ -111,8 +111,7 @@ foreach (getLocales() as $localeId => $locale) {
 			$localeId,
 			$locale['name'],
 			($localeId == $this->data['lang']) ? true : null,
-			$localeExists,
-			$localeExists == 'yes' ? '' : 'disabled'
+			$localeExists
 		);
 
 		if ($localeExists != 'yes') {

@@ -103,8 +103,8 @@ class CScreenHistory extends CScreenBase {
 				'nodeids' => get_current_nodeid(),
 				'itemids' => $this->itemids,
 				'webitems' => true,
-				'selectHosts' => array('hostid', 'name'),
-				'output' => API_OUTPUT_EXTEND,
+				'selectHosts' => array('name'),
+				'output' => array('itemid', 'key_', 'name', 'value_type', 'valuemapid'),
 				'preservekeys' => true
 			));
 

@@ -25,6 +25,7 @@ void	add_event(zbx_uint64_t eventid, unsigned char source, unsigned char object,
 {
 }
 
-void	process_events()
+int	process_events(void)
 {
+	return 0;
 }
