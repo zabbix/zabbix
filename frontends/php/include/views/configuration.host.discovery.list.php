@@ -38,7 +38,7 @@ $discoveryForm->setName('discovery');
 $discoveryForm->addVar('hostid', $this->data['hostid']);
 
 // create table
-$discoveryTable = new CTableInfo(_('No discovery rules defined.'));
+$discoveryTable = new CTableInfo(_('No discovery rules found.'));
 
 $sortLink = new CUrl();
 $sortLink->setArgument('hostid', $this->data['hostid']);

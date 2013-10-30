@@ -33,7 +33,7 @@ $mediaTypeForm = new CForm();
 $mediaTypeForm->setName('mediaTypesForm');
 
 // create table
-$mediaTypeTable = new CTableInfo(_('No media types defined.'));
+$mediaTypeTable = new CTableInfo(_('No media types found.'));
 $mediaTypeTable->setHeader(array(
 	new CCheckBox('all_media_types', null, "checkAll('".$mediaTypeForm->getName()."', 'all_media_types', 'mediatypeids');"),
 	$this->data['displayNodes'] ? _('Node') : null,

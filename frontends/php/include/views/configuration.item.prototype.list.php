@@ -40,7 +40,7 @@ $itemForm->addVar('hostid', $this->data['hostid']);
 $itemForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 
 // create table
-$itemTable = new CTableInfo(_('No items prototypes defined.'));
+$itemTable = new CTableInfo(_('No items prototypes found.'));
 
 $sortLink = new CUrl();
 $sortLink->setArgument('parent_discoveryid', $this->data['parent_discoveryid']);
