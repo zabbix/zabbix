@@ -24,6 +24,6 @@ int	is_master_node(int current_nodeid, int master_nodeid);
 int	is_slave_node(int current_nodeid, int slave_nodeid);
 int	is_direct_slave_node(int slave_nodeid);
 
-void	main_nodewatcher_loop();
+void	main_nodewatcher_loop(void);
 
 #endif

@@ -1008,16 +1008,6 @@ static int	DBpatch_2010040(void)
 	return DBrename_field("triggers", "value_flags", &field);
 }
 
-static int	DBpatch_2010041(void)
-{
-	return DBdrop_index("events", "events_1");
-}
-
-static int	DBpatch_2010042(void)
-{
-	return DBcreate_index("events", "events_1", "source,object,objectid,eventid", 1);
-}
-
 static int	DBpatch_2010043(void)
 {
 	const ZBX_FIELD field = {"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
@@ -2145,6 +2135,109 @@ static int	DBpatch_2010181(void)
 	return DBmodify_field_type("interface", &field);
 }
 
+static int	DBpatch_2010182(void)
+{
+	const ZBX_FIELD	field = {"label", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("sysmaps_elements", &field);
+}
+
+static int	DBpatch_2010183(void)
+{
+	const ZBX_FIELD	field = {"label", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("sysmaps_links", &field);
+}
+
+static int	DBpatch_2010184(void)
+{
+	const ZBX_FIELD	field = {"label_location", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("sysmaps", &field);
+}
+
+static int	DBpatch_2010185(void)
+{
+	if (ZBX_DB_OK > DBexecute("update sysmaps_elements set label_location=-1 where label_location is null"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_2010186(void)
+{
+	const ZBX_FIELD	field = {"label_location", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("sysmaps_elements", &field);
+}
+
+static int	DBpatch_2010187(void)
+{
+	const ZBX_FIELD	field = {"label_location", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_not_null("sysmaps_elements", &field);
+}
+
+static int	DBpatch_2010188(void)
+{
+	return DBdrop_index("events", "events_1");
+}
+
+static int	DBpatch_2010189(void)
+{
+	return DBdrop_index("events", "events_2");
+}
+
+static int	DBpatch_2010190(void)
+{
+	return DBcreate_index("events", "events_1", "source,object,objectid,clock", 0);
+}
+
+static int	DBpatch_2010191(void)
+{
+	return DBcreate_index("events", "events_2", "source,object,clock", 0);
+}
+
+static int	DBpatch_2010192(void)
+{
+	if (ZBX_DB_OK <= DBexecute(
+			"update triggers"
+			" set state=%d,value=%d,lastchange=0,error=''"
+			" where exists ("
+				"select null"
+				" from functions f,items i,hosts h"
+				" where triggers.triggerid=f.triggerid"
+					" and f.itemid=i.itemid"
+					" and i.hostid=h.hostid"
+					" and h.status=%d"
+			")",
+			TRIGGER_STATE_NORMAL, TRIGGER_VALUE_OK, HOST_STATUS_TEMPLATE))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_2010193(void)
+{
+	if (ZBX_DB_OK <= DBexecute(
+			"update items"
+			" set state=%d,error=''"
+			" where exists ("
+				"select null"
+				" from hosts h"
+				" where items.hostid=h.hostid"
+					" and h.status=%d"
+			")",
+			ITEM_STATE_NORMAL, HOST_STATUS_TEMPLATE))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 #define DBPATCH_END()					{NULL}};
@@ -2234,8 +2327,6 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010038, 0, 0)
 	DBPATCH_ADD(2010039, 0, 0)
 	DBPATCH_ADD(2010040, 0, 1)
-	DBPATCH_ADD(2010041, 0, 0)
-	DBPATCH_ADD(2010042, 0, 0)
 	DBPATCH_ADD(2010043, 0, 1)
 	DBPATCH_ADD(2010044, 0, 1)
 	DBPATCH_ADD(2010045, 0, 1)
@@ -2375,6 +2466,18 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010179, 0, 1)
 	DBPATCH_ADD(2010180, 0, 1)
 	DBPATCH_ADD(2010181, 0, 1)
+	DBPATCH_ADD(2010182, 0, 1)
+	DBPATCH_ADD(2010183, 0, 1)
+	DBPATCH_ADD(2010184, 0, 1)
+	DBPATCH_ADD(2010185, 0, 1)
+	DBPATCH_ADD(2010186, 0, 1)
+	DBPATCH_ADD(2010187, 0, 1)
+	DBPATCH_ADD(2010188, 0, 1)
+	DBPATCH_ADD(2010189, 0, 1)
+	DBPATCH_ADD(2010190, 0, 1)
+	DBPATCH_ADD(2010191, 0, 1)
+	DBPATCH_ADD(2010192, 0, 0)
+	DBPATCH_ADD(2010193, 0, 0)
 
 	DBPATCH_END()
 

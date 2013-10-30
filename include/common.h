@@ -738,9 +738,6 @@ void	help(void);
 void	usage(void);
 void	version(void);
 
-/* max length of base64 data */
-#define ZBX_MAX_B64_LEN 16 * 1024
-
 const char	*get_program_name(const char *path);
 
 typedef enum
@@ -869,6 +866,9 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define ZBX_JAN_1970_IN_SEC	2208988800.0	/* 1970 - 1900 in seconds */
 
 #define ZBX_MAX_RECV_DATA_SIZE	(64 * ZBX_MEBIBYTE)
+
+/* max length of base64 data */
+#define ZBX_MAX_B64_LEN	(16 * ZBX_KIBIBYTE)
 
 double	zbx_time(void);
 void	zbx_timespec(zbx_timespec_t *ts);
