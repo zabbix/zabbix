@@ -137,7 +137,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestTextPresent('Type');
 		$this->zbxTestClickWait("//form[@name='imageForm']//table//a[text()='".$this->bg_image_name."']");
 		$this->input_type('name', $this->bg_image_name2);
-		$this->type('image', '/home/hudson/igor/trunk/frontends/php/images/sysmaps/Satellite.png');
+		$this->type('image', '/home/hudson/public_html/trunk-FRONTEND-MYSQL/frontends/php/images/sysmaps/Printer.png');
 		$this->zbxTestClickWait('save');
 		$this->zbxTestCheckTitle('Configuration of images');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF IMAGES', 'Images', 'Image updated'));
