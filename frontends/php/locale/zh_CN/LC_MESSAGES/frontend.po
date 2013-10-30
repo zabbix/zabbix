@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-25 16:42+0300\n"
+"POT-Creation-Date: 2013-10-30 15:09+0200\n"
 "PO-Revision-Date: 2013-08-25 15:11+0200\n"
 "Last-Translator: solutionware <shiys@solutionware.com.cn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -221,7 +221,7 @@ msgstr "可接受的SLA"
 msgid "Access denied!"
 msgstr "存取被拒!"
 
-#: include/func.inc.php:2066
+#: include/func.inc.php:2065
 msgid "Access denied."
 msgstr "访问被拒绝."
 
@@ -390,7 +390,7 @@ msgstr "作用中直到"
 #: include/views/administration.usergroups.edit.php:111
 #: include/views/administration.usergroups.edit.php:115
 #: include/views/administration.users.edit.php:90
-#: include/views/administration.users.edit.php:195
+#: include/views/administration.users.edit.php:194
 #: include/views/common.macros.php:66
 #: include/views/configuration.action.edit.php:308
 #: include/views/configuration.action.edit.php:507
@@ -622,7 +622,7 @@ msgstr "应用集 错误."
 msgid "Application updated"
 msgstr "应用集已更新"
 
-#: api/classes/CItemGeneral.php:374
+#: api/classes/CItemGeneral.php:391
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "ID为 \"%1$s\"的应用集不在 \"%2$s\" 之中."
@@ -656,7 +656,7 @@ msgstr "接近中"
 msgid "Apr"
 msgstr "四月"
 
-#: include/forms.inc.php:1660 include/func.inc.php:115
+#: include/forms.inc.php:1679 include/func.inc.php:115
 #: include/func.inc.php:246 jsLoader.php:121
 msgid "April"
 msgstr "四月"
@@ -720,7 +720,7 @@ msgid "At %1$s:%2$s on every day"
 msgid_plural "At %1$s:%2$s on every %3$s days"
 msgstr[0] ""
 
-#: include/forms.inc.php:1739
+#: include/forms.inc.php:1758
 msgid "At (hour:minute)"
 msgstr "于(时:分)"
 
@@ -753,7 +753,7 @@ msgstr "审计纪录"
 msgid "Aug"
 msgstr "八月"
 
-#: include/forms.inc.php:1652 include/func.inc.php:119
+#: include/forms.inc.php:1671 include/func.inc.php:119
 #: include/func.inc.php:250 jsLoader.php:125
 msgid "August"
 msgstr "八月"
@@ -803,11 +803,11 @@ msgstr "验证协议"
 msgid "Auto registration"
 msgstr "自动注册"
 
-#: include/views/administration.users.edit.php:143
+#: include/views/administration.users.edit.php:142
 msgid "Auto-login"
 msgstr "自动登入"
 
-#: include/views/administration.users.edit.php:144 profile.php:50 users.php:61
+#: include/views/administration.users.edit.php:143 profile.php:50 users.php:61
 msgid "Auto-logout (min 90 seconds)"
 msgstr "自动退出(90秒)"
 
@@ -1035,7 +1035,7 @@ msgstr "项目原型的组态"
 
 #: include/views/configuration.item.copy.php:28
 #: include/views/configuration.item.list.php:39
-#: include/views/configuration.item.massupdate.php:28 items.php:778
+#: include/views/configuration.item.massupdate.php:28 items.php:779
 msgid "CONFIGURATION OF ITEMS"
 msgstr "项目的组态"
 
@@ -1180,7 +1180,7 @@ msgid "Canada (136 characters)"
 msgstr "加拿大 (136 字元)"
 
 #: include/classes/class.cbuttoncancel.php:25 include/js.inc.php:222
-#: include/setup.inc.php:136
+#: include/setup.inc.php:140
 #: include/views/administration.general.regularexpressions.edit.php:58
 #: include/views/configuration.action.edit.php:1002
 #: include/views/configuration.action.edit.php:1011
@@ -1408,7 +1408,7 @@ msgstr "无法连接到系统主机主控程序的捉捕器的埠, 但是它应�
 msgid "Cannot copy graphs"
 msgstr "无法複製图形"
 
-#: items.php:716
+#: items.php:717
 msgid "Cannot copy items"
 msgstr "无法複製项目"
 
@@ -1550,7 +1550,7 @@ msgstr "无法删除资产纪录."
 msgid "Cannot delete item"
 msgstr "无法删除项目"
 
-#: disc_prototypes.php:336 items.php:769
+#: disc_prototypes.php:336 items.php:770
 msgid "Cannot delete items"
 msgstr "无法删除项目"
 
@@ -2147,7 +2147,7 @@ msgstr ""
 msgid "Cannot update item"
 msgstr "无法更新项目"
 
-#: items.php:660
+#: items.php:661
 msgid "Cannot update items"
 msgstr "无法更新项目"
 
@@ -2717,7 +2717,7 @@ msgstr "确认文字"
 #: include/views/inventory.host.view.php:103
 #: include/views/inventory.host.view.php:125
 #: include/views/inventory.host.view.php:147
-#: include/views/inventory.host.view.php:169
+#: include/views/inventory.host.view.php:168
 #: include/views/js/configuration.sysmaps.js.php:357
 msgid "Connect to"
 msgstr "连接到"
@@ -2870,7 +2870,7 @@ msgstr "创建图标映射"
 msgid "Create image"
 msgstr "创建图像"
 
-#: include/views/configuration.item.list.php:37 items.php:776
+#: include/views/configuration.item.list.php:37 items.php:777
 msgid "Create item"
 msgstr "创建监控项"
 
@@ -3035,7 +3035,7 @@ msgstr "当前时间是 > N"
 msgid "Current time is NOT N"
 msgstr "当前时间不是 N"
 
-#: include/setup.inc.php:191
+#: include/setup.inc.php:198
 msgid "Current value"
 msgstr "当前值"
 
@@ -3137,7 +3137,7 @@ msgstr "DNS"
 #: include/views/inventory.host.view.php:103
 #: include/views/inventory.host.view.php:125
 #: include/views/inventory.host.view.php:147
-#: include/views/inventory.host.view.php:169
+#: include/views/inventory.host.view.php:168
 msgid "DNS name"
 msgstr "DNS名称"
 
@@ -3145,7 +3145,7 @@ msgstr "DNS名称"
 msgid "DOWN"
 msgstr "断线"
 
-#: include/forms.inc.php:1609 include/maintenances.inc.php:36
+#: include/forms.inc.php:1628 include/maintenances.inc.php:36
 #: include/reports.inc.php:61 include/reports.inc.php:397
 #: include/reports.inc.php:405 report3.php:58 report4.php:108
 msgid "Daily"
@@ -3194,11 +3194,11 @@ msgstr "数据概览"
 msgid "Data type"
 msgstr "数据类型"
 
-#: include/setup.inc.php:249 include/setup.inc.php:352
+#: include/setup.inc.php:256 include/setup.inc.php:359
 msgid "Database file"
 msgstr "数据库文件"
 
-#: include/setup.inc.php:253 setup.php:45
+#: include/setup.inc.php:260 setup.php:38
 msgid "Database host"
 msgstr "数据库主机"
 
@@ -3206,36 +3206,36 @@ msgstr "数据库主机"
 msgid "Database monitor"
 msgstr "数据库监视"
 
-#: include/setup.inc.php:264 include/setup.inc.php:364 setup.php:47
+#: include/setup.inc.php:271 include/setup.inc.php:371 setup.php:40
 msgid "Database name"
 msgstr "数据库名称"
 
-#: include/setup.inc.php:366
+#: include/setup.inc.php:373
 msgid "Database password"
 msgstr "数据库密码"
 
-#: include/setup.inc.php:257 include/setup.inc.php:359
-#: include/setup.inc.php:362 setup.php:46
+#: include/setup.inc.php:264 include/setup.inc.php:366
+#: include/setup.inc.php:369 setup.php:39
 msgid "Database port"
 msgstr "数据端口"
 
-#: include/setup.inc.php:269 include/setup.inc.php:368
+#: include/setup.inc.php:276 include/setup.inc.php:375
 msgid "Database schema"
 msgstr "数据库概要"
 
-#: include/setup.inc.php:357
+#: include/setup.inc.php:364
 msgid "Database server"
 msgstr "数据库服务器"
 
-#: include/setup.inc.php:246 include/setup.inc.php:345
+#: include/setup.inc.php:253 include/setup.inc.php:352
 msgid "Database type"
 msgstr "数据库类型"
 
-#: include/setup.inc.php:365
+#: include/setup.inc.php:372
 msgid "Database user"
 msgstr "数据库用户"
 
-#: include/forms.inc.php:1676 include/forms.inc.php:1735 jsrpc.php:137
+#: include/forms.inc.php:1695 include/forms.inc.php:1754 jsrpc.php:137
 msgid "Date"
 msgstr "日期"
 
@@ -3255,12 +3255,12 @@ msgstr "硬件维修过期日期"
 msgid "Date HW purchased"
 msgstr "硬件购买日期"
 
-#: include/forms.inc.php:1678 report3.php:124 report4.php:168 report5.php:44
+#: include/forms.inc.php:1697 report3.php:124 report4.php:168 report5.php:44
 #: tr_status.php:285 tr_status.php:287
 msgid "Day"
 msgstr "日"
 
-#: include/forms.inc.php:1710
+#: include/forms.inc.php:1729
 msgid "Day of month"
 msgstr "月中第几日"
 
@@ -3280,8 +3280,8 @@ msgstr "月中第几日是 > N"
 msgid "Day of month is NOT N"
 msgstr "月中第几日不是 N"
 
-#: include/forms.inc.php:1638 include/forms.inc.php:1681
-#: include/forms.inc.php:1706
+#: include/forms.inc.php:1657 include/forms.inc.php:1700
+#: include/forms.inc.php:1725
 msgid "Day of week"
 msgstr "星期中第几日"
 
@@ -3301,7 +3301,7 @@ msgstr "星期中第几日是 > N"
 msgid "Day of week is NOT N"
 msgstr "星期中第几日不是 N"
 
-#: include/forms.inc.php:1752 tr_status.php:285 tr_status.php:287
+#: include/forms.inc.php:1771 tr_status.php:285 tr_status.php:287
 msgid "Days"
 msgstr "天数"
 
@@ -3323,7 +3323,7 @@ msgstr "调试模式已更新"
 msgid "Dec"
 msgstr "十二"
 
-#: include/forms.inc.php:1672 include/func.inc.php:123
+#: include/forms.inc.php:1691 include/func.inc.php:123
 #: include/func.inc.php:254 jsLoader.php:129
 msgid "December"
 msgstr "十二"
@@ -3494,7 +3494,7 @@ msgstr "删除脚本?"
 #: include/views/administration.usergroups.edit.php:116
 #: include/views/administration.usergroups.list.php:153
 #: include/views/administration.users.edit.php:94
-#: include/views/administration.users.edit.php:198
+#: include/views/administration.users.edit.php:197
 #: include/views/administration.users.list.php:138
 #: include/views/configuration.action.list.php:105
 #: include/views/configuration.application.list.php:120
@@ -3625,7 +3625,7 @@ msgstr "删除所选的模板?"
 msgid "Delete selected triggers?"
 msgstr "删除所选的触发器?"
 
-#: include/views/administration.users.edit.php:366
+#: include/views/administration.users.edit.php:365
 msgid "Delete selected user?"
 msgstr "删除所选的用户?"
 
@@ -3785,7 +3785,7 @@ msgid "Description"
 msgstr "描述"
 
 #: include/actions.inc.php:966 include/blocks.inc.php:719
-#: include/func.inc.php:2186
+#: include/func.inc.php:2185
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:44
 #: include/views/configuration.action.edit.php:328
@@ -3944,7 +3944,7 @@ msgstr "停用所选的触发器?"
 #: include/views/administration.usergroups.list.php:59
 #: include/views/administration.usergroups.list.php:84
 #: include/views/administration.usergroups.list.php:88
-#: include/views/administration.users.edit.php:164
+#: include/views/administration.users.edit.php:163
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.list.php:73
@@ -4011,7 +4011,7 @@ msgid "Discovery object"
 msgstr "探索物件"
 
 #: include/actions.inc.php:70 include/audit.inc.php:44
-#: include/blocks.inc.php:1159 include/forms.inc.php:1117
+#: include/blocks.inc.php:1159 include/forms.inc.php:1118
 #: include/views/configuration.discovery.edit.php:81
 #: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:32
@@ -4235,7 +4235,7 @@ msgctxt "Exa short"
 msgid "E"
 msgstr "E"
 
-#: include/func.inc.php:2153
+#: include/func.inc.php:2152
 msgid "ERROR"
 msgstr "错误"
 
@@ -4247,7 +4247,7 @@ msgstr "事件"
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "每个URL必须是唯一的. 请确保仅有一个URL为名."
 
-#: include/views/administration.users.edit.php:190
+#: include/views/administration.users.edit.php:189
 #: include/views/configuration.action.edit.php:376
 #: include/views/configuration.action.edit.php:389
 #: include/views/configuration.maintenance.edit.php:112
@@ -4486,7 +4486,7 @@ msgstr "启用所选的触发器?"
 #: include/views/administration.usergroups.list.php:58
 #: include/views/administration.usergroups.list.php:83
 #: include/views/administration.usergroups.list.php:88
-#: include/views/administration.users.edit.php:160
+#: include/views/administration.users.edit.php:159
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.edit.php:59
@@ -4592,11 +4592,11 @@ msgstr "事件"
 msgid "Events and alerts"
 msgstr "时间和报警"
 
-#: include/forms.inc.php:1621
+#: include/forms.inc.php:1640
 msgid "Every day(s)"
 msgstr "每日"
 
-#: include/forms.inc.php:1628
+#: include/forms.inc.php:1647
 msgid "Every week(s)"
 msgstr "每週"
 
@@ -4678,8 +4678,8 @@ msgstr "汇出到CSV"
 msgid "Expression"
 msgstr "表示式"
 
-#: include/forms.inc.php:1445 include/forms.inc.php:1450
-#: include/forms.inc.php:1463
+#: include/forms.inc.php:1464 include/forms.inc.php:1469
+#: include/forms.inc.php:1482
 msgid "Expression Syntax Error."
 msgstr "表示式语法错误."
 
@@ -4731,8 +4731,8 @@ msgstr "伪"
 msgid "FTP"
 msgstr "FTP"
 
-#: include/setup.inc.php:202 include/setup.inc.php:304
-#: include/setup.inc.php:458
+#: include/setup.inc.php:209 include/setup.inc.php:311
+#: include/setup.inc.php:465
 msgid "Fail"
 msgstr "失败"
 
@@ -4768,7 +4768,7 @@ msgstr "常用的"
 msgid "Feb"
 msgstr "二月"
 
-#: include/forms.inc.php:1650 include/func.inc.php:113
+#: include/forms.inc.php:1669 include/func.inc.php:113
 #: include/func.inc.php:244 jsLoader.php:119
 msgid "February"
 msgstr "二月"
@@ -4880,7 +4880,7 @@ msgstr "查找字符串V的最后 (最近的) 值. N = 1 - 如果发现，0 - �
 msgid "Find string V in last (most recent) value. N NOT 1 - if found, 0 - otherwise"
 msgstr "查找字符串V的最后 (最近的) 值. N = 1 - 如果发现，0 - 其他"
 
-#: include/setup.inc.php:129
+#: include/setup.inc.php:133
 msgid "Finish"
 msgstr "完成"
 
@@ -4888,7 +4888,7 @@ msgstr "完成"
 msgid "Finnish (fi_FI)"
 msgstr "芬兰语 (fi_FI)"
 
-#: include/forms.inc.php:1688 include/maintenances.inc.php:118
+#: include/forms.inc.php:1707 include/maintenances.inc.php:118
 msgid "First"
 msgstr "首"
 
@@ -4919,7 +4919,7 @@ msgstr "访客的密码必须为空"
 msgid "Formula"
 msgstr "公式"
 
-#: include/forms.inc.php:1691 include/maintenances.inc.php:121
+#: include/forms.inc.php:1710 include/maintenances.inc.php:121
 msgid "Fourth"
 msgstr "第四"
 
@@ -4931,7 +4931,7 @@ msgstr "法语 (fr_FR)"
 msgid "Fri"
 msgstr "週五"
 
-#: include/forms.inc.php:1635 include/forms.inc.php:1703
+#: include/forms.inc.php:1654 include/forms.inc.php:1722
 #: include/func.inc.php:135 include/func.inc.php:219
 msgid "Friday"
 msgstr "週五"
@@ -4957,7 +4957,7 @@ msgstr "前端存取"
 msgid "Frontend access updated"
 msgstr "前端存取已更新"
 
-#: include/views/administration.users.edit.php:209
+#: include/views/administration.users.edit.php:208
 msgid "Frontend messaging"
 msgstr "前端信息中"
 
@@ -5064,7 +5064,7 @@ msgstr "确认"
 msgid "Go to"
 msgstr "到"
 
-#: include/func.inc.php:2084
+#: include/func.inc.php:2083
 msgid "Go to dashboard"
 msgstr "转到仪表板"
 
@@ -5464,7 +5464,7 @@ msgstr "历史记录"
 msgid "History and simple graphs"
 msgstr "简单图形的历史"
 
-#: httpconf.php:307 items.php:500 items.php:505 items.php:738 items.php:744
+#: httpconf.php:307 items.php:500 items.php:505 items.php:739 items.php:745
 msgid "History cleared"
 msgstr "历史已清除"
 
@@ -5497,7 +5497,7 @@ msgstr "横向对齐"
 #: include/classes/screens/CScreenHostTriggers.php:63
 #: include/classes/screens/CScreenHostTriggers.php:123
 #: include/forms.inc.php:552 include/html.inc.php:378 include/maps.inc.php:24
-#: include/setup.inc.php:317 include/triggers.inc.php:1247
+#: include/setup.inc.php:324 include/triggers.inc.php:1247
 #: include/triggers.inc.php:1599
 #: include/views/configuration.application.list.php:45
 #: include/views/configuration.application.list.php:61
@@ -5522,8 +5522,8 @@ msgstr "横向对齐"
 #: include/views/js/configuration.sysmaps.js.php:99
 #: include/views/monitoring.charts.php:26
 #: include/views/monitoring.screen.php:97
-#: include/views/monitoring.slides.php:83 items.php:500 items.php:738
-#: items.php:765 jsLoader.php:146 latest.php:292 latest.php:318 latest.php:335
+#: include/views/monitoring.slides.php:83 items.php:500 items.php:739
+#: items.php:766 jsLoader.php:146 latest.php:292 latest.php:318 latest.php:335
 #: popup.php:510 popup.php:526 popup.php:818 popup.php:1019 queue.php:202
 #: report2.php:360 report2.php:396 report5.php:59 tr_status.php:250
 #: tr_status.php:367
@@ -5852,7 +5852,7 @@ msgstr "主机已更新"
 msgid "Hourly"
 msgstr "每小时"
 
-#: include/forms.inc.php:1754
+#: include/forms.inc.php:1773
 msgid "Hours"
 msgstr "时"
 
@@ -5905,7 +5905,7 @@ msgstr "IP地址"
 #: include/views/inventory.host.view.php:103
 #: include/views/inventory.host.view.php:125
 #: include/views/inventory.host.view.php:147
-#: include/views/inventory.host.view.php:169
+#: include/views/inventory.host.view.php:168
 msgid "IP address"
 msgstr "IP地址"
 
@@ -5943,7 +5943,7 @@ msgstr "IPMI认证演算法"
 #: include/views/configuration.host.edit.php:293
 #: include/views/configuration.host.edit.php:369
 #: include/views/configuration.host.prototype.edit.php:146
-#: include/views/inventory.host.view.php:156
+#: include/views/inventory.host.view.php:177
 msgid "IPMI interfaces"
 msgstr "IPMI介面"
 
@@ -6125,7 +6125,7 @@ msgstr "图示"
 msgid "Identical expression already exists"
 msgstr "相同的表达式已经存在"
 
-#: include/func.inc.php:2074 include/func.inc.php:2094
+#: include/func.inc.php:2073 include/func.inc.php:2093
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "假如您认为这个信息是错的, 请谘询您的管理者关于如何取得需要的许可权."
 
@@ -6205,7 +6205,7 @@ msgstr "汇入文件"
 msgid "Imported successfully"
 msgstr "已成功汇入"
 
-#: hostinventories.php:171
+#: hostinventories.php:173
 #, c-format
 msgid "Impossible to filter by inventory field \"%s\", which does not exist."
 msgstr "不可能以不存在的资产纪录栏位\"%s\"来过滤."
@@ -6429,7 +6429,7 @@ msgstr "不正确的自变数传给方法."
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr "不正确的身份验证协议对于发现规则\"%1$s\"."
 
-#: api/classes/CItemGeneral.php:355
+#: api/classes/CItemGeneral.php:372
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr "不正确的身份验证协议监控项\"%1$s\"."
@@ -6512,12 +6512,12 @@ msgstr "不正确的触发器栏位."
 msgid "Incorrect file upload."
 msgstr "不正确的档桉上传."
 
-#: api/classes/CItemGeneral.php:811
+#: api/classes/CItemGeneral.php:828
 #, c-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "不正确的弹性间隔\"%1$s\"."
 
-#: api/classes/CItemGeneral.php:800
+#: api/classes/CItemGeneral.php:817
 #, c-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "在项目\"%1$s\"中不正确的弹性间隔. 弹性间隔必须是一个字串."
@@ -6615,13 +6615,13 @@ msgstr "提供不正确的项目值类型\"%1$s\"给触发器函数\"%2$s\"."
 msgid "Incorrect key."
 msgstr "不正确的键值."
 
-#: api/classes/CDRule.php:319 api/classes/CItemGeneral.php:288
+#: api/classes/CDRule.php:319 api/classes/CItemGeneral.php:289
 #: discoveryconf.php:110
 #, c-format
 msgid "Incorrect key: \"%1$s\"."
 msgstr "不正确的键值: \"%1$s\"."
 
-#: include/forms.inc.php:1270 items.php:890
+#: include/forms.inc.php:1289 items.php:891
 msgid "Incorrect list of items."
 msgstr "不正确的项目清单"
 
@@ -6739,7 +6739,7 @@ msgstr "不正确的埠范围."
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr "错误的隐私协议对于发现规则\"%1$s\"."
 
-#: api/classes/CItemGeneral.php:364
+#: api/classes/CItemGeneral.php:381
 #, c-format
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr "错误的隐私协议对于监控项\"%1$s\"."
@@ -6972,11 +6972,11 @@ msgstr "资讯"
 msgid "Insert"
 msgstr "插入"
 
-#: include/forms.inc.php:1457 jsLoader.php:109
+#: include/forms.inc.php:1476 jsLoader.php:109
 msgid "Insert macro"
 msgstr "插入巨集"
 
-#: include/menu.inc.php:277 include/profiles.inc.php:261 setup.php:120
+#: include/menu.inc.php:277 include/profiles.inc.php:261 setup.php:127
 msgid "Installation"
 msgstr "安装"
 
@@ -7182,11 +7182,11 @@ msgid "Italian (it_IT)"
 msgstr "意大利语 (it_IT)"
 
 #: include/audit.inc.php:36 include/classes/screens/CScreenHistory.php:163
-#: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1120
+#: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1121
 #: include/reports.inc.php:434 include/views/configuration.graph.edit.php:166
 #: include/views/configuration.graph.edit.php:221
 #: include/views/configuration.triggers.expression.php:57 items.php:499
-#: items.php:738 items.php:764 tr_logform.php:273
+#: items.php:739 items.php:765 tr_logform.php:273
 msgid "Item"
 msgstr "项目"
 
@@ -7231,7 +7231,7 @@ msgstr "\"%2$s\"上的项目\"%1$s\" : 应用集\"%3$s\"不存在."
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "略过项目\"%1$s\"-用户规则."
 
-#: api/classes/CItemGeneral.php:346
+#: api/classes/CItemGeneral.php:363
 #, c-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "项目\"%1$s:%2$s\"有无效的埠: \"%3$s\"."
@@ -7256,7 +7256,7 @@ msgstr "项目在“正常”状态"
 msgid "Item in \"not supported\" state"
 msgstr "项目在“不支持”的状态"
 
-#: include/forms.inc.php:1120
+#: include/forms.inc.php:1121
 msgid "Item prototype"
 msgstr "项目原型"
 
@@ -7293,36 +7293,36 @@ msgstr "项目使用来自非上层主机的主机介面."
 msgid "Item uses incorrect interface type."
 msgstr "项目使用不正确的介面类型."
 
-#: api/classes/CItemGeneral.php:324
+#: api/classes/CItemGeneral.php:321
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "项目将不会被刷新. 请输入正确的更新区间."
 
-#: api/classes/CItemGeneral.php:417
+#: api/classes/CItemGeneral.php:434
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "键值为 \"%1$s\"的项目已存在于\"%2$s\" 为探索规则."
 
-#: api/classes/CItemGeneral.php:423
+#: api/classes/CItemGeneral.php:440
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "键值为 \"%1$s\"的项目已存在于\"%2$s\" 为创建自项目原型的项目."
 
-#: api/classes/CItemGeneral.php:420
+#: api/classes/CItemGeneral.php:437
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "键值为 \"%1$s\"的项目已存在于\"%2$s\" 为项目原型."
 
-#: api/classes/CItemGeneral.php:414
+#: api/classes/CItemGeneral.php:431
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "键值为 \"%1$s\"的项目已存在于\"%2$s\" 为项目."
 
-#: api/classes/CItemGeneral.php:426
+#: api/classes/CItemGeneral.php:443
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "键值为 \"%1$s\"的项目已存在于\"%2$s\" 为未知的项目组件."
 
-#: api/classes/CItemGeneral.php:777
+#: api/classes/CItemGeneral.php:794
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "键值为 \"%1$s\"的项目已存在于\"%2$s\" ."
@@ -7354,19 +7354,19 @@ msgstr "项目"
 msgid "Items (m/d/n)"
 msgstr "项目 (m/d/n)"
 
-#: applications.php:211 disc_prototypes.php:325 items.php:675
+#: applications.php:211 disc_prototypes.php:325 items.php:676
 msgid "Items activated"
 msgstr "项目已激活"
 
-#: items.php:716
+#: items.php:717
 msgid "Items copied"
 msgstr "项目已複製"
 
-#: disc_prototypes.php:336 items.php:769
+#: disc_prototypes.php:336 items.php:770
 msgid "Items deleted"
 msgstr "项目已删除"
 
-#: applications.php:214 disc_prototypes.php:325 items.php:686
+#: applications.php:214 disc_prototypes.php:325 items.php:687
 msgid "Items disabled"
 msgstr "项目已失效"
 
@@ -7374,7 +7374,7 @@ msgstr "项目已失效"
 msgid "Items list"
 msgstr "项目清单"
 
-#: items.php:660
+#: items.php:661
 msgid "Items updated"
 msgstr "监控项已更新"
 
@@ -7389,7 +7389,7 @@ msgstr "JMX 端点代理程式"
 #: include/views/configuration.host.edit.php:278
 #: include/views/configuration.host.edit.php:356
 #: include/views/configuration.host.prototype.edit.php:133
-#: include/views/inventory.host.view.php:177
+#: include/views/inventory.host.view.php:155
 msgid "JMX interfaces"
 msgstr "JMX介面"
 
@@ -7424,7 +7424,7 @@ msgstr "Jabber 标识符"
 msgid "Jan"
 msgstr "一月"
 
-#: include/forms.inc.php:1645 include/func.inc.php:112
+#: include/forms.inc.php:1664 include/func.inc.php:112
 #: include/func.inc.php:243 jsLoader.php:118
 msgid "January"
 msgstr "一月"
@@ -7437,7 +7437,7 @@ msgstr "日语 (ja_JP)"
 msgid "Jul"
 msgstr "七月"
 
-#: include/forms.inc.php:1647 include/func.inc.php:118
+#: include/forms.inc.php:1666 include/func.inc.php:118
 #: include/func.inc.php:249 jsLoader.php:124
 msgid "July"
 msgstr "七月"
@@ -7446,7 +7446,7 @@ msgstr "七月"
 msgid "Jun"
 msgstr "六月"
 
-#: include/forms.inc.php:1670 include/func.inc.php:117
+#: include/forms.inc.php:1689 include/func.inc.php:117
 #: include/func.inc.php:248 jsLoader.php:123
 msgid "June"
 msgstr "六月"
@@ -7595,7 +7595,7 @@ msgstr "保持用户会话数据(天)\"%1$s\"."
 msgid "Key"
 msgstr "键值"
 
-#: api/classes/CItemGeneral.php:298
+#: api/classes/CItemGeneral.php:300
 #, c-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "键值\"%1$s\"不符 <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
@@ -7677,11 +7677,11 @@ msgstr "标示"
 msgid "Label location"
 msgstr "标示位置"
 
-#: include/views/administration.users.edit.php:130
+#: include/views/administration.users.edit.php:129
 msgid "Language"
 msgstr "语言"
 
-#: include/forms.inc.php:1692 include/maintenances.inc.php:122
+#: include/forms.inc.php:1711 include/maintenances.inc.php:122
 msgid "Last"
 msgstr "末"
 
@@ -7978,7 +7978,7 @@ msgstr "日志与SNMP捉捕器不符"
 msgid "Logged in as"
 msgstr "登入为"
 
-#: auditlogs.php:143 include/func.inc.php:2080 include/func.inc.php:2097
+#: auditlogs.php:143 include/func.inc.php:2079 include/func.inc.php:2096
 #: include/menu.inc.php:282 include/page_header.php:227
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:64
@@ -8150,7 +8150,7 @@ msgstr "维修已删除"
 msgid "Maintenance period"
 msgstr "维护周期"
 
-#: include/forms.inc.php:1749
+#: include/forms.inc.php:1768
 msgid "Maintenance period length"
 msgstr "维修期间长度"
 
@@ -8263,7 +8263,7 @@ msgstr "拓墣图"
 msgid "Mar"
 msgstr "三月"
 
-#: include/forms.inc.php:1655 include/func.inc.php:114
+#: include/forms.inc.php:1674 include/func.inc.php:114
 #: include/func.inc.php:245 jsLoader.php:120
 msgid "March"
 msgstr "三月"
@@ -8324,7 +8324,7 @@ msgid "Max count of events per trigger to show"
 msgstr "可展示的每触发器最多事件计数"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2188
+#: include/func.inc.php:2187
 msgid "Maximize"
 msgstr "最大化"
 
@@ -8379,7 +8379,7 @@ msgid "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d cha
 msgid_plural "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d characters."
 msgstr[0] ""
 
-#: include/forms.inc.php:1665 include/func.inc.php:116
+#: include/forms.inc.php:1684 include/func.inc.php:116
 #: include/func.inc.php:247 jsLoader.php:122
 msgid "May"
 msgstr "五月"
@@ -8389,8 +8389,8 @@ msgctxt "May short"
 msgid "May"
 msgstr "五月"
 
-#: include/views/administration.users.edit.php:194
-#: include/views/administration.users.edit.php:322 popup_media.php:27
+#: include/views/administration.users.edit.php:193
+#: include/views/administration.users.edit.php:321 popup_media.php:27
 msgid "Media"
 msgstr "示警媒介"
 
@@ -8471,11 +8471,11 @@ msgstr "信息动作"
 msgid "Message text limit"
 msgstr "信息文字限制"
 
-#: include/views/administration.users.edit.php:215
+#: include/views/administration.users.edit.php:214
 msgid "Message timeout"
 msgstr "信息逾时"
 
-#: include/views/administration.users.edit.php:210
+#: include/views/administration.users.edit.php:209
 msgid "Message timeout (seconds)"
 msgstr "信息逾时(秒)"
 
@@ -8483,7 +8483,7 @@ msgstr "信息逾时(秒)"
 msgid "Messages"
 msgstr "信息"
 
-#: include/views/administration.users.edit.php:351
+#: include/views/administration.users.edit.php:350
 msgid "Messaging"
 msgstr "信息中"
 
@@ -8497,7 +8497,7 @@ msgid "Middle"
 msgstr "居中"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2188
+#: include/func.inc.php:2187
 msgid "Minimize"
 msgstr "最小化"
 
@@ -8561,7 +8561,7 @@ msgstr "周期T的最小值是 > N"
 msgid "Minimum value for period T is NOT N"
 msgstr "周期T的最小值不是N"
 
-#: include/forms.inc.php:1756
+#: include/forms.inc.php:1775
 msgid "Minutes"
 msgstr "分"
 
@@ -8633,7 +8633,7 @@ msgstr "模型"
 msgid "Mon"
 msgstr "一"
 
-#: include/forms.inc.php:1631 include/forms.inc.php:1699
+#: include/forms.inc.php:1650 include/forms.inc.php:1718
 #: include/func.inc.php:131 include/func.inc.php:215
 msgid "Monday"
 msgstr "週一"
@@ -8659,11 +8659,11 @@ msgstr "已监测的主机"
 msgid "Monitoring"
 msgstr "监测中"
 
-#: include/forms.inc.php:1674 report3.php:106 report4.php:155 report5.php:46
+#: include/forms.inc.php:1693 report3.php:106 report4.php:155 report5.php:46
 msgid "Month"
 msgstr "月"
 
-#: include/forms.inc.php:1611 include/maintenances.inc.php:40
+#: include/forms.inc.php:1630 include/maintenances.inc.php:40
 #: include/reports.inc.php:63 include/reports.inc.php:399
 #: include/reports.inc.php:407 report3.php:60 report4.php:110
 msgid "Monthly"
@@ -8728,7 +8728,7 @@ msgstr "NTLM认证"
 #: graphs.php:41 host_discovery.php:41 hosts.php:759 hosts.php:793
 #: httpconf.php:44 httpmon.php:88 include/forms.inc.php:599
 #: include/hosts.inc.php:115 include/reports.inc.php:171
-#: include/setup.inc.php:325
+#: include/setup.inc.php:332
 #: include/views/administration.general.iconmap.edit.php:29
 #: include/views/administration.general.iconmap.list.php:25
 #: include/views/administration.general.image.edit.php:35
@@ -8881,7 +8881,7 @@ msgstr "新的正规表示式"
 msgid "New service time"
 msgstr "新的服务时间"
 
-#: include/setup.inc.php:126
+#: include/setup.inc.php:130
 msgid "Next"
 msgstr "下一步"
 
@@ -8891,7 +8891,7 @@ msgid "Next"
 msgstr "次"
 
 #: events.php:761 include/events.inc.php:362 include/events.inc.php:380
-#: include/func.inc.php:2407 include/triggers.inc.php:1606
+#: include/func.inc.php:2406 include/triggers.inc.php:1606
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
 #: include/views/js/adm.regexprs.edit.js.php:142
@@ -8936,6 +8936,14 @@ msgstr ""
 #: include/views/configuration.host.edit.php:353
 #: include/views/configuration.host.prototype.edit.php:130
 msgid "No JMX interfaces defined."
+msgstr ""
+
+#: api/classes/CItemGeneral.php:351
+msgid "No SNMP OID specified."
+msgstr ""
+
+#: api/classes/CItemGeneral.php:357
+msgid "No SNMP community specified."
 msgstr ""
 
 #: include/views/configuration.host.edit.php:340
@@ -9001,7 +9009,7 @@ msgstr "没有指定给动作操作命令\"%s\"的认证类型."
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "没有指定给动作操作命令\"%s\"的认证用户名称."
 
-#: api/classes/CItemGeneral.php:330
+#: api/classes/CItemGeneral.php:328
 msgid "No authentication user name specified."
 msgstr "没有指定的认证用户名称"
 
@@ -9290,7 +9298,7 @@ msgstr "没有已定义的对应."
 msgid "No matches found"
 msgstr "没有找到匹配"
 
-#: include/views/administration.users.edit.php:156
+#: include/views/administration.users.edit.php:155
 msgid "No media defined."
 msgstr "没有已定义的示警媒介."
 
@@ -9408,7 +9416,7 @@ msgstr "没有所说的物件的许可权或其不存在!"
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "没有指定给动作操作命令\"%s\"的私有金钥."
 
-#: api/classes/CItemGeneral.php:338
+#: api/classes/CItemGeneral.php:336
 msgid "No private key file specified."
 msgstr "没有指定的私有金钥."
 
@@ -9429,7 +9437,7 @@ msgstr "没有给定代理ID."
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "没有指定给动作操作命令\"%s\"的公开金钥档."
 
-#: api/classes/CItemGeneral.php:335
+#: api/classes/CItemGeneral.php:333
 msgid "No public key file specified."
 msgstr "没有指定的公开金钥档"
 
@@ -9490,7 +9498,7 @@ msgstr "没有已定义的步骤."
 msgid "No target selected"
 msgstr "没有选择目标"
 
-#: graphs.php:331 items.php:722
+#: graphs.php:331 items.php:723
 msgid "No target selected."
 msgstr "没有已选的目标"
 
@@ -9711,7 +9719,7 @@ msgstr "警报"
 msgid "Nov"
 msgstr "十一"
 
-#: include/forms.inc.php:1667 include/func.inc.php:122
+#: include/forms.inc.php:1686 include/func.inc.php:122
 #: include/func.inc.php:253 jsLoader.php:128
 msgid "November"
 msgstr "十一月"
@@ -9801,9 +9809,9 @@ msgstr "OEM"
 #: chart4.php:159 chart5.php:192 httpdetails.php:149 httpdetails.php:234
 #: httpmon.php:149 include/classes/tree/CServiceTree.php:46
 #: include/maps.inc.php:676 include/maps.inc.php:758 include/maps.inc.php:848
-#: include/maps.inc.php:938 include/setup.inc.php:199
-#: include/setup.inc.php:228 include/setup.inc.php:303
-#: include/setup.inc.php:457 include/triggers.inc.php:166
+#: include/maps.inc.php:938 include/setup.inc.php:206
+#: include/setup.inc.php:235 include/setup.inc.php:310
+#: include/setup.inc.php:464 include/triggers.inc.php:166
 #: include/views/monitoring.overview.php:41
 msgid "OK"
 msgstr "正常"
@@ -9859,7 +9867,7 @@ msgstr "十月"
 msgid "Octal"
 msgstr "八进位"
 
-#: include/forms.inc.php:1662 include/func.inc.php:121
+#: include/forms.inc.php:1681 include/func.inc.php:121
 #: include/func.inc.php:252 jsLoader.php:127
 msgid "October"
 msgstr "十月"
@@ -9885,7 +9893,7 @@ msgstr "开"
 msgid "On status change triggers blink for"
 msgstr "于状态改变时, 触发器因此闪烁于"
 
-#: include/views/administration.users.edit.php:213
+#: include/views/administration.users.edit.php:212
 msgid "Once"
 msgstr "一次"
 
@@ -9893,7 +9901,7 @@ msgstr "一次"
 msgid "One of the objects is left without a host group."
 msgstr "其中的一个对象被留下没有主机组."
 
-#: include/forms.inc.php:1608 include/maintenances.inc.php:34
+#: include/forms.inc.php:1627 include/maintenances.inc.php:34
 msgid "One time only"
 msgstr "一次性"
 
@@ -10388,7 +10396,7 @@ msgstr "解析错误"
 msgid "Passive"
 msgstr "被动式"
 
-#: httpconf.php:55 include/setup.inc.php:278
+#: httpconf.php:55 include/setup.inc.php:285
 #: include/views/administration.mediatypes.edit.php:82
 #: include/views/administration.mediatypes.edit.php:86
 #: include/views/administration.users.edit.php:60
@@ -10443,7 +10451,7 @@ msgstr "百分比线(右)"
 msgid "Period"
 msgstr "期间"
 
-#: include/forms.inc.php:1613
+#: include/forms.inc.php:1632
 #: include/views/configuration.maintenance.edit.php:100
 msgid "Period type"
 msgstr "期间类型"
@@ -10454,11 +10462,11 @@ msgid "Periods"
 msgstr "期间"
 
 #: include/views/administration.usergroups.edit.php:129
-#: include/views/administration.users.edit.php:348
+#: include/views/administration.users.edit.php:347
 msgid "Permissions"
 msgstr "许可权"
 
-#: include/views/administration.users.edit.php:346
+#: include/views/administration.users.edit.php:345
 msgid "Permissions can be assigned for user groups only."
 msgstr "许可权只能被指派予用户群组"
 
@@ -10482,12 +10490,12 @@ msgstr "置入演算法"
 msgid "Plain text"
 msgstr "文本"
 
-#: include/views/administration.users.edit.php:228
-#: include/views/administration.users.edit.php:265
+#: include/views/administration.users.edit.php:227
+#: include/views/administration.users.edit.php:264
 msgid "Play"
 msgstr "播放"
 
-#: include/views/administration.users.edit.php:216
+#: include/views/administration.users.edit.php:215
 msgid "Play sound"
 msgstr "播放声音"
 
@@ -10495,7 +10503,7 @@ msgstr "播放声音"
 msgid "Please be aware that database still contains data related to the deleted node."
 msgstr "请注意, 资料库依然含有和删除的节点关联的资料."
 
-#: include/setup.inc.php:222
+#: include/setup.inc.php:229
 msgid "Please correct all issues and press \"Retry\" button"
 msgstr "请修正所有的议题并按下\"再试\"按钮"
 
@@ -10516,7 +10524,7 @@ msgid "Populates host inventory field"
 msgstr "填入主机资产纪录栏位"
 
 #: authentication.php:37 disc_prototypes.php:82 host_discovery.php:79
-#: hosts.php:762 include/forms.inc.php:490 include/setup.inc.php:321
+#: hosts.php:762 include/forms.inc.php:490 include/setup.inc.php:328
 #: include/views/administration.authentication.edit.php:58
 #: include/views/administration.node.edit.php:78
 #: include/views/administration.node.list.php:44
@@ -10530,8 +10538,8 @@ msgstr "填入主机资产纪录栏位"
 #: include/views/inventory.host.view.php:103
 #: include/views/inventory.host.view.php:125
 #: include/views/inventory.host.view.php:147
-#: include/views/inventory.host.view.php:169 items.php:86 items.php:149
-#: nodes.php:40 setup.php:53
+#: include/views/inventory.host.view.php:168 items.php:86 items.php:149
+#: nodes.php:40 setup.php:46
 msgid "Port"
 msgstr "埠"
 
@@ -10566,7 +10574,7 @@ msgstr "贴上"
 msgid "Preview"
 msgstr "预览"
 
-#: include/setup.inc.php:146
+#: include/setup.inc.php:150
 msgid "Previous"
 msgstr "前"
 
@@ -10813,7 +10821,7 @@ msgstr "接收者(降幂)"
 msgid "Recipient(s)"
 msgstr "收件人(s)"
 
-#: include/views/administration.users.edit.php:225
+#: include/views/administration.users.edit.php:224
 msgid "Recovery"
 msgstr "恢复"
 
@@ -10826,7 +10834,7 @@ msgstr "恢复信息"
 msgid "Recovery subject"
 msgstr "恢复主旨"
 
-#: include/views/administration.users.edit.php:145 profile.php:52 users.php:63
+#: include/views/administration.users.edit.php:144 profile.php:52 users.php:63
 msgid "Refresh (in seconds)"
 msgstr "刷新(秒计)"
 
@@ -11024,7 +11032,7 @@ msgstr "报表 3"
 msgid "Reports"
 msgstr "报表"
 
-#: include/setup.inc.php:192 include/views/configuration.httpconf.edit.php:165
+#: include/setup.inc.php:199 include/views/configuration.httpconf.edit.php:165
 msgid "Required"
 msgstr "要求的"
 
@@ -11155,7 +11163,7 @@ msgstr "剩馀可试数(升幂)"
 msgid "Retries left (descending)"
 msgstr "剩馀可试数(降幂)"
 
-#: include/setup.inc.php:224 include/setup.inc.php:463
+#: include/setup.inc.php:231 include/setup.inc.php:470
 #: include/views/general.warning.php:33
 msgid "Retry"
 msgstr "再试"
@@ -11187,7 +11195,7 @@ msgstr "位于X的屏幕元素 X - %1$s 和Y - %2$s的行跨度太大."
 msgid "Rows"
 msgstr "行"
 
-#: include/views/administration.users.edit.php:146 profile.php:53 users.php:64
+#: include/views/administration.users.edit.php:145 profile.php:53 users.php:64
 msgid "Rows per page"
 msgstr "每页行数"
 
@@ -11336,7 +11344,7 @@ msgstr "SNMP介面"
 msgid "SNMP trap"
 msgstr "SNMP捉捕"
 
-#: api/classes/CItemGeneral.php:306
+#: api/classes/CItemGeneral.php:345
 msgid "SNMP trap key is invalid."
 msgstr "SNMP捉捕键值是无效的"
 
@@ -11409,7 +11417,7 @@ msgstr "Safari"
 msgid "Sat"
 msgstr "六"
 
-#: include/forms.inc.php:1636 include/forms.inc.php:1704
+#: include/forms.inc.php:1655 include/forms.inc.php:1723
 #: include/func.inc.php:136 include/func.inc.php:220
 msgid "Saturday"
 msgstr "週六"
@@ -11436,9 +11444,9 @@ msgstr "週六"
 #: include/views/administration.script.edit.php:119
 #: include/views/administration.usergroups.edit.php:137
 #: include/views/administration.usergroups.edit.php:143
-#: include/views/administration.users.edit.php:359
-#: include/views/administration.users.edit.php:363
-#: include/views/administration.users.edit.php:373
+#: include/views/administration.users.edit.php:358
+#: include/views/administration.users.edit.php:362
+#: include/views/administration.users.edit.php:372
 #: include/views/configuration.action.edit.php:1034
 #: include/views/configuration.application.edit.php:52
 #: include/views/configuration.application.edit.php:62
@@ -11648,7 +11656,7 @@ msgstr "搜寻式样是空白"
 msgid "Search/Filter elements limit"
 msgstr "搜寻/过滤组件限制"
 
-#: include/forms.inc.php:1689 include/maintenances.inc.php:119
+#: include/forms.inc.php:1708 include/maintenances.inc.php:119
 msgid "Second"
 msgstr "秒"
 
@@ -11680,7 +11688,7 @@ msgstr "第二个POC电话B"
 msgid "Secondary POC screen name"
 msgstr "第二个POC筛选名称"
 
-#: include/views/administration.users.edit.php:214
+#: include/views/administration.users.edit.php:213
 msgid "Seconds"
 msgstr "秒"
 
@@ -11808,7 +11816,7 @@ msgstr "九月"
 msgid "Separated"
 msgstr "分开的"
 
-#: include/forms.inc.php:1657 include/func.inc.php:120
+#: include/forms.inc.php:1676 include/func.inc.php:120
 #: include/func.inc.php:251 jsLoader.php:126
 msgid "September"
 msgstr "九月"
@@ -12331,8 +12339,8 @@ msgstr "名字为\"%1$s\"的步骤已经存在."
 msgid "Steps"
 msgstr "步骤"
 
-#: include/views/administration.users.edit.php:229
-#: include/views/administration.users.edit.php:266
+#: include/views/administration.users.edit.php:228
+#: include/views/administration.users.edit.php:265
 msgid "Stop"
 msgstr "停止"
 
@@ -12389,7 +12397,7 @@ msgstr "期间 T 的值总数不是 N"
 msgid "Sun"
 msgstr "日"
 
-#: include/forms.inc.php:1637 include/forms.inc.php:1705
+#: include/forms.inc.php:1656 include/forms.inc.php:1724
 #: include/func.inc.php:138 include/func.inc.php:214
 msgid "Sunday"
 msgstr "日"
@@ -12411,7 +12419,7 @@ msgstr "瑞士(sv_SE)"
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "切换认证方法将重设除了此连线期之外的所有连线!继续吗?"
 
-#: include/users.inc.php:83 include/views/administration.users.edit.php:133
+#: include/users.inc.php:83 include/views/administration.users.edit.php:132
 msgid "System default"
 msgstr "系统预设"
 
@@ -12696,7 +12704,7 @@ msgstr "请求的远程程序不存在/不可用"
 msgid "The web scenario application belongs to a different host than the web scenario host."
 msgstr "web 场景应用属于一个不同的主机而不是 web 场景主机."
 
-#: include/views/administration.users.edit.php:135
+#: include/views/administration.users.edit.php:134
 msgid "Theme"
 msgstr "背景主题"
 
@@ -12706,7 +12714,7 @@ msgid "There is \"%1$d\" group with Internal GUI access."
 msgid_plural "There are \"%1$d\" groups with Internal GUI access."
 msgstr[0] "有内部GUI存取的群组\"%1$d\"."
 
-#: include/forms.inc.php:1690 include/maintenances.inc.php:120
+#: include/forms.inc.php:1709 include/maintenances.inc.php:120
 msgid "Third"
 msgstr "第三的"
 
@@ -12739,7 +12747,7 @@ msgstr "本年"
 msgid "Thu"
 msgstr "四"
 
-#: include/forms.inc.php:1634 include/forms.inc.php:1702
+#: include/forms.inc.php:1653 include/forms.inc.php:1721
 #: include/func.inc.php:134 include/func.inc.php:218
 msgid "Thursday"
 msgstr "週四"
@@ -13007,7 +13015,7 @@ msgstr "触发器类型之于"
 msgid "Trigger severities"
 msgstr "触发器严重性"
 
-#: include/actions.inc.php:54 include/views/administration.users.edit.php:273
+#: include/actions.inc.php:54 include/views/administration.users.edit.php:272
 msgid "Trigger severity"
 msgstr "触发器示警度"
 
@@ -13086,7 +13094,7 @@ msgstr "尝试读取不能存取的属性\"%s\"."
 msgid "Tue"
 msgstr "二"
 
-#: include/forms.inc.php:1632 include/forms.inc.php:1700
+#: include/forms.inc.php:1651 include/forms.inc.php:1719
 #: include/func.inc.php:132 include/func.inc.php:216
 msgid "Tuesday"
 msgstr "週二"
@@ -13165,11 +13173,11 @@ msgstr "计算方式"
 msgid "Type of information"
 msgstr "数据类型"
 
-#: api/classes/CItemGeneral.php:316
+#: api/classes/CItemGeneral.php:313
 msgid "Type of information must be \"Log\" for log key."
 msgstr "日志键值的资讯类型必须是\"Log\" ."
 
-#: api/classes/CItemGeneral.php:312
+#: api/classes/CItemGeneral.php:308
 msgid "Type of information must be \"Numeric (float)\" for aggregate items."
 msgstr "整合性项目的资讯的类型必须是\"Numeric (float)\"."
 
@@ -13194,7 +13202,7 @@ msgstr "上线"
 msgid "URL"
 msgstr "URL"
 
-#: include/views/administration.users.edit.php:147
+#: include/views/administration.users.edit.php:146
 msgid "URL (after login)"
 msgstr "URL (登陆后)"
 
@@ -13232,7 +13240,7 @@ msgstr "USA (160字元)"
 msgid "USER PROFILE"
 msgstr "用户基本资料"
 
-#: include/func.inc.php:2586
+#: include/func.inc.php:2585
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -13571,10 +13579,10 @@ msgid "Used in actions"
 msgstr "用于动作中"
 
 #: httpconf.php:53 include/acknow.inc.php:49 include/actions.inc.php:965
-#: include/audit.inc.php:24 include/hosts.inc.php:67 include/setup.inc.php:274
+#: include/audit.inc.php:24 include/hosts.inc.php:67 include/setup.inc.php:281
 #: include/views/administration.auditlogs.list.php:56
 #: include/views/administration.auditlogs.list.php:86
-#: include/views/administration.users.edit.php:320
+#: include/views/administration.users.edit.php:319
 #: include/views/configuration.action.edit.php:512
 #: include/views/configuration.httpconf.edit.php:82
 msgid "User"
@@ -13589,7 +13597,7 @@ msgstr "用户\"%s\"不能没有用户群组."
 msgid "User added"
 msgstr "添加用户"
 
-#: include/views/administration.users.edit.php:338
+#: include/views/administration.users.edit.php:337
 msgid "User can't change type for himself"
 msgstr "用户不能自行改变类型"
 
@@ -13689,8 +13697,8 @@ msgstr "用户基本资料"
 msgid "User sessions"
 msgstr "用户会话"
 
-#: include/views/administration.users.edit.php:338
-#: include/views/administration.users.edit.php:342
+#: include/views/administration.users.edit.php:337
+#: include/views/administration.users.edit.php:341
 #: include/views/administration.users.list.php:58
 msgid "User type"
 msgstr "用户类型"
@@ -13950,7 +13958,7 @@ msgstr "Web 场景"
 msgid "Wed"
 msgstr "三"
 
-#: include/forms.inc.php:1633 include/forms.inc.php:1701
+#: include/forms.inc.php:1652 include/forms.inc.php:1720
 #: include/func.inc.php:133 include/func.inc.php:217
 msgid "Wednesday"
 msgstr "週三"
@@ -13959,7 +13967,7 @@ msgstr "週三"
 msgid "Week"
 msgstr "週"
 
-#: include/forms.inc.php:1610 include/maintenances.inc.php:38
+#: include/forms.inc.php:1629 include/maintenances.inc.php:38
 #: include/reports.inc.php:62 include/reports.inc.php:398
 #: include/reports.inc.php:406 report3.php:59 report4.php:109
 msgid "Weekly"
@@ -14220,7 +14228,7 @@ msgstr "每年"
 
 #: events.php:761 include/blocks.inc.php:727
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:365
-#: include/events.inc.php:383 include/func.inc.php:2407
+#: include/events.inc.php:383 include/func.inc.php:2406
 #: include/triggers.inc.php:1606
 #: include/views/administration.users.list.php:76
 #: include/views/js/adm.regexprs.edit.js.php:139
@@ -14231,7 +14239,7 @@ msgstr "是"
 msgid "Yotta"
 msgstr "Yotta"
 
-#: include/views/administration.users.edit.php:128
+#: include/views/administration.users.edit.php:127
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "您无法选择某些语言, 因为这些语系并未安装于web伺服器上."
 
@@ -14240,7 +14248,7 @@ msgstr "您无法选择某些语言, 因为这些语系并未安装于web伺服�
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "您未被允许来帮用户\"%s\"转换优先权."
 
-#: include/func.inc.php:2090
+#: include/func.inc.php:2089
 msgid "You are not logged in."
 msgstr "您尚未登入."
 
@@ -14291,15 +14299,15 @@ msgstr "您没有许可权来更新其它用户."
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "您没有许可权来来更新用户或用户不存在."
 
-#: include/func.inc.php:2072
+#: include/func.inc.php:2071
 msgid "You have no permissions to access this page."
 msgstr "你没有许可权来访问这个页面."
 
-#: include/func.inc.php:2092
+#: include/func.inc.php:2091
 msgid "You must login to view this page."
 msgstr "您必需登入才能浏览此页面."
 
-#: include/func.inc.php:2068
+#: include/func.inc.php:2067
 msgid "Your are logged in as"
 msgstr "你已经登录作为"
 
@@ -14367,7 +14375,7 @@ msgid "Zabbix internal authentication"
 msgstr "Zabbix内部认证"
 
 #: include/classes/class.cserverinfo.php:37
-#: include/classes/class.cserverinfo.php:38 include/setup.inc.php:374
+#: include/classes/class.cserverinfo.php:38 include/setup.inc.php:381
 #: include/views/administration.script.edit.php:54
 #: include/views/configuration.action.edit.php:699
 #: include/views/js/configuration.action.edit.js.php:122
@@ -14410,11 +14418,11 @@ msgstr "Zabbix服务器端运行中"
 msgid "Zabbix server is running check interval \"%1$s\"."
 msgstr "Zabbix主机正运作检查间隔\"%1$s\"."
 
-#: include/setup.inc.php:376
+#: include/setup.inc.php:383
 msgid "Zabbix server name"
 msgstr "Zabbix主机名称"
 
-#: include/setup.inc.php:375
+#: include/setup.inc.php:382
 msgid "Zabbix server port"
 msgstr "Zabbix主机埠"
 
@@ -14567,7 +14575,7 @@ msgstr "日"
 msgid "dd"
 msgstr "dd"
 
-#: include/classes/class.cpagefilter.php:754 include/setup.inc.php:359
+#: include/classes/class.cpagefilter.php:754 include/setup.inc.php:366
 #: include/views/configuration.slideconf.edit.php:66
 #: include/views/js/configuration.slideconf.edit.js.php:13
 msgid "default"
@@ -14783,7 +14791,7 @@ msgid "not running"
 msgstr "非运行中"
 
 #: hostinventoriesoverview.php:70 include/classes/class.cpagefilter.php:807
-#: include/classes/class.cpagefilter.php:890 include/forms.inc.php:1135
+#: include/classes/class.cpagefilter.php:890 include/forms.inc.php:1136
 msgid "not selected"
 msgstr "非所选的"
 
