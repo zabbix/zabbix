@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-30 15:09+0200\n"
+"POT-Creation-Date: 2013-10-30 16:14+0200\n"
 "PO-Revision-Date: 2013-10-10 08:23+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
-"X-POOTLE-MTIME: 1381386222.0\n"
+"X-POOTLE-MTIME: 1381386223.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -23,11 +23,11 @@ msgstr "\"%s\" täytyy olla välillä 1970.01.01 - 2038.01.18."
 
 #: include/profiles.inc.php:320
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
-msgstr "\"Näytä OK-tilassa olevat liipaisimet\" täytyy olla \"0\" tai positiivinen kokonaisluku.\"Näytä OK-tilassa olevat liipaisimet\" täytyy olla \"0\" tai positiivinen kokonaisluku."
+msgstr "\"Näytä OK-tilassa olevat liipaisimet\" täytyy olla \"0\" tai positiivinen kokonaisluku.\"Näytä OK-tilassa olevat liipaisimet\" täytyy olla \"0\" tai positiivinen kokonaisluku.\"Näytä OK-tilassa olevat liipaisimet\" täytyy olla \"0\" tai positiivinen kokonaisluku."
 
 #: include/profiles.inc.php:325
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
-msgstr "\"Liipaisimet viĺkkuvat tilanvaihdossa\" täytyy olla \"0\" tai positiivinen kokonaisluku.\"Liipaisimet viĺkkuvat tilanvaihdossa\" täytyy olla \"0\" tai positiivinen kokonaisluku."
+msgstr "\"Liipaisimet viĺkkuvat tilanvaihdossa\" täytyy olla \"0\" tai positiivinen kokonaisluku.\"Liipaisimet viĺkkuvat tilanvaihdossa\" täytyy olla \"0\" tai positiivinen kokonaisluku.\"Liipaisimet viĺkkuvat tilanvaihdossa\" täytyy olla \"0\" tai positiivinen kokonaisluku."
 
 #: include/func.inc.php:442
 #, c-format
@@ -316,7 +316,7 @@ msgstr ""
 #: api/classes/CAction.php:541 api/classes/CAction.php:656
 #, c-format
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seconds)."
-msgstr "Toiminnolla \"%1$s\" on väärä arvo kohdalle \"esc_period\" (minimi %2$s sekuntia).Toiminnolla \"%1$s\" on väärä arvo kohdalle \"esc_period\" (minimi %2$s sekuntia)."
+msgstr "Toiminnolla \"%1$s\" on väärä arvo kohdalle \"esc_period\" (minimi %2$s sekuntia).Toiminnolla \"%1$s\" on väärä arvo kohdalle \"esc_period\" (minimi %2$s sekuntia).Toiminnolla \"%1$s\" on väärä arvo kohdalle \"esc_period\" (minimi %2$s sekuntia)."
 
 #: api/classes/CAction.php:727
 #, c-format
@@ -739,7 +739,7 @@ msgstr "Ainakin yksi ylläpitoikkuna täytyy olla luotuna."
 
 #: include/classes/class.frontendsetup.php:294
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
-msgstr "Ainakin MySQL, PostgreSQL, Oracle, SQLite3 tai IBM DB2 pitäisi olla tuettuAinakin MySQL, PostgreSQL, Oracle, SQLite3 tai IBM DB2 pitäisi olla tuettu"
+msgstr "Ainakin MySQL, PostgreSQL, Oracle, SQLite3 tai IBM DB2 pitäisi olla tuettuAinakin MySQL, PostgreSQL, Oracle, SQLite3 tai IBM DB2 pitäisi olla tuettuAinakin MySQL, PostgreSQL, Oracle, SQLite3 tai IBM DB2 pitäisi olla tuettu"
 
 #: include/menu.inc.php:264
 #: include/views/administration.general.housekeeper.edit.php:93
@@ -1218,7 +1218,7 @@ msgstr ""
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
 msgstr ""
 
-#: include/reports.inc.php:505
+#: include/reports.inc.php:504
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\"."
 msgstr ""
@@ -6917,7 +6917,7 @@ msgstr ""
 msgid "Incorrect value \"%1$s\" for unsigned int field \"%2$s\"."
 msgstr ""
 
-#: include/reports.inc.php:540 include/reports.inc.php:544
+#: include/reports.inc.php:539 include/reports.inc.php:543
 #, c-format
 msgid "Incorrect value for field \"%1$s\"."
 msgstr ""
@@ -7103,7 +7103,7 @@ msgstr ""
 msgid "Invalid params."
 msgstr ""
 
-#: include/reports.inc.php:590 include/reports.inc.php:594
+#: include/reports.inc.php:589 include/reports.inc.php:593
 #, c-format
 msgid "Invalid period for field \"%1$s\"."
 msgstr ""
@@ -8579,7 +8579,7 @@ msgstr ""
 msgid "Missing \"%1$s\" field for item."
 msgstr ""
 
-#: include/reports.inc.php:580
+#: include/reports.inc.php:579
 #, c-format
 msgid "Missing \"%1$s\" field for period."
 msgstr ""

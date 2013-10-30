@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-30 15:09+0200\n"
+"POT-Creation-Date: 2013-10-30 16:14+0200\n"
 "PO-Revision-Date: 2013-10-07 09:40+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -1211,7 +1211,7 @@ msgstr "数値型ではないアイテム\"%1$s\"はグラフ\"%2$s\"に追加�
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
 msgstr ""
 
-#: include/reports.inc.php:505
+#: include/reports.inc.php:504
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\"."
 msgstr ""
@@ -6917,7 +6917,7 @@ msgstr "整数フィールド\"%2$s\"の値\"%1$s\"が正しくありません�
 msgid "Incorrect value \"%1$s\" for unsigned int field \"%2$s\"."
 msgstr "符号なし整数フィールド\"%2$s\"の値\"%1$s\"が正しくありません。"
 
-#: include/reports.inc.php:540 include/reports.inc.php:544
+#: include/reports.inc.php:539 include/reports.inc.php:543
 #, c-format
 msgid "Incorrect value for field \"%1$s\"."
 msgstr "フィールド\"%1$s\"の値が正しくありません。"
@@ -7103,7 +7103,7 @@ msgstr "パラメータの数が正しくありません。"
 msgid "Invalid params."
 msgstr "パラメータが正しくありません。"
 
-#: include/reports.inc.php:590 include/reports.inc.php:594
+#: include/reports.inc.php:589 include/reports.inc.php:593
 #, c-format
 msgid "Invalid period for field \"%1$s\"."
 msgstr ""
@@ -8572,7 +8572,7 @@ msgstr "アクションの実行条件の\"%1$s\"フィールドが存在しま�
 msgid "Missing \"%1$s\" field for item."
 msgstr "アイテムの\"%1$s\"フィールドが存在しません。"
 
-#: include/reports.inc.php:580
+#: include/reports.inc.php:579
 #, c-format
 msgid "Missing \"%1$s\" field for period."
 msgstr "期間の\"%1$s\"フィールドが存在しません。"
