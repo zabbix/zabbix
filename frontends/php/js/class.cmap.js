@@ -498,7 +498,8 @@ ZABBIX.apps.map = (function($) {
 							$('#elementNameHost').multiSelectHelper({
 								objectName: 'hosts',
 								name: 'elementValue',
-								selectedLimit: 1
+								selectedLimit: 1,
+								objectOptions: { editable: true }
 							});
 							break;
 
@@ -507,7 +508,8 @@ ZABBIX.apps.map = (function($) {
 							$('#elementNameHostGroup').multiSelectHelper({
 								objectName: 'hostGroup',
 								name: 'elementValue',
-								selectedLimit: 1
+								selectedLimit: 1,
+								objectOptions: { editable: true }
 							});
 							break;
 
@@ -1333,7 +1335,8 @@ ZABBIX.apps.map = (function($) {
 							objectName: 'hosts',
 							name: 'elementValue',
 							data: [{id: selement.elementid, name: selement.elementName}],
-							selectedLimit: 1
+							selectedLimit: 1,
+							objectOptions: { editable: true }
 						});
 						break;
 
@@ -1343,7 +1346,8 @@ ZABBIX.apps.map = (function($) {
 							objectName: 'hostGroup',
 							name: 'elementValue',
 							data: [{id: selement.elementid, name: selement.elementName}],
-							selectedLimit: 1
+							selectedLimit: 1,
+							objectOptions: { editable: true }
 						});
 						break;
 				}
