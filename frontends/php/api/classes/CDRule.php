@@ -40,7 +40,6 @@ class CDRule extends CZBXAPI {
 	public function get(array $options = array()) {
 		$result = array();
 		$nodeCheck = false;
-		$userType = self::$userData['type'];
 
 		$sqlParts = array(
 			'select'	=> array('drules' => 'dr.druleid'),
@@ -78,12 +77,7 @@ class CDRule extends CZBXAPI {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
-// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $userType) {
-		}
-		elseif (is_null($options['editable']) && (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN)) {
-		}
-		elseif (!is_null($options['editable']) && (self::$userData['type']!=USER_TYPE_SUPER_ADMIN)) {
+		if (CWebUser::getType() < USER_TYPE_ZABBIX_ADMIN) {
 			return array();
 		}
 
