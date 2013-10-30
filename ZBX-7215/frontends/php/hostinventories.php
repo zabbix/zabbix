@@ -84,7 +84,7 @@ if ($hostid > 0) {
 	$inventoryFields = array_keys($data['tableTitles']);
 
 	// overview tab
-	$host = API::Host()->get(array(
+	$data['host'] = API::Host()->get(array(
 		'hostids' => $hostid,
 		'output' => array('hostid', 'host', 'name', 'maintenance_status'),
 		'selectInterfaces' => API_OUTPUT_EXTEND,
@@ -98,9 +98,11 @@ if ($hostid > 0) {
 		'selectHttpTests' => API_OUTPUT_COUNT,
 		'preservekeys' => true
 	));
-
-	$data['host'] = reset($host);
+	$data['host'] = reset($data['host']);
 	unset($data['host']['inventory']['hostid']);
+
+	// resolve macros
+	$data['host']['interfaces'] = CMacrosResolverHelper::resolveHostInterfaces($data['host']['interfaces']);
 
 	// get permissions
 	$userType = CWebUser::getType();
