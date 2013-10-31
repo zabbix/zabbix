@@ -370,7 +370,7 @@ static void	process_updated_records(int nodeid, char *data)
 				if (dnum != num_param(table->uniq))
 				{
 					zabbix_log(LOG_LEVEL_DEBUG, "%s(): missing required fields [%s][%s]",
-							__function_name, table->table, ZBX_NULL2STR(table->uniq));
+							__function_name, table->table, table->uniq);
 					dsql_offset = dtmp_offset;
 					goto next;
 				}
