@@ -48,7 +48,7 @@ $usersForm = new CForm();
 $usersForm->setName('userForm');
 
 // create users table
-$usersTable = new CTableInfo(_('No users defined.'));
+$usersTable = new CTableInfo(_('No users found.'));
 $usersTable->setHeader(array(
 	new CCheckBox('all_users', null, "checkAll('".$usersForm->getName()."', 'all_users', 'group_userid');"),
 	$this->data['displayNodes'] ? _('Node') : null,

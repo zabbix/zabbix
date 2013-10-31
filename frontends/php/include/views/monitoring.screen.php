@@ -32,7 +32,7 @@ $headerForm->addItem($configComboBox);
 if (empty($this->data['screens'])) {
 	$screenWidget->addPageHeader(_('SCREENS'), $headerForm);
 	$screenWidget->addItem(BR());
-	$screenWidget->addItem(new CTableInfo(_('No screens defined.')));
+	$screenWidget->addItem(new CTableInfo(_('No screens found.')));
 
 	$screenBuilder = new CScreenBuilder();
 	CScreenBuilder::insertScreenStandardJs(array(
