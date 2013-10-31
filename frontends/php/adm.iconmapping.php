@@ -142,6 +142,8 @@ $iconList = API::Image()->get(array(
 	'output' => API_OUTPUT_EXTEND,
 	'preservekeys' => true
 ));
+order_result($iconList, 'name');
+
 foreach ($iconList as $icon) {
 	$data['iconList'][$icon['imageid']] = $icon['name'];
 }
