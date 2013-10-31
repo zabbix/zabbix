@@ -39,7 +39,7 @@ $proxyForm = new CForm('get');
 $proxyForm->setName('proxyForm');
 
 // create table
-$proxyTable = new CTableInfo(_('No proxies defined.'));
+$proxyTable = new CTableInfo(_('No proxies found.'));
 $proxyTable->setHeader(array(
 	new CCheckBox('all_hosts', null, "checkAll('".$proxyForm->getName()."', 'all_hosts', 'hosts');"),
 	$this->data['displayNodes'] ? _('Node') : null,
