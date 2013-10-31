@@ -23,25 +23,16 @@ jQuery(function($) {
 	/**
 	 * Multi select helper.
 	 *
-	 * @param {string} 	options['objectName']		backend data source
-	 * @param {object}	options['objectOptions'] 	parameters to be added the request URL
+	 * @param objectName options['objectName']	backend data source
 	 *
 	 * @see jQuery.multiSelect()
 	 */
 	$.fn.multiSelectHelper = function(options) {
-		options = $.extend({
-			objectName: null,
-			objectOptions: {}
-		}, options);
-
 		// url
 		options.url = new Curl('jsrpc.php');
 		options.url.setArgument('type', 11); // PAGE_TYPE_TEXT_RETURN_JSON
 		options.url.setArgument('method', 'multiselect.get');
 		options.url.setArgument('objectName', options.objectName);
-		for (var key in options.objectOptions) {
-			options.url.setArgument(key, options.objectOptions[key]);
-		}
 		options.url = options.url.getUrl();
 
 		// labels
