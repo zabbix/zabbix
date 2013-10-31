@@ -1076,7 +1076,7 @@ class testFormAction extends CWebTest {
 
 		if (isset($data['new_operation_opmessage_default_msg'])) {
 			$new_operation_opmessage_default_msg = $data['new_operation_opmessage_default_msg'];
-			$this->zbxTestCheckboxUnselect('new_operation_opmessage_default_msg');
+			$this->zbxTestCheckboxSelect('new_operation_opmessage_default_msg', false);
 			$this->wait();
 		}
 		elseif ($new_operation_operationtype == 'Send message') {

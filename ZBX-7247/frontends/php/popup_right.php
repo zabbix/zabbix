@@ -71,7 +71,7 @@ check_fields($fields);
 	$form = new CForm();
 	$form->setAttribute('id', 'groups');
 
-	$table = new CTableInfo(_('No resources defined.'));
+	$table = new CTableInfo(_('No host groups found.'));
 	$table->setHeader(new CCol(array(new CCheckBox('all_groups', NULL, 'check_all(this.checked)'),_('Name'))));
 
 // NODES

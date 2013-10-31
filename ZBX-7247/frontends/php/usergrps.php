@@ -421,17 +421,17 @@ if (isset($_REQUEST['form'])) {
 	$data['users'] = DBfetchArray(DBselect(
 		'SELECT DISTINCT u.userid,u.alias,u.name,u.surname'.
 		' FROM users u'.$sqlFrom.
-			$sqlWhere.
-		' ORDER BY u.alias'
+			$sqlWhere
 	));
+	order_result($data['users'], 'alias');
 
 	// get user groups
 	$data['usergroups'] = DBfetchArray(DBselect(
 		'SELECT ug.usrgrpid,ug.name'.
 		' FROM usrgrp ug'.
-			whereDbNode('usrgrpid').
-		' ORDER BY ug.name'
+			whereDbNode('usrgrpid')
 	));
+	order_result($data['usergroups'], 'name');
 
 	// render view
 	$userGroupsView = new CView('administration.usergroups.edit', $data);
