@@ -29,7 +29,7 @@ $screenWidget->addItem($form);
 if (empty($this->data['screen']) || empty($this->data['host'])) {
 	$screenWidget->addPageHeader(_('SCREENS'));
 	$screenWidget->addItem(BR());
-	$screenWidget->addItem(new CTableInfo(_('No screens defined.')));
+	$screenWidget->addItem(new CTableInfo(_('No screens found.')));
 
 	$screenBuilder = new CScreenBuilder();
 	CScreenBuilder::insertScreenStandardJs(array(

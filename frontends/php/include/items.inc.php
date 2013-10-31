@@ -788,7 +788,7 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 		}
 	}
 
-	$table = new CTableInfo(_('No items defined.'));
+	$table = new CTableInfo(_('No items found.'));
 	if (empty($hostNames)) {
 		return $table;
 	}
