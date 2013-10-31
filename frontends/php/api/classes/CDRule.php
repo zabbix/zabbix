@@ -40,7 +40,6 @@ class CDRule extends CZBXAPI {
 	public function get(array $options = array()) {
 		$result = array();
 		$nodeCheck = false;
-		$userType = self::$userData['type'];
 
 		$sqlParts = array(
 			'select'	=> array('drules' => 'dr.druleid'),
@@ -78,12 +77,7 @@ class CDRule extends CZBXAPI {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
-// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $userType) {
-		}
-		elseif (is_null($options['editable']) && (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN)) {
-		}
-		elseif (!is_null($options['editable']) && (self::$userData['type']!=USER_TYPE_SUPER_ADMIN)) {
+		if (CWebUser::getType() < USER_TYPE_ZABBIX_ADMIN) {
 			return array();
 		}
 
@@ -250,10 +244,8 @@ class CDRule extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input.'));
 		}
 
-		if (self::$userData['type'] >= USER_TYPE_ZABBIX_ADMIN) {
-			if (!count(get_accessible_nodes_by_user(self::$userData, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-			}
+		if (CWebUser::getType() < USER_TYPE_ZABBIX_ADMIN) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		$proxies = array();
@@ -573,10 +565,8 @@ class CDRule extends CZBXAPI {
 	public function delete(array $druleIds) {
 		$druleIds = zbx_toArray($druleIds);
 
-		if (self::$userData['type'] >= USER_TYPE_ZABBIX_ADMIN) {
-			if (!count(get_accessible_nodes_by_user(self::$userData, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-			}
+		if (CWebUser::getType() < USER_TYPE_ZABBIX_ADMIN) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		$actionIds = array();
