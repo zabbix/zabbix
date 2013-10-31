@@ -101,7 +101,7 @@ if (!empty($this->data['parent_discoveryid'])) {
 $link->setArgument('hostid', $this->data['hostid']);
 $link = $link->getUrl();
 
-$triggersTable = new CTableInfo(_('No triggers defined.'));
+$triggersTable = new CTableInfo(_('No triggers found.'));
 $triggersTable->setHeader(array(
 	new CCheckBox('all_triggers', null, "checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');"),
 	$this->data['displayNodes'] ? _('Node') : null,

@@ -70,7 +70,7 @@ while ($media_type_data = DBfetch($db_media_types)) {
 // if no media types were defined, we have nothing to show
 if (zbx_empty($media_types)) {
 	show_table_header(_('Notifications'));
-	$table = new CTableInfo(_('No media types defined.'));
+	$table = new CTableInfo(_('No notifications found.'));
 	$table->show();
 }
 else {

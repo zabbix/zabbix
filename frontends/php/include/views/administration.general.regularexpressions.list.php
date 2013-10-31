@@ -25,7 +25,7 @@ $regExpForm = new CForm();
 $regExpForm->setName('regularExpressionsForm');
 $regExpForm->addItem(BR());
 
-$regExpTable = new CTableInfo(_('No regular expressions defined.'));
+$regExpTable = new CTableInfo(_('No regular expressions found.'));
 $regExpTable->setHeader(array(
 	new CCheckBox('all_regexps', null, "checkAll('regularExpressionsForm', 'all_regexps', 'regexpids');"),
 	$this->data['displayNodes'] ? _('Node') : null,

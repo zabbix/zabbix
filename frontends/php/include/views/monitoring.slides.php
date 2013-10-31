@@ -40,7 +40,7 @@ if (empty($this->data['slideshows'])) {
 		)
 	);
 	$slideWidget->addItem(BR());
-	$slideWidget->addItem(new CTableInfo(_('No slide shows defined.')));
+	$slideWidget->addItem(new CTableInfo(_('No slide shows found.')));
 }
 else {
 	$favouriteIcon = $this->data['screen']
@@ -101,7 +101,7 @@ else {
 		$slideWidget->addItem(new CSpan(_('Loading...'), 'textcolorstyles'));
 	}
 	else {
-		$slideWidget->addItem(new CTableInfo(_('No slides defined.')));
+		$slideWidget->addItem(new CTableInfo(_('No slides found.')));
 	}
 }
 

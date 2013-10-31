@@ -367,7 +367,7 @@ $eventsWidget->addFlicker($scroll, CProfile::get('web.events.filter.state', 0));
 /*
  * Display
  */
-$table = new CTableInfo(_('No events defined.'));
+$table = new CTableInfo(_('No events found.'));
 
 // trigger events
 if ($source == EVENT_OBJECT_TRIGGER) {
