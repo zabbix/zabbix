@@ -506,7 +506,7 @@ static char	*snmp_get_octet_string(struct variable_list *vars)
 
 	zbx_lrtrim(strval_dyn, ZBX_WHITESPACE);
 end:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():'%s'", __function_name, strval_dyn ? strval_dyn : "(null)");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():'%s'", __function_name, ZBX_NULL2STR(strval_dyn));
 
 	return strval_dyn;
 }
