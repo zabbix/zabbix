@@ -35,6 +35,10 @@ abstract class CMapElement extends CZBXAPI {
 			$selementDbFields = array('selementid' => null);
 
 			$dbSelements = $this->fetchSelementsByIds(zbx_objectValues($selements, 'selementid'));
+
+			if ($update) {
+				$selements = $this->extendFromObjects($selements, $dbSelements, array('elementtype', 'elementid'));
+			}
 		}
 		else {
 			$selementDbFields = array(
@@ -72,7 +76,48 @@ abstract class CMapElement extends CZBXAPI {
 		}
 		unset($selement);
 
+		// check permissions to used objects
+		$this->checkSelementPermissions($selements);
+
 		return ($update || $delete) ? $dbSelements : true;
+	}
+
+	/**
+	 * Checks that the user has write permissions to objects used in the map elements.
+	 *
+	 * @throws APIException if the user has no permissions to at least one of the objects
+	 *
+	 * @param array $selements
+	 */
+	protected function checkSelementPermissions(array $selements) {
+		if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+			return;
+		}
+
+		$hostIds = $groupIds = $triggerIds = $mapIds = array();
+		foreach ($selements as $selement) {
+			switch ($selement['elementtype']) {
+				case SYSMAP_ELEMENT_TYPE_HOST:
+					$hostIds[$selement['elementid']] = $selement['elementid'];
+					break;
+				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+					$groupIds[$selement['elementid']] = $selement['elementid'];
+					break;
+				case SYSMAP_ELEMENT_TYPE_TRIGGER:
+					$triggerIds[$selement['elementid']] = $selement['elementid'];
+					break;
+				case SYSMAP_ELEMENT_TYPE_MAP:
+					$mapIds[$selement['elementid']] = $selement['elementid'];
+					break;
+			}
+		}
+
+		if (($hostIds && !API::Host()->isWritable($hostIds))
+				|| ($groupIds && !API::HostGroup()->isWritable($groupIds))
+				|| ($triggerIds && !API::Trigger()->isWritable($triggerIds))
+				|| ($mapIds && !API::Map()->isWritable($mapIds))) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
 	}
 
 	/**
