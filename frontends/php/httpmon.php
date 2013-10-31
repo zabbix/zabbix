@@ -77,7 +77,7 @@ $httpmon_wdgt->addPageHeader(
 	_('STATUS OF WEB MONITORING'),
 	get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']))
 );
-$httpmon_wdgt->addHeader(_('Web checks'), $r_form);
+$httpmon_wdgt->addHeader(_('Web scenarios'), $r_form);
 $httpmon_wdgt->addHeaderRowNumber();
 
 // TABLE
