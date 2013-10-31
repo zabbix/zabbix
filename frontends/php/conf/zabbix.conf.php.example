@@ -31,5 +31,11 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 //     'hosts_groups' => 1,
 //     // ...
 //   ),
+//   'CTrigger::create' => array(
+//     'auditlog' => 1000,
+//     'events' => 1000,
+//     'functions' => 1000,
+//     'triggers' => 1000,
+//   ),
 // );
 ?>
