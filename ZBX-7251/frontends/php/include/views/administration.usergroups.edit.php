@@ -20,7 +20,7 @@
 
 
 $userGroupWidget = new CWidget();
-$userGroupWidget->addPageHeader(_('CONFIGURATION OF USER GROUP'));
+$userGroupWidget->addPageHeader(_('CONFIGURATION OF USER GROUPS'));
 
 // create form
 $userGroupForm = new CForm();

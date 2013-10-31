@@ -113,8 +113,15 @@ $conditionFormList->addRow(_('Conditions'), new CDiv($conditionTable, 'objectgro
 
 // append new condition to form list
 $conditionTypeComboBox = new CComboBox('new_condition[conditiontype]', $this->data['new_condition']['conditiontype'], 'submit()');
+foreach ($this->data['allowedConditions'] as $key => $condition) {
+	$this->data['allowedConditions'][$key] = array(
+		'name' => condition_type2str($condition),
+		'type' => $condition
+	);
+}
+order_result($this->data['allowedConditions'], 'name');
 foreach ($this->data['allowedConditions'] as $condition) {
-	$conditionTypeComboBox->addItem($condition, condition_type2str($condition));
+	$conditionTypeComboBox->addItem($condition['type'], $condition['name']);
 }
 
 $conditionOperatorsComboBox = new CComboBox('new_condition[operator]', $this->data['new_condition']['operator']);
@@ -553,14 +560,15 @@ if (!empty($this->data['new_operation'])) {
 			$mediaTypeComboBox = new CComboBox('new_operation[opmessage][mediatypeid]', $this->data['new_operation']['opmessage']['mediatypeid']);
 			$mediaTypeComboBox->addItem(0, '- '._('All').' -');
 
-			$db_mediatypes = DBselect(
+			$dbMediaTypes = DBfetchArray(DBselect(
 				'SELECT mt.mediatypeid,mt.description'.
 				' FROM media_type mt'.
-				whereDbNode('mt.mediatypeid').
-				' ORDER BY mt.description'
-			);
-			while ($db_mediatype = DBfetch($db_mediatypes)) {
-				$mediaTypeComboBox->addItem($db_mediatype['mediatypeid'], $db_mediatype['description']);
+				whereDbNode('mt.mediatypeid')
+			));
+			order_result($dbMediaTypes, 'description');
+
+			foreach ($dbMediaTypes as $dbMediaType) {
+				$mediaTypeComboBox->addItem($dbMediaType['mediatypeid'], $dbMediaType['description']);
 			}
 
 			$newOperationsTable->addRow(array(_('Send only to'), $mediaTypeComboBox));
