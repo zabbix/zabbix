@@ -39,6 +39,10 @@ class CScreenHostgroupTriggers extends CScreenBase {
 
 		// by default triggers are sorted by date desc, do we need to override this?
 		switch ($this->screenitem['sort_triggers']) {
+			case SCREEN_SORT_TRIGGERS_DATE_DESC:
+				$params['sortfield'] = 'lastchange';
+				$params['sortorder'] = ZBX_SORT_DOWN;
+				break;
 			case SCREEN_SORT_TRIGGERS_SEVERITY_DESC:
 				$params['sortfield'] = 'priority';
 				$params['sortorder'] = ZBX_SORT_DOWN;

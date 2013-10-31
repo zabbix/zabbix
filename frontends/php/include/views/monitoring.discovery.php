@@ -33,7 +33,7 @@ $discoveryHeaderForm->addItem(array(_('Discovery rule').SPACE, $discoveryRulesCo
 $discoveryWidget->addHeader(_('Discovery rules'), $discoveryHeaderForm);
 
 // craete table
-$discoveryTable = new CTableInfo(_('No discoveries defined.'));
+$discoveryTable = new CTableInfo(_('No discovered devices found.'));
 $discoveryTable->makeVerticalRotation();
 
 $header = array(

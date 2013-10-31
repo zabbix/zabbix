@@ -44,7 +44,7 @@ class testFormScreen extends CWebTest {
 		$this->zbxTestTextPresent('Item updated');
 		$this->zbxTestClickWait('link=Change');
 		$this->assertElementPresent('//input[@id=\'dynamic\']/@checked');
-		$this->zbxTestCheckboxUnselect('dynamic');
+		$this->zbxTestCheckboxSelect('dynamic', false);
 		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent('Item updated');
 		$this->zbxTestClickWait('link=Change');
