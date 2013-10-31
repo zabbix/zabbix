@@ -408,7 +408,10 @@
 
 			jQuery(opCmdTargetObject).multiSelectHelper({
 				objectName: (opCmdTarget == 'host') ? 'hosts' : 'hostGroup',
-				name: 'opCmdTargetObjectName[]'
+				name: 'opCmdTargetObjectName[]',
+				objectOptions: {
+					editable: true
+				}
 			});
 		}
 	}

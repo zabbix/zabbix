@@ -1208,7 +1208,7 @@ function getTriggersOverview($hostIds, $application, $viewMode = null, $screenId
 		}
 	}
 
-	$triggerTable = new CTableInfo(_('No triggers defined.'));
+	$triggerTable = new CTableInfo(_('No triggers found.'));
 
 	if (empty($hostNames)) {
 		return $triggerTable;

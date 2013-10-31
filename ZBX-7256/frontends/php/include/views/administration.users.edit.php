@@ -152,7 +152,7 @@ if (uint_in_array(CWebUser::$data['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TY
 	$userMediaFormList = new CFormList('userMediaFormList');
 	$userForm->addVar('user_medias', $this->data['user_medias']);
 
-	$mediaTableInfo = new CTableInfo(_('No media defined.'));
+	$mediaTableInfo = new CTableInfo(_('No media found.'));
 
 	foreach ($this->data['user_medias'] as $id => $media) {
 		if (!isset($media['active']) || !$media['active']) {

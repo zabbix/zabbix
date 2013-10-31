@@ -329,7 +329,7 @@ if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsou
 }
 
 // create operation table
-$operationsTable = new CTable(_('No operations defined.'), 'formElementTable');
+$operationsTable = new CTable(null, 'formElementTable');
 $operationsTable->attr('style', 'min-width: 600px;');
 if ($this->data['action']['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 	$operationsTable->setHeader(array(_('Steps'), _('Details'), _('Start in'), _('Duration (sec)'), _('Action')));
@@ -793,7 +793,8 @@ if (!empty($this->data['new_operation'])) {
 				new CCol(array(
 					new CMultiSelect(array(
 						'name' => 'discoveryHostGroup',
-						'objectName' => 'hostGroup'
+						'objectName' => 'hostGroup',
+						'objectOptions' => array('editable' => true)
 					)),
 					new CButton('add', _('Add'), 'return addDiscoveryHostGroup();', 'link_menu')
 				), null, 2),
@@ -837,7 +838,8 @@ if (!empty($this->data['new_operation'])) {
 				new CCol(array(
 					new CMultiSelect(array(
 						'name' => 'discoveryTemplates',
-						'objectName' => 'templates'
+						'objectName' => 'templates',
+						'objectOptions' => array('editable' => true)
 					)),
 					new CButton('add', _('Add'), 'return addDiscoveryTemplates();', 'link_menu')
 				), null, 2),
