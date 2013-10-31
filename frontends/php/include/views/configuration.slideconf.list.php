@@ -34,7 +34,7 @@ $slideForm = new CForm();
 $slideForm->setName('slideForm');
 
 // create table
-$slidesTable = new CTableInfo(_('No slide shows defined.'));
+$slidesTable = new CTableInfo(_('No slide shows found.'));
 $slidesTable->setHeader(array(
 	new CCheckBox('all_shows', null, "checkAll('".$slideForm->getName()."', 'all_shows', 'shows');"),
 	$this->data['displayNodes'] ? _('Node') : null,

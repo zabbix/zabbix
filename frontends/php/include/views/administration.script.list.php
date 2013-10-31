@@ -32,7 +32,7 @@ $scriptsForm = new CForm();
 $scriptsForm->setName('scriptsForm');
 $scriptsForm->setAttribute('id', 'scripts');
 
-$scriptsTable = new CTableInfo(_('No scripts defined.'));
+$scriptsTable = new CTableInfo(_('No scripts found.'));
 $scriptsTable->setHeader(array(
 	new CCheckBox('all_scripts', null, "checkAll('".$scriptsForm->getName()."', 'all_scripts', 'scripts');"),
 	$this->data['displayNodes'] ? _('Node') : null,

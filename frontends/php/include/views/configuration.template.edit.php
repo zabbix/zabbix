@@ -372,7 +372,7 @@ $divTabs->addTab('templateTab', _('Template'), $templateList);
 $tmplList = new CFormList('tmpllist');
 
 // create linked template table
-$linkedTemplateTable = new CTable(_('No templates defined.'), 'formElementTable');
+$linkedTemplateTable = new CTable(_('No templates linked.'), 'formElementTable');
 $linkedTemplateTable->attr('id', 'linkedTemplateTable');
 $linkedTemplateTable->attr('style', 'min-width: 400px;');
 $linkedTemplateTable->setHeader(array(_('Name'), _('Action')));

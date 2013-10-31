@@ -329,7 +329,7 @@ if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsou
 }
 
 // create operation table
-$operationsTable = new CTable(_('No operations defined.'), 'formElementTable');
+$operationsTable = new CTable(null, 'formElementTable');
 $operationsTable->attr('style', 'min-width: 600px;');
 if ($this->data['action']['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 	$operationsTable->setHeader(array(_('Steps'), _('Details'), _('Start in'), _('Duration (sec)'), _('Action')));

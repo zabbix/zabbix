@@ -55,7 +55,7 @@ if (!empty($this->data['hostid'])) {
 }
 
 // create table
-$itemTable = new CTableInfo(_('No items defined.'));
+$itemTable = new CTableInfo(_('No items found.'));
 $itemTable->setHeader(array(
 	new CCheckBox('all_items', null, "checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');"),
 	$this->data['displayNodes'] ? _('Node') : null,

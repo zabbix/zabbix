@@ -58,7 +58,7 @@ if (!empty($this->data['graphid'])) {
 		'profileIdx2' => $this->data['graphid']
 	));
 
-	$chartTable = new CTable(_('No graphs defined.'), 'maxwidth');
+	$chartTable = new CTable(null, 'maxwidth');
 	$chartTable->addRow($screen->get());
 
 	$chartsWidget->addItem($chartTable);
@@ -74,7 +74,7 @@ else {
 		'timeline' => $screen->timeline
 	));
 
-	$chartsWidget->addItem(new CTableInfo(_('No graphs defined.')));
+	$chartsWidget->addItem(new CTableInfo(_('No graphs found.')));
 }
 
 return $chartsWidget;
