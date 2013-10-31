@@ -23,25 +23,24 @@ jQuery(function($) {
 	/**
 	 * Multi select helper.
 	 *
-	 * @param {string} 	options['objectName']		backend data source
-	 * @param {object}	options['objectOptions'] 	parameters to be added the request URL
+	 * @param string options['objectName']		backend data source
+	 * @param object options['objectOptions']	parameters to be added the request URL (optional)
 	 *
 	 * @see jQuery.multiSelect()
 	 */
 	$.fn.multiSelectHelper = function(options) {
-		options = $.extend({
-			objectName: null,
-			objectOptions: {}
-		}, options);
+		options = $.extend({objectOptions: {}}, options);
 
 		// url
 		options.url = new Curl('jsrpc.php');
 		options.url.setArgument('type', 11); // PAGE_TYPE_TEXT_RETURN_JSON
 		options.url.setArgument('method', 'multiselect.get');
 		options.url.setArgument('objectName', options.objectName);
+
 		for (var key in options.objectOptions) {
 			options.url.setArgument(key, options.objectOptions[key]);
 		}
+
 		options.url = options.url.getUrl();
 
 		// labels
@@ -53,8 +52,7 @@ jQuery(function($) {
 		};
 
 		return this.each(function() {
-			$(this).empty();
-			$(this).multiSelect(options);
+			$(this).empty().multiSelect(options);
 		});
 	};
 

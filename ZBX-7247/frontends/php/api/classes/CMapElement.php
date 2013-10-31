@@ -112,11 +112,10 @@ abstract class CMapElement extends CZBXAPI {
 			}
 		}
 
-		if ($hostIds && !API::Host()->isWritable($hostIds)
-				|| $groupIds && !API::HostGroup()->isWritable($groupIds)
-				|| $triggerIds && !API::Trigger()->isWritable($triggerIds)
-				|| $mapIds && !API::Map()->isWritable($mapIds)) {
-
+		if (($hostIds && !API::Host()->isWritable($hostIds))
+				|| ($groupIds && !API::HostGroup()->isWritable($groupIds))
+				|| ($triggerIds && !API::Trigger()->isWritable($triggerIds))
+				|| ($mapIds && !API::Map()->isWritable($mapIds))) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
