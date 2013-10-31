@@ -27,7 +27,7 @@ if ($this->data['is_profile']) {
 	$userWidget->addPageHeader(_('USER PROFILE').NAME_DELIMITER.$this->data['name'].' '.$this->data['surname']);
 }
 else {
-	$userWidget->addPageHeader(_('CONFIGURATION OF USER'));
+	$userWidget->addPageHeader(_('CONFIGURATION OF USERS'));
 }
 
 // create form
