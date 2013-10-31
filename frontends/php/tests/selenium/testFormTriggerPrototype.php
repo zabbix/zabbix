@@ -800,7 +800,7 @@ class testFormTriggerPrototype extends CWebTest {
 		}
 
 		if (isset($data['status'])) {
-			$this->zbxTestCheckboxUnselect('status');
+			$this->zbxTestCheckboxSelect('status', false);
 		}
 
 		if (isset($data['constructor'])) {
