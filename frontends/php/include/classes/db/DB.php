@@ -112,7 +112,8 @@ class DB {
 	 *
 	 * @return string
 	 */
-	protected static function reserveIds($table, $count, $set_cache = false) {
+	public static function reserveIds($table, $count, $set_cache = false) {
+	// HACK: expose method protected->public for access via get_dbid method
 		global $DB;
 		static $cache;
 		static $reservedIds;

@@ -889,10 +889,16 @@ function get_dbid($table, $field) {
 				continue;
 			}
 
-			$sql = 'UPDATE ids SET nextid=nextid+1 WHERE nodeid='.$nodeid.' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field);
-			DBexecute($sql);
+			// HACK: ensure usage of reserve ID cache rather than bespoke locking on ids table.
+			$row = array();
+			$row['nextid'] = DB::reserveIds($table,1);
+			if (empty($row)) {
+				$sql = 'UPDATE ids SET nextid=nextid+1 WHERE nodeid='.$nodeid.' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field);
+				DBexecute($sql);
 
-			$row = DBfetch(DBselect('SELECT i.nextid FROM ids i WHERE i.nodeid='.$nodeid.' AND i.table_name='.zbx_dbstr($table).' AND i.field_name='.zbx_dbstr($field)));
+				$row = DBfetch(DBselect('SELECT i.nextid FROM ids i WHERE i.nodeid='.$nodeid.' AND i.table_name='.zbx_dbstr($table).' AND i.field_name='.zbx_dbstr($field)));
+			}
+
 			if (!$row || is_null($row['nextid'])) {
 				// should never be here
 				continue;

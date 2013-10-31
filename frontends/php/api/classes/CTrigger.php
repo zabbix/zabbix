@@ -1140,6 +1140,10 @@ class CTrigger extends CTriggerGeneral {
 		$triggers = zbx_toArray($triggers);
 
 		$this->checkInput($triggers, __FUNCTION__);
+
+		// Commit known id counts prior to processing.
+		DB::commitReserveIds(array(), __CLASS__ . '::' . __FUNCTION__);
+
 		$this->createReal($triggers);
 
 		foreach ($triggers as $trigger) {
