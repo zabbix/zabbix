@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/perm.inc.php';
  * @return bool
  */
 function check_right_on_discovery() {
-	return CWebUser::getType() >= USER_TYPE_ZABBIX_ADMIN;
+	return (CWebUser::getType() >= USER_TYPE_ZABBIX_ADMIN);
 }
 
 function svc_default_port($type_int) {
