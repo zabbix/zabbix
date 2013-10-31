@@ -34,7 +34,7 @@ $discoveryForm = new CForm();
 $discoveryForm->setName('druleForm');
 
 // create table
-$discoveryTable = new CTableInfo(_('No discovery rules defined.'));
+$discoveryTable = new CTableInfo(_('No discovery rules found.'));
 $discoveryTable->setHeader(array(
 	new CCheckBox('all_drules', null, "checkAll('".$discoveryForm->getName()."', 'all_drules', 'g_druleid');"),
 	$this->data['displayNodes'] ? _('Node') : null,

@@ -377,9 +377,9 @@ else {
 
 	// get user groups
 	$data['userGroups'] = API::UserGroup()->get(array(
-		'output' => API_OUTPUT_EXTEND,
-		'sortfield' => 'name'
+		'output' => API_OUTPUT_EXTEND
 	));
+	order_result($data['userGroups'], 'name');
 
 	// get users
 	$data['users'] = API::User()->get(array(

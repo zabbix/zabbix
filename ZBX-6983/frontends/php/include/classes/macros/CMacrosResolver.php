@@ -260,7 +260,15 @@ class CMacrosResolver {
 			while ($dbInterface = DBfetch($dbInterfaces)) {
 				$hostId = $dbInterface['hostid'];
 
-				if (!isset($interfaces[$hostId]) || $this->interfacePriorities[$dbInterface['type']] > $interfaces[$hostId]['type']) {
+				if (isset($interfaces[$hostId])) {
+					$dbPriority = $this->interfacePriorities[$dbInterface['type']];
+					$existPriority = $this->interfacePriorities[$interfaces[$hostId]['type']];
+
+					if ($dbPriority > $existPriority) {
+						$interfaces[$hostId] = $dbInterface;
+					}
+				}
+				else {
 					$interfaces[$hostId] = $dbInterface;
 				}
 			}

@@ -390,7 +390,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	/*
 	 * Triggers
 	 */
-	$triggerTable = new CTableInfo(_('No triggers defined.'));
+	$triggerTable = new CTableInfo(_('No triggers found.'));
 	$triggerTable->setHeader(array(
 		is_show_all_nodes() ? _('Node') : null,
 		($_REQUEST['filter_hostid'] == 0 || $availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) ? _('Host') : null,

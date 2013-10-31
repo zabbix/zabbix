@@ -71,7 +71,7 @@ $filterForm->addItem($filterTable);
 $hostInventoryWidget->addFlicker($filterForm, CProfile::get('web.hostinventories.filter.state', 0));
 $hostInventoryWidget->addHeaderRowNumber();
 
-$table = new CTableInfo(_('No hosts defined.'));
+$table = new CTableInfo(_('No hosts found.'));
 $table->setHeader(array(
 	is_show_all_nodes() ? make_sorting_header(_('Node'), 'hostid') : null,
 	make_sorting_header(_('Host'), 'name'),
