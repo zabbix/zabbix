@@ -7,6 +7,7 @@ New features:
 ..F.I..... [ZBXNEXT-715] increased the size of sysmaps_elements.label and sysmaps_links.label fields to 2048 characters (Sasha)
 
 Bug fixes:
+..F....... [ZBX-7240] fixed map editing form behaving incorrectly after it has been submitted unsuccessfully (Pavels)
 A......... [ZBX-7256] fixed sorting by hostname in trigger.get (Pavels)
 ..F....... [ZBX-7247] fixed multiselect allowing to select read only objects in places where write permissions are required (Pavels)
 A......... [ZBX-7247] fixed map.create and map.update not checking permissions to objects used in map elements (Pavels)
