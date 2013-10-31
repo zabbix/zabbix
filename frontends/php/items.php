@@ -856,9 +856,9 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 		$data['db_applications'] = DBfetchArray(DBselect(
 			'SELECT a.applicationid,a.name'.
 			' FROM applications a'.
-			' WHERE a.hostid='.zbx_dbstr($data['hostid']).
-			' ORDER BY a.name'
+			' WHERE a.hostid='.zbx_dbstr($data['hostid'])
 		));
+		order_result($data['db_applications'], 'name');
 	}
 
 	// item types
