@@ -56,39 +56,45 @@ if (isset($_REQUEST['save'])) {
 	$result = update_config($configs);
 
 	show_messages($result, _('Configuration updated'), _('Cannot update configuration'));
+
 	if ($result) {
-		$msg = array();
-		$msg[] = _s('Refresh unsupported items (in sec) "%1$s".', get_request('refresh_unsupported'));
-		if (!is_null($val = get_request('discovery_groupid'))) {
-			$val = API::HostGroup()->get(array(
-				'groupids' => $val,
-				'editable' => 1,
-				'output' => API_OUTPUT_EXTEND
+		$audit = array(
+			_s('Refresh unsupported items (in sec) "%1$s".', get_request('refresh_unsupported'))
+		);
+
+		if (hasRequest('discovery_groupid')) {
+			$hostGroup = API::HostGroup()->get(array(
+				'groupids' => get_request('discovery_groupid'),
+				'editable' => true,
+				'output' => array('groupid', 'name')
 			));
+			if ($hostGroup) {
+				$hostGroup = reset($hostGroup);
 
-			if (!empty($val)) {
-				$val = array_pop($val);
-				$msg[] = _('Group for discovered hosts.').' ['.$val['name'].']';
+				$audit[] = _s('Group for discovered hosts "%1$s".', $hostGroup['name']);
 
-				if (bccomp($val['groupid'], $orig_config['discovery_groupid']) != 0) {
+				if (bccomp($hostGroup['groupid'], $orig_config['discovery_groupid']) != 0) {
 					setHostGroupInternal($orig_config['discovery_groupid'], ZBX_NOT_INTERNAL_GROUP);
-					setHostGroupInternal($val['groupid'], ZBX_INTERNAL_GROUP);
+					setHostGroupInternal($hostGroup['groupid'], ZBX_INTERNAL_GROUP);
 				}
 			}
 		}
-		if (!is_null($val = get_request('alert_usrgrpid'))) {
-			if (0 == $val) {
-				$val = _('None');
+
+		if (hasRequest('alert_usrgrpid')) {
+			$userGroupId = get_request('alert_usrgrpid');
+
+			if ($userGroupId) {
+				$userGroupName = DBfetch(DBselect('SELECT u.name FROM usrgrp u WHERE u.usrgrpid='.zbx_dbstr($userGroupId)));
+				$userGroupName = reset($userGroupName);
 			}
 			else {
-				$val = DBfetch(DBselect('SELECT u.name FROM usrgrp u WHERE u.usrgrpid='.zbx_dbstr($val)));
-				$val = $val['name'];
+				$userGroupName = _('None');
 			}
 
-			$msg[] = _('User group for database down message.').' ['.$val.']';
+			$audit[] = _s('User group for database down message "%1$s".', $userGroupName);
 		}
 
-		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, implode('; ', $msg));
+		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, implode('; ', $audit));
 	}
 
 	DBend($result);
@@ -132,17 +138,18 @@ else {
 }
 
 $data['discovery_groups'] = API::HostGroup()->get(array(
-	'sortfield' => 'name',
-	'editable' => true,
-	'output' => API_OUTPUT_EXTEND,
-	'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
+	'output' => array('usrgrpid', 'name'),
+	'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
+	'editable' => true
 ));
+order_result($data['discovery_groups'], 'name');
+
 $data['alert_usrgrps'] = DBfetchArray(DBselect(
-		'SELECT u.usrgrpid,u.name'.
-		' FROM usrgrp u'.
-		whereDbNode('u.usrgrpid').
-		' ORDER BY u.name'
+	'SELECT u.usrgrpid,u.name'.
+	' FROM usrgrp u'.
+	whereDbNode('u.usrgrpid')
 ));
+order_result($data['alert_usrgrps'], 'name');
 
 $otherForm = new CView('administration.general.other.edit', $data);
 $cnf_wdgt->addItem($otherForm->render());

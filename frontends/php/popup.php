@@ -1257,33 +1257,34 @@ elseif ($srctbl == 'slides') {
 	$table->setHeader($header);
 
 	$slideshows = array();
-	$result = DBselect(
-			'SELECT s.slideshowid,s.name'.
-			' FROM slideshows s'.
-			whereDbNode('s.slideshowid', $nodeId).
-			' ORDER BY s.name'
-	);
-	while ($row = DBfetch($result)) {
-		if (!slideshow_accessible($row['slideshowid'], PERM_READ)) {
+	$dbSlideshows = DBfetchArray(DBselect(
+		'SELECT s.slideshowid,s.name'.
+		' FROM slideshows s'.
+		whereDbNode('s.slideshowid', $nodeId)
+	));
+	order_result($dbSlideshows, 'name');
+
+	foreach ($dbSlideshows as $dbSlideshow) {
+		if (!slideshow_accessible($dbSlideshow['slideshowid'], PERM_READ)) {
 			continue;
 		}
-		$slideshows[$row['slideshowid']] = $row;
+		$slideshows[$dbSlideshow['slideshowid']] = $dbSlideshow;
 
-		$name = new CLink($row['name'], '#');
+		$name = new CLink($dbSlideshow['name'], '#');
 		if ($multiselect) {
-			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($row['slideshowid']).');';
+			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($dbSlideshow['slideshowid']).');';
 		}
 		else {
 			$values = array(
-				$dstfld1 => $row[$srcfld1],
-				$dstfld2 => $row[$srcfld2]
+				$dstfld1 => $dbSlideshow[$srcfld1],
+				$dstfld2 => $dbSlideshow[$srcfld2]
 			);
 			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); close_window(); return false;';
 		}
 		$name->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
 
 		if ($multiselect) {
-			$name = new CCol(array(new CCheckBox('slides['.zbx_jsValue($row[$srcfld1]).']', null, null, $row['slideshowid']), $name));
+			$name = new CCol(array(new CCheckBox('slides['.zbx_jsValue($dbSlideshow[$srcfld1]).']', null, null, $dbSlideshow['slideshowid']), $name));
 		}
 		$table->addRow($name);
 	}
