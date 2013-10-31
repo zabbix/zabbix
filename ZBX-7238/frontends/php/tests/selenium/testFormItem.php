@@ -2604,8 +2604,8 @@ class testFormItem extends CWebTest {
 		$this->assertElementPresent('configDropDown');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeper');
 
-		$this->zbxTestCheckboxUnselect('hk_history_global');
-		$this->zbxTestCheckboxUnselect('hk_trends_global');
+		$this->zbxTestCheckboxSelect('hk_history_global', false);
+		$this->zbxTestCheckboxSelect('hk_trends_global', false);
 
 		$this->zbxTestClickWait('save');
 
@@ -2642,10 +2642,10 @@ class testFormItem extends CWebTest {
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeper');
 
 		$this->input_type('hk_history', 90);
-		$this->zbxTestCheckboxUnselect('hk_history_global');
+		$this->zbxTestCheckboxSelect('hk_history_global', false);
 
 		$this->input_type('hk_trends', 365);
-		$this->zbxTestCheckboxUnselect('hk_trends_global');
+		$this->zbxTestCheckboxSelect('hk_trends_global', false);
 
 		$this->zbxTestClickWait('save');
 

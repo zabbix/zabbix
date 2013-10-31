@@ -28,7 +28,7 @@ $configurationComboBox = new CComboBox('config', 'usergrps.php', 'javascript: re
 $configurationComboBox->addItem('usergrps.php', _('User groups'));
 $configurationComboBox->addItem('users.php', _('Users'));
 $createForm->addItem(array($configurationComboBox, new CSubmit('form', _('Create user group'))));
-$userGroupsWidget->addPageHeader(_('CONFIGURATION OF USERS AND USER GROUPS'), $createForm);
+$userGroupsWidget->addPageHeader(_('CONFIGURATION OF USER GROUPS'), $createForm);
 
 // append header to widget
 $userGroupsWidget->addHeader(_('User groups'));
@@ -39,7 +39,7 @@ $userGroupsForm = new CForm();
 $userGroupsForm->setName('userGroupsForm');
 
 // create user group table
-$userGroupTable = new CTableInfo(_('No user groups defined.'));
+$userGroupTable = new CTableInfo(_('No user groups found.'));
 $userGroupTable->setHeader(array(
 	new CCheckBox('all_groups', null, "checkAll('".$userGroupsForm->getName()."','all_groups','group_groupid');"),
 	$this->data['displayNodes'] ? _('Node') : null,

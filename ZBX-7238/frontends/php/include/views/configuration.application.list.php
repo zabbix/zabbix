@@ -54,7 +54,7 @@ $applicationForm->addVar('groupid', $this->data['groupid']);
 $applicationForm->addVar('hostid', $this->data['hostid']);
 
 // create table
-$applicationTable = new CTableInfo(_('No applications defined.'));
+$applicationTable = new CTableInfo(_('No applications found.'));
 $applicationTable->setHeader(array(
 	new CCheckBox('all_applications', null, "checkAll('".$applicationForm->getName()."', 'all_applications', 'applications');"),
 	$this->data['displayNodes'] ? _('Node') : null,

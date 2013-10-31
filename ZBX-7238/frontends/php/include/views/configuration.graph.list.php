@@ -70,7 +70,7 @@ if (!empty($this->data['parent_discoveryid'])) {
 }
 
 // create table
-$graphTable = new CTableInfo(!empty($this->data['parent_discoveryid']) ? _('No graph prototypes defined.') : _('No graphs defined.'));
+$graphTable = new CTableInfo(!empty($this->data['parent_discoveryid']) ? _('No graph prototypes found.') : _('No graphs found.'));
 $graphTable->setHeader(array(
 	new CCheckBox('all_graphs', null, "checkAll('".$graphForm->getName()."', 'all_graphs', 'group_graphid');"),
 	$this->data['displayNodes'] ? _('Node') : null,
