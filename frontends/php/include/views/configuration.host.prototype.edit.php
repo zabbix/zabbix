@@ -100,7 +100,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$row = new CRow(null, null, 'agentIterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_AGENT])) {
 		$row->addItem(new CCol(null, 'interface-drag-control'));
-		$row->addItem(new CCol(_('No agent interfaces defined.'), null, 5));
+		$row->addItem(new CCol(_('No agent interfaces found.'), null, 5));
 	}
 	$ifTab->addRow($row);
 
@@ -114,7 +114,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$row = new CRow(null, null, 'SNMPIterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_SNMP])) {
 		$row->addItem(new CCol(null, 'interface-drag-control'));
-		$row->addItem(new CCol(_('No SNMP interfaces defined.'), null, 5));
+		$row->addItem(new CCol(_('No SNMP interfaces found.'), null, 5));
 	}
 	$ifTab->addRow($row);
 	$hostList->addRow(_('SNMP interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row');
@@ -127,7 +127,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$row = new CRow(null, null, 'JMXIterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_JMX])) {
 		$row->addItem(new CCol(null, 'interface-drag-control'));
-		$row->addItem(new CCol(_('No JMX interfaces defined.'), null, 5));
+		$row->addItem(new CCol(_('No JMX interfaces found.'), null, 5));
 	}
 	$ifTab->addRow($row);
 	$hostList->addRow(_('JMX interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row');
@@ -140,7 +140,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$row = new CRow(null, null, 'IPMIIterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_IPMI])) {
 		$row->addItem(new CCol(null, 'interface-drag-control'));
-		$row->addItem(new CCol(_('No IPMI interfaces defined.'), null, 5));
+		$row->addItem(new CCol(_('No IPMI interfaces found.'), null, 5));
 	}
 	$ifTab->addRow($row);
 	$hostList->addRow(_('IPMI interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row interface-row-last');
@@ -208,7 +208,7 @@ $divTabs->addTab('groupTab', _('Groups'), $groupList);
 $tmplList = new CFormList('tmpllist');
 
 // create linked template table
-$linkedTemplateTable = new CTable(_('No templates defined.'), 'formElementTable');
+$linkedTemplateTable = new CTable(_('No templates linked.'), 'formElementTable');
 $linkedTemplateTable->attr('id', 'linkedTemplateTable');
 $linkedTemplateTable->attr('style', 'min-width: 400px;');
 $linkedTemplateTable->setHeader(array(_('Name'), _('Action')));
