@@ -37,7 +37,8 @@ $hostGroupsToReplace = null;
 if (isset($_REQUEST['groups'])) {
 	$getHostGroups = API::HostGroup()->get(array(
 		'groupids' => $_REQUEST['groups'],
-		'output' => array('groupid', 'name')
+		'output' => array('groupid', 'name'),
+		'editable' => true
 	));
 	foreach ($getHostGroups as $getHostGroup) {
 		$hostGroupsToReplace[] = array(
@@ -50,6 +51,7 @@ if (isset($_REQUEST['groups'])) {
 $replaceGroups = new CMultiSelect(array(
 		'name' => 'groups[]',
 		'objectName' => 'hostGroup',
+		'objectOptions' => array('editable' => true),
 		'data' => $hostGroupsToReplace
 	));
 
@@ -95,6 +97,7 @@ if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 	$newGroups = new CMultiSelect(array(
 			'name' => 'new_groups[]',
 			'objectName' => 'hostGroup',
+			'objectOptions' => array('editable' => true),
 			'data' => $hostGroupsToAdd,
 			'addNew' => true
 		));
@@ -112,6 +115,7 @@ else {
 	$newGroups = new CMultiSelect(array(
 			'name' => 'new_groups[]',
 			'objectName' => 'hostGroup',
+			'objectOptions' => array('editable' => true),
 			'data' => $hostGroupsToAdd
 		));
 
