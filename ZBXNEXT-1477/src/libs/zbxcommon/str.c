@@ -1655,6 +1655,152 @@ char	*get_param_dyn(const char *p, int num)
 
 /******************************************************************************
  *                                                                            *
+ * Function: replace_key_params_dyn                                           *
+ *                                                                            *
+ * Purpose: replaces an item key, SNMP OID or their parameters by using       *
+ *          callback function                                                 *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      data      - [IN/OUT] item key or SNMP OID                             *
+ *      key_type  - [IN] ZBX_KEY_TYPE_*                                       *
+ *      cb        - [IN] callback function                                    *
+ *      cb_data   - [IN] callback function custom data                        *
+ *      error     - [OUT] error messsage                                      *
+ *      maxerrlen - [IN] error size                                           *
+ *                                                                            *
+ * Return value: SUCCEED - function executed successfully                     *
+ *               FAIL - otherwise, error will contain error message           *
+ *                                                                            *
+ ******************************************************************************/
+int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, void *cb_data, char *error,
+		size_t maxerrlen)
+{
+	typedef enum
+	{
+		ZBX_STATE_NEW,
+		ZBX_STATE_END,
+		ZBX_STATE_UNQUOTED,
+		ZBX_STATE_QUOTED
+	}
+	zbx_parser_state_t;
+
+	size_t			i, l = 0;
+	int			level = 0, num = 0, res = SUCCEED;
+	zbx_parser_state_t	state = ZBX_STATE_END;
+
+	if (ZBX_KEY_TYPE_ITEM == key_type)
+	{
+		for (i = 0; SUCCEED == is_key_char((*data)[i]) && '\0' != (*data)[i]; i++)
+			;
+
+		if (0 == i)
+			goto clean;
+
+		if ('[' != (*data)[i] && '\0' != (*data)[i])
+			goto clean;
+	}
+	else
+	{
+		for (i = 0; '[' != (*data)[i] && '\0' != (*data)[i]; i++)
+			;
+	}
+
+	cb(data, key_type, 0, &i, level, num, 0, cb_data);
+
+	for (; '\0' != (*data)[i]; i++)
+	{
+		if (0 == level)
+		{
+			/* first square bracket + Zapcat compatibility */
+			if (ZBX_STATE_END == state && '[' == (*data)[i])
+				state = ZBX_STATE_NEW;
+			else
+				break;
+		}
+
+		switch (state)
+		{
+			case ZBX_STATE_NEW:	/* a new parameter started */
+				switch ((*data)[i])
+				{
+					case ' ':
+						break;
+					case ',':
+						cb(data, key_type, i, &i, level, num, 0, cb_data);
+						if (1 == level)
+							num++;
+						break;
+					case '[':
+						level++;
+						if (1 == level)
+							num++;
+						break;
+					case ']':
+						cb(data, key_type, i, &i, level, num, 0, cb_data);
+						level--;
+						state = ZBX_STATE_END;
+						break;
+					case '"':
+						state = ZBX_STATE_QUOTED;
+						l = i;
+						break;
+					default:
+						state = ZBX_STATE_UNQUOTED;
+						l = i;
+				}
+				break;
+			case ZBX_STATE_END:	/* end of parameter */
+				switch ((*data)[i])
+				{
+					case ' ':
+						break;
+					case ',':
+						state = ZBX_STATE_NEW;
+						if (1 == level)
+							num++;
+						break;
+					case ']':
+						level--;
+						break;
+					default:
+						goto clean;
+				}
+				break;
+			case ZBX_STATE_UNQUOTED:	/* an unquoted parameter */
+				if (']' == (*data)[i] || ',' == (*data)[i])
+				{
+					cb(data, key_type, l, &i, level, num, 0, cb_data);
+
+					i--;
+					state = ZBX_STATE_END;
+				}
+				break;
+			case ZBX_STATE_QUOTED:	/* a quoted parameter */
+				if ('"' == (*data)[i] && '\\' != (*data)[i - 1])
+				{
+					i++; cb(data, key_type, l, &i, level, num, 1, cb_data); i--;
+
+					state = ZBX_STATE_END;
+				}
+				break;
+		}
+	}
+clean:
+	if (0 == i || '\0' != (*data)[i] || 0 != level)
+	{
+		if (NULL != error)
+		{
+			zbx_snprintf(error, maxerrlen, "Invalid %s at position " ZBX_FS_SIZE_T,
+					(ZBX_KEY_TYPE_ITEM == key_type ? "item key" : "SNMP OID"), (zbx_fs_size_t)i);
+		}
+		res = FAIL;
+	}
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: remove_param                                                     *
  *                                                                            *
  * Purpose: remove parameter by index (num) from parameter list (param)       *
