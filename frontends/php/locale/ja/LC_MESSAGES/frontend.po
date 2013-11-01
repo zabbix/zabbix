@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-01 07:37+0200\n"
-"PO-Revision-Date: 2013-10-07 09:40+0300\n"
-"Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
+"POT-Creation-Date: 2013-11-01 07:39+0200\n"
+"PO-Revision-Date: 2013-11-01 03:59+0300\n"
+"Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1381131658.0\n"
+"X-POOTLE-MTIME: 1383271162.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -34,7 +34,7 @@ msgstr "\"トリガー変化時の点滅期間\"は\"0\"かそれ以上の整数
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
-msgstr[0] ""
+msgstr[0] "%1$d 日"
 
 #: include/blocks.inc.php:1027
 #, c-format
@@ -66,7 +66,7 @@ msgstr[0] "%1$s日"
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
-msgstr[0] ""
+msgstr[0] "%4$s回のログイン失敗がログに記録されています。最後のログイン失敗はホスト%1$sから%2$sの%3$sに行われています。"
 
 #: include/views/monitoring.discovery.php:131
 #, c-format
@@ -356,7 +356,7 @@ msgstr "選択を有効"
 #: include/views/administration.proxy.edit.php:42
 #: include/views/administration.proxy.list.php:86
 msgid "Active"
-msgstr "有効"
+msgstr "アクティブ"
 
 #: include/views/configuration.maintenance.list.php:62
 msgctxt "maintenance status"
@@ -855,7 +855,7 @@ msgstr "期間Tの値の平均値 = N"
 
 #: popup_trexpr.php:160
 msgid "Average value of a period T is > N"
-msgstr "期間Tの値の平均値is > N"
+msgstr "期間Tの値の平均値 > N"
 
 #: popup_trexpr.php:170
 msgid "Average value of a period T is NOT N"
@@ -1199,12 +1199,12 @@ msgstr "数値型ではないアイテム\"%1$s\"はグラフ\"%2$s\"に追加�
 #: api/classes/CGraphPrototype.php:721 api/classes/CGraphPrototype.php:783
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
-msgstr ""
+msgstr "数値型ではないアイテム\"%1$s\"はグラフのプロトタイプ\"%2$s\"に追加できません。"
 
 #: include/reports.inc.php:504
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\"."
-msgstr ""
+msgstr "数値型ではないアイテム\"%1$s\"は追加できません。"
 
 #: actionconf.php:150
 msgid "Cannot add action"
@@ -1591,7 +1591,7 @@ msgstr "スクリプトを削除できません。スクリプト\"%1$s\"は実�
 #: api/classes/CScript.php:525
 #, c-format
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
-msgstr ""
+msgstr "スクリプトを削除できません。スクリプトID\"%1$s\"は存在しません。"
 
 #: actionconf.php:331
 msgid "Cannot delete selected actions"
@@ -1747,7 +1747,7 @@ msgstr "アイテムのキー\"%2$s\"のインターフェースは\"%1$s\"に�
 #: include/classes/import/CConfigurationImport.php:934
 #, c-format
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
-msgstr ""
+msgstr "グラフ\"%2$s\"で利用されているホストまたはテンプレート\"%1$s\"が見つかりません。"
 
 #: include/classes/import/CXmlImport18.php:768
 #: include/classes/import/importers/CMapImporter.php:247
@@ -1823,13 +1823,13 @@ msgstr "条件式\"%s\"を展開できません"
 #, c-format
 msgid "Cannot import screen \"%1$s\": subscreen \"%2$s\" does not exist."
 msgid_plural "Cannot import screen \"%1$s\": subscreens \"%2$s\" do not exist."
-msgstr[0] ""
+msgstr[0] "スクリーン\"%1$s\"をインポートできません：サブスクリーン\"%2$s\"がありません。"
 
 #: include/classes/import/importers/CTemplateImporter.php:114
 #, c-format
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" does not exist."
-msgstr[0] ""
+msgstr[0] "テンプレート\"%1$s\"をインポートできません。リンクされているテンプレート\"%2$s\"が存在しません。"
 
 #: include/classes/class.cview.php:113
 #, c-format
@@ -2030,7 +2030,7 @@ msgstr "グラフ\"%1$s\"の\"templateid\"を更新できません。"
 #: api/classes/CGraphPrototype.php:42
 #, c-format
 msgid "Cannot update \"templateid\" for graph prototype \"%1$s\"."
-msgstr ""
+msgstr "グラフのプロトタイプ\"%1$s\"の\"templateid\"を更新できません。"
 
 #: api/classes/CScreen.php:447 api/classes/CTemplateScreen.php:668
 #, c-format
@@ -4318,7 +4318,7 @@ msgstr "入力パラメータが空白です"
 
 #: api/classes/CApplication.php:496
 msgid "Empty input parameters."
-msgstr ""
+msgstr "入力パラメータが空白です。"
 
 #: api/classes/CDRule.php:244
 msgid "Empty input."
@@ -6819,7 +6819,7 @@ msgstr "\"%1$s\"付近の書式が正しくありません。"
 #: api/classes/CUser.php:351
 #, c-format
 msgid "Incorrect theme for user \"%1$s\"."
-msgstr ""
+msgstr "ユーザー\"%1$s\"のテーマが正しくありません。"
 
 #: include/classes/validators/CTimePeriodValidator.php:99
 #, c-format
@@ -7109,7 +7109,7 @@ msgstr "パラメータが正しくありません。"
 #: include/reports.inc.php:589 include/reports.inc.php:593
 #, c-format
 msgid "Invalid period for field \"%1$s\"."
-msgstr ""
+msgstr "フィールド\"%1$s\"の期間が正しくありません。"
 
 #: api/classes/CHttpTest.php:637
 #, c-format
@@ -12644,13 +12644,13 @@ msgstr "ホストが発見されなくなったため%1$sに削除されます�
 #, c-format
 msgid "The image is used in icon map %1$s."
 msgid_plural "The image is used in icon maps %1$s."
-msgstr[0] ""
+msgstr[0] "イメージはアイコンのマッピング%1$sに利用されています。"
 
 #: api/classes/CImage.php:519
 #, c-format
 msgid "The image is used in map %1$s."
 msgid_plural "The image is used in maps %1$s."
-msgstr[0] ""
+msgstr[0] "イメージはマップ%1$sに利用されています。"
 
 #: include/views/configuration.item.list.php:126
 #, c-format

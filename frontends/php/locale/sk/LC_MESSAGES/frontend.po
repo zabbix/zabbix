@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-01 07:37+0200\n"
-"PO-Revision-Date: 2013-10-24 18:26+0300\n"
+"POT-Creation-Date: 2013-11-01 07:39+0200\n"
+"PO-Revision-Date: 2013-10-30 18:19+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1382631976.0\n"
+"X-POOTLE-MTIME: 1383149989.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -8968,11 +8968,11 @@ msgstr ""
 
 #: api/classes/CItemGeneral.php:351
 msgid "No SNMP OID specified."
-msgstr ""
+msgstr "Nie je špecifikované žiadne SNMP OID."
 
 #: api/classes/CItemGeneral.php:357
 msgid "No SNMP community specified."
-msgstr ""
+msgstr "Nie je špecifikované žiadne SNMP community."
 
 #: include/views/configuration.host.edit.php:340
 #: include/views/configuration.host.prototype.edit.php:117
@@ -14211,25 +14211,25 @@ msgstr "Označenie osi Y"
 
 #: include/translateDefines.inc.php:31 include/translateDefines.inc.php:32
 msgid "Y-m-d H:i:s"
-msgstr "Y-m-d H:i:s"
+msgstr "d-m-Y H:i:s"
 
 #: include/classes/screens/CScreenHistory.php:215
 #: include/translateDefines.inc.php:29 include/translateDefines.inc.php:30
 #: include/translateDefines.inc.php:33
 msgid "Y.M.d H:i:s"
-msgstr "Y.M.d H:i:s"
+msgstr "d.M.Y H:i:s"
 
 #: include/translateDefines.inc.php:38
 msgid "Y.m.d"
-msgstr "Y. m. d"
+msgstr "d.m.Y H:i"
 
 #: include/translateDefines.inc.php:37
 msgid "Y.m.d H:i"
-msgstr "j. n. Y G:i"
+msgstr "d.m.Y H:i"
 
 #: include/func.inc.php:581 include/translateDefines.inc.php:47
 msgid "Y.m.d H:i:s"
-msgstr "Y.m.d H:i:s"
+msgstr "d.m.Y H:i:s"
 
 #: report3.php:70 report3.php:89 report4.php:115 report4.php:143
 #: report5.php:47
