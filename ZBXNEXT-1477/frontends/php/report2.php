@@ -131,8 +131,10 @@ if ($_REQUEST['filter_timetill'] > 0 && $_REQUEST['filter_timesince'] > $_REQUES
 	zbx_swap($_REQUEST['filter_timesince'], $_REQUEST['filter_timetill']);
 }
 
-$_REQUEST['filter_timesince'] = zbxDateToTime($_REQUEST['filter_timesince']);
-$_REQUEST['filter_timetill'] = zbxDateToTime($_REQUEST['filter_timetill']);
+$_REQUEST['filter_timesince'] = zbxDateToTime($_REQUEST['filter_timesince']
+	? $_REQUEST['filter_timesince'] : date(TIMESTAMP_FORMAT_ZERO_TIME, time() - SEC_PER_DAY));
+$_REQUEST['filter_timetill'] = zbxDateToTime($_REQUEST['filter_timetill']
+	? $_REQUEST['filter_timetill'] : date(TIMESTAMP_FORMAT_ZERO_TIME, time()));
 
 /*
  * Header
