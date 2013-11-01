@@ -103,6 +103,7 @@ if ($config['dropdown_first_entry'] || $this->data['pageFilter']->applicationsSe
 		$dataTable = getTriggersOverview(
 			array_keys($this->data['pageFilter']->hosts),
 			$this->data['pageFilter']->application,
+			$page['file'],
 			$this->data['view_style']
 		);
 	}
