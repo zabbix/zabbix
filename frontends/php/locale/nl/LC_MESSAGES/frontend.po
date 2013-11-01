@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-24 22:01+0300\n"
+"POT-Creation-Date: 2013-11-01 06:26+0200\n"
 "PO-Revision-Date: 2013-10-11 14:13+0300\n"
 "Last-Translator: open-future <patrik@open-future.be>\n"
 "Language-Team: NL\n"
@@ -4539,11 +4539,11 @@ msgstr "Filteren op naam"
 
 #: popup_trexpr.php:298
 msgid "Find string V in last (most recent) value. N = 1 - if found, 0 - otherwise"
-msgstr "Vind reeks V in de laatste (meest recente) waarde. N = 1 - indien gevonden, 0 - anders"
+msgstr "Vind reeks V in de laatste (meest recente) waarde. N = 1 - indien gevonden, 0 - andersVind reeks V in de laatste (meest recente) waarde. N = 1 - indien gevonden, 0 - anders"
 
 #: popup_trexpr.php:303
 msgid "Find string V in last (most recent) value. N NOT 1 - if found, 0 - otherwise"
-msgstr "Vind reeks V in de laatste (meest recente) waarde. N is niet 1 - indien gevonden, 0 - anders"
+msgstr "Vind reeks V in de laatste (meest recente) waarde. N is niet 1 - indien gevonden, 0 - andersVind reeks V in de laatste (meest recente) waarde. N is niet 1 - indien gevonden, 0 - anders"
 
 #: include/setup.inc.php:130
 msgid "Finish"
@@ -4750,7 +4750,7 @@ msgstr "Grafiek"
 #: api/classes/CGraph.php:601 api/classes/CGraphPrototype.php:648
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (inherited from another template)."
-msgstr "Grafiek \"%1$s\" bestaat al op \"%2$s\" (overgenomen van een ander sjabloon)."
+msgstr "Grafiek \"%1$s\" bestaat al op \"%2$s\" (overgenomen van een ander sjabloon).Grafiek \"%1$s\" bestaat al op \"%2$s\" (overgenomen van een ander sjabloon)."
 
 #: api/classes/CGraph.php:622 api/classes/CGraph.php:629
 #: api/classes/CGraphPrototype.php:670 api/classes/CGraphPrototype.php:677
@@ -4766,12 +4766,12 @@ msgstr "Grafiek \"%1$s\" bestaat al op \"%2$s\"."
 #: api/classes/CGraph.php:554 api/classes/CGraphPrototype.php:601
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymax value item)."
-msgstr "Grafiek \"%1$s\" kan niet erven. Geen vereiste items op \"%2$s\" (Ymax waarde item)."
+msgstr "Grafiek \"%1$s\" kan niet erven. Geen vereiste items op \"%2$s\" (Ymax waarde item).Grafiek \"%1$s\" kan niet erven. Geen vereiste items op \"%2$s\" (Ymax waarde item)."
 
 #: api/classes/CGraph.php:562 api/classes/CGraphPrototype.php:609
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymin value item)."
-msgstr "Grafiek \"%1$s\" kan niet erven. Geen vereiste items op \"%2$s\" (Ymin waarde item)."
+msgstr "Grafiek \"%1$s\" kan niet erven. Geen vereiste items op \"%2$s\" (Ymin waarde item).Grafiek \"%1$s\" kan niet erven. Geen vereiste items op \"%2$s\" (Ymin waarde item)."
 
 #: api/classes/CGraph.php:548 api/classes/CGraphPrototype.php:595
 #, php-format
@@ -4792,7 +4792,7 @@ msgstr "Grafiek \"%1$s\" overgeslagen - user regel."
 #: api/classes/CGraph.php:38
 #, php-format
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
-msgstr "Grafiek \"%1$s\" met templated items kan geen items van andere hosts bevatten."
+msgstr "Grafiek \"%1$s\" met templated items kan geen items van andere hosts bevatten.Grafiek \"%1$s\" met templated items kan geen items van andere hosts bevatten."
 
 #: graphs.php:246
 msgid "Graph added"
@@ -4817,7 +4817,7 @@ msgstr "Grafiek naam"
 #: api/classes/CGraphPrototype.php:34
 #, php-format
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
-msgstr "Grafiek prototype \"%1$s\" met templated items kunnen geen items van andere hosts bevatten."
+msgstr "Grafiek prototype \"%1$s\" met templated items kunnen geen items van andere hosts bevatten.Grafiek prototype \"%1$s\" met templated items kunnen geen items van andere hosts bevatten."
 
 #: api/classes/CGraphPrototype.php:793
 #, php-format
@@ -4856,7 +4856,7 @@ msgstr "Grafiek bijgewerkt"
 #: api/classes/CGraphGeneral.php:120
 #, php-format
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
-msgstr "Grafiek met de naam \"%1$s\" bestaat al in grafieken of grafiek prototypes."
+msgstr "Grafiek met de naam \"%1$s\" bestaat al in grafieken of grafiek prototypes.Grafiek met de naam \"%1$s\" bestaat al in grafieken of grafiek prototypes."
 
 #: api/classes/CGraph.php:583 api/classes/CGraph.php:604
 #: api/classes/CGraphPrototype.php:630 api/classes/CGraphPrototype.php:651

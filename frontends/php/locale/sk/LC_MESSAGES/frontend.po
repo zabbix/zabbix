@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-24 22:01+0300\n"
-"PO-Revision-Date: 2013-09-29 10:54+0300\n"
+"POT-Creation-Date: 2013-11-01 06:26+0200\n"
+"PO-Revision-Date: 2013-10-30 18:17+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1380444852.0\n"
+"X-POOTLE-MTIME: 1383149825.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -91,7 +91,7 @@ msgstr "(0 - donekonečna)"
 #: include/views/configuration.hostgroups.list.php:31
 #: include/views/configuration.template.edit.php:143
 msgid "(Only super admins can create groups)"
-msgstr "(Skupiny môžu vytvárať iba SuperAdmini)"
+msgstr "(Skupiny môžu vytvárať iba super administrátori)"
 
 #: include/forms.inc.php:539 include/forms.inc.php:554
 msgid "(in days)"
@@ -254,7 +254,7 @@ msgstr "Potvrdené OK udalosti"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:49
 msgid "Acknowledged PROBLEM events"
-msgstr "Potvrdené PROBLÉMové udalosti"
+msgstr "Potvrdené PROBLÉMOVÉ udalosti"
 
 #: acknow.php:27 tr_events.php:123
 msgid "Acknowledges"
@@ -344,7 +344,7 @@ msgstr "Aktívny"
 #: include/views/configuration.maintenance.list.php:61
 msgctxt "maintenance status"
 msgid "Active"
-msgstr "Aktivny"
+msgstr "Aktívny"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:571
 #: include/views/configuration.maintenance.edit.php:81 maintenance.php:147
@@ -806,7 +806,7 @@ msgstr "Priemerná hodnota za čas T NIE JE N"
 
 #: popup_bitem.php:140
 msgid "Axis side"
-msgstr "Strana osi"
+msgstr "Umiestnenie osi"
 
 #: include/func.inc.php:401
 msgctxt "Byte short"
@@ -1607,7 +1607,7 @@ msgstr "Nemôžem nájsť hostiteľské rozhranie na \"%1$s\" pre kľúč polož
 #: include/classes/import/CConfigurationImport.php:877
 #, php-format
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
-msgstr ""
+msgstr "Nemôžem nájsť hosta alebo šablónu \"%1$s\" použitú v grafe \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:767
 #: include/classes/import/importers/CMapImporter.php:247
@@ -1703,7 +1703,7 @@ msgstr "Nie je možné vložiť view súbor \"%s\"."
 
 #: api/classes/CUser.php:816
 msgid "Cannot insert user media."
-msgstr "Nie je možné vložit médium používateľa."
+msgstr "Nie je možné vložiť médium používateľa."
 
 #: api/classes/CHost.php:1858
 msgid "Cannot link template"
@@ -2523,7 +2523,7 @@ msgstr "Kontakt"
 
 #: include/hosts.inc.php:259
 msgid "Contract number"
-msgstr "Kontaktné telefónne číslo"
+msgstr "Číslo zmluvy"
 
 #: include/views/js/configuration.sysmaps.js.php:151
 msgid "Coordinates"
@@ -2921,7 +2921,7 @@ msgstr "Stmaviť"
 
 #: dashboard.php:24 include/menu.inc.php:33 include/profiles.inc.php:352
 msgid "Dashboard"
-msgstr "Konzola"
+msgstr "Nástenka"
 
 #: dashconf.php:27
 msgid "Dashboard configuration"
@@ -3720,7 +3720,7 @@ msgstr "Zistené zariadenie"
 #: include/views/configuration.action.list.php:34 templates.php:463
 #: templates.php:531
 msgid "Discovery"
-msgstr "Zisťovanie"
+msgstr "Zisťovania"
 
 #: include/views/configuration.discovery.edit.php:46
 msgid "Discovery by proxy"
@@ -3758,7 +3758,7 @@ msgstr "Zisťovacie pravidlo \"%1$s\" už existuje na \"%2$s\", zdedené z inej 
 #: api/classes/CDiscoveryRule.php:881
 #, php-format
 msgid "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
-msgstr "Zisťovacie pravidlo \"%1$s:%2$s\" ma nesprávny lifetime: \"%3$s\". (min: %4$d, max: %5$d, použivateľské makro povolené)"
+msgstr "Zisťovacie pravidlo \"%1$s:%2$s\" ma nesprávny lifetime: \"%3$s\". (min: %4$d, max: %5$d, používateľské makro povolené)"
 
 #: api/classes/CDRule.php:596
 #, php-format
@@ -4091,7 +4091,7 @@ msgstr "Povoliť"
 
 #: include/views/administration.usergroups.list.php:137
 msgid "Enable DEBUG"
-msgstr "Povoliť ladiaci DEBUG režim"
+msgstr "Povoliť ladiaci režim"
 
 #: include/views/administration.script.edit.php:101
 msgid "Enable confirmation"
@@ -4324,7 +4324,7 @@ msgstr "Vylúčiť"
 #: include/views/js/administration.script.edit.js.php:66
 #: include/views/js/general.script.confirm.js.php:37
 msgid "Execute"
-msgstr "Spustiť"
+msgstr "Vykonať"
 
 #: api/classes/CImage.php:339
 #, php-format
@@ -4337,15 +4337,15 @@ msgstr "SQL chyba pri spustení [%1$s] v [%2$s]."
 #: include/views/js/configuration.action.edit.js.php:114 popup.php:1807
 #: popup.php:1814
 msgid "Execute on"
-msgstr "Spustené na"
+msgstr "Vykonávať na"
 
 #: include/items.inc.php:1334 include/views/configuration.item.edit.php:186
 msgid "Executed script"
-msgstr "Spustený skript"
+msgstr "Vykonaný skript"
 
 #: include/views/js/general.script.confirm.js.php:16
 msgid "Execution confirmation"
-msgstr "Potvrdenie spustenia"
+msgstr "Potvrdenie vykonania"
 
 #: sysmap.php:190
 msgid "Expand macros"
@@ -4733,7 +4733,7 @@ msgstr "Globálne skripty"
 #: include/views/configuration.triggers.list.php:240 sysmaps.php:296
 #: templates.php:621 tr_status.php:783
 msgid "Go"
-msgstr "Spusti"
+msgstr "Vykonať"
 
 #: include/views/js/monitoring.maps.js.php:51 jsLoader.php:177
 msgid "Go to"
@@ -4944,7 +4944,7 @@ msgstr "Skupina \"%1$s\" je interná a nemôže byť zmazaná."
 #: api/classes/CHostGroup.php:770
 #, php-format
 msgid "Group \"%s\" cannot be deleted, because it is used in a global script."
-msgstr "Skupina \"%s\" nemôže byť zmazaná, pretože je použivaná v globálnom skripte."
+msgstr "Skupina \"%s\" nemôže byť zmazaná, pretože je používaná v globálnom skripte."
 
 #: api/classes/CHostGroup.php:754
 #, php-format
@@ -5300,7 +5300,7 @@ msgstr "Siete hosta"
 
 #: include/hosts.inc.php:299
 msgid "Host router"
-msgstr "Hostov router"
+msgstr "Hostov smerovač"
 
 #: host_screen.php:27 include/views/js/monitoring.maps.js.php:28
 #: jsLoader.php:176
@@ -6786,7 +6786,7 @@ msgstr "Júl"
 
 #: include/func.inc.php:223
 msgid "Jun"
-msgstr "Jun"
+msgstr "Jún"
 
 #: include/forms.inc.php:1566 include/func.inc.php:109
 #: include/func.inc.php:240 jsLoader.php:119
@@ -7267,7 +7267,7 @@ msgstr "MD5"
 
 #: report5.php:52
 msgid "MOST BUSY TRIGGERS TOP 100"
-msgstr "NAJAKTÍVNEJŠIE SPÚŠTAČE TOP 100"
+msgstr "100 NAJAKTÍVNEJŠÍCH SPÚŠŤAČOV"
 
 #: include/audit.inc.php:50 include/views/common.macros.php:25
 #: include/views/configuration.item.edit.php:336
@@ -7835,7 +7835,7 @@ msgstr "Viac ako jeden graf s menom \"%1$s\" pre host."
 
 #: report5.php:24
 msgid "Most busy triggers top 100"
-msgstr "Najaktívnejšie spúšťače TOP 100"
+msgstr "100 najaktívnejších spúšťačov"
 
 #: jsLoader.php:166
 msgid "Move"
@@ -7847,7 +7847,7 @@ msgstr "Mozilla Firefox"
 
 #: include/triggers.inc.php:1647
 msgid "Multiple PROBLEM events"
-msgstr "Viacnásobné PROBLÉMové udalosti"
+msgstr "Viacnásobné PROBLÉMOVÉ udalosti"
 
 #: include/views/configuration.triggers.edit.php:242
 msgid "Multiple PROBLEM events generation"
@@ -7965,7 +7965,7 @@ msgstr "Nikdy"
 
 #: httpdetails.php:150 httpdetails.php:205
 msgid "Never executed"
-msgstr "Nikdy nespustené"
+msgstr "Nikdy nevykonané"
 
 #: include/forms.inc.php:1937 include/views/configuration.action.edit.php:396
 #: include/views/configuration.action.edit.php:596
@@ -8197,7 +8197,7 @@ msgstr "Žiadne udalosti bez potvrdenia"
 #: api/classes/CAction.php:1504
 #, php-format
 msgid "No execution target specified for action operation command \"%s\"."
-msgstr "Žiadny cieľ spustenia nie je špecifikovaný pre akciu príkazu \"%s\"."
+msgstr "Žiadny cieľ vykonania nie je špecifikovaný pre akciu príkazu \"%s\"."
 
 #: include/classes/helpers/CUploadFile.php:156
 msgid "No file was uploaded."
@@ -8857,7 +8857,7 @@ msgstr "OOB IP adresa"
 
 #: include/hosts.inc.php:314
 msgid "OOB router"
-msgstr "OOB router"
+msgstr "OOB smerovač"
 
 #: include/hosts.inc.php:309
 msgid "OOB subnet mask"
@@ -8933,68 +8933,68 @@ msgstr "Jednorázovo"
 #: include/views/configuration.services.edit.php:133
 #: include/views/configuration.services.edit.php:288
 msgid "One-time downtime"
-msgstr "Jednorázový downtime"
+msgstr "Jednorázový prestoj"
 
 #: api/classes/CUserGroup.php:330 api/classes/CUserGroup.php:407
 msgid "Only Super Admins can add user groups."
-msgstr "Len Super Admini môžu pridať používateľské skupiny."
+msgstr "Len super administrátori môžu pridať používateľské skupiny."
 
 #: api/classes/CUserMacro.php:398
 msgid "Only Super Admins can create global macros."
-msgstr "Len Super Admini môžu vytvoriť globálne makrá."
+msgstr "Len super administrátori môžu vytvoriť globálne makrá."
 
 #: api/classes/CHostGroup.php:642
 msgid "Only Super Admins can create host groups."
-msgstr "Len Super Admini môžu vytvoriť skupiny."
+msgstr "Len super administrátori môžu vytvoriť skupiny."
 
 #: api/classes/CIconMap.php:244
 msgid "Only Super Admins can create icon maps."
-msgstr "Len Super Admini môžu vytvoriť mapové ikony."
+msgstr "Len super administrátori môžu vytvoriť mapové ikony."
 
 #: api/classes/CMediatype.php:315
 msgid "Only Super Admins can create media types."
-msgstr "Len Super Admini môžu vytvoriť typy médií."
+msgstr "Len super administrátori môžu vytvoriť typy médií."
 
 #: api/classes/CUserMacro.php:498
 msgid "Only Super Admins can delete global macros."
-msgstr "Len Super Admini môžu zmazať globálne makrá."
+msgstr "Len super administrátori môžu zmazať globálne makrá."
 
 #: api/classes/CMediatype.php:428
 msgid "Only Super Admins can delete media types."
-msgstr "Len Super Admini môžu zmazať typy médií."
+msgstr "Len super administrátori môžu zmazať typy médií."
 
 #. GETTEXT: API exception
 #: api/classes/CUserGroup.php:705
 msgid "Only Super Admins can delete user groups."
-msgstr "Len Super Admini môžu zmazať používateľské skupiny."
+msgstr "Len super administrátori môžu zmazať používateľské skupiny."
 
 #: api/classes/CMediatype.php:366
 msgid "Only Super Admins can edit media types."
-msgstr "Len Super Admini môžu upravovať typy médií."
+msgstr "Len super administrátori môžu upravovať typy médií."
 
 #: api/classes/CUserMacro.php:436
 msgid "Only Super Admins can update global macros."
-msgstr "Len Super Admini môžu upravovať globálne makrá."
+msgstr "Len super administrátori môžu upravovať globálne makrá."
 
 #: api/classes/CIconMap.php:300
 msgid "Only Super Admins can update icon maps."
-msgstr "Len Super Admini môžu aktualizovať mapové ikony."
+msgstr "Len super administrátori môžu aktualizovať mapové ikony."
 
 #: api/classes/CUserGroup.php:382 api/classes/CUserGroup.php:504
 msgid "Only Super Admins can update user groups."
-msgstr "Len Super Admini môžu aktualizovať používateľské skupiny."
+msgstr "Len super administrátori môžu aktualizovať používateľské skupiny."
 
 #: api/classes/CUser.php:685
 msgid "Only Zabbix Admins can add user media."
-msgstr "Len Zabbix Admini môžu pridať použivateľské médiá."
+msgstr "Len Zabbix administrátori môžu pridať používateľské médiá."
 
 #: api/classes/CUser.php:753
 msgid "Only Zabbix Admins can change user media."
-msgstr "Len Zabbix Admini môžu zmeniť použivateľské médiá."
+msgstr "Len Zabbix administrátori môžu zmeniť používateľské médiá."
 
 #: api/classes/CUser.php:723
 msgid "Only Zabbix Admins can remove user media."
-msgstr "Len Zabbix Admini môžu zmazať použivateľské médiá."
+msgstr "Len Zabbix administrátori môžu zmazať používateľské médiá."
 
 #: api/classes/CWebCheck.php:604
 msgid "Only characters are allowed."
@@ -9014,7 +9014,7 @@ msgstr "Len jedna používateľská skupina môže byť zmenená naraz."
 
 #: api/classes/CProxy.php:608
 msgid "Only super admins can delete proxies."
-msgstr "Len super admini môžu zmazať proxy."
+msgstr "Len super administrátori môžu zmazať proxy."
 
 #: include/services.inc.php:298
 #, php-format
@@ -9180,7 +9180,7 @@ msgstr "P"
 
 #: dashboard.php:225
 msgid "PERSONAL DASHBOARD"
-msgstr "OSOBNÁ KONZOLA"
+msgstr "OSOBNÁ NÁSTENKA"
 
 #: include/classes/class.frontendsetup.php:316
 msgid "PHP bcmath"
@@ -9200,7 +9200,7 @@ msgstr "PHP modul ctype chýba (PHP konfiguračný parameter --enable-ctype)"
 
 #: include/classes/class.frontendsetup.php:288
 msgid "PHP databases support"
-msgstr "PHP - podpora databáz"
+msgstr "PHP podpora databáz"
 
 #: include/classes/class.frontendsetup.php:380
 msgid "PHP gd"
@@ -10245,7 +10245,7 @@ msgstr "Rusky (ru_RU)"
 #: jsLoader.php:131
 msgctxt "Saturday short"
 msgid "S"
-msgstr "Sob"
+msgstr "So"
 
 #: jsLoader.php:132
 msgctxt "Sunday short"
@@ -10413,7 +10413,7 @@ msgstr "STAV MONITORINGU WEBOV"
 
 #: report1.php:32
 msgid "STATUS OF ZABBIX"
-msgstr "STAV ZABBIXu"
+msgstr "STAV ZABBIXU"
 
 #: include/views/configuration.httpconf.edit.php:91
 msgid "Safari"
@@ -11977,7 +11977,7 @@ msgstr "Spúšťač zmazaný"
 #: adm.valuemapping.php:134 adm.workingtime.php:70
 #: include/views/administration.general.triggerDisplayOptions.edit.php:114
 msgid "Trigger displaying options"
-msgstr "Zobrazovacie možnosti spúšťača"
+msgstr "Zobrazovacie možnosti spúšťačov"
 
 #: include/views/configuration.triggers.expression.php:125
 msgid "Trigger expression condition"
@@ -12098,7 +12098,7 @@ msgstr "Stav spúšťačov"
 
 #: include/menu.inc.php:133
 msgid "Triggers top 100"
-msgstr "Spúšťače top 100"
+msgstr "100 najaktívnejších spúšťačov"
 
 #: dashconf.php:249
 msgid "Triggers with severity"
@@ -12330,7 +12330,7 @@ msgstr "Jednotky"
 #: include/views/js/configuration.discovery.edit.js.php:141 popup.php:574
 #: popup.php:592 report2.php:239
 msgid "Unknown"
-msgstr "Neznáme"
+msgstr "Neznámy"
 
 #: auditlogs.php:155
 msgid "Unknown action"
@@ -12691,7 +12691,7 @@ msgstr "Používateľ s aliasom \"%s\" už existuje."
 #: include/views/configuration.host.edit.php:541
 #: include/views/general.login.php:62 index.php:35
 msgid "Username"
-msgstr "Použivateľské meno"
+msgstr "Používateľské meno"
 
 #: include/menu.inc.php:253
 #: include/views/administration.usergroups.edit.php:53
@@ -13182,15 +13182,15 @@ msgstr "Y"
 
 #: include/views/configuration.graph.edit.php:274
 msgid "Y axis MAX value"
-msgstr "MAXimálna hodnota osy Y"
+msgstr "Maximálna hodnota osy Y"
 
 #: api/classes/CGraphGeneral.php:93
 msgid "Y axis MAX value must be greater than Y axis MIN value."
-msgstr "MAXimálna hodnota pre os Y musí byť väčšia ako MINimálna hodnota pre túto os."
+msgstr "Maximálna hodnota pre os Y musí byť väčšia ako minimálna hodnota pre túto os."
 
 #: include/views/configuration.graph.edit.php:216
 msgid "Y axis MIN value"
-msgstr "MINimálna hodnota osy Y"
+msgstr "Minimálna hodnota osy Y"
 
 #: include/views/configuration.graph.edit.php:74
 msgid "Y axis side"
@@ -13203,25 +13203,25 @@ msgstr "Označenie osi Y"
 
 #: include/translateDefines.inc.php:31 include/translateDefines.inc.php:32
 msgid "Y-m-d H:i:s"
-msgstr "Y-m-d H:i:s"
+msgstr "d-m-Y H:i:s"
 
 #: include/classes/screens/CScreenHistory.php:215
 #: include/translateDefines.inc.php:29 include/translateDefines.inc.php:30
 #: include/translateDefines.inc.php:33
 msgid "Y.M.d H:i:s"
-msgstr "Y.M.d H:i:s"
+msgstr "d.M.Y H:i:s"
 
 #: include/translateDefines.inc.php:38
 msgid "Y.m.d"
-msgstr "Y. m. d"
+msgstr "d.m.Y"
 
 #: include/translateDefines.inc.php:37
 msgid "Y.m.d H:i"
-msgstr "j. n. Y G:i"
+msgstr "d.m.Y H:i"
 
 #: include/func.inc.php:507 include/translateDefines.inc.php:47
 msgid "Y.m.d H:i:s"
-msgstr "Y.m.d H:i:s"
+msgstr "d.m.Y H:i:s"
 
 #: report3.php:72 report3.php:91 report4.php:105 report4.php:126
 #: report5.php:48
@@ -13350,11 +13350,11 @@ msgstr "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
 
 #: include/users.inc.php:40
 msgid "Zabbix Admin"
-msgstr "Zabbix Admin"
+msgstr "Zabbix administrátor"
 
 #: include/users.inc.php:41
 msgid "Zabbix Super Admin"
-msgstr "Zabbix Super Admin"
+msgstr "Zabbix super administrátor"
 
 #: include/users.inc.php:39
 msgid "Zabbix User"
@@ -13382,7 +13382,7 @@ msgstr "Zabbix prijal neplatnú požiadavku."
 
 #: include/items.inc.php:83
 msgid "Zabbix internal"
-msgstr "Zabbix interné premenné"
+msgstr "Zabbix interne"
 
 #: authentication.php:182
 msgid "Zabbix internal authentication"
@@ -13459,7 +13459,7 @@ msgstr "Zväčšenie"
 #: include/classes/screens/CScreenHostgroupTriggers.php:127
 #: include/classes/screens/CScreenHostTriggers.php:127
 msgid "[H:i:s]"
-msgstr "[G:i:s]"
+msgstr "[H:i:s]"
 
 #: include/func.inc.php:133
 #, php-format
@@ -13622,7 +13622,7 @@ msgstr "presne"
 #: include/actions.inc.php:835
 #: include/views/administration.auditacts.list.php:89
 msgid "executed"
-msgstr "spustené"
+msgstr "vykonané"
 
 #: jsLoader.php:89
 msgid "fixed"
@@ -13870,7 +13870,7 @@ msgstr "poslané"
 
 #: include/views/configuration.services.edit.php:200
 msgid "short description"
-msgstr "krátky opis"
+msgstr "krátky popis"
 
 #: include/views/configuration.sysmap.edit.php:76
 msgid "show icon mappings"
@@ -13898,7 +13898,7 @@ msgstr "spúšťač"
 #: include/classes/class.frontendsetup.php:376
 #: include/classes/class.frontendsetup.php:476
 msgid "unknown"
-msgstr "neznáme"
+msgstr "neznámy"
 
 #: include/views/common.macros.php:34
 msgid "value"

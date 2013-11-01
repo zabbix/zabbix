@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-24 22:01+0300\n"
-"PO-Revision-Date: 2013-10-07 08:03+0300\n"
-"Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
+"POT-Creation-Date: 2013-11-01 06:26+0200\n"
+"PO-Revision-Date: 2013-11-01 03:54+0300\n"
+"Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1381125788.0\n"
+"X-POOTLE-MTIME: 1383270861.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -327,7 +327,7 @@ msgstr "選択を有効"
 #: include/views/administration.proxy.list.php:84
 #: include/views/configuration.httpconf.edit.php:118
 msgid "Active"
-msgstr "有効"
+msgstr "アクティブ"
 
 #: include/views/configuration.maintenance.list.php:61
 msgctxt "maintenance status"
@@ -523,7 +523,7 @@ msgstr "グリッドに揃える"
 #: include/views/configuration.sysmap.edit.php:138 jsLoader.php:87
 #: popup_right.php:56 tr_status.php:215
 msgid "All"
-msgstr "全て"
+msgstr "すべて"
 
 #: include/classes/class.chostsinfo.php:115
 #: include/classes/class.ctriggersinfo.php:124
@@ -786,7 +786,7 @@ msgstr "期間Tの値の平均値 = N"
 
 #: popup_trexpr.php:143
 msgid "Average value of a period T is > N"
-msgstr "期間Tの値の平均値is > N"
+msgstr "期間Tの値の平均値 > N"
 
 #: popup_trexpr.php:153
 msgid "Average value of a period T is NOT N"
@@ -855,7 +855,7 @@ msgstr "太線"
 
 #: include/items.inc.php:131
 msgid "Boolean"
-msgstr "ブール型"
+msgstr "Boolean"
 
 #: include/views/configuration.screen.constructor.edit.php:602
 #: include/views/configuration.sysmap.edit.php:132
@@ -1592,7 +1592,7 @@ msgstr "アイテムのキー\"%2$s\"のインターフェースは\"%1$s\"に�
 #: include/classes/import/CConfigurationImport.php:877
 #, php-format
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
-msgstr ""
+msgstr "グラフ\"%2$s\"で利用されているホストまたはテンプレートが見つかりません。"
 
 #: include/classes/import/CXmlImport18.php:767
 #: include/classes/import/importers/CMapImporter.php:247
@@ -2205,7 +2205,7 @@ msgstr "列の結合"
 #: api/classes/CScreenItem.php:613
 #, php-format
 msgid "Column span of screen element located at X - %1$s and Y - %2$s is too big."
-msgstr "X - %1$s、Y - %2$sに設定されているスクリーンの列の幅が大きすぎます。"
+msgstr "スクリーンの要素の列結合の位置 X - %1$s と Y - %2$s が大きすぎます。"
 
 #: include/views/configuration.screen.edit.php:40 screenconf.php:51
 msgid "Columns"
@@ -5954,7 +5954,7 @@ msgstr "色\"%1$s\"が正しくありません。"
 #: api/classes/CScreenItem.php:590
 #, php-format
 msgid "Incorrect column span provided for screen element located at X - %1$s and Y - %2$s."
-msgstr "X - %1$s、Y - %2$sに設定されているスクリーンの列の幅が正しくありません。"
+msgstr "列の結合によるスクリーンの要素の位置 X - %1$s と Y - %2$s が正しくありません。"
 
 #: api/classes/CDRule.php:437
 msgid "Incorrect delay."
@@ -6187,7 +6187,7 @@ msgstr "スクリーンのリソースタイプが正しくありません。"
 #: api/classes/CScreenItem.php:585
 #, php-format
 msgid "Incorrect row span provided for screen element located at X - %1$s and Y - %2$s."
-msgstr "X - %1$s、Y - %2$sに設定されているスクリーンの行の高さが正しくありません。"
+msgstr "行の結合によるスクリーンの要素の位置 X - %1$s と Y - %2$s が正しくありません。"
 
 #: api/classes/CScreenItem.php:558
 #, php-format
@@ -7160,7 +7160,7 @@ msgstr "ログの時間の形式"
 
 #: include/views/administration.general.other.edit.php:39
 msgid "Log unmatched SNMP traps"
-msgstr "マッチしないSNMPトラップをログに記録"
+msgstr "Log unmatched SNMP traps"
 
 #: include/classes/class.cserverinfo.php:45
 msgid "Logged in as"
@@ -8109,7 +8109,7 @@ msgstr "期間Tの間にデータが存在しない N= 1、それ以外 N = 0"
 
 #: popup_trexpr.php:499
 msgid "No data received during period of time T, then N NOT 1, 0 - otherwise"
-msgstr "期間Tの間にデータが存在しない N NOT 1、それ以外 N NOT 0"
+msgstr "期間Tの間にデータが存在しない N NOT 1、それ以外 N = 0"
 
 #: api/classes/CHostInterface.php:1001
 #, php-format
@@ -9342,7 +9342,7 @@ msgstr "\"%1$s\"が入力されましたが、文字列かユーザーマクロ�
 #: include/classes/validators/CTriggerFunctionValidator.php:106
 #, php-format
 msgid "Parameter sec or #num or user macro expected, \"%1$s\" given."
-msgstr "\"%1$s\"が入力されましたが、秒、#数字、ユーザーマクロのいずれかを設定してください。"
+msgstr "\"%1$s\"が入力されましたが、秒、#データ数、ユーザー定義マクロのいずれかを設定してください。"
 
 #: include/classes/validators/CTriggerFunctionValidator.php:99
 #, php-format
@@ -10013,7 +10013,7 @@ msgstr "アイコンのマッピングに必須フィールド\"インベント�
 
 #: include/views/administration.script.edit.php:97
 msgid "Required host permissions"
-msgstr "必要なホストへのアクセス権"
+msgstr "ホストの権限が必要です"
 
 #: include/views/administration.proxy.list.php:50
 msgid "Required performance (vps)"
@@ -10152,7 +10152,7 @@ msgstr "行の結合"
 #: api/classes/CScreenItem.php:608
 #, php-format
 msgid "Row span of screen element located at X - %1$s and Y - %2$s is too big."
-msgstr "X - %1$s、Y - %2$sに設定されているスクリーンの行の高さが正しくありません。"
+msgstr "スクリーンの要素の行結合の位置 X - %1$s と Y - %2$s が大きすぎます。"
 
 #: include/views/configuration.screen.edit.php:41 screenconf.php:52
 msgid "Rows"
@@ -13575,7 +13575,7 @@ msgstr "every"
 
 #: hostinventories.php:123
 msgid "exactly"
-msgstr "exactly"
+msgstr "完全一致"
 
 #: include/actions.inc.php:835
 #: include/views/administration.auditacts.list.php:89
