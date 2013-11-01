@@ -559,7 +559,7 @@ Changes for 2.0.10rc1
 
 New features:
 ..F....... [ZBX-7103] improved loading speed of tr_events.php page (Sasha)
-A.F....... [ZBX-1357] updated Dutch, German, Hungarian, Japanese, Italian, Romanian and Slovak translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Dutch, German, Hungarian, Japanese, Italian, Romanian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 .......PS. [ZBX-6835] fixed bug when agent/proxy connection error could have resulted in a wrong warning about message size (wiper)
