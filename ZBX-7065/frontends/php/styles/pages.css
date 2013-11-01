@@ -197,7 +197,6 @@
 div.trigger_displaying_form_col { width: 12em; zoom: 1; *display: inline; }
 
 /* login */
-.loginBG { background: #AABBCC url(../images/gradients/texture_diagonal.gif); }
 .loginForm {
 	margin: -10% auto; padding: 15px; height: 260px; width: 582px; *position: relative; *top: -50%;
 	background: url(../images/general/login/background.png) no-repeat;
@@ -225,7 +224,6 @@ div.trigger_displaying_form_col { width: 12em; zoom: 1; *display: inline; }
 .browserwarningCopyright a:hover { text-decoration: underline; }
 
 /* setup wizard */
-.setupBG { background: #AABBCC url(../images/gradients/texture_diagonal.gif); }
 div.setup_wizard { margin: 15px auto 0; width: 800px; height: 541px; background: url(../images/general/setup/background.png) no-repeat; }
 div.setup_wizard_welcome { background: url(../images/general/setup/welcome_screen.png) no-repeat; }
 div.setup_wizard_licence { margin-top: 110px; margin-left: 10px; text-align: left; }
