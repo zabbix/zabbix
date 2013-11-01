@@ -1549,7 +1549,7 @@ static int	DBpatch_2010101(void)
 
 			zbx_free(param);
 
-			if (ITEM_KEY_LEN < zbx_strlen_utf8(key))
+			if (255 /* ITEM_KEY_LEN */ < zbx_strlen_utf8(key))
 				error_message = zbx_dsprintf(error_message, "key \"%s\" is too long", row[1]);
 		}
 
@@ -2238,6 +2238,86 @@ static int	DBpatch_2010193(void)
 	return FAIL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: replace_key_param                                                *
+ *                                                                            *
+ * Comments: auxiliary function for DBpatch_2010194()                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	replace_key_param(char **data, int key_type, size_t l, size_t *r, int level, int num, int quoted,
+		void *cb_data)
+{
+	char	c, *param, *new_param;
+
+	if (1 != level || 4 != num)	/* the fourth parameter on first level should be updated */
+		return;
+
+	c = (*data)[*r];
+	(*data)[*r] = '\0';
+
+	param = zbx_strdup(NULL, *data + l);
+	(*data)[*r] = c;
+
+	if (0 != quoted)
+		unquote_key_param(param);
+
+	if ('\0' != *param)
+	{
+		new_param = zbx_dsprintf(NULL, "^%s$", param);
+
+		quote_key_param(&new_param, quoted);
+		(*r)--; zbx_replace_string(data, l, r, new_param); (*r)++;
+
+		zbx_free(new_param);
+	}
+
+	zbx_free(param);
+}
+
+static int	DBpatch_2010194(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*key = NULL, *key_esc, error[64];
+	int		ret = SUCCEED;
+
+	result = DBselect("select itemid,key_ from items where key_ like 'eventlog[%%'");
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		key = zbx_strdup(key, row[1]);
+
+		if (SUCCEED != replace_key_params_dyn(&key, ZBX_KEY_TYPE_ITEM, replace_key_param, NULL,
+				error, sizeof(error)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot convert item key \"%s\": %s.", row[1], error);
+			continue;
+		}
+
+		if (255 /* ITEM_KEY_LEN */ < zbx_strlen_utf8(key))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot convert item key \"%s\": key is too long.", row[1]);
+			continue;
+		}
+
+		if (0 != strcmp(key, row[1]))
+		{
+			key_esc = DBdyn_escape_string(key);
+
+			if (ZBX_DB_OK > DBexecute("update items set key_='%s' where itemid=%s", key_esc, row[0]))
+				ret = FAIL;
+
+			zbx_free(key_esc);
+		}
+	}
+	DBfree_result(result);
+
+	zbx_free(key);
+
+	return ret;
+}
+
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 #define DBPATCH_END()					{NULL}};
@@ -2478,6 +2558,7 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010191, 0, 1)
 	DBPATCH_ADD(2010192, 0, 0)
 	DBPATCH_ADD(2010193, 0, 0)
+	DBPATCH_ADD(2010194, 0, 1)
 
 	DBPATCH_END()
 
