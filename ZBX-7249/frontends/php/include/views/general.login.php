@@ -34,7 +34,7 @@ require_once dirname(__FILE__).'/../page_header.php';
 	<div style="display: table; position: absolute; height: 99%; width: 99%;">
 		<div class="vertical-middle">
 			<div class="loginForm">
-				<div style="position: relative; color: #F0F0F0; height: 100%;">
+				<div style="position: relative; color: #FFF; height: 100%;">
 					<!-- Help & Support -->
 					<div style="position: absolute; top: 0px; right: 10px;">
 						<a class="highlight" href="http://www.zabbix.com/documentation"><?php echo _('Help'); ?></a>
@@ -44,9 +44,9 @@ require_once dirname(__FILE__).'/../page_header.php';
 
 					<!-- Copyright -->
 					<div style="float: left; width: 250px; height: 100%;">
-						<div style="position: absolute; top: 39%; left: 2%;" class="loginLogo"></div>
+						<div style="position: absolute; top: 39%; left: 30px;" class="loginLogo"></div>
 						<div style="position: absolute; bottom: 2px;">
-							<span class="bold textwhite" style="margin: 0 0 4px 4px; font-size: 0.9em; opacity: 0.7;">
+							<span class="bold textwhite" style="margin: 0 0 4px 4px; font-size: 0.9em;">
 								<?php echo _s('Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA',
 									ZABBIX_VERSION, ZABBIX_COPYRIGHT_FROM, ZABBIX_COPYRIGHT_TO); ?>
 							</span>
@@ -58,7 +58,7 @@ require_once dirname(__FILE__).'/../page_header.php';
 						<div style="float: right;">
 							<ul style="list-style-type: none;">
 								<li style="padding-right: 6px; height: 22px;">
-									<div class="ui-corner-all textwhite bold" style="padding: 2px 4px; float: right; background-color: #CC3333; visibility: <?php echo zbx_empty($message) ? 'hidden' : 'visible'; ?>" >
+									<div class="ui-corner-all textwhite bold" style="padding: 2px 4px; float: right; background-color: #D60900; visibility: <?php echo zbx_empty($message) ? 'hidden' : 'visible'; ?>" >
 										<span class="nowrap"><?php echo $message; ?></span>
 									</div>
 								</li>
@@ -93,7 +93,6 @@ require_once dirname(__FILE__).'/../page_header.php';
 </form>
 <script type="text/javascript">
 	jQuery(document).ready(function() {
-		jQuery(document.body).addClass('loginBG');
 		jQuery('#enter').button();
 		jQuery('#name').focus();
 	});

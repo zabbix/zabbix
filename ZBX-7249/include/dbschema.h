@@ -50,7 +50,7 @@
 
 typedef struct
 {
-	const char    	*name;
+	const char	*name;
 	const char	*default_value;
 	const char	*fk_table;
 	const char	*fk_field;
