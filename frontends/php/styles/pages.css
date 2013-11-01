@@ -204,7 +204,6 @@ div.trigger_displaying_form_col { width: 12em; zoom: 1; *display: inline; }
 .loginLogo { height: 51px; width: 162px; background: url(../images/general/login/logo.png) no-repeat; }
 
 /* browserwarning */
-.browserwarningBG { background: #AABBCC url(../images/gradients/texture_diagonal.gif); }
 .browserwarningForm {
 	margin: auto; font-size: 12px; height: 465px; width: 610px; *position: relative; *top: -50%;
 	background: url(../images/general/browserwarning/background.png) no-repeat;

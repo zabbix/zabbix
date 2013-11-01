@@ -28,7 +28,7 @@
 	<link rel="stylesheet" type="text/css" href="styles/default.css" />
 	<link rel="stylesheet" type="text/css" href="styles/pages.css" />
 </head>
-<body class="originalblue browserwarningBG">
+<body class="originalblue">
 	<div style="display: table; height: 99%; width: 99%;">
 		<div class="vertical-middle">
 			<div class="browserwarningForm">
