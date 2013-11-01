@@ -169,15 +169,13 @@ div.trigger_displaying_form_col { width: 12em; zoom: 1; *display: inline; }
 .trigger-expression #expr_type { width: 605px; max-width: 605px; }
 
 /* login */
-.loginBG { background: #AABBCC url(../images/gradients/texture_diagonal.gif); }
 .loginForm {
-	margin: auto; padding: 15px; height: 260px; width: 582px; *position: relative; *top: -50%;
+	margin: -10% auto; padding: 15px; height: 260px; width: 582px; *position: relative; *top: -50%;
 	background: url(../images/general/login/background.png) no-repeat;
 }
-.loginLogo { height: 53px; width: 163px; background: url(../images/general/login/logo.png) no-repeat; }
+.loginLogo { height: 51px; width: 162px; background: url(../images/general/login/logo.png) no-repeat; }
 
 /* browserwarning */
-.browserwarningBG { background: #AABBCC url(../images/gradients/texture_diagonal.gif); }
 .browserwarningForm {
 	margin: auto; font-size: 12px; height: 465px; width: 610px; *position: relative; *top: -50%;
 	background: url(../images/general/browserwarning/background.png) no-repeat;
@@ -197,18 +195,15 @@ div.trigger_displaying_form_col { width: 12em; zoom: 1; *display: inline; }
 .browserwarningCopyright a:hover { text-decoration: underline; }
 
 /* setup wizard */
-.setupBG { background: #AABBCC url(../images/gradients/texture_diagonal.gif); }
 div.setup_wizard { margin: 15px auto 0; width: 800px; height: 541px; background: url(../images/general/setup/background.png) no-repeat; }
 div.setup_wizard_welcome { background: url(../images/general/setup/welcome_screen.png) no-repeat; }
-div.setup_wizard_licence { margin-top: 80px; margin-left: 10px; text-align: left; }
-div.setup_wizard div.left { float: left; margin: 40px 0 0 20px; width: 220px; }
-div.setup_wizard div.setup_logo { margin-left: 10px; height: 53px; background: url(../images/general/setup/logo.png) no-repeat; }
-div.setup_wizard div.setup_version { margin-left: 20px; color: #608CB6; font-weight: bold; font-size: 16px; }
-div.setup_wizard div.left_menu { margin: 50px 0 0 }
+div.setup_wizard_licence { margin-top: 110px; margin-left: 10px; text-align: left; }
+div.setup_wizard div.left { float: left; margin-left: 20px; width: 220px; }
+div.setup_wizard div.left_menu { margin-top: 120px; }
 div.setup_wizard div.left_menu ul { list-style-type: none }
-div.setup_wizard div.left_menu li { margin: 1px 0 0; padding: 5px; color: #608cb6; font-weight: bold; font-size: 12px; }
+div.setup_wizard div.left_menu li { padding: 7px 7px 7px 10px; color: #608cb6; font-weight: bold; font-size: 12px; }
 div.setup_wizard div.left_menu li.current { background: #608CB6; color: #fff; }
-div.setup_wizard div.left_menu li.completed { background: #A4BDD5; color: #BDE5EE; }
+div.setup_wizard div.left_menu li.completed { background: #C3D4E6; color: #777; }
 div.setup_wizard div.right { float: left; margin: 40px 0 0; width: 530px; }
 div.setup_wizard div.right div.setup_title { padding: 10px; background: #608CB6; color: #FFF; text-align: left; font-size: 20px; }
 div.setup_wizard div.right div.blank_title { height: 38px }
