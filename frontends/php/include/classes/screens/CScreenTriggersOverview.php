@@ -27,7 +27,6 @@ class CScreenTriggersOverview extends CScreenBase {
 	 * @return CDiv (screen inside container)
 	 */
 	public function get() {
-		global $page;
 		$hostids = array();
 
 		$dbHostGroups = DBselect(
@@ -39,10 +38,8 @@ class CScreenTriggersOverview extends CScreenBase {
 			$hostids[$dbHostGroup['hostid']] = $dbHostGroup['hostid'];
 		}
 
-		$page['file'] = $this->pageFile;
-
-		return $this->getOutput(
-			getTriggersOverview($hostids, $this->screenitem['application'], $this->screenitem['style'], $this->screenid)
-		);
+		return $this->getOutput(getTriggersOverview($hostids, $this->screenitem['application'],
+				$this->pageFile, $this->screenitem['style'], $this->screenid
+		));
 	}
 }
