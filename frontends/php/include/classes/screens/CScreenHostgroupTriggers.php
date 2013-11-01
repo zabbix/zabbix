@@ -34,7 +34,8 @@ class CScreenHostgroupTriggers extends CScreenBase {
 			'hostids' => null,
 			'maintenance' => null,
 			'severity' => null,
-			'limit' => $this->screenitem['elements']
+			'limit' => $this->screenitem['elements'],
+			'backUrl' => $this->pageFile
 		);
 
 		// by default triggers are sorted by date desc, do we need to override this?
@@ -102,7 +103,7 @@ class CScreenHostgroupTriggers extends CScreenBase {
 				$params['hostids'] = $hostid;
 			}
 
-			$item = new CForm();
+			$item = new CForm(null, $this->pageFile);
 
 			$groupComboBox = new CComboBox('tr_groupid', $groupid, 'submit()');
 			$groupComboBox->addItem(0, _('all'));

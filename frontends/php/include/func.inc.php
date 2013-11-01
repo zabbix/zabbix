@@ -301,7 +301,7 @@ function zbxDateToTime($strdate) {
 		return mktime($hours, $minutes, 0, $month, $date, $year);
 	}
 	else {
-		return (!empty($strdate) && is_numeric($strdate)) ? $strdate : time();
+		return ($strdate && is_numeric($strdate)) ? $strdate : time();
 	}
 }
 
