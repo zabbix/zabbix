@@ -90,7 +90,6 @@ frontends/php/images/general/ok_icon.png -text
 frontends/php/images/general/ok_icon_bb.png -text
 frontends/php/images/general/plus.png -text
 frontends/php/images/general/setup/background.png -text
-frontends/php/images/general/setup/logo.png -text
 frontends/php/images/general/setup/welcome_screen.png -text
 frontends/php/images/general/snmp_available.png -text
 frontends/php/images/general/snmp_available_bb.png -text
@@ -145,7 +144,6 @@ frontends/php/images/gradients/sla_red.png -text
 frontends/php/images/gradients/sla_red15.png -text
 frontends/php/images/gradients/table_head2_bb.gif -text
 frontends/php/images/gradients/table_head_bb.gif -text
-frontends/php/images/gradients/texture_diagonal.gif -text
 frontends/php/images/sysmaps/Hub.png -text svneol=unset#unset
 frontends/php/images/sysmaps/Hub_small.png -text svneol=unset#unset
 frontends/php/images/sysmaps/Network.png -text svneol=unset#unset

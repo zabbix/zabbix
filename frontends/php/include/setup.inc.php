@@ -101,8 +101,6 @@ class CSetupWizard extends CForm {
 
 	function bodyToString($destroy = true) {
 		$left = new CDiv(null, 'left');
-		$left->addItem(new CDiv(null, 'setup_logo'));
-		$left->addItem(new CDiv(ZABBIX_VERSION, 'setup_version'));
 		$left->addItem(new CDiv($this->getList(), 'left_menu'));
 
 		$link1 = new CLink('www.zabbix.com', 'http://www.zabbix.com/', null, null, true);

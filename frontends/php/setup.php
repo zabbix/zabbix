@@ -142,7 +142,7 @@ $pageHeader->addJsFile($path);
 
 $pageHeader->display();
 ?>
-<body class="originalblue setupBG">
+<body class="originalblue">
 
 <?php $ZBX_SETUP_WIZARD->show(); ?>
 <script>
