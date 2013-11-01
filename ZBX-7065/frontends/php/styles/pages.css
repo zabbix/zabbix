@@ -199,10 +199,10 @@ div.trigger_displaying_form_col { width: 12em; zoom: 1; *display: inline; }
 /* login */
 .loginBG { background: #AABBCC url(../images/gradients/texture_diagonal.gif); }
 .loginForm {
-	margin: auto; padding: 15px; height: 260px; width: 582px; *position: relative; *top: -50%;
+	margin: -10% auto; padding: 15px; height: 260px; width: 582px; *position: relative; *top: -50%;
 	background: url(../images/general/login/background.png) no-repeat;
 }
-.loginLogo { height: 53px; width: 163px; background: url(../images/general/login/logo.png) no-repeat; }
+.loginLogo { height: 51px; width: 162px; background: url(../images/general/login/logo.png) no-repeat; }
 
 /* browserwarning */
 .browserwarningBG { background: #AABBCC url(../images/gradients/texture_diagonal.gif); }
