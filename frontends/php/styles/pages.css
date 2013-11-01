@@ -19,68 +19,37 @@
 
 /* host edit */
 .host-edit .interface-group,
-.hostprototype-edit .interface-group {
-	width: 750px;
-}
+.hostprototype-edit .interface-group { width: 750px; }
 .host-edit .interface-row .dt,
-.hostprototype-edit .interface-row .dt {
-	padding-top: 5px;
-}
+.hostprototype-edit .interface-row .dt { padding-top: 5px; }
 .host-edit .interface-row .dd,
-.hostprototype-edit .interface-row .dd {
-	padding: 0; line-height: 1.0em;
-}
+.hostprototype-edit .interface-row .dd { padding: 0; line-height: 1.0em; }
 .host-edit .interface-row .dd .interface-group,
-.hostprototype-edit .interface-row .dd .interface-group {
-	line-height: 1.8em;
-}
+.hostprototype-edit .interface-row .dd .interface-group { line-height: 1.8em; }
 .host-edit .interface-row .objectgroup,
-.hostprototype-edit .interface-row .objectgroup {
-	border-top-width: 0; padding-top: 4px;
-}
+.hostprototype-edit .interface-row .objectgroup { border-top-width: 0; padding-top: 4px; }
 .host-edit .interface-row .interface-drag-control,
 .host-edit .interface-row .interface-add-control,
 .hostprototype-edit .interface-row .interface-drag-control,
-.hostprototype-edit .interface-row .interface-add-control {
-	width: 2em;
-}
+.hostprototype-edit .interface-row .interface-add-control { width: 2em; }
 .host-edit .interface-row .interface-ip,
-.hostprototype-edit .interface-row .interface-ip {
-	width: 16.5em;
-}
+.hostprototype-edit .interface-row .interface-ip { width: 16.5em; }
 .host-edit .interface-row .interface-dns,
-.hostprototype-edit .interface-row .interface-dns {
-	width: 20em;
-}
+.hostprototype-edit .interface-row .interface-dns { width: 20em; }
 .host-edit .interface-row .interface-connect-to,
-.hostprototype-edit .interface-row .interface-connect-to {
-	width: 8em; white-space: nowrap;
-}
+.hostprototype-edit .interface-row .interface-connect-to { width: 8em; white-space: nowrap; }
 .host-edit .interface-row .interface-port,
-.hostprototype-edit .interface-row .interface-port {
-	width: 11em;
-}
+.hostprototype-edit .interface-row .interface-port { width: 11em; }
 .host-edit .interface-row .interface-default,
-.hostprototype-edit .interface-row .interface-default {
-	width: 4em;
-}
+.hostprototype-edit .interface-row .interface-default { width: 4em; }
 .host-edit .interface-row-first .dd,
-.hostprototype-edit .interface-row-first .dd {
-	padding-top: 2px;
-}
+.hostprototype-edit .interface-row-first .dd { padding-top: 2px; }
 .host-edit .interface-row-first .objectgroup,
-.hostprototype-edit .interface-row-first .objectgroup {
-	border-top-width: 1px; padding-top: 0;
-}
+.hostprototype-edit .interface-row-first .objectgroup { border-top-width: 1px; padding-top: 0; }
 .host-edit .dropArea .interface-add-control,
-.hostprototype-edit .dropArea .interface-add-control {
-	visibility: hidden;
-}
-
+.hostprototype-edit .dropArea .interface-add-control { visibility: hidden; }
 .host-edit #groups { height: 140px; }
-
 .host-edit #linkedTemplateTable { min-width: 400px; }
-
 .host-edit.host-edit-discovered #linkedTemplateTable { min-width: 250px; }
 
 /* housekeeper elements */
@@ -195,6 +164,9 @@
 
 /* administration of triggers */
 div.trigger_displaying_form_col { width: 12em; zoom: 1; *display: inline; }
+
+/* triggers expression condition */
+.trigger-expression #expr_type { width: 605px; max-width: 605px; }
 
 /* login */
 .loginBG { background: #AABBCC url(../images/gradients/texture_diagonal.gif); }

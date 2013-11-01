@@ -7,6 +7,7 @@ New features:
 ..F.I..... [ZBXNEXT-715] increased the size of sysmaps_elements.label and sysmaps_links.label fields to 2048 characters (Sasha)
 
 Bug fixes:
+..F....... [ZBX-7266] fixed frontend big dropdowns displaying (Eduard)
 ..F....... [ZBX-7248] fixed frontend initial calendar time (Eduard)
 .......PS. [ZBX-7208] fixed DB schema generation for "t_shorttext"-type fields (Andris, asaveljevs)
 ..F....... [ZBX-7240] fixed map editing form behaving incorrectly after it has been submitted unsuccessfully (Pavels)
