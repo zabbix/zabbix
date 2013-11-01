@@ -27,12 +27,22 @@ class CScreenTriggersOverview extends CScreenBase {
 	 * @return CDiv (screen inside container)
 	 */
 	public function get() {
+		global $page;
 		$hostids = array();
-		$dbHostGroups = DBselect('SELECT DISTINCT hg.hostid FROM hosts_groups hg WHERE hg.groupid='.zbx_dbstr($this->screenitem['resourceid']));
+
+		$dbHostGroups = DBselect(
+			'SELECT DISTINCT hg.hostid'.
+			' FROM hosts_groups hg'.
+			' WHERE hg.groupid='.zbx_dbstr($this->screenitem['resourceid'])
+		);
 		while ($dbHostGroup = DBfetch($dbHostGroups)) {
 			$hostids[$dbHostGroup['hostid']] = $dbHostGroup['hostid'];
 		}
 
-		return $this->getOutput(getTriggersOverview($hostids, $this->screenitem['application'], $this->screenitem['style'], $this->screenid));
+		$page['file'] = $this->pageFile;
+
+		return $this->getOutput(
+			getTriggersOverview($hostids, $this->screenitem['application'], $this->screenitem['style'], $this->screenid)
+		);
 	}
 }
