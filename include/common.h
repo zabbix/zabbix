@@ -790,7 +790,7 @@ int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uin
 	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, (size_t)8, 0x0LL, 0xFFFFFFFFFFFFFFFFLL)
 
 #define is_uint64_n(str, n, value) \
-		is_uint_n_range(str, n, value, (size_t)8, 0x0LL, 0xFFFFFFFFFFFFFFFFLL)
+	is_uint_n_range(str, n, value, (size_t)8, 0x0LL, 0xFFFFFFFFFFFFFFFFLL)
 
 #define is_uint31(str, value) \
 	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, (size_t)4, 0x0LL, 0x7FFFFFFFLL)
@@ -800,7 +800,6 @@ int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uin
 
 #define is_uint_range(str, value, min, max) \
 	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, sizeof(unsigned int), min, max)
-
 
 int	is_boolean(const char *str, zbx_uint64_t *value);
 int	is_uoct(const char *str);
@@ -948,6 +947,8 @@ double	time_diff(struct timeval *from, struct timeval *to);
 char	*zbx_age2str(int age);
 char	*zbx_date2str(time_t date);
 char	*zbx_time2str(time_t time);
+
+#define ZBX_NULL2STR(str)	(NULL != str ? str : "(null)")
 
 char	*zbx_strcasestr(const char *haystack, const char *needle);
 int	zbx_mismatch(const char *s1, const char *s2);

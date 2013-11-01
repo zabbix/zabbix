@@ -1752,8 +1752,10 @@
 				);
 			}
 			else {
-				$date = zbxDateToTime($new_timeperiod['start_date']);
+				$date = zbxDateToTime($new_timeperiod['start_date']
+					? $new_timeperiod['start_date'] : date(TIMESTAMP_FORMAT_ZERO_TIME, time()));
 			}
+
 			$tblPeriod->addRow(array(_('Date'), createDateSelector('new_timeperiod_start_date', $date)));
 		}
 
@@ -1780,4 +1782,3 @@
 
 		return $tblPeriod;
 	}
-
