@@ -818,6 +818,14 @@ void	del_zeroes(char *s);
 int	get_param(const char *param, int num, char *buf, size_t max_len);
 int	num_param(const char *param);
 char	*get_param_dyn(const char *param, int num);
+
+typedef void	(*replace_key_param_f)(char **data, int key_type, size_t l, size_t *r, int level, int num, int quoted,
+		void *cb_data);
+#define ZBX_KEY_TYPE_ITEM	0
+#define ZBX_KEY_TYPE_OID	1
+int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, void *cb_data, char *error,
+		size_t maxerrlen);
+
 void	remove_param(char *param, int num);
 const char	*get_string(const char *p, char *buf, size_t bufsize);
 int	get_key_param(char *param, int num, char *buf, size_t max_len);
