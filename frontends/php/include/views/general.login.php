@@ -93,7 +93,6 @@ require_once dirname(__FILE__).'/../page_header.php';
 </form>
 <script type="text/javascript">
 	jQuery(document).ready(function() {
-		jQuery(document.body).addClass('loginBG');
 		jQuery('#enter').button();
 		jQuery('#name').focus();
 	});
