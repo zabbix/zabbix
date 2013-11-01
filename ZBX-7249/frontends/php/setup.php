@@ -131,6 +131,7 @@ $pageHeader->addCssInit();
 $pageHeader->addCssFile('styles/themes/originalblue/main.css');
 $pageHeader->addJsFile('js/jquery/jquery.js');
 $pageHeader->addJsFile('js/jquery/jquery-ui.js');
+$pageHeader->addJsFile('js/functions.js');
 
 // if init fails due to missing configuration, set user as guest with default en_GB language
 if (!CWebUser::$data) {
