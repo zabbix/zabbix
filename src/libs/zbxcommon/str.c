@@ -1685,7 +1685,7 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 	zbx_parser_state_t;
 
 	size_t			i, l = 0;
-	int			level = 0, num = 0, res = SUCCEED;
+	int			level = 0, num = 0, ret = SUCCEED;
 	zbx_parser_state_t	state = ZBX_STATE_END;
 
 	if (ZBX_KEY_TYPE_ITEM == key_type)
@@ -1793,10 +1793,10 @@ clean:
 			zbx_snprintf(error, maxerrlen, "Invalid %s at position " ZBX_FS_SIZE_T,
 					(ZBX_KEY_TYPE_ITEM == key_type ? "item key" : "SNMP OID"), (zbx_fs_size_t)i);
 		}
-		res = FAIL;
+		ret = FAIL;
 	}
 
-	return res;
+	return ret;
 }
 
 /******************************************************************************
