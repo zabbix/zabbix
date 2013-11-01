@@ -58,7 +58,7 @@ require_once dirname(__FILE__).'/../page_header.php';
 						<div style="float: right;">
 							<ul style="list-style-type: none;">
 								<li style="padding-right: 6px; height: 22px;">
-									<div class="ui-corner-all textwhite bold" style="padding: 2px 4px; float: right; background-color: #CC3333; visibility: <?php echo zbx_empty($message) ? 'hidden' : 'visible'; ?>" >
+									<div class="ui-corner-all textwhite bold" style="padding: 2px 4px; float: right; background-color: #D60900; visibility: <?php echo zbx_empty($message) ? 'hidden' : 'visible'; ?>" >
 										<span class="nowrap"><?php echo $message; ?></span>
 									</div>
 								</li>
