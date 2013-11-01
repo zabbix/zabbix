@@ -19,7 +19,7 @@
 **/
 
 
-$iconMapTable = new CTableInfo(_('No icon map defined.'));
+$iconMapTable = new CTableInfo(_('No icon maps found.'));
 $iconMapTable->setHeader(array(
 	$this->data['displayNodes'] ? _('Node') : null,
 	_('Name'),

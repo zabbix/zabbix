@@ -1816,6 +1816,12 @@ class CTrigger extends CTriggerGeneral {
 	protected function applyQuerySortOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQuerySortOptions($tableName, $tableAlias, $options, $sqlParts);
 
+		// if the parent method call adds a hostname column to the select clause, replace it with "h.name"
+		// since column "t.hostname" doesn't exist
+		if (isset($sqlParts['select']['hostname'])) {
+			$sqlParts['select']['hostname'] = 'h.name';
+		}
+
 		if (!zbx_empty($options['sortfield'])) {
 			$sqlParts = $this->addQueryOrder('t.lastchange', $sqlParts, ZBX_SORT_DOWN);
 		}
