@@ -149,13 +149,20 @@ CArrayHelper::sort($triggers, array(
 	'host', 'description', 'priority'
 ));
 
+$hosts = API::Host()->get(array(
+	'output' => array('hostid'),
+	'hostids' => $hostIds,
+	'selectScreens' => API_OUTPUT_COUNT,
+	'preservekeys' => true
+));
+
 $scripts = API::Script()->getScriptsByHosts($hostIds);
 
 foreach ($triggers as $trigger) {
 	$hostId = $trigger['hostid'];
 
 	$hostName = new CSpan($trigger['hostname'], 'link_menu');
-	$hostName->setMenuPopup(getMenuPopupHost(array('hostid' => $hostId), $scripts[$hostId]));
+	$hostName->setMenuPopup(getMenuPopupHost($hosts[$hostId], $scripts[$hostId]));
 
 	$triggerDescription = new CSpan($trigger['description'], 'link_menu');
 	$triggerDescription->setMenuPopup(getMenuPopupTrigger($trigger, $trigger['items']));
