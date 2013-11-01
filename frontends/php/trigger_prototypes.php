@@ -222,20 +222,19 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 		'editable' => true
 	));
 
-	// find triggers that must be updated
-	$updateTriggerPrototypes = array();
-	foreach ($dbTriggerPrototypes as $dbTriggerPrototype){
-		if ($dbTriggerPrototype['status'] != $status) {
+	if ($dbTriggerPrototypes) {
+		$updateTriggerPrototypes = array();
+		foreach ($dbTriggerPrototypes as $dbTriggerPrototype) {
 			$updateTriggerPrototypes[] = array(
 				'triggerid' => $dbTriggerPrototype['triggerid'],
 				'status' => $status
 			);
 		}
-	}
 
-	$goResult = true;
-	if ($updateTriggerPrototypes) {
 		$goResult = API::TriggerPrototype()->update($updateTriggerPrototypes);
+	}
+	else {
+		$goResult = true;
 	}
 
 	show_messages($goResult, _('Status updated'), _('Cannot update status'));
