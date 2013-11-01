@@ -2,17 +2,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-01 07:37+0200\n"
-"PO-Revision-Date: 2012-04-05 23:44+0200\n"
-"Last-Translator: Jakub <lauda.jakub@gmail.com>\n"
+"POT-Creation-Date: 2013-11-01 07:39+0200\n"
+"PO-Revision-Date: 2013-10-30 18:25+0300\n"
+"Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Pootle 2.1.4\n"
+"X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
+"X-POOTLE-MTIME: 1383150332.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -256,7 +257,7 @@ msgstr "Přijetí bylo potvrzeno"
 
 #: acknow.php:190 acknow.php:223
 msgid "Acknowledge alarm by"
-msgstr "Alarm přijat - "
+msgstr "Alarm přijat -"
 
 #: acknow.php:191 acknow.php:225
 msgid "Acknowledge and return"
@@ -634,7 +635,7 @@ msgstr "Aplikace byla aktualizována"
 #: api/classes/CItemGeneral.php:391
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
-msgstr "Aplikace s ID  \"%1$s\" není na \"%2$s\" dostupná."
+msgstr "Aplikace s ID \"%1$s\" není na \"%2$s\" dostupná."
 
 #: hosts.php:794 hosts.php:884 include/forms.inc.php:902
 #: include/html.inc.php:396 include/html.inc.php:400
@@ -1582,12 +1583,11 @@ msgid "Cannot delete proxy"
 msgstr "Nelze smazat proxy"
 
 #: adm.regexps.php:173
-#, fuzzy
 msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
 msgstr[0] "Nelze smazat regulární výraz"
-msgstr[1] "Nelze smazat regulární výraz"
-msgstr[2] "Nelze smazat regulární výraz"
+msgstr[1] "Nelze smazat regulární výrazy"
+msgstr[2] "Nelze smazat regulární výrazy"
 
 #: screenconf.php:221
 msgid "Cannot delete screen"
@@ -3762,7 +3762,7 @@ msgstr "Závisející"
 #: include/views/configuration.triggers.list.php:171 popup.php:764
 #: tr_status.php:589
 msgid "Depends on"
-msgstr "Závisí na:"
+msgstr "Závisí na"
 
 #: include/hosts.inc.php:270
 msgid "Deployment status"
@@ -4591,11 +4591,11 @@ msgstr ""
 
 #: include/forms.inc.php:1643
 msgid "Every day(s)"
-msgstr "Perioda dní"
+msgstr "Perioda dne(í)"
 
 #: include/forms.inc.php:1650
 msgid "Every week(s)"
-msgstr "Perioda týdnů"
+msgstr "Perioda týdne(ů)"
 
 #: include/func.inc.php:658
 msgid "Exa"
@@ -7516,7 +7516,7 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:381 items.php:53
 #: items.php:153
 msgid "Keep history (in days)"
-msgstr "Ponechat historii [dny]"
+msgstr "Ponechat historii (dny)"
 
 #: adm.housekeeper.php:53
 msgid "Keep history data for (in days)"
@@ -7574,7 +7574,7 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:391 items.php:60
 #: items.php:154
 msgid "Keep trends (in days)"
-msgstr "Ponechat trendy [dny]"
+msgstr "Ponechat trendy (dny)"
 
 #: include/views/administration.general.housekeeper.edit.php:45
 msgid "Keep trigger data for (in days)"
@@ -10815,7 +10815,7 @@ msgstr ""
 #: include/classes/screens/CScreenActions.php:128
 #: include/views/administration.auditacts.list.php:74
 msgid "Recipient(s)"
-msgstr "Příjemci"
+msgstr "Příjemce(i)"
 
 #: include/views/administration.users.edit.php:224
 msgid "Recovery"
@@ -10885,12 +10885,11 @@ msgid "Regular expression added"
 msgstr "Regulární výraz byl přidán"
 
 #: adm.regexps.php:172
-#, fuzzy
 msgid "Regular expression deleted"
 msgid_plural "Regular expressions deleted"
 msgstr[0] "Regulární výraz byl smazán"
-msgstr[1] "Regulární výraz byl smazán"
-msgstr[2] "Regulární výraz byl smazán"
+msgstr[1] "Regulární výrazy byli smazány"
+msgstr[2] "Regulární výrazy byli smazány"
 
 #: include/regexp.inc.php:85
 msgid "Regular expression does not exist."
@@ -13209,7 +13208,7 @@ msgstr "URL"
 
 #: include/views/administration.users.edit.php:146
 msgid "URL (after login)"
-msgstr "URL po přihlášení"
+msgstr "URL (po přihlášení)"
 
 #: include/hosts.inc.php:275
 msgid "URL A"
@@ -13489,7 +13488,7 @@ msgstr "Interval aktualizací"
 #: include/views/configuration.item.edit.php:270
 #: include/views/configuration.item.massupdate.php:310 items.php:49
 msgid "Update interval (in sec)"
-msgstr "Interval aktualizace [s]"
+msgstr "Interval aktualizace (s)"
 
 #: auditlogs.php:137 include/classes/class.cserverinfo.php:41
 msgid "Updated"

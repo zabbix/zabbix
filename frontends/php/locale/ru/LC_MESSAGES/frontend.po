@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-01 07:37+0200\n"
-"PO-Revision-Date: 2013-10-09 19:40+0300\n"
+"POT-Creation-Date: 2013-11-01 07:39+0200\n"
+"PO-Revision-Date: 2013-10-30 18:15+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1381340414.0\n"
+"X-POOTLE-MTIME: 1383149736.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -42,9 +42,9 @@ msgstr[2] "%1$d дня"
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "отображено %1$d из %2$d события"
+msgstr[1] "отображено %1$d из %2$d событий"
+msgstr[2] "отображено %1$d из %2$d событий"
 
 #: chart4.php:89 chart5.php:83
 #, c-format
@@ -74,9 +74,9 @@ msgstr[2] "%1$s дней"
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%4$s неуспешная попытка входа в систему. Последняя неуспешная попытка с %1$s в %2$s %3$s."
+msgstr[1] "%4$s неуспешных попытка входа в систему. Последняя неуспешная попытка с %1$s в %2$s %3$s."
+msgstr[2] "%4$s неуспешных попытка входа в систему. Последняя неуспешная попытка с %1$s в %2$s %3$s."
 
 #: include/views/monitoring.discovery.php:131
 #, c-format
@@ -722,17 +722,17 @@ msgstr "В %1$s:%2$s с дня %3$s каждый %4$s"
 #, c-format
 msgid "At %1$s:%2$s on every %3$s of every week"
 msgid_plural "At %1$s:%2$s on every %3$s of every %4$s weeks"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "В %1$s:%2$s каждые %3$s каждую неделю"
+msgstr[1] "В %1$s:%2$s каждые %3$s каждые %4$s недели"
+msgstr[2] "В %1$s:%2$s каждые %3$s каждые %4$s недели"
 
 #: include/maintenances.inc.php:63
 #, c-format
 msgid "At %1$s:%2$s on every day"
 msgid_plural "At %1$s:%2$s on every %3$s days"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "В %1$s:%2$s каждый день"
+msgstr[1] "В %1$s:%2$s каждые %3$s дня"
+msgstr[2] "В %1$s:%2$s каждые %3$s дней"
 
 #: include/forms.inc.php:1761
 msgid "At (hour:minute)"
@@ -1278,7 +1278,7 @@ msgstr "Не удалось добавить элемент данных"
 #: api/classes/CApplication.php:547
 #, c-format
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
-msgstr ""
+msgstr "Не удалось добавить элемент данных \"%1$s\" из \"%2$s\" в группу элементов данных \"%3$s\" из \"%4$s\"."
 
 #: api/classes/CApplication.php:600
 msgid "Cannot add items."
@@ -1765,7 +1765,7 @@ msgstr "Не удалось найти интерфейс у узла сети \
 #: include/classes/import/CConfigurationImport.php:934
 #, c-format
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
-msgstr ""
+msgstr "Не удалось найти узел сети или шаблон \"%1$s\" указанный в графике \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:768
 #: include/classes/import/importers/CMapImporter.php:247
@@ -1841,17 +1841,17 @@ msgstr "Не удалось раскрыть выражение \"%s\"."
 #, c-format
 msgid "Cannot import screen \"%1$s\": subscreen \"%2$s\" does not exist."
 msgid_plural "Cannot import screen \"%1$s\": subscreens \"%2$s\" do not exist."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось импортировать комплексный экран \"%1$s\": подэкран \"%2$s\" не существует."
+msgstr[1] "Не удалось импортировать комплексный экран \"%1$s\": подэкраны \"%2$s\" не существуют."
+msgstr[2] "Не удалось импортировать комплексный экран \"%1$s\": подэкраны \"%2$s\" не существуют."
 
 #: include/classes/import/importers/CTemplateImporter.php:114
 #, c-format
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" does not exist."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось импортировать шаблон \"%1$s\", соединенный шаблон \"%2$s\" не существует."
+msgstr[1] "Не удалось импортировать шаблон \"%1$s\", соединенные шаблоны \"%2$s\" не существуют."
+msgstr[2] "Не удалось импортировать шаблон \"%1$s\", соединенные шаблоны \"%2$s\" не существуют."
 
 #: include/classes/class.cview.php:113
 #, c-format
@@ -1908,7 +1908,7 @@ msgstr "Невозможно выполнить запрос обновлени�
 
 #: api/classes/CApplication.php:536
 msgid "Cannot process applications from different hosts or templates."
-msgstr ""
+msgstr "Не удалось обработать группы элементов данных из разных узлов сети или шаблонов."
 
 #: include/classes/server/CZabbixServer.php:222
 #, c-format
@@ -2271,7 +2271,7 @@ msgstr "Не удалось обновить веб-сценарий"
 
 #: include/views/js/configuration.discovery.edit.js.php:600
 msgid "Cannot validate discovery check: invalid request or connection to Zabbix server failed."
-msgstr "Не удалось проверить проверку обнаружения: ошибочный запрос или не удалось подключиться к Zabbix серверу.Не удалось проверить проверку обнаружения: ошибочный запрос или не удалось подключиться к Zabbix серверу.Не удалось проверить проверку обнаружения: ошибочный запрос или не удалось подключиться к Zabbix серверу.Не удалось проверить проверку обнаружения: ошибочный запрос или не удалось подключиться к Zabbix серверу."
+msgstr "Не удалось проверить проверку обнаружения: ошибочный запрос или не удалось подключиться к Zabbix серверу.Не удалось проверить проверку обнаружения: ошибочный запрос или не удалось подключиться к Zabbix серверу.Не удалось проверить проверку обнаружения: ошибочный запрос или не удалось подключиться к Zabbix серверу.Не удалось проверить проверку обнаружения: ошибочный запрос или не удалось подключиться к Zabbix серверу.Не удалось проверить проверку обнаружения: ошибочный запрос или не удалось подключиться к Zabbix серверу."
 
 #: popup_bitem.php:114 popup_period.php:114
 msgid "Caption"
@@ -2998,7 +2998,7 @@ msgstr "Создано: Веб-сценарий \"%1$s\" в \"%2$s\"."
 
 #: include/items.inc.php:41
 msgid "Critical"
-msgstr ""
+msgstr "Критичная"
 
 #: popup_trexpr.php:365
 msgid "Current date is < N"
@@ -4342,7 +4342,7 @@ msgstr "Пустой входной параметр."
 
 #: api/classes/CApplication.php:496
 msgid "Empty input parameters."
-msgstr ""
+msgstr "Пустые входные параметры."
 
 #: api/classes/CDRule.php:244
 msgid "Empty input."
@@ -8343,25 +8343,25 @@ msgstr "Развернуть"
 #, c-format
 msgid "Maximum DNS name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum DNS name length is %1$d characters, \"%2$s\" is %3$d characters."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Максимальная длина DNS имени %1$d символов, \"%2$s\" - %3$d символ."
+msgstr[1] "Максимальная длина DNS имени %1$d символов, \"%2$s\" - %3$d символа."
+msgstr[2] "Максимальная длина DNS имени %1$d символов, \"%2$s\" - %3$d символов."
 
 #: api/classes/CUser.php:315
 #, c-format
 msgid "Maximum alias length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum alias length is %1$d characters, \"%2$s\" is %3$d characters."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Максимальная длина алиаса %1$d символов, \"%2$s\" - %3$d символ."
+msgstr[1] "Максимальная длина алиаса %1$d символов, \"%2$s\" - %3$d символа."
+msgstr[2] "Максимальная длина алиаса %1$d символов, \"%2$s\" - %3$d символов."
 
 #: api/classes/CHost.php:733
 #, c-format
 msgid "Maximum host name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum host name length is %1$d characters, \"%2$s\" is %3$d characters."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Максимальная длина имени узла сети %1$d символов, \"%2$s\" - %3$d символ."
+msgstr[1] "Максимальная длина имени узла сети %1$d символов, \"%2$s\" - %3$d символа."
+msgstr[2] "Максимальная длина имени узла сети %1$d символов, \"%2$s\" - %3$d символов."
 
 #: include/views/configuration.item.edit.php:319
 #: include/views/configuration.item.massupdate.php:372
@@ -8396,9 +8396,9 @@ msgstr "Максимальное значение за период T NOT N"
 #, c-format
 msgid "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d characters."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Максимальная длина видимого имени узла сети %1$d символов, \"%2$s\" - %3$d символ."
+msgstr[1] "Максимальная длина видимого имени узла сети %1$d символов, \"%2$s\" - %3$d символа."
+msgstr[2] "Максимальная длина видимого имени узла сети %1$d символов, \"%2$s\" - %3$d символов."
 
 #: include/forms.inc.php:1687 include/func.inc.php:116
 #: include/func.inc.php:247 jsLoader.php:122
@@ -8967,11 +8967,11 @@ msgstr ""
 
 #: api/classes/CItemGeneral.php:351
 msgid "No SNMP OID specified."
-msgstr ""
+msgstr "SNMP OID не указан."
 
 #: api/classes/CItemGeneral.php:357
 msgid "No SNMP community specified."
-msgstr ""
+msgstr "SNMP community не указан."
 
 #: include/views/configuration.host.edit.php:340
 #: include/views/configuration.host.prototype.edit.php:117
@@ -12686,17 +12686,17 @@ msgstr "Узел сети более не обнаруживается и буд
 #, c-format
 msgid "The image is used in icon map %1$s."
 msgid_plural "The image is used in icon maps %1$s."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Изображение используется в соответствии иконок %1$s."
+msgstr[1] "Изображение используется в соответствиях иконок %1$s."
+msgstr[2] "Изображение используется в соответствиях иконок %1$s."
 
 #: api/classes/CImage.php:519
 #, c-format
 msgid "The image is used in map %1$s."
 msgid_plural "The image is used in maps %1$s."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Изображение используется на карте сети %1$s."
+msgstr[1] "Изображение используется на картах сети %1$s."
+msgstr[2] "Изображение используется на картах сети %1$s."
 
 #: include/views/configuration.item.list.php:126
 #, c-format
@@ -13868,7 +13868,7 @@ msgstr "Поставщик"
 
 #: include/items.inc.php:43
 msgid "Verbose"
-msgstr ""
+msgstr "Подробно"
 
 #: include/views/configuration.screen.constructor.edit.php:543
 msgid "Vertical"

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-01 07:37+0200\n"
+"POT-Creation-Date: 2013-11-01 07:39+0200\n"
 "PO-Revision-Date: 2013-10-15 07:19+0300\n"
 "Last-Translator: Jaba <janis.jaunbalodis@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -10182,7 +10182,7 @@ msgstr "PHP bcmath"
 
 #: include/classes/class.frontendsetup.php:322
 msgid "PHP bcmath extension missing (PHP configuration parameter --enable-bcmath)"
-msgstr "Trūkst PHP bcmath paplašinājums (PHP konfigurācija parameters --enable-bcmath)Trūkst PHP bcmath paplašinājums (PHP konfigurācija parameters --enable-bcmath)"
+msgstr "Trūkst PHP bcmath paplašinājums (PHP konfigurācija parameters --enable-bcmath)Trūkst PHP bcmath paplašinājums (PHP konfigurācija parameters --enable-bcmath)Trūkst PHP bcmath paplašinājums (PHP konfigurācija parameters --enable-bcmath)"
 
 #: include/classes/class.frontendsetup.php:549
 msgid "PHP ctype"
@@ -10190,7 +10190,7 @@ msgstr "PHP ctype"
 
 #: include/classes/class.frontendsetup.php:553
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)"
-msgstr "Trūkst PHP ctype paplašinājums (PHP konfigurācija parameters --enable-ctype)Trūkst PHP ctype paplašinājums (PHP konfigurācija parameters --enable-ctype)"
+msgstr "Trūkst PHP ctype paplašinājums (PHP konfigurācija parameters --enable-ctype)Trūkst PHP ctype paplašinājums (PHP konfigurācija parameters --enable-ctype)Trūkst PHP ctype paplašinājums (PHP konfigurācija parameters --enable-ctype)"
 
 #: include/classes/class.frontendsetup.php:290
 msgid "PHP databases support"
@@ -10235,7 +10235,7 @@ msgstr "PHP gettext"
 
 #: include/classes/class.frontendsetup.php:610
 msgid "PHP gettext extension missing (PHP configuration parameter --with-gettext)"
-msgstr "Trūkst PHP gettext paplašinājums (PHP konfigurācija parameters --with-gettext)Trūkst PHP gettext paplašinājums (PHP konfigurācija parameters --with-gettext)"
+msgstr "Trūkst PHP gettext paplašinājums (PHP konfigurācija parameters --with-gettext)Trūkst PHP gettext paplašinājums (PHP konfigurācija parameters --with-gettext)Trūkst PHP gettext paplašinājums (PHP konfigurācija parameters --with-gettext)"
 
 #: include/classes/class.frontendsetup.php:482
 msgid "PHP libxml"
@@ -10251,7 +10251,7 @@ msgstr "PHP mbstring"
 
 #: include/classes/class.frontendsetup.php:341
 msgid "PHP mbstring extension missing (PHP configuration parameter --enable-mbstring)"
-msgstr "Trūkst mbstring paplašinājums (PHP konfigurācijas parametrs --enable-mbstring)Trūkst mbstring paplašinājums (PHP konfigurācijas parametrs --enable-mbstring)"
+msgstr "Trūkst mbstring paplašinājums (PHP konfigurācijas parametrs --enable-mbstring)Trūkst mbstring paplašinājums (PHP konfigurācijas parametrs --enable-mbstring)Trūkst mbstring paplašinājums (PHP konfigurācijas parametrs --enable-mbstring)"
 
 #: include/classes/class.frontendsetup.php:174
 msgid "PHP option max_execution_time"
