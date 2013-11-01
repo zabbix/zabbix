@@ -507,7 +507,11 @@ class CTrigger extends CTriggerGeneral {
 		$result = $this->handleDeprecatedOutput($result, 'value_flag', 'state', $options['output']);
 
 		// unset extra fields
-		$result = $this->unsetExtraFields($result, array('state', 'expression'), $options['output']);
+		$extraFields = array('state', 'expression');
+		if ($options['expandData'] === null) {
+			$extraFields[] = 'hostname';
+		}
+		$result = $this->unsetExtraFields($result, $extraFields, $options['output']);
 
 		return $result;
 	}
@@ -1816,13 +1820,13 @@ class CTrigger extends CTriggerGeneral {
 	protected function applyQuerySortOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQuerySortOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		// if the parent method call adds a hostname column to the select clause, replace it with "h.name"
-		// since column "t.hostname" doesn't exist
-		if (isset($sqlParts['select']['hostname'])) {
-			$sqlParts['select']['hostname'] = 'h.name';
-		}
-
 		if (!zbx_empty($options['sortfield'])) {
+			// if the parent method call adds a hostname column to the select clause, replace it with "h.name"
+			// since column "t.hostname" doesn't exist
+			if (isset($sqlParts['select']['hostname'])) {
+				$sqlParts['select']['hostname'] = 'h.name as hostname';
+			}
+
 			$sqlParts = $this->addQueryOrder('t.lastchange', $sqlParts, ZBX_SORT_DOWN);
 		}
 
@@ -1831,7 +1835,6 @@ class CTrigger extends CTriggerGeneral {
 
 	protected function applyQuerySortField($sortfield, $sortorder, $alias, array $sqlParts) {
 		if ($sortfield == 'hostname') {
-			$sqlParts['select']['hostname'] = 'h.name';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts'] = 'hosts h';
