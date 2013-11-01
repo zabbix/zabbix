@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-01 07:37+0200\n"
+"POT-Creation-Date: 2013-11-01 07:39+0200\n"
 "PO-Revision-Date: 2013-10-23 13:39+0300\n"
 "Last-Translator: open-future <patrik@open-future.be>\n"
 "Language-Team: NL\n"
@@ -1904,7 +1904,7 @@ msgstr ""
 #: include/classes/server/CZabbixServer.php:222
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
-msgstr "Kan het antwoord niet lezen, controleer verbinding met de Zabbix server \"%1$s\".Kan het antwoord niet lezen, controleer verbinding met de Zabbix server \"%1$s\".Kan het antwoord niet lezen, controleer verbinding met de Zabbix server \"%1$s\".Kan het antwoord niet lezen, controleer verbinding met de Zabbix server \"%1$s\"."
+msgstr "Kan het antwoord niet lezen, controleer verbinding met de Zabbix server \"%1$s\".Kan het antwoord niet lezen, controleer verbinding met de Zabbix server \"%1$s\".Kan het antwoord niet lezen, controleer verbinding met de Zabbix server \"%1$s\".Kan het antwoord niet lezen, controleer verbinding met de Zabbix server \"%1$s\".Kan het antwoord niet lezen, controleer verbinding met de Zabbix server \"%1$s\"."
 
 #: include/views/js/monitoring.history.js.php:35
 msgid "Cannot remove all items, at least one item should remain."
@@ -1925,7 +1925,7 @@ msgstr "Kan de discovery regel niet opslaan zonder checks."
 #: include/classes/server/CZabbixServer.php:192
 #, c-format
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
-msgstr "Kan commando niet lezen, controleer verbinding met de Zabbix server \"%1$s\".Kan commando niet lezen, controleer verbinding met de Zabbix server \"%1$s\".Kan commando niet lezen, controleer verbinding met de Zabbix server \"%1$s\".Kan commando niet lezen, controleer verbinding met de Zabbix server \"%1$s\"."
+msgstr "Kan commando niet lezen, controleer verbinding met de Zabbix server \"%1$s\".Kan commando niet lezen, controleer verbinding met de Zabbix server \"%1$s\".Kan commando niet lezen, controleer verbinding met de Zabbix server \"%1$s\".Kan commando niet lezen, controleer verbinding met de Zabbix server \"%1$s\".Kan commando niet lezen, controleer verbinding met de Zabbix server \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:243
 #, c-format
@@ -2262,7 +2262,7 @@ msgstr "Kan web scenario niet bijwerken"
 
 #: include/views/js/configuration.discovery.edit.js.php:600
 msgid "Cannot validate discovery check: invalid request or connection to Zabbix server failed."
-msgstr "Kan ontdekking controleren niet valideren: ongeldig verzoek of aansluiting op Zabbix server is mislukt.Kan ontdekking controleren niet valideren: ongeldig verzoek of aansluiting op Zabbix server is mislukt.Kan ontdekking controleren niet valideren: ongeldig verzoek of aansluiting op Zabbix server is mislukt.Kan ontdekking controleren niet valideren: ongeldig verzoek of aansluiting op Zabbix server is mislukt."
+msgstr "Kan ontdekking controleren niet valideren: ongeldig verzoek of aansluiting op Zabbix server is mislukt.Kan ontdekking controleren niet valideren: ongeldig verzoek of aansluiting op Zabbix server is mislukt.Kan ontdekking controleren niet valideren: ongeldig verzoek of aansluiting op Zabbix server is mislukt.Kan ontdekking controleren niet valideren: ongeldig verzoek of aansluiting op Zabbix server is mislukt.Kan ontdekking controleren niet valideren: ongeldig verzoek of aansluiting op Zabbix server is mislukt."
 
 #: popup_bitem.php:114 popup_period.php:114
 msgid "Caption"
@@ -4174,7 +4174,7 @@ msgstr "Dupliceer afhankelijkheden in trigger \"%1$s\"."
 #: api/classes/CHostPrototype.php:197
 #, c-format
 msgid "Duplicate group prototype name \"%2$s\" for host prototype \"%1$s\"."
-msgstr "Dupliceren van groep prototype naam \"%2$s\" voor gastheer prototype \"%1$s\".Dupliceren van groep prototype naam \"%2$s\" voor gastheer prototype \"%1$s\".Dupliceren van groep prototype naam \"%2$s\" voor gastheer prototype \"%1$s\".Dupliceren van groep prototype naam \"%2$s\" voor gastheer prototype \"%1$s\"."
+msgstr "Dupliceren van groep prototype naam \"%2$s\" voor gastheer prototype \"%1$s\".Dupliceren van groep prototype naam \"%2$s\" voor gastheer prototype \"%1$s\".Dupliceren van groep prototype naam \"%2$s\" voor gastheer prototype \"%1$s\".Dupliceren van groep prototype naam \"%2$s\" voor gastheer prototype \"%1$s\".Dupliceren van groep prototype naam \"%2$s\" voor gastheer prototype \"%1$s\"."
 
 #: api/classes/CHostPrototype.php:191
 #, c-format
@@ -4536,11 +4536,11 @@ msgstr "gebeurtenis ID"
 
 #: popup_trexpr.php:443
 msgid "Event ID of last log entry matching regular expression T, then N = 1, 0 - otherwise"
-msgstr "Gebeurtenis-ID van vorig logboekvermelding passend aan reguliere expressie T, dan is N = 1, 0 - andersGebeurtenis-ID van vorig logboekvermelding passend aan reguliere expressie T, dan is N = 1, 0 - anders"
+msgstr "Gebeurtenis-ID van vorig logboekvermelding passend aan reguliere expressie T, dan is N = 1, 0 - andersGebeurtenis-ID van vorig logboekvermelding passend aan reguliere expressie T, dan is N = 1, 0 - andersGebeurtenis-ID van vorig logboekvermelding passend aan reguliere expressie T, dan is N = 1, 0 - anders"
 
 #: popup_trexpr.php:448
 msgid "Event ID of last log entry matching regular expression T, then N NOT 1, 0 - otherwise"
-msgstr "Gebeurtenis-ID van vorig logboekvermelding bijpassende reguliere expressie T, dan is N NIET 1, 0 - andersGebeurtenis-ID van vorig logboekvermelding bijpassende reguliere expressie T, dan is N NIET 1, 0 - anders"
+msgstr "Gebeurtenis-ID van vorig logboekvermelding bijpassende reguliere expressie T, dan is N NIET 1, 0 - andersGebeurtenis-ID van vorig logboekvermelding bijpassende reguliere expressie T, dan is N NIET 1, 0 - andersGebeurtenis-ID van vorig logboekvermelding bijpassende reguliere expressie T, dan is N NIET 1, 0 - anders"
 
 #: acknow.php:152 include/actions.inc.php:88
 msgid "Event acknowledged"
@@ -4845,7 +4845,7 @@ msgstr "Bestand is te groot, max upload grootte is %1$s bytes."
 #: include/classes/class.cview.php:68
 #, fuzzy, c-format
 msgid "File provided to a view does not exist. Tried to find \"%s\"."
-msgstr "Bestand aangeboden aan de view bestaat niet. Geprobeerd om \"%s\" te vinden.Bestand aangeboden aan de view bestaat niet. Geprobeerd om \"%s\" te vinden."
+msgstr "Bestand aangeboden aan de view bestaat niet. Geprobeerd om \"%s\" te vinden.Bestand aangeboden aan de view bestaat niet. Geprobeerd om \"%s\" te vinden.Bestand aangeboden aan de view bestaat niet. Geprobeerd om \"%s\" te vinden."
 
 #: include/graphs.inc.php:67
 msgid "Filled region"
@@ -4873,11 +4873,11 @@ msgstr "Filter per naam"
 
 #: popup_trexpr.php:315
 msgid "Find string V in last (most recent) value. N = 1 - if found, 0 - otherwise"
-msgstr "Vindt reeks V in de laatste (meest recente) waarde. N = 1 - indien gevonden, 0 - andersVindt reeks V in de laatste (meest recente) waarde. N = 1 - indien gevonden, 0 - anders"
+msgstr "Vindt reeks V in de laatste (meest recente) waarde. N = 1 - indien gevonden, 0 - andersVindt reeks V in de laatste (meest recente) waarde. N = 1 - indien gevonden, 0 - andersVindt reeks V in de laatste (meest recente) waarde. N = 1 - indien gevonden, 0 - anders"
 
 #: popup_trexpr.php:320
 msgid "Find string V in last (most recent) value. N NOT 1 - if found, 0 - otherwise"
-msgstr "Vindt reeks V in de laatste (meest recente) waarde. N NIET 1 - indien gevonden, 0 - andersVindt reeks V in de laatste (meest recente) waarde. N NIET 1 - indien gevonden, 0 - anders"
+msgstr "Vindt reeks V in de laatste (meest recente) waarde. N NIET 1 - indien gevonden, 0 - andersVindt reeks V in de laatste (meest recente) waarde. N NIET 1 - indien gevonden, 0 - andersVindt reeks V in de laatste (meest recente) waarde. N NIET 1 - indien gevonden, 0 - anders"
 
 #: include/setup.inc.php:133
 msgid "Finish"
@@ -5086,7 +5086,7 @@ msgstr "Grafiek"
 #: api/classes/CGraph.php:447 api/classes/CGraphPrototype.php:463
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (inherited from another template)."
-msgstr "Grafiek \"%1$s\" bestaat al op \"%2$s\" (overgenomen van een ander sjabloon).Grafiek \"%1$s\" bestaat al op \"%2$s\" (overgenomen van een ander sjabloon)."
+msgstr "Grafiek \"%1$s\" bestaat al op \"%2$s\" (overgenomen van een ander sjabloon).Grafiek \"%1$s\" bestaat al op \"%2$s\" (overgenomen van een ander sjabloon).Grafiek \"%1$s\" bestaat al op \"%2$s\" (overgenomen van een ander sjabloon)."
 
 #: api/classes/CGraph.php:468 api/classes/CGraph.php:475
 #: api/classes/CGraphPrototype.php:485 api/classes/CGraphPrototype.php:492
@@ -5102,12 +5102,12 @@ msgstr "Grafiek \"%1$s\" bestaat al op \"%2$s\"."
 #: api/classes/CGraph.php:400 api/classes/CGraphPrototype.php:407
 #, c-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymax value item)."
-msgstr "Grafiek \"%1$s\" kan niet erven. Geen vereiste items op \"%2$s\" (Ymax waarde item).Grafiek \"%1$s\" kan niet erven. Geen vereiste items op \"%2$s\" (Ymax waarde item)."
+msgstr "Grafiek \"%1$s\" kan niet erven. Geen vereiste items op \"%2$s\" (Ymax waarde item).Grafiek \"%1$s\" kan niet erven. Geen vereiste items op \"%2$s\" (Ymax waarde item).Grafiek \"%1$s\" kan niet erven. Geen vereiste items op \"%2$s\" (Ymax waarde item)."
 
 #: api/classes/CGraph.php:408 api/classes/CGraphPrototype.php:416
 #, c-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymin value item)."
-msgstr "Grafiek \"%1$s\" kan niet erven. Geen vereiste items op \"%2$s\" (Ymin waarde item).Grafiek \"%1$s\" kan niet erven. Geen vereiste items op \"%2$s\" (Ymin waarde item)."
+msgstr "Grafiek \"%1$s\" kan niet erven. Geen vereiste items op \"%2$s\" (Ymin waarde item).Grafiek \"%1$s\" kan niet erven. Geen vereiste items op \"%2$s\" (Ymin waarde item).Grafiek \"%1$s\" kan niet erven. Geen vereiste items op \"%2$s\" (Ymin waarde item)."
 
 #: api/classes/CGraph.php:394 api/classes/CGraphPrototype.php:401
 #, c-format
@@ -5128,7 +5128,7 @@ msgstr "Grafiek \"%1$s\" overgeslagen - gebruikers regel."
 #: api/classes/CGraph.php:38
 #, c-format
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
-msgstr "Grafiek \"%1$s\" met templated items kan geen items van andere hosts bevatten.Grafiek \"%1$s\" met templated items kan geen items van andere hosts bevatten."
+msgstr "Grafiek \"%1$s\" met templated items kan geen items van andere hosts bevatten.Grafiek \"%1$s\" met templated items kan geen items van andere hosts bevatten.Grafiek \"%1$s\" met templated items kan geen items van andere hosts bevatten."
 
 #: graphs.php:252
 msgid "Graph added"
@@ -5157,7 +5157,7 @@ msgstr "Grafiek prototype"
 #: api/classes/CGraphPrototype.php:38
 #, c-format
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
-msgstr "Grafiek prototype \"%1$s\" met templated artikkelen kan geen items van andere hosts bevatten.Grafiek prototype \"%1$s\" met templated artikkelen kan geen items van andere hosts bevatten."
+msgstr "Grafiek prototype \"%1$s\" met templated artikkelen kan geen items van andere hosts bevatten.Grafiek prototype \"%1$s\" met templated artikkelen kan geen items van andere hosts bevatten.Grafiek prototype \"%1$s\" met templated artikkelen kan geen items van andere hosts bevatten."
 
 #: api/classes/CGraphPrototype.php:609
 #, c-format
@@ -5196,7 +5196,7 @@ msgstr "Grafiek bijgewerkt"
 #: api/classes/CGraphGeneral.php:735
 #, c-format
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
-msgstr "Grafiek met de naam \"%1$s\" bestaat al in grafieken of grafiek prototypes.Grafiek met de naam \"%1$s\" bestaat al in grafieken of grafiek prototypes."
+msgstr "Grafiek met de naam \"%1$s\" bestaat al in grafieken of grafiek prototypes.Grafiek met de naam \"%1$s\" bestaat al in grafieken of grafiek prototypes.Grafiek met de naam \"%1$s\" bestaat al in grafieken of grafiek prototypes."
 
 #: api/classes/CGraph.php:429 api/classes/CGraph.php:450
 #: api/classes/CGraphPrototype.php:445 api/classes/CGraphPrototype.php:466
@@ -5266,7 +5266,7 @@ msgstr "Groep"
 #: api/classes/CHostGroup.php:613
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
-msgstr "Groep \"%1$s\" kan niet worden verwijderd, omdat het wordt gebruikt door een gastheer prototype.Groep \"%1$s\" kan niet worden verwijderd, omdat het wordt gebruikt door een gastheer prototype."
+msgstr "Groep \"%1$s\" kan niet worden verwijderd, omdat het wordt gebruikt door een gastheer prototype.Groep \"%1$s\" kan niet worden verwijderd, omdat het wordt gebruikt door een gastheer prototype.Groep \"%1$s\" kan niet worden verwijderd, omdat het wordt gebruikt door een gastheer prototype."
 
 #: include/classes/import/importers/CTemplateImporter.php:233
 #, c-format
@@ -5307,7 +5307,7 @@ msgstr "Groep prototype ID kan niet leeg zijn."
 #: api/classes/CHostPrototype.php:156 api/classes/CHostPrototype.php:434
 #, c-format
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
-msgstr "Groep prototype kan niet worden gebaseerd op een ontdekte gastheer groep \"%1$s\".Groep prototype kan niet worden gebaseerd op een ontdekte gastheer groep \"%1$s\"."
+msgstr "Groep prototype kan niet worden gebaseerd op een ontdekte gastheer groep \"%1$s\".Groep prototype kan niet worden gebaseerd op een ontdekte gastheer groep \"%1$s\".Groep prototype kan niet worden gebaseerd op een ontdekte gastheer groep \"%1$s\"."
 
 #: include/views/configuration.host.prototype.edit.php:203
 msgid "Group prototypes"
@@ -5555,7 +5555,7 @@ msgstr "Host \"%s\" bestaad reeeds."
 #: include/classes/import/CXmlImport18.php:928
 #, fuzzy, c-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
-msgstr "Host \"%s\" heeft de parameter \"useipmi\" aangevinkt, maar heeft geen \"ipmi_ip\" parameter! Host IP-adres wordt gebruikt als adres voor de IPMI interface.Host \"%s\" heeft de parameter \"useipmi\" aangevinkt, maar heeft geen \"ipmi_ip\" parameter! Host IP-adres wordt gebruikt als adres voor de IPMI interface."
+msgstr "Host \"%s\" heeft de parameter \"useipmi\" aangevinkt, maar heeft geen \"ipmi_ip\" parameter! Host IP-adres wordt gebruikt als adres voor de IPMI interface.Host \"%s\" heeft de parameter \"useipmi\" aangevinkt, maar heeft geen \"ipmi_ip\" parameter! Host IP-adres wordt gebruikt als adres voor de IPMI interface.Host \"%s\" heeft de parameter \"useipmi\" aangevinkt, maar heeft geen \"ipmi_ip\" parameter! Host IP-adres wordt gebruikt als adres voor de IPMI interface."
 
 #: include/views/configuration.screen.constructor.edit.php:340
 msgid "Host (ascending)"
@@ -5575,7 +5575,7 @@ msgstr "Host toegevoegd"
 
 #: api/classes/CHostInterface.php:844
 msgid "Host cannot have more than one default interface of the same type."
-msgstr "Host kan niet meer dan een standaard interface van hetzelfde type bevatten.Host kan niet meer dan een standaard interface van hetzelfde type bevatten."
+msgstr "Host kan niet meer dan een standaard interface van hetzelfde type bevatten.Host kan niet meer dan een standaard interface van hetzelfde type bevatten.Host kan niet meer dan een standaard interface van hetzelfde type bevatten."
 
 #: hostinventoriesoverview.php:92
 #: include/views/administration.proxy.list.php:49
@@ -5608,12 +5608,12 @@ msgstr "Host groep \"%1$s\" bestaat al."
 #: api/classes/CHostGroup.php:645
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
-msgstr "Host groep \"%1$s\" kan niet worden verwijderd, omdat het wordt gebruikt in een globaal script.Host groep \"%1$s\" kan niet worden verwijderd, omdat het wordt gebruikt in een globaal script."
+msgstr "Host groep \"%1$s\" kan niet worden verwijderd, omdat het wordt gebruikt in een globaal script.Host groep \"%1$s\" kan niet worden verwijderd, omdat het wordt gebruikt in een globaal script.Host groep \"%1$s\" kan niet worden verwijderd, omdat het wordt gebruikt in een globaal script."
 
 #: api/classes/CHostGroup.php:626
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because some hosts depend on it."
-msgstr "Host groep \"%1$s\" kan niet worden verwijderd, omdat sommige hosts hier van afhankelijk zijn.Host groep \"%1$s\" kan niet worden verwijderd, omdat sommige hosts hier van afhankelijk zijn."
+msgstr "Host groep \"%1$s\" kan niet worden verwijderd, omdat sommige hosts hier van afhankelijk zijn.Host groep \"%1$s\" kan niet worden verwijderd, omdat sommige hosts hier van afhankelijk zijn.Host groep \"%1$s\" kan niet worden verwijderd, omdat sommige hosts hier van afhankelijk zijn."
 
 #: api/classes/CHostGroup.php:600
 #, c-format
@@ -5703,7 +5703,7 @@ msgstr "Host netwerken"
 #: api/classes/CHostPrototype.php:785
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
-msgstr "Host prototype \"%1$s\" bestaat al op \"%2$s\", geërfd van een andere sjabloon.Host prototype \"%1$s\" bestaat al op \"%2$s\", geërfd van een andere sjabloon."
+msgstr "Host prototype \"%1$s\" bestaat al op \"%2$s\", geërfd van een andere sjabloon.Host prototype \"%1$s\" bestaat al op \"%2$s\", geërfd van een andere sjabloon.Host prototype \"%1$s\" bestaat al op \"%2$s\", geërfd van een andere sjabloon."
 
 #: api/classes/CHostPrototype.php:773
 #, c-format
@@ -5730,7 +5730,7 @@ msgstr "Host prototype bijgewerkt"
 #: api/classes/CHostPrototype.php:1100
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\"."
-msgstr "Host prototype met hostnaam \"%1$s\" bestaat al op ontdekking regel \"%2$s\".Host prototype met hostnaam \"%1$s\" bestaat al op ontdekking regel \"%2$s\"."
+msgstr "Host prototype met hostnaam \"%1$s\" bestaat al op ontdekking regel \"%2$s\".Host prototype met hostnaam \"%1$s\" bestaat al op ontdekking regel \"%2$s\".Host prototype met hostnaam \"%1$s\" bestaat al op ontdekking regel \"%2$s\"."
 
 #: api/classes/CHostPrototype.php:1096
 #, c-format
@@ -5740,7 +5740,7 @@ msgstr "Host prototype met hostnaam \"%1$s\" bestaat reeds."
 #: api/classes/CHostPrototype.php:1108
 #, c-format
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
-msgstr "Host prototype met zichtbare naam \"%1$s\" bestaat al op ontdekking regel \"%2$s\".Host prototype met zichtbare naam \"%1$s\" bestaat al op ontdekking regel \"%2$s\"."
+msgstr "Host prototype met zichtbare naam \"%1$s\" bestaat al op ontdekking regel \"%2$s\".Host prototype met zichtbare naam \"%1$s\" bestaat al op ontdekking regel \"%2$s\".Host prototype met zichtbare naam \"%1$s\" bestaat al op ontdekking regel \"%2$s\"."
 
 #: api/classes/CHostPrototype.php:1105
 #, c-format
@@ -6057,7 +6057,7 @@ msgstr "icoon map"
 #: api/classes/CIconMap.php:328
 #, c-format
 msgid "Icon map \"%1$s\" cannot be deleted. Used in map \"%2$s\"."
-msgstr "icoon map \"%1$s\" kan niet worden verwijderd. Wordt gebruikt in de map \"%2$s\".icoon map \"%1$s\" kan niet worden verwijderd. Wordt gebruikt in de map \"%2$s\"."
+msgstr "icoon map \"%1$s\" kan niet worden verwijderd. Wordt gebruikt in de map \"%2$s\".icoon map \"%1$s\" kan niet worden verwijderd. Wordt gebruikt in de map \"%2$s\".icoon map \"%1$s\" kan niet worden verwijderd. Wordt gebruikt in de map \"%2$s\"."
 
 #: api/classes/CIconMap.php:433
 #, c-format
@@ -6082,7 +6082,7 @@ msgstr "Icoon map \"%s\" kan niet toegewezen worden aan lege expressie."
 #: api/classes/CIconMap.php:447
 #, c-format
 msgid "Icon map \"%s\" cannot have mapping with global expression that does not exist."
-msgstr "Icoon map \"%1$s\" kan niet toegewezen worden met globale expressie die niet bestaat.Icoon map \"%1$s\" kan niet toegewezen worden met globale expressie die niet bestaat."
+msgstr "Icoon map \"%1$s\" kan niet toegewezen worden met globale expressie die niet bestaat.Icoon map \"%1$s\" kan niet toegewezen worden met globale expressie die niet bestaat.Icoon map \"%1$s\" kan niet toegewezen worden met globale expressie die niet bestaat."
 
 #: api/classes/CIconMap.php:451
 #, c-format
@@ -6142,7 +6142,7 @@ msgstr "Identieke expressie bestaat reeds"
 
 #: include/func.inc.php:2073 include/func.inc.php:2093
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
-msgstr "Als u denkt dat dit bericht foutis, neem dan contact op met uw beheerders over het verkrijgen van de nodige toestemmingen.Als u denkt dat dit bericht foutis, neem dan contact op met uw beheerders over het verkrijgen van de nodige toestemmingen."
+msgstr "Als u denkt dat dit bericht foutis, neem dan contact op met uw beheerders over het verkrijgen van de nodige toestemmingen.Als u denkt dat dit bericht foutis, neem dan contact op met uw beheerders over het verkrijgen van de nodige toestemmingen.Als u denkt dat dit bericht foutis, neem dan contact op met uw beheerders over het verkrijgen van de nodige toestemmingen."
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
 #: include/maps.inc.php:950
@@ -6297,7 +6297,7 @@ msgstr "Verkeerde actie, conditie discovery controleren."
 
 #: api/classes/CAction.php:1690
 msgid "Incorrect action condition discovery check. Discovery check does not exist or you have no access to it."
-msgstr "Verkeerde actie, conditie discovery controleren. Discovery controle bestaat niet of u heeft geen toegang.Verkeerde actie, conditie discovery controleren. Discovery controle bestaat niet of u heeft geen toegang."
+msgstr "Verkeerde actie, conditie discovery controleren. Discovery controle bestaat niet of u heeft geen toegang.Verkeerde actie, conditie discovery controleren. Discovery controle bestaat niet of u heeft geen toegang.Verkeerde actie, conditie discovery controleren. Discovery controle bestaat niet of u heeft geen toegang."
 
 #: api/classes/CAction.php:1572
 msgid "Incorrect action condition discovery object."
@@ -6306,7 +6306,7 @@ msgstr "Verkeerde actie conditie discovery object."
 #: api/classes/CAction.php:1687
 #, fuzzy
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
-msgstr "Verkeerde actie conditie discovery regel. Discovery regel bestaat niet of u hebt er geen toegang toe.Verkeerde actie conditie discovery regel. Discovery regel bestaat niet of u hebt er geen toegang toe."
+msgstr "Verkeerde actie conditie discovery regel. Discovery regel bestaat niet of u hebt er geen toegang toe.Verkeerde actie conditie discovery regel. Discovery regel bestaat niet of u hebt er geen toegang toe.Verkeerde actie conditie discovery regel. Discovery regel bestaat niet of u hebt er geen toegang toe."
 
 #: api/classes/CAction.php:1617
 msgid "Incorrect action condition discovery status."
@@ -6318,11 +6318,11 @@ msgstr "Verkeerde actie conditie type gebeurtenis."
 
 #: api/classes/CAction.php:1675
 msgid "Incorrect action condition host group. Host group does not exist or you have no access to it."
-msgstr "Verkeerde actie conditie host groep. Host groep bestaat niet of u hebt er geen toegang toe.Verkeerde actie conditie host groep. Host groep bestaat niet of u hebt er geen toegang toe."
+msgstr "Verkeerde actie conditie host groep. Host groep bestaat niet of u hebt er geen toegang toe.Verkeerde actie conditie host groep. Host groep bestaat niet of u hebt er geen toegang toe.Verkeerde actie conditie host groep. Host groep bestaat niet of u hebt er geen toegang toe."
 
 #: api/classes/CAction.php:1678
 msgid "Incorrect action condition host. Host does not exist or you have no access to it."
-msgstr "Verkeerde actie conditie host. Host bestaat niet of u hebt geen toegang.Verkeerde actie conditie host. Host bestaat niet of u hebt geen toegang."
+msgstr "Verkeerde actie conditie host. Host bestaat niet of u hebt geen toegang.Verkeerde actie conditie host. Host bestaat niet of u hebt geen toegang.Verkeerde actie conditie host. Host bestaat niet of u hebt geen toegang."
 
 #: api/classes/CAction.php:1588
 #, c-format
@@ -6340,11 +6340,11 @@ msgstr "Verkeerde actie voorwaarde poort \"%1$s\"."
 
 #: api/classes/CAction.php:1693
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
-msgstr "Verkeerde actie voorwaarde proxy. Proxy bestaat niet of u hebt geen toegang.Verkeerde actie voorwaarde proxy. Proxy bestaat niet of u hebt geen toegang."
+msgstr "Verkeerde actie voorwaarde proxy. Proxy bestaat niet of u hebt geen toegang.Verkeerde actie voorwaarde proxy. Proxy bestaat niet of u hebt geen toegang.Verkeerde actie voorwaarde proxy. Proxy bestaat niet of u hebt geen toegang."
 
 #: api/classes/CAction.php:1681
 msgid "Incorrect action condition template. Template does not exist or you have no access to it."
-msgstr "Verkeerde actie voorwaarde sjabloon. Sjabloon bestaat niet of u hebt geen toegang.Verkeerde actie voorwaarde sjabloon. Sjabloon bestaat niet of u hebt geen toegang."
+msgstr "Verkeerde actie voorwaarde sjabloon. Sjabloon bestaat niet of u hebt geen toegang.Verkeerde actie voorwaarde sjabloon. Sjabloon bestaat niet of u hebt geen toegang.Verkeerde actie voorwaarde sjabloon. Sjabloon bestaat niet of u hebt geen toegang."
 
 #: api/classes/CAction.php:1633
 msgid "Incorrect action condition trigger severity."
@@ -6356,7 +6356,7 @@ msgstr "Verkeerde actie voorwaarde trigger waarde."
 
 #: api/classes/CAction.php:1684
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
-msgstr "Verkeerde actie voorwaarde trigger. Trigger bestaat niet of u hebt geen toegang.Verkeerde actie voorwaarde trigger. Trigger bestaat niet of u hebt geen toegang."
+msgstr "Verkeerde actie voorwaarde trigger. Trigger bestaat niet of u hebt geen toegang.Verkeerde actie voorwaarde trigger. Trigger bestaat niet of u hebt geen toegang.Verkeerde actie voorwaarde trigger. Trigger bestaat niet of u hebt geen toegang."
 
 #: api/classes/CAction.php:1668
 msgid "Incorrect action condition type."
