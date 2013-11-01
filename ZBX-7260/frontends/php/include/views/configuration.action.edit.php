@@ -793,7 +793,8 @@ if (!empty($this->data['new_operation'])) {
 				new CCol(array(
 					new CMultiSelect(array(
 						'name' => 'discoveryHostGroup',
-						'objectName' => 'hostGroup'
+						'objectName' => 'hostGroup',
+						'objectOptions' => array('editable' => true)
 					)),
 					new CButton('add', _('Add'), 'return addDiscoveryHostGroup();', 'link_menu')
 				), null, 2),
@@ -837,7 +838,8 @@ if (!empty($this->data['new_operation'])) {
 				new CCol(array(
 					new CMultiSelect(array(
 						'name' => 'discoveryTemplates',
-						'objectName' => 'templates'
+						'objectName' => 'templates',
+						'objectOptions' => array('editable' => true)
 					)),
 					new CButton('add', _('Add'), 'return addDiscoveryTemplates();', 'link_menu')
 				), null, 2),
