@@ -572,4 +572,5 @@ void	DBdelete_groups(zbx_vector_uint64_t *groupids);
 void	DBselect_uint64(const char *sql, zbx_vector_uint64_t *ids);
 
 int	get_nodeid_by_id(zbx_uint64_t id);
+
 #endif

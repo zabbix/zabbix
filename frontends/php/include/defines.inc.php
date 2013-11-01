@@ -951,6 +951,7 @@ define('ZABBIX_HOMEPAGE', 'http://www.zabbix.com');
 
 // non translatable date formats
 define('TIMESTAMP_FORMAT', 'YmdHis');
+define('TIMESTAMP_FORMAT_ZERO_TIME', 'Ymd0000');
 
 // actions
 define('LONG_DESCRIPTION',	0);

@@ -58,8 +58,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	insert_js_function('add_period');
 	insert_js_function('update_period');
 
-	$_REQUEST['report_timesince'] = zbxDateToTime(get_request('report_timesince', date(TIMESTAMP_FORMAT, time() - SEC_PER_DAY)));
-	$_REQUEST['report_timetill'] = zbxDateToTime(get_request('report_timetill', date(TIMESTAMP_FORMAT)));
+	$_REQUEST['report_timesince'] = zbxDateToTime(get_request('report_timesince', date(TIMESTAMP_FORMAT_ZERO_TIME, time() - SEC_PER_DAY)));
+	$_REQUEST['report_timetill'] = zbxDateToTime(get_request('report_timetill', date(TIMESTAMP_FORMAT_ZERO_TIME)));
 
 	$_REQUEST['caption'] = get_request('caption','');
 	if(zbx_empty($_REQUEST['caption']) && isset($_REQUEST['report_timesince']) && isset($_REQUEST['report_timetill'])){
@@ -103,8 +103,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$report_timetill = get_request('report_timetill', time());
 
 		$frmPd->addVar('config',$config);
-		$frmPd->addVar('report_timesince', date(TIMESTAMP_FORMAT, $report_timesince));
-		$frmPd->addVar('report_timetill', date(TIMESTAMP_FORMAT, $report_timetill));
+		$frmPd->addVar('report_timesince', date(TIMESTAMP_FORMAT_ZERO_TIME, $report_timesince));
+		$frmPd->addVar('report_timetill', date(TIMESTAMP_FORMAT_ZERO_TIME, $report_timetill));
 
 		if(isset($_REQUEST['period_id']))
 			$frmPd->addVar('period_id',$_REQUEST['period_id']);
