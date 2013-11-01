@@ -210,6 +210,7 @@ if (isset($_REQUEST['form'])) {
 	if (!isset($_REQUEST['sysmapid']) || isset($_REQUEST['form_refresh'])) {
 		$data = array(
 			'sysmap' => array(
+				'sysmapid' => getRequest('sysmapid'),
 				'name' => get_request('name', ''),
 				'width' => get_request('width', 800),
 				'height' => get_request('height', 600),
