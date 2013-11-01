@@ -245,43 +245,71 @@ class CSetupWizard extends CForm {
 		$DB['TYPE'] = $this->getConfig('DB_TYPE');
 
 		$cmbType = new CComboBox('type', $DB['TYPE'], 'this.form.submit();');
+		$cmbType->attr('onchange', "disableSetupStepButton('#next_2')");
+
 		foreach ($ZBX_CONFIG['allowed_db'] as $id => $name) {
 			$cmbType->addItem($id, $name);
 		}
 		$table->addRow(array(new CCol(_('Database type'), 'header'), $cmbType));
+
 		switch ($DB['TYPE']) {
 			case ZBX_DB_SQLITE3:
-				$table->addRow(array(new CCol(_('Database file'), 'header'), new CTextBox('database', $this->getConfig('DB_DATABASE', 'zabbix'))));
+				$database = new CTextBox('database', $this->getConfig('DB_DATABASE', 'zabbix'));
+				$database->attr('onchange', "disableSetupStepButton('#next_2')");
+				$table->addRow(array(
+					new CCol(_('Database file'), 'header'),
+					$database
+				));
 			break;
 			default:
+				$server = new CTextBox('server', $this->getConfig('DB_SERVER', 'localhost'));
+				$server->attr('onchange', "disableSetupStepButton('#next_2')");
 				$table->addRow(array(
 					new CCol(_('Database host'), 'header'),
-					new CTextBox('server', $this->getConfig('DB_SERVER', 'localhost'))
+					$server
 				));
+
+				$port = new CNumericBox('port', $this->getConfig('DB_PORT', '0'), 5, 'no', false, false);
+				$port->attr('style', '');
+				$port->attr(
+					'onchange',
+					"disableSetupStepButton('#next_2'); validateNumericBox(this, 'false', 'false');"
+				);
+
 				$table->addRow(array(
 					new CCol(_('Database port'), 'header'),
-					array(
-						new CNumericBox('port', $this->getConfig('DB_PORT', '0'), 5),
-						' 0 - use default port'
-					)
+					array($port, ' 0 - use default port')
 				));
+
+				$database = new CTextBox('database', $this->getConfig('DB_DATABASE', 'zabbix'));
+				$database->attr('onchange', "disableSetupStepButton('#next_2')");
+
 				$table->addRow(array(
 					new CCol(_('Database name'), 'header'),
-					new CTextBox('database', $this->getConfig('DB_DATABASE', 'zabbix'))
+					$database
 				));
+
 				if ($DB['TYPE'] == ZBX_DB_DB2) {
+					$schema = new CTextBox('schema', $this->getConfig('DB_SCHEMA', ''));
+					$schema->attr('onchange', "disableSetupStepButton('#next_2')");
 					$table->addRow(array(
 						new CCol(_('Database schema'), 'header'),
-						new CTextBox('schema', $this->getConfig('DB_SCHEMA', ''))
+						$schema
 					));
 				}
+
+				$user = new CTextBox('user', $this->getConfig('DB_USER', 'root'));
+				$user->attr('onchange', "disableSetupStepButton('#next_2')");
 				$table->addRow(array(
 					new CCol(_('User'), 'header'),
-					new CTextBox('user', $this->getConfig('DB_USER', 'root'))
+					$user
 				));
+
+				$password = new CPassBox('password', $this->getConfig('DB_PASSWORD', ''));
+				$password->attr('onchange', "disableSetupStepButton('#next_2')");
 				$table->addRow(array(
 					new CCol(_('Password'), 'header'),
-					new CPassBox('password', $this->getConfig('DB_PASSWORD', ''))
+					$password
 				));
 			break;
 		}
@@ -322,10 +350,21 @@ class CSetupWizard extends CForm {
 			new CCol(_('Host'), 'header'),
 			new CTextBox('zbx_server', $this->getConfig('ZBX_SERVER', 'localhost'))
 		));
+
+		$port = new CNumericBox(
+			'zbx_server_port',
+			$this->getConfig('ZBX_SERVER_PORT', '10051'),
+			20,
+			'no',
+			false,
+			false
+		);
+		$port->attr('style', '');
 		$table->addRow(array(
 			new CCol(_('Port'), 'header'),
-			new CNumericBox('zbx_server_port', $this->getConfig('ZBX_SERVER_PORT', '10051'), 5)
+			$port
 		));
+
 		$table->addRow(array(
 			new CCol(_('Name'), 'header'),
 			new CTextBox('zbx_server_name', $this->getConfig('ZBX_SERVER_NAME', ''))
