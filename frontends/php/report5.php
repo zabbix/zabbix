@@ -113,71 +113,66 @@ while ($row = DBfetch($result)) {
 
 $triggers = API::Trigger()->get(array(
 	'triggerids' => array_keys($triggersEventCount),
-	'output' => array('triggerid', 'description', 'expression', 'priority', 'flags', 'lastchange'),
+	'output' => array('triggerid', 'description', 'expression', 'priority', 'flags', 'url', 'lastchange'),
 	'selectItems' => array('hostid', 'name', 'value_type', 'key_'),
+	'selectHosts' => array('hostid'),
 	'expandDescription' => true,
 	'expandData' => true,
 	'preservekeys' => true,
-	'nopermissions' => true,
+	'nopermissions' => true
 ));
 
-$hosts = array();
+$hostIds = array();
 
-foreach ($triggers as $tid => $trigger) {
-	$hosts[$trigger['hostid']] = $trigger['hostid'];
-	$trigger['cnt_event'] = $triggersEventCount[$tid];
+foreach ($triggers as $triggerId => $trigger) {
+	$hostIds[$trigger['hostid']] = $trigger['hostid'];
 
-	$items = $trigger['items'];
-	$trigger['items'] = array();
-	foreach ($items as $item) {
-		$trigger['items'][$item['itemid']] = array(
-			'itemid' => $item['itemid'],
-			'action' => str_in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64)) ? 'showgraph' : 'showvalues',
-			'name' => itemName($item),
-			'value_type' => $item['value_type']
+	$triggerItems = array();
+
+	foreach ($trigger['items'] as $item) {
+		$triggerItems[] = array(
+			'name' => htmlspecialchars(itemName($item)),
+			'params' => array(
+				'itemid' => $item['itemid'],
+				'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
+					? 'showgraph' : 'showvalues'
+			)
 		);
 	}
-	$triggers[$tid] = $trigger;
+
+	$triggers[$triggerId]['items'] = $triggerItems;
+	$triggers[$triggerId]['cnt_event'] = $triggersEventCount[$triggerId];
 }
 
-CArrayHelper::sort($triggers, array(array('field' => 'cnt_event', 'order' => ZBX_SORT_DOWN), 'host', 'description', 'priority'));
+CArrayHelper::sort($triggers, array(
+	array('field' => 'cnt_event', 'order' => ZBX_SORT_DOWN),
+	'host', 'description', 'priority'
+));
 
-$scripts_by_hosts = API::Script()->getScriptsByHosts($hosts);
+$hosts = API::Host()->get(array(
+	'output' => array('hostid'),
+	'hostids' => $hostIds,
+	'selectScreens' => API_OUTPUT_COUNT,
+	'preservekeys' => true
+));
+
+$scripts = API::Script()->getScriptsByHosts($hostIds);
 
 foreach ($triggers as $trigger) {
-	$menus = '';
-	$host_nodeid = id2nodeid($trigger['hostid']);
-	foreach ($scripts_by_hosts[$trigger['hostid']] as $script) {
-		$script_nodeid = id2nodeid($script['scriptid']);
-		if (bccomp($host_nodeid, $script_nodeid) == 0) {
-			$menus .= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$trigger['hostid']."&scriptid=".$script['scriptid']."','Global script',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
-		}
-	}
+	$hostId = $trigger['hostid'];
 
-	$menus .= "['"._('URLs')."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
-	$menus .= "['"._('Latest data')."',\"javascript: redirect('latest.php?hostid=".$trigger['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
-	$menus = "show_popup_menu(event,[['"._('Scripts')."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus."],180);";
+	$hostName = new CSpan($trigger['hostname'], 'link_menu');
+	$hostName->setMenuPopup(getMenuPopupHost($hosts[$hostId], $scripts[$hostId]));
 
-	$hostSpan = new CSpan($trigger['hostname'], 'link_menu');
-	$hostSpan->setAttribute('onclick', $menus);
-
-	$tr_conf_link = 'null';
-	if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-		$tr_conf_link = "['"._('Configuration of trigger')."',\"javascript: redirect('triggers.php?form=update&triggerid=".$trigger['triggerid']."&hostid=".$trigger['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
-	}
-
-
-	$tr_desc = new CSpan($trigger['description'], 'link_menu');
-	$tr_desc->addAction('onclick', "create_mon_trigger_menu(event, ".
-			" [{'triggerid': '".$trigger['triggerid']."', 'lastchange': '".$trigger['lastchange']."'},".$tr_conf_link."],".
-			zbx_jsvalue($trigger['items'], true).");");
+	$triggerDescription = new CSpan($trigger['description'], 'link_menu');
+	$triggerDescription->setMenuPopup(getMenuPopupTrigger($trigger, $trigger['items']));
 
 	$table->addRow(array(
 		get_node_name_by_elid($trigger['triggerid']),
-		$hostSpan,
-		$tr_desc,
+		$hostName,
+		$triggerDescription,
 		getSeverityCell($trigger['priority']),
-		$trigger['cnt_event'],
+		$trigger['cnt_event']
 	));
 }
 
