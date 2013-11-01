@@ -4240,7 +4240,7 @@ static void	replace_key_param(char **data, int key_type, size_t l, size_t *r, in
 
 	if (NULL != strchr(*data + l, '{'))
 	{
-		param = zbx_strdup(param, *data + l);
+		param = zbx_strdup(NULL, *data + l);
 		(*data)[*r] = c;
 
 		if (0 != quoted)
