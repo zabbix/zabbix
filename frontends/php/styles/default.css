@@ -150,7 +150,7 @@ form { margin: 0; }
 .input[disabled]:hover { text-decoration: none; border-color: #ACA899; }
 .input option { color: #000000; }
 .select {
-	margin: 0 2px 0 0; height: 14px; line-height: 14px;
+	margin: 0 2px 0 0; height: 14px; line-height: 14px; max-width: 314px;
 	-moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box;
 }
 select[multiple="multiple"], select.openView { height: auto; }
@@ -164,13 +164,11 @@ input[type="submit"].formlist { vertical-align: top; margin-bottom: 1px; cursor:
 input[type="button"].input[disabled].formlist,
 input[type="submit"].input[disabled].formlist { cursor: default; }
 input.jqueryinput,
-input.jqueryinput,
 .jqueryinputset input[type="button"],
 .jqueryinputset input[type="submit"] { height: auto; }
 textarea.textarea_standard,
 textarea.textarea_big { height: auto; }
 
-.selectShorten { width: 200px; }
 .radio { margin: 2px 2px 2px 0; vertical-align: top; }
 .checkbox { padding: 0; border: 0; }
 .formrow .listInfoLabel { vertical-align: middle; display: table-cell; height: 100%; }
