@@ -705,7 +705,6 @@ size_t	zbx_strlcat(char *dst, const char *src, size_t siz)
  * Comments: returns a pointer to allocated memory                            *
  *                                                                            *
  ******************************************************************************/
-#include "log.h"
 char	*zbx_dvsprintf(char *dest, const char *f, va_list args)
 {
 	char	*string = NULL;
