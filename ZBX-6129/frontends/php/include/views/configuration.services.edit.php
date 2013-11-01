@@ -188,7 +188,7 @@ if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIM
 		$serviceTimeFrom = $fromYear.$fromMonth.$fromDay.$fromHours.$fromMinutes;
 	}
 	else {
-		$downtimeSince = date(TIMESTAMP_FORMAT);
+		$downtimeSince = date(TIMESTAMP_FORMAT_ZERO_TIME);
 		$fromDate = zbxDateToTime($downtimeSince);
 		$serviceTimeFrom = $downtimeSince;
 	}
@@ -211,7 +211,7 @@ if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIM
 		$serviceTimeTo = $toYear.$toMonth.$toDay.$toHours.$toMinutes;
 	}
 	else {
-		$downtimeTill = date(TIMESTAMP_FORMAT, time() + 86400);
+		$downtimeTill = date(TIMESTAMP_FORMAT_ZERO_TIME, time() + SEC_PER_DAY);
 		$toDate = zbxDateToTime($downtimeTill);
 		$serviceTimeTo = $downtimeTill;
 	}

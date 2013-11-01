@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/maps.inc.php';
 require_once dirname(__FILE__).'/users.inc.php';
 
 function make_favorite_graphs() {
-	$favList = new CList(null, 'favorites');
+	$favList = new CList(null, 'favorites', _('No graphs added.'));
 	$graphids = array();
 	$itemids = array();
 
@@ -96,7 +96,7 @@ function make_favorite_graphs() {
 }
 
 function make_favorite_screens() {
-	$favList = new CList(null, 'favorites');
+	$favList = new CList(null, 'favorites', _('No screens added.'));
 	$fav_screens = CFavorite::get('web.favorite.screenids');
 
 	if (!$fav_screens) {
@@ -147,7 +147,7 @@ function make_favorite_screens() {
 }
 
 function make_favorite_maps() {
-	$favList = new CList(null, 'favorites');
+	$favList = new CList(null, 'favorites', _('No maps added.'));
 	$fav_sysmaps = CFavorite::get('web.favorite.sysmapids');
 
 	if (!$fav_sysmaps) {
@@ -180,7 +180,7 @@ function make_system_status($filter) {
 		$ackParams['screenid'] = $filter['screenid'];
 	}
 
-	$table = new CTableInfo();
+	$table = new CTableInfo(_('No host groups found.'));
 	$table->setHeader(array(
 		is_show_all_nodes() ? _('Node') : null,
 		_('Host group'),
@@ -370,7 +370,7 @@ function make_system_status($filter) {
 }
 
 function make_hoststat_summary($filter) {
-	$table = new CTableInfo();
+	$table = new CTableInfo(_('No host groups found.'));
 	$table->setHeader(array(
 		is_show_all_nodes() ? _('Node') : null,
 		_('Host group'),
@@ -898,7 +898,7 @@ function make_latest_issues(array $filter = array()) {
 		$lastChangeHeaderDiv->addStyle('float: left');
 	}
 
-	$table = new CTableInfo();
+	$table = new CTableInfo(_('No events found.'));
 	$table->setHeader(array(
 		is_show_all_nodes() ? _('Node') : null,
 		($showSortIndicator && ($filter['sortfield'] === 'hostname')) ? array($hostHeaderDiv, $sortDiv) : _('Host'),
@@ -1071,7 +1071,7 @@ function make_webmon_overview($filter) {
 	));
 	$availableHostIds = array_keys($availableHosts);
 
-	$table = new CTableInfo();
+	$table = new CTableInfo(_('No web scenarios found.'));
 	$table->setHeader(array(
 		is_show_all_nodes() ? _('Node') : null,
 		_('Host group'),

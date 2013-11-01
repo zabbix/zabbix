@@ -19,7 +19,7 @@
 **/
 
 
-$valueMappingTable = new CTableInfo(_('No value map defined.'));
+$valueMappingTable = new CTableInfo(_('No value maps found.'));
 $valueMappingTable->setHeader(array(
 	$this->data['displayNodes'] ? _('Node') : null,
 	_('Name'),

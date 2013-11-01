@@ -219,8 +219,9 @@ class CHttpTestManager {
 					);
 					$this->updateItemsApplications($dbStepIds, $httpTest['applicationid']);
 				}
+
 				if (isset($httpTest['status'])) {
-					$status = HTTPTEST_STATUS_ACTIVE ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
+					$status = ($httpTest['status'] == HTTPTEST_STATUS_ACTIVE) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
 
 					$itemIds = DBfetchColumn(DBselect(
 						'SELECT hsi.itemid'.
@@ -228,6 +229,7 @@ class CHttpTestManager {
 							' WHERE hs.httpstepid=hsi.httpstepid'.
 								' AND hs.httptestid='.zbx_dbstr($httpTest['httptestid'])
 					), 'itemid');
+
 					DB::update('items', array(
 						'values' => array('status' => $status),
 						'where' => array('itemid' => $itemIds)

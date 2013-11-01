@@ -108,7 +108,7 @@ if ($config['dropdown_first_entry'] || $this->data['pageFilter']->applicationsSe
 	}
 }
 else {
-	$dataTable = new CTableInfo(_('No items defined.'));
+	$dataTable = new CTableInfo(_('No items found.'));
 }
 
 $overviewWidget->addItem($dataTable);

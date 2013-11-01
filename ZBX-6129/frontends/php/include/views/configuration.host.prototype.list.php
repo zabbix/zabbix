@@ -41,7 +41,7 @@ $itemForm->setName('hosts');
 $itemForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 
 // create table
-$hostTable = new CTableInfo(_('No host prototypes defined.'));
+$hostTable = new CTableInfo(_('No host prototypes found.'));
 
 $sortLink = new CUrl();
 $sortLink->setArgument('parent_discoveryid', $this->data['parent_discoveryid']);

@@ -352,7 +352,7 @@ else {
 	$showHideAllDiv = null;
 }
 
-$triggerTable = new CTableInfo(_('No triggers defined.'));
+$triggerTable = new CTableInfo(_('No triggers found.'));
 $triggerTable->setHeader(array(
 	$showHideAllDiv,
 	$config['event_ack_enable'] ? $headerCheckBox : null,
