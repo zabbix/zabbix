@@ -66,13 +66,6 @@ class CComboBox extends CTag {
 			parent::addItem($value);
 		}
 		else {
-			$title = false;
-			// if caption is too long ( > 44 symbols), we add new class - 'selectShorten',
-			// so that the select box would not stretch
-			if (zbx_strlen($caption) > 44 && !$this->hasClass('selectShorten')) {
-				$this->setAttribute('class', $this->getAttribute('class').' selectShorten');
-				$title = true;
-			}
 			if (is_null($selected)) {
 				$selected = 'no';
 				if (is_array($this->value)) {
@@ -87,13 +80,13 @@ class CComboBox extends CTag {
 			else {
 				$selected = 'yes';
 			}
+
 			$citem = new CComboItem($value, $caption, $selected, $enabled);
-			if ($title) {
-				$citem->setTitle($caption);
-			}
+
 			if ($class !== null) {
 				$citem->addClass($class);
 			}
+
 			parent::addItem($citem);
 		}
 	}
