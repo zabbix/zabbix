@@ -100,6 +100,8 @@ if ($config['dropdown_first_entry'] || $this->data['pageFilter']->applicationsSe
 		);
 	}
 	elseif ($this->data['type'] == SHOW_TRIGGERS) {
+		global $page;
+
 		$dataTable = getTriggersOverview(
 			array_keys($this->data['pageFilter']->hosts),
 			$this->data['pageFilter']->application,
