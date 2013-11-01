@@ -1167,4 +1167,6 @@ function disableSetupStepButton(buttonId) {
 		addClass('ui-button-disabled').
 		attr('disabled', 'disabled').
 		attr('aria-disabled', 'true');
+
+	jQuery('.info_bar .ok').remove();
 }
