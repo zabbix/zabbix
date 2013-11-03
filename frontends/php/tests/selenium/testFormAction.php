@@ -1722,8 +1722,8 @@ class testFormAction extends CWebTest {
 				'def_longdata' => 'def_longdata',
 				'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Name": cannot be empty.',
-						'Warning. Field "operations" is mandatory.'
+						'Incorrect value for field "Name": cannot be empty.',
+						'Field "operations" is mandatory.'
 				)
 			)),
 			array(array(
@@ -1757,8 +1757,8 @@ class testFormAction extends CWebTest {
 				'def_longdata' => 'def_longdata',
 				'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Name": cannot be empty.',
-						'Warning. Field "operations" is mandatory.'
+						'Incorrect value for field "Name": cannot be empty.',
+						'Field "operations" is mandatory.'
 				)
 			)),
 			array(array(
@@ -1792,8 +1792,8 @@ class testFormAction extends CWebTest {
 				'def_longdata' => 'def_longdata',
 				'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Name": cannot be empty.',
-						'Warning. Field "operations" is mandatory.'
+						'Incorrect value for field "Name": cannot be empty.',
+						'Field "operations" is mandatory.'
 				)
 			)),
 			array(array(
@@ -1829,10 +1829,10 @@ class testFormAction extends CWebTest {
 				'def_longdata' => 'def_longdata',
 				'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Name": cannot be empty.',
-						'Warning. Field "operations" is mandatory.'
+						'Incorrect value for field "Name": cannot be empty.',
+						'Field "operations" is mandatory.'
 				)
-			)),
+			))
 		);
 	}
 
@@ -1951,22 +1951,22 @@ class testFormAction extends CWebTest {
 
 		$this->zbxTestClickWait('save');
 
-		$expected = $data['expected'];
-		switch ($expected) {
+		switch ($data['expected']) {
 			case ACTION_GOOD:
-				$this->zbxTestTextPresent('Action added');
 				$this->zbxTestCheckTitle('Configuration of actions');
 				$this->zbxTestTextPresent('CONFIGURATION OF ACTIONS');
+				$this->zbxTestTextPresent('Action added');
 				break;
 
 			case ACTION_BAD:
 				$this->zbxTestCheckTitle('Configuration of actions');
 				$this->zbxTestTextPresent('CONFIGURATION OF ACTIONS');
-				foreach ($data['errors'] as $msg) {
-					$this->zbxTestTextPresent($msg);
-				}
+				$this->zbxTestTextPresent($data['errors']);
 				break;
-			}
+		}
+	}
+
+	public function testFormAction_Create() {
 		$this->zbxTestLogin('actionconf.php?form=1&eventsource=0');
 		$this->zbxTestCheckTitle('Configuration of actions');
 
