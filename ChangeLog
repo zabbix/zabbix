@@ -1,6 +1,7 @@
 Changes for 2.1.9
 
 New features:
+...GI..PS. [ZBXNEXT-1477] added support of Windows eventlog source regex filter (Sasha)
 ..F.I..... [ZBXNEXT-544] moved help_items data to php code (Pavels, Sasha)
 ..F....... [ZBXNEXT-1827] improved multiselect full text search (Eduard)
 ..F....... [ZBX-7065] changed the design of the setup, login and browser warning pages (Pavels)
