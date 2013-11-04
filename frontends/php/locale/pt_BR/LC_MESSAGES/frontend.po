@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-04 14:47+0200\n"
-"PO-Revision-Date: 2013-10-30 17:46+0300\n"
+"POT-Creation-Date: 2013-11-04 14:50+0200\n"
+"PO-Revision-Date: 2013-11-03 10:38+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1383147983.0\n"
+"X-POOTLE-MTIME: 1383467910.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -70,8 +70,8 @@ msgstr[1] "%1$s dias"
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%4$s falhou na tentativa de login. Última tentativa sem sucesso foi de %1$s em %2$s as %3$s."
+msgstr[1] "%4$s falharam nas tentativas de login. Última tentativa sem sucesso foi de %1$s em %2$s as %3$s."
 
 #: include/views/monitoring.discovery.php:131
 #, c-format
@@ -161,7 +161,7 @@ msgstr "últimos 500 valores"
 
 #: include/views/administration.script.edit.php:41
 msgid "<Sub-menu/Sub-menu.../>Script"
-msgstr ""
+msgstr "<Sub-menu/Sub-menu.../>Script"
 
 #: include/views/configuration.sysmap.edit.php:55
 msgid "<manual>"
@@ -717,15 +717,15 @@ msgstr "Às %1$s:%2$s do dia %3$s de cada %4$s"
 #, c-format
 msgid "At %1$s:%2$s on every %3$s of every week"
 msgid_plural "At %1$s:%2$s on every %3$s of every %4$s weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Às %1$s:%2$s de cada %3$s de cada semana"
+msgstr[1] "Às %1$s:%2$s de cada %3$s de cada %4$s semanas"
 
 #: include/maintenances.inc.php:63
 #, c-format
 msgid "At %1$s:%2$s on every day"
 msgid_plural "At %1$s:%2$s on every %3$s days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Às %1$s:%2$s de cada dia"
+msgstr[1] "Às %1$s:%2$s a cada %3$s dias"
 
 #: include/forms.inc.php:1763
 msgid "At (hour:minute)"
@@ -1213,7 +1213,7 @@ msgstr "Não foi possível adicionar o item não numérico \"%1$s\" ao protótip
 #: include/reports.inc.php:504
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\"."
-msgstr ""
+msgstr "Não é possível adicionar o item não numérico \"%1$s\"."
 
 #: actionconf.php:150
 msgid "Cannot add action"
@@ -1271,7 +1271,7 @@ msgstr "Item não foi adicionado"
 #: api/classes/CApplication.php:547
 #, c-format
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
-msgstr ""
+msgstr "Não foi possível adicionar o item \"%1$s\" de \"%2$s\" à aplicação \"%3$s\" de \"%4$s\"."
 
 #: api/classes/CApplication.php:600
 msgid "Cannot add items."
@@ -1601,7 +1601,7 @@ msgstr "Não foi possível excluir os scripts. Script \"%1$s\" é usado na opera
 #: api/classes/CScript.php:525
 #, c-format
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
-msgstr ""
+msgstr "Falha ao excluir scripts. Não existe script com o scriptid \"%1$s\"."
 
 #: actionconf.php:331
 msgid "Cannot delete selected actions"
@@ -1757,7 +1757,7 @@ msgstr "Não foi possível encontrar interface \"%1$s\" no host para a chave do 
 #: include/classes/import/CConfigurationImport.php:934
 #, c-format
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
-msgstr ""
+msgstr "Não foi possível localizar o host ou template \"%1$s\" utilizado no gráfico \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:768
 #: include/classes/import/importers/CMapImporter.php:247
@@ -1833,15 +1833,15 @@ msgstr "Não foi possível implodir a expressão \"%s\"."
 #, c-format
 msgid "Cannot import screen \"%1$s\": subscreen \"%2$s\" does not exist."
 msgid_plural "Cannot import screen \"%1$s\": subscreens \"%2$s\" do not exist."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não foi possível importar a tela \"%1$s\": a subtela \"%2$s\" não existe."
+msgstr[1] "Não foi possível importar a tela \"%1$s\": as subtelas \"%2$s\" não existem."
 
 #: include/classes/import/importers/CTemplateImporter.php:114
 #, c-format
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" does not exist."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não foi possível importar o template \"%1$s\", vinculado com o template \"%2$s\" que não existe."
+msgstr[1] "Não foi possível importar o template \"%1$s\", vinculado com os templates \"%2$s\" que não existem."
 
 #: include/classes/class.cview.php:113
 #, c-format
@@ -1898,7 +1898,7 @@ msgstr "Não é possível executar comando de atualização na tabela \"%1$s\" s
 
 #: api/classes/CApplication.php:536
 msgid "Cannot process applications from different hosts or templates."
-msgstr ""
+msgstr "Não é possível processar aplicações de diferentes hosts ou templates."
 
 #: include/classes/server/CZabbixServer.php:222
 #, c-format
@@ -2261,7 +2261,7 @@ msgstr "Não foi possível atualizar o cenário web"
 
 #: include/views/js/configuration.discovery.edit.js.php:600
 msgid "Cannot validate discovery check: invalid request or connection to Zabbix server failed."
-msgstr ""
+msgstr "Não foi possível validar a verificação de descoberta: a requisição foi inválida ou a conexão com o servidor Zabbix falhou."
 
 #: popup_bitem.php:114 popup_period.php:114
 msgid "Caption"
@@ -2983,7 +2983,7 @@ msgstr "Criado: Cenário Web \"%1$s\" em \"%2$s\"."
 
 #: include/items.inc.php:41
 msgid "Critical"
-msgstr ""
+msgstr "Crítico"
 
 #: popup_trexpr.php:365
 msgid "Current date is < N"
@@ -3989,7 +3989,7 @@ msgstr "Verificação de descoberta"
 #: include/views/js/configuration.discovery.edit.js.php:599
 #: include/views/js/configuration.discovery.edit.js.php:616
 msgid "Discovery check error"
-msgstr ""
+msgstr "Erro na regra de descoberta"
 
 #: popup.php:100
 msgid "Discovery checks"
@@ -4194,7 +4194,7 @@ msgstr "Nome duplicado para o mapa: \"%s\"."
 #: api/classes/CScript.php:417 api/classes/CScript.php:473
 #, c-format
 msgid "Duplicate script name \"%1$s\"."
-msgstr ""
+msgstr "Nome de script duplicado \"%1$s\"."
 
 #: include/profiles.inc.php:345
 #, c-format
@@ -4327,7 +4327,7 @@ msgstr "Parâmetro de entrada vazio."
 
 #: api/classes/CApplication.php:496
 msgid "Empty input parameters."
-msgstr ""
+msgstr "Parâmetros de entrada vazios."
 
 #: api/classes/CDRule.php:244
 msgid "Empty input."
@@ -4349,11 +4349,11 @@ msgstr "Falta o nome para o protótipo de host \"%1$s\"."
 #: api/classes/CScript.php:575
 #, c-format
 msgid "Empty name for script \"%1$s\"."
-msgstr ""
+msgstr "Falta o nome para o script \"%1$s\"."
 
 #: api/classes/CScript.php:414 api/classes/CScript.php:470
 msgid "Empty name for script."
-msgstr ""
+msgstr "Falta o nome do script."
 
 #: api/classes/CService.php:1111
 msgid "Empty name."
@@ -5359,7 +5359,7 @@ msgstr ""
 #: include/views/inventory.host.list.php:26
 #: include/views/inventory.host.view.php:24
 msgid "HOST INVENTORY"
-msgstr ""
+msgstr "INVENTÁRIO DOS HOSTS"
 
 #: hostinventoriesoverview.php:65
 msgid "HOST INVENTORY OVERVIEW"
@@ -6686,7 +6686,7 @@ msgstr "Foi informado um comprimento inválido para o mapa \"%s\"."
 #: api/classes/CScript.php:582
 #, c-format
 msgid "Incorrect menu path for script \"%1$s\"."
-msgstr ""
+msgstr "O caminho para o script \"%1$s\" está incorreto no menu."
 
 #: include/nodes.inc.php:306
 msgid "Incorrect node type."
@@ -6830,7 +6830,7 @@ msgstr "Sintaxe inválida próxima a \"%1$s\"."
 #: api/classes/CUser.php:351
 #, c-format
 msgid "Incorrect theme for user \"%1$s\"."
-msgstr ""
+msgstr "Tema incorreto para o usuário \"%1$s\"."
 
 #: include/classes/validators/CTimePeriodValidator.php:99
 #, c-format
@@ -6935,7 +6935,7 @@ msgstr "O valor \"%1$s\" é inválido para o campo \"%2$s\" - espera-se um núme
 #: include/reports.inc.php:539 include/reports.inc.php:543
 #, c-format
 msgid "Incorrect value for field \"%1$s\"."
-msgstr ""
+msgstr "Valor incorreto para o campo \"%1$s\"."
 
 #: include/validate.inc.php:442
 #, c-format
@@ -7123,7 +7123,7 @@ msgstr "Parâmetros inválidos."
 #: include/reports.inc.php:589 include/reports.inc.php:593
 #, c-format
 msgid "Invalid period for field \"%1$s\"."
-msgstr ""
+msgstr "Período inválido para o campo \"%1$s\"."
 
 #: api/classes/CHttpTest.php:637
 #, c-format
@@ -7809,7 +7809,7 @@ msgstr "Últimos eventos"
 
 #: jsLoader.php:207
 msgid "Latest values"
-msgstr ""
+msgstr "Últimos valores"
 
 #: include/locales.inc.php:66
 msgid "Latvian (lv_LV)"
@@ -8357,22 +8357,22 @@ msgstr "Maximizar"
 #, c-format
 msgid "Maximum DNS name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum DNS name length is %1$d characters, \"%2$s\" is %3$d characters."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "O tamanho máximo do nome de DNS é de %1$d caracteres, \"%2$s\" possui %3$d caracter."
+msgstr[1] "O tamanho máximo do nome de DNS é de %1$d caracteres, \"%2$s\" possui %3$d caracteres."
 
 #: api/classes/CUser.php:315
 #, c-format
 msgid "Maximum alias length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum alias length is %1$d characters, \"%2$s\" is %3$d characters."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "O tamanho máximo de um apelido é de %1$d caracteres, \"%2$s\" possui %3$d caracter."
+msgstr[1] "O tamanho máximo de um apelido é de %1$d caracteres, \"%2$s\" possui %3$d caracteres."
 
 #: api/classes/CHost.php:733
 #, c-format
 msgid "Maximum host name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum host name length is %1$d characters, \"%2$s\" is %3$d characters."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "O nome do host deve possuir no máximo %1$d characteres, \"%2$s\" possui %3$d caracteres."
+msgstr[1] "O nome do host deve possuir no máximo %1$d characteres, \"%2$s\" possui %3$d caracteres."
 
 #: include/views/configuration.item.edit.php:319
 #: include/views/configuration.item.massupdate.php:372
@@ -8406,8 +8406,8 @@ msgstr "O valor máximo para um período T é NÃO É N"
 #, c-format
 msgid "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d characters."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "O nome visível do host deve possuir no máximo %1$d caracteres, \"%2$s\" possui %3$d caracteres."
+msgstr[1] "O nome visível do host deve possuir no máximo %1$d caracteres, \"%2$s\" possui %3$d caracteres."
 
 #: include/forms.inc.php:1687 include/func.inc.php:116
 #: include/func.inc.php:247 jsLoader.php:122
@@ -8604,12 +8604,12 @@ msgstr "O campo \"%1$s\" está faltando na condição da ação."
 #: include/reports.inc.php:481
 #, c-format
 msgid "Missing \"%1$s\" field for item."
-msgstr ""
+msgstr "Está faltando o campo \"%1$s\" para o item."
 
 #: include/reports.inc.php:579
 #, c-format
 msgid "Missing \"%1$s\" field for period."
-msgstr ""
+msgstr "Está faltando o campo \"%1$s\" para o período."
 
 #: api/classes/CGraphGeneral.php:75
 msgid "Missing \"gitemid\" field for item."
@@ -8975,11 +8975,11 @@ msgstr ""
 
 #: api/classes/CItemGeneral.php:351
 msgid "No SNMP OID specified."
-msgstr ""
+msgstr "Não foi especificado o OID SNMP."
 
 #: api/classes/CItemGeneral.php:357
 msgid "No SNMP community specified."
-msgstr ""
+msgstr "Não foi especificada a comunidade SNMP."
 
 #: include/views/configuration.host.edit.php:340
 #: include/views/configuration.host.prototype.edit.php:117
@@ -11628,7 +11628,7 @@ msgstr "Script"
 #: api/classes/CScript.php:623
 #, c-format
 msgid "Script \"%1$s\" already exists."
-msgstr ""
+msgstr "O scritp \"%1$s\" já existe."
 
 #: scripts.php:126
 msgid "Script added"
@@ -11641,7 +11641,7 @@ msgstr "Script removido"
 #: api/classes/CScript.php:615
 #, c-format
 msgid "Script menu path \"%1$s\" already used in script name \"%2$s\"."
-msgstr ""
+msgstr "O caminho para o script \"%1$s\" já é utilizado para o script \"%2$s\"."
 
 #: include/views/administration.mediatypes.edit.php:65
 #: include/views/administration.mediatypes.list.php:57
@@ -11651,7 +11651,7 @@ msgstr "Nome script"
 #: api/classes/CScript.php:602
 #, c-format
 msgid "Script name \"%1$s\" already used in menu path for script \"%2$s\"."
-msgstr ""
+msgstr "O nome de script \"%1$s\" já é utilizado no menu para o script \"%2$s\"."
 
 #: include/classes/debug/CProfiler.php:125
 msgid "Script profiler"
@@ -11664,7 +11664,7 @@ msgstr "Script atualizado"
 #: api/classes/CScript.php:465
 #, c-format
 msgid "Script with scriptid \"%1$s\" does not exist."
-msgstr ""
+msgstr "Não existe script com o scriptid \"%1$s\"."
 
 #: include/menu.inc.php:260 include/views/administration.script.list.php:28
 #: jsLoader.php:184 jsLoader.php:211 scripts_exec.php:26
@@ -12709,15 +12709,15 @@ msgstr "O host não foi mais descoberto e será excluído em %1$s (às %2$s de %
 #, c-format
 msgid "The image is used in icon map %1$s."
 msgid_plural "The image is used in icon maps %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "A imagem é utilizada no mapeamento de ícones %1$s."
+msgstr[1] "A imagem é utilizada no mapeamento de ícones %1$s."
 
 #: api/classes/CImage.php:519
 #, c-format
 msgid "The image is used in map %1$s."
 msgid_plural "The image is used in maps %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "A imagem é utilizada no mapa %1$s."
+msgstr[1] "A imagem é utilizada nos mapas %1$s."
 
 #: include/views/configuration.item.list.php:126
 #, c-format
@@ -13889,7 +13889,7 @@ msgstr "Fornecedor"
 
 #: include/items.inc.php:43
 msgid "Verbose"
-msgstr ""
+msgstr "Detalhado"
 
 #: include/views/configuration.screen.constructor.edit.php:543
 msgid "Vertical"
