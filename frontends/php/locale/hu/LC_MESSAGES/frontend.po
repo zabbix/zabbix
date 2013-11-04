@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-01 19:42+0200\n"
+"POT-Creation-Date: 2013-11-04 14:47+0200\n"
 "PO-Revision-Date: 2013-01-09 22:10+0200\n"
 "Last-Translator: Robert <szenasy.robert@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -9287,6 +9287,10 @@ msgstr ""
 
 #: report4.php:73
 msgid "No notifications found."
+msgstr ""
+
+#: include/views/configuration.action.edit.php:332
+msgid "No operations defined."
 msgstr ""
 
 #: include/classes/import/CConfigurationImport.php:880
