@@ -459,7 +459,6 @@ static int	sql_insert_execute(zbx_sql_insert_t *sql)
 	return DBexecute("insert into alerts %s values %s", sql->fields, sql->values);
 }
 
-
 #endif
 
 /******************************************************************************
@@ -468,8 +467,8 @@ static int	sql_insert_execute(zbx_sql_insert_t *sql)
  *                                                                            *
  * Purpose: inserts data into alerts table                                    *
  *                                                                            *
- * Paramters: <param> - a reference to the value of respective alerts table   *
- *                      field, can be NULL.                                   *
+ * Parameters: <param> - a reference to the value of respective alerts table  *
+ *                       field, can be NULL.                                  *
  *                                                                            *
  * Return value: ZBX_DB_FAIL - the insert failed                              *
  *                                                                            *
@@ -896,7 +895,7 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVE
 		zbx_snprintf(error, sizeof(error), "No media defined for user \"%s\"",
 				zbx_user_string(userid));
 
-		alertid		= DBget_maxid("alerts");
+		alertid = DBget_maxid("alerts");
 
 		db_insert_alert(&alertid, &action->actionid, &c_event->eventid, &userid, &now, NULL,
 				NULL, subject, message, &status, &retries, error, &escalation->esc_step, &alerttype);
