@@ -2291,13 +2291,13 @@ static int	DBpatch_2010194(void)
 		if (SUCCEED != replace_key_params_dyn(&key, ZBX_KEY_TYPE_ITEM, replace_key_param, NULL,
 				error, sizeof(error)))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot convert item key \"%s\": %s.", row[1], error);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot convert item key \"%s\": %s.", row[1], error);
 			continue;
 		}
 
 		if (255 /* ITEM_KEY_LEN */ < zbx_strlen_utf8(key))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot convert item key \"%s\": key is too long.", row[1]);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot convert item key \"%s\": key is too long.", row[1]);
 			continue;
 		}
 
