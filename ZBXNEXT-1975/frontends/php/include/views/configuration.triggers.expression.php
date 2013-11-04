@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/js/configuration.triggers.expression.js.php';
 
-$expressionWidget = new CWidget();
+$expressionWidget = new CWidget(null, 'trigger-expression');
 
 // create form
 $expressionForm = new CForm();
@@ -58,7 +58,6 @@ $expressionFormList->addRow(_('Item'), $item);
 
 // append function to form list
 $functionComboBox = new CComboBox('expr_type', $this->data['expr_type'], 'submit()');
-$functionComboBox->addStyle('width: 605px;');
 
 foreach ($this->data['functions'] as $id => $f) {
 	// if user has selected an item, we are filtering out the triggers that can't work with it

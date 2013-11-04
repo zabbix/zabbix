@@ -191,10 +191,10 @@ if ($config != 3) {
 	}
 }
 
-$_REQUEST['report_timesince'] = zbxDateToTime(
-	get_request('report_timesince', date(TIMESTAMP_FORMAT, time() - SEC_PER_DAY))
-);
-$_REQUEST['report_timetill'] = zbxDateToTime(get_request('report_timetill', date(TIMESTAMP_FORMAT)));
+$_REQUEST['report_timesince'] = zbxDateToTime(get_request('report_timesince',
+	date(TIMESTAMP_FORMAT_ZERO_TIME, time() - SEC_PER_DAY)));
+$_REQUEST['report_timetill'] = zbxDateToTime(get_request('report_timetill',
+	date(TIMESTAMP_FORMAT_ZERO_TIME, time())));
 
 $rep6_wdgt = new CWidget();
 

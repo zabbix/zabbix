@@ -37,7 +37,7 @@ $sysmapWidget->addHeader(_('Maps'));
 $sysmapWidget->addHeaderRowNumber();
 
 // create table
-$sysmapTable = new CTableInfo(_('No maps defined.'));
+$sysmapTable = new CTableInfo(_('No maps found.'));
 $sysmapTable->setHeader(array(
 	new CCheckBox('all_maps', null, "checkAll('".$sysmapForm->getName()."', 'all_maps', 'maps');"),
 	$this->data['displayNodes'] ? _('Node') : null,

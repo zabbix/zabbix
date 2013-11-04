@@ -528,6 +528,7 @@ $functions = array(
 		'allowed_types' => $allowedTypesInt
 	)
 );
+order_result($functions, 'description');
 
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(

@@ -438,7 +438,7 @@ jQuery(function($) {
 			}
 
 			menuPopup.position({
-				of: opener,
+				of: event,
 				my: 'left top',
 				at: 'left bottom'
 			});
@@ -552,7 +552,7 @@ jQuery(function($) {
 					closeInactiveMenuPopup(menuPopup, 1000);
 				})
 				.position({
-					of: (opener.prop('tagName') == 'AREA') ? mapContainer : opener,
+					of: (opener.prop('tagName') == 'AREA') ? mapContainer : event,
 					my: 'left top',
 					at: 'left bottom'
 				});

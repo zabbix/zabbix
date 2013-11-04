@@ -36,7 +36,7 @@ if (ZBX_DISTRIBUTED) {
 	$createForm->addItem(new CSubmit('form', _('Create node')));
 
 
-	$nodeTable = new CTableInfo(_('No nodes defined.'));
+	$nodeTable = new CTableInfo();
 	$nodeTable->setHeader(array(
 		make_sorting_header(_('ID'), 'n.nodeid'),
 		make_sorting_header(_('Name'), 'n.name'),

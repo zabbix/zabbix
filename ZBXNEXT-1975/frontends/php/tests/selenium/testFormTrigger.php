@@ -802,7 +802,7 @@ class testFormTrigger extends CWebTest {
 		}
 
 		if (isset($data['status'])) {
-			$this->zbxTestCheckboxUnselect('status');
+			$this->zbxTestCheckboxSelect('status', false);
 			$status = 'unchecked';
 		}
 		else {

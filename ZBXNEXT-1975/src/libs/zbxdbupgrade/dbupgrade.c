@@ -2211,6 +2211,46 @@ static int	DBpatch_2010191(void)
 
 static int	DBpatch_2010192(void)
 {
+	if (ZBX_DB_OK <= DBexecute(
+			"update triggers"
+			" set state=%d,value=%d,lastchange=0,error=''"
+			" where exists ("
+				"select null"
+				" from functions f,items i,hosts h"
+				" where triggers.triggerid=f.triggerid"
+					" and f.itemid=i.itemid"
+					" and i.hostid=h.hostid"
+					" and h.status=%d"
+			")",
+			TRIGGER_STATE_NORMAL, TRIGGER_VALUE_OK, HOST_STATUS_TEMPLATE))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_2010193(void)
+{
+	if (ZBX_DB_OK <= DBexecute(
+			"update items"
+			" set state=%d,error=''"
+			" where exists ("
+				"select null"
+				" from hosts h"
+				" where items.hostid=h.hostid"
+					" and h.status=%d"
+			")",
+			ITEM_STATE_NORMAL, HOST_STATUS_TEMPLATE))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_2010194(void)
+{
 #ifdef HAVE_ORACLE
 	const ZBX_FIELD	field = {"message_tmp", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
@@ -2220,7 +2260,7 @@ static int	DBpatch_2010192(void)
 #endif
 }
 
-static int	DBpatch_2010193(void)
+static int	DBpatch_2010195(void)
 {
 #ifdef HAVE_ORACLE
 	return ZBX_DB_OK > DBexecute("update alerts set message_tmp=message") ? FAIL : SUCCEED;
@@ -2229,7 +2269,7 @@ static int	DBpatch_2010193(void)
 #endif
 }
 
-static int	DBpatch_2010194(void)
+static int	DBpatch_2010196(void)
 {
 #ifdef HAVE_ORACLE
 	return DBdrop_field("alerts", "message");
@@ -2238,7 +2278,7 @@ static int	DBpatch_2010194(void)
 #endif
 }
 
-static int	DBpatch_2010195(void)
+static int	DBpatch_2010197(void)
 {
 #ifdef HAVE_ORACLE
 	const ZBX_FIELD	field = {"message", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
@@ -2487,10 +2527,12 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010189, 0, 1)
 	DBPATCH_ADD(2010190, 0, 1)
 	DBPATCH_ADD(2010191, 0, 1)
-	DBPATCH_ADD(2010192, 0, 1)
-	DBPATCH_ADD(2010193, 0, 1)
+	DBPATCH_ADD(2010192, 0, 0)
+	DBPATCH_ADD(2010193, 0, 0)
 	DBPATCH_ADD(2010194, 0, 1)
 	DBPATCH_ADD(2010195, 0, 1)
+	DBPATCH_ADD(2010196, 0, 1)
+	DBPATCH_ADD(2010197, 0, 1)
 
 	DBPATCH_END()
 

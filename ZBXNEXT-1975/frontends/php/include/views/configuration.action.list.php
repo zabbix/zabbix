@@ -45,7 +45,7 @@ $actionForm = new CForm();
 $actionForm->setName('actionForm');
 
 // create table
-$actionTable = new CTableInfo(_('No actions defined.'));
+$actionTable = new CTableInfo(_('No actions found.'));
 $actionTable->setHeader(array(
 	new CCheckBox('all_items', null, "checkAll('".$actionForm->getName()."', 'all_items', 'g_actionid');"),
 	$this->data['displayNodes'] ? _('Node') : null,
