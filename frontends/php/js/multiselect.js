@@ -628,23 +628,14 @@ jQuery(function($) {
 
 	function addAvailable(item, obj, values, options) {
 		if (empty(options.limit) || (options.limit > 0 && $('.available li', obj).length < options.limit)) {
-			if (typeof(values.available[item.id]) == 'undefined'
-					&& typeof(values.selected[item.id]) == 'undefined'
-					&& typeof(values.ignored[item.id]) == 'undefined') {
+			if (typeof values.available[item.id] === 'undefined'
+					&& typeof values.selected[item.id] === 'undefined'
+					&& typeof values.ignored[item.id] === 'undefined') {
 				values.available[item.id] = item;
 
 				var prefix = $('<span>', {
 					'class': 'prefix',
 					text: item.prefix
-				});
-
-				var matchedText = $('<span>', {
-					'class': 'matched',
-					text: item.name.substr(0, values.search.length)
-				});
-
-				var unMatchedText = $('<span>', {
-					text: item.name.substr(values.search.length, item.name.length)
 				});
 
 				var li = $('<li>', {
@@ -657,7 +648,38 @@ jQuery(function($) {
 					$('.available li.hover', obj).removeClass('hover');
 					li.addClass('hover');
 				})
-				.append(prefix, matchedText, unMatchedText);
+				.append(prefix);
+
+				// highlight matched
+				var text = item.name.toLowerCase(),
+					search = values.search.toLowerCase(),
+					start = 0,
+					end = 0,
+					searchLength = search.length;
+
+				while (text.indexOf(search, end) > -1) {
+					end = text.indexOf(search, end);
+
+					if (end > start) {
+						li.append($('<span>', {
+							text: item.name.substring(start, end)
+						}));
+					}
+
+					li.append($('<span>', {
+						'class': 'matched',
+						text: item.name.substring(end, end + searchLength)
+					}));
+
+					end += searchLength;
+					start = end;
+				}
+
+				if (end < item.name.length) {
+					li.append($('<span>', {
+						text: item.name.substring(end, item.name.length)
+					}));
+				}
 
 				$('.available ul', obj).append(li);
 			}
