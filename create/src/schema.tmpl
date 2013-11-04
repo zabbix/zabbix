@@ -612,11 +612,6 @@ FIELD		|legendview	|t_integer	|1	|NOT NULL	|0
 INDEX		|1		|description
 INDEX		|2		|theme
 
-TABLE|help_items|itemtype,key_|ZBX_DATA
-FIELD		|itemtype	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|description	|t_varchar(255)	|''	|NOT NULL	|0
-
 TABLE|globalmacro|globalmacroid|ZBX_SYNC,ZBX_DATA
 FIELD		|globalmacroid	|t_id		|	|NOT NULL	|0
 FIELD		|macro		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
@@ -1308,4 +1303,4 @@ INDEX		|2		|templateid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2010191	|2010193
+ROW		|2010194	|2010194
