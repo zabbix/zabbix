@@ -77,11 +77,11 @@ $httpmon_wdgt->addPageHeader(
 	_('STATUS OF WEB MONITORING'),
 	get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']))
 );
-$httpmon_wdgt->addHeader(_('Web checks'), $r_form);
+$httpmon_wdgt->addHeader(_('Web scenarios'), $r_form);
 $httpmon_wdgt->addHeaderRowNumber();
 
 // TABLE
-$table = new CTableInfo(_('No web checks defined.'));
+$table = new CTableInfo(_('No web scenarios found.'));
 $table->SetHeader(array(
 	$displayNodes ? _('Node') : null,
 	$_REQUEST['hostid'] == 0 ? make_sorting_header(_('Host'), 'hostname') : null,

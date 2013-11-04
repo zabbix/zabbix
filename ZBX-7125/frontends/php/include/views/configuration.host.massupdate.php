@@ -37,7 +37,8 @@ $hostGroupsToReplace = null;
 if (isset($_REQUEST['groups'])) {
 	$getHostGroups = API::HostGroup()->get(array(
 		'groupids' => $_REQUEST['groups'],
-		'output' => array('groupid', 'name')
+		'output' => array('groupid', 'name'),
+		'editable' => true
 	));
 	foreach ($getHostGroups as $getHostGroup) {
 		$hostGroupsToReplace[] = array(
@@ -48,10 +49,11 @@ if (isset($_REQUEST['groups'])) {
 }
 
 $replaceGroups = new CMultiSelect(array(
-		'name' => 'groups[]',
-		'objectName' => 'hostGroup',
-		'data' => $hostGroupsToReplace
-	));
+	'name' => 'groups[]',
+	'objectName' => 'hostGroup',
+	'objectOptions' => array('editable' => true),
+	'data' => $hostGroupsToReplace
+));
 
 $hostFormList->addRow(
 	array(
@@ -93,11 +95,12 @@ if (isset($_REQUEST['new_groups'])) {
 }
 if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 	$newGroups = new CMultiSelect(array(
-			'name' => 'new_groups[]',
-			'objectName' => 'hostGroup',
-			'data' => $hostGroupsToAdd,
-			'addNew' => true
-		));
+		'name' => 'new_groups[]',
+		'objectName' => 'hostGroup',
+		'objectOptions' => array('editable' => true),
+		'data' => $hostGroupsToAdd,
+		'addNew' => true
+	));
 
 	$hostFormList->addRow(
 		array(
@@ -110,10 +113,11 @@ if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 }
 else {
 	$newGroups = new CMultiSelect(array(
-			'name' => 'new_groups[]',
-			'objectName' => 'hostGroup',
-			'data' => $hostGroupsToAdd
-		));
+		'name' => 'new_groups[]',
+		'objectName' => 'hostGroup',
+		'objectOptions' => array('editable' => true),
+		'data' => $hostGroupsToAdd
+	));
 
 	$hostFormList->addRow(
 		array(
@@ -162,13 +166,11 @@ $templatesTable->setAttribute('id', 'template_table');
 $templatesDiv = new CDiv(
 	array(
 		$templatesTable,
-		new CMultiSelect(
-			array(
-				'name' => 'templates[]',
-				'objectName' => 'templates',
-				'data' => $this->data['linkedTemplates']
-			)
-		),
+		new CMultiSelect(array(
+			'name' => 'templates[]',
+			'objectName' => 'templates',
+			'data' => $this->data['linkedTemplates']
+		)),
 		new CCheckBox('mass_replace_tpls', $this->data['mass_replace_tpls']),
 		SPACE,
 		_('Replace'),

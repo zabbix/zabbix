@@ -66,7 +66,7 @@ if ($this->data['application_list']) {
 	);
 }
 else {
-	$httpFormList->addRow(_('Application'), new CSpan(_('No applications defined')));
+	$httpFormList->addRow(_('Application'), new CSpan(_('No applications found.')));
 }
 
 // New application
@@ -151,7 +151,7 @@ $httpFormList->addRow(_('Enabled'), new CCheckBox('status', !$this->data['status
  * Step tab
  */
 $httpStepFormList = new CFormList('httpFormList');
-$stepsTable = new CTable(_('No steps defined.'), 'formElementTable');
+$stepsTable = new CTable(null, 'formElementTable');
 $stepsTable->setAttributes(array(
 	'style' => 'min-width: 500px;',
 	'id' => 'httpStepTable'

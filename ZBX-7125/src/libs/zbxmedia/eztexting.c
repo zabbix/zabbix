@@ -225,8 +225,7 @@ int	send_ez_texting(const char *username, const char *password, const char *send
 
 	if (NULL == page.data || FAIL == is_int_prefix(page.data))
 	{
-		zbx_snprintf(error, max_error_len, "Did not receive a proper response: [%s]",
-				NULL == page.data ? "(null)" : page.data);
+		zbx_snprintf(error, max_error_len, "Did not receive a proper response: [%s]", ZBX_NULL2STR(page.data));
 		goto clean;
 	}
 

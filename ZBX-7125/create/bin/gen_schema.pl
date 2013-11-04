@@ -28,7 +28,7 @@ my ($fkeys, $fkeys_prefix, $fkeys_suffix, $fkeys_drop, $uniq);
 my %c = (
 	"type"		=>	"code",
 	"database"	=>	"",
-	"after"		=>	"\t{0}\n};\n",
+	"after"		=>	"\t{0}\n\n#undef ZBX_TYPE_SHORTTEXT_LEN\n\n};\n",
 	"t_bigint"	=>	"ZBX_TYPE_UINT",
 	"t_char"	=>	"ZBX_TYPE_CHAR",
 	"t_text"	=>	"ZBX_TYPE_TEXT",
@@ -67,6 +67,13 @@ $c{"before"} = "/*
 #include \"dbschema.h\"
 
 const ZBX_TABLE\ttables[] = {
+
+#if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE)
+#	define ZBX_TYPE_SHORTTEXT_LEN	2048
+#else
+#	define ZBX_TYPE_SHORTTEXT_LEN	65535
+#endif
+
 ";
 
 my %ibm_db2 = (
@@ -196,7 +203,18 @@ sub newstate
 
 	if ($state ne "bof")
 	{
-		if ($output{"type"} eq "code" && $new eq "table") { print ",\n\t\t{0}\n\t\t}${uniq}\n\t},\n"; $uniq = ""; }
+		if ($output{"type"} eq "code" && $new eq "table")
+		{
+			if ($uniq ne "")
+			{
+				print ",\n\t\t{0}\n\t\t}${uniq}\n\t},\n";
+				$uniq = "";
+			}
+			else
+			{
+				print ",\n\t\t{0}\n\t\t},\n\t\tNULL\n\t},\n";
+			}
+		}
 	}
 
 	$state = $new;
@@ -282,6 +300,10 @@ sub process_field
 		elsif ($type eq "ZBX_TYPE_TEXT")
 		{
 			$length = 65535;
+		}
+		elsif ($type eq "ZBX_TYPE_SHORTTEXT")
+		{
+			$length = "ZBX_TYPE_SHORTTEXT_LEN";
 		}
 		else
 		{
