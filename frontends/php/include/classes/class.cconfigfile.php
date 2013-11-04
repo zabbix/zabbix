@@ -50,6 +50,9 @@ class CConfigFile {
 		if (!file_exists($this->configFile)) {
 			self::exception('Config file does not exist.', self::CONFIG_NOT_FOUND);
 		}
+		if (!is_readable($this->configFile)) {
+			self::exception('Permission denied.');
+		}
 
 		ob_start();
 		include($this->configFile);
