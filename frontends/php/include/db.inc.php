@@ -543,6 +543,7 @@ function _llnw_allow_DBexecute($query) {
 		"table_name='auditlog' AND field_name='auditid'",
 		"INSERT INTO profiles",
 		// login related queries that drop into infinite look on failure.
+		"UPDATE ids SET nextid=nextid+1 WHERE nodeid=1 AND table_name='user_history' AND field_name='userhistoryid'",
 	);
 	foreach ($whitelist as $allow) {
 		if (stripos($query, $allow) !== FALSE) {
