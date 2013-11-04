@@ -2,17 +2,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-04 14:47+0200\n"
-"PO-Revision-Date: 2013-01-31 23:10+0200\n"
-"Last-Translator: maxhq <jens@jebecs.de>\n"
+"POT-Creation-Date: 2013-11-04 14:50+0200\n"
+"PO-Revision-Date: 2013-11-03 17:35+0300\n"
+"Last-Translator: volter <volker27@gmx.at>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.1.6\n"
+"X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
+"X-POOTLE-MTIME: 1383492903.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -33,15 +34,16 @@ msgstr "\"Auslöser blinken bei Statusänderung\" muss \"0\" oder eine Ganzzahl 
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d Tag"
+msgstr[1] "%1$d Tage"
 
+# Der Singular gehört überprüft, wenn das 1 von x heißt.
 #: include/blocks.inc.php:1027
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d von %2$d Ereignissen wird angezeigt"
+msgstr[1] "%1$d von %2$d Ereignissen werden angezeigt"
 
 #: chart4.php:89 chart5.php:83
 #, c-format
@@ -62,28 +64,28 @@ msgstr[1] "%1$s Elemente"
 #, c-format
 msgid "%1$s day"
 msgid_plural "%1$s days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s Tag"
+msgstr[1] "%1$s Tage"
 
 #: include/page_header.php:446
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%4$s fehlgeschlagener Anmeldeversuch von %1$s protokolliert. Letzter Fehlversuch stammt von %1$s auf %2$s um %3$s."
+msgstr[1] "%4$s fehlgeschlagene Anmeldeversuche von %1$s protokolliert. Letzter Fehlversuch stammt von %1$s auf %2$s um %3$s."
 
 #: include/views/monitoring.discovery.php:131
 #, c-format
 msgid "%d device"
 msgid_plural "%d devices"
-msgstr[0] "%d Gerät"
-msgstr[1] "%d Geräte"
+msgstr[0] "(%1$s %2$s)"
+msgstr[1] ""
 
 #: include/users.inc.php:293
 #, c-format
 msgctxt "user fullname"
 msgid "(%1$s %2$s)"
-msgstr ""
+msgstr "(%1$s %2$s)"
 
 #: include/views/configuration.action.edit.php:443
 msgid "(0 - infinitely)"
@@ -93,7 +95,7 @@ msgstr "(0 - unendlich)"
 #: include/views/configuration.hostgroups.list.php:31
 #: include/views/configuration.template.edit.php:122
 msgid "(Only super admins can create groups)"
-msgstr ""
+msgstr "(Nur Super-Admins können Gruppen erstellen)"
 
 #: include/forms.inc.php:591 include/forms.inc.php:606
 msgid "(in days)"
@@ -170,7 +172,7 @@ msgstr "<manuell>"
 #: include/views/configuration.item.massupdate.php:172
 #: include/views/js/configuration.discovery.edit.js.php:95
 msgid "AES"
-msgstr ""
+msgstr "AES"
 
 #: acknow.php:185
 msgid "ALARM ACKNOWLEDGES"
@@ -226,7 +228,7 @@ msgstr "Zugriff verweigert!"
 
 #: include/func.inc.php:2065
 msgid "Access denied."
-msgstr ""
+msgstr "Zugriff verweigert."
 
 #: api/classes/CUser.php:881
 #, c-format
@@ -311,17 +313,18 @@ msgstr "Aktion"
 #: api/classes/CAction.php:685
 #, c-format
 msgid "Action \"%1$s\" already exists."
-msgstr ""
+msgstr "Aktion \"%1$s\" existiert bereits."
 
 #: api/classes/CAction.php:541 api/classes/CAction.php:656
 #, c-format
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seconds)."
 msgstr "Aktion \"%1$s\" hat falschen Wert in \"esc_period\" (mindestens %2$s Sekunden)."
 
+# Mit oder ohne "hat"?
 #: api/classes/CAction.php:727
 #, c-format
 msgid "Action \"%1$s\" no operations defined."
-msgstr ""
+msgstr "Aktion \"%1$s\" hat keine Operationen definiert."
 
 #: api/classes/CAction.php:665
 #, c-format
@@ -458,11 +461,11 @@ msgstr "Fehlendes hinzufügen"
 
 #: include/views/configuration.item.massupdate.php:537
 msgid "Add new or existing applications"
-msgstr ""
+msgstr "Neue oder existierende Kategorie hinzufügen"
 
 #: include/views/configuration.host.massupdate.php:107
 msgid "Add new or existing host groups"
-msgstr ""
+msgstr "Neue oder existierende Hostgruppe hinzufügen"
 
 #: include/views/configuration.graph.edit.php:116
 msgid "Add prototype"
@@ -798,14 +801,14 @@ msgstr "Authentifizierungsmethode auf Zabbix-intern geändert"
 #: include/views/configuration.item.massupdate.php:159
 #: include/views/js/configuration.discovery.edit.js.php:83
 msgid "Authentication passphrase"
-msgstr ""
+msgstr "Passwort zur Authentifizierung"
 
 #: include/views/configuration.item.edit.php:148
 #: include/views/configuration.item.massupdate.php:149
 #: include/views/js/configuration.discovery.edit.js.php:71
 #: include/views/js/configuration.discovery.edit.js.php:88
 msgid "Authentication protocol"
-msgstr ""
+msgstr "Authenthifizierungsprotokoll"
 
 #: include/views/configuration.action.list.php:35
 msgid "Auto registration"
@@ -916,11 +919,11 @@ msgstr "Bind-Passwort"
 
 #: popup_trexpr.php:521
 msgid "Bitwise AND of last (most recent) T value and mask is = N"
-msgstr ""
+msgstr "Bitweises UND des letzen (jüngsten) T-Werts mit der Maske N"
 
 #: popup_trexpr.php:526
 msgid "Bitwise AND of last (most recent) T value and mask is NOT N"
-msgstr ""
+msgstr "Bitweises UND des letzen (jüngsten) T-Werts mit der Maske NICHT N"
 
 #: include/classes/core/ZBase.php:233
 msgid "Black & Blue"
@@ -1206,12 +1209,12 @@ msgstr "Kann Ereignis nicht bestätigen"
 
 #: httpconf.php:268
 msgid "Cannot activate web scenario"
-msgstr ""
+msgstr "Kann Web-Szenario nicht aktivieren"
 
 #: api/classes/CGraph.php:721
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
-msgstr ""
+msgstr "Nicht-numerisches Element \"%1$s\" kann dem Graphen \"%2$s\" nicht hinzgefügt werden."
 
 #: api/classes/CGraphPrototype.php:721 api/classes/CGraphPrototype.php:783
 #, c-format
@@ -1279,11 +1282,11 @@ msgstr "Kann Element nicht hinzufügen"
 #: api/classes/CApplication.php:547
 #, c-format
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
-msgstr ""
+msgstr "Kann Element \"%1$s\" von \"%2$s\" nicht hinzufügen zur Kategorie \"%3$s\" von \"%4$s\""
 
 #: api/classes/CApplication.php:600
 msgid "Cannot add items."
-msgstr ""
+msgstr "Kann Elemente nicht hinzufügen."
 
 #: adm.macros.php:120
 msgid "Cannot add macro."
@@ -1314,7 +1317,7 @@ msgstr "Kann Netzwerkkarte nicht hinzufügen"
 #: httpconf.php:193
 #, c-format
 msgid "Cannot add new application \"%1$s\"."
-msgstr ""
+msgstr "Kann die neue Kategorie \"%1$s\" nicht hinzufügen."
 
 #: nodes.php:84
 msgid "Cannot add node"
@@ -1371,7 +1374,7 @@ msgstr "Kann Wertezuordnung nicht hinzufügen"
 
 #: httpconf.php:146
 msgid "Cannot add web scenario"
-msgstr ""
+msgstr "Kann Web-Szenario nicht hinzufügen"
 
 #: authentication.php:165
 msgid "Cannot change authentication method to HTTP"
@@ -1465,7 +1468,7 @@ msgstr "Kann Karte \"%s\" nicht erstellen."
 
 #: httpconf.php:150
 msgid "Cannot create new application, web scenario is already assigned to application."
-msgstr ""
+msgstr "Kann keine neue Kategorie anlegen. Web-Szenario ist schon einer Kategorie zugewiesen."
 
 #: include/js.inc.php:265
 msgid "Cannot create new element"
@@ -1535,7 +1538,7 @@ msgstr "Kann Host-Gruppe nicht löschen."
 
 #: api/classes/CDiscoveryRule.php:412
 msgid "Cannot delete host prototype."
-msgstr ""
+msgstr "Kann Systemprototyp nicht löschen."
 
 #: host_prototypes.php:119 host_prototypes.php:232
 msgid "Cannot delete host prototypes"
@@ -1631,7 +1634,7 @@ msgstr "Kann Vorlage nicht löschen"
 
 #: api/classes/CApplication.php:444
 msgid "Cannot delete templated application."
-msgstr ""
+msgstr "Kann vorlagenbasierte Kategorie nicht löschen."
 
 #: api/classes/CGraph.php:560 api/classes/CGraphPrototype.php:577
 msgid "Cannot delete templated graphs."
@@ -1661,7 +1664,7 @@ msgstr "Kann vorlagenbasierten Auslöser \"%1$s:%2$s\" nicht löschen."
 #: api/classes/CHttpTest.php:390
 #, c-format
 msgid "Cannot delete templated web scenario \"%1$s\"."
-msgstr ""
+msgstr "Kann vorlagenbasiertes Web-Szenario \"%1$s\" nicht löschen."
 
 #: trigger_prototypes.php:181 triggers.php:197
 msgid "Cannot delete trigger"
@@ -1697,7 +1700,7 @@ msgstr "Kann Wertezuordnung nicht löschen"
 
 #: httpconf.php:122 httpconf.php:313
 msgid "Cannot delete web scenario"
-msgstr ""
+msgstr "Kann Web-Szenario nicht löschen"
 
 #: media_types.php:177
 msgid "Cannot disable media type"
@@ -1705,11 +1708,11 @@ msgstr "Kann Medientyp nicht deaktivieren"
 
 #: httpconf.php:268
 msgid "Cannot disable web scenario"
-msgstr ""
+msgstr "Kann Web-Szenario nicht deaktivieren"
 
 #: queue.php:61
 msgid "Cannot display item queue."
-msgstr ""
+msgstr "Kann Elementenwarteschlange nicht anzeigen."
 
 #: chart7.php:74
 msgid "Cannot display more than one item with type \"Graph sum\"."
@@ -1767,7 +1770,7 @@ msgstr "Kann für den Elementschlüssel \"%2$s\" die Hostschnittstelle auf \"%1$
 #: include/classes/import/CConfigurationImport.php:934
 #, c-format
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
-msgstr ""
+msgstr "Kann System oder Vorlage \"%1$s\" nicht finden, die in Graph \"%2$s\" benutzt wird."
 
 #: include/classes/import/CXmlImport18.php:768
 #: include/classes/import/importers/CMapImporter.php:247
@@ -1908,12 +1911,12 @@ msgstr "Kann keine Änderung auf Tabelle \"%1$s\" durchführen ohne WHERE-Beding
 
 #: api/classes/CApplication.php:536
 msgid "Cannot process applications from different hosts or templates."
-msgstr ""
+msgstr "Kann Kategorien verschiedener Systeme und Vorlagen nicht verarbeiten."
 
 #: include/classes/server/CZabbixServer.php:222
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
-msgstr ""
+msgstr "Kann Antwort nicht lesen. Überprüfen Sie die Verbindungen mit dem Zabbix-Server \"%1$s\"."
 
 #: include/views/js/monitoring.history.js.php:35
 msgid "Cannot remove all items, at least one item should remain."
@@ -1934,17 +1937,17 @@ msgstr "Kann Discovery-Regel nicht ohne Prüfungen speichern."
 #: include/classes/server/CZabbixServer.php:192
 #, c-format
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
-msgstr ""
+msgstr "Kann Befehl nicht abschicken. Überprüfen Sie die Verbindungen mit dem Zabbix-Server \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:243
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
-msgstr ""
+msgstr "Kann \"%1$s\" nicht setzen für Element \"%2$s\"."
 
 #: api/classes/CTrigger.php:663
 #, c-format
 msgid "Cannot set \"%1$s\" for trigger \"%2$s\"."
-msgstr ""
+msgstr "Kann \"%1$s\" nicht setzen für Auslöser \"%2$s\"."
 
 #: api/classes/CApplication.php:345
 #, c-format
@@ -1963,7 +1966,7 @@ msgstr "Kann \"templateid\" nicht setzen für Auslöser-Prototypen \"%1$s\"."
 
 #: api/classes/CHost.php:671 api/classes/CHost.php:1142
 msgid "Cannot set inventory fields for disabled inventory."
-msgstr ""
+msgstr "Kann Inventarfeld nicht setzen wegen deaktivierter Inventarfunktion."
 
 #: api/classes/CHostInterface.php:324
 msgid "Cannot switch host for interface."
@@ -1975,11 +1978,11 @@ msgstr "Kann Benutzer nicht entsperren"
 
 #: api/classes/CHostGeneral.php:511
 msgid "Cannot unlink and clear Web scenarios."
-msgstr ""
+msgstr "Kann Web-Szenarien nicht trennen und leeren."
 
 #: api/classes/CHostGeneral.php:564
 msgid "Cannot unlink and clear applications."
-msgstr ""
+msgstr "Kann Kategorien nicht trennen und leeren."
 
 #: api/classes/CHostGeneral.php:338
 msgid "Cannot unlink and clear discovery rules"
@@ -2032,12 +2035,12 @@ msgstr ""
 #: api/classes/CItemGeneral.php:207
 #, c-format
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
-msgstr ""
+msgstr "Kann \"%1$s\" für Element \"%2$s\" nicht ändern."
 
 #: api/classes/CTrigger.php:663
 #, c-format
 msgid "Cannot update \"%1$s\" for trigger \"%2$s\"."
-msgstr ""
+msgstr "Kann \"%1$s\" für Auslöser \"%2$s\" nicht ändern."
 
 #: api/classes/CApplication.php:342
 #, c-format
@@ -2233,7 +2236,7 @@ msgstr "Kann Vorlage nicht ändern"
 
 #: api/classes/CApplication.php:353
 msgid "Cannot update templated applications."
-msgstr ""
+msgstr "Kann Kategorien aus Vorlagen nicht ändern."
 
 #: api/classes/CTemplate.php:790 api/classes/CTemplate.php:1061
 #, c-format
@@ -2269,7 +2272,7 @@ msgstr "Kann Wertezuordnung nicht ändern"
 
 #: httpconf.php:141
 msgid "Cannot update web scenario"
-msgstr ""
+msgstr "Kann Web-Szenario nicht ändern"
 
 #: include/views/js/configuration.discovery.edit.js.php:600
 msgid "Cannot validate discovery check: invalid request or connection to Zabbix server failed."
@@ -2459,7 +2462,7 @@ msgstr "Farbe"
 #: include/validate.inc.php:354 jsLoader.php:163
 #, c-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
-msgstr ""
+msgstr "Farb-Angabe \"%1$s\" falsch: Erwarte hexadekadischen Farb-Code (6 Stellen)."
 
 #: include/views/js/configuration.sysmaps.js.php:378
 msgid "Colour (OK)"
@@ -2518,7 +2521,7 @@ msgstr "Kommentare"
 #: include/views/monitoring.triggerComment.php:43
 #, c-format
 msgid "Comments for \"%s\"."
-msgstr ""
+msgstr "Kommentare zu \"%s\"."
 
 #: include/views/administration.mediatypes.edit.php:46
 msgid "Commercial"
@@ -2837,7 +2840,7 @@ msgstr "Erstelle Kategorie"
 
 #: include/views/configuration.application.list.php:30
 msgid "Create application (select host first)"
-msgstr ""
+msgstr "Erstelle Kategorie (Zuerst System wählen)"
 
 #: include/views/configuration.discovery.list.php:27
 #: include/views/configuration.host.discovery.list.php:27
@@ -2883,7 +2886,7 @@ msgstr "Erstelle Element"
 
 #: include/views/configuration.item.list.php:31
 msgid "Create item (select host first)"
-msgstr ""
+msgstr "Erstelle Element (Zuerst System wählen)"
 
 #: include/views/configuration.item.prototype.list.php:28
 msgid "Create item prototype"
@@ -2915,7 +2918,7 @@ msgstr "Erstelle Szenario"
 
 #: include/views/configuration.httpconf.list.php:29
 msgid "Create scenario (select host first)"
-msgstr ""
+msgstr "Erstelle Szenario (Zuerst System wählen)"
 
 #: include/views/configuration.screen.list.php:27
 msgid "Create screen"
@@ -2939,7 +2942,7 @@ msgstr "Erstelle Auslöser"
 
 #: include/views/configuration.triggers.list.php:46
 msgid "Create trigger (select host first)"
-msgstr ""
+msgstr "Erstelle Auslöser (Zuerst System wählen)"
 
 #: include/views/configuration.triggers.list.php:40
 msgid "Create trigger prototype"
@@ -3742,7 +3745,7 @@ msgstr "Gelöscht: Auslöser-Prototyp \"%1$s\" auf \"%2$s\"."
 #: api/classes/CHttpTest.php:450
 #, c-format
 msgid "Deleted: Web scenario \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Gelöscht: Web-Szenario \"%1$s\" auf \"%2$s\"."
 
 #: include/views/administration.general.regularexpressions.edit.php:53
 msgid "Delimiter"
@@ -3983,7 +3986,7 @@ msgstr "Gefunden"
 
 #: include/views/configuration.host.edit.php:158
 msgid "Discovered by"
-msgstr ""
+msgstr "Gefunden von"
 
 #: include/views/monitoring.discovery.php:41
 msgid "Discovered device"
@@ -4323,7 +4326,7 @@ msgstr "Aktions-Bedingung leer."
 
 #: include/classes/validators/CColorValidator.php:33
 msgid "Empty color."
-msgstr ""
+msgstr "Farbe leer."
 
 #: api/classes/CHostPrototype.php:458
 msgid "Empty host ID for host prototype."
@@ -4331,7 +4334,7 @@ msgstr ""
 
 #: api/classes/CHostPrototype.php:173
 msgid "Empty host."
-msgstr ""
+msgstr "Leeres System."
 
 #: api/classes/CAction.php:1260 api/classes/CApplication.php:288
 #: api/classes/CDiscoveryRule.php:339 api/classes/CGraph.php:540
@@ -4352,7 +4355,7 @@ msgstr "Leerer Eingabe-Parameter."
 
 #: api/classes/CApplication.php:496
 msgid "Empty input parameters."
-msgstr ""
+msgstr "Eingegebene Parameter leer."
 
 #: api/classes/CDRule.php:244
 msgid "Empty input."
@@ -4374,11 +4377,11 @@ msgstr ""
 #: api/classes/CScript.php:575
 #, c-format
 msgid "Empty name for script \"%1$s\"."
-msgstr ""
+msgstr "Name leer für Skript \"%1$s\"."
 
 #: api/classes/CScript.php:414 api/classes/CScript.php:470
 msgid "Empty name for script."
-msgstr ""
+msgstr "Name leer für Skript."
 
 #: api/classes/CService.php:1111
 msgid "Empty name."
@@ -4391,7 +4394,7 @@ msgstr "Parameter leer"
 #: include/classes/server/CZabbixServer.php:232
 #, c-format
 msgid "Empty response received from Zabbix server \"%1$s\"."
-msgstr ""
+msgstr "Leere Antwort erhalten von Zabbix-Server \"%1$s\"."
 
 #: include/classes/validators/CTimePeriodValidator.php:46
 msgid "Empty time period."
@@ -4436,7 +4439,7 @@ msgstr "Hosts aktivieren, die durch ausgewählte Proxys überwacht werden?"
 #: include/views/administration.general.housekeeper.edit.php:117
 #: include/views/administration.general.housekeeper.edit.php:138
 msgid "Enable housekeeping"
-msgstr ""
+msgstr "Entrümpler aktivieren"
 
 # Passive Form besser lesbar im Dropdown-Feld
 #: hosts.php:998 include/views/administration.mediatypes.list.php:113
@@ -4598,7 +4601,7 @@ msgstr "Details Auslöserquelle"
 
 #: include/actions.inc.php:94
 msgid "Event type"
-msgstr ""
+msgstr "Ereignistyp"
 
 #: events.php:301 include/menu.inc.php:57
 #: include/views/inventory.host.view.php:212 jsLoader.php:104 jsLoader.php:200
@@ -4609,7 +4612,7 @@ msgstr "Ereignisse"
 
 #: include/views/administration.general.housekeeper.edit.php:54
 msgid "Events and alerts"
-msgstr ""
+msgstr "Ereignisse und Alarmierungen"
 
 #: include/forms.inc.php:1643
 msgid "Every day(s)"
@@ -4800,47 +4803,47 @@ msgstr "Feld"
 #: include/classes/db/DB.php:327
 #, c-format
 msgid "Field \"%1$s\" cannot be set to NULL."
-msgstr ""
+msgstr "Feld \"%1$s\" darf nicht NULL sein."
 
 #: include/validate.inc.php:400
 #, c-format
 msgid "Field \"%1$s\" is mandatory."
-msgstr ""
+msgstr "\"%1$s\" ist ein Pflichtfeld."
 
 #: include/validate.inc.php:313
 #, c-format
 msgid "Field \"%1$s\" is not IP range."
-msgstr ""
+msgstr "Feld \"%1$s\" ist kein IP-Adress-Bereich."
 
 #: include/validate.inc.php:303
 #, c-format
 msgid "Field \"%1$s\" is not IP."
-msgstr ""
+msgstr "Feld \"%1$s\" ist keine IP-Adresse."
 
 #: include/validate.inc.php:338
 #, c-format
 msgid "Field \"%1$s\" is not decimal number."
-msgstr ""
+msgstr "Feld \"%1$s\" ist keine Dezimalzahl."
 
 #: include/validate.inc.php:323
 #, c-format
 msgid "Field \"%1$s\" is not integer list or range."
-msgstr ""
+msgstr "Feld \"%1$s\" ist keine Liste oder ein Bereich von Ganzzahlen."
 
 #: include/validate.inc.php:332
 #, c-format
 msgid "Field \"%1$s\" is not integer."
-msgstr ""
+msgstr "Feld \"%1$s\" ist keine Ganzzahl."
 
 #: include/validate.inc.php:344
 #, c-format
 msgid "Field \"%1$s\" is not string."
-msgstr ""
+msgstr "Feld \"%1$s\" ist keine Zeichenfolge."
 
 #: include/validate.inc.php:412
 #, c-format
 msgid "Field \"%1$s\" must be missing."
-msgstr ""
+msgstr "Feld \"%1$s\" muss fehlen."
 
 #: api/classes/CDRule.php:376
 msgid "Field \"druleid\" is required."
@@ -5390,7 +5393,7 @@ msgstr ""
 #: include/views/inventory.host.list.php:26
 #: include/views/inventory.host.view.php:24
 msgid "HOST INVENTORY"
-msgstr ""
+msgstr "HOST-INVENTAR"
 
 #: hostinventoriesoverview.php:65
 msgid "HOST INVENTORY OVERVIEW"
@@ -5412,7 +5415,7 @@ msgstr "HTTP-Authentifizierung"
 
 #: include/views/configuration.httpconf.edit.php:144
 msgid "HTTP proxy"
-msgstr ""
+msgstr "HTTP-Proxy"
 
 #: include/discovery.inc.php:71
 #: include/views/js/configuration.discovery.edit.js.php:171
@@ -5478,7 +5481,7 @@ msgstr "Ausblenden"
 
 #: include/views/monitoring.dashconf.php:62
 msgid "Hide selected groups"
-msgstr ""
+msgstr "Ausgewählte Gruppen verstecken"
 
 #: adm.triggerseverities.php:62
 #: include/views/administration.general.triggerSeverity.edit.php:58
@@ -5636,17 +5639,17 @@ msgstr "Hostgruppe \"%1$s\" existiert bereits."
 #: api/classes/CHostGroup.php:645
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
-msgstr ""
+msgstr "Systemgruppe \"%1$s\" kann nicht gelöscht werden weil ein globales Skript sie verwendet."
 
 #: api/classes/CHostGroup.php:626
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because some hosts depend on it."
-msgstr ""
+msgstr "Systemgruppe \"%1$s\" kann nicht gelöscht werden weil ein System von ihr abhängt."
 
 #: api/classes/CHostGroup.php:600
 #, c-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
-msgstr ""
+msgstr "\"%1$s\" ist eine interne Systemgruppe und kann nicht gelöscht werden."
 
 #: include/views/js/configuration.sysmaps.js.php:33
 msgid "Host group elements"
@@ -5662,7 +5665,7 @@ msgstr "Beschriftung Hostgruppe"
 
 #: api/classes/CHostGroup.php:484 api/classes/CHostGroup.php:544
 msgid "Host group name cannot be empty."
-msgstr ""
+msgstr "Hostgruppe braucht einen Namen."
 
 #: include/forms.inc.php:197 include/menu.inc.php:160
 #: include/views/administration.script.edit.php:84
@@ -5705,7 +5708,7 @@ msgstr "Liste der Hosts"
 
 #: include/actions.inc.php:96
 msgid "Host metadata"
-msgstr ""
+msgstr "Systemmetadaten"
 
 #: host_prototypes.php:40 hosts.php:53 include/actions.inc.php:58
 #: include/views/configuration.host.edit.php:169
@@ -5717,7 +5720,7 @@ msgstr "Name des Hosts"
 #: api/classes/CHostPrototype.php:174
 #, c-format
 msgid "Host name \"%1$s\" is too long, it must not be longer than %2$d characters."
-msgstr ""
+msgstr "Systemname \"%1$s\" ist zu lang, darf nicht länger als %2$d Zeichen sein."
 
 #: api/classes/CHostPrototype.php:176
 #, c-format
@@ -6167,7 +6170,7 @@ msgstr "Symbole"
 
 #: include/views/js/adm.regexprs.edit.js.php:222
 msgid "Identical expression already exists"
-msgstr ""
+msgstr "Ein identischer Ausdruck existiert bereits"
 
 #: include/func.inc.php:2073 include/func.inc.php:2093
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
@@ -6476,7 +6479,7 @@ msgstr ""
 #: api/classes/CItemGeneral.php:372
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
-msgstr ""
+msgstr "Unzulässiges Authentifzierungsprotokoll für Element \"%1$s\"."
 
 #: api/classes/CService.php:1145
 #, c-format
@@ -6495,7 +6498,7 @@ msgstr "Unzulässige Zeichen in Vorlagen-Name [ %1$s ]"
 #: api/classes/CHostPrototype.php:175
 #, c-format
 msgid "Incorrect characters used for host \"%1$s\"."
-msgstr ""
+msgstr "Unzulässige Zeichen in System \"%1$s\"."
 
 #: api/classes/CHost.php:743 api/classes/CHost.php:1090
 #, c-format
@@ -6505,7 +6508,7 @@ msgstr "Unzulässige Zeichen im Hostnamen \"%s\"."
 #: api/classes/CProxy.php:241
 #, c-format
 msgid "Incorrect characters used for proxy name \"%1$s\"."
-msgstr ""
+msgstr "Unzulässige Zeichen im Proxynamen \"%1$s\"."
 
 #: api/classes/CTemplate.php:887
 #, c-format
@@ -6719,7 +6722,7 @@ msgstr "Kartenbreite-Wert falsch für Karte \"%s\"."
 #: api/classes/CScript.php:582
 #, c-format
 msgid "Incorrect menu path for script \"%1$s\"."
-msgstr ""
+msgstr "Falsches Menüpfad für Skript \"%1$s\"."
 
 #: include/nodes.inc.php:306
 msgid "Incorrect node type."
@@ -6732,7 +6735,7 @@ msgstr ""
 #: api/classes/CAction.php:538 api/classes/CAction.php:589
 #, c-format
 msgid "Incorrect parameter for action \"%1$s\"."
-msgstr ""
+msgstr "Falscher Parameter für Aktion \"%1$s\"."
 
 #: api/classes/CAction.php:819
 msgid "Incorrect parameter for operations."
@@ -6799,7 +6802,7 @@ msgstr "Falscher Ressourcentyp angegeben für Tafelelement."
 #: include/classes/server/CZabbixServer.php:239
 #, c-format
 msgid "Incorrect response received from Zabbix server \"%1$s\"."
-msgstr ""
+msgstr "Zabbix-Server \"%1$s\" hat eine falsche Antwort geschickt."
 
 #: api/classes/CScreenItem.php:583
 #, c-format
@@ -6942,12 +6945,12 @@ msgstr "Falsche Benutzergruppe."
 #: include/validate.inc.php:451
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
-msgstr ""
+msgstr "Falscher Wert \"%1$s\" für Feld \"%2$s\"."
 
 #: include/validate.inc.php:447
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
-msgstr ""
+msgstr "Falscher Wert \"%1$s\" für Feld \"%2$s\": Muss zwischen %3$s und %4$s liegen"
 
 #: include/classes/db/DB.php:357
 #, c-format
@@ -6967,12 +6970,12 @@ msgstr "Falscher Wert \"%1$s\" für das vorzeichenlose Ganzzahl-Feld \"%2$s\"."
 #: include/reports.inc.php:539 include/reports.inc.php:543
 #, c-format
 msgid "Incorrect value for field \"%1$s\"."
-msgstr ""
+msgstr "Falscher Wert für Feld \"%1$s\"."
 
 #: include/validate.inc.php:442
 #, c-format
 msgid "Incorrect value for field \"%1$s\": cannot be empty."
-msgstr ""
+msgstr "Falscher Wert für Feld \"%1$s\": Darf nicht leer sein."
 
 #: include/classes/class.cbuttonqmessage.php:52
 #, c-format
@@ -6982,7 +6985,7 @@ msgstr "Falscher Wert für setMessage(): \"%s\"."
 #: api/classes/CProxy.php:220 api/classes/CProxy.php:231
 #, c-format
 msgid "Incorrect value used for proxy status \"%1$s\"."
-msgstr ""
+msgstr "Falscher Wert benutzt für Proxystatus \"%1$s\"."
 
 #: include/profiles.inc.php:273
 msgid "Incorrect working time."
@@ -7060,17 +7063,17 @@ msgstr "Es wurde kein DNS-Name angegeben für Schnittstelle mit IP-Adresse \"%1$
 #: include/views/administration.authentication.edit.php:35
 msgctxt "authentication"
 msgid "Internal"
-msgstr ""
+msgstr "Intern"
 
 #: include/views/configuration.action.list.php:36
 msgctxt "event source"
 msgid "Internal"
-msgstr ""
+msgstr "Intern"
 
 #: include/users.inc.php:84
 msgctxt "user type"
 msgid "Internal"
-msgstr ""
+msgstr "Intern"
 
 #: api/rpc/class.cjsonrpc.php:202
 msgid "Internal JSON-RPC error."
@@ -7114,7 +7117,7 @@ msgstr "Ungültiges Datum \"%s\"."
 
 #: include/classes/validators/CTriggerFunctionValidator.php:266
 msgid "Invalid first parameter."
-msgstr ""
+msgstr "Ungültiger erster Parameter."
 
 #: include/classes/validators/CTriggerFunctionValidator.php:269
 msgid "Invalid fourth parameter."
@@ -7171,7 +7174,7 @@ msgstr ""
 
 #: include/classes/validators/CTriggerFunctionValidator.php:268
 msgid "Invalid third parameter."
-msgstr ""
+msgstr "Ungültiger dritter Parameter."
 
 #: disc_prototypes.php:195 host_discovery.php:179 items.php:354
 msgid "Invalid time period"
@@ -7190,7 +7193,7 @@ msgstr "Inventar"
 #: api/classes/CHost.php:1303
 #, c-format
 msgid "Inventory disabled for host \"%s\"."
-msgstr ""
+msgstr "Inventarfunktion deaktiviert für System \"%s\"."
 
 #: include/views/administration.general.iconmap.edit.php:41
 msgid "Inventory field"
@@ -7237,7 +7240,7 @@ msgstr "Element"
 #: api/classes/CItemGeneral.php:100
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\""
-msgstr ""
+msgstr "Element \"%1$s\" existiert bereits auf \"%2$s\""
 
 #: api/classes/CItemGeneral.php:99 api/classes/CItem.php:37
 #, c-format
@@ -7247,7 +7250,7 @@ msgstr "Element \"%1$s\" existiert bereits auf \"%2$s\"; vererbt von einer ander
 #: api/classes/CItem.php:38
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "Element \"%1$s\" existiert bereits auf \"%2$s\"."
 
 #: api/classes/CItem.php:959
 #, c-format
@@ -7294,11 +7297,11 @@ msgstr "Element gelöscht"
 
 #: include/actions.inc.php:1153
 msgid "Item in \"normal\" state"
-msgstr ""
+msgstr "Element im Zustand \"normal\""
 
 #: include/actions.inc.php:1152
 msgid "Item in \"not supported\" state"
-msgstr ""
+msgstr "Element im Zustand \"nicht unterstützt\""
 
 #: include/forms.inc.php:1124
 msgid "Item prototype"
@@ -7375,7 +7378,7 @@ msgstr "Element mit Schlüssel \"%1$s\" existiert bereits auf \"%2$s\"."
 #: api/classes/managers/CHttpTestManager.php:826
 #, c-format
 msgid "Item with key \"%1$s\" already exists."
-msgstr ""
+msgstr "Element mit Schlüssel \"%1$s\" existiert bereits."
 
 #: hosts.php:795 hosts.php:886 include/html.inc.php:420
 #: include/html.inc.php:424 include/items.inc.php:800

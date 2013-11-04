@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-04 14:47+0200\n"
+"POT-Creation-Date: 2013-11-04 14:50+0200\n"
 "PO-Revision-Date: 2013-10-11 08:21+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1600,7 +1600,7 @@ msgstr "Impossibile rimuovere gli script. Lo script \"%1$s\" e' utilizzato nell'
 #: api/classes/CScript.php:525
 #, fuzzy, c-format
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
-msgstr "Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste.Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste.Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste.Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste.Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste.Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste."
+msgstr "Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste.Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste.Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste.Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste.Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste.Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste.Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste."
 
 #: actionconf.php:331
 msgid "Cannot delete selected actions"
@@ -2260,7 +2260,7 @@ msgstr "Impossibile aggiornare scenario web"
 
 #: include/views/js/configuration.discovery.edit.js.php:600
 msgid "Cannot validate discovery check: invalid request or connection to Zabbix server failed."
-msgstr "Impossibile validare controllo discovery: richiesta non valida o connessione al server Zabbix fallita.Impossibile validare controllo discovery: richiesta non valida o connessione al server Zabbix fallita.Impossibile validare controllo discovery: richiesta non valida o connessione al server Zabbix fallita.Impossibile validare controllo discovery: richiesta non valida o connessione al server Zabbix fallita.Impossibile validare controllo discovery: richiesta non valida o connessione al server Zabbix fallita."
+msgstr "Impossibile validare controllo discovery: richiesta non valida o connessione al server Zabbix fallita.Impossibile validare controllo discovery: richiesta non valida o connessione al server Zabbix fallita.Impossibile validare controllo discovery: richiesta non valida o connessione al server Zabbix fallita.Impossibile validare controllo discovery: richiesta non valida o connessione al server Zabbix fallita.Impossibile validare controllo discovery: richiesta non valida o connessione al server Zabbix fallita.Impossibile validare controllo discovery: richiesta non valida o connessione al server Zabbix fallita."
 
 #: popup_bitem.php:114 popup_period.php:114
 msgid "Caption"
@@ -8325,7 +8325,7 @@ msgstr "Massimizza"
 msgid "Maximum DNS name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum DNS name length is %1$d characters, \"%2$s\" is %3$d characters."
 msgstr[0] "La massima lunghezza del nome DNS è %2$d caratteri, \"%3$s\" è %1$d carattere."
-msgstr[1] "La massima lunghezza del nome DNS è %2$d caratteri, \"%3$s\" è %1$d caratteri.La massima lunghezza del nome DNS è %2$d caratteri, \"%3$s\" è %1$d caratteri."
+msgstr[1] "La massima lunghezza del nome DNS è %2$d caratteri, \"%3$s\" è %1$d caratteri.La massima lunghezza del nome DNS è %2$d caratteri, \"%3$s\" è %1$d caratteri.La massima lunghezza del nome DNS è %2$d caratteri, \"%3$s\" è %1$d caratteri."
 
 #: api/classes/CUser.php:315
 #, c-format

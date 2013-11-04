@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-04 14:47+0200\n"
-"PO-Revision-Date: 2013-11-01 03:59+0300\n"
+"POT-Creation-Date: 2013-11-04 14:50+0200\n"
+"PO-Revision-Date: 2013-11-04 07:37+0300\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1383271162.0\n"
+"X-POOTLE-MTIME: 1383543461.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -40,7 +40,7 @@ msgstr[0] "%1$d 日"
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
-msgstr[0] ""
+msgstr[0] "%2$d件中%1$件の障害が表示されています"
 
 #: chart4.php:89 chart5.php:83
 #, c-format
@@ -78,7 +78,7 @@ msgstr[0] "%dデバイス"
 #, c-format
 msgctxt "user fullname"
 msgid "(%1$s %2$s)"
-msgstr ""
+msgstr "(%1$s %2$s)"
 
 #: include/views/configuration.action.edit.php:443
 msgid "(0 - infinitely)"
@@ -111,7 +111,7 @@ msgstr "(プロキシなし)"
 
 #: include/blocks.inc.php:1500
 msgid "-"
-msgstr ""
+msgstr "-"
 
 #: acknow.php:131
 msgid "----[BULK ACKNOWLEDGE]----"
@@ -155,7 +155,7 @@ msgstr "最新500個の値"
 
 #: include/views/administration.script.edit.php:41
 msgid "<Sub-menu/Sub-menu.../>Script"
-msgstr ""
+msgstr "<サブメニュー/サブメニュー.../>スクリプト"
 
 #: include/views/configuration.sysmap.edit.php:55
 msgid "<manual>"
@@ -165,7 +165,7 @@ msgstr "<マニュアル>"
 #: include/views/configuration.item.massupdate.php:172
 #: include/views/js/configuration.discovery.edit.js.php:95
 msgid "AES"
-msgstr ""
+msgstr "AES"
 
 #: acknow.php:185
 msgid "ALARM ACKNOWLEDGES"
@@ -176,16 +176,16 @@ msgstr "アラーム確認"
 #: include/views/configuration.action.edit.php:946
 #: include/views/configuration.triggers.edit.php:106 tr_logform.php:287
 msgid "AND"
-msgstr ""
+msgstr "AND"
 
 #: include/views/configuration.action.edit.php:108
 #: include/views/configuration.action.edit.php:945
 msgid "AND / OR"
-msgstr ""
+msgstr "AND / OR"
 
 #: include/views/administration.auditacts.list.php:31
 msgid "AUDIT ACTIONS"
-msgstr "監査アクション"
+msgstr "アクションの履歴"
 
 #: include/views/administration.auditlogs.list.php:31
 msgid "AUDIT LOGS"
@@ -489,7 +489,7 @@ msgstr "追加"
 
 #: include/hosts.inc.php:69
 msgid "Admin"
-msgstr ""
+msgstr "Admin"
 
 #: include/menu.inc.php:218
 msgid "Administration"
@@ -699,24 +699,24 @@ msgstr "%3$s %1$s:%2$s"
 #: include/maintenances.inc.php:125
 #, c-format
 msgid "At %1$s:%2$s on %3$s %4$s of every %5$s"
-msgstr ""
+msgstr "毎%5$s %3$s %4$s %1$s:%2$s"
 
 #: include/maintenances.inc.php:134
 #, c-format
 msgid "At %1$s:%2$s on day %3$s of every %4$s"
-msgstr ""
+msgstr "毎%4$s %3$日 %1$s:%2$s"
 
 #: include/maintenances.inc.php:83
 #, c-format
 msgid "At %1$s:%2$s on every %3$s of every week"
 msgid_plural "At %1$s:%2$s on every %3$s of every %4$s weeks"
-msgstr[0] ""
+msgstr[0] "毎%4$s週 毎%3$s %1$s:%2$s"
 
 #: include/maintenances.inc.php:63
 #, c-format
 msgid "At %1$s:%2$s on every day"
 msgid_plural "At %1$s:%2$s on every %3$s days"
-msgstr[0] ""
+msgstr[0] "毎%3$s日 %1$s:%2$s"
 
 #: include/forms.inc.php:1763
 msgid "At (hour:minute)"
@@ -741,7 +741,7 @@ msgstr "監査"
 
 #: auditacts.php:27
 msgid "Audit actions"
-msgstr "監査アクション"
+msgstr "アクションの履歴"
 
 #: auditlogs.php:27
 msgid "Audit logs"
@@ -911,7 +911,7 @@ msgstr "最新(T秒前/T個前)の値とマスクのANDビット演算  NOT N"
 
 #: include/classes/core/ZBase.php:233
 msgid "Black & Blue"
-msgstr ""
+msgstr "Black & Blue"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:28
 msgid "Blinking"
@@ -1262,7 +1262,7 @@ msgstr "アイテムを追加できません"
 #: api/classes/CApplication.php:547
 #, c-format
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
-msgstr ""
+msgstr "\"%2$s\"のアイテム\"%1$s\"を\"%4$s\"のアプリケーション\"%3$s\"に追加できません"
 
 #: api/classes/CApplication.php:600
 msgid "Cannot add items."
@@ -1288,7 +1288,7 @@ msgstr "グラフ\"%1$s\"にグラフの合計値は2つ以上設定できませ
 #: api/classes/CGraphPrototype.php:43
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
-msgstr ""
+msgstr "グラフのプロトタイプ\"%1$s\"にグラフの合計値は2つ以上設定できません。"
 
 #: sysmaps.php:171
 msgid "Cannot add network map"
@@ -1886,7 +1886,7 @@ msgstr "where句がないため\"%1$s\"テーブルにupdate文を実行でき�
 
 #: api/classes/CApplication.php:536
 msgid "Cannot process applications from different hosts or templates."
-msgstr ""
+msgstr "異なるホストまたはテンプレートのアプリケーションを処理できません。"
 
 #: include/classes/server/CZabbixServer.php:222
 #, c-format
@@ -2078,7 +2078,7 @@ msgstr "ディスカバリのルールを更新できません"
 
 #: usergrps.php:265
 msgid "Cannot update frontend access"
-msgstr "フロントエンドのアクセスを更新できません"
+msgstr "Webインターフェースのアクセスを更新できません"
 
 #: graphs.php:249
 msgid "Cannot update graph"
@@ -2249,7 +2249,7 @@ msgstr "Webシナリオを更新できません"
 
 #: include/views/js/configuration.discovery.edit.js.php:600
 msgid "Cannot validate discovery check: invalid request or connection to Zabbix server failed."
-msgstr ""
+msgstr "ディスカバリチェックが検証できません：リクエストが正しくないかZabbixサーバーに接続できません。"
 
 #: popup_bitem.php:114 popup_period.php:114
 msgid "Caption"
@@ -2456,7 +2456,7 @@ msgstr "列"
 
 #: include/views/js/adm.regexprs.edit.js.php:23
 msgid "Combined result"
-msgstr "結果の結合"
+msgstr "最終結果"
 
 #: include/actions.inc.php:909 include/actions.inc.php:943
 #: include/actions.inc.php:998
@@ -2972,7 +2972,7 @@ msgstr "作成: \"%2$s\"のWebシナリオ\"%1$s\"."
 
 #: include/items.inc.php:41
 msgid "Critical"
-msgstr ""
+msgstr "クリティカル"
 
 #: popup_trexpr.php:365
 msgid "Current date is < N"
@@ -3047,11 +3047,11 @@ msgstr "カスタムスクリプト"
 
 #: include/views/administration.general.triggerSeverity.edit.php:26
 msgid "Custom severity"
-msgstr "カスタム重要度"
+msgstr "カスタム深刻度"
 
 #: include/views/administration.general.triggerSeverity.edit.php:67
 msgid "Custom severity names affect all locales and require manual translation!"
-msgstr "カスタム重要度の名前はすべての言語に影響するため、複数言語を利用している場合は手動で翻訳を行ってください！"
+msgstr "カスタム深刻度の名前はすべての言語に影響するため、複数言語を利用している場合は手動で翻訳を行ってください！"
 
 #: include/views/js/configuration.sysmaps.js.php:45
 msgid "Custom size"
@@ -3067,7 +3067,7 @@ msgstr "チェコ語 (cs_CZ)"
 
 #: include/classes/class.cchart.php:1328
 msgid "D"
-msgstr ""
+msgstr "D"
 
 #: include/translateDefines.inc.php:48
 msgid "D, d M Y H:i:s O"
@@ -3081,7 +3081,7 @@ msgstr "ダッシュボードの設定"
 #: include/views/configuration.item.massupdate.php:170
 #: include/views/js/configuration.discovery.edit.js.php:95
 msgid "DES"
-msgstr ""
+msgstr "DES"
 
 #: httpdetails.php:120
 msgid "DETAILS OF SCENARIO"
@@ -3094,7 +3094,7 @@ msgstr "無効"
 
 #: include/triggers.inc.php:185
 msgid "DISCOVERED"
-msgstr ""
+msgstr "DISCOVERED"
 
 #: include/menu.inc.php:242
 msgid "DM"
@@ -3108,7 +3108,7 @@ msgstr "分散監視"
 #: include/views/inventory.host.view.php:91
 #: include/views/js/configuration.host.edit.js.php:18 search.php:132
 msgid "DNS"
-msgstr ""
+msgstr "DNS"
 
 #: include/views/administration.proxy.edit.php:55
 #: include/views/configuration.host.edit.php:229
@@ -3123,7 +3123,7 @@ msgstr "DNS名"
 
 #: include/triggers.inc.php:184
 msgid "DOWN"
-msgstr ""
+msgstr "DOWN"
 
 #: include/forms.inc.php:1631 include/maintenances.inc.php:36
 #: include/reports.inc.php:61 include/reports.inc.php:397
@@ -3133,7 +3133,7 @@ msgstr "毎日"
 
 #: include/classes/core/ZBase.php:234
 msgid "Dark orange"
-msgstr ""
+msgstr "Dark orange"
 
 #: include/reports.inc.php:444
 msgid "Darken"
@@ -3163,7 +3163,7 @@ msgstr "データ"
 #: include/classes/class.cchart.php:2462 include/classes/class.cpie.php:720
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
-msgstr ""
+msgstr "Data from %1$s. Generated in %2$s sec."
 
 #: include/screens.inc.php:29
 msgid "Data overview"
@@ -3341,7 +3341,7 @@ msgstr "デフォルトのメッセージ"
 
 #: actionconf.php:42 include/views/configuration.action.edit.php:325
 msgid "Default operation step duration"
-msgstr "デフォルトのアクション実行ステップの期間"
+msgstr "デフォルトのアクション実行ステップの間隔"
 
 #: include/views/configuration.action.edit.php:45
 msgid "Default subject"
@@ -3949,7 +3949,7 @@ msgstr "発見"
 
 #: include/views/configuration.host.edit.php:158
 msgid "Discovered by"
-msgstr ""
+msgstr "Discovered by"
 
 #: include/views/monitoring.discovery.php:41
 msgid "Discovered device"
@@ -3976,7 +3976,7 @@ msgstr "ディスカバリチェック"
 #: include/views/js/configuration.discovery.edit.js.php:599
 #: include/views/js/configuration.discovery.edit.js.php:616
 msgid "Discovery check error"
-msgstr ""
+msgstr "ディスカバリチェックエラー"
 
 #: popup.php:100
 msgid "Discovery checks"
@@ -4629,7 +4629,7 @@ msgstr "JSON-rpc version 2.0が必要です, \"%s\" でリクエストされま�
 #: include/views/configuration.maintenance.list.php:56
 msgctxt "maintenance status"
 msgid "Expired"
-msgstr "期限切れ"
+msgstr "メンテナンス期間の終了"
 
 #: include/graphs.inc.php:27 popup.php:1143
 msgid "Exploded"
@@ -4931,15 +4931,15 @@ msgstr "開始"
 #: include/views/administration.usergroups.list.php:50
 #: include/views/administration.users.list.php:62
 msgid "Frontend access"
-msgstr "フロントエンドへのアクセス"
+msgstr "Webインターフェースへのアクセス"
 
 #: usergrps.php:265
 msgid "Frontend access updated"
-msgstr "フロントエンドへのアクセスを更新しました"
+msgstr "Webインターフェースへのアクセスを更新しました"
 
 #: include/views/administration.users.edit.php:208
 msgid "Frontend messaging"
-msgstr "フロントエンドメッセージング"
+msgstr "Webインターフェースのアラート表示"
 
 #: include/views/configuration.host.edit.php:826
 #: include/views/configuration.template.edit.php:441
@@ -4953,7 +4953,7 @@ msgstr "フルスクリーン"
 #: include/views/configuration.graph.edit.php:73
 #: include/views/configuration.triggers.expression.php:69 popup_bitem.php:146
 msgid "Function"
-msgstr "機能"
+msgstr "関数"
 
 #: include/func.inc.php:655
 msgctxt "Giga short"
@@ -5050,7 +5050,7 @@ msgstr "ダッシュボードへ移動"
 
 #: include/views/configuration.httpconf.edit.php:122
 msgid "Google Chrome"
-msgstr ""
+msgstr "Google Chrome"
 
 #: include/graphs.inc.php:75
 msgid "Gradient line"
@@ -5346,7 +5346,7 @@ msgstr ""
 #: include/views/inventory.host.list.php:26
 #: include/views/inventory.host.view.php:24
 msgid "HOST INVENTORY"
-msgstr ""
+msgstr "ホストインベントリ"
 
 #: hostinventoriesoverview.php:65
 msgid "HOST INVENTORY OVERVIEW"
@@ -6214,16 +6214,16 @@ msgstr "最後の行と列は削除できません。"
 #: include/classes/class.ctweenbox.php:100
 #: include/views/configuration.template.edit.php:171
 msgid "In"
-msgstr "In"
+msgstr "利用中"
 
 #: include/views/administration.usergroups.edit.php:55
 msgid "In group"
-msgstr "グループ"
+msgstr "グループに所属"
 
 #: include/views/configuration.host.edit.php:187
 #: include/views/configuration.template.edit.php:115
 msgid "In groups"
-msgstr "グループ"
+msgstr "所属グループ"
 
 #: hosts.php:917 include/views/configuration.maintenance.edit.php:168
 #: include/views/configuration.maintenance.edit.php:176
@@ -6235,7 +6235,7 @@ msgstr "メンテナンス中"
 #: include/classes/screens/CScreenActions.php:139
 #: include/views/administration.auditacts.list.php:94
 msgid "In progress"
-msgstr "進捗中"
+msgstr "実行中"
 
 #: tr_logform.php:279 tr_logform.php:332
 msgid "Include"
@@ -6671,7 +6671,7 @@ msgstr "マップ\"%s\"の幅の値が正しくありません。"
 #: api/classes/CScript.php:582
 #, c-format
 msgid "Incorrect menu path for script \"%1$s\"."
-msgstr ""
+msgstr "スクリプト\"%1$s\"のメニューパスが正しくありません。"
 
 #: include/nodes.inc.php:306
 msgid "Incorrect node type."
@@ -7726,7 +7726,7 @@ msgstr "最新の変更 (降順)"
 
 #: httpmon.php:90 latest.php:324 latest.php:337
 msgid "Last check"
-msgstr "最新のチェック"
+msgstr "最新のチェック時刻"
 
 #: jsLoader.php:208
 msgid "Last hour graph"
@@ -8005,12 +8005,12 @@ msgstr "ローレベルディスカバリが\"取得不可\"の状態"
 #: include/func.inc.php:413 include/func.inc.php:654
 msgctxt "Mega short"
 msgid "M"
-msgstr ""
+msgstr "M"
 
 #: jsLoader.php:130
 msgctxt "Monday short"
 msgid "M"
-msgstr ""
+msgstr "M"
 
 #: include/translateDefines.inc.php:41 report3.php:114
 msgid "M Y"
@@ -8030,13 +8030,13 @@ msgstr "メンテナンス"
 
 #: include/hosts.inc.php:39
 msgid "MD2"
-msgstr ""
+msgstr "MD2"
 
 #: include/hosts.inc.php:40 include/views/configuration.item.edit.php:144
 #: include/views/configuration.item.massupdate.php:140
 #: include/views/js/configuration.discovery.edit.js.php:78
 msgid "MD5"
-msgstr ""
+msgstr "MD5"
 
 #: report5.php:51
 msgid "MOST BUSY TRIGGERS TOP 100"
@@ -8219,7 +8219,7 @@ msgstr "マップ\"%s\"はすでに存在します。"
 
 #: include/views/administration.general.valuemapping.edit.php:41
 msgid "Mapped to"
-msgstr "マッピング先"
+msgstr "マッピング文字列"
 
 #: include/valuemap.inc.php:141
 #, c-format
@@ -8311,19 +8311,19 @@ msgstr "最大化"
 #, c-format
 msgid "Maximum DNS name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum DNS name length is %1$d characters, \"%2$s\" is %3$d characters."
-msgstr[0] ""
+msgstr[0] "DNS名の最大文字数は%1$d文字です。\"%2$s\"は%3$d文字あります。"
 
 #: api/classes/CUser.php:315
 #, c-format
 msgid "Maximum alias length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum alias length is %1$d characters, \"%2$s\" is %3$d characters."
-msgstr[0] ""
+msgstr[0] "エイリアスの最大文字数は%1$d文字です。\"%2$s\"は%3$d文字あります。"
 
 #: api/classes/CHost.php:733
 #, c-format
 msgid "Maximum host name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum host name length is %1$d characters, \"%2$s\" is %3$d characters."
-msgstr[0] ""
+msgstr[0] "ホスト名の最大文字数は%1$d文字です。\"%2$s\"は%3$d文字あります。"
 
 #: include/views/configuration.item.edit.php:319
 #: include/views/configuration.item.massupdate.php:372
@@ -8356,7 +8356,7 @@ msgstr "期間Tの値の最大値 NOT N"
 #, c-format
 msgid "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d characters."
-msgstr[0] ""
+msgstr[0] "ホストの表示名の最大文字数は%1$d文字です。\"%2$s\"は%3$d文字あります。"
 
 #: include/forms.inc.php:1687 include/func.inc.php:116
 #: include/func.inc.php:247 jsLoader.php:122
@@ -8452,11 +8452,11 @@ msgstr "メッセージの上限文字数"
 
 #: include/views/administration.users.edit.php:214
 msgid "Message timeout"
-msgstr "メッセージタイムアウト"
+msgstr "表示期間"
 
 #: include/views/administration.users.edit.php:209
 msgid "Message timeout (seconds)"
-msgstr "メッセージタイムアウト (秒)"
+msgstr "表示期間 (秒)"
 
 #: jsLoader.php:168
 msgid "Messages"
@@ -8464,7 +8464,7 @@ msgstr "メッセージ"
 
 #: include/views/administration.users.edit.php:350
 msgid "Messaging"
-msgstr "メッセージング"
+msgstr "アラート表示"
 
 #: api/rpc/class.cjsonrpc.php:191
 msgid "Method not found."
@@ -8671,7 +8671,7 @@ msgstr "移動"
 
 #: include/views/configuration.httpconf.edit.php:101
 msgid "Mozilla Firefox"
-msgstr ""
+msgstr "Mozilla Firefox"
 
 #: include/triggers.inc.php:1606
 msgid "Multiple PROBLEM events"
@@ -8923,11 +8923,11 @@ msgstr ""
 
 #: api/classes/CItemGeneral.php:351
 msgid "No SNMP OID specified."
-msgstr ""
+msgstr "SNMP OIDが設定されていません。"
 
 #: api/classes/CItemGeneral.php:357
 msgid "No SNMP community specified."
-msgstr ""
+msgstr "SNMPコミュニティ名が設定されていません。"
 
 #: include/views/configuration.host.edit.php:340
 #: include/views/configuration.host.prototype.edit.php:117
@@ -9805,11 +9805,11 @@ msgstr "OOBサブネットマスク"
 #: include/views/configuration.action.edit.php:947
 #: include/views/configuration.triggers.edit.php:113 tr_logform.php:288
 msgid "OR"
-msgstr ""
+msgstr "OR"
 
 #: include/hosts.inc.php:125 include/views/inventory.host.list.php:81
 msgid "OS"
-msgstr ""
+msgstr "OS"
 
 #: include/hosts.inc.php:130
 msgid "OS (Full details)"
@@ -10140,7 +10140,7 @@ msgstr "プロキシごとの概要"
 #: include/func.inc.php:657
 msgctxt "Peta short"
 msgid "P"
-msgstr ""
+msgstr "P"
 
 #: dashboard.php:268
 msgid "PERSONAL DASHBOARD"
@@ -10148,7 +10148,7 @@ msgstr "ダッシュボード"
 
 #: include/classes/class.frontendsetup.php:318
 msgid "PHP bcmath"
-msgstr ""
+msgstr "PHP bcmath"
 
 #: include/classes/class.frontendsetup.php:322
 msgid "PHP bcmath extension missing (PHP configuration parameter --enable-bcmath)"
@@ -10156,7 +10156,7 @@ msgstr "PHP bcmathモジュールが存在しません (PHPのconfigure時のパ
 
 #: include/classes/class.frontendsetup.php:549
 msgid "PHP ctype"
-msgstr ""
+msgstr "PHP ctype"
 
 #: include/classes/class.frontendsetup.php:553
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)"
@@ -10168,7 +10168,7 @@ msgstr "PHPデータベースサポート"
 
 #: include/classes/class.frontendsetup.php:382
 msgid "PHP gd"
-msgstr ""
+msgstr "PHP gd"
 
 #: include/classes/class.frontendsetup.php:458
 msgid "PHP gd FreeType support"
@@ -10201,7 +10201,7 @@ msgstr "PHP GDモジュールが存在しません (PHPのconfigure時のパラ�
 
 #: include/classes/class.frontendsetup.php:606
 msgid "PHP gettext"
-msgstr ""
+msgstr "PHP gettext"
 
 #: include/classes/class.frontendsetup.php:610
 msgid "PHP gettext extension missing (PHP configuration parameter --with-gettext)"
@@ -10209,7 +10209,7 @@ msgstr "PHP gettextモジュールが存在しません (PHPのconfigure時の�
 
 #: include/classes/class.frontendsetup.php:482
 msgid "PHP libxml"
-msgstr ""
+msgstr "PHP libxml"
 
 #: include/classes/class.frontendsetup.php:486
 msgid "PHP libxml extension missing"
@@ -10217,7 +10217,7 @@ msgstr "PHP libxmlモジュールが存在しません"
 
 #: include/classes/class.frontendsetup.php:337
 msgid "PHP mbstring"
-msgstr ""
+msgstr "PHP mbstring"
 
 #: include/classes/class.frontendsetup.php:341
 msgid "PHP mbstring extension missing (PHP configuration parameter --enable-mbstring)"
@@ -10701,7 +10701,7 @@ msgstr "プロキシを削除しました"
 
 #: include/views/administration.proxy.edit.php:88
 msgid "Proxy hosts"
-msgstr "プロキシホスト"
+msgstr "プロキシ経由で監視するホスト"
 
 #: api/classes/CProxy.php:326
 msgid "Proxy interface creation failed."
@@ -10745,7 +10745,7 @@ msgstr "キュー"
 
 #: include/hosts.inc.php:43
 msgid "RMCP+"
-msgstr ""
+msgstr "RMCP+"
 
 #: include/views/administration.script.edit.php:94
 #: include/views/administration.script.list.php:84
@@ -10800,7 +10800,7 @@ msgstr "リカバリメッセージ"
 
 #: actionconf.php:47 include/views/configuration.action.edit.php:51
 msgid "Recovery subject"
-msgstr "リカバリの件名"
+msgstr "復旧通知の件名"
 
 #: include/views/administration.users.edit.php:144 profile.php:52 users.php:63
 msgid "Refresh (in seconds)"
@@ -11218,12 +11218,12 @@ msgstr "ロシア語 (ru_RU)"
 #: jsLoader.php:135
 msgctxt "Saturday short"
 msgid "S"
-msgstr ""
+msgstr "S"
 
 #: jsLoader.php:136
 msgctxt "Sunday short"
 msgid "S"
-msgstr ""
+msgstr "S"
 
 #: include/views/monitoring.hostscreen.php:30
 #: include/views/monitoring.hostscreen.php:40
@@ -11244,11 +11244,11 @@ msgstr "サーバー"
 #: include/views/configuration.item.massupdate.php:142
 #: include/views/js/configuration.discovery.edit.js.php:78
 msgid "SHA"
-msgstr ""
+msgstr "SHA"
 
 #: report3.php:83 srv_status.php:142
 msgid "SLA"
-msgstr ""
+msgstr "SLA"
 
 #: include/views/monitoring.slides.php:35
 #: include/views/monitoring.slides.php:56
@@ -11258,12 +11258,12 @@ msgstr "スライドショー"
 #: include/media.inc.php:26
 #: include/views/administration.mediatypes.edit.php:43
 msgid "SMS"
-msgstr ""
+msgstr "SMS"
 
 #: include/discovery.inc.php:58
 #: include/views/js/configuration.discovery.edit.js.php:181
 msgid "SMTP"
-msgstr ""
+msgstr "SMTP"
 
 #: include/views/administration.mediatypes.edit.php:59
 #: include/views/administration.mediatypes.list.php:53
@@ -11273,7 +11273,7 @@ msgstr "送信元メールアドレス"
 #: include/views/administration.mediatypes.edit.php:58
 #: include/views/administration.mediatypes.list.php:52
 msgid "SMTP helo"
-msgstr ""
+msgstr "SMTP helo"
 
 #: include/views/administration.mediatypes.edit.php:57
 #: include/views/administration.mediatypes.list.php:51
@@ -11282,7 +11282,7 @@ msgstr "SMTPサーバー"
 
 #: include/hosts.inc.php:471 include/items.inc.php:245
 msgid "SNMP"
-msgstr ""
+msgstr "SNMP"
 
 #: include/views/js/configuration.discovery.edit.js.php:44
 msgid "SNMP Key"
@@ -11292,7 +11292,7 @@ msgstr "SNMPキー"
 #: include/views/configuration.item.edit.php:119
 #: include/views/js/configuration.discovery.edit.js.php:427 items.php:84
 msgid "SNMP OID"
-msgstr ""
+msgstr "SNMP OID"
 
 #: disc_prototypes.php:76 host_discovery.php:73 include/forms.inc.php:472
 #: include/views/configuration.item.edit.php:127
@@ -11355,7 +11355,7 @@ msgstr "SQLの実行に失敗しました\"%1$s\"。"
 #: include/views/configuration.action.edit.php:691
 #: include/views/js/configuration.discovery.edit.js.php:182
 msgid "SSH"
-msgstr ""
+msgstr "SSH"
 
 #: include/items.inc.php:94
 msgid "SSH agent"
@@ -11379,7 +11379,7 @@ msgstr "Zabbixサーバーの状態"
 
 #: include/views/configuration.httpconf.edit.php:116
 msgid "Safari"
-msgstr ""
+msgstr "Safari"
 
 #: include/func.inc.php:208
 msgid "Sat"
@@ -11577,7 +11577,7 @@ msgstr "スクリプトを削除しました"
 #: api/classes/CScript.php:615
 #, c-format
 msgid "Script menu path \"%1$s\" already used in script name \"%2$s\"."
-msgstr ""
+msgstr "スクリプトのメニューパス\"%1$s\"はスクリプト名\"%2$s\"にすでに利用されています。"
 
 #: include/views/administration.mediatypes.edit.php:65
 #: include/views/administration.mediatypes.list.php:57
@@ -11587,7 +11587,7 @@ msgstr "スクリプト名"
 #: api/classes/CScript.php:602
 #, c-format
 msgid "Script name \"%1$s\" already used in menu path for script \"%2$s\"."
-msgstr ""
+msgstr "スクリプト名\"%1$s\"はスクリプト\"%2$s\"のメニューパスにすでに利用されています。"
 
 #: include/classes/debug/CProfiler.php:125
 msgid "Script profiler"
@@ -12290,7 +12290,7 @@ msgstr "ステップ\"%1$s\" [%3$sの%2$s] 失敗: %4$s"
 
 #: include/views/configuration.action.edit.php:449
 msgid "Step duration"
-msgstr "ステップの期間"
+msgstr "ステップの間隔"
 
 #: include/views/configuration.httpconf.popup.php:87 popup_httpstep.php:24
 msgid "Step of scenario"
@@ -12319,7 +12319,7 @@ msgstr "保存時の計算"
 
 #: include/hosts.inc.php:41
 msgid "Straight"
-msgstr ""
+msgstr "Straight"
 
 #: include/views/configuration.screen.constructor.edit.php:545
 msgid "Style"
@@ -12402,22 +12402,22 @@ msgstr "システムステータス"
 #: include/func.inc.php:656
 msgctxt "Tera short"
 msgid "T"
-msgstr ""
+msgstr "T"
 
 #: jsLoader.php:133
 msgctxt "Thursday short"
 msgid "T"
-msgstr ""
+msgstr "T"
 
 #: jsLoader.php:131
 msgctxt "Tuesday short"
 msgid "T"
-msgstr ""
+msgstr "T"
 
 #: include/discovery.inc.php:64
 #: include/views/js/configuration.discovery.edit.js.php:174
 msgid "TCP"
-msgstr ""
+msgstr "TCP"
 
 #: include/items.inc.php:95
 msgid "TELNET agent"
@@ -12471,7 +12471,7 @@ msgstr "ターゲットタイプ"
 #: include/views/configuration.action.edit.php:692
 #: include/views/js/configuration.discovery.edit.js.php:183
 msgid "Telnet"
-msgstr ""
+msgstr "Telnet"
 
 #: include/actions.inc.php:62 include/audit.inc.php:51
 #: include/forms.inc.php:608 include/forms.inc.php:927
@@ -13051,7 +13051,7 @@ msgstr "表示するトリガーの深刻度"
 
 #: queue.php:241
 msgid "Truncated"
-msgstr ""
+msgstr "Truncated"
 
 #: include/classes/class.cpagefilter.php:198
 #, c-format
@@ -13159,7 +13159,7 @@ msgstr "不明"
 
 #: include/triggers.inc.php:183
 msgid "UP"
-msgstr ""
+msgstr "UP"
 
 #: include/views/configuration.httpconf.edit.php:164
 #: include/views/configuration.httpconf.popup.php:78
@@ -13168,7 +13168,7 @@ msgstr ""
 #: include/views/js/configuration.sysmaps.js.php:182 jsLoader.php:215
 #: popup_httpstep.php:37 tr_logform.php:365
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: include/views/administration.users.edit.php:146
 msgid "URL (after login)"
@@ -13176,15 +13176,15 @@ msgstr "ログイン後のURL"
 
 #: include/hosts.inc.php:275
 msgid "URL A"
-msgstr ""
+msgstr "URL A"
 
 #: include/hosts.inc.php:280
 msgid "URL B"
-msgstr ""
+msgstr "URL B"
 
 #: include/hosts.inc.php:285
 msgid "URL C"
-msgstr ""
+msgstr "URL C"
 
 #: include/html.inc.php:106
 msgid "URL parameter cannot be array."
@@ -13209,7 +13209,7 @@ msgstr "ユーザープロファイル"
 
 #: include/func.inc.php:2585
 msgid "UTF-8"
-msgstr ""
+msgstr "UTF-8"
 
 #: include/locales.inc.php:78
 msgid "Ukrainian (uk_UA)"
@@ -13419,12 +13419,12 @@ msgstr "ホストのプロトタイプ%1$sのホストインベントリでは�
 #: include/blocks.inc.php:1167
 msgctxt "discovery results in dashboard"
 msgid "Up"
-msgstr ""
+msgstr "Up"
 
 #: include/discovery.inc.php:154
 msgctxt "discovery status"
 msgid "Up"
-msgstr ""
+msgstr "Up"
 
 #: include/views/administration.auditlogs.list.php:46
 #: include/views/configuration.action.edit.php:1019
@@ -13636,7 +13636,7 @@ msgstr "自身のユーザーアカウントは削除できません。"
 #: api/classes/CUser.php:340
 #, c-format
 msgid "User may not modify GUI access for himself by becoming a member of user group \"%s\"."
-msgstr "ユーザーはグループ\"%s\"のメンバーになることにより自分自身のフロントエンドへのアクセス設定を変更することはできません。"
+msgstr "ユーザーはグループ\"%s\"のメンバーになることにより自分自身のWebインターフェースへのアクセス設定を変更することはできません。"
 
 #: api/classes/CUser.php:344
 #, c-format
@@ -13818,7 +13818,7 @@ msgstr "ベンダー"
 
 #: include/items.inc.php:43
 msgid "Verbose"
-msgstr ""
+msgstr "Verbose"
 
 #: include/views/configuration.screen.constructor.edit.php:543
 msgid "Vertical"
@@ -13846,7 +13846,7 @@ msgstr "ホスト名を設定しない場合、表示名は必須項目です。
 #: jsLoader.php:132
 msgctxt "Wednesday short"
 msgid "W"
-msgstr ""
+msgstr "W"
 
 #: adm.triggerseverities.php:58 include/items.inc.php:33
 #: include/views/administration.general.triggerSeverity.edit.php:46
@@ -14095,7 +14095,7 @@ msgstr "正しくないマクロ \"%1$s\"."
 
 #: include/views/js/configuration.sysmaps.js.php:167
 msgid "X"
-msgstr ""
+msgstr "X"
 
 #: include/reports.inc.php:55 include/reports.inc.php:164
 #: include/reports.inc.php:315
@@ -14125,18 +14125,18 @@ msgstr "XMLファイルにワーニングが含まれています %1$s"
 
 #: include/views/js/configuration.sysmaps.js.php:169 report3.php:96
 msgid "Y"
-msgstr ""
+msgstr "Y"
 
 #: include/func.inc.php:660
 msgctxt "Yotta short"
 msgid "Y"
-msgstr ""
+msgstr "Y"
 
 #. GETTEXT: Date format (year). Do not translate.
 #: include/translateDefines.inc.php:40
 msgctxt "date format"
 msgid "Y"
-msgstr ""
+msgstr "Y"
 
 #: include/views/configuration.graph.edit.php:270
 msgid "Y axis MAX value"
@@ -14283,7 +14283,7 @@ msgstr "分散監視用に設定されていません。"
 #: include/func.inc.php:659
 msgctxt "Zetta short"
 msgid "Z"
-msgstr ""
+msgstr "Z"
 
 #: index.php:29
 msgid "ZABBIX"
@@ -14291,13 +14291,13 @@ msgstr "Zabbix"
 
 #: include/page_header.php:113
 msgid "Zabbix"
-msgstr ""
+msgstr "Zabbix"
 
 #: include/page_footer.php:103 include/views/general.browserwarning.php:60
 #: include/views/general.login.php:50
 #, c-format
 msgid "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
-msgstr ""
+msgstr "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
 
 #: include/users.inc.php:55
 msgid "Zabbix Admin"
@@ -14372,7 +14372,7 @@ msgstr "Zabbixサーバーの情報"
 
 #: jsrpc.php:174
 msgid "Zabbix server is not running: the information displayed may not be current."
-msgstr "Zabbixサーバが動作していません (画面のリフレッシュを行ってステータスを再確認してください)"
+msgstr "Zabbixサーバーが動作していません (画面のリフレッシュを行ってステータスを再確認してください)"
 
 #: include/blocks.inc.php:726
 msgid "Zabbix server is running"
@@ -14406,7 +14406,7 @@ msgstr "ズーム"
 #: include/classes/screens/CScreenHostgroupTriggers.php:132
 #: include/classes/screens/CScreenHostTriggers.php:131
 msgid "[H:i:s]"
-msgstr ""
+msgstr "[H:i:s]"
 
 #: include/func.inc.php:141
 #, c-format
@@ -14452,7 +14452,7 @@ msgstr "すでに存在します"
 #: include/views/js/configuration.action.edit.js.php:509
 #: include/views/js/configuration.action.edit.js.php:517
 msgid "and"
-msgstr ""
+msgstr "and"
 
 #: include/views/monitoring.history.php:126
 msgid "as Blue"
@@ -14484,7 +14484,7 @@ msgstr "平均"
 #: include/func.inc.php:541 jsLoader.php:97
 msgctxt "day short"
 msgid "d"
-msgstr ""
+msgstr "d"
 
 #: include/html.inc.php:592 include/maintenances.inc.php:59
 #: include/page_header.php:449 include/translateDefines.inc.php:42
@@ -14538,7 +14538,7 @@ msgstr "日"
 
 #: include/html.inc.php:636
 msgid "dd"
-msgstr ""
+msgstr "dd"
 
 #: include/classes/class.cpagefilter.php:754 include/setup.inc.php:403
 #: include/views/configuration.slideconf.edit.php:66
@@ -14581,7 +14581,7 @@ msgstr "esc_step_fromとesc_step_toは両方設定する必要があります。
 
 #: include/views/inventory.host.list.php:41
 msgid "exactly"
-msgstr ""
+msgstr "完全一致"
 
 #: include/actions.inc.php:933
 #: include/views/administration.auditacts.list.php:89
@@ -14590,11 +14590,11 @@ msgstr "実行"
 
 #: jsLoader.php:92
 msgid "fixed"
-msgstr ""
+msgstr "fixed"
 
 #: include/func.inc.php:1879
 msgid "found"
-msgstr ""
+msgstr "found"
 
 #: include/views/configuration.item.edit.php:364
 #: include/views/configuration.item.edit.php:385
@@ -14605,12 +14605,12 @@ msgstr "グローバルのデータ保存期間の設定"
 #: include/func.inc.php:542 jsLoader.php:98
 msgctxt "hour short"
 msgid "h"
-msgstr ""
+msgstr "h"
 
 #: include/html.inc.php:642 include/views/configuration.services.edit.php:241
 #: include/views/configuration.services.edit.php:247
 msgid "hh"
-msgstr ""
+msgstr "hh"
 
 #: api/classes/CMap.php:420
 msgid "host"
@@ -14639,7 +14639,7 @@ msgstr "内部イベント"
 
 #: include/classes/class.cserverinfo.php:44
 msgid "is"
-msgstr ""
+msgstr "is"
 
 #: include/events.inc.php:67
 msgid "item"
@@ -14666,12 +14666,12 @@ msgstr "ローレベルディスカバリルール"
 #: include/func.inc.php:543
 msgctxt "minute short"
 msgid "m"
-msgstr ""
+msgstr "m"
 
 #: include/func.inc.php:540 jsLoader.php:96
 msgctxt "month short"
 msgid "m"
-msgstr ""
+msgstr "m"
 
 #: include/views/js/common.macros.js.php:53
 msgid "macro(s)"
@@ -14707,12 +14707,12 @@ msgstr "最小60秒"
 #: include/views/configuration.services.edit.php:244
 #: include/views/configuration.services.edit.php:250
 msgid "mm"
-msgstr ""
+msgstr "mm"
 
 #: include/func.inc.php:545
 msgctxt "millisecond short"
 msgid "ms"
-msgstr ""
+msgstr "ms"
 
 #: include/views/administration.authentication.edit.php:63
 msgid "must be a valid LDAP user"
@@ -14757,7 +14757,7 @@ msgstr "現在"
 #: include/blocks.inc.php:352 include/blocks.inc.php:696
 #: include/func.inc.php:1876
 msgid "of"
-msgstr ""
+msgstr "of"
 
 #: include/classes/class.frontendsetup.php:291
 #: include/classes/class.frontendsetup.php:319
@@ -14790,7 +14790,7 @@ msgstr ""
 #: include/classes/class.frontendsetup.php:607
 #: include/views/monitoring.hostscreen.php:54
 msgid "on"
-msgstr ""
+msgstr "on"
 
 #: include/views/configuration.action.edit.php:931
 #: include/views/configuration.action.edit.php:934
@@ -14798,7 +14798,7 @@ msgstr ""
 #: include/views/js/configuration.action.edit.js.php:513
 #: include/views/js/configuration.action.edit.js.php:516
 msgid "or"
-msgstr ""
+msgstr "or"
 
 #: include/js.inc.php:133 include/js.inc.php:136
 msgid "other"
@@ -14827,7 +14827,7 @@ msgstr "実行中"
 #: include/func.inc.php:544
 msgctxt "second short"
 msgid "s"
-msgstr ""
+msgstr "s"
 
 #: include/page_header.php:125
 #: include/views/configuration.httpconf.edit.php:220
@@ -14864,7 +14864,7 @@ msgstr "テンプレートID\"%1$s\"が%2$s回利用されています"
 
 #: include/func.inc.php:1872
 msgid "to"
-msgstr ""
+msgstr "to"
 
 #: api/classes/CMap.php:421 include/events.inc.php:34
 #: include/events.inc.php:63
@@ -14887,13 +14887,13 @@ msgstr "値"
 
 #: include/actions.inc.php:345 include/actions.inc.php:357
 msgid "via"
-msgstr ""
+msgstr "via"
 
 #: include/func.inc.php:539 jsLoader.php:95
 msgctxt "year short"
 msgid "y"
-msgstr ""
+msgstr "y"
 
 #: include/html.inc.php:640
 msgid "yyyy"
-msgstr ""
+msgstr "yyyy"
