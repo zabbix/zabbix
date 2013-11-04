@@ -1674,7 +1674,9 @@ static void	replace_key_param(char **data, int key_type, size_t l, size_t *r, in
 
 	if (NULL != param)
 	{
-		(*r)--; zbx_replace_string(data, l, r, param); (*r)++;
+		(*r)--;
+		zbx_replace_string(data, l, r, param);
+		(*r)++;
 
 		zbx_free(param);
 	}
