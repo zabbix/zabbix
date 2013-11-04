@@ -2245,34 +2245,31 @@ static int	DBpatch_2010193(void)
  * Comments: auxiliary function for DBpatch_2010194()                         *
  *                                                                            *
  ******************************************************************************/
-static void	replace_key_param(char **data, int key_type, size_t l, size_t *r, int level, int num, int quoted,
-		void *cb_data)
+static char	*replace_key_param(const char *data, int key_type, int level, int num, int quoted, void *cb_data)
 {
-	char	c, *param, *new_param;
+	char	*param, *new_param;
 
 	if (1 != level || 4 != num)	/* the fourth parameter on first level should be updated */
-		return;
+		return NULL;
 
-	c = (*data)[*r];
-	(*data)[*r] = '\0';
+	param = zbx_strdup(NULL, data);
 
-	param = zbx_strdup(NULL, *data + l);
-	(*data)[*r] = c;
+	unquote_key_param(param);
 
-	if (0 != quoted)
-		unquote_key_param(param);
-
-	if ('\0' != *param)
+	if ('\0' == *param)
 	{
-		new_param = zbx_dsprintf(NULL, "^%s$", param);
-
-		quote_key_param(&new_param, quoted);
-		(*r)--; zbx_replace_string(data, l, r, new_param); (*r)++;
-
-		zbx_free(new_param);
+		zbx_free(param);
+		return NULL;
 	}
 
+	new_param = zbx_dsprintf(NULL, "^%s$", param);
+
 	zbx_free(param);
+
+	quote_key_param(&new_param, quoted);
+
+	return new_param;
+
 }
 
 static int	DBpatch_2010194(void)

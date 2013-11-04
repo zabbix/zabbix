@@ -1655,6 +1655,35 @@ char	*get_param_dyn(const char *p, int num)
 
 /******************************************************************************
  *                                                                            *
+ * Function: replace_key_param                                                *
+ *                                                                            *
+ * Purpose: replaces an item key, SNMP OID or their parameters when callback  *
+ *          function returns a new string                                     *
+ *                                                                            *
+ * Comments: auxiliary function for replace_key_params_dyn()                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	replace_key_param(char **data, int key_type, size_t l, size_t *r, int level, int num, int quoted,
+		replace_key_param_f cb, void *cb_data)
+{
+	char	c = (*data)[*r], *param;
+
+	(*data)[*r] = '\0';
+
+	if (NULL != (param = cb(*data + l, key_type, level, num, quoted, cb_data)))
+	{
+		(*data)[*r] = c;
+
+		(*r)--; zbx_replace_string(data, l, r, param); (*r)++;
+
+		zbx_free(param);
+	}
+	else
+		(*data)[*r] = c;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: replace_key_params_dyn                                           *
  *                                                                            *
  * Purpose: replaces an item key, SNMP OID or their parameters by using       *
@@ -1705,7 +1734,7 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 			;
 	}
 
-	cb(data, key_type, 0, &i, level, num, 0, cb_data);
+	replace_key_param(data, key_type, 0, &i, level, num, 0, cb, cb_data);
 
 	for (; '\0' != (*data)[i]; i++)
 	{
@@ -1726,7 +1755,7 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 					case ' ':
 						break;
 					case ',':
-						cb(data, key_type, i, &i, level, num, 0, cb_data);
+						replace_key_param(data, key_type, i, &i, level, num, 0, cb, cb_data);
 						if (1 == level)
 							num++;
 						break;
@@ -1736,7 +1765,7 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 							num++;
 						break;
 					case ']':
-						cb(data, key_type, i, &i, level, num, 0, cb_data);
+						replace_key_param(data, key_type, i, &i, level, num, 0, cb, cb_data);
 						level--;
 						state = ZBX_STATE_END;
 						break;
@@ -1769,7 +1798,7 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 			case ZBX_STATE_UNQUOTED:	/* an unquoted parameter */
 				if (']' == (*data)[i] || ',' == (*data)[i])
 				{
-					cb(data, key_type, l, &i, level, num, 0, cb_data);
+					replace_key_param(data, key_type, l, &i, level, num, 0, cb, cb_data);
 
 					i--;
 					state = ZBX_STATE_END;
@@ -1778,7 +1807,7 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 			case ZBX_STATE_QUOTED:	/* a quoted parameter */
 				if ('"' == (*data)[i] && '\\' != (*data)[i - 1])
 				{
-					i++; cb(data, key_type, l, &i, level, num, 1, cb_data); i--;
+					i++; replace_key_param(data, key_type, l, &i, level, num, 1, cb, cb_data); i--;
 
 					state = ZBX_STATE_END;
 				}

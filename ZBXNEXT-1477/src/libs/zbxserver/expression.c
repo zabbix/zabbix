@@ -4222,45 +4222,35 @@ replace_key_param_data_t;
  * Comments: auxiliary function for substitute_key_macros()                   *
  *                                                                            *
  ******************************************************************************/
-static void	replace_key_param(char **data, int key_type, size_t l, size_t *r, int level, int num, int quoted,
-		void *cb_data)
+static char	*replace_key_param(const char *data, int key_type, int level, int num, int quoted, void *cb_data)
 {
 	replace_key_param_data_t	*replace_key_param_data = (replace_key_param_data_t *)cb_data;
 	zbx_uint64_t			*hostid = replace_key_param_data->hostid;
 	DC_ITEM				*dc_item = replace_key_param_data->dc_item;
 	struct zbx_json_parse		*jp_row = replace_key_param_data->jp_row;
 	int				macro_type = replace_key_param_data->macro_type;
-	char				c, *param;
+	char				*param;
 
 	if (ZBX_KEY_TYPE_ITEM == key_type && 0 == level)
-		return;
+		return NULL;
 
-	c = (*data)[*r];
-	(*data)[*r] = '\0';
+	if (NULL == strchr(data, '{'))
+		return NULL;
 
-	if (NULL != strchr(*data + l, '{'))
-	{
-		param = zbx_strdup(NULL, *data + l);
-		(*data)[*r] = c;
+	param = zbx_strdup(NULL, data);
 
-		if (0 != quoted)
-			unquote_key_param(param);
+	if (0 != level)
+		unquote_key_param(param);
 
-		if (NULL == jp_row)
-		{
-			substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, dc_item, &param, macro_type,
-					NULL, 0);
-		}
-		else
-			substitute_discovery_macros(&param, jp_row, ZBX_MACRO_ANY, NULL, 0);
-
-		quote_key_param(&param, quoted);
-		(*r)--; zbx_replace_string(data, l, r, param); (*r)++;
-
-		zbx_free(param);
-	}
+	if (NULL == jp_row)
+		substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, dc_item, &param, macro_type, NULL, 0);
 	else
-		(*data)[*r] = c;
+		substitute_discovery_macros(&param, jp_row, ZBX_MACRO_ANY, NULL, 0);
+
+	if (0 != level)
+		quote_key_param(&param, quoted);
+
+	return param;
 }
 
 /******************************************************************************
