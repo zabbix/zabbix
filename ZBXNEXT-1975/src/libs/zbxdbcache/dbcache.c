@@ -1786,7 +1786,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		rc = DBexecute("%s", sql);
 
-	if (ZBX_DB_OK <= rc && 0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+	if (ZBX_DB_OK <= rc && 0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER)
+			&& 0 < h_num + huint_num + hstr_num + htext_num + hlog_num)
 	{
 		/* the history values were written into database, now add to value cache */
 		zbx_log_value_t	log;
