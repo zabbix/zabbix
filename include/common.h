@@ -819,8 +819,27 @@ int	get_param(const char *param, int num, char *buf, size_t max_len);
 int	num_param(const char *param);
 char	*get_param_dyn(const char *param, int num);
 
-typedef void	(*replace_key_param_f)(char **data, int key_type, size_t l, size_t *r, int level, int num, int quoted,
-		void *cb_data);
+/******************************************************************************
+ *                                                                            *
+ * Purpose: replaces an item key, SNMP OID or their parameters                *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      data      - [IN] an item key, SNMP OID or their parameter             *
+ *      key_type  - [IN] ZBX_KEY_TYPE_*                                       *
+ *      level     - [IN] for item keys and OIDs the level will be 0;          *
+ *                       for their parameters - 1 or higher (for arrays)      *
+ *      num       - [IN] parameter number; for item keys and OIDs the level   *
+ *                       will be 0; for their parameters - 1 or higher        *
+ *      quoted    - [IN] 1 if parameter is quoted; 0 - othetwise              *
+ *      cb_data   - [IN] callback function custom data                        *
+ *                                                                            *
+ * Return value: NULL if parameter doesn't change; a new string - otherwise   *
+ *                                                                            *
+ * Comments: The new string should be quoted if it contains special           *
+ *           characters                                                       *
+ *                                                                            *
+ ******************************************************************************/
+typedef char	*(*replace_key_param_f)(const char *data, int key_type, int level, int num, int quoted, void *cb_data);
 #define ZBX_KEY_TYPE_ITEM	0
 #define ZBX_KEY_TYPE_OID	1
 int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, void *cb_data, char *error,

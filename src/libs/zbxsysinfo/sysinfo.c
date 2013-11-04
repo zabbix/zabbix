@@ -1005,6 +1005,9 @@ void	unquote_key_param(char *param)
 {
 	char	*dst;
 
+	if ('"' != *param)
+		return;
+
 	for (dst = param++; '\0' != *param; param++)
 	{
 		if ('\\' == *param && '"' == param[1])
