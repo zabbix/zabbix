@@ -397,6 +397,8 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 
 			if (HOST_AVAILABLE_FALSE != *available)
 			{
+				char	reason[MAX_STRING_LEN];
+
 				zbx_snprintf(error_msg, sizeof(error_msg), "temporarily disabling %s checks on host [%s]:"
 						" host unavailable",
 						zbx_host_type_string(item->type), item->host.host);
@@ -406,8 +408,10 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 				offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=%d,",
 						fld_available, *available);
 
-				update_triggers_status_to_unknown(item->host.hostid, item->type, ts,
-						"Agent is unavailable.");
+				zbx_snprintf(reason, sizeof(reason), "%s is unavailable.",
+						zbx_host_type_string(item->type));
+
+				update_triggers_status_to_unknown(item->host.hostid, item->type, ts, reason);
 			}
 
 			error_esc = DBdyn_escape_string_len(error, HOST_ERROR_LEN);
