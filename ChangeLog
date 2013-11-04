@@ -1,6 +1,7 @@
 Changes for 2.1.9
 
 New features:
+..F....... [ZBXNEXT-1827] improved multiselect full text search (Eduard)
 ..F....... [ZBX-7065] changed the design of the setup, login and browser warning pages (Pavels)
 ..F....... [ZBX-6983] renamed the "Latest host group issues" screen element to "Host group issues" and "Latest host issues" to "Host issues" (Pavels)
 ..F....... [ZBX-7215] improved the design of the search auto suggest (Pavels)
