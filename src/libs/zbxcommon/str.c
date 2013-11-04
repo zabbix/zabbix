@@ -1669,17 +1669,15 @@ static void	replace_key_param(char **data, int key_type, size_t l, size_t *r, in
 	char	c = (*data)[*r], *param;
 
 	(*data)[*r] = '\0';
+	param = cb(*data + l, key_type, level, num, quoted, cb_data);
+	(*data)[*r] = c;
 
-	if (NULL != (param = cb(*data + l, key_type, level, num, quoted, cb_data)))
+	if (NULL != param)
 	{
-		(*data)[*r] = c;
-
 		(*r)--; zbx_replace_string(data, l, r, param); (*r)++;
 
 		zbx_free(param);
 	}
-	else
-		(*data)[*r] = c;
 }
 
 /******************************************************************************
