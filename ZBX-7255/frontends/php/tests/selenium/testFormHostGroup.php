@@ -21,33 +21,37 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testFormHostGroup extends CWebTest {
-	private $nameSize = 50;
-	private $nameMaxLength = 64;
-
 	private $hostGroup = 'Test Group';
 
-
 	public function testFormHostGroup_CheckLayout() {
-		$this->zbxTestLogin('hostgroups.php');
-		$this->zbxTestClickWait('form');
-
+		$this->zbxTestLogin('hostgroups.php?form=Create+host+group');
+		$this->zbxTestCheckTitle('Configuration of host groups');
 		$this->zbxTestTextPresent('CONFIGURATION OF HOST GROUPS');
 		$this->zbxTestTextPresent('Host group');
 		$this->zbxTestTextPresent(array('Group name', 'Hosts', 'Hosts in', 'Other hosts | Group'));
 
 		$this->assertElementPresent('name');
+		$this->assertAttribute("//input[@id='name']/@size", 50);
+		$this->assertAttribute("//input[@id='name']/@maxlength", 64);
+
 		$this->assertElementPresent('twb_groupid');
+
 		$this->assertElementPresent('hosts_left');
+		$this->assertAttribute("//select[@id='hosts_left']/@size", 25);
+		$this->assertAttribute("//select[@id='hosts_left']/@style", 'width: 280px;');
+
 		$this->assertElementPresent('add');
 		$this->assertElementPresent('remove');
+
 		$this->assertElementPresent('hosts_right');
+		$this->assertAttribute("//select[@id='hosts_right']/@size", 25);
+		$this->assertAttribute("//select[@id='hosts_right']/@style", 'width: 280px;');
+
 		$this->assertElementPresent('save');
 		$this->assertElementNotPresent('clone');
 		$this->assertElementNotPresent('delete');
 		$this->assertElementPresent('cancel');
 
-		$this->assertAttribute("//input[@id='name']/@size", $this->nameSize);
-		$this->assertAttribute("//input[@id='name']/@maxlength", $this->nameMaxLength);
 	}
 
 	public function testFormHostGroup_CreateEmpty() {
