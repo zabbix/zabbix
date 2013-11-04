@@ -68,7 +68,7 @@ require_once dirname(__FILE__).'/../page_header.php';
 								<li style="margin-top: 10px; padding-top: 1px; height: 22px; width: 265px; white-space: nowrap;" >
 									<div class="label"><?php echo _('Password'); ?></div><input type="password" id="password" name="password" class="input"/>
 								</li>
-								<li style="margin-top: 8px; margin-left: 64px;">
+								<li style="margin-top: 8px; text-align: center;">
 									<input type="checkbox" id="autologin" name="autologin" value="1" <?php echo (get_request('autologin', 1) == 1) ? 'checked="checked"' : ''; ?> />
 									<label for="autologin" class="bold" style="line-height: 20px; vertical-align: top;">
 										<?php echo _('Remember me for 30 days'); ?>
