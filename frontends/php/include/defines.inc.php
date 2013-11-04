@@ -20,7 +20,7 @@
 
 define('ZABBIX_VERSION',     '2.1.9');
 define('ZABBIX_API_VERSION', '2.1.9');
-define('ZABBIX_DB_VERSION',	 2010195);
+define('ZABBIX_DB_VERSION',	 2010197);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
 define('ZABBIX_COPYRIGHT_TO',   '2013');
@@ -951,6 +951,7 @@ define('ZABBIX_HOMEPAGE', 'http://www.zabbix.com');
 
 // non translatable date formats
 define('TIMESTAMP_FORMAT', 'YmdHis');
+define('TIMESTAMP_FORMAT_ZERO_TIME', 'Ymd0000');
 
 // actions
 define('LONG_DESCRIPTION',	0);

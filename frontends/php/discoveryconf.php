@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 require_once dirname(__FILE__).'/include/discovery.inc.php';
 
-$page['title'] = _('Configuration of discovery');
+$page['title'] = _('Configuration of discovery rules');
 $page['file'] = 'discoveryconf.php';
 $page['hist_arg'] = array();
 $page['type'] = detect_page_type();
