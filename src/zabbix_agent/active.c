@@ -1179,7 +1179,8 @@ static void	process_active_checks(char *server, unsigned short port)
 									output_template, &item_value) &&
 							SUCCEED == regexp_match_ex(&regexps, str_severity, key_severity,
 									ZBX_IGNORE_CASE) &&
-							(('\0' == *key_source) ? 1 : (0 == strcmp(key_source, source))) &&
+							SUCCEED == regexp_match_ex(&regexps, source, key_source,
+									ZBX_IGNORE_CASE) &&
 							SUCCEED == regexp_match_ex(&regexps, str_logeventid,
 									key_logeventid, ZBX_CASE_SENSITIVE))
 					{
