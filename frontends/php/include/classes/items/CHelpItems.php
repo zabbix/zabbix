@@ -22,14 +22,13 @@
 /**
  * Class containing information about help items.
  */
-class CHelpItems
-{
+class CHelpItems {
 
 	/**
 	 * Available help items groups by item type.
 	 *
 	 * Each help item has the following properties:
-	 * - key 			- default key
+	 * - key			- default key
 	 * - description	- description of the item
 	 *
 	 * @var array
@@ -89,12 +88,12 @@ class CHelpItems
 				'description' => 'Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If ip is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]'
 			),
 			array(
-				'key' => 'net.tcp.service.perf[service,<ip>,<port>]',
-				'description' => 'Check performance of service "service". 0 - service is down, sec - number of seconds spent on connection to the service. If ip is missing 127.0.0.1 is used.  If port number is missing, default service port is used.'
-			),
-			array(
 				'key' => 'net.tcp.service[service,<ip>,<port>]',
 				'description' => 'Check if service is available. 0 - service is down, 1 - service is running. If ip is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45].'
+			),
+			array(
+				'key' => 'net.tcp.service.perf[service,<ip>,<port>]',
+				'description' => 'Check performance of service "service". 0 - service is down, sec - number of seconds spent on connection to the service. If ip is missing 127.0.0.1 is used.  If port number is missing, default service port is used.'
 			),
 			array(
 				'key' => 'perf_counter[counter,<interval>]',
