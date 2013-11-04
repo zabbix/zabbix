@@ -288,7 +288,7 @@ class FrontendSetup {
 
 		$result = array(
 			'name' => _('PHP databases support'),
-			'current' => empty($current) ? _('no') : new CSpan($current),
+			'current' => empty($current) ? _('off') : new CSpan($current),
 			'required' => null,
 			'result' => !empty($current),
 			'error' => _('At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported')
@@ -316,7 +316,7 @@ class FrontendSetup {
 
 		$result = array(
 			'name' => _('PHP bcmath'),
-			'current' => $current ? _('yes') : _('no'),
+			'current' => $current ? _('on') : _('off'),
 			'required' => null,
 			'result' => $current,
 			'error' => _('PHP bcmath extension missing (PHP configuration parameter --enable-bcmath)')
@@ -335,7 +335,7 @@ class FrontendSetup {
 
 		$result = array(
 			'name' => _('PHP mbstring'),
-			'current' => $current ? _('yes') : _('no'),
+			'current' => $current ? _('on') : _('off'),
 			'required' => null,
 			'result' => $current,
 			'error' => _('PHP mbstring extension missing (PHP configuration parameter --enable-mbstring)')
@@ -354,7 +354,7 @@ class FrontendSetup {
 
 		$result = array(
 			'name' => _('PHP sockets'),
-			'current' => $current ? _('yes') : _('no'),
+			'current' => $current ? _('on') : _('off'),
 			'required' => null,
 			'result' => $current,
 			'error' => _('PHP sockets extension missing (PHP configuration parameter --enable-sockets)')
@@ -405,7 +405,7 @@ class FrontendSetup {
 
 		$result = array(
 			'name' => _('PHP gd PNG support'),
-			'current' => $current ? _('yes') : _('no'),
+			'current' => $current ? _('on') : _('off'),
 			'required' => null,
 			'result' => $current,
 			'error' => _('PHP gd PNG image support missing')
@@ -431,7 +431,7 @@ class FrontendSetup {
 
 		$result = array(
 			'name' => _('PHP gd JPEG support'),
-			'current' => $current ? _('yes') : _('no'),
+			'current' => $current ? _('on') : _('off'),
 			'required' => null,
 			'result' => $current,
 			'error' => _('PHP gd JPEG image support missing')
@@ -456,7 +456,7 @@ class FrontendSetup {
 
 		$result = array(
 			'name' => _('PHP gd FreeType support'),
-			'current' => $current ? _('yes') : _('no'),
+			'current' => $current ? _('on') : _('off'),
 			'required' => null,
 			'result' => $current,
 			'error' => _('PHP gd FreeType support missing')
@@ -499,7 +499,7 @@ class FrontendSetup {
 
 		$result = array(
 			'name' => _('PHP xmlwriter'),
-			'current' => $current ? _('yes') : _('no'),
+			'current' => $current ? _('on') : _('off'),
 			'required' => null,
 			'result' => $current,
 			'error' => _('PHP xmlwriter extension missing')
@@ -518,7 +518,7 @@ class FrontendSetup {
 
 		$result = array(
 			'name' => _('PHP xmlreader'),
-			'current' => $current ? _('yes') : _('no'),
+			'current' => $current ? _('on') : _('off'),
 			'required' => null,
 			'result' => $current,
 			'error' => _('PHP xmlreader extension missing')
@@ -547,7 +547,7 @@ class FrontendSetup {
 
 		$result = array(
 			'name' => _('PHP ctype'),
-			'current' => $current ? _('yes') : _('no'),
+			'current' => $current ? _('on') : _('off'),
 			'required' => null,
 			'result' => $current,
 			'error' => _('PHP ctype extension missing (PHP configuration parameter --enable-ctype)')
@@ -566,7 +566,7 @@ class FrontendSetup {
 
 		$result = array(
 			'name' => _('PHP session'),
-			'current' => $current ? _('yes') : _('no'),
+			'current' => $current ? _('on') : _('off'),
 			'required' => null,
 			'result' => $current,
 			'error' => _('PHP session extension missing (PHP configuration parameter --enable-session)')
@@ -585,8 +585,8 @@ class FrontendSetup {
 
 		$result = array(
 			'name' => _('PHP session auto start'),
-			'current' => $current ? _('no') : _('yes'),
-			'required' => null,
+			'current' => $current ? _('off') : _('on'),
+			'required' => _('off'),
 			'result' => $current,
 			'error' => _('PHP session auto start must be disabled (PHP directive "session.auto_start")')
 		);
@@ -604,7 +604,7 @@ class FrontendSetup {
 
 		$result = array(
 			'name' => _('PHP gettext'),
-			'current' => $current ? _('yes') : _('no'),
+			'current' => $current ? _('on') : _('off'),
 			'required' => null,
 			'result' => $current,
 			'error' => _('PHP gettext extension missing (PHP configuration parameter --with-gettext)')

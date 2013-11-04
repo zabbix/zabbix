@@ -49,7 +49,7 @@ if ($this->data['status'] == HOST_STATUS_PROXY_PASSIVE) {
 		$proxyForm->addVar('interface[hostid]', $this->data['interface']['hostid']);
 	}
 
-	$interfaceTable = new CTable(_('No interface defined.'), 'formElementTable');
+	$interfaceTable = new CTable(null, 'formElementTable');
 	$interfaceTable->addRow(array(
 		_('IP address'),
 		_('DNS name'),

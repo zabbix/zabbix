@@ -1,11 +1,34 @@
 Changes for 2.1.9
 
 New features:
+..F....... [ZBXNEXT-1827] improved multiselect full text search (Eduard)
+..F....... [ZBX-7065] changed the design of the setup, login and browser warning pages (Pavels)
+..F....... [ZBX-6983] renamed the "Latest host group issues" screen element to "Host group issues" and "Latest host issues" to "Host issues" (Pavels)
 ..F....... [ZBX-7215] improved the design of the search auto suggest (Pavels)
 .....J.... [ZBXNEXT-1776] added support for java.math.BigDecimal, java.math.BigInteger and some other open types (asaveljevs)
 ..F.I..... [ZBXNEXT-715] increased the size of sysmaps_elements.label and sysmaps_links.label fields to 2048 characters (Sasha)
 
 Bug fixes:
+...G...PS. [ZBX-7125] fixed improper reading of configuration files in case there were problems with included files; we now exit with failure (asaveljevs)
+..F....... [ZBX-7257] improved config file validation (Eduard)
+..F....... [ZBX-7249] changed setup pre-requisites values "yes" to "on" and "no" to "off", fixed numeric value validation and port text alignment (Pavels, Ivo)
+..F....... [ZBX-7267] implement menu popup in trigger top 100 page for hosts and triggers columns (Eduard)
+..F....... [ZBX-7260] fixed "Wrong RPC call to JS RPC" error when acknowledging trigger and changing group or host in screen element (Ivo)
+..F....... [ZBX-6129] fixed changing the status of triggers and trigger prototype working incorrectly if they no longer exist (Pavels)
+..F....... [ZBX-7266] fixed frontend big dropdowns displaying (Eduard)
+..F....... [ZBX-7248] fixed frontend initial calendar time (Eduard)
+.......PS. [ZBX-7208] fixed DB schema generation for "t_shorttext"-type fields (Andris, asaveljevs)
+..F....... [ZBX-7240] fixed map editing form behaving incorrectly after it has been submitted unsuccessfully (Pavels)
+A......... [ZBX-7256] fixed sorting by hostname in trigger.get (Pavels)
+..F....... [ZBX-7247] fixed multiselect allowing to select read only objects in places where write permissions are required (Pavels)
+A......... [ZBX-7247] fixed map.create and map.update not checking permissions to objects used in map elements (Pavels)
+A.F....... [ZBX-7238] fixed network discovery rule permission checks for admin users (Pavels)
+..F....... [ZBX-7251] corrected multiple page headers and other text strings (Pavels)
+..F....... [ZBX-7212] fixed interface macros priorities (Eduard)
+A.F....... [ZBX-7235] fixed activating and deactivating a web scenarios (Eduard)
+..F....... [ZBX-7181] fixed frontend natural sorting (Eduard)
+..F....... [ZBX-7236] removed the sorting indicator from the "Last 20 issues" widget (Pavels)
+A......... [ZBX-7224] fixed host prototype children group deletion (Eduard)
 ..F....... [ZBX-7199] fixed permission issue in bar report (Eduard)
 ..F....... [ZBX-7215] fixed search auto suggest alwasy displaying results in lower case (Pavels)
 ....I..... [ZBX-7166] added database upgrade patches to set status of template triggers to Enabled and state of template items to normal (Andris, Sasha)
@@ -547,7 +570,7 @@ Changes for 2.0.10rc1
 
 New features:
 ..F....... [ZBX-7103] improved loading speed of tr_events.php page (Sasha)
-A.F....... [ZBX-1357] updated Dutch, German, Hungarian, Japanese, Italian, Romanian and Slovak translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Dutch, German, Hungarian, Japanese, Italian, Romanian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 .......PS. [ZBX-6835] fixed bug when agent/proxy connection error could have resulted in a wrong warning about message size (wiper)
