@@ -29,33 +29,33 @@ $message = trim(preg_replace('/\[.*\]/', '', $message));
 
 require_once dirname(__FILE__).'/../page_header.php';
 ?>
-<form action="index.php" method="post">
-	<input type="hidden" name="request" class="input hidden" value="<?php echo $request; ?>" />
-	<div style="display: table; position: absolute; height: 99%; width: 99%;">
-		<div class="vertical-middle">
-			<div class="loginForm">
-				<div style="position: relative; color: #FFF; height: 100%;">
-					<!-- Help & Support -->
-					<div style="position: absolute; top: 0px; right: 10px;">
-						<a class="highlight" href="http://www.zabbix.com/documentation"><?php echo _('Help'); ?></a>
-						&nbsp;|&nbsp;
-						<a class="highlight" href="https://support.zabbix.com"><?php echo _('Support'); ?></a>
-					</div>
+<div class="login">
+	<div id="glow">
+		<div class="loginForm">
+			<div style="position: relative; color: #FFF; height: 100%;">
+				<!-- Help & Support -->
+				<div style="position: absolute; top: 0px; right: 10px;">
+					<a class="highlight" href="http://www.zabbix.com/documentation"><?php echo _('Help'); ?></a>
+					&nbsp;|&nbsp;
+					<a class="highlight" href="https://support.zabbix.com"><?php echo _('Support'); ?></a>
+				</div>
 
-					<!-- Copyright -->
-					<div style="float: left; width: 250px; height: 100%;">
-						<div style="position: absolute; top: 39%; left: 30px;" class="loginLogo"></div>
-						<div style="position: absolute; bottom: 2px;">
+				<!-- Copyright -->
+				<div style="float: left; width: 250px; height: 100%;">
+					<div style="position: absolute; top: 39%; left: 30px;" class="loginLogo"></div>
+					<div style="position: absolute; bottom: 2px;">
 							<span class="bold textwhite" style="margin: 0 0 4px 4px; font-size: 0.9em;">
 								<?php echo _s('Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA',
 									ZABBIX_VERSION, ZABBIX_COPYRIGHT_FROM, ZABBIX_COPYRIGHT_TO); ?>
 							</span>
-						</div>
 					</div>
+				</div>
 
-					<!-- Login Form -->
-					<div style="height: 100%; padding-top: 58px; padding-right: 40px; margin-left: 275px;">
-						<div style="float: right;">
+				<!-- Login Form -->
+				<div style="height: 100%; padding-top: 58px; padding-right: 40px; margin-left: 275px;">
+					<div style="float: right;">
+						<form action="index.php" method="post">
+							<input type="hidden" name="request" class="input hidden" value="<?php echo $request; ?>" />
 							<ul style="list-style-type: none;">
 								<li style="padding-right: 6px; height: 22px;">
 									<div class="ui-corner-all textwhite bold" style="padding: 2px 4px; float: right; background-color: #D60900; visibility: <?php echo zbx_empty($message) ? 'hidden' : 'visible'; ?>" >
@@ -77,20 +77,21 @@ require_once dirname(__FILE__).'/../page_header.php';
 									<input type="submit" class="input jqueryinput" name="enter" id="enter" value="<?php echo _('Sign in'); ?>" />
 									<?php if (CWebUser::$data['userid'] > 0) { ?>
 										<span style="margin-left: 14px;">
-											<a class="highlight underline" href="dashboard.php"><?php echo _('Login as Guest'); ?></a>
-										</span>
+												<a class="highlight underline" href="dashboard.php"><?php echo _('Login as Guest'); ?></a>
+											</span>
 									<?php } ?>
 								</li>
 							</ul>
-						</div>
+						</form>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-</form>
+</div>
 <script type="text/javascript">
 	jQuery(document).ready(function() {
+		jQuery('body').css('background-color', '#E8EAEF');
 		jQuery('#enter').button();
 		jQuery('#name').focus();
 	});
