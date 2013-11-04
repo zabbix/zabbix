@@ -1176,7 +1176,7 @@ static void	process_active_checks(char *server, unsigned short port)
 					zbx_snprintf(str_logeventid, sizeof(str_logeventid), "%lu", logeventid);
 
 					if (SUCCEED == regexp_sub_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE,
-									NULL, &item_value) &&
+									output_template, &item_value) &&
 							SUCCEED == regexp_match_ex(&regexps, str_severity, key_severity,
 									ZBX_IGNORE_CASE) &&
 							SUCCEED == regexp_match_ex(&regexps, source, key_source,
