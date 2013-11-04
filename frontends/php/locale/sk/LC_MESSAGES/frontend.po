@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-04 14:47+0200\n"
-"PO-Revision-Date: 2013-10-30 18:19+0300\n"
+"POT-Creation-Date: 2013-11-04 14:50+0200\n"
+"PO-Revision-Date: 2013-11-03 16:01+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1383149989.0\n"
+"X-POOTLE-MTIME: 1383487292.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -722,17 +722,17 @@ msgstr "V %1$s:%2$s dňa %3$s každý %4$s"
 #, c-format
 msgid "At %1$s:%2$s on every %3$s of every week"
 msgid_plural "At %1$s:%2$s on every %3$s of every %4$s weeks"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "O %1$s:%2$s každý %3$s každý týždeň"
+msgstr[1] "O %1$s:%2$s každý %3$s každý %4$s týždeň"
+msgstr[2] "O %1$s:%2$s každý %3$s každý %4$s týždeň"
 
 #: include/maintenances.inc.php:63
 #, c-format
 msgid "At %1$s:%2$s on every day"
 msgid_plural "At %1$s:%2$s on every %3$s days"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "O %1$s:%2$s každý deň"
+msgstr[1] "O %1$s:%2$s každý %3$s deň"
+msgstr[2] "O %1$s:%2$s každý %3$s deň"
 
 #: include/forms.inc.php:1763
 msgid "At (hour:minute)"
