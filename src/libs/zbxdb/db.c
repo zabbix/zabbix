@@ -791,7 +791,6 @@ int	zbx_db_bind_parameter(int position, void *buffer, unsigned char type)
 	}
 
 	return ret;
-
 }
 
 int	zbx_db_statement_execute()
