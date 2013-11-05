@@ -29,6 +29,8 @@ $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
+unset($_REQUEST['sid']);
+
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'groupid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
