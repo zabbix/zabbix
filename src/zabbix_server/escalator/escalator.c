@@ -308,32 +308,260 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, zbx_
 	DBfree_result(result);
 }
 
+typedef struct
+{
+	char	*fields;
+	size_t	fields_alloc;
+	size_t	fields_offset;
+
+	char	*values;
+	size_t	values_alloc;
+	size_t	values_offset;
+
+	char	delimiter;
+	int	index;
+}
+zbx_sql_insert_t;
+
+static void	sql_insert_init(zbx_sql_insert_t *sql)
+{
+	memset(sql, 0, sizeof(zbx_sql_insert_t));
+}
+
+static void	sql_insert_clean(zbx_sql_insert_t *sql)
+{
+	zbx_free(sql->fields);
+	zbx_free(sql->values);
+}
+
+static void	sql_insert_fields_begin(zbx_sql_insert_t *sql)
+{
+	sql->delimiter = '(';
+	sql->index = 1;
+}
+
+static void	sql_insert_fields_end(zbx_sql_insert_t *sql)
+{
+	zbx_chrcpy_alloc(&sql->fields, &sql->fields_alloc, &sql->fields_offset, ')');
+	zbx_chrcpy_alloc(&sql->values, &sql->values_alloc, &sql->values_offset, ')');
+}
+
+#ifdef HAVE_ORACLE
+
+static void	sql_insert_fields_add(zbx_sql_insert_t *sql, const char *name)
+{
+	zbx_snprintf_alloc(&sql->fields, &sql->fields_alloc, &sql->fields_offset, "%c%s", sql->delimiter, name);
+	zbx_snprintf_alloc(&sql->values, &sql->values_alloc, &sql->values_offset, "%c:%d", sql->delimiter,
+			sql->index++);
+
+	sql->delimiter = ',';
+}
+
+static void	sql_insert_fields_add_uint64(zbx_sql_insert_t *sql, const char *name, const zbx_uint64_t *value)
+{
+	if (NULL != value)
+		sql_insert_fields_add(sql, name);
+}
+
+static void	sql_insert_fields_add_int(zbx_sql_insert_t *sql, const char *name, const int *value)
+{
+	if (NULL != value)
+		sql_insert_fields_add(sql, name);
+}
+
+static void	sql_insert_fields_add_str(zbx_sql_insert_t *sql, const char *name, const char *value, int max_len)
+{
+	if (NULL != value)
+		sql_insert_fields_add(sql, name);
+}
+
+static void	sql_insert_fields_bind_uint64(zbx_sql_insert_t *sql, const zbx_uint64_t *value)
+{
+	if (NULL != value)
+		DBbind_parameter(sql->index++, (void *)value, ZBX_TYPE_ID);
+}
+
+static void	sql_insert_fields_bind_int(zbx_sql_insert_t *sql, const int *value)
+{
+	if (NULL != value)
+		DBbind_parameter(sql->index++, (void *)value, ZBX_TYPE_INT);
+}
+
+static void	sql_insert_fields_bind_str(zbx_sql_insert_t *sql, const char *value)
+{
+	if (NULL != value)
+		DBbind_parameter(sql->index++, (void *)value, ZBX_TYPE_TEXT);
+}
+
+static void	sql_insert_prepare(zbx_sql_insert_t *sql)
+{
+	char	*stmt = NULL;
+	size_t	stmt_alloc = 0, stmt_offset = 0;
+
+	sql->index = 1;
+	zbx_snprintf_alloc(&stmt, &stmt_alloc, &stmt_offset, "insert into alerts %s values %s", sql->fields, sql->values);
+	DBstatement_prepare(stmt);
+	zbx_free(stmt);
+}
+
+static int	sql_insert_execute(zbx_sql_insert_t *sql)
+{
+	return DBstatement_execute();
+}
+
+#else
+
+static void	sql_insert_fields_add_uint64(zbx_sql_insert_t *sql, const char *name, const zbx_uint64_t *value)
+{
+	if (NULL != value)
+	{
+		zbx_snprintf_alloc(&sql->fields, &sql->fields_alloc, &sql->fields_offset, "%c%s", sql->delimiter, name);
+		zbx_snprintf_alloc(&sql->values, &sql->values_alloc, &sql->values_offset, "%c" ZBX_FS_UI64,
+				sql->delimiter, *value);
+		sql->delimiter = ',';
+	}
+}
+
+static void	sql_insert_fields_add_int(zbx_sql_insert_t *sql, const char *name, const int *value)
+{
+	if (NULL != value)
+	{
+		zbx_snprintf_alloc(&sql->fields, &sql->fields_alloc, &sql->fields_offset, "%c%s", sql->delimiter, name);
+		zbx_snprintf_alloc(&sql->values, &sql->values_alloc, &sql->values_offset, "%c%d", sql->delimiter,
+				*value);
+		sql->delimiter = ',';
+	}
+}
+
+static void	sql_insert_fields_add_str(zbx_sql_insert_t *sql, const char *name, const char *value, int max_len)
+{
+	if (NULL != value)
+	{
+		char	*value_esc;
+		value_esc =  DBdyn_escape_string_len(value, max_len);
+
+		zbx_snprintf_alloc(&sql->fields, &sql->fields_alloc, &sql->fields_offset, "%c%s", sql->delimiter, name);
+		zbx_snprintf_alloc(&sql->values, &sql->values_alloc, &sql->values_offset, "%c'%s'", sql->delimiter,
+				value_esc);
+		sql->delimiter = ',';
+		zbx_free(value_esc);
+	}
+}
+
+#	define sql_insert_fields_bind_uint64(sql, value)
+#	define sql_insert_fields_bind_int(sql, value)
+#	define sql_insert_fields_bind_str(sql, value)
+
+#	define sql_insert_prepare(sql)
+
+static int	sql_insert_execute(zbx_sql_insert_t *sql)
+{
+	return DBexecute("insert into alerts %s values %s", sql->fields, sql->values);
+}
+
+#endif
+
+/******************************************************************************
+ *                                                                            *
+ * Function: db_insert_alert                                                  *
+ *                                                                            *
+ * Purpose: inserts data into alerts table                                    *
+ *                                                                            *
+ * Parameters: <param> - a reference to the value of respective alerts table  *
+ *                       field, can be NULL.                                  *
+ *                                                                            *
+ * Return value: ZBX_DB_FAIL - the insert failed                              *
+ *                                                                            *
+ * Comments: This function builds sql insert statement from the non NULL      *
+ *           parameters and executes it.                                      *
+ *           For Oracle databases parameter binding is used.                  *
+ *                                                                            *
+ *           The order of fields is:                                          *
+ *                1. alertid                                                  *
+ *                2. actionid                                                 *
+ *                3. eventid                                                  *
+ *                4. userid                                                   *
+ *                5. clock                                                    *
+ *                6. mediatypeid                                              *
+ *                7. sendto                                                   *
+ *                8. subject                                                  *
+ *                9. message                                                  *
+ *               10. status                                                   *
+ *               11. retries                                                  *
+ *               12. error                                                    *
+ *               13. esc_step                                                 *
+ *               14. alerttype                                                *
+ *                                                                            *
+ ******************************************************************************/
+static int	db_insert_alert(const zbx_uint64_t *alertid, const zbx_uint64_t *actionid, const zbx_uint64_t *eventid,
+		const zbx_uint64_t *userid, const int *clock, const zbx_uint64_t *mediatypeid, const char *sendto,
+		const char *subject, const char *message, const int *status, const int *retries, const char *error,
+		const int *esc_step, const int *alerttype)
+{
+	int			ret;
+	zbx_sql_insert_t	sql;
+
+	sql_insert_init(&sql);
+
+	sql_insert_fields_begin(&sql);
+	sql_insert_fields_add_uint64(&sql, "alertid", alertid);
+	sql_insert_fields_add_uint64(&sql, "actionid", actionid);
+	sql_insert_fields_add_uint64(&sql, "eventid", eventid);
+	sql_insert_fields_add_uint64(&sql, "userid", userid);
+	sql_insert_fields_add_int(&sql, "clock", clock);
+	sql_insert_fields_add_uint64(&sql, "mediatypeid", mediatypeid);
+	sql_insert_fields_add_str(&sql, "sendto", sendto, ALERT_SENDTO_LEN);
+	sql_insert_fields_add_str(&sql, "subject", subject, ALERT_SUBJECT_LEN);
+	sql_insert_fields_add_str(&sql, "message", message, ALERT_MESSAGE_LEN);
+	sql_insert_fields_add_int(&sql, "status", status);
+	sql_insert_fields_add_int(&sql, "retries", retries);
+	sql_insert_fields_add_str(&sql, "error", error, ALERT_ERROR_LEN);
+	sql_insert_fields_add_int(&sql, "esc_step", esc_step);
+	sql_insert_fields_add_int(&sql, "alerttype", alerttype);
+	sql_insert_fields_end(&sql);
+
+	sql_insert_prepare(&sql);
+
+	sql_insert_fields_bind_uint64(&sql, alertid);
+	sql_insert_fields_bind_uint64(&sql, actionid);
+	sql_insert_fields_bind_uint64(&sql, eventid);
+	sql_insert_fields_bind_uint64(&sql, userid);
+	sql_insert_fields_bind_int(&sql, clock);
+	sql_insert_fields_bind_uint64(&sql, mediatypeid);
+	sql_insert_fields_bind_str(&sql, sendto);
+	sql_insert_fields_bind_str(&sql, subject);
+	sql_insert_fields_bind_str(&sql, message);
+	sql_insert_fields_bind_int(&sql, status);
+	sql_insert_fields_bind_int(&sql, retries);
+	sql_insert_fields_bind_str(&sql, error);
+	sql_insert_fields_bind_int(&sql, esc_step);
+	sql_insert_fields_bind_int(&sql, alerttype);
+
+	ret = sql_insert_execute(&sql);
+
+	sql_insert_clean(&sql);
+
+	return ret;
+}
+
 static void	add_command_alert(DC_HOST *host, zbx_uint64_t eventid, zbx_uint64_t actionid,
 		int esc_step, const char *command, zbx_alert_status_t status, const char *error)
 {
 	const char	*__function_name = "add_command_alert";
 	zbx_uint64_t	alertid;
-	int		now;
-	char		*tmp = NULL, *command_esc, *error_esc;
+	int		now, alerttype = ALERT_TYPE_COMMAND, alert_status = status;
+	char		*tmp = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	alertid = DBget_maxid("alerts");
 	now = (int)time(NULL);
 	tmp = zbx_dsprintf(tmp, "%s:%s", host->host, NULL == command ? "" : command);
-	command_esc = DBdyn_escape_string_len(tmp, ALERT_MESSAGE_LEN);
-	error_esc = DBdyn_escape_string_len(error, ALERT_ERROR_LEN);
+
+	db_insert_alert(&alertid, &actionid, &eventid, NULL, &now, NULL, NULL, NULL, tmp, &alert_status, NULL, error,
+			&esc_step, &alerttype);
+
 	zbx_free(tmp);
-
-	DBexecute("insert into alerts"
-			" (alertid,actionid,eventid,clock,message,status,error,alerttype,esc_step)"
-			" values "
-			"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s',%d,'%s',%d,%d)",
-			alertid, actionid, eventid, now, command_esc, (int)status,
-			error_esc, ALERT_TYPE_COMMAND, esc_step);
-
-	zbx_free(error_esc);
-	zbx_free(command_esc);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -585,8 +813,7 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVE
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	alertid;
-	int		now, severity, medias = 0;
-	char		*sendto_esc, *error_esc, *subject_esc, *message_esc;
+	int		now, severity, medias = 0, alerttype = ALERT_TYPE_MESSAGE;
 	char		error[MAX_STRING_LEN];
 	DB_EVENT	*c_event;
 
@@ -594,9 +821,6 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVE
 
 	c_event = (NULL != r_event ? r_event : event);
 	now = time(NULL);
-
-	subject_esc = DBdyn_escape_string_len(subject, ALERT_SUBJECT_LEN);
-	message_esc = DBdyn_escape_string_len(message, ALERT_MESSAGE_LEN);
 
 	if (0 == mediatypeid)
 	{
@@ -643,87 +867,39 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVE
 		}
 
 		alertid = DBget_maxid("alerts");
-		sendto_esc = DBdyn_escape_string_len(row[1], ALERT_SENDTO_LEN);
 
 		if (MEDIA_TYPE_STATUS_ACTIVE == atoi(row[4]))
 		{
-			DBexecute("insert into alerts (alertid,actionid,eventid,userid,clock"
-					",mediatypeid,sendto,subject,message,status,alerttype,esc_step)"
-					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d"
-					"," ZBX_FS_UI64 ",'%s','%s','%s',%d,%d,%d)",
-					alertid,
-					action->actionid,
-					c_event->eventid,
-					userid,
-					now,
-					mediatypeid,
-					sendto_esc,
-					subject_esc,
-					message_esc,
-					ALERT_STATUS_NOT_SENT,
-					ALERT_TYPE_MESSAGE,
-					escalation->esc_step);
+			int	status = ALERT_STATUS_NOT_SENT;
+
+			db_insert_alert(&alertid, &action->actionid, &c_event->eventid, &userid, &now, &mediatypeid,
+					row[1], subject, message, &status, NULL, NULL, &escalation->esc_step,
+					&alerttype);
 		}
 		else
 		{
-			error_esc = DBdyn_escape_string("Media type disabled");
+			int	status = ALERT_STATUS_FAILED;
 
-			DBexecute("insert into alerts (alertid,actionid,eventid,userid,clock"
-					",mediatypeid,sendto,subject,message,status,alerttype,esc_step,error)"
-					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d"
-					"," ZBX_FS_UI64 ",'%s','%s','%s',%d,%d,%d,'%s')",
-					alertid,
-					action->actionid,
-					c_event->eventid,
-					userid,
-					now,
-					mediatypeid,
-					sendto_esc,
-					subject_esc,
-					message_esc,
-					ALERT_STATUS_FAILED,
-					ALERT_TYPE_MESSAGE,
-					escalation->esc_step,
-					error_esc);
-
-			zbx_free(error_esc);
+			db_insert_alert(&alertid, &action->actionid, &c_event->eventid, &userid, &now, &mediatypeid,
+					row[1], subject, message, &status, NULL, "Media type disabled",
+					&escalation->esc_step, &alerttype);
 		}
-
-		zbx_free(sendto_esc);
 	}
 
 	DBfree_result(result);
 
 	if (0 == medias)
 	{
+		int	retries = ALERT_MAX_RETRIES, status = ALERT_STATUS_FAILED;
+
 		zbx_snprintf(error, sizeof(error), "No media defined for user \"%s\"",
 				zbx_user_string(userid));
 
-		alertid		= DBget_maxid("alerts");
-		error_esc	= DBdyn_escape_string(error);
+		alertid = DBget_maxid("alerts");
 
-		DBexecute("insert into alerts (alertid,actionid,eventid,userid,retries,clock"
-				",subject,message,status,alerttype,error,esc_step)"
-				" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d"
-				",'%s','%s',%d,%d,'%s',%d)",
-				alertid,
-				action->actionid,
-				c_event->eventid,
-				userid,
-				ALERT_MAX_RETRIES,
-				now,
-				subject_esc,
-				message_esc,
-				ALERT_STATUS_FAILED,
-				ALERT_TYPE_MESSAGE,
-				error_esc,
-				escalation->esc_step);
-
-		zbx_free(error_esc);
+		db_insert_alert(&alertid, &action->actionid, &c_event->eventid, &userid, &now, NULL,
+				NULL, subject, message, &status, &retries, error, &escalation->esc_step, &alerttype);
 	}
-
-	zbx_free(subject_esc);
-	zbx_free(message_esc);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

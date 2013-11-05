@@ -857,7 +857,10 @@ class CZBXAPI {
 
 		$filter = array();
 		foreach ($options['filter'] as $field => $value) {
-			if (!isset($tableSchema['fields'][$field]) || zbx_empty($value)) {
+			// skip missing fields and text fields (not supported by Oracle)
+			// skip empty values
+			if (!isset($tableSchema['fields'][$field]) || $tableSchema['fields'][$field]['type'] == DB::FIELD_TYPE_TEXT
+					|| zbx_empty($value)) {
 				continue;
 			}
 

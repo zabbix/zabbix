@@ -1463,9 +1463,11 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(const zbx_vmware_service_t *ser
 		const char *id, char **error)
 {
 	const char	*__function_name = "vmware_service_create_vm";
+
 	zbx_vmware_vm_t	*vm;
 	int		ret = FAIL;
 	char		*value;
+	const char	*uuid_xpath[3] = {NULL, ZBX_XPATH_LN1("uuid"), ZBX_XPATH_LN1("instanceUuid")};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() vmid:'%s'", __function_name, id);
 
@@ -1477,7 +1479,7 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(const zbx_vmware_service_t *ser
 	if (SUCCEED != vmware_service_get_vm_data(service, easyhandle, id, &vm->details, error))
 		goto out;
 
-	if (NULL == (value = zbx_xml_read_value(vm->details, ZBX_XPATH_LN1("uuid"))))
+	if (NULL == (value = zbx_xml_read_value(vm->details, uuid_xpath[service->type])))
 		goto out;
 
 	vm->uuid = value;
@@ -1740,7 +1742,6 @@ static zbx_vmware_hv_t	*vmware_service_create_hv(const zbx_vmware_service_t *ser
 
 	ret = SUCCEED;
 out:
-
 	zbx_vector_str_clean(&vms);
 	zbx_vector_str_destroy(&vms);
 

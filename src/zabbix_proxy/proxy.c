@@ -643,10 +643,6 @@ int	MAIN_ZABBIX_ENTRY()
 
 	zbx_free_config();
 
-	DBinit();
-	if (SUCCEED != DBcheck_version())
-		exit(EXIT_FAILURE);
-
 	init_database_cache();
 	init_configuration_cache();
 	init_selfmon_collector();
@@ -654,6 +650,10 @@ int	MAIN_ZABBIX_ENTRY()
 	/* initialize vmware support */
 	if (0 != CONFIG_VMWARE_FORKS)
 		zbx_vmware_init();
+
+	DBinit();
+	if (SUCCEED != DBcheck_version())
+		exit(EXIT_FAILURE);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	DCsync_configuration();
