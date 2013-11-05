@@ -9,6 +9,7 @@ New features:
 ..F....... [ZBXNEXT-1851] hid American English, Greek and Polish translations from the frontend (Richlv)
 
 Bug fixes:
+..F....... [ZBX-6528] fixed highlighting unmonitored hosts in Host inventory page (Ivo)
 A.F....... [ZBX-7259] fixed "Show lines" field in Configuration > Screen > cell element to be a value between 1 and 100 (Ivo)
 ..F....... [ZBX-7286] fixed displaying double quotes as HTML entities in trigger menu pop-ups (Ivo)
 ..F....... [ZBX-7284] fixed incorrect permissions when selecting a screen element from pop-up in screens and slideshow pages (Ivo)
