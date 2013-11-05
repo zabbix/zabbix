@@ -134,7 +134,7 @@ $allowedSrcFields = array(
 	'graphs'				=> '"graphid", "name"',
 	'sysmaps'				=> '"sysmapid", "name"',
 	'slides'				=> '"slideshowid"',
-	'help_items'			=> '"key_"',
+	'help_items'			=> '"key"',
 	'overview'				=> '"groupid", "name"',
 	'screens'				=> '"screenid"',
 	'screens2'				=> '"screenid", "name"',
@@ -682,12 +682,12 @@ elseif ($srctbl == 'help_items') {
 	$table = new CTableInfo(_('No item keys found.'));
 	$table->setHeader(array(_('Key'), _('Name')));
 
-	$result = DBselect('SELECT hi.* FROM help_items hi WHERE hi.itemtype='.zbx_dbstr($itemtype).' ORDER BY hi.key_');
-	while ($row = DBfetch($result)) {
-		$action = get_window_opener($dstfrm, $dstfld1, html_entity_decode($row[$srcfld1])).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
-		$name = new CSpan($row['key_'], 'link');
+	$helpItems = new CHelpItems();
+	foreach ($helpItems->getByType($itemtype) as $helpItem) {
+		$action = get_window_opener($dstfrm, $dstfld1, $helpItem[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
+		$name = new CSpan($helpItem['key'], 'link');
 		$name->setAttribute('onclick', $action.' close_window(); return false;');
-		$table->addRow(array($name, $row['description']));
+		$table->addRow(array($name, $helpItem['description']));
 	}
 	$table->show();
 }
