@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-04 14:50+0200\n"
+"POT-Creation-Date: 2013-11-05 09:03+0200\n"
 "PO-Revision-Date: 2013-01-09 22:10+0200\n"
 "Last-Translator: Robert <szenasy.robert@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -916,7 +916,7 @@ msgstr ""
 msgid "Bitwise AND of last (most recent) T value and mask is NOT N"
 msgstr ""
 
-#: include/classes/core/ZBase.php:233
+#: include/classes/core/ZBase.php:234
 msgid "Black & Blue"
 msgstr "Fekete & kék"
 
@@ -2372,7 +2372,7 @@ msgstr ""
 msgid "Circular template linkage is not allowed."
 msgstr ""
 
-#: include/classes/core/ZBase.php:231
+#: include/classes/core/ZBase.php:232
 msgid "Classic"
 msgstr ""
 
@@ -3131,7 +3131,7 @@ msgstr ""
 msgid "Daily"
 msgstr "Napi"
 
-#: include/classes/core/ZBase.php:234
+#: include/classes/core/ZBase.php:235
 msgid "Dark orange"
 msgstr ""
 
@@ -5398,7 +5398,7 @@ msgstr ""
 msgid "Height"
 msgstr "Magasság"
 
-#: include/page_header.php:203 include/views/general.login.php:40
+#: include/page_header.php:203 include/views/general.login.php:38
 msgid "Help"
 msgstr "Segítség"
 
@@ -7967,7 +7967,7 @@ msgstr ""
 msgid "Login"
 msgstr "Belépés"
 
-#: include/views/general.login.php:82
+#: include/views/general.login.php:80
 msgid "Login as Guest"
 msgstr ""
 
@@ -10068,7 +10068,7 @@ msgstr "Operátor"
 msgid "Original"
 msgstr "Eredeti"
 
-#: include/classes/core/ZBase.php:232
+#: include/classes/core/ZBase.php:233
 msgid "Original blue"
 msgstr "Eredeti kék"
 
@@ -10386,7 +10386,7 @@ msgstr ""
 #: include/views/configuration.item.edit.php:192
 #: include/views/configuration.item.massupdate.php:246
 #: include/views/configuration.item.massupdate.php:290
-#: include/views/general.login.php:70
+#: include/views/general.login.php:69
 #: include/views/js/configuration.item.edit.js.php:138
 msgid "Password"
 msgstr "Jelszó"
@@ -10887,7 +10887,7 @@ msgstr "Reguláris kifejezés frissítve"
 msgid "Regular expressions"
 msgstr "Reguláris kifejezések"
 
-#: include/views/general.login.php:76
+#: include/views/general.login.php:74
 msgid "Remember me for 30 days"
 msgstr ""
 
@@ -12012,7 +12012,7 @@ msgstr "Munkaidő megjelenítése"
 msgid "Shown"
 msgstr ""
 
-#: include/views/general.login.php:79 index.php:55 index.php:64
+#: include/views/general.login.php:77 index.php:55 index.php:64
 msgid "Sign in"
 msgstr ""
 
@@ -12380,7 +12380,7 @@ msgstr ""
 msgid "Sunday"
 msgstr "Vasárnap"
 
-#: include/views/general.login.php:42
+#: include/views/general.login.php:40
 msgid "Support"
 msgstr ""
 
@@ -14307,7 +14307,7 @@ msgid "Zabbix"
 msgstr "Zabbix"
 
 #: include/page_footer.php:103 include/views/general.browserwarning.php:60
-#: include/views/general.login.php:50
+#: include/views/general.login.php:48
 #, c-format
 msgid "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
 msgstr ""
