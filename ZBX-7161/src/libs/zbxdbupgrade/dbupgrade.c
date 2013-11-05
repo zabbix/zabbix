@@ -86,6 +86,14 @@
 #	define ZBX_TYPE_SHORTTEXT_STR	"text"
 #endif
 
+#if defined(HAVE_IBM_DB2)
+#	define ZBX_TYPE_TEXT_STR	"varchar(2048)"
+#elif defined(HAVE_ORACLE)
+#	define ZBX_TYPE_TEXT_STR	"nclob"
+#else
+#	define ZBX_TYPE_TEXT_STR	"text"
+#endif
+
 #define ZBX_FIRST_DB_VERSION		2010000
 
 typedef struct
@@ -211,6 +219,9 @@ static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offse
 			break;
 		case ZBX_TYPE_SHORTTEXT:
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_SHORTTEXT_STR);
+			break;
+		case ZBX_TYPE_TEXT:
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_TEXT_STR);
 			break;
 		default:
 			assert(0);
@@ -2268,7 +2279,7 @@ static int	DBpatch_2010194(void)
  *                                                                            *
  * Function: replace_key_param                                                *
  *                                                                            *
- * Comments: auxiliary function for DBpatch_2010194()                         *
+ * Comments: auxiliary function for DBpatch_2010195()                         *
  *                                                                            *
  ******************************************************************************/
 static char	*replace_key_param(const char *data, int key_type, int level, int num, int quoted, void *cb_data)
@@ -2295,7 +2306,6 @@ static char	*replace_key_param(const char *data, int key_type, int level, int nu
 	quote_key_param(&new_param, quoted);
 
 	return new_param;
-
 }
 
 static int	DBpatch_2010195(void)
@@ -2314,13 +2324,13 @@ static int	DBpatch_2010195(void)
 		if (SUCCEED != replace_key_params_dyn(&key, ZBX_KEY_TYPE_ITEM, replace_key_param, NULL,
 				error, sizeof(error)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot convert item key \"%s\": %s.", row[1], error);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot convert item key \"%s\": %s", row[1], error);
 			continue;
 		}
 
 		if (255 /* ITEM_KEY_LEN */ < zbx_strlen_utf8(key))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot convert item key \"%s\": key is too long.", row[1]);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot convert item key \"%s\": key is too long", row[1]);
 			continue;
 		}
 
@@ -2339,6 +2349,46 @@ static int	DBpatch_2010195(void)
 	zbx_free(key);
 
 	return ret;
+}
+
+static int	DBpatch_2010196(void)
+{
+#ifdef HAVE_ORACLE
+	const ZBX_FIELD	field = {"message_tmp", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("alerts", &field);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_2010197(void)
+{
+#ifdef HAVE_ORACLE
+	return ZBX_DB_OK > DBexecute("update alerts set message_tmp=message") ? FAIL : SUCCEED;
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_2010198(void)
+{
+#ifdef HAVE_ORACLE
+	return DBdrop_field("alerts", "message");
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_2010199(void)
+{
+#ifdef HAVE_ORACLE
+	const ZBX_FIELD	field = {"message", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBrename_field("alerts", "message_tmp", &field);
+#else
+	return SUCCEED;
+#endif
 }
 
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
@@ -2583,6 +2633,10 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010193, 0, 0)
 	DBPATCH_ADD(2010194, 0, 1)
 	DBPATCH_ADD(2010195, 0, 1)
+	DBPATCH_ADD(2010196, 0, 1)
+	DBPATCH_ADD(2010197, 0, 1)
+	DBPATCH_ADD(2010198, 0, 1)
+	DBPATCH_ADD(2010199, 0, 1)
 
 	DBPATCH_END()
 

@@ -263,6 +263,12 @@
 				tolerance: 'pointer',
 				opacity: 0.6,
 				update: recalculateSortOrder,
+				helper: function(e, ui) {
+					ui.children().each(function() {
+						jQuery(this).width(jQuery(this).width());
+					});
+					return ui;
+				},
 				start: function(e, ui) {
 					jQuery(ui.placeholder).height(jQuery(ui.helper).height());
 				}
@@ -307,7 +313,10 @@
 				}
 			});
 
-			jQuery('#previewTab img').attr('src', 'styles/themes/<?php echo getUserTheme(CWebUser::$data); ?>/images/preloader.gif');
+			jQuery('#previewTab img')
+				.attr('src', 'styles/themes/<?php echo getUserTheme(CWebUser::$data); ?>/images/preloader.gif')
+				.width(80)
+				.height(12);
 			jQuery('<img />').attr('src', name + '?period=3600' + src).load(function() {
 				jQuery('#previewChar img').remove();
 				jQuery('#previewChar').append(jQuery(this));
