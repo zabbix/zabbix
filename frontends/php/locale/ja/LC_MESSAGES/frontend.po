@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-04 14:50+0200\n"
+"POT-Creation-Date: 2013-11-05 09:03+0200\n"
 "PO-Revision-Date: 2013-11-04 07:37+0300\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -909,7 +909,7 @@ msgstr "最新(T秒前/T個前)の値とマスクのANDビット演算 = N"
 msgid "Bitwise AND of last (most recent) T value and mask is NOT N"
 msgstr "最新(T秒前/T個前)の値とマスクのANDビット演算  NOT N"
 
-#: include/classes/core/ZBase.php:233
+#: include/classes/core/ZBase.php:234
 msgid "Black & Blue"
 msgstr "Black & Blue"
 
@@ -2361,7 +2361,7 @@ msgstr "テンプレート%1$sに循環参照が存在します。"
 msgid "Circular template linkage is not allowed."
 msgstr "テンプレートの循環リンクは行えません。"
 
-#: include/classes/core/ZBase.php:231
+#: include/classes/core/ZBase.php:232
 msgid "Classic"
 msgstr "クラシック"
 
@@ -3131,7 +3131,7 @@ msgstr "DOWN"
 msgid "Daily"
 msgstr "毎日"
 
-#: include/classes/core/ZBase.php:234
+#: include/classes/core/ZBase.php:235
 msgid "Dark orange"
 msgstr "Dark orange"
 
@@ -5397,7 +5397,7 @@ msgstr "ハードウェア (詳細)"
 msgid "Height"
 msgstr "高さ"
 
-#: include/page_header.php:203 include/views/general.login.php:40
+#: include/page_header.php:203 include/views/general.login.php:38
 msgid "Help"
 msgstr "ヘルプ"
 
@@ -7965,7 +7965,7 @@ msgstr "次のユーザーでログイン"
 msgid "Login"
 msgstr "ログイン"
 
-#: include/views/general.login.php:82
+#: include/views/general.login.php:80
 msgid "Login as Guest"
 msgstr "ゲストとしてログイン"
 
@@ -10060,7 +10060,7 @@ msgstr "オペレータ"
 msgid "Original"
 msgstr "変更なし"
 
-#: include/classes/core/ZBase.php:232
+#: include/classes/core/ZBase.php:233
 msgid "Original blue"
 msgstr "Original blue"
 
@@ -10378,7 +10378,7 @@ msgstr "パッシブ"
 #: include/views/configuration.item.edit.php:192
 #: include/views/configuration.item.massupdate.php:246
 #: include/views/configuration.item.massupdate.php:290
-#: include/views/general.login.php:70
+#: include/views/general.login.php:69
 #: include/views/js/configuration.item.edit.js.php:138
 msgid "Password"
 msgstr "パスワード"
@@ -10877,7 +10877,7 @@ msgstr "正規表現を更新しました"
 msgid "Regular expressions"
 msgstr "正規表現"
 
-#: include/views/general.login.php:76
+#: include/views/general.login.php:74
 msgid "Remember me for 30 days"
 msgstr "30日間記憶する"
 
@@ -12002,7 +12002,7 @@ msgstr "ワーキングタイムの表示"
 msgid "Shown"
 msgstr "表示"
 
-#: include/views/general.login.php:79 index.php:55 index.php:64
+#: include/views/general.login.php:77 index.php:55 index.php:64
 msgid "Sign in"
 msgstr "サインイン"
 
@@ -12370,7 +12370,7 @@ msgstr "日"
 msgid "Sunday"
 msgstr "日曜"
 
-#: include/views/general.login.php:42
+#: include/views/general.login.php:40
 msgid "Support"
 msgstr "サポート"
 
@@ -14294,7 +14294,7 @@ msgid "Zabbix"
 msgstr "Zabbix"
 
 #: include/page_footer.php:103 include/views/general.browserwarning.php:60
-#: include/views/general.login.php:50
+#: include/views/general.login.php:48
 #, c-format
 msgid "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
 msgstr "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
