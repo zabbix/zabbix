@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-04 14:50+0200\n"
+"POT-Creation-Date: 2013-11-05 09:03+0200\n"
 "PO-Revision-Date: 2013-11-03 16:01+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -925,7 +925,7 @@ msgstr "Bitové A poslednej hodnoty T a maska je = N"
 msgid "Bitwise AND of last (most recent) T value and mask is NOT N"
 msgstr "Bitové A poslednej hodnoty T a maska NIE JE N"
 
-#: include/classes/core/ZBase.php:233
+#: include/classes/core/ZBase.php:234
 msgid "Black & Blue"
 msgstr "Čierna a modrá"
 
@@ -2384,7 +2384,7 @@ msgstr "Kruhový odkaz v šablónach: %1$s."
 msgid "Circular template linkage is not allowed."
 msgstr "Kruhové odkazovanie šablón nie je povolené."
 
-#: include/classes/core/ZBase.php:231
+#: include/classes/core/ZBase.php:232
 msgid "Classic"
 msgstr "Klasická"
 
@@ -3155,7 +3155,7 @@ msgstr "DOWN"
 msgid "Daily"
 msgstr "Denne"
 
-#: include/classes/core/ZBase.php:234
+#: include/classes/core/ZBase.php:235
 msgid "Dark orange"
 msgstr "Tmavo oranžová"
 
@@ -5423,7 +5423,7 @@ msgstr "Hardvér (podrobnosti)"
 msgid "Height"
 msgstr "Výška"
 
-#: include/page_header.php:203 include/views/general.login.php:40
+#: include/page_header.php:203 include/views/general.login.php:38
 msgid "Help"
 msgstr "Pomoc"
 
@@ -7993,7 +7993,7 @@ msgstr "Prihlásený ako"
 msgid "Login"
 msgstr "Prihlásiť"
 
-#: include/views/general.login.php:82
+#: include/views/general.login.php:80
 msgid "Login as Guest"
 msgstr "Prihlásiť ako Hosť"
 
@@ -10100,7 +10100,7 @@ msgstr "Operátor"
 msgid "Original"
 msgstr "Originálny"
 
-#: include/classes/core/ZBase.php:232
+#: include/classes/core/ZBase.php:233
 msgid "Original blue"
 msgstr "Pôvodná modrá"
 
@@ -10418,7 +10418,7 @@ msgstr "Pasívny"
 #: include/views/configuration.item.edit.php:192
 #: include/views/configuration.item.massupdate.php:246
 #: include/views/configuration.item.massupdate.php:290
-#: include/views/general.login.php:70
+#: include/views/general.login.php:69
 #: include/views/js/configuration.item.edit.js.php:138
 msgid "Password"
 msgstr "Heslo"
@@ -10919,7 +10919,7 @@ msgstr "Regulárny výraz aktualizovaný"
 msgid "Regular expressions"
 msgstr "Regulárne výrazy"
 
-#: include/views/general.login.php:76
+#: include/views/general.login.php:74
 msgid "Remember me for 30 days"
 msgstr "Zapamätať moje prihlásenie na 30 dní"
 
@@ -12044,7 +12044,7 @@ msgstr "Zobraziť pracovný čas"
 msgid "Shown"
 msgstr "Zobraz"
 
-#: include/views/general.login.php:79 index.php:55 index.php:64
+#: include/views/general.login.php:77 index.php:55 index.php:64
 msgid "Sign in"
 msgstr "Prihlásiť sa"
 
@@ -12412,7 +12412,7 @@ msgstr "Ned"
 msgid "Sunday"
 msgstr "Nedeľa"
 
-#: include/views/general.login.php:42
+#: include/views/general.login.php:40
 msgid "Support"
 msgstr "Podpora"
 
@@ -14342,7 +14342,7 @@ msgid "Zabbix"
 msgstr "Zabbix"
 
 #: include/page_footer.php:103 include/views/general.browserwarning.php:60
-#: include/views/general.login.php:50
+#: include/views/general.login.php:48
 #, c-format
 msgid "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
 msgstr "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"

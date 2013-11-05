@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-04 14:50+0200\n"
+"POT-Creation-Date: 2013-11-05 09:03+0200\n"
 "PO-Revision-Date: 2013-09-11 18:19+0300\n"
 "Last-Translator: altmir <rmircea@birotec.ro>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -925,7 +925,7 @@ msgstr "Operațiunea ȘI a ultimei (cea mai recentă) valori T și mască este =
 msgid "Bitwise AND of last (most recent) T value and mask is NOT N"
 msgstr "Operațiunea ȘI a ultimei (cea mai recentă) valori T și mască NU este = N"
 
-#: include/classes/core/ZBase.php:233
+#: include/classes/core/ZBase.php:234
 msgid "Black & Blue"
 msgstr "Negru & Albastru"
 
@@ -2383,7 +2383,7 @@ msgstr "Refefință circulară în șabloanele: %1$s."
 msgid "Circular template linkage is not allowed."
 msgstr "Legătura circulară în șabloane nu este permisă."
 
-#: include/classes/core/ZBase.php:231
+#: include/classes/core/ZBase.php:232
 msgid "Classic"
 msgstr "Clasic"
 
@@ -3153,7 +3153,7 @@ msgstr "INACTIV"
 msgid "Daily"
 msgstr "Zilnic"
 
-#: include/classes/core/ZBase.php:234
+#: include/classes/core/ZBase.php:235
 msgid "Dark orange"
 msgstr "Portocaliu închis"
 
@@ -5421,7 +5421,7 @@ msgstr ""
 msgid "Height"
 msgstr ""
 
-#: include/page_header.php:203 include/views/general.login.php:40
+#: include/page_header.php:203 include/views/general.login.php:38
 msgid "Help"
 msgstr ""
 
@@ -7991,7 +7991,7 @@ msgstr ""
 msgid "Login"
 msgstr ""
 
-#: include/views/general.login.php:82
+#: include/views/general.login.php:80
 msgid "Login as Guest"
 msgstr ""
 
@@ -10098,7 +10098,7 @@ msgstr ""
 msgid "Original"
 msgstr ""
 
-#: include/classes/core/ZBase.php:232
+#: include/classes/core/ZBase.php:233
 msgid "Original blue"
 msgstr ""
 
@@ -10416,7 +10416,7 @@ msgstr ""
 #: include/views/configuration.item.edit.php:192
 #: include/views/configuration.item.massupdate.php:246
 #: include/views/configuration.item.massupdate.php:290
-#: include/views/general.login.php:70
+#: include/views/general.login.php:69
 #: include/views/js/configuration.item.edit.js.php:138
 msgid "Password"
 msgstr ""
@@ -10917,7 +10917,7 @@ msgstr ""
 msgid "Regular expressions"
 msgstr ""
 
-#: include/views/general.login.php:76
+#: include/views/general.login.php:74
 msgid "Remember me for 30 days"
 msgstr ""
 
@@ -12042,7 +12042,7 @@ msgstr ""
 msgid "Shown"
 msgstr ""
 
-#: include/views/general.login.php:79 index.php:55 index.php:64
+#: include/views/general.login.php:77 index.php:55 index.php:64
 msgid "Sign in"
 msgstr ""
 
@@ -12410,7 +12410,7 @@ msgstr ""
 msgid "Sunday"
 msgstr ""
 
-#: include/views/general.login.php:42
+#: include/views/general.login.php:40
 msgid "Support"
 msgstr ""
 
@@ -14340,7 +14340,7 @@ msgid "Zabbix"
 msgstr ""
 
 #: include/page_footer.php:103 include/views/general.browserwarning.php:60
-#: include/views/general.login.php:50
+#: include/views/general.login.php:48
 #, c-format
 msgid "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
 msgstr ""
