@@ -5,6 +5,7 @@ New features:
 ..F....... [ZBXNEXT-1851] hid American English, Greek and Polish translations from the frontend (Richlv)
 
 Bug fixes:
+........S. [ZBX-7258] fixed vCenter VMs unique identifier for host names (Sasha)
 ..F....... [ZBX-7283] fixed latest data table layout issues when switching hosts and the "Show details" filter (Pavels)
 ..F....... [ZBX-5854] fixed host status indicator not displaying maintenance status in the host configuration form header (Pavels)
 ..F....... [ZBX-7242] fixed sortable table elements not to change width while dragging them (Ivo)
