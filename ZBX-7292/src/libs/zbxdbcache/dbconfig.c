@@ -2202,7 +2202,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 
 			if (0 != macros)
 			{
-				DCget_host_by_hostid(&host, hostid);
+				DCget_host_by_hostid(&host, interface->hostid);
 
 				if (0 != (macros & 0x01))
 				{
