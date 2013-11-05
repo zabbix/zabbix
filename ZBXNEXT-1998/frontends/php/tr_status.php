@@ -559,7 +559,7 @@ foreach ($triggers as $trigger) {
 	$triggerItems = array();
 
 	foreach ($trigger['items'] as $item) {
-		$itemName = htmlspecialchars(itemName($item));
+		$itemName = itemName($item);
 
 		// if we have items from different hosts, we must prefix a host name
 		if ($usedHostCount > 1) {

@@ -48,7 +48,7 @@ function mbstrings_available() {
 function getLocales() {
 	return array(
 		'en_GB' => array('name' => _('English (en_GB)'),	'display' => true),
-		'en_US' => array('name' => _('English (en_US)'),	'display' => true),
+		'en_US' => array('name' => _('English (en_US)'),	'display' => false),
 		'bg_BG' => array('name' => _('Bulgarian (bg_BG)'),	'display' => true),
 		'zh_CN' => array('name' => _('Chinese (zh_CN)'),	'display' => true),
 		'zh_TW' => array('name' => _('Chinese (zh_TW)'),	'display' => true),
@@ -57,7 +57,7 @@ function getLocales() {
 		'fi_FI' => array('name' => _('Finnish (fi_FI)'),	'display' => false),
 		'fr_FR' => array('name' => _('French (fr_FR)'),		'display' => true),
 		'de_DE' => array('name' => _('German (de_DE)'),		'display' => true),
-		'el_GR' => array('name' => _('Greek (el_GR)'),		'display' => true),
+		'el_GR' => array('name' => _('Greek (el_GR)'),		'display' => false),
 		'hu_HU' => array('name' => _('Hungarian (hu_HU)'),	'display' => false),
 		'id_ID' => array('name' => _('Indonesian (id_ID)'),	'display' => true),
 		'it_IT' => array('name' => _('Italian (it_IT)'),	'display' => true),
@@ -66,7 +66,7 @@ function getLocales() {
 		'lv_LV' => array('name' => _('Latvian (lv_LV)'),	'display' => false),
 		'lt_LT' => array('name' => _('Lithuanian (lt_LT)'),	'display' => false),
 		'fa_IR' => array('name' => _('Persian (fa_IR)'),	'display' => false),
-		'pl_PL' => array('name' => _('Polish (pl_PL)'),		'display' => true),
+		'pl_PL' => array('name' => _('Polish (pl_PL)'),		'display' => false),
 		'pt_BR' => array('name' => _('Portuguese (pt_BR)'),	'display' => true),
 		'pt_PT' => array('name' => _('Portuguese (pt_PT)'),	'display' => true),
 		'ro_RO' => array('name' => _('Romanian (ro_RO)'),	'display' => false),
