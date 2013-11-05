@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-05 09:03+0200\n"
-"PO-Revision-Date: 2013-11-04 07:37+0300\n"
-"Last-Translator: Kodai <kodai74@gmail.com>\n"
+"POT-Creation-Date: 2013-11-05 09:04+0200\n"
+"PO-Revision-Date: 2013-11-05 02:37+0300\n"
+"Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1383543461.0\n"
+"X-POOTLE-MTIME: 1383611827.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -40,7 +40,7 @@ msgstr[0] "%1$d 日"
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
-msgstr[0] "%2$d件中%1$件の障害が表示されています"
+msgstr[0] "%2$d件中%1$d件の障害が表示されています"
 
 #: chart4.php:89 chart5.php:83
 #, c-format
@@ -1106,12 +1106,12 @@ msgstr "トリガーの設定"
 #: include/views/administration.usergroups.edit.php:23
 #: include/views/administration.usergroups.list.php:31
 msgid "CONFIGURATION OF USER GROUPS"
-msgstr ""
+msgstr "ユーザーグループの設定"
 
 #: include/views/administration.users.edit.php:30
 #: include/views/administration.users.list.php:31
 msgid "CONFIGURATION OF USERS"
-msgstr ""
+msgstr "ユーザーの設定"
 
 #: adm.valuemapping.php:147
 msgid "CONFIGURATION OF VALUE MAPPING"
@@ -2601,7 +2601,7 @@ msgstr "マクロの設定"
 
 #: maintenance.php:27
 msgid "Configuration of maintenance periods"
-msgstr ""
+msgstr "メンテナンス期間の設定"
 
 #: media_types.php:26
 msgid "Configuration of media types"
@@ -5274,7 +5274,7 @@ msgstr "ディスカバリで発見されたホストのグループ"
 #: adm.other.php:74
 #, c-format
 msgid "Group for discovered hosts \"%1$s\"."
-msgstr ""
+msgstr "ディスカバリで発見されたホスト\"%1$s\"のグループ。"
 
 #: include/views/administration.usergroups.edit.php:41
 #: include/views/configuration.hostgroups.edit.php:40
@@ -5341,7 +5341,7 @@ msgstr "イベント履歴"
 
 #: include/classes/screens/CScreenHostgroupTriggers.php:132
 msgid "HOST GROUP ISSUES"
-msgstr ""
+msgstr "ホストグループの障害"
 
 #: include/views/inventory.host.list.php:26
 #: include/views/inventory.host.view.php:24
@@ -5354,7 +5354,7 @@ msgstr "ホストインベントリの概要"
 
 #: include/classes/screens/CScreenHostTriggers.php:131
 msgid "HOST ISSUES"
-msgstr ""
+msgstr "ホストの障害"
 
 #: include/discovery.inc.php:60
 #: include/views/administration.authentication.edit.php:39
@@ -5607,7 +5607,7 @@ msgstr "ホストグループ内のホスト"
 
 #: include/screens.inc.php:39
 msgid "Host group issues"
-msgstr ""
+msgstr "ホストグループの障害"
 
 #: include/views/configuration.sysmap.edit.php:75
 msgid "Host group label type"
@@ -5646,7 +5646,7 @@ msgstr "ホストインベントリの概要"
 
 #: include/screens.inc.php:40
 msgid "Host issues"
-msgstr ""
+msgstr "ホストの障害"
 
 #: include/views/configuration.sysmap.edit.php:83
 msgid "Host label type"
@@ -8910,16 +8910,16 @@ msgstr "グラフ\"%s\"のフィールド\"ymin_type\"がありません。"
 #: include/views/configuration.host.edit.php:366
 #: include/views/configuration.host.prototype.edit.php:143
 msgid "No IPMI interfaces found."
-msgstr ""
+msgstr "IPMIインターフェースが設定されていません"
 
 #: include/views/configuration.services.child.list.php:35
 msgid "No IT services found."
-msgstr ""
+msgstr "ITサービスが設定されていません。"
 
 #: include/views/configuration.host.edit.php:353
 #: include/views/configuration.host.prototype.edit.php:130
 msgid "No JMX interfaces found."
-msgstr ""
+msgstr "JMXインターフェースが設定されていません。"
 
 #: api/classes/CItemGeneral.php:351
 msgid "No SNMP OID specified."
@@ -8932,7 +8932,7 @@ msgstr "SNMPコミュニティ名が設定されていません。"
 #: include/views/configuration.host.edit.php:340
 #: include/views/configuration.host.prototype.edit.php:117
 msgid "No SNMP interfaces found."
-msgstr ""
+msgstr "SNMPイターフェースが設定されていません。"
 
 #: api/classes/CScreenItem.php:472
 msgid "No URL provided for screen element."
@@ -8948,7 +8948,7 @@ msgstr "アクセスできるリソースがありません"
 
 #: include/acknow.inc.php:48
 msgid "No acknowledges found."
-msgstr ""
+msgstr "障害対応コメントはありません。"
 
 #: include/actions.inc.php:825 include/actions.inc.php:904
 #: include/actions.inc.php:961 include/classes/screens/CScreenActions.php:121
@@ -8959,7 +8959,7 @@ msgstr "アクションが設定されていません。"
 #: include/views/configuration.host.edit.php:326
 #: include/views/configuration.host.prototype.edit.php:103
 msgid "No agent interfaces found."
-msgstr ""
+msgstr "エージェントのインターフェースが設定されていません。"
 
 #: include/hosts.inc.php:588
 #, c-format
@@ -8969,12 +8969,12 @@ msgstr "ID\"%1$s\"を持つアプリケーションが設定されていませ�
 #: include/views/configuration.application.list.php:57
 #: include/views/configuration.httpconf.edit.php:69 popup.php:1017
 msgid "No applications found."
-msgstr ""
+msgstr "アプリケーションがありません。"
 
 #: include/views/administration.auditacts.list.php:67
 #: include/views/administration.auditlogs.list.php:83
 msgid "No audit entries found."
-msgstr ""
+msgstr "監査履歴はありません。"
 
 #: api/classes/CAction.php:1339
 #, c-format
@@ -9034,7 +9034,7 @@ msgstr "詳細がありません"
 
 #: include/views/monitoring.discovery.php:36
 msgid "No discovered devices found."
-msgstr ""
+msgstr "発見されたデバイスはありません。"
 
 #: api/classes/CHostPrototype.php:112
 #, c-format
@@ -9049,7 +9049,7 @@ msgstr "ディスカバリルールIDが設定されていません。"
 #: include/views/configuration.host.discovery.list.php:41 popup.php:1425
 #: popup.php:1445
 msgid "No discovery rules found."
-msgstr ""
+msgstr "ディスカバリルールが設定されていません。"
 
 #: jsLoader.php:178
 msgid "No elements selected!"
@@ -9066,7 +9066,7 @@ msgstr "イベントはありません"
 #: events.php:370 include/blocks.inc.php:901
 #: include/classes/screens/CScreenEvents.php:37 include/events.inc.php:198
 msgid "No events found."
-msgstr ""
+msgstr "イベントはありません。"
 
 #: acknow.php:81
 msgid "No events to acknowledge"
@@ -9097,16 +9097,16 @@ msgstr "グラフID\"%s\"のグラフアイテムがありません。"
 
 #: include/views/configuration.graph.list.php:73
 msgid "No graph prototypes found."
-msgstr ""
+msgstr "グラフのプロトタイプが設定されていません。"
 
 #: include/blocks.inc.php:28
 msgid "No graphs added."
-msgstr ""
+msgstr "グラフが追加されていません。"
 
 #: include/views/configuration.graph.list.php:73
 #: include/views/monitoring.charts.php:77 popup.php:1074
 msgid "No graphs found."
-msgstr ""
+msgstr "グラフはありません。"
 
 #: api/classes/CHost.php:701 api/classes/CHost.php:711
 #, c-format
@@ -9151,7 +9151,7 @@ msgstr "スクリーンの要素にホストグループIDが設定されてい�
 #: include/views/configuration.hostgroups.list.php:56 popup.php:1398
 #: popup_right.php:74 search.php:279
 msgid "No host groups found."
-msgstr ""
+msgstr "ホストグループはありません。"
 
 #: include/hosts.inc.php:493
 #, c-format
@@ -9160,7 +9160,7 @@ msgstr "グループID\"%s\"を持つホストグループが設定されてい�
 
 #: include/views/configuration.host.prototype.list.php:44
 msgid "No host prototypes found."
-msgstr ""
+msgstr "ホストプロトタイプが設定されていません。"
 
 #: include/hosts.inc.php:536
 #, c-format
@@ -9170,7 +9170,7 @@ msgstr "ホストID\"%s\"を持つホストが設定されていません。"
 #: hostinventoriesoverview.php:88 hosts.php:789
 #: include/views/inventory.host.list.php:74 search.php:127
 msgid "No hosts found."
-msgstr ""
+msgstr "ホストが設定されていません。"
 
 #: api/classes/CMapElement.php:70
 #, c-format
@@ -9179,7 +9179,7 @@ msgstr "マップの要素\"%s\"にアイコンが存在しません。"
 
 #: include/views/administration.general.iconmap.list.php:22
 msgid "No icon maps found."
-msgstr ""
+msgstr "アイコンのマッピングが設定されていません。"
 
 #: include/views/configuration.sysmap.edit.php:47
 msgid "No image"
@@ -9187,7 +9187,7 @@ msgstr "イメージは存在しません"
 
 #: include/views/administration.general.image.list.php:36
 msgid "No images found."
-msgstr ""
+msgstr "イメージはありません。"
 
 #: include/views/configuration.item.edit.php:112
 #: include/views/configuration.item.massupdate.php:77
@@ -9215,11 +9215,11 @@ msgstr "スクリーンの要素にアイテムIDが設定されていません�
 
 #: popup.php:682
 msgid "No item keys found."
-msgstr ""
+msgstr "アイテムのキーが設定されていません。"
 
 #: include/views/configuration.item.prototype.list.php:43 popup.php:925
 msgid "No item prototypes found."
-msgstr ""
+msgstr "アイテムのプロトタイプが設定されていません。"
 
 #: include/items.inc.php:499
 #, c-format
@@ -9238,19 +9238,19 @@ msgstr "アイテムが設定されていません。"
 #: include/items.inc.php:791 include/views/configuration.item.list.php:58
 #: include/views/monitoring.overview.php:114 popup.php:815
 msgid "No items found."
-msgstr ""
+msgstr "アイテムが設定されていません。"
 
 #: include/views/common.macros.php:26
 msgid "No macros found."
-msgstr ""
+msgstr "マクロが設定されていません。"
 
 #: include/views/configuration.maintenance.edit.php:98
 msgid "No maintenance periods defined."
-msgstr ""
+msgstr "メンテナンス期間が設定されていません。"
 
 #: include/views/configuration.maintenance.list.php:41
 msgid "No maintenance periods found."
-msgstr ""
+msgstr "メンテナンス期間が設定されていません。"
 
 #: api/classes/CScreenItem.php:460
 msgid "No map ID provided for screen element."
@@ -9258,12 +9258,12 @@ msgstr "スクリーンの要素にマップIDが設定されていません。"
 
 #: include/blocks.inc.php:150
 msgid "No maps added."
-msgstr ""
+msgstr "マップが追加されていません。"
 
 #: include/views/configuration.sysmap.list.php:40
 #: include/views/monitoring.maps.php:23 popup.php:1175
 msgid "No maps found."
-msgstr ""
+msgstr "マップが設定されていません。"
 
 #: include/classes/class.cmultiselect.php:51 jsLoader.php:192
 msgid "No matches found"
@@ -9271,19 +9271,19 @@ msgstr "条件に一致するデータはありません"
 
 #: include/views/administration.users.edit.php:155
 msgid "No media found."
-msgstr ""
+msgstr "メディアが設定されていません。"
 
 #: include/views/administration.mediatypes.list.php:36
 msgid "No media types found."
-msgstr ""
+msgstr "メディアタイプが設定されていません。"
 
 #: report4.php:73
 msgid "No notifications found."
-msgstr ""
+msgstr "通知はありません。"
 
 #: include/views/configuration.action.edit.php:332
 msgid "No operations defined."
-msgstr ""
+msgstr "アクションの実行内容が設定されていません。"
 
 #: include/classes/import/CConfigurationImport.php:880
 #: include/classes/import/CConfigurationImport.php:960
@@ -9389,7 +9389,7 @@ msgstr "秘密鍵ファイルが設定されていません。"
 
 #: include/views/administration.proxy.list.php:42 popup.php:1469
 msgid "No proxies found."
-msgstr ""
+msgstr "プロキシが設定されていません。"
 
 #: include/views/configuration.discovery.edit.php:44
 msgid "No proxy"
@@ -9414,7 +9414,7 @@ msgstr "実行するアクションのメッセージに送信先が設定され
 
 #: include/views/administration.general.regularexpressions.list.php:28
 msgid "No regular expressions found."
-msgstr ""
+msgstr "正規表現が設定されていません。"
 
 #: include/classes/screens/CScreenBuilder.php:293
 msgid "No rows in screen."
@@ -9426,14 +9426,14 @@ msgstr "スクリーンの要素にスクリーンIDが設定されていませ�
 
 #: include/blocks.inc.php:99
 msgid "No screens added."
-msgstr ""
+msgstr "スクリーンが追加されていません。"
 
 #: include/classes/screens/CScreenBuilder.php:267
 #: include/views/configuration.screen.list.php:48
 #: include/views/monitoring.hostscreen.php:32
 #: include/views/monitoring.screen.php:35 popup.php:1313 popup.php:1371
 msgid "No screens found."
-msgstr ""
+msgstr "スクリーンが設定されていません。"
 
 #: api/classes/CAction.php:1362
 msgid "No script specified for action operation command."
@@ -9441,7 +9441,7 @@ msgstr "実行するアクションのコマンドにスクリプトが設定さ
 
 #: include/views/administration.script.list.php:35 popup.php:1495
 msgid "No scripts found."
-msgstr ""
+msgstr "スクリプトが設定されていません。"
 
 #: slides.php:158
 msgid "No slide shows defined."
@@ -9450,11 +9450,11 @@ msgstr "スライドショーが設定されていません。"
 #: include/views/configuration.slideconf.list.php:37
 #: include/views/monitoring.slides.php:43
 msgid "No slide shows found."
-msgstr ""
+msgstr "スライドショーが設定されていません。"
 
 #: include/views/monitoring.slides.php:104 popup.php:1248
 msgid "No slides found."
-msgstr ""
+msgstr "スライドが設定されていません。"
 
 #: api/classes/CProxy.php:227
 msgid "No status for proxy."
@@ -9470,7 +9470,7 @@ msgstr "何も選択されていません。"
 
 #: search.php:390 templates.php:481
 msgid "No templates found."
-msgstr ""
+msgstr "テンプレートが設定されていません。"
 
 #: include/views/configuration.host.edit.php:626
 #: include/views/configuration.host.prototype.edit.php:211
@@ -9509,15 +9509,15 @@ msgstr "ユーザー IDが存在しません。"
 #: include/views/administration.usergroups.list.php:42 popup.php:559
 #: popup_usrgrp.php:89
 msgid "No user groups found."
-msgstr ""
+msgstr "ユーザーグループが設定されていません。"
 
 #: include/views/administration.users.list.php:51 popup.php:617
 msgid "No users found."
-msgstr ""
+msgstr "ユーザーが設定されていません。"
 
 #: include/views/administration.general.valuemapping.list.php:22
 msgid "No value maps found."
-msgstr ""
+msgstr "値のマッピングが設定されていません。"
 
 #: include/classes/screens/CScreenHistory.php:159
 #: include/classes/screens/CScreenHistory.php:265
@@ -9529,7 +9529,7 @@ msgstr "値が存在しません。"
 #: httpmon.php:84 include/blocks.inc.php:1074
 #: include/views/configuration.httpconf.list.php:58
 msgid "No web scenarios found."
-msgstr ""
+msgstr "ウェブシナリオが設定されていません。"
 
 #: events.php:578 events.php:591 hosts.php:792 httpmon.php:86
 #: include/actions.inc.php:68 include/audit.inc.php:42
@@ -13619,7 +13619,7 @@ msgstr "データベース停止メッセージの送信先グループ"
 #: adm.other.php:94
 #, c-format
 msgid "User group for database down message \"%1$s\"."
-msgstr ""
+msgstr "データベース停止メッセージ\"%1$s\"の送信先グループ。"
 
 #: include/views/administration.script.edit.php:78
 #: include/views/administration.usergroups.list.php:28
@@ -14774,7 +14774,7 @@ msgstr "of"
 #: include/classes/class.frontendsetup.php:589
 #: include/classes/class.frontendsetup.php:607
 msgid "off"
-msgstr ""
+msgstr "off"
 
 #: include/classes/class.frontendsetup.php:319
 #: include/classes/class.frontendsetup.php:338

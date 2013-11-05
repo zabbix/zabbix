@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-05 09:03+0200\n"
-"PO-Revision-Date: 2013-11-03 10:38+0300\n"
+"POT-Creation-Date: 2013-11-05 09:04+0200\n"
+"PO-Revision-Date: 2013-11-04 15:07+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1383467910.0\n"
+"X-POOTLE-MTIME: 1383570426.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -1115,12 +1115,12 @@ msgstr "CONFIGURAÇÃO DE TRIGGERS"
 #: include/views/administration.usergroups.edit.php:23
 #: include/views/administration.usergroups.list.php:31
 msgid "CONFIGURATION OF USER GROUPS"
-msgstr ""
+msgstr "CONFIGURAÇÃO DOS GRUPOS DE USUÁRIOS"
 
 #: include/views/administration.users.edit.php:30
 #: include/views/administration.users.list.php:31
 msgid "CONFIGURATION OF USERS"
-msgstr ""
+msgstr "CONFIGURAÇÃO DOS USUÁRIOS"
 
 #: adm.valuemapping.php:147
 msgid "CONFIGURATION OF VALUE MAPPING"
@@ -2613,7 +2613,7 @@ msgstr "Configuração das macros"
 
 #: maintenance.php:27
 msgid "Configuration of maintenance periods"
-msgstr ""
+msgstr "Configuração dos períodos de manutenção"
 
 #: media_types.php:26
 msgid "Configuration of media types"
@@ -5287,7 +5287,7 @@ msgstr "Grupo para hosts descobertos"
 #: adm.other.php:74
 #, c-format
 msgid "Group for discovered hosts \"%1$s\"."
-msgstr ""
+msgstr "Grupo para a descoberta de hosts \"%1$s\"."
 
 #: include/views/administration.usergroups.edit.php:41
 #: include/views/configuration.hostgroups.edit.php:40
@@ -5354,7 +5354,7 @@ msgstr "HISTÓRICO DE EVENTOS"
 
 #: include/classes/screens/CScreenHostgroupTriggers.php:132
 msgid "HOST GROUP ISSUES"
-msgstr ""
+msgstr "INCIDENTES DO GRUPO DE HOSTS"
 
 #: include/views/inventory.host.list.php:26
 #: include/views/inventory.host.view.php:24
@@ -5367,7 +5367,7 @@ msgstr "VISÃO GERAL DO INVENTÁRIO DE HOSTS"
 
 #: include/classes/screens/CScreenHostTriggers.php:131
 msgid "HOST ISSUES"
-msgstr ""
+msgstr "INCIDENTES DO HOST"
 
 #: include/discovery.inc.php:60
 #: include/views/administration.authentication.edit.php:39
@@ -5620,7 +5620,7 @@ msgstr "Elementos do grupo de hosts"
 
 #: include/screens.inc.php:39
 msgid "Host group issues"
-msgstr ""
+msgstr "Incidentes do grupo de hosts"
 
 #: include/views/configuration.sysmap.edit.php:75
 msgid "Host group label type"
@@ -5659,7 +5659,7 @@ msgstr "Visão geral do inventário de host"
 
 #: include/screens.inc.php:40
 msgid "Host issues"
-msgstr ""
+msgstr "Incidentes dos hosts"
 
 #: include/views/configuration.sysmap.edit.php:83
 msgid "Host label type"
@@ -8962,16 +8962,16 @@ msgstr "Falta o campo \"ymin_type\" para o gráfico \"%s\"."
 #: include/views/configuration.host.edit.php:366
 #: include/views/configuration.host.prototype.edit.php:143
 msgid "No IPMI interfaces found."
-msgstr ""
+msgstr "Nenhuma interface IPMI encontrada."
 
 #: include/views/configuration.services.child.list.php:35
 msgid "No IT services found."
-msgstr ""
+msgstr "Nenhum serviço de TI encontrado."
 
 #: include/views/configuration.host.edit.php:353
 #: include/views/configuration.host.prototype.edit.php:130
 msgid "No JMX interfaces found."
-msgstr ""
+msgstr "Nenhuma interface JMX encontrada."
 
 #: api/classes/CItemGeneral.php:351
 msgid "No SNMP OID specified."
@@ -8984,7 +8984,7 @@ msgstr "Não foi especificada a comunidade SNMP."
 #: include/views/configuration.host.edit.php:340
 #: include/views/configuration.host.prototype.edit.php:117
 msgid "No SNMP interfaces found."
-msgstr ""
+msgstr "Nenhuma interface SNMP encontrada."
 
 #: api/classes/CScreenItem.php:472
 msgid "No URL provided for screen element."
@@ -9000,7 +9000,7 @@ msgstr "Nenhum recurso acessível"
 
 #: include/acknow.inc.php:48
 msgid "No acknowledges found."
-msgstr ""
+msgstr "Nenhum reconhecimento encontrado."
 
 #: include/actions.inc.php:825 include/actions.inc.php:904
 #: include/actions.inc.php:961 include/classes/screens/CScreenActions.php:121
@@ -9011,7 +9011,7 @@ msgstr "Nenhuma ação localizada."
 #: include/views/configuration.host.edit.php:326
 #: include/views/configuration.host.prototype.edit.php:103
 msgid "No agent interfaces found."
-msgstr ""
+msgstr "Nenhuma interface de agente encontrada."
 
 #: include/hosts.inc.php:588
 #, c-format
@@ -9021,12 +9021,12 @@ msgstr "Nenhuma aplicação com o ID \"%1$s\"."
 #: include/views/configuration.application.list.php:57
 #: include/views/configuration.httpconf.edit.php:69 popup.php:1017
 msgid "No applications found."
-msgstr ""
+msgstr "Nenhuma aplicação encontrada."
 
 #: include/views/administration.auditacts.list.php:67
 #: include/views/administration.auditlogs.list.php:83
 msgid "No audit entries found."
-msgstr ""
+msgstr "Nenhuma entrada de auditoria encontrada."
 
 #: api/classes/CAction.php:1339
 #, c-format
@@ -9086,7 +9086,7 @@ msgstr "Sem detalhes"
 
 #: include/views/monitoring.discovery.php:36
 msgid "No discovered devices found."
-msgstr ""
+msgstr "Nenhum dispositivo encontrado."
 
 #: api/classes/CHostPrototype.php:112
 #, c-format
@@ -9101,7 +9101,7 @@ msgstr "Não foram informados os IDs de regra de descoberta."
 #: include/views/configuration.host.discovery.list.php:41 popup.php:1425
 #: popup.php:1445
 msgid "No discovery rules found."
-msgstr ""
+msgstr "Nenhuma regra de descoberta encontrada."
 
 #: jsLoader.php:178
 msgid "No elements selected!"
@@ -9118,7 +9118,7 @@ msgstr "Sem eventos"
 #: events.php:370 include/blocks.inc.php:901
 #: include/classes/screens/CScreenEvents.php:37 include/events.inc.php:198
 msgid "No events found."
-msgstr ""
+msgstr "Nenhum evento encontrado."
 
 #: acknow.php:81
 msgid "No events to acknowledge"
@@ -9149,16 +9149,16 @@ msgstr "Não foi localizado um gráfico com o graphid \"%s\"."
 
 #: include/views/configuration.graph.list.php:73
 msgid "No graph prototypes found."
-msgstr ""
+msgstr "Nenhum protótipo de gráfico encontrado."
 
 #: include/blocks.inc.php:28
 msgid "No graphs added."
-msgstr ""
+msgstr "Nenhum gráfico adicionado."
 
 #: include/views/configuration.graph.list.php:73
 #: include/views/monitoring.charts.php:77 popup.php:1074
 msgid "No graphs found."
-msgstr ""
+msgstr "Nenhum gráfico encontrado."
 
 #: api/classes/CHost.php:701 api/classes/CHost.php:711
 #, c-format
@@ -9208,7 +9208,7 @@ msgstr "Não foi informado o ID do grupo para um elemento da tela."
 #: include/views/configuration.hostgroups.list.php:56 popup.php:1398
 #: popup_right.php:74 search.php:279
 msgid "No host groups found."
-msgstr ""
+msgstr "Nenhum grupo de hosts encontrado."
 
 #: include/hosts.inc.php:493
 #, c-format
@@ -9217,7 +9217,7 @@ msgstr "Não existem grupos de hosts com o groupid \"%s\"."
 
 #: include/views/configuration.host.prototype.list.php:44
 msgid "No host prototypes found."
-msgstr ""
+msgstr "Nenhum protótipo de host encontrado."
 
 #: include/hosts.inc.php:536
 #, c-format
@@ -9227,7 +9227,7 @@ msgstr "Não existe host com o hostid \"%s\"."
 #: hostinventoriesoverview.php:88 hosts.php:789
 #: include/views/inventory.host.list.php:74 search.php:127
 msgid "No hosts found."
-msgstr ""
+msgstr "Nenhum host encontrado."
 
 #: api/classes/CMapElement.php:70
 #, c-format
@@ -9236,7 +9236,7 @@ msgstr "Nenhum ícone para o elemento do mapa \"%s\"."
 
 #: include/views/administration.general.iconmap.list.php:22
 msgid "No icon maps found."
-msgstr ""
+msgstr "Nenhum mapeamento de ícones encontrado."
 
 #: include/views/configuration.sysmap.edit.php:47
 msgid "No image"
@@ -9244,7 +9244,7 @@ msgstr "Sem imagem"
 
 #: include/views/administration.general.image.list.php:36
 msgid "No images found."
-msgstr ""
+msgstr "Nenhuma imagem encontrada."
 
 #: include/views/configuration.item.edit.php:112
 #: include/views/configuration.item.massupdate.php:77
@@ -9274,11 +9274,11 @@ msgstr "Não foi definido um ID de item para um elemento da tela."
 
 #: popup.php:682
 msgid "No item keys found."
-msgstr ""
+msgstr "Nenhuma chave de item encontrada."
 
 #: include/views/configuration.item.prototype.list.php:43 popup.php:925
 msgid "No item prototypes found."
-msgstr ""
+msgstr "Nenhum protótipo de item encontrado."
 
 #: include/items.inc.php:499
 #, c-format
@@ -9299,19 +9299,19 @@ msgstr "Nenhum item definido."
 #: include/items.inc.php:791 include/views/configuration.item.list.php:58
 #: include/views/monitoring.overview.php:114 popup.php:815
 msgid "No items found."
-msgstr ""
+msgstr "Nenhum item encontrado."
 
 #: include/views/common.macros.php:26
 msgid "No macros found."
-msgstr ""
+msgstr "Nenhuma macro encontrada."
 
 #: include/views/configuration.maintenance.edit.php:98
 msgid "No maintenance periods defined."
-msgstr ""
+msgstr "Nenhum período de manutenção definido."
 
 #: include/views/configuration.maintenance.list.php:41
 msgid "No maintenance periods found."
-msgstr ""
+msgstr "Nenhum período de manutenção encontrado."
 
 #: api/classes/CScreenItem.php:460
 msgid "No map ID provided for screen element."
@@ -9319,12 +9319,12 @@ msgstr "Não foi informado um ID de mapa para um elemento da tela."
 
 #: include/blocks.inc.php:150
 msgid "No maps added."
-msgstr ""
+msgstr "Nenhum mapa adicionado."
 
 #: include/views/configuration.sysmap.list.php:40
 #: include/views/monitoring.maps.php:23 popup.php:1175
 msgid "No maps found."
-msgstr ""
+msgstr "Nenhum mapa encontrado."
 
 #: include/classes/class.cmultiselect.php:51 jsLoader.php:192
 msgid "No matches found"
@@ -9332,19 +9332,19 @@ msgstr "Nenhuma correspondência encontrada"
 
 #: include/views/administration.users.edit.php:155
 msgid "No media found."
-msgstr ""
+msgstr "Nenhuma mídia encontrada."
 
 #: include/views/administration.mediatypes.list.php:36
 msgid "No media types found."
-msgstr ""
+msgstr "Nenhum tipo de mídia encontrado."
 
 #: report4.php:73
 msgid "No notifications found."
-msgstr ""
+msgstr "Nenhuma notificação encontrada."
 
 #: include/views/configuration.action.edit.php:332
 msgid "No operations defined."
-msgstr ""
+msgstr "Nenhuma operação definida."
 
 #: include/classes/import/CConfigurationImport.php:880
 #: include/classes/import/CConfigurationImport.php:960
@@ -9450,7 +9450,7 @@ msgstr "Não foi informado o arquivo de chave privada."
 
 #: include/views/administration.proxy.list.php:42 popup.php:1469
 msgid "No proxies found."
-msgstr ""
+msgstr "Nenhum proxy encontrado."
 
 #: include/views/configuration.discovery.edit.php:44
 msgid "No proxy"
@@ -9475,7 +9475,7 @@ msgstr "Sem destinatários para a operação de mensagem da ação."
 
 #: include/views/administration.general.regularexpressions.list.php:28
 msgid "No regular expressions found."
-msgstr ""
+msgstr "Nenhuma expressão regular encontrada."
 
 #: include/classes/screens/CScreenBuilder.php:293
 msgid "No rows in screen."
@@ -9487,14 +9487,14 @@ msgstr "Não foi informado um ID de tela para um elemento da tela."
 
 #: include/blocks.inc.php:99
 msgid "No screens added."
-msgstr ""
+msgstr "Nenhuma tela adicionada."
 
 #: include/classes/screens/CScreenBuilder.php:267
 #: include/views/configuration.screen.list.php:48
 #: include/views/monitoring.hostscreen.php:32
 #: include/views/monitoring.screen.php:35 popup.php:1313 popup.php:1371
 msgid "No screens found."
-msgstr ""
+msgstr "Nenhuma tela encontrada."
 
 #: api/classes/CAction.php:1362
 msgid "No script specified for action operation command."
@@ -9502,7 +9502,7 @@ msgstr "Nenhum script definido para a ação de comando."
 
 #: include/views/administration.script.list.php:35 popup.php:1495
 msgid "No scripts found."
-msgstr ""
+msgstr "Nenhum script encontrado."
 
 #: slides.php:158
 msgid "No slide shows defined."
@@ -9511,11 +9511,11 @@ msgstr "Nenhuma apresentação de slides definida."
 #: include/views/configuration.slideconf.list.php:37
 #: include/views/monitoring.slides.php:43
 msgid "No slide shows found."
-msgstr ""
+msgstr "Nenhum slide show encontrado."
 
 #: include/views/monitoring.slides.php:104 popup.php:1248
 msgid "No slides found."
-msgstr ""
+msgstr "Nenhum slide encontrado."
 
 #: api/classes/CProxy.php:227
 msgid "No status for proxy."
@@ -9531,7 +9531,7 @@ msgstr "Nenhum alvo selecionado."
 
 #: search.php:390 templates.php:481
 msgid "No templates found."
-msgstr ""
+msgstr "Nenhum template encontrado."
 
 #: include/views/configuration.host.edit.php:626
 #: include/views/configuration.host.prototype.edit.php:211
@@ -9570,15 +9570,15 @@ msgstr "Nenhum usuário com o ID informado."
 #: include/views/administration.usergroups.list.php:42 popup.php:559
 #: popup_usrgrp.php:89
 msgid "No user groups found."
-msgstr ""
+msgstr "Nenhum grupo de usuários encontrado."
 
 #: include/views/administration.users.list.php:51 popup.php:617
 msgid "No users found."
-msgstr ""
+msgstr "Nenhum usuário encontrado."
 
 #: include/views/administration.general.valuemapping.list.php:22
 msgid "No value maps found."
-msgstr ""
+msgstr "Nenhum mapeamento de valores encontrado."
 
 #: include/classes/screens/CScreenHistory.php:159
 #: include/classes/screens/CScreenHistory.php:265
@@ -9590,7 +9590,7 @@ msgstr "Nenhum valor encontrado."
 #: httpmon.php:84 include/blocks.inc.php:1074
 #: include/views/configuration.httpconf.list.php:58
 msgid "No web scenarios found."
-msgstr ""
+msgstr "Nenhum cenário web encontrado."
 
 #: events.php:578 events.php:591 hosts.php:792 httpmon.php:86
 #: include/actions.inc.php:68 include/audit.inc.php:42
@@ -13690,7 +13690,7 @@ msgstr "Grupo de usuários que receberá a mensagem de banco de dados indisponí
 #: adm.other.php:94
 #, c-format
 msgid "User group for database down message \"%1$s\"."
-msgstr ""
+msgstr "Grupo para mensagens de problemas com o banco de dados \"%1$s\"."
 
 #: include/views/administration.script.edit.php:78
 #: include/views/administration.usergroups.list.php:28
@@ -14848,7 +14848,7 @@ msgstr "de"
 #: include/classes/class.frontendsetup.php:589
 #: include/classes/class.frontendsetup.php:607
 msgid "off"
-msgstr ""
+msgstr "off"
 
 #: include/classes/class.frontendsetup.php:319
 #: include/classes/class.frontendsetup.php:338

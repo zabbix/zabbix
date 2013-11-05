@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-05 09:03+0200\n"
-"PO-Revision-Date: 2013-10-30 18:25+0300\n"
+"POT-Creation-Date: 2013-11-05 09:04+0200\n"
+"PO-Revision-Date: 2013-11-04 20:24+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1383150332.0\n"
+"X-POOTLE-MTIME: 1383589494.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -549,7 +549,7 @@ msgstr "Alias"
 
 #: include/views/configuration.sysmap.constructor.php:56
 msgid "Align icons"
-msgstr "zarovnat ikony"
+msgstr "Zarovnat ikony"
 
 #: include/blocks.inc.php:1295 include/blocks.inc.php:1304
 #: include/blocks.inc.php:1349 include/blocks.inc.php:1433
@@ -570,7 +570,7 @@ msgstr "zarovnat ikony"
 #: include/views/monitoring.dashconf.php:48
 #: include/views/monitoring.dashconf.php:92 jsLoader.php:90 popup_right.php:56
 msgid "All"
-msgstr "vše"
+msgstr "Vše"
 
 #: include/classes/class.chostsinfo.php:115
 #: include/classes/class.ctriggersinfo.php:124
@@ -1081,7 +1081,7 @@ msgstr "NASTAVENÍ PROXY"
 
 #: adm.regexps.php:212
 msgid "CONFIGURATION OF REGULAR EXPRESSIONS"
-msgstr "NASTAVENÍ PRO REGULAR EXPRESSIONS"
+msgstr "NASTAVENÍ PRO REGULÁRNÍ VÝRAZY"
 
 #: include/views/configuration.screen.constructor.list.php:23
 #: include/views/configuration.screen.edit.php:23
@@ -1144,7 +1144,7 @@ msgstr "NASTAVENÍ PRACOVNÍ DOBY"
 
 #: adm.triggerdisplayoptions.php:90
 msgid "CONFIGURATION OF ZABBIX"
-msgstr "NASTAVENÍ PRO ZABBIX"
+msgstr "NASTAVENÍ ZABBIXU"
 
 #: include/views/configuration.services.edit.php:66 services.php:44
 msgid "Calculate SLA, acceptable SLA (in %)"
@@ -1406,7 +1406,7 @@ msgstr "Nelze klonovat předlohy spouštěčů."
 
 #: scripts_exec.php:65
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
-msgstr "Připojení na Trapper port daemona Zabbix serveru selhalo, pro spuštění skriptu, ale musí být port dostupný."
+msgstr "Připojení na trapper port daemona Zabbix serveru selhalo. Pro spuštění skriptu, ale musí být port dostupný."
 
 #: graphs.php:323
 msgid "Cannot copy graphs"
@@ -3140,7 +3140,7 @@ msgstr ""
 #: include/reports.inc.php:61 include/reports.inc.php:397
 #: include/reports.inc.php:405 report3.php:58 report4.php:108
 msgid "Daily"
-msgstr "denně"
+msgstr "Denně"
 
 #: include/classes/core/ZBase.php:235
 msgid "Dark orange"
@@ -3312,12 +3312,12 @@ msgstr "Ladící mód byl aktualizován"
 
 #: include/func.inc.php:237
 msgid "Dec"
-msgstr "pro"
+msgstr "Pro"
 
 #: include/forms.inc.php:1694 include/func.inc.php:123
 #: include/func.inc.php:254 jsLoader.php:129
 msgid "December"
-msgstr "prosinec"
+msgstr "Prosinec"
 
 #: include/items.inc.php:138
 msgid "Decimal"
@@ -3662,7 +3662,7 @@ msgstr "Smazat spouštěč?"
 
 #: auditlogs.php:140
 msgid "Deleted"
-msgstr "Deleted"
+msgstr "Smazán"
 
 #: api/classes/CApplication.php:479
 #, c-format
@@ -4095,7 +4095,7 @@ msgstr "Rozložení hodnot pro časové období"
 
 #: include/services.inc.php:61
 msgid "Do not calculate"
-msgstr "nevypočítávat"
+msgstr "Nevypočítávat"
 
 #: jsLoader.php:103
 msgid "Do you wish to replace the conditional expression?"
@@ -4125,7 +4125,7 @@ msgstr ""
 #: include/views/monitoring.discovery.php:43
 #: include/views/monitoring.discovery.php:166 report3.php:83
 msgid "Downtime"
-msgstr "Downtime"
+msgstr "Prostoj"
 
 #: include/views/configuration.host.edit.php:284
 msgid "Drag here to change the type of the interface to \"IPMI\" type."
@@ -4595,7 +4595,7 @@ msgstr "Perioda týdne(ů)"
 
 #: include/func.inc.php:658
 msgid "Exa"
-msgstr "exa"
+msgstr "Exa"
 
 #: tr_logform.php:280 tr_logform.php:332
 msgid "Exclude"
@@ -4759,12 +4759,12 @@ msgstr "Oblíbené"
 
 #: include/func.inc.php:227
 msgid "Feb"
-msgstr "ún"
+msgstr "Ún"
 
 #: include/forms.inc.php:1672 include/func.inc.php:113
 #: include/func.inc.php:244 jsLoader.php:119
 msgid "February"
-msgstr "únor"
+msgstr "Únor"
 
 #: hostinventoriesoverview.php:91 include/views/inventory.host.list.php:44
 msgid "Field"
@@ -4883,7 +4883,7 @@ msgstr ""
 
 #: include/forms.inc.php:1710 include/maintenances.inc.php:118
 msgid "First"
-msgstr "první"
+msgstr "První"
 
 #: include/func.inc.php:1814
 msgctxt "page navigation"
@@ -4914,7 +4914,7 @@ msgstr "Vzorec"
 
 #: include/forms.inc.php:1713 include/maintenances.inc.php:121
 msgid "Fourth"
-msgstr "čtvrtý"
+msgstr "Čtvrtý"
 
 #: include/locales.inc.php:58
 msgid "French (fr_FR)"
@@ -4922,12 +4922,12 @@ msgstr "Francouzsky (fr_FR)"
 
 #: include/func.inc.php:207
 msgid "Fri"
-msgstr "pá"
+msgstr "Pá"
 
 #: include/forms.inc.php:1657 include/forms.inc.php:1725
 #: include/func.inc.php:135 include/func.inc.php:219
 msgid "Friday"
-msgstr "pátek"
+msgstr "Pátek"
 
 #: include/reports.inc.php:70 include/reports.inc.php:386
 #: include/views/configuration.action.edit.php:437
@@ -5009,7 +5009,7 @@ msgstr "Podpora"
 
 #: include/func.inc.php:655
 msgid "Giga"
-msgstr "giga"
+msgstr "Giga"
 
 #: include/triggers.inc.php:1737 tr_testexpr.php:35
 msgid "Given expression is not a macro"
@@ -5420,7 +5420,7 @@ msgstr "Šestnáctkový"
 
 #: include/views/configuration.sysmap.constructor.php:41 jsLoader.php:144
 msgid "Hidden"
-msgstr "skryta"
+msgstr "Skryta"
 
 #: include/classes/class.cuiwidget.php:58
 #: include/classes/class.cwidget.php:183 include/html.inc.php:162
@@ -5859,7 +5859,7 @@ msgstr ""
 #: include/reports.inc.php:60 include/reports.inc.php:396
 #: include/reports.inc.php:404
 msgid "Hourly"
-msgstr "hodinově"
+msgstr "Hodinově"
 
 #: include/forms.inc.php:1778
 msgid "Hours"
@@ -5975,7 +5975,7 @@ msgstr "IPMI uživatelské jméno"
 
 #: srv_status.php:161
 msgid "IT SERVICES"
-msgstr "SLUŽBY IT"
+msgstr "IT SLUŽBY"
 
 #: report3.php:74
 msgid "IT SERVICES AVAILABILITY REPORT"
@@ -7431,12 +7431,12 @@ msgstr "Jabber účet"
 
 #: include/func.inc.php:226
 msgid "Jan"
-msgstr "led"
+msgstr "Led"
 
 #: include/forms.inc.php:1667 include/func.inc.php:112
 #: include/func.inc.php:243 jsLoader.php:118
 msgid "January"
-msgstr "leden"
+msgstr "Leden"
 
 #: include/locales.inc.php:65
 msgid "Japanese (ja_JP)"
@@ -7444,21 +7444,21 @@ msgstr "Japonsky (ja_JP)"
 
 #: include/func.inc.php:232
 msgid "Jul"
-msgstr "čvc"
+msgstr "Čvc"
 
 #: include/forms.inc.php:1669 include/func.inc.php:118
 #: include/func.inc.php:249 jsLoader.php:124
 msgid "July"
-msgstr "červenec"
+msgstr "Červenec"
 
 #: include/func.inc.php:231
 msgid "Jun"
-msgstr "čer"
+msgstr "Čer"
 
 #: include/forms.inc.php:1692 include/func.inc.php:117
 #: include/func.inc.php:248 jsLoader.php:123
 msgid "June"
-msgstr "červen"
+msgstr "Červen"
 
 #: include/func.inc.php:417 include/func.inc.php:653
 msgctxt "Kilo short"
@@ -7624,7 +7624,7 @@ msgstr "Klíčové slovo"
 
 #: include/func.inc.php:653
 msgid "Kilo"
-msgstr "kilo"
+msgstr "Kilo"
 
 #: include/locales.inc.php:64
 msgid "Korean (ko_KR)"
@@ -7684,7 +7684,7 @@ msgstr "Jazyk"
 
 #: include/forms.inc.php:1714 include/maintenances.inc.php:122
 msgid "Last"
-msgstr "poslední"
+msgstr "Poslední"
 
 #: include/func.inc.php:1854
 msgctxt "page navigation"
@@ -7795,7 +7795,7 @@ msgstr "Litevsky (lv_LV)"
 #: include/views/js/configuration.sysmaps.js.php:246
 #: include/views/monitoring.overview.php:86 popup_bitem.php:150
 msgid "Left"
-msgstr "vlevo"
+msgstr "Vlevo"
 
 #: include/reports.inc.php:57 include/reports.inc.php:167
 #: include/reports.inc.php:318
@@ -8440,7 +8440,7 @@ msgstr ""
 
 #: include/func.inc.php:654
 msgid "Mega"
-msgstr "mega"
+msgstr "Mega"
 
 #: include/views/administration.usergroups.list.php:48
 #: include/views/configuration.hostgroups.list.php:62
@@ -9898,7 +9898,7 @@ msgstr ""
 
 #: include/forms.inc.php:1630 include/maintenances.inc.php:34
 msgid "One time only"
-msgstr "pouze jednou"
+msgstr "Pouze jednou"
 
 #: include/views/configuration.services.edit.php:145
 #: include/views/configuration.services.edit.php:260
@@ -10010,7 +10010,7 @@ msgstr ""
 
 #: include/views/configuration.action.edit.php:1015
 msgid "Operation condition"
-msgstr "podmínka operace"
+msgstr "Podmínka operace"
 
 #: include/views/configuration.action.edit.php:1023
 msgid "Operation details"
@@ -10036,7 +10036,7 @@ msgstr "Operace"
 
 #: include/hosts.inc.php:68
 msgid "Operator"
-msgstr "operator"
+msgstr "Operátor"
 
 #: include/views/configuration.host.massupdate.php:62
 #: include/views/configuration.host.massupdate.php:109
@@ -10471,7 +10471,7 @@ msgstr ""
 
 #: include/func.inc.php:657
 msgid "Peta"
-msgstr "peta"
+msgstr "Peta"
 
 #: include/graphs.inc.php:26 popup.php:1140
 msgid "Pie"
@@ -10673,11 +10673,11 @@ msgstr ""
 
 #: include/services.inc.php:60
 msgid "Problem, if all children have problems"
-msgstr "problém, když všechny podřazené mají problém"
+msgstr "Problém, když všechny podřazené mají problém"
 
 #: include/services.inc.php:59
 msgid "Problem, if at least one child has a problem"
-msgstr "problém, když alespoň jeden podřazený má problém"
+msgstr "Problém, když alespoň jeden podřazený má problém"
 
 #: chart4.php:163 include/maps.inc.php:708 include/maps.inc.php:791
 #: include/maps.inc.php:882 report2.php:400 report3.php:83
@@ -11172,7 +11172,7 @@ msgstr "Znovu zkusit"
 #: include/views/js/configuration.sysmaps.js.php:85
 #: include/views/js/configuration.sysmaps.js.php:247 popup_bitem.php:151
 msgid "Right"
-msgstr "vpravo"
+msgstr "Vpravo"
 
 #: include/locales.inc.php:72
 msgid "Romanian (ro_RO)"
@@ -11302,7 +11302,7 @@ msgstr "SMTP e-mail"
 #: include/views/administration.mediatypes.edit.php:58
 #: include/views/administration.mediatypes.list.php:52
 msgid "SMTP helo"
-msgstr "SMTP HELO"
+msgstr "SMTP helo"
 
 #: include/views/administration.mediatypes.edit.php:57
 #: include/views/administration.mediatypes.list.php:51
@@ -11404,7 +11404,7 @@ msgstr "STAV SLEDOVÁNÍ WEBŮ"
 
 #: report1.php:32
 msgid "STATUS OF ZABBIX"
-msgstr "STAV ZABBIXE"
+msgstr "STAV ZABBIXU"
 
 #: include/views/configuration.httpconf.edit.php:116
 msgid "Safari"
@@ -11412,12 +11412,12 @@ msgstr ""
 
 #: include/func.inc.php:208
 msgid "Sat"
-msgstr "so"
+msgstr "So"
 
 #: include/forms.inc.php:1658 include/forms.inc.php:1726
 #: include/func.inc.php:136 include/func.inc.php:220
 msgid "Saturday"
-msgstr "sobota"
+msgstr "Sobota"
 
 #: acknow.php:219 include/views/administration.authentication.edit.php:76
 #: include/views/administration.general.gui.edit.php:57
@@ -11655,7 +11655,7 @@ msgstr "Omezení počtu položek pro vyhledávání/filtr"
 
 #: include/forms.inc.php:1711 include/maintenances.inc.php:119
 msgid "Second"
-msgstr "druhý"
+msgstr "Druhý"
 
 #: include/hosts.inc.php:440
 msgid "Secondary POC cell"
@@ -11754,7 +11754,7 @@ msgstr "Vybrat řádky s hodnotou jako"
 #: include/views/monitoring.dashconf.php:49
 #: include/views/monitoring.history.php:132
 msgid "Selected"
-msgstr "vybrané"
+msgstr "Vybrané"
 
 #: actionconf.php:331
 msgid "Selected actions deleted"
@@ -11806,17 +11806,17 @@ msgstr ""
 
 #: include/func.inc.php:234
 msgid "Sep"
-msgstr "zář"
+msgstr "Zář"
 
 #: include/views/configuration.sysmap.edit.php:122
 #: include/views/monitoring.dashconf.php:93
 msgid "Separated"
-msgstr "Separated"
+msgstr "Odděleně"
 
 #: include/forms.inc.php:1679 include/func.inc.php:120
 #: include/func.inc.php:251 jsLoader.php:126
 msgid "September"
-msgstr "září"
+msgstr "Září"
 
 #: include/hosts.inc.php:140 include/views/inventory.host.list.php:82
 msgid "Serial number A"
@@ -12348,7 +12348,7 @@ msgstr "Uložit hodnotu"
 
 #: include/hosts.inc.php:41
 msgid "Straight"
-msgstr "Straight"
+msgstr "Přímý"
 
 #: include/views/configuration.screen.constructor.edit.php:545
 msgid "Style"
@@ -12609,7 +12609,7 @@ msgstr ""
 
 #: include/func.inc.php:656
 msgid "Tera"
-msgstr "tera"
+msgstr "Tera"
 
 #: include/views/administration.authentication.edit.php:88
 #: include/views/administration.general.regularexpressions.edit.php:81
@@ -13546,22 +13546,22 @@ msgstr ""
 
 #: include/views/administration.general.image.edit.php:37
 msgid "Upload"
-msgstr "Upload"
+msgstr "Nahrát"
 
 #: include/views/monitoring.maps.php:54
 msgid "Upper level maps"
-msgstr "Upper level maps"
+msgstr "Mapa nejvyšší úrovně"
 
 #: include/views/configuration.services.edit.php:135
 #: include/views/configuration.services.edit.php:258
 #: include/views/monitoring.discovery.php:43
 #: include/views/monitoring.discovery.php:163
 msgid "Uptime"
-msgstr "Uptime"
+msgstr "Doba provozu"
 
 #: include/actions.inc.php:84
 msgid "Uptime/Downtime"
-msgstr "Uptime/Downtime"
+msgstr "Doba dostupnosti/nedostupnosti"
 
 #: include/screens.inc.php:44
 #: include/views/configuration.screen.constructor.edit.php:561
@@ -13890,7 +13890,7 @@ msgstr "Upozornění"
 
 #: jsLoader.php:174
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
-msgstr "We are sorry, the maximum possible number of elements to remember has been reached."
+msgstr "Je nám líto, maximální počet elementů na zapamatování byl již dosažen."
 
 #: hosts.php:799 hosts.php:894 include/menu.inc.php:42
 #: include/views/inventory.host.view.php:206
@@ -13956,12 +13956,12 @@ msgstr ""
 
 #: include/func.inc.php:205
 msgid "Wed"
-msgstr "st"
+msgstr "St"
 
 #: include/forms.inc.php:1655 include/forms.inc.php:1723
 #: include/func.inc.php:133 include/func.inc.php:217
 msgid "Wednesday"
-msgstr "středa"
+msgstr "Středa"
 
 #: report5.php:45
 msgid "Week"
@@ -13971,7 +13971,7 @@ msgstr "Týden"
 #: include/reports.inc.php:62 include/reports.inc.php:398
 #: include/reports.inc.php:406 report3.php:59 report4.php:109
 msgid "Weekly"
-msgstr "týdně"
+msgstr "Týdně"
 
 #: popup_media.php:123
 msgid "When active"
@@ -13990,7 +13990,7 @@ msgstr "Šířka"
 #: include/views/configuration.maintenance.edit.php:41
 #: include/views/configuration.maintenance.list.php:70
 msgid "With data collection"
-msgstr "se sběrem dat"
+msgstr "Se sběrem dat"
 
 #: tr_status.php:279
 msgid "With last event unacknowledged"
@@ -14224,7 +14224,7 @@ msgstr "Rok"
 #: include/reports.inc.php:64 include/reports.inc.php:400
 #: include/reports.inc.php:408 report3.php:61 report4.php:111
 msgid "Yearly"
-msgstr "ročně"
+msgstr "Ročně"
 
 #: events.php:761 include/blocks.inc.php:727
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:365
@@ -14237,7 +14237,7 @@ msgstr "Ano"
 
 #: include/func.inc.php:660
 msgid "Yotta"
-msgstr "yotta"
+msgstr "Yotta"
 
 #: include/views/administration.users.edit.php:127
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
@@ -14336,11 +14336,11 @@ msgstr ""
 
 #: include/users.inc.php:55
 msgid "Zabbix Admin"
-msgstr "ZABBIX Admin"
+msgstr "Zabbix Admin"
 
 #: include/users.inc.php:56
 msgid "Zabbix Super Admin"
-msgstr "ZABBIX Super Admin"
+msgstr "Zabbix Super Admin"
 
 #: include/users.inc.php:54
 msgid "Zabbix User"
@@ -14352,7 +14352,7 @@ msgstr "Zabbix uživatel"
 #: include/views/js/configuration.action.edit.js.php:118
 #: include/views/js/configuration.discovery.edit.js.php:184
 msgid "Zabbix agent"
-msgstr "ZABBIX agent"
+msgstr "Zabbix agent"
 
 #: include/items.inc.php:82
 msgid "Zabbix agent (active)"
@@ -14429,7 +14429,7 @@ msgstr "Zabbix zachytávač"
 
 #: include/func.inc.php:659
 msgid "Zetta"
-msgstr "zetta"
+msgstr "Zetta"
 
 #: jsLoader.php:91
 msgid "Zoom"
@@ -14834,7 +14834,7 @@ msgstr "nebo"
 
 #: include/js.inc.php:133 include/js.inc.php:136
 msgid "other"
-msgstr "other"
+msgstr "jiný"
 
 #: include/page_header.php:125
 msgid "refreshed every"
@@ -14864,7 +14864,7 @@ msgstr ""
 #: include/page_header.php:125
 #: include/views/configuration.httpconf.edit.php:220
 msgid "sec"
-msgstr "sec"
+msgstr "sek"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:105
 #: include/views/administration.general.triggerDisplayOptions.edit.php:111
