@@ -1324,7 +1324,7 @@ elseif ($srctbl == 'screens') {
 
 	$options = array(
 		'nodeids' => $nodeId,
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('screenid', 'name'),
 		'preservekeys' => true,
 		'editable' => true
 	);
@@ -1374,8 +1374,7 @@ elseif ($srctbl == 'screens2') {
 
 	$options = array(
 		'nodeids' => $nodeId,
-		'output' => API_OUTPUT_EXTEND,
-		'preservekeys' => true,
+		'output' => array('screenid', 'name'),
 		'editable' => true
 	);
 	$screens = API::Screen()->get($options);
