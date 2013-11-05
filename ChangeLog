@@ -1,6 +1,7 @@
 Changes for 2.2.0rc1
 
 New features:
+........S. [ZBXNEXT-1998] added vmware.fullname[], vmware.version[] key support (wiper)
 ..F.I...S. [ZBXNEXT-1975] increased the size of alerts table message field to 64KB also on Oracle database (Pavels, wiper)
 ..F....... [ZBXNEXT-1371] added links to graphs, web monitoring and LLD rules in the search results; thanks to Volker Fröhlich and Marc for patches (Pavels)
 .........T [ZBX-6832] improved default templates (e.g., split "Template App Agentless" into 12 templates for each service) (asaveljevs, neogan, Sasha)

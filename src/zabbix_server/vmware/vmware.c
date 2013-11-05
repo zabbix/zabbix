@@ -343,6 +343,9 @@ static void	vmware_service_shared_free(zbx_vmware_service_t *service)
 	__vm_mem_free_func(service->username);
 	__vm_mem_free_func(service->password);
 
+	if (NULL != service->contents)
+		__vm_mem_free_func(service->contents);
+
 	vmware_data_shared_free(service->data);
 
 	__vm_mem_free_func(service);
@@ -750,6 +753,56 @@ out:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_service_get_contents                                      *
+ *                                                                            *
+ * Purpose: retrieves vmware service instance contents                        *
+ *                                                                            *
+ * Parameters: service    - [IN] the vmware service                           *
+ *             easyhandle - [IN] the CURL handle                              *
+ *             error      - [OUT] the error message in the case of failure    *
+ *                                                                            *
+ * Return value: SUCCEED - the contents were retrieved successfully           *
+ *               FAIL    - the content retrieval faield                       *
+ *                                                                            *
+ ******************************************************************************/
+static	int	vmware_service_get_contents(zbx_vmware_service_t *service, CURL *easyhandle, char **contents,
+		char **error)
+{
+#	define ZBX_POST_VMWARE_CONTENTS 						\
+		ZBX_POST_VSPHERE_HEADER							\
+		"<ns0:RetrieveServiceContent>"						\
+			"<ns0:_this type=\"ServiceInstance\">ServiceInstance</ns0:_this>"	\
+		"</ns0:RetrieveServiceContent>"						\
+		ZBX_POST_VSPHERE_FOOTER
+
+	int	err, opt, ret = FAIL;
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, ZBX_POST_VMWARE_CONTENTS)))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
+		goto out;
+	}
+
+	page.offset = 0;
+
+	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
+	{
+		*error = zbx_strdup(*error, curl_easy_strerror(err));
+		goto out;
+	}
+
+	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
+		goto out;
+
+	*contents = zbx_strdup(*contents, page.data);
+
+	ret = SUCCEED;
+out:
 	return ret;
 }
 
@@ -2413,13 +2466,23 @@ out:
  ******************************************************************************/
 static int	vmware_service_initialize(zbx_vmware_service_t *service, CURL *easyhandle, char **error)
 {
-	int		ret = FAIL;
+	int	ret = FAIL;
+	char	*contents = NULL;
 
 	if (SUCCEED != vmware_service_get_perfcounters(service, easyhandle, error))
 		goto out;
 
+	if (SUCCEED != vmware_service_get_contents(service, easyhandle, &contents, error))
+		goto out;
+
+	zbx_vmware_lock();
+	service->contents = vmware_shared_strdup(contents);
+	zbx_vmware_unlock();
+
 	ret = SUCCEED;
 out:
+	zbx_free(contents);
+
 	return ret;
 }
 
@@ -2472,7 +2535,9 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 
 	if (0 != (service->state & ZBX_VMWARE_STATE_NEW) &&
 			SUCCEED != vmware_service_initialize(service, easyhandle, &data->error))
+	{
 		goto clean;
+	}
 
 	if (SUCCEED != vmware_service_get_hv_list(service, easyhandle, &hvs, &data->error))
 		goto clean;
