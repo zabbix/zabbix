@@ -5,7 +5,7 @@ New features:
 ..F....... [ZBXNEXT-1851] hid American English, Greek and Polish translations from the frontend (Richlv)
 
 Bug fixes:
-....I..... [ZBX-7269] fixed units and value type for vmware.vm.vfs.fs.size[{$URL},{HOST.HOST},{#FSNAME},pfree] item in "Template Virt VMware Guest" template (Sasha)
+.........T [ZBX-7269] fixed units and value type for vmware.vm.vfs.fs.size[{$URL},{HOST.HOST},{#FSNAME},pfree] item in "Template Virt VMware Guest" template (Sasha)
 ..F....... [ZBX-7213] fixed pre-loader image width and height for Internet Explorer (Ivo)
 ....I..... [ZBX-7273] fixed newlines in default data strings for Oracle (Sasha)
 ........S. [ZBX-7141] made it clear agent of which particular type is unavailable for unknown triggers (asaveljevs, Sasha)
