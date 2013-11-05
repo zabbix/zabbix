@@ -30,6 +30,10 @@ int	check_vcenter_cluster_status(AGENT_REQUEST *request, const char *username, c
 		AGENT_RESULT *result);
 int	check_vcenter_eventlog(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
+int	check_vcenter_version(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_fullname(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
 
 int	check_vcenter_hv_cluster_name(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
