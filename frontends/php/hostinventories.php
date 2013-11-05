@@ -179,7 +179,7 @@ else{
 			}
 
 			$options = array(
-				'output' => array('hostid', 'name'),
+				'output' => array('hostid', 'name', 'status'),
 				'selectInventory' => $requiredInventoryFields,
 				'withInventory' => true,
 				'selectGroups' => API_OUTPUT_EXTEND,

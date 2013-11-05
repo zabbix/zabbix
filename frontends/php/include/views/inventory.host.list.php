@@ -94,7 +94,11 @@ foreach ($this->data['hosts'] as $host) {
 
 	$row = array(
 		get_node_name_by_elid($host['hostid']),
-		new CLink($host['name'],'?hostid='.$host['hostid'].url_param('groupid')),
+		new CLink(
+			$host['name'],
+			'?hostid='.$host['hostid'].url_param('groupid'),
+			($host['status'] == HOST_STATUS_NOT_MONITORED) ? 'not-monitored' : ''
+		),
 		$hostGroups,
 		zbx_str2links($host['inventory']['name']),
 		zbx_str2links($host['inventory']['type']),
