@@ -309,35 +309,44 @@ $table = new CTableInfo(_('No values found.'));
 
 $link = new CCol(new CDiv(null, 'app-list-toggle-all icon-plus-9x9'));
 
+// table headers
+$hostHeader = make_sorting_header(_('Host'), 'h.name');
+$hostHeader->addClass('latest-host');
+$lastCheckHeader = make_sorting_header(_('Last check'), 'i.lastclock');
+$lastCheckHeader->addClass('latest-lastcheck');
+$itemHeader = make_sorting_header(_('Name'), 'i.name');
+$itemHeader->addClass('latest-item');
+
 if ($filterShowDetails) {
 	$config = select_config();
 
+	$table->addClass('latest-details');
 	$table->setHeader(array(
 		$link,
 		is_show_all_nodes() ? make_sorting_header(_('Node'), 'h.hostid') : null,
-		($_REQUEST['hostid'] == 0) ? make_sorting_header(_('Host'), 'h.name') : null,
-		make_sorting_header(_('Name'), 'i.name'),
+		($_REQUEST['hostid'] == 0) ? $hostHeader : null,
+		$itemHeader,
 		new CSpan(_('Interval')),
 		new CSpan(_('History')),
 		new CSpan(_('Trends')),
 		new CSpan(_('Type')),
-		make_sorting_header(_('Last check'), 'i.lastclock'),
+		$lastCheckHeader,
 		new CSpan(_('Last value')),
 		new CSpan(_x('Change', 'noun in latest data')),
-		SPACE,
-		new CSpan(_('Error'))
+		new CCol(SPACE, 'latest-actions'),
+		new CCol(new CSpan(_('Error')), 'latest-error')
 	));
 }
 else {
 	$table->setHeader(array(
 		$link,
-		is_show_all_nodes() ? make_sorting_header(_('Node'), 'h.hostid') : null,
+		is_show_all_nodes() ? $hostHeader : null,
 		($_REQUEST['hostid'] == 0) ? make_sorting_header(_('Host'), 'h.name') : null,
-		make_sorting_header(_('Name'), 'i.name'),
-		make_sorting_header(_('Last check'), 'i.lastclock'),
+		$itemHeader,
+		$lastCheckHeader,
 		new CSpan(_('Last value')),
 		new CSpan(_x('Change', 'noun in latest data')),
-		SPACE
+		new CCol(SPACE, 'latest-actions')
 	));
 }
 
@@ -452,7 +461,7 @@ foreach ($items as $key => $item){
 			new CCol(new CDiv($lastClock, $stateCss)),
 			new CCol(new CDiv($lastValue, $stateCss)),
 			new CCol(new CDiv($change, $stateCss)),
-			$actions,
+			new CCol($actions, 'latest-actions'),
 			new CCol($statusIcons)
 		)));
 	}
@@ -465,7 +474,7 @@ foreach ($items as $key => $item){
 			new CCol(new CDiv($lastClock, $stateCss)),
 			new CCol(new CDiv($lastValue, $stateCss)),
 			new CCol(new CDiv($change, $stateCss)),
-			$actions
+			new CCol($actions, 'latest-actions'),
 		)));
 	}
 
