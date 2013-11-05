@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-04 14:50+0200\n"
+"POT-Creation-Date: 2013-11-05 09:03+0200\n"
 "PO-Revision-Date: 2013-10-30 18:15+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -925,7 +925,7 @@ msgstr "Побитовое AND последних (наиболее новых) 
 msgid "Bitwise AND of last (most recent) T value and mask is NOT N"
 msgstr "Побитовое AND последних (наиболее новых) T значений и маска NOT N"
 
-#: include/classes/core/ZBase.php:233
+#: include/classes/core/ZBase.php:234
 msgid "Black & Blue"
 msgstr "Черная & Синяя"
 
@@ -2383,7 +2383,7 @@ msgstr "Закольцованная ссылка в шаблонах: %1$s."
 msgid "Circular template linkage is not allowed."
 msgstr "Закольцованное соединение шаблонов не допускается."
 
-#: include/classes/core/ZBase.php:231
+#: include/classes/core/ZBase.php:232
 msgid "Classic"
 msgstr "Классическая"
 
@@ -3153,7 +3153,7 @@ msgstr "НЕДОСТУПНО"
 msgid "Daily"
 msgstr "Ежедневно"
 
-#: include/classes/core/ZBase.php:234
+#: include/classes/core/ZBase.php:235
 msgid "Dark orange"
 msgstr "Темно-оранжевая"
 
@@ -5421,7 +5421,7 @@ msgstr "Аппаратные средства (полная детализаци
 msgid "Height"
 msgstr "Высота"
 
-#: include/page_header.php:203 include/views/general.login.php:40
+#: include/page_header.php:203 include/views/general.login.php:38
 msgid "Help"
 msgstr "Помощь"
 
@@ -7992,7 +7992,7 @@ msgstr "Вход выполнен под"
 msgid "Login"
 msgstr "Вход в систему"
 
-#: include/views/general.login.php:82
+#: include/views/general.login.php:80
 msgid "Login as Guest"
 msgstr "Войти как Гость"
 
@@ -10099,7 +10099,7 @@ msgstr "Оператор"
 msgid "Original"
 msgstr "Оригинальное"
 
-#: include/classes/core/ZBase.php:232
+#: include/classes/core/ZBase.php:233
 msgid "Original blue"
 msgstr "Оригинальная синяя"
 
@@ -10417,7 +10417,7 @@ msgstr "Пассивный"
 #: include/views/configuration.item.edit.php:192
 #: include/views/configuration.item.massupdate.php:246
 #: include/views/configuration.item.massupdate.php:290
-#: include/views/general.login.php:70
+#: include/views/general.login.php:69
 #: include/views/js/configuration.item.edit.js.php:138
 msgid "Password"
 msgstr "Пароль"
@@ -10919,7 +10919,7 @@ msgstr "Регулярное выражение обновлено"
 msgid "Regular expressions"
 msgstr "Регулярные выражения"
 
-#: include/views/general.login.php:76
+#: include/views/general.login.php:74
 msgid "Remember me for 30 days"
 msgstr "Запомнить меня на 30 дней"
 
@@ -12044,7 +12044,7 @@ msgstr "Показывать рабочее время"
 msgid "Shown"
 msgstr "Показана"
 
-#: include/views/general.login.php:79 index.php:55 index.php:64
+#: include/views/general.login.php:77 index.php:55 index.php:64
 msgid "Sign in"
 msgstr "Войти"
 
@@ -12412,7 +12412,7 @@ msgstr "Вс"
 msgid "Sunday"
 msgstr "Воскресенье"
 
-#: include/views/general.login.php:42
+#: include/views/general.login.php:40
 msgid "Support"
 msgstr "Поддержка"
 
@@ -14342,7 +14342,7 @@ msgid "Zabbix"
 msgstr "Zabbix"
 
 #: include/page_footer.php:103 include/views/general.browserwarning.php:60
-#: include/views/general.login.php:50
+#: include/views/general.login.php:48
 #, c-format
 msgid "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
 msgstr "Zabbix %1$s Все права защищены %2$s-%3$s SIA Zabbix"

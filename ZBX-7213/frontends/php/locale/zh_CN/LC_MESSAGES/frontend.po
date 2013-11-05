@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-04 14:50+0200\n"
+"POT-Creation-Date: 2013-11-05 09:03+0200\n"
 "PO-Revision-Date: 2013-08-25 15:11+0200\n"
 "Last-Translator: solutionware <shiys@solutionware.com.cn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -911,7 +911,7 @@ msgstr "按位与最后一个(最近的) T值和掩码是 = N"
 msgid "Bitwise AND of last (most recent) T value and mask is NOT N"
 msgstr "按位与最后一个(最近的) T值和掩码不是 N"
 
-#: include/classes/core/ZBase.php:233
+#: include/classes/core/ZBase.php:234
 msgid "Black & Blue"
 msgstr "黑&蓝"
 
@@ -2363,7 +2363,7 @@ msgstr "模板中的循环式引用: %1$s."
 msgid "Circular template linkage is not allowed."
 msgstr "循环式模板连结是不允许的."
 
-#: include/classes/core/ZBase.php:231
+#: include/classes/core/ZBase.php:232
 msgid "Classic"
 msgstr "典型的"
 
@@ -3133,7 +3133,7 @@ msgstr "断线"
 msgid "Daily"
 msgstr "每日"
 
-#: include/classes/core/ZBase.php:234
+#: include/classes/core/ZBase.php:235
 msgid "Dark orange"
 msgstr "暗橘色"
 
@@ -5400,7 +5400,7 @@ msgstr "硬体(全细节)"
 msgid "Height"
 msgstr "高"
 
-#: include/page_header.php:203 include/views/general.login.php:40
+#: include/page_header.php:203 include/views/general.login.php:38
 msgid "Help"
 msgstr "帮助"
 
@@ -7968,7 +7968,7 @@ msgstr "登入为"
 msgid "Login"
 msgstr "登入"
 
-#: include/views/general.login.php:82
+#: include/views/general.login.php:80
 msgid "Login as Guest"
 msgstr "登入为访客"
 
@@ -10063,7 +10063,7 @@ msgstr "操作者"
 msgid "Original"
 msgstr "原始的"
 
-#: include/classes/core/ZBase.php:232
+#: include/classes/core/ZBase.php:233
 msgid "Original blue"
 msgstr "原始的蓝色"
 
@@ -10381,7 +10381,7 @@ msgstr "被动式"
 #: include/views/configuration.item.edit.php:192
 #: include/views/configuration.item.massupdate.php:246
 #: include/views/configuration.item.massupdate.php:290
-#: include/views/general.login.php:70
+#: include/views/general.login.php:69
 #: include/views/js/configuration.item.edit.js.php:138
 msgid "Password"
 msgstr "密码"
@@ -10880,7 +10880,7 @@ msgstr "正规表示式已更新"
 msgid "Regular expressions"
 msgstr "正规表示式"
 
-#: include/views/general.login.php:76
+#: include/views/general.login.php:74
 msgid "Remember me for 30 days"
 msgstr "记住我三十日"
 
@@ -12005,7 +12005,7 @@ msgstr "展示工作时间"
 msgid "Shown"
 msgstr "已展示"
 
-#: include/views/general.login.php:79 index.php:55 index.php:64
+#: include/views/general.login.php:77 index.php:55 index.php:64
 msgid "Sign in"
 msgstr "签入"
 
@@ -12373,7 +12373,7 @@ msgstr "日"
 msgid "Sunday"
 msgstr "日"
 
-#: include/views/general.login.php:42
+#: include/views/general.login.php:40
 msgid "Support"
 msgstr "支援"
 
@@ -14297,7 +14297,7 @@ msgid "Zabbix"
 msgstr "Zabbix"
 
 #: include/page_footer.php:103 include/views/general.browserwarning.php:60
-#: include/views/general.login.php:50
+#: include/views/general.login.php:48
 #, c-format
 msgid "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
 msgstr "Zabbix %1$s 版权Copyright %2$s-%3$s 由Zabbix SIA拥有"
