@@ -482,12 +482,12 @@ class CScreenItem extends CZBXAPI {
 				case SCREEN_RESOURCE_HOST_TRIGGERS:
 				case SCREEN_RESOURCE_PLAIN_TEXT:
 				case SCREEN_RESOURCE_URL:
-					if ($screenItem['elements'] < 1 || $screenItem['elements'] > 10000) {
+					if ($screenItem['elements'] < 1 || $screenItem['elements'] > 100) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.',
 							$screenItem['elements'], 'elements',
 							1,
-							10000
+							100
 						));
 					}
 					break;
