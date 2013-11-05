@@ -5,6 +5,7 @@ New features:
 ..F....... [ZBXNEXT-1851] hid American English, Greek and Polish translations from the frontend (Richlv)
 
 Bug fixes:
+..F....... [ZBX-5854] fixed host status indicator not displaying maintenance status in the host configuration form header (Pavels)
 ..F....... [ZBX-7242] fixed sortable table elements not to change width while dragging them (Ivo)
 ..F....... [ZBX-7213] fixed pre-loader image width and height for Internet Explorer (Ivo)
 ....I..... [ZBX-7273] fixed newlines in default data strings for Oracle (Sasha)
