@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-04 14:50+0200\n"
+"POT-Creation-Date: 2013-11-05 09:03+0200\n"
 "PO-Revision-Date: 2013-10-10 08:26+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -908,7 +908,7 @@ msgstr ""
 msgid "Bitwise AND of last (most recent) T value and mask is NOT N"
 msgstr ""
 
-#: include/classes/core/ZBase.php:233
+#: include/classes/core/ZBase.php:234
 msgid "Black & Blue"
 msgstr "Hitam & Biru"
 
@@ -2360,7 +2360,7 @@ msgstr "Referensi melingkar pada template: %1$s."
 msgid "Circular template linkage is not allowed."
 msgstr "Template linkage melingkar tidak diperbolehkan."
 
-#: include/classes/core/ZBase.php:231
+#: include/classes/core/ZBase.php:232
 msgid "Classic"
 msgstr "Klasik"
 
@@ -3129,7 +3129,7 @@ msgstr "DOWN"
 msgid "Daily"
 msgstr "Harian"
 
-#: include/classes/core/ZBase.php:234
+#: include/classes/core/ZBase.php:235
 msgid "Dark orange"
 msgstr "Orange gelap"
 
@@ -5395,7 +5395,7 @@ msgstr "Hardware (Detail lengkap)"
 msgid "Height"
 msgstr "Tinggi"
 
-#: include/page_header.php:203 include/views/general.login.php:40
+#: include/page_header.php:203 include/views/general.login.php:38
 msgid "Help"
 msgstr "Bantuan"
 
@@ -7963,7 +7963,7 @@ msgstr "Masuk sebagai"
 msgid "Login"
 msgstr "Login"
 
-#: include/views/general.login.php:82
+#: include/views/general.login.php:80
 msgid "Login as Guest"
 msgstr "Login sebagai Guest"
 
@@ -10058,7 +10058,7 @@ msgstr "Operator"
 msgid "Original"
 msgstr "Original"
 
-#: include/classes/core/ZBase.php:232
+#: include/classes/core/ZBase.php:233
 msgid "Original blue"
 msgstr "Original blue"
 
@@ -10376,7 +10376,7 @@ msgstr "Pasif"
 #: include/views/configuration.item.edit.php:192
 #: include/views/configuration.item.massupdate.php:246
 #: include/views/configuration.item.massupdate.php:290
-#: include/views/general.login.php:70
+#: include/views/general.login.php:69
 #: include/views/js/configuration.item.edit.js.php:138
 msgid "Password"
 msgstr "Password"
@@ -10875,7 +10875,7 @@ msgstr "Ekspresi reguler diperbarui"
 msgid "Regular expressions"
 msgstr "Ekspresi reguler"
 
-#: include/views/general.login.php:76
+#: include/views/general.login.php:74
 msgid "Remember me for 30 days"
 msgstr "Ingatkan saya selama 30 hari"
 
@@ -12000,7 +12000,7 @@ msgstr "Tampilkan waktu kerja"
 msgid "Shown"
 msgstr "Ditampilkan"
 
-#: include/views/general.login.php:79 index.php:55 index.php:64
+#: include/views/general.login.php:77 index.php:55 index.php:64
 msgid "Sign in"
 msgstr "Masuk"
 
@@ -12368,7 +12368,7 @@ msgstr "Sen"
 msgid "Sunday"
 msgstr "Senin"
 
-#: include/views/general.login.php:42
+#: include/views/general.login.php:40
 msgid "Support"
 msgstr "Dukungan"
 
@@ -14292,7 +14292,7 @@ msgid "Zabbix"
 msgstr "Zabbix"
 
 #: include/page_footer.php:103 include/views/general.browserwarning.php:60
-#: include/views/general.login.php:50
+#: include/views/general.login.php:48
 #, c-format
 msgid "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
 msgstr ""

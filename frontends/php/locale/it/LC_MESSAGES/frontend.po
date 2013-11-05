@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-04 14:50+0200\n"
+"POT-Creation-Date: 2013-11-05 09:03+0200\n"
 "PO-Revision-Date: 2013-10-11 08:21+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -917,7 +917,7 @@ msgstr "Il bit AND degli ultimi (più recenti) valore e maschera di T è = N"
 msgid "Bitwise AND of last (most recent) T value and mask is NOT N"
 msgstr "Il bit AND degli ultimi (più recenti) valore e maschera di T NON è N"
 
-#: include/classes/core/ZBase.php:233
+#: include/classes/core/ZBase.php:234
 msgid "Black & Blue"
 msgstr "Il bit AND degli ultimi (più recenti) valore e maschera di T NON è N"
 
@@ -2372,7 +2372,7 @@ msgstr "Riferimento circolare nei template: %1$s."
 msgid "Circular template linkage is not allowed."
 msgstr "Il collegamento circolare di template non è permesso."
 
-#: include/classes/core/ZBase.php:231
+#: include/classes/core/ZBase.php:232
 msgid "Classic"
 msgstr "Classico"
 
@@ -3142,7 +3142,7 @@ msgstr "GIÙ"
 msgid "Daily"
 msgstr "Per giorni"
 
-#: include/classes/core/ZBase.php:234
+#: include/classes/core/ZBase.php:235
 msgid "Dark orange"
 msgstr "Arancione scuro"
 
@@ -5409,7 +5409,7 @@ msgstr "Hardware (Dettagli completi)"
 msgid "Height"
 msgstr "Altezza"
 
-#: include/page_header.php:203 include/views/general.login.php:40
+#: include/page_header.php:203 include/views/general.login.php:38
 msgid "Help"
 msgstr "Aiuto"
 
@@ -7978,7 +7978,7 @@ msgstr "Connesso come"
 msgid "Login"
 msgstr "Accedi"
 
-#: include/views/general.login.php:82
+#: include/views/general.login.php:80
 msgid "Login as Guest"
 msgstr "Accedi come Guest"
 
@@ -10079,7 +10079,7 @@ msgstr "Operatore"
 msgid "Original"
 msgstr "Originale"
 
-#: include/classes/core/ZBase.php:232
+#: include/classes/core/ZBase.php:233
 msgid "Original blue"
 msgstr "Blu originale"
 
@@ -10397,7 +10397,7 @@ msgstr "Passivo"
 #: include/views/configuration.item.edit.php:192
 #: include/views/configuration.item.massupdate.php:246
 #: include/views/configuration.item.massupdate.php:290
-#: include/views/general.login.php:70
+#: include/views/general.login.php:69
 #: include/views/js/configuration.item.edit.js.php:138
 msgid "Password"
 msgstr "Password"
@@ -10897,7 +10897,7 @@ msgstr "Espressione regolare aggiornata"
 msgid "Regular expressions"
 msgstr "Espressioni regolari"
 
-#: include/views/general.login.php:76
+#: include/views/general.login.php:74
 msgid "Remember me for 30 days"
 msgstr "Ricordami per i prossimi 30 giorni"
 
@@ -12022,7 +12022,7 @@ msgstr "Mostra orario di lavoro"
 msgid "Shown"
 msgstr "Visibile"
 
-#: include/views/general.login.php:79 index.php:55 index.php:64
+#: include/views/general.login.php:77 index.php:55 index.php:64
 msgid "Sign in"
 msgstr "Accedi"
 
@@ -12390,7 +12390,7 @@ msgstr "Dom"
 msgid "Sunday"
 msgstr "Domenica"
 
-#: include/views/general.login.php:42
+#: include/views/general.login.php:40
 msgid "Support"
 msgstr "Supporto"
 
@@ -14317,7 +14317,7 @@ msgid "Zabbix"
 msgstr "Zabbix"
 
 #: include/page_footer.php:103 include/views/general.browserwarning.php:60
-#: include/views/general.login.php:50
+#: include/views/general.login.php:48
 #, c-format
 msgid "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
 msgstr "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"

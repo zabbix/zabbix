@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-04 14:50+0200\n"
+"POT-Creation-Date: 2013-11-05 09:03+0200\n"
 "PO-Revision-Date: 2013-08-30 18:59+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -925,7 +925,7 @@ msgstr ""
 msgid "Bitwise AND of last (most recent) T value and mask is NOT N"
 msgstr ""
 
-#: include/classes/core/ZBase.php:233
+#: include/classes/core/ZBase.php:234
 msgid "Black & Blue"
 msgstr "Бірюзові сутінки"
 
@@ -2384,7 +2384,7 @@ msgstr "Посилання, утворююче кільце, в шаблонах
 msgid "Circular template linkage is not allowed."
 msgstr "Приєднання шаблону, утворююче кільце, не дозволено."
 
-#: include/classes/core/ZBase.php:231
+#: include/classes/core/ZBase.php:232
 msgid "Classic"
 msgstr "Класична"
 
@@ -3154,7 +3154,7 @@ msgstr "НЕДОСТУПНИЙ"
 msgid "Daily"
 msgstr "Щодня"
 
-#: include/classes/core/ZBase.php:234
+#: include/classes/core/ZBase.php:235
 msgid "Dark orange"
 msgstr "Помаранчева ніч"
 
@@ -5422,7 +5422,7 @@ msgstr "Апаратна частина (повні деталі)"
 msgid "Height"
 msgstr "Висота"
 
-#: include/page_header.php:203 include/views/general.login.php:40
+#: include/page_header.php:203 include/views/general.login.php:38
 msgid "Help"
 msgstr "Допомога"
 
@@ -7992,7 +7992,7 @@ msgstr "Підключено до системи як"
 msgid "Login"
 msgstr "Вхід в систему"
 
-#: include/views/general.login.php:82
+#: include/views/general.login.php:80
 msgid "Login as Guest"
 msgstr "Увійти як Гість"
 
@@ -10099,7 +10099,7 @@ msgstr "Оператор"
 msgid "Original"
 msgstr "Оригінальне"
 
-#: include/classes/core/ZBase.php:232
+#: include/classes/core/ZBase.php:233
 msgid "Original blue"
 msgstr "Оригінальна блакитна"
 
@@ -10417,7 +10417,7 @@ msgstr "Пасивний"
 #: include/views/configuration.item.edit.php:192
 #: include/views/configuration.item.massupdate.php:246
 #: include/views/configuration.item.massupdate.php:290
-#: include/views/general.login.php:70
+#: include/views/general.login.php:69
 #: include/views/js/configuration.item.edit.js.php:138
 msgid "Password"
 msgstr "Пароль"
@@ -10919,7 +10919,7 @@ msgstr "Регулярний вираз оновлено"
 msgid "Regular expressions"
 msgstr "Регулярні вирази"
 
-#: include/views/general.login.php:76
+#: include/views/general.login.php:74
 msgid "Remember me for 30 days"
 msgstr "Запам'ятати мене на 30 днів"
 
@@ -12044,7 +12044,7 @@ msgstr "Відображувати робочий час"
 msgid "Shown"
 msgstr "Показана"
 
-#: include/views/general.login.php:79 index.php:55 index.php:64
+#: include/views/general.login.php:77 index.php:55 index.php:64
 msgid "Sign in"
 msgstr "Увійти"
 
@@ -12412,7 +12412,7 @@ msgstr "Нед"
 msgid "Sunday"
 msgstr "Неділя"
 
-#: include/views/general.login.php:42
+#: include/views/general.login.php:40
 msgid "Support"
 msgstr "Підтримка"
 
@@ -14342,7 +14342,7 @@ msgid "Zabbix"
 msgstr "Zabbix"
 
 #: include/page_footer.php:103 include/views/general.browserwarning.php:60
-#: include/views/general.login.php:50
+#: include/views/general.login.php:48
 #, c-format
 msgid "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
 msgstr "Zabbix %1$s Всі права захищено %2$s-%3$s Zabbix SIA"
