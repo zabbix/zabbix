@@ -50,6 +50,7 @@ $fields = array(
 	'applications' =>	array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
 	'groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
 	'hostid' =>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		'isset({form})&&{form}=="update"'),
+	'src_hostid' =>		array(T_ZBX_INT, O_OPT, null,			DB_ID,		null),
 	'host' =>			array(T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({save})', _('Host name')),
 	'visiblename' =>	array(T_ZBX_STR, O_OPT, null,			null,		'isset({save})'),
 	'proxy_hostid' =>	array(T_ZBX_INT, O_OPT, P_SYS,		    DB_ID,		null),
@@ -107,6 +108,13 @@ check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 $_REQUEST['go'] = get_request('go', 'none');
+
+if (hasRequest('full_clone') && getRequest('hostid') > 0) {
+	$_REQUEST['src_hostid'] = getRequest('hostid');
+}
+if (hasRequest('clone') || hasRequest('full_clone')) {
+	$_REQUEST['hostid'] = 0;
+}
 
 /*
  * Permissions
@@ -357,7 +365,7 @@ elseif (isset($_REQUEST['save'])) {
 	try {
 		DBstart();
 
-		if (isset($_REQUEST['hostid']) && $_REQUEST['form'] != 'full_clone') {
+		if (isset($_REQUEST['hostid'])) {
 			$createNew = false;
 			$msgOk = _('Host updated');
 			$msgFail = _('Cannot update host');
@@ -491,7 +499,7 @@ elseif (isset($_REQUEST['save'])) {
 		}
 
 		if ($_REQUEST['form'] == 'full_clone') {
-			$srcHostId = get_request('hostid');
+			$srcHostId = getRequest('src_hostid');
 
 			if (!copyApplications($srcHostId, $hostId)) {
 				throw new Exception();
@@ -699,8 +707,8 @@ elseif (isset($_REQUEST['form'])) {
 	$hostsWidget->addPageHeader(_('CONFIGURATION OF HOSTS'));
 
 	$data = array();
-	if ($hostId = get_request('hostid', 0)) {
-		$hostsWidget->addItem(get_header_host_table('', $_REQUEST['hostid']));
+	if ($hostId = getRequest('hostid', 0)) {
+		$hostsWidget->addItem(get_header_host_table('', $hostId));
 
 		$dbHosts = API::Host()->get(array(
 			'hostids' => $hostId,

@@ -145,11 +145,14 @@ $frmHost->addVar('clear_templates', $clear_templates);
 
 $hostList = new CFormList('hostlist');
 
-if ($_REQUEST['hostid'] > 0 && get_request('form') != 'clone') {
+if ($_REQUEST['hostid'] > 0) {
 	$frmHost->addVar('hostid', $_REQUEST['hostid']);
 }
 if ($_REQUEST['groupid'] > 0) {
 	$frmHost->addVar('groupid', $_REQUEST['groupid']);
+}
+if (getRequest('form') == 'full_clone') {
+	$frmHost->addVar('src_hostid', ($_REQUEST['hostid'] > 0) ? $_REQUEST['hostid'] : getRequest('src_hostid'));
 }
 
 // LLD rule link
@@ -405,9 +408,11 @@ $cmbStatus->addItem(HOST_STATUS_NOT_MONITORED, _('Not monitored'));
 $hostList->addRow(_('Status'), $cmbStatus);
 
 if ($_REQUEST['form'] == 'full_clone') {
+	$hostId = getRequest('src_hostid', getRequest('hostid'));
+
 	// host applications
 	$hostApps = API::Application()->get(array(
-		'hostids' => $_REQUEST['hostid'],
+		'hostids' => $hostId,
 		'inherited' => false,
 		'output' => array('name'),
 		'preservekeys' => true
@@ -428,7 +433,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 
 	// host items
 	$hostItems = API::Item()->get(array(
-		'hostids' => $_REQUEST['hostid'],
+		'hostids' => $hostId,
 		'inherited' => false,
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 		'output' => array('itemid', 'key_', 'name')
@@ -449,7 +454,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 	// host triggers
 	$hostTriggers = API::Trigger()->get(array(
 		'inherited' => false,
-		'hostids' => $_REQUEST['hostid'],
+		'hostids' => $hostId,
 		'output' => array('triggerid', 'description'),
 		'selectItems' => array('type'),
 		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL))
@@ -477,7 +482,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 	// host graphs
 	$hostGraphs = API::Graph()->get(array(
 		'inherited' => false,
-		'hostids' => $_REQUEST['hostid'],
+		'hostids' => $hostId,
 		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
 		'selectHosts' => array('hostid'),
 		'selectItems' => array('type'),
@@ -510,7 +515,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 
 	$hostDiscoveryRules = API::DiscoveryRule()->get(array(
 		'inherited' => false,
-		'hostids' => $_REQUEST['hostid'],
+		'hostids' => $hostId,
 		'output' => array('itemid', 'key_', 'name')
 	));
 	if (!empty($hostDiscoveryRules)) {
@@ -529,7 +534,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 
 	// item prototypes
 	$hostItemPrototypes = API::ItemPrototype()->get(array(
-		'hostids' => $_REQUEST['hostid'],
+		'hostids' => $hostId,
 		'discoveryids' => $hostDiscoveryRuleids,
 		'inherited' => false,
 		'output' => array('itemid', 'key_', 'name')
@@ -549,7 +554,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 
 	// Trigger prototypes
 	$hostTriggerPrototypes = API::TriggerPrototype()->get(array(
-		'hostids' => $_REQUEST['hostid'],
+		'hostids' => $hostId,
 		'discoveryids' => $hostDiscoveryRuleids,
 		'inherited' => false,
 		'output' => array('triggerid', 'description'),
@@ -577,7 +582,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 
 	// Graph prototypes
 	$hostGraphPrototypes = API::GraphPrototype()->get(array(
-		'hostids' => $_REQUEST['hostid'],
+		'hostids' => $hostId,
 		'discoveryids' => $hostDiscoveryRuleids,
 		'inherited' => false,
 		'selectHosts' => array('hostid'),
