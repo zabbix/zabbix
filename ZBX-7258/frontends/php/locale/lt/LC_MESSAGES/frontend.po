@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-01 19:42+0200\n"
+"POT-Creation-Date: 2013-11-05 09:03+0200\n"
 "PO-Revision-Date: 2013-10-10 08:29+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -23,11 +23,11 @@ msgstr "\"%s\" turi būti tarp 1970.01.01 ir 2038.01.18."
 
 #: include/profiles.inc.php:320
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
-msgstr "\"Rodyti OK trigerius\" reikšmė turi būti \"0\" arba teigiamas sveikasis skaičius.\"Rodyti OK trigerius\" reikšmė turi būti \"0\" arba teigiamas sveikasis skaičius.\"Rodyti OK trigerius\" reikšmė turi būti \"0\" arba teigiamas sveikasis skaičius.\"Rodyti OK trigerius\" reikšmė turi būti \"0\" arba teigiamas sveikasis skaičius."
+msgstr "\"Rodyti OK trigerius\" reikšmė turi būti \"0\" arba teigiamas sveikasis skaičius.\"Rodyti OK trigerius\" reikšmė turi būti \"0\" arba teigiamas sveikasis skaičius.\"Rodyti OK trigerius\" reikšmė turi būti \"0\" arba teigiamas sveikasis skaičius.\"Rodyti OK trigerius\" reikšmė turi būti \"0\" arba teigiamas sveikasis skaičius.\"Rodyti OK trigerius\" reikšmė turi būti \"0\" arba teigiamas sveikasis skaičius."
 
 #: include/profiles.inc.php:325
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
-msgstr "\"Trigeriai mirksi keičiantis statusui\" reikšmė turi būti \"0\" arba teigiamas sveikasis skaičius.\"Trigeriai mirksi keičiantis statusui\" reikšmė turi būti \"0\" arba teigiamas sveikasis skaičius.\"Trigeriai mirksi keičiantis statusui\" reikšmė turi būti \"0\" arba teigiamas sveikasis skaičius.\"Trigeriai mirksi keičiantis statusui\" reikšmė turi būti \"0\" arba teigiamas sveikasis skaičius."
+msgstr "\"Trigeriai mirksi keičiantis statusui\" reikšmė turi būti \"0\" arba teigiamas sveikasis skaičius.\"Trigeriai mirksi keičiantis statusui\" reikšmė turi būti \"0\" arba teigiamas sveikasis skaičius.\"Trigeriai mirksi keičiantis statusui\" reikšmė turi būti \"0\" arba teigiamas sveikasis skaičius.\"Trigeriai mirksi keičiantis statusui\" reikšmė turi būti \"0\" arba teigiamas sveikasis skaičius.\"Trigeriai mirksi keičiantis statusui\" reikšmė turi būti \"0\" arba teigiamas sveikasis skaičius."
 
 #: include/func.inc.php:442
 #, c-format
@@ -211,19 +211,19 @@ msgstr "AVAILABILITY REPORT"
 
 #: popup_trexpr.php:139
 msgid "Absolute difference between last and previous value is < N"
-msgstr "Absoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra < NAbsoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra < NAbsoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra < NAbsoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra < N"
+msgstr "Absoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra < NAbsoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra < NAbsoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra < NAbsoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra < NAbsoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra < N"
 
 #: popup_trexpr.php:147
 msgid "Absolute difference between last and previous value is = N"
-msgstr "Absoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra = NAbsoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra = NAbsoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra = NAbsoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra = N"
+msgstr "Absoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra = NAbsoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra = NAbsoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra = NAbsoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra = NAbsoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra = N"
 
 #: popup_trexpr.php:143
 msgid "Absolute difference between last and previous value is > N"
-msgstr "Absoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra > NAbsoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra > NAbsoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra > NAbsoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra > N"
+msgstr "Absoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra > NAbsoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra > NAbsoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra > NAbsoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra > NAbsoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra > N"
 
 #: popup_trexpr.php:151
 msgid "Absolute difference between last and previous value is NOT N"
-msgstr "Absoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra NOT NAbsoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra NOT NAbsoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra NOT NAbsoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra NOT N"
+msgstr "Absoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra NOT NAbsoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra NOT NAbsoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra NOT NAbsoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra NOT NAbsoliutus skirtumas tarp paskutinės ir prieš tai esančios reikšmės yra NOT N"
 
 #: report3.php:83 srv_status.php:142
 msgid "Acceptable SLA"
@@ -329,7 +329,7 @@ msgstr ""
 #: api/classes/CAction.php:541 api/classes/CAction.php:656
 #, c-format
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seconds)."
-msgstr "Veiksmas \"%1$s\" turi neteisinga reikšme \"esc_period\" (minimaliai %2$s sekundžių).Veiksmas \"%1$s\" turi neteisinga reikšme \"esc_period\" (minimaliai %2$s sekundžių).Veiksmas \"%1$s\" turi neteisinga reikšme \"esc_period\" (minimaliai %2$s sekundžių).Veiksmas \"%1$s\" turi neteisinga reikšme \"esc_period\" (minimaliai %2$s sekundžių)."
+msgstr "Veiksmas \"%1$s\" turi neteisinga reikšme \"esc_period\" (minimaliai %2$s sekundžių).Veiksmas \"%1$s\" turi neteisinga reikšme \"esc_period\" (minimaliai %2$s sekundžių).Veiksmas \"%1$s\" turi neteisinga reikšme \"esc_period\" (minimaliai %2$s sekundžių).Veiksmas \"%1$s\" turi neteisinga reikšme \"esc_period\" (minimaliai %2$s sekundžių).Veiksmas \"%1$s\" turi neteisinga reikšme \"esc_period\" (minimaliai %2$s sekundžių)."
 
 #: api/classes/CAction.php:727
 #, c-format
@@ -754,7 +754,7 @@ msgstr "Bent vienas priežiūros periodas turi būti sukurtas."
 
 #: include/classes/class.frontendsetup.php:294
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
-msgstr "Bent vienas iš MySQL, PostgreSQL, Oracle, SQLite3 arba IBM DB2 turėtų būti palaikomasBent vienas iš MySQL, PostgreSQL, Oracle, SQLite3 arba IBM DB2 turėtų būti palaikomasBent vienas iš MySQL, PostgreSQL, Oracle, SQLite3 arba IBM DB2 turėtų būti palaikomasBent vienas iš MySQL, PostgreSQL, Oracle, SQLite3 arba IBM DB2 turėtų būti palaikomas"
+msgstr "Bent vienas iš MySQL, PostgreSQL, Oracle, SQLite3 arba IBM DB2 turėtų būti palaikomasBent vienas iš MySQL, PostgreSQL, Oracle, SQLite3 arba IBM DB2 turėtų būti palaikomasBent vienas iš MySQL, PostgreSQL, Oracle, SQLite3 arba IBM DB2 turėtų būti palaikomasBent vienas iš MySQL, PostgreSQL, Oracle, SQLite3 arba IBM DB2 turėtų būti palaikomasBent vienas iš MySQL, PostgreSQL, Oracle, SQLite3 arba IBM DB2 turėtų būti palaikomas"
 
 #: include/menu.inc.php:264
 #: include/views/administration.general.housekeeper.edit.php:93
@@ -931,7 +931,7 @@ msgstr ""
 msgid "Bitwise AND of last (most recent) T value and mask is NOT N"
 msgstr ""
 
-#: include/classes/core/ZBase.php:233
+#: include/classes/core/ZBase.php:234
 msgid "Black & Blue"
 msgstr "Juoda ir Mėlyna"
 
@@ -1249,7 +1249,7 @@ msgstr "Negalima pridėti priklausomybės iš mazgo į šabloną."
 #: include/triggers.inc.php:505
 #, c-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
-msgstr "Negalima pridėti priklausomybės iš trigerio \"%1$s:%2$s\" į neegzistuojantį trigerį \"%3$s:%4$s\".Negalima pridėti priklausomybės iš trigerio \"%1$s:%2$s\" į neegzistuojantį trigerį \"%3$s:%4$s\".Negalima pridėti priklausomybės iš trigerio \"%1$s:%2$s\" į neegzistuojantį trigerį \"%3$s:%4$s\".Negalima pridėti priklausomybės iš trigerio \"%1$s:%2$s\" į neegzistuojantį trigerį \"%3$s:%4$s\"."
+msgstr "Negalima pridėti priklausomybės iš trigerio \"%1$s:%2$s\" į neegzistuojantį trigerį \"%3$s:%4$s\".Negalima pridėti priklausomybės iš trigerio \"%1$s:%2$s\" į neegzistuojantį trigerį \"%3$s:%4$s\".Negalima pridėti priklausomybės iš trigerio \"%1$s:%2$s\" į neegzistuojantį trigerį \"%3$s:%4$s\".Negalima pridėti priklausomybės iš trigerio \"%1$s:%2$s\" į neegzistuojantį trigerį \"%3$s:%4$s\".Negalima pridėti priklausomybės iš trigerio \"%1$s:%2$s\" į neegzistuojantį trigerį \"%3$s:%4$s\"."
 
 #: host_discovery.php:267
 msgid "Cannot add discovery rule"
@@ -1307,7 +1307,7 @@ msgstr "Negalima pridėti medijos tipo"
 #: api/classes/CGraph.php:43
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
-msgstr "Negalima pridėti daugiau nei vieno elemento su tipu \"Grafiko suma\" ant grafiko \"%1$s\".Negalima pridėti daugiau nei vieno elemento su tipu \"Grafiko suma\" ant grafiko \"%1$s\".Negalima pridėti daugiau nei vieno elemento su tipu \"Grafiko suma\" ant grafiko \"%1$s\".Negalima pridėti daugiau nei vieno elemento su tipu \"Grafiko suma\" ant grafiko \"%1$s\"."
+msgstr "Negalima pridėti daugiau nei vieno elemento su tipu \"Grafiko suma\" ant grafiko \"%1$s\".Negalima pridėti daugiau nei vieno elemento su tipu \"Grafiko suma\" ant grafiko \"%1$s\".Negalima pridėti daugiau nei vieno elemento su tipu \"Grafiko suma\" ant grafiko \"%1$s\".Negalima pridėti daugiau nei vieno elemento su tipu \"Grafiko suma\" ant grafiko \"%1$s\".Negalima pridėti daugiau nei vieno elemento su tipu \"Grafiko suma\" ant grafiko \"%1$s\"."
 
 #: api/classes/CGraphPrototype.php:43
 #, c-format
@@ -1414,7 +1414,7 @@ msgstr "Negalima klonuoti trigerio prototipų."
 
 #: scripts_exec.php:65
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
-msgstr "Negalima prisijungti prie traperio jungties zabbixo serverio tarnybos, bet turėtų būti galima paleisti skriptą.Negalima prisijungti prie traperio jungties zabbixo serverio tarnybos, bet turėtų būti galima paleisti skriptą.Negalima prisijungti prie traperio jungties zabbixo serverio tarnybos, bet turėtų būti galima paleisti skriptą.Negalima prisijungti prie traperio jungties zabbixo serverio tarnybos, bet turėtų būti galima paleisti skriptą."
+msgstr "Negalima prisijungti prie traperio jungties zabbixo serverio tarnybos, bet turėtų būti galima paleisti skriptą.Negalima prisijungti prie traperio jungties zabbixo serverio tarnybos, bet turėtų būti galima paleisti skriptą.Negalima prisijungti prie traperio jungties zabbixo serverio tarnybos, bet turėtų būti galima paleisti skriptą.Negalima prisijungti prie traperio jungties zabbixo serverio tarnybos, bet turėtų būti galima paleisti skriptą.Negalima prisijungti prie traperio jungties zabbixo serverio tarnybos, bet turėtų būti galima paleisti skriptą."
 
 #: graphs.php:323
 msgid "Cannot copy graphs"
@@ -2391,7 +2391,7 @@ msgstr ""
 msgid "Circular template linkage is not allowed."
 msgstr ""
 
-#: include/classes/core/ZBase.php:231
+#: include/classes/core/ZBase.php:232
 msgid "Classic"
 msgstr ""
 
@@ -3150,7 +3150,7 @@ msgstr ""
 msgid "Daily"
 msgstr ""
 
-#: include/classes/core/ZBase.php:234
+#: include/classes/core/ZBase.php:235
 msgid "Dark orange"
 msgstr ""
 
@@ -5418,7 +5418,7 @@ msgstr ""
 msgid "Height"
 msgstr ""
 
-#: include/page_header.php:203 include/views/general.login.php:40
+#: include/page_header.php:203 include/views/general.login.php:38
 msgid "Help"
 msgstr ""
 
@@ -7988,7 +7988,7 @@ msgstr ""
 msgid "Login"
 msgstr ""
 
-#: include/views/general.login.php:82
+#: include/views/general.login.php:80
 msgid "Login as Guest"
 msgstr ""
 
@@ -9316,6 +9316,10 @@ msgstr ""
 msgid "No notifications found."
 msgstr ""
 
+#: include/views/configuration.action.edit.php:332
+msgid "No operations defined."
+msgstr ""
+
 #: include/classes/import/CConfigurationImport.php:880
 #: include/classes/import/CConfigurationImport.php:960
 #: include/classes/import/CXmlImport18.php:1553
@@ -10091,7 +10095,7 @@ msgstr ""
 msgid "Original"
 msgstr ""
 
-#: include/classes/core/ZBase.php:232
+#: include/classes/core/ZBase.php:233
 msgid "Original blue"
 msgstr ""
 
@@ -10409,7 +10413,7 @@ msgstr ""
 #: include/views/configuration.item.edit.php:192
 #: include/views/configuration.item.massupdate.php:246
 #: include/views/configuration.item.massupdate.php:290
-#: include/views/general.login.php:70
+#: include/views/general.login.php:69
 #: include/views/js/configuration.item.edit.js.php:138
 msgid "Password"
 msgstr ""
@@ -10910,7 +10914,7 @@ msgstr ""
 msgid "Regular expressions"
 msgstr ""
 
-#: include/views/general.login.php:76
+#: include/views/general.login.php:74
 msgid "Remember me for 30 days"
 msgstr ""
 
@@ -12035,7 +12039,7 @@ msgstr ""
 msgid "Shown"
 msgstr ""
 
-#: include/views/general.login.php:79 index.php:55 index.php:64
+#: include/views/general.login.php:77 index.php:55 index.php:64
 msgid "Sign in"
 msgstr ""
 
@@ -12403,7 +12407,7 @@ msgstr ""
 msgid "Sunday"
 msgstr ""
 
-#: include/views/general.login.php:42
+#: include/views/general.login.php:40
 msgid "Support"
 msgstr ""
 
@@ -14333,7 +14337,7 @@ msgid "Zabbix"
 msgstr ""
 
 #: include/page_footer.php:103 include/views/general.browserwarning.php:60
-#: include/views/general.login.php:50
+#: include/views/general.login.php:48
 #, c-format
 msgid "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
 msgstr ""

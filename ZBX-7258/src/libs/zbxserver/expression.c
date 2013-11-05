@@ -4206,18 +4206,51 @@ int	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row, int 
 	return ret;
 }
 
-static void	unquote_key_param(char *param)
+typedef struct
 {
-	char	*dst;
+	zbx_uint64_t		*hostid;
+	DC_ITEM			*dc_item;
+	struct zbx_json_parse	*jp_row;
+	int			macro_type;
+}
+replace_key_param_data_t;
 
-	for (dst = param; '\0' != *param; param++)
-	{
-		if ('\\' == *param && '"' == param[1])
-			continue;
+/******************************************************************************
+ *                                                                            *
+ * Function: replace_key_param                                                *
+ *                                                                            *
+ * Comments: auxiliary function for substitute_key_macros()                   *
+ *                                                                            *
+ ******************************************************************************/
+static char	*replace_key_param(const char *data, int key_type, int level, int num, int quoted, void *cb_data)
+{
+	replace_key_param_data_t	*replace_key_param_data = (replace_key_param_data_t *)cb_data;
+	zbx_uint64_t			*hostid = replace_key_param_data->hostid;
+	DC_ITEM				*dc_item = replace_key_param_data->dc_item;
+	struct zbx_json_parse		*jp_row = replace_key_param_data->jp_row;
+	int				macro_type = replace_key_param_data->macro_type;
+	char				*param;
 
-		*dst++ = *param;
-	}
-	*dst = '\0';
+	if (ZBX_KEY_TYPE_ITEM == key_type && 0 == level)
+		return NULL;
+
+	if (NULL == strchr(data, '{'))
+		return NULL;
+
+	param = zbx_strdup(NULL, data);
+
+	if (0 != level)
+		unquote_key_param(param);
+
+	if (NULL == jp_row)
+		substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, dc_item, &param, macro_type, NULL, 0);
+	else
+		substitute_discovery_macros(&param, jp_row, ZBX_MACRO_ANY, NULL, 0);
+
+	if (0 != level)
+		quote_key_param(&param, quoted);
+
+	return param;
 }
 
 /******************************************************************************
@@ -4225,8 +4258,6 @@ static void	unquote_key_param(char *param)
  * Function: substitute_key_macros                                            *
  *                                                                            *
  * Purpose: safely substitutes macros in parameters of an item key and OID    *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Example:  key                     | macro       | result                   *
  *          -------------------------+-------------+-----------------         *
@@ -4242,201 +4273,32 @@ static void	unquote_key_param(char *param)
 int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, struct zbx_json_parse *jp_row,
 		int macro_type, char *error, size_t maxerrlen)
 {
-	const char	*__function_name = "substitute_key_macros";
-
-	typedef enum
-	{
-		ZBX_STATE_NEW,
-		ZBX_STATE_END,
-		ZBX_STATE_UNQUOTED,
-		ZBX_STATE_QUOTED
-	}
-	zbx_parser_state_t;
-
-	char			*param = NULL, c;
-	size_t			i, l = 0;
-	int			level = 0, res = SUCCEED;
-	zbx_parser_state_t	state = ZBX_STATE_END;
+	const char			*__function_name = "substitute_key_macros";
+	replace_key_param_data_t	replace_key_param_data;
+	int				key_type, ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, *data);
 
-	assert(MACRO_TYPE_ITEM_KEY == macro_type || MACRO_TYPE_SNMP_OID == macro_type);
+	replace_key_param_data.hostid = hostid;
+	replace_key_param_data.dc_item = dc_item;
+	replace_key_param_data.jp_row = jp_row;
+	replace_key_param_data.macro_type = macro_type;
 
-	if (MACRO_TYPE_ITEM_KEY == macro_type)
+	switch (macro_type)
 	{
-		for (i = 0; SUCCEED == is_key_char((*data)[i]) && '\0' != (*data)[i]; i++)
-			;
-
-		if ('[' != (*data)[i] || 0 == i)
-			goto clean;
-	}
-	else
-	{
-		for (i = 0; '[' != (*data)[i] && '\0' != (*data)[i]; i++)
-			;
-
-		c = (*data)[i];
-		(*data)[i] = '\0';
-
-		if (NULL != strchr(*data, '{'))
-		{
-			param = zbx_strdup(param, *data);
-			(*data)[i] = c;
-
-			if (NULL == jp_row)
-			{
-				substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, dc_item,
-						&param, macro_type, NULL, 0);
-			}
-			else
-				substitute_discovery_macros(&param, jp_row, ZBX_MACRO_ANY, NULL, 0);
-
-			i--; zbx_replace_string(data, 0, &i, param); i++;
-
-			zbx_free(param);
-		}
-		else
-			(*data)[i] = c;
+		case MACRO_TYPE_ITEM_KEY:
+			key_type = ZBX_KEY_TYPE_ITEM;
+			break;
+		case MACRO_TYPE_SNMP_OID:
+			key_type = ZBX_KEY_TYPE_OID;
+			break;
+		default:
+			assert(0);
 	}
 
-	for (; '\0' != (*data)[i]; i++)
-	{
-		if (0 == level)
-		{
-			/* first square bracket + Zapcat compatibility */
-			if (ZBX_STATE_END == state && '[' == (*data)[i])
-				state = ZBX_STATE_NEW;
-			else
-				break;
-		}
+	ret = replace_key_params_dyn(data, key_type, replace_key_param, &replace_key_param_data, error, maxerrlen);
 
-		switch (state)
-		{
-			case ZBX_STATE_NEW:	/* a new parameter started */
-				switch ((*data)[i])
-				{
-					case ' ':
-					case ',':
-						break;
-					case '[':
-						level++;
-						break;
-					case ']':
-						level--;
-						state = ZBX_STATE_END;
-						break;
-					case '"':
-						state = ZBX_STATE_QUOTED;
-						l = i;
-						break;
-					default:
-						state = ZBX_STATE_UNQUOTED;
-						l = i;
-				}
-				break;
-			case ZBX_STATE_END:	/* end of parameter */
-				switch ((*data)[i])
-				{
-					case ' ':
-						break;
-					case ',':
-						state = ZBX_STATE_NEW;
-						break;
-					case ']':
-						level--;
-						break;
-					default:
-						goto clean;
-				}
-				break;
-			case ZBX_STATE_UNQUOTED:	/* an unquoted parameter */
-				if (']' == (*data)[i] || ',' == (*data)[i])
-				{
-					if (']' == (*data)[i])
-					{
-						level--;
-						state = ZBX_STATE_END;
-					}
-					else
-						state = ZBX_STATE_NEW;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s data:'%s'", __function_name, zbx_result_string(ret), *data);
 
-					c = (*data)[i];
-					(*data)[i] = '\0';
-
-					if (NULL != strchr(*data + l, '{'))
-					{
-						param = zbx_strdup(param, *data + l);
-						(*data)[i] = c;
-
-						if (NULL == jp_row)
-						{
-							substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL,
-									dc_item, &param, macro_type, NULL, 0);
-						}
-						else
-						{
-							substitute_discovery_macros(&param, jp_row, ZBX_MACRO_ANY,
-									NULL, 0);
-						}
-
-						quote_key_param(&param, 0);
-						i--; zbx_replace_string(data, l, &i, param); i++;
-
-						zbx_free(param);
-					}
-					else
-						(*data)[i] = c;
-				}
-				break;
-			case ZBX_STATE_QUOTED:	/* a quoted parameter */
-				if ('"' == (*data)[i] && '\\' != (*data)[i - 1])
-				{
-					state = ZBX_STATE_END;
-
-					c = (*data)[i];
-					(*data)[i] = '\0';
-
-					if (NULL != strchr(*data + l + 1, '{'))
-					{
-						param = zbx_strdup(param, *data + l + 1);
-						(*data)[i] = c;
-
-						unquote_key_param(param);
-
-						if (NULL == jp_row)
-						{
-							substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL,
-									dc_item, &param, macro_type, NULL, 0);
-						}
-						else
-						{
-							substitute_discovery_macros(&param, jp_row, ZBX_MACRO_ANY,
-									NULL, 0);
-						}
-
-						quote_key_param(&param, 1);
-						zbx_replace_string(data, l, &i, param);
-
-						zbx_free(param);
-					}
-					else
-						(*data)[i] = c;
-				}
-				break;
-		}
-	}
-clean:
-	if (0 == i || '\0' != (*data)[i] || 0 != level)
-	{
-		if (NULL != error)
-		{
-			zbx_snprintf(error, maxerrlen, "Invalid %s at position " ZBX_FS_SIZE_T,
-					(MACRO_TYPE_ITEM_KEY == macro_type ? "item key" : "SNMP OID"), (zbx_fs_size_t)i);
-		}
-		res = FAIL;
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s data:'%s'", __function_name, zbx_result_string(res), *data);
-
-	return res;
+	return ret;
 }
