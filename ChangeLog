@@ -1,10 +1,21 @@
 Changes for 2.2.0rc1
 
 New features:
+..F.I...S. [ZBXNEXT-1975] increased the size of alerts table message field to 64KB also on Oracle database (Pavels, wiper)
+..F....... [ZBXNEXT-1371] added links to graphs, web monitoring and LLD rules in the search results; thanks to Volker Fröhlich and Marc for patches (Pavels)
+.........T [ZBX-6832] improved default templates (e.g., split "Template App Agentless" into 12 templates for each service) (asaveljevs, neogan, Sasha)
 ..F....... [ZBXNEXT-1851] hid American English, Greek and Polish translations from the frontend (Richlv)
 
 Bug fixes:
 .......PS. [ZBX-7282] fixed server or proxy crash while terminating database upgrade bu TERM signal (Sasha)
+...G...... [ZBX-7275] fixed eventlog sometimes returning garbage value (wiper)
+.........T [ZBX-7269] fixed units and value type for vmware.vm.vfs.fs.size[{$URL},{HOST.HOST},{#FSNAME},pfree] item in "Template Virt VMware Guest" template (Sasha)
+........S. [ZBX-7258] fixed vCenter VMs unique identifier for host names (Sasha)
+..F....... [ZBX-7283] fixed latest data table layout issues when switching hosts and the "Show details" filter (Pavels)
+..F....... [ZBX-5854] fixed host status indicator not displaying maintenance status in the host configuration form header (Pavels)
+..F....... [ZBX-7242] fixed sortable table elements not to change width while dragging them (Ivo)
+..F....... [ZBX-7213] fixed pre-loader image width and height for Internet Explorer (Ivo)
+....I..... [ZBX-7273] fixed newlines in default data strings for Oracle (Sasha)
 ........S. [ZBX-7141] made it clear agent of which particular type is unavailable for unknown triggers (asaveljevs, Sasha)
 
 --------------------------------------------------------------------------------
@@ -320,6 +331,7 @@ A......... [ZBX-6771] fixed "status" field and existing host validation in Proxy
 Changes for 2.1.0
 
 New features:
+...G...... [ZBXNEXT-1653] added regexp extraction support to file/web/log keys (wiper)
 ........S. [ZBXNEXT-322] implemented value cache (wiper)
 ...G...... [ZBXNEXT-1571] added support for proc.num for HP-UX (igors)
 ...G...PS. [ZBX-6299] added JSON validator (wiper)
@@ -586,6 +598,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Dutch, German, Hungarian, Japanese, Italian, Romanian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+....I..... [ZBX-7273] fixed newlines in default data strings for Oracle (Sasha)
 .......PS. [ZBX-6835] fixed bug when agent/proxy connection error could have resulted in a wrong warning about message size (wiper)
 A.F....... [ZBX-6760] improved performance of getting global scripts (Sasha)
 ........S. [ZBX-7151] limited alert message and items parameter length to 2048 characters when working with Oracle and DB2 databases (wiper)
