@@ -107,6 +107,8 @@ class CAlert extends CZBXAPI {
 			// triggers
 			if ($options['eventobject'] == EVENT_OBJECT_TRIGGER) {
 				$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
+
+				// Oracle does not support using disctinct with nclob fields, so we must use exists instead of joins
 				$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
 					' FROM events e,functions f,items i,hosts_groups hgg'.
@@ -125,6 +127,8 @@ class CAlert extends CZBXAPI {
 			// items and LLD rules
 			elseif ($options['eventobject'] == EVENT_OBJECT_ITEM || $options['eventobject'] == EVENT_OBJECT_LLDRULE) {
 				$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
+
+				// Oracle does not support using disctinct with nclob fields, so we must use exists instead of joins
 				$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
 					' FROM events e,items i,hosts_groups hgg'.
@@ -141,36 +145,43 @@ class CAlert extends CZBXAPI {
 			}
 		}
 
-		$sqlParts['from']['e'] = 'events e';
-		$sqlParts['where']['ae'] = 'a.eventid=e.eventid';
-		$sqlParts['where'][] = 'e.source='.zbx_dbstr($options['eventsource']);
-		$sqlParts['where'][] = 'e.object='.zbx_dbstr($options['eventobject']);
+		// Oracle does not support using disctinct with nclob fields, so we must use exists instead of joins
+		$sqlParts['where'][] = 'EXISTS ('.
+			'SELECT NULL'.
+			' FROM events e'.
+			' WHERE a.eventid=e.eventid'.
+				' AND e.source='.zbx_dbstr($options['eventsource']).
+				' AND e.object='.zbx_dbstr($options['eventobject']).
+		')';
 
 		// groupids
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
 
-			$sqlParts = $this->addQuerySelect('hg.groupid', $sqlParts);
-			$sqlParts['from']['events'] = 'events e';
-			$sqlParts['where']['ae'] = 'a.eventid=e.eventid';
-
 			// triggers
 			if ($options['eventobject'] == EVENT_OBJECT_TRIGGER) {
-				$sqlParts['from']['functions'] = 'functions f';
-				$sqlParts['from']['items'] = 'items i';
-				$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-				$sqlParts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
-				$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
-				$sqlParts['where']['fe'] = 'f.triggerid=e.objectid';
-				$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
+				// Oracle does not support using disctinct with nclob fields, so we must use exists instead of joins
+				$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM events e,functions f,items i,hosts_groups hg'.
+					' WHERE a.eventid=e.eventid'.
+						' AND e.objectid=f.triggerid'.
+						' AND f.itemid=i.itemid'.
+						' AND i.hostid=hg.hostid'.
+						' AND '.dbConditionInt('hg.groupid', $options['groupids']).
+				')';
 			}
 			// lld rules and items
 			elseif ($options['eventobject'] == EVENT_OBJECT_LLDRULE || $options['eventobject'] == EVENT_OBJECT_ITEM) {
-				$sqlParts['from']['items'] = 'items i';
-				$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-				$sqlParts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
-				$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
-				$sqlParts['where']['fi'] = 'e.objectid=i.itemid';
+				// Oracle does not support using disctinct with nclob fields, so we must use exists instead of joins
+				$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM events e,items i,hosts_groups hg'.
+					' WHERE a.eventid=e.eventid'.
+						' AND e.objectid=i.itemid'.
+						' AND i.hostid=hg.hostid'.
+						' AND '.dbConditionInt('hg.groupid', $options['groupids']).
+				')';
 			}
 		}
 
@@ -178,23 +189,28 @@ class CAlert extends CZBXAPI {
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 
-			$sqlParts = $this->addQuerySelect('i.hostid', $sqlParts);
-			$sqlParts['from']['events'] = 'events e';
-			$sqlParts['where']['ae'] = 'a.eventid=e.eventid';
-
 			// triggers
 			if ($options['eventobject'] == EVENT_OBJECT_TRIGGER) {
-				$sqlParts['from']['functions'] = 'functions f';
-				$sqlParts['from']['items'] = 'items i';
-				$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
-				$sqlParts['where']['ft'] = 'f.triggerid=e.objectid';
-				$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
+				// Oracle does not support using disctinct with nclob fields, so we must use exists instead of joins
+				$sqlParts['where'][] = 'EXISTS ('.
+				'SELECT NULL'.
+				' FROM events e,functions f,items i'.
+				' WHERE a.eventid=e.eventid'.
+					' AND e.objectid=f.triggerid'.
+					' AND f.itemid=i.itemid'.
+					' AND '.dbConditionInt('i.hostid', $options['hostids']).
+				')';
 			}
 			// lld rules and items
 			elseif ($options['eventobject'] == EVENT_OBJECT_LLDRULE || $options['eventobject'] == EVENT_OBJECT_ITEM) {
-				$sqlParts['from']['items'] = 'items i';
-				$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
-				$sqlParts['where']['fi'] = 'e.objectid=i.itemid';
+				// Oracle does not support using disctinct with nclob fields, so we must use exists instead of joins
+				$sqlParts['where'][] = 'EXISTS ('.
+				'SELECT NULL'.
+				' FROM events e,items i'.
+				' WHERE a.eventid=e.eventid'.
+					' AND e.objectid=i.itemid'.
+					' AND '.dbConditionInt('i.hostid', $options['hostids']).
+				')';
 			}
 		}
 
@@ -207,14 +223,16 @@ class CAlert extends CZBXAPI {
 
 		// objectids
 		if ($options['objectids'] !== null
-				&& in_array($options['object'], array(EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE))) {
-
+				&& in_array($options['eventobject'], array(EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE))) {
 			zbx_value2array($options['objectids']);
 
-			$sqlParts['select']['actionid'] = 'a.actionid';
-			$sqlParts['from']['events'] = 'events e';
-			$sqlParts['where']['ae'] = 'a.eventid=e.eventid';
-			$sqlParts['where'][] = dbConditionInt('e.objectid', $options['objectids']);
+			// Oracle does not support using disctinct with nclob fields, so we must use exists instead of joins
+			$sqlParts['where'][] = 'EXISTS ('.
+				'SELECT NULL'.
+				' FROM events e'.
+				' WHERE a.eventid=e.eventid'.
+					' AND '.dbConditionInt('e.objectid', $options['objectids']).
+			')';
 		}
 
 		// eventids
@@ -285,35 +303,7 @@ class CAlert extends CZBXAPI {
 				$result = $alert['rowscount'];
 			}
 			else {
-				if (!isset($result[$alert['alertid']])) {
-					$result[$alert['alertid']] = array();
-				}
-
-				// hostids
-				if (isset($alert['hostid']) && is_null($options['selectHosts'])) {
-					if (!isset($result[$alert['alertid']]['hosts'])) {
-						$result[$alert['alertid']]['hosts'] = array();
-					}
-					$result[$alert['alertid']]['hosts'][] = array('hostid' => $alert['hostid']);
-				}
-
-				// userids
-				if (isset($alert['userid']) && is_null($options['selectUsers'])) {
-					if (!isset($result[$alert['alertid']]['users'])) {
-						$result[$alert['alertid']]['users'] = array();
-					}
-					$result[$alert['alertid']]['users'][] = array('userid' => $alert['userid']);
-				}
-
-				// mediatypeids
-				if (isset($alert['mediatypeid']) && is_null($options['selectMediatypes'])) {
-					if (!isset($result[$alert['alertid']]['mediatypes'])) {
-						$result[$alert['alertid']]['mediatypes'] = array();
-					}
-					$result[$alert['alertid']]['mediatypes'][] = array('mediatypeid' => $alert['mediatypeid']);
-				}
-
-				$result[$alert['alertid']] += $alert;
+				$result[$alert['alertid']] = $alert;
 			}
 		}
 
