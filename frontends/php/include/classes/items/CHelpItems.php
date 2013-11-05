@@ -558,6 +558,14 @@ class CHelpItems {
 				'description' => 'VMware event log, <url> - VMware service URL'
 			),
 			array(
+				'key' => 'vmware.fullname[<url>]',
+				'description' => 'VMware service full name, <url> - VMware service URL'
+			),
+			array(
+				'key' => 'vmware.eventlog[<url>]',
+				'description' => 'VMware service version, <url> - VMware service URL'
+			),
+			array(
 				'key' => 'vmware.hv.cluster.name[<url>,<uuid>]',
 				'description' => 'VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name'
 			),
