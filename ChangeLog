@@ -1,6 +1,25 @@
+Changes for 2.2.0rc1
+
+New features:
+.........T [ZBX-6832] improved default templates (e.g., split "Template App Agentless" into 12 templates for each service) (asaveljevs, neogan, Sasha)
+..F....... [ZBXNEXT-1851] hid American English, Greek and Polish translations from the frontend (Richlv)
+
+Bug fixes:
+........S. [ZBX-7258] fixed vCenter VMs unique identifier for host names (Sasha)
+..F....... [ZBX-7283] fixed latest data table layout issues when switching hosts and the "Show details" filter (Pavels)
+..F....... [ZBX-5854] fixed host status indicator not displaying maintenance status in the host configuration form header (Pavels)
+..F....... [ZBX-7242] fixed sortable table elements not to change width while dragging them (Ivo)
+..F....... [ZBX-7213] fixed pre-loader image width and height for Internet Explorer (Ivo)
+....I..... [ZBX-7273] fixed newlines in default data strings for Oracle (Sasha)
+........S. [ZBX-7141] made it clear agent of which particular type is unavailable for unknown triggers (asaveljevs, Sasha)
+
+--------------------------------------------------------------------------------
 Changes for 2.1.9
 
 New features:
+...GI..PS. [ZBXNEXT-1477] added support of Windows eventlog source regex filter (Sasha)
+..F.I..... [ZBXNEXT-544] moved help_items data to php code (Pavels, Sasha)
+..F....... [ZBXNEXT-1827] improved multiselect full text search (Eduard)
 ..F....... [ZBX-7065] changed the design of the setup, login and browser warning pages (Pavels)
 ..F....... [ZBX-6983] renamed the "Latest host group issues" screen element to "Host group issues" and "Latest host issues" to "Host issues" (Pavels)
 ..F....... [ZBX-7215] improved the design of the search auto suggest (Pavels)
@@ -8,7 +27,8 @@ New features:
 ..F.I..... [ZBXNEXT-715] increased the size of sysmaps_elements.label and sysmaps_links.label fields to 2048 characters (Sasha)
 
 Bug fixes:
-........S. [ZBX-7258] fixed vCenter VMs unique identifier for host names (Sasha)
+...G...PS. [ZBX-7125] fixed improper reading of configuration files in case there were problems with included files; we now exit with failure (asaveljevs)
+..F....... [ZBX-7257] improved config file validation (Eduard)
 ..F....... [ZBX-7249] changed setup pre-requisites values "yes" to "on" and "no" to "off", fixed numeric value validation and port text alignment (Pavels, Ivo)
 ..F....... [ZBX-7267] implement menu popup in trigger top 100 page for hosts and triggers columns (Eduard)
 ..F....... [ZBX-7260] fixed "Wrong RPC call to JS RPC" error when acknowledging trigger and changing group or host in screen element (Ivo)
@@ -92,6 +112,7 @@ A......... [ZBX-7101] fixed generated SQL queries in action.get method when simu
 Changes for 2.1.7
 
 New features:
+..F....... [ZBXNEXT-1851] hid Czech, Dutch, Hungarian, Korean, Latvian, Persian, Spanish and Turkish translations from the frontend (Richlv)
 ..FG...... [ZBX-2008] added support of Windows Eventing 6.0 (igors, Ivo)
 ...G...... [ZBXNEXT-1942] added zabbix sender dynamic link library for windows (wiper)
 ...G...... [ZBXNEXT-935] zabbix sender exit status now better reflects the operation result - success:0, partial success:2, failure:1 (asaveljevs, wiper)
@@ -305,6 +326,7 @@ A......... [ZBX-6771] fixed "status" field and existing host validation in Proxy
 Changes for 2.1.0
 
 New features:
+...G...... [ZBXNEXT-1653] added regexp extraction support to file/web/log keys (wiper)
 ........S. [ZBXNEXT-322] implemented value cache (wiper)
 ...G...... [ZBXNEXT-1571] added support for proc.num for HP-UX (igors)
 ...G...PS. [ZBX-6299] added JSON validator (wiper)
@@ -571,6 +593,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Dutch, German, Hungarian, Japanese, Italian, Romanian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+....I..... [ZBX-7273] fixed newlines in default data strings for Oracle (Sasha)
 .......PS. [ZBX-6835] fixed bug when agent/proxy connection error could have resulted in a wrong warning about message size (wiper)
 A.F....... [ZBX-6760] improved performance of getting global scripts (Sasha)
 ........S. [ZBX-7151] limited alert message and items parameter length to 2048 characters when working with Oracle and DB2 databases (wiper)

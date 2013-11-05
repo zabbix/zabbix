@@ -283,6 +283,11 @@ static void	DBcreate_table_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "\n)" ZBX_DB_TABLE_OPTIONS);
 }
 
+static void	DBdrop_table_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *table_name)
+{
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "drop table %s", table_name);
+}
+
 static void	DBmodify_field_type_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, const ZBX_FIELD *field)
 {
@@ -433,6 +438,22 @@ static int	DBcreate_table(const ZBX_TABLE *table)
 	int	ret = FAIL;
 
 	DBcreate_table_sql(&sql, &sql_alloc, &sql_offset, table);
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		ret = SUCCEED;
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBdrop_table(const char *table_name)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = FAIL;
+
+	DBdrop_table_sql(&sql, &sql_alloc, &sql_offset, table_name);
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
 		ret = SUCCEED;
@@ -1549,7 +1570,7 @@ static int	DBpatch_2010101(void)
 
 			zbx_free(param);
 
-			if (ITEM_KEY_LEN < zbx_strlen_utf8(key))
+			if (255 /* ITEM_KEY_LEN */ < zbx_strlen_utf8(key))
 				error_message = zbx_dsprintf(error_message, "key \"%s\" is too long", row[1]);
 		}
 
@@ -2238,6 +2259,87 @@ static int	DBpatch_2010193(void)
 	return FAIL;
 }
 
+static int	DBpatch_2010194(void)
+{
+	return DBdrop_table("help_items");
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: replace_key_param                                                *
+ *                                                                            *
+ * Comments: auxiliary function for DBpatch_2010195()                         *
+ *                                                                            *
+ ******************************************************************************/
+static char	*replace_key_param(const char *data, int key_type, int level, int num, int quoted, void *cb_data)
+{
+	char	*param, *new_param;
+
+	if (1 != level || 4 != num)	/* the fourth parameter on first level should be updated */
+		return NULL;
+
+	param = zbx_strdup(NULL, data);
+
+	unquote_key_param(param);
+
+	if ('\0' == *param)
+	{
+		zbx_free(param);
+		return NULL;
+	}
+
+	new_param = zbx_dsprintf(NULL, "^%s$", param);
+
+	zbx_free(param);
+
+	quote_key_param(&new_param, quoted);
+
+	return new_param;
+}
+
+static int	DBpatch_2010195(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*key = NULL, *key_esc, error[64];
+	int		ret = SUCCEED;
+
+	result = DBselect("select itemid,key_ from items where key_ like 'eventlog[%%'");
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		key = zbx_strdup(key, row[1]);
+
+		if (SUCCEED != replace_key_params_dyn(&key, ZBX_KEY_TYPE_ITEM, replace_key_param, NULL,
+				error, sizeof(error)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot convert item key \"%s\": %s", row[1], error);
+			continue;
+		}
+
+		if (255 /* ITEM_KEY_LEN */ < zbx_strlen_utf8(key))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot convert item key \"%s\": key is too long", row[1]);
+			continue;
+		}
+
+		if (0 != strcmp(key, row[1]))
+		{
+			key_esc = DBdyn_escape_string(key);
+
+			if (ZBX_DB_OK > DBexecute("update items set key_='%s' where itemid=%s", key_esc, row[0]))
+				ret = FAIL;
+
+			zbx_free(key_esc);
+		}
+	}
+	DBfree_result(result);
+
+	zbx_free(key);
+
+	return ret;
+}
+
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 #define DBPATCH_END()					{NULL}};
@@ -2478,6 +2580,8 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010191, 0, 1)
 	DBPATCH_ADD(2010192, 0, 0)
 	DBPATCH_ADD(2010193, 0, 0)
+	DBPATCH_ADD(2010194, 0, 1)
+	DBPATCH_ADD(2010195, 0, 1)
 
 	DBPATCH_END()
 
