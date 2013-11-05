@@ -153,7 +153,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$sql = 'SELECT dropdown_first_remember FROM config WHERE dropdown_first_remember=0';
 		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "dropdown_first_remember"');
 
-		$this->zbxTestCheckboxUnselect('dropdown_first_remember');
+		$this->zbxTestCheckboxSelect('dropdown_first_remember', false);
 		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent(array('Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'remember selected'));
 
@@ -286,7 +286,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI'));
-		$this->zbxTestCheckboxUnselect('event_ack_enable');
+		$this->zbxTestCheckboxSelect('event_ack_enable', false);
 
 		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent(array('Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'Enable event acknowledges'));
