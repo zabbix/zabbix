@@ -109,7 +109,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 #define ZBX_CFG_RTRIM_CHARS	ZBX_CFG_LTRIM_CHARS "\r\n"
 
 	FILE		*file;
-	int		i, lineno, result = SUCCEED, param_valid;
+	int		i, lineno, param_valid;
 	char		line[MAX_STRING_LEN], *parameter, *value;
 	zbx_uint64_t	var;
 
@@ -143,29 +143,23 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 			*value++ = '\0';
 
 			zbx_rtrim(parameter, ZBX_CFG_RTRIM_CHARS);
-
 			zbx_ltrim(value, ZBX_CFG_LTRIM_CHARS);
 
 			zabbix_log(LOG_LEVEL_DEBUG, "cfg: para: [%s] val [%s]", parameter, value);
 
 			if (0 == strcmp(parameter, "Include"))
 			{
-				if (FAIL == (result = parse_cfg_object(value, cfg, level, strict)))
-					break;
+				if (FAIL == parse_cfg_object(value, cfg, level, strict))
+				{
+					fclose(file);
+					goto error;
+				}
 
 				continue;
 			}
 
-			for (i = 0; '\0' != value[i]; i++)
-			{
-				if ('\n' == value[i])
-				{
-					value[i] = '\0';
-					break;
-				}
-			}
-
 			param_valid = 0;
+
 			for (i = 0; NULL != cfg[i].parameter; i++)
 			{
 				if (0 != strcmp(cfg[i].parameter, parameter))
@@ -173,7 +167,8 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 
 				param_valid = 1;
 
-				zabbix_log(LOG_LEVEL_DEBUG, "accepted configuration parameter: '%s' = '%s'",parameter, value);
+				zabbix_log(LOG_LEVEL_DEBUG, "accepted configuration parameter: '%s' = '%s'",
+						parameter, value);
 
 				switch (cfg[i].type)
 				{
@@ -221,7 +216,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 	}
 
 	if (1 != level)	/* skip mandatory parameters check for included files */
-		return result;
+		return SUCCEED;
 
 	for (i = 0; NULL != cfg[i].parameter; i++) /* check for mandatory parameters */
 	{
@@ -244,10 +239,10 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 		}
 	}
 
-	return result;
+	return SUCCEED;
 cannot_open:
 	if (0 != optional)
-		return result;
+		return SUCCEED;
 	zbx_error("cannot open config file [%s]: %s", cfg_file, zbx_strerror(errno));
 	goto error;
 non_utf8:

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-01 19:42+0200\n"
+"POT-Creation-Date: 2013-11-05 09:03+0200\n"
 "PO-Revision-Date: 2013-10-10 08:23+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -23,11 +23,11 @@ msgstr "\"%s\" täytyy olla välillä 1970.01.01 - 2038.01.18."
 
 #: include/profiles.inc.php:320
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
-msgstr "\"Näytä OK-tilassa olevat liipaisimet\" täytyy olla \"0\" tai positiivinen kokonaisluku.\"Näytä OK-tilassa olevat liipaisimet\" täytyy olla \"0\" tai positiivinen kokonaisluku.\"Näytä OK-tilassa olevat liipaisimet\" täytyy olla \"0\" tai positiivinen kokonaisluku.\"Näytä OK-tilassa olevat liipaisimet\" täytyy olla \"0\" tai positiivinen kokonaisluku."
+msgstr "\"Näytä OK-tilassa olevat liipaisimet\" täytyy olla \"0\" tai positiivinen kokonaisluku.\"Näytä OK-tilassa olevat liipaisimet\" täytyy olla \"0\" tai positiivinen kokonaisluku.\"Näytä OK-tilassa olevat liipaisimet\" täytyy olla \"0\" tai positiivinen kokonaisluku.\"Näytä OK-tilassa olevat liipaisimet\" täytyy olla \"0\" tai positiivinen kokonaisluku.\"Näytä OK-tilassa olevat liipaisimet\" täytyy olla \"0\" tai positiivinen kokonaisluku."
 
 #: include/profiles.inc.php:325
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
-msgstr "\"Liipaisimet viĺkkuvat tilanvaihdossa\" täytyy olla \"0\" tai positiivinen kokonaisluku.\"Liipaisimet viĺkkuvat tilanvaihdossa\" täytyy olla \"0\" tai positiivinen kokonaisluku.\"Liipaisimet viĺkkuvat tilanvaihdossa\" täytyy olla \"0\" tai positiivinen kokonaisluku.\"Liipaisimet viĺkkuvat tilanvaihdossa\" täytyy olla \"0\" tai positiivinen kokonaisluku."
+msgstr "\"Liipaisimet viĺkkuvat tilanvaihdossa\" täytyy olla \"0\" tai positiivinen kokonaisluku.\"Liipaisimet viĺkkuvat tilanvaihdossa\" täytyy olla \"0\" tai positiivinen kokonaisluku.\"Liipaisimet viĺkkuvat tilanvaihdossa\" täytyy olla \"0\" tai positiivinen kokonaisluku.\"Liipaisimet viĺkkuvat tilanvaihdossa\" täytyy olla \"0\" tai positiivinen kokonaisluku.\"Liipaisimet viĺkkuvat tilanvaihdossa\" täytyy olla \"0\" tai positiivinen kokonaisluku."
 
 #: include/func.inc.php:442
 #, c-format
@@ -316,7 +316,7 @@ msgstr ""
 #: api/classes/CAction.php:541 api/classes/CAction.php:656
 #, c-format
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seconds)."
-msgstr "Toiminnolla \"%1$s\" on väärä arvo kohdalle \"esc_period\" (minimi %2$s sekuntia).Toiminnolla \"%1$s\" on väärä arvo kohdalle \"esc_period\" (minimi %2$s sekuntia).Toiminnolla \"%1$s\" on väärä arvo kohdalle \"esc_period\" (minimi %2$s sekuntia).Toiminnolla \"%1$s\" on väärä arvo kohdalle \"esc_period\" (minimi %2$s sekuntia)."
+msgstr "Toiminnolla \"%1$s\" on väärä arvo kohdalle \"esc_period\" (minimi %2$s sekuntia).Toiminnolla \"%1$s\" on väärä arvo kohdalle \"esc_period\" (minimi %2$s sekuntia).Toiminnolla \"%1$s\" on väärä arvo kohdalle \"esc_period\" (minimi %2$s sekuntia).Toiminnolla \"%1$s\" on väärä arvo kohdalle \"esc_period\" (minimi %2$s sekuntia).Toiminnolla \"%1$s\" on väärä arvo kohdalle \"esc_period\" (minimi %2$s sekuntia)."
 
 #: api/classes/CAction.php:727
 #, c-format
@@ -739,7 +739,7 @@ msgstr "Ainakin yksi ylläpitoikkuna täytyy olla luotuna."
 
 #: include/classes/class.frontendsetup.php:294
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
-msgstr "Ainakin MySQL, PostgreSQL, Oracle, SQLite3 tai IBM DB2 pitäisi olla tuettuAinakin MySQL, PostgreSQL, Oracle, SQLite3 tai IBM DB2 pitäisi olla tuettuAinakin MySQL, PostgreSQL, Oracle, SQLite3 tai IBM DB2 pitäisi olla tuettuAinakin MySQL, PostgreSQL, Oracle, SQLite3 tai IBM DB2 pitäisi olla tuettu"
+msgstr "Ainakin MySQL, PostgreSQL, Oracle, SQLite3 tai IBM DB2 pitäisi olla tuettuAinakin MySQL, PostgreSQL, Oracle, SQLite3 tai IBM DB2 pitäisi olla tuettuAinakin MySQL, PostgreSQL, Oracle, SQLite3 tai IBM DB2 pitäisi olla tuettuAinakin MySQL, PostgreSQL, Oracle, SQLite3 tai IBM DB2 pitäisi olla tuettuAinakin MySQL, PostgreSQL, Oracle, SQLite3 tai IBM DB2 pitäisi olla tuettu"
 
 #: include/menu.inc.php:264
 #: include/views/administration.general.housekeeper.edit.php:93
@@ -916,7 +916,7 @@ msgstr ""
 msgid "Bitwise AND of last (most recent) T value and mask is NOT N"
 msgstr ""
 
-#: include/classes/core/ZBase.php:233
+#: include/classes/core/ZBase.php:234
 msgid "Black & Blue"
 msgstr "Musta & sininen"
 
@@ -2371,7 +2371,7 @@ msgstr ""
 msgid "Circular template linkage is not allowed."
 msgstr ""
 
-#: include/classes/core/ZBase.php:231
+#: include/classes/core/ZBase.php:232
 msgid "Classic"
 msgstr ""
 
@@ -3130,7 +3130,7 @@ msgstr ""
 msgid "Daily"
 msgstr ""
 
-#: include/classes/core/ZBase.php:234
+#: include/classes/core/ZBase.php:235
 msgid "Dark orange"
 msgstr ""
 
@@ -5397,7 +5397,7 @@ msgstr ""
 msgid "Height"
 msgstr ""
 
-#: include/page_header.php:203 include/views/general.login.php:40
+#: include/page_header.php:203 include/views/general.login.php:38
 msgid "Help"
 msgstr ""
 
@@ -7966,7 +7966,7 @@ msgstr ""
 msgid "Login"
 msgstr ""
 
-#: include/views/general.login.php:82
+#: include/views/general.login.php:80
 msgid "Login as Guest"
 msgstr ""
 
@@ -9288,6 +9288,10 @@ msgstr ""
 msgid "No notifications found."
 msgstr ""
 
+#: include/views/configuration.action.edit.php:332
+msgid "No operations defined."
+msgstr ""
+
 #: include/classes/import/CConfigurationImport.php:880
 #: include/classes/import/CConfigurationImport.php:960
 #: include/classes/import/CXmlImport18.php:1553
@@ -10063,7 +10067,7 @@ msgstr ""
 msgid "Original"
 msgstr ""
 
-#: include/classes/core/ZBase.php:232
+#: include/classes/core/ZBase.php:233
 msgid "Original blue"
 msgstr ""
 
@@ -10381,7 +10385,7 @@ msgstr ""
 #: include/views/configuration.item.edit.php:192
 #: include/views/configuration.item.massupdate.php:246
 #: include/views/configuration.item.massupdate.php:290
-#: include/views/general.login.php:70
+#: include/views/general.login.php:69
 #: include/views/js/configuration.item.edit.js.php:138
 msgid "Password"
 msgstr ""
@@ -10881,7 +10885,7 @@ msgstr ""
 msgid "Regular expressions"
 msgstr ""
 
-#: include/views/general.login.php:76
+#: include/views/general.login.php:74
 msgid "Remember me for 30 days"
 msgstr ""
 
@@ -12006,7 +12010,7 @@ msgstr ""
 msgid "Shown"
 msgstr ""
 
-#: include/views/general.login.php:79 index.php:55 index.php:64
+#: include/views/general.login.php:77 index.php:55 index.php:64
 msgid "Sign in"
 msgstr ""
 
@@ -12374,7 +12378,7 @@ msgstr ""
 msgid "Sunday"
 msgstr ""
 
-#: include/views/general.login.php:42
+#: include/views/general.login.php:40
 msgid "Support"
 msgstr ""
 
@@ -14301,7 +14305,7 @@ msgid "Zabbix"
 msgstr ""
 
 #: include/page_footer.php:103 include/views/general.browserwarning.php:60
-#: include/views/general.login.php:50
+#: include/views/general.login.php:48
 #, c-format
 msgid "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
 msgstr ""

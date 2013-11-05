@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-01 19:42+0200\n"
+"POT-Creation-Date: 2013-11-05 09:03+0200\n"
 "PO-Revision-Date: 2013-10-15 07:19+0300\n"
 "Last-Translator: Jaba <janis.jaunbalodis@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -927,7 +927,7 @@ msgstr ""
 msgid "Bitwise AND of last (most recent) T value and mask is NOT N"
 msgstr ""
 
-#: include/classes/core/ZBase.php:233
+#: include/classes/core/ZBase.php:234
 msgid "Black & Blue"
 msgstr "Melns & Zils"
 
@@ -2385,7 +2385,7 @@ msgstr ""
 msgid "Circular template linkage is not allowed."
 msgstr ""
 
-#: include/classes/core/ZBase.php:231
+#: include/classes/core/ZBase.php:232
 msgid "Classic"
 msgstr "Klasiskais"
 
@@ -3144,7 +3144,7 @@ msgstr ""
 msgid "Daily"
 msgstr "Ik dienu"
 
-#: include/classes/core/ZBase.php:234
+#: include/classes/core/ZBase.php:235
 msgid "Dark orange"
 msgstr "Tumši oranžs"
 
@@ -5412,7 +5412,7 @@ msgstr ""
 msgid "Height"
 msgstr "Augstums"
 
-#: include/page_header.php:203 include/views/general.login.php:40
+#: include/page_header.php:203 include/views/general.login.php:38
 msgid "Help"
 msgstr "Palīdzība"
 
@@ -7982,7 +7982,7 @@ msgstr ""
 msgid "Login"
 msgstr "Pieslēgties"
 
-#: include/views/general.login.php:82
+#: include/views/general.login.php:80
 msgid "Login as Guest"
 msgstr "Pieteikšanās kā viesim"
 
@@ -9310,6 +9310,10 @@ msgstr ""
 msgid "No notifications found."
 msgstr ""
 
+#: include/views/configuration.action.edit.php:332
+msgid "No operations defined."
+msgstr ""
+
 #: include/classes/import/CConfigurationImport.php:880
 #: include/classes/import/CConfigurationImport.php:960
 #: include/classes/import/CXmlImport18.php:1553
@@ -10085,7 +10089,7 @@ msgstr "Operators"
 msgid "Original"
 msgstr ""
 
-#: include/classes/core/ZBase.php:232
+#: include/classes/core/ZBase.php:233
 msgid "Original blue"
 msgstr ""
 
@@ -10177,7 +10181,7 @@ msgstr "PHP bcmath"
 
 #: include/classes/class.frontendsetup.php:322
 msgid "PHP bcmath extension missing (PHP configuration parameter --enable-bcmath)"
-msgstr "Trūkst PHP bcmath paplašinājums (PHP konfigurācija parameters --enable-bcmath)Trūkst PHP bcmath paplašinājums (PHP konfigurācija parameters --enable-bcmath)Trūkst PHP bcmath paplašinājums (PHP konfigurācija parameters --enable-bcmath)"
+msgstr "Trūkst PHP bcmath paplašinājums (PHP konfigurācija parameters --enable-bcmath)Trūkst PHP bcmath paplašinājums (PHP konfigurācija parameters --enable-bcmath)Trūkst PHP bcmath paplašinājums (PHP konfigurācija parameters --enable-bcmath)Trūkst PHP bcmath paplašinājums (PHP konfigurācija parameters --enable-bcmath)"
 
 #: include/classes/class.frontendsetup.php:549
 msgid "PHP ctype"
@@ -10185,7 +10189,7 @@ msgstr "PHP ctype"
 
 #: include/classes/class.frontendsetup.php:553
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)"
-msgstr "Trūkst PHP ctype paplašinājums (PHP konfigurācija parameters --enable-ctype)Trūkst PHP ctype paplašinājums (PHP konfigurācija parameters --enable-ctype)Trūkst PHP ctype paplašinājums (PHP konfigurācija parameters --enable-ctype)"
+msgstr "Trūkst PHP ctype paplašinājums (PHP konfigurācija parameters --enable-ctype)Trūkst PHP ctype paplašinājums (PHP konfigurācija parameters --enable-ctype)Trūkst PHP ctype paplašinājums (PHP konfigurācija parameters --enable-ctype)Trūkst PHP ctype paplašinājums (PHP konfigurācija parameters --enable-ctype)"
 
 #: include/classes/class.frontendsetup.php:290
 msgid "PHP databases support"
@@ -10230,7 +10234,7 @@ msgstr "PHP gettext"
 
 #: include/classes/class.frontendsetup.php:610
 msgid "PHP gettext extension missing (PHP configuration parameter --with-gettext)"
-msgstr "Trūkst PHP gettext paplašinājums (PHP konfigurācija parameters --with-gettext)Trūkst PHP gettext paplašinājums (PHP konfigurācija parameters --with-gettext)Trūkst PHP gettext paplašinājums (PHP konfigurācija parameters --with-gettext)"
+msgstr "Trūkst PHP gettext paplašinājums (PHP konfigurācija parameters --with-gettext)Trūkst PHP gettext paplašinājums (PHP konfigurācija parameters --with-gettext)Trūkst PHP gettext paplašinājums (PHP konfigurācija parameters --with-gettext)Trūkst PHP gettext paplašinājums (PHP konfigurācija parameters --with-gettext)"
 
 #: include/classes/class.frontendsetup.php:482
 msgid "PHP libxml"
@@ -10246,7 +10250,7 @@ msgstr "PHP mbstring"
 
 #: include/classes/class.frontendsetup.php:341
 msgid "PHP mbstring extension missing (PHP configuration parameter --enable-mbstring)"
-msgstr "Trūkst mbstring paplašinājums (PHP konfigurācijas parametrs --enable-mbstring)Trūkst mbstring paplašinājums (PHP konfigurācijas parametrs --enable-mbstring)Trūkst mbstring paplašinājums (PHP konfigurācijas parametrs --enable-mbstring)"
+msgstr "Trūkst mbstring paplašinājums (PHP konfigurācijas parametrs --enable-mbstring)Trūkst mbstring paplašinājums (PHP konfigurācijas parametrs --enable-mbstring)Trūkst mbstring paplašinājums (PHP konfigurācijas parametrs --enable-mbstring)Trūkst mbstring paplašinājums (PHP konfigurācijas parametrs --enable-mbstring)"
 
 #: include/classes/class.frontendsetup.php:174
 msgid "PHP option max_execution_time"
@@ -10403,7 +10407,7 @@ msgstr ""
 #: include/views/configuration.item.edit.php:192
 #: include/views/configuration.item.massupdate.php:246
 #: include/views/configuration.item.massupdate.php:290
-#: include/views/general.login.php:70
+#: include/views/general.login.php:69
 #: include/views/js/configuration.item.edit.js.php:138
 msgid "Password"
 msgstr "Parole"
@@ -10904,7 +10908,7 @@ msgstr ""
 msgid "Regular expressions"
 msgstr "Regulārās izteiksmes"
 
-#: include/views/general.login.php:76
+#: include/views/general.login.php:74
 msgid "Remember me for 30 days"
 msgstr ""
 
@@ -12029,7 +12033,7 @@ msgstr "Parādīt darba laiku"
 msgid "Shown"
 msgstr "Parādīts"
 
-#: include/views/general.login.php:79 index.php:55 index.php:64
+#: include/views/general.login.php:77 index.php:55 index.php:64
 msgid "Sign in"
 msgstr "Pierakstīties"
 
@@ -12397,7 +12401,7 @@ msgstr "Saule"
 msgid "Sunday"
 msgstr "Svētdiena"
 
-#: include/views/general.login.php:42
+#: include/views/general.login.php:40
 msgid "Support"
 msgstr "Atbalsts"
 
@@ -14327,7 +14331,7 @@ msgid "Zabbix"
 msgstr "Zabbix"
 
 #: include/page_footer.php:103 include/views/general.browserwarning.php:60
-#: include/views/general.login.php:50
+#: include/views/general.login.php:48
 #, c-format
 msgid "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
 msgstr "Zabbix %1$s Autortiesības aizsargātas %2$s-%3$s ar Zabbix SIA"
