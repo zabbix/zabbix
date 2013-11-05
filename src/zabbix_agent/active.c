@@ -1230,9 +1230,9 @@ static void	process_active_checks(char *server, unsigned short port)
 
 			if (NULL != pvalue)
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "for key [%s] received value [%s]", active_metrics[i].key, *pvalue);
-				process_value(server, port, CONFIG_HOSTNAME,
-						active_metrics[i].key_orig, *pvalue, NULL,
+				zabbix_log(LOG_LEVEL_DEBUG, "for key [%s] received value [%s]", active_metrics[i].key,
+						*pvalue);
+				process_value(server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig, *pvalue, NULL,
 						NULL, NULL, NULL, NULL, NULL, 0);
 
 				if (0 == strcmp(*pvalue, ZBX_NOTSUPPORTED))
