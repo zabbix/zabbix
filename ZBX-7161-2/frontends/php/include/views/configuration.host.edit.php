@@ -88,8 +88,8 @@ else {
 }
 
 // load data from the DB when opening the full clone form for the first time
-$cloneFormOpened = (in_array(getRequest('form'), array('clone', 'full_clone')) && getRequest('form_refresh') == 1);
-if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloneFormOpened)) {
+$fullCloneFormOpened = (in_array(getRequest('form'), array('clone', 'full_clone')) && getRequest('form_refresh') == 1);
+if (getRequest('hostid') && (!hasRequest('form_refresh') || $fullCloneFormOpened)) {
 	$proxy_hostid = $dbHost['proxy_hostid'];
 	$host = $dbHost['host'];
 	$visiblename = $dbHost['name'];
