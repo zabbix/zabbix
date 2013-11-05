@@ -2613,7 +2613,7 @@ const char	*zbx_permission_string(int perm)
 	}
 }
 
-const char	*zbx_host_type_string(zbx_item_type_t item_type)
+const char	*zbx_agent_type_string(zbx_item_type_t item_type)
 {
 	switch (item_type)
 	{
@@ -2622,11 +2622,11 @@ const char	*zbx_host_type_string(zbx_item_type_t item_type)
 		case ITEM_TYPE_SNMPv1:
 		case ITEM_TYPE_SNMPv2c:
 		case ITEM_TYPE_SNMPv3:
-			return "SNMP";
+			return "SNMP agent";
 		case ITEM_TYPE_IPMI:
-			return "IPMI";
+			return "IPMI agent";
 		case ITEM_TYPE_JMX:
-			return "JMX";
+			return "JMX agent";
 		default:
 			return "generic";
 	}

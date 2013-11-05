@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-04 14:50+0200\n"
+"POT-Creation-Date: 2013-11-05 09:03+0200\n"
 "PO-Revision-Date: 2012-03-21 08:20+0200\n"
 "Last-Translator: Murat <murat@profelis.com.tr>\n"
 "Language-Team: Zabbix translation team\n"
@@ -916,7 +916,7 @@ msgstr ""
 msgid "Bitwise AND of last (most recent) T value and mask is NOT N"
 msgstr ""
 
-#: include/classes/core/ZBase.php:233
+#: include/classes/core/ZBase.php:234
 msgid "Black & Blue"
 msgstr "Siyah & Mavi"
 
@@ -2372,7 +2372,7 @@ msgstr ""
 msgid "Circular template linkage is not allowed."
 msgstr ""
 
-#: include/classes/core/ZBase.php:231
+#: include/classes/core/ZBase.php:232
 msgid "Classic"
 msgstr ""
 
@@ -3131,7 +3131,7 @@ msgstr "AŞAĞI"
 msgid "Daily"
 msgstr "Günlük"
 
-#: include/classes/core/ZBase.php:234
+#: include/classes/core/ZBase.php:235
 msgid "Dark orange"
 msgstr "Koyu portakal"
 
@@ -5398,7 +5398,7 @@ msgstr "Donanım(Tüm detaylar)"
 msgid "Height"
 msgstr "Yükseklik"
 
-#: include/page_header.php:203 include/views/general.login.php:40
+#: include/page_header.php:203 include/views/general.login.php:38
 msgid "Help"
 msgstr "Yardım"
 
@@ -7967,7 +7967,7 @@ msgstr "olarak oturum açıldı"
 msgid "Login"
 msgstr "Oturum aç"
 
-#: include/views/general.login.php:82
+#: include/views/general.login.php:80
 msgid "Login as Guest"
 msgstr "Misafir Olarak Oturum Aç"
 
@@ -10068,7 +10068,7 @@ msgstr "İşlemci"
 msgid "Original"
 msgstr "Orjinal"
 
-#: include/classes/core/ZBase.php:232
+#: include/classes/core/ZBase.php:233
 msgid "Original blue"
 msgstr "Orjinal mavi"
 
@@ -10386,7 +10386,7 @@ msgstr "Pasif"
 #: include/views/configuration.item.edit.php:192
 #: include/views/configuration.item.massupdate.php:246
 #: include/views/configuration.item.massupdate.php:290
-#: include/views/general.login.php:70
+#: include/views/general.login.php:69
 #: include/views/js/configuration.item.edit.js.php:138
 msgid "Password"
 msgstr "Parola"
@@ -10887,7 +10887,7 @@ msgstr "Düzenli ifade güncellendi"
 msgid "Regular expressions"
 msgstr "Düzenli ifadeler"
 
-#: include/views/general.login.php:76
+#: include/views/general.login.php:74
 msgid "Remember me for 30 days"
 msgstr "30 gün için beni hatırla"
 
@@ -12012,7 +12012,7 @@ msgstr "Çalışma zamanlarını göster"
 msgid "Shown"
 msgstr "Gösterilen"
 
-#: include/views/general.login.php:79 index.php:55 index.php:64
+#: include/views/general.login.php:77 index.php:55 index.php:64
 msgid "Sign in"
 msgstr "Giriş Yap"
 
@@ -12380,7 +12380,7 @@ msgstr "Paz"
 msgid "Sunday"
 msgstr "Pazar"
 
-#: include/views/general.login.php:42
+#: include/views/general.login.php:40
 msgid "Support"
 msgstr "Destek"
 
@@ -14307,7 +14307,7 @@ msgid "Zabbix"
 msgstr "Zabbix"
 
 #: include/page_footer.php:103 include/views/general.browserwarning.php:60
-#: include/views/general.login.php:50
+#: include/views/general.login.php:48
 #, c-format
 msgid "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
 msgstr ""
