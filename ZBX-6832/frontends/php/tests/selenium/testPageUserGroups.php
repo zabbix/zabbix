@@ -32,7 +32,7 @@ class testPageUserGroups extends CWebTest {
 	public function testPageUserGroups_CheckLayout($group) {
 		$this->zbxTestLogin('usergrps.php');
 		$this->zbxTestCheckTitle('Configuration of user groups');
-		$this->zbxTestTextPresent('CONFIGURATION OF USERS AND USER GROUPS');
+		$this->zbxTestTextPresent('CONFIGURATION OF USER GROUPS');
 		$this->zbxTestTextPresent('Displaying');
 		// Header
 		$this->zbxTestTextPresent(array('Name', '#', 'Members', 'Status', 'Frontend access', 'Debug mode'));
@@ -61,7 +61,7 @@ class testPageUserGroups extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of user groups');
 		$this->zbxTestTextPresent('Group updated');
 		$this->zbxTestTextPresent("$name");
-		$this->zbxTestTextPresent('CONFIGURATION OF USERS AND USER GROUPS');
+		$this->zbxTestTextPresent('CONFIGURATION OF USER GROUPS');
 
 		$this->assertEquals($oldHashGroup, DBhash($sqlHashGroup));
 		$this->assertEquals($oldHashUsersGroups, DBhash($sqlHashUsersGroups));

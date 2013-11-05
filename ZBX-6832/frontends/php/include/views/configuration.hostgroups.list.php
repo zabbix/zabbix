@@ -53,7 +53,7 @@ foreach ($this->data['groups'] as $hostGroup) {
 }
 
 // create table
-$hostGroupTable = new CTableInfo(_('No host groups defined.'));
+$hostGroupTable = new CTableInfo(_('No host groups found.'));
 $hostGroupTable->setHeader(array(
 	new CCheckBox('all_groups', null, "checkAll('".$hostGroupForm->getName()."', 'all_groups', 'groups');"),
 	$this->data['displayNodes'] ? _('Node') : null,

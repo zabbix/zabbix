@@ -156,7 +156,7 @@ class CScreenHistory extends CScreenBase {
 				$useEventLogItem = (strpos($this->item['key_'], 'eventlog[') === 0);
 
 				if (empty($this->plaintext)) {
-					$historyTable = new CTableInfo(_('No history defined.'));
+					$historyTable = new CTableInfo(_('No values found.'));
 					$historyTable->setHeader(
 						array(
 							_('Timestamp'),
@@ -262,7 +262,7 @@ class CScreenHistory extends CScreenBase {
 			// numeric, float
 			else {
 				if (empty($this->plaintext)) {
-					$historyTable = new CTableInfo(_('No history defined.'));
+					$historyTable = new CTableInfo(_('No values found.'));
 					$historyTable->setHeader(array(_('Timestamp'), _('Value')));
 				}
 

@@ -24,55 +24,44 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
  * Test the creation of inheritance of new objects on a previously linked template.
  */
 class testInheritanceGraph extends CWebTest {
+	private $templateid = 15000;	// 'Inheritance test template'
+	private $template = 'Inheritance test template';
 
-	/**
-	 * The name of the test template created in the test data set.
-	 *
-	 * @var string
-	 */
-	protected $template = 'Inheritance test template';
+	private $hostid = 15001;		// 'Template inheritance test host'
+	private $host = 'Template inheritance test host';
 
-	/**
-	 * The name of the test host created in the test data set.
-	 *
-	 * @var string
-	 */
-	protected $host = 'Template inheritance test host';
-
-	/**
-	 * The name of the test item created in the test data set.
-	 *
-	 * @var string
-	 */
-	protected $item = 'itemInheritance';
-
-	/**
-	 * Backup the tables that will be modified during the tests.
-	 */
-	public function testInheritanceGraph_Setup() {
+	public function testInheritanceGraph_backup() {
 		DBsave_tables('graphs');
 	}
 
-	// Returns update data
+	// return list of graphs from a template
 	public static function update() {
-		return DBdata("select * from graphs g left join graphs_items gi on gi.graphid=g.graphid where gi.itemid='24329' and g.name LIKE 'testInheritanceGraph%' and g.graphid < 699999");
+		return DBdata(
+			'SELECT g.graphid'.
+			' FROM graphs g'.
+			' WHERE EXISTS ('.
+				'SELECT NULL'.
+				' FROM graphs_items gi,items i'.
+				' WHERE g.graphid=gi.graphid'.
+					' AND gi.itemid=i.itemid'.
+					' AND i.hostid=15000'.	//	$this->templateid.
+					' AND i.flags=0'.
+				')'.
+				' AND g.flags=0'
+		);
 	}
 
 	/**
 	 * @dataProvider update
 	 */
 	public function testInheritanceGraph_SimpleUpdate($data) {
-		$sqlGraphs = "select * from graphs";
+		$sqlGraphs = 'SELECT * FROM graphs ORDER BY graphid';
 		$oldHashGraphs = DBhash($sqlGraphs);
 
-		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&hostid=30000');
+		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid']);
 		$this->zbxTestClickWait('save');
 		$this->zbxTestCheckTitle('Configuration of graphs');
-		$this->zbxTestTextPresent(array(
-			'Graph updated',
-			$data['name'],
-			'GRAPHS'
-		));
+		$this->zbxTestTextPresent('Graph updated');
 
 		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
 	}
@@ -82,233 +71,14 @@ class testInheritanceGraph extends CWebTest {
 		return array(
 			array(
 				array(
-					'expected' => TEST_BAD,
-					'errors' => array(
-						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Name": cannot be empty.'
-					)
-				)
-			),
-			array(
-				array(
 					'expected' => TEST_GOOD,
-					'name' => 'graphSaveCheck',
+					'name' => 'testInheritanceGraph5',
 					'addItems' => array(
-						array('itemName' => 'itemInheritance', 'remove' => true),
-						array('itemName' => 'itemInheritance')
-					),
-					'dbCheck' => true,
-					'formCheck' => true
-				)
-			),
-			array(
-				array(
-					'expected' => TEST_BAD,
-					'name' => 'graphSaveCheck',
-					'errors' => array(
-						'ERROR: Cannot add graph',
-						'Graph with name "graphSaveCheck" already exists in graphs or graph prototypes.'
+						array('itemName' => 'testInheritanceItem1'),
+						array('itemName' => 'testInheritanceItem2'),
+						array('itemName' => 'testInheritanceItem3'),
+						array('itemName' => 'testInheritanceItem4')
 					)
-				)
-			),
-			array(
-				array(
-					'expected' => TEST_BAD,
-					'name' => 'graphSaveCheck',
-					'noItems' => true,
-					'errors' => array(
-						'ERROR: Cannot add graph',
-						'Missing items for graph "graphSaveCheck".'
-					)
-				)
-			),
-			array(
-				array(
-					'expected' => TEST_GOOD,
-					'name' => 'graphNormal1',
-					'ymin_type' => 'Fixed',
-					'ymax_type' => 'Item',
-					'ymax_name' => 'itemInheritance',
-					'dbCheck' => true,
-					'formCheck' => true
-				)
-			),
-			array(
-				array(
-					'expected' => TEST_GOOD,
-					'name' => 'graphNormal2',
-					'ymin_type' => 'Item',
-					'ymin_name' => 'itemInheritance',
-					'ymax_type' => 'Item',
-					'ymax_name' => 'itemInheritance',
-					'dbCheck' => true,
-					'formCheck' => true
-				)
-			),
-			array(
-				array(
-					'expected' => TEST_GOOD,
-					'name' => 'graphNormal3',
-					'ymin_type' => 'Fixed',
-					'ymax_type' => 'Item',
-					'ymax_name' => 'itemInheritance',
-					'dbCheck' => true,
-					'formCheck' => true
-				)
-			),
-			array(
-				array(
-					'expected' => TEST_GOOD,
-					'name' => 'graphNormal4',
-					'graphtype' => 'Normal'
-				)
-			),
-			array(
-				array(
-					'expected' => TEST_GOOD,
-					'name' => 'graphStacked1',
-					'graphtype' => 'Stacked'
-				)
-			),
-			array(
-				array(
-					'expected' => TEST_GOOD,
-					'name' => 'graphStacked2',
-					'graphtype' => 'Stacked',
-					'ymin_type' => 'Fixed'
-				)
-			),
-			array(
-				array(
-					'expected' => TEST_GOOD,
-					'name' => 'graphStacked3',
-					'graphtype' => 'Stacked',
-					'ymin_type' => 'Item',
-					'ymin_name' => 'itemInheritance',
-					'ymax_type' => 'Fixed'
-				)
-			),
-			array(
-				array(
-					'expected' => TEST_BAD,
-					'name' => 'graphStacked',
-					'graphtype' => 'Stacked',
-					'ymin_type' => 'Item',
-					'ymax_type' => 'Fixed',
-					'errors' => array(
-						'ERROR: Cannot add graph',
-						'No permissions to referred object or it does not exist!'
-					)
-				)
-			),
-			array(
-				array(
-					'expected' => TEST_BAD,
-					'name' => 'graphStacked',
-					'width' => 'name',
-					'height' => 'name',
-					'graphtype' => 'Stacked',
-					'ymin_type' => 'Fixed',
-					'yaxismin' => 'name',
-					'ymax_type' => 'Fixed',
-					'yaxismax' => 'name',
-					'errors' => array(
-						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.',
-						'Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.',
-						'Field "yaxismin" is not decimal number.',
-						'Field "yaxismin" is not decimal number.'
-					)
-				)
-			),
-			array(
-				array(
-					'expected' => TEST_BAD,
-					'name' => 'graphStacked',
-					'width' => '65536',
-					'height' => '-22',
-					'graphtype' => 'Stacked',
-					'ymin_type' => 'Fixed',
-					'ymax_type' => 'Fixed',
-					'errors' => array(
-						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.',
-						'Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.'
-					)
-				)
-			),
-			array(
-				array(
-					'expected' => TEST_GOOD,
-					'name' => 'graphPie',
-					'graphtype' => 'Pie'
-				)
-			),
-			array(
-				array(
-					'expected' => TEST_GOOD,
-					'name' => 'graphExploded',
-					'graphtype' => 'Exploded'
-				)
-			),
-			array(
-				array(
-					'expected' => TEST_GOOD,
-					'name' => 'graph!@#$%^&*()><>?:"|{},./;',
-					'graphtype' => 'Exploded',
-					'dbCheck' => true,
-					'formCheck' => true
-				)
-			),
-			array(
-				array(
-					'expected' => TEST_GOOD,
-					'name' => 'graphSimple',
-					'hostCheck' => true,
-					'dbCheck' => true
-				)
-			),
-			array(
-				array('expected' => TEST_GOOD,
-					'name' => 'name',
-					'hostCheck' => true
-				)
-			),
-			array(
-				array(
-					'expected' => TEST_GOOD,
-					'name' => 'graphRemove',
-					'hostCheck' => true,
-					'dbCheck' => true,
-					'remove' => true
-				)
-			),
-			array(
-				array(
-					'expected' => TEST_GOOD,
-					'name' => 'graphNotRemove',
-					'hostCheck' => true,
-					'dbCheck' => true,
-					'hostRemove' => true,
-					'remove' => true)
-			),
-			array(
-				array(
-					'expected' => TEST_GOOD,
-					'name' => 'graphSomeRemove',
-					'hostCheck' => true,
-					'dbCheck' => true,
-					'hostRemove' => true,
-					'remove' => true
-				)
-			),
-			array(
-				array(
-					'expected' => TEST_BAD,
-					'name' => 'graphSimple',
-					'errors' => array(
-						'ERROR: Cannot add graph',
-						'Graph with name "graphSimple" already exists in graphs or graph prototypes')
 				)
 			)
 		);
@@ -318,200 +88,35 @@ class testInheritanceGraph extends CWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceGraph_SimpleCreate($data) {
-		$this->zbxTestLogin('graphs.php?hostid=30000&form=Create+graph');
+		$this->zbxTestLogin('graphs.php?form=Create+graph&hostid='.$this->templateid);
 
-		if (isset($data['name'])) {
-			$this->input_type('name', $data['name']);
-		}
-		$graphName = $this->getValue('name');
+		$this->input_type('name', $data['name']);
 
-		if (isset($data['graphtype'])) {
-			$this->zbxTestDropdownSelectWait('graphtype', $data['graphtype']);
-		}
-		$graphtype = $this->getSelectedLabel('graphtype');
-
-		if (isset($data['addItems'])) {
-			foreach($data['addItems'] as $item) {
-				$this->zbxTestLaunchPopup('add_item');
-				$link = $item['itemName'];
-				$this->zbxTestClick("link=$link");
-				sleep(1);
-				$this->selectWindow(null);
-				if(isset($item['remove'])) {
-				$this->zbxTestClick('items_0_remove');
-				}
-			}
-		}
-		elseif (!isset($data['noItems'])) {
+		foreach ($data['addItems'] as $item) {
 			$this->zbxTestLaunchPopup('add_item');
+			$this->zbxTestClick('link='.$item['itemName']);
 			sleep(1);
-			$this->zbxTestClick('link='.$this->item);
-			sleep(1);
-			$this->selectWindow(null);
-
-		}
-
-		if (isset($data['width'])) {
-			$this->input_type('width', $data['width']);
-		}
-		$width = $this->getValue('width');
-
-		if (isset($data['height'])) {
-			$this->input_type('height', $data['height']);
-		}
-		$height = $this->getValue('height');
-
-		if (isset($data['ymin_type'])) {
-			$this->zbxTestDropdownSelectWait('ymin_type', $data['ymin_type']);
-			sleep(1);
-		}
-
-		if (isset($data['ymax_type'])) {
-			$this->zbxTestDropdownSelectWait('ymax_type', $data['ymax_type']);
-			sleep(1);
-		}
-
-		if ($graphtype == 'Normal' || $graphtype == 'Stacked') {
-			$ymin_type = $this->getSelectedLabel('ymin_type');
-			$ymax_type = $this->getSelectedLabel('ymax_type');
-		}
-		else {
-			$ymin_type = null;
-			$ymax_type = null;
-		}
-
-		if (isset($data['yaxismin'])) {
-			$this->input_type('yaxismin' ,$data['yaxismin']);
-			$yaxismin = $this->getValue('yaxismin');
-		}
-		elseif ($ymin_type == 'Fixed') {
-			$yaxismin = $this->getValue('yaxismin');
-		}
-		else {
-			$yaxismin = null;
-		}
-
-		if (isset($data['yaxismax'])) {
-			$this->input_type('yaxismax' ,$data['yaxismax']);
-			$yaxismin = $this->getValue('yaxismax');
-		}
-		elseif ($ymax_type == 'Fixed') {
-			$yaxismax = $this->getValue('yaxismax');
-		}
-		else {
-			$yaxismax = null;
-		}
-
-		if (isset($data['ymin_name'])) {
-			$this->zbxTestLaunchPopup('yaxis_min' , 'zbx_popup_item');
-			$this->zbxTestClick('link='.$this->item);
-			$this->selectWindow(null);
-			sleep(1);
-			$ymin_name = $data['ymin_name'];
-			$yminValue = $this->getValue('ymin_name');
-
-			$this->assertEquals($yminValue, $this->template.': '.$ymin_name);
-		}
-
-		if (isset($data['ymax_name'])) {
-			$this->zbxTestLaunchPopup('yaxis_max', 'zbx_popup_item');
-			$this->zbxTestClick('link='.$this->item);
-			$this->selectWindow(null);
-			sleep(1);
-			$ymax_name = $data['ymax_name'];
-			$ymaxValue = $this->getValue('ymax_name');
-
-			$this->assertEquals($ymaxValue, $this->template.': '.$ymax_name);
+			$this->selectWindow();
 		}
 
 		$this->zbxTestClickWait('save');
-		$expected = $data['expected'];
+
 		switch ($data['expected']) {
 			case TEST_GOOD:
-				$this->zbxTestTextPresent('Graph added');
 				$this->zbxTestCheckTitle('Configuration of graphs');
 				$this->zbxTestTextPresent('CONFIGURATION OF GRAPHS');
+				$this->zbxTestTextPresent('Graph added');
 				break;
 
 			case TEST_BAD:
 				$this->zbxTestCheckTitle('Configuration of graphs');
 				$this->zbxTestTextPresent('CONFIGURATION OF GRAPHS');
-				foreach ($data['errors'] as $msg) {
-					$this->zbxTestTextPresent($msg);
-				}
+				$this->zbxTestTextPresent($data['errors']);
 				break;
-		}
-
-		if (isset($data['hostCheck'])) {
-			$this->zbxTestOpenWait('hosts.php');
-			$this->zbxTestClickWait('link='.$this->host);
-			$this->zbxTestClickWait("//div[@class='w']//a[text()='Graphs']");
-
-			$this->zbxTestTextPresent($this->template.": $graphName");
-			$this->zbxTestClickWait("link=$graphName");
-
-			$this->assertElementValue('name', $graphName);
-			$this->assertElementPresent("//span[text()='".$this->host.': '.$this->item."']");
-		}
-
-		if (isset($data['dbCheck'])) {
-			// template
-			$result = DBselect("SELECT name, graphid FROM graphs where name = '".$graphName."' limit 1");
-			while ($row = DBfetch($result)) {
-				$this->assertEquals($row['name'], $graphName);
-				$templateid = $row['graphid'];
-			}
-
-			// host
-			$result = DBselect("SELECT name FROM graphs where name = '".$graphName."' AND templateid = ".$templateid."");
-			while ($row = DBfetch($result)) {
-				$this->assertEquals($row['name'], $graphName);
-			}
-		}
-
-		if (isset($data['hostRemove'])) {
-			$result = DBselect("SELECT graphid FROM graphs where name = '".$graphName."' limit 1");
-			while ($row = DBfetch($result)) {
-				$templateid = $row['graphid'];
-			}
-
-			$result = DBselect("SELECT graphid FROM graphs where name = '".$graphName."' AND templateid = ".$templateid."");
-			while ($row = DBfetch($result)) {
-				$graphId = $row['graphid'];
-			}
-			$this->zbxTestOpenWait('hosts.php');
-			$this->zbxTestClickWait('link='.$this->host);
-			$this->zbxTestClickWait("//div[@class='w']//a[text()='Graphs']");
-
-			$this->assertElementPresent("group_graphid_$graphId");
-			$this->assertAttribute("//input[@id='group_graphid_$graphId']/@disabled", 'disabled');
-		}
-
-		if (isset($data['remove'])) {
-			$result = DBselect("SELECT graphid FROM graphs where name = '".$graphName."' limit 1");
-			while ($row = DBfetch($result)) {
-				$graphid = $row['graphid'];
-			}
-
-			$this->zbxTestOpenWait('templates.php');
-			$this->zbxTestClickWait('link='.$this->template);
-			$this->zbxTestClickWait("//div[@class='w']//a[text()='Graphs']");
-
-			$this->zbxTestCheckboxSelect("group_graphid_$graphid");
-			$this->zbxTestDropdownSelect('go', 'Delete selected');
-			$this->zbxTestClick('goButton');
-
-			$this->getConfirmation();
-			$this->wait();
-			$this->zbxTestTextPresent('Graphs deleted');
-			$this->zbxTestTextNotPresent($this->template.": $graphName");
 		}
 	}
 
-	/**
-	 * Restore the original tables.
-	 */
-	public function testInheritanceGraph_Teardown() {
+	public function testInheritanceGraph_restore() {
 		DBrestore_tables('graphs');
 	}
 }

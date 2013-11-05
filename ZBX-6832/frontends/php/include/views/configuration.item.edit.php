@@ -79,7 +79,7 @@ $itemFormList->addRow(_('Key'), array(
 	new CTextBox('key', $this->data['key'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']),
 	!$this->data['limited'] && !$this->data['is_discovery_rule']
 		? new CButton('keyButton', _('Select'),
-			'return PopUp("popup.php?srctbl=help_items&srcfld1=key_'.
+			'return PopUp("popup.php?srctbl=help_items&srcfld1=key'.
 				'&dstfrm='.$itemForm->getName().'&dstfld1=key&itemtype="+jQuery("#type option:selected").val());',
 			'formlist')
 		: null

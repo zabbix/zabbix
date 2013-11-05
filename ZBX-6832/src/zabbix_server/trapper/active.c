@@ -413,6 +413,10 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 					if (0 == get_param(params, 3, tmp, sizeof(tmp)) && '@' == *tmp)
 						zbx_vector_str_append_uniq(&names, tmp + 1);
 
+					/* "source" parameter */
+					if (0 == get_param(params, 4, tmp, sizeof(tmp)) && '@' == *tmp)
+						zbx_vector_str_append_uniq(&names, tmp + 1);
+
 					/* "logeventid" parameter */
 					if (0 == get_param(params, 5, tmp, sizeof(tmp)) && '@' == *tmp)
 						zbx_vector_str_append_uniq(&names, tmp + 1);

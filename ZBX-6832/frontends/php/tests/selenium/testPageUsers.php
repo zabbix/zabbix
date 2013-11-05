@@ -35,7 +35,7 @@ class testPageUsers extends CWebTest {
 
 		$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
 
-		$this->zbxTestTextPresent('CONFIGURATION OF USERS AND USER GROUPS');
+		$this->zbxTestTextPresent('CONFIGURATION OF USERS');
 		$this->zbxTestTextPresent('Displaying');
 		$this->zbxTestTextPresent(array('Alias', 'Name', 'Surname', 'User type', 'Groups', 'Is online?', 'Login', 'Frontend access', 'Debug mode', 'Status'));
 		$this->zbxTestTextPresent(array($user['alias'], $user['name'], $user['surname']));
@@ -65,7 +65,7 @@ class testPageUsers extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of users');
 		$this->zbxTestTextPresent('User updated');
 		$this->zbxTestTextPresent($alias);
-		$this->zbxTestTextPresent('CONFIGURATION OF USERS AND USER GROUPS');
+		$this->zbxTestTextPresent('CONFIGURATION OF USERS');
 
 		$this->assertEquals($oldHashUser, DBhash($sqlHashUser));
 		$this->assertEquals($oldHashGroup, DBhash($sqlHashGroup), 'Chuck Norris: User update changed data in table users_groups');

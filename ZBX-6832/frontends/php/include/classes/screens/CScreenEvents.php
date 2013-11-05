@@ -34,7 +34,7 @@ class CScreenEvents extends CScreenBase {
 			'eventLimit' => $this->screenitem['elements']
 		);
 
-		$item = new CTableInfo(_('No events defined.'));
+		$item = new CTableInfo(_('No events found.'));
 		$item->setHeader(array(
 			_('Time'),
 			is_show_all_nodes() ? _('Node') : null,

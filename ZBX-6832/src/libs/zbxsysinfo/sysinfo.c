@@ -990,6 +990,36 @@ void	*get_result_value_by_type(AGENT_RESULT *result, int require_type)
 
 /******************************************************************************
  *                                                                            *
+ * Function: unquote_key_param                                                *
+ *                                                                            *
+ * Purpose: unquotes special symbols in item key parameter                    *
+ *                                                                            *
+ * Parameters: param - [IN/OUT] item key parameter                            *
+ *                                                                            *
+ * Comments:                                                                  *
+ *   "param"     => param                                                     *
+ *   "\"param\"" => "param"                                                   *
+ *                                                                            *
+ ******************************************************************************/
+void	unquote_key_param(char *param)
+{
+	char	*dst;
+
+	if ('"' != *param)
+		return;
+
+	for (dst = param++; '\0' != *param; param++)
+	{
+		if ('\\' == *param && '"' == param[1])
+			continue;
+
+		*dst++ = *param;
+	}
+	*--dst = '\0';
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: quote_key_param                                                  *
  *                                                                            *
  * Purpose: quotes special symbols in item key parameter                      *

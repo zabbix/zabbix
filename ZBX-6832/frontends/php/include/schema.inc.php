@@ -2852,30 +2852,6 @@ return array(
 			),
 		),
 	),
-	'help_items' => array(
-		'type' => DB::TABLE_TYPE_HISTORY,
-		'key' => 'itemtype,key_',
-		'fields' => array(
-			'itemtype' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			),
-			'key_' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => '',
-			),
-			'description' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => '',
-			),
-		),
-	),
 	'globalmacro' => array(
 		'type' => DB::TABLE_TYPE_CONFIG,
 		'key' => 'globalmacroid',

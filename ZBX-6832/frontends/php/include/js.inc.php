@@ -161,12 +161,12 @@ function insert_javascript_for_editable_combobox() {
 }
 
 function insert_show_color_picker_javascript() {
-	global $SHOW_COLOR_PICKER_SCRIPT_ISERTTED;
+	global $SHOW_COLOR_PICKER_SCRIPT_INSERTED;
 
-	if ($SHOW_COLOR_PICKER_SCRIPT_ISERTTED) {
+	if ($SHOW_COLOR_PICKER_SCRIPT_INSERTED) {
 		return;
 	}
-	$SHOW_COLOR_PICKER_SCRIPT_ISERTTED = true;
+	$SHOW_COLOR_PICKER_SCRIPT_INSERTED = true;
 	$table = new CTable();
 
 	// gray colors

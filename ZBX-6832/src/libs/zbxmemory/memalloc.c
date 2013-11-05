@@ -534,8 +534,8 @@ void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, zbx_uin
 	int		shm_id, index;
 	void		*base;
 
-	descr = (NULL == descr ? "(null)" : descr);
-	param = (NULL == param ? "(null)" : param);
+	descr = ZBX_NULL2STR(descr);
+	param = ZBX_NULL2STR(param);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() descr:'%s' param:'%s' size:" ZBX_FS_SIZE_T,
 			__function_name, descr, param, (zbx_fs_size_t)size);

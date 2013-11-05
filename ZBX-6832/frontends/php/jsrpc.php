@@ -242,7 +242,6 @@ switch ($data['method']) {
 				$hostGroups = API::HostGroup()->get(array(
 					'editable' => isset($data['editable']) ? $data['editable'] : null,
 					'output' => array('groupid', 'name'),
-					'startSearch' => true,
 					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
 					'filter' => isset($data['filter']) ? $data['filter'] : null,
 					'limit' => isset($data['limit']) ? $data['limit'] : null
@@ -278,7 +277,6 @@ switch ($data['method']) {
 					'editable' => isset($data['editable']) ? $data['editable'] : null,
 					'output' => array('hostid', 'name'),
 					'templated_hosts' => isset($data['templated_hosts']) ? $data['templated_hosts'] : null,
-					'startSearch' => true,
 					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
 					'limit' => $config['search_limit']
 				));
@@ -312,7 +310,6 @@ switch ($data['method']) {
 				$templates = API::Template()->get(array(
 					'editable' => isset($data['editable']) ? $data['editable'] : null,
 					'output' => array('templateid', 'name'),
-					'startSearch' => true,
 					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
 					'limit' => $config['search_limit']
 				));
@@ -346,7 +343,6 @@ switch ($data['method']) {
 				$applications = API::Application()->get(array(
 					'hostids' => zbx_toArray($data['hostid']),
 					'output' => array('applicationid', 'name'),
-					'startSearch' => true,
 					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
 					'limit' => $config['search_limit']
 				));
@@ -381,7 +377,6 @@ switch ($data['method']) {
 					'editable' => isset($data['editable']) ? $data['editable'] : null,
 					'output' => array('triggerid', 'description'),
 					'selectHosts' => array('name'),
-					'startSearch' => true,
 					'search' => isset($data['search']) ? array('description' => $data['search']) : null,
 					'limit' => $config['search_limit']
 				));
