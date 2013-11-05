@@ -96,11 +96,16 @@
 			items: 'tbody tr.sortable',
 			axis: 'y',
 			cursor: 'move',
-			containment: 'parent',
 			handle: 'span.ui-icon-arrowthick-2-n-s',
 			tolerance: 'pointer',
 			opacity: 0.6,
 			update: recalculateSortOrder,
+			helper: function(e, ui) {
+				ui.children().each(function() {
+					jQuery(this).width(jQuery(this).width());
+				});
+				return ui;
+			},
 			start: function(e, ui) {
 				$(ui.placeholder).height($(ui.helper).height());
 			}
