@@ -105,6 +105,7 @@ A......... [ZBX-7101] fixed generated SQL queries in action.get method when simu
 Changes for 2.1.7
 
 New features:
+..F....... [ZBXNEXT-1851] hid Czech, Dutch, Hungarian, Korean, Latvian, Persian, Spanish and Turkish translations from the frontend (Richlv)
 ..FG...... [ZBX-2008] added support of Windows Eventing 6.0 (igors, Ivo)
 ...G...... [ZBXNEXT-1942] added zabbix sender dynamic link library for windows (wiper)
 ...G...... [ZBXNEXT-935] zabbix sender exit status now better reflects the operation result - success:0, partial success:2, failure:1 (asaveljevs, wiper)
