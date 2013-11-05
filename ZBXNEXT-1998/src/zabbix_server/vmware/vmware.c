@@ -2535,7 +2535,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	if (0 != (service->state & ZBX_VMWARE_STATE_NEW) &&
 			SUCCEED != vmware_service_initialize(service, easyhandle, &data->error))
 	{
-			goto clean;
+		goto clean;
 	}
 
 	if (SUCCEED != vmware_service_get_hv_list(service, easyhandle, &hvs, &data->error))
