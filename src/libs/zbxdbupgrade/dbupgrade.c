@@ -86,6 +86,14 @@
 #	define ZBX_TYPE_SHORTTEXT_STR	"text"
 #endif
 
+#if defined(HAVE_IBM_DB2)
+#	define ZBX_TYPE_TEXT_STR	"varchar(2048)"
+#elif defined(HAVE_ORACLE)
+#	define ZBX_TYPE_TEXT_STR	"nclob"
+#else
+#	define ZBX_TYPE_TEXT_STR	"text"
+#endif
+
 #define ZBX_FIRST_DB_VERSION		2010000
 
 typedef struct
@@ -211,6 +219,9 @@ static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offse
 			break;
 		case ZBX_TYPE_SHORTTEXT:
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_SHORTTEXT_STR);
+			break;
+		case ZBX_TYPE_TEXT:
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_TEXT_STR);
 			break;
 		default:
 			assert(0);
@@ -2340,6 +2351,46 @@ static int	DBpatch_2010195(void)
 	return ret;
 }
 
+static int	DBpatch_2010196(void)
+{
+#ifdef HAVE_ORACLE
+	const ZBX_FIELD	field = {"message_tmp", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("alerts", &field);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_2010197(void)
+{
+#ifdef HAVE_ORACLE
+	return ZBX_DB_OK > DBexecute("update alerts set message_tmp=message") ? FAIL : SUCCEED;
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_2010198(void)
+{
+#ifdef HAVE_ORACLE
+	return DBdrop_field("alerts", "message");
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_2010199(void)
+{
+#ifdef HAVE_ORACLE
+	const ZBX_FIELD	field = {"message", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBrename_field("alerts", "message_tmp", &field);
+#else
+	return SUCCEED;
+#endif
+}
+
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 #define DBPATCH_END()					{NULL}};
@@ -2582,6 +2633,10 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010193, 0, 0)
 	DBPATCH_ADD(2010194, 0, 1)
 	DBPATCH_ADD(2010195, 0, 1)
+	DBPATCH_ADD(2010196, 0, 1)
+	DBPATCH_ADD(2010197, 0, 1)
+	DBPATCH_ADD(2010198, 0, 1)
+	DBPATCH_ADD(2010199, 0, 1)
 
 	DBPATCH_END()
 
