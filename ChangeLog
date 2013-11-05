@@ -1,6 +1,7 @@
 Changes for 2.2.0rc1
 
 New features:
+..F....... [ZBXNEXT-1851] hid American English, Greek and Polish translations from the frontend (Richlv)
 
 Bug fixes:
 ........S. [ZBX-7141] made it clear agent of which particular type is unavailable for unknown triggers (asaveljevs, Sasha)
