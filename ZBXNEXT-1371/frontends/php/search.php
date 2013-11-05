@@ -189,30 +189,12 @@ foreach ($hosts as $hnum => $host) {
 	}
 	else {
 		$host_link = new CSpan($caption, $style);
-		$applications_link = array(
-			new CSpan(_('Applications'), 'unknown'),
-			' ('.$host['applications'].')'
-		);
-		$items_link = array(
-			new CSpan(_('Items'), 'unknown'),
-			' ('.$host['items'].')'
-		);
-		$triggers_link = array(
-			new CSpan(_('Triggers'), 'unknown'),
-			' ('.$host['triggers'].')'
-		);
-		$graphs_link = array(
-			new CSpan(_('Graphs'), 'unknown'),
-			' ('.$host['graphs'].')'
-		);
-		$discoveryLink = array(
-			new CSpan(_('Discoveries'), 'unknown'),
-			' ('.$host['discoveries'].')'
-		);
-		$httpTestsLink = array(
-			new CSpan(_('Web'), 'unknown'),
-			' ('.$host['httpTests'].')'
-		);
+		$applications_link = _('Applications').' ('.$host['applications'].')';
+		$items_link = _('Items').' ('.$host['items'].')';
+		$triggers_link = _('Triggers').' ('.$host['triggers'].')';
+		$graphs_link = _('Graphs').' ('.$host['graphs'].')';
+		$discoveryLink = _('Discoveries').' ('.$host['discoveries'].')';
+		$httpTestsLink = _('Web').' ('.$host['httpTests'].')';
 	}
 
 	$hostip = make_decoration($host['ip'], $search);
@@ -312,7 +294,7 @@ foreach ($hostGroups as $hnum => $group) {
 				);
 			}
 			else {
-				$hostsLink = new CSpan(_('Hosts').' (0)', 'unknown');
+				$hostsLink = _('Hosts').' (0)';
 			}
 
 			if ($group['templates']) {
@@ -322,7 +304,7 @@ foreach ($hostGroups as $hnum => $group) {
 				);
 			}
 			else {
-				$templatesLink = new CSpan(_('Templates').' (0)', 'unknown');
+				$templatesLink = _('Templates').' (0)';
 			}
 
 			$hgroup_link = new CLink($caption, 'hostgroups.php?form=update&'.$link);
@@ -450,34 +432,13 @@ if ($admin) {
 		}
 		else {
 			$template_link = new CSpan($caption);
-			$applications_link = array(
-				new CSpan(_('Applications'), 'unknown'),
-				' ('.$template['applications'].')'
-			);
-			$items_link = array(
-				new CSpan(_('Items'), 'unknown'),
-				' ('.$template['items'].')'
-			);
-			$triggers_link = array(
-				new CSpan(_('Triggers'), 'unknown'),
-				' ('.$template['triggers'].')'
-			);
-			$graphs_link = array(
-				new CSpan(_('Graphs'), 'unknown'),
-				' ('.$template['graphs'].')'
-			);
-			$screensLink = array(
-				new CSpan(_('Screens'), 'unknown'),
-				' ('.$template['screens'].')'
-			);
-			$discoveryLink = array(
-				new CSpan(_('Discovery'), 'unknown'),
-				' ('.$template['discoveries'].')'
-			);
-			$httpTestsLink = array(
-				new CSpan(_('Web'), 'unknown'),
-				' ('.$template['httpTests'].')'
-			);
+			$applications_link = _('Applications').' ('.$template['applications'].')';
+			$items_link = _('Items').' ('.$template['items'].')';
+			$triggers_link = _('Triggers').' ('.$template['triggers'].')';
+			$graphs_link = _('Graphs').' ('.$template['graphs'].')';
+			$screensLink = _('Screens').' ('.$template['screens'].')';
+			$discoveryLink = _('Discovery').' ('.$template['discoveries'].')';
+			$httpTestsLink = _('Web').' ('.$template['httpTests'].')';
 		}
 
 		$table->addRow(array(
