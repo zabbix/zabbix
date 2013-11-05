@@ -4079,7 +4079,6 @@ static zbx_uint64_t	DBget_same_itemid(zbx_uint64_t hostid, zbx_uint64_t titemid)
 
 	if (NULL != (row = DBfetch(result)))
 		ZBX_STR2UINT64(itemid, row[0]);
-
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_UI64, __function_name, itemid);
