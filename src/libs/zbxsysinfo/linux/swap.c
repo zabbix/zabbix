@@ -250,9 +250,11 @@ int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (SYSINFO_RET_OK != get_swap_stat(swapdev, &ss))
 		return SYSINFO_RET_FAIL;
 
-	if ((NULL == mode || '\0' == *mode || 0 == strcmp(mode, "pages")) &&	/* default parameter */
-			(NULL == swapdev || '\0' == *swapdev || 0 == strcmp(swapdev, "all")))
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "pages"))
 	{
+		if (NULL != swapdev && '\0' != *swapdev && 0 != strcmp(swapdev, "all"))
+			return SYSINFO_RET_FAIL;
+
 		SET_UI64_RESULT(result, ss.rpag);
 	}
 	else if (0 == strcmp(mode, "sectors"))
@@ -279,9 +281,11 @@ int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (SYSINFO_RET_OK != get_swap_stat(swapdev, &ss))
 		return SYSINFO_RET_FAIL;
 
-	if ((NULL == mode || '\0' == *mode || 0 == strcmp(mode, "pages")) &&	/* default parameter */
-			(NULL == swapdev || '\0' == *swapdev || 0 == strcmp(swapdev, "all")))
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "pages"))
 	{
+		if (NULL != swapdev && '\0' != *swapdev && 0 != strcmp(swapdev, "all"))
+			return SYSINFO_RET_FAIL;
+
 		SET_UI64_RESULT(result, ss.wpag);
 	}
 	else if (0 == strcmp(mode, "sectors"))
