@@ -173,25 +173,33 @@ typedef enum	_EVT_VARIANT_TYPE
 }
 EVT_VARIANT_TYPE;
 
-BOOL WINAPI	EvtGetLogInfo( EVT_HANDLE Log, EVT_LOG_PROPERTY_ID PropertyId, DWORD PropertyValueBufferSize,
-		PEVT_VARIANT PropertyValueBuffer,	__out PDWORD PropertyValueBufferUsed);
-BOOL WINAPI	EvtRender(EVT_HANDLE Context, EVT_HANDLE Fragment, DWORD Flags, DWORD BufferSize,
-				__out_bcount_part_opt(BufferSize, *BufferUsed) PVOID Buffer, __out PDWORD BufferUsed,
-				__out PDWORD PropertyCount);
-BOOL WINAPI	EvtNext(EVT_HANDLE ResultSet, DWORD EventsSize, PEVT_HANDLE Events, DWORD Timeout, DWORD Flags,
-				__out PDWORD Returned);
-BOOL WINAPI	EvtClose(EVT_HANDLE Object);
-BOOL WINAPI	EvtFormatMessage(EVT_HANDLE PublisherMetadata, EVT_HANDLE Event, DWORD MessageId,
-		DWORD ValueCount, PEVT_VARIANT Values, DWORD Flags, DWORD BufferSize,
-				__out_ecount_part_opt(BufferSize, *BufferUsed) LPWSTR Buffer, __out PDWORD BufferUsed);
+int			process_eventlog(const char *source, zbx_uint64_t *lastlogsize, unsigned long *out_timestamp,
+			char **out_source, unsigned short *out_severity, char **out_message, unsigned long *out_eventid,
+			unsigned char skip_old_data);
+int			process_eventlog6(const char *source, zbx_uint64_t *lastlogsize, unsigned long *out_timestamp,
+			char **out_provider, char **out_source, unsigned short *out_severity, char **out_message,
+			unsigned long *out_eventid, zbx_uint64_t *FirstID, zbx_uint64_t *LastID,
+			EVT_HANDLE *render_context, EVT_HANDLE *query, zbx_uint64_t *keywords,
+			unsigned char skip_old_data);
+int			initialize_eventlog6(const char *source, zbx_uint64_t *lastlogsize, zbx_uint64_t *FirstID,
+			zbx_uint64_t *LastID, EVT_HANDLE *render_context, EVT_HANDLE *query);
+int			finalize_eventlog6(EVT_HANDLE *render_context, EVT_HANDLE *query);
 
 EVT_HANDLE WINAPI	EvtOpenLog(EVT_HANDLE Session, LPCWSTR Path, DWORD Flags);
 EVT_HANDLE WINAPI	EvtCreateRenderContext(DWORD ValuePathsCount, LPCWSTR* ValuePaths, DWORD Flags);
 EVT_HANDLE WINAPI	EvtQuery(EVT_HANDLE Session, LPCWSTR Path, LPCWSTR Query, DWORD Flags);
 EVT_HANDLE WINAPI	EvtOpenPublisherMetadata(EVT_HANDLE Session, LPCWSTR PublisherId, LPCWSTR LogFilePath,
-					LCID Locale, DWORD Flags);
-
-int	process_eventlog(const char *source, zbx_uint64_t *lastlogsize, unsigned long *out_timestamp,
-		char **out_source, unsigned short *out_severity, char **out_message, unsigned long *out_eventid,
-		unsigned char skip_old_data, zbx_uint64_t *keyword);
+			LCID Locale, DWORD Flags);
+BOOL WINAPI		EvtGetLogInfo( EVT_HANDLE Log, EVT_LOG_PROPERTY_ID PropertyId, DWORD PropertyValueBufferSize,
+			PEVT_VARIANT PropertyValueBuffer,	__out PDWORD PropertyValueBufferUsed);
+BOOL WINAPI		EvtRender(EVT_HANDLE Context, EVT_HANDLE Fragment, DWORD Flags, DWORD BufferSize,
+			__out_bcount_part_opt(BufferSize, *BufferUsed) PVOID Buffer, __out PDWORD BufferUsed,
+			__out PDWORD PropertyCount);
+BOOL WINAPI		EvtNext(EVT_HANDLE ResultSet, DWORD EventsSize, PEVT_HANDLE Events, DWORD Timeout, DWORD Flags,
+			__out PDWORD Returned);
+BOOL WINAPI		EvtClose(EVT_HANDLE Object);
+BOOL WINAPI		EvtFormatMessage(EVT_HANDLE PublisherMetadata, EVT_HANDLE Event, DWORD MessageId,
+			DWORD ValueCount, PEVT_VARIANT Values, DWORD Flags, DWORD BufferSize,
+			__out_ecount_part_opt(BufferSize, *BufferUsed) LPWSTR Buffer, __out PDWORD BufferUsed);
 #endif	/* ZABBIX_EVENTLOG_H */
+
