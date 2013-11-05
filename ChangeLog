@@ -1,7 +1,6 @@
 Changes for 2.2.0rc1
 
 New features:
-.........T [ZBX-6832] improved default templates (e.g., split "Template App Agentless" into 12 templates for each service) (asaveljevs, neogan, Sasha)
 ..F....... [ZBXNEXT-1851] hid American English, Greek and Polish translations from the frontend (Richlv)
 
 Bug fixes:
@@ -322,7 +321,7 @@ A......... [ZBX-6771] fixed "status" field and existing host validation in Proxy
 Changes for 2.1.0
 
 New features:
-...G...... [ZBXNEXT-1653] added regexp extaction support to file/web/log keys (wiper)
+...G...... [ZBXNEXT-1653] added regexp extraction support to file/web/log keys (wiper)
 ........S. [ZBXNEXT-322] implemented value cache (wiper)
 ...G...... [ZBXNEXT-1571] added support for proc.num for HP-UX (igors)
 ...G...PS. [ZBX-6299] added JSON validator (wiper)
