@@ -136,6 +136,8 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 	}
 	elseif (isset($_REQUEST['triggers'])) {
 		$_REQUEST['events'] = API::Event()->get(array(
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
 			'objectids' => $_REQUEST['triggers'],
 			'output' => array('eventid'),
 			'acknowledged' => EVENT_NOT_ACKNOWLEDGED

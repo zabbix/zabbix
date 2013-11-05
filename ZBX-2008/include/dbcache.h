@@ -182,7 +182,7 @@ typedef struct
 }
 zbx_host_key_t;
 
-/* housekeeping related configuration data*/
+/* housekeeping related configuration data */
 typedef struct
 {
 	int		events_trigger;
@@ -267,7 +267,7 @@ void	*DCget_stats(int request);
 
 zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 
-void	DCsync_configuration();
+void	DCsync_configuration(void);
 void	init_configuration_cache();
 void	free_configuration_cache();
 void	DCload_config();
@@ -282,7 +282,8 @@ void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions,
 void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num);
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, char **errors, int item_num);
-void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_t *trigger_order, int process_num);
+void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_t *trigger_order, int process_num,
+			int *trigger_count);
 void	DCfree_triggers(zbx_vector_ptr_t *triggers);
 int	DCconfig_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid, unsigned char type);
 int	DCconfig_get_poller_nextcheck(unsigned char poller_type);
@@ -310,7 +311,7 @@ int	DCconfig_check_trigger_dependencies(zbx_uint64_t triggerid);
 
 void	DCconfig_set_trigger_value(zbx_uint64_t triggerid, unsigned char value,
 		unsigned char state, const char *error, int *lastchange);
-void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
+void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int maintenance_status,
 		int maintenance_type, int maintenance_from);
 
 #define ZBX_CONFSTATS_BUFFER_TOTAL	1
@@ -344,5 +345,6 @@ void	DCget_functions_hostids(zbx_vector_uint64_t *hosts, const zbx_vector_uint64
 void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * const *names, int names_num);
 void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name);
 
-int	DCget_item_time_added(zbx_uint64_t itemid, int *time_added);
+int	DCget_data_expected_from(zbx_uint64_t itemid, int *seconds);
+
 #endif

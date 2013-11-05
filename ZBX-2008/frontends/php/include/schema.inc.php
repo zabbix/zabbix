@@ -914,7 +914,7 @@ return array(
 			'ip' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 39,
+				'length' => 64,
 				'default' => '127.0.0.1',
 			),
 			'dns' => array(
@@ -2605,7 +2605,7 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
 				'length' => 16,
-				'default' => '0',
+				'default' => '100',
 			),
 			'templateid' => array(
 				'null' => true,
@@ -2735,7 +2735,7 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '1',
+				'default' => '0',
 			),
 			'calc_fnc' => array(
 				'null' => false,
@@ -2849,30 +2849,6 @@ return array(
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => 1,
-			),
-		),
-	),
-	'help_items' => array(
-		'type' => DB::TABLE_TYPE_HISTORY,
-		'key' => 'itemtype,key_',
-		'fields' => array(
-			'itemtype' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			),
-			'key_' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => '',
-			),
-			'description' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => '',
 			),
 		),
 	),
@@ -3352,7 +3328,7 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '3',
+				'default' => '0',
 			),
 			'highlight' => array(
 				'null' => false,
@@ -3528,13 +3504,14 @@ return array(
 			'label' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 2048,
 				'default' => '',
 			),
 			'label_location' => array(
-				'null' => true,
+				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
+				'default' => '-1',
 			),
 			'x' => array(
 				'null' => false,
@@ -3645,7 +3622,7 @@ return array(
 			'label' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 2048,
 				'default' => '',
 			),
 		),

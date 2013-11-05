@@ -269,7 +269,7 @@ void	udiv128_64(zbx_uint128_t *result, const zbx_uint128_t *dividend, zbx_uint64
 		result->hi = 0;
 	result->lo = 0;
 
-	/* shift divisor left by 64 bits - simply assign it to the high qword*/
+	/* shift divisor left by 64 bits - simply assign it to the high qword */
 	uset128(&divisor, value, 0);
 
 	/* Reminder is always less than divisor shifted right by 64 bits (because of the */

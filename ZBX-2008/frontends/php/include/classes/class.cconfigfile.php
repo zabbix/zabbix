@@ -24,7 +24,6 @@ class CConfigFile {
 	const CONFIG_NOT_FOUND = 1;
 	const CONFIG_ERROR = 2;
 
-	const CONFIG_FILE_NAME = 'zabbix.conf.php';
 	const CONFIG_FILE_PATH = '/conf/zabbix.conf.php';
 
 	public $configFile = null;
@@ -50,6 +49,9 @@ class CConfigFile {
 	public function load() {
 		if (!file_exists($this->configFile)) {
 			self::exception('Config file does not exist.', self::CONFIG_NOT_FOUND);
+		}
+		if (!is_readable($this->configFile)) {
+			self::exception('Permission denied.');
 		}
 
 		ob_start();

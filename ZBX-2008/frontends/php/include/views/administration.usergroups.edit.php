@@ -20,7 +20,7 @@
 
 
 $userGroupWidget = new CWidget();
-$userGroupWidget->addPageHeader(_('CONFIGURATION OF USER GROUP'));
+$userGroupWidget->addPageHeader(_('CONFIGURATION OF USER GROUPS'));
 
 // create form
 $userGroupForm = new CForm();
@@ -78,7 +78,7 @@ $userGroupFormList->addRow(_('Debug mode'), new CCheckBox('debug_mode', $this->d
 $permissionsFormList = new CFormList('permissionsFormList');
 
 // append permissions table to form list
-$permissionsTable = new CTable(_('No permissions defined.'), 'right_table');
+$permissionsTable = new CTable(null, 'right_table');
 $permissionsTable->setHeader(array(_('Read-write'), _('Read only'), _('Deny')), 'header');
 
 $lstWrite = new CListBox('right_to_del[read_write][]', null, 20);

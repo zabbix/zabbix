@@ -27,7 +27,7 @@ if ($this->data['is_profile']) {
 	$userWidget->addPageHeader(_('USER PROFILE').NAME_DELIMITER.$this->data['name'].' '.$this->data['surname']);
 }
 else {
-	$userWidget->addPageHeader(_('CONFIGURATION OF USER'));
+	$userWidget->addPageHeader(_('CONFIGURATION OF USERS'));
 }
 
 // create form
@@ -111,8 +111,7 @@ foreach (getLocales() as $localeId => $locale) {
 			$localeId,
 			$locale['name'],
 			($localeId == $this->data['lang']) ? true : null,
-			$localeExists,
-			$localeExists == 'yes' ? '' : 'disabled'
+			$localeExists
 		);
 
 		if ($localeExists != 'yes') {
@@ -153,7 +152,7 @@ if (uint_in_array(CWebUser::$data['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TY
 	$userMediaFormList = new CFormList('userMediaFormList');
 	$userForm->addVar('user_medias', $this->data['user_medias']);
 
-	$mediaTableInfo = new CTableInfo(_('No media defined.'));
+	$mediaTableInfo = new CTableInfo(_('No media found.'));
 
 	foreach ($this->data['user_medias'] as $id => $media) {
 		if (!isset($media['active']) || !$media['active']) {

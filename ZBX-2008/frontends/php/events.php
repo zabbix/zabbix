@@ -51,7 +51,7 @@ else {
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-$allow_discovery = check_right_on_discovery(PERM_READ);
+$allow_discovery = check_right_on_discovery();
 $allowed_sources[] = EVENT_SOURCE_TRIGGERS;
 if ($allow_discovery) {
 	$allowed_sources[] = EVENT_SOURCE_DISCOVERY;
@@ -135,7 +135,7 @@ if ($_REQUEST['triggerid'] > 0 && isset($_REQUEST['hostid'])) {
 	$oldTriggers = API::Trigger()->get(array(
 		'output' => array('triggerid', 'description', 'expression'),
 		'selectHosts' => array('hostid', 'host'),
-		'selectItems' => API_OUTPUT_EXTEND,
+		'selectItems' => array('itemid', 'hostid', 'key_', 'type', 'flags', 'status'),
 		'selectFunctions' => API_OUTPUT_EXTEND,
 		'triggerids' => $_REQUEST['triggerid']
 	));
@@ -154,7 +154,7 @@ if ($_REQUEST['triggerid'] > 0 && isset($_REQUEST['hostid'])) {
 		$newTriggers = API::Trigger()->get(array(
 			'output' => array('triggerid', 'description', 'expression'),
 			'selectHosts' => array('hostid', 'host'),
-			'selectItems' => API_OUTPUT_EXTEND,
+			'selectItems' => array('itemid', 'key_'),
 			'selectFunctions' => API_OUTPUT_EXTEND,
 			'filter' => array('description' => $oldTrigger['description']),
 			'hostids' => $hostid
@@ -367,16 +367,18 @@ $eventsWidget->addFlicker($scroll, CProfile::get('web.events.filter.state', 0));
 /*
  * Display
  */
-$table = new CTableInfo(_('No events defined.'));
+$table = new CTableInfo(_('No events found.'));
 
 // trigger events
 if ($source == EVENT_OBJECT_TRIGGER) {
 	$sourceName = 'trigger';
 
 	$firstEvent = API::Event()->get(array(
+		'source' => EVENT_SOURCE_TRIGGERS,
+		'object' => EVENT_OBJECT_TRIGGER,
 		'output' => API_OUTPUT_EXTEND,
 		'objectids' => !empty($_REQUEST['triggerid']) ? $_REQUEST['triggerid'] : null,
-		'sortfield' => 'eventid',
+		'sortfield' => array('clock'),
 		'sortorder' => ZBX_SORT_UP,
 		'limit' => 1
 	));
@@ -391,7 +393,7 @@ else {
 		'output' => API_OUTPUT_EXTEND,
 		'source' => EVENT_SOURCE_DISCOVERY,
 		'object' => EVENT_OBJECT_DHOST,
-		'sortfield' => 'eventid',
+		'sortfield' => array('clock'),
 		'sortorder' => ZBX_SORT_UP,
 		'limit' => 1
 	));
@@ -401,7 +403,7 @@ else {
 		'output' => API_OUTPUT_EXTEND,
 		'source' => EVENT_SOURCE_DISCOVERY,
 		'object' => EVENT_OBJECT_DSERVICE,
-		'sortfield' => 'eventid',
+		'sortfield' => array('clock'),
 		'sortorder' => ZBX_SORT_UP,
 		'limit' => 1
 	));
@@ -442,7 +444,9 @@ else {
 			'object' => EVENT_OBJECT_DHOST,
 			'time_from' => $from,
 			'time_till' => $till,
-			'output' => array('eventid'),
+			'output' => array('eventid', 'object', 'objectid', 'clock', 'value'),
+			'sortfield' => array('clock', 'eventid'),
+			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => $config['search_limit'] + 1
 		));
 		$dServiceEvents = API::Event()->get(array(
@@ -450,22 +454,18 @@ else {
 			'object' => EVENT_OBJECT_DSERVICE,
 			'time_from' => $from,
 			'time_till' => $till,
-			'output' => array('eventid'),
+			'output' => array('eventid', 'object', 'objectid', 'clock', 'value'),
+			'sortfield' => array('clock', 'eventid'),
+			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => $config['search_limit'] + 1
 		));
 		$dsc_events = array_merge($dHostEvents, $dServiceEvents);
-		order_result($dsc_events, 'eventid', ZBX_SORT_DOWN);
+		CArrayHelper::sort($dsc_events, array(
+			array('field' => 'clock', 'order' => ZBX_SORT_DOWN),
+			array('field' => 'eventid', 'order' => ZBX_SORT_DOWN)
+		));
 		$dsc_events = array_slice($dsc_events, 0, $config['search_limit'] + 1);
 		$paging = getPagingLine($dsc_events);
-
-		// fetch events for the current page
-		$dsc_events = DBfetchArray(DBselect(
-			'SELECT e.*'.
-			' FROM events e'.
-			' WHERE e.source='.EVENT_SOURCE_DISCOVERY.
-				' AND '.dbConditionInt('e.eventid', zbx_objectValues($dsc_events, 'eventid')).
-			' ORDER BY eventid DESC'
-		));
 
 		// do we need to make CVS export button enabled?
 		$csv_disabled = zbx_empty($dsc_events);
@@ -618,12 +618,14 @@ else {
 
 			// query event with short data
 			$events = API::Event()->get(array(
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER,
 				'nodeids' => get_current_nodeid(),
 				'objectids' => zbx_objectValues($triggers, 'triggerid'),
 				'time_from' => $from,
 				'time_till' => $till,
 				'output' => array('eventid'),
-				'sortfield' => 'eventid',
+				'sortfield' => array('clock', 'eventid'),
 				'sortorder' => ZBX_SORT_DOWN,
 				'limit' => $config['search_limit'] + 1
 			));
@@ -633,11 +635,13 @@ else {
 
 			// query event with extend data
 			$events = API::Event()->get(array(
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER,
 				'nodeids' => get_current_nodeid(),
 				'eventids' => zbx_objectValues($events, 'eventid'),
 				'output' => API_OUTPUT_EXTEND,
 				'select_acknowledges' => API_OUTPUT_COUNT,
-				'sortfield' => 'eventid',
+				'sortfield' => array('clock', 'eventid'),
 				'sortorder' => ZBX_SORT_DOWN,
 				'nopermissions' => true
 			));
@@ -684,7 +688,7 @@ else {
 
 				foreach ($trigger['items'] as $item) {
 					$triggerItems[] = array(
-						'name' => htmlspecialchars(itemName($item)),
+						'name' => itemName($item),
 						'params' => array(
 							'itemid' => $item['itemid'],
 							'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))

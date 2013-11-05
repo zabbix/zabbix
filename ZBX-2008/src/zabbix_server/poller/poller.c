@@ -270,14 +270,14 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 	if (HOST_AVAILABLE_TRUE == *available)
 	{
 		zbx_snprintf(error_msg, sizeof(error_msg), "resuming %s checks on host [%s]: connection restored",
-				zbx_host_type_string(item->type), item->host.host);
+				zbx_agent_type_string(item->type), item->host.host);
 
 		zabbix_log(LOG_LEVEL_WARNING, "%s", error_msg);
 	}
 	else if (HOST_AVAILABLE_TRUE != *available)
 	{
 		zbx_snprintf(error_msg, sizeof(error_msg), "enabling %s checks on host [%s]: host became available",
-				zbx_host_type_string(item->type), item->host.host);
+				zbx_agent_type_string(item->type), item->host.host);
 
 		zabbix_log(LOG_LEVEL_WARNING, "%s", error_msg);
 
@@ -375,7 +375,7 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 	{
 		zbx_snprintf(error_msg, sizeof(error_msg), "%s item [%s] on host [%s] failed:"
 				" first network error, wait for %d seconds",
-				zbx_host_type_string(item->type), item->key_orig, item->host.host, CONFIG_UNREACHABLE_DELAY);
+				zbx_agent_type_string(item->type), item->key_orig, item->host.host, CONFIG_UNREACHABLE_DELAY);
 
 		*errors_from = ts->sec;
 		*disable_until = ts->sec + CONFIG_UNREACHABLE_DELAY;
@@ -387,7 +387,7 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 		{
 			zbx_snprintf(error_msg, sizeof(error_msg), "%s item [%s] on host [%s] failed:"
 					" another network error, wait for %d seconds",
-					zbx_host_type_string(item->type), item->key_orig, item->host.host, CONFIG_UNREACHABLE_DELAY);
+					zbx_agent_type_string(item->type), item->key_orig, item->host.host, CONFIG_UNREACHABLE_DELAY);
 
 			*disable_until = ts->sec + CONFIG_UNREACHABLE_DELAY;
 		}
@@ -397,17 +397,21 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 
 			if (HOST_AVAILABLE_FALSE != *available)
 			{
-				zbx_snprintf(error_msg, sizeof(error_msg), "temporarily disabling %s checks on host [%s]:"
-						" host unavailable",
-						zbx_host_type_string(item->type), item->host.host);
+				char	reason[64];
+
+				zbx_snprintf(error_msg, sizeof(error_msg),
+						"temporarily disabling %s checks on host [%s]: host unavailable",
+						zbx_agent_type_string(item->type), item->host.host);
 
 				*available = HOST_AVAILABLE_FALSE;
 
 				offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=%d,",
 						fld_available, *available);
 
-				update_triggers_status_to_unknown(item->host.hostid, item->type, ts,
-						"Agent is unavailable.");
+				zbx_snprintf(reason, sizeof(reason), "%s is unavailable.",
+						zbx_agent_type_string(item->type));
+
+				update_triggers_status_to_unknown(item->host.hostid, item->type, ts, reason);
 			}
 
 			error_esc = DBdyn_escape_string_len(error, HOST_ERROR_LEN);
@@ -773,30 +777,56 @@ exit:
 
 void	main_poller_loop(unsigned char poller_type)
 {
-	int	nextcheck, sleeptime, processed;
-	double	sec;
+	int	nextcheck, sleeptime = -1, processed = 0, old_processed = 0;
+	double	sec, total_sec = 0.0, old_total_sec = 0.0;
+	time_t	last_stat_time;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In main_poller_loop() process_type:'%s' process_num:%d",
-			get_process_type_string(process_type), process_num);
+#define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
+				/* once in STAT_INTERVAL seconds */
 
-	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
+	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
+	last_stat_time = time(NULL);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
-		zbx_setproctitle("%s [getting values]", get_process_type_string(process_type));
+		if (0 != sleeptime)
+		{
+			zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, getting values]",
+					get_process_type_string(process_type), process_num, old_processed,
+					old_total_sec);
+		}
 
 		sec = zbx_time();
-		processed = get_values(poller_type);
-		sec = zbx_time() - sec;
-
-		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while updating %d values",
-				get_process_type_string(process_type), process_num, sec, processed);
+		processed += get_values(poller_type);
+		total_sec += zbx_time() - sec;
 
 		nextcheck = DCconfig_get_poller_nextcheck(poller_type);
 		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
+		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
+		{
+			if (0 == sleeptime)
+			{
+				zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, getting values]",
+					get_process_type_string(process_type), process_num, processed, total_sec);
+			}
+			else
+			{
+				zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, idle %d sec]",
+					get_process_type_string(process_type), process_num, processed, total_sec,
+					sleeptime);
+				old_processed = processed;
+				old_total_sec = total_sec;
+			}
+			processed = 0;
+			total_sec = 0.0;
+			last_stat_time = time(NULL);
+		}
+
 		zbx_sleep_loop(sleeptime);
 	}
+
+#undef STAT_INTERVAL
 }

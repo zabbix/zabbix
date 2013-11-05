@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/maps.inc.php';
 require_once dirname(__FILE__).'/users.inc.php';
 
 function make_favorite_graphs() {
-	$favList = new CList(null, 'favorites');
+	$favList = new CList(null, 'favorites', _('No graphs added.'));
 	$graphids = array();
 	$itemids = array();
 
@@ -96,7 +96,7 @@ function make_favorite_graphs() {
 }
 
 function make_favorite_screens() {
-	$favList = new CList(null, 'favorites');
+	$favList = new CList(null, 'favorites', _('No screens added.'));
 	$fav_screens = CFavorite::get('web.favorite.screenids');
 
 	if (!$fav_screens) {
@@ -147,7 +147,7 @@ function make_favorite_screens() {
 }
 
 function make_favorite_maps() {
-	$favList = new CList(null, 'favorites');
+	$favList = new CList(null, 'favorites', _('No maps added.'));
 	$fav_sysmaps = CFavorite::get('web.favorite.sysmapids');
 
 	if (!$fav_sysmaps) {
@@ -180,7 +180,7 @@ function make_system_status($filter) {
 		$ackParams['screenid'] = $filter['screenid'];
 	}
 
-	$table = new CTableInfo();
+	$table = new CTableInfo(_('No host groups found.'));
 	$table->setHeader(array(
 		is_show_all_nodes() ? _('Node') : null,
 		_('Host group'),
@@ -370,7 +370,7 @@ function make_system_status($filter) {
 }
 
 function make_hoststat_summary($filter) {
-	$table = new CTableInfo();
+	$table = new CTableInfo(_('No host groups found.'));
 	$table->setHeader(array(
 		is_show_all_nodes() ? _('Node') : null,
 		_('Host group'),
@@ -778,6 +778,8 @@ function make_status_of_zbx() {
 /**
  * Create DIV with latest problem triggers.
  *
+ * If no sortfield and sortorder are defined, the sort indicater in the column name will not be displayed.
+ *
  * @param array  $filter['screenid']
  * @param array  $filter['groupids']
  * @param array  $filter['hostids']
@@ -792,6 +794,9 @@ function make_status_of_zbx() {
  * @return CDiv
  */
 function make_latest_issues(array $filter = array()) {
+	// hide the sort indicator if no sortfield and sortorder are given
+	$showSortIndicator = isset($filter['sortfield']) || isset($filter['sortorder']);
+
 	if (!isset($filter['sortfield'])) {
 		$filter['sortfield'] = 'lastchange';
 	}
@@ -818,8 +823,8 @@ function make_latest_issues(array $filter = array()) {
 		'output' => array('triggerid', 'state', 'error', 'url', 'expression', 'description', 'priority', 'lastchange'),
 		'selectHosts' => array('hostid', 'name'),
 		'selectLastEvent' => array('eventid', 'acknowledged', 'objectid', 'clock', 'ns'),
-		'sortfield' => isset($filter['sortfield']) ? $filter['sortfield'] : 'lastchange',
-		'sortorder' => isset($filter['sortorder']) ? $filter['sortorder'] : ZBX_SORT_DOWN,
+		'sortfield' => $filter['sortfield'],
+		'sortorder' => $filter['sortorder'],
 		'limit' => isset($filter['limit']) ? $filter['limit'] : DEFAULT_LATEST_ISSUES_CNT
 	)));
 
@@ -882,21 +887,23 @@ function make_latest_issues(array $filter = array()) {
 	$config = select_config();
 
 	// indicator of sort field
-	$sortDiv = new CDiv(SPACE, ($filter['sortorder'] === ZBX_SORT_DOWN) ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor');
-	$sortDiv->addStyle('float: left');
-	$hostHeaderDiv = new CDiv(array(_('Host'), SPACE));
-	$hostHeaderDiv->addStyle('float: left');
-	$issueHeaderDiv = new CDiv(array(_('Issue'), SPACE));
-	$issueHeaderDiv->addStyle('float: left');
-	$lastChangeHeaderDiv = new CDiv(array(_('Time'), SPACE));
-	$lastChangeHeaderDiv->addStyle('float: left');
+	if ($showSortIndicator) {
+		$sortDiv = new CDiv(SPACE, ($filter['sortorder'] === ZBX_SORT_DOWN) ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor');
+		$sortDiv->addStyle('float: left');
+		$hostHeaderDiv = new CDiv(array(_('Host'), SPACE));
+		$hostHeaderDiv->addStyle('float: left');
+		$issueHeaderDiv = new CDiv(array(_('Issue'), SPACE));
+		$issueHeaderDiv->addStyle('float: left');
+		$lastChangeHeaderDiv = new CDiv(array(_('Time'), SPACE));
+		$lastChangeHeaderDiv->addStyle('float: left');
+	}
 
-	$table = new CTableInfo();
+	$table = new CTableInfo(_('No events found.'));
 	$table->setHeader(array(
 		is_show_all_nodes() ? _('Node') : null,
-		($filter['sortfield'] === 'hostname') ? array($hostHeaderDiv, $sortDiv) : _('Host'),
-		($filter['sortfield'] === 'priority') ? array($issueHeaderDiv, $sortDiv) : _('Issue'),
-		($filter['sortfield'] === 'lastchange') ? array($lastChangeHeaderDiv, $sortDiv) : _('Last change'),
+		($showSortIndicator && ($filter['sortfield'] === 'hostname')) ? array($hostHeaderDiv, $sortDiv) : _('Host'),
+		($showSortIndicator && ($filter['sortfield'] === 'priority')) ? array($issueHeaderDiv, $sortDiv) : _('Issue'),
+		($showSortIndicator && ($filter['sortfield'] === 'lastchange')) ? array($lastChangeHeaderDiv, $sortDiv) : _('Last change'),
 		_('Age'),
 		_('Info'),
 		$config['event_ack_enable'] ? _('Ack') : null,
@@ -1017,7 +1024,7 @@ function make_latest_issues(array $filter = array()) {
 
 	$script = new CJSScript(get_js("jQuery('#hat_lastiss_footer').html('"._s('Updated: %s', zbx_date2str(_('H:i:s')))."')"));
 
-	$infoDiv = new CDiv(_n('%2$d of %1$d issue is shown', '%2$d of %1$d issues are shown', $triggersTotalCount, count($triggers)));
+	$infoDiv = new CDiv(_n('%1$d of %2$d issue is shown', '%1$d of %2$d issues are shown', count($triggers), $triggersTotalCount));
 	$infoDiv->addStyle('text-align: right; padding-right: 3px;');
 
 	return new CDiv(array($table, $infoDiv, $script));
@@ -1064,7 +1071,7 @@ function make_webmon_overview($filter) {
 	));
 	$availableHostIds = array_keys($availableHosts);
 
-	$table = new CTableInfo();
+	$table = new CTableInfo(_('No web scenarios found.'));
 	$table->setHeader(array(
 		is_show_all_nodes() ? _('Node') : null,
 		_('Host group'),

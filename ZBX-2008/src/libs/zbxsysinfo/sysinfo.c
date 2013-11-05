@@ -990,6 +990,36 @@ void	*get_result_value_by_type(AGENT_RESULT *result, int require_type)
 
 /******************************************************************************
  *                                                                            *
+ * Function: unquote_key_param                                                *
+ *                                                                            *
+ * Purpose: unquotes special symbols in item key parameter                    *
+ *                                                                            *
+ * Parameters: param - [IN/OUT] item key parameter                            *
+ *                                                                            *
+ * Comments:                                                                  *
+ *   "param"     => param                                                     *
+ *   "\"param\"" => "param"                                                   *
+ *                                                                            *
+ ******************************************************************************/
+void	unquote_key_param(char *param)
+{
+	char	*dst;
+
+	if ('"' != *param)
+		return;
+
+	for (dst = param++; '\0' != *param; param++)
+	{
+		if ('\\' == *param && '"' == param[1])
+			continue;
+
+		*dst++ = *param;
+	}
+	*--dst = '\0';
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: quote_key_param                                                  *
  *                                                                            *
  * Purpose: quotes special symbols in item key parameter                      *
@@ -1027,3 +1057,23 @@ void	quote_key_param(char **param, int forced)
 	}
 	(*param)[--sz_dst] = '"';
 }
+
+#ifdef HAVE_KSTAT_H
+zbx_uint64_t	get_kstat_numeric_value(const kstat_named_t *kn)
+{
+	switch (kn->data_type)
+	{
+		case KSTAT_DATA_INT32:
+			return kn->value.i32;
+		case KSTAT_DATA_UINT32:
+			return kn->value.ui32;
+		case KSTAT_DATA_INT64:
+			return kn->value.i64;
+		case KSTAT_DATA_UINT64:
+			return kn->value.ui64;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			return 0;
+	}
+}
+#endif

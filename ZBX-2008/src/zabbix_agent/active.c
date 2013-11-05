@@ -701,10 +701,7 @@ ret:
  *             port        - port of Zabbix server                            *
  *             host        - name of host in Zabbix database                  *
  *             key         - name of metric                                   *
- *             value       - a reference to the string version of key value.  *
- *                           The value must be preallocated by caller.        *
- *                           If process_value() function stores value         *
- *                           then it sets value reference to NULL.            *
+ *             value       - key value                                        *
  *             lastlogsize - size of read logfile                             *
  *             mtime       - time of last file modification                   *
  *             timestamp   - timestamp of read value                          *
@@ -728,7 +725,7 @@ static int	process_value(
 		unsigned short	port,
 		const char	*host,
 		const char	*key,
-		char		**value,
+		const char	*value,
 		zbx_uint64_t	*lastlogsize,
 		int		*mtime,
 		unsigned long	*timestamp,
@@ -743,7 +740,7 @@ static int	process_value(
 	int				i, ret = FAIL;
 	size_t				sz;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s:%s' value:'%s'", __function_name, host, key, *value);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s:%s' value:'%s'", __function_name, host, key, value);
 
 	send_buffer(server, port);
 
@@ -799,10 +796,7 @@ static int	process_value(
 	memset(el, 0, sizeof(ZBX_ACTIVE_BUFFER_ELEMENT));
 	el->host = zbx_strdup(NULL, host);
 	el->key = zbx_strdup(NULL, key);
-
-	/* value is already allocated by caller, so we don't have to dup it */
-	el->value = *value;
-	*value = NULL;
+	el->value = (NULL == value) ? NULL : zbx_strdup(NULL, value);
 
 	if (NULL != source)
 		el->source = strdup(source);
@@ -942,11 +936,13 @@ static void	process_active_checks(char *server, unsigned short port)
 							output_template, &item_value))
 					{
 						send_err = process_value(server, port, CONFIG_HOSTNAME,
-								active_metrics[i].key_orig, &item_value, &lastlogsize,
+								active_metrics[i].key_orig, item_value, &lastlogsize,
 								NULL, NULL, NULL, NULL,	NULL, 1);
+
+						zbx_free(item_value);
+
 						s_count++;
 					}
-					zbx_free(item_value);
 					p_count++;
 
 					zbx_free(value);
@@ -979,10 +975,8 @@ static void	process_active_checks(char *server, unsigned short port)
 				zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported",
 						active_metrics[i].key);
 
-				process_value(server, port, CONFIG_HOSTNAME,
-						active_metrics[i].key_orig, &item_value,
+				process_value(server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig, NULL,
 						&active_metrics[i].lastlogsize, NULL, NULL, NULL, NULL, NULL, 0);
-				zbx_free(item_value);
 			}
 		}
 		/* special processing for log files with rotation */
@@ -1054,11 +1048,13 @@ static void	process_active_checks(char *server, unsigned short port)
 							output_template, &item_value))
 					{
 						send_err = process_value(server, port, CONFIG_HOSTNAME,
-								active_metrics[i].key_orig, &item_value, &lastlogsize,
+								active_metrics[i].key_orig, item_value, &lastlogsize,
 								&mtime, NULL, NULL, NULL, NULL, 1);
+
+						zbx_free(item_value);
+
 						s_count++;
 					}
-					zbx_free(item_value);
 					p_count++;
 
 					zbx_free(value);
@@ -1070,7 +1066,7 @@ static void	process_active_checks(char *server, unsigned short port)
 					}
 					else
 					{
-						/* buffer is full, stop processing active checks*/
+						/* buffer is full, stop processing active checks */
 						/* till the buffer is cleared */
 						lastlogsize = active_metrics[i].lastlogsize;
 						mtime = active_metrics[i].mtime;
@@ -1094,11 +1090,9 @@ static void	process_active_checks(char *server, unsigned short port)
 				zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported",
 						active_metrics[i].key);
 
-				process_value(server, port, CONFIG_HOSTNAME,
-						active_metrics[i].key_orig, &item_value,
+				process_value(server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig, NULL,
 						&active_metrics[i].lastlogsize, &active_metrics[i].mtime,
 						NULL, NULL, NULL, NULL, 0);
-				zbx_free(item_value);
 			}
 		}
 		/* special processing for eventlog */
@@ -1226,20 +1220,19 @@ static void	process_active_checks(char *server, unsigned short port)
 							zbx_snprintf(str_logeventid, sizeof(str_logeventid), "%lu",
 									logeventid);
 
-							if (SUCCEED == regexp_sub_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE,
-											output_template, &item_value) &&
-									SUCCEED == regexp_match_ex(&regexps, str_severity, key_severity,
-											ZBX_IGNORE_CASE) &&
-									(('\0' == *key_source) ? 1 : (0 == strcmp(key_source, provider))) &&
-									SUCCEED == regexp_match_ex(&regexps, str_logeventid,
-											key_logeventid, ZBX_CASE_SENSITIVE))
+							if (SUCCEED == regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE) &&
+								SUCCEED == regexp_match_ex(&regexps, str_severity, key_severity,
+										ZBX_IGNORE_CASE) &&
+								SUCCEED == regexp_match_ex(&regexps, provider, key_source,
+										ZBX_IGNORE_CASE) &&
+								SUCCEED == regexp_match_ex(&regexps, str_logeventid,
+										key_logeventid, ZBX_CASE_SENSITIVE))
 							{
 								send_err = process_value(server, port, CONFIG_HOSTNAME,
-										active_metrics[i].key_orig, &item_value, &lastlogsize,
+										active_metrics[i].key_orig, value, &lastlogsize,
 										NULL, &timestamp, provider, &severity, &logeventid, 1);
 								s_count++;
 							}
-							zbx_free(item_value);
 							p_count++;
 
 							zbx_free(source);
@@ -1317,20 +1310,19 @@ static void	process_active_checks(char *server, unsigned short port)
 
 						zbx_snprintf(str_logeventid, sizeof(str_logeventid), "%lu", logeventid);
 
-						if (SUCCEED == regexp_sub_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE,
-										output_template, &item_value) &&
+						if (SUCCEED == regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE) &&
 								SUCCEED == regexp_match_ex(&regexps, str_severity, key_severity,
 										ZBX_IGNORE_CASE) &&
-								(('\0' == *key_source) ? 1 : (0 == strcmp(key_source, source))) &&
+								SUCCEED == regexp_match_ex(&regexps, source, key_source,
+										ZBX_IGNORE_CASE) &&
 								SUCCEED == regexp_match_ex(&regexps, str_logeventid,
 										key_logeventid, ZBX_CASE_SENSITIVE))
 						{
 							send_err = process_value(server, port, CONFIG_HOSTNAME,
-									active_metrics[i].key_orig, &item_value, &lastlogsize,
+									active_metrics[i].key_orig, value, &lastlogsize,
 									NULL, &timestamp, source, &severity, &logeventid, 1);
 							s_count++;
 						}
-						zbx_free(item_value);
 						p_count++;
 
 						zbx_free(source);
@@ -1340,7 +1332,7 @@ static void	process_active_checks(char *server, unsigned short port)
 							active_metrics[i].lastlogsize = lastlogsize;
 						else
 						{
-							/* buffer is full, stop processing active checks*/
+							/* buffer is full, stop processing active checks */
 							/* till the buffer is cleared */
 							lastlogsize = active_metrics[i].lastlogsize;
 							goto ret;
@@ -1366,10 +1358,8 @@ static void	process_active_checks(char *server, unsigned short port)
 				zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported",
 						active_metrics[i].key);
 
-				process_value(server, port, CONFIG_HOSTNAME,
-						active_metrics[i].key_orig, &item_value,
+				process_value(server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig, NULL,
 						&active_metrics[i].lastlogsize, NULL, NULL, NULL, NULL, NULL, 0);
-				zbx_free(item_value);
 			}
 		}
 		else
@@ -1381,13 +1371,10 @@ static void	process_active_checks(char *server, unsigned short port)
 
 			if (NULL != pvalue)
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "for key [%s] received value [%s]",
-						active_metrics[i].key, *pvalue);
-				item_value = zbx_strdup(NULL, *pvalue);
-				process_value(server, port, CONFIG_HOSTNAME,
-						active_metrics[i].key_orig, &item_value, NULL,
+				zabbix_log(LOG_LEVEL_DEBUG, "for key [%s] received value [%s]", active_metrics[i].key,
+						*pvalue);
+				process_value(server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig, *pvalue, NULL,
 						NULL, NULL, NULL, NULL, NULL, 0);
-				zbx_free(item_value);
 
 				if (0 == strcmp(*pvalue, ZBX_NOTSUPPORTED))
 				{
@@ -1409,12 +1396,15 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 {
 	ZBX_THREAD_ACTIVECHK_ARGS activechk_args;
 
-	int	nextcheck = 0, nextrefresh = 0, nextsend = 0;
+	int	nextcheck = 0, nextrefresh = 0, nextsend = 0, thread_num, thread_num2;
 
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
 
-	zabbix_log(LOG_LEVEL_WARNING, "agent #%d started [active checks]", ((zbx_thread_args_t *)args)->thread_num);
+	thread_num = ((zbx_thread_args_t *)args)->thread_num;
+	thread_num2 = ((zbx_thread_args_t *)args)->thread_num2;
+
+	zabbix_log(LOG_LEVEL_WARNING, "agent #%d started [active checks #%d]", thread_num, thread_num2);
 
 	activechk_args.host = zbx_strdup(NULL, ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->host);
 	activechk_args.port = ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->port;
@@ -1433,7 +1423,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 		if (time(NULL) >= nextrefresh)
 		{
-			zbx_setproctitle("poller [getting list of active checks]");
+			zbx_setproctitle("active checks #%d [getting list of active checks]", thread_num2);
 
 			if (FAIL == refresh_active_checks(activechk_args.host, activechk_args.port))
 			{
@@ -1447,7 +1437,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 		if (time(NULL) >= nextcheck && CONFIG_BUFFER_SIZE / 2 > buffer.pcount)
 		{
-			zbx_setproctitle("poller [processing active checks]");
+			zbx_setproctitle("active checks #%d [processing active checks]", thread_num2);
 
 			process_active_checks(activechk_args.host, activechk_args.port);
 			if (CONFIG_BUFFER_SIZE / 2 <= buffer.pcount)	/* failed to complete processing active checks */
@@ -1459,8 +1449,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "sleeping for %d second(s)", 1);
-			zbx_setproctitle("poller [sleeping for %d second(s)]", 1);
+			zbx_setproctitle("active checks #%d [idle 1 sec]", thread_num2);
 			zbx_sleep(1);
 		}
 	}

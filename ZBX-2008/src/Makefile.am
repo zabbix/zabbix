@@ -36,6 +36,7 @@ PROXY_SUBDIRS = \
 	zabbix_server/nodewatcher \
 	zabbix_server/selfmon \
 	zabbix_server/snmptrapper \
+	zabbix_server/vmware \
 	zabbix_proxy
 endif
 endif

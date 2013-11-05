@@ -23,6 +23,6 @@
 extern char		*CONFIG_SNMPTRAP_FILE;
 extern unsigned char	process_type;
 
-void	main_snmptrapper_loop();
+void	main_snmptrapper_loop(void);
 
 #endif

@@ -103,8 +103,8 @@ class CScreenHistory extends CScreenBase {
 				'nodeids' => get_current_nodeid(),
 				'itemids' => $this->itemids,
 				'webitems' => true,
-				'selectHosts' => array('hostid', 'name'),
-				'output' => API_OUTPUT_EXTEND,
+				'selectHosts' => array('name'),
+				'output' => array('itemid', 'key_', 'name', 'value_type', 'valuemapid'),
 				'preservekeys' => true
 			));
 
@@ -156,7 +156,7 @@ class CScreenHistory extends CScreenBase {
 				$useEventLogItem = (strpos($this->item['key_'], 'eventlog[') === 0);
 
 				if (empty($this->plaintext)) {
-					$historyTable = new CTableInfo(_('No history defined.'));
+					$historyTable = new CTableInfo(_('No values found.'));
 					$historyTable->setHeader(
 						array(
 							_('Timestamp'),
@@ -262,7 +262,7 @@ class CScreenHistory extends CScreenBase {
 			// numeric, float
 			else {
 				if (empty($this->plaintext)) {
-					$historyTable = new CTableInfo(_('No history defined.'));
+					$historyTable = new CTableInfo(_('No values found.'));
 					$historyTable->setHeader(array(_('Timestamp'), _('Value')));
 				}
 

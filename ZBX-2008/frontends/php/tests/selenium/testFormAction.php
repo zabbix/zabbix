@@ -481,13 +481,13 @@ class testFormAction extends CWebTest {
 		}
 
 		if (isset($data['new_condition_conditiontype'])) {
-			$this->zbxTestDropdownSelectWait('//select[@id=\'new_condition_conditiontype\']', $data['new_condition_conditiontype']);
+			$this->zbxTestDropdownSelectWait('new_condition_conditiontype', $data['new_condition_conditiontype']);
 		}
 		$new_condition_conditiontype = $this->getSelectedLabel('//select[@id=\'new_condition_conditiontype\']');
 
 		if ($eventsource == 'Triggers') {
 			if (isset($data['evaltype'])) {
-				$this->zbxTestDropdownSelectWait('//select[@id=\'evaltype\']', $data['evaltype']);
+				$this->zbxTestDropdownSelectWait('evaltype', $data['evaltype']);
 			}
 			$evaltype = $this->getSelectedLabel('//select[@id=\'evaltype\']');
 		}
@@ -1076,7 +1076,7 @@ class testFormAction extends CWebTest {
 
 		if (isset($data['new_operation_opmessage_default_msg'])) {
 			$new_operation_opmessage_default_msg = $data['new_operation_opmessage_default_msg'];
-			$this->zbxTestCheckboxUnselect('new_operation_opmessage_default_msg');
+			$this->zbxTestCheckboxSelect('new_operation_opmessage_default_msg', false);
 			$this->wait();
 		}
 		elseif ($new_operation_operationtype == 'Send message') {
@@ -1238,11 +1238,7 @@ class testFormAction extends CWebTest {
 		if ($opCmdTarget != null) {
 			$this->assertVisible('//*[@id=\'opcmdEditForm\']');
 			$this->assertVisible('//select[@name=\'opCmdTarget\']');
-			$this->zbxTestDropdownHasOptions("//select[@name='opCmdTarget']", array(
-					'Current host',
-					'Host',
-					'Host group'
-			));
+			$this->zbxTestDropdownHasOptions('opCmdTarget', array('Current host', 'Host', 'Host group'));
 
 			$this->assertVisible('//input[@value=\'Add\' and @name=\'save\']');
 			$this->assertVisible('//input[@value=\'Cancel\' and @name=\'cancel\']');
@@ -1656,16 +1652,16 @@ class testFormAction extends CWebTest {
 		$this->zbxTestLogin('actionconf.php');
 		switch ($eventsource) {
 			case EVENT_SOURCE_TRIGGERS:
-				$this->zbxTestDropdownSelectWait('//select[@id=\'eventsource\']', 'Triggers');
+				$this->zbxTestDropdownSelectWait('eventsource', 'Triggers');
 				break;
 			case EVENT_SOURCE_DISCOVERY:
-				$this->zbxTestDropdownSelectWait('//select[@id=\'eventsource\']', 'Discovery');
+				$this->zbxTestDropdownSelectWait('eventsource', 'Discovery');
 				break;
 			case EVENT_SOURCE_AUTO_REGISTRATION:
-				$this->zbxTestDropdownSelectWait('//select[@id=\'eventsource\']', 'Auto registration');
+				$this->zbxTestDropdownSelectWait('eventsource', 'Auto registration');
 				break;
 			case EVENT_SOURCE_INTERNAL;
-				$this->zbxTestDropdownSelectWait('//select[@id=\'eventsource\']', 'Internal');
+				$this->zbxTestDropdownSelectWait('eventsource', 'Internal');
 				break;
 		}
 
@@ -1726,8 +1722,8 @@ class testFormAction extends CWebTest {
 				'def_longdata' => 'def_longdata',
 				'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Name": cannot be empty.',
-						'Warning. Field "operations" is mandatory.'
+						'Incorrect value for field "Name": cannot be empty.',
+						'Field "operations" is mandatory.'
 				)
 			)),
 			array(array(
@@ -1761,8 +1757,8 @@ class testFormAction extends CWebTest {
 				'def_longdata' => 'def_longdata',
 				'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Name": cannot be empty.',
-						'Warning. Field "operations" is mandatory.'
+						'Incorrect value for field "Name": cannot be empty.',
+						'Field "operations" is mandatory.'
 				)
 			)),
 			array(array(
@@ -1796,8 +1792,8 @@ class testFormAction extends CWebTest {
 				'def_longdata' => 'def_longdata',
 				'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Name": cannot be empty.',
-						'Warning. Field "operations" is mandatory.'
+						'Incorrect value for field "Name": cannot be empty.',
+						'Field "operations" is mandatory.'
 				)
 			)),
 			array(array(
@@ -1833,10 +1829,10 @@ class testFormAction extends CWebTest {
 				'def_longdata' => 'def_longdata',
 				'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "Name": cannot be empty.',
-						'Warning. Field "operations" is mandatory.'
+						'Incorrect value for field "Name": cannot be empty.',
+						'Field "operations" is mandatory.'
 				)
-			)),
+			))
 		);
 	}
 
@@ -1862,7 +1858,7 @@ class testFormAction extends CWebTest {
 		if (isset($data['conditions'])) {
 			$this->zbxTestClick('link=Conditions');
 			foreach ($data['conditions'] as $condition) {
-				$this->zbxTestDropdownSelectWait("new_condition_conditiontype", $condition['type']);
+				$this->zbxTestDropdownSelectWait('new_condition_conditiontype', $condition['type']);
 				switch ($condition['type']) {
 					case 'Application':
 					case 'Host name':
@@ -1955,22 +1951,22 @@ class testFormAction extends CWebTest {
 
 		$this->zbxTestClickWait('save');
 
-		$expected = $data['expected'];
-		switch ($expected) {
+		switch ($data['expected']) {
 			case ACTION_GOOD:
-				$this->zbxTestTextPresent('Action added');
 				$this->zbxTestCheckTitle('Configuration of actions');
 				$this->zbxTestTextPresent('CONFIGURATION OF ACTIONS');
+				$this->zbxTestTextPresent('Action added');
 				break;
 
 			case ACTION_BAD:
 				$this->zbxTestCheckTitle('Configuration of actions');
 				$this->zbxTestTextPresent('CONFIGURATION OF ACTIONS');
-				foreach ($data['errors'] as $msg) {
-					$this->zbxTestTextPresent($msg);
-				}
+				$this->zbxTestTextPresent($data['errors']);
 				break;
-			}
+		}
+	}
+
+	public function testFormAction_Create() {
 		$this->zbxTestLogin('actionconf.php?form=1&eventsource=0');
 		$this->zbxTestCheckTitle('Configuration of actions');
 

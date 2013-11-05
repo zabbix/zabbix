@@ -23,7 +23,7 @@ $macros = array_values($this->data['macros']);
 
 if ($readonly && !$macros) {
 	$macrosFormList = new CFormList('macrosFormList');
-	$macrosFormList->addRow(_('No macros defined.'));
+	$macrosFormList->addRow(_('No macros found.'));
 
 	return $macrosFormList;
 }

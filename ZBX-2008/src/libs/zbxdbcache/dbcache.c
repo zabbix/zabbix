@@ -1726,7 +1726,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 {
 	const char	*__function_name = "DCmass_add_history";
 	size_t		sql_offset = 0;
-	int		i, h_num = 0, huint_num = 0, hstr_num = 0, htext_num = 0, hlog_num = 0;
+	int		i, h_num = 0, huint_num = 0, hstr_num = 0, htext_num = 0, hlog_num = 0, rc = ZBX_DB_OK;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1784,49 +1784,50 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+		rc = DBexecute("%s", sql);
+
+	if (ZBX_DB_OK <= rc && 0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER) &&
+			0 != h_num + huint_num + hstr_num + htext_num + hlog_num)
 	{
-		if (ZBX_DB_OK <= DBexecute("%s", sql) && 0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+		/* the history values were written into database, now add to value cache */
+		zbx_log_value_t	log;
+		history_value_t	value, *pvalue;
+
+		value.log = &log;
+
+		zbx_vc_lock();
+
+		for (i = 0; i < history_num; i++)
 		{
-			/* the history values were written into database, now add to value cache */
-			zbx_log_value_t	log;
-			history_value_t		value, *pvalue;
+			if (0 == history[i].keep_history || 0 != history[i].value_null)
+				continue;
 
-			value.log = &log;
-
-			zbx_vc_lock();
-
-			for (i = 0; i < history_num; i++)
+			switch (history[i].value_type)
 			{
-				if (0 == history[i].keep_history || 0 != history[i].value_null)
+				case ITEM_VALUE_TYPE_FLOAT:
+				case ITEM_VALUE_TYPE_UINT64:
+					pvalue = &history[i].value;
+					break;
+				case ITEM_VALUE_TYPE_STR:
+				case ITEM_VALUE_TYPE_TEXT:
+					pvalue = &history[i].value_orig;
+					break;
+				case ITEM_VALUE_TYPE_LOG:
+					log.timestamp = history[i].timestamp;
+					log.severity = history[i].severity;
+					log.logeventid = history[i].logeventid;
+					log.value = history[i].value_orig.str;
+					log.source = history[i].value.str;
+					pvalue = &value;
+					break;
+				default:
+					THIS_SHOULD_NEVER_HAPPEN;
 					continue;
-
-				switch (history[i].value_type)
-				{
-					case ITEM_VALUE_TYPE_FLOAT:
-					case ITEM_VALUE_TYPE_UINT64:
-						pvalue = &history[i].value;
-						break;
-					case ITEM_VALUE_TYPE_STR:
-					case ITEM_VALUE_TYPE_TEXT:
-						pvalue = &history[i].value_orig;
-						break;
-					case ITEM_VALUE_TYPE_LOG:
-						log.timestamp = history[i].timestamp;
-						log.severity = history[i].severity;
-						log.logeventid = history[i].logeventid;
-						log.value = history[i].value_orig.str;
-						log.source = history[i].value.str;
-						pvalue = &value;
-						break;
-					default:
-						THIS_SHOULD_NEVER_HAPPEN;
-						continue;
-				}
-				zbx_vc_add_value(history[i].itemid, history[i].value_type, &history[i].ts, pvalue);
 			}
-
-			zbx_vc_unlock();
+			zbx_vc_add_value(history[i].itemid, history[i].value_type, &history[i].ts, pvalue);
 		}
+
+		zbx_vc_unlock();
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
