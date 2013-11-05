@@ -92,6 +92,7 @@ $params = array(
 	'selectApplications' => API_OUTPUT_COUNT,
 	'selectScreens' => API_OUTPUT_COUNT,
 	'selectHttpTests' => API_OUTPUT_COUNT,
+	'selectDiscoveries' => API_OUTPUT_COUNT,
 	'output' => array('name', 'status'),
 	'searchByAny' => true
 );
@@ -133,12 +134,14 @@ $table->setHeader(array(
 	new CCol(_('Latest data')),
 	new CCol(_('Triggers')),
 	new CCol(_('Events')),
+	new CCol(_('Graphs')),
 	new CCol(_('Screens')),
 	new CCol(_('Web')),
 	new CCol(_('Applications')),
 	new CCol(_('Items')),
 	new CCol(_('Triggers')),
 	new CCol(_('Graphs')),
+	new CCol(_('Discovery')),
 	new CCol(_('Web'))
 ));
 
@@ -175,6 +178,10 @@ foreach ($hosts as $hnum => $host) {
 			new CLink(_('Graphs'), 'graphs.php?'.$link),
 			' ('.$host['graphs'].')'
 		);
+		$discoveryLink = array(
+			new CLink(_('Discovery'), 'host_discovery.php?'.$link),
+			' ('.$host['discoveries'].')'
+		);
 		$httpTestsLink = array(
 			new CLink(_('Web'), 'httpconf.php?'.$link),
 			' ('.$host['httpTests'].')'
@@ -198,6 +205,10 @@ foreach ($hosts as $hnum => $host) {
 			new CSpan(_('Graphs'), 'unknown'),
 			' ('.$host['graphs'].')'
 		);
+		$discoveryLink = array(
+			new CSpan(_('Discoveries'), 'unknown'),
+			' ('.$host['discoveries'].')'
+		);
 		$httpTestsLink = array(
 			new CSpan(_('Web'), 'unknown'),
 			' ('.$host['httpTests'].')'
@@ -215,12 +226,14 @@ foreach ($hosts as $hnum => $host) {
 		new CLink(_('Latest data'), 'latest.php?'.$link),
 		new CLink(_('Triggers'), 'tr_status.php?'.$link),
 		new CLink(_('Events'), 'events.php?'.$link),
+		new CLink(_('Graphs'), 'charts.php?'.$link),
 		new CLink(_('Screens'), 'host_screen.php?hostid='.$hostid),
 		new CLink(_('Web'), 'httpmon.php?'.$link),
 		$applications_link,
 		$items_link,
 		$triggers_link,
 		$graphs_link,
+		$discoveryLink,
 		$httpTestsLink
 	));
 }
@@ -272,6 +285,8 @@ $header = array(
 	new CCol(_('Latest data')),
 	new CCol(_('Triggers')),
 	new CCol(_('Events')),
+	new CCol(_('Graphs')),
+	new CCol(_('Web')),
 	$admin ? new CCol(_('Hosts')) : null,
 	$admin ? new CCol(_('Templates')) : null,
 );
@@ -324,6 +339,8 @@ foreach ($hostGroups as $hnum => $group) {
 		new CLink(_('Latest data'), 'latest.php?'.$link),
 		new CLink(_('Triggers'), 'tr_status.php?'.$link),
 		new CLink(_('Events'), 'events.php?'.$link),
+		new CLink(_('Graphs'), 'charts.php?'.$link),
+		new CLink(_('Web'), 'httpmon.php?'.$link),
 		$hostsLink,
 		$templatesLink
 	));
@@ -350,6 +367,7 @@ if ($admin) {
 		'selectApplications' => API_OUTPUT_COUNT,
 		'selectScreens' => API_OUTPUT_COUNT,
 		'selectHttpTests' => API_OUTPUT_COUNT,
+		'selectDiscoveries' => API_OUTPUT_COUNT,
 		'limit' => $rows_per_page
 	);
 	$db_templates = API::Template()->get($params);
@@ -384,6 +402,7 @@ if ($admin) {
 		new CCol(_('Triggers')),
 		new CCol(_('Graphs')),
 		new CCol(_('Screens')),
+		new CCol(_('Discovery')),
 		new CCol(_('Web')),
 	);
 
@@ -420,6 +439,10 @@ if ($admin) {
 				new CLink(_('Screens'), 'screenconf.php?templateid='.$templateid),
 				' ('.$template['screens'].')'
 			);
+			$discoveryLink = array(
+				new CLink(_('Discovery'), 'host_discovery.php?'.$link),
+				' ('.$template['discoveries'].')'
+			);
 			$httpTestsLink = array(
 				new CLink(_('Web'), 'httpconf.php?'.$link),
 				' ('.$template['httpTests'].')'
@@ -447,6 +470,10 @@ if ($admin) {
 				new CSpan(_('Screens'), 'unknown'),
 				' ('.$template['screens'].')'
 			);
+			$discoveryLink = array(
+				new CSpan(_('Discovery'), 'unknown'),
+				' ('.$template['discoveries'].')'
+			);
 			$httpTestsLink = array(
 				new CSpan(_('Web'), 'unknown'),
 				' ('.$template['httpTests'].')'
@@ -461,6 +488,7 @@ if ($admin) {
 			$triggers_link,
 			$graphs_link,
 			$screensLink,
+			$discoveryLink,
 			$httpTestsLink
 		));
 	}
