@@ -2268,7 +2268,7 @@ static int	DBpatch_2010194(void)
  *                                                                            *
  * Function: replace_key_param                                                *
  *                                                                            *
- * Comments: auxiliary function for DBpatch_2010194()                         *
+ * Comments: auxiliary function for DBpatch_2010195()                         *
  *                                                                            *
  ******************************************************************************/
 static char	*replace_key_param(const char *data, int key_type, int level, int num, int quoted, void *cb_data)
@@ -2295,7 +2295,6 @@ static char	*replace_key_param(const char *data, int key_type, int level, int nu
 	quote_key_param(&new_param, quoted);
 
 	return new_param;
-
 }
 
 static int	DBpatch_2010195(void)
@@ -2314,13 +2313,13 @@ static int	DBpatch_2010195(void)
 		if (SUCCEED != replace_key_params_dyn(&key, ZBX_KEY_TYPE_ITEM, replace_key_param, NULL,
 				error, sizeof(error)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot convert item key \"%s\": %s.", row[1], error);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot convert item key \"%s\": %s", row[1], error);
 			continue;
 		}
 
 		if (255 /* ITEM_KEY_LEN */ < zbx_strlen_utf8(key))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot convert item key \"%s\": key is too long.", row[1]);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot convert item key \"%s\": key is too long", row[1]);
 			continue;
 		}
 
