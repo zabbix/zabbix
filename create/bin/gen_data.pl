@@ -162,9 +162,13 @@ sub process_row
 
 			$_ =~ s/&pipe;/|/g;
 
-			if ($output{'database'} eq 'mysql' || $output{'database'} eq 'oracle')
+			if ($output{'database'} eq 'mysql')
 			{
 				$_ =~ s/&eol;/\\r\\n/g;
+			}
+			elsif ($output{'database'} eq 'oracle')
+			{
+				$_ =~ s/&eol;/' || chr(13) || chr(10) || '/g;
 			}
 			else
 			{
