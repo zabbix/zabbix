@@ -107,6 +107,7 @@ class CAlert extends CZBXAPI {
 			// triggers
 			if ($options['eventobject'] == EVENT_OBJECT_TRIGGER) {
 				$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
+
 				// Oracle does not support using disctinct with nclob fields, so we must use exists instead of joins
 				$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
@@ -126,6 +127,7 @@ class CAlert extends CZBXAPI {
 			// items and LLD rules
 			elseif ($options['eventobject'] == EVENT_OBJECT_ITEM || $options['eventobject'] == EVENT_OBJECT_LLDRULE) {
 				$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
+
 				// Oracle does not support using disctinct with nclob fields, so we must use exists instead of joins
 				$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
@@ -222,7 +224,6 @@ class CAlert extends CZBXAPI {
 		// objectids
 		if ($options['objectids'] !== null
 				&& in_array($options['eventobject'], array(EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE))) {
-
 			zbx_value2array($options['objectids']);
 
 			// Oracle does not support using disctinct with nclob fields, so we must use exists instead of joins
