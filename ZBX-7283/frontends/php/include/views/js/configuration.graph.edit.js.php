@@ -263,6 +263,12 @@
 				tolerance: 'pointer',
 				opacity: 0.6,
 				update: recalculateSortOrder,
+				helper: function(e, ui) {
+					ui.children().each(function() {
+						jQuery(this).width(jQuery(this).width());
+					});
+					return ui;
+				},
 				start: function(e, ui) {
 					jQuery(ui.placeholder).height(jQuery(ui.helper).height());
 				}
