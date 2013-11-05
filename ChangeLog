@@ -1,6 +1,7 @@
 Changes for 2.2.0rc1
 
 New features:
+.........T [ZBX-6832] improved default templates (e.g., split "Template App Agentless" into 12 templates for each service) (asaveljevs, neogan, Sasha)
 ..F....... [ZBXNEXT-1851] hid American English, Greek and Polish translations from the frontend (Richlv)
 
 Bug fixes:
