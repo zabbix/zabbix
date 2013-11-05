@@ -6,6 +6,7 @@ New features:
 ..F....... [ZBXNEXT-1851] hid American English, Greek and Polish translations from the frontend (Richlv)
 
 Bug fixes:
+.........T [ZBX-7269] fixed units and value type for vmware.vm.vfs.fs.size[{$URL},{HOST.HOST},{#FSNAME},pfree] item in "Template Virt VMware Guest" template (Sasha)
 ........S. [ZBX-7258] fixed vCenter VMs unique identifier for host names (Sasha)
 ..F....... [ZBX-7283] fixed latest data table layout issues when switching hosts and the "Show details" filter (Pavels)
 ..F....... [ZBX-5854] fixed host status indicator not displaying maintenance status in the host configuration form header (Pavels)
