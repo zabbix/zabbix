@@ -9,6 +9,8 @@ New features:
 ..F....... [ZBXNEXT-1851] hid American English, Greek and Polish translations from the frontend (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7161] fixed full clone form not saving data after an unsuccessful submit (Pavels)
+..F....... [ZBX-7161] fixed the clone button in the host configuration form (Pavels)
 ..F....... [ZBX-6528] fixed highlighting unmonitored hosts in Host inventory page (Ivo)
 A.F....... [ZBX-7259] fixed "Show lines" field in Configuration > Screen > cell element to be a value between 1 and 100 (Ivo)
 ..F....... [ZBX-7286] fixed displaying double quotes as HTML entities in trigger menu pop-ups (Ivo)
