@@ -44,7 +44,6 @@ static int	vmware_set_powerstate_result(AGENT_RESULT *result)
 	}
 
 	return ret;
-
 }
 
 static zbx_vmware_hv_t	*hv_get(zbx_vector_ptr_t *hvs, const char *uuid)
@@ -89,6 +88,7 @@ static zbx_vmware_vm_t	*service_vm_get(zbx_vmware_service_t *service, const char
 		if (NULL != (vm = vm_get(&hv->vms, uuid)))
 			return vm;
 	}
+
 	return NULL;
 }
 
