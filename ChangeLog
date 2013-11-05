@@ -7,6 +7,7 @@ New features:
 ..F....... [ZBXNEXT-1851] hid American English, Greek and Polish translations from the frontend (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7284] fixed incorrect permissions when selecting a screen element from pop-up in screens and slideshow pages (Ivo)
 .......PS. [ZBX-7282] fixed server or proxy crash while terminating database upgrade by TERM signal (Sasha)
 ...G...... [ZBX-7275] fixed eventlog sometimes returning garbage value (wiper)
 .........T [ZBX-7269] fixed units and value type for vmware.vm.vfs.fs.size[{$URL},{HOST.HOST},{#FSNAME},pfree] item in "Template Virt VMware Guest" template (Sasha)
