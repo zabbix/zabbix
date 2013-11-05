@@ -294,11 +294,11 @@ class CHelpItems {
 				'description' => 'Maximum number of processes supported by OS.'
 			),
 			array(
-				'key' => 'log[file,<pattern>,<encoding>,<maxlines>,<mode>]',
+				'key' => 'log[file,<pattern>,<encoding>,<maxlines>,<mode>,<output>]',
 				'description' => 'Monitoring of log file. pattern - regular expression'
 			),
 			array(
-				'key' => 'logrt[file_format,<pattern>,<encoding>,<maxlines>,<mode>]',
+				'key' => 'logrt[file_format,<pattern>,<encoding>,<maxlines>,<mode>,<output>]',
 				'description' => 'Monitoring of log file with rotation. fileformat - [path][regexp], pattern - regular expression'
 			),
 			array(
@@ -482,11 +482,11 @@ class CHelpItems {
 				'description' => 'Calculate MD5 check sum of a given file. String MD5 hash of the file. Can be used for files less than 64MB, unsupported otherwise. Example: vfs.file.md5sum[/usr/local/etc/zabbix_agentd.conf]'
 			),
 			array(
-				'key' => 'vfs.file.regexp[file,regexp,<encoding>]',
+				'key' => 'vfs.file.regexp[file,regexp,<encoding>,<start line>,<end line>,<output>]',
 				'description' => 'Find string in a file. Matched string'
 			),
 			array(
-				'key' => 'vfs.file.regmatch[file,regexp,<encoding>]',
+				'key' => 'vfs.file.regmatch[file,regexp,<encoding>,<start line>,<end line>]',
 				'description' => 'Find string in a file. 0 - expression not found, 1 - found'
 			),
 			array(
@@ -518,7 +518,7 @@ class CHelpItems {
 				'description' => 'Get timing of loading full WEB page. Default path is /'
 			),
 			array(
-				'key' => 'web.page.regexp[host,<path>,<port>,<regexp>,<length>]',
+				'key' => 'web.page.regexp[host,<path>,<port>,<regexp>,<length>,<output>]',
 				'description' => 'Get first occurence of regexp in WEB page. Default path is /'
 			)
 		),
