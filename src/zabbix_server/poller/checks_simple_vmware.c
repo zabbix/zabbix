@@ -560,6 +560,65 @@ unlock:
 	return ret;
 }
 
+int	check_vcenter_version(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	char			*url, *version;
+	int			ret = SYSINFO_RET_FAIL;
+	zbx_vmware_service_t	*service;
+
+	if (1 != request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (version = zbx_xml_read_value(service->contents, ZBX_XPATH_LN2("about", "version"))))
+		goto unlock;
+
+	SET_STR_RESULT(result, version);
+
+	ret = SYSINFO_RET_OK;
+
+unlock:
+	zbx_vmware_unlock();
+
+	return ret;
+}
+
+int	check_vcenter_fullname(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	char			*url, *fullname;
+	int			ret = SYSINFO_RET_FAIL;
+	zbx_vmware_service_t	*service;
+
+	if (1 != request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (fullname = zbx_xml_read_value(service->contents, ZBX_XPATH_LN2("about", "fullName"))))
+		goto unlock;
+
+	SET_STR_RESULT(result, fullname);
+
+	ret = SYSINFO_RET_OK;
+unlock:
+	zbx_vmware_unlock();
+
+	return ret;
+}
+
 int	check_vcenter_hv_cluster_name(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {

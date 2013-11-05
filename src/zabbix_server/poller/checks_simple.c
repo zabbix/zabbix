@@ -45,6 +45,8 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"cluster.discovery", VMCHECK_FUNC(check_vcenter_cluster_discovery)},
 	{"cluster.status", VMCHECK_FUNC(check_vcenter_cluster_status)},
 	{"eventlog", VMCHECK_FUNC(check_vcenter_eventlog)},
+	{"version", VMCHECK_FUNC(check_vcenter_version)},
+	{"fullname", VMCHECK_FUNC(check_vcenter_fullname)},
 
 	{"hv.cluster.name", VMCHECK_FUNC(check_vcenter_hv_cluster_name)},
 	{"hv.cpu.usage", VMCHECK_FUNC(check_vcenter_hv_cpu_usage)},
