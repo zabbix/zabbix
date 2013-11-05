@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-05 09:03+0200\n"
-"PO-Revision-Date: 2013-10-23 13:39+0300\n"
+"POT-Creation-Date: 2013-11-05 09:04+0200\n"
+"PO-Revision-Date: 2013-11-04 16:00+0300\n"
 "Last-Translator: open-future <patrik@open-future.be>\n"
 "Language-Team: NL\n"
 "Language: nl\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1382528340.0\n"
+"X-POOTLE-MTIME: 1383573612.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -43,8 +43,8 @@ msgstr[1] "%1$d dagen"
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d van %2$d probleem wordt getoond"
+msgstr[1] "%1$d van %2$d problemen wordt getoond"
 
 #: chart4.php:89 chart5.php:83
 #, c-format
@@ -72,8 +72,8 @@ msgstr[1] "%1$s dagen"
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%4$s mislukte login poging gelogd. Laatste mislukte poging was van %1$s op %2$s op %3$s."
+msgstr[1] "%4$s mislukte login pogingen gelogd. Laatste mislukte poging was van %1$s op %2$s op %3$s."
 
 #: include/views/monitoring.discovery.php:131
 #, c-format
@@ -718,15 +718,15 @@ msgstr "Om %1$s:%2$s op dag %3$s elke %4$s"
 #, c-format
 msgid "At %1$s:%2$s on every %3$s of every week"
 msgid_plural "At %1$s:%2$s on every %3$s of every %4$s weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Op %1$s:%2$s op elke %3$s van iedere week"
+msgstr[1] "Op %1$s:%2$s op elke %3$s van alle %4$s weken"
 
 #: include/maintenances.inc.php:63
 #, c-format
 msgid "At %1$s:%2$s on every day"
 msgid_plural "At %1$s:%2$s on every %3$s days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Op %1$s:%2$ s op elke dag"
+msgstr[1] "Op %1$s:%2$s op alle %3$s dagen"
 
 #: include/forms.inc.php:1763
 msgid "At (hour:minute)"
@@ -1116,12 +1116,12 @@ msgstr "CONFIGURATIE VAN TRIGGERS"
 #: include/views/administration.usergroups.edit.php:23
 #: include/views/administration.usergroups.list.php:31
 msgid "CONFIGURATION OF USER GROUPS"
-msgstr ""
+msgstr "CONFIGURATIE VAN GEBRUIKERSGROEPEN"
 
 #: include/views/administration.users.edit.php:30
 #: include/views/administration.users.list.php:31
 msgid "CONFIGURATION OF USERS"
-msgstr ""
+msgstr "CONFIGURATIE VAN GEBRUIKERS"
 
 #: adm.valuemapping.php:147
 msgid "CONFIGURATION OF VALUE MAPPING"
@@ -1272,7 +1272,7 @@ msgstr "Kan item niet toevoegen"
 #: api/classes/CApplication.php:547
 #, c-format
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
-msgstr ""
+msgstr "Kan geen add-item \"%1$s\" van \"%2$s\" om de toepassing \"%3$s\" van \"%4$s\"."
 
 #: api/classes/CApplication.php:600
 msgid "Cannot add items."
@@ -1758,7 +1758,7 @@ msgstr "Kan de host interface op \"%1$s\" voor item key \"%2$s\" niet vinden."
 #: include/classes/import/CConfigurationImport.php:934
 #, c-format
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
-msgstr ""
+msgstr "Kan host of sjabloon \"%1$s\" gebruikt in grafiek \"%2$s\" niet vinden."
 
 #: include/classes/import/CXmlImport18.php:768
 #: include/classes/import/importers/CMapImporter.php:247
@@ -1834,15 +1834,15 @@ msgstr "Kan expressie \"%s\" niet imploderen."
 #, c-format
 msgid "Cannot import screen \"%1$s\": subscreen \"%2$s\" does not exist."
 msgid_plural "Cannot import screen \"%1$s\": subscreens \"%2$s\" do not exist."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan scherm niet importeren \"%1$s\": subscherm \"%2$s\" bestaat niet."
+msgstr[1] "Kan scherm niet importeren \"%1$s\": subschermen \"%2$s\" bestaan niet."
 
 #: include/classes/import/importers/CTemplateImporter.php:114
 #, c-format
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" does not exist."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan sjabloon niet importeren \"%1$s\", gekoppeld sjabloon \"%2$s\" bestaat niet."
+msgstr[1] "Kan sjabloon niet importeren \"%1$s\", gekoppelde sjablonen \"%2$s\" bestaan niet."
 
 #: include/classes/class.cview.php:113
 #, c-format
@@ -1899,7 +1899,7 @@ msgstr "Kan de update statement niet uitvoeren op tabel \"%1$s\" zonder where co
 
 #: api/classes/CApplication.php:536
 msgid "Cannot process applications from different hosts or templates."
-msgstr ""
+msgstr "Kan toepassingen van verschillende hosts of sjablonen niet verwerken."
 
 #: include/classes/server/CZabbixServer.php:222
 #, c-format
@@ -2614,7 +2614,7 @@ msgstr "Configuratie van macros"
 
 #: maintenance.php:27
 msgid "Configuration of maintenance periods"
-msgstr ""
+msgstr "Configuratie van onderhouds perioden"
 
 #: media_types.php:26
 msgid "Configuration of media types"
@@ -3798,7 +3798,7 @@ msgstr "Apparaat"
 
 #: discoveryconf.php:41 include/views/configuration.discovery.edit.php:69
 msgid "Device uniqueness criteria"
-msgstr "Apparaat uniekheid criteria"
+msgstr "Apparaat uniekheidscriteria"
 
 #: popup_trexpr.php:175
 msgid "Difference between MAX and MIN value of a period T is < N"
@@ -4328,7 +4328,7 @@ msgstr "Lege invoerparameter"
 
 #: api/classes/CApplication.php:496
 msgid "Empty input parameters."
-msgstr ""
+msgstr "Lege invoerparameters."
 
 #: api/classes/CDRule.php:244
 msgid "Empty input."
@@ -4348,9 +4348,9 @@ msgid "Empty name for host prototype \"%1$s\"."
 msgstr "Lege naam voor gastheer prototype \"%1$s\"."
 
 #: api/classes/CScript.php:575
-#, fuzzy, c-format
+#, c-format
 msgid "Empty name for script \"%1$s\"."
-msgstr "Lege naam voor script \"%1*s\"."
+msgstr "Lege naam voor script \"%1$s\"."
 
 #: api/classes/CScript.php:414 api/classes/CScript.php:470
 msgid "Empty name for script."
@@ -4513,7 +4513,7 @@ msgid "Error"
 msgstr "Fout"
 
 #: include/db.inc.php:951
-#, fuzzy, c-format
+#, c-format
 msgid "Error in search request for table \"%1$s\"."
 msgstr "Fout in opzoek verzoek voor tabel \"%1$s\"."
 
@@ -4739,7 +4739,6 @@ msgid "Failed to update template"
 msgstr "Mislukt om template te updaten."
 
 #: include/items.inc.php:37
-#, fuzzy
 msgid "Failure Audit"
 msgstr "Controle op mislukking"
 
@@ -4839,9 +4838,9 @@ msgid "File is too big, max upload size is %1$s bytes."
 msgstr "Bestand is te groot, max upload grootte is %1$s bytes."
 
 #: include/classes/class.cview.php:68
-#, fuzzy, c-format
+#, c-format
 msgid "File provided to a view does not exist. Tried to find \"%s\"."
-msgstr "Bestand aangeboden aan de view bestaat niet. Geprobeerd om \"%s\" te vinden.Bestand aangeboden aan de view bestaat niet. Geprobeerd om \"%s\" te vinden.Bestand aangeboden aan de view bestaat niet. Geprobeerd om \"%s\" te vinden.Bestand aangeboden aan de view bestaat niet. Geprobeerd om \"%s\" te vinden."
+msgstr "Bestand aangeboden aan de view bestaat niet. Geprobeerd om \"%s\" te vinden."
 
 #: include/graphs.inc.php:67
 msgid "Filled region"
@@ -5289,7 +5288,7 @@ msgstr "Groep voor ontdekte hosts"
 #: adm.other.php:74
 #, c-format
 msgid "Group for discovered hosts \"%1$s\"."
-msgstr ""
+msgstr "Groep voor ontdekte hosts \"%1$s\"."
 
 #: include/views/administration.usergroups.edit.php:41
 #: include/views/configuration.hostgroups.edit.php:40
@@ -5356,7 +5355,7 @@ msgstr "EVENEMENTEN GESCHIEDENIS"
 
 #: include/classes/screens/CScreenHostgroupTriggers.php:132
 msgid "HOST GROUP ISSUES"
-msgstr ""
+msgstr "HOST GROUP PROBLEMEN"
 
 #: include/views/inventory.host.list.php:26
 #: include/views/inventory.host.view.php:24
@@ -5369,7 +5368,7 @@ msgstr "OVERZICHT HOST INVENTARIS"
 
 #: include/classes/screens/CScreenHostTriggers.php:131
 msgid "HOST ISSUES"
-msgstr ""
+msgstr "HOST PROBLEMEN"
 
 #: include/discovery.inc.php:60
 #: include/views/administration.authentication.edit.php:39
@@ -5549,9 +5548,9 @@ msgid "Host \"%s\" already exists."
 msgstr "Host \"%s\" bestaad reeeds."
 
 #: include/classes/import/CXmlImport18.php:928
-#, fuzzy, c-format
+#, c-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
-msgstr "Host \"%s\" heeft de parameter \"useipmi\" aangevinkt, maar heeft geen \"ipmi_ip\" parameter! Host IP-adres wordt gebruikt als adres voor de IPMI interface.Host \"%s\" heeft de parameter \"useipmi\" aangevinkt, maar heeft geen \"ipmi_ip\" parameter! Host IP-adres wordt gebruikt als adres voor de IPMI interface.Host \"%s\" heeft de parameter \"useipmi\" aangevinkt, maar heeft geen \"ipmi_ip\" parameter! Host IP-adres wordt gebruikt als adres voor de IPMI interface.Host \"%s\" heeft de parameter \"useipmi\" aangevinkt, maar heeft geen \"ipmi_ip\" parameter! Host IP-adres wordt gebruikt als adres voor de IPMI interface."
+msgstr "Host \"%s\" heeft de parameter \"useipmi\" aangevinkt, maar heeft geen \"ipmi_ip\" parameter! Host IP-adres wordt gebruikt als adres voor de IPMI interface."
 
 #: include/views/configuration.screen.constructor.edit.php:340
 msgid "Host (ascending)"
@@ -5622,7 +5621,7 @@ msgstr "Host groep elementen"
 
 #: include/screens.inc.php:39
 msgid "Host group issues"
-msgstr ""
+msgstr "Host groep problemen"
 
 #: include/views/configuration.sysmap.edit.php:75
 msgid "Host group label type"
@@ -5661,7 +5660,7 @@ msgstr "Host inventaris overzicht"
 
 #: include/screens.inc.php:40
 msgid "Host issues"
-msgstr ""
+msgstr "Host problemen"
 
 #: include/views/configuration.sysmap.edit.php:83
 msgid "Host label type"
@@ -6300,9 +6299,8 @@ msgid "Incorrect action condition discovery object."
 msgstr "Verkeerde actie conditie discovery object."
 
 #: api/classes/CAction.php:1687
-#, fuzzy
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
-msgstr "Verkeerde actie conditie discovery regel. Discovery regel bestaat niet of u hebt er geen toegang toe.Verkeerde actie conditie discovery regel. Discovery regel bestaat niet of u hebt er geen toegang toe.Verkeerde actie conditie discovery regel. Discovery regel bestaat niet of u hebt er geen toegang toe.Verkeerde actie conditie discovery regel. Discovery regel bestaat niet of u hebt er geen toegang toe."
+msgstr "Verkeerde actie conditie discovery regel. Discovery regel bestaat niet of u hebt er geen toegang toe."
 
 #: api/classes/CAction.php:1617
 msgid "Incorrect action condition discovery status."
@@ -6373,25 +6371,24 @@ msgid "Incorrect action operation command type."
 msgstr "Verkeerde actie bediening soort commando."
 
 #: api/classes/CAction.php:1717
-#, fuzzy
 msgid "Incorrect action operation condition acknowledge type."
 msgstr "Verkeerde actie bedrijfstoestand type erkennen."
 
 #: api/classes/CAction.php:1722
 msgid "Incorrect action operation condition type."
-msgstr ""
+msgstr "Verkeerde actie bediening conditie type."
 
 #: api/classes/CAction.php:1292 api/classes/CAction.php:1296
 msgid "Incorrect action operation escalation step values."
-msgstr ""
+msgstr "Verkeerde actie bediening escalatie stap waarden."
 
 #: api/classes/CAction.php:1445
 msgid "Incorrect action operation host group. Host group does not exist or you have no access to this host group."
-msgstr ""
+msgstr "Verkeerde actie van host-groep. Host groep bestaat niet of u heeft geen toegang tot deze host groep."
 
 #: api/classes/CAction.php:1448
 msgid "Incorrect action operation host. Host does not exist or you have no access to this host."
-msgstr ""
+msgstr "Verkeerde actie van host. Host bestaat niet of u heeft geen toegang tot deze host."
 
 #: api/classes/CAction.php:1380 api/classes/CAction.php:1384
 #, c-format
@@ -6404,137 +6401,137 @@ msgstr "Verkeerde actie werking stapduur."
 
 #: api/classes/CAction.php:1440
 msgid "Incorrect action operation type."
-msgstr ""
+msgstr "Verkeerde actie soort operatie."
 
 #: api/classes/CAction.php:1454
 msgid "Incorrect action operation user group. User group does not exist or you have no access to this user group."
-msgstr ""
+msgstr "Verkeerde actie bediening gebruikersgroep. Gebruikersgroep bestaat niet of u heeft geen toegang tot deze gebruikersgroep."
 
 #: api/classes/CAction.php:1451
 msgid "Incorrect action operation user. User does not exist or you have no access to this user."
-msgstr ""
+msgstr "Verkeerde actie bediening gebruiker. Gebruiker bestaat niet of u heeft geen toegang tot deze gebruiker."
 
 #: api/classes/CAction.php:745
 msgid "Incorrect action operationid."
-msgstr ""
+msgstr "Verkeerde actie operationid."
 
 #: api/classes/CService.php:1126
 #, c-format
 msgid "Incorrect algorithm for service \"%1$s\"."
-msgstr ""
+msgstr "Onjuist algoritme voor service \"%1$s\"."
 
 #: include/regexp.inc.php:53 include/regexp.inc.php:91
 #: include/regexp.inc.php:163
 msgid "Incorrect arguments passed to function"
-msgstr ""
+msgstr "Onjuiste argumenten doorgegeven aan de functie"
 
 #: api/classes/CApplication.php:322 api/classes/CHostInterface.php:314
 #: api/classes/CHostInterface.php:513 api/classes/CHttpTest.php:535
 #: api/classes/CItemGeneral.php:198
 msgid "Incorrect arguments passed to function."
-msgstr ""
+msgstr "Onjuiste argumenten doorgegeven aan de functie."
 
 #: api/classes/CHostInterface.php:342
 msgid "Incorrect arguments passed to method."
-msgstr ""
+msgstr "Onjuiste argumenten doorgegeven aan de werkwijze."
 
 #: api/classes/CDRule.php:350
 #, c-format
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
-msgstr ""
+msgstr "Onjuist authenticatie protocol voor discovery rule \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:372
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
-msgstr ""
+msgstr "Onjuiste authenticatie protocol voor punt \"%1$s\"."
 
 #: api/classes/CService.php:1145
 #, c-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
-msgstr ""
+msgstr "Onjuiste berekening SLA waarde voor service \"%1$s\"."
 
 #: include/nodes.inc.php:286 include/nodes.inc.php:330
 msgid "Incorrect characters used for Node name."
-msgstr ""
+msgstr "Verkeerde tekens gebruikt voor Node naam."
 
 #: api/classes/CTemplate.php:501
 #, c-format
 msgid "Incorrect characters used for Template name [ %1$s ]"
-msgstr ""
+msgstr "Onjuiste tekens voor de Template [ %1$s ]"
 
 #: api/classes/CHostPrototype.php:175
 #, c-format
 msgid "Incorrect characters used for host \"%1$s\"."
-msgstr ""
+msgstr "Verkeerde tekens gebruikt voor host \"%1$s\"."
 
 #: api/classes/CHost.php:743 api/classes/CHost.php:1090
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
-msgstr ""
+msgstr "Verkeerde tekens gebruikt voor hostnaam \"%s\"."
 
 #: api/classes/CProxy.php:241
 #, c-format
 msgid "Incorrect characters used for proxy name \"%1$s\"."
-msgstr ""
+msgstr "Verkeerde tekens gebruikt voor proxy naam \"%1$s\"."
 
 #: api/classes/CTemplate.php:887
 #, c-format
 msgid "Incorrect characters used for template name \"%s\"."
-msgstr ""
+msgstr "Verkeerde tekens gebruikt voor template naam \"%s\"."
 
 #: api/classes/CScreenItem.php:588
 #, c-format
 msgid "Incorrect column span provided for screen element located at X - %1$s and Y - %2$s."
-msgstr ""
+msgstr "Onjuist kolom bereik voorzien voor het scherm element gelegen op X - %1$s en Y - %2$s."
 
 #: api/classes/CDRule.php:261
 msgid "Incorrect delay."
-msgstr ""
+msgstr "Onjuist vertraging."
 
 #: api/classes/CHostPrototype.php:113
 #, c-format
 msgid "Incorrect discovery rule ID for host prototype \"%1$s\"."
-msgstr ""
+msgstr "Onjuiste ontdekking regel ID voor host prototype \"%1$s\"."
 
 #: include/classes/validators/event/CEventSourceObjectValidator.php:66
 #, c-format
 msgid "Incorrect event object \"%1$s\" (%2$s) for event source \"%3$s\" (%4$s), only the following objects are supported: %5$s."
-msgstr ""
+msgstr "Onjuist gebeurtenisobject \"%1$s\" (%2$s) voor event source \"%3$s\" (%4$s), worden alleen de volgende objecten ondersteund: % 5$s."
 
 #: api/classes/CAlert.php:358
 msgid "Incorrect eventobject value."
-msgstr ""
+msgstr "Onjuist eventobject waarde."
 
 #: api/classes/CAlert.php:351
 msgid "Incorrect eventsource value."
-msgstr ""
+msgstr "Onjuiste gebeurtenis bron waarde."
 
 #: include/classes/db/DB.php:539 include/classes/db/DB.php:706
 #, c-format
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
-msgstr ""
+msgstr "Onjuist veld \"%1$s\" naam of waarde in waar statement voor tabel \"%2$s\"."
 
 #: api/classes/CMap.php:384
 msgid "Incorrect fields for sysmap."
-msgstr ""
+msgstr "Onjuiste velden voor sysmap."
 
 #: api/classes/CTrigger.php:668
 msgid "Incorrect fields for trigger."
-msgstr ""
+msgstr "Onjuiste velden voor trigger."
 
 #: include/classes/helpers/CUploadFile.php:159
 msgid "Incorrect file upload."
-msgstr ""
+msgstr "Onjuist bestand opgeladen."
 
 #: api/classes/CItemGeneral.php:828
 #, c-format
 msgid "Incorrect flexible interval \"%1$s\"."
-msgstr ""
+msgstr "Onjuist flexibele interval \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:817
 #, c-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
-msgstr ""
+msgstr "Onjuiste flexibel interval in Item \"%1$s\". Flexibele interval moet een string zijn."
 
 #: include/triggers.inc.php:629 include/triggers.inc.php:1738
 #: tr_testexpr.php:36
