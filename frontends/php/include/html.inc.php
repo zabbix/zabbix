@@ -365,7 +365,12 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	else {
 		switch ($dbHost['status']) {
 			case HOST_STATUS_MONITORED:
-				$status = new CSpan(_('Monitored'), 'off');
+				if ($dbHost['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+					$status = new CSpan(_('In maintenance'), 'orange');
+				}
+				else {
+					$status = new CSpan(_('Monitored'), 'enabled');
+				}
 				break;
 			case HOST_STATUS_NOT_MONITORED:
 				$status = new CSpan(_('Not monitored'), 'on');
