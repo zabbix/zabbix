@@ -1460,6 +1460,7 @@ static void	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action,
 					escalation->actionid);
 			break;
 		case ESCALATION_STATUS_RECOVERY:
+		case ESCALATION_STATUS_SLEEP:
 			result = DBselect(
 					"select actionid,name,status%s"
 					" from actions"
@@ -1702,7 +1703,7 @@ static int	process_escalations(int now)
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 							"update escalations set nextcheck=%d"
 							" where escalationid=" ZBX_FS_UI64,
-							escalation.nextcheck + SEC_PER_HOUR,
+							escalation.nextcheck + SEC_PER_MIN,
 							escalation.escalationid);
 				}
 			}
