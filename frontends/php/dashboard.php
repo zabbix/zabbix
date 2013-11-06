@@ -127,7 +127,7 @@ if (isset($_REQUEST['favobj'])) {
 			CProfile::update('web.dashboard.widget.'.$widgetName.'.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 		}
 		elseif (getRequest('favaction') == 'sort') {
-			$favdata = json_decode(getRequest('favdata'));
+			$favdata = CJs::decodeJson(getRequest('favdata'));
 			foreach ($favdata as $col => $column) {
 				foreach ($column as $row => $widgetName) {
 					$widgetName = substr($widgetName, 4, -7);

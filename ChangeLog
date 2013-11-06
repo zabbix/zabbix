@@ -9,6 +9,7 @@ New features:
 ..F....... [ZBXNEXT-1851] hid American English, Greek and Polish translations from the frontend (Richlv)
 
 Bug fixes:
+..F....PS. [ZBX-7299] fixed dashboard widget drag'n'drop not working on PHP setups without JSON (Pavels)
 .......PS. [ZBX-7292] fixed resolving of macros in host interfaces (Sasha)
 ...G....S. [ZBX-7061] fixed warnings produced by clang static analyzer (e.g., Linux agent crash for item system.swap.in[sda3]) (wiper)
 ..F....... [ZBX-7161] fixed full clone form not saving data after an unsuccessful submit (Pavels)
