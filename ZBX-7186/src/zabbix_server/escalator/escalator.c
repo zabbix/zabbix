@@ -1151,7 +1151,8 @@ static void	free_event_info(DB_EVENT *event)
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
- * Comments: if 'action' is not NULL, it gathers information about it         *
+ * Comments: If 'action' is not NULL, it gathers information about it. If     *
+ *           information could not be gathered, its 'actionid' is set to 0.   *
  *                                                                            *
  ******************************************************************************/
 static void	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action, char **error)
@@ -1313,7 +1314,12 @@ static void	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action,
 		}
 	}
 	else
+	{
+		if (NULL != action)
+			action->actionid = 0;
+
 		*error = zbx_dsprintf(*error, "action [" ZBX_FS_UI64 "] deleted", escalation->actionid);
+	}
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() error='%s'", __function_name, NULL != *error ? *error : "(null)");
