@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-11-01 06:26+0200\n"
-"PO-Revision-Date: 2013-11-01 03:54+0300\n"
+"PO-Revision-Date: 2013-11-04 07:37+0300\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1383270861.0\n"
+"X-POOTLE-MTIME: 1383543432.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -165,7 +165,7 @@ msgstr "AND / OR"
 
 #: include/views/administration.auditacts.list.php:31
 msgid "AUDIT ACTIONS"
-msgstr "監査アクション"
+msgstr "アクションの履歴"
 
 #: include/views/administration.auditlogs.list.php:31
 msgid "AUDIT LOGS"
@@ -688,7 +688,7 @@ msgstr "監査"
 
 #: auditacts.php:27
 msgid "Audit actions"
-msgstr "監査アクション"
+msgstr "アクションの履歴"
 
 #: auditlogs.php:27
 msgid "Audit logs"
@@ -1592,7 +1592,7 @@ msgstr "アイテムのキー\"%2$s\"のインターフェースは\"%1$s\"に�
 #: include/classes/import/CConfigurationImport.php:877
 #, php-format
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
-msgstr "グラフ\"%2$s\"で利用されているホストまたはテンプレートが見つかりません。"
+msgstr "グラフ\"%2$s\"で利用されているホストまたはテンプレート\"%1$s\"が見つかりません。"
 
 #: include/classes/import/CXmlImport18.php:767
 #: include/classes/import/importers/CMapImporter.php:247
@@ -1774,7 +1774,7 @@ msgstr "トリガーのプロトタイプ\"%1$s\"に\"templateid\"を設定で�
 
 #: api/classes/CHostInterface.php:510
 msgid "Cannot switch host for interface."
-msgstr "インターフェイスのためのホストを切り替えできません。"
+msgstr "インターフェースのためのホストを切り替えできません。"
 
 #: users.php:296
 msgid "Cannot unblock users"
@@ -1875,7 +1875,7 @@ msgstr "ディスカバリのルールを更新できません"
 
 #: usergrps.php:246
 msgid "Cannot update frontend access"
-msgstr "フロントエンドのアクセスを更新できません"
+msgstr "Webインターフェースのアクセスを更新できません"
 
 #: graphs.php:243
 msgid "Cannot update graph"
@@ -2213,7 +2213,7 @@ msgstr "列"
 
 #: include/forms.inc.php:1844
 msgid "Combined result"
-msgstr "結果の結合"
+msgstr "最終結果"
 
 #: include/actions.inc.php:811 include/actions.inc.php:845
 #: include/actions.inc.php:900
@@ -2822,11 +2822,11 @@ msgstr "カスタムスクリプト"
 
 #: include/views/administration.general.triggerSeverity.edit.php:26
 msgid "Custom severity"
-msgstr "カスタム重要度"
+msgstr "カスタム深刻度"
 
 #: include/views/administration.general.triggerSeverity.edit.php:67
 msgid "Custom severity names affect all locales and require manual translation!"
-msgstr "カスタム重要度の名前はすべての言語に影響するため、複数言語を利用している場合は手動で翻訳を行ってください！"
+msgstr "カスタム深刻度の名前はすべての言語に影響するため、複数言語を利用している場合は手動で翻訳を行ってください！"
 
 #: include/views/js/configuration.sysmaps.js.php:43
 msgid "Custom size"
@@ -3098,7 +3098,7 @@ msgstr "デフォルトのメッセージ"
 
 #: actionconf.php:37 include/views/configuration.action.edit.php:44
 msgid "Default operation step duration"
-msgstr "デフォルトのアクション実行ステップの期間"
+msgstr "デフォルトのアクション実行ステップの間隔"
 
 #: include/views/configuration.action.edit.php:50
 msgid "Default subject"
@@ -4345,7 +4345,7 @@ msgstr "JSON-rpc version 2.0が必要です, \"%s\" でリクエストされま�
 #: include/views/configuration.maintenance.list.php:55
 msgctxt "maintenance status"
 msgid "Expired"
-msgstr "期限切れ"
+msgstr "メンテナンス期間の終了"
 
 #: include/graphs.inc.php:27 popup.php:1413
 msgid "Exploded"
@@ -4601,15 +4601,15 @@ msgstr "開始"
 #: include/views/administration.usergroups.list.php:49
 #: include/views/administration.users.list.php:61
 msgid "Frontend access"
-msgstr "フロントエンドへのアクセス"
+msgstr "Webインターフェースへのアクセス"
 
 #: usergrps.php:246
 msgid "Frontend access updated"
-msgstr "フロントエンドへのアクセスを更新しました"
+msgstr "Webインターフェースへのアクセスを更新しました"
 
 #: include/views/administration.users.edit.php:182
 msgid "Frontend messaging"
-msgstr "フロントエンドメッセージング"
+msgstr "Webインターフェースのアラート表示"
 
 #: include/views/configuration.host.edit.php:640
 #: include/views/configuration.template.edit.php:436
@@ -4623,7 +4623,7 @@ msgstr "フルスクリーン"
 #: include/views/configuration.graph.edit.php:71
 #: include/views/configuration.triggers.expression.php:66 popup_bitem.php:133
 msgid "Function"
-msgstr "機能"
+msgstr "関数"
 
 #: include/classes/validators/CTriggerFunctionValidator.php:71
 #, php-format
@@ -5726,17 +5726,17 @@ msgstr "最後の行と列は削除できません。"
 #: include/classes/class.ctweenbox.php:101
 #: include/views/configuration.template.edit.php:195
 msgid "In"
-msgstr "In"
+msgstr "利用中"
 
 #: include/views/administration.usergroups.edit.php:53
 msgid "In group"
-msgstr "グループ"
+msgstr "グループに所属"
 
 #: include/views/configuration.host.edit.php:186
 #: include/views/configuration.host.massupdate.php:46
 #: include/views/configuration.template.edit.php:135
 msgid "In groups"
-msgstr "グループ"
+msgstr "所属グループ"
 
 #: hosts.php:789 include/views/configuration.maintenance.edit.php:188
 #: include/views/configuration.maintenance.edit.php:196
@@ -5748,7 +5748,7 @@ msgstr "メンテナンス中"
 #: include/classes/screens/CScreenActions.php:140
 #: include/views/administration.auditacts.list.php:94
 msgid "In progress"
-msgstr "進捗中"
+msgstr "実行中"
 
 #: tr_logform.php:278 tr_logform.php:331
 msgid "Include"
@@ -6613,7 +6613,7 @@ msgstr "アイテムを更新しました"
 
 #: api/classes/CItemGeneral.php:246
 msgid "Item uses host interface from non-parent host."
-msgstr "アイテムが親ホストのものではないホストインターフェイスを利用しています。"
+msgstr "アイテムが親ホストのものではないホストインターフェースを利用しています。"
 
 #: api/classes/CItemGeneral.php:249
 msgid "Item uses incorrect interface type."
@@ -6945,7 +6945,7 @@ msgstr "最新の変更 (降順)"
 
 #: httpmon.php:144 latest.php:193
 msgid "Last check"
-msgstr "最新のチェック"
+msgstr "最新のチェック時刻"
 
 #: api/classes/CWebCheck.php:633
 #, php-format
@@ -7417,7 +7417,7 @@ msgstr "マップ\"%s\"はすでに存在します"
 
 #: include/views/administration.general.valuemapping.edit.php:39
 msgid "Mapped to"
-msgstr "マッピング先"
+msgstr "マッピング文字列"
 
 #: include/valuemap.inc.php:136
 #, php-format
@@ -7630,11 +7630,11 @@ msgstr "メッセージの上限文字数"
 
 #: include/views/administration.users.edit.php:188
 msgid "Message timeout"
-msgstr "メッセージタイムアウト"
+msgstr "表示期間"
 
 #: include/views/administration.users.edit.php:183
 msgid "Message timeout (seconds)"
-msgstr "メッセージタイムアウト (秒)"
+msgstr "表示期間 (秒)"
 
 #: jsLoader.php:163
 msgid "Messages"
@@ -7642,7 +7642,7 @@ msgstr "メッセージ"
 
 #: include/views/administration.users.edit.php:319
 msgid "Messaging"
-msgstr "メッセージング"
+msgstr "アラート表示"
 
 #: api/rpc/class.cjsonrpc.php:191
 msgid "Method not found."
@@ -8078,7 +8078,7 @@ msgstr "実行するアクションのコマンド\"%s\"に認証ユーザー名
 
 #: api/classes/CItemGeneral.php:309
 msgid "No authentication user name specified."
-msgstr "認証ユーザー名設定されていません。"
+msgstr "認証ユーザー名が設定されていません。"
 
 #: api/classes/CAction.php:1496
 msgid "No command specified for action operation."
@@ -8114,7 +8114,7 @@ msgstr "期間Tの間にデータが存在しない N NOT 1、それ以外 N = 0
 #: api/classes/CHostInterface.php:1001
 #, php-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
-msgstr "\"%2$s\"上の\"%1$s\"タイプのデフォルトインターフェイスが設定されていません。"
+msgstr "\"%2$s\"上の\"%1$s\"タイプのデフォルトインターフェースが設定されていません。"
 
 #: include/views/configuration.services.edit.php:75
 #: include/views/configuration.triggers.edit.php:268
@@ -8158,7 +8158,7 @@ msgstr "イベントはありません"
 
 #: events.php:386 include/classes/screens/CScreenEvents.php:42
 msgid "No events defined."
-msgstr "イベントが設定されていません。"
+msgstr "表示するイベントはありません。"
 
 #: acknow.php:75
 msgid "No events to acknowledge"
@@ -8219,7 +8219,7 @@ msgstr "テンプレート[ %s ]にグループが設定されていません"
 #: include/classes/screens/CScreenHistory.php:159
 #: include/classes/screens/CScreenHistory.php:265
 msgid "No history defined."
-msgstr "ヒストリが設定されていません。"
+msgstr "表示するヒストリはありません。"
 
 #: api/classes/CDiscoveryRule.php:657
 msgid "No host IDs given."
@@ -8331,7 +8331,7 @@ msgstr "アイテムが設定されていません。"
 
 #: include/views/configuration.item.prototype.list.php:43
 msgid "No items prototypes defined."
-msgstr "アイテムのプロトタイプが設定されていません。No items prototypes defined."
+msgstr "アイテムのプロトタイプが設定されていません。"
 
 #: include/views/configuration.maintenance.list.php:41
 msgid "No maintenance defined."
@@ -9294,7 +9294,7 @@ msgstr "PHP xmlwriter"
 
 #: include/classes/class.frontendsetup.php:503
 msgid "PHP xmlwriter extension missing"
-msgstr "PHP xmlreaderモジュールが存在しません"
+msgstr "PHP xmlwriterモジュールが存在しません"
 
 #: include/discovery.inc.php:62
 #: include/views/js/configuration.discovery.edit.js.php:128
@@ -9700,7 +9700,7 @@ msgstr "プロキシを削除しました"
 
 #: include/views/administration.proxy.edit.php:82
 msgid "Proxy hosts"
-msgstr "プロキシホスト"
+msgstr "プロキシ経由で監視するホスト"
 
 #: api/classes/CProxy.php:402
 msgid "Proxy interface creation failed."
@@ -11344,7 +11344,7 @@ msgstr "ステップ\"%s\"はすでに存在します。"
 
 #: include/views/configuration.action.edit.php:430
 msgid "Step duration"
-msgstr "ステップの期間"
+msgstr "ステップの間隔"
 
 #: include/views/configuration.httpconf.popup.php:68 popup_httpstep.php:24
 msgid "Step of scenario"
@@ -11802,11 +11802,11 @@ msgstr "タイムスタンプ"
 
 #: popup_trexpr.php:396
 msgid "Timestamp not different from Zabbix server time for more than T seconds, then N = 1, 0 - otherwise"
-msgstr "タイムスタンプがZabbixサーバの時刻とT秒以上の差がある場合 N = 1、その他の場合 N =0 (=条件)"
+msgstr "タイムスタンプがZabbixサーバーの時刻とT秒以上の差がある場合 N = 1、その他の場合 N =0 (=条件)"
 
 #: popup_trexpr.php:401
 msgid "Timestamp not different from Zabbix server time for more than T seconds, then N NOT 1, 0 - otherwise"
-msgstr "タイムスタンプがZabbixサーバの時刻とT秒以上の差がある場合 N = 1、その他の場合 N =0 (#条件)"
+msgstr "タイムスタンプがZabbixサーバーの時刻とT秒以上の差がある場合 N = 1、その他の場合 N =0 (#条件)"
 
 #: include/reports.inc.php:212 include/reports.inc.php:374
 #: include/reports.inc.php:523
@@ -11820,7 +11820,7 @@ msgstr "終了"
 
 #: include/views/js/configuration.item.edit.js.php:43
 msgid "To set a host interface select a single item type for all items"
-msgstr "すべてのアイテムのため1つのホストインターフェイスを選択する必要があります"
+msgstr "すべてのアイテムのため1つのホストインターフェースを選択する必要があります"
 
 #: srv_status.php:78
 msgid "Today"
@@ -12608,7 +12608,7 @@ msgstr "自身のユーザーアカウントは削除できません。"
 #: api/classes/CUser.php:421
 #, php-format
 msgid "User may not modify GUI access for himself by becoming a member of user group \"%s\"."
-msgstr "ユーザーはグループ\"%s\"のメンバーになることにより自分自身のフロントエンドへのアクセス設定を変更することはできません。"
+msgstr "ユーザーはグループ\"%s\"のメンバーになることにより自分自身のWebインターフェースへのアクセス設定を変更することはできません。"
 
 #: api/classes/CUser.php:425
 #, php-format
@@ -13383,7 +13383,7 @@ msgstr "Zabbixサーバーの情報"
 
 #: jsrpc.php:173
 msgid "Zabbix server is not running: the information displayed may not be current."
-msgstr "Zabbixサーバが動作していません (画面のリフレッシュを行ってステータスを再確認してください)"
+msgstr "Zabbixサーバーが動作していません (画面のリフレッシュを行ってステータスを再確認してください)"
 
 #: include/blocks.inc.php:723
 msgid "Zabbix server is running"

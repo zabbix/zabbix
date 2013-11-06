@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-10-24 22:01+0300\n"
-"PO-Revision-Date: 2013-04-04 11:00+0200\n"
+"PO-Revision-Date: 2013-11-05 13:39+0300\n"
 "Last-Translator: Sébastien <sebastien@tiramiseb.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -11,8 +11,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Pootle 2.1.6\n"
+"X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
+"X-POOTLE-MTIME: 1383651576.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -1598,7 +1599,7 @@ msgstr "Impossible de trouver l'interface de l'hôte sur \"%1$s\" pour la clé d
 #: include/classes/import/CConfigurationImport.php:877
 #, php-format
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
-msgstr ""
+msgstr "Impossible de trouver l'hôte ou le modèle \"%1$s\" utilisé dans le graphique \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:767
 #: include/classes/import/importers/CMapImporter.php:247
@@ -10158,7 +10159,7 @@ msgstr "Droit"
 
 #: include/locales.inc.php:66
 msgid "Romanian (ro_RO)"
-msgstr ""
+msgstr "Roumain (ro_RO)"
 
 #: include/views/configuration.screen.constructor.edit.php:606
 #: screenedit.php:46

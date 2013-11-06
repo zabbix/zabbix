@@ -3,16 +3,17 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-10-24 22:01+0300\n"
-"PO-Revision-Date: 2013-05-09 23:01+0200\n"
-"Last-Translator: emmanux <emmanuel.arias@ues21.edu.ar>\n"
+"PO-Revision-Date: 2013-11-02 13:37+0300\n"
+"Last-Translator: David.perez <david.perez@securitasdirect.es>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.1.6\n"
+"X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
+"X-POOTLE-MTIME: 1383392231.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -1598,7 +1599,7 @@ msgstr "No se pudo encontrar la interfaz del equipo en \"%1$s\" para el ítem \"
 #: include/classes/import/CConfigurationImport.php:877
 #, php-format
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
-msgstr ""
+msgstr "No se ha encontrado servidor o plantilla \"%1$s\" usado en el gráfico \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:767
 #: include/classes/import/importers/CMapImporter.php:247
@@ -1910,7 +1911,6 @@ msgid "Cannot update hosts"
 msgstr "No se pudo actualizar los equipos"
 
 #: adm.iconmapping.php:77
-#, fuzzy
 msgid "Cannot update icon map"
 msgstr "No se pudo actualizar el mapa de íconos"
 
@@ -1939,7 +1939,6 @@ msgid "Cannot update macros"
 msgstr "No se pudo actualizar las macros"
 
 #: maintenance.php:133
-#, fuzzy
 msgid "Cannot update maintenance"
 msgstr "No se pudo actualizar el periodo de mantenimiento"
 
@@ -2022,9 +2021,8 @@ msgid "Cannot update users status"
 msgstr "No se pudo actualizar el estado de los usuarios"
 
 #: adm.valuemapping.php:64
-#, fuzzy
 msgid "Cannot update value map"
-msgstr "No se pudo actualizar la asignación"
+msgstr "No se pudo actualizar el mapa de valores"
 
 #: popup_bitem.php:115 popup_period.php:114
 msgid "Caption"
@@ -2035,9 +2033,8 @@ msgid "Case sensitive"
 msgstr "Distingue entre mayúsculas y minúsculas"
 
 #: include/views/configuration.screen.constructor.edit.php:586
-#, fuzzy
 msgid "Center"
-msgstr "Centrar"
+msgstr "Centro"
 
 #: include/classes/screens/CScreenBase.php:258
 #: include/classes/screens/CScreenBuilder.php:419
@@ -2071,33 +2068,28 @@ msgid "Character string not included"
 msgstr "Cadena de caracteres no incluidos"
 
 #: include/hosts.inc.php:239
-#, fuzzy
 msgid "Chassis"
 msgstr "Chasis"
 
 #: include/views/js/configuration.discovery.edit.js.php:286
-#, fuzzy
 msgid "Check already exists."
 msgstr "La comprobación ya existe."
 
 #: include/classes/parsers/CTriggerExpression.php:248
-#, fuzzy, php-format
+#, php-format
 msgid "Check expression part starting from \"%1$s\"."
 msgstr "Verifique la parte de la expresión que empieza con \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:262
-#, fuzzy
 msgid "Check the key, please. Default example was passed."
-msgstr "Verifique la cadena. Se pasó el ejemplo predeterminado."
+msgstr "Por favor, verifique la cadena. Se pasó el ejemplo predeterminado."
 
 #: include/views/js/configuration.discovery.edit.js.php:23
-#, fuzzy
 msgid "Check type"
 msgstr "Verifique el tipo"
 
 #: include/views/configuration.discovery.edit.php:61
 #: include/views/configuration.discovery.list.php:43
-#, fuzzy
 msgid "Checks"
 msgstr "Comprobaciones"
 
@@ -2150,7 +2142,6 @@ msgid "Clear"
 msgstr "Limpiar"
 
 #: include/views/configuration.item.edit.php:460
-#, fuzzy
 msgid "Clear history and trends"
 msgstr "Limpiar historial y tendencias"
 
@@ -2345,7 +2336,6 @@ msgid "Configuration of housekeeper"
 msgstr "Configuración de housekeeper"
 
 #: adm.iconmapping.php:24
-#, fuzzy
 msgid "Configuration of icon mapping"
 msgstr "Configuración de mapeo de íconos"
 
@@ -2434,7 +2424,6 @@ msgid "Configuration of users"
 msgstr "Configuración de usuarios"
 
 #: adm.valuemapping.php:24
-#, fuzzy
 msgid "Configuration of value mapping"
 msgstr "Configuración de mapas de valores"
 
@@ -2542,7 +2531,7 @@ msgid "Copy selected to ..."
 msgstr "Copiar a..."
 
 #: api/classes/CUser.php:986
-#, fuzzy, php-format
+#, php-format
 msgid "Correct login \"%s\"."
 msgstr "Inicio de sesión satisfactorio \"%s\"."
 
@@ -2867,7 +2856,6 @@ msgid "D"
 msgstr "D"
 
 #: include/translateDefines.inc.php:48
-#, fuzzy
 msgid "D, d M Y H:i:s O"
 msgstr "D, d M Y H:i:s O"
 
@@ -2951,7 +2939,6 @@ msgid "Data from %1$s. Generated in %2$s sec."
 msgstr "Datos de %1$s. Generado en %2$s segundos."
 
 #: include/screens.inc.php:29
-#, fuzzy
 msgid "Data overview"
 msgstr "Resumen de datos"
 
@@ -3124,7 +3111,6 @@ msgid "Default message"
 msgstr "Mensaje por defecto"
 
 #: actionconf.php:37 include/views/configuration.action.edit.php:44
-#, fuzzy
 msgid "Default operation step duration"
 msgstr "Duración del paso de operación predeterminada"
 
@@ -3280,7 +3266,6 @@ msgid "Delete selected"
 msgstr "Eliminar"
 
 #: include/views/configuration.httpconf.list.php:142
-#, fuzzy
 msgid "Delete selected WEB scenarios?"
 msgstr "¿Eliminar escenarios WEB seleccionados?"
 
@@ -3737,17 +3722,14 @@ msgid "Discovery by proxy"
 msgstr "Descubrimiento por proxy"
 
 #: include/actions.inc.php:72
-#, fuzzy
 msgid "Discovery check"
 msgstr "Comprobación de descubrimiento"
 
 #: popup.php:123
-#, fuzzy
 msgid "Discovery checks"
 msgstr "Descubrimiento de comprobaciones"
 
 #: include/html.inc.php:378
-#, fuzzy
 msgid "Discovery list"
 msgstr "Lista de descubrimiento"
 
@@ -4967,7 +4949,7 @@ msgstr "El grupo \"%s\" no puede ser eliminado, porque está siendo usando en un
 #: api/classes/CHostGroup.php:754
 #, php-format
 msgid "Group \"%s\" cannot be deleted, because some hosts depend on it."
-msgstr ""
+msgstr "El grupo \"%s\" no puede ser borrado, porque algunos servidores dependen de él."
 
 #: hostgroups.php:144 usergrps.php:173
 msgid "Group added"
@@ -5009,16 +4991,16 @@ msgstr "Grupos"
 
 #: include/views/configuration.maintenance.edit.php:198
 msgid "Groups in maintenance"
-msgstr ""
+msgstr "Grupos en mantenimiento"
 
 #: include/translateDefines.inc.php:50
 msgid "H.i"
-msgstr ""
+msgstr "H.i"
 
 #: include/classes/class.cchart.php:1233 include/classes/class.cchart.php:1292
 #: include/page_header.php:486
 msgid "H:i"
-msgstr ""
+msgstr "H:i"
 
 #: include/blocks.inc.php:365 include/blocks.inc.php:704
 #: include/blocks.inc.php:772 include/blocks.inc.php:982
@@ -5026,19 +5008,20 @@ msgstr ""
 #: include/classes/screens/CScreenSystemStatus.php:47
 #: include/views/configuration.item.list.php:102
 msgid "H:i:s"
-msgstr ""
+msgstr "H:i:s"
 
 #: events.php:282
 msgid "HISTORY OF EVENTS"
-msgstr ""
+msgstr "HISTÓRICO DE EVENTOS"
 
+# Hosts puede ser dispositivos, equipos, servidores, maquinas osimpelmente hosts.
 #: hostinventories.php:84
 msgid "HOST INVENTORIES"
-msgstr ""
+msgstr "INVENTARIO DE DISPOSITIVOS"
 
 #: hostinventoriesoverview.php:61
 msgid "HOST INVENTORY OVERVIEW"
-msgstr ""
+msgstr "INVENTARIO GENERAL DE DISPOSITIVOS"
 
 #: include/discovery.inc.php:61
 #: include/views/administration.authentication.edit.php:39
@@ -5048,16 +5031,16 @@ msgstr "HTTP"
 
 #: authentication.php:188
 msgid "HTTP authentication"
-msgstr ""
+msgstr "Autenticación HTTP"
 
 #: include/discovery.inc.php:72
 #: include/views/js/configuration.discovery.edit.js.php:122
 msgid "HTTPS"
-msgstr ""
+msgstr "HTTPS"
 
 #: include/hosts.inc.php:249
 msgid "HW architecture"
-msgstr ""
+msgstr "Arquitectura HW"
 
 #: include/hosts.inc.php:169
 msgid "Hardware"
@@ -5065,7 +5048,7 @@ msgstr "Hardware"
 
 #: include/hosts.inc.php:174
 msgid "Hardware (Full details)"
-msgstr ""
+msgstr "Hardware (Todos los detalles)"
 
 #: graphs.php:43 include/views/configuration.graph.edit.php:55
 #: include/views/configuration.graph.list.php:79
@@ -5086,7 +5069,7 @@ msgstr "Hexadecimal"
 
 #: jsLoader.php:140 sysmap.php:158
 msgid "Hidden"
-msgstr ""
+msgstr "Oculto"
 
 #: include/classes/class.cuiwidget.php:58
 #: include/classes/class.cwidget.php:183 include/html.inc.php:146
@@ -5124,7 +5107,7 @@ msgstr "Histórico (días)"
 
 #: jsLoader.php:109
 msgid "History and simple graphs"
-msgstr ""
+msgstr "Histórico y gráficos simples"
 
 #: httpconf.php:351 httpconf.php:354 items.php:469 items.php:472 items.php:624
 #: items.php:628
@@ -5200,7 +5183,7 @@ msgstr "El servidor \"%1$s\" ya existe."
 #: api/classes/CProxy.php:643
 #, php-format
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
-msgstr ""
+msgstr "Servidor \"%1$s\" esta monitorizado mediante el proxy \"%2$s\"."
 
 #: api/classes/CTemplate.php:1004
 #, php-format
@@ -5210,11 +5193,11 @@ msgstr "El servidor \"%s\" ya existe."
 #: include/classes/import/CXmlImport18.php:927
 #, php-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
-msgstr ""
+msgstr "Servidor \"%s\" tiene el parametro \"useipmi\" activado, pero no tiene el parametro \"ipmi_ip\" ! Usando la dirección IP del servidor o la IP del dispositivo IPMI."
 
 #: include/views/configuration.screen.constructor.edit.php:343
 msgid "Host (ascending)"
-msgstr ""
+msgstr "Servidor (ascendiente)"
 
 #: include/actions.inc.php:76
 msgid "Host IP"
@@ -5222,11 +5205,11 @@ msgstr "IP del servidor"
 
 #: include/forms.inc.php:1717
 msgid "Host Inventory"
-msgstr ""
+msgstr "Inventario de servidores"
 
 #: include/views/administration.script.list.php:43
 msgid "Host access"
-msgstr ""
+msgstr "Acceso a servidores"
 
 #: hosts.php:326
 msgid "Host added"
@@ -5234,12 +5217,12 @@ msgstr "Equipo añadido"
 
 #: api/classes/CHostInterface.php:1005
 msgid "Host cannot have more than one default interface of the same type."
-msgstr ""
+msgstr "El servidor no puede tener mas de un interfaz por defecto del mismo tipo."
 
 #: hostinventoriesoverview.php:88
 #: include/views/administration.proxy.list.php:48
 msgid "Host count"
-msgstr ""
+msgstr "Cantidad de servidores"
 
 #: hosts.php:508 hosts.php:532
 msgid "Host deleted"
@@ -5263,15 +5246,15 @@ msgstr "Grupo del equipo"
 #: api/classes/CHostGroup.php:650 api/classes/CHostGroup.php:703
 #, php-format
 msgid "Host group \"%1$s\" already exists."
-msgstr ""
+msgstr "El grupo de servidores \"%1$s\" ya existe."
 
 #: include/views/js/configuration.sysmaps.js.php:31
 msgid "Host group elements"
-msgstr ""
+msgstr "Elementos del grupo de dispositivos"
 
 #: include/views/configuration.sysmap.edit.php:92
 msgid "Host group label type"
-msgstr ""
+msgstr "Tipo de etiqueta del grupo de dispositivos"
 
 #: dashconf.php:180 include/forms.inc.php:197 include/menu.inc.php:160
 #: include/views/administration.script.edit.php:91
@@ -5285,54 +5268,54 @@ msgstr "Grupos de equipos"
 #: include/views/configuration.item.edit.php:131
 #: include/views/configuration.item.massupdate.php:84
 msgid "Host interface"
-msgstr ""
+msgstr "Interfaz del equipo"
 
 #: hostinventories.php:26 jsLoader.php:180
 msgid "Host inventories"
-msgstr ""
+msgstr "Inventarios del dispositivo"
 
 #: include/views/configuration.host.edit.php:630
 msgid "Host inventory"
-msgstr ""
+msgstr "Inventario del dispositivo"
 
 #: hostinventoriesoverview.php:26
 msgid "Host inventory overview"
-msgstr ""
+msgstr "Resumen del inventario del dispositivo"
 
 #: include/views/configuration.sysmap.edit.php:100
 msgid "Host label type"
-msgstr ""
+msgstr "Tipo de etiqueta del equipo"
 
 #: include/html.inc.php:343
 msgid "Host list"
-msgstr ""
+msgstr "Lista de dispositivos"
 
 #: hosts.php:51 include/actions.inc.php:58
 #: include/views/configuration.host.edit.php:170
 msgid "Host name"
-msgstr ""
+msgstr "Nombre de dispositivo"
 
 #: include/hosts.inc.php:289
 msgid "Host networks"
-msgstr ""
+msgstr "Red de dispositivos"
 
 #: include/hosts.inc.php:299
 msgid "Host router"
-msgstr ""
+msgstr "Enrutador del equipo"
 
 #: host_screen.php:27 include/views/js/monitoring.maps.js.php:28
 #: jsLoader.php:176
 msgid "Host screens"
-msgstr ""
+msgstr "Pantallas del equipo"
 
 #: dashboard.php:310
 msgid "Host status"
-msgstr ""
+msgstr "Estado del equipo"
 
 #: include/triggers.inc.php:1020
 #, php-format
 msgid "Host status became \"%s\""
-msgstr ""
+msgstr "El estado del host cambio a \"%s\""
 
 #: hostgroups.php:196 hosts.php:521 hosts.php:544 proxies.php:166
 msgid "Host status updated"
@@ -5340,19 +5323,19 @@ msgstr "Estado del equipo actualizado"
 
 #: include/hosts.inc.php:294
 msgid "Host subnet mask"
-msgstr ""
+msgstr "Máscara de subred del equipo"
 
 #: include/actions.inc.php:62
 msgid "Host template"
-msgstr ""
+msgstr "Plantilla del equipo"
 
 #: include/views/configuration.screen.constructor.edit.php:513
 msgid "Host time"
-msgstr ""
+msgstr "Hora del equipo"
 
 #: api/classes/CHost.php:1573
 msgid "Host update failed."
-msgstr ""
+msgstr "Error en actualización del equipo."
 
 #: hosts.php:321
 msgid "Host updated"
@@ -5361,7 +5344,7 @@ msgstr "Servidor actualizado"
 #: api/classes/CHost.php:1423 api/classes/CTemplate.php:1360
 #, php-format
 msgid "Host with the same name \"%s\" already exists."
-msgstr ""
+msgstr "El nombre \"%s\" de equipo ya existe"
 
 #: api/classes/CHost.php:1429 api/classes/CTemplate.php:1014
 #: api/classes/CTemplate.php:1333
@@ -5402,11 +5385,11 @@ msgstr "Servidores y plantillas"
 
 #: include/views/configuration.hostgroups.edit.php:59
 msgid "Hosts in"
-msgstr ""
+msgstr "Dispositivos en"
 
 #: include/views/configuration.maintenance.edit.php:189
 msgid "Hosts in maintenance"
-msgstr ""
+msgstr "Equipos en mantenimiento"
 
 #: include/classes/class.chostsinfo.php:104 include/screens.inc.php:33
 msgid "Hosts info"
@@ -5424,11 +5407,11 @@ msgstr "Servidores actualizados"
 #: include/reports.inc.php:218 include/reports.inc.php:664
 #: include/reports.inc.php:672
 msgid "Hourly"
-msgstr ""
+msgstr "Cada hora"
 
 #: include/forms.inc.php:1699
 msgid "Hours"
-msgstr ""
+msgstr "Horas"
 
 #: adm.gui.php:96 adm.housekeeper.php:72 adm.iconmapping.php:110
 #: adm.images.php:132 adm.macros.php:159 adm.other.php:105 adm.regexps.php:209
@@ -5445,7 +5428,7 @@ msgstr "Húngaro (hu_HU)"
 #: include/discovery.inc.php:70
 #: include/views/js/configuration.discovery.edit.js.php:123
 msgid "ICMP ping"
-msgstr ""
+msgstr "Ping ICMP"
 
 #: include/views/administration.auditlogs.list.php:90
 #: include/views/administration.node.edit.php:41
@@ -5476,7 +5459,7 @@ msgstr "Dirección IP"
 
 #: api/classes/CHostInterface.php:533
 msgid "IP and DNS cannot be empty for host interface."
-msgstr ""
+msgstr "IP y DNS no puede quedar vacío para el interfaz del equipo"
 
 #: include/views/configuration.discovery.edit.php:47
 #: include/views/configuration.discovery.list.php:41
@@ -5485,7 +5468,7 @@ msgstr "Rango de IP's"
 
 #: api/classes/CDRule.php:430
 msgid "IP range cannot be empty."
-msgstr ""
+msgstr "Rango de IP no puede quedar vacío."
 
 #: include/hosts.inc.php:476 include/items.inc.php:188
 #: include/views/administration.script.edit.php:49
@@ -5493,36 +5476,36 @@ msgstr ""
 #: include/views/configuration.action.edit.php:645
 #: include/views/configuration.host.edit.php:543
 msgid "IPMI"
-msgstr ""
+msgstr "IPMI"
 
 #: include/items.inc.php:88
 msgid "IPMI agent"
-msgstr ""
+msgstr "Agente IPMI"
 
 #: include/views/configuration.host.massupdate.php:139
 msgid "IPMI authentication algorithm"
-msgstr ""
+msgstr "Algoritmo de autenticación de IPMI"
 
 #: include/views/configuration.host.edit.php:280
 msgid "IPMI interfaces"
-msgstr ""
+msgstr "Interfaces IPMI"
 
 #: include/views/configuration.host.massupdate.php:168
 msgid "IPMI password"
-msgstr ""
+msgstr "Contraseña IPMI"
 
 #: include/views/configuration.host.massupdate.php:150
 msgid "IPMI privilege level"
-msgstr ""
+msgstr "Nivel de privilegio de IPMI"
 
 #: disc_prototypes.php:95 host_discovery.php:91
 #: include/views/configuration.item.edit.php:164 items.php:126
 msgid "IPMI sensor"
-msgstr ""
+msgstr "Sensor IPMI"
 
 #: include/views/configuration.host.massupdate.php:159
 msgid "IPMI username"
-msgstr ""
+msgstr "Nombre de usuario IPMI"
 
 #: srv_status.php:179
 msgid "IT SERVICES"
@@ -5538,11 +5521,11 @@ msgstr "Servicio TI"
 
 #: include/views/configuration.services.child.list.php:25
 msgid "IT service dependencies"
-msgstr ""
+msgstr "Dependencias de servicio IT"
 
 #: include/views/configuration.services.parent.list.php:25
 msgid "IT service parent"
-msgstr ""
+msgstr "Padre del servicio IT"
 
 #: include/menu.inc.php:82 include/menu.inc.php:215
 #: include/views/configuration.services.list.php:26 srv_status.php:26
@@ -5595,68 +5578,68 @@ msgstr "Tipo de etiqueta para el icono"
 #: include/views/administration.general.iconmap.edit.php:134
 #: include/views/administration.general.iconmap.list.php:23
 msgid "Icon map"
-msgstr ""
+msgstr "Mapa de icono"
 
 #: api/classes/CIconMap.php:421
 #, php-format
 msgid "Icon map \"%1$s\" cannot be deleted. Used in map \"%2$s\"."
-msgstr ""
+msgstr "El mapa del icono \"%1$s\" no puede ser borrado. Usado en el mapa \"%2$s\"."
 
 #: api/classes/CIconMap.php:528
 #, php-format
 msgid "Icon map \"%1$s\" has mapping with incorrect iconid \"%2$s\"."
-msgstr ""
+msgstr "El mapa del icono \"%1$s\" esta mapeado con el icono \"%2$s\" incorrecto"
 
 #: api/classes/CIconMap.php:524
 #, php-format
 msgid "Icon map \"%1$s\" has mapping with incorrect inventory link \"%2$s\"."
-msgstr ""
+msgstr "Mapa de icono \"%1$s\" tiene mapa con un enlace el inventario \"%2$s\" incorrecto."
 
 #: api/classes/CIconMap.php:276 api/classes/CIconMap.php:353
 #, php-format
 msgid "Icon map \"%s\" already exists."
-msgstr ""
+msgstr "Mapa de icono \"%s\" ya existe."
 
 #: api/classes/CIconMap.php:538
 #, php-format
 msgid "Icon map \"%s\" cannot have mapping with empty expression."
-msgstr ""
+msgstr "Mapa de icono \"%s\" no puede tener un mapa con expresión vacía."
 
 #: api/classes/CIconMap.php:542
 #, php-format
 msgid "Icon map \"%s\" cannot have mapping with global expression that does not exist."
-msgstr ""
+msgstr "Mapa de icono \"%s\" no puede tener un mapa con expresión global que no existe."
 
 #: api/classes/CIconMap.php:546
 #, php-format
 msgid "Icon map \"%s\" has incorrect expression."
-msgstr ""
+msgstr "Mapa de icono \"%s\" tiene una expresión incorrecta."
 
 #: api/classes/CIconMap.php:499 api/classes/CIconMap.php:504
 #, php-format
 msgid "Icon map \"%s\" must have at least one mapping."
-msgstr ""
+msgstr "Mapa de icono \"%s\" debe de tener al menos un mapa"
 
 #: adm.iconmapping.php:81
 msgid "Icon map created"
-msgstr ""
+msgstr "Mapa de iconos creado"
 
 #: adm.iconmapping.php:95
 msgid "Icon map deleted"
-msgstr ""
+msgstr "Mapa de iconos borrado"
 
 #: api/classes/CIconMap.php:256 api/classes/CIconMap.php:316
 msgid "Icon map name cannot be empty."
-msgstr ""
+msgstr "Nombre de mapa de iconos no puede estar vacío."
 
 #: adm.iconmapping.php:76
 msgid "Icon map updated"
-msgstr ""
+msgstr "Mapa de iconos actualizado"
 
 #: api/classes/CIconMap.php:340
 #, php-format
 msgid "Icon map with iconmapid \"%s\" does not exist."
-msgstr ""
+msgstr "Mapa de iconos con iconmapid  \"%s\" no existe."
 
 #: adm.gui.php:98 adm.housekeeper.php:74 adm.iconmapping.php:112
 #: adm.iconmapping.php:168 adm.images.php:134 adm.macros.php:161
@@ -5664,24 +5647,24 @@ msgstr ""
 #: adm.triggerseverities.php:82 adm.valuemapping.php:128
 #: adm.workingtime.php:64
 msgid "Icon mapping"
-msgstr ""
+msgstr "Mapa de iconos"
 
 #: api/classes/CIconMap.php:552
 #, php-format
 msgid "Icon mapping entry \"%1$s\" against \"%2$s\" already exists."
-msgstr ""
+msgstr "Entrada de mapa de iconos \"%1$s\" contra \"%2$s\" ya existe"
 
 #: jsLoader.php:158
 msgid "Iconmap is not enabled"
-msgstr ""
+msgstr "Mapa de iconos no esta habilitado"
 
 #: include/views/js/configuration.sysmaps.js.php:111
 msgid "Icons"
-msgstr ""
+msgstr "Iconos"
 
 #: include/config.inc.php:263
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
-msgstr ""
+msgstr "Si crees que este mensaje es erróneo, por favor consulte a los administradores acerca de cómo obtener los permisos necesarios."
 
 #: api/classes/CImage.php:306 api/classes/CImage.php:421 image.php:26
 #: include/audit.inc.php:37 include/maps.inc.php:28 include/maps.inc.php:952
@@ -5703,16 +5686,16 @@ msgstr "Imágen eliminada"
 
 #: include/views/configuration.sysmap.edit.php:124
 msgid "Image label type"
-msgstr ""
+msgstr "Tipo de etiqueta de la imagen"
 
 #: api/classes/CImage.php:343
 #, php-format
 msgid "Image load error [%1$s] in [%2$s]."
-msgstr ""
+msgstr "Error en carga de la imagen [%1$s] in [%2$s]."
 
 #: api/classes/CImage.php:588 include/classes/helpers/CUploadFile.php:129
 msgid "Image size must be less than 1MB."
-msgstr ""
+msgstr "El tamaño de la imagen debe de ser menor a 1MB."
 
 #: adm.images.php:57
 msgid "Image updated"
@@ -5729,11 +5712,11 @@ msgstr "Imágenes"
 
 #: include/views/conf.import.php:51
 msgid "Images for all maps will be updated!"
-msgstr ""
+msgstr "Las imágenes para todos los mapas seran actualizados!!"
 
 #: include/views/configuration.action.edit.php:356
 msgid "Immediately"
-msgstr ""
+msgstr "Inmediatamente"
 
 #: hosts.php:634 include/views/configuration.screen.list.php:33
 #: include/views/conf.import.php:69 include/views/conf.import.php:74
@@ -5743,7 +5726,7 @@ msgstr "Importar"
 
 #: conf.import.php:135
 msgid "Import failed"
-msgstr ""
+msgstr "Error de importación"
 
 #: include/views/conf.import.php:64
 msgid "Import file"
@@ -5751,37 +5734,37 @@ msgstr "Fichero para importar"
 
 #: conf.import.php:131
 msgid "Imported successfully"
-msgstr ""
+msgstr "Importación correcta."
 
 #: hostinventories.php:187
 #, php-format
 msgid "Impossible to filter by inventory field \"%s\", which does not exist."
-msgstr ""
+msgstr "Imposible filtrar por campo de inventario \"%s\", porque éste no existe"
 
 #: screenedit.php:237 screenedit.php:252
 msgid "Impossible to remove last row and column."
-msgstr ""
+msgstr "No se puede borrar último fila o columna"
 
 #: include/classes/class.ctweenbox.php:74
 #: include/classes/class.ctweenbox.php:101
 #: include/views/configuration.template.edit.php:195
 msgid "In"
-msgstr ""
+msgstr "En"
 
 #: include/views/administration.usergroups.edit.php:53
 msgid "In group"
-msgstr ""
+msgstr "En grupo"
 
 #: include/views/configuration.host.edit.php:186
 #: include/views/configuration.host.massupdate.php:46
 #: include/views/configuration.template.edit.php:135
 msgid "In groups"
-msgstr ""
+msgstr "Grupos en"
 
 #: hosts.php:789 include/views/configuration.maintenance.edit.php:188
 #: include/views/configuration.maintenance.edit.php:196
 msgid "In maintenance"
-msgstr ""
+msgstr "En mantenimiento"
 
 #: include/actions.inc.php:764 include/actions.inc.php:838
 #: include/actions.inc.php:889 include/actions.inc.php:955
@@ -5791,44 +5774,45 @@ msgid "In progress"
 msgstr "En progreso"
 
 #: tr_logform.php:278 tr_logform.php:331
+#, fuzzy
 msgid "Include"
-msgstr ""
+msgstr "Include"
 
 #: api/classes/CService.php:1330
 #, php-format
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
-msgstr ""
+msgstr "valor de campo \"programa\" incluido incorrecto para dependencia de servicio \"%1$s\"."
 
 #: api/classes/CMap.php:586 api/classes/CMap.php:590 api/classes/CMap.php:597
 #: api/classes/CMap.php:602
 #, php-format
 msgid "Incorrect %1$s label type value for map \"%2$s\"."
-msgstr ""
+msgstr "Valor de tipo de etiqueta %1$s incorrecto para mapa \"%2$s\"."
 
 #: api/classes/CProxy.php:350
 #, php-format
 msgid "Incorrect IP for passive proxy \"%1$s\"."
-msgstr ""
+msgstr "IP incorrecta para proxy masivo \"%1$s\"."
 
 #: api/classes/CDRule.php:433
 #, php-format
 msgid "Incorrect IP range \"%s\"."
-msgstr ""
+msgstr "Rango de IP \"%s\" incorrecto."
 
 #: api/classes/CDRule.php:495
 #: include/views/js/configuration.discovery.edit.js.php:311
 msgid "Incorrect SNMP OID."
-msgstr ""
+msgstr "SNMP OID incorrecto."
 
 #: api/classes/CDRule.php:492
 #: include/views/js/configuration.discovery.edit.js.php:307
 msgid "Incorrect SNMP community."
-msgstr ""
+msgstr "Incorrecta comunidad de SNMP "
 
 #: api/classes/CService.php:1160
 #, php-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
-msgstr ""
+msgstr "SLA aceptable incorrecto para el servicio \"%1$s\"."
 
 #: api/classes/CAction.php:1696
 msgid "Incorrect action condition discovery check."
@@ -5857,74 +5841,77 @@ msgstr ""
 #: api/classes/CAction.php:1690
 #, php-format
 msgid "Incorrect action condition ip \"%s\"."
-msgstr ""
+msgstr "Condición de acción para IP \"%s\" incorrecta."
 
 #: api/classes/CAction.php:1684
 #, php-format
 msgid "Incorrect action condition period \"%s\"."
-msgstr ""
+msgstr "Acción en condición para periodo \"%s\" incorrecto."
 
 #: api/classes/CAction.php:1702
 #, php-format
 msgid "Incorrect action condition port \"%s\"."
-msgstr ""
+msgstr "Acción en condición para puerto \"%s\" incorrecto."
 
 #: api/classes/CAction.php:1754
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
-msgstr ""
+msgstr "Incorrecta acción en condición para proxy. El proxy no existe o usted no tiene acceso a él."
 
 #: api/classes/CAction.php:1742
 msgid "Incorrect action condition template. Template does not exist or you have no access to it."
-msgstr ""
+msgstr "Incorrecta acción en condición para plantilla. La plantilla no existe o usted no tiene acceso a él."
 
 #: api/classes/CAction.php:1745
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
-msgstr ""
+msgstr "Incorrecta acción en condición para el filtro. El filtro no existe o usted no tiene acceso a él."
 
 #: api/classes/CAction.php:1730
 msgid "Incorrect action condition type."
-msgstr ""
+msgstr "Tipo de condición de acción incorrecto."
 
 #: api/classes/CAction.php:919
 msgid "Incorrect action conditionid."
-msgstr ""
+msgstr "conditionid de la acción incorrecto"
 
 #: api/classes/CAction.php:1544
 msgid "Incorrect action operation command type."
-msgstr ""
+msgstr "Tipo de comando de operación de la acción incorrecto."
 
 #: api/classes/CAction.php:1778
 msgid "Incorrect action operation condition acknowledge type."
-msgstr ""
+msgstr "Tipo de reconocimiento de la condición de la acción de operación incorrecto."
 
 #: api/classes/CAction.php:1783
+#, fuzzy
 msgid "Incorrect action operation condition type."
-msgstr ""
+msgstr "Tipo de condición para la operación de la acción incorrecto."
 
 #: api/classes/CAction.php:1462 api/classes/CAction.php:1466
+#, fuzzy
 msgid "Incorrect action operation escalation step values."
-msgstr ""
+msgstr "Valores de los pasos de escalado de la operación de la acción incorrectos"
 
 #: api/classes/CAction.php:1615
 msgid "Incorrect action operation host group. Host group does not exist or you have no access to this host group."
-msgstr ""
+msgstr "Acción de la operación en grupo de equipos incorrecto. El grupo de equipos no existe o usted no tiene acceso al grupo de equipos."
 
 #: api/classes/CAction.php:1618
 msgid "Incorrect action operation host. Host does not exist or you have no access to this host."
-msgstr ""
+msgstr "Acción de la operación en equipo incorrecto. El equipo no existe o usted no tiene acceso al equipo."
 
 #: api/classes/CAction.php:1550 api/classes/CAction.php:1554
 #, php-format
 msgid "Incorrect action operation port \"%s\"."
-msgstr ""
+msgstr "Acción de operación para puerto \"%s\" incorrecta."
 
 #: api/classes/CAction.php:1472
 msgid "Incorrect action operation step duration."
 msgstr ""
 
 #: api/classes/CAction.php:1610
+#, fuzzy
 msgid "Incorrect action operation type."
-msgstr ""
+msgstr "Tipo de acción de operación incorrecto."
 
 #: api/classes/CAction.php:1624
 msgid "Incorrect action operation user group. User group does not exist or you have no access to this user group."
@@ -5936,60 +5923,60 @@ msgstr ""
 
 #: api/classes/CAction.php:944
 msgid "Incorrect action operationid."
-msgstr ""
+msgstr "Acción de operationid incorrecta."
 
 #: api/classes/CService.php:1123
 #, php-format
 msgid "Incorrect algorithm for service \"%1$s\"."
-msgstr ""
+msgstr "Algoritmo para servicio \"%1$s\" incorrecto"
 
 #: api/classes/CApplication.php:436 include/regexp.inc.php:53
 #: include/regexp.inc.php:91 include/regexp.inc.php:162
 msgid "Incorrect arguments passed to function"
-msgstr ""
+msgstr "Argumentos enviados a la función incorrectos"
 
 #: api/classes/CHostInterface.php:500 api/classes/CHostInterface.php:690
 #: api/classes/CItemGeneral.php:174 api/classes/CWebCheck.php:537
 msgid "Incorrect arguments passed to function."
-msgstr ""
+msgstr "Los argumentos enviados enviados para la función, son incorrectos."
 
 #: api/classes/CHostInterface.php:528
 msgid "Incorrect arguments passed to method."
-msgstr ""
+msgstr "Argumentos enviados al método incorrectos"
 
 #: api/classes/CService.php:1142
 #, php-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
-msgstr ""
+msgstr "Valores de calculo de SLA incorrectos para el servicio \"%1$s\"."
 
 #: include/nodes.inc.php:267 include/nodes.inc.php:308
 msgid "Incorrect characters used for Node name."
-msgstr ""
+msgstr "Ha usado caracteres inválidos para el nombre del equipo."
 
 #: api/classes/CProxy.php:359
 #, php-format
 msgid "Incorrect characters used for Proxy name \"%s\"."
-msgstr ""
+msgstr "Ha usado caracteres inválidos para el nombre del proxy \"%s\"."
 
 #: api/classes/CTemplate.php:995
 #, php-format
 msgid "Incorrect characters used for Template name [ %1$s ]"
-msgstr ""
+msgstr "Ha usado caracteres inválidos para el nombre de plantilla [ %1$s ]"
 
 #: api/classes/CHost.php:1357 api/classes/CHost.php:1678
 #, php-format
 msgid "Incorrect characters used for host name \"%s\"."
-msgstr ""
+msgstr "Ha usado caracteres inválidos para el nombre de equipo \"%s\"."
 
 #: api/classes/CTemplate.php:1365
 #, php-format
 msgid "Incorrect characters used for template name \"%s\"."
-msgstr ""
+msgstr "Ha usado caracteres inválidos para el nombre de plantilla \"%s\"."
 
 #: api/classes/CGraphGeneral.php:71
 #, php-format
 msgid "Incorrect colour \"%1$s\"."
-msgstr ""
+msgstr "Color \"%1$s\" incorrecto."
 
 #: api/classes/CScreenItem.php:590
 #, php-format
@@ -5998,33 +5985,33 @@ msgstr ""
 
 #: api/classes/CDRule.php:437
 msgid "Incorrect delay."
-msgstr ""
+msgstr "Retraso incorrecto."
 
 #: adm.regexps.php:181
 msgid "Incorrect expression"
-msgstr ""
+msgstr "Expresión incorrecta"
 
 #: include/classes/db/DB.php:455 include/classes/db/DB.php:621
 #, php-format
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
-msgstr ""
+msgstr "Nombre de campo \"%1$s\" incorrecto o valor en alguno de las declaraciones para la tabla \"%2$s\"."
 
 #: api/classes/CMap.php:546
 msgid "Incorrect fields for sysmap"
-msgstr ""
+msgstr "Campos incorrectos para sysmap"
 
 #: api/classes/CTrigger.php:1018
 msgid "Incorrect fields for trigger."
-msgstr ""
+msgstr "Campos incorrectos para filtro"
 
 #: include/classes/helpers/CUploadFile.php:159
 msgid "Incorrect file upload."
-msgstr ""
+msgstr "Carga de archivo incorrecta."
 
 #: api/classes/CItemGeneral.php:759
 #, php-format
 msgid "Incorrect flexible interval \"%1$s\"."
-msgstr ""
+msgstr "Intervalo flexible \"%1$s\" incorrecto."
 
 #: api/classes/CItemGeneral.php:748
 #, php-format
@@ -6053,36 +6040,36 @@ msgstr ""
 
 #: include/profiles.inc.php:257
 msgid "Incorrect host group."
-msgstr ""
+msgstr "Grupo de equipo incorrecto."
 
 #: image.php:48
 msgid "Incorrect image index."
-msgstr ""
+msgstr "Indice de imagen incorrecto."
 
 #: api/classes/CHostInterface.php:804
 #, php-format
 msgid "Incorrect interface DNS parameter \"%s\" provided."
-msgstr ""
+msgstr "El parámetro de interfaz de DNS \"%s\" definido es incorrecto."
 
 #: api/classes/CHostInterface.php:820
 #, php-format
 msgid "Incorrect interface IP parameter \"%s\" provided."
-msgstr ""
+msgstr "El parámetro de interfaz de IP \"%s\" definido es incorrecto."
 
 #: api/classes/CHostInterface.php:836
 #, php-format
 msgid "Incorrect interface port \"%s\" provided."
-msgstr ""
+msgstr "El interfaz de puerto \"%s\" definido es incorrecto."
 
 #: api/classes/CHost.php:1291
 #, php-format
 msgid "Incorrect inventory field \"%s\"."
-msgstr ""
+msgstr "El campo de inventario \"%s\" es incorrecto."
 
 #: api/classes/CScreenItem.php:531
 #, php-format
 msgid "Incorrect item ID \"%s\" provided for screen element."
-msgstr ""
+msgstr "ID del elemento \"%s\" definido es incorrecto para el elemento de pantalla"
 
 #: api/classes/CGraphGeneral.php:401
 msgid "Incorrect item for axis value."
@@ -6100,17 +6087,17 @@ msgstr ""
 
 #: api/classes/CDRule.php:482
 msgid "Incorrect key."
-msgstr ""
+msgstr "Letra incorrecta."
 
 #: discoveryconf.php:109
 #, php-format
 msgid "Incorrect key: \"%1$s\"."
-msgstr ""
+msgstr "Letra incorrecta: \"%1$s\""
 
 #: api/classes/CDRule.php:487
 #, php-format
 msgid "Incorrect key: %s"
-msgstr ""
+msgstr "Letra incorrecta: \"%1$s\""
 
 #: include/forms.inc.php:1171 items.php:768
 msgid "Incorrect list of items."

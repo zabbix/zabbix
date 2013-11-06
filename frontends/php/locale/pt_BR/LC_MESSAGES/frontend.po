@@ -1602,7 +1602,7 @@ msgstr "Não foi encontrado a interface do host em \"%1$s\" para a chave do item
 #: include/classes/import/CConfigurationImport.php:877
 #, php-format
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
-msgstr "Não foi possível localizar o host ou template \"%1$s\" utilizado no gráfico \"%2$s\"."
+msgstr "Não foi possível localizar o host ou template \"%1$s\" utilizado no gráfico \"%2$s\".Não foi possível localizar o host ou template \"%1$s\" utilizado no gráfico \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:767
 #: include/classes/import/importers/CMapImporter.php:247

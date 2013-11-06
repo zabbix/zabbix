@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-10-24 22:01+0300\n"
-"PO-Revision-Date: 2013-04-04 12:23+0200\n"
+"PO-Revision-Date: 2013-11-05 16:28+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
@@ -11,8 +11,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Pootle 2.1.6\n"
+"X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
+"X-POOTLE-MTIME: 1383661707.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -1605,7 +1606,7 @@ msgstr "Не вдалося знайти інтерфейс вузла мере�
 #: include/classes/import/CConfigurationImport.php:877
 #, php-format
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
-msgstr ""
+msgstr "Не вдалося знайти вузел мережі чи шаблон \"%1$s\" використовуваний на графіку \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:767
 #: include/classes/import/importers/CMapImporter.php:247
@@ -10171,12 +10172,12 @@ msgstr "З правого боку"
 
 #: include/locales.inc.php:66
 msgid "Romanian (ro_RO)"
-msgstr ""
+msgstr "Румунська (ro_RO)"
 
 #: include/views/configuration.screen.constructor.edit.php:606
 #: screenedit.php:46
 msgid "Row span"
-msgstr "Об'єднати рядки"
+msgstr "Румунська (ro_RO)"
 
 #: api/classes/CScreenItem.php:608
 #, php-format
