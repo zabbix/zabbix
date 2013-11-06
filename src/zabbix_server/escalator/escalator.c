@@ -1360,8 +1360,7 @@ static void	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action,
 
 		if (NULL == (row = DBfetch(result)))
 		{
-			*error = zbx_dsprintf(*error, "trigger [" ZBX_FS_UI64 "] deleted.",
-					escalation->triggerid);
+			*error = zbx_dsprintf(*error, "trigger [" ZBX_FS_UI64 "] deleted.", escalation->triggerid);
 		}
 		else if (TRIGGER_STATUS_DISABLED == atoi(row[1]))
 		{
@@ -1420,8 +1419,7 @@ static void	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action,
 
 			if (NULL == (row = DBfetch(result)))
 			{
-				*error = zbx_dsprintf(*error, "item [" ZBX_FS_UI64 "] deleted.",
-						escalation->itemid);
+				*error = zbx_dsprintf(*error, "item [" ZBX_FS_UI64 "] deleted.", escalation->itemid);
 			}
 			else if (ITEM_STATUS_DISABLED == atoi(row[1]))
 			{
@@ -1460,6 +1458,7 @@ static void	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action,
 					escalation->actionid);
 			break;
 		case ESCALATION_STATUS_RECOVERY:
+		case ESCALATION_STATUS_SLEEP:
 			result = DBselect(
 					"select actionid,name,status%s"
 					" from actions"
@@ -1701,8 +1700,8 @@ static int	process_escalations(int now)
 				{
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 							"update escalations set nextcheck=%d"
-							" where escalationid" ZBX_FS_UI64,
-							escalation.nextcheck + SEC_PER_HOUR,
+							" where escalationid=" ZBX_FS_UI64,
+							escalation.nextcheck + SEC_PER_MIN,
 							escalation.escalationid);
 				}
 			}
