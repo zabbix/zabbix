@@ -426,7 +426,7 @@ static int zbx_open_eventlog6(LPCWSTR wsource, zbx_uint64_t *lastlogsize, EVT_HA
 		renderedContent = (EVT_VARIANT*)zbx_realloc((void *)renderedContent, size_required);
 		size = size_required;
 
-		if (!EvtRender(*render_context, event_bookmark, EvtRenderEventValues, size, renderedContent,
+		if (TRUE != EvtRender(*render_context, event_bookmark, EvtRenderEventValues, size, renderedContent,
 				&size_required, &bookmarkedCount))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "EvtRender failed:%s", strerror_from_system(GetLastError()));
