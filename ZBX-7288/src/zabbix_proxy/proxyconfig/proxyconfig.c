@@ -61,11 +61,12 @@ static void	process_configuration_sync(size_t *data_size)
 	if (FAIL == get_data_from_server(&sock, ZBX_PROTO_VALUE_PROXY_CONFIG, &data))
 		goto exit;
 
-	if ('\0' != *data)
+	if (SUCCEED == zbx_json_open(data, &jp))
 	{
 		*data_size = strlen(data);	/* performance metric */
 		zabbix_log(LOG_LEVEL_WARNING, "Received configuration data from server. Datalen " ZBX_FS_SIZE_T,
 				(zbx_fs_size_t)*data_size);
+		process_proxyconfig(&jp);
 	}
 	else
 	{
@@ -73,11 +74,6 @@ static void	process_configuration_sync(size_t *data_size)
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot obtain configuration data from server. "
 				"Proxy host name might not be matching that on the server.");
 	}
-
-	if (FAIL == zbx_json_open(data, &jp))
-		goto exit;
-
-	process_proxyconfig(&jp);
 exit:
 	disconnect_server(&sock);
 
