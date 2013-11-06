@@ -36,7 +36,7 @@ INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VA
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (10022,10053,1,2,1,'127.0.0.1','','161');
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (10023,10053,1,3,1,'127.0.0.1','','623');
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (10024,10053,1,4,1,'127.0.0.1','','12345');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (100,10053,4);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (200, 10053, 4);
 
 -- Add regular expressions
 INSERT INTO regexps (regexpid, name, test_string) VALUES (20,'1_regexp_1','first test string');
@@ -349,7 +349,7 @@ INSERT INTO sysmaps_links (linkid, sysmapid, selementid1, selementid2, drawtype,
 INSERT INTO sysmaps_links (linkid, sysmapid, selementid1, selementid2, drawtype, color, label) VALUES (7,3,3,6,0,'00CC00','');
 INSERT INTO sysmaps_links (linkid, sysmapid, selementid1, selementid2, drawtype, color, label) VALUES (8,3,7,3,0,'00CC00','');
 
-INSERT INTO sysmaps_link_triggers (linktriggerid, linkid, triggerid, drawtype, color) VALUES (1,1,13136,4,'DD0000');
+INSERT INTO sysmaps_link_triggers (linktriggerid, linkid, triggerid, drawtype, color) VALUES (1,1,13545,4,'DD0000');
 
 INSERT INTO sysmap_element_url (sysmapelementurlid, selementid, name, url) VALUES (1,4,'Zabbix home','www.zabbix.com');
 INSERT INTO sysmap_element_url (sysmapelementurlid, selementid, name, url) VALUES (2,5,'www.wikipedia.org','www.wikipedia.org');
@@ -667,7 +667,7 @@ INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip,
 INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (700, 1, 1328684860, 1, 2, 'Default theme "originalblue".; Event acknowledges "1".; Show events not older than (in days) "7".; Show events max "100".; Dr...', '192.168.3.32', 0, '');
 
 -- adding test data to the 'alerts' table for testing Audit->Actions report
-INSERT INTO events (eventid, source, object, objectid, clock, value, acknowledged, ns) VALUES (1, 0, 0, 13136, 1329724790, 1, 0, 0);
+INSERT INTO events (eventid, source, object, objectid, clock, value, acknowledged, ns) VALUES (1, 0, 0, 13545, 1329724790, 1, 0, 0);
 
 INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype) VALUES (1, 12, 1, 1, 1329724800, 1, 'igor.danoshaites@zabbix.com', 'PROBLEM: Value of item key1 > 5', 'Event at 2012.02.20 10:00:00 Hostname: H1 Value of item key1 > 5: PROBLEM Last value: 6', 1, 0, '', 1, 0);
 INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype) VALUES (2, 12, 1, 1, 1329724810, 1, 'igor.danoshaites@zabbix.com', 'PROBLEM: Value of item key1 > 6', 'Event at 2012.02.20 10:00:10 Hostname: H1 Value of item key1 > 6: PROBLEM', 1, 0, '', 1, 0);
@@ -682,7 +682,7 @@ INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, send
 
 -- host, item, trigger  for testing macro resolving in trigger description
 INSERT INTO hosts (host, name, status, hostid) VALUES ('Host for trigger description macros','Host for trigger description macros', 0, 20006);
-INSERT INTO hosts_groups (hostid, groupid, hostgroupid) VALUES (20006, 4, 101);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (201, 20006, 4);
 INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.0.1', '', '1', '10050', '1', 20006, 10025);
 INSERT INTO items (itemid, name, key_, hostid, interfaceid, delay, value_type, params, description) VALUES (24338, 'item1', 'key1', 20006, 10025, 30, 3, '', '');
 INSERT INTO triggers (triggerid, description, value, state, lastchange, comments) VALUES (15517, 'trigger host.host:{HOST.HOST} | host.host2:{HOST.HOST2} | host.name:{HOST.NAME} | item.value:{ITEM.VALUE} | item.value1:{ITEM.VALUE1} | item.lastvalue:{ITEM.LASTVALUE} | host.ip:{HOST.IP} | host.dns:{HOST.DNS} | host.conn:{HOST.CONN}', 0, 1, '1339761311', '');
