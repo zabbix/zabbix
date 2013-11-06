@@ -607,6 +607,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Dutch, German, Hungarian, Japanese, Italian, Romanian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-7292] fixed resolving of macros in host interfaces (Sasha)
 ....I..... [ZBX-7273] fixed newlines in default data strings for Oracle (Sasha)
 .......PS. [ZBX-6835] fixed bug when agent/proxy connection error could have resulted in a wrong warning about message size (wiper)
 A.F....... [ZBX-6760] improved performance of getting global scripts (Sasha)
