@@ -38,8 +38,6 @@ ZABBIX.namespace = function(namespace) {
 ZABBIX.namespace('classes.Observer');
 
 ZABBIX.classes.Observer = (function() {
-	'use strict';
-
 	var Observer = function() {
 		this.listeners = {};
 	};
@@ -108,8 +106,6 @@ ZABBIX.classes.Observer = (function() {
 ZABBIX.namespace('apps.map');
 
 ZABBIX.apps.map = (function($) {
-	'use strict';
-
 	// dependencies
 	var Observer = ZABBIX.classes.Observer;
 
@@ -147,9 +143,9 @@ ZABBIX.apps.map = (function($) {
 				overflow: 'hidden'
 			});
 
+			// make better icon displaying in IE
 			if (IE) {
 				this.container.css({
-					'background-color': 'blue',
 					filter: 'alpha(opacity=0)'
 				});
 			}
