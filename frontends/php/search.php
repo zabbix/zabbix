@@ -193,7 +193,7 @@ foreach ($hosts as $hnum => $host) {
 		$items_link = _('Items').' ('.$host['items'].')';
 		$triggers_link = _('Triggers').' ('.$host['triggers'].')';
 		$graphs_link = _('Graphs').' ('.$host['graphs'].')';
-		$discoveryLink = _('Discoveries').' ('.$host['discoveries'].')';
+		$discoveryLink = _('Discovery').' ('.$host['discoveries'].')';
 		$httpTestsLink = _('Web').' ('.$host['httpTests'].')';
 	}
 
