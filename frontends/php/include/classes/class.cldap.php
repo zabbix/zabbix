@@ -32,6 +32,7 @@ class CLdap {
 			'bind_password' => 'secret',
 			'base_dn' => 'ou=users,ou=system',
 			'search_attribute' => 'uid',
+			// Allows users to authenticate with their full email address OR just their username. Also, allows application accounts to authenticate.
 			'userfilter' => '(&(|(objectClass=posixAccount)(objectClass=llnwPerson)(objectClass=llnwApplication))(|(uid=%{user})(uid=%{user}@llnw.com)(cn=%{user})))',
 			'groupkey' => 'cn',
 			'mapping' => array(
@@ -44,6 +45,9 @@ class CLdap {
 			'starttls' => true,
 			'deref' => null
 		);
+		// Note: may be useful for LDAP org settings:
+		// 'grouptree'=>           'ou=groups,dc=llnw,dc=com',
+		// 'groupfilter'=>         '(&(objectClass=llnwGroup)(cn=zabbix-group*))',
 
 		if (is_array($arg)) {
 			$this->cnf = zbx_array_merge($this->cnf, $arg);
