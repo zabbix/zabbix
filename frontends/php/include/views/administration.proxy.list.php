@@ -56,7 +56,14 @@ foreach ($this->data['proxies'] as $proxy) {
 	$hosts = array();
 
 	if (!empty($proxy['hosts'])) {
+		$i = 1;
+
 		foreach ($proxy['hosts'] as $host) {
+			if ($i > $this->data['config']['max_in_table']) {
+				break;
+			}
+			$i++;
+
 			if ($host['status'] == HOST_STATUS_MONITORED) {
 				$style = 'off';
 			}
