@@ -207,7 +207,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->input_type('comments', 'comments');
 		$this->input_type('url', 'url');
 		$this->zbxTestClick('priority_label_2');
-		$this->zbxTestCheckboxUnselect('status');
+		$this->zbxTestCheckboxSelect('status', false);
 
 		$this->zbxTestClickWait('save');
 
@@ -245,9 +245,9 @@ class testTemplateInheritance extends CWebTest {
 		$this->input_type('width', '950');
 		$this->input_type('height', '250');
 		$this->zbxTestDropdownSelect('graphtype', 'Normal');
-		$this->zbxTestCheckboxUnselect('show_legend');
-		$this->zbxTestCheckboxUnselect('show_work_period');
-		$this->zbxTestCheckboxUnselect('show_triggers');
+		$this->zbxTestCheckboxSelect('show_legend', false);
+		$this->zbxTestCheckboxSelect('show_work_period', false);
+		$this->zbxTestCheckboxSelect('show_triggers', false);
 		$this->zbxTestCheckboxSelect('visible_percent_left');
 		$this->input_type('percent_left', '4');
 		$this->input_type('percent_right', '5');
@@ -327,7 +327,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->assertElementValue('filter_macro', 'macro');
 		$this->assertElementValue('filter_value', 'regexp');
 		$this->assertElementText('description', 'description');
-		$this->zbxTestCheckboxUnselect('status');
+		$this->zbxTestCheckboxSelect('status', false);
 	}
 
 	/**
@@ -361,7 +361,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->input_type('trends', '55');
 		$this->input_type('description', 'description');
 		$this->zbxTestDropdownSelect('delta', 'Delta (simple change)');
-		$this->zbxTestCheckboxUnselect('status');
+		$this->zbxTestCheckboxSelect('status', false);
 
 		$this->zbxTestClickWait('save');
 
@@ -409,7 +409,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->input_type('comments', 'comments');
 		$this->input_type('url', 'url');
 		$this->zbxTestClick('priority_label_2');
-		$this->zbxTestCheckboxUnselect('status');
+		$this->zbxTestCheckboxSelect('status', false);
 
 		$this->zbxTestClickWait('save');
 
@@ -449,9 +449,9 @@ class testTemplateInheritance extends CWebTest {
 		$this->input_type('width', '950');
 		$this->input_type('height', '250');
 		$this->zbxTestDropdownSelect('graphtype', 'Normal');
-		$this->zbxTestCheckboxUnselect('show_legend');
-		$this->zbxTestCheckboxUnselect('show_work_period');
-		$this->zbxTestCheckboxUnselect('show_triggers');
+		$this->zbxTestCheckboxSelect('show_legend', false);
+		$this->zbxTestCheckboxSelect('show_work_period', false);
+		$this->zbxTestCheckboxSelect('show_triggers', false);
 		$this->zbxTestCheckboxSelect('visible_percent_left');
 		$this->input_type('percent_left', '4');
 		$this->input_type('percent_right', '5');

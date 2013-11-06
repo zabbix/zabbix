@@ -38,8 +38,6 @@ ZABBIX.namespace = function(namespace) {
 ZABBIX.namespace('classes.Observer');
 
 ZABBIX.classes.Observer = (function() {
-	'use strict';
-
 	var Observer = function() {
 		this.listeners = {};
 	};
@@ -108,8 +106,6 @@ ZABBIX.classes.Observer = (function() {
 ZABBIX.namespace('apps.map');
 
 ZABBIX.apps.map = (function($) {
-	'use strict';
-
 	// dependencies
 	var Observer = ZABBIX.classes.Observer;
 
@@ -147,9 +143,9 @@ ZABBIX.apps.map = (function($) {
 				overflow: 'hidden'
 			});
 
+			// make better icon displaying in IE
 			if (IE) {
 				this.container.css({
-					'background-color': 'blue',
 					filter: 'alpha(opacity=0)'
 				});
 			}
@@ -498,7 +494,10 @@ ZABBIX.apps.map = (function($) {
 							$('#elementNameHost').multiSelectHelper({
 								objectName: 'hosts',
 								name: 'elementValue',
-								selectedLimit: 1
+								selectedLimit: 1,
+								objectOptions: {
+									editable: true
+								}
 							});
 							break;
 
@@ -507,7 +506,10 @@ ZABBIX.apps.map = (function($) {
 							$('#elementNameHostGroup').multiSelectHelper({
 								objectName: 'hostGroup',
 								name: 'elementValue',
-								selectedLimit: 1
+								selectedLimit: 1,
+								objectOptions: {
+									editable: true
+								}
 							});
 							break;
 
@@ -1333,7 +1335,10 @@ ZABBIX.apps.map = (function($) {
 							objectName: 'hosts',
 							name: 'elementValue',
 							data: [{id: selement.elementid, name: selement.elementName}],
-							selectedLimit: 1
+							selectedLimit: 1,
+							objectOptions: {
+								editable: true
+							}
 						});
 						break;
 
@@ -1343,7 +1348,10 @@ ZABBIX.apps.map = (function($) {
 							objectName: 'hostGroup',
 							name: 'elementValue',
 							data: [{id: selement.elementid, name: selement.elementName}],
-							selectedLimit: 1
+							selectedLimit: 1,
+							objectOptions: {
+								editable: true
+							}
 						});
 						break;
 				}

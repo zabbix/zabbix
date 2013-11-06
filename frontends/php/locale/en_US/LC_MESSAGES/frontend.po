@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-25 16:42+0300\n"
+"POT-Creation-Date: 2013-11-05 09:03+0200\n"
 "PO-Revision-Date: 2012-09-05 20:50+0200\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: \n"
@@ -35,7 +35,7 @@ msgid_plural "%1$d days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/blocks.inc.php:1020
+#: include/blocks.inc.php:1027
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
@@ -84,7 +84,7 @@ msgctxt "user fullname"
 msgid "(%1$s %2$s)"
 msgstr ""
 
-#: include/views/configuration.action.edit.php:436
+#: include/views/configuration.action.edit.php:443
 msgid "(0 - infinitely)"
 msgstr "(0 - infinitely)"
 
@@ -94,26 +94,26 @@ msgstr "(0 - infinitely)"
 msgid "(Only super admins can create groups)"
 msgstr ""
 
-#: include/forms.inc.php:588 include/forms.inc.php:603
+#: include/forms.inc.php:591 include/forms.inc.php:606
 msgid "(in days)"
 msgstr "(in days)"
 
-#: include/forms.inc.php:448
+#: include/forms.inc.php:451
 msgid "(in sec)"
 msgstr "(in sec)"
 
-#: include/views/configuration.action.edit.php:446
+#: include/views/configuration.action.edit.php:453
 msgid "(minimum 60 seconds, 0 - use action default)"
 msgstr "(minimum 60 seconds, 0 - use action default)"
 
 #: include/views/configuration.host.edit.php:375
 #: include/views/configuration.host.edit.php:396
-#: include/views/configuration.host.massupdate.php:130
+#: include/views/configuration.host.massupdate.php:134
 #: include/views/configuration.host.prototype.edit.php:153
 msgid "(no proxy)"
 msgstr "(no proxy)"
 
-#: include/blocks.inc.php:1493
+#: include/blocks.inc.php:1500
 msgid "-"
 msgstr ""
 
@@ -121,11 +121,11 @@ msgstr ""
 msgid "----[BULK ACKNOWLEDGE]----"
 msgstr "----[BULK ACKNOWLEDGE]----"
 
-#: include/triggers.inc.php:2221 include/triggers.inc.php:2222
-#: include/triggers.inc.php:2223 include/triggers.inc.php:2225
-#: include/triggers.inc.php:2227 include/triggers.inc.php:2230
-#: include/triggers.inc.php:2233 include/triggers.inc.php:2234
-#: include/triggers.inc.php:2245
+#: include/triggers.inc.php:2223 include/triggers.inc.php:2224
+#: include/triggers.inc.php:2225 include/triggers.inc.php:2227
+#: include/triggers.inc.php:2229 include/triggers.inc.php:2232
+#: include/triggers.inc.php:2235 include/triggers.inc.php:2236
+#: include/triggers.inc.php:2247
 msgid "0 or 1"
 msgstr "0 or 1"
 
@@ -175,15 +175,15 @@ msgstr ""
 msgid "ALARM ACKNOWLEDGES"
 msgstr "ALARM ACKNOWLEDGES"
 
-#: include/triggers.inc.php:1660
+#: include/triggers.inc.php:1662
 #: include/views/configuration.action.edit.php:109
-#: include/views/configuration.action.edit.php:936
+#: include/views/configuration.action.edit.php:946
 #: include/views/configuration.triggers.edit.php:106 tr_logform.php:287
 msgid "AND"
 msgstr "AND"
 
 #: include/views/configuration.action.edit.php:108
-#: include/views/configuration.action.edit.php:935
+#: include/views/configuration.action.edit.php:945
 msgid "AND / OR"
 msgstr "AND / OR"
 
@@ -195,7 +195,7 @@ msgstr "AUDIT ACTIONS"
 msgid "AUDIT LOGS"
 msgstr "AUDIT LOGS"
 
-#: report2.php:151
+#: report2.php:153
 msgid "AVAILABILITY REPORT"
 msgstr "AVAILABILITY REPORT"
 
@@ -223,7 +223,7 @@ msgstr "Acceptable SLA"
 msgid "Access denied!"
 msgstr "Access denied!"
 
-#: include/func.inc.php:2066
+#: include/func.inc.php:2065
 msgid "Access denied."
 msgstr ""
 
@@ -233,9 +233,9 @@ msgid "Account is blocked for %s seconds"
 msgstr "Account is blocked for %s seconds"
 
 #: events.php:584 events.php:597 include/actions.inc.php:256
-#: include/blocks.inc.php:902 include/blocks.inc.php:1466
+#: include/blocks.inc.php:909 include/blocks.inc.php:1473
 #: include/events.inc.php:204 include/events.inc.php:279
-#: include/views/configuration.action.edit.php:994
+#: include/views/configuration.action.edit.php:1004
 msgid "Ack"
 msgstr "Ack"
 
@@ -282,13 +282,13 @@ msgstr "Acknowledging disabled"
 #: include/audit.inc.php:28 include/views/administration.auditlogs.list.php:62
 #: include/views/administration.auditlogs.list.php:89
 #: include/views/configuration.action.edit.php:70
-#: include/views/configuration.action.edit.php:328
-#: include/views/configuration.action.edit.php:332
-#: include/views/configuration.action.edit.php:503
-#: include/views/configuration.action.edit.php:512
-#: include/views/configuration.action.edit.php:630
-#: include/views/configuration.action.edit.php:879
-#: include/views/configuration.action.edit.php:1021
+#: include/views/configuration.action.edit.php:335
+#: include/views/configuration.action.edit.php:339
+#: include/views/configuration.action.edit.php:510
+#: include/views/configuration.action.edit.php:519
+#: include/views/configuration.action.edit.php:638
+#: include/views/configuration.action.edit.php:889
+#: include/views/configuration.action.edit.php:1031
 #: include/views/configuration.graph.edit.php:78
 #: include/views/configuration.host.edit.php:637
 #: include/views/configuration.host.prototype.edit.php:214
@@ -335,7 +335,7 @@ msgstr "Action added"
 msgid "Action deleted"
 msgstr "Action deleted"
 
-#: include/views/configuration.action.edit.php:411
+#: include/views/configuration.action.edit.php:418
 msgid "Action operations"
 msgstr "Action operations"
 
@@ -343,8 +343,8 @@ msgstr "Action operations"
 msgid "Action updated"
 msgstr "Action updated"
 
-#: events.php:585 events.php:598 include/blocks.inc.php:903
-#: include/blocks.inc.php:1467 include/events.inc.php:205
+#: events.php:585 events.php:598 include/blocks.inc.php:910
+#: include/blocks.inc.php:1474 include/events.inc.php:205
 #: include/menu.inc.php:191 include/views/administration.auditacts.list.php:29
 #: include/views/administration.auditacts.list.php:32
 #: include/views/administration.auditlogs.list.php:29
@@ -379,9 +379,9 @@ msgstr "Active since"
 msgid "Active till"
 msgstr "Active till"
 
-#: include/blocks.inc.php:1188 include/blocks.inc.php:1194
-#: include/blocks.inc.php:1309 include/blocks.inc.php:1354
-#: include/blocks.inc.php:1360 include/reports.inc.php:119
+#: include/blocks.inc.php:1195 include/blocks.inc.php:1201
+#: include/blocks.inc.php:1316 include/blocks.inc.php:1361
+#: include/blocks.inc.php:1367 include/reports.inc.php:119
 #: include/reports.inc.php:217 include/reports.inc.php:259
 #: include/views/administration.auditlogs.list.php:45
 #: include/views/administration.general.iconmap.edit.php:119
@@ -392,15 +392,15 @@ msgstr "Active till"
 #: include/views/administration.usergroups.edit.php:111
 #: include/views/administration.usergroups.edit.php:115
 #: include/views/administration.users.edit.php:90
-#: include/views/administration.users.edit.php:195
+#: include/views/administration.users.edit.php:194
 #: include/views/common.macros.php:66
-#: include/views/configuration.action.edit.php:308
-#: include/views/configuration.action.edit.php:507
-#: include/views/configuration.action.edit.php:516
-#: include/views/configuration.action.edit.php:790
-#: include/views/configuration.action.edit.php:834
-#: include/views/configuration.action.edit.php:1000
-#: include/views/configuration.action.edit.php:1009
+#: include/views/configuration.action.edit.php:315
+#: include/views/configuration.action.edit.php:514
+#: include/views/configuration.action.edit.php:523
+#: include/views/configuration.action.edit.php:799
+#: include/views/configuration.action.edit.php:844
+#: include/views/configuration.action.edit.php:1010
+#: include/views/configuration.action.edit.php:1019
 #: include/views/configuration.graph.edit.php:107
 #: include/views/configuration.host.edit.php:238
 #: include/views/configuration.host.edit.php:255
@@ -458,7 +458,7 @@ msgstr "Add missing"
 msgid "Add new or existing applications"
 msgstr ""
 
-#: include/views/configuration.host.massupdate.php:104
+#: include/views/configuration.host.massupdate.php:107
 msgid "Add new or existing host groups"
 msgstr ""
 
@@ -483,7 +483,7 @@ msgstr "Add to favorites"
 msgid "Add to host group"
 msgstr "Add to host group"
 
-#: include/actions.inc.php:429 include/views/configuration.action.edit.php:814
+#: include/actions.inc.php:429 include/views/configuration.action.edit.php:823
 msgid "Add to host groups"
 msgstr "Add to host groups"
 
@@ -503,7 +503,7 @@ msgstr "Administration"
 msgid "Advanced labels"
 msgstr "Advanced labels"
 
-#: include/blocks.inc.php:900 include/blocks.inc.php:1464
+#: include/blocks.inc.php:907 include/blocks.inc.php:1471
 #: include/events.inc.php:203 include/events.inc.php:279
 #: include/events.inc.php:282 tr_status.php:363
 msgid "Age"
@@ -519,7 +519,7 @@ msgid "Age less than %s"
 msgstr "Age less than %s"
 
 #: include/items.inc.php:244 include/views/administration.script.list.php:64
-#: include/views/configuration.httpconf.edit.php:139 popup.php:1548
+#: include/views/configuration.httpconf.edit.php:139 popup.php:1549
 msgid "Agent"
 msgstr "Agent"
 
@@ -543,9 +543,9 @@ msgstr "Alias"
 msgid "Align icons"
 msgstr "Align icons"
 
-#: include/blocks.inc.php:1288 include/blocks.inc.php:1297
-#: include/blocks.inc.php:1342 include/blocks.inc.php:1426
-#: include/blocks.inc.php:1435 include/nodes.inc.php:174
+#: include/blocks.inc.php:1295 include/blocks.inc.php:1304
+#: include/blocks.inc.php:1349 include/blocks.inc.php:1433
+#: include/blocks.inc.php:1442 include/nodes.inc.php:174
 #: include/page_header.php:300 include/reports.inc.php:340
 #: include/views/administration.auditlogs.list.php:42
 #: include/views/administration.auditlogs.list.php:52
@@ -556,7 +556,7 @@ msgstr "Align icons"
 #: include/views/administration.script.list.php:83
 #: include/views/administration.usergroups.edit.php:45
 #: include/views/administration.users.list.php:36
-#: include/views/configuration.action.edit.php:554
+#: include/views/configuration.action.edit.php:561
 #: include/views/configuration.hostgroups.edit.php:44
 #: include/views/configuration.sysmap.edit.php:121
 #: include/views/monitoring.dashconf.php:48
@@ -592,7 +592,7 @@ msgid "Any character string included"
 msgstr "Any character string included"
 
 #: applications.php:117 httpconf.php:42 include/actions.inc.php:90
-#: include/audit.inc.php:32 include/forms.inc.php:574
+#: include/audit.inc.php:32 include/forms.inc.php:577
 #: include/views/configuration.application.edit.php:46
 #: include/views/configuration.application.list.php:62
 #: include/views/configuration.httpconf.edit.php:64
@@ -624,12 +624,12 @@ msgstr "Application error."
 msgid "Application updated"
 msgstr "Application updated"
 
-#: api/classes/CItemGeneral.php:374
+#: api/classes/CItemGeneral.php:391
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Application with ID \"%1$s\" is not available on \"%2$s\"."
 
-#: hosts.php:794 hosts.php:884 include/forms.inc.php:899
+#: hosts.php:794 hosts.php:884 include/forms.inc.php:902
 #: include/html.inc.php:396 include/html.inc.php:400
 #: include/views/configuration.application.list.php:47
 #: include/views/configuration.host.edit.php:426
@@ -658,7 +658,7 @@ msgstr "Approaching"
 msgid "Apr"
 msgstr "Apr"
 
-#: include/forms.inc.php:1660 include/func.inc.php:115
+#: include/forms.inc.php:1682 include/func.inc.php:115
 #: include/func.inc.php:246 jsLoader.php:121
 msgid "April"
 msgstr "April"
@@ -724,7 +724,7 @@ msgid_plural "At %1$s:%2$s on every %3$s days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/forms.inc.php:1739
+#: include/forms.inc.php:1763
 msgid "At (hour:minute)"
 msgstr "At (hour:minute)"
 
@@ -757,7 +757,7 @@ msgstr "Audit logs"
 msgid "Aug"
 msgstr "Aug"
 
-#: include/forms.inc.php:1652 include/func.inc.php:119
+#: include/forms.inc.php:1674 include/func.inc.php:119
 #: include/func.inc.php:250 jsLoader.php:125
 msgid "August"
 msgstr "August"
@@ -772,7 +772,7 @@ msgstr "Authentication"
 msgid "Authentication algorithm"
 msgstr "Authentication algorithm"
 
-#: include/views/configuration.action.edit.php:709
+#: include/views/configuration.action.edit.php:717
 #: include/views/configuration.item.edit.php:182
 #: include/views/configuration.item.massupdate.php:250
 msgid "Authentication method"
@@ -807,16 +807,16 @@ msgstr ""
 msgid "Auto registration"
 msgstr "Auto registration"
 
-#: include/views/administration.users.edit.php:143
+#: include/views/administration.users.edit.php:142
 msgid "Auto-login"
 msgstr "Auto-login"
 
-#: include/views/administration.users.edit.php:144 profile.php:50 users.php:61
+#: include/views/administration.users.edit.php:143 profile.php:50 users.php:61
 msgid "Auto-logout (min 90 seconds)"
 msgstr "Auto-logout (min 90 seconds)"
 
 #: include/views/configuration.host.edit.php:761
-#: include/views/configuration.host.massupdate.php:240
+#: include/views/configuration.host.massupdate.php:242
 #: include/views/configuration.host.prototype.edit.php:303
 msgid "Automatic"
 msgstr "Automatic"
@@ -915,7 +915,7 @@ msgstr ""
 msgid "Bitwise AND of last (most recent) T value and mask is NOT N"
 msgstr ""
 
-#: include/classes/core/ZBase.php:233
+#: include/classes/core/ZBase.php:234
 msgid "Black & Blue"
 msgstr "Black & Blue"
 
@@ -955,11 +955,11 @@ msgstr ""
 msgid "Bulk acknowledge"
 msgstr "Bulk acknowledge"
 
-#: report2.php:175
+#: report2.php:177
 msgid "By host"
 msgstr "By host"
 
-#: report2.php:176
+#: report2.php:178
 msgid "By trigger template"
 msgstr "By trigger template"
 
@@ -977,12 +977,8 @@ msgstr "CONFIGURATION OF APPLICATIONS"
 msgid "CONFIGURATION OF AUTHENTICATION"
 msgstr "CONFIGURATION OF AUTHENTICATION"
 
-#: include/views/configuration.discovery.edit.php:25
+#: host_discovery.php:303 include/views/configuration.discovery.edit.php:25
 #: include/views/configuration.discovery.list.php:28
-msgid "CONFIGURATION OF DISCOVERY RULE"
-msgstr "CONFIGURATION OF DISCOVERY RULE"
-
-#: host_discovery.php:303
 #: include/views/configuration.host.discovery.list.php:28
 msgid "CONFIGURATION OF DISCOVERY RULES"
 msgstr "CONFIGURATION OF DISCOVERY RULES"
@@ -1039,7 +1035,7 @@ msgstr "CONFIGURATION OF ITEM PROTOTYPES"
 
 #: include/views/configuration.item.copy.php:28
 #: include/views/configuration.item.list.php:39
-#: include/views/configuration.item.massupdate.php:28 items.php:778
+#: include/views/configuration.item.massupdate.php:28 items.php:779
 msgid "CONFIGURATION OF ITEMS"
 msgstr "CONFIGURATION OF ITEMS"
 
@@ -1078,9 +1074,6 @@ msgid "CONFIGURATION OF REGULAR EXPRESSIONS"
 msgstr "CONFIGURATION OF REGULAR EXPRESSIONS"
 
 #: include/views/configuration.screen.constructor.list.php:23
-msgid "CONFIGURATION OF SCREEN"
-msgstr "CONFIGURATION OF SCREEN"
-
 #: include/views/configuration.screen.edit.php:23
 #: include/views/configuration.screen.list.php:35
 msgid "CONFIGURATION OF SCREENS"
@@ -1112,22 +1105,19 @@ msgstr "CONFIGURATION OF TRIGGER SEVERITIES"
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:54
-#: include/views/configuration.triggers.massupdate.php:42 triggers.php:380
+#: include/views/configuration.triggers.massupdate.php:42 triggers.php:327
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "CONFIGURATION OF TRIGGERS"
 
-#: include/views/administration.users.edit.php:30
-msgid "CONFIGURATION OF USER"
-msgstr "CONFIGURATION OF USER"
-
 #: include/views/administration.usergroups.edit.php:23
-msgid "CONFIGURATION OF USER GROUP"
-msgstr "CONFIGURATION OF USER GROUP"
-
 #: include/views/administration.usergroups.list.php:31
+msgid "CONFIGURATION OF USER GROUPS"
+msgstr ""
+
+#: include/views/administration.users.edit.php:30
 #: include/views/administration.users.list.php:31
-msgid "CONFIGURATION OF USERS AND USER GROUPS"
-msgstr "CONFIGURATION OF USERS AND USER GROUPS"
+msgid "CONFIGURATION OF USERS"
+msgstr ""
 
 #: adm.valuemapping.php:147
 msgid "CONFIGURATION OF VALUE MAPPING"
@@ -1184,10 +1174,10 @@ msgid "Canada (136 characters)"
 msgstr "Canada (136 characters)"
 
 #: include/classes/class.cbuttoncancel.php:25 include/js.inc.php:222
-#: include/setup.inc.php:136
+#: include/setup.inc.php:138
 #: include/views/administration.general.regularexpressions.edit.php:58
-#: include/views/configuration.action.edit.php:1002
-#: include/views/configuration.action.edit.php:1011
+#: include/views/configuration.action.edit.php:1012
+#: include/views/configuration.action.edit.php:1021
 #: include/views/configuration.maintenance.edit.php:147
 #: include/views/configuration.services.parent.list.php:62
 #: include/views/js/administration.general.housekeeper.edit.js.php:149
@@ -1217,7 +1207,7 @@ msgstr ""
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
 msgstr ""
 
-#: include/reports.inc.php:505
+#: include/reports.inc.php:504
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\"."
 msgstr ""
@@ -1234,7 +1224,7 @@ msgstr ""
 msgid "Cannot add application"
 msgstr "Cannot add application"
 
-#: api/classes/CTrigger.php:1406
+#: api/classes/CTrigger.php:1410
 msgid "Cannot add dependency from a host to a template."
 msgstr "Cannot add dependency from a host to a template."
 
@@ -1347,7 +1337,7 @@ msgstr "Cannot add slide show"
 msgid "Cannot add template"
 msgstr "Cannot add template"
 
-#: trigger_prototypes.php:168 triggers.php:183 triggers.php:350
+#: trigger_prototypes.php:168 triggers.php:183 triggers.php:297
 #: tr_logform.php:148
 msgid "Cannot add trigger"
 msgstr "Cannot add trigger"
@@ -1412,7 +1402,7 @@ msgstr "Cannot connect to the trapper port of zabbix server daemon, but it shoul
 msgid "Cannot copy graphs"
 msgstr "Cannot copy graphs"
 
-#: items.php:716
+#: items.php:717
 msgid "Cannot copy items"
 msgstr "Cannot copy items"
 
@@ -1430,11 +1420,11 @@ msgstr ""
 msgid "Cannot create another database connection."
 msgstr "Cannot create another database connection."
 
-#: api/classes/CTrigger.php:1440
+#: api/classes/CTrigger.php:1444
 msgid "Cannot create circular dependencies."
 msgstr ""
 
-#: api/classes/CTrigger.php:1412
+#: api/classes/CTrigger.php:1416
 msgid "Cannot create dependency on trigger itself."
 msgstr ""
 
@@ -1485,7 +1475,7 @@ msgstr "Cannot delete action"
 msgid "Cannot delete application"
 msgstr "Cannot delete application"
 
-#: api/classes/CTrigger.php:1066
+#: api/classes/CTrigger.php:1070
 msgid "Cannot delete dependency"
 msgstr "Cannot delete dependency"
 
@@ -1554,7 +1544,7 @@ msgstr "Cannot delete inventory."
 msgid "Cannot delete item"
 msgstr "Cannot delete item"
 
-#: disc_prototypes.php:336 items.php:769
+#: disc_prototypes.php:336 items.php:770
 msgid "Cannot delete items"
 msgstr "Cannot delete items"
 
@@ -1650,7 +1640,7 @@ msgstr ""
 msgid "Cannot delete templated items."
 msgstr "Cannot delete templated items."
 
-#: api/classes/CTrigger.php:1874 api/classes/CTriggerPrototype.php:674
+#: api/classes/CTrigger.php:1883 api/classes/CTriggerPrototype.php:674
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Cannot delete templated trigger \"%1$s:%2$s\"."
@@ -1672,7 +1662,7 @@ msgstr ""
 msgid "Cannot delete trigger."
 msgstr "Cannot delete trigger."
 
-#: trigger_prototypes.php:297 triggers.php:362
+#: trigger_prototypes.php:246 triggers.php:309
 msgid "Cannot delete triggers"
 msgstr "Cannot delete triggers"
 
@@ -1830,7 +1820,7 @@ msgstr "Cannot format tree."
 msgid "Cannot have empty visible template name"
 msgstr "Cannot have empty visible template name"
 
-#: api/classes/CTrigger.php:1099 api/classes/CTrigger.php:1238
+#: api/classes/CTrigger.php:1103 api/classes/CTrigger.php:1242
 #: api/classes/CTriggerPrototype.php:755 api/classes/CTriggerPrototype.php:813
 #, c-format
 msgid "Cannot implode expression \"%s\"."
@@ -1924,7 +1914,7 @@ msgstr "Cannot remove macro."
 msgid "Cannot rename guest user."
 msgstr "Cannot rename guest user."
 
-#: api/classes/CDRule.php:277
+#: api/classes/CDRule.php:269
 msgid "Cannot save discovery rule without checks."
 msgstr "Cannot save discovery rule without checks."
 
@@ -1938,7 +1928,7 @@ msgstr ""
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTrigger.php:659
+#: api/classes/CTrigger.php:663
 #, c-format
 msgid "Cannot set \"%1$s\" for trigger \"%2$s\"."
 msgstr ""
@@ -2021,7 +2011,7 @@ msgstr ""
 msgid "Cannot update \"%1$s\" for a discovered item."
 msgstr ""
 
-#: api/classes/CTrigger.php:631
+#: api/classes/CTrigger.php:635
 #, c-format
 msgid "Cannot update \"%1$s\" for a discovered trigger."
 msgstr ""
@@ -2031,7 +2021,7 @@ msgstr ""
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTrigger.php:659
+#: api/classes/CTrigger.php:663
 #, c-format
 msgid "Cannot update \"%1$s\" for trigger \"%2$s\"."
 msgstr ""
@@ -2154,7 +2144,7 @@ msgstr ""
 msgid "Cannot update item"
 msgstr "Cannot update item"
 
-#: items.php:660
+#: items.php:661
 msgid "Cannot update items"
 msgstr "Cannot update items"
 
@@ -2220,7 +2210,7 @@ msgstr "Cannot update service"
 msgid "Cannot update slide show"
 msgstr "Cannot update slide show"
 
-#: actionconf.php:322 trigger_prototypes.php:291 triggers.php:322
+#: actionconf.php:322 trigger_prototypes.php:240 triggers.php:269
 msgid "Cannot update status"
 msgstr "Cannot update status"
 
@@ -2300,8 +2290,8 @@ msgstr "Change"
 msgid "Change password"
 msgstr "Change password"
 
-#: include/forms.inc.php:423 include/items.inc.php:125
-#: include/triggers.inc.php:2198 include/views/configuration.item.edit.php:224
+#: include/forms.inc.php:426 include/items.inc.php:125
+#: include/triggers.inc.php:2200 include/views/configuration.item.edit.php:224
 #: include/views/configuration.item.massupdate.php:210
 msgid "Character"
 msgstr "Character"
@@ -2340,7 +2330,7 @@ msgstr "Check type"
 msgid "Checks"
 msgstr "Checks"
 
-#: api/classes/CDRule.php:415
+#: api/classes/CDRule.php:407
 msgid "Checks should be unique."
 msgstr "Checks should be unique."
 
@@ -2356,7 +2346,7 @@ msgstr "Chinese (zh_CN)"
 msgid "Chinese (zh_TW)"
 msgstr "Chinese (zh_TW)"
 
-#: api/classes/CMapElement.php:70
+#: api/classes/CMapElement.php:74
 #, c-format
 msgid "Circular link cannot be created for map element \"%s\"."
 msgstr "Circular link cannot be created for map element \"%s\"."
@@ -2380,7 +2370,7 @@ msgstr "Circular reference in templates: %1$s."
 msgid "Circular template linkage is not allowed."
 msgstr "Circular template linkage is not allowed."
 
-#: include/classes/core/ZBase.php:231
+#: include/classes/core/ZBase.php:232
 msgid "Classic"
 msgstr "Classic"
 
@@ -2397,7 +2387,7 @@ msgstr "Clear history and trends"
 msgid "Clear history for selected"
 msgstr "Clear history for selected"
 
-#: include/views/configuration.host.massupdate.php:178
+#: include/views/configuration.host.massupdate.php:180
 msgid "Clear when unlinking"
 msgstr "Clear when unlinking"
 
@@ -2409,7 +2399,7 @@ msgstr "Clock"
 #: include/views/administration.general.regularexpressions.edit.php:88
 #: include/views/administration.proxy.edit.php:100
 #: include/views/administration.script.edit.php:115
-#: include/views/configuration.action.edit.php:1029
+#: include/views/configuration.action.edit.php:1039
 #: include/views/configuration.application.edit.php:54
 #: include/views/configuration.discovery.edit.php:92
 #: include/views/configuration.graph.edit.php:304
@@ -2494,9 +2484,9 @@ msgstr "Command cannot be empty."
 
 #: include/views/administration.script.edit.php:61
 #: include/views/administration.script.list.php:42
-#: include/views/configuration.action.edit.php:759
-#: include/views/configuration.action.edit.php:763 popup.php:1500
-#: popup.php:1507
+#: include/views/configuration.action.edit.php:767
+#: include/views/configuration.action.edit.php:771 popup.php:1501
+#: popup.php:1508
 msgid "Commands"
 msgstr "Commands"
 
@@ -2531,8 +2521,8 @@ msgid "Condition"
 msgstr "Condition"
 
 #: include/views/configuration.action.edit.php:112
-#: include/views/configuration.action.edit.php:954
-#: include/views/configuration.action.edit.php:1022
+#: include/views/configuration.action.edit.php:964
+#: include/views/configuration.action.edit.php:1032
 #: include/views/configuration.action.list.php:53
 msgid "Conditions"
 msgstr "Conditions"
@@ -2570,11 +2560,7 @@ msgstr "Configuration of applications"
 msgid "Configuration of authentication"
 msgstr "Configuration of authentication"
 
-#: discoveryconf.php:26
-msgid "Configuration of discovery"
-msgstr "Configuration of discovery"
-
-#: host_discovery.php:27
+#: discoveryconf.php:26 host_discovery.php:27
 msgid "Configuration of discovery rules"
 msgstr "Configuration of discovery rules"
 
@@ -2623,8 +2609,8 @@ msgid "Configuration of macros"
 msgstr "Configuration of macros"
 
 #: maintenance.php:27
-msgid "Configuration of maintenance"
-msgstr "Configuration of maintenance"
+msgid "Configuration of maintenance periods"
+msgstr ""
 
 #: media_types.php:26
 msgid "Configuration of media types"
@@ -2661,10 +2647,6 @@ msgstr "Configuration of slide shows"
 #: templates.php:38
 msgid "Configuration of templates"
 msgstr "Configuration of templates"
-
-#: report5.php:166
-msgid "Configuration of trigger"
-msgstr "Configuration of trigger"
 
 #: adm.triggerdisplayoptions.php:24
 msgid "Configuration of trigger displaying options"
@@ -2724,7 +2706,7 @@ msgstr "Confirmation text"
 #: include/views/inventory.host.view.php:103
 #: include/views/inventory.host.view.php:125
 #: include/views/inventory.host.view.php:147
-#: include/views/inventory.host.view.php:169
+#: include/views/inventory.host.view.php:168
 #: include/views/js/configuration.sysmaps.js.php:357
 msgid "Connect to"
 msgstr "Connect to"
@@ -2877,7 +2859,7 @@ msgstr "Create icon map"
 msgid "Create image"
 msgstr "Create image"
 
-#: include/views/configuration.item.list.php:37 items.php:776
+#: include/views/configuration.item.list.php:37 items.php:777
 msgid "Create item"
 msgstr "Create item"
 
@@ -2982,7 +2964,7 @@ msgstr "Created: Item \"%1$s\" on \"%2$s\"."
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Created: Item prototype \"%1$s\" on \"%2$s\"."
 
-#: api/classes/CTrigger.php:1133
+#: api/classes/CTrigger.php:1137
 #, c-format
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Created: Trigger \"%1$s\" on \"%2$s\"."
@@ -3042,7 +3024,7 @@ msgstr ""
 msgid "Current time is NOT N"
 msgstr ""
 
-#: include/setup.inc.php:191
+#: include/setup.inc.php:196
 msgid "Current value"
 msgstr "Current value"
 
@@ -3068,7 +3050,7 @@ msgstr "Custom multiplier"
 msgid "Custom screens"
 msgstr "Custom screens"
 
-#: include/views/configuration.action.edit.php:682
+#: include/views/configuration.action.edit.php:690
 msgid "Custom script"
 msgstr "Custom script"
 
@@ -3144,7 +3126,7 @@ msgstr "DNS"
 #: include/views/inventory.host.view.php:103
 #: include/views/inventory.host.view.php:125
 #: include/views/inventory.host.view.php:147
-#: include/views/inventory.host.view.php:169
+#: include/views/inventory.host.view.php:168
 msgid "DNS name"
 msgstr "DNS name"
 
@@ -3152,13 +3134,13 @@ msgstr "DNS name"
 msgid "DOWN"
 msgstr "DOWN"
 
-#: include/forms.inc.php:1609 include/maintenances.inc.php:36
+#: include/forms.inc.php:1631 include/maintenances.inc.php:36
 #: include/reports.inc.php:61 include/reports.inc.php:397
 #: include/reports.inc.php:405 report3.php:58 report4.php:108
 msgid "Daily"
 msgstr "Daily"
 
-#: include/classes/core/ZBase.php:234
+#: include/classes/core/ZBase.php:235
 msgid "Dark orange"
 msgstr "Dark orange"
 
@@ -3196,16 +3178,16 @@ msgstr "Data from %1$s. Generated in %2$s sec."
 msgid "Data overview"
 msgstr "Data overview"
 
-#: include/forms.inc.php:455 include/views/configuration.item.edit.php:239
+#: include/forms.inc.php:458 include/views/configuration.item.edit.php:239
 #: include/views/configuration.item.massupdate.php:227
 msgid "Data type"
 msgstr "Data type"
 
-#: include/setup.inc.php:249 include/setup.inc.php:352
+#: include/setup.inc.php:260 include/setup.inc.php:396
 msgid "Database file"
 msgstr "Database file"
 
-#: include/setup.inc.php:253 setup.php:45
+#: include/setup.inc.php:268 setup.php:38
 msgid "Database host"
 msgstr "Database host"
 
@@ -3213,36 +3195,36 @@ msgstr "Database host"
 msgid "Database monitor"
 msgstr "Database monitor"
 
-#: include/setup.inc.php:264 include/setup.inc.php:364 setup.php:47
+#: include/setup.inc.php:288 include/setup.inc.php:408 setup.php:40
 msgid "Database name"
 msgstr "Database name"
 
-#: include/setup.inc.php:366
+#: include/setup.inc.php:410
 msgid "Database password"
 msgstr "Database password"
 
-#: include/setup.inc.php:257 include/setup.inc.php:359
-#: include/setup.inc.php:362 setup.php:46
+#: include/setup.inc.php:280 include/setup.inc.php:403
+#: include/setup.inc.php:406 setup.php:39
 msgid "Database port"
 msgstr "Database port"
 
-#: include/setup.inc.php:269 include/setup.inc.php:368
+#: include/setup.inc.php:296 include/setup.inc.php:412
 msgid "Database schema"
 msgstr "Database schema"
 
-#: include/setup.inc.php:357
+#: include/setup.inc.php:401
 msgid "Database server"
 msgstr "Database server"
 
-#: include/setup.inc.php:246 include/setup.inc.php:345
+#: include/setup.inc.php:253 include/setup.inc.php:389
 msgid "Database type"
 msgstr "Database type"
 
-#: include/setup.inc.php:365
+#: include/setup.inc.php:409
 msgid "Database user"
 msgstr "Database user"
 
-#: include/forms.inc.php:1676 include/forms.inc.php:1735 jsrpc.php:137
+#: include/forms.inc.php:1698 include/forms.inc.php:1759 jsrpc.php:137
 msgid "Date"
 msgstr "Date"
 
@@ -3262,12 +3244,12 @@ msgstr "Date HW maintenance expires"
 msgid "Date HW purchased"
 msgstr "Date HW purchased"
 
-#: include/forms.inc.php:1678 report3.php:124 report4.php:168 report5.php:44
+#: include/forms.inc.php:1700 report3.php:124 report4.php:168 report5.php:44
 #: tr_status.php:285 tr_status.php:287
 msgid "Day"
 msgstr "Day"
 
-#: include/forms.inc.php:1710
+#: include/forms.inc.php:1732
 msgid "Day of month"
 msgstr "Day of month"
 
@@ -3287,8 +3269,8 @@ msgstr ""
 msgid "Day of month is NOT N"
 msgstr ""
 
-#: include/forms.inc.php:1638 include/forms.inc.php:1681
-#: include/forms.inc.php:1706
+#: include/forms.inc.php:1660 include/forms.inc.php:1703
+#: include/forms.inc.php:1728
 msgid "Day of week"
 msgstr "Day of week"
 
@@ -3308,7 +3290,7 @@ msgstr ""
 msgid "Day of week is NOT N"
 msgstr ""
 
-#: include/forms.inc.php:1752 tr_status.php:285 tr_status.php:287
+#: include/forms.inc.php:1776 tr_status.php:285 tr_status.php:287
 msgid "Days"
 msgstr "Days"
 
@@ -3330,7 +3312,7 @@ msgstr "Debug mode updated"
 msgid "Dec"
 msgstr "Dec"
 
-#: include/forms.inc.php:1672 include/func.inc.php:123
+#: include/forms.inc.php:1694 include/func.inc.php:123
 #: include/func.inc.php:254 jsLoader.php:129
 msgid "December"
 msgstr "December"
@@ -3341,7 +3323,7 @@ msgstr "Decimal"
 
 #: include/hosts.inc.php:37
 #: include/views/administration.general.iconmap.edit.php:133
-#: include/views/configuration.action.edit.php:365
+#: include/views/configuration.action.edit.php:372
 #: include/views/configuration.host.edit.php:232
 #: include/views/configuration.host.edit.php:319
 #: include/views/configuration.host.prototype.edit.php:96
@@ -3362,11 +3344,11 @@ msgid "Default delay (in seconds)"
 msgstr "Default delay (in seconds)"
 
 #: include/views/configuration.action.edit.php:46
-#: include/views/configuration.action.edit.php:569
+#: include/views/configuration.action.edit.php:577
 msgid "Default message"
 msgstr "Default message"
 
-#: actionconf.php:42 include/views/configuration.action.edit.php:318
+#: actionconf.php:42 include/views/configuration.action.edit.php:325
 msgid "Default operation step duration"
 msgstr "Default operation step duration"
 
@@ -3420,7 +3402,7 @@ msgstr "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgid "Delete application?"
 msgstr "Delete application?"
 
-#: include/views/configuration.action.edit.php:1030
+#: include/views/configuration.action.edit.php:1040
 msgid "Delete current action?"
 msgstr "Delete current action?"
 
@@ -3501,7 +3483,7 @@ msgstr "Delete script?"
 #: include/views/administration.usergroups.edit.php:116
 #: include/views/administration.usergroups.list.php:153
 #: include/views/administration.users.edit.php:94
-#: include/views/administration.users.edit.php:198
+#: include/views/administration.users.edit.php:197
 #: include/views/administration.users.list.php:138
 #: include/views/configuration.action.list.php:105
 #: include/views/configuration.application.list.php:120
@@ -3632,7 +3614,7 @@ msgstr "Delete selected templates?"
 msgid "Delete selected triggers?"
 msgstr "Delete selected triggers?"
 
-#: include/views/administration.users.edit.php:366
+#: include/views/administration.users.edit.php:365
 msgid "Delete selected user?"
 msgstr "Delete selected user?"
 
@@ -3724,7 +3706,7 @@ msgstr "Deleted: Proxy \"%1$s\"."
 msgid "Deleted: Template \"%1$s\"."
 msgstr "Deleted: Template \"%1$s\"."
 
-#: api/classes/CTrigger.php:853
+#: api/classes/CTrigger.php:857
 #, c-format
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Deleted: Trigger \"%1$s\" on \"%2$s\"."
@@ -3753,7 +3735,7 @@ msgstr "Delta (simple change)"
 msgid "Delta (speed per second)"
 msgstr "Delta (speed per second)"
 
-#: include/forms.inc.php:261 include/perm.inc.php:25
+#: include/forms.inc.php:264 include/perm.inc.php:25
 #: include/views/administration.usergroups.edit.php:82
 msgid "Deny"
 msgstr "Deny"
@@ -3764,11 +3746,11 @@ msgstr "Deny"
 msgid "Dependencies"
 msgstr "Dependencies"
 
-#: include/triggers.inc.php:1378 tr_status.php:605
+#: include/triggers.inc.php:1380 tr_status.php:605
 msgid "Dependent"
 msgstr "Dependent"
 
-#: include/triggers.inc.php:1358
+#: include/triggers.inc.php:1360
 #: include/views/configuration.services.edit.php:115
 #: include/views/configuration.triggers.list.php:171 popup.php:764
 #: tr_status.php:589
@@ -3793,11 +3775,11 @@ msgid "Description"
 msgstr "Description"
 
 #: include/actions.inc.php:966 include/blocks.inc.php:719
-#: include/func.inc.php:2186
+#: include/func.inc.php:2185
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:44
-#: include/views/configuration.action.edit.php:328
-#: include/views/configuration.action.edit.php:332
+#: include/views/configuration.action.edit.php:335
+#: include/views/configuration.action.edit.php:339
 #: include/views/inventory.host.view.php:282 jsrpc.php:136 queue.php:71
 msgid "Details"
 msgstr "Details"
@@ -3944,20 +3926,20 @@ msgstr "Disable selected media types?"
 msgid "Disable selected triggers?"
 msgstr "Disable selected triggers?"
 
-#: auditlogs.php:152 dashboard.php:270 include/discovery.inc.php:123
+#: auditlogs.php:152 dashboard.php:270 include/discovery.inc.php:122
 #: include/httptest.inc.php:46 include/items.inc.php:155
-#: include/items.inc.php:209 include/triggers.inc.php:1605
-#: include/triggers.inc.php:2454 include/users.inc.php:85
+#: include/items.inc.php:209 include/triggers.inc.php:1607
+#: include/triggers.inc.php:2456 include/users.inc.php:85
 #: include/views/administration.mediatypes.list.php:97
 #: include/views/administration.usergroups.list.php:59
 #: include/views/administration.usergroups.list.php:84
 #: include/views/administration.usergroups.list.php:88
-#: include/views/administration.users.edit.php:164
+#: include/views/administration.users.edit.php:163
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.list.php:73
 #: include/views/configuration.host.edit.php:757
-#: include/views/configuration.host.massupdate.php:238
+#: include/views/configuration.host.massupdate.php:240
 #: include/views/configuration.host.prototype.edit.php:299
 #: include/views/configuration.item.massupdate.php:300
 #: include/views/js/configuration.sysmaps.js.php:153
@@ -3971,7 +3953,7 @@ msgstr "Disabled"
 msgid "Disaster"
 msgstr "Disaster"
 
-#: include/discovery.inc.php:157
+#: include/discovery.inc.php:156
 msgid "Discovered"
 msgstr "Discovered"
 
@@ -4019,7 +4001,7 @@ msgid "Discovery object"
 msgstr "Discovery object"
 
 #: include/actions.inc.php:70 include/audit.inc.php:44
-#: include/blocks.inc.php:1159 include/forms.inc.php:1117
+#: include/blocks.inc.php:1166 include/forms.inc.php:1121
 #: include/views/configuration.discovery.edit.php:81
 #: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:32
@@ -4041,7 +4023,7 @@ msgstr "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from anoth
 msgid "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
 msgstr "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
 
-#: api/classes/CDRule.php:455 api/classes/CDRule.php:524
+#: api/classes/CDRule.php:447 api/classes/CDRule.php:516
 #, c-format
 msgid "Discovery rule \"%s\" already exists."
 msgstr "Discovery rule \"%s\" already exists."
@@ -4125,12 +4107,12 @@ msgstr "Done"
 msgid "Dot"
 msgstr "Dot"
 
-#: include/blocks.inc.php:1161
+#: include/blocks.inc.php:1168
 msgctxt "discovery results in dashboard"
 msgid "Down"
 msgstr "Down"
 
-#: include/discovery.inc.php:156
+#: include/discovery.inc.php:155
 msgctxt "discovery status"
 msgid "Down"
 msgstr "Down"
@@ -4176,7 +4158,7 @@ msgstr "Dropdown first entry \"%1$s\"."
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr "Dropdown remember selected \"%1$s\"."
 
-#: api/classes/CTrigger.php:1582
+#: api/classes/CTrigger.php:1586
 #, c-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr ""
@@ -4226,7 +4208,7 @@ msgstr "Duplicate user alias \"%s\"."
 msgid "Duration"
 msgstr "Duration"
 
-#: include/views/configuration.action.edit.php:328
+#: include/views/configuration.action.edit.php:335
 msgid "Duration (sec)"
 msgstr "Duration (sec)"
 
@@ -4243,7 +4225,7 @@ msgctxt "Exa short"
 msgid "E"
 msgstr "E"
 
-#: include/func.inc.php:2153
+#: include/func.inc.php:2152
 msgid "ERROR"
 msgstr "ERROR"
 
@@ -4255,9 +4237,9 @@ msgstr "EVENTS"
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "Each URL should have a unique name. Please make sure there is only one URL named"
 
-#: include/views/administration.users.edit.php:190
-#: include/views/configuration.action.edit.php:376
-#: include/views/configuration.action.edit.php:389
+#: include/views/administration.users.edit.php:189
+#: include/views/configuration.action.edit.php:383
+#: include/views/configuration.action.edit.php:396
 #: include/views/configuration.maintenance.edit.php:112
 #: include/views/configuration.screen.list.php:63
 #: include/views/configuration.sysmap.list.php:47
@@ -4332,8 +4314,8 @@ msgstr ""
 #: api/classes/CItemPrototype.php:489 api/classes/CProxy.php:487
 #: api/classes/CService.php:341 api/classes/CService.php:377
 #: api/classes/CService.php:443 api/classes/CService.php:515
-#: api/classes/CTemplate.php:617 api/classes/CTrigger.php:877
-#: api/classes/CTrigger.php:941 api/classes/CTrigger.php:1031
+#: api/classes/CTemplate.php:617 api/classes/CTrigger.php:881
+#: api/classes/CTrigger.php:945 api/classes/CTrigger.php:1035
 #: api/classes/CTriggerPrototype.php:652 api/classes/CUserGroup.php:602
 #: api/classes/CUserMacro.php:394 api/classes/CUserMacro.php:546
 #: api/classes/CUser.php:554
@@ -4344,7 +4326,7 @@ msgstr "Empty input parameter."
 msgid "Empty input parameters."
 msgstr ""
 
-#: api/classes/CDRule.php:250
+#: api/classes/CDRule.php:244
 msgid "Empty input."
 msgstr "Empty input."
 
@@ -4484,9 +4466,9 @@ msgstr "Enable selected media types?"
 msgid "Enable selected triggers?"
 msgstr "Enable selected triggers?"
 
-#: auditlogs.php:149 dashboard.php:270 include/discovery.inc.php:122
+#: auditlogs.php:149 dashboard.php:270 include/discovery.inc.php:121
 #: include/httptest.inc.php:45 include/items.inc.php:154
-#: include/items.inc.php:206 include/triggers.inc.php:2451
+#: include/items.inc.php:206 include/triggers.inc.php:2453
 #: include/views/administration.mediatypes.edit.php:96
 #: include/views/administration.mediatypes.list.php:96
 #: include/views/administration.usergroups.edit.php:65
@@ -4494,7 +4476,7 @@ msgstr "Enable selected triggers?"
 #: include/views/administration.usergroups.list.php:58
 #: include/views/administration.usergroups.list.php:83
 #: include/views/administration.usergroups.list.php:88
-#: include/views/administration.users.edit.php:160
+#: include/views/administration.users.edit.php:159
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.edit.php:59
@@ -4569,7 +4551,7 @@ msgstr "Event acknowledging disabled"
 msgid "Event details"
 msgstr "Event details"
 
-#: include/triggers.inc.php:1603
+#: include/triggers.inc.php:1605
 msgid "Event generation"
 msgstr "Event generation"
 
@@ -4600,11 +4582,11 @@ msgstr "Events"
 msgid "Events and alerts"
 msgstr ""
 
-#: include/forms.inc.php:1621
+#: include/forms.inc.php:1643
 msgid "Every day(s)"
 msgstr "Every day(s)"
 
-#: include/forms.inc.php:1628
+#: include/forms.inc.php:1650
 msgid "Every week(s)"
 msgstr "Every week(s)"
 
@@ -4627,13 +4609,13 @@ msgstr "Execute SQL error [%1$s] in [%2$s]."
 
 #: include/views/administration.script.edit.php:56
 #: include/views/administration.script.list.php:41
-#: include/views/configuration.action.edit.php:700
-#: include/views/js/configuration.action.edit.js.php:113 popup.php:1499
-#: popup.php:1506
+#: include/views/configuration.action.edit.php:708
+#: include/views/js/configuration.action.edit.js.php:113 popup.php:1500
+#: popup.php:1507
 msgid "Execute on"
 msgstr "Execute on"
 
-#: include/items.inc.php:1401 include/views/configuration.item.edit.php:195
+#: include/items.inc.php:1405 include/views/configuration.item.edit.php:195
 msgid "Executed script"
 msgstr "Executed script"
 
@@ -4672,7 +4654,7 @@ msgstr "Export selected"
 msgid "Export to CSV"
 msgstr "Export to CSV"
 
-#: include/triggers.inc.php:1602
+#: include/triggers.inc.php:1604
 #: include/views/administration.general.iconmap.edit.php:41
 #: include/views/administration.general.regularexpressions.edit.php:42
 #: include/views/administration.general.regularexpressions.edit.php:51
@@ -4686,8 +4668,8 @@ msgstr "Export to CSV"
 msgid "Expression"
 msgstr "Expression"
 
-#: include/forms.inc.php:1445 include/forms.inc.php:1450
-#: include/forms.inc.php:1463
+#: include/forms.inc.php:1467 include/forms.inc.php:1472
+#: include/forms.inc.php:1485
 msgid "Expression Syntax Error."
 msgstr "Expression Syntax Error."
 
@@ -4734,17 +4716,17 @@ msgstr "F"
 msgid "FALSE"
 msgstr "FALSE"
 
-#: include/discovery.inc.php:60
+#: include/discovery.inc.php:59
 #: include/views/js/configuration.discovery.edit.js.php:169
 msgid "FTP"
 msgstr "FTP"
 
-#: include/setup.inc.php:202 include/setup.inc.php:304
-#: include/setup.inc.php:458
+#: include/setup.inc.php:207 include/setup.inc.php:337
+#: include/setup.inc.php:502
 msgid "Fail"
 msgstr "Fail"
 
-#: include/actions.inc.php:1075 include/blocks.inc.php:1072
+#: include/actions.inc.php:1075 include/blocks.inc.php:1079
 msgid "Failed"
 msgstr "Failed"
 
@@ -4756,15 +4738,15 @@ msgstr "Failed to update template"
 msgid "Failure Audit"
 msgstr "Failure Audit"
 
-#: dashboard.php:311 include/blocks.inc.php:1181
+#: dashboard.php:311 include/blocks.inc.php:1188
 msgid "Favourite graphs"
 msgstr "Favorite graphs"
 
-#: dashboard.php:339 include/blocks.inc.php:1307
+#: dashboard.php:339 include/blocks.inc.php:1314
 msgid "Favourite maps"
 msgstr "Favorite maps"
 
-#: dashboard.php:325 include/blocks.inc.php:1352
+#: dashboard.php:325 include/blocks.inc.php:1359
 msgid "Favourite screens"
 msgstr "Favorite screens"
 
@@ -4776,7 +4758,7 @@ msgstr "Favorites"
 msgid "Feb"
 msgstr "Feb"
 
-#: include/forms.inc.php:1650 include/func.inc.php:113
+#: include/forms.inc.php:1672 include/func.inc.php:113
 #: include/func.inc.php:244 jsLoader.php:119
 msgid "February"
 msgstr "February"
@@ -4830,7 +4812,7 @@ msgstr ""
 msgid "Field \"%1$s\" must be missing."
 msgstr ""
 
-#: api/classes/CDRule.php:384
+#: api/classes/CDRule.php:376
 msgid "Field \"druleid\" is required."
 msgstr "Field \"druleid\" is required."
 
@@ -4838,7 +4820,7 @@ msgstr "Field \"druleid\" is required."
 msgid "Field \"host\" is mandatory"
 msgstr "Field \"host\" is mandatory"
 
-#: api/classes/CDRule.php:391
+#: api/classes/CDRule.php:383
 msgid "Field \"name\" is required."
 msgstr "Field \"name\" is required."
 
@@ -4861,18 +4843,18 @@ msgid "Filled region"
 msgstr "Filled region"
 
 #: events.php:356 hosts.php:765 include/classes/class.cwidget.php:130
-#: include/forms.inc.php:624
+#: include/forms.inc.php:627
 #: include/views/administration.auditacts.list.php:49
 #: include/views/administration.auditlogs.list.php:65
 #: include/views/configuration.item.edit.php:340
 #: include/views/inventory.host.list.php:52
 #: include/views/monitoring.dashconf.php:104
-#: include/views/monitoring.history.php:133 latest.php:302 report2.php:384
+#: include/views/monitoring.history.php:133 latest.php:302 report2.php:386
 #: tr_status.php:318
 msgid "Filter"
 msgstr "Filter"
 
-#: report2.php:317
+#: report2.php:319
 msgid "Filter by host group"
 msgstr "Filter by host group"
 
@@ -4888,7 +4870,7 @@ msgstr ""
 msgid "Find string V in last (most recent) value. N NOT 1 - if found, 0 - otherwise"
 msgstr ""
 
-#: include/setup.inc.php:129
+#: include/setup.inc.php:131
 msgid "Finish"
 msgstr "Finish"
 
@@ -4896,7 +4878,7 @@ msgstr "Finish"
 msgid "Finnish (fi_FI)"
 msgstr ""
 
-#: include/forms.inc.php:1688 include/maintenances.inc.php:118
+#: include/forms.inc.php:1710 include/maintenances.inc.php:118
 msgid "First"
 msgstr "First"
 
@@ -4923,11 +4905,11 @@ msgstr "Flexible intervals"
 msgid "For guest, password must be empty"
 msgstr "For guest, password must be empty"
 
-#: include/items.inc.php:1405 include/views/configuration.item.edit.php:207
+#: include/items.inc.php:1409 include/views/configuration.item.edit.php:207
 msgid "Formula"
 msgstr "Formula"
 
-#: include/forms.inc.php:1691 include/maintenances.inc.php:121
+#: include/forms.inc.php:1713 include/maintenances.inc.php:121
 msgid "Fourth"
 msgstr "Fourth"
 
@@ -4939,17 +4921,17 @@ msgstr "French (fr_FR)"
 msgid "Fri"
 msgstr "Fri"
 
-#: include/forms.inc.php:1635 include/forms.inc.php:1703
+#: include/forms.inc.php:1657 include/forms.inc.php:1725
 #: include/func.inc.php:135 include/func.inc.php:219
 msgid "Friday"
 msgstr "Friday"
 
 #: include/reports.inc.php:70 include/reports.inc.php:386
-#: include/views/configuration.action.edit.php:430
+#: include/views/configuration.action.edit.php:437
 #: include/views/configuration.services.edit.php:226
 #: include/views/configuration.services.edit.php:252
 #: include/views/js/configuration.sysmaps.js.php:334 popup_period.php:119
-#: report2.php:373 report3.php:143 report4.php:184 services.php:178
+#: report2.php:375 report3.php:143 report4.php:184 services.php:178
 #: services.php:184
 msgid "From"
 msgstr "From"
@@ -4965,7 +4947,7 @@ msgstr "Frontend access"
 msgid "Frontend access updated"
 msgstr "Frontend access updated"
 
-#: include/views/administration.users.edit.php:209
+#: include/views/administration.users.edit.php:208
 msgid "Frontend messaging"
 msgstr "Frontend messaging"
 
@@ -4979,7 +4961,7 @@ msgid "Fullscreen"
 msgstr "Fullscreen"
 
 #: include/views/configuration.graph.edit.php:73
-#: include/views/configuration.triggers.expression.php:70 popup_bitem.php:146
+#: include/views/configuration.triggers.expression.php:69 popup_bitem.php:146
 msgid "Function"
 msgstr "Function"
 
@@ -4994,7 +4976,7 @@ msgid "GSM modem"
 msgstr "GSM modem"
 
 #: adm.gui.php:95 adm.housekeeper.php:120 adm.iconmapping.php:109
-#: adm.images.php:131 adm.macros.php:158 adm.other.php:104 adm.regexps.php:192
+#: adm.images.php:131 adm.macros.php:158 adm.other.php:110 adm.regexps.php:192
 #: adm.triggerdisplayoptions.php:74 adm.triggerseverities.php:79
 #: adm.valuemapping.php:126 adm.workingtime.php:61
 #: include/views/administration.general.gui.edit.php:51
@@ -5026,7 +5008,7 @@ msgstr "Get support"
 msgid "Giga"
 msgstr "Giga"
 
-#: include/triggers.inc.php:1735 tr_testexpr.php:35
+#: include/triggers.inc.php:1737 tr_testexpr.php:35
 msgid "Given expression is not a macro"
 msgstr "Given expression is not a macro"
 
@@ -5034,7 +5016,7 @@ msgstr "Given expression is not a macro"
 msgid "Global expression does not exist."
 msgstr "Global expression does not exist."
 
-#: include/views/configuration.action.edit.php:685
+#: include/views/configuration.action.edit.php:693
 msgid "Global script"
 msgstr "Global script"
 
@@ -5072,7 +5054,7 @@ msgstr "Go"
 msgid "Go to"
 msgstr "Go to"
 
-#: include/func.inc.php:2084
+#: include/func.inc.php:2083
 msgid "Go to dashboard"
 msgstr ""
 
@@ -5084,11 +5066,11 @@ msgstr "Google Chrome"
 msgid "Gradient line"
 msgstr "Gradient line"
 
-#: include/audit.inc.php:29 include/blocks.inc.php:1188
+#: include/audit.inc.php:29 include/blocks.inc.php:1195
 #: include/screens.inc.php:30 include/views/configuration.graph.edit.php:285
 #: include/views/monitoring.charts.php:27
 #: include/views/monitoring.history.php:63 latest.php:404 latest.php:578
-#: report2.php:400
+#: report2.php:402
 msgid "Graph"
 msgstr "Graph"
 
@@ -5212,7 +5194,7 @@ msgstr ""
 msgid "Graph with same name but other type exist."
 msgstr "Graph with same name but other type exist."
 
-#: dashboard.php:312 hosts.php:797 hosts.php:890 include/blocks.inc.php:1288
+#: dashboard.php:312 hosts.php:797 hosts.php:890 include/blocks.inc.php:1295
 #: include/html.inc.php:470 include/html.inc.php:474 include/menu.inc.php:62
 #: include/views/configuration.graph.list.php:56
 #: include/views/configuration.host.discovery.list.php:52
@@ -5248,9 +5230,9 @@ msgstr "Grid"
 #: events.php:285 hostinventoriesoverview.php:83 hosts.php:750 httpmon.php:72
 #: include/classes/class.chostsinfo.php:112
 #: include/classes/class.ctriggersinfo.php:121
-#: include/classes/screens/CScreenHostgroupTriggers.php:61
-#: include/classes/screens/CScreenHostgroupTriggers.php:120
-#: include/classes/screens/CScreenHostTriggers.php:122
+#: include/classes/screens/CScreenHostgroupTriggers.php:66
+#: include/classes/screens/CScreenHostgroupTriggers.php:125
+#: include/classes/screens/CScreenHostTriggers.php:126
 #: include/reports.inc.php:345 include/screens.inc.php:340
 #: include/views/configuration.application.list.php:44
 #: include/views/configuration.copy.elements.php:59
@@ -5295,13 +5277,14 @@ msgstr "Group added"
 msgid "Group deleted"
 msgstr "Group deleted"
 
-#: include/views/administration.general.other.edit.php:37
+#: include/views/administration.general.other.edit.php:36
 msgid "Group for discovered hosts"
 msgstr "Group for discovered hosts"
 
-#: adm.other.php:71
-msgid "Group for discovered hosts."
-msgstr "Group for discovered hosts."
+#: adm.other.php:74
+#, c-format
+msgid "Group for discovered hosts \"%1$s\"."
+msgstr ""
 
 #: include/views/administration.usergroups.edit.php:41
 #: include/views/configuration.hostgroups.edit.php:40
@@ -5336,7 +5319,7 @@ msgstr "Grouping by"
 #: include/views/configuration.host.prototype.edit.php:177
 #: include/views/configuration.host.prototype.edit.php:205
 #: include/views/configuration.template.edit.php:115
-#: include/views/conf.import.php:26 popup_usrgrp.php:25 popup_usrgrp.php:49
+#: include/views/conf.import.php:26
 msgid "Groups"
 msgstr "Groups"
 
@@ -5354,8 +5337,8 @@ msgid "H:i"
 msgstr "h:i A"
 
 #: include/blocks.inc.php:367 include/blocks.inc.php:707
-#: include/blocks.inc.php:774 include/blocks.inc.php:1018
-#: include/blocks.inc.php:1117 include/blocks.inc.php:1175
+#: include/blocks.inc.php:774 include/blocks.inc.php:1025
+#: include/blocks.inc.php:1124 include/blocks.inc.php:1182
 #: include/classes/screens/CScreenSystemStatus.php:47 include/html.inc.php:593
 #: include/views/configuration.hostgroups.list.php:139
 #: include/views/configuration.item.list.php:128
@@ -5366,6 +5349,10 @@ msgstr "h:i:s A"
 msgid "HISTORY OF EVENTS"
 msgstr "HISTORY OF EVENTS"
 
+#: include/classes/screens/CScreenHostgroupTriggers.php:132
+msgid "HOST GROUP ISSUES"
+msgstr ""
+
 #: include/views/inventory.host.list.php:26
 #: include/views/inventory.host.view.php:24
 msgid "HOST INVENTORY"
@@ -5375,7 +5362,11 @@ msgstr ""
 msgid "HOST INVENTORY OVERVIEW"
 msgstr "HOST INVENTORY OVERVIEW"
 
-#: include/discovery.inc.php:61
+#: include/classes/screens/CScreenHostTriggers.php:131
+msgid "HOST ISSUES"
+msgstr ""
+
+#: include/discovery.inc.php:60
 #: include/views/administration.authentication.edit.php:39
 #: include/views/js/configuration.discovery.edit.js.php:170
 msgid "HTTP"
@@ -5389,7 +5380,7 @@ msgstr "HTTP authentication"
 msgid "HTTP proxy"
 msgstr ""
 
-#: include/discovery.inc.php:72
+#: include/discovery.inc.php:71
 #: include/views/js/configuration.discovery.edit.js.php:171
 msgid "HTTPS"
 msgstr "HTTPS"
@@ -5416,7 +5407,7 @@ msgstr "Hardware (Full details)"
 msgid "Height"
 msgstr "Height"
 
-#: include/page_header.php:203 include/views/general.login.php:40
+#: include/page_header.php:203 include/views/general.login.php:38
 msgid "Help"
 msgstr "Help"
 
@@ -5459,7 +5450,7 @@ msgstr ""
 msgid "High"
 msgstr "High"
 
-#: history.php:27 include/forms.inc.php:934 include/page_header.php:425
+#: history.php:27 include/forms.inc.php:937 include/page_header.php:425
 #: include/views/administration.general.housekeeper.edit.php:133
 #: include/views/configuration.item.list.php:68
 #: include/views/configuration.item.prototype.list.php:54 jsLoader.php:107
@@ -5471,7 +5462,7 @@ msgstr "History"
 msgid "History and simple graphs"
 msgstr "History and simple graphs"
 
-#: httpconf.php:307 items.php:500 items.php:505 items.php:738 items.php:744
+#: httpconf.php:307 items.php:500 items.php:505 items.php:739 items.php:745
 msgid "History cleared"
 msgstr "History cleared"
 
@@ -5498,20 +5489,20 @@ msgstr "Horizontal align"
 #: events.php:289 events.php:528 events.php:579 events.php:592 httpmon.php:73
 #: httpmon.php:87 include/actions.inc.php:64 include/audit.inc.php:27
 #: include/blocks.inc.php:592 include/blocks.inc.php:639
-#: include/blocks.inc.php:887 include/blocks.inc.php:897
-#: include/blocks.inc.php:1462 include/classes/screens/CScreenEvents.php:41
-#: include/classes/screens/CScreenHostgroupTriggers.php:121
-#: include/classes/screens/CScreenHostTriggers.php:63
-#: include/classes/screens/CScreenHostTriggers.php:123
-#: include/forms.inc.php:552 include/html.inc.php:378 include/maps.inc.php:24
-#: include/setup.inc.php:317 include/triggers.inc.php:1247
-#: include/triggers.inc.php:1599
+#: include/blocks.inc.php:893 include/blocks.inc.php:904
+#: include/blocks.inc.php:1469 include/classes/screens/CScreenEvents.php:41
+#: include/classes/screens/CScreenHostgroupTriggers.php:126
+#: include/classes/screens/CScreenHostTriggers.php:67
+#: include/classes/screens/CScreenHostTriggers.php:127
+#: include/forms.inc.php:555 include/html.inc.php:378 include/maps.inc.php:24
+#: include/setup.inc.php:350 include/triggers.inc.php:1249
+#: include/triggers.inc.php:1601
 #: include/views/configuration.application.list.php:45
 #: include/views/configuration.application.list.php:61
 #: include/views/configuration.graph.list.php:54
 #: include/views/configuration.host.edit.php:52
 #: include/views/configuration.host.edit.php:620
-#: include/views/configuration.host.massupdate.php:289
+#: include/views/configuration.host.massupdate.php:291
 #: include/views/configuration.host.prototype.edit.php:164
 #: include/views/configuration.httpconf.list.php:44
 #: include/views/configuration.httpconf.list.php:62
@@ -5529,10 +5520,10 @@ msgstr "Horizontal align"
 #: include/views/js/configuration.sysmaps.js.php:99
 #: include/views/monitoring.charts.php:26
 #: include/views/monitoring.screen.php:97
-#: include/views/monitoring.slides.php:83 items.php:500 items.php:738
-#: items.php:765 jsLoader.php:146 latest.php:292 latest.php:318 latest.php:335
+#: include/views/monitoring.slides.php:83 items.php:500 items.php:739
+#: items.php:766 jsLoader.php:146 latest.php:292 latest.php:318 latest.php:335
 #: popup.php:510 popup.php:526 popup.php:818 popup.php:1019 queue.php:202
-#: report2.php:360 report2.php:396 report5.php:59 tr_status.php:250
+#: report2.php:362 report2.php:398 report5.php:59 tr_status.php:250
 #: tr_status.php:367
 msgid "Host"
 msgstr "Host"
@@ -5588,7 +5579,7 @@ msgstr "Host deleted"
 
 #: include/actions.inc.php:60 include/audit.inc.php:35
 #: include/blocks.inc.php:186 include/blocks.inc.php:376
-#: include/blocks.inc.php:1070 include/forms.inc.php:514
+#: include/blocks.inc.php:1077 include/forms.inc.php:517
 #: include/maps.inc.php:25 include/views/administration.script.list.php:44
 #: include/views/configuration.hostgroups.edit.php:67
 #: include/views/js/configuration.action.edit.js.php:89
@@ -5596,7 +5587,7 @@ msgstr "Host deleted"
 #: include/views/js/configuration.sysmaps.js.php:20
 #: include/views/js/configuration.sysmaps.js.php:30
 #: include/views/js/configuration.sysmaps.js.php:91 jsLoader.php:149
-#: report2.php:339 search.php:271
+#: report2.php:341 search.php:271
 msgid "Host group"
 msgstr "Host group"
 
@@ -5624,6 +5615,10 @@ msgstr ""
 msgid "Host group elements"
 msgstr "Host group elements"
 
+#: include/screens.inc.php:39
+msgid "Host group issues"
+msgstr ""
+
 #: include/views/configuration.sysmap.edit.php:75
 msgid "Host group label type"
 msgstr "Host group label type"
@@ -5632,7 +5627,7 @@ msgstr "Host group label type"
 msgid "Host group name cannot be empty."
 msgstr ""
 
-#: include/forms.inc.php:194 include/menu.inc.php:160
+#: include/forms.inc.php:197 include/menu.inc.php:160
 #: include/views/administration.script.edit.php:84
 #: include/views/configuration.copy.elements.php:47
 #: include/views/configuration.hostgroups.list.php:39
@@ -5658,6 +5653,10 @@ msgstr "Host inventory"
 #: hostinventoriesoverview.php:26
 msgid "Host inventory overview"
 msgstr "Host inventory overview"
+
+#: include/screens.inc.php:40
+msgid "Host issues"
+msgstr ""
 
 #: include/views/configuration.sysmap.edit.php:83
 msgid "Host label type"
@@ -5804,8 +5803,8 @@ msgstr "Host with the same name \"%s\" already exists."
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "Host with the same visible name \"%s\" already exists."
 
-#: hostinventoriesoverview.php:85 hosts.php:752 include/forms.inc.php:217
-#: include/forms.inc.php:894 include/items.inc.php:813
+#: hostinventoriesoverview.php:85 hosts.php:752 include/forms.inc.php:220
+#: include/forms.inc.php:897 include/items.inc.php:817
 #: include/menu.inc.php:112 include/menu.inc.php:168
 #: include/reports.inc.php:378 include/views/administration.proxy.edit.php:88
 #: include/views/administration.proxy.list.php:52
@@ -5859,12 +5858,12 @@ msgstr "Hosts updated"
 msgid "Hourly"
 msgstr "Hourly"
 
-#: include/forms.inc.php:1754
+#: include/forms.inc.php:1778
 msgid "Hours"
 msgstr "Hours"
 
 #: adm.gui.php:96 adm.housekeeper.php:121 adm.iconmapping.php:110
-#: adm.images.php:132 adm.macros.php:159 adm.other.php:105 adm.regexps.php:193
+#: adm.images.php:132 adm.macros.php:159 adm.other.php:111 adm.regexps.php:193
 #: adm.triggerdisplayoptions.php:75 adm.triggerseverities.php:80
 #: adm.valuemapping.php:127 adm.workingtime.php:62
 #: include/views/administration.general.housekeeper.edit.php:158
@@ -5875,7 +5874,7 @@ msgstr "Housekeeper"
 msgid "Hungarian (hu_HU)"
 msgstr "Hungarian (hu_HU)"
 
-#: include/discovery.inc.php:70
+#: include/discovery.inc.php:69
 #: include/views/js/configuration.discovery.edit.js.php:172
 msgid "ICMP ping"
 msgstr "ICMP ping"
@@ -5886,7 +5885,7 @@ msgstr "ICMP ping"
 msgid "ID"
 msgstr "ID"
 
-#: include/discovery.inc.php:64
+#: include/discovery.inc.php:63
 #: include/views/js/configuration.discovery.edit.js.php:173
 msgid "IMAP"
 msgstr "IMAP"
@@ -5912,7 +5911,7 @@ msgstr "IP"
 #: include/views/inventory.host.view.php:103
 #: include/views/inventory.host.view.php:125
 #: include/views/inventory.host.view.php:147
-#: include/views/inventory.host.view.php:169
+#: include/views/inventory.host.view.php:168
 msgid "IP address"
 msgstr "IP address"
 
@@ -5925,16 +5924,16 @@ msgstr "IP and DNS cannot be empty for host interface."
 msgid "IP range"
 msgstr "IP range"
 
-#: api/classes/CDRule.php:262
+#: api/classes/CDRule.php:254
 msgid "IP range cannot be empty."
 msgstr "IP range cannot be empty."
 
 #: include/hosts.inc.php:477 include/items.inc.php:247
 #: include/views/administration.script.edit.php:46
 #: include/views/administration.script.list.php:54
-#: include/views/configuration.action.edit.php:681
+#: include/views/configuration.action.edit.php:689
 #: include/views/configuration.host.edit.php:721
-#: include/views/configuration.host.massupdate.php:291
+#: include/views/configuration.host.massupdate.php:293
 #: include/views/configuration.host.prototype.edit.php:268
 msgid "IPMI"
 msgstr "IPMI"
@@ -5943,22 +5942,22 @@ msgstr "IPMI"
 msgid "IPMI agent"
 msgstr "IPMI agent"
 
-#: include/views/configuration.host.massupdate.php:199
+#: include/views/configuration.host.massupdate.php:201
 msgid "IPMI authentication algorithm"
 msgstr "IPMI authentication algorithm"
 
 #: include/views/configuration.host.edit.php:293
 #: include/views/configuration.host.edit.php:369
 #: include/views/configuration.host.prototype.edit.php:146
-#: include/views/inventory.host.view.php:156
+#: include/views/inventory.host.view.php:177
 msgid "IPMI interfaces"
 msgstr "IPMI interfaces"
 
-#: include/views/configuration.host.massupdate.php:228
+#: include/views/configuration.host.massupdate.php:230
 msgid "IPMI password"
 msgstr "IPMI password"
 
-#: include/views/configuration.host.massupdate.php:210
+#: include/views/configuration.host.massupdate.php:212
 msgid "IPMI privilege level"
 msgstr "IPMI privilege level"
 
@@ -5967,7 +5966,7 @@ msgstr "IPMI privilege level"
 msgid "IPMI sensor"
 msgstr "IPMI sensor"
 
-#: include/views/configuration.host.massupdate.php:219
+#: include/views/configuration.host.massupdate.php:221
 msgid "IPMI username"
 msgstr "IPMI username"
 
@@ -6108,8 +6107,8 @@ msgid "Icon map with iconmapid \"%s\" does not exist."
 msgstr "Icon map with iconmapid \"%s\" does not exist."
 
 #: adm.gui.php:98 adm.housekeeper.php:123 adm.iconmapping.php:112
-#: adm.iconmapping.php:174 adm.images.php:134 adm.macros.php:161
-#: adm.other.php:107 adm.regexps.php:195 adm.triggerdisplayoptions.php:77
+#: adm.iconmapping.php:176 adm.images.php:134 adm.macros.php:161
+#: adm.other.php:113 adm.regexps.php:195 adm.triggerdisplayoptions.php:77
 #: adm.triggerseverities.php:82 adm.valuemapping.php:129
 #: adm.workingtime.php:64
 msgid "Icon mapping"
@@ -6132,7 +6131,7 @@ msgstr "Icons"
 msgid "Identical expression already exists"
 msgstr ""
 
-#: include/func.inc.php:2074 include/func.inc.php:2094
+#: include/func.inc.php:2073 include/func.inc.php:2093
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 
@@ -6177,7 +6176,7 @@ msgid "Image updated"
 msgstr "Image updated"
 
 #: adm.gui.php:97 adm.housekeeper.php:122 adm.iconmapping.php:111
-#: adm.images.php:133 adm.macros.php:160 adm.other.php:106 adm.regexps.php:194
+#: adm.images.php:133 adm.macros.php:160 adm.other.php:112 adm.regexps.php:194
 #: adm.triggerdisplayoptions.php:76 adm.triggerseverities.php:81
 #: adm.valuemapping.php:128 adm.workingtime.php:63
 #: include/views/administration.general.image.list.php:29
@@ -6189,7 +6188,7 @@ msgstr "Images"
 msgid "Images for all maps will be updated!"
 msgstr "Images for all maps will be updated!"
 
-#: include/views/configuration.action.edit.php:368
+#: include/views/configuration.action.edit.php:375
 msgid "Immediately"
 msgstr "Immediately"
 
@@ -6212,7 +6211,7 @@ msgstr "Import file"
 msgid "Imported successfully"
 msgstr "Imported successfully"
 
-#: hostinventories.php:171
+#: hostinventories.php:173
 #, c-format
 msgid "Impossible to filter by inventory field \"%s\", which does not exist."
 msgstr "Impossible to filter by inventory field \"%s\", which does not exist."
@@ -6263,17 +6262,17 @@ msgstr "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgid "Incorrect %1$s label type value for map \"%2$s\"."
 msgstr "Incorrect %1$s label type value for map \"%2$s\"."
 
-#: api/classes/CDRule.php:265
+#: api/classes/CDRule.php:257
 #, c-format
 msgid "Incorrect IP range \"%s\"."
 msgstr "Incorrect IP range \"%s\"."
 
-#: api/classes/CDRule.php:329
+#: api/classes/CDRule.php:321
 #: include/views/js/configuration.discovery.edit.js.php:568
 msgid "Incorrect SNMP OID."
 msgstr "Incorrect SNMP OID."
 
-#: api/classes/CDRule.php:325
+#: api/classes/CDRule.php:317
 #: include/views/js/configuration.discovery.edit.js.php:564
 msgid "Incorrect SNMP community."
 msgstr "Incorrect SNMP community."
@@ -6431,12 +6430,12 @@ msgstr "Incorrect arguments passed to function."
 msgid "Incorrect arguments passed to method."
 msgstr "Incorrect arguments passed to method."
 
-#: api/classes/CDRule.php:358
+#: api/classes/CDRule.php:350
 #, c-format
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:355
+#: api/classes/CItemGeneral.php:372
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr ""
@@ -6480,7 +6479,7 @@ msgstr "Incorrect characters used for template name \"%s\"."
 msgid "Incorrect column span provided for screen element located at X - %1$s and Y - %2$s."
 msgstr ""
 
-#: api/classes/CDRule.php:269
+#: api/classes/CDRule.php:261
 msgid "Incorrect delay."
 msgstr "Incorrect delay."
 
@@ -6511,7 +6510,7 @@ msgstr "Incorrect field \"%1$s\" name or value in where statement for table \"%2
 msgid "Incorrect fields for sysmap."
 msgstr ""
 
-#: api/classes/CTrigger.php:664
+#: api/classes/CTrigger.php:668
 msgid "Incorrect fields for trigger."
 msgstr "Incorrect fields for trigger."
 
@@ -6519,17 +6518,17 @@ msgstr "Incorrect fields for trigger."
 msgid "Incorrect file upload."
 msgstr "Incorrect file upload."
 
-#: api/classes/CItemGeneral.php:811
+#: api/classes/CItemGeneral.php:828
 #, c-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "Incorrect flexible interval \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:800
+#: api/classes/CItemGeneral.php:817
 #, c-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 
-#: include/triggers.inc.php:629 include/triggers.inc.php:1736
+#: include/triggers.inc.php:629 include/triggers.inc.php:1738
 #: tr_testexpr.php:36
 msgid "Incorrect function is used"
 msgstr "Incorrect function is used"
@@ -6608,7 +6607,7 @@ msgstr "Incorrect item ID \"%s\" provided for screen element."
 msgid "Incorrect item for axis value."
 msgstr "Incorrect item for axis value."
 
-#: api/classes/CTrigger.php:732 include/triggers.inc.php:1002
+#: api/classes/CTrigger.php:736 include/triggers.inc.php:1002
 #, c-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
 msgstr "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
@@ -6618,17 +6617,17 @@ msgstr "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\".
 msgid "Incorrect item value type \"%1$s\" provided for trigger function \"%2$s\"."
 msgstr ""
 
-#: api/classes/CDRule.php:314
+#: api/classes/CDRule.php:306
 msgid "Incorrect key."
 msgstr "Incorrect key."
 
-#: api/classes/CDRule.php:319 api/classes/CItemGeneral.php:288
+#: api/classes/CDRule.php:311 api/classes/CItemGeneral.php:289
 #: discoveryconf.php:110
 #, c-format
 msgid "Incorrect key: \"%1$s\"."
 msgstr "Incorrect key: \"%1$s\"."
 
-#: include/forms.inc.php:1270 items.php:890
+#: include/forms.inc.php:1292 items.php:891
 msgid "Incorrect list of items."
 msgstr "Incorrect list of items."
 
@@ -6737,21 +6736,21 @@ msgstr "Incorrect parent for service \"%1$s\"."
 msgid "Incorrect parent service."
 msgstr "Incorrect parent service."
 
-#: api/classes/CDRule.php:308 discoveryconf.php:103
+#: api/classes/CDRule.php:300 discoveryconf.php:103
 msgid "Incorrect port range."
 msgstr "Incorrect port range."
 
-#: api/classes/CDRule.php:367
+#: api/classes/CDRule.php:359
 #, c-format
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:364
+#: api/classes/CItemGeneral.php:381
 #, c-format
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr ""
 
-#: api/classes/CDRule.php:295
+#: api/classes/CDRule.php:287
 msgid "Incorrect proxyid."
 msgstr "Incorrect proxyid."
 
@@ -6809,7 +6808,7 @@ msgstr ""
 msgid "Incorrect status for service \"%1$s\"."
 msgstr "Incorrect status for service \"%1$s\"."
 
-#: api/classes/CDRule.php:273
+#: api/classes/CDRule.php:265
 msgid "Incorrect status."
 msgstr "Incorrect status."
 
@@ -6863,12 +6862,12 @@ msgstr "Incorrect trigger expression."
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
 
-#: api/classes/CTrigger.php:712
+#: api/classes/CTrigger.php:716
 #, c-format
 msgid "Incorrect trigger expression. Host \"%s\" does not exist or you have no access to this host."
 msgstr "Incorrect trigger expression. Host \"%s\" does not exist or you have no access to this host."
 
-#: api/classes/CTrigger.php:718
+#: api/classes/CTrigger.php:722
 msgid "Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously."
 msgstr "Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously."
 
@@ -6894,7 +6893,7 @@ msgstr "Incorrect usage of bracket symbols. \"%1$s\" found after final bracket."
 msgid "Incorrect user data in \"get_accessible_groups_by_user\"."
 msgstr "Incorrect user data in \"get_accessible_groups_by_user\"."
 
-#: include/perm.inc.php:227
+#: include/perm.inc.php:239
 msgid "Incorrect user data in \"get_accessible_nodes_by_user\"."
 msgstr "Incorrect user data in \"get_accessible_nodes_by_user\"."
 
@@ -6927,7 +6926,7 @@ msgstr "Incorrect value \"%1$s\" for int field \"%2$s\"."
 msgid "Incorrect value \"%1$s\" for unsigned int field \"%2$s\"."
 msgstr "Incorrect value \"%1$s\" for unsigned int field \"%2$s\"."
 
-#: include/reports.inc.php:540 include/reports.inc.php:544
+#: include/reports.inc.php:539 include/reports.inc.php:543
 #, c-format
 msgid "Incorrect value for field \"%1$s\"."
 msgstr ""
@@ -6965,7 +6964,7 @@ msgstr "Incorrect y min item for graph \"%1$s\"."
 msgid "Indonesian (id_ID)"
 msgstr ""
 
-#: include/blocks.inc.php:901 include/blocks.inc.php:1465
+#: include/blocks.inc.php:908 include/blocks.inc.php:1472
 #: include/classes/class.cformlist.php:72 tr_status.php:361
 msgid "Info"
 msgstr "Info"
@@ -6975,15 +6974,15 @@ msgstr "Info"
 msgid "Information"
 msgstr "Information"
 
-#: include/views/configuration.triggers.expression.php:131
+#: include/views/configuration.triggers.expression.php:130
 msgid "Insert"
 msgstr "Insert"
 
-#: include/forms.inc.php:1457 jsLoader.php:109
+#: include/forms.inc.php:1479 jsLoader.php:109
 msgid "Insert macro"
 msgstr "Insert macro"
 
-#: include/menu.inc.php:277 include/profiles.inc.php:261 setup.php:120
+#: include/menu.inc.php:277 include/profiles.inc.php:261 setup.php:127
 msgid "Installation"
 msgstr "Installation"
 
@@ -7047,7 +7046,7 @@ msgstr "Internal error."
 msgid "Internet Explorer"
 msgstr "Internet Explorer"
 
-#: include/forms.inc.php:944
+#: include/forms.inc.php:947
 #: include/views/configuration.host.discovery.list.php:55
 #: include/views/configuration.item.edit.php:276
 #: include/views/configuration.item.list.php:67
@@ -7113,7 +7112,7 @@ msgstr ""
 msgid "Invalid params."
 msgstr "Invalid params."
 
-#: include/reports.inc.php:590 include/reports.inc.php:594
+#: include/reports.inc.php:589 include/reports.inc.php:593
 #, c-format
 msgid "Invalid period for field \"%1$s\"."
 msgstr ""
@@ -7146,7 +7145,7 @@ msgid "Invalid view name given \"%s\". Allowed chars: \"a-z\" and \".\"."
 msgstr "Invalid view name given \"%s\". Allowed chars: \"a-z\" and \".\"."
 
 #: include/menu.inc.php:101
-#: include/views/configuration.host.massupdate.php:292
+#: include/views/configuration.host.massupdate.php:294
 msgid "Inventory"
 msgstr "Inventory"
 
@@ -7159,7 +7158,7 @@ msgstr ""
 msgid "Inventory field"
 msgstr "Inventory field"
 
-#: include/views/configuration.host.massupdate.php:243
+#: include/views/configuration.host.massupdate.php:245
 msgid "Inventory mode"
 msgstr "Inventory mode"
 
@@ -7167,8 +7166,8 @@ msgstr "Inventory mode"
 msgid "Is online?"
 msgstr "Is online?"
 
-#: include/blocks.inc.php:889 include/blocks.inc.php:898
-#: include/blocks.inc.php:1463
+#: include/blocks.inc.php:895 include/blocks.inc.php:905
+#: include/blocks.inc.php:1470
 msgid "Issue"
 msgstr "Issue"
 
@@ -7189,11 +7188,11 @@ msgid "Italian (it_IT)"
 msgstr "Italian (it_IT)"
 
 #: include/audit.inc.php:36 include/classes/screens/CScreenHistory.php:163
-#: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1120
+#: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1124
 #: include/reports.inc.php:434 include/views/configuration.graph.edit.php:166
 #: include/views/configuration.graph.edit.php:221
 #: include/views/configuration.triggers.expression.php:57 items.php:499
-#: items.php:738 items.php:764 tr_logform.php:273
+#: items.php:739 items.php:765 tr_logform.php:273
 msgid "Item"
 msgstr "Item"
 
@@ -7238,7 +7237,7 @@ msgstr "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Item \"%1$s\" skipped - user rule."
 
-#: api/classes/CItemGeneral.php:346
+#: api/classes/CItemGeneral.php:363
 #, c-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
@@ -7263,7 +7262,7 @@ msgstr ""
 msgid "Item in \"not supported\" state"
 msgstr ""
 
-#: include/forms.inc.php:1120
+#: include/forms.inc.php:1124
 msgid "Item prototype"
 msgstr "Item prototype"
 
@@ -7300,48 +7299,48 @@ msgstr "Item uses host interface from non-parent host."
 msgid "Item uses incorrect interface type."
 msgstr "Item uses incorrect interface type."
 
-#: api/classes/CItemGeneral.php:324
+#: api/classes/CItemGeneral.php:321
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Item will not be refreshed. Please enter a correct update interval."
 
-#: api/classes/CItemGeneral.php:417
+#: api/classes/CItemGeneral.php:434
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 
-#: api/classes/CItemGeneral.php:423
+#: api/classes/CItemGeneral.php:440
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 
-#: api/classes/CItemGeneral.php:420
+#: api/classes/CItemGeneral.php:437
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 
-#: api/classes/CItemGeneral.php:414
+#: api/classes/CItemGeneral.php:431
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 
-#: api/classes/CItemGeneral.php:426
+#: api/classes/CItemGeneral.php:443
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 
-#: api/classes/CItemGeneral.php:777
+#: api/classes/CItemGeneral.php:794
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Item with key \"%1$s\" already exists on \"%2$s\"."
 
-#: api/classes/managers/CHttpTestManager.php:693
-#: api/classes/managers/CHttpTestManager.php:824
+#: api/classes/managers/CHttpTestManager.php:695
+#: api/classes/managers/CHttpTestManager.php:826
 #, c-format
 msgid "Item with key \"%1$s\" already exists."
 msgstr ""
 
 #: hosts.php:795 hosts.php:886 include/html.inc.php:420
-#: include/html.inc.php:424 include/items.inc.php:796
+#: include/html.inc.php:424 include/items.inc.php:800
 #: include/reports.inc.php:117 include/reports.inc.php:257
 #: include/views/configuration.application.list.php:99
 #: include/views/configuration.graph.edit.php:276
@@ -7361,19 +7360,19 @@ msgstr "Items"
 msgid "Items (m/d/n)"
 msgstr "Items (m/d/n)"
 
-#: applications.php:211 disc_prototypes.php:325 items.php:675
+#: applications.php:211 disc_prototypes.php:325 items.php:676
 msgid "Items activated"
 msgstr "Items activated"
 
-#: items.php:716
+#: items.php:717
 msgid "Items copied"
 msgstr "Items copied"
 
-#: disc_prototypes.php:336 items.php:769
+#: disc_prototypes.php:336 items.php:770
 msgid "Items deleted"
 msgstr "Items deleted"
 
-#: applications.php:214 disc_prototypes.php:325 items.php:686
+#: applications.php:214 disc_prototypes.php:325 items.php:687
 msgid "Items disabled"
 msgstr "Items disabled"
 
@@ -7381,7 +7380,7 @@ msgstr "Items disabled"
 msgid "Items list"
 msgstr "Items list"
 
-#: items.php:660
+#: items.php:661
 msgid "Items updated"
 msgstr "Items updated"
 
@@ -7396,7 +7395,7 @@ msgstr "JMX agent"
 #: include/views/configuration.host.edit.php:278
 #: include/views/configuration.host.edit.php:356
 #: include/views/configuration.host.prototype.edit.php:133
-#: include/views/inventory.host.view.php:177
+#: include/views/inventory.host.view.php:155
 msgid "JMX interfaces"
 msgstr "JMX interfaces"
 
@@ -7431,7 +7430,7 @@ msgstr "Jabber identifier"
 msgid "Jan"
 msgstr "Jan"
 
-#: include/forms.inc.php:1645 include/func.inc.php:112
+#: include/forms.inc.php:1667 include/func.inc.php:112
 #: include/func.inc.php:243 jsLoader.php:118
 msgid "January"
 msgstr "January"
@@ -7444,7 +7443,7 @@ msgstr "Japanese (ja_JP)"
 msgid "Jul"
 msgstr "Jul"
 
-#: include/forms.inc.php:1647 include/func.inc.php:118
+#: include/forms.inc.php:1669 include/func.inc.php:118
 #: include/func.inc.php:249 jsLoader.php:124
 msgid "July"
 msgstr "July"
@@ -7453,7 +7452,7 @@ msgstr "July"
 msgid "Jun"
 msgstr "Jun"
 
-#: include/forms.inc.php:1670 include/func.inc.php:117
+#: include/forms.inc.php:1692 include/func.inc.php:117
 #: include/func.inc.php:248 jsLoader.php:123
 msgid "June"
 msgstr "June"
@@ -7502,7 +7501,7 @@ msgstr ""
 msgid "Keep data for (in days)"
 msgstr ""
 
-#: include/forms.inc.php:588
+#: include/forms.inc.php:591
 msgid "Keep history"
 msgstr "Keep history"
 
@@ -7560,7 +7559,7 @@ msgstr ""
 msgid "Keep trend data for (in days) \"%1$s\"."
 msgstr ""
 
-#: include/forms.inc.php:603
+#: include/forms.inc.php:606
 msgid "Keep trends"
 msgstr "Keep trends"
 
@@ -7592,7 +7591,7 @@ msgstr ""
 msgid "Keep user session data for (in days) \"%1$s\"."
 msgstr ""
 
-#: disc_prototypes.php:44 host_discovery.php:45 include/forms.inc.php:614
+#: disc_prototypes.php:44 host_discovery.php:45 include/forms.inc.php:617
 #: include/views/configuration.host.discovery.list.php:54
 #: include/views/configuration.item.edit.php:78
 #: include/views/configuration.item.list.php:66
@@ -7602,7 +7601,7 @@ msgstr ""
 msgid "Key"
 msgstr "Key"
 
-#: api/classes/CItemGeneral.php:298
+#: api/classes/CItemGeneral.php:300
 #, c-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
@@ -7611,7 +7610,7 @@ msgstr "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s
 msgid "Key cannot be empty."
 msgstr "Key cannot be empty."
 
-#: include/views/configuration.action.edit.php:746
+#: include/views/configuration.action.edit.php:754
 #: include/views/js/configuration.item.edit.js.php:135
 msgid "Key passphrase"
 msgstr "Key passphrase"
@@ -7632,15 +7631,7 @@ msgstr "Korean (ko_KR)"
 msgid "LATEST DATA"
 msgstr "LATEST DATA"
 
-#: include/classes/screens/CScreenHostgroupTriggers.php:127
-msgid "LATEST HOST GROUP ISSUES"
-msgstr ""
-
-#: include/classes/screens/CScreenHostTriggers.php:127
-msgid "LATEST HOST ISSUES"
-msgstr ""
-
-#: include/discovery.inc.php:58
+#: include/discovery.inc.php:57
 #: include/views/administration.authentication.edit.php:37
 #: include/views/js/configuration.discovery.edit.js.php:175
 msgid "LDAP"
@@ -7672,7 +7663,7 @@ msgid "LOST"
 msgstr "LOST"
 
 #: include/maps.inc.php:45 include/views/configuration.action.edit.php:70
-#: include/views/configuration.action.edit.php:879
+#: include/views/configuration.action.edit.php:889
 #: include/views/js/configuration.sysmaps.js.php:70
 #: include/views/js/configuration.sysmaps.js.php:231
 #: include/views/js/configuration.sysmaps.js.php:349
@@ -7684,11 +7675,11 @@ msgstr "Label"
 msgid "Label location"
 msgstr "Label location"
 
-#: include/views/administration.users.edit.php:130
+#: include/views/administration.users.edit.php:129
 msgid "Language"
 msgstr "Language"
 
-#: include/forms.inc.php:1692 include/maintenances.inc.php:122
+#: include/forms.inc.php:1714 include/maintenances.inc.php:122
 msgid "Last"
 msgstr "Last"
 
@@ -7736,7 +7727,7 @@ msgstr "Last 365 days"
 msgid "Last 7 days"
 msgstr "Last 7 days"
 
-#: include/blocks.inc.php:899 tr_status.php:362
+#: include/blocks.inc.php:906 tr_status.php:362
 msgid "Last change"
 msgstr "Last change"
 
@@ -7775,22 +7766,13 @@ msgstr "Last week graph"
 
 #: include/menu.inc.php:47 include/views/inventory.host.view.php:207
 #: include/views/inventory.host.view.php:218 jsLoader.php:183 jsLoader.php:205
-#: latest.php:26 report5.php:158 search.php:133 search.php:215 search.php:272
-#: search.php:324
+#: latest.php:26 search.php:133 search.php:215 search.php:272 search.php:324
 msgid "Latest data"
 msgstr "Latest data"
 
 #: events.php:41 jsLoader.php:206
 msgid "Latest events"
 msgstr "Latest events"
-
-#: include/screens.inc.php:39
-msgid "Latest host group issues"
-msgstr ""
-
-#: include/screens.inc.php:40
-msgid "Latest host issues"
-msgstr ""
 
 #: jsLoader.php:207
 msgid "Latest values"
@@ -7873,7 +7855,7 @@ msgstr "Link selementid2 field is pointing to a nonexistent map selement ID \"%1
 msgid "Link should have both \"name\" and \"url\" fields for map \"%s\"."
 msgstr "Link should have both \"name\" and \"url\" fields for map \"%s\"."
 
-#: include/views/configuration.host.massupdate.php:186
+#: include/views/configuration.host.massupdate.php:188
 msgid "Link templates"
 msgstr "Link templates"
 
@@ -7885,7 +7867,7 @@ msgstr "Link to template"
 msgid "Link to templates"
 msgstr "Link to templates"
 
-#: include/views/configuration.action.edit.php:858
+#: include/views/configuration.action.edit.php:868
 msgid "Link with templates"
 msgstr "Link with templates"
 
@@ -7909,7 +7891,7 @@ msgstr "Links between the selected elements"
 msgid "Links for the selected element"
 msgstr "Links for the selected element"
 
-#: include/classes/class.clist.php:33
+#: include/classes/class.clist.php:40
 msgid "List is empty"
 msgstr "List is empty"
 
@@ -7943,8 +7925,8 @@ msgstr "Location latitude"
 msgid "Location longitude"
 msgstr "Location longitude"
 
-#: include/forms.inc.php:424 include/items.inc.php:127
-#: include/triggers.inc.php:2199 include/views/configuration.item.edit.php:225
+#: include/forms.inc.php:427 include/items.inc.php:127
+#: include/triggers.inc.php:2201 include/views/configuration.item.edit.php:225
 #: include/views/configuration.item.massupdate.php:211
 msgid "Log"
 msgstr "Log"
@@ -7978,7 +7960,7 @@ msgstr ""
 msgid "Log time format"
 msgstr "Log time format"
 
-#: include/views/administration.general.other.edit.php:39
+#: include/views/administration.general.other.edit.php:38
 msgid "Log unmatched SNMP traps"
 msgstr "Log unmatched SNMP traps"
 
@@ -7986,7 +7968,7 @@ msgstr "Log unmatched SNMP traps"
 msgid "Logged in as"
 msgstr "Logged in as"
 
-#: auditlogs.php:143 include/func.inc.php:2080 include/func.inc.php:2097
+#: auditlogs.php:143 include/func.inc.php:2079 include/func.inc.php:2096
 #: include/menu.inc.php:282 include/page_header.php:227
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:64
@@ -7994,7 +7976,7 @@ msgstr "Logged in as"
 msgid "Login"
 msgstr "Login"
 
-#: include/views/general.login.php:82
+#: include/views/general.login.php:80
 msgid "Login as Guest"
 msgstr "Login as Guest"
 
@@ -8019,7 +8001,7 @@ msgstr "Logout"
 msgid "Logs"
 msgstr "Logs"
 
-#: include/discovery.inc.php:158
+#: include/discovery.inc.php:157
 msgid "Lost"
 msgstr "Lost"
 
@@ -8112,7 +8094,7 @@ msgid "Macro with hostmacroid \"%1$s\" does not exist."
 msgstr "Macro with hostmacroid \"%1$s\" does not exist."
 
 #: adm.gui.php:100 adm.housekeeper.php:125 adm.iconmapping.php:114
-#: adm.images.php:136 adm.macros.php:163 adm.other.php:109 adm.regexps.php:197
+#: adm.images.php:136 adm.macros.php:163 adm.other.php:115 adm.regexps.php:197
 #: adm.triggerdisplayoptions.php:79 adm.triggerseverities.php:84
 #: adm.valuemapping.php:131 adm.workingtime.php:66
 #: include/views/administration.general.macros.edit.php:31
@@ -8158,7 +8140,7 @@ msgstr "Maintenance deleted"
 msgid "Maintenance period"
 msgstr ""
 
-#: include/forms.inc.php:1749
+#: include/forms.inc.php:1773
 msgid "Maintenance period length"
 msgstr "Maintenance period length"
 
@@ -8178,11 +8160,11 @@ msgstr "Maintenance type"
 msgid "Maintenance updated"
 msgstr "Maintenance updated"
 
-#: include/blocks.inc.php:930 tr_status.php:655
+#: include/blocks.inc.php:937 tr_status.php:655
 msgid "Maintenance with data collection"
 msgstr "Maintenance with data collection"
 
-#: include/blocks.inc.php:929 tr_status.php:654
+#: include/blocks.inc.php:936 tr_status.php:654
 msgid "Maintenance without data collection"
 msgstr "Maintenance without data collection"
 
@@ -8191,7 +8173,7 @@ msgid "Mandatory parameter is missing."
 msgstr "Mandatory parameter is missing."
 
 #: include/views/configuration.host.edit.php:759
-#: include/views/configuration.host.massupdate.php:239
+#: include/views/configuration.host.massupdate.php:241
 #: include/views/configuration.host.prototype.edit.php:301
 msgid "Manual"
 msgstr "Manual"
@@ -8200,7 +8182,7 @@ msgstr "Manual"
 msgid "Manual Logout"
 msgstr "Manual Logout"
 
-#: include/audit.inc.php:40 include/blocks.inc.php:1309
+#: include/audit.inc.php:40 include/blocks.inc.php:1316
 #: include/maps.inc.php:27 include/screens.inc.php:34
 #: include/views/configuration.sysmap.edit.php:184
 #: include/views/js/configuration.sysmaps.js.php:18
@@ -8260,7 +8242,7 @@ msgstr "Mapping value \"%1$s\" is not unique."
 msgid "Mappings"
 msgstr "Mappings"
 
-#: dashboard.php:340 include/blocks.inc.php:1342 include/menu.inc.php:72
+#: dashboard.php:340 include/blocks.inc.php:1349 include/menu.inc.php:72
 #: include/menu.inc.php:204 include/views/configuration.sysmap.list.php:36
 #: include/views/conf.import.php:36 include/views/monitoring.maps.php:36
 #: popup.php:80
@@ -8271,7 +8253,7 @@ msgstr "Maps"
 msgid "Mar"
 msgstr "Mar"
 
-#: include/forms.inc.php:1655 include/func.inc.php:114
+#: include/forms.inc.php:1677 include/func.inc.php:114
 #: include/func.inc.php:245 jsLoader.php:120
 msgid "March"
 msgstr "March"
@@ -8332,7 +8314,7 @@ msgid "Max count of events per trigger to show"
 msgstr "Max count of events per trigger to show"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2188
+#: include/func.inc.php:2187
 msgid "Maximize"
 msgstr "Maximize"
 
@@ -8392,7 +8374,7 @@ msgid_plural "Maximum visible host name length is %1$d characters, \"%2$s\" is %
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/forms.inc.php:1665 include/func.inc.php:116
+#: include/forms.inc.php:1687 include/func.inc.php:116
 #: include/func.inc.php:247 jsLoader.php:122
 msgid "May"
 msgstr "May"
@@ -8402,8 +8384,8 @@ msgctxt "May short"
 msgid "May"
 msgstr "May"
 
-#: include/views/administration.users.edit.php:194
-#: include/views/administration.users.edit.php:322 popup_media.php:27
+#: include/views/administration.users.edit.php:193
+#: include/views/administration.users.edit.php:321 popup_media.php:27
 msgid "Media"
 msgstr "Media"
 
@@ -8472,7 +8454,7 @@ msgstr "Menu"
 #: include/classes/screens/CScreenActions.php:153
 #: include/views/administration.auditacts.list.php:75
 #: include/views/administration.auditacts.list.php:109
-#: include/views/configuration.action.edit.php:581
+#: include/views/configuration.action.edit.php:589
 msgid "Message"
 msgstr "Message"
 
@@ -8484,11 +8466,11 @@ msgstr "Message actions"
 msgid "Message text limit"
 msgstr "Message text limit"
 
-#: include/views/administration.users.edit.php:215
+#: include/views/administration.users.edit.php:214
 msgid "Message timeout"
 msgstr "Message timeout"
 
-#: include/views/administration.users.edit.php:210
+#: include/views/administration.users.edit.php:209
 msgid "Message timeout (seconds)"
 msgstr "Message timeout (seconds)"
 
@@ -8496,7 +8478,7 @@ msgstr "Message timeout (seconds)"
 msgid "Messages"
 msgstr "Messages"
 
-#: include/views/administration.users.edit.php:351
+#: include/views/administration.users.edit.php:350
 msgid "Messaging"
 msgstr "Messaging"
 
@@ -8510,7 +8492,7 @@ msgid "Middle"
 msgstr "Middle"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2188
+#: include/func.inc.php:2187
 msgid "Minimize"
 msgstr "Minimize"
 
@@ -8575,7 +8557,7 @@ msgstr ""
 msgid "Minimum value for period T is NOT N"
 msgstr ""
 
-#: include/forms.inc.php:1756
+#: include/forms.inc.php:1780
 msgid "Minutes"
 msgstr "Minutes"
 
@@ -8589,7 +8571,7 @@ msgstr ""
 msgid "Missing \"%1$s\" field for item."
 msgstr ""
 
-#: include/reports.inc.php:580
+#: include/reports.inc.php:579
 #, c-format
 msgid "Missing \"%1$s\" field for period."
 msgstr ""
@@ -8635,7 +8617,7 @@ msgstr "Missing key \"%1$s\" for host \"%2$s\"."
 msgid "Missing parameter: usrgrpids."
 msgstr "Missing parameter: usrgrpids."
 
-#: include/views/administration.proxy.list.php:47 report2.php:181
+#: include/views/administration.proxy.list.php:47 report2.php:183
 msgid "Mode"
 msgstr "Mode"
 
@@ -8647,20 +8629,20 @@ msgstr "Model"
 msgid "Mon"
 msgstr "Mon"
 
-#: include/forms.inc.php:1631 include/forms.inc.php:1699
+#: include/forms.inc.php:1653 include/forms.inc.php:1721
 #: include/func.inc.php:131 include/func.inc.php:215
 msgid "Monday"
 msgstr "Monday"
 
 #: hosts.php:921 include/html.inc.php:368
 #: include/views/configuration.host.edit.php:402
-#: include/views/configuration.host.massupdate.php:145
+#: include/views/configuration.host.massupdate.php:149
 #: include/views/configuration.host.prototype.edit.php:159
 msgid "Monitored"
 msgstr "Monitored"
 
 #: include/views/configuration.host.edit.php:399
-#: include/views/configuration.host.massupdate.php:136
+#: include/views/configuration.host.massupdate.php:140
 #: include/views/configuration.host.prototype.edit.php:155
 msgid "Monitored by proxy"
 msgstr "Monitored by proxy"
@@ -8673,11 +8655,11 @@ msgstr "Monitored host"
 msgid "Monitoring"
 msgstr "Monitoring"
 
-#: include/forms.inc.php:1674 report3.php:106 report4.php:155 report5.php:46
+#: include/forms.inc.php:1696 report3.php:106 report4.php:155 report5.php:46
 msgid "Month"
 msgstr "Month"
 
-#: include/forms.inc.php:1611 include/maintenances.inc.php:40
+#: include/forms.inc.php:1633 include/maintenances.inc.php:40
 #: include/reports.inc.php:63 include/reports.inc.php:399
 #: include/reports.inc.php:407 report3.php:60 report4.php:110
 msgid "Monthly"
@@ -8708,7 +8690,7 @@ msgstr "Move"
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
 
-#: include/triggers.inc.php:1604
+#: include/triggers.inc.php:1606
 msgid "Multiple PROBLEM events"
 msgstr "Multiple PROBLEM events"
 
@@ -8724,7 +8706,7 @@ msgstr "Mute"
 msgid "NETWORK MAPS"
 msgstr "NETWORK MAPS"
 
-#: include/discovery.inc.php:63
+#: include/discovery.inc.php:62
 #: include/views/js/configuration.discovery.edit.js.php:176
 msgid "NNTP"
 msgstr "NNTP"
@@ -8740,9 +8722,9 @@ msgstr "NTLM authentication"
 #: actionconf.php:37 actionconf.php:158 adm.regexps.php:37 adm.regexps.php:140
 #: adm.regexps.php:178 applications.php:38 disc_prototypes.php:42
 #: graphs.php:41 host_discovery.php:41 hosts.php:759 hosts.php:793
-#: httpconf.php:44 httpmon.php:88 include/forms.inc.php:599
+#: httpconf.php:44 httpmon.php:88 include/forms.inc.php:602
 #: include/hosts.inc.php:115 include/reports.inc.php:171
-#: include/setup.inc.php:325
+#: include/setup.inc.php:369
 #: include/views/administration.general.iconmap.edit.php:29
 #: include/views/administration.general.iconmap.list.php:25
 #: include/views/administration.general.image.edit.php:35
@@ -8762,7 +8744,7 @@ msgstr "NTLM authentication"
 #: include/views/administration.users.list.php:56
 #: include/views/configuration.action.edit.php:43
 #: include/views/configuration.action.edit.php:70
-#: include/views/configuration.action.edit.php:879
+#: include/views/configuration.action.edit.php:889
 #: include/views/configuration.action.list.php:52
 #: include/views/configuration.application.edit.php:42
 #: include/views/configuration.discovery.edit.php:40
@@ -8805,10 +8787,10 @@ msgstr "NTLM authentication"
 #: maintenance.php:223 popup_httpstep.php:36 popup.php:562 popup.php:621
 #: popup.php:683 popup.php:706 popup.php:820 popup.php:929 popup.php:938
 #: popup.php:1020 popup.php:1055 popup.php:1084 popup.php:1178 popup.php:1181
-#: popup.php:1251 popup.php:1254 popup.php:1316 popup.php:1320 popup.php:1371
-#: popup.php:1398 popup.php:1425 popup.php:1445 popup.php:1469 popup.php:1498
-#: popup.php:1505 popup_right.php:75 popup_usrgrp.php:92 queue.php:203
-#: report2.php:397 screenconf.php:50 services.php:41 slideconf.php:38
+#: popup.php:1251 popup.php:1254 popup.php:1317 popup.php:1321 popup.php:1372
+#: popup.php:1399 popup.php:1426 popup.php:1446 popup.php:1470 popup.php:1499
+#: popup.php:1506 popup_right.php:75 popup_usrgrp.php:92 queue.php:203
+#: report2.php:399 screenconf.php:50 services.php:41 slideconf.php:38
 #: sysmaps.php:48 trigger_prototypes.php:41 triggers.php:41 tr_status.php:368
 #: users.php:45
 msgid "Name"
@@ -8843,9 +8825,9 @@ msgstr "Never"
 msgid "Never executed"
 msgstr "Never executed"
 
-#: include/views/configuration.action.edit.php:408
-#: include/views/configuration.action.edit.php:632
-#: include/views/configuration.action.edit.php:952
+#: include/views/configuration.action.edit.php:415
+#: include/views/configuration.action.edit.php:640
+#: include/views/configuration.action.edit.php:962
 #: include/views/configuration.discovery.edit.php:56
 #: include/views/configuration.maintenance.edit.php:132
 msgid "New"
@@ -8856,7 +8838,7 @@ msgstr "New"
 msgid "New application"
 msgstr "New application"
 
-#: include/views/configuration.action.edit.php:310
+#: include/views/configuration.action.edit.php:317
 msgid "New condition"
 msgstr "New condition"
 
@@ -8875,7 +8857,7 @@ msgstr "New flexible interval"
 msgid "New group"
 msgstr "New group"
 
-#: include/views/configuration.host.massupdate.php:120
+#: include/views/configuration.host.massupdate.php:124
 msgid "New host group"
 msgstr "New host group"
 
@@ -8895,7 +8877,7 @@ msgstr "New regular expression"
 msgid "New service time"
 msgstr "New service time"
 
-#: include/setup.inc.php:126
+#: include/setup.inc.php:128
 msgid "Next"
 msgstr "Next"
 
@@ -8905,7 +8887,7 @@ msgid "Next"
 msgstr "Next"
 
 #: events.php:761 include/events.inc.php:362 include/events.inc.php:380
-#: include/func.inc.php:2407 include/triggers.inc.php:1606
+#: include/func.inc.php:2406 include/triggers.inc.php:1608
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
 #: include/views/js/adm.regexprs.edit.js.php:142
@@ -8944,17 +8926,29 @@ msgstr "No \"ymin_type\" field for graph \"%s\"."
 
 #: include/views/configuration.host.edit.php:366
 #: include/views/configuration.host.prototype.edit.php:143
-msgid "No IPMI interfaces defined."
+msgid "No IPMI interfaces found."
+msgstr ""
+
+#: include/views/configuration.services.child.list.php:35
+msgid "No IT services found."
 msgstr ""
 
 #: include/views/configuration.host.edit.php:353
 #: include/views/configuration.host.prototype.edit.php:130
-msgid "No JMX interfaces defined."
+msgid "No JMX interfaces found."
+msgstr ""
+
+#: api/classes/CItemGeneral.php:351
+msgid "No SNMP OID specified."
+msgstr ""
+
+#: api/classes/CItemGeneral.php:357
+msgid "No SNMP community specified."
 msgstr ""
 
 #: include/views/configuration.host.edit.php:340
 #: include/views/configuration.host.prototype.edit.php:117
-msgid "No SNMP interfaces defined."
+msgid "No SNMP interfaces found."
 msgstr ""
 
 #: api/classes/CScreenItem.php:472
@@ -8965,27 +8959,23 @@ msgstr "No URL provided for screen element."
 msgid "No URLs defined."
 msgstr "No URLs defined."
 
-#: include/forms.inc.php:259
+#: include/forms.inc.php:262
 msgid "No accessible resources"
 msgstr "No accessible resources"
 
 #: include/acknow.inc.php:48
-msgid "No acknowledges defined."
-msgstr "No acknowledges defined."
-
-#: include/views/administration.auditacts.list.php:67
-#: include/views/configuration.action.list.php:48
-msgid "No actions defined."
-msgstr "No actions defined."
+msgid "No acknowledges found."
+msgstr ""
 
 #: include/actions.inc.php:825 include/actions.inc.php:904
 #: include/actions.inc.php:961 include/classes/screens/CScreenActions.php:121
+#: include/views/configuration.action.list.php:48
 msgid "No actions found."
 msgstr "No actions found."
 
 #: include/views/configuration.host.edit.php:326
 #: include/views/configuration.host.prototype.edit.php:103
-msgid "No agent interfaces defined."
+msgid "No agent interfaces found."
 msgstr ""
 
 #: include/hosts.inc.php:588
@@ -8993,17 +8983,15 @@ msgstr ""
 msgid "No application with ID \"%1$s\"."
 msgstr "No application with ID \"%1$s\"."
 
-#: include/views/configuration.httpconf.edit.php:69
-msgid "No applications defined"
+#: include/views/configuration.application.list.php:57
+#: include/views/configuration.httpconf.edit.php:69 popup.php:1017
+msgid "No applications found."
 msgstr ""
 
-#: include/views/configuration.application.list.php:57 popup.php:1017
-msgid "No applications defined."
-msgstr "No applications defined."
-
+#: include/views/administration.auditacts.list.php:67
 #: include/views/administration.auditlogs.list.php:83
-msgid "No audit defined."
-msgstr "No audit defined."
+msgid "No audit entries found."
+msgstr ""
 
 #: api/classes/CAction.php:1339
 #, c-format
@@ -9015,7 +9003,7 @@ msgstr "No authentication type specified for action operation command \"%s\"."
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "No authentication user name specified for action operation command \"%s\"."
 
-#: api/classes/CItemGeneral.php:330
+#: api/classes/CItemGeneral.php:328
 msgid "No authentication user name specified."
 msgstr "No authentication user name specified."
 
@@ -9028,7 +9016,7 @@ msgid "No command type specified for action operation."
 msgstr "No command type specified for action operation."
 
 #: include/views/configuration.action.edit.php:67
-#: include/views/configuration.action.edit.php:877
+#: include/views/configuration.action.edit.php:887
 msgid "No conditions defined."
 msgstr "No conditions defined."
 
@@ -9036,11 +9024,6 @@ msgstr "No conditions defined."
 #: include/views/configuration.maintenance.list.php:70
 msgid "No data collection"
 msgstr "No data collection"
-
-#: include/classes/screens/CScreenPlainText.php:41
-#: include/classes/screens/CScreenPlainText.php:61
-msgid "No data defined."
-msgstr "No data defined."
 
 #: popup_trexpr.php:511
 msgid "No data received during period of time T, then N = 1, 0 - otherwise"
@@ -9067,12 +9050,8 @@ msgid "No details"
 msgstr "No details"
 
 #: include/views/monitoring.discovery.php:36
-msgid "No discoveries defined."
-msgstr "No discoveries defined."
-
-#: popup.php:1444
-msgid "No discovery checks defined."
-msgstr "No discovery checks defined."
+msgid "No discovered devices found."
+msgstr ""
 
 #: api/classes/CHostPrototype.php:112
 #, c-format
@@ -9084,9 +9063,10 @@ msgid "No discovery rule IDs given."
 msgstr "No discovery rule IDs given."
 
 #: include/views/configuration.discovery.list.php:37
-#: include/views/configuration.host.discovery.list.php:41 popup.php:1424
-msgid "No discovery rules defined."
-msgstr "No discovery rules defined."
+#: include/views/configuration.host.discovery.list.php:41 popup.php:1425
+#: popup.php:1445
+msgid "No discovery rules found."
+msgstr ""
 
 #: jsLoader.php:178
 msgid "No elements selected!"
@@ -9096,13 +9076,14 @@ msgstr "No elements selected!"
 msgid "No errors found."
 msgstr "No errors found."
 
-#: include/blocks.inc.php:975 include/blocks.inc.php:1484 tr_status.php:724
+#: include/blocks.inc.php:982 include/blocks.inc.php:1491 tr_status.php:724
 msgid "No events"
 msgstr ""
 
-#: events.php:370 include/classes/screens/CScreenEvents.php:37
-msgid "No events defined."
-msgstr "No events defined."
+#: events.php:370 include/blocks.inc.php:901
+#: include/classes/screens/CScreenEvents.php:37 include/events.inc.php:198
+msgid "No events found."
+msgstr ""
 
 #: acknow.php:81
 msgid "No events to acknowledge"
@@ -9132,15 +9113,17 @@ msgid "No graph item with graphid \"%s\"."
 msgstr "No graph item with graphid \"%s\"."
 
 #: include/views/configuration.graph.list.php:73
-msgid "No graph prototypes defined."
-msgstr "No graph prototypes defined."
+msgid "No graph prototypes found."
+msgstr ""
+
+#: include/blocks.inc.php:28
+msgid "No graphs added."
+msgstr ""
 
 #: include/views/configuration.graph.list.php:73
-#: include/views/monitoring.charts.php:61
-#: include/views/monitoring.charts.php:77
-#: include/views/monitoring.history.php:184 popup.php:1074
-msgid "No graphs defined."
-msgstr "No graphs defined."
+#: include/views/monitoring.charts.php:77 popup.php:1074
+msgid "No graphs found."
+msgstr ""
 
 #: api/classes/CHost.php:701 api/classes/CHost.php:711
 #, c-format
@@ -9159,11 +9142,6 @@ msgstr "No groups for template"
 #, c-format
 msgid "No groups for template [ %s ]"
 msgstr "No groups for template [ %s ]"
-
-#: include/classes/screens/CScreenHistory.php:159
-#: include/classes/screens/CScreenHistory.php:265
-msgid "No history defined."
-msgstr "No history defined."
 
 #: api/classes/CHost.php:1452
 msgid "No host ID given."
@@ -9186,9 +9164,11 @@ msgstr ""
 msgid "No host group ID provided for screen element."
 msgstr "No host group ID provided for screen element."
 
-#: include/views/configuration.hostgroups.list.php:56 popup.php:1397
-msgid "No host groups defined."
-msgstr "No host groups defined."
+#: include/blocks.inc.php:183 include/blocks.inc.php:373
+#: include/views/configuration.hostgroups.list.php:56 popup.php:1398
+#: popup_right.php:74 search.php:279
+msgid "No host groups found."
+msgstr ""
 
 #: include/hosts.inc.php:493
 #, c-format
@@ -9196,7 +9176,7 @@ msgid "No host groups with groupid \"%s\"."
 msgstr "No host groups with groupid \"%s\"."
 
 #: include/views/configuration.host.prototype.list.php:44
-msgid "No host prototypes defined."
+msgid "No host prototypes found."
 msgstr ""
 
 #: include/hosts.inc.php:536
@@ -9205,29 +9185,25 @@ msgid "No host with hostid \"%s\"."
 msgstr "No host with hostid \"%s\"."
 
 #: hostinventoriesoverview.php:88 hosts.php:789
-#: include/views/inventory.host.list.php:74
-msgid "No hosts defined."
-msgstr "No hosts defined."
+#: include/views/inventory.host.list.php:74 search.php:127
+msgid "No hosts found."
+msgstr ""
 
-#: api/classes/CMapElement.php:66
+#: api/classes/CMapElement.php:70
 #, c-format
 msgid "No icon for map element \"%s\"."
 msgstr "No icon for map element \"%s\"."
 
 #: include/views/administration.general.iconmap.list.php:22
-msgid "No icon map defined."
-msgstr "No icon map defined."
+msgid "No icon maps found."
+msgstr ""
 
 #: include/views/configuration.sysmap.edit.php:47
 msgid "No image"
 msgstr "No image"
 
 #: include/views/administration.general.image.list.php:36
-msgid "No images defined."
-msgstr "No images defined."
-
-#: include/views/administration.proxy.edit.php:52
-msgid "No interface defined."
+msgid "No images found."
 msgstr ""
 
 #: include/views/configuration.item.edit.php:112
@@ -9254,9 +9230,13 @@ msgstr "No interfaces for host \"%s\"."
 msgid "No item ID provided for screen element."
 msgstr "No item ID provided for screen element."
 
-#: popup.php:925
-msgid "No item prototypes defined."
-msgstr "No item prototypes defined."
+#: popup.php:682
+msgid "No item keys found."
+msgstr ""
+
+#: include/views/configuration.item.prototype.list.php:43 popup.php:925
+msgid "No item prototypes found."
+msgstr ""
 
 #: include/items.inc.php:499
 #, c-format
@@ -9268,57 +9248,59 @@ msgstr "No item with itemid \"%1$s\"."
 msgid "No item with itemid=\"%1$s\"."
 msgstr "No item with itemid=\"%1$s\"."
 
-#: chart3.php:119 include/items.inc.php:787
-#: include/views/configuration.graph.edit.php:64
-#: include/views/configuration.item.list.php:58
-#: include/views/monitoring.overview.php:111 popup.php:682 popup.php:815
+#: chart3.php:119
 msgid "No items defined."
 msgstr "No items defined."
 
-#: include/views/configuration.item.prototype.list.php:43
-msgid "No items prototypes defined."
-msgstr "No items prototypes defined."
+#: include/items.inc.php:791 include/views/configuration.item.list.php:58
+#: include/views/monitoring.overview.php:114 popup.php:815
+msgid "No items found."
+msgstr ""
 
 #: include/views/common.macros.php:26
-msgid "No macros defined."
+msgid "No macros found."
+msgstr ""
+
+#: include/views/configuration.maintenance.edit.php:98
+msgid "No maintenance periods defined."
 msgstr ""
 
 #: include/views/configuration.maintenance.list.php:41
-msgid "No maintenance defined."
-msgstr "No maintenance defined."
-
-#: include/views/configuration.maintenance.edit.php:98
-msgid "No maintenance period defined."
-msgstr "No maintenance period defined."
+msgid "No maintenance periods found."
+msgstr ""
 
 #: api/classes/CScreenItem.php:460
 msgid "No map ID provided for screen element."
 msgstr "No map ID provided for screen element."
 
+#: include/blocks.inc.php:150
+msgid "No maps added."
+msgstr ""
+
 #: include/views/configuration.sysmap.list.php:40
 #: include/views/monitoring.maps.php:23 popup.php:1175
-msgid "No maps defined."
-msgstr "No maps defined."
+msgid "No maps found."
+msgstr ""
 
 #: include/classes/class.cmultiselect.php:51 jsLoader.php:192
 msgid "No matches found"
 msgstr ""
 
-#: include/views/administration.users.edit.php:156
-msgid "No media defined."
-msgstr "No media defined."
+#: include/views/administration.users.edit.php:155
+msgid "No media found."
+msgstr ""
 
-#: include/views/administration.mediatypes.list.php:36 report4.php:73
-msgid "No media types defined."
-msgstr "No media types defined."
+#: include/views/administration.mediatypes.list.php:36
+msgid "No media types found."
+msgstr ""
 
-#: include/views/administration.node.list.php:39 popup.php:1054
-msgid "No nodes defined."
-msgstr "No nodes defined."
+#: report4.php:73
+msgid "No notifications found."
+msgstr ""
 
-#: include/views/configuration.action.edit.php:325
+#: include/views/configuration.action.edit.php:332
 msgid "No operations defined."
-msgstr "No operations defined."
+msgstr ""
 
 #: include/classes/import/CConfigurationImport.php:880
 #: include/classes/import/CConfigurationImport.php:960
@@ -9351,10 +9333,6 @@ msgstr "No permission for trigger \"%s\"."
 msgid "No permissions"
 msgstr "No permissions"
 
-#: include/views/administration.usergroups.edit.php:81
-msgid "No permissions defined."
-msgstr "No permissions defined."
-
 #: include/classes/import/CXmlImport18.php:1024
 #, c-format
 msgid "No permissions for group \"%1$s\"."
@@ -9379,7 +9357,7 @@ msgstr "No permissions for system access."
 #: api/classes/CApplication.php:441 api/classes/CApplication.php:514
 #: api/classes/CApplication.php:527 api/classes/CDiscoveryRule.php:357
 #: api/classes/CDiscoveryRule.php:451 api/classes/CDiscoveryRule.php:456
-#: api/classes/CDRule.php:255 api/classes/CDRule.php:578
+#: api/classes/CDRule.php:248 api/classes/CDRule.php:569
 #: api/classes/CEvent.php:734 api/classes/CGraphGeneral.php:65
 #: api/classes/CGraphGeneral.php:86 api/classes/CGraph.php:711
 #: api/classes/CGraphPrototype.php:692 api/classes/CGraphPrototype.php:752
@@ -9400,20 +9378,20 @@ msgstr "No permissions for system access."
 #: api/classes/CItemPrototype.php:508 api/classes/CMaintenance.php:320
 #: api/classes/CMaintenance.php:345 api/classes/CMaintenance.php:358
 #: api/classes/CMaintenance.php:466 api/classes/CMaintenance.php:483
-#: api/classes/CMaintenance.php:550 api/classes/CMapElement.php:56
-#: api/classes/CMapElement.php:145 api/classes/CMap.php:389
-#: api/classes/CProxy.php:172 api/classes/CProxy.php:213
-#: api/classes/CProxy.php:285 api/classes/CProxy.php:551
-#: api/classes/CScreenItem.php:328 api/classes/CScreenItem.php:412
-#: api/classes/CScreen.php:438 api/classes/CScreen.php:518
-#: api/classes/CService.php:1255 api/classes/CService.php:1270
-#: api/classes/CTemplateScreen.php:704 api/classes/CTemplateScreen.php:725
-#: api/classes/CTemplateScreen.php:731 api/classes/CTrigger.php:636
-#: api/classes/CTrigger.php:960 api/classes/CTrigger.php:981
-#: api/classes/CTrigger.php:1853 api/classes/CTriggerPrototype.php:566
-#: api/classes/CTriggerPrototype.php:669 api/classes/CUserMacro.php:726
-#: api/classes/CUserMacro.php:835 api/classes/CUser.php:1165
-#: include/func.inc.php:2053
+#: api/classes/CMaintenance.php:550 api/classes/CMapElement.php:60
+#: api/classes/CMapElement.php:119 api/classes/CMapElement.php:190
+#: api/classes/CMap.php:389 api/classes/CProxy.php:172
+#: api/classes/CProxy.php:213 api/classes/CProxy.php:285
+#: api/classes/CProxy.php:551 api/classes/CScreenItem.php:328
+#: api/classes/CScreenItem.php:412 api/classes/CScreen.php:438
+#: api/classes/CScreen.php:518 api/classes/CService.php:1255
+#: api/classes/CService.php:1270 api/classes/CTemplateScreen.php:704
+#: api/classes/CTemplateScreen.php:725 api/classes/CTemplateScreen.php:731
+#: api/classes/CTrigger.php:640 api/classes/CTrigger.php:964
+#: api/classes/CTrigger.php:985 api/classes/CTrigger.php:1862
+#: api/classes/CTriggerPrototype.php:566 api/classes/CTriggerPrototype.php:669
+#: api/classes/CUserMacro.php:726 api/classes/CUserMacro.php:835
+#: api/classes/CUser.php:1165 include/func.inc.php:2053
 msgid "No permissions to referred object or it does not exist!"
 msgstr "No permissions to referred object or it does not exist!"
 
@@ -9422,13 +9400,13 @@ msgstr "No permissions to referred object or it does not exist!"
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "No private key file specified for action operation command \"%s\"."
 
-#: api/classes/CItemGeneral.php:338
+#: api/classes/CItemGeneral.php:336
 msgid "No private key file specified."
 msgstr "No private key file specified."
 
-#: include/views/administration.proxy.list.php:42 popup.php:1468
-msgid "No proxies defined."
-msgstr "No proxies defined."
+#: include/views/administration.proxy.list.php:42 popup.php:1469
+msgid "No proxies found."
+msgstr ""
 
 #: include/views/configuration.discovery.edit.php:44
 msgid "No proxy"
@@ -9443,7 +9421,7 @@ msgstr ""
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "No public key file specified for action operation command \"%s\"."
 
-#: api/classes/CItemGeneral.php:335
+#: api/classes/CItemGeneral.php:333
 msgid "No public key file specified."
 msgstr "No public key file specified."
 
@@ -9452,12 +9430,8 @@ msgid "No recipients for action operation message."
 msgstr "No recipients for action operation message."
 
 #: include/views/administration.general.regularexpressions.list.php:28
-msgid "No regular expressions defined."
-msgstr "No regular expressions defined."
-
-#: popup_right.php:74
-msgid "No resources defined."
-msgstr "No resources defined."
+msgid "No regular expressions found."
+msgstr ""
 
 #: include/classes/screens/CScreenBuilder.php:293
 msgid "No rows in screen."
@@ -9467,54 +9441,58 @@ msgstr "No rows in screen."
 msgid "No screen ID provided for screen element."
 msgstr "No screen ID provided for screen element."
 
+#: include/blocks.inc.php:99
+msgid "No screens added."
+msgstr ""
+
 #: include/classes/screens/CScreenBuilder.php:267
 #: include/views/configuration.screen.list.php:48
 #: include/views/monitoring.hostscreen.php:32
-#: include/views/monitoring.screen.php:35 popup.php:1312 popup.php:1370
-msgid "No screens defined."
-msgstr "No screens defined."
+#: include/views/monitoring.screen.php:35 popup.php:1313 popup.php:1371
+msgid "No screens found."
+msgstr ""
 
 #: api/classes/CAction.php:1362
 msgid "No script specified for action operation command."
 msgstr "No script specified for action operation command."
 
-#: include/views/administration.script.list.php:35 popup.php:1494
-msgid "No scripts defined."
-msgstr "No scripts defined."
+#: include/views/administration.script.list.php:35 popup.php:1495
+msgid "No scripts found."
+msgstr ""
 
-#: include/views/configuration.slideconf.list.php:37
-#: include/views/monitoring.slides.php:43 slides.php:158
+#: slides.php:158
 msgid "No slide shows defined."
 msgstr "No slide shows defined."
 
-#: include/views/configuration.slideconf.edit.php:44
+#: include/views/configuration.slideconf.list.php:37
+#: include/views/monitoring.slides.php:43
+msgid "No slide shows found."
+msgstr ""
+
 #: include/views/monitoring.slides.php:104 popup.php:1248
-msgid "No slides defined."
-msgstr "No slides defined."
+msgid "No slides found."
+msgstr ""
 
 #: api/classes/CProxy.php:227
 msgid "No status for proxy."
 msgstr ""
 
-#: httpdetails.php:128 include/views/configuration.httpconf.edit.php:154
-msgid "No steps defined."
-msgstr "No steps defined."
-
-#: triggers.php:356
+#: triggers.php:303
 msgid "No target selected"
 msgstr "No target selected"
 
-#: graphs.php:331 items.php:722
+#: graphs.php:331 items.php:723
 msgid "No target selected."
 msgstr "No target selected."
 
+#: search.php:390 templates.php:481
+msgid "No templates found."
+msgstr ""
+
 #: include/views/configuration.host.edit.php:626
 #: include/views/configuration.host.prototype.edit.php:211
-#: include/views/configuration.template.edit.php:375 templates.php:481
-msgid "No templates defined."
-msgstr "No templates defined."
-
 #: include/views/configuration.host.prototype.edit.php:233
+#: include/views/configuration.template.edit.php:375
 msgid "No templates linked."
 msgstr ""
 
@@ -9531,13 +9509,13 @@ msgstr "No trigger"
 msgid "No trigger with triggerid \"%1$s\"."
 msgstr "No trigger with triggerid \"%1$s\"."
 
-#: chart4.php:40 include/triggers.inc.php:1211
-#: include/views/configuration.triggers.list.php:104 popup.php:702
-#: report2.php:393 tr_comments.php:41 tr_status.php:355
+#: chart4.php:40 tr_comments.php:41
 msgid "No triggers defined."
 msgstr "No triggers defined."
 
-#: report5.php:56
+#: include/triggers.inc.php:1212
+#: include/views/configuration.triggers.list.php:104 popup.php:702
+#: report2.php:395 report5.php:56 tr_status.php:355
 msgid "No triggers found."
 msgstr "No triggers found."
 
@@ -9547,36 +9525,36 @@ msgstr ""
 
 #: include/views/administration.usergroups.list.php:42 popup.php:559
 #: popup_usrgrp.php:89
-msgid "No user groups defined."
-msgstr "No user groups defined."
+msgid "No user groups found."
+msgstr ""
 
 #: include/views/administration.users.list.php:51 popup.php:617
-msgid "No users defined."
-msgstr "No users defined."
+msgid "No users found."
+msgstr ""
 
 #: include/views/administration.general.valuemapping.list.php:22
-msgid "No value map defined."
-msgstr "No value map defined."
+msgid "No value maps found."
+msgstr ""
 
-#: latest.php:308
+#: include/classes/screens/CScreenHistory.php:159
+#: include/classes/screens/CScreenHistory.php:265
+#: include/classes/screens/CScreenPlainText.php:41
+#: include/classes/screens/CScreenPlainText.php:61 latest.php:308
 msgid "No values found."
 msgstr "No values found."
 
-#: httpmon.php:84
-msgid "No web checks defined."
-msgstr "No web checks defined."
-
+#: httpmon.php:84 include/blocks.inc.php:1074
 #: include/views/configuration.httpconf.list.php:58
-msgid "No web scenarios defined."
-msgstr "No web scenarios defined."
+msgid "No web scenarios found."
+msgstr ""
 
 #: events.php:578 events.php:591 hosts.php:792 httpmon.php:86
 #: include/actions.inc.php:68 include/audit.inc.php:42
 #: include/blocks.inc.php:185 include/blocks.inc.php:375
-#: include/blocks.inc.php:896 include/blocks.inc.php:1069
-#: include/blocks.inc.php:1158 include/blocks.inc.php:1461
+#: include/blocks.inc.php:903 include/blocks.inc.php:1076
+#: include/blocks.inc.php:1165 include/blocks.inc.php:1468
 #: include/classes/screens/CScreenEvents.php:40 include/page_header.php:324
-#: include/triggers.inc.php:1596
+#: include/triggers.inc.php:1598
 #: include/views/administration.general.iconmap.list.php:24
 #: include/views/administration.general.regularexpressions.list.php:31
 #: include/views/administration.general.valuemapping.list.php:24
@@ -9600,7 +9578,7 @@ msgstr "No web scenarios defined."
 #: include/views/configuration.triggers.list.php:107
 #: include/views/inventory.host.list.php:76
 #: include/views/monitoring.discovery.php:40 latest.php:317 latest.php:334
-#: popup.php:491 popup_right.php:66 queue.php:201 report2.php:395
+#: popup.php:491 popup_right.php:66 queue.php:201 report2.php:397
 #: report5.php:58 search.php:129 search.php:270 search.php:380
 #: templates.php:484 tr_status.php:366
 msgid "Node"
@@ -9624,7 +9602,7 @@ msgstr "Node with same ID already exists."
 
 #: include/actions.inc.php:827 include/actions.inc.php:906
 #: include/actions.inc.php:964 include/classes/screens/CScreenActions.php:123
-#: include/forms.inc.php:171
+#: include/forms.inc.php:174
 #: include/views/administration.auditacts.list.php:69
 #: include/views/administration.node.list.php:25
 #: include/views/administration.node.list.php:32
@@ -9632,17 +9610,17 @@ msgstr "Node with same ID already exists."
 msgid "Nodes"
 msgstr "Nodes"
 
-#: adm.other.php:81 include/hosts.inc.php:38 include/httptest.inc.php:27
+#: adm.other.php:91 include/hosts.inc.php:38 include/httptest.inc.php:27
 #: include/services.inc.php:317
 #: include/views/administration.general.gui.edit.php:27
-#: include/views/administration.general.other.edit.php:31
+#: include/views/administration.general.other.edit.php:30
 #: include/views/configuration.item.edit.php:447
 #: include/views/configuration.item.edit.php:457
 msgid "None"
 msgstr "None"
 
 #: include/graphs.inc.php:24 include/items.inc.php:180
-#: include/triggers.inc.php:1603 popup.php:1146
+#: include/triggers.inc.php:1605 popup.php:1146
 msgid "Normal"
 msgstr "Normal"
 
@@ -9650,15 +9628,16 @@ msgstr "Normal"
 msgid "Normal view"
 msgstr "Normal view"
 
-#: include/actions.inc.php:256 include/views/configuration.action.edit.php:993
+#: include/actions.inc.php:256
+#: include/views/configuration.action.edit.php:1003
 msgid "Not Ack"
 msgstr "Not Ack"
 
-#: include/forms.inc.php:609 include/forms.inc.php:792
+#: include/forms.inc.php:612 include/forms.inc.php:795
 msgid "Not Templated items"
 msgstr "Not Templated items"
 
-#: api/classes/CTrigger.php:1485
+#: api/classes/CTrigger.php:1489
 #, c-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr "Not all templates are linked to \"%s\"."
@@ -9686,7 +9665,7 @@ msgstr "Not connected"
 
 #: hosts.php:930 include/html.inc.php:371
 #: include/views/configuration.host.edit.php:403
-#: include/views/configuration.host.massupdate.php:146
+#: include/views/configuration.host.massupdate.php:150
 #: include/views/configuration.host.prototype.edit.php:160
 msgid "Not monitored"
 msgstr "Not monitored"
@@ -9725,7 +9704,7 @@ msgstr "Notifications"
 msgid "Nov"
 msgstr "Nov"
 
-#: include/forms.inc.php:1667 include/func.inc.php:122
+#: include/forms.inc.php:1689 include/func.inc.php:122
 #: include/func.inc.php:253 jsLoader.php:128
 msgid "November"
 msgstr "November"
@@ -9790,19 +9769,19 @@ msgstr ""
 msgid "Number of users (online)"
 msgstr "Number of users (online)"
 
-#: include/forms.inc.php:422 include/items.inc.php:123
-#: include/triggers.inc.php:2197 include/views/configuration.item.edit.php:223
+#: include/forms.inc.php:425 include/items.inc.php:123
+#: include/triggers.inc.php:2199 include/views/configuration.item.edit.php:223
 #: include/views/configuration.item.massupdate.php:209
 msgid "Numeric (float)"
 msgstr "Numeric (float)"
 
-#: include/triggers.inc.php:2196 include/triggers.inc.php:2212
-#: include/triggers.inc.php:2216 include/triggers.inc.php:2226
-#: include/triggers.inc.php:2231 include/triggers.inc.php:2235
+#: include/triggers.inc.php:2198 include/triggers.inc.php:2214
+#: include/triggers.inc.php:2218 include/triggers.inc.php:2228
+#: include/triggers.inc.php:2233 include/triggers.inc.php:2237
 msgid "Numeric (integer 64bit)"
 msgstr "Numeric (integer 64bit)"
 
-#: include/forms.inc.php:421 include/items.inc.php:121
+#: include/forms.inc.php:424 include/items.inc.php:121
 #: include/views/configuration.item.edit.php:222
 #: include/views/configuration.item.massupdate.php:208
 msgid "Numeric (unsigned)"
@@ -9815,9 +9794,9 @@ msgstr "OEM"
 #: chart4.php:159 chart5.php:192 httpdetails.php:149 httpdetails.php:234
 #: httpmon.php:149 include/classes/tree/CServiceTree.php:46
 #: include/maps.inc.php:676 include/maps.inc.php:758 include/maps.inc.php:848
-#: include/maps.inc.php:938 include/setup.inc.php:199
-#: include/setup.inc.php:228 include/setup.inc.php:303
-#: include/setup.inc.php:457 include/triggers.inc.php:166
+#: include/maps.inc.php:938 include/setup.inc.php:204
+#: include/setup.inc.php:233 include/setup.inc.php:336
+#: include/setup.inc.php:501 include/triggers.inc.php:166
 #: include/views/monitoring.overview.php:41
 msgid "OK"
 msgstr "OK"
@@ -9838,9 +9817,9 @@ msgstr "OOB router"
 msgid "OOB subnet mask"
 msgstr "OOB subnet mask"
 
-#: include/triggers.inc.php:1660
+#: include/triggers.inc.php:1662
 #: include/views/configuration.action.edit.php:110
-#: include/views/configuration.action.edit.php:937
+#: include/views/configuration.action.edit.php:947
 #: include/views/configuration.triggers.edit.php:113 tr_logform.php:288
 msgid "OR"
 msgstr "OR"
@@ -9857,7 +9836,7 @@ msgstr "OS (Full details)"
 msgid "OS (Short)"
 msgstr "OS (Short)"
 
-#: adm.other.php:119
+#: adm.other.php:125
 msgid "OTHER CONFIGURATION PARAMETERS"
 msgstr "OTHER CONFIGURATION PARAMETERS"
 
@@ -9873,7 +9852,7 @@ msgstr "Oct"
 msgid "Octal"
 msgstr "Octal"
 
-#: include/forms.inc.php:1662 include/func.inc.php:121
+#: include/forms.inc.php:1684 include/func.inc.php:121
 #: include/func.inc.php:252 jsLoader.php:127
 msgid "October"
 msgstr "October"
@@ -9883,9 +9862,9 @@ msgstr "October"
 msgid "Off"
 msgstr "Off"
 
-#: include/actions.inc.php:1072 include/blocks.inc.php:1071
+#: include/actions.inc.php:1072 include/blocks.inc.php:1078
 #: include/classes/class.ctriggersinfo.php:134
-#: include/views/administration.users.list.php:86 report2.php:399
+#: include/views/administration.users.list.php:86 report2.php:401
 #: report3.php:83
 msgid "Ok"
 msgstr "Ok"
@@ -9899,7 +9878,7 @@ msgstr "On"
 msgid "On status change triggers blink for"
 msgstr "On status change triggers blink for"
 
-#: include/views/administration.users.edit.php:213
+#: include/views/administration.users.edit.php:212
 msgid "Once"
 msgstr "Once"
 
@@ -9907,7 +9886,7 @@ msgstr "Once"
 msgid "One of the objects is left without a host group."
 msgstr ""
 
-#: include/forms.inc.php:1608 include/maintenances.inc.php:34
+#: include/forms.inc.php:1630 include/maintenances.inc.php:34
 msgid "One time only"
 msgstr "One time only"
 
@@ -9985,7 +9964,7 @@ msgstr "Only characters are allowed."
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Only items assigned to enabled hosts are counted"
 
-#: api/classes/CDRule.php:376
+#: api/classes/CDRule.php:368
 msgid "Only one check can be unique."
 msgstr "Only one check can be unique."
 
@@ -10019,11 +9998,11 @@ msgstr "Operation \"%s\" already exists."
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "Operation cannot be performed due to unauthorized request."
 
-#: include/views/configuration.action.edit.php:1005
+#: include/views/configuration.action.edit.php:1015
 msgid "Operation condition"
 msgstr "Operation condition"
 
-#: include/views/configuration.action.edit.php:1013
+#: include/views/configuration.action.edit.php:1023
 msgid "Operation details"
 msgstr "Operation details"
 
@@ -10035,12 +10014,12 @@ msgstr "Operation has no group to operate."
 msgid "Operation has no template to operate."
 msgstr "Operation has no template to operate."
 
-#: include/views/configuration.action.edit.php:463
-#: include/views/configuration.action.edit.php:469
+#: include/views/configuration.action.edit.php:470
+#: include/views/configuration.action.edit.php:476
 msgid "Operation type"
 msgstr "Operation type"
 
-#: include/views/configuration.action.edit.php:1023
+#: include/views/configuration.action.edit.php:1033
 #: include/views/configuration.action.list.php:54
 msgid "Operations"
 msgstr "Operations"
@@ -10049,18 +10028,18 @@ msgstr "Operations"
 msgid "Operator"
 msgstr "Operator"
 
-#: include/views/configuration.host.massupdate.php:60
-#: include/views/configuration.host.massupdate.php:106
-#: include/views/configuration.host.massupdate.php:122
-#: include/views/configuration.host.massupdate.php:138
-#: include/views/configuration.host.massupdate.php:151
-#: include/views/configuration.host.massupdate.php:188
-#: include/views/configuration.host.massupdate.php:201
-#: include/views/configuration.host.massupdate.php:212
-#: include/views/configuration.host.massupdate.php:221
-#: include/views/configuration.host.massupdate.php:230
-#: include/views/configuration.host.massupdate.php:245
-#: include/views/configuration.host.massupdate.php:276
+#: include/views/configuration.host.massupdate.php:62
+#: include/views/configuration.host.massupdate.php:109
+#: include/views/configuration.host.massupdate.php:126
+#: include/views/configuration.host.massupdate.php:142
+#: include/views/configuration.host.massupdate.php:155
+#: include/views/configuration.host.massupdate.php:190
+#: include/views/configuration.host.massupdate.php:203
+#: include/views/configuration.host.massupdate.php:214
+#: include/views/configuration.host.massupdate.php:223
+#: include/views/configuration.host.massupdate.php:232
+#: include/views/configuration.host.massupdate.php:247
+#: include/views/configuration.host.massupdate.php:278
 #: include/views/configuration.item.massupdate.php:47
 #: include/views/configuration.item.massupdate.php:81
 #: include/views/configuration.item.massupdate.php:97
@@ -10098,12 +10077,12 @@ msgstr "Operator"
 msgid "Original"
 msgstr "Original"
 
-#: include/classes/core/ZBase.php:232
+#: include/classes/core/ZBase.php:233
 msgid "Original blue"
 msgstr "Original blue"
 
 #: adm.gui.php:105 adm.housekeeper.php:130 adm.iconmapping.php:119
-#: adm.images.php:141 adm.macros.php:168 adm.other.php:114 adm.regexps.php:202
+#: adm.images.php:141 adm.macros.php:168 adm.other.php:120 adm.regexps.php:202
 #: adm.triggerdisplayoptions.php:84 adm.triggerseverities.php:89
 #: adm.valuemapping.php:136 adm.workingtime.php:71
 #: include/classes/class.ctweenbox.php:76
@@ -10133,7 +10112,7 @@ msgstr "Other hosts"
 msgid "Other hosts | Group"
 msgstr "Other hosts | Group"
 
-#: include/views/administration.general.other.edit.php:42
+#: include/views/administration.general.other.edit.php:41
 msgid "Other parameters"
 msgstr "Other parameters"
 
@@ -10329,7 +10308,7 @@ msgstr "PHP xmlwriter"
 msgid "PHP xmlwriter extension missing"
 msgstr "PHP xmlwriter extension missing"
 
-#: include/discovery.inc.php:62
+#: include/discovery.inc.php:61
 #: include/views/js/configuration.discovery.edit.js.php:177
 msgid "POP"
 msgstr "POP"
@@ -10402,13 +10381,13 @@ msgstr "Parse error"
 msgid "Passive"
 msgstr "Passive"
 
-#: httpconf.php:55 include/setup.inc.php:278
+#: httpconf.php:55 include/setup.inc.php:311
 #: include/views/administration.mediatypes.edit.php:82
 #: include/views/administration.mediatypes.edit.php:86
 #: include/views/administration.users.edit.php:60
 #: include/views/administration.users.edit.php:73
-#: include/views/configuration.action.edit.php:704
-#: include/views/configuration.action.edit.php:737
+#: include/views/configuration.action.edit.php:712
+#: include/views/configuration.action.edit.php:745
 #: include/views/configuration.host.edit.php:720
 #: include/views/configuration.host.prototype.edit.php:267
 #: include/views/configuration.httpconf.edit.php:83
@@ -10416,7 +10395,7 @@ msgstr "Passive"
 #: include/views/configuration.item.edit.php:192
 #: include/views/configuration.item.massupdate.php:246
 #: include/views/configuration.item.massupdate.php:290
-#: include/views/general.login.php:70
+#: include/views/general.login.php:69
 #: include/views/js/configuration.item.edit.js.php:138
 msgid "Password"
 msgstr "Password"
@@ -10452,12 +10431,12 @@ msgstr "Percentile line (right)"
 #: include/views/configuration.item.massupdate.php:321
 #: include/views/configuration.item.massupdate.php:362
 #: include/views/configuration.maintenance.edit.php:102 popup_period.php:27
-#: popup_period.php:92 popup_period.php:126 report2.php:381 report3.php:62
+#: popup_period.php:92 popup_period.php:126 report2.php:383 report3.php:62
 #: report4.php:106 report6.php:56 srv_status.php:158
 msgid "Period"
 msgstr "Period"
 
-#: include/forms.inc.php:1613
+#: include/forms.inc.php:1635
 #: include/views/configuration.maintenance.edit.php:100
 msgid "Period type"
 msgstr "Period type"
@@ -10468,11 +10447,11 @@ msgid "Periods"
 msgstr "Periods"
 
 #: include/views/administration.usergroups.edit.php:129
-#: include/views/administration.users.edit.php:348
+#: include/views/administration.users.edit.php:347
 msgid "Permissions"
 msgstr "Permissions"
 
-#: include/views/administration.users.edit.php:346
+#: include/views/administration.users.edit.php:345
 msgid "Permissions can be assigned for user groups only."
 msgstr "Permissions can be assigned for user groups only."
 
@@ -10496,12 +10475,12 @@ msgstr "Placing algorithm"
 msgid "Plain text"
 msgstr "Plain text"
 
-#: include/views/administration.users.edit.php:228
-#: include/views/administration.users.edit.php:265
+#: include/views/administration.users.edit.php:227
+#: include/views/administration.users.edit.php:264
 msgid "Play"
 msgstr "Play"
 
-#: include/views/administration.users.edit.php:216
+#: include/views/administration.users.edit.php:215
 msgid "Play sound"
 msgstr "Play sound"
 
@@ -10509,7 +10488,7 @@ msgstr "Play sound"
 msgid "Please be aware that database still contains data related to the deleted node."
 msgstr "Please be aware that database still contains data related to the deleted node."
 
-#: include/setup.inc.php:222
+#: include/setup.inc.php:227
 msgid "Please correct all issues and press \"Retry\" button"
 msgstr "Please correct all issues and press \"Retry\" button"
 
@@ -10530,12 +10509,12 @@ msgid "Populates host inventory field"
 msgstr "Populates host inventory field"
 
 #: authentication.php:37 disc_prototypes.php:82 host_discovery.php:79
-#: hosts.php:762 include/forms.inc.php:490 include/setup.inc.php:321
+#: hosts.php:762 include/forms.inc.php:493 include/setup.inc.php:364
 #: include/views/administration.authentication.edit.php:58
 #: include/views/administration.node.edit.php:78
 #: include/views/administration.node.list.php:44
 #: include/views/administration.proxy.edit.php:57
-#: include/views/configuration.action.edit.php:751
+#: include/views/configuration.action.edit.php:759
 #: include/views/configuration.host.edit.php:231
 #: include/views/configuration.host.edit.php:318
 #: include/views/configuration.host.prototype.edit.php:95
@@ -10544,8 +10523,8 @@ msgstr "Populates host inventory field"
 #: include/views/inventory.host.view.php:103
 #: include/views/inventory.host.view.php:125
 #: include/views/inventory.host.view.php:147
-#: include/views/inventory.host.view.php:169 items.php:86 items.php:149
-#: nodes.php:40 setup.php:53
+#: include/views/inventory.host.view.php:168 items.php:86 items.php:149
+#: nodes.php:40 setup.php:46
 msgid "Port"
 msgstr "Port"
 
@@ -10580,7 +10559,7 @@ msgstr "Post"
 msgid "Preview"
 msgstr "Preview"
 
-#: include/setup.inc.php:146
+#: include/setup.inc.php:148
 msgid "Previous"
 msgstr "Previous"
 
@@ -10648,7 +10627,7 @@ msgstr ""
 msgid "Privacy protocol"
 msgstr ""
 
-#: include/views/configuration.action.edit.php:730
+#: include/views/configuration.action.edit.php:738
 #: include/views/configuration.item.edit.php:189
 #: include/views/configuration.item.massupdate.php:280
 msgid "Private key file"
@@ -10691,7 +10670,7 @@ msgid "Problem, if at least one child has a problem"
 msgstr "Problem, if at least one child has a problem"
 
 #: chart4.php:163 include/maps.inc.php:708 include/maps.inc.php:791
-#: include/maps.inc.php:882 report2.php:398 report3.php:83
+#: include/maps.inc.php:882 report2.php:400 report3.php:83
 msgid "Problems"
 msgstr "Problems"
 
@@ -10761,13 +10740,13 @@ msgstr "Proxy name"
 msgid "Proxy updated"
 msgstr "Proxy updated"
 
-#: include/views/configuration.action.edit.php:705
+#: include/views/configuration.action.edit.php:713
 #: include/views/configuration.item.edit.php:181
 #: include/views/configuration.item.massupdate.php:247
 msgid "Public key"
 msgstr "Public key"
 
-#: include/views/configuration.action.edit.php:723
+#: include/views/configuration.action.edit.php:731
 #: include/views/configuration.item.edit.php:186
 #: include/views/configuration.item.massupdate.php:270
 msgid "Public key file"
@@ -10790,12 +10769,12 @@ msgstr "RMCP+"
 msgid "Read"
 msgstr "Read"
 
-#: include/forms.inc.php:261 include/perm.inc.php:24
+#: include/forms.inc.php:264 include/perm.inc.php:24
 #: include/views/administration.usergroups.edit.php:82
 msgid "Read only"
 msgstr "Read only"
 
-#: include/forms.inc.php:261 include/perm.inc.php:23
+#: include/forms.inc.php:264 include/perm.inc.php:23
 #: include/views/administration.usergroups.edit.php:82
 msgid "Read-write"
 msgstr "Read-write"
@@ -10827,7 +10806,7 @@ msgstr "Recipient (descending)"
 msgid "Recipient(s)"
 msgstr "Recipient(s)"
 
-#: include/views/administration.users.edit.php:225
+#: include/views/administration.users.edit.php:224
 msgid "Recovery"
 msgstr "Recovery"
 
@@ -10840,7 +10819,7 @@ msgstr "Recovery message"
 msgid "Recovery subject"
 msgstr "Recovery subject"
 
-#: include/views/administration.users.edit.php:145 profile.php:52 users.php:63
+#: include/views/administration.users.edit.php:144 profile.php:52 users.php:63
 msgid "Refresh (in seconds)"
 msgstr "Refresh (in seconds)"
 
@@ -10852,11 +10831,11 @@ msgstr "Refresh time in seconds"
 msgid "Refresh time multiplier"
 msgstr "Refresh time multiplier"
 
-#: adm.other.php:33 include/views/administration.general.other.edit.php:36
+#: adm.other.php:33 include/views/administration.general.other.edit.php:35
 msgid "Refresh unsupported items (in sec)"
 msgstr "Refresh unsupported items (in sec)"
 
-#: adm.other.php:61
+#: adm.other.php:62
 #, c-format
 msgid "Refresh unsupported items (in sec) \"%1$s\"."
 msgstr "Refresh unsupported items (in sec) \"%1$s\"."
@@ -10909,14 +10888,14 @@ msgid "Regular expression updated"
 msgstr "Regular expression updated"
 
 #: adm.gui.php:99 adm.housekeeper.php:124 adm.iconmapping.php:113
-#: adm.images.php:135 adm.macros.php:162 adm.other.php:108 adm.regexps.php:196
+#: adm.images.php:135 adm.macros.php:162 adm.other.php:114 adm.regexps.php:196
 #: adm.triggerdisplayoptions.php:78 adm.triggerseverities.php:83
 #: adm.valuemapping.php:130 adm.workingtime.php:65
 #: include/views/administration.general.regularexpressions.list.php:22
 msgid "Regular expressions"
 msgstr "Regular expressions"
 
-#: include/views/general.login.php:76
+#: include/views/general.login.php:74
 msgid "Remember me for 30 days"
 msgstr "Remember me for 30 days"
 
@@ -10924,17 +10903,17 @@ msgstr "Remember me for 30 days"
 msgid "Remote command"
 msgstr "Remote command"
 
-#: include/blocks.inc.php:1201 include/blocks.inc.php:1288
-#: include/blocks.inc.php:1297 include/blocks.inc.php:1314
-#: include/blocks.inc.php:1342 include/blocks.inc.php:1365
-#: include/blocks.inc.php:1426 include/blocks.inc.php:1435
+#: include/blocks.inc.php:1208 include/blocks.inc.php:1295
+#: include/blocks.inc.php:1304 include/blocks.inc.php:1321
+#: include/blocks.inc.php:1349 include/blocks.inc.php:1372
+#: include/blocks.inc.php:1433 include/blocks.inc.php:1442
 #: include/views/administration.general.iconmap.edit.php:74
 #: include/views/administration.general.iconmap.edit.php:113
 #: include/views/common.macros.php:51
 #: include/views/configuration.action.edit.php:97
-#: include/views/configuration.action.edit.php:379
-#: include/views/configuration.action.edit.php:392
-#: include/views/configuration.action.edit.php:902
+#: include/views/configuration.action.edit.php:386
+#: include/views/configuration.action.edit.php:399
+#: include/views/configuration.action.edit.php:912
 #: include/views/configuration.httpconf.edit.php:211
 #: include/views/configuration.item.edit.php:289
 #: include/views/configuration.item.massupdate.php:334
@@ -10986,7 +10965,7 @@ msgstr "Remove from favorites"
 msgid "Remove from host group"
 msgstr "Remove from host group"
 
-#: include/actions.inc.php:432 include/views/configuration.action.edit.php:815
+#: include/actions.inc.php:432 include/views/configuration.action.edit.php:824
 msgid "Remove from host groups"
 msgstr "Remove from host groups"
 
@@ -11002,7 +10981,7 @@ msgstr "Remove link"
 msgid "Remove selected"
 msgstr "Remove selected"
 
-#: include/views/configuration.host.massupdate.php:174
+#: include/views/configuration.host.massupdate.php:176
 #: include/views/configuration.triggers.edit.php:120
 msgid "Replace"
 msgstr "Replace"
@@ -11015,11 +10994,11 @@ msgstr ""
 msgid "Replace depenencies"
 msgstr "Replace depenencies"
 
-#: include/views/configuration.host.massupdate.php:58
+#: include/views/configuration.host.massupdate.php:60
 msgid "Replace host groups"
 msgstr "Replace host groups"
 
-#: chart_bar.php:66 report2.php:181 report5.php:53 report6.php:210
+#: chart_bar.php:66 report2.php:183 report5.php:53 report6.php:210
 msgid "Report"
 msgstr "Report"
 
@@ -11039,7 +11018,7 @@ msgstr "Report 3"
 msgid "Reports"
 msgstr "Reports"
 
-#: include/setup.inc.php:192 include/views/configuration.httpconf.edit.php:165
+#: include/setup.inc.php:197 include/views/configuration.httpconf.edit.php:165
 msgid "Required"
 msgstr "Required"
 
@@ -11075,12 +11054,12 @@ msgstr "Required status codes"
 msgid "Required string"
 msgstr "Required string"
 
-#: events.php:357 hosts.php:770 include/forms.inc.php:629
+#: events.php:357 hosts.php:770 include/forms.inc.php:632
 #: include/html.inc.php:249 include/reports.inc.php:128
 #: include/reports.inc.php:268 include/reports.inc.php:450
 #: include/views/administration.auditacts.list.php:51
 #: include/views/administration.auditlogs.list.php:67
-#: include/views/inventory.host.list.php:57 latest.php:303 report2.php:385
+#: include/views/inventory.host.list.php:57 latest.php:303 report2.php:387
 #: tr_status.php:319
 msgid "Reset"
 msgstr "Reset"
@@ -11170,7 +11149,7 @@ msgstr "Retries left (ascending)"
 msgid "Retries left (descending)"
 msgstr "Retries left (descending)"
 
-#: include/setup.inc.php:224 include/setup.inc.php:463
+#: include/setup.inc.php:229 include/setup.inc.php:507
 #: include/views/general.warning.php:33
 msgid "Retry"
 msgstr "Retry"
@@ -11202,7 +11181,7 @@ msgstr ""
 msgid "Rows"
 msgstr "Rows"
 
-#: include/views/administration.users.edit.php:146 profile.php:53 users.php:64
+#: include/views/administration.users.edit.php:145 profile.php:53 users.php:64
 msgid "Rows per page"
 msgstr "Rows per page"
 
@@ -11299,7 +11278,7 @@ msgstr "SLIDE SHOWS"
 msgid "SMS"
 msgstr "SMS"
 
-#: include/discovery.inc.php:59
+#: include/discovery.inc.php:58
 #: include/views/js/configuration.discovery.edit.js.php:181
 msgid "SMTP"
 msgstr "SMTP"
@@ -11327,13 +11306,13 @@ msgstr "SNMP"
 msgid "SNMP Key"
 msgstr "SNMP Key"
 
-#: disc_prototypes.php:79 host_discovery.php:76 include/forms.inc.php:483
+#: disc_prototypes.php:79 host_discovery.php:76 include/forms.inc.php:486
 #: include/views/configuration.item.edit.php:119
 #: include/views/js/configuration.discovery.edit.js.php:427 items.php:84
 msgid "SNMP OID"
 msgstr "SNMP OID"
 
-#: disc_prototypes.php:76 host_discovery.php:73 include/forms.inc.php:469
+#: disc_prototypes.php:76 host_discovery.php:73 include/forms.inc.php:472
 #: include/views/configuration.item.edit.php:127
 #: include/views/configuration.item.massupdate.php:95
 #: include/views/js/configuration.discovery.edit.js.php:39 items.php:82
@@ -11351,21 +11330,21 @@ msgstr "SNMP interfaces"
 msgid "SNMP trap"
 msgstr "SNMP trap"
 
-#: api/classes/CItemGeneral.php:306
+#: api/classes/CItemGeneral.php:345
 msgid "SNMP trap key is invalid."
 msgstr "SNMP trap key is invalid."
 
-#: include/discovery.inc.php:67 include/items.inc.php:84
+#: include/discovery.inc.php:66 include/items.inc.php:84
 #: include/views/js/configuration.discovery.edit.js.php:178
 msgid "SNMPv1 agent"
 msgstr "SNMPv1 agent"
 
-#: include/discovery.inc.php:68 include/items.inc.php:85
+#: include/discovery.inc.php:67 include/items.inc.php:85
 #: include/views/js/configuration.discovery.edit.js.php:179
 msgid "SNMPv2 agent"
 msgstr "SNMPv2 agent"
 
-#: include/discovery.inc.php:69 include/items.inc.php:86
+#: include/discovery.inc.php:68 include/items.inc.php:86
 #: include/views/js/configuration.discovery.edit.js.php:180
 msgid "SNMPv3 agent"
 msgstr "SNMPv3 agent"
@@ -11375,7 +11354,7 @@ msgstr "SNMPv3 agent"
 msgid "SQL count: %s (selects: %s | executes: %s)"
 msgstr "SQL count: %s (selects: %s | executes: %s)"
 
-#: include/items.inc.php:1403 include/views/configuration.item.edit.php:199
+#: include/items.inc.php:1407 include/views/configuration.item.edit.php:199
 msgid "SQL query"
 msgstr ""
 
@@ -11390,8 +11369,8 @@ msgstr "SQL statement execution has failed \"%1$s\""
 msgid "SQL statement execution has failed \"%1$s\"."
 msgstr "SQL statement execution has failed \"%1$s\"."
 
-#: include/discovery.inc.php:57
-#: include/views/configuration.action.edit.php:683
+#: include/discovery.inc.php:56
+#: include/views/configuration.action.edit.php:691
 #: include/views/js/configuration.discovery.edit.js.php:182
 msgid "SSH"
 msgstr "SSH"
@@ -11424,7 +11403,7 @@ msgstr "Safari"
 msgid "Sat"
 msgstr "Sat"
 
-#: include/forms.inc.php:1636 include/forms.inc.php:1704
+#: include/forms.inc.php:1658 include/forms.inc.php:1726
 #: include/func.inc.php:136 include/func.inc.php:220
 msgid "Saturday"
 msgstr "Saturday"
@@ -11436,7 +11415,7 @@ msgstr "Saturday"
 #: include/views/administration.general.image.edit.php:55
 #: include/views/administration.general.image.edit.php:59
 #: include/views/administration.general.macros.edit.php:33
-#: include/views/administration.general.other.edit.php:48
+#: include/views/administration.general.other.edit.php:47
 #: include/views/administration.general.regularexpressions.edit.php:92
 #: include/views/administration.general.triggerDisplayOptions.edit.php:120
 #: include/views/administration.general.triggerSeverity.edit.php:76
@@ -11451,10 +11430,10 @@ msgstr "Saturday"
 #: include/views/administration.script.edit.php:119
 #: include/views/administration.usergroups.edit.php:137
 #: include/views/administration.usergroups.edit.php:143
-#: include/views/administration.users.edit.php:359
-#: include/views/administration.users.edit.php:363
-#: include/views/administration.users.edit.php:373
-#: include/views/configuration.action.edit.php:1034
+#: include/views/administration.users.edit.php:358
+#: include/views/administration.users.edit.php:362
+#: include/views/administration.users.edit.php:372
+#: include/views/configuration.action.edit.php:1044
 #: include/views/configuration.application.edit.php:52
 #: include/views/configuration.application.edit.php:62
 #: include/views/configuration.discovery.edit.php:90
@@ -11517,7 +11496,7 @@ msgstr "Schedule"
 msgid "Scheduled check"
 msgstr ""
 
-#: include/audit.inc.php:41 include/blocks.inc.php:1354
+#: include/audit.inc.php:41 include/blocks.inc.php:1361
 #: include/screens.inc.php:36 include/views/configuration.screen.edit.php:47
 #: include/views/configuration.screen.list.php:54
 #: include/views/configuration.slideconf.edit.php:50
@@ -11577,7 +11556,7 @@ msgstr "Screen should contain at least one row and column."
 msgid "Screen updated"
 msgstr "Screen updated"
 
-#: dashboard.php:326 include/blocks.inc.php:1426 include/html.inc.php:495
+#: dashboard.php:326 include/blocks.inc.php:1433 include/html.inc.php:495
 #: include/html.inc.php:499 include/menu.inc.php:67 include/menu.inc.php:195
 #: include/views/configuration.screen.list.php:38
 #: include/views/configuration.template.edit.php:362
@@ -11642,7 +11621,7 @@ msgid "Script with scriptid \"%1$s\" does not exist."
 msgstr ""
 
 #: include/menu.inc.php:260 include/views/administration.script.list.php:28
-#: jsLoader.php:184 jsLoader.php:211 report5.php:159 scripts_exec.php:26
+#: jsLoader.php:184 jsLoader.php:211 scripts_exec.php:26
 msgid "Scripts"
 msgstr "Scripts"
 
@@ -11663,7 +11642,7 @@ msgstr "Search pattern is empty"
 msgid "Search/Filter elements limit"
 msgstr "Search/Filter elements limit"
 
-#: include/forms.inc.php:1689 include/maintenances.inc.php:119
+#: include/forms.inc.php:1711 include/maintenances.inc.php:119
 msgid "Second"
 msgstr "Second"
 
@@ -11695,7 +11674,7 @@ msgstr "Secondary POC phone B"
 msgid "Secondary POC screen name"
 msgstr "Secondary POC screen name"
 
-#: include/views/administration.users.edit.php:214
+#: include/views/administration.users.edit.php:213
 msgid "Seconds"
 msgstr "Seconds"
 
@@ -11705,22 +11684,22 @@ msgstr "Seconds"
 msgid "Security level"
 msgstr ""
 
-#: include/forms.inc.php:476 include/views/configuration.item.edit.php:131
+#: include/forms.inc.php:479 include/views/configuration.item.edit.php:131
 #: include/views/configuration.item.massupdate.php:115
 #: include/views/js/configuration.discovery.edit.js.php:56
 msgid "Security name"
 msgstr ""
 
 #: events.php:340 include/classes/html/CButtonPopup.php:52
-#: include/forms.inc.php:577 include/page_header.php:328
+#: include/forms.inc.php:580 include/page_header.php:328
 #: include/reports.inc.php:423
 #: include/views/administration.auditacts.list.php:45
 #: include/views/administration.auditlogs.list.php:59
-#: include/views/configuration.action.edit.php:199
-#: include/views/configuration.action.edit.php:213
-#: include/views/configuration.action.edit.php:226
-#: include/views/configuration.action.edit.php:239
-#: include/views/configuration.action.edit.php:689
+#: include/views/configuration.action.edit.php:206
+#: include/views/configuration.action.edit.php:220
+#: include/views/configuration.action.edit.php:233
+#: include/views/configuration.action.edit.php:246
+#: include/views/configuration.action.edit.php:697
 #: include/views/configuration.graph.edit.php:88
 #: include/views/configuration.graph.edit.php:184
 #: include/views/configuration.graph.edit.php:239
@@ -11741,7 +11720,7 @@ msgstr ""
 #: include/views/js/configuration.sysmaps.js.php:111
 #: include/views/js/configuration.sysmaps.js.php:118 popup_bitem.php:125
 #: popup.php:599 popup.php:668 popup.php:797 popup.php:907 popup.php:1001
-#: popup.php:1157 popup.php:1228 popup.php:1292 popup.php:1354 popup.php:1566
+#: popup.php:1157 popup.php:1228 popup.php:1293 popup.php:1355 popup.php:1567
 #: popup_right.php:109 popup_usrgrp.php:106 tr_logform.php:271
 msgid "Select"
 msgstr "Select"
@@ -11794,7 +11773,7 @@ msgstr "Send message to user groups"
 msgid "Send message to users"
 msgstr "Send message to users"
 
-#: include/views/configuration.action.edit.php:566
+#: include/views/configuration.action.edit.php:574
 msgid "Send only to"
 msgstr "Send only to"
 
@@ -11802,11 +11781,11 @@ msgstr "Send only to"
 msgid "Send to"
 msgstr "Send to"
 
-#: include/views/configuration.action.edit.php:550
+#: include/views/configuration.action.edit.php:557
 msgid "Send to User groups"
 msgstr "Send to User groups"
 
-#: include/views/configuration.action.edit.php:551
+#: include/views/configuration.action.edit.php:558
 msgid "Send to Users"
 msgstr "Send to Users"
 
@@ -11823,7 +11802,7 @@ msgstr "Sep"
 msgid "Separated"
 msgstr "Separated"
 
-#: include/forms.inc.php:1657 include/func.inc.php:120
+#: include/forms.inc.php:1679 include/func.inc.php:120
 #: include/func.inc.php:251 jsLoader.php:126
 msgid "September"
 msgstr "September"
@@ -11836,7 +11815,7 @@ msgstr "Serial number A"
 msgid "Serial number B"
 msgstr "Serial number B"
 
-#: include/views/administration.script.list.php:67 popup.php:1551
+#: include/views/administration.script.list.php:67 popup.php:1552
 #: queue.php:146
 msgid "Server"
 msgstr "Server"
@@ -11923,7 +11902,7 @@ msgstr "Session terminated, re-login, please."
 
 #: events.php:582 events.php:595 include/classes/screens/CScreenEvents.php:44
 #: include/classes/screens/CScreenHistory.php:166
-#: include/triggers.inc.php:1601 include/views/configuration.item.list.php:136
+#: include/triggers.inc.php:1603 include/views/configuration.item.list.php:136
 #: include/views/configuration.triggers.edit.php:247
 #: include/views/configuration.triggers.list.php:108
 #: include/views/configuration.triggers.massupdate.php:70 popup.php:707
@@ -11944,7 +11923,7 @@ msgstr "Severity name cannot be empty."
 #: include/reports.inc.php:126 include/reports.inc.php:266
 #: include/reports.inc.php:448
 #: include/views/configuration.application.list.php:63
-#: include/views/js/configuration.sysmaps.js.php:26 report2.php:416
+#: include/views/js/configuration.sysmaps.js.php:26 report2.php:418
 #: tr_status.php:758 tr_status.php:763
 msgid "Show"
 msgstr "Show"
@@ -12041,7 +12020,7 @@ msgstr "Show working time"
 msgid "Shown"
 msgstr "Shown"
 
-#: include/views/general.login.php:79 index.php:55 index.php:64
+#: include/views/general.login.php:77 index.php:55 index.php:64
 msgid "Sign in"
 msgstr "Sign in"
 
@@ -12054,11 +12033,11 @@ msgstr "Simple"
 msgid "Simple check"
 msgstr "Simple check"
 
-#: include/blocks.inc.php:1194 include/screens.inc.php:38
+#: include/blocks.inc.php:1201 include/screens.inc.php:38
 msgid "Simple graph"
 msgstr "Simple graph"
 
-#: include/blocks.inc.php:1297 jsLoader.php:114
+#: include/blocks.inc.php:1304 jsLoader.php:114
 msgid "Simple graphs"
 msgstr "Simple graphs"
 
@@ -12112,7 +12091,7 @@ msgstr "Skipped copying of graph \"%1$s\" to host \"%2$s\"."
 msgid "Slide"
 msgstr "Slide"
 
-#: include/audit.inc.php:45 include/blocks.inc.php:1360
+#: include/audit.inc.php:45 include/blocks.inc.php:1367
 #: include/views/monitoring.slides.php:76
 msgid "Slide show"
 msgstr "Slide show"
@@ -12144,7 +12123,7 @@ msgstr "Slide show updated"
 msgid "Slide shows"
 msgstr "Slide shows"
 
-#: include/blocks.inc.php:1435
+#: include/blocks.inc.php:1442
 #: include/views/configuration.slideconf.edit.php:98
 msgid "Slides"
 msgstr "Slides"
@@ -12231,11 +12210,11 @@ msgstr "Stacked"
 msgid "Standard items"
 msgstr "Standard items"
 
-#: include/views/configuration.action.edit.php:328
+#: include/views/configuration.action.edit.php:335
 msgid "Start in"
 msgstr "Start in"
 
-#: include/forms.inc.php:530 include/forms.inc.php:919
+#: include/forms.inc.php:533 include/forms.inc.php:922
 #: include/views/configuration.maintenance.list.php:47
 msgid "State"
 msgstr "State"
@@ -12247,7 +12226,7 @@ msgstr "State"
 #: include/classes/screens/CScreenActions.php:63
 #: include/classes/screens/CScreenActions.php:126 include/events.inc.php:201
 #: include/events.inc.php:279 include/events.inc.php:282
-#: include/forms.inc.php:569 include/forms.inc.php:914
+#: include/forms.inc.php:572 include/forms.inc.php:917
 #: include/views/administration.auditacts.list.php:72
 #: include/views/administration.mediatypes.list.php:42
 #: include/views/administration.usergroups.list.php:49
@@ -12257,7 +12236,7 @@ msgstr "State"
 #: include/views/configuration.host.discovery.list.php:57
 #: include/views/configuration.host.edit.php:405
 #: include/views/configuration.hostgroups.list.php:63
-#: include/views/configuration.host.massupdate.php:149
+#: include/views/configuration.host.massupdate.php:153
 #: include/views/configuration.host.prototype.edit.php:162
 #: include/views/configuration.host.prototype.list.php:54
 #: include/views/configuration.httpconf.list.php:66
@@ -12313,12 +12292,12 @@ msgstr "Status of triggers"
 msgid "Status only"
 msgstr "Status only"
 
-#: actionconf.php:322 trigger_prototypes.php:291 triggers.php:322
+#: actionconf.php:322 trigger_prototypes.php:240 triggers.php:269
 msgid "Status updated"
 msgstr "Status updated"
 
 #: httpdetails.php:130 include/actions.inc.php:848 include/actions.inc.php:922
-#: include/views/configuration.action.edit.php:451
+#: include/views/configuration.action.edit.php:458
 msgid "Step"
 msgstr "Step"
 
@@ -12327,7 +12306,7 @@ msgstr "Step"
 msgid "Step \"%1$s\" [%2$s of %3$s] failed: %4$s"
 msgstr "Step \"%1$s\" [%2$s of %3$s] failed: %4$s"
 
-#: include/views/configuration.action.edit.php:442
+#: include/views/configuration.action.edit.php:449
 msgid "Step duration"
 msgstr "Step duration"
 
@@ -12340,14 +12319,14 @@ msgstr "Step of scenario"
 msgid "Step with name \"%1$s\" already exists."
 msgstr ""
 
-#: httpconf.php:50 include/views/configuration.action.edit.php:328
+#: httpconf.php:50 include/views/configuration.action.edit.php:335
 #: include/views/configuration.httpconf.edit.php:234
 #: include/views/configuration.httpconf.edit.php:242
 msgid "Steps"
 msgstr "Steps"
 
-#: include/views/administration.users.edit.php:229
-#: include/views/administration.users.edit.php:266
+#: include/views/administration.users.edit.php:228
+#: include/views/administration.users.edit.php:265
 msgid "Stop"
 msgstr "Stop"
 
@@ -12364,7 +12343,7 @@ msgstr "Straight"
 msgid "Style"
 msgstr "Style"
 
-#: include/forms.inc.php:947
+#: include/forms.inc.php:950
 msgid "Subfilter [affects only filtered data!]"
 msgstr "Subfilter [affects only filtered data!]"
 
@@ -12372,7 +12351,7 @@ msgstr "Subfilter [affects only filtered data!]"
 #: include/actions.inc.php:485 include/actions.inc.php:872
 #: include/classes/screens/CScreenActions.php:148
 #: include/views/administration.auditacts.list.php:104
-#: include/views/configuration.action.edit.php:577
+#: include/views/configuration.action.edit.php:585
 msgid "Subject"
 msgstr "Subject"
 
@@ -12404,12 +12383,12 @@ msgstr ""
 msgid "Sun"
 msgstr "Sun"
 
-#: include/forms.inc.php:1637 include/forms.inc.php:1705
+#: include/forms.inc.php:1659 include/forms.inc.php:1727
 #: include/func.inc.php:138 include/func.inc.php:214
 msgid "Sunday"
 msgstr "Sunday"
 
-#: include/views/general.login.php:42
+#: include/views/general.login.php:40
 msgid "Support"
 msgstr "Support"
 
@@ -12426,7 +12405,7 @@ msgstr "Swedish (sv_SE)"
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Switching authentication method will reset all except this session! Continue?"
 
-#: include/users.inc.php:83 include/views/administration.users.edit.php:133
+#: include/users.inc.php:83 include/views/administration.users.edit.php:132
 msgid "System default"
 msgstr "System default"
 
@@ -12453,7 +12432,7 @@ msgctxt "Tuesday short"
 msgid "T"
 msgstr "T"
 
-#: include/discovery.inc.php:65
+#: include/discovery.inc.php:64
 #: include/views/js/configuration.discovery.edit.js.php:174
 msgid "TCP"
 msgstr "TCP"
@@ -12489,7 +12468,7 @@ msgstr "Table \"%1$s\" doesn't have a field named \"%2$s\"."
 msgid "Tag"
 msgstr "Tag"
 
-#: include/views/configuration.action.edit.php:630
+#: include/views/configuration.action.edit.php:638
 #: include/views/configuration.copy.elements.php:93
 #: include/views/configuration.item.copy.php:74
 #: include/views/configuration.triggers.edit.php:146
@@ -12497,7 +12476,7 @@ msgstr "Tag"
 msgid "Target"
 msgstr "Target"
 
-#: include/views/configuration.action.edit.php:677
+#: include/views/configuration.action.edit.php:685
 msgid "Target list"
 msgstr "Target list"
 
@@ -12506,17 +12485,17 @@ msgstr "Target list"
 msgid "Target type"
 msgstr "Target type"
 
-#: include/discovery.inc.php:71
-#: include/views/configuration.action.edit.php:684
+#: include/discovery.inc.php:70
+#: include/views/configuration.action.edit.php:692
 #: include/views/js/configuration.discovery.edit.js.php:183
 msgid "Telnet"
 msgstr "Telnet"
 
 #: include/actions.inc.php:62 include/audit.inc.php:51
-#: include/forms.inc.php:605 include/forms.inc.php:924
+#: include/forms.inc.php:608 include/forms.inc.php:927
 #: include/html.inc.php:363 include/views/configuration.template.edit.php:35
 #: include/views/configuration.template.edit.php:366
-#: include/views/configuration.triggers.list.php:126 report2.php:257
+#: include/views/configuration.triggers.list.php:126 report2.php:259
 msgid "Template"
 msgstr "Template"
 
@@ -12552,7 +12531,7 @@ msgstr "Template cannot be linked to another template more than once even throug
 msgid "Template deleted"
 msgstr "Template deleted"
 
-#: report2.php:235
+#: report2.php:237
 msgid "Template group"
 msgstr "Template group"
 
@@ -12572,7 +12551,7 @@ msgstr "Template name"
 msgid "Template screens"
 msgstr "Template screens"
 
-#: report2.php:294
+#: report2.php:296
 msgid "Template trigger"
 msgstr "Template trigger"
 
@@ -12596,14 +12575,14 @@ msgstr "Template with the same name \"%s\" already exists."
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr "Template with the same visible name \"%s\" already exists."
 
-#: include/forms.inc.php:608 include/forms.inc.php:795
+#: include/forms.inc.php:611 include/forms.inc.php:798
 msgid "Templated items"
 msgstr "Templated items"
 
 #: hosts.php:801 include/menu.inc.php:164
 #: include/views/configuration.host.edit.php:687
 #: include/views/configuration.hostgroups.list.php:150
-#: include/views/configuration.host.massupdate.php:290
+#: include/views/configuration.host.massupdate.php:292
 #: include/views/configuration.host.prototype.edit.php:253
 #: include/views/configuration.host.prototype.list.php:53
 #: include/views/conf.import.php:28 search.php:276 search.php:305
@@ -12649,8 +12628,8 @@ msgstr ""
 msgid "Test string"
 msgstr "Test string"
 
-#: include/forms.inc.php:425 include/items.inc.php:129
-#: include/triggers.inc.php:2200 include/views/configuration.item.edit.php:226
+#: include/forms.inc.php:428 include/items.inc.php:129
+#: include/triggers.inc.php:2202 include/views/configuration.item.edit.php:226
 #: include/views/configuration.item.massupdate.php:212
 msgid "Text"
 msgstr "Text"
@@ -12713,7 +12692,7 @@ msgstr "The requested remote-procedure does not exist / is not available"
 msgid "The web scenario application belongs to a different host than the web scenario host."
 msgstr ""
 
-#: include/views/administration.users.edit.php:135
+#: include/views/administration.users.edit.php:134
 msgid "Theme"
 msgstr "Theme"
 
@@ -12724,7 +12703,7 @@ msgid_plural "There are \"%1$d\" groups with Internal GUI access."
 msgstr[0] "There is \"%1$d\" group with Internal GUI access."
 msgstr[1] "There are \"%1$d\" groups with Internal GUI access."
 
-#: include/forms.inc.php:1690 include/maintenances.inc.php:120
+#: include/forms.inc.php:1712 include/maintenances.inc.php:120
 msgid "Third"
 msgstr "Third"
 
@@ -12757,7 +12736,7 @@ msgstr "This year"
 msgid "Thu"
 msgstr "Thu"
 
-#: include/forms.inc.php:1634 include/forms.inc.php:1702
+#: include/forms.inc.php:1656 include/forms.inc.php:1724
 #: include/func.inc.php:134 include/func.inc.php:218
 msgid "Thursday"
 msgstr "Thursday"
@@ -12765,7 +12744,7 @@ msgstr "Thursday"
 #: include/reports.inc.php:74 include/reports.inc.php:390
 #: include/views/configuration.services.edit.php:227
 #: include/views/configuration.services.edit.php:253 popup_period.php:123
-#: report2.php:375 report3.php:143 report4.php:184 services.php:192
+#: report2.php:377 report3.php:143 report4.php:184 services.php:192
 #: services.php:198
 msgid "Till"
 msgstr "Till"
@@ -12773,7 +12752,7 @@ msgstr "Till"
 #: events.php:501 events.php:510 events.php:577 events.php:590
 #: include/acknow.inc.php:49 include/actions.inc.php:828
 #: include/actions.inc.php:851 include/actions.inc.php:907
-#: include/actions.inc.php:925 include/blocks.inc.php:891
+#: include/actions.inc.php:925 include/blocks.inc.php:897
 #: include/classes/screens/CScreenActions.php:32
 #: include/classes/screens/CScreenActions.php:38
 #: include/classes/screens/CScreenActions.php:43
@@ -12786,8 +12765,8 @@ msgstr "Till"
 #: include/views/configuration.services.edit.php:252
 #: include/views/configuration.services.edit.php:253
 #: include/views/configuration.services.edit.php:280
-#: include/views/configuration.triggers.expression.php:93
-#: include/views/configuration.triggers.expression.php:101 jsLoader.php:139
+#: include/views/configuration.triggers.expression.php:92
+#: include/views/configuration.triggers.expression.php:100 jsLoader.php:139
 #: popup_trexpr.php:43
 msgid "Time"
 msgstr "Time"
@@ -12841,7 +12820,7 @@ msgstr ""
 msgid "Title"
 msgstr "Title"
 
-#: include/views/configuration.action.edit.php:432
+#: include/views/configuration.action.edit.php:439
 #: include/views/js/configuration.sysmaps.js.php:335
 msgid "To"
 msgstr "To"
@@ -12886,7 +12865,7 @@ msgstr "Transaction has not been closed. Aborting..."
 msgid "Transport error."
 msgstr "Transport error."
 
-#: include/forms.inc.php:939
+#: include/forms.inc.php:942
 #: include/views/administration.general.housekeeper.edit.php:155
 #: include/views/configuration.item.list.php:69
 #: include/views/configuration.item.prototype.list.php:55 latest.php:322
@@ -12895,7 +12874,7 @@ msgstr "Trends"
 
 #: events.php:296 events.php:337 include/actions.inc.php:56
 #: include/audit.inc.php:33 include/classes/class.cchart.php:467
-#: include/maps.inc.php:26 include/triggers.inc.php:1600
+#: include/maps.inc.php:26 include/triggers.inc.php:1602
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:69
 #: include/views/configuration.services.edit.php:93
@@ -12925,17 +12904,17 @@ msgstr "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "Trigger \"%1$s\" skipped - user rule."
 
-#: api/classes/CTrigger.php:1624
+#: api/classes/CTrigger.php:1628
 #, c-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Trigger \"%s\" belongs to templates with different linkages."
 
-#: trigger_prototypes.php:168 triggers.php:183 triggers.php:350
+#: trigger_prototypes.php:168 triggers.php:183 triggers.php:297
 #: tr_logform.php:148
 msgid "Trigger added"
 msgstr "Trigger added"
 
-#: api/classes/CTrigger.php:1528
+#: api/classes/CTrigger.php:1532
 msgid "Trigger cannot be dependent on a trigger that is inherited from it."
 msgstr ""
 
@@ -12948,18 +12927,18 @@ msgid "Trigger deleted"
 msgstr "Trigger deleted"
 
 #: adm.gui.php:104 adm.housekeeper.php:129 adm.iconmapping.php:118
-#: adm.images.php:140 adm.macros.php:167 adm.other.php:113 adm.regexps.php:201
+#: adm.images.php:140 adm.macros.php:167 adm.other.php:119 adm.regexps.php:201
 #: adm.triggerdisplayoptions.php:83 adm.triggerseverities.php:88
 #: adm.valuemapping.php:135 adm.workingtime.php:70
 #: include/views/administration.general.triggerDisplayOptions.edit.php:114
 msgid "Trigger displaying options"
 msgstr "Trigger displaying options"
 
-#: include/views/configuration.triggers.expression.php:126
+#: include/views/configuration.triggers.expression.php:125
 msgid "Trigger expression condition"
 msgstr "Trigger expression condition"
 
-#: api/classes/CTrigger.php:692 api/classes/CTriggerPrototype.php:801
+#: api/classes/CTrigger.php:696 api/classes/CTriggerPrototype.php:801
 msgid "Trigger expression must contain at least one host:key reference."
 msgstr "Trigger expression must contain at least one host:key reference."
 
@@ -13018,14 +12997,14 @@ msgid "Trigger prototypes of"
 msgstr "Trigger prototypes of"
 
 #: adm.gui.php:103 adm.housekeeper.php:128 adm.iconmapping.php:117
-#: adm.images.php:139 adm.macros.php:166 adm.other.php:112 adm.regexps.php:200
+#: adm.images.php:139 adm.macros.php:166 adm.other.php:118 adm.regexps.php:200
 #: adm.triggerdisplayoptions.php:82 adm.triggerseverities.php:87
 #: adm.valuemapping.php:134 adm.workingtime.php:69
 #: include/views/administration.general.triggerSeverity.edit.php:70
 msgid "Trigger severities"
 msgstr "Trigger severities"
 
-#: include/actions.inc.php:54 include/views/administration.users.edit.php:273
+#: include/actions.inc.php:54 include/views/administration.users.edit.php:272
 msgid "Trigger severity"
 msgstr "Trigger severity"
 
@@ -13038,9 +13017,9 @@ msgstr "Trigger updated"
 msgid "Trigger value"
 msgstr "Trigger value"
 
-#: hosts.php:796 hosts.php:888 include/forms.inc.php:590
+#: hosts.php:796 hosts.php:888 include/forms.inc.php:593
 #: include/html.inc.php:445 include/html.inc.php:449 include/menu.inc.php:52
-#: include/triggers.inc.php:1223
+#: include/triggers.inc.php:1224
 #: include/views/configuration.action.list.php:33
 #: include/views/configuration.host.discovery.list.php:51
 #: include/views/configuration.host.edit.php:473
@@ -13063,7 +13042,7 @@ msgstr "Triggers"
 msgid "Triggers (e/d)[p/o]"
 msgstr ""
 
-#: trigger_prototypes.php:297 triggers.php:362
+#: trigger_prototypes.php:246 triggers.php:309
 msgid "Triggers deleted"
 msgstr "Triggers deleted"
 
@@ -13104,7 +13083,7 @@ msgstr "Try to read inaccessible property \"%s\"."
 msgid "Tue"
 msgstr "Tue"
 
-#: include/forms.inc.php:1632 include/forms.inc.php:1700
+#: include/forms.inc.php:1654 include/forms.inc.php:1722
 #: include/func.inc.php:132 include/func.inc.php:216
 msgid "Tuesday"
 msgstr "Tuesday"
@@ -13124,7 +13103,7 @@ msgstr "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory fie
 
 #: include/actions.inc.php:829 include/classes/screens/CScreenActions.php:48
 #: include/classes/screens/CScreenActions.php:53
-#: include/classes/screens/CScreenActions.php:125 include/forms.inc.php:526
+#: include/classes/screens/CScreenActions.php:125 include/forms.inc.php:529
 #: include/hosts.inc.php:105
 #: include/views/administration.auditacts.list.php:71
 #: include/views/administration.general.image.edit.php:36
@@ -13135,7 +13114,7 @@ msgstr "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory fie
 #: include/views/administration.node.list.php:43
 #: include/views/administration.script.edit.php:48
 #: include/views/administration.script.list.php:40
-#: include/views/configuration.action.edit.php:693
+#: include/views/configuration.action.edit.php:701
 #: include/views/configuration.graph.edit.php:72
 #: include/views/configuration.host.discovery.list.php:56
 #: include/views/configuration.item.edit.php:67
@@ -13171,11 +13150,11 @@ msgid "Type (descending)"
 msgstr "Type (descending)"
 
 #: include/views/configuration.action.edit.php:111
-#: include/views/configuration.action.edit.php:940
+#: include/views/configuration.action.edit.php:950
 msgid "Type of calculation"
 msgstr "Type of calculation"
 
-#: include/forms.inc.php:528 include/forms.inc.php:909
+#: include/forms.inc.php:531 include/forms.inc.php:912
 #: include/views/configuration.item.edit.php:216
 #: include/views/configuration.item.edit.php:227
 #: include/views/configuration.item.massupdate.php:215 popup.php:823
@@ -13183,15 +13162,15 @@ msgstr "Type of calculation"
 msgid "Type of information"
 msgstr "Type of information"
 
-#: api/classes/CItemGeneral.php:316
+#: api/classes/CItemGeneral.php:313
 msgid "Type of information must be \"Log\" for log key."
 msgstr "Type of information must be \"Log\" for log key."
 
-#: api/classes/CItemGeneral.php:312
+#: api/classes/CItemGeneral.php:308
 msgid "Type of information must be \"Numeric (float)\" for aggregate items."
 msgstr "Type of information must be \"Numeric (float)\" for aggregate items."
 
-#: include/forms.inc.php:904
+#: include/forms.inc.php:907
 msgid "Types"
 msgstr "Types"
 
@@ -13212,7 +13191,7 @@ msgstr "UP"
 msgid "URL"
 msgstr "URL"
 
-#: include/views/administration.users.edit.php:147
+#: include/views/administration.users.edit.php:146
 msgid "URL (after login)"
 msgstr "URL (after login)"
 
@@ -13238,7 +13217,6 @@ msgstr ""
 
 #: include/views/configuration.sysmap.edit.php:180
 #: include/views/js/configuration.sysmaps.js.php:177 jsLoader.php:216
-#: report5.php:157
 msgid "URLs"
 msgstr "URLs"
 
@@ -13250,7 +13228,7 @@ msgstr "USA (160 characters)"
 msgid "USER PROFILE"
 msgstr "USER PROFILE"
 
-#: include/func.inc.php:2586
+#: include/func.inc.php:2585
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -13308,9 +13286,9 @@ msgstr "Units"
 #: include/actions.inc.php:201 include/actions.inc.php:209
 #: include/actions.inc.php:223 include/actions.inc.php:234
 #: include/actions.inc.php:265 include/actions.inc.php:654
-#: include/actions.inc.php:1167 include/blocks.inc.php:1073
-#: include/classes/class.chostsinfo.php:127 include/discovery.inc.php:133
-#: include/discovery.inc.php:170 include/events.inc.php:47
+#: include/actions.inc.php:1167 include/blocks.inc.php:1080
+#: include/classes/class.chostsinfo.php:127 include/discovery.inc.php:132
+#: include/discovery.inc.php:169 include/events.inc.php:47
 #: include/events.inc.php:78 include/graphs.inc.php:37
 #: include/graphs.inc.php:77 include/hosts.inc.php:53 include/hosts.inc.php:80
 #: include/html.inc.php:374 include/httptest.inc.php:39
@@ -13322,8 +13300,8 @@ msgstr "Units"
 #: include/media.inc.php:40 include/nodes.inc.php:278 include/perm.inc.php:30
 #: include/regexp.inc.php:206 include/screens.inc.php:55
 #: include/triggers.inc.php:62 include/triggers.inc.php:177
-#: include/triggers.inc.php:196 include/triggers.inc.php:2451
-#: include/triggers.inc.php:2457 include/users.inc.php:66
+#: include/triggers.inc.php:196 include/triggers.inc.php:2453
+#: include/triggers.inc.php:2459 include/users.inc.php:66
 #: include/users.inc.php:88
 #: include/views/js/configuration.discovery.edit.js.php:192
 msgid "Unknown"
@@ -13341,11 +13319,11 @@ msgstr "Unknown calculation algorithm of service status"
 msgid "Unknown function."
 msgstr "Unknown function."
 
-#: include/triggers.inc.php:1734 tr_testexpr.php:34
+#: include/triggers.inc.php:1736 tr_testexpr.php:34
 msgid "Unknown host item, no such item in selected host"
 msgstr "Unknown host item, no such item in selected host"
 
-#: include/triggers.inc.php:1733 tr_testexpr.php:33
+#: include/triggers.inc.php:1735 tr_testexpr.php:33
 msgid "Unknown host, no such host present in system"
 msgstr "Unknown host, no such host present in system"
 
@@ -13357,7 +13335,7 @@ msgstr "Unknown interface type."
 msgid "Unknown resource"
 msgstr "Unknown resource"
 
-#: include/items.inc.php:978
+#: include/items.inc.php:982
 msgid "Unknown value type"
 msgstr "Unknown value type"
 
@@ -13376,7 +13354,7 @@ msgstr "Unlink and clear"
 msgid "Unlink from template"
 msgstr "Unlink from template"
 
-#: include/actions.inc.php:456 include/views/configuration.action.edit.php:859
+#: include/actions.inc.php:456 include/views/configuration.action.edit.php:869
 msgid "Unlink from templates"
 msgstr "Unlink from templates"
 
@@ -13459,19 +13437,19 @@ msgstr ""
 msgid "Unsupported parameter \"%2$s\" for host prototype %1$s host inventory."
 msgstr ""
 
-#: include/blocks.inc.php:1160
+#: include/blocks.inc.php:1167
 msgctxt "discovery results in dashboard"
 msgid "Up"
 msgstr "Up"
 
-#: include/discovery.inc.php:155
+#: include/discovery.inc.php:154
 msgctxt "discovery status"
 msgid "Up"
 msgstr "Up"
 
 #: include/views/administration.auditlogs.list.php:46
-#: include/views/configuration.action.edit.php:1009
-#: include/views/configuration.host.massupdate.php:296
+#: include/views/configuration.action.edit.php:1019
+#: include/views/configuration.host.massupdate.php:298
 #: include/views/configuration.httpconf.popup.php:93
 #: include/views/configuration.item.massupdate.php:562
 #: include/views/js/adm.regexprs.edit.js.php:255
@@ -13484,7 +13462,7 @@ msgstr "Update"
 msgid "Update existing"
 msgstr "Update existing"
 
-#: include/forms.inc.php:448 include/views/configuration.httpconf.list.php:65
+#: include/forms.inc.php:451 include/views/configuration.httpconf.list.php:65
 #: items.php:152
 msgid "Update interval"
 msgstr "Update interval"
@@ -13505,8 +13483,8 @@ msgid "Updated status of host"
 msgstr "Updated status of host"
 
 #: include/blocks.inc.php:367 include/blocks.inc.php:707
-#: include/blocks.inc.php:774 include/blocks.inc.php:1018
-#: include/blocks.inc.php:1117 include/blocks.inc.php:1175
+#: include/blocks.inc.php:774 include/blocks.inc.php:1025
+#: include/blocks.inc.php:1124 include/blocks.inc.php:1182
 #: include/classes/screens/CScreenSystemStatus.php:47
 #, c-format
 msgid "Updated: %s"
@@ -13537,7 +13515,7 @@ msgstr "Updated: Item \"%1$s\" on \"%2$s\"."
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 
-#: api/classes/CTrigger.php:1277
+#: api/classes/CTrigger.php:1281
 #, c-format
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Updated: Trigger \"%1$s\" on \"%2$s\"."
@@ -13547,7 +13525,7 @@ msgstr "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgid "Updated: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Updated: Trigger prototype \"%1$s\" on \"%2$s\"."
 
-#: api/classes/managers/CHttpTestManager.php:247
+#: api/classes/managers/CHttpTestManager.php:249
 #, c-format
 msgid "Updated: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -13589,11 +13567,11 @@ msgid "Used in actions"
 msgstr "Used in actions"
 
 #: httpconf.php:53 include/acknow.inc.php:49 include/actions.inc.php:965
-#: include/audit.inc.php:24 include/hosts.inc.php:67 include/setup.inc.php:274
+#: include/audit.inc.php:24 include/hosts.inc.php:67 include/setup.inc.php:304
 #: include/views/administration.auditlogs.list.php:56
 #: include/views/administration.auditlogs.list.php:86
-#: include/views/administration.users.edit.php:320
-#: include/views/configuration.action.edit.php:512
+#: include/views/administration.users.edit.php:319
+#: include/views/configuration.action.edit.php:519
 #: include/views/configuration.httpconf.edit.php:82
 msgid "User"
 msgstr "User"
@@ -13607,7 +13585,7 @@ msgstr "User \"%s\" cannot be without user group."
 msgid "User added"
 msgstr "User added"
 
-#: include/views/administration.users.edit.php:338
+#: include/views/administration.users.edit.php:337
 msgid "User can't change type for himself"
 msgstr "User can't change type for himself"
 
@@ -13636,7 +13614,7 @@ msgstr "User deleted"
 #: include/views/administration.script.list.php:43
 #: include/views/administration.usergroups.edit.php:128
 #: include/views/administration.users.list.php:41
-#: include/views/configuration.action.edit.php:503
+#: include/views/configuration.action.edit.php:510
 msgid "User group"
 msgstr "User group"
 
@@ -13655,18 +13633,20 @@ msgstr "User group \"%s\" already exists."
 msgid "User group [%s] is used in configuration for database down messages."
 msgstr "User group [%s] is used in configuration for database down messages."
 
-#: include/views/administration.general.other.edit.php:38
+#: include/views/administration.general.other.edit.php:37
 msgid "User group for database down message"
 msgstr "User group for database down message"
 
-#: adm.other.php:88
-msgid "User group for database down message."
-msgstr "User group for database down message."
+#: adm.other.php:94
+#, c-format
+msgid "User group for database down message \"%1$s\"."
+msgstr ""
 
 #: include/views/administration.script.edit.php:78
 #: include/views/administration.usergroups.list.php:28
 #: include/views/administration.usergroups.list.php:34
 #: include/views/administration.users.list.php:28 popup.php:48
+#: popup_usrgrp.php:25 popup_usrgrp.php:49
 msgid "User groups"
 msgstr "User groups"
 
@@ -13685,7 +13665,7 @@ msgid "User may not modify system status for himself by becoming a member of use
 msgstr "User may not modify system status for himself by becoming a member of user group \"%s\"."
 
 #: disc_prototypes.php:66 host_discovery.php:61
-#: include/views/configuration.action.edit.php:716
+#: include/views/configuration.action.edit.php:724
 #: include/views/configuration.item.edit.php:183
 #: include/views/configuration.item.massupdate.php:260 items.php:70
 msgid "User name"
@@ -13707,8 +13687,8 @@ msgstr "User profile"
 msgid "User sessions"
 msgstr ""
 
-#: include/views/administration.users.edit.php:338
-#: include/views/administration.users.edit.php:342
+#: include/views/administration.users.edit.php:337
+#: include/views/administration.users.edit.php:341
 #: include/views/administration.users.list.php:58
 msgid "User type"
 msgstr "User type"
@@ -13828,7 +13808,7 @@ msgid "Value map with valuemapid \"%1$s\" does not exist."
 msgstr "Value map with valuemapid \"%1$s\" does not exist."
 
 #: adm.gui.php:101 adm.housekeeper.php:126 adm.iconmapping.php:115
-#: adm.images.php:137 adm.macros.php:164 adm.other.php:110 adm.regexps.php:198
+#: adm.images.php:137 adm.macros.php:164 adm.other.php:116 adm.regexps.php:198
 #: adm.triggerdisplayoptions.php:80 adm.triggerseverities.php:85
 #: adm.valuemapping.php:132 adm.valuemapping.php:199 adm.workingtime.php:67
 #: include/views/administration.general.valuemapping.edit.php:55
@@ -13907,16 +13887,12 @@ msgstr "We are sorry, the maximum possible number of elements to remember has be
 msgid "Web"
 msgstr "Web"
 
-#: httpmon.php:80
-msgid "Web checks"
-msgstr "Web checks"
-
 #: dashboard.php:411 include/items.inc.php:98
 msgid "Web monitoring"
 msgstr "Web monitoring"
 
-#: api/classes/managers/CHttpTestManager.php:366
-#: api/classes/managers/CHttpTestManager.php:374
+#: api/classes/managers/CHttpTestManager.php:368
+#: api/classes/managers/CHttpTestManager.php:376
 #, c-format
 msgid "Web scenario \"%1$s\" already exists on host \"%2$s\"."
 msgstr ""
@@ -13960,7 +13936,7 @@ msgstr ""
 msgid "Web scenario step number cannot be less than 1."
 msgstr ""
 
-#: include/html.inc.php:519 include/html.inc.php:523
+#: httpmon.php:80 include/html.inc.php:519 include/html.inc.php:523
 msgid "Web scenarios"
 msgstr ""
 
@@ -13968,7 +13944,7 @@ msgstr ""
 msgid "Wed"
 msgstr "Wed"
 
-#: include/forms.inc.php:1633 include/forms.inc.php:1701
+#: include/forms.inc.php:1655 include/forms.inc.php:1723
 #: include/func.inc.php:133 include/func.inc.php:217
 msgid "Wednesday"
 msgstr "Wednesday"
@@ -13977,7 +13953,7 @@ msgstr "Wednesday"
 msgid "Week"
 msgstr "Week"
 
-#: include/forms.inc.php:1610 include/maintenances.inc.php:38
+#: include/forms.inc.php:1632 include/maintenances.inc.php:38
 #: include/reports.inc.php:62 include/reports.inc.php:398
 #: include/reports.inc.php:406 report3.php:59 report4.php:109
 msgid "Weekly"
@@ -14010,8 +13986,8 @@ msgstr "With last event unacknowledged"
 msgid "With problems"
 msgstr "With problems"
 
-#: include/forms.inc.php:593 include/forms.inc.php:820
-#: include/forms.inc.php:929
+#: include/forms.inc.php:596 include/forms.inc.php:823
+#: include/forms.inc.php:932
 msgid "With triggers"
 msgstr "With triggers"
 
@@ -14023,7 +13999,7 @@ msgstr "With unacknowledged events"
 msgid "Without problems"
 msgstr "Without problems"
 
-#: include/forms.inc.php:594 include/forms.inc.php:817
+#: include/forms.inc.php:597 include/forms.inc.php:820
 msgid "Without triggers"
 msgstr "Without triggers"
 
@@ -14032,7 +14008,7 @@ msgid "Wizard"
 msgstr "Wizard"
 
 #: adm.gui.php:102 adm.housekeeper.php:127 adm.iconmapping.php:116
-#: adm.images.php:138 adm.macros.php:165 adm.other.php:111 adm.regexps.php:199
+#: adm.images.php:138 adm.macros.php:165 adm.other.php:117 adm.regexps.php:199
 #: adm.triggerdisplayoptions.php:81 adm.triggerseverities.php:86
 #: adm.valuemapping.php:133 adm.workingtime.php:68
 #: include/views/administration.general.workingtime.edit.php:25
@@ -14055,7 +14031,7 @@ msgstr "Write"
 msgid "Wrong fields for dependency for service \"%1$s\"."
 msgstr "Wrong fields for dependency for service \"%1$s\"."
 
-#: api/classes/CMapElement.php:51
+#: api/classes/CMapElement.php:55
 msgid "Wrong fields for element."
 msgstr "Wrong fields for element."
 
@@ -14073,15 +14049,15 @@ msgstr ""
 msgid "Wrong fields for image."
 msgstr ""
 
-#: api/classes/CMapElement.php:452
+#: api/classes/CMapElement.php:497
 msgid "Wrong fields for linktrigger delete."
 msgstr ""
 
-#: api/classes/CMapElement.php:427
+#: api/classes/CMapElement.php:472
 msgid "Wrong fields for linktrigger update."
 msgstr ""
 
-#: api/classes/CMapElement.php:392
+#: api/classes/CMapElement.php:437
 msgid "Wrong fields for linktrigger."
 msgstr ""
 
@@ -14091,7 +14067,7 @@ msgstr ""
 msgid "Wrong fields for macro \"%1$s\"."
 msgstr "Wrong fields for macro \"%1$s\"."
 
-#: api/classes/CMapElement.php:136
+#: api/classes/CMapElement.php:181
 msgid "Wrong fields for map link."
 msgstr ""
 
@@ -14238,8 +14214,8 @@ msgstr "Yearly"
 
 #: events.php:761 include/blocks.inc.php:727
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:365
-#: include/events.inc.php:383 include/func.inc.php:2407
-#: include/triggers.inc.php:1606
+#: include/events.inc.php:383 include/func.inc.php:2406
+#: include/triggers.inc.php:1608
 #: include/views/administration.users.list.php:76
 #: include/views/js/adm.regexprs.edit.js.php:139
 msgid "Yes"
@@ -14249,7 +14225,7 @@ msgstr "Yes"
 msgid "Yotta"
 msgstr "Yotta"
 
-#: include/views/administration.users.edit.php:128
+#: include/views/administration.users.edit.php:127
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 
@@ -14258,7 +14234,7 @@ msgstr "You are not able to choose some of the languages, because locales for th
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "You are not allowed to alter privileges for user \"%s\"."
 
-#: include/func.inc.php:2090
+#: include/func.inc.php:2089
 msgid "You are not logged in."
 msgstr "You are not logged in."
 
@@ -14309,15 +14285,15 @@ msgstr "You do not have permissions to update other users."
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "You do not have permissions to update user or user does not exist."
 
-#: include/func.inc.php:2072
+#: include/func.inc.php:2071
 msgid "You have no permissions to access this page."
 msgstr ""
 
-#: include/func.inc.php:2092
+#: include/func.inc.php:2091
 msgid "You must login to view this page."
 msgstr "You must login to view this page."
 
-#: include/func.inc.php:2068
+#: include/func.inc.php:2067
 msgid "Your are logged in as"
 msgstr ""
 
@@ -14339,7 +14315,7 @@ msgid "Zabbix"
 msgstr "Zabbix"
 
 #: include/page_footer.php:103 include/views/general.browserwarning.php:60
-#: include/views/general.login.php:50
+#: include/views/general.login.php:48
 #, c-format
 msgid "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
 msgstr ""
@@ -14356,9 +14332,9 @@ msgstr "Zabbix Super Admin"
 msgid "Zabbix User"
 msgstr "Zabbix User"
 
-#: include/discovery.inc.php:66 include/items.inc.php:81
+#: include/discovery.inc.php:65 include/items.inc.php:81
 #: include/views/administration.script.edit.php:53
-#: include/views/configuration.action.edit.php:698
+#: include/views/configuration.action.edit.php:706
 #: include/views/js/configuration.action.edit.js.php:118
 #: include/views/js/configuration.discovery.edit.js.php:184
 msgid "Zabbix agent"
@@ -14385,9 +14361,9 @@ msgid "Zabbix internal authentication"
 msgstr "Zabbix internal authentication"
 
 #: include/classes/class.cserverinfo.php:37
-#: include/classes/class.cserverinfo.php:38 include/setup.inc.php:374
+#: include/classes/class.cserverinfo.php:38 include/setup.inc.php:418
 #: include/views/administration.script.edit.php:54
-#: include/views/configuration.action.edit.php:699
+#: include/views/configuration.action.edit.php:707
 #: include/views/js/configuration.action.edit.js.php:122
 msgid "Zabbix server"
 msgstr "Zabbix server"
@@ -14428,11 +14404,11 @@ msgstr "Zabbix server is running"
 msgid "Zabbix server is running check interval \"%1$s\"."
 msgstr "Zabbix server is running check interval \"%1$s\"."
 
-#: include/setup.inc.php:376
+#: include/setup.inc.php:420
 msgid "Zabbix server name"
 msgstr "Zabbix server name"
 
-#: include/setup.inc.php:375
+#: include/setup.inc.php:419
 msgid "Zabbix server port"
 msgstr "Zabbix server port"
 
@@ -14448,8 +14424,8 @@ msgstr "Zetta"
 msgid "Zoom"
 msgstr "Zoom"
 
-#: include/classes/screens/CScreenHostgroupTriggers.php:127
-#: include/classes/screens/CScreenHostTriggers.php:127
+#: include/classes/screens/CScreenHostgroupTriggers.php:132
+#: include/classes/screens/CScreenHostTriggers.php:131
 msgid "[H:i:s]"
 msgstr "[h:i:s A]"
 
@@ -14469,17 +14445,17 @@ msgstr "agent"
 
 #: include/classes/class.cchart.php:1809
 #: include/classes/class.cpagefilter.php:890
-#: include/classes/screens/CScreenHostgroupTriggers.php:104
-#: include/classes/screens/CScreenHostgroupTriggers.php:110
-#: include/classes/screens/CScreenHostTriggers.php:106
-#: include/classes/screens/CScreenHostTriggers.php:112
-#: include/forms.inc.php:377 include/forms.inc.php:420
-#: include/forms.inc.php:435 include/forms.inc.php:442
-#: include/forms.inc.php:459 include/forms.inc.php:592
-#: include/forms.inc.php:607 include/graphs.inc.php:86
-#: include/views/js/configuration.graph.edit.js.php:45 report2.php:220
-#: report2.php:239 report2.php:261 report2.php:298 report2.php:324
-#: report2.php:343 report4.php:94 report4.php:270
+#: include/classes/screens/CScreenHostgroupTriggers.php:109
+#: include/classes/screens/CScreenHostgroupTriggers.php:115
+#: include/classes/screens/CScreenHostTriggers.php:110
+#: include/classes/screens/CScreenHostTriggers.php:116
+#: include/forms.inc.php:380 include/forms.inc.php:423
+#: include/forms.inc.php:438 include/forms.inc.php:445
+#: include/forms.inc.php:462 include/forms.inc.php:595
+#: include/forms.inc.php:610 include/graphs.inc.php:86
+#: include/views/js/configuration.graph.edit.js.php:45 report2.php:222
+#: report2.php:241 report2.php:263 report2.php:300 report2.php:326
+#: report2.php:345 report4.php:94 report4.php:270
 msgid "all"
 msgstr "all"
 
@@ -14491,11 +14467,11 @@ msgstr ""
 msgid "already exists"
 msgstr "already exists"
 
-#: include/views/configuration.action.edit.php:918
-#: include/views/configuration.action.edit.php:925
-#: include/views/js/configuration.action.edit.js.php:505
-#: include/views/js/configuration.action.edit.js.php:506
-#: include/views/js/configuration.action.edit.js.php:514
+#: include/views/configuration.action.edit.php:928
+#: include/views/configuration.action.edit.php:935
+#: include/views/js/configuration.action.edit.js.php:508
+#: include/views/js/configuration.action.edit.js.php:509
+#: include/views/js/configuration.action.edit.js.php:517
 msgid "and"
 msgstr "and"
 
@@ -14545,7 +14521,7 @@ msgid "d M Y H:i"
 msgstr "M jS, Y h:i A"
 
 #: acknow.php:208 events.php:269 httpdetails.php:116 httpmon.php:140
-#: include/acknow.inc.php:54 include/blocks.inc.php:994
+#: include/acknow.inc.php:54 include/blocks.inc.php:1001
 #: include/classes/screens/CScreenEvents.php:58
 #: include/classes/screens/CScreenPlainText.php:95 include/events.inc.php:183
 #: include/events.inc.php:256 include/events.inc.php:309
@@ -14585,7 +14561,7 @@ msgstr "days"
 msgid "dd"
 msgstr "dd"
 
-#: include/classes/class.cpagefilter.php:754 include/setup.inc.php:359
+#: include/classes/class.cpagefilter.php:754 include/setup.inc.php:403
 #: include/views/configuration.slideconf.edit.php:66
 #: include/views/js/configuration.slideconf.edit.js.php:13
 msgid "default"
@@ -14697,9 +14673,9 @@ msgid "last"
 msgstr "last"
 
 #: hosts.php:759 hosts.php:760 hosts.php:761 include/actions.inc.php:29
-#: include/forms.inc.php:469 include/forms.inc.php:476
-#: include/forms.inc.php:483 include/forms.inc.php:490
-#: include/forms.inc.php:599 include/forms.inc.php:614
+#: include/forms.inc.php:472 include/forms.inc.php:479
+#: include/forms.inc.php:486 include/forms.inc.php:493
+#: include/forms.inc.php:602 include/forms.inc.php:617
 #: include/views/inventory.host.list.php:40
 msgid "like"
 msgstr "like"
@@ -14722,7 +14698,7 @@ msgstr "m"
 msgid "macro(s)"
 msgstr "macro(s)"
 
-#: include/actions.inc.php:194 include/views/configuration.action.edit.php:191
+#: include/actions.inc.php:194 include/views/configuration.action.edit.php:198
 msgid "maintenance"
 msgstr "maintenance"
 
@@ -14744,7 +14720,7 @@ msgstr "max"
 msgid "min"
 msgstr "min"
 
-#: include/views/configuration.action.edit.php:320
+#: include/views/configuration.action.edit.php:327
 msgid "minimum 60 seconds"
 msgstr "minimum 60 seconds"
 
@@ -14767,22 +14743,6 @@ msgstr "must be a valid LDAP user"
 msgid "new"
 msgstr ""
 
-#: include/classes/class.frontendsetup.php:291
-#: include/classes/class.frontendsetup.php:319
-#: include/classes/class.frontendsetup.php:338
-#: include/classes/class.frontendsetup.php:357
-#: include/classes/class.frontendsetup.php:408
-#: include/classes/class.frontendsetup.php:434
-#: include/classes/class.frontendsetup.php:459
-#: include/classes/class.frontendsetup.php:502
-#: include/classes/class.frontendsetup.php:521
-#: include/classes/class.frontendsetup.php:550
-#: include/classes/class.frontendsetup.php:569
-#: include/classes/class.frontendsetup.php:588
-#: include/classes/class.frontendsetup.php:607
-msgid "no"
-msgstr "no"
-
 #: include/classes/class.cchart.php:1886 include/classes/class.cpie.php:333
 #, c-format
 msgid "no data"
@@ -14801,7 +14761,7 @@ msgid "not running"
 msgstr "not running"
 
 #: hostinventoriesoverview.php:70 include/classes/class.cpagefilter.php:807
-#: include/classes/class.cpagefilter.php:890 include/forms.inc.php:1135
+#: include/classes/class.cpagefilter.php:890 include/forms.inc.php:1139
 msgid "not selected"
 msgstr "not selected"
 
@@ -14820,15 +14780,44 @@ msgstr "now"
 msgid "of"
 msgstr "of"
 
+#: include/classes/class.frontendsetup.php:291
+#: include/classes/class.frontendsetup.php:319
+#: include/classes/class.frontendsetup.php:338
+#: include/classes/class.frontendsetup.php:357
+#: include/classes/class.frontendsetup.php:408
+#: include/classes/class.frontendsetup.php:434
+#: include/classes/class.frontendsetup.php:459
+#: include/classes/class.frontendsetup.php:502
+#: include/classes/class.frontendsetup.php:521
+#: include/classes/class.frontendsetup.php:550
+#: include/classes/class.frontendsetup.php:569
+#: include/classes/class.frontendsetup.php:588
+#: include/classes/class.frontendsetup.php:589
+#: include/classes/class.frontendsetup.php:607
+msgid "off"
+msgstr ""
+
+#: include/classes/class.frontendsetup.php:319
+#: include/classes/class.frontendsetup.php:338
+#: include/classes/class.frontendsetup.php:357
+#: include/classes/class.frontendsetup.php:408
+#: include/classes/class.frontendsetup.php:434
+#: include/classes/class.frontendsetup.php:459
+#: include/classes/class.frontendsetup.php:502
+#: include/classes/class.frontendsetup.php:521
+#: include/classes/class.frontendsetup.php:550
+#: include/classes/class.frontendsetup.php:569
+#: include/classes/class.frontendsetup.php:588
+#: include/classes/class.frontendsetup.php:607
 #: include/views/monitoring.hostscreen.php:54
 msgid "on"
 msgstr "on"
 
-#: include/views/configuration.action.edit.php:921
-#: include/views/configuration.action.edit.php:924
-#: include/views/js/configuration.action.edit.js.php:509
-#: include/views/js/configuration.action.edit.js.php:510
+#: include/views/configuration.action.edit.php:931
+#: include/views/configuration.action.edit.php:934
+#: include/views/js/configuration.action.edit.js.php:512
 #: include/views/js/configuration.action.edit.js.php:513
+#: include/views/js/configuration.action.edit.js.php:516
 msgid "or"
 msgstr "or"
 
@@ -14925,21 +14914,6 @@ msgstr ""
 msgctxt "year short"
 msgid "y"
 msgstr "y"
-
-#: include/classes/class.frontendsetup.php:319
-#: include/classes/class.frontendsetup.php:338
-#: include/classes/class.frontendsetup.php:357
-#: include/classes/class.frontendsetup.php:408
-#: include/classes/class.frontendsetup.php:434
-#: include/classes/class.frontendsetup.php:459
-#: include/classes/class.frontendsetup.php:502
-#: include/classes/class.frontendsetup.php:521
-#: include/classes/class.frontendsetup.php:550
-#: include/classes/class.frontendsetup.php:569
-#: include/classes/class.frontendsetup.php:588
-#: include/classes/class.frontendsetup.php:607
-msgid "yes"
-msgstr "yes"
 
 #: include/html.inc.php:640
 msgid "yyyy"

@@ -61,7 +61,7 @@ $graphTypeComboBox->addItems(graphType());
 $graphFormList->addRow(_('Graph type'), $graphTypeComboBox);
 
 // append items to form list
-$itemsTable = new CTable(_('No items defined.'), 'formElementTable');
+$itemsTable = new CTable(null, 'formElementTable');
 $itemsTable->attr('style', 'min-width: 700px;');
 $itemsTable->attr('id', 'itemsTable');
 $itemsTable->setHeader(array(

@@ -4063,7 +4063,7 @@ static zbx_uint64_t	DBget_same_itemid(zbx_uint64_t hostid, zbx_uint64_t titemid)
 	const char	*__function_name = "DBget_same_itemid";
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	itemid;
+	zbx_uint64_t	itemid = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64
 			" titemid:" ZBX_FS_UI64,
@@ -4077,10 +4077,8 @@ static zbx_uint64_t	DBget_same_itemid(zbx_uint64_t hostid, zbx_uint64_t titemid)
 				" and ti.itemid=" ZBX_FS_UI64,
 			hostid, titemid);
 
-	while (NULL != (row = DBfetch(result)))
-	{
+	if (NULL != (row = DBfetch(result)))
 		ZBX_STR2UINT64(itemid, row[0]);
-	}
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_UI64, __function_name, itemid);

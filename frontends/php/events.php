@@ -51,7 +51,7 @@ else {
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-$allow_discovery = check_right_on_discovery(PERM_READ);
+$allow_discovery = check_right_on_discovery();
 $allowed_sources[] = EVENT_SOURCE_TRIGGERS;
 if ($allow_discovery) {
 	$allowed_sources[] = EVENT_SOURCE_DISCOVERY;
@@ -367,7 +367,7 @@ $eventsWidget->addFlicker($scroll, CProfile::get('web.events.filter.state', 0));
 /*
  * Display
  */
-$table = new CTableInfo(_('No events defined.'));
+$table = new CTableInfo(_('No events found.'));
 
 // trigger events
 if ($source == EVENT_OBJECT_TRIGGER) {
@@ -688,7 +688,7 @@ else {
 
 				foreach ($trigger['items'] as $item) {
 					$triggerItems[] = array(
-						'name' => htmlspecialchars(itemName($item)),
+						'name' => itemName($item),
 						'params' => array(
 							'itemid' => $item['itemid'],
 							'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))

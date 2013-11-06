@@ -34,7 +34,7 @@
 .classic .ui-widget { font-family: Verdana, Arial, sans-serif; font-size: 1em; }
 .classic .ui-widget .ui-widget { font-size: 1em; }
 .classic .ui-widget input, .classic .ui-widget select, .classic .ui-widget textarea, .classic .ui-widget button { font-family: Verdana, Arial, sans-serif; font-size: 1em; }
-.classic .ui-widget-content { background: #ffffff url(images/bg_flat_100_ffffff.png) 50% 50% repeat-x; color: #000000; }
+.classic .ui-widget-content { border: 1px solid #7e9ab4; background: #ffffff url(images/bg_flat_100_ffffff.png) 50% 50% repeat-x; color: #000000; }
 .classic .ui-widget-content a { color: #3C3089; }
 .classic .ui-widget-header { border: 1px solid #4E6EA7; background: #4E6EA7 url(images/widget_header.gif) repeat-x top left; color: #ffffff; font-weight: bold; }
 .classic .ui-widget-header a { color: #ffffff; }

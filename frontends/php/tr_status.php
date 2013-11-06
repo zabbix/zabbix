@@ -352,7 +352,7 @@ else {
 	$showHideAllDiv = null;
 }
 
-$triggerTable = new CTableInfo(_('No triggers defined.'));
+$triggerTable = new CTableInfo(_('No triggers found.'));
 $triggerTable->setHeader(array(
 	$showHideAllDiv,
 	$config['event_ack_enable'] ? $headerCheckBox : null,
@@ -559,7 +559,7 @@ foreach ($triggers as $trigger) {
 	$triggerItems = array();
 
 	foreach ($trigger['items'] as $item) {
-		$itemName = htmlspecialchars(itemName($item));
+		$itemName = itemName($item);
 
 		// if we have items from different hosts, we must prefix a host name
 		if ($usedHostCount > 1) {

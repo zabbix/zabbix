@@ -639,24 +639,6 @@ int	MAIN_ZABBIX_ENTRY()
 
 	zbx_free_config();
 
-	if (SUCCEED != DBcheck_version())
-		exit(EXIT_FAILURE);
-
-#ifdef	HAVE_SQLITE3
-	zbx_create_sqlite3_mutex(CONFIG_DBNAME);
-#endif
-
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
-	if (0 != CONFIG_NODEID)
-	{
-		result = DBselect("select masterid from nodes where nodeid=%d", CONFIG_NODEID);
-
-		if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
-			CONFIG_MASTER_NODEID = atoi(row[0]);
-		DBfree_result(result);
-	}
-
 	init_database_cache();
 	init_configuration_cache();
 	init_selfmon_collector();
@@ -669,6 +651,24 @@ int	MAIN_ZABBIX_ENTRY()
 	zbx_vc_init();
 
 	zbx_create_services_lock();
+
+#ifdef	HAVE_SQLITE3
+	zbx_create_sqlite3_mutex(CONFIG_DBNAME);
+#endif
+
+	if (SUCCEED != DBcheck_version())
+		exit(EXIT_FAILURE);
+
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+	if (0 != CONFIG_NODEID)
+	{
+		result = DBselect("select masterid from nodes where nodeid=%d", CONFIG_NODEID);
+
+		if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+			CONFIG_MASTER_NODEID = atoi(row[0]);
+		DBfree_result(result);
+	}
 
 	DCload_config();
 
