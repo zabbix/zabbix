@@ -44,10 +44,7 @@ class testFormWeb extends CWebTest {
 	 */
 	protected $hostid = 40001;
 
-	/**
-	 * Backup the tables that will be modified during the tests.
-	 */
-	public function testFormWeb_Setup() {
+	public function testFormWeb_backup() {
 		DBsave_tables('httptest');
 	}
 
@@ -839,44 +836,18 @@ class testFormWeb extends CWebTest {
 					)
 				)
 			),
-			// Retries-letters
+			// Retries-minus one
 			array(
 				array(
 					'expected' => TEST_BAD,
-					'name' => 'Retries-letters only',
-					'retries' => 'Ab',
+					'name' => 'Retries- minus one',
+					'retries' => '-1',
 					'add_step' => array(
-						array('step' => 'Retries-letters')
+						array('step' => 'Retries- minus one')
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Retries": must be between 1 and 10.'
-					)
-				)
-			),
-			// Retries-number
-			array(
-				array(
-					'expected' => TEST_GOOD,
-					'name' => 'Retries-one',
-					'retries' => '1',
-					'add_step' => array(
-						array('step' => 'Retries-one')
-					)
-				)
-			),
-			// Retries-eleven
-			array(
-				array(
-					'expected' => TEST_BAD,
-					'name' => 'Retries- eleven',
-					'retries' => '11',
-					'add_step' => array(
-						array('step' => 'Retries- eleven')
-					),
-					'errors' => array(
-						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Retries": must be between 1 and 10.'
+						'Incorrect value "-1" for "Retries" field: must be between 1 and 10.'
 					)
 				)
 			),
@@ -891,7 +862,18 @@ class testFormWeb extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Retries": must be between 1 and 10.'
+						'Incorrect value "0" for "Retries" field: must be between 1 and 10.'
+					)
+				)
+			),
+			// Retries-number
+			array(
+				array(
+					'expected' => TEST_GOOD,
+					'name' => 'Retries-one',
+					'retries' => '1',
+					'add_step' => array(
+						array('step' => 'Retries-one')
 					)
 				)
 			),
@@ -906,100 +888,18 @@ class testFormWeb extends CWebTest {
 					)
 				)
 			),
-			// Retries-minus one
+			// Retries-eleven
 			array(
 				array(
 					'expected' => TEST_BAD,
-					'name' => 'Retries- minus one',
-					'retries' => '-1',
+					'name' => 'Retries- eleven',
+					'retries' => '11',
 					'add_step' => array(
-						array('step' => 'Retries- minus one')
+						array('step' => 'Retries- eleven')
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Retries": must be between 1 and 10.'
-					)
-				)
-			),
-			// Retries-99
-			array(
-				array(
-					'expected' => TEST_BAD,
-					'name' => 'Retries- 99',
-					'retries' => '99',
-					'add_step' => array(
-						array('step' => 'Retries- 99')
-					),
-					'errors' => array(
-						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Retries": must be between 1 and 10.'
-					)
-				)
-			),
-			// Interval-letters
-			array(
-				array(
-					'expected' => TEST_BAD,
-					'name' => 'Interval-letters only',
-					'delay' => 'AbCdeF',
-					'add_step' => array(
-						array('step' => 'Interval-letters')
-					),
-					'errors' => array(
-						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Update interval (in sec)": must be between 1 and 86400.'
-					)
-				)
-			),
-			// Interval-number
-			array(
-				array(
-					'expected' => TEST_GOOD,
-					'name' => 'Interval-one',
-					'delay' => '1',
-					'add_step' => array(
-						array('step' => 'Interval-one')
-					)
-				)
-			),
-			// Interval-86401
-			array(
-				array(
-					'expected' => TEST_BAD,
-					'name' => 'Interval- 86401',
-					'delay' => '86401',
-					'add_step' => array(
-						array('step' => 'Interval- 86401')
-					),
-					'errors' => array(
-						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Update interval (in sec)": must be between 1 and 86400.'
-					)
-				)
-			),
-			// Interval-zero
-			array(
-				array(
-					'expected' => TEST_BAD,
-					'name' => 'Interval- zero',
-					'delay' => '0',
-					'add_step' => array(
-						array('step' => 'Interval- zero')
-					),
-					'errors' => array(
-						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Update interval (in sec)": must be between 1 and 86400.'
-					)
-				)
-			),
-			// Interval-86400
-			array(
-				array(
-					'expected' => TEST_GOOD,
-					'name' => 'Interval- 86400',
-					'delay' => '86400',
-					'add_step' => array(
-						array('step' => 'Interval- 86400')
+						'Incorrect value "11" for "Retries" field: must be between 1 and 10.'
 					)
 				)
 			),
@@ -1014,22 +914,59 @@ class testFormWeb extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Update interval (in sec)": must be between 1 and 86400.'
+						'Incorrect value "-1" for field "Update interval (in sec)": must be between 1 and 86400.'
 					)
 				)
 			),
-			// Interval-99999
+			// Interval-zero
 			array(
 				array(
 					'expected' => TEST_BAD,
-					'name' => 'Interval- 99999',
-					'delay' => '99999',
+					'name' => 'Interval- zero',
+					'delay' => '0',
 					'add_step' => array(
-						array('step' => 'Interval- 99999')
+						array('step' => 'Interval- zero')
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Update interval (in sec)": must be between 1 and 86400.'
+						'Incorrect value "0" for field "Update interval (in sec)": must be between 1 and 86400.'
+					)
+				)
+			),
+			// Interval-number
+			array(
+				array(
+					'expected' => TEST_GOOD,
+					'name' => 'Interval-one',
+					'delay' => '1',
+					'add_step' => array(
+						array('step' => 'Interval-one')
+					)
+				)
+			),
+			// Interval-86400
+			array(
+				array(
+					'expected' => TEST_GOOD,
+					'name' => 'Interval- 86400',
+					'delay' => '86400',
+					'add_step' => array(
+						array('step' => 'Interval- 86400')
+					)
+				)
+			),
+			// Interval-86401
+			array(
+				array(
+					'expected' => TEST_BAD,
+					'name' => 'Interval- 86401',
+					'delay' => '86401',
+					'add_step' => array(
+						array('step' => 'Interval- 86401')
+					),
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Incorrect value "86401" for field "Update interval (in sec)": must be between 1 and 86400.'
 					)
 				)
 			),
@@ -1686,10 +1623,7 @@ class testFormWeb extends CWebTest {
 		}
 	}
 
-	/**
-	 * Restore the original tables.
-	 */
-	public function testFormWeb_Teardown() {
+	public function testFormWeb_restore() {
 		DBrestore_tables('httptest');
 	}
 }

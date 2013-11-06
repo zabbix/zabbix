@@ -48,8 +48,8 @@ function valueDistributionFormForMultiplePeriods($items = array()) {
 
 	$reportForm->addVar('config', $config);
 
-	$reportForm->addVar('report_timesince', date(TIMESTAMP_FORMAT, $report_timesince));
-	$reportForm->addVar('report_timetill', date(TIMESTAMP_FORMAT, $report_timetill));
+	$reportForm->addVar('report_timesince', date(TIMESTAMP_FORMAT_ZERO_TIME, $report_timesince));
+	$reportForm->addVar('report_timetill', date(TIMESTAMP_FORMAT_ZERO_TIME, $report_timetill));
 
 	$reportForm->addRow(_('Title'), new CTextBox('title', $title, 40));
 	$reportForm->addRow(_('X label'), new CTextBox('xlabel', $xlabel, 40));
@@ -287,8 +287,8 @@ function valueComparisonFormForMultiplePeriods() {
 	$scaletype = get_request('scaletype', TIMEPERIOD_TYPE_WEEKLY);
 	$avgperiod = get_request('avgperiod', TIMEPERIOD_TYPE_DAILY);
 
-	$report_timesince = get_request('report_timesince', date(TIMESTAMP_FORMAT, time() - SEC_PER_DAY));
-	$report_timetill = get_request('report_timetill', date(TIMESTAMP_FORMAT));
+	$report_timesince = get_request('report_timesince', date(TIMESTAMP_FORMAT_ZERO_TIME, time() - SEC_PER_DAY));
+	$report_timetill = get_request('report_timetill', date(TIMESTAMP_FORMAT_ZERO_TIME));
 
 	$itemId = get_request('itemid', 0);
 
@@ -490,7 +490,6 @@ function validateBarReportItems($items = array()) {
 		'nodeids' => get_current_nodeid(true),
 		'itemids' => $itemIds,
 		'webitems' => true,
-		'editable' => true,
 		'output' => array('name', 'value_type'),
 		'preservekeys' => true,
 		'selectHosts' => array('name')

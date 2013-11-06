@@ -125,7 +125,7 @@ $httpdetailsWidget->addPageHeader(
 );
 
 // append table to widget
-$httpdetailsTable = new CTableInfo(_('No steps defined.'));
+$httpdetailsTable = new CTableInfo();
 $httpdetailsTable->setHeader(array(
 	_('Step'),
 	_('Speed'),

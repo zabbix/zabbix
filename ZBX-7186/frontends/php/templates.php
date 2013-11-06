@@ -478,7 +478,7 @@ else {
 	$form = new CForm();
 	$form->setName('templates');
 
-	$table = new CTableInfo(_('No templates defined.'));
+	$table = new CTableInfo(_('No templates found.'));
 	$table->setHeader(array(
 		new CCheckBox('all_templates', null, "checkAll('".$form->getName()."', 'all_templates', 'templates');"),
 		$displayNodes ? _('Node') : null,

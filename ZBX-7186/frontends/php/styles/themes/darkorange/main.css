@@ -328,29 +328,6 @@ table.calendartab tr td.selected{
 	font-weight: bolder;
 }
 
-
-/* Suggest */
-
-table.suggest{
-	background-color: #2F2F2F;
-}
-
-table.suggest tr{
-	background-color: #2F2F2F;
-}
-
-table.suggest tr.highlight{
-	background-color: #6F3F00;
-}
-
-table.suggest tr.highlight td{
-	color: #DFDFDF;
-}
-
-table.suggest tr td{
-	color: #FF5500;
-}
-
 table.right_table.calculated select, table.right_table.calculated option { background: #444; }
 table.right_table .read_write option { color: #00AD00; }
 table.right_table .deny option { color: #F20000; }
@@ -437,8 +414,6 @@ span.link{ color: #FF5500; }
 span.link:hover{ color: #FF8800; }
 
 span.darklink{ color: #AA5500; }span.darklink:hover{ color: #FF5500; }
-
-div.suggest{ border: 1px #FF5500 solid; }
 
 /*////////////////	FORMS	////////////////////*/
 .input, .input[disabled]:hover, input.formlist[type="button"],
@@ -527,6 +502,11 @@ div.preloader {
 .multiselect .available .prefix { color: #838383; }
 .multiselect .available ul li.hover { background: #908E8E; }
 .multiselect .available ul li.hover .prefix { color: #F1F1F1; }
+
+/* suggest */
+div.suggest { border-color: #908E8E; }
+table.suggest tr { background: #313131; color: #DFDFDF; }
+table.suggest tr.highlight { background: #908E8E; }
 
 /* menu popup */
 .menuPopup { border: 1px solid #1F1F1F; }

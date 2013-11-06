@@ -134,7 +134,7 @@ $allowedSrcFields = array(
 	'graphs'				=> '"graphid", "name"',
 	'sysmaps'				=> '"sysmapid", "name"',
 	'slides'				=> '"slideshowid"',
-	'help_items'			=> '"key_"',
+	'help_items'			=> '"key"',
 	'overview'				=> '"groupid", "name"',
 	'screens'				=> '"screenid"',
 	'screens2'				=> '"screenid", "name"',
@@ -556,7 +556,7 @@ if ($srctbl == 'usrgrp') {
 	$form->setName('usrgrpform');
 	$form->setAttribute('id', 'usrgrps');
 
-	$table = new CTableInfo(_('No user groups defined.'));
+	$table = new CTableInfo(_('No user groups found.'));
 	$table->setHeader(array(
 		$multiselect ? new CCheckBox('all_usrgrps', null, "javascript: checkAll('".$form->getName()."', 'all_usrgrps', 'usrgrps');") : null,
 		_('Name')
@@ -614,7 +614,7 @@ elseif ($srctbl == 'users') {
 	$form->setName('userform');
 	$form->setAttribute('id', 'users');
 
-	$table = new CTableInfo(_('No users defined.'));
+	$table = new CTableInfo(_('No users found.'));
 	$table->setHeader(array(
 		($multiselect ? new CCheckBox('all_users', null, "javascript: checkAll('".$form->getName()."', 'all_users', 'users');") : null),
 		_('Alias'),
@@ -679,15 +679,15 @@ elseif ($srctbl == 'users') {
  * Help items
  */
 elseif ($srctbl == 'help_items') {
-	$table = new CTableInfo(_('No items defined.'));
+	$table = new CTableInfo(_('No item keys found.'));
 	$table->setHeader(array(_('Key'), _('Name')));
 
-	$result = DBselect('SELECT hi.* FROM help_items hi WHERE hi.itemtype='.zbx_dbstr($itemtype).' ORDER BY hi.key_');
-	while ($row = DBfetch($result)) {
-		$action = get_window_opener($dstfrm, $dstfld1, html_entity_decode($row[$srcfld1])).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
-		$name = new CSpan($row['key_'], 'link');
+	$helpItems = new CHelpItems();
+	foreach ($helpItems->getByType($itemtype) as $helpItem) {
+		$action = get_window_opener($dstfrm, $dstfld1, $helpItem[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
+		$name = new CSpan($helpItem['key'], 'link');
 		$name->setAttribute('onclick', $action.' close_window(); return false;');
-		$table->addRow(array($name, $row['description']));
+		$table->addRow(array($name, $helpItem['description']));
 	}
 	$table->show();
 }
@@ -699,7 +699,7 @@ elseif ($srctbl == 'triggers') {
 	$form->setName('triggerform');
 	$form->setAttribute('id', 'triggers');
 
-	$table = new CTableInfo(_('No triggers defined.'));
+	$table = new CTableInfo(_('No triggers found.'));
 
 	$table->setHeader(array(
 		$multiselect ? new CCheckBox('all_triggers', null, "checkAll('".$form->getName()."', 'all_triggers', 'triggers');") : null,
@@ -812,7 +812,7 @@ elseif ($srctbl == 'items') {
 	$form->setName('itemform');
 	$form->setAttribute('id', 'items');
 
-	$table = new CTableInfo(_('No items defined.'));
+	$table = new CTableInfo(_('No items found.'));
 
 	$header = array(
 		$pageFilter->hostsAll ? _('Host') : null,
@@ -922,7 +922,7 @@ elseif ($srctbl == 'prototypes') {
 	$form->setName('itemform');
 	$form->setAttribute('id', 'items');
 
-	$table = new CTableInfo(_('No item prototypes defined.'));
+	$table = new CTableInfo(_('No item prototypes found.'));
 
 	if ($multiselect) {
 		$header = array(
@@ -1014,7 +1014,7 @@ elseif ($srctbl == 'prototypes') {
  * Applications
  */
 elseif ($srctbl == 'applications') {
-	$table = new CTableInfo(_('No applications defined.'));
+	$table = new CTableInfo(_('No applications found.'));
 	$table->setHeader(array(
 		$hostid > 0 ? null : _('Host'),
 		_('Name')
@@ -1051,7 +1051,7 @@ elseif ($srctbl == 'applications') {
  * Nodes
  */
 elseif ($srctbl == 'nodes') {
-	$table = new CTableInfo(_('No nodes defined.'));
+	$table = new CTableInfo();
 	$table->setHeader(_('Name'));
 
 	$result = DBselect('SELECT DISTINCT n.* FROM nodes n WHERE '.dbConditionInt('n.nodeid', get_accessible_nodes_by_user(CWebUser::$data, PERM_READ)));
@@ -1071,7 +1071,7 @@ elseif ($srctbl == 'graphs') {
 	$form->setName('graphform');
 	$form->setAttribute('id', 'graphs');
 
-	$table = new CTableInfo(_('No graphs defined.'));
+	$table = new CTableInfo(_('No graphs found.'));
 
 	if ($multiselect) {
 		$header = array(
@@ -1172,7 +1172,7 @@ elseif ($srctbl == 'sysmaps') {
 	$form->setName('sysmapform');
 	$form->setAttribute('id', 'sysmaps');
 
-	$table = new CTableInfo(_('No maps defined.'));
+	$table = new CTableInfo(_('No maps found.'));
 
 	if ($multiselect) {
 		$header = array(array(new CCheckBox('all_sysmaps', null, "javascript: checkAll('".$form->getName()."', 'all_sysmaps', 'sysmaps');"), _('Name')));
@@ -1245,7 +1245,7 @@ elseif ($srctbl == 'slides') {
 	$form->setName('slideform');
 	$form->setAttribute('id', 'slides');
 
-	$table = new CTableInfo(_('No slides defined.'));
+	$table = new CTableInfo(_('No slides found.'));
 
 	if ($multiselect) {
 		$header = array(array(new CCheckBox('all_slides', null, "javascript: checkAll('".$form->getName()."', 'all_slides', 'slides');"), _('Name')),);
@@ -1257,33 +1257,34 @@ elseif ($srctbl == 'slides') {
 	$table->setHeader($header);
 
 	$slideshows = array();
-	$result = DBselect(
-			'SELECT s.slideshowid,s.name'.
-			' FROM slideshows s'.
-			whereDbNode('s.slideshowid', $nodeId).
-			' ORDER BY s.name'
-	);
-	while ($row = DBfetch($result)) {
-		if (!slideshow_accessible($row['slideshowid'], PERM_READ)) {
+	$dbSlideshows = DBfetchArray(DBselect(
+		'SELECT s.slideshowid,s.name'.
+		' FROM slideshows s'.
+		whereDbNode('s.slideshowid', $nodeId)
+	));
+	order_result($dbSlideshows, 'name');
+
+	foreach ($dbSlideshows as $dbSlideshow) {
+		if (!slideshow_accessible($dbSlideshow['slideshowid'], PERM_READ)) {
 			continue;
 		}
-		$slideshows[$row['slideshowid']] = $row;
+		$slideshows[$dbSlideshow['slideshowid']] = $dbSlideshow;
 
-		$name = new CLink($row['name'], '#');
+		$name = new CLink($dbSlideshow['name'], '#');
 		if ($multiselect) {
-			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($row['slideshowid']).');';
+			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($dbSlideshow['slideshowid']).');';
 		}
 		else {
 			$values = array(
-				$dstfld1 => $row[$srcfld1],
-				$dstfld2 => $row[$srcfld2]
+				$dstfld1 => $dbSlideshow[$srcfld1],
+				$dstfld2 => $dbSlideshow[$srcfld2]
 			);
 			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); close_window(); return false;';
 		}
 		$name->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
 
 		if ($multiselect) {
-			$name = new CCol(array(new CCheckBox('slides['.zbx_jsValue($row[$srcfld1]).']', null, null, $row['slideshowid']), $name));
+			$name = new CCol(array(new CCheckBox('slides['.zbx_jsValue($dbSlideshow[$srcfld1]).']', null, null, $dbSlideshow['slideshowid']), $name));
 		}
 		$table->addRow($name);
 	}
@@ -1309,7 +1310,7 @@ elseif ($srctbl == 'screens') {
 	$form->setName('screenform');
 	$form->setAttribute('id', 'screens');
 
-	$table = new CTableInfo(_('No screens defined.'));
+	$table = new CTableInfo(_('No screens found.'));
 
 	if ($multiselect) {
 		$header = array(
@@ -1323,8 +1324,9 @@ elseif ($srctbl == 'screens') {
 
 	$options = array(
 		'nodeids' => $nodeId,
-		'output' => API_OUTPUT_EXTEND,
-		'preservekeys' => true
+		'output' => array('screenid', 'name'),
+		'preservekeys' => true,
+		'editable' => true
 	);
 	$screens = API::Screen()->get($options);
 	order_result($screens, 'name');
@@ -1367,12 +1369,13 @@ elseif ($srctbl == 'screens') {
 elseif ($srctbl == 'screens2') {
 	require_once dirname(__FILE__).'/include/screens.inc.php';
 
-	$table = new CTableInfo(_('No screens defined.'));
+	$table = new CTableInfo(_('No screens found.'));
 	$table->setHeader(_('Name'));
 
 	$options = array(
 		'nodeids' => $nodeId,
-		'output' => API_OUTPUT_EXTEND
+		'output' => array('screenid', 'name'),
+		'editable' => true
 	);
 	$screens = API::Screen()->get($options);
 	order_result($screens, 'name');
@@ -1394,7 +1397,7 @@ elseif ($srctbl == 'screens2') {
  * Overview
  */
 elseif ($srctbl == 'overview') {
-	$table = new CTableInfo(_('No host groups defined.'));
+	$table = new CTableInfo(_('No host groups found.'));
 	$table->setHeader(_('Name'));
 
 	$options = array(
@@ -1421,7 +1424,7 @@ elseif ($srctbl == 'overview') {
  * Discovery rules
  */
 elseif ($srctbl == 'drules') {
-	$table = new CTableInfo(_('No discovery rules defined.'));
+	$table = new CTableInfo(_('No discovery rules found.'));
 	$table->setHeader(_('Name'));
 
 	$result = DBselect(
@@ -1441,7 +1444,7 @@ elseif ($srctbl == 'drules') {
  * Discovery checks
  */
 elseif ($srctbl == 'dchecks') {
-	$table = new CTableInfo(_('No discovery checks defined.'));
+	$table = new CTableInfo(_('No discovery rules found.'));
 	$table->setHeader(_('Name'));
 
 	$dRules = API::DRule()->get(array(
@@ -1465,7 +1468,7 @@ elseif ($srctbl == 'dchecks') {
  * Proxies
  */
 elseif ($srctbl == 'proxies') {
-	$table = new CTableInfo(_('No proxies defined.'));
+	$table = new CTableInfo(_('No proxies found.'));
 	$table->setHeader(_('Name'));
 
 	$result = DBselect(
@@ -1491,7 +1494,7 @@ elseif ($srctbl == 'scripts') {
 	$form->setName('scriptform');
 	$form->attr('id', 'scripts');
 
-	$table = new CTableInfo(_('No scripts defined.'));
+	$table = new CTableInfo(_('No scripts found.'));
 
 	if ($multiselect) {
 		$header = array(

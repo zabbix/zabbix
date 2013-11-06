@@ -135,7 +135,10 @@
 
 		// set user rights
 		if (!$data['is_profile']) {
-			$data['groups'] = API::UserGroup()->get(array('usrgrpids' => $data['user_groups'], 'output' => API_OUTPUT_EXTEND));
+			$data['groups'] = API::UserGroup()->get(array(
+				'usrgrpids' => $data['user_groups'],
+				'output' => array('usrgrpid', 'name')
+			));
 			order_result($data['groups'], 'name');
 
 			$group_ids = array_values($data['user_groups']);
@@ -1749,8 +1752,10 @@
 				);
 			}
 			else {
-				$date = zbxDateToTime($new_timeperiod['start_date']);
+				$date = zbxDateToTime($new_timeperiod['start_date']
+					? $new_timeperiod['start_date'] : date(TIMESTAMP_FORMAT_ZERO_TIME, time()));
 			}
+
 			$tblPeriod->addRow(array(_('Date'), createDateSelector('new_timeperiod_start_date', $date)));
 		}
 
@@ -1777,4 +1782,3 @@
 
 		return $tblPeriod;
 	}
-

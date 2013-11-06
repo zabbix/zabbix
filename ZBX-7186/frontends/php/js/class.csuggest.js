@@ -145,7 +145,7 @@ serverRespond: function(needle, respond){
 
 	for(var i=0; i < respond.length; i++){
 		if(!isset(i, respond) || empty(respond[i])) continue;
-		params.list[i] = respond[i].name.toLowerCase();
+		params.list[i] = respond[i].name;
 	}
 	this.needles[params.needle].list = params.list;
 
@@ -457,7 +457,7 @@ positionSuggests: function(){
 
 	if(is_null(this.dom.suggest)) return true;
 
-	var pos = getPosition(this.dom.input);
+	var pos = jQuery(this.dom.input).offset();
 	var dims = getDimensions(this.dom.input);
 
 	this.dom.suggest.style.top = (pos.top+dims.height)+'px';
@@ -489,16 +489,14 @@ newSugTab: function(needle){
 		var td = document.createElement('td');
 		tr.appendChild(td);
 
-		td.appendChild(document.createTextNode(needle));
+		var bold = document.createElement('b');
+		bold.appendChild(document.createTextNode(list[key].substr(0, needle.length)));
+		td.appendChild(bold);
+		td.appendChild(document.createTextNode(list[key].substr(needle.length)));
+
 		addListener(td, 'mouseover', this.mouseOver.bindAsEventListener(this), true);
 		addListener(td, 'mouseup', this.selectSuggest.bindAsEventListener(this), true);
 		addListener(td, 'mouseout', this.mouseOut.bindAsEventListener(this), true);
-
-// text
-		var bold = document.createElement('b');
-		td.appendChild(bold);
-
-		bold.appendChild(document.createTextNode(list[key].substr(needle.length)));
 
 		if(count >= this.suggestLimit) break;
 	}
