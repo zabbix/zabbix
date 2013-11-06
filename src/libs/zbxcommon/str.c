@@ -752,7 +752,7 @@ char	*zbx_dvsprintf(char *dest, const char *f, va_list args)
  ******************************************************************************/
 char	*__zbx_zbx_dsprintf(char *dest, const char *f, ...)
 {
-	char	*string = NULL;
+	char	*string;
 	va_list args;
 
 	va_start(args, f);
