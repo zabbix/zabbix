@@ -61,18 +61,37 @@ static void	process_configuration_sync(size_t *data_size)
 	if (FAIL == get_data_from_server(&sock, ZBX_PROTO_VALUE_PROXY_CONFIG, &data))
 		goto exit;
 
-	if (SUCCEED == zbx_json_open(data, &jp))
+	if ('\0' != *data)
 	{
 		*data_size = strlen(data);	/* performance metric */
-		zabbix_log(LOG_LEVEL_WARNING, "Received configuration data from server. Datalen " ZBX_FS_SIZE_T,
-				(zbx_fs_size_t)*data_size);
-		process_proxyconfig(&jp);
+
+		if (SUCCEED == zbx_json_open(data, &jp))
+		{
+			char	value[16];
+
+			if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value)) &&
+					0 == strcmp(value, ZBX_PROTO_VALUE_FAILED))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Cannot obtain configuration data from server. "
+						"Proxy host name might not be matching that on the server.");
+				goto exit;
+			}
+
+			zabbix_log(LOG_LEVEL_WARNING, "Received configuration data from server. Datalen " ZBX_FS_SIZE_T,
+					(zbx_fs_size_t)*data_size);
+			process_proxyconfig(&jp);
+		}
+		else
+		{
+			*data_size = 0;
+			zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server: %s",
+					zbx_json_strerror());
+		}
 	}
 	else
 	{
 		*data_size = 0;
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot obtain configuration data from server. "
-				"Proxy host name might not be matching that on the server.");
+		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server: empty string received");
 	}
 exit:
 	disconnect_server(&sock);
