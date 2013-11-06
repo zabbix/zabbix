@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-06 18:42+0200\n"
-"PO-Revision-Date: 2013-08-30 18:59+0300\n"
+"POT-Creation-Date: 2013-11-06 18:44+0200\n"
+"PO-Revision-Date: 2013-11-05 18:31+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1377881992.0\n"
+"X-POOTLE-MTIME: 1383669069.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -34,9 +34,9 @@ msgstr "\"Мигання тригера при зміні статусу\" ма�
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$d день"
+msgstr[1] "%1$d дні"
+msgstr[2] "%1$d днів"
 
 #: include/blocks.inc.php:1027
 #, c-format
@@ -66,17 +66,17 @@ msgstr[2] "%1$s елементів даних"
 #, c-format
 msgid "%1$s day"
 msgid_plural "%1$s days"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s день"
+msgstr[1] "%1$s дні"
+msgstr[2] "%1$s днів"
 
 #: include/page_header.php:446
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Зафіксовано %4$s невдалу спробу входу в систему. Остання невдала спроба була з %1$s о %2$s %3$s."
+msgstr[1] "Зафіксовано %4$s невдалих спроби входу в систему. Остання невдала спроба була з %1$s о %2$s %3$s."
+msgstr[2] "Зафіксовано %4$s невдалих спроб входу в систему. Остання невдала спроба була з %1$s о %2$s %3$s."
 
 #: include/views/monitoring.discovery.php:131
 #, c-format
@@ -90,7 +90,7 @@ msgstr[2] "%d пристроїв"
 #, c-format
 msgctxt "user fullname"
 msgid "(%1$s %2$s)"
-msgstr ""
+msgstr "(%1$s %2$s)"
 
 #: include/views/configuration.action.edit.php:443
 msgid "(0 - infinitely)"
@@ -123,7 +123,7 @@ msgstr "(без проксі)"
 
 #: include/blocks.inc.php:1500
 msgid "-"
-msgstr ""
+msgstr "-"
 
 #: acknow.php:131
 msgid "----[BULK ACKNOWLEDGE]----"
@@ -167,7 +167,7 @@ msgstr "500 останніх значень"
 
 #: include/views/administration.script.edit.php:41
 msgid "<Sub-menu/Sub-menu.../>Script"
-msgstr ""
+msgstr "<Підменю/Підменю.../>Скрипт"
 
 #: include/views/configuration.sysmap.edit.php:55
 msgid "<manual>"
@@ -177,7 +177,7 @@ msgstr "<вручну>"
 #: include/views/configuration.item.massupdate.php:172
 #: include/views/js/configuration.discovery.edit.js.php:95
 msgid "AES"
-msgstr ""
+msgstr "AES"
 
 #: acknow.php:185
 msgid "ALARM ACKNOWLEDGES"
@@ -233,7 +233,7 @@ msgstr "Доступ заборонено!"
 
 #: include/func.inc.php:2065
 msgid "Access denied."
-msgstr ""
+msgstr "Доступ заборонено."
 
 #: api/classes/CUser.php:881
 #, c-format
@@ -318,7 +318,7 @@ msgstr "Дія"
 #: api/classes/CAction.php:685
 #, c-format
 msgid "Action \"%1$s\" already exists."
-msgstr ""
+msgstr "Дія \"%1$s\" вже існує."
 
 #: api/classes/CAction.php:541 api/classes/CAction.php:656
 #, c-format
@@ -328,7 +328,7 @@ msgstr "В дії \"%1$s\" вказано некоректне значення 
 #: api/classes/CAction.php:727
 #, c-format
 msgid "Action \"%1$s\" no operations defined."
-msgstr ""
+msgstr "В дії \"%1$s\" не вказано операцій."
 
 #: api/classes/CAction.php:665
 #, c-format
@@ -464,11 +464,11 @@ msgstr "Додати відсутнє"
 
 #: include/views/configuration.item.massupdate.php:537
 msgid "Add new or existing applications"
-msgstr ""
+msgstr "Додати нові або існуючі групи елементів даних"
 
 #: include/views/configuration.host.massupdate.php:107
 msgid "Add new or existing host groups"
-msgstr ""
+msgstr "Додати нові або існуючі групи вузлів мережі"
 
 #: include/views/configuration.graph.edit.php:116
 msgid "Add prototype"
@@ -706,33 +706,33 @@ msgstr "Етикетка власника"
 #: include/maintenances.inc.php:56
 #, c-format
 msgid "At %1$s:%2$s on %3$s"
-msgstr ""
+msgstr "О %1$s:%2$s %3$s"
 
 #: include/maintenances.inc.php:125
 #, c-format
 msgid "At %1$s:%2$s on %3$s %4$s of every %5$s"
-msgstr ""
+msgstr "О %1$s:%2$s %3$s %4$s кожний %5$s"
 
 #: include/maintenances.inc.php:134
 #, c-format
 msgid "At %1$s:%2$s on day %3$s of every %4$s"
-msgstr ""
+msgstr "О %1$s:%2$s на %3$s день кожний %4$s"
 
 #: include/maintenances.inc.php:83
 #, c-format
 msgid "At %1$s:%2$s on every %3$s of every week"
 msgid_plural "At %1$s:%2$s on every %3$s of every %4$s weeks"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "О %1$s:%2$s кожний %3$s кожний тиждень"
+msgstr[1] "О %1$s:%2$s кожний %3$s кожні %4$s тижні"
+msgstr[2] "О %1$s:%2$s кожний %3$s кожні %4$s тижнів"
 
 #: include/maintenances.inc.php:63
 #, c-format
 msgid "At %1$s:%2$s on every day"
 msgid_plural "At %1$s:%2$s on every %3$s days"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "О %1$s:%2$s кожний день"
+msgstr[1] "О %1$s:%2$s кожні %3$s дні"
+msgstr[2] "О %1$s:%2$s кожні %3$s днів"
 
 #: include/forms.inc.php:1763
 msgid "At (hour:minute)"
@@ -804,14 +804,14 @@ msgstr "Метод аутентифікації змінено на Zabbix вн�
 #: include/views/configuration.item.massupdate.php:159
 #: include/views/js/configuration.discovery.edit.js.php:83
 msgid "Authentication passphrase"
-msgstr ""
+msgstr "Пароль для аутентифікації"
 
 #: include/views/configuration.item.edit.php:148
 #: include/views/configuration.item.massupdate.php:149
 #: include/views/js/configuration.discovery.edit.js.php:71
 #: include/views/js/configuration.discovery.edit.js.php:88
 msgid "Authentication protocol"
-msgstr ""
+msgstr "Протокол аутентифікації"
 
 #: include/views/configuration.action.list.php:35
 msgid "Auto registration"
@@ -919,11 +919,11 @@ msgstr "Пароль підключення (Bind password)"
 
 #: popup_trexpr.php:521
 msgid "Bitwise AND of last (most recent) T value and mask is = N"
-msgstr ""
+msgstr "Побітове AND останнього (найбільш свіжого) значення T та маска = N"
 
 #: popup_trexpr.php:526
 msgid "Bitwise AND of last (most recent) T value and mask is NOT N"
-msgstr ""
+msgstr "Побітове AND останнього (найбільш свіжого) значення T та маска НЕ є N"
 
 #: include/classes/core/ZBase.php:234
 msgid "Black & Blue"
@@ -1015,7 +1015,7 @@ msgstr "НАЛАШТУВАННЯ ГРУП ВУЗЛІВ МЕРЕЖІ"
 #: include/views/configuration.host.prototype.edit.php:29
 #: include/views/configuration.host.prototype.list.php:31
 msgid "CONFIGURATION OF HOST PROTOTYPES"
-msgstr ""
+msgstr "НАЛАШТУВАННЯ ПРОТОТИПІВ ВУЗЛІВ МЕРЕЖІ"
 
 #: hosts.php:634 hosts.php:699 hosts.php:747
 msgid "CONFIGURATION OF HOSTS"
@@ -1122,12 +1122,12 @@ msgstr "НАЛАШТУВАННЯ ТРИГЕРІВ"
 #: include/views/administration.usergroups.edit.php:23
 #: include/views/administration.usergroups.list.php:31
 msgid "CONFIGURATION OF USER GROUPS"
-msgstr ""
+msgstr "НАЛАШТУВАННЯ ГРУП КОРИСТУВАЧІВ"
 
 #: include/views/administration.users.edit.php:30
 #: include/views/administration.users.list.php:31
 msgid "CONFIGURATION OF USERS"
-msgstr ""
+msgstr "НАЛАШТУВАННЯ КОРИСТУВАЧІВ"
 
 #: adm.valuemapping.php:147
 msgid "CONFIGURATION OF VALUE MAPPING"
@@ -1205,7 +1205,7 @@ msgstr "Не вдалося підтвердити подію"
 
 #: httpconf.php:268
 msgid "Cannot activate web scenario"
-msgstr ""
+msgstr "Не вдалося активувати веб сценарій"
 
 #: api/classes/CGraph.php:721
 #, c-format
@@ -1583,7 +1583,6 @@ msgid "Cannot delete proxy"
 msgstr "Не вдалося видалити проксі"
 
 #: adm.regexps.php:173
-#, fuzzy
 msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
 msgstr[0] "Не вдалося видалити регулярний вираз"
@@ -10898,12 +10897,11 @@ msgid "Regular expression added"
 msgstr "Регулярний вираз додано"
 
 #: adm.regexps.php:172
-#, fuzzy
 msgid "Regular expression deleted"
 msgid_plural "Regular expressions deleted"
 msgstr[0] "Регулярний вираз видалено"
-msgstr[1] "Регулярний вираз видалено"
-msgstr[2] "Регулярний вираз видалено"
+msgstr[1] "Регулярні вирази видалено"
+msgstr[2] "Регулярні вирази видалено"
 
 #: include/regexp.inc.php:85
 msgid "Regular expression does not exist."
