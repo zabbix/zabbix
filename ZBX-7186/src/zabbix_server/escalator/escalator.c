@@ -1701,7 +1701,7 @@ static int	process_escalations(int now)
 				{
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 							"update escalations set nextcheck=%d"
-							" where escalationid" ZBX_FS_UI64,
+							" where escalationid=" ZBX_FS_UI64,
 							escalation.nextcheck + SEC_PER_HOUR,
 							escalation.escalationid);
 				}
