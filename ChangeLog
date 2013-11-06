@@ -1,6 +1,7 @@
 Changes for 2.2.0rc2
 
 Bug fixes:
+........S. [ZBX-7304] fixed wrong SQL statement in processing of escalations (asaveljevs)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.0rc1
