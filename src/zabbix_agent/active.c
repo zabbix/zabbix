@@ -183,7 +183,7 @@ out:
  * Purpose: Parse list of active checks received from server                  *
  *                                                                            *
  * Parameters: str  - NULL terminated string received from server             *
- * 	       host - address of host					      *
+ *             host - address of host                                         *
  *                                                                            *
  * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on an incorrect format of string                        *
