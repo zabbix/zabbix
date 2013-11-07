@@ -59,10 +59,6 @@ static int	zbx_open_eventlog(LPCTSTR wsource, HANDLE *eventlog_handle, zbx_uint6
 	HKEY		hk = NULL;
 	int		ret = FAIL;
 
-	assert(eventlog_handle);
-	assert(pNumRecords);
-	assert(pLatestRecord);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	*eventlog_handle = NULL;
@@ -269,13 +265,6 @@ int	process_eventlog(const char *source, zbx_uint64_t *lastlogsize, unsigned lon
 	LPTSTR		wsource;
 	zbx_uint64_t	FirstID, LastID;
 	register long	i;
-
-	assert(NULL != lastlogsize);
-	assert(NULL != out_timestamp);
-	assert(NULL != out_source);
-	assert(NULL != out_severity);
-	assert(NULL != out_message);
-	assert(NULL != out_eventid);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() source:'%s' lastlogsize:" ZBX_FS_UI64,
 			__function_name, source, *lastlogsize);
@@ -502,12 +491,6 @@ int	initialize_eventlog6(const char *source, zbx_uint64_t *lastlogsize, zbx_uint
 	LPWSTR		wsource = NULL;
 	int		ret = FAIL;
 
-	assert(lastlogsize);
-	assert(FirstID);
-	assert(LastID);
-	assert(render_context);
-	assert(query);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() source:'%s' previous lastlogsize:%ld",
 			__function_name, source, *lastlogsize);
 
@@ -718,18 +701,6 @@ int	process_eventlog6(const char *source, zbx_uint64_t *lastlogsize, unsigned lo
 	zbx_uint64_t	reading_startpoint = 0;
 	LPWSTR		wsource = NULL;
 	int		ret = FAIL;
-
-	assert(NULL != lastlogsize);
-	assert(NULL != out_timestamp);
-	assert(NULL != out_provider);
-	assert(NULL != out_source);
-	assert(NULL != out_severity);
-	assert(NULL != out_message);
-	assert(NULL != out_eventid);
-	assert(NULL != FirstID);
-	assert(NULL != LastID);
-	assert(NULL != render_context);
-	assert(NULL != query);
 
 	*out_timestamp	= 0;
 	*out_provider	= NULL;
