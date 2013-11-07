@@ -338,44 +338,48 @@ function get_same_graphitems_for_host($gitems, $dest_hostid, $error = true) {
 /**
  * Copy specified graph to specified host.
  *
- * @param $graphid
- * @param $hostid
- * @return array|bool
+ * @param string $graphId
+ * @param string $hostId
+ *
+ * @return array
  */
-function copy_graph_to_host($graphid, $hostid) {
+function copyGraphToHost($graphId, $hostId) {
 	$graphs = API::Graph()->get(array(
-		'graphids' => $graphid,
+		'graphids' => $graphId,
 		'output' => API_OUTPUT_EXTEND,
+		'selectHosts' => array('hostid', 'name'),
 		'selectGraphItems' => API_OUTPUT_EXTEND
 	));
 	$graph = reset($graphs);
+	$graphHost = reset($graph['hosts']);
 
-	$new_gitems = get_same_graphitems_for_host($graph['gitems'], $hostid);
+	if ($graphHost['hostid'] == $hostId) {
+		error(_s('Graph "%1$s" already exist in "%2$s".', $graph['name'], $graphHost['name']));
 
-	if (!$new_gitems) {
-		$host = get_host_by_hostid($hostid);
+		return false;
+	}
+
+	if (!($newGraphItems = get_same_graphitems_for_host($graph['gitems'], $hostId))) {
+		$host = get_host_by_hostid($hostId);
+
 		info(_s('Skipped copying of graph "%1$s" to host "%2$s".', $graph['name'], $host['host']));
+
 		return false;
 	}
 
 	// retrieve actual ymax_itemid and ymin_itemid
-	if ($graph['ymax_itemid']) {
-		if ($itemid = get_same_item_for_host($graph['ymax_itemid'], $hostid)) {
-			$graph['ymax_itemid'] = $itemid;
-		};
+	if ($graph['ymax_itemid'] && $itemId = get_same_item_for_host($graph['ymax_itemid'], $hostId)) {
+		$graph['ymax_itemid'] = $itemId;
 	}
 
-	if ($graph['ymin_itemid']) {
-		if ($itemid = get_same_item_for_host($graph['ymin_itemid'], $hostid)) {
-			$graph['ymin_itemid'] = $itemid;
-		}
+	if ($graph['ymin_itemid'] && $itemId = get_same_item_for_host($graph['ymin_itemid'], $hostId)) {
+		$graph['ymin_itemid'] = $itemId;
 	}
 
-	$graph['gitems'] = $new_gitems;
+	$graph['gitems'] = $newGraphItems;
 	unset($graph['templateid']);
-	$result = API::Graph()->create($graph);
 
-	return $result;
+	return API::Graph()->create($graph);
 }
 
 function navigation_bar_calc($idx = null, $idx2 = 0, $update = false) {
