@@ -1,7 +1,6 @@
 Changes for 2.2.0rc2
 
 Bug fixes:
-...G...... [ZBX-7289] added server address and port number to "no active checks on server" message (igors)
 ..F....... [ZBXNEXT-1371] fixed links in global search results to LLD discovery for non-admin users to say "Discovery" instead of "Discoveries" (Richlv)
 ........S. [ZBX-7304] fixed wrong SQL statement in processing of escalations (asaveljevs)
 
