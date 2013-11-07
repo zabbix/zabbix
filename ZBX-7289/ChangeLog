@@ -1,3 +1,10 @@
+Changes for 2.2.0rc2
+
+Bug fixes:
+..F....... [ZBXNEXT-1371] fixed links in global search results to LLD discovery for non-admin users to say "Discovery" instead of "Discoveries" (Richlv)
+........S. [ZBX-7304] fixed wrong SQL statement in processing of escalations (asaveljevs)
+
+--------------------------------------------------------------------------------
 Changes for 2.2.0rc1
 
 New features:

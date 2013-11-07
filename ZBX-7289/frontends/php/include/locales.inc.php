@@ -48,7 +48,7 @@ function mbstrings_available() {
 function getLocales() {
 	return array(
 		'en_GB' => array('name' => _('English (en_GB)'),	'display' => true),
-		'en_US' => array('name' => _('English (en_US)'),	'display' => false),
+		'en_US' => array('name' => _('English (en_US)'),	'display' => true),
 		'bg_BG' => array('name' => _('Bulgarian (bg_BG)'),	'display' => true),
 		'zh_CN' => array('name' => _('Chinese (zh_CN)'),	'display' => true),
 		'zh_TW' => array('name' => _('Chinese (zh_TW)'),	'display' => true),
