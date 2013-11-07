@@ -188,7 +188,7 @@ if ($hosts) {
 	$items = API::Item()->get(array(
 		'hostids' => array_keys($hosts),
 		'output' => array('itemid', 'name', 'type', 'value_type', 'units', 'hostid', 'state', 'valuemapid', 'status',
-			'error', 'trends', 'history', 'delay', 'key_'),
+			'error', 'trends', 'history', 'delay', 'key_', 'flags'),
 		'selectApplications' => array('applicationid'),
 		'selectItemDiscovery' => array('ts_delete'),
 		'webitems' => true,
@@ -420,7 +420,7 @@ foreach ($items as $key => $item){
 	$itemName = array(SPACE, SPACE, $item['resolvedName']);
 
 	if ($filterShowDetails) {
-		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST)
+		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST || $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
 			? new CSpan(resolveItemKeyMacros($item), 'enabled')
 			: new CLink(resolveItemKeyMacros($item), 'items.php?form=update&itemid='.$item['itemid'], 'enabled');
 		$itemName = array_merge($itemName, array(BR(), SPACE, SPACE, $itemKey));
@@ -595,7 +595,7 @@ foreach ($items as $item) {
 	$itemName = array(SPACE, SPACE, $item['resolvedName']);
 
 	if ($filterShowDetails) {
-		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST)
+		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST || $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
 			? new CSpan(resolveItemKeyMacros($item), 'enabled')
 			: new CLink(resolveItemKeyMacros($item), 'items.php?form=update&itemid='.$item['itemid'], 'enabled');
 		$itemName = array_merge($itemName, array(BR(), SPACE, SPACE, $itemKey));
