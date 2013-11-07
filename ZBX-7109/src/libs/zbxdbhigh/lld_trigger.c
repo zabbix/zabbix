@@ -750,7 +750,7 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid, struct zbx_json_parse *jp_data,
+void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 		char **error, const char *f_macro, const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num)
 {
 	const char		*__function_name = "DBlld_update_triggers";
@@ -777,7 +777,7 @@ void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid, s
 				" and f.itemid=i.itemid"
 				" and i.itemid=id.itemid"
 				" and id.parent_itemid=" ZBX_FS_UI64,
-			discovery_itemid);
+			lld_ruleid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -794,7 +794,7 @@ void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid, s
 				" and f.itemid=i.itemid"
 				" and i.itemid=id.itemid"
 				" and id.parent_itemid=" ZBX_FS_UI64,
-			discovery_itemid);
+			lld_ruleid);
 
 	/* run through trigger prototypes */
 	while (NULL != (row = DBfetch(result)))

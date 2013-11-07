@@ -29,14 +29,13 @@
  *                                                                            *
  * Purpose: add or update items, triggers and graphs for discovery item       *
  *                                                                            *
- * Parameters: discovery_itemid - [IN] discovery item identificator           *
- *                                     from database                          *
- *             value            - [IN] received value from agent              *
+ * Parameters: lld_ruleid - [IN] discovery item identificator from database   *
+ *             value      - [IN] received value from agent                    *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zbx_timespec_t *ts)
+void	DBlld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_timespec_t *ts)
 {
 	const char		*__function_name = "DBlld_process_discovery_rule";
 	DB_RESULT		result;
@@ -52,7 +51,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 	char			*sql = NULL;
 	size_t			sql_alloc = 128, sql_offset = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, discovery_itemid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, lld_ruleid);
 
 	sql = zbx_malloc(sql, sql_alloc);
 
@@ -62,7 +61,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 			"select hostid,key_,status,filter,error,lifetime"
 			" from items"
 			" where itemid=" ZBX_FS_UI64,
-			discovery_itemid);
+			lld_ruleid);
 
 	if (NULL != (row = DBfetch(result)))
 	{
@@ -87,7 +86,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 		zbx_free(lifetime_str);
 	}
 	else
-		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery rule ID [" ZBX_FS_UI64 "]", discovery_itemid);
+		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery rule ID [" ZBX_FS_UI64 "]", lld_ruleid);
 	DBfree_result(result);
 
 	if (0 == hostid)
@@ -143,10 +142,10 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 				__function_name, f_macro, f_regexp);
 	}
 
-	DBlld_update_items(hostid, discovery_itemid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num,
+	DBlld_update_items(hostid, lld_ruleid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num,
 			lifetime, ts->sec);
-	DBlld_update_triggers(hostid, discovery_itemid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num);
-	DBlld_update_graphs(hostid, discovery_itemid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num);
+	DBlld_update_triggers(hostid, lld_ruleid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num);
+	DBlld_update_graphs(hostid, lld_ruleid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num);
 
 	clean_regexps_ex(regexps, &regexps_num);
 	zbx_free(regexps);
@@ -154,7 +153,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 	if (ITEM_STATUS_NOTSUPPORTED == status)
 	{
 		zabbix_log(LOG_LEVEL_WARNING,  "discovery rule [" ZBX_FS_UI64 "][%s] became supported",
-				discovery_itemid, zbx_host_key_string(discovery_itemid));
+				lld_ruleid, zbx_host_key_string(lld_ruleid));
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",status=%d", ITEM_STATUS_ACTIVE);
 	}
@@ -168,7 +167,7 @@ error:
 		zbx_free(error_esc);
 	}
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where itemid=" ZBX_FS_UI64, discovery_itemid);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where itemid=" ZBX_FS_UI64, lld_ruleid);
 
 	DBbegin();
 
