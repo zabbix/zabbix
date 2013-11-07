@@ -79,7 +79,7 @@ CTree.prototype = {
 		}
 	},
 
-	openNode: function(nodes) {cdump(nodes);
+	openNode: function(nodes) {
 		for (var i = 0, size = nodes.length; i < size; i++) {
 			var nodeId = nodes[i].replace('.', '\\.');
 
