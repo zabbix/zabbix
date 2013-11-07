@@ -45,8 +45,6 @@ static	LPCWSTR RENDER_ITEMS[] = {
 #define	VAR_LEVEL(p) (p[4].ByteVal)
 #define	VAR_KEYWORDS(p) (p[5].UInt64Val)
 #define	VAR_TIME_CREATED(p) (p[6].FileTimeVal)
-#define	VAR_EVENT_DATA(p) (p[7].StringArr[0])
-#define	VAR_EVENT_TYPE(p) (p[7].Type)
 
 #define	EVENTLOG_REG_PATH TEXT("SYSTEM\\CurrentControlSet\\Services\\EventLog\\")
 
@@ -665,17 +663,6 @@ static int	zbx_get_eventlog_message6(LPCWSTR wsource, zbx_uint64_t *which, unsig
 				NULL == *out_provider ? "" : *out_provider);
 		zabbix_log(LOG_LEVEL_WARNING, "In Eventlog Name(%s) at Event Record ID(" ZBX_FS_UI64 "): %s",
 				tmp_str, *which, *out_message);
-
-		if (EvtVarTypeNull != VAR_EVENT_TYPE(renderedContent))
-		{
-			char	*data;
-
-			data = zbx_unicode_to_utf8(VAR_EVENT_DATA(renderedContent));
-			*out_message = zbx_strdcatf(*out_message, "The following information was included"
-					" with the event: %s", data);
-
-			zbx_free(data);
-		}
 	}
 
 	ret = SUCCEED;
