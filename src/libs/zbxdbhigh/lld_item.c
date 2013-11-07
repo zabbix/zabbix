@@ -632,7 +632,6 @@ static void	DBlld_item_make(zbx_vector_ptr_t *items, const char *name_proto, con
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: DBlld_applications_make                                          *
