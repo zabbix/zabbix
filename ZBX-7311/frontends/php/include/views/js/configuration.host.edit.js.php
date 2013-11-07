@@ -348,6 +348,9 @@
 				hostInterfacesManager.resetMainInterfaces();
 			},
 			activate: function(event, ui) {
+				jQuery(ui.helper).css('opacity', 0.6);
+				jQuery(ui.helper).find('td:first-child').width(29);
+
 				if (!jQuery(this).find(ui.draggable).length) {
 					jQuery(this).addClass('dropArea');
 					jQuery('span.dragHelpText', this).toggle();
