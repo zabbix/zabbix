@@ -224,7 +224,7 @@ retry:
 
 	if (SUCCEED != err)
 	{
-		*out_message = zbx_strdcatf(*out_message, "The description for Event ID (%lu) in Source (%s)"
+		*out_message = zbx_strdcatf(*out_message, "The description for Event ID:%lu in Source:'%s'"
 				" cannot be found. The local computer may not have the necessary registry"
 				" information or message DLL files to display messages from a remote computer.",
 				*out_eventid, NULL == *out_source ? "" : *out_source);
@@ -551,7 +551,7 @@ static LPSTR expand_message6(LPCWSTR pname, EVT_HANDLE event)
 			if (TRUE != EvtFormatMessage(provider, event, 0, 0, NULL, EvtFormatMessageEvent,
 					require, pmessage, &require))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "formatting message failed: %s",
+				zabbix_log(LOG_LEVEL_DEBUG, "formatting message failed: %s",
 						strerror_from_system(GetLastError()));
 				goto finish;
 			}
@@ -645,24 +645,21 @@ static int	zbx_get_eventlog_message6(LPCWSTR wsource, zbx_uint64_t *which, unsig
 
 	if (VAR_RECORD_NUMBER(renderedContent) != *which)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "In Eventlog '%s': Expected EventRecordID(" ZBX_FS_UI64 ")"
-				" is not equal to the real EventRecordID(" ZBX_FS_UI64 ")."
-				" Overwriting expected EventRecordID by the real EventRecordID",
-				tmp_str, *which, VAR_RECORD_NUMBER(renderedContent));
+		zabbix_log(LOG_LEVEL_DEBUG, "Overwriting expected EventRecordID:" ZBX_FS_UI64 " with the real"
+				" EventRecordID:" ZBX_FS_UI64 " in eventlog '%s'", *which,
+				VAR_RECORD_NUMBER(renderedContent), tmp_str);
 		*which = VAR_RECORD_NUMBER(renderedContent);
 	}
 
 	/* some events dont have enough information for making event message */
 	if (NULL == *out_message)
 	{
-		*out_message = zbx_strdcatf(*out_message, "The description for Event ID (%lu) in Source (%s)"
+		*out_message = zbx_strdcatf(*out_message, "The description for Event ID:%lu in Source:'%s'"
 				" cannot be found. Either the component that raises this event is not installed"
 				" on your local computer or the installation is corrupted. You can install or repair"
 				" the component on the local computer. If the event originated on another computer,"
 				" the display information had to be saved with the event.", *out_eventid,
 				NULL == *out_provider ? "" : *out_provider);
-		zabbix_log(LOG_LEVEL_WARNING, "In Eventlog Name(%s) at Event Record ID(" ZBX_FS_UI64 "): %s",
-				tmp_str, *which, *out_message);
 	}
 
 	ret = SUCCEED;
