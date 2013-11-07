@@ -182,9 +182,7 @@ out:
  *                                                                            *
  * Purpose: Parse list of active checks received from server                  *
  *                                                                            *
- * Parameters: str  - NULL terminated string received from server             *
- *             host - address of host                                         *
- *             port - port number on host                                     *
+ * Parameters: str - NULL terminated string received from server              *
  *                                                                            *
  * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on an incorrect format of string                        *
@@ -198,11 +196,11 @@ out:
  *           <key>:<refresh time>:<last log size>:<modification time>         *
  *                                                                            *
  ******************************************************************************/
-static int	parse_list_of_checks(char *str, const char *host, unsigned short port)
+static int	parse_list_of_checks(char *str)
 {
 	const char		*p;
-	char			name[MAX_STRING_LEN], key_orig[MAX_STRING_LEN], expression[MAX_STRING_LEN],
-				tmp[MAX_STRING_LEN], exp_delimiter;
+	char			name[MAX_STRING_LEN], key_orig[MAX_STRING_LEN], expression[MAX_STRING_LEN], tmp[MAX_STRING_LEN],
+				exp_delimiter;
 	int			delay, mtime, expression_type, case_sensitive;
 	zbx_uint64_t		lastlogsize;
 	struct zbx_json_parse	jp;
@@ -221,7 +219,7 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 	if (0 != strcmp(tmp, ZBX_PROTO_VALUE_SUCCESS))
 	{
 		if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, tmp, sizeof(tmp)))
-			zabbix_log(LOG_LEVEL_WARNING, "no active checks on server [%s:%hu]: %s", host, port, tmp);
+			zabbix_log(LOG_LEVEL_WARNING, "no active checks on server: %s", tmp);
 		else
 			zabbix_log(LOG_LEVEL_WARNING, "no active checks on server");
 		return FAIL;
@@ -446,7 +444,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 					zabbix_log(LOG_LEVEL_WARNING, "active check configuration update from [%s:%hu]"
 							" is working again", host, port);
 				}
-				parse_list_of_checks(buf, host, port);
+				parse_list_of_checks(buf);
 			}
 		}
 
