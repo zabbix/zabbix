@@ -150,11 +150,11 @@ class CChart extends CGraphDraw {
 	}
 
 	public function setYAxisMin($yaxismin) {
-		$this->yaxismin = $yaxismin;
+		$this->yaxismin = (int) $yaxismin;
 	}
 
 	public function setYAxisMax($yaxismax) {
-		$this->yaxismax = $yaxismax;
+		$this->yaxismax = (int) $yaxismax;
 	}
 
 	public function setYMinItemId($itemid) {
