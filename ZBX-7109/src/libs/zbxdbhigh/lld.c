@@ -23,6 +23,130 @@
 #include "zbxalgo.h"
 #include "zbxserver.h"
 
+static int	lld_check_record(struct zbx_json_parse *jp_row, const char *f_macro, const char *f_regexp,
+		ZBX_REGEXP *regexps, int regexps_num)
+{
+	const char	*__function_name = "lld_check_record";
+
+	char		*value = NULL;
+	size_t		value_alloc = 0;
+	int		res = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() jp_row:'%.*s'", __function_name,
+			jp_row->end - jp_row->start + 1, jp_row->start);
+
+	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, f_macro, &value, &value_alloc))
+		res = regexp_match_ex(regexps, regexps_num, value, f_regexp, ZBX_CASE_SENSITIVE);
+
+	zbx_free(value);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+
+	return res;
+}
+
+static int	DBlld_rows_get(char *value, char *filter, zbx_vector_ptr_t *lld_rows, char **error)
+{
+	const char		*__function_name = "DBlld_parse_value";
+
+	struct zbx_json_parse	jp, jp_data, jp_row;
+	char			*f_macro = NULL, *f_regexp = NULL;
+	const char		*p;
+	ZBX_REGEXP		*regexps = NULL;
+	int			regexps_alloc = 0, regexps_num = 0;
+	zbx_lld_row_t		*lld_row;
+	int			ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (SUCCEED != zbx_json_open(value, &jp))
+	{
+		*error = zbx_strdup(*error, "Value should be a JSON object.");
+		goto out;
+	}
+
+	/* {"data":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
+	/*         ^-------------------------------------------^  */
+	if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
+	{
+		*error = zbx_dsprintf(*error, "Cannot find the \"%s\" array in the received JSON object.",
+				ZBX_PROTO_TAG_DATA);
+		goto out;
+	}
+
+	if (NULL != (f_regexp = strchr(filter, ':')))
+	{
+		f_macro = filter;
+		*f_regexp++ = '\0';
+
+		if ('@' == *f_regexp)
+		{
+			DB_RESULT	result;
+			DB_ROW		row;
+			char		*f_regexp_esc;
+
+			f_regexp_esc = DBdyn_escape_string(f_regexp + 1);
+
+			result = DBselect("select e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
+					" from regexps r,expressions e"
+					" where r.regexpid=e.regexpid"
+						" and r.name='%s'" DB_NODE,
+					f_regexp_esc, DBnode_local("r.regexpid"));
+
+			zbx_free(f_regexp_esc);
+
+			while (NULL != (row = DBfetch(result)))
+			{
+				add_regexp_ex(&regexps, &regexps_alloc, &regexps_num,
+						f_regexp + 1, row[0], atoi(row[1]), row[2][0], atoi(row[3]));
+			}
+			DBfree_result(result);
+		}
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() f_macro:'%s' f_regexp:'%s'", __function_name, f_macro, f_regexp);
+	}
+
+	p = NULL;
+	/* {"data":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
+	/*          ^                                             */
+	while (NULL != (p = zbx_json_next(&jp_data, p)))
+	{
+		/* {"data":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
+		/*          ^------------------^                          */
+		if (FAIL == zbx_json_brackets_open(p, &jp_row))
+			continue;
+
+		if (NULL != f_macro && SUCCEED != lld_check_record(&jp_row, f_macro, f_regexp, regexps, regexps_num))
+			continue;
+
+		lld_row = zbx_malloc(NULL, sizeof(zbx_lld_row_t));
+		memcpy(&lld_row->jp_row, &jp_row, sizeof(struct zbx_json_parse));
+
+		zbx_vector_ptr_append(lld_rows, lld_row);
+	}
+
+	clean_regexps_ex(regexps, &regexps_num);
+	zbx_free(regexps);
+
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+static void	DBlld_rows_free(zbx_vector_ptr_t *lld_rows)
+{
+	zbx_lld_row_t	*lld_row;
+
+	while (0 != lld_rows->values_num)
+	{
+		lld_row = (zbx_lld_row_t *)lld_rows->values[--lld_rows->values_num];
+
+		zbx_free(lld_row);
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DBlld_process_discovery_rule                                     *
@@ -38,21 +162,20 @@
 void	DBlld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_timespec_t *ts)
 {
 	const char		*__function_name = "DBlld_process_discovery_rule";
+
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_uint64_t		hostid = 0;
-	struct zbx_json_parse	jp, jp_data;
 	char			*discovery_key = NULL, *filter = NULL, *error = NULL, *db_error = NULL, *error_esc;
 	unsigned char		status = 0;
 	unsigned short		lifetime;
-	char			*f_macro = NULL, *f_regexp = NULL;
-	ZBX_REGEXP		*regexps = NULL;
-	int			regexps_alloc = 0, regexps_num = 0;
+	zbx_vector_ptr_t	lld_rows;
 	char			*sql = NULL;
 	size_t			sql_alloc = 128, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, lld_ruleid);
 
+	zbx_vector_ptr_create(&lld_rows);
 	sql = zbx_malloc(sql, sql_alloc);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set lastclock=%d,lastns=%d", ts->sec, ts->ns);
@@ -92,63 +215,14 @@ void	DBlld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_time
 	if (0 == hostid)
 		goto clean;
 
+	if (SUCCEED != DBlld_rows_get(value, filter, &lld_rows, &error))
+		goto error;
+
 	error = zbx_strdup(error, "");
 
-	if (SUCCEED != zbx_json_open(value, &jp))
-	{
-		error = zbx_strdup(error, "Value should be a JSON object");
-		goto error;
-	}
-
-	/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
-	/*                     ^-------------------------------------------^  */
-	if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
-	{
-		error = zbx_dsprintf(error, "Cannot find the \"%s\" array in the received JSON object",
-				ZBX_PROTO_TAG_DATA);
-		goto error;
-	}
-
-	if (NULL != (f_regexp = strchr(filter, ':')))
-	{
-		f_macro = filter;
-		*f_regexp++ = '\0';
-
-		if ('@' == *f_regexp)
-		{
-			DB_RESULT	result;
-			DB_ROW		row;
-			char		*f_regexp_esc;
-
-			f_regexp_esc = DBdyn_escape_string(f_regexp + 1);
-
-			result = DBselect("select e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
-					" from regexps r,expressions e"
-					" where r.regexpid=e.regexpid"
-						" and r.name='%s'" DB_NODE,
-					f_regexp_esc, DBnode_local("r.regexpid"));
-
-			zbx_free(f_regexp_esc);
-
-			while (NULL != (row = DBfetch(result)))
-			{
-				add_regexp_ex(&regexps, &regexps_alloc, &regexps_num,
-						f_regexp + 1, row[0], atoi(row[1]), row[2][0], atoi(row[3]));
-			}
-			DBfree_result(result);
-		}
-
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() f_macro:'%s' f_regexp:'%s'",
-				__function_name, f_macro, f_regexp);
-	}
-
-	DBlld_update_items(hostid, lld_ruleid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num,
-			lifetime, ts->sec);
-	DBlld_update_triggers(hostid, lld_ruleid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num);
-	DBlld_update_graphs(hostid, lld_ruleid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num);
-
-	clean_regexps_ex(regexps, &regexps_num);
-	zbx_free(regexps);
+	DBlld_update_items(hostid, lld_ruleid, &lld_rows, &error, lifetime, ts->sec);
+	DBlld_update_triggers(hostid, lld_ruleid, &lld_rows, &error);
+	DBlld_update_graphs(hostid, lld_ruleid, &lld_rows, &error);
 
 	if (ITEM_STATUS_NOTSUPPORTED == status)
 	{
@@ -180,6 +254,9 @@ clean:
 	zbx_free(filter);
 	zbx_free(discovery_key);
 	zbx_free(sql);
+
+	DBlld_rows_free(&lld_rows);
+	zbx_vector_ptr_destroy(&lld_rows);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
