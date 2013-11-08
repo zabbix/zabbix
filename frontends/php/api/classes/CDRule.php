@@ -594,7 +594,12 @@ class CDRule extends CZBXAPI {
 			));
 		}
 
-		DB::delete('drules', array('druleid' => $druleIds));
+		$result = DB::delete('drules', array('druleid' => $druleIds));
+		if ($result) {
+			foreach ($druleIds as $druleId) {
+				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_DISCOVERY_RULE, '['.$druleId.']');
+			}
+		}
 
 		return array('druleids' => $druleIds);
 	}
