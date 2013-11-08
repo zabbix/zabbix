@@ -572,11 +572,11 @@ class CDRule extends CZBXAPI {
 		$actionIds = array();
 
 		$dbActions = DBselect(
-			'SELECT DISTINCT c.actionid'.
-			' FROM c.conditions'.
-			' WHERE c.conditiontype='.CONDITION_TYPE_DRULE.
-				' AND '.dbConditionString('c.value', $druleIds).
-			' ORDER BY c.actionid'
+			'SELECT DISTINCT actionid'.
+			' FROM conditions'.
+			' WHERE conditiontype='.CONDITION_TYPE_DRULE.
+				' AND '.dbConditionString('value', $druleIds).
+			' ORDER BY actionid'
 		);
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionIds[] = $dbAction['actionid'];
