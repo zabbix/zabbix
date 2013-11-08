@@ -1278,11 +1278,11 @@
 		$data = array(
 			'title' => $title,
 			'elements_field' => $elementsField,
-			'elements' => get_request($elementsField, array()),
-			'copy_type' => get_request('copy_type', 0),
-			'filter_groupid' => get_request('filter_groupid', 0),
-			'copy_targetid' => get_request('copy_targetid', array()),
-			'hostid' => get_request('hostid', 0),
+			'elements' => getRequest($elementsField, array()),
+			'copy_type' => getRequest('copy_type', 0),
+			'filter_groupid' => getRequest('filter_groupid', 0),
+			'copy_targetid' => getRequest('copy_targetid', array()),
+			'hostid' => getRequest('hostid', 0),
 			'groups' => array(),
 			'hosts' => array()
 		);

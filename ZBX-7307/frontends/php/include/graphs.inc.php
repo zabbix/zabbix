@@ -354,7 +354,7 @@ function copyGraphToHost($graphId, $hostId) {
 	$graphHost = reset($graph['hosts']);
 
 	if ($graphHost['hostid'] == $hostId) {
-		error(_s('Graph "%1$s" already exist in "%2$s".', $graph['name'], $graphHost['name']));
+		error(_s('Graph "%1$s" already exist on "%2$s".', $graph['name'], $graphHost['name']));
 
 		return false;
 	}
