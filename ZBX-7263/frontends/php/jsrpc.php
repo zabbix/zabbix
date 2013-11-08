@@ -81,17 +81,14 @@ switch ($data['method']) {
 
 		// timeout
 		$timeout = time() - $msgsettings['timeout'];
-		$lastMsgTime = isset($data['params']['messageLast']['events'])
-			? $data['params']['messageLast']['events']['time'] : 0;
-
-		$lastChangeSince = max(array($lastMsgTime, $msgsettings['last.clock'], $timeout));
-		if (!is_int($lastChangeSince)) {
-			$lastChangeSince = PHP_INT_MAX;
+		$lastMsgTime = 0;
+		if (isset($data['params']['messageLast']['events'])) {
+			$lastMsgTime = $data['params']['messageLast']['events']['time'];
 		}
 
 		$options = array(
 			'nodeids' => get_current_nodeid(true),
-			'lastChangeSince' => $lastChangeSince,
+			'lastChangeSince' => max(array($lastMsgTime, $msgsettings['last.clock'], $timeout)),
 			'value' => array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE),
 			'priority' => array_keys($msgsettings['triggers.severities']),
 			'triggerLimit' => 15
