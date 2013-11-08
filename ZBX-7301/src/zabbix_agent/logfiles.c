@@ -369,7 +369,8 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 		unsigned char skip_old_data)
 {
 	const char		*__function_name = "process_logrt";
-	int			i = 0, nbytes, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, fd = 0, length = 0, j = 0;
+	int			i = 0, nbytes, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, fd = 0, length = 0,
+				j = 0, retries = 0;
 	char			buffer[MAX_BUFFER_LEN], *directory = NULL, *format = NULL, *logfile_candidate = NULL;
 	struct stat		file_buf;
 	struct st_logfile	*logfiles = NULL;
@@ -392,19 +393,21 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 		goto out;
 	}
 
+retry:
+	if (3 < ++retries)
+		goto out;
+
 #ifdef _WINDOWS
 	/* try to "open" Windows directory */
 	find_path = zbx_dsprintf(find_path, "%s*", directory);
 	find_handle = _findfirst((const char *)find_path, &find_data);
+	zbx_free(find_path);
+
 	if (-1 == find_handle)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot get entries from '%s' directory: %s", directory, zbx_strerror(errno));
-		zbx_free(directory);
-		zbx_free(format);
-		zbx_free(find_path);
 		goto out;
 	}
-	zbx_free(find_path);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "we are in the Windows directory reading cycle");
 	do
@@ -432,8 +435,6 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 	if (NULL == (dir = opendir(directory)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot open directory '%s' for reading: %s", directory, zbx_strerror(errno));
-		zbx_free(directory);
-		zbx_free(format);
 		goto out;
 	}
 
@@ -492,7 +493,13 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 		if (0 != zbx_stat(logfile_candidate, &file_buf))/* situation could have changed */
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot stat '%s': %s", logfile_candidate, zbx_strerror(errno));
-			break;	/* must return, situation could have changed */
+			goto retry;	/* apparently log file has been moved, rescan the directory */
+		}
+
+		if (-1 == (fd = zbx_open(logfile_candidate, O_RDONLY)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot open '%s': %s", logfile_candidate, zbx_strerror(errno));
+			goto retry;	/* apparently log file has been moved, rescan the directory */
 		}
 
 		if (1 == skip_old_data)
@@ -506,12 +513,6 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 
 		if (file_buf.st_size < *lastlogsize)
 			*lastlogsize = 0;	/* maintain backward compatibility */
-
-		if (-1 == (fd = zbx_open(logfile_candidate, O_RDONLY)))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot open '%s': %s", logfile_candidate, zbx_strerror(errno));
-			break;	/* must return, situation could have changed */
-		}
 
 #ifdef _WINDOWS
 		if (-1L != _lseeki64(fd, (__int64)*lastlogsize, SEEK_SET))
@@ -569,16 +570,16 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 
 #ifdef _WINDOWS
 	if (0 != find_handle && -1 == _findclose(find_handle))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot close the find directory handle: %s", zbx_strerror(errno));
 #else
 	if (NULL != dir && -1 == closedir(dir))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot close directory '%s': %s", directory, zbx_strerror(errno));
 #endif
 
 	zbx_free(logfile_candidate);
+out:
 	zbx_free(directory);
 	zbx_free(format);
-out:
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
