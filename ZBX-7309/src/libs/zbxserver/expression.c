@@ -2729,7 +2729,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				else if (0 == strcmp(m, MVAR_TRIGGER_NAME))
 				{
 					replace_to = zbx_strdup(replace_to, c_event->trigger.description);
-					substitute_simple_macros(actionid, event, r_event, userid, hostid, dc_host,
+					substitute_simple_macros(actionid, c_event, NULL, userid, hostid, dc_host,
 							dc_item, &replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION, error,
 							maxerrlen);
 				}
