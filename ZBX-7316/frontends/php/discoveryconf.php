@@ -167,12 +167,12 @@ if (isset($_REQUEST['save'])) {
 	}
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['druleid'])) {
-	$result = delete_discovery_rule($_REQUEST['druleid']);
+	$result = API::DRule()->delete(array($_REQUEST['druleid']));
+	$result = (bool) $result['druleids'];
+
 	show_messages($result, _('Discovery rule deleted'), _('Cannot delete discovery rule'));
 
 	if ($result) {
-		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_DISCOVERY_RULE, '['.$_REQUEST['druleid'].']');
-
 		unset($_REQUEST['form'], $_REQUEST['druleid']);
 		clearCookies($result);
 	}
@@ -193,16 +193,10 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 	clearCookies($goResult);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_druleid'])) {
-	$goResult = false;
-	foreach ($_REQUEST['g_druleid'] as $drid) {
-		if (delete_discovery_rule($drid)) {
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_DISCOVERY_RULE, '['.$drid.']');
-			$goResult = true;
-		}
-	}
-
-	show_messages($goResult, _('Discovery rules deleted'));
-	clearCookies($goResult);
+	$result = API::DRule()->delete($_REQUEST['g_druleid']);
+	$result = (bool) $result['druleids'];
+	show_messages($result, _('Discovery rules deleted'));
+	clearCookies($result);
 }
 
 /*
