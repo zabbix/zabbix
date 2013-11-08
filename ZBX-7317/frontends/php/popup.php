@@ -1394,33 +1394,6 @@ elseif ($srctbl == 'screens2') {
 	$table->show();
 }
 /*
- * Overview
- */
-elseif ($srctbl == 'overview') {
-	$table = new CTableInfo(_('No host groups found.'));
-	$table->setHeader(_('Name'));
-
-	$options = array(
-		'nodeids' => $nodeId,
-		'monitored_hosts' => true,
-		'output' => API_OUTPUT_EXTEND
-	);
-	if (!is_null($writeonly)) {
-		$options['editable'] = true;
-	}
-	$hostGroups = API::HostGroup()->get($options);
-	order_result($hostGroups, 'name');
-
-	foreach ($hostGroups as $hostGroup) {
-		$name = new CSpan($hostGroup['name'], 'link');
-
-		$action = get_window_opener($dstfrm, $dstfld1, $hostGroup[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $hostGroup[$srcfld2]) : '');
-		$name->setAttribute('onclick', $action.' close_window(); return false;');
-		$table->addRow($name);
-	}
-	$table->show();
-}
-/*
  * Discovery rules
  */
 elseif ($srctbl == 'drules') {
