@@ -31,7 +31,7 @@
 .host-edit .interface-row .interface-drag-control,
 .host-edit .interface-row .interface-add-control,
 .hostprototype-edit .interface-row .interface-drag-control,
-.hostprototype-edit .interface-row .interface-add-control { width: 2em; }
+.hostprototype-edit .interface-row .interface-add-control { width: 28px; }
 .host-edit .interface-row .interface-ip,
 .hostprototype-edit .interface-row .interface-ip { width: 16.5em; }
 .host-edit .interface-row .interface-dns,
