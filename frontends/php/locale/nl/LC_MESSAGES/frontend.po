@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-11-06 18:42+0200\n"
-"PO-Revision-Date: 2013-11-04 16:00+0300\n"
+"PO-Revision-Date: 2013-11-08 15:57+0300\n"
 "Last-Translator: open-future <patrik@open-future.be>\n"
 "Language-Team: NL\n"
 "Language: nl\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1383573612.0\n"
+"X-POOTLE-MTIME: 1383919048.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -6539,137 +6539,137 @@ msgstr "Onjuiste flexibel interval in Item \"%1$s\". Flexibele interval moet een
 #: include/triggers.inc.php:629 include/triggers.inc.php:1738
 #: tr_testexpr.php:36
 msgid "Incorrect function is used"
-msgstr ""
+msgstr "Verkeerde functie wordt gebruikt"
 
 #: api/classes/CScreenItem.php:533
 #, c-format
 msgid "Incorrect graph ID \"%s\" provided for screen element."
-msgstr ""
+msgstr "Verkeerde grafiek ID \"%s\" voorzien voor het scherm element."
 
 #: api/classes/CHostPrototype.php:396 api/classes/CHostPrototype.php:403
 msgid "Incorrect group prototype ID."
-msgstr ""
+msgstr "Verkeerde groep prototype ID."
 
 #: api/classes/CHostPrototype.php:196
 #, c-format
 msgid "Incorrect group prototypes for host prototype \"%1$s\"."
-msgstr ""
+msgstr "Verkeerde groep prototypes voor host prototype \"%1$s\"."
 
 #: api/classes/CScreenItem.php:519
 #, c-format
 msgid "Incorrect host ID \"%s\" provided for screen element."
-msgstr ""
+msgstr "Verkeerde host ID \"%s\" ingevoerd voor het scherm element."
 
 #: api/classes/CScreenItem.php:505
 #, c-format
 msgid "Incorrect host group ID \"%s\" provided for screen element."
-msgstr ""
+msgstr "Verkeerde host groep ID \"%s\" ingevoerd voor het scherm element."
 
 #: api/classes/CHostPrototype.php:241
 msgid "Incorrect host group ID for group prototype."
-msgstr ""
+msgstr "Verkeerde host groep ID voor groep prototype."
 
 #: include/profiles.inc.php:291
 msgid "Incorrect host group."
-msgstr ""
+msgstr "Verkeerde host groep."
 
 #: api/classes/CHostPrototype.php:190
 #, c-format
 msgid "Incorrect host groups for host prototype \"%1$s\"."
-msgstr ""
+msgstr "Verkeerde host groepen voor host prototype \"%1$s\"."
 
 #: api/classes/CHostPrototype.php:459
 msgid "Incorrect host prototype ID."
-msgstr ""
+msgstr "Verkeerde host prototype ID."
 
 #: image.php:46
 msgid "Incorrect image index."
-msgstr ""
+msgstr "Verkeerde index voor afbeelding."
 
 #: api/classes/CHostInterface.php:643
 #, c-format
 msgid "Incorrect interface DNS parameter \"%s\" provided."
-msgstr ""
+msgstr "Verkeerde interface DNS parameter \"%s\" ingevoerd."
 
 #: api/classes/CHostInterface.php:658
 #, c-format
 msgid "Incorrect interface IP parameter \"%s\" provided."
-msgstr ""
+msgstr "Verkeerde interface IP parameter \"%s\" ingevoerd."
 
 #: api/classes/CHostInterface.php:674
 #, c-format
 msgid "Incorrect interface port \"%s\" provided."
-msgstr ""
+msgstr "Verkeerde interface poort \"%s\" ingevoerd."
 
 #: api/classes/CHost.php:677
 #, c-format
 msgid "Incorrect inventory field \"%s\"."
-msgstr ""
+msgstr "Verkeerd inventaris veld \"%s\"."
 
 #: api/classes/CScreenItem.php:548
 #, c-format
 msgid "Incorrect item ID \"%s\" provided for screen element."
-msgstr ""
+msgstr "Onjuiste item ID \"%s\" ingevoerd voor het scherm element."
 
 #: api/classes/CGraphGeneral.php:314
 msgid "Incorrect item for axis value."
-msgstr ""
+msgstr "Onjuiste punt voor aswaarde."
 
 #: api/classes/CTrigger.php:736 include/triggers.inc.php:1002
 #, c-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
-msgstr ""
+msgstr "Onjuist artikel sleutel \"%1$s\" ingevoerd voor trigger uitdrukking op \"%2$s\"."
 
 #: include/classes/validators/CTriggerFunctionValidator.php:254
 #, c-format
 msgid "Incorrect item value type \"%1$s\" provided for trigger function \"%2$s\"."
-msgstr ""
+msgstr "Onjuiste waarde item type \"%1$s\" bedoeld als trigger functie \"%2$s\"."
 
 #: api/classes/CDRule.php:306
 msgid "Incorrect key."
-msgstr ""
+msgstr "Verkeerde sleutel."
 
 #: api/classes/CDRule.php:311 api/classes/CItemGeneral.php:289
 #: discoveryconf.php:110
 #, c-format
 msgid "Incorrect key: \"%1$s\"."
-msgstr ""
+msgstr "Verkeerde key: \"%1$s\"."
 
 #: include/forms.inc.php:1292 items.php:891
 msgid "Incorrect list of items."
-msgstr ""
+msgstr "Onjuiste lijst van items."
 
 #: maintenance.php:307
 msgid "Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18"
-msgstr ""
+msgstr "Verkeerde onderhouds - datum moet zijn tussen 1970.01.01 en 2038.01.18"
 
 #: maintenance.php:335
 msgid "Incorrect maintenance date"
-msgstr ""
+msgstr "Verkeerde onderhouds datum"
 
 #: maintenance.php:314
 msgid "Incorrect maintenance day period"
-msgstr ""
+msgstr "Verkeerde dag onderhoudsperiode"
 
 #: maintenance.php:321 maintenance.php:332
 msgid "Incorrect maintenance days of week"
-msgstr ""
+msgstr "Verkeerd onderhouds dagen van de week"
 
 #: maintenance.php:329
 msgid "Incorrect maintenance month period"
-msgstr ""
+msgstr "Verkeerde periode onderhouds maanden"
 
 #: maintenance.php:294
 msgid "Incorrect maintenance period"
-msgstr ""
+msgstr "Verkeerde onderhouds periode"
 
 #: maintenance.php:291
 msgid "Incorrect maintenance period (minimum 5 minutes)"
-msgstr ""
+msgstr "Verkeerde onderhouds periode (minimum 5 minuten)"
 
 #: maintenance.php:318
 msgid "Incorrect maintenance week period"
-msgstr ""
+msgstr "Verkeerd onderhouds weken"
 
 #: api/classes/CScreenItem.php:562
 #, c-format
@@ -6689,195 +6689,195 @@ msgstr "Foutieve breedte ingesteld voor kaart \"%s\"."
 #: api/classes/CScript.php:582
 #, c-format
 msgid "Incorrect menu path for script \"%1$s\"."
-msgstr ""
+msgstr "Onjuist menupad voor script \"%1$s\"."
 
 #: include/nodes.inc.php:306
 msgid "Incorrect node type."
-msgstr ""
+msgstr "Onjuist type node."
 
 #: api/classes/CEvent.php:412
 msgid "Incorrect object value."
-msgstr ""
+msgstr "Onjuist object waarde."
 
 #: api/classes/CAction.php:538 api/classes/CAction.php:589
 #, c-format
 msgid "Incorrect parameter for action \"%1$s\"."
-msgstr ""
+msgstr "Onjuiste parameter voor de actie \"%1$s\"."
 
 #: api/classes/CAction.php:819
 msgid "Incorrect parameter for operations."
-msgstr ""
+msgstr "Verkeerde parameter voor operaties."
 
 #: api/classes/CIconMap.php:175
 #, c-format
 msgid "Incorrect parameter is used for icon map \"%s\"."
-msgstr ""
+msgstr "Verkeerde parameter wordt gebruikt voor het pictogram map \"%s\"."
 
 #: api/classes/CAction.php:647
 #, c-format
 msgid "Incorrect parameters for action update method \"%s\"."
-msgstr ""
+msgstr "Verkeerde parameters voor de actie update methode \"%s\"."
 
 #: api/classes/CAction.php:789
 msgid "Incorrect parameters for condition."
-msgstr ""
+msgstr "Verkeerde parameters voor de conditie."
 
 #: api/classes/CIconMap.php:233
 #, c-format
 msgid "Incorrect parameters for icon map update method \"%s\"."
-msgstr ""
+msgstr "Verkeerde parameters voor pictogram kaart update methode \"%s\"."
 
 #: api/classes/CMaintenance.php:377 api/classes/CMaintenance.php:564
 msgid "Incorrect parameters for maintenance."
-msgstr ""
+msgstr "Verkeerde parameters voor onderhoud."
 
 #: api/classes/CUserGroup.php:248 api/classes/CUserGroup.php:298
 msgid "Incorrect parameters for user group."
-msgstr ""
+msgstr "Verkeerde parameters voor de gebruikersgroep."
 
 #: api/classes/CService.php:1211
 #, c-format
 msgid "Incorrect parent for service \"%1$s\"."
-msgstr ""
+msgstr "Verkeerde ouder voor service \"%1$s\"."
 
 #: api/classes/CService.php:1214
 msgid "Incorrect parent service."
-msgstr ""
+msgstr "Verkeerde ouder service."
 
 #: api/classes/CDRule.php:300 discoveryconf.php:103
 msgid "Incorrect port range."
-msgstr ""
+msgstr "Verkeerd poortbereik."
 
 #: api/classes/CDRule.php:359
 #, c-format
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
-msgstr ""
+msgstr "Verkeerd privacy protocol voor discovery rule \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:381
 #, c-format
 msgid "Incorrect privacy protocol for item \"%1$s\"."
-msgstr ""
+msgstr "Verkeerd privacy protocol voor item \"%1$s\"."
 
 #: api/classes/CDRule.php:287
 msgid "Incorrect proxyid."
-msgstr ""
+msgstr "Verkeerde proxyid."
 
 #: api/classes/CScreenItem.php:417
 msgid "Incorrect resource type provided for screen item."
-msgstr ""
+msgstr "Onjuist bron type ingevoerd voor het scherm item."
 
 #: include/classes/server/CZabbixServer.php:239
 #, c-format
 msgid "Incorrect response received from Zabbix server \"%1$s\"."
-msgstr ""
+msgstr "Verkeerde reactie ontvangen van Zabbix server \"%1$s\"."
 
 #: api/classes/CScreenItem.php:602
 #, c-format
 msgid "Incorrect row span provided for screen element located at X - %1$s and Y - %2$s."
-msgstr ""
+msgstr "Verkeerde rij overspanning gegeven voor screen element gelegen op X - %1$s en Y - %2$s."
 
 #: api/classes/CScreenItem.php:575
 #, c-format
 msgid "Incorrect screen ID \"%s\" provided for screen element."
-msgstr ""
+msgstr "Verkeerd scherm ID \"%s\" ingevoerd voor het scherm element."
 
 #: include/screens.inc.php:171 include/screens.inc.php:229
 msgid "Incorrect screen provided for slide show."
-msgstr ""
+msgstr "Verkeerd scherm aangebracht voor diashow."
 
 #: include/services.inc.php:491 include/services.inc.php:500
 msgid "Incorrect service end time."
-msgstr ""
+msgstr "Verkeerde dienst eindtijd."
 
 #: include/services.inc.php:488 include/services.inc.php:497
 msgid "Incorrect service start time."
-msgstr ""
+msgstr "Verkeerde dienst starttijd."
 
 #: include/services.inc.php:482
 msgid "Incorrect service time type."
-msgstr ""
+msgstr "Verkeerd type servicetijd."
 
 #: api/classes/CService.php:1180
 #, c-format
 msgid "Incorrect sorder order for service \"%1$s\"."
-msgstr ""
+msgstr "Verkeerde sorder order voor service \"%1$s\"."
 
 #: api/classes/CEvent.php:405
 msgid "Incorrect source value."
-msgstr ""
+msgstr "Verkeerde bronwaarde."
 
 #: api/classes/CHostPrototype.php:185
 #, c-format
 msgid "Incorrect status for host prototype \"%1$s\"."
-msgstr ""
+msgstr "Verkeerde status van host prototype \"%1$s\"."
 
 #: api/classes/CService.php:1234
 #, c-format
 msgid "Incorrect status for service \"%1$s\"."
-msgstr ""
+msgstr "Verkeerde status voor service \"%1$s\"."
 
 #: api/classes/CDRule.php:265
 msgid "Incorrect status."
-msgstr ""
+msgstr "Verkeerde status."
 
 #: api/classes/CItemKey.php:222
 #, c-format
 msgid "Incorrect syntax near \"%1$s\" at position \"%2$s\""
-msgstr ""
+msgstr "Verkeerde syntaxis dichtbij \"%1$s\" op positie \"%2$s\""
 
 #: api/classes/CItemKey.php:166
 #, c-format
 msgid "Incorrect syntax near \"%1$s\"."
-msgstr ""
+msgstr "Verkeerde syntaxis dichtbij \"%1$s\"."
 
 #: api/classes/CUser.php:351
 #, c-format
 msgid "Incorrect theme for user \"%1$s\"."
-msgstr ""
+msgstr "Onjuist thema voor gebruiker \"%1$s\"."
 
 #: include/classes/validators/CTimePeriodValidator.php:99
 #, c-format
 msgid "Incorrect time period \"%1$s\" start day must be less or equal to end day."
-msgstr ""
+msgstr "Onjuist tijd \"%1$s\" begindag moet kleiner of gelijk zijn aan het einde dag."
 
 #: include/classes/validators/CTimePeriodValidator.php:105
 #, c-format
 msgid "Incorrect time period \"%1$s\" start time must be less than end time."
-msgstr ""
+msgstr "Onjuist tijd \"%1$s\" starttijd moet minder dan eindtijd zijn."
 
 #: include/classes/validators/CTimePeriodValidator.php:89
 #: include/classes/validators/CTimePeriodValidator.php:94
 #, c-format
 msgid "Incorrect time period \"%1$s\"."
-msgstr ""
+msgstr "Onjuist tijdsperiode \"%1$s\"."
 
 #: api/classes/CService.php:1195
 #, c-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
-msgstr ""
+msgstr "Verkeerde trigger ID voor service \"%1$s\"."
 
 #: include/triggers.inc.php:640
 msgid "Incorrect trigger expression"
-msgstr ""
+msgstr "Verkeerde trigger expressie"
 
 #: include/classes/parsers/CTriggerExpression.php:285
 #: include/classes/parsers/CTriggerExpression.php:290
 msgid "Incorrect trigger expression."
-msgstr ""
+msgstr "Verkeerde trigger expressie."
 
 #: include/triggers.inc.php:1105
 #, c-format
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
-msgstr ""
+msgstr "Verkeerde trigger expressie. Host \"%1$s\" bestaat niet of u heeft geen toegang tot deze host."
 
 #: api/classes/CTrigger.php:716
 #, c-format
 msgid "Incorrect trigger expression. Host \"%s\" does not exist or you have no access to this host."
-msgstr ""
+msgstr "Verkeerde trigger expressie. Host \"%s\" bestaat niet of u heeft geen toegang tot deze host."
 
 #: api/classes/CTrigger.php:722
 msgid "Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously."
-msgstr ""
+msgstr "Verkeerde trigger expressie. Trigger expressie-elementen mogen niet behoren tot een template en een gastheer tegelijk."
 
 #: include/classes/validators/CTriggerFunctionValidator.php:248
 #: include/classes/validators/CTriggerFunctionValidator.php:260
@@ -6885,97 +6885,97 @@ msgstr ""
 #: include/classes/validators/CTriggerFunctionValidator.php:294
 #, c-format
 msgid "Incorrect trigger function \"%1$s\" provided in expression."
-msgstr ""
+msgstr "Verkeerde trigger functie \"%1$s\" ingevoerd in expressie."
 
 #: include/func.inc.php:1159
 msgid "Incorrect type of asort_by_key."
-msgstr ""
+msgstr "Verkeerd type asort_by_key."
 
 #: api/classes/CItemKey.php:178 api/classes/CItemKey.php:214
 #: api/classes/CItemKey.php:256
 #, c-format
 msgid "Incorrect usage of bracket symbols. \"%1$s\" found after final bracket."
-msgstr ""
+msgstr "Onjuist gebruik van de bracket symbolen. \"%1$s\" gevonden na laatste bracket."
 
 #: include/perm.inc.php:151
 msgid "Incorrect user data in \"get_accessible_groups_by_user\"."
-msgstr ""
+msgstr "Verkeerde gebruikersgegevens in \"get_accessible_groups_by_user\"."
 
 #: include/perm.inc.php:239
 msgid "Incorrect user data in \"get_accessible_nodes_by_user\"."
-msgstr ""
+msgstr "Verkeerde gebruikersgegevens in \"get_accessible_nodes_by_user\"."
 
 #: include/profiles.inc.php:279
 msgid "Incorrect user group."
-msgstr ""
+msgstr "Verkeerde gebruikersgroep."
 
 #: include/validate.inc.php:451
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
-msgstr ""
+msgstr "Onjuiste waarde \"%1$s\" voor \"%2$s\" veld."
 
 #: api/classes/CScreenItem.php:487 include/validate.inc.php:447
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
-msgstr ""
+msgstr "Onjuiste waarde \"%1$s\" voor \"%2$s\" veld: moet zijn tussen de %3$s en %4$s."
 
 #: include/classes/db/DB.php:357
 #, c-format
 msgid "Incorrect value \"%1$s\" for float field \"%2$s\"."
-msgstr ""
+msgstr "Onjuiste waarde \"%1$s\" voor float veld \"%2$s\"."
 
 #: include/classes/db/DB.php:351
 #, c-format
 msgid "Incorrect value \"%1$s\" for int field \"%2$s\"."
-msgstr ""
+msgstr "Onjuiste waarde \"%1$s\" voor int veld \"%2$s\"."
 
 #: include/classes/db/DB.php:345
 #, c-format
 msgid "Incorrect value \"%1$s\" for unsigned int field \"%2$s\"."
-msgstr ""
+msgstr "Onjuiste waarde \"%1$s\" voor unsigned int veld \"%2$s\"."
 
 #: include/reports.inc.php:539 include/reports.inc.php:543
 #, c-format
 msgid "Incorrect value for field \"%1$s\"."
-msgstr ""
+msgstr "Onjuiste waarde voor veld \"%1$s\"."
 
 #: include/validate.inc.php:442
 #, c-format
 msgid "Incorrect value for field \"%1$s\": cannot be empty."
-msgstr ""
+msgstr "Onjuiste waarde voor veld \"%1$s\": kan niet leeg zijn."
 
 #: include/classes/class.cbuttonqmessage.php:52
 #, c-format
 msgid "Incorrect value for setMessage(): \"%s\"."
-msgstr ""
+msgstr "Onjuiste waarde voor setMessage (): \"%s\"."
 
 #: api/classes/CProxy.php:220 api/classes/CProxy.php:231
 #, c-format
 msgid "Incorrect value used for proxy status \"%1$s\"."
-msgstr ""
+msgstr "Onjuiste waarde gebruikt voor proxy-status \"%1$s\"."
 
 #: include/profiles.inc.php:273
 msgid "Incorrect working time."
-msgstr ""
+msgstr "Verkeerde werktijd."
 
 #: include/classes/import/CXmlImport18.php:1591
 #, c-format
 msgid "Incorrect y max item for graph \"%1$s\"."
-msgstr ""
+msgstr "Verkeerd y max item voor grafiek \"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:1578
 #, c-format
 msgid "Incorrect y min item for graph \"%1$s\"."
-msgstr ""
+msgstr "Verkeerd y min item voor grafiek \"%1$s\"."
 
 #: include/locales.inc.php:62
 msgid "Indonesian (id_ID)"
-msgstr ""
+msgstr "Indonesisch (id_ID)"
 
 #: include/blocks.inc.php:908 include/blocks.inc.php:1472
 #: include/classes/class.cformlist.php:72 tr_status.php:361
 msgid "Info"
-msgstr ""
+msgstr "Info"
 
 #: adm.triggerseverities.php:56 include/items.inc.php:31
 #: include/views/administration.general.triggerSeverity.edit.php:40
@@ -6984,75 +6984,75 @@ msgstr "Informatie"
 
 #: include/views/configuration.triggers.expression.php:130
 msgid "Insert"
-msgstr ""
+msgstr "Invoegen"
 
 #: include/forms.inc.php:1479 jsLoader.php:109
 msgid "Insert macro"
-msgstr ""
+msgstr "Macro invoegen"
 
 #: include/menu.inc.php:277 include/profiles.inc.php:261 setup.php:127
 msgid "Installation"
-msgstr ""
+msgstr "Installatie"
 
 #: include/hosts.inc.php:265
 msgid "Installer name"
-msgstr ""
+msgstr "Naam installateur"
 
 #: disc_prototypes.php:41 host_discovery.php:40 hosts.php:800
 #: include/views/administration.proxy.edit.php:71 items.php:40
 msgid "Interface"
-msgstr ""
+msgstr "Interface"
 
 #: api/classes/CHostInterface.php:864
 #, c-format
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Interface is gekoppeld aan item \"%1$s\" op \"%2$s\"."
 
 #: include/views/js/configuration.host.edit.js.php:135
 msgid "Interface is used by items that require this type of the interface."
-msgstr ""
+msgstr "Interface wordt gebruikt door items die dit type van de interface vereisen."
 
 #: api/classes/CHostInterface.php:351
 #, c-format
 msgid "Interface with DNS \"%1$s\" cannot have empty IP address."
-msgstr ""
+msgstr "Interface met DNS \"%1$s\" kan geen leeg IP-adres bevatten."
 
 #: api/classes/CHostInterface.php:357 api/classes/CHostInterface.php:364
 #, c-format
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name while having \"Use DNS\" property on \"%2$s\"."
-msgstr ""
+msgstr "Interface met IP \"%1$s\" kan geen lege DNS naam hebben zolang er gebruikt gemaakt wordt van  \"Use DNS\" op \"%2$s\"."
 
 #: api/classes/CHostInterface.php:370
 #, c-format
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name."
-msgstr ""
+msgstr "Interface met IP \"% 1 $ s\" kan geen lege DNS-naam hebben."
 
 #: include/views/administration.authentication.edit.php:35
 msgctxt "authentication"
 msgid "Internal"
-msgstr ""
+msgstr "Interne"
 
 #: include/views/configuration.action.list.php:36
 msgctxt "event source"
 msgid "Internal"
-msgstr ""
+msgstr "Interne"
 
 #: include/users.inc.php:84
 msgctxt "user type"
 msgid "Internal"
-msgstr ""
+msgstr "Interne"
 
 #: api/rpc/class.cjsonrpc.php:202
 msgid "Internal JSON-RPC error."
-msgstr ""
+msgstr "Interne JSON-RPC fout."
 
 #: api/rpc/class.cjsonrpc.php:201
 msgid "Internal error."
-msgstr ""
+msgstr "Interne fout."
 
 #: include/views/configuration.httpconf.edit.php:94
 msgid "Internet Explorer"
-msgstr ""
+msgstr "Internet Explorer"
 
 #: include/forms.inc.php:947
 #: include/views/configuration.host.discovery.list.php:55
@@ -7062,47 +7062,47 @@ msgstr ""
 #: include/views/configuration.item.prototype.list.php:53
 #: include/views/configuration.services.edit.php:129 latest.php:329
 msgid "Interval"
-msgstr ""
+msgstr "Interval"
 
 #: include/views/configuration.item.edit.php:307
 #: include/views/configuration.item.massupdate.php:358
 msgid "Interval (in sec)"
-msgstr ""
+msgstr "Interval (in sec)"
 
 #: api/rpc/class.cjsonrpc.php:182
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
-msgstr ""
+msgstr "Ongeldige JSON. Er is een fout opgetreden op de servertijdens het ontleden van de JSON tekst."
 
 #: api/rpc/class.cjsonrpc.php:186
 msgid "Invalid Request."
-msgstr ""
+msgstr "Ongeldige Request."
 
 #: maintenance.php:135 maintenance.php:149 services.php:178 services.php:192
 #, c-format
 msgid "Invalid date \"%s\"."
-msgstr ""
+msgstr "Ongeldige datum \"%s\"."
 
 #: include/classes/validators/CTriggerFunctionValidator.php:266
 msgid "Invalid first parameter."
-msgstr ""
+msgstr "Ongeldige eerste parameter."
 
 #: include/classes/validators/CTriggerFunctionValidator.php:269
 msgid "Invalid fourth parameter."
-msgstr ""
+msgstr "Ongeldige vierde parameter."
 
 #: api/classes/CUserMacro.php:822
 #, c-format
 msgid "Invalid hostid for macro \"%1$s\"."
-msgstr ""
+msgstr "Ongeldige hostid voor macro \"%1$s\"."
 
 #: api/classes/CItemKey.php:80 api/classes/CItemKey.php:99
 #: api/classes/CItemKey.php:270
 msgid "Invalid item key format."
-msgstr ""
+msgstr "Ongeldig item key formaat."
 
 #: maintenance.php:302
 msgid "Invalid maintenance period"
-msgstr ""
+msgstr "Ongeldige onderhoudsperiode"
 
 #: api/classes/CScreenItem.php:146 api/classes/CScreenItem.php:226
 #: api/classes/CScript.php:448 api/classes/CService.php:206
@@ -7110,47 +7110,47 @@ msgstr ""
 #: api/classes/CUserMacro.php:339 api/classes/CUserMacro.php:472
 #: api/rpc/class.cjsonrpc.php:197
 msgid "Invalid method parameters."
-msgstr ""
+msgstr "Ongeldige werkwijze parameters."
 
 #: include/classes/validators/CTriggerFunctionValidator.php:261
 msgid "Invalid number of parameters."
-msgstr ""
+msgstr "Ongeldig aantal parameters."
 
 #: api/rpc/class.cjsonrpc.php:196
 msgid "Invalid params."
-msgstr ""
+msgstr "Ongeldige parameters."
 
 #: include/reports.inc.php:589 include/reports.inc.php:593
 #, c-format
 msgid "Invalid period for field \"%1$s\"."
-msgstr ""
+msgstr "Ongeldige periode voor het veld \"%1$s\"."
 
 #: api/classes/CHttpTest.php:637
 #, c-format
 msgid "Invalid response code \"%1$s\"."
-msgstr ""
+msgstr "Ongeldige respons code \"%1$s\"."
 
 #: api/classes/CHttpTest.php:632
 #, c-format
 msgid "Invalid response code range \"%1$s\"."
-msgstr ""
+msgstr "Ongeldige respons code, range \"%1$s\"."
 
 #: include/classes/validators/CTriggerFunctionValidator.php:267
 msgid "Invalid second parameter."
-msgstr ""
+msgstr "Ongeldige tweede parameter."
 
 #: include/classes/validators/CTriggerFunctionValidator.php:268
 msgid "Invalid third parameter."
-msgstr ""
+msgstr "Ongeldige derde parameter."
 
 #: disc_prototypes.php:195 host_discovery.php:179 items.php:354
 msgid "Invalid time period"
-msgstr ""
+msgstr "Ongeldige tijdsperiode"
 
 #: include/classes/class.cview.php:62
 #, c-format
 msgid "Invalid view name given \"%s\". Allowed chars: \"a-z\" and \".\"."
-msgstr ""
+msgstr "Ongeldige view naam gegeven \"%s\". Toegestane tekens: \"a-z\" en \".\"."
 
 #: include/menu.inc.php:101
 #: include/views/configuration.host.massupdate.php:294
@@ -7160,15 +7160,15 @@ msgstr "Inventaris"
 #: api/classes/CHost.php:1303
 #, c-format
 msgid "Inventory disabled for host \"%s\"."
-msgstr ""
+msgstr "Inventarisatie uitgeschakeld voor host \"%s\"."
 
 #: include/views/administration.general.iconmap.edit.php:41
 msgid "Inventory field"
-msgstr ""
+msgstr "Inventaris veld"
 
 #: include/views/configuration.host.massupdate.php:245
 msgid "Inventory mode"
-msgstr ""
+msgstr "Inventaris modus"
 
 #: include/views/administration.users.list.php:60
 msgid "Is online?"
@@ -7177,19 +7177,19 @@ msgstr "Is verbonden?"
 #: include/blocks.inc.php:895 include/blocks.inc.php:905
 #: include/blocks.inc.php:1470
 msgid "Issue"
-msgstr ""
+msgstr "Probleem"
 
 #: api/classes/CUser.php:145
 msgid "It is not possible to filter by user password."
-msgstr ""
+msgstr "Het is niet mogelijk om te filteren op gebruikerswachtwoord."
 
 #: include/page_header.php:234
 msgid "It is not possible to logout from HTTP authentication."
-msgstr ""
+msgstr "Het is niet mogelijk om uit te loggen uit HTTP-authenticatie."
 
 #: api/classes/CUserMedia.php:186 api/classes/CUser.php:153
 msgid "It is not possible to search by user password."
-msgstr ""
+msgstr "Het is niet mogelijk om te zoeken op gebruikerswachtwoord."
 
 #: include/locales.inc.php:63
 msgid "Italian (it_IT)"
@@ -7207,48 +7207,48 @@ msgstr "Item"
 #: api/classes/CItemGeneral.php:100
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\""
-msgstr ""
+msgstr "Item \"%1$s\" bestaat al op \"%2$s\""
 
 #: api/classes/CItemGeneral.php:99 api/classes/CItem.php:37
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
-msgstr ""
+msgstr "Item \"%1$s\" bestaat al op \"%2$s\", geërfd van een ander sjabloon."
 
 #: api/classes/CItem.php:38
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "Item \"%1$s\" bestaat al op \"%2$s\"."
 
 #: api/classes/CItem.php:959
 #, c-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
-msgstr ""
+msgstr "Item \"%1$s\" kan een ontbrekende host inventaris veld nummer \"%2$d\" niet invullen. Keuzes zijn: van 0 (niet bevolken) tot %3$d."
 
 #: api/classes/CTemplateScreen.php:597
 #, c-format
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
-msgstr ""
+msgstr "Item \"%1$s\" bestaat niet op template '%2$s \"."
 
 #: include/classes/import/CXmlImport18.php:1526
 #, c-format
 msgid "Item \"%1$s\" does not exist."
-msgstr ""
+msgstr "Item \"%1$s\" bestaat niet."
 
 #: include/classes/import/CConfigurationImport.php:578
 #, c-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
-msgstr ""
+msgstr "Item \"%1$s\" op \"%2$s\": applicatie \"%3$s\" bestaat niet."
 
 #: include/classes/import/CXmlImport18.php:1274
 #: include/classes/import/CXmlImport18.php:1278
 #, c-format
 msgid "Item \"%1$s\" skipped - user rule."
-msgstr ""
+msgstr "Item \"%1$s\" overgeslagen - user regel."
 
 #: api/classes/CItemGeneral.php:363
 #, c-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
-msgstr ""
+msgstr "Item \"%1$s:%2$s\" bevat ongeldige poort: \"%3$s\"."
 
 #: disc_prototypes.php:308 items.php:479 screenedit.php:183
 msgid "Item added"
@@ -7256,7 +7256,7 @@ msgstr "Item toegevoegd"
 
 #: include/views/administration.proxy.list.php:50
 msgid "Item count"
-msgstr ""
+msgstr "Product aantallen"
 
 #: disc_prototypes.php:204 items.php:362 screenedit.php:202
 msgid "Item deleted"
@@ -7264,36 +7264,36 @@ msgstr "Item verwijderd"
 
 #: include/actions.inc.php:1153
 msgid "Item in \"normal\" state"
-msgstr ""
+msgstr "Item in \"normale\" toestand"
 
 #: include/actions.inc.php:1152
 msgid "Item in \"not supported\" state"
-msgstr ""
+msgstr "Item in \"niet ondersteund\" toestand"
 
 #: include/forms.inc.php:1124
 msgid "Item prototype"
-msgstr ""
+msgstr "Item prototype"
 
 #: api/classes/CItemPrototype.php:38
 #, c-format
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\""
-msgstr ""
+msgstr "Item prototype \"%1$s\" bestaat al op \"%2$s\""
 
 #: api/classes/CItemPrototype.php:37
 #, c-format
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
-msgstr ""
+msgstr "Item prototype \"%1$s\" bestaat al op \"%2$s\", geërfd van een ander sjabloon."
 
 #: include/html.inc.php:414 include/html.inc.php:418
 #: include/views/configuration.host.discovery.list.php:101
 #: include/views/configuration.host.edit.php:549
 #: include/views/configuration.template.edit.php:299
 msgid "Item prototypes"
-msgstr ""
+msgstr "Item prototypes"
 
 #: include/views/configuration.item.prototype.list.php:32
 msgid "Item prototypes of"
-msgstr ""
+msgstr "Item prototypes van"
 
 #: disc_prototypes.php:304 items.php:476 screenedit.php:176
 msgid "Item updated"
@@ -7301,7 +7301,7 @@ msgstr "Item bijgewerkt"
 
 #: api/classes/CItemGeneral.php:267
 msgid "Item uses host interface from non-parent host."
-msgstr ""
+msgstr "Item maakt gebruik van de host interface van niet-ouder host."
 
 #: api/classes/CItemGeneral.php:270
 msgid "Item uses incorrect interface type."
@@ -7309,43 +7309,43 @@ msgstr ""
 
 #: api/classes/CItemGeneral.php:321
 msgid "Item will not be refreshed. Please enter a correct update interval."
-msgstr ""
+msgstr "Item zal niet worden vernieuwd. Vul alstublieft een werkend update-interval in."
 
 #: api/classes/CItemGeneral.php:434
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
-msgstr ""
+msgstr "Item met de key \"%1$s\" bestaat reeds op \"%2$s\" als een ontdekking regel."
 
 #: api/classes/CItemGeneral.php:440
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
-msgstr ""
+msgstr "Item met de key \"%1$s\" bestaat reeds op \"%2$s\" als een item gemaakt van prototype item."
 
 #: api/classes/CItemGeneral.php:437
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
-msgstr ""
+msgstr "Item met de sleutel \"%1$s\" bestaat reeds op \"%2$s\" als een item prototype."
 
 #: api/classes/CItemGeneral.php:431
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
-msgstr ""
+msgstr "Item met de sleutel \"%1$s\" bestaat reeds op \"%2$s\" als een item."
 
 #: api/classes/CItemGeneral.php:443
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
-msgstr ""
+msgstr "Item met de sleutel \"%1$s\" bestaat reeds op \"%2$s\" als een onbekende item element."
 
 #: api/classes/CItemGeneral.php:794
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "Item met de sleutel \"%1$s\" bestaat reeds op \"%2$s\"."
 
 #: api/classes/managers/CHttpTestManager.php:695
 #: api/classes/managers/CHttpTestManager.php:826
 #, c-format
 msgid "Item with key \"%1$s\" already exists."
-msgstr ""
+msgstr "Item met de sleutel \"%1$s\" bestaat reeds."
 
 #: hosts.php:795 hosts.php:886 include/html.inc.php:425
 #: include/html.inc.php:429 include/items.inc.php:800
@@ -7374,7 +7374,7 @@ msgstr "Items geactiveerd"
 
 #: items.php:717
 msgid "Items copied"
-msgstr ""
+msgstr "Items gekopieerd"
 
 #: disc_prototypes.php:336 items.php:770
 msgid "Items deleted"
@@ -7427,21 +7427,21 @@ msgstr ""
 #: include/media.inc.php:27
 #: include/views/administration.mediatypes.edit.php:44
 msgid "Jabber"
-msgstr ""
+msgstr "Jabber"
 
 #: include/views/administration.mediatypes.edit.php:81
 #: include/views/administration.mediatypes.list.php:65
 msgid "Jabber identifier"
-msgstr ""
+msgstr "Jabber id"
 
 #: include/func.inc.php:226
 msgid "Jan"
-msgstr ""
+msgstr "Jan"
 
 #: include/forms.inc.php:1667 include/func.inc.php:112
 #: include/func.inc.php:243 jsLoader.php:118
 msgid "January"
-msgstr ""
+msgstr "Januari"
 
 #: include/locales.inc.php:65
 msgid "Japanese (ja_JP)"
@@ -7449,26 +7449,26 @@ msgstr "Japanese (ja_JP)"
 
 #: include/func.inc.php:232
 msgid "Jul"
-msgstr ""
+msgstr "Jul"
 
 #: include/forms.inc.php:1669 include/func.inc.php:118
 #: include/func.inc.php:249 jsLoader.php:124
 msgid "July"
-msgstr ""
+msgstr "Juli"
 
 #: include/func.inc.php:231
 msgid "Jun"
-msgstr ""
+msgstr "Jun"
 
 #: include/forms.inc.php:1692 include/func.inc.php:117
 #: include/func.inc.php:248 jsLoader.php:123
 msgid "June"
-msgstr ""
+msgstr "Juni"
 
 #: include/func.inc.php:417 include/func.inc.php:653
 msgctxt "Kilo short"
 msgid "K"
-msgstr ""
+msgstr "K"
 
 #: adm.housekeeper.php:43
 msgid "Keep IT service data for (in days)"
@@ -7521,42 +7521,42 @@ msgstr "Bewaar geschiedenis (in dagen)"
 
 #: adm.housekeeper.php:53
 msgid "Keep history data for (in days)"
-msgstr ""
+msgstr "Houd historische gegevens bij (in dagen)"
 
 #: adm.housekeeper.php:106
 #, c-format
 msgid "Keep history data for (in days) \"%1$s\"."
-msgstr ""
+msgstr "Houd historische gegevens bij (in dagen) \"%1$s\"."
 
 #: include/views/administration.general.housekeeper.edit.php:47
 msgid "Keep internal data for (in days)"
-msgstr ""
+msgstr "Houd interne data bij (in dagen)"
 
 #: adm.housekeeper.php:36
 msgid "Keep internal event and alert data for (in days)"
-msgstr ""
+msgstr "Houd interne gebeurtenis en alert gegevens bij (in dagen)"
 
 #: adm.housekeeper.php:100
 #, c-format
 msgid "Keep internal event and alert data for (in days) \"%1$s\"."
-msgstr ""
+msgstr "Houd interne gebeurtenis en alert gegevens bij (in dagen) \"%1$s\"."
 
 #: include/views/configuration.item.edit.php:326
 msgid "Keep lost resources period (in days)"
-msgstr ""
+msgstr "Houd verloren middelen periode bij (in dagen)"
 
 #: include/views/administration.general.housekeeper.edit.php:49
 msgid "Keep network discovery data for (in days)"
-msgstr ""
+msgstr "Netwerk discovery gegevens bewaren (in dagen)"
 
 #: adm.housekeeper.php:38
 msgid "Keep network discovery event and alert data for (in days)"
-msgstr ""
+msgstr "Houd netwerk discovery gebeurtenis en alert gegevens bij (in dagen)"
 
 #: adm.housekeeper.php:101
 #, c-format
 msgid "Keep network discovery event and alert data for (in days) \"%1$s\"."
-msgstr ""
+msgstr "Houd netwerk discovery gebeurtenis en alert gegevens bij (in dagen) \"%1$s\"."
 
 #: adm.housekeeper.php:57
 msgid "Keep trend data for (in days)"
@@ -7621,12 +7621,11 @@ msgstr "Key mag niet leeg zijn."
 #: include/views/configuration.action.edit.php:754
 #: include/views/js/configuration.item.edit.js.php:135
 msgid "Key passphrase"
-msgstr ""
+msgstr "Key wachtzin"
 
 #: tr_logform.php:296
-#, fuzzy
 msgid "Keyword"
-msgstr "Keyword"
+msgstr "sleutelwoord"
 
 #: include/func.inc.php:653
 msgid "Kilo"
@@ -7648,20 +7647,20 @@ msgstr "LDAP"
 
 #: authentication.php:187
 msgid "LDAP authentication"
-msgstr ""
+msgstr "LDAP verificatie"
 
 #: authentication.php:35
 #: include/views/administration.authentication.edit.php:57
 msgid "LDAP host"
-msgstr ""
+msgstr "LDAP host"
 
 #: authentication.php:140
 msgid "LDAP login successful"
-msgstr ""
+msgstr "LDAP login succesvol"
 
 #: authentication.php:140
 msgid "LDAP login was not successful"
-msgstr ""
+msgstr "LDAP login was niet succesvol"
 
 #: include/classes/screens/CScreenClock.php:70
 msgid "LOCAL"
@@ -7670,7 +7669,7 @@ msgstr "LOCAL"
 #: include/triggers.inc.php:186
 #, fuzzy
 msgid "LOST"
-msgstr "LOST"
+msgstr "VERLOREN"
 
 #: include/maps.inc.php:45 include/views/configuration.action.edit.php:70
 #: include/views/configuration.action.edit.php:889
@@ -7696,14 +7695,14 @@ msgstr "Laatst"
 #: include/func.inc.php:1854
 msgctxt "page navigation"
 msgid "Last"
-msgstr ""
+msgstr "Laatste"
 
 #: dashboard.php:397
 #, c-format
 msgid "Last %1$d issue"
 msgid_plural "Last %1$d issues"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Laatste %1$d probleem"
+msgstr[1] "Laatste %1$d problemen"
 
 #: popup_trexpr.php:239
 msgid "Last (most recent) T value is < N"
