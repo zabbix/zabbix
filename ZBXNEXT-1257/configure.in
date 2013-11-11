@@ -1233,36 +1233,16 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	PROXY_LDFLAGS="$PROXY_LDFLAGS $UNIXODBC_LDFLAGS"
 	PROXY_LIBS="$PROXY_LIBS $UNIXODBC_LIBS"
 
-	dnl Check for NET-SNMP [by default - skip]
+	dnl Check for Net-SNMP [by default - skip]
 	LIBNETSNMP_CHECK_CONFIG([no])
 	if test "x$want_netsnmp" = "xyes"; then
 		if test "x$found_netsnmp" != "xyes"; then
-			AC_MSG_ERROR([Invalid NET-SNMP directory - unable to find net-snmp-config])
+			AC_MSG_ERROR([Invalid Net-SNMP directory - unable to find net-snmp-config])
 		else
-			have_snmp="net-snmp"
+			have_snmp="yes"
 		fi
 	fi
 	CFLAGS="$CFLAGS $SNMP_CFLAGS"
-	SERVER_LDFLAGS="$SERVER_LDFLAGS $SNMP_LDFLAGS"
-	SERVER_LIBS="$SERVER_LIBS $SNMP_LIBS"
-
-	PROXY_LDFLAGS="$PROXY_LDFLAGS $SNMP_LDFLAGS"
-	PROXY_LIBS="$PROXY_LIBS $SNMP_LIBS"
-
-	dnl Check for UCD-SNMP [by default - skip]
-	LIBSNMP_CHECK_CONFIG([no])
-	if test "x$want_snmp" = "xyes"; then
-		if test "x$found_snmp" != "xyes"; then
-			AC_MSG_ERROR([Invalid UCD-SNMP directory - unable to find ucd-snmp-config.h])
-		else
-			have_snmp="ucd-snmp"
-		fi
-
-		if test  "x$found_netsnmp" = "xyes"; then
-			AC_MSG_ERROR([You can configure for only one SNMP library.])
-		fi
-	fi
-	CFLAGS="$CFLAGS $SNMP_CPPFLAGS"
 	SERVER_LDFLAGS="$SERVER_LDFLAGS $SNMP_LDFLAGS"
 	SERVER_LIBS="$SERVER_LIBS $SNMP_LIBS"
 
@@ -1294,7 +1274,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 		if test "x$found_openipmi" != "xyes"; then
 			AC_MSG_ERROR([Invalid OPENIPMI directory - unable to find ipmiif.h])
 		else
-			have_ipmi="openipmi"
+			have_ipmi="yes"
 		fi
 	fi
 	CFLAGS="$CFLAGS $OPENIPMI_CFLAGS"
