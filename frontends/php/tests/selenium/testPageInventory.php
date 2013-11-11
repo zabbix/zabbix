@@ -21,7 +21,7 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageInventory extends CWebTest {
-	// Returns all host inventories
+	// Returns all host inventory
 	public static function allInventory() {
 		return DBdata("select * from host_inventory order by hostid");
 	}
@@ -39,7 +39,7 @@ class testPageInventory extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
 		$this->zbxTestCheckTitle('Host inventory');
-		$this->zbxTestTextPresent('HOST INVENTORIES');
+		$this->zbxTestTextPresent('HOST INVENTORY');
 		$this->zbxTestTextPresent('Displaying');
 		$this->zbxTestTextNotPresent('Displaying 0');
 // Header
@@ -72,7 +72,7 @@ class testPageInventory extends CWebTest {
 		$this->zbxTestClickWait('cancel');
 
 		$this->zbxTestCheckTitle('Host inventory');
-		$this->zbxTestTextPresent('HOST INVENTORIES');
+		$this->zbxTestTextPresent('HOST INVENTORY');
 	}
 
 }
