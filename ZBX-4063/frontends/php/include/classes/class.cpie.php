@@ -159,7 +159,7 @@ class CPie extends CGraphDraw {
 		}
 
 		for ($i = 0; $i < $this->num; $i++) {
-			$real_item = get_item_by_itemid($this->items[$i]['itemid']);
+			$item = get_item_by_itemid($this->items[$i]['itemid']);
 			$type = $this->items[$i]['calc_type'];
 			$from_time = $this->from_time;
 			$to_time = $this->to_time;
@@ -167,10 +167,11 @@ class CPie extends CGraphDraw {
 			$sql_arr = array();
 
 			if (ZBX_HISTORY_DATA_UPKEEP > -1) {
-				$real_item['history'] = ZBX_HISTORY_DATA_UPKEEP;
+				$item['history'] = ZBX_HISTORY_DATA_UPKEEP;
 			}
 
-			if (($real_item['history'] * SEC_PER_DAY) > (time() - ($from_time + $this->period / 2))) { // should pick data from history or trends
+			if ((($item['history'] * SEC_PER_DAY) > (time() - ($from_time + $this->period / 2))) // should pick data from history or trends
+					|| $item['trends'] == 0) { // take data from history if trends is switched off
 				$this->dataFrom = 'history';
 				array_push($sql_arr,
 					'SELECT h.itemid,'.
@@ -215,8 +216,8 @@ class CPie extends CGraphDraw {
 				);
 			}
 
-			$this->data[$this->items[$i]['itemid']][$type]['last'] = isset($history[$real_item['itemid']])
-				? $history[$real_item['itemid']][0]['value'] : null;
+			$this->data[$this->items[$i]['itemid']][$type]['last'] = isset($history[$item['itemid']])
+				? $history[$item['itemid']][0]['value'] : null;
 			$this->data[$this->items[$i]['itemid']][$type]['shift_min'] = 0;
 			$this->data[$this->items[$i]['itemid']][$type]['shift_max'] = 0;
 			$this->data[$this->items[$i]['itemid']][$type]['shift_avg'] = 0;
