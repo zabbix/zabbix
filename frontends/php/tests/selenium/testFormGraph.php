@@ -796,8 +796,8 @@ class testFormGraph extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.',
-						'Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.',
+						'Incorrect value "0" for "Width (min:20, max:65535)" field: must be between 20 and 65535.',
+						'Incorrect value "0" for "Height (min:20, max:65535)" field: must be between 20 and 65535.',
 						'Field "yaxismin" is not decimal number.',
 						'Field "yaxismin" is not decimal number.'
 					)
@@ -817,8 +817,8 @@ class testFormGraph extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.',
-						'Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.'
+						'Incorrect value "65536" for "Width (min:20, max:65535)" field: must be between 20 and 65535.',
+						'Incorrect value "-22" for "Height (min:20, max:65535)" field: must be between 20 and 65535.'
 					)
 				)
 			),
