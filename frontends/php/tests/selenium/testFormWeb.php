@@ -914,7 +914,7 @@ class testFormWeb extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value "-1" for field "Update interval (in sec)": must be between 1 and 86400.'
+						'Incorrect value "-1" for "Update interval (in sec)" field: must be between 1 and 86400.'
 					)
 				)
 			),
@@ -929,7 +929,7 @@ class testFormWeb extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value "0" for field "Update interval (in sec)": must be between 1 and 86400.'
+						'Incorrect value "0" for "Update interval (in sec)" field: must be between 1 and 86400.'
 					)
 				)
 			),
@@ -966,7 +966,7 @@ class testFormWeb extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value "86401" for field "Update interval (in sec)": must be between 1 and 86400.'
+						'Incorrect value "86401" for "Update interval (in sec)" field: must be between 1 and 86400.'
 					)
 				)
 			),

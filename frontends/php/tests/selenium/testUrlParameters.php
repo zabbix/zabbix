@@ -996,20 +996,20 @@ class testUrlParameters extends CWebTest {
 					)
 				)
 			),
-			// Host inventories
+			// Host inventory
 			array(
 				array(
 					'expected' => LINK_GOOD,
 					'url' => 'hostinventories.php?&form_refresh=1&groupid=50003',
-					'title' => 'Host inventories',
-					'text' => 'HOST INVENTORIES'
+					'title' => 'Host inventory',
+					'text' => 'HOST INVENTORY'
 				)
 			),
 			array(
 				array(
 					'expected' => LINK_BAD,
 					'url' => 'hostinventories.php?&form_refresh=1&groupid=1111',
-					'title' => 'Host inventories',
+					'title' => 'Host inventory',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
 					)
@@ -1019,7 +1019,7 @@ class testUrlParameters extends CWebTest {
 				array(
 					'expected' => LINK_BAD,
 					'url' => 'hostinventories.php?&form_refresh=1&groupid=abc',
-					'title' => 'Host inventories',
+					'title' => 'Host inventory',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Field "groupid" is not integer.'
@@ -1030,7 +1030,7 @@ class testUrlParameters extends CWebTest {
 				array(
 					'expected' => LINK_BAD,
 					'url' => 'hostinventories.php?&form_refresh=1&groupid=',
-					'title' => 'Host inventories',
+					'title' => 'Host inventory',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Field "groupid" is not integer.'
