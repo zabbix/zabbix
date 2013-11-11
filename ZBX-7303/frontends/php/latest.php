@@ -409,11 +409,11 @@ foreach ($items as $key => $item){
 		$change = UNKNOWN_VALUE;
 	}
 
-	if(($item['value_type']==ITEM_VALUE_TYPE_FLOAT) || ($item['value_type']==ITEM_VALUE_TYPE_UINT64)){
-		$actions = new CLink(_('Graph'),'history.php?action=showgraph&itemid='.$item['itemid']);
+	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
+		$actions = new CLink(_('Graph'), 'history.php?action=showgraph&itemid='.$item['itemid']);
 	}
-	else{
-		$actions = new CLink(_('History'),'history.php?action=showvalues&itemid='.$item['itemid']);
+	else {
+		$actions = new CLink(_('History'), 'history.php?action=showvalues&itemid='.$item['itemid']);
 	}
 
 	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown txt' : 'txt';

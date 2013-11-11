@@ -95,7 +95,7 @@
 .latest-mon .tableinfo.latest-details td.latest-lastcheck { width: 9%; }
 .latest-mon .tableinfo.latest-details td.latest-error { width: 4%; }
 .latest-mon .tableinfo.latest-details td.latest-error div { float: left; }
-.latest-mon .tableinfo div.item { padding-left: 5px; }
+.latest-mon .tableinfo div.item { padding-left: 8px; }
 
 /* regexp test result table, based on .tableinfo */
 #testResultTable tr td:first-child { width: auto; }
