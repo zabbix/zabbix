@@ -64,7 +64,7 @@ div #div_node_tree { background-color:#1D4161; }
 
 .normal		{ background-color: #AADDDD; }
 
-a, a:link, a:visited { color: #99C7E4; }
+a { color: #99C7E4; }
 a:hover, a:active { color: #B0D5EC; }
 
 a.highlight { font-size: 10px; font-weight: bold; }
