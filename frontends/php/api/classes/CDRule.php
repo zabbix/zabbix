@@ -563,23 +563,7 @@ class CDRule extends CZBXAPI {
 	 * @return boolean
 	 */
 	public function delete(array $druleIds) {
-		if (empty($druleIds)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
-		}
-
-		$drules = $this->get(array(
-			'druleids' => $druleIds,
-			'editable' => true,
-			'output' => array('druleid'),
-			'preservekeys' => true
-		));
-		foreach ($druleIds as $druleId) {
-			if (!isset($drules[$druleId])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-		}
+		$this->validateDelete($druleIds);
 
 		$actionIds = array();
 
@@ -613,7 +597,7 @@ class CDRule extends CZBXAPI {
 			}
 		}
 
-		return array('drules' => $druleIds);
+		return array('druleids' => $druleIds);
 	}
 
 	/**
@@ -769,5 +753,37 @@ class CDRule extends CZBXAPI {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Validates the input parameters for the delete() method.
+	 *
+	 * @throws APIException if the input is invalid
+	 *
+	 * @param array $druleIds
+	 *
+	 * @return void
+	 */
+	protected function validateDelete(array $druleIds) {
+		if (!$druleIds) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
+		$this->checkDrulePermissions($druleIds);
+	}
+
+	/**
+	 * Checks if the current user has access to given discovery rules.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for discovery rules.
+	 *
+	 * @param array $druleIds
+	 *
+	 * @return void
+	 */
+	protected function checkDrulePermissions(array $druleIds) {
+		if (!$this->isWritable($druleIds)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
 	}
 }

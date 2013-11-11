@@ -73,20 +73,7 @@ if (isset($_REQUEST['druleid'])) {
 		access_deny();
 	}
 }
-if (isset($_REQUEST['go'])) {
-	if (!isset($_REQUEST['g_druleid']) || !is_array($_REQUEST['g_druleid'])) {
-		access_deny();
-	}
-	else {
-		$dbDRules = API::DRule()->get(array(
-			'druleids' => $_REQUEST['g_druleid'],
-			'countOutput' => true
-		));
-		if ($dbDRules != count($_REQUEST['g_druleid'])) {
-			access_deny();
-		}
-	}
-}
+
 $_REQUEST['go'] = get_request('go', 'none');
 
 // ajax
@@ -169,11 +156,11 @@ if (isset($_REQUEST['save'])) {
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['druleid'])) {
 	$result = API::DRule()->delete(array($_REQUEST['druleid']));
 
-	show_messages($result['drules'], _('Discovery rule deleted'), _('Cannot delete discovery rule'));
+	show_messages($result, _('Discovery rule deleted'), _('Cannot delete discovery rule'));
 
-	if ($result['drules']) {
+	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['druleid']);
-		clearCookies($result['drules']);
+		clearCookies($result);
 	}
 }
 elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['g_druleid'])) {
@@ -194,8 +181,8 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_druleid'])) {
 	$result = API::DRule()->delete($_REQUEST['g_druleid']);
 
-	show_messages($result['drules'], _('Discovery rules deleted'));
-	clearCookies($result['drules']);
+	show_messages($result, _('Discovery rules deleted'), _('Cannot delete discovery rules'));
+	clearCookies($result);
 }
 
 /*
