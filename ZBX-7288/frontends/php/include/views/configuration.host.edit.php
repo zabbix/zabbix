@@ -87,7 +87,9 @@ else {
 	$original_templates = array();
 }
 
-if ($_REQUEST['hostid'] > 0 && (!isset($_REQUEST['form_refresh']) || in_array(get_request('form'), array('clone', 'full_clone')))) {
+// load data from the DB when opening the full clone form for the first time
+$cloneFormOpened = (in_array(getRequest('form'), array('clone', 'full_clone')) && getRequest('form_refresh') == 1);
+if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloneFormOpened)) {
 	$proxy_hostid = $dbHost['proxy_hostid'];
 	$host = $dbHost['host'];
 	$visiblename = $dbHost['name'];
@@ -821,7 +823,8 @@ $frmHost->addItem($divTabs);
  * footer
  */
 $others = array();
-if ($_REQUEST['hostid'] > 0 && $_REQUEST['form'] != 'full_clone') {
+// do not display the clone and delete buttons for clone forms and new host forms
+if (getRequest('hostid') && !in_array(getRequest('form'), array('clone', 'full_clone'))) {
 	$others[] = new CSubmit('clone', _('Clone'));
 	$others[] = new CSubmit('full_clone', _('Full clone'));
 	$others[] = new CButtonDelete(_('Delete selected host?'), url_param('form').url_param('hostid').url_param('groupid'));

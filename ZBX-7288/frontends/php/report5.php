@@ -131,7 +131,7 @@ foreach ($triggers as $triggerId => $trigger) {
 
 	foreach ($trigger['items'] as $item) {
 		$triggerItems[] = array(
-			'name' => htmlspecialchars(itemName($item)),
+			'name' => itemName($item),
 			'params' => array(
 				'itemid' => $item['itemid'],
 				'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))

@@ -1,12 +1,34 @@
+Changes for 2.2.0rc2
+
+Bug fixes:
+..F....... [ZBXNEXT-1371] fixed links in global search results to LLD discovery for non-admin users to say "Discovery" instead of "Discoveries" (Richlv)
+........S. [ZBX-7304] fixed wrong SQL statement in processing of escalations (asaveljevs)
+
+--------------------------------------------------------------------------------
 Changes for 2.2.0rc1
 
 New features:
+..F....... [ZBXNEXT-1513] set autofocus for the event acknowledgement text field (Pavels)
+........S. [ZBXNEXT-1998] added vmware.fullname[], vmware.version[] key support (wiper)
 ..F.I...S. [ZBXNEXT-1975] increased the size of alerts table message field to 64KB also on Oracle database (Pavels, wiper)
 ..F....... [ZBXNEXT-1371] added links to graphs, web monitoring and LLD rules in the search results; thanks to Volker Fröhlich and Marc for patches (Pavels)
 .........T [ZBX-6832] improved default templates (e.g., split "Template App Agentless" into 12 templates for each service) (asaveljevs, neogan, Sasha)
 ..F....... [ZBXNEXT-1851] hid American English, Greek and Polish translations from the frontend (Richlv)
 
 Bug fixes:
+........S. [ZBX-7186] fixed recovery-awaiting escalations staying in the database forever if their action, trigger or item is deleted (asaveljevs)
+..F....... [ZBX-7280] fixed map background in IE10 (Eduard)
+..F....... [ZBX-7276] fixed count of displaying hosts in proxy list (Eduard)
+..F....PS. [ZBX-7299] fixed dashboard widget drag'n'drop not working on PHP setups without JSON (Pavels)
+.......PS. [ZBX-7292] fixed resolving of macros in host interfaces (Sasha)
+...G....S. [ZBX-7061] fixed warnings produced by clang static analyzer (e.g., Linux agent crash for item system.swap.in[sda3]) (wiper)
+..F....... [ZBX-7161] fixed full clone form not saving data after an unsuccessful submit (Pavels)
+..F....... [ZBX-7161] fixed the clone button in the host configuration form (Pavels)
+..F....... [ZBX-6528] fixed highlighting unmonitored hosts in Host inventory page (Ivo)
+A.F....... [ZBX-7259] fixed "Show lines" field in Configuration > Screen > cell element to be a value between 1 and 100 (Ivo)
+..F....... [ZBX-7286] fixed displaying double quotes as HTML entities in trigger menu pop-ups (Ivo)
+..F....... [ZBX-7284] fixed incorrect permissions when selecting a screen element from pop-up in screens and slideshow pages (Ivo)
+.......PS. [ZBX-7282] fixed server or proxy crash while terminating database upgrade by TERM signal (Sasha)
 ...G...... [ZBX-7275] fixed eventlog sometimes returning garbage value (wiper)
 .........T [ZBX-7269] fixed units and value type for vmware.vm.vfs.fs.size[{$URL},{HOST.HOST},{#FSNAME},pfree] item in "Template Virt VMware Guest" template (Sasha)
 ........S. [ZBX-7258] fixed vCenter VMs unique identifier for host names (Sasha)
@@ -597,6 +619,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Dutch, German, Hungarian, Japanese, Italian, Romanian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-7292] fixed resolving of macros in host interfaces (Sasha)
 ....I..... [ZBX-7273] fixed newlines in default data strings for Oracle (Sasha)
 .......PS. [ZBX-6835] fixed bug when agent/proxy connection error could have resulted in a wrong warning about message size (wiper)
 A.F....... [ZBX-6760] improved performance of getting global scripts (Sasha)

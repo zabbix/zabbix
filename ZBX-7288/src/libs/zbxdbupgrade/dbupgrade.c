@@ -2391,6 +2391,11 @@ static int	DBpatch_2010199(void)
 #endif
 }
 
+static int	DBpatch_2020000(void)
+{
+	return SUCCEED;
+}
+
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 #define DBPATCH_END()					{NULL}};
@@ -2637,6 +2642,7 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010197, 0, 1)
 	DBPATCH_ADD(2010198, 0, 1)
 	DBPATCH_ADD(2010199, 0, 1)
+	DBPATCH_ADD(2020000, 0, 1)
 
 	DBPATCH_END()
 
