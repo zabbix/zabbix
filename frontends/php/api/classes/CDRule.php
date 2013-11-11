@@ -563,10 +563,22 @@ class CDRule extends CZBXAPI {
 	 * @return boolean
 	 */
 	public function delete(array $druleIds) {
-		$druleIds = zbx_toArray($druleIds);
+		if (empty($druleIds)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
 
-		if (CWebUser::getType() < USER_TYPE_ZABBIX_ADMIN) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+		$drules = $this->get(array(
+			'druleids' => $druleIds,
+			'editable' => true,
+			'output' => array('druleid'),
+			'preservekeys' => true
+		));
+		foreach ($druleIds as $druleId) {
+			if (!isset($drules[$druleId])) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 
 		$actionIds = array();
@@ -601,7 +613,7 @@ class CDRule extends CZBXAPI {
 			}
 		}
 
-		return array('druleids' => $druleIds);
+		return array('drules' => $druleIds);
 	}
 
 	/**
