@@ -84,10 +84,6 @@ switch ($srctbl) {
 		$page['title'] = _('Screens');
 		$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 		break;
-	case 'overview':
-		$page['title'] = _('Overview');
-		$min_user_type = USER_TYPE_ZABBIX_ADMIN;
-		break;
 	case 'nodes':
 		$page['title'] = _('Nodes');
 		$min_user_type = USER_TYPE_ZABBIX_USER;
@@ -135,7 +131,6 @@ $allowedSrcFields = array(
 	'sysmaps'				=> '"sysmapid", "name"',
 	'slides'				=> '"slideshowid"',
 	'help_items'			=> '"key"',
-	'overview'				=> '"groupid", "name"',
 	'screens'				=> '"screenid"',
 	'screens2'				=> '"screenid", "name"',
 	'nodes'					=> '"nodeid", "name"',
