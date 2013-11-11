@@ -726,21 +726,21 @@ abstract class CGraphGeneral extends CZBXAPI {
 			));
 
 			if ($dbGraphs) {
-				$isDuplicateGraphsFound = false;
+				$duplicateGraphsFound = false;
 
 				if (isset($graph['graphid'])) {
 					foreach ($dbGraphs as $dbGraph) {
 						if (bccomp($dbGraph['graphid'], $graph['graphid']) != 0) {
-							$isDuplicateGraphsFound = true;
+							$duplicateGraphsFound = true;
 							break;
 						}
 					}
 				}
 				else {
-					$isDuplicateGraphsFound = true;
+					$duplicateGraphsFound = true;
 				}
 
-				if ($isDuplicateGraphsFound) {
+				if ($duplicateGraphsFound) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Graph with name "%1$s" already exists in graphs or graph prototypes.', $graph['name'])
 					);
