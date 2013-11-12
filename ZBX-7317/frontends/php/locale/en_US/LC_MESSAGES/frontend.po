@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-11-06 18:44+0200\n"
-"PO-Revision-Date: 2013-11-05 23:52+0300\n"
-"Last-Translator: Jonathan <linuxgurugamer@gmail.com>\n"
+"PO-Revision-Date: 2013-11-08 14:14+0300\n"
+"Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: \n"
 "Language: en_US\n"
 "MIME-Version: 1.0\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
-"X-POOTLE-MTIME: 1383688340.0\n"
+"X-POOTLE-MTIME: 1383912848.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -13042,14 +13042,12 @@ msgid "Triggers"
 msgstr "Triggers"
 
 #: include/classes/class.cserverinfo.php:64
-#, fuzzy
 msgid "Triggers (e/d)[p/o]"
 msgstr "Triggers (e/d)[p/o]"
 
 #: trigger_prototypes.php:246 triggers.php:309
-#, fuzzy
 msgid "Triggers deleted"
-msgstr "Triggers (e/d)[p/o]"
+msgstr "Triggers deleted"
 
 #: include/classes/class.ctriggersinfo.php:110 include/screens.inc.php:42
 msgid "Triggers info"
