@@ -306,7 +306,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 			foreach ($db_triggers as $triggerid => $trigger) {
 				$host = reset($trigger['hosts']);
 				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, $triggerid,
-					$host['host'].':'.$trigger['description'], 'triggers', $statusOld, $statusNew);
+					$host['host'].': '.$trigger['description'], 'triggers', $statusOld, $statusNew);
 			}
 		}
 
