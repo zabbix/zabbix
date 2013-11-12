@@ -58,7 +58,7 @@ class CScreenGraph extends CScreenBase {
 			// if items from one host we change them, or set calculated if not exist on that host
 			if (count($graph['hosts']) == 1) {
 				if ($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $graph['ymax_itemid']) {
-					$newDinamic = get_same_graphitems_for_host(
+					$newDinamic = getSameGraphItemsForHost(
 						array(array('itemid' => $graph['ymax_itemid'])),
 						$this->hostid,
 						false
@@ -74,7 +74,7 @@ class CScreenGraph extends CScreenBase {
 				}
 
 				if ($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $graph['ymin_itemid']) {
-					$newDinamic = get_same_graphitems_for_host(
+					$newDinamic = getSameGraphItemsForHost(
 						array(array('itemid' => $graph['ymin_itemid'])),
 						$this->hostid,
 						false
@@ -103,7 +103,7 @@ class CScreenGraph extends CScreenBase {
 				$this->screenitem['url']->setArgument($name, $value);
 			}
 
-			$newGraphItems = get_same_graphitems_for_host($graph['gitems'], $this->hostid, false);
+			$newGraphItems = getSameGraphItemsForHost($graph['gitems'], $this->hostid, false);
 			foreach ($newGraphItems as $newGraphItem) {
 				unset($newGraphItem['gitemid'], $newGraphItem['graphid']);
 
