@@ -3,6 +3,7 @@ Changes for 2.2.1rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-7289] added server address and port number to "no active checks on server" message (igors)
 ..F....... [ZBX-6920] fixed displaying of soft linked IT services (Eduard)
 ..F....... [ZBX-7037] added agent.hostname to the list of supported items (Pavels)
 ..F....... [ZBX-7317] removed unused code in popup.php (Ivo)
