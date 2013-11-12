@@ -11,6 +11,9 @@ Changes for 2.2.1rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-2008] added support of Audit Success/Failure severity for Security log (igors)
+...G...... [ZBX-2008] implemented automatic loading of wevtapi.dll file and its functions (igors)
+...G...... [ZBX-2008] improved performance of eventlog monitoring (igors)
 ..F....... [ZBX-7263] fixed validation of filter parameters in tr_status.php (Eduard)
 ..F....... [ZBX-7303] removed link to item configuration for discovered items in latest data screen (Eduard)
 ...G...... [ZBX-7289] added server address and port number to "no active checks on server" message (igors)
