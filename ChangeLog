@@ -11,6 +11,7 @@ Changes for 2.2.1rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-7311] fixed dragging of host interfaces (Ivo)
 ..F....... [ZBX-7272] fixed graph's grid with fixed Y axis MIN/MAX values (Eduard)
 ...G...... [ZBX-2008] added support of Audit Success/Failure severity for Security log (igors)
 ...G...... [ZBX-2008] implemented automatic loading of wevtapi.dll file and its functions (igors)
