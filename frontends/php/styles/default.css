@@ -248,6 +248,7 @@ ul.messages li.error { color: #D40000; list-style: url("../images/general/error3
 
 /* drag & drop */
 .draggable { cursor: move; }
+.ui-draggable-dragging { opacity: 0.6; -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=60)"; }
 .dragHelpText { display: none; }
 
 /* subfilter buttons */
