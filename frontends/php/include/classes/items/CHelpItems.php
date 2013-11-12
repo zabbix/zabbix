@@ -36,6 +36,10 @@ class CHelpItems {
 	protected $items = array(
 		ITEM_TYPE_ZABBIX => array(
 			array(
+				'key' => 'agent.hostname',
+				'description' => 'Agent host name defined in the configuration file. String value.'
+			),
+			array(
 				'key' => 'agent.ping',
 				'description' => 'Check the agent usability. Always return 1. Can be used as a TCP ping.'
 			),
@@ -273,6 +277,10 @@ class CHelpItems {
 			)
 		),
 		ITEM_TYPE_ZABBIX_ACTIVE => array(
+			array(
+				'key' => 'agent.hostname',
+				'description' => 'Agent host name defined in the configuration file. String value.'
+			),
 			array(
 				'key' => 'agent.ping',
 				'description' => 'Check the agent usability. Always return 1. Can be used as a TCP ping.'
