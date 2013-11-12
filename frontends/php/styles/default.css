@@ -134,6 +134,8 @@ a.weight_normal { font-weight: normal; }
 .underline:visited { text-decoration: underline; }
 .underline:hover { text-decoration: underline; }
 
+.parent-discovery, a.parent-discovery, a.parent-discovery:hover	{ color: #999900; }
+
 /* form */
 fieldset { margin: 0 0 2px 0; padding: 2px; border: 1px solid gray; }
 fieldset legend { margin: 0.2em 0.5em; }
