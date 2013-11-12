@@ -1,6 +1,7 @@
 Changes for 2.2.1rc1
 
 New features:
+....I..PS. [ZBXNEXT-1257] dropped support for UCD-SNMP (asaveljevs)
 
 Bug fixes:
 ..F....... [ZBX-7311] fixed dragging of host interfaces (Ivo)
