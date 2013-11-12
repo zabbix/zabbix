@@ -233,7 +233,7 @@ int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, AGENT_RESULT
 			struct tm	*ptm;
 			time_t		now;
 
-			now = time();
+			now = time(NULL);
 			ptm = localtime(&now);
 			tz_offset = ptm->tm_gmtoff;
 #else
