@@ -546,7 +546,7 @@ elseif (isset($_REQUEST['save'])) {
 					continue;
 				}
 
-				if (!copy_graph_to_host($graph['graphid'], $hostId)) {
+				if (!copyGraphToHost($graph['graphid'], $hostId)) {
 					throw new Exception();
 				}
 			}

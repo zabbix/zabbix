@@ -12,6 +12,7 @@ New features:
 ....I..PS. [ZBXNEXT-1257] dropped support for UCD-SNMP (asaveljevs)
 
 Bug fixes:
+..F....... [ZBX-7307] improved validation for copying graph (Eduard)
 ..F....... [ZBX-7325] fixed parent LLD rule link color in the darkblue and darkorange themes (Pavels)
 ..F....... [ZBX-7311] fixed dragging of host interfaces (Ivo)
 ..F....... [ZBX-7272] fixed graph's grid with fixed Y axis MIN/MAX values (Eduard)

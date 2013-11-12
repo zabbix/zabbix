@@ -717,20 +717,30 @@ abstract class CGraphGeneral extends CZBXAPI {
 			));
 
 			$hostAndTemplateIds = array_keys($hostsAndTemplates);
-			$graphsExists = API::Graph()->get(array(
+
+			$dbGraphs = API::Graph()->get(array(
 				'hostids' => $hostAndTemplateIds,
 				'output' => array('graphid'),
 				'filter' => array('name' => $graph['name'], 'flags' => null), // 'flags' => null overrides default behaviour
-				'nopermissions' => true,
-				'preservekeys' => true, // faster
-				'limit' => 1 // one match enough for check
+				'nopermissions' => true
 			));
 
-			// if graph exists with given name and it is create action (if graphid does not exist)
-			// or update action with ids not matching, rise exception
-			foreach ($graphsExists as $graphExists) {
-				if ((isset($graph['graphid']) && bccomp($graphExists['graphid'], $graph['graphid']) != 0)
-						|| !isset($graph['graphid'])) {
+			if ($dbGraphs) {
+				$duplicateGraphsFound = false;
+
+				if (isset($graph['graphid'])) {
+					foreach ($dbGraphs as $dbGraph) {
+						if (bccomp($dbGraph['graphid'], $graph['graphid']) != 0) {
+							$duplicateGraphsFound = true;
+							break;
+						}
+					}
+				}
+				else {
+					$duplicateGraphsFound = true;
+				}
+
+				if ($duplicateGraphsFound) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Graph with name "%1$s" already exists in graphs or graph prototypes.', $graph['name'])
 					);

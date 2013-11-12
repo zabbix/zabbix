@@ -1274,15 +1274,15 @@
 		return $data;
 	}
 
-	function getCopyElementsFormData($elements_field, $title = null) {
+	function getCopyElementsFormData($elementsField, $title = null) {
 		$data = array(
 			'title' => $title,
-			'elements_field' => $elements_field,
-			'elements' => get_request($elements_field, array()),
-			'copy_type' => get_request('copy_type', 0),
-			'filter_groupid' => get_request('filter_groupid', 0),
-			'copy_targetid' => get_request('copy_targetid', array()),
-			'hostid' => get_request('hostid', 0),
+			'elements_field' => $elementsField,
+			'elements' => getRequest($elementsField, array()),
+			'copy_type' => getRequest('copy_type', 0),
+			'filter_groupid' => getRequest('filter_groupid', 0),
+			'copy_targetid' => getRequest('copy_targetid', array()),
+			'hostid' => getRequest('hostid', 0),
 			'groups' => array(),
 			'hosts' => array()
 		);
@@ -1290,11 +1290,14 @@
 		// validate elements
 		if (empty($data['elements']) || !is_array($data['elements'])) {
 			error(_('Incorrect list of items.'));
+
 			return null;
 		}
 
 		// get groups
-		$data['groups'] = API::HostGroup()->get(array('output' => API_OUTPUT_EXTEND));
+		$data['groups'] = API::HostGroup()->get(array(
+			'output' => array('groupid', 'name')
+		));
 		order_result($data['groups'], 'name');
 
 		// get hosts
@@ -1304,13 +1307,15 @@
 					$data['filter_groupid'] = $group['groupid'];
 				}
 			}
+
 			$data['hosts'] = API::Host()->get(array(
-				'output' => API_OUTPUT_EXTEND,
+				'output' => array('groupid', 'name'),
 				'groupids' => $data['filter_groupid'],
 				'templated_hosts' => true
 			));
 			order_result($data['hosts'], 'name');
 		}
+
 		return $data;
 	}
 
