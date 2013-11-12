@@ -48,7 +48,7 @@ $fields = array(
 	'show_severity' =>		array(T_ZBX_INT, O_OPT, P_SYS,	null,		null),
 	'show_details' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'show_maintenance' =>	array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'status_change_days' =>	array(T_ZBX_INT, O_OPT, null,	null,		null),
+	'status_change_days' =>	array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, DAY_IN_YEAR * 2), null),
 	'status_change' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'txt_select' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// ajax
@@ -185,10 +185,20 @@ else {
 
 // status change days
 if (isset($_REQUEST['status_change_days'])) {
+	$maxDays = DAY_IN_YEAR * 2;
+
+	if ($_REQUEST['status_change_days'] > $maxDays) {
+		$_REQUEST['status_change_days'] = $maxDays;
+	}
+
 	CProfile::update('web.tr_status.filter.status_change_days', $_REQUEST['status_change_days'], PROFILE_TYPE_INT);
 }
 else {
-	$_REQUEST['status_change_days'] = CProfile::get('web.tr_status.filter.status_change_days', 14);
+	$_REQUEST['status_change_days'] = CProfile::get('web.tr_status.filter.status_change_days');
+
+	if (!$_REQUEST['status_change_days']) {
+		$_REQUEST['status_change_days'] = 14;
+	}
 }
 
 // ack status
@@ -299,7 +309,7 @@ $severityComboBox->addItems(array(
 ));
 $filterForm->addRow(_('Minimum trigger severity'), $severityComboBox);
 
-$statusChangeDays = new CNumericBox('status_change_days', $_REQUEST['status_change_days'], 4, false, false, false);
+$statusChangeDays = new CNumericBox('status_change_days', $_REQUEST['status_change_days'], 3, false, false, false);
 if (!$_REQUEST['status_change']) {
 	$statusChangeDays->setAttribute('disabled', 'disabled');
 }
