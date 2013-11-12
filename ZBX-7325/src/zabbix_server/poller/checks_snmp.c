@@ -290,7 +290,7 @@ static struct snmp_session	*snmp_open_session(DC_ITEM *item, char *err)
 	zbx_snprintf(addr, sizeof(addr), "%s:%d", item->interface.addr, (int)item->interface.port);
 #endif	/* HAVE_IPV6 */
 	session.peername = addr;
-	session.remote_port = item->interface.port;	/* remote_port is no longer used in latest versions of NET-SNMP */
+	session.remote_port = item->interface.port;	/* remote_port is no longer used in latest versions of Net-SNMP */
 
 	if (session.version == SNMP_VERSION_1 || session.version == SNMP_VERSION_2c)
 	{

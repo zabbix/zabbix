@@ -188,7 +188,7 @@ if ($hosts) {
 	$items = API::Item()->get(array(
 		'hostids' => array_keys($hosts),
 		'output' => array('itemid', 'name', 'type', 'value_type', 'units', 'hostid', 'state', 'valuemapid', 'status',
-			'error', 'trends', 'history', 'delay', 'key_'),
+			'error', 'trends', 'history', 'delay', 'key_', 'flags'),
 		'selectApplications' => array('applicationid'),
 		'selectItemDiscovery' => array('ts_delete'),
 		'webitems' => true,
@@ -409,21 +409,20 @@ foreach ($items as $key => $item){
 		$change = UNKNOWN_VALUE;
 	}
 
-	if(($item['value_type']==ITEM_VALUE_TYPE_FLOAT) || ($item['value_type']==ITEM_VALUE_TYPE_UINT64)){
-		$actions = new CLink(_('Graph'),'history.php?action=showgraph&itemid='.$item['itemid']);
+	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
+		$actions = new CLink(_('Graph'), 'history.php?action=showgraph&itemid='.$item['itemid']);
 	}
-	else{
-		$actions = new CLink(_('History'),'history.php?action=showvalues&itemid='.$item['itemid']);
+	else {
+		$actions = new CLink(_('History'), 'history.php?action=showvalues&itemid='.$item['itemid']);
 	}
 
 	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown txt' : 'txt';
-	$itemName = array(SPACE, SPACE, $item['resolvedName']);
+	$itemName = $item['resolvedName'];
 
 	if ($filterShowDetails) {
-		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST)
+		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST || $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
 			? new CSpan(resolveItemKeyMacros($item), 'enabled')
 			: new CLink(resolveItemKeyMacros($item), 'items.php?form=update&itemid='.$item['itemid'], 'enabled');
-		$itemName = array_merge($itemName, array(BR(), SPACE, SPACE, $itemKey));
 
 		$statusIcons = array();
 		if ($item['status'] == ITEM_STATUS_ACTIVE) {
@@ -448,7 +447,7 @@ foreach ($items as $key => $item){
 			SPACE,
 			is_show_all_nodes() ? SPACE : null,
 			($_REQUEST['hostid'] > 0) ? null : SPACE,
-			new CCol(new CDiv($itemName, $stateCss)),
+			new CCol(new CDiv(array($itemName, BR(), $itemKey), $stateCss.' item')),
 			new CCol(new CDiv(
 				($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER)
 					? UNKNOWN_VALUE
@@ -470,7 +469,7 @@ foreach ($items as $key => $item){
 			SPACE,
 			is_show_all_nodes() ? SPACE : null,
 			($_REQUEST['hostid'] > 0) ? null : SPACE,
-			new CCol(new CDiv($itemName, $stateCss)),
+			new CCol(new CDiv($itemName, $stateCss.' item')),
 			new CCol(new CDiv($lastClock, $stateCss)),
 			new CCol(new CDiv($lastValue, $stateCss)),
 			new CCol(new CDiv($change, $stateCss)),
@@ -592,13 +591,12 @@ foreach ($items as $item) {
 
 	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown txt' : 'txt';
 
-	$itemName = array(SPACE, SPACE, $item['resolvedName']);
+	$itemName = $item['resolvedName'];
 
 	if ($filterShowDetails) {
-		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST)
+		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST || $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
 			? new CSpan(resolveItemKeyMacros($item), 'enabled')
 			: new CLink(resolveItemKeyMacros($item), 'items.php?form=update&itemid='.$item['itemid'], 'enabled');
-		$itemName = array_merge($itemName, array(BR(), SPACE, SPACE, $itemKey));
 
 		$statusIcons = array();
 		if ($item['status'] == ITEM_STATUS_ACTIVE) {
@@ -623,7 +621,7 @@ foreach ($items as $item) {
 			SPACE,
 			is_show_all_nodes() ? ($host['item_cnt'] ? SPACE : get_node_name_by_elid($item['itemid'])) : null,
 			$_REQUEST['hostid'] ? null : SPACE,
-			new CCol(new CDiv($itemName, $stateCss)),
+			new CCol(new CDiv(array($itemName, BR(), $itemKey), $stateCss.' item')),
 			new CCol(new CDiv(
 				($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER)
 					? UNKNOWN_VALUE
@@ -645,7 +643,7 @@ foreach ($items as $item) {
 			SPACE,
 			is_show_all_nodes() ? ($host['item_cnt'] ? SPACE : get_node_name_by_elid($item['itemid'])) : null,
 			$_REQUEST['hostid'] ? null : SPACE,
-			new CCol(new CDiv($itemName, $stateCss)),
+			new CCol(new CDiv($itemName, $stateCss.' item')),
 			new CCol(new CDiv($lastClock, $stateCss)),
 			new CCol(new CDiv($lastValue, $stateCss)),
 			new CCol(new CDiv($change, $stateCss)),
