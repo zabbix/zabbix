@@ -89,16 +89,13 @@
 .latest-mon .tableinfo td,
 .latest-mon .tableinfo div.txt,
 .latest-mon .tableinfo td span,
-.latest-mon .tableinfo td.latest-actions a {
-	overflow: hidden; text-overflow: ellipsis;
-}
+.latest-mon .tableinfo td.latest-actions a { overflow: hidden; text-overflow: ellipsis; }
 .latest-mon .tableinfo td span,
-.latest-mon .tableinfo td.latest-actions a {
-	float: left; max-width: 100%;
-}
+.latest-mon .tableinfo td.latest-actions a { float: left; max-width: 100%; }
 .latest-mon .tableinfo.latest-details td.latest-lastcheck { width: 9%; }
 .latest-mon .tableinfo.latest-details td.latest-error { width: 4%; }
 .latest-mon .tableinfo.latest-details td.latest-error div { float: left; }
+.latest-mon .tableinfo div.item { padding-left: 8px; }
 
 /* regexp test result table, based on .tableinfo */
 #testResultTable tr td:first-child { width: auto; }
