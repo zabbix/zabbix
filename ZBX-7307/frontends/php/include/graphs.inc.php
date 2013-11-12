@@ -306,7 +306,7 @@ function get_graph_by_graphid($graphid) {
  *
  * @return array|bool
  */
-function get_same_graphitems_for_host($gitems, $destinationHostId, $error = true, $flags = null) {
+function getSameGraphItemsForHost($gitems, $destinationHostId, $error = true, array $flags = array()) {
 	$result = array();
 
 	$flagsSql = $flags ? ' AND '.dbConditionInt('dest.flags', $flags) : '';
@@ -367,7 +367,7 @@ function copyGraphToHost($graphId, $hostId) {
 		return false;
 	}
 
-	$graph['gitems'] = get_same_graphitems_for_host(
+	$graph['gitems'] = getSameGraphItemsForHost(
 		$graph['gitems'],
 		$hostId,
 		true,
