@@ -279,12 +279,8 @@ class CZabbixServer {
 						$dErrorMsg = _s("Connection to Zabbix server \"%s\" timed out. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Firewall is blocking TCP connection.\n", $this->host);
 						break;
 
-					case 'php_network_getaddresses: getaddrinfo failed: Name or service not known':
-						$dErrorMsg = _s("Connection to Zabbix server \"%s\" failed. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Incorrect DNS server configuration.\n", $this->host);
-						break;
-
 					default:
-						$dErrorMsg = '';
+						$dErrorMsg = _s("Connection to Zabbix server \"%s\" failed. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Incorrect DNS server configuration.\n", $this->host);
 				}
 
 				$this->error = $dErrorMsg.$errorMsg;
@@ -305,9 +301,7 @@ class CZabbixServer {
 	 */
 	protected function validateResponse(array $response) {
 		return (isset($response['response'])
-			&& ($response['response'] == self::RESPONSE_SUCCESS && isset($response['data'])
-				|| $response['response'] == self::RESPONSE_FAILED && isset($response['info']))
-		);
+					&& ($response['response'] == self::RESPONSE_SUCCESS && isset($response['data'])
+						|| $response['response'] == self::RESPONSE_FAILED && isset($response['info'])));
 	}
-
 }
