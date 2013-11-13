@@ -56,7 +56,7 @@ else {
 
 // create widget header
 if (!empty($this->data['parent_discoveryid'])) {
-	$triggersWidget->addHeader(array(_('Trigger prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'gold')));
+	$triggersWidget->addHeader(array(_('Trigger prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'parent-discovery')));
 	$triggersWidget->addHeaderRowNumber(array(
 		'[ ',
 		new CLink(
@@ -155,7 +155,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 				CHtml::encode($trigger['discoveryRule']['name']),
 				'trigger_prototypes.php?'.
 					'hostid='.$this->data['hostid'].'&parent_discoveryid='.$trigger['discoveryRule']['itemid'],
-				'gold'
+				'parent-discovery'
 			);
 			$description[] = NAME_DELIMITER.$trigger['description'];
 		}
