@@ -1,5 +1,5 @@
 <?php
-$d='/var/www/zabbix-prod/llnw/';
+$d='/var/www/zabbix/llnw/';
 include($d.'config.php');
 
 // THIS PAGE IS LIVE!!!
