@@ -9,6 +9,7 @@ Bug fixes:
 Changes for 2.2.1rc1
 
 New features:
+A.F....... [ZBX-1357] updated Brazilian Portuguese, French, Italian, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
 ....I..PS. [ZBXNEXT-1257] dropped support for UCD-SNMP (asaveljevs)
 
 Bug fixes:
@@ -650,7 +651,7 @@ Changes for 2.0.10rc1
 
 New features:
 ..F....... [ZBX-7103] improved loading speed of tr_events.php page (Sasha)
-A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Dutch, German, Hungarian, Japanese, Italian, Romanian and Slovak translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Czech, Dutch, French, German, Greek, Hungarian, Japanese, Italian, Romanian, Russian, Slovak, Spanish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 ..F....... [ZBX-6129] fixed trying to change the status of a deleted trigger or trigger ptototype changes the status of all trigger and prototypes (Pavels)
