@@ -14,6 +14,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, French, Italian, Russian and
 ....I..PS. [ZBXNEXT-1257] dropped support for UCD-SNMP (asaveljevs)
 
 Bug fixes:
+A.F....... [ZBX-7316] fixed drule.delete method (Ivo)
 A.F....... [ZBX-7293] fixed typo in the plural form of a translatable string (Richlv)
 ..F....... [ZBX-7307] improved validation for copying graph (Eduard)
 ..F....... [ZBX-7325] fixed parent LLD rule link color in the darkblue and darkorange themes (Pavels)
