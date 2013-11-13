@@ -40,7 +40,8 @@ class FrontendSetup {
 	 * Function for getting class object, implements Singleton.
 	 *
 	 * @static
-	 * @return object
+	 *
+	 * @return FrontendSetup
 	 */
 	public static function i() {
 		if (null === self::$_instance) {
@@ -83,7 +84,6 @@ class FrontendSetup {
 		$result[] = $this->checkPhpCtype();
 		$result[] = $this->checkPhpSession();
 		$result[] = $this->checkPhpSessionAutoStart();
-		$result[] = $this->checkPhpGettext();
 
 		return $result;
 	}
@@ -589,25 +589,6 @@ class FrontendSetup {
 			'required' => _('off'),
 			'result' => $current,
 			'error' => _('PHP session auto start must be disabled (PHP directive "session.auto_start")')
-		);
-
-		return $result;
-	}
-
-	/**
-	 * Checks for PHP gettext extension.
-	 *
-	 * @return array
-	 */
-	public function checkPhpGettext() {
-		$current = function_exists('bindtextdomain');
-
-		$result = array(
-			'name' => _('PHP gettext'),
-			'current' => $current ? _('on') : _('off'),
-			'required' => null,
-			'result' => $current,
-			'error' => _('PHP gettext extension missing (PHP configuration parameter --with-gettext)')
 		);
 
 		return $result;
