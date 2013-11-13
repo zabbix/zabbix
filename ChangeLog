@@ -4,6 +4,7 @@ New features:
 ....I..PS. [ZBXNEXT-1257] dropped support for UCD-SNMP (asaveljevs)
 
 Bug fixes:
+A.F....... [ZBX-7293] fixed typo in the plural form of a translatable string (Richlv)
 ..F....... [ZBX-7307] improved validation for copying graph (Eduard)
 ..F....... [ZBX-7325] fixed parent LLD rule link color in the darkblue and darkorange themes (Pavels)
 ..F....... [ZBX-7311] fixed dragging of host interfaces (Ivo)
