@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1383669069.0\n"
+"X-POOTLE-MTIME: 1384234602.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -42,9 +42,9 @@ msgstr[2] "%1$d днів"
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "відображено %1$d з %2$d проблеми"
+msgstr[1] "відображено %1$d з %2$d проблем"
+msgstr[2] "відображено %1$d з %2$d проблем"
 
 #: chart4.php:89 chart5.php:83
 #, c-format
@@ -1210,17 +1210,17 @@ msgstr "Не вдалося активувати веб сценарій"
 #: api/classes/CGraph.php:721
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
-msgstr ""
+msgstr "Не вдалося додати не числовий елемент даних \"%1$s\" на графік \"%2$s\"."
 
 #: api/classes/CGraphPrototype.php:721 api/classes/CGraphPrototype.php:783
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
-msgstr ""
+msgstr "Не вдалося додати не числовий елемент даних \"%1$s\" до прототипу графіка \"%2$s\"."
 
 #: include/reports.inc.php:504
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\"."
-msgstr ""
+msgstr "Не вдалося додати не числовий елемент даних \"%1$s\"."
 
 #: actionconf.php:150
 msgid "Cannot add action"
@@ -1228,7 +1228,7 @@ msgstr "Не вдалося додати дію"
 
 #: actionconf.php:225
 msgid "Cannot add action condition"
-msgstr ""
+msgstr "Не вдалося додати умову дії."
 
 #: applications.php:108
 msgid "Cannot add application"
@@ -1261,7 +1261,7 @@ msgstr "Не вдалося додати вузел мережі"
 
 #: host_prototypes.php:202
 msgid "Cannot add host prototype"
-msgstr ""
+msgstr "Не вдалося додати прототип вузла мережі"
 
 #: adm.images.php:62
 msgid "Cannot add image"
@@ -1278,11 +1278,11 @@ msgstr "Не вдалося додати елемент даних"
 #: api/classes/CApplication.php:547
 #, c-format
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
-msgstr ""
+msgstr "Не вдалося додати елемент даних \"%1$s\" з \"%2$s\" в групу елементів даних \"%3$s\" з \"%4$s\"."
 
 #: api/classes/CApplication.php:600
 msgid "Cannot add items."
-msgstr ""
+msgstr "Не вдалося додати елементи даних."
 
 #: adm.macros.php:120
 msgid "Cannot add macro."
@@ -1304,7 +1304,7 @@ msgstr "Не вдалося додати більше одного елемен�
 #: api/classes/CGraphPrototype.php:43
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
-msgstr ""
+msgstr "Неможливо додати більше одного елемента даних з типом 'Сумарний графік' до прототипу графіка \"%1$s\"."
 
 #: sysmaps.php:171
 msgid "Cannot add network map"
@@ -1313,7 +1313,7 @@ msgstr "Не вдалося додати карту мережі"
 #: httpconf.php:193
 #, c-format
 msgid "Cannot add new application \"%1$s\"."
-msgstr ""
+msgstr "Не вдалося додати нову групу елементів даних \"%1$s\"."
 
 #: nodes.php:84
 msgid "Cannot add node"
@@ -1370,7 +1370,7 @@ msgstr "Не вдалося додати перетворення значенн
 
 #: httpconf.php:146
 msgid "Cannot add web scenario"
-msgstr ""
+msgstr "Не вдалося додати веб-сценарій"
 
 #: authentication.php:165
 msgid "Cannot change authentication method to HTTP"
@@ -1394,7 +1394,7 @@ msgstr "Не вдалося клонувати прототипи графікі
 
 #: api/classes/CDiscoveryRule.php:1000
 msgid "Cannot clone host prototypes."
-msgstr ""
+msgstr "Не вдалося клонувати прототипи вузлів мережі."
 
 #: api/classes/CDiscoveryRule.php:836
 msgid "Cannot clone item prototypes."
@@ -1424,7 +1424,7 @@ msgstr "Не вдалося скопіювати тригер \"%1$s:%2$s\", т�
 #: api/classes/CHostPrototype.php:151
 #, c-format
 msgid "Cannot create a host prototype on a discovered host \"%1$s\"."
-msgstr ""
+msgstr "Не вдалося створити прототип вузла мережі у виявленого вузла мережі \"%1$s\"."
 
 #: include/db.inc.php:34
 msgid "Cannot create another database connection."
@@ -1462,7 +1462,7 @@ msgstr "Не вдалося створити карту мережі \"%s\"."
 
 #: httpconf.php:150
 msgid "Cannot create new application, web scenario is already assigned to application."
-msgstr ""
+msgstr "Не вдалося створити нову групу елементів даних, веб-сценарій вже приєднано до групи елементів даних."
 
 #: include/js.inc.php:265
 msgid "Cannot create new element"
@@ -1532,11 +1532,11 @@ msgstr "Не вдалося видалити групу вузлів мереж�
 
 #: api/classes/CDiscoveryRule.php:412
 msgid "Cannot delete host prototype."
-msgstr ""
+msgstr "Не вдалося видалити прототип вузла мережі. "
 
 #: host_prototypes.php:119 host_prototypes.php:232
 msgid "Cannot delete host prototypes"
-msgstr ""
+msgstr "Не вдалося видалити прототипи вузлів мережі"
 
 #: adm.iconmapping.php:97
 msgid "Cannot delete icon map"
@@ -1609,7 +1609,7 @@ msgstr "Не вдалося видалити скрипт. Скрипт \"%1$s\"
 #: api/classes/CScript.php:525
 #, c-format
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
-msgstr ""
+msgstr "Не вдалося видалити скрипти. Скрипт з scriptid \"%1$s\" не існує."
 
 #: actionconf.php:331
 msgid "Cannot delete selected actions"
@@ -1629,7 +1629,7 @@ msgstr "Не вдалося видалити шаблон"
 
 #: api/classes/CApplication.php:444
 msgid "Cannot delete templated application."
-msgstr ""
+msgstr "Не вдалося видалити шаблонну групу елементів даних."
 
 #: api/classes/CGraph.php:560 api/classes/CGraphPrototype.php:577
 msgid "Cannot delete templated graphs."
@@ -1637,7 +1637,7 @@ msgstr "Не вдалося видалити шаблонний графік."
 
 #: api/classes/CHostPrototype.php:1076
 msgid "Cannot delete templated host prototype."
-msgstr ""
+msgstr "Не вдалося видалити шаблонний прототип вузла мережі."
 
 #: api/classes/CItem.php:692
 msgid "Cannot delete templated item."
@@ -1659,7 +1659,7 @@ msgstr "Не вдалося видалити шаблонний тригер \"%
 #: api/classes/CHttpTest.php:390
 #, c-format
 msgid "Cannot delete templated web scenario \"%1$s\"."
-msgstr ""
+msgstr "Не вдалося видалити шаблонний веб-сценарій \"%1$s\"."
 
 #: trigger_prototypes.php:181 triggers.php:197
 msgid "Cannot delete trigger"
@@ -1695,7 +1695,7 @@ msgstr "Не вдалося видалити перетворення значе
 
 #: httpconf.php:122 httpconf.php:313
 msgid "Cannot delete web scenario"
-msgstr ""
+msgstr "Не вдалося видалити веб-сценарій"
 
 #: media_types.php:177
 msgid "Cannot disable media type"
@@ -1703,15 +1703,15 @@ msgstr "Не вдалося дезактивувати метод повідом
 
 #: httpconf.php:268
 msgid "Cannot disable web scenario"
-msgstr ""
+msgstr "Не вдалося відключити веб-сценарій"
 
 #: queue.php:61
 msgid "Cannot display item queue."
-msgstr ""
+msgstr "Не вдалося відобразити чергу елементів даних."
 
 #: chart7.php:74
 msgid "Cannot display more than one item with type \"Graph sum\"."
-msgstr ""
+msgstr "Не удалось відобразити більше одного елемента даних з типом \"Сума графіку\". "
 
 #: media_types.php:160
 msgid "Cannot enable media type"
@@ -2022,22 +2022,22 @@ msgstr ""
 #: api/classes/CItemGeneral.php:176
 #, c-format
 msgid "Cannot update \"%1$s\" for a discovered item."
-msgstr ""
+msgstr "Не вдалося оновити \"%1$s\" для виявленого елемента даних."
 
 #: api/classes/CTrigger.php:635
 #, c-format
 msgid "Cannot update \"%1$s\" for a discovered trigger."
-msgstr ""
+msgstr "Не вдалося оновити \"%1$s\" для виявленого тригера."
 
 #: api/classes/CItemGeneral.php:207
 #, c-format
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
-msgstr ""
+msgstr "Не вдалося оновити \"%1$s\" для елемента даних \"%2$s\"."
 
 #: api/classes/CTrigger.php:663
 #, c-format
 msgid "Cannot update \"%1$s\" for trigger \"%2$s\"."
-msgstr ""
+msgstr "Не вдалося оновити \"%1$s\" для тригера \"%2$s\"."
 
 #: api/classes/CApplication.php:342
 #, c-format
@@ -2052,7 +2052,7 @@ msgstr "Не вдалося оновити \"templateid\" для графіка 
 #: api/classes/CGraphPrototype.php:42
 #, c-format
 msgid "Cannot update \"templateid\" for graph prototype \"%1$s\"."
-msgstr ""
+msgstr "Не вдалося оновити \"templateid\" у прототипа графіка \"%1$s\"."
 
 #: api/classes/CScreen.php:447 api/classes/CTemplateScreen.php:668
 #, c-format
@@ -2066,11 +2066,11 @@ msgstr "Не вдалося оновити \"templateid\" для прототи�
 
 #: api/classes/CGraphGeneral.php:60
 msgid "Cannot update a discovered graph."
-msgstr ""
+msgstr "Не вдалося оновити виявлений графік."
 
 #: api/classes/CHostGroup.php:537
 msgid "Cannot update a discovered host group."
-msgstr ""
+msgstr "Не вдалося оновити виявлену групу вузлів мережі."
 
 #: actionconf.php:146
 msgid "Cannot update action"
@@ -2118,7 +2118,7 @@ msgstr "Не вдалося оновити групу."
 #: api/classes/CHostGroup.php:909
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
-msgstr ""
+msgstr "Не вдалося оновити групи для виявленого вузла мережі \"%1$s\"."
 
 #: hostgroups.php:222 hosts.php:363
 msgid "Cannot update host"
@@ -2126,7 +2126,7 @@ msgstr "Не вдалося оновити вузел мережі"
 
 #: host_prototypes.php:188
 msgid "Cannot update host prototype"
-msgstr ""
+msgstr "Не вдалося оновити прототип вузла мережі"
 
 #: hosts.php:612
 msgid "Cannot update host status"
@@ -2151,7 +2151,7 @@ msgstr "Не вдалось оновити фонове зображення."
 #: api/classes/CHostInterface.php:395
 #, c-format
 msgid "Cannot update interface for discovered host \"%1$s\"."
-msgstr ""
+msgstr "Не вдалося оновити інтерфейс для виявленого вузла мережі \"%1$s\"."
 
 #: disc_prototypes.php:304 items.php:476 screenedit.php:176
 msgid "Cannot update item"
@@ -2197,7 +2197,7 @@ msgstr "Не вдалося оновити проксі"
 #: api/classes/CProxy.php:299
 #, c-format
 msgid "Cannot update proxy for discovered host \"%1$s\"."
-msgstr ""
+msgstr "Не вдалося оновити проксі для виявленого вузла мережі \"%1$s\"."
 
 #: adm.regexps.php:127
 msgid "Cannot update regular expression"
@@ -2233,7 +2233,7 @@ msgstr "Не вдалося оновити шаблон"
 
 #: api/classes/CApplication.php:353
 msgid "Cannot update templated applications."
-msgstr ""
+msgstr "Не вдалося оновити шаблоні групи елементів даних."
 
 #: api/classes/CTemplate.php:790 api/classes/CTemplate.php:1061
 #, c-format
@@ -2878,7 +2878,7 @@ msgstr "Створити елемент даних"
 
 #: include/views/configuration.item.list.php:31
 msgid "Create item (select host first)"
-msgstr ""
+msgstr "Створити елемент даних (оберіть спочатку вузел мережі)"
 
 #: include/views/configuration.item.prototype.list.php:28
 msgid "Create item prototype"
@@ -2934,7 +2934,7 @@ msgstr "Створити тригер"
 
 #: include/views/configuration.triggers.list.php:46
 msgid "Create trigger (select host first)"
-msgstr ""
+msgstr "Створити тригер (оберіть спочатку вузел мережі)"
 
 #: include/views/configuration.triggers.list.php:40
 msgid "Create trigger prototype"
@@ -2965,7 +2965,7 @@ msgstr "Створено: Правило виявлення\"%1$s\" у \"%2$s\".
 #: api/classes/CHostPrototype.php:364
 #, c-format
 msgid "Created: Host prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Створено: Прототип вузла мережі \"%1$s\" у \"%2$s\"."
 
 #: api/classes/CItem.php:591
 #, c-format
@@ -2990,11 +2990,11 @@ msgstr "Створено: Прототип тригера \"%1$s\" у \"%2$s\"."
 #: api/classes/managers/CHttpTestManager.php:124
 #, c-format
 msgid "Created: Web scenario \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "СтворитиВеб-сценарій \"%1$s\" у \"%2$s\"."
 
 #: include/items.inc.php:41
 msgid "Critical"
-msgstr ""
+msgstr "Критична"
 
 #: popup_trexpr.php:365
 msgid "Current date is < N"
@@ -3103,7 +3103,7 @@ msgstr "ПАРАМЕТРИ ПАНЕЛІ"
 #: include/views/configuration.item.massupdate.php:170
 #: include/views/js/configuration.discovery.edit.js.php:95
 msgid "DES"
-msgstr ""
+msgstr "DES"
 
 #: httpdetails.php:120
 msgid "DETAILS OF SCENARIO"

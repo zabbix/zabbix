@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1383570426.0\n"
+"X-POOTLE-MTIME: 1384256046.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -12258,7 +12258,7 @@ msgstr "Pilha"
 
 #: popup.php:64
 msgid "Standard items"
-msgstr "Itens padões"
+msgstr "Itens padrões"
 
 #: include/views/configuration.action.edit.php:335
 msgid "Start in"
