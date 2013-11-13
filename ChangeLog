@@ -1,6 +1,7 @@
 Changes for 2.2.1rc1
 
 New features:
+..F....... [ZBX-7250] made gettext an optional feature for the frontend (Pavels)
 A.F....... [ZBX-1357] updated Brazilian Portuguese, French, Italian, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
 ....I..PS. [ZBXNEXT-1257] dropped support for UCD-SNMP (asaveljevs)
 
