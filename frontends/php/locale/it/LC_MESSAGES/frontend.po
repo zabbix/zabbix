@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-13 04:42+0200\n"
-"PO-Revision-Date: 2013-10-11 08:21+0300\n"
+"POT-Creation-Date: 2013-11-13 04:44+0200\n"
+"PO-Revision-Date: 2013-11-12 16:41+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: it\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1381472492.0\n"
+"X-POOTLE-MTIME: 1384267313.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -41,8 +41,8 @@ msgstr[1] "%1$d giorni"
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d di %2$d problemi visualizzati"
+msgstr[1] "%1$d di %2$d problemi visualizzati"
 
 #: chart4.php:89 chart5.php:83
 #, c-format
@@ -70,8 +70,8 @@ msgstr[1] "%1$s giorni"
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%4$s tentativo di accesso fallito registrato. Ultimo tentativo fallito da %1$s il %2$s alle %3$s."
+msgstr[1] "%4$s tentativi di accesso falliti registrati. Ultimo tentativo fallito da %1$s il %2$s alle %3$s."
 
 #: include/views/monitoring.discovery.php:131
 #, c-format
@@ -716,15 +716,15 @@ msgstr "Alle %1$s:%2$s il giorno %3$s di ogni %4$s"
 #, c-format
 msgid "At %1$s:%2$s on every %3$s of every week"
 msgid_plural "At %1$s:%2$s on every %3$s of every %4$s weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Alle %1$s:%2$s ogni %3$s di tutte le settimane"
+msgstr[1] "Alle %1$s:%2$s di ogni %3$s di tutte %4$s le settimane"
 
 #: include/maintenances.inc.php:63
 #, c-format
 msgid "At %1$s:%2$s on every day"
 msgid_plural "At %1$s:%2$s on every %3$s days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Alle %1$s:%2$s di tutti i giorni"
+msgstr[1] "Alle %1$s:%2$s di tutti %3$s i giorni"
 
 #: include/forms.inc.php:1768
 msgid "At (hour:minute)"
@@ -1114,12 +1114,12 @@ msgstr "CONFIGURAZIONE TRIGGER"
 #: include/views/administration.usergroups.edit.php:23
 #: include/views/administration.usergroups.list.php:31
 msgid "CONFIGURATION OF USER GROUPS"
-msgstr ""
+msgstr "CONFIGURAZIONE GRUPPI UTENTE"
 
 #: include/views/administration.users.edit.php:30
 #: include/views/administration.users.list.php:31
 msgid "CONFIGURATION OF USERS"
-msgstr ""
+msgstr "CONFIGURAZIONE UTENTI"
 
 #: adm.valuemapping.php:147
 msgid "CONFIGURATION OF VALUE MAPPING"
@@ -1270,7 +1270,7 @@ msgstr "Impossibile aggiungere l'item"
 #: api/classes/CApplication.php:547
 #, c-format
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
-msgstr ""
+msgstr "Non posso aggiungere l'item \"%1$s\" da \"%2$s\" all'applicazione \"%3$s\" da \"%4$s\"."
 
 #: api/classes/CApplication.php:600
 msgid "Cannot add items."
@@ -1598,9 +1598,9 @@ msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s
 msgstr "Impossibile rimuovere gli script. Lo script \"%1$s\" e' utilizzato nell'operazione \"%2$s\" dell'azione."
 
 #: api/classes/CScript.php:525
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
-msgstr "Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste.Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste.Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste.Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste.Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste.Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste.Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste."
+msgstr "Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste."
 
 #: actionconf.php:331
 msgid "Cannot delete selected actions"
@@ -1756,7 +1756,7 @@ msgstr "Impossibile trovare interfaccia host su \"%1$s\" per la chiave item \"%2
 #: include/classes/import/CConfigurationImport.php:934
 #, c-format
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
-msgstr ""
+msgstr "Non è possibile trovare host o template \"%1$s\" utilizzati nel grafico \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:768
 #: include/classes/import/importers/CMapImporter.php:247
@@ -1832,15 +1832,15 @@ msgstr "Impossibile implodere espressione \"%s\"."
 #, c-format
 msgid "Cannot import screen \"%1$s\": subscreen \"%2$s\" does not exist."
 msgid_plural "Cannot import screen \"%1$s\": subscreens \"%2$s\" do not exist."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Non è possibile importare la schermata \"%1$s\": sottoschermata \"%2$s\" inesistente."
+msgstr[1] "Non è possibile importare la schermata \"%1$s\": sottoschermate \"%2$s\" inesistenti."
 
 #: include/classes/import/importers/CTemplateImporter.php:114
-#, c-format
+#, fuzzy, c-format
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Non è possibile importare il template \"%1$s\", template collegato \"%2$s\" inesistente."
+msgstr[1] "Non è possibile importare il template \"%1$s\", template collegati \"%2$s\" inesistenti."
 
 #: include/classes/class.cview.php:113
 #, c-format
@@ -1897,7 +1897,7 @@ msgstr "Impossibile eseguire aggiornamento statement nella tabella \"%1$s\" senz
 
 #: api/classes/CApplication.php:536
 msgid "Cannot process applications from different hosts or templates."
-msgstr ""
+msgstr "Non è possibile processare applicazioni provenienti da host o template differenti."
 
 #: include/classes/server/CZabbixServer.php:222
 #, c-format
@@ -2612,7 +2612,7 @@ msgstr "Configurazione macro"
 
 #: maintenance.php:27
 msgid "Configuration of maintenance periods"
-msgstr ""
+msgstr "Configurazione periodi di manutenzione"
 
 #: media_types.php:26
 msgid "Configuration of media types"
@@ -4327,7 +4327,7 @@ msgstr "Parametro di input vuoto."
 
 #: api/classes/CApplication.php:496
 msgid "Empty input parameters."
-msgstr ""
+msgstr "Parametri in input assenti."
 
 #: api/classes/CDRule.php:244
 msgid "Empty input."
@@ -5289,7 +5289,7 @@ msgstr "Gruppo per host discoverati"
 #: adm.other.php:74
 #, c-format
 msgid "Group for discovered hosts \"%1$s\"."
-msgstr ""
+msgstr "Gruppo per host discoverati \"%1$s\"."
 
 #: include/views/administration.usergroups.edit.php:41
 #: include/views/configuration.hostgroups.edit.php:40
@@ -5356,7 +5356,7 @@ msgstr "STORICO DEGLI EVENTI"
 
 #: include/classes/screens/CScreenHostgroupTriggers.php:132
 msgid "HOST GROUP ISSUES"
-msgstr ""
+msgstr "PROBLEMI HOST GROUP "
 
 #: include/views/inventory.host.list.php:26
 #: include/views/inventory.host.view.php:24
@@ -5369,7 +5369,7 @@ msgstr "PANORAMICA INVENTARIO HOST"
 
 #: include/classes/screens/CScreenHostTriggers.php:131
 msgid "HOST ISSUES"
-msgstr ""
+msgstr "PROBLEMI HOST"
 
 #: include/discovery.inc.php:60
 #: include/views/administration.authentication.edit.php:39
@@ -5622,7 +5622,7 @@ msgstr "Elementi gruppo host"
 
 #: include/screens.inc.php:39
 msgid "Host group issues"
-msgstr ""
+msgstr "Problemi Host group"
 
 #: include/views/configuration.sysmap.edit.php:75
 msgid "Host group label type"
@@ -5661,7 +5661,7 @@ msgstr "Panoramica inventario host"
 
 #: include/screens.inc.php:40
 msgid "Host issues"
-msgstr ""
+msgstr "Problemi host"
 
 #: include/views/configuration.sysmap.edit.php:83
 msgid "Host label type"
@@ -8329,21 +8329,21 @@ msgstr "Massimizza"
 msgid "Maximum DNS name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum DNS name length is %1$d characters, \"%2$s\" is %3$d characters."
 msgstr[0] "La massima lunghezza del nome DNS è %2$d caratteri, \"%3$s\" è %1$d carattere."
-msgstr[1] "La massima lunghezza del nome DNS è %2$d caratteri, \"%3$s\" è %1$d caratteri.La massima lunghezza del nome DNS è %2$d caratteri, \"%3$s\" è %1$d caratteri.La massima lunghezza del nome DNS è %2$d caratteri, \"%3$s\" è %1$d caratteri."
+msgstr[1] "La massima lunghezza del nome DNS è %2$d caratteri, \"%3$s\" è %1$d caratteri."
 
 #: api/classes/CUser.php:315
 #, c-format
 msgid "Maximum alias length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum alias length is %1$d characters, \"%2$s\" is %3$d characters."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "La massima lunghezza alias è %1$d caratteri, \"%2$s\" è %3$d carattere."
+msgstr[1] "La massima lunghezza alias è %1$d caratteri, \"%2$s\" è %3$d caratteri."
 
 #: api/classes/CHost.php:733
 #, c-format
 msgid "Maximum host name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum host name length is %1$d characters, \"%2$s\" is %3$d characters."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "La massima lunghezza nome host è %1$d caratteri, \"%2$s\" è %3$d carattere."
+msgstr[1] "La massima lunghezza nome host è %1$d caratteri, \"%2$s\" è %3$d caratteri."
 
 #: include/views/configuration.item.edit.php:319
 #: include/views/configuration.item.massupdate.php:372
@@ -8377,8 +8377,8 @@ msgstr "Il valore massimo per il periodo T NON è N"
 #, c-format
 msgid "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d characters."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "La massima lunghezza nome host visibile è %1$d caratteri, \"%2$s\" è %3$d carattere."
+msgstr[1] "La massima lunghezza nome host visibile è %1$d caratteri, \"%2$s\" è %3$d caratteri."
 
 #: include/forms.inc.php:1692 include/func.inc.php:116
 #: include/func.inc.php:247 jsLoader.php:122
@@ -8932,29 +8932,29 @@ msgstr "Nessun campo \"ymin_type\" per il grafico \"%s\"."
 #: include/views/configuration.host.edit.php:368
 #: include/views/configuration.host.prototype.edit.php:143
 msgid "No IPMI interfaces found."
-msgstr ""
+msgstr "Nessuna interfaccia IPMI trovata."
 
 #: include/views/configuration.services.child.list.php:35
 msgid "No IT services found."
-msgstr ""
+msgstr "Nessun servizio IT trovato."
 
 #: include/views/configuration.host.edit.php:355
 #: include/views/configuration.host.prototype.edit.php:130
 msgid "No JMX interfaces found."
-msgstr ""
+msgstr "Nessuna interfaccia JMX trovata."
 
 #: api/classes/CItemGeneral.php:351
 msgid "No SNMP OID specified."
-msgstr ""
+msgstr "Nessun SNMP OID specificato."
 
 #: api/classes/CItemGeneral.php:357
 msgid "No SNMP community specified."
-msgstr ""
+msgstr "Nessun SNMP community specificato."
 
 #: include/views/configuration.host.edit.php:342
 #: include/views/configuration.host.prototype.edit.php:117
 msgid "No SNMP interfaces found."
-msgstr ""
+msgstr "Nessuna interfaccia SNMP trovata."
 
 #: api/classes/CScreenItem.php:472
 msgid "No URL provided for screen element."
@@ -8970,7 +8970,7 @@ msgstr "Nessuna risorsa accessibile"
 
 #: include/acknow.inc.php:48
 msgid "No acknowledges found."
-msgstr ""
+msgstr "Nessun acknowledge trovato."
 
 #: include/actions.inc.php:825 include/actions.inc.php:904
 #: include/actions.inc.php:961 include/classes/screens/CScreenActions.php:121
@@ -8981,7 +8981,7 @@ msgstr "Nessuna azione trovata."
 #: include/views/configuration.host.edit.php:328
 #: include/views/configuration.host.prototype.edit.php:103
 msgid "No agent interfaces found."
-msgstr ""
+msgstr "Nessuna interfaccia agent trovata."
 
 #: include/hosts.inc.php:588
 #, c-format
@@ -8991,12 +8991,12 @@ msgstr "Nessuna applicazione con ID \"%1$s\"."
 #: include/views/configuration.application.list.php:57
 #: include/views/configuration.httpconf.edit.php:69 popup.php:1012
 msgid "No applications found."
-msgstr ""
+msgstr "Nessuna applicazione trovata."
 
 #: include/views/administration.auditacts.list.php:67
 #: include/views/administration.auditlogs.list.php:83
 msgid "No audit entries found."
-msgstr ""
+msgstr "Nessuna audit entry trovata."
 
 #: api/classes/CAction.php:1339
 #, c-format
@@ -9056,7 +9056,7 @@ msgstr "Nessun dettaglio"
 
 #: include/views/monitoring.discovery.php:36
 msgid "No discovered devices found."
-msgstr ""
+msgstr "Nessun device discoverato trovato."
 
 #: api/classes/CHostPrototype.php:112
 #, c-format
@@ -9071,7 +9071,7 @@ msgstr "Nessun ID regola di discovery fornito."
 #: include/views/configuration.host.discovery.list.php:41 popup.php:1395
 #: popup.php:1415
 msgid "No discovery rules found."
-msgstr ""
+msgstr "Nessuna regola di discovery trovata."
 
 #: jsLoader.php:178
 msgid "No elements selected!"
@@ -9088,7 +9088,7 @@ msgstr "Nessun evento"
 #: events.php:370 include/blocks.inc.php:901
 #: include/classes/screens/CScreenEvents.php:37 include/events.inc.php:198
 msgid "No events found."
-msgstr ""
+msgstr "Nessun evento trovato."
 
 #: acknow.php:81
 msgid "No events to acknowledge"
@@ -9119,16 +9119,16 @@ msgstr "Nessun item del grafico con graphid \"%s\"."
 
 #: include/views/configuration.graph.list.php:73
 msgid "No graph prototypes found."
-msgstr ""
+msgstr "Nessun graph prototype trovato."
 
 #: include/blocks.inc.php:28
 msgid "No graphs added."
-msgstr ""
+msgstr "Nessun grafico aggiunto."
 
 #: include/views/configuration.graph.list.php:73
 #: include/views/monitoring.charts.php:77 popup.php:1069
 msgid "No graphs found."
-msgstr ""
+msgstr "Nessun grafico trovato."
 
 #: api/classes/CHost.php:701 api/classes/CHost.php:711
 #, c-format
@@ -9173,7 +9173,7 @@ msgstr "Nessun ID gruppo host fornito per l'elemento della schermata."
 #: include/views/configuration.hostgroups.list.php:56 popup_right.php:74
 #: search.php:276
 msgid "No host groups found."
-msgstr ""
+msgstr "Nessun host group trovato. "
 
 #: include/hosts.inc.php:493
 #, c-format
@@ -9182,7 +9182,7 @@ msgstr "Nessun gruppo host con groupid \"%s\"."
 
 #: include/views/configuration.host.prototype.list.php:44
 msgid "No host prototypes found."
-msgstr ""
+msgstr "Nessun prototipo host trovato."
 
 #: include/hosts.inc.php:536
 #, c-format
@@ -9192,7 +9192,7 @@ msgstr "Nessun host con hostid \"%s\"."
 #: hostinventoriesoverview.php:88 hosts.php:789
 #: include/views/inventory.host.list.php:74 search.php:128
 msgid "No hosts found."
-msgstr ""
+msgstr "Nessun host trovato."
 
 #: api/classes/CMapElement.php:70
 #, c-format
@@ -9201,7 +9201,7 @@ msgstr "Nessuna icona per l'elemento della mappa \"%s\"."
 
 #: include/views/administration.general.iconmap.list.php:22
 msgid "No icon maps found."
-msgstr ""
+msgstr "Nessuna icona per mappa trovata."
 
 #: include/views/configuration.sysmap.edit.php:47
 msgid "No image"
@@ -9209,7 +9209,7 @@ msgstr "Nessuna immagine"
 
 #: include/views/administration.general.image.list.php:36
 msgid "No images found."
-msgstr ""
+msgstr "Nessuna immagine trovata."
 
 #: include/views/configuration.item.edit.php:112
 #: include/views/configuration.item.massupdate.php:77
@@ -9237,11 +9237,11 @@ msgstr "Nessun ID item fornito per l'elemento della schermata."
 
 #: popup.php:677
 msgid "No item keys found."
-msgstr ""
+msgstr "Nessun item key trovato."
 
 #: include/views/configuration.item.prototype.list.php:43 popup.php:920
 msgid "No item prototypes found."
-msgstr ""
+msgstr "Nessun item prototype trovato."
 
 #: include/items.inc.php:499
 #, c-format
@@ -9260,19 +9260,19 @@ msgstr "Nessun item definito."
 #: include/items.inc.php:791 include/views/configuration.item.list.php:58
 #: include/views/monitoring.overview.php:114 popup.php:810
 msgid "No items found."
-msgstr ""
+msgstr "Nessun item trovato."
 
 #: include/views/common.macros.php:26
 msgid "No macros found."
-msgstr ""
+msgstr "Nessuna macro trovata."
 
 #: include/views/configuration.maintenance.edit.php:98
 msgid "No maintenance periods defined."
-msgstr ""
+msgstr "Nesun periodo di manutenzione definito."
 
 #: include/views/configuration.maintenance.list.php:41
 msgid "No maintenance periods found."
-msgstr ""
+msgstr "Nessun periodo di manutenzione trovato."
 
 #: api/classes/CScreenItem.php:460
 msgid "No map ID provided for screen element."
@@ -9280,12 +9280,12 @@ msgstr "Nessun ID mappa fornito per l'elemento della schermata."
 
 #: include/blocks.inc.php:150
 msgid "No maps added."
-msgstr ""
+msgstr "Nessuna mappa aggiunta."
 
 #: include/views/configuration.sysmap.list.php:40
 #: include/views/monitoring.maps.php:23 popup.php:1170
 msgid "No maps found."
-msgstr ""
+msgstr "Nessuna mappa trovata."
 
 #: include/classes/class.cmultiselect.php:51 jsLoader.php:192
 msgid "No matches found"
@@ -9293,19 +9293,19 @@ msgstr "Nessuna corrispondenza trovata"
 
 #: include/views/administration.users.edit.php:155
 msgid "No media found."
-msgstr ""
+msgstr "Nessun media trovato."
 
 #: include/views/administration.mediatypes.list.php:36
 msgid "No media types found."
-msgstr ""
+msgstr "Nessun media type trovato."
 
 #: report4.php:73
 msgid "No notifications found."
-msgstr ""
+msgstr "Nessuna notifica trovata."
 
 #: include/views/configuration.action.edit.php:332
 msgid "No operations defined."
-msgstr ""
+msgstr "Nessuna operazione definita."
 
 #: include/classes/import/CConfigurationImport.php:880
 #: include/classes/import/CConfigurationImport.php:960
@@ -9411,7 +9411,7 @@ msgstr "Nessun file di chiave privata specificato."
 
 #: include/views/administration.proxy.list.php:42 popup.php:1439
 msgid "No proxies found."
-msgstr ""
+msgstr "Nessun proxy trovato."
 
 #: include/views/configuration.discovery.edit.php:44
 msgid "No proxy"
@@ -9436,7 +9436,7 @@ msgstr "Nessun destinatario per il messaggio dell'operazione azione."
 
 #: include/views/administration.general.regularexpressions.list.php:28
 msgid "No regular expressions found."
-msgstr ""
+msgstr "Nessuna regular expression trovata."
 
 #: include/classes/screens/CScreenBuilder.php:293
 msgid "No rows in screen."
@@ -9448,14 +9448,14 @@ msgstr "Nessun ID schermata fornito per l'elemento della schermata."
 
 #: include/blocks.inc.php:99
 msgid "No screens added."
-msgstr ""
+msgstr "Nessuna schermata aggiunta."
 
 #: include/classes/screens/CScreenBuilder.php:267
 #: include/views/configuration.screen.list.php:48
 #: include/views/monitoring.hostscreen.php:32
 #: include/views/monitoring.screen.php:35 popup.php:1308 popup.php:1367
 msgid "No screens found."
-msgstr ""
+msgstr "Nessuna schermata trovata."
 
 #: api/classes/CAction.php:1362
 msgid "No script specified for action operation command."
@@ -9463,7 +9463,7 @@ msgstr "Nessuno script specificato per il comando dell'operazione azione."
 
 #: include/views/administration.script.list.php:35 popup.php:1465
 msgid "No scripts found."
-msgstr ""
+msgstr "Nessun script trovato."
 
 #: slides.php:158
 msgid "No slide shows defined."
@@ -9472,11 +9472,11 @@ msgstr "Nessuna presentazione definita."
 #: include/views/configuration.slideconf.list.php:37
 #: include/views/monitoring.slides.php:43
 msgid "No slide shows found."
-msgstr ""
+msgstr "Nessuna presentazione trovata."
 
 #: include/views/monitoring.slides.php:104 popup.php:1243
 msgid "No slides found."
-msgstr ""
+msgstr "Nessuna presentazione trovata."
 
 #: api/classes/CProxy.php:227
 msgid "No status for proxy."
@@ -9492,7 +9492,7 @@ msgstr "Nessun target selezionato."
 
 #: search.php:391 templates.php:481
 msgid "No templates found."
-msgstr ""
+msgstr "Nessun template trovato."
 
 #: include/views/configuration.host.edit.php:628
 #: include/views/configuration.host.prototype.edit.php:211
@@ -9531,15 +9531,15 @@ msgstr "Nessun ID utente fornito."
 #: include/views/administration.usergroups.list.php:42 popup.php:554
 #: popup_usrgrp.php:89
 msgid "No user groups found."
-msgstr ""
+msgstr "Nessun gruppo utente trovato."
 
 #: include/views/administration.users.list.php:51 popup.php:612
 msgid "No users found."
-msgstr ""
+msgstr "Nessun utente trovato."
 
 #: include/views/administration.general.valuemapping.list.php:22
 msgid "No value maps found."
-msgstr ""
+msgstr "Nessun valore mappa trovato."
 
 #: include/classes/screens/CScreenHistory.php:159
 #: include/classes/screens/CScreenHistory.php:265
@@ -9551,7 +9551,7 @@ msgstr "Nessun valore trovato."
 #: httpmon.php:84 include/blocks.inc.php:1074
 #: include/views/configuration.httpconf.list.php:58
 msgid "No web scenarios found."
-msgstr ""
+msgstr "Nessun Web Scenario trovato."
 
 #: events.php:578 events.php:591 hosts.php:792 httpmon.php:86
 #: include/actions.inc.php:68 include/audit.inc.php:42
@@ -12665,15 +12665,15 @@ msgstr "L'host non è stato più discoverato e sarà rimosso in %1$s (il %2$s al
 #, c-format
 msgid "The image is used in icon map %1$s."
 msgid_plural "The image is used in icon maps %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "L'immagine è utilizzata nella mappa icone %1$s."
+msgstr[1] "L'immagine è utilizzata nelle mappe icone %1$s."
 
 #: api/classes/CImage.php:519
 #, c-format
 msgid "The image is used in map %1$s."
 msgid_plural "The image is used in maps %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "L'immagine è utilizzata nella mappa %1$s."
+msgstr[1] "L'immagine è utilizzata nelle mappe %1$s."
 
 #: include/views/configuration.item.list.php:126
 #, c-format
@@ -13644,7 +13644,7 @@ msgstr "Gruppo utenti per messaggio di database inattivo"
 #: adm.other.php:94
 #, c-format
 msgid "User group for database down message \"%1$s\"."
-msgstr ""
+msgstr "Gruppo Utente per segnalazione problemi Database \"%1$s\"."
 
 #: include/views/administration.script.edit.php:78
 #: include/views/administration.usergroups.list.php:28
@@ -14800,7 +14800,7 @@ msgstr "di"
 #: include/classes/class.frontendsetup.php:589
 #: include/classes/class.frontendsetup.php:607
 msgid "off"
-msgstr ""
+msgstr "off"
 
 #: include/classes/class.frontendsetup.php:319
 #: include/classes/class.frontendsetup.php:338
