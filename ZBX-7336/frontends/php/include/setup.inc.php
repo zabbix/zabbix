@@ -19,16 +19,6 @@
 **/
 
 
-function zbx_is_callable($var) {
-	foreach ($var as $e) {
-		if (!is_callable($e)) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
 class CSetupWizard extends CForm {
 
 	function __construct(&$ZBX_CONFIG) {
@@ -197,7 +187,8 @@ class CSetupWizard extends CForm {
 			new CCol(_('Required'), 'header')
 		));
 
-		$reqs = FrontendSetup::i()->checkRequirements();
+		$frontendSetup = new FrontendSetup($this->ZBX_CONFIG);
+		$reqs = $frontendSetup->checkRequirements();
 		foreach ($reqs as $req) {
 			$result = null;
 			if ($req['result']) {
@@ -237,17 +228,14 @@ class CSetupWizard extends CForm {
 	}
 
 	function stage3() {
-		global $ZBX_CONFIG;
-
 		$table = new CTable(null, 'requirements');
 		$table->setAlign('center');
 
 		$DB['TYPE'] = $this->getConfig('DB_TYPE');
 
 		$cmbType = new CComboBox('type', $DB['TYPE'], 'this.form.submit();');
-		$cmbType->attr('onchange', "disableSetupStepButton('#next_2')");
 
-		foreach ($ZBX_CONFIG['allowed_db'] as $id => $name) {
+		foreach ($this->ZBX_CONFIG['allowed_db'] as $id => $name) {
 			$cmbType->addItem($id, $name);
 		}
 		$table->addRow(array(new CCol(_('Database type'), 'header'), $cmbType));
@@ -332,7 +320,7 @@ class CSetupWizard extends CForm {
 			), 'vertical_center'), 'table_wraper'),
 
 			new CDiv(array(
-				isset($_REQUEST['type']) ? !$this->DISABLE_NEXT_BUTTON ?
+				isset($_REQUEST['retry']) ? !$this->DISABLE_NEXT_BUTTON ?
 					new CSpan(array(_('OK'), BR()), 'ok')
 					: new CSpan(array(_('Fail'), BR()), 'fail')
 					: null,
