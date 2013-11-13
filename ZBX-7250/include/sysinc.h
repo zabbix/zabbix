@@ -390,21 +390,10 @@
 #	endif
 #endif
 
-/* NET-SNMP is used */
+/* Net-SNMP is used */
 #ifdef HAVE_NETSNMP
 #	include <net-snmp/net-snmp-config.h>
 #	include <net-snmp/net-snmp-includes.h>
-#endif
-
-/* Required for SNMP support */
-#ifdef HAVE_UCDSNMP
-#	include <ucd-snmp/ucd-snmp-config.h>
-#	include <ucd-snmp/ucd-snmp-includes.h>
-#	include <ucd-snmp/system.h>
-/* For usmHMACMD5AuthProtocol */
-#	include <ucd-snmp/transform_oids.h>
-/* For generate_Ku() */
-#	include <ucd-snmp/keytools.h>
 #endif
 
 /* LIBXML2 is used */

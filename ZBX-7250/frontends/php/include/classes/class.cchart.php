@@ -540,6 +540,7 @@ class CChart extends CGraphDraw {
 		if ($this->ymin_type == GRAPH_YAXIS_TYPE_FIXED) {
 			return $this->yaxismin;
 		}
+
 		if ($this->ymin_type == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 			$item = get_item_by_itemid($this->ymin_itemid);
 			$history = Manager::History()->getLast(array($item));
@@ -604,6 +605,7 @@ class CChart extends CGraphDraw {
 				$minY = min($minY, min($val));
 			}
 		}
+
 		return $minY;
 	}
 
@@ -612,6 +614,7 @@ class CChart extends CGraphDraw {
 		if ($this->ymax_type == GRAPH_YAXIS_TYPE_FIXED) {
 			return $this->yaxismax;
 		}
+
 		if ($this->ymax_type == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 			$item = get_item_by_itemid($this->ymax_itemid);
 			$history = Manager::History()->getLast(array($item));
@@ -675,6 +678,7 @@ class CChart extends CGraphDraw {
 				$maxY = max($maxY, max($val));
 			}
 		}
+
 		return $maxY;
 	}
 
@@ -998,6 +1002,7 @@ class CChart extends CGraphDraw {
 		if (bccomp($diff_val, 0) == 0) {
 			$diff_val = 1;
 		}
+
 		$this->gridStepX[$side] = bcdiv(bcmul($this->gridStep[$side], $this->sizeY), $diff_val);
 
 		if (isset($this->axis_valuetype[$other_side])) {
@@ -2266,6 +2271,13 @@ class CChart extends CGraphDraw {
 			$this->m_minY[$graphSide] = $this->calculateMinY($graphSide);
 			$this->m_maxY[$graphSide] = $this->calculateMaxY($graphSide);
 
+			if ($this->m_minY[$graphSide] === null) {
+				$this->m_minY[$graphSide] = 0;
+			}
+			if ($this->m_maxY[$graphSide] === null) {
+				$this->m_maxY[$graphSide] = 1;
+			}
+
 			if ($this->m_minY[$graphSide] == $this->m_maxY[$graphSide]) {
 				if ($this->graphOrientation[$graphSide] == '-') {
 					$this->m_maxY[$graphSide] = 0;
@@ -2287,7 +2299,7 @@ class CChart extends CGraphDraw {
 			}
 
 			// If max Y-scale bigger min Y-scale only for 10% or less, then we don't allow Y-scale duplicate
-			if (!empty($this->m_maxY[$graphSide]) && !empty($this->m_minY[$graphSide])) {
+			if ($this->m_maxY[$graphSide] && $this->m_minY[$graphSide]) {
 				if ($this->m_minY[$graphSide] < 0) {
 					$absMinY = bcmul($this->m_minY[$graphSide], '-1');
 				}
