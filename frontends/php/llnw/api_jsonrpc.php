@@ -39,5 +39,10 @@ elseif ($json['method'] == 'hostlist.get' || $json['method'] == 'hostlist.pull')
 elseif ($json['method'] == 'proxymap.get') {
    include($base_dir.'proxy.php');
 }
+elseif ($json['method'] == 'alertqueue.create') {
+   include($base_dir.'alert-queue.php');
+}
+
+sendErrorResponse('235', "Invalid method", "Invalid method");
 
 ?>
