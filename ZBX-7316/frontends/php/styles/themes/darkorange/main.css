@@ -33,8 +33,8 @@
 .pum_o_item:hover, .pum_b_submenu:hover, .pum_o_submenu:hover, .pum_b_submenu  { background-color: #555; }
 
 /*////////////////	LINKS	////////////////////*/
-a, a:link, a:visited {	color:#FF5500;  }
-a:hover, a:active { color:#FF8800; }
+a {	color: #FF5500; }
+a:hover, a:active { color: #FF8800; }
 
 a.highlight { font-size: 10px; font-weight: bold; }
 a.highlight:link, a.highlight:visited { color: #DFDFDF; }

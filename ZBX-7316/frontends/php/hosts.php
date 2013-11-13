@@ -546,7 +546,7 @@ elseif (isset($_REQUEST['save'])) {
 					continue;
 				}
 
-				if (!copy_graph_to_host($graph['graphid'], $hostId)) {
+				if (!copyGraphToHost($graph['graphid'], $hostId)) {
 					throw new Exception();
 				}
 			}
@@ -900,7 +900,7 @@ else {
 			$description[] = $proxies[$host['proxy_hostid']]['host'].NAME_DELIMITER;
 		}
 		if ($host['discoveryRule']) {
-			$description[] = new CLink($host['discoveryRule']['name'], 'host_prototypes.php?parent_discoveryid='.$host['discoveryRule']['itemid'], 'gold');
+			$description[] = new CLink($host['discoveryRule']['name'], 'host_prototypes.php?parent_discoveryid='.$host['discoveryRule']['itemid'], 'parent-discovery');
 			$description[] = NAME_DELIMITER;
 		}
 

@@ -53,45 +53,41 @@ if (!function_exists('ngettext')) {
 	}
 }
 
-if (!function_exists('pgettext')) {
-	/**
-	 * Stub gettext function in case gettext is not available. Do not use directly, use _x() instead.
-	 *
-	 * @see _x
-	 *
-	 * @param string $context
-	 * @param string $msgId
-	 *
-	 * @return string
-	 */
-	function pgettext($context, $msgId) {
-		$contextString = $context."\004".$msgId;
-		$translation = _($contextString);
+/**
+ * Translates the string with respect to the given context.
+ *
+ * @see _x
+ *
+ * @param string $context
+ * @param string $msgId
+ *
+ * @return string
+ */
+function pgettext($context, $msgId) {
+	$contextString = $context."\004".$msgId;
+	$translation = _($contextString);
 
-		return ($translation == $contextString) ? $msgId : $translation;
-	}
+	return ($translation == $contextString) ? $msgId : $translation;
 }
 
-if (!function_exists('npgettext')) {
-	/**
-	 * Stub gettext function in case gettext is not available. Do not use directly, use _xn() instead.
-	 *
-	 * @see _xn
-	 *
-	 * @param string $context
-	 * @param string $msgId
-	 * @param string $msgIdPlural
-	 * @param string $num
-	 *
-	 * @return string
-	 */
-	function npgettext($context, $msgId, $msgIdPlural, $num) {
-		$contextString = $context."\004".$msgId;
-		$contextStringp = $context."\004".$msgIdPlural;
-		$translation = ngettext($contextString, $contextStringp, $num);
+/**
+ * Translates the string with respect to the given context and plural forms.
+ *
+ * @see _xn
+ *
+ * @param string $context
+ * @param string $msgId
+ * @param string $msgIdPlural
+ * @param string $num
+ *
+ * @return string
+ */
+function npgettext($context, $msgId, $msgIdPlural, $num) {
+	$contextString = $context."\004".$msgId;
+	$contextStringp = $context."\004".$msgIdPlural;
+	$translation = ngettext($contextString, $contextStringp, $num);
 
-		return ($translation == $contextString || $translation == $contextStringp) ? $msgId : $translation;
-	}
+	return ($translation == $contextString || $translation == $contextStringp) ? $msgId : $translation;
 }
 
 /**

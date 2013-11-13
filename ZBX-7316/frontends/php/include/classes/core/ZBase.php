@@ -350,9 +350,6 @@ class ZBase {
 			bind_textdomain_codeset('frontend', 'UTF-8');
 			textdomain('frontend');
 		}
-		else {
-			error('Your PHP has no gettext support. Zabbix translations are not available.');
-		}
 
 		// should be after locale initialization
 		require_once $this->getRootDir().'/include/translateDefines.inc.php';
