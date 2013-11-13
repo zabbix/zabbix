@@ -601,6 +601,23 @@ class CDRule extends CZBXAPI {
 	}
 
 	/**
+	 * Validates the input parameters for the delete() method.
+	 *
+	 * @throws APIException if the input is invalid
+	 *
+	 * @param array $druleIds
+	 *
+	 * @return void
+	 */
+	protected function validateDelete(array $druleIds) {
+		if (!$druleIds) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
+		$this->checkDrulePermissions($druleIds);
+	}
+
+	/**
 	 * Delete related action conditions.
 	 *
 	 * @param array $dCheckIds
@@ -753,23 +770,6 @@ class CDRule extends CZBXAPI {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Validates the input parameters for the delete() method.
-	 *
-	 * @throws APIException if the input is invalid
-	 *
-	 * @param array $druleIds
-	 *
-	 * @return void
-	 */
-	protected function validateDelete(array $druleIds) {
-		if (!$druleIds) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
-		}
-
-		$this->checkDrulePermissions($druleIds);
 	}
 
 	/**
