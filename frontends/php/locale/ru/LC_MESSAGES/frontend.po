@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-13 04:42+0200\n"
-"PO-Revision-Date: 2013-11-08 16:25+0300\n"
+"POT-Creation-Date: 2013-11-13 04:44+0200\n"
+"PO-Revision-Date: 2013-11-12 06:23+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1383920723.0\n"
+"X-POOTLE-MTIME: 1384230220.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -722,9 +722,9 @@ msgstr "В %1$s:%2$s на %3$s день каждый %4$s"
 #, c-format
 msgid "At %1$s:%2$s on every %3$s of every week"
 msgid_plural "At %1$s:%2$s on every %3$s of every %4$s weeks"
-msgstr[0] "В %1$s:%2$s каждые %3$s каждую неделю"
-msgstr[1] "В %1$s:%2$s каждые %3$s каждые %4$s недели"
-msgstr[2] "В %1$s:%2$s каждые %3$s каждые %4$s недели"
+msgstr[0] "В %1$s:%2$s каждый %3$s каждую неделю"
+msgstr[1] "В %1$s:%2$s каждый %3$s каждые %4$s недели"
+msgstr[2] "В %1$s:%2$s каждый %3$s каждые %4$s недель"
 
 #: include/maintenances.inc.php:63
 #, c-format
@@ -1278,7 +1278,7 @@ msgstr "Не удалось добавить элемент данных"
 #: api/classes/CApplication.php:547
 #, c-format
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
-msgstr "Не удалось добавить элемент данных \"%1$s\" из \"%2$s\" в группу элементов данных \"%3$s\" из \"%4$s\".Не удалось добавить элемент данных \"%1$s\" из \"%2$s\" в группу элементов данных \"%3$s\" из \"%4$s\"."
+msgstr "Не удалось добавить элемент данных \"%1$s\" из \"%2$s\" в группу элементов данных \"%3$s\" из \"%4$s\"."
 
 #: api/classes/CApplication.php:600
 msgid "Cannot add items."
@@ -1765,7 +1765,7 @@ msgstr "Не удалось найти интерфейс у узла сети \
 #: include/classes/import/CConfigurationImport.php:934
 #, c-format
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
-msgstr "Не удалось найти узел сети или шаблон \"%1$s\" указанный в графике \"%2$s\".Не удалось найти узел сети или шаблон \"%1$s\" указанный в графике \"%2$s\"."
+msgstr "Не удалось найти узел сети или шаблон \"%1$s\" указанный в графике \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:768
 #: include/classes/import/importers/CMapImporter.php:247
@@ -1843,7 +1843,7 @@ msgid "Cannot import screen \"%1$s\": subscreen \"%2$s\" does not exist."
 msgid_plural "Cannot import screen \"%1$s\": subscreens \"%2$s\" do not exist."
 msgstr[0] "Не удалось импортировать комплексный экран \"%1$s\": подэкран \"%2$s\" не существует."
 msgstr[1] "Не удалось импортировать комплексный экран \"%1$s\": подэкраны \"%2$s\" не существуют."
-msgstr[2] "Не удалось импортировать комплексный экран \"%1$s\": подэкраны \"%2$s\" не существуют.Не удалось импортировать комплексный экран \"%1$s\": подэкраны \"%2$s\" не существуют."
+msgstr[2] "Не удалось импортировать комплексный экран \"%1$s\": подэкраны \"%2$s\" не существуют."
 
 #: include/classes/import/importers/CTemplateImporter.php:114
 #, fuzzy, c-format
@@ -1851,7 +1851,7 @@ msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist.
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
 msgstr[0] "Не удалось импортировать шаблон \"%1$s\", соединенный шаблон \"%2$s\" не существует."
 msgstr[1] "Не удалось импортировать шаблон \"%1$s\", соединенные шаблоны \"%2$s\" не существуют."
-msgstr[2] "Не удалось импортировать шаблон \"%1$s\", соединенные шаблоны \"%2$s\" не существуют.Не удалось импортировать шаблон \"%1$s\", соединенные шаблоны \"%2$s\" не существуют."
+msgstr[2] "Не удалось импортировать шаблон \"%1$s\", соединенные шаблоны \"%2$s\" не существуют."
 
 #: include/classes/class.cview.php:113
 #, c-format
@@ -8360,7 +8360,7 @@ msgid "Maximum host name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum host name length is %1$d characters, \"%2$s\" is %3$d characters."
 msgstr[0] "Максимальная длина имени узла сети %1$d символов, \"%2$s\" - %3$d символ."
 msgstr[1] "Максимальная длина имени узла сети %1$d символов, \"%2$s\" - %3$d символа."
-msgstr[2] "Максимальная длина имени узла сети %1$d символов, \"%2$s\" - %3$d символов.Максимальная длина имени узла сети %1$d символов, \"%2$s\" - %3$d символов."
+msgstr[2] "Максимальная длина имени узла сети %1$d символов, \"%2$s\" - %3$d символов."
 
 #: include/views/configuration.item.edit.php:319
 #: include/views/configuration.item.massupdate.php:372
@@ -8397,7 +8397,7 @@ msgid "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d cha
 msgid_plural "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d characters."
 msgstr[0] "Максимальная длина видимого имени узла сети %1$d символов, \"%2$s\" - %3$d символ."
 msgstr[1] "Максимальная длина видимого имени узла сети %1$d символов, \"%2$s\" - %3$d символа."
-msgstr[2] "Максимальная длина видимого имени узла сети %1$d символов, \"%2$s\" - %3$d символов.Максимальная длина видимого имени узла сети %1$d символов, \"%2$s\" - %3$d символов."
+msgstr[2] "Максимальная длина видимого имени узла сети %1$d символов, \"%2$s\" - %3$d символов."
 
 #: include/forms.inc.php:1692 include/func.inc.php:116
 #: include/func.inc.php:247 jsLoader.php:122
