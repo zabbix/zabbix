@@ -112,7 +112,7 @@ class CTemplateImporter extends CImporter {
 				}
 			}
 			throw new Exception(_n('Cannot import template "%1$s", linked template "%2$s" does not exist.',
-				'Cannot import template "%1$s", linked templates "%2$s" does not exist.',
+				'Cannot import template "%1$s", linked templates "%2$s" do not exist.',
 				$template['host'], implode(', ', $unresolvedReferences), count($unresolvedReferences)));
 		}
 	}
