@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-24 22:01+0300\n"
+"POT-Creation-Date: 2013-11-13 03:36+0200\n"
 "PO-Revision-Date: 2013-01-12 23:52+0200\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -1033,7 +1033,7 @@ msgstr "КОНФИГУРАЦИЯ ВАЖНОСТ НА ТРИГЕР "
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:45
-#: include/views/configuration.triggers.massupdate.php:40 triggers.php:376
+#: include/views/configuration.triggers.massupdate.php:40 triggers.php:378
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "КОНФИГУРАЦИЯ НА ТРИГЕРИ"
 
@@ -1229,7 +1229,7 @@ msgstr "Не може да се добави слайдшоу"
 msgid "Cannot add template"
 msgstr "Не може да се добави шаблон"
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Cannot add trigger"
 msgstr "Не може да се добави тригер"
@@ -1526,7 +1526,7 @@ msgstr "Не може да се изтрие шаблонния тригер п�
 msgid "Cannot delete trigger."
 msgstr "Не може да се изтрие тригера."
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Cannot delete triggers"
 msgstr "Не може да се изтрият тригерите"
 
@@ -1995,7 +1995,7 @@ msgstr "Не може да се актуализират услугите"
 msgid "Cannot update slide show"
 msgstr "Не може да се актуализира слайдшоу"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr "Не може да се актуализира състоянието"
 
@@ -8561,7 +8561,7 @@ msgstr "Не са дефинирани слайдове."
 msgid "No steps defined."
 msgstr "Не са дефинирани стъпки."
 
-#: triggers.php:348
+#: triggers.php:350
 msgid "No target selected"
 msgstr "Не е избрана цел"
 
@@ -11362,7 +11362,7 @@ msgstr "Състояние на тригерите"
 msgid "Status only"
 msgstr "Само състояние"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr "Състояние актуализирано"
 
@@ -11958,7 +11958,7 @@ msgstr "Тригер \"%1$s:%2$s\" не разполага с прототип �
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Тригер \"%s\" принадлежи към шаблони с различни връзки."
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Trigger added"
 msgstr "Тригер добавен"
@@ -12044,7 +12044,7 @@ msgstr "Важност на тригер "
 msgid "Trigger severity"
 msgstr "Важност на тригер "
 
-#: triggers.php:288
+#: triggers.php:289
 msgid "Trigger status became \"Disabled\"."
 msgstr "Състоянието на тригера е \"Излючено\"."
 
@@ -12080,7 +12080,7 @@ msgstr "Тригери"
 msgid "Triggers (e/d)[p/u/o]"
 msgstr "Тригери (e/d)[p/u/o]"
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Triggers deleted"
 msgstr "Тригери изтрити"
 

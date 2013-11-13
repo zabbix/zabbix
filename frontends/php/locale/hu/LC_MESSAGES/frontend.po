@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-24 22:01+0300\n"
+"POT-Creation-Date: 2013-11-13 03:36+0200\n"
 "PO-Revision-Date: 2013-10-14 13:57+0300\n"
 "Last-Translator: halt <kisst@bgk.bme.hu>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1033,7 +1033,7 @@ msgstr ""
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:45
-#: include/views/configuration.triggers.massupdate.php:40 triggers.php:376
+#: include/views/configuration.triggers.massupdate.php:40 triggers.php:378
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "TRIGGEREK KONFIGURÁCIÓJA"
 
@@ -1229,7 +1229,7 @@ msgstr ""
 msgid "Cannot add template"
 msgstr "A mintát nem lehet létrehozni"
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Cannot add trigger"
 msgstr "Triggerek létrehozása sikertelen"
@@ -1524,7 +1524,7 @@ msgstr "Trigger prototipus törlése sikertelen"
 msgid "Cannot delete trigger."
 msgstr "Trigger törlése sikertelen."
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Cannot delete triggers"
 msgstr "Triggerek törlése sikertelen"
 
@@ -1992,7 +1992,7 @@ msgstr "Szolgáltatások frissítése sikertelen"
 msgid "Cannot update slide show"
 msgstr ""
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr "Státusz frissítése sikertelen"
 
@@ -8532,7 +8532,7 @@ msgstr ""
 msgid "No steps defined."
 msgstr ""
 
-#: triggers.php:348
+#: triggers.php:350
 msgid "No target selected"
 msgstr "Nincs cél kiválasztva"
 
@@ -11329,7 +11329,7 @@ msgstr "Triggerek állapota"
 msgid "Status only"
 msgstr "Csak státusz"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr "Státusz frissítve"
 
@@ -11925,7 +11925,7 @@ msgstr ""
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr ""
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Trigger added"
 msgstr "Trigger létrehozva"
@@ -12011,7 +12011,7 @@ msgstr ""
 msgid "Trigger severity"
 msgstr "Trigger súlyosság"
 
-#: triggers.php:288
+#: triggers.php:289
 msgid "Trigger status became \"Disabled\"."
 msgstr ""
 
@@ -12047,7 +12047,7 @@ msgstr "Trigger-ek"
 msgid "Triggers (e/d)[p/u/o]"
 msgstr "Triggerek (e/l)[h/i/o]"
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Triggers deleted"
 msgstr "Triggerek törölve"
 

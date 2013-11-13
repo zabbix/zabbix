@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-24 22:01+0300\n"
+"POT-Creation-Date: 2013-11-13 03:36+0200\n"
 "PO-Revision-Date: 2013-11-08 09:29+0300\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -1036,7 +1036,7 @@ msgstr "ΔΙΑΜΟΡΦΩΣΗ ΒΑΡΥΤΗΤΑΣ ΕΝΑΥΣΜΑΤΩΝ"
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:45
-#: include/views/configuration.triggers.massupdate.php:40 triggers.php:376
+#: include/views/configuration.triggers.massupdate.php:40 triggers.php:378
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "ΔΙΑΜΟΡΦΩΣΗ ΕΝΑΥΣΜΑΤΩΝ"
 
@@ -1232,7 +1232,7 @@ msgstr "Αδύνατη η προσθήκη προβολής διαφάνειας
 msgid "Cannot add template"
 msgstr "Αδύνατη η προσθήκη σχεδιότυπου"
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Cannot add trigger"
 msgstr "Αδύνατη η προσθήκη εναύσματος"
@@ -1527,7 +1527,7 @@ msgstr "Αδύνατη η διαγραφή πρωτότυπου εναύσματ
 msgid "Cannot delete trigger."
 msgstr "Αδύνατη η διαγραφή εναύσματος."
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Cannot delete triggers"
 msgstr "Αδύνατη η διαγραφή εναυσμάτων"
 
@@ -1995,7 +1995,7 @@ msgstr "Αδύνατη η ενημέρωση υπηρεσίας"
 msgid "Cannot update slide show"
 msgstr "Αδύνατη η ενημέρωση προβολής διαφάνειας"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr "Αδύνατη η ενημέρωση κατάστασης"
 
@@ -8548,7 +8548,7 @@ msgstr "Δεν ορίσθηκαν διαφάνειες."
 msgid "No steps defined."
 msgstr "Δεν ορίσθηκαν βήματα."
 
-#: triggers.php:348
+#: triggers.php:350
 msgid "No target selected"
 msgstr "Δεν επιλέχθηκε στόχος"
 
@@ -11345,7 +11345,7 @@ msgstr "Κατάσταση των εναυσμάτων"
 msgid "Status only"
 msgstr "Κατάσταση μόνο"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr "Κατάσταση ενημερώθηκε"
 
@@ -11941,7 +11941,7 @@ msgstr "Το έναυσμα \"%1$s:%2$s\" δεν έχει πρωτότυπο σ�
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Το έναυσμα \"%s\" ανήκει σε σχεδιότυπο με διαφορετικούς συνδέσμους."
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Trigger added"
 msgstr "Έναυσμα προστέθηκε"
@@ -12027,7 +12027,7 @@ msgstr "Βαρύτητες εναυσμάτων"
 msgid "Trigger severity"
 msgstr "Σοβαρότητα εναύσματος"
 
-#: triggers.php:288
+#: triggers.php:289
 msgid "Trigger status became \"Disabled\"."
 msgstr "Η κατάσταση εναύσματος έγινε \"Ανενεργό\"."
 
@@ -12063,7 +12063,7 @@ msgstr "Εναύσματα"
 msgid "Triggers (e/d)[p/u/o]"
 msgstr "Εναύσματα (ε/α)[π/α/o]"
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Triggers deleted"
 msgstr "Εναύσματα διεγράφησαν"
 

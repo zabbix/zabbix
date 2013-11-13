@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-24 22:01+0300\n"
+"POT-Creation-Date: 2013-11-13 03:36+0200\n"
 "PO-Revision-Date: 2013-04-29 23:58+0200\n"
 "Last-Translator: Murat <murat@profelis.com.tr>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1033,7 +1033,7 @@ msgstr "TETİK ÖNEM DERECELERİNİN YAPILANDIRMASI"
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:45
-#: include/views/configuration.triggers.massupdate.php:40 triggers.php:376
+#: include/views/configuration.triggers.massupdate.php:40 triggers.php:378
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "TETİKLERİN YAPILANDIRMASI"
 
@@ -1229,7 +1229,7 @@ msgstr "Slayt gösterisi eklenemiyor"
 msgid "Cannot add template"
 msgstr "Şablon eklenemedi"
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Cannot add trigger"
 msgstr "Tetik eklenemedi"
@@ -1524,7 +1524,7 @@ msgstr "Tetikleyici prototipi silinemiyor"
 msgid "Cannot delete trigger."
 msgstr "Tetikleyici silinemiyor."
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Cannot delete triggers"
 msgstr "Tetikler silinemedi"
 
@@ -1992,7 +1992,7 @@ msgstr "Servis güncellenemedi"
 msgid "Cannot update slide show"
 msgstr "Slayt gösterisi güncellenemiyor"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr "Durum güncellenemedi"
 
@@ -8543,7 +8543,7 @@ msgstr ""
 msgid "No steps defined."
 msgstr ""
 
-#: triggers.php:348
+#: triggers.php:350
 msgid "No target selected"
 msgstr "Herhangi bir hedef seçilmedi"
 
@@ -11340,7 +11340,7 @@ msgstr "Tetiklerin Durumu"
 msgid "Status only"
 msgstr "Yalnızca durum"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr "Durum güncellendi"
 
@@ -11936,7 +11936,7 @@ msgstr ""
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr ""
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Trigger added"
 msgstr "Tetik eklendi"
@@ -12022,7 +12022,7 @@ msgstr "Tetik önem dereceleri"
 msgid "Trigger severity"
 msgstr "Tetik önem derecesi"
 
-#: triggers.php:288
+#: triggers.php:289
 msgid "Trigger status became \"Disabled\"."
 msgstr "Tetik durumu \"Pasif\" oldu."
 
@@ -12058,7 +12058,7 @@ msgstr "Tetikler"
 msgid "Triggers (e/d)[p/u/o]"
 msgstr "Tetikler (a/p)[s/b/t]"
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Triggers deleted"
 msgstr "Tetikler silindi"
 

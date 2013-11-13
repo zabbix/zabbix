@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-24 22:01+0300\n"
+"POT-Creation-Date: 2013-11-13 03:36+0200\n"
 "PO-Revision-Date: 2012-10-30 11:01+0200\n"
 "Last-Translator: busel7 <bonny.useful@gmail.com>\n"
 "Language-Team: none\n"
@@ -1024,7 +1024,7 @@ msgstr "KONFIGURASI SEVERITIES TRIGGER"
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:45
-#: include/views/configuration.triggers.massupdate.php:40 triggers.php:376
+#: include/views/configuration.triggers.massupdate.php:40 triggers.php:378
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "KONFIGURASI TRIGGER"
 
@@ -1220,7 +1220,7 @@ msgstr "Tidak dapat menambah slide show"
 msgid "Cannot add template"
 msgstr "Tidak dapat menambah template"
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Cannot add trigger"
 msgstr "Tidak dapat menambah trigger"
@@ -1514,7 +1514,7 @@ msgstr "Tidak dapat menghapus prototipe trigger"
 msgid "Cannot delete trigger."
 msgstr "Tidak dapat menghapus trigger."
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Cannot delete triggers"
 msgstr "Tidak dapat menghapus trigger."
 
@@ -1980,7 +1980,7 @@ msgstr "Tidak dapat perbarui service"
 msgid "Cannot update slide show"
 msgstr "Tidak dapat perbarui slide show"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr "Tidak dapat perbarui status"
 
@@ -8525,7 +8525,7 @@ msgstr "Tidak ada slide yang didefinisikan."
 msgid "No steps defined."
 msgstr "Tidak ada langkah yang didefinisikan."
 
-#: triggers.php:348
+#: triggers.php:350
 msgid "No target selected"
 msgstr "Tidak ada sasaran yang dipilih"
 
@@ -11320,7 +11320,7 @@ msgstr "Status trigger"
 msgid "Status only"
 msgstr "Status saja"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr "Status diperbarui"
 
@@ -11913,7 +11913,7 @@ msgstr "Trigger \"%1$s:%2$s\" tidak memiliki prototipe item."
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Trigger \"%s\" milik template dengan linkage berbeda."
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Trigger added"
 msgstr "Trigger ditambah"
@@ -11999,7 +11999,7 @@ msgstr "Trigger tingkat keparahan"
 msgid "Trigger severity"
 msgstr "Trigger keparahan"
 
-#: triggers.php:288
+#: triggers.php:289
 msgid "Trigger status became \"Disabled\"."
 msgstr "Status trigger menjadi \"Non-aktif\"."
 
@@ -12035,7 +12035,7 @@ msgstr "Trigger"
 msgid "Triggers (e/d)[p/u/o]"
 msgstr "Trigger (e/d)[p/u/o]"
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Triggers deleted"
 msgstr "Trigger dihapus"
 

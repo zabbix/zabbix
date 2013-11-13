@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-24 22:01+0300\n"
+"POT-Creation-Date: 2013-11-13 03:36+0200\n"
 "PO-Revision-Date: 2013-11-05 13:39+0300\n"
 "Last-Translator: Sébastien <sebastien@tiramiseb.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1032,7 +1032,7 @@ msgstr "CONFIGURATION DES SÉVÉRITÉS DES DÉCLENCHEURS"
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:45
-#: include/views/configuration.triggers.massupdate.php:40 triggers.php:376
+#: include/views/configuration.triggers.massupdate.php:40 triggers.php:378
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "CONFIGURATION DES DÉCLENCHEURS"
 
@@ -1228,7 +1228,7 @@ msgstr "Impossible d'ajouter le diaporama"
 msgid "Cannot add template"
 msgstr "Impossible d'ajouter le modèle"
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Cannot add trigger"
 msgstr "Impossible d'ajouter le déclencheur"
@@ -1523,7 +1523,7 @@ msgstr "Impossible de supprimer le prototype de déclencheur"
 msgid "Cannot delete trigger."
 msgstr "Impossible de supprimer le déclencheur."
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Cannot delete triggers"
 msgstr "Impossible de supprimer les déclencheurs"
 
@@ -1993,7 +1993,7 @@ msgstr "Impossible de mettre à jour le service"
 msgid "Cannot update slide show"
 msgstr "Impossible de mettre à jour le diaporama"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr "Impossible de mettre à jour l'état"
 
@@ -8544,7 +8544,7 @@ msgstr "Aucune diapositive définie."
 msgid "No steps defined."
 msgstr "Aucune étpa définie."
 
-#: triggers.php:348
+#: triggers.php:350
 msgid "No target selected"
 msgstr "Aucune cible sélectionnée"
 
@@ -11340,7 +11340,7 @@ msgstr "État des déclencheurs"
 msgid "Status only"
 msgstr "État seulement"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr "État mis à jour"
 
@@ -11936,7 +11936,7 @@ msgstr "Le déclencheur \"%1$s:%2$s\" n'a pas de prototype d'élément."
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Le déclencheur \"%s\" appartient à des modèles avec des liens différents."
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Trigger added"
 msgstr "Déclencheur ajouté"
@@ -12022,7 +12022,7 @@ msgstr "Sévérités des déclencheurs"
 msgid "Trigger severity"
 msgstr "Sévérité du déclencheur"
 
-#: triggers.php:288
+#: triggers.php:289
 msgid "Trigger status became \"Disabled\"."
 msgstr "L'état du déclencheur est devenu \"Désactivé\"."
 
@@ -12058,7 +12058,7 @@ msgstr "Déclencheurs"
 msgid "Triggers (e/d)[p/u/o]"
 msgstr "Déclencheurs (a/d)[p/i/o]"
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Triggers deleted"
 msgstr "Déclencheurs supprimés"
 

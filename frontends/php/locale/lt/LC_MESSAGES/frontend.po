@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-24 22:01+0300\n"
+"POT-Creation-Date: 2013-11-13 03:36+0200\n"
 "PO-Revision-Date: 2013-08-27 14:55+0200\n"
 "Last-Translator: Saulute <salomejazelskyte@gmail.com>\n"
 "Language-Team: none\n"
@@ -1050,7 +1050,7 @@ msgstr "CONFIGURATION OF TRIGGER SEVERITIES"
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:45
-#: include/views/configuration.triggers.massupdate.php:40 triggers.php:376
+#: include/views/configuration.triggers.massupdate.php:40 triggers.php:378
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "CONFIGURATION OF TRIGGERS"
 
@@ -1246,7 +1246,7 @@ msgstr "Negalima pridėti skaidrių rodymo"
 msgid "Cannot add template"
 msgstr "Negalima pridėti šablono"
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Cannot add trigger"
 msgstr "Negalima pridėti trigerio"
@@ -1542,7 +1542,7 @@ msgstr ""
 msgid "Cannot delete trigger."
 msgstr ""
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Cannot delete triggers"
 msgstr ""
 
@@ -2012,7 +2012,7 @@ msgstr ""
 msgid "Cannot update slide show"
 msgstr ""
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr ""
 
@@ -8557,7 +8557,7 @@ msgstr ""
 msgid "No steps defined."
 msgstr ""
 
-#: triggers.php:348
+#: triggers.php:350
 msgid "No target selected"
 msgstr ""
 
@@ -11354,7 +11354,7 @@ msgstr ""
 msgid "Status only"
 msgstr ""
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr ""
 
@@ -11953,7 +11953,7 @@ msgstr ""
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr ""
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Trigger added"
 msgstr ""
@@ -12039,7 +12039,7 @@ msgstr ""
 msgid "Trigger severity"
 msgstr ""
 
-#: triggers.php:288
+#: triggers.php:289
 msgid "Trigger status became \"Disabled\"."
 msgstr ""
 
@@ -12075,7 +12075,7 @@ msgstr ""
 msgid "Triggers (e/d)[p/u/o]"
 msgstr ""
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Triggers deleted"
 msgstr ""
 

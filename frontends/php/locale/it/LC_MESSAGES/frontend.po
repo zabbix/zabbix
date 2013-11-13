@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-24 22:01+0300\n"
+"POT-Creation-Date: 2013-11-13 03:36+0200\n"
 "PO-Revision-Date: 2013-10-11 08:18+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1032,7 +1032,7 @@ msgstr "CONFIGURAZIONE SEVERITY DEI TRIGGER"
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:45
-#: include/views/configuration.triggers.massupdate.php:40 triggers.php:376
+#: include/views/configuration.triggers.massupdate.php:40 triggers.php:378
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "CONFIGURAZIONE TRIGGER"
 
@@ -1228,7 +1228,7 @@ msgstr "Impossibile aggiungere la presentazione"
 msgid "Cannot add template"
 msgstr "Impossibile aggiungere il template"
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Cannot add trigger"
 msgstr "Impossibile aggiungere il trigger"
@@ -1523,7 +1523,7 @@ msgstr "Impossibile rimuovere il prototipo di trigger"
 msgid "Cannot delete trigger."
 msgstr "Impossibile rimuovere il trigger."
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Cannot delete triggers"
 msgstr "Impossibile rimuovere i trigger"
 
@@ -1991,7 +1991,7 @@ msgstr "Impossibile aggiornare il servizio"
 msgid "Cannot update slide show"
 msgstr "Impossibile aggiornare la presentazione"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr "Impossibile aggiornare lo stato"
 
@@ -8542,7 +8542,7 @@ msgstr "Nessuna diapositiva definita."
 msgid "No steps defined."
 msgstr "Nessun passo definito."
 
-#: triggers.php:348
+#: triggers.php:350
 msgid "No target selected"
 msgstr "Nessun target selezionato"
 
@@ -11338,7 +11338,7 @@ msgstr "Stato dei trigger"
 msgid "Status only"
 msgstr "Solo lo stato"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr "Stato aggiornato"
 
@@ -11934,7 +11934,7 @@ msgstr "Il trigger \"%1$s:%2$s\" non ha prototipi di item."
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Il trigger \"%s\" appartiene a template con differenti collegamenti."
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Trigger added"
 msgstr "Trigger aggiunto"
@@ -12020,7 +12020,7 @@ msgstr "Severity trigger"
 msgid "Trigger severity"
 msgstr "Severity trigger"
 
-#: triggers.php:288
+#: triggers.php:289
 msgid "Trigger status became \"Disabled\"."
 msgstr "Lo stato del trigger è cambiato in \"Disabilitato\"."
 
@@ -12056,7 +12056,7 @@ msgstr "Trigger"
 msgid "Triggers (e/d)[p/u/o]"
 msgstr "Trigger (e/d)[p/u/o]"
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Triggers deleted"
 msgstr "Trigger rimossi"
 

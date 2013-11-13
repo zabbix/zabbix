@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-24 22:01+0300\n"
+"POT-Creation-Date: 2013-11-13 03:36+0200\n"
 "PO-Revision-Date: 2013-10-01 08:35+0300\n"
 "Last-Translator: volter <volker27@gmx.at>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1042,7 +1042,7 @@ msgstr "KONFIGURATION DER AUSLÖSER-SCHWEREGRADE"
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:45
-#: include/views/configuration.triggers.massupdate.php:40 triggers.php:376
+#: include/views/configuration.triggers.massupdate.php:40 triggers.php:378
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "KONFIGURATION VON AUSLÖSERN"
 
@@ -1239,7 +1239,7 @@ msgstr "Kann Vorführung nicht hinzufügen"
 msgid "Cannot add template"
 msgstr "Kann Vorlage nicht hinzufügen"
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Cannot add trigger"
 msgstr "Kann Auslöser nicht hinzufügen"
@@ -1536,7 +1536,7 @@ msgstr "Kann Auslöserprototyp nicht löschen"
 msgid "Cannot delete trigger."
 msgstr "Kann Auslöser nicht löschen."
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Cannot delete triggers"
 msgstr "Kann Auslöser nicht löschen"
 
@@ -2004,7 +2004,7 @@ msgstr "Kann Dienst nicht ändern"
 msgid "Cannot update slide show"
 msgstr "Kann Vorführung nicht ändern"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr "Kann Status nicht ändern"
 
@@ -8584,7 +8584,7 @@ msgstr "Keine Seiten definiert."
 msgid "No steps defined."
 msgstr "Keine Schritte definiert."
 
-#: triggers.php:348
+#: triggers.php:350
 msgid "No target selected"
 msgstr "Kein Ziel ausgewählt"
 
@@ -11402,7 +11402,7 @@ msgstr "Aktuelle Auslöser"
 msgid "Status only"
 msgstr "Status des Elements"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr "Status geändert"
 
@@ -12002,7 +12002,7 @@ msgstr "Auslöser \"%1$s:%2$s\" hat keinen Elementen-Prototyp."
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Auslöser \"%s\" gehört zu Vorlagen mit unterschiedlichen Verknüpfungen."
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Trigger added"
 msgstr "Auslöser hinzugefügt"
@@ -12088,7 +12088,7 @@ msgstr "Auslöser-Schwere"
 msgid "Trigger severity"
 msgstr "Auslöserpriorität"
 
-#: triggers.php:288
+#: triggers.php:289
 msgid "Trigger status became \"Disabled\"."
 msgstr "Status des Auslösers ist \"Deaktiviert\"."
 
@@ -12124,7 +12124,7 @@ msgstr "Auslöser"
 msgid "Triggers (e/d)[p/u/o]"
 msgstr "Auslöser (a/d)[p/u/o]"
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Triggers deleted"
 msgstr "Auslöser wurden gelöscht"
 

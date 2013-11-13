@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-01 06:26+0200\n"
+"POT-Creation-Date: 2013-11-13 03:36+0200\n"
 "PO-Revision-Date: 2013-11-04 07:37+0300\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -1026,7 +1026,7 @@ msgstr "トリガー深刻度の設定"
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:45
-#: include/views/configuration.triggers.massupdate.php:40 triggers.php:376
+#: include/views/configuration.triggers.massupdate.php:40 triggers.php:378
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "トリガーの設定"
 
@@ -1222,7 +1222,7 @@ msgstr "スライドショーを追加できません"
 msgid "Cannot add template"
 msgstr "テンプレートを追加できません"
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Cannot add trigger"
 msgstr "トリガーを追加できません"
@@ -1516,7 +1516,7 @@ msgstr "トリガープロトタイプを削除できません"
 msgid "Cannot delete trigger."
 msgstr "トリガーを削除できません"
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Cannot delete triggers"
 msgstr "トリガーを削除できません"
 
@@ -1982,7 +1982,7 @@ msgstr "サービスを更新できません"
 msgid "Cannot update slide show"
 msgstr "スライドショーを更新できません"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr "ステータスを更新できません"
 
@@ -8528,7 +8528,7 @@ msgstr "スライドが設定されていません。"
 msgid "No steps defined."
 msgstr "ステップが設定されていません。"
 
-#: triggers.php:348
+#: triggers.php:350
 msgid "No target selected"
 msgstr "何も選択されていません"
 
@@ -11323,7 +11323,7 @@ msgstr "トリガーのステータス"
 msgid "Status only"
 msgstr "ステータスのみ"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr "ステータスを更新しました"
 
@@ -11916,7 +11916,7 @@ msgstr "トリガー\"%1$s:%2$s\"にはアイテムのプロトタイプが設�
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "トリガー\"%s\"はリンクされている他のテンプレートに含まれています"
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Trigger added"
 msgstr "トリガーを追加しました"
@@ -12002,7 +12002,7 @@ msgstr "トリガーの深刻度"
 msgid "Trigger severity"
 msgstr "トリガーの深刻度"
 
-#: triggers.php:288
+#: triggers.php:289
 msgid "Trigger status became \"Disabled\"."
 msgstr "トリガーのステータスを\"無効\"に設定しました。"
 
@@ -12038,7 +12038,7 @@ msgstr "トリガー"
 msgid "Triggers (e/d)[p/u/o]"
 msgstr "トリガー数 (有効/無効)[障害/不明/正常]"
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Triggers deleted"
 msgstr "トリガーを削除しました"
 

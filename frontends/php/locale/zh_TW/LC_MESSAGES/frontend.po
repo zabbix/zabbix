@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-24 22:01+0300\n"
+"POT-Creation-Date: 2013-11-13 03:36+0200\n"
 "PO-Revision-Date: 2012-11-06 15:57+0800\n"
 "Last-Translator: Yaochiu Huang <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1028,7 +1028,7 @@ msgstr "觸發器嚴重性的組態"
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:45
-#: include/views/configuration.triggers.massupdate.php:40 triggers.php:376
+#: include/views/configuration.triggers.massupdate.php:40 triggers.php:378
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "觸發器的組態"
 
@@ -1224,7 +1224,7 @@ msgstr "無法新增簡報片展示"
 msgid "Cannot add template"
 msgstr "無法新增模板"
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Cannot add trigger"
 msgstr "無法新增觸發器"
@@ -1518,7 +1518,7 @@ msgstr "無法刪除觸發器原型"
 msgid "Cannot delete trigger."
 msgstr "無法刪除觸發器."
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Cannot delete triggers"
 msgstr "無法删除觸發器"
 
@@ -1984,7 +1984,7 @@ msgstr "無法更新服務"
 msgid "Cannot update slide show"
 msgstr "無法更新簡報片展示"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr "無法更新狀態"
 
@@ -8530,7 +8530,7 @@ msgstr "沒有已定義的簡報片."
 msgid "No steps defined."
 msgstr "沒有已定義的步驟."
 
-#: triggers.php:348
+#: triggers.php:350
 msgid "No target selected"
 msgstr "沒有選擇目標"
 
@@ -11325,7 +11325,7 @@ msgstr "觸發器狀態"
 msgid "Status only"
 msgstr "只有狀態"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr "狀態已更新"
 
@@ -11918,7 +11918,7 @@ msgstr "觸發器\"%1$s:%2$s\"並無項目原型."
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "觸發器\"%s\"屬於有不同連結的模板."
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Trigger added"
 msgstr "觸發器已新增"
@@ -12004,7 +12004,7 @@ msgstr "觸發器嚴重性"
 msgid "Trigger severity"
 msgstr "觸發器示警度"
 
-#: triggers.php:288
+#: triggers.php:289
 msgid "Trigger status became \"Disabled\"."
 msgstr "觸發器狀態成為\"Disabled\"."
 
@@ -12040,7 +12040,7 @@ msgstr "觸發器"
 msgid "Triggers (e/d)[p/u/o]"
 msgstr "觸發器 (e/d)[p/u/o]"
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Triggers deleted"
 msgstr "觸發器已删除"
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-24 22:01+0300\n"
+"POT-Creation-Date: 2013-11-13 03:36+0200\n"
 "PO-Revision-Date: 2013-11-05 22:47+0300\n"
 "Last-Translator: Jonathan <linuxgurugamer@gmail.com>\n"
 "Language-Team: RedPrairie\n"
@@ -1031,7 +1031,7 @@ msgstr "CONFIGURATION OF TRIGGER SEVERITIES"
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:45
-#: include/views/configuration.triggers.massupdate.php:40 triggers.php:376
+#: include/views/configuration.triggers.massupdate.php:40 triggers.php:378
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "CONFIGURATION OF TRIGGERS"
 
@@ -1227,7 +1227,7 @@ msgstr "Cannot add slide show"
 msgid "Cannot add template"
 msgstr "Cannot add template"
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Cannot add trigger"
 msgstr "Cannot add trigger"
@@ -1522,7 +1522,7 @@ msgstr "Cannot delete trigger prototype"
 msgid "Cannot delete trigger."
 msgstr "Cannot delete trigger."
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Cannot delete triggers"
 msgstr "Cannot delete triggers"
 
@@ -1990,7 +1990,7 @@ msgstr "Cannot update service"
 msgid "Cannot update slide show"
 msgstr "Cannot update slide show"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr "Cannot update status"
 
@@ -8541,7 +8541,7 @@ msgstr "No slides defined."
 msgid "No steps defined."
 msgstr "No steps defined."
 
-#: triggers.php:348
+#: triggers.php:350
 msgid "No target selected"
 msgstr "No target selected"
 
@@ -11337,7 +11337,7 @@ msgstr "Status of triggers"
 msgid "Status only"
 msgstr "Status only"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr "Status updated"
 
@@ -11933,7 +11933,7 @@ msgstr "Trigger \"%1$s:%2$s\" does not have item prototype."
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Trigger \"%s\" belongs to templates with different linkages."
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Trigger added"
 msgstr "Trigger added"
@@ -12019,7 +12019,7 @@ msgstr "Trigger severities"
 msgid "Trigger severity"
 msgstr "Trigger severity"
 
-#: triggers.php:288
+#: triggers.php:289
 msgid "Trigger status became \"Disabled\"."
 msgstr "Trigger status became \"Disabled\"."
 
@@ -12055,7 +12055,7 @@ msgstr "Triggers"
 msgid "Triggers (e/d)[p/u/o]"
 msgstr "Triggers (e/d)[p/u/o]"
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Triggers deleted"
 msgstr "Triggers deleted"
 

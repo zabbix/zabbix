@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-01 06:26+0200\n"
+"POT-Creation-Date: 2013-11-13 03:36+0200\n"
 "PO-Revision-Date: 2013-10-11 14:13+0300\n"
 "Last-Translator: open-future <patrik@open-future.be>\n"
 "Language-Team: NL\n"
@@ -1034,7 +1034,7 @@ msgstr "CONFIGURATIE VAN TRIGGER SEVERITIES"
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:45
-#: include/views/configuration.triggers.massupdate.php:40 triggers.php:376
+#: include/views/configuration.triggers.massupdate.php:40 triggers.php:378
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "CONFIGURATIE VAN TRIGGERS"
 
@@ -1230,7 +1230,7 @@ msgstr "Kan diavoorstelling niet toevoegen"
 msgid "Cannot add template"
 msgstr "Kan template niet toevoegen"
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Cannot add trigger"
 msgstr "Kan trigger niet toevoegen"
@@ -1525,7 +1525,7 @@ msgstr "Kan trekker prototype niet verwijderen"
 msgid "Cannot delete trigger."
 msgstr "Kan trigger niet verwijderen."
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Cannot delete triggers"
 msgstr "Kan triggers niet verwijderen"
 
@@ -1993,7 +1993,7 @@ msgstr "Kan service niet bijwerken"
 msgid "Cannot update slide show"
 msgstr "Kan de diavoorstelling niet bijwerken"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr "Kan status niet bijwerken"
 
@@ -8552,7 +8552,7 @@ msgstr ""
 msgid "No steps defined."
 msgstr ""
 
-#: triggers.php:348
+#: triggers.php:350
 msgid "No target selected"
 msgstr ""
 
@@ -11349,7 +11349,7 @@ msgstr "Status van triggers"
 msgid "Status only"
 msgstr "Status alleen"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr "Status bijgewerkt"
 
@@ -11945,7 +11945,7 @@ msgstr ""
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr ""
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Trigger added"
 msgstr "Trigger toegevoegd"
@@ -12031,7 +12031,7 @@ msgstr "Trigger severities"
 msgid "Trigger severity"
 msgstr "Trigger severity"
 
-#: triggers.php:288
+#: triggers.php:289
 msgid "Trigger status became \"Disabled\"."
 msgstr "Trigger status is \"Uitgeschakeld\"."
 
@@ -12067,7 +12067,7 @@ msgstr "Triggers"
 msgid "Triggers (e/d)[p/u/o]"
 msgstr "Triggers (e/d)[p/o/ok]"
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Triggers deleted"
 msgstr "Triggers verwijderd"
 

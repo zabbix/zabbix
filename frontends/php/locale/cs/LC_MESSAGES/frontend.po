@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-01 06:26+0200\n"
+"POT-Creation-Date: 2013-11-13 03:36+0200\n"
 "PO-Revision-Date: 2013-10-23 00:21+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1038,7 +1038,7 @@ msgstr "NASTAVENÍ PRIORIT SPOUŠTĚČŮ"
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:45
-#: include/views/configuration.triggers.massupdate.php:40 triggers.php:376
+#: include/views/configuration.triggers.massupdate.php:40 triggers.php:378
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "NASTAVENÍ SPOUŠTĚČŮ"
 
@@ -1234,7 +1234,7 @@ msgstr "Nelze přidat slide-show"
 msgid "Cannot add template"
 msgstr "Nelze přidat šablonu"
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Cannot add trigger"
 msgstr "Nelze přidat spouštěč"
@@ -1530,7 +1530,7 @@ msgstr ""
 msgid "Cannot delete trigger."
 msgstr ""
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Cannot delete triggers"
 msgstr "Nelze smazat spouštěče"
 
@@ -2000,7 +2000,7 @@ msgstr "Nelze upravit službu"
 msgid "Cannot update slide show"
 msgstr ""
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr "Nelze upravit stav"
 
@@ -8545,7 +8545,7 @@ msgstr ""
 msgid "No steps defined."
 msgstr ""
 
-#: triggers.php:348
+#: triggers.php:350
 msgid "No target selected"
 msgstr "Není vybrán cíl"
 
@@ -11342,7 +11342,7 @@ msgstr "Stav spouštěčů"
 msgid "Status only"
 msgstr "Pouze stav"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr "Stav byl aktualizován"
 
@@ -11941,7 +11941,7 @@ msgstr ""
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr ""
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Trigger added"
 msgstr "Spouštěč byl přidán"
@@ -12027,7 +12027,7 @@ msgstr ""
 msgid "Trigger severity"
 msgstr "Závažnost spouštěče"
 
-#: triggers.php:288
+#: triggers.php:289
 msgid "Trigger status became \"Disabled\"."
 msgstr ""
 
@@ -12063,7 +12063,7 @@ msgstr "Spouštěče"
 msgid "Triggers (e/d)[p/u/o]"
 msgstr "Spouštěče (pov/zak)[A/?/N]"
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Triggers deleted"
 msgstr "Spouštěče byly smazány"
 

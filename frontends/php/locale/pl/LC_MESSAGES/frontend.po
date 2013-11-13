@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-24 22:01+0300\n"
+"POT-Creation-Date: 2013-11-13 03:36+0200\n"
 "PO-Revision-Date: 2013-07-18 08:43+0200\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1037,7 +1037,7 @@ msgstr "KONFIGURACJA POZIOMÓW WYZWALACZY"
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:45
-#: include/views/configuration.triggers.massupdate.php:40 triggers.php:376
+#: include/views/configuration.triggers.massupdate.php:40 triggers.php:378
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "KONFIGURACJA WYZWALACZY"
 
@@ -1233,7 +1233,7 @@ msgstr "Nie można dodać pokazu slajdów"
 msgid "Cannot add template"
 msgstr "Nie można dodać szablonu"
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Cannot add trigger"
 msgstr "Nie można dodać wyzwalacza"
@@ -1530,7 +1530,7 @@ msgstr ""
 msgid "Cannot delete trigger."
 msgstr "Nie można usunąć wyzwalacza."
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Cannot delete triggers"
 msgstr "Nie można usunąć wyzwalaczy"
 
@@ -2000,7 +2000,7 @@ msgstr "Nie można uaktualnić usługi"
 msgid "Cannot update slide show"
 msgstr "Nie można uaktualnić pokazu slajdów"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr "Nie można uaktualnić statusu"
 
@@ -8546,7 +8546,7 @@ msgstr "Nie zdefiniowano żadnych slajdów."
 msgid "No steps defined."
 msgstr "Nie zdefiniowano żadnych kroków."
 
-#: triggers.php:348
+#: triggers.php:350
 msgid "No target selected"
 msgstr "Nie wybrano żadnego celu"
 
@@ -11344,7 +11344,7 @@ msgstr "Stan wyzwalaczy"
 msgid "Status only"
 msgstr "Tylko stan"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr "Uaktualniono stan"
 
@@ -11943,7 +11943,7 @@ msgstr ""
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Wyzwalacz \"%s\" należy do szablonów z różnymi połączeniami."
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Trigger added"
 msgstr "Dodano wyzwalacz"
@@ -12029,7 +12029,7 @@ msgstr "Poziomy wyzwalacza"
 msgid "Trigger severity"
 msgstr "Drastyczność wyzwalacza"
 
-#: triggers.php:288
+#: triggers.php:289
 msgid "Trigger status became \"Disabled\"."
 msgstr ""
 
@@ -12065,7 +12065,7 @@ msgstr "Wyzwalacze"
 msgid "Triggers (e/d)[p/u/o]"
 msgstr "Wyzwalacze (wł./wył.)[pr/nn/ok]"
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Triggers deleted"
 msgstr "Usunięto wyzwalacze"
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-01 06:26+0200\n"
+"POT-Creation-Date: 2013-11-13 03:36+0200\n"
 "PO-Revision-Date: 2013-10-30 18:17+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1038,7 +1038,7 @@ msgstr "NASTAVENIE PRIORÍT SPÚŠŤAČOV"
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:45
-#: include/views/configuration.triggers.massupdate.php:40 triggers.php:376
+#: include/views/configuration.triggers.massupdate.php:40 triggers.php:378
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "NASTAVENIE SPÚŠŤAČOV"
 
@@ -1234,7 +1234,7 @@ msgstr "Nie je možné pridať prezentáciu"
 msgid "Cannot add template"
 msgstr "Nie je možné pridať šablónu"
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Cannot add trigger"
 msgstr "Nie je možné pridať spúšťač"
@@ -1530,7 +1530,7 @@ msgstr "Nie je možné zmazať prototyp spúšťača"
 msgid "Cannot delete trigger."
 msgstr "Nie je možné zmazať spúšťač."
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Cannot delete triggers"
 msgstr "Nie je možné zmazať spúšťače"
 
@@ -2001,7 +2001,7 @@ msgstr "Nie je možné upraviť službu"
 msgid "Cannot update slide show"
 msgstr "Nie je možné upraviť prezentáciu"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr "Nie je možné upraviť stav"
 
@@ -8558,7 +8558,7 @@ msgstr "Žiadne definované slajdy."
 msgid "No steps defined."
 msgstr "Žiadne definované kroky."
 
-#: triggers.php:348
+#: triggers.php:350
 msgid "No target selected"
 msgstr "Nie je vybraný cieľ"
 
@@ -11355,7 +11355,7 @@ msgstr "Stavy spúšťačov"
 msgid "Status only"
 msgstr "Len stav"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr "Stav aktualizovaný"
 
@@ -11954,7 +11954,7 @@ msgstr "Spúšťač \"%1$s:%2$s\" nemá prototyp položky."
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Spúšťač \"%s\" patrí k šablónam s rôznymi spojeniami."
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Trigger added"
 msgstr "Spúšťač pridaný"
@@ -12040,7 +12040,7 @@ msgstr "Závažnosti spúšťačov"
 msgid "Trigger severity"
 msgstr "Závažnosť spúšťača"
 
-#: triggers.php:288
+#: triggers.php:289
 msgid "Trigger status became \"Disabled\"."
 msgstr "Stav spúšťača sa stal \"Zakázaný\"."
 
@@ -12076,7 +12076,7 @@ msgstr "Spúšťače"
 msgid "Triggers (e/d)[p/u/o]"
 msgstr "Spúšťače (e/d)[p/u/o]"
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Triggers deleted"
 msgstr "Spúšťače zmazané"
 

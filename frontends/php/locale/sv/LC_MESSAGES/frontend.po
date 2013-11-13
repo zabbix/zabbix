@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-24 22:01+0300\n"
+"POT-Creation-Date: 2013-11-13 03:36+0200\n"
 "PO-Revision-Date: 2013-01-27 08:54+0200\n"
 "Last-Translator: Niklas <niklas@gyori.se>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1031,7 +1031,7 @@ msgstr ""
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:45
-#: include/views/configuration.triggers.massupdate.php:40 triggers.php:376
+#: include/views/configuration.triggers.massupdate.php:40 triggers.php:378
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "KONFIGURATION AV UTLÖSARE"
 
@@ -1227,7 +1227,7 @@ msgstr ""
 msgid "Cannot add template"
 msgstr ""
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Cannot add trigger"
 msgstr "Kan inte lägga till utlösare"
@@ -1522,7 +1522,7 @@ msgstr ""
 msgid "Cannot delete trigger."
 msgstr ""
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Cannot delete triggers"
 msgstr "Kan inte ta bort utlösare"
 
@@ -1990,7 +1990,7 @@ msgstr "Kan inte uppdatera tjänst"
 msgid "Cannot update slide show"
 msgstr ""
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr "Kan inte uppdatera status"
 
@@ -8530,7 +8530,7 @@ msgstr ""
 msgid "No steps defined."
 msgstr ""
 
-#: triggers.php:348
+#: triggers.php:350
 msgid "No target selected"
 msgstr ""
 
@@ -11326,7 +11326,7 @@ msgstr "Status för utlösare"
 msgid "Status only"
 msgstr "Endast status"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr "Status uppdaterad"
 
@@ -11922,7 +11922,7 @@ msgstr ""
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr ""
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Trigger added"
 msgstr "Utlösare lades till"
@@ -12008,7 +12008,7 @@ msgstr ""
 msgid "Trigger severity"
 msgstr "Allvarlighetsgrad för utlösare"
 
-#: triggers.php:288
+#: triggers.php:289
 msgid "Trigger status became \"Disabled\"."
 msgstr ""
 
@@ -12044,7 +12044,7 @@ msgstr "Utlösare"
 msgid "Triggers (e/d)[p/u/o]"
 msgstr "Utlösare (a/i)[p/o/ok]"
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Triggers deleted"
 msgstr "Utlösare togs bort"
 
