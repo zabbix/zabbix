@@ -204,9 +204,10 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 {
 	const char		*__function_name = "activate_host";
+
 	int			*errors_from, *disable_until;
 	unsigned char		*available;
-	const char		*fld_errors_from, *fld_available, *fld_disable_until, *fld_error;
+	const char		*fld_prefix;
 	zbx_host_availability_t	availability, availability_old;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
@@ -219,10 +220,7 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 			available = &item->host.available;
 			disable_until = &item->host.disable_until;
 
-			fld_errors_from = "errors_from";
-			fld_available = "available";
-			fld_disable_until = "disable_until";
-			fld_error = "error";
+			fld_prefix = "";
 			break;
 		case ITEM_TYPE_SNMPv1:
 		case ITEM_TYPE_SNMPv2c:
@@ -231,30 +229,21 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 			available = &item->host.snmp_available;
 			disable_until = &item->host.snmp_disable_until;
 
-			fld_errors_from = "snmp_errors_from";
-			fld_available = "snmp_available";
-			fld_disable_until = "snmp_disable_until";
-			fld_error = "snmp_error";
+			fld_prefix = "snmp_";
 			break;
 		case ITEM_TYPE_IPMI:
 			errors_from = &item->host.ipmi_errors_from;
 			available = &item->host.ipmi_available;
 			disable_until = &item->host.ipmi_disable_until;
 
-			fld_errors_from = "ipmi_errors_from";
-			fld_available = "ipmi_available";
-			fld_disable_until = "ipmi_disable_until";
-			fld_error = "ipmi_error";
+			fld_prefix = "ipmi_";
 			break;
 		case ITEM_TYPE_JMX:
 			errors_from = &item->host.jmx_errors_from;
 			available = &item->host.jmx_available;
 			disable_until = &item->host.jmx_disable_until;
 
-			fld_errors_from = "jmx_errors_from";
-			fld_available = "jmx_available";
-			fld_disable_until = "jmx_disable_until";
-			fld_error = "jmx_error";
+			fld_prefix = "jmx_";
 			break;
 		default:
 			return;
@@ -264,64 +253,61 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 		return;
 
 	*errors_from = 0;
-	*disable_until = 0;
 	*available = HOST_AVAILABLE_TRUE;
+	*disable_until = 0;
 
 	availability.hostid = item->host.hostid;
 	availability.type = item->type;
-	availability.available = *available;
 	availability.errors_from =  *errors_from;
+	availability.available = *available;
 	availability.disable_until = *disable_until;
 
 	if (1 == DCconfig_update_host_availability(&availability, 1, &availability_old))
 	{
-		char	*sql = NULL, *errmsg = NULL;
-		size_t	sql_alloc = 0, sql_offset = 0, errmsg_alloc = 0, errmsg_offset = 0;
+		char	*sql = NULL;
+		size_t	sql_alloc = 0, sql_offset = 0;
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set ");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set ");
 
 		if (HOST_AVAILABLE_TRUE == availability_old.available)
 		{
 			if (0 != availability_old.errors_from)
 			{
-				zbx_snprintf_alloc(&errmsg, &errmsg_alloc, &errmsg_offset,
-						"resuming %s checks on host [%s]: connection restored",
+				zabbix_log(LOG_LEVEL_WARNING, "resuming %s checks on host \"%s\": connection restored",
 						zbx_host_type_string(item->type), item->host.host);
 			}
 		}
 		else
 		{
-			zbx_snprintf_alloc(&errmsg, &errmsg_alloc, &errmsg_offset,
-					"enabling %s checks on host [%s]: host became available",
+			zabbix_log(LOG_LEVEL_WARNING, "enabling %s checks on host \"%s\": host became available",
 					zbx_host_type_string(item->type), item->host.host);
 
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s=%d,", fld_available, HOST_AVAILABLE_TRUE);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%savailable=%d,",
+					fld_prefix, HOST_AVAILABLE_TRUE);
 		}
 
-		if (NULL != errmsg)
-			zabbix_log(LOG_LEVEL_WARNING, "%s", errmsg);
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s=%d,%s=%d,%s='' where hostid=" ZBX_FS_UI64,
-				fld_errors_from, *errors_from, fld_disable_until, *disable_until, fld_error,
-				item->host.hostid);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"%serrors_from=%d,%sdisable_until=%d,%serror='' where hostid=" ZBX_FS_UI64,
+				fld_prefix, *errors_from, fld_prefix, *disable_until, fld_prefix, item->host.hostid);
 
 		DBbegin();
 		DBexecute("%s", sql);
 		DBcommit();
 
-		zbx_free(errmsg);
 		zbx_free(sql);
 	}
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error)
 {
 	const char		*__function_name = "deactivate_host";
+
 	char			*error_esc;
 	int			*errors_from, *disable_until;
 	unsigned char		*available;
-	const char		*fld_errors_from, *fld_available, *fld_disable_until, *fld_error;
+	const char		*fld_prefix;
 	zbx_host_availability_t	availability, availability_old;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
@@ -334,10 +320,7 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 			available = &item->host.available;
 			disable_until = &item->host.disable_until;
 
-			fld_errors_from = "errors_from";
-			fld_available = "available";
-			fld_disable_until = "disable_until";
-			fld_error = "error";
+			fld_prefix = "";
 			break;
 		case ITEM_TYPE_SNMPv1:
 		case ITEM_TYPE_SNMPv2c:
@@ -346,30 +329,21 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 			available = &item->host.snmp_available;
 			disable_until = &item->host.snmp_disable_until;
 
-			fld_errors_from = "snmp_errors_from";
-			fld_available = "snmp_available";
-			fld_disable_until = "snmp_disable_until";
-			fld_error = "snmp_error";
+			fld_prefix = "snmp_";
 			break;
 		case ITEM_TYPE_IPMI:
 			errors_from = &item->host.ipmi_errors_from;
 			available = &item->host.ipmi_available;
 			disable_until = &item->host.ipmi_disable_until;
 
-			fld_errors_from = "ipmi_errors_from";
-			fld_available = "ipmi_available";
-			fld_disable_until = "ipmi_disable_until";
-			fld_error = "ipmi_error";
+			fld_prefix = "ipmi_";
 			break;
 		case ITEM_TYPE_JMX:
 			errors_from = &item->host.jmx_errors_from;
 			available = &item->host.jmx_available;
 			disable_until = &item->host.jmx_disable_until;
 
-			fld_errors_from = "jmx_errors_from";
-			fld_available = "jmx_available";
-			fld_disable_until = "jmx_disable_until";
-			fld_error = "jmx_error";
+			fld_prefix = "jmx_";
 			break;
 		default:
 			return;
@@ -395,73 +369,68 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 
 	availability.hostid = item->host.hostid;
 	availability.type = item->type;
-	availability.available = *available;
 	availability.errors_from =  *errors_from;
+	availability.available = *available;
 	availability.disable_until = *disable_until;
 
 	if (1 == DCconfig_update_host_availability(&availability, 1, &availability_old))
 	{
-		char	*sql = NULL, *errmsg = NULL;
-		size_t	sql_alloc = 0, sql_offset = 0, errmsg_alloc = 0, errmsg_offset = 0;
+		char	*sql = NULL;
+		size_t	sql_alloc = 0, sql_offset = 0;
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set ");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set ");
 
 		if (0 == availability_old.errors_from)
 		{
-			zbx_snprintf_alloc(&errmsg, &errmsg_alloc, &errmsg_offset, "%s item [%s] on host [%s] failed:"
+			zabbix_log(LOG_LEVEL_WARNING, "%s item \"%s\" on host \"%s\" failed:"
 					" first network error, wait for %d seconds",
 					zbx_host_type_string(item->type), item->key_orig, item->host.host,
 					CONFIG_UNREACHABLE_DELAY);
 
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s=%d,", fld_errors_from, *errors_from);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%serrors_from=%d,",
+					fld_prefix, *errors_from);
 		}
 		else
 		{
 			if (ts->sec - *errors_from <= CONFIG_UNREACHABLE_PERIOD)
 			{
-				zbx_snprintf_alloc(&errmsg, &errmsg_alloc, &errmsg_offset,
-						"%s item [%s] on host [%s] failed: another network error, wait for"
-						" %d seconds",
+				zabbix_log(LOG_LEVEL_WARNING, "%s item \"%s\" on host \"%s\" failed:"
+						" another network error, wait for %d seconds",
 						zbx_host_type_string(item->type), item->key_orig, item->host.host,
 						CONFIG_UNREACHABLE_DELAY);
 			}
 			else
 			{
-
 				if (HOST_AVAILABLE_FALSE != availability_old.available)
 				{
-					zbx_snprintf_alloc(&errmsg, &errmsg_alloc, &errmsg_offset,
-							"temporarily disabling %s checks on host [%s]:"
+					zabbix_log(LOG_LEVEL_WARNING, "temporarily disabling %s checks on host \"%s\":"
 							" host unavailable",
 							zbx_host_type_string(item->type), item->host.host);
 
-					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s=%d,",
-							fld_available, *available);
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%savailable=%d,",
+							fld_prefix, *available);
 
 					update_triggers_status_to_unknown(item->host.hostid, item->type, ts,
 							"Agent is unavailable.");
 				}
 
 				error_esc = DBdyn_escape_string_len(error, HOST_ERROR_LEN);
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s='%s',", fld_error, error_esc);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%serror='%s',",
+						fld_prefix, error_esc);
 				zbx_free(error_esc);
 			}
 		}
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s=%d where hostid=" ZBX_FS_UI64,
-				fld_disable_until, *disable_until, item->host.hostid);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sdisable_until=%d where hostid=" ZBX_FS_UI64,
+				fld_prefix, *disable_until, item->host.hostid);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() errors_from:%d available:%d", __function_name, *errors_from,
 				*available);
-
-		if (NULL != errmsg)
-			zabbix_log(LOG_LEVEL_WARNING, "%s", errmsg);
 
 		DBbegin();
 		DBexecute("%s", sql);
 		DBcommit();
 
-		zbx_free(errmsg);
 		zbx_free(sql);
 	}
 

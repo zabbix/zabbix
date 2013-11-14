@@ -4426,7 +4426,7 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 int	DCconfig_update_host_availability(const zbx_host_availability_t *availability, int availability_num,
 		zbx_host_availability_t *availability_old)
 {
-	int		update_count = 0, i, now;
+	int		update_count = 0, i;
 	ZBX_DC_HOST	*dc_host;
 
 	LOCK_CACHE;
@@ -4444,8 +4444,8 @@ int	DCconfig_update_host_availability(const zbx_host_availability_t *availabilit
 			case ITEM_TYPE_ZABBIX:
 				if (NULL != availability_old)
 				{
-					availability_old[i].available = dc_host->available;
 					availability_old[i].errors_from = dc_host->errors_from;
+					availability_old[i].available = dc_host->available;
 					availability_old[i].disable_until = dc_host->disable_until;
 				}
 
@@ -4460,8 +4460,8 @@ int	DCconfig_update_host_availability(const zbx_host_availability_t *availabilit
 			case ITEM_TYPE_SNMPv3:
 				if (NULL != availability_old)
 				{
-					availability_old[i].available = dc_host->snmp_available;
 					availability_old[i].errors_from = dc_host->snmp_errors_from;
+					availability_old[i].available = dc_host->snmp_available;
 					availability_old[i].disable_until = dc_host->snmp_disable_until;
 				}
 
@@ -4474,8 +4474,8 @@ int	DCconfig_update_host_availability(const zbx_host_availability_t *availabilit
 			case ITEM_TYPE_IPMI:
 				if (NULL != availability_old)
 				{
-					availability_old[i].available = dc_host->ipmi_available;
 					availability_old[i].errors_from = dc_host->ipmi_errors_from;
+					availability_old[i].available = dc_host->ipmi_available;
 					availability_old[i].disable_until = dc_host->ipmi_disable_until;
 				}
 
@@ -4488,8 +4488,8 @@ int	DCconfig_update_host_availability(const zbx_host_availability_t *availabilit
 			case ITEM_TYPE_JMX:
 				if (NULL != availability_old)
 				{
-					availability_old[i].available = dc_host->jmx_available;
 					availability_old[i].errors_from = dc_host->jmx_errors_from;
+					availability_old[i].available = dc_host->jmx_available;
 					availability_old[i].disable_until = dc_host->jmx_disable_until;
 				}
 
