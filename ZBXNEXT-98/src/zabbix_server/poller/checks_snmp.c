@@ -1284,14 +1284,7 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 
 					zabbix_log(LOG_LEVEL_DEBUG, "%s() idx:'%s'", __function_name, idx);
 
-					if (NULL == (pl = strchr(item->snmp_oid, '[')))
-					{
-						SET_MSG_RESULT(value, zbx_dsprintf(NULL, "Cannot find left bracket"
-									" in the OID [%s]",
-									item->snmp_oid));
-						ret = NOTSUPPORTED;
-						break;
-					}
+					pl = strchr(item->snmp_oid, '[');
 
 					*pl = '\0';
 					snmp_normalize(oid_normalized, item->snmp_oid, sizeof(oid_normalized));
