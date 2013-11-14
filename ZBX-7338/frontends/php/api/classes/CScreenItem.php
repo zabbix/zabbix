@@ -96,17 +96,17 @@ class CScreenItem extends CZBXAPI {
 		$result = array();
 		while ($row = DBfetch($res)) {
 			// count query, return a single result
-			if ($options['countOutput'] === null) {
-				if ($options['preservekeys'] === null) {
-					$result[] = $row;
-				}
-				else {
-					$result[$row['screenitemid']] = $row;
-				}
+			if ($options['countOutput'] !== null) {
+				$result = $row['rowscount'];
 			}
 			// normal select query
 			else {
-				$result = $row['rowscount'];
+				if ($options['preservekeys'] !== null) {
+					$result[$row['screenitemid']] = $row;
+				}
+				else {
+					$result[] = $row;
+				}
 			}
 		}
 
