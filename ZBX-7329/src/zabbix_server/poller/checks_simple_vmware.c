@@ -229,7 +229,7 @@ int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, AGENT_RESULT
 
 		{
 			int		tz_offset;
-#ifdef __BSD_VISIBLE
+#if defined(HAVE_TM_TM_GMTOFF)
 			struct tm	*ptm;
 			time_t		now;
 
