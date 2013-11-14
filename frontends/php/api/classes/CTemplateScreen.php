@@ -96,6 +96,7 @@ class CTemplateScreen extends CScreen {
 				unset($options['hostids']);
 
 				$options['templateids'] = API::Template()->get(array(
+					'output' => array('templateid'),
 					'templateids' => $options['templateids'],
 					'editable' => $options['editable'],
 					'preservekeys' => true
@@ -104,6 +105,7 @@ class CTemplateScreen extends CScreen {
 			}
 			elseif (!is_null($options['hostids'])) {
 				$options['templateids'] = API::Host()->get(array(
+					'output' => array('hostid'),
 					'hostids' => $options['hostids'],
 					'editable' => $options['editable'],
 					'preservekeys' => true

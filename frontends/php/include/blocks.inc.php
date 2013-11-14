@@ -261,6 +261,7 @@ function make_system_status($filter) {
 	}
 	if ($eventIds) {
 		$eventAcknowledges = API::Event()->get(array(
+			'output' => array('eventid'),
 			'eventids' => $eventIds,
 			'select_acknowledges' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
@@ -842,6 +843,7 @@ function make_latest_issues(array $filter = array()) {
 	}
 	if ($eventIds) {
 		$eventAcknowledges = API::Event()->get(array(
+			'output' => array('eventid'),
 			'eventids' => $eventIds,
 			'select_acknowledges' => API_OUTPUT_EXTEND,
 			'preservekeys' => true

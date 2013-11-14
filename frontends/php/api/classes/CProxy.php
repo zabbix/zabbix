@@ -242,6 +242,7 @@ class CProxy extends CZBXAPI {
 				}
 
 				$proxiesExists = $this->get(array(
+					'output' => array('proxyid'),
 					'filter' => array('host' => $proxy['host'])
 				));
 				foreach ($proxiesExists as $proxyExists) {

@@ -200,6 +200,7 @@ class CScreen extends CZBXAPI {
 
 			// group
 			$allowedGroups = API::HostGroup()->get(array(
+				'output' => array('groupid'),
 				'nodeids' => $options['nodeids'],
 				'groupids' => $groupsToCheck,
 				'editable' => $options['editable']
@@ -208,6 +209,7 @@ class CScreen extends CZBXAPI {
 
 			// host
 			$allowedHosts = API::Host()->get(array(
+				'output' => array('hostid'),
 				'nodeids' => $options['nodeids'],
 				'hostids' => $hostsToCheck,
 				'editable' => $options['editable']
@@ -216,6 +218,7 @@ class CScreen extends CZBXAPI {
 
 			// graph
 			$allowedGraphs = API::Graph()->get(array(
+				'output' => array('graphid'),
 				'nodeids' => $options['nodeids'],
 				'graphids' => $graphsToCheck,
 				'editable' => $options['editable']
@@ -224,6 +227,7 @@ class CScreen extends CZBXAPI {
 
 			// item
 			$allowedItems = API::Item()->get(array(
+				'output' => array('itemid'),
 				'nodeids' => $options['nodeids'],
 				'itemids' => $itemsToCheck,
 				'webitems' => 1,
@@ -233,6 +237,7 @@ class CScreen extends CZBXAPI {
 
 			// map
 			$allowedMaps = API::Map()->get(array(
+				'output' => array('sysmapid'),
 				'nodeids' => $options['nodeids'],
 				'sysmapids' => $mapsToCheck,
 				'editable' => $options['editable']
@@ -241,6 +246,7 @@ class CScreen extends CZBXAPI {
 
 			// screen
 			$allowedScreens = API::Screen()->get(array(
+				'output' => array('screenid'),
 				'nodeids' => $options['nodeids'],
 				'screenids' => $screensToCheck,
 				'editable' => $options['editable']
@@ -509,6 +515,7 @@ class CScreen extends CZBXAPI {
 		$screenIds = zbx_toArray($screenIds);
 
 		$delScreens = $this->get(array(
+			'output' => array('screenid'),
 			'screenids' => $screenIds,
 			'editable' => true,
 			'preservekeys' => true
@@ -540,6 +547,7 @@ class CScreen extends CZBXAPI {
 	 */
 	protected function replaceItems($screenid, $screenItems) {
 		$dbScreenItems = API::ScreenItem()->get(array(
+			'output' => array('screenitemid'),
 			'screenids' => $screenid,
 			'preservekeys' => true
 		));

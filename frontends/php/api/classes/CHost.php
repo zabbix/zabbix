@@ -1459,6 +1459,7 @@ class CHost extends CHostGeneral {
 
 		// delete the discovery rules first
 		$delRules = API::DiscoveryRule()->get(array(
+			'output' => array('itemid'),
 			'hostids' => $hostIds,
 			'nopermissions' => true,
 			'preservekeys' => true

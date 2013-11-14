@@ -2264,6 +2264,7 @@ function get_item_function_info($expr) {
 			}
 
 			$hostFound = API::Host()->get(array(
+				'output' => array('hostid'),
 				'filter' => array('host' => array($exprPart['host'])),
 				'templated_hosts' => true
 			));

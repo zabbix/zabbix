@@ -485,6 +485,7 @@ class CMaintenance extends CZBXAPI {
 
 			// Checking whether a maintenance with this name already exists. First, getting all maintenances with the same name as this
 			$receivedMaintenances = API::Maintenance()->get(array(
+				'output' => array('maintenanceid'),
 				'filter' => array('name' => $maintenance['name'])
 			));
 

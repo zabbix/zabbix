@@ -320,6 +320,7 @@ class CScreenItem extends CZBXAPI {
 
 		// check permissions
 		$dbScreenItems = $this->get(array(
+			'output' => array('screenitemid'),
 			'screenitemids' => $screenItemids,
 			'preservekeys' => true
 		));
