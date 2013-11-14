@@ -6,6 +6,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, French, Italian, Russian and
 ....I..PS. [ZBXNEXT-1257] dropped support for UCD-SNMP (asaveljevs)
 
 Bug fixes:
+........S. [ZBX-7309] fixed resolving of {ITEM.VALUE} macro in recovery messages (Andris, Sasha)
 ..F....... [ZBX-7254] fixed selected tab not being reset when opening the host mass update form (Pavels)
 A.F....... [ZBX-7316] fixed drule.delete method (Ivo)
 A.F....... [ZBX-7293] fixed typo in the plural form of a translatable string (Richlv)
