@@ -1,5 +1,5 @@
 /*
-** Zabbix
+f** Zabbix
 ** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -1634,11 +1634,7 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 out:
 	datastore = zbx_malloc(NULL, sizeof(zbx_vmware_datastore_t));
 	datastore->name = (NULL != name) ? name : zbx_strdup(NULL, id);
-
-	if (NULL != uuid)
-	{
-		datastore->uuid = uuid;
-	}
+	datastore->uuid = uuid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name,
 			zbx_result_string(NULL != datastore ? SUCCEED : FAIL));
