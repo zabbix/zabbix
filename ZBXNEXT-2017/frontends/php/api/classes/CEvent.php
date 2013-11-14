@@ -139,6 +139,7 @@ class CEvent extends CZBXAPI {
 				// specific triggers
 				if ($options['objectids'] !== null) {
 					$triggers = API::Trigger()->get(array(
+						'output' => array('triggerid'),
 						'triggerids' => $options['objectids'],
 						'editable' => $options['editable']
 					));
@@ -168,6 +169,7 @@ class CEvent extends CZBXAPI {
 				if ($options['objectids'] !== null) {
 					if ($options['object'] == EVENT_OBJECT_ITEM) {
 						$items = API::Item()->get(array(
+							'output' => array('itemid'),
 							'itemids' => $options['objectids'],
 							'editable' => $options['editable']
 						));
@@ -175,6 +177,7 @@ class CEvent extends CZBXAPI {
 					}
 					elseif ($options['object'] == EVENT_OBJECT_LLDRULE) {
 						$items = API::DiscoveryRule()->get(array(
+							'output' => array('itemid'),
 							'itemids' => $options['objectids'],
 							'editable' => $options['editable']
 						));

@@ -108,6 +108,7 @@ if (isset($_REQUEST['favobj'])) {
 				$slideshow = get_slideshow_by_slideshowid($elementid);
 				$screen = get_slideshow($elementid, get_request('upd_counter'));
 				$screens = API::Screen()->get(array(
+					'output' => array('screenid'),
 					'screenids' => $screen['screenid']
 				));
 

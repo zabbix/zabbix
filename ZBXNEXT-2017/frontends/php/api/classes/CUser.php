@@ -380,6 +380,7 @@ class CUser extends CZBXAPI {
 			if (isset($user['alias'])) {
 				$nodeids = $update ? id2nodeid($user['userid']) : get_current_nodeid(false);
 				$userExist = $this->get(array(
+					'output' => array('userid'),
 					'nodeids' => $nodeids,
 					'filter' => array('alias' => $user['alias']),
 					'nopermissions' => true

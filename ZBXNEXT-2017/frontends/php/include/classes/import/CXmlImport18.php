@@ -447,7 +447,10 @@ class CXmlImport18 {
 			$exists = API::Screen()->exists(array('name' => $screen['name']));
 
 			if ($exists && !empty($rules['screens']['updateExisting'])) {
-				$db_screens = API::Screen()->get(array('filter' => array('name' => $screen['name'])));
+				$db_screens = API::Screen()->get(array(
+					'output' => array('screenid'),
+					'filter' => array('name' => $screen['name'])
+				));
 				if (empty($db_screens)) {
 					throw new Exception(_s('No permissions for screen "%1$s".', $screen['name']));
 				}
@@ -1087,7 +1090,10 @@ class CXmlImport18 {
 
 // HOSTS
 				if (isset($host_db['proxy_hostid'])) {
-					$proxy_exists = API::Proxy()->get(array('proxyids' => $host_db['proxy_hostid']));
+					$proxy_exists = API::Proxy()->get(array(
+						'output' => array('proxyid'),
+						'proxyids' => $host_db['proxy_hostid']
+					));
 					if (empty($proxy_exists)) {
 						$host_db['proxy_hostid'] = 0;
 					}

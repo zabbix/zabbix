@@ -99,6 +99,7 @@ class CHistory extends CZBXAPI {
 		}
 		else {
 			$itemOptions = array(
+				'output' => array('itemid'),
 				'editable' => $options['editable'],
 				'preservekeys' => true,
 				'webitems' => true

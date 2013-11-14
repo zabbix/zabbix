@@ -122,6 +122,7 @@ abstract class CHostGeneral extends CHostBase {
 
 		if (isset($data['macros'])) {
 			$hostMacros = API::UserMacro()->get(array(
+				'output' => array('hostmacroid'),
 				'hostids' => $allHostIds,
 				'filter' => array(
 					'macro' => $data['macros']

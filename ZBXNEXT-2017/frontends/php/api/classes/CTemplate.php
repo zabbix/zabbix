@@ -469,12 +469,12 @@ class CTemplate extends CHostGeneral {
 
 
 		// PERMISSIONS {{{
-		$options = array(
+		$updGroups = API::HostGroup()->get(array(
+			'output' => array('groupid'),
 			'groupids' => $groupids,
 			'editable' => 1,
 			'preservekeys' => 1
-		);
-		$updGroups = API::HostGroup()->get($options);
+		));
 		foreach ($groupids as $gnum => $groupid) {
 			if (!isset($updGroups[$groupid])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
@@ -636,6 +636,7 @@ class CTemplate extends CHostGeneral {
 
 		// delete the discovery rules first
 		$delRules = API::DiscoveryRule()->get(array(
+			'output' => array('itemid'),
 			'hostids' => $templateids,
 			'nopermissions' => true,
 			'preservekeys' => true
@@ -917,7 +918,10 @@ class CTemplate extends CHostGeneral {
 		// UPDATE HOSTGROUPS LINKAGE {{{
 		if (isset($data['groups']) && !is_null($data['groups'])) {
 			$data['groups'] = zbx_toArray($data['groups']);
-			$templateGroups = API::HostGroup()->get(array('hostids' => $templateids));
+			$templateGroups = API::HostGroup()->get(array(
+				'output' => array('groupid'),
+				'hostids' => $templateids
+			));
 			$templateGroupids = zbx_objectValues($templateGroups, 'groupid');
 			$newGroupids = zbx_objectValues($data['groups'], 'groupid');
 
@@ -983,7 +987,10 @@ class CTemplate extends CHostGeneral {
 		}
 
 		if (isset($data['templates_link']) && !is_null($data['templates_link'])) {
-			$templateTemplates = API::Template()->get(array('hostids' => $templateids));
+			$templateTemplates = API::Template()->get(array(
+				'output' => array('templateid'),
+				'hostids' => $templateids
+			));
 			$templateTemplateids = zbx_objectValues($templateTemplates, 'templateid');
 			$newTemplateids = zbx_objectValues($data['templates_link'], 'templateid');
 

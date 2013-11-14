@@ -826,6 +826,7 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 
 	// hosts
 	$data['hosts'] = API::Host()->get(array(
+		'output' => array('hostid'),
 		'itemids' => $data['itemids'],
 		'selectInterfaces' => API_OUTPUT_EXTEND
 	));

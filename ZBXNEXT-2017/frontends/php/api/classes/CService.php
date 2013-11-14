@@ -1480,6 +1480,7 @@ class CService extends CZBXAPI {
 			// if services with specific trigger IDs were requested, return only the ones accessible to the current user.
 			if ($options['filter']['triggerid']) {
 				$accessibleTriggers = API::Trigger()->get(array(
+					'output' => array('triggerid'),
 					'triggerids' => $options['filter']['triggerid']
 				));
 				$options['filter']['triggerid'] = zbx_objectValues($accessibleTriggers, 'triggerid');

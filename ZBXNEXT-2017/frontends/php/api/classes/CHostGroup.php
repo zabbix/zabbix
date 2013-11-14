@@ -769,6 +769,7 @@ class CHostGroup extends CZBXAPI {
 		$groupids = zbx_objectValues($groups, 'groupid');
 
 		$updGroups = $this->get(array(
+			'output' => array('groupid'),
 			'groupids' => $groupids,
 			'editable' => true,
 			'preservekeys' => true
@@ -884,6 +885,7 @@ class CHostGroup extends CZBXAPI {
 
 		// validate permission
 		$allowedGroups = $this->get(array(
+			'output' => array('groupid'),
 			'groupids' => $groupIds,
 			'editable' => true,
 			'preservekeys' => true
@@ -915,6 +917,7 @@ class CHostGroup extends CZBXAPI {
 		// validate allowed templates
 		if (!empty($templateIds)) {
 			$allowedTemplates = API::Template()->get(array(
+				'output' => array('templateid'),
 				'templateids' => $templateIds,
 				'editable' => true,
 				'preservekeys' => true
