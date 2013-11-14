@@ -48,7 +48,7 @@ static char	*zbx_get_snmp_type_error(u_char type)
 			return zbx_strdup(NULL, "No more variables left in this MIB View"
 					" (it is past the end of the MIB tree)");
 		default:
-			return zbx_dsprintf(NULL, "Value has unknown type 0x%02X", type);
+			return zbx_dsprintf(NULL, "Value has unknown type 0x%02X", (unsigned int)type);
 	}
 }
 
@@ -651,7 +651,7 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char *OI
 								ASN_TIMETICKS == vars->type || ASN_GAUGE == vars->type)
 #endif
 						{
-							zbx_snprintf(strval, sizeof(strval), "%u", *vars->val.integer);
+							zbx_snprintf(strval, sizeof(strval), "%lu", *vars->val.integer);
 						}
 						else if (ASN_COUNTER64 == vars->type)
 						{
@@ -665,15 +665,15 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char *OI
 						else if (ASN_INTEGER == vars->type)
 #endif
 						{
-							zbx_snprintf(strval, sizeof(strval), "%d", *vars->val.integer);
+							zbx_snprintf(strval, sizeof(strval), "%ld", *vars->val.integer);
 						}
 						else if (ASN_IPADDRESS == vars->type)
 						{
-							zbx_snprintf(strval, sizeof(strval), "%d.%d.%d.%d",
-									vars->val.string[0],
-									vars->val.string[1],
-									vars->val.string[2],
-									vars->val.string[3]);
+							zbx_snprintf(strval, sizeof(strval), "%u.%u.%u.%u",
+									(unsigned int)vars->val.string[0],
+									(unsigned int)vars->val.string[1],
+									(unsigned int)vars->val.string[2],
+									(unsigned int)vars->val.string[3]);
 						}
 						else
 						{
@@ -831,11 +831,11 @@ static int	snmp_set_value(struct variable_list *vars, DC_ITEM *item, AGENT_RESUL
 #endif
 	else if (ASN_IPADDRESS == vars->type)
 	{
-		SET_STR_RESULT(value, zbx_dsprintf(NULL, "%d.%d.%d.%d",
-				vars->val.string[0],
-				vars->val.string[1],
-				vars->val.string[2],
-				vars->val.string[3]));
+		SET_STR_RESULT(value, zbx_dsprintf(NULL, "%u.%u.%u.%u",
+					(unsigned int)vars->val.string[0],
+					(unsigned int)vars->val.string[1],
+					(unsigned int)vars->val.string[2],
+					(unsigned int)vars->val.string[3]));
 	}
 	else
 	{
