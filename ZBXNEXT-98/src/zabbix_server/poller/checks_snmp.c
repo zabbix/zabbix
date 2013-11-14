@@ -96,7 +96,7 @@ static int	zbx_snmp_index_compare(const zbx_snmp_index_t *s1, const zbx_snmp_ind
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static int	get_snmpidx_nearestindex(zbx_snmp_index_t *s)
+static int	get_snmpidx_nearestindex(const zbx_snmp_index_t *s)
 {
 	const char	*__function_name = "get_snmpidx_nearestindex";
 	int		first_index, last_index, index = 0, cmp_res;
@@ -241,9 +241,9 @@ end:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static struct snmp_session	*snmp_open_session(DC_ITEM *item, char *err)
+static struct snmp_session	*zbx_snmp_open_session(DC_ITEM *item, char *err)
 {
-	const char		*__function_name = "snmp_open_session";
+	const char		*__function_name = "zbx_snmp_open_session";
 	struct snmp_session	session, *ss = NULL;
 	char			addr[128];
 #ifdef HAVE_IPV6
@@ -453,9 +453,9 @@ end:
 	return ss;
 }
 
-static void	snmp_close_session(struct snmp_session *session)
+static void	zbx_snmp_close_session(struct snmp_session *session)
 {
-	const char	*__function_name = "snmp_close_session";
+	const char	*__function_name = "zbx_snmp_close_session";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -465,9 +465,9 @@ static void	snmp_close_session(struct snmp_session *session)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static char	*snmp_get_octet_string(struct variable_list *vars)
+static char	*zbx_snmp_get_octet_string(struct variable_list *vars)
 {
-	const char	*__function_name = "snmp_get_octet_string";
+	const char	*__function_name = "zbx_snmp_get_octet_string";
 	static char	buf[MAX_STRING_LEN];
 	const char	*hint;
 	char		*strval_dyn = NULL, is_hex = 0;
@@ -518,7 +518,7 @@ end:
 
 /******************************************************************************
  *                                                                            *
- * Function: snmp_get_index                                                   *
+ * Function: zbx_snmp_get_index                                               *
  *                                                                            *
  * Purpose: find index of OID with given value                                *
  *                                                                            *
@@ -537,10 +537,10 @@ end:
  *             improve performance.                                           *
  *                                                                            *
  ******************************************************************************/
-static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char *OID, const char *value,
+static int	zbx_snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char *OID, const char *value,
 		char **idx, size_t *idx_alloc, char *err, int bulk)
 {
-	const char		*__function_name = "snmp_get_index";
+	const char		*__function_name = "zbx_snmp_get_index";
 	oid			anOID[MAX_OID_LEN], rootOID[MAX_OID_LEN];
 	size_t			anOID_len = MAX_OID_LEN, rootOID_len = MAX_OID_LEN, OID_len = 0;
 	char			strval[MAX_STRING_LEN], *strval_dyn, snmp_oid[MAX_STRING_LEN], *error;
@@ -629,7 +629,7 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char *OI
 
 						if (ASN_OCTET_STR == vars->type)
 						{
-							if (NULL == (strval_dyn = snmp_get_octet_string(vars)))
+							if (NULL == (strval_dyn = zbx_snmp_get_octet_string(vars)))
 							{
 								zbx_strlcpy(err, "Out of memory.", MAX_STRING_LEN);
 								ret = NOTSUPPORTED;
@@ -769,9 +769,9 @@ out:
 	return ret;
 }
 
-static int	snmp_set_value(struct variable_list *vars, DC_ITEM *item, AGENT_RESULT *value)
+static int	zbx_snmp_set_result(struct variable_list *vars, DC_ITEM *item, AGENT_RESULT *value)
 {
-	const char	*__function_name = "snmp_set_value";
+	const char	*__function_name = "zbx_snmp_set_result";
 	char		*strval_dyn;
 	int		ret = SUCCEED;
 
@@ -779,7 +779,7 @@ static int	snmp_set_value(struct variable_list *vars, DC_ITEM *item, AGENT_RESUL
 
 	if (ASN_OCTET_STR == vars->type)
 	{
-		if (NULL == (strval_dyn = snmp_get_octet_string(vars)))
+		if (NULL == (strval_dyn = zbx_snmp_get_octet_string(vars)))
 		{
 			SET_MSG_RESULT(value, zbx_strdup(NULL, "Cannot receive string value: out of memory."));
 			ret = NOTSUPPORTED;
@@ -850,7 +850,7 @@ static int	snmp_set_value(struct variable_list *vars, DC_ITEM *item, AGENT_RESUL
 
 /******************************************************************************
  *                                                                            *
- * Function: snmp_walk                                                        *
+ * Function: zbx_snmp_walk                                                    *
  *                                                                            *
  * Purpose: retrieve information for low-level discovery item                 *
  *                                                                            *
@@ -866,9 +866,9 @@ static int	snmp_set_value(struct variable_list *vars, DC_ITEM *item, AGENT_RESUL
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static int	snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID, AGENT_RESULT *value)
+static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID, AGENT_RESULT *value)
 {
-	const char		*__function_name = "snmp_walk";
+	const char		*__function_name = "zbx_snmp_walk";
 
 	struct snmp_pdu		*pdu, *response;
 	oid			anOID[MAX_OID_LEN], rootOID[MAX_OID_LEN];
@@ -957,7 +957,7 @@ static int	snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID, AG
 
 						init_result(&snmp_value);
 
-						if (SUCCEED == snmp_set_value(vars, item, &snmp_value) &&
+						if (SUCCEED == zbx_snmp_set_result(vars, item, &snmp_value) &&
 								GET_STR_RESULT(&snmp_value))
 						{
 							zbx_json_addobject(&j, NULL);
@@ -1038,9 +1038,9 @@ out:
 	return ret;
 }
 
-static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, const char *snmp_oid, AGENT_RESULT *value)
+static int	zbx_snmp_get_value(struct snmp_session *ss, DC_ITEM *item, const char *snmp_oid, AGENT_RESULT *value)
 {
-	const char		*__function_name = "get_snmp";
+	const char		*__function_name = "zbx_snmp_get_value";
 
 	struct snmp_pdu		*pdu, *response;
 	oid			anOID[MAX_OID_LEN];
@@ -1069,7 +1069,7 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, const char *snmp_oid
 	{
 		for (vars = response->variables; NULL != vars; vars = vars->next_variable)
 		{
-			if (SUCCEED == (ret = snmp_set_value(vars, item, value)))
+			if (SUCCEED == (ret = zbx_snmp_set_result(vars, item, value)))
 				break;
 		}
 	}
@@ -1119,16 +1119,16 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: snmp_normalize                                                   *
+ * Function: zbx_snmp_translate                                               *
  *                                                                            *
  * Purpose: translate well-known object identifiers into numeric form         *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static void	snmp_normalize(char *oid_normalized, const char *oid, int maxlen)
+static void	zbx_snmp_translate(char *oid_translated, const char *oid, int maxlen)
 {
-	const char	*__function_name = "snmp_normalize";
+	const char	*__function_name = "zbx_snmp_translate";
 
 	typedef struct
 	{
@@ -1175,15 +1175,15 @@ static void	snmp_normalize(char *oid_normalized, const char *oid, int maxlen)
 		if (0 == strncmp(mibs[i].mib, oid, mibs[i].sz))
 		{
 			found = 1;
-			zbx_snprintf(oid_normalized, maxlen, "%s%s", mibs[i].replace, oid + mibs[i].sz);
+			zbx_snprintf(oid_translated, maxlen, "%s%s", mibs[i].replace, oid + mibs[i].sz);
 			break;
 		}
 	}
 
 	if (0 == found)
-		zbx_strlcpy(oid_normalized, oid, maxlen);
+		zbx_strlcpy(oid_translated, oid, maxlen);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() oid_normalized:'%s'", __function_name, oid_normalized);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() oid_translated:'%s'", __function_name, oid_translated);
 }
 
 int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
@@ -1191,7 +1191,7 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 	const char		*__function_name = "get_value_snmp";
 
 	struct snmp_session	*ss;
-	char			method[8], oid_normalized[MAX_STRING_LEN], oid_index[MAX_STRING_LEN],
+	char			method[8], oid_translated[MAX_STRING_LEN], oid_index[MAX_STRING_LEN],
 				oid_full[MAX_STRING_LEN], index_value[MAX_STRING_LEN], err[MAX_STRING_LEN], *pl;
 	int			num, ret = SUCCEED;
 	char			*idx = NULL;
@@ -1201,7 +1201,7 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 
 	assert(item->type == ITEM_TYPE_SNMPv1 || item->type == ITEM_TYPE_SNMPv2c || item->type == ITEM_TYPE_SNMPv3);
 
-	if (NULL == (ss = snmp_open_session(item, err)))
+	if (NULL == (ss = zbx_snmp_open_session(item, err)))
 	{
 		SET_MSG_RESULT(value, strdup(err));
 		ret = NOTSUPPORTED;
@@ -1215,8 +1215,8 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 		switch (num)
 		{
 			case 0:
-				snmp_normalize(oid_normalized, item->snmp_oid, sizeof(oid_normalized));
-				ret = snmp_walk(ss, item, oid_normalized, value);
+				zbx_snmp_translate(oid_translated, item->snmp_oid, sizeof(oid_translated));
+				ret = zbx_snmp_walk(ss, item, oid_translated, value);
 				break;
 			default:
 				SET_MSG_RESULT(value, zbx_dsprintf(NULL, "OID [%s] contains unsupported parameters",
@@ -1230,8 +1230,8 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 		{
 			case 0:
 				zabbix_log(LOG_LEVEL_DEBUG, "standard processing");
-				snmp_normalize(oid_normalized, item->snmp_oid, sizeof(oid_normalized));
-				ret = get_snmp(ss, item, oid_normalized, value);
+				zbx_snmp_translate(oid_translated, item->snmp_oid, sizeof(oid_translated));
+				ret = zbx_snmp_get_value(ss, item, oid_translated, value);
 				break;
 			case 3:
 				do
@@ -1263,18 +1263,19 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 
 					idx = zbx_malloc(idx, idx_alloc);
 
-					snmp_normalize(oid_normalized, oid_index, sizeof(oid_normalized));
+					zbx_snmp_translate(oid_translated, oid_index, sizeof(oid_translated));
 
-					if (SUCCEED == (ret = cache_get_snmp_index(item, oid_normalized, index_value,
+					if (SUCCEED == (ret = cache_get_snmp_index(item, oid_translated, index_value,
 									&idx, &idx_alloc)))
 					{
-						zbx_snprintf(oid_full, sizeof(oid_full), "%s.%s", oid_normalized, idx);
-						ret = snmp_get_index(ss, item, oid_full, index_value,
+						zbx_snprintf(oid_full, sizeof(oid_full), "%s.%s", oid_translated, idx);
+						ret = zbx_snmp_get_index(ss, item, oid_full, index_value,
 								NULL, NULL, err, 0);
 					}
 
-					if (SUCCEED != ret && SUCCEED != (ret = snmp_get_index(ss, item, oid_normalized,
-									index_value, &idx, &idx_alloc, err, 1)))
+					if (SUCCEED != ret && SUCCEED != (ret = zbx_snmp_get_index(ss, item,
+									oid_translated, index_value, &idx, &idx_alloc,
+									err, 1)))
 					{
 						SET_MSG_RESULT(value, zbx_dsprintf(NULL, "Cannot find index [%s]"
 									" of the OID [%s]: %s",
@@ -1287,11 +1288,11 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 					pl = strchr(item->snmp_oid, '[');
 
 					*pl = '\0';
-					snmp_normalize(oid_normalized, item->snmp_oid, sizeof(oid_normalized));
+					zbx_snmp_translate(oid_translated, item->snmp_oid, sizeof(oid_translated));
 					*pl = '[';
 
-					zbx_snprintf(oid_full, sizeof(oid_full), "%s.%s", oid_normalized, idx);
-					ret = get_snmp(ss, item, oid_full, value);
+					zbx_snprintf(oid_full, sizeof(oid_full), "%s.%s", oid_translated, idx);
+					ret = zbx_snmp_get_value(ss, item, oid_full, value);
 				}
 				while (0);
 
@@ -1305,7 +1306,7 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 		}
 	}
 
-	snmp_close_session(ss);
+	zbx_snmp_close_session(ss);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
