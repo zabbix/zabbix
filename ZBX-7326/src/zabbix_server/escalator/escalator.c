@@ -1563,7 +1563,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static int	process_escalations(int now)
+static int	process_escalations(int now, int *nextcheck)
 {
 	const char		*__function_name = "process_escalations";
 	DB_RESULT		result;
@@ -1586,6 +1586,7 @@ static int	process_escalations(int now)
 			" order by actionid,triggerid,itemid,escalationid",
 			DBwhere_node_local("escalationid"));
 
+	*nextcheck = now + CONFIG_ESCALATOR_FREQUENCY;
 	memset(&escalation, 0, sizeof(escalation));
 
 	do
@@ -1703,11 +1704,11 @@ static int	process_escalations(int now)
 				}
 				else
 				{
+					escalation.nextcheck += SEC_PER_MIN;
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 							"update escalations set nextcheck=%d"
 							" where escalationid=" ZBX_FS_UI64,
-							escalation.nextcheck + SEC_PER_MIN,
-							escalation.escalationid);
+							escalation.nextcheck, escalation.escalationid);
 				}
 			}
 
@@ -1716,6 +1717,9 @@ static int	process_escalations(int now)
 			DBcommit();
 		}
 next:
+		if (0 != escalation.escalationid && escalation.nextcheck < *nextcheck)
+			*nextcheck = escalation.nextcheck;
+
 		if (NULL != row)
 			memcpy(&escalation, &last_escalation, sizeof(escalation));
 	}
@@ -1761,8 +1765,11 @@ next:
  ******************************************************************************/
 void	main_escalator_loop(void)
 {
-	int	now, escalations_count = 0;
-	double	sec = 0.0;
+#define	STAT_INTERVAL	5
+
+	int	now, escalations_count = 0, nextcheck, sleeptime, show_stats = 1;
+	double	sec, total_sec = 0.0;
+	time_t	last_stat_time;
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
@@ -1770,18 +1777,42 @@ void	main_escalator_loop(void)
 
 	for (;;)
 	{
-		zbx_setproctitle("%s [processed %d escalations in " ZBX_FS_DBL " sec, processing escalations]",
-				get_process_type_string(process_type), escalations_count, sec);
-
 		now = time(NULL);
+
+		if (1 == show_stats)
+		{
+			zbx_setproctitle("%s [processed %d escalations in " ZBX_FS_DBL " sec, processing escalations]",
+					get_process_type_string(process_type), escalations_count, total_sec);
+
+			escalations_count = 0;
+			total_sec = 0.0;
+
+			show_stats = 0;
+			last_stat_time = now;
+		}
+
 		sec = zbx_time();
-		escalations_count = process_escalations(now);
-		sec = zbx_time() - sec;
+		escalations_count += process_escalations(now, &nextcheck);
+		total_sec += zbx_time() - sec;
 
-		zbx_setproctitle("%s [processed %d escalations in " ZBX_FS_DBL " sec, idle %d sec]",
-				get_process_type_string(process_type), escalations_count, sec,
-				CONFIG_ESCALATOR_FREQUENCY);
+		sleeptime = nextcheck - now;
+		if (CONFIG_ESCALATOR_FREQUENCY < sleeptime)
+			sleeptime = CONFIG_ESCALATOR_FREQUENCY;
 
-		zbx_sleep_loop(CONFIG_ESCALATOR_FREQUENCY);
+		if (0 < sleeptime)
+		{
+			zbx_setproctitle("%s [processed %d escalations in " ZBX_FS_DBL " sec, idle %d sec]",
+					get_process_type_string(process_type), escalations_count, total_sec,
+					sleeptime);
+
+			zbx_sleep_loop(sleeptime);
+
+			show_stats = 1;
+			continue;
+		}
+
+		if (STAT_INTERVAL <= time(NULL) - last_stat_time)
+			show_stats = 1;
 	}
 }
+
