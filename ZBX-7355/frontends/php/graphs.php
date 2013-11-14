@@ -252,29 +252,37 @@ elseif (isset($_REQUEST['save'])) {
 		show_messages($result, _('Graph added'), _('Cannot add graph'));
 	}
 }
-elseif (isset($_REQUEST['delete']) && isset($_REQUEST['graphid'])) {
-	$result = !empty($_REQUEST['parent_discoveryid'])
-		? API::GraphPrototype()->delete($_REQUEST['graphid'])
-		: API::Graph()->delete($_REQUEST['graphid']);
+elseif (hasRequest('delete') && $graphId = getRequest('graphid')) {
+	if ($parentDiscoveryId = getRequest('parent_discoveryid')) {
+		$result = API::GraphPrototype()->delete($graphId);
+
+		show_messages($result, _('Graph prototype deleted'), _('Cannot delete graph prototype'));
+		clearCookies($result, $parentDiscoveryId);
+	}
+	else {
+		$result = API::Graph()->delete($graphId);
+
+		show_messages($result, _('Graph deleted'), _('Cannot delete graph'));
+		clearCookies($result, getRequest('hostid'));
+	}
 
 	if ($result) {
 		unset($_REQUEST['form']);
 	}
-
-	show_messages($result, _('Graph deleted'), _('Cannot delete graph'));
-	clearCookies($result,
-		empty($_REQUEST['parent_discoveryid']) ? $_REQUEST['hostid'] : $_REQUEST['parent_discoveryid']
-	);
 }
-elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_graphid'])) {
-	$goResult = !empty($_REQUEST['parent_discoveryid'])
-		? API::GraphPrototype()->delete($_REQUEST['group_graphid'])
-		: API::Graph()->delete($_REQUEST['group_graphid']);
+elseif (getRequest('go') == 'delete' && $graphIds = getRequest('group_graphid')) {
+	if ($parentDiscoveryId = getRequest('parent_discoveryid')) {
+		$result = API::GraphPrototype()->delete($graphIds);
 
-	show_messages($goResult, _('Graphs deleted'), _('Cannot delete graphs'));
-	clearCookies($goResult,
-		empty($_REQUEST['parent_discoveryid']) ? $_REQUEST['hostid'] : $_REQUEST['parent_discoveryid']
-	);
+		show_messages($result, _('Graph prototypes deleted'), _('Cannot delete graph prototypes'));
+		clearCookies($result, $parentDiscoveryId);
+	}
+	else {
+		$result = API::Graph()->delete($graphIds);
+
+		show_messages($result, _('Graphs deleted'), _('Cannot delete graphs'));
+		clearCookies($result, getRequest('hostid'));
+	}
 }
 elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQUEST['group_graphid'])) {
 	if (!empty($_REQUEST['copy_targetid']) && isset($_REQUEST['copy_type'])) {
