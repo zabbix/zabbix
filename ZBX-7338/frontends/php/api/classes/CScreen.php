@@ -455,7 +455,7 @@ class CScreen extends CZBXAPI {
 				$existScreen = reset($existScreen);
 
 				if ($existScreen && bccomp($existScreen['screenid'], $screen['screenid']) != 0) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Screen "%1$s" already exists.', $screen['name']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Screen "%1$s" already exists.', $screen['name']));
 				}
 			}
 		}
@@ -496,7 +496,7 @@ class CScreen extends CZBXAPI {
 
 		DB::update('screens', $update);
 
-		// udpate screen items
+		// replace screen items
 		foreach ($screens as $screen) {
 			if (isset($screen['screenitems'])) {
 				$this->replaceItems($screen['screenid'], $screen['screenitems']);
@@ -541,27 +541,49 @@ class CScreen extends CZBXAPI {
 	}
 
 	/**
-	 * Replaces all of the screen items of the given screen with the new ones.
+	 * Replaces all of the screen items of the given screen.
 	 *
-	 * @param int $screenId			The ID of the target screen
+	 * @param int   $screenId		The ID of the target screen
 	 * @param array $screenItems	An array of screen items
 	 */
 	protected function replaceItems($screenId, $screenItems) {
-		$dbScreenItems = API::ScreenItem()->get(array(
-			'screenids' => $screenId,
-			'preservekeys' => true
-		));
-
 		foreach ($screenItems as &$screenItem) {
 			$screenItem['screenid'] = $screenId;
 		}
 		unset($screenItem);
 
-		$result = API::ScreenItem()->updateByPosition($screenItems);
+		$createScreenItems = $deleteScreenItems = $updateScreenItems = array();
+		$deleteScreenItemsIds = array();
 
-		// deleted the old items
-		$deleteItemIds = array_diff(array_keys($dbScreenItems), $result['screenitemids']);
-		API::ScreenItem()->delete($deleteItemIds);
+		$dbScreenItems = API::ScreenItem()->get(array(
+			'screenids' => $screenId,
+			'preservekeys' => true
+		));
+
+		foreach ($screenItems as $screenItem) {
+			if (isset($screenItem['screenitemid']) && isset($dbScreenItems[$screenItem['screenitemid']])) {
+				$updateScreenItems[$screenItem['screenitemid']] = $screenItem;
+			}
+			else {
+				$createScreenItems[] = $screenItem;
+			}
+		}
+
+		foreach ($dbScreenItems as $dbScreenItem) {
+			if (!isset($updateScreenItems[$dbScreenItem['screenitemid']])) {
+				$deleteScreenItemsIds[$dbScreenItem['screenitemid']] = $dbScreenItem['screenitemid'];
+			}
+		}
+
+		if ($deleteScreenItemsIds) {
+			API::ScreenItem()->delete($deleteScreenItemsIds);
+		}
+		if ($updateScreenItems) {
+			API::ScreenItem()->update($updateScreenItems);
+		}
+		if ($createScreenItems) {
+			API::ScreenItem()->create($createScreenItems);
+		}
 	}
 
 	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
