@@ -42,7 +42,7 @@ class CScreen extends CZBXAPI {
 	 * @param int    $options['limit']		limit selection
 	 * @param string $options['order']		deprecated parameter (for now)
 	 *
-	 * @return array|bool 					Host data as array or false if error
+	 * @return array|bool					Host data as array or false if error
 	 */
 	public function get($options = array()) {
 		$result = array();
@@ -160,6 +160,7 @@ class CScreen extends CZBXAPI {
 			$screensItems = array();
 
 			$dbScreenItems = DBselect('SELECT si.* FROM screens_items si WHERE '.dbConditionInt('si.screenid', $screenIds));
+
 			while ($screenItem = DBfetch($dbScreenItems)) {
 				$screensItems[$screenItem['screenitemid']] = $screenItem;
 
@@ -172,19 +173,24 @@ class CScreen extends CZBXAPI {
 						case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
 							$groupsToCheck[] = $screenItem['resourceid'];
 							break;
+
 						case SCREEN_RESOURCE_HOST_TRIGGERS:
 							$hostsToCheck[] = $screenItem['resourceid'];
 							break;
+
 						case SCREEN_RESOURCE_GRAPH:
 							$graphsToCheck[] = $screenItem['resourceid'];
 							break;
+
 						case SCREEN_RESOURCE_SIMPLE_GRAPH:
 						case SCREEN_RESOURCE_PLAIN_TEXT:
 							$itemsToCheck[] = $screenItem['resourceid'];
 							break;
+
 						case SCREEN_RESOURCE_MAP:
 							$mapsToCheck[] = $screenItem['resourceid'];
 							break;
+
 						case SCREEN_RESOURCE_SCREEN:
 							$screensToCheck[] = $screenItem['resourceid'];
 							break;
@@ -364,13 +370,14 @@ class CScreen extends CZBXAPI {
 	protected function validateCreate(array $screens) {
 		$newScreenNames = zbx_objectValues($screens, 'name');
 
+		$screenDbFields = array('name' => null);
+
 		foreach ($screens as $screen) {
-			$screenDbFields = array('name' => null);
 			if (!check_db_fields($screenDbFields, $screen)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for screen "%1$s".', $screen['name']));
 			}
 
-			// check for "templateid", because it is not allowed
+			// "templateid", is not allowed
 			if (array_key_exists('templateid', $screen)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot set "templateid" for screen "%1$s".', $screen['name']));
 			}
@@ -378,7 +385,7 @@ class CScreen extends CZBXAPI {
 
 		$dbScreens = $this->get(array(
 			'filter' => array('name' => $newScreenNames),
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('name'),
 			'nopermissions' => true
 		));
 		foreach ($dbScreens as $dbScreen) {
@@ -389,30 +396,28 @@ class CScreen extends CZBXAPI {
 	/**
 	 * Create screen.
 	 *
-	 * @param array  $screens
-	 * @param string $screens['name']
-	 * @param array  $screens['hsize']
-	 * @param int    $screens['vsize']
+	 * @param array $screens
 	 *
 	 * @return array
 	 */
 	public function create(array $screens) {
 		$screens = zbx_toArray($screens);
+
 		$this->validateCreate($screens);
-		$insertScreenItems = array();
 
-		$screenIds = DB::insert('screens', $screens);
+		$screenIds = array();
 
-		foreach ($screens as $key => $screen) {
+		// replace screen items
+		foreach ($screens as $screen) {
+			$screenId = DB::insert('screens', zbx_toArray($screen));
+			$screenId = reset($screenId);
+
 			if (isset($screen['screenitems'])) {
-				foreach ($screen['screenitems'] as $screenitem) {
-					$screenitem['screenid'] = $screenIds[$key];
-					$insertScreenItems[] = $screenitem;
-				}
+				$this->replaceItems($screenId, $screen['screenitems']);
 			}
-		}
 
-		API::ScreenItem()->create($insertScreenItems);
+			$screenIds[] = $screenId;
+		}
 
 		return array('screenids' => $screenIds);
 	}
@@ -432,7 +437,7 @@ class CScreen extends CZBXAPI {
 			'preservekeys' => true
 		));
 		foreach ($screens as $screen) {
-			if (!isset($screen['screenid'], $dbScreens[$screen['screenid']])) {
+			if (!isset($dbScreens[$screen['screenid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
@@ -446,15 +451,14 @@ class CScreen extends CZBXAPI {
 			}
 
 			if (isset($screen['name'])) {
-				$existScreen = $this->get(array(
+				$dbScreenExist = $this->get(array(
 					'filter' => array('name' => $screen['name']),
-					'preservekeys' => true,
 					'nopermissions' => true,
 					'output' => array('screenid')
 				));
-				$existScreen = reset($existScreen);
+				$dbScreenExist = reset($dbScreenExist);
 
-				if ($existScreen && bccomp($existScreen['screenid'], $screen['screenid']) != 0) {
+				if ($dbScreenExist && bccomp($dbScreenExist['screenid'], $screen['screenid']) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Screen "%1$s" already exists.', $screen['name']));
 				}
 			}
@@ -464,11 +468,7 @@ class CScreen extends CZBXAPI {
 	/**
 	 * Update screen.
 	 *
-	 * @param array  $screens
-	 * @param string $screens['screenid']
-	 * @param int    $screens['name']
-	 * @param int    $screens['hsize']
-	 * @param int    $screens['vsize']
+	 * @param array $screens
 	 *
 	 * @return bool
 	 */
@@ -477,8 +477,7 @@ class CScreen extends CZBXAPI {
 
 		$this->validateUpdate($screens);
 
-		$update = array();
-		$screenIds = array();
+		$update = $screenIds = array();
 
 		foreach ($screens as $screen) {
 			$screenId = $screen['screenid'];
@@ -503,11 +502,41 @@ class CScreen extends CZBXAPI {
 			}
 		}
 
+		// delete outside screen items
+		$dbScreenItems = API::ScreenItem()->get(array(
+			'screenids' => $screenIds,
+			'output' => array('screenitemid', 'screenid', 'x', 'y')
+		));
+
+		$deleteScreenItemIds = array();
+
+		foreach ($screens as $screen) {
+			if (isset($screen['hsize'])) {
+				foreach ($dbScreenItems as $dbScreenItem) {
+					if ($dbScreenItem['screenid'] == $screen['screenid'] && $dbScreenItem['x'] > $screen['hsize'] - 1) {
+						$deleteScreenItemIds[$dbScreenItem['screenitemid']] = $dbScreenItem['screenitemid'];
+					}
+				}
+			}
+
+			if (isset($screen['vsize'])) {
+				foreach ($dbScreenItems as $dbScreenItem) {
+					if ($dbScreenItem['screenid'] == $screen['screenid'] && $dbScreenItem['y'] > $screen['vsize'] - 1) {
+						$deleteScreenItemIds[$dbScreenItem['screenitemid']] = $dbScreenItem['screenitemid'];
+					}
+				}
+			}
+		}
+
+		if ($deleteScreenItemIds) {
+			API::ScreenItem()->delete($deleteScreenItemIds);
+		}
+
 		return array('screenids' => $screenIds);
 	}
 
 	/**
-	 * Delete Screen.
+	 * Delete screen.
 	 *
 	 * @param array $screenIds
 	 *
@@ -516,13 +545,13 @@ class CScreen extends CZBXAPI {
 	public function delete($screenIds) {
 		$screenIds = zbx_toArray($screenIds);
 
-		$delScreens = $this->get(array(
+		$dbScreens = $this->get(array(
 			'screenids' => $screenIds,
 			'editable' => true,
 			'preservekeys' => true
 		));
 		foreach ($screenIds as $screenId) {
-			if (!isset($delScreens[$screenId])) {
+			if (!isset($dbScreens[$screenId])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
