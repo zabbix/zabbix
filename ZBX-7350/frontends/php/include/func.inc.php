@@ -2464,9 +2464,10 @@ function get_status() {
 	// hosts
 	$dbHosts = DBselect(
 		'SELECT COUNT(*) AS cnt,h.status'.
-				' FROM hosts h'.
-				' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.' )'.
-				' GROUP BY h.status');
+		' FROM hosts h'.
+		' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.' )'.
+			' AND h.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
+		' GROUP BY h.status');
 	while ($dbHost = DBfetch($dbHosts)) {
 		switch ($dbHost['status']) {
 			case HOST_STATUS_MONITORED:
