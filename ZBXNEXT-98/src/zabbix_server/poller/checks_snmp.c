@@ -575,8 +575,13 @@ static int	zbx_snmp_set_result(const struct variable_list *var, const DC_ITEM *i
 		}
 		else
 		{
-			if (SUCCEED != set_result_type(value, item->value_type, item->data_type, strval_dyn))
-				ret = NOTSUPPORTED;
+			if (NULL != item)
+			{
+				if (SUCCEED != set_result_type(value, item->value_type, item->data_type, strval_dyn))
+					ret = NOTSUPPORTED;
+			}
+			else
+				SET_STR_RESULT(value, zbx_strdup(NULL, strval_dyn));
 
 			zbx_free(strval_dyn);
 		}
@@ -755,7 +760,7 @@ static int	zbx_snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char
 
 					init_result(&snmp_value);
 
-					if (SUCCEED == zbx_snmp_set_result(var, item, &snmp_value) &&
+					if (SUCCEED == zbx_snmp_set_result(var, NULL, &snmp_value) &&
 							NULL != GET_STR_RESULT(&snmp_value))
 					{
 						cache_put_snmp_index(item, (char *)OID, snmp_value.str, &snmp_oid[OID_len + 1]);
@@ -928,7 +933,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID
 
 					init_result(&snmp_value);
 
-					if (SUCCEED == zbx_snmp_set_result(var, item, &snmp_value) &&
+					if (SUCCEED == zbx_snmp_set_result(var, NULL, &snmp_value) &&
 							NULL != GET_STR_RESULT(&snmp_value))
 					{
 						zbx_json_addobject(&j, NULL);
