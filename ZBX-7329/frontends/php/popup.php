@@ -84,10 +84,6 @@ switch ($srctbl) {
 		$page['title'] = _('Screens');
 		$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 		break;
-	case 'overview':
-		$page['title'] = _('Overview');
-		$min_user_type = USER_TYPE_ZABBIX_ADMIN;
-		break;
 	case 'nodes':
 		$page['title'] = _('Nodes');
 		$min_user_type = USER_TYPE_ZABBIX_USER;
@@ -135,7 +131,6 @@ $allowedSrcFields = array(
 	'sysmaps'				=> '"sysmapid", "name"',
 	'slides'				=> '"slideshowid"',
 	'help_items'			=> '"key"',
-	'overview'				=> '"groupid", "name"',
 	'screens'				=> '"screenid"',
 	'screens2'				=> '"screenid", "name"',
 	'nodes'					=> '"nodeid", "name"',
@@ -1388,33 +1383,6 @@ elseif ($srctbl == 'screens2') {
 		$name = new CLink($row['name'], '#');
 
 		$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
-		$name->setAttribute('onclick', $action.' close_window(); return false;');
-		$table->addRow($name);
-	}
-	$table->show();
-}
-/*
- * Overview
- */
-elseif ($srctbl == 'overview') {
-	$table = new CTableInfo(_('No host groups found.'));
-	$table->setHeader(_('Name'));
-
-	$options = array(
-		'nodeids' => $nodeId,
-		'monitored_hosts' => true,
-		'output' => API_OUTPUT_EXTEND
-	);
-	if (!is_null($writeonly)) {
-		$options['editable'] = true;
-	}
-	$hostGroups = API::HostGroup()->get($options);
-	order_result($hostGroups, 'name');
-
-	foreach ($hostGroups as $hostGroup) {
-		$name = new CSpan($hostGroup['name'], 'link');
-
-		$action = get_window_opener($dstfrm, $dstfld1, $hostGroup[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $hostGroup[$srcfld2]) : '');
 		$name->setAttribute('onclick', $action.' close_window(); return false;');
 		$table->addRow($name);
 	}

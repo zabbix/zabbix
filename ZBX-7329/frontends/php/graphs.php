@@ -315,7 +315,7 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQU
 		DBstart();
 		foreach ($_REQUEST['group_graphid'] as $graphid) {
 			foreach ($dbHosts as $host) {
-				$goResult &= (bool) copy_graph_to_host($graphid, $host['hostid']);
+				$goResult &= (bool) copyGraphToHost($graphid, $host['hostid']);
 			}
 		}
 		$goResult = DBend($goResult);

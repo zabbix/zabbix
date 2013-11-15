@@ -9,8 +9,8 @@ DESC_H = zabbix_agent_desc.h
 RESOURCE_RC = resource.rc
 RESOURCE_RES = zabbix_agent.res
 OBJS  = ..\..\..\src\libs\zbxalgo\algodefs.o \
-  ..\..\..\src\libs\zbxalgo\vector.o \
-  ..\..\..\src\libs\zbxcommon\alias.o \
+	..\..\..\src\libs\zbxalgo\vector.o \
+	..\..\..\src\libs\zbxcommon\alias.o \
 	..\..\..\src\libs\zbxcommon\comms.o \
 	..\..\..\src\libs\zbxcommon\misc.o \
 	..\..\..\src\libs\zbxcommon\str.o \
@@ -64,11 +64,10 @@ OBJS  = ..\..\..\src\libs\zbxalgo\algodefs.o \
 	..\..\..\src\zabbix_agent\stats.o \
 	..\..\..\src\zabbix_agent\zabbix_agentd.o \
 	..\..\..\src\zabbix_agent\zbxconf.o \
-  ..\..\..\src\libs\zbxregexp\gnuregex.o \
+	..\..\..\src\libs\zbxregexp\gnuregex.o \
 	..\..\..\src\libs\zbxregexp\zbxregexp.o
 
-
-LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib
+LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib delayimp.lib wevtapi.lib
 
 all: $(PROGNAME)
 
