@@ -201,102 +201,167 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
+/******************************************************************************
+ *                                                                            *
+ * Function: db_host_update_availability                                      *
+ *                                                                            *
+ * Purpose: write host availability changes into database                     *
+ *                                                                            *
+ * Parameters: in    - [IN] the host availability data before changes         *
+ *             out   - [IN] the host availability data after changes          *
+ *             error - [IN] an optional error message that will be written    *
+ *                          into database if availability data was changed.   *
+ *                          Can be NULL (empty error message will be written) *
+ *                                                                            *
+ * Return value: SUCCEED - the availability changes were written into db      *
+ *               FAIL    - no changes in availability data were detected      *
+ *                                                                            *
+ ******************************************************************************/
+static int	db_host_update_availability(const zbx_host_availability_t *in, const zbx_host_availability_t *out,
+		const char *error)
 {
-	const char		*__function_name = "activate_host";
+	char	*sqlset = NULL, sqlset_delim = ' ', *sqlset_prefix;
+	size_t	sqlset_alloc = 0, sqlset_offset = 0;
 
-	int			*errors_from, *disable_until;
-	unsigned char		*available;
-	const char		*fld_prefix;
-	zbx_host_availability_t	availability, availability_old;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
-			__function_name, item->host.hostid, item->itemid, item->type);
-
-	switch (item->type)
+	switch (in->type)
 	{
 		case ITEM_TYPE_ZABBIX:
-			errors_from = &item->host.errors_from;
-			available = &item->host.available;
-			disable_until = &item->host.disable_until;
-
-			fld_prefix = "";
+			sqlset_prefix = "";
 			break;
 		case ITEM_TYPE_SNMPv1:
 		case ITEM_TYPE_SNMPv2c:
 		case ITEM_TYPE_SNMPv3:
-			errors_from = &item->host.snmp_errors_from;
-			available = &item->host.snmp_available;
-			disable_until = &item->host.snmp_disable_until;
-
-			fld_prefix = "snmp_";
+			sqlset_prefix = "snmp_";
 			break;
 		case ITEM_TYPE_IPMI:
-			errors_from = &item->host.ipmi_errors_from;
-			available = &item->host.ipmi_available;
-			disable_until = &item->host.ipmi_disable_until;
-
-			fld_prefix = "ipmi_";
+			sqlset_prefix = "impi_";
 			break;
 		case ITEM_TYPE_JMX:
-			errors_from = &item->host.jmx_errors_from;
-			available = &item->host.jmx_available;
-			disable_until = &item->host.jmx_disable_until;
-
-			fld_prefix = "jmx_";
+			sqlset_prefix = "jmx_";
 			break;
 		default:
-			return;
+			return FAIL;
 	}
 
-	if (0 == *errors_from && HOST_AVAILABLE_TRUE == *available)
-		return;
-
-	*errors_from = 0;
-	*available = HOST_AVAILABLE_TRUE;
-	*disable_until = 0;
-
-	availability.hostid = item->host.hostid;
-	availability.type = item->type;
-	availability.errors_from =  *errors_from;
-	availability.available = *available;
-	availability.disable_until = *disable_until;
-
-	if (1 == DCconfig_update_host_availability(&availability, 1, &availability_old))
+	if (in->available != out->available)
 	{
-		char	*sql = NULL;
-		size_t	sql_alloc = 0, sql_offset = 0;
+		zbx_snprintf_alloc(&sqlset, &sqlset_alloc, &sqlset_offset, "%c%savailable=%d", sqlset_delim,
+				sqlset_prefix, out->available);
+		sqlset_delim = ',';
+	}
+	if (in->errors_from != out->errors_from)
+	{
+		zbx_snprintf_alloc(&sqlset, &sqlset_alloc, &sqlset_offset, "%c%serrors_from=%d", sqlset_delim,
+				sqlset_prefix, out->errors_from);
+		sqlset_delim = ',';
+	}
+	if (in->disable_until != out->disable_until)
+	{
+		zbx_snprintf_alloc(&sqlset, &sqlset_alloc, &sqlset_offset, "%c%sdisable_until=%d", sqlset_delim,
+				sqlset_prefix, out->disable_until);
+		sqlset_delim = ',';
+	}
 
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set ");
+	if (NULL != sqlset)
+	{
+		char	*error_esc;
 
-		if (HOST_AVAILABLE_TRUE == availability_old.available)
-		{
-			if (0 != availability_old.errors_from)
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "resuming %s checks on host \"%s\": connection restored",
-						zbx_host_type_string(item->type), item->host.host);
-			}
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "enabling %s checks on host \"%s\": host became available",
-					zbx_host_type_string(item->type), item->host.host);
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%savailable=%d,",
-					fld_prefix, HOST_AVAILABLE_TRUE);
-		}
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"%serrors_from=%d,%sdisable_until=%d,%serror='' where hostid=" ZBX_FS_UI64,
-				fld_prefix, *errors_from, fld_prefix, *disable_until, fld_prefix, item->host.hostid);
+		error_esc = (NULL == error) ? zbx_strdup(NULL, "") : DBdyn_escape_string_len(error, HOST_ERROR_LEN);
 
 		DBbegin();
-		DBexecute("%s", sql);
+		DBexecute("update hosts set%s,%serror='%s' where hostid="
+				ZBX_FS_UI64, sqlset, sqlset_prefix, error_esc, out->hostid);
 		DBcommit();
 
-		zbx_free(sql);
+		zbx_free(error_esc);
+		zbx_free(sqlset);
+
+		return SUCCEED;
 	}
 
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: host_get_availability                                            *
+ *                                                                            *
+ * Purpose: get host availability data based on the specified item type       *
+ *                                                                            *
+ * Parameters: dc_host      - [IN] the host                                   *
+ *             type         - [IN] the item type                              *
+ *             availability - [OUT] the host availability data                *
+ *                                                                            *
+ * Return value: SUCCEED - the host availability data was retrieved           *
+ *                         successfully                                       *
+ *               FAIL    - failed to retrieve host availability data,         *
+ *                         unrecognized item type was specified               *
+ *                                                                            *
+ ******************************************************************************/
+static int	host_get_availability(const DC_HOST *dc_host, int type, zbx_host_availability_t *availability)
+{
+	switch (type)
+	{
+		case ITEM_TYPE_ZABBIX:
+			availability->errors_from = dc_host->errors_from;
+			availability->available = dc_host->available;
+			availability->disable_until = dc_host->disable_until;
+			break;
+		case ITEM_TYPE_SNMPv1:
+		case ITEM_TYPE_SNMPv2c:
+		case ITEM_TYPE_SNMPv3:
+			availability->errors_from = dc_host->snmp_errors_from;
+			availability->available = dc_host->snmp_available;
+			availability->disable_until = dc_host->snmp_disable_until;
+			break;
+		case ITEM_TYPE_IPMI:
+			availability->errors_from = dc_host->ipmi_errors_from;
+			availability->available = dc_host->ipmi_available;
+			availability->disable_until = dc_host->ipmi_disable_until;
+			break;
+		case ITEM_TYPE_JMX:
+			availability->errors_from = dc_host->jmx_errors_from;
+			availability->available = dc_host->jmx_available;
+			availability->disable_until = dc_host->jmx_disable_until;
+			break;
+		default:
+			return FAIL;
+	}
+
+	availability->type = type;
+	availability->hostid = dc_host->hostid;
+
+	return SUCCEED;
+}
+
+static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
+{
+	const char		*__function_name = "activate_host";
+	zbx_host_availability_t	in, out;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
+			__function_name, item->host.hostid, item->itemid, item->type);
+
+	if (FAIL == host_get_availability(&item->host, item->type, &in))
+		goto out;
+
+	if (FAIL == DChost_activate(item->host.hostid, item->type, &in, &out))
+		goto out;
+
+	if (FAIL == db_host_update_availability(&in, &out, NULL))
+		goto out;
+
+	if (HOST_AVAILABLE_TRUE == in.available)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "resuming %s checks on host \"%s\": connection restored",
+				zbx_host_type_string(item->type), item->host.host);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "enabling %s checks on host \"%s\": host became available",
+				zbx_host_type_string(item->type), item->host.host);
+	}
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
@@ -304,136 +369,54 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 {
 	const char		*__function_name = "deactivate_host";
 
-	char			*error_esc;
-	int			*errors_from, *disable_until;
-	unsigned char		*available;
-	const char		*fld_prefix;
-	zbx_host_availability_t	availability, availability_old;
+	zbx_host_availability_t	in, out;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
 			__function_name, item->host.hostid, item->itemid, item->type);
 
-	switch (item->type)
+	if (FAIL == host_get_availability(&item->host, item->type, &in))
+		goto out;
+
+	if (FAIL == DChost_deactivate(item->host.hostid, item->type, ts, &in, &out))
+		goto out;
+
+	if (FAIL == db_host_update_availability(&in, &out, error))
+		goto out;
+
+	if (0 == in.errors_from)
 	{
-		case ITEM_TYPE_ZABBIX:
-			errors_from = &item->host.errors_from;
-			available = &item->host.available;
-			disable_until = &item->host.disable_until;
-
-			fld_prefix = "";
-			break;
-		case ITEM_TYPE_SNMPv1:
-		case ITEM_TYPE_SNMPv2c:
-		case ITEM_TYPE_SNMPv3:
-			errors_from = &item->host.snmp_errors_from;
-			available = &item->host.snmp_available;
-			disable_until = &item->host.snmp_disable_until;
-
-			fld_prefix = "snmp_";
-			break;
-		case ITEM_TYPE_IPMI:
-			errors_from = &item->host.ipmi_errors_from;
-			available = &item->host.ipmi_available;
-			disable_until = &item->host.ipmi_disable_until;
-
-			fld_prefix = "ipmi_";
-			break;
-		case ITEM_TYPE_JMX:
-			errors_from = &item->host.jmx_errors_from;
-			available = &item->host.jmx_available;
-			disable_until = &item->host.jmx_disable_until;
-
-			fld_prefix = "jmx_";
-			break;
-		default:
-			return;
-	}
-
-	if (0 == *errors_from)
-	{
-		*errors_from = ts->sec;
-		*disable_until = ts->sec + CONFIG_UNREACHABLE_DELAY;
+		zabbix_log(LOG_LEVEL_WARNING, "%s item \"%s\" on host \"%s\" failed:"
+				" first network error, wait for %d seconds",
+				zbx_host_type_string(item->type), item->key_orig, item->host.host,
+				out.disable_until - ts->sec);
 	}
 	else
 	{
-		if (ts->sec - *errors_from <= CONFIG_UNREACHABLE_PERIOD)
+		if (HOST_AVAILABLE_FALSE != in.available)
 		{
-			*disable_until = ts->sec + CONFIG_UNREACHABLE_DELAY;
-		}
-		else
-		{
-			*disable_until = ts->sec + CONFIG_UNAVAILABLE_DELAY;
-			*available = HOST_AVAILABLE_FALSE;
-		}
-	}
-
-	availability.hostid = item->host.hostid;
-	availability.type = item->type;
-	availability.errors_from =  *errors_from;
-	availability.available = *available;
-	availability.disable_until = *disable_until;
-
-	if (1 == DCconfig_update_host_availability(&availability, 1, &availability_old))
-	{
-		char	*sql = NULL;
-		size_t	sql_alloc = 0, sql_offset = 0;
-
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set ");
-
-		if (0 == availability_old.errors_from)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s item \"%s\" on host \"%s\" failed:"
-					" first network error, wait for %d seconds",
-					zbx_host_type_string(item->type), item->key_orig, item->host.host,
-					CONFIG_UNREACHABLE_DELAY);
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%serrors_from=%d,",
-					fld_prefix, *errors_from);
-		}
-		else
-		{
-			if (ts->sec - *errors_from <= CONFIG_UNREACHABLE_PERIOD)
+			if (HOST_AVAILABLE_FALSE != out.available)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "%s item \"%s\" on host \"%s\" failed:"
 						" another network error, wait for %d seconds",
 						zbx_host_type_string(item->type), item->key_orig, item->host.host,
-						CONFIG_UNREACHABLE_DELAY);
+						out.disable_until - ts->sec);
 			}
 			else
 			{
-				if (HOST_AVAILABLE_FALSE != availability_old.available)
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "temporarily disabling %s checks on host \"%s\":"
-							" host unavailable",
-							zbx_host_type_string(item->type), item->host.host);
+				zabbix_log(LOG_LEVEL_WARNING, "temporarily disabling %s checks on host \"%s\":"
+						" host unavailable",
+						zbx_host_type_string(item->type), item->host.host);
 
-					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%savailable=%d,",
-							fld_prefix, *available);
-
-					update_triggers_status_to_unknown(item->host.hostid, item->type, ts,
-							"Agent is unavailable.");
-				}
-
-				error_esc = DBdyn_escape_string_len(error, HOST_ERROR_LEN);
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%serror='%s',",
-						fld_prefix, error_esc);
-				zbx_free(error_esc);
+				update_triggers_status_to_unknown(item->host.hostid, item->type, ts,
+						"Agent is unavailable.");
 			}
 		}
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sdisable_until=%d where hostid=" ZBX_FS_UI64,
-				fld_prefix, *disable_until, item->host.hostid);
-
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() errors_from:%d available:%d", __function_name, *errors_from,
-				*available);
-
-		DBbegin();
-		DBexecute("%s", sql);
-		DBcommit();
-
-		zbx_free(sql);
 	}
 
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() errors_from:%d available:%d", __function_name, out.errors_from,
+			out.available);
+
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
