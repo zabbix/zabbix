@@ -583,6 +583,7 @@ static int	zbx_snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char
 		char **idx, size_t *idx_alloc, char *err)
 {
 	const char		*__function_name = "zbx_snmp_get_index";
+
 	oid			anOID[MAX_OID_LEN], rootOID[MAX_OID_LEN];
 	size_t			anOID_len = MAX_OID_LEN, rootOID_len = MAX_OID_LEN, OID_len = 0;
 	char			strval[MAX_STRING_LEN], *strval_dyn, snmp_oid[MAX_STRING_LEN], *error;
@@ -653,20 +654,20 @@ static int	zbx_snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char
 				if (SNMP_ENDOFMIBVIEW != var->type && SNMP_NOSUCHOBJECT != var->type &&
 						SNMP_NOSUCHINSTANCE != var->type)
 				{
+					/* not an exception value */
+					if (0 <= snmp_oid_compare(anOID, anOID_len, var->name, var->name_length))
+					{
+						zbx_snprintf(err, MAX_STRING_LEN, "OID not increasing.");
+						ret = NOTSUPPORTED;
+						running = 0;
+					}
+
 					if (-1 == snprint_objid(snmp_oid, sizeof(snmp_oid),
 								var->name, var->name_length))
 					{
 						zbx_snprintf(err, MAX_STRING_LEN, "snprint_objid(): buffer is"
 								" not large enough: OID: \"%s\" snmp_OID: \"%s\".",
 								OID, snmp_oid);
-						ret = NOTSUPPORTED;
-						running = 0;
-					}
-
-					/* not an exception value */
-					if (0 <= snmp_oid_compare(anOID, anOID_len, var->name, var->name_length))
-					{
-						zbx_snprintf(err, MAX_STRING_LEN, "OID not increasing.");
 						ret = NOTSUPPORTED;
 						running = 0;
 					}
@@ -941,7 +942,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID
 					/* not an exception value */
 					if (0 <= snmp_oid_compare(anOID, anOID_len, var->name, var->name_length))
 					{
-						SET_MSG_RESULT(value, strdup("OID not increasing."));
+						SET_MSG_RESULT(value, zbx_strdup(NULL, "OID not increasing."));
 						ret = NOTSUPPORTED;
 						running = 0;
 						break;
@@ -961,7 +962,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID
 					init_result(&snmp_value);
 
 					if (SUCCEED == zbx_snmp_set_result(var, item, &snmp_value) &&
-							GET_STR_RESULT(&snmp_value))
+							NULL != GET_STR_RESULT(&snmp_value))
 					{
 						zbx_json_addobject(&j, NULL);
 						zbx_json_addstring(&j, "{#SNMPINDEX}", &snmp_oid[OID_len + 1],
@@ -994,7 +995,7 @@ next:
 	zbx_json_close(&j);
 
 	if (SUCCEED == ret)
-		SET_TEXT_RESULT(value, strdup(j.buffer));
+		SET_TEXT_RESULT(value, zbx_strdup(NULL, j.buffer));
 out:
 	zbx_json_free(&j);
 
@@ -1132,7 +1133,7 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 	struct snmp_session	*ss;
 	char			method[8], oid_translated[MAX_STRING_LEN], oid_index[MAX_STRING_LEN],
 				oid_full[MAX_STRING_LEN], index_value[MAX_STRING_LEN], err[MAX_STRING_LEN], *pl;
-	int			num, ret = SUCCEED;
+	int			num, ret;
 	char			*idx = NULL;
 	size_t			idx_alloc = 32;
 
@@ -1142,7 +1143,7 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 
 	if (NULL == (ss = zbx_snmp_open_session(item, err)))
 	{
-		SET_MSG_RESULT(value, strdup(err));
+		SET_MSG_RESULT(value, zbx_strdup(NULL, err));
 		ret = NOTSUPPORTED;
 		goto out;
 	}
