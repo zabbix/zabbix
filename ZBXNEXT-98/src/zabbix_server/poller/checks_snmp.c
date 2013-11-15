@@ -59,7 +59,7 @@ static int	zbx_get_snmp_response_error(const struct snmp_session *ss, const DC_I
 
 	if (STAT_SUCCESS == status)
 	{
-		zbx_snprintf(err, MAX_STRING_LEN, "SNMP error: %s.", snmp_errstring(response->errstat));
+		zbx_snprintf(err, MAX_STRING_LEN, "SNMP error: %s", snmp_errstring(response->errstat));
 		ret = NOTSUPPORTED;
 	}
 	else if (STAT_ERROR == status)
@@ -1011,7 +1011,7 @@ static int	zbx_snmp_get_value(struct snmp_session *ss, DC_ITEM *item, const char
 	oid			anOID[MAX_OID_LEN];
 	size_t			anOID_len = MAX_OID_LEN;
 	struct variable_list	*var;
-	int			status, ret = SUCCEED;
+	int			status, ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() oid:'%s'", __function_name, snmp_oid);
 
@@ -1032,11 +1032,13 @@ static int	zbx_snmp_get_value(struct snmp_session *ss, DC_ITEM *item, const char
 
 	if (STAT_SUCCESS == status && SNMP_ERR_NOERROR == response->errstat)
 	{
-		for (var = response->variables; NULL != var; var = var->next_variable)
+		if (NULL == (var = response->variables))
 		{
-			if (SUCCEED == (ret = zbx_snmp_set_result(var, item, value)))
-				break;
+			THIS_SHOULD_NEVER_HAPPEN;
+			ret = NOTSUPPORTED;
 		}
+		else
+			ret = zbx_snmp_set_result(var, item, value);
 	}
 	else
 	{
