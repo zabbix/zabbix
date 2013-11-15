@@ -580,7 +580,7 @@ end:
  *                                                                            *
  ******************************************************************************/
 static int	zbx_snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char *OID, const char *value,
-		char **idx, size_t *idx_alloc, char *err, int bulk)
+		char **idx, size_t *idx_alloc, char *err)
 {
 	const char		*__function_name = "zbx_snmp_get_index";
 	oid			anOID[MAX_OID_LEN], rootOID[MAX_OID_LEN];
@@ -590,7 +590,7 @@ static int	zbx_snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char
 	struct snmp_pdu		*pdu, *response;
 	struct variable_list	*var;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() oid:'%s' value:'%s' bulk:%d", __function_name, OID, value, bulk);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() oid:'%s' value:'%s'", __function_name, OID, value);
 
 	*err = '\0';
 
@@ -602,30 +602,26 @@ static int	zbx_snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char
 		goto out;
 	}
 
-	if (NULL != idx)
+	if (-1 == snprint_objid(snmp_oid, sizeof(snmp_oid), rootOID, rootOID_len))
 	{
-		if (-1 == snprint_objid(snmp_oid, sizeof(snmp_oid), rootOID, rootOID_len))
-		{
-			zbx_snprintf(err, MAX_STRING_LEN, "snprint_objid(): buffer is not large enough: \"%s\".", OID);
-			ret = NOTSUPPORTED;
-			goto out;
-		}
-		OID_len = strlen(snmp_oid);
+		zbx_snprintf(err, MAX_STRING_LEN, "snprint_objid(): buffer is not large enough: \"%s\".", OID);
+		ret = NOTSUPPORTED;
+		goto out;
 	}
+	OID_len = strlen(snmp_oid);
 
 	/* copy rootOID to anOID */
 	memcpy(anOID, rootOID, rootOID_len * sizeof(oid));
 	anOID_len = rootOID_len;
 
-	if (1 == bulk)
-		cache_del_snmp_index_subtree(item, OID);
+	cache_del_snmp_index_subtree(item, OID);
 
 	running = 1;
 
 	while (1 == running)
 	{
-		pdu = snmp_pdu_create(1 == bulk ? SNMP_MSG_GETNEXT : SNMP_MSG_GET);	/* create empty PDU */
-		snmp_add_null_var(pdu, anOID, anOID_len);				/* add OID as variable to PDU */
+		pdu = snmp_pdu_create(SNMP_MSG_GETNEXT);	/* create empty PDU */
+		snmp_add_null_var(pdu, anOID, anOID_len);	/* add OID as variable to PDU */
 
 		/* communicate with agent */
 		status = snmp_synch_response(ss, pdu, &response);
@@ -729,24 +725,16 @@ static int	zbx_snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char
 						zbx_free(error);
 					}
 
-					if (1 == bulk)
-						cache_put_snmp_index(item, (char *)OID, strval, &snmp_oid[OID_len + 1]);
+					cache_put_snmp_index(item, (char *)OID, strval, &snmp_oid[OID_len + 1]);
 
 					if (0 == found && 0 == strcmp(value, strval))
 					{
 						size_t	idx_offset = 0;
 
-						if (NULL != idx)
-						{
-							zbx_strcpy_alloc(idx, idx_alloc, &idx_offset,
-									&snmp_oid[OID_len + 1]);
-							zabbix_log(LOG_LEVEL_DEBUG, "index found: '%s'", *idx);
-						}
+						zbx_strcpy_alloc(idx, idx_alloc, &idx_offset, &snmp_oid[OID_len + 1]);
+						zabbix_log(LOG_LEVEL_DEBUG, "index found: '%s'", *idx);
 
 						found = 1;
-
-						if (0 == bulk)
-							running = 0;
 					}
 
 					/* go to next variable */
@@ -1217,14 +1205,25 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 					if (SUCCEED == (ret = cache_get_snmp_index(item, oid_translated, index_value,
 									&idx, &idx_alloc)))
 					{
+						AGENT_RESULT	current_index_value;
+
 						zbx_snprintf(oid_full, sizeof(oid_full), "%s.%s", oid_translated, idx);
-						ret = zbx_snmp_get_index(ss, item, oid_full, index_value,
-								NULL, NULL, err, 0);
+
+						ret = zbx_snmp_get_value(ss, item, oid_full, &current_index_value);
+
+						if (SUCCEED == ret &&
+								(NULL == GET_STR_RESULT(&current_index_value) ||
+								0 != strcmp(current_index_value.str, index_value)))
+						{
+							ret = NOTSUPPORTED;
+						}
+
+						free_result(&current_index_value);
 					}
 
 					if (SUCCEED != ret && SUCCEED != (ret = zbx_snmp_get_index(ss, item,
 									oid_translated, index_value, &idx, &idx_alloc,
-									err, 1)))
+									err)))
 					{
 						SET_MSG_RESULT(value, zbx_dsprintf(NULL, "Cannot find index [%s]"
 									" of the OID [%s]: %s",
