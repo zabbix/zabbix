@@ -1,6 +1,7 @@
 Changes for 2.0.10rc1
 
 New features:
+....I..... [ZBXNEXT-1256] changed example directory size user parameter to return bytes (Richlv)
 ..F....... [ZBX-7103] improved loading speed of tr_events.php page (Sasha)
 A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Czech, Dutch, French, German, Greek, Hungarian, Japanese, Italian, Romanian, Russian, Slovak, Spanish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
@@ -1434,6 +1435,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.19rc1
 
+....I..... [ZBXNEXT-1256] changed example directory size user parameter to return bytes (Richlv)
 ..F....... [ZBX-7156] fixed string value escaping in profiles (Eduard)
 ...G...... [ZBX-4658] fixed system.boottime and system.uptime returning bogus values on Solaris when agent is compiled as a 64-bit binary (asaveljevs)
 ........S. [ZBX-7119] fixed data collection stopping after no data maintenance until configuration cache is updated (asaveljevs)
