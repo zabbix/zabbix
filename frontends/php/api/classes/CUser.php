@@ -560,15 +560,13 @@ class CUser extends CZBXAPI {
 	}
 
 	/**
-	 * Delete Users
+	 * Delete Users.
 	 *
-	 * @param $userIds
+	 * @param array	$userIds
 	 *
-	 * @return boolean
+	 * @return array|boolean
 	 */
-	public function delete($userIds) {
-		$userIds = zbx_toArray($userIds);
-
+	public function delete(array $userIds) {
 		$this->validateDelete($userIds);
 
 		// delete action operation msg
