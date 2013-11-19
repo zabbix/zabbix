@@ -257,8 +257,6 @@ class CScreenItem extends CZBXAPI {
 	}
 
 	/**
-	 * TODO: deprecated
-	 *
 	 * Update screen items using the given 'x' and 'y' parameters.
 	 * If the given cell is free, a new screen item will be created.
 	 *
@@ -269,29 +267,58 @@ class CScreenItem extends CZBXAPI {
 	public function updateByPosition(array $screenItems) {
 		$screenItems = zbx_toArray($screenItems);
 
-		$screens = array();
-
 		$screenItemDBfields = array(
-			'screenid' => null
+			'screenid' => null,
+			'x' => null,
+			'y' => null
 		);
 
 		foreach ($screenItems as $screenItem) {
 			if (!check_db_fields($screenItemDBfields, $screenItem)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
 			}
+		}
 
-			$screens[$screenItem['screenid']]['screenitems'][] = $screenItem;
+		$dbScreenItems = $this->get(array(
+			'screenids' => zbx_objectValues($screenItems, 'screenid'),
+			'output' => array('screenitemid', 'screenid', 'x', 'y'),
+			'editable' => true,
+			'preservekeys' => true
+		));
+
+		$screens = array();
+
+		foreach ($screenItems as $screenItem) {
+			$found = false;
+
+			foreach ($dbScreenItems as $dbScreenItem) {
+				if ($screenItem['screenid'] == $dbScreenItem['screenid']
+						&& $screenItem['x'] == $dbScreenItem['x'] && $screenItem['y'] == $dbScreenItem['y']) {
+					$found = true;
+
+					$screenItem['screenitemid'] = $dbScreenItem['screenitemid'];
+					$screens[$screenItem['screenid']]['screenid'] = $screenItem['screenid'];
+					$screens[$screenItem['screenid']]['screenitems'][] = $screenItem;
+
+					break;
+				}
+			}
+
+			if (!$found) {
+				$screens[$screenItem['screenid']]['screenid'] = $screenItem['screenid'];
+				$screens[$screenItem['screenid']]['screenitems'][] = $screenItem;
+			}
 		}
 
 		API::Screen()->update($screens);
 
-		return array('screenitemids' => zbx_toObject($screenItems, 'screenitemid'));
+		return array('screenitemids' => zbx_objectValues($dbScreenItems, 'screenitemid'));
 	}
 
 	/**
 	 * Deletes screen items.
 	 *
-	 * @param array|int $screenItemIds	The IDs of the screen items to delete
+	 * @param array $screenItemIds
 	 *
 	 * @return array
 	 */
@@ -320,7 +347,7 @@ class CScreenItem extends CZBXAPI {
 	/**
 	 * Returns true if the given screen items exist and are available for reading.
 	 *
-	 * @param array $screenItemIds	An array if screen item IDs
+	 * @param array $screenItemIds
 	 *
 	 * @return bool
 	 */

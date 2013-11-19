@@ -481,7 +481,7 @@ class CScreen extends CZBXAPI {
 
 		foreach ($screens as $screen) {
 			$screenId = $screen['screenid'];
-			unset($screen['screenid']);
+			unset($screen['screenid'], $screen['screenitems']);
 
 			if ($screen) {
 				$update[] = array(
