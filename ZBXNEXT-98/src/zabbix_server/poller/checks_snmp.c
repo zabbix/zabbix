@@ -703,6 +703,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID
 		ret = NOTSUPPORTED;
 		goto out;
 	}
+
 	OID_len = strlen(snmp_oid);
 
 	/* copy rootOID to anOID */
@@ -725,8 +726,19 @@ static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID
 
 	while (1 == running)
 	{
-		pdu = snmp_pdu_create(SNMP_MSG_GETNEXT);	/* create empty PDU */
-		snmp_add_null_var(pdu, anOID, anOID_len);	/* add OID as variable to PDU */
+		if (NULL == (pdu = snmp_pdu_create(SNMP_MSG_GETNEXT)))	/* create empty PDU */
+		{
+			SET_MSG_RESULT(value, zbx_strdup(NULL, "snmp_pdu_create(): cannot create PDU object."));
+			ret = NOTSUPPORTED;
+			break;
+		}
+
+		if (NULL == snmp_add_null_var(pdu, anOID, anOID_len))	/* add OID as variable to PDU */
+		{
+			SET_MSG_RESULT(value, zbx_strdup(NULL, "snmp_add_null_var(): cannot add null variable."));
+			ret = NOTSUPPORTED;
+			break;
+		}
 
 		/* communicate with agent */
 		status = snmp_synch_response(ss, pdu, &response);
@@ -736,14 +748,12 @@ static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID
 		{
 			ret = zbx_get_snmp_response_error(ss, item, status, response, err);
 			SET_MSG_RESULT(value, zbx_strdup(NULL, err));
-
 			running = 0;
-
 			goto next;
 		}
 
 		/* process response */
-		for (var = response->variables; NULL != var && 1 == running; var = var->next_variable)
+		for (var = response->variables; NULL != var; var = var->next_variable)
 		{
 			/* verify if we are in the same subtree */
 			if (var->name_length < rootOID_len ||
@@ -758,6 +768,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID
 				}
 
 				running = 0;
+				break;
 			}
 			else
 			{
@@ -831,7 +842,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID
 					free_result(&snmp_value);
 
 					/* go to next variable */
-					memmove((char *)anOID, (char *)var->name, var->name_length * sizeof(oid));
+					memcpy((char *)anOID, (char *)var->name, var->name_length * sizeof(oid));
 					anOID_len = var->name_length;
 				}
 				else
@@ -841,6 +852,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID
 					SET_MSG_RESULT(value, zbx_get_snmp_type_error(var->type));
 					ret = NOTSUPPORTED;
 					running = 0;
+					break;
 				}
 			}
 		}
@@ -881,8 +893,6 @@ static int	zbx_snmp_get_value(struct snmp_session *ss, DC_ITEM *item, const char
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() oid:'%s'", __function_name, snmp_oid);
 
-	init_result(value);
-
 	if (NULL == snmp_parse_oid(snmp_oid, anOID, &anOID_len))
 	{
 		SET_MSG_RESULT(value, zbx_dsprintf(NULL, "snmp_parse_oid(): cannot parse OID \"%s\".", snmp_oid));
@@ -890,8 +900,19 @@ static int	zbx_snmp_get_value(struct snmp_session *ss, DC_ITEM *item, const char
 		goto out;
 	}
 
-	pdu = snmp_pdu_create(SNMP_MSG_GET);
-	snmp_add_null_var(pdu, anOID, anOID_len);
+	if (NULL == (pdu = snmp_pdu_create(SNMP_MSG_GET)))
+	{
+		SET_MSG_RESULT(value, zbx_strdup(NULL, "snmp_pdu_create(): cannot create PDU object."));
+		ret = NOTSUPPORTED;
+		goto out;
+	}
+
+	if (NULL == snmp_add_null_var(pdu, anOID, anOID_len))
+	{
+		SET_MSG_RESULT(value, zbx_strdup(NULL, "snmp_add_null_var(): cannot add null variable."));
+		ret = NOTSUPPORTED;
+		goto out;
+	}
 
 	status = snmp_synch_response(ss, pdu, &response);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response():%d", __function_name, status);
@@ -1075,6 +1096,8 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 					{
 						AGENT_RESULT	current_index_value;
 
+						init_result(&current_index_value);
+
 						zbx_snprintf(oid_full, sizeof(oid_full), "%s.%s", oid_translated, idx);
 
 						ret = zbx_snmp_get_value(ss, item, oid_full, &current_index_value);
@@ -1092,6 +1115,8 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 					if (SUCCEED != ret)
 					{
 						AGENT_RESULT	index;
+
+						init_result(&index);
 
 						if (SUCCEED == (ret = zbx_snmp_walk(ss, item, oid_translated,
 										index_value, &index)))
