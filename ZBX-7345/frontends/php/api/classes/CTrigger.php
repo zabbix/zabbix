@@ -610,7 +610,6 @@ class CTrigger extends CTriggerGeneral {
 	 * @param string $method
 	 */
 	public function checkInput(array &$triggers, $method) {
-		$create = ($method == 'create');
 		$update = ($method == 'update');
 
 		// permissions
@@ -957,7 +956,7 @@ class CTrigger extends CTriggerGeneral {
 
 		if (!$this->isReadable($depTtriggerIds)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		};
+		}
 
 		$this->checkDependencies($triggers);
 		$this->checkDependencyParents($triggers);
@@ -978,7 +977,7 @@ class CTrigger extends CTriggerGeneral {
 		$triggerIds = array_unique(zbx_objectValues($triggersData, 'triggerid'));
 		if (!$this->isWritable($triggerIds)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		};
+		}
 
 		$this->validateAddDependencies($triggersData);
 
@@ -1354,7 +1353,7 @@ class CTrigger extends CTriggerGeneral {
 						}
 						$host = reset($childTrigger['hosts']);
 						$dependencies = replace_template_dependencies($dependencies, $host['hostid']);
-						foreach ($dependencies as $triggerId => $depTriggerId) {
+						foreach ($dependencies as $depTriggerId) {
 							$newDependencies[] = array(
 								'triggerid' => $childTrigger['triggerid'],
 								'dependsOnTriggerid' => $depTriggerId
