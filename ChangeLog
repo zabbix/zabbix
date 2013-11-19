@@ -6,7 +6,7 @@ New features:
 A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Czech, Dutch, French, German, Greek, Hungarian, Japanese, Italian, Romanian, Russian, Slovak, Spanish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
-..F....... [ZBX-6129] fixed trying to change the status of a deleted trigger or trigger ptototype changes the status of all trigger and prototypes (Pavels)
+..F....... [ZBX-6129] fixed trying to change the status of a deleted trigger or trigger prototype changes the status of all trigger and prototypes (Pavels)
 ..F....... [ZBX-6920] fixed displaying of soft linked IT services (Eduard)
 .......PS. [ZBX-7292] fixed resolving of macros in host interfaces (Sasha)
 ....I..... [ZBX-7273] fixed newlines in default data strings for Oracle (Sasha)
