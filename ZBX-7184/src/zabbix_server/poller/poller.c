@@ -345,7 +345,7 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 	if (FAIL == host_get_availability(&item->host, item->type, &in))
 		goto out;
 
-	if (FAIL == DChost_activate(item->host.hostid, item->type, &in, &out))
+	if (FAIL == DChost_activate(&in, &out))
 		goto out;
 
 	if (FAIL == db_host_update_availability(&in, &out, NULL))
@@ -377,7 +377,7 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 	if (FAIL == host_get_availability(&item->host, item->type, &in))
 		goto out;
 
-	if (FAIL == DChost_deactivate(item->host.hostid, item->type, ts, &in, &out))
+	if (FAIL == DChost_deactivate(ts, &in, &out))
 		goto out;
 
 	if (FAIL == db_host_update_availability(&in, &out, error))

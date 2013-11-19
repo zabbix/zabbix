@@ -326,10 +326,9 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck);
 
 void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, char **replace_to);
 
-int	DChost_activate(zbx_uint64_t hostid, int item_type, zbx_host_availability_t *in, zbx_host_availability_t *out);
+int	DChost_activate(zbx_host_availability_t *in, zbx_host_availability_t *out);
 
-int	DChost_deactivate(zbx_uint64_t hostid, int item_type, zbx_timespec_t *ts, zbx_host_availability_t *in,
-		zbx_host_availability_t *out);
+int	DChost_deactivate(zbx_timespec_t *ts, zbx_host_availability_t *in, zbx_host_availability_t *out);
 
 int	DChost_update_availability(const zbx_host_availability_t *availability, int availability_num);
 

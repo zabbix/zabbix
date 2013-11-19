@@ -4521,7 +4521,7 @@ static int	DChost_set_availability(ZBX_DC_HOST *dc_host, const zbx_host_availabi
  *               FAIL    - failed to activate host, host not found            *
  *                                                                            *
  ******************************************************************************/
-int	DChost_activate(zbx_uint64_t hostid, int item_type, zbx_host_availability_t *in, zbx_host_availability_t *out)
+int	DChost_activate(zbx_host_availability_t *in, zbx_host_availability_t *out)
 {
 	int		ret = FAIL;
 	ZBX_DC_HOST	*dc_host;
@@ -4532,9 +4532,9 @@ int	DChost_activate(zbx_uint64_t hostid, int item_type, zbx_host_availability_t 
 
 	LOCK_CACHE;
 
-	if (NULL != (dc_host = zbx_hashset_search(&config->hosts, &hostid)))
+	if (NULL != (dc_host = zbx_hashset_search(&config->hosts, &in->hostid)))
 	{
-		DChost_get_availability(dc_host, item_type, in);
+		DChost_get_availability(dc_host, in->type, in);
 		*out = *in;
 
 		out->errors_from = 0;
@@ -4570,8 +4570,7 @@ out:
  *               FAIL    - failed to activate host, host not found            *
  *                                                                            *
  ******************************************************************************/
-int	DChost_deactivate(zbx_uint64_t hostid, int item_type, zbx_timespec_t *ts, zbx_host_availability_t *in,
-		zbx_host_availability_t *out)
+int	DChost_deactivate(zbx_timespec_t *ts, zbx_host_availability_t *in, zbx_host_availability_t *out)
 {
 	int		ret = FAIL;
 	ZBX_DC_HOST	*dc_host;
@@ -4582,9 +4581,9 @@ int	DChost_deactivate(zbx_uint64_t hostid, int item_type, zbx_timespec_t *ts, zb
 
 	LOCK_CACHE;
 
-	if (NULL != (dc_host = zbx_hashset_search(&config->hosts, &hostid)))
+	if (NULL != (dc_host = zbx_hashset_search(&config->hosts, &in->hostid)))
 	{
-		DChost_get_availability(dc_host, item_type, in);
+		DChost_get_availability(dc_host, in->type, in);
 		*out = *in;
 
 		if (0 == out->errors_from)
