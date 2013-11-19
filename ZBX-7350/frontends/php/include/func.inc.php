@@ -2462,11 +2462,14 @@ function get_status() {
 			+ $status['items_count_not_supported'];
 
 	// hosts
+	$statuses = array(HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE);
+	$flags = array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED);
+
 	$dbHosts = DBselect(
 		'SELECT COUNT(*) AS cnt,h.status'.
 		' FROM hosts h'.
-		' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.' )'.
-			' AND h.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
+		' WHERE '.dbConditionInt('h.status', $statuses).
+			' AND '.dbConditionInt('h.flags', $flags).
 		' GROUP BY h.status');
 	while ($dbHost = DBfetch($dbHosts)) {
 		switch ($dbHost['status']) {
