@@ -2661,7 +2661,7 @@ function getMenuPopupHost(array $host, array $scripts = null, $hasGoTo = true) {
 }
 
 /**
- * Prepare data for host menu popup.
+ * Prepare data for map menu popup.
  *
  * @param string $hostId					host id
  * @param array  $scripts					host scripts (optional)
