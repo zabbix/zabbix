@@ -1424,7 +1424,7 @@ class CHost extends CHostGeneral {
 	 * @return void
 	 */
 	protected function validateDelete(array $hostIds, $nopermissions = false) {
-		if (empty($hostIds)) {
+		if (!$hostIds) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
@@ -1434,16 +1434,14 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
-	 * Delete Host
+	 * Delete Host.
 	 *
-	 * @param string|array 	$hostIds
-	 * @param bool			$nopermissions
+	 * @param array	$hostIds
+	 * @param bool	$nopermissions
 	 *
 	 * @return array|boolean
 	 */
-	public function delete($hostIds, $nopermissions = false) {
-		$hostIds = zbx_toArray($hostIds);
-
+	public function delete(array $hostIds, $nopermissions = false) {
 		$this->validateDelete($hostIds, $nopermissions);
 
 		// delete the discovery rules first

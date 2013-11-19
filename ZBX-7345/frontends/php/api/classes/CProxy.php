@@ -400,13 +400,11 @@ class CProxy extends CZBXAPI {
 	/**
 	 * Delete proxy.
 	 *
-	 * @param string|array $proxyIds
+	 * @param array	$proxyIds
 	 *
-	 * @return array
+	 * @return array|boolean
 	 */
-	public function delete($proxyIds) {
-		$proxyIds = zbx_toArray($proxyIds);
-
+	public function delete(array $proxyIds) {
 		$this->validateDelete($proxyIds);
 
 		$dbProxies = DBselect(
