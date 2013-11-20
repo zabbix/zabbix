@@ -687,7 +687,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID
 	AGENT_RESULT		snmp_value;
 	char			err[MAX_STRING_LEN];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() oid:'%s' search:'s'", __function_name, OID, ZBX_NULL2STR(search));
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() oid:'%s' search:'%s'", __function_name, OID, ZBX_NULL2STR(search));
 
 	/* create OID from string */
 	if (NULL == snmp_parse_oid(OID, rootOID, &rootOID_len))
@@ -864,8 +864,7 @@ next:
 
 	if (NULL != search)
 	{
-		if (0 == found)
-			ret = NOTSUPPORTED;
+		ret = (1 == found ? SUCCEED : NOTSUPPORTED);
 	}
 	else
 	{
