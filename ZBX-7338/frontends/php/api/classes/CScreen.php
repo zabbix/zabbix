@@ -332,7 +332,7 @@ class CScreen extends CZBXAPI {
 		}
 
 		// removing keys (hash -> array)
-		if ($options['preservekeys'] == null) {
+		if ($options['preservekeys'] === null) {
 			$result = zbx_cleanHashes($result);
 		}
 
