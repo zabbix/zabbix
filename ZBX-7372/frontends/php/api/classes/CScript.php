@@ -363,8 +363,10 @@ class CScript extends CZBXAPI {
 			}
 
 			foreach ($scripts as $scriptId => $script) {
+				$hosts = $script['hosts'];
+				unset($script['hosts']);
 				// set script to host
-				foreach ($script['hosts'] as $host) {
+				foreach ($hosts as $host) {
 					$hostId = $host['hostid'];
 
 					if (isset($scriptsByHost[$hostId])) {
