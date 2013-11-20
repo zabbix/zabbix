@@ -15,6 +15,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, French, Italian, Russian and
 ....I..PS. [ZBXNEXT-1257] dropped support for UCD-SNMP (asaveljevs)
 
 Bug fixes:
+A......... [ZBX-7351] fixed screen item not being saved if resource type is URL (Ivo)
 ........S. [ZBX-7329] fixed VMware related compiling error on FreeBSD (wiper)
 ........S. [ZBX-7359] fixed possible crash when parsing VMware datastore data (wiper)
 ........S. [ZBX-7309] fixed resolving of {ITEM.VALUE} macro in recovery messages (Andris, Sasha)
