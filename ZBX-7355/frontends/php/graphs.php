@@ -252,7 +252,9 @@ elseif (isset($_REQUEST['save'])) {
 		show_messages($result, _('Graph added'), _('Cannot add graph'));
 	}
 }
-elseif (hasRequest('delete') && $graphId = getRequest('graphid')) {
+elseif (hasRequest('delete') && hasRequest('graphid')) {
+	$graphId = getRequest('graphid');
+
 	if ($parentDiscoveryId = getRequest('parent_discoveryid')) {
 		$result = API::GraphPrototype()->delete($graphId);
 
@@ -270,7 +272,9 @@ elseif (hasRequest('delete') && $graphId = getRequest('graphid')) {
 		unset($_REQUEST['form']);
 	}
 }
-elseif (getRequest('go') == 'delete' && $graphIds = getRequest('group_graphid')) {
+elseif (getRequest('go') == 'delete' && hasRequest('group_graphid')) {
+	$graphIds = getRequest('group_graphid');
+
 	if ($parentDiscoveryId = getRequest('parent_discoveryid')) {
 		$result = API::GraphPrototype()->delete($graphIds);
 
