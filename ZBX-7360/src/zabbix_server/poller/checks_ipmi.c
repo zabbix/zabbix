@@ -24,7 +24,7 @@
 #define	IPMI_SENSOR_ID_SZ	33	/* It should be enough max 16 bytes for sensor ID and terminating '\0' */
 					/* (see SDR record format in IPMI v2 spec). */
 					/* Non-threshold sensors in OpenIPMI 2.0.16 - 2.0.18 have longer identifiers */
-					/* while for OpenIPMI 2.0.19 17 bytes is enough. */
+					/* while for OpenIPMI 2.0.19 17 bytes are enough. */
 					/* Therefore it is defined longer than necessary 17 bytes. */
 #include "log.h"
 
