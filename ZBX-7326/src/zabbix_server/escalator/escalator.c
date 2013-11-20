@@ -1796,8 +1796,6 @@ void	main_escalator_loop(void)
 		total_sec += zbx_time() - sec;
 
 		sleeptime = nextcheck - now;
-		if (CONFIG_ESCALATOR_FREQUENCY < sleeptime)
-			sleeptime = CONFIG_ESCALATOR_FREQUENCY;
 
 		if (0 < sleeptime)
 		{
