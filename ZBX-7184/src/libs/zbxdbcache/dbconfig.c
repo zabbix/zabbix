@@ -4421,7 +4421,8 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
  *                         unrecognized item type was specified               *
  *                                                                            *
  ******************************************************************************/
-static int	DChost_get_availability(const ZBX_DC_HOST *dc_host, int type, zbx_host_availability_t *availability)
+static int	DChost_get_availability(const ZBX_DC_HOST *dc_host, unsigned char type,
+		zbx_host_availability_t *availability)
 {
 	switch (type)
 	{
@@ -4459,7 +4460,7 @@ static int	DChost_get_availability(const ZBX_DC_HOST *dc_host, int type, zbx_hos
 
 /******************************************************************************
  *                                                                            *
- * Function: DChost_get_availability                                          *
+ * Function: DChost_set_availability                                          *
  *                                                                            *
  * Purpose: set host availability data based on the specified item type       *
  *                                                                            *
@@ -4510,12 +4511,10 @@ static int	DChost_set_availability(ZBX_DC_HOST *dc_host, const zbx_host_availabi
  *                                                                            *
  * Purpose: set host as available for the checks of the specified item type   *
  *                                                                            *
- * Parameters: hostid    - [IN] the host id                                   *
- *             type      - [IN] the item type                                 *
- *             in        - [IN/OUT] IN: the caller's host availability data   *
- *                                  OUT: the host availability data in cache  *
- *                                  before changes                            *
- *             out       - [OUT] the host availability data after changes     *
+ * Parameters: in  - [IN/OUT] IN: the caller's host availability data         *
+ *                            OUT: the host availability data in cache        *
+ *                            before changes                                  *
+ *             out - [OUT] the host availability data after changes           *
  *                                                                            *
  * Return value: SUCCEED - the host was activated successfully                *
  *               FAIL    - failed to activate host, host not found            *
@@ -4535,8 +4534,9 @@ int	DChost_activate(zbx_host_availability_t *in, zbx_host_availability_t *out)
 	if (NULL != (dc_host = zbx_hashset_search(&config->hosts, &in->hostid)))
 	{
 		DChost_get_availability(dc_host, in->type, in);
-		*out = *in;
 
+		out->hostid = in->hostid;
+		out->type = in->type;
 		out->errors_from = 0;
 		out->available = HOST_AVAILABLE_TRUE;
 		out->disable_until = 0;
@@ -4558,13 +4558,11 @@ out:
  * Purpose: attempt to set host as unavailable for the checks of the          *
  *          specified item type based on the time the checks are failing      *
  *                                                                            *
- * Parameters: hostid    - [IN] the host id                                   *
- *             type      - [IN] the item type                                 *
- *             ts        - [IN] the failure timestamp                         *
- *             in        - [IN/OUT] IN: the caller's host availability data   *
- *                                  OUT: the host availability data in cache  *
- *                                  before changes                            *
- *             out       - [OUT] the host availability data after changes     *
+ * Parameters: ts  - [IN] the failure timestamp                               *
+ *             in  - [IN/OUT] IN: the caller's host availability data         *
+ *                            OUT: the host availability data in cache        *
+ *                            before changes                                  *
+ *             out - [OUT] the host availability data after changes           *
  *                                                                            *
  * Return value: SUCCEED - the host was deactivated successfully              *
  *               FAIL    - failed to activate host, host not found            *
@@ -4600,7 +4598,7 @@ int	DChost_deactivate(zbx_timespec_t *ts, zbx_host_availability_t *in, zbx_host_
 			if (CONFIG_UNREACHABLE_DELAY <= ts->sec - out->errors_from)
 			{
 				/* repeating error */
-				if (CONFIG_UNREACHABLE_PERIOD >= ts->sec - out->errors_from)
+				if (CONFIG_UNREACHABLE_PERIOD > ts->sec - out->errors_from)
 				{
 					/* leave host available, schedule next unreachable check */
 					out->disable_until = ts->sec + CONFIG_UNREACHABLE_DELAY;
@@ -4635,12 +4633,10 @@ out:
  *             availability_num - [IN] the number of items in availability    *
  *                                array                                       *
  *                                                                            *
- * Return value: The number of updates performed.                             *
- *                                                                            *
  ******************************************************************************/
-int	DChost_update_availability(const zbx_host_availability_t *availability, int availability_num)
+void	DChost_update_availability(const zbx_host_availability_t *availability, int availability_num)
 {
-	int		update_count = 0, i;
+	int		i;
 	ZBX_DC_HOST	*dc_host;
 
 	LOCK_CACHE;
@@ -4651,13 +4647,9 @@ int	DChost_update_availability(const zbx_host_availability_t *availability, int 
 			continue;
 
 		DChost_set_availability(dc_host, &availability[i]);
-
-		update_count++;
 	}
 
 	UNLOCK_CACHE;
-
-	return update_count;
 }
 
 /******************************************************************************

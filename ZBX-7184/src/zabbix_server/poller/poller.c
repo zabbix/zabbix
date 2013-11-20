@@ -211,7 +211,6 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
  *             out   - [IN] the host availability data after changes          *
  *             error - [IN] an optional error message that will be written    *
  *                          into database if availability data was changed.   *
- *                          Can be NULL (empty error message will be written) *
  *                                                                            *
  * Return value: SUCCEED - the availability changes were written into db      *
  *               FAIL    - no changes in availability data were detected      *
@@ -249,28 +248,29 @@ static int	db_host_update_availability(const zbx_host_availability_t *in, const 
 				sqlset_prefix, out->available);
 		sqlset_delim = ',';
 	}
+
 	if (in->errors_from != out->errors_from)
 	{
 		zbx_snprintf_alloc(&sqlset, &sqlset_alloc, &sqlset_offset, "%c%serrors_from=%d", sqlset_delim,
 				sqlset_prefix, out->errors_from);
 		sqlset_delim = ',';
 	}
+
 	if (in->disable_until != out->disable_until)
 	{
 		zbx_snprintf_alloc(&sqlset, &sqlset_alloc, &sqlset_offset, "%c%sdisable_until=%d", sqlset_delim,
 				sqlset_prefix, out->disable_until);
-		sqlset_delim = ',';
 	}
 
 	if (NULL != sqlset)
 	{
 		char	*error_esc;
 
-		error_esc = (NULL == error) ? zbx_strdup(NULL, "") : DBdyn_escape_string_len(error, HOST_ERROR_LEN);
+		error_esc = DBdyn_escape_string_len(error, HOST_ERROR_LEN);
 
 		DBbegin();
-		DBexecute("update hosts set%s,%serror='%s' where hostid="
-				ZBX_FS_UI64, sqlset, sqlset_prefix, error_esc, out->hostid);
+		DBexecute("update hosts set%s,%serror='%s' where hostid=" ZBX_FS_UI64,
+				sqlset, sqlset_prefix, error_esc, out->hostid);
 		DBcommit();
 
 		zbx_free(error_esc);
@@ -298,7 +298,7 @@ static int	db_host_update_availability(const zbx_host_availability_t *in, const 
  *                         unrecognized item type was specified               *
  *                                                                            *
  ******************************************************************************/
-static int	host_get_availability(const DC_HOST *dc_host, int type, zbx_host_availability_t *availability)
+static int	host_get_availability(const DC_HOST *dc_host, unsigned char type, zbx_host_availability_t *availability)
 {
 	switch (type)
 	{
@@ -337,10 +337,11 @@ static int	host_get_availability(const DC_HOST *dc_host, int type, zbx_host_avai
 static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 {
 	const char		*__function_name = "activate_host";
+
 	zbx_host_availability_t	in, out;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
-			__function_name, item->host.hostid, item->itemid, item->type);
+			__function_name, item->host.hostid, item->itemid, (int)item->type);
 
 	if (FAIL == host_get_availability(&item->host, item->type, &in))
 		goto out;
@@ -348,7 +349,7 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 	if (FAIL == DChost_activate(&in, &out))
 		goto out;
 
-	if (FAIL == db_host_update_availability(&in, &out, NULL))
+	if (FAIL == db_host_update_availability(&in, &out, ""))
 		goto out;
 
 	if (HOST_AVAILABLE_TRUE == in.available)
@@ -372,7 +373,7 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 	zbx_host_availability_t	in, out;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
-			__function_name, item->host.hostid, item->itemid, item->type);
+			__function_name, item->host.hostid, item->itemid, (int)item->type);
 
 	if (FAIL == host_get_availability(&item->host, item->type, &in))
 		goto out;
@@ -415,7 +416,6 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() errors_from:%d available:%d", __function_name, out.errors_from,
 			out.available);
-
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
