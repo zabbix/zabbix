@@ -170,6 +170,7 @@ class CScreenItem extends CZBXAPI {
 			$this->checkDuplicateResourceInCell($screenItem, $dbScreenItems);
 			$this->checkSpans($screenItem);
 			$this->checkSpansInBounds($screenItem, $dbScreens[$screenItem['screenid']]);
+			$this->checkGridCoordinates($screenItem, $dbScreens[$screenItem['screenid']]);
 		}
 
 		// check duplicate resource in cell for new screen items
@@ -251,6 +252,7 @@ class CScreenItem extends CZBXAPI {
 			$this->checkDuplicateResourceInCell($screenItem, $dbScreenItems);
 			$this->checkSpans($screenItem);
 			$this->checkSpansInBounds($screenItem, $dbScreens[$screenItem['screenid']]);
+			$this->checkGridCoordinates($screenItem, $dbScreens[$screenItem['screenid']]);
 		}
 
 		$this->checkInput($screenItems, $dbScreenItems);
@@ -286,7 +288,7 @@ class CScreenItem extends CZBXAPI {
 			'preservekeys' => true
 		));
 
-		$screens = array();
+		$create = $update = $affectedIds = array();
 
 		foreach ($screenItems as $screenItem) {
 			$found = false;
@@ -297,22 +299,29 @@ class CScreenItem extends CZBXAPI {
 					$found = true;
 
 					$screenItem['screenitemid'] = $dbScreenItem['screenitemid'];
-					$screens[$screenItem['screenid']]['screenid'] = $screenItem['screenid'];
-					$screens[$screenItem['screenid']]['screenitems'][] = $screenItem;
+					$update[$dbScreenItem['screenitemid']] = $screenItem;
 
 					break;
 				}
 			}
 
 			if (!$found) {
-				$screens[$screenItem['screenid']]['screenid'] = $screenItem['screenid'];
-				$screens[$screenItem['screenid']]['screenitems'][] = $screenItem;
+				$create[] = $screenItem;
 			}
 		}
 
-		API::Screen()->update($screens);
+		if ($update) {
+			$screenItems = API::ScreenItem()->update($update);
 
-		return array('screenitemids' => zbx_objectValues($dbScreenItems, 'screenitemid'));
+			$affectedIds = reset($screenItems);
+		}
+		if ($create) {
+			$screenItems = API::ScreenItem()->create($create);
+
+			$affectedIds = array_merge($affectedIds, reset($screenItems));
+		}
+
+		return array('screenitemids' => $affectedIds);
 	}
 
 	/**
@@ -695,6 +704,28 @@ class CScreenItem extends CZBXAPI {
 					}
 				}
 			}
+		}
+	}
+
+	/**
+	 * Checks that the row and column fit into the size of the screen.
+	 *
+	 * @throws APIException if the any of the coordinates is bigger then the free space on the screen
+	 *
+	 * @param array $screenItem
+	 * @param array $screen
+	 */
+	protected function checkGridCoordinates(array $screenItem, array $screen) {
+		if (isset($screenItem['y']) && isset($screen['vsize']) && $screenItem['y'] > $screen['vsize'] - 1) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Row Y "%1$s" of screen element is bigger then the free space on the screen.', $screenItem['y'])
+			);
+		}
+
+		if (isset($screenItem['x']) && isset($screen['hsize']) && $screenItem['x'] > $screen['hsize'] - 1) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Column X "%1$s" of screen element is bigger then the free space on the screen.', $screenItem['x'])
+			);
 		}
 	}
 
