@@ -1767,8 +1767,8 @@ void	main_escalator_loop(void)
 {
 #define	STAT_INTERVAL	5
 
-	int	now, escalations_count = 0, nextcheck, sleeptime, show_stats = 1;
-	double	sec, total_sec = 0.0;
+	int	now, escalations_count = 0, nextcheck, sleeptime = -1, old_escalations_count = 0;
+	double	sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t	last_stat_time;
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
@@ -1777,40 +1777,42 @@ void	main_escalator_loop(void)
 
 	for (;;)
 	{
-		now = time(NULL);
-
-		if (1 == show_stats)
+		if (0 != sleeptime)
 		{
 			zbx_setproctitle("%s [processed %d escalations in " ZBX_FS_DBL " sec, processing escalations]",
-					get_process_type_string(process_type), escalations_count, total_sec);
-
-			escalations_count = 0;
-			total_sec = 0.0;
-
-			show_stats = 0;
-			last_stat_time = now;
+					get_process_type_string(process_type), old_escalations_count, old_total_sec);
 		}
 
 		sec = zbx_time();
-		escalations_count += process_escalations(now, &nextcheck);
+		escalations_count += process_escalations(time(NULL), &nextcheck);
 		total_sec += zbx_time() - sec;
 
 		sleeptime = calculate_sleeptime(nextcheck, CONFIG_ESCALATOR_FREQUENCY);
 
-		if (0 < sleeptime)
+		now = time(NULL);
+
+		if (0 != sleeptime || STAT_INTERVAL <= now - last_stat_time)
 		{
-			zbx_setproctitle("%s [processed %d escalations in " ZBX_FS_DBL " sec, idle %d sec]",
-					get_process_type_string(process_type), escalations_count, total_sec,
-					sleeptime);
+			if (0 == sleeptime)
+			{
+				zbx_setproctitle("%s [processed %d escalations in " ZBX_FS_DBL " sec, processing escalations]",
+						get_process_type_string(process_type), escalations_count, total_sec);
+			}
+			else
+			{
+				zbx_setproctitle("%s [processed %d escalations in " ZBX_FS_DBL " sec, idle %d sec]",
+						get_process_type_string(process_type), escalations_count, total_sec,
+						sleeptime);
 
-			zbx_sleep_loop(sleeptime);
-
-			show_stats = 1;
-			continue;
+				old_escalations_count = escalations_count;
+				old_total_sec = total_sec;
+			}
+			escalations_count = 0;
+			total_sec = 0.0;
+			last_stat_time = now;
 		}
 
-		if (STAT_INTERVAL <= time(NULL) - last_stat_time)
-			show_stats = 1;
+		zbx_sleep_loop(sleeptime);
 	}
 }
 
