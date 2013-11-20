@@ -737,6 +737,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID
 		{
 			SET_MSG_RESULT(value, zbx_strdup(NULL, "snmp_add_null_var(): cannot add null variable."));
 			ret = NOTSUPPORTED;
+			snmp_free_pdu(pdu);
 			break;
 		}
 
@@ -911,6 +912,7 @@ static int	zbx_snmp_get_value(struct snmp_session *ss, DC_ITEM *item, const char
 	{
 		SET_MSG_RESULT(value, zbx_strdup(NULL, "snmp_add_null_var(): cannot add null variable."));
 		ret = NOTSUPPORTED;
+		snmp_free_pdu(pdu);
 		goto out;
 	}
 
