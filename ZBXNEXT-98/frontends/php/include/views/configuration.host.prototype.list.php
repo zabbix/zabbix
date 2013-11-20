@@ -31,7 +31,7 @@ $createForm->addItem(new CSubmit('form', _('Create host prototype')));
 $itemsWidget->addPageHeader(_('CONFIGURATION OF HOST PROTOTYPES'), $createForm);
 
 // header
-$itemsWidget->addHeader(array(_('Host prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'gold')));
+$itemsWidget->addHeader(array(_('Host prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'parent-discovery')));
 $itemsWidget->addHeaderRowNumber();
 $itemsWidget->addItem(get_header_host_table('hosts', $discoveryRule['hostid'], $this->data['parent_discoveryid']));
 

@@ -29,7 +29,7 @@ if (!empty($this->data['parent_discoveryid'])) {
 	$createForm->addItem(new CSubmit('form', _('Create graph prototype')));
 
 	$graphWidget->addPageHeader(_('CONFIGURATION OF GRAPH PROTOTYPES'), $createForm);
-	$graphWidget->addHeader(array(_('Graph prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'gold')));
+	$graphWidget->addHeader(array(_('Graph prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'parent-discovery')));
 
 	if (!empty($this->data['hostid'])) {
 		$graphWidget->addItem(get_header_host_table('graphs', $this->data['hostid'], $this->data['parent_discoveryid']));
@@ -118,7 +118,7 @@ foreach ($this->data['graphs'] as $graph) {
 		$name[] = new CLink(
 			$graph['discoveryRule']['name'],
 			'host_discovery.php?form=update&itemid='.$graph['discoveryRule']['itemid'],
-			'gold'
+			'parent-discovery'
 		);
 		$name[] = NAME_DELIMITER;
 		$name[] = new CSpan($graph['name']);

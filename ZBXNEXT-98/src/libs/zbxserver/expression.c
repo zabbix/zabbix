@@ -2693,9 +2693,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 						0 == strcmp(m, MVAR_TRIGGER_COMMENT))
 				{
 					replace_to = zbx_strdup(replace_to, c_event->trigger.comments);
-					substitute_simple_macros(actionid, event, r_event, userid, hostid, dc_host,
-							dc_item, &replace_to, MACRO_TYPE_TRIGGER_COMMENTS, error,
-							maxerrlen);
+					substitute_simple_macros(NULL, c_event, NULL, NULL, NULL, NULL, NULL,
+							&replace_to, MACRO_TYPE_TRIGGER_COMMENTS, error, maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_EVENTS_ACK))
 				{
@@ -2729,9 +2728,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				else if (0 == strcmp(m, MVAR_TRIGGER_NAME))
 				{
 					replace_to = zbx_strdup(replace_to, c_event->trigger.description);
-					substitute_simple_macros(actionid, event, r_event, userid, hostid, dc_host,
-							dc_item, &replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION, error,
-							maxerrlen);
+					substitute_simple_macros(NULL, c_event, NULL, NULL, NULL, NULL, NULL,
+							&replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION, error, maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_NAME_ORIG))
 				{
@@ -2756,9 +2754,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				else if (0 == strcmp(m, MVAR_TRIGGER_URL))
 				{
 					replace_to = zbx_strdup(replace_to, c_event->trigger.url);
-					substitute_simple_macros(actionid, event, r_event, userid, hostid, dc_host,
-							dc_item, &replace_to, MACRO_TYPE_TRIGGER_URL, error,
-							maxerrlen);
+					substitute_simple_macros(NULL, c_event, NULL, NULL, NULL, NULL, NULL,
+							&replace_to, MACRO_TYPE_TRIGGER_URL, error, maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_VALUE))
 				{
@@ -2879,9 +2876,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 						0 == strcmp(m, MVAR_TRIGGER_COMMENT))
 				{
 					replace_to = zbx_strdup(replace_to, c_event->trigger.comments);
-					substitute_simple_macros(actionid, event, r_event, userid, hostid, dc_host,
-							dc_item, &replace_to, MACRO_TYPE_TRIGGER_COMMENTS, error,
-							maxerrlen);
+					substitute_simple_macros(NULL, c_event, NULL, NULL, NULL, NULL, NULL,
+							&replace_to, MACRO_TYPE_TRIGGER_COMMENTS, error, maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_EXPRESSION))
 				{
@@ -2899,9 +2895,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				else if (0 == strcmp(m, MVAR_TRIGGER_NAME))
 				{
 					replace_to = zbx_strdup(replace_to, c_event->trigger.description);
-					substitute_simple_macros(actionid, event, r_event, userid, hostid, dc_host,
-							dc_item, &replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION, error,
-							maxerrlen);
+					substitute_simple_macros(NULL, c_event, NULL, NULL, NULL, NULL, NULL,
+							&replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION, error, maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_NAME_ORIG))
 				{
@@ -2926,8 +2921,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				else if (0 == strcmp(m, MVAR_TRIGGER_URL))
 				{
 					replace_to = zbx_strdup(replace_to, c_event->trigger.url);
-					substitute_simple_macros(actionid, event, r_event, userid, hostid, dc_host,
-							dc_item, &replace_to, MACRO_TYPE_TRIGGER_URL, error, maxerrlen);
+					substitute_simple_macros(NULL, c_event, NULL, NULL, NULL, NULL, NULL,
+							&replace_to, MACRO_TYPE_TRIGGER_URL, error, maxerrlen);
 				}
 			}
 			else if (EVENT_SOURCE_DISCOVERY == c_event->source)

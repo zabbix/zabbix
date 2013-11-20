@@ -276,7 +276,7 @@ elseif (isset($_REQUEST['save'])) {
 
 			$result = true;
 			foreach ($dbGraphs as $dbGraph) {
-				$result &= (bool) copy_graph_to_host($dbGraph['graphid'], $templateId);
+				$result &= (bool) copyGraphToHost($dbGraph['graphid'], $templateId);
 			}
 
 			if (!$result) {
