@@ -1123,9 +1123,9 @@ function item_get_history($db_item, $clock, $ns) {
 }
 
 /**
- * Check if current time is within given period
+ * Check if current time is within given period.
  *
- * @param array $period              time period format: "wd[-wd2],hh:mm-hh:mm"
+ * @param string $period              time period format: "wd[-wd2],hh:mm-hh:mm"
  * @param int $now                   current timestamp
  *
  * @return bool                      true - within in a period, false - out of period
