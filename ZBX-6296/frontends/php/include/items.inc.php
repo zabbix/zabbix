@@ -631,20 +631,21 @@ function resolveItemKeyMacros(array $item) {
 }
 
 /**
- * Expand macros inside key name and return it
+ * Expand macros inside key name.
+ *
  * Example:
  *	key: 'test.key[a, b, "{HOSTNAME}"]'
  *	name: 'Test item $1, $2, $3'
  *	result: 'Test item a, b, Zabbix-server'
  *
- * @param array $item
+ * @param array  $item
  * @param string $item['key_']
  * @param string $item['itemid']
  * @param string $item['name']
  *
  * @return string
  */
-function itemName($item) {
+function itemName(array $item) {
 	$name = $item['name'];
 
 	// if item name contains $1..$9 macros, we need to expand them
@@ -653,9 +654,11 @@ function itemName($item) {
 
 		// parsing key to get the parameters out of it
 		$ItemKey = new CItemKey($key);
+
 		if ($ItemKey->isValid()) {
 			$keyParameters = $ItemKey->getParameters();
 			$searchOffset = 0;
+
 			while (preg_match('/\$[1-9]/', $name, $matches, PREG_OFFSET_CAPTURE, $searchOffset)) {
 				// matches[0][0] - matched param, [1] - second character of it
 				$paramNumber = $matches[0][0][1] - 1;
@@ -666,6 +669,7 @@ function itemName($item) {
 			}
 		}
 	}
+
 	if (preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $name, $arr)) {
 		$macros = API::UserMacro()->getMacros(array(
 			'macros' => $arr[1],
@@ -673,6 +677,7 @@ function itemName($item) {
 		));
 		$name = str_replace(array_keys($macros), array_values($macros), $name);
 	}
+
 	return $name;
 }
 

@@ -576,7 +576,7 @@ class CUserMacro extends CZBXAPI {
 	}
 
 	/**
-	 * Get macros
+	 * Get macros with values.
 	 *
 	 * @param array $data
 	 *
@@ -693,15 +693,21 @@ class CUserMacro extends CZBXAPI {
 			$items = array($items);
 		}
 
-		foreach ($items as $num => $item) {
-			if (!isset($item['itemid']) || !isset($item['key_'])) continue;
+		foreach ($items as $key => $item) {
+			if (!isset($item['itemid']) || !isset($item['key_'])) {
+				continue;
+			}
 
 			if ($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $item['key_'], $arr)) {
-				$macros = $this->getMacros(array('macros' => $arr[1],'itemid' => $item['itemid']));
+				$macros = $this->getMacros(array(
+					'macros' => $arr[1],
+					'itemid' => $item['itemid']
+				));
 
 				$search = array_keys($macros);
 				$values = array_values($macros);
-				$items[$num]['key_'] = str_replace($search, $values, $item['key_']);
+
+				$items[$key]['key_'] = str_replace($search, $values, $item['key_']);
 			}
 		}
 

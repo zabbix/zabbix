@@ -199,15 +199,16 @@ if ($hosts) {
 	));
 }
 if ($items) {
-	// filter items by name
-	foreach ($items as $key => &$item) {
-		$item['resolvedName'] = itemName($item);
+	// macros
+	$macroResolver = new CMacrosResolver();
+	$items = $macroResolver->resolveItems($items);
 
-		if (!zbx_empty($filterSelect) && !zbx_stristr($item['resolvedName'], $filterSelect)) {
+	// filter items by name
+	foreach ($items as $key => $item) {
+		if (!zbx_empty($filterSelect) && !zbx_stristr($item['name'], $filterSelect)) {
 			unset($items[$key]);
 		}
 	}
-	unset($item);
 
 	if ($items) {
 		// get history
@@ -236,13 +237,13 @@ if ($items) {
 
 		// sort
 		if ($sortField == 'i.name') {
-			$sortFields = array(array('field' => 'resolvedName', 'order' => $sortOrder), 'itemid');
+			$sortFields = array(array('field' => 'name', 'order' => $sortOrder), 'itemid');
 		}
 		elseif ($sortField == 'i.lastclock') {
-			$sortFields = array(array('field' => 'lastclock', 'order' => $sortOrder), 'resolvedName', 'itemid');
+			$sortFields = array(array('field' => 'lastclock', 'order' => $sortOrder), 'name', 'itemid');
 		}
 		else {
-			$sortFields = array('resolvedName', 'itemid');
+			$sortFields = array('name', 'itemid');
 		}
 		CArrayHelper::sort($items, $sortFields);
 
@@ -417,12 +418,11 @@ foreach ($items as $key => $item){
 	}
 
 	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown txt' : 'txt';
-	$itemName = $item['resolvedName'];
 
 	if ($filterShowDetails) {
 		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST || $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
-			? new CSpan(resolveItemKeyMacros($item), 'enabled')
-			: new CLink(resolveItemKeyMacros($item), 'items.php?form=update&itemid='.$item['itemid'], 'enabled');
+			? new CSpan($item['key_'], 'enabled')
+			: new CLink($item['key_'], 'items.php?form=update&itemid='.$item['itemid'], 'enabled');
 
 		$statusIcons = array();
 		if ($item['status'] == ITEM_STATUS_ACTIVE) {
@@ -447,7 +447,7 @@ foreach ($items as $key => $item){
 			SPACE,
 			is_show_all_nodes() ? SPACE : null,
 			($_REQUEST['hostid'] > 0) ? null : SPACE,
-			new CCol(new CDiv(array($itemName, BR(), $itemKey), $stateCss.' item')),
+			new CCol(new CDiv(array($item['name'], BR(), $itemKey), $stateCss.' item')),
 			new CCol(new CDiv(
 				($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER)
 					? UNKNOWN_VALUE
@@ -469,7 +469,7 @@ foreach ($items as $key => $item){
 			SPACE,
 			is_show_all_nodes() ? SPACE : null,
 			($_REQUEST['hostid'] > 0) ? null : SPACE,
-			new CCol(new CDiv($itemName, $stateCss.' item')),
+			new CCol(new CDiv($item['name'], $stateCss.' item')),
 			new CCol(new CDiv($lastClock, $stateCss)),
 			new CCol(new CDiv($lastValue, $stateCss)),
 			new CCol(new CDiv($change, $stateCss)),
@@ -591,12 +591,10 @@ foreach ($items as $item) {
 
 	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown txt' : 'txt';
 
-	$itemName = $item['resolvedName'];
-
 	if ($filterShowDetails) {
 		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST || $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
-			? new CSpan(resolveItemKeyMacros($item), 'enabled')
-			: new CLink(resolveItemKeyMacros($item), 'items.php?form=update&itemid='.$item['itemid'], 'enabled');
+			? new CSpan($item['key_'], 'enabled')
+			: new CLink($item['key_'], 'items.php?form=update&itemid='.$item['itemid'], 'enabled');
 
 		$statusIcons = array();
 		if ($item['status'] == ITEM_STATUS_ACTIVE) {
@@ -621,7 +619,7 @@ foreach ($items as $item) {
 			SPACE,
 			is_show_all_nodes() ? ($host['item_cnt'] ? SPACE : get_node_name_by_elid($item['itemid'])) : null,
 			$_REQUEST['hostid'] ? null : SPACE,
-			new CCol(new CDiv(array($itemName, BR(), $itemKey), $stateCss.' item')),
+			new CCol(new CDiv(array($item['name'], BR(), $itemKey), $stateCss.' item')),
 			new CCol(new CDiv(
 				($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER)
 					? UNKNOWN_VALUE
@@ -643,7 +641,7 @@ foreach ($items as $item) {
 			SPACE,
 			is_show_all_nodes() ? ($host['item_cnt'] ? SPACE : get_node_name_by_elid($item['itemid'])) : null,
 			$_REQUEST['hostid'] ? null : SPACE,
-			new CCol(new CDiv($itemName, $stateCss.' item')),
+			new CCol(new CDiv($item['name'], $stateCss.' item')),
 			new CCol(new CDiv($lastClock, $stateCss)),
 			new CCol(new CDiv($lastValue, $stateCss)),
 			new CCol(new CDiv($change, $stateCss)),
