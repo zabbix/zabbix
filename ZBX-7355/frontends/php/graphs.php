@@ -182,8 +182,8 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['graphid'])) {
 
 	$_REQUEST['form'] = 'clone';
 }
-elseif (isset($_REQUEST['save'])) {
-	$items = get_request('items', array());
+elseif (hasRequest('save')) {
+	$items = getRequest('items', array());
 
 	// remove passing "gitemid" to API if new items added via pop-up
 	foreach ($items as &$item) {
@@ -213,43 +213,52 @@ elseif (isset($_REQUEST['save'])) {
 		'gitems' => $items
 	);
 
-	if (!empty($_REQUEST['parent_discoveryid'])) {
+	if (hasRequest('parent_discoveryid')) {
 		$graph['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 	}
 
-	if (isset($_REQUEST['graphid'])) {
-		$graph['graphid'] = $_REQUEST['graphid'];
+	// update graphs and graph prototypes
+	if ($graph['graphid'] = getRequest('graphid')) {
+		if (hasRequest('parent_discoveryid')) {
+			$result = API::GraphPrototype()->update($graph);
 
-		$result = !empty($_REQUEST['parent_discoveryid'])
-			? API::GraphPrototype()->update($graph)
-			: API::Graph()->update($graph);
+			show_messages($result, _('Graph prototype updated'), _('Cannot update graph prototype'));
+		}
+		else {
+			$result = API::Graph()->update($graph);
+
+			show_messages($result, _('Graph updated'), _('Cannot update graph'));
+		}
 
 		if ($result) {
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_GRAPH, 'Graph ID ['.$_REQUEST['graphid'].'] Graph ['.$_REQUEST['name'].']');
+			add_audit(
+				AUDIT_ACTION_UPDATE,
+				AUDIT_RESOURCE_GRAPH,
+				'Graph ID ['.$graph['graphid'].'] Graph ['.getRequest('name').']'
+			);
 		}
 	}
+	// add graphs and graph prototypes
 	else {
-		$result = !empty($_REQUEST['parent_discoveryid'])
-			? API::GraphPrototype()->create($graph)
-			: API::Graph()->create($graph);
+		if (hasRequest('parent_discoveryid')) {
+			$result = API::GraphPrototype()->create($graph);
+
+			show_messages($result, _('Graph prototype added'), _('Cannot add graph prototype'));
+		}
+		else {
+			$result = API::Graph()->create($graph);
+
+			show_messages($result, _('Graph added'), _('Cannot add graph'));
+		}
 
 		if ($result) {
-			add_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_GRAPH, 'Graph ['.$_REQUEST['name'].']');
+			add_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_GRAPH, 'Graph ['.getRequest('name').']');
 		}
 	}
 
 	if ($result) {
 		unset($_REQUEST['form']);
-		clearCookies($result,
-			empty($_REQUEST['parent_discoveryid']) ? $_REQUEST['hostid'] : $_REQUEST['parent_discoveryid']
-		);
-	}
-
-	if (isset($_REQUEST['graphid'])) {
-		show_messages($result, _('Graph updated'), _('Cannot update graph'));
-	}
-	else {
-		show_messages($result, _('Graph added'), _('Cannot add graph'));
+		clearCookies($result, getRequest('parent_discoveryid', getRequest('hostid')));
 	}
 }
 elseif (hasRequest('delete') && hasRequest('graphid')) {

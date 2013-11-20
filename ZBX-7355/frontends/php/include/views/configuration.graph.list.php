@@ -156,7 +156,8 @@ if (!$this->data['parent_discoveryid']) {
 }
 
 $goOption = new CComboItem('delete', _('Delete selected'));
-$goOption->setAttribute('confirm',
+$goOption->setAttribute(
+	'confirm',
 	$this->data['parent_discoveryid'] ? _('Delete selected graph prototypes?') : _('Delete selected graphs?')
 );
 $goComboBox->addItem($goOption);
