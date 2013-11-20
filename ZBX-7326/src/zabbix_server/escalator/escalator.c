@@ -1795,7 +1795,7 @@ void	main_escalator_loop(void)
 		escalations_count += process_escalations(now, &nextcheck);
 		total_sec += zbx_time() - sec;
 
-		sleeptime = nextcheck - now;
+		sleeptime = calculate_sleeptime(nextcheck, CONFIG_ESCALATOR_FREQUENCY);
 
 		if (0 < sleeptime)
 		{
