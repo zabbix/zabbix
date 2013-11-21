@@ -1765,13 +1765,15 @@ next:
  ******************************************************************************/
 void	main_escalator_loop(void)
 {
-#define	STAT_INTERVAL	5
-
-	int	now, escalations_count = 0, nextcheck, sleeptime = -1, old_escalations_count = 0;
+	int	now, nextcheck, sleeptime = -1, escalations_count = 0, old_escalations_count = 0;
 	double	sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t	last_stat_time;
 
+#define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
+				/* once in STAT_INTERVAL seconds */
+
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
+	last_stat_time = time(NULL);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
@@ -1815,4 +1817,3 @@ void	main_escalator_loop(void)
 		zbx_sleep_loop(sleeptime);
 	}
 }
-
