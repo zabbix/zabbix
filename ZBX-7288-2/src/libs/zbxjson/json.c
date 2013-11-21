@@ -36,7 +36,7 @@
 
 static char	zbx_json_strerror_message[ZBX_JSON_MAX_STRERROR];
 
-const char	*zbx_json_strerror()
+const char	*zbx_json_strerror(void)
 {
 	zbx_json_strerror_message[ZBX_JSON_MAX_STRERROR - 1] = '\0'; /* force terminate string */
 	return (&zbx_json_strerror_message[0]);
@@ -491,11 +491,11 @@ int	zbx_json_open(const char *buffer, struct zbx_json_parse *jp)
 	{
 		if (NULL != error)
 		{
-			zbx_set_json_strerror("cannot open JSON object: %s", error);
+			zbx_set_json_strerror("cannot parse as a valid JSON object: %s", error);
 			zbx_free(error);
 		}
 		else
-			zbx_set_json_strerror("cannot open JSON object \"%.64s\"", buffer);
+			zbx_set_json_strerror("cannot parse as a valid JSON object \"%.64s\"", buffer);
 
 		return FAIL;
 	}
