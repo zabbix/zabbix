@@ -1047,7 +1047,7 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 				ret = zbx_snmp_walk(ss, item, oid_translated, NULL, value);
 				break;
 			default:
-				SET_MSG_RESULT(value, zbx_dsprintf(NULL, "OID \"%s\" contains unsupported parameters",
+				SET_MSG_RESULT(value, zbx_dsprintf(NULL, "OID \"%s\" contains unsupported parameters.",
 						item->snmp_oid));
 				ret = NOTSUPPORTED;
 		}
@@ -1074,7 +1074,7 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 				if (0 != strcmp("index", method))
 				{
 					SET_MSG_RESULT(value, zbx_dsprintf(NULL,
-							"Unsupported method \"%s\" in the OID \"%s\"",
+							"Unsupported method \"%s\" in the OID \"%s\".",
 							method, item->snmp_oid));
 					ret = NOTSUPPORTED;
 					break;
@@ -1123,6 +1123,7 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 								"Cannot find index \"%s\" of the OID \"%s\": %s",
 								oid_index, item->snmp_oid, index.msg));
 					}
+
 					free_result(&index);
 				}
 
@@ -1144,7 +1145,7 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 
 				break;
 			default:
-				SET_MSG_RESULT(value, zbx_dsprintf(NULL, "OID \"%s\" contains unsupported parameters",
+				SET_MSG_RESULT(value, zbx_dsprintf(NULL, "OID \"%s\" contains unsupported parameters.",
 						item->snmp_oid));
 				ret = NOTSUPPORTED;
 		}
