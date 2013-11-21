@@ -304,7 +304,7 @@ class CProfiler {
 			$callStackString = $path['basename'].':'.$firstCall['line'] . ' &rarr; '.rtrim($callStackString, '&rarr; ');
 		}
 
-		if (isset($callWithFile['file']) && isset($callWithFile['line'])) {
+		if ($callWithFile) {
 			$callStackString .= ' in '.$callWithFile['file'].':'.$callWithFile['line'];
 		}
 
