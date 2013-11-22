@@ -19,7 +19,7 @@
 **/
 
 
-class CLineAutoGraphDraw extends CGraphDraw {
+class CLineGraphDraw extends CGraphDraw {
 
 	public function __construct($type = GRAPH_TYPE_NORMAL) {
 		parent::__construct($type);
