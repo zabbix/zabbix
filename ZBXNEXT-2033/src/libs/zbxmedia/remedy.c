@@ -800,6 +800,7 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	triggerid;
+	const char	*status;
 
 	zbx_remedy_field_t	fields[] = {
 			{"Categorization_Tier_1", NULL},
@@ -886,13 +887,10 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 		/* check if the ticket should be reopened */
 		if (NULL != remedy_fields_get_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_INCIDENT_NUMBER))
 		{
-			const char	*status;
-
 			status = remedy_fields_get_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_STATUS);
 
 			if (0 == strcmp(status, ZBX_REMEDY_STATUS_RESOLVED))
 			{
-				/* TODO: what should be the status of reopened tickets? */
 				remedy_fields_set_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_STATUS,
 						ZBX_REMEDY_STATUS_ASSIGNED);
 
@@ -955,6 +953,18 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 			ret = SUCCEED;
 			goto out;
 		}
+
+		status = remedy_fields_get_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_STATUS);
+
+		if (0 == strcmp(status, ZBX_REMEDY_STATUS_RESOLVED) ||
+				0 == strcmp(status, ZBX_REMEDY_STATUS_CLOSED) ||
+				0 == strcmp(status, ZBX_REMEDY_STATUS_CANCELLED))
+		{
+			/* don't resolve already resolved, closed or cancelled incidents */
+			ret = SUCCEED;
+			goto out;
+		}
+
 
 		remedy_fields_set_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_STATUS,
 				ZBX_REMEDY_STATUS_RESOLVED);
