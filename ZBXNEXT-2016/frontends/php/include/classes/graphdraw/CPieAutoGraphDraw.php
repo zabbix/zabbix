@@ -19,7 +19,7 @@
 **/
 
 
-class CPie extends CGraphDraw {
+class CPieAutoGraphDraw extends CGraphDraw {
 
 	public function __construct($type = GRAPH_TYPE_PIE) {
 		parent::__construct($type);

@@ -63,7 +63,7 @@ $timeline = CScreenBase::calculateTime(array(
 	'stime' => get_request('stime')
 ));
 
-$graph = new CChart();
+$graph = new CLineAutoGraphDraw();
 $graph->setPeriod($timeline['period']);
 $graph->setSTime($timeline['stime']);
 

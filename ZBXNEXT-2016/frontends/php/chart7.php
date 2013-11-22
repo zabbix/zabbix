@@ -83,7 +83,7 @@ foreach ($items as $item) {
 if ($isDataValid) {
 	navigation_bar_calc();
 
-	$graph = new CPie(get_request('graphtype', GRAPH_TYPE_NORMAL));
+	$graph = new CPieAutoGraphDraw(get_request('graphtype', GRAPH_TYPE_NORMAL));
 	$graph->setHeader(get_request('name', ''));
 
 	if (!empty($_REQUEST['graph3d'])) {

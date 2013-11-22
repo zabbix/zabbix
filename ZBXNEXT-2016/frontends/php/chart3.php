@@ -136,7 +136,7 @@ if ($isDataValid) {
 
 	CProfile::update($profileIdx.'.httptestid', $profileIdx2, PROFILE_TYPE_ID);
 
-	$graph = new CChart(get_request('graphtype', GRAPH_TYPE_NORMAL));
+	$graph = new CLineAutoGraphDraw(get_request('graphtype', GRAPH_TYPE_NORMAL));
 	$graph->setHeader($name);
 	$graph->setPeriod($timeline['period']);
 	$graph->setSTime($timeline['stime']);
