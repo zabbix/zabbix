@@ -213,62 +213,70 @@ elseif (hasRequest('save')) {
 		'gitems' => $items
 	);
 
+	// create and update graph prototypes
+	$create = false;
 	if (hasRequest('parent_discoveryid')) {
 		$graph['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
-	}
 
-	// update graphs and graph prototypes
-	if ($graph['graphid'] = getRequest('graphid')) {
-		if (hasRequest('parent_discoveryid')) {
+		if (hasRequest('graphid')) {
+			$graph['graphid'] = getRequest('graphid');
 			$result = API::GraphPrototype()->update($graph);
 
 			show_messages($result, _('Graph prototype updated'), _('Cannot update graph prototype'));
+
 		}
 		else {
+			$result = API::GraphPrototype()->create($graph);
+
+			show_messages($result, _('Graph prototype added'), _('Cannot add graph prototype'));
+
+			$create = true;
+		}
+
+		clearCookies($result, getRequest('parent_discoveryid'));
+	}
+	// create and update graphs
+	else {
+		if (hasRequest('graphid')) {
+			$graph['graphid'] = getRequest('graphid');
 			$result = API::Graph()->update($graph);
 
 			show_messages($result, _('Graph updated'), _('Cannot update graph'));
 		}
+		else {
+			$result = API::Graph()->create($graph);
 
-		if ($result) {
+			show_messages($result, _('Graph added'), _('Cannot add graph'));
+
+			$create = true;
+		}
+
+		clearCookies($result, getRequest('hostid'));
+	}
+
+	if ($result) {
+		if ($create) {
+			add_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_GRAPH, 'Graph ['.getRequest('name').']');
+		}
+		else {
 			add_audit(
 				AUDIT_ACTION_UPDATE,
 				AUDIT_RESOURCE_GRAPH,
 				'Graph ID ['.$graph['graphid'].'] Graph ['.getRequest('name').']'
 			);
 		}
-	}
-	// add graphs and graph prototypes
-	else {
-		if (hasRequest('parent_discoveryid')) {
-			$result = API::GraphPrototype()->create($graph);
 
-			show_messages($result, _('Graph prototype added'), _('Cannot add graph prototype'));
-		}
-		else {
-			$result = API::Graph()->create($graph);
-
-			show_messages($result, _('Graph added'), _('Cannot add graph'));
-		}
-
-		if ($result) {
-			add_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_GRAPH, 'Graph ['.getRequest('name').']');
-		}
-	}
-
-	if ($result) {
 		unset($_REQUEST['form']);
-		clearCookies($result, getRequest('parent_discoveryid', getRequest('hostid')));
 	}
 }
 elseif (hasRequest('delete') && hasRequest('graphid')) {
 	$graphId = getRequest('graphid');
 
-	if ($parentDiscoveryId = getRequest('parent_discoveryid')) {
+	if (hasRequest('parent_discoveryid')) {
 		$result = API::GraphPrototype()->delete($graphId);
 
 		show_messages($result, _('Graph prototype deleted'), _('Cannot delete graph prototype'));
-		clearCookies($result, $parentDiscoveryId);
+		clearCookies($result, getRequest('parent_discoveryid'));
 	}
 	else {
 		$result = API::Graph()->delete($graphId);
@@ -284,11 +292,11 @@ elseif (hasRequest('delete') && hasRequest('graphid')) {
 elseif (getRequest('go') == 'delete' && hasRequest('group_graphid')) {
 	$graphIds = getRequest('group_graphid');
 
-	if ($parentDiscoveryId = getRequest('parent_discoveryid')) {
+	if (hasRequest('parent_discoveryid')) {
 		$result = API::GraphPrototype()->delete($graphIds);
 
 		show_messages($result, _('Graph prototypes deleted'), _('Cannot delete graph prototypes'));
-		clearCookies($result, $parentDiscoveryId);
+		clearCookies($result, getRequest('parent_discoveryid'));
 	}
 	else {
 		$result = API::Graph()->delete($graphIds);

@@ -156,7 +156,8 @@ elseif (hasRequest('save')) {
 		'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE
 	);
 
-	if ($trigger['triggerid'] = getRequest('triggerid')) {
+	if (hasRequest('triggerid')) {
+		$trigger['triggerid'] = getRequest('triggerid');
 		$result = API::TriggerPrototype()->update($trigger);
 
 		show_messages($result, _('Trigger prototype updated'), _('Cannot update trigger prototype'));
