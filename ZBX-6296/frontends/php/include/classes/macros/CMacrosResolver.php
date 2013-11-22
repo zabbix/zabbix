@@ -1223,6 +1223,8 @@ class CMacrosResolver {
 	}
 
 	/**
+	 * TODO rename me.
+	 *
 	 * Get macros with values.
 	 *
 	 * @param array $hostMacros			Macros to resolve (hostid => array(macro => value))
@@ -1230,6 +1232,11 @@ class CMacrosResolver {
 	 * @return array
 	 */
 	private function getUserMacrosNew(array $hostMacros) {
+		$allMacrosResolved = true;
+
+		/*
+		 * User macros
+		 */
 		$hostIds = array_keys($hostMacros);
 		$relations = array();
 
@@ -1263,21 +1270,33 @@ class CMacrosResolver {
 					}
 				}
 
+				// check if all macros are resolved
+				foreach ($hostMacros as $hostId => $macros) {
+					foreach ($macros as $macro => $value) {
+						if ($value === null) {
+							$allMacrosResolved = false;
+							break 2;
+						}
+					}
+				}
+
 				// get next portion of hostIds
-				if ($relations) {
-					foreach ($hostMacros as $hostId => $macros) {
-						foreach ($macros as $macro => $value) {
-							if ($value === null) {
-								foreach ($dbHosts as $dbHostId => $dbHost) {
-									if ($dbHosts[$dbHostId]['parentTemplates']) {
-										if (isTreeRelationExist($relations, array($hostId), $dbHostId)) {
-											order_result($dbHosts[$dbHostId]['parentTemplates'], 'templateid');
+				if (!$allMacrosResolved) {
+					if ($relations) {
+						foreach ($hostMacros as $hostId => $macros) {
+							foreach ($macros as $macro => $value) {
+								if ($value === null) {
+									foreach ($dbHosts as $dbHostId => $dbHost) {
+										if ($dbHosts[$dbHostId]['parentTemplates']) {
+											if (isTreeRelationExist($relations, array($hostId), $dbHostId)) {
+												order_result($dbHosts[$dbHostId]['parentTemplates'], 'templateid');
 
-											$templateIds = zbx_objectValues($dbHosts[$dbHostId]['parentTemplates'], 'templateid');
+												$templateIds = zbx_objectValues($dbHosts[$dbHostId]['parentTemplates'], 'templateid');
 
-											foreach ($templateIds as $templateId) {
-												$relations[] = array($dbHostId => $templateId);
-												$hostIds[$templateId] = $templateId;
+												foreach ($templateIds as $templateId) {
+													$relations[] = array($dbHostId => $templateId);
+													$hostIds[$templateId] = $templateId;
+												}
 											}
 										}
 									}
@@ -1285,19 +1304,19 @@ class CMacrosResolver {
 							}
 						}
 					}
-				}
-				else {
-					foreach ($hostMacros as $hostId => $macros) {
-						foreach ($macros as $macro => $value) {
-							if ($value === null) {
-								if (isset($dbHosts[$hostId]) && $dbHosts[$hostId]['parentTemplates']) {
-									order_result($dbHosts[$hostId]['parentTemplates'], 'templateid');
+					else {
+						foreach ($hostMacros as $hostId => $macros) {
+							foreach ($macros as $macro => $value) {
+								if ($value === null) {
+									if (isset($dbHosts[$hostId]) && $dbHosts[$hostId]['parentTemplates']) {
+										order_result($dbHosts[$hostId]['parentTemplates'], 'templateid');
 
-									$templateIds = zbx_objectValues($dbHosts[$hostId]['parentTemplates'], 'templateid');
+										$templateIds = zbx_objectValues($dbHosts[$hostId]['parentTemplates'], 'templateid');
 
-									foreach ($templateIds as $templateId) {
-										$relations[] = array($hostId => $templateId);
-										$hostIds[$templateId] = $templateId;
+										foreach ($templateIds as $templateId) {
+											$relations[] = array($hostId => $templateId);
+											$hostIds[$templateId] = $templateId;
+										}
 									}
 								}
 							}
@@ -1307,7 +1326,31 @@ class CMacrosResolver {
 			}
 		} while ($hostIds);
 
-		// unresolved macros stay as is
+		/*
+		 * Global macros
+		 */
+		if (!$allMacrosResolved) {
+			$dbGlobalMacros = API::UserMacro()->get(array(
+				'output' => array('macro', 'value'),
+				'globalmacro' => true,
+				'nopermissions' => true
+			));
+			if ($dbGlobalMacros) {
+				$dbGlobalMacros = zbx_toHash($dbGlobalMacros, 'macro');
+
+				foreach ($hostMacros as $hostId => $macros) {
+					foreach ($macros as $macro => $value) {
+						if ($value === null && isset($dbGlobalMacros[$macro])) {
+							$hostMacros[$hostId][$macro] = $dbGlobalMacros[$macro]['value'];
+						}
+					}
+				}
+			}
+		}
+
+		/*
+		 * Unresolved macros stay as is
+		 */
 		foreach ($hostMacros as $hostId => $macros) {
 			foreach ($macros as $macro => $value) {
 				if ($value === null) {
