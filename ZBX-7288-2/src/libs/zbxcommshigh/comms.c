@@ -133,3 +133,77 @@ out:
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_recv_response_dyn                                            *
+ *                                                                            *
+ * Purpose: receive json SUCCEED or FAIL from socket                          *
+ *                                                                            *
+ * Parameters: sock       - [IN] socket descriptor                            *
+ *             info       - [IN/OUT] info message or NULL                     *
+ *             info_alloc - [IN/OUT] alocated size of info buffer             *
+ *             timeout    - [IN] timeout for this operation                   *
+ *                                                                            *
+ * Return value: SUCCEED - "response":"success" response successfully         *
+ *                         retrieved                                          *
+ *               NETWORK_ERROR - network related error occurred               *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     If 'info' parameter is NULL pointer then the value of "info" will not  *
+ *     be extracted from JSON.                                                *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_recv_response_dyn(zbx_sock_t *sock, char **info, size_t *info_alloc, int timeout)
+{
+	const char		*__function_name = "zbx_recv_response_dyn";
+
+	struct zbx_json_parse	jp;
+	char			value[16], *answer;
+	size_t			offset = 0;
+	int			ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (FAIL == (ret = zbx_tcp_recv_to(sock, &answer, timeout)))
+	{
+		/* since we have successfully sent data earlier, we assume the other */
+		/* side is just too busy processing our data if there is no response */
+		zabbix_log(LOG_LEVEL_DEBUG, "did not receive response from host");
+		ret = NETWORK_ERROR;
+		goto out;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() '%s'", __function_name, answer);
+
+	/* deal with empty string here because zbx_json_open() does not produce an error message in this case */
+	if ('\0' == *answer)
+	{
+		if (NULL != info)
+			zbx_strcpy_alloc(info, info_alloc, &offset, "empty string received");
+		ret = FAIL;
+		goto out;
+	}
+
+	if (SUCCEED != (ret = zbx_json_open(answer, &jp)) ||
+			SUCCEED != (ret = zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value))))
+	{
+		if (NULL != info)
+			zbx_strcpy_alloc(info, info_alloc, &offset, zbx_json_strerror());
+		goto out;
+	}
+
+	if (0 != strcmp(value, ZBX_PROTO_VALUE_SUCCESS))
+		ret = FAIL;
+
+	if (NULL != info &&
+			SUCCEED != zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_INFO, info, info_alloc))
+	{
+		zbx_strcpy_alloc(info, info_alloc, &offset, "");
+	}
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
