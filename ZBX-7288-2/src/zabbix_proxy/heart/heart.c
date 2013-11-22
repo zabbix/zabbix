@@ -60,7 +60,8 @@ static int	send_heartbeat(void)
 
 	if (FAIL == put_data_to_server(&sock, &j))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Heartbeat message failed");
+		zabbix_log(LOG_LEVEL_WARNING, "sending heartbeat message to server \"%s:%d\" failed", CONFIG_SERVER,
+				CONFIG_SERVER_PORT);
 		ret = FAIL;
 	}
 
