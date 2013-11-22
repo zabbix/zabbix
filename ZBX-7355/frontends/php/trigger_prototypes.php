@@ -184,15 +184,16 @@ elseif (hasRequest('delete') && hasRequest('triggerid')) {
 		unset($_REQUEST['form'], $_REQUEST['triggerid']);
 	}
 }
-elseif ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['mass_save']) && isset($_REQUEST['g_triggerid'])) {
-	$visible = get_request('visible');
+elseif (getRequest('go') == 'massupdate' && hasRequest('mass_save') && hasRequest('g_triggerid')) {
+	$triggerIds = getRequest('g_triggerid');
+	$visible = getRequest('visible');
 
 	if (isset($visible['priority'])) {
-		$priority = get_request('priority');
+		$priority = getRequest('priority');
 
-		foreach ($_REQUEST['g_triggerid'] as $triggerid) {
+		foreach ($triggerIds as $triggerId) {
 			$result = API::TriggerPrototype()->update(array(
-				'triggerid' => $triggerid,
+				'triggerid' => $triggerId,
 				'priority' => $priority
 			));
 			if (!$result) {
@@ -204,8 +205,8 @@ elseif ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['mass_save']) && isse
 		$result = true;
 	}
 
-	show_messages($result, _('Trigger updated'), _('Cannot update trigger'));
-	clearCookies($result, $_REQUEST['parent_discoveryid']);
+	show_messages($result, _('Trigger prototypes updated'), _('Cannot update trigger prototypes'));
+	clearCookies($result, getRequest('parent_discoveryid'));
 
 	if ($result) {
 		unset($_REQUEST['massupdate'], $_REQUEST['form'], $_REQUEST['g_triggerid']);

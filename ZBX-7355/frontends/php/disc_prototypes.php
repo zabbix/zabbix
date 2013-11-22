@@ -195,15 +195,14 @@ if (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
 		show_messages(false, null, _('Invalid time period'));
 	}
 }
-elseif (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
+elseif (hasRequest('delete') && hasRequest('itemid')) {
 	DBstart();
-
-	$result = API::Itemprototype()->delete($_REQUEST['itemid']);
+	$result = API::Itemprototype()->delete(getRequest('itemid'));
 	$result = DBend($result);
 
-	show_messages($result, _('Item deleted'), _('Cannot delete item'));
+	show_messages($result, _('Item prototype deleted'), _('Cannot delete item prototype'));
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
-	clearCookies($result, $_REQUEST['parent_discoveryid']);
+	clearCookies($result, getRequest('parent_discoveryid'));
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])) {
 	unset($_REQUEST['itemid']);
@@ -277,9 +276,11 @@ elseif (hasRequest('save')) {
 		'applications'	=> $applications
 	);
 
-	if ($item['itemid'] = getRequest('itemid')) {
-		$db_item = get_item_by_itemid_limited($item['itemid']);
-		$db_item['applications'] = get_applications_by_itemid($item['itemid']);
+	if (hasRequest('itemid')) {
+		$itemId = getRequest('itemid');
+
+		$db_item = get_item_by_itemid_limited($itemId);
+		$db_item['applications'] = get_applications_by_itemid($itemId);
 
 		// unset snmpv3 fields
 		if ($item['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
@@ -296,6 +297,8 @@ elseif (hasRequest('save')) {
 				unset($item[$field]);
 			}
 		}
+
+		$item['itemid'] = $itemId;
 
 		$result = API::Itemprototype()->update($item);
 		show_messages($result, _('Item prototype updated'), _('Cannot update item prototype'));
