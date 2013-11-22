@@ -78,23 +78,24 @@ static void	recv_proxyhistory(zbx_sock_t *sock, struct zbx_json_parse *jp)
 {
 	const char	*__function_name = "recv_proxyhistory";
 	zbx_uint64_t	proxy_hostid;
-	char		host[HOST_HOST_LEN_MAX], info[128] = "", error[256];
+	char		host[HOST_HOST_LEN_MAX], error[256] = "";
 	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (FAIL == (ret = get_proxy_id(jp, &proxy_hostid, host, error, sizeof(error))))
+	if (SUCCEED == (ret = get_proxy_id(jp, &proxy_hostid, host, error, sizeof(error))))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "History data from active proxy on [%s] failed: %s",
+		update_proxy_lastaccess(proxy_hostid);
+
+		ret = process_hist_data(sock, jp, proxy_hostid, error, sizeof(error));
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "history data from active proxy on \"%s\" failed: %s",
 				get_ip_by_socket(sock), error);
-		goto exit;
 	}
 
-	update_proxy_lastaccess(proxy_hostid);
-
-	ret = process_hist_data(sock, jp, proxy_hostid, info, sizeof(info));
-exit:
-	zbx_send_response(sock, ret, info, CONFIG_TIMEOUT);
+	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
