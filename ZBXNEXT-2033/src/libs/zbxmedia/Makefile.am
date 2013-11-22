@@ -10,4 +10,5 @@ libzbxmedia_a_SOURCES = \
 			email.c \
 			eztexting.c \
 			$(JABBER_SOURCES) \
-			sms.c
+			sms.c \
+			remedy.c

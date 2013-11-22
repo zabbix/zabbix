@@ -24,6 +24,9 @@
 
 extern char	*CONFIG_SOURCE_IP;
 
+struct DB_ALERT;
+struct DB_MEDIATYPE;
+
 int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_email, const char *mailto,
 		const char *mailsubject, const char *mailbody, char *error, size_t max_error_len);
 int	send_ez_texting(const char *username, const char *password, const char *sendto,
@@ -33,5 +36,8 @@ int	send_jabber(const char *username, const char *password, const char *sendto,
 		const char *subject, const char *message, char *error, int max_error_len);
 #endif
 int	send_sms(const char *device, const char *number, const char *message, char *error, int max_error_len);
+
+/* TODO: using DB_ structures requires db.h include, which might result in some compilation problems */
+int remedy_process_alert(struct DB_ALERT *alert, struct DB_MEDIATYPE *media, char **error);
 
 #endif

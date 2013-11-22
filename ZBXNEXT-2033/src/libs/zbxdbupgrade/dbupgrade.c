@@ -2396,6 +2396,27 @@ static int	DBpatch_2020000(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_2020001(void)
+{
+	const ZBX_TABLE	table = {"ticket", "ticketid", 0,
+		{
+			{"ticketid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+			{"externalid", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+			{"triggerid", NULL, "triggers", "triggerid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE},
+			{"clock", NULL, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+			{NULL}
+		},
+		NULL
+	};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2020002(void)
+{
+	return DBcreate_index("ticket", "ticket_1", "triggerid,clock", 0);
+}
+
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 #define DBPATCH_END()					{NULL}};
@@ -2643,6 +2664,8 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010198, 0, 1)
 	DBPATCH_ADD(2010199, 0, 1)
 	DBPATCH_ADD(2020000, 0, 1)
+	DBPATCH_ADD(2020001, 0, 1)
+	DBPATCH_ADD(2020002, 0, 1)
 
 	DBPATCH_END()
 
