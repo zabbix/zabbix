@@ -158,18 +158,35 @@ int	put_data_to_server(zbx_sock_t *sock, struct zbx_json *j)
 {
 	const char	*__function_name = "put_data_to_server";
 
+	static char	*info = NULL;
+	static size_t	info_alloc = 64;
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() datalen:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)j->buffer_size);
 
+	if (NULL == info)
+		info = zbx_malloc(info, info_alloc);
+
 	if (FAIL == send_data_to_server(sock, j->buffer))
 		goto exit;
 
-	if (SUCCEED != zbx_recv_response(sock, NULL, 0, 0))
+	*info = '\0';
+
+	if (SUCCEED != zbx_recv_response_dyn(sock, &info, &info_alloc, 0))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "negative response from server \"%s:%d\": %s", CONFIG_SERVER,
+				CONFIG_SERVER_PORT, info);
 		goto exit;
+	}
 
 	ret = SUCCEED;
 exit:
+	if (1024 < info_alloc)
+	{
+		zbx_free(info);
+		info_alloc = 64;
+	}
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
