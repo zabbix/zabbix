@@ -1036,35 +1036,37 @@ class CMacrosResolver {
 	 *
 	 * @param array  $items
 	 * @param string $items[n]['itemid']
+	 * @param string $items[n]['hostid']
 	 * @param string $items[n]['name']
 	 * @param string $items[n]['key_']
+	 * @param bool   $resolveAllItemsKeys
 	 */
-	public function resolveItems(array $items) {
+	public function resolveItems(array $items, $resolveAllItemsKeys = false) {
 		$items = zbx_toHash($items, 'itemid');
 
+		// user macros
+		$items = $this->resolveUserMacrosInItem($items, 'name');
+
+		// macros in item key
+		if ($resolveAllItemsKeys) {
+			$items = $this->resolveItemKeys($items);
+		}
+
+		// reference macros - $1..$9
 		$itemsWithMacros = array();
 
-		foreach ($items as &$item) {
-			// user macros in item name
-			if (preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $item['name'], $arr)) {
-				$macros = API::UserMacro()->getMacros(array(
-					'macros' => $arr[1],
-					'itemid' => $item['itemid']
-				));
-				$item['name'] = str_replace(array_keys($macros), array_values($macros), $item['name']);
-			}
-
+		foreach ($items as $item) {
 			if (preg_match(self::PATTERN_ITEM_NUMBER, $item['name'])) {
 				$itemsWithMacros[$item['itemid']] = $item;
 			}
 		}
-		unset($item);
 
 		if ($itemsWithMacros) {
 			// macros in item key
-			$itemsWithMacros = $this->resolveItemKeys($itemsWithMacros);
+			if (!$resolveAllItemsKeys) {
+				$itemsWithMacros = $this->resolveItemKeys($itemsWithMacros);
+			}
 
-			// expand items where name contains $1..$9 macros
 			foreach ($itemsWithMacros as $item) {
 				// parsing key to get the parameters out of it
 				$itemKey = new CItemKey($item['key_']);
@@ -1096,6 +1098,7 @@ class CMacrosResolver {
 	 *
 	 * @param array  $items
 	 * @param string $items[n]['itemid']
+	 * @param string $items[n]['hostid']
 	 * @param string $items[n]['key_']
 	 */
 	public function resolveItemKeys(array $items) {
@@ -1105,7 +1108,9 @@ class CMacrosResolver {
 		$itemMacros = array();
 
 		foreach ($items as $item) {
-			if ($macros = $this->findMacros(self::PATTERN_ITEM_MACROS, array($item['key_']))) {
+			$macros = $this->findMacros(self::PATTERN_ITEM_MACROS, array($item['key_']));
+
+			if ($macros) {
 				$itemMacros[$item['itemid']] = $macros;
 			}
 		}
@@ -1174,8 +1179,143 @@ class CMacrosResolver {
 		}
 
 		// user macros
-		$items = API::UserMacro()->resolveItem($items);
+		$items = $this->resolveUserMacrosInItem($items, 'key_');
 
 		return $items;
+	}
+
+	/**
+	 * Resolve user macros in item.
+	 *
+	 * @param array  $items
+	 * @param string $items[n]['itemid']
+	 * @param string $items[n]['hostid']
+	 * @param string $items[n][$field]
+	 * @param string $field
+	 */
+	public function resolveUserMacrosInItem(array $items, $field) {
+		$hostMacros = array();
+
+		foreach ($items as $item) {
+			$macros = $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, array($item[$field]));
+
+			if ($macros) {
+				foreach ($macros as $macro) {
+					$hostMacros[$item['hostid']][$macro] = null;
+				}
+			}
+		}
+
+		if ($hostMacros) {
+			$hostMacros = $this->getUserMacrosNew($hostMacros);
+
+			foreach ($items as &$item) {
+				if (isset($hostMacros[$item['hostid']])) {
+					$macros = $hostMacros[$item['hostid']];
+
+					$item[$field] = str_replace(array_keys($macros), array_values($macros), $item[$field]);
+				}
+			}
+			unset($item);
+		}
+
+		return $items;
+	}
+
+	/**
+	 * Get macros with values.
+	 *
+	 * @param array $hostMacros			Macros to resolve (hostid => array(macro => value))
+	 *
+	 * @return array
+	 */
+	private function getUserMacrosNew(array $hostMacros) {
+		$hostIds = array_keys($hostMacros);
+		$relations = array();
+
+		do {
+			$dbHosts = API::Host()->get(array(
+				'hostids' => $hostIds,
+				'templated_hosts' => true,
+				'output' => array('hostid'),
+				'selectMacros' => array('macro', 'value'),
+				'selectParentTemplates' => array('templateid'),
+				'sortorder' => 'hostid',
+				'preservekeys' => true
+			));
+
+			$hostIds = array();
+
+			if ($dbHosts) {
+				// set macros value
+				foreach ($hostMacros as $hostId => $macros) {
+					foreach ($dbHosts as $dbHostId => $dbHost) {
+						if ($dbHost['macros']) {
+							if (bccomp($hostId, $dbHostId) == 0
+									|| ($relations && isTreeRelationExist($relations, array($hostId), $dbHostId))) {
+								foreach ($dbHost['macros'] as $macro) {
+									if (array_key_exists($macro['macro'], $macros) && $macros[$macro['macro']] === null) {
+										$hostMacros[$hostId][$macro['macro']] = $macro['value'];
+									}
+								}
+							}
+						}
+					}
+				}
+
+				// get next portion of hostIds
+				if ($relations) {
+					foreach ($hostMacros as $hostId => $macros) {
+						foreach ($macros as $macro => $value) {
+							if ($value === null) {
+								foreach ($dbHosts as $dbHostId => $dbHost) {
+									if ($dbHosts[$dbHostId]['parentTemplates']) {
+										if (isTreeRelationExist($relations, array($hostId), $dbHostId)) {
+											order_result($dbHosts[$dbHostId]['parentTemplates'], 'templateid');
+
+											$templateIds = zbx_objectValues($dbHosts[$dbHostId]['parentTemplates'], 'templateid');
+
+											foreach ($templateIds as $templateId) {
+												$relations[] = array($dbHostId => $templateId);
+												$hostIds[$templateId] = $templateId;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				else {
+					foreach ($hostMacros as $hostId => $macros) {
+						foreach ($macros as $macro => $value) {
+							if ($value === null) {
+								if (isset($dbHosts[$hostId]) && $dbHosts[$hostId]['parentTemplates']) {
+									order_result($dbHosts[$hostId]['parentTemplates'], 'templateid');
+
+									$templateIds = zbx_objectValues($dbHosts[$hostId]['parentTemplates'], 'templateid');
+
+									foreach ($templateIds as $templateId) {
+										$relations[] = array($hostId => $templateId);
+										$hostIds[$templateId] = $templateId;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		} while ($hostIds);
+
+		// unresolved macros stay as is
+		foreach ($hostMacros as $hostId => $macros) {
+			foreach ($macros as $macro => $value) {
+				if ($value === null) {
+					$hostMacros[$hostId][$macro] = $macro;
+				}
+			}
+		}
+
+		return $hostMacros;
 	}
 }
