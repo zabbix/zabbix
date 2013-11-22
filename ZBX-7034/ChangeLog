@@ -7,6 +7,11 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, French, Italian, Russian and
 ....I..PS. [ZBXNEXT-1257] dropped support for UCD-SNMP (asaveljevs)
 
 Bug fixes:
+..F....... [ZBX-7337] fixed undefined index debug profiler (Eduard)
+..F....... [ZBX-7337] fixed input parameters validation in multiple pages (Eduard, Sasha)
+A......... [ZBX-7372] fixed undefined indexes in script.getscriptsbyhosts method (Ivo)
+..F....... [ZBX-7350] fixed displaying host prototypes in "Status of Zabbix" (Ivo)
+.......PS. [ZBXNEXT-98] refactored code for SNMP checks (asaveljevs, Sasha)
 ........S. [ZBX-7184] added check to prevent host from being switched to unavailable state multiple times in a row (wiper)
 A......... [ZBX-7351] fixed screen item not being saved if resource type is URL (Ivo)
 ........S. [ZBX-7329] fixed VMware related compiling error on FreeBSD (wiper)
