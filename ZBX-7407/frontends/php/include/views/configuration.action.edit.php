@@ -29,9 +29,12 @@ $actionForm = new CForm();
 $actionForm->setName('action.edit');
 $actionForm->addVar('form', $this->data['form']);
 $actionForm->addVar('form_refresh', $this->data['form_refresh']);
-$actionForm->addVar('eventsource', $this->data['eventsource']);
-if (!empty($this->data['actionid'])) {
+
+if ($this->data['actionid']) {
 	$actionForm->addVar('actionid', $this->data['actionid']);
+}
+else {
+	$actionForm->addVar('eventsource', $this->data['eventsource']);
 }
 
 /*
