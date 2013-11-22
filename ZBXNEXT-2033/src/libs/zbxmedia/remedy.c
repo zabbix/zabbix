@@ -410,6 +410,7 @@ out:
  *                                                                            *
  * Parameters: url        - [IN] the Remedy service URL                       *
  *             ...        - [IN] various ticket parameters                    *
+ *             externalid - [OUT] the number of created incident in Remedy    *
  *             error      - [OUT] the error description                       *
  *                                                                            *
  * Return Value: SUCCEED - the ticket was created successfully                *
@@ -421,7 +422,7 @@ out:
  ******************************************************************************/
 static int	remedy_create_ticket(const char *url, const char *user, const char *password, const char *loginid,
 		const char *service, const char *ci, const char *summary, const char *notes, const char *impact,
-		const char *urgency, char **ticketnumber, char **error)
+		const char *urgency, char **externalid, char **error)
 {
 #	define ZBX_POST_REMEDY_CREATE_SERVICE								\
 		ZBX_SOAP_ENVELOPE_CREATE_OPEN								\
@@ -485,7 +486,7 @@ static int	remedy_create_ticket(const char *url, const char *user, const char *p
 	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
 		goto out;
 
-	if (NULL == (*ticketnumber = zbx_xml_read_value(page.data,
+	if (NULL == (*externalid = zbx_xml_read_value(page.data,
 			ZBX_XPATH_LN2("HelpDesk_Submit_ServiceResponse", "Incident_Number"))))
 	{
 		*error = zbx_dsprintf(*error, "Cannot retrieve incident number from Remedy response");
@@ -504,7 +505,8 @@ out:
 	zbx_free(summary_esc);
 	zbx_free(service_url);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s externalid:%s", __function_name, zbx_result_string(ret),
+			*externalid);
 
 	return ret;
 }
@@ -749,10 +751,13 @@ static int	remedy_read_ticket(zbx_uint64_t triggerid, const char *url, const cha
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	/* find the latest ticket id which was created for the specified trigger */
-	result = DBselect("select externalid from ticket"
-				" where triggerid=" ZBX_FS_UI64
-				" order by triggerid,clock desc",
-				triggerid);
+	result = DBselect("select t.externalid,t.clock from ticket t,events e"
+				" where e.source=%d"
+					" and e.object=%d"
+					" and e.objectid=" ZBX_FS_UI64
+					" and e.eventid=t.eventid"
+				" order by t.clock desc",
+				EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid);
 
 	if (NULL != (row = DBfetch(result)))
 		ret = remedy_query_ticket(url, user, password, row[0], fields, fields_num, error);
@@ -852,12 +857,13 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 	result = DBselect("select e.value,t.priority,t.triggerid,h.host"
 			" from triggers t,hosts h,items i,functions f,events e"
 			" where e.eventid=" ZBX_FS_UI64
+				" and e.source=%d"
 				" and e.object=%d"
 				" and e.objectid=t.triggerid"
 				" and t.triggerid=f.triggerid"
 				" and f.itemid=i.itemid"
 				" and i.hostid=h.hostid",
-				alert->eventid, EVENT_OBJECT_TRIGGER);
+				alert->eventid, EVENT_SOURCE_TRIGGERS,  EVENT_OBJECT_TRIGGER);
 
 	if (NULL == (row = DBfetch(result)))
 		goto out;
@@ -930,9 +936,9 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 			ticketid = DBget_maxid_num("ticket", 1);
 			ticketnumber_dyn = DBdyn_escape_string(ticketnumber);
 
-			if (ZBX_DB_OK > DBexecute("insert into ticket (ticketid,externalid,triggerid,clock) values"
+			if (ZBX_DB_OK > DBexecute("insert into ticket (ticketid,externalid,eventid,clock) values"
 					" (" ZBX_FS_UI64 ",'%s'," ZBX_FS_UI64 ",%d)",
-					ticketid, ticketnumber_dyn, triggerid, time(NULL)))
+					ticketid, ticketnumber_dyn, alert->eventid, time(NULL)))
 			{
 				ret = FAIL;
 			}
@@ -951,9 +957,9 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 		}
 
 		remedy_fields_set_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_STATUS,
-				ZBX_REMEDY_STATUS_CLOSED);
+				ZBX_REMEDY_STATUS_RESOLVED);
 
-		ret = remedy_modify_ticket( media->smtp_server, media->username, media->passwd, fields, ARRSIZE(fields),
+		ret = remedy_modify_ticket(media->smtp_server, media->username, media->passwd, fields, ARRSIZE(fields),
 				error);
 	}
 
