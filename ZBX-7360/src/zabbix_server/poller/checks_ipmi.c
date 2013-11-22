@@ -31,8 +31,6 @@
 #include <OpenIPMI/ipmiif.h>
 #include <OpenIPMI/ipmi_posix.h>
 #include <OpenIPMI/ipmi_lan.h>
-#include <OpenIPMI/ipmi_sdr.h>
-#include <OpenIPMI/ipmi_msgbits.h>
 #include <OpenIPMI/ipmi_auth.h>
 
 typedef union
@@ -80,7 +78,8 @@ typedef struct zbx_ipmi_host_s
 	int			sensor_count;
 	int			control_count;
 	ipmi_con_t		*con;
-	int			domain_up, done;
+	int			domain_up;
+	int			done;
 	char			*err;
 	struct zbx_ipmi_host_s	*next;
 }
@@ -89,7 +88,7 @@ zbx_ipmi_host_t;
 static zbx_ipmi_host_t	*hosts = NULL;
 static os_handler_t	*os_hnd;
 
-static char *sensor_id_to_str(char *str, size_t str_sz, const char *id, enum ipmi_str_type_e id_type, int id_sz)
+static char	*sensor_id_to_str(char *str, size_t str_sz, const char *id, enum ipmi_str_type_e id_type, int id_sz)
 {
 	/* minimum size of 'str' buffer, str_sz, is 35 bytes to avoid truncation */
 	int	i;
@@ -561,7 +560,7 @@ static void	got_discrete_states(ipmi_sensor_t *sensor, int err, ipmi_states_t *s
 out:
 	h->done = 1;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s():%s", __function_name, zbx_result_string(h->ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(h->ret));
 }
 
 static void	read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
@@ -980,7 +979,7 @@ static void	my_vlog(os_handler_t *handler, const char *format, enum ipmi_log_typ
 int	init_ipmi_handler(void)
 {
 	const char	*__function_name = "init_ipmi_handler";
-	int	ret;
+	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1103,8 +1102,7 @@ static zbx_ipmi_host_t	*init_ipmi_host(const char *ip, int port, int authtype, i
 	options[3].option = IPMI_OPEN_OPTION_LOCAL_ONLY;	/* scan only local resources */
 	options[3].ival = 1;
 
-	if (0 != (ret = ipmi_open_domain("", &h->con, 1, setup_done, h, domain_up, h, options,
-			sizeof(options) / sizeof(options[0]), NULL)))
+	if (0 != (ret = ipmi_open_domain("", &h->con, 1, setup_done, h, domain_up, h, options, ARRSIZE(options), NULL)))
 	{
 		h->err = zbx_dsprintf(h->err, "Cannot connect to IPMI host [%s]:%d. ipmi_open_domain() failed: %s",
 				h->ip, h->port, zbx_strerror(ret));
