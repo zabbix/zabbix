@@ -158,6 +158,8 @@ class CPieGraphDraw extends CGraphDraw {
 			$history = Manager::History()->getLast($lastValueItems);
 		}
 
+		$config = select_config();
+
 		for ($i = 0; $i < $this->num; $i++) {
 			$real_item = get_item_by_itemid($this->items[$i]['itemid']);
 			$type = $this->items[$i]['calc_type'];
@@ -166,8 +168,9 @@ class CPieGraphDraw extends CGraphDraw {
 
 			$sql_arr = array();
 
-			if (ZBX_HISTORY_DATA_UPKEEP > -1) {
-				$real_item['history'] = ZBX_HISTORY_DATA_UPKEEP;
+			// override item history setting with housekeeping settings
+			if ($config['hk_history_global']) {
+				$real_item['history'] = $config['hk_history'];
 			}
 
 			if (($real_item['history'] * SEC_PER_DAY) > (time() - ($from_time + $this->period / 2))) { // should pick data from history or trends
