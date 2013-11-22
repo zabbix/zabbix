@@ -81,12 +81,10 @@ if (isset($_REQUEST['save'])) {
 		'hk_sessions_mode' => get_request('hk_sessions_mode', 0),
 		'hk_sessions' => get_request('hk_sessions'),
 		'hk_history_mode' => get_request('hk_history_mode', 0),
-		'hk_history_global' => (get_request('hk_history_mode') == 1)
-			? get_request('hk_history_global', 0) : $data['config']['hk_history_global'],
+		'hk_history_global' => get_request('hk_history_global', 0),
 		'hk_history' => get_request('hk_history'),
 		'hk_trends_mode' => get_request('hk_trends_mode', 0),
-		'hk_trends_global' => (get_request('hk_trends_mode') == 1)
-			? get_request('hk_trends_global', 0) : $data['config']['hk_trends_global'],
+		'hk_trends_global' => get_request('hk_trends_global', 0),
 		'hk_trends' => get_request('hk_trends')
 	);
 
@@ -156,13 +154,11 @@ if ($data['form_refresh']) {
 	$data['config']['hk_sessions'] = isset($_REQUEST['hk_sessions'])
 		? get_request('hk_sessions') : $data['config']['hk_sessions'];
 	$data['config']['hk_history_mode'] = get_request('hk_history_mode');
-	$data['config']['hk_history_global'] = (get_request('hk_history_mode') == 1)
-		? get_request('hk_history_global') : $data['config']['hk_history_global'];
+	$data['config']['hk_history_global'] = get_request('hk_history_global');
 	$data['config']['hk_history'] = isset($_REQUEST['hk_history'])
 		? get_request('hk_history') : $data['config']['hk_history'];
 	$data['config']['hk_trends_mode'] = get_request('hk_trends_mode');
-	$data['config']['hk_trends_global'] = (get_request('hk_trends_mode') == 1)
-		? get_request('hk_trends_global') : $data['config']['hk_trends_global'];
+	$data['config']['hk_trends_global'] = get_request('hk_trends_global');
 	$data['config']['hk_trends'] = isset($_REQUEST['hk_trends'])
 		? get_request('hk_trends') : $data['config']['hk_trends'];
 }

@@ -116,13 +116,9 @@ $histortTab = new CTable(null, 'formElementTable');
 
 $histortTab->addRow(array(new CLabel(_('Enable housekeeping'), 'hk_history_mode'),
 	new CCheckBox('hk_history_mode', $this->data['config']['hk_history_mode'], null, 1)));
-$houseKeeperHistoryGlobal = new CCheckBox('hk_history_global',
-	$this->data['config']['hk_history_global'], null, 1);
-if (!$this->data['config']['hk_history_mode']) {
-	$houseKeeperHistoryGlobal->setAttribute('disabled', 'disabled');
-}
+$houseKeeperHistoryGlobal = new CCheckBox('hk_history_global', $this->data['config']['hk_history_global'], null, 1);
 $houseKeeperHistoryModeGlobal = new CNumericBox('hk_history', $this->data['config']['hk_history'], 5);
-if (!$this->data['config']['hk_history_mode'] || !$this->data['config']['hk_history_global']) {
+if (!$this->data['config']['hk_history_global']) {
 	$houseKeeperHistoryModeGlobal->setAttribute('disabled', 'disabled');
 }
 $histortTab->addRow(array(new CLabel(_('Override item history period'),
@@ -138,13 +134,9 @@ $trendTab = new CTable(null, 'formElementTable');
 $trendTab->addRow(array(new CLabel(_('Enable housekeeping'),
 	'hk_trends_mode'), new CCheckBox('hk_trends_mode',
 	$this->data['config']['hk_trends_mode'], null, 1)));
-$houseKeeperTrendGlobal = new CCheckBox('hk_trends_global',
-	$this->data['config']['hk_trends_global'], null, 1);
-if (!$this->data['config']['hk_trends_mode']) {
-	$houseKeeperTrendGlobal->setAttribute('disabled', 'disabled');
-}
+$houseKeeperTrendGlobal = new CCheckBox('hk_trends_global', $this->data['config']['hk_trends_global'], null, 1);
 $houseKeeperTrendModeGlobal = new CNumericBox('hk_trends', $this->data['config']['hk_trends'], 5);
-if (!$this->data['config']['hk_trends_mode'] || !$this->data['config']['hk_trends_global']) {
+if (!$this->data['config']['hk_trends_global']) {
 	$houseKeeperTrendModeGlobal->setAttribute('disabled', 'disabled');
 }
 $trendTab->addRow(array(new CLabel(_('Override item trend period'),
