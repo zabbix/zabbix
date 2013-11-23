@@ -816,7 +816,6 @@ class testUrlParameters extends CWebTest {
 					),
 					array(
 						'url' => 'screens.php',
-						'text_not_present' => 'SCREENS',
 						'text_present' => 'SCREENS'
 					)
 				)
