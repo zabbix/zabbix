@@ -214,7 +214,6 @@ elseif (hasRequest('save')) {
 	);
 
 	// create and update graph prototypes
-	$create = false;
 	if (hasRequest('parent_discoveryid')) {
 		$graph['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 
@@ -229,8 +228,6 @@ elseif (hasRequest('save')) {
 			$result = API::GraphPrototype()->create($graph);
 
 			show_messages($result, _('Graph prototype added'), _('Cannot add graph prototype'));
-
-			$create = true;
 		}
 
 		clearCookies($result, getRequest('parent_discoveryid'));
@@ -247,23 +244,21 @@ elseif (hasRequest('save')) {
 			$result = API::Graph()->create($graph);
 
 			show_messages($result, _('Graph added'), _('Cannot add graph'));
-
-			$create = true;
 		}
 
 		clearCookies($result, getRequest('hostid'));
 	}
 
 	if ($result) {
-		if ($create) {
-			add_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_GRAPH, 'Graph ['.getRequest('name').']');
-		}
-		else {
+		if (hasRequest('graphid')) {
 			add_audit(
 				AUDIT_ACTION_UPDATE,
 				AUDIT_RESOURCE_GRAPH,
 				'Graph ID ['.$graph['graphid'].'] Graph ['.getRequest('name').']'
 			);
+		}
+		else {
+			add_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_GRAPH, 'Graph ['.getRequest('name').']');
 		}
 
 		unset($_REQUEST['form']);
