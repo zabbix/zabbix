@@ -314,7 +314,10 @@ $buttons = array();
 if (!empty($this->data['triggerid'])) {
 	$buttons[] = new CSubmit('clone', _('Clone'));
 
-	$deleteButton = new CButtonDelete(_('Delete trigger?'), url_param('form').url_param('groupid').url_param('hostid').url_param('triggerid').url_param('parent_discoveryid'));
+	$deleteButton = new CButtonDelete(
+		$this->data['parent_discoveryid'] ? _('Delete trigger prototype?') : _('Delete trigger?'),
+		url_params(array('form', 'groupid', 'hostid', 'triggerid', 'parent_discoveryid'))
+	);
 	if ($this->data['limited']) {
 		$deleteButton->setAttribute('disabled', 'disabled');
 	}
