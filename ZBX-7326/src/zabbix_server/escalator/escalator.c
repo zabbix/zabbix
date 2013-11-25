@@ -1640,8 +1640,7 @@ static int	process_escalations(int now, int *nextcheck)
 					escalation.r_eventid = last_escalation.r_eventid;
 					escalation.status = ESCALATION_STATUS_ACTIVE;
 				}
-				else if (escalation.nextcheck > now ||
-						ESCALATION_STATUS_SLEEP == escalation.status)
+				else if (escalation.nextcheck > now || ESCALATION_STATUS_SLEEP == escalation.status)
 				{
 					zbx_vector_uint64_append(&escalationids, escalation.escalationid);
 					goto next;
@@ -1722,9 +1721,7 @@ static int	process_escalations(int now, int *nextcheck)
 		}
 
 		if (ESCALATION_STATUS_COMPLETED != escalation.status && escalation.nextcheck < *nextcheck)
-		{
 			*nextcheck = escalation.nextcheck;
-		}
 next:
 		if (NULL != row)
 			memcpy(&escalation, &last_escalation, sizeof(escalation));
