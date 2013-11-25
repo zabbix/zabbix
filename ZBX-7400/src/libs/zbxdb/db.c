@@ -1457,26 +1457,21 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 			ub4	alloc, amount;
 			ub1	csfrm;
 
+			rc = OCILobCharSetForm(oracle.envhp, oracle.errhp, result->clobs[i], &csfrm);
+
+			if (OCI_SUCCESS != rc)
+				break;
+
 			rc = OCILobGetLength(oracle.svchp, oracle.errhp, result->clobs[i], &amount);
 
 			if (OCI_SUCCESS != rc)
 			{
 				/* If the LOB is NULL or empty, the length is undefined. */
 				/* In this case the function returns OCI_INVALID_HANDLE. */
-				if (OCI_INVALID_HANDLE != rc)
-					zabbix_errlog(ERR_Z3006, rc, zbx_oci_error(rc));
-
-				amount = 0;
-			}
-			else
-			{
-				rc = OCILobCharSetForm(oracle.envhp, oracle.errhp, result->clobs[i], &csfrm);
-
-				if (OCI_SUCCESS != rc)
-				{
-					zabbix_errlog(ERR_Z3006, rc, zbx_oci_error(rc));
+				if (OCI_INVALID_HANDLE == rc)
 					amount = 0;
-				}
+				else
+					break;
 			}
 
 			if (result->values_alloc[i] < (alloc = amount * 4 + 1))
@@ -1494,6 +1489,8 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 				if (OCI_SUCCESS != rc)
 					zabbix_errlog(ERR_Z3006, rc, zbx_oci_error(rc));
 			}
+			else
+				rc = OCI_SUCCESS;
 
 			result->values[i][amount] = '\0';
 		}
