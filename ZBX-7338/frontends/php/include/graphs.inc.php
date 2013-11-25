@@ -285,7 +285,9 @@ function get_min_itemclock_by_itemid($itemIds) {
 }
 
 function getGraphByGraphId($graphId) {
-	if ($dbGraph = DBfetch(DBselect('SELECT g.* FROM graphs g WHERE g.graphid='.zbx_dbstr($graphId)))) {
+	$dbGraph = DBfetch(DBselect('SELECT g.* FROM graphs g WHERE g.graphid='.zbx_dbstr($graphId)));
+
+	if ($dbGraph) {
 		return $dbGraph;
 	}
 

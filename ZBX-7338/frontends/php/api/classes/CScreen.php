@@ -379,7 +379,10 @@ class CScreen extends CZBXAPI {
 
 			// "templateid", is not allowed
 			if (array_key_exists('templateid', $screen)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot set "templateid" for screen "%1$s".', $screen['name']));
+				self::exception(
+					ZBX_API_ERROR_PARAMETERS,
+					_s('Cannot set "templateid" for screen "%1$s".', $screen['name'])
+				);
 			}
 		}
 
@@ -405,18 +408,26 @@ class CScreen extends CZBXAPI {
 
 		$this->validateCreate($screens);
 
-		$screenIds = array();
+		$screenIds = DB::insert('screens', $screens);
 
-		// replace screen items
+		// create screen items
+		$screenItems = array();
+		$n = 0;
+
 		foreach ($screens as $screen) {
-			$screenId = DB::insert('screens', zbx_toArray($screen));
-			$screenId = reset($screenId);
-
 			if (isset($screen['screenitems'])) {
-				$this->replaceItems($screenId, $screen['screenitems']);
+				foreach ($screen['screenitems'] as $screenItem) {
+					$screenItem['screenid'] = $screenIds[$n];
+
+					$screenItems[] = $screenItem;
+				}
 			}
 
-			$screenIds[] = $screenId;
+			$n++;
+		}
+
+		if ($screenItems) {
+			API::ScreenItem()->create($screenItems);
 		}
 
 		return array('screenids' => $screenIds);
@@ -447,7 +458,10 @@ class CScreen extends CZBXAPI {
 		foreach ($screens as $screen) {
 			// "templateid" is not allowed
 			if (array_key_exists('templateid', $screen)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update "templateid" for screen "%1$s".', $screen['name']));
+				self::exception(
+					ZBX_API_ERROR_PARAMETERS,
+					_s('Cannot update "templateid" for screen "%1$s".', $screen['name'])
+				);
 			}
 
 			if (isset($screen['name'])) {
@@ -470,7 +484,7 @@ class CScreen extends CZBXAPI {
 	 *
 	 * @param array $screens
 	 *
-	 * @return bool
+	 * @return array
 	 */
 	public function update(array $screens) {
 		$screens = zbx_toArray($screens);
