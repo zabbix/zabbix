@@ -1,11 +1,24 @@
 Changes for 2.2.1rc1
 
 New features:
+....I..... [ZBXNEXT-1256] changed example directory size user parameter to return bytes (Richlv)
 ..F....... [ZBX-7250] made gettext an optional feature for the frontend (Pavels)
 A.F....... [ZBX-1357] updated Brazilian Portuguese, French, Italian, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
 ....I..PS. [ZBXNEXT-1257] dropped support for UCD-SNMP (asaveljevs)
 
 Bug fixes:
+..F....... [ZBX-7355] fixed various prototype confirmation messages (Ivo)
+..F....... [ZBX-7408] removed unnecessary variables and includes in slide show configuration (Ivo)
+.D........ [ZBX-7034] improved Alias parameter description in the example configuration files (Richlv)
+..F....... [ZBX-7337] fixed undefined index debug profiler (Eduard)
+..F....... [ZBX-7337] fixed input parameters validation in multiple pages (Eduard, Sasha)
+A......... [ZBX-7372] fixed undefined indexes in script.getscriptsbyhosts method (Ivo)
+..F....... [ZBX-7350] fixed displaying host prototypes in "Status of Zabbix" (Ivo)
+.......PS. [ZBXNEXT-98] refactored code for SNMP checks (asaveljevs, Sasha)
+........S. [ZBX-7184] added check to prevent host from being switched to unavailable state multiple times in a row (wiper)
+A......... [ZBX-7351] fixed screen item not being saved if resource type is URL (Ivo)
+........S. [ZBX-7329] fixed VMware related compiling error on FreeBSD (wiper)
+........S. [ZBX-7359] fixed possible crash when parsing VMware datastore data (wiper)
 ........S. [ZBX-7309] fixed resolving of {ITEM.VALUE} macro in recovery messages (Andris, Sasha)
 ..F....... [ZBX-7254] fixed selected tab not being reset when opening the host mass update form (Pavels)
 A.F....... [ZBX-7316] fixed drule.delete method (Ivo)
@@ -14,13 +27,13 @@ A.F....... [ZBX-7293] fixed typo in the plural form of a translatable string (Ri
 ..F....... [ZBX-7325] fixed parent LLD rule link color in the darkblue and darkorange themes (Pavels)
 ..F....... [ZBX-7311] fixed dragging of host interfaces (Ivo)
 ..F....... [ZBX-7272] fixed graph's grid with fixed Y axis MIN/MAX values (Eduard)
-...G...... [ZBX-2008] added support of Audit Success/Failure severity for Security log (igors)
+...G...... [ZBX-2008] added support of Audit Success/Failure severity for Windows Security log (igors)
 ...G...... [ZBX-2008] implemented automatic loading of wevtapi.dll file and its functions (igors)
 ...G...... [ZBX-2008] improved performance of eventlog monitoring (igors)
 ..F....... [ZBX-7263] fixed validation of filter parameters in tr_status.php (Eduard)
 ..F....... [ZBX-7303] removed link to item configuration for discovered items in latest data screen (Eduard)
 ...G...... [ZBX-7289] added server address and port number to "no active checks on server" message (igors)
-..F....... [ZBX-6920] fixed displaying of soft linked IT services (Eduard)
+..F....... [ZBX-6920] fixed displaying of soft linked IT services that contain a dot in their name (Eduard)
 ..F....... [ZBX-7037] added agent.hostname to the list of supported items (Pavels)
 ..F....... [ZBX-7317] removed unused code in popup.php (Ivo)
 
@@ -106,11 +119,11 @@ A.F....... [ZBX-7235] fixed activating and deactivating a web scenarios (Eduard)
 ..F....... [ZBX-7236] removed the sorting indicator from the "Last 20 issues" widget (Pavels)
 A......... [ZBX-7224] fixed host prototype children group deletion (Eduard)
 ..F....... [ZBX-7199] fixed permission issue in bar report (Eduard)
-..F....... [ZBX-7215] fixed search auto suggest alwasy displaying results in lower case (Pavels)
+..F....... [ZBX-7215] fixed search auto suggest always displaying results in lower case (Pavels)
 ....I..... [ZBX-7166] added database upgrade patches to set status of template triggers to Enabled and state of template items to normal (Andris, Sasha)
 ..F....... [ZBX-7198] fixed displaying trigger popup menu relative to mouse cursor in Monitoring > Overview page (Ivo)
 ....I..... [ZBX-7218] fixed configuration failing with Oracle 12.1 instant client libraries (asaveljevs, Sasha)
-A.F....... [ZBX-7165] fixed snmp fields validation in item configuration (Eduard)
+A.F....... [ZBX-7165] fixed SNMP field validation in item configuration (Eduard)
 ..F....... [ZBX-5942] fixed setup navigation (Eduard, Pavels)
 ..F....... [ZBX-7137] fixed macros resolving in inventory host interfaces (Eduard)
 ...G...PS. [ZBX-7206] fixed arithmetic expressions in C macros not being wrapped in parentheses (asaveljevs)
@@ -172,8 +185,8 @@ Changes for 2.1.7
 New features:
 ..F....... [ZBXNEXT-1851] hid Czech, Dutch, Hungarian, Korean, Latvian, Persian, Spanish and Turkish translations from the frontend (Richlv)
 ..FG...... [ZBX-2008] added support of Windows Eventing 6.0 (igors, Ivo)
-...G...... [ZBXNEXT-1942] added zabbix sender dynamic link library for windows (wiper)
-...G...... [ZBXNEXT-935] zabbix sender exit status now better reflects the operation result - success:0, partial success:2, failure:1 (asaveljevs, wiper)
+...G...... [ZBXNEXT-1942] added Zabbix sender dynamic link library for Windows (wiper)
+...G...... [ZBXNEXT-935] changed Zabbix sender exit status to better reflect the operation result - success:0, partial success:2, failure:1 (asaveljevs, wiper)
 .......PS. [ZBXNEXT-935] improved readability of server response to sender/agent data (asaveljevs, wiper)
 .......PS. [ZBXNEXT-1633] improved VMware virtual machine monitoring performance (wiper)
 ..F....... [ZBX-6911] added functionality to save positions of block on dashboard page in profiles table (Vitalij)
@@ -195,13 +208,14 @@ A.F....... [ZBX-7091] fixed SQL injection vulnerabilities in dashboard favourite
 ..F....... [ZBX-6994] fixed logic of SQL creation, removed unneeded i.flags IN (0,4) from SQL, if i.flags is set from filter or is null (Vitalij)
 ..F....... [ZBX-6993] fixed JS errors in various pages having a child node with high ID value (Ivo)
 ..F....... [ZBX-7032] fixed possibility to add "ICMP ping" check in Configuration > Discovery (Ivo)
-........S. [ZBX-6904] now ESC.HISTORY macro creates the same message content whithin the same escalation step when notification is sent to multiple recipients (igors)
+........S. [ZBX-6904] fixed ESC.HISTORY macro to create the same message content within the same escalation step when notification is sent to multiple recipients (igors)
 
 --------------------------------------------------------------------------------
 Changes for 2.1.6
 
 New features:
 ..F....... [ZBX-2616] upgraded the bundled DejaVu font from 2.33 to 2.34 (Richlv)
+..F....... [ZBXNEXT-1763] added links to inventory in Monitoring -> Maps and Monitoring -> Latest Data (Oleg)
 ..F....... [ZBXNEXT-1763] added host related information under Monitoring (Oleg)
 ..F....... [ZBX-6983] changed the "Status of host group triggers" and "Status of host triggers" screen elements and the "Latest 20 issues" to display triggers without events (Pavels)
 ..F....... [ZBX-6983] renamed the "Status of host group triggers" screen element to "Latest host group issues" and "Status of host triggers" to "Latest host issues" (Pavels)
@@ -225,7 +239,7 @@ A.F....... [ZBX-7026] removed automatic changing of "error" field when trigger a
 Changes for 2.1.5
 
 New features:
-...G...... [ZBXNEXT-836] added windows agent wmi query support with wmi.get key (wiper)
+...G...... [ZBXNEXT-836] added Windows agent WMI query support with wmi.get key (wiper)
 ........S. [ZBXNEXT-1267] changed network discovery to take in account proxies when identifying discovered hosts (wiper)
 ........S. [ZBXNEXT-322] improved value cache multi-process performance by unlocking it during database requests (wiper)
 ..F.....S. [ZBX-6883] added possibility to use empty parameters in the trigger functions (Sasha)
@@ -647,11 +661,13 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.10rc1
 
 New features:
+....I..... [ZBXNEXT-1256] changed example directory size user parameter to return bytes (Richlv)
 ..F....... [ZBX-7103] improved loading speed of tr_events.php page (Sasha)
 A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Czech, Dutch, French, German, Greek, Hungarian, Japanese, Italian, Romanian, Russian, Slovak, Spanish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
-..F....... [ZBX-6129] fixed trying to change the status of a deleted trigger or trigger ptototype changes the status of all trigger and prototypes (Pavels)
+....I..... [ZBX-7218] fixed configuration failing with Oracle 12.1 instant client libraries (asaveljevs, Sasha)
+..F....... [ZBX-6129] fixed trying to change the status of a deleted trigger or trigger prototype changes the status of all trigger and prototypes (Pavels)
 ..F....... [ZBX-6920] fixed displaying of soft linked IT services (Eduard)
 .......PS. [ZBX-7292] fixed resolving of macros in host interfaces (Sasha)
 ....I..... [ZBX-7273] fixed newlines in default data strings for Oracle (Sasha)
@@ -2080,6 +2096,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.19rc1
 
+....I..... [ZBXNEXT-1256] changed example directory size user parameter to return bytes (Richlv)
 ..F....... [ZBX-7156] fixed string value escaping in profiles (Eduard)
 ...G...... [ZBX-4658] fixed system.boottime and system.uptime returning bogus values on Solaris when agent is compiled as a 64-bit binary (asaveljevs)
 ........S. [ZBX-7119] fixed data collection stopping after no data maintenance until configuration cache is updated (asaveljevs)
