@@ -1440,9 +1440,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 		return NULL;
 
 	for (i = 0; i < result->ncolumn; i++)
-	{
 		result->values[i] = (SQL_NULL_DATA == result->values_len[i] ? NULL : result->values_cli[i]);
-	}
 
 	return result->values;
 #elif defined(HAVE_MYSQL)
@@ -1460,12 +1458,6 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 		if (NULL == result->clobs[i])
 			continue;
 
-		if (OCI_SUCCESS != (rc2 = OCILobCharSetForm(oracle.envhp, oracle.errhp, result->clobs[i], &csfrm)))
-		{
-			zabbix_errlog(ERR_Z3006, rc2, zbx_oci_error(rc2));
-			return NULL;
-		}
-
 		if (OCI_SUCCESS != (rc2 = OCILobGetLength(oracle.svchp, oracle.errhp, result->clobs[i], &amount)))
 		{
 			/* If the LOB is NULL, the length is undefined. */
@@ -1477,6 +1469,11 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 			}
 			else
 				amount = 0;
+		}
+		else if (OCI_SUCCESS != (rc2 = OCILobCharSetForm(oracle.envhp, oracle.errhp, result->clobs[i], &csfrm)))
+		{
+			zabbix_errlog(ERR_Z3006, rc2, zbx_oci_error(rc2));
+			return NULL;
 		}
 
 		if (result->values_alloc[i] < (alloc = amount * 4 + 1))
