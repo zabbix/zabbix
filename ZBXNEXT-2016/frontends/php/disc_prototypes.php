@@ -111,10 +111,13 @@ $fields = array(
 	'group_itemid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'new_application' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
 	'applications' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'history' =>				array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({save})', _('Keep history (in days)')),
+	'history' =>				array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({save})',
+		_('History storage period')
+	),
 	'trends' =>					array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),
 		'isset({save})&&isset({value_type})&&'.IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type'),
-		_('Keep trends (in days)')),
+		_('Trend storage period')
+	),
 	'add_delay_flex' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	// actions
 	'go' =>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
