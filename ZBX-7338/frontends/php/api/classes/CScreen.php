@@ -368,13 +368,11 @@ class CScreen extends CZBXAPI {
 	 * @param array $screens
 	 */
 	protected function validateCreate(array $screens) {
-		$newScreenNames = zbx_objectValues($screens, 'name');
-
 		$screenDbFields = array('name' => null);
 
 		foreach ($screens as $screen) {
 			if (!check_db_fields($screenDbFields, $screen)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for screen "%1$s".', $screen['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
 
 			// "templateid", is not allowed
@@ -387,7 +385,7 @@ class CScreen extends CZBXAPI {
 		}
 
 		$dbScreens = $this->get(array(
-			'filter' => array('name' => $newScreenNames),
+			'filter' => array('name' => zbx_objectValues($screens, 'name')),
 			'output' => array('name'),
 			'nopermissions' => true
 		));
@@ -447,6 +445,7 @@ class CScreen extends CZBXAPI {
 			'output' => array('screenid'),
 			'preservekeys' => true
 		));
+
 		foreach ($screens as $screen) {
 			if (!isset($dbScreens[$screen['screenid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
@@ -550,6 +549,25 @@ class CScreen extends CZBXAPI {
 	}
 
 	/**
+	 * Validate input for delete method.
+	 *
+	 * @param array $screenIds
+	 */
+	protected function validateDelete(array $screenIds) {
+		$dbScreens = $this->get(array(
+			'screenids' => $screenIds,
+			'editable' => true,
+			'preservekeys' => true
+		));
+
+		foreach ($screenIds as $screenId) {
+			if (!isset($dbScreens[$screenId])) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+			}
+		}
+	}
+
+	/**
 	 * Delete screen.
 	 *
 	 * @param array $screenIds
@@ -559,16 +577,7 @@ class CScreen extends CZBXAPI {
 	public function delete($screenIds) {
 		$screenIds = zbx_toArray($screenIds);
 
-		$dbScreens = $this->get(array(
-			'screenids' => $screenIds,
-			'editable' => true,
-			'preservekeys' => true
-		));
-		foreach ($screenIds as $screenId) {
-			if (!isset($dbScreens[$screenId])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-			}
-		}
+		$this->validateDelete($screenIds);
 
 		DB::delete('screens_items', array('screenid' => $screenIds));
 		DB::delete('screens_items', array('resourceid' => $screenIds, 'resourcetype' => SCREEN_RESOURCE_SCREEN));
