@@ -1475,7 +1475,10 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 				rc = OCILobCharSetForm(oracle.envhp, oracle.errhp, result->clobs[i], &csfrm);
 
 				if (OCI_SUCCESS != rc)
+				{
 					zabbix_errlog(ERR_Z3006, rc, zbx_oci_error(rc));
+					amount = 0;
+				}
 			}
 
 			if (result->values_alloc[i] < (alloc = amount * 4 + 1))
