@@ -7,6 +7,8 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, French, Italian, Russian and
 ....I..PS. [ZBXNEXT-1257] dropped support for UCD-SNMP (asaveljevs)
 
 Bug fixes:
+........S. [ZBX-7400] fixed possible server crash when processing trigger functions with text or log items with Oracle backend (Sasha)
+........S. [ZBX-7400] fixed possible server crash when sending messages with Oracle backend (Sasha)
 ........S. [ZBX-7326] improved escalator idle time calculations and statistics reporting (wiper)
 ..F....... [ZBX-7355] fixed various prototype confirmation messages (Ivo)
 ..F....... [ZBX-7408] removed unnecessary variables and includes in slide show configuration (Ivo)
@@ -667,7 +669,7 @@ New features:
 A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Czech, Dutch, French, German, Greek, Hungarian, Japanese, Italian, Romanian, Russian, Slovak, Spanish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
-........S. [ZBX-7400] fixed possible server crash when sending messages with Oracle backend (Sasha)
+........S. [ZBX-7400] fixed fetching of empty text or log history data with Oracle backend (Sasha)
 ....I..... [ZBX-7218] fixed configuration failing with Oracle 12.1 instant client libraries (asaveljevs, Sasha)
 ..F....... [ZBX-6129] fixed trying to change the status of a deleted trigger or trigger prototype changes the status of all trigger and prototypes (Pavels)
 ..F....... [ZBX-6920] fixed displaying of soft linked IT services (Eduard)
