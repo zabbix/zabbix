@@ -258,6 +258,7 @@ class FrontendSetup {
 
 		// Semaphore related functions are checked elsewhere. The 'false' is to prevent autoloading of the SQLite3 class.
 		if (class_exists('SQLite3', false) && zbx_is_callable(array('ftok', 'sem_acquire', 'sem_release', 'sem_get'))) {
+			$this->ZBX_CONFIG['allowed_db'][ZBX_DB_SQLITE3] = 'SQLite3';
 			$current[] = 'SQLite3';
 			$current[] = BR();
 		}
