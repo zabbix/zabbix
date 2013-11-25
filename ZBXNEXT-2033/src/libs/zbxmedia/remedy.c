@@ -422,7 +422,7 @@ out:
  ******************************************************************************/
 static int	remedy_create_ticket(const char *url, const char *user, const char *password, const char *loginid,
 		const char *service, const char *ci, const char *summary, const char *notes, const char *impact,
-		const char *urgency, char **externalid, char **error)
+		const char *urgency, const char *company, char **externalid, char **error)
 {
 #	define ZBX_POST_REMEDY_CREATE_SERVICE								\
 		ZBX_SOAP_ENVELOPE_CREATE_OPEN								\
@@ -441,7 +441,7 @@ static int	remedy_create_ticket(const char *url, const char *user, const char *p
 			"<urn:Urgency>%s</urn:Urgency>"							\
 			"<urn:ServiceCI>%s</urn:ServiceCI>"						\
 			"<urn:Login_ID>%s</urn:Login_ID>"						\
-			"<urn:Customer_Company>Bombardier Transportation</urn:Customer_Company>"	\
+			"<urn:Customer_Company>%s</urn:Customer_Company>"	\
 			"<urn:CSC_INC></urn:CSC_INC>"							\
 		"</urn:HelpDesk_Submit_Service>"							\
 		ZBX_SOAP_BODY_CLOSE									\
@@ -469,7 +469,7 @@ static int	remedy_create_ticket(const char *url, const char *user, const char *p
 	ci_esc = xml_escape_dyn(ci);
 
 	xml = zbx_dsprintf(xml, ZBX_POST_REMEDY_CREATE_SERVICE, user, password, ci_esc, impact,
-			ZBX_REMEDY_ACTION_CREATE, summary_esc, notes_esc, urgency, service, loginid);
+			ZBX_REMEDY_ACTION_CREATE, summary_esc, notes_esc, urgency, service, loginid, company);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, xml)))
 	{
@@ -926,7 +926,8 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 
 		if (SUCCEED == (ret = remedy_create_ticket(media->smtp_server, media->username, media->passwd,
 				media->smtp_helo, ZBX_REMEDY_DEFAULT_SERVICECI, row[3], alert->subject, alert->message,
-				impact_map[remedy_event], urgency_map[remedy_event], &ticketnumber, error)))
+				impact_map[remedy_event], urgency_map[remedy_event], media->exec_path, &ticketnumber,
+				error)))
 		{
 			zbx_uint64_t	ticketid;
 			char		*ticketnumber_dyn;
@@ -960,7 +961,7 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 				0 == strcmp(status, ZBX_REMEDY_STATUS_CLOSED) ||
 				0 == strcmp(status, ZBX_REMEDY_STATUS_CANCELLED))
 		{
-			/* don't resolve already resolved, closed or cancelled incidents */
+			/* don't resolve already resolved, closed or canceled incidents */
 			ret = SUCCEED;
 			goto out;
 		}
