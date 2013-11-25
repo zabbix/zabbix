@@ -45,20 +45,19 @@ void	recv_discovery_data(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	int			ret;
 	zbx_uint64_t		proxy_hostid;
-	char			host[HOST_HOST_LEN_MAX], error[256];
+	char			host[HOST_HOST_LEN_MAX], error[256] = "";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (FAIL == (ret = get_proxy_id(jp, &proxy_hostid, host, error, sizeof(error))))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Discovery data from active proxy on [%s] failed: %s",
+		zabbix_log(LOG_LEVEL_WARNING, "discovery data from active proxy on \"%s\" failed: %s",
 				get_ip_by_socket(sock), error);
-		goto exit;
 	}
+	else
+		process_dhis_data(jp);
 
-	process_dhis_data(jp);
-exit:
-	zbx_send_response(sock, ret, NULL, CONFIG_TIMEOUT);
+	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 }

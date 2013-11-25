@@ -103,11 +103,16 @@ void	recv_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
+	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid proxy configuration data: %s", zbx_json_strerror());
+		zbx_send_response(sock, ret, zbx_json_strerror(), CONFIG_TIMEOUT);
+	}
 	else
+	{
 		process_proxyconfig(&jp_data);
+		zbx_send_response(sock, ret, NULL, CONFIG_TIMEOUT);
+	}
 
-	zbx_send_response(sock, ret, NULL, CONFIG_TIMEOUT);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
