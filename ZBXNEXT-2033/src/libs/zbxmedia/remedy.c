@@ -441,7 +441,7 @@ static int	remedy_create_ticket(const char *url, const char *user, const char *p
 			"<urn:Urgency>%s</urn:Urgency>"							\
 			"<urn:ServiceCI>%s</urn:ServiceCI>"						\
 			"<urn:Login_ID>%s</urn:Login_ID>"						\
-			"<urn:Customer_Company>%s</urn:Customer_Company>"	\
+			"<urn:Customer_Company>%s</urn:Customer_Company>"				\
 			"<urn:CSC_INC></urn:CSC_INC>"							\
 		"</urn:HelpDesk_Submit_Service>"							\
 		ZBX_SOAP_BODY_CLOSE									\
@@ -670,17 +670,20 @@ static int	remedy_modify_ticket(const char *url, const char *user, const char *p
 
 	for (i = 0; i < fields_num; i++)
 	{
-		char	*value = NULL, *pvalue;
-
 		if (NULL != fields[i].value)
-			pvalue = value = xml_escape_dyn(fields[i].value);
-		else
-			pvalue = "";
+		{
+			char	*value = NULL;
 
-		zbx_snprintf_alloc(&xml, &xml_alloc, &xml_offset, "<urn:%s>%s</urn:%s>", fields[i].name, pvalue,
+			value = xml_escape_dyn(fields[i].value);
+			zbx_snprintf_alloc(&xml, &xml_alloc, &xml_offset, "<urn:%s>%s</urn:%s>", fields[i].name, value,
 				fields[i].name);
 
-		zbx_free(value);
+			zbx_free(value);
+		}
+		else
+		{
+			zbx_snprintf_alloc(&xml, &xml_alloc, &xml_offset, "<urn:%s/>", fields[i].name);
+		}
 	}
 
 	zbx_snprintf_alloc(&xml, &xml_alloc, &xml_offset,
