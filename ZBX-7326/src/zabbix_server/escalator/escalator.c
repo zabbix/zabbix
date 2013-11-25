@@ -1717,8 +1717,11 @@ static int	process_escalations(int now, int *nextcheck)
 			DBcommit();
 		}
 skip:
-		if (0 != escalation.escalationid && escalation.nextcheck < *nextcheck)
+		if (0 != escalation.escalationid && ESCALATION_STATUS_COMPLETED != escalation.status &&
+				escalation.nextcheck < *nextcheck)
+		{
 			*nextcheck = escalation.nextcheck;
+		}
 next:
 		if (NULL != row)
 			memcpy(&escalation, &last_escalation, sizeof(escalation));
