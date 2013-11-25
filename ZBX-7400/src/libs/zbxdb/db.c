@@ -1254,7 +1254,7 @@ error:
 
 		if (SQLT_CLOB == data_type)
 		{
-			if (ZBX_DB_OK == err)
+			if (OCI_SUCCESS == err)
 			{
 				/* allocate the lob locator variable */
 				err = OCIDescriptorAlloc((dvoid *)oracle.envhp, (dvoid **)&result->clobs[counter - 1],
@@ -1455,18 +1455,28 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 	{
 		if (NULL != result->clobs[i])
 		{
-			ub4	alloc, amount, amt = 0;
+			ub4	alloc, amount;
 			ub1	csfrm;
+			boolean	is_initialized;
 
 			rc = OCILobGetLength(oracle.svchp, oracle.errhp, result->clobs[i], &amount);
 
 			if (OCI_SUCCESS != rc)
-				break;
+			{
+				/* If the LOB is NULL or empty, the length is undefined. */
+				/* In this case the function returns OCI_INVALID_HANDLE. */
+				if (OCI_INVALID_HANDLE != rc)
+					zabbix_errlog(ERR_Z3006, rc, zbx_oci_error(rc));
 
-			rc = OCILobCharSetForm(oracle.envhp, oracle.errhp, result->clobs[i], &csfrm);
+				amount = 0;
+			}
+			else
+			{
+				rc = OCILobCharSetForm(oracle.envhp, oracle.errhp, result->clobs[i], &csfrm);
 
-			if (OCI_SUCCESS != rc)
-				break;
+				if (OCI_SUCCESS != rc)
+					zabbix_errlog(ERR_Z3006, rc, zbx_oci_error(rc));
+			}
 
 			if (result->values_alloc[i] < (alloc = amount * 4 + 1))
 			{
@@ -1474,15 +1484,17 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 				result->values[i] = zbx_realloc(result->values[i], result->values_alloc[i]);
 			}
 
-			amt = amount;
-			rc = OCILobRead(oracle.svchp, oracle.errhp, result->clobs[i], &amt, (ub4)1,
-					(dvoid *)result->values[i], (ub4)(result->values_alloc[i] - 1),
-					(dvoid *)NULL, (OCICallbackLobRead)NULL, (ub2)0, csfrm);
+			if (OCI_SUCCESS == rc)
+			{
+				rc = OCILobRead(oracle.svchp, oracle.errhp, result->clobs[i], &amount, (ub4)1,
+						(dvoid *)result->values[i], (ub4)(result->values_alloc[i] - 1),
+						(dvoid *)NULL, (OCICallbackLobRead)NULL, (ub2)0, csfrm);
 
-			if (OCI_SUCCESS != rc)
-				zabbix_errlog(ERR_Z3006, rc, zbx_oci_error(rc));
+				if (OCI_SUCCESS != rc)
+					zabbix_errlog(ERR_Z3006, rc, zbx_oci_error(rc));
+			}
 
-			result->values[i][amt] = '\0';
+			result->values[i][amount] = '\0';
 		}
 	}
 
