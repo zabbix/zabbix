@@ -796,9 +796,10 @@ int	zbx_db_bind_parameter(int position, void *buffer, unsigned char type)
 int	zbx_db_statement_execute()
 {
 	const char	*__function_name = "zbx_db_statement_execute";
-	sword	err;
-	ub4	nrows;
-	int	ret;
+
+	sword		err;
+	ub4		nrows;
+	int		ret;
 
 	if (1 == txn_error)
 	{
