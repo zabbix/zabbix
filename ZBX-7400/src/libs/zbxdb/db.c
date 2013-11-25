@@ -1313,7 +1313,6 @@ error:
 		OCIDescriptorFree(parmdp, OCI_DTYPE_PARAM);
 		parmdp = NULL;
 	}
-
 error:
 	if (OCI_SUCCESS != err)
 	{
@@ -1457,7 +1456,6 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 		{
 			ub4	alloc, amount;
 			ub1	csfrm;
-			boolean	is_initialized;
 
 			rc = OCILobGetLength(oracle.svchp, oracle.errhp, result->clobs[i], &amount);
 
