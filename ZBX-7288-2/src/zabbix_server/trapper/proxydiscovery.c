@@ -45,9 +45,11 @@ void	recv_discovery_data(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	int			ret;
 	zbx_uint64_t		proxy_hostid;
-	char			host[HOST_HOST_LEN_MAX], error[256] = "";
+	char			host[HOST_HOST_LEN_MAX], error[256];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	error[0] = '\0';
 
 	if (FAIL == (ret = get_proxy_id(jp, &proxy_hostid, host, error, sizeof(error))))
 	{
