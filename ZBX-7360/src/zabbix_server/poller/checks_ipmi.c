@@ -21,11 +21,14 @@
 
 #ifdef HAVE_OPENIPMI
 
-#define	IPMI_SENSOR_ID_SZ	33	/* It should be enough max 16 bytes for sensor ID and terminating '\0' */
-					/* (see SDR record format in IPMI v2 spec). */
-					/* Non-threshold sensors in OpenIPMI 2.0.16 - 2.0.18 have longer identifiers */
-					/* while for OpenIPMI 2.0.19 17 bytes are enough. */
-					/* Therefore it is defined longer than necessary 17 bytes. */
+/* Theoretically it should be enough max 16 bytes for sensor ID and terminating '\0' (see SDR record format in IPMI */
+/* v2 spec). OpenIPMI author Corey Minyard explained at	*/
+/* www.mail-archive.com/openipmi-developer@lists.sourceforge.net/msg02013.html: */
+/* "...Since you can use BCD and the field is 16 bytes max, you can get up to 32 bytes in the ID string. Adding the */
+/* sensor sharing and that's another three bytes (I believe 142 is the maximum number you can get), so 35 bytes is  */
+/* the maximum, I believe." */
+#define IPMI_SENSOR_ID_SZ	36
+
 #include "log.h"
 
 #include <OpenIPMI/ipmiif.h>
@@ -117,13 +120,12 @@ static char	*sensor_id_to_str(char *str, size_t str_sz, const char *id, enum ipm
 			*(str + id_len) = '\0';
 			break;
 		case IPMI_BINARY_STR:
-			/* "BCD Plus" or "6-bit ASCII packed" encoding. OpenIPMI does not tell us which one. */
-			/* Don't guess, just print it as a hex string. */
+			/* "BCD Plus" or "6-bit ASCII packed" encoding - print it as a hex string. */
 
 			*p++ = '0';	/* prefix to distinguish from ASCII/Unicode strings */
 			*p++ = 'x';
 			for (i = 0; i < id_sz; i++, p += 2)
-				zbx_snprintf(p, str_sz - 2 - i - i, "%2.2hhx", *(id + i));
+				zbx_snprintf(p, str_sz - (size_t)(2 + i + i), "%2.2x", (unsigned int)*(id + i));
 			*p = '\0';
 			break;
 		default:
