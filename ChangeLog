@@ -15,6 +15,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, French, Italian, Russian and
 ....I..PS. [ZBXNEXT-1257] dropped support for UCD-SNMP (asaveljevs)
 
 Bug fixes:
+..F....... [ZBX-7408] removed unnecessary variables and includes in slide show configuration (Ivo)
 .D........ [ZBX-7034] improved Alias parameter description in the example configuration files (Richlv)
 ..F....... [ZBX-7337] fixed undefined index debug profiler (Eduard)
 ..F....... [ZBX-7337] fixed input parameters validation in multiple pages (Eduard, Sasha)
