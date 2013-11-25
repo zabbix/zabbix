@@ -1144,6 +1144,10 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 			escalation->status = (action->recovery_msg == 1) ? ESCALATION_STATUS_SLEEP : ESCALATION_STATUS_COMPLETED;
 	}
 
+	/* schedule nextcheck for sleeping escalations */
+	if (ESCALATION_STATUS_SLEEP == escalation->status)
+		escalation->nextcheck = time(NULL) + SEC_PER_MIN;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
@@ -1591,6 +1595,8 @@ static int	process_escalations(int now, int *nextcheck)
 
 	do
 	{
+		unsigned char	esc_superseded = 0;
+
 		memset(&last_escalation, 0, sizeof(last_escalation));
 
 		if (NULL != (row = DBfetch(result)))
@@ -1610,43 +1616,41 @@ static int	process_escalations(int now, int *nextcheck)
 				last_escalation.status = ESCALATION_STATUS_COMPLETED;
 		}
 
-		if (0 != escalation.escalationid)
+		if (0 == escalation.escalationid)
+			goto next;
+
+		if (ESCALATION_STATUS_COMPLETED == escalation.status)
 		{
-			unsigned char	esc_superseded = 0;
+			/* delete a recovery record and skip all processing */
+			zbx_vector_uint64_append(&escalationids, escalation.escalationid);
+			goto next;
+		}
 
-			if (ESCALATION_STATUS_COMPLETED == escalation.status)
+		if (0 != last_escalation.escalationid)
+		{
+			esc_superseded = (escalation.actionid == last_escalation.actionid &&
+					escalation.triggerid == last_escalation.triggerid &&
+					escalation.itemid == last_escalation.itemid);
+
+			if (0 != esc_superseded)
 			{
-				/* delete a recovery record and skip all processing */
-				zbx_vector_uint64_append(&escalationids, escalation.escalationid);
-				goto next;
-			}
-
-			if (0 != last_escalation.escalationid)
-			{
-				esc_superseded = (escalation.actionid == last_escalation.actionid &&
-						escalation.triggerid == last_escalation.triggerid &&
-						escalation.itemid == last_escalation.itemid);
-
-				if (0 != esc_superseded)
+				if (0 != last_escalation.r_eventid)
 				{
-					if (0 != last_escalation.r_eventid)
-					{
-						/* recover this escalation */
-						escalation.r_eventid = last_escalation.r_eventid;
-						escalation.status = ESCALATION_STATUS_ACTIVE;
-					}
-					else if (escalation.nextcheck > now ||
-							ESCALATION_STATUS_SLEEP == escalation.status)
-					{
-						zbx_vector_uint64_append(&escalationids, escalation.escalationid);
-						goto next;
-					}
+					/* recover this escalation */
+					escalation.r_eventid = last_escalation.r_eventid;
+					escalation.status = ESCALATION_STATUS_ACTIVE;
+				}
+				else if (escalation.nextcheck > now ||
+						ESCALATION_STATUS_SLEEP == escalation.status)
+				{
+					zbx_vector_uint64_append(&escalationids, escalation.escalationid);
+					goto next;
 				}
 			}
+		}
 
-			if (escalation.nextcheck > now && 0 == escalation.r_eventid)
-				goto skip;
-
+		if (escalation.nextcheck <= now || 0 != escalation.r_eventid)
+		{
 			DBbegin();
 
 			sql_offset = 0;
@@ -1704,7 +1708,7 @@ static int	process_escalations(int now, int *nextcheck)
 				}
 				else
 				{
-					escalation.nextcheck += SEC_PER_MIN;
+					escalation.nextcheck = time(NULL) + SEC_PER_MIN;
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 							"update escalations set nextcheck=%d"
 							" where escalationid=" ZBX_FS_UI64,
@@ -1716,9 +1720,8 @@ static int	process_escalations(int now, int *nextcheck)
 
 			DBcommit();
 		}
-skip:
-		if (0 != escalation.escalationid && ESCALATION_STATUS_COMPLETED != escalation.status &&
-				escalation.nextcheck < *nextcheck)
+
+		if (ESCALATION_STATUS_COMPLETED != escalation.status && escalation.nextcheck < *nextcheck)
 		{
 			*nextcheck = escalation.nextcheck;
 		}
