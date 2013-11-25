@@ -452,7 +452,7 @@ static int	remedy_create_ticket(const char *url, const char *user, const char *p
 	struct curl_slist	*headers = NULL;
 	int			ret = FAIL, err, opt;
 	char			*xml = NULL, *summary_esc = NULL, *notes_esc = NULL, *ci_esc = NULL,
-				*service_url = NULL;
+				*service_url = NULL, *impact_esc, *urgency_esc, *company_esc, *service_esc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -467,9 +467,14 @@ static int	remedy_create_ticket(const char *url, const char *user, const char *p
 	summary_esc = xml_escape_dyn(summary);
 	notes_esc = xml_escape_dyn(notes);
 	ci_esc = xml_escape_dyn(ci);
+	impact_esc = xml_escape_dyn(impact);
+	urgency_esc = xml_escape_dyn(urgency);
+	service_esc = xml_escape_dyn(service);
+	company_esc = xml_escape_dyn(company);
 
-	xml = zbx_dsprintf(xml, ZBX_POST_REMEDY_CREATE_SERVICE, user, password, ci_esc, impact,
-			ZBX_REMEDY_ACTION_CREATE, summary_esc, notes_esc, urgency, service, loginid, company);
+	xml = zbx_dsprintf(xml, ZBX_POST_REMEDY_CREATE_SERVICE, user, password, ci_esc, impact_esc,
+			ZBX_REMEDY_ACTION_CREATE, summary_esc, notes_esc, urgency_esc, service_esc, loginid,
+			company_esc);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, xml)))
 	{
@@ -500,6 +505,10 @@ out:
 	curl_slist_free_all(headers);
 
 	zbx_free(xml);
+	zbx_free(impact_esc);
+	zbx_free(urgency_esc);
+	zbx_free(service_esc);
+	zbx_free(company_esc);
 	zbx_free(ci_esc);
 	zbx_free(notes_esc);
 	zbx_free(summary_esc);
@@ -608,8 +617,8 @@ out:
 	curl_easy_cleanup(easyhandle);
 	curl_slist_free_all(headers);
 
-	zbx_free(service_url);
 	zbx_free(xml);
+	zbx_free(service_url);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -713,6 +722,7 @@ out:
 	curl_easy_cleanup(easyhandle);
 	curl_slist_free_all(headers);
 
+	zbx_free(xml);
 	zbx_free(service_url);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
@@ -874,6 +884,7 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 
 	ZBX_STR2UINT64(triggerid, row[2]);
 
+	/* retrieve the last incident triggered by the event source trigger */
 	if (FAIL == remedy_read_ticket(triggerid, media->smtp_server, media->username, media->passwd,
 			fields, ARRSIZE(fields), error))
 	{
@@ -953,7 +964,7 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 	{
 		if (NULL == remedy_fields_get_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_INCIDENT_NUMBER))
 		{
-			/* trigger with no ticket associated to it was switched to OK state */
+			/* trigger without associated ticket was switched to OK state */
 			ret = SUCCEED;
 			goto out;
 		}
