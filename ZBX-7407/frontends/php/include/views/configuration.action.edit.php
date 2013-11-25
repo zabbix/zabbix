@@ -28,7 +28,6 @@ $actionWidget->addPageHeader(_('CONFIGURATION OF ACTIONS'));
 $actionForm = new CForm();
 $actionForm->setName('action.edit');
 $actionForm->addVar('form', $this->data['form']);
-$actionForm->addVar('form_refresh', $this->data['form_refresh']);
 
 if ($this->data['actionid']) {
 	$actionForm->addVar('actionid', $this->data['actionid']);
@@ -1028,7 +1027,7 @@ if (!empty($this->data['new_operation'])) {
 
 // append tabs to form
 $actionTabs = new CTabView();
-if (!isset($_REQUEST['form_refresh'])) {
+if (!hasRequest('form_refresh')) {
 	$actionTabs->setSelected(0);
 }
 $actionTabs->addTab('actionTab', _('Action'), $actionFormList);

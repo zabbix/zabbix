@@ -361,7 +361,6 @@ show_messages();
 if (hasRequest('form')) {
 	$data = array(
 		'form' => get_request('form'),
-		'form_refresh' => get_request('form_refresh', 0),
 		'actionid' => get_request('actionid'),
 		'new_condition' => get_request('new_condition', array()),
 		'new_operation' => get_request('new_operation', null)
@@ -385,7 +384,7 @@ if (hasRequest('form')) {
 		$data['esc_period'] = getRequest('esc_period');
 	}
 
-	if (isset($data['action']['actionid']) && !isset($_REQUEST['form_refresh'])) {
+	if (isset($data['action']['actionid']) && !hasRequest('form_refresh')) {
 		sortOperations($data['eventsource'], $data['action']['operations']);
 	}
 	else {
@@ -393,14 +392,14 @@ if (hasRequest('form')) {
 		$data['action']['name'] = get_request('name');
 		$data['action']['evaltype'] = get_request('evaltype', 0);
 		$data['action']['esc_period'] = get_request('esc_period', SEC_PER_HOUR);
-		$data['action']['status'] = get_request('status', isset($_REQUEST['form_refresh']) ? 1 : 0);
+		$data['action']['status'] = get_request('status', hasRequest('form_refresh') ? 1 : 0);
 		$data['action']['recovery_msg'] = get_request('recovery_msg', 0);
 		$data['action']['conditions'] = get_request('conditions', array());
 		$data['action']['operations'] = get_request('operations', array());
 
 		sortOperations($data['eventsource'], $data['action']['operations']);
 
-		if (!empty($data['actionid']) && isset($_REQUEST['form_refresh'])) {
+		if ($data['actionid'] && hasRequest('form_refresh')) {
 			$data['action']['def_shortdata'] = get_request('def_shortdata');
 			$data['action']['def_longdata'] = get_request('def_longdata');
 		}
@@ -428,9 +427,7 @@ if (hasRequest('form')) {
 		}
 	}
 
-	if (empty($data['action']['actionid'])
-			&& !isset($_REQUEST['form_refresh'])
-			&& $data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+	if (!$data['actionid'] && !hasRequest('form_refresh') && $data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 		$data['action']['conditions'] = array(
 			array(
 				'conditiontype' => CONDITION_TYPE_TRIGGER_VALUE,
