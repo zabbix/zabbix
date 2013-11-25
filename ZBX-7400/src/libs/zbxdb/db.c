@@ -1453,48 +1453,50 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 
 	for (i = 0; i < result->ncolumn; i++)
 	{
-		if (NULL != result->clobs[i])
+		ub4	alloc, amount;
+		ub1	csfrm;
+		sword	rc2;
+
+		if (NULL == result->clobs[i])
+			continue;
+
+		if (OCI_SUCCESS != (rc2 = OCILobCharSetForm(oracle.envhp, oracle.errhp, result->clobs[i], &csfrm)))
 		{
-			ub4	alloc, amount;
-			ub1	csfrm;
+			zabbix_errlog(ERR_Z3006, rc2, zbx_oci_error(rc2));
+			return NULL;
+		}
 
-			rc = OCILobCharSetForm(oracle.envhp, oracle.errhp, result->clobs[i], &csfrm);
-
-			if (OCI_SUCCESS != rc)
-				break;
-
-			rc = OCILobGetLength(oracle.svchp, oracle.errhp, result->clobs[i], &amount);
-
-			if (OCI_SUCCESS != rc)
+		if (OCI_SUCCESS != (rc2 = OCILobGetLength(oracle.svchp, oracle.errhp, result->clobs[i], &amount)))
+		{
+			/* If the LOB is NULL, the length is undefined. */
+			/* In this case the function returns OCI_INVALID_HANDLE. */
+			if (OCI_INVALID_HANDLE != rc2)
 			{
-				/* If the LOB is NULL or empty, the length is undefined. */
-				/* In this case the function returns OCI_INVALID_HANDLE. */
-				if (OCI_INVALID_HANDLE == rc)
-					amount = 0;
-				else
-					break;
-			}
-
-			if (result->values_alloc[i] < (alloc = amount * 4 + 1))
-			{
-				result->values_alloc[i] = alloc;
-				result->values[i] = zbx_realloc(result->values[i], result->values_alloc[i]);
-			}
-
-			if (OCI_SUCCESS == rc)
-			{
-				rc = OCILobRead(oracle.svchp, oracle.errhp, result->clobs[i], &amount, (ub4)1,
-						(dvoid *)result->values[i], (ub4)(result->values_alloc[i] - 1),
-						(dvoid *)NULL, (OCICallbackLobRead)NULL, (ub2)0, csfrm);
-
-				if (OCI_SUCCESS != rc)
-					zabbix_errlog(ERR_Z3006, rc, zbx_oci_error(rc));
+				zabbix_errlog(ERR_Z3006, rc2, zbx_oci_error(rc2));
+				return NULL;
 			}
 			else
-				rc = OCI_SUCCESS;
-
-			result->values[i][amount] = '\0';
+				amount = 0;
 		}
+
+		if (result->values_alloc[i] < (alloc = amount * 4 + 1))
+		{
+			result->values_alloc[i] = alloc;
+			result->values[i] = zbx_realloc(result->values[i], result->values_alloc[i]);
+		}
+
+		if (OCI_SUCCESS == rc2)
+		{
+			if (OCI_SUCCESS != (rc2 = OCILobRead(oracle.svchp, oracle.errhp, result->clobs[i], &amount,
+					(ub4)1, (dvoid *)result->values[i], (ub4)(result->values_alloc[i] - 1),
+					(dvoid *)NULL, (OCICallbackLobRead)NULL, (ub2)0, csfrm)))
+			{
+				zabbix_errlog(ERR_Z3006, rc2, zbx_oci_error(rc2));
+				return NULL;
+			}
+		}
+
+		result->values[i][amount] = '\0';
 	}
 
 	if (OCI_SUCCESS == rc)
