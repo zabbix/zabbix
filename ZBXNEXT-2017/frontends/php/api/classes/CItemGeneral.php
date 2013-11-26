@@ -137,7 +137,7 @@ abstract class CItemGeneral extends CZBXAPI {
 				'hostids' => zbx_objectValues($dbItems, 'hostid'),
 				'templated_hosts' => true,
 				'editable' => true,
-				'selectApplications' => API_OUTPUT_REFER,
+				'selectApplications' => array('applicationid'),
 				'preservekeys' => true
 			));
 		}
@@ -157,7 +157,7 @@ abstract class CItemGeneral extends CZBXAPI {
 				'hostids' => zbx_objectValues($items, 'hostid'),
 				'templated_hosts' => true,
 				'editable' => true,
-				'selectApplications' => API_OUTPUT_REFER,
+				'selectApplications' => array('applicationid'),
 				'preservekeys' => true
 			));
 		}

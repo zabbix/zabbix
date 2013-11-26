@@ -800,7 +800,7 @@ class CItem extends CItemGeneral {
 		$items = $this->get(array(
 			'hostids' => $data['templateids'],
 			'preservekeys' => true,
-			'selectApplications' => API_OUTPUT_REFER,
+			'selectApplications' => array('applicationid'),
 			'output' => $selectFields,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 		));

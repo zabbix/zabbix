@@ -730,7 +730,7 @@ class CUserMacro extends CZBXAPI {
 			'hostids' => $hostIds,
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'templated_hosts' => true,
-			'output' => API_OUTPUT_REFER,
+			'output' => array('hostmacroid'),
 			'preservekeys' => true
 		));
 
