@@ -14,7 +14,7 @@ if (json_last_error() != 0) {
 }
 
 // TODO: convert this to an actual zbx user authentication using the Zabbix API login() and userGroup() functions
-if ($json['key'] != 'sjE4i') {
+if (($json['key'] != 'sjE4i') && (strlen($json['key']) != 32)) {
    exit;
 }
 
@@ -44,6 +44,9 @@ elseif ($json['method'] == 'alertqueue.create') {
 }
 elseif ($json['method'] == 'proxy.status' || $json['method'] == 'proxy.reassign') {
    include($base_dir.'proxy-assign.php');
+}
+elseif ($json['method'] == 'dm.info') {
+   include($base_dir.'dm-info.php');
 }
 
 sendErrorResponse('235', "Invalid method", "Invalid method");

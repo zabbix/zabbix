@@ -64,7 +64,7 @@ $USER_DETAILS = array();
 $USER_RIGHTS = array();
 $ZBX_LOCALNODEID = 0;
 $ZBX_LOCMASTERID = 0;
-$ZBX_CONFIGURATION_FILE = './conf/zabbix.conf.php';
+$ZBX_CONFIGURATION_FILE = empty($ZBX_CONFIGURATION_FILE) ? './conf/zabbix.conf.php' : $ZBX_CONFIGURATION_FILE;
 $ZBX_CONFIGURATION_FILE = realpath(dirname($ZBX_CONFIGURATION_FILE)).DIRECTORY_SEPARATOR.basename($ZBX_CONFIGURATION_FILE);
 
 // include tactical overview modules
