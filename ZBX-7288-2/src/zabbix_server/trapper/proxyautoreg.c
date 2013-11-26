@@ -49,16 +49,17 @@ void	recv_areg_data(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	error[0] = '\0';
+
 	if (FAIL == (ret = get_proxy_id(jp, &proxy_hostid, host, error, sizeof(error))))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Autoregistration data from active proxy on [%s] failed: %s",
+		zabbix_log(LOG_LEVEL_WARNING, "autoregistration data from active proxy on \"%s\" failed: %s",
 				get_ip_by_socket(sock), error);
-		goto exit;
 	}
+	else
+		process_areg_data(jp, proxy_hostid);
 
-	process_areg_data(jp, proxy_hostid);
-exit:
-	zbx_send_response(sock, ret, NULL, CONFIG_TIMEOUT);
+	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 }
