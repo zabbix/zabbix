@@ -564,7 +564,7 @@ class CUser extends CZBXAPI {
 	 *
 	 * @param array	$userIds
 	 *
-	 * @return array|boolean
+	 * @return array
 	 */
 	public function delete(array $userIds) {
 		$this->validateDelete($userIds);

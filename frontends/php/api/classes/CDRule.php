@@ -560,7 +560,7 @@ class CDRule extends CZBXAPI {
 	 *
 	 * @param array $druleIds
 	 *
-	 * @return array|boolean
+	 * @return array
 	 */
 	public function delete(array $druleIds) {
 		$druleIds = zbx_toArray($druleIds);

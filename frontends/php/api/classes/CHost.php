@@ -1439,7 +1439,7 @@ class CHost extends CHostGeneral {
 	 * @param array	$hostIds
 	 * @param bool	$nopermissions
 	 *
-	 * @return array|boolean
+	 * @return array
 	 */
 	public function delete(array $hostIds, $nopermissions = false) {
 		$this->validateDelete($hostIds, $nopermissions);

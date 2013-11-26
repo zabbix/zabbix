@@ -402,7 +402,7 @@ class CProxy extends CZBXAPI {
 	 *
 	 * @param array	$proxyIds
 	 *
-	 * @return array|boolean
+	 * @return array
 	 */
 	public function delete(array $proxyIds) {
 		$this->validateDelete($proxyIds);
