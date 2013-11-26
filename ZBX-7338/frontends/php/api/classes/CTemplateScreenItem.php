@@ -123,6 +123,7 @@ class CTemplateScreenItem extends CZBXAPI {
 				'hostids' => $options['hostids'],
 				'selectScreenItems' => API_OUTPUT_EXTEND
 			));
+
 			if ($dbTemplateScreens) {
 				foreach ($result as &$screenItem) {
 					foreach ($dbTemplateScreens as $dbTemplateScreen) {

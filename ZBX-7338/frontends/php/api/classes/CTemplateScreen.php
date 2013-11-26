@@ -544,14 +544,29 @@ class CTemplateScreen extends CScreen {
 			}
 		}
 
+		$templateIds = zbx_objectValues($screens, 'templateid');
+
 		$dbScreens = $this->get(array(
 			'filter' => array(
 				'name' => zbx_objectValues($screens, 'name'),
-				'templateid' => zbx_objectValues($screens, 'templateid')
+				'templateid' => $templateIds
 			),
 			'output' => array('name', 'templateid'),
 			'nopermissions' => true
 		));
+
+		$dbTemplates = API::Template()->get(array(
+			'templateids' => $templateIds,
+			'output' => array('name', 'templateid'),
+			'editable' => true,
+			'preservekeys' => true
+		));
+
+		foreach ($templateIds as $templateId) {
+			if (!isset($dbTemplates[$templateId])) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+			}
+		}
 
 		foreach ($screens as $screen) {
 			foreach ($dbScreens as $dbScreen) {

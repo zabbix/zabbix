@@ -155,6 +155,7 @@ class CScreenItem extends CZBXAPI {
 		$dbScreens = API::Screen()->get(array(
 			'screenids' => $screenIds,
 			'output' => array('screenid', 'hsize', 'vsize', 'name'),
+			'with_templated' => true,
 			'editable' => true,
 			'preservekeys' => true
 		));
@@ -173,7 +174,6 @@ class CScreenItem extends CZBXAPI {
 		}
 
 		$this->checkDuplicateResourceInCell($screenItems, $dbScreenItems, $dbScreens);
-
 		$this->checkInput($screenItems, $dbScreenItems);
 	}
 
@@ -228,6 +228,7 @@ class CScreenItem extends CZBXAPI {
 		$dbScreens = API::Screen()->get(array(
 			'screenitemids' => $screenItemIds,
 			'output' => array('screenid', 'hsize', 'vsize', 'name'),
+			'with_templated' => true,
 			'editable' => true,
 			'preservekeys' => true
 		));
@@ -248,7 +249,6 @@ class CScreenItem extends CZBXAPI {
 		}
 
 		$this->checkDuplicateResourceInCell($screenItems, $dbScreenItems, $dbScreens);
-
 		$this->checkInput($screenItems, $dbScreenItems);
 	}
 
@@ -527,6 +527,7 @@ class CScreenItem extends CZBXAPI {
 			$dbHostGroups = API::HostGroup()->get(array(
 				'groupids' => $hostGroupsIds,
 				'output' => array('groupid'),
+				'editable' => true,
 				'preservekeys' => true
 			));
 			foreach ($hostGroupsIds as $hostGroupsId) {
@@ -544,6 +545,7 @@ class CScreenItem extends CZBXAPI {
 			$dbHosts = API::Host()->get(array(
 				'hostids' => $hostIds,
 				'output' => array('hostid'),
+				'editable' => true,
 				'preservekeys' => true
 			));
 			foreach ($hostIds as $hostId) {
@@ -561,6 +563,7 @@ class CScreenItem extends CZBXAPI {
 			$dbGraphs = API::Graph()->get(array(
 				'graphids' => $graphIds,
 				'output' => array('graphid'),
+				'editable' => true,
 				'preservekeys' => true
 			));
 			foreach ($graphIds as $graphId) {
@@ -578,6 +581,7 @@ class CScreenItem extends CZBXAPI {
 			$dbItems = API::Item()->get(array(
 				'itemids' => $itemIds,
 				'output' => array('itemid'),
+				'editable' => true,
 				'preservekeys' => true,
 				'webitems' => true
 			));
@@ -596,6 +600,7 @@ class CScreenItem extends CZBXAPI {
 			$dbMaps = API::Map()->get(array(
 				'sysmapids' => $mapIds,
 				'output' => array('sysmapid'),
+				'editable' => true,
 				'preservekeys' => true
 			));
 			foreach ($mapIds as $mapId) {
@@ -613,6 +618,8 @@ class CScreenItem extends CZBXAPI {
 			$dbScreens = API::Screen()->get(array(
 				'screenids' => $screenIds,
 				'output' => array('screenid'),
+				'editable' => true,
+				'with_templated' => true,
 				'preservekeys' => true
 			));
 			if (empty($dbScreens)) {
