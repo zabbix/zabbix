@@ -367,16 +367,6 @@ foreach ($items as $key => $item){
 		$item['unitsLong'] = '';
 	}
 
-	$itemApplications = reset($item['applications']);
-	$db_app = &$applications[$itemApplications['applicationid']];
-
-	if (!isset($tab_rows[$db_app['applicationid']])) {
-		$tab_rows[$db_app['applicationid']] = array();
-	}
-	$app_rows = &$tab_rows[$db_app['applicationid']];
-
-	$db_app['item_cnt']++;
-
 	// last check time and last value
 	if ($lastHistory) {
 		$lastClock = zbx_date2str(_('d M Y H:i:s'), $lastHistory['clock']);
@@ -443,7 +433,7 @@ foreach ($items as $key => $item){
 			$trendValue = UNKNOWN_VALUE;
 		}
 
-		array_push($app_rows, new CRow(array(
+		$row = new CRow(array(
 			SPACE,
 			is_show_all_nodes() ? SPACE : null,
 			($_REQUEST['hostid'] > 0) ? null : SPACE,
@@ -462,10 +452,10 @@ foreach ($items as $key => $item){
 			new CCol(new CDiv($change, $stateCss)),
 			new CCol($actions, 'latest-actions'),
 			new CCol($statusIcons)
-		)));
+		));
 	}
 	else {
-		array_push($app_rows, new CRow(array(
+		$row = new CRow(array(
 			SPACE,
 			is_show_all_nodes() ? SPACE : null,
 			($_REQUEST['hostid'] > 0) ? null : SPACE,
@@ -474,7 +464,15 @@ foreach ($items as $key => $item){
 			new CCol(new CDiv($lastValue, $stateCss)),
 			new CCol(new CDiv($change, $stateCss)),
 			new CCol($actions, 'latest-actions'),
-		)));
+		));
+	}
+
+	// add the item row to each application tab
+	foreach ($item['applications'] as $itemApplication) {
+		$applicationId = $itemApplication['applicationid'];
+
+		$applications[$applicationId]['item_cnt']++;
+		$tab_rows[$applicationId][] = $row;
 	}
 
 	// remove items with applications from the collection
