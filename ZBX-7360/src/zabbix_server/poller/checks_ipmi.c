@@ -125,7 +125,10 @@ static char	*sensor_id_to_str(char *str, size_t str_sz, const char *id, enum ipm
 			*p++ = '0';	/* prefix to distinguish from ASCII/Unicode strings */
 			*p++ = 'x';
 			for (i = 0; i < id_sz; i++, p += 2)
-				zbx_snprintf(p, str_sz - (size_t)(2 + i + i), "%2.2x", (unsigned int)*(id + i));
+			{
+				zbx_snprintf(p, str_sz - (size_t)(2 + i + i), "%02x",
+						(unsigned int)(unsigned char)*(id + i));
+			}
 			*p = '\0';
 			break;
 		default:
