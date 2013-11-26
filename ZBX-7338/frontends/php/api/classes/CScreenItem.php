@@ -83,7 +83,7 @@ class CScreenItem extends CZBXAPI {
 	 * @param array $options['filter']			Result filter
 	 * @param array $options['limit']			The size of the result set
 	 *
-	 * @return array|bool						Host data as array or false if error
+	 * @return array
 	 */
 	public function get(array $options = array()) {
 		$options = zbx_array_merge($this->getOptions, $options);
@@ -140,7 +140,6 @@ class CScreenItem extends CZBXAPI {
 	protected function validateCreate(array $screenItems) {
 		$screenItemDBfields = array(
 			'screenid' => null,
-			'resourceid' => null,
 			'resourcetype' => null
 		);
 
@@ -167,14 +166,14 @@ class CScreenItem extends CZBXAPI {
 			'preservekeys' => true
 		));
 
+		$this->checkInput($screenItems, $dbScreenItems);
+		$this->checkDuplicateResourceInCell($screenItems, $dbScreenItems, $dbScreens);
+
 		foreach ($screenItems as $screenItem) {
 			$this->checkSpans($screenItem, $dbScreens[$screenItem['screenid']]);
 			$this->checkSpansInBounds($screenItem, $dbScreenItems, $dbScreens[$screenItem['screenid']]);
 			$this->checkGridCoordinates($screenItem, $dbScreens[$screenItem['screenid']]);
 		}
-
-		$this->checkDuplicateResourceInCell($screenItems, $dbScreenItems, $dbScreens);
-		$this->checkInput($screenItems, $dbScreenItems);
 	}
 
 	/**
@@ -242,14 +241,14 @@ class CScreenItem extends CZBXAPI {
 
 		$screenItems = $this->extendObjects($this->tableName(), $screenItems, array('screenid', 'x', 'y', 'rowspan', 'colspan'));
 
+		$this->checkInput($screenItems, $dbScreenItems);
+		$this->checkDuplicateResourceInCell($screenItems, $dbScreenItems, $dbScreens);
+
 		foreach ($screenItems as $screenItem) {
 			$this->checkSpans($screenItem, $dbScreens[$screenItem['screenid']]);
 			$this->checkSpansInBounds($screenItem, $dbScreenItems, $dbScreens[$screenItem['screenid']]);
 			$this->checkGridCoordinates($screenItem, $dbScreens[$screenItem['screenid']]);
 		}
-
-		$this->checkDuplicateResourceInCell($screenItems, $dbScreenItems, $dbScreens);
-		$this->checkInput($screenItems, $dbScreenItems);
 	}
 
 	/**
@@ -261,8 +260,6 @@ class CScreenItem extends CZBXAPI {
 	 * @return array
 	 */
 	public function updateByPosition(array $screenItems) {
-		$screenItems = zbx_toArray($screenItems);
-
 		$screenItemDBfields = array(
 			'screenid' => null,
 			'x' => null,
@@ -295,7 +292,7 @@ class CScreenItem extends CZBXAPI {
 					$screenItem['screenitemid'] = $dbScreenItem['screenitemid'];
 					$update[$dbScreenItem['screenitemid']] = $screenItem;
 
-					break;
+					continue 2;
 				}
 			}
 
@@ -307,12 +304,13 @@ class CScreenItem extends CZBXAPI {
 		if ($update) {
 			$screenItems = API::ScreenItem()->update($update);
 
-			$affectedIds = reset($screenItems);
+			$affectedIds = $screenItems['screenitemids'];
 		}
+
 		if ($create) {
 			$screenItems = API::ScreenItem()->create($create);
 
-			$affectedIds = array_merge($affectedIds, reset($screenItems));
+			$affectedIds = array_merge($affectedIds, $screenItems['screenitemids']);
 		}
 
 		return array('screenitemids' => $affectedIds);
@@ -333,6 +331,7 @@ class CScreenItem extends CZBXAPI {
 			'screenitemids' => $screenItemIds,
 			'preservekeys' => true
 		));
+
 		foreach ($screenItemIds as $screenItemId) {
 			if (!isset($dbScreenItems[$screenItemId])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));

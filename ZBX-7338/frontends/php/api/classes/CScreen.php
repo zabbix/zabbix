@@ -389,11 +389,11 @@ class CScreen extends CZBXAPI {
 			}
 		}
 
-		$dbScreens = $this->get(array(
+		$dbScreens = API::getApi()->select('screens', array(
 			'filter' => array('name' => zbx_objectValues($screens, 'name')),
-			'output' => array('name'),
-			'nopermissions' => true
+			'output' => array('name')
 		));
+
 		foreach ($dbScreens as $dbScreen) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Screen "%1$s" already exists.', $dbScreen['name']));
 		}
@@ -469,9 +469,8 @@ class CScreen extends CZBXAPI {
 			}
 
 			if (isset($screen['name'])) {
-				$dbScreenExist = $this->get(array(
+				$dbScreenExist = API::getApi()->select('screens', array(
 					'filter' => array('name' => $screen['name']),
-					'nopermissions' => true,
 					'output' => array('screenid')
 				));
 				$dbScreenExist = reset($dbScreenExist);

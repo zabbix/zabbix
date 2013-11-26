@@ -500,8 +500,11 @@ class CTemplateScreen extends CScreen {
 							if ($rid && !isset($resourceGraphsMap[$rid])) {
 								$graph = DBfetch(DBselect('SELECT g.name FROM graphs g WHERE g.graphid='.zbx_dbstr($rid)));
 								$template = DBfetch(DBselect('SELECT h.name FROM hosts h WHERE h.hostid='.zbx_dbstr($templateId)));
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph "%1$s" does not exist on template "%2$s".',
-									$graph['name'], $template['name']));
+
+								self::exception(
+									ZBX_API_ERROR_PARAMETERS,
+									_s('Graph "%1$s" does not exist on template "%2$s".', $graph['name'], $template['name'])
+								);
 							}
 
 							$screenItem['resourceid'] = $resourceGraphsMap[$rid];
@@ -511,8 +514,11 @@ class CTemplateScreen extends CScreen {
 							if ($rid && !isset($resourceItemsMap[$rid])) {
 								$item = DBfetch(DBselect('SELECT i.name FROM items i WHERE i.itemid='.zbx_dbstr($rid)));
 								$template = DBfetch(DBselect('SELECT h.name FROM hosts h WHERE h.hostid='.zbx_dbstr($templateId)));
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%1$s" does not exist on template "%2$s".',
-									$item['name'], $template['name']));
+
+								self::exception(
+									ZBX_API_ERROR_PARAMETERS,
+									_s('Item "%1$s" does not exist on template "%2$s".', $item['name'], $template['name'])
+								);
 							}
 
 							$screenItem['resourceid'] = $resourceItemsMap[$rid];
@@ -673,11 +679,7 @@ class CTemplateScreen extends CScreen {
 
 			self::exception(
 				ZBX_API_ERROR_PARAMETERS,
-				_s(
-					'Screen "%1$s" already exists on template "%2$2".',
-					$dbExistingScreen['name'],
-					$dbTemplate['name']
-				)
+				_s('Screen "%1$s" already exists on template "%2$2".', $dbExistingScreen['name'], $dbTemplate['name'])
 			);
 		}
 	}
