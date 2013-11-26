@@ -760,7 +760,8 @@ function make_status_of_zbx() {
 
 	// check requirements
 	if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
-		$reqs = FrontendSetup::i()->checkRequirements();
+		$frontendSetup = new FrontendSetup();
+		$reqs = $frontendSetup->checkRequirements();
 		foreach ($reqs as $req) {
 			if ($req['result'] == false) {
 				$table->addRow(array(

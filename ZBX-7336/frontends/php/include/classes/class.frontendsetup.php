@@ -34,26 +34,6 @@ class FrontendSetup {
 	const MIN_PHP_GD_VERSION = '2.0';
 	const MIN_PHP_LIBXML_VERSION = '2.6.15';
 
-	private static $_instance = null;
-
-	public function __construct($ZBX_CONFIG = null) {
-		$this->ZBX_CONFIG = &$ZBX_CONFIG;
-	}
-
-	/**
-	 * Function for getting class object, implements Singleton.
-	 *
-	 * @static
-	 * @return object
-	 */
-	public static function i() {
-		if (null === self::$_instance) {
-			self::$_instance = new self;
-		}
-
-		return self::$_instance;
-	}
-
 	/**
 	 * Perform all requirements checks.
 	 *
@@ -227,45 +207,12 @@ class FrontendSetup {
 	public function checkPhpDatabases() {
 		$current = array();
 
-		if (zbx_is_callable(array('mysqli_connect', 'mysqli_connect_error', 'mysqli_error', 'mysqli_query',
-				'mysqli_fetch_assoc', 'mysqli_free_result', 'mysqli_real_escape_string', 'mysqli_close'))) {
-			$this->ZBX_CONFIG['allowed_db'][ZBX_DB_MYSQL] = 'MySQL';
-			$current[] = 'MySQL';
-			$current[] = BR();
-		}
-
-		if (zbx_is_callable(array('pg_pconnect', 'pg_fetch_array', 'pg_fetch_row', 'pg_exec', 'pg_getlastoid'))) {
-			$this->ZBX_CONFIG['allowed_db'][ZBX_DB_POSTGRESQL] = 'PostgreSQL';
-			$current[] = 'PostgreSQL';
-			$current[] = BR();
-		}
-
-		if (zbx_is_callable(array('oci_connect', 'oci_error', 'oci_parse', 'oci_execute', 'oci_fetch_assoc',
-				'oci_commit', 'oci_close', 'oci_rollback', 'oci_field_type', 'oci_new_descriptor',
-				'oci_bind_by_name', 'oci_free_statement'))) {
-			$this->ZBX_CONFIG['allowed_db'][ZBX_DB_ORACLE] = 'Oracle';
-			$current[] = 'Oracle';
-			$current[] = BR();
-		}
-
-		if (zbx_is_callable(array('db2_connect', 'db2_set_option', 'db2_commit', 'db2_rollback', 'db2_autocommit',
-				'db2_prepare', 'db2_execute', 'db2_stmt_errormsg', 'db2_fetch_assoc', 'db2_free_result',
-				'db2_escape_string', 'db2_close'))) {
-			$this->ZBX_CONFIG['allowed_db'][ZBX_DB_DB2] = 'IBM DB2';
-			$current[] = 'IBM DB2';
-			$current[] = BR();
-		}
-
-		// Semaphore related functions are checked elsewhere. The 'false' is to prevent autoloading of the SQLite3 class.
-		if (class_exists('SQLite3', false) && zbx_is_callable(array('ftok', 'sem_acquire', 'sem_release', 'sem_get'))) {
-			$this->ZBX_CONFIG['allowed_db'][ZBX_DB_SQLITE3] = 'SQLite3';
-			$current[] = 'SQLite3';
-			$current[] = BR();
-		}
-
-		// set cookies for setup only and not for ajax blocks in dashboard
-		if (get_cookie('ZBX_CONFIG')) {
-			zbx_setcookie('ZBX_CONFIG', serialize($this->ZBX_CONFIG));
+		$databases = $this->getSupportedDatabases();
+		if ($databases) {
+			foreach ($databases as $database => $name) {
+				$current[] = $name;
+				$current[] = BR();
+			}
 		}
 
 		$result = array(
@@ -277,6 +224,42 @@ class FrontendSetup {
 		);
 
 		return $result;
+	}
+
+	/**
+	 * Get list of supported databases.
+	 *
+	 * @return array
+	 */
+	public function getSupportedDatabases() {
+		$allowedDb = array();
+		if (zbx_is_callable(array('mysqli_connect', 'mysqli_connect_error', 'mysqli_error', 'mysqli_query',
+				'mysqli_fetch_assoc', 'mysqli_free_result', 'mysqli_real_escape_string', 'mysqli_close'))) {
+			$allowedDb[ZBX_DB_MYSQL] = 'MySQL';
+		}
+
+		if (zbx_is_callable(array('pg_pconnect', 'pg_fetch_array', 'pg_fetch_row', 'pg_exec', 'pg_getlastoid'))) {
+			$allowedDb[ZBX_DB_POSTGRESQL] = 'PostgreSQL';
+		}
+
+		if (zbx_is_callable(array('oci_connect', 'oci_error', 'oci_parse', 'oci_execute', 'oci_fetch_assoc',
+				'oci_commit', 'oci_close', 'oci_rollback', 'oci_field_type', 'oci_new_descriptor',
+				'oci_bind_by_name', 'oci_free_statement'))) {
+			$allowedDb[ZBX_DB_ORACLE] = 'Oracle';
+		}
+
+		if (zbx_is_callable(array('db2_connect', 'db2_set_option', 'db2_commit', 'db2_rollback', 'db2_autocommit',
+				'db2_prepare', 'db2_execute', 'db2_stmt_errormsg', 'db2_fetch_assoc', 'db2_free_result',
+				'db2_escape_string', 'db2_close'))) {
+			$allowedDb[ZBX_DB_DB2] = 'IBM DB2';
+		}
+
+		// Semaphore related functions are checked elsewhere. The 'false' is to prevent autoloading of the SQLite3 class.
+		if (class_exists('SQLite3', false) && zbx_is_callable(array('ftok', 'sem_acquire', 'sem_release', 'sem_get'))) {
+			$allowedDb[ZBX_DB_SQLITE3] = 'SQLite3';
+		}
+
+		return $allowedDb;
 	}
 
 	/**

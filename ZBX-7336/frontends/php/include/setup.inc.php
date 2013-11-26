@@ -187,7 +187,7 @@ class CSetupWizard extends CForm {
 			new CCol(_('Required'), 'header')
 		));
 
-		$frontendSetup = new FrontendSetup($this->ZBX_CONFIG);
+		$frontendSetup = new FrontendSetup();
 		$reqs = $frontendSetup->checkRequirements();
 		foreach ($reqs as $req) {
 			$result = null;
@@ -235,7 +235,10 @@ class CSetupWizard extends CForm {
 
 		$cmbType = new CComboBox('type', $DB['TYPE'], 'this.form.submit();');
 
-		foreach ($this->ZBX_CONFIG['allowed_db'] as $id => $name) {
+		$frontendSetup = new FrontendSetup();
+		$databases = $frontendSetup->getSupportedDatabases();
+
+		foreach ($databases as $id => $name) {
 			$cmbType->addItem($id, $name);
 		}
 		$table->addRow(array(new CCol(_('Database type'), 'header'), $cmbType));
@@ -367,18 +370,18 @@ class CSetupWizard extends CForm {
 	}
 
 	function stage5() {
-		$allowed_db = $this->getConfig('allowed_db', array());
-
-		$DB['TYPE'] = $this->getConfig('DB_TYPE');
+		$dbType = $this->getConfig('DB_TYPE');
+		$frontendSetup = new FrontendSetup();
+		$databases = $frontendSetup->getSupportedDatabases();
 
 		$table = new CTable(null, 'requirements');
 		$table->setAlign('center');
 		$table->addRow(array(
 			new CCol(_('Database type'), 'header'),
-			$allowed_db[$this->getConfig('DB_TYPE')]
+			$databases[$dbType]
 		));
 
-		switch ($DB['TYPE']) {
+		switch ($dbType) {
 			case ZBX_DB_SQLITE3:
 				$table->addRow(array(
 					new CCol(_('Database file'), 'header'),
@@ -387,16 +390,15 @@ class CSetupWizard extends CForm {
 				break;
 			default:
 				$table->addRow(array(new CCol(_('Database server'), 'header'), $this->getConfig('DB_SERVER')));
-				if ($this->getConfig('DB_PORT') == 0) {
-					$table->addRow(array(new CCol(_('Database port'), 'header'), _('default')));
-				}
-				else {
-					$table->addRow(array(new CCol(_('Database port'), 'header'), $this->getConfig('DB_PORT')));
-				}
+				$dbPort = $this->getConfig('DB_PORT');
+				$table->addRow(array(
+					new CCol(_('Database port'), 'header'),
+					($dbPort == 0) ? _('default') : $dbPort
+				));
 				$table->addRow(array(new CCol(_('Database name'), 'header'), $this->getConfig('DB_DATABASE')));
 				$table->addRow(array(new CCol(_('Database user'), 'header'), $this->getConfig('DB_USER')));
 				$table->addRow(array(new CCol(_('Database password'), 'header'), preg_replace('/./', '*', $this->getConfig('DB_PASSWORD'))));
-				if ($this->getConfig('DB_TYPE', '') == ZBX_DB_DB2) {
+				if ($dbType == ZBX_DB_DB2) {
 					$table->addRow(array(new CCol(_('Database schema'), 'header'), $this->getConfig('DB_SCHEMA')));
 				}
 				break;
