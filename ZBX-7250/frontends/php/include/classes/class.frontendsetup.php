@@ -628,7 +628,7 @@ class FrontendSetup {
 			'current' => $current ? _('on') : _('off'),
 			'required' => null,
 			'result' => $current ? self::CHECK_OK : self::CHECK_WARNING,
-			'error' => _('PHP gettext extension missing (PHP configuration parameter --with-gettext)')
+			'error' => _('PHP gettext extension missing (PHP configuration parameter --with-gettext). Translations will not be available.')
 		);
 
 		return $result;

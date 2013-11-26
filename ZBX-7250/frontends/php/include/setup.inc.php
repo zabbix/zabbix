@@ -203,13 +203,19 @@ class CSetupWizard extends CForm {
 
 			// OK
 			if ($req['result'] == FrontendSetup::CHECK_OK) {
-				$class = '';
+				$rowClass = '';
 				$result = new CSpan(_('OK'), 'green');
 			}
-			// warning or fatal error
+			// warning
+			elseif ($req['result'] == FrontendSetup::CHECK_WARNING) {
+				$rowClass = 'orange';
+				$result = new CSpan(_x('Warning', 'setup'), 'link_menu orange');
+				$result->setHint($req['error']);
+			}
+			// fatal error
 			else {
-				$class = ($req['result'] == FrontendSetup::CHECK_FATAL) ? 'fail' : 'orange';
-				$result = new CSpan(_('Fail'), 'link_menu '.$class);
+				$rowClass = 'fail';
+				$result = new CSpan(_('Fail'), 'link_menu fail');
 				$result->setHint($req['error']);
 			}
 
@@ -220,7 +226,7 @@ class CSetupWizard extends CForm {
 					$req['required'] ? $req['required'] : SPACE,
 					$result
 				),
-				$class
+				$rowClass
 			);
 
 			$finalResult = max($finalResult, $req['result']);
