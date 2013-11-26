@@ -15,6 +15,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, French, Italian, Russian and
 ....I..PS. [ZBXNEXT-1257] dropped support for UCD-SNMP (asaveljevs)
 
 Bug fixes:
+..F....... [ZBX-7354] fixed resetting linked template list when trying to add template with empty field (Ivo)
 .......PS. [ZBX-7360] fixed maximum IPMI sensor ID length; thanks to OpenIPMI author Corey Minyard (Andris, asaveljevs)
 ........S. [ZBX-7400] fixed possible server crash when processing trigger functions with text or log items with Oracle backend (Sasha)
 ........S. [ZBX-7400] fixed possible server crash when sending messages with Oracle backend (Sasha)
