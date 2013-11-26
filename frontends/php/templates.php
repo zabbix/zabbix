@@ -430,7 +430,7 @@ if (isset($_REQUEST['form'])) {
 		$dbTemplates = API::Template()->get(array(
 			'templateids' => $templateId,
 			'selectGroups' => API_OUTPUT_EXTEND,
-			'selectParentTemplates' => API_OUTPUT_EXTEND,
+			'selectParentTemplates' => array('templateid', 'name'),
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND
 		));
@@ -445,7 +445,7 @@ if (isset($_REQUEST['form'])) {
 		$data['original_templates'] = array();
 	}
 
-	$templateIds = get_request('templates', $data['original_templates']);
+	$templateIds = getRequest('templates', hasRequest('form_refresh') ? array() : $data['original_templates']);
 
 	$data['linkedTemplates'] = API::Template()->get(array(
 		'templateids' => $templateIds,
