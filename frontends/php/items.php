@@ -938,7 +938,7 @@ else {
 		'output' => API_OUTPUT_EXTEND,
 		'editable' => true,
 		'selectHosts' => API_OUTPUT_EXTEND,
-		'selectTriggers' => API_OUTPUT_REFER,
+		'selectTriggers' => array('triggerid', 'description'),
 		'selectApplications' => API_OUTPUT_EXTEND,
 		'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 		'selectItemDiscovery' => array('ts_delete'),
