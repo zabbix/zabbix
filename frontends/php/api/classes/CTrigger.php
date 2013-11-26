@@ -626,8 +626,7 @@ class CTrigger extends CTriggerGeneral {
 				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 				'output' => API_OUTPUT_EXTEND,
 				'editable' => true,
-				'preservekeys' => true,
-				'selectDependencies' => API_OUTPUT_REFER
+				'preservekeys' => true
 			));
 
 			$updateDiscoveredValidator = new CUpdateDiscoveredValidator(array(
@@ -1151,7 +1150,7 @@ class CTrigger extends CTriggerGeneral {
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => array('name'),
-			'selectDependencies' => API_OUTPUT_REFER,
+			'selectDependencies' => array('triggerid'),
 			'preservekeys' => true,
 			'nopermissions' => true
 		));
@@ -1334,7 +1333,7 @@ class CTrigger extends CTriggerGeneral {
 			'hostids' => $templateIds,
 			'preservekeys' => true,
 			'output' => array('triggerid'),
-			'selectDependencies' => API_OUTPUT_REFER
+			'selectDependencies' => array('triggerid')
 		));
 
 		if ($parentTriggers) {
@@ -1344,7 +1343,6 @@ class CTrigger extends CTriggerGeneral {
 				'nopermissions' => true,
 				'preservekeys' => true,
 				'output' => array('triggerid', 'templateid'),
-				'selectDependencies' => API_OUTPUT_REFER,
 				'selectHosts' => array('hostid')
 			));
 
@@ -1602,9 +1600,9 @@ class CTrigger extends CTriggerGeneral {
 		$expressionData->parse($trigger['expression']);
 
 		$templatesData = API::Template()->get(array(
-			'output' => API_OUTPUT_REFER,
-			'selectHosts' => API_OUTPUT_REFER,
-			'selectTemplates' => API_OUTPUT_REFER,
+			'output' => array('templateid'),
+			'selectHosts' => array('hostid'),
+			'selectTemplates' => array('templateid'),
 			'filter' => array('host' => $expressionData->getHosts()),
 			'nopermissions' => true,
 			'preservekeys' => true

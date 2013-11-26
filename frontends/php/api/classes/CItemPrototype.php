@@ -611,7 +611,7 @@ class CItemPrototype extends CItemGeneral {
 		$items = $this->get(array(
 			'hostids' => $data['templateids'],
 			'preservekeys' => true,
-			'selectApplications' => API_OUTPUT_REFER,
+			'selectApplications' => array('applicationid'),
 			'output' => $selectFields
 		));
 

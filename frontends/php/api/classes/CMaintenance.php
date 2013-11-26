@@ -472,8 +472,8 @@ class CMaintenance extends CZBXAPI {
 			'maintenanceids' => zbx_objectValues($maintenances, 'maintenanceid'),
 			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
-			'selectGroups' => API_OUTPUT_REFER,
-			'selectHosts' => API_OUTPUT_REFER,
+			'selectGroups' => array('groupid'),
+			'selectHosts' => array('hostid'),
 			'selectTimeperiods' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		));

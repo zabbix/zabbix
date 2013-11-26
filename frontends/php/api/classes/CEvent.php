@@ -704,7 +704,7 @@ class CEvent extends CZBXAPI {
 	protected function checkCanBeAcknowledged(array $eventIds) {
 		$allowedEvents = $this->get(array(
 			'eventids' => $eventIds,
-			'output' => API_OUTPUT_REFER,
+			'output' => array('eventid'),
 			'preservekeys' => true
 		));
 		foreach ($eventIds as $eventId) {
