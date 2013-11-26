@@ -226,15 +226,26 @@ int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, AGENT_RESULT
 		/* 2013-06-04T14:19:23.406298Z */
 		if (6 == sscanf(value, "%d-%d-%dT%d:%d:%d.%*s", &tm.tm_year, &tm.tm_mon, &tm.tm_mday, &tm.tm_hour,
 				&tm.tm_min, &tm.tm_sec))
+
 		{
+			int		tz_offset;
+#if defined(HAVE_TM_TM_GMTOFF)
+			struct tm	*ptm;
+			time_t		now;
+
+			now = time(NULL);
+			ptm = localtime(&now);
+			tz_offset = ptm->tm_gmtoff;
+#else
+			tz_offset = -timezone;
+#endif
 			tm.tm_year -= 1900;
 			tm.tm_mon--;
 			tm.tm_isdst = -1;
 
 			if (0 < (t = mktime(&tm)))
-				log->timestamp = (int)t - timezone;
+				log->timestamp = (int)t + tz_offset;
 		}
-
 		zbx_free(value);
 	}
 
