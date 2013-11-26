@@ -72,7 +72,10 @@ if ($json['method'] == 'proxy.status') {
    }
 }
 elseif ($json['method'] == 'proxy.reassign') {
-
+// Automatically moves all hosts from a given proxy to the closest alternate.
+// A force move is possible by specifyin a second proxy and a force parameter.
+// proxy.reassign <proxy shortname 1> [<proxy shortname 2> <force true/false>]
+// ex: proxy.reassign PRX01 PRX02 1
    $proxy_data = file_get_contents('proxymap.json');
    $proxymap = json_decode($proxy_data,true);
 
@@ -179,6 +182,12 @@ elseif ($json['method'] == 'proxy.reassign') {
    exit;
 }
 
+/**
+ * proxy.get Zabbix API helper
+ *
+ * @param string,array $proxyids    Proxy or proxies
+ * @param array        $selectHost  Specific hosts
+ */
 function getProxiesNew($proxyids='',$selectHosts='') {
 
    $t['method'] = 'proxy.get';
@@ -204,6 +213,10 @@ function getProxiesNew($proxyids='',$selectHosts='') {
    }
 }
 
+/**
+ * Get a proxy id from a hostname
+ * @param $name hostname (long or short)
+ */
 function getProxyId($name) {
 
    $t['method'] = 'proxy.get';
@@ -220,6 +233,11 @@ function getProxyId($name) {
    }
 }
 
+/**
+ * Assign hosts to a proxy (host.massupdate API helper)
+ * @param $proxyid
+ * @param array $hostids
+ */
 function assignHostsToProxy($proxyid, $hostids) {
 
    $t['method'] = 'host.massupdate';
