@@ -189,7 +189,7 @@ class CSetupWizard extends CForm {
 		$table = new CTable(null, 'requirements');
 		$table->setAlign('center');
 
-		$final_result = true;
+		$finalResult = FrontendSetup::CHECK_OK;
 
 		$table->addRow(array(
 			SPACE,
@@ -200,11 +200,16 @@ class CSetupWizard extends CForm {
 		$reqs = FrontendSetup::i()->checkRequirements();
 		foreach ($reqs as $req) {
 			$result = null;
-			if ($req['result']) {
+
+			// OK
+			if ($req['result'] == FrontendSetup::CHECK_OK) {
+				$class = '';
 				$result = new CSpan(_('OK'), 'green');
 			}
+			// warning or fatal error
 			else {
-				$result = new CSpan(_('Fail'), 'link_menu fail');
+				$class = ($req['result'] == FrontendSetup::CHECK_FATAL) ? 'fail' : 'orange';
+				$result = new CSpan(_('Fail'), 'link_menu '.$class);
 				$result->setHint($req['error']);
 			}
 
@@ -215,25 +220,38 @@ class CSetupWizard extends CForm {
 					$req['required'] ? $req['required'] : SPACE,
 					$result
 				),
-				$req['result'] ? SPACE : 'fail');
+				$class
+			);
 
-			$final_result &= (bool) $req['result'];
+			$finalResult = max($finalResult, $req['result']);
 		}
 
-		if (!$final_result) {
+		// fatal error
+		if ($finalResult == FrontendSetup::CHECK_FATAL) {
 			$this->DISABLE_NEXT_BUTTON = true;
 
-			$final_result = array(
+			$message = array(
 				_('Please correct all issues and press "Retry" button'),
 				BR(),
-				new CSubmit('retry', _('Retry')));
+				new CSubmit('retry', _('Retry'))
+			);
 		}
+		// OK or warning
 		else {
 			$this->DISABLE_NEXT_BUTTON = false;
-			$final_result = array(new CSpan(_('OK'), 'ok'));
+			$message = array(new CSpan(_('OK'), 'ok'));
+
+			// add a warning message
+			if ($finalResult == FrontendSetup::CHECK_WARNING) {
+				$message[] = BR();
+				$message[] = _('(with warnings)');
+			}
 		}
 
-		return array(new CDiv(array(BR(), $table, BR()), 'table_wraper'), new CDiv($final_result, 'info_bar'));
+		return array(
+			new CDiv(array(BR(), $table, BR()), 'table_wraper'),
+			new CDiv($message, 'info_bar')
+		);
 	}
 
 	function stage3() {
