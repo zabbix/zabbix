@@ -271,7 +271,7 @@ elseif (isset($_REQUEST['save'])) {
 			$dbGraphs = API::Graph()->get(array(
 				'hostids' => $cloneTemplateId,
 				'inherited' => false,
-				'output' => API_OUTPUT_REFER
+				'output' => array('graphid')
 			));
 
 			$result = true;

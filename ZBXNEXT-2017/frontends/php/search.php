@@ -341,7 +341,7 @@ if ($admin) {
 		'nodeids' => get_current_nodeid(true),
 		'search' => array('name' => $search),
 		'output' => array('name'),
-		'selectGroups' => API_OUTPUT_REFER,
+		'selectGroups' => array('groupid'),
 		'sortfield' => 'name',
 		'selectItems' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,
