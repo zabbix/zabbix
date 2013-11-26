@@ -53,45 +53,41 @@ if (!function_exists('ngettext')) {
 	}
 }
 
-if (!function_exists('pgettext')) {
-	/**
-	 * Stub gettext function in case gettext is not available. Do not use directly, use _x() instead.
-	 *
-	 * @see _x
-	 *
-	 * @param string $context
-	 * @param string $msgId
-	 *
-	 * @return string
-	 */
-	function pgettext($context, $msgId) {
-		$contextString = $context."\004".$msgId;
-		$translation = _($contextString);
+/**
+ * Translates the string with respect to the given context.
+ *
+ * @see _x
+ *
+ * @param string $context
+ * @param string $msgId
+ *
+ * @return string
+ */
+function pgettext($context, $msgId) {
+	$contextString = $context."\004".$msgId;
+	$translation = _($contextString);
 
-		return ($translation == $contextString) ? $msgId : $translation;
-	}
+	return ($translation == $contextString) ? $msgId : $translation;
 }
 
-if (!function_exists('npgettext')) {
-	/**
-	 * Stub gettext function in case gettext is not available. Do not use directly, use _xn() instead.
-	 *
-	 * @see _xn
-	 *
-	 * @param string $context
-	 * @param string $msgId
-	 * @param string $msgIdPlural
-	 * @param string $num
-	 *
-	 * @return string
-	 */
-	function npgettext($context, $msgId, $msgIdPlural, $num) {
-		$contextString = $context."\004".$msgId;
-		$contextStringp = $context."\004".$msgIdPlural;
-		$translation = ngettext($contextString, $contextStringp, $num);
+/**
+ * Translates the string with respect to the given context and plural forms.
+ *
+ * @see _xn
+ *
+ * @param string $context
+ * @param string $msgId
+ * @param string $msgIdPlural
+ * @param string $num
+ *
+ * @return string
+ */
+function npgettext($context, $msgId, $msgIdPlural, $num) {
+	$contextString = $context."\004".$msgId;
+	$contextStringp = $context."\004".$msgIdPlural;
+	$translation = ngettext($contextString, $contextStringp, $num);
 
-		return ($translation == $contextString || $translation == $contextStringp) ? $msgId : $translation;
-	}
+	return ($translation == $contextString || $translation == $contextStringp) ? $msgId : $translation;
 }
 
 /**
@@ -107,29 +103,29 @@ if (!function_exists('npgettext')) {
 function _s($string) {
 	$arguments = array_slice(func_get_args(), 1);
 
-	return vsprintf(_($string), $arguments);
+	return _params(_($string), $arguments);
 }
 
 /**
- * Translates the string in the correct form with respect to the given numeric parameter.
+ * Translates the string in the correct form with respect to the given numeric parameter. According to gettext
+ * standards the numeric parameter must be passed last.
  * Supports unlimited parameters; placeholders must be defined as %1$s, %2$s etc.
  *
  * Examples:
- * _n('%1$s item on host %2$s', '%1$s items on host %2$s', 1, 'Zabbix server') // 1 item on host Zabbix server
- * _n('%1$s item on host %2$s', '%1$s items on host %2$s', 2, 'Zabbix server') // 2 items on host Zabbix server
+ * _n('%2$s item on host %1$s', '%2$s items on host %1$s', 'Zabbix server', 1) // 1 item on host Zabbix server
+ * _n('%2$s item on host %1$s', '%2$s items on host %1$s', 'Zabbix server', 2) // 2 items on host Zabbix server
  *
  * @param string $string1		singular string
  * @param string $string2		plural string
- * @param string $param			numeric parameter that will be used to choose the correct form, also gets replaced as
- *								the first parameter
+ * @param string $param			parameter to replace the first placeholder
  * @param string $param,...		unlimited number of optional parameters
  *
  * @return string
  */
-function _n($string1, $string2, $value) {
+function _n($string1, $string2) {
 	$arguments = array_slice(func_get_args(), 2);
 
-	return vsprintf(ngettext($string1, $string2, $value), $arguments);
+	return _params(ngettext($string1, $string2, end($arguments)), $arguments);
 }
 
 /**
@@ -151,8 +147,8 @@ function _x($message, $context) {
 	$arguments = array_slice(func_get_args(), 2);
 
 	return ($context == '')
-		? vsprintf($message, $arguments)
-		: vsprintf(pgettext($context, $message), $arguments);
+		? _params($message, $arguments)
+		: _params(pgettext($context, $message), $arguments);
 }
 
 /**
@@ -177,6 +173,18 @@ function _xn($message, $messagePlural, $num, $context) {
 	array_unshift($arguments, $num);
 
 	return ($context == '')
-		? vsprintf(ngettext($message, $messagePlural, $num), $arguments)
-		: vsprintf(npgettext($context, $message, $messagePlural, $num), $arguments);
+		? _params(ngettext($message, $messagePlural, $num), $arguments)
+		: _params(npgettext($context, $message, $messagePlural, $num), $arguments);
+}
+
+/**
+ * Returns a formatted string.
+ *
+ * @param string $format		recieves already stranlated string with format
+ * @param array  $arguments		arguments to replace according to given format
+ *
+ * @return string
+ */
+function _params($format, array $arguments) {
+	return vsprintf($format, $arguments);
 }

@@ -752,7 +752,7 @@ char	*zbx_dvsprintf(char *dest, const char *f, va_list args)
  ******************************************************************************/
 char	*__zbx_zbx_dsprintf(char *dest, const char *f, ...)
 {
-	char	*string = NULL;
+	char	*string;
 	va_list args;
 
 	va_start(args, f);
@@ -1655,6 +1655,181 @@ char	*get_param_dyn(const char *p, int num)
 
 /******************************************************************************
  *                                                                            *
+ * Function: replace_key_param                                                *
+ *                                                                            *
+ * Purpose: replaces an item key, SNMP OID or their parameters when callback  *
+ *          function returns a new string                                     *
+ *                                                                            *
+ * Comments: auxiliary function for replace_key_params_dyn()                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	replace_key_param(char **data, int key_type, size_t l, size_t *r, int level, int num, int quoted,
+		replace_key_param_f cb, void *cb_data)
+{
+	char	c = (*data)[*r], *param;
+
+	(*data)[*r] = '\0';
+	param = cb(*data + l, key_type, level, num, quoted, cb_data);
+	(*data)[*r] = c;
+
+	if (NULL != param)
+	{
+		(*r)--;
+		zbx_replace_string(data, l, r, param);
+		(*r)++;
+
+		zbx_free(param);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: replace_key_params_dyn                                           *
+ *                                                                            *
+ * Purpose: replaces an item key, SNMP OID or their parameters by using       *
+ *          callback function                                                 *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      data      - [IN/OUT] item key or SNMP OID                             *
+ *      key_type  - [IN] ZBX_KEY_TYPE_*                                       *
+ *      cb        - [IN] callback function                                    *
+ *      cb_data   - [IN] callback function custom data                        *
+ *      error     - [OUT] error messsage                                      *
+ *      maxerrlen - [IN] error size                                           *
+ *                                                                            *
+ * Return value: SUCCEED - function executed successfully                     *
+ *               FAIL - otherwise, error will contain error message           *
+ *                                                                            *
+ ******************************************************************************/
+int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, void *cb_data, char *error,
+		size_t maxerrlen)
+{
+	typedef enum
+	{
+		ZBX_STATE_NEW,
+		ZBX_STATE_END,
+		ZBX_STATE_UNQUOTED,
+		ZBX_STATE_QUOTED
+	}
+	zbx_parser_state_t;
+
+	size_t			i, l = 0;
+	int			level = 0, num = 0, ret = SUCCEED;
+	zbx_parser_state_t	state = ZBX_STATE_END;
+
+	if (ZBX_KEY_TYPE_ITEM == key_type)
+	{
+		for (i = 0; SUCCEED == is_key_char((*data)[i]) && '\0' != (*data)[i]; i++)
+			;
+
+		if (0 == i)
+			goto clean;
+
+		if ('[' != (*data)[i] && '\0' != (*data)[i])
+			goto clean;
+	}
+	else
+	{
+		for (i = 0; '[' != (*data)[i] && '\0' != (*data)[i]; i++)
+			;
+	}
+
+	replace_key_param(data, key_type, 0, &i, level, num, 0, cb, cb_data);
+
+	for (; '\0' != (*data)[i]; i++)
+	{
+		if (0 == level)
+		{
+			/* first square bracket + Zapcat compatibility */
+			if (ZBX_STATE_END == state && '[' == (*data)[i])
+				state = ZBX_STATE_NEW;
+			else
+				break;
+		}
+
+		switch (state)
+		{
+			case ZBX_STATE_NEW:	/* a new parameter started */
+				switch ((*data)[i])
+				{
+					case ' ':
+						break;
+					case ',':
+						replace_key_param(data, key_type, i, &i, level, num, 0, cb, cb_data);
+						if (1 == level)
+							num++;
+						break;
+					case '[':
+						level++;
+						if (1 == level)
+							num++;
+						break;
+					case ']':
+						replace_key_param(data, key_type, i, &i, level, num, 0, cb, cb_data);
+						level--;
+						state = ZBX_STATE_END;
+						break;
+					case '"':
+						state = ZBX_STATE_QUOTED;
+						l = i;
+						break;
+					default:
+						state = ZBX_STATE_UNQUOTED;
+						l = i;
+				}
+				break;
+			case ZBX_STATE_END:	/* end of parameter */
+				switch ((*data)[i])
+				{
+					case ' ':
+						break;
+					case ',':
+						state = ZBX_STATE_NEW;
+						if (1 == level)
+							num++;
+						break;
+					case ']':
+						level--;
+						break;
+					default:
+						goto clean;
+				}
+				break;
+			case ZBX_STATE_UNQUOTED:	/* an unquoted parameter */
+				if (']' == (*data)[i] || ',' == (*data)[i])
+				{
+					replace_key_param(data, key_type, l, &i, level, num, 0, cb, cb_data);
+
+					i--;
+					state = ZBX_STATE_END;
+				}
+				break;
+			case ZBX_STATE_QUOTED:	/* a quoted parameter */
+				if ('"' == (*data)[i] && '\\' != (*data)[i - 1])
+				{
+					i++; replace_key_param(data, key_type, l, &i, level, num, 1, cb, cb_data); i--;
+
+					state = ZBX_STATE_END;
+				}
+				break;
+		}
+	}
+clean:
+	if (0 == i || '\0' != (*data)[i] || 0 != level)
+	{
+		if (NULL != error)
+		{
+			zbx_snprintf(error, maxerrlen, "Invalid %s at position " ZBX_FS_SIZE_T,
+					(ZBX_KEY_TYPE_ITEM == key_type ? "item key" : "SNMP OID"), (zbx_fs_size_t)i);
+		}
+		ret = FAIL;
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: remove_param                                                     *
  *                                                                            *
  * Purpose: remove parameter by index (num) from parameter list (param)       *
@@ -2438,7 +2613,7 @@ const char	*zbx_permission_string(int perm)
 	}
 }
 
-const char	*zbx_host_type_string(zbx_item_type_t item_type)
+const char	*zbx_agent_type_string(zbx_item_type_t item_type)
 {
 	switch (item_type)
 	{
@@ -2447,11 +2622,11 @@ const char	*zbx_host_type_string(zbx_item_type_t item_type)
 		case ITEM_TYPE_SNMPv1:
 		case ITEM_TYPE_SNMPv2c:
 		case ITEM_TYPE_SNMPv3:
-			return "SNMP";
+			return "SNMP agent";
 		case ITEM_TYPE_IPMI:
-			return "IPMI";
+			return "IPMI agent";
 		case ITEM_TYPE_JMX:
-			return "JMX";
+			return "JMX agent";
 		default:
 			return "generic";
 	}

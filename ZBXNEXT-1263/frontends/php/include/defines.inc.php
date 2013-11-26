@@ -18,9 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',     '2.1.8');
-define('ZABBIX_API_VERSION', '2.1.8');
-define('ZABBIX_DB_VERSION',	 2010178);
+define('ZABBIX_VERSION',     '2.3.0');
+define('ZABBIX_API_VERSION', '2.3.0');
+define('ZABBIX_DB_VERSION',	 2020000);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
 define('ZABBIX_COPYRIGHT_TO',   '2013');
@@ -68,7 +68,7 @@ define('ZBX_SCRIPT_EXECUTE_ON_SERVER',	1);
 define('ZBX_FLAG_DISCOVERY_NORMAL',		0x0); // a normal item
 define('ZBX_FLAG_DISCOVERY_RULE',		0x1); // a low level discovery rule
 define('ZBX_FLAG_DISCOVERY_PROTOTYPE',	0x2); // an item prototype
-define('ZBX_FLAG_DISCOVERY_CREATED',		0x4); // an item created via a discovery rule
+define('ZBX_FLAG_DISCOVERY_CREATED',	0x4); // an item created via a discovery rule
 
 define('EXTACK_OPTION_ALL',		0);
 define('EXTACK_OPTION_UNACK',	1);
@@ -951,6 +951,7 @@ define('ZABBIX_HOMEPAGE', 'http://www.zabbix.com');
 
 // non translatable date formats
 define('TIMESTAMP_FORMAT', 'YmdHis');
+define('TIMESTAMP_FORMAT_ZERO_TIME', 'Ymd0000');
 
 // actions
 define('LONG_DESCRIPTION',	0);
@@ -970,6 +971,9 @@ define('QUEUE_DETAIL_ITEM_COUNT', 500);
 
 // configuration -> maps default add icon name
 define('MAP_DEFAULT_ICON', 'Server_(96)');
+
+// server variables
+define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] != 'off');
 
 // if magic quotes on, then get rid of them
 if (get_magic_quotes_gpc()) {

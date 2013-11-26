@@ -60,11 +60,11 @@ function shedule2str($timeperiod) {
 		);
 	}
 	elseif ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_DAILY) {
-		$str = _n('At %2$s:%3$s on every day',
-			'At %2$s:%3$s on every %1$s days',
-			$timeperiod['every'],
+		$str = _n('At %1$s:%2$s on every day',
+			'At %1$s:%2$s on every %3$s days',
 			$timeperiod['hour'],
-			$timeperiod['minute']
+			$timeperiod['minute'],
+			$timeperiod['every']
 		);
 	}
 	elseif ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_WEEKLY) {
@@ -80,12 +80,12 @@ function shedule2str($timeperiod) {
 			}
 		}
 
-		$str = _n('At %2$s:%3$s on every %4$s of every week',
-			'At %2$s:%3$s on every %4$s of every %1$s weeks',
-			$timeperiod['every'],
+		$str = _n('At %1$s:%2$s on every %3$s of every week',
+			'At %1$s:%2$s on every %3$s of every %4$s weeks',
 			$timeperiod['hour'],
 			$timeperiod['minute'],
-			$days
+			$days,
+			$timeperiod['every']
 		);
 	}
 	elseif ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY) {

@@ -39,7 +39,7 @@ $proxyForm = new CForm('get');
 $proxyForm->setName('proxyForm');
 
 // create table
-$proxyTable = new CTableInfo(_('No proxies defined.'));
+$proxyTable = new CTableInfo(_('No proxies found.'));
 $proxyTable->setHeader(array(
 	new CCheckBox('all_hosts', null, "checkAll('".$proxyForm->getName()."', 'all_hosts', 'hosts');"),
 	$this->data['displayNodes'] ? _('Node') : null,
@@ -56,7 +56,14 @@ foreach ($this->data['proxies'] as $proxy) {
 	$hosts = array();
 
 	if (!empty($proxy['hosts'])) {
+		$i = 1;
+
 		foreach ($proxy['hosts'] as $host) {
+			if ($i > $this->data['config']['max_in_table']) {
+				break;
+			}
+			$i++;
+
 			if ($host['status'] == HOST_STATUS_MONITORED) {
 				$style = 'off';
 			}

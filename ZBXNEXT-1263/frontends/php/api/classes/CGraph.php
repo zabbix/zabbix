@@ -105,19 +105,45 @@ class CGraph extends CGraphGeneral {
 
 			$userGroups = getUserGroupsByUserId($userid);
 
+			// check permissions by graph items
 			$sqlParts['where'][] = 'NOT EXISTS ('.
 				'SELECT NULL'.
 				' FROM graphs_items gi,items i,hosts_groups hgg'.
 					' LEFT JOIN rights r'.
 						' ON r.id=hgg.groupid'.
 							' AND '.dbConditionInt('r.groupid', $userGroups).
-				' WHERE (g.graphid=gi.graphid'.
-						' AND gi.itemid=i.itemid'.
-						' OR g.ymin_type='.GRAPH_YAXIS_TYPE_ITEM_VALUE.
-						' AND g.ymin_itemid=i.itemid'.
-						' OR g.ymax_type='.GRAPH_YAXIS_TYPE_ITEM_VALUE.
-						' AND g.ymax_itemid=i.itemid'.
-					')'.
+				' WHERE g.graphid=gi.graphid'.
+					' AND gi.itemid=i.itemid'.
+					' AND i.hostid=hgg.hostid'.
+				' GROUP BY i.hostid'.
+				' HAVING MAX(permission)<'.$permission.
+					' OR MIN(permission) IS NULL'.
+					' OR MIN(permission)='.PERM_DENY.
+				')';
+			// check permissions by Y min item
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+				'SELECT NULL'.
+				' FROM items i,hosts_groups hgg'.
+					' LEFT JOIN rights r'.
+						' ON r.id=hgg.groupid'.
+							' AND '.dbConditionInt('r.groupid', $userGroups).
+				' WHERE g.ymin_type='.GRAPH_YAXIS_TYPE_ITEM_VALUE.
+					' AND g.ymin_itemid=i.itemid'.
+					' AND i.hostid=hgg.hostid'.
+				' GROUP BY i.hostid'.
+				' HAVING MAX(permission)<'.$permission.
+					' OR MIN(permission) IS NULL'.
+					' OR MIN(permission)='.PERM_DENY.
+				')';
+			// check permissions by Y max item
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+				'SELECT NULL'.
+				' FROM items i,hosts_groups hgg'.
+					' LEFT JOIN rights r'.
+						' ON r.id=hgg.groupid'.
+							' AND '.dbConditionInt('r.groupid', $userGroups).
+				' WHERE g.ymax_type='.GRAPH_YAXIS_TYPE_ITEM_VALUE.
+					' AND g.ymax_itemid=i.itemid'.
 					' AND i.hostid=hgg.hostid'.
 				' GROUP BY i.hostid'.
 				' HAVING MAX(permission)<'.$permission.
@@ -355,7 +381,6 @@ class CGraph extends CGraphGeneral {
 		$graph = $this->get(array(
 			'graphids' => $graph['graphid'],
 			'nopermissions' => true,
-			'selectItems' => API_OUTPUT_EXTEND,
 			'selectGraphItems' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND
 		));
@@ -365,12 +390,12 @@ class CGraph extends CGraphGeneral {
 			$tmpGraph = $graph;
 			$tmpGraph['templateid'] = $graph['graphid'];
 
-			if (!$tmpGraph['gitems'] = get_same_graphitems_for_host($tmpGraph['gitems'], $chdHost['hostid'])) {
+			if (!$tmpGraph['gitems'] = getSameGraphItemsForHost($tmpGraph['gitems'], $chdHost['hostid'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph "%1$s" cannot inherit. No required items on "%2$s".', $tmpGraph['name'], $chdHost['host']));
 			}
 
 			if ($tmpGraph['ymax_itemid'] > 0) {
-				$ymaxItemid = get_same_graphitems_for_host(array(array('itemid' => $tmpGraph['ymax_itemid'])), $chdHost['hostid']);
+				$ymaxItemid = getSameGraphItemsForHost(array(array('itemid' => $tmpGraph['ymax_itemid'])), $chdHost['hostid']);
 				if (!$ymaxItemid) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph "%1$s" cannot inherit. No required items on "%2$s" (Ymax value item).', $tmpGraph['name'], $chdHost['host']));
 				}
@@ -378,7 +403,7 @@ class CGraph extends CGraphGeneral {
 				$tmpGraph['ymax_itemid'] = $ymaxItemid['itemid'];
 			}
 			if ($tmpGraph['ymin_itemid'] > 0) {
-				$yminItemid = get_same_graphitems_for_host(array(array('itemid' => $tmpGraph['ymin_itemid'])), $chdHost['hostid']);
+				$yminItemid = getSameGraphItemsForHost(array(array('itemid' => $tmpGraph['ymin_itemid'])), $chdHost['hostid']);
 				if (!$yminItemid) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph "%1$s" cannot inherit. No required items on "%2$s" (Ymin value item).', $tmpGraph['name'], $chdHost['host']));
 				}
@@ -664,7 +689,7 @@ class CGraph extends CGraphGeneral {
 	}
 
 	/**
-	 * Validates graph item permissions
+	 * Validates graph item permissions.
 	 *
 	 * @param array $itemIds
 	 *
@@ -676,7 +701,7 @@ class CGraph extends CGraphGeneral {
 			'itemids' => $itemIds,
 			'webitems' => true,
 			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('name', 'value_type'),
 			'preservekeys' => true
 		));
 

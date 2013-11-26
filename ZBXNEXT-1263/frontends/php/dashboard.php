@@ -127,7 +127,7 @@ if (isset($_REQUEST['favobj'])) {
 			CProfile::update('web.dashboard.widget.'.$widgetName.'.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 		}
 		elseif (getRequest('favaction') == 'sort') {
-			$favdata = json_decode(getRequest('favdata'));
+			$favdata = CJs::decodeJson(getRequest('favdata'));
 			foreach ($favdata as $col => $column) {
 				foreach ($column as $row => $widgetName) {
 					$widgetName = substr($widgetName, 4, -7);
@@ -426,7 +426,7 @@ $drules = DBfetch(DBselect(
 		' WHERE d.status='.DRULE_STATUS_ACTIVE.
 			andDbNode('d.druleid')
 ));
-if ($drules['cnt'] > 0 && check_right_on_discovery(PERM_READ)) {
+if ($drules['cnt'] > 0 && check_right_on_discovery()) {
 	$refresh_tab[] = array('id' => 'hat_dscvry', 'frequency' => CProfile::get('web.dashboard.widget.dscvry.rf_rate', 60));
 
 	$refresh_menu = get_icon('menu', array('menu' => 'hat_dscvry'));

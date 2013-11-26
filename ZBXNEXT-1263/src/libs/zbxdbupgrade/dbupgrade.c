@@ -32,12 +32,6 @@
 #	define ZBX_DROP_FK		" drop constraint"
 #endif
 
-#ifdef HAVE_POSTGRESQL
-#	define ZBX_DB_ONLY		" only"
-#else
-#	define ZBX_DB_ONLY		""
-#endif
-
 #if defined(HAVE_IBM_DB2)
 #	define ZBX_DB_ALTER_COLUMN	" alter column"
 #elif defined(HAVE_POSTGRESQL)
@@ -71,12 +65,16 @@
 #endif
 
 #if defined(HAVE_IBM_DB2)
+#	define ZBX_TYPE_FLOAT_STR	"decfloat(16)"
 #	define ZBX_TYPE_UINT_STR	"bigint"
 #elif defined(HAVE_MYSQL)
+#	define ZBX_TYPE_FLOAT_STR	"double(16,4)"
 #	define ZBX_TYPE_UINT_STR	"bigint unsigned"
 #elif defined(HAVE_ORACLE)
+#	define ZBX_TYPE_FLOAT_STR	"number(20,4)"
 #	define ZBX_TYPE_UINT_STR	"number(20)"
 #elif defined(HAVE_POSTGRESQL)
+#	define ZBX_TYPE_FLOAT_STR	"numeric(16,4)"
 #	define ZBX_TYPE_UINT_STR	"numeric(20)"
 #endif
 
@@ -86,6 +84,14 @@
 #	define ZBX_TYPE_SHORTTEXT_STR	"nvarchar2(2048)"
 #else
 #	define ZBX_TYPE_SHORTTEXT_STR	"text"
+#endif
+
+#if defined(HAVE_IBM_DB2)
+#	define ZBX_TYPE_TEXT_STR	"varchar(2048)"
+#elif defined(HAVE_ORACLE)
+#	define ZBX_TYPE_TEXT_STR	"nclob"
+#else
+#	define ZBX_TYPE_TEXT_STR	"text"
 #endif
 
 #define ZBX_FIRST_DB_VERSION		2010000
@@ -205,11 +211,17 @@ static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offse
 		case ZBX_TYPE_CHAR:
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s(%hu)", ZBX_TYPE_CHAR_STR, field->length);
 			break;
+		case ZBX_TYPE_FLOAT:
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_FLOAT_STR);
+			break;
 		case ZBX_TYPE_UINT:
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_UINT_STR);
 			break;
 		case ZBX_TYPE_SHORTTEXT:
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_SHORTTEXT_STR);
+			break;
+		case ZBX_TYPE_TEXT:
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_TEXT_STR);
 			break;
 		default:
 			assert(0);
@@ -282,11 +294,15 @@ static void	DBcreate_table_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "\n)" ZBX_DB_TABLE_OPTIONS);
 }
 
+static void	DBdrop_table_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *table_name)
+{
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "drop table %s", table_name);
+}
+
 static void	DBmodify_field_type_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, const ZBX_FIELD *field)
 {
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s" ZBX_DB_ALTER_COLUMN " ",
-			table_name);
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table %s" ZBX_DB_ALTER_COLUMN " ", table_name);
 
 #ifdef HAVE_MYSQL
 	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
@@ -299,8 +315,7 @@ static void	DBmodify_field_type_sql(char **sql, size_t *sql_alloc, size_t *sql_o
 static void	DBdrop_not_null_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, const ZBX_FIELD *field)
 {
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s" ZBX_DB_ALTER_COLUMN " ",
-			table_name);
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table %s" ZBX_DB_ALTER_COLUMN " ", table_name);
 
 #if defined(HAVE_MYSQL)
 	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
@@ -314,8 +329,7 @@ static void	DBdrop_not_null_sql(char **sql, size_t *sql_alloc, size_t *sql_offse
 static void	DBset_not_null_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, const ZBX_FIELD *field)
 {
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s" ZBX_DB_ALTER_COLUMN " ",
-			table_name);
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table %s" ZBX_DB_ALTER_COLUMN " ", table_name);
 
 #if defined(HAVE_MYSQL)
 	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
@@ -329,8 +343,7 @@ static void	DBset_not_null_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 static void	DBset_default_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, const ZBX_FIELD *field)
 {
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s" ZBX_DB_ALTER_COLUMN " ",
-			table_name);
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table %s" ZBX_DB_ALTER_COLUMN " ", table_name);
 
 #if defined(HAVE_MYSQL)
 	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
@@ -344,14 +357,14 @@ static void	DBset_default_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 static void	DBadd_field_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, const ZBX_FIELD *field)
 {
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s add ", table_name);
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table %s add ", table_name);
 	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
 }
 
 static void	DBrename_field_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, const char *field_name, const ZBX_FIELD *field)
 {
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s ", table_name);
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table %s ", table_name);
 
 #ifdef HAVE_MYSQL
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "change column %s ", field_name);
@@ -364,8 +377,7 @@ static void	DBrename_field_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 static void	DBdrop_field_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, const char *field_name)
 {
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s drop column %s",
-			table_name, field_name);
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table %s drop column %s", table_name, field_name);
 }
 
 static void	DBcreate_index_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
@@ -404,8 +416,8 @@ static void	DBrename_index_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 static void	DBadd_foreign_key_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, int id, const ZBX_FIELD *field)
 {
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s"
-			" add constraint c_%s_%d foreign key (%s) references %s (%s)",
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset,
+			"alter table %s add constraint c_%s_%d foreign key (%s) references %s (%s)",
 			table_name, table_name, id, field->name, field->fk_table, field->fk_field);
 	if (0 != (field->fk_flags & ZBX_FK_CASCADE_DELETE))
 		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " on delete cascade");
@@ -414,7 +426,7 @@ static void	DBadd_foreign_key_sql(char **sql, size_t *sql_alloc, size_t *sql_off
 static void	DBdrop_foreign_key_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, int id)
 {
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s" ZBX_DROP_FK " c_%s_%d",
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table %s" ZBX_DROP_FK " c_%s_%d",
 			table_name, table_name, id);
 }
 
@@ -437,6 +449,22 @@ static int	DBcreate_table(const ZBX_TABLE *table)
 	int	ret = FAIL;
 
 	DBcreate_table_sql(&sql, &sql_alloc, &sql_offset, table);
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		ret = SUCCEED;
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBdrop_table(const char *table_name)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = FAIL;
+
+	DBdrop_table_sql(&sql, &sql_alloc, &sql_offset, table_name);
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
 		ret = SUCCEED;
@@ -1012,16 +1040,6 @@ static int	DBpatch_2010040(void)
 	return DBrename_field("triggers", "value_flags", &field);
 }
 
-static int	DBpatch_2010041(void)
-{
-	return DBdrop_index("events", "events_1");
-}
-
-static int	DBpatch_2010042(void)
-{
-	return DBcreate_index("events", "events_1", "source,object,objectid,eventid", 1);
-}
-
 static int	DBpatch_2010043(void)
 {
 	const ZBX_FIELD field = {"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
@@ -1563,7 +1581,7 @@ static int	DBpatch_2010101(void)
 
 			zbx_free(param);
 
-			if (ITEM_KEY_LEN < zbx_strlen_utf8(key))
+			if (255 /* ITEM_KEY_LEN */ < zbx_strlen_utf8(key))
 				error_message = zbx_dsprintf(error_message, "key \"%s\" is too long", row[1]);
 		}
 
@@ -2128,6 +2146,256 @@ static int	DBpatch_2010178(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_2010179(void)
+{
+	const ZBX_FIELD	field = {"yaxismax", "100", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	return DBset_default("graphs", &field);
+}
+
+static int	DBpatch_2010180(void)
+{
+	const ZBX_FIELD	field = {"yaxisside", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("graphs_items", &field);
+}
+
+static int	DBpatch_2010181(void)
+{
+	const ZBX_FIELD	field = {"ip", "127.0.0.1", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("interface", &field);
+}
+
+static int	DBpatch_2010182(void)
+{
+	const ZBX_FIELD	field = {"label", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("sysmaps_elements", &field);
+}
+
+static int	DBpatch_2010183(void)
+{
+	const ZBX_FIELD	field = {"label", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("sysmaps_links", &field);
+}
+
+static int	DBpatch_2010184(void)
+{
+	const ZBX_FIELD	field = {"label_location", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("sysmaps", &field);
+}
+
+static int	DBpatch_2010185(void)
+{
+	if (ZBX_DB_OK > DBexecute("update sysmaps_elements set label_location=-1 where label_location is null"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_2010186(void)
+{
+	const ZBX_FIELD	field = {"label_location", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("sysmaps_elements", &field);
+}
+
+static int	DBpatch_2010187(void)
+{
+	const ZBX_FIELD	field = {"label_location", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_not_null("sysmaps_elements", &field);
+}
+
+static int	DBpatch_2010188(void)
+{
+	return DBdrop_index("events", "events_1");
+}
+
+static int	DBpatch_2010189(void)
+{
+	return DBdrop_index("events", "events_2");
+}
+
+static int	DBpatch_2010190(void)
+{
+	return DBcreate_index("events", "events_1", "source,object,objectid,clock", 0);
+}
+
+static int	DBpatch_2010191(void)
+{
+	return DBcreate_index("events", "events_2", "source,object,clock", 0);
+}
+
+static int	DBpatch_2010192(void)
+{
+	if (ZBX_DB_OK <= DBexecute(
+			"update triggers"
+			" set state=%d,value=%d,lastchange=0,error=''"
+			" where exists ("
+				"select null"
+				" from functions f,items i,hosts h"
+				" where triggers.triggerid=f.triggerid"
+					" and f.itemid=i.itemid"
+					" and i.hostid=h.hostid"
+					" and h.status=%d"
+			")",
+			TRIGGER_STATE_NORMAL, TRIGGER_VALUE_OK, HOST_STATUS_TEMPLATE))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_2010193(void)
+{
+	if (ZBX_DB_OK <= DBexecute(
+			"update items"
+			" set state=%d,error=''"
+			" where exists ("
+				"select null"
+				" from hosts h"
+				" where items.hostid=h.hostid"
+					" and h.status=%d"
+			")",
+			ITEM_STATE_NORMAL, HOST_STATUS_TEMPLATE))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_2010194(void)
+{
+	return DBdrop_table("help_items");
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: replace_key_param                                                *
+ *                                                                            *
+ * Comments: auxiliary function for DBpatch_2010195()                         *
+ *                                                                            *
+ ******************************************************************************/
+static char	*replace_key_param(const char *data, int key_type, int level, int num, int quoted, void *cb_data)
+{
+	char	*param, *new_param;
+
+	if (1 != level || 4 != num)	/* the fourth parameter on first level should be updated */
+		return NULL;
+
+	param = zbx_strdup(NULL, data);
+
+	unquote_key_param(param);
+
+	if ('\0' == *param)
+	{
+		zbx_free(param);
+		return NULL;
+	}
+
+	new_param = zbx_dsprintf(NULL, "^%s$", param);
+
+	zbx_free(param);
+
+	quote_key_param(&new_param, quoted);
+
+	return new_param;
+}
+
+static int	DBpatch_2010195(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*key = NULL, *key_esc, error[64];
+	int		ret = SUCCEED;
+
+	result = DBselect("select itemid,key_ from items where key_ like 'eventlog[%%'");
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		key = zbx_strdup(key, row[1]);
+
+		if (SUCCEED != replace_key_params_dyn(&key, ZBX_KEY_TYPE_ITEM, replace_key_param, NULL,
+				error, sizeof(error)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot convert item key \"%s\": %s", row[1], error);
+			continue;
+		}
+
+		if (255 /* ITEM_KEY_LEN */ < zbx_strlen_utf8(key))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot convert item key \"%s\": key is too long", row[1]);
+			continue;
+		}
+
+		if (0 != strcmp(key, row[1]))
+		{
+			key_esc = DBdyn_escape_string(key);
+
+			if (ZBX_DB_OK > DBexecute("update items set key_='%s' where itemid=%s", key_esc, row[0]))
+				ret = FAIL;
+
+			zbx_free(key_esc);
+		}
+	}
+	DBfree_result(result);
+
+	zbx_free(key);
+
+	return ret;
+}
+
+static int	DBpatch_2010196(void)
+{
+#ifdef HAVE_ORACLE
+	const ZBX_FIELD	field = {"message_tmp", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("alerts", &field);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_2010197(void)
+{
+#ifdef HAVE_ORACLE
+	return ZBX_DB_OK > DBexecute("update alerts set message_tmp=message") ? FAIL : SUCCEED;
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_2010198(void)
+{
+#ifdef HAVE_ORACLE
+	return DBdrop_field("alerts", "message");
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_2010199(void)
+{
+#ifdef HAVE_ORACLE
+	const ZBX_FIELD	field = {"message", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBrename_field("alerts", "message_tmp", &field);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_2020000(void)
+{
+	return SUCCEED;
+}
+
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 #define DBPATCH_END()					{NULL}};
@@ -2217,8 +2485,6 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010038, 0, 0)
 	DBPATCH_ADD(2010039, 0, 0)
 	DBPATCH_ADD(2010040, 0, 1)
-	DBPATCH_ADD(2010041, 0, 0)
-	DBPATCH_ADD(2010042, 0, 0)
 	DBPATCH_ADD(2010043, 0, 1)
 	DBPATCH_ADD(2010044, 0, 1)
 	DBPATCH_ADD(2010045, 0, 1)
@@ -2355,6 +2621,28 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010176, 0, 1)
 	DBPATCH_ADD(2010177, 0, 1)
 	DBPATCH_ADD(2010178, 0, 1)
+	DBPATCH_ADD(2010179, 0, 1)
+	DBPATCH_ADD(2010180, 0, 1)
+	DBPATCH_ADD(2010181, 0, 1)
+	DBPATCH_ADD(2010182, 0, 1)
+	DBPATCH_ADD(2010183, 0, 1)
+	DBPATCH_ADD(2010184, 0, 1)
+	DBPATCH_ADD(2010185, 0, 1)
+	DBPATCH_ADD(2010186, 0, 1)
+	DBPATCH_ADD(2010187, 0, 1)
+	DBPATCH_ADD(2010188, 0, 1)
+	DBPATCH_ADD(2010189, 0, 1)
+	DBPATCH_ADD(2010190, 0, 1)
+	DBPATCH_ADD(2010191, 0, 1)
+	DBPATCH_ADD(2010192, 0, 0)
+	DBPATCH_ADD(2010193, 0, 0)
+	DBPATCH_ADD(2010194, 0, 1)
+	DBPATCH_ADD(2010195, 0, 1)
+	DBPATCH_ADD(2010196, 0, 1)
+	DBPATCH_ADD(2010197, 0, 1)
+	DBPATCH_ADD(2010198, 0, 1)
+	DBPATCH_ADD(2010199, 0, 1)
+	DBPATCH_ADD(2020000, 0, 1)
 
 	DBPATCH_END()
 

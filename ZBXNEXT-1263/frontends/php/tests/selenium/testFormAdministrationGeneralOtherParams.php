@@ -129,7 +129,7 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		$this->input_type('refresh_unsupported', '65535');
 		$this->zbxTestDropdownSelect('discovery_groupid', 'Linux servers');
 		$this->zbxTestDropdownSelect('alert_usrgrpid', 'Enabled debug mode');
-		$this->zbxTestCheckboxUnselect('snmptrap_logging');
+		$this->zbxTestCheckboxSelect('snmptrap_logging', false);
 		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent('Configuration updated');
 
@@ -144,8 +144,7 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		$this->zbxTestTextPresent('Other parameters');
 		$this->input_type('refresh_unsupported', '65536');
 		$this->zbxTestClickWait('save');
-		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Incorrect value for field "Refresh unsupported items (in sec)": must be between 0 and 65535.'));
-		// $this->zbxTestTextPresent('Incorrect value for field "Refresh unsupported items (in sec)": must be between 0 and 65535.');
+		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Incorrect value "65536" for "Refresh unsupported items (in sec)" field: must be between 0 and 65535.'));
 	}
 
 }

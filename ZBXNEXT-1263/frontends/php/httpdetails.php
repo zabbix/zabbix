@@ -37,7 +37,7 @@ $fields = array(
 	'period' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'stime' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'reset' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'httptestid' =>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		'isset({favobj})'),
+	'httptestid' =>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
 	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
 	// ajax
 	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
@@ -125,7 +125,7 @@ $httpdetailsWidget->addPageHeader(
 );
 
 // append table to widget
-$httpdetailsTable = new CTableInfo(_('No steps defined.'));
+$httpdetailsTable = new CTableInfo();
 $httpdetailsTable->setHeader(array(
 	_('Step'),
 	_('Speed'),

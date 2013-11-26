@@ -29,7 +29,7 @@ $screenWidget->addItem($form);
 if (empty($this->data['screen']) || empty($this->data['host'])) {
 	$screenWidget->addPageHeader(_('SCREENS'));
 	$screenWidget->addItem(BR());
-	$screenWidget->addItem(new CTableInfo(_('No screens defined.')));
+	$screenWidget->addItem(new CTableInfo(_('No screens found.')));
 
 	$screenBuilder = new CScreenBuilder();
 	CScreenBuilder::insertScreenStandardJs(array(
@@ -51,7 +51,7 @@ else {
 			$screenComboBox->addItem('host_screen.php?hostid='.$this->data['hostid'].'&screenid='.$screen['screenid'], $screen['name']);
 		}
 
-		$screenWidget->addHeader(array($this->data['screen']['name'], SPACE, _('on'), SPACE, new CSpan($this->data['host']['name'], 'gold')), $screenComboBox);
+		$screenWidget->addHeader(array($this->data['screen']['name'], SPACE, _('on'), SPACE, new CSpan($this->data['host']['name'], 'parent-discovery')), $screenComboBox);
 	}
 
 	// append screens to widget

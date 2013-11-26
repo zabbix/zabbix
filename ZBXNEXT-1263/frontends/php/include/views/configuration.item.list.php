@@ -55,7 +55,7 @@ if (!empty($this->data['hostid'])) {
 }
 
 // create table
-$itemTable = new CTableInfo(_('No items defined.'));
+$itemTable = new CTableInfo(_('No items found.'));
 $itemTable->setHeader(array(
 	new CCheckBox('all_items', null, "checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');"),
 	$this->data['displayNodes'] ? _('Node') : null,
@@ -88,7 +88,7 @@ foreach ($this->data['items'] as $item) {
 		$description[] = new CLink(
 			CHtml::encode($item['discoveryRule']['name']),
 			'disc_prototypes.php?parent_discoveryid='.$item['discoveryRule']['itemid'],
-			'gold'
+			'parent-discovery'
 		);
 		$description[] = NAME_DELIMITER.$item['name_expanded'];
 	}

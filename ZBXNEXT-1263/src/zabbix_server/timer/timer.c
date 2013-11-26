@@ -45,7 +45,7 @@ extern int		process_num;
  * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
  *                                                                            *
  ******************************************************************************/
-static void	process_time_functions(void)
+static void	process_time_functions(int *triggers_count, int *events_count)
 {
 	const char		*__function_name = "process_time_functions";
 	DC_TRIGGER		*trigger_info = NULL;
@@ -55,7 +55,7 @@ static void	process_time_functions(void)
 
 	zbx_vector_ptr_create(&trigger_order);
 
-	DCconfig_get_time_based_triggers(&trigger_info, &trigger_order, process_num);
+	DCconfig_get_time_based_triggers(&trigger_info, &trigger_order, process_num, triggers_count);
 
 	if (0 == trigger_order.values_num)
 		goto clean;
@@ -68,7 +68,7 @@ static void	process_time_functions(void)
 
 	DCfree_triggers(&trigger_order);
 
-	process_events();
+	*events_count = process_events();
 
 	DBcommit();
 clean:
@@ -284,13 +284,11 @@ static void	get_trigger_values(zbx_uint64_t triggerid, int maintenance_from, int
 				" and object=%d"
 				" and objectid=" ZBX_FS_UI64
 				" and clock<%d"
-				" and value in (%d,%d)"
-			" order by object desc,objectid desc,eventid desc",
+			" order by clock desc,eventid desc",
 			EVENT_SOURCE_TRIGGERS,
 			EVENT_OBJECT_TRIGGER,
 			triggerid,
-			maintenance_to,
-			TRIGGER_VALUE_OK, TRIGGER_VALUE_PROBLEM);
+			maintenance_to);
 
 	result = DBselectN(sql, 1);
 
@@ -322,13 +320,11 @@ static void	get_trigger_values(zbx_uint64_t triggerid, int maintenance_from, int
 				" and object=%d"
 				" and objectid=" ZBX_FS_UI64
 				" and clock<%d"
-				" and value in (%d,%d)"
-			" order by object desc,objectid desc,eventid desc",
+			" order by clock desc,eventid desc",
 			EVENT_SOURCE_TRIGGERS,
 			EVENT_OBJECT_TRIGGER,
 			triggerid,
-			maintenance_from,
-			TRIGGER_VALUE_OK, TRIGGER_VALUE_PROBLEM);
+			maintenance_from);
 
 	result = DBselectN(sql, 1);
 
@@ -352,7 +348,7 @@ static void	get_trigger_values(zbx_uint64_t triggerid, int maintenance_from, int
 				" and object=%d"
 				" and objectid=" ZBX_FS_UI64
 				" and clock between %d and %d"
-				" and value in (%d)"
+				" and value=%d"
 			" order by object desc,objectid desc,eventid desc",
 			EVENT_SOURCE_TRIGGERS,
 			EVENT_OBJECT_TRIGGER,
@@ -604,7 +600,7 @@ static int	day_in_month(int year, int mon)
 		return month[mon];
 }
 
-static void	process_maintenance(void)
+static int	process_maintenance(void)
 {
 	const char			*__function_name = "process_maintenance";
 	DB_RESULT			result;
@@ -618,7 +614,7 @@ static void	process_maintenance(void)
 					db_period, db_maintenance_type;
 	static zbx_host_maintenance_t	*hm = NULL;
 	static int			hm_alloc = 4;
-	int				hm_count = 0;
+	int				hm_count = 0, res;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -644,7 +640,7 @@ static void	process_maintenance(void)
 	{
 		ZBX_STR2UINT64(db_maintenanceid, row[0]);
 		db_maintenance_type	= atoi(row[1]);
-		db_active_since		= (time_t)atoi(row[2]);
+		db_active_since		= atoi(row[2]);
 		db_timeperiod_type	= atoi(row[3]);
 		db_every		= atoi(row[4]);
 		db_month		= atoi(row[5]);
@@ -654,92 +650,97 @@ static void	process_maintenance(void)
 		db_period		= atoi(row[9]);
 		db_start_date		= atoi(row[10]);
 
-		switch (db_timeperiod_type) {
-		case TIMEPERIOD_TYPE_ONETIME:
-			break;
-		case TIMEPERIOD_TYPE_DAILY:
-			db_start_date = now - sec + db_start_time;
-			if (sec < db_start_time)
-				db_start_date -= SEC_PER_DAY;
-
-			if (db_start_date < db_active_since)
-				continue;
-
-			tm = localtime(&db_active_since);
-			active_since = db_active_since - (tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec);
-
-			day = (db_start_date - active_since) / SEC_PER_DAY + 1;
-			db_start_date -= SEC_PER_DAY * (day % db_every);
-			break;
-		case TIMEPERIOD_TYPE_WEEKLY:
-			db_start_date = now - sec + db_start_time;
-			if (sec < db_start_time)
-				db_start_date -= SEC_PER_DAY;
-
-			if (db_start_date < db_active_since)
-				continue;
-
-			tm = localtime(&db_active_since);
-			wday = (0 == tm->tm_wday ? 7 : tm->tm_wday) - 1;
-			active_since = db_active_since - (wday * SEC_PER_DAY + tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec);
-
-			for (; db_start_date >= db_active_since; db_start_date -= SEC_PER_DAY)
-			{
-				/* check for every x week(s) */
-				week = (db_start_date - active_since) / SEC_PER_WEEK + 1;
-				if (0 != (week % db_every))
-					continue;
-
-				/* check for day of the week */
-				tm = localtime(&db_start_date);
-				wday = (0 == tm->tm_wday ? 7 : tm->tm_wday) - 1;
-				if (0 == (db_dayofweek & (1 << wday)))
-					continue;
-
+		switch (db_timeperiod_type)
+		{
+			case TIMEPERIOD_TYPE_ONETIME:
 				break;
-			}
-			break;
-		case TIMEPERIOD_TYPE_MONTHLY:
-			db_start_date = now - sec + db_start_time;
-			if (sec < db_start_time)
-				db_start_date -= SEC_PER_DAY;
+			case TIMEPERIOD_TYPE_DAILY:
+				db_start_date = now - sec + db_start_time;
+				if (sec < db_start_time)
+					db_start_date -= SEC_PER_DAY;
 
-			for (; db_start_date >= db_active_since; db_start_date -= SEC_PER_DAY)
-			{
-				/* check for month */
-				tm = localtime(&db_start_date);
-				if (0 == (db_month & (1 << tm->tm_mon)))
+				if (db_start_date < db_active_since)
 					continue;
 
-				if (0 != db_day)
+				tm = localtime(&db_active_since);
+				active_since = db_active_since - (tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN
+						+ tm->tm_sec);
+
+				day = (db_start_date - active_since) / SEC_PER_DAY;
+				db_start_date -= SEC_PER_DAY * (day % db_every);
+				break;
+			case TIMEPERIOD_TYPE_WEEKLY:
+				db_start_date = now - sec + db_start_time;
+				if (sec < db_start_time)
+					db_start_date -= SEC_PER_DAY;
+
+				if (db_start_date < db_active_since)
+					continue;
+
+				tm = localtime(&db_active_since);
+				wday = (0 == tm->tm_wday ? 7 : tm->tm_wday) - 1;
+				active_since = db_active_since - (wday * SEC_PER_DAY + tm->tm_hour * SEC_PER_HOUR +
+						tm->tm_min * SEC_PER_MIN + tm->tm_sec);
+
+				for (; db_start_date >= db_active_since; db_start_date -= SEC_PER_DAY)
 				{
-					/* check for day of the month */
-					if (db_day != tm->tm_mday)
+					/* check for every x week(s) */
+					week = (db_start_date - active_since) / SEC_PER_WEEK;
+					if (0 != week % db_every)
 						continue;
-				}
-				else
-				{
+
 					/* check for day of the week */
+					tm = localtime(&db_start_date);
 					wday = (0 == tm->tm_wday ? 7 : tm->tm_wday) - 1;
 					if (0 == (db_dayofweek & (1 << wday)))
 						continue;
 
-					/* check for number of day (first, second, third, fourth or last) */
-					day = (tm->tm_mday - 1) / 7 + 1;
-					if (5 == db_every && 4 == day)
+					break;
+				}
+				break;
+			case TIMEPERIOD_TYPE_MONTHLY:
+				db_start_date = now - sec + db_start_time;
+				if (sec < db_start_time)
+					db_start_date -= SEC_PER_DAY;
+
+				for (; db_start_date >= db_active_since; db_start_date -= SEC_PER_DAY)
+				{
+					/* check for month */
+					tm = localtime(&db_start_date);
+					if (0 == (db_month & (1 << tm->tm_mon)))
+						continue;
+
+					if (0 != db_day)
 					{
-						if (tm->tm_mday + 7 <= day_in_month(tm->tm_year, tm->tm_mon))
+						/* check for day of the month */
+						if (db_day != tm->tm_mday)
 							continue;
 					}
-					else if (db_every != day)
-						continue;
-				}
+					else
+					{
+						/* check for day of the week */
+						wday = (0 == tm->tm_wday ? 7 : tm->tm_wday) - 1;
+						if (0 == (db_dayofweek & (1 << wday)))
+							continue;
 
+						/* check for number of day (first, second, third, fourth or last) */
+						day = (tm->tm_mday - 1) / 7 + 1;
+						if (5 == db_every && 4 == day)
+						{
+							if (tm->tm_mday + 7 <= day_in_month(tm->tm_year, tm->tm_mon))
+								continue;
+						}
+						else if (db_every != day)
+						{
+							continue;
+						}
+					}
+
+					break;
+				}
 				break;
-			}
-			break;
-		default:
-			continue;
+			default:
+				continue;
 		}
 
 		/* allow one time periods to start before active time */
@@ -760,10 +761,13 @@ static void	process_maintenance(void)
 
 	update_maintenance_hosts(hm, hm_count, (int)now);
 
+	res = hm_count;
+
 	while (0 != hm_count--)
 		zbx_free(hm[hm_count].host);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	return res;
 }
 
 /******************************************************************************
@@ -783,9 +787,22 @@ static void	process_maintenance(void)
  ******************************************************************************/
 void	main_timer_loop(void)
 {
-	int	now, nextcheck, sleeptime;
+	int	now, nextcheck, sleeptime = -1,
+		triggers_count = 0, events_count = 0, hm_count = 0,
+		old_triggers_count = 0, old_events_count = 0, old_hm_count = 0,
+		tr_count, ev_count;
 
-	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
+	double	sec = 0.0, sec_maint = 0.0,
+		total_sec = 0.0, total_sec_maint = 0.0,
+		old_total_sec = 0.0, old_total_sec_maint = 0.0;
+
+	time_t	last_stat_time;
+
+#define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
+				/* once in STAT_INTERVAL seconds */
+
+	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
+	last_stat_time = time(NULL);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
@@ -795,11 +812,88 @@ void	main_timer_loop(void)
 		nextcheck = now + TIMER_DELAY - (now % TIMER_DELAY);
 		sleeptime = nextcheck - now;
 
+		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
+		{
+			if (0 == sleeptime)
+			{
+				if (1 != process_num)
+				{
+					zbx_setproctitle("%s #%d [processed %d triggers, %d events in " ZBX_FS_DBL
+							" sec, processing time functions]",
+							get_process_type_string(process_type), process_num,
+							triggers_count, events_count, total_sec);
+				}
+				else
+				{
+					zbx_setproctitle("%s #1 [processed %d triggers, %d events in " ZBX_FS_DBL
+							" sec, %d maint.periods in " ZBX_FS_DBL " sec, processing time "
+							"functions]",
+							get_process_type_string(process_type),
+							triggers_count, events_count, total_sec, hm_count,
+							total_sec_maint);
+				}
+			}
+			else
+			{
+				if (1 != process_num)
+				{
+					zbx_setproctitle("%s #%d [processed %d triggers, %d events in " ZBX_FS_DBL
+							" sec, idle %d sec]",
+							get_process_type_string(process_type), process_num,
+							triggers_count, events_count, total_sec, sleeptime);
+				}
+				else
+				{
+					zbx_setproctitle("%s #1 [processed %d triggers, %d events in " ZBX_FS_DBL
+							" sec, %d maint.periods in " ZBX_FS_DBL " sec, idle %d sec]",
+							get_process_type_string(process_type),
+							triggers_count, events_count, total_sec, hm_count,
+							total_sec_maint, sleeptime);
+					old_hm_count = hm_count;
+					old_total_sec_maint = total_sec_maint;
+				}
+				old_triggers_count = triggers_count;
+				old_events_count = events_count;
+				old_total_sec = total_sec;
+			}
+
+			triggers_count = 0;
+			events_count = 0;
+			hm_count = 0;
+			total_sec = 0.0;
+			total_sec_maint = 0.0;
+			last_stat_time = time(NULL);
+		}
+
 		zbx_sleep_loop(sleeptime);
 
-		zbx_setproctitle("%s [processing time functions]", get_process_type_string(process_type));
+		if (0 != sleeptime)
+		{
+			if (1 != process_num)
+			{
+				zbx_setproctitle("%s #%d [processed %d triggers, %d events in " ZBX_FS_DBL
+						" sec, processing time functions]",
+						get_process_type_string(process_type), process_num,
+						old_triggers_count, old_events_count, old_total_sec);
+			}
+			else
+			{
+				zbx_setproctitle("%s #1 [processed %d triggers, %d events in " ZBX_FS_DBL
+						" sec, %d maint.periods in " ZBX_FS_DBL " sec, processing time "
+						"functions]",
+						get_process_type_string(process_type),
+						old_triggers_count, old_events_count, old_total_sec, old_hm_count,
+						old_total_sec_maint);
+			}
+		}
 
-		process_time_functions();
+		sec = zbx_time();
+		tr_count = 0;
+		ev_count = 0;
+		process_time_functions(&tr_count, &ev_count);
+		triggers_count += tr_count;
+		events_count += ev_count;
+		total_sec += zbx_time() - sec;
 
 		/* only the "timer #1" process evaluates the maintenance periods */
 		if (1 != process_num)
@@ -809,9 +903,17 @@ void	main_timer_loop(void)
 		/* process time functions can take long time */
 		if (0 == nextcheck % SEC_PER_MIN || nextcheck + SEC_PER_MIN - (nextcheck % SEC_PER_MIN) <= time(NULL))
 		{
-			zbx_setproctitle("%s [processing maintenance periods]", get_process_type_string(process_type));
+			zbx_setproctitle("%s #1 [processed %d triggers, %d events in " ZBX_FS_DBL
+					" sec, %d maint.periods in " ZBX_FS_DBL " sec, processing maintenance periods]",
+					get_process_type_string(process_type),
+					triggers_count, events_count, total_sec, old_hm_count,
+					old_total_sec_maint);
 
-			process_maintenance();
+			sec_maint = zbx_time();
+			hm_count += process_maintenance();
+			total_sec_maint += zbx_time() - sec_maint;
 		}
 	}
+
+#undef STAT_INTERVAL
 }

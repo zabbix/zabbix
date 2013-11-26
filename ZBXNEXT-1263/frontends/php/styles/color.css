@@ -31,7 +31,6 @@
 .red	{ color: #DC0000; }
 .orange	{ color: #EE6000; }
 .blue	{ color: #0099FF; }
-.gold	{ color: #999900; }
 
 .normal { background-color: #AAFFAA !important; }
 
@@ -107,4 +106,4 @@ table.tableinfo a.disabled:active		{ color: #DC0000; }
 
 .input.select.not-monitored				{ color: #DC0000; }
 .input option.not-monitored				{ color: #DC0000; }
-.input option.disabled					{ color: #808080; }
+.input option[disabled]					{ color: #ACA899; }

@@ -21,14 +21,13 @@
 
 require_once dirname(__FILE__).'/perm.inc.php';
 
-function check_right_on_discovery($permission) {
-	if (CWebUser::$data['type'] >= USER_TYPE_ZABBIX_ADMIN) {
-		if (count(get_accessible_nodes_by_user(CWebUser::$data, $permission, PERM_RES_IDS_ARRAY))) {
-			return true;
-		}
-	}
-
-	return false;
+/**
+ * Returns true if the user has the permissions to network discovery.
+ *
+ * @return bool
+ */
+function check_right_on_discovery() {
+	return (CWebUser::getType() >= USER_TYPE_ZABBIX_ADMIN);
 }
 
 function svc_default_port($type_int) {
@@ -173,26 +172,4 @@ function discovery_object_status2str($status = null) {
 
 function get_discovery_rule_by_druleid($druleid) {
 	return DBfetch(DBselect('SELECT d.* FROM drules d WHERE d.druleid='.zbx_dbstr($druleid)));
-}
-
-function delete_discovery_rule($druleid) {
-	$actionids = array();
-
-	$dbActions = DBselect(
-		'SELECT DISTINCT c.actionid'.
-		' FROM conditions c'.
-		' WHERE c.conditiontype='.CONDITION_TYPE_DRULE.
-			' AND c.value='.zbx_dbstr($druleid)
-	);
-	while ($action = DBfetch($dbActions)) {
-		$actionids[] = $action['actionid'];
-	}
-
-	// disabling actions with deleted conditions
-	if (!empty($actionids)) {
-		DBexecute('UPDATE actions SET status='.ACTION_STATUS_DISABLED.' WHERE '.dbConditionInt('actionid', $actionids));
-		DBexecute('DELETE FROM conditions WHERE conditiontype='.CONDITION_TYPE_DRULE.' AND value='.zbx_dbstr($druleid));
-	}
-
-	return DBexecute('DELETE FROM drules WHERE druleid='.zbx_dbstr($druleid));
 }

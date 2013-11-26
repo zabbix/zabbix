@@ -297,23 +297,28 @@ function get_graph_by_graphid($graphid) {
 }
 
 /**
- * Replace items for specified host.
+ * Search items by same key in destination host.
  *
- * @param $gitems
- * @param $dest_hostid
- * @param bool $error if false error won't be thrown when item does not exist
+ * @param array  $gitems
+ * @param string $destinationHostId
+ * @param bool   $error					if false error won't be thrown when item does not exist
+ * @param array  $flags
+ *
  * @return array|bool
  */
-function get_same_graphitems_for_host($gitems, $dest_hostid, $error = true) {
+function getSameGraphItemsForHost($gitems, $destinationHostId, $error = true, array $flags = array()) {
 	$result = array();
+
+	$flagsSql = $flags ? ' AND '.dbConditionInt('dest.flags', $flags) : '';
 
 	foreach ($gitems as $gitem) {
 		$dbItem = DBfetch(DBselect(
 			'SELECT dest.itemid,src.key_'.
 			' FROM items dest,items src'.
 			' WHERE dest.key_=src.key_'.
-				' AND dest.hostid='.zbx_dbstr($dest_hostid).
-				' AND src.itemid='.zbx_dbstr($gitem['itemid'])
+				' AND dest.hostid='.zbx_dbstr($destinationHostId).
+				' AND src.itemid='.zbx_dbstr($gitem['itemid']).
+				$flagsSql
 		));
 
 		if ($dbItem) {
@@ -322,13 +327,16 @@ function get_same_graphitems_for_host($gitems, $dest_hostid, $error = true) {
 		}
 		elseif ($error) {
 			$item = get_item_by_itemid($gitem['itemid']);
-			$host = get_host_by_hostid($dest_hostid);
+			$host = get_host_by_hostid($destinationHostId);
+
 			error(_s('Missing key "%1$s" for host "%2$s".', $item['key_'], $host['host']));
+
 			return false;
 		}
 		else {
 			continue;
 		}
+
 		$result[] = $gitem;
 	}
 
@@ -338,44 +346,54 @@ function get_same_graphitems_for_host($gitems, $dest_hostid, $error = true) {
 /**
  * Copy specified graph to specified host.
  *
- * @param $graphid
- * @param $hostid
- * @return array|bool
+ * @param string $graphId
+ * @param string $hostId
+ *
+ * @return array
  */
-function copy_graph_to_host($graphid, $hostid) {
+function copyGraphToHost($graphId, $hostId) {
 	$graphs = API::Graph()->get(array(
-		'graphids' => $graphid,
+		'graphids' => $graphId,
 		'output' => API_OUTPUT_EXTEND,
+		'selectHosts' => array('hostid', 'name'),
 		'selectGraphItems' => API_OUTPUT_EXTEND
 	));
 	$graph = reset($graphs);
+	$graphHost = reset($graph['hosts']);
 
-	$new_gitems = get_same_graphitems_for_host($graph['gitems'], $hostid);
+	if ($graphHost['hostid'] == $hostId) {
+		error(_s('Graph "%1$s" already exists on "%2$s".', $graph['name'], $graphHost['name']));
 
-	if (!$new_gitems) {
-		$host = get_host_by_hostid($hostid);
+		return false;
+	}
+
+	$graph['gitems'] = getSameGraphItemsForHost(
+		$graph['gitems'],
+		$hostId,
+		true,
+		array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)
+	);
+
+	if (!$graph['gitems']) {
+		$host = get_host_by_hostid($hostId);
+
 		info(_s('Skipped copying of graph "%1$s" to host "%2$s".', $graph['name'], $host['host']));
+
 		return false;
 	}
 
 	// retrieve actual ymax_itemid and ymin_itemid
-	if ($graph['ymax_itemid']) {
-		if ($itemid = get_same_item_for_host($graph['ymax_itemid'], $hostid)) {
-			$graph['ymax_itemid'] = $itemid;
-		};
+	if ($graph['ymax_itemid'] && $itemId = get_same_item_for_host($graph['ymax_itemid'], $hostId)) {
+		$graph['ymax_itemid'] = $itemId;
 	}
 
-	if ($graph['ymin_itemid']) {
-		if ($itemid = get_same_item_for_host($graph['ymin_itemid'], $hostid)) {
-			$graph['ymin_itemid'] = $itemid;
-		}
+	if ($graph['ymin_itemid'] && $itemId = get_same_item_for_host($graph['ymin_itemid'], $hostId)) {
+		$graph['ymin_itemid'] = $itemId;
 	}
 
-	$graph['gitems'] = $new_gitems;
 	unset($graph['templateid']);
-	$result = API::Graph()->create($graph);
 
-	return $result;
+	return API::Graph()->create($graph);
 }
 
 function navigation_bar_calc($idx = null, $idx2 = 0, $update = false) {

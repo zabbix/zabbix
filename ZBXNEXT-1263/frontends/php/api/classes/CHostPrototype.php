@@ -1325,7 +1325,8 @@ class CHostPrototype extends CHostBase {
 			}
 			$inventory = API::getApi()->select('host_inventory', array(
 				'output' => $output,
-				'filter' => array('hostid' => $hostPrototypeIds)
+				'filter' => array('hostid' => $hostPrototypeIds),
+				'nodeids' => get_current_nodeid(true)
 			));
 			$result = $relationMap->mapOne($result, zbx_toHash($inventory, 'hostid'), 'inventory');
 		}
@@ -1335,10 +1336,19 @@ class CHostPrototype extends CHostBase {
 
 	/**
 	 * Deletes the given group prototype and all discovered groups.
+	 * Deletes also group prototype children.
 	 *
 	 * @param array $groupPrototypeIds
 	 */
 	protected function deleteGroupPrototypes(array $groupPrototypeIds) {
+		// delete child group prototypes
+		$groupPrototypeChildren = DBfetchArray(DBselect(
+			'SELECT gp.group_prototypeid FROM group_prototype gp WHERE '.dbConditionInt('templateid', $groupPrototypeIds)
+		));
+		if ($groupPrototypeChildren) {
+			$this->deleteGroupPrototypes(zbx_objectValues($groupPrototypeChildren, 'group_prototypeid'));
+		}
+
 		// delete discovered groups
 		$hostGroups = DBfetchArray(DBselect(
 			'SELECT groupid FROM group_discovery WHERE '.dbConditionInt('parent_group_prototypeid', $groupPrototypeIds)

@@ -531,10 +531,10 @@ elseif (isset($_REQUEST['save'])) {
 
 			$graphs = API::Graph()->get(array(
 				'hostids' => $srcHostId,
-				'selectItems' => API_OUTPUT_EXTEND,
+				'selectItems' => array('type'),
 				'output' => API_OUTPUT_EXTEND,
 				'inherited' => false,
-				'selectHosts' => API_OUTPUT_REFER,
+				'selectHosts' => array('hostid'),
 				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 			));
 			foreach ($graphs as $graph) {
@@ -546,7 +546,7 @@ elseif (isset($_REQUEST['save'])) {
 					continue;
 				}
 
-				if (!copy_graph_to_host($graph['graphid'], $hostId)) {
+				if (!copyGraphToHost($graph['graphid'], $hostId)) {
 					throw new Exception();
 				}
 			}
@@ -666,9 +666,9 @@ if ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['hosts'])) {
 		'SELECT h.hostid,h.host'.
 		' FROM hosts h'.
 		' WHERE h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'.
-			andDbNode('h.hostid').
-		' ORDER BY h.host'
+			andDbNode('h.hostid')
 	));
+	order_result($data['proxies'], 'host');
 
 	// get inventories
 	if ($data['inventory_mode'] != HOST_INVENTORY_DISABLED) {
@@ -786,7 +786,7 @@ else {
 	$form = new CForm();
 	$form->setName('hosts');
 
-	$table = new CTableInfo(_('No hosts defined.'));
+	$table = new CTableInfo(_('No hosts found.'));
 	$table->setHeader(array(
 		new CCheckBox('all_hosts', null, "checkAll('".$form->getName()."', 'all_hosts', 'hosts');"),
 		$displayNodes ? _('Node') : null,
@@ -900,7 +900,7 @@ else {
 			$description[] = $proxies[$host['proxy_hostid']]['host'].NAME_DELIMITER;
 		}
 		if ($host['discoveryRule']) {
-			$description[] = new CLink($host['discoveryRule']['name'], 'host_prototypes.php?parent_discoveryid='.$host['discoveryRule']['itemid'], 'gold');
+			$description[] = new CLink($host['discoveryRule']['name'], 'host_prototypes.php?parent_discoveryid='.$host['discoveryRule']['itemid'], 'parent-discovery');
 			$description[] = NAME_DELIMITER;
 		}
 

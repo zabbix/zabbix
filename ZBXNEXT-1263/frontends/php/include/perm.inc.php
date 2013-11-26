@@ -164,8 +164,7 @@ function get_accessible_groups_by_user($userData, $perm, $permRes = PERM_RES_IDS
 				' FROM groups hg'.
 					' LEFT JOIN nodes n ON '.DBid2nodeid('hg.groupid').'=n.nodeid'.
 				whereDbNode('hg.groupid', $nodeId).
-				' GROUP BY n.nodeid,n.name,hg.groupid,hg.name'.
-				' ORDER BY node_name,hg.name';
+				' GROUP BY n.nodeid,n.name,hg.groupid,hg.name';
 	}
 	else {
 		$sql = 'SELECT n.nodeid AS nodeid,n.name AS node_name,hg.groupid,hg.name,MAX(r.permission) AS permission,MIN(r.permission) AS permission_deny,g.userid'.
@@ -175,8 +174,7 @@ function get_accessible_groups_by_user($userData, $perm, $permRes = PERM_RES_IDS
 					' LEFT JOIN nodes n ON '.DBid2nodeid('hg.groupid').'=n.nodeid'.
 				' WHERE g.userid='.zbx_dbstr($userId).
 					andDbNode('hg.groupid', $nodeId).
-				' GROUP BY n.nodeid,n.name,hg.groupid,hg.name,g.userid'.
-				' ORDER BY node_name,hg.name,permission';
+				' GROUP BY n.nodeid,n.name,hg.groupid,hg.name,g.userid';
 	}
 
 	$dbGroups = DBselect($sql);
@@ -217,6 +215,20 @@ function get_accessible_groups_by_user($userData, $perm, $permRes = PERM_RES_IDS
 	}
 
 	unset($processed, $groupData, $dbGroups);
+
+	if ($userType == USER_TYPE_SUPER_ADMIN) {
+		CArrayHelper::sort($result, array(
+			array('field' => 'node_name', 'order' => ZBX_SORT_UP),
+			array('field' => 'name', 'order' => ZBX_SORT_UP)
+		));
+	}
+	else {
+		CArrayHelper::sort($result, array(
+			array('field' => 'node_name', 'order' => ZBX_SORT_UP),
+			array('field' => 'name', 'order' => ZBX_SORT_UP),
+			array('field' => 'permission', 'order' => ZBX_SORT_UP)
+		));
+	}
 
 	return $result;
 }
@@ -331,58 +343,63 @@ function get_accessible_hosts_by_rights(&$rights, $user_type, $perm, $perm_res =
 	$where = count($where) ? $where = ' WHERE '.implode(' AND ', $where) : '';
 
 	$perm_by_host = array();
-	$db_hosts = DBselect(
+
+	$dbHosts = DBselect(
 		'SELECT n.nodeid AS nodeid,n.name AS node_name,hg.groupid AS groupid,h.hostid,h.host,h.name AS host_name,h.status'.
 		' FROM hosts h'.
 			' LEFT JOIN hosts_groups hg ON hg.hostid=h.hostid'.
 			' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('h.hostid').
-		$where.
-		' ORDER BY n.name,h.name'
+			$where
 	);
-	while ($host_data = DBfetch($db_hosts)) {
-		if (isset($host_data['groupid']) && isset($res_perm[$host_data['groupid']])) {
-			if (!isset($perm_by_host[$host_data['hostid']])) {
-				$perm_by_host[$host_data['hostid']] = array();
+	while ($dbHost = DBfetch($dbHosts)) {
+		if (isset($dbHost['groupid']) && isset($res_perm[$dbHost['groupid']])) {
+			if (!isset($perm_by_host[$dbHost['hostid']])) {
+				$perm_by_host[$dbHost['hostid']] = array();
 			}
-			$perm_by_host[$host_data['hostid']][] = $res_perm[$host_data['groupid']];
-			$host_perm[$host_data['hostid']][$host_data['groupid']] = $res_perm[$host_data['groupid']];
+			$perm_by_host[$dbHost['hostid']][] = $res_perm[$dbHost['groupid']];
+			$host_perm[$dbHost['hostid']][$dbHost['groupid']] = $res_perm[$dbHost['groupid']];
 		}
-		$host_perm[$host_data['hostid']]['data'] = $host_data;
+		$host_perm[$dbHost['hostid']]['data'] = $dbHost;
 	}
 
-	foreach ($host_perm as $hostid => $host_data) {
-		$host_data = $host_data['data'];
+	foreach ($host_perm as $hostid => $dbHost) {
+		$dbHost = $dbHost['data'];
 
 		// select min rights from groups
 		if (USER_TYPE_SUPER_ADMIN == $user_type) {
-			$host_data['permission'] = PERM_READ_WRITE;
+			$dbHost['permission'] = PERM_READ_WRITE;
 		}
 		else {
 			if (isset($perm_by_host[$hostid])) {
-				$host_data['permission'] = (min($perm_by_host[$hostid]) == PERM_DENY)
+				$dbHost['permission'] = (min($perm_by_host[$hostid]) == PERM_DENY)
 					? PERM_DENY
 					: max($perm_by_host[$hostid]);
 			}
 			else {
-				if (is_null($host_data['nodeid'])) {
-					$host_data['nodeid'] = id2nodeid($host_data['groupid']);
+				if (is_null($dbHost['nodeid'])) {
+					$dbHost['nodeid'] = id2nodeid($dbHost['groupid']);
 				}
-				$host_data['permission'] = PERM_DENY;
+				$dbHost['permission'] = PERM_DENY;
 			}
 		}
 
-		if ($host_data['permission'] < $perm) {
+		if ($dbHost['permission'] < $perm) {
 			continue;
 		}
 
 		switch ($perm_res) {
 			case PERM_RES_DATA_ARRAY:
-				$result[$host_data['hostid']] = $host_data;
+				$result[$dbHost['hostid']] = $dbHost;
 				break;
 			default:
-				$result[$host_data['hostid']] = $host_data['hostid'];
+				$result[$dbHost['hostid']] = $dbHost['hostid'];
 		}
 	}
+
+	CArrayHelper::sort($result, array(
+		array('field' => 'node_name', 'order' => ZBX_SORT_UP),
+		array('field' => 'host_name', 'order' => ZBX_SORT_UP)
+	));
 
 	return $result;
 }
@@ -407,41 +424,47 @@ function get_accessible_groups_by_rights(&$rights, $user_type, $perm, $perm_res 
 		$group_perm[$right['id']] = $right['permission'];
 	}
 
-	$db_groups = DBselect(
+	$dbHostGroups = DBselect(
 		'SELECT n.nodeid AS nodeid,n.name AS node_name,g.*,'.PERM_DENY.' AS permission'.
 		' FROM groups g'.
 			' LEFT JOIN nodes n ON '.DBid2nodeid('g.groupid').'=n.nodeid'.
-			$where.
-		' ORDER BY n.name,g.name'
+			$where
 	);
-	while ($group_data = DBfetch($db_groups)) {
+	while ($dbHostGroup = DBfetch($dbHostGroups)) {
 		if (USER_TYPE_SUPER_ADMIN == $user_type) {
-			$group_data['permission'] = PERM_READ_WRITE;
+			$dbHostGroup['permission'] = PERM_READ_WRITE;
 		}
 		else {
-			if (isset($group_perm[$group_data['groupid']])) {
-				$group_data['permission'] = $group_perm[$group_data['groupid']];
+			if (isset($group_perm[$dbHostGroup['groupid']])) {
+				$dbHostGroup['permission'] = $group_perm[$dbHostGroup['groupid']];
 			}
 			else {
-				if (is_null($group_data['nodeid'])) {
-					$group_data['nodeid'] = id2nodeid($group_data['groupid']);
+				if (is_null($dbHostGroup['nodeid'])) {
+					$dbHostGroup['nodeid'] = id2nodeid($dbHostGroup['groupid']);
 				}
-				$group_data['permission'] = PERM_DENY;
+
+				$dbHostGroup['permission'] = PERM_DENY;
 			}
 		}
 
-		if ($group_data['permission'] < $perm) {
+		if ($dbHostGroup['permission'] < $perm) {
 			continue;
 		}
 
 		switch ($perm_res) {
 			case PERM_RES_DATA_ARRAY:
-				$result[$group_data['groupid']] = $group_data;
+				$result[$dbHostGroup['groupid']] = $dbHostGroup;
 				break;
+
 			default:
-				$result[$group_data['groupid']] = $group_data['groupid'];
+				$result[$dbHostGroup['groupid']] = $dbHostGroup['groupid'];
 		}
 	}
+
+	CArrayHelper::sort($result, array(
+		array('field' => 'node_name', 'order' => ZBX_SORT_UP),
+		array('field' => 'name', 'order' => ZBX_SORT_UP)
+	));
 
 	return $result;
 }

@@ -136,6 +136,8 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 	}
 	elseif (isset($_REQUEST['triggers'])) {
 		$_REQUEST['events'] = API::Event()->get(array(
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
 			'objectids' => $_REQUEST['triggers'],
 			'output' => array('eventid'),
 			'acknowledged' => EVENT_NOT_ACKNOWLEDGED
@@ -249,11 +251,14 @@ elseif (isset($_REQUEST['events'])) {
 	}
 }
 
-$messageTable->addRow(_('Message'), new CTextArea('message', '', array(
+$message = new CTextArea('message', '', array(
 	'rows' => ZBX_TEXTAREA_STANDARD_ROWS,
 	'width' => ZBX_TEXTAREA_BIG_WIDTH,
 	'maxlength' => 255
-)));
+));
+$message->attr('autofocus', 'autofocus');
+
+$messageTable->addRow(_('Message'), $message);
 $messageTable->addItemToBottomRow(new CSubmit('saveandreturn', $saveAndReturnLabel));
 
 if (!$bulk) {

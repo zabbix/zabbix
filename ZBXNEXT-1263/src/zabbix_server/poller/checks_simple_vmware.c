@@ -44,7 +44,6 @@ static int	vmware_set_powerstate_result(AGENT_RESULT *result)
 	}
 
 	return ret;
-
 }
 
 static zbx_vmware_hv_t	*hv_get(zbx_vector_ptr_t *hvs, const char *uuid)
@@ -89,6 +88,7 @@ static zbx_vmware_vm_t	*service_vm_get(zbx_vmware_service_t *service, const char
 		if (NULL != (vm = vm_get(&hv->vms, uuid)))
 			return vm;
 	}
+
 	return NULL;
 }
 
@@ -226,15 +226,26 @@ int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, AGENT_RESULT
 		/* 2013-06-04T14:19:23.406298Z */
 		if (6 == sscanf(value, "%d-%d-%dT%d:%d:%d.%*s", &tm.tm_year, &tm.tm_mon, &tm.tm_mday, &tm.tm_hour,
 				&tm.tm_min, &tm.tm_sec))
+
 		{
+			int		tz_offset;
+#if defined(HAVE_TM_TM_GMTOFF)
+			struct tm	*ptm;
+			time_t		now;
+
+			now = time(NULL);
+			ptm = localtime(&now);
+			tz_offset = ptm->tm_gmtoff;
+#else
+			tz_offset = -timezone;
+#endif
 			tm.tm_year -= 1900;
 			tm.tm_mon--;
 			tm.tm_isdst = -1;
 
 			if (0 < (t = mktime(&tm)))
-				log->timestamp = (int)t - timezone;
+				log->timestamp = (int)t + tz_offset;
 		}
-
 		zbx_free(value);
 	}
 
@@ -554,6 +565,65 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const char *username, const c
 		goto unlock;
 
 	ret = vmware_get_events(service->data->events, request->lastlogsize, result);
+unlock:
+	zbx_vmware_unlock();
+
+	return ret;
+}
+
+int	check_vcenter_version(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	char			*url, *version;
+	int			ret = SYSINFO_RET_FAIL;
+	zbx_vmware_service_t	*service;
+
+	if (1 != request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (version = zbx_xml_read_value(service->contents, ZBX_XPATH_LN2("about", "version"))))
+		goto unlock;
+
+	SET_STR_RESULT(result, version);
+
+	ret = SYSINFO_RET_OK;
+
+unlock:
+	zbx_vmware_unlock();
+
+	return ret;
+}
+
+int	check_vcenter_fullname(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	char			*url, *fullname;
+	int			ret = SYSINFO_RET_FAIL;
+	zbx_vmware_service_t	*service;
+
+	if (1 != request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (fullname = zbx_xml_read_value(service->contents, ZBX_XPATH_LN2("about", "fullName"))))
+		goto unlock;
+
+	SET_STR_RESULT(result, fullname);
+
+	ret = SYSINFO_RET_OK;
 unlock:
 	zbx_vmware_unlock();
 

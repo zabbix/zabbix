@@ -33,7 +33,7 @@ $mediaTypeForm = new CForm();
 $mediaTypeForm->setName('mediaTypesForm');
 
 // create table
-$mediaTypeTable = new CTableInfo(_('No media types defined.'));
+$mediaTypeTable = new CTableInfo(_('No media types found.'));
 $mediaTypeTable->setHeader(array(
 	new CCheckBox('all_media_types', null, "checkAll('".$mediaTypeForm->getName()."', 'all_media_types', 'mediatypeids');"),
 	$this->data['displayNodes'] ? _('Node') : null,
@@ -78,7 +78,7 @@ foreach ($this->data['mediatypes'] as $mediaType) {
 	$actionLinks = array();
 	if (!empty($mediaType['listOfActions'])) {
 		foreach ($mediaType['listOfActions'] as $action) {
-			$actionLinks[] = new CLink($action['name'], 'actionconf.php?form=edit&actionid='.$action['actionid']);
+			$actionLinks[] = new CLink($action['name'], 'actionconf.php?form=update&actionid='.$action['actionid']);
 			$actionLinks[] = ', ';
 		}
 		array_pop($actionLinks);

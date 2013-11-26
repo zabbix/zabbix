@@ -40,7 +40,6 @@ class CDRule extends CZBXAPI {
 	public function get(array $options = array()) {
 		$result = array();
 		$nodeCheck = false;
-		$userType = self::$userData['type'];
 
 		$sqlParts = array(
 			'select'	=> array('drules' => 'dr.druleid'),
@@ -78,12 +77,7 @@ class CDRule extends CZBXAPI {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
-// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $userType) {
-		}
-		elseif (is_null($options['editable']) && (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN)) {
-		}
-		elseif (!is_null($options['editable']) && (self::$userData['type']!=USER_TYPE_SUPER_ADMIN)) {
+		if (CWebUser::getType() < USER_TYPE_ZABBIX_ADMIN) {
 			return array();
 		}
 
@@ -250,10 +244,8 @@ class CDRule extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input.'));
 		}
 
-		if (self::$userData['type'] >= USER_TYPE_ZABBIX_ADMIN) {
-			if (!count(get_accessible_nodes_by_user(self::$userData, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-			}
+		if (CWebUser::getType() < USER_TYPE_ZABBIX_ADMIN) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		$proxies = array();
@@ -571,22 +563,16 @@ class CDRule extends CZBXAPI {
 	 * @return boolean
 	 */
 	public function delete(array $druleIds) {
-		$druleIds = zbx_toArray($druleIds);
-
-		if (self::$userData['type'] >= USER_TYPE_ZABBIX_ADMIN) {
-			if (!count(get_accessible_nodes_by_user(self::$userData, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-			}
-		}
+		$this->validateDelete($druleIds);
 
 		$actionIds = array();
 
 		$dbActions = DBselect(
-			'SELECT DISTINCT c.actionid'.
-			' FROM c.conditions'.
-			' WHERE c.conditiontype='.CONDITION_TYPE_DRULE.
-				' AND '.dbConditionString('c.value', $druleIds).
-			' ORDER BY c.actionid'
+			'SELECT DISTINCT actionid'.
+			' FROM conditions'.
+			' WHERE conditiontype='.CONDITION_TYPE_DRULE.
+				' AND '.dbConditionString('value', $druleIds).
+			' ORDER BY actionid'
 		);
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionIds[] = $dbAction['actionid'];
@@ -604,9 +590,31 @@ class CDRule extends CZBXAPI {
 			));
 		}
 
-		DB::delete('drules', array('druleid' => $druleIds));
+		$result = DB::delete('drules', array('druleid' => $druleIds));
+		if ($result) {
+			foreach ($druleIds as $druleId) {
+				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_DISCOVERY_RULE, '['.$druleId.']');
+			}
+		}
 
 		return array('druleids' => $druleIds);
+	}
+
+	/**
+	 * Validates the input parameters for the delete() method.
+	 *
+	 * @throws APIException if the input is invalid
+	 *
+	 * @param array $druleIds
+	 *
+	 * @return void
+	 */
+	protected function validateDelete(array $druleIds) {
+		if (!$druleIds) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
+		$this->checkDrulePermissions($druleIds);
 	}
 
 	/**
@@ -762,5 +770,20 @@ class CDRule extends CZBXAPI {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Checks if the current user has access to given discovery rules.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for discovery rules.
+	 *
+	 * @param array $druleIds
+	 *
+	 * @return void
+	 */
+	protected function checkDrulePermissions(array $druleIds) {
+		if (!$this->isWritable($druleIds)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
 	}
 }

@@ -27,7 +27,7 @@ if ($this->data['is_profile']) {
 	$userWidget->addPageHeader(_('USER PROFILE').NAME_DELIMITER.$this->data['name'].' '.$this->data['surname']);
 }
 else {
-	$userWidget->addPageHeader(_('CONFIGURATION OF USER'));
+	$userWidget->addPageHeader(_('CONFIGURATION OF USERS'));
 }
 
 // create form
@@ -99,35 +99,41 @@ if (!$this->data['is_profile']) {
 
 // append languages to form list
 $languageComboBox = new CComboBox('lang', $this->data['lang']);
-$languagesUnableSet = 0;
 
+$allLocalesAvailable = true;
 foreach (getLocales() as $localeId => $locale) {
 	if ($locale['display']) {
 		// checking if this locale exists in the system. The only way of doing it is to try and set one
 		// trying to set only the LC_MONETARY locale to avoid changing LC_NUMERIC
-		$localeExists = (setlocale(LC_MONETARY , zbx_locale_variants($localeId)) || $localeId == 'en_GB') ? 'yes' : 'no';
+		$localeExists = (setlocale(LC_MONETARY , zbx_locale_variants($localeId)) || $localeId == 'en_GB');
 
 		$languageComboBox->addItem(
 			$localeId,
 			$locale['name'],
 			($localeId == $this->data['lang']) ? true : null,
-			$localeExists,
-			$localeExists == 'yes' ? '' : 'disabled'
+			$localeExists
 		);
 
-		if ($localeExists != 'yes') {
-			$languagesUnableSet++;
-		}
+		$allLocalesAvailable &= $localeExists;
 	}
 }
 
 // restoring original locale
 setlocale(LC_MONETARY, zbx_locale_variants(CWebUser::$data['lang']));
 
-$languageHint = ($languagesUnableSet > 0)
-	? _('You are not able to choose some of the languages, because locales for them are not installed on the web server.')
-	: '';
-$userFormList->addRow(_('Language'), array($languageComboBox, SPACE, new CSpan($languageHint, 'red wrap')));
+$languageError = '';
+if (!function_exists('bindtextdomain')) {
+	$languageError = 'Translations are unavailable because the PHP gettext module is missing.';
+	$languageComboBox->attr('disabled', 'disabled');
+}
+elseif (!$allLocalesAvailable) {
+	$languageError = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
+}
+
+$userFormList->addRow(
+	_('Language'),
+	$languageError ? array($languageComboBox, SPACE, new CSpan($languageError, 'red wrap')) : $languageComboBox
+);
 
 // append themes to form list
 $themes = array_merge(array(THEME_DEFAULT => _('System default')), Z::getThemes());
@@ -153,7 +159,7 @@ if (uint_in_array(CWebUser::$data['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TY
 	$userMediaFormList = new CFormList('userMediaFormList');
 	$userForm->addVar('user_medias', $this->data['user_medias']);
 
-	$mediaTableInfo = new CTableInfo(_('No media defined.'));
+	$mediaTableInfo = new CTableInfo(_('No media found.'));
 
 	foreach ($this->data['user_medias'] as $id => $media) {
 		if (!isset($media['active']) || !$media['active']) {

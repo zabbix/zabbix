@@ -64,7 +64,7 @@ div #div_node_tree { background-color:#1D4161; }
 
 .normal		{ background-color: #AADDDD; }
 
-a, a:link, a:visited { color: #99C7E4; }
+a { color: #99C7E4; }
 a:hover, a:active { color: #B0D5EC; }
 
 a.highlight { font-size: 10px; font-weight: bold; }
@@ -372,28 +372,9 @@ table.calendartab tr td.selected{
 	font-weight: bolder;
 }
 
-
-/* Suggest */
-
-table.suggest{
-	background-color: #022744;
-}
-
-table.suggest tr{
-	background-color: #022744;
-}
-
-table.suggest tr.highlight{
-	background-color: #245078;
-}
-
-table.suggest tr.highlight td{
-	color: #FFFFFF;
-}
-
-table.suggest tr td{
-	color: #77B7DA;
-}
+table.right_table.calculated select, table.right_table.calculated option { background: #0B1823; }
+table.right_table .read_write option { color: #00AD00; }
+table.right_table .deny option { color: #F20000; }
 
 /*////////////////	DIVS	////////////////////*/
 /* calendar */
@@ -479,8 +460,6 @@ span.link:hover{ color: #B0D5EC; }
 
 span.darklink{ color: #3C759B; }span.darklink:hover{ color: #77B7DA; }
 
-div.suggest{ border: 1px #77B7DA solid; }
-
 /*////////////////	FORMS	////////////////////*/
 .input, .input[disabled]:hover, input.formlist[type="button"],
 div.calendar input[type="button"] {
@@ -548,6 +527,11 @@ div.preloader {
 .multiselect .available .prefix { color: #77B7DA; }
 .multiselect .available ul li.hover { background: #4A7FA2; }
 .multiselect .available ul li.hover .prefix { color: #F1F1F1; }
+
+/* suggest */
+div.suggest { border-color: #285473; }
+table.suggest tr { background-color: #001C31; }
+table.suggest tr.highlight { background-color: #4A7FA2; }
 
 /* menu popup */
 .menuPopup { border: 1px solid #022744; }

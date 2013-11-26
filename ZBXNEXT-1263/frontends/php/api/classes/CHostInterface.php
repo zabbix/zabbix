@@ -630,11 +630,11 @@ class CHostInterface extends CZBXAPI {
 			self::exception(
 				ZBX_API_ERROR_PARAMETERS,
 				_n(
-					'Maximum DNS name length is %2$d characters, "%3$s" is %1$d character.',
-					'Maximum DNS name length is %2$d characters, "%3$s" is %1$d characters.',
-					zbx_strlen($interface['dns']),
+					'Maximum DNS name length is %1$d characters, "%2$s" is %3$d character.',
+					'Maximum DNS name length is %1$d characters, "%2$s" is %3$d characters.',
 					64,
-					$interface['dns']
+					$interface['dns'],
+					zbx_strlen($interface['dns'])
 				)
 			);
 		}
@@ -652,7 +652,7 @@ class CHostInterface extends CZBXAPI {
 	 * @param array $interface
 	 */
 	protected function checkIp(array $interface) {
-		if (isset($interface['ip']) && !validate_ip($interface['ip'], $arr)
+		if (!zbx_empty($interface['ip']) && !validate_ip($interface['ip'], $arr)
 				&& !preg_match('/^'.ZBX_PREG_MACRO_NAME_FORMAT.'$/i', $interface['ip'])
 				&& !preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/i', $interface['ip'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface IP parameter "%s" provided.', $interface['ip']));

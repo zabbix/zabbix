@@ -29,7 +29,7 @@ $chartForm->addItem(array(SPACE._('Graph').SPACE, $this->data['pageFilter']->get
 $chartsWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.charts.filter.state', 1));
 
 if ($this->data['graphid']) {
-	$chartsWidget->addPageHeader(_('Graphs'), array(
+	$chartsWidget->addPageHeader(_('GRAPHS'), array(
 		get_icon('favourite', array('fav' => 'web.favorite.graphids', 'elname' => 'graphid', 'elid' => $this->data['graphid'])),
 		SPACE,
 		get_icon('reset', array('id' => $this->data['graphid'])),
@@ -38,7 +38,7 @@ if ($this->data['graphid']) {
 	));
 }
 else {
-	$chartsWidget->addPageHeader(_('Graphs'), array(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))));
+	$chartsWidget->addPageHeader(_('GRAPHS'), array(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))));
 }
 
 $chartsWidget->addHeader(
@@ -58,7 +58,7 @@ if (!empty($this->data['graphid'])) {
 		'profileIdx2' => $this->data['graphid']
 	));
 
-	$chartTable = new CTable(_('No graphs defined.'), 'maxwidth');
+	$chartTable = new CTable(null, 'maxwidth');
 	$chartTable->addRow($screen->get());
 
 	$chartsWidget->addItem($chartTable);
@@ -74,7 +74,7 @@ else {
 		'timeline' => $screen->timeline
 	));
 
-	$chartsWidget->addItem(new CTableInfo(_('No graphs defined.')));
+	$chartsWidget->addItem(new CTableInfo(_('No graphs found.')));
 }
 
 return $chartsWidget;

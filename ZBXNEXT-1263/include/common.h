@@ -126,7 +126,7 @@ typedef enum
 	ITEM_TYPE_SNMPTRAP	/* 17 */
 }
 zbx_item_type_t;
-const char	*zbx_host_type_string(zbx_item_type_t item_type);
+const char	*zbx_agent_type_string(zbx_item_type_t item_type);
 
 typedef enum
 {
@@ -738,9 +738,6 @@ void	help(void);
 void	usage(void);
 void	version(void);
 
-/* max length of base64 data */
-#define ZBX_MAX_B64_LEN 16 * 1024
-
 const char	*get_program_name(const char *path);
 
 typedef enum
@@ -793,7 +790,7 @@ int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uin
 	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, (size_t)8, 0x0LL, 0xFFFFFFFFFFFFFFFFLL)
 
 #define is_uint64_n(str, n, value) \
-		is_uint_n_range(str, n, value, (size_t)8, 0x0LL, 0xFFFFFFFFFFFFFFFFLL)
+	is_uint_n_range(str, n, value, (size_t)8, 0x0LL, 0xFFFFFFFFFFFFFFFFLL)
 
 #define is_uint31(str, value) \
 	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, (size_t)4, 0x0LL, 0x7FFFFFFFLL)
@@ -803,7 +800,6 @@ int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uin
 
 #define is_uint_range(str, value, min, max) \
 	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, sizeof(unsigned int), min, max)
-
 
 int	is_boolean(const char *str, zbx_uint64_t *value);
 int	is_uoct(const char *str);
@@ -822,6 +818,33 @@ void	del_zeroes(char *s);
 int	get_param(const char *param, int num, char *buf, size_t max_len);
 int	num_param(const char *param);
 char	*get_param_dyn(const char *param, int num);
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: replaces an item key, SNMP OID or their parameters                *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      data      - [IN] an item key, SNMP OID or their parameter             *
+ *      key_type  - [IN] ZBX_KEY_TYPE_*                                       *
+ *      level     - [IN] for item keys and OIDs the level will be 0;          *
+ *                       for their parameters - 1 or higher (for arrays)      *
+ *      num       - [IN] parameter number; for item keys and OIDs the level   *
+ *                       will be 0; for their parameters - 1 or higher        *
+ *      quoted    - [IN] 1 if parameter is quoted; 0 - othetwise              *
+ *      cb_data   - [IN] callback function custom data                        *
+ *                                                                            *
+ * Return value: NULL if parameter doesn't change; a new string - otherwise   *
+ *                                                                            *
+ * Comments: The new string should be quoted if it contains special           *
+ *           characters                                                       *
+ *                                                                            *
+ ******************************************************************************/
+typedef char	*(*replace_key_param_f)(const char *data, int key_type, int level, int num, int quoted, void *cb_data);
+#define ZBX_KEY_TYPE_ITEM	0
+#define ZBX_KEY_TYPE_OID	1
+int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, void *cb_data, char *error,
+		size_t maxerrlen);
+
 void	remove_param(char *param, int num);
 const char	*get_string(const char *p, char *buf, size_t bufsize);
 int	get_key_param(char *param, int num, char *buf, size_t max_len);
@@ -869,6 +892,9 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define ZBX_JAN_1970_IN_SEC	2208988800.0	/* 1970 - 1900 in seconds */
 
 #define ZBX_MAX_RECV_DATA_SIZE	(64 * ZBX_MEBIBYTE)
+
+/* max length of base64 data */
+#define ZBX_MAX_B64_LEN	(16 * ZBX_KIBIBYTE)
 
 double	zbx_time(void);
 void	zbx_timespec(zbx_timespec_t *ts);
@@ -948,6 +974,8 @@ double	time_diff(struct timeval *from, struct timeval *to);
 char	*zbx_age2str(int age);
 char	*zbx_date2str(time_t date);
 char	*zbx_time2str(time_t time);
+
+#define ZBX_NULL2STR(str)	(NULL != str ? str : "(null)")
 
 char	*zbx_strcasestr(const char *haystack, const char *needle);
 int	zbx_mismatch(const char *s1, const char *s2);

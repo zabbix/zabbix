@@ -29,9 +29,9 @@
 #define DEVICE_DIR	"/proc/sys/dev/sensors"
 #else
 #define DEVICE_DIR	"/sys/class/hwmon"
-#define EXTRA		"device"
-#define ATTR_MAX	128
 #endif
+
+#define ATTR_MAX	128
 
 static void	count_sensor(int do_task, const char *filename, double *aggr, int *cnt)
 {

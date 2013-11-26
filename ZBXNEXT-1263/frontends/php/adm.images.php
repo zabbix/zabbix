@@ -174,9 +174,9 @@ else {
 
 	$data['images'] = API::Image()->get(array(
 		'filter' => array('imagetype' => $data['imagetype']),
-		'output' => API_OUTPUT_EXTEND,
-		'sortfield' => 'name'
+		'output' => array('imageid', 'imagetype', 'name')
 	));
+	order_result($data['images'], 'name');
 
 	// nodes
 	if ($data['displayNodes']) {

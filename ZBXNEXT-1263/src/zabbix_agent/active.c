@@ -27,6 +27,7 @@
 #ifdef _WINDOWS
 #	include "eventlog.h"
 #	include "winmeta.h"
+#	include <delayimp.h>
 #endif
 #include "comms.h"
 #include "threads.h"
@@ -47,6 +48,40 @@ __declspec(thread) static zbx_vector_ptr_t	regexps;
 static ZBX_ACTIVE_METRIC	*active_metrics = NULL;
 static ZBX_ACTIVE_BUFFER	buffer;
 static zbx_vector_ptr_t		regexps;
+#endif
+
+#ifdef _WINDOWS
+LONG WINAPI	DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS excpointers)
+{
+	LONG		disposition = EXCEPTION_EXECUTE_HANDLER;
+	PDelayLoadInfo	delayloadinfo = (PDelayLoadInfo)(excpointers->ExceptionRecord->ExceptionInformation[0]);
+
+	switch (excpointers->ExceptionRecord->ExceptionCode)
+	{
+		case VcppException(ERROR_SEVERITY_ERROR, ERROR_MOD_NOT_FOUND):
+			zabbix_log(LOG_LEVEL_DEBUG, "function %s was not found in %s",
+					delayloadinfo->dlp.szProcName, delayloadinfo->szDll);
+			break;
+		case VcppException(ERROR_SEVERITY_ERROR, ERROR_PROC_NOT_FOUND):
+			if (delayloadinfo->dlp.fImportByName)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "function %s was not found in %sn",
+						delayloadinfo->dlp.szProcName, delayloadinfo->szDll);
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "function ordinal %d was not found in %sn",
+						delayloadinfo->dlp.dwOrdinal, delayloadinfo->szDll);
+			}
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_DEBUG, "unexpected exception [%08X] in process_eventlog()",
+					excpointers->ExceptionRecord->ExceptionCode);
+			disposition = EXCEPTION_CONTINUE_SEARCH;
+			break;
+	}
+	return(disposition);
+}
 #endif
 
 static void	init_active_metrics(void)
@@ -182,7 +217,9 @@ out:
  *                                                                            *
  * Purpose: Parse list of active checks received from server                  *
  *                                                                            *
- * Parameters: str - NULL terminated string received from server              *
+ * Parameters: str  - NULL terminated string received from server             *
+ *             host - address of host                                         *
+ *             port - port number on host                                     *
  *                                                                            *
  * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on an incorrect format of string                        *
@@ -196,11 +233,11 @@ out:
  *           <key>:<refresh time>:<last log size>:<modification time>         *
  *                                                                            *
  ******************************************************************************/
-static int	parse_list_of_checks(char *str)
+static int	parse_list_of_checks(char *str, const char *host, unsigned short port)
 {
 	const char		*p;
-	char			name[MAX_STRING_LEN], key_orig[MAX_STRING_LEN], expression[MAX_STRING_LEN], tmp[MAX_STRING_LEN],
-				exp_delimiter;
+	char			name[MAX_STRING_LEN], key_orig[MAX_STRING_LEN], expression[MAX_STRING_LEN],
+				tmp[MAX_STRING_LEN], exp_delimiter;
 	int			delay, mtime, expression_type, case_sensitive;
 	zbx_uint64_t		lastlogsize;
 	struct zbx_json_parse	jp;
@@ -219,7 +256,7 @@ static int	parse_list_of_checks(char *str)
 	if (0 != strcmp(tmp, ZBX_PROTO_VALUE_SUCCESS))
 	{
 		if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, tmp, sizeof(tmp)))
-			zabbix_log(LOG_LEVEL_WARNING, "no active checks on server: %s", tmp);
+			zabbix_log(LOG_LEVEL_WARNING, "no active checks on server [%s:%hu]: %s", host, port, tmp);
 		else
 			zabbix_log(LOG_LEVEL_WARNING, "no active checks on server");
 		return FAIL;
@@ -315,7 +352,8 @@ static int	parse_list_of_checks(char *str)
 
 			exp_delimiter = tmp[0];
 
-			if (SUCCEED != zbx_json_value_by_name(&jp_row, "case_sensitive", tmp, sizeof(tmp)) || '\0' == *tmp)
+			if (SUCCEED != zbx_json_value_by_name(&jp_row, "case_sensitive", tmp,
+					sizeof(tmp)) || '\0' == *tmp)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve value of tag \"%s\"", "case_sensitive");
 				continue;
@@ -444,7 +482,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 					zabbix_log(LOG_LEVEL_WARNING, "active check configuration update from [%s:%hu]"
 							" is working again", host, port);
 				}
-				parse_list_of_checks(buf);
+				parse_list_of_checks(buf, host, port);
 			}
 		}
 
@@ -666,10 +704,7 @@ ret:
  *             port        - port of Zabbix server                            *
  *             host        - name of host in Zabbix database                  *
  *             key         - name of metric                                   *
- *             value       - a reference to the string version of key value.  *
- *                           The value must be preallocated by caller.        *
- *                           If process_value() function stores value         *
- *                           then it sets value reference to NULL.            *
+ *             value       - key value                                        *
  *             lastlogsize - size of read logfile                             *
  *             mtime       - time of last file modification                   *
  *             timestamp   - timestamp of read value                          *
@@ -693,7 +728,7 @@ static int	process_value(
 		unsigned short	port,
 		const char	*host,
 		const char	*key,
-		char		**value,
+		const char	*value,
 		zbx_uint64_t	*lastlogsize,
 		int		*mtime,
 		unsigned long	*timestamp,
@@ -708,7 +743,7 @@ static int	process_value(
 	int				i, ret = FAIL;
 	size_t				sz;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s:%s' value:'%s'", __function_name, host, key, *value);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s:%s' value:'%s'", __function_name, host, key, value);
 
 	send_buffer(server, port);
 
@@ -764,10 +799,7 @@ static int	process_value(
 	memset(el, 0, sizeof(ZBX_ACTIVE_BUFFER_ELEMENT));
 	el->host = zbx_strdup(NULL, host);
 	el->key = zbx_strdup(NULL, key);
-
-	/* value is already allocated by caller, so we don't have to dup it */
-	el->value = *value;
-	*value = NULL;
+	el->value = (NULL == value) ? NULL : zbx_strdup(NULL, value);
 
 	if (NULL != source)
 		el->source = strdup(source);
@@ -813,9 +845,14 @@ static void	process_active_checks(char *server, unsigned short port)
 	unsigned long	timestamp, logeventid;
 	unsigned short	severity;
 	char		key_severity[MAX_STRING_LEN], str_severity[32] /* for `regex_match_ex' */;
-	char		key_source[MAX_STRING_LEN], *source = NULL;
+	char		key_source[MAX_STRING_LEN], *provider = NULL, *source = NULL;
 	char		key_logeventid[MAX_STRING_LEN], str_logeventid[8] /* for `regex_match_ex' */;
 	OSVERSIONINFO	versionInfo;
+	zbx_uint64_t	keywords;
+	EVT_HANDLE	eventlog6_render_context = NULL;
+	EVT_HANDLE	eventlog6_query = NULL;
+	zbx_uint64_t	eventlog6_firstid = 0;
+	zbx_uint64_t	eventlog6_lastid = 0;
 #endif
 	char		encoding[32];
 	char		tmp[16];
@@ -844,8 +881,11 @@ static void	process_active_checks(char *server, unsigned short port)
 			do
 			{
 				/* simple try realization */
-				if (ZBX_COMMAND_WITH_PARAMS != parse_command(active_metrics[i].key, NULL, 0, params, sizeof(params)))
+				if (ZBX_COMMAND_WITH_PARAMS != parse_command(active_metrics[i].key, NULL, 0,
+						params, sizeof(params)))
+				{
 					break;
+				}
 
 				if (6 < num_param(params))
 					break;
@@ -899,11 +939,13 @@ static void	process_active_checks(char *server, unsigned short port)
 							output_template, &item_value))
 					{
 						send_err = process_value(server, port, CONFIG_HOSTNAME,
-								active_metrics[i].key_orig, &item_value, &lastlogsize,
+								active_metrics[i].key_orig, item_value, &lastlogsize,
 								NULL, NULL, NULL, NULL,	NULL, 1);
+
+						zbx_free(item_value);
+
 						s_count++;
 					}
-					zbx_free(item_value);
 					p_count++;
 
 					zbx_free(value);
@@ -936,10 +978,8 @@ static void	process_active_checks(char *server, unsigned short port)
 				zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported",
 						active_metrics[i].key);
 
-				process_value(server, port, CONFIG_HOSTNAME,
-						active_metrics[i].key_orig, &item_value,
+				process_value(server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig, NULL,
 						&active_metrics[i].lastlogsize, NULL, NULL, NULL, NULL, NULL, 0);
-				zbx_free(item_value);
 			}
 		}
 		/* special processing for log files with rotation */
@@ -950,8 +990,11 @@ static void	process_active_checks(char *server, unsigned short port)
 			do
 			{
 				/* simple try realization */
-				if (ZBX_COMMAND_WITH_PARAMS != parse_command(active_metrics[i].key, NULL, 0, params, sizeof(params)))
+				if (ZBX_COMMAND_WITH_PARAMS != parse_command(active_metrics[i].key, NULL, 0,
+						params, sizeof(params)))
+				{
 					break;
+				}
 
 				if (6 < num_param(params))
 					break;
@@ -990,8 +1033,8 @@ static void	process_active_checks(char *server, unsigned short port)
 				lastlogsize = active_metrics[i].lastlogsize;
 				mtime = active_metrics[i].mtime;
 
-				while (SUCCEED == (ret = process_logrt(filename, &lastlogsize, &mtime, &value, encoding,
-						active_metrics[i].skip_old_data)))
+				while (SUCCEED == (ret = process_logrt(filename, &lastlogsize, &mtime, &value,
+						encoding, active_metrics[i].skip_old_data)))
 				{
 					active_metrics[i].skip_old_data = 0;
 
@@ -1008,11 +1051,13 @@ static void	process_active_checks(char *server, unsigned short port)
 							output_template, &item_value))
 					{
 						send_err = process_value(server, port, CONFIG_HOSTNAME,
-								active_metrics[i].key_orig, &item_value, &lastlogsize,
+								active_metrics[i].key_orig, item_value, &lastlogsize,
 								&mtime, NULL, NULL, NULL, NULL, 1);
+
+						zbx_free(item_value);
+
 						s_count++;
 					}
-					zbx_free(item_value);
 					p_count++;
 
 					zbx_free(value);
@@ -1024,7 +1069,7 @@ static void	process_active_checks(char *server, unsigned short port)
 					}
 					else
 					{
-						/* buffer is full, stop processing active checks*/
+						/* buffer is full, stop processing active checks */
 						/* till the buffer is cleared */
 						lastlogsize = active_metrics[i].lastlogsize;
 						mtime = active_metrics[i].mtime;
@@ -1048,11 +1093,9 @@ static void	process_active_checks(char *server, unsigned short port)
 				zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported",
 						active_metrics[i].key);
 
-				process_value(server, port, CONFIG_HOSTNAME,
-						active_metrics[i].key_orig, &item_value,
+				process_value(server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig, NULL,
 						&active_metrics[i].lastlogsize, &active_metrics[i].mtime,
 						NULL, NULL, NULL, NULL, 0);
-				zbx_free(item_value);
 			}
 		}
 		/* special processing for eventlog */
@@ -1063,8 +1106,11 @@ static void	process_active_checks(char *server, unsigned short port)
 			do
 			{
 				/* simple try realization */
-				if (ZBX_COMMAND_WITH_PARAMS != parse_command(active_metrics[i].key, NULL, 0, params, sizeof(params)))
+				if (ZBX_COMMAND_WITH_PARAMS != parse_command(active_metrics[i].key, NULL, 0,
+						params, sizeof(params)))
+				{
 					break;
+				}
 
 				if (7 < num_param(params))
 					break;
@@ -1103,116 +1149,207 @@ static void	process_active_checks(char *server, unsigned short port)
 				p_count = 0;
 				lastlogsize = active_metrics[i].lastlogsize;
 
-				while (SUCCEED == (ret = process_eventlog(filename, &lastlogsize,
-						&timestamp, &source, &severity, &value, &logeventid,
-						active_metrics[i].skip_old_data)))
-				{
-					active_metrics[i].skip_old_data = 0;
+				versionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+				GetVersionEx(&versionInfo);
 
-					/* End of file. The eventlog could become empty, must save `lastlogsize'. */
-					if (NULL == value)
+				if (versionInfo.dwMajorVersion >= 6)	/* Windows Vista, 7 or Server 2008 */
+				{
+					__try
 					{
-						active_metrics[i].lastlogsize = lastlogsize;
+						if (SUCCEED != initialize_eventlog6(filename, &lastlogsize,
+								&eventlog6_firstid, &eventlog6_lastid,
+								&eventlog6_render_context, &eventlog6_query))
+						{
+							finalize_eventlog6(&eventlog6_render_context, &eventlog6_query);
+							break;
+						}
+
+						while (SUCCEED == (ret = process_eventlog6(filename, &lastlogsize,
+								&timestamp, &provider, &source, &severity, &value,
+								&logeventid, &eventlog6_firstid, &eventlog6_lastid,
+								&eventlog6_render_context, &eventlog6_query,
+								&keywords, active_metrics[i].skip_old_data)))
+						{
+							active_metrics[i].skip_old_data = 0;
+
+							/* End of file. */
+							/* The eventlog could become empty, must save `lastlogsize'. */
+							if (NULL == value)
+							{
+								active_metrics[i].lastlogsize = lastlogsize;
+								break;
+							}
+
+							switch (severity)
+							{
+								case WINEVENT_LEVEL_LOG_ALWAYS:
+								case WINEVENT_LEVEL_INFO:
+									if (0 != (keywords &
+											WINEVENT_KEYWORD_AUDIT_FAILURE))
+									{
+										severity = ITEM_LOGTYPE_FAILURE_AUDIT;
+										strscpy(str_severity, AUDIT_FAILURE);
+										break;
+									}
+									else if (0 != (keywords &
+											WINEVENT_KEYWORD_AUDIT_SUCCESS))
+									{
+										severity = ITEM_LOGTYPE_SUCCESS_AUDIT;
+										strscpy(str_severity, AUDIT_SUCCESS);
+										break;
+									}
+									else
+										severity = ITEM_LOGTYPE_INFORMATION;
+										strscpy(str_severity, INFORMATION_TYPE);
+										break;
+								case WINEVENT_LEVEL_WARNING:
+									severity = ITEM_LOGTYPE_WARNING;
+									strscpy(str_severity, WARNING_TYPE);
+									break;
+								case WINEVENT_LEVEL_ERROR:
+									severity = ITEM_LOGTYPE_ERROR;
+									strscpy(str_severity, ERROR_TYPE);
+									break;
+								case WINEVENT_LEVEL_CRITICAL:
+									severity = ITEM_LOGTYPE_CRITICAL;
+									strscpy(str_severity, CRITICAL_TYPE);
+									break;
+								case WINEVENT_LEVEL_VERBOSE:
+									severity = ITEM_LOGTYPE_VERBOSE;
+									strscpy(str_severity, VERBOSE_TYPE);
+									break;
+							}
+
+							zbx_snprintf(str_logeventid, sizeof(str_logeventid), "%lu",
+									logeventid);
+
+							if (SUCCEED == regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE) &&
+								SUCCEED == regexp_match_ex(&regexps, str_severity, key_severity,
+										ZBX_IGNORE_CASE) &&
+								SUCCEED == regexp_match_ex(&regexps, provider, key_source,
+										ZBX_IGNORE_CASE) &&
+								SUCCEED == regexp_match_ex(&regexps, str_logeventid,
+										key_logeventid, ZBX_CASE_SENSITIVE))
+							{
+								send_err = process_value(server, port, CONFIG_HOSTNAME,
+										active_metrics[i].key_orig, value, &lastlogsize,
+										NULL, &timestamp, provider, &severity, &logeventid, 1);
+								s_count++;
+							}
+							p_count++;
+
+							zbx_free(source);
+							zbx_free(provider);
+							zbx_free(value);
+
+							if (SUCCEED == send_err)
+								active_metrics[i].lastlogsize = lastlogsize;
+							else
+							{
+								/* buffer is full, stop processing active checks*/
+								/* till the buffer is cleared */
+								lastlogsize = active_metrics[i].lastlogsize;
+								goto ret;
+							}
+
+							/* do not flood Zabbix server if file grows too fast */
+							if (s_count >= (maxlines_persec * active_metrics[i].refresh))
+								break;
+
+							/* do not flood local system if file grows too fast */
+							if (p_count >= (4 * maxlines_persec * active_metrics[i].refresh))
+								break;
+
+						} /* while processing an eventlog */
+
+						finalize_eventlog6(&eventlog6_render_context, &eventlog6_query);
+					}
+					__except (DelayLoadDllExceptionFilter(GetExceptionInformation()))
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "failed to process eventlog");
 						break;
 					}
-
-					versionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-					GetVersionEx(&versionInfo);
-
-					if (versionInfo.dwMajorVersion >= 6)    /* Windows Vista, Windows 7 or Windows Server 2008 */
+				}
+				else if (versionInfo.dwMajorVersion < 6)    /* Windows versions before Vista */
+				{
+					while (SUCCEED == (ret = process_eventlog(filename, &lastlogsize,
+							&timestamp, &source, &severity, &value, &logeventid,
+							active_metrics[i].skip_old_data)))
 					{
-						switch (severity)
+						active_metrics[i].skip_old_data = 0;
+
+						/* End of file. */
+						/* The eventlog could become empty, must save `lastlogsize'. */
+						if (NULL == value)
 						{
-							case WINEVENT_LEVEL_LOG_ALWAYS:
-							case WINEVENT_LEVEL_INFO:
-								severity = ITEM_LOGTYPE_INFORMATION;
-								zbx_snprintf(str_severity, sizeof(str_severity), INFORMATION_TYPE);
-								break;
-							case WINEVENT_LEVEL_WARNING:
-								severity = ITEM_LOGTYPE_WARNING;
-								zbx_snprintf(str_severity, sizeof(str_severity), WARNING_TYPE);
-								break;
-							case WINEVENT_LEVEL_ERROR:
-								severity = ITEM_LOGTYPE_ERROR;
-								zbx_snprintf(str_severity, sizeof(str_severity), ERROR_TYPE);
-								break;
-							case WINEVENT_LEVEL_CRITICAL:
-								severity = ITEM_LOGTYPE_CRITICAL;
-								zbx_snprintf(str_severity, sizeof(str_severity), CRITICAL_TYPE);
-								break;
-							case WINEVENT_LEVEL_VERBOSE:
-								severity = ITEM_LOGTYPE_VERBOSE;
-								zbx_snprintf(str_severity, sizeof(str_severity), VERBOSE_TYPE);
-								break;
+							active_metrics[i].lastlogsize = lastlogsize;
+							break;
 						}
-					}
-					else
-					{
+
 						switch (severity)
 						{
 							case EVENTLOG_SUCCESS:
 							case EVENTLOG_INFORMATION_TYPE:
 								severity = ITEM_LOGTYPE_INFORMATION;
-								zbx_snprintf(str_severity, sizeof(str_severity), INFORMATION_TYPE);
+								strscpy(str_severity, INFORMATION_TYPE);
 								break;
 							case EVENTLOG_WARNING_TYPE:
 								severity = ITEM_LOGTYPE_WARNING;
-								zbx_snprintf(str_severity, sizeof(str_severity), WARNING_TYPE);
+								strscpy(str_severity, WARNING_TYPE);
 								break;
 							case EVENTLOG_ERROR_TYPE:
 								severity = ITEM_LOGTYPE_ERROR;
-								zbx_snprintf(str_severity, sizeof(str_severity), ERROR_TYPE);
+								strscpy(str_severity, ERROR_TYPE);
 								break;
 							case EVENTLOG_AUDIT_FAILURE:
 								severity = ITEM_LOGTYPE_FAILURE_AUDIT;
-								zbx_snprintf(str_severity, sizeof(str_severity), AUDIT_FAILURE);
+								strscpy(str_severity, AUDIT_FAILURE);
 								break;
 							case EVENTLOG_AUDIT_SUCCESS:
 								severity = ITEM_LOGTYPE_SUCCESS_AUDIT;
-								zbx_snprintf(str_severity, sizeof(str_severity), AUDIT_SUCCESS);
+								strscpy(str_severity, AUDIT_SUCCESS);
 								break;
 						}
-					}
-					zbx_snprintf(str_logeventid, sizeof(str_logeventid), "%lu", logeventid);
 
-					if (SUCCEED == regexp_sub_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE,
-									output_template, &item_value) &&
-							SUCCEED == regexp_match_ex(&regexps, str_severity, key_severity,
-									ZBX_IGNORE_CASE) &&
-							(('\0' == *key_source) ? 1 : (0 == strcmp(key_source, source))) &&
-							SUCCEED == regexp_match_ex(&regexps, str_logeventid,
-									key_logeventid, ZBX_CASE_SENSITIVE))
-					{
-						send_err = process_value(server, port, CONFIG_HOSTNAME,
-								active_metrics[i].key_orig, &item_value, &lastlogsize,
-								NULL, &timestamp, source, &severity, &logeventid, 1);
-						s_count++;
-					}
-					zbx_free(item_value);
-					p_count++;
+						zbx_snprintf(str_logeventid, sizeof(str_logeventid), "%lu", logeventid);
 
-					zbx_free(source);
-					zbx_free(value);
+						if (SUCCEED == regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE) &&
+								SUCCEED == regexp_match_ex(&regexps, str_severity, key_severity,
+										ZBX_IGNORE_CASE) &&
+								SUCCEED == regexp_match_ex(&regexps, source, key_source,
+										ZBX_IGNORE_CASE) &&
+								SUCCEED == regexp_match_ex(&regexps, str_logeventid,
+										key_logeventid, ZBX_CASE_SENSITIVE))
+						{
+							send_err = process_value(server, port, CONFIG_HOSTNAME,
+									active_metrics[i].key_orig, value, &lastlogsize,
+									NULL, &timestamp, source, &severity, &logeventid, 1);
+							s_count++;
+						}
+						p_count++;
 
-					if (SUCCEED == send_err)
-						active_metrics[i].lastlogsize = lastlogsize;
-					else
-					{
-						/* buffer is full, stop processing active checks*/
-						/* till the buffer is cleared */
-						lastlogsize = active_metrics[i].lastlogsize;
-						goto ret;
-					}
+						zbx_free(source);
+						zbx_free(value);
 
-					/* do not flood Zabbix server if file grows too fast */
-					if (s_count >= (maxlines_persec * active_metrics[i].refresh))
-						break;
+						if (SUCCEED == send_err)
+							active_metrics[i].lastlogsize = lastlogsize;
+						else
+						{
+							/* buffer is full, stop processing active checks */
+							/* till the buffer is cleared */
+							lastlogsize = active_metrics[i].lastlogsize;
+							goto ret;
+						}
 
-					/* do not flood local system if file grows too fast */
-					if (p_count >= (4 * maxlines_persec * active_metrics[i].refresh))
-						break;
-				} /* while processing an eventlog */
+						/* do not flood Zabbix server if file grows too fast */
+						if (s_count >= (maxlines_persec * active_metrics[i].refresh))
+							break;
 
+						/* do not flood local system if file grows too fast */
+						if (p_count >= (4 * maxlines_persec * active_metrics[i].refresh))
+							break;
+					} /* while processing an eventlog */
+				}
 				break;
 			}
 			while (0); /* simple try realization */
@@ -1224,10 +1361,8 @@ static void	process_active_checks(char *server, unsigned short port)
 				zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported",
 						active_metrics[i].key);
 
-				process_value(server, port, CONFIG_HOSTNAME,
-						active_metrics[i].key_orig, &item_value,
+				process_value(server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig, NULL,
 						&active_metrics[i].lastlogsize, NULL, NULL, NULL, NULL, NULL, 0);
-				zbx_free(item_value);
 			}
 		}
 		else
@@ -1239,12 +1374,10 @@ static void	process_active_checks(char *server, unsigned short port)
 
 			if (NULL != pvalue)
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "for key [%s] received value [%s]", active_metrics[i].key, *pvalue);
-				item_value = zbx_strdup(NULL, *pvalue);
-				process_value(server, port, CONFIG_HOSTNAME,
-						active_metrics[i].key_orig, &item_value, NULL,
+				zabbix_log(LOG_LEVEL_DEBUG, "for key [%s] received value [%s]", active_metrics[i].key,
+						*pvalue);
+				process_value(server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig, *pvalue, NULL,
 						NULL, NULL, NULL, NULL, NULL, 0);
-				zbx_free(item_value);
 
 				if (0 == strcmp(*pvalue, ZBX_NOTSUPPORTED))
 				{
@@ -1266,12 +1399,15 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 {
 	ZBX_THREAD_ACTIVECHK_ARGS activechk_args;
 
-	int	nextcheck = 0, nextrefresh = 0, nextsend = 0;
+	int	nextcheck = 0, nextrefresh = 0, nextsend = 0, thread_num, thread_num2;
 
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
 
-	zabbix_log(LOG_LEVEL_WARNING, "agent #%d started [active checks]", ((zbx_thread_args_t *)args)->thread_num);
+	thread_num = ((zbx_thread_args_t *)args)->thread_num;
+	thread_num2 = ((zbx_thread_args_t *)args)->thread_num2;
+
+	zabbix_log(LOG_LEVEL_WARNING, "agent #%d started [active checks #%d]", thread_num, thread_num2);
 
 	activechk_args.host = zbx_strdup(NULL, ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->host);
 	activechk_args.port = ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->port;
@@ -1290,7 +1426,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 		if (time(NULL) >= nextrefresh)
 		{
-			zbx_setproctitle("poller [getting list of active checks]");
+			zbx_setproctitle("active checks #%d [getting list of active checks]", thread_num2);
 
 			if (FAIL == refresh_active_checks(activechk_args.host, activechk_args.port))
 			{
@@ -1304,7 +1440,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 		if (time(NULL) >= nextcheck && CONFIG_BUFFER_SIZE / 2 > buffer.pcount)
 		{
-			zbx_setproctitle("poller [processing active checks]");
+			zbx_setproctitle("active checks #%d [processing active checks]", thread_num2);
 
 			process_active_checks(activechk_args.host, activechk_args.port);
 			if (CONFIG_BUFFER_SIZE / 2 <= buffer.pcount)	/* failed to complete processing active checks */
@@ -1316,8 +1452,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "sleeping for %d second(s)", 1);
-			zbx_setproctitle("poller [sleeping for %d second(s)]", 1);
+			zbx_setproctitle("active checks #%d [idle 1 sec]", thread_num2);
 			zbx_sleep(1);
 		}
 	}
@@ -1333,3 +1468,4 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	zbx_thread_exit(0);
 #endif
 }
+

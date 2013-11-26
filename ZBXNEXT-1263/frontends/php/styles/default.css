@@ -134,6 +134,8 @@ a.weight_normal { font-weight: normal; }
 .underline:visited { text-decoration: underline; }
 .underline:hover { text-decoration: underline; }
 
+.parent-discovery, a.parent-discovery, a.parent-discovery:hover	{ color: #999900; }
+
 /* form */
 fieldset { margin: 0 0 2px 0; padding: 2px; border: 1px solid gray; }
 fieldset legend { margin: 0.2em 0.5em; }
@@ -150,7 +152,7 @@ form { margin: 0; }
 .input[disabled]:hover { text-decoration: none; border-color: #ACA899; }
 .input option { color: #000000; }
 .select {
-	margin: 0 2px 0 0; height: 14px; line-height: 14px;
+	margin: 0 2px 0 0; height: 14px; line-height: 14px; max-width: 314px;
 	-moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box;
 }
 select[multiple="multiple"], select.openView { height: auto; }
@@ -164,13 +166,11 @@ input[type="submit"].formlist { vertical-align: top; margin-bottom: 1px; cursor:
 input[type="button"].input[disabled].formlist,
 input[type="submit"].input[disabled].formlist { cursor: default; }
 input.jqueryinput,
-input.jqueryinput,
 .jqueryinputset input[type="button"],
 .jqueryinputset input[type="submit"] { height: auto; }
 textarea.textarea_standard,
 textarea.textarea_big { height: auto; }
 
-.selectShorten { width: 200px; }
 .radio { margin: 2px 2px 2px 0; vertical-align: top; }
 .checkbox { padding: 0; border: 0; }
 .formrow .listInfoLabel { vertical-align: middle; display: table-cell; height: 100%; }
@@ -250,6 +250,7 @@ ul.messages li.error { color: #D40000; list-style: url("../images/general/error3
 
 /* drag & drop */
 .draggable { cursor: move; }
+.ui-draggable-dragging { opacity: 0.6; -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=60)"; }
 .dragHelpText { display: none; }
 
 /* subfilter buttons */
@@ -385,10 +386,11 @@ table.ack_msgs tr.msg td { padding: 5px; text-align: left; vertical-align: top; 
 table.right_table { border-width: 0; margin: 0; padding: 0; }
 table.right_table tr.header td { font-weight: bold; text-align: left; }
 table.right_table td { margin: 0; padding: 0; text-align: left; white-space: nowrap; word-spacing: 0; }
-table.right_table select { width: 200px; }
-table.right_table tr td.read_write select { color: #008800; width: 250px; }
-table.right_table tr td.read_only select { color: #CC8800; width: 250px; }
-table.right_table tr td.deny select { color: #CC0000; width: 250px; }
+table.right_table select { width: 250px; }
+table.right_table.calculated select { background: #EBEFF2; }
+table.right_table .read_write option { color: #008800; }
+table.right_table .read_only option { color: #CC8800; }
+table.right_table .deny option { color: #CC0000; }
 
 /* graph */
 table.graph { width: 100%; text-align: center; }
@@ -476,10 +478,14 @@ table.header_wide tr.next td.header_l { background: none; text-align: left; heig
 table.header_wide tr.next td.header_r { background: none; text-align: right; height: 20px; padding-right: 5px; border-width: 0; }
 
 /* suggest */
+div.suggest { position: absolute; border: 1px #AAA solid; border-top: 0; width: 164px; z-index: 100; display: none;
+	-webkit-box-shadow: 0 4px 5px rgba(0, 0, 0, 0.15); -moz-box-shadow: 0 4px 5px rgba(0, 0, 0, 0.15);
+	box-shadow: 0 4px 5px rgba(0, 0, 0, 0.15);
+}
 table.suggest { width: 100%; margin: 0; border-spacing: 0; background-color: #FEFEFE; }
 table.suggest tr { background-color: #FEFEFE; }
-table.suggest tr.highlight { background-color: #AACCFF; }
-table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; font-size: 1.1em; cursor: default; }
+table.suggest tr.highlight { background-color: #7A9FC1; color: #FFF; }
+table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; font-size: 1.1em; cursor: pointer; }
 
 /* flash clock */
 .flashclock {
@@ -498,9 +504,6 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 }
 #color_picker table tr td { margin: 0; padding: 2px; }
 #color_picker a { text-decoration: none; padding: 0; margin: 0; }
-
-/* suggest */
-div.suggest { position: absolute; border: 1px #5C7099 solid; width: 162px; z-index: 100; display: none; }
 
 /* flickerfreescreen */
 .flickerfreescreen .shadow { background-color: #000000; }

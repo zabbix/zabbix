@@ -182,7 +182,7 @@ typedef struct
 }
 zbx_host_key_t;
 
-/* housekeeping related configuration data*/
+/* housekeeping related configuration data */
 typedef struct
 {
 	int		events_trigger;
@@ -267,7 +267,7 @@ void	*DCget_stats(int request);
 
 zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 
-void	DCsync_configuration();
+void	DCsync_configuration(void);
 void	init_configuration_cache();
 void	free_configuration_cache();
 void	DCload_config();
@@ -282,7 +282,8 @@ void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions,
 void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num);
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, char **errors, int item_num);
-void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_t *trigger_order, int process_num);
+void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_t *trigger_order, int process_num,
+			int *trigger_count);
 void	DCfree_triggers(zbx_vector_ptr_t *triggers);
 int	DCconfig_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid, unsigned char type);
 int	DCconfig_get_poller_nextcheck(unsigned char poller_type);
@@ -325,7 +326,11 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck);
 
 void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, char **replace_to);
 
-int	DCconfig_update_host_availability(const zbx_host_availability_t *availability, int availability_num);
+int	DChost_activate(zbx_host_availability_t *in, zbx_host_availability_t *out);
+
+int	DChost_deactivate(zbx_timespec_t *ts, zbx_host_availability_t *in, zbx_host_availability_t *out);
+
+void	DChost_update_availability(const zbx_host_availability_t *availability, int availability_num);
 
 void	DCget_delta_items(zbx_hashset_t *items, const zbx_vector_uint64_t *ids);
 void	DCset_delta_items(zbx_hashset_t *items);
@@ -344,5 +349,6 @@ void	DCget_functions_hostids(zbx_vector_uint64_t *hosts, const zbx_vector_uint64
 void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * const *names, int names_num);
 void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name);
 
-int	DCget_item_time_added(zbx_uint64_t itemid, int *time_added);
+int	DCget_data_expected_from(zbx_uint64_t itemid, int *seconds);
+
 #endif

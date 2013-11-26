@@ -48,7 +48,7 @@ $fields = array(
 	'show_severity' =>		array(T_ZBX_INT, O_OPT, P_SYS,	null,		null),
 	'show_details' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'show_maintenance' =>	array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'status_change_days' =>	array(T_ZBX_INT, O_OPT, null,	null,		null),
+	'status_change_days' =>	array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, DAY_IN_YEAR * 2), null),
 	'status_change' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'txt_select' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// ajax
@@ -185,10 +185,20 @@ else {
 
 // status change days
 if (isset($_REQUEST['status_change_days'])) {
+	$maxDays = DAY_IN_YEAR * 2;
+
+	if ($_REQUEST['status_change_days'] > $maxDays) {
+		$_REQUEST['status_change_days'] = $maxDays;
+	}
+
 	CProfile::update('web.tr_status.filter.status_change_days', $_REQUEST['status_change_days'], PROFILE_TYPE_INT);
 }
 else {
-	$_REQUEST['status_change_days'] = CProfile::get('web.tr_status.filter.status_change_days', 14);
+	$_REQUEST['status_change_days'] = CProfile::get('web.tr_status.filter.status_change_days');
+
+	if (!$_REQUEST['status_change_days']) {
+		$_REQUEST['status_change_days'] = 14;
+	}
 }
 
 // ack status
@@ -299,7 +309,7 @@ $severityComboBox->addItems(array(
 ));
 $filterForm->addRow(_('Minimum trigger severity'), $severityComboBox);
 
-$statusChangeDays = new CNumericBox('status_change_days', $_REQUEST['status_change_days'], 4, false, false, false);
+$statusChangeDays = new CNumericBox('status_change_days', $_REQUEST['status_change_days'], 3, false, false, false);
 if (!$_REQUEST['status_change']) {
 	$statusChangeDays->setAttribute('disabled', 'disabled');
 }
@@ -352,7 +362,7 @@ else {
 	$showHideAllDiv = null;
 }
 
-$triggerTable = new CTableInfo(_('No triggers defined.'));
+$triggerTable = new CTableInfo(_('No triggers found.'));
 $triggerTable->setHeader(array(
 	$showHideAllDiv,
 	$config['event_ack_enable'] ? $headerCheckBox : null,
@@ -423,7 +433,7 @@ $options = array(
 	'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 	'output' => API_OUTPUT_EXTEND,
 	'selectHosts' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid', 'description'),
-	'selectItems' => API_OUTPUT_EXTEND,
+	'selectItems' => array('itemid', 'hostid', 'key_', 'name', 'value_type'),
 	'selectDependencies' => API_OUTPUT_EXTEND,
 	'selectLastEvent' => true,
 	'expandDescription' => true,
@@ -447,14 +457,15 @@ $triggerEditable = API::Trigger()->get(array(
 if ($config['event_ack_enable']) {
 	// get all unacknowledged events, if trigger has unacknowledged even => it has events
 	$eventCounts = API::Event()->get(array(
+		'source' => EVENT_SOURCE_TRIGGERS,
+		'object' => EVENT_OBJECT_TRIGGER,
 		'countOutput' => true,
 		'groupCount' => true,
 		'objectids' => $triggerIds,
 		'filter' => array(
 			'acknowledged' => 0,
 			'value' => TRIGGER_VALUE_TRUE
-		),
-		'nopermissions' => true
+		)
 	));
 	foreach ($eventCounts as $eventCount) {
 		$triggers[$eventCount['objectid']]['hasEvents'] = true;
@@ -474,10 +485,11 @@ if ($config['event_ack_enable']) {
 	if (!empty($triggerIdsWithoutUnackEvents)) {
 		// for triggers without unack. events we try to select any event
 		$allEventCounts = API::Event()->get(array(
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
 			'countOutput' => true,
 			'groupCount' => true,
-			'objectids' => $triggerIdsWithoutUnackEvents,
-			'nopermissions' => true
+			'objectids' => $triggerIdsWithoutUnackEvents
 		));
 		$allEventCounts = zbx_toHash($allEventCounts, 'objectid');
 
@@ -491,13 +503,16 @@ if ($config['event_ack_enable']) {
 
 if ($showEvents != EVENTS_OPTION_NOEVENT) {
 	$options = array(
+		'source' => EVENT_SOURCE_TRIGGERS,
+		'object' => EVENT_OBJECT_TRIGGER,
 		'nodeids' => get_current_nodeid(),
 		'objectids' => zbx_objectValues($triggers, 'triggerid'),
 		'output' => API_OUTPUT_EXTEND,
 		'select_acknowledges' => API_OUTPUT_COUNT,
 		'time_from' => time() - $config['event_expire'] * SEC_PER_DAY,
 		'time_till' => time(),
-		'nopermissions' => true
+		'sortfield' => array('clock', 'eventid'),
+		'sortorder' => ZBX_SORT_DOWN
 	);
 
 	switch ($showEvents) {
@@ -509,11 +524,6 @@ if ($showEvents != EVENTS_OPTION_NOEVENT) {
 			break;
 	}
 	$events = API::Event()->get($options);
-
-	CArrayHelper::sort($events, array(
-		array('field' => 'clock', 'order' => ZBX_SORT_DOWN),
-		array('field' => 'eventid', 'order' => ZBX_SORT_DOWN)
-	));
 
 	foreach ($events as $event) {
 		$triggers[$event['objectid']]['events'][] = $event;
@@ -559,7 +569,7 @@ foreach ($triggers as $trigger) {
 	$triggerItems = array();
 
 	foreach ($trigger['items'] as $item) {
-		$itemName = htmlspecialchars(itemName($item));
+		$itemName = itemName($item);
 
 		// if we have items from different hosts, we must prefix a host name
 		if ($usedHostCount > 1) {
@@ -580,11 +590,7 @@ foreach ($triggers as $trigger) {
 	$description->setMenuPopup(getMenuPopupTrigger($trigger, $triggerItems));
 
 	if ($_REQUEST['show_details']) {
-		$font = new CTag('font', 'yes');
-		$font->setAttribute('color', '#000');
-		$font->setAttribute('size', '-2');
-		$font->addItem(explode_exp($trigger['expression'], true, true));
-		$description = array($description, BR(), $font);
+		$description = array($description, BR(), explode_exp($trigger['expression'], true, true));
 	}
 
 	if (!empty($trigger['dependencies'])) {

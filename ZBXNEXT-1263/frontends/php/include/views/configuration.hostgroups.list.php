@@ -53,7 +53,7 @@ foreach ($this->data['groups'] as $hostGroup) {
 }
 
 // create table
-$hostGroupTable = new CTableInfo(_('No host groups defined.'));
+$hostGroupTable = new CTableInfo(_('No host groups found.'));
 $hostGroupTable->setHeader(array(
 	new CCheckBox('all_groups', null, "checkAll('".$hostGroupForm->getName()."', 'all_groups', 'groups');"),
 	$this->data['displayNodes'] ? _('Node') : null,
@@ -121,7 +121,7 @@ foreach ($this->data['groups'] as $group) {
 	// name
 	$name = array();
 	if ($group['discoveryRule']) {
-		$name[] = new CLink($group['discoveryRule']['name'], 'host_prototypes.php?parent_discoveryid='.$group['discoveryRule']['itemid'], 'gold');
+		$name[] = new CLink($group['discoveryRule']['name'], 'host_prototypes.php?parent_discoveryid='.$group['discoveryRule']['itemid'], 'parent-discovery');
 		$name[] = NAME_DELIMITER;
 	}
 	$name[] = new CLink($group['name'], 'hostgroups.php?form=update&groupid='.$group['groupid']);

@@ -21,16 +21,13 @@
 
 /************ REQUEST ************/
 function redirect($url) {
-	zbx_flush_post_cookies();
 	$curl = new Curl($url);
 	$curl->setArgument('sid', null);
 	header('Location: '.$curl->getUrl());
-	exit();
+	exit;
 }
 
 function jsRedirect($url, $timeout = null) {
-	zbx_flush_post_cookies();
-
 	$script = is_numeric($timeout)
 		? 'setTimeout(\'window.location="'.$url.'"\', '.($timeout * 1000).')'
 		: 'window.location.replace("'.$url.'");';
@@ -100,35 +97,13 @@ function get_cookie($name, $default_value = null) {
 }
 
 function zbx_setcookie($name, $value, $time = null) {
-	setcookie($name, $value, isset($time) ? $time : 0);
+	setcookie($name, $value, isset($time) ? $time : 0, null, null, HTTPS);
 	$_COOKIE[$name] = $value;
 }
 
 function zbx_unsetcookie($name) {
 	zbx_setcookie($name, null, -99999);
 	unset($_COOKIE[$name]);
-}
-
-function zbx_flush_post_cookies($unset = false) {
-	global $ZBX_PAGE_COOKIES;
-
-	if (isset($ZBX_PAGE_COOKIES)) {
-		foreach ($ZBX_PAGE_COOKIES as $cookie) {
-			if ($unset) {
-				zbx_unsetcookie($cookie[0]);
-			}
-			else {
-				zbx_setcookie($cookie[0], $cookie[1], $cookie[2]);
-			}
-		}
-		unset($ZBX_PAGE_COOKIES);
-	}
-}
-
-function zbx_set_post_cookie($name, $value, $time = null) {
-	global $ZBX_PAGE_COOKIES;
-
-	$ZBX_PAGE_COOKIES[] = array($name, $value, isset($time) ? $time : 0);
 }
 
 /************* DATE *************/
@@ -326,7 +301,7 @@ function zbxDateToTime($strdate) {
 		return mktime($hours, $minutes, 0, $month, $date, $year);
 	}
 	else {
-		return (!empty($strdate) && is_numeric($strdate)) ? $strdate : time();
+		return ($strdate && is_numeric($strdate)) ? $strdate : time();
 	}
 }
 
@@ -2080,7 +2055,6 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 	}
 	// deny access to a page
 	else {
-
 		// url to redirect the user to after he loggs in
 		$url = new CUrl(!empty($_REQUEST['request']) ? $_REQUEST['request'] : '');
 		$url->setArgument('sid', null);
@@ -2490,9 +2464,12 @@ function get_status() {
 	// hosts
 	$dbHosts = DBselect(
 		'SELECT COUNT(*) AS cnt,h.status'.
-				' FROM hosts h'.
-				' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.' )'.
-				' GROUP BY h.status');
+		' FROM hosts h'.
+		' WHERE '.dbConditionInt('h.status', array(
+				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE
+			)).
+			' AND '.dbConditionInt('h.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
+		' GROUP BY h.status');
 	while ($dbHost = DBfetch($dbHosts)) {
 		switch ($dbHost['status']) {
 			case HOST_STATUS_MONITORED:
@@ -2687,7 +2664,7 @@ function getMenuPopupHost(array $host, array $scripts = null, $hasGoTo = true) {
 }
 
 /**
- * Prepare data for host menu popup.
+ * Prepare data for map menu popup.
  *
  * @param string $hostId					host id
  * @param array  $scripts					host scripts (optional)

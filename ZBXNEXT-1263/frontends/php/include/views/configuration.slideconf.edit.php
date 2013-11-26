@@ -41,7 +41,7 @@ $slideFormList->addRow(_('Name'), $nameTextBox);
 $slideFormList->addRow(_('Default delay (in seconds)'), new CNumericBox('delay', $this->data['delay'], 5, 'no', false, false));
 
 // append slide table
-$slideTable = new CTableInfo(_('No slides defined.'), 'formElementTable');
+$slideTable = new CTableInfo(null, 'formElementTable');
 $slideTable->setAttribute('style', 'min-width: 312px;');
 $slideTable->setAttribute('id', 'slideTable');
 $slideTable->setHeader(array(
@@ -114,7 +114,7 @@ else {
 		new CSubmit('save', _('Save')),
 		array(
 			new CSubmit('clone', _('Clone')),
-			new CButtonDelete(_('Delete slide show?'), url_param('form').url_param('slideshowid').url_param('config')),
+			new CButtonDelete(_('Delete slide show?'), url_params(array('form', 'slideshowid'))),
 			new CButtonCancel()
 		)
 	));

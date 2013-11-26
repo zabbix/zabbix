@@ -20,83 +20,16 @@
 
 require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
-define('HOUSEKEEPER_GOOD', 0);
-define('HOUSEKEEPER_BAD', 1);
-
 class testFormAdministrationGeneralHousekeeper extends CWebTest {
 
-	// Returns layout data
-	public static function layout() {
-		return array(
-			array(
-				array('hk_events_mode' => 'unchecked')
-			),
-			array(
-				array('hk_services_mode' => 'unchecked')
-			),
-			array(
-				array('hk_audit_mode' => 'unchecked')
-			),
-			array(
-				array('hk_sessions_mode' => 'unchecked')
-			),
-			array(
-				array('hk_history_mode' => 'unchecked')
-			),
-			array(
-				array('hk_history_global' => 'checked')
-			),
-			array(
-				array('hk_trends_mode' => 'unchecked')
-			),
-			array(
-				array('hk_trends_global' => 'checked')
-			)
-		);
-	}
-
-	/**
-	 * @dataProvider layout
-	 */
-	public function testFormAdministrationGeneralHousekeeper_CheckLayout($data) {
-
-		$this->zbxTestLogin('adm.gui.php');
+	public function testFormAdministrationGeneralHousekeeper_CheckLayout() {
+		$this->zbxTestLogin('adm.housekeeper.php');
 		$this->assertElementPresent('configDropDown');
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeper');
+
 		$this->zbxTestCheckTitle('Configuration of housekeeper');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF HOUSEKEEPER', 'Housekeeper'));
 
-		if (isset($data['hk_events_mode'])) {
-			$this->zbxTestCheckboxUnselect('hk_events_mode');
-		}
-
-		if (isset($data['hk_services_mode'])) {
-			$this->zbxTestCheckboxUnselect('hk_services_mode');
-		}
-
-		if (isset($data['hk_audit_mode'])) {
-			$this->zbxTestCheckboxUnselect('hk_audit_mode');
-		}
-
-		if (isset($data['hk_sessions_mode'])) {
-			$this->zbxTestCheckboxUnselect('hk_sessions_mode');
-		}
-
-		if (isset($data['hk_history_mode'])) {
-			$this->zbxTestCheckboxUnselect('hk_history_mode');
-		}
-
-		if (isset($data['hk_history_global'])) {
-			$this->zbxTestCheckboxSelect('hk_history_global');
-		}
-
-		if (isset($data['hk_trends_mode'])) {
-			$this->zbxTestCheckboxUnselect('hk_trends_mode');
-		}
-
-		if (isset($data['hk_trends_global'])) {
-			$this->zbxTestCheckboxSelect('hk_trends_global');
-		}
+		// events and alerts
 
 		$this->zbxTestTextPresent('Events and alerts');
 		$this->zbxTestTextPresent('Enable housekeeping');
@@ -108,148 +41,139 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->assertAttribute("//input[@id='hk_events_trigger']/@maxlength", 5);
 		$this->assertAttribute("//input[@id='hk_events_trigger']/@size", 5);
 		$this->assertAttribute("//input[@id='hk_events_trigger']/@value", 365);
-		if (isset($data['hk_events_mode'])) {
-			$this->assertElementPresent("//input[@id='hk_events_trigger']/@disabled");
-		}
-		else {
-			$this->assertElementNotPresent("//input[@id='hk_events_trigger']/@disabled");
-		}
+		$this->assertElementNotPresent("//input[@id='hk_events_trigger']/@disabled");
 
 		$this->zbxTestTextPresent('Keep internal data for (in days)');
 		$this->assertVisible('hk_events_internal');
 		$this->assertAttribute("//input[@id='hk_events_internal']/@maxlength", 5);
 		$this->assertAttribute("//input[@id='hk_events_internal']/@size", 5);
 		$this->assertAttribute("//input[@id='hk_events_internal']/@value", 365);
-		if (isset($data['hk_events_mode'])) {
-			$this->assertElementPresent("//input[@id='hk_events_internal']/@disabled");
-		}
-		else {
-			$this->assertElementNotPresent("//input[@id='hk_events_internal']/@disabled");
-		}
+		$this->assertElementNotPresent("//input[@id='hk_events_internal']/@disabled");
 
 		$this->zbxTestTextPresent('Keep network discovery data for (in days)');
 		$this->assertVisible('hk_events_discovery');
 		$this->assertAttribute("//input[@id='hk_events_discovery']/@maxlength", 5);
 		$this->assertAttribute("//input[@id='hk_events_discovery']/@size", 5);
 		$this->assertAttribute("//input[@id='hk_events_discovery']/@value", 365);
-		if (isset($data['hk_events_mode'])) {
-			$this->assertElementPresent("//input[@id='hk_events_discovery']/@disabled");
-		}
-		else {
-			$this->assertElementNotPresent("//input[@id='hk_events_discovery']/@disabled");
-		}
+		$this->assertElementNotPresent("//input[@id='hk_events_discovery']/@disabled");
 
 		$this->zbxTestTextPresent('Keep auto-registration data for (in days)');
 		$this->assertVisible('hk_events_autoreg');
 		$this->assertAttribute("//input[@id='hk_events_autoreg']/@maxlength", 5);
 		$this->assertAttribute("//input[@id='hk_events_autoreg']/@size", 5);
 		$this->assertAttribute("//input[@id='hk_events_autoreg']/@value", 365);
-		if (isset($data['hk_events_mode'])) {
-			$this->assertElementPresent("//input[@id='hk_events_autoreg']/@disabled");
-		}
-		else {
-			$this->assertElementNotPresent("//input[@id='hk_events_autoreg']/@disabled");
-		}
+		$this->assertElementNotPresent("//input[@id='hk_events_autoreg']/@disabled");
+
+		$this->zbxTestCheckboxSelect('hk_events_mode', false);
+		$this->assertElementPresent("//input[@id='hk_events_trigger']/@disabled");
+		$this->assertElementPresent("//input[@id='hk_events_internal']/@disabled");
+		$this->assertElementPresent("//input[@id='hk_events_discovery']/@disabled");
+		$this->assertElementPresent("//input[@id='hk_events_autoreg']/@disabled");
+
+		// IT services
 
 		$this->zbxTestTextPresent('IT services');
 		$this->zbxTestTextPresent('Enable housekeeping');
 		$this->assertVisible('hk_services_mode');
 		$this->assertAttribute("//input[@id='hk_services_mode']/@checked", 'checked');
+
 		$this->zbxTestTextPresent('Keep data for (in days)');
 		$this->assertVisible('hk_services');
 		$this->assertAttribute("//input[@id='hk_services']/@maxlength", 5);
 		$this->assertAttribute("//input[@id='hk_services']/@size", 5);
 		$this->assertAttribute("//input[@id='hk_services']/@value", 365);
-		if (isset($data['hk_services_mode'])) {
-			$this->assertElementPresent("//input[@id='hk_services']/@disabled");
-		}
-		else {
-			$this->assertElementNotPresent("//input[@id='hk_services']/@disabled");
-		}
+		$this->assertElementNotPresent("//input[@id='hk_services']/@disabled");
+
+		$this->zbxTestCheckboxSelect('hk_services_mode', false);
+		$this->assertElementPresent("//input[@id='hk_services']/@disabled");
+
+		// audit
 
 		$this->zbxTestTextPresent('Audit');
 		$this->zbxTestTextPresent('Enable housekeeping');
 		$this->assertVisible('hk_audit_mode');
 		$this->assertAttribute("//input[@id='hk_audit_mode']/@checked", 'checked');
+
 		$this->zbxTestTextPresent('Keep data for (in days)');
-		$this->assertVisible('hk_services');
+		$this->assertVisible('hk_audit');
 		$this->assertAttribute("//input[@id='hk_audit']/@maxlength", 5);
 		$this->assertAttribute("//input[@id='hk_audit']/@size", 5);
 		$this->assertAttribute("//input[@id='hk_audit']/@value", 365);
-		if (isset($data['hk_audit_mode'])) {
-			$this->assertElementPresent("//input[@id='hk_audit']/@disabled");
-		}
-		else {
-			$this->assertElementNotPresent("//input[@id='hk_audit']/@disabled");
-		}
+		$this->assertElementNotPresent("//input[@id='hk_audit']/@disabled");
+
+		$this->zbxTestCheckboxSelect('hk_audit_mode', false);
+		$this->assertElementPresent("//input[@id='hk_audit']/@disabled");
+
+		//	user sessions
 
 		$this->zbxTestTextPresent('User sessions');
 		$this->zbxTestTextPresent('Enable housekeeping');
 		$this->assertVisible('hk_sessions_mode');
 		$this->assertAttribute("//input[@id='hk_sessions_mode']/@checked", 'checked');
+
 		$this->zbxTestTextPresent('Keep data for (in days)');
 		$this->assertVisible('hk_sessions');
 		$this->assertAttribute("//input[@id='hk_sessions']/@maxlength", 5);
 		$this->assertAttribute("//input[@id='hk_sessions']/@size", 5);
 		$this->assertAttribute("//input[@id='hk_sessions']/@value", 365);
-		if (isset($data['hk_sessions_mode'])) {
-			$this->assertElementPresent("//input[@id='hk_sessions']/@disabled");
-		}
-		else {
-			$this->assertElementNotPresent("//input[@id='hk_sessions']/@disabled");
-		}
+		$this->assertElementNotPresent("//input[@id='hk_sessions']/@disabled");
+
+		$this->zbxTestCheckboxSelect('hk_sessions_mode', false);
+		$this->assertElementPresent("//input[@id='hk_sessions']/@disabled");
+
+		// history
 
 		$this->zbxTestTextPresent('History');
 		$this->zbxTestTextPresent('Enable housekeeping');
 		$this->assertVisible('hk_history_mode');
 		$this->assertAttribute("//input[@id='hk_history_mode']/@checked", 'checked');
+
 		$this->zbxTestTextPresent('Override item history period');
 		$this->assertVisible('hk_history_global');
 		$this->assertElementNotPresent("//input[@id='hk_history_global']/@checked");
-		if (isset($data['hk_history_mode'])) {
-			$this->assertElementPresent("//input[@id='hk_history_global']/@disabled");
-		}
-		else {
-			$this->assertElementNotPresent("//input[@id='hk_history_global']/@disabled");
-		}
+		$this->assertElementNotPresent("//input[@id='hk_history_global']/@disabled");
 
 		$this->zbxTestTextPresent('Keep data for (in days)');
 		$this->assertVisible('hk_history');
 		$this->assertAttribute("//input[@id='hk_history']/@maxlength", 5);
 		$this->assertAttribute("//input[@id='hk_history']/@size", 5);
 		$this->assertAttribute("//input[@id='hk_history']/@value", 90);
-		if (!isset($data['hk_history_global'])) {
-			$this->assertElementPresent("//input[@id='hk_history']/@disabled");
-		}
-		else {
-			$this->assertElementNotPresent("//input[@id='hk_history']/@disabled");
-		}
+		$this->assertElementPresent("//input[@id='hk_history']/@disabled");
+
+		$this->zbxTestCheckboxSelect('hk_history_global');
+		$this->assertElementNotPresent("//input[@id='hk_history']/@disabled");
+
+		$this->zbxTestCheckboxSelect('hk_history_mode', false);
+		$this->assertElementPresent("//input[@id='hk_history_global']/@disabled");
+		$this->assertElementPresent("//input[@id='hk_history']/@disabled");
+
+		// trends
 
 		$this->zbxTestTextPresent('Trends');
 		$this->zbxTestTextPresent('Enable housekeeping');
 		$this->assertVisible('hk_trends_mode');
 		$this->assertAttribute("//input[@id='hk_trends_mode']/@checked", 'checked');
+
 		$this->zbxTestTextPresent('Override item trend period');
-		$this->assertVisible('hk_history_global');
+		$this->assertVisible('hk_trends_global');
 		$this->assertElementNotPresent("//input[@id='hk_trends_global']/@checked");
-		if (isset($data['hk_trends_mode'])) {
-			$this->assertElementPresent("//input[@id='hk_trends_global']/@disabled");
-		}
-		else {
-			$this->assertElementNotPresent("//input[@id='hk_trends_global']/@disabled");
-		}
+		$this->assertElementNotPresent("//input[@id='hk_trends_global']/@disabled");
 
 		$this->zbxTestTextPresent('Keep data for (in days)');
 		$this->assertVisible('hk_trends');
 		$this->assertAttribute("//input[@id='hk_trends']/@maxlength", 5);
 		$this->assertAttribute("//input[@id='hk_trends']/@size", 5);
 		$this->assertAttribute("//input[@id='hk_trends']/@value", 365);
-		if (!isset($data['hk_trends_global'])) {
-			$this->assertElementPresent("//input[@id='hk_trends']/@disabled");
-		}
-		else {
-			$this->assertElementNotPresent("//input[@id='hk_trends']/@disabled");
-		}
+		$this->assertElementPresent("//input[@id='hk_trends']/@disabled");
+
+		$this->zbxTestCheckboxSelect('hk_trends_global');
+		$this->assertElementNotPresent("//input[@id='hk_trends']/@disabled");
+
+		$this->zbxTestCheckboxSelect('hk_trends_mode', false);
+		$this->assertElementPresent("//input[@id='hk_trends_global']/@disabled");
+		$this->assertElementPresent("//input[@id='hk_trends']/@disabled");
+
+		// buttons
 
 		$this->assertVisible('save');
 		$this->assertAttribute("//input[@id='save']/@value", 'Save');
@@ -258,245 +182,107 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->assertAttribute("//input[@id='resetDefaults']/@value", 'Reset defaults');
 	}
 
-	// Returns update data
 	public static function update() {
 		return array(
 			array(
 				array(
-					'expected' => HOUSEKEEPER_GOOD,
-					'hk_events_mode' => 'unchecked',
-					'formCheck' => true,
-					'dbCheck' => true
+					'expected' => TEST_GOOD,
+					'hk_events_mode' => true,
+					'hk_events_trigger' => 101,
+					'hk_events_internal' => 102,
+					'hk_events_discovery' => 103,
+					'hk_events_autoreg' => 104,
+					'hk_services_mode' => true,
+					'hk_services' => 105,
+					'hk_audit_mode' => true,
+					'hk_audit' => 107,
+					'hk_sessions_mode' => true,
+					'hk_sessions' => 108,
+					'hk_history_mode' => true,
+					'hk_history_global' => true,
+					'hk_history' => 109,
+					'hk_trends_mode' => true,
+					'hk_trends_global' => true,
+					'hk_trends' => 110
 				)
 			),
 			array(
 				array(
-					'expected' => HOUSEKEEPER_GOOD,
-					'hk_services_mode' => 'unchecked',
-					'formCheck' => true,
-					'dbCheck' => true
+					'expected' => TEST_GOOD,
+					'hk_events_mode' => false,
+					'hk_services_mode' => false,
+					'hk_audit_mode' => false,
+					'hk_sessions_mode' => false,
+					'hk_history_mode' => false,
+					'hk_trends_mode' => false
 				)
 			),
 			array(
 				array(
-					'expected' => HOUSEKEEPER_GOOD,
-					'hk_audit_mode' => 'unchecked',
-					'formCheck' => true,
-					'dbCheck' => true
+					'expected' => TEST_GOOD,
+					'hk_events_mode' => true,
+					'hk_services_mode' => true,
+					'hk_audit_mode' => true,
+					'hk_sessions_mode' => true,
+					'hk_history_mode' => true,
+					'hk_history_global' => false,
+					'hk_trends_mode' => true,
+					'hk_trends_global' => false
 				)
 			),
 			array(
 				array(
-					'expected' => HOUSEKEEPER_GOOD,
-					'hk_sessions_mode' => 'unchecked',
-					'formCheck' => true,
-					'dbCheck' => true
-				)
-			),
-			array(
-				array(
-					'expected' => HOUSEKEEPER_GOOD,
-					'hk_history_mode' => 'unchecked',
-					'formCheck' => true,
-					'dbCheck' => true
-				)
-			),
-			array(
-				array(
-					'expected' => HOUSEKEEPER_GOOD,
-					'hk_history_global' => 'checked',
-					'formCheck' => true,
-					'dbCheck' => true
-				)
-			),
-			array(
-				array(
-					'expected' => HOUSEKEEPER_GOOD,
-					'hk_trends_mode' => 'unchecked',
-					'formCheck' => true,
-					'dbCheck' => true
-				)
-			),
-			array(
-				array(
-					'expected' => HOUSEKEEPER_GOOD,
-					'hk_trends_global' => 'checked',
-					'formCheck' => true,
-					'dbCheck' => true
-				)
-			),
-			array(
-				array(
-					'expected' => HOUSEKEEPER_GOOD,
-					'hk_history_global' => 'checked',
-					'hk_trends_global' => 'checked',
-					'hk_events_trigger' => 100,
-					'hk_events_internal' => 200,
-					'hk_events_discovery' => 300,
-					'hk_events_autoreg' => 400,
-					'hk_services' => 500,
-					'hk_audit' => 600,
-					'hk_sessions' => 700,
-					'hk_history' => 800,
-					'hk_trends' => 900,
-					'formCheck' => true,
-					'dbCheck' => true
-				)
-			),
-			array(
-				array(
-					'expected' => HOUSEKEEPER_GOOD,
-					'hk_history_global' => 'checked',
-					'hk_trends_global' => 'checked',
-					'hk_events_trigger' => 1,
-					'hk_events_internal' => 1,
-					'hk_events_discovery' => 1,
-					'hk_events_autoreg' => 1,
-					'hk_services' => 1,
-					'hk_audit' => 1,
-					'hk_sessions' => 1,
-					'hk_history' => 1,
-					'hk_trends' => 1,
-					'formCheck' => true,
-					'dbCheck' => true
-				)
-			),
-			array(
-				array(
-					'expected' => HOUSEKEEPER_GOOD,
-					'hk_history_global' => 'checked',
-					'hk_trends_global' => 'checked',
-					'hk_events_trigger' => 99999,
-					'hk_events_internal' => 99999,
-					'hk_events_discovery' => 99999,
-					'hk_events_autoreg' => 99999,
-					'hk_services' => 99999,
-					'hk_audit' => 99999,
-					'hk_sessions' => 99999,
-					'hk_history' => 99999,
-					'hk_trends' => 99999,
-					'formCheck' => true,
-					'dbCheck' => true
-				)
-			),
-			array(
-				array(
-					'expected' => HOUSEKEEPER_BAD,
-					'hk_history_global' => 'checked',
-					'hk_trends_global' => 'checked',
-					'hk_events_trigger' => '-100',
-					'hk_events_internal' => '-200',
-					'hk_events_discovery' => '-300',
-					'hk_events_autoreg' => '-400',
-					'hk_services' => '-500',
-					'hk_audit' => '-600',
-					'hk_sessions' => '-700',
-					'hk_history' => '-800',
-					'hk_trends' => '-900',
-					'errors' => array(
-						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Keep trigger event and alert data for (in days)": must be between 1 and 99999.',
-						'Incorrect value for field "Keep internal event and alert data for (in days)": must be between 1 and 99999.',
-						'Incorrect value for field "Keep network discovery event and alert data for (in days)": must be between 1 and 99999.',
-						'Incorrect value for field "Keep auto-registration event and alert data for (in days)": must be between 1 and 99999.',
-						'Incorrect value for field "Keep IT service data for (in days)": must be between 1 and 99999.'
-					)
-				)
-			),
-			array(
-				array(
-					'expected' => HOUSEKEEPER_BAD,
-					'hk_history_global' => 'checked',
-					'hk_trends_global' => 'checked',
-					'hk_events_trigger' => 'abc',
-					'hk_events_internal' => 'abc',
-					'hk_events_discovery' => 'abc',
-					'hk_events_autoreg' => 'abc',
-					'hk_services' => 'abc',
-					'hk_audit' => 'abc',
-					'hk_sessions' => 'abc',
-					'hk_history' => 'abc',
-					'hk_trends' => 'abc',
-					'errors' => array(
-						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Keep trigger event and alert data for (in days)": must be between 1 and 99999.',
-						'Incorrect value for field "Keep internal event and alert data for (in days)": must be between 1 and 99999.',
-						'Incorrect value for field "Keep network discovery event and alert data for (in days)": must be between 1 and 99999.',
-						'Incorrect value for field "Keep auto-registration event and alert data for (in days)": must be between 1 and 99999.',
-						'Incorrect value for field "Keep IT service data for (in days)": must be between 1 and 99999.'
-					)
-				)
-			),
-			array(
-				array(
-					'expected' => HOUSEKEEPER_BAD,
-					'hk_history_global' => 'checked',
-					'hk_trends_global' => 'checked',
-					'hk_events_trigger' => '',
-					'hk_events_internal' => '',
-					'hk_events_discovery' => '',
-					'hk_events_autoreg' => '',
-					'hk_services' => '',
-					'hk_audit' => '',
-					'hk_sessions' => '',
-					'hk_history' => '',
-					'hk_trends' => '',
-					'errors' => array(
-						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Keep trigger event and alert data for (in days)": must be between 1 and 99999.',
-						'Incorrect value for field "Keep internal event and alert data for (in days)": must be between 1 and 99999.',
-						'Incorrect value for field "Keep network discovery event and alert data for (in days)": must be between 1 and 99999.',
-						'Incorrect value for field "Keep auto-registration event and alert data for (in days)": must be between 1 and 99999.',
-						'Incorrect value for field "Keep IT service data for (in days)": must be between 1 and 99999.'
-					)
-				)
-			),
-			array(
-				array(
-					'expected' => HOUSEKEEPER_BAD,
-					'hk_history_global' => 'checked',
-					'hk_trends_global' => 'checked',
-					'hk_events_trigger' => ' ',
-					'hk_events_internal' => ' ',
-					'hk_events_discovery' => ' ',
-					'hk_events_autoreg' => ' ',
-					'hk_services' => ' ',
-					'hk_audit' => ' ',
-					'hk_sessions' => ' ',
-					'hk_history' => ' ',
-					'hk_trends' => ' ',
-					'errors' => array(
-						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Keep trigger event and alert data for (in days)": must be between 1 and 99999.',
-						'Incorrect value for field "Keep internal event and alert data for (in days)": must be between 1 and 99999.',
-						'Incorrect value for field "Keep network discovery event and alert data for (in days)": must be between 1 and 99999.',
-						'Incorrect value for field "Keep auto-registration event and alert data for (in days)": must be between 1 and 99999.',
-						'Incorrect value for field "Keep IT service data for (in days)": must be between 1 and 99999.'
-					)
-				)
-			),
-			array(
-				array(
-					'expected' => HOUSEKEEPER_BAD,
-					'hk_history_global' => 'checked',
-					'hk_trends_global' => 'checked',
+					'expected' => TEST_BAD,
+					'hk_events_mode' => true,
 					'hk_events_trigger' => 0,
 					'hk_events_internal' => 0,
 					'hk_events_discovery' => 0,
 					'hk_events_autoreg' => 0,
+					'hk_services_mode' => true,
 					'hk_services' => 0,
+					'hk_audit_mode' => true,
 					'hk_audit' => 0,
+					'hk_sessions_mode' => true,
 					'hk_sessions' => 0,
-					'hk_history' => 0,
-					'hk_trends' => 0,
+					'hk_history_mode' => true,
+					'hk_history_global' => true,
+					'hk_history' => -1,
+					'hk_trends_mode' => true,
+					'hk_trends_global' => true,
+					'hk_trends' => -1,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value for field "Keep trigger event and alert data for (in days)": must be between 1 and 99999.',
-						'Incorrect value for field "Keep internal event and alert data for (in days)": must be between 1 and 99999.',
-						'Incorrect value for field "Keep network discovery event and alert data for (in days)": must be between 1 and 99999.',
-						'Incorrect value for field "Keep auto-registration event and alert data for (in days)": must be between 1 and 99999.',
-						'Incorrect value for field "Keep IT service data for (in days)": must be between 1 and 99999.'
+						'Incorrect value "0" for "Keep trigger event and alert data for (in days)" field: must be between 1 and 99999.',
+						'Incorrect value "0" for "Keep internal event and alert data for (in days)" field: must be between 1 and 99999.',
+						'Incorrect value "0" for "Keep network discovery event and alert data for (in days)" field: must be between 1 and 99999.',
+						'Incorrect value "0" for "Keep auto-registration event and alert data for (in days)" field: must be between 1 and 99999.',
+						'Incorrect value "0" for "Keep IT service data for (in days)" field: must be between 1 and 99999.',
+						'Incorrect value "0" for "Keep audit data for (in days)" field: must be between 1 and 99999.',
+						'Incorrect value "0" for "Keep user session data for (in days)" field: must be between 1 and 99999.',
+						'Incorrect value "-1" for "Keep history data for (in days)" field: must be between 0 and 99999.',
+						'Incorrect value "-1" for "Keep trend data for (in days)" field: must be between 0 and 99999.'
 					)
+				)
+			),
+			array(
+				array(
+					'expected' => TEST_GOOD,
+					'resetDefaults' => true,
+					'hk_events_mode' => true,
+					'hk_events_trigger' => 365,
+					'hk_events_internal' => 365,
+					'hk_events_discovery' => 365,
+					'hk_events_autoreg' => 365,
+					'hk_services_mode' => true,
+					'hk_services' => 365,
+					'hk_audit_mode' => true,
+					'hk_audit' => 365,
+					'hk_sessions_mode' => true,
+					'hk_sessions' => 365,
+					'hk_history_mode' => true,
+					'hk_history_global' => false,
+					'hk_trends_mode' => true,
+					'hk_trends_global' => false
 				)
 			)
 		);
@@ -506,385 +292,191 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 	 * @dataProvider update
 	 */
 	public function testFormAdministrationGeneralHousekeeper_SimpleUpdate($data) {
+		$this->zbxTestLogin('adm.housekeeper.php');
 
-		if (isset($data['dbCheck'])) {
-			DBsave_tables('config');
-		}
-
-		$this->zbxTestLogin('adm.gui.php');
-		$this->assertElementPresent('configDropDown');
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeper');
-		$this->zbxTestCheckTitle('Configuration of housekeeper');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF HOUSEKEEPER', 'Housekeeper'));
-
-		if (isset($data['hk_events_mode'])) {
-			$this->zbxTestCheckboxUnselect('hk_events_mode');
-			$hk_events_mode = 'unchecked';
+		if (isset($data['resetDefaults'])) {
+			$this->zbxTestClick('resetDefaults');
+			$this->zbxTestClick("//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-dialog-buttons']/div/div/button[1]");
 		}
 		else {
-			$hk_events_mode = 'checked';
-		}
-
-		if (isset($data['hk_events_trigger'])) {
-			$this->input_type('hk_events_trigger', $data['hk_events_trigger']);
-		}
-
-		if (isset($data['hk_events_internal'])) {
-			$this->input_type('hk_events_internal', $data['hk_events_internal']);
-		}
-
-		if (isset($data['hk_events_discovery'])) {
-			$this->input_type('hk_events_discovery', $data['hk_events_discovery']);
-		}
-
-		if (isset($data['hk_events_autoreg'])) {
-			$this->input_type('hk_events_autoreg', $data['hk_events_autoreg']);
-		}
-
-		if (isset($data['hk_services_mode'])) {
-			$this->zbxTestCheckboxUnselect('hk_services_mode');
-			$hk_services_mode = 'unchecked';
-		}
-		else {
-			$hk_services_mode = 'checked';
-		}
-
-		if (isset($data['hk_services'])) {
-			$this->input_type('hk_services', $data['hk_services']);
-		}
-
-		if (isset($data['hk_audit_mode'])) {
-			$this->zbxTestCheckboxUnselect('hk_audit_mode');
-			$hk_audit_mode = 'unchecked';
-		}
-		else {
-			$hk_audit_mode = 'checked';
-		}
-
-		if (isset($data['hk_audit'])) {
-			$this->input_type('hk_audit', $data['hk_audit']);
-		}
-
-		if (isset($data['hk_sessions_mode'])) {
-			$this->zbxTestCheckboxUnselect('hk_sessions_mode');
-			$hk_sessions_mode = 'unchecked';
-		}
-		else {
-			$hk_sessions_mode = 'checked';
-		}
-
-		if (isset($data['hk_sessions'])) {
-			$this->input_type('hk_sessions', $data['hk_sessions']);
-		}
-
-		if (isset($data['hk_history_mode'])) {
-			$this->zbxTestCheckboxUnselect('hk_history_mode');
-			$hk_history_mode = 'unchecked';
-		}
-		else {
-			$hk_history_mode = 'checked';
-		}
-
-		if (isset($data['hk_history_global'])) {
-			$this->zbxTestCheckboxSelect('hk_history_global');
-			$hk_history_global = 'checked';
-		}
-		else {
-			$hk_history_global = 'unchecked';
-		}
-
-		if (isset($data['hk_history'])) {
-			$this->input_type('hk_history', $data['hk_history']);
-		}
-
-		if (isset($data['hk_trends_mode'])) {
-			$this->zbxTestCheckboxUnselect('hk_trends_mode');
-			$hk_trends_mode = 'unchecked';
-		}
-		else {
-			$hk_trends_mode = 'checked';
-		}
-
-		if (isset($data['hk_trends_global'])) {
-			$this->zbxTestCheckboxSelect('hk_trends_global');
-			$hk_trends_global = 'checked';
-		}
-		else {
-			$hk_trends_global = 'unchecked';
-		}
-
-		if (isset($data['hk_trends'])) {
-			$this->input_type('hk_trends', $data['hk_trends']);
-		}
-
-		$hk_events_trigger = $this->getValue('hk_events_trigger');
-		$hk_events_internal = $this->getValue('hk_events_internal');
-		$hk_events_discovery = $this->getValue('hk_events_discovery');
-		$hk_events_autoreg = $this->getValue('hk_events_autoreg');
-		$hk_sessions = $this->getValue('hk_sessions');
-		$hk_services = $this->getValue('hk_services');
-		$hk_audit = $this->getValue('hk_audit');
-		$hk_history = $this->getValue('hk_history');
-		$hk_trends = $this->getValue('hk_trends');
-
-		$this->zbxTestClickWait('save');
-		$expected = $data['expected'];
-
-		switch ($expected) {
-			case HOUSEKEEPER_GOOD:
-				$this->zbxTestTextPresent('Configuration updated');
-				$this->zbxTestCheckTitle('Configuration of housekeeper');
-				$this->zbxTestTextPresent(array('CONFIGURATION OF HOUSEKEEPER', 'Housekeeper'));
-				break;
-
-			case HOUSEKEEPER_BAD:
-				$this->zbxTestTextNotPresent('Configuration updated');
-				$this->zbxTestCheckTitle('Configuration of housekeeper');
-				foreach ($data['errors'] as $msg) {
-					$this->zbxTestTextPresent($msg);
-				}
-				break;
-		}
-
-		if (isset($data['formCheck'])) {
+			// events and alerts
 
 			if (isset($data['hk_events_mode'])) {
-				$this->assertElementNotPresent("//input[@id='hk_events_mode']/@checked");
+				$this->zbxTestCheckboxSelect('hk_events_mode', $data['hk_events_mode']);
 			}
-			else {
-				$this->assertElementPresent("//input[@id='hk_events_mode']/@checked");
+
+			if (isset($data['hk_events_trigger'])) {
+				$this->input_type('hk_events_trigger', $data['hk_events_trigger']);
 			}
+
+			if (isset($data['hk_events_internal'])) {
+				$this->input_type('hk_events_internal', $data['hk_events_internal']);
+			}
+
+			if (isset($data['hk_events_discovery'])) {
+				$this->input_type('hk_events_discovery', $data['hk_events_discovery']);
+			}
+
+			if (isset($data['hk_events_autoreg'])) {
+				$this->input_type('hk_events_autoreg', $data['hk_events_autoreg']);
+			}
+
+			// IT services
 
 			if (isset($data['hk_services_mode'])) {
-				$this->assertElementNotPresent("//input[@id='hk_services_mode']/@checked");
+				$this->zbxTestCheckboxSelect('hk_services_mode', $data['hk_services_mode']);
 			}
-			else {
-				$this->assertElementPresent("//input[@id='hk_services_mode']/@checked");
+
+			if (isset($data['hk_services'])) {
+				$this->input_type('hk_services', $data['hk_services']);
 			}
+
+			// audit
 
 			if (isset($data['hk_audit_mode'])) {
-				$this->assertElementNotPresent("//input[@id='hk_audit_mode']/@checked");
+				$this->zbxTestCheckboxSelect('hk_audit_mode', $data['hk_audit_mode']);
 			}
-			else {
-				$this->assertElementPresent("//input[@id='hk_audit_mode']/@checked");
+
+			if (isset($data['hk_audit'])) {
+				$this->input_type('hk_audit', $data['hk_audit']);
 			}
+
+			// user sessions
 
 			if (isset($data['hk_sessions_mode'])) {
-				$this->assertElementNotPresent("//input[@id='hk_sessions_mode']/@checked");
-			}
-			else {
-				$this->assertElementPresent("//input[@id='hk_sessions_mode']/@checked");
+				$this->zbxTestCheckboxSelect('hk_sessions_mode', $data['hk_sessions_mode']);
 			}
 
-			if (isset($data['hk_history_mode'])) {
-				$this->assertElementNotPresent("//input[@id='hk_history_mode']/@checked");
+			if (isset($data['hk_sessions'])) {
+				$this->input_type('hk_sessions', $data['hk_sessions']);
 			}
-			else {
-				$this->assertElementPresent("//input[@id='hk_history_mode']/@checked");
+
+			// history
+
+			if (isset($data['hk_history_mode'])) {
+				$this->zbxTestCheckboxSelect('hk_history_mode', $data['hk_history_mode']);
 			}
 
 			if (isset($data['hk_history_global'])) {
-				$this->assertElementPresent("//input[@id='hk_history_global']/@checked");
-			}
-			else {
-				$this->assertElementNotPresent("//input[@id='hk_history_global']/@checked");
+				$this->zbxTestCheckboxSelect('hk_history_global', $data['hk_history_global']);
 			}
 
-			if (isset($data['hk_trends_mode'])) {
-				$this->assertElementNotPresent("//input[@id='hk_trends_mode']/@checked");
+			if (isset($data['hk_history'])) {
+				$this->input_type('hk_history', $data['hk_history']);
 			}
-			else {
-				$this->assertElementPresent("//input[@id='hk_trends_mode']/@checked");
+
+			// trends
+
+			if (isset($data['hk_trends_mode'])) {
+				$this->zbxTestCheckboxSelect('hk_trends_mode', $data['hk_trends_mode']);
 			}
 
 			if (isset($data['hk_trends_global'])) {
-				$this->assertElementPresent("//input[@id='hk_trends_global']/@checked");
+				$this->zbxTestCheckboxSelect('hk_trends_global', $data['hk_trends_global']);
 			}
-			else {
-				$this->assertElementNotPresent("//input[@id='hk_trends_global']/@checked");
+
+			if (isset($data['hk_trends'])) {
+				$this->input_type('hk_trends', $data['hk_trends']);
 			}
 		}
 
-		if (isset($data['dbCheck'])) {
-			$result = DBselect("SELECT * FROM config");
-			while ($row = DBfetch($result)) {
-				switch($row['hk_events_mode']) {
-					case 1:
-						$hk_events_modeDB = 'checked';
-						break;
-					case 0:
-						$hk_events_modeDB = 'unchecked';
-						break;
-				}
-				$this->assertEquals($hk_events_mode, $hk_events_modeDB);
-
-				$hk_events_triggerDB = $row['hk_events_trigger'];
-				$this->assertEquals($hk_events_trigger, $hk_events_triggerDB);
-
-				$hk_events_internalDB = $row['hk_events_internal'];
-				$this->assertEquals($hk_events_internal, $hk_events_internalDB);
-
-				$hk_events_discoveryDB = $row['hk_events_discovery'];
-				$this->assertEquals($hk_events_discovery, $hk_events_discoveryDB);
-
-				$hk_events_autoregDB = $row['hk_events_autoreg'];
-				$this->assertEquals($hk_events_autoreg, $hk_events_autoregDB);
-
-				switch($row['hk_services_mode']) {
-					case 1:
-						$hk_services_modeDB = 'checked';
-						break;
-					case 0:
-						$hk_services_modeDB = 'unchecked';
-						break;
-				}
-				$this->assertEquals($hk_services_mode, $hk_services_modeDB);
-
-				$hk_servicesDB = $row['hk_services'];
-				$this->assertEquals($hk_services, $hk_servicesDB);
-
-				switch($row['hk_audit_mode']) {
-					case 1:
-						$hk_audit_modeDB = 'checked';
-						break;
-					case 0:
-						$hk_audit_modeDB = 'unchecked';
-						break;
-				}
-				$this->assertEquals($hk_audit_mode, $hk_audit_modeDB);
-
-				$hk_auditDB = $row['hk_audit'];
-				$this->assertEquals($hk_audit, $hk_auditDB);
-
-				switch($row['hk_sessions_mode']) {
-					case 1:
-						$hk_sessions_modeDB = 'checked';
-						break;
-					case 0:
-						$hk_sessions_modeDB = 'unchecked';
-						break;
-				}
-				$this->assertEquals($hk_sessions_mode, $hk_sessions_modeDB);
-
-				$hk_sessionsDB = $row['hk_sessions'];
-				$this->assertEquals($hk_sessions, $hk_sessionsDB);
-
-				switch($row['hk_history_mode']) {
-					case 1:
-						$hk_history_modeDB = 'checked';
-						break;
-					case 0:
-						$hk_history_modeDB = 'unchecked';
-						break;
-				}
-				$this->assertEquals($hk_history_mode, $hk_history_modeDB);
-
-				switch($row['hk_history_global']) {
-					case 1:
-						$hk_history_globalDB = 'checked';
-						break;
-					case 0:
-						$hk_history_globalDB = 'unchecked';
-						break;
-				}
-				$this->assertEquals($hk_history_global, $hk_history_globalDB);
-
-				$hk_historyDB = $row['hk_history'];
-				$this->assertEquals($hk_history, $hk_historyDB);
-
-				switch($row['hk_trends_mode']) {
-					case 1:
-						$hk_trends_modeDB = 'checked';
-						break;
-					case 0:
-						$hk_trends_modeDB = 'unchecked';
-						break;
-				}
-				$this->assertEquals($hk_trends_mode, $hk_trends_modeDB);
-
-				switch($row['hk_trends_global']) {
-					case 1:
-						$hk_trends_globalDB = 'checked';
-						break;
-					case 0:
-						$hk_trends_globalDB = 'unchecked';
-						break;
-				}
-				$this->assertEquals($hk_trends_global, $hk_trends_globalDB);
-
-				$hk_trendsDB = $row['hk_trends'];
-				$this->assertEquals($hk_trends, $hk_trendsDB);
-			}
-
-			DBrestore_tables('config');
-		}
-	}
-
-	public function testFormAdministrationGeneralHousekeeper_ResetDefaults() {
-		DBsave_tables('config');
-
-		$this->zbxTestLogin('adm.gui.php');
-		$this->assertElementPresent('configDropDown');
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeper');
-		$this->zbxTestCheckTitle('Configuration of housekeeper');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF HOUSEKEEPER', 'Housekeeper'));
-
-		$sqlConfig = "SELECT * FROM config ORDER BY configid";
-		$oldHashConfig = DBhash($sqlConfig);
-
-		$this->zbxTestClick('resetDefaults');
-		sleep(1);
-		$this->assertVisible("//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-dialog-buttons']");
-		$this->zbxTestClick("//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-dialog-buttons']/div/div/button[1]");
 		$this->zbxTestClickWait('save');
 
-		$this->zbxTestTextPresent('Configuration updated');
-		$this->zbxTestCheckTitle('Configuration of housekeeper');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF HOUSEKEEPER', 'Housekeeper'));
+		switch ($data['expected']) {
+			case TEST_GOOD:
+				$this->zbxTestCheckTitle('Configuration of housekeeper');
+				$this->zbxTestTextPresent('CONFIGURATION OF HOUSEKEEPER');
+				$this->zbxTestTextPresent('Configuration updated');
+				break;
 
-		$this->assertElementPresent("//input[@id='hk_events_mode']/@checked");
-		$this->assertVisible('hk_events_trigger');
-		$this->assertAttribute("//input[@id='hk_events_trigger']/@value", 365);
-		$this->assertElementNotPresent("//input[@id='hk_events_trigger']/@disabled");
+			case TEST_BAD:
+				$this->zbxTestCheckTitle('Configuration of housekeeper');
+				$this->zbxTestTextPresent('CONFIGURATION OF HOUSEKEEPER');
+				$this->zbxTestTextNotPresent('Configuration updated');
+				$this->zbxTestTextPresent($data['errors']);
+				break;
+		}
 
-		$this->assertVisible('hk_events_internal');
-		$this->assertAttribute("//input[@id='hk_events_internal']/@value", 365);
-		$this->assertElementNotPresent("//input[@id='hk_events_internal']/@disabled");
+		if ($data['expected'] == TEST_GOOD) {
+			// events and alerts
 
-		$this->assertVisible('hk_events_discovery');
-		$this->assertAttribute("//input[@id='hk_events_discovery']/@value", 365);
-		$this->assertElementNotPresent("//input[@id='hk_events_discovery']/@disabled");
+			if (isset($data['hk_events_mode'])) {
+				$this->assertEquals($this->isChecked('hk_events_mode'), $data['hk_events_mode']);
+			}
 
-		$this->assertVisible('hk_events_autoreg');
-		$this->assertAttribute("//input[@id='hk_events_autoreg']/@value", 365);
-		$this->assertElementNotPresent("//input[@id='hk_events_autoreg']/@disabled");
+			if (isset($data['hk_events_trigger'])) {
+				$this->assertElementValue('hk_events_trigger', $data['hk_events_trigger']);
+			}
 
-		$this->assertElementPresent("//input[@id='hk_services_mode']/@checked");
-		$this->assertVisible('hk_services');
-		$this->assertAttribute("//input[@id='hk_services']/@value", 365);
-		$this->assertElementNotPresent("//input[@id='hk_services']/@disabled");
+			if (isset($data['hk_events_internal'])) {
+				$this->assertElementValue('hk_events_internal', $data['hk_events_internal']);
+			}
 
-		$this->assertElementPresent("//input[@id='hk_audit_mode']/@checked");
-		$this->assertVisible('hk_audit');
-		$this->assertAttribute("//input[@id='hk_audit']/@value", 365);
-		$this->assertElementNotPresent("//input[@id='hk_audit']/@disabled");
+			if (isset($data['hk_events_discovery'])) {
+				$this->assertElementValue('hk_events_discovery', $data['hk_events_discovery']);
+			}
 
-		$this->assertElementPresent("//input[@id='hk_sessions_mode']/@checked");
-		$this->assertVisible('hk_sessions');
-		$this->assertAttribute("//input[@id='hk_sessions']/@value", 365);
-		$this->assertElementNotPresent("//input[@id='hk_sessions']/@disabled");
+			if (isset($data['hk_events_autoreg'])) {
+				$this->assertElementValue('hk_events_autoreg', $data['hk_events_autoreg']);
+			}
 
-		$this->assertElementPresent("//input[@id='hk_history_mode']/@checked");
-		$this->assertElementNotPresent("//input[@id='hk_history_global']/@checked");
-		$this->assertVisible('hk_history');
-		$this->assertElementPresent("//input[@id='hk_history']/@disabled");
+			// IT services
 
-		$this->assertElementPresent("//input[@id='hk_trends_mode']/@checked");
-		$this->assertElementNotPresent("//input[@id='hk_trends_global']/@checked");
-		$this->assertVisible('hk_trends');
-		$this->assertElementPresent("//input[@id='hk_trends']/@disabled");
+			if (isset($data['hk_services_mode'])) {
+				$this->assertEquals($this->isChecked('hk_services_mode'), $data['hk_services_mode']);
+			}
 
-		$this->assertEquals($oldHashConfig, DBhash($sqlConfig), "Values in some DB fields changed, but shouldn't.");
-		DBrestore_tables('config');
+			if (isset($data['hk_services'])) {
+				$this->assertElementValue('hk_services', $data['hk_services']);
+			}
+
+			// audit
+
+			if (isset($data['hk_audit_mode'])) {
+				$this->assertEquals($this->isChecked('hk_audit_mode'), $data['hk_audit_mode']);
+			}
+
+			if (isset($data['hk_audit'])) {
+				$this->assertElementValue('hk_audit', $data['hk_audit']);
+			}
+
+			// user sessions
+
+			if (isset($data['hk_sessions_mode'])) {
+				$this->assertEquals($this->isChecked('hk_sessions_mode'), $data['hk_sessions_mode']);
+			}
+
+			if (isset($data['hk_sessions'])) {
+				$this->assertElementValue('hk_sessions', $data['hk_sessions']);
+			}
+
+			// history
+
+			if (isset($data['hk_history_mode'])) {
+				$this->assertEquals($this->isChecked('hk_history_mode'), $data['hk_history_mode']);
+			}
+
+			if (isset($data['hk_history_global'])) {
+				$this->assertEquals($this->isChecked('hk_history_global'), $data['hk_history_global']);
+			}
+
+			if (isset($data['hk_history'])) {
+				$this->assertElementValue('hk_history', $data['hk_history']);
+			}
+
+			// trends
+
+			if (isset($data['hk_trends_mode'])) {
+				$this->assertEquals($this->isChecked('hk_trends_mode'), $data['hk_trends_mode']);
+			}
+
+			if (isset($data['hk_trends_global'])) {
+				$this->assertEquals($this->isChecked('hk_trends_global'), $data['hk_trends_global']);
+			}
+
+			if (isset($data['hk_trends'])) {
+				$this->assertElementValue('hk_trends', $data['hk_trends']);
+			}
+		}
 	}
 }

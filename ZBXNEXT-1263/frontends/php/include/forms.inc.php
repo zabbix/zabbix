@@ -135,7 +135,10 @@
 
 		// set user rights
 		if (!$data['is_profile']) {
-			$data['groups'] = API::UserGroup()->get(array('usrgrpids' => $data['user_groups'], 'output' => API_OUTPUT_EXTEND));
+			$data['groups'] = API::UserGroup()->get(array(
+				'usrgrpids' => $data['user_groups'],
+				'output' => array('usrgrpid', 'name')
+			));
 			order_result($data['groups'], 'name');
 
 			$group_ids = array_values($data['user_groups']);
@@ -256,7 +259,7 @@
 				}
 			}
 
-			$table = new CTable(_('No accessible resources'), 'right_table');
+			$table = new CTable(_('No accessible resources'), 'right_table calculated');
 			if (!$isHeaderDisplayed) {
 				$table->setHeader(array(_('Read-write'), _('Read only'), _('Deny')), 'header');
 				$isHeaderDisplayed = true;
@@ -951,7 +954,7 @@
 	}
 
 	/**
-	 * Get data for item view.
+	 * Get data for item edit page.
 	 *
 	 * @param bool $options['is_discovery_rule']
 	 *
@@ -1108,6 +1111,7 @@
 					break;
 				}
 			} while ($itemid != 0);
+
 			$data['templates'] = array_reverse($data['templates']);
 			array_shift($data['templates']);
 		}
@@ -1249,18 +1253,36 @@
 		// template
 		$data['is_template'] = isTemplate($data['hostid']);
 
+		// unset snmpv3 fields
+		if ($data['type'] != ITEM_TYPE_SNMPV3) {
+			$data['snmpv3_contextname'] = '';
+			$data['snmpv3_securityname'] = '';
+			$data['snmpv3_securitylevel'] = ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV;
+			$data['snmpv3_authprotocol'] = ITEM_AUTHPROTOCOL_MD5;
+			$data['snmpv3_authpassphrase'] = '';
+			$data['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
+			$data['snmpv3_privpassphrase'] = '';
+		}
+
+		// unset ssh auth fields
+		if ($data['type'] != ITEM_TYPE_SSH) {
+			$data['authtype'] = ITEM_AUTHTYPE_PASSWORD;
+			$data['publickey'] = '';
+			$data['privatekey'] = '';
+		}
+
 		return $data;
 	}
 
-	function getCopyElementsFormData($elements_field, $title = null) {
+	function getCopyElementsFormData($elementsField, $title = null) {
 		$data = array(
 			'title' => $title,
-			'elements_field' => $elements_field,
-			'elements' => get_request($elements_field, array()),
-			'copy_type' => get_request('copy_type', 0),
-			'filter_groupid' => get_request('filter_groupid', 0),
-			'copy_targetid' => get_request('copy_targetid', array()),
-			'hostid' => get_request('hostid', 0),
+			'elements_field' => $elementsField,
+			'elements' => getRequest($elementsField, array()),
+			'copy_type' => getRequest('copy_type', 0),
+			'filter_groupid' => getRequest('filter_groupid', 0),
+			'copy_targetid' => getRequest('copy_targetid', array()),
+			'hostid' => getRequest('hostid', 0),
 			'groups' => array(),
 			'hosts' => array()
 		);
@@ -1268,11 +1290,14 @@
 		// validate elements
 		if (empty($data['elements']) || !is_array($data['elements'])) {
 			error(_('Incorrect list of items.'));
+
 			return null;
 		}
 
 		// get groups
-		$data['groups'] = API::HostGroup()->get(array('output' => API_OUTPUT_EXTEND));
+		$data['groups'] = API::HostGroup()->get(array(
+			'output' => array('groupid', 'name')
+		));
 		order_result($data['groups'], 'name');
 
 		// get hosts
@@ -1282,13 +1307,15 @@
 					$data['filter_groupid'] = $group['groupid'];
 				}
 			}
+
 			$data['hosts'] = API::Host()->get(array(
-				'output' => API_OUTPUT_EXTEND,
+				'output' => array('groupid', 'name'),
 				'groupids' => $data['filter_groupid'],
 				'templated_hosts' => true
 			));
 			order_result($data['hosts'], 'name');
 		}
+
 		return $data;
 	}
 
@@ -1730,8 +1757,10 @@
 				);
 			}
 			else {
-				$date = zbxDateToTime($new_timeperiod['start_date']);
+				$date = zbxDateToTime($new_timeperiod['start_date']
+					? $new_timeperiod['start_date'] : date(TIMESTAMP_FORMAT_ZERO_TIME, time()));
 			}
+
 			$tblPeriod->addRow(array(_('Date'), createDateSelector('new_timeperiod_start_date', $date)));
 		}
 
@@ -1758,4 +1787,3 @@
 
 		return $tblPeriod;
 	}
-

@@ -28,7 +28,6 @@
 
 #define ZBX_VMWARE_STATE_UPDATING	0x100
 
-
 typedef struct
 {
 	zbx_uint64_t	nic_packets_rx;
@@ -126,6 +125,9 @@ typedef struct
 
 	/* The last vmware service access time. If a service is not accessed for a day it is removed */
 	int			lastaccess;
+
+	/* the vmware service instance contents */
+	char			*contents;
 
 	/* The service data object that is swapped with a new one during service update */
 	zbx_vmware_data_t	*data;

@@ -85,7 +85,7 @@ $r_form->addItem(array(_('Grouping by'), SPACE, $inventoryFieldsComboBox));
 $hostinvent_wdgt->addHeader(_('Hosts'), $r_form);
 $hostinvent_wdgt->addItem(BR());
 
-$table = new CTableInfo(_('No hosts defined.'));
+$table = new CTableInfo(_('No hosts found.'));
 $table->setHeader(
 	array(
 		make_sorting_header($groupFieldTitle === '' ? _('Field') : $groupFieldTitle, 'inventory_field'),

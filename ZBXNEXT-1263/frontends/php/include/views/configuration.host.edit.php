@@ -87,7 +87,9 @@ else {
 	$original_templates = array();
 }
 
-if ($_REQUEST['hostid'] > 0 && (!isset($_REQUEST['form_refresh']) || in_array(get_request('form'), array('clone', 'full_clone')))) {
+// load data from the DB when opening the full clone form for the first time
+$cloneFormOpened = (in_array(getRequest('form'), array('clone', 'full_clone')) && getRequest('form_refresh') == 1);
+if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloneFormOpened)) {
 	$proxy_hostid = $dbHost['proxy_hostid'];
 	$host = $dbHost['host'];
 	$visiblename = $dbHost['name'];
@@ -323,7 +325,7 @@ else {
 	$row = new CRow(null, null, 'agentIterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_AGENT])) {
 		$row->addItem(new CCol(null, 'interface-drag-control'));
-		$row->addItem(new CCol(_('No agent interfaces defined.'), null, 5));
+		$row->addItem(new CCol(_('No agent interfaces found.'), null, 5));
 	}
 	$ifTab->addRow($row);
 
@@ -337,7 +339,7 @@ else {
 	$row = new CRow(null, null, 'SNMPIterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_SNMP])) {
 		$row->addItem(new CCol(null, 'interface-drag-control'));
-		$row->addItem(new CCol(_('No SNMP interfaces defined.'), null, 5));
+		$row->addItem(new CCol(_('No SNMP interfaces found.'), null, 5));
 	}
 	$ifTab->addRow($row);
 	$hostList->addRow(_('SNMP interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row');
@@ -350,7 +352,7 @@ else {
 	$row = new CRow(null, null, 'JMXIterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_JMX])) {
 		$row->addItem(new CCol(null, 'interface-drag-control'));
-		$row->addItem(new CCol(_('No JMX interfaces defined.'), null, 5));
+		$row->addItem(new CCol(_('No JMX interfaces found.'), null, 5));
 	}
 	$ifTab->addRow($row);
 	$hostList->addRow(_('JMX interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row');
@@ -363,7 +365,7 @@ else {
 	$row = new CRow(null, null, 'IPMIIterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_IPMI])) {
 		$row->addItem(new CCol(null, 'interface-drag-control'));
-		$row->addItem(new CCol(_('No IPMI interfaces defined.'), null, 5));
+		$row->addItem(new CCol(_('No IPMI interfaces found.'), null, 5));
 	}
 	$ifTab->addRow($row);
 	$hostList->addRow(_('IPMI interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row interface-row-last');
@@ -409,9 +411,10 @@ if ($_REQUEST['form'] == 'full_clone') {
 	$hostApps = API::Application()->get(array(
 		'hostids' => $_REQUEST['hostid'],
 		'inherited' => false,
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('name'),
 		'preservekeys' => true
 	));
+
 	if (!empty($hostApps)) {
 		$applicationsList = array();
 		foreach ($hostApps as $hostAppId => $hostApp) {
@@ -430,7 +433,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 		'hostids' => $_REQUEST['hostid'],
 		'inherited' => false,
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
-		'output' => API_OUTPUT_EXTEND
+		'output' => array('itemid', 'key_', 'name')
 	));
 	if (!empty($hostItems)) {
 		$itemsList = array();
@@ -449,14 +452,10 @@ if ($_REQUEST['form'] == 'full_clone') {
 	$hostTriggers = API::Trigger()->get(array(
 		'inherited' => false,
 		'hostids' => $_REQUEST['hostid'],
-		'output' => array(
-			'triggerid',
-			'description'
-		),
-		'selectItems' => API_OUTPUT_EXTEND,
+		'output' => array('triggerid', 'description'),
+		'selectItems' => array('type'),
 		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL))
 	));
-
 	if (!empty($hostTriggers)) {
 		$triggersList = array();
 
@@ -482,9 +481,9 @@ if ($_REQUEST['form'] == 'full_clone') {
 		'inherited' => false,
 		'hostids' => $_REQUEST['hostid'],
 		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
-		'selectHosts' => API_OUTPUT_REFER,
-		'selectItems' => API_OUTPUT_EXTEND,
-		'output' => API_OUTPUT_EXTEND
+		'selectHosts' => array('hostid'),
+		'selectItems' => array('type'),
+		'output' => array('graphid', 'name')
 	));
 	if (!empty($hostGraphs)) {
 		$graphsList = array();
@@ -514,7 +513,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 	$hostDiscoveryRules = API::DiscoveryRule()->get(array(
 		'inherited' => false,
 		'hostids' => $_REQUEST['hostid'],
-		'output' => API_OUTPUT_EXTEND
+		'output' => array('itemid', 'key_', 'name')
 	));
 	if (!empty($hostDiscoveryRules)) {
 		$discoveryRuleList = array();
@@ -535,7 +534,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 		'hostids' => $_REQUEST['hostid'],
 		'discoveryids' => $hostDiscoveryRuleids,
 		'inherited' => false,
-		'output' => API_OUTPUT_EXTEND
+		'output' => array('itemid', 'key_', 'name')
 	));
 	if (!empty($hostItemPrototypes)) {
 		$prototypeList = array();
@@ -555,8 +554,8 @@ if ($_REQUEST['form'] == 'full_clone') {
 		'hostids' => $_REQUEST['hostid'],
 		'discoveryids' => $hostDiscoveryRuleids,
 		'inherited' => false,
-		'output' => API_OUTPUT_EXTEND,
-		'selectItems' => API_OUTPUT_EXTEND
+		'output' => array('triggerid', 'description'),
+		'selectItems' => array('type')
 	));
 	if (!empty($hostTriggerPrototypes)) {
 		$prototypeList = array();
@@ -583,8 +582,8 @@ if ($_REQUEST['form'] == 'full_clone') {
 		'hostids' => $_REQUEST['hostid'],
 		'discoveryids' => $hostDiscoveryRuleids,
 		'inherited' => false,
-		'selectHosts' => API_OUTPUT_EXTEND,
-		'output' => API_OUTPUT_EXTEND
+		'selectHosts' => array('hostid'),
+		'output' => array('graphid', 'name')
 	));
 	if (!empty($hostGraphPrototypes)) {
 		$prototypeList = array();
@@ -626,7 +625,7 @@ $divTabs->addTab('hostTab', _('Host'), $hostList);
 $tmplList = new CFormList('tmpllist');
 
 // create linked template table
-$linkedTemplateTable = new CTable(_('No templates defined.'), 'formElementTable');
+$linkedTemplateTable = new CTable(_('No templates linked.'), 'formElementTable');
 $linkedTemplateTable->attr('id', 'linkedTemplateTable');
 
 $linkedTemplates = API::Template()->get(array(
@@ -824,7 +823,8 @@ $frmHost->addItem($divTabs);
  * footer
  */
 $others = array();
-if ($_REQUEST['hostid'] > 0 && $_REQUEST['form'] != 'full_clone') {
+// do not display the clone and delete buttons for clone forms and new host forms
+if (getRequest('hostid') && !in_array(getRequest('form'), array('clone', 'full_clone'))) {
 	$others[] = new CSubmit('clone', _('Clone'));
 	$others[] = new CSubmit('full_clone', _('Full clone'));
 	$others[] = new CButtonDelete(_('Delete selected host?'), url_param('form').url_param('hostid').url_param('groupid'));

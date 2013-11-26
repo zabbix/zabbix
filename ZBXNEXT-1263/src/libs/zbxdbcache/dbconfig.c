@@ -85,7 +85,7 @@ typedef struct
 	int			nextcheck;
 	int			lastclock;
 	int			mtime;
-	int			time_added;
+	int			data_expected_from;
 	unsigned char		type;
 	unsigned char		data_type;
 	unsigned char		value_type;
@@ -209,6 +209,7 @@ typedef struct
 	const char	*host;
 	const char	*name;
 	int		maintenance_from;
+	int		data_expected_from;
 	int		errors_from;
 	int		disable_until;
 	int		snmp_errors_from;
@@ -894,7 +895,7 @@ static void	DCsync_items(DB_RESULT result)
 			item->lastclock = 0;
 			ZBX_STR2UINT64(item->lastlogsize, row[31]);
 			item->mtime = atoi(row[32]);
-			item->time_added = now;
+			item->data_expected_from = now;
 		}
 		else if (NULL != item->triggers && NULL == item->triggers[0])
 		{
@@ -1767,6 +1768,7 @@ static void	DCsync_hosts(DB_RESULT result)
 			host->maintenance_status = (unsigned char)atoi(row[7]);
 			host->maintenance_type = (unsigned char)atoi(row[8]);
 			host->maintenance_from = atoi(row[9]);
+			host->data_expected_from = 0;
 
 			host->errors_from = atoi(row[10]);
 			host->available = (unsigned char)atoi(row[11]);
@@ -2279,8 +2281,9 @@ static void	DCsync_interfaces(DB_RESULT result)
 
 		if (INTERFACE_TYPE_SNMP == interface->type)	/* used only for SNMP traps */
 		{
-			if ('\0' != *(interface_snmpaddr_local.addr = ('\0' != interface->useip) ?
-					interface->ip : interface->dns))
+			interface_snmpaddr_local.addr = (0 != interface->useip ? interface->ip : interface->dns);
+
+			if ('\0' != *interface_snmpaddr_local.addr)
 			{
 				if (NULL == (interface_snmpaddr = zbx_hashset_search(&config->interface_snmpaddrs, &interface_snmpaddr_local)))
 				{
@@ -2343,7 +2346,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 
 			if (0 != macros)
 			{
-				DCget_host_by_hostid(&host, hostid);
+				DCget_host_by_hostid(&host, interface->hostid);
 
 				if (0 != (macros & 0x01))
 				{
@@ -2494,7 +2497,7 @@ static DB_RESULT	DCsync_config_select()
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
-void	DCsync_configuration()
+void	DCsync_configuration(void)
 {
 	const char		*__function_name = "DCsync_configuration";
 
@@ -2823,6 +2826,7 @@ void	DCsync_configuration()
 	DBfree_result(gmacro_result);
 	DBfree_result(hmacro_result);
 	DBfree_result(if_result);
+	DBfree_result(expr_result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -3815,7 +3819,8 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
  *           and which does not have its host in no-data maintenance          *
  *                                                                            *
  ******************************************************************************/
-void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_t *trigger_order, int process_num)
+void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_t *trigger_order, int process_num,
+			int *trigger_count)
 {
 	int			i, found;
 	zbx_uint64_t		functionid;
@@ -3881,6 +3886,8 @@ void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_
 	UNLOCK_CACHE;
 
 	zbx_vector_ptr_sort(trigger_order, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+	*trigger_count = trigger_order->values_num;	/* performance metric */
 }
 
 void	DCfree_triggers(zbx_vector_ptr_t *triggers)
@@ -4402,7 +4409,224 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_update_host_availability                                *
+ * Function: DChost_get_availability                                          *
+ *                                                                            *
+ * Purpose: get host availability data based on the specified item type       *
+ *                                                                            *
+ * Parameters: dc_host      - [IN] the host                                   *
+ *             type         - [IN] the item type                              *
+ *             availability - [OUT] the host availability data                *
+ *                                                                            *
+ * Return value: SUCCEED - the host availability data was retrieved           *
+ *                         successfully                                       *
+ *               FAIL    - failed to retrieve host availability data,         *
+ *                         unrecognized item type was specified               *
+ *                                                                            *
+ ******************************************************************************/
+static int	DChost_get_availability(const ZBX_DC_HOST *dc_host, unsigned char type,
+		zbx_host_availability_t *availability)
+{
+	switch (type)
+	{
+		case ITEM_TYPE_ZABBIX:
+			availability->errors_from = dc_host->errors_from;
+			availability->available = dc_host->available;
+			availability->disable_until = dc_host->disable_until;
+			break;
+		case ITEM_TYPE_SNMPv1:
+		case ITEM_TYPE_SNMPv2c:
+		case ITEM_TYPE_SNMPv3:
+			availability->errors_from = dc_host->snmp_errors_from;
+			availability->available = dc_host->snmp_available;
+			availability->disable_until = dc_host->snmp_disable_until;
+			break;
+		case ITEM_TYPE_IPMI:
+			availability->errors_from = dc_host->ipmi_errors_from;
+			availability->available = dc_host->ipmi_available;
+			availability->disable_until = dc_host->ipmi_disable_until;
+			break;
+		case ITEM_TYPE_JMX:
+			availability->errors_from = dc_host->jmx_errors_from;
+			availability->available = dc_host->jmx_available;
+			availability->disable_until = dc_host->jmx_disable_until;
+			break;
+		default:
+			return FAIL;
+	}
+
+	availability->type = type;
+	availability->hostid = dc_host->hostid;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DChost_set_availability                                          *
+ *                                                                            *
+ * Purpose: set host availability data based on the specified item type       *
+ *                                                                            *
+ * Parameters: dc_host      - [OUT] the host                                  *
+ *             availability - [IN] the host availability data                 *
+ *                                                                            *
+ * Return value: SUCCEED - the host availability data was set successfully    *
+ *               FAIL    - failed to set host availability data,              *
+ *                         unrecognized item type was specified               *
+ *                                                                            *
+ ******************************************************************************/
+static int	DChost_set_availability(ZBX_DC_HOST *dc_host, const zbx_host_availability_t *availability)
+{
+	switch (availability->type)
+	{
+		case ITEM_TYPE_ZABBIX:
+			dc_host->errors_from = availability->errors_from;
+			dc_host->available = availability->available;
+			dc_host->disable_until = availability->disable_until;
+			break;
+		case ITEM_TYPE_SNMPv1:
+		case ITEM_TYPE_SNMPv2c:
+		case ITEM_TYPE_SNMPv3:
+			dc_host->snmp_errors_from = availability->errors_from;
+			dc_host->snmp_available = availability->available;
+			dc_host->snmp_disable_until = availability->disable_until;
+			break;
+		case ITEM_TYPE_IPMI:
+			dc_host->ipmi_errors_from = availability->errors_from;
+			dc_host->ipmi_available = availability->available;
+			dc_host->ipmi_disable_until = availability->disable_until;
+			break;
+		case ITEM_TYPE_JMX:
+			dc_host->jmx_errors_from = availability->errors_from;
+			dc_host->jmx_available = availability->available;
+			dc_host->jmx_disable_until = availability->disable_until;
+			break;
+		default:
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DChost_activate                                                  *
+ *                                                                            *
+ * Purpose: set host as available for the checks of the specified item type   *
+ *                                                                            *
+ * Parameters: in  - [IN/OUT] IN: the caller's host availability data         *
+ *                            OUT: the host availability data in cache        *
+ *                            before changes                                  *
+ *             out - [OUT] the host availability data after changes           *
+ *                                                                            *
+ * Return value: SUCCEED - the host was activated successfully                *
+ *               FAIL    - failed to activate host, host not found            *
+ *                                                                            *
+ ******************************************************************************/
+int	DChost_activate(zbx_host_availability_t *in, zbx_host_availability_t *out)
+{
+	int		ret = FAIL;
+	ZBX_DC_HOST	*dc_host;
+
+	/* don't try activating host if there were no errors detected */
+	if (0 == in->errors_from)
+		goto out;
+
+	LOCK_CACHE;
+
+	if (NULL != (dc_host = zbx_hashset_search(&config->hosts, &in->hostid)))
+	{
+		DChost_get_availability(dc_host, in->type, in);
+
+		out->hostid = in->hostid;
+		out->type = in->type;
+		out->errors_from = 0;
+		out->available = HOST_AVAILABLE_TRUE;
+		out->disable_until = 0;
+
+		DChost_set_availability(dc_host, out);
+
+		ret = SUCCEED;
+	}
+
+	UNLOCK_CACHE;
+out:
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DChost_deactivate                                                *
+ *                                                                            *
+ * Purpose: attempt to set host as unavailable for the checks of the          *
+ *          specified item type based on the time the checks are failing      *
+ *                                                                            *
+ * Parameters: ts  - [IN] the failure timestamp                               *
+ *             in  - [IN/OUT] IN: the caller's host availability data         *
+ *                            OUT: the host availability data in cache        *
+ *                            before changes                                  *
+ *             out - [OUT] the host availability data after changes           *
+ *                                                                            *
+ * Return value: SUCCEED - the host was deactivated successfully              *
+ *               FAIL    - failed to activate host, host not found            *
+ *                                                                            *
+ ******************************************************************************/
+int	DChost_deactivate(zbx_timespec_t *ts, zbx_host_availability_t *in, zbx_host_availability_t *out)
+{
+	int		ret = FAIL;
+	ZBX_DC_HOST	*dc_host;
+
+	/* don't try deactivating host if the unreachable delay has not passed since the first error */
+	if (CONFIG_UNREACHABLE_DELAY > ts->sec - out->errors_from)
+		goto out;
+
+	LOCK_CACHE;
+
+	if (NULL != (dc_host = zbx_hashset_search(&config->hosts, &in->hostid)))
+	{
+		DChost_get_availability(dc_host, in->type, in);
+		*out = *in;
+
+		if (0 == out->errors_from)
+		{
+			/* first error, schedule next unreachable check */
+			out->errors_from = ts->sec;
+			out->disable_until = ts->sec + CONFIG_UNREACHABLE_DELAY;
+		}
+		else
+		{
+			/* Check if other pollers haven't already attempted deactivating host. */
+			/* In that case should wait the initial unreachable delay before       */
+			/* trying to make it unavailable.                                      */
+			if (CONFIG_UNREACHABLE_DELAY <= ts->sec - out->errors_from)
+			{
+				/* repeating error */
+				if (CONFIG_UNREACHABLE_PERIOD > ts->sec - out->errors_from)
+				{
+					/* leave host available, schedule next unreachable check */
+					out->disable_until = ts->sec + CONFIG_UNREACHABLE_DELAY;
+				}
+				else
+				{
+					/* make host unavailable, schedule next unavailable check */
+					out->disable_until = ts->sec + CONFIG_UNAVAILABLE_DELAY;
+					out->available = HOST_AVAILABLE_FALSE;
+				}
+			}
+		}
+
+		DChost_set_availability(dc_host, out);
+
+		ret = SUCCEED;
+	}
+
+	UNLOCK_CACHE;
+out:
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DChost_update_availability                                       *
  *                                                                            *
  * Purpose: update hosts availability in configuration cache                  *
  *                                                                            *
@@ -4411,54 +4635,23 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
  *             availability_num - [IN] the number of items in availability    *
  *                                array                                       *
  *                                                                            *
- * Return value: The number of updates performed.                             *
- *                                                                            *
  ******************************************************************************/
-int	DCconfig_update_host_availability(const zbx_host_availability_t *availability, int availability_num)
+void	DChost_update_availability(const zbx_host_availability_t *availability, int availability_num)
 {
-	int		update_count = 0, i;
+	int		i;
 	ZBX_DC_HOST	*dc_host;
 
 	LOCK_CACHE;
 
 	for (i = 0; i < availability_num; i++)
 	{
-		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &availability->hostid)))
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &availability[i].hostid)))
 			continue;
 
-		switch (availability->type)
-		{
-			case ITEM_TYPE_ZABBIX:
-				dc_host->errors_from = availability->errors_from;
-				dc_host->available = availability->available;
-				dc_host->disable_until = availability->disable_until;
-				break;
-			case ITEM_TYPE_SNMPv1:
-			case ITEM_TYPE_SNMPv2c:
-			case ITEM_TYPE_SNMPv3:
-				dc_host->snmp_errors_from = availability->errors_from;
-				dc_host->snmp_available = availability->available;
-				dc_host->snmp_disable_until = availability->disable_until;
-				break;
-			case ITEM_TYPE_IPMI:
-				dc_host->ipmi_errors_from = availability->errors_from;
-				dc_host->ipmi_available = availability->available;
-				dc_host->ipmi_disable_until = availability->disable_until;
-				break;
-			case ITEM_TYPE_JMX:
-				dc_host->jmx_errors_from = availability->errors_from;
-				dc_host->jmx_available = availability->available;
-				dc_host->jmx_disable_until = availability->disable_until;
-				break;
-			default:
-				continue;
-		}
-		update_count++;
+		DChost_set_availability(dc_host, &availability[i]);
 	}
 
 	UNLOCK_CACHE;
-
-	return update_count;
 }
 
 /******************************************************************************
@@ -4565,8 +4758,10 @@ void	DCconfig_set_trigger_value(zbx_uint64_t triggerid, unsigned char value,
 void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int maintenance_status,
 		int maintenance_type, int maintenance_from)
 {
-	int		i;
+	int		i, now;
 	ZBX_DC_HOST	*dc_host;
+
+	now = time(NULL);
 
 	LOCK_CACHE;
 
@@ -4575,9 +4770,14 @@ void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int 
 		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &hostids[i])))
 			continue;
 
-		if (HOST_MAINTENANCE_STATUS_OFF == dc_host->maintenance_status ||
-				HOST_MAINTENANCE_STATUS_OFF == maintenance_status)
+		if (dc_host->maintenance_status != maintenance_status)
 			dc_host->maintenance_from = maintenance_from;
+
+		/* store time at which no-data maintenance ended for the host (either */
+		/* because no-data maintenance ended or because maintenance type was */
+		/* changed to normal), this is needed for nodata() trigger function */
+		if (MAINTENANCE_TYPE_NODATA == dc_host->maintenance_type && MAINTENANCE_TYPE_NODATA != maintenance_type)
+			dc_host->data_expected_from = now;
 
 		dc_host->maintenance_status = maintenance_status;
 		dc_host->maintenance_type = maintenance_type;
@@ -5329,25 +5529,28 @@ void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCget_item_time_added                                            *
+ * Function: DCget_data_expected_from                                         *
  *                                                                            *
- * Purpose: returns time of adding of an item into the configuration cache    *
+ * Purpose: Returns time since which data is expected for the given item. We  *
+ *          would not mind not having data for the item before that time, but *
+ *          since that time we expect data to be coming.                      *
  *                                                                            *
  * Parameters: itemid  - [IN] the item id                                     *
- *             seconds - [OUT] the number of seconds of adding of an item     *
- *                             into the configuration cache                   *
+ *             seconds - [OUT] the time data is expected as a Unix timestamp  *
  *                                                                            *
  ******************************************************************************/
-int	DCget_item_time_added(zbx_uint64_t itemid, int *time_added)
+int	DCget_data_expected_from(zbx_uint64_t itemid, int *seconds)
 {
 	ZBX_DC_ITEM	*item;
+	ZBX_DC_HOST	*host;
 	int		ret = FAIL;
 
 	LOCK_CACHE;
 
-	if (NULL != (item = zbx_hashset_search(&config->items, &itemid)))
+	if (NULL != (item = zbx_hashset_search(&config->items, &itemid)) &&
+			NULL != (host = zbx_hashset_search(&config->hosts, &item->hostid)))
 	{
-		*time_added = item->time_added;
+		*seconds = MAX(item->data_expected_from, host->data_expected_from);
 		ret = SUCCEED;
 	}
 

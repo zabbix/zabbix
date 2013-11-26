@@ -366,7 +366,6 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 		'triggerids' => $srcTriggerIds,
 		'output' => array('triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type'),
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
-		'selectItems' => API_OUTPUT_EXTEND,
 		'selectDependencies' => API_OUTPUT_REFER
 	);
 	if ($srcHostId) {
@@ -1132,12 +1131,13 @@ function replace_template_dependencies($deps, $hostid) {
  *
  * @param array  $hostIds
  * @param string $application	name of application to filter
+ * @param string $pageFile		the page where the element is displayed
  * @param int    $viewMode		table display style: either hosts on top, or host on the left side
  * @param string $screenId		the ID of the screen, that contains the trigger overview table
  *
  * @return CTableInfo
  */
-function getTriggersOverview($hostIds, $application, $viewMode = null, $screenId = null) {
+function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null, $screenId = null) {
 	if (is_null($viewMode)) {
 		$viewMode = CProfile::get('web.overview.view.style', STYLE_TOP);
 	}
@@ -1209,7 +1209,7 @@ function getTriggersOverview($hostIds, $application, $viewMode = null, $screenId
 		}
 	}
 
-	$triggerTable = new CTableInfo(_('No triggers defined.'));
+	$triggerTable = new CTableInfo(_('No triggers found.'));
 
 	if (empty($hostNames)) {
 		return $triggerTable;
@@ -1236,6 +1236,7 @@ function getTriggersOverview($hostIds, $application, $viewMode = null, $screenId
 			foreach ($hostNames as $hostName) {
 				$columns[] = getTriggerOverviewCells(
 					isset($triggerHosts[$hostName]) ? $triggerHosts[$hostName] : null,
+					$pageFile,
 					$screenId
 				);
 			}
@@ -1264,6 +1265,7 @@ function getTriggersOverview($hostIds, $application, $viewMode = null, $screenId
 			foreach ($triggers as $triggerHosts) {
 				$columns[] = getTriggerOverviewCells(
 					isset($triggerHosts[$hostName]) ? $triggerHosts[$hostName] : null,
+					$pageFile,
 					$screenId
 				);
 			}
@@ -1281,11 +1283,12 @@ function getTriggersOverview($hostIds, $application, $viewMode = null, $screenId
  * @see getTriggersOverview()
  *
  * @param array  $trigger
+ * @param string $pageFile		the page where the element is displayed
  * @param string $screenId
  *
  * @return CCol
  */
-function getTriggerOverviewCells($trigger, $screenId = null) {
+function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 	$ack = null;
 	$css = null;
 	$style = null;
@@ -1306,12 +1309,10 @@ function getTriggerOverviewCells($trigger, $screenId = null) {
 			if ($config['event_ack_enable'] == 1) {
 				if ($event = get_last_event_by_triggerid($trigger['triggerid'])) {
 					if ($screenId) {
-						global $page;
-
 						$acknowledge = array(
 							'eventid' => $event['eventid'],
 							'screenid' => $screenId,
-							'backurl' => $page['file']
+							'backurl' => $pageFile
 						);
 					}
 					else {

@@ -152,8 +152,8 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 
 	$items = API::Item()->get(array(
 		'itemids' => $resourceId,
-		'selectHosts' => array('hostid', 'name', 'status'),
-		'output' => API_OUTPUT_EXTEND
+		'selectHosts' => array('name'),
+		'output' => array('itemid', 'key_', 'name')
 	));
 	if (!empty($items)) {
 		$id = $resourceId;
@@ -234,8 +234,8 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 
 	$items = API::Item()->get(array(
 		'itemids' => $resourceId,
-		'selectHosts' => array('hostid', 'name'),
-		'output' => API_OUTPUT_EXTEND
+		'selectHosts' => array('name'),
+		'output' => array('itemid', 'key_', 'name')
 	));
 	if (!empty($items)) {
 		$id = $resourceId;
@@ -272,7 +272,7 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
 		$selectButton
 	));
-	$screenFormList->addRow(_('Show lines'), new CNumericBox('elements', $elements, 2));
+	$screenFormList->addRow(_('Show lines'), new CNumericBox('elements', $elements, 3));
 	$screenFormList->addRow(_('Show text as HTML'), new CCheckBox('style', $style, null, 1));
 }
 
@@ -331,7 +331,7 @@ elseif (in_array($resourceType, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN
 		)));
 	}
 
-	$screenFormList->addRow(_('Show lines'), new CNumericBox('elements', $elements, 2));
+	$screenFormList->addRow(_('Show lines'), new CNumericBox('elements', $elements, 3));
 	$screenFormList->addRow(
 		_('Sort triggers by'),
 		new CComboBox('sort_triggers', $sortTriggers, null, array(
@@ -346,7 +346,7 @@ elseif (in_array($resourceType, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN
  * Screen item: History of actions
  */
 elseif ($resourceType == SCREEN_RESOURCE_ACTIONS) {
-	$screenFormList->addRow(_('Show lines'), new CNumericBox('elements', $elements, 2));
+	$screenFormList->addRow(_('Show lines'), new CNumericBox('elements', $elements, 3));
 	$screenFormList->addRow(
 		_('Sort triggers by'),
 		new CComboBox('sort_triggers', $sortTriggers, null, array(
@@ -369,7 +369,7 @@ elseif ($resourceType == SCREEN_RESOURCE_ACTIONS) {
  * Screen item: History of events
  */
 elseif ($resourceType == SCREEN_RESOURCE_EVENTS) {
-	$screenFormList->addRow(_('Show lines'), new CNumericBox('elements', $elements, 2));
+	$screenFormList->addRow(_('Show lines'), new CNumericBox('elements', $elements, 3));
 	$screenFormList->addVar('resourceid', 0);
 }
 
@@ -488,7 +488,7 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 		$items = API::Item()->get(array(
 			'itemids' => $resourceId,
 			'selectHosts' => array('name'),
-			'output' => API_OUTPUT_EXTEND
+			'output' => array('itemid', 'key_', 'name')
 		));
 		if ($items) {
 			$item = reset($items);

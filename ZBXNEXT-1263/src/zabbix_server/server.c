@@ -56,6 +56,7 @@
 #include "vmware/vmware.h"
 
 #include "valuecache.h"
+#include "setproctitle.h"
 
 #define INIT_SERVER(type, count)								\
 	process_type = type;									\
@@ -485,6 +486,9 @@ int	main(int argc, char **argv)
 	char		ch = '\0';
 	int		nodeid = 0;
 
+#if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
+	argv = setproctitle_save_env(argc, argv);
+#endif
 	progname = get_program_name(argv[0]);
 
 	/* parse the command-line */
@@ -635,24 +639,6 @@ int	MAIN_ZABBIX_ENTRY()
 
 	zbx_free_config();
 
-	if (SUCCEED != DBcheck_version())
-		exit(EXIT_FAILURE);
-
-#ifdef	HAVE_SQLITE3
-	zbx_create_sqlite3_mutex(CONFIG_DBNAME);
-#endif
-
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
-	if (0 != CONFIG_NODEID)
-	{
-		result = DBselect("select masterid from nodes where nodeid=%d", CONFIG_NODEID);
-
-		if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
-			CONFIG_MASTER_NODEID = atoi(row[0]);
-		DBfree_result(result);
-	}
-
 	init_database_cache();
 	init_configuration_cache();
 	init_selfmon_collector();
@@ -665,6 +651,24 @@ int	MAIN_ZABBIX_ENTRY()
 	zbx_vc_init();
 
 	zbx_create_services_lock();
+
+#ifdef	HAVE_SQLITE3
+	zbx_create_sqlite3_mutex(CONFIG_DBNAME);
+#endif
+
+	if (SUCCEED != DBcheck_version())
+		exit(EXIT_FAILURE);
+
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+	if (0 != CONFIG_NODEID)
+	{
+		result = DBselect("select masterid from nodes where nodeid=%d", CONFIG_NODEID);
+
+		if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+			CONFIG_MASTER_NODEID = atoi(row[0]);
+		DBfree_result(result);
+	}
 
 	DCload_config();
 
@@ -932,6 +936,10 @@ void	zbx_on_exit()
 			ZABBIX_VERSION, ZABBIX_REVISION);
 
 	zabbix_close_log();
+
+#if defined(PS_OVERWRITE_ARGV)
+	setproctitle_free_env();
+#endif
 
 	exit(SUCCEED);
 }

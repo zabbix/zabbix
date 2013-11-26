@@ -34,7 +34,7 @@ $slideForm = new CForm();
 $slideForm->setName('slideForm');
 
 // create table
-$slidesTable = new CTableInfo(_('No slide shows defined.'));
+$slidesTable = new CTableInfo(_('No slide shows found.'));
 $slidesTable->setHeader(array(
 	new CCheckBox('all_shows', null, "checkAll('".$slideForm->getName()."', 'all_shows', 'shows');"),
 	$this->data['displayNodes'] ? _('Node') : null,
@@ -50,7 +50,7 @@ foreach ($this->data['slides'] as $slide) {
 	$slidesTable->addRow(array(
 		new CCheckBox('shows['.$slide['slideshowid'].']', null, null, $slide['slideshowid']),
 		$this->data['displayNodes'] ? $slide['nodename'] : null,
-		new CLink($slide['name'], '?config=1&form=update&slideshowid='.$slide['slideshowid'], 'action'),
+		new CLink($slide['name'], '?form=update&slideshowid='.$slide['slideshowid'], 'action'),
 		$slide['delay'],
 		$slide['cnt']
 	));

@@ -35,7 +35,7 @@
  * When a new service is requested by poller the zbx_vmware_get_service() function
  * creates a new service object, marks it as new, but still returns NULL object.
  *
- * The collectors checks the service object list for new services or services not updated
+ * The collectors check the service object list for new services or services not updated
  * during last CONFIG_VMWARE_FREQUENCY seconds. If such service is found it is marked
  * as updating.
  *
@@ -50,12 +50,11 @@
 
 /* external variables */
 extern unsigned char	process_type;
+extern int		process_num;
 
 extern char		*CONFIG_FILE;
 extern int		CONFIG_VMWARE_FREQUENCY;
 extern zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE;
-
-/* */
 
 #define VMWARE_VECTOR_CREATE(ref, type)	zbx_vector_##type##_create_ext(ref,  __vm_mem_malloc_func, \
 		__vm_mem_realloc_func, __vm_mem_free_func)
@@ -88,7 +87,8 @@ typedef struct
 }
 zbx_vmware_service_objects_t;
 
-static zbx_vmware_service_objects_t	vmware_service_objects[3] = {
+static zbx_vmware_service_objects_t	vmware_service_objects[3] =
+{
 	{NULL, NULL, NULL, NULL},
 	{"ha-perfmgr", "ha-sessionmgr", "ha-eventmgr", "ha-property-collector"},
 	{"PerfMgr", "SessionManager", "EventManager", "propertyCollector"}
@@ -186,8 +186,7 @@ static char	*vmware_shared_strdup(const char *source)
  ******************************************************************************/
 static void	vmware_datastore_shared_free(zbx_vmware_datastore_t *datastore)
 {
-	if (NULL != datastore->name)
-		__vm_mem_free_func(datastore->name);
+	__vm_mem_free_func(datastore->name);
 
 	if (NULL != datastore->uuid)
 		__vm_mem_free_func(datastore->uuid);
@@ -342,6 +341,9 @@ static void	vmware_service_shared_free(zbx_vmware_service_t *service)
 	__vm_mem_free_func(service->url);
 	__vm_mem_free_func(service->username);
 	__vm_mem_free_func(service->password);
+
+	if (NULL != service->contents)
+		__vm_mem_free_func(service->contents);
 
 	vmware_data_shared_free(service->data);
 
@@ -704,14 +706,14 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 		if (NULL == (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
 		{
 			/* Successfully authenticated with vcenter service manager. */
-			/* Set the service type and return with success             */
+			/* Set the service type and return with success.            */
 			service->type = ZBX_VMWARE_SERVICE_VCENTER;
 			ret = SUCCEED;
 			goto out;
 		}
 
-		/* Tf the wrong service manager was used, set the service type as vsphere and */
-		/* try again with vsphere service manager. Otherwiser return with failure.    */
+		/* If the wrong service manager was used, set the service type as vsphere and */
+		/* try again with vsphere service manager. Otherwise return with failure.     */
 		if (NULL == (error_object = zbx_xml_read_value(page.data,
 				ZBX_XPATH_LN3("detail", "NotAuthenticatedFault", "object"))))
 		{
@@ -750,6 +752,56 @@ out:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_service_get_contents                                      *
+ *                                                                            *
+ * Purpose: retrieves vmware service instance contents                        *
+ *                                                                            *
+ * Parameters: service    - [IN] the vmware service                           *
+ *             easyhandle - [IN] the CURL handle                              *
+ *             error      - [OUT] the error message in the case of failure    *
+ *                                                                            *
+ * Return value: SUCCEED - the contents were retrieved successfully           *
+ *               FAIL    - the content retrieval faield                       *
+ *                                                                            *
+ ******************************************************************************/
+static	int	vmware_service_get_contents(zbx_vmware_service_t *service, CURL *easyhandle, char **contents,
+		char **error)
+{
+#	define ZBX_POST_VMWARE_CONTENTS 						\
+		ZBX_POST_VSPHERE_HEADER							\
+		"<ns0:RetrieveServiceContent>"						\
+			"<ns0:_this type=\"ServiceInstance\">ServiceInstance</ns0:_this>"	\
+		"</ns0:RetrieveServiceContent>"						\
+		ZBX_POST_VSPHERE_FOOTER
+
+	int	err, opt, ret = FAIL;
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, ZBX_POST_VMWARE_CONTENTS)))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
+		goto out;
+	}
+
+	page.offset = 0;
+
+	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
+	{
+		*error = zbx_strdup(*error, curl_easy_strerror(err));
+		goto out;
+	}
+
+	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
+		goto out;
+
+	*contents = zbx_strdup(*contents, page.data);
+
+	ret = SUCCEED;
+out:
 	return ret;
 }
 
@@ -1463,9 +1515,11 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(const zbx_vmware_service_t *ser
 		const char *id, char **error)
 {
 	const char	*__function_name = "vmware_service_create_vm";
+
 	zbx_vmware_vm_t	*vm;
 	int		ret = FAIL;
 	char		*value;
+	const char	*uuid_xpath[3] = {NULL, ZBX_XPATH_LN1("uuid"), ZBX_XPATH_LN1("instanceUuid")};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() vmid:'%s'", __function_name, id);
 
@@ -1477,7 +1531,7 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(const zbx_vmware_service_t *ser
 	if (SUCCEED != vmware_service_get_vm_data(service, easyhandle, id, &vm->details, error))
 		goto out;
 
-	if (NULL == (value = zbx_xml_read_value(vm->details, ZBX_XPATH_LN1("uuid"))))
+	if (NULL == (value = zbx_xml_read_value(vm->details, uuid_xpath[service->type])))
 		goto out;
 
 	vm->uuid = value;
@@ -1579,14 +1633,9 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 out:
 	datastore = zbx_malloc(NULL, sizeof(zbx_vmware_datastore_t));
 	datastore->name = (NULL != name) ? name : zbx_strdup(NULL, id);
+	datastore->uuid = uuid;
 
-	if (NULL != uuid)
-	{
-		datastore->uuid = uuid;
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name,
-			zbx_result_string(NULL != datastore ? SUCCEED : FAIL));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return datastore;
 }
@@ -1740,7 +1789,6 @@ static zbx_vmware_hv_t	*vmware_service_create_hv(const zbx_vmware_service_t *ser
 
 	ret = SUCCEED;
 out:
-
 	zbx_vector_str_clean(&vms);
 	zbx_vector_str_destroy(&vms);
 
@@ -2412,13 +2460,23 @@ out:
  ******************************************************************************/
 static int	vmware_service_initialize(zbx_vmware_service_t *service, CURL *easyhandle, char **error)
 {
-	int		ret = FAIL;
+	int	ret = FAIL;
+	char	*contents = NULL;
 
 	if (SUCCEED != vmware_service_get_perfcounters(service, easyhandle, error))
 		goto out;
 
+	if (SUCCEED != vmware_service_get_contents(service, easyhandle, &contents, error))
+		goto out;
+
+	zbx_vmware_lock();
+	service->contents = vmware_shared_strdup(contents);
+	zbx_vmware_unlock();
+
 	ret = SUCCEED;
 out:
+	zbx_free(contents);
+
 	return ret;
 }
 
@@ -2471,7 +2529,9 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 
 	if (0 != (service->state & ZBX_VMWARE_STATE_NEW) &&
 			SUCCEED != vmware_service_initialize(service, easyhandle, &data->error))
+	{
 		goto clean;
+	}
 
 	if (SUCCEED != vmware_service_get_hv_list(service, easyhandle, &hvs, &data->error))
 		goto clean;
@@ -2495,7 +2555,6 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 
 	ret = SUCCEED;
 clean:
-
 	curl_slist_free_all(headers);
 	curl_easy_cleanup(easyhandle);
 
@@ -2674,14 +2733,27 @@ void	zbx_vmware_destroy(void)
 void	main_vmware_loop(void)
 {
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-	int			i, now, state, next_update;
+	int			i, now, state, next_update, updated_services = 0, removed_services = 0,
+				old_updated_services = 0, old_removed_services = 0, sleeptime = -1;
 	zbx_vmware_service_t	*service = NULL;
+	double			sec, total_sec = 0.0, old_total_sec = 0.0;
+	time_t			last_stat_time;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In main_vmware_loop()");
+#define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
+				/* once in STAT_INTERVAL seconds */
+
+	last_stat_time = time(NULL);
 
 	for (;;)
 	{
-		zbx_setproctitle("%s [querying vmware services]", get_process_type_string(process_type));
+		if (0 != sleeptime)
+		{
+			zbx_setproctitle("%s #%d [updated %d, removed %d VMware services in " ZBX_FS_DBL " sec, "
+					"querying VMware services]", get_process_type_string(process_type), process_num,
+					old_updated_services, old_removed_services, old_total_sec);
+		}
+
+		sec = zbx_time();
 
 		do
 		{
@@ -2704,6 +2776,7 @@ void	main_vmware_loop(void)
 					zbx_vector_ptr_remove(&vmware->services, i);
 					vmware_service_shared_free(service);
 					state = ZBX_VMWARE_SERVICE_REMOVE;
+					removed_services++;
 					break;
 				}
 
@@ -2711,6 +2784,7 @@ void	main_vmware_loop(void)
 				{
 					service->state |= ZBX_VMWARE_STATE_UPDATING;
 					state = ZBX_VMWARE_SERVICE_UPDATE;
+					updated_services++;
 					break;
 				}
 
@@ -2725,12 +2799,37 @@ void	main_vmware_loop(void)
 
 		} while (ZBX_VMWARE_SERVICE_IDLE != state);
 
-		if (next_update > (now = time(NULL)))
+		total_sec += zbx_time() - sec;
+		now = time(NULL);
+
+		sleeptime = 0 < next_update - now ? next_update - now : 0;
+
+		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{
-			zbx_setproctitle("%s [sleeping]", get_process_type_string(process_type));
-			zbx_sleep_loop(next_update - now);
+			if (0 == sleeptime)
+			{
+				zbx_setproctitle("%s #%d [updated %d, removed %d VMware services in " ZBX_FS_DBL " sec,"
+						" querying VMware services]", get_process_type_string(process_type),
+						process_num, updated_services, removed_services, total_sec);
+			}
+			else
+			{
+				zbx_setproctitle("%s #%d [updated %d, removed %d VMware services in " ZBX_FS_DBL " sec,"
+						" idle %d sec]", get_process_type_string(process_type), process_num,
+						updated_services, removed_services, total_sec, sleeptime);
+				old_updated_services = updated_services;
+				old_removed_services = removed_services;
+				old_total_sec = total_sec;
+			}
+			updated_services = 0;
+			removed_services = 0;
+			total_sec = 0.0;
+			last_stat_time = time(NULL);
 		}
+
+		zbx_sleep_loop(sleeptime);
 	}
+#undef STAT_INTERVAL
 #endif
 }
 
@@ -2845,7 +2944,6 @@ out:
 	return value;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_xml_read_node_value                                          *
@@ -2894,7 +2992,6 @@ clean:
 
 	return value;
 }
-
 
 /******************************************************************************
  *                                                                            *

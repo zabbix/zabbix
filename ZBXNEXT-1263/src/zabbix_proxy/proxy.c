@@ -50,6 +50,7 @@
 #include "heart/heart.h"
 #include "../zabbix_server/selfmon/selfmon.h"
 #include "../zabbix_server/vmware/vmware.h"
+#include "setproctitle.h"
 
 #define INIT_PROXY(type, count)									\
 	process_type = type;									\
@@ -517,6 +518,9 @@ int	main(int argc, char **argv)
 	zbx_task_t	task = ZBX_TASK_START;
 	char		ch;
 
+#if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
+	argv = setproctitle_save_env(argc, argv);
+#endif
 	progname = get_program_name(argv[0]);
 
 	/* parse the command-line */
@@ -639,10 +643,6 @@ int	MAIN_ZABBIX_ENTRY()
 
 	zbx_free_config();
 
-	DBinit();
-	if (SUCCEED != DBcheck_version())
-		exit(EXIT_FAILURE);
-
 	init_database_cache();
 	init_configuration_cache();
 	init_selfmon_collector();
@@ -650,6 +650,10 @@ int	MAIN_ZABBIX_ENTRY()
 	/* initialize vmware support */
 	if (0 != CONFIG_VMWARE_FORKS)
 		zbx_vmware_init();
+
+	DBinit();
+	if (SUCCEED != DBcheck_version())
+		exit(EXIT_FAILURE);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	DCsync_configuration();
@@ -870,6 +874,10 @@ void	zbx_on_exit()
 			ZABBIX_VERSION, ZABBIX_REVISION);
 
 	zabbix_close_log();
+
+#if defined(PS_OVERWRITE_ARGV)
+	setproctitle_free_env();
+#endif
 
 	exit(SUCCEED);
 }

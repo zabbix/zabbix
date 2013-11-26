@@ -363,7 +363,7 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; }
 .classic .ui-dialog .ui-resizable-se { width: 12px; height: 12px; right: -5px; bottom: -5px; background-position: 16px 16px; }
 
 .classic .ui-draggable .ui-dialog-titlebar { cursor: move; }
-.classic .ui-sortable-placeholder { border: 1px dotted #2f2f2f; }
+.classic .ui-sortable-placeholder { box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; border: 1px dotted #2f2f2f; }
 
 .classic .ui-slider { position: relative; text-align: left; }
 .classic .ui-slider .ui-slider-handle { position: absolute; z-index: 2; width: 1.2em; height: 1.2em; cursor: default; }

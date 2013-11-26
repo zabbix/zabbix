@@ -71,7 +71,7 @@ $filterForm->addItem($filterTable);
 $hostInventoryWidget->addFlicker($filterForm, CProfile::get('web.hostinventories.filter.state', 0));
 $hostInventoryWidget->addHeaderRowNumber();
 
-$table = new CTableInfo(_('No hosts defined.'));
+$table = new CTableInfo(_('No hosts found.'));
 $table->setHeader(array(
 	is_show_all_nodes() ? make_sorting_header(_('Node'), 'hostid') : null,
 	make_sorting_header(_('Host'), 'name'),
@@ -94,7 +94,11 @@ foreach ($this->data['hosts'] as $host) {
 
 	$row = array(
 		get_node_name_by_elid($host['hostid']),
-		new CLink($host['name'],'?hostid='.$host['hostid'].url_param('groupid')),
+		new CLink(
+			$host['name'],
+			'?hostid='.$host['hostid'].url_param('groupid'),
+			($host['status'] == HOST_STATUS_NOT_MONITORED) ? 'not-monitored' : ''
+		),
 		$hostGroups,
 		zbx_str2links($host['inventory']['name']),
 		zbx_str2links($host['inventory']['type']),

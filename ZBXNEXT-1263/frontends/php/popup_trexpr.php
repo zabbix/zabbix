@@ -528,6 +528,7 @@ $functions = array(
 		'allowed_types' => $allowedTypesInt
 	)
 );
+order_result($functions, 'description');
 
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
@@ -579,7 +580,7 @@ if (isset($_REQUEST['expression']) && $_REQUEST['dstfld1'] == 'expr_temp') {
 
 		$myItem = API::Item()->get(array(
 			'filter' => array('host' => $exprPart['host'], 'key_' => $exprPart['item'], 'flags' => null),
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('itemid'),
 			'webitems' => true
 		));
 		$myItem = reset($myItem);
@@ -615,10 +616,10 @@ if (!isset($function)) {
 
 if ($itemId) {
 	$items = API::Item()->get(array(
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('itemid', 'key_', 'name'),
 		'itemids' => $itemId,
 		'webitems' => true,
-		'selectHosts' => API_OUTPUT_EXTEND,
+		'selectHosts' => array('host'),
 		'filter' => array('flags' => null)
 	));
 	$item = reset($items);

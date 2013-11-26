@@ -88,8 +88,8 @@ static zbx_hk_cleanup_table_t	hk_cleanup_tables[] = {
 };
 
 /* trends table offsets in the hk_cleanup_tables[] mapping  */
-#define HK_UPADTE_CACHE_OFFSET_TREND_FLOAT	ITEM_VALUE_TYPE_MAX
-#define HK_UPADTE_CACHE_OFFSET_TREND_UINT	(HK_UPADTE_CACHE_OFFSET_TREND_FLOAT + 1)
+#define HK_UPDATE_CACHE_OFFSET_TREND_FLOAT	ITEM_VALUE_TYPE_MAX
+#define HK_UPDATE_CACHE_OFFSET_TREND_UINT	(HK_UPDATE_CACHE_OFFSET_TREND_FLOAT + 1)
 
 /* the oldest record timestamp cache for items in history tables */
 typedef struct
@@ -371,14 +371,14 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 		}
 		if (value_type == ITEM_VALUE_TYPE_FLOAT)
 		{
-			rule = rules + HK_UPADTE_CACHE_OFFSET_TREND_FLOAT;
+			rule = rules + HK_UPDATE_CACHE_OFFSET_TREND_FLOAT;
 			if (ZBX_HK_OPTION_ENABLED == *rule->poption_global)
 				trends = *rule->poption;
 			hk_history_item_update(rule, now, itemid, trends);
 		}
 		else if (value_type == ITEM_VALUE_TYPE_UINT64)
 		{
-			rule = rules + HK_UPADTE_CACHE_OFFSET_TREND_UINT;
+			rule = rules + HK_UPDATE_CACHE_OFFSET_TREND_UINT;
 
 			if (ZBX_HK_OPTION_ENABLED == *rule->poption_global)
 				trends = *rule->poption;
@@ -748,10 +748,20 @@ static int	housekeeping_audit(int now)
 static int	housekeeping_events(int now)
 {
 	static zbx_hk_rule_t 	rules[] = {
-		{"events", "source="ZBX_STR(EVENT_SOURCE_TRIGGERS), 0, &hk_config.events_trigger},
-		{"events", "source="ZBX_STR(EVENT_SOURCE_DISCOVERY), 0, &hk_config.events_discovery},
-		{"events", "source="ZBX_STR(EVENT_SOURCE_AUTO_REGISTRATION), 0, &hk_config.events_autoreg},
-		{"events", "source="ZBX_STR(EVENT_SOURCE_INTERNAL), 0, &hk_config.events_internal},
+		{"events", "source=" ZBX_STR(EVENT_SOURCE_TRIGGERS)
+			" and object=" ZBX_STR(EVENT_OBJECT_TRIGGER), 0, &hk_config.events_trigger},
+		{"events", "source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
+			" and object=" ZBX_STR(EVENT_OBJECT_DHOST), 0, &hk_config.events_discovery},
+		{"events", "source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
+			" and object=" ZBX_STR(EVENT_OBJECT_DSERVICE), 0, &hk_config.events_discovery},
+		{"events", "source=" ZBX_STR(EVENT_SOURCE_AUTO_REGISTRATION)
+			" and object=" ZBX_STR(EVENT_OBJECT_ZABBIX_ACTIVE), 0, &hk_config.events_autoreg},
+		{"events", "source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
+			" and object=" ZBX_STR(EVENT_OBJECT_TRIGGER), 0, &hk_config.events_internal},
+		{"events", "source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
+			" and object=" ZBX_STR(EVENT_OBJECT_ITEM), 0, &hk_config.events_internal},
+		{"events", "source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
+			" and object=" ZBX_STR(EVENT_OBJECT_LLDRULE), 0, &hk_config.events_internal},
 		{NULL}
 	};
 
@@ -770,6 +780,7 @@ static int	housekeeping_events(int now)
 void	main_housekeeper_loop(void)
 {
 	int	now, d_history_and_trends, d_cleanup, d_events, d_sessions, d_services, d_audit;
+	double	sec;
 
 	for (;;)
 	{
@@ -782,6 +793,7 @@ void	main_housekeeper_loop(void)
 		DCconfig_get_config_hk(&hk_config);
 
 		zbx_setproctitle("%s [removing old history and trends]", get_process_type_string(process_type));
+		sec = zbx_time();
 		d_history_and_trends = housekeeping_history_and_trends(now);
 
 		zbx_setproctitle("%s [removing deleted items data]", get_process_type_string(process_type));
@@ -799,12 +811,18 @@ void	main_housekeeper_loop(void)
 		zbx_setproctitle("%s [removing old audit log items]", get_process_type_string(process_type));
 		d_audit = housekeeping_audit(now);
 
-		zabbix_log(LOG_LEVEL_WARNING, "housekeeper deleted: %d records from history and trends,"
-				" %d records of deleted items, %d events, %d sessions,"
-				" %d service alarms, %d audit items",
-				d_history_and_trends, d_cleanup, d_events, d_sessions, d_services, d_audit);
+		sec = zbx_time() - sec;
 
+		zabbix_log(LOG_LEVEL_WARNING, "%s [deleted %d hist/trends, %d items, %d events, %d sessions, %d alarms,"
+				" %d audit items in " ZBX_FS_DBL " sec, idle %d hour(s)]",
+				get_process_type_string(process_type), d_history_and_trends, d_cleanup, d_events,
+				d_sessions, d_services, d_audit, sec, CONFIG_HOUSEKEEPING_FREQUENCY);
 		DBclose();
+
+		zbx_setproctitle("%s [deleted %d hist/trends, %d items, %d events, %d sessions, %d alarms, %d audit "
+				"items in " ZBX_FS_DBL " sec, idle %d hour(s)]",
+				get_process_type_string(process_type), d_history_and_trends, d_cleanup, d_events,
+				d_sessions, d_services, d_audit, sec, CONFIG_HOUSEKEEPING_FREQUENCY);
 
 		zbx_sleep_loop(CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR);
 	}

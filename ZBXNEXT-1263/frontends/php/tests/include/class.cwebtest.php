@@ -187,14 +187,8 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		$this->click("xpath=//a[contains(@href,'$a')]");
 	}
 
-	public function zbxTestCheckboxSelect($a) {
-		if (!$this->isChecked($a)) {
-			$this->click($a);
-		}
-	}
-
-	public function zbxTestCheckboxUnselect($a) {
-		if ($this->isChecked($a)) {
+	public function zbxTestCheckboxSelect($a, $select = true) {
+		if ($select != $this->isChecked($a)) {
 			$this->click($a);
 		}
 	}
@@ -204,21 +198,32 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 	}
 
 	public function zbxTestDropdownHasOptions($id, array $strings) {
+		$attribute = $this->isElementPresent("//select[@id='".$id."']") ? 'id' : 'name';
+		$this->assertElementPresent("//select[@".$attribute."='".$id."']");
+
 		foreach ($strings as $string) {
-			$this->assertElementPresent("//select[@name='".$id."']//option[text()='".$string."']");
+			$this->assertElementPresent("//select[@".$attribute."='".$id."']//option[text()='".$string."']");
 		}
 	}
 
-	public function zbxTestDropdownSelect($id, $str) {
-		$this->zbxTestDropdownHasOptions($id, array($str));
-		$this->select($id, $str);
+	public function zbxTestDropdownSelect($id, $string) {
+		$attribute = $this->isElementPresent("//select[@id='".$id."']") ? 'id' : 'name';
+		$this->assertElementPresent("//select[@".$attribute."='".$id."']");
+
+		$this->assertElementPresent("//select[@".$attribute."='".$id."']//option[text()='".$string."']");
+		$this->select("//select[@".$attribute."='".$id."']", $string);
 	}
 
-	public function zbxTestDropdownSelectWait($id, $str) {
-		$selected = $this->getSelectedLabel($id);
-		$this->zbxTestDropdownSelect($id, $str);
-		// Wait only if drop down selection was changed
-		if ($selected != $str) {
+	public function zbxTestDropdownSelectWait($id, $string) {
+		$attribute = $this->isElementPresent("//select[@id='".$id."']") ? 'id' : 'name';
+		$this->assertElementPresent("//select[@".$attribute."='".$id."']");
+		$this->assertElementPresent("//select[@".$attribute."='".$id."']//option[text()='".$string."']");
+
+		$selected = $this->getSelectedLabel("//select[@".$attribute."='".$id."']");
+
+		// select and wait if drop down selection should be changed
+		if ($selected != $string) {
+			$this->select("//select[@".$attribute."='".$id."']", $string);
 			$this->wait();
 		}
 	}
@@ -248,7 +253,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 	// zbx_popup is the default opened window id if none is passed
 	public function zbxTestLaunchPopup($buttonId, $windowId = 'zbx_popup') {
 		// the above does not seem to work, thus this ugly method has to be used - at least until buttons get unique names...
-		$this->click("//input[@id='$buttonId' and contains(@onclick, 'return PopUp')]");
+		$this->click("//input[@id='$buttonId']");	// and contains(@onclick, 'return PopUp')
 		$this->waitForPopUp($windowId, 6000);
 		$this->selectWindow($windowId);
 		$this->zbxTestCheckFatalErrors();
