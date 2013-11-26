@@ -591,7 +591,7 @@ class CTemplateScreen extends CScreen {
 		$dbScreens = $this->get(array(
 			'screenids' => zbx_objectValues($screens, 'screenid'),
 			'editable' => true,
-			'output' => array('screenid'),
+			'output' => array('screenid', 'templateid'),
 			'preservekeys' => true
 		));
 
@@ -616,7 +616,7 @@ class CTemplateScreen extends CScreen {
 				$dbScreenExist = $this->get(array(
 					'filter' => array(
 						'name' => $screen['name'],
-						'templateid' => $dbScreen['templateid']
+						'templateid' => $dbScreens[$screen['screenid']]['templateid']
 					),
 					'nopermissions' => true,
 					'output' => array('screenid')
