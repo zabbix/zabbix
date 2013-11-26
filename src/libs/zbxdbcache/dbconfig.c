@@ -2826,6 +2826,7 @@ void	DCsync_configuration(void)
 	DBfree_result(gmacro_result);
 	DBfree_result(hmacro_result);
 	DBfree_result(if_result);
+	DBfree_result(expr_result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
