@@ -444,7 +444,7 @@ if (isset($_REQUEST['form'])) {
 		$data['original_templates'] = array();
 	}
 
-	$templateIds = getRequest('templates', hasRequest('add_template') ? array() : $data['original_templates']);
+	$templateIds = getRequest('templates', hasRequest('form_refresh') ? array() : $data['original_templates']);
 
 	$data['linkedTemplates'] = API::Template()->get(array(
 		'templateids' => $templateIds,
