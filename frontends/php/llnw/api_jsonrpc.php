@@ -1,5 +1,5 @@
 <?php
-$d='/var/www/zabbix-prod/llnw/';
+$d='/var/www/zabbix/llnw/';
 include($d.'config.php');
 
 // THIS PAGE IS LIVE!!!
@@ -42,7 +42,9 @@ elseif ($json['method'] == 'proxymap.get') {
 elseif ($json['method'] == 'alertqueue.create') {
    include($base_dir.'alert-queue.php');
 }
+elseif ($json['method'] == 'proxy.status' || $json['method'] == 'proxy.reassign') {
+   include($base_dir.'proxy-assign.php');
+}
 
 sendErrorResponse('235', "Invalid method", "Invalid method");
-
 ?>
