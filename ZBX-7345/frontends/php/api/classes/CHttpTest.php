@@ -352,7 +352,7 @@ class CHttpTest extends CZBXAPI {
 	 *
 	 * @param $httpTestIds
 	 *
-	 * @return array|bool
+	 * @return array
 	 */
 	public function delete($httpTestIds, $nopermissions = false) {
 		if (empty($httpTestIds)) {
