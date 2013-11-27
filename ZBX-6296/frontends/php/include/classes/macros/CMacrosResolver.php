@@ -1223,103 +1223,140 @@ class CMacrosResolver {
 	}
 
 	/**
+	 * Retrieves user macro from the requested hosts
+	 *
+	 * @param array  $hostIds		The sorted list of hosts where macros will be looked for (hostid => hostid)
+	 * @param string $macro			Macro to resolve
+	 * @param array  $hostTemplates	The list of linked templates (hostid => array(templateid))
+	 * @param array  $hostMacros	The list of macros on hosts (hostid => array(macro => value))
+	 *
+	 * @return array
+	 */
+	private function getHostMacros(array $hostIds, $macro, array $hostTemplates, array $hostMacros) {
+		if (!$hostIds) {
+			return null;
+		}
+
+		foreach ($hostIds as $hostId) {
+			if (isset($hostMacros[$hostId]) && isset($hostMacros[$hostId][$macro])) {
+				return $hostMacros[$hostId][$macro];
+			}
+		}
+
+		if (!$hostTemplates) {
+			return null;
+		}
+
+		$templateIds = array();
+
+		foreach ($hostIds as $hostId) {
+			if (isset($hostTemplates[$hostId])) {
+				foreach ($hostTemplates[$hostId] as $templateId) {
+					$templateIds[$templateId] = $templateId;
+				}
+			}
+		}
+
+		natsort($templateIds);
+
+		return $this->getHostMacros($templateIds, $macro, $hostTemplates, $hostMacros);
+	}
+
+	/**
 	 * TODO rename me.
 	 *
 	 * Get macros with values.
 	 *
-	 * @param array $hostMacros			Macros to resolve (hostid => array(macro => value))
+	 * @param array $data			Macros to resolve (hostid => array(macro => null))
 	 *
 	 * @return array
 	 */
-	private function getUserMacrosNew(array $hostMacros) {
-		$allMacrosResolved = true;
+	private function getUserMacrosNew(array $data) {
+		if (!$data) {
+			return $data;
+		}
 
 		/*
 		 * User macros
 		 */
-		$hostIds = array_keys($hostMacros);
-		$relations = array();
+		$hostIds = array();
+		foreach ($data as $hostId => $macros) {
+			$hostIds[$hostId] = $hostId;
+		}
+
+		$hostTemplates = array();		// hostid => array(templateid)
+		$hostMacros = array();			// hostid => array(macro => value)
+		$resolvedHostIds = array();		// hostid => true
 
 		do {
+			$dbMacros = API::UserMacro()->get(array(
+				'hostids' => $hostIds,
+				'output' => array('hostid', 'macro', 'value')
+			));
+			if ($dbMacros) {
+				foreach ($dbMacros as $dbMacro) {
+					if (!isset($hostMacros[$dbMacro['hostid']])) {
+						$hostMacros[$dbMacro['hostid']] = array();
+					}
+					$hostMacros[$dbMacro['hostid']][$dbMacro['macro']] = $dbMacro['value'];
+				}
+
+				foreach ($data as $hostId => &$macros) {
+					if (isset($resolvedHostIds[$hostId])) {
+						continue;
+					}
+
+					$resolved = true;
+
+					foreach ($macros as $macro => &$value) {
+						if ($value === null) {
+							$value = $this->getHostMacros(array($hostId), $macro, $hostTemplates, $hostMacros);
+							if ($value === null) {
+								$resolved = false;
+							}
+						}
+					}
+					unset($value);
+
+					if ($resolved) {
+						$resolvedHostIds[$hostId] = true;
+					}
+				}
+				unset($macros);
+
+				$allMacrosResolved = true;
+				foreach ($data as $hostId => $macros) {
+					if (!isset($resolvedHostIds[$hostId])) {
+						$allMacrosResolved = false;
+						break;
+					}
+				}
+
+				if ($allMacrosResolved) {
+					// there are no more hosts with unresolved macros
+					return $data;
+				}
+			}
+
 			$dbHosts = API::Host()->get(array(
 				'hostids' => $hostIds,
 				'templated_hosts' => true,
 				'output' => array('hostid'),
-				'selectMacros' => array('macro', 'value'),
-				'selectParentTemplates' => array('templateid'),
-				'sortorder' => 'hostid',
-				'preservekeys' => true
+				'selectParentTemplates' => array('templateid')
 			));
 
 			$hostIds = array();
 
 			if ($dbHosts) {
-				// set macros value
-				foreach ($hostMacros as $hostId => $macros) {
-					foreach ($dbHosts as $dbHostId => $dbHost) {
-						if ($dbHost['macros']) {
-							if (bccomp($hostId, $dbHostId) == 0
-									|| ($relations && isTreeRelationExist($relations, array($hostId), $dbHostId))) {
-								foreach ($dbHost['macros'] as $macro) {
-									if (array_key_exists($macro['macro'], $macros) && $macros[$macro['macro']] === null) {
-										$hostMacros[$hostId][$macro['macro']] = $macro['value'];
-									}
-								}
-							}
-						}
-					}
+				foreach ($dbHosts as $dbHost) {
+					$hostTemplates[$dbHost['hostid']] = zbx_objectValues($dbHost['parentTemplates'], 'templateid');
 				}
 
-				// check if all macros are resolved
-				foreach ($hostMacros as $hostId => $macros) {
-					foreach ($macros as $macro => $value) {
-						if ($value === null) {
-							$allMacrosResolved = false;
-							break 2;
-						}
-					}
-				}
-
-				// get next portion of hostIds
-				if (!$allMacrosResolved) {
-					if ($relations) {
-						foreach ($hostMacros as $hostId => $macros) {
-							foreach ($macros as $macro => $value) {
-								if ($value === null) {
-									foreach ($dbHosts as $dbHostId => $dbHost) {
-										if ($dbHosts[$dbHostId]['parentTemplates']) {
-											if (isTreeRelationExist($relations, array($hostId), $dbHostId)) {
-												order_result($dbHosts[$dbHostId]['parentTemplates'], 'templateid');
-
-												$templateIds = zbx_objectValues($dbHosts[$dbHostId]['parentTemplates'], 'templateid');
-
-												foreach ($templateIds as $templateId) {
-													$relations[] = array($dbHostId => $templateId);
-													$hostIds[$templateId] = $templateId;
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-					else {
-						foreach ($hostMacros as $hostId => $macros) {
-							foreach ($macros as $macro => $value) {
-								if ($value === null) {
-									if (isset($dbHosts[$hostId]) && $dbHosts[$hostId]['parentTemplates']) {
-										order_result($dbHosts[$hostId]['parentTemplates'], 'templateid');
-
-										$templateIds = zbx_objectValues($dbHosts[$hostId]['parentTemplates'], 'templateid');
-
-										foreach ($templateIds as $templateId) {
-											$relations[] = array($hostId => $templateId);
-											$hostIds[$templateId] = $templateId;
-										}
-									}
-								}
-							}
+				foreach ($dbHosts as $dbHost) {
+					// only unprocessed templates will be populated
+					foreach ($hostTemplates[$dbHost['hostid']] as $templateId) {
+						if (!isset($hostTemplates[$templateId])) {
+							$hostIds[$templateId] = $templateId;
 						}
 					}
 				}
@@ -1329,21 +1366,33 @@ class CMacrosResolver {
 		/*
 		 * Global macros
 		 */
-		if (!$allMacrosResolved) {
-			$dbGlobalMacros = API::UserMacro()->get(array(
-				'output' => array('macro', 'value'),
-				'globalmacro' => true,
-				'nopermissions' => true
-			));
-			if ($dbGlobalMacros) {
-				$dbGlobalMacros = zbx_toHash($dbGlobalMacros, 'macro');
+		$dbGlobalMacros = API::UserMacro()->get(array(
+			'output' => array('macro', 'value'),
+			'globalmacro' => true
+		));
+		if ($dbGlobalMacros) {
+			$dbGlobalMacros = zbx_toHash($dbGlobalMacros, 'macro');
 
-				foreach ($hostMacros as $hostId => $macros) {
-					foreach ($macros as $macro => $value) {
-						if ($value === null && isset($dbGlobalMacros[$macro])) {
-							$hostMacros[$hostId][$macro] = $dbGlobalMacros[$macro]['value'];
+			foreach ($data as $hostId => $macros) {
+				if (isset($resolvedHostIds[$hostId])) {
+					continue;
+				}
+
+				$resolved = true;
+
+				foreach ($macros as $macro => $value) {
+					if ($value === null) {
+						if (isset($dbGlobalMacros[$macro])) {
+							$data[$hostId][$macro] = $dbGlobalMacros[$macro]['value'];
+						}
+						else {
+							$resolved = false;
 						}
 					}
+				}
+
+				if ($resolved) {
+					$resolvedHostIds[$hostId] = true;
 				}
 			}
 		}
@@ -1351,14 +1400,18 @@ class CMacrosResolver {
 		/*
 		 * Unresolved macros stay as is
 		 */
-		foreach ($hostMacros as $hostId => $macros) {
+		foreach ($data as $hostId => $macros) {
+			if (isset($resolvedHostIds[$hostId])) {
+				continue;
+			}
+
 			foreach ($macros as $macro => $value) {
 				if ($value === null) {
-					$hostMacros[$hostId][$macro] = $macro;
+					$data[$hostId][$macro] = $macro;
 				}
 			}
 		}
 
-		return $hostMacros;
+		return $data;
 	}
 }

@@ -2356,37 +2356,6 @@ function get_tree_by_parentid($parentid, &$tree, $parent_field, $level = 0) {
 	return $result;
 }
 
-/**
- * Is relation between parent and children exist in tree.
- *
- * @param array  $data
- * @param array  $parents
- * @param string $searchChildren
- */
-function isTreeRelationExist(array $data, array $parents, $searchChildren) {
-	$childrens = array();
-
-	foreach ($data as $pairs) {
-		foreach ($parents as $parent) {
-			if (isset($pairs[$parent])) {
-				$children = $pairs[$parent];
-
-				if (bccomp($children, $searchChildren) == 0) {
-					return true;
-				}
-
-				$childrens[$children] = $children;
-			}
-		}
-	}
-
-	if ($childrens) {
-		return isTreeRelationExist($data, $childrens, $searchChildren);
-	}
-
-	return false;
-}
-
 function parse_period($str) {
 	$out = null;
 	$str = trim($str, ';');
