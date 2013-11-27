@@ -158,14 +158,13 @@ int	put_data_to_server(zbx_sock_t *sock, struct zbx_json *j)
 {
 	const char	*__function_name = "put_data_to_server";
 
-	static char	*info = NULL;
-	static size_t	info_alloc = 64;
+	char		*info = NULL;
+	size_t		info_alloc = 128;
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() datalen:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)j->buffer_size);
 
-	if (NULL == info)
-		info = zbx_malloc(info, info_alloc);
+	info = zbx_malloc(info, info_alloc);
 
 	if (FAIL == send_data_to_server(sock, j->buffer))
 		goto exit;
@@ -181,11 +180,7 @@ int	put_data_to_server(zbx_sock_t *sock, struct zbx_json *j)
 
 	ret = SUCCEED;
 exit:
-	if (1024 < info_alloc)
-	{
-		zbx_free(info);
-		info_alloc = 64;
-	}
+	zbx_free(info);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
