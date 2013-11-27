@@ -478,7 +478,6 @@ foreach ($items as $key => $item){
 	// remove items with applications from the collection
 	unset($items[$key]);
 }
-unset($app_rows, $db_app);
 
 foreach ($applications as $appid => $dbApp) {
 	$host = $hosts[$dbApp['hostid']];
