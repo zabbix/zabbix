@@ -77,23 +77,23 @@ if (isset($_REQUEST['save'])) {
 	DBstart();
 
 	$configs = array(
-		'hk_events_mode' => get_request('hk_events_mode', 0),
-		'hk_events_trigger' => get_request('hk_events_trigger'),
-		'hk_events_internal' => get_request('hk_events_internal'),
-		'hk_events_discovery' => get_request('hk_events_discovery'),
-		'hk_events_autoreg' => get_request('hk_events_autoreg'),
-		'hk_services_mode' => get_request('hk_services_mode', 0),
-		'hk_services' => get_request('hk_services'),
-		'hk_audit_mode' => get_request('hk_audit_mode', 0),
-		'hk_audit' => get_request('hk_audit'),
-		'hk_sessions_mode' => get_request('hk_sessions_mode', 0),
-		'hk_sessions' => get_request('hk_sessions'),
-		'hk_history_mode' => get_request('hk_history_mode', 0),
-		'hk_history_global' => get_request('hk_history_global', 0),
-		'hk_history' => get_request('hk_history'),
-		'hk_trends_mode' => get_request('hk_trends_mode', 0),
-		'hk_trends_global' => get_request('hk_trends_global', 0),
-		'hk_trends' => get_request('hk_trends')
+		'hk_events_mode' => getRequest('hk_events_mode', 0),
+		'hk_events_trigger' => getRequest('hk_events_trigger'),
+		'hk_events_internal' => getRequest('hk_events_internal'),
+		'hk_events_discovery' => getRequest('hk_events_discovery'),
+		'hk_events_autoreg' => getRequest('hk_events_autoreg'),
+		'hk_services_mode' => getRequest('hk_services_mode', 0),
+		'hk_services' => getRequest('hk_services'),
+		'hk_audit_mode' => getRequest('hk_audit_mode', 0),
+		'hk_audit' => getRequest('hk_audit'),
+		'hk_sessions_mode' => getRequest('hk_sessions_mode', 0),
+		'hk_sessions' => getRequest('hk_sessions'),
+		'hk_history_mode' => getRequest('hk_history_mode', 0),
+		'hk_history_global' => getRequest('hk_history_global', 0),
+		'hk_history' => getRequest('hk_history'),
+		'hk_trends_mode' => getRequest('hk_trends_mode', 0),
+		'hk_trends_global' => getRequest('hk_trends_global', 0),
+		'hk_trends' => getRequest('hk_trends')
 	);
 
 	$result = update_config($configs);
@@ -102,15 +102,15 @@ if (isset($_REQUEST['save'])) {
 
 	if ($result) {
 		$msg = array();
-		$msg[] = _s('Trigger event and alert data storage period (in days) "%1$s".', get_request('hk_events_trigger'));
-		$msg[] = _s('Internal event and alert data storage period (in days) "%1$s".', get_request('hk_events_internal'));
-		$msg[] = _s('Network discovery event and alert data storage period (in days) "%1$s".', get_request('hk_events_discovery'));
-		$msg[] = _s('Auto-registration event and alert data storage period (in days) "%1$s".', get_request('hk_events_autoreg'));
-		$msg[] = _s('IT service data storage period (in days) "%1$s".', get_request('hk_services'));
-		$msg[] = _s('Audit data storage period (in days) "%1$s".', get_request('hk_audit'));
-		$msg[] = _s('User session data storage period (in days) "%1$s".', get_request('hk_sessions'));
-		$msg[] = _s('History data storage period (in days) "%1$s".', get_request('hk_history'));
-		$msg[] = _s('Trend data storage period (in days) "%1$s".', get_request('hk_trends'));
+		$msg[] = _s('Trigger event and alert data storage period (in days) "%1$s".', getRequest('hk_events_trigger'));
+		$msg[] = _s('Internal event and alert data storage period (in days) "%1$s".', getRequest('hk_events_internal'));
+		$msg[] = _s('Network discovery event and alert data storage period (in days) "%1$s".', getRequest('hk_events_discovery'));
+		$msg[] = _s('Auto-registration event and alert data storage period (in days) "%1$s".', getRequest('hk_events_autoreg'));
+		$msg[] = _s('IT service data storage period (in days) "%1$s".', getRequest('hk_services'));
+		$msg[] = _s('Audit data storage period (in days) "%1$s".', getRequest('hk_audit'));
+		$msg[] = _s('User session data storage period (in days) "%1$s".', getRequest('hk_sessions'));
+		$msg[] = _s('History data storage period (in days) "%1$s".', getRequest('hk_history'));
+		$msg[] = _s('Trend data storage period (in days) "%1$s".', getRequest('hk_trends'));
 
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, implode('; ', $msg));
 	}
@@ -140,35 +140,35 @@ $form->addItem($cmbConf);
 $cnf_wdgt = new CWidget(null, 'hk');
 $cnf_wdgt->addPageHeader(_('CONFIGURATION OF HOUSEKEEPING'), $form);
 
-$data['form_refresh'] = get_request('form_refresh', 0);
+$data['form_refresh'] = getRequest('form_refresh', 0);
 
 if ($data['form_refresh']) {
-	$data['config']['hk_events_mode'] = get_request('hk_events_mode');
+	$data['config']['hk_events_mode'] = getRequest('hk_events_mode');
 	$data['config']['hk_events_trigger'] = isset($_REQUEST['hk_events_trigger'])
-		? get_request('hk_events_trigger') : $data['config']['hk_events_trigger'];
+		? getRequest('hk_events_trigger') : $data['config']['hk_events_trigger'];
 	$data['config']['hk_events_internal'] = isset($_REQUEST['hk_events_internal'])
-		? get_request('hk_events_internal') : $data['config']['hk_events_internal'];
+		? getRequest('hk_events_internal') : $data['config']['hk_events_internal'];
 	$data['config']['hk_events_discovery'] = isset($_REQUEST['hk_events_discovery'])
-		? get_request('hk_events_discovery') : $data['config']['hk_events_discovery'];
+		? getRequest('hk_events_discovery') : $data['config']['hk_events_discovery'];
 	$data['config']['hk_events_autoreg'] = isset($_REQUEST['hk_events_autoreg'])
-		? get_request('hk_events_autoreg') : $data['config']['hk_events_autoreg'];
-	$data['config']['hk_services_mode'] = get_request('hk_services_mode');
+		? getRequest('hk_events_autoreg') : $data['config']['hk_events_autoreg'];
+	$data['config']['hk_services_mode'] = getRequest('hk_services_mode');
 	$data['config']['hk_services'] = isset($_REQUEST['hk_services'])
-		? get_request('hk_services') : $data['config']['hk_services'];
-	$data['config']['hk_audit_mode'] = get_request('hk_audit_mode');
+		? getRequest('hk_services') : $data['config']['hk_services'];
+	$data['config']['hk_audit_mode'] = getRequest('hk_audit_mode');
 	$data['config']['hk_audit'] = isset($_REQUEST['hk_audit'])
-		? get_request('hk_audit') : $data['config']['hk_audit'];
-	$data['config']['hk_sessions_mode'] = get_request('hk_sessions_mode');
+		? getRequest('hk_audit') : $data['config']['hk_audit'];
+	$data['config']['hk_sessions_mode'] = getRequest('hk_sessions_mode');
 	$data['config']['hk_sessions'] = isset($_REQUEST['hk_sessions'])
-		? get_request('hk_sessions') : $data['config']['hk_sessions'];
-	$data['config']['hk_history_mode'] = get_request('hk_history_mode');
-	$data['config']['hk_history_global'] = get_request('hk_history_global');
+		? getRequest('hk_sessions') : $data['config']['hk_sessions'];
+	$data['config']['hk_history_mode'] = getRequest('hk_history_mode');
+	$data['config']['hk_history_global'] = getRequest('hk_history_global');
 	$data['config']['hk_history'] = isset($_REQUEST['hk_history'])
-		? get_request('hk_history') : $data['config']['hk_history'];
-	$data['config']['hk_trends_mode'] = get_request('hk_trends_mode');
-	$data['config']['hk_trends_global'] = get_request('hk_trends_global');
+		? getRequest('hk_history') : $data['config']['hk_history'];
+	$data['config']['hk_trends_mode'] = getRequest('hk_trends_mode');
+	$data['config']['hk_trends_global'] = getRequest('hk_trends_global');
 	$data['config']['hk_trends'] = isset($_REQUEST['hk_trends'])
-		? get_request('hk_trends') : $data['config']['hk_trends'];
+		? getRequest('hk_trends') : $data['config']['hk_trends'];
 }
 else {
 	$data['config'] = select_config(false);
