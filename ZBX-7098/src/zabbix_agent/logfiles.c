@@ -211,8 +211,9 @@ out:
 
 struct st_logfile
 {
-	char	*filename;
-	int	mtime;
+	char		*filename;
+	int		mtime;
+	zbx_uint64_t	size;
 };
 
 /******************************************************************************
@@ -269,15 +270,11 @@ static void free_logfiles(struct st_logfile **logfiles, int *logfiles_alloc, int
  *           Do not forget to change process_log() accordingly!               *
  *                                                                            *
  ******************************************************************************/
-static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, const char *filename, int mtime)
+static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, const char *filename,
+		int mtime, zbx_uint64_t size)
 {
 	const char	*__function_name = "add_logfile";
 	int		i = 0, cmp = 0;
-
-	assert(NULL != logfiles);
-	assert(NULL != logfiles_alloc);
-	assert(NULL != logfiles_num);
-	assert(0 <= *logfiles_num);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' mtime:%d", __function_name, filename, mtime);
 
@@ -340,6 +337,7 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 
 	(*logfiles)[i].filename = strdup(filename);
 	(*logfiles)[i].mtime = mtime;
+	(*logfiles)[i].size = size;
 	++(*logfiles_num);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -370,7 +368,8 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 		unsigned char skip_old_data)
 {
 	const char		*__function_name = "process_logrt";
-	int			i = 0, nbytes, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, fd = 0, length = 0, j = 0;
+	int			i = 0, nbytes, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, fd = 0, length = 0,
+				j = 0, mtime_shift = 0;
 	char			buffer[MAX_BUFFER_LEN], *directory = NULL, *format = NULL, *logfile_candidate = NULL;
 	struct stat		file_buf;
 	struct st_logfile	*logfiles = NULL;
@@ -423,7 +422,8 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 		else if (NULL != zbx_regexp_match(file_name_utf8, format, &length))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
-			add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, file_name_utf8, (int)file_buf.st_mtime);
+			add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, file_name_utf8, (int)file_buf.st_mtime,
+					(zbx_uint64_t)file_buf.st_size);
 		}
 		else
 			zabbix_log(LOG_LEVEL_DEBUG, "'%s' does not match '%s'", logfile_candidate, format);
@@ -455,7 +455,8 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 		else if (NULL != zbx_regexp_match(d_ent->d_name, format, &length))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
-			add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, d_ent->d_name, (int)file_buf.st_mtime);
+			add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, d_ent->d_name, (int)file_buf.st_mtime,
+					(zbx_uint64_t)file_buf.st_size);
 		}
 		else
 			zabbix_log(LOG_LEVEL_DEBUG, "'%s' does not match '%s'", logfile_candidate, format);
@@ -478,14 +479,21 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 			break;	/* the first occurrence is found */
 	}
 
-	/* escaping those with the same mtime, taking the latest one (without exceptions!) */
+	/* escaping those with the same mtime, taking the last one bigger than the lastlogsize */
 	for (j = i + 1; j < logfiles_num; j++)
 	{
-		if (logfiles[j].mtime == logfiles[i].mtime)
-			i = j;	/* moving to the newer one */
+		if (logfiles[j].mtime == logfiles[i].mtime && *lastlogsize <= logfiles[j].size)
+			i = j;
 		else
 			break;	/* all next mtimes are bigger */
 	}
+
+	/* When the last two log files have the same modification time we must increment the  */
+	/* last modified time to avoid reading the old file during next process_logrt() call. */
+	/* Otherwise next time the older file will be used with the lastlogsize value of the  */
+	/* newer file resulting in duplicate log records.                                     */
+	if (1 < logfiles_num && logfiles[logfiles_num - 2].mtime == logfiles[logfiles_num - 1].mtime)
+		mtime_shift = 1;
 
 	/* if all mtimes are less than the given one, take the latest file from existing ones */
 	if (0 < logfiles_num && i == logfiles_num)
@@ -508,7 +516,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 					logfile_candidate, *lastlogsize);
 		}
 
-		*mtime = (int)file_buf.st_mtime;	/* must contain the latest mtime as possible */
+		*mtime = (int)file_buf.st_mtime + mtime_shift;
 
 		if (file_buf.st_size < *lastlogsize)
 			*lastlogsize = 0;	/* maintain backward compatibility */
