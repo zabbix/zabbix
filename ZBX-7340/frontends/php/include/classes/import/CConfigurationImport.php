@@ -734,9 +734,17 @@ class CConfigurationImport {
 					// resolve group prototypes
 					$groupLinks = array();
 					foreach ($hostPrototype['group_links'] as $groupLink) {
-						$groupLinks[] = array(
-							'groupid' => $this->referencer->resolveGroup($groupLink['group']['name'])
-						);
+						$groupId = $this->referencer->resolveGroup($groupLink['group']['name']);
+						if (!$groupId) {
+							throw new Exception(_s(
+								'Cannot find host group "%1$s" for host prototype "%2$s" of discovery rule "%3$s" on "%4$s".',
+								$groupLink['group']['name'],
+								$hostPrototype['name'],
+								$item['name'],
+								$host
+							));
+						}
+						$groupLinks[] = array('groupid' => $groupId);
 					}
 					$hostPrototype['groupLinks'] = $groupLinks;
 					$hostPrototype['groupPrototypes'] = $hostPrototype['group_prototypes'];
@@ -745,7 +753,17 @@ class CConfigurationImport {
 					// resolve templates
 					$templates = array();
 					foreach ($hostPrototype['templates'] as $template) {
-						$templates[] = array('templateid' => $this->referencer->resolveTemplate($template['name']));
+						$templateId = $this->referencer->resolveTemplate($template['name']);
+						if (!$templateId) {
+							throw new Exception(_s(
+								'Cannot find template "%1$s" for host prototype "%2$s" of discovery rule "%3$s" on "%4$s".',
+								$template['name'],
+								$hostPrototype['name'],
+								$item['name'],
+								$host
+							));
+						}
+						$templates[] = array('templateid' => $templateId);
 					}
 					$hostPrototype['templates'] = $templates;
 
