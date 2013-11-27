@@ -24,10 +24,28 @@
  */
 class CHelpItems {
 
+	/**
+	 * A list of all available help items grouped by item type.
+	 *
+	 * @see CHelpItems::getItems()	for a description of the structure
+	 *
+	 * @var array
+	 */
 	protected $items = array();
 
 	public function __construct() {
 		$this->items = $this->getItems();
+	}
+
+	/**
+	 * Returns the help items available for the given item type.
+	 *
+	 * @param int $type
+	 *
+	 * @return array
+	 */
+	public function getByType($type) {
+		return $this->items[$type];
 	}
 
 	/**
@@ -870,16 +888,5 @@ class CHelpItems {
 				)
 			)
 		);
-	}
-
-	/**
-	 * Returns the help items available for the given item type.
-	 *
-	 * @param int $type
-	 *
-	 * @return array
-	 */
-	public function getByType($type) {
-		return $this->items[$type];
 	}
 }
