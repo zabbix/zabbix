@@ -204,18 +204,18 @@ class CSetupWizard extends CForm {
 			// OK
 			if ($req['result'] == FrontendSetup::CHECK_OK) {
 				$rowClass = '';
-				$result = new CSpan(_('OK'), 'green');
+				$result = new CSpan(_('OK'), 'ok');
 			}
 			// warning
 			elseif ($req['result'] == FrontendSetup::CHECK_WARNING) {
-				$rowClass = 'orange';
-				$result = new CSpan(_x('Warning', 'setup'), 'link_menu orange');
+				$rowClass = 'notice';
+				$result = new CSpan(_x('Warning', 'setup'), 'link_menu notice');
 				$result->setHint($req['error']);
 			}
 			// fatal error
 			else {
-				$rowClass = 'red';
-				$result = new CSpan(_('Fail'), 'link_menu red');
+				$rowClass = 'fail';
+				$result = new CSpan(_('Fail'), 'link_menu fail');
 				$result->setHint($req['error']);
 			}
 
@@ -245,7 +245,7 @@ class CSetupWizard extends CForm {
 		// OK or warning
 		else {
 			$this->DISABLE_NEXT_BUTTON = false;
-			$message = array(new CSpan(_('OK'), 'green'));
+			$message = array(new CSpan(_('OK'), 'ok'));
 
 			// add a warning message
 			if ($finalResult == FrontendSetup::CHECK_WARNING) {
@@ -357,8 +357,8 @@ class CSetupWizard extends CForm {
 
 			new CDiv(array(
 				isset($_REQUEST['type']) ? !$this->DISABLE_NEXT_BUTTON ?
-					new CSpan(array(_('OK'), BR()), 'green')
-					: new CSpan(array(_('Fail'), BR()), 'red')
+					new CSpan(array(_('OK'), BR()), 'ok')
+					: new CSpan(array(_('Fail'), BR()), 'fail')
 					: null,
 				new  CSubmit('retry', 'Test connection')
 			), 'info_bar')
@@ -522,8 +522,8 @@ class CSetupWizard extends CForm {
 
 		$table = array('Configuration file', BR(), '"'.Z::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH.'"',
 			BR(), 'created: ', $this->getConfig('ZBX_CONFIG_FILE_CORRECT', false)
-			? new CSpan(_('OK'), 'green')
-			: new CSpan(_('Fail'), 'red')
+			? new CSpan(_('OK'), 'ok')
+			: new CSpan(_('Fail'), 'fail')
 		);
 
 		return array(

@@ -763,7 +763,7 @@ function make_status_of_zbx() {
 		$reqs = FrontendSetup::i()->checkRequirements();
 		foreach ($reqs as $req) {
 			if ($req['result'] != FrontendSetup::CHECK_OK) {
-				$class = ($req['result'] == FrontendSetup::CHECK_WARNING) ? 'orange' : 'red';
+				$class = ($req['result'] == FrontendSetup::CHECK_WARNING) ? 'notice' : 'fail';
 				$table->addRow(array(
 					new CSpan($req['name'], $class),
 					new CSpan($req['current'], $class),
