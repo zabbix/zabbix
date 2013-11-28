@@ -26,7 +26,7 @@ $houseKeeperTab = new CFormList('scriptsTab');
 $eventAlertTab = new CTable(null, 'formElementTable');
 $eventsMode = new CCheckBox('hk_events_mode', $this->data['config']['hk_events_mode'], null, 1);
 $eventAlertTab->addRow(array(
-	new CLabel(_('Internal housekeeping'), 'hk_events_mode'),
+	new CLabel(_('Enable internal housekeeping'), 'hk_events_mode'),
 	$eventsMode
 ));
 
@@ -64,7 +64,7 @@ $houseKeeperTab->addRow(_('Events and alerts'), new CDiv($eventAlertTab));
 $itServicesTab = new CTable(null, 'formElementTable');
 
 $itServicesTab->addRow(array(
-	new CLabel(_('Internal housekeeping'), 'hk_services_mode'),
+	new CLabel(_('Enable internal housekeeping'), 'hk_services_mode'),
 	new CCheckBox('hk_services_mode', $this->data['config']['hk_services_mode'], null, 1)
 ));
 
@@ -83,7 +83,7 @@ $houseKeeperTab->addRow(_('IT services'), new CDiv($itServicesTab));
 $auditTab = new CTable(null, 'formElementTable');
 
 $auditTab->addRow(array(
-	new CLabel(_('Internal housekeeping'), 'hk_audit_mode'),
+	new CLabel(_('Enable internal housekeeping'), 'hk_audit_mode'),
 	new CCheckBox('hk_audit_mode', $this->data['config']['hk_audit_mode'], null, 1)
 ));
 
@@ -102,7 +102,7 @@ $houseKeeperTab->addRow(_('Audit'), new CDiv($auditTab));
 $userSessionTab = new CTable(null, 'formElementTable');
 
 $userSessionTab->addRow(array(
-	new CLabel(_('Internal housekeeping'), 'hk_sessions_mode'),
+	new CLabel(_('Enable internal housekeeping'), 'hk_sessions_mode'),
 	new CCheckBox('hk_sessions_mode', $this->data['config']['hk_sessions_mode'], null, 1)
 ));
 
@@ -121,7 +121,7 @@ $houseKeeperTab->addRow(_('User sessions'), new CDiv($userSessionTab));
 $histortTab = new CTable(null, 'formElementTable');
 
 $histortTab->addRow(array(
-	new CLabel(_('Internal housekeeping'), 'hk_history_mode'),
+	new CLabel(_('Enable internal housekeeping'), 'hk_history_mode'),
 	new CCheckBox('hk_history_mode', $this->data['config']['hk_history_mode'], null, 1)
 ));
 $houseKeeperHistoryGlobal = new CCheckBox('hk_history_global', $this->data['config']['hk_history_global'], null, 1);
@@ -142,7 +142,7 @@ $houseKeeperTab->addRow(_('History'), new CDiv($histortTab));
 $trendTab = new CTable(null, 'formElementTable');
 
 $trendTab->addRow(array(
-	new CLabel(_('Internal housekeeping'), 'hk_trends_mode'),
+	new CLabel(_('Enable internal housekeeping'), 'hk_trends_mode'),
 	new CCheckBox('hk_trends_mode', $this->data['config']['hk_trends_mode'], null, 1)
 ));
 $houseKeeperTrendGlobal = new CCheckBox('hk_trends_global', $this->data['config']['hk_trends_global'], null, 1);
