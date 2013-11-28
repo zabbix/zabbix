@@ -150,6 +150,6 @@ int	zbx_send_response_ext(zbx_sock_t *sock, int result, const char *info, int pr
 		zbx_send_response_ext(sock, result, info, 0, timeout)
 
 int	zbx_recv_response(zbx_sock_t *sock, char *info, int max_info_len, int timeout);
-int	zbx_recv_response_dyn(zbx_sock_t *sock, char **info, size_t *info_alloc, int timeout);
+int	zbx_recv_response_dyn(zbx_sock_t *sock, char **info, int timeout);
 
 #endif
