@@ -588,7 +588,7 @@
 			), 'col1'),
 			new CCol(array($snmpCommunityLabel, $snmpSecurityLabel), 'label'),
 			new CCol(array($snmpCommunityField, $snmpSecurityField)),
-			new CCol(array(bold(_('Keep history')), SPACE._('(in days)').NAME_DELIMITER), 'label'),
+			new CCol(array(bold(_('History')), SPACE._('(in days)').NAME_DELIMITER), 'label'),
 			new CCol(new CNumericBox('filter_history', $filter_history, 8, null, true)),
 			new CCol(bold(_('Triggers').NAME_DELIMITER), 'label'),
 			new CCol(new CComboBox('filter_with_triggers', $filter_with_triggers, null, array(
@@ -603,7 +603,7 @@
 			new CCol(new CTextBox('filter_name', $filter_name, ZBX_TEXTBOX_FILTER_SIZE), 'col1'),
 			new CCol($snmpOidLabel, 'label'),
 			new CCol($snmpOidField),
-			new CCol(array(bold(_('Keep trends')), SPACE._('(in days)').NAME_DELIMITER), 'label'),
+			new CCol(array(bold(_('Trends')), SPACE._('(in days)').NAME_DELIMITER), 'label'),
 			new CCol(new CNumericBox('filter_trends', $filter_trends, 8, null, true)),
 			new CCol(bold(_('Template').NAME_DELIMITER), 'label'),
 			new CCol(new CComboBox('filter_templated_items', $filter_templated_items, null, array(
