@@ -1201,7 +1201,10 @@ class CMacrosResolver {
 
 			if ($macros) {
 				foreach ($macros as $macro) {
-					$hostMacros[$item['hostid']][$macro] = null;
+					if (!isset($hostMacros[$item['hostid']])) {
+						$hostMacros[$item['hostid']] = array('hostids' => array($item['hostid']), 'macros' => array());
+					}
+					$hostMacros[$item['hostid']]['macros'][$macro] = null;
 				}
 			}
 		}
@@ -1211,7 +1214,7 @@ class CMacrosResolver {
 
 			foreach ($items as &$item) {
 				if (isset($hostMacros[$item['hostid']])) {
-					$macros = $hostMacros[$item['hostid']];
+					$macros = $hostMacros[$item['hostid']]['macros'];
 
 					$item[$field] = str_replace(array_keys($macros), array_values($macros), $item[$field]);
 				}
@@ -1267,21 +1270,23 @@ class CMacrosResolver {
 	 *
 	 * Get macros with values.
 	 *
-	 * @param array $data			Macros to resolve (hostid => array(macro => null))
+	 * @param array $data			Macros to resolve (array(hostids => array(hostid), macros => array(macro => null)))
 	 *
 	 * @return array
 	 */
 	private function getUserMacrosNew(array $data) {
-		if (!$data) {
-			return $data;
-		}
-
 		/*
 		 * User macros
 		 */
 		$hostIds = array();
-		foreach ($data as $hostId => $macros) {
-			$hostIds[$hostId] = $hostId;
+		foreach ($data as $element) {
+			foreach ($element['hostids'] as $hostId) {
+				$hostIds[$hostId] = $hostId;
+			}
+		}
+
+		if (!$hostIds) {
+			return $data;
 		}
 
 		$hostTemplates = array();		// hostid => array(templateid)
@@ -1323,18 +1328,23 @@ class CMacrosResolver {
 
 		$allMacrosResolved = true;
 
-		foreach ($data as $hostId => &$macros) {
-			foreach ($macros as $macro => &$value) {
+		foreach ($data as &$element) {
+			$hostIds = array();
+
+			foreach ($element['hostids'] as $hostId) {
+				$hostIds[$hostId] = $hostId;
+			}
+			natsort($hostIds);
+
+			foreach ($element['macros'] as $macro => &$value) {
+				$value = $this->getHostMacros($hostIds, $macro, $hostTemplates, $hostMacros);
 				if ($value === null) {
-					$value = $this->getHostMacros(array($hostId), $macro, $hostTemplates, $hostMacros);
-					if ($value === null) {
-						$allMacrosResolved = false;
-					}
+					$allMacrosResolved = false;
 				}
 			}
 			unset($value);
 		}
-		unset($macros);
+		unset($element);
 
 		if ($allMacrosResolved) {
 			// there are no more hosts with unresolved macros
@@ -1353,18 +1363,20 @@ class CMacrosResolver {
 
 			$allMacrosResolved = true;
 
-			foreach ($data as $hostId => $macros) {
-				foreach ($macros as $macro => $value) {
+			foreach ($data as &$element) {
+				foreach ($element['macros'] as $macro => &$value) {
 					if ($value === null) {
 						if (isset($dbGlobalMacros[$macro])) {
-							$data[$hostId][$macro] = $dbGlobalMacros[$macro]['value'];
+							$value = $dbGlobalMacros[$macro]['value'];
 						}
 						else {
 							$allMacrosResolved = false;
 						}
 					}
 				}
+				unset($value);
 			}
+			unset($element);
 
 			if ($allMacrosResolved) {
 				// there are no more hosts with unresolved macros
@@ -1375,13 +1387,15 @@ class CMacrosResolver {
 		/*
 		 * Unresolved macros stay as is
 		 */
-		foreach ($data as $hostId => $macros) {
-			foreach ($macros as $macro => $value) {
+		foreach ($data as &$element) {
+			foreach ($element['macros'] as $macro => &$value) {
 				if ($value === null) {
-					$data[$hostId][$macro] = $macro;
+					$value = $macro;
 				}
 			}
+			unset($value);
 		}
+		unset($element);
 
 		return $data;
 	}
