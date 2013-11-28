@@ -20,7 +20,7 @@
 ?>
 <?php
 
-class CBar extends CGraphDraw {
+class CBarGraphDraw extends CGraphDraw {
 
 	public function __construct($type = GRAPH_TYPE_COLUMN) {
 		parent::__construct($type);
