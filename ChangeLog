@@ -9,6 +9,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, French, Italian, Russian and
 ....I..PS. [ZBXNEXT-1257] dropped support for UCD-SNMP (asaveljevs)
 
 Bug fixes:
+..F....... [ZBX-7340] fixed incorrect error messages when imported objects reference unexisting objects (Pavels)
 A.F....... [ZBX-7445] fixed frontend redundant call of history (Eduard)
 ..F....... [ZBX-7277] made item selection helper translatable (Ivo)
 .......PS. [ZBX-6160] fixed memory leak in configuration syncer process (Sasha)
