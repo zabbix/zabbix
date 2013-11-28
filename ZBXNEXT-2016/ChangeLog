@@ -7,6 +7,20 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, French, Italian, Russian and
 ....I..PS. [ZBXNEXT-1257] dropped support for UCD-SNMP (asaveljevs)
 
 Bug fixes:
+..F....... [ZBX-7277] made item selection helper translatable (Ivo)
+.......PS. [ZBX-6160] fixed "ORA-01000: maximum open cursors exceeded" error; fixed memory leak in configuration syncer process (Sasha)
+..F....... [ZBX-7354] fixed resetting linked template list when trying to add template with empty field (Ivo)
+.......PS. [ZBX-7360] fixed maximum IPMI sensor ID length; thanks to OpenIPMI author Corey Minyard (Andris, asaveljevs)
+........S. [ZBX-7400] fixed possible server crash when processing trigger functions with text or log items with Oracle backend (Sasha)
+........S. [ZBX-7400] fixed possible server crash when sending messages with Oracle backend (Sasha)
+........S. [ZBX-7326] improved escalator idle time calculations and statistics reporting (wiper)
+..F....... [ZBX-7355] fixed various prototype confirmation messages (Ivo)
+..F....... [ZBX-7408] removed unnecessary variables and includes in slide show configuration (Ivo)
+.D........ [ZBX-7034] improved Alias parameter description in the example configuration files (Richlv)
+..F....... [ZBX-7337] fixed undefined index debug profiler (Eduard)
+..F....... [ZBX-7337] fixed input parameters validation in multiple pages (Eduard, Sasha)
+A......... [ZBX-7372] fixed undefined indexes in script.getscriptsbyhosts method (Ivo)
+..F....... [ZBX-7350] fixed displaying host prototypes in "Status of Zabbix" (Ivo)
 .......PS. [ZBXNEXT-98] refactored code for SNMP checks (asaveljevs, Sasha)
 ........S. [ZBX-7184] added check to prevent host from being switched to unavailable state multiple times in a row (wiper)
 A......... [ZBX-7351] fixed screen item not being saved if resource type is URL (Ivo)
@@ -659,6 +673,8 @@ New features:
 A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Czech, Dutch, French, German, Greek, Hungarian, Japanese, Italian, Romanian, Russian, Slovak, Spanish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-7400] fixed fetching of empty text or log history data with Oracle backend (Sasha)
+....I..... [ZBX-7218] fixed configuration failing with Oracle 12.1 instant client libraries (asaveljevs, Sasha)
 ..F....... [ZBX-6129] fixed trying to change the status of a deleted trigger or trigger prototype changes the status of all trigger and prototypes (Pavels)
 ..F....... [ZBX-6920] fixed displaying of soft linked IT services (Eduard)
 .......PS. [ZBX-7292] fixed resolving of macros in host interfaces (Sasha)

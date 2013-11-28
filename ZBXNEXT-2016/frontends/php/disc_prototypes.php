@@ -198,21 +198,20 @@ if (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
 		show_messages(false, null, _('Invalid time period'));
 	}
 }
-elseif (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
+elseif (hasRequest('delete') && hasRequest('itemid')) {
 	DBstart();
-
-	$result = API::Itemprototype()->delete($_REQUEST['itemid']);
+	$result = API::Itemprototype()->delete(getRequest('itemid'));
 	$result = DBend($result);
 
-	show_messages($result, _('Item deleted'), _('Cannot delete item'));
+	show_messages($result, _('Item prototype deleted'), _('Cannot delete item prototype'));
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
-	clearCookies($result, $_REQUEST['parent_discoveryid']);
+	clearCookies($result, getRequest('parent_discoveryid'));
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])) {
 	unset($_REQUEST['itemid']);
 	$_REQUEST['form'] = 'clone';
 }
-elseif (isset($_REQUEST['save'])) {
+elseif (hasRequest('save')) {
 	$delay_flex = get_request('delay_flex', array());
 	$db_delay_flex = '';
 	foreach ($delay_flex as $value) {
@@ -280,9 +279,11 @@ elseif (isset($_REQUEST['save'])) {
 		'applications'	=> $applications
 	);
 
-	if (isset($_REQUEST['itemid'])) {
-		$db_item = get_item_by_itemid_limited($_REQUEST['itemid']);
-		$db_item['applications'] = get_applications_by_itemid($_REQUEST['itemid']);
+	if (hasRequest('itemid')) {
+		$itemId = getRequest('itemid');
+
+		$db_item = get_item_by_itemid_limited($itemId);
+		$db_item['applications'] = get_applications_by_itemid($itemId);
 
 		// unset snmpv3 fields
 		if ($item['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
@@ -300,44 +301,43 @@ elseif (isset($_REQUEST['save'])) {
 			}
 		}
 
-		$item['itemid'] = $_REQUEST['itemid'];
+		$item['itemid'] = $itemId;
 
 		$result = API::Itemprototype()->update($item);
-
-		show_messages($result, _('Item updated'), _('Cannot update item'));
+		show_messages($result, _('Item prototype updated'), _('Cannot update item prototype'));
 	}
 	else {
 		$result = API::Itemprototype()->create($item);
-		show_messages($result, _('Item added'), _('Cannot add item'));
+		show_messages($result, _('Item prototype added'), _('Cannot add item prototype'));
 	}
 
 	$result = DBend($result);
 	if ($result) {
 		unset($_REQUEST['itemid'], $_REQUEST['form']);
-		clearCookies($result, $_REQUEST['parent_discoveryid']);
+		clearCookies($result, getRequest('parent_discoveryid'));
 	}
 }
-elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['group_itemid'])) {
-	$group_itemid = $_REQUEST['group_itemid'];
+elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('group_itemid')) {
+	$itemId = getRequest('group_itemid');
 
 	DBstart();
 
-	$goResult = ($_REQUEST['go'] == 'activate') ? activate_item($group_itemid) : disable_item($group_itemid);
-	$goResult = DBend($goResult);
+	$isActivated = (getRequest('go') == 'activate');
 
-	show_messages($goResult, ($_REQUEST['go'] == 'activate') ? _('Items activated') : _('Items disabled'), null);
-	clearCookies($goResult, $_REQUEST['parent_discoveryid']);
+	$result = $isActivated ? activate_item($itemId) : disable_item($itemId);
+	$result = DBend($result);
+
+	show_messages($result, $isActivated ? _('Item prototypes activated') : _('Item prototypes disabled'));
+	clearCookies($result, getRequest('parent_discoveryid'));
 }
-elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
-	$group_itemid = $_REQUEST['group_itemid'];
-
+elseif (getRequest('go') == 'delete' && hasRequest('group_itemid')) {
 	DBstart();
 
-	$goResult = API::Itemprototype()->delete($group_itemid);
-	$goResult = DBend($goResult);
+	$result = API::Itemprototype()->delete(getRequest('group_itemid'));
+	$result = DBend($result);
 
-	show_messages($goResult, _('Items deleted'), _('Cannot delete items'));
-	clearCookies($goResult, $_REQUEST['parent_discoveryid']);
+	show_messages($result, _('Item prototypes deleted'), _('Cannot delete item prototypes'));
+	clearCookies($result, getRequest('parent_discoveryid'));
 }
 
 /*

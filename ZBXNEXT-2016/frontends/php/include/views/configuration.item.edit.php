@@ -508,8 +508,9 @@ if (!empty($this->data['itemid'])) {
 			);
 		}
 		else {
-			array_push($buttons, new CButtonDelete(_('Delete item?'),
-				url_params(array('form', 'groupid', 'itemid', 'parent_discoveryid', 'hostid')))
+			$buttons[] = new CButtonDelete(
+				$this->data['parent_discoveryid'] ? _('Delete item prototype?') : _('Delete item?'),
+				url_params(array('form', 'groupid', 'itemid', 'parent_discoveryid', 'hostid'))
 			);
 		}
 	}
