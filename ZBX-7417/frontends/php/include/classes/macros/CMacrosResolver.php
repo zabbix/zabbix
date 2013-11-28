@@ -843,6 +843,7 @@ class CMacrosResolver {
 	 * If macro can not be resolved it is replaced with UNRESOLVED_MACRO_STRING string i.e. "*UNKNOWN*"
 	 * Supports function "last", "min", "max" and "avg".
 	 * Supports seconds as parameters, except "last" function.
+	 * Second parameter like {hostname:key.last(0,86400) and offsets like {hostname:key.last(#1)} are not supported.
 	 * Supports postfixes s,m,h,d and w for parameter.
 	 *
 	 * @param array 	$strList				list of string in which macros should be resolved
@@ -865,7 +866,7 @@ class CMacrosResolver {
 				'(?<hosts>('.ZBX_PREG_HOST_FORMAT.'|({('.self::PATTERN_HOST_INTERNAL.')'.self::PATTERN_MACRO_PARAM.'}))):'.
 				'(?<keys>'.ZBX_PREG_ITEM_KEY_FORMAT.')\.'.
 				'(?<functions>(last|max|min|avg))\('.
-				'(?<parameters>([0-9]+[smhdw]?))'.
+				'(?<parameters>([0-9]+[smhdwKMGT]?)?)'.
 				'\)}{1})/Uux', $str, $matches, PREG_OFFSET_CAPTURE);
 
 			if (!empty($matches['hosts'])) {
