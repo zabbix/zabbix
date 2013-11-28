@@ -471,7 +471,7 @@ class CTrigger extends CTriggerGeneral {
 			$options['selectHosts'] = API_OUTPUT_REFER;
 		}
 		if ($options['itemids'] !== null && $options['selectItems'] === null) {
-			$options['selectItems'] = API_OUTPUT_REFER;
+			$options['selectItems'] = array('itemid');
 		}
 
 		if ($result) {

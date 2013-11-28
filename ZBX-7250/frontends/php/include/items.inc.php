@@ -577,7 +577,7 @@ function resolveItemKeyMacros(array $item) {
 			'selectInterfaces' => array('ip', 'dns', 'useip'),
 			'selectHosts' => array('host', 'name'),
 			'webitems' => true,
-			'output' => API_OUTPUT_REFER,
+			'output' => array('itemid'),
 			'filter' => array('flags' => null)
 		));
 
