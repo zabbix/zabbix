@@ -854,12 +854,14 @@ static boolean at_begline_loc_p (), at_endline_loc_p ();
 static boolean group_in_compile_stack ();
 static reg_errcode_t compile_range ();
 
+#define FREE_MEM(var) if (var) free (var); var = NULL
+
 /* Fetch the next character in the uncompiled pattern---translating it
    if necessary.  Also cast from a signed character in the constant
    string passed to us by the user to an unsigned char that we can use
    as an array index (in, e.g., `translate').  */
 #define PATFETCH(c)							\
-do {if (p == pend) {FREE_VAR (compile_stack.stack); return REG_EEND;}	\
+do {if (p == pend) {FREE_MEM (compile_stack.stack); return REG_EEND;}	\
     c = (unsigned char) *p++;						\
     if (translate) c = translate[c]; 					\
   } while (0)
@@ -867,7 +869,7 @@ do {if (p == pend) {FREE_VAR (compile_stack.stack); return REG_EEND;}	\
 /* Fetch the next character in the uncompiled pattern, with no
    translation.  */
 #define PATFETCH_RAW(c)							\
-do {if (p == pend) {FREE_VAR (compile_stack.stack); return REG_EEND;}	\
+do {if (p == pend) {FREE_MEM (compile_stack.stack); return REG_EEND;}	\
     c = (unsigned char) *p++; 						\
   } while (0)
 
@@ -952,7 +954,7 @@ do {if (p == pend) {FREE_VAR (compile_stack.stack); return REG_EEND;}	\
     unsigned char *old_buffer = bufp->buffer;				\
     if (bufp->allocated == MAX_BUF_SIZE) 				\
 	{								\
-		FREE_VAR (compile_stack.stack);				\
+		FREE_MEM (compile_stack.stack);				\
 		return REG_ESIZE;					\
 	}								\
     bufp->allocated <<= 1;						\
@@ -961,7 +963,7 @@ do {if (p == pend) {FREE_VAR (compile_stack.stack); return REG_EEND;}	\
     bufp->buffer = (unsigned char *) realloc (bufp->buffer, bufp->allocated);\
     if (bufp->buffer == NULL)						\
 	{								\
-		FREE_VAR (compile_stack.stack);				\
+		FREE_MEM (compile_stack.stack);				\
 		return REG_ESPACE;					\
 	}								\
     /* If the buffer moved, move all the pointers into it.  */		\
@@ -1181,7 +1183,7 @@ regex_compile (pattern, size, syntax, bufp)
         }
 	if (!bufp->buffer)
 	{
-		FREE_VAR (compile_stack.stack);
+		FREE_MEM (compile_stack.stack);
 		return REG_ESPACE;
 	}
       bufp->allocated = INIT_BUF_SIZE;
@@ -1238,7 +1240,7 @@ regex_compile (pattern, size, syntax, bufp)
             {
 		if (syntax & RE_CONTEXT_INVALID_OPS)
 		{
-			FREE_VAR (compile_stack.stack);
+			FREE_MEM (compile_stack.stack);
 			return REG_BADRPT;
 		}
               else if (!(syntax & RE_CONTEXT_INDEP_OPS))
@@ -1275,7 +1277,7 @@ regex_compile (pattern, size, syntax, bufp)
                   {
 			if (p == pend)
 			{
-				FREE_VAR (compile_stack.stack);
+				FREE_MEM (compile_stack.stack);
 				return REG_EESCAPE;
 			}
 
@@ -1378,7 +1380,7 @@ regex_compile (pattern, size, syntax, bufp)
 
 		if (p == pend)
 		{
-			FREE_VAR (compile_stack.stack);
+			FREE_MEM (compile_stack.stack);
 			return REG_EBRACK;
 		}
             /* Ensure that we have enough space to push a charset: the
@@ -1412,7 +1414,7 @@ regex_compile (pattern, size, syntax, bufp)
               {
 		if (p == pend)
 		{
-			FREE_VAR (compile_stack.stack);
+			FREE_MEM (compile_stack.stack);
 			return REG_EBRACK;
 		}
 
@@ -1423,7 +1425,7 @@ regex_compile (pattern, size, syntax, bufp)
                   {
 			if (p == pend)
 			{
-				FREE_VAR (compile_stack.stack);
+				FREE_MEM (compile_stack.stack);
 				return REG_EESCAPE;
 			}
 
@@ -1442,7 +1444,7 @@ regex_compile (pattern, size, syntax, bufp)
                    was a character class.  */
                 if (had_char_class && c == '-' && *p != ']')
 		{
-			FREE_VAR (compile_stack.stack);
+			FREE_MEM (compile_stack.stack);
 			return REG_ERANGE;
 		}
 
@@ -1459,7 +1461,7 @@ regex_compile (pattern, size, syntax, bufp)
                       = compile_range (&p, pend, translate, syntax, b);
 			if (ret != REG_NOERROR)
 			{
-				FREE_VAR (compile_stack.stack);
+				FREE_MEM (compile_stack.stack);
 				return ret;
 			}
                   }
@@ -1474,7 +1476,7 @@ regex_compile (pattern, size, syntax, bufp)
                     ret = compile_range (&p, pend, translate, syntax, b);
 			if (ret != REG_NOERROR)
 			{
-				FREE_VAR (compile_stack.stack);
+				FREE_MEM (compile_stack.stack);
 				return ret;
 			}
                   }
@@ -1492,7 +1494,7 @@ regex_compile (pattern, size, syntax, bufp)
                     /* If pattern is `[[:'.  */
 			if (p == pend)
 			{
-				FREE_VAR (compile_stack.stack);
+				FREE_MEM (compile_stack.stack);
 				return REG_EBRACK;
 			}
 
@@ -1527,7 +1529,7 @@ regex_compile (pattern, size, syntax, bufp)
 
 			if (!IS_CHAR_CLASS (str))
 			{
-				FREE_VAR (compile_stack.stack);
+				FREE_MEM (compile_stack.stack);
 				return REG_ECTYPE;
 			}
 
@@ -1537,7 +1539,7 @@ regex_compile (pattern, size, syntax, bufp)
 
 			if (p == pend)
 			{
-				FREE_VAR (compile_stack.stack);
+				FREE_MEM (compile_stack.stack);
 				return REG_EBRACK;
 			}
 
@@ -1623,7 +1625,7 @@ regex_compile (pattern, size, syntax, bufp)
         case '\\':
 		if (p == pend)
 		{
-			FREE_VAR (compile_stack.stack);
+			FREE_MEM (compile_stack.stack);
 			return REG_EESCAPE;
 		}
 
@@ -1691,7 +1693,7 @@ regex_compile (pattern, size, syntax, bufp)
                   goto normal_backslash;
                 else
 		{
-			FREE_VAR (compile_stack.stack);
+			FREE_MEM (compile_stack.stack);
 			return REG_ERPAREN;
 		}
 
@@ -1714,7 +1716,7 @@ regex_compile (pattern, size, syntax, bufp)
                   goto normal_char;
                 else
 		{
-			FREE_VAR (compile_stack.stack);
+			FREE_MEM (compile_stack.stack);
 			return REG_ERPAREN;
 		}
 
@@ -1824,7 +1826,7 @@ regex_compile (pattern, size, syntax, bufp)
                       goto unfetch_interval;
                     else
 			{
-				FREE_VAR (compile_stack.stack);
+				FREE_MEM (compile_stack.stack);
 				return REG_EBRACE;
 			}
                   }
@@ -1847,7 +1849,7 @@ regex_compile (pattern, size, syntax, bufp)
                       goto unfetch_interval;
                     else
 			{
-				FREE_VAR (compile_stack.stack);
+				FREE_MEM (compile_stack.stack);
 				return REG_BADBR;
 			}
                   }
@@ -1856,7 +1858,7 @@ regex_compile (pattern, size, syntax, bufp)
                   {
 			if (c != '\\')
 			{
-				FREE_VAR (compile_stack.stack);
+				FREE_MEM (compile_stack.stack);
 				return REG_EBRACE;
 			}
                     PATFETCH (c);
@@ -1868,7 +1870,7 @@ regex_compile (pattern, size, syntax, bufp)
                       goto unfetch_interval;
                     else
 			{
-				FREE_VAR (compile_stack.stack);
+				FREE_MEM (compile_stack.stack);
 				return REG_BADBR;
 			}
                   }
@@ -1880,7 +1882,7 @@ regex_compile (pattern, size, syntax, bufp)
                   {
                     if (syntax & RE_CONTEXT_INVALID_OPS)
 			{
-				FREE_VAR (compile_stack.stack);
+				FREE_MEM (compile_stack.stack);
 				return REG_BADRPT;
 			}
                     else if (syntax & RE_CONTEXT_INDEP_OPS)
@@ -2050,7 +2052,7 @@ regex_compile (pattern, size, syntax, bufp)
 
               if (c1 > regnum)
 		{
-			FREE_VAR (compile_stack.stack);
+			FREE_MEM (compile_stack.stack);
 			return REG_ESUBREG;
 		}
 
@@ -2125,7 +2127,7 @@ regex_compile (pattern, size, syntax, bufp)
 
   if (!COMPILE_STACK_EMPTY)
 	{
-		FREE_VAR (compile_stack.stack);
+		FREE_MEM (compile_stack.stack);
 		return REG_EPAREN;
 	}
 
@@ -2681,7 +2683,7 @@ re_compile_fastmap (bufp)
            that is all we do.  */
 	case duplicate:
 		bufp->can_be_null = 1;
-		FREE_VAR (fail_stack.stack);
+		FREE_MEM (fail_stack.stack);
 		return 0;
 
 
@@ -2738,7 +2740,7 @@ re_compile_fastmap (bufp)
              then the fastmap is irrelevant.  Something's wrong here.  */
 	  else if (bufp->can_be_null)
 		{
-			FREE_VAR (fail_stack.stack);
+			FREE_MEM (fail_stack.stack);
 			return 0;
 		}
           /* Otherwise, have to check alternative paths.  */
@@ -3207,8 +3209,6 @@ typedef union
 #else /* not REGEX_MALLOC */
 /* Some MIPS systems (at least) want this to free alloca'd storage.  */
 #define FREE_VARIABLES() alloca (0)
-/* No need to explicitly free anything.  */
-#define FREE_VAR(var)
 #endif /* not REGEX_MALLOC */
 
 
