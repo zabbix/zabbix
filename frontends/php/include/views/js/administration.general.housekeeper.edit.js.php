@@ -28,28 +28,8 @@ $schema = DB::getSchema('config');
 			jQuery('#hk_history').prop('disabled', !this.checked);
 		});
 
-		jQuery('#hk_history_mode').change(function() {
-			jQuery('#hk_history_global').prop('disabled', !this.checked);
-			if (jQuery('#hk_history_mode').prop('checked') == true
-					&& jQuery('#hk_history_global').prop('checked') == true) {
-				jQuery('#hk_history').prop('disabled', false);
-			} else {
-				jQuery('#hk_history').prop('disabled', true);
-			}
-		});
-
 		jQuery('#hk_trends_global').change(function() {
 			jQuery('#hk_trends').prop('disabled', !this.checked);
-		});
-
-		jQuery('#hk_trends_mode').change(function() {
-			jQuery('#hk_trends_global').prop('disabled', !this.checked);
-			if (jQuery('#hk_trends_mode').prop('checked') == true
-					&& jQuery('#hk_trends_global').prop('checked') == true) {
-				jQuery('#hk_trends').prop('disabled', false);
-			} else {
-				jQuery('#hk_trends').prop('disabled', true);
-			}
 		});
 
 		// reset button
@@ -122,7 +102,6 @@ $schema = DB::getSchema('config');
 						<?php endif; ?>
 
 						jQuery('#hk_history_global').trigger('change');
-						jQuery('#hk_history_mode').trigger('change');
 
 						jQuery('#hk_history').val("<?php echo $schema['fields']['hk_history']['default']; ?>");
 
@@ -140,7 +119,6 @@ $schema = DB::getSchema('config');
 						<?php endif; ?>
 
 						jQuery('#hk_trends_global').trigger('change');
-						jQuery('#hk_trends_mode').trigger('change');
 
 						jQuery('#hk_trends').val("<?php echo $schema['fields']['hk_trends']['default']; ?>");
 
