@@ -448,7 +448,7 @@ if (!empty($this->data['new_operation'])) {
 		$stepTable->addRow(array(
 			_('Step duration'),
 			new CCol(array(
-				new CNumericBox('new_operation[esc_period]', $this->data['new_operation']['esc_period'], 5),
+				new CNumericBox('new_operation[esc_period]', $this->data['new_operation']['esc_period'], 6),
 				SPACE,
 				_('(minimum 60 seconds, 0 - use action default)')
 			))),
