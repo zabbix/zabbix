@@ -2683,7 +2683,6 @@ re_compile_fastmap (bufp)
            that is all we do.  */
 	case duplicate:
 		bufp->can_be_null = 1;
-		FREE_MEM (fail_stack.stack);
 		return 0;
 
 
@@ -2739,10 +2738,8 @@ re_compile_fastmap (bufp)
           /* Return if we have already set `can_be_null'; if we have,
              then the fastmap is irrelevant.  Something's wrong here.  */
 	  else if (bufp->can_be_null)
-		{
-			FREE_MEM (fail_stack.stack);
-			return 0;
-		}
+		return 0;
+
           /* Otherwise, have to check alternative paths.  */
 	  break;
 
@@ -4935,13 +4932,13 @@ regexec (preg, string, nmatch, pmatch, eflags)
 	if (regs.start == NULL)
 	{
 		if (NULL != regs.end)
-		free (regs.end);
+			free (regs.end);
 		return (int) REG_NOMATCH;
 	}
 	if (regs.end == NULL)
 	{
 		if (NULL != regs.start)
-		free (regs.start);
+			free (regs.start);
 		return (int) REG_NOMATCH;
 	}
     }
