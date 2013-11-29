@@ -164,17 +164,17 @@ int	put_data_to_server(zbx_sock_t *sock, struct zbx_json *j)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() datalen:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)j->buffer_size);
 
 	if (FAIL == send_data_to_server(sock, j->buffer))
-		goto exit;
+		goto out;
 
 	if (SUCCEED != zbx_recv_response_dyn(sock, &info, 0))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "sending data: negative response from server \"%s:%d\": %s",
-				CONFIG_SERVER, CONFIG_SERVER_PORT, NULL != info ? ZBX_NULL2STR(*info) : "");
-		goto exit;
+				CONFIG_SERVER, CONFIG_SERVER_PORT, ZBX_NULL2STR(info));
+		goto out;
 	}
 
 	ret = SUCCEED;
-exit:
+out:
 	zbx_free(info);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));

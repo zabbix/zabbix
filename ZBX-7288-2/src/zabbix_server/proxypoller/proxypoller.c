@@ -232,7 +232,17 @@ static int	process_proxy()
 			if (SUCCEED == (ret = connect_to_proxy(&proxy, &s, CONFIG_TRAPPER_TIMEOUT)))
 			{
 				if (SUCCEED == (ret = send_data_to_proxy(&proxy, &s, j.buffer)))
-					ret = zbx_recv_response(&s, NULL, 0, 0);
+				{
+					char	*info = NULL;
+
+					if (SUCCEED != (ret = zbx_recv_response_dyn(&s, &info, 0)))
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy "
+								"\"%s\": negative response from proxy: %s", proxy.host,
+								ZBX_NULL2STR(info));
+					}
+					zbx_free(info);
+				}
 
 				disconnect_proxy(&s);
 			}

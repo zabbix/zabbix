@@ -138,21 +138,22 @@ static void	send_proxyhistory(zbx_sock_t *sock)
 
 	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
 
-	if (FAIL == zbx_tcp_send_to(sock, j.buffer, CONFIG_TIMEOUT))
+	if (SUCCEED != zbx_tcp_send_to(sock, j.buffer, CONFIG_TIMEOUT))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "error while sending history data to server: %s", zbx_tcp_strerror());
-	}
-	else if (SUCCEED == zbx_recv_response_dyn(sock, &info, CONFIG_TIMEOUT))
-	{
-		if (0 != records)
-			proxy_set_hist_lastid(lastid);
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "sending history data: negative response from server: %s",
-				NULL != info ? ZBX_NULL2STR(*info) : "");
+		goto out;
 	}
 
+	if (SUCCEED != zbx_recv_response_dyn(sock, &info, CONFIG_TIMEOUT))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "sending history data: negative response from server: %s",
+					ZBX_NULL2STR(info));
+		goto out;
+	}
+
+	if (0 != records)
+		proxy_set_hist_lastid(lastid);
+out:
 	zbx_json_free(&j);
 	zbx_free(info);
 

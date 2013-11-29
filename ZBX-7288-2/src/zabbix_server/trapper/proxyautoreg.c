@@ -86,6 +86,7 @@ void	send_areg_data(zbx_sock_t *sock)
 	struct zbx_json	j;
 	zbx_uint64_t	lastid;
 	int		records;
+	char		*info = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -99,13 +100,25 @@ void	send_areg_data(zbx_sock_t *sock)
 
 	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
 
-	if (FAIL == zbx_tcp_send_to(sock, j.buffer, CONFIG_TIMEOUT))
-		zabbix_log(LOG_LEVEL_WARNING, "Error while sending availability of hosts. %s",
+	if (SUCCEED != zbx_tcp_send_to(sock, j.buffer, CONFIG_TIMEOUT))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "error while sending auto-registration data to server: %s",
 				zbx_tcp_strerror());
-	else if (SUCCEED == zbx_recv_response(sock, NULL, 0, CONFIG_TIMEOUT) && 0 != records)
-		proxy_set_areg_lastid(lastid);
+		goto out;
+	}
 
+	if (SUCCEED != zbx_recv_response_dyn(sock, &info, CONFIG_TIMEOUT))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "sending auto-registration data: negative response from server: %s",
+				ZBX_NULL2STR(info));
+		goto out;
+	}
+
+	if (0 != records)
+		proxy_set_areg_lastid(lastid);
+out:
 	zbx_json_free(&j);
+	zbx_free(info);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

@@ -93,16 +93,18 @@ void	send_host_availability(zbx_sock_t *sock)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() [%s]", __function_name, j.buffer);
 
-	if (FAIL == zbx_tcp_send_to(sock, j.buffer, CONFIG_TIMEOUT))
+	if (SUCCEED != zbx_tcp_send_to(sock, j.buffer, CONFIG_TIMEOUT))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "error while sending host availability data: %s", zbx_tcp_strerror());
-	}
-	else if (SUCCEED != zbx_recv_response_dyn(sock, &info, CONFIG_TIMEOUT))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "sending host availability data: negative response from server: %s",
-				NULL != info ? ZBX_NULL2STR(*info) : "");
+		goto out;
 	}
 
+	if (SUCCEED != zbx_recv_response_dyn(sock, &info, CONFIG_TIMEOUT))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "sending host availability data: negative response from server: %s",
+				ZBX_NULL2STR(info));
+	}
+out:
 	zbx_json_free(&j);
 	zbx_free(info);
 
