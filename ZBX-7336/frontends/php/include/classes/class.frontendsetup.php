@@ -208,11 +208,9 @@ class FrontendSetup {
 		$current = array();
 
 		$databases = $this->getSupportedDatabases();
-		if ($databases) {
-			foreach ($databases as $database => $name) {
-				$current[] = $name;
-				$current[] = BR();
-			}
+		foreach ($databases as $database => $name) {
+			$current[] = $name;
+			$current[] = BR();
 		}
 
 		$result = array(
