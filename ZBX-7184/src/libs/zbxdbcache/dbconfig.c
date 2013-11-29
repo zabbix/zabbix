@@ -4528,7 +4528,7 @@ int	DChost_activate(zbx_host_availability_t *in, zbx_host_availability_t *out)
 	ZBX_DC_HOST	*dc_host;
 
 	/* don't try activating host if there were no errors detected */
-	if (0 == in->errors_from)
+	if (0 == in->errors_from && HOST_AVAILABLE_TRUE == in->available)
 		goto out;
 
 	LOCK_CACHE;
