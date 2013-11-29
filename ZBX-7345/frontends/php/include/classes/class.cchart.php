@@ -19,7 +19,7 @@
 **/
 
 
-class CLineGraphDraw extends CGraphDraw {
+class CChart extends CGraphDraw {
 
 	public function __construct($type = GRAPH_TYPE_NORMAL) {
 		parent::__construct($type);
@@ -191,8 +191,6 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$this->itemsHost = null;
 
-		$config = select_config();
-
 		for ($i = 0; $i < $this->num; $i++) {
 			$real_item = get_item_by_itemid($this->items[$i]['itemid']);
 			if (is_null($this->itemsHost)) {
@@ -216,9 +214,8 @@ class CLineGraphDraw extends CGraphDraw {
 
 			$sql_arr = array();
 
-			// override item history setting with housekeeping settings
-			if ($config['hk_history_global']) {
-				$real_item['history'] = $config['hk_history'];
+			if (ZBX_HISTORY_DATA_UPKEEP > -1) {
+				$real_item['history'] = ZBX_HISTORY_DATA_UPKEEP;
 			}
 
 			if (($real_item['history'] * SEC_PER_DAY) > (time() - ($this->from_time + $this->period / 2)) // should pick data from history or trends

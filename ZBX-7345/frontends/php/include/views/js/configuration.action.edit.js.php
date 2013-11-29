@@ -590,7 +590,6 @@
 		jQuery('#clone').click(function() {
 			jQuery('#actionid, #delete, #clone').remove();
 			jQuery('#cancel').addClass('ui-corner-left');
-			jQuery('#form').val('clone');
 			jQuery('#name').focus();
 		});
 

@@ -113,7 +113,8 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$sql = 'SELECT default_theme FROM config WHERE default_theme='.zbx_dbstr('originalblue');
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: "Original blue" theme can not be selected as default theme: it does not exist in the DB');
 
-		$this->assertEquals($oldHash, DBhash($sqlHash));
+		$newHash = DBhash($sqlHash);
+		$this->assertEquals($oldHash, $newHash, "Values in some other DB fields also changed, but shouldn't.");
 	}
 
 	public function testFormAdministrationGeneralGUI_ChangeDropdownFirstEntry() {
@@ -135,7 +136,8 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$sql = 'SELECT dropdown_first_entry FROM config WHERE dropdown_first_entry=1';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Value "All" can not be selected as "dropdown first entry" value');
 
-		$this->assertEquals($oldHash, DBhash($sqlHash));
+		$newHash = DBhash($sqlHash);
+		$this->assertEquals($oldHash, $newHash, "Values in some other DB fields also changed, but shouldn't.");
 	}
 
 	public function testFormAdministrationGeneralGUI_ChangeDropdownFirstRemember() {
@@ -158,7 +160,8 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$sql = 'SELECT dropdown_first_remember FROM config WHERE dropdown_first_remember=1';
 		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "dropdown_first_remember"');
 
-		$this->assertEquals($oldHash, DBhash($sqlHash));
+		$newHash = DBhash($sqlHash);
+		$this->assertEquals($oldHash, $newHash, "Values in some DB fields changed, but shouldn't.");
 	}
 
 	public function testFormAdministrationGeneralGUI_ChangeSearchLimit() {
@@ -214,67 +217,55 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI', 'Search/Filter elements limit'));
 		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Incorrect value "-1" for "Search/Filter elements limit" field: must be between 1 and 999999.'));
 
-		$this->assertEquals($oldHash, DBhash($sqlHash));
+		$newHash = DBhash($sqlHash);
+		$this->assertEquals($oldHash, $newHash, "Values in some DB fields changed, but shouldn't.");
 	}
 
 	public function testFormAdministrationGeneralGUI_ChangeMaxInTable() {
-		$sqlHash = 'SELECT configid,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,event_expire,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
-		$oldHash = DBhash($sqlHash);
 
 		$this->zbxTestLogin('adm.gui.php');
 		$this->input_type('max_in_table', '1000');
 		$this->zbxTestClickWait('save');
-		$this->zbxTestTextPresent(array(
-			'Configuration updated',
-			'CONFIGURATION OF GUI',
-			'GUI',
-			'Max count of elements to show inside table cell'
-		));
+		$this->zbxTestTextPresent(array('Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'Max count of elements to show inside table cell'));
 
-		$this->assertEquals(1, DBcount('SELECT NULL FROM config WHERE max_in_table=1000'));
+		$sqlHash = 'SELECT configid,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,event_expire,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
+		$oldHash = DBhash($sqlHash);
+
+		$sql = 'SELECT max_in_table FROM config WHERE max_in_table=1000';
+		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "max_in_table"');
 
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI'));
 		$this->input_type('max_in_table', '1');
 		$this->zbxTestClickWait('save');
-		$this->zbxTestTextPresent(array(
-			'Configuration updated',
-			'CONFIGURATION OF GUI',
-			'GUI',
-			'Max count of elements to show inside table cell'
-		));
+		$this->zbxTestTextPresent(array('Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'Max count of elements to show inside table cell'));
 
-		$this->assertEquals(1, DBcount('SELECT NULL FROM config WHERE max_in_table=1'));
+		$sql = 'SELECT max_in_table FROM config WHERE max_in_table=1';
+		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "max_in_table"');
 
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI'));
 		$this->input_type('max_in_table', '99999');
 		$this->zbxTestClickWait('save');
-		$this->zbxTestTextPresent(array(
-			'Configuration updated',
-			'CONFIGURATION OF GUI',
-			'GUI',
-			'Max count of elements to show inside table cell'
-		));
+		$this->zbxTestTextPresent(array('Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'Max count of elements to show inside table cell'));
 
-		$this->assertEquals(1, DBcount('SELECT NULL FROM config WHERE max_in_table=99999'));
+		$sql = 'SELECT max_in_table FROM config WHERE max_in_table=99999';
+		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "max_in_table"');
 
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI'));
 		$this->input_type('max_in_table', '-1');
 		$this->zbxTestClickWait('save');
-		$this->zbxTestTextPresent(array(
-			'ERROR: Page received incorrect data',
-			'Incorrect value "-1" for "Max count of elements to show inside table cell" field: must be between 1 and 99999.',
-			'CONFIGURATION OF GUI',
-			'GUI',
-			'Max count of elements to show inside table cell'
-		));
+		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Incorrect value for field "Max count of elements to show inside table cell": must be between 1 and 99999.'));
 
-		$this->assertEquals($oldHash, DBhash($sqlHash));
+		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI', 'Max count of elements to show inside table cell'));
+
+		$newHash = DBhash($sqlHash);
+		$this->assertEquals($oldHash, $newHash, "Values in some DB fields changed, but shouldn't.");
+
 	}
 
 	public function testFormAdministrationGeneralGUI_EventAckEnable() {
@@ -303,7 +294,8 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$sql = 'SELECT event_ack_enable FROM config WHERE event_ack_enable=0';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "event_ack_enable"');
 
-		$this->assertEquals($oldHash, DBhash($sqlHash));
+		$newHash = DBhash($sqlHash);
+		$this->assertEquals($oldHash, $newHash, "Values in some DB fields changed, but shouldn't.");
 	}
 
 	public function testFormAdministrationGeneralGUI_EventExpire() {
@@ -354,7 +346,9 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 
 		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI', 'Show events not older than (in days)'));
 
-		$this->assertEquals($oldHash, DBhash($sqlHash));
+		$newHash = DBhash($sqlHash);
+		$this->assertEquals($oldHash, $newHash, "Values in some DB fields changed, but shouldn't.");
+
 	}
 
 	public function testFormAdministrationGeneralGUI_EventShowMax() {
@@ -397,6 +391,8 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 
 		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI', 'Max count of events per trigger to show'));
 
-		$this->assertEquals($oldHash, DBhash($sqlHash));
+		$newHash = DBhash($sqlHash);
+		$this->assertEquals($oldHash, $newHash, "Values in some DB fields changed, but shouldn't.");
+
 	}
 }

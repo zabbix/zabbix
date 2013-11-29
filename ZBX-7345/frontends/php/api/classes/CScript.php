@@ -337,7 +337,7 @@ class CScript extends CZBXAPI {
 
 		$scripts = $this->get(array(
 			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => array('hostid'),
+			'selectHosts' => API_OUTPUT_REFER,
 			'hostids' => $hostIds,
 			'sortfield' => 'name',
 			'preservekeys' => true
@@ -346,11 +346,11 @@ class CScript extends CZBXAPI {
 		if ($scripts) {
 			// resolve macros
 			$macrosData = array();
-			foreach ($scripts as $scriptId => $script) {
+			foreach ($scripts as $script) {
 				if (!empty($script['confirmation'])) {
 					foreach ($script['hosts'] as $host) {
 						if (isset($scriptsByHost[$host['hostid']])) {
-							$macrosData[$host['hostid']][$scriptId] = $script['confirmation'];
+							$macrosData[$host['hostid']][] = $script['confirmation'];
 						}
 					}
 				}
@@ -362,9 +362,11 @@ class CScript extends CZBXAPI {
 				));
 			}
 
-			foreach ($scripts as $scriptId => $script) {
+			$i = 0;
+			foreach ($scripts as $script) {
 				$hosts = $script['hosts'];
 				unset($script['hosts']);
+
 				// set script to host
 				foreach ($hosts as $host) {
 					$hostId = $host['hostid'];
@@ -374,10 +376,14 @@ class CScript extends CZBXAPI {
 						$scriptsByHost[$hostId][$size] = $script;
 
 						// set confirmation text with resolved macros
-						if (isset($macrosData[$hostId][$scriptId]) && $script['confirmation']) {
-							$scriptsByHost[$hostId][$size]['confirmation'] = $macrosData[$hostId][$scriptId];
+						if (!empty($macrosData[$hostId]) && !empty($script['confirmation'])) {
+							$scriptsByHost[$hostId][$size]['confirmation'] = $macrosData[$hostId][$i];
 						}
 					}
+				}
+
+				if (!empty($script['confirmation'])) {
+					$i++;
 				}
 			}
 		}

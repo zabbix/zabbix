@@ -151,28 +151,25 @@ foreach ($this->data['graphs'] as $graph) {
 
 // create go buttons
 $goComboBox = new CComboBox('go');
-if (!$this->data['parent_discoveryid']) {
+if (empty($this->data['parent_discoveryid'])) {
 	$goComboBox->addItem('copy_to', _('Copy selected to ...'));
 }
 
 $goOption = new CComboItem('delete', _('Delete selected'));
-$goOption->setAttribute(
-	'confirm',
-	$this->data['parent_discoveryid'] ? _('Delete selected graph prototypes?') : _('Delete selected graphs?')
-);
+$goOption->setAttribute('confirm', _('Delete selected graphs?'));
 $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->attr('id', 'goButton');
 
 zbx_add_post_js('chkbxRange.pageGoName = "group_graphid";');
-if ($this->data['parent_discoveryid']) {
-	zbx_add_post_js('chkbxRange.prefix = "'.$this->data['parent_discoveryid'].'";');
-	zbx_add_post_js('cookie.prefix = "'.$this->data['parent_discoveryid'].'";');
-}
-else {
+if (empty($this->data['parent_discoveryid'])) {
 	zbx_add_post_js('chkbxRange.prefix = "'.$this->data['hostid'].'";');
 	zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
+}
+else {
+	zbx_add_post_js('chkbxRange.prefix = "'.$this->data['parent_discoveryid'].'";');
+	zbx_add_post_js('cookie.prefix = "'.$this->data['parent_discoveryid'].'";');
 }
 
 // append table to form

@@ -19,7 +19,10 @@
 **/
 
 
-abstract class CGraphDraw {
+require_once dirname(__FILE__).'/../items.inc.php';
+require_once dirname(__FILE__).'/../hosts.inc.php';
+
+class CGraphDraw {
 
 	public function __construct($type = GRAPH_TYPE_NORMAL) {
 		$this->stime = null;

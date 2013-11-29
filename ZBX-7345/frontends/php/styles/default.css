@@ -263,6 +263,8 @@ span.subfilter_inactive:hover { color: #999999; }
 span.subfilter_active { color: teal; }
 
 /* requirements table */
+span.ok { white-space: normal; font-weight: bold; }
+span.fail { font-weight: bold; }
 span.info { font-weight: bold; font-size: 11px; }
 
 /* saverities */

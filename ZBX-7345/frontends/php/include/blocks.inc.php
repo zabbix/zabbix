@@ -762,12 +762,11 @@ function make_status_of_zbx() {
 	if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
 		$reqs = FrontendSetup::i()->checkRequirements();
 		foreach ($reqs as $req) {
-			if ($req['result'] != FrontendSetup::CHECK_OK) {
-				$class = ($req['result'] == FrontendSetup::CHECK_WARNING) ? 'notice' : 'fail';
+			if ($req['result'] == false) {
 				$table->addRow(array(
-					new CSpan($req['name'], $class),
-					new CSpan($req['current'], $class),
-					new CSpan($req['error'], $class)
+					new CSpan($req['name'], 'red'),
+					new CSpan($req['current'], 'red'),
+					new CSpan($req['error'], 'red')
 				));
 			}
 		}
