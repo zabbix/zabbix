@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-11-29 20:52+0200\n"
-"PO-Revision-Date: 2013-11-08 15:57+0300\n"
+"PO-Revision-Date: 2013-11-21 15:44+0300\n"
 "Last-Translator: open-future <patrik@open-future.be>\n"
 "Language-Team: NL\n"
 "Language: nl\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1383919048.0\n"
+"X-POOTLE-MTIME: 1385041464.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -1975,7 +1975,7 @@ msgstr[0] "Kan scherm niet importeren \"%1$s\": subscherm \"%2$s\" bestaat niet.
 msgstr[1] "Kan scherm niet importeren \"%1$s\": subschermen \"%2$s\" bestaan niet."
 
 #: include/classes/import/importers/CTemplateImporter.php:114
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
 msgstr[0] "Kan sjabloon niet importeren \"%1$s\", gekoppeld sjabloon \"%2$s\" bestaat niet."
@@ -7732,7 +7732,7 @@ msgstr "Item maakt gebruik van de host interface van niet-ouder host."
 
 #: api/classes/CItemGeneral.php:270
 msgid "Item uses incorrect interface type."
-msgstr ""
+msgstr "Item maakt gebruik van verkeerd interface type."
 
 #: api/classes/CItemGeneral.php:321
 msgid "Item will not be refreshed. Please enter a correct update interval."
@@ -7813,43 +7813,43 @@ msgstr "Items gedeactiveerd"
 
 #: include/views/monitoring.history.php:110
 msgid "Items list"
-msgstr ""
+msgstr "Items lijst"
 
 #: items.php:664
 msgid "Items updated"
-msgstr ""
+msgstr "Bijgewerkte artikelen"
 
 #: include/hosts.inc.php:474 include/items.inc.php:246
 msgid "JMX"
-msgstr ""
+msgstr "JMX"
 
 #: include/items.inc.php:96
 msgid "JMX agent"
-msgstr ""
+msgstr "JMX agent"
 
 #: include/views/configuration.host.edit.php:280
 #: include/views/configuration.host.edit.php:358
 #: include/views/configuration.host.prototype.edit.php:133
 #: include/views/inventory.host.view.php:155
 msgid "JMX interfaces"
-msgstr ""
+msgstr "JMX interfaces"
 
 #: api/rpc/class.cjsonrpc.php:149
 #, c-format
 msgid "JSON-rpc error generation failed. No such error \"%s\"."
-msgstr ""
+msgstr "JSON-rpc fout generatie mislukt. Geen dergelijke fout \"%s\"."
 
 #: api/rpc/class.cjsonrpc.php:95
 msgid "JSON-rpc method is not defined."
-msgstr ""
+msgstr "JSON-rpc-methode is niet gedefinieerd."
 
 #: api/rpc/class.cjsonrpc.php:100
 msgid "JSON-rpc params is not an Array."
-msgstr ""
+msgstr "JSON-rpc params is geen een Array."
 
 #: api/rpc/class.cjsonrpc.php:85
 msgid "JSON-rpc version is not specified."
-msgstr ""
+msgstr "JSON-rpc-versie is niet gespecificeerd."
 
 #: include/media.inc.php:27
 #: include/views/administration.mediatypes.edit.php:44
@@ -7914,7 +7914,7 @@ msgstr "Key"
 #: api/classes/CItemGeneral.php:300
 #, c-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
-msgstr ""
+msgstr "Sleutel \"%1$s\" komt niet overeen met <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 
 #: api/classes/CItemKey.php:54
 msgid "Key cannot be empty."
@@ -7969,7 +7969,6 @@ msgid "LOCAL"
 msgstr "LOCAL"
 
 #: include/triggers.inc.php:186
-#, fuzzy
 msgid "LOST"
 msgstr "VERLOREN"
 
@@ -8008,19 +8007,19 @@ msgstr[1] "Laatste %1$d problemen"
 
 #: popup_trexpr.php:239
 msgid "Last (most recent) T value is < N"
-msgstr ""
+msgstr "Laatst (meest recente) T waarde is < N"
 
 #: popup_trexpr.php:249
 msgid "Last (most recent) T value is = N"
-msgstr ""
+msgstr "Laatst (meest recente) T waarde = N"
 
 #: popup_trexpr.php:244
 msgid "Last (most recent) T value is > N"
-msgstr ""
+msgstr "Laatst (meest recente) T waarde > N"
 
 #: popup_trexpr.php:254
 msgid "Last (most recent) T value is NOT N"
-msgstr ""
+msgstr "Laatst (meest recente) T waarde is NOT N"
 
 #: srv_status.php:39
 msgid "Last 24 hours"
@@ -8060,12 +8059,10 @@ msgstr "Grafiek voor de laatste maand"
 
 #: popup_trexpr.php:48 popup_trexpr.php:59 popup_trexpr.php:75
 #: popup_trexpr.php:82 popup_trexpr.php:101
-#, fuzzy
 msgid "Last of"
 msgstr "Laatste van"
 
 #: include/views/administration.proxy.list.php:48
-#, fuzzy
 msgid "Last seen (age)"
 msgstr "Voor het laatst gezien (doorlooptijd)"
 
@@ -8089,7 +8086,7 @@ msgstr "Laatste gebeurtenissen"
 
 #: jsLoader.php:207
 msgid "Latest values"
-msgstr ""
+msgstr "Laatste waarden"
 
 #: include/locales.inc.php:66
 msgid "Latvian (lv_LV)"
@@ -8113,19 +8110,19 @@ msgstr "Legenda"
 
 #: popup_trexpr.php:325
 msgid "Length of last (most recent) T value in characters is < N"
-msgstr ""
+msgstr "Lengte van de laatste (meest recente) T waarde in letters is < N"
 
 #: popup_trexpr.php:335
 msgid "Length of last (most recent) T value in characters is = N"
-msgstr ""
+msgstr "Lengte van de laatste (meest recente) T waarde in letters is = N"
 
 #: popup_trexpr.php:330
 msgid "Length of last (most recent) T value in characters is > N"
-msgstr ""
+msgstr "Lengte van de laatste (meest recente) T waarde in letters is > N"
 
 #: popup_trexpr.php:340
 msgid "Length of last (most recent) T value in characters is NOT N"
-msgstr ""
+msgstr "Lengte van de laatste (meest recente) T waarde in letters is NIET N"
 
 #: include/graphs.inc.php:65 include/views/js/configuration.sysmaps.js.php:369
 #: include/views/js/configuration.sysmaps.js.php:447
@@ -8139,7 +8136,6 @@ msgstr "Koppeling"
 #: include/views/js/configuration.sysmaps.js.php:324
 #: include/views/js/configuration.sysmaps.js.php:336
 #: include/views/js/configuration.sysmaps.js.php:388
-#, fuzzy
 msgid "Link indicators"
 msgstr "Koppelings indicatoren"
 
@@ -8152,12 +8148,12 @@ msgstr "Naam van de koppeling moet uniek zijn voor de kaart \"%s\"."
 #: include/views/configuration.host.prototype.edit.php:250
 #: include/views/configuration.template.edit.php:421
 msgid "Link new templates"
-msgstr ""
+msgstr "Koppelen nieuwe sjablonen"
 
 #: api/classes/CMap.php:502
 #, c-format
 msgid "Link selementid1 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
-msgstr ""
+msgstr "Link selementid1 veld wijst naar een niet-bestaande map selement ID \"%1$s\" voor map \"%2$s\"."
 
 #: api/classes/CMap.php:509
 #, c-format
