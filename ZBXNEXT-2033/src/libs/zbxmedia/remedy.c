@@ -1003,7 +1003,7 @@ out:
 
 int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 {
-	zbx_snprintf(error, max_error_len, "Zabbix server is built without Remedy ticket support");
+	*error = zbx_dsprintf(*error, "Zabbix server is built without Remedy ticket support");
 	return FAIL;
 }
 
