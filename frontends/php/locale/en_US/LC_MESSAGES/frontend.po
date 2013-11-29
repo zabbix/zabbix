@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-29 20:24+0200\n"
-"PO-Revision-Date: 2013-11-08 14:14+0300\n"
-"Last-Translator: richlv <richlv@nakts.net>\n"
+"POT-Creation-Date: 2013-11-29 21:21+0200\n"
+"PO-Revision-Date: 2013-11-13 16:57+0300\n"
+"Last-Translator: Mikhail <mikhail.dobrinin@redprairie.com>\n"
 "Language-Team: \n"
 "Language: en_US\n"
 "MIME-Version: 1.0\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
-"X-POOTLE-MTIME: 1383912848.0\n"
+"X-POOTLE-MTIME: 1384354620.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -1972,7 +1972,7 @@ msgstr[0] "Cannot import screen \"%1$s\": subscreen \"%2$s\" does not exist."
 msgstr[1] "Cannot import screen \"%1$s\": subscreens \"%2$s\" do not exist."
 
 #: include/classes/import/importers/CTemplateImporter.php:114
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
 msgstr[0] "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."

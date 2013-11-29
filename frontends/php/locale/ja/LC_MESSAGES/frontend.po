@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-29 20:24+0200\n"
-"PO-Revision-Date: 2013-11-05 02:37+0300\n"
-"Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
+"POT-Creation-Date: 2013-11-29 21:21+0200\n"
+"PO-Revision-Date: 2013-11-28 15:42+0300\n"
+"Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1383611827.0\n"
+"X-POOTLE-MTIME: 1385646169.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -722,7 +722,7 @@ msgstr "毎%5$s %3$s %4$s %1$s:%2$s"
 #: include/maintenances.inc.php:134
 #, c-format
 msgid "At %1$s:%2$s on day %3$s of every %4$s"
-msgstr "毎%4$s %3$日 %1$s:%2$s"
+msgstr "毎%4$s %3$s日 %1$s:%2$s"
 
 #: include/maintenances.inc.php:83
 #, c-format
@@ -1963,7 +1963,7 @@ msgid_plural "Cannot import screen \"%1$s\": subscreens \"%2$s\" do not exist."
 msgstr[0] "スクリーン\"%1$s\"をインポートできません：サブスクリーン\"%2$s\"がありません。"
 
 #: include/classes/import/importers/CTemplateImporter.php:114
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
 msgstr[0] "テンプレート\"%1$s\"をインポートできません。リンクされているテンプレート\"%2$s\"が存在しません。"
@@ -7410,7 +7410,7 @@ msgstr "Zabbixデータベース内のユーザー情報"
 #: include/views/configuration.action.list.php:36
 msgctxt "event source"
 msgid "Internal"
-msgstr "Zabbixデータベース内のユーザー情報"
+msgstr "インターナル"
 
 #: include/users.inc.php:84
 msgctxt "user type"

@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-29 20:24+0200\n"
-"PO-Revision-Date: 2013-11-05 20:20+0300\n"
-"Last-Translator: Sébastien <sebastien@tiramiseb.fr>\n"
+"POT-Creation-Date: 2013-11-29 21:21+0200\n"
+"PO-Revision-Date: 2013-11-19 08:25+0300\n"
+"Last-Translator: frederic <masterlf@msn.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1384112843.0\n"
+"X-POOTLE-MTIME: 1384842357.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -7662,15 +7662,15 @@ msgstr "Nombre d'éléments"
 
 #: items.php:365 screenedit.php:202
 msgid "Item deleted"
-msgstr "Élément supprimé"
+msgstr "Élément dans un état \"non supporté\""
 
 #: include/actions.inc.php:1153
 msgid "Item in \"normal\" state"
-msgstr ""
+msgstr "Élément dans un état \"normal\""
 
 #: include/actions.inc.php:1152
 msgid "Item in \"not supported\" state"
-msgstr ""
+msgstr "Élément dans un état \"non supporté\""
 
 #: include/forms.inc.php:1124
 msgid "Item prototype"

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-29 20:24+0200\n"
-"PO-Revision-Date: 2013-11-08 16:25+0300\n"
+"POT-Creation-Date: 2013-11-29 21:21+0200\n"
+"PO-Revision-Date: 2013-11-16 11:22+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1384230220.0\n"
+"X-POOTLE-MTIME: 1384593743.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -42,9 +42,9 @@ msgstr[2] "%1$d дней"
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
-msgstr[0] "отображено %1$d из %2$d события"
-msgstr[1] "отображено %1$d из %2$d событий"
-msgstr[2] "отображено %1$d из %2$d событий"
+msgstr[0] "отображено %1$d из %2$d проблемы"
+msgstr[1] "отображено %1$d из %2$d проблем"
+msgstr[2] "отображено %1$d из %2$d проблем"
 
 #: chart4.php:89 chart5.php:83
 #, c-format
@@ -131,7 +131,7 @@ msgstr "-"
 
 #: acknow.php:131
 msgid "----[BULK ACKNOWLEDGE]----"
-msgstr "----[ВВЕДЕНО КАК МАССОВОЕ ПОДТВЕРЖДЕНИЕ]----"
+msgstr "----[МАССОВОЕ ПОДТВЕРЖДЕНИЕ]----"
 
 #: include/triggers.inc.php:2223 include/triggers.inc.php:2224
 #: include/triggers.inc.php:2225 include/triggers.inc.php:2227
@@ -740,17 +740,17 @@ msgstr "В %1$s:%2$s на %3$s день каждый %4$s"
 #, c-format
 msgid "At %1$s:%2$s on every %3$s of every week"
 msgid_plural "At %1$s:%2$s on every %3$s of every %4$s weeks"
-msgstr[0] "В %1$s:%2$s каждый %3$s каждую неделю"
-msgstr[1] "В %1$s:%2$s каждый %3$s каждые %4$s недели"
-msgstr[2] "В %1$s:%2$s каждый %3$s каждые %4$s недель"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: include/maintenances.inc.php:63
 #, c-format
 msgid "At %1$s:%2$s on every day"
 msgid_plural "At %1$s:%2$s on every %3$s days"
-msgstr[0] "В %1$s:%2$s каждый день"
-msgstr[1] "В %1$s:%2$s каждые %3$s дня"
-msgstr[2] "В %1$s:%2$s каждые %3$s дней"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: include/forms.inc.php:1768
 msgid "At (hour:minute)"
@@ -1382,7 +1382,7 @@ msgstr "Невозможно добавить более одного элеме
 #: api/classes/CGraphPrototype.php:43
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
-msgstr "Не удалось добавить более одного элемента данных с типом 'Суммарный график' к прототипу графика \"%1$s\"."
+msgstr "Не удалось добавить более одного элемента данных с типом \"Суммарный график\" к прототипу графика \"%1$s\"."
 
 #: sysmaps.php:171
 msgid "Cannot add network map"
@@ -1808,7 +1808,7 @@ msgstr "Не удалось отобразить очередь элементо
 
 #: chart7.php:74
 msgid "Cannot display more than one item with type \"Graph sum\"."
-msgstr "Не удалось отобразить более одного элемента данных с типом \"Сумма графика\".Не удалось отобразить более одного элемента данных с типом \"Сумма графика\"."
+msgstr "Не удалось отобразить более одного элемента данных с типом \"Суммарный график\"."
 
 #: media_types.php:160
 msgid "Cannot enable media type"
@@ -1983,7 +1983,7 @@ msgstr[1] "Не удалось импортировать комплексный
 msgstr[2] "Не удалось импортировать комплексный экран \"%1$s\": подэкраны \"%2$s\" не существуют."
 
 #: include/classes/import/importers/CTemplateImporter.php:114
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
 msgstr[0] "Не удалось импортировать шаблон \"%1$s\", соединенный шаблон \"%2$s\" не существует."
@@ -2045,7 +2045,7 @@ msgstr "Невозможно выполнить запрос обновлени�
 
 #: api/classes/CApplication.php:536
 msgid "Cannot process applications from different hosts or templates."
-msgstr "Не удалось обработать группы элементов данных из разных узлов сети или шаблонов.Не удалось обработать группы элементов данных из разных узлов сети или шаблонов."
+msgstr "Не удалось обработать группы элементов данных из разных узлов сети или шаблонов."
 
 #: include/classes/server/CZabbixServer.php:222
 #, c-format
@@ -3024,7 +3024,7 @@ msgstr "Копировать"
 #: include/views/configuration.item.list.php:283
 #: include/views/configuration.triggers.list.php:281
 msgid "Copy selected to ..."
-msgstr "Копировать выбранное в..."
+msgstr "Копировать выбранное в ..."
 
 #: api/classes/CUser.php:950
 #, c-format
@@ -4543,7 +4543,7 @@ msgstr "СОБЫТИЯ"
 
 #: jsLoader.php:159
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
-msgstr "У каждого URL должно быть уникальное имя. Пожалуйста, удостоверьтесь, что есть только один URL с этим именем."
+msgstr "У каждого URL должно быть уникальное имя. Пожалуйста, удостоверьтесь, что есть только один URL с этим именем"
 
 #: include/views/administration.users.edit.php:196
 #: include/views/configuration.action.edit.php:383
@@ -5330,7 +5330,7 @@ msgstr "Общие"
 #: include/classes/graphdraw/CBarGraphDraw.php:779
 #, c-format
 msgid "Generated in %s sec"
-msgstr "Сгенерировано за %s сек."
+msgstr "Сгенерировано за %s сек"
 
 #: include/locales.inc.php:59
 msgid "German (de_DE)"
@@ -6464,7 +6464,7 @@ msgstr "Соответствие иконок \"%1$s\" ссылается на �
 #: api/classes/CIconMap.php:429
 #, c-format
 msgid "Icon map \"%1$s\" has mapping with incorrect inventory link \"%2$s\"."
-msgstr "Соответствие иконок \"%1$s\" ссылается на некорректную связь \"%2$s\" с инвентарными данными."
+msgstr "Соответствие иконок \"%1$s\" имеет некорректную ссылку на \"%2$s\" с инвентарными данными."
 
 #: api/classes/CIconMap.php:198 api/classes/CIconMap.php:276
 #, c-format
@@ -6699,7 +6699,7 @@ msgstr "Некорректная проверка обнаружения в ус
 
 #: api/classes/CAction.php:1572
 msgid "Incorrect action condition discovery object."
-msgstr "Некорректный объект обнаружения в условии действия"
+msgstr "Некорректный объект обнаружения в условии действия."
 
 #: api/classes/CAction.php:1687
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
@@ -9641,7 +9641,7 @@ msgstr "Элементы данных не заданы."
 #: include/items.inc.php:791 include/views/configuration.item.list.php:58
 #: include/views/monitoring.overview.php:114 popup.php:810
 msgid "No items found."
-msgstr "Элементы данныз не найдены."
+msgstr "Элементы данных не найдены."
 
 #: include/views/common.macros.php:26
 msgid "No macros found."
@@ -10436,7 +10436,7 @@ msgstr "Разрешены только символы."
 
 #: include/blocks.inc.php:740
 msgid "Only items assigned to enabled hosts are counted"
-msgstr "Подсчитываются только элементы данных у узлов сети Под наблюдением"
+msgstr "Подсчитываются только элементы данных у активированных узлов сети"
 
 #: api/classes/CDRule.php:368
 msgid "Only one check can be unique."
@@ -10457,7 +10457,7 @@ msgstr "Могут быть подтверждены только события
 
 #: include/blocks.inc.php:749
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
-msgstr "Подсчитываются только триггеры у узлов сети Под наблюдением и которые зависят от активных элементов данных"
+msgstr "Подсчитываются только триггеры у активированных узлов сети и которые зависят от активных элементов данных"
 
 #: include/views/configuration.httpconf.edit.php:110
 msgid "Opera"
@@ -10607,7 +10607,7 @@ msgstr ""
 #: include/views/configuration.item.edit.php:383
 msgctxt "item_form"
 msgid "Overridden by"
-msgstr "Переопределено "
+msgstr "Переопределено"
 
 #: include/views/administration.general.housekeeper.edit.php:132
 msgid "Override item history period"
@@ -12118,7 +12118,7 @@ msgstr "Скрипт удален"
 #: api/classes/CScript.php:609
 #, c-format
 msgid "Script menu path \"%1$s\" already used in script name \"%2$s\"."
-msgstr "Путь \"%1$s\" меню скрипта  уже используется в имени скрипта \"%2$s\"."
+msgstr "Путь \"%1$s\" меню скрипта уже используется в имени скрипта \"%2$s\"."
 
 #: include/views/administration.mediatypes.edit.php:65
 #: include/views/administration.mediatypes.list.php:57
@@ -12569,7 +12569,7 @@ msgstr "Простые графики"
 
 #: include/hosts.inc.php:370
 msgid "Site ZIP / postal"
-msgstr "Почтовый индекс"
+msgstr "Почтовый индекс / ящик"
 
 #: include/hosts.inc.php:340
 msgid "Site address A"

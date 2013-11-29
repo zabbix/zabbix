@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-29 20:24+0200\n"
-"PO-Revision-Date: 2013-11-04 20:28+0300\n"
+"POT-Creation-Date: 2013-11-29 21:21+0200\n"
+"PO-Revision-Date: 2013-11-29 11:02+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1383589715.0\n"
+"X-POOTLE-MTIME: 1385715769.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -1984,7 +1984,7 @@ msgstr[1] "Nie je možné importovať obrazovku \"%1$s\": subobrazovky \"%2$s\" 
 msgstr[2] "Nie je možné importovať obrazovku \"%1$s\": subobrazovky \"%2$s\" neexistujú."
 
 #: include/classes/import/importers/CTemplateImporter.php:114
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
 msgstr[0] "Nie je možné importovať šablónu \"%1$s\", prepojená šablóna \"%2$s\" neexistuje."
@@ -6876,7 +6876,7 @@ msgstr "Nepovolené znaky použité pre meno hosta \"%s\"."
 #: api/classes/CProxy.php:241
 #, c-format
 msgid "Incorrect characters used for proxy name \"%1$s\"."
-msgstr "Nepovolené znaky použité pre meno proxy \"%s\"."
+msgstr "Nepovolené znaky použité pre meno proxy \"%1$s\"."
 
 #: api/classes/CTemplate.php:887
 #, c-format
@@ -14933,7 +14933,7 @@ msgstr "Nesprávne polia pre makro \"%1$s\"."
 
 #: api/classes/CMapElement.php:181
 msgid "Wrong fields for map link."
-msgstr "Nesprávne polia pre linku mapy \"%1$s\"."
+msgstr "Nesprávne polia pre linku mapy."
 
 #: api/classes/CMediatype.php:232 api/classes/CMediatype.php:283
 msgid "Wrong fields for media type."
@@ -15056,7 +15056,7 @@ msgstr "d.M.Y H:i:s"
 
 #: include/translateDefines.inc.php:38
 msgid "Y.m.d"
-msgstr "d.m.Y H:i"
+msgstr "d.m.Y"
 
 #: include/translateDefines.inc.php:37
 msgid "Y.m.d H:i"
@@ -15554,12 +15554,12 @@ msgstr "nízko úrovňové zisťovacie pravidlo"
 #: include/func.inc.php:560
 msgctxt "minute short"
 msgid "m"
-msgstr "min."
+msgstr "m"
 
 #: include/func.inc.php:557 jsLoader.php:96
 msgctxt "month short"
 msgid "m"
-msgstr "mes."
+msgstr "m"
 
 #: include/views/js/common.macros.js.php:53
 msgid "macro(s)"
@@ -15718,7 +15718,7 @@ msgstr "beží"
 #: include/func.inc.php:561
 msgctxt "second short"
 msgid "s"
-msgstr "sek."
+msgstr "s"
 
 #: include/page_header.php:125
 #: include/views/configuration.httpconf.edit.php:220

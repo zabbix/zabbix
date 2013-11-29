@@ -5,7 +5,7 @@ New features:
 ..F....... [ZBXNEXT-2016] removed the ZBX_HISTORY_DATA_UPKEEP constant (Pavels)
 ....I..... [ZBXNEXT-1256] changed example directory size user parameter to return bytes (Richlv)
 ..F....... [ZBX-7250] made gettext an optional feature for the frontend (Pavels)
-A.F....... [ZBX-1357] updated Brazilian Portuguese, French, Italian, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, Italian, Japanese, Russian, Slovak, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 ....I..PS. [ZBXNEXT-1257] dropped support for UCD-SNMP (asaveljevs)
 
 Bug fixes:
