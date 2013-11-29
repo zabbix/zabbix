@@ -51,6 +51,7 @@ Cscreen.prototype = {
 
 		jQuery('.draggable').draggable({
 			revert: 'invalid',
+			opacity: 0.8,
 			zIndex: 999,
 			start: function() {
 				if (IE) {

@@ -227,8 +227,9 @@ class testFormHost extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickWait('link='.$this->host_tmp);
-		$this->zbxTestClickWait('delete');
-		$this->getConfirmation();
+		$this->zbxTestClick('delete');
+		$this->waitForConfirmation();
+		$this->wait();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host deleted');
 
@@ -246,8 +247,8 @@ class testFormHost extends CWebTest {
 		$this->zbxTestClickWait('link=Visible host for template linkage');
 
 		$this->zbxTestClick('tab_templateTab');
-		$this->assertElementPresent("//div[@id='add_templates_']/input");
-		$this->input_type("//div[@id='add_templates_']/input", 'Template OS Linux');
+		$this->assertElementPresent("//div[@id='templates_']/input");
+		$this->input_type("//div[@id='templates_']/input", 'Template OS Linux');
 		sleep(1);
 		$this->zbxTestClick("//span[@class='matched']");
 		$this->zbxTestClickWait('add_template');
@@ -278,7 +279,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickWait('link='.$name);
-		$this->zbxTestClick('tab_templateTab');
+		$this->tab_switch('Templates');
 		$this->zbxTestTextPresent($template);
 
 		// clicks button named "Unlink" next to a template by name
@@ -291,14 +292,18 @@ class testFormHost extends CWebTest {
 
 		// this should be a separate test
 		// should check that items, triggers, graphs and applications are not linked to the template anymore
-		$this->zbxTestHrefClickWait('items.php?filter_set=1&hostid='.$hostid);
+		$this->href_click('items.php?filter_set=1&hostid='.$hostid.'&sid=');
+		$this->wait();
 		$this->zbxTestTextNotPresent($template.':');
 		// using "host navigation bar" at the top of entity list
-		$this->zbxTestHrefClickWait('triggers.php?hostid='.$hostid);
+		$this->href_click('triggers.php?hostid='.$hostid.'&sid=');
+		$this->wait();
 		$this->zbxTestTextNotPresent($template.':');
-		$this->zbxTestHrefClickWait('graphs.php?hostid='.$hostid);
+		$this->href_click('graphs.php?hostid='.$hostid.'&sid=');
+		$this->wait();
 		$this->zbxTestTextNotPresent($template.':');
-		$this->zbxTestHrefClickWait('applications.php?hostid='.$hostid);
+		$this->href_click('applications.php?hostid='.$hostid.'&sid=');
+		$this->wait();
 		$this->zbxTestTextNotPresent($template.':');
 	}
 
@@ -308,8 +313,8 @@ class testFormHost extends CWebTest {
 		$this->zbxTestClickWait('link=Visible host for template linkage');
 
 		$this->zbxTestClick('tab_templateTab');
-		$this->assertElementPresent("//div[@id='add_templates_']/input");
-		$this->input_type("//div[@id='add_templates_']/input", 'Template OS Linux');
+		$this->assertElementPresent("//div[@id='templates_']/input");
+		$this->input_type("//div[@id='templates_']/input", 'Template OS Linux');
 		sleep(1);
 		$this->zbxTestClick("//span[@class='matched']");
 		$this->zbxTestClickWait('add_template');
@@ -329,7 +334,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickWait('link='.$name);
-		$this->zbxTestClick('tab_templateTab');
+		$this->tab_switch('Templates');
 		$this->zbxTestTextPresent($template);
 
 		$template = 'Template OS Linux';
@@ -349,7 +354,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickWait('link='.$name);
-		$this->zbxTestClick('tab_templateTab');
+		$this->tab_switch('Templates');
 		$this->zbxTestTextPresent($template);
 
 		// clicks button named "Unlink" next to a template by name
@@ -359,5 +364,6 @@ class testFormHost extends CWebTest {
 		$this->zbxTestClickWait('save');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host updated');
+
 	}
 }

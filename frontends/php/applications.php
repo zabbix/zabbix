@@ -277,7 +277,7 @@ else {
 		$data['applications'] = API::Application()->get(array(
 			'applicationids' => zbx_objectValues($data['applications'], 'applicationid'),
 			'output' => API_OUTPUT_EXTEND,
-			'selectItems' => array('itemid'),
+			'selectItems' => API_OUTPUT_REFER,
 			'expandData' => true
 		));
 

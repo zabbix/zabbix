@@ -436,7 +436,7 @@ class testFormTriggerPrototype extends CWebTest {
 
 		$this->zbxTestClickWait('link='.$description);
 		$this->zbxTestClickWait('save');
-		$this->zbxTestTextPresent('Trigger prototype updated');
+		$this->zbxTestTextPresent('Trigger updated');
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF TRIGGER PROTOTYPES', "Trigger prototypes of ".$this->discoveryRule));
 		$this->zbxTestTextPresent("$description");
@@ -831,7 +831,7 @@ class testFormTriggerPrototype extends CWebTest {
 			$this->zbxTestClickWait('save');
 			switch ($data['expected']) {
 				case TEST_GOOD:
-					$this->zbxTestTextPresent('Trigger prototype added');
+					$this->zbxTestTextPresent('Trigger added');
 					$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 					$this->zbxTestTextPresent(array('CONFIGURATION OF TRIGGER PROTOTYPES', "Trigger prototypes of ".$this->discoveryRule));
 					break;

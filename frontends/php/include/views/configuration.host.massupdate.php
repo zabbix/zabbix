@@ -285,8 +285,7 @@ if ($this->data['inventory_mode'] != HOST_INVENTORY_DISABLED) {
 
 // append tabs to form
 $hostTab = new CTabView();
-// reset the tab when opening the form for the first time
-if (!hasRequest('masssave')) {
+if (!isset($_REQUEST['form_refresh'])) {
 	$hostTab->setSelected(0);
 }
 $hostTab->addTab('hostTab', _('Host'), $hostFormList);

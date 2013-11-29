@@ -21,19 +21,19 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageInventory extends CWebTest {
-
+	// Returns all host inventory
 	public static function allInventory() {
-		return DBdata(
-			'SELECT hi.*,h.name AS hostname'.
-			' FROM host_inventory hi,hosts h'.
-			' WHERE hi.hostid=h.hostid'
-		);
+		return DBdata("select * from host_inventory order by hostid");
 	}
 
 	/**
 	* @dataProvider allInventory
 	*/
-	public function testPageInventory_CheckLayout($data) {
+	public function testPageInventory_CheckLayout($inventory) {
+		$hostid = $inventory['hostid'];
+		$host = DBfetch(DBselect("select name from hosts where hostid=$hostid"));
+		$name = $host['name'];
+
 		$this->zbxTestLogin('hostinventories.php');
 
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
@@ -41,32 +41,33 @@ class testPageInventory extends CWebTest {
 		$this->zbxTestCheckTitle('Host inventory');
 		$this->zbxTestTextPresent('HOST INVENTORY');
 		$this->zbxTestTextPresent('Displaying');
-		$this->zbxTestTextPresent(
-			array('Host', 'Group', 'Name', 'Type', 'OS', 'Serial number A', 'Tag', 'MAC address A')
-		);
+		$this->zbxTestTextNotPresent('Displaying 0');
+// Header
+		$this->zbxTestTextPresent(array('Host', 'Group', 'Name', 'Type', 'OS', 'Serial number A', 'Tag', 'MAC address A'));
 
-		$this->zbxTestTextPresent(array(
-			$data['hostname'],
-			$data['name'],
-			$data['type'],
-			$data['os'],
-			$data['serialno_a'],
-			$data['tag'],
-			$data['macaddress_a'],
-		));
+// Data
+		$this->zbxTestTextPresent(
+			array(
+				$name,
+				$inventory['name'],
+				$inventory['type'],
+				$inventory['os'],
+				$inventory['serialno_a'],
+				$inventory['tag'],
+				$inventory['macaddress_a'],
+			)
+		);
 	}
 
 	/**
 	* @dataProvider allInventory
 	*/
-	public function testPageInventory_ViewInventory($data) {
-		$this->zbxTestLogin('hostinventories.php?hostid='.$data['hostid']);
+	public function testPageHostInventory_ViewInventory($inventory) {
+		$this->zbxTestLogin('hostinventories.php?hostid='.$inventory['hostid']);
 		$this->zbxTestCheckTitle('Host inventory');
 
-		$this->zbxTestClick('tab_detailsTab');
-
-		unset($data['hostid'], $data['hostname']);
-		$this->zbxTestTextPresent($data);
+		unset($inventory['hostid']);
+		$this->zbxTestTextPresent($inventory);
 
 		$this->zbxTestClickWait('cancel');
 

@@ -84,16 +84,15 @@ class CProfiler {
 	 */
 	private static $instance;
 
+
 	/**
 	 * @static
-	 *
 	 * @return CProfiler
 	 */
-	public static function getInstance() {
+	public static function  getInstance() {
 		if (self::$instance === null) {
 			self::$instance = new self;
 		}
-
 		return self::$instance;
 	}
 
@@ -168,7 +167,9 @@ class CProfiler {
 			$debug_str .= '</div>';
 		}
 
+
 		$debug_str .= '<br>';
+
 
 		foreach ($this->sqlQueryLog as $query) {
 			$time = $query[0];
@@ -190,10 +191,15 @@ class CProfiler {
 			$debug_str .= rtrim($callStackString, '-> ').'</span>'.'<br>'.'<br>';
 		}
 
+
 		$debug = new CDiv(null, 'textcolorstyles');
 		$debug->attr('name', 'zbx_gebug_info');
 		$debug->attr('style', 'display: none; overflow: auto; width: 95%; border: 1px #777777 solid; margin: 4px; padding: 4px;');
-		$debug->addItem(array(BR(), new CJSscript($debug_str), BR()));
+		$debug->addItem(array(
+			BR(),
+			new CJSscript($debug_str),
+			BR()
+		));
 		$debug->show();
 	}
 
@@ -204,8 +210,7 @@ class CProfiler {
 	 * @param string $sql
 	 */
 	public function profileSql($time, $sql) {
-		if (!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode'])
-				&& CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_DISABLED) {
+		if ((!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode']) && (CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_DISABLED))) {
 			return;
 		}
 
@@ -228,8 +233,7 @@ class CProfiler {
 	 * @param array  $result
 	 */
 	public function profileApiCall($class, $method, $params, $result) {
-		if (!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode'])
-				&& CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_DISABLED) {
+		if ((!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode']) && (CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_DISABLED))) {
 			return;
 		}
 
@@ -252,7 +256,12 @@ class CProfiler {
 	 * @return int
 	 */
 	private function getMemoryPeak() {
-		return function_exists('memory_get_peak_usage') ? memory_get_peak_usage(true) : memory_get_usage(true);
+		if (function_exists("memory_get_peak_usage")) {
+			return memory_get_peak_usage(true);
+		}
+		else {
+			return memory_get_usage(true);
+		}
 	}
 
 	/**
@@ -274,18 +283,18 @@ class CProfiler {
 		}
 
 		$callStackString = '';
-		$callWithFile = array();
 
 		$callStack = array_reverse($callStack);
+
 		$firstCall = reset($callStack);
 
+		$callWithFile = array();
 		foreach ($callStack as $call) {
 			// do not show the call to the error handler function
 			if ($call['function'] != 'zbx_err_handler') {
 				if (isset($call['class'])) {
 					$callStackString .= $call['class'].$call['type'];
 				}
-
 				$callStackString .= $call['function'].'() &rarr; ';
 			}
 
@@ -304,10 +313,10 @@ class CProfiler {
 			$callStackString = $path['basename'].':'.$firstCall['line'] . ' &rarr; '.rtrim($callStackString, '&rarr; ');
 		}
 
-		if ($callWithFile) {
-			$callStackString .= ' in '.$callWithFile['file'].':'.$callWithFile['line'];
-		}
+		$callStackString .= ' in '.$callWithFile['file'].':'.$callWithFile['line'];
 
 		return $callStackString;
 	}
+
 }
+

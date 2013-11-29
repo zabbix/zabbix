@@ -766,7 +766,7 @@ class testFormGraphPrototype extends CWebTest {
 		$this->zbxTestTextPresent(array(
 			'CONFIGURATION OF GRAPH PROTOTYPES',
 			'Graph prototypes of '.$this->discoveryRule,
-			'Graph prototype updated',
+			'Graph updated',
 			$data['name']
 		));
 
@@ -1182,7 +1182,7 @@ class testFormGraphPrototype extends CWebTest {
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
-				$this->zbxTestTextPresent('Graph prototype added');
+				$this->zbxTestTextPresent('Graph added');
 				$this->zbxTestCheckTitle('Configuration of graph prototypes');
 				$this->zbxTestTextPresent(array('CONFIGURATION OF GRAPH PROTOTYPES', "Graph prototypes of ".$this->discoveryRule));
 				break;
