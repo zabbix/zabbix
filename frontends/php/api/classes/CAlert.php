@@ -69,7 +69,6 @@ class CAlert extends CZBXAPI {
 			'groupids'					=> null,
 			'hostids'					=> null,
 			'alertids'					=> null,
-			'triggerids'				=> null,
 			'objectids'					=> null,
 			'eventids'					=> null,
 			'actionids'					=> null,
@@ -99,7 +98,6 @@ class CAlert extends CZBXAPI {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
-		$options = $this->convertDeprecatedParam($options, 'triggerids', 'objectids');
 		$this->validateGet($options);
 
 		// editable + PERMISSION CHECK
