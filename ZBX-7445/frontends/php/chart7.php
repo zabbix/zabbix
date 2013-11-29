@@ -50,6 +50,7 @@ asort_by_key($items, 'sortorder');
  * Permissions
  */
 $dbItems = API::Item()->get(array(
+	'output' => array('itemid'),
 	'webitems' => true,
 	'itemids' => zbx_objectValues($items, 'itemid')
 ));

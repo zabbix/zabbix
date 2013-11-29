@@ -824,7 +824,7 @@ elseif ($srctbl == 'items') {
 		'nodeids' => $nodeId,
 		'hostids' => $hostid,
 		'webitems' => true,
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('itemid', 'hostid', 'name', 'key_'),
 		'selectHosts' => array('hostid', 'name'),
 		'preservekeys' => true
 	);
