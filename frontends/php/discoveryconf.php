@@ -32,7 +32,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'druleid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'druleid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})&&{form}=="update"'),
 	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})'),
 	'proxy_hostid' =>	array(T_ZBX_INT, O_OPT, null,	DB_ID,		'isset({save})'),
 	'iprange' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
@@ -73,20 +73,7 @@ if (isset($_REQUEST['druleid'])) {
 		access_deny();
 	}
 }
-if (isset($_REQUEST['go'])) {
-	if (!isset($_REQUEST['g_druleid']) || !is_array($_REQUEST['g_druleid'])) {
-		access_deny();
-	}
-	else {
-		$dbDRules = API::DRule()->get(array(
-			'druleids' => $_REQUEST['g_druleid'],
-			'countOutput' => true
-		));
-		if ($dbDRules != count($_REQUEST['g_druleid'])) {
-			access_deny();
-		}
-	}
-}
+
 $_REQUEST['go'] = get_request('go', 'none');
 
 // ajax
@@ -167,12 +154,11 @@ if (isset($_REQUEST['save'])) {
 	}
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['druleid'])) {
-	$result = delete_discovery_rule($_REQUEST['druleid']);
+	$result = API::DRule()->delete(array($_REQUEST['druleid']));
+
 	show_messages($result, _('Discovery rule deleted'), _('Cannot delete discovery rule'));
 
 	if ($result) {
-		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_DISCOVERY_RULE, '['.$_REQUEST['druleid'].']');
-
 		unset($_REQUEST['form'], $_REQUEST['druleid']);
 		clearCookies($result);
 	}
@@ -193,16 +179,10 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 	clearCookies($goResult);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_druleid'])) {
-	$goResult = false;
-	foreach ($_REQUEST['g_druleid'] as $drid) {
-		if (delete_discovery_rule($drid)) {
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_DISCOVERY_RULE, '['.$drid.']');
-			$goResult = true;
-		}
-	}
+	$result = API::DRule()->delete($_REQUEST['g_druleid']);
 
-	show_messages($goResult, _('Discovery rules deleted'));
-	clearCookies($goResult);
+	show_messages($result, _('Discovery rules deleted'), _('Cannot delete discovery rules'));
+	clearCookies($result);
 }
 
 /*

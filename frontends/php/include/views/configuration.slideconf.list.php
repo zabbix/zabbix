@@ -50,7 +50,7 @@ foreach ($this->data['slides'] as $slide) {
 	$slidesTable->addRow(array(
 		new CCheckBox('shows['.$slide['slideshowid'].']', null, null, $slide['slideshowid']),
 		$this->data['displayNodes'] ? $slide['nodename'] : null,
-		new CLink($slide['name'], '?config=1&form=update&slideshowid='.$slide['slideshowid'], 'action'),
+		new CLink($slide['name'], '?form=update&slideshowid='.$slide['slideshowid'], 'action'),
 		$slide['delay'],
 		$slide['cnt']
 	));

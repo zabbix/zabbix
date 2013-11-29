@@ -21,8 +21,6 @@
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/screens.inc.php';
-require_once dirname(__FILE__).'/include/forms.inc.php';
-require_once dirname(__FILE__).'/include/maps.inc.php';
 
 $page['title'] = _('Configuration of slide shows');
 $page['file'] = 'slideconf.php';
