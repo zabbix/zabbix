@@ -1986,7 +1986,7 @@ msgstr[1] ""
 msgstr[2] ""
 
 #: include/classes/import/importers/CTemplateImporter.php:114
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
 msgstr[0] "Nie można zaimportować szablonu \"%1$s\", podłączony szablon \"%2$s\" nie istnieje."

@@ -1963,7 +1963,7 @@ msgid_plural "Cannot import screen \"%1$s\": subscreens \"%2$s\" do not exist."
 msgstr[0] "スクリーン\"%1$s\"をインポートできません：サブスクリーン\"%2$s\"がありません。"
 
 #: include/classes/import/importers/CTemplateImporter.php:114
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
 msgstr[0] "テンプレート\"%1$s\"をインポートできません。リンクされているテンプレート\"%2$s\"が存在しません。"
