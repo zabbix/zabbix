@@ -9,6 +9,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, French, Italian, Russian and
 ....I..PS. [ZBXNEXT-1257] dropped support for UCD-SNMP (asaveljevs)
 
 Bug fixes:
+..F....... [ZBX-7347] fixed custom step duration max size in action configuration (Eduard)
 ..F....... [ZBX-7336] fixed "Database type" selection in setup step 3, improved SQLite3 check and removed storing setup supported databases in cookies (Ivo)
 ..F....... [ZBX-7340] fixed incorrect error messages when imported objects reference unexisting objects (Pavels)
 A.F....... [ZBX-7445] fixed frontend redundant call of history (Eduard)
@@ -679,6 +680,7 @@ New features:
 A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Czech, Dutch, French, German, Greek, Hungarian, Japanese, Italian, Romanian, Russian, Slovak, Spanish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7347] fixed custom step duration max size in action configuration (Eduard)
 ........S. [ZBX-7400] fixed fetching of empty text or log history data with Oracle backend (Sasha)
 ....I..... [ZBX-7218] fixed configuration failing with Oracle 12.1 instant client libraries (asaveljevs, Sasha)
 ..F....... [ZBX-6129] fixed trying to change the status of a deleted trigger or trigger prototype changes the status of all trigger and prototypes (Pavels)
