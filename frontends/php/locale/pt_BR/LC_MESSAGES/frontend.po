@@ -1974,7 +1974,7 @@ msgstr[0] "Não foi possível importar a tela \"%1$s\": a subtela \"%2$s\" não 
 msgstr[1] "Não foi possível importar a tela \"%1$s\": as subtelas \"%2$s\" não existem."
 
 #: include/classes/import/importers/CTemplateImporter.php:114
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
 msgstr[0] "Não foi possível importar o template \"%1$s\", vinculado com o template \"%2$s\" que não existe."

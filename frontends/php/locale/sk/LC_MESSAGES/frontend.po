@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-11-29 20:52+0200\n"
-"PO-Revision-Date: 2013-11-04 20:28+0300\n"
+"PO-Revision-Date: 2013-11-29 11:03+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1383589715.0\n"
+"X-POOTLE-MTIME: 1385715786.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -1984,7 +1984,7 @@ msgstr[1] "Nie je možné importovať obrazovku \"%1$s\": subobrazovky \"%2$s\" 
 msgstr[2] "Nie je možné importovať obrazovku \"%1$s\": subobrazovky \"%2$s\" neexistujú."
 
 #: include/classes/import/importers/CTemplateImporter.php:114
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
 msgstr[0] "Nie je možné importovať šablónu \"%1$s\", prepojená šablóna \"%2$s\" neexistuje."

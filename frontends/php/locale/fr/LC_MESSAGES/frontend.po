@@ -1973,7 +1973,7 @@ msgstr[0] "Impossible d'importer l'écran \"%1$s\" : le sous-écran \"%2$s\" n'e
 msgstr[1] "Impossible d'importer l'écran \"%1$s\" : les sous-écrans \"%2$s\" n'existent pas."
 
 #: include/classes/import/importers/CTemplateImporter.php:114
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
 msgstr[0] "Impossible d'importer le modèle \"%1$s\", le modèle lié \"%2$s\" n'existe pas."
