@@ -432,7 +432,10 @@ if (!empty($this->data['new_operation'])) {
 	if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 		$stepFrom = new CNumericBox('new_operation[esc_step_from]', $this->data['new_operation']['esc_step_from'], 5);
 		$stepFrom->attr('size', 6);
-		$stepFrom->addAction('onchange', 'javascript:'.$stepFrom->getAttribute('onchange').' if(this.value == 0) this.value=1;');
+		$stepFrom->addAction(
+			'onchange',
+			'javascript:'.$stepFrom->getAttribute('onchange').' if (this.value == 0) this.value = 1;'
+		);
 
 		$stepTo = new CNumericBox('new_operation[esc_step_to]', $this->data['new_operation']['esc_step_to'], 5);
 		$stepTo->attr('size', 6);
