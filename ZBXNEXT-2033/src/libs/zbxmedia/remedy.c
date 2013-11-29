@@ -939,7 +939,7 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 		}
 
 		if (SUCCEED == (ret = remedy_create_ticket(media->smtp_server, media->username, media->passwd,
-				media->smtp_helo, ZBX_REMEDY_DEFAULT_SERVICECI, row[3], alert->subject, alert->message,
+				alert->sendto, ZBX_REMEDY_DEFAULT_SERVICECI, row[3], alert->subject, alert->message,
 				impact_map[remedy_event], urgency_map[remedy_event], media->exec_path, &ticketnumber,
 				error)))
 		{
