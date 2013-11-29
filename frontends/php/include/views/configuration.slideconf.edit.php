@@ -114,7 +114,7 @@ else {
 		new CSubmit('save', _('Save')),
 		array(
 			new CSubmit('clone', _('Clone')),
-			new CButtonDelete(_('Delete slide show?'), url_param('form').url_param('slideshowid').url_param('config')),
+			new CButtonDelete(_('Delete slide show?'), url_params(array('form', 'slideshowid'))),
 			new CButtonCancel()
 		)
 	));

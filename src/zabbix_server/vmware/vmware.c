@@ -186,8 +186,7 @@ static char	*vmware_shared_strdup(const char *source)
  ******************************************************************************/
 static void	vmware_datastore_shared_free(zbx_vmware_datastore_t *datastore)
 {
-	if (NULL != datastore->name)
-		__vm_mem_free_func(datastore->name);
+	__vm_mem_free_func(datastore->name);
 
 	if (NULL != datastore->uuid)
 		__vm_mem_free_func(datastore->uuid);
@@ -1634,14 +1633,9 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 out:
 	datastore = zbx_malloc(NULL, sizeof(zbx_vmware_datastore_t));
 	datastore->name = (NULL != name) ? name : zbx_strdup(NULL, id);
+	datastore->uuid = uuid;
 
-	if (NULL != uuid)
-	{
-		datastore->uuid = uuid;
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name,
-			zbx_result_string(NULL != datastore ? SUCCEED : FAIL));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return datastore;
 }
@@ -2561,7 +2555,6 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 
 	ret = SUCCEED;
 clean:
-
 	curl_slist_free_all(headers);
 	curl_easy_cleanup(easyhandle);
 
