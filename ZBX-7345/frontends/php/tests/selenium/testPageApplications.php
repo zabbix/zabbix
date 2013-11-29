@@ -21,26 +21,38 @@
 require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
 class testPageApplications extends CWebTest {
-	// Returns all hosts
+
 	public static function allHosts() {
-		return DBdata('select * from hosts where status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')');
+		return array(
+			array(
+				array(
+					// "Template OS Linux"
+					'hostid' => 10001,
+					'status' => HOST_STATUS_TEMPLATE
+				)
+			),
+			array(
+				array(
+					// "Test host" ("ЗАББИКС Сервер")
+					'hostid' => 10084,
+					'status' => HOST_STATUS_MONITORED
+				)
+			)
+		);
 	}
 
 	/**
 	* @dataProvider allHosts
 	*/
+	public function testPageApplications_CheckLayout($data) {
+		$this->zbxTestLogin('applications.php?groupid=0&hostid='.$data['hostid']);
 
-	public function testPageApplications_CheckLayout($host) {
-		$hostid = $host['hostid'];
-
-		$this->zbxTestLogin('applications.php?groupid=0&hostid='.$hostid);
-
-		// We are in the list of applications
 		$this->zbxTestCheckTitle('Configuration of applications');
 		$this->zbxTestTextPresent('CONFIGURATION OF APPLICATIONS');
 		$this->zbxTestTextPresent('Displaying');
-		$this->zbxTestTextPresent('Host list');
-		// Header
+		$this->zbxTestTextPresent($data['status'] == HOST_STATUS_TEMPLATE ? 'Template list' : 'Host list');
+
+		// table
 		$this->zbxTestTextPresent(array('Applications', 'Show'));
 
 		$this->zbxTestDropdownHasOptions('go', array('Enable selected', 'Disable selected', 'Delete selected'));

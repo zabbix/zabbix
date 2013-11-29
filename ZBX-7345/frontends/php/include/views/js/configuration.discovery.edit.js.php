@@ -650,6 +650,7 @@
 		jQuery('#clone').click(function() {
 			jQuery('#druleid, #delete, #clone').remove();
 			jQuery('#cancel').addClass('ui-corner-left');
+			jQuery('#form').val('clone');
 			jQuery('#name').focus();
 		});
 	});

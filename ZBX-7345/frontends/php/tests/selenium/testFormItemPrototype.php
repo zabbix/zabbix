@@ -1356,7 +1356,7 @@ class testFormItemPrototype extends CWebTest {
 		$this->zbxTestClickWait('save');
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestTextPresent(array(
-			'Item updated', $data['name'],
+			'Item prototype updated', $data['name'],
 			'CONFIGURATION OF ITEM PROTOTYPES',
 			'Item prototypes of '.$this->discoveryRule
 		));
@@ -2619,7 +2619,7 @@ class testFormItemPrototype extends CWebTest {
 			$expected = $data['expected'];
 			switch ($expected) {
 				case TEST_GOOD:
-					$this->zbxTestTextPresent('Item added');
+					$this->zbxTestTextPresent('Item prototype added');
 					$this->zbxTestCheckTitle('Configuration of item prototypes');
 					$this->zbxTestTextPresent(array('CONFIGURATION OF ITEM PROTOTYPES', "Item prototypes of ".$this->discoveryRule));
 					break;
