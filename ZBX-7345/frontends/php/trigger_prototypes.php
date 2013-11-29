@@ -144,7 +144,7 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['triggerid'])) {
 	unset($_REQUEST['triggerid']);
 	$_REQUEST['form'] = 'clone';
 }
-elseif (isset($_REQUEST['save'])) {
+elseif (hasRequest('save')) {
 	$trigger = array(
 		'expression' => $_REQUEST['expression'],
 		'description' => $_REQUEST['description'],
@@ -156,44 +156,45 @@ elseif (isset($_REQUEST['save'])) {
 		'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE
 	);
 
-	if (isset($_REQUEST['triggerid'])) {
-		$trigger['triggerid'] = $_REQUEST['triggerid'];
+	if (hasRequest('triggerid')) {
+		$trigger['triggerid'] = getRequest('triggerid');
 		$result = API::TriggerPrototype()->update($trigger);
 
-		show_messages($result, _('Trigger updated'), _('Cannot update trigger'));
+		show_messages($result, _('Trigger prototype updated'), _('Cannot update trigger prototype'));
 	}
 	else {
 		$result = API::TriggerPrototype()->create($trigger);
 
-		show_messages($result, _('Trigger added'), _('Cannot add trigger'));
+		show_messages($result, _('Trigger prototype added'), _('Cannot add trigger prototype'));
 	}
 
 	if ($result) {
 		unset($_REQUEST['form']);
-		clearCookies($result, $_REQUEST['parent_discoveryid']);
+		clearCookies($result, getRequest('parent_discoveryid'));
 	}
 
 	unset($_REQUEST['save']);
 }
-elseif (isset($_REQUEST['delete']) && isset($_REQUEST['triggerid'])) {
-	$result = API::TriggerPrototype()->delete($_REQUEST['triggerid']);
+elseif (hasRequest('delete') && hasRequest('triggerid')) {
+	$result = API::TriggerPrototype()->delete(getRequest('triggerid'));
 
-	show_messages($result, _('Trigger deleted'), _('Cannot delete trigger'));
-	clearCookies($result, $_REQUEST['parent_discoveryid']);
+	show_messages($result, _('Trigger prototype deleted'), _('Cannot delete trigger prototype'));
+	clearCookies($result, getRequest('parent_discoveryid'));
 
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['triggerid']);
 	}
 }
-elseif ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['mass_save']) && isset($_REQUEST['g_triggerid'])) {
-	$visible = get_request('visible');
+elseif (getRequest('go') == 'massupdate' && hasRequest('mass_save') && hasRequest('g_triggerid')) {
+	$triggerIds = getRequest('g_triggerid');
+	$visible = getRequest('visible');
 
 	if (isset($visible['priority'])) {
-		$priority = get_request('priority');
+		$priority = getRequest('priority');
 
-		foreach ($_REQUEST['g_triggerid'] as $triggerid) {
+		foreach ($triggerIds as $triggerId) {
 			$result = API::TriggerPrototype()->update(array(
-				'triggerid' => $triggerid,
+				'triggerid' => $triggerId,
 				'priority' => $priority
 			));
 			if (!$result) {
@@ -205,8 +206,8 @@ elseif ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['mass_save']) && isse
 		$result = true;
 	}
 
-	show_messages($result, _('Trigger updated'), _('Cannot update trigger'));
-	clearCookies($result, $_REQUEST['parent_discoveryid']);
+	show_messages($result, _('Trigger prototypes updated'), _('Cannot update trigger prototypes'));
+	clearCookies($result, getRequest('parent_discoveryid'));
 
 	if ($result) {
 		unset($_REQUEST['massupdate'], $_REQUEST['form'], $_REQUEST['g_triggerid']);
@@ -240,11 +241,11 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 	show_messages($goResult, _('Status updated'), _('Cannot update status'));
 	clearCookies($goResult, $_REQUEST['parent_discoveryid']);
 }
-elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_triggerid'])) {
-	$goResult = API::TriggerPrototype()->delete($_REQUEST['g_triggerid']);
+elseif (getRequest('go') == 'delete' && hasRequest('g_triggerid')) {
+	$result = API::TriggerPrototype()->delete(getRequest('g_triggerid'));
 
-	show_messages($goResult, _('Triggers deleted'), _('Cannot delete triggers'));
-	clearCookies($goResult, $_REQUEST['parent_discoveryid']);
+	show_messages($result, _('Trigger prototypes deleted'), _('Cannot delete trigger prototypes'));
+	clearCookies($result, getRequest('parent_discoveryid'));
 }
 
 /*
