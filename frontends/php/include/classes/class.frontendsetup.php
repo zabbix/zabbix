@@ -49,27 +49,6 @@ class FrontendSetup {
 	 */
 	const CHECK_FATAL = 3;
 
-	private static $_instance = null;
-
-	/**
-	 * Function for getting class object, implements Singleton.
-	 *
-	 * @static
-	 *
-	 * @return FrontendSetup
-	 */
-	public static function i() {
-		if (null === self::$_instance) {
-			self::$_instance = new self;
-		}
-
-		return self::$_instance;
-	}
-
-	private function __construct() {}
-
-	private function __clone() {}
-
 	/**
 	 * Perform all requirements checks.
 	 *
@@ -232,62 +211,9 @@ class FrontendSetup {
 	public function checkPhpDatabases() {
 		$current = array();
 
-		if (function_exists('mysqli_connect')
-				&& function_exists('mysqli_connect_error')
-				&& function_exists('mysqli_error')
-				&& function_exists('mysqli_query')
-				&& function_exists('mysqli_fetch_assoc')
-				&& function_exists('mysqli_free_result')
-				&& function_exists('mysqli_real_escape_string')
-				&& function_exists('mysqli_close')) {
-			$current[] = 'MySQL';
-			$current[] = BR();
-		}
-
-		if (function_exists('pg_pconnect')
-				&& function_exists('pg_fetch_array')
-				&& function_exists('pg_fetch_row')
-				&& function_exists('pg_exec')
-				&& function_exists('pg_getlastoid')) {
-			$current[] = 'PostgreSQL';
-			$current[] = BR();
-		}
-
-		if (function_exists('oci_connect')
-				&& function_exists('oci_error')
-				&& function_exists('oci_parse')
-				&& function_exists('oci_execute')
-				&& function_exists('oci_fetch_assoc')
-				&& function_exists('oci_commit')
-				&& function_exists('oci_close')
-				&& function_exists('oci_rollback')
-				&& function_exists('oci_field_type')
-				&& function_exists('oci_new_descriptor')
-				&& function_exists('oci_bind_by_name')
-				&& function_exists('oci_free_statement')) {
-			$current[] = 'Oracle';
-			$current[] = BR();
-		}
-
-		if (function_exists('db2_connect')
-				&& function_exists('db2_set_option')
-				&& function_exists('db2_commit')
-				&& function_exists('db2_rollback')
-				&& function_exists('db2_autocommit')
-				&& function_exists('db2_prepare')
-				&& function_exists('db2_execute')
-				&& function_exists('db2_stmt_errormsg')
-				&& function_exists('db2_fetch_assoc')
-				&& function_exists('db2_free_result')
-				&& function_exists('db2_escape_string')
-				&& function_exists('db2_close')) {
-			$current[] = 'IBM DB2';
-			$current[] = BR();
-		}
-
-		// Semaphore related functions are checked elsewhere. The 'false' is to prevent autoloading of the SQLite3 class.
-		if (class_exists('SQLite3', false)) {
-			$current[] = 'SQLite3';
+		$databases = $this->getSupportedDatabases();
+		foreach ($databases as $database => $name) {
+			$current[] = $name;
 			$current[] = BR();
 		}
 
@@ -298,6 +224,42 @@ class FrontendSetup {
 			'result' => $current ? self::CHECK_OK : self::CHECK_FATAL,
 			'error' => _('At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported.')
 		);
+	}
+
+	/**
+	 * Get list of supported databases.
+	 *
+	 * @return array
+	 */
+	public function getSupportedDatabases() {
+		$allowedDb = array();
+		if (zbx_is_callable(array('mysqli_connect', 'mysqli_connect_error', 'mysqli_error', 'mysqli_query',
+				'mysqli_fetch_assoc', 'mysqli_free_result', 'mysqli_real_escape_string', 'mysqli_close'))) {
+			$allowedDb[ZBX_DB_MYSQL] = 'MySQL';
+		}
+
+		if (zbx_is_callable(array('pg_pconnect', 'pg_fetch_array', 'pg_fetch_row', 'pg_exec', 'pg_getlastoid'))) {
+			$allowedDb[ZBX_DB_POSTGRESQL] = 'PostgreSQL';
+		}
+
+		if (zbx_is_callable(array('oci_connect', 'oci_error', 'oci_parse', 'oci_execute', 'oci_fetch_assoc',
+				'oci_commit', 'oci_close', 'oci_rollback', 'oci_field_type', 'oci_new_descriptor',
+				'oci_bind_by_name', 'oci_free_statement'))) {
+			$allowedDb[ZBX_DB_ORACLE] = 'Oracle';
+		}
+
+		if (zbx_is_callable(array('db2_connect', 'db2_set_option', 'db2_commit', 'db2_rollback', 'db2_autocommit',
+				'db2_prepare', 'db2_execute', 'db2_stmt_errormsg', 'db2_fetch_assoc', 'db2_free_result',
+				'db2_escape_string', 'db2_close'))) {
+			$allowedDb[ZBX_DB_DB2] = 'IBM DB2';
+		}
+
+		// Semaphore related functions are checked elsewhere. The 'false' is to prevent autoloading of the SQLite3 class.
+		if (class_exists('SQLite3', false) && zbx_is_callable(array('ftok', 'sem_acquire', 'sem_release', 'sem_get'))) {
+			$allowedDb[ZBX_DB_SQLITE3] = 'SQLite3';
+		}
+
+		return $allowedDb;
 	}
 
 	/**
