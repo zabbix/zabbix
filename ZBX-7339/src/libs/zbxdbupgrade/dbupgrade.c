@@ -2396,118 +2396,6 @@ static int	DBpatch_2020000(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_2020001(void)
-{
-	if (ZBX_DB_OK <= DBexecute("update items set flags=2 where itemid=23073"))
-	{
-		return SUCCEED;
-	}
-
-	return FAIL;
-}
-
-static int	DBpatch_2020002(void)
-{
-	if (ZBX_DB_OK <= DBexecute("update items set flags=2 where itemid=23074"))
-	{
-		return SUCCEED;
-	}
-
-	return FAIL;
-}
-
-static int	DBpatch_2020003(void)
-{
-	if (ZBX_DB_OK <= DBexecute("update items set flags=2 where itemid=23075"))
-	{
-		return SUCCEED;
-	}
-
-	return FAIL;
-}
-
-static int	DBpatch_2020004(void)
-{
-	if (ZBX_DB_OK <= DBexecute("update items set flags=2 where itemid=23076"))
-	{
-		return SUCCEED;
-	}
-
-	return FAIL;
-}
-
-static int	DBpatch_2020005(void)
-{
-	if (ZBX_DB_OK <= DBexecute("update item_discovery set parent_itemid=23329 where itemdiscoveryid=192"))
-	{
-		return SUCCEED;
-	}
-
-	return FAIL;
-}
-
-static int	DBpatch_2020006(void)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	result = DBselect("select itemdiscoveryid from item_discovery where itemdiscoveryid=191");
-
-	if (NULL == (row = DBfetch(result)))
-	{
-		if (ZBX_DB_OK > DBexecute(
-				"insert into item_discovery"
-					" (itemdiscoveryid,itemid,parent_itemid, key_, lastcheck, ts_delete)"
-					" values ('191','23075','23329','','0','0')"))
-		{
-			DBfree_result(result);
-			return FAIL;
-		}
-	}
-	DBfree_result(result);
-
-	return SUCCEED;
-}
-
-static int	DBpatch_2020007(void)
-{
-	if (ZBX_DB_OK <= DBexecute("update items set key_='net.if.in[{#IFNAME}]' where itemid=23073"))
-	{
-		return SUCCEED;
-	}
-
-	return FAIL;
-}
-
-static int	DBpatch_2020008(void)
-{
-	if (ZBX_DB_OK <= DBexecute("update items set key_='net.if.out[{#IFNAME}]' where itemid=23074"))
-	{
-		return SUCCEED;
-	}
-	return FAIL;
-}
-
-static int	DBpatch_2020009(void)
-{
-	if (ZBX_DB_OK <= DBexecute("update items set key_='net.if.in[{#IFNAME}]' where itemid=23075"))
-	{
-		return SUCCEED;
-	}
-
-	return FAIL;
-}
-
-static int	DBpatch_2020010(void)
-{
-	if (ZBX_DB_OK <= DBexecute("update items set key_='net.if.out[{#IFNAME}]' where itemid=23076"))
-	{
-		return SUCCEED;
-	}
-
-	return FAIL;
-}
-
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 #define DBPATCH_END()					{NULL}};
@@ -2755,16 +2643,6 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010198, 0, 1)
 	DBPATCH_ADD(2010199, 0, 1)
 	DBPATCH_ADD(2020000, 0, 1)
-	DBPATCH_ADD(2020001, 0, 1)
-	DBPATCH_ADD(2020002, 0, 1)
-	DBPATCH_ADD(2020003, 0, 1)
-	DBPATCH_ADD(2020004, 0, 1)
-	DBPATCH_ADD(2020005, 0, 1)
-	DBPATCH_ADD(2020006, 0, 1)
-	DBPATCH_ADD(2020007, 0, 1)
-	DBPATCH_ADD(2020008, 0, 1)
-	DBPATCH_ADD(2020009, 0, 1)
-	DBPATCH_ADD(2020010, 0, 1)
 
 	DBPATCH_END()
 
