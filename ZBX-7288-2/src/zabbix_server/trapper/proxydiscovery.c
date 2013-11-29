@@ -51,14 +51,15 @@ void	recv_discovery_data(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	error[0] = '\0';
 
-	if (FAIL == (ret = get_proxy_id(jp, &proxy_hostid, host, error, sizeof(error))))
+	if (SUCCEED != (ret = get_proxy_id(jp, &proxy_hostid, host, error, sizeof(error))))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "discovery data from active proxy on \"%s\" failed: %s",
 				get_ip_by_socket(sock), error);
+		goto out;
 	}
-	else
-		process_dhis_data(jp);
 
+	process_dhis_data(jp);
+out:
 	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));

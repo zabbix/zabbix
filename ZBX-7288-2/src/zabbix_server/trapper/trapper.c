@@ -85,18 +85,17 @@ static void	recv_proxyhistory(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	error[0] = '\0';
 
-	if (SUCCEED == (ret = get_proxy_id(jp, &proxy_hostid, host, error, sizeof(error))))
-	{
-		update_proxy_lastaccess(proxy_hostid);
-
-		ret = process_hist_data(sock, jp, proxy_hostid, error, sizeof(error));
-	}
-	else
+	if (SUCCEED != (ret = get_proxy_id(jp, &proxy_hostid, host, error, sizeof(error))))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "history data from active proxy on \"%s\" failed: %s",
 				get_ip_by_socket(sock), error);
+		goto out;
 	}
 
+	update_proxy_lastaccess(proxy_hostid);
+
+	ret = process_hist_data(sock, jp, proxy_hostid, error, sizeof(error));
+out:
 	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -188,14 +187,15 @@ static void	recv_proxy_heartbeat(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	error[0] = '\0';
 
-	if (FAIL == (ret = get_proxy_id(jp, &proxy_hostid, host, error, sizeof(error))))
+	if (SUCCEED != (ret = get_proxy_id(jp, &proxy_hostid, host, error, sizeof(error))))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "heartbeat from active proxy on \"%s\" failed: %s",
 				get_ip_by_socket(sock), error);
+		goto out;
 	}
-	else
-		update_proxy_lastaccess(proxy_hostid);
 
+	update_proxy_lastaccess(proxy_hostid);
+out:
 	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);

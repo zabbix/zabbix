@@ -50,14 +50,15 @@ void	recv_host_availability(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	error[0] = '\0';
 
-	if (FAIL == (ret = get_proxy_id(jp, &proxy_hostid, host, error, sizeof(error))))
+	if (SUCCEED != (ret = get_proxy_id(jp, &proxy_hostid, host, error, sizeof(error))))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "host availability data from active proxy on \"%s\" failed: %s",
 				get_ip_by_socket(sock), error);
+		goto out;
 	}
-	else
-		process_host_availability(jp);
 
+	process_host_availability(jp);
+out:
 	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);

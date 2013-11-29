@@ -49,7 +49,7 @@ void	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (FAIL == get_proxy_id(jp, &proxy_hostid, host, error, sizeof(error)))
+	if (SUCCEED != get_proxy_id(jp, &proxy_hostid, host, error, sizeof(error)))
 	{
 		zbx_send_response(sock, FAIL, error, CONFIG_TIMEOUT);
 		zabbix_log(LOG_LEVEL_WARNING, "proxy configuration request from active proxy on \"%s\" failed: %s",
@@ -112,7 +112,6 @@ void	recv_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 		process_proxyconfig(&jp_data);
 		zbx_send_response(sock, ret, NULL, CONFIG_TIMEOUT);
 	}
-
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
