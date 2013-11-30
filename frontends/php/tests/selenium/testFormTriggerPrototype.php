@@ -886,7 +886,7 @@ class testFormTriggerPrototype extends CWebTest {
 			$this->getConfirmation();
 			$this->wait();
 
-			$this->zbxTestTextPresent('Triggers deleted');
+			$this->zbxTestTextPresent('Trigger prototypes deleted');
 			$this->zbxTestTextNotPresent($this->host.": $description");
 		}
 	}
