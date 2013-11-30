@@ -1211,7 +1211,7 @@ class testFormItemPrototype extends CWebTest {
 				$this->assertNotVisible('add_delay_flex');
 		}
 
-		$this->zbxTestTextPresent('Keep history (in days)');
+		$this->zbxTestTextPresent('History storage period (in days)');
 		$this->assertVisible('history');
 		$this->assertAttribute("//input[@id='history']/@maxlength", 8);
 		$this->assertAttribute("//input[@id='history']/@value", 90);
@@ -1221,7 +1221,7 @@ class testFormItemPrototype extends CWebTest {
 		}
 
 		if ($value_type == 'Numeric (unsigned)' || $value_type == 'Numeric (float)') {
-			$this->zbxTestTextPresent('Keep trends (in days)');
+			$this->zbxTestTextPresent('Trend storage period (in days)');
 			$this->assertVisible('trends');
 			$this->assertAttribute("//input[@id='trends']/@maxlength", 8);
 			if (!isset($itemid)) {
@@ -1230,7 +1230,7 @@ class testFormItemPrototype extends CWebTest {
 			$this->assertAttribute("//input[@id='trends']/@size", 8);
 		}
 		else {
-			$this->zbxTestTextNotPresent('Keep trends (in days)');
+			$this->zbxTestTextNotPresent('Trend storage period (in days)');
 			$this->assertNotVisible('trends');
 		}
 
@@ -2028,7 +2028,7 @@ class testFormItemPrototype extends CWebTest {
 					'history' => 65536,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value "65536" for "Keep history (in days)" field: must be between 0 and 65535.'
+						'Incorrect value "65536" for "History storage period" field: must be between 0 and 65535.'
 					)
 				)
 			),
@@ -2041,7 +2041,7 @@ class testFormItemPrototype extends CWebTest {
 					'history' => '-1',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Incorrect value "-1" for "Keep history (in days)" field: must be between 0 and 65535.'
+							'Incorrect value "-1" for "History storage period" field: must be between 0 and 65535.'
 					)
 				)
 			),
@@ -2074,7 +2074,7 @@ class testFormItemPrototype extends CWebTest {
 					'trends' => '-1',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Incorrect value "-1" for "Keep trends (in days)" field: must be between 0 and 65535.'
+							'Incorrect value "-1" for "Trend storage period" field: must be between 0 and 65535.'
 					)
 				)
 			),
@@ -2087,7 +2087,7 @@ class testFormItemPrototype extends CWebTest {
 					'trends' => 65536,
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Incorrect value "65536" for "Keep trends (in days)" field: must be between 0 and 65535.'
+							'Incorrect value "65536" for "Trend storage period" field: must be between 0 and 65535.'
 					)
 				)
 			),
@@ -2717,7 +2717,7 @@ class testFormItemPrototype extends CWebTest {
 
 			$this->getConfirmation();
 			$this->wait();
-			$this->zbxTestTextPresent('Items deleted');
+			$this->zbxTestTextPresent('Item prototypes deleted');
 			$this->zbxTestTextNotPresent($itemName);
 		}
 	}
