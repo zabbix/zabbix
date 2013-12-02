@@ -34,7 +34,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'type'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		null),
 	'search'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
-//ajax
+	// ajax
 	'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	null,			null),
 	'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 	'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		null),
