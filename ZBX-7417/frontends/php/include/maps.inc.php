@@ -415,10 +415,12 @@ function resolveMapLabelMacrosAll(array $selement) {
  * @return string expanded label
  */
 function resolveMapLabelMacros($label, $replaceHosts = null) {
+	$functionsPattern = '(last|max|min|avg)\(([0-9]+['.ZBX_TIME_SUFFIXES.']?)?\)';
+
 	// find functional macro pattern
 	$pattern = (null === $replaceHosts)
-		? '/{'.ZBX_PREG_HOST_FORMAT.":.+\.(last|max|min|avg)\(([0-9]+[smhdwKMGT]?)?\)}/Uu"
-		: '/{('.ZBX_PREG_HOST_FORMAT."|{HOSTNAME[0-9]?}|{HOST\.HOST[0-9]?}):.+\.(last|max|min|avg)\(([0-9]+[smhdwKMGT]?)?\)}/Uu";
+		? '/{'.ZBX_PREG_HOST_FORMAT.':.+\.'.$functionsPattern.'}/Uu'
+		: '/{('.ZBX_PREG_HOST_FORMAT.'|{HOSTNAME[0-9]?}|{HOST\.HOST[0-9]?}):.+\.'.$functionsPattern.'}/Uu';
 
 	preg_match_all($pattern, $label, $matches);
 
@@ -448,7 +450,12 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 		$itemHost = $expressionData->expressions[0]['host'];
 		$key = $expressionData->expressions[0]['item'];
 		$function = $expressionData->expressions[0]['functionName'];
+
 		if ($function != 'last') {
+			if ($expressionData->expressions[0]['functionParamList'][0] == '') {
+				$label = str_replace($expr, UNRESOLVED_MACRO_STRING, $label);
+				continue;
+			}
 			$parameter = convertFunctionValue($expressionData->expressions[0]['functionParamList'][0]);
 		}
 

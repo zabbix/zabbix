@@ -866,7 +866,7 @@ class CMacrosResolver {
 				'(?<hosts>('.ZBX_PREG_HOST_FORMAT.'|({('.self::PATTERN_HOST_INTERNAL.')'.self::PATTERN_MACRO_PARAM.'}))):'.
 				'(?<keys>'.ZBX_PREG_ITEM_KEY_FORMAT.')\.'.
 				'(?<functions>(last|max|min|avg))\('.
-				'(?<parameters>([0-9]+[smhdwKMGT]?)?)'.
+				'(?<parameters>([0-9]+['.ZBX_TIME_SUFFIXES.']?)?)'.
 				'\)}{1})/Uux', $str, $matches, PREG_OFFSET_CAPTURE);
 
 			if (!empty($matches['hosts'])) {
