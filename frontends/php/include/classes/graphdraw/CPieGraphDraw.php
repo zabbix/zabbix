@@ -161,7 +161,7 @@ class CPieGraphDraw extends CGraphDraw {
 		$config = select_config();
 
 		for ($i = 0; $i < $this->num; $i++) {
-			$real_item = get_item_by_itemid($this->items[$i]['itemid']);
+			$item = get_item_by_itemid($this->items[$i]['itemid']);
 			$type = $this->items[$i]['calc_type'];
 			$from_time = $this->from_time;
 			$to_time = $this->to_time;
@@ -170,11 +170,14 @@ class CPieGraphDraw extends CGraphDraw {
 
 			// override item history setting with housekeeping settings
 			if ($config['hk_history_global']) {
-				$real_item['history'] = $config['hk_history'];
+				$item['history'] = $config['hk_history'];
 			}
 
-			if (($real_item['history'] * SEC_PER_DAY) > (time() - ($from_time + $this->period / 2))) { // should pick data from history or trends
+			$trendsEnabled = $config['hk_trends_global'] ? ($config['hk_trends'] > 0) : ($item['trends'] > 0);
+
+			if (!$trendsEnabled || (($item['history'] * SEC_PER_DAY) > (time() - ($from_time + $this->period / 2)))) {
 				$this->dataFrom = 'history';
+
 				array_push($sql_arr,
 					'SELECT h.itemid,'.
 						'AVG(h.value) AS avg,MIN(h.value) AS min,'.
@@ -197,6 +200,7 @@ class CPieGraphDraw extends CGraphDraw {
 			}
 			else {
 				$this->dataFrom = 'trends';
+
 				array_push($sql_arr,
 					'SELECT t.itemid,'.
 						'AVG(t.value_avg) AS avg,MIN(t.value_min) AS min,'.
@@ -218,8 +222,8 @@ class CPieGraphDraw extends CGraphDraw {
 				);
 			}
 
-			$this->data[$this->items[$i]['itemid']][$type]['last'] = isset($history[$real_item['itemid']])
-				? $history[$real_item['itemid']][0]['value'] : null;
+			$this->data[$this->items[$i]['itemid']][$type]['last'] = isset($history[$item['itemid']])
+				? $history[$item['itemid']][0]['value'] : null;
 			$this->data[$this->items[$i]['itemid']][$type]['shift_min'] = 0;
 			$this->data[$this->items[$i]['itemid']][$type]['shift_max'] = 0;
 			$this->data[$this->items[$i]['itemid']][$type]['shift_avg'] = 0;
