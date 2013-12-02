@@ -337,7 +337,7 @@ class CMacrosResolverHelper {
 
 	/**
 	 * Resolve positional macros and functional item macros, for example, {{HOST.HOST1}:key.func(param)}.
-	 *  ! if same graph will be passed more than once only name for first entry will be resolved.
+	 * ! if same graph will be passed more than once only name for first entry will be resolved.
 	 *
 	 * @static
 	 *

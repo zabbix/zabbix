@@ -122,7 +122,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		$macros = array();
 
-		$isHostMacrosAvailable = false;
+		$hostMacrosAvailable = $interfaceMacrosAvailable = $interfaceWithPrioritiesMacrosAvailable = false;
+
 		if ($this->isTypeAvailable('host')) {
 			foreach ($data as $hostId => $texts) {
 				if ($hostMacros = $this->findMacros(self::PATTERN_HOST, $texts)) {
@@ -130,12 +131,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						$macros[$hostId][$hostMacro] = UNRESOLVED_MACRO_STRING;
 					}
 
-					$isHostMacrosAvailable = true;
+					$hostMacrosAvailable = true;
 				}
 			}
 		}
 
-		$isInterfaceMacrosAvailable = false;
 		if ($this->isTypeAvailable('interface')) {
 			foreach ($data as $hostId => $texts) {
 				if ($interfaceMacros = $this->findMacros(self::PATTERN_INTERFACE, $texts)) {
@@ -143,12 +143,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						$macros[$hostId][$interfaceMacro] = UNRESOLVED_MACRO_STRING;
 					}
 
-					$isInterfaceMacrosAvailable = true;
+					$interfaceMacrosAvailable = true;
 				}
 			}
 		}
 
-		$isInterfaceWithPrioritiesMacrosAvailable = false;
 		if ($this->isTypeAvailable('interfaceWithPriorities')) {
 			foreach ($data as $hostId => $texts) {
 				if ($interfaceMacros = $this->findMacros(self::PATTERN_INTERFACE, $texts)) {
@@ -156,14 +155,15 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						$macros[$hostId][$interfaceMacro] = UNRESOLVED_MACRO_STRING;
 					}
 
-					$isInterfaceWithPrioritiesMacrosAvailable = true;
+					$interfaceWithPrioritiesMacrosAvailable = true;
 				}
 			}
 		}
 
 		// host macros
-		if ($isHostMacrosAvailable) {
+		if ($hostMacrosAvailable) {
 			$dbHosts = DBselect('SELECT h.hostid,h.name,h.host FROM hosts h WHERE '.dbConditionInt('h.hostid', $hostIds));
+
 			while ($dbHost = DBfetch($dbHosts)) {
 				$hostId = $dbHost['hostid'];
 
@@ -184,7 +184,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 
 		// interface macros, macro should be resolved to main agent interface
-		if ($isInterfaceMacrosAvailable) {
+		if ($interfaceMacrosAvailable) {
 			foreach ($data as $hostId => $texts) {
 				if ($interfaceMacros = $this->findMacros(self::PATTERN_INTERFACE, $texts)) {
 					$dbInterface = DBfetch(DBselect(
@@ -232,7 +232,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 
 		// interface macros, macro should be resolved to interface with highest priority
-		if ($isInterfaceWithPrioritiesMacrosAvailable) {
+		if ($interfaceWithPrioritiesMacrosAvailable) {
 			$interfaces = array();
 
 			$dbInterfaces = DBselect(
@@ -242,6 +242,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					' AND '.dbConditionInt('i.hostid', $hostIds).
 					' AND '.dbConditionInt('i.type', $this->interfacePriorities)
 			);
+
 			while ($dbInterface = DBfetch($dbInterfaces)) {
 				$hostId = $dbInterface['hostid'];
 
@@ -348,6 +349,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * Resolve macros in trigger.
 	 *
 	 * @param array  $data								(as int $triggerId => array $trigger)
+	 * @param string $data[$triggerId]['hosts']			to resolve user macros (optional)
 	 * @param string $data[$triggerId]['expression']
 	 * @param string $data[$triggerId]['description']	depend from config
 	 * @param string $data[$triggerId]['comments']		depend from config
@@ -356,27 +358,58 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 */
 	private function resolveTrigger(array $data) {
 		$macros = array('host' => array(), 'interfaceWithPriorities' => array(), 'item' => array());
-		$macroValues = array();
+		$macroValues = $userMacrosData = $dbHosts = array();
 
 		// get source field
 		$source = $this->getSource();
 
 		// get available functions
-		$isHostMacrosAvailable = $this->isTypeAvailable('host');
-		$isInterfaceWithPrioritiesMacrosAvailable = $this->isTypeAvailable('interfaceWithPriorities');
-		$isItemMacrosAvailable = $this->isTypeAvailable('item');
-		$isUserMacrosAvailable = $this->isTypeAvailable('user');
-		$isReferenceMacrosAvailable = $this->isTypeAvailable('reference');
+		$hostMacrosAvailable = $this->isTypeAvailable('host');
+		$interfaceWithPrioritiesMacrosAvailable = $this->isTypeAvailable('interfaceWithPriorities');
+		$itemMacrosAvailable = $this->isTypeAvailable('item');
+		$userMacrosAvailable = $this->isTypeAvailable('user');
+		$referenceMacrosAvailable = $this->isTypeAvailable('reference');
+
+		// load hosts ids
+		if ($userMacrosAvailable) {
+			$dbHosts = DBfetchArray(DBselect(
+				'SELECT f.triggerid,i.hostid'.
+					' FROM functions f,items i'.
+					' WHERE '.dbConditionInt('f.triggerid', array_keys($data)).
+					' AND f.itemid=i.itemid'
+			));
+		}
 
 		// find macros
 		foreach ($data as $triggerId => $trigger) {
 			$functions = $this->findFunctions($trigger['expression']);
 
-			if ($isUserMacrosAvailable) {
-				$macroValues[$triggerId] = $this->getUserMacros(array($trigger[$source]), array('triggerid' => $triggerId));
+			if ($userMacrosAvailable) {
+				$userMacros = $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, array($trigger[$source]));
+
+				if ($userMacros) {
+					$hostIds = array();
+
+					foreach ($dbHosts as $dbHost) {
+						if ($dbHost['triggerid'] == $triggerId) {
+							$hostIds[$dbHost['hostid']] = $dbHost['hostid'];
+						}
+					}
+
+					foreach ($userMacros as $userMacro) {
+						if (!isset($userMacrosData[$triggerId])) {
+							$userMacrosData[$triggerId] = array(
+								'hostids' => $hostIds,
+								'macros' => array()
+							);
+						}
+
+						$userMacrosData[$triggerId]['macros'][$userMacro] = null;
+					}
+				}
 			}
 
-			if ($isHostMacrosAvailable) {
+			if ($hostMacrosAvailable) {
 				foreach ($this->findFunctionMacros(self::PATTERN_HOST_FUNCTION, $trigger[$source]) as $macro => $fNums) {
 					foreach ($fNums as $fNum) {
 						$macroValues[$triggerId][$this->getFunctionMacroName($macro, $fNum)] = UNRESOLVED_MACRO_STRING;
@@ -388,7 +421,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 			}
 
-			if ($isInterfaceWithPrioritiesMacrosAvailable) {
+			if ($interfaceWithPrioritiesMacrosAvailable) {
 				foreach ($this->findFunctionMacros(self::PATTERN_INTERFACE_FUNCTION, $trigger[$source]) as $macro => $fNums) {
 					foreach ($fNums as $fNum) {
 						$macroValues[$triggerId][$this->getFunctionMacroName($macro, $fNum)] = UNRESOLVED_MACRO_STRING;
@@ -400,7 +433,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 			}
 
-			if ($isItemMacrosAvailable) {
+			if ($itemMacrosAvailable) {
 				foreach ($this->findFunctionMacros(self::PATTERN_ITEM_FUNCTION, $trigger[$source]) as $macro => $fNums) {
 					foreach ($fNums as $fNum) {
 						$macroValues[$triggerId][$this->getFunctionMacroName($macro, $fNum)] = UNRESOLVED_MACRO_STRING;
@@ -412,7 +445,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 			}
 
-			if ($isReferenceMacrosAvailable) {
+			if ($referenceMacrosAvailable) {
 				foreach ($this->getTriggerReference($trigger['expression'], $trigger[$source]) as $macro => $value) {
 					$macroValues[$triggerId][$macro] = $value;
 				}
@@ -420,14 +453,23 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 
 		// get macro value
-		if ($isHostMacrosAvailable) {
+		if ($hostMacrosAvailable) {
 			$macroValues = $this->getHostMacros($macros['host'], $macroValues);
 		}
-		if ($isInterfaceWithPrioritiesMacrosAvailable) {
+		if ($interfaceWithPrioritiesMacrosAvailable) {
 			$macroValues = $this->getIpMacros($macros['interfaceWithPriorities'], $macroValues);
 		}
-		if ($isItemMacrosAvailable) {
+		if ($itemMacrosAvailable) {
 			$macroValues = $this->getItemMacros($macros['item'], $data, $macroValues);
+		}
+		if ($userMacrosData) {
+			$userMacros = $this->getUserMacros($userMacrosData);
+
+			foreach ($userMacros as $triggerId => $userMacro) {
+				$macroValues[$triggerId] = isset($macroValues[$triggerId])
+					? array_merge($macroValues[$triggerId], $userMacro['macros'])
+					: $userMacro['macros'];
+			}
 		}
 
 		// replace macros to value
