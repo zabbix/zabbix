@@ -123,10 +123,10 @@ int	get_data_from_server(zbx_sock_t *sock, const char *request, char **data)
 	zbx_json_addstring(&j, "request", request, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, "host", CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
 
-	if (FAIL == send_data_to_server(sock, j.buffer))
+	if (SUCCEED != send_data_to_server(sock, j.buffer))
 		goto exit;
 
-	if (FAIL == recv_data_from_server(sock, data))
+	if (SUCCEED != recv_data_from_server(sock, data))
 		goto exit;
 
 	ret = SUCCEED;
@@ -163,7 +163,7 @@ int	put_data_to_server(zbx_sock_t *sock, struct zbx_json *j)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() datalen:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)j->buffer_size);
 
-	if (FAIL == send_data_to_server(sock, j->buffer))
+	if (SUCCEED != send_data_to_server(sock, j->buffer))
 		goto out;
 
 	if (SUCCEED != zbx_recv_response_dyn(sock, &info, 0))
