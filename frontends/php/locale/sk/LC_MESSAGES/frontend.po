@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-29 20:23+0200\n"
-"PO-Revision-Date: 2013-10-30 18:17+0300\n"
+"POT-Creation-Date: 2013-12-02 21:54+0200\n"
+"PO-Revision-Date: 2013-12-01 12:08+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1383149825.0\n"
+"X-POOTLE-MTIME: 1385892534.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -1062,7 +1062,7 @@ msgstr "NASTAVENIE MAPOVANIA HODNÔT"
 #: include/views/configuration.httpconf.edit.php:25
 #: include/views/configuration.httpconf.list.php:37
 msgid "CONFIGURATION OF WEB MONITORING"
-msgstr "NASTAVENIE MONITORINGU WEBOV"
+msgstr "NASTAVENIE MONITOROVANIA WEBOV"
 
 #: adm.workingtime.php:76
 msgid "CONFIGURATION OF WORKING TIME"
@@ -1868,29 +1868,29 @@ msgstr "Nie je možné aktualizovať \"templateid\" pre prototyp spúšťača \"
 
 #: actionconf.php:145
 msgid "Cannot update action"
-msgstr "Nie je možné upraviť akciu"
+msgstr "Nie je možné aktualizovať akciu"
 
 #: applications.php:122
 msgid "Cannot update application"
-msgstr "Nie je možné upraviť aplikáciu"
+msgstr "Nie je možné aktualizovať aplikáciu"
 
 #: tr_comments.php:63
 msgid "Cannot update comment"
-msgstr "Nie je možné upraviť komentár"
+msgstr "Nie je možné aktualizovať komentár"
 
 #: adm.gui.php:69 adm.housekeeper.php:53 adm.other.php:58
 #: adm.triggerdisplayoptions.php:65 adm.triggerseverities.php:69
 #: adm.workingtime.php:46
 msgid "Cannot update configuration"
-msgstr "Nie je možné upraviť nastavenia"
+msgstr "Nie je možné aktualizovať nastavenia"
 
 #: usergrps.php:275
 msgid "Cannot update debug mode"
-msgstr "Nie je možné upraviť nastavenia ladiaceho módu"
+msgstr "Nie je možné aktualizovať nastavenia ladiaceho módu"
 
 #: discoveryconf.php:145 host_discovery.php:229
 msgid "Cannot update discovery rule"
-msgstr "Nie je možné upraviť zisťovacie pravidlo"
+msgstr "Nie je možné aktualizovať zisťovacie pravidlo"
 
 #: usergrps.php:246
 msgid "Cannot update frontend access"
@@ -1902,137 +1902,137 @@ msgstr "Nie je možné aktualizovať graf"
 
 #: hostgroups.php:115 usergrps.php:168
 msgid "Cannot update group"
-msgstr "Nie je možné upraviť skupinu"
+msgstr "Nie je možné aktualizovať skupinu"
 
 #: api/classes/CUserGroup.php:397
 msgid "Cannot update group."
-msgstr "Nie je možné upraviť skupinu."
+msgstr "Nie je možné aktualizovať skupinu."
 
 #: hostgroups.php:196 hosts.php:322
 msgid "Cannot update host"
-msgstr "Nie je možné upraviť hosta"
+msgstr "Nie je možné aktualizovať hosta"
 
 #: hosts.php:521 hosts.php:544
 msgid "Cannot update host status"
-msgstr "Nie je možné upraviť stav hosta"
+msgstr "Nie je možné aktualizovať stav hosta"
 
 #: hosts.php:302
 msgid "Cannot update hosts"
-msgstr "Nie je možné upraviť hostov"
+msgstr "Nie je možné aktualizovať hostov"
 
 #: adm.iconmapping.php:77
 msgid "Cannot update icon map"
-msgstr "Nie je možné upraviť mapu ikon"
+msgstr "Nie je možné aktualizovať mapu ikon"
 
 #: adm.images.php:58
 msgid "Cannot update image"
-msgstr "Nie je možné upraviť obrázok"
+msgstr "Nie je možné aktualizovať obrázok"
 
 #: include/classes/import/CXmlImport18.php:639
 msgid "Cannot update image."
-msgstr "Nie je možné upraviť obrázok."
+msgstr "Nie je možné aktualizovať obrázok."
 
 #: disc_prototypes.php:273 items.php:447 screenedit.php:173
 msgid "Cannot update item"
-msgstr "Nie je možné upraviť položku"
+msgstr "Nie je možné aktualizovať položku"
 
 #: items.php:555
 msgid "Cannot update items"
-msgstr "Nie je možné upraviť položky"
+msgstr "Nie je možné aktualizovať položky"
 
 #: adm.macros.php:93
 msgid "Cannot update macro."
-msgstr "Nie je možné upraviť makro."
+msgstr "Nie je možné aktualizovať makro."
 
 #: adm.macros.php:147
 msgid "Cannot update macros"
-msgstr "Nie je možné upraviť makrá"
+msgstr "Nie je možné aktualizovať makrá"
 
 #: maintenance.php:133
 msgid "Cannot update maintenance"
-msgstr "Nie je možné upraviť údržbu"
+msgstr "Nie je možné aktualizovať údržbu"
 
 #: include/classes/import/CXmlImport18.php:807
 #, php-format
 msgid "Cannot update map \"%s\"."
-msgstr "Nie je možné upraviť mapu \"%s\"."
+msgstr "Nie je možné aktualizovať mapu \"%s\"."
 
 #: media_types.php:113
 msgid "Cannot update media type"
-msgstr "Nie je možné upraviť typ média"
+msgstr "Nie je možné aktualizovať typ média"
 
 #: sysmaps.php:160
 msgid "Cannot update network map"
-msgstr "Nie je možné upraviť mapu siete"
+msgstr "Nie je možné aktualizovať mapu siete"
 
 #: nodes.php:69
 msgid "Cannot update node"
-msgstr "Nie je možné upraviť uzol"
+msgstr "Nie je možné aktualizovať uzol"
 
 #: proxies.php:104
 msgid "Cannot update proxy"
-msgstr "Nie je možné upraviť proxy"
+msgstr "Nie je možné aktualizovať proxy"
 
 #: adm.regexps.php:99
 msgid "Cannot update regular expression"
-msgstr "Nie je možné upraviť regulárny výraz"
+msgstr "Nie je možné aktualizovať regulárny výraz"
 
 #: httpconf.php:205
 msgid "Cannot update scenario"
-msgstr "Nie je možné upraviť scenár"
+msgstr "Nie je možné aktualizovať scenár"
 
 #: screenconf.php:153
 msgid "Cannot update screen"
-msgstr "Nie je možné upraviť obrazovku"
+msgstr "Nie je možné aktualizovať obrazovku"
 
 #: include/classes/import/CXmlImport18.php:1701
 msgid "Cannot update screen."
-msgstr "Nie je možné upraviť obrazovku."
+msgstr "Nie je možné aktualizovať obrazovku."
 
 #: scripts.php:110
 msgid "Cannot update script"
-msgstr "Nie je možné upraviť skript"
+msgstr "Nie je možné aktualizovať skript"
 
 #: services.php:157
 msgid "Cannot update service"
-msgstr "Nie je možné upraviť službu"
+msgstr "Nie je možné aktualizovať službu"
 
 #: slideconf.php:97
 msgid "Cannot update slide show"
-msgstr "Nie je možné upraviť prezentáciu"
+msgstr "Nie je možné aktualizovať prezentáciu"
 
 #: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
-msgstr "Nie je možné upraviť stav"
+msgstr "Nie je možné aktualizovať stav"
 
 #: templates.php:179
 msgid "Cannot update template"
-msgstr "Nie je možné upraviť šablónu"
+msgstr "Nie je možné aktualizovať šablónu"
 
 #: trigger_prototypes.php:163 trigger_prototypes.php:202 triggers.php:152
 #: triggers.php:203 tr_logform.php:112
 msgid "Cannot update trigger"
-msgstr "Nie je možné upraviť spúšťač"
+msgstr "Nie je možné aktualizovať spúšťač"
 
 #: profile.php:176 users.php:191 users.php:253 users.php:273
 msgid "Cannot update user"
-msgstr "Nie je možné upraviť používateľa"
+msgstr "Nie je možné aktualizovať používateľa"
 
 #: api/classes/CUser.php:808
 msgid "Cannot update user media."
-msgstr "Nie je možné upraviť médiá používateľa."
+msgstr "Nie je možné aktualizovať médiá používateľa."
 
 #: profile.php:113 users.php:149
 msgid "Cannot update user. Both passwords must be equal."
-msgstr "Nie je možné upraviť používateľa. Heslá musia byť rovnaké."
+msgstr "Nie je možné aktualizovať používateľa. Heslá musia byť rovnaké."
 
 #: usergrps.php:303
 msgid "Cannot update users status"
-msgstr "Nie je možné upraviť stav používateľa"
+msgstr "Nie je možné aktualizovať stav používateľa"
 
 #: adm.valuemapping.php:64
 msgid "Cannot update value map"
-msgstr "Nie je možné upraviť mapu hodnôt"
+msgstr "Nie je možné aktualizovať mapu hodnôt"
 
 #: popup_bitem.php:115 popup_period.php:114
 msgid "Caption"
@@ -2439,7 +2439,7 @@ msgstr "Nastavenie mapovania hodnôt"
 
 #: httpconf.php:27
 msgid "Configuration of web monitoring"
-msgstr "Nastavenie monitoringu webu"
+msgstr "Nastavenie monitorovania webu"
 
 #: adm.workingtime.php:24
 msgid "Configuration of working time"
@@ -4010,23 +4010,23 @@ msgstr "Každá URL by mala mať jedinečné meno. Prosim uistite sa, že existu
 #: include/views/js/configuration.sysmaps.js.php:394 sysmaps.php:260
 #: sysmaps.php:283
 msgid "Edit"
-msgstr "Upraviť"
+msgstr "Aktualizovať"
 
 #: include/views/configuration.maintenance.edit.php:171
 msgid "Edit maintenance period"
-msgstr "Upraviť údržbu"
+msgstr "Aktualizovať údržbu"
 
 #: include/views/js/configuration.sysmaps.js.php:7
 msgid "Edit map element"
-msgstr "Upraviť mapový element"
+msgstr "Aktualizovať mapový element"
 
 #: jsLoader.php:182
 msgid "Edit service"
-msgstr "Upraviť službu"
+msgstr "Aktualizovať službu"
 
 #: include/views/configuration.item.list.php:181
 msgid "Edit trigger"
-msgstr "Upraviť spúštač"
+msgstr "Aktualizovať spúštač"
 
 #: include/views/configuration.sysmap.edit.php:151
 msgid "Element"
@@ -4830,7 +4830,7 @@ msgstr "Prototyp grafu \"%1$s\" so šablónovými položkami nemôže obsahovať
 #: api/classes/CGraphPrototype.php:793
 #, php-format
 msgid "Graph prototype \"%s\" deleted."
-msgstr "Prototyp grafu \"%s\" zamazaný."
+msgstr "Prototyp grafu \"%s\" zmazaný."
 
 #: api/classes/CGraphPrototype.php:856
 msgid "Graph prototype must have at least one prototype."
@@ -5081,7 +5081,7 @@ msgstr "Skryť všetky"
 
 #: include/views/configuration.httpconf.list.php:47
 msgid "Hide disabled scenarios"
-msgstr "Schovať neaktívne scenáre"
+msgstr "Skryť vypnuté scenáre"
 
 #: include/views/configuration.triggers.list.php:54
 #: include/views/configuration.triggers.list.php:69
@@ -7812,7 +7812,7 @@ msgstr "Monitorovaný host"
 
 #: include/menu.inc.php:26
 msgid "Monitoring"
-msgstr "Monitoring"
+msgstr "Monitorovanie"
 
 #: include/forms.inc.php:1570 report3.php:108 report4.php:143 report5.php:47
 msgid "Month"
@@ -10409,7 +10409,7 @@ msgstr "STAV SPÚŠŤAČOV"
 
 #: httpmon.php:97
 msgid "STATUS OF WEB MONITORING"
-msgstr "STAV MONITORINGU WEBOV"
+msgstr "STAV MONITOROVANIA WEBOV"
 
 #: report1.php:32
 msgid "STATUS OF ZABBIX"
@@ -10987,7 +10987,7 @@ msgstr "Zobraziť podrobnosti"
 
 #: include/views/configuration.httpconf.list.php:47
 msgid "Show disabled scenarios"
-msgstr "Zobraziť neaktívne scenáre"
+msgstr "Zobraziť vypnuté scenáre"
 
 #: include/views/configuration.triggers.list.php:54
 #: include/views/configuration.triggers.list.php:69
@@ -11327,7 +11327,7 @@ msgstr "Stavové kódy"
 
 #: httpmon.php:24
 msgid "Status of Web monitoring"
-msgstr "Stav monitoringu webov"
+msgstr "Stav monitorovania webov"
 
 #: dashboard.php:295 include/classes/screens/CScreenSystemStatus.php:46
 #: include/menu.inc.php:124 report1.php:25
@@ -12965,7 +12965,7 @@ msgstr "Web položka s kľúčom \"%s\" už existuje."
 
 #: dashboard.php:324 include/items.inc.php:93
 msgid "Web monitoring"
-msgstr "Monitoring webov"
+msgstr "Monitorovanie webov"
 
 #: api/classes/CWebCheck.php:505
 msgid "Webcheck must have at least one step."
@@ -13327,7 +13327,7 @@ msgstr "Musíte byť prihlásený pre zobrazenie tejto stránky."
 
 #: include/views/administration.node.list.php:28
 msgid "Your setup is not configured for distributed monitoring."
-msgstr "Vaša konfigurácia nie je nastavená pre distribuovaný monitoring."
+msgstr "Vaše nastavenie nie je nastavené pre distribuované monitorovanie."
 
 #: include/func.inc.php:570
 msgctxt "Zetta short"
@@ -13409,7 +13409,7 @@ msgid ""
 msgstr ""
 "Zabbix server \"%s\" je nedostupný. Možné dôvody:\n"
 "1. Nesprávna hodnota IP/DNS pre server v \"zabbix.conf.php\";\n"
-"2. Nesprávna sieťová konfigurácia.\n"
+"2. Nesprávna sieťové nastavenie.\n"
 
 #: include/blocks.inc.php:725
 msgid "Zabbix server IP or port is not set!"
