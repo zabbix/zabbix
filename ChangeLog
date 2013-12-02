@@ -18,6 +18,7 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, It
 ....I..PS. [ZBXNEXT-1257] dropped support for UCD-SNMP (asaveljevs)
 
 Bug fixes:
+..F....... [ZBX-4063] fixed data selecting for graphs (Eduard)
 ..F....... [ZBX-7391] fixed items belonging to multiple applications being displayed only under the first one in the latest data page (Pavels)
 ..F....... [ZBX-7347] fixed custom step duration max size in action configuration (Eduard)
 ..F....... [ZBX-7336] fixed "Database type" selection in setup step 3, improved SQLite3 check and removed storing setup supported databases in cookies (Ivo)
