@@ -795,9 +795,10 @@ int	zbx_db_bind_parameter(int position, void *buffer, unsigned char type)
 int	zbx_db_statement_execute()
 {
 	const char	*__function_name = "zbx_db_statement_execute";
-	sword	err;
-	ub4	nrows;
-	int	ret;
+
+	sword		err;
+	ub4		nrows;
+	int		ret;
 
 	if (1 == txn_error)
 	{
@@ -1253,7 +1254,7 @@ error:
 
 		if (SQLT_CLOB == data_type)
 		{
-			if (ZBX_DB_OK == err)
+			if (OCI_SUCCESS == err)
 			{
 				/* allocate the lob locator variable */
 				err = OCIDescriptorAlloc((dvoid *)oracle.envhp, (dvoid **)&result->clobs[counter - 1],
@@ -1312,7 +1313,6 @@ error:
 		OCIDescriptorFree(parmdp, OCI_DTYPE_PARAM);
 		parmdp = NULL;
 	}
-
 error:
 	if (OCI_SUCCESS != err)
 	{
@@ -1439,9 +1439,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 		return NULL;
 
 	for (i = 0; i < result->ncolumn; i++)
-	{
 		result->values[i] = (SQL_NULL_DATA == result->values_len[i] ? NULL : result->values_cli[i]);
-	}
 
 	return result->values;
 #elif defined(HAVE_MYSQL)
@@ -1452,37 +1450,49 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 
 	for (i = 0; i < result->ncolumn; i++)
 	{
-		if (NULL != result->clobs[i])
+		ub4	alloc, amount;
+		ub1	csfrm;
+		sword	rc2;
+
+		if (NULL == result->clobs[i])
+			continue;
+
+		if (OCI_SUCCESS != (rc2 = OCILobGetLength(oracle.svchp, oracle.errhp, result->clobs[i], &amount)))
 		{
-			ub4	alloc, amount, amt = 0;
-			ub1	csfrm;
-
-			rc = OCILobGetLength(oracle.svchp, oracle.errhp, result->clobs[i], &amount);
-
-			if (OCI_SUCCESS != rc)
-				break;
-
-			rc = OCILobCharSetForm(oracle.envhp, oracle.errhp, result->clobs[i], &csfrm);
-
-			if (OCI_SUCCESS != rc)
-				break;
-
-			if (result->values_alloc[i] < (alloc = amount * 4 + 1))
+			/* If the LOB is NULL, the length is undefined. */
+			/* In this case the function returns OCI_INVALID_HANDLE. */
+			if (OCI_INVALID_HANDLE != rc2)
 			{
-				result->values_alloc[i] = alloc;
-				result->values[i] = zbx_realloc(result->values[i], result->values_alloc[i]);
+				zabbix_errlog(ERR_Z3006, rc2, zbx_oci_error(rc2));
+				return NULL;
 			}
-
-			amt = amount;
-			rc = OCILobRead(oracle.svchp, oracle.errhp, result->clobs[i], &amt, (ub4)1,
-					(dvoid *)result->values[i], (ub4)(result->values_alloc[i] - 1),
-					(dvoid *)NULL, (OCICallbackLobRead)NULL, (ub2)0, csfrm);
-
-			if (OCI_SUCCESS != rc)
-				zabbix_errlog(ERR_Z3006, rc, zbx_oci_error(rc));
-
-			result->values[i][amt] = '\0';
+			else
+				amount = 0;
 		}
+		else if (OCI_SUCCESS != (rc2 = OCILobCharSetForm(oracle.envhp, oracle.errhp, result->clobs[i], &csfrm)))
+		{
+			zabbix_errlog(ERR_Z3006, rc2, zbx_oci_error(rc2));
+			return NULL;
+		}
+
+		if (result->values_alloc[i] < (alloc = amount * 4 + 1))
+		{
+			result->values_alloc[i] = alloc;
+			result->values[i] = zbx_realloc(result->values[i], result->values_alloc[i]);
+		}
+
+		if (OCI_SUCCESS == rc2)
+		{
+			if (OCI_SUCCESS != (rc2 = OCILobRead(oracle.svchp, oracle.errhp, result->clobs[i], &amount,
+					(ub4)1, (dvoid *)result->values[i], (ub4)(result->values_alloc[i] - 1),
+					(dvoid *)NULL, (OCICallbackLobRead)NULL, (ub2)0, csfrm)))
+			{
+				zabbix_errlog(ERR_Z3006, rc2, zbx_oci_error(rc2));
+				return NULL;
+			}
+		}
+
+		result->values[i][amount] = '\0';
 	}
 
 	if (OCI_SUCCESS == rc)

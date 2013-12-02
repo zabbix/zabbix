@@ -1620,13 +1620,14 @@ static void	DCsync_hosts(DB_RESULT result)
 		host->proxy_hostid = proxy_hostid;
 		DCstrpool_replace(found, &host->host, row[2]);
 		DCstrpool_replace(found, &host->name, row[23]);
-		host->maintenance_status = (unsigned char)atoi(row[7]);
-		host->maintenance_type = (unsigned char)atoi(row[8]);
-		host->maintenance_from = atoi(row[9]);
 		host->status = status;
 
 		if (0 == found)
 		{
+			host->maintenance_status = (unsigned char)atoi(row[7]);
+			host->maintenance_type = (unsigned char)atoi(row[8]);
+			host->maintenance_from = atoi(row[9]);
+
 			host->errors_from = atoi(row[10]);
 			host->available = (unsigned char)atoi(row[11]);
 			host->disable_until = atoi(row[12]);
@@ -2138,8 +2139,9 @@ static void	DCsync_interfaces(DB_RESULT result)
 
 		if (INTERFACE_TYPE_SNMP == interface->type)	/* used only for SNMP traps */
 		{
-			if ('\0' != *(interface_snmpaddr_local.addr = ('\0' != interface->useip) ?
-					interface->ip : interface->dns))
+			interface_snmpaddr_local.addr = (0 != interface->useip ? interface->ip : interface->dns);
+
+			if ('\0' != *interface_snmpaddr_local.addr)
 			{
 				if (NULL == (interface_snmpaddr = zbx_hashset_search(&config->interface_snmpaddrs, &interface_snmpaddr_local)))
 				{
@@ -2202,7 +2204,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 
 			if (0 != macros)
 			{
-				DCget_host_by_hostid(&host, hostid);
+				DCget_host_by_hostid(&host, interface->hostid);
 
 				if (0 != (macros & 0x01))
 				{
@@ -4166,32 +4168,32 @@ int	DCconfig_update_host_availability(const zbx_host_availability_t *availabilit
 
 	for (i = 0; i < availability_num; i++)
 	{
-		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &availability->hostid)))
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &availability[i].hostid)))
 			continue;
 
-		switch (availability->type)
+		switch (availability[i].type)
 		{
 			case ITEM_TYPE_ZABBIX:
-				dc_host->errors_from = availability->errors_from;
-				dc_host->available = availability->available;
-				dc_host->disable_until = availability->disable_until;
+				dc_host->errors_from = availability[i].errors_from;
+				dc_host->available = availability[i].available;
+				dc_host->disable_until = availability[i].disable_until;
 				break;
 			case ITEM_TYPE_SNMPv1:
 			case ITEM_TYPE_SNMPv2c:
 			case ITEM_TYPE_SNMPv3:
-				dc_host->snmp_errors_from = availability->errors_from;
-				dc_host->snmp_available = availability->available;
-				dc_host->snmp_disable_until = availability->disable_until;
+				dc_host->snmp_errors_from = availability[i].errors_from;
+				dc_host->snmp_available = availability[i].available;
+				dc_host->snmp_disable_until = availability[i].disable_until;
 				break;
 			case ITEM_TYPE_IPMI:
-				dc_host->ipmi_errors_from = availability->errors_from;
-				dc_host->ipmi_available = availability->available;
-				dc_host->ipmi_disable_until = availability->disable_until;
+				dc_host->ipmi_errors_from = availability[i].errors_from;
+				dc_host->ipmi_available = availability[i].available;
+				dc_host->ipmi_disable_until = availability[i].disable_until;
 				break;
 			case ITEM_TYPE_JMX:
-				dc_host->jmx_errors_from = availability->errors_from;
-				dc_host->jmx_available = availability->available;
-				dc_host->jmx_disable_until = availability->disable_until;
+				dc_host->jmx_errors_from = availability[i].errors_from;
+				dc_host->jmx_available = availability[i].available;
+				dc_host->jmx_disable_until = availability[i].disable_until;
 				break;
 			default:
 				continue;
@@ -4303,15 +4305,19 @@ void	DCconfig_set_trigger_value(zbx_uint64_t triggerid, unsigned char value,
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
-void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
-				int maintenance_type, int maintenance_from)
+void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int maintenance_status,
+		int maintenance_type, int maintenance_from)
 {
+	int		i;
 	ZBX_DC_HOST	*dc_host;
 
 	LOCK_CACHE;
 
-	if (NULL != (dc_host = zbx_hashset_search(&config->hosts, &hostid)))
+	for (i = 0; i < hostids_num; i++)
 	{
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &hostids[i])))
+			continue;
+
 		if (HOST_MAINTENANCE_STATUS_OFF == dc_host->maintenance_status ||
 				HOST_MAINTENANCE_STATUS_OFF == maintenance_status)
 			dc_host->maintenance_from = maintenance_from;

@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/../../conf/zabbix.conf.php';
 require_once dirname(__FILE__).'/../../include/func.inc.php';
 require_once dirname(__FILE__).'/../../include/db.inc.php';
 require_once dirname(__FILE__).'/../../include/classes/db/DB.php';
+require_once dirname(__FILE__).'/../../include/classes/class.cwebuser.php';
 require_once dirname(__FILE__).'/../../include/classes/debug/CProfiler.php';
 
 function error($error) {

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-25 00:50+0300\n"
-"PO-Revision-Date: 2013-09-11 21:06+0300\n"
+"POT-Creation-Date: 2013-11-29 20:23+0200\n"
+"PO-Revision-Date: 2013-10-30 17:46+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1378926385.0\n"
+"X-POOTLE-MTIME: 1383147965.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -22,11 +22,11 @@ msgstr ""
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
 msgstr "\"%s\" deve estar entre 1970.01.01 e 2038.01.18."
 
-#: include/profiles.inc.php:286
+#: include/profiles.inc.php:285
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
 msgstr "\"Exibe triggers OK\" precisa ser \"0\" ou um inteiro positivo."
 
-#: include/profiles.inc.php:291
+#: include/profiles.inc.php:290
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
 msgstr "\"Triggers piscam na mudança de estado\" é necessário ser \"0\" ou um inteiro positivo."
 
@@ -77,7 +77,7 @@ msgid_plural "%d devices"
 msgstr[0] "%d dispositivo"
 msgstr[1] "%d dispositivos"
 
-#: include/views/configuration.action.edit.php:424
+#: include/views/configuration.action.edit.php:429
 msgid "(0 - infinitely)"
 msgstr "(0 - indefinidamente)"
 
@@ -95,7 +95,7 @@ msgstr "(em dias)"
 msgid "(in sec)"
 msgstr "(em segs)"
 
-#: include/views/configuration.action.edit.php:434
+#: include/views/configuration.action.edit.php:440
 msgid "(minimum 60 seconds, 0 - use action default)"
 msgstr "(mínimo de 60 segundos, 0 - usar a ação padrão)"
 
@@ -113,11 +113,11 @@ msgstr "- todos os grupos -"
 msgid "----[BULK ACKNOWLEDGE]----"
 msgstr "----[RECONHECIMENTO EM MASSA]----"
 
-#: include/triggers.inc.php:2223 include/triggers.inc.php:2224
-#: include/triggers.inc.php:2225 include/triggers.inc.php:2227
-#: include/triggers.inc.php:2229 include/triggers.inc.php:2232
-#: include/triggers.inc.php:2235 include/triggers.inc.php:2236
-#: include/triggers.inc.php:2247 include/triggers.inc.php:2254
+#: include/triggers.inc.php:2263 include/triggers.inc.php:2264
+#: include/triggers.inc.php:2265 include/triggers.inc.php:2267
+#: include/triggers.inc.php:2269 include/triggers.inc.php:2272
+#: include/triggers.inc.php:2275 include/triggers.inc.php:2276
+#: include/triggers.inc.php:2287 include/triggers.inc.php:2294
 msgid "0 or 1"
 msgstr "0 ou 1"
 
@@ -157,15 +157,15 @@ msgstr "<manual>"
 msgid "ALARM ACKNOWLEDGES"
 msgstr "RECONHECIMENTOS DE ALARME"
 
-#: include/triggers.inc.php:1662
+#: include/triggers.inc.php:1702
 #: include/views/configuration.action.edit.php:114
-#: include/views/configuration.action.edit.php:880
-#: include/views/configuration.triggers.edit.php:104 tr_logform.php:290
+#: include/views/configuration.action.edit.php:887
+#: include/views/configuration.triggers.edit.php:104 tr_logform.php:286
 msgid "AND"
 msgstr "E"
 
 #: include/views/configuration.action.edit.php:113
-#: include/views/configuration.action.edit.php:879
+#: include/views/configuration.action.edit.php:886
 msgid "AND / OR"
 msgstr "E / OU"
 
@@ -205,19 +205,19 @@ msgstr "SLA Aceitável"
 msgid "Access denied!"
 msgstr "Acesso negado!"
 
-#: api/classes/CUser.php:916
+#: api/classes/CUser.php:917
 #, php-format
 msgid "Account is blocked for %s seconds"
 msgstr "Conta bloqueada por %s segundos"
 
 #: events.php:565 events.php:578 include/actions.inc.php:245
 #: include/blocks.inc.php:903 include/blocks.inc.php:1420
-#: include/events.inc.php:137 include/events.inc.php:210
-#: include/views/configuration.action.edit.php:938
+#: include/events.inc.php:137 include/events.inc.php:211
+#: include/views/configuration.action.edit.php:945
 msgid "Ack"
 msgstr "Reconhecido"
 
-#: acknow.php:179 include/triggers.inc.php:1236 include/triggers.inc.php:1239
+#: acknow.php:179 include/triggers.inc.php:1276 include/triggers.inc.php:1279
 #: tr_status.php:664
 msgid "Acknowledge"
 msgstr "Reconhecer"
@@ -263,11 +263,11 @@ msgstr "Reconhecimento desativado"
 #: include/views/configuration.action.edit.php:75
 #: include/views/configuration.action.edit.php:317
 #: include/views/configuration.action.edit.php:321
-#: include/views/configuration.action.edit.php:473
-#: include/views/configuration.action.edit.php:482
-#: include/views/configuration.action.edit.php:594
-#: include/views/configuration.action.edit.php:823
-#: include/views/configuration.action.edit.php:965
+#: include/views/configuration.action.edit.php:480
+#: include/views/configuration.action.edit.php:489
+#: include/views/configuration.action.edit.php:601
+#: include/views/configuration.action.edit.php:830
+#: include/views/configuration.action.edit.php:972
 #: include/views/configuration.graph.edit.php:76
 #: include/views/configuration.host.massupdate.php:90
 #: include/views/configuration.httpconf.edit.php:135
@@ -279,23 +279,23 @@ msgstr "Reconhecimento desativado"
 #: include/views/configuration.slideconf.edit.php:50
 #: include/views/configuration.triggers.edit.php:147
 #: include/views/configuration.triggers.edit.php:271
-#: include/views/configuration.triggers.massupdate.php:79 tr_logform.php:299
-#: tr_logform.php:303
+#: include/views/configuration.triggers.massupdate.php:79 tr_logform.php:295
+#: tr_logform.php:299
 msgid "Action"
 msgstr "Ação"
 
-#: api/classes/CAction.php:774 api/classes/CAction.php:871
+#: api/classes/CAction.php:775 api/classes/CAction.php:872
 #, php-format
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seconds)."
 msgstr "Ação \"%1$s\" tem um valor incorreto para \"esc_period\" (mínimo %2$s segundos)."
 
-#: api/classes/CAction.php:777 api/classes/CAction.php:791
-#: api/classes/CAction.php:880 api/classes/CAction.php:899
+#: api/classes/CAction.php:778 api/classes/CAction.php:792
+#: api/classes/CAction.php:881 api/classes/CAction.php:900
 #, php-format
 msgid "Action \"%s\" already exists."
 msgstr "Ação \"%s\" existente."
 
-#: api/classes/CAction.php:926
+#: api/classes/CAction.php:927
 #, php-format
 msgid "Action \"%s\" no operations defined."
 msgstr "Ação \"%s\" não possui operações definidas."
@@ -367,12 +367,12 @@ msgstr "Ativo até"
 #: include/views/administration.users.edit.php:170
 #: include/views/common.macros.php:51
 #: include/views/configuration.action.edit.php:302
-#: include/views/configuration.action.edit.php:477
-#: include/views/configuration.action.edit.php:486
-#: include/views/configuration.action.edit.php:747
-#: include/views/configuration.action.edit.php:780
-#: include/views/configuration.action.edit.php:944
-#: include/views/configuration.action.edit.php:953
+#: include/views/configuration.action.edit.php:484
+#: include/views/configuration.action.edit.php:493
+#: include/views/configuration.action.edit.php:754
+#: include/views/configuration.action.edit.php:787
+#: include/views/configuration.action.edit.php:951
+#: include/views/configuration.action.edit.php:960
 #: include/views/configuration.graph.edit.php:105
 #: include/views/configuration.host.edit.php:225
 #: include/views/configuration.host.edit.php:242
@@ -398,7 +398,7 @@ msgstr "Ativo até"
 #: include/views/js/configuration.sysmaps.js.php:175
 #: include/views/js/configuration.sysmaps.js.php:364
 #: include/views/monitoring.history.php:92 popup_bitem.php:150
-#: popup_media.php:141 popup_period.php:183 tr_logform.php:289
+#: popup_media.php:141 popup_period.php:183 tr_logform.php:285
 #: tr_status.php:717
 msgid "Add"
 msgstr "Adicionar"
@@ -449,7 +449,7 @@ msgstr "Adicionar aos favoritos"
 msgid "Add to host group"
 msgstr "Adicionar ao grupo de hosts"
 
-#: include/actions.inc.php:364 include/views/configuration.action.edit.php:766
+#: include/actions.inc.php:364 include/views/configuration.action.edit.php:773
 msgid "Add to host groups"
 msgstr "Adicionar aos grupos de hosts"
 
@@ -475,8 +475,8 @@ msgid "Advanced labels"
 msgstr "Textos avançados"
 
 #: include/blocks.inc.php:901 include/blocks.inc.php:1418
-#: include/events.inc.php:136 include/events.inc.php:210
-#: include/events.inc.php:213 tr_status.php:288
+#: include/events.inc.php:136 include/events.inc.php:211
+#: include/events.inc.php:214 tr_status.php:288
 msgid "Age"
 msgstr "Idade"
 
@@ -525,7 +525,7 @@ msgstr "Alinhar icones"
 #: include/views/administration.script.list.php:82
 #: include/views/administration.usergroups.edit.php:43
 #: include/views/administration.users.list.php:36
-#: include/views/configuration.action.edit.php:519
+#: include/views/configuration.action.edit.php:526
 #: include/views/configuration.hostgroups.edit.php:39
 #: include/views/configuration.sysmap.edit.php:138 jsLoader.php:87
 #: popup_right.php:56 tr_status.php:215
@@ -720,7 +720,7 @@ msgstr "Autenticação"
 msgid "Authentication algorithm"
 msgstr "Algoritmo de autenticação"
 
-#: include/views/configuration.action.edit.php:673
+#: include/views/configuration.action.edit.php:680
 #: include/views/configuration.item.edit.php:173
 #: include/views/configuration.item.massupdate.php:200
 msgid "Authentication method"
@@ -1035,7 +1035,7 @@ msgstr "CONFIGURAÇÃO DE SEVERIDADES DA TRIGGER"
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:45
-#: include/views/configuration.triggers.massupdate.php:40 triggers.php:376
+#: include/views/configuration.triggers.massupdate.php:40 triggers.php:378
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "CONFIGURAÇÃO DE TRIGGERS"
 
@@ -1109,15 +1109,15 @@ msgstr "Canadá (136 caracteres)"
 #: include/classes/class.cbuttoncancel.php:25 include/config.inc.php:267
 #: include/forms.inc.php:1707 include/forms.inc.php:2010
 #: include/js.inc.php:222 include/setup.inc.php:137
-#: include/views/configuration.action.edit.php:946
-#: include/views/configuration.action.edit.php:955
+#: include/views/configuration.action.edit.php:953
+#: include/views/configuration.action.edit.php:962
 #: include/views/configuration.services.parent.list.php:62
 #: include/views/js/administration.general.triggerDisplayOptions.js.php:55
 #: include/views/js/administration.general.triggerSeverity.js.php:38
 #: include/views/js/administration.script.edit.js.php:67
 #: include/views/js/configuration.action.edit.js.php:103
 #: include/views/js/configuration.discovery.edit.js.php:69
-#: include/views/js/general.script.confirm.js.php:41 tr_logform.php:372
+#: include/views/js/general.script.confirm.js.php:41 tr_logform.php:368
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -1231,7 +1231,7 @@ msgstr "Não foi possível adicionar o slide"
 msgid "Cannot add template"
 msgstr "Não foi possível adicionar template"
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Cannot add trigger"
 msgstr "Tigger não foi adicionada"
@@ -1463,16 +1463,16 @@ msgstr "Não foi possível excluir a tela"
 msgid "Cannot delete script"
 msgstr "Não foi possível remover script"
 
-#: api/classes/CScript.php:413
+#: api/classes/CScript.php:371
 msgid "Cannot delete scripts. Empty input parameter \"scriptids\"."
 msgstr "Não é possível excluir scripts. Parâmetro \"scriptids\" vazio."
 
-#: api/classes/CScript.php:437
+#: api/classes/CScript.php:395
 #, php-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
 msgstr "Não foi possível excluir os scripts. Script \"%1$s\" é usado na operação de ação \"%2$s\"."
 
-#: api/classes/CScript.php:426
+#: api/classes/CScript.php:384
 #, php-format
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
 msgstr "Scripts não foram excluídos. Script com scriptid \"%s\" não existe."
@@ -1526,7 +1526,7 @@ msgstr "Não foi possível excluir o protótipo de trigger"
 msgid "Cannot delete trigger."
 msgstr "Trigger não foi excluída."
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Cannot delete triggers"
 msgstr "Triggers não foram removidas"
 
@@ -1538,7 +1538,7 @@ msgstr "Não é possível excluir triggers criadas pelo processo de descoberta (
 msgid "Cannot delete user"
 msgstr "Usuário não foi removido"
 
-#: api/classes/CUser.php:786
+#: api/classes/CUser.php:787
 msgid "Cannot delete user media."
 msgstr "Não foi possível apagar a mídia do usuário."
 
@@ -1597,6 +1597,12 @@ msgstr "Não foi encontrado o host \"%1$s\" usado na tela \"%2$s\"."
 #, php-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
 msgstr "Não foi encontrado a interface do host em \"%1$s\" para a chave do item \"%2$s\"."
+
+#: include/classes/import/CConfigurationImport.php:796
+#: include/classes/import/CConfigurationImport.php:877
+#, php-format
+msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
+msgstr "Não foi possível localizar o host ou template \"%1$s\" utilizado no gráfico \"%2$s\".Não foi possível localizar o host ou template \"%1$s\" utilizado no gráfico \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:767
 #: include/classes/import/importers/CMapImporter.php:247
@@ -1689,7 +1695,7 @@ msgstr[1] "Não foi possível importar o template \"%2$s\", os templates associa
 msgid "Cannot include view file \"%s\"."
 msgstr "Não foi possível incluir o arquivo de visualização \"%s\"."
 
-#: api/classes/CUser.php:815
+#: api/classes/CUser.php:816
 msgid "Cannot insert user media."
 msgstr "Não foi possível inserir a mídia do usuário."
 
@@ -1697,7 +1703,7 @@ msgstr "Não foi possível inserir a mídia do usuário."
 msgid "Cannot link template"
 msgstr "Falha na associação do template"
 
-#: api/classes/CUser.php:880
+#: api/classes/CUser.php:881
 msgid "Cannot logout."
 msgstr "Não foi possível terminar sessão."
 
@@ -1989,7 +1995,7 @@ msgstr "Serviços não foram atualizados"
 msgid "Cannot update slide show"
 msgstr "Não é possível atualizar a apresentação de slides"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr "Status não foi atualizado"
 
@@ -2006,7 +2012,7 @@ msgstr "Trigger não foi atualizada"
 msgid "Cannot update user"
 msgstr "Usuário não foi atualizado"
 
-#: api/classes/CUser.php:807
+#: api/classes/CUser.php:808
 msgid "Cannot update user media."
 msgstr "Não foi possível atualizar a mídia de usuário."
 
@@ -2052,7 +2058,7 @@ msgid "Change password"
 msgstr "Alterar senha"
 
 #: include/forms.inc.php:418 include/items.inc.php:120
-#: include/triggers.inc.php:2201 include/views/configuration.item.edit.php:217
+#: include/triggers.inc.php:2241 include/views/configuration.item.edit.php:217
 #: include/views/configuration.item.massupdate.php:160
 msgid "Character"
 msgstr "Carácter"
@@ -2160,7 +2166,7 @@ msgstr "Relógio"
 #: include/views/administration.general.iconmap.edit.php:141
 #: include/views/administration.proxy.edit.php:94
 #: include/views/administration.script.edit.php:121
-#: include/views/configuration.action.edit.php:973
+#: include/views/configuration.action.edit.php:980
 #: include/views/configuration.application.edit.php:72
 #: include/views/configuration.discovery.edit.php:87
 #: include/views/configuration.graph.edit.php:305
@@ -2200,7 +2206,7 @@ msgstr "Cor"
 msgid "Colour (OK)"
 msgstr "Cor (OK)"
 
-#: include/profiles.inc.php:279
+#: include/profiles.inc.php:278
 msgid "Colour is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "A cor não é válida: espera-se cor no formato hexadecimal (6 símbolos)."
 
@@ -2239,8 +2245,8 @@ msgstr "O comando não pode ser vazio."
 
 #: include/views/administration.script.edit.php:63
 #: include/views/administration.script.list.php:40
-#: include/views/configuration.action.edit.php:723
-#: include/views/configuration.action.edit.php:727 popup.php:1808
+#: include/views/configuration.action.edit.php:730
+#: include/views/configuration.action.edit.php:734 popup.php:1808
 #: popup.php:1815
 msgid "Commands"
 msgstr "Comandos"
@@ -2250,7 +2256,7 @@ msgid "Comment updated"
 msgstr "Comentário atualizado"
 
 #: include/acknow.inc.php:54 tr_comments.php:70 tr_comments.php:88
-#: tr_comments.php:90 tr_logform.php:367 tr_status.php:294
+#: tr_comments.php:90 tr_logform.php:363 tr_status.php:294
 msgid "Comments"
 msgstr "Comentários"
 
@@ -2271,8 +2277,8 @@ msgid "Condition"
 msgstr "Condição"
 
 #: include/views/configuration.action.edit.php:117
-#: include/views/configuration.action.edit.php:898
-#: include/views/configuration.action.edit.php:966
+#: include/views/configuration.action.edit.php:905
+#: include/views/configuration.action.edit.php:973
 #: include/views/configuration.action.list.php:51
 msgid "Conditions"
 msgstr "Condições"
@@ -2468,7 +2474,7 @@ msgstr "Conectado como '%1$s'"
 msgid "Connected as '%1$s' from '%2$s'"
 msgstr "Conectado como '%1$s' de '%2$s'"
 
-#: api/classes/CScript.php:473
+#: api/classes/CScript.php:431
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" failed. Possible reasons:\n"
@@ -2479,7 +2485,7 @@ msgstr ""
 "1. Configuração incorreta de IP/DNS no arquivo \"zabbix.conf.php\";\n"
 "2. Configuração incorreta no servidor de DNS.\n"
 
-#: api/classes/CScript.php:464
+#: api/classes/CScript.php:422
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" refused. Possible reasons:\n"
@@ -2494,7 +2500,7 @@ msgstr ""
 "3. Processo do Zabbix server não está em execução;\n"
 "4. Firewall bloqueando a conexão TCP.\n"
 
-#: api/classes/CScript.php:470
+#: api/classes/CScript.php:428
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" timed out. Possible reasons:\n"
@@ -2528,7 +2534,7 @@ msgstr "Copiar"
 msgid "Copy selected to ..."
 msgstr "Copiar selecionados para ..."
 
-#: api/classes/CUser.php:985
+#: api/classes/CUser.php:986
 #, php-format
 msgid "Correct login \"%s\"."
 msgstr "Login correto \"%s\"."
@@ -2823,7 +2829,7 @@ msgstr "Multiplicador"
 msgid "Custom screens"
 msgstr "Telas personalizadas"
 
-#: include/views/configuration.action.edit.php:646
+#: include/views/configuration.action.edit.php:653
 msgid "Custom script"
 msgstr "Script personalizado"
 
@@ -2908,7 +2914,7 @@ msgstr "Laranja escuro"
 msgid "Darken"
 msgstr "Escurecer"
 
-#: dashboard.php:24 include/menu.inc.php:33 include/profiles.inc.php:353
+#: dashboard.php:24 include/menu.inc.php:33 include/profiles.inc.php:352
 msgid "Dashboard"
 msgstr "Dashboard"
 
@@ -3102,7 +3108,7 @@ msgid "Default delay (in seconds)"
 msgstr "Intervalo padrão (em segundos)"
 
 #: include/views/configuration.action.edit.php:51
-#: include/views/configuration.action.edit.php:534
+#: include/views/configuration.action.edit.php:541
 msgid "Default message"
 msgstr "Mensagem padrão"
 
@@ -3140,7 +3146,7 @@ msgstr "Atrasado por"
 #: include/classes/class.cbuttondelete.php:25 include/forms.inc.php:1938
 #: include/views/administration.auditlogs.list.php:47
 #: include/views/configuration.triggers.edit.php:154 jsLoader.php:104
-#: tr_logform.php:332 tr_logform.php:349
+#: tr_logform.php:328 tr_logform.php:345
 msgid "Delete"
 msgstr "Remover"
 
@@ -3160,7 +3166,7 @@ msgstr "Remover e limpar template? (Aviso: todos os hosts associados terão limp
 msgid "Delete application?"
 msgstr "Apagar a aplicação?"
 
-#: include/views/configuration.action.edit.php:974
+#: include/views/configuration.action.edit.php:981
 msgid "Delete current action?"
 msgstr "Apagar a ação atual?"
 
@@ -3170,7 +3176,7 @@ msgid "Delete discovery rule?"
 msgstr "Apagar a regra de descoberta?"
 
 #: include/views/configuration.triggers.edit.php:156 jsLoader.php:106
-#: tr_logform.php:333
+#: tr_logform.php:329
 msgid "Delete expression?"
 msgstr "Remover expressão?"
 
@@ -3194,7 +3200,7 @@ msgstr "Apagar o mapeamento de ícone?"
 msgid "Delete item?"
 msgstr "Apagar o item?"
 
-#: jsLoader.php:105 tr_logform.php:349
+#: jsLoader.php:105 tr_logform.php:345
 msgid "Delete keyword?"
 msgstr "Remover palavra-chave?"
 
@@ -3488,11 +3494,11 @@ msgstr "Nega"
 msgid "Dependencies"
 msgstr "Dependências"
 
-#: include/triggers.inc.php:1355 tr_status.php:558
+#: include/triggers.inc.php:1395 tr_status.php:558
 msgid "Dependent"
 msgstr "Dependente"
 
-#: include/triggers.inc.php:1335
+#: include/triggers.inc.php:1375
 #: include/views/configuration.services.edit.php:101
 #: include/views/configuration.triggers.list.php:140 popup.php:1032
 #: tr_status.php:542
@@ -3514,7 +3520,7 @@ msgstr "Status de publicação"
 #: include/views/configuration.maintenance.edit.php:124
 #: include/views/configuration.maintenance.list.php:47
 #: include/views/configuration.triggers.edit.php:243 popup.php:1344
-#: tr_logform.php:256
+#: tr_logform.php:252
 msgid "Description"
 msgstr "Descrição"
 
@@ -3666,7 +3672,7 @@ msgstr "Desativar triggers selecionadas?"
 
 #: auditlogs.php:152 dashboard.php:227 dashconf.php:164
 #: include/discovery.inc.php:119 include/httptest.inc.php:46
-#: include/items.inc.php:150 include/triggers.inc.php:1608
+#: include/items.inc.php:150 include/triggers.inc.php:1648
 #: include/users.inc.php:60
 #: include/views/administration.mediatypes.list.php:93
 #: include/views/administration.usergroups.list.php:58
@@ -3683,7 +3689,7 @@ msgstr "Desativar triggers selecionadas?"
 #: include/views/configuration.triggers.list.php:189
 #: include/views/js/configuration.sysmaps.js.php:139
 #: include/views/monitoring.overview.php:40 popup_media.php:137 popup.php:1043
-#: tr_logform.php:369
+#: tr_logform.php:365
 msgid "Disabled"
 msgstr "Inativo"
 
@@ -3939,12 +3945,12 @@ msgstr "Host duplicado. Já existe registro de outro Host usando o nome de exibi
 msgid "Duplicate map name for map \"%s\"."
 msgstr "Nome de mapa duplicado para o mapa \"%s\"."
 
-#: api/classes/CScript.php:312 api/classes/CScript.php:363
+#: api/classes/CScript.php:270 api/classes/CScript.php:321
 #, php-format
 msgid "Duplicate script name \"%s\"."
 msgstr "Nome de script duplicado \"%s\"."
 
-#: include/profiles.inc.php:311
+#: include/profiles.inc.php:310
 #, php-format
 msgid "Duplicate severity name \"%s\"."
 msgstr "Nome de severidade duplicado \"%s\"."
@@ -3955,7 +3961,7 @@ msgid "Duplicate user alias \"%s\"."
 msgstr "Apelido duplicado \"%s\"."
 
 #: events.php:564 events.php:577 include/events.inc.php:135
-#: include/events.inc.php:210 include/events.inc.php:213 tr_status.php:289
+#: include/events.inc.php:211 include/events.inc.php:214 tr_status.php:289
 msgid "Duration"
 msgstr "Duração"
 
@@ -4034,11 +4040,11 @@ msgstr "E-mail"
 msgid "Empty"
 msgstr "Vazio"
 
-#: api/classes/CAction.php:1724
+#: api/classes/CAction.php:1725
 msgid "Empty action condition."
 msgstr "A condição da ação está vazia."
 
-#: api/classes/CAction.php:1429 api/classes/CApplication.php:656
+#: api/classes/CAction.php:1430 api/classes/CApplication.php:656
 #: api/classes/CDiscoveryRule.php:567 api/classes/CGraph.php:693
 #: api/classes/CGraphPrototype.php:743 api/classes/CHostGroup.php:672
 #: api/classes/CHostGroup.php:729 api/classes/CHostInterface.php:642
@@ -4200,27 +4206,27 @@ msgstr "Inglês (en_US)"
 msgid "Error"
 msgstr "Erro"
 
-#: api/classes/CScript.php:478
+#: api/classes/CScript.php:436
 msgid "Error description"
 msgstr "Descrição do erro"
 
-#: api/classes/CScript.php:516
+#: api/classes/CScript.php:474
 msgid "Error description: can't read script response, check connection."
 msgstr "Descrição do erro: não foi possível receber a resposta do script, verifique a conexão."
 
-#: api/classes/CScript.php:493
+#: api/classes/CScript.php:451
 msgid "Error description: can't send command, check connection."
 msgstr "Descrição do erro: não foi possível enviar o comando, verifique a conexão."
 
-#: api/classes/CScript.php:509
+#: api/classes/CScript.php:467
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value."
 msgstr "Descrição do erro: O limite definido para a constante ZBX_SCRIPT_BYTES_LIMIT no arquivo \"include/defines.inc.php\" foi alcançado. Você pode tentar aumentar este valor."
 
-#: api/classes/CScript.php:505
+#: api/classes/CScript.php:463
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value."
 msgstr "Descrição do erro: O limite definido para a constante ZBX_SCRIPT_TIMEOUT no arquivo \"include/defines.inc.php\" foi alcançado. Você pode tentar aumentar este valor."
 
-#: api/classes/CScript.php:524
+#: api/classes/CScript.php:482
 msgid "Error description: empty response received."
 msgstr "Descrição do erro: a resposta recebida estava vazia."
 
@@ -4272,7 +4278,7 @@ msgstr "Reconhecimento de eventos desabilitado"
 msgid "Event details"
 msgstr "Detalhes do evento"
 
-#: include/triggers.inc.php:1607
+#: include/triggers.inc.php:1647
 msgid "Event generation"
 msgstr "Geração de evento"
 
@@ -4288,7 +4294,7 @@ msgstr "Origem do evento"
 msgid "Event source details"
 msgstr "Detalhes da origem do evento"
 
-#: events.php:317 include/menu.inc.php:57 include/triggers.inc.php:1267
+#: events.php:317 include/menu.inc.php:57 include/triggers.inc.php:1307
 #: jsLoader.php:111 search.php:134 search.php:206 search.php:261
 #: search.php:313 tr_status.php:211
 msgid "Events"
@@ -4306,7 +4312,7 @@ msgstr "A cada semana(s)"
 msgid "Exa"
 msgstr "Exa"
 
-#: tr_logform.php:283 tr_logform.php:335
+#: tr_logform.php:279 tr_logform.php:331
 msgid "Exclude"
 msgstr "Excluir"
 
@@ -4322,7 +4328,7 @@ msgstr "Erro de execução SQL [%1$s] em [%2$s]."
 
 #: include/views/administration.script.edit.php:58
 #: include/views/administration.script.list.php:39
-#: include/views/configuration.action.edit.php:664
+#: include/views/configuration.action.edit.php:671
 #: include/views/js/configuration.action.edit.js.php:114 popup.php:1807
 #: popup.php:1814
 msgid "Execute on"
@@ -4372,13 +4378,13 @@ msgid "Export to CSV"
 msgstr "Exportar para CSV"
 
 #: include/forms.inc.php:1775 include/forms.inc.php:1906
-#: include/forms.inc.php:1979 include/triggers.inc.php:1606
+#: include/forms.inc.php:1979 include/triggers.inc.php:1646
 #: include/views/administration.general.iconmap.edit.php:41
 #: include/views/configuration.item.list.php:111
 #: include/views/configuration.triggers.edit.php:134
 #: include/views/configuration.triggers.edit.php:145
 #: include/views/configuration.triggers.list.php:96 triggers.php:48
-#: tr_logform.php:295 tr_logform.php:303 tr_testexpr.php:135
+#: tr_logform.php:291 tr_logform.php:299 tr_testexpr.php:135
 msgid "Expression"
 msgstr "Expressão"
 
@@ -4391,7 +4397,7 @@ msgstr "Erro de sintaxe na expressão."
 msgid "Expression Variable Elements"
 msgstr "Expressão de Elementos Variáveis"
 
-#: include/triggers.inc.php:537
+#: include/triggers.inc.php:577
 msgid "Expression cannot be empty"
 msgstr "Expressão não pode ser vazia"
 
@@ -4601,7 +4607,7 @@ msgid "Friday"
 msgstr "Sexta-feira"
 
 #: include/reports.inc.php:130 include/reports.inc.php:241
-#: include/reports.inc.php:610 include/views/configuration.action.edit.php:418
+#: include/reports.inc.php:610 include/views/configuration.action.edit.php:425
 #: include/views/configuration.services.edit.php:213
 #: include/views/configuration.services.edit.php:280
 #: include/views/js/configuration.sysmaps.js.php:308 popup_period.php:130
@@ -4686,7 +4692,7 @@ msgstr "Suporte"
 msgid "Giga"
 msgstr "Giga"
 
-#: include/triggers.inc.php:1738 tr_testexpr.php:36
+#: include/triggers.inc.php:1778 tr_testexpr.php:36
 msgid "Given expression is not a macro"
 msgstr "Expressão informada não é uma macro"
 
@@ -4694,7 +4700,7 @@ msgstr "Expressão informada não é uma macro"
 msgid "Global expression does not exist."
 msgstr "Expressão global não existe."
 
-#: include/views/configuration.action.edit.php:649
+#: include/views/configuration.action.edit.php:656
 msgid "Global script"
 msgstr "Script global"
 
@@ -4864,7 +4870,7 @@ msgstr "Já existe um gráfico com o mesmo nome, mas com outro tipo."
 
 #: dashboard.php:260 hosts.php:686 hosts.php:765 include/blocks.inc.php:1242
 #: include/html.inc.php:464 include/html.inc.php:468 include/items.inc.php:802
-#: include/menu.inc.php:62 include/triggers.inc.php:1311
+#: include/menu.inc.php:62 include/triggers.inc.php:1351
 #: include/views/configuration.graph.list.php:56
 #: include/views/configuration.host.discovery.list.php:54
 #: include/views/configuration.host.edit.php:400
@@ -4932,7 +4938,7 @@ msgstr "O grupo \"%1$s\" informado no host \"%2$s\" não existe."
 msgid "Group \"%1$s\" is internal and can not be deleted."
 msgstr "O grupo \"%1$s\" é de uso interno e não pode ser excluído."
 
-#: api/classes/CHostGroup.php:769
+#: api/classes/CHostGroup.php:770
 #, php-format
 msgid "Group \"%s\" cannot be deleted, because it is used in a global script."
 msgstr "O grupo \"%s\" não pode ser excluído por ser utilizado em um script global."
@@ -5136,7 +5142,7 @@ msgstr "Alinhamento horizontal"
 #: include/classes/screens/CScreenHostTriggers.php:123
 #: include/forms.inc.php:504 include/html.inc.php:372 include/maps.inc.php:24
 #: include/reports.inc.php:112 include/setup.inc.php:310
-#: include/triggers.inc.php:1183 include/triggers.inc.php:1603
+#: include/triggers.inc.php:1223 include/triggers.inc.php:1643
 #: include/views/configuration.application.edit.php:44
 #: include/views/configuration.application.edit.php:56
 #: include/views/configuration.application.list.php:38
@@ -5302,7 +5308,7 @@ msgstr "Telas do host"
 msgid "Host status"
 msgstr "Status do host"
 
-#: include/triggers.inc.php:980
+#: include/triggers.inc.php:1020
 #, php-format
 msgid "Host status became \"%s\""
 msgstr "O status do host tornou-se \"%s\""
@@ -5463,7 +5469,7 @@ msgstr "O range de IP não pode ser vazio."
 #: include/hosts.inc.php:476 include/items.inc.php:188
 #: include/views/administration.script.edit.php:49
 #: include/views/administration.script.list.php:54
-#: include/views/configuration.action.edit.php:645
+#: include/views/configuration.action.edit.php:652
 #: include/views/configuration.host.edit.php:543
 msgid "IPMI"
 msgstr "IPMI"
@@ -5764,7 +5770,7 @@ msgstr "Em manutenção"
 msgid "In progress"
 msgstr "Em andamento"
 
-#: tr_logform.php:282 tr_logform.php:335
+#: tr_logform.php:278 tr_logform.php:331
 msgid "Include"
 msgstr "Incluir"
 
@@ -5805,111 +5811,111 @@ msgstr "A comunidade SNMP não está válida."
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr "O SLA é inaceitável para o serviço \"%1$s\"."
 
-#: api/classes/CAction.php:1695
+#: api/classes/CAction.php:1696
 msgid "Incorrect action condition discovery check."
 msgstr "A verificação de descoberata é invalida para esta ação."
 
-#: api/classes/CAction.php:1750
+#: api/classes/CAction.php:1751
 msgid "Incorrect action condition discovery check. Discovery check does not exist or you have no access to it."
 msgstr "A ação possui condição de descoberta inválida. A verificação de descoberta não existe ou você não possui acesso a ela."
 
-#: api/classes/CAction.php:1747
+#: api/classes/CAction.php:1748
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
 msgstr "A ação possui condição de descoberta inválida. A regra de descoberta não existe ou você não possui acesso a ela."
 
-#: api/classes/CAction.php:1707
+#: api/classes/CAction.php:1708
 msgid "Incorrect action condition discovery status."
 msgstr "A ação possui condição de descoberta com status inválido."
 
-#: api/classes/CAction.php:1735
+#: api/classes/CAction.php:1736
 msgid "Incorrect action condition host group. Host group does not exist or you have no access to it."
 msgstr "A ação possui condição de grupo de host inválida. O grupo de host não existe ou você não possui acesso a ele."
 
-#: api/classes/CAction.php:1738
+#: api/classes/CAction.php:1739
 msgid "Incorrect action condition host. Host does not exist or you have no access to it."
 msgstr "A ação possui condição de host inválida. O host não existe ou você não possui acesso à ele."
 
-#: api/classes/CAction.php:1689
+#: api/classes/CAction.php:1690
 #, php-format
 msgid "Incorrect action condition ip \"%s\"."
 msgstr "A ação possui condição com IP inválido \"%s\"."
 
-#: api/classes/CAction.php:1683
+#: api/classes/CAction.php:1684
 #, php-format
 msgid "Incorrect action condition period \"%s\"."
 msgstr "A ação possui condição com período inválido \"%s\"."
 
-#: api/classes/CAction.php:1701
+#: api/classes/CAction.php:1702
 #, php-format
 msgid "Incorrect action condition port \"%s\"."
 msgstr "A ação possui condição com porta inválida \"%s\"."
 
-#: api/classes/CAction.php:1753
+#: api/classes/CAction.php:1754
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
 msgstr "A ação possui condição com proxy inválido. O proxy não existe ou você não possui acesso a ele."
 
-#: api/classes/CAction.php:1741
+#: api/classes/CAction.php:1742
 msgid "Incorrect action condition template. Template does not exist or you have no access to it."
 msgstr "A ação possui condição com template inválido. O template não existe ou você não possui acesso a ele."
 
-#: api/classes/CAction.php:1744
+#: api/classes/CAction.php:1745
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
 msgstr "A ação possui condição com trigger inválido. A trigger não existe ou você não possui acesso a ele."
 
-#: api/classes/CAction.php:1729
+#: api/classes/CAction.php:1730
 msgid "Incorrect action condition type."
 msgstr "A ação possui condição com tipo inválido."
 
-#: api/classes/CAction.php:918
+#: api/classes/CAction.php:919
 msgid "Incorrect action conditionid."
 msgstr "A ação possui conditionid inválido."
 
-#: api/classes/CAction.php:1543
+#: api/classes/CAction.php:1544
 msgid "Incorrect action operation command type."
 msgstr "A ação possui operação com comando de tipo inválido."
 
-#: api/classes/CAction.php:1777
+#: api/classes/CAction.php:1778
 msgid "Incorrect action operation condition acknowledge type."
 msgstr "A ação possui condição de operação com tipo de visto inválido."
 
-#: api/classes/CAction.php:1782
+#: api/classes/CAction.php:1783
 msgid "Incorrect action operation condition type."
 msgstr "A ação possui condição de operação com tipo inválido."
 
-#: api/classes/CAction.php:1461 api/classes/CAction.php:1465
+#: api/classes/CAction.php:1462 api/classes/CAction.php:1466
 msgid "Incorrect action operation escalation step values."
 msgstr "A ação possui passo de escalonamento com valor inválido."
 
-#: api/classes/CAction.php:1614
+#: api/classes/CAction.php:1615
 msgid "Incorrect action operation host group. Host group does not exist or you have no access to this host group."
 msgstr "A ação possui uma operação com grupo de host inválido. O grupo de host não existe ou você não possui acesso a ele."
 
-#: api/classes/CAction.php:1617
+#: api/classes/CAction.php:1618
 msgid "Incorrect action operation host. Host does not exist or you have no access to this host."
 msgstr "A ação possui operação com host inválido. O host não existe ou você não possui acesso a ele."
 
-#: api/classes/CAction.php:1549 api/classes/CAction.php:1553
+#: api/classes/CAction.php:1550 api/classes/CAction.php:1554
 #, php-format
 msgid "Incorrect action operation port \"%s\"."
 msgstr "A ação possui operação com porta inválida \"%s\"."
 
-#: api/classes/CAction.php:1471
+#: api/classes/CAction.php:1472
 msgid "Incorrect action operation step duration."
 msgstr "A ação possui um passo de operação com duração inválida."
 
-#: api/classes/CAction.php:1609
+#: api/classes/CAction.php:1610
 msgid "Incorrect action operation type."
 msgstr "A ação possui operação com tipo inválido."
 
-#: api/classes/CAction.php:1623
+#: api/classes/CAction.php:1624
 msgid "Incorrect action operation user group. User group does not exist or you have no access to this user group."
 msgstr "A ação possui operação com grupo de usuário inválido. O grupo de usuário não existe ou você não possui acesso a ele."
 
-#: api/classes/CAction.php:1620
+#: api/classes/CAction.php:1621
 msgid "Incorrect action operation user. User does not exist or you have no access to this user."
 msgstr "A ação possui operação com usuário inválido. O usuário não existe ou você não possui acesso a ele."
 
-#: api/classes/CAction.php:943
+#: api/classes/CAction.php:944
 msgid "Incorrect action operationid."
 msgstr "A ação possui um operationid inválido."
 
@@ -5937,7 +5943,7 @@ msgstr "Argumentos incorretos passados ao método."
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "O cálculo do valor do SLA para o serviço \"%1$s\" está incorreto."
 
-#: include/nodes.inc.php:267 include/nodes.inc.php:309
+#: include/nodes.inc.php:267 include/nodes.inc.php:308
 msgid "Incorrect characters used for Node name."
 msgstr "Foram utilizados caracteres inválidos para o nome do Node."
 
@@ -6006,7 +6012,7 @@ msgstr "O intervalo flexível \"%1$s\" é inválido."
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "O intervalo flexível do campo \"%1$s\" é inválido. O intervalo flexível deverá ser um texto."
 
-#: include/triggers.inc.php:585 include/triggers.inc.php:1739
+#: include/triggers.inc.php:625 include/triggers.inc.php:1779
 #: tr_testexpr.php:37
 msgid "Incorrect function is used"
 msgstr "Usada função incorreta"
@@ -6026,7 +6032,7 @@ msgstr "O ID de host informado \"%s\" é inválido para o elemento da tela."
 msgid "Incorrect host group ID \"%s\" provided for screen element."
 msgstr "O ID de grupo de host informado \"%s\" é inválido para o elemento da tela."
 
-#: include/profiles.inc.php:258
+#: include/profiles.inc.php:257
 msgid "Incorrect host group."
 msgstr "Grupo de host inválido."
 
@@ -6063,7 +6069,7 @@ msgstr "Foi informado um ID de item (\"%s\") inválido para o elemento da tela."
 msgid "Incorrect item for axis value."
 msgstr "Item inválido para o eixo."
 
-#: api/classes/CTrigger.php:1119 include/triggers.inc.php:917
+#: api/classes/CTrigger.php:1119 include/triggers.inc.php:957
 #, php-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
 msgstr "Chave de item inválida \"%1$s\" é utilizada na expressão de trigger em \"%2$s\"."
@@ -6138,16 +6144,16 @@ msgstr "A altura do mapa \"%s\" é inválida."
 msgid "Incorrect map width value for map \"%s\"."
 msgstr "O comprimento do mapa \"%s\" é inválido."
 
-#: include/nodes.inc.php:287
+#: include/nodes.inc.php:286
 msgid "Incorrect node type."
 msgstr "Tipo inválido de node."
 
-#: api/classes/CAction.php:771 api/classes/CAction.php:806
+#: api/classes/CAction.php:772 api/classes/CAction.php:807
 #, php-format
 msgid "Incorrect parameter for action \"%s\"."
 msgstr "Parâmetro inválido para a ação \"%s\"."
 
-#: api/classes/CAction.php:1013
+#: api/classes/CAction.php:1014
 msgid "Incorrect parameter for operations."
 msgstr "Parâmetro inválido para operações."
 
@@ -6156,12 +6162,12 @@ msgstr "Parâmetro inválido para operações."
 msgid "Incorrect parameter is used for icon map \"%s\"."
 msgstr "Parâmetro inválido usado no mapeamento de ícone \"%s\"."
 
-#: api/classes/CAction.php:862
+#: api/classes/CAction.php:863
 #, php-format
 msgid "Incorrect parameters for action update method \"%s\"."
 msgstr "Parâmetros incorretos para a ação de atualização \"%s\"."
 
-#: api/classes/CAction.php:983
+#: api/classes/CAction.php:984
 msgid "Incorrect parameters for condition."
 msgstr "Parâmetros inválidos para a condição."
 
@@ -6270,7 +6276,7 @@ msgstr "O horário \"%1$s\" é um período incorreto."
 msgid "Incorrect trigger ID for service \"%1$s\"."
 msgstr "O serviço \"%1$s\" possui um ID de trigger inválido."
 
-#: include/triggers.inc.php:596
+#: include/triggers.inc.php:636
 msgid "Incorrect trigger expression"
 msgstr "Expressão de trigger incorreta"
 
@@ -6279,7 +6285,7 @@ msgstr "Expressão de trigger incorreta"
 msgid "Incorrect trigger expression."
 msgstr "Trigger com expressão inválida."
 
-#: include/triggers.inc.php:1057
+#: include/triggers.inc.php:1097
 #, php-format
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr "Trigger com expressão inválida. O Host \"%1$s\" não existe ou você não possui acesso à este host."
@@ -6322,7 +6328,7 @@ msgstr "Dado de usuário inválido em \"get_accessible_groups_by_user\"."
 msgid "Incorrect user data in \"get_accessible_nodes_by_user\"."
 msgstr "Dado de usuário inválido em \"get_accessible_nodes_by_user\"."
 
-#: include/profiles.inc.php:246
+#: include/profiles.inc.php:245
 msgid "Incorrect user group."
 msgstr "Grupo de usuário inválido."
 
@@ -6351,7 +6357,7 @@ msgstr "O valor \"NULO\" não é válido para o campo obrigatório \"%1$s\"."
 msgid "Incorrect value for setMessage(): \"%s\"."
 msgstr "Valor inválido para setMessage(): \"%s\"."
 
-#: include/profiles.inc.php:240
+#: include/profiles.inc.php:239
 msgid "Incorrect working time."
 msgstr "Horário de trabalho inválido."
 
@@ -6387,7 +6393,7 @@ msgstr "Inserir"
 msgid "Insert macro"
 msgstr "Inserir macro"
 
-#: include/menu.inc.php:279 include/profiles.inc.php:228 setup.php:25
+#: include/menu.inc.php:279 include/profiles.inc.php:227 setup.php:25
 msgid "Installation"
 msgstr "Instalação"
 
@@ -6555,7 +6561,7 @@ msgstr "Italiano (it_IT)"
 #: include/reports.inc.php:700 include/views/configuration.graph.edit.php:164
 #: include/views/configuration.graph.edit.php:222
 #: include/views/configuration.triggers.expression.php:55 items.php:468
-#: items.php:624 items.php:646 tr_logform.php:276
+#: items.php:624 items.php:646 tr_logform.php:272
 msgid "Item"
 msgstr "Item"
 
@@ -6834,12 +6840,12 @@ msgstr "A chave \"%1$s\" não encontrou correspondente <grpmax|grpmin|grpsum|grp
 msgid "Key cannot be empty."
 msgstr "A chave não pode ser vazia."
 
-#: include/views/configuration.action.edit.php:710
+#: include/views/configuration.action.edit.php:717
 #: include/views/js/configuration.item.edit.js.php:127
 msgid "Key passphrase"
 msgstr "Frase chave"
 
-#: tr_logform.php:299
+#: tr_logform.php:295
 msgid "Keyword"
 msgstr "Palavra-chave"
 
@@ -6887,7 +6893,7 @@ msgid "LOST"
 msgstr "PERDIDO"
 
 #: include/maps.inc.php:45 include/views/configuration.action.edit.php:75
-#: include/views/configuration.action.edit.php:823
+#: include/views/configuration.action.edit.php:830
 #: include/views/js/configuration.sysmaps.js.php:65
 #: include/views/js/configuration.sysmaps.js.php:217
 #: include/views/js/configuration.sysmaps.js.php:322
@@ -7086,7 +7092,7 @@ msgstr "Associar à template"
 msgid "Link to templates"
 msgstr "Vínculo para templates"
 
-#: include/views/configuration.action.edit.php:802
+#: include/views/configuration.action.edit.php:809
 msgid "Link with templates"
 msgstr "Vínculo com templates"
 
@@ -7141,7 +7147,7 @@ msgid "Location longitude"
 msgstr "Longitude da localização"
 
 #: include/forms.inc.php:419 include/items.inc.php:122
-#: include/triggers.inc.php:2202 include/views/configuration.item.edit.php:218
+#: include/triggers.inc.php:2242 include/views/configuration.item.edit.php:218
 #: include/views/configuration.item.massupdate.php:161
 msgid "Log"
 msgstr "Log"
@@ -7195,7 +7201,7 @@ msgstr "Login"
 msgid "Login as Guest"
 msgstr "Conectado como convidado"
 
-#: api/classes/CUser.php:977
+#: api/classes/CUser.php:978
 #, php-format
 msgid "Login failed \"%s\"."
 msgstr "Falha de login \"%s\"."
@@ -7204,8 +7210,8 @@ msgstr "Falha de login \"%s\"."
 msgid "Login name or password is incorrect"
 msgstr "Usuário ou senha inválido"
 
-#: api/classes/CUser.php:845 api/classes/CUser.php:863
-#: api/classes/CUser.php:910
+#: api/classes/CUser.php:846 api/classes/CUser.php:864
+#: api/classes/CUser.php:911
 msgid "Login name or password is incorrect."
 msgstr "Usuário ou senha inválido."
 
@@ -7636,7 +7642,7 @@ msgstr "Menu"
 #: include/classes/screens/CScreenActions.php:154
 #: include/views/administration.auditacts.list.php:75
 #: include/views/administration.auditacts.list.php:103
-#: include/views/configuration.action.edit.php:546
+#: include/views/configuration.action.edit.php:553
 msgid "Message"
 msgstr "Mensagem"
 
@@ -7835,7 +7841,7 @@ msgstr "Mover"
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
 
-#: include/triggers.inc.php:1607
+#: include/triggers.inc.php:1647
 msgid "Multiple PROBLEM events"
 msgstr "Multiplos eventos de INCIDENTE"
 
@@ -7886,7 +7892,7 @@ msgstr "Autenticação NTLM"
 #: include/views/administration.users.list.php:55
 #: include/views/configuration.action.edit.php:41
 #: include/views/configuration.action.edit.php:75
-#: include/views/configuration.action.edit.php:823
+#: include/views/configuration.action.edit.php:830
 #: include/views/configuration.action.list.php:50
 #: include/views/configuration.application.edit.php:60
 #: include/views/configuration.discovery.edit.php:38
@@ -7958,8 +7964,8 @@ msgid "Never executed"
 msgstr "Nunca executado"
 
 #: include/forms.inc.php:1937 include/views/configuration.action.edit.php:396
-#: include/views/configuration.action.edit.php:596
-#: include/views/configuration.action.edit.php:896
+#: include/views/configuration.action.edit.php:603
+#: include/views/configuration.action.edit.php:903
 #: include/views/configuration.discovery.edit.php:54
 #: include/views/configuration.maintenance.edit.php:163
 msgid "New"
@@ -8029,9 +8035,9 @@ msgstr "Próximo"
 msgid "Next check"
 msgstr "Próxima checagem"
 
-#: events.php:760 include/config.inc.php:568 include/events.inc.php:301
-#: include/events.inc.php:319 include/forms.inc.php:1922
-#: include/triggers.inc.php:1608
+#: events.php:760 include/config.inc.php:568 include/events.inc.php:302
+#: include/events.inc.php:320 include/forms.inc.php:1922
+#: include/triggers.inc.php:1648
 #: include/views/administration.users.list.php:75
 #: include/views/administration.users.list.php:78
 msgid "No"
@@ -8086,12 +8092,12 @@ msgstr "Sem aplicações definidas."
 msgid "No audit defined."
 msgstr "Sem auditoria definida."
 
-#: api/classes/CAction.php:1508
+#: api/classes/CAction.php:1509
 #, php-format
 msgid "No authentication type specified for action operation command \"%s\"."
 msgstr "Não foi definido o tipo de autenticação para a o comando da ação \"%s\"."
 
-#: api/classes/CAction.php:1512 api/classes/CAction.php:1526
+#: api/classes/CAction.php:1513 api/classes/CAction.php:1527
 #, php-format
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "Não foi definido o nome do usuário para a autenticação do comando da ação \"%s\"."
@@ -8100,16 +8106,16 @@ msgstr "Não foi definido o nome do usuário para a autenticação do comando da
 msgid "No authentication user name specified."
 msgstr "Não foi definido o nome de usuário para autenticação."
 
-#: api/classes/CAction.php:1495
+#: api/classes/CAction.php:1496
 msgid "No command specified for action operation."
 msgstr "Não foi definido comando para a operação da ação."
 
-#: api/classes/CAction.php:1490
+#: api/classes/CAction.php:1491
 msgid "No command type specified for action operation."
 msgstr "Não foi definido o tipo de comando para a operação da ação."
 
 #: include/views/configuration.action.edit.php:72
-#: include/views/configuration.action.edit.php:821
+#: include/views/configuration.action.edit.php:828
 msgid "No conditions defined."
 msgstr "Sem condições definidas."
 
@@ -8184,7 +8190,7 @@ msgstr "Sem eventos definidos."
 msgid "No events to acknowledge"
 msgstr "Não há eventos para reconhecer"
 
-#: api/classes/CAction.php:1503
+#: api/classes/CAction.php:1504
 #, php-format
 msgid "No execution target specified for action operation command \"%s\"."
 msgstr "Não foi definido o alvo para execução do comando da operação \"%s\"."
@@ -8385,8 +8391,8 @@ msgstr "Não foram definidos nós."
 msgid "No operations defined."
 msgstr "Não foram definidas operações."
 
-#: include/classes/import/CConfigurationImport.php:820
-#: include/classes/import/CConfigurationImport.php:897
+#: include/classes/import/CConfigurationImport.php:823
+#: include/classes/import/CConfigurationImport.php:903
 #: include/classes/import/CXmlImport18.php:1552
 #, php-format
 msgid "No permission for graph \"%1$s\"."
@@ -8435,11 +8441,11 @@ msgstr "Sem permissões para o mapa \"%1$s\"."
 msgid "No permissions for screen \"%1$s\"."
 msgstr "Sem permissões para a tela \"%1$s\"."
 
-#: api/classes/CUser.php:924 api/classes/CUser.php:1034
+#: api/classes/CUser.php:925 api/classes/CUser.php:1035
 msgid "No permissions for system access."
 msgstr "Sem permissões para aceso ao sistema."
 
-#: api/classes/CAction.php:854 api/classes/CAction.php:1442
+#: api/classes/CAction.php:855 api/classes/CAction.php:1443
 #: api/classes/CApplication.php:442 api/classes/CApplication.php:449
 #: api/classes/CApplication.php:597 api/classes/CApplication.php:674
 #: api/classes/CApplication.php:694 api/classes/CDiscoveryRule.php:584
@@ -8473,7 +8479,7 @@ msgstr "Sem permissões para aceso ao sistema."
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Sem permissões para o referido objeto ou ele não existe!"
 
-#: api/classes/CAction.php:1520
+#: api/classes/CAction.php:1521
 #, php-format
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "Não foi definido o arquivo de chave privada para o comando da operação \"%s\"."
@@ -8490,7 +8496,7 @@ msgstr "Não foram definidos proxies."
 msgid "No proxy"
 msgstr "Sem proxy"
 
-#: api/classes/CAction.php:1517
+#: api/classes/CAction.php:1518
 #, php-format
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "Não foi definido o arquivo de chave pública para o comando da operação \"%s\"."
@@ -8499,7 +8505,7 @@ msgstr "Não foi definido o arquivo de chave pública para o comando da operaç�
 msgid "No public key file specified."
 msgstr "Não foi definido o arquivo de chave pública."
 
-#: api/classes/CAction.php:1482
+#: api/classes/CAction.php:1483
 msgid "No recipients for action operation message."
 msgstr "Sem destinatários para a mensagem da operação."
 
@@ -8526,7 +8532,7 @@ msgstr "Não foi informado o ID de tela para o elemento."
 msgid "No screens defined."
 msgstr "Não foram definidas telas."
 
-#: api/classes/CAction.php:1531
+#: api/classes/CAction.php:1532
 msgid "No script specified for action operation command."
 msgstr "Não foi especificado o script para o comando da ação."
 
@@ -8548,7 +8554,7 @@ msgstr "Não foram definidos slides."
 msgid "No steps defined."
 msgstr "Não foram definidos os passos."
 
-#: triggers.php:348
+#: triggers.php:350
 msgid "No target selected"
 msgstr "Nenhum alvo selecionado"
 
@@ -8574,7 +8580,7 @@ msgstr "Sem trigger"
 msgid "No trigger with triggerid \"%1$s\"."
 msgstr "Sem trigger com triggerid \"%1$s\"."
 
-#: chart4.php:40 include/triggers.inc.php:1153
+#: chart4.php:40 include/triggers.inc.php:1193
 #: include/views/configuration.triggers.list.php:90 popup.php:973
 #: report2.php:232 tr_comments.php:43 tr_status.php:267
 msgid "No triggers defined."
@@ -8615,7 +8621,7 @@ msgstr "Não foram definidos cenários web."
 #: include/blocks.inc.php:897 include/blocks.inc.php:1022
 #: include/blocks.inc.php:1113 include/blocks.inc.php:1415
 #: include/classes/screens/CScreenEvents.php:45 include/page_header.php:355
-#: include/triggers.inc.php:1582 include/views/administration.node.edit.php:83
+#: include/triggers.inc.php:1622 include/views/administration.node.edit.php:83
 #: include/views/configuration.httpconf.list.php:66
 #: include/views/monitoring.discovery.php:42 latest.php:190 popup.php:491
 #: popup_right.php:66 queue.php:248 report2.php:234 report5.php:59
@@ -8635,7 +8641,7 @@ msgstr "Nó removido"
 msgid "Node updated"
 msgstr "Nó atualizado"
 
-#: include/nodes.inc.php:292
+#: include/nodes.inc.php:291
 msgid "Node with same ID already exists."
 msgstr "Já existe nó com o mesmo ID."
 
@@ -8659,7 +8665,7 @@ msgstr "Nodo"
 msgid "None"
 msgstr "Nenhum"
 
-#: include/graphs.inc.php:24 include/triggers.inc.php:1607 popup.php:1416
+#: include/graphs.inc.php:24 include/triggers.inc.php:1647 popup.php:1416
 msgid "Normal"
 msgstr "Normal"
 
@@ -8667,7 +8673,7 @@ msgstr "Normal"
 msgid "Normal view"
 msgstr "Visão normal"
 
-#: include/actions.inc.php:245 include/views/configuration.action.edit.php:937
+#: include/actions.inc.php:245 include/views/configuration.action.edit.php:944
 msgid "Not Ack"
 msgstr "Não reconhecer"
 
@@ -8701,7 +8707,7 @@ msgstr "Não classificada"
 msgid "Not connected"
 msgstr "Não conectado"
 
-#: hosts.php:801 include/html.inc.php:365 include/triggers.inc.php:980
+#: hosts.php:801 include/html.inc.php:365 include/triggers.inc.php:1020
 #: include/views/configuration.host.edit.php:296
 #: include/views/configuration.host.massupdate.php:76 popup.php:571
 msgid "Not monitored"
@@ -8729,7 +8735,7 @@ msgstr "Notas"
 msgid "Nothing"
 msgstr "Nada"
 
-#: include/profiles.inc.php:331
+#: include/profiles.inc.php:330
 msgid "Nothing to do."
 msgstr "Nada a fazer."
 
@@ -8811,14 +8817,14 @@ msgid "Number of users (online)"
 msgstr "Número de usuários (online)"
 
 #: include/forms.inc.php:417 include/items.inc.php:118
-#: include/triggers.inc.php:2200 include/views/configuration.item.edit.php:216
+#: include/triggers.inc.php:2240 include/views/configuration.item.edit.php:216
 #: include/views/configuration.item.massupdate.php:159
 msgid "Numeric (float)"
 msgstr "Numérico (fracionário)"
 
-#: include/triggers.inc.php:2199 include/triggers.inc.php:2218
-#: include/triggers.inc.php:2228 include/triggers.inc.php:2233
-#: include/triggers.inc.php:2237
+#: include/triggers.inc.php:2239 include/triggers.inc.php:2258
+#: include/triggers.inc.php:2268 include/triggers.inc.php:2273
+#: include/triggers.inc.php:2277
 msgid "Numeric (integer 64bit)"
 msgstr "Numérico (inteiro 64bits)"
 
@@ -8853,10 +8859,10 @@ msgstr "Roteador OOB"
 msgid "OOB subnet mask"
 msgstr "Máscara de subrede OOB"
 
-#: include/triggers.inc.php:1662
+#: include/triggers.inc.php:1702
 #: include/views/configuration.action.edit.php:115
-#: include/views/configuration.action.edit.php:881
-#: include/views/configuration.triggers.edit.php:111 tr_logform.php:291
+#: include/views/configuration.action.edit.php:888
+#: include/views/configuration.triggers.edit.php:111 tr_logform.php:287
 msgid "OR"
 msgstr "OU"
 
@@ -8974,15 +8980,15 @@ msgstr "Apenas super administradores podem modificar mapeamentos de ícone."
 msgid "Only Super Admins can update user groups."
 msgstr "Apenas super administradores podem modificar grupos de usuário."
 
-#: api/classes/CUser.php:684
+#: api/classes/CUser.php:685
 msgid "Only Zabbix Admins can add user media."
 msgstr "Apenas administradores podem adicionar mídia de usuário."
 
-#: api/classes/CUser.php:752
+#: api/classes/CUser.php:753
 msgid "Only Zabbix Admins can change user media."
 msgstr "Apenas administradores podem modificar mídias de usuário."
 
-#: api/classes/CUser.php:722
+#: api/classes/CUser.php:723
 msgid "Only Zabbix Admins can remove user media."
 msgstr "Apenas administradores podem apagar mídias de usuário."
 
@@ -9032,27 +9038,27 @@ msgstr "A operação \"%s\" já existe."
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "Não foi possível realizar a operação devido a um pedido não autorizado."
 
-#: include/views/configuration.action.edit.php:949
+#: include/views/configuration.action.edit.php:956
 msgid "Operation condition"
 msgstr "Condição da operação"
 
-#: include/views/configuration.action.edit.php:957
+#: include/views/configuration.action.edit.php:964
 msgid "Operation details"
 msgstr "Detalhes da operação"
 
-#: api/classes/CAction.php:1591
+#: api/classes/CAction.php:1592
 msgid "Operation has no group to operate."
 msgstr "A operação não possui grupo para operar."
 
-#: api/classes/CAction.php:1599
+#: api/classes/CAction.php:1600
 msgid "Operation has no template to operate."
 msgstr "A operação não tem template para operar."
 
-#: include/views/configuration.action.edit.php:447
+#: include/views/configuration.action.edit.php:454
 msgid "Operation type"
 msgstr "Tipo da operação"
 
-#: include/views/configuration.action.edit.php:967
+#: include/views/configuration.action.edit.php:974
 #: include/views/configuration.action.list.php:52
 msgid "Operations"
 msgstr "Ações"
@@ -9408,8 +9414,8 @@ msgstr "Passivo"
 #: include/views/administration.mediatypes.edit.php:84
 #: include/views/administration.users.edit.php:57
 #: include/views/administration.users.edit.php:68
-#: include/views/configuration.action.edit.php:668
-#: include/views/configuration.action.edit.php:701
+#: include/views/configuration.action.edit.php:675
+#: include/views/configuration.action.edit.php:708
 #: include/views/configuration.host.edit.php:542
 #: include/views/configuration.httpconf.edit.php:62
 #: include/views/configuration.item.edit.php:171
@@ -9506,7 +9512,7 @@ msgstr "Executar"
 msgid "Play sound"
 msgstr "Executar som"
 
-#: include/nodes.inc.php:329
+#: include/nodes.inc.php:328
 msgid "Please be aware that database still contains data related to the deleted node."
 msgstr "Observe que a base de dados ainda contém dados relativos ao nó eliminado."
 
@@ -9536,7 +9542,7 @@ msgstr "Preenche o campo inventário do host"
 #: include/views/administration.node.edit.php:78
 #: include/views/administration.node.list.php:44
 #: include/views/administration.proxy.edit.php:55
-#: include/views/configuration.action.edit.php:715
+#: include/views/configuration.action.edit.php:722
 #: include/views/configuration.host.edit.php:218
 #: include/views/configuration.item.edit.php:161
 #: include/views/configuration.item.massupdate.php:149 items.php:115
@@ -9560,7 +9566,7 @@ msgstr "Português Brasileiro (PT_BR)"
 msgid "Portuguese (pt_PT)"
 msgstr "Português (pt_PT)"
 
-#: tr_logform.php:303
+#: tr_logform.php:299
 msgid "Position"
 msgstr "Posição"
 
@@ -9632,7 +9638,7 @@ msgstr "Nome de tela POC primária"
 msgid "Print"
 msgstr "Imprimir"
 
-#: include/views/configuration.action.edit.php:694
+#: include/views/configuration.action.edit.php:701
 #: include/views/configuration.item.edit.php:180
 #: include/views/configuration.item.massupdate.php:230
 msgid "Private key file"
@@ -9642,7 +9648,7 @@ msgstr "Arquivo de chave privada"
 msgid "Privilege level"
 msgstr "Nível de privilégio"
 
-#: api/classes/CUser.php:835
+#: api/classes/CUser.php:836
 msgid "Probably php-ldap module is missing."
 msgstr "Provavelmente o módulo php-ldap está faltando."
 
@@ -9742,13 +9748,13 @@ msgstr "Nome do proxy"
 msgid "Proxy updated"
 msgstr "Proxy atualizado"
 
-#: include/views/configuration.action.edit.php:669
+#: include/views/configuration.action.edit.php:676
 #: include/views/configuration.item.edit.php:172
 #: include/views/configuration.item.massupdate.php:197
 msgid "Public key"
 msgstr "Chave pública"
 
-#: include/views/configuration.action.edit.php:687
+#: include/views/configuration.action.edit.php:694
 #: include/views/configuration.item.edit.php:177
 #: include/views/configuration.item.massupdate.php:220
 msgid "Public key file"
@@ -9916,7 +9922,7 @@ msgstr "Comando remoto"
 #: include/views/configuration.action.edit.php:102
 #: include/views/configuration.action.edit.php:367
 #: include/views/configuration.action.edit.php:380
-#: include/views/configuration.action.edit.php:846
+#: include/views/configuration.action.edit.php:853
 #: include/views/configuration.host.massupdate.php:97
 #: include/views/configuration.httpconf.edit.php:181
 #: include/views/configuration.item.edit.php:284
@@ -9967,7 +9973,7 @@ msgstr "Remover dos favoritos"
 msgid "Remove from host group"
 msgstr "Remover do grupo de hosts"
 
-#: include/actions.inc.php:367 include/views/configuration.action.edit.php:767
+#: include/actions.inc.php:367 include/views/configuration.action.edit.php:774
 msgid "Remove from host groups"
 msgstr "Remover dos grupos do host"
 
@@ -10163,7 +10169,7 @@ msgstr "Direita"
 
 #: include/locales.inc.php:66
 msgid "Romanian (ro_RO)"
-msgstr ""
+msgstr "Romênio (ro_RO)"
 
 #: include/views/configuration.screen.constructor.edit.php:606
 #: screenedit.php:46
@@ -10378,7 +10384,7 @@ msgid "SQL statement execution has failed \"%1$s\"."
 msgstr "A execução do comando SQL falhou \"%1$s\"."
 
 #: include/discovery.inc.php:57
-#: include/views/configuration.action.edit.php:647
+#: include/views/configuration.action.edit.php:654
 #: include/views/js/configuration.discovery.edit.js.php:133
 msgid "SSH"
 msgstr "SSH"
@@ -10441,7 +10447,7 @@ msgstr "Sábado"
 #: include/views/administration.users.edit.php:327
 #: include/views/administration.users.edit.php:335
 #: include/views/administration.users.edit.php:338
-#: include/views/configuration.action.edit.php:978
+#: include/views/configuration.action.edit.php:985
 #: include/views/configuration.application.edit.php:70
 #: include/views/configuration.application.edit.php:80
 #: include/views/configuration.discovery.edit.php:85
@@ -10463,7 +10469,7 @@ msgstr "Sábado"
 #: include/views/configuration.template.edit.php:432
 #: include/views/configuration.triggers.edit.php:312
 #: include/views/configuration.triggers.massupdate.php:124 popup_bitem.php:150
-#: popup_media.php:141 sysmap.php:180 tr_comments.php:93 tr_logform.php:370
+#: popup_media.php:141 sysmap.php:180 tr_comments.php:93 tr_logform.php:366
 msgid "Save"
 msgstr "Salvar"
 
@@ -10623,7 +10629,7 @@ msgstr "Telas"
 msgid "Script"
 msgstr "Script"
 
-#: api/classes/CScript.php:325 api/classes/CScript.php:377
+#: api/classes/CScript.php:283 api/classes/CScript.php:335
 #, php-format
 msgid "Script \"%s\" already exists."
 msgstr "O script \"%s\" já existe."
@@ -10649,7 +10655,7 @@ msgstr "Perfil de script"
 msgid "Script updated"
 msgstr "Script atualizado"
 
-#: api/classes/CScript.php:358
+#: api/classes/CScript.php:316
 #, php-format
 msgid "Script with scriptid \"%s\" does not exist."
 msgstr "Não existe script com o scriptid \"%s\"."
@@ -10729,7 +10735,7 @@ msgstr "Segundos"
 #: include/views/configuration.action.edit.php:225
 #: include/views/configuration.action.edit.php:237
 #: include/views/configuration.action.edit.php:249
-#: include/views/configuration.action.edit.php:653
+#: include/views/configuration.action.edit.php:660
 #: include/views/configuration.application.edit.php:46
 #: include/views/configuration.graph.edit.php:86
 #: include/views/configuration.graph.edit.php:183
@@ -10762,7 +10768,7 @@ msgstr "Segundos"
 #: popup.php:651 popup.php:721 popup.php:778 popup.php:875 popup.php:939
 #: popup.php:1070 popup.php:1179 popup.php:1267 popup.php:1427 popup.php:1498
 #: popup.php:1557 popup.php:1619 popup.php:1874 popup_right.php:109
-#: popup_usrgrp.php:102 tr_logform.php:274
+#: popup_usrgrp.php:102 tr_logform.php:270
 msgid "Select"
 msgstr "Selecionar"
 
@@ -10812,7 +10818,7 @@ msgstr "Enviar mensagem a um grupo de usuários"
 msgid "Send message to users"
 msgstr "Enviar mensagem para usuários"
 
-#: include/views/configuration.action.edit.php:531
+#: include/views/configuration.action.edit.php:538
 msgid "Send only to"
 msgstr "Enviar apenas para"
 
@@ -10820,11 +10826,11 @@ msgstr "Enviar apenas para"
 msgid "Send to"
 msgstr "Enviar para"
 
-#: include/views/configuration.action.edit.php:515
+#: include/views/configuration.action.edit.php:522
 msgid "Send to User groups"
 msgstr "Enviar para os grupos do usuário"
 
-#: include/views/configuration.action.edit.php:516
+#: include/views/configuration.action.edit.php:523
 msgid "Send to Users"
 msgstr "Enviar para usuários"
 
@@ -10934,17 +10940,17 @@ msgstr "Serviços"
 msgid "Services form a circular dependency."
 msgstr "Os serviços formam uma dependência circular."
 
-#: api/classes/CUser.php:1028
+#: api/classes/CUser.php:1029
 msgid "Session terminated, re-login, please."
 msgstr "Sessão terminada, logue novamente por favor."
 
 #: events.php:563 events.php:576 include/classes/screens/CScreenEvents.php:49
 #: include/classes/screens/CScreenHistory.php:166
-#: include/triggers.inc.php:1605 include/views/configuration.item.list.php:109
+#: include/triggers.inc.php:1645 include/views/configuration.item.list.php:109
 #: include/views/configuration.triggers.edit.php:245
 #: include/views/configuration.triggers.list.php:93
 #: include/views/configuration.triggers.massupdate.php:65 popup.php:978
-#: report5.php:62 tr_logform.php:366 tr_status.php:284
+#: report5.php:62 tr_logform.php:362 tr_status.php:284
 msgid "Severity"
 msgstr "Risco"
 
@@ -10952,7 +10958,7 @@ msgstr "Risco"
 msgid "Severity (descending)"
 msgstr "Severidade (descendente)"
 
-#: include/profiles.inc.php:306
+#: include/profiles.inc.php:305
 msgid "Severity name cannot be empty."
 msgstr "O nome da severidade não pode ficar vazio."
 
@@ -10997,7 +11003,7 @@ msgstr "Não mostrar eventos com mais de (em dias)"
 msgid "Show events not older than (in days) \"%1$s\"."
 msgstr "Não mostrar eventos com mais de (em dias) \"%1$s\"."
 
-#: include/triggers.inc.php:1287
+#: include/triggers.inc.php:1327
 msgid "Show graph of item"
 msgstr "Mostrar gráfico do ítem"
 
@@ -11050,7 +11056,7 @@ msgstr "Mostrar eventos desconhecidos"
 msgid "Show value"
 msgstr "Mostrar valor"
 
-#: include/triggers.inc.php:1294
+#: include/triggers.inc.php:1334
 msgid "Show values of item"
 msgstr "Mostrar valores do ítem"
 
@@ -11240,7 +11246,7 @@ msgstr "Origem"
 msgid "Spanish (es_ES)"
 msgstr "Espanhol (es_ES)"
 
-#: api/classes/CAction.php:1539
+#: api/classes/CAction.php:1540
 msgid "Specified script does not exist or you do not have rights on it for action operation command."
 msgstr "O script especificado não existe ou o usuário não tem permissões para realizar a operação comando da ação."
 
@@ -11270,7 +11276,7 @@ msgstr "Status"
 #: include/classes/screens/CScreenActions.php:58
 #: include/classes/screens/CScreenActions.php:63
 #: include/classes/screens/CScreenActions.php:127 include/events.inc.php:134
-#: include/events.inc.php:210 include/events.inc.php:213
+#: include/events.inc.php:211 include/events.inc.php:214
 #: include/forms.inc.php:499 include/forms.inc.php:838
 #: include/views/administration.auditacts.list.php:72
 #: include/views/administration.mediatypes.list.php:41
@@ -11344,12 +11350,12 @@ msgstr "Status dos triggers"
 msgid "Status only"
 msgstr "Somente status"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
+#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr "Status atualizado"
 
 #: httpdetails.php:129 include/actions.inc.php:750 include/actions.inc.php:824
-#: include/views/configuration.action.edit.php:439
+#: include/views/configuration.action.edit.php:446
 msgid "Step"
 msgstr "Passo"
 
@@ -11363,7 +11369,7 @@ msgstr "Passo \"%1$s\" [%2$s of %3$s] falhou: %4$s"
 msgid "Step \"%s\" already exists."
 msgstr "O passo \"%s\" já existe."
 
-#: include/views/configuration.action.edit.php:430
+#: include/views/configuration.action.edit.php:436
 msgid "Step duration"
 msgstr "Duração do passo"
 
@@ -11408,7 +11414,7 @@ msgstr "Subfiltro [afeta apenas os dados filtrados!]"
 #: include/actions.inc.php:420 include/actions.inc.php:774
 #: include/classes/screens/CScreenActions.php:149
 #: include/views/administration.auditacts.list.php:103
-#: include/views/configuration.action.edit.php:542
+#: include/views/configuration.action.edit.php:549
 msgid "Subject"
 msgstr "Assunto"
 
@@ -11524,7 +11530,7 @@ msgstr "A tabela \"%1$s\" não possui campo chamado \"%2$s\"."
 msgid "Tag"
 msgstr "Plaqueta"
 
-#: include/views/configuration.action.edit.php:594
+#: include/views/configuration.action.edit.php:601
 #: include/views/configuration.copy.elements.php:93
 #: include/views/configuration.item.copy.php:74
 #: include/views/configuration.triggers.edit.php:144
@@ -11532,7 +11538,7 @@ msgstr "Plaqueta"
 msgid "Target"
 msgstr "Destino"
 
-#: include/views/configuration.action.edit.php:641
+#: include/views/configuration.action.edit.php:648
 msgid "Target list"
 msgstr "Lista alvo"
 
@@ -11542,7 +11548,7 @@ msgid "Target type"
 msgstr "Tipo do destino"
 
 #: include/discovery.inc.php:71
-#: include/views/configuration.action.edit.php:648
+#: include/views/configuration.action.edit.php:655
 #: include/views/js/configuration.discovery.edit.js.php:134
 msgid "Telnet"
 msgstr "Telnet"
@@ -11677,7 +11683,7 @@ msgid "Test string"
 msgstr "Sequência de texto para teste"
 
 #: include/forms.inc.php:420 include/items.inc.php:124
-#: include/triggers.inc.php:2203 include/views/configuration.item.edit.php:219
+#: include/triggers.inc.php:2243 include/views/configuration.item.edit.php:219
 #: include/views/configuration.item.massupdate.php:162
 msgid "Text"
 msgstr "Texto"
@@ -11778,8 +11784,8 @@ msgstr "Até"
 #: include/classes/screens/CScreenActions.php:43
 #: include/classes/screens/CScreenActions.php:125
 #: include/classes/screens/CScreenEvents.php:44 include/events.inc.php:116
-#: include/events.inc.php:133 include/events.inc.php:210
-#: include/events.inc.php:213
+#: include/events.inc.php:133 include/events.inc.php:211
+#: include/events.inc.php:214
 #: include/views/administration.auditacts.list.php:70
 #: include/views/administration.auditlogs.list.php:85
 #: include/views/configuration.services.edit.php:280
@@ -11837,7 +11843,7 @@ msgstr "Timestamp com desvio não superior a T segundos em relação ao Zabbix S
 msgid "Title"
 msgstr "Título"
 
-#: include/views/configuration.action.edit.php:420
+#: include/views/configuration.action.edit.php:428
 #: include/views/js/configuration.sysmaps.js.php:309
 msgid "To"
 msgstr "Para"
@@ -11894,8 +11900,8 @@ msgstr "Estatísticas"
 
 #: events.php:309 events.php:355 include/actions.inc.php:56
 #: include/audit.inc.php:33 include/classes/class.cchart.php:466
-#: include/maps.inc.php:26 include/triggers.inc.php:1263
-#: include/triggers.inc.php:1604
+#: include/maps.inc.php:26 include/triggers.inc.php:1303
+#: include/triggers.inc.php:1644
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:65
 #: include/views/configuration.services.edit.php:78
@@ -11913,8 +11919,8 @@ msgstr "Trigger"
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr "A trigger \"%1$s\" já existe em \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:935
-#: include/classes/import/CConfigurationImport.php:971
+#: include/classes/import/CConfigurationImport.php:941
+#: include/classes/import/CConfigurationImport.php:977
 #, php-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "A trigger \"%1$s\" depende da trigger \"%2$s\", que não existe."
@@ -11940,7 +11946,7 @@ msgstr "A trigger \"%1$s:%2$s\" não possui nenhum protótipo de item."
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "A trigger \"%s\" pertence a templates com diferentes associações."
 
-#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:346
 #: tr_logform.php:147
 msgid "Trigger added"
 msgstr "Trigger adicionada"
@@ -12026,7 +12032,7 @@ msgstr "Severidades da trigger"
 msgid "Trigger severity"
 msgstr "Severidade da trigger"
 
-#: triggers.php:288
+#: triggers.php:289
 msgid "Trigger status became \"Disabled\"."
 msgstr "O status da trigger mudou para \"Desabilitado\"."
 
@@ -12041,7 +12047,7 @@ msgstr "Valor da trigger"
 
 #: hosts.php:685 hosts.php:763 include/events.inc.php:25
 #: include/forms.inc.php:517 include/html.inc.php:439 include/html.inc.php:443
-#: include/menu.inc.php:52 include/triggers.inc.php:1162
+#: include/menu.inc.php:52 include/triggers.inc.php:1202
 #: include/views/configuration.action.list.php:33
 #: include/views/configuration.host.discovery.list.php:53
 #: include/views/configuration.host.edit.php:369
@@ -12062,7 +12068,7 @@ msgstr "Triggers"
 msgid "Triggers (e/d)[p/u/o]"
 msgstr "Triggers (a/d)[v/d/f]"
 
-#: trigger_prototypes.php:287 triggers.php:353
+#: trigger_prototypes.php:289 triggers.php:355
 msgid "Triggers deleted"
 msgstr "Triggers removidas"
 
@@ -12135,7 +12141,7 @@ msgstr "Dois itens (\"%1$s\" e \"%2$s\") não podem popular o mesmo campo no inv
 #: include/views/administration.node.list.php:43
 #: include/views/administration.script.edit.php:51
 #: include/views/administration.script.list.php:38
-#: include/views/configuration.action.edit.php:657
+#: include/views/configuration.action.edit.php:664
 #: include/views/configuration.graph.edit.php:70
 #: include/views/configuration.host.discovery.list.php:57
 #: include/views/configuration.item.edit.php:82
@@ -12148,8 +12154,8 @@ msgstr "Dois itens (\"%1$s\" e \"%2$s\") não podem popular o mesmo campo no inv
 #: include/views/js/configuration.sysmaps.js.php:12
 #: include/views/js/configuration.sysmaps.js.php:355
 #: include/views/monitoring.overview.php:32 popup_media.php:121 popup.php:511
-#: popup.php:1095 popup.php:1203 popup.php:1212 tr_logform.php:299
-#: tr_logform.php:303
+#: popup.php:1095 popup.php:1203 popup.php:1212 tr_logform.php:295
+#: tr_logform.php:299
 msgid "Type"
 msgstr "Tipo"
 
@@ -12170,7 +12176,7 @@ msgid "Type (descending)"
 msgstr "Tipo (descendente)"
 
 #: include/views/configuration.action.edit.php:116
-#: include/views/configuration.action.edit.php:884
+#: include/views/configuration.action.edit.php:891
 msgid "Type of calculation"
 msgstr "Tipo do cálculo"
 
@@ -12207,7 +12213,7 @@ msgstr "PARA CIMA"
 #: include/views/configuration.sysmap.edit.php:151
 #: include/views/configuration.triggers.edit.php:244
 #: include/views/js/configuration.sysmaps.js.php:168 popup_httpstep.php:37
-#: tr_logform.php:368 tr_status.php:519
+#: tr_logform.php:364 tr_status.php:519
 msgid "URL"
 msgstr "URL"
 
@@ -12249,11 +12255,11 @@ msgstr "UTF-8"
 msgid "Ukrainian (uk_UA)"
 msgstr "Ucraniano (uk_UA)"
 
-#: include/nodes.inc.php:321
+#: include/nodes.inc.php:320
 msgid "Unable to remove local node."
 msgstr "Não foi possível remover o nó local."
 
-#: include/profiles.inc.php:229
+#: include/profiles.inc.php:228
 msgid "Unable to select configuration."
 msgstr "Não foi possível selecionar a configuração."
 
@@ -12330,11 +12336,11 @@ msgstr "Algoritmo de cálculo de status de serviço desconhecido"
 msgid "Unknown function."
 msgstr "Função desconhecida."
 
-#: include/triggers.inc.php:1737 tr_testexpr.php:35
+#: include/triggers.inc.php:1777 tr_testexpr.php:35
 msgid "Unknown host item, no such item in selected host"
 msgstr "Item de host desconhecido; não existe este item no host selecionado"
 
-#: include/triggers.inc.php:1736 tr_testexpr.php:34
+#: include/triggers.inc.php:1776 tr_testexpr.php:34
 msgid "Unknown host, no such host present in system"
 msgstr "Host desconhecido; não existe este host no sistema"
 
@@ -12350,7 +12356,7 @@ msgstr "Recurso desconhecido"
 msgid "Unknown value type"
 msgstr "Tipo de valor desconhecido"
 
-#: include/triggers.inc.php:1735 tr_testexpr.php:33
+#: include/triggers.inc.php:1775 tr_testexpr.php:33
 msgid "Unknown variable type, testing not available"
 msgstr "Tipo de variável desconhecido, teste não disponível"
 
@@ -12368,7 +12374,7 @@ msgstr "Desassociar e limpar"
 msgid "Unlink from template"
 msgstr "Desassociar da template"
 
-#: include/actions.inc.php:391 include/views/configuration.action.edit.php:803
+#: include/actions.inc.php:391 include/views/configuration.action.edit.php:810
 msgid "Unlink from templates"
 msgstr "Desvincular dos templates"
 
@@ -12437,7 +12443,7 @@ msgid "Up"
 msgstr "Disponível"
 
 #: include/views/administration.auditlogs.list.php:46
-#: include/views/configuration.action.edit.php:953
+#: include/views/configuration.action.edit.php:960
 #: include/views/configuration.host.massupdate.php:229
 #: include/views/configuration.httpconf.popup.php:74
 #: include/views/configuration.item.massupdate.php:451 popup_period.php:183
@@ -12548,7 +12554,7 @@ msgstr "Usado em ações"
 #: include/views/administration.auditlogs.list.php:56
 #: include/views/administration.auditlogs.list.php:86
 #: include/views/administration.users.edit.php:289
-#: include/views/configuration.action.edit.php:482
+#: include/views/configuration.action.edit.php:489
 #: include/views/configuration.httpconf.edit.php:61
 msgid "User"
 msgstr "Usuário"
@@ -12591,7 +12597,7 @@ msgstr "Usuário removido"
 #: include/views/administration.script.list.php:41
 #: include/views/administration.usergroups.edit.php:119
 #: include/views/administration.users.list.php:41
-#: include/views/configuration.action.edit.php:473
+#: include/views/configuration.action.edit.php:480
 msgid "User group"
 msgstr "Grupo de usuários"
 
@@ -12639,7 +12645,7 @@ msgstr "Um usuário não pode alterar o seu próprio acesso à GUI tornando-se m
 msgid "User may not modify system status for himself by becoming a member of user group \"%s\"."
 msgstr "Um usuário não pode alterar seu próprio status de acesso ao sistema tornando-se membro do grupo de usuários \"%s\"."
 
-#: include/views/configuration.action.edit.php:680
+#: include/views/configuration.action.edit.php:687
 #: include/views/configuration.item.edit.php:174
 #: include/views/configuration.item.massupdate.php:210
 msgid "User name"
@@ -12797,7 +12803,7 @@ msgstr "Os mapas de valores são utilizados para criar um mapeamento entre valor
 msgid "Value: no data"
 msgstr "Valor: sem dados"
 
-#: include/items.inc.php:793 include/triggers.inc.php:1321
+#: include/items.inc.php:793 include/triggers.inc.php:1361
 #: include/views/monitoring.history.php:62
 msgid "Values"
 msgstr "Valores"
@@ -13091,7 +13097,7 @@ msgstr "Campos errados para o proxy \"%s\"."
 msgid "Wrong fields for screen \"%1$s\"."
 msgstr "Campos errados para a tela \"%1$s\"."
 
-#: api/classes/CScript.php:308
+#: api/classes/CScript.php:266
 msgid "Wrong fields for script."
 msgstr "Campos errados para o script."
 
@@ -13219,8 +13225,8 @@ msgstr "Anual"
 
 #: events.php:760 include/blocks.inc.php:724
 #: include/classes/class.cserverinfo.php:35 include/config.inc.php:568
-#: include/events.inc.php:304 include/events.inc.php:322
-#: include/forms.inc.php:1922 include/triggers.inc.php:1608
+#: include/events.inc.php:305 include/events.inc.php:323
+#: include/forms.inc.php:1922 include/triggers.inc.php:1648
 #: include/views/administration.users.list.php:74
 msgid "Yes"
 msgstr "Sim"
@@ -13258,26 +13264,26 @@ msgstr "Você não especificou um host para operação."
 msgid "You did not specify host group for operation."
 msgstr "Você não especificou um grupo de host para operação."
 
-#: api/classes/CAction.php:1580
+#: api/classes/CAction.php:1581
 #, php-format
 msgid "You did not specify targets for action operation command \"%s\"."
 msgstr "Você não especificou um alvo para a ação de operação do comando \"%s\"."
 
-#: api/classes/CAction.php:1577
+#: api/classes/CAction.php:1578
 #, php-format
 msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr "Não foi especificado nenhum destino para a operação de script para a ação \"%s\"."
 
 #: api/classes/CGraph.php:709 api/classes/CGraphPrototype.php:758
 #: api/classes/CHostGroup.php:684 api/classes/CHostGroup.php:742
-#: api/classes/CHostGroup.php:894 api/classes/CHostGroup.php:949
-#: api/classes/CHostGroup.php:994 api/classes/CHostGroup.php:1007
-#: api/classes/CHostGroup.php:1023 api/classes/CHost.php:1604
+#: api/classes/CHostGroup.php:895 api/classes/CHostGroup.php:950
+#: api/classes/CHostGroup.php:995 api/classes/CHostGroup.php:1008
+#: api/classes/CHostGroup.php:1024 api/classes/CHost.php:1604
 #: api/classes/CHost.php:1658 api/classes/CHost.php:1972
 #: api/classes/CMaintenance.php:608 api/classes/CMaintenance.php:715
-#: api/classes/CMaintenance.php:727 api/classes/CScript.php:300
-#: api/classes/CScript.php:347 api/classes/CScript.php:409
-#: api/classes/CScript.php:459 api/classes/CTemplate.php:974
+#: api/classes/CMaintenance.php:727 api/classes/CScript.php:258
+#: api/classes/CScript.php:305 api/classes/CScript.php:367
+#: api/classes/CScript.php:417 api/classes/CTemplate.php:974
 #: api/classes/CTemplate.php:1066 api/classes/CTemplate.php:1126
 #: api/classes/CTemplate.php:1266 api/classes/CTemplate.php:1298
 #: api/classes/CTemplate.php:1532 api/classes/CTemplateScreen.php:734
@@ -13347,7 +13353,7 @@ msgstr "Usuário Zabbix"
 
 #: include/discovery.inc.php:66 include/items.inc.php:76
 #: include/views/administration.script.edit.php:56
-#: include/views/configuration.action.edit.php:662
+#: include/views/configuration.action.edit.php:669
 #: include/views/js/configuration.action.edit.js.php:120
 #: include/views/js/configuration.discovery.edit.js.php:135
 msgid "Zabbix agent"
@@ -13380,12 +13386,12 @@ msgstr "Zabbix está temporariamente indisponível!"
 #: include/classes/class.cserverinfo.php:39
 #: include/classes/class.cserverinfo.php:40 include/setup.inc.php:367
 #: include/views/administration.script.edit.php:57
-#: include/views/configuration.action.edit.php:663
+#: include/views/configuration.action.edit.php:670
 #: include/views/js/configuration.action.edit.js.php:125
 msgid "Zabbix server"
 msgstr "Servidor Zabbix"
 
-#: api/classes/CScript.php:467
+#: api/classes/CScript.php:425
 #, php-format
 msgid ""
 "Zabbix server \"%s\" can not be reached. Possible reasons:\n"
@@ -13482,8 +13488,8 @@ msgstr "todos"
 msgid "already exists"
 msgstr "já existe"
 
-#: include/views/configuration.action.edit.php:862
 #: include/views/configuration.action.edit.php:869
+#: include/views/configuration.action.edit.php:876
 #: include/views/js/configuration.action.edit.js.php:444
 #: include/views/js/configuration.action.edit.js.php:445
 #: include/views/js/configuration.action.edit.js.php:453
@@ -13530,7 +13536,7 @@ msgstr "d M Y H:i"
 #: include/acknow.inc.php:59 include/blocks.inc.php:956
 #: include/classes/screens/CScreenEvents.php:63
 #: include/classes/screens/CScreenPlainText.php:95 include/events.inc.php:116
-#: include/events.inc.php:187 include/events.inc.php:243
+#: include/events.inc.php:188 include/events.inc.php:244
 #: include/translateDefines.inc.php:27 include/translateDefines.inc.php:28
 #: include/translateDefines.inc.php:34 include/translateDefines.inc.php:35
 #: include/translateDefines.inc.php:36 include/translateDefines.inc.php:45
@@ -13592,7 +13598,7 @@ msgstr "elementos"
 msgid "elements copy to ..."
 msgstr "copiar elementos para ..."
 
-#: api/classes/CAction.php:1456
+#: api/classes/CAction.php:1457
 msgid "esc_step_from and esc_step_to must be set together."
 msgstr "esc_step_from e esc_step_to devem ser definidos em conjunto."
 
@@ -13801,8 +13807,8 @@ msgstr "de cada"
 msgid "on"
 msgstr "em"
 
-#: include/views/configuration.action.edit.php:865
-#: include/views/configuration.action.edit.php:868
+#: include/views/configuration.action.edit.php:872
+#: include/views/configuration.action.edit.php:875
 #: include/views/js/configuration.action.edit.js.php:448
 #: include/views/js/configuration.action.edit.js.php:449
 #: include/views/js/configuration.action.edit.js.php:452

@@ -232,80 +232,82 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 			'editable' => true
 		));
 
-		// triggerids which status must be changed
-		$triggerIdsToUpdate = array();
-		foreach ($db_triggers as $triggerid => $trigger){
-			if ($trigger['status'] != $status) {
-				$triggerIdsToUpdate[] = $triggerid;
-			}
-		}
-
-		// triggerids to gather child triggers
-		$childTriggerIds = array_keys($db_triggers);
-
-		do {
-			// gather all triggerids which status should be changed including child triggers
-			$db_triggers = API::Trigger()->get(array(
-				'filter' => array('templateid' => $childTriggerIds),
-				'output' => array('triggerid', 'status'),
-				'preservekeys' => true,
-				'nopermissions' => true
-			));
-			foreach ($db_triggers as $triggerid => $trigger) {
+		if ($db_triggers) {
+			// triggerids which status must be changed
+			$triggerIdsToUpdate = array();
+			foreach ($db_triggers as $triggerid => $trigger){
 				if ($trigger['status'] != $status) {
 					$triggerIdsToUpdate[] = $triggerid;
 				}
 			}
+
+			// triggerids to gather child triggers
 			$childTriggerIds = array_keys($db_triggers);
-		} while (!empty($childTriggerIds));
 
-		DB::update('triggers', array(
-			'values' => array('status' => $status),
-			'where' => array('triggerid' => $triggerIdsToUpdate)
-		));
-
-		// if disable trigger, unknown event must be created
-		if ($status == TRIGGER_STATUS_DISABLED) {
-			$valueTriggerIds = array();
-			$db_triggers = DBselect(
-				'SELECT t.triggerid'.
-				' FROM triggers t,functions f,items i,hosts h'.
-				' WHERE t.triggerid=f.triggerid'.
-					' AND f.itemid=i.itemid'.
-					' AND i.hostid=h.hostid'.
-					' AND '.dbConditionInt('t.triggerid', $triggerIdsToUpdate).
-					' AND t.value_flags='.TRIGGER_VALUE_FLAG_NORMAL.
-					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'
-			);
-			while ($row = DBfetch($db_triggers)) {
-				$valueTriggerIds[] = $row['triggerid'];
-			}
-
-			if (!empty($valueTriggerIds)) {
-				DB::update('triggers', array(
-					'values' => array(
-						'value_flags' => TRIGGER_VALUE_FLAG_UNKNOWN,
-						'error' => _('Trigger status became "Disabled".')
-					),
-					'where' => array('triggerid' => $valueTriggerIds)
+			do {
+				// gather all triggerids which status should be changed including child triggers
+				$db_triggers = API::Trigger()->get(array(
+					'filter' => array('templateid' => $childTriggerIds),
+					'output' => array('triggerid', 'status'),
+					'preservekeys' => true,
+					'nopermissions' => true
 				));
+				foreach ($db_triggers as $triggerid => $trigger) {
+					if ($trigger['status'] != $status) {
+						$triggerIdsToUpdate[] = $triggerid;
+					}
+				}
+				$childTriggerIds = array_keys($db_triggers);
+			} while (!empty($childTriggerIds));
 
-				addUnknownEvent($valueTriggerIds);
+			DB::update('triggers', array(
+				'values' => array('status' => $status),
+				'where' => array('triggerid' => $triggerIdsToUpdate)
+			));
+
+			// if disable trigger, unknown event must be created
+			if ($status == TRIGGER_STATUS_DISABLED) {
+				$valueTriggerIds = array();
+				$db_triggers = DBselect(
+					'SELECT t.triggerid'.
+					' FROM triggers t,functions f,items i,hosts h'.
+					' WHERE t.triggerid=f.triggerid'.
+						' AND f.itemid=i.itemid'.
+						' AND i.hostid=h.hostid'.
+						' AND '.dbConditionInt('t.triggerid', $triggerIdsToUpdate).
+						' AND t.value_flags='.TRIGGER_VALUE_FLAG_NORMAL.
+						' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'
+				);
+				while ($row = DBfetch($db_triggers)) {
+					$valueTriggerIds[] = $row['triggerid'];
+				}
+
+				if (!empty($valueTriggerIds)) {
+					DB::update('triggers', array(
+						'values' => array(
+							'value_flags' => TRIGGER_VALUE_FLAG_UNKNOWN,
+							'error' => _('Trigger status became "Disabled".')
+						),
+						'where' => array('triggerid' => $valueTriggerIds)
+					));
+
+					addUnknownEvent($valueTriggerIds);
+				}
 			}
-		}
 
-		// get updated triggers with additional data
-		$db_triggers = API::Trigger()->get(array(
-			'triggerids' => $triggerIdsToUpdate,
-			'output' => array('triggerid', 'description'),
-			'preservekeys' => true,
-			'selectHosts' => API_OUTPUT_EXTEND,
-			'nopermissions' => true
-		));
-		foreach ($db_triggers as $triggerid => $trigger) {
-			$host = reset($trigger['hosts']);
-			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, $triggerid,
-				$host['host'].':'.$trigger['description'], 'triggers', $statusOld, $statusNew);
+			// get updated triggers with additional data
+			$db_triggers = API::Trigger()->get(array(
+				'triggerids' => $triggerIdsToUpdate,
+				'output' => array('triggerid', 'description'),
+				'preservekeys' => true,
+				'selectHosts' => API_OUTPUT_EXTEND,
+				'nopermissions' => true
+			));
+			foreach ($db_triggers as $triggerid => $trigger) {
+				$host = reset($trigger['hosts']);
+				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, $triggerid,
+					$host['host'].': '.$trigger['description'], 'triggers', $statusOld, $statusNew);
+			}
 		}
 
 		DBend(true);
