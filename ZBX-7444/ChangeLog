@@ -1,13 +1,24 @@
 Changes for 2.2.1rc1
 
 New features:
+..F....... [ZBXNEXT-2016] changed the housekeeping settings to allow overriding item-level history and trend storage period if internal housekeeping is disabled (Pavels)
+..F....... [ZBXNEXT-2016] removed the ZBX_HISTORY_DATA_UPKEEP constant (Pavels)
 ....I..... [ZBXNEXT-1256] changed example directory size user parameter to return bytes (Richlv)
 ..F....... [ZBX-7250] made gettext an optional feature for the frontend (Pavels)
-A.F....... [ZBX-1357] updated Brazilian Portuguese, French, Italian, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, Italian, Japanese, Russian, Slovak, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 ....I..PS. [ZBXNEXT-1257] dropped support for UCD-SNMP (asaveljevs)
 
 Bug fixes:
-.......PS. [ZBX-6160] fixed "ORA-01000: maximum open cursors exceeded" error; fixed memory leak in configuration syncer process (Sasha)
+...G...... [ZBX-7444] fixed agent crash on HP-UX when processing proc.num[] item (asaveljevs)
+..F....... [ZBX-4063] fixed data selecting for graphs (Eduard)
+..F....... [ZBX-7391] fixed items belonging to multiple applications being displayed only under the first one in the latest data page (Pavels)
+..F....... [ZBX-7347] fixed custom step duration max size in action configuration (Eduard)
+..F....... [ZBX-7336] fixed "Database type" selection in setup step 3, improved SQLite3 check and removed storing setup supported databases in cookies (Ivo)
+..F....... [ZBX-7340] fixed incorrect error messages when imported objects reference unexisting objects (Pavels)
+A.F....... [ZBX-7445] fixed frontend redundant call of history (Eduard)
+..F....... [ZBX-7277] made item selection helper translatable (Ivo)
+.......PS. [ZBX-6160] fixed memory leak in configuration syncer process (Sasha)
+.......PS. [ZBX-6160] fixed "ORA-01000: maximum open cursors exceeded" error (Sasha)
 ..F....... [ZBX-7354] fixed resetting linked template list when trying to add template with empty field (Ivo)
 .......PS. [ZBX-7360] fixed maximum IPMI sensor ID length; thanks to OpenIPMI author Corey Minyard (Andris, asaveljevs)
 ........S. [ZBX-7400] fixed possible server crash when processing trigger functions with text or log items with Oracle backend (Sasha)
@@ -672,6 +683,7 @@ New features:
 A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Czech, Dutch, French, German, Greek, Hungarian, Japanese, Italian, Romanian, Russian, Slovak, Spanish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7347] fixed custom step duration max size in action configuration (Eduard)
 ........S. [ZBX-7400] fixed fetching of empty text or log history data with Oracle backend (Sasha)
 ....I..... [ZBX-7218] fixed configuration failing with Oracle 12.1 instant client libraries (asaveljevs, Sasha)
 ..F....... [ZBX-6129] fixed trying to change the status of a deleted trigger or trigger prototype changes the status of all trigger and prototypes (Pavels)

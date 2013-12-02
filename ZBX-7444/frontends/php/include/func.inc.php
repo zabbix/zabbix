@@ -19,6 +19,23 @@
 **/
 
 
+/**
+ * Verify that function exists and can be called as a function.
+ *
+ * @param array		$names
+ *
+ * @return bool
+ */
+function zbx_is_callable(array $names) {
+	foreach ($names as $name) {
+		if (!is_callable($name)) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
 /************ REQUEST ************/
 function redirect($url) {
 	$curl = new Curl($url);
