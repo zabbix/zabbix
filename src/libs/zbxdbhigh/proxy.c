@@ -52,6 +52,8 @@ typedef struct
 }
 ZBX_ID_OFFSET;
 
+extern zbx_timespec_t	recv_timespec;	/* for tracking time difference between sender and receiver */
+
 static ZBX_HISTORY_TABLE ht = {
 	"proxy_history", "history_lastid", "hosts h,items i,", "h.hostid=i.hostid and i.itemid=p.itemid and ",
 		{
@@ -2031,14 +2033,13 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 	size_t			tmp_alloc = 0;
 	int			ret = FAIL, processed = 0, value_num = 0, total_num = 0;
 	double			sec;
-	zbx_timespec_t		ts, proxy_timediff;
+	zbx_timespec_t		proxy_timediff;
 	static AGENT_VALUE	*values = NULL, *av;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	sec = zbx_time();
 
-	zbx_timespec(&ts);
 	proxy_timediff.sec = 0;
 	proxy_timediff.ns = 0;
 
@@ -2047,11 +2048,11 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 
 	if (SUCCEED == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_CLOCK, &tmp, &tmp_alloc))
 	{
-		proxy_timediff.sec = ts.sec - atoi(tmp);
+		proxy_timediff.sec = recv_timespec.sec - atoi(tmp);
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_NS, &tmp, &tmp_alloc))
 		{
-			proxy_timediff.ns = ts.ns - atoi(tmp);
+			proxy_timediff.ns = recv_timespec.ns - atoi(tmp);
 
 			if (proxy_timediff.ns < 0)
 			{

@@ -48,7 +48,8 @@ function audit_resource2str($resource_type = null) {
 		AUDIT_RESOURCE_MAINTENANCE => _('Maintenance'),
 		AUDIT_RESOURCE_SCRIPT => _('Script'),
 		AUDIT_RESOURCE_MACRO => _('Macro'),
-		AUDIT_RESOURCE_TEMPLATE => _('Template')
+		AUDIT_RESOURCE_TEMPLATE => _('Template'),
+		AUDIT_RESOURCE_INCIDENT => _('Incident')
 	);
 
 	if (is_null($resource_type)) {

@@ -49,6 +49,8 @@ switch ($data['method']) {
 		$result = API::Host()->get(array(
 			'startSearch' => 1,
 			'search' => $data['params']['search'],
+			'tlds' => isset($data['params']['tlds'])
+				? $data['params']['tlds'] : null,
 			'output' => array('hostid', 'host', 'name'),
 			'sortfield' => 'name',
 			'limit' => 15

@@ -84,6 +84,7 @@ void	send_discovery_data(zbx_sock_t *sock)
 
 	struct zbx_json	j;
 	zbx_uint64_t	lastid;
+	zbx_timespec_t	timespec;
 	int		records;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -96,7 +97,9 @@ void	send_discovery_data(zbx_sock_t *sock)
 
 	zbx_json_close(&j);
 
-	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
+	zbx_timespec(&timespec);
+	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, timespec.sec);
+	zbx_json_adduint64(&j, ZBX_PROTO_TAG_NS, timespec.ns);
 
 	if (FAIL == zbx_tcp_send_to(sock, j.buffer, CONFIG_TIMEOUT))
 		zabbix_log(LOG_LEVEL_WARNING, "Error while sending availability of hosts. %s",

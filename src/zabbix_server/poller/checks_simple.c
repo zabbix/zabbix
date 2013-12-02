@@ -18,6 +18,7 @@
 **/
 
 #include "checks_simple.h"
+#include "checks_simple_dnstest.h"
 #include "simple.h"
 #include "log.h"
 
@@ -37,7 +38,41 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 		goto notsupported;
 	}
 
-	if (0 == strcmp(key, "net.tcp.service"))
+	if (0 == strncmp(key, "dnstest.", 8))
+	{
+		const char	*kp = key + 8;	/* move forward */
+
+		if (0 == strncmp(kp, "dns.", 4))
+		{
+			kp += 4;	/* move forward */
+
+			if (0 == strcmp(kp, "udp"))
+			{
+				if (SYSINFO_RET_OK == check_dnstest_dns(item, key, params, result, ZBX_DNSTEST_UDP))
+					ret = SUCCEED;
+			}
+			else if (0 == strcmp(kp, "tcp"))
+			{
+				if (SYSINFO_RET_OK == check_dnstest_dns(item, key, params, result, ZBX_DNSTEST_TCP))
+					ret = SUCCEED;
+			}
+		}
+		else if (0 == strcmp(kp, "rdds"))
+		{
+			if (SYSINFO_RET_OK == check_dnstest_rdds(item, key, params, result))
+				ret = SUCCEED;
+		}
+		else if (0 == strcmp(kp, "probe.status"))
+		{
+			char	mode[16];
+
+			get_param(params, 1, mode, sizeof(mode));
+
+			if (0 == strcmp("automatic", mode) && SYSINFO_RET_OK == check_dnstest_probe_status(item, key, params, result))
+				ret = SUCCEED;
+		}
+	}
+	else if (0 == strcmp(key, "net.tcp.service"))
 	{
 		if (SYSINFO_RET_OK == check_service(params, item->interface.addr, result, 0))
 			ret = SUCCEED;

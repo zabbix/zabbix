@@ -97,6 +97,32 @@ $ZBX_MENU = array(
 			)
 		)
 	),
+	'dnstest' => array(
+		'label'				=> _('DNS test'),
+		'user_type'			=> USER_TYPE_ZABBIX_USER,
+		'node_perm'			=> PERM_READ_LIST,
+		'default_page_id'	=> 0,
+		'pages' => array(
+			array(
+				'url' => 'dnstest.rollingweekstatus.php',
+				'label' => _('Rolling week status')
+			),
+			array(
+				'url' => 'dnstest.incidents.php',
+				'label' => _('Incidents'),
+				'sub_pages' => array(
+					'dnstest.incidentdetails.php',
+					'dnstest.tests.php',
+					'dnstest.particulartests.php',
+					'dnstest.particularproxys.php'
+				)
+			),
+			array(
+				'url' => 'dnstest.monthlyreports.php',
+				'label' => _('Monthly reports')
+			)
+		)
+	),
 	'cm' => array(
 		'label'				=> _('Inventory'),
 		'user_type'			=> USER_TYPE_ZABBIX_USER,
@@ -328,6 +354,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page) {
 
 		$menu_class = 'horizontal_menu_n';
 		$sub_menus[$label] = array();
+
 		foreach ($menu['pages'] as $sub_page) {
 			$show_sub_menu = true;
 

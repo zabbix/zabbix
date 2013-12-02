@@ -1878,3 +1878,16 @@ function num2letter($number) {
 
 	return $str;
 }
+
+function getSLV($item, $clock) {
+	$slv = DBfetch(DBselect(DBaddLimit(
+		'SELECT h.value'.
+		' FROM history_uint h'.
+		' WHERE h.itemid='.$item.
+			' AND clock<='.$clock.
+		' ORDER BY h.clock DESC',
+		1
+	)));
+
+	return $slv ? $slv['value'] : 0;
+}

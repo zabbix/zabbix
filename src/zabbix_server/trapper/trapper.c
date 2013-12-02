@@ -44,6 +44,8 @@
 extern unsigned char	daemon_type;
 extern unsigned char	process_type;
 
+zbx_timespec_t	recv_timespec;	/* for tracking time difference between sender and receiver */
+
 /******************************************************************************
  *                                                                            *
  * Function: recv_agenthistory                                                *
@@ -119,6 +121,7 @@ static void	send_proxyhistory(zbx_sock_t *sock)
 
 	struct zbx_json	j;
 	zbx_uint64_t	lastid;
+	zbx_timespec_t	timespec;
 	int		records;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -131,7 +134,9 @@ static void	send_proxyhistory(zbx_sock_t *sock)
 
 	zbx_json_close(&j);
 
-	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
+	zbx_timespec(&timespec);
+	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, timespec.sec);
+	zbx_json_adduint64(&j, ZBX_PROTO_TAG_NS, timespec.ns);
 
 	if (FAIL == zbx_tcp_send_to(sock, j.buffer, CONFIG_TIMEOUT))
 		zabbix_log(LOG_LEVEL_WARNING, "Error while sending availability of hosts. %s",
@@ -387,6 +392,8 @@ static void	process_trapper_child(zbx_sock_t *sock)
 
 	if (SUCCEED != zbx_tcp_recv_to(sock, &data, CONFIG_TRAPPER_TIMEOUT))
 		return;
+
+	zbx_timespec(&recv_timespec);
 
 	process_trap(sock, data, sizeof(data));
 }

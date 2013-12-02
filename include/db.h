@@ -573,6 +573,8 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 const char	*DBget_inventory_field(unsigned char inventory_link);
 unsigned short	DBget_inventory_field_len(unsigned char inventory_link);
 
+void	DBget_hostids_by_item(zbx_vector_uint64_t *hostids, const char *key);
+
 #define ZBX_DB_GET_HIST_MIN	0
 #define ZBX_DB_GET_HIST_AVG	1
 #define ZBX_DB_GET_HIST_MAX	2

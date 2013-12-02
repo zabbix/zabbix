@@ -33,6 +33,8 @@
 extern unsigned char	process_type;
 extern int		process_num;
 
+zbx_timespec_t	recv_timespec;	/* for tracking time difference between sender and receiver */
+
 static int	connect_to_proxy(DC_PROXY *proxy, zbx_sock_t *sock, int timeout)
 {
 	const char	*__function_name = "connect_to_proxy";
@@ -92,6 +94,8 @@ static int	recv_data_from_proxy(DC_PROXY *proxy, zbx_sock_t *sock, char **data)
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() [%s]",
 				__function_name, *data);
+
+	zbx_timespec(&recv_timespec);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s",
 			__function_name, zbx_result_string(ret));

@@ -156,34 +156,35 @@ define('AUDIT_ACTION_LOGOUT',	4);
 define('AUDIT_ACTION_ENABLE',	5);
 define('AUDIT_ACTION_DISABLE',	6);
 
-define('AUDIT_RESOURCE_USER',			0);
-define('AUDIT_RESOURCE_ZABBIX_CONFIG',	2);
-define('AUDIT_RESOURCE_MEDIA_TYPE',		3);
-define('AUDIT_RESOURCE_HOST',			4);
-define('AUDIT_RESOURCE_ACTION',			5);
-define('AUDIT_RESOURCE_GRAPH',			6);
-define('AUDIT_RESOURCE_GRAPH_ELEMENT',	7);
-define('AUDIT_RESOURCE_USER_GROUP',		11);
-define('AUDIT_RESOURCE_APPLICATION',	12);
-define('AUDIT_RESOURCE_TRIGGER',		13);
-define('AUDIT_RESOURCE_HOST_GROUP',		14);
-define('AUDIT_RESOURCE_ITEM',			15);
-define('AUDIT_RESOURCE_IMAGE',			16);
-define('AUDIT_RESOURCE_VALUE_MAP',		17);
-define('AUDIT_RESOURCE_IT_SERVICE',		18);
-define('AUDIT_RESOURCE_MAP',			19);
-define('AUDIT_RESOURCE_SCREEN',			20);
-define('AUDIT_RESOURCE_NODE',			21);
-define('AUDIT_RESOURCE_SCENARIO',		22);
-define('AUDIT_RESOURCE_DISCOVERY_RULE',	23);
-define('AUDIT_RESOURCE_SLIDESHOW',		24);
-define('AUDIT_RESOURCE_SCRIPT',			25);
-define('AUDIT_RESOURCE_PROXY',			26);
-define('AUDIT_RESOURCE_MAINTENANCE',	27);
-define('AUDIT_RESOURCE_REGEXP',			28);
-define('AUDIT_RESOURCE_MACRO',			29);
-define('AUDIT_RESOURCE_TEMPLATE',		30);
-define('AUDIT_RESOURCE_TRIGGER_PROTOTYPE', 31);
+define('AUDIT_RESOURCE_USER',				0);
+define('AUDIT_RESOURCE_ZABBIX_CONFIG',		2);
+define('AUDIT_RESOURCE_MEDIA_TYPE',			3);
+define('AUDIT_RESOURCE_HOST',				4);
+define('AUDIT_RESOURCE_ACTION',				5);
+define('AUDIT_RESOURCE_GRAPH',				6);
+define('AUDIT_RESOURCE_GRAPH_ELEMENT',		7);
+define('AUDIT_RESOURCE_USER_GROUP',			11);
+define('AUDIT_RESOURCE_APPLICATION',		12);
+define('AUDIT_RESOURCE_TRIGGER',			13);
+define('AUDIT_RESOURCE_HOST_GROUP',			14);
+define('AUDIT_RESOURCE_ITEM',				15);
+define('AUDIT_RESOURCE_IMAGE',				16);
+define('AUDIT_RESOURCE_VALUE_MAP',			17);
+define('AUDIT_RESOURCE_IT_SERVICE',			18);
+define('AUDIT_RESOURCE_MAP',				19);
+define('AUDIT_RESOURCE_SCREEN',				20);
+define('AUDIT_RESOURCE_NODE',				21);
+define('AUDIT_RESOURCE_SCENARIO',			22);
+define('AUDIT_RESOURCE_DISCOVERY_RULE',		23);
+define('AUDIT_RESOURCE_SLIDESHOW',			24);
+define('AUDIT_RESOURCE_SCRIPT',				25);
+define('AUDIT_RESOURCE_PROXY',				26);
+define('AUDIT_RESOURCE_MAINTENANCE',		27);
+define('AUDIT_RESOURCE_REGEXP',				28);
+define('AUDIT_RESOURCE_MACRO',				29);
+define('AUDIT_RESOURCE_TEMPLATE',			30);
+define('AUDIT_RESOURCE_TRIGGER_PROTOTYPE',	31);
+define('AUDIT_RESOURCE_INCIDENT',			32);
 
 define('CONDITION_TYPE_HOST_GROUP',			0);
 define('CONDITION_TYPE_HOST',				1);
@@ -893,6 +894,66 @@ define('SHORT_DESCRIPTION',	1);
 // availability report modes
 define('AVAILABILITY_REPORT_BY_HOST', 0);
 define('AVAILABILITY_REPORT_BY_TEMPLATE', 1);
+
+// DNS TEST macros
+define('DNSTEST_PAGE_SLV',		'{$ROLLING.WEEK.STATUS.PAGE.SLV}');
+define('DNSTEST_MIN_DNS_COUNT',	'{$DNSTEST.DNS.AVAIL.MINNS}');
+define('DNSTEST_DNS_UDP_RTT',	'{$DNSTEST.DNS.UDP.RTT}');
+define('DNSTEST_DNSSEC_DELAY',	'{$DNSTEST.DNSSEC.UDP.DELAY}');
+define('DNSTEST_RDDS_DELAY',	'{$DNSTEST.RDDS.DELAY}');
+
+// DNS TEST rolling week items keys
+define('DNSTEST_SLV_DNS_ROLLWEEK',		'dnstest.slv.dns.rollweek');
+define('DNSTEST_SLV_DNSSEC_ROLLWEEK',	'dnstest.slv.dnssec.rollweek');
+define('DNSTEST_SLV_RDDS_ROLLWEEK',		'dnstest.slv.rdds.rollweek');
+define('DNSTEST_SLV_EPP_ROLLWEEK',		'dnstest.slv.epp.rollweek');
+
+// DNS TEST availability items keys
+define('DNSTEST_SLV_DNS_AVAIL',		'dnstest.slv.dns.avail');
+define('DNSTEST_SLV_DNSSEC_AVAIL',	'dnstest.slv.dnssec.avail');
+define('DNSTEST_SLV_RDDS_AVAIL',	'dnstest.slv.rdds.avail');
+define('DNSTEST_SLV_EPP_AVAIL',		'dnstest.slv.epp.avail');
+
+// DNS TEST incident status
+define('INCIDENT_ACTIVE',			0);
+define('INCIDENT_RESOLVED',			1);
+define('INCIDENT_FALSE_POSITIVE',	2);
+
+// DNS TEST incident status
+define('DNSTEST_NO_REPLY_ERROR_CODE',	-200);
+define('DNSSEC_FAIL_ERROR_CODE',		-204);
+
+// DNS TEST calculated items keys
+define('CALCULATED_ITEM_DNS_FAIL',			'dnstest.configvalue[INCIDENT.DNS.FAIL]');
+define('CALCULATED_ITEM_DNS_RECOVERY',		'dnstest.configvalue[INCIDENT.DNS.RECOVER]');
+define('CALCULATED_ITEM_DNS_DELAY',			'dnstest.configvalue[DNSTEST.DNS.UDP.DELAY]');
+define('CALCULATED_ITEM_DNSSEC_FAIL',		'dnstest.configvalue[INCIDENT.DNSSEC.FAIL]');
+define('CALCULATED_ITEM_DNSSEC_RECOVERY',	'dnstest.configvalue[INCIDENT.DNSSEC.RECOVER]');
+define('CALCULATED_ITEM_DNSSEC_DELAY',		'dnstest.configvalue[DNSTEST.DNSSEC.UDP.DELAY]');
+define('CALCULATED_ITEM_RDDS_FAIL',			'dnstest.configvalue[INCIDENT.RDDS.FAIL]');
+define('CALCULATED_ITEM_RDDS_RECOVERY',		'dnstest.configvalue[INCIDENT.RDDS.RECOVER]');
+define('CALCULATED_ITEM_RDDS_DELAY',		'dnstest.configvalue[DNSTEST.RDDS.DELAY]');
+
+// DNS TEST probes info
+define('NUMBER_OF_ONLINE_AND_TOTAL_PROBES',	'online.nodes.pl[online,percent]');
+define('NUMBER_OF_ONLINE_PROBES',			'online.nodes.pl');
+define('NUMBER_OF_TOTAL_PROBES',			'online.nodes.pl[total]');
+
+// DNS TEST probe status items keys
+define('PROBE_STATUS_AUTOMATIC',	'dnstest.probe.status[automatic,"{$DNSTEST.IP4.ROOTSERVERS1}","{$DNSTEST.IP6.ROOTSERVERS1}"]');
+define('PROBE_STATUS_MANUAL',		'dnstest.probe.status[manual]');
+define('PROBE_DNS_UDP_ITEM',		'dnstest.dns.udp.rtt[');
+define('PROBE_RDDS_ITEM',			'dnstest.rdds[');
+
+// DNS TEST probe status
+define('PROBE_DOWN',	0);
+define('PROBE_UP',		1);
+
+// DNS TEST monthly reports item
+define('MONTHLY_REPORTS_APPLICATION',	'SLV monthly');
+
+// DNS TEST "dnstest" host name
+define('DNSTEST_HOST',	'dnstest');
 
 // if magic quotes on, then get rid of them
 if (version_compare(phpversion(), '6.0', '<') && get_magic_quotes_gpc()) {

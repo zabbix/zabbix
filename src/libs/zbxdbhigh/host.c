@@ -3711,6 +3711,27 @@ out:
 	return interfaceid;
 }
 
+void	DBget_hostids_by_item(zbx_vector_uint64_t *hostids, const char *key)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	hostid;
+
+	result = DBselect(
+			"select distinct h.hostid"
+			" from items i,hosts h"
+			" where i.hostid=h.hostid"
+				" and key_='%s'",
+			key);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(hostid, row[0]);
+		zbx_vector_uint64_append(hostids, hostid);
+	}
+	DBfree_result(result);
+}
+
 void	zbx_create_services_lock()
 {
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&services_lock, ZBX_MUTEX_SERVICES))

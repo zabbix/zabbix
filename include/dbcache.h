@@ -218,6 +218,8 @@ void	DCload_config();
 void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num);
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid);
 int	DCconfig_get_item_by_key(DC_ITEM *item, zbx_uint64_t proxy_hostid, const char *host, const char *key);
+size_t	DCconfig_get_host_items_by_keypart(DC_ITEM **items, zbx_uint64_t hostid, zbx_item_type_t type,
+		const char *keypart, size_t keypart_size);
 void	DCconfig_get_items_by_itemids(DC_ITEM *items, zbx_uint64_t *itemids, int *errcodes, size_t num);
 void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions, zbx_uint64_t *functionids, int *errcodes, size_t num);
 void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num);
@@ -263,5 +265,10 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck);
 void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, char **replace_to);
 
 int	DCconfig_update_host_availability(const zbx_host_availability_t *availability, int availability_num);
+
+void	DCset_probe_online_since(time_t t);
+void	DCset_probe_last_status(char status);
+time_t	DCget_probe_online_since(void);
+char	DCget_probe_last_status(void);
 
 #endif

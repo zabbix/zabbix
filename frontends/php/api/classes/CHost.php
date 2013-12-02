@@ -49,6 +49,7 @@ class CHost extends CHostGeneral {
 	 * @param boolean       $options['selectApplications']       select Applications
 	 * @param boolean       $options['selectMacros']             select Macros
 	 * @param boolean|array $options['selectInventory']          select Inventory
+	 * @param boolean       $options['tlds']                     select only tlds
 	 * @param boolean       $options['withInventory']            select only hosts with inventory
 	 * @param int           $options['count']                    count Hosts, returned column name is rowscount
 	 * @param string        $options['pattern']                  search hosts by pattern in Host name
@@ -108,6 +109,7 @@ class CHost extends CHostGeneral {
 			'with_graphs'				=> null,
 			'with_applications'			=> null,
 			'withInventory'				=> null,
+			'tlds'						=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
 			// filter
@@ -202,6 +204,17 @@ class CHost extends CHostGeneral {
 				$sqlParts['select']['proxy_hostid'] = 'h.proxy_hostid';
 			}
 			$sqlParts['where'][] = dbConditionInt('h.proxy_hostid', $options['proxyids']);
+		}
+
+		// tlds
+		if (!is_null($options['tlds'])) {
+			if (!isset($sqlParts['from']['hosts_groups'])) {
+				$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+				$sqlParts['where']['hgh'] = 'hg.hostid=h.hostid';
+			}
+			$sqlParts['from']['groups'] = 'groups g';
+			$sqlParts['where'][] = 'g.name=\'TLDs\'';
+			$sqlParts['where']['g'] = 'g.groupid=hg.groupid';
 		}
 
 		// templateids

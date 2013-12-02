@@ -96,6 +96,8 @@
 .iconzbxunknown		{ background-image: url('../images/general/zabbix_unknown.png');}
 .iconzbxavailable	{ background-image: url('../images/general/zabbix_available.png');}
 .iconzbxunavailable	{ background-image: url('../images/general/zabbix_unavailable.png');}
+.iconrollingweekok	{ background-image: url('../images/general/rolling_week_ok.png');}
+.iconrollingweekfail{ background-image: url('../images/general/rolling_week_fail.png');}
 .iconsnmpunknown	{ background-image: url('../images/general/snmp_unknown.png');}
 .iconsnmpavailable	{ background-image: url('../images/general/snmp_available.png');}
 .iconsnmpunavailable{ background-image: url('../images/general/snmp_unavailable.png');}

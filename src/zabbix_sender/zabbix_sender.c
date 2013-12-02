@@ -491,7 +491,13 @@ int	main(int argc, char **argv)
 				zbx_json_close(&sentdval_args.json);
 
 				if (1 == WITH_TIMESTAMPS)
-					zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
+				{
+					zbx_timespec_t	timespec;
+
+					zbx_timespec(&timespec);
+					zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_CLOCK, timespec.sec);
+					zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_NS, timespec.ns);
+				}
 
 				last_send = zbx_time();
 
@@ -509,7 +515,13 @@ int	main(int argc, char **argv)
 		if (0 != buffer_count)
 		{
 			if (1 == WITH_TIMESTAMPS)
-				zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
+			{
+					zbx_timespec_t	timespec;
+
+					zbx_timespec(&timespec);
+					zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_CLOCK, timespec.sec);
+					zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_NS, timespec.ns);
+			}
 
 			ret = zbx_thread_wait(zbx_thread_start(send_value, &thread_args));
 		}
