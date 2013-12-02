@@ -69,7 +69,7 @@ void	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	alarm(CONFIG_TIMEOUT);
 
-	if (FAIL == zbx_tcp_send(sock, j.buffer))
+	if (SUCCEED != zbx_tcp_send(sock, j.buffer))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot send configuration: %s", zbx_tcp_strerror());
 
 	alarm(0);
