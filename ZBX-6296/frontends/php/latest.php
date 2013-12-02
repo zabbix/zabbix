@@ -200,8 +200,7 @@ if ($hosts) {
 }
 if ($items) {
 	// macros
-	$macroResolver = new CMacrosResolver();
-	$items = $macroResolver->resolveItems($items, (bool) $filterShowDetails);
+	$items = CMacrosResolverHelper::resolveItemName($items, (bool) $filterShowDetails);
 
 	// filter items by name
 	foreach ($items as $key => $item) {

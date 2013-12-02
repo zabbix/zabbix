@@ -66,6 +66,18 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'types' => array('graphFunctionalItem'),
 			'source' => 'name',
 			'method' => 'resolveGraph'
+		),
+		'itemName' => array(
+			'types' => array('name'),
+			'method' => 'resolveItems'
+		),
+		'itemKey' => array(
+			'types' => array('key'),
+			'method' => 'resolveItemKeys'
+		),
+		'itemNameAndKey' => array(
+			'types' => array('item', 'key'),
+			'method' => 'resolveItems'
 		)
 	);
 
@@ -283,10 +295,29 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// get user macros
 		if ($this->isTypeAvailable('user')) {
+			$userMacrosData = array();
+
 			foreach ($data as $hostId => $texts) {
+				$userMacros = $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, $texts);
+
+				foreach ($userMacros as $userMacro) {
+					if (!isset($userMacrosData[$hostId])) {
+						$userMacrosData[$hostId] = array(
+							'hostids' => array($hostId),
+							'macros' => array()
+						);
+					}
+
+					$userMacrosData[$hostId]['macros'][$userMacro] = null;
+				}
+			}
+
+			$userMacros = $this->getUserMacros($userMacrosData);
+
+			foreach ($userMacros as $hostId => $userMacro) {
 				$macros[$hostId] = isset($macros[$hostId])
-					? array_merge($macros[$hostId], $this->getUserMacros($texts, array('hostid' => $hostId)))
-					: $this->getUserMacros($texts, array('hostid' => $hostId));
+					? array_merge($macros[$hostId], $userMacro['macros'])
+					: $userMacro['macros'];
 			}
 		}
 
@@ -674,16 +705,17 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @param string $items[n]['hostid']
 	 * @param string $items[n]['name']
 	 * @param string $items[n]['key_']
-	 * @param bool   $resolveAllItemsKeys
+	 *
+	 * @return array
 	 */
-	public function resolveItems(array $items, $resolveAllItemsKeys = false) {
+	private function resolveItems(array $items) {
 		$items = zbx_toHash($items, 'itemid');
 
 		// user macros
-		$items = $this->resolveUserMacrosInItem($items, 'name');
+		$items = $this->resolveItemUserMacros($items, 'name');
 
 		// macros in item key
-		if ($resolveAllItemsKeys) {
+		if ($this->isTypeAvailable('key')) {
 			$items = $this->resolveItemKeys($items);
 		}
 
@@ -698,7 +730,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		if ($itemsWithMacros) {
 			// macros in item key
-			if (!$resolveAllItemsKeys) {
+			if (!$this->isTypeAvailable('key')) {
 				$itemsWithMacros = $this->resolveItemKeys($itemsWithMacros);
 			}
 
@@ -735,8 +767,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @param string $items[n]['itemid']
 	 * @param string $items[n]['hostid']
 	 * @param string $items[n]['key_']
+	 *
+	 * @return array
 	 */
-	public function resolveItemKeys(array $items) {
+	private function resolveItemKeys(array $items) {
 		$items = zbx_toHash($items, 'itemid');
 
 		// host and ip macros
@@ -814,43 +848,48 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 
 		// user macros
-		$items = $this->resolveUserMacrosInItem($items, 'key_');
+		$items = $this->resolveItemUserMacros($items, 'key_');
 
 		return $items;
 	}
 
 	/**
-	 * Resolve user macros in item.
+	 * Resolve user macros in items.
 	 *
 	 * @param array  $items
 	 * @param string $items[n]['itemid']
 	 * @param string $items[n]['hostid']
 	 * @param string $items[n][$field]
 	 * @param string $field
+	 *
+	 * @return array
 	 */
-	public function resolveUserMacrosInItem(array $items, $field) {
-		$hostUserMacros = array();
+	private function resolveItemUserMacros(array $items, $field) {
+		$userMacros = array();
 
 		foreach ($items as $item) {
 			$macros = $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, array($item[$field]));
 
 			if ($macros) {
 				foreach ($macros as $macro) {
-					if (!isset($hostUserMacros[$item['hostid']])) {
-						$hostUserMacros[$item['hostid']] = array('hostids' => array($item['hostid']), 'macros' => array());
+					if (!isset($userMacros[$item['hostid']])) {
+						$userMacros[$item['hostid']] = array(
+							'hostids' => array($item['hostid']),
+							'macros' => array()
+						);
 					}
 
-					$hostUserMacros[$item['hostid']]['macros'][$macro] = null;
+					$userMacros[$item['hostid']]['macros'][$macro] = null;
 				}
 			}
 		}
 
-		if ($hostUserMacros) {
-			$hostUserMacros = $this->getUserMacrosNew($hostUserMacros);
+		if ($userMacros) {
+			$userMacros = $this->getUserMacros($userMacros);
 
 			foreach ($items as &$item) {
-				if (isset($hostUserMacros[$item['hostid']])) {
-					$macros = $hostUserMacros[$item['hostid']]['macros'];
+				if (isset($userMacros[$item['hostid']])) {
+					$macros = $userMacros[$item['hostid']]['macros'];
 
 					$item[$field] = str_replace(array_keys($macros), array_values($macros), $item[$field]);
 				}

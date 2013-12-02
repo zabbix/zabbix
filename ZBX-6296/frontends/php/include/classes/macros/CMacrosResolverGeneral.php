@@ -365,37 +365,13 @@ class CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Get user macros.
-	 *
-	 * @param array $texts
-	 * @param array $options
-	 * @param int   $options['hostid']
-	 * @param int   $options['triggerid']
-	 *
-	 * @return array
-	 */
-	protected function getUserMacros(array $texts, array $options = array()) {
-		$matches = $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, $texts);
-
-		if (empty($matches)) {
-			return array();
-		}
-
-		$options['macros'] = $matches;
-
-		return API::UserMacro()->getMacros($options);
-	}
-
-	/**
-	 * TODO rename me.
-	 *
 	 * Get macros with values.
 	 *
 	 * @param array $data			Macros to resolve (array(hostids => array(hostid), macros => array(macro => null)))
 	 *
 	 * @return array
 	 */
-	protected function getUserMacrosNew(array $data) {
+	protected function getUserMacros(array $data) {
 		/*
 		 * User macros
 		 */

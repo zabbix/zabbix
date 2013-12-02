@@ -314,6 +314,8 @@ class CMacrosResolverHelper {
 	/**
 	 * Resolve positional macros and functional item macros, for example, {{HOST.HOST1}:key.func(param)}.
 	 *
+	 * @static
+	 *
 	 * @param type   $name					string in which macros should be resolved
 	 * @param array  $items					list of graph items
 	 * @param int    $items[n]['hostid']	graph n-th item corresponding host Id
@@ -321,7 +323,7 @@ class CMacrosResolverHelper {
 	 *
 	 * @return string	string with macros replaced with corresponding values
 	 */
-	public static function resolveGraphName($name, $items) {
+	public static function resolveGraphName($name, array $items) {
 		self::init();
 
 		$graph = self::$macrosResolver->resolve(array(
@@ -335,8 +337,9 @@ class CMacrosResolverHelper {
 
 	/**
 	 * Resolve positional macros and functional item macros, for example, {{HOST.HOST1}:key.func(param)}.
-	 *
 	 *  ! if same graph will be passed more than once only name for first entry will be resolved.
+	 *
+	 * @static
 	 *
 	 * @param array  $data					list or hashmap of graphs
 	 * @param int    $data[n]['graphid']	id of graph
@@ -344,7 +347,7 @@ class CMacrosResolverHelper {
 	 *
 	 * @return array	inputted data with resolved names
 	 */
-	public static function resolveGraphNameByIds($data) {
+	public static function resolveGraphNameByIds(array $data) {
 		self::init();
 
 		$graphIds = array();
@@ -389,6 +392,29 @@ class CMacrosResolverHelper {
 		unset($graph);
 
 		return $data;
+	}
+
+	/**
+	 * Resolve item name macros.
+	 *
+	 * @static
+	 *
+	 * @param array  $items
+	 * @param string $items[n]['itemid']
+	 * @param string $items[n]['hostid']
+	 * @param string $items[n]['name']
+	 * @param string $items[n]['key_']
+	 * @param bool   $resolveAllItemsKeys
+	 *
+	 * @return array
+	 */
+	public static function resolveItemName(array $items, $resolveAllItemsKeys = false) {
+		self::init();
+
+		return self::$macrosResolver->resolve(array(
+			'config' => $resolveAllItemsKeys ? 'itemNameAndKey' : 'itemName',
+			'data' => $items
+		));
 	}
 
 	/**
