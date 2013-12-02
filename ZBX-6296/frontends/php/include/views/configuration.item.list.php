@@ -90,11 +90,11 @@ foreach ($this->data['items'] as $item) {
 			'disc_prototypes.php?parent_discoveryid='.$item['discoveryRule']['itemid'],
 			'parent-discovery'
 		);
-		$description[] = NAME_DELIMITER.$item['name_expanded'];
+		$description[] = NAME_DELIMITER.$item['name'];
 	}
 	else {
 		$description[] = new CLink(
-			CHtml::encode($item['name_expanded']),
+			CHtml::encode($item['name']),
 			'?form=update&hostid='.$item['hostid'].'&itemid='.$item['itemid']
 		);
 	}
@@ -237,7 +237,7 @@ foreach ($this->data['items'] as $item) {
 			'call_triggerlog_menu('.
 				'event, '.
 				CJs::encodeJson($item['itemid']).', '.
-				CJs::encodeJson(CHtml::encode($item['name_expanded'])).', '.
+				CJs::encodeJson(CHtml::encode($item['name'])).', '.
 				$triggers.
 			');'
 		);

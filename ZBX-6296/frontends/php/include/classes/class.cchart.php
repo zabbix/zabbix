@@ -95,14 +95,14 @@ class CChart extends CGraphDraw {
 		$this->m_showTriggers = ($value == 1) ? 1 : 0;
 	}
 
-	public function addItem($itemid, $axis = GRAPH_YAXIS_SIDE_DEFAULT, $calc_fnc = CALC_FNC_AVG, $color = null, $drawtype = null, $type = null) {
+	public function addItem($itemId, $axis = GRAPH_YAXIS_SIDE_DEFAULT, $calc_fnc = CALC_FNC_AVG, $color = null, $drawtype = null, $type = null) {
 		if ($this->type == GRAPH_TYPE_STACKED) {
 			$drawtype = GRAPH_ITEM_DRAWTYPE_FILLED_REGION;
 		}
 
-		$item = get_item_by_itemid($itemid);
-		$this->items[$this->num] = $item;
-		$this->items[$this->num]['name'] = itemName($item);
+		$items = CMacrosResolverHelper::resolveItemName(array(get_item_by_itemid($itemId)));
+
+		$this->items[$this->num] = reset($items);
 		$this->items[$this->num]['delay'] = getItemDelay($item['delay'], $item['delay_flex']);
 
 		if (strpos($item['units'], ',') !== false) {
@@ -128,6 +128,7 @@ class CChart extends CGraphDraw {
 		if ($this->items[$this->num]['axisside'] == GRAPH_YAXIS_SIDE_RIGHT) {
 			$this->yaxisright = 1;
 		}
+
 		$this->num++;
 	}
 

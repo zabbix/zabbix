@@ -195,17 +195,20 @@ if ($_REQUEST['form'] == 'full_clone') {
 		$templateList->addRow(_('Applications'), $listBox);
 	}
 
-// Items
+	// items
 	$hostItems = API::Item()->get(array(
 		'hostids' => $templateid,
 		'inherited' => false,
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 		'output' => API_OUTPUT_EXTEND,
 	));
-	if (!empty($hostItems)) {
+
+	if ($hostItems) {
+		$hostItems = CMacrosResolverHelper::resolveItemName($hostItems);
+
 		$itemsList = array();
 		foreach ($hostItems as $hostItem) {
-			$itemsList[$hostItem['itemid']] = itemName($hostItem);
+			$itemsList[$hostItem['itemid']] = $hostItem['name'];
 		}
 		order_result($itemsList);
 
@@ -258,16 +261,19 @@ if ($_REQUEST['form'] == 'full_clone') {
 		$templateList->addRow(_('Graphs'), $listBox);
 	}
 
-// Discovery rules
+	// discovery rules
 	$hostDiscoveryRules = API::DiscoveryRule()->get(array(
 		'inherited' => false,
 		'hostids' => $templateid,
 		'output' => API_OUTPUT_EXTEND,
 	));
-	if (!empty($hostDiscoveryRules)) {
+
+	if ($hostDiscoveryRules) {
+		$hostDiscoveryRules = CMacrosResolverHelper::resolveItemName($hostDiscoveryRules);
+
 		$discoveryRuleList = array();
 		foreach ($hostDiscoveryRules as $discoveryRule) {
-			$discoveryRuleList[$discoveryRule['itemid']] = itemName($discoveryRule);
+			$discoveryRuleList[$discoveryRule['itemid']] = $discoveryRule['name'];
 		}
 		order_result($discoveryRuleList);
 		$hostDiscoveryRuleids = array_keys($discoveryRuleList);
@@ -278,17 +284,20 @@ if ($_REQUEST['form'] == 'full_clone') {
 
 		$templateList->addRow(_('Discovery rules'), $listBox);
 
-// Item prototypes
+		// item prototypes
 		$hostItemPrototypes = API::ItemPrototype()->get(array(
 			'hostids' => $templateid,
 			'discoveryids' => $hostDiscoveryRuleids,
 			'inherited' => false,
 			'output' => API_OUTPUT_EXTEND,
 		));
-		if (!empty($hostItemPrototypes)) {
+
+		if ($hostItemPrototypes) {
+			$hostItemPrototypes = CMacrosResolverHelper::resolveItemName($hostItemPrototypes);
+
 			$prototypeList = array();
 			foreach ($hostItemPrototypes as $itemPrototype) {
-				$prototypeList[$itemPrototype['itemid']] = itemName($itemPrototype);
+				$prototypeList[$itemPrototype['itemid']] = $itemPrototype['name'];
 			}
 			order_result($prototypeList);
 

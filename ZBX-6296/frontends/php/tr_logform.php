@@ -253,17 +253,17 @@ if(isset($_REQUEST['sform'])){
 	$frmTRLog->addRow(_('Description'), new CTextBox('description', $description, 80));
 
 	$item = '';
-	$db_items = DBselect('SELECT DISTINCT * FROM items WHERE itemid='.zbx_dbstr($itemid));
-	while($db_item = DBfetch($db_items)){
-		if($db_item['templateid']){
-			$template_host = get_realhost_by_itemid($db_item['templateid']);
-			$item = $template_host['host'].NAME_DELIMITER;
-		}
+	$dbItems = DBfetchArray(DBselect('SELECT DISTINCT * FROM items WHERE itemid='.zbx_dbstr($itemid)));
+	$dbItems = CMacrosResolverHelper::resolveItemName($dbItems);
 
-		$item .= itemName($db_item,$db_item['key_']);
+	foreach ($dbItems as $dbItem) {
+		if ($dbItem['templateid']) {
+			$template = get_realhost_by_itemid($dbItem['templateid']);
+			$item = $template['host'].NAME_DELIMITER.$dbItem['name'];
+		}
 	}
 
-	$ctb = new CTextBox('item',$item,80);
+	$ctb = new CTextBox('item', $item, 80);
 	$ctb->setAttribute('id','item');
 	$ctb->setAttribute('disabled','disabled');
 

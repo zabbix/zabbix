@@ -56,26 +56,27 @@ function make_favorite_graphs() {
 	}
 
 	if ($itemids) {
-		$options = array(
+		$items = API::Item()->get(array(
 			'itemids' => $itemids,
 			'selectHosts' => array('hostid', 'name'),
-			'output' => array('itemid', 'name', 'key_'),
+			'output' => array('itemid', 'hostid', 'name', 'key_'),
 			'webitems' => true
-		);
-		$items = API::Item()->get($options);
+		));
 		$items = zbx_toHash($items, 'itemid');
+
+		$items = CMacrosResolverHelper::resolveItemName($items);
 	}
 
 	foreach ($fav_graphs as $favorite) {
 		$sourceid = $favorite['value'];
 
-		if ('itemid' == $favorite['source']) {
+		if ($favorite['source'] == 'itemid') {
 			if (!isset($items[$sourceid])) {
 				continue;
 			}
+
 			$item = $items[$sourceid];
 			$host = reset($item['hosts']);
-			$item['name'] = itemName($item);
 
 			$link = new CLink(get_node_name_by_elid($sourceid, null, NAME_DELIMITER).$host['name'].NAME_DELIMITER.$item['name'], 'history.php?action=showgraph&itemid='.$sourceid);
 			$link->setTarget('blank');
@@ -84,14 +85,17 @@ function make_favorite_graphs() {
 			if (!isset($graphs[$sourceid])) {
 				continue;
 			}
+
 			$graph = $graphs[$sourceid];
 			$ghost = reset($graph['hosts']);
 
 			$link = new CLink(get_node_name_by_elid($sourceid, null, NAME_DELIMITER).$ghost['name'].NAME_DELIMITER.$graph['name'], 'charts.php?graphid='.$sourceid);
 			$link->setTarget('blank');
 		}
+
 		$favList->addItem($link, 'nowrap');
 	}
+
 	return $favList;
 }
 
@@ -1244,29 +1248,31 @@ function make_graph_submenu() {
 	}
 
 	if ($itemids) {
-		$options = array(
+		$items = API::Item()->get(array(
 			'itemids' => $itemids,
 			'selectHosts' => array('hostid', 'host'),
-			'output' => array('itemid', 'name', 'key_'),
+			'output' => array('itemid', 'hostid', 'name', 'key_'),
 			'webitems' => 1
-		);
-		$items = API::Item()->get($options);
-		$items = zbx_toHash($items, 'itemid');
-	}
+		));
 
+		$items = zbx_toHash($items, 'itemid');
+
+		$items = CMacrosResolverHelper::resolveItemName($items);
+	}
 
 	foreach ($fav_graphs as $favorite) {
 		$source = $favorite['source'];
 		$sourceid = $favorite['value'];
 
-		if ('itemid' == $source) {
+		if ($source == 'itemid') {
 			if (!isset($items[$sourceid])) {
 				continue;
 			}
+
 			$item_added = true;
 			$item = $items[$sourceid];
 			$host = reset($item['hosts']);
-			$item['name'] = itemName($item);
+			$item['name'] = $item['name'];
 			$favGraphs[] = array(
 				'name' => $host['host'].NAME_DELIMITER.$item['name'],
 				'favobj' => 'itemid',
@@ -1278,6 +1284,7 @@ function make_graph_submenu() {
 			if (!isset($graphs[$sourceid])) {
 				continue;
 			}
+
 			$graph_added = true;
 			$graph = $graphs[$sourceid];
 			$ghost = reset($graph['hosts']);
@@ -1307,6 +1314,7 @@ function make_graph_submenu() {
 			'favaction' => 'remove'
 		);
 	}
+
 	return $favGraphs;
 }
 

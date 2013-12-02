@@ -1289,14 +1289,11 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
  * @return CCol
  */
 function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
-	$ack = null;
-	$css = null;
-	$style = null;
-	$desc = array();
-	$config = select_config(); // for how long triggers should blink on status change (set by user in administration->general)
-	$menuPopup = array();
-	$triggerItems = array();
-	$acknowledge = array();
+	$ack = $css = $style = null;
+	$desc = $menuPopup = $triggerItems = $acknowledge = array();
+
+	// for how long triggers should blink on status change (set by user in administration->general)
+	$config = select_config();
 
 	if ($trigger) {
 		$style = 'cursor: pointer; ';
@@ -1333,19 +1330,22 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 			$css = 'normal';
 		}
 
-		$dbItems = DBselect(
+		$dbItems = DBfetchArray(DBselect(
 			'SELECT DISTINCT i.itemid,i.name,i.key_,i.value_type'.
 			' FROM items i,functions f'.
 			' WHERE f.itemid=i.itemid'.
 				' AND f.triggerid='.zbx_dbstr($trigger['triggerid'])
-		);
-		while ($item = DBfetch($dbItems)) {
+		));
+
+		$dbItems = CMacrosResolverHelper::resolveItemName($dbItems);
+
+		foreach ($dbItems as $dbItem) {
 			$triggerItems[] = array(
-				'name' => itemName($item),
+				'name' => $dbItem['name'],
 				'params' => array(
-					'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
+					'action' => in_array($dbItem['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
 						? 'showgraph' : 'showlatest',
-					'itemid' => $item['itemid'],
+					'itemid' => $dbItem['itemid'],
 					'period' => 3600
 				)
 			);

@@ -153,14 +153,17 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 	$items = API::Item()->get(array(
 		'itemids' => $resourceId,
 		'selectHosts' => array('name'),
-		'output' => array('itemid', 'key_', 'name')
+		'output' => array('itemid', 'hostid', 'key_', 'name')
 	));
-	if (!empty($items)) {
+
+	if ($items) {
+		$items = CMacrosResolverHelper::resolveItemName($items);
+
 		$id = $resourceId;
 		$item = reset($items);
 		$item['host'] = reset($item['hosts']);
 
-		$caption = $item['host']['name'].NAME_DELIMITER.itemName($item);
+		$caption = $item['host']['name'].NAME_DELIMITER.$item['name'];
 
 		$nodeName = get_node_name_by_elid($item['itemid']);
 		if (!zbx_empty($nodeName)) {
@@ -235,13 +238,16 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 	$items = API::Item()->get(array(
 		'itemids' => $resourceId,
 		'selectHosts' => array('name'),
-		'output' => array('itemid', 'key_', 'name')
+		'output' => array('itemid', 'hostid', 'key_', 'name')
 	));
-	if (!empty($items)) {
+
+	if ($items) {
+		$items = CMacrosResolverHelper::resolveItemName($items);
+
 		$id = $resourceId;
 		$item = reset($items);
 		$item['host'] = reset($item['hosts']);
-		$caption = $item['host']['name'].NAME_DELIMITER.itemName($item);
+		$caption = $item['host']['name'].NAME_DELIMITER.$item['name'];
 
 		$nodeName = get_node_name_by_elid($item['itemid']);
 		if (!zbx_empty($nodeName)) {
@@ -488,12 +494,15 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 		$items = API::Item()->get(array(
 			'itemids' => $resourceId,
 			'selectHosts' => array('name'),
-			'output' => array('itemid', 'key_', 'name')
+			'output' => array('itemid', 'hostid', 'key_', 'name')
 		));
+
 		if ($items) {
+			$items = CMacrosResolverHelper::resolveItemName($items);
+
 			$item = reset($items);
 			$host = reset($item['hosts']);
-			$caption = $host['name'].NAME_DELIMITER.itemName($item);
+			$caption = $host['name'].NAME_DELIMITER.$item['name'];
 		}
 	}
 

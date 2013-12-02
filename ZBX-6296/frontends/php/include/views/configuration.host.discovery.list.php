@@ -59,13 +59,14 @@ $discoveryTable->setHeader(array(
 ));
 foreach ($data['discoveries'] as $discovery) {
 	$description = array();
+
 	if ($discovery['templateid']) {
 		$template_host = get_realhost_by_itemid($discovery['templateid']);
 		$description[] = new CLink($template_host['name'], '?hostid='.$template_host['hostid'], 'unknown');
 		$description[] = NAME_DELIMITER;
 	}
-	$discovery['name_expanded'] = itemName($discovery);
-	$description[] = new CLink($discovery['name_expanded'], '?form=update&itemid='.$discovery['itemid']);
+
+	$description[] = new CLink($discovery['name'], '?form=update&itemid='.$discovery['itemid']);
 
 	$status = new CLink(
 		itemIndicator($discovery['status'], $discovery['state']),

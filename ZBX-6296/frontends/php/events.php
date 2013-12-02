@@ -686,9 +686,11 @@ else {
 
 				$triggerItems = array();
 
+				$trigger['items'] = CMacrosResolverHelper::resolveItemName($trigger['items']);
+
 				foreach ($trigger['items'] as $item) {
 					$triggerItems[] = array(
-						'name' => itemName($item),
+						'name' => $item['name'],
 						'params' => array(
 							'itemid' => $item['itemid'],
 							'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))

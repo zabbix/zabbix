@@ -188,12 +188,14 @@ elseif ($config == QUEUE_DETAILS) {
 	$queueData = zbx_toHash($queueData, 'itemid');
 
 	$items = API::Item()->get(array(
-		'output' => array('itemid', 'name', 'key_'),
+		'output' => array('itemid', 'hostid', 'name', 'key_'),
 		'selectHosts' => array('name'),
 		'itemids' => array_keys($queueData),
 		'webitems' => true,
 		'preservekeys' => true
 	));
+
+	$items = CMacrosResolverHelper::resolveItemName($items);
 
 	$table->setHeader(array(
 		_('Scheduled check'),
@@ -223,7 +225,7 @@ elseif ($config == QUEUE_DETAILS) {
 			zbx_date2age($itemData['nextcheck']),
 			get_node_name_by_elid($item['itemid']),
 			$host['name'],
-			itemName($item)
+			$item['name']
 		));
 	}
 }

@@ -44,7 +44,9 @@ class CScreenPlainText extends CScreenBase {
 			return $this->getOutput($table);
 		}
 
-		$item = get_item_by_itemid($this->screenitem['resourceid']);
+		$items = CMacrosResolverHelper::resolveItemName(array(get_item_by_itemid($this->screenitem['resourceid'])));
+		$item = reset($items);
+
 		switch ($item['value_type']) {
 			case ITEM_VALUE_TYPE_TEXT:
 			case ITEM_VALUE_TYPE_LOG:
@@ -59,7 +61,7 @@ class CScreenPlainText extends CScreenBase {
 		$host = get_host_by_itemid($this->screenitem['resourceid']);
 
 		$table = new CTableInfo(_('No values found.'));
-		$table->setHeader(array(_('Timestamp'), $host['name'].NAME_DELIMITER.itemName($item)));
+		$table->setHeader(array(_('Timestamp'), $host['name'].NAME_DELIMITER.$item['name']));
 
 		$stime = zbxDateToTime($this->timeline['stime']);
 

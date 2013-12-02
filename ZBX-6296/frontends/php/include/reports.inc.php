@@ -76,7 +76,9 @@ function valueDistributionFormForMultiplePeriods($items = array()) {
 
 	$reportForm->addRow(_('Period'), $reporttimetab);
 
-	if (is_array($items) && $items) {
+	if ($items) {
+		$items = CMacrosResolverHelper::resolveItemName($items);
+
 		$items_table = new CTableInfo();
 		foreach ($items as $id => &$item) {
 			$color = new CColorCell(null, $item['color']);
@@ -91,7 +93,7 @@ function valueDistributionFormForMultiplePeriods($items = array()) {
 				'", 550, 400, "graph_item_form");'
 			);
 
-			$description = $item['host']['name'].NAME_DELIMITER.itemName($item);
+			$description = $item['host']['name'].NAME_DELIMITER.$item['name'];
 
 			$items_table->addRow(array(
 				new CCheckBox('group_gid['.$id.']', isset($group_gid[$id])),
@@ -220,7 +222,9 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 	));
 	unset($periods_table, $delete_button);
 
-	if (is_array($items) && $items) {
+	if ($items) {
+		$items = CMacrosResolverHelper::resolveItemName($items);
+
 		$items_table = new CTableInfo();
 		foreach ($items as $id => &$item) {
 			$caption = new CSpan($item['caption'], 'link');
@@ -233,7 +237,7 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 				'", 550, 400, "graph_item_form");'
 			);
 
-			$description = $item['host']['name'].NAME_DELIMITER.itemName($item);
+			$description = $item['host']['name'].NAME_DELIMITER.$item['name'];
 
 			$items_table->addRow(array(
 				new CCheckBox('group_gid['.$id.']', isset($group_gid[$id])),
@@ -410,8 +414,10 @@ function valueComparisonFormForMultiplePeriods() {
 
 	$itemName = '';
 	if ($itemId) {
-		$itemName = get_item_by_itemid($itemId);
-		$itemName = itemName($itemName);
+		$items = CMacrosResolverHelper::resolveItemName(array(get_item_by_itemid($itemId)));
+		$item = reset($items);
+
+		$itemName = $item['name'];
 	}
 
 	$itemidVar = new CVar('itemid', $itemId, 'itemid');

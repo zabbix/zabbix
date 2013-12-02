@@ -404,15 +404,15 @@ class CMacrosResolverHelper {
 	 * @param string $items[n]['hostid']
 	 * @param string $items[n]['name']
 	 * @param string $items[n]['key_']
-	 * @param bool   $resolveAllItemsKeys
+	 * @param bool   $resolveKeys
 	 *
 	 * @return array
 	 */
-	public static function resolveItemName(array $items, $resolveAllItemsKeys = false) {
+	public static function resolveItemName(array $items, $resolveKeys = false) {
 		self::init();
 
 		return self::$macrosResolver->resolve(array(
-			'config' => $resolveAllItemsKeys ? 'itemNameAndKey' : 'itemName',
+			'config' => $resolveKeys ? 'itemNameAndKey' : 'itemName',
 			'data' => $items
 		));
 	}

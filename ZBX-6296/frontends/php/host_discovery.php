@@ -327,6 +327,8 @@ else {
 		'limit' => $config['search_limit'] + 1
 	));
 
+	$data['discoveries'] = CMacrosResolverHelper::resolveItemName($data['discoveries']);
+
 	// determine, show or not column of errors
 	$data['showErrorColumn'] = ($host['status'] != HOST_STATUS_TEMPLATE);
 

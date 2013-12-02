@@ -824,7 +824,7 @@ elseif ($srctbl == 'items') {
 		'nodeids' => $nodeId,
 		'hostids' => $hostid,
 		'webitems' => true,
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('itemid', 'hostid', 'name', 'key_', 'type', 'value_type', 'status', 'state'),
 		'selectHosts' => array('hostid', 'name'),
 		'preservekeys' => true
 	);
@@ -844,6 +844,8 @@ elseif ($srctbl == 'items') {
 	$items = API::Item()->get($options);
 	order_result($items, 'name', ZBX_SORT_UP);
 
+	$items = CMacrosResolverHelper::resolveItemName($items);
+
 	if ($multiselect) {
 		$jsItems = array();
 	}
@@ -852,7 +854,6 @@ elseif ($srctbl == 'items') {
 		$host = reset($item['hosts']);
 		$item['hostname'] = $host['name'];
 
-		$item['name'] = itemName($item);
 		$description = new CLink($item['name'], '#');
 		$item['name'] = $item['hostname'].NAME_DELIMITER.$item['name'];
 
@@ -953,10 +954,11 @@ elseif ($srctbl == 'prototypes') {
 	$items = API::ItemPrototype()->get($options);
 	order_result($items, 'name');
 
+	$items = CMacrosResolverHelper::resolveItemName($items);
+
 	foreach ($items as &$item) {
 		$host = reset($item['hosts']);
 
-		$item['name'] = itemName($item);
 		$description = new CSpan($item['name'], 'link');
 		$item['name'] = $host['name'].NAME_DELIMITER.$item['name'];
 

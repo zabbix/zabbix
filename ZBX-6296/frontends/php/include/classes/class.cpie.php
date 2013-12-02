@@ -34,15 +34,17 @@ class CPie extends CGraphDraw {
 	/********************************************************************************************************/
 	/* PRE CONFIG: ADD / SET / APPLY
 	/********************************************************************************************************/
-	public function addItem($itemid, $calc_fnc = CALC_FNC_AVG, $color = null, $type = null) {
-		$this->items[$this->num] = get_item_by_itemid($itemid);
-		$this->items[$this->num]['name'] = itemName($this->items[$this->num]);
+	public function addItem($itemId, $calcFnc = CALC_FNC_AVG, $color = null, $type = null) {
+		$items = CMacrosResolverHelper::resolveItemName(array(get_item_by_itemid($itemId)));
+
+		$this->items[$this->num] = reset($items);
+
 		$host = get_host_by_hostid($this->items[$this->num]['hostid']);
 
 		$this->items[$this->num]['hostname'] = $host['name'];
-		$this->items[$this->num]['color'] = is_null($color) ? 'Dark Green' : $color;
-		$this->items[$this->num]['calc_fnc'] = is_null($calc_fnc) ? CALC_FNC_AVG : $calc_fnc;
-		$this->items[$this->num]['calc_type'] = is_null($type) ? GRAPH_ITEM_SIMPLE : $type;
+		$this->items[$this->num]['color'] = ($color === null) ? 'Dark Green' : $color;
+		$this->items[$this->num]['calc_fnc'] = ($calcFnc === null) ? CALC_FNC_AVG : $calcFnc;
+		$this->items[$this->num]['calc_type'] = ($type === null) ? GRAPH_ITEM_SIMPLE : $type;
 
 		$this->num++;
 	}

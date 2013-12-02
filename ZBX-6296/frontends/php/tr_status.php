@@ -568,16 +568,11 @@ foreach ($triggers as $trigger) {
 
 	$triggerItems = array();
 
+	$trigger['items'] = CMacrosResolverHelper::resolveItemName($trigger['items']);
+
 	foreach ($trigger['items'] as $item) {
-		$itemName = itemName($item);
-
-		// if we have items from different hosts, we must prefix a host name
-		if ($usedHostCount > 1) {
-			$itemName = $usedHosts[$item['hostid']].NAME_DELIMITER.$itemName;
-		}
-
 		$triggerItems[] = array(
-			'name' => $itemName,
+			'name' => ($usedHostCount > 1) ? $usedHosts[$item['hostid']].NAME_DELIMITER.$item['name'] : $item['name'],
 			'params' => array(
 				'itemid' => $item['itemid'],
 				'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))

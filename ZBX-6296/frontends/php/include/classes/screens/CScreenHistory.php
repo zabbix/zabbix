@@ -104,9 +104,11 @@ class CScreenHistory extends CScreenBase {
 				'itemids' => $this->itemids,
 				'webitems' => true,
 				'selectHosts' => array('name'),
-				'output' => array('itemid', 'key_', 'name', 'value_type', 'valuemapid'),
+				'output' => array('itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid'),
 				'preservekeys' => true
 			));
+
+			$this->items = CMacrosResolverHelper::resolveItemName($this->items);
 
 			$this->item = reset($this->items);
 		}
@@ -215,7 +217,7 @@ class CScreenHistory extends CScreenBase {
 						$row = array(nbsp(zbx_date2str(_('Y.M.d H:i:s'), $data['clock'])));
 
 						if ($isManyItems) {
-							$row[] = $host['name'].NAME_DELIMITER.itemName($item);
+							$row[] = $host['name'].NAME_DELIMITER.$item['name'];
 						}
 
 						if ($useLogItem) {

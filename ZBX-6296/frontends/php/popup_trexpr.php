@@ -616,17 +616,20 @@ if (!isset($function)) {
 
 if ($itemId) {
 	$items = API::Item()->get(array(
-		'output' => array('itemid', 'key_', 'name'),
+		'output' => array('itemid', 'hostid', 'name', 'key_'),
 		'itemids' => $itemId,
 		'webitems' => true,
 		'selectHosts' => array('host'),
 		'filter' => array('flags' => null)
 	));
+
+	$items = CMacrosResolverHelper::resolveItemName($items);
+
 	$item = reset($items);
 	$itemKey = $item['key_'];
 	$itemHost = reset($item['hosts']);
 	$itemHost = $itemHost['host'];
-	$description = $itemHost.NAME_DELIMITER.itemName($item);
+	$description = $itemHost.NAME_DELIMITER.$item['name'];
 }
 else {
 	$itemKey = $itemHost = $description = '';

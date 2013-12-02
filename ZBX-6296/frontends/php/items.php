@@ -1038,9 +1038,10 @@ else {
 			}
 		}
 
+		$data['items'] = CMacrosResolverHelper::resolveItemName($data['items']);
+
 		foreach ($data['items'] as &$item) {
 			$item['hostids'] = zbx_objectValues($item['hosts'], 'hostid');
-			$item['name_expanded'] = itemName($item);
 
 			if (empty($data['filter_hostid'])) {
 				$host = reset($item['hosts']);

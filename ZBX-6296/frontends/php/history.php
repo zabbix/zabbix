@@ -137,6 +137,8 @@ foreach ($_REQUEST['itemid'] as $itemid) {
 	}
 }
 
+$items = CMacrosResolverHelper::resolveItemName($items);
+
 $item = reset($items);
 $host = reset($item['hosts']);
 $item['hostname'] = $host['name'];

@@ -360,6 +360,7 @@ else {
 
 	// get items
 	$sortfield = getPageSortField('name');
+
 	$data['items'] = API::ItemPrototype()->get(array(
 		'discoveryids' => $data['parent_discoveryid'],
 		'output' => API_OUTPUT_EXTEND,
@@ -368,6 +369,8 @@ else {
 		'sortfield' => $sortfield,
 		'limit' => $config['search_limit'] + 1
 	));
+
+	$data['items'] = CMacrosResolverHelper::resolveItemName($data['items']);
 
 	if (!empty($data['items'])) {
 		order_result($data['items'], $sortfield, getPageSortOrder());

@@ -68,7 +68,7 @@ foreach ($this->data['items'] as $item) {
 		$description[] = NAME_DELIMITER;
 	}
 	$description[] = new CLink(
-		itemName($item),
+		$item['name'],
 		'?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$this->data['parent_discoveryid']
 	);
 

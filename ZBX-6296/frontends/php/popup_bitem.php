@@ -58,7 +58,10 @@ $_REQUEST['caption'] = get_request('caption', '');
 $_REQUEST['axisside'] = get_request('axisside',	GRAPH_YAXIS_SIDE_LEFT);
 
 if (zbx_empty($_REQUEST['caption']) && isset($_REQUEST['itemid']) && $_REQUEST['itemid'] > 0) {
-	$_REQUEST['caption'] = itemName(get_item_by_itemid($_REQUEST['itemid']));
+	$items = CMacrosResolverHelper::resolveItemName(array(get_item_by_itemid($_REQUEST['itemid'])));
+	$item = reset($items);
+
+	$_REQUEST['caption'] = $item['name'];
 }
 
 insert_js_function('add_bitem');
