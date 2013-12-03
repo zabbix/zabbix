@@ -57,6 +57,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'source' => 'comments',
 			'method' => 'resolveTrigger'
 		),
+		'triggerExpressionUser' => array(
+			'types' => array('user'),
+			'source' => 'expression',
+			'method' => 'resolveTrigger'
+		),
 		'eventDescription' => array(
 			'types' => array('host', 'interfaceWithPriorities', 'user', 'item', 'reference'),
 			'source' => 'description',
@@ -68,16 +73,20 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'method' => 'resolveGraph'
 		),
 		'itemName' => array(
-			'types' => array('name'),
+			'types' => array('itemUser'),
+			'method' => 'resolveItems'
+		),
+		'itemNameAndKey' => array(
+			'types' => array('allKeys', 'itemUser', 'keyHost', 'keyUser'),
 			'method' => 'resolveItems'
 		),
 		'itemKey' => array(
-			'types' => array('key'),
+			'types' => array('keyHost', 'keyUser'),
 			'method' => 'resolveItemKeys'
 		),
-		'itemNameAndKey' => array(
-			'types' => array('item', 'key'),
-			'method' => 'resolveItems'
+		'itemKeyUser' => array(
+			'types' => array('keyUser'),
+			'method' => 'resolveItemKeys'
 		)
 	);
 
@@ -349,7 +358,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * Resolve macros in trigger.
 	 *
 	 * @param array  $data								(as int $triggerId => array $trigger)
-	 * @param string $data[$triggerId]['hosts']			to resolve user macros (optional)
 	 * @param string $data[$triggerId]['expression']
 	 * @param string $data[$triggerId]['description']	depend from config
 	 * @param string $data[$triggerId]['comments']		depend from config
@@ -754,10 +762,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$items = zbx_toHash($items, 'itemid');
 
 		// user macros
-		$items = $this->resolveItemUserMacros($items, 'name');
+		if ($this->isTypeAvailable('itemUser')) {
+			$items = $this->resolveItemUserMacros($items, 'name');
+		}
 
 		// macros in item key
-		if ($this->isTypeAvailable('key')) {
+		if ($this->isTypeAvailable('allKeys')) {
 			$items = $this->resolveItemKeys($items);
 		}
 
@@ -772,7 +782,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		if ($itemsWithMacros) {
 			// macros in item key
-			if (!$this->isTypeAvailable('key')) {
+			if (!$this->isTypeAvailable('allKeys')) {
 				$itemsWithMacros = $this->resolveItemKeys($itemsWithMacros);
 			}
 
@@ -815,82 +825,86 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	private function resolveItemKeys(array $items) {
 		$items = zbx_toHash($items, 'itemid');
 
-		// host and ip macros
-		$itemMacros = array();
+		// host macros
+		if ($this->isTypeAvailable('keyHost')) {
+			$itemMacros = array();
 
-		foreach ($items as $item) {
-			$macros = $this->findMacros(self::PATTERN_ITEM_MACROS, array($item['key_']));
+			foreach ($items as $item) {
+				$macros = $this->findMacros(self::PATTERN_ITEM_MACROS, array($item['key_']));
 
-			if ($macros) {
-				$itemMacros[$item['itemid']] = $macros;
+				if ($macros) {
+					$itemMacros[$item['itemid']] = $macros;
+				}
 			}
-		}
 
-		if ($itemMacros) {
-			$dbItems = API::Item()->get(array(
-				'itemids' => array_keys($itemMacros),
-				'selectInterfaces' => array('ip', 'dns', 'useip'),
-				'selectHosts' => array('host', 'name'),
-				'webitems' => true,
-				'output' => array('itemid'),
-				'filter' => array('flags' => null),
-				'preservekeys' => true
-			));
+			if ($itemMacros) {
+				$dbItems = API::Item()->get(array(
+					'itemids' => array_keys($itemMacros),
+					'selectInterfaces' => array('ip', 'dns', 'useip'),
+					'selectHosts' => array('host', 'name'),
+					'webitems' => true,
+					'output' => array('itemid'),
+					'filter' => array('flags' => null),
+					'preservekeys' => true
+				));
 
-			foreach ($dbItems as $dbItem) {
-				$itemId = $dbItem['itemid'];
-				$host = reset($dbItem['hosts']);
-				$interface = reset($dbItem['interfaces']);
+				foreach ($dbItems as $dbItem) {
+					$itemId = $dbItem['itemid'];
+					$host = reset($dbItem['hosts']);
+					$interface = reset($dbItem['interfaces']);
 
-				// if item without interface or template item, resolve interface related macros to *UNKNOWN*
-				if (!$interface) {
-					$interface = array(
-						'ip' => UNRESOLVED_MACRO_STRING,
-						'dns' => UNRESOLVED_MACRO_STRING,
-						'useip' => false
-					);
-				}
-
-				$key = $items[$itemId]['key_'];
-
-				foreach ($itemMacros[$itemId] as $macro) {
-					switch ($macro) {
-						case '{HOST.NAME}':
-							$key = str_replace('{HOST.NAME}', $host['name'], $key);
-							break;
-
-						case '{HOSTNAME}': // deprecated
-							$key = str_replace('{HOSTNAME}', $host['host'], $key);
-							break;
-
-						case '{HOST.HOST}':
-							$key = str_replace('{HOST.HOST}', $host['host'], $key);
-							break;
-
-						case '{HOST.IP}':
-							$key = str_replace('{HOST.IP}', $interface['ip'], $key);
-							break;
-
-						case '{IPADDRESS}': // deprecated
-							$key = str_replace('{IPADDRESS}', $interface['ip'], $key);
-							break;
-
-						case '{HOST.DNS}':
-							$key = str_replace('{HOST.DNS}', $interface['dns'], $key);
-							break;
-
-						case '{HOST.CONN}':
-							$key = str_replace('{HOST.CONN}', $interface['useip'] ? $interface['ip'] : $interface['dns'], $key);
-							break;
+					// if item without interface or template item, resolve interface related macros to *UNKNOWN*
+					if (!$interface) {
+						$interface = array(
+							'ip' => UNRESOLVED_MACRO_STRING,
+							'dns' => UNRESOLVED_MACRO_STRING,
+							'useip' => false
+						);
 					}
-				}
 
-				$items[$itemId]['key_'] = $key;
+					$key = $items[$itemId]['key_'];
+
+					foreach ($itemMacros[$itemId] as $macro) {
+						switch ($macro) {
+							case '{HOST.NAME}':
+								$key = str_replace('{HOST.NAME}', $host['name'], $key);
+								break;
+
+							case '{HOSTNAME}': // deprecated
+								$key = str_replace('{HOSTNAME}', $host['host'], $key);
+								break;
+
+							case '{HOST.HOST}':
+								$key = str_replace('{HOST.HOST}', $host['host'], $key);
+								break;
+
+							case '{HOST.IP}':
+								$key = str_replace('{HOST.IP}', $interface['ip'], $key);
+								break;
+
+							case '{IPADDRESS}': // deprecated
+								$key = str_replace('{IPADDRESS}', $interface['ip'], $key);
+								break;
+
+							case '{HOST.DNS}':
+								$key = str_replace('{HOST.DNS}', $interface['dns'], $key);
+								break;
+
+							case '{HOST.CONN}':
+								$key = str_replace('{HOST.CONN}', $interface['useip'] ? $interface['ip'] : $interface['dns'], $key);
+								break;
+						}
+					}
+
+					$items[$itemId]['key_'] = $key;
+				}
 			}
 		}
 
 		// user macros
-		$items = $this->resolveItemUserMacros($items, 'key_');
+		if ($this->isTypeAvailable('keyUser')) {
+			$items = $this->resolveItemUserMacros($items, 'key_');
+		}
 
 		return $items;
 	}

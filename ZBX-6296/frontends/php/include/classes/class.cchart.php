@@ -451,7 +451,8 @@ class CChart extends CGraphDraw {
 					continue;
 				}
 
-				$trigger = API::UserMacro()->resolveTrigger($trigger);
+				$trigger['expression'] = CMacrosResolverHelper::resolveTriggerExpressionUserMacro($trigger);
+
 				if (!preg_match('/^\{([0-9]+)\}\s*?([\<\>\=]{1})\s*?([\-0-9\.]+)([TGMKsmhdw]?)$/', $trigger['expression'], $arr)) {
 					continue;
 				}

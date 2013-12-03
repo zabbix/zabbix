@@ -291,6 +291,33 @@ class CMacrosResolverHelper {
 	}
 
 	/**
+	 * Resolve user macros in trigger expression.
+	 *
+	 * @static
+	 *
+	 * @param array $trigger
+	 * @param array $trigger['triggerid']
+	 * @param array $trigger['expression']
+	 *
+	 * @return string
+	 */
+	public static function resolveTriggerExpressionUserMacro(array $trigger) {
+		if (zbx_empty($trigger['expression'])) {
+			return $trigger['expression'];
+		}
+
+		self::init();
+
+		$triggers = self::$macrosResolver->resolve(array(
+			'config' => 'triggerExpressionUser',
+			'data' => zbx_toHash(array($trigger), 'triggerid')
+		));
+		$trigger = reset($triggers);
+
+		return $trigger['expression'];
+	}
+
+	/**
 	 * Resolve macros in event description.
 	 *
 	 * @static
@@ -415,6 +442,48 @@ class CMacrosResolverHelper {
 			'config' => $resolveKeys ? 'itemNameAndKey' : 'itemName',
 			'data' => $items
 		));
+	}
+
+	/**
+	 * Resolve user macros in item key.
+	 *
+	 * @static
+	 *
+	 * @param array  $items
+	 * @param string $items[n]['itemid']
+	 * @param string $items[n]['hostid']
+	 * @param string $items[n]['key_']
+	 *
+	 * @return array
+	 */
+	public static function resolveItemKeyUserMacros(array $items) {
+		self::init();
+
+		return self::$macrosResolver->resolve(array(
+			'config' => 'itemKeyUser',
+			'data' => $items
+		));
+	}
+
+	/**
+	 * Resolve user macros in item key.
+	 *
+	 * @static
+	 *
+	 * @param array  $items
+	 * @param string $items[n]['itemid']
+	 * @param string $items[n]['hostid']
+	 * @param string $items[n]['key_']
+	 *
+	 * @return array
+	 */
+	public static function resolveItemKeyUserMacro(array $item) {
+		self::init();
+
+		$items = self::resolveItemKeyUserMacros(array($item));
+		$item = reset($items);
+
+		return $item['key_'];
 	}
 
 	/**
