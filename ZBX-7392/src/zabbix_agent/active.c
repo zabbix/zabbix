@@ -528,7 +528,7 @@ static int	check_response(char *response)
 	struct zbx_json_parse	jp;
 	char			value[MAX_STRING_LEN];
 	char			info[MAX_STRING_LEN];
-	int			ret = SUCCEED;
+	int			ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() response:'%s'", __function_name, response);
 
