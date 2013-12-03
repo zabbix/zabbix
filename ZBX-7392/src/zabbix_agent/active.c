@@ -740,7 +740,7 @@ static int	process_value(
 {
 	const char			*__function_name = "process_value";
 	ZBX_ACTIVE_BUFFER_ELEMENT	*el = NULL;
-	int				i = 0, ret = FAIL;
+	int				i, ret = FAIL;
 	size_t				sz;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s:%s' value:'%s'", __function_name, host, key, value);
