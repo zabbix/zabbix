@@ -306,10 +306,10 @@ static int	zbx_check_user_parameter(const char *param, char *error, int max_erro
 
 static int	replace_param(const char *cmd, const char *param, char *out, int outlen, char *error, int max_error_len)
 {
-	int		ret = SUCCEED;
-	char		buf[MAX_STRING_LEN];
-	char		command[MAX_STRING_LEN];
-	char		*pl, *pr;
+	int	ret = SUCCEED;
+	char	buf[MAX_STRING_LEN];
+	char	command[MAX_STRING_LEN];
+	char	*pl, *pr;
 
 	assert(out);
 
