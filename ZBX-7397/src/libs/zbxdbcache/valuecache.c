@@ -122,36 +122,39 @@ typedef struct
 	/* the item state flags */
 	unsigned char	state;
 
-	/* the flag indicating that all data from DB are cached  */
+	/* the flag indicating that all data from DB are cached       */
 	unsigned char	cached_all;
 
-	/* The total number of item values in cache.               */
-	/* Used to evaluate if the item must be dropped from cache */
-	/* in low memory situation.                                */
+	/* The total number of item values in cache.                  */
+	/* Used to evaluate if the item must be dropped from cache    */
+	/* in low memory situation.                                   */
 	int		values_total;
 
-	/* The last time when item cache was accessed.             */
-	/* Used to evaluate if the item must be dropped from cache */
-	/* in low memory situation.                                */
+	/* The last time when item cache was accessed.                */
+	/* Used to evaluate if the item must be dropped from cache    */
+	/* in low memory situation.                                   */
 	int		last_accessed;
 
-	/* reference counter indicating number of processes        */
-	/* accessing item                                          */
+	/* reference counter indicating number of processes           */
+	/* accessing item                                             */
 	int		refcount;
 
-	/* The number of cache hits for this item.                 */
-	/* Used to evaluate if the item must be dropped from cache */
-	/* in low memory situation.                                */
-	zbx_uint64_t	hits;
-
-	/* The range of the largest request in seconds.          */
-	/* Used to determine if data can be removed from cache.  */
+	/* The range of the largest request in seconds.               */
+	/* Used to determine if data can be removed from cache.       */
 	int		range;
 
-	/* the last (newest) chunk if item history data          */
+	/* the maximum number of records returned by a single request */
+	int		max_response;
+
+	/* The number of cache hits for this item.                    */
+	/* Used to evaluate if the item must be dropped from cache    */
+	/* in low memory situation.                                   */
+	zbx_uint64_t	hits;
+
+	/* the last (newest) chunk if item history data               */
 	zbx_vc_chunk_t	*head;
 
-	/* the first (oldest) chunk if item history data         */
+	/* the first (oldest) chunk if item history data              */
 	zbx_vc_chunk_t	*tail;
 }
 zbx_vc_item_t;
@@ -260,7 +263,7 @@ static void	row2value_log(history_value_t *value, DB_ROW row)
 	value->log->timestamp = atoi(row[0]);
 	value->log->logeventid = atoi(row[1]);
 	value->log->severity = atoi(row[2]);
-	value->log->source = zbx_strdup(NULL, row[3]);
+	value->log->source = '\0' == *row[3] ? NULL : zbx_strdup(NULL, row[3]);
 	value->log->value = zbx_strdup(NULL, row[4]);
 }
 
@@ -1930,7 +1933,7 @@ static void	vch_item_clean_cache(zbx_vc_item_t *item)
 		zbx_vc_chunk_t	*chunk = tail;
 		int		timestamp;
 
-		timestamp = ZBX_VC_TIME() - item->range - SEC_PER_MIN;
+		timestamp = ZBX_VC_TIME() - item->range;
 
 		/* try to remove chunks with all history values older than maximum request range */
 		while (NULL != chunk && chunk->slots[chunk->last_value].timestamp.sec < timestamp)
@@ -1986,7 +1989,7 @@ static void	vch_item_clean_cache(zbx_vc_item_t *item)
  ******************************************************************************/
 static int	vch_item_add_values_at_end(zbx_vc_item_t *item, const zbx_history_record_t *values, int values_num)
 {
-	int				copied = 0, ret = FAIL, count = values_num;
+	int				copied = 0, ret = FAIL, count = values_num, chunk_slots;
 	zbx_vector_history_record_t	values_ext = {NULL};
 	zbx_vc_chunk_t			*head = item->head;
 
@@ -2011,7 +2014,12 @@ static int	vch_item_add_values_at_end(zbx_vc_item_t *item, const zbx_history_rec
 
 			now = ZBX_VC_TIME();
 			if (now - values[start - 1].timestamp.sec <= item->range)
+			{
 				item->range = now - values[start - 1].timestamp.sec - 1;
+
+				if (SEC_PER_MIN > item->range)
+					item->range = SEC_PER_MIN;
+			}
 		}
 
 		if (start >= values_num)
@@ -2060,6 +2068,16 @@ static int	vch_item_add_values_at_end(zbx_vc_item_t *item, const zbx_history_rec
 		count = values_ext.values_num;
 	}
 
+	/* Calculate the optimal number of slots for new chunks.                    */
+	/* If the number of max requested values is much less than the total number */
+	/* of cached values it suggests that timeshift requests were issued and     */
+	/* the total number of values must also be used to calculate slot count for */
+	/* the new chunk.                                                           */
+	if (item->max_response > item->values_total / 4)
+		chunk_slots = (item->max_response + 1) / 2;
+	else
+		chunk_slots = (item->max_response + item->values_total + 1) / 4;
+
 	while (count)
 	{
 		int	copy_slots, nslots = 0;
@@ -2073,7 +2091,7 @@ static int	vch_item_add_values_at_end(zbx_vc_item_t *item, const zbx_history_rec
 			/* When appending values (adding newer data) keep the chunk slot count at the half  */
 			/* of max values per request. This way the memory taken by item cache will be:      */
 			/*   3 * (<max values per request> * <slot count> + <chunk header size> )           */
-			nslots = vch_get_new_chunk_slot_count(item->values_total / 2 + 1);
+			nslots = vch_get_new_chunk_slot_count(chunk_slots);
 
 			if (FAIL == vch_item_add_chunk(item, nslots, NULL))
 				goto out;
@@ -2124,7 +2142,7 @@ out:
 static int	vch_item_add_values_at_beginning(zbx_vc_item_t *item, const zbx_history_record_t *values,
 		int values_num)
 {
-	int 	count = values_num, ret = FAIL;
+	int 	count = values_num, ret = FAIL, chunk_slots;
 
 	/* skip values already added to the item cache by another process */
 	if (NULL != item->tail)
@@ -2135,6 +2153,8 @@ static int	vch_item_add_values_at_beginning(zbx_vc_item_t *item, const zbx_histo
 			;
 		++count;
 	}
+
+	chunk_slots = count / 2;
 
 	while (count)
 	{
@@ -2147,7 +2167,7 @@ static int	vch_item_add_values_at_beginning(zbx_vc_item_t *item, const zbx_histo
 		if (0 == nslots)
 		{
 			/* when inserting before existing data reserve space only to fit the request */
-			nslots = vch_get_new_chunk_slot_count(count);
+			nslots = vch_get_new_chunk_slot_count(chunk_slots);
 
 			if (FAIL == vch_item_add_chunk(item, nslots, item->tail))
 				goto out;
@@ -2324,8 +2344,13 @@ static int	vch_item_get_values_by_time(zbx_vc_item_t *item, zbx_vector_history_r
 	/* range which might be greater than the current request range.        */
 	if (0 != item->range || 0 == item->cached_all)
 	{
-		if (item->range < seconds + now - timestamp)
+		if (item->range <= seconds + now - timestamp)
+		{
 			item->range = seconds + now - timestamp;
+
+			if (SEC_PER_MIN > item->range)
+				item->range = SEC_PER_MIN;
+		}
 	}
 
 	if (FAIL == vch_item_get_last_value(item, timestamp, &chunk, &index))
@@ -2402,8 +2427,13 @@ static int	vch_item_get_values_by_count(zbx_vc_item_t *item,  zbx_vector_history
 	/* to the maximum request range.                                        */
 	if (values->values_num == count)
 	{
-		if (item->range < now - values->values[values->values_num - 1].timestamp.sec)
+		if (item->range <= now - values->values[values->values_num - 1].timestamp.sec)
+		{
 			item->range = now - values->values[values->values_num - 1].timestamp.sec;
+
+			if (SEC_PER_MIN > item->range)
+				item->range = SEC_PER_MIN;
+		}
 	}
 out:
 	if (values->values_num < count)
@@ -2484,6 +2514,9 @@ static int	vch_item_get_value_range(zbx_vc_item_t *item,  zbx_vector_history_rec
 	hits = values->values_num - records_read;
 	misses = records_read;
 
+	if (values->values_num > item->max_response)
+		item->max_response = values->values_num;
+
 	vc_update_statistics(item, hits, misses);
 out:
 	return ret;
@@ -2540,8 +2573,16 @@ static int	vch_item_get_value(zbx_vc_item_t *item, const zbx_timespec_t *ts, zbx
 
 	vc_history_record_copy(value, &chunk->slots[index], item->value_type);
 
-	if (item->range < now - value->timestamp.sec)
+	if (item->range <= now - value->timestamp.sec)
+	{
 		item->range = now - value->timestamp.sec;
+
+		if (SEC_PER_MIN > item->range)
+			item->range = SEC_PER_MIN;
+	}
+
+	if (1 > item->max_response)
+		item->max_response = 1;
 
 	*found = 1;
 out:
