@@ -9,6 +9,7 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, It
 ....I..PS. [ZBXNEXT-1257] dropped support for UCD-SNMP (asaveljevs)
 
 Bug fixes:
+.......PS. [ZBX-7332] properly restore the original memory chunk after shared memory realloc fails, otherwise it could trigger a crash when syncing history at exit (wiper)
 ..F....... [ZBX-7373] improved performance of pages that use latest history values; thanks to Kenneth Palmertree and Maksim Tkachenko (Pavels)
 ..F....... [ZBX-7447] fixed regex configuration form not being displayed in French and Italian languages (Pavels)
 ...G...... [ZBX-7444] fixed agent crash on HP-UX when processing proc.num[] item (asaveljevs)
