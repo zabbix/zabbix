@@ -84,34 +84,6 @@ elseif (hasRequest('cancel') || hasRequest('finish')) {
 	redirect('index.php');
 }
 
-$ZBX_CONFIG['allowed_db'] = array();
-// MYSQL
-if (zbx_is_callable(array('mysqli_connect', 'mysqli_connect_error', 'mysqli_error', 'mysqli_query',
-		'mysqli_fetch_assoc', 'mysqli_free_result', 'mysqli_real_escape_string', 'mysqli_close'))) {
-	$ZBX_CONFIG['allowed_db']['MYSQL'] = 'MySQL';
-}
-// POSTGRESQL
-if (zbx_is_callable(array('pg_pconnect', 'pg_fetch_array', 'pg_fetch_row', 'pg_exec', 'pg_getlastoid'))) {
-	$ZBX_CONFIG['allowed_db']['POSTGRESQL'] = 'PostgreSQL';
-}
-// ORACLE
-if (zbx_is_callable(array('oci_connect', 'oci_error', 'oci_parse', 'oci_execute', 'oci_fetch_assoc',
-		'oci_commit', 'oci_close', 'oci_rollback', 'oci_field_type', 'oci_new_descriptor',
-		'oci_bind_by_name', 'oci_free_statement'))) {
-	$ZBX_CONFIG['allowed_db']['ORACLE'] = 'Oracle';
-}
-// IBM_DB2
-if (zbx_is_callable(array('db2_connect', 'db2_set_option', 'db2_prepare', 'db2_execute', 'db2_fetch_assoc'))) {
-	$ZBX_CONFIG['allowed_db']['IBM_DB2'] = 'IBM DB2';
-}
-// SQLITE3. The false is here to avoid autoloading of the class.
-if (class_exists('SQLite3', false) && zbx_is_callable(array('ftok', 'sem_acquire', 'sem_release', 'sem_get'))) {
-	$ZBX_CONFIG['allowed_db']['SQLITE3'] = 'SQLite3';
-}
-if (count($ZBX_CONFIG['allowed_db']) == 0) {
-	$ZBX_CONFIG['allowed_db']['no'] = 'No';
-}
-
 /*
  * Setup wizard
  */
