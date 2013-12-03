@@ -101,8 +101,9 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 
 		$items = CMacrosResolverHelper::resolveItemName(array(get_item_by_itemid($itemid)));
+		$item = reset($items);
 
-		$this->items[$this->num] = reset($items);
+		$this->items[$this->num] = $item;
 		$this->items[$this->num]['delay'] = getItemDelay($item['delay'], $item['delay_flex']);
 
 		if (strpos($item['units'], ',') !== false) {

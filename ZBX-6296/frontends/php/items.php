@@ -1027,6 +1027,7 @@ else {
 	if (!empty($data['items'])) {
 		// fill template host
 		fillItemsWithChildTemplates($data['items']);
+
 		$dbHostItems = DBselect(
 			'SELECT i.itemid,h.name,h.hostid'.
 			' FROM hosts h,items i'.
@@ -1034,13 +1035,21 @@ else {
 				' AND '.dbConditionInt('i.itemid', zbx_objectValues($data['items'], 'templateid'))
 		);
 		while ($dbHostItem = DBfetch($dbHostItems)) {
-			foreach ($data['items'] as $itemid => $item) {
+			foreach ($data['items'] as &$item) {
 				if ($item['templateid'] == $dbHostItem['itemid']) {
-					$data['items'][$itemid]['template_host'] = $dbHostItem;
+					$item['template_host'] = $dbHostItem;
 				}
 			}
+			unset($item);
 		}
 
+		// save original item key
+		foreach ($data['items'] as &$item) {
+			$item['key_orig'] = $item['key_'];
+		}
+		unset($item);
+
+		// resolve name macros
 		$data['items'] = CMacrosResolverHelper::resolveItemName($data['items']);
 
 		foreach ($data['items'] as &$item) {

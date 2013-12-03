@@ -327,6 +327,12 @@ else {
 		'limit' => $config['search_limit'] + 1
 	));
 
+	// save original discovery key
+	foreach ($data['discoveries'] as &$discovery) {
+		$discovery['key_orig'] = $discovery['key_'];
+	}
+	unset($discovery);
+
 	$data['discoveries'] = CMacrosResolverHelper::resolveItemName($data['discoveries']);
 
 	// determine, show or not column of errors

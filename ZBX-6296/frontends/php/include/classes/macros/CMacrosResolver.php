@@ -73,7 +73,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'method' => 'resolveGraph'
 		),
 		'itemName' => array(
-			'types' => array('itemUser'),
+			'types' => array('itemUser', 'keyHost', 'keyUser'),
 			'method' => 'resolveItems'
 		),
 		'itemNameAndKey' => array(
@@ -759,8 +759,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @return array
 	 */
 	private function resolveItems(array $items) {
-		$items = zbx_toHash($items, 'itemid');
-
 		// user macros
 		if ($this->isTypeAvailable('itemUser')) {
 			$items = $this->resolveItemUserMacros($items, 'name');
@@ -774,9 +772,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// reference macros - $1..$9
 		$itemsWithMacros = array();
 
-		foreach ($items as $item) {
+		foreach ($items as $key => $item) {
 			if (preg_match(self::PATTERN_ITEM_NUMBER, $item['name'])) {
-				$itemsWithMacros[$item['itemid']] = $item;
+				$itemsWithMacros[$key] = $item;
 			}
 		}
 
@@ -786,7 +784,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				$itemsWithMacros = $this->resolveItemKeys($itemsWithMacros);
 			}
 
-			foreach ($itemsWithMacros as $item) {
+			foreach ($itemsWithMacros as $key => $item) {
 				// parsing key to get the parameters out of it
 				$itemKey = new CItemKey($item['key_']);
 
@@ -805,7 +803,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 
 				// set resolved item
-				$items[$item['itemid']] = $item;
+				$items[$key] = $item;
 			}
 		}
 
@@ -823,8 +821,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @return array
 	 */
 	private function resolveItemKeys(array $items) {
-		$items = zbx_toHash($items, 'itemid');
-
 		// host macros
 		if ($this->isTypeAvailable('keyHost')) {
 			$itemMacros = array();
@@ -862,41 +858,46 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						);
 					}
 
-					$key = $items[$itemId]['key_'];
+					foreach ($items as &$item) {
+						if ($item['itemid'] == $itemId) {
+							foreach ($itemMacros[$itemId] as $macro) {
+								switch ($macro) {
+									case '{HOST.NAME}':
+										$item['key_'] = str_replace('{HOST.NAME}', $host['name'], $item['key_']);
+										break;
 
-					foreach ($itemMacros[$itemId] as $macro) {
-						switch ($macro) {
-							case '{HOST.NAME}':
-								$key = str_replace('{HOST.NAME}', $host['name'], $key);
-								break;
+									case '{HOSTNAME}': // deprecated
+										$item['key_'] = str_replace('{HOSTNAME}', $host['host'], $item['key_']);
+										break;
 
-							case '{HOSTNAME}': // deprecated
-								$key = str_replace('{HOSTNAME}', $host['host'], $key);
-								break;
+									case '{HOST.HOST}':
+										$item['key_'] = str_replace('{HOST.HOST}', $host['host'], $item['key_']);
+										break;
 
-							case '{HOST.HOST}':
-								$key = str_replace('{HOST.HOST}', $host['host'], $key);
-								break;
+									case '{HOST.IP}':
+										$item['key_'] = str_replace('{HOST.IP}', $interface['ip'], $item['key_']);
+										break;
 
-							case '{HOST.IP}':
-								$key = str_replace('{HOST.IP}', $interface['ip'], $key);
-								break;
+									case '{IPADDRESS}': // deprecated
+										$item['key_'] = str_replace('{IPADDRESS}', $interface['ip'], $item['key_']);
+										break;
 
-							case '{IPADDRESS}': // deprecated
-								$key = str_replace('{IPADDRESS}', $interface['ip'], $key);
-								break;
+									case '{HOST.DNS}':
+										$item['key_'] = str_replace('{HOST.DNS}', $interface['dns'], $item['key_']);
+										break;
 
-							case '{HOST.DNS}':
-								$key = str_replace('{HOST.DNS}', $interface['dns'], $key);
-								break;
-
-							case '{HOST.CONN}':
-								$key = str_replace('{HOST.CONN}', $interface['useip'] ? $interface['ip'] : $interface['dns'], $key);
-								break;
+									case '{HOST.CONN}':
+										$item['key_'] = str_replace(
+											'{HOST.CONN}',
+											$interface['useip'] ? $interface['ip'] : $interface['dns'],
+											$item['key_']
+										);
+										break;
+								}
+							}
 						}
 					}
-
-					$items[$itemId]['key_'] = $key;
+					unset($item);
 				}
 			}
 		}
