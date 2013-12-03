@@ -96,34 +96,34 @@ $table->setHeader(array(
 	_('Service'),
 	_('Parameter'),
 	_('SLV'),
-	_('Benchmark'),
+	_('Acceptable SLV'),
 	SPACE
 ));
 
 foreach ($this->data['services'] as $name => $services) {
-	if (count($services) > 1) {
+	if (count($services['parameters']) > 1) {
 		$table->addRow(array(
 			$name,
 			new CCol(SPACE, null, 4)
 		));
 
-		foreach ($services as $service) {
+		foreach ($services['parameters'] as $service) {
 			$table->addRow(array(
 				SPACE,
 				$service['ns'],
 				isset($service['slv']) ? $service['slv'] : '-',
-				isset($service['slv']) ? $service['slv'] : '-',
+				isset($services['acceptable_slv']) ? $services['acceptable_slv'] : '-',
 				new CLink('graph', 'history.php?action=showgraph&period=2592000&itemid=')
 			));
 		}
 	}
 	else {
-		$serviceValues = reset($services);
+		$serviceValues = reset($services['parameters']);
 		$table->addRow(array(
 			$name,
 			SPACE,
 			isset($serviceValues['slv']) ? $serviceValues['slv'] : '-',
-			isset($serviceValues['slv']) ? $serviceValues['slv'] : '-',
+			isset($services['acceptable_slv']) ? $services['acceptable_slv'] : '-',
 			new CLink('graph', 'history.php?action=showgraph&period=2592000&itemid=')
 		));
 	}

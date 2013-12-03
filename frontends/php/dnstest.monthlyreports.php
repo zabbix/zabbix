@@ -124,37 +124,46 @@ if ($data['filter_search']) {
 					case 'dnstest.slv.dns.ns.rtt.udp':
 						$newName = 'UDP DNS Resolution RTT';
 						$newKey = 'dnstest.dns.udp.rtt[{$DNSTEST.TLD},';
+						$macro = 'dnstest.configvalue[DNSTEST.SLV.DNS.UDP.RTT]';
 						break;
 					case 'dnstest.slv.dns.ns.rtt.tcp':
 						$newName = 'TCP DNS Resolution RTT';
 						$newKey = 'dnstest.dns.tcp.rtt[{$DNSTEST.TLD},';
+						$macro = 'dnstest.configvalue[DNSTEST.SLV.DNS.TCP.RTT]';
 						break;
 					case 'dnstest.slv.dns.ns.upd':
 						$newName = 'DNS update time';
 						$newKey = 'dnstest.dns.udp.upd[{$DNSTEST.TLD},';
+						$macro = 'dnstest.configvalue[DNSTEST.SLV.DNS.NS.UPD]';
 						break;
 					case 'dnstest.slv.dns.ns.month':
 						$newName = 'DNS Name Server availability';
 						$newKey = 'dnstest.slv.dns.ns.avail[';
+						$macro = 'dnstest.configvalue[DNSTEST.SLV.NS.AVAIL]';
 						break;
 					case 'dnstest.slv.rdds.43.rtt':
 						$newName = 'RDDS43 resolution RTT';
 						$newKey = 'dnstest.rdds.43.rtt[{$DNSTEST.TLD}]';
+						$macro = 'dnstest.configvalue[DNSTEST.SLV.RDDS43.RTT]';
 						break;
 					case 'dnstest.slv.rdds.80.rtt':
 						$newName = 'RDDS80 resolution RTT';
 						$newKey = 'dnstest.rdds.80.rtt[{$DNSTEST.TLD}]';
+						$macro = 'dnstest.configvalue[DNSTEST.SLV.RDDS80.RTT]';
 						break;
 					case 'dnstest.slv.rdds.upd':
 						$newName = 'RDDS update time';
 						$newKey = 'dnstest.rdds.43.upd[{$DNSTEST.TLD}]';
+						$macro = 'dnstest.configvalue[DNSTEST.SLV.RDDS.UPD]';
 				}
 
-				$data['services'][$newName][$item['itemid']]['ns'] = implode(': ', $itemKey->getParameters());
+				$data['services'][$newName]['parameters'][$item['itemid']]['ns'] = implode(': ', $itemKey->getParameters());
 
 				$itemIds[] = $item['itemid'];
 				$itemsAndServices[$item['itemid']] = $newName;
 				$newItemKeys[$item['itemid']] = $newKey;
+				$macroValue[$macro] = $item['itemid'];
+				$usedMacro[] = $macro;
 			}
 
 			// time limits
@@ -190,15 +199,42 @@ if ($data['filter_search']) {
 				$historyData = DBselect(
 					'SELECT h.value, h.itemid'.
 					' FROM history_uint h'.
-					' WHERE '.dbConditionInt('h.itemid',$itemIds).
-						' AND clock>='.$startTime.
-						' AND clock<'.$endTime
+					' WHERE '.dbConditionInt('h.itemid', $itemIds).
+						' AND h.clock>='.$startTime.
+						' AND h.clock<'.$endTime
 				);
 
 				while ($historyValue = DBfetch($historyData)) {
-					$data['services'][$itemsAndServices[$historyValue['itemid']]][$historyValue['itemid']]['slv'] = $historyValue['value'];
+					$data['services'][$itemsAndServices[$historyValue['itemid']]]['parameters'][$historyValue['itemid']]['slv'] = $historyValue['value'];
 				}
 
+				// get calculated items
+				$calculatedItems = API::Item()->get(array(
+					'output' => array('itemid', 'key_'),
+					'filter' => array(
+						'key_' => $usedMacro
+					),
+					'preservekeys' => true
+				));
+
+				$calculatedItemIds = array_keys($calculatedItems);
+
+				// get old value
+				foreach ($calculatedItemIds as $calculatedItemId) {
+					$historyData = DBfetch(DBselect(
+						'SELECT h.value, h.itemid'.
+						' FROM history_uint h'.
+						' WHERE h.itemid='.$calculatedItemId.
+							' AND h.clock>='.$startTime.
+							' AND h.clock<'.$endTime.
+						' ORDER BY h.clock DESC',
+						1
+					));
+
+					if ($historyData) {
+						$data['services'][$itemsAndServices[$macroValue[$calculatedItems[$calculatedItemId]['key_']]]]['acceptable_slv'] = $historyData['value'];
+					}
+				}
 			}
 		}
 		else {
