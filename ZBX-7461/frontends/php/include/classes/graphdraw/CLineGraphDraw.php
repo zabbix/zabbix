@@ -194,18 +194,19 @@ class CLineGraphDraw extends CGraphDraw {
 		$config = select_config();
 
 		for ($i = 0; $i < $this->num; $i++) {
-			$real_item = get_item_by_itemid($this->items[$i]['itemid']);
-			if (is_null($this->itemsHost)) {
-				$this->itemsHost = $real_item['hostid'];
+			$item = get_item_by_itemid($this->items[$i]['itemid']);
+
+			if ($this->itemsHost === null) {
+				$this->itemsHost = $item['hostid'];
 			}
-			elseif ($this->itemsHost != $real_item['hostid']) {
+			elseif ($this->itemsHost != $item['hostid']) {
 				$this->itemsHost = false;
 			}
 
 			if (!isset($this->axis_valuetype[$this->items[$i]['axisside']])) {
-				$this->axis_valuetype[$this->items[$i]['axisside']] = $real_item['value_type'];
+				$this->axis_valuetype[$this->items[$i]['axisside']] = $item['value_type'];
 			}
-			elseif ($this->axis_valuetype[$this->items[$i]['axisside']] != $real_item['value_type']) {
+			elseif ($this->axis_valuetype[$this->items[$i]['axisside']] != $item['value_type']) {
 				$this->axis_valuetype[$this->items[$i]['axisside']] = ITEM_VALUE_TYPE_FLOAT;
 			}
 
@@ -218,12 +219,16 @@ class CLineGraphDraw extends CGraphDraw {
 
 			// override item history setting with housekeeping settings
 			if ($config['hk_history_global']) {
-				$real_item['history'] = $config['hk_history'];
+				$item['history'] = $config['hk_history'];
 			}
 
-			if (($real_item['history'] * SEC_PER_DAY) > (time() - ($this->from_time + $this->period / 2)) // should pick data from history or trends
-					&& ($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL)) { // is reasonable to take data from history?
+			$trendsEnabled = $config['hk_trends_global'] ? ($config['hk_trends'] > 0) : ($item['trends'] > 0);
+
+			if (!$trendsEnabled
+					|| (($item['history'] * SEC_PER_DAY) > (time() - ($this->from_time + $this->period / 2))
+						&& ($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL))) {
 				$this->dataFrom = 'history';
+
 				array_push($sql_arr,
 					'SELECT itemid,'.$calc_field.' AS i,'.
 						'COUNT(*) AS count,AVG(value) AS avg,MIN(value) as min,'.
@@ -246,6 +251,7 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 			else {
 				$this->dataFrom = 'trends';
+
 				array_push($sql_arr,
 					'SELECT itemid,'.$calc_field.' AS i,'.
 						'SUM(num) AS count,AVG(value_avg) AS avg,MIN(value_min) AS min,'.
@@ -381,7 +387,6 @@ class CLineGraphDraw extends CGraphDraw {
 					}
 				}
 			}
-			// end of missed points calculation
 		}
 
 		// calculte shift for stacked graphs
@@ -418,7 +423,6 @@ class CLineGraphDraw extends CGraphDraw {
 				}
 			}
 		}
-		// end calculation of stacked graphs
 	}
 
 	/********************************************************************************************************/
