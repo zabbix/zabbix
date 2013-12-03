@@ -33,6 +33,7 @@ class CHistoryManager {
 	 * @return array    an array with items IDs as keys and arrays of history objects as values
 	 */
 	public function getLast(array $items, $limit = 1) {
+		$rs = array();
 		foreach ($items as $item) {
 			$table = self::getTableName($item['value_type']);
 			$query = DBselect(
