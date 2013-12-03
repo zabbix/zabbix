@@ -300,7 +300,10 @@ $graphForm->addItem($graphTab);
 $saveButton = new CSubmit('save', _('Save'));
 $cancelButton = new CButtonCancel(url_param('parent_discoveryid'));
 if (!empty($this->data['graphid'])) {
-	$deleteButton = new CButtonDelete(_('Delete graph?'), url_params(array('graphid', 'parent_discoveryid', 'hostid')));
+	$deleteButton = new CButtonDelete(
+		$this->data['parent_discoveryid'] ? _('Delete graph prototype?') : _('Delete graph?'),
+		url_params(array('graphid', 'parent_discoveryid', 'hostid'))
+	);
 	$cloneButton = new CSubmit('clone', _('Clone'));
 
 	if (!empty($this->data['templateid'])) {

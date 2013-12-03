@@ -577,7 +577,7 @@ function resolveItemKeyMacros(array $item) {
 			'selectInterfaces' => array('ip', 'dns', 'useip'),
 			'selectHosts' => array('host', 'name'),
 			'webitems' => true,
-			'output' => API_OUTPUT_REFER,
+			'output' => array('itemid'),
 			'filter' => array('flags' => null)
 		));
 
@@ -1123,12 +1123,12 @@ function item_get_history($db_item, $clock, $ns) {
 }
 
 /**
- * Check if current time is within given period
+ * Check if current time is within the given period.
  *
- * @param array $period              time period format: "wd[-wd2],hh:mm-hh:mm"
- * @param int $now                   current timestamp
+ * @param string $period	time period format: "wd[-wd2],hh:mm-hh:mm"
+ * @param int $now			current timestamp
  *
- * @return bool                      true - within in a period, false - out of period
+ * @return bool		true - within period, false - out of period
  */
 function checkTimePeriod($period, $now) {
 	if (sscanf($period, '%d-%d,%d:%d-%d:%d', $d1, $d2, $h1, $m1, $h2, $m2) != 6) {

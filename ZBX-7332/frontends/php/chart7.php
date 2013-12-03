@@ -43,7 +43,7 @@ $fields = array(
 );
 $isDataValid = check_fields($fields);
 
-$items = get_request('items', array());
+$items = getRequest('items', array());
 asort_by_key($items, 'sortorder');
 
 /*
@@ -83,13 +83,13 @@ foreach ($items as $item) {
 if ($isDataValid) {
 	navigation_bar_calc();
 
-	$graph = new CPie(get_request('graphtype', GRAPH_TYPE_NORMAL));
-	$graph->setHeader(get_request('name', ''));
+	$graph = new CPieGraphDraw(getRequest('graphtype', GRAPH_TYPE_NORMAL));
+	$graph->setHeader(getRequest('name', ''));
 
 	if (!empty($_REQUEST['graph3d'])) {
 		$graph->switchPie3D();
 	}
-	$graph->showLegend(get_request('legend', 0));
+	$graph->showLegend(getRequest('legend', 0));
 
 	unset($host);
 
@@ -105,8 +105,8 @@ if ($isDataValid) {
 	if (isset($_REQUEST['border'])) {
 		$graph->setBorder(0);
 	}
-	$graph->setWidth(get_request('width', 400));
-	$graph->setHeight(get_request('height', 300));
+	$graph->setWidth(getRequest('width', 400));
+	$graph->setHeight(getRequest('height', 300));
 
 	foreach ($items as $item) {
 		$graph->addItem($item['itemid'], $item['calc_fnc'], $item['color'], $item['type']);

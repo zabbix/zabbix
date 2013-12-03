@@ -202,6 +202,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/export',
 			$this->rootDir.'/include/classes/export/writers',
 			$this->rootDir.'/include/classes/export/elements',
+			$this->rootDir.'/include/classes/graphdraw',
 			$this->rootDir.'/include/classes/import',
 			$this->rootDir.'/include/classes/import/importers',
 			$this->rootDir.'/include/classes/import/readers',
@@ -349,9 +350,6 @@ class ZBase {
 			bindtextdomain('frontend', 'locale');
 			bind_textdomain_codeset('frontend', 'UTF-8');
 			textdomain('frontend');
-		}
-		else {
-			error('Your PHP has no gettext support. Zabbix translations are not available.');
 		}
 
 		// should be after locale initialization

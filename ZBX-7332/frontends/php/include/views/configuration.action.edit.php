@@ -430,28 +430,35 @@ if (!empty($this->data['new_operation'])) {
 	}
 
 	if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
-		$stepNumericBox = new CNumericBox('new_operation[esc_step_from]', $this->data['new_operation']['esc_step_from'], 5);
-		$stepNumericBox->addAction('onchange', 'javascript:'.$stepNumericBox->getAttribute('onchange').' if(this.value == 0) this.value=1;');
+		$stepFrom = new CNumericBox('new_operation[esc_step_from]', $this->data['new_operation']['esc_step_from'], 5);
+		$stepFrom->attr('size', 6);
+		$stepFrom->addAction(
+			'onchange',
+			'javascript:'.$stepFrom->getAttribute('onchange').' if (this.value == 0) this.value = 1;'
+		);
+
+		$stepTo = new CNumericBox('new_operation[esc_step_to]', $this->data['new_operation']['esc_step_to'], 5);
+		$stepTo->attr('size', 6);
 
 		$stepTable = new CTable();
-		$stepTable->addRow(array(_('From'), $stepNumericBox), 'indent_both');
-		$stepTable->addRow(array(
-			_('To'),
-			new CCol(array(
-				new CNumericBox('new_operation[esc_step_to]', $this->data['new_operation']['esc_step_to'], 5),
-				SPACE,
-				_('(0 - infinitely)')
-			))),
+		$stepTable->addRow(array(_('From'), $stepFrom), 'indent_both');
+		$stepTable->addRow(
+			array(
+				_('To'),
+				new CCol(array($stepTo, SPACE, _('(0 - infinitely)')))
+			),
 			'indent_both'
 		);
 
-		$stepTable->addRow(array(
-			_('Step duration'),
-			new CCol(array(
-				new CNumericBox('new_operation[esc_period]', $this->data['new_operation']['esc_period'], 5),
-				SPACE,
-				_('(minimum 60 seconds, 0 - use action default)')
-			))),
+		$stepTable->addRow(
+			array(
+				_('Step duration'),
+				new CCol(array(
+					new CNumericBox('new_operation[esc_period]', $this->data['new_operation']['esc_period'], 6),
+					SPACE,
+					_('(minimum 60 seconds, 0 - use action default)')
+				))
+			),
 			'indent_both'
 		);
 

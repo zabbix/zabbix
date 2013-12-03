@@ -56,11 +56,11 @@ else {
 
 // create widget header
 if (!empty($this->data['parent_discoveryid'])) {
-	$triggersWidget->addHeader(array(_('Trigger prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'gold')));
+	$triggersWidget->addHeader(array(_('Trigger prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'parent-discovery')));
 	$triggersWidget->addHeaderRowNumber(array(
 		'[ ',
 		new CLink(
-			$this->data['showdisabled'] ? _('Hide disabled triggers') : _('Show disabled triggers'),
+			$this->data['showdisabled'] ? _('Hide disabled trigger prototypes') : _('Show disabled trigger prototypes'),
 			'trigger_prototypes.php?'.
 				'showdisabled='.($this->data['showdisabled'] ? 0 : 1).
 				'&hostid='.$this->data['hostid'].
@@ -155,7 +155,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 				CHtml::encode($trigger['discoveryRule']['name']),
 				'trigger_prototypes.php?'.
 					'hostid='.$this->data['hostid'].'&parent_discoveryid='.$trigger['discoveryRule']['itemid'],
-				'gold'
+				'parent-discovery'
 			);
 			$description[] = NAME_DELIMITER.$trigger['description'];
 		}
@@ -262,20 +262,33 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 // create go button
 $goComboBox = new CComboBox('go');
 $goOption = new CComboItem('activate', _('Enable selected'));
-$goOption->setAttribute('confirm', _('Enable selected triggers?'));
+$goOption->setAttribute(
+	'confirm',
+	$this->data['parent_discoveryid'] ? _('Enable selected trigger prototypes?') : _('Enable selected triggers?')
+);
 $goComboBox->addItem($goOption);
+
 $goOption = new CComboItem('disable', _('Disable selected'));
-$goOption->setAttribute('confirm', _('Disable selected triggers?'));
+$goOption->setAttribute(
+	'confirm',
+	$this->data['parent_discoveryid'] ? _('Disable selected trigger prototypes?') : _('Disable selected triggers?')
+);
 $goComboBox->addItem($goOption);
+
 $goOption = new CComboItem('massupdate', _('Mass update'));
 $goComboBox->addItem($goOption);
 if (empty($this->data['parent_discoveryid'])) {
 	$goOption = new CComboItem('copy_to', _('Copy selected to ...'));
 	$goComboBox->addItem($goOption);
 }
+
 $goOption = new CComboItem('delete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected triggers?'));
+$goOption->setAttribute(
+	'confirm',
+	$this->data['parent_discoveryid'] ? _('Delete selected trigger prototypes?') : _('Delete selected triggers?')
+);
 $goComboBox->addItem($goOption);
+
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
 

@@ -29,7 +29,7 @@ if (!empty($this->data['parent_discoveryid'])) {
 	$createForm->addItem(new CSubmit('form', _('Create graph prototype')));
 
 	$graphWidget->addPageHeader(_('CONFIGURATION OF GRAPH PROTOTYPES'), $createForm);
-	$graphWidget->addHeader(array(_('Graph prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'gold')));
+	$graphWidget->addHeader(array(_('Graph prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'parent-discovery')));
 
 	if (!empty($this->data['hostid'])) {
 		$graphWidget->addItem(get_header_host_table('graphs', $this->data['hostid'], $this->data['parent_discoveryid']));
@@ -118,7 +118,7 @@ foreach ($this->data['graphs'] as $graph) {
 		$name[] = new CLink(
 			$graph['discoveryRule']['name'],
 			'host_discovery.php?form=update&itemid='.$graph['discoveryRule']['itemid'],
-			'gold'
+			'parent-discovery'
 		);
 		$name[] = NAME_DELIMITER;
 		$name[] = new CSpan($graph['name']);
@@ -151,25 +151,28 @@ foreach ($this->data['graphs'] as $graph) {
 
 // create go buttons
 $goComboBox = new CComboBox('go');
-if (empty($this->data['parent_discoveryid'])) {
+if (!$this->data['parent_discoveryid']) {
 	$goComboBox->addItem('copy_to', _('Copy selected to ...'));
 }
 
 $goOption = new CComboItem('delete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected graphs?'));
+$goOption->setAttribute(
+	'confirm',
+	$this->data['parent_discoveryid'] ? _('Delete selected graph prototypes?') : _('Delete selected graphs?')
+);
 $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->attr('id', 'goButton');
 
 zbx_add_post_js('chkbxRange.pageGoName = "group_graphid";');
-if (empty($this->data['parent_discoveryid'])) {
-	zbx_add_post_js('chkbxRange.prefix = "'.$this->data['hostid'].'";');
-	zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
-}
-else {
+if ($this->data['parent_discoveryid']) {
 	zbx_add_post_js('chkbxRange.prefix = "'.$this->data['parent_discoveryid'].'";');
 	zbx_add_post_js('cookie.prefix = "'.$this->data['parent_discoveryid'].'";');
+}
+else {
+	zbx_add_post_js('chkbxRange.prefix = "'.$this->data['hostid'].'";');
+	zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
 }
 
 // append table to form

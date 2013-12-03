@@ -19,6 +19,23 @@
 **/
 
 
+/**
+ * Verify that function exists and can be called as a function.
+ *
+ * @param array		$names
+ *
+ * @return bool
+ */
+function zbx_is_callable(array $names) {
+	foreach ($names as $name) {
+		if (!is_callable($name)) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
 /************ REQUEST ************/
 function redirect($url) {
 	$curl = new Curl($url);
@@ -2464,9 +2481,12 @@ function get_status() {
 	// hosts
 	$dbHosts = DBselect(
 		'SELECT COUNT(*) AS cnt,h.status'.
-				' FROM hosts h'.
-				' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.' )'.
-				' GROUP BY h.status');
+		' FROM hosts h'.
+		' WHERE '.dbConditionInt('h.status', array(
+				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE
+			)).
+			' AND '.dbConditionInt('h.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
+		' GROUP BY h.status');
 	while ($dbHost = DBfetch($dbHosts)) {
 		switch ($dbHost['status']) {
 			case HOST_STATUS_MONITORED:
@@ -2661,7 +2681,7 @@ function getMenuPopupHost(array $host, array $scripts = null, $hasGoTo = true) {
 }
 
 /**
- * Prepare data for host menu popup.
+ * Prepare data for map menu popup.
  *
  * @param string $hostId					host id
  * @param array  $scripts					host scripts (optional)

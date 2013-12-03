@@ -29,7 +29,7 @@ $createForm->addItem(new CSubmit('form', _('Create item prototype')));
 $itemsWidget->addPageHeader(_('CONFIGURATION OF ITEM PROTOTYPES'), $createForm);
 
 // header
-$itemsWidget->addHeader(array(_('Item prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'gold')));
+$itemsWidget->addHeader(array(_('Item prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'parent-discovery')));
 $itemsWidget->addHeaderRowNumber();
 $itemsWidget->addItem(get_header_host_table('items', $this->data['hostid'], $this->data['parent_discoveryid']));
 
@@ -109,15 +109,15 @@ foreach ($this->data['items'] as $item) {
 // create go buttons
 $goComboBox = new CComboBox('go');
 $goOption = new CComboItem('activate', _('Activate selected'));
-$goOption->setAttribute('confirm', _('Enable selected items?'));
+$goOption->setAttribute('confirm', _('Enable selected item prototypes?'));
 $goComboBox->addItem($goOption);
 
 $goOption = new CComboItem('disable', _('Disable selected'));
-$goOption->setAttribute('confirm', _('Disable selected items?'));
+$goOption->setAttribute('confirm', _('Disable selected item prototypes?'));
 $goComboBox->addItem($goOption);
 
 $goOption = new CComboItem('delete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected items?'));
+$goOption->setAttribute('confirm', _('Delete selected item prototypes?'));
 $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
