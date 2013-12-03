@@ -514,17 +514,6 @@ function DBaddLimit($query, $limit = 0, $offset = 0) {
 	return $query;
 }
 
-/**
- * Create a UNION ALL query from an array of SELECT queries and the return the DB resource.
- *
- * @param array $queries
- *
- * @return resource
- */
-function DBunion(array $queries) {
-	return DBselect('('.implode($queries, ') UNION ALL (').')');
-}
-
 function DBexecute($query, $skip_error_messages = 0) {
 	global $DB;
 

@@ -18,6 +18,7 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, It
 ....I..PS. [ZBXNEXT-1257] dropped support for UCD-SNMP (asaveljevs)
 
 Bug fixes:
+..F....... [ZBX-7373] improved performance of pages that use latest history values; thanks to Kenneth Palmertree and Maksim Tkachenko (Pavels)
 ..F....... [ZBX-7447] fixed regex configuration form not being displayed in French and Italian languages (Pavels)
 ...G...... [ZBX-7444] fixed agent crash on HP-UX when processing proc.num[] item (asaveljevs)
 ..F....... [ZBX-4063] fixed data selecting for graphs (Eduard)
