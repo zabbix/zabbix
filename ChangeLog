@@ -1,6 +1,6 @@
 Changes for 1.8.19rc1
 
-...G...... [ZBX-7479] fixed shell command injection into the user parameters (Sasha)
+...G...... [ZBX-7479] fixed remote command execution from Zabbix server if flexible user parameters are configured; thanks to Recurity Labs Team for the report (Sasha)
 ....I..... [ZBXNEXT-1256] changed example directory size user parameter to return bytes (Richlv)
 ..F....... [ZBX-7156] fixed string value escaping in profiles (Eduard)
 ...G...... [ZBX-4658] fixed system.boottime and system.uptime returning bogus values on Solaris when agent is compiled as a 64-bit binary (asaveljevs)
