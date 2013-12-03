@@ -33,21 +33,16 @@ class CHistoryManager {
 	 * @return array    an array with items IDs as keys and arrays of history objects as values
 	 */
 	public function getLast(array $items, $limit = 1) {
-		$queries = array();
+		$rs = array();
 		foreach ($items as $item) {
 			$table = self::getTableName($item['value_type']);
-			$queries[$table][] = DBaddLimit(
+			$query = DBselect(
 				'SELECT *'.
 				' FROM '.$table.' h'.
 				' WHERE h.itemid='.zbx_dbstr($item['itemid']).
 				' ORDER BY h.clock DESC',
 				$limit
 			);
-		}
-
-		$rs = array();
-		foreach ($queries as $tableQueries) {
-			$query = DBunion($tableQueries);
 			while ($history = DBfetch($query)) {
 				$rs[$history['itemid']][] = $history;
 			}
