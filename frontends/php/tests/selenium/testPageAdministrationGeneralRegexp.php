@@ -56,7 +56,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestTextPresent('CONFIGURATION OF REGULAR EXPRESSIONS');
 		$this->zbxTestTextPresent('Regular expressions');
 		$this->zbxTestDropdownHasOptions('configDropDown', array(
-			'GUI', 'Housekeeper', 'Images', 'Icon mapping', 'Regular expressions', 'Macros', 'Value mapping',
+			'GUI', 'Housekeeping', 'Images', 'Icon mapping', 'Regular expressions', 'Macros', 'Value mapping',
 			'Working time', 'Trigger severities', 'Trigger displaying options', 'Other'
 		));
 		$this->assertElementPresent('form');

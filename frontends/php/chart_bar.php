@@ -152,7 +152,7 @@ if ($config == 1) {
 
 	$period_step = $scaleperiod;
 
-	$graph = new CBar(GRAPH_TYPE_COLUMN);
+	$graph = new CBarGraphDraw(GRAPH_TYPE_COLUMN);
 	$graph->setHeader($title);
 
 	$graph_data['colors'] = array();
@@ -288,7 +288,7 @@ if ($config == 1) {
 elseif ($config == 2) {
 	$periods = get_request('periods', array());
 
-	$graph = new CBar(GRAPH_TYPE_COLUMN);
+	$graph = new CBarGraphDraw(GRAPH_TYPE_COLUMN);
 	$graph->setHeader('REPORT 1');
 
 	$graph_data = array();
@@ -423,7 +423,7 @@ elseif ($config == 3) {
 		}
 	}
 
-	$graph = new CBar(GRAPH_TYPE_COLUMN);
+	$graph = new CBarGraphDraw(GRAPH_TYPE_COLUMN);
 	$graph->setHeader('REPORT 3');
 
 	$graph_data = array();

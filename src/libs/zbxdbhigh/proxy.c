@@ -788,7 +788,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	}
 	DBfree_result(result);
 
-	/* these tables have unique indexes, need special preparation to avoid conflicts during inserts/updates */
+	/* these tables have unique indices, need special preparation to avoid conflicts during inserts/updates */
 	if (0 == strcmp("hosts_templates", table->table))
 	{
 		move_out = 1;
@@ -921,7 +921,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		}
 
 		/* special preprocessing for 'hostmacro', 'items' and 'httptest' tables to eliminate conflicts */
-		/* in the 'hostid,macro', 'hostid,key_' and 'hostid,name' unique indexes */
+		/* in the 'hostid,macro', 'hostid,key_' and 'hostid,name' unique indices */
 		if (1 < moves.values_num)
 		{
 			sql_offset = 0;
@@ -1563,7 +1563,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 
 	DBcommit();
 
-	DCconfig_update_host_availability(availability, availability_num);
+	DChost_update_availability(availability, availability_num);
 out:
 	zbx_free(availability);
 	zbx_free(sql);

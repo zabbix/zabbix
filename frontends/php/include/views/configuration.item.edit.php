@@ -361,19 +361,19 @@ else {
 		if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 			$keepHistory[] = new CSpan(_x('Overridden by', 'item_form'));
 			$keepHistory[] = SPACE;
-			$link = new CLink(_x('global housekeeper settings', 'item_form'), 'adm.housekeeper.php');
+			$link = new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php');
 			$link->setAttribute('target', '_blank');
 			$keepHistory[] =  $link;
 			$keepHistory[] = SPACE;
 			$keepHistory[] = new CSpan('('._n('%1$s day', '%1$s days', $dataConfig['hk_history']).')');
 		}
 		else {
-			$keepHistory[] = new CSpan(_('Overriden by global housekeeper settings').
+			$keepHistory[] = new CSpan(_('Overriden by global housekeeping settings').
 				'('._n('%1$s day', '%1$s days', $dataConfig['hk_history']).')'
 			);
 		}
 	}
-	$itemFormList->addRow(_('Keep history (in days)'), $keepHistory);
+	$itemFormList->addRow(_('History storage period (in days)'), $keepHistory);
 
 	$keepTrend = array();
 	$keepTrend[] =  new CNumericBox('trends', $this->data['trends'], 8);
@@ -382,20 +382,20 @@ else {
 		if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 			$keepTrend[] = new CSpan(_x('Overridden by', 'item_form'));
 			$keepTrend[] = SPACE;
-			$link = new CLink(_x('global housekeeper settings', 'item_form'), 'adm.housekeeper.php');
+			$link = new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php');
 			$link->setAttribute('target', '_blank');
 			$keepTrend[] =  $link;
 			$keepTrend[] = SPACE;
 			$keepTrend[] = new CSpan('('._n('%1$s day', '%1$s days', $dataConfig['hk_trends']).')');
 		}
 		else {
-			$keepTrend[] = new CSpan(_('Overriden by global housekeeper settings').
+			$keepTrend[] = new CSpan(_('Overriden by global housekeeping settings').
 				'('._n('%1$s day', '%1$s days', $dataConfig['hk_trends']).')'
 			);
 		}
 	}
 
-	$itemFormList->addRow(_('Keep trends (in days)'), $keepTrend, false, 'row_trends');
+	$itemFormList->addRow(_('Trend storage period (in days)'), $keepTrend, false, 'row_trends');
 	$itemFormList->addRow(_('Log time format'),
 		new CTextBox('logtimefmt', $this->data['logtimefmt'], ZBX_TEXTBOX_SMALL_SIZE, $this->data['limited'], 64),
 		false, 'row_logtimefmt'
@@ -508,8 +508,9 @@ if (!empty($this->data['itemid'])) {
 			);
 		}
 		else {
-			array_push($buttons, new CButtonDelete(_('Delete item?'),
-				url_params(array('form', 'groupid', 'itemid', 'parent_discoveryid', 'hostid')))
+			$buttons[] = new CButtonDelete(
+				$this->data['parent_discoveryid'] ? _('Delete item prototype?') : _('Delete item?'),
+				url_params(array('form', 'groupid', 'itemid', 'parent_discoveryid', 'hostid'))
 			);
 		}
 	}
