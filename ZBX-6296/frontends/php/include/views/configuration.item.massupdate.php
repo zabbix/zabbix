@@ -378,7 +378,7 @@ $itemFormList->addRow(_('New flexible interval'), array($newFlexInt, $maxFlexMsg
 // append history to form list
 $itemFormList->addRow(
 	array(
-		_('Keep history (in days)'),
+		_('History storage period (in days)'),
 		SPACE,
 		new CVisibilityBox('visible[history]', isset($this->data['visible']['history']), 'history', _('Original'))
 	),
@@ -388,7 +388,7 @@ $itemFormList->addRow(
 // append trends to form list
 $itemFormList->addRow(
 	array(
-		_('Keep trends (in days)'),
+		_('Trend storage period (in days)'),
 		SPACE,
 		new CVisibilityBox('visible[trends]', isset($this->data['visible']['trends']), 'trends', _('Original'))
 	),

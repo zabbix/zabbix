@@ -367,16 +367,6 @@ foreach ($items as $key => $item){
 		$item['unitsLong'] = '';
 	}
 
-	$itemApplications = reset($item['applications']);
-	$db_app = &$applications[$itemApplications['applicationid']];
-
-	if (!isset($tab_rows[$db_app['applicationid']])) {
-		$tab_rows[$db_app['applicationid']] = array();
-	}
-	$app_rows = &$tab_rows[$db_app['applicationid']];
-
-	$db_app['item_cnt']++;
-
 	// last check time and last value
 	if ($lastHistory) {
 		$lastClock = zbx_date2str(_('d M Y H:i:s'), $lastHistory['clock']);
@@ -442,7 +432,7 @@ foreach ($items as $key => $item){
 			$trendValue = UNKNOWN_VALUE;
 		}
 
-		array_push($app_rows, new CRow(array(
+		$row = new CRow(array(
 			SPACE,
 			is_show_all_nodes() ? SPACE : null,
 			($_REQUEST['hostid'] > 0) ? null : SPACE,
@@ -461,10 +451,10 @@ foreach ($items as $key => $item){
 			new CCol(new CDiv($change, $stateCss)),
 			new CCol($actions, 'latest-actions'),
 			new CCol($statusIcons)
-		)));
+		));
 	}
 	else {
-		array_push($app_rows, new CRow(array(
+		$row = new CRow(array(
 			SPACE,
 			is_show_all_nodes() ? SPACE : null,
 			($_REQUEST['hostid'] > 0) ? null : SPACE,
@@ -473,13 +463,20 @@ foreach ($items as $key => $item){
 			new CCol(new CDiv($lastValue, $stateCss)),
 			new CCol(new CDiv($change, $stateCss)),
 			new CCol($actions, 'latest-actions'),
-		)));
+		));
+	}
+
+	// add the item row to each application tab
+	foreach ($item['applications'] as $itemApplication) {
+		$applicationId = $itemApplication['applicationid'];
+
+		$applications[$applicationId]['item_cnt']++;
+		$tab_rows[$applicationId][] = $row;
 	}
 
 	// remove items with applications from the collection
 	unset($items[$key]);
 }
-unset($app_rows, $db_app);
 
 foreach ($applications as $appid => $dbApp) {
 	$host = $hosts[$dbApp['hostid']];
@@ -541,13 +538,6 @@ foreach ($items as $item) {
 	else
 		$item['unitsLong'] = '';
 
-	$host = &$hosts[$item['hostid']];
-
-	if (!isset($tab_rows[$host['hostid']])) $tab_rows[$host['hostid']] = array();
-	$app_rows = &$tab_rows[$host['hostid']];
-
-	$host['item_cnt']++;
-
 	// last check time and last value
 	if ($lastHistory) {
 		$lastClock = zbx_date2str(_('d M Y H:i:s'), $lastHistory['clock']);
@@ -590,6 +580,7 @@ foreach ($items as $item) {
 
 	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown txt' : 'txt';
 
+	$host = $hosts[$item['hostid']];
 	if ($filterShowDetails) {
 		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST || $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
 			? new CSpan($item['key_'], 'enabled')
@@ -614,7 +605,7 @@ foreach ($items as $item) {
 			$trendValue = UNKNOWN_VALUE;
 		}
 
-		array_push($app_rows, new CRow(array(
+		$row = new CRow(array(
 			SPACE,
 			is_show_all_nodes() ? ($host['item_cnt'] ? SPACE : get_node_name_by_elid($item['itemid'])) : null,
 			$_REQUEST['hostid'] ? null : SPACE,
@@ -633,10 +624,10 @@ foreach ($items as $item) {
 			new CCol(new CDiv($change, $stateCss)),
 			$actions,
 			new CCol($statusIcons)
-		)));
+		));
 	}
 	else {
-		array_push($app_rows, new CRow(array(
+		$row = new CRow(array(
 			SPACE,
 			is_show_all_nodes() ? ($host['item_cnt'] ? SPACE : get_node_name_by_elid($item['itemid'])) : null,
 			$_REQUEST['hostid'] ? null : SPACE,
@@ -645,10 +636,12 @@ foreach ($items as $item) {
 			new CCol(new CDiv($lastValue, $stateCss)),
 			new CCol(new CDiv($change, $stateCss)),
 			$actions
-		)));
+		));
 	}
+
+	$hosts[$item['hostid']]['item_cnt']++;
+	$tab_rows[$item['hostid']][] = $row;
 }
-unset($host, $app_rows);
 
 foreach ($hosts as $hostId => $dbHost) {
 	$host = $hosts[$dbHost['hostid']];

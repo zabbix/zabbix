@@ -106,24 +106,24 @@
 
 				switch (+this.data.expression_type) {
 					case <?php echo EXPRESSION_TYPE_INCLUDED; ?>:
-						str = '<?php echo _('Character string included'); ?>';
+						str = <?php echo CJs::encodeJson(_('Character string included')); ?>;
 						break;
 					case <?php echo EXPRESSION_TYPE_ANY_INCLUDED; ?>:
-						str = '<?php echo _('Any character string included'); ?>';
+						str = <?php echo CJs::encodeJson(_('Any character string included')); ?>;
 						break;
 					case <?php echo EXPRESSION_TYPE_NOT_INCLUDED; ?>:
-						str = '<?php echo _('Character string not included'); ?>';
+						str = <?php echo CJs::encodeJson(_('Character string not included')); ?>;
 						break;
 					case <?php echo EXPRESSION_TYPE_TRUE; ?>:
-						str = '<?php echo _('Result is TRUE'); ?>';
+						str = <?php echo CJs::encodeJson(_('Result is TRUE')); ?>;
 						break;
 					case <?php echo EXPRESSION_TYPE_FALSE; ?>:
-						str = '<?php echo _('Result is FALSE'); ?>';
+						str = <?php echo CJs::encodeJson(_('Result is FALSE')); ?>;
 						break;
 				}
 
 				if (+this.data.expression_type === <?php echo EXPRESSION_TYPE_ANY_INCLUDED; ?>) {
-					str += ' (' + '<?php echo _('delimiter'); ?>' + '="' + this.data.exp_delimiter + '")';
+					str += ' (' + <?php echo CJs::encodeJson(_('delimiter')); ?> + '="' + this.data.exp_delimiter + '")';
 				}
 
 				return str;
@@ -136,10 +136,10 @@
 			 */
 			case2str: function() {
 				if (+this.data.case_sensitive) {
-					return '<?php echo _('Yes'); ?>';
+					return <?php echo CJs::encodeJson(_('Yes')); ?>;
 				}
 				else {
-					return '<?php echo _('No'); ?>';
+					return <?php echo CJs::encodeJson(_('No')); ?>;
 				}
 			},
 
@@ -212,14 +212,14 @@
 			 */
 			validateExpression: function(data) {
 				if (data.expression === '') {
-					alert('<?php echo _('Expression cannot be empty'); ?>');
+					alert(<?php echo CJs::encodeJson(_('Expression cannot be empty')); ?>);
 					return false;
 				}
 
 				for (var id in this.expressions) {
 					// if we update expression, no error if equals itself
 					if (id != this.selectedID && this.expressions[id].equals(data)) {
-						alert('<?php echo _('Identical expression already exists'); ?>');
+						alert(<?php echo CJs::encodeJson(_('Identical expression already exists')); ?>);
 						return false;
 					}
 				}
@@ -246,13 +246,13 @@
 					};
 					this.selectedID = null;
 
-					$('#saveExpression').val('<?php echo _('Add'); ?>');
+					$('#saveExpression').val(<?php echo CJs::encodeJson(_('Add')); ?>);
 				}
 				else {
 					data = this.expressions[id].data;
 					this.selectedID = id;
 
-					$('#saveExpression').val('<?php echo _('Update'); ?>');
+					$('#saveExpression').val(<?php echo CJs::encodeJson(_('Update')); ?>);
 				}
 
 				$('#expressionNew').val(data.expression);
@@ -357,7 +357,7 @@
 					tplData = {
 						expression: expr.data.expression,
 						type: expr.type2str(),
-						result: exprResult ? '<?php echo _('TRUE'); ?>' : '<?php echo _('FALSE'); ?>',
+						result: exprResult ? <?php echo CJs::encodeJson(_('TRUE')); ?> : <?php echo CJs::encodeJson(_('FALSE')); ?>,
 						resultClass: exprResult ? 'green' : 'red'
 					};
 
@@ -366,7 +366,7 @@
 
 				tplData = {
 					resultClass: response.data.final ? 'green' : 'red',
-					result: response.data.final ? '<?php echo _('TRUE'); ?>' : '<?php echo _('FALSE'); ?>'
+					result: response.data.final ? <?php echo CJs::encodeJson(_('TRUE')); ?> : <?php echo CJs::encodeJson(_('FALSE')); ?>
 				};
 
 				$('#testResultTable').append(this.testCombinedTableRowTpl.evaluate(tplData));

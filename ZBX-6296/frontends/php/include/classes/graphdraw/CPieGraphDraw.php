@@ -19,7 +19,7 @@
 **/
 
 
-class CPie extends CGraphDraw {
+class CPieGraphDraw extends CGraphDraw {
 
 	public function __construct($type = GRAPH_TYPE_PIE) {
 		parent::__construct($type);
@@ -34,17 +34,17 @@ class CPie extends CGraphDraw {
 	/********************************************************************************************************/
 	/* PRE CONFIG: ADD / SET / APPLY
 	/********************************************************************************************************/
-	public function addItem($itemId, $calcFnc = CALC_FNC_AVG, $color = null, $type = null) {
-		$items = CMacrosResolverHelper::resolveItemName(array(get_item_by_itemid($itemId)));
+	public function addItem($itemid, $calc_fnc = CALC_FNC_AVG, $color = null, $type = null) {
+		$items = CMacrosResolverHelper::resolveItemName(array(get_item_by_itemid($itemid)));
 
 		$this->items[$this->num] = reset($items);
 
 		$host = get_host_by_hostid($this->items[$this->num]['hostid']);
 
 		$this->items[$this->num]['hostname'] = $host['name'];
-		$this->items[$this->num]['color'] = ($color === null) ? 'Dark Green' : $color;
-		$this->items[$this->num]['calc_fnc'] = ($calcFnc === null) ? CALC_FNC_AVG : $calcFnc;
-		$this->items[$this->num]['calc_type'] = ($type === null) ? GRAPH_ITEM_SIMPLE : $type;
+		$this->items[$this->num]['color'] = is_null($color) ? 'Dark Green' : $color;
+		$this->items[$this->num]['calc_fnc'] = is_null($calc_fnc) ? CALC_FNC_AVG : $calc_fnc;
+		$this->items[$this->num]['calc_type'] = is_null($type) ? GRAPH_ITEM_SIMPLE : $type;
 
 		$this->num++;
 	}
@@ -160,20 +160,26 @@ class CPie extends CGraphDraw {
 			$history = Manager::History()->getLast($lastValueItems);
 		}
 
+		$config = select_config();
+
 		for ($i = 0; $i < $this->num; $i++) {
-			$real_item = get_item_by_itemid($this->items[$i]['itemid']);
+			$item = get_item_by_itemid($this->items[$i]['itemid']);
 			$type = $this->items[$i]['calc_type'];
 			$from_time = $this->from_time;
 			$to_time = $this->to_time;
 
 			$sql_arr = array();
 
-			if (ZBX_HISTORY_DATA_UPKEEP > -1) {
-				$real_item['history'] = ZBX_HISTORY_DATA_UPKEEP;
+			// override item history setting with housekeeping settings
+			if ($config['hk_history_global']) {
+				$item['history'] = $config['hk_history'];
 			}
 
-			if (($real_item['history'] * SEC_PER_DAY) > (time() - ($from_time + $this->period / 2))) { // should pick data from history or trends
+			$trendsEnabled = $config['hk_trends_global'] ? ($config['hk_trends'] > 0) : ($item['trends'] > 0);
+
+			if (!$trendsEnabled || (($item['history'] * SEC_PER_DAY) > (time() - ($from_time + $this->period / 2)))) {
 				$this->dataFrom = 'history';
+
 				array_push($sql_arr,
 					'SELECT h.itemid,'.
 						'AVG(h.value) AS avg,MIN(h.value) AS min,'.
@@ -196,6 +202,7 @@ class CPie extends CGraphDraw {
 			}
 			else {
 				$this->dataFrom = 'trends';
+
 				array_push($sql_arr,
 					'SELECT t.itemid,'.
 						'AVG(t.value_avg) AS avg,MIN(t.value_min) AS min,'.
@@ -217,8 +224,8 @@ class CPie extends CGraphDraw {
 				);
 			}
 
-			$this->data[$this->items[$i]['itemid']][$type]['last'] = isset($history[$real_item['itemid']])
-				? $history[$real_item['itemid']][0]['value'] : null;
+			$this->data[$this->items[$i]['itemid']][$type]['last'] = isset($history[$item['itemid']])
+				? $history[$item['itemid']][0]['value'] : null;
 			$this->data[$this->items[$i]['itemid']][$type]['shift_min'] = 0;
 			$this->data[$this->items[$i]['itemid']][$type]['shift_max'] = 0;
 			$this->data[$this->items[$i]['itemid']][$type]['shift_avg'] = 0;

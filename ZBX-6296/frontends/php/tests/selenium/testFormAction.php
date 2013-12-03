@@ -1159,19 +1159,19 @@ class testFormAction extends CWebTest {
 					$this->zbxTestTextPresent ('From');
 					$this->assertVisible('new_operation_esc_step_from');
 					$this->assertAttribute('//input[@id=\'new_operation_esc_step_from\']/@maxlength', 5);
-					$this->assertAttribute('//input[@id=\'new_operation_esc_step_from\']/@size', 5);
+					$this->assertAttribute('//input[@id=\'new_operation_esc_step_from\']/@size', 6);
 					$this->assertAttribute('//input[@id=\'new_operation_esc_step_from\']/@value', 1);
 
 					$this->zbxTestTextPresent (array('To', '(0 - infinitely)'));
 					$this->assertVisible('new_operation_esc_step_to');
 					$this->assertAttribute('//input[@id=\'new_operation_esc_step_to\']/@maxlength', 5);
-					$this->assertAttribute('//input[@id=\'new_operation_esc_step_to\']/@size', 5);
+					$this->assertAttribute('//input[@id=\'new_operation_esc_step_to\']/@size', 6);
 					$this->assertAttribute('//input[@id=\'new_operation_esc_step_to\']/@value', 1);
 
 					$this->zbxTestTextPresent (array('Step duration', '(minimum 60 seconds, 0 - use action default)'));
 					$this->assertVisible('new_operation_esc_period');
-					$this->assertAttribute('//input[@id=\'new_operation_esc_period\']/@maxlength', 5);
-					$this->assertAttribute('//input[@id=\'new_operation_esc_period\']/@size', 5);
+					$this->assertAttribute('//input[@id=\'new_operation_esc_period\']/@maxlength', 6);
+					$this->assertAttribute('//input[@id=\'new_operation_esc_period\']/@size', 6);
 					$this->assertAttribute('//input[@id=\'new_operation_esc_period\']/@value', 0);
 					break;
 				}
