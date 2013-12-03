@@ -9,6 +9,7 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, It
 ....I..PS. [ZBXNEXT-1257] dropped support for UCD-SNMP (asaveljevs)
 
 Bug fixes:
+...G...... [ZBX-7479] fixed shell command injection into the user parameters (Sasha)
 ....I..... [ZBX-7461] fixed compilation on kFreeBSD and other operating systems which are not explicitly supported (asaveljevs)
 ....I..... [ZBX-7339] fixed item prototypes of OpenBSD and FreeBSD templates (igors)
 .......PS. [ZBX-7332] properly restore the original memory chunk after shared memory realloc fails, otherwise it could trigger a crash when syncing history at exit (wiper)
@@ -688,6 +689,7 @@ New features:
 A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Czech, Dutch, French, German, Greek, Hungarian, Japanese, Italian, Romanian, Russian, Slovak, Spanish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-7479] fixed shell command injection into the user parameters (Sasha)
 ..F....... [ZBX-7347] fixed custom step duration max size in action configuration (Eduard)
 ........S. [ZBX-7400] fixed fetching of empty text or log history data with Oracle backend (Sasha)
 ....I..... [ZBX-7218] fixed configuration failing with Oracle 12.1 instant client libraries (asaveljevs, Sasha)
@@ -2120,6 +2122,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.19rc1
 
+...G...... [ZBX-7479] fixed shell command injection into the user parameters (Sasha)
 ....I..... [ZBXNEXT-1256] changed example directory size user parameter to return bytes (Richlv)
 ..F....... [ZBX-7156] fixed string value escaping in profiles (Eduard)
 ...G...... [ZBX-4658] fixed system.boottime and system.uptime returning bogus values on Solaris when agent is compiled as a 64-bit binary (asaveljevs)
