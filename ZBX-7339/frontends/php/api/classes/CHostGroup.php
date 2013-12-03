@@ -573,7 +573,7 @@ class CHostGroup extends CZBXAPI {
 	 * @param array $groupids
 	 * @param bool 	$nopermissions
 	 *
-	 * @return boolean
+	 * @return array
 	 */
 	public function delete($groupids, $nopermissions = false) {
 		if (empty($groupids)) {

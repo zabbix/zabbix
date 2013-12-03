@@ -53,9 +53,6 @@ define('ZBX_PRECISION_10',	10);
 
 define('ZBX_DEFAULT_INTERVAL', '1-7,00:00-24:00');
 
-// for partitioned DB installs!!
-define('ZBX_HISTORY_DATA_UPKEEP', -1); // in days; -1: disabled, 0: always use trends
-
 define('ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT',	0);
 define('ZBX_SCRIPT_TYPE_IPMI',			1);
 define('ZBX_SCRIPT_TYPE_SSH',			2);

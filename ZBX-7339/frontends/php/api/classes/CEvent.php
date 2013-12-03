@@ -28,7 +28,7 @@ class CEvent extends CZBXAPI {
 
 	protected $tableName = 'events';
 	protected $tableAlias = 'e';
-	protected $sortColumns = array('eventid', 'object', 'objectid', 'clock');
+	protected $sortColumns = array('eventid', 'objectid', 'clock');
 
 	/**
 	 * Array of supported objects where keys are object IDs and values are translated object names.
@@ -88,7 +88,6 @@ class CEvent extends CZBXAPI {
 			'nodeids'					=> null,
 			'groupids'					=> null,
 			'hostids'					=> null,
-			'triggerids'				=> null,
 			'objectids'					=> null,
 			'eventids'					=> null,
 			'editable'					=> null,
@@ -112,8 +111,6 @@ class CEvent extends CZBXAPI {
 			// output
 			'output'					=> API_OUTPUT_REFER,
 			'selectHosts'				=> null,
-			'selectItems'				=> null,
-			'selectTriggers'			=> null,
 			'selectRelatedObject'		=> null,
 			'select_alerts'				=> null,
 			'select_acknowledges'		=> null,
@@ -126,10 +123,6 @@ class CEvent extends CZBXAPI {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
-		$this->checkDeprecatedParam($options, 'selectTriggers');
-		$this->checkDeprecatedParam($options, 'selectItems');
-		$this->checkDeprecatedParam($options, 'sortfield', 'object');
-		$options = $this->convertDeprecatedParam($options, 'triggerids', 'objectids');
 		$this->validateGet($options);
 
 		// editable + PERMISSION CHECK
@@ -474,10 +467,7 @@ class CEvent extends CZBXAPI {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if ($options['countOutput'] === null) {
-			if ($options['selectTriggers'] !== null
-				|| $options['selectRelatedObject'] !== null
-				|| $options['selectItems'] !== null
-				|| $options['selectHosts'] !== null) {
+			if ($options['selectRelatedObject'] !== null || $options['selectHosts'] !== null) {
 
 				$sqlParts = $this->addQuerySelect('e.object', $sqlParts);
 				$sqlParts = $this->addQuerySelect('e.objectid', $sqlParts);
@@ -531,51 +521,6 @@ class CEvent extends CZBXAPI {
 				'preservekeys' => true
 			));
 			$result = $relationMap->mapMany($result, $hosts, 'hosts');
-		}
-
-		// adding triggers
-		if ($options['selectTriggers'] !== null && $options['selectTriggers'] != API_OUTPUT_COUNT) {
-			$relationMap = new CRelationMap();
-			foreach ($result as $event) {
-				if ($event['object'] == EVENT_OBJECT_TRIGGER) {
-					$relationMap->addRelation($event['eventid'], $event['objectid']);
-				}
-			}
-
-			$triggers = API::Trigger()->get(array(
-				'nodeids' => $options['nodeids'],
-				'output' => $options['selectTriggers'],
-				'triggerids' => $relationMap->getRelatedIds(),
-				'nopermissions' => true,
-				'preservekeys' => true
-			));
-			$result = $relationMap->mapMany($result, $triggers, 'triggers');
-		}
-
-		// adding items
-		if ($options['selectItems'] !== null && $options['selectItems'] != API_OUTPUT_COUNT) {
-			$relationMap = new CRelationMap();
-			// discovered items
-			$dbRules = DBselect(
-				'SELECT e.eventid,f.itemid'.
-					' FROM events e,functions f'.
-					' WHERE '.dbConditionInt('e.eventid', $eventIds).
-					' AND e.objectid=f.triggerid'.
-					' AND e.object='.EVENT_OBJECT_TRIGGER
-			);
-			while ($relation = DBfetch($dbRules)) {
-				$relationMap->addRelation($relation['eventid'], $relation['itemid']);
-			}
-
-			$items = API::Item()->get(array(
-				'nodeids' => $options['nodeids'],
-				'output' => $options['selectItems'],
-				'itemids' => $relationMap->getRelatedIds(),
-				'webitems' => true,
-				'nopermissions' => true,
-				'preservekeys' => true
-			));
-			$result = $relationMap->mapMany($result, $items, 'items');
 		}
 
 		// adding the related object
