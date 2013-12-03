@@ -34,21 +34,43 @@ $fields = array(
 	'mediatypeids' =>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, null),
 	'mediatypeid' =>	array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID, 'isset({form})&&{form}=="edit"'),
 	'type' =>			array(T_ZBX_INT, O_OPT,	null,	IN(implode(',', array_keys(media_type2str()))), 'isset({save})'),
-	'description' =>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY, 'isset({save})'),
+	'description' =>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY, 'isset({save})', _('Name')),
 	'smtp_server' =>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
-		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_EMAIL),
+		'isset({save})&&isset({type})&&({type}=='.MEDIA_TYPE_EMAIL.'||{type}=='.MEDIA_TYPE_REMEDY.')',
+		fieldToString('smtp_server')
+	),
 	'smtp_helo' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
-		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_EMAIL),
+		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_EMAIL,
+		fieldToString('smtp_helo')
+	),
 	'smtp_email' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
-		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_EMAIL),
+		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_EMAIL,
+		_('SMTP email')
+	),
 	'exec_path' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
-		'isset({save})&&isset({type})&&({type}=='.MEDIA_TYPE_EXEC.'||{type}=='.MEDIA_TYPE_EZ_TEXTING.')'),
+		'isset({save})&&isset({type})&&({type}=='.MEDIA_TYPE_EXEC.
+			'||{type}=='.MEDIA_TYPE_EZ_TEXTING.
+			'||{type}=='.MEDIA_TYPE_REMEDY.')',
+		fieldToString('exec_path')
+	),
 	'gsm_modem' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
-		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_SMS),
+		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_SMS,
+		_('GSM modem')
+	),
 	'username' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
-		'isset({save})&&isset({type})&&({type}=='.MEDIA_TYPE_JABBER.'||{type}=='.MEDIA_TYPE_EZ_TEXTING.')'),
+		'isset({save})&&isset({type})&&({type}=='.MEDIA_TYPE_JABBER.
+			'||{type}=='.MEDIA_TYPE_EZ_TEXTING.
+			'||{type}=='.MEDIA_TYPE_REMEDY.
+		')',
+		fieldToString('username')
+	),
 	'password' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
-		'isset({save})&&isset({type})&&({type}=='.MEDIA_TYPE_JABBER.'||{type}=='.MEDIA_TYPE_EZ_TEXTING.')'),
+		'isset({save})&&isset({type})&&({type}=='.MEDIA_TYPE_JABBER.
+			'||{type}=='.MEDIA_TYPE_EZ_TEXTING.
+			'||{type}=='.MEDIA_TYPE_REMEDY.
+		')',
+		_('Password')
+	),
 	'status'=>			array(T_ZBX_INT, O_OPT,	null,	IN(array(MEDIA_TYPE_STATUS_ACTIVE, MEDIA_TYPE_STATUS_DISABLED)), null),
 	// actions
 	'save' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null, null),
@@ -212,11 +234,20 @@ if (!empty($_REQUEST['form'])) {
 		$data['type'] = get_request('type', MEDIA_TYPE_EMAIL);
 		$data['description'] = get_request('description', '');
 		$data['smtp_server'] = get_request('smtp_server', 'localhost');
-		$data['smtp_helo'] = get_request('smtp_helo', 'localhost');
+		$data['smtp_helo'] = getRequest('smtp_helo', ($data['type'] == MEDIA_TYPE_REMEDY) ? '' : 'localhost');
 		$data['smtp_email'] = get_request('smtp_email', 'zabbix@localhost');
 		$data['exec_path'] = get_request('exec_path', '');
 		$data['gsm_modem'] = get_request('gsm_modem', '/dev/ttyS0');
-		$data['username'] = get_request('username', ($data['type'] == MEDIA_TYPE_EZ_TEXTING) ? 'username' : 'user@server');
+		if ($data['type'] == MEDIA_TYPE_EZ_TEXTING) {
+			$defaultUsername = 'username';
+		}
+		elseif ($data['type'] == MEDIA_TYPE_JABBER) {
+			$defaultUsername = 'user@server';
+		}
+		else {
+			$defaultUsername = '';
+		}
+		$data['username'] = getRequest('username', $defaultUsername);
 		$data['password'] = get_request('password', '');
 		$data['status'] = get_request('status', MEDIA_TYPE_STATUS_ACTIVE);
 	}

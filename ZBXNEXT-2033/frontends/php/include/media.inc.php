@@ -25,7 +25,8 @@ function media_type2str($type = null) {
 		MEDIA_TYPE_EXEC => _('Script'),
 		MEDIA_TYPE_SMS => _('SMS'),
 		MEDIA_TYPE_JABBER => _('Jabber'),
-		MEDIA_TYPE_EZ_TEXTING => _('Ez Texting')
+		MEDIA_TYPE_EZ_TEXTING => _('Ez Texting'),
+		MEDIA_TYPE_REMEDY => _('Remedy Service')
 	);
 
 	if ($type === null) {
@@ -38,5 +39,50 @@ function media_type2str($type = null) {
 	}
 	else {
 		return _('Unknown');
+	}
+}
+
+function fieldToString($field) {
+	switch ($field) {
+		case 'smtp_server':
+			switch (getRequest('type')) {
+				case MEDIA_TYPE_REMEDY:
+					return _('Remedy Service URL');
+				case MEDIA_TYPE_EMAIL:
+				default:
+					return _('SMTP server');
+			}
+
+		case 'smtp_helo':
+			switch (getRequest('type')) {
+				case MEDIA_TYPE_REMEDY:
+					return _('Proxy');
+				case MEDIA_TYPE_EMAIL:
+				default:
+					return _('SMTP helo');
+			}
+
+		case 'exec_path':
+			switch (getRequest('type')) {
+				case MEDIA_TYPE_EZ_TEXTING:
+					return _('Message text limit');
+				case MEDIA_TYPE_REMEDY:
+					return _('Company name');
+				case MEDIA_TYPE_EXEC:
+				default:
+					return _('Script name');
+
+			}
+
+		case 'username':
+			switch (getRequest('type')) {
+				case MEDIA_TYPE_JABBER:
+					return _('Jabber identifier');
+				default:
+					return _('Username');
+			}
+
+		default:
+			return $field;
 	}
 }

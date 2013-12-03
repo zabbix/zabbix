@@ -43,7 +43,13 @@ $cmbType->addItems(array(
 	MEDIA_TYPE_SMS => _('SMS'),
 	MEDIA_TYPE_JABBER => _('Jabber'),
 ));
-$cmbType->addItemsInGroup(_('Commercial'), array(MEDIA_TYPE_EZ_TEXTING => _('Ez Texting')));
+$cmbType->addItemsInGroup(
+	_('Commercial'),
+	array(
+		MEDIA_TYPE_EZ_TEXTING => _('Ez Texting'),
+		MEDIA_TYPE_REMEDY => _('Remedy Service')
+	)
+);
 $cmbTypeRow = array($cmbType);
 if ($this->data['type'] == MEDIA_TYPE_EZ_TEXTING) {
 	$ez_texting_link = new CLink('https://app.eztexting.com', 'https://app.eztexting.com/', null, null, 'nosid');
@@ -64,7 +70,17 @@ elseif ($this->data['type'] == MEDIA_TYPE_SMS) {
 elseif ($this->data['type'] == MEDIA_TYPE_EXEC) {
 	$mediaTypeFormList->addRow(_('Script name'), new CTextBox('exec_path', $this->data['exec_path'], ZBX_TEXTBOX_STANDARD_SIZE));
 }
-elseif ($this->data['type'] == MEDIA_TYPE_JABBER || $this->data['type'] == MEDIA_TYPE_EZ_TEXTING) {
+elseif ($this->data['type'] == MEDIA_TYPE_JABBER
+		|| $this->data['type'] == MEDIA_TYPE_EZ_TEXTING
+		|| $this->data['type'] == MEDIA_TYPE_REMEDY) {
+
+	if ($this->data['type'] == MEDIA_TYPE_REMEDY) {
+		$mediaTypeFormList->addRow(
+			_('Remedy Service URL'),
+			new CTextBox('smtp_server', $this->data['smtp_server'], ZBX_TEXTBOX_STANDARD_SIZE)
+		);
+	}
+
 	// create password field
 	if (!empty($this->data['password'])) {
 		$passwordButton = new CButton('chPass_btn', _('Change password'), 'this.style.display="none"; $("password").enable().show().focus();');
@@ -84,6 +100,9 @@ elseif ($this->data['type'] == MEDIA_TYPE_JABBER || $this->data['type'] == MEDIA
 	else {
 		$mediaTypeFormList->addRow(_('Username'), new CTextBox('username', $this->data['username'], ZBX_TEXTBOX_STANDARD_SIZE));
 		$mediaTypeFormList->addRow(_('Password'), $passwordField);
+	}
+
+	if ($this->data['type'] == MEDIA_TYPE_EZ_TEXTING) {
 		$limitCb = new CComboBox('exec_path', $this->data['exec_path']);
 		$limitCb->addItems(array(
 			EZ_TEXTING_LIMIT_USA => _('USA (160 characters)'),
@@ -91,8 +110,17 @@ elseif ($this->data['type'] == MEDIA_TYPE_JABBER || $this->data['type'] == MEDIA
 		));
 		$mediaTypeFormList->addRow(_('Message text limit'), $limitCb);
 	}
-}
+	elseif ($this->data['type'] == MEDIA_TYPE_REMEDY) {
+		$proxyTextBox = new CTextBox('smtp_helo', $this->data['smtp_helo'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 255);
+		$proxyTextBox->setAttribute('placeholder', 'http://[username[:password]@]proxy.example.com[:port]');
+		$mediaTypeFormList->addRow(_('Proxy'), $proxyTextBox);
 
+		$mediaTypeFormList->addRow(
+			_('Company name'),
+			new CTextBox('exec_path', $this->data['exec_path'], ZBX_TEXTBOX_STANDARD_SIZE)
+		);
+	}
+}
 $mediaTypeFormList->addRow(_('Enabled'), new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE == $this->data['status'], null, MEDIA_TYPE_STATUS_ACTIVE));
 
 // append form list to tab
