@@ -999,7 +999,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 				while (!empty($mapids)) {
 					$maps = API::Map()->get(array(
 						'sysmapids' => $mapids,
-						'output' => API_OUTPUT_REFER,
+						'output' => array('sysmapid'),
 						'selectSelements' => API_OUTPUT_EXTEND,
 						'nopermissions' => true,
 						'nodeids' => get_current_nodeid(true)
