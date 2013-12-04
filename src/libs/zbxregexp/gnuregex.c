@@ -1527,21 +1527,21 @@ regex_compile (pattern, size, syntax, bufp)
                         boolean is_upper = STREQ (str, "upper");
                         boolean is_xdigit = STREQ (str, "xdigit");
 
-                    if (!IS_CHAR_CLASS (str))
-                      {
-                        FREE_MEM (compile_stack.stack);
-                        return REG_ECTYPE;
-                      }
+                        if (!IS_CHAR_CLASS (str))
+                          {
+                            FREE_MEM (compile_stack.stack);
+                            return REG_ECTYPE;
+                          }
 
                         /* Throw away the ] at the end of the character
                            class.  */
                         PATFETCH (c);
 
-                    if (p == pend)
-                      {
-                        FREE_MEM (compile_stack.stack);
-                        return REG_EBRACK;
-                      }
+                        if (p == pend)
+                          {
+                            FREE_MEM (compile_stack.stack);
+                            return REG_EBRACK;
+                          }
 
                         for (ch = 0; ch < 1 << BYTEWIDTH; ch++)
                           {
@@ -1691,11 +1691,11 @@ regex_compile (pattern, size, syntax, bufp)
               if (COMPILE_STACK_EMPTY)
                 if (syntax & RE_UNMATCHED_RIGHT_PAREN_ORD)
                   goto normal_backslash;
-              else
-                {
-                  FREE_MEM (compile_stack.stack);
-                  return REG_ERPAREN;
-                }
+                else
+                  {
+                    FREE_MEM (compile_stack.stack);
+                    return REG_ERPAREN;
+                  }
 
             handle_close:
               if (fixup_alt_jump)
@@ -1714,11 +1714,11 @@ regex_compile (pattern, size, syntax, bufp)
               if (COMPILE_STACK_EMPTY)
                 if (syntax & RE_UNMATCHED_RIGHT_PAREN_ORD)
                   goto normal_char;
-              else
-                {
-                  FREE_MEM (compile_stack.stack);
-                  return REG_ERPAREN;
-                }
+                else
+                  {
+                    FREE_MEM (compile_stack.stack);
+                    return REG_ERPAREN;
+                  }
 
               /* Since we just checked for an empty stack above, this
                  ``can't happen''.  */
@@ -2682,8 +2682,8 @@ re_compile_fastmap (bufp)
            `can_be_null' stops `re_search_2' from using the fastmap, so
            that is all we do.  */
 	case duplicate:
-		bufp->can_be_null = 1;
-		return 0;
+	  bufp->can_be_null = 1;
+	  return 0;
 
 
       /* Following are the cases which match a character.  These end
@@ -2738,7 +2738,7 @@ re_compile_fastmap (bufp)
           /* Return if we have already set `can_be_null'; if we have,
              then the fastmap is irrelevant.  Something's wrong here.  */
 	  else if (bufp->can_be_null)
-		return 0;
+	    return 0;
 
           /* Otherwise, have to check alternative paths.  */
 	  break;
@@ -4937,8 +4937,7 @@ regexec (preg, string, nmatch, pmatch, eflags)
         }
       if (regs.end == NULL)
         {
-          if (NULL != regs.start)
-            free (regs.start);
+          free (regs.start);
           return (int) REG_NOMATCH;
         }
     }
