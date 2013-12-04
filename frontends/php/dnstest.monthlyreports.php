@@ -121,49 +121,55 @@ if ($data['filter_search']) {
 			foreach ($items as $item) {
 				$itemKey = new CItemKey($item['key_']);
 				switch ($itemKey->getKeyId()) {
-					case 'dnstest.slv.dns.ns.rtt.udp':
+					case MONTHLY_REPORTS_DNS_NS_RTT_UDP:
 						$newName = 'UDP DNS Resolution RTT';
 						$newKey = 'dnstest.dns.udp.rtt[{$DNSTEST.TLD},';
 						$macro = 'dnstest.configvalue[DNSTEST.SLV.DNS.UDP.RTT]';
 						break;
-					case 'dnstest.slv.dns.ns.rtt.tcp':
+					case MONTHLY_REPORTS_DNS_NS_RTT_TCP:
 						$newName = 'TCP DNS Resolution RTT';
 						$newKey = 'dnstest.dns.tcp.rtt[{$DNSTEST.TLD},';
 						$macro = 'dnstest.configvalue[DNSTEST.SLV.DNS.TCP.RTT]';
 						break;
-					case 'dnstest.slv.dns.ns.upd':
+					case MONTHLY_REPORTS_DNS_NS_UPD:
 						$newName = 'DNS update time';
 						$newKey = 'dnstest.dns.udp.upd[{$DNSTEST.TLD},';
 						$macro = 'dnstest.configvalue[DNSTEST.SLV.DNS.NS.UPD]';
 						break;
-					case 'dnstest.slv.dns.ns.month':
+					case MONTHLY_REPORTS_DNS_NS:
 						$newName = 'DNS Name Server availability';
 						$newKey = 'dnstest.slv.dns.ns.avail[';
 						$macro = 'dnstest.configvalue[DNSTEST.SLV.NS.AVAIL]';
 						break;
-					case 'dnstest.slv.rdds.43.rtt':
+					case MONTHLY_REPORTS_RDDS43_RTT:
 						$newName = 'RDDS43 resolution RTT';
 						$newKey = 'dnstest.rdds.43.rtt[{$DNSTEST.TLD}]';
 						$macro = 'dnstest.configvalue[DNSTEST.SLV.RDDS43.RTT]';
 						break;
-					case 'dnstest.slv.rdds.80.rtt':
+					case MONTHLY_REPORTS_RDDS80_RTT:
 						$newName = 'RDDS80 resolution RTT';
 						$newKey = 'dnstest.rdds.80.rtt[{$DNSTEST.TLD}]';
 						$macro = 'dnstest.configvalue[DNSTEST.SLV.RDDS80.RTT]';
 						break;
-					case 'dnstest.slv.rdds.upd':
+					case MONTHLY_REPORTS_RDDS_UPD:
 						$newName = 'RDDS update time';
 						$newKey = 'dnstest.rdds.43.upd[{$DNSTEST.TLD}]';
 						$macro = 'dnstest.configvalue[DNSTEST.SLV.RDDS.UPD]';
+						break;
+					default:
+						$newName = null;
+						break;
 				}
 
-				$data['services'][$newName]['parameters'][$item['itemid']]['ns'] = implode(': ', $itemKey->getParameters());
+				if ($newName) {
+					$data['services'][$newName]['parameters'][$item['itemid']]['ns'] = implode(': ', $itemKey->getParameters());
 
-				$itemIds[] = $item['itemid'];
-				$itemsAndServices[$item['itemid']] = $newName;
-				$newItemKeys[$item['itemid']] = $newKey;
-				$macroValue[$macro] = $item['itemid'];
-				$usedMacro[] = $macro;
+					$itemIds[] = $item['itemid'];
+					$itemsAndServices[$item['itemid']] = $newName;
+					$newItemKeys[$item['itemid']] = $newKey;
+					$macroValue[$macro] = $item['itemid'];
+					$usedMacro[] = $macro;
+				}
 			}
 
 			// time limits

@@ -952,6 +952,15 @@ define('PROBE_UP',		1);
 // DNS TEST monthly reports item
 define('MONTHLY_REPORTS_APPLICATION',	'SLV monthly');
 
+// DNS TEST monthly reports item keys
+define('MONTHLY_REPORTS_DNS_NS_RTT_UDP',	'dnstest.slv.dns.ns.rtt.udp.month');
+define('MONTHLY_REPORTS_DNS_NS_RTT_TCP',	'dnstest.slv.dns.ns.rtt.tcp.month');
+define('MONTHLY_REPORTS_DNS_NS_UPD',		'dnstest.slv.dns.ns.upd.month');
+define('MONTHLY_REPORTS_DNS_NS',			'dnstest.slv.dns.ns.month');
+define('MONTHLY_REPORTS_RDDS43_RTT',		'dnstest.slv.rdds.43.rtt.month');
+define('MONTHLY_REPORTS_RDDS80_RTT',		'dnstest.slv.rdds.80.rtt.month');
+define('MONTHLY_REPORTS_RDDS_UPD',			'dnstest.slv.rdds.upd.month');
+
 // DNS TEST "dnstest" host name
 define('DNSTEST_HOST',	'dnstest');
 
