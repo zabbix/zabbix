@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/vendor/autoload.php';
 $base_dir = '/var/www/zabbix/llnw/';
 
 $script_name = basename($_SERVER['PHP_SELF']);
@@ -6,7 +7,7 @@ $script_name = preg_replace('/\.php$/', '', $script_name);
 
 $debug = 1;
 $logfile = '/tmp/debug-'.$script_name.'.log';
-$log = fopen($logfile,'a');
+$logger = &Log::singleton('file', $logfile, 'LLNW', array('mode' => 0600, 'timeFormat' => '%X %x'));
 
 // Zabbix API settings
 $apiurl = 'http://zabbix-stage.llnw.net/api_jsonrpc.php';

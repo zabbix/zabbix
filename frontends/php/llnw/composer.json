@@ -1,0 +1,11 @@
+{
+    "repositories": [
+        {
+            "type": "pear",
+            "url": "http://pear.php.net"
+        }
+    ],
+    "require": {
+        "pear-pear/Log": "*"
+    }
+}

@@ -47,6 +47,11 @@ try {
 	Z::getInstance()->run(ZBase::EXEC_MODE_API);
 
 	$jsonRpc = new CJSONrpc($data);
+
+	// TODO: ensure this is not polluting Zabbix namespace
+	require_once __DIR__ . '/llnw/config.php';
+	$logger->log(var_export($data, TRUE));
+
 	echo $jsonRpc->execute();
 }
 catch (Exception $e) {
