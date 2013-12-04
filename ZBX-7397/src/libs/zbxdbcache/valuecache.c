@@ -33,26 +33,22 @@
  * Each record holds item data (itemid, value_type), statistics (hits, last access time,...)
  * and the historical data (timestamp,value pairs in ascending order).
  *
- * The historical data storage mode is adapted for every item depending on request the
- * type and size. Currently the following storage modes are supported:
- *  1) lastvalue storage mode
- *     Stores only the last and previous item values. Does not support data fetching
- *     from database.
+ * The historical data are stored from largest request (+timeshift) range to the
+ * current time. The data is automatically fetched from DB whenever a request
+ * exceeds cached value range.
  *
- *  2) history storage mode.
- *     Stores item's history data from the largest request (+timeshift) range to the
- *     current time. Automatically reads from history data from DB whenever request
- *     exceeds cached value range.
+ * If an item is already being cached the new values are automatically added to the cache
+ * after being written into database.
  *
  * When cache runs out of memory to store new items it enters in low memory mode.
  * In low memory mode cache continues to function as before with few restrictions:
  *   1) items that weren't accessed during the last day are removed from cache.
  *   2) items with history storage mode and worst hits/values ratio might be removed
  *      from cache to free space.
- *   3) only items with few values are added to cache.
+ *   3) no new items are added to the cache
  *
  * The low memory mode can't be turned off - it will persist until server is rebooted.
- *
+ * In low memory mode a warning message is written into log every 5 minutes.
  */
 
 /* the period of low memory warning messages */
