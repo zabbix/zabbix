@@ -48,6 +48,9 @@ elseif ($json['method'] == 'proxy.status' || $json['method'] == 'proxy.reassign'
 elseif ($json['method'] == 'dm.info') {
    include($base_dir.'dm-info.php');
 }
+elseif ($json['method'] == 'queue.info') {
+   include($base_dir.'queue-info.php');
+}
 
 sendErrorResponse('235', "Invalid method", "Invalid method");
 ?>
