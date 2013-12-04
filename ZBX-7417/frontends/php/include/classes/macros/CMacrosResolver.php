@@ -933,24 +933,28 @@ class CMacrosResolver {
 			$i = count($matches['macros']);
 
 			while ($i--) {
+				$host = $matches['hosts'][$i][0];
+				$key = $matches['keys'][$i][0];
+				$function = $matches['functions'][$i][0];
+				$parameter = $matches['parameters'][$i][0];
+
 				// host is real and item exists and has permissions
-				if ($matches['hosts'][$i][0] !== UNRESOLVED_MACRO_STRING
-						&& is_array($hostKeyPairs[$matches['hosts'][$i][0]][$matches['keys'][$i][0]])) {
-					$item = $hostKeyPairs[$matches['hosts'][$i][0]][$matches['keys'][$i][0]];
+				if ($host !== UNRESOLVED_MACRO_STRING && is_array($hostKeyPairs[$host][$key])) {
+					$item = $hostKeyPairs[$host][$key];
 
 					// macro function is "last"
-					if ($matches['functions'][$i][0] == 'last') {
+					if ($function == 'last') {
 						$value = isset($history[$item['itemid']])
 							? formatHistoryValue($history[$item['itemid']][0]['value'], $item)
 							: UNRESOLVED_MACRO_STRING;
 					}
-
 					// macro function is "max", "min" or "avg"
 					else {
-						$value = getItemFunctionalValue($item, $matches['functions'][$i][0], $matches['parameters'][$i][0]);
+						$value = ($parameter == '')
+							? UNRESOLVED_MACRO_STRING
+							: getItemFunctionalValue($item, $function, $parameter);
 					}
 				}
-
 				// there is no item with given key in given host, or there is no permissions to that item
 				else {
 					$value = UNRESOLVED_MACRO_STRING;

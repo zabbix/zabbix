@@ -456,7 +456,7 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 				$label = str_replace($expr, UNRESOLVED_MACRO_STRING, $label);
 				continue;
 			}
-			$parameter = convertFunctionValue($expressionData->expressions[0]['functionParamList'][0]);
+			$parameter = $expressionData->expressions[0]['functionParamList'][0];
 		}
 
 		$item = API::Item()->get(array(
