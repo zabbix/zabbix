@@ -82,7 +82,7 @@ if (id2nodeid($dbGraph['graphid']) != get_current_nodeid()) {
 }
 $chartHeader .= $host['name'].NAME_DELIMITER.$dbGraph['name'];
 
-$graph = new CChart($dbGraph['graphtype']);
+$graph = new CLineGraphDraw($dbGraph['graphtype']);
 $graph->setHeader($chartHeader);
 $graph->setPeriod($timeline['period']);
 $graph->setSTime($timeline['stime']);

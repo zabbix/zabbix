@@ -1235,7 +1235,7 @@ class testFormGraphPrototype extends CWebTest {
 
 			$this->getConfirmation();
 			$this->wait();
-			$this->zbxTestTextPresent('Graphs deleted');
+			$this->zbxTestTextPresent('Graph prototypes deleted');
 			$this->zbxTestTextNotPresent($this->template.": $graphName");
 		}
 	}

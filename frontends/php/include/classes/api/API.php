@@ -74,8 +74,7 @@ class API {
 		'usergroup' => 'CUserGroup',
 		'usermacro' => 'CUserMacro',
 		'usermedia' => 'CUserMedia',
-		'httptest' => 'CHttpTest',
-		'webcheck' => 'CHttpTest'
+		'httptest' => 'CHttpTest'
 	);
 
 	/**
