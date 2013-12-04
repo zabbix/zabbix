@@ -6,11 +6,11 @@ require_once dirname(__FILE__).'/../include/config.inc.php';
 require_once dirname(__FILE__).'/../include/items.inc.php';
 
 // Allow regular zabbix sessions to pass-through to perform auth.
-if ( strlen($_POST['key']) != 32 ) {
+if ( strlen($json['key']) != 32 ) {
 	exit;
 }
 else {
-	CWebUser::$data['sessionid'] = $_POST['key'];
+	CWebUser::$data['sessionid'] = $json['key'];
 }
 
 $now = time();

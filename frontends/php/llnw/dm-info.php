@@ -5,11 +5,11 @@ $ZBX_CONFIGURATION_FILE = '../conf/zabbix.conf.php';
 require_once dirname(__FILE__).'/../include/config.inc.php';
 
 // Allow regular zabbix sessions to pass-through to perform auth.
-if ( strlen($_POST['key']) != 32 ) {
+if ( strlen($json['key']) != 32 ) {
 	exit;
 }
 else {
-	CWebUser::$data['sessionid'] = $_POST['key'];
+	CWebUser::$data['sessionid'] = $json['key'];
 }
 
 // Original: proxies.php:229
@@ -28,6 +28,12 @@ $proxyids = array_keys($data['proxies']);
 
 order_result($data['proxies'], $sortfield, getPageSortOrder());
 
+if (function_exists('DBcondition')) {
+        $dbcondition = ' AND '.DBcondition('h.proxy_hostid', $proxyids);
+}
+else {
+        $dbcondition = ' AND '.dbConditionInt('h.proxy_hostid', $proxyids);
+}
 // calculate performance
 $dbPerformance = DBselect(
 	'SELECT h.proxy_hostid,SUM(1.0/i.delay) AS qps'.
@@ -36,7 +42,7 @@ $dbPerformance = DBselect(
 		' AND i.hostid=h.hostid '.
 		' AND h.status='.HOST_STATUS_MONITORED.
 		' AND i.delay<>0'.
-		' AND '.DBcondition('h.proxy_hostid', $proxyids).
+		$dbcondition.
 	' GROUP BY h.proxy_hostid'
 );
 while ($performance = DBfetch($dbPerformance)) {
