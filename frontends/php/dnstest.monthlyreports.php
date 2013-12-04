@@ -205,7 +205,10 @@ if ($data['filter_search']) {
 				);
 
 				while ($historyValue = DBfetch($historyData)) {
-					$data['services'][$itemsAndServices[$historyValue['itemid']]]['parameters'][$historyValue['itemid']]['slv'] = $historyValue['value'];
+					$itemId = $historyValue['itemid'];
+					$serviceName = $itemsAndServices[$itemId];
+
+					$data['services'][$serviceName]['parameters'][$itemId]['slv'] = $historyValue['value'];
 				}
 
 				// get calculated items
@@ -232,7 +235,10 @@ if ($data['filter_search']) {
 					));
 
 					if ($historyData) {
-						$data['services'][$itemsAndServices[$macroValue[$calculatedItems[$calculatedItemId]['key_']]]]['acceptable_slv'] = $historyData['value'];
+						$itemKey = $calculatedItems[$calculatedItemId]['key_'];
+						$mainItemId = $macroValue[$itemKey];
+						$serviceName = $itemsAndServices[$mainItemId];
+						$data['services'][$serviceName]['acceptable_sla'] = $historyData['value'];
 					}
 				}
 			}

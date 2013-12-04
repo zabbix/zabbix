@@ -109,58 +109,73 @@ if (isset($this->data['tld'])) {
 		if (isset($tld['dns'])) {
 			$icon = $tld['dns']['trigger'] ? 'iconrollingweekfail' : 'iconrollingweekok';
 			$dnsValue = $tld['dns']['lastvalue']
-				? new CLink($tld['dns']['lastvalue'].'%', 'dnstest.incidents.php?filter_set=1&filter_rolling_week=1&'.
-					'incident_type=0&host='.$tld['host'],
-					'first-cell-value')
+				? new CLink(
+					$tld['dns']['lastvalue'].'%',
+					'dnstest.incidents.php?filter_set=1&filter_rolling_week=1&incident_type=0&host='.$tld['host'],
+					'first-cell-value'
+				)
 				: new CSpan('0%', 'first-cell-value');
 
-			$dnsStatus =  new CDiv(SPACE, 'status_icon status_icon_extra '.$icon.' cell-value');
+			$dnsStatus =  new CDiv(null, 'status_icon status_icon_extra '.$icon.' cell-value');
 			$dnsGraph = $tld['dns']['lastvalue']
-				? new CLink('graph', 'history.php?action=showgraph&period='.SEC_PER_WEEK.'&itemid='.$tld['dns']['itemid'],
-					'cell-value')
+				? new CLink(
+					'graph',
+					'history.php?action=showgraph&period='.SEC_PER_WEEK.'&itemid='.$tld['dns']['itemid'],
+					'cell-value'
+				)
 				: null;
 			$dns = array($dnsValue, $dnsStatus, $dnsGraph);
 		}
 		else {
-			$dns = new CDiv(SPACE, 'status_icon status_icon_extra iconrollingweekfail');
+			$dns = new CDiv(null, 'status_icon status_icon_extra iconrollingweekdisabled disabled-service');
 			$dns->setHint('Incorrect TLD configuration.', '', 'on');
 		}
 		if (isset($tld['dnssec'])) {
 			$icon = $tld['dnssec']['trigger'] ? 'iconrollingweekfail' : 'iconrollingweekok';
 			$dnssecValue = $tld['dnssec']['lastvalue']
-				? new CLink($tld['dnssec']['lastvalue'].'%', 'dnstest.incidents.php?filter_set=1&filter_rolling_week=1&'.
-					'incident_type=1&host='.$tld['host'],
-					'first-cell-value')
+				? new CLink(
+					$tld['dnssec']['lastvalue'].'%',
+					'dnstest.incidents.php?filter_set=1&filter_rolling_week=1&incident_type=1&host='.$tld['host'],
+					'first-cell-value'
+				)
 				: new CSpan('0%', 'first-cell-value');
 
-			$dnssecStatus = new CDiv(SPACE, 'status_icon status_icon_extra '.$icon.' cell-value');
+			$dnssecStatus = new CDiv(null, 'status_icon status_icon_extra '.$icon.' cell-value');
 			$dnssecGraph = $tld['dnssec']['lastvalue']
-				? new CLink('graph', 'history.php?action=showgraph&period='.SEC_PER_WEEK.'&itemid='.$tld['dnssec']['itemid'],
-					'cell-value')
+				? new CLink(
+					'graph',
+					'history.php?action=showgraph&period='.SEC_PER_WEEK.'&itemid='.$tld['dnssec']['itemid'],
+					'cell-value'
+				)
 				: null;
 			$dnssec =  array($dnssecValue, $dnssecStatus, $dnssecGraph);
 		}
 		else {
-			$dnssec = new CDiv(SPACE, 'status_icon status_icon_extra iconrollingweekfail');
+			$dnssec = new CDiv(null, 'status_icon status_icon_extra iconrollingweekdisabled disabled-service');
 			$dnssec->setHint('DNSSEC is disabled.', '', 'on');
 		}
 		if (isset($tld['rdds'])) {
 			$icon = $tld['rdds']['trigger'] ? 'iconrollingweekfail' : 'iconrollingweekok';
 			$rddsValue = $tld['rdds']['lastvalue']
-				? new CLink($tld['rdds']['lastvalue'].'%', 'dnstest.incidents.php?filter_set=1&filter_rolling_week=1&'.
-					'incident_type=2&host='.$tld['host'],
-					'first-cell-value')
+				? new CLink(
+					$tld['rdds']['lastvalue'].'%',
+					'dnstest.incidents.php?filter_set=1&filter_rolling_week=1&incident_type=2&host='.$tld['host'],
+					'first-cell-value'
+				)
 				: new CSpan('0%', 'first-cell-value');
 
-			$rddsStatus = new CDiv(SPACE, 'status_icon status_icon_extra '.$icon.' cell-value');
+			$rddsStatus = new CDiv(null, 'status_icon status_icon_extra '.$icon.' cell-value');
 			$rddsGraph = $tld['rdds']['lastvalue']
-				? new CLink('graph', 'history.php?action=showgraph&period='.SEC_PER_WEEK.'&itemid='.$tld['rdds']['itemid'],
-					'cell-value')
+				? new CLink(
+					'graph',
+					'history.php?action=showgraph&period='.SEC_PER_WEEK.'&itemid='.$tld['rdds']['itemid'],
+					'cell-value'
+				)
 				: null;
 			$rdds =  array($rddsValue, $rddsStatus, $rddsGraph);
 		}
 		else {
-			$rdds = new CDiv(SPACE, 'status_icon status_icon_extra iconrollingweekfail');
+			$rdds = new CDiv(null, 'status_icon status_icon_extra iconrollingweekdisabled disabled-service');
 			$rdds->setHint('RDDS is disabled.', '', 'on');
 		}
 		$row = array(

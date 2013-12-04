@@ -96,7 +96,7 @@ $table->setHeader(array(
 	_('Service'),
 	_('Parameter'),
 	_('SLV'),
-	_('Acceptable SLV'),
+	_('Acceptable SLA'),
 	SPACE
 ));
 
@@ -108,22 +108,40 @@ foreach ($this->data['services'] as $name => $services) {
 		));
 
 		foreach ($services['parameters'] as $service) {
+			$color = null;
+			if (isset($services['acceptable_sla']) && isset($service['slv'])
+					&& $services['acceptable_sla'] > $service['slv']) {
+				$color = 'red';
+			}
+			else {
+				$color = 'green';
+			}
+
 			$table->addRow(array(
 				SPACE,
 				$service['ns'],
-				isset($service['slv']) ? $service['slv'] : '-',
-				isset($services['acceptable_slv']) ? $services['acceptable_slv'] : '-',
+				isset($service['slv']) ? new CSpan($service['slv'], $color) : '-',
+				isset($services['acceptable_sla']) ? $services['acceptable_sla'] : '-',
 				new CLink('graph', 'history.php?action=showgraph&period=2592000&itemid=')
 			));
 		}
 	}
 	else {
 		$serviceValues = reset($services['parameters']);
+		$color = null;
+		if (isset($services['acceptable_sla']) && isset($serviceValues['slv'])
+				&& $services['acceptable_sla'] > $serviceValues['slv']) {
+			$color = 'red';
+		}
+		else {
+			$color = 'green';
+		}
+
 		$table->addRow(array(
 			$name,
 			SPACE,
-			isset($serviceValues['slv']) ? $serviceValues['slv'] : '-',
-			isset($services['acceptable_slv']) ? $services['acceptable_slv'] : '-',
+			isset($serviceValues['slv']) ? new CSpan($serviceValues['slv'], $color) : '-',
+			isset($services['acceptable_sla']) ? $services['acceptable_sla'] : '-',
 			new CLink('graph', 'history.php?action=showgraph&period=2592000&itemid=')
 		));
 	}

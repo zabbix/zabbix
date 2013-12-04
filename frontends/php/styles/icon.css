@@ -89,24 +89,25 @@
 	margin-top:-2px;
 }
 
-.iconerror			{ background-image: url('../images/general/error2.png');}
-.iconok				{ background-image: url('../images/general/ok_icon.png');}
-.iconwarning		{ background-image: url('../images/general/warning.png');}
-.iconunknown		{ background-image: url('../images/general/unknown_icon.png');}
-.iconzbxunknown		{ background-image: url('../images/general/zabbix_unknown.png');}
-.iconzbxavailable	{ background-image: url('../images/general/zabbix_available.png');}
-.iconzbxunavailable	{ background-image: url('../images/general/zabbix_unavailable.png');}
-.iconrollingweekok	{ background-image: url('../images/general/rolling_week_ok.png');}
-.iconrollingweekfail{ background-image: url('../images/general/rolling_week_fail.png');}
-.iconsnmpunknown	{ background-image: url('../images/general/snmp_unknown.png');}
-.iconsnmpavailable	{ background-image: url('../images/general/snmp_available.png');}
-.iconsnmpunavailable{ background-image: url('../images/general/snmp_unavailable.png');}
-.iconjmxunknown		{ background-image: url('../images/general/jmx_unknown.png');}
-.iconjmxavailable	{ background-image: url('../images/general/jmx_available.png');}
-.iconjmxunavailable	{ background-image: url('../images/general/jmx_unavailable.png');}
-.iconipmiunknown	{ background-image: url('../images/general/ipmi_unknown.png');}
-.iconipmiavailable	{ background-image: url('../images/general/ipmi_available.png');}
-.iconipmiunavailable{ background-image: url('../images/general/ipmi_unavailable.png');}
+.iconerror				{ background-image: url('../images/general/error2.png');}
+.iconok					{ background-image: url('../images/general/ok_icon.png');}
+.iconwarning			{ background-image: url('../images/general/warning.png');}
+.iconunknown			{ background-image: url('../images/general/unknown_icon.png');}
+.iconzbxunknown			{ background-image: url('../images/general/zabbix_unknown.png');}
+.iconzbxavailable		{ background-image: url('../images/general/zabbix_available.png');}
+.iconzbxunavailable		{ background-image: url('../images/general/zabbix_unavailable.png');}
+.iconrollingweekok		{ background-image: url('../images/general/rolling_week_ok.png');}
+.iconrollingweekfail	{ background-image: url('../images/general/rolling_week_fail.png');}
+.iconrollingweekdisabled{ background-image: url('../images/general/rolling_week_disabled.png');}
+.iconsnmpunknown		{ background-image: url('../images/general/snmp_unknown.png');}
+.iconsnmpavailable		{ background-image: url('../images/general/snmp_available.png');}
+.iconsnmpunavailable	{ background-image: url('../images/general/snmp_unavailable.png');}
+.iconjmxunknown			{ background-image: url('../images/general/jmx_unknown.png');}
+.iconjmxavailable		{ background-image: url('../images/general/jmx_available.png');}
+.iconjmxunavailable		{ background-image: url('../images/general/jmx_unavailable.png');}
+.iconipmiunknown		{ background-image: url('../images/general/ipmi_unknown.png');}
+.iconipmiavailable		{ background-image: url('../images/general/ipmi_available.png');}
+.iconipmiunavailable	{ background-image: url('../images/general/ipmi_unavailable.png');}
 /* </status icons> */
 
 
