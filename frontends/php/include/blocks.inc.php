@@ -432,12 +432,12 @@ function make_hoststat_summary($filter) {
 			'monitored' => true,
 			'maintenance' => $filter['maintenance'],
 			'withLastEventUnacknowledged' => true,
-			'selectHosts' => API_OUTPUT_REFER,
+			'selectHosts' => array('hostid'),
 			'filter' => array(
 				'priority' => $filter['severity'],
 				'value' => TRIGGER_VALUE_TRUE
 			),
-			'output' => API_OUTPUT_REFER
+			'output' => array('triggerid')
 		));
 		$triggers_unack = zbx_toHash($triggers_unack, 'triggerid');
 		foreach ($triggers_unack as $tunack) {

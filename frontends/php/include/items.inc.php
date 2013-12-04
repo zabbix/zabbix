@@ -308,7 +308,7 @@ function copyItemsToHosts($srcItemIds, $dstHostIds) {
 			'description', 'inventory_link'
 		),
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
-		'selectApplications' => API_OUTPUT_REFER
+		'selectApplications' => array('applicationid')
 	));
 
 	$dstHosts = API::Host()->get(array(
@@ -371,7 +371,7 @@ function copyItems($srcHostId, $dstHostId) {
 		),
 		'inherited' => false,
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
-		'selectApplications' => API_OUTPUT_REFER
+		'selectApplications' => array('applicationid')
 	));
 	$dstHosts = API::Host()->get(array(
 		'output' => array('hostid', 'host', 'status'),
