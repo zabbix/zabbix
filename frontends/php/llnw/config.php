@@ -11,8 +11,8 @@ $log = fopen($logfile,'a');
 // Zabbix API settings
 $apiurl = 'http://zabbix-stage.llnw.net/api_jsonrpc.php';
 $apiver = '2.0';
-$zabbix_user     = 'zabbix-api-sync';
-$zabbix_password = 'ZAb394-apis';
+$zabbix_user     = 'zabbix-api-llnw-zabbix';
+$zabbix_password = "MgIym4h%$'gJroD%eTef80<";
 
 $zabbix_token_file = '/tmp/zbx-api-token_'.$script_name.'.tmp';
 
