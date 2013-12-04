@@ -296,7 +296,7 @@ elseif (hasRequest('save')) {
 
 		// unset fields without changes
 		foreach ($item as $field => $value) {
-			if (isset($db_item[$field]) && ($item[$field] == $db_item[$field])) {
+			if (isset($db_item[$field]) && $item[$field] === $db_item[$field]) {
 				unset($item[$field]);
 			}
 		}
