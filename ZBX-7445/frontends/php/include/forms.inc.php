@@ -1048,27 +1048,26 @@
 
 		// item
 		if (!empty($data['itemid'])) {
-			$options = array(
+			$params = array(
 				'itemids' => $data['itemid']
 			);
 			if ($data['is_discovery_rule']) {
-				$options['output'] = API_OUTPUT_EXTEND;
-				$options['hostids'] = $data['hostid'];
-				$options['editable'] = true;
-				$data['item'] = API::DiscoveryRule()->get($options);
+				$params['output'] = API_OUTPUT_EXTEND;
+				$params['hostids'] = $data['hostid'];
+				$params['editable'] = true;
+				$data['item'] = API::DiscoveryRule()->get($params);
 			}
 			else {
-				$options['filter'] = array('flags' => null);
-				$options['output'] = array(
-					'itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay',
-					'history', 'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'multiplier', 'delta',
-					'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase',
-					'formula', 'error', 'lastlogsize', 'logtimefmt', 'templateid', 'valuemapid', 'delay_flex', 'params',
-					'ipmi_sensor', 'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'mtime',
-					'flags', 'filter', 'interfaceid', 'port', 'description', 'inventory_link', 'lifetime',
-					'snmpv3_authprotocol', 'snmpv3_privprotocol', 'state', 'snmpv3_contextname'
+				$params['filter'] = array('flags' => null);
+				$params['output'] = array(
+					'itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
+					'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'multiplier', 'delta', 'snmpv3_securityname',
+					'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'formula', 'logtimefmt',
+					'templateid', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'data_type', 'authtype', 'username',
+					'password', 'publickey', 'privatekey', 'filter', 'interfaceid', 'port', 'description',
+					'inventory_link', 'lifetime', 'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname'
 				);
-				$data['item'] = API::Item()->get($options);
+				$data['item'] = API::Item()->get($params);
 			}
 			$data['item'] = reset($data['item']);
 			$data['hostid'] = !empty($data['hostid']) ? $data['hostid'] : $data['item']['hostid'];

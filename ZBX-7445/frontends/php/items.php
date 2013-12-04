@@ -938,13 +938,8 @@ else {
 		'hostids' => $data['hostid'],
 		'search' => array(),
 		'output' => array(
-			'itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay',
-			'history', 'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'multiplier', 'delta',
-			'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase',
-			'formula', 'error', 'lastlogsize', 'logtimefmt', 'templateid', 'valuemapid', 'delay_flex', 'params',
-			'ipmi_sensor', 'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'mtime',
-			'flags', 'filter', 'interfaceid', 'port', 'description', 'inventory_link', 'lifetime',
-			'snmpv3_authprotocol', 'snmpv3_privprotocol', 'state', 'snmpv3_contextname'
+			'itemid', 'type', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type', 'error',
+			'templateid', 'flags', 'state'
 		),
 		'editable' => true,
 		'selectHosts' => API_OUTPUT_EXTEND,

@@ -1355,15 +1355,7 @@ class CXmlImport18 {
 							$current_item = API::Item()->get(array(
 								'itemids' => $result['itemids'],
 								'webitems' => true,
-								'output' => array(
-									'itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay',
-									'history', 'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'multiplier', 'delta',
-									'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase',
-									'formula', 'error', 'lastlogsize', 'logtimefmt', 'templateid', 'valuemapid', 'delay_flex', 'params',
-									'ipmi_sensor', 'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'mtime',
-									'flags', 'filter', 'interfaceid', 'port', 'description', 'inventory_link', 'lifetime',
-									'snmpv3_authprotocol', 'snmpv3_privprotocol', 'state', 'snmpv3_contextname'
-								)
+								'output' => array('itemid')
 							));
 						}
 
