@@ -560,7 +560,7 @@ class CDRule extends CZBXAPI {
 	 *
 	 * @param array $druleIds
 	 *
-	 * @return boolean
+	 * @return array
 	 */
 	public function delete(array $druleIds) {
 		$this->validateDelete($druleIds);
