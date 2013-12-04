@@ -357,6 +357,8 @@ static const char	*remedy_fields_get_value(zbx_remedy_field_t *fields, int field
  * Parameters: easyhandle - [OUT] the CURL easy handle                        *
  *             headers    - [OUT] the CURL headers                            *
  *             url        - [IN] the Remedy service URL                       *
+ *             proxy      - [IN] the http(s) proxy URL, pass empty string to  *
+ *                               disable proxy                                *
  *             error      - [OUT] the error description                       *
  *                                                                            *
  * Return Value: SUCCEED - the connection was initialized successfully        *
@@ -367,7 +369,7 @@ static const char	*remedy_fields_get_value(zbx_remedy_field_t *fields, int field
  *                                                                            *
  ******************************************************************************/
 static int	remedy_init_connection(CURL **easyhandle, const struct curl_slist *headers, const char *url,
-		char **error)
+		const char *proxy, char **error)
 {
 	int			opt, timeout = 10, ret = FAIL, err;
 
@@ -383,7 +385,8 @@ static int	remedy_init_connection(CURL **easyhandle, const struct curl_slist *he
 		goto out;
 	}
 
-	if (CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_COOKIEFILE, "")) ||
+	if (CURLE_OK != (err = curl_easy_setopt(*easyhandle, CURLOPT_PROXY, proxy)) ||
+			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_COOKIEFILE, "")) ||
 			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_FOLLOWLOCATION, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
 			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)) ||
@@ -410,6 +413,10 @@ out:
  * Purpose: creates new ticket in Remedy service                              *
  *                                                                            *
  * Parameters: url        - [IN] the Remedy service URL                       *
+ *             proxy      - [IN] the http(s) proxy URL, pass empty string to  *
+ *             user       - [IN] the Remedy user name                         *
+ *             password   - [IN] the Remedy user password                     *
+ *                               disable proxy                                *
  *             ...        - [IN] various ticket parameters                    *
  *             externalid - [OUT] the number of created incident in Remedy    *
  *             error      - [OUT] the error description                       *
@@ -421,9 +428,9 @@ out:
  * Comments: The caller must free the error description if it was set.        *
  *                                                                            *
  ******************************************************************************/
-static int	remedy_create_ticket(const char *url, const char *user, const char *password, const char *loginid,
-		const char *service, const char *ci, const char *summary, const char *notes, const char *impact,
-		const char *urgency, const char *company, char **externalid, char **error)
+static int	remedy_create_ticket(const char *url, const char *proxy, const char *user, const char *password,
+		const char *loginid, const char *service, const char *ci, const char *summary, const char *notes,
+		const char *impact, const char *urgency, const char *company, char **externalid, char **error)
 {
 #	define ZBX_POST_REMEDY_CREATE_SERVICE								\
 		ZBX_SOAP_ENVELOPE_CREATE_OPEN								\
@@ -464,7 +471,7 @@ static int	remedy_create_ticket(const char *url, const char *user, const char *p
 	headers = curl_slist_append(headers, ZBX_XML_HEADER_CONTENTTYPE);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER_SOAPACTION_CREATE);
 
-	if (FAIL == remedy_init_connection(&easyhandle, headers, service_url, error))
+	if (FAIL == remedy_init_connection(&easyhandle, headers, service_url, proxy, error))
 		goto out;
 
 	user_esc = xml_escape_dyn(user);
@@ -534,6 +541,8 @@ out:
  * Purpose: reads the specified list of ticket fields from Remedy service     *
  *                                                                            *
  * Parameters: url        - [IN] the Remedy service URL                       *
+ *             proxy      - [IN] the http(s) proxy URL, pass empty string to  *
+ *                               disable proxy                                *
  *             user       - [IN] the Remedy user name                         *
  *             password   - [IN] the Remedy user password                     *
  *             ticketid   - [NI] the Remedy ticket id                         *
@@ -559,8 +568,8 @@ out:
  *           the Incident_Number field, which will be copied from request.    *
  *                                                                            *
  ******************************************************************************/
-static int	remedy_query_ticket(const char *url, const char *user, const char *password, const char *externalid,
-		zbx_remedy_field_t *fields, int fields_num, char **error)
+static int	remedy_query_ticket(const char *url, const char *proxy, const char *user, const char *password,
+		const char *externalid, zbx_remedy_field_t *fields, int fields_num, char **error)
 {
 #	define ZBX_POST_REMEDY_QUERY_SERVICE								\
 		ZBX_SOAP_ENVELOPE_OPEN									\
@@ -588,7 +597,7 @@ static int	remedy_query_ticket(const char *url, const char *user, const char *pa
 	headers = curl_slist_append(headers, ZBX_XML_HEADER_CONTENTTYPE);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER_SOAPACTION_QUERY);
 
-	if (FAIL == remedy_init_connection(&easyhandle, headers, service_url, error))
+	if (FAIL == remedy_init_connection(&easyhandle, headers, service_url, proxy, error))
 		goto out;
 
 	xml = zbx_dsprintf(xml, ZBX_POST_REMEDY_QUERY_SERVICE, user_esc, password_esc, externalid);
@@ -646,6 +655,8 @@ out:
  * Parameters: url        - [IN] the Remedy service URL                       *
  *             user       - [IN] the Remedy user name                         *
  *             password   - [IN] the Remedy user password                     *
+ *             proxy      - [IN] the http(s) proxy URL, pass empty string to  *
+ *                               disable proxy                                *
  *             fields     - [IN/OUT] the array of fields to read.             *
  *                          To ensure that old data is not carried over the   *
  *                          fields[*].value members must be set to NULL.      *
@@ -660,8 +671,8 @@ out:
  *           ticket.                                                          *
  *                                                                            *
  ******************************************************************************/
-static int	remedy_modify_ticket(const char *url, const char *user, const char *password, zbx_remedy_field_t *fields,
-		int fields_num, char **error)
+static int	remedy_modify_ticket(const char *url, const char *proxy, const char *user, const char *password,
+		zbx_remedy_field_t *fields, int fields_num, char **error)
 {
 	const char		*__function_name = "remedy_modify_ticket";
 	CURL			*easyhandle = NULL;
@@ -680,7 +691,7 @@ static int	remedy_modify_ticket(const char *url, const char *user, const char *p
 	headers = curl_slist_append(headers, ZBX_XML_HEADER_CONTENTTYPE);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER_SOAPACTION_MODIFY);
 
-	if (FAIL == remedy_init_connection(&easyhandle, headers, service_url, error))
+	if (FAIL == remedy_init_connection(&easyhandle, headers, service_url, proxy, error))
 		goto out;
 
 	remedy_fields_set_value(fields, fields_num, ZBX_REMEDY_FIELD_ACTION, ZBX_REMEDY_ACTION_MODIFY);
@@ -758,6 +769,8 @@ out:
  *                                                                            *
  * Parameters: triggerid  - [IN] the trigger that generated event             *
  *             url        - [IN] the Remedy service URL                       *
+ *             proxy      - [IN] the http(s) proxy URL, pass empty string to  *
+ *                               disable proxy                                *
  *             user       - [IN] the Remedy user name                         *
  *             password   - [IN] the Remedy user password                     *
  *             fields     - [IN/OUT] the array of fields to read.             *
@@ -773,8 +786,8 @@ out:
  * Comments: The caller must free the error description if it was set.        *
  *                                                                            *
  ******************************************************************************/
-static int	remedy_read_ticket(zbx_uint64_t triggerid, const char *url, const char *user, const char *password,
-		zbx_remedy_field_t *fields, int fields_num, char **error)
+static int	remedy_read_ticket(zbx_uint64_t triggerid, const char *url, const char *proxy, const char *user,
+		const char *password, zbx_remedy_field_t *fields, int fields_num, char **error)
 {
 	const char	*__function_name = "remedy_read_ticket";
 	int		ret = SUCCEED;
@@ -793,7 +806,7 @@ static int	remedy_read_ticket(zbx_uint64_t triggerid, const char *url, const cha
 				EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid);
 
 	if (NULL != (row = DBfetch(result)))
-		ret = remedy_query_ticket(url, user, password, row[0], fields, fields_num, error);
+		ret = remedy_query_ticket(url, proxy, user, password, row[0], fields, fields_num, error);
 
 	DBfree_result(result);
 
@@ -904,7 +917,7 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 	ZBX_STR2UINT64(triggerid, row[2]);
 
 	/* retrieve the last incident triggered by the event source trigger */
-	if (FAIL == remedy_read_ticket(triggerid, media->smtp_server, media->username, media->passwd,
+	if (FAIL == remedy_read_ticket(triggerid, media->smtp_server, media->smtp_helo, media->username, media->passwd,
 			fields, ARRSIZE(fields), error))
 	{
 		goto out;
@@ -927,8 +940,8 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 				remedy_fields_set_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_STATUS,
 						ZBX_REMEDY_STATUS_ASSIGNED);
 
-				ret = remedy_modify_ticket( media->smtp_server, media->username, media->passwd, fields,
-						ARRSIZE(fields), error);
+				ret = remedy_modify_ticket(media->smtp_server, media->smtp_helo, media->username,
+						media->passwd, fields, ARRSIZE(fields), error);
 				goto out;
 			}
 
@@ -957,10 +970,10 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 				goto out;
 		}
 
-		if (SUCCEED == (ret = remedy_create_ticket(media->smtp_server, media->username, media->passwd,
-				alert->sendto, ZBX_REMEDY_DEFAULT_SERVICECI, row[3], alert->subject, alert->message,
-				impact_map[remedy_event], urgency_map[remedy_event], media->exec_path, &ticketnumber,
-				error)))
+		if (SUCCEED == (ret = remedy_create_ticket(media->smtp_server, media->smtp_helo, media->username,
+				media->passwd, alert->sendto, ZBX_REMEDY_DEFAULT_SERVICECI, row[3], alert->subject,
+				alert->message, impact_map[remedy_event], urgency_map[remedy_event], media->exec_path,
+				&ticketnumber, error)))
 		{
 			zbx_uint64_t	ticketid;
 			char		*ticketnumber_dyn;
@@ -1002,8 +1015,8 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 		remedy_fields_set_value(fields, ARRSIZE(fields), ZBX_REMEDY_STATUS_WORK_INFO_SUMMARY,
 				alert->subject);
 
-		ret = remedy_modify_ticket(media->smtp_server, media->username, media->passwd, fields, ARRSIZE(fields),
-				error);
+		ret = remedy_modify_ticket(media->smtp_server, media->smtp_helo, media->username, media->passwd, fields,
+				ARRSIZE(fields), error);
 	}
 
 out:
