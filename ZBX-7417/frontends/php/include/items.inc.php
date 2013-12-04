@@ -1019,7 +1019,13 @@ function formatHistoryValue($value, array $item, $trim = true) {
  */
 function getItemFunctionalValue($item, $function, $parameter) {
 	// check whether function is allowed
-	if (!in_array($function, array('min', 'max', 'avg')) || ($parameter === '' || $parameter == 0)) {
+	if (!in_array($function, array('min', 'max', 'avg')) || $parameter === '') {
+		return UNRESOLVED_MACRO_STRING;
+	}
+
+	$parameter = convertFunctionValue($parameter);
+
+	if (bccomp($parameter, 0) == 0) {
 		return UNRESOLVED_MACRO_STRING;
 	}
 
@@ -1034,7 +1040,7 @@ function getItemFunctionalValue($item, $function, $parameter) {
 		$result = DBselect(
 			'SELECT '.$function.'(value) AS value'.
 			' FROM '.$historyTables[$item['value_type']].
-			' WHERE clock>'.(time() - convertFunctionValue($parameter)).
+			' WHERE clock>'.(time() - $parameter).
 			' AND itemid='.zbx_dbstr($item['itemid']).
 			' HAVING COUNT(*)>0' // necessary because DBselect() return 0 if empty data set, for graph templates
 		);
