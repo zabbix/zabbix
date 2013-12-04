@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/graphs.inc.php';
 
 $page['file'] = 'chart3.php';
-$page['type'] = PAGE_TYPE_HTML;
+$page['type'] = PAGE_TYPE_IMAGE;
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
