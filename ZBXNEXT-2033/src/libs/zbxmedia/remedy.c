@@ -29,13 +29,13 @@
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 #define ZBX_XML_HEADER_CONTENTTYPE		"Content-Type:text/xml; charset=utf-8"
-#define	ZBX_XML_HEADER_SOAPACTION_CREATE	"SOAPAction:urn:HPD_Incident_Interface_Create_WS/HelpDesk_Submit_Service"
-#define	ZBX_XML_HEADER_SOAPACTION_QUERY		"SOAPAction:urn:HPD_Incident_Interface_WS/HelpDesk_Query_Service"
-#define	ZBX_XML_HEADER_SOAPACTION_MODIFY	"SOAPAction:urn:HPD_Incident_Interface_WS/HelpDesk_Modify_Service"
+#define	ZBX_XML_HEADER_SOAPACTION_CREATE	"SOAPAction:urn:HPD_IncidentInterface_Create_WS/HelpDesk_Submit_Service"
+#define	ZBX_XML_HEADER_SOAPACTION_QUERY		"SOAPAction:urn:HPD_IncidentInterface_WS/HelpDesk_Query_Service"
+#define	ZBX_XML_HEADER_SOAPACTION_MODIFY	"SOAPAction:urn:HPD_IncidentInterface_WS/HelpDesk_Modify_Service"
 
 
-#define ZBX_SOAP_URL		"&webService=HPD_Incident_Interface_WS"
-#define ZBX_SOAP_URL_CREATE	"&webService=HPD_Incident_Interface_Create_WS"
+#define ZBX_SOAP_URL		"&webService=HPD_IncidentInterface_WS"
+#define ZBX_SOAP_URL_CREATE	"&webService=HPD_IncidentInterface_Create_WS"
 
 #define ZBX_SOAP_XML_HEADER		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 
@@ -70,11 +70,12 @@
 
 #define ZBX_REMEDY_ERROR_INVALID_INCIDENT	"ERROR (302)"
 
-#define ZBX_REMEDY_STATUS_NEW		"New"
-#define ZBX_REMEDY_STATUS_ASSIGNED	"Assigned"
-#define ZBX_REMEDY_STATUS_RESOLVED	"Resolved"
-#define ZBX_REMEDY_STATUS_CLOSED	"Closed"
-#define ZBX_REMEDY_STATUS_CANCELLED	"Cancelled"
+#define ZBX_REMEDY_STATUS_NEW			"New"
+#define ZBX_REMEDY_STATUS_ASSIGNED		"Assigned"
+#define ZBX_REMEDY_STATUS_RESOLVED		"Resolved"
+#define ZBX_REMEDY_STATUS_CLOSED		"Closed"
+#define ZBX_REMEDY_STATUS_CANCELLED		"Cancelled"
+#define ZBX_REMEDY_STATUS_WORK_INFO_SUMMARY	"Work_Info_Summary"
 
 #define ZBX_REMEDY_ACTION_CREATE	"CREATE"
 #define ZBX_REMEDY_ACTION_MODIFY	"MODIFY"
@@ -428,10 +429,12 @@ static int	remedy_create_ticket(const char *url, const char *user, const char *p
 		ZBX_SOAP_ENVELOPE_CREATE_OPEN								\
 		ZBX_SOAP_HEADER										\
 		ZBX_SOAP_BODY_OPEN									\
-		"<urn:HelpDesk_Submit_Service>"							\
+		"<urn:HelpDesk_Submit_Service>"								\
 			"<urn:Assigned_Group>Control center</urn:Assigned_Group>"			\
 			"<urn:CI_Name>%s</urn:CI_Name>"							\
+			"<urn:First_Name/>"								\
 			"<urn:Impact>%s</urn:Impact>"							\
+			"<urn:Last_Name/>"								\
 			"<urn:Reported_Source>Systems Management</urn:Reported_Source>"			\
 			"<urn:Service_Type>Infrastructure Event</urn:Service_Type>"			\
 			"<urn:Status>New</urn:Status>"							\
@@ -442,7 +445,6 @@ static int	remedy_create_ticket(const char *url, const char *user, const char *p
 			"<urn:ServiceCI>%s</urn:ServiceCI>"						\
 			"<urn:Login_ID>%s</urn:Login_ID>"						\
 			"<urn:Customer_Company>%s</urn:Customer_Company>"				\
-			"<urn:CSC_INC></urn:CSC_INC>"							\
 		"</urn:HelpDesk_Submit_Service>"							\
 		ZBX_SOAP_BODY_CLOSE									\
 		ZBX_SOAP_ENVELOPE_CREATE_CLOSE
@@ -452,7 +454,8 @@ static int	remedy_create_ticket(const char *url, const char *user, const char *p
 	struct curl_slist	*headers = NULL;
 	int			ret = FAIL, err, opt;
 	char			*xml = NULL, *summary_esc = NULL, *notes_esc = NULL, *ci_esc = NULL,
-				*service_url = NULL, *impact_esc, *urgency_esc, *company_esc, *service_esc;
+				*service_url = NULL, *impact_esc, *urgency_esc, *company_esc, *service_esc,
+				*user_esc = NULL, *password_esc = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -464,6 +467,8 @@ static int	remedy_create_ticket(const char *url, const char *user, const char *p
 	if (FAIL == remedy_init_connection(&easyhandle, headers, service_url, error))
 		goto out;
 
+	user_esc = xml_escape_dyn(user);
+	password_esc = xml_escape_dyn(password);
 	summary_esc = xml_escape_dyn(summary);
 	notes_esc = xml_escape_dyn(notes);
 	ci_esc = xml_escape_dyn(ci);
@@ -472,7 +477,7 @@ static int	remedy_create_ticket(const char *url, const char *user, const char *p
 	service_esc = xml_escape_dyn(service);
 	company_esc = xml_escape_dyn(company);
 
-	xml = zbx_dsprintf(xml, ZBX_POST_REMEDY_CREATE_SERVICE, user, password, ci_esc, impact_esc,
+	xml = zbx_dsprintf(xml, ZBX_POST_REMEDY_CREATE_SERVICE, user_esc, password_esc, ci_esc, impact_esc,
 			ZBX_REMEDY_ACTION_CREATE, summary_esc, notes_esc, urgency_esc, service_esc, loginid,
 			company_esc);
 
@@ -512,6 +517,8 @@ out:
 	zbx_free(ci_esc);
 	zbx_free(notes_esc);
 	zbx_free(summary_esc);
+	zbx_free(password_esc);
+	zbx_free(user_esc);
 	zbx_free(service_url);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s externalid:%s", __function_name, zbx_result_string(ret),
@@ -569,11 +576,14 @@ static int	remedy_query_ticket(const char *url, const char *user, const char *pa
 	CURL			*easyhandle = NULL;
 	struct curl_slist	*headers = NULL;
 	int			ret = FAIL, opt, err;
-	char			*xml = NULL, *service_url = NULL;
+	char			*xml = NULL, *service_url = NULL, *user_esc = NULL, *password_esc = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() externalid:%s", __function_name, externalid);
 
 	service_url = zbx_dsprintf(service_url, "%s" ZBX_SOAP_URL, url);
+
+	user_esc = xml_escape_dyn(user);
+	password_esc = xml_escape_dyn(password);
 
 	headers = curl_slist_append(headers, ZBX_XML_HEADER_CONTENTTYPE);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER_SOAPACTION_QUERY);
@@ -581,7 +591,7 @@ static int	remedy_query_ticket(const char *url, const char *user, const char *pa
 	if (FAIL == remedy_init_connection(&easyhandle, headers, service_url, error))
 		goto out;
 
-	xml = zbx_dsprintf(xml, ZBX_POST_REMEDY_QUERY_SERVICE, user, password, externalid);
+	xml = zbx_dsprintf(xml, ZBX_POST_REMEDY_QUERY_SERVICE, user_esc, password_esc, externalid);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, xml)))
 	{
@@ -618,6 +628,8 @@ out:
 	curl_slist_free_all(headers);
 
 	zbx_free(xml);
+	zbx_free(password_esc);
+	zbx_free(user_esc);
 	zbx_free(service_url);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
@@ -655,12 +667,15 @@ static int	remedy_modify_ticket(const char *url, const char *user, const char *p
 	CURL			*easyhandle = NULL;
 	struct curl_slist	*headers = NULL;
 	int			ret = FAIL, err, opt, i;
-	char			*xml = NULL, *service_url = NULL;
+	char			*xml = NULL, *service_url = NULL, *user_esc = NULL, *password_esc = NULL;
 	size_t			xml_alloc = 0, xml_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	service_url = zbx_dsprintf(service_url, "%s" ZBX_SOAP_URL, url);
+
+	user_esc = xml_escape_dyn(user);
+	password_esc = xml_escape_dyn(password);
 
 	headers = curl_slist_append(headers, ZBX_XML_HEADER_CONTENTTYPE);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER_SOAPACTION_MODIFY);
@@ -675,7 +690,7 @@ static int	remedy_modify_ticket(const char *url, const char *user, const char *p
 			ZBX_SOAP_HEADER 							\
 			ZBX_SOAP_BODY_OPEN							\
 			ZBX_HELPDESK_MODIFY_SERVICE_OPEN,
-			user, password);
+			user_esc, password_esc);
 
 	for (i = 0; i < fields_num; i++)
 	{
@@ -712,6 +727,9 @@ static int	remedy_modify_ticket(const char *url, const char *user, const char *p
 		goto out;
 	}
 
+	zabbix_log(LOG_LEVEL_DEBUG, "[WDN] modify: %s", xml);
+	zabbix_log(LOG_LEVEL_DEBUG, "[WDN] response: %s", page.data);
+
 	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
 		goto out;
 
@@ -723,6 +741,8 @@ out:
 	curl_slist_free_all(headers);
 
 	zbx_free(xml);
+	zbx_free(password_esc);
+	zbx_free(user_esc);
 	zbx_free(service_url);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
@@ -863,7 +883,6 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 			{"WorkInfoAttachment1Name", NULL},
 			{"WorkInfoAttachment1Data", NULL},
 			{"WorkInfoAttachment1OrigSize", NULL},
-			{"CSC_INC", NULL}
 	};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -975,14 +994,13 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 				0 == strcmp(status, ZBX_REMEDY_STATUS_CLOSED) ||
 				0 == strcmp(status, ZBX_REMEDY_STATUS_CANCELLED))
 		{
-			/* don't resolve already resolved, closed or canceled incidents */
+			/* don't update already resolved, closed or canceled incidents */
 			ret = SUCCEED;
 			goto out;
 		}
 
-
-		remedy_fields_set_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_STATUS,
-				ZBX_REMEDY_STATUS_RESOLVED);
+		remedy_fields_set_value(fields, ARRSIZE(fields), ZBX_REMEDY_STATUS_WORK_INFO_SUMMARY,
+				alert->subject);
 
 		ret = remedy_modify_ticket(media->smtp_server, media->username, media->passwd, fields, ARRSIZE(fields),
 				error);
