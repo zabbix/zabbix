@@ -751,8 +751,8 @@ static void	vc_warn_low_memory()
  * Comments: The caller item must not be removed from cache to avoid          *
  *           complications (ie - checking if item still is in cache every     *
  *           time after calling vc_free_space() function).                    *
- *           vc_free_space() attempts to free at least VC_MIN_FREE_SPACE      *
- *           bytes of space to avoid free space request spam.                 *
+ *           vc_free_space() attempts to free at least  min_free_request      *
+ *           bytes of space to reduce number of space releaes requests.       *
  *                                                                            *
  ******************************************************************************/
 static void	vc_release_space(zbx_vc_item_t *source_item, size_t space)
@@ -1270,9 +1270,6 @@ out:
  * Return value:  the prepared item or NULL if item could not be added        *
  *                (not enough memory to store item data)                      *
  *                                                                            *
- * Comments: In low memory mode only items with request data <= 2 are added   *
- *           to the cache.                                                    *
- *                                                                            *
  ******************************************************************************/
 static zbx_vc_item_t	*vc_add_item(zbx_uint64_t itemid, int value_type, int seconds, int count,
 		int timestamp, const zbx_timespec_t *ts, zbx_vector_history_record_t *values)
@@ -1282,11 +1279,10 @@ static zbx_vc_item_t	*vc_add_item(zbx_uint64_t itemid, int value_type, int secon
 
 	now = ZBX_VC_TIME();
 
-	/* Read the item values from database (try to get at least 2 records */
-	/* to fill the lastvalue cache)                                      */
+	/* Read the item values from database */
 	if (NULL != ts)
 	{
-		ret = vc_db_read_values_by_count(itemid, value_type, values, 2, now, ts, 0);
+		ret = vc_db_read_values_by_count(itemid, value_type, values, 1, now, ts, 0);
 	}
 	else if (0 == count)
 	{
