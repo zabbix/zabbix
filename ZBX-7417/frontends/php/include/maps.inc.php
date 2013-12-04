@@ -451,14 +451,6 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 		$key = $expressionData->expressions[0]['item'];
 		$function = $expressionData->expressions[0]['functionName'];
 
-		if ($function != 'last') {
-			if ($expressionData->expressions[0]['functionParamList'][0] == '') {
-				$label = str_replace($expr, UNRESOLVED_MACRO_STRING, $label);
-				continue;
-			}
-			$parameter = $expressionData->expressions[0]['functionParamList'][0];
-		}
-
 		$item = API::Item()->get(array(
 			'webitems' => true,
 			'filter' => array(
@@ -481,7 +473,7 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 			$value = ($item['lastclock']) ? formatHistoryValue($item['lastvalue'], $item) : UNRESOLVED_MACRO_STRING;
 		}
 		else {
-			$value = getItemFunctionalValue($item, $function, $parameter);
+			$value = getItemFunctionalValue($item, $function, $expressionData->expressions[0]['functionParamList'][0]);
 		}
 
 		if (isset($value)) {

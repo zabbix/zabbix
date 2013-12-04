@@ -950,9 +950,7 @@ class CMacrosResolver {
 					}
 					// macro function is "max", "min" or "avg"
 					else {
-						$value = ($parameter == '')
-							? UNRESOLVED_MACRO_STRING
-							: getItemFunctionalValue($item, $function, $parameter);
+						$value = getItemFunctionalValue($item, $function, $parameter);
 					}
 				}
 				// there is no item with given key in given host, or there is no permissions to that item
