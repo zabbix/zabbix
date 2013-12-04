@@ -131,6 +131,9 @@ static char	*xml_escape_dyn(const char *in)
 	const char	*ptr_in;
 	int		size = 0;
 
+	if (NULL == in)
+		return zbx_strdup(NULL, "");
+
 	for (ptr_in = in; '\0' != *ptr_in; ptr_in++)
 	{
 		switch (*ptr_in)
@@ -429,8 +432,9 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	remedy_create_ticket(const char *url, const char *proxy, const char *user, const char *password,
-		const char *loginid, const char *service, const char *ci, const char *summary, const char *notes,
-		const char *impact, const char *urgency, const char *company, char **externalid, char **error)
+		const char *loginid, const char *service_name, const char *service_id, const char *ci,
+		const char *summary, const char *notes, const char *impact, const char *urgency, const char *company,
+		char **externalid, char **error)
 {
 #	define ZBX_POST_REMEDY_CREATE_SERVICE								\
 		ZBX_SOAP_ENVELOPE_CREATE_OPEN								\
@@ -450,6 +454,7 @@ static int	remedy_create_ticket(const char *url, const char *proxy, const char *
 			"<urn:Notes>%s</urn:Notes>"							\
 			"<urn:Urgency>%s</urn:Urgency>"							\
 			"<urn:ServiceCI>%s</urn:ServiceCI>"						\
+			"<urn:ServiceCI_ReconID>%s</urn:ServiceCI_ReconID>"				\
 			"<urn:Login_ID>%s</urn:Login_ID>"						\
 			"<urn:Customer_Company>%s</urn:Customer_Company>"				\
 		"</urn:HelpDesk_Submit_Service>"							\
@@ -461,8 +466,8 @@ static int	remedy_create_ticket(const char *url, const char *proxy, const char *
 	struct curl_slist	*headers = NULL;
 	int			ret = FAIL, err, opt;
 	char			*xml = NULL, *summary_esc = NULL, *notes_esc = NULL, *ci_esc = NULL,
-				*service_url = NULL, *impact_esc, *urgency_esc, *company_esc, *service_esc,
-				*user_esc = NULL, *password_esc = NULL;
+				*service_url = NULL, *impact_esc, *urgency_esc, *company_esc, *service_name_esc,
+				*service_id_esc, *user_esc = NULL, *password_esc = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -481,12 +486,13 @@ static int	remedy_create_ticket(const char *url, const char *proxy, const char *
 	ci_esc = xml_escape_dyn(ci);
 	impact_esc = xml_escape_dyn(impact);
 	urgency_esc = xml_escape_dyn(urgency);
-	service_esc = xml_escape_dyn(service);
+	service_name_esc = xml_escape_dyn(service_name);
+	service_id_esc = xml_escape_dyn(service_id);
 	company_esc = xml_escape_dyn(company);
 
 	xml = zbx_dsprintf(xml, ZBX_POST_REMEDY_CREATE_SERVICE, user_esc, password_esc, ci_esc, impact_esc,
-			ZBX_REMEDY_ACTION_CREATE, summary_esc, notes_esc, urgency_esc, service_esc, loginid,
-			company_esc);
+			ZBX_REMEDY_ACTION_CREATE, summary_esc, notes_esc, urgency_esc, service_name_esc,
+			service_id_esc, loginid, company_esc);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, xml)))
 	{
@@ -519,7 +525,8 @@ out:
 	zbx_free(xml);
 	zbx_free(impact_esc);
 	zbx_free(urgency_esc);
-	zbx_free(service_esc);
+	zbx_free(service_id_esc);
+	zbx_free(service_name_esc);
 	zbx_free(company_esc);
 	zbx_free(ci_esc);
 	zbx_free(notes_esc);
@@ -817,6 +824,70 @@ static int	remedy_read_ticket(zbx_uint64_t triggerid, const char *url, const cha
 
 /******************************************************************************
  *                                                                            *
+ * Function: remedy_get_service_by_host                                       *
+ *                                                                            *
+ * Purpose: gets remedy service associated to the specified host              *
+ *                                                                            *
+ * Parameters: hostid       - [IN] the host id                                *
+ *             valuemap     - [IN] the name of value mapping containing       *
+ *                               mapping of host group names to Remedy        *
+ *                               names                                        *
+ *             service_name - [OUT] the corresponding service name            *
+ *             service_id   - [OUT] the corresponding service  reconciliation *
+ *                                  id                                        *
+ *                                                                            *
+ * Comments: The Zabbix host association with corresponding Remedy service is *
+ *           done through a specific value mapping that maps Zabbix host      *
+ *           group names to respective Remedy services in format:             *
+ *               <group name> => <service name>:<service reconciliation id>   *
+ *           The name of this mapping must be stored in Remedy media type.    *
+ *                                                                            *
+ ******************************************************************************/
+static void	remedy_get_service_by_host(zbx_uint64_t hostid, const char *valuemap, char **service_name,
+		char **service_id)
+{
+	char		*valuemap_esc;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	valuemap_esc = DBdyn_escape_string(valuemap);
+
+	result = DBselect(
+			"select m.newvalue"
+			" from mappings m,valuemaps vm,groups g,hosts_groups hg"
+			" where hg.hostid=" ZBX_FS_UI64
+				" and g.groupid=hg.groupid"
+				" and g.name=m.value"
+				" and m.valuemapid=vm.valuemapid"
+				" and vm.name='%s'",
+			hostid, valuemap_esc);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		char	*ptr;
+
+		if (NULL != (ptr = strrchr(row[0], ':')))
+		{
+			*ptr++ = '\0';
+			*service_name = zbx_strdup(*service_name, row[0]);
+			*service_id = zbx_strdup(*service_id, ptr);
+
+			goto out;
+		}
+
+	}
+
+	*service_name = zbx_strdup(NULL, "");
+	*service_id = zbx_strdup(NULL, "");
+
+out:
+	DBfree_result(result);
+
+	zbx_free(valuemap_esc);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: remedy_process_alert                                             *
  *                                                                            *
  * Purpose: processes alert by either creating or closing ticket in Remedy    *
@@ -845,7 +916,7 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 	int		ret = FAIL;
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	triggerid;
+	zbx_uint64_t	triggerid, hostid;
 	const char	*status;
 
 	zbx_remedy_field_t	fields[] = {
@@ -900,7 +971,7 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	result = DBselect("select e.value,t.priority,t.triggerid,h.host"
+	result = DBselect("select e.value,t.priority,t.triggerid,h.host,h.hostid"
 			" from triggers t,hosts h,items i,functions f,events e"
 			" where e.eventid=" ZBX_FS_UI64
 				" and e.source=%d"
@@ -925,7 +996,7 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 
 	if (TRIGGER_VALUE_OK != atoi(row[0]))
 	{
-		char	*ticketnumber;
+		char	*ticketnumber, *service_name = NULL, *service_id = NULL;
 		int	remedy_event;
 		char	*impact_map[] = {"3-Medium", "2-Significant/Large"};
 		char	*urgency_map[] = {"3-Moderate/Limited", "2-High"};
@@ -970,8 +1041,12 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 				goto out;
 		}
 
+		ZBX_STR2UINT64(hostid, row[4]);
+
+		remedy_get_service_by_host(hostid, media->smtp_email, &service_name, &service_id);
+
 		if (SUCCEED == (ret = remedy_create_ticket(media->smtp_server, media->smtp_helo, media->username,
-				media->passwd, alert->sendto, ZBX_REMEDY_DEFAULT_SERVICECI, row[3], alert->subject,
+				media->passwd, alert->sendto, service_name, service_id, row[3], alert->subject,
 				alert->message, impact_map[remedy_event], urgency_map[remedy_event], media->exec_path,
 				&ticketnumber, error)))
 		{
@@ -991,6 +1066,9 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 			zbx_free(ticketnumber_dyn);
 			zbx_free(ticketnumber);
 		}
+
+		zbx_free(service_name);
+		zbx_free(service_id);
 	}
 	else
 	{
