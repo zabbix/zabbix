@@ -1382,7 +1382,7 @@
 			);
 			$trigger = ($data['parent_discoveryid']) ? API::TriggerPrototype()->get($options) : API::Trigger()->get($options);
 			$data['trigger'] = reset($trigger);
-			if (!empty($data['trigger']['description'])) {
+			if (!zbx_empty($data['trigger']['description'])) {
 				$data['description'] = $data['trigger']['description'];
 			}
 
