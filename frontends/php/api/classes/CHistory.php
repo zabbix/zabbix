@@ -65,7 +65,6 @@ class CHistory extends CZBXAPI {
 			'nodeids'					=> null,
 			'hostids'					=> null,
 			'itemids'					=> null,
-			'triggerids'				=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
 			// filter
@@ -81,7 +80,6 @@ class CHistory extends CZBXAPI {
 			'output'					=> API_OUTPUT_EXTEND,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
-			'groupOutput'				=> null,
 			'preservekeys'				=> null,
 			'sortfield'					=> '',
 			'sortorder'					=> '',
@@ -164,6 +162,12 @@ class CHistory extends CZBXAPI {
 			zbx_db_search($sqlParts['from']['history'], $options, $sqlParts);
 		}
 
+		// output
+		if ($options['output'] == API_OUTPUT_EXTEND) {
+			unset($sqlParts['select']['clock']);
+			$sqlParts['select']['history'] = 'h.*';
+		}
+
 		// countOutput
 		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
@@ -177,14 +181,6 @@ class CHistory extends CZBXAPI {
 			}
 		}
 
-		// groupOutput
-		$groupOutput = false;
-		if (!is_null($options['groupOutput'])) {
-			if (str_in_array('h.'.$options['groupOutput'], $sqlParts['select']) || str_in_array('h.*', $sqlParts['select'])) {
-				$groupOutput = true;
-			}
-		}
-
 		// sorting
 		$sqlParts = $this->applyQuerySortOptions($tableName, $this->tableAlias(), $options, $sqlParts);
 
@@ -192,8 +188,6 @@ class CHistory extends CZBXAPI {
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
 		}
-
-		$itemids = array();
 
 		$sqlParts['select'] = array_unique($sqlParts['select']);
 		$sqlParts['from'] = array_unique($sqlParts['from']);
@@ -220,28 +214,12 @@ class CHistory extends CZBXAPI {
 				$sqlWhere.
 				$sqlOrder;
 		$dbRes = DBselect($sql, $sqlLimit);
-		$count = 0;
-		$group = array();
 		while ($data = DBfetch($dbRes)) {
 			if ($options['countOutput']) {
 				$result = $data;
 			}
 			else {
-				$itemids[$data['itemid']] = $data['itemid'];
-
-				$result[$count] = array();
-
-				$result[$count] += $data;
-
-				// grouping
-				if ($groupOutput) {
-					$dataid = $data[$options['groupOutput']];
-					if (!isset($group[$dataid])) {
-						$group[$dataid] = array();
-					}
-					$group[$dataid][] = $result[$count];
-				}
-				$count++;
+				$result[] = $data;
 			}
 		}
 
