@@ -1289,7 +1289,7 @@ class CHost extends CHostGeneral {
 			else {
 				$hostsWithInventories = array();
 				$existingInventoriesDb = DBfetchArrayAssoc(DBselect(
-					'SELECT hostid, inventory_mode'.
+					'SELECT hostid,inventory_mode'.
 					' FROM host_inventory'.
 					' WHERE '.dbConditionInt('hostid', $hostids)
 				), 'hostid');
