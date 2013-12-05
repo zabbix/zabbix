@@ -43,9 +43,8 @@
  * When cache runs out of memory to store new items it enters in low memory mode.
  * In low memory mode cache continues to function as before with few restrictions:
  *   1) items that weren't accessed during the last day are removed from cache.
- *   2) items with history storage mode and worst hits/values ratio might be removed
- *      from cache to free space.
- *   3) no new items are added to the cache
+ *   2) items with worst hits/values ratio might be removed from cache to free the space.
+ *   3) no new items are added to the cache.
  *
  * The low memory mode can't be turned off - it will persist until server is rebooted.
  * In low memory mode a warning message is written into log every 5 minutes.
@@ -1364,16 +1363,13 @@ static void	vc_item_release(zbx_vc_item_t *item)
 
 /******************************************************************************************************************
  *                                                                                                                *
- * History storage mode data API                                                                                  *
+ * History storage API                                                                                            *
  *                                                                                                                *
  ******************************************************************************************************************/
-
 /*
- * The history storage mode caches all values from the largest request range to
- * the current time.
- *
- * The history storage mode supports requests of any range, but it's not
- * efficient when caching timeshifted requests.
+ * The value cache caches all values from the largest request range to
+ * the current time. The history data are stored in variable size chunks
+ * as illustrated in the following diagram:
  *
  *  .----------------.
  *  | zbx_vc_cache_t |
@@ -2574,7 +2570,7 @@ out:
  *                                                                            *
  * Function: vch_init                                                         *
  *                                                                            *
- * Purpose: initializes item cache in history storage mode                    *
+ * Purpose: initializes cache item with historical data                       *
  *                                                                            *
  * Parameters: item       - [IN] the item                                     *
  *             values     - [IN] the initial history data                     *
@@ -2583,13 +2579,8 @@ out:
  *             timestamp  - [IN] the request period end timestamp             *
  *             ts         - [IN] the value timestamp for single request, can  *
  *                                                                            *
- * Return value: SUCCEED - storage mode was initialized successfully          *
+ * Return value: SUCCEED - item initialized successfully                      *
  *               FAIL    - otherwise                                          *
- *                                                                            *
- * Comments: If the storage mode can cache the <values> returned by the       *
- *           initial request (<seconds>, <count>, <timestamp>, <ts>), then    *
- *           the item cache is initialized in this storage mode and <values>  *
- *           are added to cache.                                              *
  *                                                                            *
  ******************************************************************************/
 static int	vch_init(zbx_vc_item_t *item, zbx_vector_history_record_t *values, int seconds, int count,
@@ -2669,6 +2660,12 @@ static size_t	vch_item_free_cache(zbx_vc_item_t *item)
 
 	return freed;
 }
+
+/******************************************************************************************************************
+ *                                                                                                                *
+ * Public API                                                                                                     *
+ *                                                                                                                *
+ ******************************************************************************************************************/
 
 /******************************************************************************
  *                                                                            *
