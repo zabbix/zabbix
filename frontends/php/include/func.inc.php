@@ -1879,15 +1879,18 @@ function num2letter($number) {
 	return $str;
 }
 
-function getSLV($item, $clock) {
-	$slv = DBfetch(DBselect(DBaddLimit(
-		'SELECT h.value'.
-		' FROM history_uint h'.
-		' WHERE h.itemid='.$item.
-			' AND clock<='.$clock.
-		' ORDER BY h.clock DESC',
-		1
-	)));
+function getSLV($itemId) {
+	$slvItem = API::Item()->get(array(
+		'itemids' => $itemId,
+		'output' => array('lastvalue')
+	));
 
-	return $slv ? $slv['value'] : 0;
+	if ($slvItem) {
+		$slv = reset($slvItem);
+	}
+	else {
+		$slv['lastvalue'] = 0;
+	}
+
+	return $slv['lastvalue'];
 }

@@ -281,13 +281,13 @@ $tests = DBselect(
 	'SELECT h.clock, h.value'.
 	' FROM history_uint h'.
 	' WHERE h.itemid='.$availItem.
-		' AND h.clock>='.zbx_dbstr(zbxDateToTime($data['filter_from'])).
-		' AND h.clock<='.zbx_dbstr(zbxDateToTime($data['filter_to'])).
+		' AND h.clock>='.zbxDateToTime($data['filter_from']).
+		' AND h.clock<='.zbxDateToTime($data['filter_to']).
 		$failingTests
 );
 
 if ($data['tld'] && $data['slvItemId']) {
-	$data['slv'] = getSLV($data['slvItemId'], zbxDateToTime($data['filter_to']));
+	$data['slv'] = getSLV($data['slvItemId']);
 
 	// result generation
 	$data['downTests'] = 0;
@@ -363,6 +363,8 @@ if ($data['tld'] && $data['slvItemId']) {
 	}
 
 	$timeStep = getOldValue($item['itemid'], zbxDateToTime($data['filter_from'])) / 60;
+	$timeStep = $timeStep ? $timeStep : 1;
+
 	$data['downTimeMinutes'] = $data['downTests'] * $timeStep;
 
 	foreach ($incidentsData as $incident) {
@@ -400,13 +402,14 @@ if ($data['tld'] && $data['slvItemId']) {
 	$item = reset($item);
 
 	$detailsFrom = zbxDateToTime($data['filter_from']) - $timeStep * 60;
+	$detailsTo = zbxDateToTime($data['filter_to']) + $timeStep * 60;
 
 	$details = DBselect(
 		'SELECT h.clock, h.value, h.itemid'.
 		' FROM history_str h'.
 		' WHERE h.itemid='.$item['itemid'].
-			' AND h.clock>='.zbx_dbstr($detailsFrom).
-			' AND h.clock<='.zbx_dbstr(zbxDateToTime($data['filter_to']))
+			' AND h.clock>='.$detailsFrom.
+			' AND h.clock<='.$detailsTo
 	);
 
 	$detailsData = array();
@@ -423,7 +426,6 @@ if ($data['tld'] && $data['slvItemId']) {
 			if ($detail['clock'] == $test['clock']) {
 				$data['tests'][$key] = array_merge($data['tests'][$key], array('details' => $detail['value']));
 				$data['tests'][$key]['updated'] = true;
-
 				break;
 			}
 
@@ -435,9 +437,7 @@ if ($data['tld'] && $data['slvItemId']) {
 								$data['tests'][$i],
 								array('details' => $detail['details'])
 							);
-
 							$data['tests'][$key]['updated'] = true;
-
 							break;
 						}
 					}

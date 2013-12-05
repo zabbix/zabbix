@@ -201,7 +201,7 @@ $testsTable = new CTableInfo($noData);
 $testsTable->setHeader($headers);
 
 foreach ($this->data['tests'] as $test) {
-	if (isset($test['details'])) {
+	if (isset($test['details']) && $test['details']) {
 		$details = explode(',', $test['details']);
 		$detailsDescription = new CLink(
 			_s('

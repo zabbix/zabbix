@@ -91,7 +91,7 @@ $data['tld'] = reset($tld);
 // get slv item
 $slvItems = API::Item()->get(array(
 	'itemids' => $data['slvItemId'],
-	'output' => array('name', 'key_')
+	'output' => array('name', 'key_', 'lastvalue')
 ));
 
 $data['slvItem'] = reset($slvItems);
@@ -176,7 +176,7 @@ foreach ($probeItems as $probeItem) {
 $data['totalNs'] = count($totalNs);
 
 if ($data['tld'] && $data['slvItem'] && $data['probe']) {
-	$data['slv'] = getSLV($data['slvItem']['itemid'], zbxDateToTime($data['time']));
+	$data['slv'] = $data['slvItem']['lastvalue'];
 }
 else {
 	access_deny();

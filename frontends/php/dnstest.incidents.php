@@ -197,7 +197,7 @@ if ($host || $data['filter_search']) {
 					DNSTEST_SLV_EPP_AVAIL
 				)
 			),
-			'output' => array('itemid', 'hostid', 'key_'),
+			'output' => array('itemid', 'hostid', 'key_', 'lastvalue'),
 			'preservekeys' => true
 		));
 
@@ -213,21 +213,21 @@ if ($host || $data['filter_search']) {
 				switch ($item['key_']) {
 					case DNSTEST_SLV_DNS_ROLLWEEK:
 						$data['dns']['itemid'] = $item['itemid'];
-						$data['dns']['slv'] = getSLV($item['itemid'], $filterTimeTill);
+						$data['dns']['slv'] = $item['lastvalue'];
 						$data['dns']['events'] = array();
 						$dnsItems[] = $item['itemid'];
 						$itemIds[] = $item['itemid'];
 						break;
 					case DNSTEST_SLV_DNSSEC_ROLLWEEK:
 						$data['dnssec']['itemid'] = $item['itemid'];
-						$data['dnssec']['slv'] = getSLV($item['itemid'], $filterTimeTill);
+						$data['dnssec']['slv'] = $item['lastvalue'];
 						$data['dnssec']['events'] = array();
 						$dnssecItems[] = $item['itemid'];
 						$itemIds[] = $item['itemid'];
 						break;
 					case DNSTEST_SLV_RDDS_ROLLWEEK:
 						$data['rdds']['itemid'] = $item['itemid'];
-						$data['rdds']['slv'] = getSLV($item['itemid'], $filterTimeTill);
+						$data['rdds']['slv'] = $item['lastvalue'];
 						$data['rdds']['events'] = array();
 						$rddsItems[] = $item['itemid'];
 						$itemIds[] = $item['itemid'];
@@ -673,8 +673,8 @@ if ($host || $data['filter_search']) {
 					'SELECT h.clock, h.value, h.itemid'.
 					' FROM history_uint h'.
 					' WHERE '.dbConditionInt('h.itemid', $allItems).
-						' AND h.clock>='.zbx_dbstr($filterTimeFrom).
-						' AND h.clock<='.zbx_dbstr($filterTimeTill).
+						' AND h.clock>='.$filterTimeFrom.
+						' AND h.clock<='.$filterTimeTill.
 						' AND h.value=0'
 				);
 

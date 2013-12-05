@@ -89,7 +89,7 @@ $data['tld'] = reset($tld);
 // get slv item
 $slvItems = API::Item()->get(array(
 	'itemids' => $data['slvItemId'],
-	'output' => array('name', 'key_')
+	'output' => array('name', 'key_', 'lastvalue')
 ));
 
 $data['slvItem'] = reset($slvItems);
@@ -154,7 +154,7 @@ foreach ($manualItemIds as $itemId) {
 		'SELECT h.value'.
 		' FROM history_uint h'.
 		' WHERE h.itemid='.$itemId.
-			' AND h.clock>='.zbx_dbstr($data['time'])
+			' AND h.clock>='.$data['time']
 	));
 
 	if ($itemValue && $itemValue['value'] == PROBE_DOWN) {
@@ -170,7 +170,7 @@ foreach ($automaticItemIds as $itemId => $hostId) {
 			'SELECT h.value'.
 			' FROM history_uint h'.
 			' WHERE h.itemid='.$itemId.
-				' AND h.clock>='.zbx_dbstr($data['time']),
+				' AND h.clock>='.$data['time'],
 			1
 		)));
 
@@ -365,12 +365,11 @@ foreach ($hosts as $host) {
 }
 
 if ($data['tld'] && $data['slvItem']) {
-	$data['slv'] = getSLV($data['slvItem']['itemid'], zbxDateToTime($data['time']));
+	$data['slv'] = $data['slvItem']['lastvalue'];
 }
 else {
 	access_deny();
 }
-
 
 $dnsTestView = new CView('dnstest.particulartests.list', $data);
 

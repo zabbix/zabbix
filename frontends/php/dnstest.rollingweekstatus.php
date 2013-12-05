@@ -114,7 +114,6 @@ $options = array(
 
 if (get_request('filter_search')) {
 	$options['search'] = array('name' => get_request('filter_search'));
-	$options['startSearch'] = true;
 	$data['filter_search'] = get_request('filter_search');
 }
 

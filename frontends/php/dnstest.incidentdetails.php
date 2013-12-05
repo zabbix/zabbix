@@ -112,7 +112,7 @@ $tld = API::Host()->get(array(
 // get slv item
 $slvItems = API::Item()->get(array(
 	'itemids' => $data['slvItemId'],
-	'output' => array('name', 'key_')
+	'output' => array('name', 'key_', 'lastvalue')
 ));
 
 $slvItem = $slvItems ? reset($slvItems) : null;
@@ -237,7 +237,7 @@ if ($mainEvent) {
 if ($tld && $mainEvent && $slvItem) {
 	$data['tld'] = reset($tld);
 	$data['slvItem'] = $slvItem;
-	$data['slv'] = getSLV($data['slvItem']['itemid'], zbxDateToTime($data['filter_to']));
+	$data['slv'] = $data['slvItem']['lastvalue'];
 	if ($mainEvent['false_positive']) {
 		$data['incidentType'] = INCIDENT_FALSE_POSITIVE;
 	}
@@ -252,8 +252,8 @@ if ($tld && $mainEvent && $slvItem) {
 		'SELECT h.value, h.clock'.
 		' FROM history_uint h'.
 		' WHERE h.itemid='.zbx_dbstr($data['availItemId']).
-			' AND h.clock>='.zbx_dbstr($fromTime).
-			' AND h.clock<='.zbx_dbstr($toTime).
+			' AND h.clock>='.$fromTime.
+			' AND h.clock<='.$toTime.
 			$failingTests
 	);
 
@@ -288,8 +288,8 @@ if ($tld && $mainEvent && $slvItem) {
 		'SELECT h.value, h.clock'.
 		' FROM history_uint h'.
 		' WHERE h.itemid='.zbx_dbstr($data['slvItemId']).
-			' AND h.clock>='.zbx_dbstr($fromTime).
-			' AND h.clock<='.zbx_dbstr($toTime)
+			' AND h.clock>='.$fromTime.
+			' AND h.clock<='.$toTime
 	);
 
 	$tempTests = $data['tests'];
