@@ -1289,18 +1289,21 @@ class CHost extends CHostGeneral {
 			else {
 				$hostsWithInventories = array();
 				$existingInventoriesDb = DBfetchArrayAssoc(DBselect(
-					'SELECT hostid'.
+					'SELECT hostid, inventory_mode'.
 					' FROM host_inventory'.
 					' WHERE '.dbConditionInt('hostid', $hostids)
 				), 'hostid');
 
 				// check for hosts with disabled inventory mode
-				if ($updateInventory['inventory_mode'] === null && count($existingInventoriesDb) !== count($hostids)) {
+				if ($updateInventory['inventory_mode'] === null) {
 					foreach ($hostids as $hostId) {
 						if (!isset($existingInventoriesDb[$hostId])) {
 							$host = get_host_by_hostid($hostId);
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_s('Inventory disabled for host "%s".', $host['host']));
+						}
+						else {
+							$updateInventory['inventory_mode'] = $existingInventoriesDb[$hostId]['inventory_mode'];
 						}
 					}
 				}
