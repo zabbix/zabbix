@@ -1,0 +1,30 @@
+[
+    {
+        "name": "pear-pear.php.net/Log",
+        "version": "1.12.7",
+        "version_normalized": "1.12.7.0",
+        "dist": {
+            "type": "file",
+            "url": "http://pear.php.net/get/Log-1.12.7.tgz",
+            "reference": null,
+            "shasum": null
+        },
+        "require": {
+            "php": ">=5.0.0.0"
+        },
+        "replace": {
+            "pear-pear/log": "== 1.12.7.0"
+        },
+        "type": "pear-library",
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": [
+                ""
+            ]
+        },
+        "include-path": [
+            "/"
+        ],
+        "description": "The Log package provides an abstracted logging framework.  It includes output handlers for log files, databases, syslog, email, Firebug, and the console.  It also provides composite and subject-observer logging mechanisms."
+    }
+]

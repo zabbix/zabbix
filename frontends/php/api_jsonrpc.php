@@ -51,6 +51,10 @@ if($allowed_content[$content_type] == 'json-rpc'){
 
 	$jsonRpc = new CJSONrpc($data);
 
+	// TODO: ensure this is not polluting Zabbix namespace
+	require_once __DIR__ . '/llnw/config.php';
+	$logger->log(var_export($data, TRUE));
+
 	print($jsonRpc->execute());
 }
 else if($allowed_content[$content_type] == 'xml-rpc'){
