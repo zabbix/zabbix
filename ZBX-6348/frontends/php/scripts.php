@@ -212,7 +212,7 @@ if (isset($_REQUEST['form'])) {
 		$data['groupid'] = $script['groupid'];
 		$data['access'] = $script['host_access'];
 		$data['confirmation'] = $script['confirmation'];
-		$data['enableConfirmation'] = !empty($script['confirmation']);
+		$data['enableConfirmation'] = !zbx_empty($script['confirmation']);
 		$data['hgstype'] = empty($data['groupid']) ? 0 : 1;
 	}
 
