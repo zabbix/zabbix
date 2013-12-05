@@ -113,7 +113,7 @@ class CHost extends CHostGeneral {
 			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
 			// output
-			'output'					=> API_OUTPUT_REFER,
+			'output'					=> API_OUTPUT_EXTEND,
 			'selectGroups'				=> null,
 			'selectParentTemplates'		=> null,
 			'selectItems'				=> null,
@@ -167,7 +167,6 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
 
-			$sqlParts['select']['groupid'] = 'hg.groupid';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
 			$sqlParts['where']['hgh'] = 'hg.hostid=h.hostid';
@@ -181,7 +180,6 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['proxyids'])) {
 			zbx_value2array($options['proxyids']);
 
-			$sqlParts['select']['proxy_hostid'] = 'h.proxy_hostid';
 			$sqlParts['where'][] = dbConditionInt('h.proxy_hostid', $options['proxyids']);
 		}
 
@@ -189,7 +187,6 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['templateids'])) {
 			zbx_value2array($options['templateids']);
 
-			$sqlParts['select']['templateid'] = 'ht.templateid';
 			$sqlParts['from']['hosts_templates'] = 'hosts_templates ht';
 			$sqlParts['where'][] = dbConditionInt('ht.templateid', $options['templateids']);
 			$sqlParts['where']['hht'] = 'h.hostid=ht.hostid';
@@ -203,7 +200,6 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['interfaceids'])) {
 			zbx_value2array($options['interfaceids']);
 
-			$sqlParts['select']['interfaceid'] = 'hi.interfaceid';
 			$sqlParts['from']['interface'] = 'interface hi';
 			$sqlParts['where'][] = dbConditionInt('hi.interfaceid', $options['interfaceids']);
 			$sqlParts['where']['hi'] = 'h.hostid=hi.hostid';
@@ -213,7 +209,6 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
 
-			$sqlParts['select']['itemid'] = 'i.itemid';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where'][] = dbConditionInt('i.itemid', $options['itemids']);
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
@@ -223,7 +218,6 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['triggerids'])) {
 			zbx_value2array($options['triggerids']);
 
-			$sqlParts['select']['triggerid'] = 'f.triggerid';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where'][] = dbConditionInt('f.triggerid', $options['triggerids']);
@@ -235,7 +229,6 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['httptestids'])) {
 			zbx_value2array($options['httptestids']);
 
-			$sqlParts['select']['httptestid'] = 'ht.httptestid';
 			$sqlParts['from']['httptest'] = 'httptest ht';
 			$sqlParts['where'][] = dbConditionInt('ht.httptestid', $options['httptestids']);
 			$sqlParts['where']['aht'] = 'ht.hostid=h.hostid';
@@ -245,7 +238,6 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['graphids'])) {
 			zbx_value2array($options['graphids']);
 
-			$sqlParts['select']['graphid'] = 'gi.graphid';
 			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where'][] = dbConditionInt('gi.graphid', $options['graphids']);
@@ -257,7 +249,6 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['applicationids'])) {
 			zbx_value2array($options['applicationids']);
 
-			$sqlParts['select']['applicationid'] = 'a.applicationid';
 			$sqlParts['from']['applications'] = 'applications a';
 			$sqlParts['where'][] = dbConditionInt('a.applicationid', $options['applicationids']);
 			$sqlParts['where']['ah'] = 'a.hostid=h.hostid';
@@ -267,7 +258,6 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['dserviceids'])) {
 			zbx_value2array($options['dserviceids']);
 
-			$sqlParts['select']['dserviceid'] = 'ds.dserviceid';
 			$sqlParts['from']['dservices'] = 'dservices ds';
 			$sqlParts['from']['interface'] = 'interface i';
 			$sqlParts['where'][] = dbConditionInt('ds.dserviceid', $options['dserviceids']);
@@ -283,7 +273,6 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['maintenanceids'])) {
 			zbx_value2array($options['maintenanceids']);
 
-			$sqlParts['select']['maintenanceid'] = 'mh.maintenanceid';
 			$sqlParts['from']['maintenances_hosts'] = 'maintenances_hosts mh';
 			$sqlParts['where'][] = dbConditionInt('mh.maintenanceid', $options['maintenanceids']);
 			$sqlParts['where']['hmh'] = 'h.hostid=mh.hostid';
@@ -440,110 +429,6 @@ class CHost extends CHostGeneral {
 			else {
 				if (!isset($result[$host['hostid']])) {
 					$result[$host['hostid']] = array();
-				}
-
-				// groupids
-				if (isset($host['groupid']) && is_null($options['selectGroups'])) {
-					if (!isset($result[$host['hostid']]['groups'])) {
-						$result[$host['hostid']]['groups'] = array();
-					}
-
-					$result[$host['hostid']]['groups'][] = array('groupid' => $host['groupid']);
-					unset($host['groupid']);
-				}
-
-				// templateids
-				if (isset($host['templateid'])) {
-					if (!isset($result[$host['hostid']]['templates'])) {
-						$result[$host['hostid']]['templates'] = array();
-					}
-
-					$result[$host['hostid']]['templates'][] = array(
-						'templateid' => $host['templateid'],
-						'hostid' => $host['templateid']
-					);
-					unset($host['templateid']);
-				}
-
-				// triggerids
-				if (isset($host['triggerid']) && is_null($options['selectTriggers'])) {
-					if (!isset($result[$host['hostid']]['triggers'])) {
-						$result[$host['hostid']]['triggers'] = array();
-					}
-
-					$result[$host['hostid']]['triggers'][] = array('triggerid' => $host['triggerid']);
-					unset($host['triggerid']);
-				}
-
-				// interfaceids
-				if (isset($host['interfaceid']) && is_null($options['selectInterfaces'])) {
-					if (!isset($result[$host['hostid']]['interfaces'])) {
-						$result[$host['hostid']]['interfaces'] = array();
-					}
-
-					$result[$host['hostid']]['interfaces'][] = array('interfaceid' => $host['interfaceid']);
-					unset($host['interfaceid']);
-				}
-
-				// itemids
-				if (isset($host['itemid']) && is_null($options['selectItems'])) {
-					if (!isset($result[$host['hostid']]['items'])) {
-						$result[$host['hostid']]['items'] = array();
-					}
-
-					$result[$host['hostid']]['items'][] = array('itemid' => $host['itemid']);
-					unset($host['itemid']);
-				}
-
-				// graphids
-				if (isset($host['graphid']) && is_null($options['selectGraphs'])) {
-					if (!isset($result[$host['hostid']]['graphs'])) {
-						$result[$host['hostid']]['graphs'] = array();
-					}
-
-					$result[$host['hostid']]['graphs'][] = array('graphid' => $host['graphid']);
-					unset($host['graphid']);
-				}
-
-				// graphids
-				if (isset($host['applicationid'])) {
-					if (!isset($result[$host['hostid']]['applications'])) {
-						$result[$host['hostid']]['applications'] = array();
-					}
-
-					$result[$host['hostid']]['applications'][] = array('applicationid' => $host['applicationid']);
-					unset($host['applicationid']);
-				}
-
-				// httptestids
-				if (isset($host['httptestid'])) {
-					if (!isset($result[$host['hostid']]['httptests'])) {
-						$result[$host['hostid']]['httptests'] = array();
-					}
-
-					$result[$host['hostid']]['httptests'][] = array('httptestid' => $host['httptestid']);
-					unset($host['httptestid']);
-				}
-
-				// dserviceids
-				if (isset($host['dserviceid'])) {
-					if (!isset($result[$host['hostid']]['dservices'])) {
-						$result[$host['hostid']]['dservices'] = array();
-					}
-
-					$result[$host['hostid']]['dservices'][] = array('dserviceid' => $host['dserviceid']);
-					unset($host['dserviceid']);
-				}
-
-				// maintenanceids
-				if (isset($host['maintenanceid'])) {
-					if (!isset($result[$host['hostid']]['maintenances'])) {
-						$result[$host['hostid']]['maintenances'] = array();
-					}
-
-					if ($host['maintenanceid'] > 0) {
-						$result[$host['hostid']]['maintenances'][] = array('maintenanceid' => $host['maintenanceid']);
-					}
 				}
 
 				$result[$host['hostid']] += $host;

@@ -70,7 +70,7 @@ class CHttpTest extends CZBXAPI {
 			'startSearch'    => null,
 			'excludeSearch'  => null,
 			// output
-			'output'         => API_OUTPUT_REFER,
+			'output'         => API_OUTPUT_EXTEND,
 			'expandName'     => null,
 			'expandStepName' => null,
 			'selectHosts'    => null,
@@ -107,7 +107,6 @@ class CHttpTest extends CZBXAPI {
 		if (!is_null($options['httptestids'])) {
 			zbx_value2array($options['httptestids']);
 
-			$sqlParts['select']['httptestid'] = 'ht.httptestid';
 			$sqlParts['where']['httptestid'] = dbConditionInt('ht.httptestid', $options['httptestids']);
 		}
 
@@ -138,7 +137,6 @@ class CHttpTest extends CZBXAPI {
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
 
-			$sqlParts['select']['groupid'] = 'hg.groupid';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
 			$sqlParts['where'][] = 'hg.hostid=ht.hostid';
@@ -152,9 +150,6 @@ class CHttpTest extends CZBXAPI {
 		if (!is_null($options['applicationids'])) {
 			zbx_value2array($options['applicationids']);
 
-			if ($options['output'] != API_OUTPUT_EXTEND) {
-				$sqlParts['select']['applicationid'] = 'a.applicationid';
-			}
 			$sqlParts['where'][] = dbConditionInt('ht.applicationid', $options['applicationids']);
 		}
 
