@@ -57,7 +57,7 @@ foreach ($this->data['slides'] as $step => $slides) {
 	$name = '';
 	if (!empty($slides['screenid'])) {
 		$screen = get_screen_by_screenid($slides['screenid']);
-		if (!empty($screen['name'])) {
+		if (!zbx_empty($screen['name'])) {
 			$name = $screen['name'];
 		}
 	}
