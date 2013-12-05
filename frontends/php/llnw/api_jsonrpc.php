@@ -51,6 +51,7 @@ elseif ($json['method'] == 'dm.info') {
 elseif ($json['method'] == 'queue.info') {
    include($base_dir.'queue-info.php');
 }
-
-sendErrorResponse('235', "Invalid method", "Invalid method");
+else {
+   sendErrorResponse('235', "Invalid method", "Invalid method");
+}
 ?>
