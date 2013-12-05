@@ -59,8 +59,14 @@ static void	host_availability_sender(struct zbx_json *j)
 
 	if (SUCCEED == get_host_availability_data(j))
 	{
+		char	*error = NULL;
+
 		connect_to_server(&sock, 600, CONFIG_PROXYDATA_FREQUENCY); /* retry till have a connection */
-		put_data_to_server(&sock, j);
+
+		if (SUCCEED != put_data_to_server(&sock, j, &error))
+			zabbix_log(LOG_LEVEL_WARNING, "sending host_availability data to server failed: %s", error);
+
+		zbx_free(error);
 		disconnect_server(&sock);
 	}
 
@@ -104,19 +110,25 @@ static void	history_sender(struct zbx_json *j, int *records, const char *tag,
 
 	if (*records > 0)
 	{
+		char	*error = NULL;
+
 		connect_to_server(&sock, 600, CONFIG_PROXYDATA_FREQUENCY); /* retry till have a connection */
 
 		zbx_json_adduint64(j, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
 
-		if (SUCCEED == put_data_to_server(&sock, j))
+		if (SUCCEED == put_data_to_server(&sock, j, &error))
 		{
 			DBbegin();
 			f_set_lastid(lastid);
 			DBcommit();
 		}
 		else
+		{
 			*records = 0;
+			zabbix_log(LOG_LEVEL_WARNING, "sending data to server failed: %s", error);
+		}
 
+		zbx_free(error);
 		disconnect_server(&sock);
 	}
 

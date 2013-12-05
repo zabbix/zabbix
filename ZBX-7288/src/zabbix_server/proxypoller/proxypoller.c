@@ -232,7 +232,18 @@ static int	process_proxy()
 			if (SUCCEED == (ret = connect_to_proxy(&proxy, &s, CONFIG_TRAPPER_TIMEOUT)))
 			{
 				if (SUCCEED == (ret = send_data_to_proxy(&proxy, &s, j.buffer)))
-					ret = zbx_recv_response(&s, NULL, 0, 0);
+				{
+					char	*info = NULL, *error = NULL;
+
+					if (SUCCEED != (ret = zbx_recv_response_dyn(&s, &info, &error, 0)))
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy: "
+								"error=\"%s\", info=\"%s\"", ZBX_NULL2STR(error),
+								ZBX_NULL2STR(info));
+					}
+					zbx_free(info);
+					zbx_free(error);
+				}
 
 				disconnect_proxy(&s);
 			}
