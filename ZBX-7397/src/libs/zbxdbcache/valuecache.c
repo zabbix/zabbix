@@ -750,8 +750,8 @@ static void	vc_warn_low_memory()
  * Comments: The caller item must not be removed from cache to avoid          *
  *           complications (ie - checking if item still is in cache every     *
  *           time after calling vc_free_space() function).                    *
- *           vc_free_space() attempts to free at least  min_free_request      *
- *           bytes of space to reduce number of space releaes requests.       *
+ *           vc_free_space() attempts to free at least min_free_request       *
+ *           bytes of space to reduce number of space release requests.       *
  *                                                                            *
  ******************************************************************************/
 static void	vc_release_space(zbx_vc_item_t *source_item, size_t space)
@@ -1023,7 +1023,7 @@ static char	*vc_item_strdup(zbx_vc_item_t *item, const char *str)
  *                                                                            *
  * Parameters: str   - [IN] the string to remove                              *
  *                                                                            *
- * Return value: The number of bytes freed                                    *
+ * Return value: the number of bytes freed                                    *
  *                                                                            *
  * Comments: This function decrements the string reference counter and        *
  *           removes it from the string pool when counter becomes zero.       *
@@ -1104,7 +1104,7 @@ fail:
  *                                                                            *
  * Parameters: str   - [IN] the log to remove                                 *
  *                                                                            *
- * Return value: The number of bytes freed                                    *
+ * Return value: the number of bytes freed                                    *
  *                                                                            *
  * Comments: Note - only logs created with vc_item_logdup() function must     *
  *           be freed with vc_item_logfree().                                 *
@@ -1798,7 +1798,7 @@ static void	vch_item_get_values_from(const zbx_vc_item_t *item, const zbx_vc_chu
 
 /******************************************************************************
  *                                                                            *
- * Function: vc_item_remove_values_after                                      *
+ * Function: vch_item_remove_values_from                                      *
  *                                                                            *
  * Purpose: removes all item history values starting with the specified chunk *
  *          and index                                                         *
@@ -1854,7 +1854,7 @@ static void	vch_item_remove_values_from(zbx_vc_item_t *item, zbx_vc_chunk_t *chu
  * Parameters: item    - [IN] the chunk owner item                            *
  *             chunk   - [IN] the chunk to free                               *
  *                                                                            *
- * Return value:  The number of bytes freed                                   *
+ * Return value: the number of bytes freed                                    *
  *                                                                            *
  ******************************************************************************/
 static size_t	vch_item_free_chunk(zbx_vc_item_t *item, zbx_vc_chunk_t *chunk)
@@ -2263,9 +2263,9 @@ static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, const 
 				cache_records += chunk->last_value - chunk->first_value + 1;
 		}
 
-		/* We need to get item values before the first cached value, but not including it.    */
-		/* As vc_item_read_values_by_time() function returns data including the end timestamp */
-		/* decrement the first timestamp by 1.                                                */
+		/* We need to get item values before the first cached value, but not including it.     */
+		/* As vc_item_read_values_by_count() function returns data including the end timestamp */
+		/* decrement the first timestamp by 1.                                                 */
 		update_end = item->tail->slots[item->tail->first_value].timestamp.sec - 1;
 	}
 	else
@@ -2578,6 +2578,7 @@ out:
  *             count      - [IN] the number of values to get                  *
  *             timestamp  - [IN] the request period end timestamp             *
  *             ts         - [IN] the value timestamp for single request, can  *
+ *                               be NULL                                      *
  *                                                                            *
  * Return value: SUCCEED - item initialized successfully                      *
  *               FAIL    - otherwise                                          *
