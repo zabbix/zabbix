@@ -83,7 +83,7 @@ class CGraph extends CGraphGeneral {
 			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
 			// output
-			'output'					=> API_OUTPUT_REFER,
+			'output'					=> API_OUTPUT_EXTEND,
 			'selectGroups'				=> null,
 			'selectTemplates'			=> null,
 			'selectHosts'				=> null,
@@ -156,7 +156,6 @@ class CGraph extends CGraphGeneral {
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
 
-			$sqlParts['select']['groupid'] = 'hg.groupid';
 			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
@@ -188,7 +187,6 @@ class CGraph extends CGraphGeneral {
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 
-			$sqlParts['select']['hostid'] = 'i.hostid';
 			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where'][] = dbConditionInt('i.hostid', $options['hostids']);
@@ -211,7 +209,6 @@ class CGraph extends CGraphGeneral {
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
 
-			$sqlParts['select']['itemid'] = 'gi.itemid';
 			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
 			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
 			$sqlParts['where'][] = dbConditionInt('gi.itemid', $options['itemids']);
@@ -315,23 +312,6 @@ class CGraph extends CGraphGeneral {
 					$result[$graph['graphid']] = array();
 				}
 
-				// hostids
-				if (isset($graph['hostid']) && is_null($options['selectHosts'])) {
-					if (!isset($result[$graph['graphid']]['hosts'])) {
-						$result[$graph['graphid']]['hosts'] = array();
-					}
-					$result[$graph['graphid']]['hosts'][] = array('hostid' => $graph['hostid']);
-					unset($graph['hostid']);
-				}
-
-				// itemids
-				if (isset($graph['itemid']) && is_null($options['selectItems'])) {
-					if (!isset($result[$graph['graphid']]['items'])) {
-						$result[$graph['graphid']]['items'] = array();
-					}
-					$result[$graph['graphid']]['items'][] = array('itemid' => $graph['itemid']);
-					unset($graph['itemid']);
-				}
 				$result[$graph['graphid']] += $graph;
 			}
 		}

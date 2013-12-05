@@ -109,7 +109,7 @@ class CEvent extends CZBXAPI {
 			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
 			// output
-			'output'					=> API_OUTPUT_REFER,
+			'output'					=> API_OUTPUT_EXTEND,
 			'selectHosts'				=> null,
 			'selectRelatedObject'		=> null,
 			'select_alerts'				=> null,
@@ -231,8 +231,6 @@ class CEvent extends CZBXAPI {
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
 
-			$sqlParts = $this->addQuerySelect('hg.groupid', $sqlParts);
-
 			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
 				$sqlParts['from']['functions'] = 'functions f';
@@ -256,8 +254,6 @@ class CEvent extends CZBXAPI {
 		// hostids
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
-
-			$sqlParts = $this->addQuerySelect('i.hostid', $sqlParts);
 
 			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
@@ -352,15 +348,6 @@ class CEvent extends CZBXAPI {
 			else {
 				if (!isset($result[$event['eventid']])) {
 					$result[$event['eventid']]= array();
-				}
-
-				// hostids
-				if (isset($event['hostid']) && is_null($options['selectHosts'])) {
-					if (!isset($result[$event['eventid']]['hosts'])) {
-						$result[$event['eventid']]['hosts'] = array();
-					}
-					$result[$event['eventid']]['hosts'][] = array('hostid' => $event['hostid']);
-					unset($event['hostid']);
 				}
 
 				$result[$event['eventid']] += $event;

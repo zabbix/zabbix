@@ -78,7 +78,7 @@ class CHistory extends CZBXAPI {
 			'time_from'					=> null,
 			'time_till'					=> null,
 			// output
-			'output'					=> API_OUTPUT_REFER,
+			'output'					=> API_OUTPUT_EXTEND,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'groupOutput'				=> null,
@@ -129,7 +129,6 @@ class CHistory extends CZBXAPI {
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 
-			$sqlParts['select']['hostid'] = 'i.hostid';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
 			$sqlParts['where']['hi'] = 'h.itemid=i.itemid';
@@ -147,13 +146,11 @@ class CHistory extends CZBXAPI {
 
 		// time_from
 		if (!is_null($options['time_from'])) {
-			$sqlParts['select']['clock'] = 'h.clock';
 			$sqlParts['where']['clock_from'] = 'h.clock>='.zbx_dbstr($options['time_from']);
 		}
 
 		// time_till
 		if (!is_null($options['time_till'])) {
-			$sqlParts['select']['clock'] = 'h.clock';
 			$sqlParts['where']['clock_till'] = 'h.clock<='.zbx_dbstr($options['time_till']);
 		}
 
@@ -165,12 +162,6 @@ class CHistory extends CZBXAPI {
 		// search
 		if (is_array($options['search'])) {
 			zbx_db_search($sqlParts['from']['history'], $options, $sqlParts);
-		}
-
-		// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			unset($sqlParts['select']['clock']);
-			$sqlParts['select']['history'] = 'h.*';
 		}
 
 		// countOutput
@@ -240,23 +231,6 @@ class CHistory extends CZBXAPI {
 
 				$result[$count] = array();
 
-				// hostids
-				if (isset($data['hostid'])) {
-					if (!isset($result[$count]['hosts'])) {
-						$result[$count]['hosts'] = array();
-					}
-					$result[$count]['hosts'][] = array('hostid' => $data['hostid']);
-					unset($data['hostid']);
-				}
-
-				// triggerids
-				if (isset($data['triggerid'])) {
-					if (!isset($result[$count]['triggers'])) {
-						$result[$count]['triggers'] = array();
-					}
-					$result[$count]['triggers'][] = array('triggerid' => $data['triggerid']);
-					unset($data['triggerid']);
-				}
 				$result[$count] += $data;
 
 				// grouping
