@@ -375,7 +375,7 @@ class CScreen extends CZBXAPI {
 	protected function validateCreate(array $screens) {
 		$screenDbFields = array('name' => null);
 
-		foreach ($screens as $screen) {
+		foreach ($screens as &$screen) {
 			if (!check_db_fields($screenDbFields, $screen)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
@@ -387,7 +387,10 @@ class CScreen extends CZBXAPI {
 					_s('Cannot set "templateid" for screen "%1$s".', $screen['name'])
 				);
 			}
+
+			unset($screen['screenid']);
 		}
+		unset($screen);
 
 		$dbScreens = API::getApi()->select('screens', array(
 			'filter' => array('name' => zbx_objectValues($screens, 'name')),
@@ -444,6 +447,16 @@ class CScreen extends CZBXAPI {
 	 * @param array $screens
 	 */
 	protected function validateUpdate(array $screens) {
+		$screenDBfields = array(
+			'screenid' => null
+		);
+
+		foreach ($screens as $screen) {
+			if (!check_db_fields($screenDBfields, $screen)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
+			}
+		}
+
 		$dbScreens = $this->get(array(
 			'screenids' => zbx_objectValues($screens, 'screenid'),
 			'editable' => true,
@@ -520,9 +533,9 @@ class CScreen extends CZBXAPI {
 		}
 
 		// delete outside screen items
-		$dbScreenItems = API::ScreenItem()->get(array(
-			'screenids' => $screenIds,
-			'output' => array('screenitemid', 'screenid', 'x', 'y')
+		$dbScreenItems = API::getApi()->select('screens_items', array(
+			'filter' => array('screenid' => $screenIds),
+			'output' => array('screenitemid', 'screenid', 'x', 'y'),
 		));
 
 		$deleteScreenItemIds = array();
