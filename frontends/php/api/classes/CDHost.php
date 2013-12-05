@@ -85,7 +85,7 @@ class CDHost extends CZBXAPI {
 			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
 			// output
-			'output'					=> API_OUTPUT_REFER,
+			'output'					=> API_OUTPUT_EXTEND,
 			'selectDRules'				=> null,
 			'selectDServices'			=> null,
 			'countOutput'				=> null,
@@ -125,7 +125,6 @@ class CDHost extends CZBXAPI {
 		if (!is_null($options['druleids'])) {
 			zbx_value2array($options['druleids']);
 
-			$sqlParts['select']['druleid'] = 'dh.druleid';
 			$sqlParts['where']['druleid'] = dbConditionInt('dh.druleid', $options['druleids']);
 
 			if (!is_null($options['groupCount'])) {
@@ -142,7 +141,6 @@ class CDHost extends CZBXAPI {
 		if (!is_null($options['dserviceids'])) {
 			zbx_value2array($options['dserviceids']);
 
-			$sqlParts['select']['dserviceids'] = 'ds.dserviceid';
 			$sqlParts['from']['dservices'] = 'dservices ds';
 			$sqlParts['where'][] = dbConditionInt('ds.dserviceid', $options['dserviceids']);
 			$sqlParts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
