@@ -168,7 +168,7 @@ int	put_data_to_server(zbx_sock_t *sock, struct zbx_json *j)
 
 	if (SUCCEED != zbx_recv_response_dyn(sock, &info, 0))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "sending data: negative response from server \"%s:%d\": %s",
+		zabbix_log(LOG_LEVEL_WARNING, "sending data failed: negative response from server \"%s:%d\": %s",
 				CONFIG_SERVER, CONFIG_SERVER_PORT, ZBX_NULL2STR(info));
 		goto out;
 	}

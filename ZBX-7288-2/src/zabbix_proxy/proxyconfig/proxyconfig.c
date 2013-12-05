@@ -69,10 +69,6 @@ static void	process_configuration_sync(size_t *data_size)
 		goto out;
 	}
 
-	*data_size = strlen(data);	/* performance metric */
-	zabbix_log(LOG_LEVEL_WARNING, "Received configuration data from server. Datalen " ZBX_FS_SIZE_T,
-		(zbx_fs_size_t)*data_size);
-
 	if (SUCCEED != zbx_json_open(data, &jp))
 	{
 		*data_size = 0;
@@ -80,19 +76,20 @@ static void	process_configuration_sync(size_t *data_size)
 		goto out;
 	}
 
-	if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server: response missing: %s",
-				zbx_json_strerror());
-		goto out;
-	}
+	*data_size = jp.end - jp.start + 1;	/* performance metric */
 
-	if (0 != strcmp(value, ZBX_PROTO_VALUE_SUCCESS))
+	/* if the answer is short then most likely it is a negative answer "response":"failed" */
+	if (128 > *data_size &&
+			SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value)) &&
+			0 == strcmp(value, ZBX_PROTO_VALUE_FAILED))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot obtain configuration data from server. "
 				"Proxy host name might not be matching that on the server.");
 		goto out;
 	}
+
+	zabbix_log(LOG_LEVEL_WARNING, "Received configuration data from server. Datalen " ZBX_FS_SIZE_T,
+		(zbx_fs_size_t)*data_size);
 
 	process_proxyconfig(&jp);
 out:

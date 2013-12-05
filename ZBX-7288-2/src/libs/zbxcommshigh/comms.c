@@ -115,7 +115,7 @@ int	zbx_recv_response_dyn(zbx_sock_t *sock, char **info, int timeout)
 
 	struct zbx_json_parse	jp;
 	char			value[16], *answer, *info_buf = NULL;
-	size_t			info_buf_alloc, offset = 0;
+	size_t			info_buf_alloc = 0, offset = 0;
 	int			ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
