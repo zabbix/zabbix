@@ -668,27 +668,25 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 		clearCookies($result, get_request('hostid'));
 	}
 }
-elseif ($_REQUEST['go'] == 'activate' && isset($_REQUEST['group_itemid'])) {
-	$group_itemid = $_REQUEST['group_itemid'];
+elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('group_itemid')) {
+	$groupItemId = getRequest('group_itemid');
+	$enable = (getRequest('go') == 'activate');
 
 	DBstart();
+	$result = $enable ? activate_item($groupItemId) : disable_item($groupItemId);
+	$result = DBend($result);
 
-	$goResult = activate_item($group_itemid);
-	$goResult = DBend($goResult);
+	$updated = count($groupItemId);
 
-	show_messages($goResult, _('Items activated'), null);
-	clearCookies($goResult, get_request('hostid'));
-}
-elseif ($_REQUEST['go'] == 'disable' && isset($_REQUEST['group_itemid'])) {
-	$group_itemid = $_REQUEST['group_itemid'];
+	$messageSuccess = $enable
+		? _n('Item enabled', 'Items enabled', $updated)
+		: _n('Item disabled', 'Items disabled', $updated);
+	$messageFailed = $enable
+		? _n('Cannot enable item', 'Cannot enable items', $updated)
+		: _n('Cannot disable item', 'Cannot disable items', $updated);
 
-	DBstart();
-
-	$goResult = disable_item($group_itemid);
-	$goResult = DBend($goResult);
-
-	show_messages($goResult, _('Items disabled'), null);
-	clearCookies($goResult, get_request('hostid'));
+	show_messages($result, $messageSuccess, $messageFailed);
+	clearCookies($result, getRequest('hostid'));
 }
 elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQUEST['group_itemid'])) {
 	if (isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])) {
