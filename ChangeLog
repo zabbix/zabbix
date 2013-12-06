@@ -9,7 +9,6 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, It
 ....I..PS. [ZBXNEXT-1257] dropped support for UCD-SNMP (asaveljevs)
 
 Bug fixes:
-..F....... [ZBX-7427] fixed element links not being rendered correctly between host groups and other elements (Pavel)
 ...G...... [ZBX-7479] fixed remote command execution from Zabbix server if flexible user parameters are configured; thanks to Recurity Labs Team for the report (Sasha)
 ....I..... [ZBX-7461] fixed compilation on kFreeBSD and other operating systems which are not explicitly supported (asaveljevs)
 ....I..... [ZBX-7339] fixed item prototypes of OpenBSD and FreeBSD templates (igors)

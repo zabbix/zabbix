@@ -72,9 +72,6 @@ function sysmapElementLabel($label = null) {
  * @return CAreaMap
  */
 function getActionMapBySysmap($sysmap, array $options = array()) {
-	$sysmap['selements'] = zbx_toHash($sysmap['selements'], 'selementid');
-	$sysmap['links'] = zbx_toHash($sysmap['links'], 'linkid');
-
 	$actionMap = new CAreaMap('links'.$sysmap['sysmapid']);
 
 	$areas = populateFromMapAreas($sysmap);
@@ -990,7 +987,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 		$hostsToGetInventories = array();
 	}
 
-	$selements = $sysmap['selements'];
+	$selements = zbx_toHash($sysmap['selements'], 'selementid');
 	foreach ($selements as $selementId => $selement) {
 		$selements[$selementId]['hosts'] = array();
 		$selements[$selementId]['triggers'] = array();
