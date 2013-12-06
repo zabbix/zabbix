@@ -246,6 +246,7 @@ function make_system_status($filter) {
 		'sortorder' => ZBX_SORT_DOWN,
 		'output' =>  API_OUTPUT_EXTEND,
 		'selectHosts' => array('name'),
+		'selectGroups' => array('groupid'),
 		'preservekeys' => true
 	));
 

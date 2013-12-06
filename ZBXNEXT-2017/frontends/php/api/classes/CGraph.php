@@ -493,7 +493,8 @@ class CGraph extends CGraphGeneral {
 			'hostids' => $data['templateids'],
 			'preservekeys' => true,
 			'output' => API_OUTPUT_EXTEND,
-			'selectGraphItems' => API_OUTPUT_EXTEND
+			'selectGraphItems' => API_OUTPUT_EXTEND,
+			'selectHosts' => array('hostid')
 		));
 
 		foreach ($graphs as $graph) {
