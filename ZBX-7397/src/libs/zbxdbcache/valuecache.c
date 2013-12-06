@@ -138,9 +138,6 @@ typedef struct
 	/* Used to determine if data can be removed from cache.       */
 	int		range;
 
-	/* the maximum number of records returned by a single request */
-	int		max_response;
-
 	/* The number of cache hits for this item.                    */
 	/* Used to evaluate if the item must be dropped from cache    */
 	/* in low memory situation.                                   */
@@ -1404,18 +1401,33 @@ static void	vc_item_release(zbx_vc_item_t *item)
 
 /******************************************************************************
  *                                                                            *
- * Function: vch_get_new_chunk_slot_count                                     *
+ * Function: vch_item_chunk_slot_count                                        *
  *                                                                            *
  * Purpose: calculates optimal number of slots for an item data chunk         *
  *                                                                            *
- * Parameters:  item   - [IN] the item                                        *
- *              nslots - [IN] the number of requested slots                   *
+ * Parameters:  item        - [IN] the item                                   *
+ *              values_new  - [IN] the number of values to be added           *
  *                                                                            *
  * Return value: the number of slots for a new item data chunk                *
  *                                                                            *
+ * Comments: From size perspective the optimal slot count per chunk is        *
+ *           approximately square root of the number of cached values.        *
+ *           Still creating too many chunks might affect timeshift request    *
+ *           performance, so don't try creating more than 32 chunks unless    *
+ *           the calculated slot count exceeds the maximum limit.             *
+ *                                                                            *
  ******************************************************************************/
-static int	vch_get_new_chunk_slot_count(int nslots)
+static int	vch_item_chunk_slot_count(zbx_vc_item_t *item, int values_new)
 {
+	int	nslots, values;
+
+	values = item->values_total + values_new;
+
+	nslots = zbx_isqrt32(values);
+
+	if ((values + nslots - 1) / nslots + 1 > 32)
+		nslots = values / 32;
+
 	if (nslots > (int)ZBX_VC_MAX_CHUNK_RECORDS)
 		nslots = ZBX_VC_MAX_CHUNK_RECORDS;
 	if (nslots < (int)ZBX_VC_MIN_CHUNK_RECORDS)
@@ -1819,7 +1831,6 @@ static void	vch_item_remove_values_from(zbx_vc_item_t *item, zbx_vc_chunk_t *chu
 		{
 			/* the specified value is the first value in cache - all data must be dropped */
 			vch_item_free_cache(item);
-			item->tail = item->head = NULL;
 			return;
 		}
 		chunk = chunk->prev;
@@ -1969,7 +1980,7 @@ static void	vch_item_clean_cache(zbx_vc_item_t *item)
  ******************************************************************************/
 static int	vch_item_add_values_at_end(zbx_vc_item_t *item, const zbx_history_record_t *values, int values_num)
 {
-	int				copied = 0, ret = FAIL, count = values_num, chunk_slots;
+	int				copied = 0, ret = FAIL, count = values_num;
 	zbx_vector_history_record_t	values_ext = {NULL};
 	zbx_vc_chunk_t			*head = item->head;
 
@@ -2048,16 +2059,6 @@ static int	vch_item_add_values_at_end(zbx_vc_item_t *item, const zbx_history_rec
 		count = values_ext.values_num;
 	}
 
-	/* Calculate the optimal number of slots for new chunks.                    */
-	/* If the number of max requested values is much less than the total number */
-	/* of cached values it suggests that timeshift requests were issued and     */
-	/* the total number of values must also be used to calculate slot count for */
-	/* the new chunk.                                                           */
-	if (item->max_response > item->values_total / 4)
-		chunk_slots = (item->max_response + 1) / 2;
-	else
-		chunk_slots = (item->max_response + item->values_total + 1) / 4;
-
 	while (0 != count)
 	{
 		int	copy_slots, nslots = 0;
@@ -2068,10 +2069,7 @@ static int	vch_item_add_values_at_end(zbx_vc_item_t *item, const zbx_history_rec
 
 		if (0 == nslots)
 		{
-			/* When appending values (adding newer data) keep the chunk slot count at the half */
-			/* of max values per request. This way the memory taken by item cache will be:     */
-			/*   3 * (<max values per request> * <slot count> + <chunk header size>)           */
-			nslots = vch_get_new_chunk_slot_count(chunk_slots);
+			nslots = vch_item_chunk_slot_count(item, count);
 
 			if (FAIL == vch_item_add_chunk(item, nslots, NULL))
 				goto out;
@@ -2122,7 +2120,7 @@ out:
 static int	vch_item_add_values_at_beginning(zbx_vc_item_t *item, const zbx_history_record_t *values,
 		int values_num)
 {
-	int 	count = values_num, ret = FAIL, chunk_slots;
+	int 	count = values_num, ret = FAIL;
 
 	/* skip values already added to the item cache by another process */
 	if (NULL != item->tail)
@@ -2134,8 +2132,6 @@ static int	vch_item_add_values_at_beginning(zbx_vc_item_t *item, const zbx_histo
 		++count;
 	}
 
-	chunk_slots = count / 2;
-
 	while (0 != count)
 	{
 		int	copy_slots, nslots = 0;
@@ -2146,8 +2142,7 @@ static int	vch_item_add_values_at_beginning(zbx_vc_item_t *item, const zbx_histo
 
 		if (0 == nslots)
 		{
-			/* when inserting before existing data reserve space only to fit the request */
-			nslots = vch_get_new_chunk_slot_count(chunk_slots);
+			nslots = vch_item_chunk_slot_count(item, count);
 
 			if (FAIL == vch_item_add_chunk(item, nslots, item->tail))
 				goto out;
@@ -2488,9 +2483,6 @@ static int	vch_item_get_value_range(zbx_vc_item_t *item, zbx_vector_history_reco
 	hits = values->values_num - records_read;
 	misses = records_read;
 
-	if (values->values_num > item->max_response)
-		item->max_response = values->values_num;
-
 	vc_update_statistics(item, hits, misses);
 out:
 	return ret;
@@ -2554,9 +2546,6 @@ static int	vch_item_get_value(zbx_vc_item_t *item, const zbx_timespec_t *ts, zbx
 		if (SEC_PER_MIN > item->range)
 			item->range = SEC_PER_MIN;
 	}
-
-	if (1 > item->max_response)
-		item->max_response = 1;
 
 	*found = 1;
 out:
@@ -2658,6 +2647,8 @@ static size_t	vch_item_free_cache(zbx_vc_item_t *item)
 		chunk = next;
 	}
 	item->values_total = 0;
+	item->head = NULL;
+	item->tail = NULL;
 
 	return freed;
 }

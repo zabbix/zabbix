@@ -1069,4 +1069,6 @@ void umul64_64(zbx_uint128_t *result, zbx_uint64_t value, zbx_uint64_t factor);
 #define ZBX_SESSION_ACTIVE	0
 #define ZBX_SESSION_PASSIVE	1
 
+zbx_uint64_t	zbx_isqrt32(int value);
+
 #endif

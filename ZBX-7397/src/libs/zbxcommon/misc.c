@@ -2346,3 +2346,38 @@ fail:
 
 	return res;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_isqrt                                                        *
+ *                                                                            *
+ * Purpose: calculate integer part of a 32 bit square root                    *
+ *                                                                            *
+ * Parameters: value     - [IN] the value to calculate square root for        *
+ *                                                                            *
+ * Return value: the integer part of square root                              *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_isqrt32(int value)
+{
+	zbx_uint64_t	i, remainder = 0, result = 0;
+
+	for (i = 0; i < 16; i++)
+	{
+		result <<= 1;
+		remainder = (remainder << 2) + (value >> 30);
+		value <<= 2;
+
+		if (++result <= remainder)
+		{
+			remainder -= result;
+			result++;
+		}
+		else
+		{
+			result--;
+		}
+	}
+
+	return result >> 1;
+}
