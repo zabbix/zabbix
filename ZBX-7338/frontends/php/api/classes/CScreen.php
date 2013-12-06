@@ -418,18 +418,14 @@ class CScreen extends CZBXAPI {
 
 		// create screen items
 		$screenItems = array();
-		$n = 0;
-
-		foreach ($screens as $screen) {
+		foreach ($screens as $key => $screen) {
 			if (isset($screen['screenitems'])) {
 				foreach ($screen['screenitems'] as $screenItem) {
-					$screenItem['screenid'] = $screenIds[$n];
+					$screenItem['screenid'] = $screenIds[$key];
 
 					$screenItems[] = $screenItem;
 				}
 			}
-
-			$n++;
 		}
 
 		if ($screenItems) {
