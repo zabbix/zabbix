@@ -84,7 +84,7 @@ class CTemplate extends CHostGeneral {
 			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
 			// output
-			'output'					=> API_OUTPUT_REFER,
+			'output'					=> API_OUTPUT_EXTEND,
 			'selectGroups'				=> null,
 			'selectHosts'				=> null,
 			'selectTemplates'			=> null,
@@ -133,7 +133,6 @@ class CTemplate extends CHostGeneral {
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
 
-			$sqlParts['select']['groupid'] = 'hg.groupid';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
 			$sqlParts['where']['hgh'] = 'hg.hostid=h.hostid';
@@ -164,7 +163,6 @@ class CTemplate extends CHostGeneral {
 		if (!is_null($options['parentTemplateids'])) {
 			zbx_value2array($options['parentTemplateids']);
 
-			$sqlParts['select']['parentTemplateid'] = 'ht.templateid as parentTemplateid';
 			$sqlParts['from']['hosts_templates'] = 'hosts_templates ht';
 			$sqlParts['where'][] = dbConditionInt('ht.templateid', $options['parentTemplateids']);
 			$sqlParts['where']['hht'] = 'h.hostid=ht.hostid';
@@ -183,7 +181,6 @@ class CTemplate extends CHostGeneral {
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 
-			$sqlParts['select']['linked_hostid'] = 'ht.hostid as linked_hostid';
 			$sqlParts['from']['hosts_templates'] = 'hosts_templates ht';
 			$sqlParts['where'][] = dbConditionInt('ht.hostid', $options['hostids']);
 			$sqlParts['where']['hht'] = 'h.hostid=ht.templateid';
@@ -202,7 +199,6 @@ class CTemplate extends CHostGeneral {
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
 
-			$sqlParts['select']['itemid'] = 'i.itemid';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where'][] = dbConditionInt('i.itemid', $options['itemids']);
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
@@ -217,7 +213,6 @@ class CTemplate extends CHostGeneral {
 		if (!is_null($options['triggerids'])) {
 			zbx_value2array($options['triggerids']);
 
-			$sqlParts['select']['triggerid'] = 'f.triggerid';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where'][] = dbConditionInt('f.triggerid', $options['triggerids']);
@@ -234,7 +229,6 @@ class CTemplate extends CHostGeneral {
 		if (!is_null($options['graphids'])) {
 			zbx_value2array($options['graphids']);
 
-			$sqlParts['select']['graphid'] = 'gi.graphid';
 			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where'][] = dbConditionInt('gi.graphid', $options['graphids']);
@@ -324,59 +318,6 @@ class CTemplate extends CHostGeneral {
 
 				if (!isset($result[$template['templateid']])) {
 					$result[$template['templateid']]= array();
-				}
-
-				// groupids
-				if (isset($template['groupid']) && is_null($options['selectGroups'])) {
-					if (!isset($result[$template['templateid']]['groups'])) {
-						$result[$template['templateid']]['groups'] = array();
-					}
-
-					$result[$template['templateid']]['groups'][] = array('groupid' => $template['groupid']);
-					unset($template['groupid']);
-				}
-
-				// hostids
-				if (isset($template['linked_hostid']) && is_null($options['selectHosts'])) {
-					if (!isset($result[$template['templateid']]['hosts']))
-						$result[$template['templateid']]['hosts'] = array();
-
-					$result[$template['templateid']]['hosts'][] = array('hostid' => $template['linked_hostid']);
-					unset($template['linked_hostid']);
-				}
-				// parentTemplateids
-				if (isset($template['parentTemplateid']) && is_null($options['selectParentTemplates'])) {
-					if (!isset($result[$template['templateid']]['parentTemplates']))
-						$result[$template['templateid']]['parentTemplates'] = array();
-
-					$result[$template['templateid']]['parentTemplates'][] = array('templateid' => $template['parentTemplateid']);
-					unset($template['parentTemplateid']);
-				}
-
-				// itemids
-				if (isset($template['itemid']) && is_null($options['selectItems'])) {
-					if (!isset($result[$template['templateid']]['items']))
-						$result[$template['templateid']]['items'] = array();
-
-					$result[$template['templateid']]['items'][] = array('itemid' => $template['itemid']);
-					unset($template['itemid']);
-				}
-
-				// triggerids
-				if (isset($template['triggerid']) && is_null($options['selectTriggers'])) {
-					if (!isset($result[$template['templateid']]['triggers']))
-						$result[$template['templateid']]['triggers'] = array();
-
-					$result[$template['templateid']]['triggers'][] = array('triggerid' => $template['triggerid']);
-					unset($template['triggerid']);
-				}
-
-				// graphids
-				if (isset($template['graphid']) && is_null($options['selectGraphs'])) {
-					if (!isset($result[$template['templateid']]['graphs'])) $result[$template['templateid']]['graphs'] = array();
-
-					$result[$template['templateid']]['graphs'][] = array('graphid' => $template['graphid']);
-					unset($template['graphid']);
 				}
 
 				$result[$template['templateid']] += $template;

@@ -77,7 +77,7 @@ class CMaintenance extends CZBXAPI {
 			'filter'					=> null,
 			'searchWildcardsEnabled'	=> null,
 			// output
-			'output'					=> API_OUTPUT_REFER,
+			'output'					=> API_OUTPUT_EXTEND,
 			'selectGroups'				=> null,
 			'selectHosts'				=> null,
 			'selectTimeperiods'			=> null,
@@ -200,16 +200,6 @@ class CMaintenance extends CZBXAPI {
 			$sqlParts['where'][] = dbConditionInt('m.maintenanceid', $maintenanceids);
 		}
 
-		// groupids
-		if (!is_null($options['groupids'])) {
-			$options['selectGroups'] = 1;
-		}
-
-		// hostids
-		if (!is_null($options['hostids'])) {
-			$options['selectHosts'] = 1;
-		}
-
 		// maintenanceids
 		if (!is_null($options['maintenanceids'])) {
 			zbx_value2array($options['maintenanceids']);
@@ -253,23 +243,6 @@ class CMaintenance extends CZBXAPI {
 					$result[$maintenance['maintenanceid']] = array();
 				}
 
-				// groupids
-				if (isset($maintenance['groupid']) && is_null($options['selectGroups'])) {
-					if (!isset($result[$maintenance['maintenanceid']]['groups'])) {
-						$result[$maintenance['maintenanceid']]['groups'] = array();
-					}
-					$result[$maintenance['maintenanceid']]['groups'][] = array('groupid' => $maintenance['groupid']);
-					unset($maintenance['groupid']);
-				}
-
-				// hostids
-				if (isset($maintenance['hostid']) && is_null($options['selectHosts'])) {
-					if (!isset($result[$maintenance['maintenanceid']]['hosts'])) {
-						$result[$maintenance['maintenanceid']]['hosts'] = array();
-					}
-					$result[$maintenance['maintenanceid']]['hosts'][] = array('hostid' => $maintenance['hostid']);
-					unset($maintenance['hostid']);
-				}
 				$result[$maintenance['maintenanceid']] += $maintenance;
 			}
 		}

@@ -80,7 +80,7 @@ class CMap extends CMapElement {
 			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
 			// output
-			'output'					=> API_OUTPUT_REFER,
+			'output'					=> API_OUTPUT_EXTEND,
 			'selectSelements'			=> null,
 			'selectLinks'				=> null,
 			'selectIconMap'				=> null,

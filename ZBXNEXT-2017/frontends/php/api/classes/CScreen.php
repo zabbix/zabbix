@@ -90,9 +90,7 @@ class CScreen extends CZBXAPI {
 		// screenitemids
 		if (!is_null($options['screenitemids'])) {
 			zbx_value2array($options['screenitemids']);
-			if ($options['output'] != API_OUTPUT_EXTEND) {
-				$sqlParts['select']['screenitemid'] = 'si.screenitemid';
-			}
+
 			$sqlParts['from']['screens_items'] = 'screens_items si';
 			$sqlParts['where']['ssi'] = 'si.screenid=s.screenid';
 			$sqlParts['where'][] = dbConditionInt('si.screenitemid', $options['screenitemids']);
@@ -132,14 +130,6 @@ class CScreen extends CZBXAPI {
 
 				if (!isset($result[$screen['screenid']])) {
 					$result[$screen['screenid']]= array();
-				}
-
-				if (isset($screen['screenitemid']) && is_null($options['selectScreenItems'])) {
-					if (!isset($result[$screen['screenid']]['screenitems'])) {
-						$result[$screen['screenid']]['screenitems'] = array();
-					}
-					$result[$screen['screenid']]['screenitems'][] = array('screenitemid' => $screen['screenitemid']);
-					unset($screen['screenitemid']);
 				}
 
 				$result[$screen['screenid']] += $screen;

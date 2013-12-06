@@ -647,7 +647,6 @@ class CScreenItem extends CZBXAPI {
 		// screen ids
 		if ($options['screenids'] !== null) {
 			zbx_value2array($options['screenids']);
-			$sqlParts = $this->addQuerySelect($this->fieldId('screenid'), $sqlParts);
 			$sqlParts['where'][] = dbConditionInt($this->fieldId('screenid'), $options['screenids']);
 		}
 
