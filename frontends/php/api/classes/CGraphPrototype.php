@@ -509,6 +509,7 @@ class CGraphPrototype extends CGraphGeneral {
 			'preservekeys' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'selectGraphItems' => API_OUTPUT_EXTEND,
+			'selectHosts' => array('hostid'),
 			'filter' => array('flags' => null)
 		));
 
