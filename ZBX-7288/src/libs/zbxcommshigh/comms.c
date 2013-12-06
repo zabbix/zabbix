@@ -128,6 +128,7 @@ int	zbx_recv_response_dyn(zbx_sock_t *sock, char **info, char **error, int timeo
 	{
 		/* since we have successfully sent data earlier, we assume the other */
 		/* side is just too busy processing our data if there is no response */
+		*error = zbx_dsprintf(*error, "no response: network error");
 		zabbix_log(LOG_LEVEL_DEBUG, "did not receive response from host");
 		ret = NETWORK_ERROR;
 		goto out;
@@ -159,7 +160,7 @@ int	zbx_recv_response_dyn(zbx_sock_t *sock, char **info, char **error, int timeo
 
 	if (0 != strcmp(value, ZBX_PROTO_VALUE_SUCCESS))
 	{
-		*error = zbx_dsprintf(*error, "negative response: %s", value);
+		*error = zbx_dsprintf(*error, "negative response: \"%s\"", value);
 		ret = FAIL;
 	}
 

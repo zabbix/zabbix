@@ -976,6 +976,7 @@ char	*zbx_date2str(time_t date);
 char	*zbx_time2str(time_t time);
 
 #define ZBX_NULL2STR(str)	(NULL != str ? str : "(null)")
+#define ZBX_NULL2EMPTY_STR(str)	(NULL != (str) ? (str) : "")
 
 char	*zbx_strcasestr(const char *haystack, const char *needle);
 int	zbx_mismatch(const char *s1, const char *s2);

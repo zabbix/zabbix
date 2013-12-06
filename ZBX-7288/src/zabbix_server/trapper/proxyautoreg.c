@@ -111,7 +111,7 @@ void	send_areg_data(zbx_sock_t *sock)
 	if (SUCCEED != zbx_recv_response_dyn(sock, &info, &error, CONFIG_TIMEOUT))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "sending auto-registration data to server: error=\"%s\", info=\"%s\"",
-				ZBX_NULL2STR(error), ZBX_NULL2STR(info));
+				ZBX_NULL2EMPTY_STR(error), ZBX_NULL2EMPTY_STR(info));
 		goto out;
 	}
 
