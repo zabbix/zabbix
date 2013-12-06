@@ -78,7 +78,7 @@ class CItemPrototype extends CItemGeneral {
 			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
 			// output
-			'output'					=> API_OUTPUT_REFER,
+			'output'					=> API_OUTPUT_EXTEND,
 			'selectHosts'				=> null,
 			'selectApplications'		=> null,
 			'selectTriggers'			=> null,
@@ -130,10 +130,6 @@ class CItemPrototype extends CItemGeneral {
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 
-			if ($options['output'] != API_OUTPUT_EXTEND) {
-				$sqlParts['select']['hostid'] = 'i.hostid';
-			}
-
 			$sqlParts['where']['hostid'] = dbConditionInt('i.hostid', $options['hostids']);
 
 			if (!is_null($options['groupCount'])) {
@@ -152,7 +148,6 @@ class CItemPrototype extends CItemGeneral {
 		if (!is_null($options['discoveryids'])) {
 			zbx_value2array($options['discoveryids']);
 
-			$sqlParts['select']['discoveryid'] = 'id.parent_itemid';
 			$sqlParts['from']['item_discovery'] = 'item_discovery id';
 			$sqlParts['where'][] = dbConditionInt('id.parent_itemid', $options['discoveryids']);
 			$sqlParts['where']['idi'] = 'i.itemid=id.itemid';
@@ -166,7 +161,6 @@ class CItemPrototype extends CItemGeneral {
 		if (!is_null($options['triggerids'])) {
 			zbx_value2array($options['triggerids']);
 
-			$sqlParts['select']['triggerid'] = 'f.triggerid';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['where'][] = dbConditionInt('f.triggerid', $options['triggerids']);
 			$sqlParts['where']['if'] = 'i.itemid=f.itemid';
@@ -176,7 +170,6 @@ class CItemPrototype extends CItemGeneral {
 		if (!is_null($options['graphids'])) {
 			zbx_value2array($options['graphids']);
 
-			$sqlParts['select']['graphid'] = 'gi.graphid';
 			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
 			$sqlParts['where'][] = dbConditionInt('gi.graphid', $options['graphids']);
 			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';

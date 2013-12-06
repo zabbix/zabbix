@@ -147,7 +147,6 @@ class CTrigger extends CTriggerGeneral {
 
 			sort($options['groupids']);
 
-			$sqlParts['select']['groupid'] = 'hg.groupid';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
@@ -178,7 +177,6 @@ class CTrigger extends CTriggerGeneral {
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 
-			$sqlParts['select']['hostid'] = 'i.hostid';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where']['hostid'] = dbConditionInt('i.hostid', $options['hostids']);
@@ -201,7 +199,6 @@ class CTrigger extends CTriggerGeneral {
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
 
-			$sqlParts['select']['itemid'] = 'f.itemid';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['where']['itemid'] = dbConditionInt('f.itemid', $options['itemids']);
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
@@ -215,7 +212,6 @@ class CTrigger extends CTriggerGeneral {
 		if (!is_null($options['applicationids'])) {
 			zbx_value2array($options['applicationids']);
 
-			$sqlParts['select']['applicationid'] = 'ia.applicationid';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items_applications'] = 'items_applications ia';
 			$sqlParts['where']['a'] = dbConditionInt('ia.applicationid', $options['applicationids']);
@@ -383,7 +379,6 @@ class CTrigger extends CTriggerGeneral {
 
 		// group
 		if (!is_null($options['group'])) {
-			$sqlParts['select']['name'] = 'g.name';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
@@ -397,7 +392,6 @@ class CTrigger extends CTriggerGeneral {
 
 		// host
 		if (!is_null($options['host'])) {
-			$sqlParts['select']['host'] = 'h.host';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts'] = 'hosts h';
@@ -460,16 +454,6 @@ class CTrigger extends CTriggerGeneral {
 			}
 
 			$result[$trigger['triggerid']] += $trigger;
-		}
-
-		if ($options['groupids'] !== null && $options['selectGroups'] === null) {
-			$options['selectGroups'] = API_OUTPUT_REFER;
-		}
-		if ($options['hostids'] !== null && $options['selectHosts'] === null) {
-			$options['selectHosts'] = API_OUTPUT_REFER;
-		}
-		if ($options['itemids'] !== null && $options['selectItems'] === null) {
-			$options['selectItems'] = array('itemid');
 		}
 
 		if ($result) {

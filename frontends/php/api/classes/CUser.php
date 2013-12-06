@@ -73,7 +73,7 @@ class CUser extends CZBXAPI {
 			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
 			// output
-			'output'					=> API_OUTPUT_REFER,
+			'output'					=> API_OUTPUT_EXTEND,
 			'editable'					=> null,
 			'selectUsrgrps'				=> null,
 			'selectMedias'				=> null,
@@ -113,7 +113,6 @@ class CUser extends CZBXAPI {
 		if (!is_null($options['usrgrpids'])) {
 			zbx_value2array($options['usrgrpids']);
 
-			$sqlParts['select']['usrgrpid'] = 'ug.usrgrpid';
 			$sqlParts['from']['users_groups'] = 'users_groups ug';
 			$sqlParts['where'][] = dbConditionInt('ug.usrgrpid', $options['usrgrpids']);
 			$sqlParts['where']['uug'] = 'u.userid=ug.userid';
@@ -123,7 +122,6 @@ class CUser extends CZBXAPI {
 		if (!is_null($options['mediaids'])) {
 			zbx_value2array($options['mediaids']);
 
-			$sqlParts['select']['mediaid'] = 'm.mediaid';
 			$sqlParts['from']['media'] = 'media m';
 			$sqlParts['where'][] = dbConditionInt('m.mediaid', $options['mediaids']);
 			$sqlParts['where']['mu'] = 'm.userid=u.userid';
@@ -133,7 +131,6 @@ class CUser extends CZBXAPI {
 		if (!is_null($options['mediatypeids'])) {
 			zbx_value2array($options['mediatypeids']);
 
-			$sqlParts['select']['mediatypeid'] = 'm.mediatypeid';
 			$sqlParts['from']['media'] = 'media m';
 			$sqlParts['where'][] = dbConditionInt('m.mediatypeid', $options['mediatypeids']);
 			$sqlParts['where']['mu'] = 'm.userid=u.userid';
@@ -177,32 +174,6 @@ class CUser extends CZBXAPI {
 					$result[$user['userid']] = array();
 				}
 
-				// usrgrpids
-				if (isset($user['usrgrpid']) && is_null($options['selectUsrgrps'])) {
-					if (!isset($result[$user['userid']]['usrgrps'])) {
-						$result[$user['userid']]['usrgrps'] = array();
-					}
-					$result[$user['userid']]['usrgrps'][] = array('usrgrpid' => $user['usrgrpid']);
-					unset($user['usrgrpid']);
-				}
-
-				// mediaids
-				if (isset($user['mediaid']) && is_null($options['selectMedias'])) {
-					if (!isset($result[$user['userid']]['medias'])) {
-						$result[$user['userid']]['medias'] = array();
-					}
-					$result[$user['userid']]['medias'][] = array('mediaid' => $user['mediaid']);
-					unset($user['mediaid']);
-				}
-
-				// mediatypeids
-				if (isset($user['mediatypeid']) && is_null($options['selectMediatypes'])) {
-					if (!isset($result[$user['userid']]['mediatypes'])) {
-						$result[$user['userid']]['mediatypes'] = array();
-					}
-					$result[$user['userid']]['mediatypes'][] = array('mediatypeid' => $user['mediatypeid']);
-					unset($user['mediatypeid']);
-				}
 				$result[$user['userid']] += $user;
 			}
 		}

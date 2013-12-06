@@ -71,7 +71,7 @@ class CIconMap extends CZBXAPI {
 			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
 			// output
-			'output'					=> API_OUTPUT_REFER,
+			'output'					=> API_OUTPUT_EXTEND,
 			'selectMappings'			=> null,
 			'countOutput'				=> null,
 			'preservekeys'				=> null,
@@ -97,7 +97,6 @@ class CIconMap extends CZBXAPI {
 		if (!is_null($options['sysmapids'])) {
 			zbx_value2array($options['sysmapids']);
 
-			$sqlParts['select']['sysmapids'] = 's.sysmapid';
 			$sqlParts['from']['sysmaps'] = 'sysmaps s';
 			$sqlParts['where'][] = dbConditionInt('s.sysmapid', $options['sysmapids']);
 			$sqlParts['where']['ims'] = 'im.iconmapid=s.iconmapid';
@@ -128,13 +127,6 @@ class CIconMap extends CZBXAPI {
 			else {
 				if (!isset($result[$iconMap['iconmapid']])) {
 					$result[$iconMap['iconmapid']] = array();
-				}
-				if (isset($iconMap['sysmapid'])) {
-					if (!isset($result[$iconMap['iconmapid']]['sysmaps'])) {
-						$result[$iconMap['iconmapid']]['sysmaps'] = array();
-					}
-
-					$result[$iconMap['iconmapid']]['sysmaps'][] = array('sysmapid' => $iconMap['sysmapid']);
 				}
 
 				$result[$iconMap['iconmapid']] += $iconMap;
