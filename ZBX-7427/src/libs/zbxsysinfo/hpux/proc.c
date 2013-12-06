@@ -37,11 +37,11 @@ static int	check_procstate(struct pst_status pst, int zbx_proc_stat)
 	switch (zbx_proc_stat)
 	{
 		case ZBX_PROC_STAT_RUN:
-			return pst.pst_stat == PS_RUN ? SUCCEED : FAIL;
+			return PS_RUN == pst.pst_stat ? SUCCEED : FAIL;
 		case ZBX_PROC_STAT_SLEEP:
-			return pst.pst_stat == PS_SLEEP ? SUCCEED : FAIL;
+			return PS_SLEEP == pst.pst_stat ? SUCCEED : FAIL;
 		case ZBX_PROC_STAT_ZOMB:
-			return pst.pst_stat == PS_ZOMBIE ? SUCCEED : FAIL;
+			return PS_ZOMBIE == pst.pst_stat ? SUCCEED : FAIL;
 	}
 
 	return FAIL;
@@ -51,7 +51,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #define ZBX_BURST	((size_t)10)
 
-	char			tmp[MAX_STRING_LEN], *procname, *proccomm, *param;
+	char			*procname, *proccomm, *param;
 	struct passwd		*usrinfo;
 	zbx_uint64_t		proccount = 0;
 	int			zbx_proc_stat, i, count, idx = 0;
@@ -61,7 +61,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 
 	procname = get_rparam(request, 0);
-	if ('\0' == *procname)
+	if (NULL != procname && '\0' == *procname)
 		procname = NULL;
 
 	param = get_rparam(request, 1);
@@ -86,12 +86,15 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 
 	proccomm = get_rparam(request, 3);
-	if ('\0' == *proccomm)
+	if (NULL != proccomm && '\0' == *proccomm)
 		proccomm = NULL;
 
-	memset(pst, 0, ZBX_BURST * sizeof(*pst));
-	while (0 < (count = pstat_getproc(pst, sizeof(*pst), ZBX_BURST, idx))) {
-		for (i = 0; i < count; i++) {
+	memset(pst, 0, sizeof(pst));
+
+	while (0 < (count = pstat_getproc(pst, sizeof(*pst), ZBX_BURST, idx)))
+	{
+		for (i = 0; i < count; i++)
+		{
 			if (NULL != procname && 0 != strcmp(pst[i].pst_ucomm, procname))
 				continue;
 
@@ -108,7 +111,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 
 		idx = pst[count - 1].pst_idx + 1;
-		memset(pst, 0, ZBX_BURST * sizeof(*pst));
+		memset(pst, 0, sizeof(pst));
 	}
 
 	if (-1 == count)
@@ -118,4 +121,3 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	return SYSINFO_RET_OK;
 }
-

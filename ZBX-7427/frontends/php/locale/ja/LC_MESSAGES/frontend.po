@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-29 21:21+0200\n"
-"PO-Revision-Date: 2013-11-28 15:42+0300\n"
+"POT-Creation-Date: 2013-12-02 21:58+0200\n"
+"PO-Revision-Date: 2013-12-02 12:13+0300\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1385646169.0\n"
+"X-POOTLE-MTIME: 1385979212.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -526,7 +526,7 @@ msgstr "エージェント"
 #: include/classes/items/CHelpItems.php:65
 #: include/classes/items/CHelpItems.php:307
 msgid "Agent host name defined in the configuration file. String value."
-msgstr ""
+msgstr "設定ファイル内に設定されたエージェントのホスト名。文字列値。"
 
 #: include/views/configuration.host.edit.php:248
 #: include/views/configuration.host.edit.php:332
@@ -541,7 +541,7 @@ msgstr "エージェント、SNMP、JMX、IPMIインターフェース"
 
 #: include/classes/items/CHelpItems.php:561
 msgid "Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual."
-msgstr ""
+msgstr "アグリゲートチェックは監視対象のホスト上でエージェントが起動している必要はありません。Zabbixサーバーはデータベースから直接情報を収集します。詳細はZabbixマニュアル参照。"
 
 #: include/hosts.inc.php:120 include/views/administration.users.edit.php:52
 #: include/views/administration.users.list.php:55 popup.php:615 users.php:44
@@ -750,7 +750,7 @@ msgstr "少なくとも1つ以上のメンテナンス期間を作成する必�
 
 #: include/classes/class.frontendsetup.php:225
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported."
-msgstr ""
+msgstr "少なくともMySQL、PostgreSQL、Oracle、SQLite3、IBM DB2のうち1つがサポートされている必要があります。"
 
 #: include/menu.inc.php:264
 #: include/views/administration.general.housekeeper.edit.php:99
@@ -763,12 +763,12 @@ msgstr "アクションの履歴"
 
 #: adm.housekeeper.php:51
 msgid "Audit data storage period"
-msgstr ""
+msgstr "監査データ保存期間"
 
 #: adm.housekeeper.php:110
 #, c-format
 msgid "Audit data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "監査データ保存期間 (日) \"%1$s\""
 
 #: auditlogs.php:27
 msgid "Audit logs"
@@ -838,16 +838,16 @@ msgstr "自動ログアウト (最低90秒)"
 
 #: include/views/administration.general.housekeeper.edit.php:56
 msgid "Auto-registration data storage period (in days)"
-msgstr ""
+msgstr "自動登録データ保存期間(日)"
 
 #: adm.housekeeper.php:43
 msgid "Auto-registration event and alert data storage period"
-msgstr ""
+msgstr "自動登録イベントとアラートのデータ保存期間"
 
 #: adm.housekeeper.php:108
 #, c-format
 msgid "Auto-registration event and alert data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "自動登録イベントとアラートのデータ保存期間(日) \"%1$s\"。"
 
 #: include/views/configuration.host.edit.php:763
 #: include/views/configuration.host.massupdate.php:242
@@ -1047,7 +1047,7 @@ msgstr "ホストの設定"
 
 #: adm.housekeeper.php:141
 msgid "CONFIGURATION OF HOUSEKEEPING"
-msgstr ""
+msgstr "Housekeepingの設定"
 
 #: adm.iconmapping.php:130
 msgid "CONFIGURATION OF ICON MAPPING"
@@ -1173,22 +1173,22 @@ msgstr "Zabbixの設定"
 #: include/classes/items/CHelpItems.php:181
 #: include/classes/items/CHelpItems.php:435
 msgid "CPU info - lists full info for all CPUs by default"
-msgstr ""
+msgstr "CPU情報 - デフォルトはすべてのCPUのすべての情報リスト"
 
 #: include/classes/items/CHelpItems.php:157
 #: include/classes/items/CHelpItems.php:411
 msgid "CPU(s) load. Processor load. The cpu and mode are optional. If cpu is missing all is used. If mode is missing avg1 is used. Note that this is not percentage."
-msgstr ""
+msgstr "CPU load。プロセッサのロードアベレージ。cpuとmodeの設定はオプション。CPUが指定されない場合はallが利用される。modeが指定されない場合はavg1が利用される。この値はパーセンテージではないことに注意。"
 
 #: include/classes/items/CHelpItems.php:169
 #: include/classes/items/CHelpItems.php:423
 msgid "CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used.  If type is missing user is used. If mode is missing avg1 is used."
-msgstr ""
+msgstr "CPU utilisation。プロセッサのパーセント表示での負荷状況。cpu、type、modeはオプション。cpuが指定されない場合はallが利用される。typeが指定されない場合はuserが利用される。modeが指定されない場合はavg1が利用される。"
 
 #: include/classes/items/CHelpItems.php:261
 #: include/classes/items/CHelpItems.php:515
 msgid "Calculate MD5 check sum of a given file. String MD5 hash of the file. Can be used for files less than 64MB, unsupported otherwise. Example: vfs.file.md5sum[/usr/local/etc/zabbix_agentd.conf]"
-msgstr ""
+msgstr "指定されたファイルのMD5チェックサム計算。そのファイルのMD5ハッシュ文字列。64MB未満のファイルに使用することができ、それ以外はサポートされない。例： vfs.file.md5sum[/usr/local/etc/zabbix_agentd.conf]"
 
 #: include/views/configuration.services.edit.php:66 services.php:44
 msgid "Calculate SLA, acceptable SLA (in %)"
@@ -1307,7 +1307,7 @@ msgstr "グラフを追加できません"
 
 #: graphs.php:230
 msgid "Cannot add graph prototype"
-msgstr ""
+msgstr "グラフのプロトタイプを追加できません"
 
 #: hostgroups.php:154 usergrps.php:184
 msgid "Cannot add group"
@@ -1340,7 +1340,7 @@ msgstr "\"%2$s\"のアイテム\"%1$s\"を\"%4$s\"のアプリケーション\"%
 
 #: disc_prototypes.php:311
 msgid "Cannot add item prototype"
-msgstr ""
+msgstr "アイテムのプロトタイプが追加できません"
 
 #: api/classes/CApplication.php:600
 msgid "Cannot add items."
@@ -1415,7 +1415,7 @@ msgstr "トリガーを追加できません"
 
 #: trigger_prototypes.php:168
 msgid "Cannot add trigger prototype"
-msgstr ""
+msgstr "トリガーのプロトタイプが追加できません"
 
 #: users.php:212
 msgid "Cannot add user"
@@ -1625,11 +1625,11 @@ msgstr "アイテムを削除できません"
 
 #: disc_prototypes.php:206
 msgid "Cannot delete item prototype"
-msgstr ""
+msgstr "アイテムのプロトタイプを削除できません"
 
 #: disc_prototypes.php:339
 msgid "Cannot delete item prototypes"
-msgstr ""
+msgstr "アイテムのプロトタイプを削除できません"
 
 #: items.php:773
 msgid "Cannot delete items"
@@ -1742,11 +1742,11 @@ msgstr "トリガーを削除できません"
 
 #: api/classes/CItemPrototype.php:582 trigger_prototypes.php:181
 msgid "Cannot delete trigger prototype"
-msgstr "トリガープロトタイプを削除できません"
+msgstr "トリガーのプロトタイプを削除できません"
 
 #: trigger_prototypes.php:247
 msgid "Cannot delete trigger prototypes"
-msgstr ""
+msgstr "トリガーのプロトタイプを削除できません"
 
 #: api/classes/CItem.php:744
 msgid "Cannot delete trigger."
@@ -2369,11 +2369,11 @@ msgstr "トリガーを更新できません"
 
 #: trigger_prototypes.php:163
 msgid "Cannot update trigger prototype"
-msgstr ""
+msgstr "トリガーのプロトタイプが更新できません"
 
 #: trigger_prototypes.php:209
 msgid "Cannot update trigger prototypes"
-msgstr ""
+msgstr "トリガーのプロトタイプが更新できません"
 
 #: profile.php:173 users.php:205 users.php:263 users.php:287
 msgid "Cannot update user"
@@ -3291,7 +3291,7 @@ msgstr "カスタムスライド"
 msgid "Czech (cs_CZ)"
 msgstr "チェコ語 (cs_CZ)"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1336
+#: include/classes/graphdraw/CLineGraphDraw.php:1340
 msgid "D"
 msgstr "D"
 
@@ -3390,8 +3390,8 @@ msgstr "データ"
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2477
-#: include/classes/graphdraw/CPieGraphDraw.php:723
+#: include/classes/graphdraw/CLineGraphDraw.php:2481
+#: include/classes/graphdraw/CPieGraphDraw.php:727
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
 msgstr "Data from %1$s. Generated in %2$s sec."
@@ -4191,7 +4191,7 @@ msgstr "選択したホストを無効にしますか？"
 
 #: include/views/configuration.item.prototype.list.php:116
 msgid "Disable selected item prototypes?"
-msgstr ""
+msgstr "選択したアイテムのプロトタイプを無効にしますか？"
 
 #: include/views/configuration.item.list.php:277
 msgid "Disable selected items?"
@@ -4199,11 +4199,11 @@ msgstr "選択したアイテムを無効にしますか？"
 
 #: include/views/administration.mediatypes.list.php:118
 msgid "Disable selected media types?"
-msgstr "選択したメディアタイプを削除しますか？"
+msgstr "選択したメディアタイプを無効にしますか？"
 
 #: include/views/configuration.triggers.list.php:274
 msgid "Disable selected trigger prototypes?"
-msgstr ""
+msgstr "選択したトリガーのプロトタイプを無効にしますか？"
 
 #: include/views/configuration.triggers.list.php:274
 msgid "Disable selected triggers?"
@@ -5491,11 +5491,11 @@ msgstr "グラフのプロトタイプ\"%s\"を削除しました。"
 
 #: graphs.php:230
 msgid "Graph prototype added"
-msgstr ""
+msgstr "グラフのプロトタイプを追加しました"
 
 #: graphs.php:273
 msgid "Graph prototype deleted"
-msgstr ""
+msgstr "グラフのプロトタイプを削除しました"
 
 #: api/classes/CGraphPrototype.php:710 api/classes/CGraphPrototype.php:771
 msgid "Graph prototype must have at least one prototype."
@@ -5503,7 +5503,7 @@ msgstr "グラフのプロトタイプは少なくとも1つ以上のプロト�
 
 #: graphs.php:224
 msgid "Graph prototype updated"
-msgstr ""
+msgstr "グラフのプロトタイプを更新しました"
 
 #: include/html.inc.php:464 include/html.inc.php:468
 #: include/views/configuration.host.discovery.list.php:103
@@ -5514,7 +5514,7 @@ msgstr "グラフのプロトタイプ"
 
 #: graphs.php:293
 msgid "Graph prototypes deleted"
-msgstr ""
+msgstr "グラフのプロトタイプを削除しました"
 
 #: include/views/configuration.graph.list.php:32
 msgid "Graph prototypes of"
@@ -5680,8 +5680,8 @@ msgstr "メンテナンス対象のホストグループ"
 msgid "H.i"
 msgstr "H.i"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1342
-#: include/classes/graphdraw/CLineGraphDraw.php:1401
+#: include/classes/graphdraw/CLineGraphDraw.php:1346
+#: include/classes/graphdraw/CLineGraphDraw.php:1405
 #: include/page_header.php:450
 msgid "H:i"
 msgstr "H:i"
@@ -5784,7 +5784,7 @@ msgstr "無効なシナリオを非表示"
 
 #: include/views/configuration.triggers.list.php:63
 msgid "Hide disabled trigger prototypes"
-msgstr ""
+msgstr "無効なトリガーのプロトタイプを非表示"
 
 #: include/views/configuration.triggers.list.php:81
 msgid "Hide disabled triggers"
@@ -5827,12 +5827,12 @@ msgstr "ヒストリの削除には時間を要します。実行しますか？
 
 #: adm.housekeeper.php:59
 msgid "History data storage period"
-msgstr ""
+msgstr "ヒストリデータ保存期間"
 
 #: adm.housekeeper.php:112
 #, c-format
 msgid "History data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "ヒストリデータ保存期間(日) \"%1$s\""
 
 #: include/screens.inc.php:31
 msgid "History of actions"
@@ -5844,12 +5844,12 @@ msgstr "イベント履歴"
 
 #: disc_prototypes.php:115 items.php:54
 msgid "History storage period"
-msgstr ""
+msgstr "ヒストリ保存期間"
 
 #: include/views/configuration.item.edit.php:376
 #: include/views/configuration.item.massupdate.php:381
 msgid "History storage period (in days)"
-msgstr ""
+msgstr "ヒストリ保存期間(日)"
 
 #: include/views/configuration.screen.constructor.edit.php:541
 msgid "Horizontal"
@@ -6357,12 +6357,12 @@ msgstr "ITサービス"
 
 #: adm.housekeeper.php:47
 msgid "IT service data storage period"
-msgstr ""
+msgstr "ITサービスデータの保存期間"
 
 #: adm.housekeeper.php:109
 #, c-format
 msgid "IT service data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "ITサービスデータの保存期間(日) \"%1$s\""
 
 #: include/views/configuration.services.child.list.php:25
 msgid "IT service dependencies"
@@ -7410,12 +7410,12 @@ msgstr "Zabbixデータベース内のユーザー情報"
 #: include/views/configuration.action.list.php:36
 msgctxt "event source"
 msgid "Internal"
-msgstr "インターナル"
+msgstr "内部イベント"
 
 #: include/users.inc.php:84
 msgctxt "user type"
 msgid "Internal"
-msgstr "Zabbixデータベース内のユーザー情報"
+msgstr "内部イベント"
 
 #: api/rpc/class.cjsonrpc.php:202
 msgid "Internal JSON-RPC error."
@@ -7431,12 +7431,12 @@ msgstr "内部エラー。"
 
 #: adm.housekeeper.php:37
 msgid "Internal event and alert data storage period"
-msgstr ""
+msgstr "内部イベントとアラートのデータ保存期間"
 
 #: adm.housekeeper.php:106
 #, c-format
 msgid "Internal event and alert data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "内部イベントとアラートのデータ保存期間(日) \"%1$s\"。"
 
 #: include/views/configuration.httpconf.edit.php:94
 msgid "Internet Explorer"
@@ -7674,15 +7674,15 @@ msgstr "アイテムのプロトタイプ\"%1$s\"は\"%2$s\"にすでに存在�
 
 #: disc_prototypes.php:311
 msgid "Item prototype added"
-msgstr ""
+msgstr "アイテムのプロトタイプを追加しました"
 
 #: disc_prototypes.php:206
 msgid "Item prototype deleted"
-msgstr ""
+msgstr "アイテムのプロトタイプを削除しました"
 
 #: disc_prototypes.php:307
 msgid "Item prototype updated"
-msgstr ""
+msgstr "アイテムのプロトタイプを更新しました"
 
 #: include/html.inc.php:414 include/html.inc.php:418
 #: include/views/configuration.host.discovery.list.php:101
@@ -7693,15 +7693,15 @@ msgstr "アイテムのプロトタイプ"
 
 #: disc_prototypes.php:330
 msgid "Item prototypes activated"
-msgstr ""
+msgstr "アイテムのプロトタイプを有効にしました"
 
 #: disc_prototypes.php:339
 msgid "Item prototypes deleted"
-msgstr ""
+msgstr "アイテムのプロトタイプを削除しました"
 
 #: disc_prototypes.php:330
 msgid "Item prototypes disabled"
-msgstr ""
+msgstr "アイテムのプロトタイプを無効にしました"
 
 #: include/views/configuration.item.prototype.list.php:32
 msgid "Item prototypes of"
@@ -8813,32 +8813,32 @@ msgstr "最小化"
 #: include/classes/class.frontendsetup.php:117
 #, c-format
 msgid "Minimum required PHP memory limit is %s (configuration option \"memory_limit\")."
-msgstr ""
+msgstr "PHPメモリ上限の最小値は%sです (\"memory_limit\"設定オプション)。"
 
 #: include/classes/class.frontendsetup.php:151
 #, c-format
 msgid "Minimum required PHP upload filesize is %s (configuration option \"upload_max_filesize\")."
-msgstr ""
+msgstr "PHPアップロードファイルサイズの最小値は%sです (\"upload_max_filesize\"設定オプション)。"
 
 #: include/classes/class.frontendsetup.php:99
 #, c-format
 msgid "Minimum required PHP version is %s."
-msgstr ""
+msgstr "PHPの最小バージョンは%sです。"
 
 #: include/classes/class.frontendsetup.php:168
 #, c-format
 msgid "Minimum required limit on execution time of PHP scripts is %s (configuration option \"max_execution_time\")."
-msgstr ""
+msgstr "PHPスクリプトの実行時間の最小値は%sです (\"max_execution_time\"設定オプション)。"
 
 #: include/classes/class.frontendsetup.php:185
 #, c-format
 msgid "Minimum required limit on input parse time for PHP scripts is %s (configuration option \"max_input_time\")."
-msgstr ""
+msgstr "PHPスクリプトの入力パース時間の最小値は%sです (\"max_input_time\"設定オプション)。"
 
 #: include/classes/class.frontendsetup.php:134
 #, c-format
 msgid "Minimum required size of PHP post is %s (configuration option \"post_max_size\")."
-msgstr ""
+msgstr "PHPのpostサイズの最小値は%sです (\"post_max_size\"設定オプション)。"
 
 #: include/views/monitoring.maps.php:40
 msgid "Minimum severity"
@@ -9131,12 +9131,12 @@ msgstr ""
 
 #: adm.housekeeper.php:40
 msgid "Network discovery event and alert data storage period"
-msgstr ""
+msgstr "ネットワークディスカバリイベントとアラートのデータ保存期間"
 
 #: adm.housekeeper.php:107
 #, c-format
 msgid "Network discovery event and alert data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "ネットワークディスカバリイベントとアラートのデータ保存期間 (日) \"%1$s\"。"
 
 #: include/classes/items/CHelpItems.php:97
 #: include/classes/items/CHelpItems.php:351
@@ -10063,7 +10063,7 @@ msgstr "現在"
 #: include/classes/items/CHelpItems.php:161
 #: include/classes/items/CHelpItems.php:415
 msgid "Number of available proccessors."
-msgstr ""
+msgstr "有効なプロセッサー数。"
 
 #: include/blocks.inc.php:730 include/blocks.inc.php:732
 msgid "Number of hosts (monitored/not monitored/templates)"
@@ -10072,7 +10072,7 @@ msgstr "ホスト数 (有効/無効/テンプレート)"
 #: include/classes/items/CHelpItems.php:281
 #: include/classes/items/CHelpItems.php:535
 msgid "Number of inodes for a given volume. If mode is missing total is used."
-msgstr ""
+msgstr "指定されたボリュームのinode数。modeが指定されなかった場合は利用済数。"
 
 #: include/blocks.inc.php:739
 msgid "Number of items (monitored/disabled/not supported)"
@@ -10080,11 +10080,11 @@ msgstr "アイテム数 (有効/無効/取得不可)"
 
 #: include/classes/items/CHelpItems.php:823
 msgid "Number of items in Zabbix database."
-msgstr ""
+msgstr "Zabbixデータベース内のアイテム数。"
 
 #: include/classes/items/CHelpItems.php:843
 msgid "Number of items in proxy history that are not yet sent to the server"
-msgstr ""
+msgstr "サーバーへ未送信のプロキシ内のヒストリアイテム数"
 
 #: include/classes/items/CHelpItems.php:847
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
@@ -10092,7 +10092,7 @@ msgstr ""
 
 #: include/classes/items/CHelpItems.php:819
 msgid "Number of monitored hosts"
-msgstr ""
+msgstr "監視ホスト数"
 
 #: include/classes/items/CHelpItems.php:137
 #: include/classes/items/CHelpItems.php:391
@@ -10608,7 +10608,7 @@ msgstr "PHP bcmath"
 
 #: include/classes/class.frontendsetup.php:287
 msgid "PHP bcmath extension missing (PHP configuration parameter --enable-bcmath)."
-msgstr ""
+msgstr "PHP bcmathモジュールが存在しません (PHPのconfigure時のパラメータ --enable-bcmath)。"
 
 #: include/classes/class.frontendsetup.php:497
 msgid "PHP ctype"
@@ -10616,7 +10616,7 @@ msgstr "PHP ctype"
 
 #: include/classes/class.frontendsetup.php:501
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)."
-msgstr ""
+msgstr "PHP ctypeモジュールが存在しません (PHPのconfigure時のパラメータ --enable-ctype)。"
 
 #: include/classes/class.frontendsetup.php:221
 msgid "PHP databases support"
@@ -10636,11 +10636,11 @@ msgstr "PHP gd FreeTypeがサポートされていません"
 
 #: include/classes/class.frontendsetup.php:417
 msgid "PHP gd FreeType support missing."
-msgstr ""
+msgstr "PHP gd FreeTypeがサポートされていません。"
 
 #: include/classes/class.frontendsetup.php:394
 msgid "PHP gd JPEG image support missing."
-msgstr ""
+msgstr "PHP gd JPEGイメージがサポートされていません。"
 
 #: include/classes/class.frontendsetup.php:390
 msgid "PHP gd JPEG support"
@@ -10648,7 +10648,7 @@ msgstr "PHP gd JPEGのサポート"
 
 #: include/classes/class.frontendsetup.php:369
 msgid "PHP gd PNG image support missing."
-msgstr ""
+msgstr "PHP gd PNGイメージがサポートされていません。"
 
 #: include/classes/class.frontendsetup.php:365
 msgid "PHP gd PNG support"
@@ -10656,7 +10656,7 @@ msgstr "PHP gd PNGのサポート"
 
 #: include/classes/class.frontendsetup.php:346
 msgid "PHP gd extension missing (PHP configuration parameter --with-gd)."
-msgstr ""
+msgstr "PHP GDモジュールが存在しません (PHPのconfigure時のパラメータ --with-gd)。"
 
 #: include/classes/class.frontendsetup.php:548
 msgid "PHP gettext"
@@ -10664,7 +10664,7 @@ msgstr "PHP gettext"
 
 #: include/classes/class.frontendsetup.php:552
 msgid "PHP gettext extension missing (PHP configuration parameter --with-gettext). Translations will not be available."
-msgstr ""
+msgstr "PHP gettextモジュールが存在しません (PHPのconfigure時のパラメータ --with-gettext)。翻訳が利用できません。"
 
 #: include/classes/class.frontendsetup.php:436
 msgid "PHP libxml"
@@ -10672,7 +10672,7 @@ msgstr "PHP libxml"
 
 #: include/classes/class.frontendsetup.php:440
 msgid "PHP libxml extension missing."
-msgstr ""
+msgstr "PHP libxmlモジュールが存在しません。"
 
 #: include/classes/class.frontendsetup.php:300
 msgid "PHP mbstring"
@@ -10680,7 +10680,7 @@ msgstr "PHP mbstring"
 
 #: include/classes/class.frontendsetup.php:304
 msgid "PHP mbstring extension missing (PHP configuration parameter --enable-mbstring)."
-msgstr ""
+msgstr "PHP mbstringモジュールが存在しません (PHPのconfigure時のパラメータ --enable-mbstring)。"
 
 #: include/classes/class.frontendsetup.php:164
 msgid "PHP option max_execution_time"
@@ -10712,11 +10712,11 @@ msgstr "PHP session auto start"
 
 #: include/classes/class.frontendsetup.php:535
 msgid "PHP session auto start must be disabled (PHP directive \"session.auto_start\")."
-msgstr ""
+msgstr "PHP session auto startは無効に設定する必要があります (PHPのパラメータ\"session.auto_start\")。"
 
 #: include/classes/class.frontendsetup.php:518
 msgid "PHP session extension missing (PHP configuration parameter --enable-session)."
-msgstr ""
+msgstr "PHP sessionモジュールが存在しません (PHPのconfigure時のパラメータ --enable-session)。"
 
 #: include/classes/class.frontendsetup.php:317
 msgid "PHP sockets"
@@ -10724,7 +10724,7 @@ msgstr "PHP sockets"
 
 #: include/classes/class.frontendsetup.php:321
 msgid "PHP sockets extension missing (PHP configuration parameter --enable-sockets)."
-msgstr ""
+msgstr "PHP socketsモジュールが存在しません (PHPのconfigure時のパラメータ --enable-sockets)。"
 
 #: include/classes/class.frontendsetup.php:198
 msgid "PHP time zone"
@@ -10740,7 +10740,7 @@ msgstr "PHP xmlreader"
 
 #: include/classes/class.frontendsetup.php:474
 msgid "PHP xmlreader extension missing."
-msgstr ""
+msgstr "PHP xmlreaderモジュールが存在しません。"
 
 #: include/classes/class.frontendsetup.php:453
 msgid "PHP xmlwriter"
@@ -10748,7 +10748,7 @@ msgstr "PHP xmlwriter"
 
 #: include/classes/class.frontendsetup.php:457
 msgid "PHP xmlwriter extension missing."
-msgstr ""
+msgstr "PHP xmlwriterモジュールが存在しません。"
 
 #: include/discovery.inc.php:61
 #: include/views/js/configuration.discovery.edit.js.php:177
@@ -13336,7 +13336,7 @@ msgstr "時間の形式"
 
 #: include/classes/class.frontendsetup.php:202
 msgid "Time zone for PHP is not set (configuration parameter \"date.timezone\")."
-msgstr ""
+msgstr "PHPのタイムゾーンが設定されていません (\"date.timezone\"設定パラメータ)。"
 
 #: include/views/configuration.httpconf.edit.php:163
 #: include/views/configuration.httpconf.popup.php:81 popup_httpstep.php:40
@@ -13415,21 +13415,21 @@ msgstr "転送エラー。"
 
 #: adm.housekeeper.php:64
 msgid "Trend data storage period"
-msgstr ""
+msgstr "トレンドデータ保存期間"
 
 #: adm.housekeeper.php:113
 #, c-format
 msgid "Trend data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "トレンドデータ保存期間(日) \"%1$s\""
 
 #: disc_prototypes.php:119 items.php:62
 msgid "Trend storage period"
-msgstr ""
+msgstr "トレンド保存期間"
 
 #: include/views/configuration.item.edit.php:398
 #: include/views/configuration.item.massupdate.php:391
 msgid "Trend storage period (in days)"
-msgstr ""
+msgstr "トレンド保存期間(日)"
 
 #: include/forms.inc.php:606 include/forms.inc.php:942
 #: include/views/administration.general.housekeeper.edit.php:160
@@ -13440,7 +13440,7 @@ msgid "Trends"
 msgstr "トレンド"
 
 #: events.php:296 events.php:337 include/actions.inc.php:56
-#: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:470
+#: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:474
 #: include/maps.inc.php:26 include/triggers.inc.php:1602
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:69
@@ -13490,7 +13490,7 @@ msgstr "トリガーのコメント"
 
 #: include/views/administration.general.housekeeper.edit.php:44
 msgid "Trigger data storage period (in days)"
-msgstr ""
+msgstr "トリガーデータ保存期間(日)"
 
 #: triggers.php:197
 msgid "Trigger deleted"
@@ -13506,12 +13506,12 @@ msgstr "トリガー表示オプション"
 
 #: adm.housekeeper.php:34
 msgid "Trigger event and alert data storage period"
-msgstr ""
+msgstr "トリガーイベントとアラートのデータ保存期間"
 
 #: adm.housekeeper.php:105
 #, c-format
 msgid "Trigger event and alert data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "トリガーイベントとアラートのデータ保存期間 (日) \"%1$s\"。"
 
 #: include/views/configuration.triggers.expression.php:125
 msgid "Trigger expression condition"
@@ -14287,12 +14287,12 @@ msgstr "ユーザープロファイル"
 
 #: adm.housekeeper.php:55
 msgid "User session data storage period"
-msgstr ""
+msgstr "ユーザーセッションデータ保存期間"
 
 #: adm.housekeeper.php:111
 #, c-format
 msgid "User session data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "ユーザーセッションデータ保存期間(日) \"%1$s\""
 
 #: include/views/administration.general.housekeeper.edit.php:118
 msgid "User sessions"
@@ -14518,7 +14518,7 @@ msgstr ""
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/blocks.inc.php:718 include/classes/graphdraw/CPieGraphDraw.php:320
+#: include/blocks.inc.php:718 include/classes/graphdraw/CPieGraphDraw.php:324
 #: include/classes/screens/CScreenEvents.php:43
 #: include/classes/screens/CScreenHistory.php:168
 #: include/classes/screens/CScreenHistory.php:266 include/reports.inc.php:172
@@ -14619,7 +14619,7 @@ msgstr "値のマッピングは少なくとも1つ以上のマッピング設�
 msgid "Value of any performance counter, where \"counter\" parameter is the counter path and \"interval\" parameter is a number of last seconds, for which the agent returns an average value."
 msgstr ""
 
-#: include/classes/graphdraw/CPieGraphDraw.php:335
+#: include/classes/graphdraw/CPieGraphDraw.php:339
 #, c-format
 msgid "Value: no data"
 msgstr "値: データなし"
@@ -15260,7 +15260,7 @@ msgid "agent"
 msgstr "エージェント"
 
 #: include/classes/class.cpagefilter.php:890
-#: include/classes/graphdraw/CLineGraphDraw.php:1817
+#: include/classes/graphdraw/CLineGraphDraw.php:1821
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:115
 #: include/classes/screens/CScreenHostTriggers.php:110
@@ -15311,9 +15311,9 @@ msgstr "自動登録"
 msgid "auto-registered host"
 msgstr "自動登録ホスト"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1799
-#: include/classes/graphdraw/CLineGraphDraw.php:1821
-#: include/classes/graphdraw/CPieGraphDraw.php:313 include/graphs.inc.php:95
+#: include/classes/graphdraw/CLineGraphDraw.php:1803
+#: include/classes/graphdraw/CLineGraphDraw.php:1825
+#: include/classes/graphdraw/CPieGraphDraw.php:317 include/graphs.inc.php:95
 #: include/views/js/configuration.graph.edit.js.php:40
 #: include/views/js/configuration.graph.edit.js.php:48 popup_bitem.php:142
 msgid "avg"
@@ -15357,14 +15357,14 @@ msgstr "Y/m/d H:i:s"
 msgid "d.M"
 msgstr "m/d"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1339
-#: include/classes/graphdraw/CLineGraphDraw.php:1392
+#: include/classes/graphdraw/CLineGraphDraw.php:1343
+#: include/classes/graphdraw/CLineGraphDraw.php:1396
 msgid "d.m"
 msgstr "m/d"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1361
-#: include/classes/graphdraw/CLineGraphDraw.php:1376
-#: include/classes/graphdraw/CLineGraphDraw.php:1395
+#: include/classes/graphdraw/CLineGraphDraw.php:1365
+#: include/classes/graphdraw/CLineGraphDraw.php:1380
+#: include/classes/graphdraw/CLineGraphDraw.php:1399
 msgid "d.m H:i"
 msgstr "m/d H:i"
 
@@ -15485,8 +15485,8 @@ msgstr "is"
 msgid "item"
 msgstr "アイテム"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1797
-#: include/classes/graphdraw/CPieGraphDraw.php:308 include/graphs.inc.php:92
+#: include/classes/graphdraw/CLineGraphDraw.php:1801
+#: include/classes/graphdraw/CPieGraphDraw.php:312 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:42
 msgid "last"
 msgstr "最新値"
@@ -15525,17 +15525,17 @@ msgstr "メンテナンス"
 msgid "map"
 msgstr "マップ"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1800
-#: include/classes/graphdraw/CLineGraphDraw.php:1814
-#: include/classes/graphdraw/CPieGraphDraw.php:304 include/graphs.inc.php:90
+#: include/classes/graphdraw/CLineGraphDraw.php:1804
+#: include/classes/graphdraw/CLineGraphDraw.php:1818
+#: include/classes/graphdraw/CPieGraphDraw.php:308 include/graphs.inc.php:90
 #: include/views/js/configuration.graph.edit.js.php:41
 #: include/views/js/configuration.graph.edit.js.php:49 popup_bitem.php:143
 msgid "max"
 msgstr "最大"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1798
-#: include/classes/graphdraw/CLineGraphDraw.php:1811
-#: include/classes/graphdraw/CPieGraphDraw.php:300 include/graphs.inc.php:88
+#: include/classes/graphdraw/CLineGraphDraw.php:1802
+#: include/classes/graphdraw/CLineGraphDraw.php:1815
+#: include/classes/graphdraw/CPieGraphDraw.php:304 include/graphs.inc.php:88
 #: include/views/js/configuration.graph.edit.js.php:39
 #: include/views/js/configuration.graph.edit.js.php:47 popup_bitem.php:141
 msgid "min"
@@ -15564,8 +15564,8 @@ msgstr "有効なLDAPユーザーが必要です"
 msgid "new"
 msgstr "新規"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1894
-#: include/classes/graphdraw/CPieGraphDraw.php:336
+#: include/classes/graphdraw/CLineGraphDraw.php:1898
+#: include/classes/graphdraw/CPieGraphDraw.php:340
 #, c-format
 msgid "no data"
 msgstr "データなし"

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-29 20:24+0200\n"
+"POT-Creation-Date: 2013-12-02 21:57+0200\n"
 "PO-Revision-Date: 2013-11-05 18:31+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -3313,7 +3313,7 @@ msgstr "Слайдшоу користувачів"
 msgid "Czech (cs_CZ)"
 msgstr "Чеська (cs_CZ)"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1336
+#: include/classes/graphdraw/CLineGraphDraw.php:1340
 msgid "D"
 msgstr "D"
 
@@ -3412,8 +3412,8 @@ msgstr "Дані"
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2477
-#: include/classes/graphdraw/CPieGraphDraw.php:723
+#: include/classes/graphdraw/CLineGraphDraw.php:2481
+#: include/classes/graphdraw/CPieGraphDraw.php:727
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
 msgstr "Дані із %1$s. Згенеровано за %2$s сек."
@@ -5704,8 +5704,8 @@ msgstr "Групи, в яких проводиться сервіс"
 msgid "H.i"
 msgstr "H.i"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1342
-#: include/classes/graphdraw/CLineGraphDraw.php:1401
+#: include/classes/graphdraw/CLineGraphDraw.php:1346
+#: include/classes/graphdraw/CLineGraphDraw.php:1405
 #: include/page_header.php:450
 msgid "H:i"
 msgstr "H:i"
@@ -13486,7 +13486,7 @@ msgid "Trends"
 msgstr "Динаміка"
 
 #: events.php:296 events.php:337 include/actions.inc.php:56
-#: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:470
+#: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:474
 #: include/maps.inc.php:26 include/triggers.inc.php:1602
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:69
@@ -14564,7 +14564,7 @@ msgstr ""
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/blocks.inc.php:718 include/classes/graphdraw/CPieGraphDraw.php:320
+#: include/blocks.inc.php:718 include/classes/graphdraw/CPieGraphDraw.php:324
 #: include/classes/screens/CScreenEvents.php:43
 #: include/classes/screens/CScreenHistory.php:168
 #: include/classes/screens/CScreenHistory.php:266 include/reports.inc.php:172
@@ -14665,7 +14665,7 @@ msgstr "Перетворення значень повинне мати прин
 msgid "Value of any performance counter, where \"counter\" parameter is the counter path and \"interval\" parameter is a number of last seconds, for which the agent returns an average value."
 msgstr ""
 
-#: include/classes/graphdraw/CPieGraphDraw.php:335
+#: include/classes/graphdraw/CPieGraphDraw.php:339
 #, c-format
 msgid "Value: no data"
 msgstr "Значення: немає даних"
@@ -15306,7 +15306,7 @@ msgid "agent"
 msgstr "агент"
 
 #: include/classes/class.cpagefilter.php:890
-#: include/classes/graphdraw/CLineGraphDraw.php:1817
+#: include/classes/graphdraw/CLineGraphDraw.php:1821
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:115
 #: include/classes/screens/CScreenHostTriggers.php:110
@@ -15357,9 +15357,9 @@ msgstr ""
 msgid "auto-registered host"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1799
-#: include/classes/graphdraw/CLineGraphDraw.php:1821
-#: include/classes/graphdraw/CPieGraphDraw.php:313 include/graphs.inc.php:95
+#: include/classes/graphdraw/CLineGraphDraw.php:1803
+#: include/classes/graphdraw/CLineGraphDraw.php:1825
+#: include/classes/graphdraw/CPieGraphDraw.php:317 include/graphs.inc.php:95
 #: include/views/js/configuration.graph.edit.js.php:40
 #: include/views/js/configuration.graph.edit.js.php:48 popup_bitem.php:142
 msgid "avg"
@@ -15403,14 +15403,14 @@ msgstr "d.m.Y H:i:s"
 msgid "d.M"
 msgstr "d M"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1339
-#: include/classes/graphdraw/CLineGraphDraw.php:1392
+#: include/classes/graphdraw/CLineGraphDraw.php:1343
+#: include/classes/graphdraw/CLineGraphDraw.php:1396
 msgid "d.m"
 msgstr "d.m"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1361
-#: include/classes/graphdraw/CLineGraphDraw.php:1376
-#: include/classes/graphdraw/CLineGraphDraw.php:1395
+#: include/classes/graphdraw/CLineGraphDraw.php:1365
+#: include/classes/graphdraw/CLineGraphDraw.php:1380
+#: include/classes/graphdraw/CLineGraphDraw.php:1399
 msgid "d.m H:i"
 msgstr "d.m H:i"
 
@@ -15531,8 +15531,8 @@ msgstr "є"
 msgid "item"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1797
-#: include/classes/graphdraw/CPieGraphDraw.php:308 include/graphs.inc.php:92
+#: include/classes/graphdraw/CLineGraphDraw.php:1801
+#: include/classes/graphdraw/CPieGraphDraw.php:312 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:42
 msgid "last"
 msgstr "ост."
@@ -15571,17 +15571,17 @@ msgstr "сервіс"
 msgid "map"
 msgstr "карта мережі"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1800
-#: include/classes/graphdraw/CLineGraphDraw.php:1814
-#: include/classes/graphdraw/CPieGraphDraw.php:304 include/graphs.inc.php:90
+#: include/classes/graphdraw/CLineGraphDraw.php:1804
+#: include/classes/graphdraw/CLineGraphDraw.php:1818
+#: include/classes/graphdraw/CPieGraphDraw.php:308 include/graphs.inc.php:90
 #: include/views/js/configuration.graph.edit.js.php:41
 #: include/views/js/configuration.graph.edit.js.php:49 popup_bitem.php:143
 msgid "max"
 msgstr "макс."
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1798
-#: include/classes/graphdraw/CLineGraphDraw.php:1811
-#: include/classes/graphdraw/CPieGraphDraw.php:300 include/graphs.inc.php:88
+#: include/classes/graphdraw/CLineGraphDraw.php:1802
+#: include/classes/graphdraw/CLineGraphDraw.php:1815
+#: include/classes/graphdraw/CPieGraphDraw.php:304 include/graphs.inc.php:88
 #: include/views/js/configuration.graph.edit.js.php:39
 #: include/views/js/configuration.graph.edit.js.php:47 popup_bitem.php:141
 msgid "min"
@@ -15610,8 +15610,8 @@ msgstr "має бути дійсним користувачем LDAP"
 msgid "new"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1894
-#: include/classes/graphdraw/CPieGraphDraw.php:336
+#: include/classes/graphdraw/CLineGraphDraw.php:1898
+#: include/classes/graphdraw/CPieGraphDraw.php:340
 #, c-format
 msgid "no data"
 msgstr "немає даних"
