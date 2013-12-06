@@ -34,8 +34,7 @@ class CScreen extends CZBXAPI {
 	 * Get screen data.
 	 *
 	 * @param array  $options
-	 * @param array  $options['nodeids']		Node IDs
-	 * @param bool   $options['with_templated']	include templates in result
+	 * @param array  $options['nodeids']		node IDs
 	 * @param bool   $options['editable']		only with read-write permission. Ignored for SuperAdmins
 	 * @param int    $options['count']			count Hosts, returned column name is rowscount
 	 * @param string $options['pattern']		search hosts by pattern in host names
@@ -73,7 +72,6 @@ class CScreen extends CZBXAPI {
 			// output
 			'output'					=> API_OUTPUT_REFER,
 			'selectScreenItems'			=> null,
-			'with_templated'			=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -98,10 +96,6 @@ class CScreen extends CZBXAPI {
 			$sqlParts['from']['screens_items'] = 'screens_items si';
 			$sqlParts['where']['ssi'] = 'si.screenid=s.screenid';
 			$sqlParts['where'][] = dbConditionInt('si.screenitemid', $options['screenitemids']);
-		}
-
-		if ($options['with_templated'] !== null && $options['with_templated']) {
-			unset($sqlParts['where']['template']);
 		}
 
 		// filter

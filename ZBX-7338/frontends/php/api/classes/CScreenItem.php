@@ -157,10 +157,22 @@ class CScreenItem extends CZBXAPI {
 		$dbScreens = API::Screen()->get(array(
 			'screenids' => $screenIds,
 			'output' => array('screenid', 'hsize', 'vsize', 'name'),
-			'with_templated' => true,
 			'editable' => true,
 			'preservekeys' => true
 		));
+
+		if (count($dbScreens) < count($screenIds)) {
+			$dbTemplateScreens = API::TemplateScreen()->get(array(
+				'screenids' => $screenIds,
+				'output' => array('screenid', 'hsize', 'vsize', 'name'),
+				'editable' => true,
+				'preservekeys' => true
+			));
+
+			if ($dbTemplateScreens) {
+				$dbScreens = zbx_array_merge($dbScreens, $dbTemplateScreens);
+			}
+		}
 
 		$dbScreenItems = $this->get(array(
 			'screenids' => $screenIds,
@@ -236,10 +248,20 @@ class CScreenItem extends CZBXAPI {
 		$dbScreens = API::Screen()->get(array(
 			'screenitemids' => $screenItemIds,
 			'output' => array('screenid', 'hsize', 'vsize', 'name'),
-			'with_templated' => true,
 			'editable' => true,
 			'preservekeys' => true
 		));
+
+		$dbTemplateScreens = API::TemplateScreen()->get(array(
+			'screenitemids' => $screenItemIds,
+			'output' => array('screenid', 'hsize', 'vsize', 'name'),
+			'editable' => true,
+			'preservekeys' => true
+		));
+
+		if ($dbTemplateScreens) {
+			$dbScreens = zbx_array_merge($dbScreens, $dbTemplateScreens);
+		}
 
 		$dbScreenItems = $this->get(array(
 			'screenitemids' => $screenItemIds,
@@ -409,8 +431,8 @@ class CScreenItem extends CZBXAPI {
 	 *
 	 * @throws APIException if a validation error occurred.
 	 *
-	 * @param array $screenItems	An array of screen items to validate
-	 * @param array $dbScreenItems	An array of screen items $screenItems should be matched against
+	 * @param array $screenItems
+	 * @param array $dbScreenItems
 	 */
 	protected function checkInput(array $screenItems, array $dbScreenItems = array()) {
 		$hostGroupsIds = $hostIds = $graphIds = $itemIds = $mapIds = $screenIds = array();
@@ -634,15 +656,29 @@ class CScreenItem extends CZBXAPI {
 				'screenids' => $screenIds,
 				'output' => array('screenid'),
 				'editable' => true,
-				'with_templated' => true,
 				'preservekeys' => true
 			));
 
-			if (!$dbScreens) {
-				self::exception(
-					ZBX_API_ERROR_PERMISSIONS,
-					_s('Incorrect screen ID "%1$s" provided for screen element.', reset($screenIds))
-				);
+			if (count($dbScreens) < count($screenIds)) {
+				$dbTemplateScreens = API::TemplateScreen()->get(array(
+					'screenids' => $screenIds,
+					'output' => array('screenid'),
+					'editable' => true,
+					'preservekeys' => true
+				));
+
+				if ($dbTemplateScreens) {
+					$dbScreens = zbx_array_merge($dbScreens, $dbTemplateScreens);
+				}
+			}
+
+			foreach ($screenIds as $screenId) {
+				if (!isset($dbScreens[$screenId])) {
+					self::exception(
+						ZBX_API_ERROR_PERMISSIONS,
+						_s('Incorrect screen ID "%1$s" provided for screen element.', $screenId)
+					);
+				}
 			}
 		}
 	}
