@@ -104,6 +104,9 @@ elseif ($items = getRequest('items', array())) {
 		'itemids' => zbx_objectValues($items, 'itemid'),
 		'nodeids' => get_current_nodeid(true),
 		'output' => array('itemid'),
+		'filter' => array(
+			'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED)
+		),
 		'preservekeys' => true
 	));
 
