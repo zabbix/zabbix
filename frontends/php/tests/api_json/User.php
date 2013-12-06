@@ -135,7 +135,7 @@ class API_JSON_User extends CZabbixTest {
 	* @dataProvider authenticate_data
 	*/
 	public function testUser_Authenticate($data, $expect) {
-		$result = $this->api_call('user.authenticate', $data, $debug);
+		$result = $this->api_call('user.login', $data, $debug);
 
 		if ($expect) {
 			$this->assertTrue(isset($result['result']), $debug);
