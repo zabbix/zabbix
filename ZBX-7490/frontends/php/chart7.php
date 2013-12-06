@@ -50,8 +50,11 @@ asort_by_key($items, 'sortorder');
  * Permissions
  */
 $dbItems = API::Item()->get(array(
-	'webitems' => true,
-	'itemids' => zbx_objectValues($items, 'itemid')
+	'itemids' => zbx_objectValues($items, 'itemid'),
+	'filter' => array(
+		'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED)
+	),
+	'webitems' => true
 ));
 
 $dbItems = zbx_toHash($dbItems, 'itemid');
@@ -90,8 +93,6 @@ if ($isDataValid) {
 		$graph->switchPie3D();
 	}
 	$graph->showLegend(getRequest('legend', 0));
-
-	unset($host);
 
 	if (isset($_REQUEST['period'])) {
 		$graph->setPeriod($_REQUEST['period']);
