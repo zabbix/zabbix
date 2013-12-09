@@ -1,3 +1,15 @@
+Changes for 2.2.2rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 2.2.1
+
+2.2.1rc1 was released as 2.2.1 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.2.1rc1
 
 New features:
@@ -679,6 +691,18 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-5142] changed media type field label from 'Description' to 'Name' (Vedmak)
 ....I..... [ZBX-5314] increased size of autoincrement fields for PostgreSQL database (Sasha)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.11rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 2.0.10
+
+2.0.10rc1 was released as 2.0.10 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.0.10rc1
@@ -2120,6 +2144,13 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.20rc1
+
+
+Changes for 1.8.19
+
+1.8.19rc1 was released as 1.8.19 without any changes
+
 Changes for 1.8.19rc1
 
 ...G...... [ZBX-7479] fixed remote command execution from Zabbix server if flexible user parameters are configured; thanks to Recurity Labs Team for the report (Sasha)
