@@ -824,9 +824,8 @@ elseif ($srctbl == 'items') {
 		'nodeids' => $nodeId,
 		'hostids' => $hostid,
 		'webitems' => true,
-		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => array('hostid', 'name'),
-		'preservekeys' => true
+		'output' => array('itemid', 'hostid', 'name', 'key_', 'type', 'value_type', 'state', 'status'),
+		'selectHosts' => array('hostid', 'name')
 	);
 	if (!is_null($normalOnly)) {
 		$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
