@@ -54,10 +54,10 @@ $dbItems = API::Item()->get(array(
 	'filter' => array(
 		'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED)
 	),
-	'webitems' => true
+	'webitems' => true,
+	'preservekeys' => true
 ));
 
-$dbItems = zbx_toHash($dbItems, 'itemid');
 foreach ($items as $item) {
 	if (!isset($dbItems[$item['itemid']])) {
 		access_deny();
