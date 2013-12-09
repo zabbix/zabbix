@@ -62,7 +62,7 @@ class CUpdateDiscoveredValidator extends CValidator implements CPartialValidator
 			foreach ($object as $field => $value) {
 				if (!isset($allowedFields[$field])) {
 					// if we allow to update some fields, throw an error referencing a specific field
-					// we check if there are more than 1 field, because the PK must always be present
+					// we check if there is more than 1 field, because the PK must always be present
 					if (count($allowedFields) > 1) {
 						$this->error($this->messageAllowedField, $field);
 					}
