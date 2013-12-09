@@ -161,6 +161,7 @@ class CEvent extends CZBXAPI {
 				if ($options['objectids'] !== null) {
 					if ($options['object'] == EVENT_OBJECT_ITEM) {
 						$items = API::Item()->get(array(
+							'output' => array('itemid'),
 							'itemids' => $options['objectids'],
 							'editable' => $options['editable']
 						));

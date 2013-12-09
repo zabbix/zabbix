@@ -1319,32 +1319,31 @@ elseif ($srctbl == 'screens') {
 	}
 	$table->setHeader($header);
 
-	$options = array(
+	$screens = API::Screen()->get(array(
 		'nodeids' => $nodeId,
 		'output' => array('screenid', 'name'),
 		'preservekeys' => true,
-		'editable' => true
-	);
-	$screens = API::Screen()->get($options);
+		'editable' => ($writeonly === null) ? null: true
+	));
 	order_result($screens, 'name');
 
-	foreach ($screens as $row) {
-		$name = new CSpan($row['name'], 'link');
+	foreach ($screens as $screen) {
+		$name = new CSpan($screen['name'], 'link');
 
 		if ($multiselect) {
-			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($row['screenid']).');';
+			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($screen['screenid']).');';
 		}
 		else {
 			$values = array(
-				$dstfld1 => $row[$srcfld1],
-				$dstfld2 => $row[$srcfld2]
+				$dstfld1 => $screen[$srcfld1],
+				$dstfld2 => $screen[$srcfld2]
 			);
 			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); close_window(); return false;';
 		}
 		$name->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
 
 		if ($multiselect) {
-			$name = new CCol(array(new CCheckBox('screens['.zbx_jsValue($row[$srcfld1]).']', null, null, $row['screenid']), $name));
+			$name = new CCol(array(new CCheckBox('screens['.zbx_jsValue($screen[$srcfld1]).']', null, null, $screen['screenid']), $name));
 		}
 		$table->addRow($name);
 	}
@@ -1369,22 +1368,21 @@ elseif ($srctbl == 'screens2') {
 	$table = new CTableInfo(_('No screens found.'));
 	$table->setHeader(_('Name'));
 
-	$options = array(
+	$screens = API::Screen()->get(array(
 		'nodeids' => $nodeId,
 		'output' => array('screenid', 'name'),
-		'editable' => true
-	);
-	$screens = API::Screen()->get($options);
+		'editable' => ($writeonly === null) ? null: true
+	));
 	order_result($screens, 'name');
 
-	foreach ($screens as $row) {
-		if (check_screen_recursion($_REQUEST['screenid'], $row['screenid'])) {
+	foreach ($screens as $screen) {
+		if (check_screen_recursion($_REQUEST['screenid'], $screen['screenid'])) {
 			continue;
 		}
 
-		$name = new CLink($row['name'], '#');
+		$name = new CLink($screen['name'], '#');
 
-		$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
+		$action = get_window_opener($dstfrm, $dstfld1, $screen[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $screen[$srcfld2]) : '');
 		$name->setAttribute('onclick', $action.' close_window(); return false;');
 		$table->addRow($name);
 	}

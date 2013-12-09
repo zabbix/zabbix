@@ -562,6 +562,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 *
 	 * Supports function "last", "min", "max" and "avg".
 	 * Supports seconds as parameters, except "last" function.
+	 * Second parameter like {hostname:key.last(0,86400) and offsets like {hostname:key.last(#1)} are not supported.
 	 * Supports postfixes s,m,h,d and w for parameter.
 	 *
 	 * @param array  $strList				list of string in which macros should be resolved
@@ -584,7 +585,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				'(?<hosts>('.ZBX_PREG_HOST_FORMAT.'|({('.self::PATTERN_HOST_INTERNAL.')'.self::PATTERN_MACRO_PARAM.'}))):'.
 				'(?<keys>'.ZBX_PREG_ITEM_KEY_FORMAT.')\.'.
 				'(?<functions>(last|max|min|avg))\('.
-				'(?<parameters>([0-9]+[smhdw]?))'.
+				'(?<parameters>([0-9]+['.ZBX_TIME_SUFFIXES.']?)?)'.
 				'\)}{1})/Uux', $str, $matches, PREG_OFFSET_CAPTURE);
 
 			if (!empty($matches['hosts'])) {
@@ -651,24 +652,26 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$i = count($matches['macros']);
 
 			while ($i--) {
+				$host = $matches['hosts'][$i][0];
+				$key = $matches['keys'][$i][0];
+				$function = $matches['functions'][$i][0];
+				$parameter = $matches['parameters'][$i][0];
+
 				// host is real and item exists and has permissions
-				if ($matches['hosts'][$i][0] !== UNRESOLVED_MACRO_STRING
-						&& is_array($hostKeyPairs[$matches['hosts'][$i][0]][$matches['keys'][$i][0]])) {
-					$item = $hostKeyPairs[$matches['hosts'][$i][0]][$matches['keys'][$i][0]];
+				if ($host !== UNRESOLVED_MACRO_STRING && is_array($hostKeyPairs[$host][$key])) {
+					$item = $hostKeyPairs[$host][$key];
 
 					// macro function is "last"
-					if ($matches['functions'][$i][0] == 'last') {
+					if ($function == 'last') {
 						$value = isset($history[$item['itemid']])
 							? formatHistoryValue($history[$item['itemid']][0]['value'], $item)
 							: UNRESOLVED_MACRO_STRING;
 					}
-
 					// macro function is "max", "min" or "avg"
 					else {
-						$value = getItemFunctionalValue($item, $matches['functions'][$i][0], $matches['parameters'][$i][0]);
+						$value = getItemFunctionalValue($item, $function, $parameter);
 					}
 				}
-
 				// there is no item with given key in given host, or there is no permissions to that item
 				else {
 					$value = UNRESOLVED_MACRO_STRING;
