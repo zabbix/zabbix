@@ -3,6 +3,8 @@ Changes for 2.2.2rc1
 New features:
 
 Bug fixes:
+....I..... [ZBX-7227] modernized autoconf invocation and renamed "configure.in" to "configure.ac"; thanks to Dmitry Smirnov (asaveljevs)
+..F....... [ZBX-7427] fixed element links not being rendered correctly between host groups and other elements (Pavels)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.1
