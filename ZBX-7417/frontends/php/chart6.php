@@ -71,7 +71,7 @@ $timeline = CScreenBase::calculateTime(array(
 	'stime' => get_request('stime')
 ));
 
-$graph = new CPie($dbGraph['graphtype']);
+$graph = new CPieGraphDraw($dbGraph['graphtype']);
 $graph->setPeriod($timeline['period']);
 $graph->setSTime($timeline['stime']);
 

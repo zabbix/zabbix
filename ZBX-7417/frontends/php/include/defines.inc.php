@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',     '2.2.1rc1');
-define('ZABBIX_API_VERSION', '2.2.1');
+define('ZABBIX_VERSION',     '2.2.2rc1');
+define('ZABBIX_API_VERSION', '2.2.2');
 define('ZABBIX_DB_VERSION',	 2020000);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
@@ -52,9 +52,6 @@ define('ZBX_UNITS_ROUNDOFF_LOWER_LIMIT',	6);
 define('ZBX_PRECISION_10',	10);
 
 define('ZBX_DEFAULT_INTERVAL', '1-7,00:00-24:00');
-
-// for partitioned DB installs!!
-define('ZBX_HISTORY_DATA_UPKEEP', -1); // in days; -1: disabled, 0: always use trends
 
 define('ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT',	0);
 define('ZBX_SCRIPT_TYPE_IPMI',			1);
