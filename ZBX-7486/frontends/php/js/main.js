@@ -1154,5 +1154,14 @@ function createPlaceholders() {
 				}
 			}).blur();
 		});
+
+		// clear the placeholder values so they don't get submitted
+		jQuery(document).delegate('form', 'submit.placeholder', function() {
+			jQuery('.placeholder').each(function(){
+				if (jQuery(this).val() == jQuery(this).attr('placeholder')) {
+					jQuery(this).val('');
+				}
+			});
+		});
 	}
 }
