@@ -57,6 +57,9 @@ static void	process_configuration_sync(size_t *data_size)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	/* reset the performance metric */
+	*data_size = 0;
+
 	connect_to_server(&sock, 600, CONFIG_PROXYCONFIG_RETRY); /* retry till have a connection */
 
 	if (SUCCEED != get_data_from_server(&sock, ZBX_PROTO_VALUE_PROXY_CONFIG, &data))
@@ -64,14 +67,12 @@ static void	process_configuration_sync(size_t *data_size)
 
 	if ('\0' == *data)
 	{
-		*data_size = 0;
 		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server: empty string received");
 		goto out;
 	}
 
 	if (SUCCEED != zbx_json_open(data, &jp))
 	{
-		*data_size = 0;
 		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server: %s", zbx_json_strerror());
 		goto out;
 	}

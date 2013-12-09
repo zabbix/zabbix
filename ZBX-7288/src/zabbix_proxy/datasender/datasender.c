@@ -64,7 +64,7 @@ static void	host_availability_sender(struct zbx_json *j)
 		connect_to_server(&sock, 600, CONFIG_PROXYDATA_FREQUENCY); /* retry till have a connection */
 
 		if (SUCCEED != put_data_to_server(&sock, j, &error))
-			zabbix_log(LOG_LEVEL_WARNING, "sending host_availability data to server failed: %s", error);
+			zabbix_log(LOG_LEVEL_WARNING, "sending host availability data to server failed: %s", error);
 
 		zbx_free(error);
 		disconnect_server(&sock);

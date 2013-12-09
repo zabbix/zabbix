@@ -153,7 +153,7 @@ int	zbx_recv_response_dyn(zbx_sock_t *sock, char **info, char **error, int timeo
 
 	if (SUCCEED != (ret = zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value))))
 	{
-		*error = zbx_dsprintf(*error, "invalid response format: no \"response\" tag");
+		*error = zbx_dsprintf(*error, "invalid response format: no \"" ZBX_PROTO_TAG_RESPONSE "\" tag");
 		invalid_format = 1;
 		goto out;
 	}
