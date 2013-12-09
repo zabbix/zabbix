@@ -93,7 +93,7 @@ function valueDistributionFormForMultiplePeriods($items = array()) {
 				'", 550, 400, "graph_item_form");'
 			);
 
-			$description = $item['host']['name'].NAME_DELIMITER.$item['name'];
+			$description = $item['host']['name'].NAME_DELIMITER.$item['name_expanded'];
 
 			$items_table->addRow(array(
 				new CCheckBox('group_gid['.$id.']', isset($group_gid[$id])),
@@ -103,8 +103,9 @@ function valueDistributionFormForMultiplePeriods($items = array()) {
 				($item['axisside'] == GRAPH_YAXIS_SIDE_LEFT) ? _('Left') : _('Right'),
 				$color,
 			));
+
 			// once used, unset unnecessary fields so they don't pass to URL
-			unset($item['value_type'], $item['host'], $item['name']);
+			unset($item['value_type'], $item['host'], $item['name'], $item['name_expanded']);
 		}
 		unset($item);
 
@@ -237,7 +238,7 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 				'", 550, 400, "graph_item_form");'
 			);
 
-			$description = $item['host']['name'].NAME_DELIMITER.$item['name'];
+			$description = $item['host']['name'].NAME_DELIMITER.$item['name_expanded'];
 
 			$items_table->addRow(array(
 				new CCheckBox('group_gid['.$id.']', isset($group_gid[$id])),
@@ -245,8 +246,9 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 				$description,
 				graph_item_calc_fnc2str($item['calc_fnc'], 0)
 			));
+
 			// once used, unset unnecessary fields so they don't pass to URL. "color" goes in "periods" parameter.
-			unset($item['value_type'], $item['host'], $item['name'], $item['color']);
+			unset($item['value_type'], $item['host'], $item['name'], $item['name_expanded'], $item['color']);
 		}
 		unset($item);
 
@@ -417,7 +419,7 @@ function valueComparisonFormForMultiplePeriods() {
 		$items = CMacrosResolverHelper::resolveItemName(array(get_item_by_itemid($itemId)));
 		$item = reset($items);
 
-		$itemName = $item['name'];
+		$itemName = $item['name_expanded'];
 	}
 
 	$itemidVar = new CVar('itemid', $itemId, 'itemid');

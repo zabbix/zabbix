@@ -225,7 +225,7 @@ elseif ($config == QUEUE_DETAILS) {
 			zbx_date2age($itemData['nextcheck']),
 			get_node_name_by_elid($item['itemid']),
 			$host['name'],
-			$item['name']
+			$item['name_expanded']
 		));
 	}
 }

@@ -619,7 +619,7 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 	$dbItems = CMacrosResolverHelper::resolveItemName($dbItems);
 
 	CArrayHelper::sort($dbItems, array(
-		array('field' => 'name', 'order' => ZBX_SORT_UP),
+		array('field' => 'name_expanded', 'order' => ZBX_SORT_UP),
 		array('field' => 'itemid', 'order' => ZBX_SORT_UP)
 	));
 
@@ -638,21 +638,23 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 
 	$items = array();
 	foreach ($dbItems as $dbItem) {
+		$name = $dbItem['name_expanded'];
+
 		$dbItem['hostname'] = get_node_name_by_elid($dbItem['hostid'], null, NAME_DELIMITER).$dbItem['hostname'];
 		$hostNames[$dbItem['hostid']] = $dbItem['hostname'];
 
 		// a little tricky check for attempt to overwrite active trigger (value=1) with
 		// inactive or active trigger with lower priority.
-		if (!isset($items[$dbItem['name']][$dbItem['hostname']])
-				|| (($items[$dbItem['name']][$dbItem['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE && $dbItem['tr_value'] == TRIGGER_VALUE_TRUE)
-					|| (($items[$dbItem['name']][$dbItem['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE || $dbItem['tr_value'] == TRIGGER_VALUE_TRUE)
-						&& $dbItem['priority'] > $items[$dbItem['name']][$dbItem['hostname']]['severity']))) {
-			$items[$dbItem['name']][$dbItem['hostname']] = array(
+		if (!isset($items[$name][$dbItem['hostname']])
+				|| (($items[$name][$dbItem['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE && $dbItem['tr_value'] == TRIGGER_VALUE_TRUE)
+					|| (($items[$name][$dbItem['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE || $dbItem['tr_value'] == TRIGGER_VALUE_TRUE)
+						&& $dbItem['priority'] > $items[$name][$dbItem['hostname']]['severity']))) {
+			$items[$name][$dbItem['hostname']] = array(
 				'itemid' => $dbItem['itemid'],
 				'value_type' => $dbItem['value_type'],
 				'value' => isset($history[$dbItem['itemid']]) ? $history[$dbItem['itemid']][0]['value'] : null,
 				'units' => $dbItem['units'],
-				'name' => $dbItem['name'],
+				'name' => $name,
 				'valuemapid' => $dbItem['valuemapid'],
 				'severity' => $dbItem['priority'],
 				'tr_value' => $dbItem['tr_value'],

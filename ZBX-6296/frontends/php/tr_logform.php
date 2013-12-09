@@ -259,7 +259,7 @@ if(isset($_REQUEST['sform'])){
 	foreach ($dbItems as $dbItem) {
 		if ($dbItem['templateid']) {
 			$template = get_realhost_by_itemid($dbItem['templateid']);
-			$item = $template['host'].NAME_DELIMITER.$dbItem['name'];
+			$item = $template['host'].NAME_DELIMITER.$dbItem['name_expanded'];
 		}
 	}
 

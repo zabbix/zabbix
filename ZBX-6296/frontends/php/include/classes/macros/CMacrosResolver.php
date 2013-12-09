@@ -759,9 +759,15 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @return array
 	 */
 	private function resolveItems(array $items) {
+		// define resolving fields
+		foreach ($items as &$item) {
+			$item['name_expanded'] = $item['name'];
+		}
+		unset($item);
+
 		// user macros
 		if ($this->isTypeAvailable('itemUser')) {
-			$items = $this->resolveItemUserMacros($items, 'name');
+			$items = $this->resolveItemUserMacros($items, 'name_expanded');
 		}
 
 		// macros in item key
@@ -773,7 +779,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$itemsWithMacros = array();
 
 		foreach ($items as $key => $item) {
-			if (preg_match(self::PATTERN_ITEM_NUMBER, $item['name'])) {
+			if (preg_match(self::PATTERN_ITEM_NUMBER, $item['name_expanded'])) {
 				$itemsWithMacros[$key] = $item;
 			}
 		}
@@ -786,25 +792,32 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 			foreach ($itemsWithMacros as $key => $item) {
 				// parsing key to get the parameters out of it
-				$itemKey = new CItemKey($item['key_']);
+				$itemKey = new CItemKey($item['key_expanded']);
 
 				if ($itemKey->isValid()) {
 					$keyParameters = $itemKey->getParameters();
 					$searchOffset = 0;
 
-					while (preg_match('/\$[1-9]/', $item['name'], $matches, PREG_OFFSET_CAPTURE, $searchOffset)) {
+					while (preg_match('/\$[1-9]/', $item['name_expanded'], $matches, PREG_OFFSET_CAPTURE, $searchOffset)) {
 						// matches[0][0] - matched param, [1] - second character of it
 						$paramNumber = $matches[0][0][1] - 1;
 						$replaceString = isset($keyParameters[$paramNumber]) ? $keyParameters[$paramNumber] : '';
 						$searchOffset = $matches[0][1] + strlen($replaceString);
 
-						$item['name'] = substr_replace($item['name'], $replaceString, $matches[0][1], 2);
+						$item['name_expanded'] = substr_replace($item['name_expanded'], $replaceString, $matches[0][1], 2);
 					}
 				}
 
 				// set resolved item
 				$items[$key] = $item;
 			}
+		}
+
+		if (!$this->isTypeAvailable('allKeys')) {
+			foreach ($items as &$item) {
+				unset($item['key_expanded']);
+			}
+			unset($item);
 		}
 
 		return $items;
@@ -821,12 +834,20 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @return array
 	 */
 	private function resolveItemKeys(array $items) {
+		// define resolving field
+		if ($this->isTypeAvailable('keyHost') || $this->isTypeAvailable('keyUser')) {
+			foreach ($items as &$item) {
+				$item['key_expanded'] = $item['key_'];
+			}
+			unset($item);
+		}
+
 		// host macros
 		if ($this->isTypeAvailable('keyHost')) {
 			$itemMacros = array();
 
 			foreach ($items as $item) {
-				$macros = $this->findMacros(self::PATTERN_ITEM_MACROS, array($item['key_']));
+				$macros = $this->findMacros(self::PATTERN_ITEM_MACROS, array($item['key_expanded']));
 
 				if ($macros) {
 					$itemMacros[$item['itemid']] = $macros;
@@ -863,34 +884,34 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 							foreach ($itemMacros[$itemId] as $macro) {
 								switch ($macro) {
 									case '{HOST.NAME}':
-										$item['key_'] = str_replace('{HOST.NAME}', $host['name'], $item['key_']);
+										$item['key_expanded'] = str_replace('{HOST.NAME}', $host['name'], $item['key_expanded']);
 										break;
 
 									case '{HOSTNAME}': // deprecated
-										$item['key_'] = str_replace('{HOSTNAME}', $host['host'], $item['key_']);
+										$item['key_expanded'] = str_replace('{HOSTNAME}', $host['host'], $item['key_expanded']);
 										break;
 
 									case '{HOST.HOST}':
-										$item['key_'] = str_replace('{HOST.HOST}', $host['host'], $item['key_']);
+										$item['key_expanded'] = str_replace('{HOST.HOST}', $host['host'], $item['key_expanded']);
 										break;
 
 									case '{HOST.IP}':
-										$item['key_'] = str_replace('{HOST.IP}', $interface['ip'], $item['key_']);
+										$item['key_expanded'] = str_replace('{HOST.IP}', $interface['ip'], $item['key_expanded']);
 										break;
 
 									case '{IPADDRESS}': // deprecated
-										$item['key_'] = str_replace('{IPADDRESS}', $interface['ip'], $item['key_']);
+										$item['key_expanded'] = str_replace('{IPADDRESS}', $interface['ip'], $item['key_expanded']);
 										break;
 
 									case '{HOST.DNS}':
-										$item['key_'] = str_replace('{HOST.DNS}', $interface['dns'], $item['key_']);
+										$item['key_expanded'] = str_replace('{HOST.DNS}', $interface['dns'], $item['key_expanded']);
 										break;
 
 									case '{HOST.CONN}':
-										$item['key_'] = str_replace(
+										$item['key_expanded'] = str_replace(
 											'{HOST.CONN}',
 											$interface['useip'] ? $interface['ip'] : $interface['dns'],
-											$item['key_']
+											$item['key_expanded']
 										);
 										break;
 								}
@@ -904,7 +925,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// user macros
 		if ($this->isTypeAvailable('keyUser')) {
-			$items = $this->resolveItemUserMacros($items, 'key_');
+			$items = $this->resolveItemUserMacros($items, 'key_expanded');
 		}
 
 		return $items;

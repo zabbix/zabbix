@@ -529,7 +529,7 @@ elseif (isset($_REQUEST['form'])) {
 	// items
 	if ($data['items']) {
 		$items = API::Item()->get(array(
-			'output' => array('itemid', 'name', 'key_', 'flags'),
+			'output' => array('itemid', 'hostid', 'name', 'key_', 'flags'),
 			'selectHosts' => array('hostid', 'name'),
 			'itemids' => zbx_objectValues($data['items'], 'itemid'),
 			'filter' => array(
@@ -543,6 +543,7 @@ elseif (isset($_REQUEST['form'])) {
 			$host = reset($items[$item['itemid']]['hosts']);
 
 			$item['host'] = $host['name'];
+			$item['hostid'] = $items[$item['itemid']]['hostid'];
 			$item['name'] = $items[$item['itemid']]['name'];
 			$item['key_'] = $items[$item['itemid']]['key_'];
 			$item['flags'] = $items[$item['itemid']]['flags'];

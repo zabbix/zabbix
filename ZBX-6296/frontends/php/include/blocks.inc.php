@@ -78,7 +78,10 @@ function make_favorite_graphs() {
 			$item = $items[$sourceid];
 			$host = reset($item['hosts']);
 
-			$link = new CLink(get_node_name_by_elid($sourceid, null, NAME_DELIMITER).$host['name'].NAME_DELIMITER.$item['name'], 'history.php?action=showgraph&itemid='.$sourceid);
+			$link = new CLink(
+				get_node_name_by_elid($sourceid, null, NAME_DELIMITER).$host['name'].NAME_DELIMITER.$item['name_expanded'],
+				'history.php?action=showgraph&itemid='.$sourceid
+			);
 			$link->setTarget('blank');
 		}
 		else {
@@ -89,7 +92,10 @@ function make_favorite_graphs() {
 			$graph = $graphs[$sourceid];
 			$ghost = reset($graph['hosts']);
 
-			$link = new CLink(get_node_name_by_elid($sourceid, null, NAME_DELIMITER).$ghost['name'].NAME_DELIMITER.$graph['name'], 'charts.php?graphid='.$sourceid);
+			$link = new CLink(
+				get_node_name_by_elid($sourceid, null, NAME_DELIMITER).$ghost['name'].NAME_DELIMITER.$graph['name'],
+				'charts.php?graphid='.$sourceid
+			);
 			$link->setTarget('blank');
 		}
 
@@ -1251,13 +1257,12 @@ function make_graph_submenu() {
 
 	if ($itemids) {
 		$items = API::Item()->get(array(
-			'itemids' => $itemids,
-			'selectHosts' => array('hostid', 'host'),
 			'output' => array('itemid', 'hostid', 'name', 'key_'),
-			'webitems' => 1
+			'selectHosts' => array('hostid', 'host'),
+			'itemids' => $itemids,
+			'webitems' => true,
+			'preservekeys' => true
 		));
-
-		$items = zbx_toHash($items, 'itemid');
 
 		$items = CMacrosResolverHelper::resolveItemName($items);
 	}
@@ -1274,9 +1279,9 @@ function make_graph_submenu() {
 			$item_added = true;
 			$item = $items[$sourceid];
 			$host = reset($item['hosts']);
-			$item['name'] = $item['name'];
+
 			$favGraphs[] = array(
-				'name' => $host['host'].NAME_DELIMITER.$item['name'],
+				'name' => $host['host'].NAME_DELIMITER.$item['name_expanded'],
 				'favobj' => 'itemid',
 				'favid' => $sourceid,
 				'favaction' => 'remove'

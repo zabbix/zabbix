@@ -208,7 +208,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 
 		$itemsList = array();
 		foreach ($hostItems as $hostItem) {
-			$itemsList[$hostItem['itemid']] = $hostItem['name'];
+			$itemsList[$hostItem['itemid']] = $hostItem['name_expanded'];
 		}
 		order_result($itemsList);
 
@@ -273,7 +273,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 
 		$discoveryRuleList = array();
 		foreach ($hostDiscoveryRules as $discoveryRule) {
-			$discoveryRuleList[$discoveryRule['itemid']] = $discoveryRule['name'];
+			$discoveryRuleList[$discoveryRule['itemid']] = $discoveryRule['name_expanded'];
 		}
 		order_result($discoveryRuleList);
 		$hostDiscoveryRuleids = array_keys($discoveryRuleList);
@@ -297,7 +297,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 
 			$prototypeList = array();
 			foreach ($hostItemPrototypes as $itemPrototype) {
-				$prototypeList[$itemPrototype['itemid']] = $itemPrototype['name'];
+				$prototypeList[$itemPrototype['itemid']] = $itemPrototype['name_expanded'];
 			}
 			order_result($prototypeList);
 

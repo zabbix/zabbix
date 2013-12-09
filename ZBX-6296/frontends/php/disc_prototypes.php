@@ -361,7 +361,6 @@ else {
 		'discovery_rule' => $discovery_rule
 	);
 
-	// get items
 	$sortfield = getPageSortField('name');
 
 	$data['items'] = API::ItemPrototype()->get(array(
@@ -375,9 +374,7 @@ else {
 
 	$data['items'] = CMacrosResolverHelper::resolveItemName($data['items']);
 
-	if (!empty($data['items'])) {
-		order_result($data['items'], $sortfield, getPageSortOrder());
-	}
+	order_result($data['items'], $sortfield, getPageSortOrder());
 
 	$data['paging'] = getPagingLine(
 		$data['items'],

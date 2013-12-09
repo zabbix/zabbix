@@ -1365,7 +1365,7 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 
 		foreach ($dbItems as $dbItem) {
 			$triggerItems[] = array(
-				'name' => $dbItem['name'],
+				'name' => $dbItem['name_expanded'],
 				'params' => array(
 					'action' => in_array($dbItem['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
 						? 'showgraph' : 'showlatest',

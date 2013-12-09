@@ -72,6 +72,7 @@ $itemTable->setHeader(array(
 	make_sorting_header(_('Status'), 'status'),
 	$data['showErrorColumn'] ? _('Error') : null
 ));
+
 foreach ($this->data['items'] as $item) {
 	// description
 	$description = array();
@@ -90,11 +91,11 @@ foreach ($this->data['items'] as $item) {
 			'disc_prototypes.php?parent_discoveryid='.$item['discoveryRule']['itemid'],
 			'parent-discovery'
 		);
-		$description[] = NAME_DELIMITER.$item['name'];
+		$description[] = NAME_DELIMITER.$item['name_expanded'];
 	}
 	else {
 		$description[] = new CLink(
-			CHtml::encode($item['name']),
+			CHtml::encode($item['name_expanded']),
 			'?form=update&hostid='.$item['hostid'].'&itemid='.$item['itemid']
 		);
 	}
@@ -256,7 +257,7 @@ foreach ($this->data['items'] as $item) {
 		empty($this->data['filter_hostid']) ? $item['host'] : null,
 		$description,
 		$triggerInfo,
-		CHtml::encode($item['key_orig']),
+		CHtml::encode($item['key_']),
 		$item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP ? '' : $item['delay'],
 		$item['history'],
 		in_array($item['value_type'], array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT)) ? '' : $item['trends'],

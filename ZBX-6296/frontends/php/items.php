@@ -1024,7 +1024,7 @@ else {
 	}
 
 	// set values for subfilters, if any of subfilters = false then item shouldnt be shown
-	if (!empty($data['items'])) {
+	if ($data['items']) {
 		// fill template host
 		fillItemsWithChildTemplates($data['items']);
 
@@ -1042,12 +1042,6 @@ else {
 			}
 			unset($item);
 		}
-
-		// save original item key
-		foreach ($data['items'] as &$item) {
-			$item['key_orig'] = $item['key_'];
-		}
-		unset($item);
 
 		// resolve name macros
 		$data['items'] = CMacrosResolverHelper::resolveItemName($data['items']);
@@ -1085,6 +1079,7 @@ else {
 					|| uint_in_array($item['delay'], $_REQUEST['subfilter_interval']),
 				'subfilter_apps' => empty($_REQUEST['subfilter_apps'])
 			);
+
 			if (!empty($_REQUEST['subfilter_apps'])) {
 				foreach ($item['applications'] as $application) {
 					if (str_in_array($application['name'], $_REQUEST['subfilter_apps'])) {

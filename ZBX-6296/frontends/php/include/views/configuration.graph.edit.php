@@ -116,7 +116,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			$minItems = CMacrosResolverHelper::resolveItemName(array(get_item_by_itemid($this->data['ymin_itemid'])));
 			$minItem = reset($minItems);
 
-			$ymin_name = $min_host['name'].NAME_DELIMITER.$minItem['name'];
+			$ymin_name = $min_host['name'].NAME_DELIMITER.$minItem['name_expanded'];
 		}
 
 		$yaxisMinData[] = new CTextBox('ymin_name', $ymin_name, 36, 'yes');
@@ -174,7 +174,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			$maxItems = CMacrosResolverHelper::resolveItemName(array(get_item_by_itemid($this->data['ymax_itemid'])));
 			$maxItem = reset($maxItems);
 
-			$ymax_name = $max_host['name'].NAME_DELIMITER.$maxItem['name'];
+			$ymax_name = $max_host['name'].NAME_DELIMITER.$maxItem['name_expanded'];
 		}
 
 		$yaxisMaxData[] = new CTextBox('ymax_name', $ymax_name, 36, 'yes');
@@ -258,7 +258,7 @@ $itemsTable->addRow(new CRow(
 ));
 
 foreach ($this->data['items'] as $n => $item) {
-	$name = $item['host'].NAME_DELIMITER.$item['name'];
+	$name = $item['host'].NAME_DELIMITER.$item['name_expanded'];
 
 	if (zbx_empty($item['drawtype'])) {
 		$item['drawtype'] = 0;

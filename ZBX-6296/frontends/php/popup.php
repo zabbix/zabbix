@@ -854,8 +854,8 @@ elseif ($srctbl == 'items') {
 		$host = reset($item['hosts']);
 		$item['hostname'] = $host['name'];
 
-		$description = new CLink($item['name'], '#');
-		$item['name'] = $item['hostname'].NAME_DELIMITER.$item['name'];
+		$description = new CLink($item['name_expanded'], '#');
+		$item['name'] = $item['hostname'].NAME_DELIMITER.$item['name_expanded'];
 
 		if ($multiselect) {
 			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($item['itemid']).');';
@@ -877,7 +877,7 @@ elseif ($srctbl == 'items') {
 		$description->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
 
 		$table->addRow(array(
-			$hostid > 0 ? null : $item['hostname'],
+			($hostid > 0) ? null : $item['hostname'],
 			$multiselect ? new CCheckBox('items['.zbx_jsValue($item[$srcfld1]).']', null, null, $item['itemid']) : null,
 			$description,
 			$item['key_'],
@@ -959,8 +959,8 @@ elseif ($srctbl == 'prototypes') {
 	foreach ($items as &$item) {
 		$host = reset($item['hosts']);
 
-		$description = new CSpan($item['name'], 'link');
-		$item['name'] = $host['name'].NAME_DELIMITER.$item['name'];
+		$description = new CSpan($item['name_expanded'], 'link');
+		$item['name'] = $host['name'].NAME_DELIMITER.$item['name_expanded'];
 
 		if ($multiselect) {
 			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($item['itemid']).');';

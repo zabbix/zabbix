@@ -690,7 +690,7 @@ else {
 
 				foreach ($trigger['items'] as $item) {
 					$triggerItems[] = array(
-						'name' => $item['name'],
+						'name' => $item['name_expanded'],
 						'params' => array(
 							'itemid' => $item['itemid'],
 							'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))

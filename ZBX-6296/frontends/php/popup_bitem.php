@@ -61,7 +61,7 @@ if (zbx_empty($_REQUEST['caption']) && isset($_REQUEST['itemid']) && $_REQUEST['
 	$items = CMacrosResolverHelper::resolveItemName(array(get_item_by_itemid($_REQUEST['itemid'])));
 	$item = reset($items);
 
-	$_REQUEST['caption'] = $item['name'];
+	$_REQUEST['caption'] = $item['name_expanded'];
 }
 
 insert_js_function('add_bitem');

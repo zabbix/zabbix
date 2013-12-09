@@ -217,7 +217,7 @@ class CScreenHistory extends CScreenBase {
 						$row = array(nbsp(zbx_date2str(_('Y.M.d H:i:s'), $data['clock'])));
 
 						if ($isManyItems) {
-							$row[] = $host['name'].NAME_DELIMITER.$item['name'];
+							$row[] = $host['name'].NAME_DELIMITER.$item['name_expanded'];
 						}
 
 						if ($useLogItem) {

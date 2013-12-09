@@ -36,25 +36,22 @@ if (PAGE_TYPE_HTML == $page['type']) {
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-//		VAR			     			 TYPE	   OPTIONAL FLAGS	VALIDATION	EXCEPTION
+//	VAR						TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'apps'=>				array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		NULL),
-	'groupid'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
-	'hostid'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
-
-	'fullscreen'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),	NULL),
-// filter
-	'select'=>				array(T_ZBX_STR, O_OPT, NULL,	NULL,		NULL),
-	'show_without_data'=>	array(T_ZBX_INT, O_OPT, NULL,	IN('0,1'),	NULL),
-	'show_details'=>		array(T_ZBX_INT, O_OPT, NULL,	IN('0,1'),	NULL),
-	'filter_rst'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),	NULL),
-	'filter_set'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	null,		NULL),
-//ajax
-	'favobj'=>				array(T_ZBX_STR, O_OPT, P_ACT,	NULL,		NULL),
-	'favref'=>				array(T_ZBX_STR, O_OPT, P_ACT,  NULL,		NULL),
-	'favstate'=>			array(T_ZBX_INT, O_OPT, P_ACT,  NULL,		NULL),
-	'toggle_ids'=>			array(T_ZBX_STR, O_OPT, P_ACT,  NULL,		NULL),
-	'toggle_open_state'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NULL,		NULL)
+	'apps' =>				array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
+	'groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'fullscreen' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
+	'select' =>				array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'show_without_data' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
+	'show_details' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
+	'filter_rst' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
+	'filter_set' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'favobj' =>				array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	'favref' =>				array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	'favstate' =>			array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
+	'toggle_ids' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	'toggle_open_state' =>	array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
 );
 check_fields($fields);
 
@@ -204,7 +201,7 @@ if ($items) {
 
 	// filter items by name
 	foreach ($items as $key => $item) {
-		if (!zbx_empty($filterSelect) && !zbx_stristr($item['name'], $filterSelect)) {
+		if (!zbx_empty($filterSelect) && !zbx_stristr($item['name_expanded'], $filterSelect)) {
 			unset($items[$key]);
 		}
 	}
@@ -236,13 +233,13 @@ if ($items) {
 
 		// sort
 		if ($sortField == 'i.name') {
-			$sortFields = array(array('field' => 'name', 'order' => $sortOrder), 'itemid');
+			$sortFields = array(array('field' => 'name_expanded', 'order' => $sortOrder), 'itemid');
 		}
 		elseif ($sortField == 'i.lastclock') {
-			$sortFields = array(array('field' => 'lastclock', 'order' => $sortOrder), 'name', 'itemid');
+			$sortFields = array(array('field' => 'lastclock', 'order' => $sortOrder), 'name_expanded', 'itemid');
 		}
 		else {
-			$sortFields = array('name', 'itemid');
+			$sortFields = array('name_expanded', 'itemid');
 		}
 		CArrayHelper::sort($items, $sortFields);
 
@@ -252,6 +249,7 @@ if ($items) {
 			'hostids' => $hostIds,
 			'preservekeys' => true
 		));
+
 		if ($applications) {
 			foreach ($applications as &$application) {
 				$application['hostname'] = $hosts[$application['hostid']]['name'];
@@ -275,6 +273,7 @@ if ($items) {
 				'countOutput' => true,
 				'groupCount' => true
 			));
+
 			foreach ($screens as $screen) {
 				$hosts[$screen['hostid']]['screens'] = $screen['rowscount'];
 			}
@@ -410,8 +409,8 @@ foreach ($items as $key => $item){
 
 	if ($filterShowDetails) {
 		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST || $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
-			? new CSpan($item['key_'], 'enabled')
-			: new CLink($item['key_'], 'items.php?form=update&itemid='.$item['itemid'], 'enabled');
+			? new CSpan($item['key_expanded'], 'enabled')
+			: new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid'], 'enabled');
 
 		$statusIcons = array();
 		if ($item['status'] == ITEM_STATUS_ACTIVE) {
@@ -436,7 +435,7 @@ foreach ($items as $key => $item){
 			SPACE,
 			is_show_all_nodes() ? SPACE : null,
 			($_REQUEST['hostid'] > 0) ? null : SPACE,
-			new CCol(new CDiv(array($item['name'], BR(), $itemKey), $stateCss.' item')),
+			new CCol(new CDiv(array($item['name_expanded'], BR(), $itemKey), $stateCss.' item')),
 			new CCol(new CDiv(
 				($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER)
 					? UNKNOWN_VALUE
@@ -458,7 +457,7 @@ foreach ($items as $key => $item){
 			SPACE,
 			is_show_all_nodes() ? SPACE : null,
 			($_REQUEST['hostid'] > 0) ? null : SPACE,
-			new CCol(new CDiv($item['name'], $stateCss.' item')),
+			new CCol(new CDiv($item['name_expanded'], $stateCss.' item')),
 			new CCol(new CDiv($lastClock, $stateCss)),
 			new CCol(new CDiv($lastValue, $stateCss)),
 			new CCol(new CDiv($change, $stateCss)),
@@ -583,8 +582,8 @@ foreach ($items as $item) {
 	$host = $hosts[$item['hostid']];
 	if ($filterShowDetails) {
 		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST || $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
-			? new CSpan($item['key_'], 'enabled')
-			: new CLink($item['key_'], 'items.php?form=update&itemid='.$item['itemid'], 'enabled');
+			? new CSpan($item['key_expanded'], 'enabled')
+			: new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid'], 'enabled');
 
 		$statusIcons = array();
 		if ($item['status'] == ITEM_STATUS_ACTIVE) {
@@ -609,7 +608,7 @@ foreach ($items as $item) {
 			SPACE,
 			is_show_all_nodes() ? ($host['item_cnt'] ? SPACE : get_node_name_by_elid($item['itemid'])) : null,
 			$_REQUEST['hostid'] ? null : SPACE,
-			new CCol(new CDiv(array($item['name'], BR(), $itemKey), $stateCss.' item')),
+			new CCol(new CDiv(array($item['name_expanded'], BR(), $itemKey), $stateCss.' item')),
 			new CCol(new CDiv(
 				($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER)
 					? UNKNOWN_VALUE
@@ -631,7 +630,7 @@ foreach ($items as $item) {
 			SPACE,
 			is_show_all_nodes() ? ($host['item_cnt'] ? SPACE : get_node_name_by_elid($item['itemid'])) : null,
 			$_REQUEST['hostid'] ? null : SPACE,
-			new CCol(new CDiv($item['name'], $stateCss.' item')),
+			new CCol(new CDiv($item['name_expanded'], $stateCss.' item')),
 			new CCol(new CDiv($lastClock, $stateCss)),
 			new CCol(new CDiv($lastValue, $stateCss)),
 			new CCol(new CDiv($change, $stateCss)),

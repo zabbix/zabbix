@@ -629,7 +629,7 @@ if ($itemId) {
 	$itemKey = $item['key_'];
 	$itemHost = reset($item['hosts']);
 	$itemHost = $itemHost['host'];
-	$description = $itemHost.NAME_DELIMITER.$item['name'];
+	$description = $itemHost.NAME_DELIMITER.$item['name_expanded'];
 }
 else {
 	$itemKey = $itemHost = $description = '';

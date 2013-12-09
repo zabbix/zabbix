@@ -483,7 +483,7 @@ class CMacrosResolverHelper {
 		$items = self::resolveItemKeyUserMacros(array($item));
 		$item = reset($items);
 
-		return $item['key_'];
+		return $item['key_expanded'];
 	}
 
 	/**

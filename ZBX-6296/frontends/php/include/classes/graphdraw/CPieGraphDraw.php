@@ -289,8 +289,8 @@ class CPieGraphDraw extends CGraphDraw {
 			if (zbx_strlen($this->items[$i]['host']) > $max_host_len) {
 				$max_host_len = zbx_strlen($this->items[$i]['host']);
 			}
-			if (zbx_strlen($this->items[$i]['name']) > $max_name_len) {
-				$max_name_len = zbx_strlen($this->items[$i]['name']);
+			if (zbx_strlen($this->items[$i]['name_expanded']) > $max_name_len) {
+				$max_name_len = zbx_strlen($this->items[$i]['name_expanded']);
 			}
 		}
 
@@ -333,7 +333,7 @@ class CPieGraphDraw extends CGraphDraw {
 
 				$str = sprintf('%s: %s [%s] ',
 					str_pad($this->items[$i]['host'], $max_host_len, ' '),
-					str_pad($this->items[$i]['name'], $max_name_len, ' '),
+					str_pad($this->items[$i]['name_expanded'], $max_name_len, ' '),
 					$fncRealName
 				);
 			}
@@ -341,7 +341,7 @@ class CPieGraphDraw extends CGraphDraw {
 				$strvalue = sprintf(_('Value: no data'));
 				$str = sprintf('%s: %s [ '._('no data').' ]',
 					str_pad($this->items[$i]['host'], $max_host_len, ' '),
-					str_pad($this->items[$i]['name'], $max_name_len, ' ')
+					str_pad($this->items[$i]['name_expanded'], $max_name_len, ' ')
 				);
 			}
 

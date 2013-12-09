@@ -68,7 +68,7 @@ foreach ($this->data['items'] as $item) {
 		$description[] = NAME_DELIMITER;
 	}
 	$description[] = new CLink(
-		$item['name'],
+		$item['name_expanded'],
 		'?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$this->data['parent_discoveryid']
 	);
 
@@ -99,7 +99,8 @@ foreach ($this->data['items'] as $item) {
 		$item['key_'],
 		$item['delay'],
 		$item['history'],
-		in_array($item['value_type'], array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT)) ? '' : $item['trends'],
+		in_array($item['value_type'], array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT))
+			? '' : $item['trends'],
 		item_type2str($item['type']),
 		new CCol($applications, 'wraptext'),
 		$status

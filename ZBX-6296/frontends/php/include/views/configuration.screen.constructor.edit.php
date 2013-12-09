@@ -163,7 +163,7 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 		$item = reset($items);
 		$item['host'] = reset($item['hosts']);
 
-		$caption = $item['host']['name'].NAME_DELIMITER.$item['name'];
+		$caption = $item['host']['name'].NAME_DELIMITER.$item['name_expanded'];
 
 		$nodeName = get_node_name_by_elid($item['itemid']);
 		if (!zbx_empty($nodeName)) {
@@ -247,7 +247,7 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 		$id = $resourceId;
 		$item = reset($items);
 		$item['host'] = reset($item['hosts']);
-		$caption = $item['host']['name'].NAME_DELIMITER.$item['name'];
+		$caption = $item['host']['name'].NAME_DELIMITER.$item['name_expanded'];
 
 		$nodeName = get_node_name_by_elid($item['itemid']);
 		if (!zbx_empty($nodeName)) {
@@ -502,7 +502,7 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 
 			$item = reset($items);
 			$host = reset($item['hosts']);
-			$caption = $host['name'].NAME_DELIMITER.$item['name'];
+			$caption = $host['name'].NAME_DELIMITER.$item['name_expanded'];
 		}
 	}
 
