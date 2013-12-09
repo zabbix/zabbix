@@ -33,7 +33,7 @@ class CScreenGraph extends CScreenBase {
 		$graphDims = getGraphDims($resourceid);
 		$graphDims['graphHeight'] = $this->screenitem['height'];
 		$graphDims['width'] = $this->screenitem['width'];
-		$graph = get_graph_by_graphid($resourceid);
+		$graph = getGraphByGraphId($resourceid);
 		$graphid = $graph['graphid'];
 		$legend = $graph['show_legend'];
 		$graph3d = $graph['show_3d'];
