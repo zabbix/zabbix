@@ -1058,17 +1058,7 @@ void	zbx_trim_str_list(char *list, char delimiter);
 
 int	parse_serveractive_element(char *str, char **host, unsigned short *port, unsigned short port_default);
 
-/* 128 bit unsigned integer handling */
-#define uset128(base, hi64, lo64)	(base)->hi = hi64; (base)->lo = lo64
-
-void uinc128_64(zbx_uint128_t *base, zbx_uint64_t value);
-void uinc128_128(zbx_uint128_t *base, const zbx_uint128_t *value);
-void udiv128_64(zbx_uint128_t *result, const zbx_uint128_t *base, zbx_uint64_t value);
-void umul64_64(zbx_uint128_t *result, zbx_uint64_t value, zbx_uint64_t factor);
-
 #define ZBX_SESSION_ACTIVE	0
 #define ZBX_SESSION_PASSIVE	1
-
-zbx_uint64_t	zbx_isqrt32(int value);
 
 #endif
