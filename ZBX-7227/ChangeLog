@@ -1,3 +1,15 @@
+Changes for 2.2.2rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 2.2.1
+
+2.2.1rc1 was released as 2.2.1 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.2.1rc1
 
 New features:
@@ -9,6 +21,13 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, It
 ....I..PS. [ZBXNEXT-1257] dropped support for UCD-SNMP (asaveljevs)
 
 Bug fixes:
+...G...... [ZBX-7479] fixed remote command execution from Zabbix server if flexible user parameters are configured; thanks to Recurity Labs Team for the report (Sasha)
+....I..... [ZBX-7461] fixed compilation on kFreeBSD and other operating systems which are not explicitly supported (asaveljevs)
+....I..... [ZBX-7339] fixed item prototypes of OpenBSD and FreeBSD templates (igors)
+.......PS. [ZBX-7332] properly restore the original memory chunk after shared memory realloc fails, otherwise it could trigger a crash when syncing history at exit (wiper)
+..F....... [ZBX-7373] improved performance of pages that use latest history values; thanks to Kenneth Palmertree and Maksim Tkachenko (Pavels)
+..F....... [ZBX-7447] fixed regex configuration form not being displayed in French and Italian languages (Pavels)
+...G...... [ZBX-7444] fixed agent crash on HP-UX when processing proc.num[] item (asaveljevs)
 ..F....... [ZBX-4063] fixed data selecting for graphs (Eduard)
 ..F....... [ZBX-7391] fixed items belonging to multiple applications being displayed only under the first one in the latest data page (Pavels)
 ..F....... [ZBX-7347] fixed custom step duration max size in action configuration (Eduard)
@@ -674,6 +693,18 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
 
 --------------------------------------------------------------------------------
+Changes for 2.0.11rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 2.0.10
+
+2.0.10rc1 was released as 2.0.10 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.0.10rc1
 
 New features:
@@ -682,6 +713,7 @@ New features:
 A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Czech, Dutch, French, German, Greek, Hungarian, Japanese, Italian, Romanian, Russian, Slovak, Spanish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-7479] fixed remote command execution from Zabbix server if flexible user parameters are configured; thanks to Recurity Labs Team for the report (Sasha)
 ..F....... [ZBX-7347] fixed custom step duration max size in action configuration (Eduard)
 ........S. [ZBX-7400] fixed fetching of empty text or log history data with Oracle backend (Sasha)
 ....I..... [ZBX-7218] fixed configuration failing with Oracle 12.1 instant client libraries (asaveljevs, Sasha)
@@ -2112,8 +2144,16 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.20rc1
+
+
+Changes for 1.8.19
+
+1.8.19rc1 was released as 1.8.19 without any changes
+
 Changes for 1.8.19rc1
 
+...G...... [ZBX-7479] fixed remote command execution from Zabbix server if flexible user parameters are configured; thanks to Recurity Labs Team for the report (Sasha)
 ....I..... [ZBXNEXT-1256] changed example directory size user parameter to return bytes (Richlv)
 ..F....... [ZBX-7156] fixed string value escaping in profiles (Eduard)
 ...G...... [ZBX-4658] fixed system.boottime and system.uptime returning bogus values on Solaris when agent is compiled as a 64-bit binary (asaveljevs)

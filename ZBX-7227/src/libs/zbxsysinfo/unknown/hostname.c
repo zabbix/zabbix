@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2013 Zabbix SIA
@@ -18,22 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
+#include "sysinfo.h"
 
-class API_JSON_APIInfo extends CZabbixTest {
+ZBX_METRIC	parameter_hostname =
+/*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
+	{"system.hostname",     0,              SYSTEM_HOSTNAME,        NULL};
 
-	public function testAPIInfo_VersionWithAuth() {
-		$result = $this->api_acall('apiinfo.version', array(), $debug);
-
-		$this->assertTrue(isset($result['result']), $debug);
-		$this->assertSame($result['result'], '2.2.2');
-	}
-
-	public function testAPIInfo_VersionWithoutAuth() {
-		$result = $this->api_call('apiinfo.version', array(), $debug);
-
-		$this->assertTrue(isset($result['result']), $debug);
-		$this->assertSame($result['result'], '2.2.2');
-	}
-
+int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return SYSINFO_RET_FAIL;
 }
