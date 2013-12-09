@@ -328,16 +328,24 @@ class ZBase {
 	protected function initLocales() {
 		init_mbstrings();
 
+		// reset the LC_NUMERIC locale so that PHP would always use a point instead of a comma for decimal numbers
+		setlocale(LC_NUMERIC, array(
+			'C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'
+		));
+
 		if (function_exists('bindtextdomain')) {
 			// initializing gettext translations depending on language selected by user
 			$locales = zbx_locale_variants(CWebUser::$data['lang']);
 			$locale_found = false;
 			foreach ($locales as $locale) {
-				putenv('LC_ALL='.$locale);
+				// only change the locales that are really necessary
+				putenv('LC_MESSAGES='.$locale);
+				putenv('LC_TIME='.$locale);
 				putenv('LANG='.$locale);
 				putenv('LANGUAGE='.$locale);
+				setlocale(LC_TIME, $locale);
 
-				if (setlocale(LC_ALL, $locale)) {
+				if (setlocale(LC_MESSAGES, $locale)) {
 					$locale_found = true;
 					CWebUser::$data['locale'] = $locale;
 					break;
@@ -354,9 +362,6 @@ class ZBase {
 
 		// should be after locale initialization
 		require_once $this->getRootDir().'/include/translateDefines.inc.php';
-
-		// numeric Locale to default
-		setlocale(LC_NUMERIC, array('C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'));
 	}
 
 	/**
