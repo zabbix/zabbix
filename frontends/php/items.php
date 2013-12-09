@@ -937,7 +937,10 @@ else {
 	$options = array(
 		'hostids' => $data['hostid'],
 		'search' => array(),
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array(
+			'itemid', 'type', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type', 'error',
+			'templateid', 'flags', 'state'
+		),
 		'editable' => true,
 		'selectHosts' => API_OUTPUT_EXTEND,
 		'selectTriggers' => API_OUTPUT_REFER,
