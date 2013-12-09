@@ -128,7 +128,7 @@ $fields = array(
 	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
 	// filter
-	'filter_set' =>				array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	'filter_set' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	// ajax
 	'favobj' =>					array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
 	'favref' =>					array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),

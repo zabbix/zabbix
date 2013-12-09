@@ -93,7 +93,7 @@ $fields = array(
 	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
 	'form_refresh' =>	array(T_ZBX_STR, O_OPT, null,		null,			null),
 	// filter
-	'filter_set' =>		array(T_ZBX_STR, O_OPT, P_ACT,		null,			null),
+	'filter_set' =>		array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
 	'filter_host' =>	array(T_ZBX_STR, O_OPT, null,		null,			null),
 	'filter_ip' =>		array(T_ZBX_STR, O_OPT, null,		null,			null),
 	'filter_dns' =>		array(T_ZBX_STR, O_OPT, null,		null,			null),

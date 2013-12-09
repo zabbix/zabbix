@@ -136,7 +136,7 @@ $fields = array(
 	'massupdate' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
 	// filter
-	'filter_set' =>				array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	'filter_set' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'filter_groupid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'filter_hostid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'filter_application' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
