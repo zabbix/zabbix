@@ -280,7 +280,7 @@ if ($host || $data['filter_search']) {
 			$newEventIds = array();
 			foreach ($triggerIds as $triggerId) {
 				$beginEvent = DBfetch(DBselect(
-					'SELECT e.eventid, e.value'.
+					'SELECT e.eventid,e.value'.
 					' FROM events e'.
 					' WHERE e.objectid='.$triggerId.
 					'	AND e.clock<'.$filterTimeFrom.
@@ -341,6 +341,8 @@ if ($host || $data['filter_search']) {
 							'sortorder' => ZBX_SORT_UP
 						));
 
+						$addEvent = reset($addEvent);
+
 						if ($addEvent) {
 							$newData[$i] = array(
 								'status' => TRIGGER_VALUE_FALSE,
@@ -364,7 +366,7 @@ if ($host || $data['filter_search']) {
 									$newData[$i]
 								);
 							}
-							elseif (in_array($eventTrigger['triggerid'], $dnssecTriggers)) {
+							elseif (in_array($eventTrigger['triggerid'], $rddsTriggers)) {
 								unset($data['rdds']['events'][$i]['status']);
 								$itemType = 'rdds';
 								$itemId = $rddsAvailItem;

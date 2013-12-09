@@ -105,9 +105,28 @@ $table->setHeader(array(
 ));
 
 if (isset($this->data['tld'])) {
+	$from = date('YmdHis', time() - SEC_PER_WEEK);
+	$till = date('YmdHis', time());
 	foreach ($this->data['tld'] as $key => $tld) {
 		if (isset($tld['dns'])) {
-			$icon = $tld['dns']['trigger'] ? 'iconrollingweekfail' : 'iconrollingweekok';
+			if ($tld['dns']['trigger']) {
+				if ($tld['dns']['incident'] && isset($tld['dns']['availItemId'])
+						&& isset($tld['dns']['itemid'])) {
+					$dnsStatus =  new CLink(
+						new CDiv(null, 'status_icon status_icon_extra iconrollingweekfail cell-value'),
+						'dnstest.incidentdetails.php?host='.$tld['host'].'&eventid='.$tld['dns']['incident'].
+							'&slvItemId='.$tld['dns']['itemid'].'&filter_from='.$from.'&filter_to='.$till.
+							'&availItemId='.$tld['dns']['availItemId']
+					);
+				}
+				else {
+					$dnsStatus =  new CDiv(null, 'status_icon status_icon_extra iconrollingweekfail cell-value');
+				}
+			}
+			else {
+				$dnsStatus =  new CDiv(null, 'status_icon status_icon_extra iconrollingweekok cell-value');
+			}
+
 			$dnsValue = $tld['dns']['lastvalue']
 				? new CLink(
 					$tld['dns']['lastvalue'].'%',
@@ -116,7 +135,6 @@ if (isset($this->data['tld'])) {
 				)
 				: new CSpan('0%', 'first-cell-value');
 
-			$dnsStatus =  new CDiv(null, 'status_icon status_icon_extra '.$icon.' cell-value');
 			$dnsGraph = $tld['dns']['lastvalue']
 				? new CLink(
 					'graph',
@@ -131,7 +149,24 @@ if (isset($this->data['tld'])) {
 			$dns->setHint('Incorrect TLD configuration.', '', 'on');
 		}
 		if (isset($tld['dnssec'])) {
-			$icon = $tld['dnssec']['trigger'] ? 'iconrollingweekfail' : 'iconrollingweekok';
+			if ($tld['dnssec']['trigger']) {
+				if ($tld['dnssec']['incident'] && isset($tld['dnssec']['availItemId'])
+						&& isset($tld['dnssec']['itemid'])) {
+					$dnssecStatus =  new CLink(
+						new CDiv(null, 'status_icon status_icon_extra iconrollingweekfail cell-value'),
+						'dnstest.incidentdetails.php?host='.$tld['host'].'&eventid='.$tld['dnssec']['incident'].
+							'&slvItemId='.$tld['dnssec']['itemid'].'&filter_from='.$from.'&filter_to='.$till.
+							'&availItemId='.$tld['dnssec']['availItemId']
+					);
+				}
+				else {
+					$dnssecStatus =  new CDiv(null, 'status_icon status_icon_extra iconrollingweekfail cell-value');
+				}
+			}
+			else {
+				$dnssecStatus =  new CDiv(null, 'status_icon status_icon_extra iconrollingweekok cell-value');
+			}
+
 			$dnssecValue = $tld['dnssec']['lastvalue']
 				? new CLink(
 					$tld['dnssec']['lastvalue'].'%',
@@ -140,7 +175,6 @@ if (isset($this->data['tld'])) {
 				)
 				: new CSpan('0%', 'first-cell-value');
 
-			$dnssecStatus = new CDiv(null, 'status_icon status_icon_extra '.$icon.' cell-value');
 			$dnssecGraph = $tld['dnssec']['lastvalue']
 				? new CLink(
 					'graph',
@@ -155,7 +189,24 @@ if (isset($this->data['tld'])) {
 			$dnssec->setHint('DNSSEC is disabled.', '', 'on');
 		}
 		if (isset($tld['rdds'])) {
-			$icon = $tld['rdds']['trigger'] ? 'iconrollingweekfail' : 'iconrollingweekok';
+			if ($tld['rdds']['trigger']) {
+				if ($tld['rdds']['incident'] && isset($tld['rdds']['availItemId'])
+						&& isset($tld['rdds']['itemid'])) {
+					$rddsStatus =  new CLink(
+						new CDiv(null, 'status_icon status_icon_extra iconrollingweekfail cell-value'),
+						'dnstest.incidentdetails.php?host='.$tld['host'].'&eventid='.$tld['rdds']['incident'].
+							'&slvItemId='.$tld['rdds']['itemid'].'&filter_from='.$from.'&filter_to='.$till.
+							'&availItemId='.$tld['rdds']['availItemId']
+					);
+				}
+				else {
+					$rddsStatus =  new CDiv(null, 'status_icon status_icon_extra iconrollingweekfail cell-value');
+				}
+			}
+			else {
+				$rddsStatus =  new CDiv(null, 'status_icon status_icon_extra iconrollingweekok cell-value');
+			}
+
 			$rddsValue = $tld['rdds']['lastvalue']
 				? new CLink(
 					$tld['rdds']['lastvalue'].'%',
@@ -164,7 +215,6 @@ if (isset($this->data['tld'])) {
 				)
 				: new CSpan('0%', 'first-cell-value');
 
-			$rddsStatus = new CDiv(null, 'status_icon status_icon_extra '.$icon.' cell-value');
 			$rddsGraph = $tld['rdds']['lastvalue']
 				? new CLink(
 					'graph',

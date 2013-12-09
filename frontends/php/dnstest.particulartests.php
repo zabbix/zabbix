@@ -371,6 +371,8 @@ else {
 	access_deny();
 }
 
+CArrayHelper::sort($data['probes'], array('name'));
+
 $dnsTestView = new CView('dnstest.particulartests.list', $data);
 
 $dnsTestView->render();

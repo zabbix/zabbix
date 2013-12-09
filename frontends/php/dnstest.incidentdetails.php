@@ -285,7 +285,7 @@ if ($tld && $mainEvent && $slvItem) {
 		);
 	}
 	$slvs = DBselect(
-		'SELECT h.value, h.clock'.
+		'SELECT h.value,h.clock'.
 		' FROM history_uint h'.
 		' WHERE h.itemid='.zbx_dbstr($data['slvItemId']).
 			' AND h.clock>='.$fromTime.

@@ -91,7 +91,7 @@ $data['tld'] = reset($tld);
 // get slv item
 $slvItems = API::Item()->get(array(
 	'itemids' => $data['slvItemId'],
-	'output' => array('name', 'key_', 'lastvalue')
+	'output' => array('name', 'lastvalue')
 ));
 
 $data['slvItem'] = reset($slvItems);
