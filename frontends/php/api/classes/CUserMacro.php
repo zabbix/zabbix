@@ -751,7 +751,7 @@ class CUserMacro extends CZBXAPI {
 				}
 			}
 
-			// if macro has hostmacrid it should be updated otherwise created as new
+			// if macro has hostmacroid it should be updated otherwise created as new
 			foreach ($hostMacros as $hostMacro) {
 				if (isset($hostMacro['hostmacroid']) && isset($dbHostMacros[$hostMacro['hostmacroid']])) {
 					$macrosToUpdate[] = $hostMacro;
