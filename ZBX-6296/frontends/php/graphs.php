@@ -476,10 +476,11 @@ elseif (isset($_REQUEST['form'])) {
 
 		// items
 		$data['items'] = API::GraphItem()->get(array(
+			'output' => array(
+				'gitemid', 'graphid', 'itemid', 'type', 'drawtype', 'yaxisside', 'calc_fnc', 'color', 'sortorder'
+			),
 			'graphids' => $data['graphid'],
-			'sortfield' => 'gitemid',
-			'output' => API_OUTPUT_EXTEND,
-			'expandData' => true
+			'sortfield' => 'gitemid'
 		));
 	}
 	else {
@@ -523,6 +524,32 @@ elseif (isset($_REQUEST['form'])) {
 		$data['show_legend'] = $_REQUEST['show_legend'] = 1;
 		$data['show_work_period'] = $_REQUEST['show_work_period'] = 1;
 		$data['show_triggers'] = $_REQUEST['show_triggers'] = 1;
+	}
+
+	// items
+	if ($data['items']) {
+		$items = API::Item()->get(array(
+			'output' => array('itemid', 'name', 'key_', 'flags'),
+			'selectHosts' => array('hostid', 'name'),
+			'itemids' => zbx_objectValues($data['items'], 'itemid'),
+			'filter' => array(
+				'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED)
+			),
+			'webitems' => true,
+			'preservekeys' => true
+		));
+
+		foreach ($data['items'] as &$item) {
+			$host = reset($items[$item['itemid']]['hosts']);
+
+			$item['host'] = $host['name'];
+			$item['name'] = $items[$item['itemid']]['name'];
+			$item['key_'] = $items[$item['itemid']]['key_'];
+			$item['flags'] = $items[$item['itemid']]['flags'];
+		}
+		unset($item);
+
+		$data['items'] = CMacrosResolverHelper::resolveItemName($data['items']);
 	}
 
 	$_REQUEST['items'] = $data['items'];

@@ -493,12 +493,12 @@ function validateBarReportItems($items = array()) {
 	}
 
 	$validItems = API::Item()->get(array(
+		'output' => array('itemid', 'hostid', 'name', 'key_', 'value_type'),
+		'selectHosts' => array('name'),
+		'webitems' => true,
 		'nodeids' => get_current_nodeid(true),
 		'itemids' => $itemIds,
-		'webitems' => true,
-		'output' => array('name', 'value_type'),
-		'preservekeys' => true,
-		'selectHosts' => array('name')
+		'preservekeys' => true
 	));
 
 	$items = zbx_toHash($items, 'itemid');

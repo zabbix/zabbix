@@ -651,7 +651,7 @@ else {
 			$triggers = API::Trigger()->get(array(
 				'triggerids' => zbx_objectValues($events, 'objectid'),
 				'selectHosts' => array('hostid'),
-				'selectItems' => array('name', 'value_type', 'key_'),
+				'selectItems' => array('itemid', 'hostid', 'name', 'key_', 'value_type'),
 				'output' => array('description', 'expression', 'priority', 'flags', 'url')
 			));
 			$triggers = zbx_toHash($triggers, 'triggerid');
