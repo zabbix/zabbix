@@ -418,10 +418,13 @@ function resolveMapLabelMacrosAll(array $selement) {
  * @return string expanded label
  */
 function resolveMapLabelMacros($label, $replaceHosts = null) {
+	$functionsPattern = '(last|max|min|avg)\(([0-9]+['.ZBX_TIME_SUFFIXES.']?)?\)';
+
 	// find functional macro pattern
 	$pattern = (null === $replaceHosts)
-		? '/{'.ZBX_PREG_HOST_FORMAT.":.+\.(last|max|min|avg)\([0-9]+[smhdwKMGT]?\)}/Uu"
-		: '/{('.ZBX_PREG_HOST_FORMAT."|{HOSTNAME[0-9]?}|{HOST\.HOST[0-9]?}):.+\.(last|max|min|avg)\([0-9]+[smhdwKMGT]?\)}/Uu";
+		? '/{'.ZBX_PREG_HOST_FORMAT.':.+\.'.$functionsPattern.'}/Uu'
+		: '/{('.ZBX_PREG_HOST_FORMAT.'|{HOSTNAME[0-9]?}|{HOST\.HOST[0-9]?}):.+\.'.$functionsPattern.'}/Uu';
+
 	preg_match_all($pattern, $label, $matches);
 
 	// for each functional macro
@@ -450,7 +453,6 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 		$itemHost = $expressionData->expressions[0]['host'];
 		$key = $expressionData->expressions[0]['item'];
 		$function = $expressionData->expressions[0]['functionName'];
-		$parameter = convertFunctionValue($expressionData->expressions[0]['functionParamList'][0]);
 
 		$item = API::Item()->get(array(
 			'webitems' => true,
@@ -458,24 +460,25 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 				'host' => $itemHost,
 				'key_' => $key
 			),
-			'output' => array('lastclock', 'value_type', 'lastvalue', 'units', 'valuemapid')
+			'output' => array('itemid', 'lastclock', 'value_type', 'lastvalue', 'units', 'valuemapid')
 		));
 
 		$item = reset($item);
 
 		// if no corresponding item found with functional macro key and host
 		if (!$item) {
-			$label = str_replace($expr, '???', $label);
+			$label = str_replace($expr, UNRESOLVED_MACRO_STRING, $label);
 			continue;
 		}
 
 		// do function type (last, min, max, avg) related actions
-		if (0 == strcmp($function, 'last')) {
+		if ($function == 'last') {
 			$value = ($item['lastclock']) ? formatHistoryValue($item['lastvalue'], $item) : UNRESOLVED_MACRO_STRING;
 		}
-		elseif (0 == strcmp($function, 'min') || 0 == strcmp($function, 'max') || 0 == strcmp($function, 'avg')) {
-			$value = getItemFunctionalValue($item, $function, $parameter);
+		else {
+			$value = getItemFunctionalValue($item, $function, $expressionData->expressions[0]['functionParamList'][0]);
 		}
+
 		if (isset($value)) {
 			$label = str_replace($expr, $value, $label);
 		}
