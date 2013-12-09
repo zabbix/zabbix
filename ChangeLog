@@ -3,6 +3,7 @@ Changes for 2.2.2rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-7427] fixed element links not being rendered correctly between host groups and other elements (Pavels)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.1
