@@ -92,7 +92,7 @@ class CTextArea extends CTag {
 		if (!defined('IS_TEXTAREA_MAXLENGTH_JS_INSERTED')) {
 			define('IS_TEXTAREA_MAXLENGTH_JS_INSERTED', true);
 
-			// firefox and google chrome has own implementation of maxlength validation on textarea
+			// firefox and google chrome have own implementations of maxlength validation on textarea
 			insert_js('
 				if (!CR && !GK) {
 					jQuery("textarea[maxlength]").bind("paste contextmenu change keydown keypress keyup", function() {
