@@ -3,6 +3,7 @@ Changes for 2.2.2rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-7438] made frontend object status update messages more consistent (Ivo)
 A.F....... [ZBX-7445] fixed frontend redundant call of history (Eduard)
 ....I..... [ZBX-7227] modernized autoconf invocation and renamed "configure.in" to "configure.ac"; thanks to Dmitry Smirnov (asaveljevs)
 ..F....... [ZBX-7443] fixed adding screen to favourites from dashboard (Eduard)
