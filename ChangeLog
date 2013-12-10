@@ -3,6 +3,7 @@ Changes for 2.2.2rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-7516] fixed typo in SQL query: changed "impi_disable_until" to "ipmi_disable_until" (asaveljevs)
 A......... [ZBX-7509] changed "value_flag" to proper name "value_flags" in triggers API (Ivo)
 ..F....... [ZBX-7489] changed "filter_set" to no longer require SID parameter in URL (Ivo)
 ..F....... [ZBX-7486] fixed placeholder default value submitting for IE (Ivo)
