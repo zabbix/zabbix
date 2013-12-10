@@ -592,13 +592,15 @@ elseif ($_REQUEST['go'] == 'delete') {
 	show_messages($goResult, _('Host deleted'), _('Cannot delete host'));
 	clearCookies($goResult);
 }
-elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
-	$status = ($_REQUEST['go'] == 'activate') ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
-	$hosts = get_request('hosts', array());
+elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
+	$enable =(getRequest('go') == 'activate');
+	$status = $enable ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
+	$hosts = getRequest('hosts', array());
+
 	$actHosts = API::Host()->get(array(
 		'hostids' => $hosts,
 		'editable' => true,
-		'templated_hosts' => 1,
+		'templated_hosts' => true,
 		'output' => array('hostid')
 	));
 	$actHosts = zbx_objectValues($actHosts, 'hostid');
@@ -606,11 +608,20 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 	if ($actHosts) {
 		DBstart();
 
-		$goResult = updateHostStatus($actHosts, $status);
-		$goResult = DBend($goResult);
+		$result = updateHostStatus($actHosts, $status);
+		$result = DBend($result);
 
-		show_messages($goResult, _('Host status updated'), _('Cannot update host status'));
-		clearCookies($goResult);
+		$updated = count($actHosts);
+
+		$messageSuccess = $enable
+			? _n('Host enabled', 'Hosts enabled', $updated)
+			: _n('Host disabled', 'Hosts disabled', $updated);
+		$messageFailed = $enable
+			? _n('Cannot enable host', 'Cannot enable hosts', $updated)
+			: _n('Cannot disable host', 'Cannot disable hosts', $updated);
+
+		show_messages($result, $messageSuccess, $messageFailed);
+		clearCookies($result);
 	}
 }
 

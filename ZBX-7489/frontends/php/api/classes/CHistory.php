@@ -98,15 +98,13 @@ class CHistory extends CZBXAPI {
 		if (USER_TYPE_SUPER_ADMIN == self::$userData['type'] || $options['nopermissions']) {
 		}
 		else {
-			$itemOptions = array(
+			$items = API::Item()->get(array(
+				'itemids' => ($options['itemids'] === null) ? null : $options['itemids'],
+				'output' => array('itemid'),
 				'editable' => $options['editable'],
 				'preservekeys' => true,
 				'webitems' => true
-			);
-			if (!is_null($options['itemids'])) {
-				$itemOptions['itemids'] = $options['itemids'];
-			}
-			$items = API::Item()->get($itemOptions);
+			));
 			$options['itemids'] = array_keys($items);
 		}
 

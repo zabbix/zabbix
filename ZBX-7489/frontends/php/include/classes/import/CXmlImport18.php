@@ -1258,16 +1258,15 @@ class CXmlImport18 {
 							$item_db['key_'] = self::convertOldSimpleKey($item_db['key_']);
 						}
 
-						$options = array(
+						$current_item = API::Item()->get(array(
 							'filter' => array(
 								'hostid' => $item_db['hostid'],
 								'key_' => $item_db['key_']
 							),
-							'webitems' => 1,
-							'output' => API_OUTPUT_EXTEND,
-							'editable' => 1
-						);
-						$current_item = API::Item()->get($options);
+							'webitems' => true,
+							'editable' => true,
+							'output' => array('itemid')
+						));
 						$current_item = reset($current_item);
 
 						if (!$current_item && empty($rules['items']['createMissing'])) {
@@ -1340,14 +1339,12 @@ class CXmlImport18 {
 								throw new Exception();
 							}
 
-							$options = array(
+							$current_item = API::Item()->get(array(
 								'itemids' => $result['itemids'],
-								'webitems' => 1,
-								'output' => API_OUTPUT_EXTEND
-							);
-							$current_item = API::Item()->get($options);
+								'webitems' => true,
+								'output' => array('itemid')
+							));
 						}
-
 
 						if (!$current_item && !empty($rules['items']['createMissing'])) {
 							$result = API::Item()->create($item_db);
@@ -1355,12 +1352,11 @@ class CXmlImport18 {
 								throw new Exception();
 							}
 
-							$options = array(
+							$current_item = API::Item()->get(array(
 								'itemids' => $result['itemids'],
-								'webitems' => 1,
-								'output' => API_OUTPUT_EXTEND
-							);
-							$current_item = API::Item()->get($options);
+								'webitems' => true,
+								'output' => array('itemid')
+							));
 						}
 
 						if (!empty($item_applications)) {
@@ -1508,10 +1504,10 @@ class CXmlImport18 {
 							if ($current_item = API::Item()->exists($gitem_db)) {
 								$current_item = API::Item()->get(array(
 									'filter' => array('key_' => $gitem_db['key_']),
-									'webitems' => 1,
+									'webitems' => true,
+									'editable' => true,
 									'host' => $gitem_db['host'],
-									'output' => API_OUTPUT_EXTEND,
-									'editable' => 1
+									'output' => array('itemid', 'hostid')
 								));
 								if (empty($current_item)) {
 									throw new Exception(_s('No permission for item "%1$s".', $gitem_db['key_']));
