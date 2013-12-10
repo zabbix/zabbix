@@ -1022,7 +1022,7 @@ have_snmp="no"
 have_ipmi="no"
 have_ipv6="no"
 have_ssh2="no"
-have_ssl="no"
+have_tls="no"
 
 if test "x$ipv6" = "xyes"; then
 	AC_DEFINE(HAVE_IPV6,1,[Define to 1 if IPv6 should be enabled.])
@@ -1268,15 +1268,15 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	PROXY_LDFLAGS="$PROXY_LDFLAGS $SSH2_LDFLAGS"
 	PROXY_LIBS="$PROXY_LIBS $SSH2_LIBS"
 
-	dnl Check for LIBSSL [by default - skip]
+	dnl Check for OpenSSL libssl [by default - skip]
 	LIBSSL_CHECK_CONFIG([no])
-	if test "x$want_ssl" = "xyes"; then
-		if test "x$found_ssl" != "xyes"; then
-			AC_MSG_ERROR([SSL library not found])
-		elif test "x$accept_ssl_version" != "xyes"; then
-			AC_MSG_ERROR([SSL library version requirement not met (>= 1.0.0)])
+	if test "x$want_openssl" = "xyes"; then
+		if test "x$found_openssl" != "xyes"; then
+			AC_MSG_ERROR([OpenSSL library libssl not found])
+		elif test "x$accept_openssl_version" != "xyes"; then
+			AC_MSG_ERROR([OpenSSL library libssl version requirement not met (>= 1.0.0)])
 		else
-			have_ssl="yes"
+			have_tls="OpenSSL"
 		fi
 	fi
 	CFLAGS="$CFLAGS $SSL_CFLAGS"
@@ -1285,6 +1285,30 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 	PROXY_LDFLAGS="$PROXY_LDFLAGS $SSL_LDFLAGS"
 	PROXY_LIBS="$PROXY_LIBS $SSL_LIBS"
+
+	AGENT_LDFLAGS="$AGENT_LDFLAGS $SSL_LDFLAGS"
+	AGENT_LIBS="$AGENT_LIBS $SSL_LIBS"
+
+	dnl Check for LIBGNUTLS [by default - skip]
+	LIBGNUTLS_CHECK_CONFIG([no])
+	if test "x$want_gnutls" = "xyes"; then
+		if test "x$found_gnutls" != "xyes"; then
+			AC_MSG_ERROR([GNU TLS library not found])
+		elif test "x$accept_gnutls_version" != "xyes"; then
+			AC_MSG_ERROR([GNU TLS library version requirement not met (>= 1.0.0)])
+		else
+			have_tls="GNU TLS"
+		fi
+	fi
+	CFLAGS="$CFLAGS $GNUTLS_CFLAGS"
+	SERVER_LDFLAGS="$SERVER_LDFLAGS $GNUTLS_LDFLAGS"
+	SERVER_LIBS="$SERVER_LIBS $GNUTLS_LIBS"
+
+	PROXY_LDFLAGS="$PROXY_LDFLAGS $GNUTLS_LDFLAGS"
+	PROXY_LIBS="$PROXY_LIBS $GNUTLS_LIBS"
+
+	AGENT_LDFLAGS="$AGENT_LDFLAGS $GNUTLS_LDFLAGS"
+	AGENT_LIBS="$AGENT_LIBS $GNUTLS_LIBS"
 
 	found_openipmi="no"
 	dnl Check for libOpenIPMI [by default - skip]
@@ -1477,7 +1501,7 @@ echo "  Server details:
     SNMP:                  ${have_snmp}
     IPMI:                  ${have_ipmi}
     SSH:                   ${have_ssh2}
-    SSL:                   ${have_ssl}
+    TLS:                   ${have_tls}
     ODBC:                  ${have_unixodbc}
     Linker flags:          ${LDFLAGS} ${SERVER_LDFLAGS}
     Libraries:             ${LIBS} ${SERVER_LIBS}"
@@ -1495,7 +1519,7 @@ echo "  Proxy details:
     SNMP:                  ${have_snmp}
     IPMI:                  ${have_ipmi}
     SSH:                   ${have_ssh2}
-    SSL:                   ${have_ssl}
+    TLS:                   ${have_tls}
     ODBC:                  ${have_unixodbc}
     Linker flags:          ${LDFLAGS} ${PROXY_LDFLAGS}
     Libraries:             ${LIBS} ${PROXY_LIBS}"

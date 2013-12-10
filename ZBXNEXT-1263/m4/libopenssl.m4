@@ -5,12 +5,12 @@
 #    Dmitry Borovikov                         Feb-13-2010
 #
 # Checks for OpenSSL library libssl.  DEFAULT-ACTION is the string yes or no to
-# specify whether to default to --with-libssl or --without-libssl.
+# specify whether to default to --with-openssl or --without-openssl.
 # If not supplied, DEFAULT-ACTION is no.
 #
 # The minimal supported OpenSSL library libssl version is TODO: XXXXX.
 #
-# This macro #defines HAVE_LIBSSL if a required header files are
+# This macro #defines HAVE_OPENSSL if a required header files are
 # found, and sets @SSL_LDFLAGS@, @SSL_CFLAGS@ and @SSL_LIBS@
 # to the necessary values.
 #
@@ -30,51 +30,51 @@ AC_TRY_LINK(
 [
 	SSL_library_init();
 ],
-found_ssl="yes",)
+found_openssl="yes",)
 ])dnl
 
 AC_DEFUN([LIBSSL_ACCEPT_VERSION],
 [
-		accept_ssl_version="yes"
+		accept_openssl_version="yes"
 ])dnl
 
 AC_DEFUN([LIBSSL_CHECK_CONFIG],
 [
-  AC_ARG_WITH(ssl,[
+  AC_ARG_WITH(openssl,[
 If you want to use encryption provided by OpenSSL libssl library:
-AC_HELP_STRING([--with-ssl@<:@=DIR@:>@],[use SSL package @<:@default=no@:>@, DIR is the SSL library install directory.])],
+AC_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@:>@, DIR is the OpenSSL library libssl install directory.])],
     [
 	if test "$withval" = "no"; then
-	    want_ssl="no"
+	    want_openssl="no"
 	    _libssl_dir="no"
 	elif test "$withval" = "yes"; then
-	    want_ssl="yes"
+	    want_openssl="yes"
 	    _libssl_dir="no"
 	else
-	    want_ssl="yes"
+	    want_openssl="yes"
 	    _libssl_dir=$withval
 	fi
-	accept_ssl_version="no"
-    ],[want_ssl=ifelse([$1],,[no],[$1])]
+	accept_openssl_version="no"
+    ],[want_openssl=ifelse([$1],,[no],[$1])]
   )
 
-  if test "x$want_ssl" = "xyes"; then
-     AC_MSG_CHECKING(for SSL support)
+  if test "x$want_openssl" = "xyes"; then
+     AC_MSG_CHECKING(for OpenSSL support)
      if test "x$_libssl_dir" = "xno"; then
        if test -f /usr/include/openssl/ssl.h; then
          SSL_CFLAGS=-I/usr/include/openssl
          SSL_LDFLAGS=-L/usr/lib
          SSL_LIBS="-lssl"
-         found_ssl="yes"
+         found_openssl="yes"
 	 LIBSSL_ACCEPT_VERSION([/usr/include/openssl/ssl.h])
        elif test -f /usr/local/include/openssl/ssl.h; then
          SSL_CFLAGS=-I/usr/local/include/openssl
          SSL_LDFLAGS=-L/usr/local/lib
          SSL_LIBS="-lssl"
-         found_ssl="yes"
+         found_openssl="yes"
 	 LIBSSL_ACCEPT_VERSION([/usr/local/include/openssl/ssl.h])
        else #libraries are not found in default directories
-         found_ssl="no"
+         found_openssl="no"
          AC_MSG_RESULT(no)
        fi # test -f /usr/include/openssl/ssl.h; then
      else # test "x$_libssl_dir" = "xno"; then
@@ -82,16 +82,16 @@ AC_HELP_STRING([--with-ssl@<:@=DIR@:>@],[use SSL package @<:@default=no@:>@, DIR
 	 SSL_CFLAGS=-I$_libssl_dir/include/openssl
          SSL_LDFLAGS=-L$_libssl_dir/lib
          SSL_LIBS="-lssl"
-         found_ssl="yes"
+         found_openssl="yes"
 	 LIBSSL_ACCEPT_VERSION([$_libssl_dir/include/openssl/ssl.h])
        else #if test -f $_libssl_dir/include/openssl/ssl.h; then
-         found_ssl="no"
+         found_openssl="no"
          AC_MSG_RESULT(no)
        fi #test -f $_libssl_dir/include/openssl/ssl.h; then
      fi #if test "x$_libssl_dir" = "xno"; then
-  fi # if test "x$want_ssl" != "xno"; then
+  fi # if test "x$want_openssl" != "xno"; then
 
-  if test "x$found_ssl" = "xyes"; then
+  if test "x$found_openssl" = "xyes"; then
     am_save_cflags="$CFLAGS"
     am_save_ldflags="$LDFLAGS"
     am_save_libs="$LIBS"
@@ -100,15 +100,15 @@ AC_HELP_STRING([--with-ssl@<:@=DIR@:>@],[use SSL package @<:@default=no@:>@, DIR
     LDFLAGS="$LDFLAGS $SSL_LDFLAGS"
     LIBS="$LIBS $SSL_LIBS"
 
-    found_ssl="no"
+    found_openssl="no"
     LIBSSL_TRY_LINK([no])
 
     CFLAGS="$am_save_cflags"
     LDFLAGS="$am_save_ldflags"
     LIBS="$am_save_libs"
 
-    if test "x$found_ssl" = "xyes"; then
-      AC_DEFINE([HAVE_SSL], 1, [Define to 1 if you have the 'libssl' library (-lssl)])
+    if test "x$found_openssl" = "xyes"; then
+      AC_DEFINE([HAVE_OPENSSL], 1, [Define to 1 if you have the 'libssl' library (-lssl)])
       AC_MSG_RESULT(yes)
     else
       AC_MSG_RESULT(no)

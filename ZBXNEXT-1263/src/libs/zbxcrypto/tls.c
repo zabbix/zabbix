@@ -19,27 +19,58 @@
 
 #include "common.h"
 #include "log.h"
+#include "tls.h"
 
-#if defined(HAVE_SSL)
+#if defined(HAVE_OPENSSL)
 #	include <openssl/ssl.h>
+#elsif defined(HAVE_GNUTLS)
+#	include <gnutls/gnutls.h>
 #endif
 
 /******************************************************************************
  *                                                                            *
- * Function: init_tls                                                         *
+ * Function: zbx_tls_init                                                     *
  *                                                                            *
- * Purpose: initialize crypto libraries.                                      *
+ * Purpose: initialize crypto library.                                        *
  *                                                                            *
  ******************************************************************************/
-void	init_tls(void)
+int	zbx_tls_init(void)
 {
-	const char	*__function_name = "init_tls";
+	const char	*__function_name = "zbx_tls_init";
+	int		ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-#if defined(HAVE_SSL)
+#if defined(HAVE_OPENSSL)
 	SSL_load_error_strings();
 	SSL_library_init();
+#elsif defined(HAVE_GNUTLS)
+	if (GNUTLS_E_SUCCESS != gnutls_global_init())
+		ret = FAIL;
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tls_free                                                     *
+ *                                                                            *
+ * Purpose: release crypto library resources.                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_tls_free(void)
+{
+	const char	*__function_name = "zbx_tls_free";
+	int		ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+#if defined(HAVE_OPENSSL)
+	ERR_free_strings();
+#if defined(HAVE_GNUTLS)
+	gnutls_global_deinit();
+#endif
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	return ret;
 }
