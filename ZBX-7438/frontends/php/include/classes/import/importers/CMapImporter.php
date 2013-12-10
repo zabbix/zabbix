@@ -125,8 +125,8 @@ class CMapImporter extends CImporter {
 			$checked[] = $elementMapName;
 		}
 
-		// we need to find map that current element reference to
-		// and if it has selements check all them recursively
+		// we need to find maps that reference the current element
+		// and if one has selements, check all of them recursively
 		if (!empty($maps[$elementMapName]['selements'])) {
 			foreach ($maps[$elementMapName]['selements'] as $selement) {
 				return $this->checkCircularRecursive($selement, $maps, $checked);

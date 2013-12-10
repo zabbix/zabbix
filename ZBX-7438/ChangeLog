@@ -1,3 +1,23 @@
+Changes for 2.2.2rc1
+
+New features:
+
+Bug fixes:
+A.F....... [ZBX-7445] fixed frontend redundant call of history (Eduard)
+....I..... [ZBX-7227] modernized autoconf invocation and renamed "configure.in" to "configure.ac"; thanks to Dmitry Smirnov (asaveljevs)
+..F....... [ZBX-7443] fixed adding screen to favourites from dashboard (Eduard)
+..F....... [ZBX-7490] fixed chart with prototype items displaing in graphs configuration page (Eduard)
+A......... [ZBX-7454] fixed automatic changing host inventory mode from 'Automatic' to 'Manual' when updating host with no 'inventory_mode' parameter set (Ivo)
+..F....... [ZBX-7417] expanded function last() with no parameters in map element labels and graph names (Ivo)
+A......... [ZBX-7338] fixed screen item validation (Eduard)
+..F....... [ZBX-7427] fixed element links not being rendered correctly between host groups and other elements (Pavels)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.1
+
+2.2.1rc1 was released as 2.2.1 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.2.1rc1
 
 New features:
@@ -679,6 +699,18 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-5142] changed media type field label from 'Description' to 'Name' (Vedmak)
 ....I..... [ZBX-5314] increased size of autoincrement fields for PostgreSQL database (Sasha)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.11rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 2.0.10
+
+2.0.10rc1 was released as 2.0.10 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.0.10rc1
@@ -2120,6 +2152,13 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.20rc1
+
+
+Changes for 1.8.19
+
+1.8.19rc1 was released as 1.8.19 without any changes
+
 Changes for 1.8.19rc1
 
 ...G...... [ZBX-7479] fixed remote command execution from Zabbix server if flexible user parameters are configured; thanks to Recurity Labs Team for the report (Sasha)
