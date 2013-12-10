@@ -12,13 +12,14 @@ Changes for 2.2.2rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-7489] changed "filter_set" to no longer require SID parameter in URL (Ivo)
 ..F....... [ZBX-7486] fixed placeholder default value submitting for IE (Ivo)
 ..F....... [ZBX-7438] made frontend object status update messages more consistent (Ivo)
 A.F....... [ZBX-7445] fixed frontend redundant call of history (Eduard)
 ....I..... [ZBX-7227] modernized autoconf invocation and renamed "configure.in" to "configure.ac"; thanks to Dmitry Smirnov (asaveljevs)
 ..F....... [ZBX-7443] fixed adding screen to favourites from dashboard (Eduard)
 ..F....... [ZBX-7490] fixed chart with prototype items displaing in graphs configuration page (Eduard)
-A......... [ZBX-7454] fixed automatic changing host inventory mode from 'Automatic' to 'Manual' when updating host with no 'inventory_mode' parameter set (Ivo)
+A......... [ZBX-7454] fixed automatic changing host inventory mode from "Automatic" to "Manual" when updating host with no "inventory_mode" parameter set (Ivo)
 ..F....... [ZBX-7417] expanded function last() with no parameters in map element labels and graph names (Ivo)
 A......... [ZBX-7338] fixed screen item validation (Eduard)
 ..F....... [ZBX-7427] fixed element links not being rendered correctly between host groups and other elements (Pavels)
