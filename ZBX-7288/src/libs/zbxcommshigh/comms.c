@@ -166,10 +166,13 @@ int	zbx_recv_response(zbx_sock_t *sock, char **info, int timeout, char **error)
 
 	if (NULL != info)
 	{
-		if (SUCCEED == zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_INFO, &info_buf, &info_buf_alloc))
-			*info = info_buf;
-		else
+		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_INFO, &info_buf, &info_buf_alloc))
+		{
 			*info = NULL;
+			zbx_free(info_buf);
+		}
+		else
+			*info = info_buf;
 	}
 out:
 	if (0 != invalid_format)
