@@ -195,7 +195,6 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
 			'output' => API_OUTPUT_EXTEND
 		));
 
-		$updated = 0;
 		if ($hosts) {
 			$result = API::Host()->massUpdate(array(
 				'hosts' => $hosts,
@@ -213,7 +212,6 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
 						array('status' => $host['status']),
 						array('status' => $status)
 					);
-					$updated++;
 				}
 			}
 		}
@@ -222,6 +220,8 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
 		}
 
 		$result = DBend($result);
+
+		$updated = count($hosts);
 
 		$messageSuccess = $enable
 			? _n('Host enabled', 'Hosts enabled', $updated)
