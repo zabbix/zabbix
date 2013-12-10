@@ -23,7 +23,7 @@
 
 #if defined(HAVE_OPENSSL)
 #	include <openssl/ssl.h>
-#elsif defined(HAVE_GNUTLS)
+#elif defined(HAVE_GNUTLS)
 #	include <gnutls/gnutls.h>
 #endif
 
@@ -44,7 +44,7 @@ int	zbx_tls_init(void)
 #if defined(HAVE_OPENSSL)
 	SSL_load_error_strings();
 	SSL_library_init();
-#elsif defined(HAVE_GNUTLS)
+#elif defined(HAVE_GNUTLS)
 	if (GNUTLS_E_SUCCESS != gnutls_global_init())
 		ret = FAIL;
 #endif
@@ -68,7 +68,7 @@ int	zbx_tls_free(void)
 
 #if defined(HAVE_OPENSSL)
 	ERR_free_strings();
-#if defined(HAVE_GNUTLS)
+#elif defined(HAVE_GNUTLS)
 	gnutls_global_deinit();
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
