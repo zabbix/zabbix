@@ -84,8 +84,15 @@ static void	process_configuration_sync(size_t *data_size)
 			SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value)) &&
 			0 == strcmp(value, ZBX_PROTO_VALUE_FAILED))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot obtain configuration data from server. "
-				"Proxy host name might not be matching that on the server.");
+		char	*info = NULL;
+		size_t	info_alloc = 0;
+
+		zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_INFO, &info, &info_alloc);
+
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot obtain configuration data from server. " ZBX_PROTO_TAG_INFO
+				":\"%s\". Proxy host name might not be matching that on the server.",
+				ZBX_NULL2EMPTY_STR(info));
+		zbx_free(info);
 		goto out;
 	}
 
