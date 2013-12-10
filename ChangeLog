@@ -12,6 +12,7 @@ Changes for 2.2.2rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-7509] changed "value_flag" to proper name "value_flags" in triggers API (Ivo)
 ..F....... [ZBX-7489] changed "filter_set" to no longer require SID parameter in URL (Ivo)
 ..F....... [ZBX-7486] fixed placeholder default value submitting for IE (Ivo)
 ..F....... [ZBX-7438] made frontend object status update messages more consistent (Ivo)
