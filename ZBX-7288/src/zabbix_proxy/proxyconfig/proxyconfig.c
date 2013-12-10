@@ -77,7 +77,7 @@ static void	process_configuration_sync(size_t *data_size)
 		goto out;
 	}
 
-	*data_size = jp.end - jp.start + 1;     /* performance metric */
+	*data_size = (size_t)(jp.end - jp.start + 1);     /* performance metric */
 
 	/* if the answer is short then most likely it is a negative answer "response":"failed" */
 	if (128 > *data_size &&
