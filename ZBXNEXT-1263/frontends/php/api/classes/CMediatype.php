@@ -327,7 +327,7 @@ class CMediatype extends CZBXAPI {
 	 *
 	 * @param array $mediatypeids
 	 *
-	 * @return boolean
+	 * @return array
 	 */
 	public function delete($mediatypeids) {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {

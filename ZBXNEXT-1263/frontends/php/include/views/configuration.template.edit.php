@@ -200,7 +200,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 		'hostids' => $templateid,
 		'inherited' => false,
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('itemid', 'key_', 'name', 'hostid')
 	));
 	if (!empty($hostItems)) {
 		$itemsList = array();
