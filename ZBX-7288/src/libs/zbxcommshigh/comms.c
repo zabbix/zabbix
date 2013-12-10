@@ -77,15 +77,15 @@ int	zbx_send_response_ext(zbx_sock_t *sock, int result, const char *info, int pr
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_recv_response_dyn                                            *
+ * Function: zbx_recv_response                                                *
  *                                                                            *
  * Purpose: read a response message (in JSON format) from socket, optionally  *
  *          extract "info" value.                                             *
  *                                                                            *
  * Parameters: sock       - [IN] socket descriptor                            *
  *             info       - [IN/OUT] pointer to "info" value location or NULL *
- *             error      - [IN/OUT] pointer to error message                 *
  *             timeout    - [IN] timeout for this operation                   *
+ *             error      - [IN/OUT] pointer to error message                 *
  *                                                                            *
  * Return value: SUCCEED - "response":"success" response successfully         *
  *                         retrieved                                          *
@@ -113,9 +113,9 @@ int	zbx_send_response_ext(zbx_sock_t *sock, int result, const char *info, int pr
  *                and "error" memory !                                        *
  *                                                                            *
  ******************************************************************************/
-int	zbx_recv_response_dyn(zbx_sock_t *sock, char **info, char **error, int timeout)
+int	zbx_recv_response(zbx_sock_t *sock, char **info, int timeout, char **error)
 {
-	const char		*__function_name = "zbx_recv_response_dyn";
+	const char		*__function_name = "zbx_recv_response";
 
 	struct zbx_json_parse	jp;
 	char			value[16], *answer, *info_buf = NULL;

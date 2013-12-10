@@ -143,7 +143,7 @@ static void	send_proxyhistory(zbx_sock_t *sock)
 		goto out;
 	}
 
-	if (SUCCEED != zbx_recv_response_dyn(sock, &info, &error, CONFIG_TIMEOUT))
+	if (SUCCEED != zbx_recv_response(sock, &info, CONFIG_TIMEOUT, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "sending history data to server: error=\"%s\", info=\"%s\"",
 				ZBX_NULL2EMPTY_STR(error), ZBX_NULL2EMPTY_STR(info));

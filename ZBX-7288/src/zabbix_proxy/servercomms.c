@@ -166,7 +166,7 @@ int	put_data_to_server(zbx_sock_t *sock, struct zbx_json *j, char **error)
 	if (SUCCEED != send_data_to_server(sock, j->buffer))
 		goto out;
 
-	if (SUCCEED != zbx_recv_response_dyn(sock, &info, &err, 0))
+	if (SUCCEED != zbx_recv_response(sock, &info, 0, &err))
 	{
 		*error = zbx_dsprintf(*error, "error=\"%s\", info=\"%s\"", ZBX_NULL2EMPTY_STR(err),
 				ZBX_NULL2EMPTY_STR(info));
