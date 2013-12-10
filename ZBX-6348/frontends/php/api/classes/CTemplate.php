@@ -457,7 +457,7 @@ class CTemplate extends CHostGeneral {
 		// CHECK IF HOSTS HAVE AT LEAST 1 GROUP {{{
 		foreach ($templates as $tnum => $template) {
 			if (empty($template['groups'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for template "%1$s"', $template['host']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for template "%1$s".', $template['host']));
 			}
 			$templates[$tnum]['groups'] = zbx_toArray($templates[$tnum]['groups']);
 

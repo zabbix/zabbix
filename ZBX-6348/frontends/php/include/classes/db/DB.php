@@ -670,7 +670,9 @@ class DB {
 	 */
 	public static function recordModified($tableName, array $oldRecord, array $newRecord) {
 		foreach ($oldRecord as $field => $value) {
-			if (self::hasField($tableName, $field) && isset($newRecord[$field]) && $value !== $newRecord[$field]) {
+			if (self::hasField($tableName, $field)
+					&& isset($newRecord[$field])
+					&& !zbx_strcmp($value, $newRecord[$field])) {
 				return true;
 			}
 		}

@@ -459,7 +459,7 @@ elseif (isset($_REQUEST['save'])) {
 
 			// unset fields without changes
 			foreach ($item as $field => $value) {
-				if ($item[$field] === $db_item[$field]) {
+				if (zbx_strcmp($item[$field], $db_item[$field])) {
 					unset($item[$field]);
 				}
 			}

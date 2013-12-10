@@ -480,7 +480,7 @@ class CHostGroup extends CZBXAPI {
 		}
 
 		foreach ($groups as $group) {
-			if (zbx_empty($group['name'])) {
+			if (!isset($group['name']) || (isset($group['name']) && zbx_empty($group['name']))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Host group name cannot be empty.'));
 			}
 			if ($this->exists(array('name' => $group['name']))) {

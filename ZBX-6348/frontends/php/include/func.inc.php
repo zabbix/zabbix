@@ -944,6 +944,25 @@ function zbx_formatDomId($value) {
 	return str_replace(array('[', ']'), array('_', ''), $value);
 }
 
+/**
+ * Compare two values depending on type. If one of the values is an array or an object, compare using === operator.
+ * Otherwise use binary safe string comparison.
+ *
+ * @param mixed $value1
+ * @param mixed $value2
+ *
+ * @return bool
+ */
+function zbx_strcmp($value1, $value2) {
+	$types = array('array', 'object');
+
+	if (in_array(gettype($value1), $types) || in_array(gettype($value2), $types)) {
+		return ($value1 === $value2);
+	} else {
+		return (strcmp($value1, $value2) == 0);
+	}
+}
+
 function zbx_strlen($str) {
 	if (defined('ZBX_MBSTRINGS_ENABLED')) {
 		return mb_strlen($str);

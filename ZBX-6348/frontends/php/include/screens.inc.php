@@ -249,7 +249,7 @@ function update_slideshow($slideshowid, $name, $delay, $slides) {
 	$changed = false;
 	$slideshow = array('name' => $name, 'delay' => $delay);
 	foreach ($slideshow as $key => $val) {
-		if ($db_slideshow[$key] !== $val) {
+		if (!zbx_strcmp($val, $db_slideshow[$key])) {
 			$changed = true;
 			break;
 		}

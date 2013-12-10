@@ -341,19 +341,15 @@ class CHttpTest extends CZBXAPI {
 			$dbTest = $dbHttpTests[$httpTest['httptestid']];
 			$test['hostid'] = $dbTest['hostid'];
 
-			if (!empty($dbTest['templateid'])
-					|| (!isset($test['name'])
-					|| isset($test['name'])
-					&& zbx_empty($test['name']))) {
+			if ((!isset($test['name']) || (isset($test['name']) && zbx_empty($test['name'])))
+					|| !empty($dbTest['templateid'])) {
 				$test['name'] = $dbTest['name'];
 			}
 			if (!empty($test['steps'])) {
 				foreach ($test['steps'] as $snum => $step) {
 					if (isset($step['httpstepid'])
 							&& (!empty($dbTest['templateid'])
-							|| (!isset($step['name'])
-							|| isset($step['name'])
-							&& zbx_empty($step['name'])))) {
+								|| (!isset($step['name']) || (isset($step['name']) && zbx_empty($step['name']))))) {
 						$test['steps'][$snum]['name'] = $dbTest['steps'][$step['httpstepid']]['name'];
 					}
 					if (!empty($dbTest['templateid'])) {
