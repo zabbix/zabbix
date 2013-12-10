@@ -103,7 +103,7 @@ void	send_host_availability(zbx_sock_t *sock)
 
 	if (SUCCEED != zbx_recv_response(sock, &info, CONFIG_TIMEOUT, &error))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "sending host availability data to server: error=\"%s\", info=\"%s\"",
+		zabbix_log(LOG_LEVEL_WARNING, "sending host availability data to server: error:\"%s\", info:\"%s\"",
 				ZBX_NULL2EMPTY_STR(error), ZBX_NULL2EMPTY_STR(info));
 	}
 out:

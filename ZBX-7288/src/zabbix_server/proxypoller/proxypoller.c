@@ -238,7 +238,7 @@ static int	process_proxy(void)
 					if (SUCCEED != (ret = zbx_recv_response(&s, &info, 0, &error)))
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy: "
-								"error=\"%s\", info=\"%s\"", ZBX_NULL2EMPTY_STR(error),
+								"error:\"%s\", info:\"%s\"", ZBX_NULL2EMPTY_STR(error),
 								ZBX_NULL2EMPTY_STR(info));
 					}
 					zbx_free(info);
