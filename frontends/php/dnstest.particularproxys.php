@@ -41,8 +41,6 @@ $fields = array(
 );
 check_fields($fields);
 
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
-
 if (isset($_REQUEST['favobj'])) {
 	if('filter' == $_REQUEST['favobj']){
 		CProfile::update('web.dnstest.incidents.filter.state', get_request('favstate'), PROFILE_TYPE_INT);

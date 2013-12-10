@@ -97,11 +97,11 @@ $dnsTestWidget->addFlicker($filterForm, CProfile::get('web.dnstest.rollingweekst
 
 $table = new CTableInfo(_('No TLD\'s found.'));
 $table->setHeader(array(
-	_('TLD'),
-	_('DNS (4Hrs)'),
-	_('DNSSEC (4Hrs)'),
-	_('RDDS (24Hrs)'),
-	_('EPP (24Hrs)')
+	make_sorting_header(_('TLD'), 'name'),
+	make_sorting_header(_('DNS (4Hrs)') , 'dns'),
+	make_sorting_header(_('DNSSEC (4Hrs)'), 'dnssec'),
+	make_sorting_header(_('RDDS (24Hrs)'), 'rdds'),
+	make_sorting_header(_('EPP (24Hrs)'), 'epp')
 ));
 
 if (isset($this->data['tld'])) {

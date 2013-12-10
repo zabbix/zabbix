@@ -51,7 +51,6 @@ $fields = array(
 );
 
 check_fields($fields);
-
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 if (isset($_REQUEST['favobj'])) {
@@ -166,19 +165,12 @@ if (get_request('filter_slv', 0) > 0
 // get TLD
 $tlds = API::Host()->get($options);
 
-$hostIds = array();
 $data['tld'] = array();
 
 if ($tlds) {
-	foreach ($tlds as $tld) {
-		$data['tld'][$tld['hostid']] = array(
-			'hostid' => $tld['hostid'],
-			'host' => $tld['host'],
-			'name' => $tld['name'],
-			'status' => false
-		);
-		$hostIds[] = $tld['hostid'];
-	}
+	$sortField = getPageSortField('name');
+	$sortOrder = getPageSortOrder();
+	$hostIds = array_keys($tlds);
 
 	// get items
 	$items = API::Item()->get(array(
@@ -194,37 +186,63 @@ if ($tlds) {
 	));
 
 	if ($items) {
-		foreach ($items as $item) {
-			switch ($item['key_']) {
-				case DNSTEST_SLV_DNS_ROLLWEEK:
-					$data['tld'][$item['hostid']]['dns']['itemid'] = $item['itemid'];
-					$data['tld'][$item['hostid']]['dns']['lastvalue'] = $item['lastvalue'];
-					$data['tld'][$item['hostid']]['dns']['trigger'] = false;
+		if ($sortField != 'name') {
+			$sortItems = array();
+			foreach ($items as $item) {
+				if (($item['key_'] == DNSTEST_SLV_DNS_ROLLWEEK && $sortField == 'dns')
+						|| ($item['key_'] == DNSTEST_SLV_DNSSEC_ROLLWEEK && $sortField == 'dnssec')
+						|| ($item['key_'] == DNSTEST_SLV_RDDS_ROLLWEEK && $sortField == 'rdds')) {
+					$sortItems[$item['itemid']]['lastvalue'] = $item['lastvalue'];
+					$sortItems[$item['itemid']]['hostid'] = $item['hostid'];
 					$itemIds[] = $item['itemid'];
-					break;
-				case DNSTEST_SLV_DNSSEC_ROLLWEEK:
-					$data['tld'][$item['hostid']]['dnssec']['itemid'] = $item['itemid'];
-					$data['tld'][$item['hostid']]['dnssec']['lastvalue'] = $item['lastvalue'];
-					$data['tld'][$item['hostid']]['dnssec']['trigger'] = false;
-					$itemIds[] = $item['itemid'];
-					break;
-				case DNSTEST_SLV_RDDS_ROLLWEEK:
-					$data['tld'][$item['hostid']]['rdds']['itemid'] = $item['itemid'];
-					$data['tld'][$item['hostid']]['rdds']['lastvalue'] = $item['lastvalue'];
-					$data['tld'][$item['hostid']]['rdds']['trigger'] = false;
-					$itemIds[] = $item['itemid'];
-					break;
-				case DNSTEST_SLV_DNS_AVAIL:
-					$data['tld'][$item['hostid']]['dns']['availItemId'] = $item['itemid'];
-					break;
-				case DNSTEST_SLV_DNSSEC_AVAIL:
-					$data['tld'][$item['hostid']]['dnssec']['availItemId'] = $item['itemid'];
-					break;
-				case DNSTEST_SLV_RDDS_AVAIL:
-					$data['tld'][$item['hostid']]['rdds']['availItemId'] = $item['itemid'];
-					break;
+				}
 			}
 
+			// sorting
+			CArrayHelper::sort($sortItems, array(array('field' => 'lastvalue', 'order' => $sortOrder)));
+
+			foreach ($sortItems as $itemId => $sortItem) {
+				$data['tld'][$sortItem['hostid']][$sortField]['itemid'] = $itemId;
+				$data['tld'][$sortItem['hostid']][$sortField]['lastvalue'] = $sortItem['lastvalue'];
+				$data['tld'][$sortItem['hostid']][$sortField]['trigger'] = false;
+			}
+		}
+
+		foreach ($items as $item) {
+			if ($item['key_'] == DNSTEST_SLV_DNS_ROLLWEEK && $sortField != 'dns') {
+				$data['tld'][$item['hostid']]['dns']['itemid'] = $item['itemid'];
+				$data['tld'][$item['hostid']]['dns']['lastvalue'] = $item['lastvalue'];
+				$data['tld'][$item['hostid']]['dns']['trigger'] = false;
+				$itemIds[] = $item['itemid'];
+			}
+			elseif ($item['key_'] == DNSTEST_SLV_DNSSEC_ROLLWEEK && $sortField != 'dnssec') {
+				$data['tld'][$item['hostid']]['dnssec']['itemid'] = $item['itemid'];
+				$data['tld'][$item['hostid']]['dnssec']['lastvalue'] = $item['lastvalue'];
+				$data['tld'][$item['hostid']]['dnssec']['trigger'] = false;
+				$itemIds[] = $item['itemid'];
+			}
+			elseif ($item['key_'] == DNSTEST_SLV_RDDS_ROLLWEEK && $sortField != 'rdds') {
+				$data['tld'][$item['hostid']]['rdds']['itemid'] = $item['itemid'];
+				$data['tld'][$item['hostid']]['rdds']['lastvalue'] = $item['lastvalue'];
+				$data['tld'][$item['hostid']]['rdds']['trigger'] = false;
+				$itemIds[] = $item['itemid'];
+			}
+			elseif ($item['key_'] == DNSTEST_SLV_DNS_AVAIL) {
+				$data['tld'][$item['hostid']]['dns']['availItemId'] = $item['itemid'];
+			}
+			elseif ($item['key_'] == DNSTEST_SLV_DNSSEC_AVAIL) {
+				$data['tld'][$item['hostid']]['dnssec']['availItemId'] = $item['itemid'];
+			}
+			elseif ($item['key_'] == DNSTEST_SLV_RDDS_AVAIL) {
+				$data['tld'][$item['hostid']]['rdds']['availItemId'] = $item['itemid'];
+			}
+		}
+
+		foreach ($tlds as $tld) {
+			$data['tld'][$tld['hostid']]['hostid'] = $tld['hostid'];
+			$data['tld'][$tld['hostid']]['host'] = $tld['host'];
+			$data['tld'][$tld['hostid']]['name'] = $tld['name'];
+			$data['tld'][$tld['hostid']]['status'] = false;
 		}
 
 		// get triggers
@@ -268,6 +286,10 @@ if ($tlds) {
 				}
 			}
 		}
+	}
+
+	if ($sortField == 'name') {
+		order_result($data['tld'], 'name', $sortOrder);
 	}
 }
 
