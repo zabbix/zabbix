@@ -75,7 +75,7 @@ if (isset($_REQUEST['filter_set'])) {
 	$data['filter_dnssec'] = get_request('filter_dnssec');
 	$data['filter_rdds'] = get_request('filter_rdds');
 	$data['filter_epp'] = get_request('filter_epp');
-	$data['filter_slv'] = get_request('filter_slv');
+	$data['filter_slv'] = get_request('filter_slv', 0);
 	$data['filter_status'] = get_request('filter_status');
 
 	CProfile::update('web.dnstest.rollingweekstatus.filter_search', get_request('filter_search'), PROFILE_TYPE_STR);
@@ -112,36 +112,36 @@ $options = array(
 	'preservekeys' => true
 );
 
-if (get_request('filter_search')) {
-	$options['search'] = array('name' => get_request('filter_search'));
-	$data['filter_search'] = get_request('filter_search');
+if ($data['filter_search']) {
+	$options['search'] = array('name' => $data['filter_search']);
+	$data['filter_search'] = $data['filter_search'];
 }
 
-if (get_request('filter_slv', 0) > 0
-		&& (get_request('filter_dns') || get_request('filter_dnssec') || get_request('filter_rdds')
-			|| get_request('filter_epp'))) {
+if ($data['filter_slv'] > 0
+		&& ($data['filter_dns'] || $data['filter_dnssec'] || $data['filter_rdds']
+			|| $data['filter_epp'])) {
 
 	$slvValues = explode(',', $data['slv']['value']);
-	if (!in_array(get_request('filter_slv'), $slvValues)) {
+	if (!in_array($data['filter_slv'], $slvValues)) {
 		show_error_message(_('Not allowed value for "Exceeding or equal to" field'));
 	}
 	else {
 		$itemsOptions = array();
 		$itemCount = 0;
 
-		if (get_request('filter_dns')) {
+		if ($data['filter_dns']) {
 			$items['key_'][] = DNSTEST_SLV_DNS_ROLLWEEK;
 			$itemCount++;
 		}
-		if (get_request('filter_dnssec')) {
+		if ($data['filter_dnssec']) {
 			$items['key_'][] = DNSTEST_SLV_DNSSEC_ROLLWEEK;
 			$itemCount++;
 		}
-		if (get_request('filter_rdds')) {
+		if ($data['filter_rdds']) {
 			$items['key_'][] = DNSTEST_SLV_RDDS_ROLLWEEK;
 			$itemCount++;
 		}
-		if (get_request('filter_epp')) {
+		if ($data['filter_epp']) {
 			$items['key_'][] = DNSTEST_SLV_EPP_ROLLWEEK;
 			$itemCount++;
 		}
@@ -149,7 +149,7 @@ if (get_request('filter_slv', 0) > 0
 		$itemsHostids = DBselect(
 			'SELECT DISTINCT i.hostid'.
 			' FROM items i'.
-			' WHERE i.lastvalue>='.get_request('filter_slv').
+			' WHERE i.lastvalue>='.$data['filter_slv'].
 				' AND '.dbConditionString('i.key_', $items['key_'])
 		);
 
