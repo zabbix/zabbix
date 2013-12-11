@@ -18,6 +18,7 @@
 **/
 
 #include "common.h"
+#include "zbxalgo.h"
 
 #define UINT64_BIT_COUNT	(sizeof(zbx_uint64_t) << 3)
 #define UINT32_BIT_COUNT	(UINT64_BIT_COUNT >> 1)
