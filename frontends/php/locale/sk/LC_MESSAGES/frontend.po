@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-12-02 21:54+0200\n"
-"PO-Revision-Date: 2013-12-01 12:08+0300\n"
+"PO-Revision-Date: 2013-12-02 21:08+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1385892534.0\n"
+"X-POOTLE-MTIME: 1386011322.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -4602,7 +4602,7 @@ msgstr "Francúzsky (fr_FR)"
 
 #: include/func.inc.php:199
 msgid "Fri"
-msgstr "Pia"
+msgstr "Pi"
 
 #: include/forms.inc.php:1531 include/forms.inc.php:1612
 #: include/func.inc.php:127 include/func.inc.php:211
@@ -7788,7 +7788,7 @@ msgstr "Model"
 
 #: include/func.inc.php:195
 msgid "Mon"
-msgstr "Pon"
+msgstr "Po"
 
 #: include/forms.inc.php:1527 include/forms.inc.php:1608
 #: include/func.inc.php:123 include/func.inc.php:207
@@ -10421,7 +10421,7 @@ msgstr "Safari"
 
 #: include/func.inc.php:200
 msgid "Sat"
-msgstr "Sob"
+msgstr "So"
 
 #: include/forms.inc.php:1532 include/forms.inc.php:1613
 #: include/func.inc.php:128 include/func.inc.php:212
@@ -11449,7 +11449,7 @@ msgstr "Súčet hodnôt v perióde T NIE JE N"
 
 #: include/func.inc.php:194
 msgid "Sun"
-msgstr "Ned"
+msgstr "Ne"
 
 #: include/forms.inc.php:1533 include/forms.inc.php:1614
 #: include/func.inc.php:130 include/func.inc.php:206
@@ -11769,7 +11769,7 @@ msgstr "Tento rok"
 
 #: include/func.inc.php:198
 msgid "Thu"
-msgstr "Stv"
+msgstr "Št"
 
 #: include/forms.inc.php:1530 include/forms.inc.php:1611
 #: include/func.inc.php:126 include/func.inc.php:210
@@ -12115,7 +12115,7 @@ msgstr "Pokus o čítanie nedostupnej vlastnosti \"%s\"."
 
 #: include/func.inc.php:196
 msgid "Tue"
-msgstr "Uto"
+msgstr "Ut"
 
 #: include/forms.inc.php:1528 include/forms.inc.php:1609
 #: include/func.inc.php:124 include/func.inc.php:208
@@ -12973,7 +12973,7 @@ msgstr "Web kontrola musí mať najmenej jeden krok."
 
 #: include/func.inc.php:197
 msgid "Wed"
-msgstr "Str"
+msgstr "St"
 
 #: include/forms.inc.php:1529 include/forms.inc.php:1610
 #: include/func.inc.php:125 include/func.inc.php:209
