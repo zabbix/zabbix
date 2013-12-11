@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-12-11 06:39+0200\n"
-"PO-Revision-Date: 2013-01-09 22:10+0200\n"
+"POT-Creation-Date: 2013-12-11 06:42+0200\n"
+"PO-Revision-Date: 2013-12-10 22:40+0300\n"
 "Last-Translator: Robert <szenasy.robert@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: hu\n"
@@ -11,8 +11,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.1.6\n"
+"X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
+"X-POOTLE-MTIME: 1386708052.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -62,8 +63,8 @@ msgstr[1] "%1$s elem"
 #, c-format
 msgid "%1$s day"
 msgid_plural "%1$s days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s nap"
+msgstr[1] "%1$s nap"
 
 #: include/page_header.php:446
 #, c-format
@@ -116,7 +117,7 @@ msgstr "(nincs proxy)"
 
 #: include/setup.inc.php:244
 msgid "(with warnings)"
-msgstr ""
+msgstr "(figyelmeztetésekkel)"
 
 #: include/blocks.inc.php:1502
 msgid "-"
@@ -230,7 +231,7 @@ msgstr "Hozzáférés megtagadva!"
 
 #: include/func.inc.php:2082
 msgid "Access denied."
-msgstr ""
+msgstr "Hozzáférés megtagadva."
 
 #: api/classes/CUser.php:881
 #, c-format
@@ -448,7 +449,7 @@ msgstr "Hozzáadás"
 
 #: acknow.php:218
 msgid "Add comment by"
-msgstr "Megjegyzés hozzáfűzése"
+msgstr "Megjegyzés hozzáadta"
 
 #: include/views/configuration.sysmap.constructor.php:28
 msgid "Add element"
@@ -460,7 +461,7 @@ msgstr "Új hoszt"
 
 #: include/views/configuration.sysmap.constructor.php:33
 msgid "Add link"
-msgstr "Kapcsolat felvétele"
+msgstr "Kapcsolat hozzáadása"
 
 #: include/views/conf.import.php:23
 msgid "Add missing"
@@ -480,7 +481,7 @@ msgstr "Prototípus hozzáadása"
 
 #: jsLoader.php:186
 msgid "Add service"
-msgstr ""
+msgstr "Szolgáltatás hozzáadása"
 
 #: slides.php:95
 msgid "Add to"
@@ -545,7 +546,7 @@ msgstr ""
 #: include/views/configuration.host.prototype.edit.php:107
 #: include/views/inventory.host.view.php:111
 msgid "Agent interfaces"
-msgstr "Ügynök interface"
+msgstr "Ügynök interfészek"
 
 #: hosts.php:58
 msgid "Agent or SNMP or JMX or IPMI interface"
@@ -632,11 +633,11 @@ msgstr "Alkalmazás"
 #: api/classes/CApplication.php:375
 #, c-format
 msgid "Application \"%1$s\" already exists."
-msgstr ""
+msgstr "A(z) \"%1$s\" alkalmazás már létezik."
 
 #: applications.php:107
 msgid "Application added"
-msgstr "Alkalmazás felvéve"
+msgstr "Alkalmazás hozzáadva"
 
 #: applications.php:140 applications.php:179
 msgid "Application deleted"
@@ -756,11 +757,11 @@ msgstr ""
 
 #: api/classes/CMaintenance.php:332 api/classes/CMaintenance.php:524
 msgid "At least one host or group should be selected."
-msgstr ""
+msgstr "Legalább egy hostot vagy csoportot ki kell választani."
 
 #: api/classes/CMaintenance.php:402 api/classes/CMaintenance.php:515
 msgid "At least one maintenance period must be created."
-msgstr ""
+msgstr "Legalább egy karbantartási periódust létre kell hozni."
 
 #: include/classes/class.frontendsetup.php:225
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported."
@@ -836,7 +837,7 @@ msgstr ""
 #: include/views/js/configuration.discovery.edit.js.php:71
 #: include/views/js/configuration.discovery.edit.js.php:88
 msgid "Authentication protocol"
-msgstr ""
+msgstr "Hitelesítési protokol"
 
 #: include/views/configuration.action.list.php:35
 msgid "Auto registration"
@@ -876,7 +877,7 @@ msgstr ""
 #: include/views/js/configuration.sysmaps.js.php:130
 #: include/views/js/configuration.sysmaps.js.php:255
 msgid "Automatic icon selection"
-msgstr ""
+msgstr "Automatikus ikon kiválasztás"
 
 #: hosts.php:814
 msgid "Availability"
@@ -997,7 +998,7 @@ msgstr "Világosabb"
 
 #: include/locales.inc.php:52
 msgid "Bulgarian (bg_BG)"
-msgstr ""
+msgstr "Bolgár (bg_BG)"
 
 #: tr_status.php:855
 msgid "Bulk acknowledge"
@@ -1670,11 +1671,10 @@ msgid "Cannot delete proxy"
 msgstr "Proxy törlése sikertelen"
 
 #: adm.regexps.php:173
-#, fuzzy
 msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
 msgstr[0] "Reguláris kifejezés törlése nem sikerült"
-msgstr[1] "Reguláris kifejezés törlése nem sikerült"
+msgstr[1] "Reguláris kifejezések törlése nem sikerült"
 
 #: screenconf.php:221
 msgid "Cannot delete screen"
@@ -11044,12 +11044,12 @@ msgstr "Időszak típusa"
 #: include/views/configuration.maintenance.edit.php:134
 #: include/views/configuration.maintenance.edit.php:186
 msgid "Periods"
-msgstr ""
+msgstr "Időszakok"
 
 #: include/views/administration.usergroups.edit.php:129
 #: include/views/administration.users.edit.php:354
 msgid "Permissions"
-msgstr ""
+msgstr "Jogosultságok"
 
 #: include/views/administration.users.edit.php:352
 msgid "Permissions can be assigned for user groups only."
@@ -11057,7 +11057,7 @@ msgstr ""
 
 #: include/locales.inc.php:68
 msgid "Persian (fa_IR)"
-msgstr ""
+msgstr "Perzsa (fa_IR)"
 
 #: include/func.inc.php:674
 msgid "Peta"
@@ -11073,16 +11073,16 @@ msgstr ""
 
 #: include/screens.inc.php:35
 msgid "Plain text"
-msgstr "Szöveg"
+msgstr "Egyszerű szöveg"
 
 #: include/views/administration.users.edit.php:234
 #: include/views/administration.users.edit.php:271
 msgid "Play"
-msgstr ""
+msgstr "Lejátszás"
 
 #: include/views/administration.users.edit.php:222
 msgid "Play sound"
-msgstr ""
+msgstr "Hang lejátszása"
 
 #: include/nodes.inc.php:355
 msgid "Please be aware that database still contains data related to the deleted node."
@@ -11142,7 +11142,7 @@ msgstr "Portugál (pt_BR)"
 
 #: include/locales.inc.php:71
 msgid "Portuguese (pt_PT)"
-msgstr ""
+msgstr "Portugál (pt_PT)"
 
 #: tr_logform.php:300
 msgid "Position"
@@ -11166,7 +11166,7 @@ msgstr "Előző"
 #: include/func.inc.php:1837
 msgctxt "page navigation"
 msgid "Previous"
-msgstr ""
+msgstr "Előző"
 
 #: popup_trexpr.php:299
 msgid "Previous value is < N"
@@ -11280,7 +11280,7 @@ msgstr "Profil"
 
 #: popup.php:60
 msgid "Prototypes"
-msgstr ""
+msgstr "Prototipus"
 
 #: include/views/administration.node.list.php:26
 #: include/views/administration.proxy.list.php:27
@@ -11451,7 +11451,7 @@ msgstr "Reguláris kifejezés"
 #: include/regexp.inc.php:62 include/regexp.inc.php:102
 #, c-format
 msgid "Regular expression \"%s\" already exists."
-msgstr ""
+msgstr "Reguláris kifejezés törölve"
 
 #: popup_trexpr.php:423
 msgid "Regular expression V matching last value in period T, then N = 1, 0 - otherwise"
@@ -11478,7 +11478,7 @@ msgstr "Reguláris kifejezés hozzáadva"
 msgid "Regular expression deleted"
 msgid_plural "Regular expressions deleted"
 msgstr[0] "Reguláris kifejezés törölve"
-msgstr[1] "Reguláris kifejezés törölve"
+msgstr[1] "Reguláris kifejezések törölve"
 
 #: include/regexp.inc.php:85
 msgid "Regular expression does not exist."
@@ -11737,7 +11737,7 @@ msgstr "Eredmény típusa"
 
 #: httpconf.php:46 include/views/configuration.httpconf.edit.php:90
 msgid "Retries"
-msgstr ""
+msgstr "Próbálkozások"
 
 #: include/actions.inc.php:831 include/classes/screens/CScreenActions.php:68
 #: include/classes/screens/CScreenActions.php:73
@@ -11796,7 +11796,7 @@ msgstr "Jobbra"
 
 #: include/locales.inc.php:72
 msgid "Romanian (ro_RO)"
-msgstr ""
+msgstr "Román (ro_RO)"
 
 #: include/views/configuration.screen.constructor.edit.php:601
 #: screenedit.php:47
@@ -11817,19 +11817,19 @@ msgstr "Szabályok"
 
 #: include/actions.inc.php:493
 msgid "Run IPMI command"
-msgstr ""
+msgstr "IPMI parancs futtatása"
 
 #: include/actions.inc.php:496
 msgid "Run SSH commands"
-msgstr ""
+msgstr "SSH parancsok futtatása"
 
 #: include/actions.inc.php:499
 msgid "Run TELNET commands"
-msgstr ""
+msgstr "TELNET parancsok futtatása"
 
 #: include/actions.inc.php:519
 msgid "Run commands"
-msgstr ""
+msgstr "Parancsok futtatása"
 
 #: include/actions.inc.php:503
 msgid "Run custom commands on Zabbix agent"
@@ -11887,13 +11887,13 @@ msgstr "KERESÉS"
 
 #: include/classes/screens/CScreenClock.php:64
 msgid "SERVER"
-msgstr ""
+msgstr "KISZOLGÁLÓ"
 
 #: include/views/configuration.item.edit.php:146
 #: include/views/configuration.item.massupdate.php:142
 #: include/views/js/configuration.discovery.edit.js.php:78
 msgid "SHA"
-msgstr ""
+msgstr "SHA"
 
 #: report3.php:83 srv_status.php:142
 msgid "SLA"
@@ -11931,11 +11931,11 @@ msgstr "SMTP szerver"
 
 #: include/hosts.inc.php:471 include/items.inc.php:245
 msgid "SNMP"
-msgstr ""
+msgstr "SNMP"
 
 #: include/views/js/configuration.discovery.edit.js.php:44
 msgid "SNMP Key"
-msgstr ""
+msgstr "SNMP kulcs"
 
 #: disc_prototypes.php:79 host_discovery.php:76 include/forms.inc.php:486
 #: include/views/configuration.item.edit.php:119
@@ -11948,18 +11948,18 @@ msgstr "SNMP OID"
 #: include/views/configuration.item.massupdate.php:95
 #: include/views/js/configuration.discovery.edit.js.php:39 items.php:85
 msgid "SNMP community"
-msgstr "SNMP jelszó (community)"
+msgstr "SNMP tagság"
 
 #: include/views/configuration.host.edit.php:265
 #: include/views/configuration.host.edit.php:345
 #: include/views/configuration.host.prototype.edit.php:120
 #: include/views/inventory.host.view.php:134
 msgid "SNMP interfaces"
-msgstr ""
+msgstr "SNMP interfészek"
 
 #: include/items.inc.php:87
 msgid "SNMP trap"
-msgstr ""
+msgstr "SNMP trap"
 
 #: api/classes/CItemGeneral.php:345
 msgid "SNMP trap key is invalid."
@@ -11968,17 +11968,17 @@ msgstr ""
 #: include/discovery.inc.php:66 include/items.inc.php:84
 #: include/views/js/configuration.discovery.edit.js.php:178
 msgid "SNMPv1 agent"
-msgstr "SNMPv1 agent"
+msgstr "SNMPv1 ügynök"
 
 #: include/discovery.inc.php:67 include/items.inc.php:85
 #: include/views/js/configuration.discovery.edit.js.php:179
 msgid "SNMPv2 agent"
-msgstr "SNMPv2 agent"
+msgstr "SNMPv2 ügynök"
 
 #: include/discovery.inc.php:68 include/items.inc.php:86
 #: include/views/js/configuration.discovery.edit.js.php:180
 msgid "SNMPv3 agent"
-msgstr "SNMPv3 agent"
+msgstr "SNMPv3 ügynök"
 
 #: include/classes/debug/CProfiler.php:142
 #, c-format
@@ -11987,7 +11987,7 @@ msgstr ""
 
 #: include/items.inc.php:1413 include/views/configuration.item.edit.php:199
 msgid "SQL query"
-msgstr ""
+msgstr "SQL lekérdezés"
 
 #: include/classes/db/DB.php:716
 #, c-format
@@ -12008,7 +12008,7 @@ msgstr "SSH"
 
 #: include/items.inc.php:94
 msgid "SSH agent"
-msgstr "SSH agent"
+msgstr "SSH ügynök"
 
 #: include/views/monitoring.discovery.php:28
 msgid "STATUS OF DISCOVERY"
@@ -12028,11 +12028,11 @@ msgstr "ZABBIX ÁLLAPOT"
 
 #: include/views/configuration.httpconf.edit.php:116
 msgid "Safari"
-msgstr ""
+msgstr "Safari"
 
 #: include/func.inc.php:225
 msgid "Sat"
-msgstr ""
+msgstr "Szom"
 
 #: include/forms.inc.php:1673 include/forms.inc.php:1741
 #: include/func.inc.php:153 include/func.inc.php:237
@@ -12097,7 +12097,7 @@ msgstr "Mentés"
 
 #: acknow.php:220
 msgid "Save and return"
-msgstr ""
+msgstr "Mentés és visszatérés"
 
 #: include/reports.inc.php:65 include/reports.inc.php:401
 msgid "Scale"
@@ -12251,7 +12251,7 @@ msgstr ""
 #: include/views/administration.mediatypes.edit.php:65
 #: include/views/administration.mediatypes.list.php:57
 msgid "Script name"
-msgstr "Script név"
+msgstr "Script neve"
 
 #: api/classes/CScript.php:596
 #, c-format

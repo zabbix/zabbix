@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-12-11 06:39+0200\n"
-"PO-Revision-Date: 2013-11-13 16:57+0300\n"
+"POT-Creation-Date: 2013-12-11 06:42+0200\n"
+"PO-Revision-Date: 2013-12-09 23:29+0300\n"
 "Last-Translator: Mikhail <mikhail.dobrinin@redprairie.com>\n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
-"X-POOTLE-MTIME: 1384354620.0\n"
+"X-POOTLE-MTIME: 1386624581.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -116,7 +116,7 @@ msgstr "(no proxy)"
 
 #: include/setup.inc.php:244
 msgid "(with warnings)"
-msgstr ""
+msgstr "(with warnings)"
 
 #: include/blocks.inc.php:1502
 msgid "-"
@@ -160,7 +160,7 @@ msgstr "5 seconds"
 
 #: include/views/monitoring.history.php:66
 msgid "500 latest values"
-msgstr "<Sub-menu/Sub-menu.../>Script"
+msgstr "500 latest values"
 
 #: include/views/administration.script.edit.php:41
 msgid "<Sub-menu/Sub-menu.../>Script"
@@ -389,7 +389,7 @@ msgstr "Active since"
 #: include/views/configuration.maintenance.edit.php:90 maintenance.php:149
 #: maintenance.php:153
 msgid "Active till"
-msgstr "Active till"
+msgstr "Active until"
 
 #: include/blocks.inc.php:1197 include/blocks.inc.php:1203
 #: include/blocks.inc.php:1318 include/blocks.inc.php:1363
@@ -538,7 +538,7 @@ msgstr "Agent"
 #: include/classes/items/CHelpItems.php:65
 #: include/classes/items/CHelpItems.php:307
 msgid "Agent host name defined in the configuration file. String value."
-msgstr ""
+msgstr "Agent host name defined in the configuration file. String value."
 
 #: include/views/configuration.host.edit.php:248
 #: include/views/configuration.host.edit.php:332
@@ -553,7 +553,7 @@ msgstr "Agent or SNMP or JMX or IPMI interface"
 
 #: include/classes/items/CHelpItems.php:561
 msgid "Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual."
-msgstr ""
+msgstr "Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual."
 
 #: include/hosts.inc.php:120 include/views/administration.users.edit.php:52
 #: include/views/administration.users.list.php:55 popup.php:615 users.php:44
@@ -607,7 +607,7 @@ msgstr "Allowed hosts"
 #: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:543
 msgid "Amount of memory size in bytes. If mode is missing total is used."
-msgstr ""
+msgstr "Amount of memory size in bytes. If mode is missing total is used."
 
 #: tr_status.php:281 tr_status.php:287
 msgid "Any"
@@ -764,7 +764,7 @@ msgstr "At least one maintenance period must be created."
 
 #: include/classes/class.frontendsetup.php:225
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported."
-msgstr ""
+msgstr "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported."
 
 #: include/menu.inc.php:264
 #: include/views/administration.general.housekeeper.edit.php:99
@@ -777,12 +777,12 @@ msgstr "Audit actions"
 
 #: adm.housekeeper.php:51
 msgid "Audit data storage period"
-msgstr ""
+msgstr "Audit data storage period"
 
 #: adm.housekeeper.php:110
 #, c-format
 msgid "Audit data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "Audit data storage period (in days) \"%1$s\"."
 
 #: auditlogs.php:27
 msgid "Audit logs"
@@ -852,16 +852,16 @@ msgstr "Auto-logout (min 90 seconds)"
 
 #: include/views/administration.general.housekeeper.edit.php:56
 msgid "Auto-registration data storage period (in days)"
-msgstr ""
+msgstr "Auto-registration data storage period (in days)"
 
 #: adm.housekeeper.php:43
 msgid "Auto-registration event and alert data storage period"
-msgstr ""
+msgstr "Auto-registration event and alert data storage period"
 
 #: adm.housekeeper.php:108
 #, c-format
 msgid "Auto-registration event and alert data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "Auto-registration event and alert data storage period (in days) \"%1$s\"."
 
 #: include/views/configuration.host.edit.php:763
 #: include/views/configuration.host.massupdate.php:242
@@ -1061,7 +1061,7 @@ msgstr "CONFIGURATION OF HOSTS"
 
 #: adm.housekeeper.php:141
 msgid "CONFIGURATION OF HOUSEKEEPING"
-msgstr ""
+msgstr "CONFIGURATION OF HOUSEKEEPING"
 
 #: adm.iconmapping.php:130
 msgid "CONFIGURATION OF ICON MAPPING"
@@ -1187,22 +1187,22 @@ msgstr "CONFIGURATION OF ZABBIX"
 #: include/classes/items/CHelpItems.php:181
 #: include/classes/items/CHelpItems.php:435
 msgid "CPU info - lists full info for all CPUs by default"
-msgstr ""
+msgstr "CPU info - lists full info for all CPUs by default"
 
 #: include/classes/items/CHelpItems.php:157
 #: include/classes/items/CHelpItems.php:411
 msgid "CPU(s) load. Processor load. The cpu and mode are optional. If cpu is missing all is used. If mode is missing avg1 is used. Note that this is not percentage."
-msgstr ""
+msgstr "CPU(s) load. Processor load. The cpu and mode are optional. If cpu is missing all is used. If mode is missing avg1 is used. Note that this is not percentage."
 
 #: include/classes/items/CHelpItems.php:169
 #: include/classes/items/CHelpItems.php:423
 msgid "CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used.  If type is missing user is used. If mode is missing avg1 is used."
-msgstr ""
+msgstr "CPU(s) utilization. Processor load in percents. The CPU, type and mode are optional. If CPU is missing all is used. If type is missing user is used. If mode is missing avg1 is used."
 
 #: include/classes/items/CHelpItems.php:261
 #: include/classes/items/CHelpItems.php:515
 msgid "Calculate MD5 check sum of a given file. String MD5 hash of the file. Can be used for files less than 64MB, unsupported otherwise. Example: vfs.file.md5sum[/usr/local/etc/zabbix_agentd.conf]"
-msgstr ""
+msgstr "Calculate MD5 check sum of a given file. String MD5 hash of the file. Can be used for files less than 64MB, unsupported otherwise. Example: vfs.file.md5sum[/usr/local/etc/zabbix_agentd.conf]"
 
 #: include/views/configuration.services.edit.php:66 services.php:44
 msgid "Calculate SLA, acceptable SLA (in %)"
@@ -1211,12 +1211,12 @@ msgstr "Calculate SLA, acceptable SLA (in %)"
 #: include/classes/items/CHelpItems.php:249
 #: include/classes/items/CHelpItems.php:503
 msgid "Calculate check sum of a given file. Check sum of the file calculate by standard algorithm used by UNIX utility cksum. Example: vfs.file.cksum[/etc/passwd]"
-msgstr ""
+msgstr "Calculate check sum of a given file. Check sum of the file calculate by standard algorithm used by UNIX utility cksum. Example: vfs.file.cksum[/etc/passwd]"
 
 #: include/classes/items/CHelpItems.php:285
 #: include/classes/items/CHelpItems.php:539
 msgid "Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used.  In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free]."
-msgstr ""
+msgstr "Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used. In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free]."
 
 #: include/items.inc.php:97 include/views/configuration.graph.edit.php:164
 #: include/views/configuration.graph.edit.php:219
@@ -1317,7 +1317,7 @@ msgstr "Cannot add graph"
 
 #: graphs.php:230
 msgid "Cannot add graph prototype"
-msgstr ""
+msgstr "Cannot add graph prototype"
 
 #: hostgroups.php:154 usergrps.php:184
 msgid "Cannot add group"
@@ -1350,7 +1350,7 @@ msgstr "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4
 
 #: disc_prototypes.php:311
 msgid "Cannot add item prototype"
-msgstr ""
+msgstr "Cannot add item prototype"
 
 #: api/classes/CApplication.php:600
 msgid "Cannot add items."
@@ -1425,7 +1425,7 @@ msgstr "Cannot add trigger"
 
 #: trigger_prototypes.php:168
 msgid "Cannot add trigger prototype"
-msgstr ""
+msgstr "Cannot add trigger prototype"
 
 #: users.php:212
 msgid "Cannot add user"
@@ -2077,12 +2077,12 @@ msgstr "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 #: include/classes/import/CConfigurationImport.php:593
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:730
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 
 #: srv_status.php:168
 msgid "Cannot format Tree. Check logic structure in service links."
@@ -2376,7 +2376,7 @@ msgstr "Cannot update graph"
 
 #: graphs.php:224
 msgid "Cannot update graph prototype"
-msgstr ""
+msgstr "Cannot update graph prototype"
 
 #: hostgroups.php:125 usergrps.php:178
 msgid "Cannot update group"
@@ -2427,7 +2427,7 @@ msgstr "Cannot update item"
 
 #: disc_prototypes.php:307
 msgid "Cannot update item prototype"
-msgstr ""
+msgstr "Cannot update item prototype"
 
 #: items.php:664
 msgid "Cannot update items"
@@ -2514,11 +2514,11 @@ msgstr "Cannot update trigger"
 
 #: trigger_prototypes.php:163
 msgid "Cannot update trigger prototype"
-msgstr ""
+msgstr "Cannot update trigger prototype"
 
 #: trigger_prototypes.php:209
 msgid "Cannot update trigger prototypes"
-msgstr ""
+msgstr "Cannot update trigger prototypes"
 
 #: profile.php:173 users.php:205 users.php:263 users.php:287
 msgid "Cannot update user"
@@ -2555,11 +2555,11 @@ msgstr "Case sensitive"
 
 #: include/classes/items/CHelpItems.php:785
 msgid "Catches all SNMP traps from a corresponding address that match regex. Default regex is an empty string."
-msgstr ""
+msgstr "Catches all SNMP traps from a corresponding address that match regex. Default regex is an empty string."
 
 #: include/classes/items/CHelpItems.php:781
 msgid "Catches all SNMP traps that are not caught by any of the snmptrap[] items from a corresponding address of the interface."
-msgstr ""
+msgstr "Catches all SNMP traps that are not caught by any of the snmptrap[] items from a corresponding address of the interface."
 
 #: include/views/configuration.screen.constructor.edit.php:581
 msgid "Center"
@@ -2603,7 +2603,7 @@ msgstr "Chassis"
 #: include/classes/items/CHelpItems.php:177
 #: include/classes/items/CHelpItems.php:431
 msgid "Chassis info - returns full info by default"
-msgstr ""
+msgstr "Chassis info - returns full info by default"
 
 #: include/views/js/configuration.discovery.edit.js.php:536
 msgid "Check already exists."
@@ -2672,7 +2672,7 @@ msgstr ""
 #: include/classes/items/CHelpItems.php:113
 #: include/classes/items/CHelpItems.php:367
 msgid "Checks if this port is in LISTEN state. 0 - it is not, 1 - it is in LISTEN state."
-msgstr ""
+msgstr "Checks if this port is in LISTEN state. 0 - it is not, 1 - it is in LISTEN state."
 
 #: api/classes/CDRule.php:407
 msgid "Checks should be unique."
@@ -2873,7 +2873,7 @@ msgstr "Configuration"
 
 #: include/classes/items/CHelpItems.php:851
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
-msgstr ""
+msgstr "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 
 #: conf.import.php:25
 msgid "Configuration import"
@@ -2929,7 +2929,7 @@ msgstr "Configuration of hosts"
 
 #: adm.housekeeper.php:24
 msgid "Configuration of housekeeping"
-msgstr ""
+msgstr "Configuration of housekeeping"
 
 #: adm.iconmapping.php:24
 msgid "Configuration of icon mapping"
@@ -3119,7 +3119,7 @@ msgstr "Context name"
 #: include/classes/items/CHelpItems.php:165
 #: include/classes/items/CHelpItems.php:419
 msgid "Context switches."
-msgstr ""
+msgstr "Context switches."
 
 #: include/hosts.inc.php:260
 msgid "Contract number"
@@ -3334,7 +3334,7 @@ msgstr "Critical"
 #: include/classes/items/CHelpItems.php:209
 #: include/classes/items/CHelpItems.php:463
 msgid "Current OS - returns full info by default"
-msgstr ""
+msgstr "Current OS - returns full info by default"
 
 #: popup_trexpr.php:365
 msgid "Current date is < N"
@@ -3524,7 +3524,7 @@ msgstr "Data"
 
 #: include/classes/items/CHelpItems.php:887
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
-msgstr ""
+msgstr "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 
 #: include/classes/graphdraw/CLineGraphDraw.php:2481
 #: include/classes/graphdraw/CPieGraphDraw.php:727
@@ -3542,7 +3542,7 @@ msgstr "Data overview"
 #: include/views/administration.general.housekeeper.edit.php:135
 #: include/views/administration.general.housekeeper.edit.php:156
 msgid "Data storage period (in days)"
-msgstr ""
+msgstr "Data storage period (in days)"
 
 #: include/forms.inc.php:458 include/views/configuration.item.edit.php:239
 #: include/views/configuration.item.massupdate.php:227
@@ -3783,7 +3783,7 @@ msgstr "Delete expression?"
 
 #: include/views/configuration.graph.edit.php:304
 msgid "Delete graph prototype?"
-msgstr ""
+msgstr "Delete graph prototype?"
 
 #: include/views/configuration.graph.edit.php:304
 msgid "Delete graph?"
@@ -3803,7 +3803,7 @@ msgstr "Delete icon map?"
 
 #: include/views/configuration.item.edit.php:512
 msgid "Delete item prototype?"
-msgstr ""
+msgstr "Delete item prototype?"
 
 #: include/views/configuration.item.edit.php:512
 msgid "Delete item?"
@@ -4328,7 +4328,7 @@ msgstr "Disable selected hosts?"
 
 #: include/views/configuration.item.prototype.list.php:116
 msgid "Disable selected item prototypes?"
-msgstr ""
+msgstr "Disable selected item prototypes?"
 
 #: include/views/configuration.item.list.php:277
 msgid "Disable selected items?"
@@ -4340,7 +4340,7 @@ msgstr "Disable selected media types?"
 
 #: include/views/configuration.triggers.list.php:274
 msgid "Disable selected trigger prototypes?"
-msgstr ""
+msgstr "Disable selected trigger prototypes?"
 
 #: include/views/configuration.triggers.list.php:274
 msgid "Disable selected triggers?"
@@ -4829,7 +4829,7 @@ msgstr "Enable hosts monitored by selected proxies?"
 #: include/views/administration.general.housekeeper.edit.php:124
 #: include/views/administration.general.housekeeper.edit.php:145
 msgid "Enable internal housekeeping"
-msgstr ""
+msgstr "Enable internal housekeeping"
 
 #: hosts.php:1009 include/views/administration.mediatypes.list.php:113
 #: include/views/administration.proxy.list.php:104
@@ -4878,7 +4878,7 @@ msgstr "Enable selected hosts?"
 
 #: include/views/configuration.item.prototype.list.php:112
 msgid "Enable selected item prototypes?"
-msgstr ""
+msgstr "Enable selected item prototypes?"
 
 #: include/views/configuration.item.list.php:273
 msgid "Enable selected items?"
@@ -4890,7 +4890,7 @@ msgstr "Enable selected media types?"
 
 #: include/views/configuration.triggers.list.php:267
 msgid "Enable selected trigger prototypes?"
-msgstr ""
+msgstr "Enable selected trigger prototypes?"
 
 #: include/views/configuration.triggers.list.php:267
 msgid "Enable selected triggers?"
@@ -5271,7 +5271,7 @@ msgstr "File provided to a view does not exist. Tried to find \"%s\"."
 #: include/classes/items/CHelpItems.php:277
 #: include/classes/items/CHelpItems.php:531
 msgid "File time information. Number of seconds.The mode is optional. If mode is missing modify is used."
-msgstr ""
+msgstr "File time information. Number of seconds. The mode is optional. If mode is missing modify is used."
 
 #: include/graphs.inc.php:67
 msgid "Filled region"
@@ -5308,12 +5308,12 @@ msgstr "Find string V in last (most recent) value. N NOT 1 - if found, 0 - other
 #: include/classes/items/CHelpItems.php:269
 #: include/classes/items/CHelpItems.php:523
 msgid "Find string in a file. 0 - expression not found, 1 - found"
-msgstr ""
+msgstr "Find string in a file. 0 - expression not found, 1 - found"
 
 #: include/classes/items/CHelpItems.php:265
 #: include/classes/items/CHelpItems.php:519
 msgid "Find string in a file. Matched string"
-msgstr ""
+msgstr "Find string in a file. Matched string"
 
 #: include/setup.inc.php:121
 msgid "Finish"
@@ -5418,7 +5418,7 @@ msgstr "G"
 #: include/views/monitoring.charts.php:32
 #: include/views/monitoring.charts.php:41
 msgid "GRAPHS"
-msgstr ""
+msgstr "GRAPHS"
 
 #: include/views/administration.mediatypes.edit.php:62
 #: include/views/administration.mediatypes.list.php:61
@@ -5966,12 +5966,12 @@ msgstr "History clearing can take a long time. Continue?"
 
 #: adm.housekeeper.php:59
 msgid "History data storage period"
-msgstr ""
+msgstr "History data storage period"
 
 #: adm.housekeeper.php:112
 #, c-format
 msgid "History data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "History data storage period (in days) \"%1$s\"."
 
 #: include/screens.inc.php:31
 msgid "History of actions"
@@ -5983,12 +5983,12 @@ msgstr "History of events"
 
 #: disc_prototypes.php:115 items.php:54
 msgid "History storage period"
-msgstr ""
+msgstr "History storage period"
 
 #: include/views/configuration.item.edit.php:376
 #: include/views/configuration.item.massupdate.php:381
 msgid "History storage period (in days)"
-msgstr ""
+msgstr "History storage period (in days)"
 
 #: include/views/configuration.screen.constructor.edit.php:541
 msgid "Horizontal"
@@ -6392,7 +6392,7 @@ msgstr "Hours"
 #: adm.valuemapping.php:127 adm.workingtime.php:62
 #: include/views/administration.general.housekeeper.edit.php:163
 msgid "Housekeeping"
-msgstr ""
+msgstr "Housekeeping"
 
 #: include/locales.inc.php:61
 msgid "Hungarian (hu_HU)"
@@ -6508,12 +6508,12 @@ msgstr "IT service"
 
 #: adm.housekeeper.php:47
 msgid "IT service data storage period"
-msgstr ""
+msgstr "IT service data storage period"
 
 #: adm.housekeeper.php:109
 #, c-format
 msgid "IT service data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "IT service data storage period (in days) \"%1$s\"."
 
 #: include/views/configuration.services.child.list.php:25
 msgid "IT service dependencies"
@@ -7568,7 +7568,7 @@ msgstr "Internal JSON-RPC error."
 
 #: include/views/administration.general.housekeeper.edit.php:48
 msgid "Internal data storage period (in days)"
-msgstr ""
+msgstr "Internal data storage period (in days)"
 
 #: api/rpc/class.cjsonrpc.php:201
 msgid "Internal error."
@@ -7576,7 +7576,7 @@ msgstr "Internal error."
 
 #: adm.housekeeper.php:37
 msgid "Internal event and alert data storage period"
-msgstr ""
+msgstr "Internal event and alert data storage period"
 
 #: adm.housekeeper.php:106
 #, c-format
@@ -8806,12 +8806,12 @@ msgstr "Maximum number of flexible intervals added"
 #: include/classes/items/CHelpItems.php:77
 #: include/classes/items/CHelpItems.php:323
 msgid "Maximum number of opened files supported by OS."
-msgstr ""
+msgstr "Maximum number of opened files supported by OS."
 
 #: include/classes/items/CHelpItems.php:81
 #: include/classes/items/CHelpItems.php:327
 msgid "Maximum number of processes supported by OS."
-msgstr ""
+msgstr "Maximum number of processes supported by OS."
 
 #: include/classes/screens/CScreenBase.php:339 include/graphs.inc.php:424
 #, c-format
@@ -8921,7 +8921,7 @@ msgstr "Memory limit: %s"
 #: include/classes/items/CHelpItems.php:133
 #: include/classes/items/CHelpItems.php:387
 msgid "Memory used by a process. <name> process name (default: \"all processes\"). <user> user name (default: \"all users\"). <mode> possible values: avg, max, min, sum (default). <cmdline> filter by command line (supports regex). Example: proc.mem[,root]."
-msgstr ""
+msgstr "Memory used by a process. <name> process name (default: \"all processes\"). <user> user name (default: \"all users\"). <mode> possible values: avg, max, min, sum (default). <cmdline> filter by command line (supports regex). Example: proc.mem[,root]."
 
 #: include/html.inc.php:246 include/views/configuration.item.list.php:235
 #: include/views/monitoring.slides.php:50
@@ -8979,22 +8979,22 @@ msgstr "Minimize"
 #: include/classes/class.frontendsetup.php:117
 #, c-format
 msgid "Minimum required PHP memory limit is %s (configuration option \"memory_limit\")."
-msgstr ""
+msgstr "Minimum required PHP memory limit is %s (configuration option \"memory_limit\")."
 
 #: include/classes/class.frontendsetup.php:151
 #, c-format
 msgid "Minimum required PHP upload filesize is %s (configuration option \"upload_max_filesize\")."
-msgstr ""
+msgstr "Minimum required PHP upload filesize is %s (configuration option \"upload_max_filesize\")."
 
 #: include/classes/class.frontendsetup.php:99
 #, c-format
 msgid "Minimum required PHP version is %s."
-msgstr ""
+msgstr "Minimum required PHP version is %s."
 
 #: include/classes/class.frontendsetup.php:168
 #, c-format
 msgid "Minimum required limit on execution time of PHP scripts is %s (configuration option \"max_execution_time\")."
-msgstr ""
+msgstr "Minimum required limit on execution time of PHP scripts is %s (configuration option \"max_execution_time\")."
 
 #: include/classes/class.frontendsetup.php:185
 #, c-format

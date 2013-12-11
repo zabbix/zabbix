@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-12-11 06:39+0200\n"
-"PO-Revision-Date: 2013-12-01 16:28+0300\n"
+"POT-Creation-Date: 2013-12-11 06:42+0200\n"
+"PO-Revision-Date: 2013-12-02 21:08+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1385908104.0\n"
+"X-POOTLE-MTIME: 1386011315.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -2227,7 +2227,7 @@ msgstr "Nie je možné odstrániť makro."
 
 #: api/classes/CUser.php:299
 msgid "Cannot rename guest user."
-msgstr "Nie je možné premenovať používateľa \"guest\"."
+msgstr "Nie je možné premenovať používateľa guest."
 
 #: api/classes/CDRule.php:269
 msgid "Cannot save discovery rule without checks."
@@ -5061,7 +5061,7 @@ msgstr "Každý deň(dni)"
 
 #: include/forms.inc.php:1665
 msgid "Every week(s)"
-msgstr "Každý týždeň(týždne)"
+msgstr "Každý týždeň(e)"
 
 #: include/func.inc.php:675
 msgid "Exa"
@@ -5407,7 +5407,7 @@ msgstr "Francúzsky (fr_FR)"
 
 #: include/func.inc.php:224
 msgid "Fri"
-msgstr "Pia"
+msgstr "Pi"
 
 #: include/forms.inc.php:1672 include/forms.inc.php:1740
 #: include/func.inc.php:152 include/func.inc.php:236
@@ -9167,7 +9167,7 @@ msgstr "Model"
 
 #: include/func.inc.php:220
 msgid "Mon"
-msgstr "Pon"
+msgstr "Po"
 
 #: include/forms.inc.php:1668 include/forms.inc.php:1736
 #: include/func.inc.php:148 include/func.inc.php:232
@@ -12107,7 +12107,7 @@ msgstr "Safari"
 
 #: include/func.inc.php:225
 msgid "Sat"
-msgstr "Sob"
+msgstr "So"
 
 #: include/forms.inc.php:1673 include/forms.inc.php:1741
 #: include/func.inc.php:153 include/func.inc.php:237
@@ -13135,7 +13135,7 @@ msgstr "Súčet hodnôt v periode T NIE JE N"
 
 #: include/func.inc.php:219
 msgid "Sun"
-msgstr "Ned"
+msgstr "Ne"
 
 #: include/forms.inc.php:1674 include/forms.inc.php:1742
 #: include/func.inc.php:155 include/func.inc.php:231
@@ -13531,7 +13531,7 @@ msgstr "Tento rok"
 
 #: include/func.inc.php:223
 msgid "Thu"
-msgstr "Stv"
+msgstr "Št"
 
 #: include/forms.inc.php:1671 include/forms.inc.php:1739
 #: include/func.inc.php:151 include/func.inc.php:235
@@ -13969,7 +13969,7 @@ msgstr "Pokus o čítanie nedostupnej vlastnosti \"%s\"."
 
 #: include/func.inc.php:221
 msgid "Tue"
-msgstr "Uto"
+msgstr "Ut"
 
 #: include/forms.inc.php:1669 include/forms.inc.php:1737
 #: include/func.inc.php:149 include/func.inc.php:233
@@ -14977,7 +14977,7 @@ msgstr "Zobrazované meno nemôže byť prázdne ak meno hostu chýba."
 #: jsLoader.php:132
 msgctxt "Wednesday short"
 msgid "W"
-msgstr "Str"
+msgstr "St"
 
 #: adm.triggerseverities.php:58 include/items.inc.php:33
 #: include/views/administration.general.triggerSeverity.edit.php:46
@@ -15065,7 +15065,7 @@ msgstr "Web scenáre"
 
 #: include/func.inc.php:222
 msgid "Wed"
-msgstr "Str"
+msgstr "St"
 
 #: include/forms.inc.php:1670 include/forms.inc.php:1738
 #: include/func.inc.php:150 include/func.inc.php:234

@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-12-11 06:39+0200\n"
-"PO-Revision-Date: 2013-11-19 08:25+0300\n"
-"Last-Translator: frederic <masterlf@msn.com>\n"
+"POT-Creation-Date: 2013-12-11 06:42+0200\n"
+"PO-Revision-Date: 2013-12-09 22:11+0300\n"
+"Last-Translator: Sébastien <sebastien@tiramiseb.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1384842357.0\n"
+"X-POOTLE-MTIME: 1386619872.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -117,7 +117,7 @@ msgstr "(pas de proxy)"
 
 #: include/setup.inc.php:244
 msgid "(with warnings)"
-msgstr ""
+msgstr "(avec avertissements)"
 
 #: include/blocks.inc.php:1502
 msgid "-"
@@ -539,7 +539,7 @@ msgstr "Agent"
 #: include/classes/items/CHelpItems.php:65
 #: include/classes/items/CHelpItems.php:307
 msgid "Agent host name defined in the configuration file. String value."
-msgstr ""
+msgstr "Nom d'hôte de l'agent défini dans le fichier de configuration. Chaîne de caractères."
 
 #: include/views/configuration.host.edit.php:248
 #: include/views/configuration.host.edit.php:332
@@ -554,7 +554,7 @@ msgstr "Interface de l'agent ou SNMP ou JMX ou IPMI"
 
 #: include/classes/items/CHelpItems.php:561
 msgid "Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual."
-msgstr ""
+msgstr "Les vérifications agrégées ne nécessitent aucun agent en fonctionnement sur un hôte supervisé. Le serveur Zabbix collecte des informations agrégées en faisant des requêtes directes dans la base de données. Voir le manuel de Zabbix."
 
 #: include/hosts.inc.php:120 include/views/administration.users.edit.php:52
 #: include/views/administration.users.list.php:55 popup.php:615 users.php:44
@@ -603,12 +603,12 @@ msgstr "Tous les nœuds"
 #: include/views/configuration.item.edit.php:438
 #: include/views/configuration.item.massupdate.php:457
 msgid "Allowed hosts"
-msgstr "Hôtes autorisés"
+msgstr "Quantité de mémoire en octets. Si le mode manque, le total est utilisé."
 
 #: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:543
 msgid "Amount of memory size in bytes. If mode is missing total is used."
-msgstr ""
+msgstr "Quantité de mémoire en octets. Si le mode manque, le total est utilisé."
 
 #: tr_status.php:281 tr_status.php:287
 msgid "Any"
@@ -765,7 +765,7 @@ msgstr "Une période de maintenance au moins doit être créée."
 
 #: include/classes/class.frontendsetup.php:225
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported."
-msgstr ""
+msgstr "Au moins l'un de MySQL, PostgreSQL, Oracle, SQLite3 ou IBM DB2 doit être supporté."
 
 #: include/menu.inc.php:264
 #: include/views/administration.general.housekeeper.edit.php:99
@@ -778,12 +778,12 @@ msgstr "Actions d'audit"
 
 #: adm.housekeeper.php:51
 msgid "Audit data storage period"
-msgstr ""
+msgstr "Durée de stockage des données d'audit"
 
 #: adm.housekeeper.php:110
 #, c-format
 msgid "Audit data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "Durée de stockage des données d'audit (en jour) \"%1$s\"."
 
 #: auditlogs.php:27
 msgid "Audit logs"
@@ -853,16 +853,16 @@ msgstr "Déconnexion auto (min 90 sec.)"
 
 #: include/views/administration.general.housekeeper.edit.php:56
 msgid "Auto-registration data storage period (in days)"
-msgstr ""
+msgstr "Durée de stockage des données d'auto-enregistrement (en jours)"
 
 #: adm.housekeeper.php:43
 msgid "Auto-registration event and alert data storage period"
-msgstr ""
+msgstr "Période de stockage des événements et données d'alerte pour l'auto-enregistrement"
 
 #: adm.housekeeper.php:108
 #, c-format
 msgid "Auto-registration event and alert data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "Période de stockage (en jours) des événements et données d'alerte pour l'auto-enregistrement \"%1$s\"."
 
 #: include/views/configuration.host.edit.php:763
 #: include/views/configuration.host.massupdate.php:242
@@ -1062,7 +1062,7 @@ msgstr "CONFIGURATION DES HÔTES"
 
 #: adm.housekeeper.php:141
 msgid "CONFIGURATION OF HOUSEKEEPING"
-msgstr ""
+msgstr "CONFIGURATION DU MÉNAGE AUTOMATIQUE"
 
 #: adm.iconmapping.php:130
 msgid "CONFIGURATION OF ICON MAPPING"
@@ -1188,22 +1188,22 @@ msgstr "CONFIGURATION DE ZABBIX"
 #: include/classes/items/CHelpItems.php:181
 #: include/classes/items/CHelpItems.php:435
 msgid "CPU info - lists full info for all CPUs by default"
-msgstr ""
+msgstr "Information du processeur - liste toutes les informations pour tous les processeurs par défaut"
 
 #: include/classes/items/CHelpItems.php:157
 #: include/classes/items/CHelpItems.php:411
 msgid "CPU(s) load. Processor load. The cpu and mode are optional. If cpu is missing all is used. If mode is missing avg1 is used. Note that this is not percentage."
-msgstr ""
+msgstr "Charge du/des processeur(s). Le processeur et le mode sont optionnels. Si le processeur manque, tous sont utilisés. Si le mode manque, avg1 est utilisé. Notez que cela n'est pas le pourcentage."
 
 #: include/classes/items/CHelpItems.php:169
 #: include/classes/items/CHelpItems.php:423
 msgid "CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used.  If type is missing user is used. If mode is missing avg1 is used."
-msgstr ""
+msgstr "Utilisation du/des processeur(s). Le processeur, le type et le mode sont optionnels. Si le processeur manque, tous sont utilisés. Si le type manque, user est utilisé. Si le mode manque, avg1 est utilisé."
 
 #: include/classes/items/CHelpItems.php:261
 #: include/classes/items/CHelpItems.php:515
 msgid "Calculate MD5 check sum of a given file. String MD5 hash of the file. Can be used for files less than 64MB, unsupported otherwise. Example: vfs.file.md5sum[/usr/local/etc/zabbix_agentd.conf]"
-msgstr ""
+msgstr "Calculer la somme de contrôle MD5 d'un fichier donné. Hashé MD5 du fichier sous forme de chaîne . Peut être utilisé pour des fichiers de moins de 64 Mo, non supporté dans les autres cas. Exemple : vfs.file.md5sum[/usr/local/etc/zabbix_agentd.conf]"
 
 #: include/views/configuration.services.edit.php:66 services.php:44
 msgid "Calculate SLA, acceptable SLA (in %)"
@@ -1212,12 +1212,12 @@ msgstr "Calculer SLA, SLA acceptable (en %)"
 #: include/classes/items/CHelpItems.php:249
 #: include/classes/items/CHelpItems.php:503
 msgid "Calculate check sum of a given file. Check sum of the file calculate by standard algorithm used by UNIX utility cksum. Example: vfs.file.cksum[/etc/passwd]"
-msgstr ""
+msgstr "Calcule la somme de contrôle d'un fichier donné. La somme de contrôle du fichier est calculée par l'algorithme standard utilisé par l'utilitaire UNIX cksum. Exemple : vfs.file.cksum[/etc/passwd]"
 
 #: include/classes/items/CHelpItems.php:285
 #: include/classes/items/CHelpItems.php:539
 msgid "Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used.  In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free]."
-msgstr ""
+msgstr "Calcule l'espace disque pour un volume donné. Espace disque en Ko. Si le mode manque, le total est utilisé. Dans le cas de volumes montés, l'espace disque inutilisé pour le système de fichier local est retourné. Exemple :  vfs.fs.size[/tmp,free]."
 
 #: include/items.inc.php:97 include/views/configuration.graph.edit.php:164
 #: include/views/configuration.graph.edit.php:219
@@ -1318,7 +1318,7 @@ msgstr "Impossible d'ajouter le graphique"
 
 #: graphs.php:230
 msgid "Cannot add graph prototype"
-msgstr ""
+msgstr "Impossible d'ajouter le prototype de graphique"
 
 #: hostgroups.php:154 usergrps.php:184
 msgid "Cannot add group"
@@ -1351,7 +1351,7 @@ msgstr "Impossible d'ajouter l'élément \"%1$s\" de \"%2$s\" à l'application \
 
 #: disc_prototypes.php:311
 msgid "Cannot add item prototype"
-msgstr ""
+msgstr "Impossible d'ajouter le prototype d'élément"
 
 #: api/classes/CApplication.php:600
 msgid "Cannot add items."
@@ -1426,7 +1426,7 @@ msgstr "Impossible d'ajouter le déclencheur"
 
 #: trigger_prototypes.php:168
 msgid "Cannot add trigger prototype"
-msgstr ""
+msgstr "Impossible d'ajouter le prototype de déclencheur"
 
 #: users.php:212
 msgid "Cannot add user"
@@ -1584,7 +1584,7 @@ msgstr "Impossible de supprimer le prototype de graphique"
 
 #: graphs.php:293
 msgid "Cannot delete graph prototypes"
-msgstr ""
+msgstr "Impossible de supprimer les prototypes de graphiques"
 
 #: api/classes/CItem.php:728
 msgid "Cannot delete graph."
@@ -1636,7 +1636,7 @@ msgstr "Impossible de supprimer l'élément"
 
 #: disc_prototypes.php:206
 msgid "Cannot delete item prototype"
-msgstr ""
+msgstr "Impossible de supprimer le prototype d'élément"
 
 #: disc_prototypes.php:346
 msgid "Cannot delete item prototypes"
@@ -2065,7 +2065,7 @@ msgstr "Impossible de trouver l'écran \"%1$s\" utilisée dans l'écran \"%2$s\"
 #: include/classes/import/CConfigurationImport.php:778
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Impossible de trouver le modèle \"%1$s\" pour le prototype d'hôte \"%2$s\" de la règle de découverte \"%3$s\" sur \"%4$s\"."
 
 #: include/classes/import/CXmlImport18.php:746
 #: include/classes/import/CXmlImport18.php:789
@@ -2078,7 +2078,7 @@ msgstr "Impossible de trouver le déclencheur \"%1$s\" utilisé dans la carte \"
 #: include/classes/import/CConfigurationImport.php:593
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "Impossible de trouver la correspondance de valeur \"%1$s\" utilisée pour l'élément \"%2$s\" sur \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:730
 #, c-format

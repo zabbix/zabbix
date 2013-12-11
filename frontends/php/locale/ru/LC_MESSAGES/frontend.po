@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-12-11 06:39+0200\n"
-"PO-Revision-Date: 2013-11-16 11:22+0300\n"
+"POT-Creation-Date: 2013-12-11 06:42+0200\n"
+"PO-Revision-Date: 2013-12-10 15:53+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1384593743.0\n"
+"X-POOTLE-MTIME: 1386683595.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -123,7 +123,7 @@ msgstr "(без прокси)"
 
 #: include/setup.inc.php:244
 msgid "(with warnings)"
-msgstr ""
+msgstr "(с предупреждениями)"
 
 #: include/blocks.inc.php:1502
 msgid "-"
@@ -547,7 +547,7 @@ msgstr "Агент"
 #: include/classes/items/CHelpItems.php:65
 #: include/classes/items/CHelpItems.php:307
 msgid "Agent host name defined in the configuration file. String value."
-msgstr ""
+msgstr "Имя узла агента указанное в файле конфигурации. Строковое значение."
 
 #: include/views/configuration.host.edit.php:248
 #: include/views/configuration.host.edit.php:332
@@ -562,7 +562,7 @@ msgstr "Интерфейс Агента или SNMP или JMX или IPMI"
 
 #: include/classes/items/CHelpItems.php:561
 msgid "Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual."
-msgstr ""
+msgstr "Аггрегативные проверки не требуют запущенного на узле сети какого-либо агента для мониторинга. Zabbix сервер собирает агрегатную информацию, выполняя прямые запросы в базу данных. Смотрите Документацию по Zabbix."
 
 #: include/hosts.inc.php:120 include/views/administration.users.edit.php:52
 #: include/views/administration.users.list.php:55 popup.php:615 users.php:44
@@ -616,7 +616,7 @@ msgstr "Разрешенные узлы сети"
 #: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:543
 msgid "Amount of memory size in bytes. If mode is missing total is used."
-msgstr ""
+msgstr "Размер памяти в байтах. Если режим не указан, используется полный размер."
 
 #: tr_status.php:281 tr_status.php:287
 msgid "Any"
@@ -775,7 +775,7 @@ msgstr "Должен быть создан по крайней мере один
 
 #: include/classes/class.frontendsetup.php:225
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported."
-msgstr ""
+msgstr "По крайней мере одна из MySQL, PostgreSQL, Oracle, SQLite3 или IBM DB2 баз данных должна поддерживаться."
 
 #: include/menu.inc.php:264
 #: include/views/administration.general.housekeeper.edit.php:99
@@ -788,12 +788,12 @@ msgstr "Аудит действий"
 
 #: adm.housekeeper.php:51
 msgid "Audit data storage period"
-msgstr ""
+msgstr "Период хранения данных аудита"
 
 #: adm.housekeeper.php:110
 #, c-format
 msgid "Audit data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "Период хранения данных аудита (в днях) \"%1$s\"."
 
 #: auditlogs.php:27
 msgid "Audit logs"
@@ -863,7 +863,7 @@ msgstr "Авто-выход (мин 90 секунд)"
 
 #: include/views/administration.general.housekeeper.edit.php:56
 msgid "Auto-registration data storage period (in days)"
-msgstr ""
+msgstr "Период хранения данных о авторегистрациях (в днях)"
 
 #: adm.housekeeper.php:43
 msgid "Auto-registration event and alert data storage period"
