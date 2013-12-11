@@ -36,18 +36,18 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	// filter
-	'filter_set' =>			array(T_ZBX_STR, O_OPT,	P_ACT,	null,		null),
-	'filter_search' =>		array(T_ZBX_STR, O_OPT,  null,	null,		null),
-	'filter_dns' =>			array(T_ZBX_INT, O_OPT,  null,	IN('0,1'),	null),
-	'filter_dnssec' =>		array(T_ZBX_INT, O_OPT,  null,	IN('0,1'),	null),
-	'filter_rdds' =>		array(T_ZBX_INT, O_OPT,  null,	IN('0,1'),	null),
-	'filter_epp' =>			array(T_ZBX_INT, O_OPT,  null,	IN('0,1'),	null),
-	'filter_slv' =>			array(T_ZBX_INT, O_OPT,  null,	null,		null),
-	'filter_status' =>		array(T_ZBX_INT, O_OPT,  null,	null,		null),
+	'filter_set' =>		array(T_ZBX_STR, O_OPT,	P_ACT,	null,		null),
+	'filter_search' =>	array(T_ZBX_STR, O_OPT,  null,	null,		null),
+	'filter_dns' =>		array(T_ZBX_INT, O_OPT,  null,	IN('0,1'),	null),
+	'filter_dnssec' =>	array(T_ZBX_INT, O_OPT,  null,	IN('0,1'),	null),
+	'filter_rdds' =>	array(T_ZBX_INT, O_OPT,  null,	IN('0,1'),	null),
+	'filter_epp' =>		array(T_ZBX_INT, O_OPT,  null,	IN('0,1'),	null),
+	'filter_slv' =>		array(T_ZBX_INT, O_OPT,  null,	null,		null),
+	'filter_status' =>	array(T_ZBX_INT, O_OPT,  null,	null,		null),
 	// ajax
-	'favobj' =>				array(T_ZBX_STR, O_OPT, P_ACT,	NULL,		NULL),
-	'favref' =>				array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})'),
-	'favstate' =>			array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})&&("filter"=={favobj})')
+	'favobj' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	'favref' =>			array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})'),
+	'favstate' =>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})&&("filter"=={favobj})')
 );
 
 check_fields($fields);

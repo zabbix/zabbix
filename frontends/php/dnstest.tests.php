@@ -26,14 +26,15 @@ $page['title'] = _('Tests');
 $page['file'] = 'dnstest.tests.php';
 $page['hist_arg'] = array('groupid', 'hostid');
 $page['scripts'] = array('class.calendar.js');
+$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'host' =>					array(T_ZBX_STR, O_MAND,	P_SYS,	null,			NULL),
-	'type' =>					array(T_ZBX_INT, O_MAND,	null,	IN('0,1,2'),	null),
-	'slvItemId' =>				array(T_ZBX_INT, O_MAND,	P_SYS,	DB_ID,			NULL),
+	'host' =>					array(T_ZBX_STR, O_OPT,		P_SYS,	null,			null),
+	'type' =>					array(T_ZBX_INT, O_OPT,		null,	IN('0,1,2'),	null),
+	'slvItemId' =>				array(T_ZBX_INT, O_OPT,		P_SYS,	DB_ID,			null),
 	'original_from' =>			array(T_ZBX_INT, O_OPT,		null,	null,			null),
 	'original_to' =>			array(T_ZBX_INT, O_OPT,		null,	null,			null),
 	// filter
@@ -43,7 +44,7 @@ $fields = array(
 	'filter_rolling_week' =>	array(T_ZBX_INT, O_OPT,		null,	null,			null),
 	'filter_failing_tests' =>	array(T_ZBX_INT, O_OPT,		null,	IN('0,1'),		null),
 	// ajax
-	'favobj'=>					array(T_ZBX_STR, O_OPT,		P_ACT,	NULL,			NULL),
+	'favobj'=>					array(T_ZBX_STR, O_OPT,		P_ACT,	null,			null),
 	'favref'=>					array(T_ZBX_STR, O_OPT,		P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 	'favstate'=>				array(T_ZBX_INT, O_OPT,		P_ACT,  NOT_EMPTY,		'isset({favobj})&&("filter"=={favobj})')
 );
@@ -65,6 +66,11 @@ $data['host'] = get_request('host');
 $data['type'] = get_request('type');
 $data['slvItemId'] = get_request('slvItemId');
 $data['tests'] = array();
+
+// check
+if (!$data['host'] || !$data['slvItemId'] || $data['type'] === null) {
+	access_deny();
+}
 
 /*
  * Filter

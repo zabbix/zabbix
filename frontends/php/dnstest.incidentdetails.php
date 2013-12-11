@@ -26,33 +26,34 @@ $page['title'] = _('Incidents details');
 $page['file'] = 'dnstest.incidentdetails.php';
 $page['hist_arg'] = array('groupid', 'hostid');
 $page['scripts'] = array('class.calendar.js');
+$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'host' =>					array(T_ZBX_STR, O_MAND,	P_SYS,	null,		null),
-	'eventid' =>				array(T_ZBX_INT, O_MAND,	P_SYS,	null,		null),
-	'slvItemId' =>				array(T_ZBX_INT, O_MAND,	P_SYS,	DB_ID,		null),
-	'availItemId' =>			array(T_ZBX_INT, O_MAND,	P_SYS,	DB_ID,		null),
-	'original_from' =>			array(T_ZBX_INT, O_OPT,		null,	null,		null),
-	'original_to' =>			array(T_ZBX_INT, O_OPT,		null,	null,		null),
+	'host' =>					array(T_ZBX_STR, O_OPT,	P_SYS,	null,		null),
+	'eventid' =>				array(T_ZBX_INT, O_OPT,	P_SYS,	null,		null),
+	'slvItemId' =>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
+	'availItemId' =>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
+	'original_from' =>			array(T_ZBX_INT, O_OPT,	null,	null,		null),
+	'original_to' =>			array(T_ZBX_INT, O_OPT,	null,	null,		null),
 	// filter
-	'filter_set' =>				array(T_ZBX_STR, O_OPT,		P_ACT,	null,		null),
-	'filter_from' =>			array(T_ZBX_INT, O_OPT,		null,	null,		null),
-	'filter_to' =>				array(T_ZBX_INT, O_OPT,		null,	null,		null),
-	'filter_rolling_week' =>	array(T_ZBX_INT, O_OPT,		null,	null,		null),
-	'filter_failing_tests' =>	array(T_ZBX_INT, O_OPT,		null,	IN('0,1'),	null),
+	'filter_set' =>				array(T_ZBX_STR, O_OPT,	P_ACT,	null,		null),
+	'filter_from' =>			array(T_ZBX_INT, O_OPT,	null,	null,		null),
+	'filter_to' =>				array(T_ZBX_INT, O_OPT,	null,	null,		null),
+	'filter_rolling_week' =>	array(T_ZBX_INT, O_OPT,	null,	null,		null),
+	'filter_failing_tests' =>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
 	// ajax
-	'favobj'=>					array(T_ZBX_STR, O_OPT,	P_ACT,	NULL,		NULL),
-	'favref'=>					array(T_ZBX_STR, O_OPT,	P_ACT,  NOT_EMPTY,	'isset({favobj})'),
-	'favstate'=>				array(T_ZBX_INT, O_OPT,	P_ACT,  NOT_EMPTY,	'isset({favobj})&&("filter"=={favobj})')
+	'favobj' =>					array(T_ZBX_STR, O_OPT,	P_ACT,	null,		null),
+	'favref' =>					array(T_ZBX_STR, O_OPT,	P_ACT,  NOT_EMPTY,	'isset({favobj})'),
+	'favstate' =>				array(T_ZBX_INT, O_OPT,	P_ACT,  NOT_EMPTY,	'isset({favobj})&&("filter"=={favobj})')
 );
 check_fields($fields);
 
 if (isset($_REQUEST['favobj'])) {
 	if('filter' == $_REQUEST['favobj']){
-		CProfile::update('web.dnstest.incidents.filter.state', get_request('favstate'), PROFILE_TYPE_INT);
+		CProfile::update('web.dnstest.incidentdetails.filter.state', get_request('favstate'), PROFILE_TYPE_INT);
 	}
 }
 

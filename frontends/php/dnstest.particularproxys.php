@@ -30,27 +30,12 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'host' =>					array(T_ZBX_STR, O_MAND,	P_SYS,	null,			NULL),
-	'probe' =>					array(T_ZBX_STR, O_MAND,	P_SYS,	null,			NULL),
-	'time' =>					array(T_ZBX_INT, O_MAND,	P_SYS,	DB_ID,			NULL),
-	'slvItemId' =>				array(T_ZBX_INT, O_MAND,	P_SYS,	DB_ID,			NULL),
-	// ajax
-	'favobj'=>					array(T_ZBX_STR, O_OPT,	P_ACT,	NULL,			NULL),
-	'favref'=>					array(T_ZBX_STR, O_OPT,	P_ACT,  NOT_EMPTY,		'isset({favobj})'),
-	'favstate'=>				array(T_ZBX_INT, O_OPT,	P_ACT,  NOT_EMPTY,		'isset({favobj})&&("filter"=={favobj})')
+	'host' =>		array(T_ZBX_STR, O_MAND,	P_SYS,	null,	null),
+	'probe' =>		array(T_ZBX_STR, O_MAND,	P_SYS,	null,	null),
+	'time' =>		array(T_ZBX_INT, O_MAND,	P_SYS,	DB_ID,	null),
+	'slvItemId' =>	array(T_ZBX_INT, O_MAND,	P_SYS,	DB_ID,	null)
 );
 check_fields($fields);
-
-if (isset($_REQUEST['favobj'])) {
-	if('filter' == $_REQUEST['favobj']){
-		CProfile::update('web.dnstest.incidents.filter.state', get_request('favstate'), PROFILE_TYPE_INT);
-	}
-}
-
-if ((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])) {
-	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit();
-}
 
 $data = array();
 $data['proxys'] = array();
