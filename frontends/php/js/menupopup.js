@@ -562,7 +562,7 @@ jQuery(function($) {
 	};
 
 	/**
-	 * Closing menu after delay with check is menu was reactived by mouse over action.
+	 * Closing menu after delay.
 	 *
 	 * @param object menuPopup
 	 * @param int    delay
