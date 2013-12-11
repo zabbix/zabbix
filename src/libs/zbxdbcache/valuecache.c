@@ -3118,7 +3118,7 @@ void	zbx_history_record_vector_destroy(zbx_vector_history_record_t *vector, int 
  * Purpose: frees resources allocated by a cached value                       *
  *                                                                            *
  * Parameters: value      - [IN] the cached value to clear                    *
- *             value_type - [IN] the the history value type                   *
+ *             value_type - [IN] the history value type                       *
  *                                                                            *
  ******************************************************************************/
 void	zbx_history_record_clear(zbx_history_record_t *value, int value_type)
@@ -3144,7 +3144,7 @@ void	zbx_history_record_clear(zbx_history_record_t *value, int value_type)
  * Parameters: buffer     - [OUT] the output buffer                           *
  *             size       - [IN] the output buffer size                       *
  *             value      - [IN] the value to convert                         *
- *             value_type - [IN] the the history value type                   *
+ *             value_type - [IN] the history value type                       *
  *                                                                            *
  ******************************************************************************/
 void	zbx_vc_history_value2str(char *buffer, size_t size, history_value_t *value, int value_type)
