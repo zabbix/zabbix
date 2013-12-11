@@ -437,7 +437,7 @@ elseif (isset($_REQUEST['form'])) {
 		if (!empty($data['templateid'])) {
 			$parentGraphid = $data['templateid'];
 			do {
-				$parentGraph = get_graph_by_graphid($parentGraphid);
+				$parentGraph = getGraphByGraphId($parentGraphid);
 
 				// parent graph prototype link
 				if (get_request('parent_discoveryid')) {

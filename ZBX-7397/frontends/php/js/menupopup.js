@@ -503,7 +503,7 @@ jQuery(function($) {
 				});
 			}
 
-			// skip menu displaing with empty sections
+			// skip displaying empty menu sections
 			if (menuPopup.children().length == 0) {
 				return;
 			}

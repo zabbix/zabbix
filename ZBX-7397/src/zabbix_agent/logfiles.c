@@ -539,7 +539,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 				{
 					if (i == logfiles_num - 1)
 					{
-						ret = SUCCEED;	/* EOF of the the most current file is reached */
+						ret = SUCCEED;	/* EOF of the most current file is reached */
 						break;
 					}
 					else

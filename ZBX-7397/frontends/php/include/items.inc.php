@@ -577,7 +577,7 @@ function resolveItemKeyMacros(array $item) {
 			'selectInterfaces' => array('ip', 'dns', 'useip'),
 			'selectHosts' => array('host', 'name'),
 			'webitems' => true,
-			'output' => API_OUTPUT_REFER,
+			'output' => array('itemid'),
 			'filter' => array('flags' => null)
 		));
 
@@ -1008,18 +1008,24 @@ function formatHistoryValue($value, array $item, $trim = true) {
  * Retrieves from DB historical data for items and applies functional calculations.
  * If fore some reasons fails, returns UNRESOLVED_MACRO_STRING.
  *
- * @param type $item
- * @param type $item['value_type'] type of item, allowed: ITEM_VALUE_TYPE_FLOAT and ITEM_VALUE_TYPE_UINT64
- * @param type $item['itemid'] id of item
- * @param type $item['units'] units of item
- * @param type $function function to apply to time period from param, allowed: min, max and avg
- * @param type $param formatted parameter for function, example: "2w" meaning 2 weeks
+ * @param array		$item
+ * @param string	$item['value_type']	type of item, allowed: ITEM_VALUE_TYPE_FLOAT and ITEM_VALUE_TYPE_UINT64
+ * @param string	$item['itemid']		ID of item
+ * @param string	$item['units']		units of item
+ * @param string	$function			function to apply to time period from param, allowed: min, max and avg
+ * @param string	$parameter			formatted parameter for function, example: "2w" meaning 2 weeks
  *
  * @return string item functional value from history
  */
-function getItemFunctionalValue($item, $function, $param) {
+function getItemFunctionalValue($item, $function, $parameter) {
 	// check whether function is allowed
-	if (!in_array($function, array('min', 'max', 'avg'))) {
+	if (!in_array($function, array('min', 'max', 'avg')) || $parameter === '') {
+		return UNRESOLVED_MACRO_STRING;
+	}
+
+	$parameter = convertFunctionValue($parameter);
+
+	if (bccomp($parameter, 0) == 0) {
 		return UNRESOLVED_MACRO_STRING;
 	}
 
@@ -1034,7 +1040,7 @@ function getItemFunctionalValue($item, $function, $param) {
 		$result = DBselect(
 			'SELECT '.$function.'(value) AS value'.
 			' FROM '.$historyTables[$item['value_type']].
-			' WHERE clock>'.(time() - convertFunctionValue($param)).
+			' WHERE clock>'.(time() - $parameter).
 			' AND itemid='.zbx_dbstr($item['itemid']).
 			' HAVING COUNT(*)>0' // necessary because DBselect() return 0 if empty data set, for graph templates
 		);
