@@ -570,6 +570,15 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 								" Datalen " ZBX_FS_SIZE_T, (zbx_fs_size_t)datalen);
 						recv_proxyconfig(sock, &jp);
 					}
+					else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_ACTIVE))
+					{
+						const char	*msg = "the proxy is configured as \"Active\" but "
+								"server sent configuration data as for a \"Passive\""
+								" proxy";
+
+						zabbix_log(LOG_LEVEL_WARNING, "%s", msg);
+						zbx_send_response(sock, FAIL, msg, CONFIG_TIMEOUT);
+					}
 				}
 				else if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA) ||
 					0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA))

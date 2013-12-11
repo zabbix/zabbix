@@ -104,7 +104,7 @@ int	get_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, ch
 	{
 		if (FAIL == zbx_check_hostname(host))
 		{
-			zbx_snprintf(error, max_error_len, "invalid proxy name [%s]", host);
+			zbx_snprintf(error, max_error_len, "invalid proxy name \"%s\"", host);
 			return ret;
 		}
 
@@ -126,7 +126,7 @@ int	get_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, ch
 			ret = SUCCEED;
 		}
 		else
-			zbx_snprintf(error, max_error_len, "proxy [%s] not found", host);
+			zbx_snprintf(error, max_error_len, "proxy \"%s\" not found", host);
 
 		DBfree_result(result);
 	}
