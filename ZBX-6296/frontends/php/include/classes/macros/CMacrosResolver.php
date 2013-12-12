@@ -831,20 +831,29 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 		unset($item);
 
-		// host macros
-		$itemMacros = array();
+		$macros = $itemIds = array();
 
-		foreach ($items as $item) {
-			$macros = $this->findMacros(self::PATTERN_ITEM_MACROS, array($item['key_expanded']));
+		// host, ip macros
+		foreach ($items as $key => $item) {
+			$matchedMacros = $this->findMacros(self::PATTERN_ITEM_MACROS, array($item['key_expanded']));
 
-			if ($macros) {
-				$itemMacros[$item['itemid']] = $macros;
+			if ($matchedMacros) {
+				$itemIds[$item['itemid']] = $item['itemid'];
+
+				$macros[$key] = array(
+					'itemid' => $item['itemid'],
+					'macros' => array()
+				);
+
+				foreach ($matchedMacros as $macro) {
+					$macros[$key]['macros'][$macro] = null;
+				}
 			}
 		}
 
-		if ($itemMacros) {
+		if ($macros) {
 			$dbItems = API::Item()->get(array(
-				'itemids' => array_keys($itemMacros),
+				'itemids' => $itemIds,
 				'selectInterfaces' => array('ip', 'dns', 'useip'),
 				'selectHosts' => array('host', 'name'),
 				'webitems' => true,
@@ -853,65 +862,99 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				'preservekeys' => true
 			));
 
-			foreach ($dbItems as $dbItem) {
-				$itemId = $dbItem['itemid'];
-				$host = reset($dbItem['hosts']);
-				$interface = reset($dbItem['interfaces']);
+			foreach ($macros as $key => $macroData) {
+				if (isset($dbItems[$macroData['itemid']])) {
+					$host = reset($dbItems[$macroData['itemid']]['hosts']);
+					$interface = reset($dbItems[$macroData['itemid']]['interfaces']);
 
-				// if item without interface or template item, resolve interface related macros to *UNKNOWN*
-				if (!$interface) {
-					$interface = array(
-						'ip' => UNRESOLVED_MACRO_STRING,
-						'dns' => UNRESOLVED_MACRO_STRING,
-						'useip' => false
-					);
-				}
+					// if item without interface or template item, resolve interface related macros to *UNKNOWN*
+					if (!$interface) {
+						$interface = array(
+							'ip' => UNRESOLVED_MACRO_STRING,
+							'dns' => UNRESOLVED_MACRO_STRING,
+							'useip' => false
+						);
+					}
 
-				foreach ($items as &$item) {
-					if ($item['itemid'] == $itemId) {
-						foreach ($itemMacros[$itemId] as $macro) {
-							switch ($macro) {
-								case '{HOST.NAME}':
-									$item['key_expanded'] = str_replace('{HOST.NAME}', $host['name'], $item['key_expanded']);
-									break;
+					foreach ($macroData['macros'] as $macro => $value) {
+						switch ($macro) {
+							case '{HOST.NAME}':
+								$macros[$key]['macros'][$macro] = $host['name'];
+								break;
 
-								case '{HOSTNAME}': // deprecated
-									$item['key_expanded'] = str_replace('{HOSTNAME}', $host['host'], $item['key_expanded']);
-									break;
+							case '{HOSTNAME}': // deprecated
+								$macros[$key]['macros'][$macro] = $host['host'];
+								break;
 
-								case '{HOST.HOST}':
-									$item['key_expanded'] = str_replace('{HOST.HOST}', $host['host'], $item['key_expanded']);
-									break;
+							case '{HOST.HOST}':
+								$macros[$key]['macros'][$macro] = $host['host'];
+								break;
 
-								case '{HOST.IP}':
-									$item['key_expanded'] = str_replace('{HOST.IP}', $interface['ip'], $item['key_expanded']);
-									break;
+							case '{HOST.IP}':
+								$macros[$key]['macros'][$macro] = $interface['ip'];
+								break;
 
-								case '{IPADDRESS}': // deprecated
-									$item['key_expanded'] = str_replace('{IPADDRESS}', $interface['ip'], $item['key_expanded']);
-									break;
+							case '{IPADDRESS}': // deprecated
+								$macros[$key]['macros'][$macro] = $interface['ip'];
+								break;
 
-								case '{HOST.DNS}':
-									$item['key_expanded'] = str_replace('{HOST.DNS}', $interface['dns'], $item['key_expanded']);
-									break;
+							case '{HOST.DNS}':
+								$macros[$key]['macros'][$macro] = $interface['dns'];
+								break;
 
-								case '{HOST.CONN}':
-									$item['key_expanded'] = str_replace(
-										'{HOST.CONN}',
-										$interface['useip'] ? $interface['ip'] : $interface['dns'],
-										$item['key_expanded']
-									);
-									break;
-							}
+							case '{HOST.CONN}':
+								$macros[$key]['macros'][$macro] = $interface['useip'] ? $interface['ip'] : $interface['dns'];
+								break;
 						}
 					}
 				}
-				unset($item);
+
+				unset($macros[$key]['itemid']);
 			}
 		}
 
 		// user macros
-		$items = $this->resolveItemUserMacros($items, 'key_expanded');
+		$userMacros = array();
+
+		foreach ($items as $item) {
+			$matchedMacros = $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, array($item['key_expanded']));
+
+			if ($matchedMacros) {
+				foreach ($matchedMacros as $macro) {
+					if (!isset($userMacros[$item['hostid']])) {
+						$userMacros[$item['hostid']] = array(
+							'hostids' => array($item['hostid']),
+							'macros' => array()
+						);
+					}
+
+					$userMacros[$item['hostid']]['macros'][$macro] = null;
+				}
+			}
+		}
+
+		if ($userMacros) {
+			$userMacros = $this->getUserMacros($userMacros);
+
+			foreach ($items as $key => $item) {
+				if (isset($userMacros[$item['hostid']])) {
+					$macros[$key]['macros'] = isset($macros[$key])
+						? zbx_array_merge($macros[$key]['macros'], $userMacros[$item['hostid']]['macros'])
+						: $userMacros[$item['hostid']]['macros'];
+				}
+			}
+		}
+
+		// replace macros to value
+		if ($macros) {
+			foreach ($macros as $key => $macroData) {
+				$items[$key]['key_expanded'] = str_replace(
+					array_keys($macroData['macros']),
+					array_values($macroData['macros']),
+					$items[$key]['key_expanded']
+				);
+			}
+		}
 
 		return $items;
 	}
