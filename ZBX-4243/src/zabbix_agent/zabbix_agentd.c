@@ -73,6 +73,8 @@ const char	title_message[] = APPLICATION_NAME
 	;
 /* end of application TITLE */
 
+const char	syslog_app_name[] = "zabbix_agentd";
+
 /* application USAGE message */
 const char	usage_message[] =
 	"[-Vhp]"
