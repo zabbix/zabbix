@@ -77,7 +77,7 @@ function valueDistributionFormForMultiplePeriods($items = array()) {
 	$reportForm->addRow(_('Period'), $reporttimetab);
 
 	if ($items) {
-		$items = CMacrosResolverHelper::resolveItemName($items);
+		$items = CMacrosResolverHelper::resolveItemNames($items);
 
 		$items_table = new CTableInfo();
 		foreach ($items as $id => &$item) {
@@ -224,7 +224,7 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 	unset($periods_table, $delete_button);
 
 	if ($items) {
-		$items = CMacrosResolverHelper::resolveItemName($items);
+		$items = CMacrosResolverHelper::resolveItemNames($items);
 
 		$items_table = new CTableInfo();
 		foreach ($items as $id => &$item) {
@@ -416,7 +416,7 @@ function valueComparisonFormForMultiplePeriods() {
 
 	$itemName = '';
 	if ($itemId) {
-		$items = CMacrosResolverHelper::resolveItemName(array(get_item_by_itemid($itemId)));
+		$items = CMacrosResolverHelper::resolveItemNames(array(get_item_by_itemid($itemId)));
 		$item = reset($items);
 
 		$itemName = $item['name_expanded'];

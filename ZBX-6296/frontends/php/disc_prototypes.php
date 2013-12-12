@@ -372,7 +372,7 @@ else {
 		'limit' => $config['search_limit'] + 1
 	));
 
-	$data['items'] = CMacrosResolverHelper::resolveItemName($data['items']);
+	$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
 
 	order_result($data['items'], $sortfield, getPageSortOrder());
 

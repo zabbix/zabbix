@@ -35,7 +35,7 @@ class CPieGraphDraw extends CGraphDraw {
 	/* PRE CONFIG: ADD / SET / APPLY
 	/********************************************************************************************************/
 	public function addItem($itemid, $calc_fnc = CALC_FNC_AVG, $color = null, $type = null) {
-		$items = CMacrosResolverHelper::resolveItemName(array(get_item_by_itemid($itemid)));
+		$items = CMacrosResolverHelper::resolveItemNames(array(get_item_by_itemid($itemid)));
 
 		$this->items[$this->num] = reset($items);
 

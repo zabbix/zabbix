@@ -431,21 +431,18 @@ class CMacrosResolverHelper {
 	 * @param string $items[n]['hostid']
 	 * @param string $items[n]['name']
 	 * @param string $items[n]['key_']
-	 * @param bool   $resolveKeys
+	 * @param string $items[n]['key_expanded']
 	 *
 	 * @return array
 	 */
-	public static function resolveItemName(array $items, $resolveKeys = false) {
+	public static function resolveItemNames(array $items) {
 		self::init();
 
-		return self::$macrosResolver->resolve(array(
-			'config' => $resolveKeys ? 'itemNameAndKey' : 'itemName',
-			'data' => $items
-		));
+		return self::$macrosResolver->resolveItemNames($items);
 	}
 
 	/**
-	 * Resolve user macros in item key.
+	 * Resolve item key macros.
 	 *
 	 * @static
 	 *
@@ -456,34 +453,10 @@ class CMacrosResolverHelper {
 	 *
 	 * @return array
 	 */
-	public static function resolveItemKeyUserMacros(array $items) {
+	public static function resolveItemKeys(array $items) {
 		self::init();
 
-		return self::$macrosResolver->resolve(array(
-			'config' => 'itemKeyUser',
-			'data' => $items
-		));
-	}
-
-	/**
-	 * Resolve user macros in item key.
-	 *
-	 * @static
-	 *
-	 * @param array  $items
-	 * @param string $items[n]['itemid']
-	 * @param string $items[n]['hostid']
-	 * @param string $items[n]['key_']
-	 *
-	 * @return array
-	 */
-	public static function resolveItemKeyUserMacro(array $item) {
-		self::init();
-
-		$items = self::resolveItemKeyUserMacros(array($item));
-		$item = reset($items);
-
-		return $item['key_expanded'];
+		return self::$macrosResolver->resolveItemKeys($items);
 	}
 
 	/**

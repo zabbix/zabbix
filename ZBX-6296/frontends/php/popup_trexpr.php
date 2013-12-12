@@ -623,7 +623,7 @@ if ($itemId) {
 		'filter' => array('flags' => null)
 	));
 
-	$items = CMacrosResolverHelper::resolveItemName($items);
+	$items = CMacrosResolverHelper::resolveItemNames($items);
 
 	$item = reset($items);
 	$itemKey = $item['key_'];

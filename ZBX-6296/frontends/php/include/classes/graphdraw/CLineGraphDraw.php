@@ -100,7 +100,7 @@ class CLineGraphDraw extends CGraphDraw {
 			$drawtype = GRAPH_ITEM_DRAWTYPE_FILLED_REGION;
 		}
 
-		$items = CMacrosResolverHelper::resolveItemName(array(get_item_by_itemid($itemid)));
+		$items = CMacrosResolverHelper::resolveItemNames(array(get_item_by_itemid($itemid)));
 		$item = reset($items);
 
 		$this->items[$this->num] = $item;

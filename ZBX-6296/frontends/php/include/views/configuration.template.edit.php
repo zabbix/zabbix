@@ -204,7 +204,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 	));
 
 	if ($hostItems) {
-		$hostItems = CMacrosResolverHelper::resolveItemName($hostItems);
+		$hostItems = CMacrosResolverHelper::resolveItemNames($hostItems);
 
 		$itemsList = array();
 		foreach ($hostItems as $hostItem) {
@@ -269,7 +269,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 	));
 
 	if ($hostDiscoveryRules) {
-		$hostDiscoveryRules = CMacrosResolverHelper::resolveItemName($hostDiscoveryRules);
+		$hostDiscoveryRules = CMacrosResolverHelper::resolveItemNames($hostDiscoveryRules);
 
 		$discoveryRuleList = array();
 		foreach ($hostDiscoveryRules as $discoveryRule) {
@@ -293,7 +293,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 		));
 
 		if ($hostItemPrototypes) {
-			$hostItemPrototypes = CMacrosResolverHelper::resolveItemName($hostItemPrototypes);
+			$hostItemPrototypes = CMacrosResolverHelper::resolveItemNames($hostItemPrototypes);
 
 			$prototypeList = array();
 			foreach ($hostItemPrototypes as $itemPrototype) {

@@ -1047,7 +1047,7 @@ else {
 		}
 
 		// resolve name macros
-		$data['items'] = CMacrosResolverHelper::resolveItemName($data['items']);
+		$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
 
 		foreach ($data['items'] as &$item) {
 			$item['hostids'] = zbx_objectValues($item['hosts'], 'hostid');

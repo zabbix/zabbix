@@ -157,7 +157,7 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 	));
 
 	if ($items) {
-		$items = CMacrosResolverHelper::resolveItemName($items);
+		$items = CMacrosResolverHelper::resolveItemNames($items);
 
 		$id = $resourceId;
 		$item = reset($items);
@@ -242,7 +242,7 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 	));
 
 	if ($items) {
-		$items = CMacrosResolverHelper::resolveItemName($items);
+		$items = CMacrosResolverHelper::resolveItemNames($items);
 
 		$id = $resourceId;
 		$item = reset($items);
@@ -498,7 +498,7 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 		));
 
 		if ($items) {
-			$items = CMacrosResolverHelper::resolveItemName($items);
+			$items = CMacrosResolverHelper::resolveItemNames($items);
 
 			$item = reset($items);
 			$host = reset($item['hosts']);

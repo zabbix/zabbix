@@ -71,22 +71,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'types' => array('graphFunctionalItem'),
 			'source' => 'name',
 			'method' => 'resolveGraph'
-		),
-		'itemName' => array(
-			'types' => array('itemUser', 'keyHost', 'keyUser'),
-			'method' => 'resolveItems'
-		),
-		'itemNameAndKey' => array(
-			'types' => array('allKeys', 'itemUser', 'keyHost', 'keyUser'),
-			'method' => 'resolveItems'
-		),
-		'itemKey' => array(
-			'types' => array('keyHost', 'keyUser'),
-			'method' => 'resolveItemKeys'
-		),
-		'itemKeyUser' => array(
-			'types' => array('keyUser'),
-			'method' => 'resolveItemKeys'
 		)
 	);
 
@@ -751,17 +735,20 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Resolve item macros.
+	 * Resolve item name macros to "name_expanded" field.
 	 *
 	 * @param array  $items
 	 * @param string $items[n]['itemid']
 	 * @param string $items[n]['hostid']
 	 * @param string $items[n]['name']
 	 * @param string $items[n]['key_']
+	 * @param string $items[n]['key_expanded']
 	 *
 	 * @return array
 	 */
-	private function resolveItems(array $items) {
+	public function resolveItemNames(array $items) {
+		$itemsWithMacros = $resolveKeyItems = array();
+
 		// define resolving fields
 		foreach ($items as &$item) {
 			$item['name_expanded'] = $item['name'];
@@ -769,18 +756,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		unset($item);
 
 		// user macros
-		if ($this->isTypeAvailable('itemUser')) {
-			$items = $this->resolveItemUserMacros($items, 'name_expanded');
-		}
-
-		// macros in item key
-		if ($this->isTypeAvailable('allKeys')) {
-			$items = $this->resolveItemKeys($items);
-		}
+		$items = $this->resolveItemUserMacros($items, 'name_expanded');
 
 		// reference macros - $1..$9
-		$itemsWithMacros = array();
-
 		foreach ($items as $key => $item) {
 			if (preg_match(self::PATTERN_ITEM_NUMBER, $item['name_expanded'])) {
 				$itemsWithMacros[$key] = $item;
@@ -788,11 +766,22 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 
 		if ($itemsWithMacros) {
-			// macros in item key
-			if (!$this->isTypeAvailable('allKeys')) {
-				$itemsWithMacros = $this->resolveItemKeys($itemsWithMacros);
+			// resolve macros in item key
+			foreach ($itemsWithMacros as $key => $item) {
+				if (!isset($item['key_expanded'])) {
+					$resolveKeyItems[$key] = $item;
+				}
 			}
 
+			if ($resolveKeyItems) {
+				$resolveKeyItems = $this->resolveItemKeys($resolveKeyItems);
+
+				foreach ($resolveKeyItems as $key => $item) {
+					$itemsWithMacros[$key] = $item;
+				}
+			}
+
+			// reference macros - $1..$9
 			foreach ($itemsWithMacros as $key => $item) {
 				// parsing key to get the parameters out of it
 				$itemKey = new CItemKey($item['key_expanded']);
@@ -816,18 +805,17 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 		}
 
-		if (!$this->isTypeAvailable('allKeys')) {
-			foreach ($items as &$item) {
-				unset($item['key_expanded']);
+		if ($resolveKeyItems) {
+			foreach ($resolveKeyItems as $key => $item) {
+				unset($items[$key]['key_expanded']);
 			}
-			unset($item);
 		}
 
 		return $items;
 	}
 
 	/**
-	 * Resolve macros in item key.
+	 * Resolve item key macros to "key_expanded" field.
 	 *
 	 * @param array  $items
 	 * @param string $items[n]['itemid']
@@ -836,100 +824,94 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 *
 	 * @return array
 	 */
-	private function resolveItemKeys(array $items) {
+	public function resolveItemKeys(array $items) {
 		// define resolving field
-		if ($this->isTypeAvailable('keyHost') || $this->isTypeAvailable('keyUser')) {
-			foreach ($items as &$item) {
-				$item['key_expanded'] = $item['key_'];
-			}
-			unset($item);
+		foreach ($items as &$item) {
+			$item['key_expanded'] = $item['key_'];
 		}
+		unset($item);
 
 		// host macros
-		if ($this->isTypeAvailable('keyHost')) {
-			$itemMacros = array();
+		$itemMacros = array();
 
-			foreach ($items as $item) {
-				$macros = $this->findMacros(self::PATTERN_ITEM_MACROS, array($item['key_expanded']));
+		foreach ($items as $item) {
+			$macros = $this->findMacros(self::PATTERN_ITEM_MACROS, array($item['key_expanded']));
 
-				if ($macros) {
-					$itemMacros[$item['itemid']] = $macros;
-				}
+			if ($macros) {
+				$itemMacros[$item['itemid']] = $macros;
 			}
+		}
 
-			if ($itemMacros) {
-				$dbItems = API::Item()->get(array(
-					'itemids' => array_keys($itemMacros),
-					'selectInterfaces' => array('ip', 'dns', 'useip'),
-					'selectHosts' => array('host', 'name'),
-					'webitems' => true,
-					'output' => array('itemid'),
-					'filter' => array('flags' => null),
-					'preservekeys' => true
-				));
+		if ($itemMacros) {
+			$dbItems = API::Item()->get(array(
+				'itemids' => array_keys($itemMacros),
+				'selectInterfaces' => array('ip', 'dns', 'useip'),
+				'selectHosts' => array('host', 'name'),
+				'webitems' => true,
+				'output' => array('itemid'),
+				'filter' => array('flags' => null),
+				'preservekeys' => true
+			));
 
-				foreach ($dbItems as $dbItem) {
-					$itemId = $dbItem['itemid'];
-					$host = reset($dbItem['hosts']);
-					$interface = reset($dbItem['interfaces']);
+			foreach ($dbItems as $dbItem) {
+				$itemId = $dbItem['itemid'];
+				$host = reset($dbItem['hosts']);
+				$interface = reset($dbItem['interfaces']);
 
-					// if item without interface or template item, resolve interface related macros to *UNKNOWN*
-					if (!$interface) {
-						$interface = array(
-							'ip' => UNRESOLVED_MACRO_STRING,
-							'dns' => UNRESOLVED_MACRO_STRING,
-							'useip' => false
-						);
-					}
+				// if item without interface or template item, resolve interface related macros to *UNKNOWN*
+				if (!$interface) {
+					$interface = array(
+						'ip' => UNRESOLVED_MACRO_STRING,
+						'dns' => UNRESOLVED_MACRO_STRING,
+						'useip' => false
+					);
+				}
 
-					foreach ($items as &$item) {
-						if ($item['itemid'] == $itemId) {
-							foreach ($itemMacros[$itemId] as $macro) {
-								switch ($macro) {
-									case '{HOST.NAME}':
-										$item['key_expanded'] = str_replace('{HOST.NAME}', $host['name'], $item['key_expanded']);
-										break;
+				foreach ($items as &$item) {
+					if ($item['itemid'] == $itemId) {
+						foreach ($itemMacros[$itemId] as $macro) {
+							switch ($macro) {
+								case '{HOST.NAME}':
+									$item['key_expanded'] = str_replace('{HOST.NAME}', $host['name'], $item['key_expanded']);
+									break;
 
-									case '{HOSTNAME}': // deprecated
-										$item['key_expanded'] = str_replace('{HOSTNAME}', $host['host'], $item['key_expanded']);
-										break;
+								case '{HOSTNAME}': // deprecated
+									$item['key_expanded'] = str_replace('{HOSTNAME}', $host['host'], $item['key_expanded']);
+									break;
 
-									case '{HOST.HOST}':
-										$item['key_expanded'] = str_replace('{HOST.HOST}', $host['host'], $item['key_expanded']);
-										break;
+								case '{HOST.HOST}':
+									$item['key_expanded'] = str_replace('{HOST.HOST}', $host['host'], $item['key_expanded']);
+									break;
 
-									case '{HOST.IP}':
-										$item['key_expanded'] = str_replace('{HOST.IP}', $interface['ip'], $item['key_expanded']);
-										break;
+								case '{HOST.IP}':
+									$item['key_expanded'] = str_replace('{HOST.IP}', $interface['ip'], $item['key_expanded']);
+									break;
 
-									case '{IPADDRESS}': // deprecated
-										$item['key_expanded'] = str_replace('{IPADDRESS}', $interface['ip'], $item['key_expanded']);
-										break;
+								case '{IPADDRESS}': // deprecated
+									$item['key_expanded'] = str_replace('{IPADDRESS}', $interface['ip'], $item['key_expanded']);
+									break;
 
-									case '{HOST.DNS}':
-										$item['key_expanded'] = str_replace('{HOST.DNS}', $interface['dns'], $item['key_expanded']);
-										break;
+								case '{HOST.DNS}':
+									$item['key_expanded'] = str_replace('{HOST.DNS}', $interface['dns'], $item['key_expanded']);
+									break;
 
-									case '{HOST.CONN}':
-										$item['key_expanded'] = str_replace(
-											'{HOST.CONN}',
-											$interface['useip'] ? $interface['ip'] : $interface['dns'],
-											$item['key_expanded']
-										);
-										break;
-								}
+								case '{HOST.CONN}':
+									$item['key_expanded'] = str_replace(
+										'{HOST.CONN}',
+										$interface['useip'] ? $interface['ip'] : $interface['dns'],
+										$item['key_expanded']
+									);
+									break;
 							}
 						}
 					}
-					unset($item);
 				}
+				unset($item);
 			}
 		}
 
 		// user macros
-		if ($this->isTypeAvailable('keyUser')) {
-			$items = $this->resolveItemUserMacros($items, 'key_expanded');
-		}
+		$items = $this->resolveItemUserMacros($items, 'key_expanded');
 
 		return $items;
 	}

@@ -108,7 +108,7 @@ class CScreenHistory extends CScreenBase {
 				'preservekeys' => true
 			));
 
-			$this->items = CMacrosResolverHelper::resolveItemName($this->items);
+			$this->items = CMacrosResolverHelper::resolveItemNames($this->items);
 
 			$this->item = reset($this->items);
 		}

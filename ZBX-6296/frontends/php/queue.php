@@ -195,7 +195,7 @@ elseif ($config == QUEUE_DETAILS) {
 		'preservekeys' => true
 	));
 
-	$items = CMacrosResolverHelper::resolveItemName($items);
+	$items = CMacrosResolverHelper::resolveItemNames($items);
 
 	$table->setHeader(array(
 		_('Scheduled check'),

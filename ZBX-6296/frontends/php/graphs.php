@@ -550,7 +550,7 @@ elseif (isset($_REQUEST['form'])) {
 		}
 		unset($item);
 
-		$data['items'] = CMacrosResolverHelper::resolveItemName($data['items']);
+		$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
 	}
 
 	$_REQUEST['items'] = $data['items'];

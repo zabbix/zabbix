@@ -616,7 +616,7 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 				$sqlWhere
 	));
 
-	$dbItems = CMacrosResolverHelper::resolveItemName($dbItems);
+	$dbItems = CMacrosResolverHelper::resolveItemNames($dbItems);
 
 	CArrayHelper::sort($dbItems, array(
 		array('field' => 'name_expanded', 'order' => ZBX_SORT_UP),

@@ -44,7 +44,7 @@ class CScreenPlainText extends CScreenBase {
 			return $this->getOutput($table);
 		}
 
-		$items = CMacrosResolverHelper::resolveItemName(array(get_item_by_itemid($this->screenitem['resourceid'])));
+		$items = CMacrosResolverHelper::resolveItemNames(array(get_item_by_itemid($this->screenitem['resourceid'])));
 		$item = reset($items);
 
 		switch ($item['value_type']) {

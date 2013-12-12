@@ -748,65 +748,76 @@ function explode_exp($expressionCompressed, $html = false, $resolveMacro = false
 			}
 
 			$state = '';
+			$error = true;
 
-			$sql = 'SELECT h.host,h.hostid,i.itemid,i.key_,f.function,f.triggerid,f.parameter,i.itemid,i.status,i.type,i.flags'.
+			if (is_numeric($functionId)) {
+				$functionData = DBfetch(DBselect(
+					'SELECT h.host,h.hostid,i.itemid,i.key_,f.function,f.triggerid,f.parameter,i.itemid,i.status,i.type,i.flags'.
 					' FROM items i,functions f,hosts h'.
 					' WHERE f.functionid='.zbx_dbstr($functionId).
 						' AND i.itemid=f.itemid'.
-						' AND h.hostid=i.hostid';
+						' AND h.hostid=i.hostid'
+				));
 
-			if (is_numeric($functionId) && $functionData = DBfetch(DBselect($sql))) {
-				if ($resolveMacro) {
-					$trigger = $functionData;
+				if ($functionData) {
+					$error = false;
 
-					$functionData['key_'] = CMacrosResolverHelper::resolveItemKeyUserMacro($functionData);
-					$functionData['expression'] = $functionData['parameter'];
-					$functionData['expression'] = CMacrosResolverHelper::resolveTriggerExpressionUserMacro($functionData);
-					$functionData['parameter'] = $functionData['expression'];
-				}
+					if ($resolveMacro) {
+						$trigger = $functionData;
 
-				if ($sourceHost !== null && $destinationHost !== null && $sourceHost === $functionData['host']) {
-					$functionData['host'] = $destinationHost;
-				}
+						$items = CMacrosResolverHelper::resolveItemKeys(array($functionData));
+						$item = reset($items);
 
-				if ($html) {
-					if ($functionData['status'] == ITEM_STATUS_DISABLED) {
-						$style = 'disabled';
+						$functionData['key_'] = $item['key_expanded'];
+						$functionData['expression'] = $functionData['parameter'];
+						$functionData['expression'] = CMacrosResolverHelper::resolveTriggerExpressionUserMacro($functionData);
+						$functionData['parameter'] = $functionData['expression'];
 					}
-					elseif ($functionData['status'] == ITEM_STATUS_ACTIVE) {
-						$style = 'enabled';
+
+					if ($sourceHost !== null && $destinationHost !== null && $sourceHost === $functionData['host']) {
+						$functionData['host'] = $destinationHost;
+					}
+
+					if ($html) {
+						if ($functionData['status'] == ITEM_STATUS_DISABLED) {
+							$style = 'disabled';
+						}
+						elseif ($functionData['status'] == ITEM_STATUS_ACTIVE) {
+							$style = 'enabled';
+						}
+						else {
+							$style = 'unknown';
+						}
+
+						if ($functionData['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $functionData['type'] == ITEM_TYPE_HTTPTEST) {
+							$link = new CSpan($functionData['host'].':'.$functionData['key_'], $style);
+						}
+						elseif ($functionData['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+							$link = new CLink(
+								$functionData['host'].':'.$functionData['key_'],
+								'disc_prototypes.php?form=update&itemid='.$functionData['itemid'].'&parent_discoveryid='.
+									$trigger['discoveryRuleid'].'&switch_node='.id2nodeid($functionData['itemid']),
+								$style
+							);
+						}
+						else {
+							$link = new CLink(
+								$functionData['host'].':'.$functionData['key_'],
+								'items.php?form=update&itemid='.$functionData['itemid'].'&switch_node='.
+									id2nodeid($functionData['itemid']),
+								$style
+							);
+						}
+
+						$expressionExpanded[] = array('{', $link,'.', bold($functionData['function'].'('), $functionData['parameter'], bold(')'), '}');
 					}
 					else {
-						$style = 'unknown';
+						$expressionExpanded .= '{'.$functionData['host'].':'.$functionData['key_'].'.'.$functionData['function'].'('.$functionData['parameter'].')}';
 					}
-
-					if ($functionData['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $functionData['type'] == ITEM_TYPE_HTTPTEST) {
-						$link = new CSpan($functionData['host'].':'.$functionData['key_'], $style);
-					}
-					elseif ($functionData['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$link = new CLink(
-							$functionData['host'].':'.$functionData['key_'],
-							'disc_prototypes.php?form=update&itemid='.$functionData['itemid'].'&parent_discoveryid='.
-								$trigger['discoveryRuleid'].'&switch_node='.id2nodeid($functionData['itemid']),
-							$style
-						);
-					}
-					else {
-						$link = new CLink(
-							$functionData['host'].':'.$functionData['key_'],
-							'items.php?form=update&itemid='.$functionData['itemid'].'&switch_node='.
-								id2nodeid($functionData['itemid']),
-							$style
-						);
-					}
-
-					$expressionExpanded[] = array('{', $link,'.', bold($functionData['function'].'('), $functionData['parameter'], bold(')'), '}');
-				}
-				else {
-					$expressionExpanded .= '{'.$functionData['host'].':'.$functionData['key_'].'.'.$functionData['function'].'('.$functionData['parameter'].')}';
 				}
 			}
-			else {
+
+			if ($error) {
 				if ($html) {
 					$expressionExpanded[] = new CSpan('*ERROR*', 'on');
 				}
@@ -1361,7 +1372,7 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 				' AND f.triggerid='.zbx_dbstr($trigger['triggerid'])
 		));
 
-		$dbItems = CMacrosResolverHelper::resolveItemName($dbItems);
+		$dbItems = CMacrosResolverHelper::resolveItemNames($dbItems);
 
 		foreach ($dbItems as $dbItem) {
 			$triggerItems[] = array(

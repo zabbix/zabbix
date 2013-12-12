@@ -255,7 +255,7 @@ if(isset($_REQUEST['sform'])){
 	$itemName = '';
 
 	$dbItems = DBfetchArray(DBselect('SELECT DISTINCT * FROM items WHERE itemid='.zbx_dbstr($itemid)));
-	$dbItems = CMacrosResolverHelper::resolveItemName($dbItems);
+	$dbItems = CMacrosResolverHelper::resolveItemNames($dbItems);
 	$dbItem = reset($dbItems);
 
 	if ($dbItem['templateid']) {

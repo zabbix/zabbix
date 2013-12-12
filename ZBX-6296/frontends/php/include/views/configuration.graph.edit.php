@@ -113,7 +113,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		if (!empty($this->data['ymin_itemid'])) {
 			$min_host = get_host_by_itemid($this->data['ymin_itemid']);
 
-			$minItems = CMacrosResolverHelper::resolveItemName(array(get_item_by_itemid($this->data['ymin_itemid'])));
+			$minItems = CMacrosResolverHelper::resolveItemNames(array(get_item_by_itemid($this->data['ymin_itemid'])));
 			$minItem = reset($minItems);
 
 			$ymin_name = $min_host['name'].NAME_DELIMITER.$minItem['name_expanded'];
@@ -171,7 +171,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		if (!empty($this->data['ymax_itemid'])) {
 			$max_host = get_host_by_itemid($this->data['ymax_itemid']);
 
-			$maxItems = CMacrosResolverHelper::resolveItemName(array(get_item_by_itemid($this->data['ymax_itemid'])));
+			$maxItems = CMacrosResolverHelper::resolveItemNames(array(get_item_by_itemid($this->data['ymax_itemid'])));
 			$maxItem = reset($maxItems);
 
 			$ymax_name = $max_host['name'].NAME_DELIMITER.$maxItem['name_expanded'];

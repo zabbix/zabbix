@@ -64,7 +64,7 @@ function make_favorite_graphs() {
 		));
 		$items = zbx_toHash($items, 'itemid');
 
-		$items = CMacrosResolverHelper::resolveItemName($items);
+		$items = CMacrosResolverHelper::resolveItemNames($items);
 	}
 
 	foreach ($fav_graphs as $favorite) {
@@ -1264,7 +1264,7 @@ function make_graph_submenu() {
 			'preservekeys' => true
 		));
 
-		$items = CMacrosResolverHelper::resolveItemName($items);
+		$items = CMacrosResolverHelper::resolveItemNames($items);
 	}
 
 	foreach ($fav_graphs as $favorite) {

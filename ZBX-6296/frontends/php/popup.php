@@ -844,7 +844,7 @@ elseif ($srctbl == 'items') {
 	$items = API::Item()->get($options);
 	order_result($items, 'name', ZBX_SORT_UP);
 
-	$items = CMacrosResolverHelper::resolveItemName($items);
+	$items = CMacrosResolverHelper::resolveItemNames($items);
 
 	if ($multiselect) {
 		$jsItems = array();
@@ -954,7 +954,7 @@ elseif ($srctbl == 'prototypes') {
 	$items = API::ItemPrototype()->get($options);
 	order_result($items, 'name');
 
-	$items = CMacrosResolverHelper::resolveItemName($items);
+	$items = CMacrosResolverHelper::resolveItemNames($items);
 
 	foreach ($items as &$item) {
 		$host = reset($item['hosts']);

@@ -568,7 +568,7 @@ foreach ($triggers as $trigger) {
 
 	$triggerItems = array();
 
-	$trigger['items'] = CMacrosResolverHelper::resolveItemName($trigger['items']);
+	$trigger['items'] = CMacrosResolverHelper::resolveItemNames($trigger['items']);
 
 	foreach ($trigger['items'] as $item) {
 		$triggerItems[] = array(
