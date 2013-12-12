@@ -326,10 +326,10 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
  *                                                                            *
  ******************************************************************************/
 static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost,
-		int *host_status, char *ip, const char *dns)
+		int *host_status, char *ip, const char *dns, int now)
 {
 	const char	*__function_name = "process_check";
-	int		port, first, last, now;
+	int		port, first, last;
 	char		*curr_range, *next_range, *last_port;
 	int		status;
 	char		value[DSERVICE_VALUE_LEN_MAX];
@@ -367,8 +367,6 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost,
 			if (-1 == *host_status || DOBJECT_STATUS_UP == status)
 				*host_status = status;
 
-			now = time(NULL);
-
 			DBbegin();
 
 			if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
@@ -391,7 +389,7 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost,
  *                                                                            *
  ******************************************************************************/
 static void	process_checks(DB_DRULE *drule, DB_DHOST *dhost, int *host_status,
-		char *ip, const char *dns, int unique)
+		char *ip, const char *dns, int unique, int now)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -434,7 +432,7 @@ static void	process_checks(DB_DRULE *drule, DB_DHOST *dhost, int *host_status,
 		dcheck.ports = row[10];
 		dcheck.snmpv3_contextname = row[11];
 
-		process_check(drule, &dcheck, dhost, host_status, ip, dns);
+		process_check(drule, &dcheck, dhost, host_status, ip, dns, now);
 	}
 	DBfree_result(result);
 }
@@ -652,8 +650,8 @@ static void	process_rule(DB_DRULE *drule)
 			alarm(0);
 
 			if (drule->unique_dcheckid)
-				process_checks(drule, &dhost, &host_status, ip, dns, 1);
-			process_checks(drule, &dhost, &host_status, ip, dns, 0);
+				process_checks(drule, &dhost, &host_status, ip, dns, 1, now);
+			process_checks(drule, &dhost, &host_status, ip, dns, 0, now);
 
 			DBbegin();
 
