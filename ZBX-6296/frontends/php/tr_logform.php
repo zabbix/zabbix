@@ -254,7 +254,11 @@ if(isset($_REQUEST['sform'])){
 
 	$itemName = '';
 
-	$dbItems = DBfetchArray(DBselect('SELECT DISTINCT * FROM items WHERE itemid='.zbx_dbstr($itemid)));
+	$dbItems = DBfetchArray(DBselect(
+		'SELECT itemid,hostid,name,key_,templateid'.
+		' FROM items'.
+		' WHERE itemid='.zbx_dbstr($itemid)
+	));
 	$dbItems = CMacrosResolverHelper::resolveItemNames($dbItems);
 	$dbItem = reset($dbItems);
 

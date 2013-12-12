@@ -1366,7 +1366,7 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 		}
 
 		$dbItems = DBfetchArray(DBselect(
-			'SELECT DISTINCT i.itemid,i.name,i.key_,i.value_type'.
+			'SELECT DISTINCT i.itemid,i.hostid,i.name,i.key_,i.value_type'.
 			' FROM items i,functions f'.
 			' WHERE f.itemid=i.itemid'.
 				' AND f.triggerid='.zbx_dbstr($trigger['triggerid'])

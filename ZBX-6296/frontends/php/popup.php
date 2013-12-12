@@ -825,8 +825,7 @@ elseif ($srctbl == 'items') {
 		'hostids' => $hostid,
 		'webitems' => true,
 		'output' => array('itemid', 'hostid', 'name', 'key_', 'type', 'value_type', 'status', 'state'),
-		'selectHosts' => array('hostid', 'name'),
-		'preservekeys' => true
+		'selectHosts' => array('hostid', 'name')
 	);
 	if (!is_null($normalOnly)) {
 		$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
@@ -842,9 +841,10 @@ elseif ($srctbl == 'items') {
 	}
 
 	$items = API::Item()->get($options);
-	order_result($items, 'name', ZBX_SORT_UP);
 
 	$items = CMacrosResolverHelper::resolveItemNames($items);
+
+	order_result($items, 'name_expanded');
 
 	if ($multiselect) {
 		$jsItems = array();
@@ -952,9 +952,10 @@ elseif ($srctbl == 'prototypes') {
 	}
 
 	$items = API::ItemPrototype()->get($options);
-	order_result($items, 'name');
 
 	$items = CMacrosResolverHelper::resolveItemNames($items);
+
+	order_result($items, 'name_expanded');
 
 	foreach ($items as &$item) {
 		$host = reset($item['hosts']);

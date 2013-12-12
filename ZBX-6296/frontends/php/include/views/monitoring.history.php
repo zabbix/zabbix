@@ -27,8 +27,8 @@ $header = array('left' => count($this->data['items']).SPACE._('ITEMS'), 'right' 
 $headerPlaintext = array();
 
 if (count($this->data['items']) == 1) {
-	$header['left'] = array(new CLink($this->data['item']['hostname'], 'latest.php?hostid='.$this->data['item']['hostid']), NAME_DELIMITER, $this->data['item']['name']);
-	$headerPlaintext[] = $this->data['item']['hostname'].NAME_DELIMITER.$this->data['item']['name'];
+	$header['left'] = array(new CLink($this->data['item']['hostname'], 'latest.php?hostid='.$this->data['item']['hostid']), NAME_DELIMITER, $this->data['item']['name_expanded']);
+	$headerPlaintext[] = $this->data['item']['hostname'].NAME_DELIMITER.$this->data['item']['name_expanded'];
 
 	if ($this->data['action'] == 'showgraph') {
 		$header['right'][] = get_icon('favourite', array(
@@ -89,7 +89,7 @@ if ($this->data['action'] == 'showvalues' || $this->data['action'] == 'showlates
 
 			$host = reset($item['hosts']);
 			$itemsData[$itemid]['id'] = $itemid;
-			$itemsData[$itemid]['name'] = $host['name'].NAME_DELIMITER.$item['name'];
+			$itemsData[$itemid]['name'] = $host['name'].NAME_DELIMITER.$item['name_expanded'];
 		}
 
 		order_result($itemsData, 'name');
