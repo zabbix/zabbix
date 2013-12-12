@@ -1135,6 +1135,7 @@ class CHost extends CHostGeneral {
 
 		// second check is necessary, because import incorrectly inputs unset 'inventory' as empty string rather than null
 		if (isset($data['inventory']) && $data['inventory']) {
+			echo 'inventory ir un nav tukšs<br>';
 			$updateInventory = $data['inventory'];
 			$updateInventory['inventory_mode'] = null;
 
@@ -1148,7 +1149,10 @@ class CHost extends CHostGeneral {
 				$updateInventory = array();
 			}
 			$updateInventory['inventory_mode'] = $data['inventory_mode'];
+			echo 'ir inventory more iesetots<br>';
 		}
+
+		echo '$updateInventory:<br><pre>'; print_r($updateInventory); echo '</pre>';
 
 		if (isset($data['status'])) {
 			$updateStatus = $data['status'];
@@ -1287,6 +1291,7 @@ class CHost extends CHostGeneral {
 				}
 			}
 			else {
+				echo '$updateInventory inventory mode ir ['.$updateInventory['inventory_mode'].']<br>';
 				$hostsWithInventories = array();
 				$existingInventoriesDb = DBfetchArrayAssoc(DBselect(
 					'SELECT hostid,inventory_mode'.
@@ -1296,6 +1301,7 @@ class CHost extends CHostGeneral {
 
 				// check for hosts with disabled inventory mode
 				if ($updateInventory['inventory_mode'] === null) {
+					echo 'mode nav uzsetots';
 					foreach ($hostids as $hostId) {
 						if (!isset($existingInventoriesDb[$hostId])) {
 							$host = get_host_by_hostid($hostId);
@@ -1303,7 +1309,7 @@ class CHost extends CHostGeneral {
 								_s('Inventory disabled for host "%s".', $host['host']));
 						}
 						else {
-							$updateInventory['inventory_mode'] = $existingInventoriesDb[$hostId]['inventory_mode'];
+							unset($updateInventory['inventory_mode']);
 						}
 					}
 				}
@@ -1314,7 +1320,8 @@ class CHost extends CHostGeneral {
 				// when hosts are being updated to use automatic mode for host inventories,
 				// we must check if some items are set to populate inventory fields of every host.
 				// if they do, mass update for those fields should be ignored
-				if ($updateInventory['inventory_mode'] == HOST_INVENTORY_AUTOMATIC) {
+				if (isset($updateInventory['inventory_mode'])
+						&& $updateInventory['inventory_mode'] == HOST_INVENTORY_AUTOMATIC) {
 					// getting all items on all affected hosts
 					$itemsToInventories = API::item()->get(array(
 						'output' => array('inventory_link', 'hostid'),
