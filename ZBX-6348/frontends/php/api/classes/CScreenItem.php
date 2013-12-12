@@ -468,7 +468,7 @@ class CScreenItem extends CZBXAPI {
 				$screens[] = $screenItem['resourceid'];
 			}
 			elseif ($screenItem['resourcetype'] == SCREEN_RESOURCE_URL) {
-				if (!$screenItem['url']) {
+				if (zbx_empty($screenItem['url'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No URL provided for screen element.'));
 				}
 			}
