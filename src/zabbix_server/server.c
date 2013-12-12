@@ -66,6 +66,7 @@
 
 const char	*progname = NULL;
 const char	title_message[] = "Zabbix server";
+const char	syslog_app_name[] = "zabbix_server";
 const char	usage_message[] = "[-hV] [-c <file>] [-n <nodeid>] [-R <option>]";
 
 const char	*help_message[] = {
