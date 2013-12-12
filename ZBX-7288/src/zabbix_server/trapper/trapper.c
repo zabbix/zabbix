@@ -474,6 +474,15 @@ out:
 	return ret;
 }
 
+static void	active_passive_misconfig(zbx_sock_t *sock)
+{
+	const char	*msg = "misconfiguration error: the proxy is running in the active mode but server sends "
+			"requests to it as to proxy in passive mode";
+
+	zabbix_log(LOG_LEVEL_WARNING, "%s", msg);
+	zbx_send_response(sock, FAIL, msg, CONFIG_TIMEOUT);
+}
+
 static int	process_trap(zbx_sock_t	*sock, char *s)
 {
 	char	*pl, *pr, *data, value_dec[MAX_BUFFER_LEN];
@@ -563,7 +572,9 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 				if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_CONFIG))
 				{
 					if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+					{
 						send_proxyconfig(sock, &jp);
+					}
 					else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "Received configuration data from server."
@@ -572,12 +583,12 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 					}
 					else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_ACTIVE))
 					{
-						const char	*msg = "the proxy is configured as \"Active\" but "
-								"server sent configuration data as for a \"Passive\""
-								" proxy";
-
-						zabbix_log(LOG_LEVEL_WARNING, "%s", msg);
-						zbx_send_response(sock, FAIL, msg, CONFIG_TIMEOUT);
+						/* This is a misconfiguration: the proxy is configured in active mode */
+						/* but server sends requests to it as to a proxy in passive mode. To  */
+						/* prevent logging of this problem for every request we report it     */
+						/* only when the server sends configuration to the proxy and ignore   */
+						/* it for other requests.                                             */
+						active_passive_misconfig(sock);
 					}
 				}
 				else if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA) ||
