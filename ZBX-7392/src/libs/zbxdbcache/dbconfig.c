@@ -2826,6 +2826,7 @@ void	DCsync_configuration(void)
 	DBfree_result(gmacro_result);
 	DBfree_result(hmacro_result);
 	DBfree_result(if_result);
+	DBfree_result(expr_result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -4527,7 +4528,7 @@ int	DChost_activate(zbx_host_availability_t *in, zbx_host_availability_t *out)
 	ZBX_DC_HOST	*dc_host;
 
 	/* don't try activating host if there were no errors detected */
-	if (0 == in->errors_from)
+	if (0 == in->errors_from && HOST_AVAILABLE_TRUE == in->available)
 		goto out;
 
 	LOCK_CACHE;

@@ -31,7 +31,7 @@ EXTRA_DIST = \
 	osf/osf.c osf/hostname.c \
 	osx/osx.c osx/hostname.c \
 	solaris/solaris.c solaris/hostname.c \
-	unknown/unknown.c \
+	unknown/unknown.c unknown/hostname.c \
 	win32
 
 noinst_LIBRARIES = \

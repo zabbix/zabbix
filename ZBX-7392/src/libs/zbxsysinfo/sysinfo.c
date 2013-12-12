@@ -427,13 +427,49 @@ void	test_parameters()
 	test_aliases();
 }
 
+static int	zbx_check_user_parameter(const char *param, char *error, int max_error_len)
+{
+	const char	suppressed_chars[] = "\\'\"`*?[]{}~$!&;()<>|#@\n", *c;
+	char		*buf = NULL;
+	size_t		buf_alloc = 128, buf_offset = 0;
+
+	if (0 != CONFIG_UNSAFE_USER_PARAMETERS)
+		return SUCCEED;
+
+	for (c = suppressed_chars; '\0' != *c; c++)
+	{
+		if (NULL == strchr(param, *c))
+			continue;
+
+		buf = zbx_malloc(buf, buf_alloc);
+
+		for (c = suppressed_chars; '\0' != *c; c++)
+		{
+			if (c != suppressed_chars)
+				zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, ", ");
+
+			if (0 != isprint(*c))
+				zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, *c);
+			else
+				zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "0x%02x", *c);
+		}
+
+		zbx_snprintf(error, max_error_len, "special characters \"%s\" are not allowed in the parameters", buf);
+
+		zbx_free(buf);
+
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 static int	replace_param(const char *cmd, const char *param, char *out, int outlen, char *error, int max_error_len)
 {
-	int		ret = SUCCEED;
-	char		buf[MAX_STRING_LEN];
-	char		command[MAX_STRING_LEN];
-	char		*pl, *pr;
-	const char	suppressed_chars[] = "\\'\"`*?[]{}~$!&;()<>|#@", *c;
+	int	ret = SUCCEED;
+	char	buf[MAX_STRING_LEN];
+	char	command[MAX_STRING_LEN];
+	char	*pl, *pr;
 
 	assert(out);
 
@@ -465,24 +501,9 @@ static int	replace_param(const char *cmd, const char *param, char *out, int outl
 			{
 				get_param(param, (int)(pr[1] - '0'), buf, sizeof(buf));
 
-				if (0 == CONFIG_UNSAFE_USER_PARAMETERS)
-				{
-					for (c = suppressed_chars; '\0' != *c; c++)
-					{
-						if (NULL != strchr(buf, *c))
-						{
-							zbx_snprintf(error, max_error_len, "Special characters '%s'"
-									" are not allowed in the parameters",
-									suppressed_chars);
-							ret = FAIL;
-							break;
-						}
-					}
-				}
+				if (SUCCEED != (ret = zbx_check_user_parameter(buf, error, max_error_len)))
+					break;
 			}
-
-			if (FAIL == ret)
-				break;
 
 			zbx_strlcat(out, buf, outlen);
 			outlen -= MIN((int)strlen(buf), (int)outlen);

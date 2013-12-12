@@ -361,9 +361,8 @@ out:
  *                                                                            *
  * Author: Dmitry Borovikov (logrotation)                                     *
  *                                                                            *
- * Comments:                                                                  *
- *    This function allocates memory for 'value', because use zbx_free.       *
- *    Return SUCCEED and NULL value if end of file received.                  *
+ * Comments: This function allocates memory for 'value', so use zbx_free().   *
+ *           Return SUCCEED and NULL 'value' if end of file received.         *
  *                                                                            *
  ******************************************************************************/
 int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **value, const char *encoding,
@@ -539,7 +538,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 				{
 					if (i == logfiles_num - 1)
 					{
-						ret = SUCCEED;	/* EOF of the the most current file is reached */
+						ret = SUCCEED;	/* EOF of the most current file is reached */
 						break;
 					}
 					else
@@ -547,7 +546,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 						zbx_free(logfile_candidate);
 						*lastlogsize = 0;
 						close(fd);
-						continue;	/* try to read from more current file */
+						continue;	/* try to read from a more current file */
 					}
 				}
 			}
@@ -605,9 +604,8 @@ out:
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *    This function allocates memory for 'value', because use zbx_free.       *
- *    Return SUCCEED and NULL value if end of file received.                  *
+ * Comments: This function allocates memory for 'value', so use zbx_free().   *
+ *           Return SUCCEED and NULL 'value' if end of file received.         *
  *                                                                            *
  ******************************************************************************/
 int	process_log(char *filename, zbx_uint64_t *lastlogsize, char **value, const char *encoding,

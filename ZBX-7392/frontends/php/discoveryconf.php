@@ -32,7 +32,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'druleid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'druleid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})&&{form}=="update"'),
 	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})'),
 	'proxy_hostid' =>	array(T_ZBX_INT, O_OPT, null,	DB_ID,		'isset({save})'),
 	'iprange' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
@@ -163,20 +163,32 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['druleid'])) {
 		clearCookies($result);
 	}
 }
-elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['g_druleid'])) {
-	$status = ($_REQUEST['go'] == 'activate') ? DRULE_STATUS_ACTIVE : DRULE_STATUS_DISABLED;
+elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('g_druleid')) {
+	$result = true;
+	$enable = (getRequest('go') == 'activate');
+	$status = $enable ? DRULE_STATUS_ACTIVE : DRULE_STATUS_DISABLED;
+	$auditAction = $enable ? AUDIT_ACTION_ENABLE : AUDIT_ACTION_DISABLE;
+	$updated = 0;
 
-	$goResult = false;
-	foreach ($_REQUEST['g_druleid'] as $drid) {
-		if (DBexecute('UPDATE drules SET status='.$status.' WHERE druleid='.zbx_dbstr($drid))) {
-			$rule_data = get_discovery_rule_by_druleid($drid);
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_DISCOVERY_RULE, '['.$drid.'] '.$rule_data['name']);
-			$goResult = true;
+	foreach (getRequest('g_druleid') as $druleId) {
+		$result &= DBexecute('UPDATE drules SET status='.$status.' WHERE druleid='.zbx_dbstr($druleId));
+
+		if ($result) {
+			$druleData = get_discovery_rule_by_druleid($druleId);
+			add_audit($auditAction, AUDIT_RESOURCE_DISCOVERY_RULE, '['.$druleId.'] '.$druleData['name']);
 		}
+		$updated++;
 	}
 
-	show_messages($goResult, _('Discovery rules updated'));
-	clearCookies($goResult);
+	$messageSuccess = $enable
+		? _n('Discovery rule enabled', 'Discovery rules enabled', $updated)
+		: _n('Discovery rule disabled', 'Discovery rules disabled', $updated);
+	$messageFailed = $enable
+		? _n('Cannot enable discovery rule', 'Cannot enable discovery rules', $updated)
+		: _n('Cannot disable discovery rule', 'Cannot disable discovery rules', $updated);
+
+	show_messages($result, $messageSuccess, $messageFailed);
+	clearCookies($result);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_druleid'])) {
 	$result = API::DRule()->delete($_REQUEST['g_druleid']);
