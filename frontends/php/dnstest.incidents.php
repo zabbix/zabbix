@@ -377,6 +377,7 @@ if ($host || $data['filter_search']) {
 								$data[$itemType]['events'][$i]['startTime'],
 								$data[$itemType]['events'][$i]['endTime']
 							);
+
 							$data[$itemType]['events'][$i]['rollingWeekHistory'] = getCount(
 								$itemId,
 								$itemType,
@@ -405,6 +406,13 @@ if ($host || $data['filter_search']) {
 									'itemId' => $rddsAvailItem
 								);
 							}
+
+							$data[$itemInfo['itemType']]['events'][$i]['incidentHistory'] = getCount(
+								$itemInfo['itemId'],
+								$itemInfo['itemType'],
+								$data[$itemInfo['itemType']]['events'][$i]['startTime'],
+								$filterTimeTill
+							);
 
 							$data[$itemInfo['itemType']]['events'][$i]['rollingWeekHistory'] = getCount(
 								$itemInfo['itemId'],
@@ -555,6 +563,7 @@ if ($host || $data['filter_search']) {
 						$data[$itemType]['events'][$i]['startTime'],
 						$data[$itemType]['events'][$i]['endTime']
 					);
+
 					$data[$itemType]['events'][$i]['rollingWeekHistory'] = getCount(
 						$itemId,
 						$itemType,
@@ -620,6 +629,7 @@ if ($host || $data['filter_search']) {
 						$data[$itemType]['events'][$i]['startTime'],
 						$data[$itemType]['events'][$i]['endTime']
 					);
+
 					$data[$itemType]['events'][$i]['rollingWeekHistory'] = getCount(
 						$itemId,
 						$itemType,
@@ -648,6 +658,13 @@ if ($host || $data['filter_search']) {
 							'itemId' => $rddsAvailItem
 						);
 					}
+
+					$data[$itemInfo['itemType']]['events'][$i]['incidentHistory'] = getCount(
+						$itemInfo['itemId'],
+						$itemInfo['itemType'],
+						$data[$itemInfo['itemType']]['events'][$i]['startTime'],
+						$filterTimeTill
+					);
 
 					$data[$itemInfo['itemType']]['events'][$i]['rollingWeekHistory'] = getCount(
 						$itemInfo['itemId'],

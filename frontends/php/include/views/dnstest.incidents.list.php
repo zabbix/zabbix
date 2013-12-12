@@ -195,8 +195,8 @@ $headers = array(
 	_('Status'),
 	_('Start time'),
 	_('End Time'),
-	_('Incident duration time'),
-	_('Input into rolling week'),
+	_('Total number of tests'),
+	_('Failed tests within incident'),
 	_('Service ticket')
 );
 $noData = _('No incidents found.');
@@ -238,19 +238,19 @@ if (isset($this->data['tld'])) {
 			$dnsTable->addRow($row);
 		}
 
-		$minutesDown = new CLink(
+		$testsDown = new CLink(
 			$this->data['dns']['incidentTotal'],
 			'dnstest.tests.php?filter_from='.$this->data['filter_from'].'&filter_to='.$this->data['filter_to'].
 				'&filter_set=1&host='.$this->data['tld']['host'].'&type=0&slvItemId='.$this->data['dns']['itemid']
 		);
 
 		$testsInfo = array(
-			_('Minutes down'),
+			_('Tests are down'),
 			':',
 			SPACE,
-			$minutesDown,
+			$testsDown,
 			SPACE,
-			_n('minute', 'minutes', $this->data['dns']['incidentTotal']),
+			_n('test', 'tests', $this->data['dns']['incidentTotal']),
 			'('._s(
 				'%1$s in incidents, %2$s outside incidents',
 				$this->data['dns']['inIncident'],
@@ -259,12 +259,6 @@ if (isset($this->data['tld'])) {
 		);
 
 		$details = new CSpan(array(
-			_s(
-				'From %1$s till %2$s',
-				date('d.m.Y H:i:s', zbxDateToTime($this->data['filter_from'])),
-				date('d.m.Y H:i:s', zbxDateToTime($this->data['filter_to']))
-			),
-			BR(),
 			_s(
 				'Incidents: %1$s',
 				isset($this->data['dns']) ? count($this->data['dns']['events']) : 0
@@ -316,19 +310,19 @@ if (isset($this->data['tld'])) {
 		}
 
 
-		$minutesDown = new CLink(
+		$testsDown = new CLink(
 			$this->data['dnssec']['incidentTotal'],
 			'dnstest.tests.php?filter_from='.$this->data['filter_from'].'&filter_to='.$this->data['filter_to'].
 				'&filter_set=1&host='.$this->data['tld']['host'].'&type=1&slvItemId='.$this->data['dnssec']['itemid']
 		);
 
 		$testsInfo = array(
-			_('Minutes down'),
+			_('Tests are down'),
 			':',
 			SPACE,
-			$minutesDown,
+			$testsDown,
 			SPACE,
-			_n('minute', 'minutes', $this->data['dnssec']['incidentTotal']),
+			_n('test', 'tests', $this->data['dnssec']['incidentTotal']),
 			'('._s(
 				'%1$s in incidents, %2$s outside incidents',
 				$this->data['dnssec']['inIncident'],
@@ -337,12 +331,6 @@ if (isset($this->data['tld'])) {
 		);
 
 		$details = new CSpan(array(
-			_s(
-				'From %1$s till %2$s',
-				date('d.m.Y H:i:s', zbxDateToTime($this->data['filter_from'])),
-				date('d.m.Y H:i:s', zbxDateToTime($this->data['filter_to']))
-			),
-			BR(),
 			_s(
 				'Incidents: %1$s',
 				isset($this->data['dnssec']) ? count($this->data['dnssec']['events']) : 0
@@ -393,19 +381,19 @@ if (isset($this->data['tld'])) {
 			$rddsTable->addRow($row);
 		}
 
-		$minutesDown = new CLink(
+		$testsDown = new CLink(
 			$this->data['rdds']['incidentTotal'],
 			'dnstest.tests.php?filter_from='.$this->data['filter_from'].'&filter_to='.$this->data['filter_to'].
 				'&filter_set=1&host='.$this->data['tld']['host'].'&type=2&slvItemId='.$this->data['rdds']['itemid']
 		);
 
 		$testsInfo = array(
-			_('Minutes down'),
+			_('Tests are down'),
 			':',
 			SPACE,
-			$minutesDown,
+			$testsDown,
 			SPACE,
-			_n('minute', 'minutes', $this->data['rdds']['incidentTotal']),
+			_n('test', 'tests', $this->data['rdds']['incidentTotal']),
 			'('._s(
 				'%1$s in incidents, %2$s outside incidents',
 				$this->data['rdds']['inIncident'],
@@ -414,12 +402,6 @@ if (isset($this->data['tld'])) {
 		);
 
 		$details = new CSpan(array(
-			_s(
-				'From %1$s till %2$s',
-				date('d.m.Y H:i:s', zbxDateToTime($this->data['filter_from'])),
-				date('d.m.Y H:i:s', zbxDateToTime($this->data['filter_to']))
-			),
-			BR(),
 			_s(
 				'Incidents: %1$s',
 				isset($this->data['rdds']) ? count($this->data['rdds']['events']) : 0

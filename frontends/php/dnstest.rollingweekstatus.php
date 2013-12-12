@@ -126,23 +126,22 @@ if ($data['filter_slv'] > 0
 		show_error_message(_('Not allowed value for "Exceeding or equal to" field'));
 	}
 	else {
-		$itemsOptions = array();
 		$itemCount = 0;
 
 		if ($data['filter_dns']) {
-			$items['key_'][] = DNSTEST_SLV_DNS_ROLLWEEK;
+			$items['key'][] = DNSTEST_SLV_DNS_ROLLWEEK;
 			$itemCount++;
 		}
 		if ($data['filter_dnssec']) {
-			$items['key_'][] = DNSTEST_SLV_DNSSEC_ROLLWEEK;
+			$items['key'][] = DNSTEST_SLV_DNSSEC_ROLLWEEK;
 			$itemCount++;
 		}
 		if ($data['filter_rdds']) {
-			$items['key_'][] = DNSTEST_SLV_RDDS_ROLLWEEK;
+			$items['key'][] = DNSTEST_SLV_RDDS_ROLLWEEK;
 			$itemCount++;
 		}
 		if ($data['filter_epp']) {
-			$items['key_'][] = DNSTEST_SLV_EPP_ROLLWEEK;
+			$items['key'][] = DNSTEST_SLV_EPP_ROLLWEEK;
 			$itemCount++;
 		}
 
@@ -150,15 +149,52 @@ if ($data['filter_slv'] > 0
 			'SELECT DISTINCT i.hostid'.
 			' FROM items i'.
 			' WHERE i.lastvalue>='.$data['filter_slv'].
-				' AND '.dbConditionString('i.key_', $items['key_'])
+				' AND '.dbConditionString('i.key_', $items['key'])
 		);
 
 		while ($hostId = DBfetch($itemsHostids)) {
 			$options['hostids'][] = $hostId['hostid'];
 		}
+
 		if (!isset($options['hostids'])) {
 			$options['hostids'] = 0;
 		}
+	}
+}
+
+// disabled services
+if ($data['filter_status'] == 2
+		&& (!isset($options['hostids']) || (isset($options['hostids']) && $options['hostids'] != 0))) {
+	if (isset($options['hostids'])) {
+		$filtredHost = ' AND '.dbConditionInt('i.hostid', $options['hostids']);
+		unset($options['hostids']);
+	}
+	else {
+		$filtredHost = null;
+	}
+
+	$items['key'] = array(
+		DNSTEST_SLV_DNS_ROLLWEEK,
+		DNSTEST_SLV_DNSSEC_ROLLWEEK,
+		DNSTEST_SLV_RDDS_ROLLWEEK,
+		DNSTEST_SLV_EPP_ROLLWEEK
+	);
+
+	$itemsHostids = DBselect(
+		'SELECT i.hostid,COUNT(itemid)'.
+		' FROM items i'.
+		' WHERE '.dbConditionString('i.key_', $items['key']).
+			$filtredHost.
+		' GROUP BY i.hostid'.
+		' HAVING COUNT(i.itemid)<=2'
+	);
+
+	while ($hostId = DBfetch($itemsHostids)) {
+		$options['hostids'][] = $hostId['hostid'];
+	}
+
+	if (!isset($options['hostids'])) {
+		$options['hostids'] = 0;
 	}
 }
 
@@ -273,13 +309,14 @@ if ($tlds) {
 						break;
 				}
 
-				if ($data['filter_status']) {
+				if ($data['filter_status'] == 1) {
 					$data['tld'][$items[$trItem]['hostid']]['status'] = true;
 				}
 			}
 		}
 
-		if ($data['filter_status']) {
+		// fail services
+		if ($data['filter_status'] == 1) {
 			foreach ($data['tld'] as $tld) {
 				if ($tld['status'] != true) {
 					unset($data['tld'][$tld['hostid']]);

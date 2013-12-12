@@ -39,6 +39,7 @@ $filterStatus = new CComboBox('filter_status',
 );
 $filterStatus->addItem(0, _('all'));
 $filterStatus->addItem(1, _('fail'));
+$filterStatus->addItem(2, _('disabled'));
 
 $filterValue = new CComboBox('filter_slv', isset($this->data['filter_slv']) ? $this->data['filter_slv'] : null);
 $slvs = explode(',', $this->data['slv']['value']);
