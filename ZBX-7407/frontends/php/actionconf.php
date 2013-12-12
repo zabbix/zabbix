@@ -40,7 +40,7 @@ $fields = array(
 		O_OPT,
 		null,
 		IN(array(EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_SOURCE_INTERNAL)),
-		'(isset({form})&&{form}!="update")||!isset({form})'
+		null
 	),
 	'evaltype' =>			array(T_ZBX_INT, O_OPT, null,
 		IN(array(ACTION_EVAL_TYPE_AND_OR, ACTION_EVAL_TYPE_AND, ACTION_EVAL_TYPE_OR)), 'isset({save})'),
@@ -79,20 +79,10 @@ $fields = array(
 	'favstate' =>			array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})&&"filter"=={favobj}')
 );
 
-$eventsource = getRequest('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS));
+$dataValid = check_fields($fields);
 
-if (!hasRequest('form')) {
-	$_REQUEST['eventsource'] = $eventsource;
-}
-// for update form 'eventsource' must not be set
-elseif (getRequest('form') == 'update' && hasRequest('eventsource')) {
-	$fields['eventsource'] = array(T_ZBX_INT, O_NO, null, null, null);
-}
-
-check_fields($fields);
-
-if (!hasRequest('form')) {
-	unset($_REQUEST['eventsource']);
+if ($dataValid && hasRequest('eventsource') && !hasRequest('form')) {
+	CProfile::update('web.actionconf.eventsource', getRequest('eventsource'), PROFILE_TYPE_INT);
 }
 
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
@@ -120,8 +110,6 @@ if (isset($_REQUEST['actionid'])) {
 		access_deny();
 	}
 }
-
-CProfile::update('web.actionconf.eventsource', $eventsource, PROFILE_TYPE_INT);
 
 /*
  * Actions
@@ -165,7 +153,9 @@ elseif (hasRequest('save')) {
 		show_messages($result, _('Action updated'), _('Cannot update action'));
 	}
 	else {
-		$action['eventsource'] = $eventsource;
+		$action['eventsource'] = getRequest('eventsource',
+			CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS)
+		);
 
 		$result = API::Action()->create($action);
 		show_messages($result, _('Action added'), _('Cannot add action'));
@@ -301,6 +291,9 @@ elseif (isset($_REQUEST['add_operation']) && isset($_REQUEST['new_operation'])) 
 			}
 			else {
 				$_REQUEST['operations'][] = $new_operation;
+				$eventsource = getRequest('eventsource',
+					CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS)
+				);
 				sortOperations($eventsource, $_REQUEST['operations']);
 			}
 		}
@@ -379,7 +372,9 @@ if (hasRequest('form')) {
 		$data['eventsource'] = $data['action']['eventsource'];
 	}
 	else {
-		$data['eventsource'] = $eventsource;
+		$data['eventsource'] = getRequest('eventsource',
+			CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS)
+		);
 		$data['evaltype'] = getRequest('evaltype');
 		$data['esc_period'] = getRequest('esc_period');
 	}
@@ -388,7 +383,6 @@ if (hasRequest('form')) {
 		sortOperations($data['eventsource'], $data['action']['operations']);
 	}
 	else {
-		$data['action']['eventsource'] = $data['eventsource'];
 		$data['action']['name'] = get_request('name');
 		$data['action']['evaltype'] = get_request('evaltype', 0);
 		$data['action']['esc_period'] = get_request('esc_period', SEC_PER_HOUR);
@@ -485,7 +479,7 @@ if (hasRequest('form')) {
 }
 else {
 	$data = array(
-		'eventsource' => $eventsource,
+		'eventsource' => getRequest('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS)),
 		'displayNodes' => is_array(get_current_nodeid())
 	);
 
