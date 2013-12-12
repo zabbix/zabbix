@@ -157,14 +157,14 @@ $stepsTable->setAttributes(array(
 	'id' => 'httpStepTable'
 ));
 $stepsTable->setHeader(array(
+	new CCol(SPACE, null, null, '16'),
 	new CCol(SPACE, null, null, '15'),
-	new CCol(SPACE, null, null, '15'),
-	new CCol(_('Name'), null, null, '150'),
-	new CCol(_('Timeout'), null, null, '50'),
-	new CCol(_('URL'), null, null, '200'),
-	new CCol(_('Required'), null, null, '50'),
+	new CCol(_('Name'), null, null, '155'),
+	new CCol(_('Timeout'), null, null, '60'),
+	new CCol(_('URL'), null, null, '350'),
+	new CCol(_('Required'), null, null, '220'),
 	new CCol(_('Status codes'), 'nowrap', null, '90'),
-	new CCol('', null, null, '50')
+	new CCol('', null, null, '60')
 ));
 
 $i = 1;

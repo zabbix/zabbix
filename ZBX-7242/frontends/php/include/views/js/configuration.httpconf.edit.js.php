@@ -91,6 +91,10 @@
 	jQuery(function($) {
 		'use strict';
 
+		if ($.browser['safari']) {
+			var tableWidth = $('#httpStepTable').width();
+		}
+
 		$('#httpStepTable').sortable({
 			disabled: ($('#httpStepTable').find('tr.sortable').length <= 1),
 			items: 'tbody tr.sortable',
@@ -102,8 +106,18 @@
 			update: recalculateSortOrder,
 			helper: function(e, ui) {
 				ui.children().each(function() {
-					jQuery(this).width(jQuery(this).width());
+					var td = $(this);
+					td.width(td.width());
 				});
+
+				// when dragging element on safari, it jumps out of the table
+				if ($.browser['safari']) {
+					// move back draggable element to proper position
+					ui.css('left', (ui.offset().left - 2)+'px');
+					// don't allow to change with of whole table
+					$('#httpStepTable').css('width', tableWidth + 'px');
+				}
+
 				return ui;
 			},
 			start: function(e, ui) {
