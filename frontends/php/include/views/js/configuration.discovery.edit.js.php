@@ -345,7 +345,7 @@
 
 			// rename button to "update"
 			if (isUpdate) {
-				jQuery('#add_new_dcheck').val("<?php echo CHtml::encode(_('Update')); ?>");
+				jQuery('#add_new_dcheck').val(<?php echo CJs::encodeJson(_('Update')); ?>);
 			}
 
 			// button "remove" form
@@ -650,6 +650,7 @@
 		jQuery('#clone').click(function() {
 			jQuery('#druleid, #delete, #clone').remove();
 			jQuery('#cancel').addClass('ui-corner-left');
+			jQuery('#form').val('clone');
 			jQuery('#name').focus();
 		});
 	});

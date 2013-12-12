@@ -93,7 +93,7 @@ $form->cleanItems();
 $cmbConf = new CComboBox('configDropDown', 'adm.gui.php', 'redirect(this.options[this.selectedIndex].value);');
 $cmbConf->addItems(array(
 	'adm.gui.php' => _('GUI'),
-	'adm.housekeeper.php' => _('Housekeeper'),
+	'adm.housekeeper.php' => _('Housekeeping'),
 	'adm.images.php' => _('Images'),
 	'adm.iconmapping.php' => _('Icon mapping'),
 	'adm.regexps.php' => _('Regular expressions'),

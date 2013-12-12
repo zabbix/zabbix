@@ -688,7 +688,7 @@ class CHost extends CHostGeneral {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
 
-				// cannot update certain fields for discoverd hosts
+				// cannot update certain fields for discovered hosts
 				$this->checkPartialValidator($host, $updateDiscoveredValidator, $dbHosts[$host['hostid']]);
 			}
 			else {
@@ -1289,18 +1289,21 @@ class CHost extends CHostGeneral {
 			else {
 				$hostsWithInventories = array();
 				$existingInventoriesDb = DBfetchArrayAssoc(DBselect(
-					'SELECT hostid'.
+					'SELECT hostid,inventory_mode'.
 					' FROM host_inventory'.
 					' WHERE '.dbConditionInt('hostid', $hostids)
 				), 'hostid');
 
 				// check for hosts with disabled inventory mode
-				if ($updateInventory['inventory_mode'] === null && count($existingInventoriesDb) !== count($hostids)) {
+				if ($updateInventory['inventory_mode'] === null) {
 					foreach ($hostids as $hostId) {
 						if (!isset($existingInventoriesDb[$hostId])) {
 							$host = get_host_by_hostid($hostId);
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_s('Inventory disabled for host "%s".', $host['host']));
+						}
+						else {
+							$updateInventory['inventory_mode'] = $existingInventoriesDb[$hostId]['inventory_mode'];
 						}
 					}
 				}
@@ -1424,7 +1427,7 @@ class CHost extends CHostGeneral {
 	 * @return void
 	 */
 	protected function validateDelete(array $hostIds, $nopermissions = false) {
-		if (empty($hostIds)) {
+		if (!$hostIds) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
@@ -1434,27 +1437,14 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
-	 * Delete Host
+	 * Delete Host.
 	 *
-	 * @param string|array 	$hostIds
-	 * @param bool			$nopermissions
+	 * @param array	$hostIds
+	 * @param bool	$nopermissions
 	 *
-	 * @return array|boolean
+	 * @return array
 	 */
-	public function delete($hostIds, $nopermissions = false) {
-		$hostIds = zbx_toArray($hostIds);
-
-		// deprecated input support
-		if ($hostIds && is_array($hostIds[0])) {
-			$this->deprecated('Passing objects is deprecated, use an array of IDs instead.');
-			foreach ($hostIds as $host) {
-				if (!check_db_fields(array('hostid' => null), $host)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No host ID given.'));
-				}
-			}
-			$hostIds = zbx_objectValues($hostIds, 'hostid');
-		}
-
+	public function delete(array $hostIds, $nopermissions = false) {
 		$this->validateDelete($hostIds, $nopermissions);
 
 		// delete the discovery rules first

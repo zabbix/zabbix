@@ -588,7 +588,7 @@
 			), 'col1'),
 			new CCol(array($snmpCommunityLabel, $snmpSecurityLabel), 'label'),
 			new CCol(array($snmpCommunityField, $snmpSecurityField)),
-			new CCol(array(bold(_('Keep history')), SPACE._('(in days)').NAME_DELIMITER), 'label'),
+			new CCol(array(bold(_('History')), SPACE._('(in days)').NAME_DELIMITER), 'label'),
 			new CCol(new CNumericBox('filter_history', $filter_history, 8, null, true)),
 			new CCol(bold(_('Triggers').NAME_DELIMITER), 'label'),
 			new CCol(new CComboBox('filter_with_triggers', $filter_with_triggers, null, array(
@@ -603,7 +603,7 @@
 			new CCol(new CTextBox('filter_name', $filter_name, ZBX_TEXTBOX_FILTER_SIZE), 'col1'),
 			new CCol($snmpOidLabel, 'label'),
 			new CCol($snmpOidField),
-			new CCol(array(bold(_('Keep trends')), SPACE._('(in days)').NAME_DELIMITER), 'label'),
+			new CCol(array(bold(_('Trends')), SPACE._('(in days)').NAME_DELIMITER), 'label'),
 			new CCol(new CNumericBox('filter_trends', $filter_trends, 8, null, true)),
 			new CCol(bold(_('Template').NAME_DELIMITER), 'label'),
 			new CCol(new CComboBox('filter_templated_items', $filter_templated_items, null, array(
@@ -1048,18 +1048,28 @@
 
 		// item
 		if (!empty($data['itemid'])) {
-			$params = array(
-				'itemids' => $data['itemid'],
-				'output' => API_OUTPUT_EXTEND
-			);
 			if ($data['is_discovery_rule']) {
-				$params['hostids'] = $data['hostid'];
-				$params['editable'] = true;
-				$data['item'] = API::DiscoveryRule()->get($params);
+				$data['item'] = API::DiscoveryRule()->get(array(
+					'itemids' => $data['itemid'],
+					'output' => API_OUTPUT_EXTEND,
+					'hostids' => $data['hostid'],
+					'editable' => true
+				));
 			}
 			else {
-				$params['filter'] = array('flags' => null);
-				$data['item'] = API::Item()->get($params);
+				$data['item'] = API::Item()->get(array(
+					'itemids' => $data['itemid'],
+					'filter' => array('flags' => null),
+					'output' => array(
+						'itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
+						'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'multiplier', 'delta',
+						'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase',
+						'formula', 'logtimefmt', 'templateid', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor',
+						'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'filter',
+						'interfaceid', 'port', 'description', 'inventory_link', 'lifetime', 'snmpv3_authprotocol',
+						'snmpv3_privprotocol', 'snmpv3_contextname'
+					)
+				));
 			}
 			$data['item'] = reset($data['item']);
 			$data['hostid'] = !empty($data['hostid']) ? $data['hostid'] : $data['item']['hostid'];

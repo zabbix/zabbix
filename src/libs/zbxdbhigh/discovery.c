@@ -209,7 +209,7 @@ static void	discovery_register_host(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST
  ******************************************************************************/
 static void	discovery_register_service(DB_DRULE *drule, DB_DCHECK *dcheck,
 		DB_DHOST *dhost, DB_DSERVICE *dservice, const char *ip, const char *dns,
-		int port, int status, int now)
+		int port, int status)
 {
 	const char	*__function_name = "discovery_register_service";
 
@@ -511,7 +511,7 @@ void	discovery_update_service(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhos
 
 	/* register service if is not registered yet */
 	if (0 != dhost->dhostid)
-		discovery_register_service(drule, dcheck, dhost, &dservice, ip, dns, port, status, now);
+		discovery_register_service(drule, dcheck, dhost, &dservice, ip, dns, port, status);
 
 	/* service was not registered because we do not add down service */
 	if (0 != dservice.dserviceid)

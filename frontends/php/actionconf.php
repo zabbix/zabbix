@@ -33,7 +33,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'actionid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'actionid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})&&{form}=="update"'),
 	'name' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Name')),
 	'eventsource' =>		array(T_ZBX_INT, O_MAND, null,
 		IN(array(EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_SOURCE_INTERNAL)), null),
@@ -298,32 +298,46 @@ elseif (isset($_REQUEST['edit_operationid'])) {
 		$_REQUEST['new_operation']['action'] = 'update';
 	}
 }
-elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['g_actionid'])) {
-	$status = ($_REQUEST['go'] == 'activate') ? 0 : 1;
-	$statusName = $status ? 'disabled' : 'enabled';
+elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('g_actionid')) {
+	$result = true;
+	$enable = (getRequest('go') == 'activate');
+	$status = $enable ? ACTION_STATUS_ENABLED : ACTION_STATUS_DISABLED;
+	$statusName = $enable ? 'enabled' : 'disabled';
+	$actionIds = array();
+	$updated = 0;
 
 	DBstart();
-	$actionIds = array();
-
-	$goResult = DBselect(
+	$dbActions = DBselect(
 		'SELECT a.actionid'.
 		' FROM actions a'.
 		' WHERE '.dbConditionInt('a.actionid', $_REQUEST['g_actionid'])
 	);
-	while ($row = DBfetch($goResult)) {
-		$res = DBexecute('UPDATE actions SET status='.zbx_dbstr($status).' WHERE actionid='.zbx_dbstr($row['actionid']));
-		if ($res) {
+	while ($row = DBfetch($dbActions)) {
+		$result &= DBexecute(
+			'UPDATE actions'.
+			' SET status='.zbx_dbstr($status).
+			' WHERE actionid='.zbx_dbstr($row['actionid'])
+		);
+		if ($result) {
 			$actionIds[] = $row['actionid'];
 		}
+		$updated++;
 	}
-	$goResult = DBend($res);
+	$result = DBend($result);
 
-	if ($goResult && isset($res)) {
-		show_messages($goResult, _('Status updated'), _('Cannot update status'));
+	if ($result) {
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',', $actionIds).'] '.$statusName);
 	}
 
-	clearCookies($goResult);
+	$messageSuccess = $enable
+		? _n('Action enabled', 'Actions enabled', $updated)
+		: _n('Action disabled', 'Actions disabled', $updated);
+	$messageFailed = $enable
+		? _n('Cannot enable action', 'Cannot enable actions', $updated)
+		: _n('Cannot disable action', 'Cannot disable actions', $updated);
+
+	show_messages($result, $messageSuccess, $messageFailed);
+	clearCookies($result);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_actionid'])) {
 	$goResult = API::Action()->delete($_REQUEST['g_actionid']);
