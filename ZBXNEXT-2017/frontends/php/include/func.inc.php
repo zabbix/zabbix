@@ -811,7 +811,7 @@ function zbx_ctype_digit($x) {
 }
 
 function zbx_empty($value) {
-	if (is_null($value)) {
+	if ($value === null) {
 		return true;
 	}
 	if (is_array($value) && empty($value)) {

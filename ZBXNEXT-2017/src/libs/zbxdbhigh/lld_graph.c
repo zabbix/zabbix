@@ -584,8 +584,7 @@ void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, struct zb
 		int		width, height;
 		double		yaxismin, yaxismax, percent_left, percent_right;
 		unsigned char	show_work_period, show_triggers, graphtype, show_legend, show_3d,
-				ymin_type = GRAPH_YAXIS_TYPE_CALCULATED, ymax_type = GRAPH_YAXIS_TYPE_CALCULATED,
-				ymin_flags = 0, ymax_flags = 0;
+				ymin_type, ymax_type, ymin_flags = 0, ymax_flags = 0;
 		int		i;
 
 		ZBX_STR2UINT64(parent_graphid, row[0]);

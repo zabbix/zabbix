@@ -128,7 +128,7 @@ $fields = array(
 	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
 	// filter
-	'filter_set' =>				array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	'filter_set' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	// ajax
 	'favobj' =>					array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
 	'favref' =>					array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),
@@ -318,16 +318,23 @@ elseif (hasRequest('save')) {
 	}
 }
 elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('group_itemid')) {
-	$itemId = getRequest('group_itemid');
+	$groupItemId = getRequest('group_itemid');
+	$enable = (getRequest('go') == 'activate');
 
 	DBstart();
-
-	$isActivated = (getRequest('go') == 'activate');
-
-	$result = $isActivated ? activate_item($itemId) : disable_item($itemId);
+	$result = $enable ? activate_item($groupItemId) : disable_item($groupItemId);
 	$result = DBend($result);
 
-	show_messages($result, $isActivated ? _('Item prototypes activated') : _('Item prototypes disabled'));
+	$updated = count($groupItemId);
+
+	$messageSuccess = $enable
+		? _n('Item prototype enabled', 'Item prototypes enabled', $updated)
+		: _n('Item prototype disabled', 'Item prototypes disabled', $updated);
+	$messageFailed = $enable
+		? _n('Cannot enable item prototype', 'Cannot enable item prototypes', $updated)
+		: _n('Cannot disable item prototype', 'Cannot disable item prototypes', $updated);
+
+	show_messages($result, $messageSuccess, $messageFailed);
 	clearCookies($result, getRequest('parent_discoveryid'));
 }
 elseif (getRequest('go') == 'delete' && hasRequest('group_itemid')) {

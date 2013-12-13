@@ -272,21 +272,25 @@ elseif (isset($_REQUEST['save'])) {
 		clearCookies($result, $_REQUEST['hostid']);
 	}
 }
-elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['g_hostdruleid'])) {
-	$groupHostDiscoveryRuleId = $_REQUEST['g_hostdruleid'];
+elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('g_hostdruleid')) {
+	$groupHostDiscoveryRuleId = getRequest('g_hostdruleid');
+	$enable = (getRequest('go') == 'activate');
 
 	DBstart();
+	$result = $enable ? activate_item($groupHostDiscoveryRuleId) : disable_item($groupHostDiscoveryRuleId);
+	$result = DBend($result);
 
-	$goResult = ($_REQUEST['go'] == 'activate')
-		? activate_item($groupHostDiscoveryRuleId)
-		: disable_item($groupHostDiscoveryRuleId);
-	$goResult = DBend($goResult);
+	$updated = count($groupHostDiscoveryRuleId);
 
-	show_messages($goResult,
-		($_REQUEST['go'] == 'activate') ? _('Discovery rules activated') : _('Discovery rules disabled'),
-		null
-	);
-	clearCookies($goResult, $_REQUEST['hostid']);
+	$messageSuccess = $enable
+		? _n('Discovery rule enabled', 'Discovery rules enabled', $updated)
+		: _n('Discovery rule disabled', 'Discovery rules disabled', $updated);
+	$messageFailed = $enable
+		? _n('Cannot enable discovery rules', 'Cannot enable discovery rules', $updated)
+		: _n('Cannot disable discovery rules', 'Cannot disable discovery rules', $updated);
+
+	show_messages($result, $messageSuccess, $messageFailed);
+	clearCookies($result, getRequest('hostid'));
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_hostdruleid'])) {
 	$goResult = API::DiscoveryRule()->delete($_REQUEST['g_hostdruleid']);
