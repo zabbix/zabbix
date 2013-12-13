@@ -25,6 +25,20 @@
 #include "zbxalgo.h"
 #include "valuecache.h"
 
+#define ZBX_REQUEST_HOST_NAME		0
+#define ZBX_REQUEST_HOST_IP		1
+#define ZBX_REQUEST_HOST_DNS		2
+#define ZBX_REQUEST_HOST_CONN		3
+#define ZBX_REQUEST_ITEM_ID		4
+#define ZBX_REQUEST_ITEM_NAME		5
+#define ZBX_REQUEST_ITEM_NAME_ORIG	6
+#define ZBX_REQUEST_ITEM_KEY		7
+#define ZBX_REQUEST_ITEM_KEY_ORIG	8
+#define ZBX_REQUEST_ITEM_DESCRIPTION	9
+#define ZBX_REQUEST_PROXY_NAME		10
+#define ZBX_REQUEST_HOST_HOST		11
+#define ZBX_REQUEST_HOST_PORT		12
+
 /******************************************************************************
  *                                                                            *
  * Function: get_N_functionid                                                 *
@@ -898,9 +912,6 @@ out:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-#define ZBX_REQUEST_HOST_IP	1
-#define ZBX_REQUEST_HOST_DNS	2
-#define ZBX_REQUEST_HOST_CONN	3
 static int	DBget_interface_value(zbx_uint64_t hostid, char **replace_to, int request, unsigned char agent_only)
 {
 	DB_RESULT	result;
@@ -918,7 +929,7 @@ static int	DBget_interface_value(zbx_uint64_t hostid, char **replace_to, int req
 		zbx_snprintf(sql, sizeof(sql), "=%d", INTERFACE_TYPE_AGENT);
 
 	result = DBselect(
-			"select type,useip,ip,dns"
+			"select type,useip,ip,dns,port"
 			" from interface"
 			" where hostid=" ZBX_FS_UI64
 				" and type%s"
@@ -949,6 +960,9 @@ static int	DBget_interface_value(zbx_uint64_t hostid, char **replace_to, int req
 				useip = (unsigned char)atoi(row[1]);
 				*replace_to = zbx_strdup(*replace_to, 1 == useip ? row[2] : row[3]);
 				break;
+			case ZBX_REQUEST_HOST_PORT:
+				*replace_to = zbx_strdup(*replace_to, row[4]);
+				break;
 		}
 		ret = SUCCEED;
 	}
@@ -967,15 +981,6 @@ static int	DBget_interface_value(zbx_uint64_t hostid, char **replace_to, int req
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-#define ZBX_REQUEST_HOST_NAME		0
-#define ZBX_REQUEST_ITEM_ID		4
-#define ZBX_REQUEST_ITEM_NAME		5
-#define ZBX_REQUEST_ITEM_NAME_ORIG	6
-#define ZBX_REQUEST_ITEM_KEY		7
-#define ZBX_REQUEST_ITEM_KEY_ORIG	8
-#define ZBX_REQUEST_ITEM_DESCRIPTION	9
-#define ZBX_REQUEST_PROXY_NAME		10
-#define ZBX_REQUEST_HOST_HOST		11
 static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 {
 	const char	*__function_name = "DBget_item_value";
@@ -1011,6 +1016,7 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 			case ZBX_REQUEST_HOST_IP:
 			case ZBX_REQUEST_HOST_DNS:
 			case ZBX_REQUEST_HOST_CONN:
+			case ZBX_REQUEST_HOST_PORT:
 				ZBX_STR2UINT64(hostid, row[0]);
 				ret = DBget_interface_value(hostid, replace_to, request, 0);
 				break;
@@ -2039,7 +2045,7 @@ static const char	*ex_macros[] =
 	MVAR_PROFILE_TAG, MVAR_PROFILE_MACADDRESS, MVAR_PROFILE_HARDWARE, MVAR_PROFILE_SOFTWARE,
 	MVAR_PROFILE_CONTACT, MVAR_PROFILE_LOCATION, MVAR_PROFILE_NOTES,
 	MVAR_HOST_HOST, MVAR_HOST_NAME, MVAR_HOSTNAME, MVAR_PROXY_NAME,
-	MVAR_HOST_CONN, MVAR_HOST_DNS, MVAR_HOST_IP, MVAR_IPADDRESS,
+	MVAR_HOST_CONN, MVAR_HOST_DNS, MVAR_HOST_IP, MVAR_HOST_PORT, MVAR_IPADDRESS,
 	MVAR_ITEM_ID, MVAR_ITEM_NAME, MVAR_ITEM_NAME_ORIG, MVAR_ITEM_DESCRIPTION,
 	MVAR_ITEM_KEY, MVAR_ITEM_KEY_ORIG, MVAR_TRIGGER_KEY,
 	MVAR_ITEM_LASTVALUE,
@@ -2578,6 +2584,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_HOST_IP);
 				}
+				else if (0 == strcmp(m, MVAR_HOST_PORT))
+				{
+					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
+							N_functionid, ZBX_REQUEST_HOST_PORT);
+				}
 				else if (0 == strcmp(m, MVAR_HOST_NAME))
 				{
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
@@ -2811,6 +2822,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_HOST_IP);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_PORT))
+				{
+					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
+							N_functionid, ZBX_REQUEST_HOST_PORT);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_NAME))
 				{
@@ -3129,6 +3145,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_HOST_IP);
 				}
+				else if (0 == strcmp(m, MVAR_HOST_PORT))
+				{
+					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_HOST_PORT);
+				}
 				else if (0 == strcmp(m, MVAR_HOST_NAME))
 				{
 					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_HOST_NAME);
@@ -3224,6 +3244,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 				{
 					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_HOST_IP);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_PORT))
+				{
+					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_HOST_PORT);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_NAME))
 				{
