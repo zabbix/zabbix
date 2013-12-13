@@ -909,18 +909,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 								$macros[$key]['macros'][$macro] = $host['name'];
 								break;
 
+							case '{HOST.HOST}':
 							case '{HOSTNAME}': // deprecated
 								$macros[$key]['macros'][$macro] = $host['host'];
 								break;
 
-							case '{HOST.HOST}':
-								$macros[$key]['macros'][$macro] = $host['host'];
-								break;
-
 							case '{HOST.IP}':
-								$macros[$key]['macros'][$macro] = $interface['ip'];
-								break;
-
 							case '{IPADDRESS}': // deprecated
 								$macros[$key]['macros'][$macro] = $interface['ip'];
 								break;
