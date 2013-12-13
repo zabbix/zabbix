@@ -655,7 +655,7 @@ class CScreen extends CZBXAPI {
 		// adding ScreenItems
 		if ($options['selectScreenItems'] !== null && $options['selectScreenItems'] != API_OUTPUT_COUNT) {
 			$screenItems = API::getApi()->select('screens_items', array(
-				'output' => $this->outputExtend('screens_items', array('screenid', 'screenitemid'), $options['selectScreenItems']),
+				'output' => $this->outputExtend($options['selectScreenItems'], array('screenid', 'screenitemid')),
 				'filter' => array('screenid' => $screenIds),
 				'preservekeys' => true,
 				'nodeids' => get_current_nodeid(true)

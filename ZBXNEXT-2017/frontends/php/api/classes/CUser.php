@@ -1082,7 +1082,7 @@ class CUser extends CZBXAPI {
 		// adding medias
 		if ($options['selectMedias'] !== null && $options['selectMedias'] != API_OUTPUT_COUNT) {
 			$userMedias = API::UserMedia()->get(array(
-				'output' => $this->outputExtend('media', array('userid', 'mediaid'), $options['selectMedias']),
+				'output' => $this->outputExtend($options['selectMedias'], array('userid', 'mediaid')),
 				'userids' => $userids,
 				'preservekeys' => true
 			));

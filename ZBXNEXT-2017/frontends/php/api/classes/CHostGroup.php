@@ -1120,7 +1120,7 @@ class CHostGroup extends CZBXAPI {
 		// adding group discovery
 		if ($options['selectGroupDiscovery'] !== null) {
 			$groupDiscoveries = API::getApi()->select('group_discovery', array(
-				'output' => $this->outputExtend('group_discovery', array('groupid'), $options['selectGroupDiscovery']),
+				'output' => $this->outputExtend($options['selectGroupDiscovery'], array('groupid')),
 				'filter' => array('groupid' => $groupIds),
 				'preservekeys' => true,
 				'nodeids' => get_current_nodeid(true)

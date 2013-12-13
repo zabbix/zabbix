@@ -1124,7 +1124,7 @@ class CItem extends CItemGeneral {
 		// adding item discovery
 		if ($options['selectItemDiscovery'] !== null) {
 			$itemDiscoveries = API::getApi()->select('item_discovery', array(
-				'output' => $this->outputExtend('item_discovery', array('itemdiscoveryid', 'itemid'), $options['selectItemDiscovery']),
+				'output' => $this->outputExtend($options['selectItemDiscovery'], array('itemdiscoveryid', 'itemid')),
 				'filter' => array('itemid' => array_keys($result)),
 				'preservekeys' => true,
 				'nodeids' => get_current_nodeid(true)

@@ -567,8 +567,8 @@ class CEvent extends CZBXAPI {
 			if ($options['select_acknowledges'] != API_OUTPUT_COUNT) {
 				// create the base query
 				$sqlParts = API::getApi()->createSelectQueryParts('acknowledges', 'a', array(
-					'output' => $this->outputExtend('acknowledges',
-						array('acknowledgeid', 'eventid', 'clock'), $options['select_acknowledges']
+					'output' => $this->outputExtend($options['select_acknowledges'],
+						array('acknowledgeid', 'eventid', 'clock')
 					),
 					'filter' => array('eventid' => $eventIds),
 					'nodeids' => get_current_nodeid(true)
