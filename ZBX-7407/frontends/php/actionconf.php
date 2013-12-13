@@ -35,10 +35,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'actionid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'name' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Name')),
-	'eventsource' =>		array(
-		T_ZBX_INT,
-		O_OPT,
-		null,
+	'eventsource' =>		array(T_ZBX_INT, O_OPT, null,
 		IN(array(EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_SOURCE_INTERNAL)),
 		null
 	),
