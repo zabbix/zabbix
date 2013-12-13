@@ -25,19 +25,39 @@
 #include "zbxalgo.h"
 #include "valuecache.h"
 
-#define ZBX_REQUEST_HOST_NAME		0
+/* The following definitions are used to identify the field */
+/* for various field definitions for various value getters  */
+/* grouped by their scope:                                  */
+
+/* DBget_item_value(), DBget_interface_value() */
 #define ZBX_REQUEST_HOST_IP		1
 #define ZBX_REQUEST_HOST_DNS		2
 #define ZBX_REQUEST_HOST_CONN		3
-#define ZBX_REQUEST_ITEM_ID		4
-#define ZBX_REQUEST_ITEM_NAME		5
-#define ZBX_REQUEST_ITEM_NAME_ORIG	6
-#define ZBX_REQUEST_ITEM_KEY		7
-#define ZBX_REQUEST_ITEM_KEY_ORIG	8
-#define ZBX_REQUEST_ITEM_DESCRIPTION	9
-#define ZBX_REQUEST_PROXY_NAME		10
-#define ZBX_REQUEST_HOST_HOST		11
-#define ZBX_REQUEST_HOST_PORT		12
+#define ZBX_REQUEST_HOST_PORT		4
+
+/* DBget_item_value() */
+#define ZBX_REQUEST_HOST_NAME		101
+#define ZBX_REQUEST_ITEM_ID		102
+#define ZBX_REQUEST_ITEM_NAME		103
+#define ZBX_REQUEST_ITEM_NAME_ORIG	104
+#define ZBX_REQUEST_ITEM_KEY		105
+#define ZBX_REQUEST_ITEM_KEY_ORIG	106
+#define ZBX_REQUEST_ITEM_DESCRIPTION	107
+#define ZBX_REQUEST_PROXY_NAME		108
+#define ZBX_REQUEST_HOST_HOST		109
+
+/* DBget_history_log_value() */
+#define ZBX_REQUEST_ITEM_LOG_DATE	201
+#define ZBX_REQUEST_ITEM_LOG_TIME	202
+#define ZBX_REQUEST_ITEM_LOG_AGE	203
+#define ZBX_REQUEST_ITEM_LOG_SOURCE	204
+#define ZBX_REQUEST_ITEM_LOG_SEVERITY	205
+#define ZBX_REQUEST_ITEM_LOG_NSEVERITY	206
+#define ZBX_REQUEST_ITEM_LOG_EVENTID	207
+
+/* DBget_node_value() */
+#define ZBX_REQUEST_NODE_ID		301
+#define ZBX_REQUEST_NODE_NAME		302
 
 /******************************************************************************
  *                                                                            *
@@ -1358,13 +1378,6 @@ static int	DBget_drule_value_by_event(const DB_EVENT *event, char **replace_to, 
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-#define ZBX_REQUEST_ITEM_LOG_DATE	0
-#define ZBX_REQUEST_ITEM_LOG_TIME	1
-#define ZBX_REQUEST_ITEM_LOG_AGE	2
-#define ZBX_REQUEST_ITEM_LOG_SOURCE	3
-#define ZBX_REQUEST_ITEM_LOG_SEVERITY	4
-#define ZBX_REQUEST_ITEM_LOG_NSEVERITY	5
-#define ZBX_REQUEST_ITEM_LOG_EVENTID	6
 static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int request, int clock, int ns)
 {
 	const char	*__function_name = "DBget_history_log_value";
@@ -1740,8 +1753,6 @@ static void	get_event_ack_history(const DB_EVENT *event, char **replace_to)
  * Return value: upon successful completion return SUCCEED, otherwise FAIL    *
  *                                                                            *
  ******************************************************************************/
-#define ZBX_REQUEST_NODE_ID	0
-#define ZBX_REQUEST_NODE_NAME	1
 static int	DBget_node_value(zbx_uint64_t objectid, char **replace_to, int request)
 {
 	const char	*__function_name = "DBget_node_value";
