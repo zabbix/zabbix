@@ -25,9 +25,8 @@
 #include "zbxalgo.h"
 #include "valuecache.h"
 
-/* The following definitions are used to identify the field */
-/* for various field definitions for various value getters  */
-/* grouped by their scope:                                  */
+/* The following definitions are used to identify the request field */
+/* for various value getters grouped by their scope:                */
 
 /* DBget_item_value(), DBget_interface_value() */
 #define ZBX_REQUEST_HOST_IP		1
