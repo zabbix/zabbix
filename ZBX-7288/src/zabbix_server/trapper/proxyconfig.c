@@ -51,7 +51,7 @@ void	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	error[0] = '\0';
 
-	if (SUCCEED != get_proxy_id(jp, &proxy_hostid, host, error, sizeof(error)))
+	if (SUCCEED != get_active_proxy_id(jp, &proxy_hostid, host, error, sizeof(error)))
 	{
 		zbx_send_response(sock, FAIL, error, CONFIG_TIMEOUT);
 		zabbix_log(LOG_LEVEL_WARNING, "proxy configuration request from active proxy on \"%s\" failed: %s",
