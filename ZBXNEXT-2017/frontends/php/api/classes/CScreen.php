@@ -70,7 +70,7 @@ class CScreen extends CZBXAPI {
 			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
 			// output
-			'output'					=> API_OUTPUT_REFER,
+			'output'					=> API_OUTPUT_EXTEND,
 			'selectScreenItems'			=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
