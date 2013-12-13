@@ -266,6 +266,9 @@ if(isset($_REQUEST['sform'])){
 		$template = get_realhost_by_itemid($dbItem['templateid']);
 		$itemName = $template['host'].NAME_DELIMITER.$dbItem['name_expanded'];
 	}
+	else {
+		$itemName = $dbItem['name_expanded'];
+	}
 
 	$ctb = new CTextBox('item', $itemName, 80);
 	$ctb->setAttribute('id','item');
