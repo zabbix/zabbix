@@ -115,9 +115,7 @@ void	zbx_vector_ ## __id ## _remove(zbx_vector_ ## __id ## _t *vector, int index
 void	zbx_vector_ ## __id ## _sort(zbx_vector_ ## __id ## _t *vector, zbx_compare_func_t compare_func)	\
 {														\
 	if (2 <= vector->values_num)										\
-	{													\
 		qsort(vector->values, vector->values_num, sizeof(__type), compare_func);			\
-	}													\
 }														\
 														\
 void	zbx_vector_ ## __id ## _uniq(zbx_vector_ ## __id ## _t *vector, zbx_compare_func_t compare_func)	\
@@ -205,4 +203,5 @@ void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector)					\
 		vector->values_alloc = 0;									\
 	}													\
 }
+
 #endif	/* ZABBIX_VECTORIMPL_H */

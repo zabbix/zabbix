@@ -45,5 +45,4 @@ int	regexp_match_ex(zbx_vector_ptr_t *regexps, const char *string, const char *p
 int	regexp_sub_ex(zbx_vector_ptr_t *regexps, const char *string, const char *pattern, int case_sensitive,
 		const char *output_template, char **output);
 
-
 #endif /* ZABBIX_ZBXREGEXP_H */

@@ -1,12 +1,71 @@
+Changes for 2.2.2rc1
+
+New features:
+A.F....... [ZBX-1357] updated American English, French, Hungarian, Japanese, Russian and Slovak translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+...G...PS. [ZBX-7392] fixed memory leaks in gnuregex.c (igors)
+........S. [ZBX-7397] reduced value cache memory usage (wiper)
+........S. [ZBX-7516] fixed typo in SQL query: changed "impi_disable_until" to "ipmi_disable_until" (asaveljevs)
+A......... [ZBX-7509] changed "value_flag" to proper name "value_flags" in triggers API (Ivo)
+..F....... [ZBX-7489] changed "filter_set" to no longer require SID parameter in URL (Ivo)
+..F....... [ZBX-7486] fixed placeholder default value submitting for IE (Ivo)
+..F....... [ZBX-7438] made frontend object status update messages more consistent (Ivo)
+A.F....... [ZBX-7445] fixed frontend redundant call of history (Eduard)
+....I..... [ZBX-7227] modernized autoconf invocation and renamed "configure.in" to "configure.ac"; thanks to Dmitry Smirnov (asaveljevs)
+..F....... [ZBX-7443] fixed adding screen to favourites from dashboard (Eduard)
+..F....... [ZBX-7490] fixed chart with prototype items displaing in graphs configuration page (Eduard)
+A......... [ZBX-7454] fixed automatic changing host inventory mode from "Automatic" to "Manual" when updating host with no "inventory_mode" parameter set (Ivo)
+..F....... [ZBX-7417] expanded function last() with no parameters in map element labels and graph names (Ivo)
+A......... [ZBX-7338] fixed screen item validation (Eduard)
+..F....... [ZBX-7427] fixed element links not being rendered correctly between host groups and other elements (Pavels)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.1
+
+2.2.1rc1 was released as 2.2.1 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.2.1rc1
 
 New features:
+..F....... [ZBXNEXT-2016] changed the housekeeping settings to allow overriding item-level history and trend storage period if internal housekeeping is disabled (Pavels)
+..F....... [ZBXNEXT-2016] removed the ZBX_HISTORY_DATA_UPKEEP constant (Pavels)
 ....I..... [ZBXNEXT-1256] changed example directory size user parameter to return bytes (Richlv)
 ..F....... [ZBX-7250] made gettext an optional feature for the frontend (Pavels)
-A.F....... [ZBX-1357] updated Brazilian Portuguese, French, Italian, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, Italian, Japanese, Russian, Slovak, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 ....I..PS. [ZBXNEXT-1257] dropped support for UCD-SNMP (asaveljevs)
 
 Bug fixes:
+...G...... [ZBX-7479] fixed remote command execution from Zabbix server if flexible user parameters are configured; thanks to Recurity Labs Team for the report (Sasha)
+....I..... [ZBX-7461] fixed compilation on kFreeBSD and other operating systems which are not explicitly supported (asaveljevs)
+....I..... [ZBX-7339] fixed item prototypes of OpenBSD and FreeBSD templates (igors)
+.......PS. [ZBX-7332] properly restore the original memory chunk after shared memory realloc fails, otherwise it could trigger a crash when syncing history at exit (wiper)
+..F....... [ZBX-7373] improved performance of pages that use latest history values; thanks to Kenneth Palmertree and Maksim Tkachenko (Pavels)
+..F....... [ZBX-7447] fixed regex configuration form not being displayed in French and Italian languages (Pavels)
+...G...... [ZBX-7444] fixed agent crash on HP-UX when processing proc.num[] item (asaveljevs)
+..F....... [ZBX-4063] fixed data selecting for graphs (Eduard)
+..F....... [ZBX-7391] fixed items belonging to multiple applications being displayed only under the first one in the latest data page (Pavels)
+..F....... [ZBX-7347] fixed custom step duration max size in action configuration (Eduard)
+..F....... [ZBX-7336] fixed "Database type" selection in setup step 3, improved SQLite3 check and removed storing setup supported databases in cookies (Ivo)
+..F....... [ZBX-7340] fixed incorrect error messages when imported objects reference unexisting objects (Pavels)
+A.F....... [ZBX-7445] fixed frontend redundant call of history (Eduard)
+..F....... [ZBX-7277] made item selection helper translatable (Ivo)
+.......PS. [ZBX-6160] fixed memory leak in configuration syncer process (Sasha)
+.......PS. [ZBX-6160] fixed "ORA-01000: maximum open cursors exceeded" error (Sasha)
+..F....... [ZBX-7354] fixed resetting linked template list when trying to add template with empty field (Ivo)
+.......PS. [ZBX-7360] fixed maximum IPMI sensor ID length; thanks to OpenIPMI author Corey Minyard (Andris, asaveljevs)
+........S. [ZBX-7400] fixed possible server crash when processing trigger functions with text or log items with Oracle backend (Sasha)
+........S. [ZBX-7400] fixed possible server crash when sending messages with Oracle backend (Sasha)
+........S. [ZBX-7326] improved escalator idle time calculations and statistics reporting (wiper)
+..F....... [ZBX-7355] fixed various prototype confirmation messages (Ivo)
+..F....... [ZBX-7408] removed unnecessary variables and includes in slide show configuration (Ivo)
+.D........ [ZBX-7034] improved Alias parameter description in the example configuration files (Richlv)
+..F....... [ZBX-7337] fixed undefined index debug profiler (Eduard)
+..F....... [ZBX-7337] fixed input parameters validation in multiple pages (Eduard, Sasha)
+A......... [ZBX-7372] fixed undefined indexes in script.getscriptsbyhosts method (Ivo)
+..F....... [ZBX-7350] fixed displaying host prototypes in "Status of Zabbix" (Ivo)
+.......PS. [ZBXNEXT-98] refactored code for SNMP checks (asaveljevs, Sasha)
 ........S. [ZBX-7184] added check to prevent host from being switched to unavailable state multiple times in a row (wiper)
 A......... [ZBX-7351] fixed screen item not being saved if resource type is URL (Ivo)
 ........S. [ZBX-7329] fixed VMware related compiling error on FreeBSD (wiper)
@@ -650,6 +709,19 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
 
 --------------------------------------------------------------------------------
+Changes for 2.0.11rc1
+
+New features:
+A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 2.0.10
+
+2.0.10rc1 was released as 2.0.10 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.0.10rc1
 
 New features:
@@ -658,6 +730,10 @@ New features:
 A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Czech, Dutch, French, German, Greek, Hungarian, Japanese, Italian, Romanian, Russian, Slovak, Spanish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-7479] fixed remote command execution from Zabbix server if flexible user parameters are configured; thanks to Recurity Labs Team for the report (Sasha)
+..F....... [ZBX-7347] fixed custom step duration max size in action configuration (Eduard)
+........S. [ZBX-7400] fixed fetching of empty text or log history data with Oracle backend (Sasha)
+....I..... [ZBX-7218] fixed configuration failing with Oracle 12.1 instant client libraries (asaveljevs, Sasha)
 ..F....... [ZBX-6129] fixed trying to change the status of a deleted trigger or trigger prototype changes the status of all trigger and prototypes (Pavels)
 ..F....... [ZBX-6920] fixed displaying of soft linked IT services (Eduard)
 .......PS. [ZBX-7292] fixed resolving of macros in host interfaces (Sasha)
@@ -2085,8 +2161,16 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.20rc1
+
+
+Changes for 1.8.19
+
+1.8.19rc1 was released as 1.8.19 without any changes
+
 Changes for 1.8.19rc1
 
+...G...... [ZBX-7479] fixed remote command execution from Zabbix server if flexible user parameters are configured; thanks to Recurity Labs Team for the report (Sasha)
 ....I..... [ZBXNEXT-1256] changed example directory size user parameter to return bytes (Richlv)
 ..F....... [ZBX-7156] fixed string value escaping in profiles (Eduard)
 ...G...... [ZBX-4658] fixed system.boottime and system.uptime returning bogus values on Solaris when agent is compiled as a 64-bit binary (asaveljevs)
