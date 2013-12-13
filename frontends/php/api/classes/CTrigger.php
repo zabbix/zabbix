@@ -101,7 +101,7 @@ class CTrigger extends CTriggerGeneral {
 			'expandDescription'				=> null,
 			'expandComment'					=> null,
 			'expandExpression'				=> null,
-			'output'						=> API_OUTPUT_REFER,
+			'output'						=> API_OUTPUT_EXTEND,
 			'selectGroups'					=> null,
 			'selectHosts'					=> null,
 			'selectItems'					=> null,
