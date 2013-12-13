@@ -222,7 +222,6 @@ class CMaintenance extends CZBXAPI {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		$maintenanceids = array();
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
@@ -237,13 +236,7 @@ class CMaintenance extends CZBXAPI {
 				}
 			}
 			else {
-				$maintenanceids[$maintenance['maintenanceid']] = $maintenance['maintenanceid'];
-
-				if (!isset($result[$maintenance['maintenanceid']])) {
-					$result[$maintenance['maintenanceid']] = array();
-				}
-
-				$result[$maintenance['maintenanceid']] += $maintenance;
+				$result[$maintenance['maintenanceid']] = $maintenance;
 			}
 		}
 

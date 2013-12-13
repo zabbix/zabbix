@@ -128,17 +128,13 @@ class CMap extends CMapElement {
 			else {
 				$sysmapids[$sysmap['sysmapid']] = $sysmap['sysmapid'];
 
-				if (!isset($result[$sysmap['sysmapid']])) {
-					$result[$sysmap['sysmapid']] = array();
-				}
-
 				// originally we intended not to pass those parameters if advanced labels are off, but they might be useful
 				// leaving this block commented
 				// if (isset($sysmap['label_format']) && ($sysmap['label_format'] == SYSMAP_LABEL_ADVANCED_OFF)) {
 				// 	unset($sysmap['label_string_hostgroup'], $sysmap['label_string_host'], $sysmap['label_string_trigger'], $sysmap['label_string_map'], $sysmap['label_string_image']);
 				// }
 
-				$result[$sysmap['sysmapid']] += $sysmap;
+				$result[$sysmap['sysmapid']] = $sysmap;
 			}
 		}
 

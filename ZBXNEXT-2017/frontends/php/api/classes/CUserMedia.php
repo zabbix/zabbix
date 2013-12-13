@@ -190,7 +190,6 @@ class CUserMedia extends CZBXAPI {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		$mediaids = array();
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
@@ -205,12 +204,7 @@ class CUserMedia extends CZBXAPI {
 				}
 			}
 			else {
-				$mediaids[$media['mediaid']] = $media['mediaid'];
-
-				if (!isset($result[$media['mediaid']])) {
-					$result[$media['mediaid']]= array();
-				}
-				$result[$media['mediaid']] += $media;
+				$result[$media['mediaid']] = $media;
 			}
 		}
 

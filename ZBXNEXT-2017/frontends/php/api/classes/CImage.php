@@ -136,11 +136,7 @@ class CImage extends CZBXAPI {
 				$imageids[$image['imageid']] = $image['imageid'];
 				unset($image['image']);
 
-				if (!isset($result[$image['imageid']])) {
-					$result[$image['imageid']] = array();
-				}
-
-				$result[$image['imageid']] += $image;
+				$result[$image['imageid']] = $image;
 			}
 		}
 

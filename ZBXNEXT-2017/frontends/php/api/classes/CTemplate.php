@@ -316,11 +316,7 @@ class CTemplate extends CHostGeneral {
 				$template['templateid'] = $template['hostid'];
 				unset($template['hostid']);
 
-				if (!isset($result[$template['templateid']])) {
-					$result[$template['templateid']]= array();
-				}
-
-				$result[$template['templateid']] += $template;
+				$result[$template['templateid']] = $template;
 			}
 
 		}

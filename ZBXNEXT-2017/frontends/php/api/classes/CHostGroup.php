@@ -355,11 +355,7 @@ class CHostGroup extends CZBXAPI {
 				}
 			}
 			else {
-				if (!isset($result[$group['groupid']])) {
-					$result[$group['groupid']] = array();
-				}
-
-				$result[$group['groupid']] += $group;
+				$result[$group['groupid']] = $group;
 			}
 		}
 

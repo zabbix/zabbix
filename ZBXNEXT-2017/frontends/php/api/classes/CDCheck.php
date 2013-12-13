@@ -159,12 +159,8 @@ class CDCheck extends CZBXAPI {
 				else
 					$result = $dcheck['rowscount'];
 			}
-			else{
-				if (!isset($result[$dcheck['dcheckid']])) {
-					$result[$dcheck['dcheckid']]= array();
-				}
-
-				$result[$dcheck['dcheckid']] += $dcheck;
+			else {
+				$result[$dcheck['dcheckid']] = $dcheck;
 			}
 		}
 

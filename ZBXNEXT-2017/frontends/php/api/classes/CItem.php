@@ -350,7 +350,6 @@ class CItem extends CItemGeneral {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		$itemids = array();
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
@@ -365,13 +364,7 @@ class CItem extends CItemGeneral {
 				}
 			}
 			else {
-				$itemids[$item['itemid']] = $item['itemid'];
-
-				if (!isset($result[$item['itemid']])) {
-					$result[$item['itemid']]= array();
-				}
-
-				$result[$item['itemid']] += $item;
+				$result[$item['itemid']] = $item;
 			}
 		}
 

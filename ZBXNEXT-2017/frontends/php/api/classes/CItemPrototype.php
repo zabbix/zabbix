@@ -232,7 +232,6 @@ class CItemPrototype extends CItemGeneral {
 		}
 //----------
 
-		$itemids = array();
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
@@ -244,47 +243,8 @@ class CItemPrototype extends CItemGeneral {
 				else
 					$result = $item['rowscount'];
 			}
-			else{
-				$itemids[$item['itemid']] = $item['itemid'];
-
-				if (!isset($result[$item['itemid']])) {
-					$result[$item['itemid']]= array();
-				}
-
-				// hostids
-				if (isset($item['hostid']) && is_null($options['selectHosts'])) {
-					if (!isset($result[$item['itemid']]['hosts'])) $result[$item['itemid']]['hosts'] = array();
-					$result[$item['itemid']]['hosts'][] = array('hostid' => $item['hostid']);
-				}
-
-				// triggerids
-				if (isset($item['triggerid']) && is_null($options['selectTriggers'])) {
-					if (!isset($result[$item['itemid']]['triggers']))
-						$result[$item['itemid']]['triggers'] = array();
-
-					$result[$item['itemid']]['triggers'][] = array('triggerid' => $item['triggerid']);
-					unset($item['triggerid']);
-				}
-
-				// graphids
-				if (isset($item['graphid']) && is_null($options['selectGraphs'])) {
-					if (!isset($result[$item['itemid']]['graphs']))
-						$result[$item['itemid']]['graphs'] = array();
-
-					$result[$item['itemid']]['graphs'][] = array('graphid' => $item['graphid']);
-					unset($item['graphid']);
-				}
-
-				// discoveryids
-				if (isset($item['discoveryids'])) {
-					if (!isset($result[$item['itemid']]['discovery']))
-						$result[$item['itemid']]['discovery'] = array();
-
-					$result[$item['itemid']]['discovery'][] = array('ruleid' => $item['item_parentid']);
-					unset($item['item_parentid']);
-				}
-
-				$result[$item['itemid']] += $item;
+			else {
+				$result[$item['itemid']] = $item;
 			}
 		}
 

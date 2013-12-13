@@ -123,11 +123,7 @@ class CGraphItem extends CZBXAPI {
 				$result = $gitem['rowscount'];
 			}
 			else {
-				if (!isset($result[$gitem['gitemid']])) {
-					$result[$gitem['gitemid']] = array();
-				}
-
-				$result[$gitem['gitemid']] += $gitem;
+				$result[$gitem['gitemid']] = $gitem;
 			}
 		}
 

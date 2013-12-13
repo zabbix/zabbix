@@ -125,11 +125,7 @@ class CIconMap extends CZBXAPI {
 				$result = $iconMap['rowscount'];
 			}
 			else {
-				if (!isset($result[$iconMap['iconmapid']])) {
-					$result[$iconMap['iconmapid']] = array();
-				}
-
-				$result[$iconMap['iconmapid']] += $iconMap;
+				$result[$iconMap['iconmapid']] = $iconMap;
 			}
 		}
 

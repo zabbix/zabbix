@@ -172,11 +172,8 @@ class CDRule extends CZBXAPI {
 				else
 					$result = $drule['rowscount'];
 			}
-			else{
-				if (!isset($result[$drule['druleid']]))
-					$result[$drule['druleid']]= array();
-
-				$result[$drule['druleid']] += $drule;
+			else {
+				$result[$drule['druleid']] = $drule;
 			}
 		}
 

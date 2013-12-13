@@ -200,11 +200,7 @@ class CHostInterface extends CZBXAPI {
 				}
 			}
 			else {
-				if (!isset($result[$interface['interfaceid']])) {
-					$result[$interface['interfaceid']] = array();
-				}
-
-				$result[$interface['interfaceid']] += $interface;
+				$result[$interface['interfaceid']] = $interface;
 			}
 		}
 
