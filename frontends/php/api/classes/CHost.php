@@ -1567,7 +1567,7 @@ class CHost extends CHostGeneral {
 		if ($options['selectInterfaces'] !== null) {
 			if ($options['selectInterfaces'] != API_OUTPUT_COUNT) {
 				$interfaces = API::HostInterface()->get(array(
-					'output' => $this->outputExtend('interface', array('hostid', 'interfaceid'), $options['selectInterfaces']),
+					'output' => $this->outputExtend($options['selectInterfaces'], array('hostid', 'interfaceid')),
 					'nodeids' => $options['nodeids'],
 					'hostids' => $hostids,
 					'nopermissions' => true,
@@ -1602,7 +1602,7 @@ class CHost extends CHostGeneral {
 		if ($options['selectScreens'] !== null) {
 			if ($options['selectScreens'] != API_OUTPUT_COUNT) {
 				$screens = API::TemplateScreen()->get(array(
-					'output' => $this->outputExtend('screens', 'hostid', $options['selectScreens']),
+					'output' => $this->outputExtend($options['selectScreens'], array('hostid')),
 					'nodeids' => $options['nodeids'],
 					'hostids' => $hostids,
 					'nopermissions' => true
@@ -1659,7 +1659,7 @@ class CHost extends CHostGeneral {
 		// adding host discovery
 		if ($options['selectHostDiscovery'] !== null) {
 			$hostDiscoveries = API::getApi()->select('host_discovery', array(
-				'output' => $this->outputExtend('host_discovery', array('hostid'), $options['selectHostDiscovery']),
+				'output' => $this->outputExtend($options['selectHostDiscovery'], array('hostid')),
 				'filter' => array('hostid' => $hostids),
 				'preservekeys' => true,
 				'nodeids' => get_current_nodeid(true)

@@ -1139,7 +1139,7 @@ class CTemplate extends CHostGeneral {
 		if ($options['selectScreens'] !== null) {
 			if ($options['selectScreens'] != API_OUTPUT_COUNT) {
 				$screens = API::TemplateScreen()->get(array(
-					'output' => $this->outputExtend('screens', array('templateid'), $options['selectScreens']),
+					'output' => $this->outputExtend($options['selectScreens'], array('templateid')),
 					'nodeids' => $options['nodeids'],
 					'templateids' => $templateids,
 					'nopermissions' => true

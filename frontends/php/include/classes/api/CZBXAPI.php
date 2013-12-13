@@ -221,26 +221,19 @@ class CZBXAPI {
 	/**
 	 * Adds the given fields to the "output" option if it's not already present.
 	 *
-	 * @param string       $tableName
-	 * @param string|array $fields		either a single field name, or an array of fields
-	 * @param string       $output
+	 * @param string $output
+	 * @param array $fields        either a single field name, or an array of fields
 	 *
 	 * @return mixed
 	 */
-	protected function outputExtend($tableName, $fields, $output) {
-		$fields = (array) $fields;
-
-		foreach ($fields as $field) {
-			if ($output == API_OUTPUT_REFER) {
-				$output = array($this->pk($tableName), $field);
-			}
-
-			if (is_array($output) && !in_array($field, $output)) {
-				$output[] = $field;
-			}
+	protected function outputExtend($output, array $fields) {
+		// if output is set to extend, it already contains that field; return it as is
+		if ($output === API_OUTPUT_EXTEND) {
+			return $output;
 		}
 
-		return $output;
+		// if output is an array, add the additional fields
+		return array_keys(array_flip(array_merge($output, $fields)));
 	}
 
 	/**

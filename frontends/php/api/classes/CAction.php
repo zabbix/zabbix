@@ -1732,7 +1732,7 @@ class CAction extends CZBXAPI {
 		// adding conditions
 		if (!is_null($options['selectConditions']) && $options['selectConditions'] != API_OUTPUT_COUNT) {
 			$conditions = API::getApi()->select('conditions', array(
-				'output' => $this->outputExtend('conditions', array('actionid', 'conditionid'), $options['selectConditions']),
+				'output' => $this->outputExtend($options['selectConditions'], array('actionid', 'conditionid')),
 				'filter' => array('actionid' => $actionIds),
 				'preservekeys' => true,
 				'nodeids' => get_current_nodeid(true)
@@ -1746,8 +1746,8 @@ class CAction extends CZBXAPI {
 		// adding operations
 		if ($options['selectOperations'] !== null && $options['selectOperations'] != API_OUTPUT_COUNT) {
 			$operations = API::getApi()->select('operations', array(
-				'output' => $this->outputExtend('operations',
-					array('operationid', 'actionid', 'operationtype'), $options['selectOperations']
+				'output' => $this->outputExtend($options['selectOperations'],
+					array('operationid', 'actionid', 'operationtype')
 				),
 				'filter' => array('actionid' => $actionIds),
 				'preservekeys' => true,

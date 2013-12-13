@@ -715,7 +715,7 @@ class CHttpTest extends CZBXAPI {
 		if ($options['selectSteps'] !== null) {
 			if ($options['selectSteps'] != API_OUTPUT_COUNT) {
 				$httpSteps = API::getApi()->select('httpstep', array(
-					'output' => $this->outputExtend('httpstep', array('httptestid', 'httpstepid'), $options['selectSteps']),
+					'output' => $this->outputExtend($options['selectSteps'], array('httptestid', 'httpstepid')),
 					'filters' => array('httptestid' => $httpTestIds),
 					'preservekeys' => true,
 					'nodeids' => get_current_nodeid(true)

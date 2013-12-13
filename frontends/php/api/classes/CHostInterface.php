@@ -881,7 +881,7 @@ class CHostInterface extends CZBXAPI {
 		if ($options['selectItems'] !== null) {
 			if ($options['selectItems'] != API_OUTPUT_COUNT) {
 				$items = API::Item()->get(array(
-					'output' => $this->outputExtend('items', array('itemid', 'interfaceid'), $options['selectItems']),
+					'output' => $this->outputExtend($options['selectItems'], array('itemid', 'interfaceid')),
 					'nodeids' => $options['nodeids'],
 					'interfaceids' => $interfaceIds,
 					'nopermissions' => true,

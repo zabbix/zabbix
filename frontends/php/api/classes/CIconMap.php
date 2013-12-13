@@ -459,7 +459,7 @@ class CIconMap extends CZBXAPI {
 
 		if ($options['selectMappings'] !== null && $options['selectMappings'] != API_OUTPUT_COUNT) {
 			$mappings = API::getApi()->select('icon_mapping', array(
-				'output' => $this->outputExtend('icon_mapping', array('iconmapid', 'iconmappingid'), $options['selectMappings']),
+				'output' => $this->outputExtend($options['selectMappings'], array('iconmapid', 'iconmappingid')),
 				'filter' => array('iconmapid' => $iconMapIds),
 				'preservekeys' => true,
 				'nodeids' => get_current_nodeid(true)

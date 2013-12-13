@@ -267,7 +267,7 @@ class CDHost extends CZBXAPI {
 		if (!is_null($options['selectDServices'])) {
 			if ($options['selectDServices'] != API_OUTPUT_COUNT) {
 				$dservices = API::DService()->get(array(
-					'output' => $this->outputExtend('dservices', array('dserviceid', 'dhostid'), $options['selectDServices']),
+					'output' => $this->outputExtend($options['selectDServices'], array('dserviceid', 'dhostid')),
 					'nodeids' => $options['nodeids'],
 					'dhostids' => $dhostIds,
 					'preservekeys' => true
