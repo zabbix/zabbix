@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated American English, French, Hungarian, Japanese, Russian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A.F....... [ZBX-7407] fixed being able to change event source for existing actions (Ivo)
 ...G...PS. [ZBX-7392] fixed memory leaks in gnuregex.c (igors)
 ........S. [ZBX-7397] reduced value cache memory usage (wiper)
 ........S. [ZBX-7516] fixed typo in SQL query: changed "impi_disable_until" to "ipmi_disable_until" (asaveljevs)
