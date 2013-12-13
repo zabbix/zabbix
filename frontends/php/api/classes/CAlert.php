@@ -106,7 +106,7 @@ class CAlert extends CZBXAPI {
 			if ($options['eventobject'] == EVENT_OBJECT_TRIGGER) {
 				$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
-				// Oracle does not support using disctinct with nclob fields, so we must use exists instead of joins
+				// Oracle does not support using distinct with nclob fields, so we must use exists instead of joins
 				$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
 					' FROM events e,functions f,items i,hosts_groups hgg'.
@@ -126,7 +126,7 @@ class CAlert extends CZBXAPI {
 			elseif ($options['eventobject'] == EVENT_OBJECT_ITEM || $options['eventobject'] == EVENT_OBJECT_LLDRULE) {
 				$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
-				// Oracle does not support using disctinct with nclob fields, so we must use exists instead of joins
+				// Oracle does not support using distinct with nclob fields, so we must use exists instead of joins
 				$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
 					' FROM events e,items i,hosts_groups hgg'.
@@ -143,7 +143,7 @@ class CAlert extends CZBXAPI {
 			}
 		}
 
-		// Oracle does not support using disctinct with nclob fields, so we must use exists instead of joins
+		// Oracle does not support using distinct with nclob fields, so we must use exists instead of joins
 		$sqlParts['where'][] = 'EXISTS ('.
 			'SELECT NULL'.
 			' FROM events e'.
@@ -158,7 +158,7 @@ class CAlert extends CZBXAPI {
 
 			// triggers
 			if ($options['eventobject'] == EVENT_OBJECT_TRIGGER) {
-				// Oracle does not support using disctinct with nclob fields, so we must use exists instead of joins
+				// Oracle does not support using distinct with nclob fields, so we must use exists instead of joins
 				$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
 					' FROM events e,functions f,items i,hosts_groups hg'.
@@ -171,7 +171,7 @@ class CAlert extends CZBXAPI {
 			}
 			// lld rules and items
 			elseif ($options['eventobject'] == EVENT_OBJECT_LLDRULE || $options['eventobject'] == EVENT_OBJECT_ITEM) {
-				// Oracle does not support using disctinct with nclob fields, so we must use exists instead of joins
+				// Oracle does not support using distinct with nclob fields, so we must use exists instead of joins
 				$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
 					' FROM events e,items i,hosts_groups hg'.
@@ -189,7 +189,7 @@ class CAlert extends CZBXAPI {
 
 			// triggers
 			if ($options['eventobject'] == EVENT_OBJECT_TRIGGER) {
-				// Oracle does not support using disctinct with nclob fields, so we must use exists instead of joins
+				// Oracle does not support using distinct with nclob fields, so we must use exists instead of joins
 				$sqlParts['where'][] = 'EXISTS ('.
 				'SELECT NULL'.
 				' FROM events e,functions f,items i'.
@@ -201,7 +201,7 @@ class CAlert extends CZBXAPI {
 			}
 			// lld rules and items
 			elseif ($options['eventobject'] == EVENT_OBJECT_LLDRULE || $options['eventobject'] == EVENT_OBJECT_ITEM) {
-				// Oracle does not support using disctinct with nclob fields, so we must use exists instead of joins
+				// Oracle does not support using distinct with nclob fields, so we must use exists instead of joins
 				$sqlParts['where'][] = 'EXISTS ('.
 				'SELECT NULL'.
 				' FROM events e,items i'.
@@ -224,7 +224,7 @@ class CAlert extends CZBXAPI {
 				&& in_array($options['eventobject'], array(EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE))) {
 			zbx_value2array($options['objectids']);
 
-			// Oracle does not support using disctinct with nclob fields, so we must use exists instead of joins
+			// Oracle does not support using distinct with nclob fields, so we must use exists instead of joins
 			$sqlParts['where'][] = 'EXISTS ('.
 				'SELECT NULL'.
 				' FROM events e'.

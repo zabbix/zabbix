@@ -210,21 +210,33 @@ elseif (isset($_REQUEST['save'])) {
 	clearCookies($result, $discoveryRule['itemid']);
 }
 // GO
-elseif (($_REQUEST['go'] == 'activate' || $_REQUEST['go'] == 'disable') && isset($_REQUEST['group_hostid'])) {
-	DBstart();
+elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('group_hostid')) {
+	$enable = (getRequest('go') == 'activate');
+	$status = $enable ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
 	$update = array();
-	foreach ((array) get_request('group_hostid') as $hostPrototypeId) {
+
+	DBstart();
+	foreach ((array) getRequest('group_hostid') as $hostPrototypeId) {
 		$update[] = array(
 			'hostid' => $hostPrototypeId,
-			'status' => (get_request('go') == 'activate') ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED
+			'status' => $status
 		);
 	}
 
-	$go_result = API::HostPrototype()->update($update);
+	$result = API::HostPrototype()->update($update);
+	DBend($result);
 
-	show_messages($go_result, ($_REQUEST['go'] == 'activate') ? _('Host prototypes activated') : _('Host prototypes disabled'), null);
-	DBend($go_result);
-	clearCookies($go_result, $discoveryRule['itemid']);
+	$updated = count($update);
+
+	$messageSuccess = $enable
+		? _n('Host prototype enabled', 'Host prototypes enabled', $updated)
+		: _n('Host prototype disabled', 'Host prototypes disabled', $updated);
+	$messageFailed = $enable
+		? _n('Cannot enable host prototype', 'Cannot enable host prototypes', $updated)
+		: _n('Cannot disable host prototype', 'Cannot disable host prototypes', $updated);
+
+	show_messages($result, $messageSuccess, $messageFailed);
+	clearCookies($result, $discoveryRule['itemid']);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_hostid'])) {
 	DBstart();
