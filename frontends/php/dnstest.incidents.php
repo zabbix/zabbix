@@ -52,7 +52,7 @@ $fields = array(
 check_fields($fields);
 
 if (isset($_REQUEST['favobj'])) {
-	if('filter' == $_REQUEST['favobj']){
+	if('filter' == $_REQUEST['favobj']) {
 		CProfile::update('web.dnstest.incidents.filter.state', get_request('favstate'), PROFILE_TYPE_INT);
 	}
 }
@@ -371,14 +371,15 @@ if ($host || $data['filter_search']) {
 								$data['rdds']['events'][$i] = array_merge($data['rdds']['events'][$i], $newData[$i]);
 							}
 
-							$data[$itemType]['events'][$i]['incidentHistory'] = getCount(
+							$data[$itemType]['events'][$i]['incidentTotalTests'] = getTotalTestsCount(
 								$itemId,
-								$itemType,
+								$filterTimeFrom,
+								$filterTimeTill,
 								$data[$itemType]['events'][$i]['startTime'],
 								$data[$itemType]['events'][$i]['endTime']
 							);
 
-							$data[$itemType]['events'][$i]['rollingWeekHistory'] = getCount(
+							$data[$itemType]['events'][$i]['incidentFailedTests'] = getFailedTestsCount(
 								$itemId,
 								$itemType,
 								$filterTimeFrom,
@@ -407,14 +408,14 @@ if ($host || $data['filter_search']) {
 								);
 							}
 
-							$data[$itemInfo['itemType']]['events'][$i]['incidentHistory'] = getCount(
+							$data[$itemInfo['itemType']]['events'][$i]['incidentTotalTests'] = getTotalTestsCount(
 								$itemInfo['itemId'],
-								$itemInfo['itemType'],
-								$data[$itemInfo['itemType']]['events'][$i]['startTime'],
-								$filterTimeTill
+								$filterTimeFrom,
+								$filterTimeTill,
+								$data[$itemInfo['itemType']]['events'][$i]['startTime']
 							);
 
-							$data[$itemInfo['itemType']]['events'][$i]['rollingWeekHistory'] = getCount(
+							$data[$itemInfo['itemType']]['events'][$i]['incidentFailedTests'] = getFailedTestsCount(
 								$itemInfo['itemId'],
 								$itemInfo['itemType'],
 								$filterTimeFrom,
@@ -488,13 +489,14 @@ if ($host || $data['filter_search']) {
 								'startTime' => $addEvent['clock'],
 								'endTime' => $event['clock'],
 								'false_positive' => $event['false_positive'],
-								'incidentHistory' => getCount(
+								'incidentTotalTests' => getTotalTestsCount(
 									$itemInfo['itemId'],
-									$itemInfo['itemType'],
+									$filterTimeFrom,
+									$filterTimeTill,
 									$addEvent['clock'],
 									$event['clock']
 								),
-								'rollingWeekHistory' => getCount(
+								'incidentFailedTests' => getFailedTestsCount(
 									$itemInfo['itemId'],
 									$itemInfo['itemType'],
 									$filterTimeFrom,
@@ -557,14 +559,15 @@ if ($host || $data['filter_search']) {
 				}
 
 				if ($getHistory) {
-					$data[$itemType]['events'][$i]['incidentHistory'] = getCount(
+					$data[$itemType]['events'][$i]['incidentTotalTests'] = getTotalTestsCount(
 						$itemId,
-						$itemType,
+						$filterTimeFrom,
+						$filterTimeTill,
 						$data[$itemType]['events'][$i]['startTime'],
 						$data[$itemType]['events'][$i]['endTime']
 					);
 
-					$data[$itemType]['events'][$i]['rollingWeekHistory'] = getCount(
+					$data[$itemType]['events'][$i]['incidentFailedTests'] = getFailedTestsCount(
 						$itemId,
 						$itemType,
 						$filterTimeFrom,
@@ -623,14 +626,15 @@ if ($host || $data['filter_search']) {
 						$data['rdds']['events'][$i] = array_merge($data['rdds']['events'][$i], $newData[$i]);
 					}
 
-					$data[$itemType]['events'][$i]['incidentHistory'] = getCount(
+					$data[$itemType]['events'][$i]['incidentTotalTests'] = getTotalTestsCount(
 						$itemId,
-						$itemType,
+						$filterTimeFrom,
+						$filterTimeTill,
 						$data[$itemType]['events'][$i]['startTime'],
 						$data[$itemType]['events'][$i]['endTime']
 					);
 
-					$data[$itemType]['events'][$i]['rollingWeekHistory'] = getCount(
+					$data[$itemType]['events'][$i]['incidentFailedTests'] = getFailedTestsCount(
 						$itemId,
 						$itemType,
 						$filterTimeFrom,
@@ -659,14 +663,14 @@ if ($host || $data['filter_search']) {
 						);
 					}
 
-					$data[$itemInfo['itemType']]['events'][$i]['incidentHistory'] = getCount(
+					$data[$itemInfo['itemType']]['events'][$i]['incidentTotalTests'] = getTotalTestsCount(
 						$itemInfo['itemId'],
-						$itemInfo['itemType'],
-						$data[$itemInfo['itemType']]['events'][$i]['startTime'],
-						$filterTimeTill
+						$filterTimeFrom,
+						$filterTimeTill,
+						$data[$itemInfo['itemType']]['events'][$i]['startTime']
 					);
 
-					$data[$itemInfo['itemType']]['events'][$i]['rollingWeekHistory'] = getCount(
+					$data[$itemInfo['itemType']]['events'][$i]['incidentFailedTests'] = getFailedTestsCount(
 						$itemInfo['itemId'],
 						$itemInfo['itemType'],
 						$filterTimeFrom,
@@ -676,44 +680,44 @@ if ($host || $data['filter_search']) {
 				}
 			}
 
-			// incident count
-			$allItems = array($dnsAvailItem, $dnssecAvailItem, $rddsAvailItem);
+			$data['dns']['totalTests'] = 0;
+			$data['dnssec']['totalTests'] = 0;
+			$data['rdds']['totalTests'] = 0;
+			$data['dns']['inIncident'] = 0;
+			$data['dnssec']['inIncident'] = 0;
+			$data['rdds']['inIncident'] = 0;
 
-			foreach ($allItems as $key => $allItem) {
-				if (!$allItem) {
-					unset($allItems[$key]);
-				}
+			$dnsAndDnssec = array();
+
+			if ($dnsAvailItem && $dnssecAvailItem) {
+				$dnsAndDnssec = array($dnsAvailItem, $dnssecAvailItem);
+			}
+			elseif ($dnsAvailItem && !$dnssecAvailItem) {
+				$dnsAndDnssec[] = $dnsAvailItem;
+			}
+			elseif (!$dnsAvailItem && $dnssecAvailItem) {
+				$dnsAndDnssec[] = $dnssecAvailItem;
 			}
 
-			if ($allItems) {
+			if ($dnsAndDnssec) {
 				$itemsHistories = DBselect(
 					'SELECT h.clock, h.value, h.itemid'.
 					' FROM history_uint h'.
-					' WHERE '.dbConditionInt('h.itemid', $allItems).
+					' WHERE '.dbConditionInt('h.itemid', $dnsAndDnssec).
 						' AND h.clock>='.$filterTimeFrom.
 						' AND h.clock<='.$filterTimeTill.
 						' AND h.value=0'
 				);
 
-				$data['dns']['incidentTotal'] = 0;
-				$data['dnssec']['incidentTotal'] = 0;
-				$data['rdds']['incidentTotal'] = 0;
-				$data['dns']['inIncident'] = 0;
-				$data['dnssec']['inIncident'] = 0;
-				$data['rdds']['inIncident'] = 0;
-
 				while ($itemsHistory = DBfetch($itemsHistories)) {
 					if ($itemsHistory['itemid'] == $dnsAvailItem) {
 						$type = 'dns';
 					}
-					elseif ($itemsHistory['itemid'] == $dnssecAvailItem) {
+					else {
 						$type = 'dnssec';
 					}
-					else {
-						$type = 'rdds';
-					}
 
-					$data[$type]['incidentTotal']++;
+					$data[$type]['totalTests']++;
 
 					foreach ($data[$type]['events'] as $incident) {
 						if ($itemsHistory['clock'] >= $incident['startTime'] && (!isset($incident['endTime'])
@@ -724,51 +728,25 @@ if ($host || $data['filter_search']) {
 				}
 			}
 
-			// get host with calculated items
-			$dnstest = API::Host()->get(array(
-				'output' => array('hostid'),
-				'filter' => array(
-					'host' => DNSTEST_HOST
-				)
-			));
+			if ($rddsAvailItem) {
+				$itemsHistories = DBselect(
+					'SELECT h.clock, h.value, h.itemid'.
+					' FROM history_uint h'.
+					' WHERE h.itemid='.$rddsAvailItem.
+						' AND h.clock>='.$filterTimeFrom.
+						' AND h.clock<='.$filterTimeTill.
+						' AND h.value<2'
+				);
 
-			if ($dnstest) {
-				$dnstest = reset($dnstest);
-			}
-			else {
-				show_error_message(_s('No permissions to referred host "%1$s" or it does not exist!', DNSTEST_HOST));
-				require_once dirname(__FILE__).'/include/page_footer.php';
-				exit;
-			}
+				while ($itemsHistory = DBfetch($itemsHistories)) {
+					$data['rdds']['totalTests']++;
 
-			$items = API::Item()->get(array(
-				'hostids' => array($dnstest['hostid']),
-				'output' => array('itemid', 'key_'),
-				'filter' => array(
-					'key_' => array(CALCULATED_ITEM_DNS_DELAY, CALCULATED_ITEM_DNSSEC_DELAY, CALCULATED_ITEM_RDDS_DELAY)
-				)
-			));
-
-			if (count($items) != 3) {
-				show_error_message(_s('Missed items for host "%1$s"!', DNSTEST_HOST));
-				require_once dirname(__FILE__).'/include/page_footer.php';
-				exit;
-			}
-
-			$getItems = array();
-			foreach ($items as $item) {
-				$timeStep = getOldValue($item['itemid'], $filterTimeFrom) / 60;
-				if ($item['key_'] == CALCULATED_ITEM_DNS_DELAY) {
-					$data['dns']['incidentTotal'] *= $timeStep;
-					$data['dns']['inIncident'] *= $timeStep;
-				}
-				elseif ($item['key_'] == CALCULATED_ITEM_DNSSEC_DELAY) {
-					$data['dnssec']['incidentTotal'] *= $timeStep;
-					$data['dnssec']['inIncident'] *= $timeStep;
-				}
-				else {
-					$data['rdds']['incidentTotal'] *= $timeStep;
-					$data['rdds']['inIncident'] *= $timeStep;
+					foreach ($data['rdds']['events'] as $incident) {
+						if ($itemsHistory['clock'] >= $incident['startTime'] && (!isset($incident['endTime'])
+								|| (isset($incident['endTime']) && $itemsHistory['clock'] <= $incident['endTime']))) {
+							$data['rdds']['inIncident']++;
+						}
+					}
 				}
 			}
 		}

@@ -19,31 +19,33 @@
 **/
 
 
-function getCount($itemId, $itemType, $startTime, $endTime, $incidentStartTime = null, $incidentEndTime = null) {
-	if (!$incidentStartTime) {
-		$from = ($startTime >= $incidentStartTime) ? $startTime : $incidentStartTime;
-	}
-	else {
-		$from = ($startTime >= $incidentStartTime) ? $incidentStartTime : $startTime;
-	}
-
-	if (!$incidentEndTime) {
-		$to = $endTime;
-	}
-	else {
-		$to = ($endTime >= $incidentEndTime) ? $incidentEndTime : $endTime;
-	}
-
+function getFailedTestsCount($itemId, $itemType, $startTime, $endTime, $incidentStartTime, $incidentEndTime = null) {
+	$to = $incidentEndTime ? $incidentEndTime : $endTime;
 	$value = ($itemType == 'rdds') ? '!=2' : '=0';
 
-	$getCount = DBfetch(DBselect(
+	$getFailedTestsCount = DBfetch(DBselect(
 		'SELECT COUNT(itemid) AS count'.
 		' FROM history_uint h'.
 		' WHERE h.itemid='.$itemId.
-			' AND h.clock>='.zbx_dbstr($from).
-			' AND h.clock<='.zbx_dbstr($to).
+			' AND h.clock>='.$incidentStartTime.
+			' AND h.clock<='.$to.
 			' AND h.value'.$value
 	));
 
-	return $getCount['count'];
+	return $getFailedTestsCount['count'];
+}
+
+function getTotalTestsCount($itemId, $startTime, $endTime, $incidentStartTime = null, $incidentEndTime = null) {
+	$from = $incidentStartTime ? $incidentStartTime : $startTime;
+	$to = $incidentEndTime ? $incidentEndTime : $endTime;
+
+	$getTotalTestsCount = DBfetch(DBselect(
+		'SELECT COUNT(itemid) AS count'.
+		' FROM history_uint h'.
+		' WHERE h.itemid='.$itemId.
+			' AND h.clock>='.$from.
+			' AND h.clock<='.$to
+	));
+
+	return $getTotalTestsCount['count'];
 }

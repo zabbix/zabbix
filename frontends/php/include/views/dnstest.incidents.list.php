@@ -195,8 +195,8 @@ $headers = array(
 	_('Status'),
 	_('Start time'),
 	_('End Time'),
-	_('Total number of tests'),
 	_('Failed tests within incident'),
+	_('Total number of tests'),
 	_('Service ticket')
 );
 $noData = _('No incidents found.');
@@ -230,8 +230,8 @@ if (isset($this->data['tld'])) {
 				$incidentStatus,
 				date('d.m.Y H:i:s', $event['startTime']),
 				isset($event['endTime']) ? date('d.m.Y H:i:s', $event['endTime']) : '-',
-				isset($event['incidentHistory']) ? $event['incidentHistory'] : '-',
-				$event['rollingWeekHistory'],
+				$event['incidentFailedTests'],
+				$event['incidentTotalTests'],
 				new CLink('XYZ123', 'http://ticket.com', null, null, true),
 			);
 
@@ -239,7 +239,7 @@ if (isset($this->data['tld'])) {
 		}
 
 		$testsDown = new CLink(
-			$this->data['dns']['incidentTotal'],
+			$this->data['dns']['totalTests'],
 			'dnstest.tests.php?filter_from='.$this->data['filter_from'].'&filter_to='.$this->data['filter_to'].
 				'&filter_set=1&host='.$this->data['tld']['host'].'&type=0&slvItemId='.$this->data['dns']['itemid']
 		);
@@ -250,11 +250,11 @@ if (isset($this->data['tld'])) {
 			SPACE,
 			$testsDown,
 			SPACE,
-			_n('test', 'tests', $this->data['dns']['incidentTotal']),
+			_n('test', 'tests', $this->data['dns']['totalTests']),
 			'('._s(
 				'%1$s in incidents, %2$s outside incidents',
 				$this->data['dns']['inIncident'],
-				$this->data['dns']['incidentTotal'] - $this->data['dns']['inIncident']
+				$this->data['dns']['totalTests'] - $this->data['dns']['inIncident']
 			).')'
 		);
 
@@ -301,8 +301,8 @@ if (isset($this->data['tld'])) {
 				$incidentStatus,
 				date('d.m.Y H:i:s', $event['startTime']),
 				isset($event['endTime']) ? date('d.m.Y H:i:s', $event['endTime']) : '-',
-				isset($event['incidentHistory']) ? $event['incidentHistory'] : '-',
-				$event['rollingWeekHistory'],
+				$event['incidentFailedTests'],
+				$event['incidentTotalTests'],
 				new CLink('XYZ123', 'http://ticket.com', null, null, true),
 			);
 
@@ -311,7 +311,7 @@ if (isset($this->data['tld'])) {
 
 
 		$testsDown = new CLink(
-			$this->data['dnssec']['incidentTotal'],
+			$this->data['dnssec']['totalTests'],
 			'dnstest.tests.php?filter_from='.$this->data['filter_from'].'&filter_to='.$this->data['filter_to'].
 				'&filter_set=1&host='.$this->data['tld']['host'].'&type=1&slvItemId='.$this->data['dnssec']['itemid']
 		);
@@ -322,11 +322,11 @@ if (isset($this->data['tld'])) {
 			SPACE,
 			$testsDown,
 			SPACE,
-			_n('test', 'tests', $this->data['dnssec']['incidentTotal']),
+			_n('test', 'tests', $this->data['dnssec']['totalTests']),
 			'('._s(
 				'%1$s in incidents, %2$s outside incidents',
 				$this->data['dnssec']['inIncident'],
-				$this->data['dnssec']['incidentTotal'] - $this->data['dnssec']['inIncident']
+				$this->data['dnssec']['totalTests'] - $this->data['dnssec']['inIncident']
 			).')'
 		);
 
@@ -373,8 +373,8 @@ if (isset($this->data['tld'])) {
 				$incidentStatus,
 				date('d.m.Y H:i:s', $event['startTime']),
 				isset($event['endTime']) ? date('d.m.Y H:i:s', $event['endTime']) : '-',
-				isset($event['incidentHistory']) ? $event['incidentHistory'] : '-',
-				$event['rollingWeekHistory'],
+				$event['incidentFailedTests'],
+				$event['incidentTotalTests'],
 				new CLink('XYZ123', 'http://ticket.com', null, null, true),
 			);
 
@@ -382,7 +382,7 @@ if (isset($this->data['tld'])) {
 		}
 
 		$testsDown = new CLink(
-			$this->data['rdds']['incidentTotal'],
+			$this->data['rdds']['totalTests'],
 			'dnstest.tests.php?filter_from='.$this->data['filter_from'].'&filter_to='.$this->data['filter_to'].
 				'&filter_set=1&host='.$this->data['tld']['host'].'&type=2&slvItemId='.$this->data['rdds']['itemid']
 		);
@@ -393,11 +393,11 @@ if (isset($this->data['tld'])) {
 			SPACE,
 			$testsDown,
 			SPACE,
-			_n('test', 'tests', $this->data['rdds']['incidentTotal']),
+			_n('test', 'tests', $this->data['rdds']['totalTests']),
 			'('._s(
 				'%1$s in incidents, %2$s outside incidents',
 				$this->data['rdds']['inIncident'],
-				$this->data['rdds']['incidentTotal'] - $this->data['rdds']['inIncident']
+				$this->data['rdds']['totalTests'] - $this->data['rdds']['inIncident']
 			).')'
 		);
 
