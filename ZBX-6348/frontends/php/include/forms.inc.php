@@ -1506,7 +1506,7 @@
 				'selectHosts' => array('name')
 			));
 			foreach ($data['db_dependencies'] as &$dependency) {
-				if (!empty($dependency['hosts'][0]['name'])) {
+				if (!zbx_empty($dependency['hosts'][0]['name'])) {
 					$dependency['host'] = $dependency['hosts'][0]['name'];
 				}
 				unset($dependency['hosts']);
