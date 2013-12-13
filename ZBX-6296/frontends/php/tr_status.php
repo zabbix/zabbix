@@ -428,7 +428,8 @@ $triggers = API::Trigger()->get($options);
 order_result($triggers, $sortfield, $sortorder);
 $paging = getPagingLine($triggers);
 
-$options = array(
+
+$triggers = API::Trigger()->get(array(
 	'nodeids' => get_current_nodeid(),
 	'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 	'output' => API_OUTPUT_EXTEND,
@@ -438,8 +439,7 @@ $options = array(
 	'selectLastEvent' => true,
 	'expandDescription' => true,
 	'preservekeys' => true
-);
-$triggers = API::Trigger()->get($options);
+));
 
 order_result($triggers, $sortfield, $sortorder);
 

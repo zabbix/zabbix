@@ -78,6 +78,10 @@ class class_CDescription extends PHPUnit_Framework_TestCase {
 				' FROM triggers t'.
 				' WHERE t.triggerid='.$triggerId
 		));
+
+		$triggers = appendHostsToTriggers(array($trigger), array('hostid'));
+		$trigger = reset($trigger);
+
 		$description = CMacrosResolverHelper::resolveTriggerName($trigger);
 
 		$this->assertEquals($expectedDescription, $description);

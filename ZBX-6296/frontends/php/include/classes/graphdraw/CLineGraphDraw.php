@@ -459,6 +459,7 @@ class CLineGraphDraw extends CGraphDraw {
 					continue;
 				}
 
+				$trigger['hosts'][] = array('hostid' => $trigger['hostid']);
 				$trigger['expression'] = CMacrosResolverHelper::resolveTriggerExpressionUserMacro($trigger);
 
 				if (!preg_match('/^\{([0-9]+)\}\s*?([\<\>\=]{1})\s*?([\-0-9\.]+)([TGMKsmhdw]?)$/', $trigger['expression'], $arr)) {

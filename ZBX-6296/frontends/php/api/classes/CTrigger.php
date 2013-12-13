@@ -465,8 +465,12 @@ class CTrigger extends CTriggerGeneral {
 		if ($options['groupids'] !== null && $options['selectGroups'] === null) {
 			$options['selectGroups'] = API_OUTPUT_REFER;
 		}
-		if ($options['hostids'] !== null && $options['selectHosts'] === null) {
-			$options['selectHosts'] = API_OUTPUT_REFER;
+		if ($options['selectHosts'] === null
+				&& ($options['hostids'] !== null
+					|| $options['expandDescription'] !== null
+					|| $options['expandComment'] !== null
+					|| $options['expandExpression'] !== null)) {
+			$options['selectHosts'] = array('hostid');
 		}
 		if ($options['itemids'] !== null && $options['selectItems'] === null) {
 			$options['selectItems'] = array('itemid');
@@ -480,9 +484,8 @@ class CTrigger extends CTriggerGeneral {
 		if (!is_null($options['expandDescription']) && $result && array_key_exists('description', reset($result))) {
 			$result = CMacrosResolverHelper::resolveTriggerNames($result);
 		}
-
 		// expandComment
-		if (!is_null($options['expandComment']) && $result && array_key_exists('comment', reset($result))) {
+		if (!is_null($options['expandComment']) && $result && array_key_exists('comments', reset($result))) {
 			$result = CMacrosResolverHelper::resolveTriggerDescriptions($result);
 		}
 

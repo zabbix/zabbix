@@ -760,8 +760,10 @@ elseif ($srctbl == 'triggers') {
 				BR()
 			);
 
-			foreach ($trigger['dependencies'] as $val) {
-				$description[] = array(CMacrosResolverHelper::resolveTriggerName($val), BR());
+			foreach ($trigger['dependencies'] as $dependentTrigger) {
+				$dependentTrigger['hosts'][] = array('hostid' => $dependentTrigger['hostid']);
+
+				$description[] = array(CMacrosResolverHelper::resolveTriggerName($dependentTrigger), BR());
 			}
 		}
 

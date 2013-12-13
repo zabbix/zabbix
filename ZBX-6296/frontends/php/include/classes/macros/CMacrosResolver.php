@@ -341,14 +341,13 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	/**
 	 * Resolve macros in trigger.
 	 *
-	 * @param array  $data								(as int $triggerId => array $trigger)
-	 * @param string $data[$triggerId]['expression']
-	 * @param string $data[$triggerId]['description']	depend from config
-	 * @param string $data[$triggerId]['comments']		depend from config
+	 * @param string $triggers[$triggerId]['expression']
+	 * @param string $triggers[$triggerId]['description']	depend from config
+	 * @param string $triggers[$triggerId]['comments']		depend from config
 	 *
 	 * @return array
 	 */
-	private function resolveTrigger(array $data) {
+	private function resolveTrigger(array $triggers) {
 		$macros = array('host' => array(), 'interfaceWithPriorities' => array(), 'item' => array());
 		$macroValues = $userMacrosData = $dbHosts = array();
 
@@ -362,29 +361,13 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$userMacrosAvailable = $this->isTypeAvailable('user');
 		$referenceMacrosAvailable = $this->isTypeAvailable('reference');
 
-		// load hosts ids
-		if ($userMacrosAvailable) {
-			$dbHosts = DBfetchArray(DBselect(
-				'SELECT f.triggerid,i.hostid'.
-					' FROM functions f,items i'.
-					' WHERE '.dbConditionInt('f.triggerid', array_keys($data)).
-					' AND f.itemid=i.itemid'
-			));
-		}
-
 		// find macros
-		foreach ($data as $triggerId => $trigger) {
+		foreach ($triggers as $triggerId => $trigger) {
 			if ($userMacrosAvailable) {
 				$userMacros = $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, array($trigger[$source]));
 
 				if ($userMacros) {
-					$hostIds = array();
-
-					foreach ($dbHosts as $dbHost) {
-						if (bccomp($dbHost['triggerid'], $triggerId) == 0) {
-							$hostIds[$dbHost['hostid']] = $dbHost['hostid'];
-						}
-					}
+					$hostIds = zbx_objectValues($trigger['hosts'], 'hostid');
 
 					foreach ($userMacros as $userMacro) {
 						if (!isset($userMacrosData[$triggerId])) {
@@ -452,7 +435,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$macroValues = $this->getIpMacros($macros['interfaceWithPriorities'], $macroValues);
 		}
 		if ($itemMacrosAvailable) {
-			$macroValues = $this->getItemMacros($macros['item'], $data, $macroValues);
+			$macroValues = $this->getItemMacros($macros['item'], $triggers, $macroValues);
 		}
 		if ($userMacrosData) {
 			$userMacros = $this->getUserMacros($userMacrosData);
@@ -465,7 +448,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 
 		// replace macros to value
-		foreach ($data as $triggerId => $trigger) {
+		foreach ($triggers as $triggerId => $trigger) {
 			preg_match_all('/'.self::PATTERN_HOST_FUNCTION.
 								'|'.self::PATTERN_INTERFACE_FUNCTION.
 								'|'.self::PATTERN_ITEM_FUNCTION.
@@ -479,10 +462,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				$trigger[$source] = substr_replace($trigger[$source], $macrosValue, $matche[1], strlen($matche[0]));
 			}
 
-			$data[$triggerId][$source] = $trigger[$source];
+			$triggers[$triggerId][$source] = $trigger[$source];
 		}
 
-		return $data;
+		return $triggers;
 	}
 
 	/**
@@ -495,10 +478,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @return string
 	 */
 	public function resolveTriggerReference($expression, $text) {
-		if ($macros = $this->getTriggerReference($expression, $text)) {
-			foreach ($macros as $i => $value) {
-				$text = str_replace($i, $value, $text);
-			}
+		foreach ($this->getTriggerReference($expression, $text) as $key => $value) {
+			$text = str_replace($key, $value, $text);
 		}
 
 		return $text;

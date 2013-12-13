@@ -107,6 +107,7 @@ elseif (get_request('triggers')) {
  */
 $eventTrigger = null;
 $eventAcknowledged = null;
+$eventTriggerName = null;
 
 $bulk = !isset($_REQUEST['eventid']);
 
@@ -116,10 +117,14 @@ if (!$bulk) {
 		'output' => API_OUTPUT_EXTEND,
 		'selectRelatedObject' => API_OUTPUT_EXTEND
 	));
+
 	if ($events) {
 		$event = reset($events);
 
-		$eventTriggerName = CMacrosResolverHelper::resolveTriggerName($event['relatedObject']);
+		$triggers = appendHostsToTriggers(array($event['relatedObject']), array('hostid'));
+		$trigger = reset($triggers);
+
+		$eventTriggerName = CMacrosResolverHelper::resolveTriggerName($trigger);
 		$eventAcknowledged = $event['acknowledged'];
 	}
 

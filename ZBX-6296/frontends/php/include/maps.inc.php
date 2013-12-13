@@ -562,7 +562,7 @@ function add_elementNames(&$selements) {
 	$triggers = API::Trigger()->get(array(
 		'triggerids' => $triggerids,
 		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => array('name'),
+		'selectHosts' => array('hostid', 'name'),
 		'nopermissions' => true,
 		'nodeids' => get_current_nodeid(true),
 		'preservekeys' => true
@@ -1120,6 +1120,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 			'triggerids' => array_keys($triggers_map),
 			'filter' => array('state' => null),
 			'output' => API_OUTPUT_EXTEND,
+			'selectHosts' => array('hostid'),
 			'nopermissions' => true
 		));
 		$all_triggers = array_merge($all_triggers, $triggers);
@@ -1136,6 +1137,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 		$triggers = API::Trigger()->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'triggerids' => array_keys($triggers_map_submaps),
+			'selectHosts' => array('hostid'),
 			'filter' => array('state' => null),
 			'skipDependent' => true,
 			'output' => API_OUTPUT_EXTEND,
@@ -1180,6 +1182,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 		'triggerids' => array_keys($all_triggers),
 		'withLastEventUnacknowledged' => true,
 		'output' => array('triggerid'),
+		'selectHosts' => array('hostid'),
 		'nodeids' => get_current_nodeid(true),
 		'nopermissions' => true,
 		'monitored' => true,

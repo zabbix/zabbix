@@ -285,6 +285,41 @@ function get_hosts_by_triggerid($triggerids) {
 	);
 }
 
+/**
+ * Append hosts with specified fields to triggers.
+ *
+ * @param array $triggers
+ * @param array $fields
+ *
+ * @return array
+ */
+function appendHostsToTriggers(array $triggers, array $fields) {
+	if (!in_array('hostid', $fields)) {
+		$fields[] = 'hostid';
+	}
+
+	$dbHosts = DBfetchArray(DBselect(
+		'SELECT DISTINCT h.'.implode(',h.', $fields).',f.triggerid'.
+		' FROM hosts h,functions f,items i'.
+		' WHERE i.itemid=f.itemid'.
+			' AND h.hostid=i.hostid'.
+			' AND '.dbConditionInt('f.triggerid', zbx_objectValues($triggers, 'triggerid'))
+	));
+
+	foreach ($triggers as &$trigger) {
+		foreach ($dbHosts as $dbHost) {
+			if (bccomp($trigger['triggerid'], $dbHost['triggerid']) == 0) {
+				unset($dbHost['triggerid']);
+
+				$trigger['hosts'][$dbHost['hostid']] = $dbHost;
+			}
+		}
+	}
+	unset($trigger);
+
+	return $triggers;
+}
+
 function get_triggers_by_hostid($hostid) {
 	return DBselect(
 		'SELECT DISTINCT t.*'.
@@ -770,6 +805,7 @@ function explode_exp($expressionCompressed, $html = false, $resolveMacro = false
 
 						$functionData['key_'] = $item['key_expanded'];
 						$functionData['expression'] = $functionData['parameter'];
+						$functionData['hosts'][] = $functionData['hostid'];
 						$functionData['expression'] = CMacrosResolverHelper::resolveTriggerExpressionUserMacro($functionData);
 						$functionData['parameter'] = $functionData['expression'];
 					}

@@ -281,6 +281,7 @@ if (isset($_REQUEST['pservices'])) {
 
 	// expand trigger descriptions
 	$triggers = zbx_objectValues($parentServices, 'trigger');
+	$triggers = appendHostsToTriggers($triggers, array('hostid'));
 	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
 	foreach ($parentServices as $key => $parentService) {
 		$parentServices[$key]['trigger'] = !empty($parentService['trigger'])
@@ -322,6 +323,7 @@ elseif (isset($_REQUEST['cservices'])) {
 
 	// expand trigger descriptions
 	$triggers = zbx_objectValues($childServices, 'trigger');
+	$triggers = appendHostsToTriggers($triggers, array('hostid'));
 	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
 	foreach ($childServices as $key => $childService) {
 		$childServices[$key]['trigger'] = !empty($childService['trigger'])
@@ -380,6 +382,7 @@ elseif (isset($_REQUEST['form'])) {
 
 			// expand trigger descriptions
 			$triggers = zbx_objectValues($childServices, 'trigger');
+			$triggers = appendHostsToTriggers($triggers, array('hostid'));
 			$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
 			foreach ($service['dependencies'] as $dependency) {
 				$childService = $childServices[$dependency['servicedownid']];
@@ -443,7 +446,7 @@ else {
 
 	// triggers
 	$triggers = zbx_objectValues($services, 'trigger');
-
+	$triggers = appendHostsToTriggers($triggers, array('hostid'));
 	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
 
 	foreach ($services as &$service) {
