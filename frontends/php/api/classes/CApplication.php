@@ -218,11 +218,7 @@ class CApplication extends CZBXAPI {
 				}
 			}
 			else {
-				if (!isset($result[$application['applicationid']])) {
-					$result[$application['applicationid']]= array();
-				}
-
-				$result[$application['applicationid']] += $application;
+				$result[$application['applicationid']] = $application;
 			}
 		}
 

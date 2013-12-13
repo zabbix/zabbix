@@ -137,11 +137,7 @@ class CProxy extends CZBXAPI {
 				$proxy['proxyid'] = $proxy['hostid'];
 				unset($proxy['hostid']);
 
-				if (!isset($result[$proxy['proxyid']])) {
-					$result[$proxy['proxyid']]= array();
-				}
-
-				$result[$proxy['proxyid']] += $proxy;
+				$result[$proxy['proxyid']] = $proxy;
 			}
 		}
 

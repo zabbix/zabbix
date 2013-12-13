@@ -449,11 +449,7 @@ class CTrigger extends CTriggerGeneral {
 		sort($triggerids);
 
 		foreach ($triggers as $trigger) {
-			if (!isset($result[$trigger['triggerid']])) {
-				$result[$trigger['triggerid']] = array();
-			}
-
-			$result[$trigger['triggerid']] += $trigger;
+			$result[$trigger['triggerid']] = $trigger;
 		}
 
 		if ($result) {

@@ -188,12 +188,8 @@ class CDHost extends CZBXAPI {
 				else
 					$result = $dhost['rowscount'];
 			}
-			else{
-				if (!isset($result[$dhost['dhostid']])) {
-					$result[$dhost['dhostid']]= array();
-				}
-
-				$result[$dhost['dhostid']] += $dhost;
+			else {
+				$result[$dhost['dhostid']] = $dhost;
 			}
 		}
 

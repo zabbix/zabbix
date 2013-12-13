@@ -148,11 +148,7 @@ class CUserGroup extends CZBXAPI {
 				$result = $usrgrp['rowscount'];
 			}
 			else {
-				if (!isset($result[$usrgrp['usrgrpid']])) {
-					$result[$usrgrp['usrgrpid']]= array();
-				}
-
-				$result[$usrgrp['usrgrpid']] += $usrgrp;
+				$result[$usrgrp['usrgrpid']] = $usrgrp;
 			}
 		}
 

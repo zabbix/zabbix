@@ -213,11 +213,7 @@ class CHttpTest extends CZBXAPI {
 				}
 			}
 			else {
-				if (!isset($result[$httpTest['httptestid']])) {
-					$result[$httpTest['httptestid']] = array();
-				}
-
-				$result[$httpTest['httptestid']] += $httpTest;
+				$result[$httpTest['httptestid']] = $httpTest;
 			}
 		}
 

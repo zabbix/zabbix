@@ -213,11 +213,7 @@ class CUserMacro extends CZBXAPI {
 					$result = $macro['rowscount'];
 				}
 				else {
-					if (!isset($result[$macro['globalmacroid']])) {
-						$result[$macro['globalmacroid']] = array();
-					}
-
-					$result[$macro['globalmacroid']] += $macro;
+					$result[$macro['globalmacroid']] = $macro;
 				}
 			}
 		}
@@ -226,16 +222,11 @@ class CUserMacro extends CZBXAPI {
 			$sqlParts = $this->applyQueryOutputOptions('hostmacro', 'hm', $options, $sqlParts);
 			$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 			while ($macro = DBfetch($res)) {
-
 				if ($options['countOutput']) {
 					$result = $macro['rowscount'];
 				}
 				else {
-					if (!isset($result[$macro['hostmacroid']])) {
-						$result[$macro['hostmacroid']] = array();
-					}
-
-					$result[$macro['hostmacroid']] += $macro;
+					$result[$macro['hostmacroid']] = $macro;
 				}
 			}
 		}

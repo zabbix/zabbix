@@ -298,8 +298,6 @@ class CGraphPrototype extends CGraphGeneral {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		$graphids = array();
-
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
@@ -314,13 +312,7 @@ class CGraphPrototype extends CGraphGeneral {
 				}
 			}
 			else {
-				$graphids[$graph['graphid']] = $graph['graphid'];
-
-				if (!isset($result[$graph['graphid']])) {
-					$result[$graph['graphid']]= array();
-				}
-
-				$result[$graph['graphid']] += $graph;
+				$result[$graph['graphid']] = $graph;
 			}
 		}
 

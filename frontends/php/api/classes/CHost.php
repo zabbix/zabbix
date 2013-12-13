@@ -427,11 +427,7 @@ class CHost extends CHostGeneral {
 				}
 			}
 			else {
-				if (!isset($result[$host['hostid']])) {
-					$result[$host['hostid']] = array();
-				}
-
-				$result[$host['hostid']] += $host;
+				$result[$host['hostid']] = $host;
 			}
 		}
 

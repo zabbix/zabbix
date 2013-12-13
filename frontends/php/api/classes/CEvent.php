@@ -346,11 +346,7 @@ class CEvent extends CZBXAPI {
 				}
 			}
 			else {
-				if (!isset($result[$event['eventid']])) {
-					$result[$event['eventid']]= array();
-				}
-
-				$result[$event['eventid']] += $event;
+				$result[$event['eventid']] = $event;
 			}
 		}
 

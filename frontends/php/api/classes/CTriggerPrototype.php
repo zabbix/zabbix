@@ -385,7 +385,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		$triggerids = array();
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
@@ -400,18 +399,12 @@ class CTriggerPrototype extends CTriggerGeneral {
 				}
 			}
 			else {
-				$triggerids[$trigger['triggerid']] = $trigger['triggerid'];
-
-				if (!isset($result[$trigger['triggerid']])) {
-					$result[$trigger['triggerid']] = array();
-				}
-
 				// expand expression
 				if ($options['expandExpression'] !== null && isset($trigger['expression'])) {
 					$trigger['expression'] = explode_exp($trigger['expression'], false, true);
 				}
 
-				$result[$trigger['triggerid']] += $trigger;
+				$result[$trigger['triggerid']] = $trigger;
 			}
 		}
 

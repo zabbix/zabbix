@@ -230,11 +230,7 @@ class CDiscoveryRule extends CItemGeneral {
 				}
 			}
 			else {
-				if (!isset($result[$item['itemid']])) {
-					$result[$item['itemid']]= array();
-				}
-
-				$result[$item['itemid']] += $item;
+				$result[$item['itemid']] = $item;
 			}
 		}
 

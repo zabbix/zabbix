@@ -169,11 +169,7 @@ class CMediatype extends CZBXAPI {
 				}
 			}
 			else {
-				if (!isset($result[$mediatype['mediatypeid']])) {
-					$result[$mediatype['mediatypeid']] = array();
-				}
-
-				$result[$mediatype['mediatypeid']] += $mediatype;
+				$result[$mediatype['mediatypeid']] = $mediatype;
 			}
 		}
 

@@ -222,11 +222,7 @@ class CTemplateScreen extends CScreen {
 				}
 			}
 			else {
-				if (!isset($result[$screen['screenid']])) {
-					$result[$screen['screenid']] = array();
-				}
-
-				$result[$screen['screenid']] += $screen;
+				$result[$screen['screenid']] = $screen;
 			}
 		}
 

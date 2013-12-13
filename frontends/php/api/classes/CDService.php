@@ -210,12 +210,8 @@ class CDService extends CZBXAPI{
 				else
 					$result = $dservice['rowscount'];
 			}
-			else{
-				if (!isset($result[$dservice['dserviceid']])) {
-					$result[$dservice['dserviceid']]= array();
-				}
-
-				$result[$dservice['dserviceid']] += $dservice;
+			else {
+				$result[$dservice['dserviceid']] = $dservice;
 			}
 		}
 
