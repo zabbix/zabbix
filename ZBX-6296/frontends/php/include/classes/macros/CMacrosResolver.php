@@ -374,8 +374,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// find macros
 		foreach ($data as $triggerId => $trigger) {
-			$functions = $this->findFunctions($trigger['expression']);
-
 			if ($userMacrosAvailable) {
 				$userMacros = $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, array($trigger[$source]));
 
@@ -383,7 +381,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					$hostIds = array();
 
 					foreach ($dbHosts as $dbHost) {
-						if ($dbHost['triggerid'] == $triggerId) {
+						if (bccomp($dbHost['triggerid'], $triggerId) == 0) {
 							$hostIds[$dbHost['hostid']] = $dbHost['hostid'];
 						}
 					}
@@ -400,6 +398,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					}
 				}
 			}
+
+			$functions = $this->findFunctions($trigger['expression']);
 
 			if ($hostMacrosAvailable) {
 				foreach ($this->findFunctionMacros(self::PATTERN_HOST_FUNCTION, $trigger[$source]) as $macro => $fNums) {
@@ -747,66 +747,112 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @return array
 	 */
 	public function resolveItemNames(array $items) {
-		$itemsWithMacros = $resolveKeyItems = array();
-
 		// define resolving fields
 		foreach ($items as &$item) {
 			$item['name_expanded'] = $item['name'];
 		}
 		unset($item);
 
-		// user macros
-		$items = $this->resolveItemUserMacros($items, 'name_expanded');
+		$macros = $itemsWithReferenceMacros = $itemsWithUnResolvedKeys = array();
 
 		// reference macros - $1..$9
 		foreach ($items as $key => $item) {
-			if (preg_match(self::PATTERN_ITEM_NUMBER, $item['name_expanded'])) {
-				$itemsWithMacros[$key] = $item;
+			$matchedMacros = $this->findMacros(self::PATTERN_ITEM_NUMBER, array($item['name_expanded']));
+
+			if ($matchedMacros) {
+				$macros[$key] = array('macros' => array());
+
+				foreach ($matchedMacros as $macro) {
+					$macros[$key]['macros'][$macro] = null;
+				}
+
+				$itemsWithReferenceMacros[$key] = $item;
 			}
 		}
 
-		if ($itemsWithMacros) {
+		if ($itemsWithReferenceMacros) {
 			// resolve macros in item key
-			foreach ($itemsWithMacros as $key => $item) {
+			foreach ($itemsWithReferenceMacros as $key => $item) {
 				if (!isset($item['key_expanded'])) {
-					$resolveKeyItems[$key] = $item;
+					$itemsWithUnResolvedKeys[$key] = $item;
 				}
 			}
 
-			if ($resolveKeyItems) {
-				$resolveKeyItems = $this->resolveItemKeys($resolveKeyItems);
+			if ($itemsWithUnResolvedKeys) {
+				$itemsWithUnResolvedKeys = $this->resolveItemKeys($itemsWithUnResolvedKeys);
 
-				foreach ($resolveKeyItems as $key => $item) {
-					$itemsWithMacros[$key] = $item;
+				foreach ($itemsWithUnResolvedKeys as $key => $item) {
+					$itemsWithReferenceMacros[$key] = $item;
 				}
 			}
 
 			// reference macros - $1..$9
-			foreach ($itemsWithMacros as $key => $item) {
-				// parsing key to get the parameters out of it
+			foreach ($itemsWithReferenceMacros as $key => $item) {
 				$itemKey = new CItemKey($item['key_expanded']);
 
 				if ($itemKey->isValid()) {
-					$keyParameters = $itemKey->getParameters();
-					$searchOffset = 0;
+					foreach ($itemKey->getParameters() as $n => $keyParameter) {
+						$j = 0;
 
-					while (preg_match('/\$[1-9]/', $item['name_expanded'], $matches, PREG_OFFSET_CAPTURE, $searchOffset)) {
-						// matches[0][0] - matched param, [1] - second character of it
-						$paramNumber = $matches[0][0][1] - 1;
-						$replaceString = isset($keyParameters[$paramNumber]) ? $keyParameters[$paramNumber] : '';
-						$searchOffset = $matches[0][1] + strlen($replaceString);
+						foreach ($macros[$key]['macros'] as $macro => $value) {
+							if ($n === $j) {
+								$macros[$key]['macros'][$macro] = $keyParameter;
+								break;
+							}
 
-						$item['name_expanded'] = substr_replace($item['name_expanded'], $replaceString, $matches[0][1], 2);
+							$j++;
+						}
 					}
 				}
-
-				// set resolved item
-				$items[$key] = $item;
 			}
 		}
 
-		if ($resolveKeyItems) {
-			foreach ($resolveKeyItems as $key => $item) {
+		// user macros
+		$userMacros = array();
+
+		foreach ($items as $item) {
+			$matchedMacros = $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, array($item['name_expanded']));
+
+			if ($matchedMacros) {
+				foreach ($matchedMacros as $macro) {
+					if (!isset($userMacros[$item['hostid']])) {
+						$userMacros[$item['hostid']] = array(
+							'hostids' => array($item['hostid']),
+							'macros' => array()
+						);
+					}
+
+					$userMacros[$item['hostid']]['macros'][$macro] = null;
+				}
+			}
+		}
+
+		if ($userMacros) {
+			$userMacros = $this->getUserMacros($userMacros);
+
+			foreach ($items as $key => $item) {
+				if (isset($userMacros[$item['hostid']])) {
+					$macros[$key]['macros'] = isset($macros[$key])
+						? zbx_array_merge($macros[$key]['macros'], $userMacros[$item['hostid']]['macros'])
+						: $userMacros[$item['hostid']]['macros'];
+				}
+			}
+		}
+
+		// replace macros to value
+		if ($macros) {
+			foreach ($macros as $key => $macroData) {
+				$items[$key]['name_expanded'] = str_replace(
+					array_keys($macroData['macros']),
+					array_values($macroData['macros']),
+					$items[$key]['name_expanded']
+				);
+			}
+		}
+
+		// unset temporary variable
+		if ($itemsWithUnResolvedKeys) {
+			foreach ($itemsWithUnResolvedKeys as $key => $item) {
 				unset($items[$key]['key_expanded']);
 			}
 		}
@@ -954,53 +1000,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					$items[$key]['key_expanded']
 				);
 			}
-		}
-
-		return $items;
-	}
-
-	/**
-	 * Resolve user macros in items.
-	 *
-	 * @param array  $items
-	 * @param string $items[n]['itemid']
-	 * @param string $items[n]['hostid']
-	 * @param string $items[n][$field]
-	 * @param string $field
-	 *
-	 * @return array
-	 */
-	private function resolveItemUserMacros(array $items, $field) {
-		$userMacros = array();
-
-		foreach ($items as $item) {
-			$macros = $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, array($item[$field]));
-
-			if ($macros) {
-				foreach ($macros as $macro) {
-					if (!isset($userMacros[$item['hostid']])) {
-						$userMacros[$item['hostid']] = array(
-							'hostids' => array($item['hostid']),
-							'macros' => array()
-						);
-					}
-
-					$userMacros[$item['hostid']]['macros'][$macro] = null;
-				}
-			}
-		}
-
-		if ($userMacros) {
-			$userMacros = $this->getUserMacros($userMacros);
-
-			foreach ($items as &$item) {
-				if (isset($userMacros[$item['hostid']])) {
-					$macros = $userMacros[$item['hostid']]['macros'];
-
-					$item[$field] = str_replace(array_keys($macros), array_values($macros), $item[$field]);
-				}
-			}
-			unset($item);
 		}
 
 		return $items;
