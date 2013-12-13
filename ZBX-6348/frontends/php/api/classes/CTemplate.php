@@ -484,9 +484,8 @@ class CTemplate extends CHostGeneral {
 
 		foreach ($templates as $tnum => $template) {
 			// If visible name is not given or empty it should be set to host name
-			if (!isset($template['name']) || (isset($template['name']) && zbx_empty(trim($template['name']))))
-			{
-				if (isset($template['host'])) $template['name'] = $template['host'];
+			if ((!isset($template['name']) || zbx_empty(trim($template['name']))) && isset($template['host'])) {
+				$template['name'] = $template['host'];
 			}
 
 			$templateDbFields = array(
@@ -585,9 +584,8 @@ class CTemplate extends CHostGeneral {
 		$macros = array();
 		foreach ($templates as $template) {
 			// if visible name is not given or empty it should be set to host name
-			if (!isset($template['name']) || (isset($template['name']) && zbx_empty(trim($template['name']))))
-			{
-				if (isset($template['host'])) $template['name'] = $template['host'];
+			if ((!isset($template['name']) || zbx_empty(trim($template['name']))) && isset($template['host'])) {
+				$template['name'] = $template['host'];
 			}
 			$tplTmp = $template;
 
@@ -912,21 +910,20 @@ class CTemplate extends CHostGeneral {
 		}
 
 		$sqlSet = array();
-		if (isset($data['host'])) $sqlSet[] = 'host=' . zbx_dbstr($data['host']);
-		if (isset($data['name']))
-		{
+		if (isset($data['host'])) {
+			$sqlSet[] = 'host=' . zbx_dbstr($data['host']);
+		}
+
+		if (isset($data['name'])) {
 			// if visible name is empty replace it with host name
-			if (zbx_empty(trim($data['name'])) && isset($data['host']))
-			{
+			if (zbx_empty(trim($data['name'])) && isset($data['host'])) {
 				$sqlSet[] = 'name=' . zbx_dbstr($data['host']);
 			}
-// we cannot have empty visible name
-			elseif (zbx_empty(trim($data['name'])) && !isset($data['host']))
-			{
+			// we cannot have empty visible name
+			elseif (zbx_empty(trim($data['name'])) && !isset($data['host'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot have empty visible template name'));
 			}
-			else
-			{
+			else {
 				$sqlSet[] = 'name=' . zbx_dbstr($data['name']);
 			}
 		}

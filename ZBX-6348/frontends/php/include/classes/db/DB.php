@@ -672,7 +672,7 @@ class DB {
 		foreach ($oldRecord as $field => $value) {
 			if (self::hasField($tableName, $field)
 					&& isset($newRecord[$field])
-					&& !zbx_strcmp($value, $newRecord[$field])) {
+					&& (string) $value !== (string) $newRecord[$field]) {
 				return true;
 			}
 		}
