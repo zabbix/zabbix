@@ -739,7 +739,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @param string $items[n]['itemid']
 	 * @param string $items[n]['hostid']
 	 * @param string $items[n]['name']
-	 * @param string $items[n]['key_']				item key
+	 * @param string $items[n]['key_']				item key (optional)
+	 *												but is (mandatory) if macros exist and "key_expanded" is not present
 	 * @param string $items[n]['key_expanded']		expanded item key (optional)
 	 *
 	 * @return array
@@ -790,15 +791,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 				if ($itemKey->isValid()) {
 					foreach ($itemKey->getParameters() as $n => $keyParameter) {
-						$j = 0;
+						$paramNum = '$'.++$n;
 
-						foreach ($macros[$key]['macros'] as $macro => $value) {
-							if ($n === $j) {
-								$macros[$key]['macros'][$macro] = $keyParameter;
-								break;
-							}
-
-							$j++;
+						if (array_key_exists($paramNum, $macros[$key]['macros'])) {
+							$macros[$key]['macros'][$paramNum] = $keyParameter;
 						}
 					}
 				}
