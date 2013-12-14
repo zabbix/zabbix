@@ -105,7 +105,6 @@ else {
 
 	// expand trigger descriptions
 	$triggers = zbx_objectValues($services, 'trigger');
-	$triggers = appendHostsToTriggers($triggers, array('hostid'));
 	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
 
 	foreach ($services as &$service) {

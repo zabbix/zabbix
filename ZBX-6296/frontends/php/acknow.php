@@ -121,10 +121,7 @@ if (!$bulk) {
 	if ($events) {
 		$event = reset($events);
 
-		$triggers = appendHostsToTriggers(array($event['relatedObject']), array('hostid'));
-		$trigger = reset($triggers);
-
-		$eventTriggerName = CMacrosResolverHelper::resolveTriggerName($trigger);
+		$eventTriggerName = CMacrosResolverHelper::resolveTriggerName($event['relatedObject']);
 		$eventAcknowledged = $event['acknowledged'];
 	}
 

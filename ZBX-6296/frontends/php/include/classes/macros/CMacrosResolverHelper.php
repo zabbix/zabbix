@@ -267,7 +267,6 @@ class CMacrosResolverHelper {
 			' FROM triggers t'.
 			' WHERE '.dbConditionInt('t.triggerid', $triggerIds)
 		));
-		$triggers = appendHostsToTriggers($triggers, array('hostid'));
 
 		return self::$macrosResolver->resolve(array(
 			'config' => 'triggerName',

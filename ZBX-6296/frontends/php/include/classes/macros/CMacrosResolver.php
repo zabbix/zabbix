@@ -341,15 +341,16 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	/**
 	 * Resolve macros in trigger.
 	 *
+	 * @param string $triggers[$triggerId]['hosts']['n']['hostid']	hosts to resolve user macros (optional)
 	 * @param string $triggers[$triggerId]['expression']
-	 * @param string $triggers[$triggerId]['description']	depend from config
-	 * @param string $triggers[$triggerId]['comments']		depend from config
+	 * @param string $triggers[$triggerId]['description']			depend from config
+	 * @param string $triggers[$triggerId]['comments']				depend from config
 	 *
 	 * @return array
 	 */
 	private function resolveTrigger(array $triggers) {
 		$macros = array('host' => array(), 'interfaceWithPriorities' => array(), 'item' => array());
-		$macroValues = $userMacrosData = $dbHosts = array();
+		$macroValues = $userMacrosData = array();
 
 		// get source field
 		$source = $this->getSource();
@@ -367,16 +368,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				$userMacros = $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, array($trigger[$source]));
 
 				if ($userMacros) {
-					$hostIds = zbx_objectValues($trigger['hosts'], 'hostid');
-
 					foreach ($userMacros as $userMacro) {
-						if (!isset($userMacrosData[$triggerId])) {
-							$userMacrosData[$triggerId] = array(
-								'hostids' => $hostIds,
-								'macros' => array()
-							);
-						}
-
 						$userMacrosData[$triggerId]['macros'][$userMacro] = null;
 					}
 				}
@@ -438,6 +430,31 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$macroValues = $this->getItemMacros($macros['item'], $triggers, $macroValues);
 		}
 		if ($userMacrosData) {
+			// get hosts for triggers
+			$triggersWithoutHosts = $triggerIds = array();
+
+			foreach ($triggers as $triggerId => $trigger) {
+				if (!isset($trigger['hosts'])) {
+					$triggerIds[$triggerId] = $triggerId;
+
+					$triggersWithoutHosts[$triggerId] = $trigger;
+				}
+			}
+
+			$dbTriggers = API::Trigger()->get(array(
+				'output' => array('triggerid'),
+				'selectHosts' => array('hostid'),
+				'triggerids' => $triggerIds,
+				'preservekeys' => true
+			));
+
+			foreach ($userMacrosData as $triggerId => $userMacro) {
+				$userMacrosData[$triggerId]['hostids'] = isset($dbTriggers[$triggerId])
+					? zbx_objectValues($dbTriggers[$triggerId]['hosts'], 'hostid')
+					: zbx_objectValues($triggers[$triggerId]['hosts'], 'hostid');
+			}
+
+			// get user macros values
 			$userMacros = $this->getUserMacros($userMacrosData);
 
 			foreach ($userMacros as $triggerId => $userMacro) {
@@ -722,8 +739,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @param string $items[n]['itemid']
 	 * @param string $items[n]['hostid']
 	 * @param string $items[n]['name']
-	 * @param string $items[n]['key_']
-	 * @param string $items[n]['key_expanded']
+	 * @param string $items[n]['key_']				item key
+	 * @param string $items[n]['key_expanded']		expanded item key (optional)
 	 *
 	 * @return array
 	 */
@@ -828,13 +845,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					array_values($macroData['macros']),
 					$items[$key]['name_expanded']
 				);
-			}
-		}
-
-		// unset temporary variable
-		if ($itemsWithUnResolvedKeys) {
-			foreach ($itemsWithUnResolvedKeys as $key => $item) {
-				unset($items[$key]['key_expanded']);
 			}
 		}
 
