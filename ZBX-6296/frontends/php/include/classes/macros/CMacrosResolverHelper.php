@@ -422,7 +422,7 @@ class CMacrosResolverHelper {
 	}
 
 	/**
-	 * Resolve item name macros.
+	 * Resolve item name macros to "name_expanded" field.
 	 *
 	 * @static
 	 *
@@ -430,8 +430,9 @@ class CMacrosResolverHelper {
 	 * @param string $items[n]['itemid']
 	 * @param string $items[n]['hostid']
 	 * @param string $items[n]['name']
-	 * @param string $items[n]['key_']
-	 * @param string $items[n]['key_expanded']
+	 * @param string $items[n]['key_']				item key (optional)
+	 *												but is (mandatory) if macros exist and "key_expanded" is not present
+	 * @param string $items[n]['key_expanded']		expanded item key (optional)
 	 *
 	 * @return array
 	 */
@@ -442,7 +443,7 @@ class CMacrosResolverHelper {
 	}
 
 	/**
-	 * Resolve item key macros.
+	 * Resolve item key macros to "key_expanded" field.
 	 *
 	 * @static
 	 *
@@ -457,6 +458,23 @@ class CMacrosResolverHelper {
 		self::init();
 
 		return self::$macrosResolver->resolveItemKeys($items);
+	}
+
+	/**
+	 * Resolve function parameter macros to "parameter_expanded" field.
+	 *
+	 * @static
+	 *
+	 * @param array  $data
+	 * @param string $data[n]['hostid']
+	 * @param string $data[n]['parameter']
+	 *
+	 * @return array
+	 */
+	public static function resolveFunctionParameters(array $data) {
+		self::init();
+
+		return self::$macrosResolver->resolveFunctionParameters($data);
 	}
 
 	/**

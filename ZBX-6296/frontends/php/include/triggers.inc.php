@@ -765,14 +765,17 @@ function explode_exp($expressionCompressed, $html = false, $resolveMacro = false
 					if ($resolveMacro) {
 						$trigger = $functionData;
 
+						// expand macros in item key
 						$items = CMacrosResolverHelper::resolveItemKeys(array($functionData));
 						$item = reset($items);
 
 						$functionData['key_'] = $item['key_expanded'];
-						$functionData['expression'] = $functionData['parameter'];
+
+						// expand macros in function parameter
 						$functionData['hosts'][] = $functionData['hostid'];
-						$functionData['expression'] = CMacrosResolverHelper::resolveTriggerExpressionUserMacro($functionData);
-						$functionData['parameter'] = $functionData['expression'];
+						$functionParameters = CMacrosResolverHelper::resolveFunctionParameters(array($functionData));
+						$functionParameter = reset($functionParameters);
+						$functionData['parameter'] = $functionParameter['parameter_expanded'];
 					}
 
 					if ($sourceHost !== null && $destinationHost !== null && $sourceHost === $functionData['host']) {

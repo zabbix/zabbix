@@ -985,4 +985,68 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		return $items;
 	}
+
+	/**
+	 * Resolve function parameter macros to "parameter_expanded" field.
+	 *
+	 * @param array  $data
+	 * @param string $data[n]['hostid']
+	 * @param string $data[n]['parameter']
+	 *
+	 * @return array
+	 */
+	public function resolveFunctionParameters(array $data) {
+		// define resolving field
+		foreach ($data as &$item) {
+			$item['parameter_expanded'] = $item['parameter'];
+		}
+		unset($item);
+
+		$macros = array();
+
+		// user macros
+		$userMacros = array();
+
+		foreach ($data as $item) {
+			$matchedMacros = $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, array($item['parameter_expanded']));
+
+			if ($matchedMacros) {
+				foreach ($matchedMacros as $macro) {
+					if (!isset($userMacros[$item['hostid']])) {
+						$userMacros[$item['hostid']] = array(
+							'hostids' => array($item['hostid']),
+							'macros' => array()
+						);
+					}
+
+					$userMacros[$item['hostid']]['macros'][$macro] = null;
+				}
+			}
+		}
+
+		if ($userMacros) {
+			$userMacros = $this->getUserMacros($userMacros);
+
+			foreach ($data as $key => $item) {
+				if (isset($userMacros[$item['hostid']])) {
+					$macros[$key]['macros'] = isset($macros[$key])
+						? zbx_array_merge($macros[$key]['macros'], $userMacros[$item['hostid']]['macros'])
+						: $userMacros[$item['hostid']]['macros'];
+				}
+			}
+		}
+
+		// replace macros to value
+		if ($macros) {
+			foreach ($macros as $key => $macroData) {
+				$data[$key]['parameter_expanded'] = str_replace(
+					array_keys($macroData['macros']),
+					array_values($macroData['macros']),
+					$data[$key]['parameter_expanded']
+				);
+			}
+		}
+
+		return $data;
+	}
 }
