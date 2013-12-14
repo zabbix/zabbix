@@ -86,7 +86,7 @@ class CZBXAPI {
 			'excludeSearch'			=> null,
 			'searchWildcardsEnabled'=> null,
 			// output
-			'output'				=> API_OUTPUT_REFER,
+			'output'				=> API_OUTPUT_EXTEND,
 			'countOutput'			=> null,
 			'groupCount'			=> null,
 			'preservekeys'			=> null,
@@ -247,9 +247,7 @@ class CZBXAPI {
 	protected function outputIsRequested($field, $output) {
 		switch ($output) {
 			// if all fields are requested, just return true
-			// API_OUTPUT_REFER will always return true as an exception
 			case API_OUTPUT_EXTEND:
-			case API_OUTPUT_REFER:
 				return true;
 
 			// if the number of objects is requested, return false
