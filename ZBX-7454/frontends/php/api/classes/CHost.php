@@ -1135,13 +1135,12 @@ class CHost extends CHostGeneral {
 
 		// second check is necessary, because import incorrectly inputs unset 'inventory' as empty string rather than null
 		if (isset($data['inventory']) && $data['inventory']) {
-			echo 'inventory ir un nav tukšs<br>';
-			$updateInventory = $data['inventory'];
-			$updateInventory['inventory_mode'] = null;
-
 			if (isset($data['inventory_mode']) && $data['inventory_mode'] == HOST_INVENTORY_DISABLED) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set inventory fields for disabled inventory.'));
 			}
+
+			$updateInventory = $data['inventory'];
+			$updateInventory['inventory_mode'] = null;
 		}
 
 		if (isset($data['inventory_mode'])) {
@@ -1149,10 +1148,7 @@ class CHost extends CHostGeneral {
 				$updateInventory = array();
 			}
 			$updateInventory['inventory_mode'] = $data['inventory_mode'];
-			echo 'ir inventory more iesetots<br>';
 		}
-
-		echo '$updateInventory:<br><pre>'; print_r($updateInventory); echo '</pre>';
 
 		if (isset($data['status'])) {
 			$updateStatus = $data['status'];
@@ -1291,7 +1287,6 @@ class CHost extends CHostGeneral {
 				}
 			}
 			else {
-				echo '$updateInventory inventory mode ir ['.$updateInventory['inventory_mode'].']<br>';
 				$hostsWithInventories = array();
 				$existingInventoriesDb = DBfetchArrayAssoc(DBselect(
 					'SELECT hostid,inventory_mode'.
@@ -1301,81 +1296,91 @@ class CHost extends CHostGeneral {
 
 				// check for hosts with disabled inventory mode
 				if ($updateInventory['inventory_mode'] === null) {
-					echo 'mode nav uzsetots';
 					foreach ($hostids as $hostId) {
 						if (!isset($existingInventoriesDb[$hostId])) {
 							$host = get_host_by_hostid($hostId);
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Inventory disabled for host "%s".', $host['host']));
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+								'Inventory disabled for host "%1$s".', $host['host']
+							));
 						}
 						else {
-							unset($updateInventory['inventory_mode']);
+							if ($existingInventoriesDb[$hostId]['inventory_mode'] == HOST_INVENTORY_AUTOMATIC) {
+								$automaticHostIds[] = $hostId;
+							}
 						}
 					}
 				}
+
 				foreach ($existingInventoriesDb as $existingInventory) {
 					$hostsWithInventories[] = $existingInventory['hostid'];
 				}
 
-				// when hosts are being updated to use automatic mode for host inventories,
-				// we must check if some items are set to populate inventory fields of every host.
-				// if they do, mass update for those fields should be ignored
-				if (isset($updateInventory['inventory_mode'])
-						&& $updateInventory['inventory_mode'] == HOST_INVENTORY_AUTOMATIC) {
-					// getting all items on all affected hosts
-					$itemsToInventories = API::item()->get(array(
+				// gather items for hosts if inventory mode needs to be updated or at least on host mode is automatic
+				if ((isset($updateInventory['inventory_mode'])
+						&& $updateInventory['inventory_mode'] == HOST_INVENTORY_AUTOMATIC)
+							|| $updateInventory['inventory_mode'] === null
+							|| (isset($automaticHostIds) && $automaticHostIds)) {
+					$options = array(
 						'output' => array('inventory_link', 'hostid'),
-						'filter' => array('hostid' => $hostids),
 						'nopermissions' => true
-					));
+					);
+
+					// if some hosts are set to automatic mode select only items from them and not from all hosts
+					if ((isset($automaticHostIds) && $automaticHostIds)) {
+						$options['hostids'] = $automaticHostIds;
+					}
+					else {
+						$options['hostids'] = $hostids;
+					}
+
+					$itemsToInventories = API::item()->get($options);
 
 					// gathering links to array: 'hostid'=>array('inventory_name_1'=>true, 'inventory_name_2'=>true)
 					$inventoryLinksOnHosts = array();
 					$inventoryFields = getHostInventories();
 					foreach ($itemsToInventories as $hinv) {
-						if ($hinv['inventory_link'] != 0) { // 0 means 'no link'
+						// 0 means 'no link'
+						if ($hinv['inventory_link'] != 0) {
+							$inventoryName = $inventoryFields[$hinv['inventory_link']]['db_field'];
 							if (isset($inventoryLinksOnHosts[$hinv['hostid']])) {
-								$inventoryLinksOnHosts[$hinv['hostid']][$inventoryFields[$hinv['inventory_link']]['db_field']] = true;
+								$inventoryLinksOnHosts[$hinv['hostid']][$inventoryName] = true;
 							}
 							else {
-								$inventoryLinksOnHosts[$hinv['hostid']] = array($inventoryFields[$hinv['inventory_link']]['db_field'] => true);
-							}
-						}
-					}
-
-					// now we have all info we need to determine, which inventory fields should be saved
-					$inventoriesToSave = array();
-					foreach ($hostids as $hostid) {
-						$inventoriesToSave[$hostid] = $updateInventory;
-						$inventoriesToSave[$hostid]['hostid'] = $hostid;
-						foreach ($updateInventory as $inventoryName => $hinv) {
-							if (isset($inventoryLinksOnHosts[$hostid][$inventoryName])) {
-								unset($inventoriesToSave[$hostid][$inventoryName]);
+								$inventoryLinksOnHosts[$hinv['hostid']] = array($inventoryName => true);
 							}
 						}
 					}
 				}
-				else {
-					// if mode is not automatic, all fields can be saved
-					$inventoriesToSave = array();
-					foreach ($hostids as $hostid) {
-						$inventoriesToSave[$hostid] = $updateInventory;
-						$inventoriesToSave[$hostid]['hostid'] = $hostid;
+
+				$inventoriesToSave = array();
+				foreach ($hostids as $hostId) {
+					$inventoriesToSave[$hostId] = $updateInventory;
+					// if no 'inventory_mode' has been passed, set inventory 'inventory_mode' from DB
+					if ($updateInventory['inventory_mode'] === null) {
+						$inventoriesToSave[$hostId]['inventory_mode'] =
+							$existingInventoriesDb[$hostId]['inventory_mode'];
+					}
+					$inventoriesToSave[$hostId]['hostid'] = $hostId;
+					// update only certain fields when 'inventory_mode' is 'Automatic'
+					foreach ($updateInventory as $inventoryName => $hinv) {
+						if (isset($inventoryLinksOnHosts[$hostId][$inventoryName])) {
+							unset($inventoriesToSave[$hostId][$inventoryName]);
+						}
 					}
 				}
 
 				$hostsWithoutInventory = array_diff($hostids, $hostsWithInventories);
 
 				// hosts that have no inventory yet, need it to be inserted
-				foreach ($hostsWithoutInventory as $hostid) {
-					DB::insert('host_inventory', array($inventoriesToSave[$hostid]), false);
+				foreach ($hostsWithoutInventory as $hostId) {
+					DB::insert('host_inventory', array($inventoriesToSave[$hostId]), false);
 				}
 
 				// those hosts that already have an inventory, need it to be updated
-				foreach ($hostsWithInventories as $hostid) {
+				foreach ($hostsWithInventories as $hostId) {
 					DB::update('host_inventory', array(
-						'values' => $inventoriesToSave[$hostid],
-						'where' => array('hostid' => $hostid)
+						'values' => $inventoriesToSave[$hostId],
+						'where' => array('hostid' => $hostId)
 					));
 				}
 			}
