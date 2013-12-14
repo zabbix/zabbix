@@ -167,10 +167,7 @@ zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data)
 {
 	unsigned char	buf[8];
 
-	memset(buf, 0, sizeof(buf));
 	memcpy(buf, &data, sizeof(buf));
-
-	data = 0;
 
 	data  = (zbx_uint64_t)buf[7];	data <<= 8;
 	data |= (zbx_uint64_t)buf[6];	data <<= 8;

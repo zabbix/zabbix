@@ -27,7 +27,7 @@ class CTriggerExpression {
 	const STATE_AFTER_CLOSE_BRACE = 4;
 	const STATE_AFTER_CONSTANT = 5;
 
-	// for parse of item key parameters
+	// for parsing of item key parameters
 	const STATE_NEW = 0;
 	const STATE_END = 1;
 	const STATE_UNQUOTED = 2;

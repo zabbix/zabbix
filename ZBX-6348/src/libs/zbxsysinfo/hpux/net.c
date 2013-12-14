@@ -237,7 +237,7 @@ static int	dlpi_attach(int fd, int ppa)
 	if (DL_OK_ACK != *(int *)buf_ctl)
 		return FAIL;
 
-	/* Succesfully attached to a PPA. */
+	/* Successfully attached to a PPA. */
 	return SUCCEED;
 }
 
@@ -264,7 +264,7 @@ static int	dlpi_detach(int fd)
 	if (DL_OK_ACK != *(int *)buf_ctl)
 		return FAIL;
 
-	/* succesfully detached */
+	/* successfully detached */
 	return SUCCEED;
 }
 

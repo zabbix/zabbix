@@ -108,7 +108,7 @@ foreach ($this->data['items'] as $item) {
 
 // create go buttons
 $goComboBox = new CComboBox('go');
-$goOption = new CComboItem('activate', _('Activate selected'));
+$goOption = new CComboItem('activate', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable selected item prototypes?'));
 $goComboBox->addItem($goOption);
 

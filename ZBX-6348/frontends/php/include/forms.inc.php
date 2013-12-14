@@ -1048,18 +1048,28 @@
 
 		// item
 		if (!empty($data['itemid'])) {
-			$params = array(
-				'itemids' => $data['itemid'],
-				'output' => API_OUTPUT_EXTEND
-			);
 			if ($data['is_discovery_rule']) {
-				$params['hostids'] = $data['hostid'];
-				$params['editable'] = true;
-				$data['item'] = API::DiscoveryRule()->get($params);
+				$data['item'] = API::DiscoveryRule()->get(array(
+					'itemids' => $data['itemid'],
+					'output' => API_OUTPUT_EXTEND,
+					'hostids' => $data['hostid'],
+					'editable' => true
+				));
 			}
 			else {
-				$params['filter'] = array('flags' => null);
-				$data['item'] = API::Item()->get($params);
+				$data['item'] = API::Item()->get(array(
+					'itemids' => $data['itemid'],
+					'filter' => array('flags' => null),
+					'output' => array(
+						'itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
+						'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'multiplier', 'delta',
+						'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase',
+						'formula', 'logtimefmt', 'templateid', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor',
+						'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'filter',
+						'interfaceid', 'port', 'description', 'inventory_link', 'lifetime', 'snmpv3_authprotocol',
+						'snmpv3_privprotocol', 'snmpv3_contextname'
+					)
+				));
 			}
 			$data['item'] = reset($data['item']);
 			$data['hostid'] = !empty($data['hostid']) ? $data['hostid'] : $data['item']['hostid'];
