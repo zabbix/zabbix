@@ -539,6 +539,7 @@ misc/init.d/fedora/core5/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
+src/libs/zbxdbupgrade/dbupgrade.h -text
 src/libs/zbxdbupgrade/dbupgrade_2010.c -text
 src/libs/zbxdbupgrade/dbupgrade_2020.c -text
 src/libs/zbxdbupgrade/dbupgrade_2030.c -text
