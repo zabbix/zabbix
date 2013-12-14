@@ -347,7 +347,7 @@ class CHttpTest extends CZBXAPI {
 			if (!empty($test['steps'])) {
 				foreach ($test['steps'] as $snum => $step) {
 					if (isset($step['httpstepid'])
-							&& (!empty($dbTest['templateid']) || (!isset($step['name']) || zbx_empty($step['name'])))) {
+							&& (!empty($dbTest['templateid']) || !isset($step['name']) || zbx_empty($step['name']))) {
 						$test['steps'][$snum]['name'] = $dbTest['steps'][$step['httpstepid']]['name'];
 					}
 					if (!empty($dbTest['templateid'])) {
