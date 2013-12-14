@@ -28,6 +28,8 @@
  * 2.2 development database patches
  */
 
+#ifndef HAVE_SQLITE3
+
 /*********************************************************************************
  *                                                                               *
  * Function: parse_db_monitor_item_params                                        *
@@ -1792,6 +1794,8 @@ static int	DBpatch_2010199(void)
 	return SUCCEED;
 #endif
 }
+
+#endif
 
 DBPATCH_START(2010)
 
