@@ -1,6 +1,7 @@
 Changes for 2.2.2rc1
 
 New features:
+........S. [ZBXNEXT-2069] added HOST.PORT macro support for internal and trigger based notifications (wiper)
 A.F....... [ZBX-1357] updated American English, French, Hungarian, Japanese, Russian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
