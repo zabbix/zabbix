@@ -2,6 +2,7 @@
 Changes for 2.3.0
 
 New features:
+....I...S. [ZBXNEXT-581] split database upgrade patches over multiple files for easier maintenance (wiper)
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
