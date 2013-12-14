@@ -637,10 +637,10 @@ extern zbx_dbpatch_t	DBPATCH_VERSION(2020)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(2030)[];
 
 static zbx_db_version_t dbversions[] = {
-		{DBPATCH_VERSION(2010), "2.2 development"},
-		{DBPATCH_VERSION(2020), "2.2 maintenance"},
-		{DBPATCH_VERSION(2030), "2.4 development"},
-		{NULL}
+	{DBPATCH_VERSION(2010), "2.2 development"},
+	{DBPATCH_VERSION(2020), "2.2 maintenance"},
+	{DBPATCH_VERSION(2030), "2.4 development"},
+	{NULL}
 };
 
 static void	DBget_version(int *mandatory, int *optional)
