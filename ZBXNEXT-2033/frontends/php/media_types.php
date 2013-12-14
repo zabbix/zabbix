@@ -37,11 +37,11 @@ $fields = array(
 	'description' =>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY, 'isset({save})', _('Name')),
 	'smtp_server' =>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
 		'isset({save})&&isset({type})&&({type}=='.MEDIA_TYPE_EMAIL.'||{type}=='.MEDIA_TYPE_REMEDY.')',
-		fieldToString('smtp_server')
+		getMediaTypeLabel('smtp_server', getRequest('type'))
 	),
 	'smtp_helo' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
 		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_EMAIL,
-		fieldToString('smtp_helo')
+		getMediaTypeLabel('smtp_helo', getRequest('type'))
 	),
 	'smtp_email' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
 		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_EMAIL,
@@ -51,7 +51,7 @@ $fields = array(
 		'isset({save})&&isset({type})&&({type}=='.MEDIA_TYPE_EXEC.
 			'||{type}=='.MEDIA_TYPE_EZ_TEXTING.
 			'||{type}=='.MEDIA_TYPE_REMEDY.')',
-		fieldToString('exec_path')
+		getMediaTypeLabel('exec_path', getRequest('type'))
 	),
 	'gsm_modem' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
 		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_SMS,
@@ -62,7 +62,7 @@ $fields = array(
 			'||{type}=='.MEDIA_TYPE_EZ_TEXTING.
 			'||{type}=='.MEDIA_TYPE_REMEDY.
 		')',
-		fieldToString('username')
+		getMediaTypeLabel('username', getRequest('type'))
 	),
 	'password' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
 		'isset({save})&&isset({type})&&({type}=='.MEDIA_TYPE_JABBER.

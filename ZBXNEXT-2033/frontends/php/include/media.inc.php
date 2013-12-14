@@ -42,10 +42,10 @@ function media_type2str($type = null) {
 	}
 }
 
-function fieldToString($field) {
+function getMediaTypeLabel($field, $type) {
 	switch ($field) {
 		case 'smtp_server':
-			switch (getRequest('type')) {
+			switch ($type) {
 				case MEDIA_TYPE_REMEDY:
 					return _('Remedy Service URL');
 				case MEDIA_TYPE_EMAIL:
@@ -54,7 +54,7 @@ function fieldToString($field) {
 			}
 
 		case 'smtp_helo':
-			switch (getRequest('type')) {
+			switch ($type) {
 				case MEDIA_TYPE_REMEDY:
 					return _('Proxy');
 				case MEDIA_TYPE_EMAIL:
@@ -63,7 +63,7 @@ function fieldToString($field) {
 			}
 
 		case 'exec_path':
-			switch (getRequest('type')) {
+			switch ($type) {
 				case MEDIA_TYPE_EZ_TEXTING:
 					return _('Message text limit');
 				case MEDIA_TYPE_REMEDY:
@@ -75,7 +75,7 @@ function fieldToString($field) {
 			}
 
 		case 'username':
-			switch (getRequest('type')) {
+			switch ($type) {
 				case MEDIA_TYPE_JABBER:
 					return _('Jabber identifier');
 				default:
