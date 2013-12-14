@@ -125,7 +125,7 @@ struct zbx_json_parse
 	const char		*end;
 };
 
-const char	*zbx_json_strerror();
+const char	*zbx_json_strerror(void);
 
 void	zbx_json_init(struct zbx_json *j, size_t allocate);
 void	zbx_json_clean(struct zbx_json *j);
