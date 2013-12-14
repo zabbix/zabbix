@@ -34,7 +34,11 @@ zbx_dbpatch_t;
 #define DBPATCH_START(zabbix_version)			zbx_dbpatch_t	DBPATCH_VERSION(zabbix_version)[] = {
 #define DBPATCH_END()					{NULL}};
 
-#ifndef HAVE_SQLITE3
+#ifdef HAVE_SQLITE3
+
+#define DBPATCH_ADD(version, duplicates, mandatory)	{NULL, version, duplicates, mandatory},
+
+#else
 
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 
@@ -55,11 +59,6 @@ int	DBadd_foreign_key(const char *table_name, int id, const ZBX_FIELD *field);
 int	DBdrop_foreign_key(const char *table_name, int id);
 int	DBmodify_proxy_table_id_field(const char *table_name);
 
-#else
-
-#define DBPATCH_ADD(version, duplicates, mandatory)	{NULL, version, duplicates, mandatory},
-
-#endif	/* not HAVE_SQLITE3 */
-
+#endif
 
 #endif

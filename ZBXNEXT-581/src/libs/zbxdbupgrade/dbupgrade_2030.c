@@ -28,10 +28,14 @@
  * 2.4 development database patches
  */
 
+#ifndef HAVE_SQLITE3
+
 static int	DBpatch_2030000(void)
 {
 	return SUCCEED;
 }
+
+#endif
 
 DBPATCH_START(2030)
 
