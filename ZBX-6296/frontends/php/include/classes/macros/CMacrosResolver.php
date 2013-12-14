@@ -431,13 +431,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 		if ($userMacrosData) {
 			// get hosts for triggers
-			$triggersWithoutHosts = $triggerIds = array();
+			$triggerIds = array();
 
-			foreach ($triggers as $triggerId => $trigger) {
-				if (!isset($trigger['hosts'])) {
+			foreach ($userMacrosData as $triggerId => $userMacro) {
+				if (!isset($triggers[$triggerId]['hosts'])) {
 					$triggerIds[$triggerId] = $triggerId;
-
-					$triggersWithoutHosts[$triggerId] = $trigger;
 				}
 			}
 
@@ -449,9 +447,16 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			));
 
 			foreach ($userMacrosData as $triggerId => $userMacro) {
-				$userMacrosData[$triggerId]['hostids'] = isset($dbTriggers[$triggerId])
-					? zbx_objectValues($dbTriggers[$triggerId]['hosts'], 'hostid')
-					: zbx_objectValues($triggers[$triggerId]['hosts'], 'hostid');
+				if (isset($triggers[$triggerId]['hosts'])) {
+					$userMacrosData[$triggerId]['hostids'] = zbx_objectValues($triggers[$triggerId]['hosts'], 'hostid');
+				}
+				elseif (isset($dbTriggers[$triggerId])) {
+					$userMacrosData[$triggerId]['hostids'] =
+						zbx_objectValues($dbTriggers[$triggerId]['hosts'], 'hostid');
+				}
+				else {
+					$userMacrosData[$triggerId]['hostids'] = array();
+				}
 			}
 
 			// get user macros values
