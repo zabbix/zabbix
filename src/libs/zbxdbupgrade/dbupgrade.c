@@ -671,7 +671,7 @@ int	DBcheck_version(void)
 {
 	const char		*__function_name = "DBcheck_version";
 	const char		*dbversion_table_name = "dbversion";
-	int			db_mandatory, db_optional, required, ret = FAIL, i, total;
+	int			db_mandatory, db_optional, required, ret = FAIL, i, total = 0;
 	zbx_db_version_t	*dbversion;
 	zbx_dbpatch_t		*patches;
 
@@ -680,6 +680,21 @@ int	DBcheck_version(void)
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	required = ZBX_FIRST_DB_VERSION;
+
+	/* find out the required version number by getting the last mandatory version */
+	/* of the last version patch array                                            */
+	for (dbversion = dbversions; NULL != dbversion->patches; dbversion++)
+		;
+
+	patches = (--dbversion)->patches;
+
+	for (i = 0; 0 != patches[i].version; i++)
+	{
+		if (0 != patches[i].mandatory)
+			required = patches[i].version;
+	}
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
@@ -709,15 +724,10 @@ int	DBcheck_version(void)
 
 	DBget_version(&db_mandatory, &db_optional);
 
-	required = ZBX_FIRST_DB_VERSION;
-
 	for (dbversion = dbversions; NULL != (patches = dbversion->patches); dbversion++)
 	{
 		for (i = 0; 0 != patches[i].version; i++)
 		{
-			if (0 != patches[i].mandatory)
-				required = patches[i].version;
-
 			if (db_optional < patches[i].version)
 				total++;
 		}
