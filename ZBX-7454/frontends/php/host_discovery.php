@@ -235,10 +235,12 @@ elseif (isset($_REQUEST['save'])) {
 		'filter' => $filter
 	);
 
-	if (isset($_REQUEST['itemid'])) {
+	if (hasRequest('itemid')) {
+		$itemId = getRequest('itemid');
+
 		DBstart();
 
-		$db_item = get_item_by_itemid_limited($_REQUEST['itemid']);
+		$dbItem = get_item_by_itemid_limited($itemId);
 
 		// unset snmpv3 fields
 		if ($item['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
@@ -249,14 +251,8 @@ elseif (isset($_REQUEST['save'])) {
 			$item['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
 		}
 
-		// unset fields without changes
-		foreach ($item as $field => $value) {
-			if ($item[$field] == $db_item[$field]) {
-				unset($item[$field]);
-			}
-		}
-
-		$item['itemid'] = $_REQUEST['itemid'];
+		$item = CArrayHelper::unsetEqualValues($item, $dbItem);
+		$item['itemid'] = $itemId;
 
 		$result = API::DiscoveryRule()->update($item);
 		$result = DBend($result);
