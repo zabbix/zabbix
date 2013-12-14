@@ -21,6 +21,7 @@
 // reset the LC_CTYPE locale so that case transformation functions would work correctly
 // it is also required for PHP to work with the Turkish locale (https://bugs.php.net/bug.php?id=18556)
 // WARNING: this must be done before executing any other code, otherwise code execution could fail!
+// this will be unnecessary in PHP 5.5
 setlocale(LC_CTYPE, array(
 	'C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'
 ));
