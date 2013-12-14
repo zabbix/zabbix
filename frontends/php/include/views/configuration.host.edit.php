@@ -93,9 +93,12 @@ if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloneFormOpened)) {
 	$proxy_hostid = $dbHost['proxy_hostid'];
 	$host = $dbHost['host'];
 	$visiblename = $dbHost['name'];
-	if ($visiblename == $host) { // display empty visible name if equal to host name
+
+	// display empty visible name if equal to host name
+	if ($visiblename === $host) {
 		$visiblename = '';
 	}
+
 	$status = $dbHost['status'];
 
 	$ipmi_authtype = $dbHost['ipmi_authtype'];
