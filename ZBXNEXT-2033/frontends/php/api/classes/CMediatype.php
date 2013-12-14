@@ -218,13 +218,9 @@ class CMediatype extends CZBXAPI {
 	 * @return array
 	 */
 	public function create($mediaTypes) {
-		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can create media types.'));
-		}
+		$mediaTypes = zbx_toArray($mediaTypes);
 
 		$this->validateCreate($mediaTypes);
-
-		$mediaTypes = zbx_toArray($mediaTypes);
 
 		$mediaTypeIds = DB::insert('media_type', $mediaTypes);
 
@@ -249,13 +245,9 @@ class CMediatype extends CZBXAPI {
 	 * @return array
 	 */
 	public function update($mediaTypes) {
-		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can update media types.'));
-		}
+		$mediaTypes = zbx_toArray($mediaTypes);
 
 		$this->validateUpdate($mediaTypes);
-
-		$mediaTypes = zbx_toArray($mediaTypes);
 
 		$update = array();
 		foreach ($mediaTypes as $mediaType) {
@@ -311,6 +303,10 @@ class CMediatype extends CZBXAPI {
 	 * @return void
 	 */
 	protected function validateCreate(array $mediaTypes) {
+		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can create media types.'));
+		}
+
 		if (!$mediaTypes) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
@@ -323,8 +319,6 @@ class CMediatype extends CZBXAPI {
 		));
 
 		$requiredFields = array('type', 'description');
-
-		$mediaTypes = zbx_toArray($mediaTypes);
 
 		foreach ($mediaTypes as $mediaType) {
 			// check if required keys are set and they are not empty
@@ -347,26 +341,15 @@ class CMediatype extends CZBXAPI {
 				}
 			}
 
-			// validate description length
-			if (zbx_strlen($mediaType['description']) > 100) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _n(
-					'Maximum media type description length is %1$d characters, "%2$s" is %3$d character.',
-					'Maximum media type description is %1$d characters, "%2$s" is %3$d characters.',
-					100,
-					$mediaType['description'],
-					zbx_strlen($mediaType['description'])
-				));
-			}
-
 			// check if media type already exists
-			$mediaTypeExists = $this->get(array(
+			$dbMediaTypeExists = API::getApi()->select($this->tableName(), array(
 				'filter' => array('description' => $mediaType['description']),
-				'output' => API_OUTPUT_EXTEND
+				'output' => array('description')
 			));
-			if ($mediaTypeExists) {
+			if ($dbMediaTypeExists) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 					'Media type "%1$s" already exists.',
-					$mediaTypeExists[0]['description']
+					$dbMediaTypeExists[0]['description']
 				));
 			}
 
@@ -379,8 +362,8 @@ class CMediatype extends CZBXAPI {
 				));
 			}
 
-			// validate other fields depending on each type
-			$this->validateRequiredFieldsByType($mediaType);
+			// check other fields depending on each type
+			$this->checkRequiredFieldsByType($mediaType);
 
 			// validate optional field
 			if (isset($mediaType['status']) && !$statusValidator->validate($mediaType['status'])) {
@@ -403,22 +386,16 @@ class CMediatype extends CZBXAPI {
 	 * @return void
 	 */
 	protected function validateUpdate(array $mediaTypes) {
+		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can update media types.'));
+		}
+
 		if (!$mediaTypes) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$mediaTypes = zbx_toArray($mediaTypes);
-
-		$typeValidator = new CSetValidator(array(
-			'values' => array_keys(media_type2str())
-		));
-		$statusValidator = new CSetValidator(array(
-			'values' => array(MEDIA_TYPE_STATUS_ACTIVE, MEDIA_TYPE_STATUS_DISABLED)
-		));
-
 		$requiredFields = array('mediatypeid');
 
-		// first check only of required fields are set and if they are not empty
 		foreach ($mediaTypes as $mediaType) {
 			$missingKeys = checkRequiredKeys($mediaType, $requiredFields);
 			if ($missingKeys) {
@@ -427,58 +404,56 @@ class CMediatype extends CZBXAPI {
 					implode(', ', $missingKeys)
 				));
 			}
-			else {
-				foreach ($requiredFields as $field) {
-					if (zbx_empty($mediaType[$field])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is missing a value.', $field));
-					}
-				}
-			}
 		}
 
-		$mediaTypesDb = $this->get(array(
-			'output' => API_OUTPUT_EXTEND,
+		$mediaTypeIds = zbx_objectValues($mediaTypes, 'mediatypeid');
+
+		$dbMediaTypes = $this->get(array(
+			'mediatypeids' => $mediaTypeIds,
+			'countOutput' => true
+		));
+
+		if ($dbMediaTypes != count($mediaTypes)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _(
+				'No permissions to referred object or it does not exist!'
+			));
+		}
+
+		$typeValidator = new CSetValidator(array(
+			'values' => array_keys(media_type2str())
+		));
+		$statusValidator = new CSetValidator(array(
+			'values' => array(MEDIA_TYPE_STATUS_ACTIVE, MEDIA_TYPE_STATUS_DISABLED)
+		));
+
+
+		$dbMediaTypes = API::getApi()->select($this->tableName(), array(
+			'mediatypeids' => $mediaTypeIds,
+			'output' => array('mediatypeid', 'type', 'description', 'status'),
 			'preservekeys' => true
 		));
 
 		foreach ($mediaTypes as $mediaType) {
-			if (!isset($mediaTypesDb[$mediaType['mediatypeid']])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _(
-					'No permissions to referred object or it does not exist!'
-				));
-			}
-
 			// if description changed, check if matches any of existing descriptions
 			if (isset($mediaType['description'])
-					&& $mediaTypesDb[$mediaType['mediatypeid']]['description'] != $mediaType['description']) {
-				foreach ($mediaTypesDb as $mediaTypeDb) {
-					if ($mediaTypeDb['description'] == $mediaType['description']) {
+					&& $dbMediaTypes[$mediaType['mediatypeid']]['description'] != $mediaType['description']) {
+				foreach ($dbMediaTypes as $dbMediaType) {
+					if ($dbMediaType['description'] == $mediaType['description']) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 							'Media type "%1$s" already exists.',
 							$mediaType['description']
 						));
 					}
 				}
-
-				// validate new description
-				if (zbx_strlen($mediaType['description']) > 100) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _n(
-						'Maximum media type description length is %1$d characters, "%2$s" is %3$d character.',
-						'Maximum media type description is %1$d characters, "%2$s" is %3$d characters.',
-						100,
-						$mediaType['description'],
-						zbx_strlen($mediaType['description'])
-					));
-				}
 			}
 			// use description from DB in other error messages
 			else {
-				$mediaType['description'] = $mediaTypesDb[$mediaType['mediatypeid']]['description'];
+				$mediaType['description'] = $dbMediaTypes[$mediaType['mediatypeid']]['description'];
 			}
 
 			// when changing type, validate new required fields just like in create method
 			if (isset($mediaType['type'])
-					&& $mediaTypesDb[$mediaType['mediatypeid']]['type'] != $mediaType['type']) {
+					&& $dbMediaTypes[$mediaType['mediatypeid']]['type'] != $mediaType['type']) {
 				if (!$typeValidator->validate($mediaType['type'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 						'Media type "%1$s" has incorrect value for field "%2$s".',
@@ -487,12 +462,12 @@ class CMediatype extends CZBXAPI {
 					));
 				}
 
-				$this->validateRequiredFieldsByType($mediaType);
+				$this->checkRequiredFieldsByType($mediaType);
 			}
 
 			// validate input on status change
 			if (isset($mediaType['status'])
-					&& $mediaTypesDb[$mediaType['mediatypeid']]['status'] != $mediaType['status']
+					&& $dbMediaTypes[$mediaType['mediatypeid']]['status'] != $mediaType['status']
 					&& !$statusValidator->validate($mediaType['status'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 					'Media type "%1$s" has incorrect value for field "%2$s".',
@@ -504,7 +479,7 @@ class CMediatype extends CZBXAPI {
 	}
 
 	/**
-	 * Validate required fields by type.
+	 * Check required fields by type.
 	 *
 	 * @throws APIException if the input is invalid
 	 *
@@ -514,18 +489,20 @@ class CMediatype extends CZBXAPI {
 	 *
 	 * @return void
 	 */
-	protected function validateRequiredFieldsByType(array $mediaType) {
+	protected function checkRequiredFieldsByType(array $mediaType) {
 		$messageTextLimitValidator = new CSetValidator(array(
 			'values' => array(EZ_TEXTING_LIMIT_USA, EZ_TEXTING_LIMIT_CANADA)
 		));
 
-		$requiredFieldsByType = array();
-		$requiredFieldsByType[MEDIA_TYPE_EMAIL] = array('smtp_server', 'smtp_helo', 'smtp_email');
-		$requiredFieldsByType[MEDIA_TYPE_EXEC] = array('exec_path');
-		$requiredFieldsByType[MEDIA_TYPE_SMS] = array('gsm_modem');
-		$requiredFieldsByType[MEDIA_TYPE_JABBER] = array('username', 'passwd');
-		$requiredFieldsByType[MEDIA_TYPE_EZ_TEXTING] = array('exec_path', 'username', 'passwd');
-		$requiredFieldsByType[MEDIA_TYPE_REMEDY] = array('smtp_server', 'exec_path', 'username', 'passwd');
+		$requiredFieldsByType = array(
+			MEDIA_TYPE_EMAIL => array('smtp_server', 'smtp_helo', 'smtp_email'),
+			MEDIA_TYPE_EXEC => array('exec_path'),
+			MEDIA_TYPE_SMS => array('gsm_modem'),
+			MEDIA_TYPE_JABBER => array('username', 'passwd'),
+			MEDIA_TYPE_EZ_TEXTING => array('exec_path', 'username', 'passwd'),
+			MEDIA_TYPE_REMEDY => array('smtp_server', 'exec_path', 'username', 'passwd')
+
+		);
 
 		foreach ($requiredFieldsByType[$mediaType['type']] as $field) {
 			// check if fields set on Create method
@@ -533,7 +510,7 @@ class CMediatype extends CZBXAPI {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 					'Field "%1$s" required for media type "%2$s".',
 					$field,
-					$mediatype['description']
+					$mediaType['description']
 				));
 			}
 			elseif (isset($mediaType[$field]) && zbx_empty($mediaType[$field])) {
