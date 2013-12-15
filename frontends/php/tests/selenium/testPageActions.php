@@ -224,10 +224,12 @@ class testPageActions extends CWebTest {
 		switch ($action['status']) {
 			case ACTION_STATUS_ENABLED:
 				$this->zbxTestHrefClickWait('actionconf.php?go=disable&g_actionid%5B%5D='.$action['actionid'].'&');
+				$this->zbxTestTextPresent('Action disabled');
 				$newStatus = ACTION_STATUS_DISABLED;
 				break;
 			case ACTION_STATUS_DISABLED:
 				$this->zbxTestHrefClickWait('actionconf.php?go=activate&g_actionid%5B%5D='.$action['actionid'].'&');
+				$this->zbxTestTextPresent('Action enabled');
 				$newStatus = ACTION_STATUS_ENABLED;
 				break;
 			default:
@@ -235,7 +237,6 @@ class testPageActions extends CWebTest {
 		}
 
 		$this->zbxTestCheckTitle('Configuration of actions');
-		$this->zbxTestTextPresent('Status updated');
 
 		$this->assertEquals(1, DBcount(
 			'SELECT NULL'.
@@ -266,7 +267,7 @@ class testPageActions extends CWebTest {
 		$this->getConfirmation();
 
 		$this->zbxTestCheckTitle('Configuration of actions');
-		$this->zbxTestTextPresent('Status updated');
+		$this->zbxTestTextPresent('Action disabled');
 		$this->zbxTestTextPresent('Disabled');
 
 		$this->assertEquals(1, DBcount(
@@ -298,7 +299,7 @@ class testPageActions extends CWebTest {
 		$this->getConfirmation();
 
 		$this->zbxTestCheckTitle('Configuration of actions');
-		$this->zbxTestTextPresent('Status updated');
+		$this->zbxTestTextPresent('Action enabled');
 		$this->zbxTestTextPresent('Enabled');
 
 		$this->assertEquals(1, DBcount(

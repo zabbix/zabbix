@@ -108,7 +108,7 @@ class testPageDiscovery extends CWebTest {
 
 		$this->getConfirmation();
 		$this->zbxTestCheckTitle('Configuration of discovery');
-		$this->zbxTestTextPresent('Discovery rules updated');
+		$this->zbxTestTextPresent('Discovery rules enabled');
 
 		$sql = "select * from drules where status=".DRULE_STATUS_DISABLED;
 		$this->assertEquals(0, DBcount($sql));
@@ -132,7 +132,7 @@ class testPageDiscovery extends CWebTest {
 
 		$this->getConfirmation();
 		$this->zbxTestCheckTitle('Configuration of discovery');
-		$this->zbxTestTextPresent('Discovery rules updated');
+		$this->zbxTestTextPresent('Discovery rule enabled');
 
 		$sql = "select * from drules where druleid=$druleid and status=".DRULE_STATUS_ACTIVE;
 		$this->assertEquals(1, DBcount($sql));
@@ -151,7 +151,7 @@ class testPageDiscovery extends CWebTest {
 
 		$this->getConfirmation();
 		$this->zbxTestCheckTitle('Configuration of discovery');
-		$this->zbxTestTextPresent('Discovery rules updated');
+		$this->zbxTestTextPresent('Discovery rules disabled');
 
 		$sql = "select * from drules where status=".DRULE_STATUS_ACTIVE;
 		$this->assertEquals(0, DBcount($sql));
@@ -175,7 +175,7 @@ class testPageDiscovery extends CWebTest {
 
 		$this->getConfirmation();
 		$this->zbxTestCheckTitle('Configuration of discovery');
-		$this->zbxTestTextPresent('Discovery rules updated');
+		$this->zbxTestTextPresent('Discovery rule disabled');
 
 		$sql = "select * from drules where druleid=$druleid and status=".DRULE_STATUS_DISABLED;
 		$this->assertEquals(1, DBcount($sql));
