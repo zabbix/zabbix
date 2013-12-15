@@ -1002,29 +1002,29 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 */
 	public function resolveFunctionParameters(array $data) {
 		// define resolving field
-		foreach ($data as &$item) {
-			$item['parameter_expanded'] = $item['parameter'];
+		foreach ($data as &$function) {
+			$function['parameter_expanded'] = $function['parameter'];
 		}
-		unset($item);
+		unset($function);
 
 		$macros = array();
 
 		// user macros
 		$userMacros = array();
 
-		foreach ($data as $item) {
-			$matchedMacros = $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, array($item['parameter_expanded']));
+		foreach ($data as $function) {
+			$matchedMacros = $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, array($function['parameter_expanded']));
 
 			if ($matchedMacros) {
 				foreach ($matchedMacros as $macro) {
-					if (!isset($userMacros[$item['hostid']])) {
-						$userMacros[$item['hostid']] = array(
-							'hostids' => array($item['hostid']),
+					if (!isset($userMacros[$function['hostid']])) {
+						$userMacros[$function['hostid']] = array(
+							'hostids' => array($function['hostid']),
 							'macros' => array()
 						);
 					}
 
-					$userMacros[$item['hostid']]['macros'][$macro] = null;
+					$userMacros[$function['hostid']]['macros'][$macro] = null;
 				}
 			}
 		}
@@ -1032,11 +1032,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		if ($userMacros) {
 			$userMacros = $this->getUserMacros($userMacros);
 
-			foreach ($data as $key => $item) {
-				if (isset($userMacros[$item['hostid']])) {
+			foreach ($data as $key => $function) {
+				if (isset($userMacros[$function['hostid']])) {
 					$macros[$key]['macros'] = isset($macros[$key])
-						? zbx_array_merge($macros[$key]['macros'], $userMacros[$item['hostid']]['macros'])
-						: $userMacros[$item['hostid']]['macros'];
+						? zbx_array_merge($macros[$key]['macros'], $userMacros[$function['hostid']]['macros'])
+						: $userMacros[$function['hostid']]['macros'];
 				}
 			}
 		}
