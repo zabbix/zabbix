@@ -772,7 +772,6 @@ function explode_exp($expressionCompressed, $html = false, $resolveMacro = false
 						$functionData['key_'] = $item['key_expanded'];
 
 						// expand macros in function parameter
-						$functionData['hosts'][] = $functionData['hostid'];
 						$functionParameters = CMacrosResolverHelper::resolveFunctionParameters(array($functionData));
 						$functionParameter = reset($functionParameters);
 						$functionData['parameter'] = $functionParameter['parameter_expanded'];
