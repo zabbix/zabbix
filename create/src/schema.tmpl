@@ -1303,14 +1303,12 @@ INDEX		|2		|templateid
 TABLE|item_condition|item_conditionid|ZBX_SYNC,ZBX_DATA
 FIELD		|item_conditionid|t_id		|	|NOT NULL	|0
 FIELD		|itemid		|t_id		|	|NOT NULL	|ZBX_SYNC		|1|items
-FIELD		|templateid	|t_id		|	|NULL		|ZBX_SYNC		|2|item_condition	|item_conditionid
 FIELD		|operator	|t_integer	|'8'	|NOT NULL	|ZBX_SYNC
 FIELD		|macro		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|itemid
-INDEX		|2		|templateid
 
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2030008	|2030008
+ROW		|2030006	|2030006
