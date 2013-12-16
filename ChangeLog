@@ -6,6 +6,7 @@ New features:
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+...G...PS. [ZBX-4243] fixed Zabbix syslog application names (appnames) (Andris)
 ........S. [ZBX-7204] fixed the timestamp order of events generated during network discovery (igors)
 
 --------------------------------------------------------------------------------
