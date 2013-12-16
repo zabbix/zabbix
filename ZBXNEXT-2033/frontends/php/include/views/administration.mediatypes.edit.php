@@ -17,7 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
+require_once dirname(__FILE__).'/js/administration.mediatypes.edit.js.php';
 
 $mediaTypeWidget = new CWidget();
 $mediaTypeWidget->addPageHeader(_('CONFIGURATION OF MEDIA TYPES'));
@@ -36,7 +36,7 @@ $nameTextBox->attr('autofocus', 'autofocus');
 $mediaTypeFormList->addRow(_('Name'), $nameTextBox);
 
 // append type to form list
-$cmbType = new CComboBox('type', $this->data['type'], 'submit()');
+$cmbType = new CComboBox('type', $this->data['type']);
 $cmbType->addItems(array(
 	MEDIA_TYPE_EMAIL => _('Email'),
 	MEDIA_TYPE_EXEC => _('Script'),

@@ -41,7 +41,14 @@ function media_type2str($type = null) {
 		return _('Unknown');
 	}
 }
-
+/**
+ * Get translated label depending on Media Type field type.
+ *
+ * @param string $field
+ * @param string $type
+ *
+ * @return string
+ */
 function getMediaTypeLabel($field, $type) {
 	switch ($field) {
 		case 'smtp_server':
