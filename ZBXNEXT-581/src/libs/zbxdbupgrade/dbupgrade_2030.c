@@ -71,7 +71,7 @@ static int	DBpatch_2030004(void)
 	char		*value, *macro_esc, *value_esc;
 	int		ret = FAIL, rc;
 
-	result = DBselect("select itemid,filter from items where filter<>''");
+	result = DBselect("select itemid,filter from items where filter<>'' and flags=%d", ZBX_FLAG_DISCOVERY_RULE);
 
 	while (NULL != (row = DBfetch(result)))
 	{
