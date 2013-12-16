@@ -27,6 +27,8 @@
 #define ZBX_SYNC_PARTIAL	0
 #define	ZBX_SYNC_FULL		1
 
+#define ZBX_SYNC_MAX	1000
+
 #define	ZBX_NO_POLLER			255
 #define	ZBX_POLLER_TYPE_NORMAL		0
 #define	ZBX_POLLER_TYPE_UNREACHABLE	1
@@ -221,6 +223,9 @@ int	DCconfig_get_item_by_key(DC_ITEM *item, zbx_uint64_t proxy_hostid, const cha
 void	DCconfig_get_items_by_itemids(DC_ITEM *items, zbx_uint64_t *itemids, int *errcodes, size_t num);
 void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions, zbx_uint64_t *functionids, int *errcodes, size_t num);
 void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num);
+void	DCconfig_lock_triggers_by_itemids(const zbx_uint64_t *itemids, int itemids_num, unsigned char *can_take,
+		zbx_vector_uint64_t *triggerids);
+void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids);
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, char **errors, int item_num);
 int	DCconfig_get_trigger_for_event(DB_TRIGGER *trigger, zbx_uint64_t triggerid);
