@@ -58,6 +58,51 @@ $testTimeFrom = mktime(
 	date('Y', $data['time'])
 );
 
+// macro
+if ($data['type'] == 0 || $data['type'] == 1) {
+	$macro[] = DNSTEST_DNSSEC_DELAY;
+}
+else {
+	$macro[] = DNSTEST_RDDS_DELAY;
+}
+
+if ($data['type'] == 0) {
+	$macro[] = DNSTEST_MIN_DNS_COUNT;
+	$macro[] = DNSTEST_DNS_UDP_RTT;
+}
+
+// get global macros
+$macros = API::UserMacro()->get(array(
+	'globalmacro' => true,
+	'output' => API_OUTPUT_EXTEND,
+	'filter' => array(
+		'macro' => $macro
+	)
+));
+
+if ($data['type'] == 0) {
+	foreach ($macros as $macro) {
+		if ($macro['macro'] == DNSTEST_MIN_DNS_COUNT) {
+			$minDnsCount = $macro['value'];
+		}
+		elseif ($macro['macro'] == DNSTEST_DNS_UDP_RTT) {
+			$udpRtt = $macro['value'];
+		}
+		else {
+			$macroTime = $macro['value'] - 1;
+		}
+	}
+}
+else {
+	$macro = reset($macros);
+	$macroTime = $macro['value'] - 1;
+}
+
+// time calculation
+$timeFrom = $macroTime - 59;
+$testTimeTill = $testTimeFrom + 59;
+$testTimeFrom -= $timeFrom;
+
 // get TLD
 $tld = API::Host()->get(array(
 	'tlds' => true,
@@ -114,7 +159,7 @@ foreach ($probeItems as $probeItem) {
 			$manualItemIds[] = $probeItem['itemid'];
 		}
 		// automatic items
-		if ($probeItem['key_'] != PROBE_STATUS_MANUAL) {
+		if ($probeItem['key_'] != PROBE_STATUS_AUTOMATIC) {
 			$automaticItemIds[$probeItem['itemid']] = $probeItem['hostid'];
 		}
 	}
@@ -133,12 +178,14 @@ foreach ($hosts as $host) {
 
 // get manual data
 foreach ($manualItemIds as $itemId) {
-	$itemValue = DBfetch(DBselect(
+	$itemValue = DBfetch(DBselect(DBaddLimit(
 		'SELECT h.value'.
 		' FROM history_uint h'.
 		' WHERE h.itemid='.$itemId.
-			' AND h.clock>='.$data['time']
-	));
+			' AND h.clock>='.$testTimeFrom.
+			' AND h.clock<='.$testTimeTill,
+		1
+	)));
 
 	if ($itemValue && $itemValue['value'] == PROBE_DOWN) {
 		$data['probes'][$probeItems[$itemId]['hostid']]['status'] = PROBE_DOWN;
@@ -153,7 +200,8 @@ foreach ($automaticItemIds as $itemId => $hostId) {
 			'SELECT h.value'.
 			' FROM history_uint h'.
 			' WHERE h.itemid='.$itemId.
-				' AND h.clock>='.$data['time'],
+				' AND h.clock>='.$testTimeFrom.
+				' AND h.clock<='.$testTimeTill,
 			1
 		)));
 
@@ -181,46 +229,6 @@ $hosts = API::Host()->get(array(
 $hostIds = array();
 foreach ($hosts as $host) {
 	$hostIds[] = $host['hostid'];
-}
-
-if ($data['type'] == 0 || $data['type'] == 1) {
-	$macro[] = DNSTEST_DNSSEC_DELAY;
-}
-else {
-	$macro[] = DNSTEST_RDDS_DELAY;
-}
-
-if ($data['type'] == 0) {
-	$macro[] = DNSTEST_MIN_DNS_COUNT;
-	$macro[] = DNSTEST_DNS_UDP_RTT;
-}
-
-// get global macros
-$macros = API::UserMacro()->get(array(
-	'globalmacro' => true,
-	'output' => API_OUTPUT_EXTEND,
-	'filter' => array(
-		'macro' => $macro
-	)
-));
-
-//$testTimeTill = $testTimeFrom + 59;
-if ($data['type'] == 0) {
-	foreach ($macros as $macro) {
-		if ($macro['macro'] == DNSTEST_MIN_DNS_COUNT) {
-			$minDnsCount = $macro['value'];
-		}
-		elseif ($macro['macro'] == DNSTEST_DNS_UDP_RTT) {
-			$udpRtt = $macro['value'];
-		}
-		else {
-			$macroTime = $macro['value'] - 1;
-		}
-	}
-}
-else {
-	$macro = reset($macros);
-	$macroTime = $macro['value'] - 1;
 }
 
 // time calculation

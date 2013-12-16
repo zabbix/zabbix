@@ -226,7 +226,7 @@ foreach ($this->data['tests'] as $test) {
 		$value,
 		isset($test['slv']) ? $test['slv'].'%' : '-',
 		new CLink(
-			'details',
+			_('details'),
 			'dnstest.particulartests.php?slvItemId='.$this->data['slvItemId'].'&host='.$this->data['tld']['host'].
 				'&time='.$test['clock'].'&type='.$this->data['type']
 		)

@@ -151,15 +151,6 @@ $filterTable->addRow(array(
 			'javascript: location.href = "dnstest.tests.php?filter_set=1&filter_rolling_week=1&host='.
 				$this->data['tld']['host'].'&type='.$this->data['type'].'&sid='.$this->data['sid'].
 				'&slvItemId='.$this->data['slvItemId'].'";'
-		),
-		new CSpan(
-			array(
-				new CCheckBox('filter_failing_tests',
-					isset($this->data['filter_failing_tests']) ? $this->data['filter_failing_tests'] : null, null, 1),
-				SPACE,
-				bold(_('Only failing tests'))
-			),
-			'spaces'
 		)
 	)
 ));
@@ -189,9 +180,8 @@ $dnsTestWidget->addFlicker($filterForm, CProfile::get('web.dnstest.tests.filter.
 
 $headers = array(
 	_('Time'),
-	_('Result'),
-	_('Details'),
-	_('Effects rolling week')
+	_('Effects rolling week'),
+	SPACE
 );
 $noData = _('No tests found.');
 
@@ -201,22 +191,6 @@ $testsTable = new CTableInfo($noData);
 $testsTable->setHeader($headers);
 
 foreach ($this->data['tests'] as $test) {
-	if (isset($test['details']) && $test['details']) {
-		$details = explode(',', $test['details']);
-		$detailsDescription = new CLink(
-			_s('
-				%1$s out of %2$s probes reported availability of service',
-				$details[0].'%',
-				$details[1]
-			),
-			'dnstest.particulartests.php?slvItemId='.$this->data['slvItemId'].'&host='.$this->data['tld']['host'].
-				'&time='.$test['clock'].'&type='.$this->data['type']
-			);
-	}
-	else {
-		$detailsDescription = '-';
-	}
-
 	if (!$test['incident']) {
 		$rollingWeekEffects = _('No');
 	}
@@ -226,11 +200,15 @@ foreach ($this->data['tests'] as $test) {
 	else {
 		$rollingWeekEffects = _('Yes / False positive');
 	}
+
 	$row = array(
 		date('d.m.Y H:i:s', $test['clock']),
-		$test['value'] ? _('Up') : _('Down'),
-		$detailsDescription,
-		$rollingWeekEffects
+		$rollingWeekEffects,
+		new CLink(
+			_('details'),
+			'dnstest.particulartests.php?slvItemId='.$this->data['slvItemId'].'&host='.$this->data['tld']['host'].
+				'&time='.$test['clock'].'&type='.$this->data['type']
+		)
 	);
 
 	$testsTable->addRow($row);
@@ -258,17 +236,25 @@ $testsInfoTable->addRow(array(array(
 $testsInfoTable->addRow(array(array(
 	new CDiv(array(
 		array(
-			new CSpan(array(bold(_('Number of tests downtime')), ':', SPACE, $this->data['downTests']), 'first-row-element'),
+			new CSpan(
+				array(bold(_('Number of tests downtime')), ':', SPACE, $this->data['downTests']), 'first-row-element'
+			),
 			new CSpan(array(bold(_('Number of mimutes downtime')), ':', SPACE, $this->data['downTimeMinutes']))
 		),
 		BR(),
 		array(
-			new CSpan(array(bold(_('Number of state changes')), ':', SPACE, $this->data['statusChanges']), 'first-row-element'),
-			new CSpan(array(bold(_('Total time within selected period')), ':', SPACE, convertUnitsS($this->data['downPeriod'])))
+			new CSpan(
+				array(bold(_('Number of state changes')), ':', SPACE, $this->data['statusChanges']), 'first-row-element'
+			),
+			new CSpan(array(
+				bold(_('Total time within selected period')), ':', SPACE, convertUnitsS($this->data['downPeriod'])
+			))
 		),
 		BR(),
 		BR(),
-		new CSpan(array(bold(_s('%1$s of downtime: Number of minutes of downtime/Total time within selected period', round($this->data['downTimeMinutes'] / ($this->data['downPeriod'] / 60) * 100).'%'))))
+		new CSpan(array(bold(
+			_s('Downtime: %1$s', round($this->data['downTimeMinutes'] / ($this->data['downPeriod'] / 60) * 100).'%')
+		)))
 	), 'info-block')
 )));
 

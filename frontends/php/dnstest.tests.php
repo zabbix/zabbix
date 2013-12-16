@@ -276,175 +276,108 @@ if ($items) {
 			$incidentsData[$i] = array_merge($incidentsData[$i], $newData[$i]);
 		}
 	}
-}
 
-// get tests results
-$failingTests = $data['filter_failing_tests'] ? ' AND h.value=0' : null;
+	// get tests results
+	$failingTests = $data['filter_failing_tests'] ? ' AND h.value=0' : null;
 
-$tests = DBselect(
-	'SELECT h.clock, h.value'.
-	' FROM history_uint h'.
-	' WHERE h.itemid='.$availItem.
-		' AND h.clock>='.zbxDateToTime($data['filter_from']).
-		' AND h.clock<='.zbxDateToTime($data['filter_to']).
-		$failingTests
-);
-
-if ($data['tld'] && $data['slvItemId']) {
-	$data['slv'] = getSLV($data['slvItemId']);
-
-	// result generation
-	$data['downTests'] = 0;
-	$data['statusChanges'] = 0;
-	while ($test = DBfetch($tests)) {
-		$data['tests'][] = array(
-			'value' => $test['value'],
-			'clock' => $test['clock'],
-			'incident' => 0,
-			'updated' => false
-		);
-
-		// state changes
-		if (!isset($statusChanged)) {
-			$statusChanged = $test['value'];
-		}
-		else {
-			if ($statusChanged != $test['value']) {
-				$statusChanged = $test['value'];
-				$data['statusChanges']++;
-			}
-		}
-
-		if (!$test['value']) {
-			$data['downTests']++;
-		}
-	}
-
-	$data['downPeriod'] = zbxDateToTime($data['filter_to']) - zbxDateToTime($data['filter_from']);
-
-	if (!$data['type']) {
-		$itemKey = CALCULATED_ITEM_DNS_DELAY;
-	}
-	elseif ($data['type'] == 1) {
-		$itemKey = CALCULATED_ITEM_DNSSEC_DELAY;
-	}
-	else {
-		$itemKey = CALCULATED_ITEM_RDDS_DELAY;
-	}
-
-	// get host with calculated items
-	$dnstest = API::Host()->get(array(
-		'output' => array('hostid'),
-		'filter' => array(
-			'host' => DNSTEST_HOST
-		)
-	));
-
-	if ($dnstest) {
-		$dnstest = reset($dnstest);
-	}
-	else {
-		show_error_message(_s('No permissions to referred host "%1$s" or it does not exist!', DNSTEST_HOST));
-		require_once dirname(__FILE__).'/include/page_footer.php';
-		exit;
-	}
-
-	$item = API::Item()->get(array(
-		'hostids' => $dnstest['hostid'],
-		'output' => array('itemid'),
-		'filter' => array(
-			'key_' => $itemKey
-		)
-	));
-
-	if ($item) {
-		$item = reset($item);
-	}
-	else {
-		show_error_message(_s('Missed items for host "%1$s"!', DNSTEST_HOST));
-		require_once dirname(__FILE__).'/include/page_footer.php';
-		exit;
-	}
-
-	$timeStep = getOldValue($item['itemid'], zbxDateToTime($data['filter_from'])) / 60;
-	$timeStep = $timeStep ? $timeStep : 1;
-
-	$data['downTimeMinutes'] = $data['downTests'] * $timeStep;
-
-	foreach ($incidentsData as $incident) {
-		foreach ($data['tests'] as $key => $test) {
-			if (!$test['updated'] && $incident['startTime'] < $test['clock'] && (!isset($incident['endTime'])
-					|| (isset($incident['endTime']) && $incident['endTime'] > $test['clock']))) {
-				$data['tests'][$key]['incident'] = $incident['false_positive'] ? 2 : 1;
-				$data['tests'][$key]['updated'] = true;
-			}
-		}
-	}
-
-	foreach ($data['tests'] as $key => $test) {
-		$data['tests'][$key]['updated'] = false;
-	}
-
-	// details generation
-	$probeStatus = API::Host()->get(array(
-		'output' => array('hostid'),
-		'filter' => array(
-			'host' => 'Probes Status'
-		)
-	));
-
-	$probeStatus = reset($probeStatus);
-
-	$item = API::Item()->get(array(
-		'hostids' => $probeStatus['hostid'],
-		'output' => array('itemid', 'key_'),
-		'filter' => array(
-			'key_' => NUMBER_OF_ONLINE_AND_TOTAL_PROBES
-		)
-	));
-
-	$item = reset($item);
-
-	$detailsFrom = zbxDateToTime($data['filter_from']) - $timeStep * 60;
-	$detailsTo = zbxDateToTime($data['filter_to']) + $timeStep * 60;
-
-	$details = DBselect(
-		'SELECT h.clock, h.value, h.itemid'.
-		' FROM history_str h'.
-		' WHERE h.itemid='.$item['itemid'].
-			' AND h.clock>='.$detailsFrom.
-			' AND h.clock<='.$detailsTo
+	$tests = DBselect(
+		'SELECT h.clock, h.value'.
+		' FROM history_uint h'.
+		' WHERE h.itemid='.$availItem.
+			' AND h.clock>='.zbxDateToTime($data['filter_from']).
+			' AND h.clock<='.zbxDateToTime($data['filter_to']).
+			$failingTests
 	);
 
-	$detailsData = array();
+	if ($data['tld'] && $data['slvItemId']) {
+		$data['slv'] = getSLV($data['slvItemId']);
 
-	while ($detail = DBfetch($details)) {
-		$detailsData[] = array(
-			'clock' => $detail['clock'],
-			'details' => $detail['value']
-		);
-	}
-
-	foreach ($detailsData as $detailsKey => $detail) {
-		foreach ($data['tests'] as $key => $test) {
-			if ($detail['clock'] == $test['clock']) {
-				$data['tests'][$key] = array_merge($data['tests'][$key], array('details' => $detail['value']));
-				$data['tests'][$key]['updated'] = true;
-				break;
+		// result generation
+		$data['downTests'] = 0;
+		$data['statusChanges'] = 0;
+		while ($test = DBfetch($tests)) {
+			if (($data['type'] < 2 && $test['value'] == 1) || ($data['type'] == 2 && $test['value'] == 2)) {
+				$data['tests'][] = array(
+					'value' => $test['value'],
+					'clock' => $test['clock'],
+					'incident' => 0,
+					'updated' => false
+				);
 			}
 
-			if (!$test['updated']) {
-				if ($detail['clock'] > $test['clock']) {
-					for ($i = $key; $i >= 0; $i--) {
-						if (!$data['tests'][$i]['updated']) {
-							$data['tests'][$i] = array_merge(
-								$data['tests'][$i],
-								array('details' => $detail['details'])
-							);
-							$data['tests'][$key]['updated'] = true;
-							break;
-						}
-					}
+			// state changes
+			if (!isset($statusChanged)) {
+				$statusChanged = $test['value'];
+			}
+			else {
+				if ($statusChanged != $test['value']) {
+					$statusChanged = $test['value'];
+					$data['statusChanges']++;
+				}
+			}
+
+			if (!$test['value']) {
+				$data['downTests']++;
+			}
+		}
+
+		$data['downPeriod'] = zbxDateToTime($data['filter_to']) - zbxDateToTime($data['filter_from']);
+
+		if (!$data['type']) {
+			$itemKey = CALCULATED_ITEM_DNS_DELAY;
+		}
+		elseif ($data['type'] == 1) {
+			$itemKey = CALCULATED_ITEM_DNSSEC_DELAY;
+		}
+		else {
+			$itemKey = CALCULATED_ITEM_RDDS_DELAY;
+		}
+
+		// get host with calculated items
+		$dnstest = API::Host()->get(array(
+			'output' => array('hostid'),
+			'filter' => array(
+				'host' => DNSTEST_HOST
+			)
+		));
+
+		if ($dnstest) {
+			$dnstest = reset($dnstest);
+		}
+		else {
+			show_error_message(_s('No permissions to referred host "%1$s" or it does not exist!', DNSTEST_HOST));
+			require_once dirname(__FILE__).'/include/page_footer.php';
+			exit;
+		}
+
+		$item = API::Item()->get(array(
+			'hostids' => $dnstest['hostid'],
+			'output' => array('itemid'),
+			'filter' => array(
+				'key_' => $itemKey
+			)
+		));
+
+		if ($item) {
+			$item = reset($item);
+		}
+		else {
+			show_error_message(_s('Missed items for host "%1$s"!', DNSTEST_HOST));
+			require_once dirname(__FILE__).'/include/page_footer.php';
+			exit;
+		}
+
+		$timeStep = getOldValue($item['itemid'], zbxDateToTime($data['filter_from'])) / 60;
+		$timeStep = $timeStep ? $timeStep : 1;
+
+		$data['downTimeMinutes'] = $data['downTests'] * $timeStep;
+
+		foreach ($incidentsData as $incident) {
+			foreach ($data['tests'] as $key => $test) {
+				if (!$test['updated'] && $incident['startTime'] < $test['clock'] && (!isset($incident['endTime'])
+						|| (isset($incident['endTime']) && $incident['endTime'] > $test['clock']))) {
+					$data['tests'][$key]['incident'] = $incident['false_positive'] ? 2 : 1;
+					$data['tests'][$key]['updated'] = true;
 				}
 			}
 		}
