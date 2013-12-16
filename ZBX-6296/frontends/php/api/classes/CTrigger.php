@@ -465,12 +465,8 @@ class CTrigger extends CTriggerGeneral {
 		if ($options['groupids'] !== null && $options['selectGroups'] === null) {
 			$options['selectGroups'] = API_OUTPUT_REFER;
 		}
-		if ($options['selectHosts'] === null
-				&& ($options['hostids'] !== null
-					|| $options['expandDescription'] !== null
-					|| $options['expandComment'] !== null
-					|| $options['expandExpression'] !== null)) {
-			$options['selectHosts'] = array('hostid');
+		if ($options['hostids'] !== null && $options['selectHosts'] === null) {
+			$options['selectHosts'] = API_OUTPUT_REFER;
 		}
 		if ($options['itemids'] !== null && $options['selectItems'] === null) {
 			$options['selectItems'] = array('itemid');
