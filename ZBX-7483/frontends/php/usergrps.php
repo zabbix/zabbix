@@ -195,7 +195,7 @@ elseif (isset($_REQUEST['save'])) {
 elseif (isset($_REQUEST['delete'])) {
 	DBstart();
 
-	$result = API::UserGroup()->delete($_REQUEST['usrgrpid']);
+	$result = API::UserGroup()->delete(array($_REQUEST['usrgrpid']));
 	$result = DBend($result);
 
 	show_messages($result, _('Group deleted'), _('Cannot delete group'));

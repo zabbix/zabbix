@@ -87,17 +87,15 @@ class CUserGroup extends CZBXAPI {
 
 		// permissions
 		if ($userType != USER_TYPE_SUPER_ADMIN) {
-			if ($options['editable']) {
-				return array();
+			if ($options['editable'] === null && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
+				$sqlParts['where'][] = 'g.usrgrpid IN ('.
+					'SELECT uug.usrgrpid'.
+					' FROM users_groups uug'.
+					' WHERE uug.userid='.self::$userData['userid'].
+				')';
 			}
 			else {
-				if (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
-					$sqlParts['where'][] = 'g.usrgrpid IN ('.
-						'SELECT uug.usrgrpid'.
-						' FROM users_groups uug'.
-						' WHERE uug.userid='.self::$userData['userid'].
-					')';
-				}
+				return array();
 			}
 		}
 
@@ -589,8 +587,6 @@ class CUserGroup extends CZBXAPI {
 	 * @return array
 	 */
 	public function delete(array $userGroupIds) {
-		$userGroupIds = zbx_toArray($userGroupIds);
-
 		$this->validateDelete($userGroupIds);
 
 		$operationIds = $delelteOperationIds = array();
@@ -639,6 +635,12 @@ class CUserGroup extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
+		$dbUserGroup = $this->get(array(
+			'output' => array('usrgrpid', 'name'),
+			'usrgrpids' => $userGroupIds,
+			'preservekeys' => true
+		));
+
 		// check if user group is used in scripts
 		$dbScripts = API::Script()->get(array(
 			'output' => array('scriptid', 'name', 'usrgrpid'),
@@ -660,12 +662,6 @@ class CUserGroup extends CZBXAPI {
 
 		// check if user group is used in config
 		$config = select_config();
-
-		$dbUserGroup = $this->get(array(
-			'output' => array('usrgrpid', 'name'),
-			'usrgrpids' => $userGroupIds,
-			'preservekeys' => true
-		));
 
 		if (isset($dbUserGroup[$config['alert_usrgrpid']])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
