@@ -6051,13 +6051,6 @@ return array(
 				'ref_table' => 'items',
 				'ref_field' => 'itemid',
 			),
-			'templateid' => array(
-				'null' => true,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'item_condition',
-				'ref_field' => 'item_conditionid',
-			),
 			'operator' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
