@@ -533,8 +533,6 @@ void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vecto
 {
 	const char		*__function_name = "DBlld_update_graphs";
 
-	struct zbx_json_parse	jp_row;
-	const char		*p;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vector_ptr_t	graphs;
