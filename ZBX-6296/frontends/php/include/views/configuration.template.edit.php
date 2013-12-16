@@ -48,25 +48,26 @@ if ($templateid) {
 	$frmHost->addVar('templateid', $templateid);
 }
 
-if (($templateid > 0) && !isset($_REQUEST['form_refresh'])) {
+if ($templateid > 0 && !hasRequest('form_refresh')) {
 	$host = $this->data['dbTemplate']['host'];
 	$visiblename = $this->data['dbTemplate']['name'];
-// display empry visible nam if equal to host name
-	if ($visiblename == $host) {
+
+	// display empty visible name if equal to host name
+	if ($visiblename === $host) {
 		$visiblename = '';
 	}
 
-// get template groups from db
+	// get template groups from db
 	$groups = $this->data['dbTemplate']['groups'];
 	$groups = zbx_objectValues($groups, 'groupid');
 
 	$macros = order_macros($this->data['dbTemplate']['macros'], 'macro');
 
-// get template hosts from db
+	// get template hosts from db
 	$hosts_linked_to = API::Host()->get(array(
 		'templateids' => $templateid,
-		'editable' => 1,
-		'templated_hosts' => 1
+		'editable' => true,
+		'templated_hosts' => true
 	));
 
 	$hosts_linked_to = zbx_objectValues($hosts_linked_to, 'hostid');

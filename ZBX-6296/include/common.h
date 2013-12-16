@@ -729,6 +729,7 @@ while (0)
 
 extern const char	*progname;
 extern const char	title_message[];
+extern const char	syslog_app_name[];
 extern const char	usage_message[];
 extern const char	*help_message[];
 
@@ -976,6 +977,7 @@ char	*zbx_date2str(time_t date);
 char	*zbx_time2str(time_t time);
 
 #define ZBX_NULL2STR(str)	(NULL != str ? str : "(null)")
+#define ZBX_NULL2EMPTY_STR(str)	(NULL != (str) ? (str) : "")
 
 char	*zbx_strcasestr(const char *haystack, const char *needle);
 int	zbx_mismatch(const char *s1, const char *s2);
@@ -1057,14 +1059,6 @@ void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value);
 void	zbx_trim_str_list(char *list, char delimiter);
 
 int	parse_serveractive_element(char *str, char **host, unsigned short *port, unsigned short port_default);
-
-/* 128 bit unsigned integer handling */
-#define uset128(base, hi64, lo64)	(base)->hi = hi64; (base)->lo = lo64
-
-void uinc128_64(zbx_uint128_t *base, zbx_uint64_t value);
-void uinc128_128(zbx_uint128_t *base, const zbx_uint128_t *value);
-void udiv128_64(zbx_uint128_t *result, const zbx_uint128_t *base, zbx_uint64_t value);
-void umul64_64(zbx_uint128_t *result, zbx_uint64_t value, zbx_uint64_t factor);
 
 #define ZBX_SESSION_ACTIVE	0
 #define ZBX_SESSION_PASSIVE	1

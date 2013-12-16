@@ -40,8 +40,8 @@ $fields = array(
 	'fullscreen' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
 	'btnSelect' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// filter
-	'filter_rst' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'filter_set' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	'filter_rst' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'filter_set' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'show_triggers' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'show_events' =>		array(T_ZBX_INT, O_OPT, P_SYS,	null,		null),
 	'ack_status' =>			array(T_ZBX_INT, O_OPT, P_SYS,	null,		null),

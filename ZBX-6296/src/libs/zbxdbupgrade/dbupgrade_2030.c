@@ -17,20 +17,30 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_SERVERCOMMS_H
-#define ZABBIX_SERVERCOMMS_H
+#include "common.h"
+#include "db.h"
+#include "log.h"
+#include "sysinfo.h"
+#include "zbxdbupgrade.h"
+#include "dbupgrade.h"
 
-extern char	*CONFIG_SOURCE_IP;
-extern char	*CONFIG_SERVER;
-extern int	CONFIG_SERVER_PORT;
-extern char	*CONFIG_HOSTNAME;
+/*
+ * 2.4 development database patches
+ */
 
-#include "comms.h"
+#ifndef HAVE_SQLITE3
 
-int	connect_to_server(zbx_sock_t *sock, int timeout, int retry_interval);
-void	disconnect_server(zbx_sock_t *sock);
-
-int	get_data_from_server(zbx_sock_t *sock, const char *request, char **data);
-int	put_data_to_server(zbx_sock_t *sock, struct zbx_json *j, char **error);
+static int	DBpatch_2030000(void)
+{
+	return SUCCEED;
+}
 
 #endif
+
+DBPATCH_START(2030)
+
+/* version, duplicates flag, mandatory flag */
+
+DBPATCH_ADD(2030000, 0, 1)
+
+DBPATCH_END()
