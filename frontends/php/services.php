@@ -443,7 +443,6 @@ else {
 
 	// triggers
 	$triggers = zbx_objectValues($services, 'trigger');
-
 	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
 
 	foreach ($services as &$service) {

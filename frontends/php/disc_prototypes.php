@@ -362,8 +362,8 @@ else {
 		'discovery_rule' => $discovery_rule
 	);
 
-	// get items
 	$sortfield = getPageSortField('name');
+
 	$data['items'] = API::ItemPrototype()->get(array(
 		'discoveryids' => $data['parent_discoveryid'],
 		'output' => API_OUTPUT_EXTEND,
@@ -373,9 +373,9 @@ else {
 		'limit' => $config['search_limit'] + 1
 	));
 
-	if (!empty($data['items'])) {
-		order_result($data['items'], $sortfield, getPageSortOrder());
-	}
+	$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
+
+	order_result($data['items'], $sortfield, getPageSortOrder());
 
 	$data['paging'] = getPagingLine(
 		$data['items'],

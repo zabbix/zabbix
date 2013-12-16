@@ -428,7 +428,8 @@ $triggers = API::Trigger()->get($options);
 order_result($triggers, $sortfield, $sortorder);
 $paging = getPagingLine($triggers);
 
-$options = array(
+
+$triggers = API::Trigger()->get(array(
 	'nodeids' => get_current_nodeid(),
 	'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 	'output' => API_OUTPUT_EXTEND,
@@ -438,8 +439,7 @@ $options = array(
 	'selectLastEvent' => true,
 	'expandDescription' => true,
 	'preservekeys' => true
-);
-$triggers = API::Trigger()->get($options);
+));
 
 order_result($triggers, $sortfield, $sortorder);
 
@@ -568,16 +568,11 @@ foreach ($triggers as $trigger) {
 
 	$triggerItems = array();
 
+	$trigger['items'] = CMacrosResolverHelper::resolveItemNames($trigger['items']);
+
 	foreach ($trigger['items'] as $item) {
-		$itemName = itemName($item);
-
-		// if we have items from different hosts, we must prefix a host name
-		if ($usedHostCount > 1) {
-			$itemName = $usedHosts[$item['hostid']].NAME_DELIMITER.$itemName;
-		}
-
 		$triggerItems[] = array(
-			'name' => $itemName,
+			'name' => ($usedHostCount > 1) ? $usedHosts[$item['hostid']].NAME_DELIMITER.$item['name_expanded'] : $item['name_expanded'],
 			'params' => array(
 				'itemid' => $item['itemid'],
 				'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
