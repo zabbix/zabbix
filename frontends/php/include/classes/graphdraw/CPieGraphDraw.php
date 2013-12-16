@@ -35,8 +35,10 @@ class CPieGraphDraw extends CGraphDraw {
 	/* PRE CONFIG: ADD / SET / APPLY
 	/********************************************************************************************************/
 	public function addItem($itemid, $calc_fnc = CALC_FNC_AVG, $color = null, $type = null) {
-		$this->items[$this->num] = get_item_by_itemid($itemid);
-		$this->items[$this->num]['name'] = itemName($this->items[$this->num]);
+		$items = CMacrosResolverHelper::resolveItemNames(array(get_item_by_itemid($itemid)));
+
+		$this->items[$this->num] = reset($items);
+
 		$host = get_host_by_hostid($this->items[$this->num]['hostid']);
 
 		$this->items[$this->num]['hostname'] = $host['name'];
@@ -287,8 +289,8 @@ class CPieGraphDraw extends CGraphDraw {
 			if (zbx_strlen($this->items[$i]['host']) > $max_host_len) {
 				$max_host_len = zbx_strlen($this->items[$i]['host']);
 			}
-			if (zbx_strlen($this->items[$i]['name']) > $max_name_len) {
-				$max_name_len = zbx_strlen($this->items[$i]['name']);
+			if (zbx_strlen($this->items[$i]['name_expanded']) > $max_name_len) {
+				$max_name_len = zbx_strlen($this->items[$i]['name_expanded']);
 			}
 		}
 
@@ -331,7 +333,7 @@ class CPieGraphDraw extends CGraphDraw {
 
 				$str = sprintf('%s: %s [%s] ',
 					str_pad($this->items[$i]['host'], $max_host_len, ' '),
-					str_pad($this->items[$i]['name'], $max_name_len, ' '),
+					str_pad($this->items[$i]['name_expanded'], $max_name_len, ' '),
 					$fncRealName
 				);
 			}
@@ -339,7 +341,7 @@ class CPieGraphDraw extends CGraphDraw {
 				$strvalue = sprintf(_('Value: no data'));
 				$str = sprintf('%s: %s [ '._('no data').' ]',
 					str_pad($this->items[$i]['host'], $max_host_len, ' '),
-					str_pad($this->items[$i]['name'], $max_name_len, ' ')
+					str_pad($this->items[$i]['name_expanded'], $max_name_len, ' ')
 				);
 			}
 

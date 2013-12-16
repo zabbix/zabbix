@@ -50,11 +50,12 @@ $trigger = API::Trigger()->get(array(
 	'output' => API_OUTPUT_EXTEND,
 	'expandDescription' => true
 ));
-$trigger = reset($trigger);
 
 if (!$trigger) {
 	access_deny();
 }
+
+$trigger = reset($trigger);
 
 /*
  * Actions

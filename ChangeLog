@@ -17,6 +17,9 @@ New features:
 A.F....... [ZBX-1357] updated American English, French, Hungarian, Japanese, Russian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-6296] optimized macros resolving in latest data (Eduard)
+..F....... [ZBX-6296] rewrited user macros resolving (Eduard, Sasha)
+..F....... [ZBX-6296] rewrited macros resolving in function parameters (Eduard)
 A.F....... [ZBX-6348] fixed possibility to create host groups and update all other existing objects with name containing only zeros (Ivo)
 .......PS. [ZBX-7288] improved error logging for server-proxy communication (Andris)
 A.F....... [ZBX-7407] fixed being able to change event source for existing actions (Ivo)
