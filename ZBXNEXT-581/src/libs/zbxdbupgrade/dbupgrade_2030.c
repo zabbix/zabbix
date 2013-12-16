@@ -42,7 +42,6 @@ static int	DBpatch_2030001(void)
 				{
 					{"item_conditionid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-					{"templateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
 					{"operator", "8", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"macro", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
@@ -60,32 +59,19 @@ static int	DBpatch_2030002(void)
 
 static int	DBpatch_2030003(void)
 {
-	return DBcreate_index("item_condition", "item_condition_2", "templateid", 0);
-}
-
-static int	DBpatch_2030004(void)
-{
 	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("item_condition", 1, &field);
 }
 
-static int	DBpatch_2030005(void)
-{
-	const ZBX_FIELD	field = {"templateid", NULL, "item_condition", "item_conditionid", 0, 0, 0,
-			ZBX_FK_CASCADE_DELETE};
-
-	return DBadd_foreign_key("item_condition", 2, &field);
-}
-
-static int	DBpatch_2030006(void)
+static int	DBpatch_2030004(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*value, *macro_esc, *value_esc, *templateid;
+	char		*value, *macro_esc, *value_esc;
 	int		ret = FAIL, rc;
 
-	result = DBselect("select itemid,filter,templateid from items where filter<>''");
+	result = DBselect("select itemid,filter from items where filter<>''");
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -96,12 +82,11 @@ static int	DBpatch_2030006(void)
 
 		macro_esc = DBdyn_escape_string(row[1]);
 		value_esc = DBdyn_escape_string(value);
-		templateid = (SUCCEED == DBis_null(row[2])) ? "null" : row[2];
 
 		rc = DBexecute("insert into item_condition"
-				" (item_conditionid,itemid,templateid,macro,value)"
-				" values (%s,%s,%s,'%s','%s')",
-				row[0], row[0], templateid, macro_esc, value_esc);
+				" (item_conditionid,itemid,macro,value)"
+				" values (%s,%s,'%s','%s')",
+				row[0], row[0],  macro_esc, value_esc);
 
 		zbx_free(value_esc);
 		zbx_free(macro_esc);
@@ -117,14 +102,14 @@ out:
 	return ret;
 }
 
-static int	DBpatch_2030007(void)
+static int	DBpatch_2030005(void)
 {
 	const ZBX_FIELD field = {"evaltype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
 
-static int	DBpatch_2030008(void)
+static int	DBpatch_2030006(void)
 {
 	return DBdrop_field("items", "filter");
 }
@@ -142,7 +127,5 @@ DBPATCH_ADD(2030003, 0, 1)
 DBPATCH_ADD(2030004, 0, 1)
 DBPATCH_ADD(2030005, 0, 1)
 DBPATCH_ADD(2030006, 0, 1)
-DBPATCH_ADD(2030007, 0, 1)
-DBPATCH_ADD(2030008, 0, 1)
 
 DBPATCH_END()
