@@ -482,9 +482,8 @@ class CTrigger extends CTriggerGeneral {
 		if (!is_null($options['expandDescription']) && $result && array_key_exists('description', reset($result))) {
 			$result = CMacrosResolverHelper::resolveTriggerNames($result);
 		}
-
 		// expandComment
-		if (!is_null($options['expandComment']) && $result && array_key_exists('comment', reset($result))) {
+		if (!is_null($options['expandComment']) && $result && array_key_exists('comments', reset($result))) {
 			$result = CMacrosResolverHelper::resolveTriggerDescriptions($result);
 		}
 
