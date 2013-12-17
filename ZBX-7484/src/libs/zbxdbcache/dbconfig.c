@@ -1280,7 +1280,9 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 		trigger->type = (unsigned char)atoi(row[5]);
 		trigger->value = (unsigned char)atoi(row[6]);
 		trigger->value_flags = (unsigned char)atoi(row[7]);
-		trigger->locked = 0;
+
+		if (0 == found)
+			trigger->locked = 0;
 	}
 
 	/* remove deleted or disabled triggers from buffer */
