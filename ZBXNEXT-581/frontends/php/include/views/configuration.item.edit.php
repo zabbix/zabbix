@@ -325,29 +325,6 @@ $itemFormList->addRow(_('New flexible interval'), array($newFlexInt, $maxFlexMsg
 if ($this->data['is_discovery_rule']) {
 	$itemFormList->addRow(_('Keep lost resources period (in days)'), new CTextBox('lifetime', $this->data['lifetime'], ZBX_TEXTBOX_SMALL_SIZE, false, 64));
 
-	// append filter to formlist
-	if (!empty($this->data['filter'])) {
-		// exploding filter to two parts: before first ':' and after
-		$pos = zbx_strpos($this->data['filter'], ':');
-		$filter_macro = zbx_substr($this->data['filter'], 0, $pos);
-		$filter_value = zbx_substr($this->data['filter'], $pos + 1);
-	}
-	else {
-		$filter_macro = '';
-		$filter_value = '';
-	}
-	$itemFormList->addRow(
-		_('Filter'),
-		array(
-			_('Macro'),
-			SPACE,
-			new CTextBox('filter_macro', $filter_macro, 13),
-			SPACE,
-			_('Regexp'),
-			SPACE,
-			new CTextBox('filter_value', $filter_value, 20)
-		)
-	);
 	$itemFormList->addRow(_('Allowed hosts'),
 		new CTextBox('trapper_hosts', $this->data['trapper_hosts'], ZBX_TEXTBOX_STANDARD_SIZE),
 		false, 'row_trapper_hosts');
