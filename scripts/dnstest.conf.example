@@ -14,3 +14,7 @@ name = zabbix
 user = zabbix
 password = zabbix
 host = localhost
+
+[salesforce]
+username = someone@example.com
+password = password
