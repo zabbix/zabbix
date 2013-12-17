@@ -303,8 +303,10 @@ if (isset($_REQUEST['form'])) {
 else {
 	$data = array(
 		'hostid' => get_request('hostid', 0),
-		'host' => $host
+		'host' => $host,
+		'showErrorColumn' => ($host['status'] != HOST_STATUS_TEMPLATE)
 	);
+
 	$sortfield = getPageSortField('name');
 
 	// discoveries
@@ -320,12 +322,9 @@ else {
 		'limit' => $config['search_limit'] + 1
 	));
 
-	// determine, show or not column of errors
-	$data['showErrorColumn'] = ($host['status'] != HOST_STATUS_TEMPLATE);
+	$data['discoveries'] = CMacrosResolverHelper::resolveItemNames($data['discoveries']);
 
-	if (!empty($data['discoveries'])) {
-		order_result($data['discoveries'], $sortfield, getPageSortOrder());
-	}
+	order_result($data['discoveries'], $sortfield, getPageSortOrder());
 
 	// paging
 	$data['paging'] = getPagingLine($data['discoveries'], array('itemid'), array('hostid' => get_request('hostid')));
