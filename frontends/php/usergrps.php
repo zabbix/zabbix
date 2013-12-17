@@ -87,7 +87,8 @@ if (isset($_REQUEST['usrgrpid'])) {
 		'usrgrpids' => $_REQUEST['usrgrpid'],
 		'output' => API_OUTPUT_EXTEND
 	));
-	if (empty($dbUserGroup)) {
+
+	if (!$dbUserGroup) {
 		access_deny();
 	}
 }
@@ -96,11 +97,12 @@ elseif (isset($_REQUEST['go'])) {
 		access_deny();
 	}
 	else {
-		$dbUserGroupChk = API::UserGroup()->get(array(
+		$dbUserGroupCount = API::UserGroup()->get(array(
 			'usrgrpids' => $_REQUEST['group_groupid'],
 			'countOutput' => true
 		));
-		if ($dbUserGroupChk != count($_REQUEST['group_groupid'])) {
+
+		if ($dbUserGroupCount != count($_REQUEST['group_groupid'])) {
 			access_deny();
 		}
 	}
@@ -193,7 +195,7 @@ elseif (isset($_REQUEST['save'])) {
 elseif (isset($_REQUEST['delete'])) {
 	DBstart();
 
-	$result = API::UserGroup()->delete($_REQUEST['usrgrpid']);
+	$result = API::UserGroup()->delete(array($_REQUEST['usrgrpid']));
 	$result = DBend($result);
 
 	show_messages($result, _('Group deleted'), _('Cannot delete group'));
