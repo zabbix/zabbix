@@ -2265,7 +2265,7 @@ int	DCsync_history(int sync_type)
 				if (0 == skipped_clock || skipped_clock > cache->history[f].clock)
 					skipped_clock = cache->history[f].clock;
 
-				uint64_array_remove(cache->itemids, &cache->itemids_num, &history[f].itemid, 1);
+				uint64_array_remove(cache->itemids, &cache->itemids_num, &cache->history[f].itemid, 1);
 
 				continue;
 			}
