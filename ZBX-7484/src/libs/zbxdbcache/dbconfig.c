@@ -3662,7 +3662,7 @@ void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_
 			{
 				dc_trigger = (ZBX_DC_TRIGGER *)config->time_triggers.values[j];
 
-				if (dc_trigger->triggerid <= trigger->triggerid)
+				if (dc_trigger->triggerid >= trigger->triggerid)
 					break;
 
 				j++;
@@ -3716,6 +3716,8 @@ void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_
 
 		if (1 == found)
 		{
+			dc_trigger->locked = 1;
+
 			trigger = &(*trigger_info)[trigger_order->values_num];
 
 			DCget_trigger(trigger, dc_trigger);
