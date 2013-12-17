@@ -218,7 +218,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 		$d_script = " if (!isset('state', this)) { this.state = 'none'; }".
 			" if (this.state == 'none') { this.state = 'block'; }".
 			" else { this.state = 'none'; }".
-			" showHideByName('zbx_gebug_info', this.state);";
+			" showHideByName('zbx_debug_info', this.state);";
 		$debug->setAttribute('onclick', 'javascript: '.$d_script);
 		array_push($page_header_r_col, $debug, '|');
 	}
