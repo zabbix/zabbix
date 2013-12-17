@@ -562,7 +562,7 @@ function add_elementNames(&$selements) {
 	$triggers = API::Trigger()->get(array(
 		'triggerids' => $triggerids,
 		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => array('name'),
+		'selectHosts' => array('hostid', 'name'),
 		'nopermissions' => true,
 		'nodeids' => get_current_nodeid(true),
 		'preservekeys' => true
