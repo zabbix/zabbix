@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-12-18 00:49+0200\n"
-"PO-Revision-Date: 2013-12-02 21:08+0300\n"
+"POT-Creation-Date: 2013-12-18 00:54+0200\n"
+"PO-Revision-Date: 2013-12-17 21:59+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1386011331.0\n"
+"X-POOTLE-MTIME: 1387310363.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -345,16 +345,16 @@ msgstr "Akcia bola zmazaná"
 #: actionconf.php:345
 msgid "Action disabled"
 msgid_plural "Actions disabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Akcia vypnutá"
+msgstr[1] "Akcie vypnuté"
+msgstr[2] "Akcie vypnuté"
 
 #: actionconf.php:344
 msgid "Action enabled"
 msgid_plural "Actions enabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Akcia povolená"
+msgstr[1] "Akcie povolené"
+msgstr[2] "Akcie povolené"
 
 #: include/views/configuration.action.edit.php:420
 msgid "Action operations"
@@ -1798,54 +1798,53 @@ msgstr "Nie je možné zmazať web scenár"
 #: actionconf.php:348
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie je možné vypnúť akciu"
+msgstr[1] "Nie je možné vypnúť akcie"
+msgstr[2] "Nie je možné vypnúť akcie"
 
 #: discoveryconf.php:188
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie je možné vypnúť zisťovacie pravidlo"
+msgstr[1] "Nie je možné vypnúť zisťovacie pravidlá"
+msgstr[2] "Nie je možné vypnúť zisťovacie pravidlá"
 
 #: host_discovery.php:286
 msgid "Cannot disable discovery rules"
 msgid_plural "Cannot disable discovery rules"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie je možné vypnúť zisťovacie pravidlá"
+msgstr[1] "Nie je možné vypnúť zisťovacie pravidlá"
+msgstr[2] "Nie je možné vypnúť zisťovacie pravidlá"
 
 #: hostgroups.php:231 hosts.php:621 proxies.php:183
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie je možné vypnúť hosta"
+msgstr[1] "Nie je možné vypnúť hostov"
+msgstr[2] "Nie je možné vypnúť hostov"
 
 #: host_prototypes.php:236
 msgid "Cannot disable host prototype"
 msgid_plural "Cannot disable host prototypes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie je možné vypnúť prototyp hosta"
+msgstr[1] "Nie je možné vypnúť prototypy hosta"
+msgstr[2] "Nie je možné vypnúť prototypy hosta"
 
 #: applications.php:211 items.php:682
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie je možné vypnúť položku"
+msgstr[1] "Nie je možné vypnúť položky"
+msgstr[2] "Nie je možné vypnúť položky"
 
 #: disc_prototypes.php:329
 msgid "Cannot disable item prototype"
 msgid_plural "Cannot disable item prototypes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie je možné vypnúť prototyp položky"
+msgstr[1] "Nie je možné vypnúť prototypy položky"
+msgstr[2] "Nie je možné vypnúť prototypy položky"
 
 #: media_types.php:166
-#, fuzzy
 msgid "Cannot disable media type"
 msgid_plural "Cannot disable media types"
 msgstr[0] "Nie je možné zakázať typ média"
@@ -1855,26 +1854,25 @@ msgstr[2] "Nie je možné zakázať typ média"
 #: triggers.php:276
 msgid "Cannot disable trigger"
 msgid_plural "Cannot disable triggers"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie je možné vypnúť spúšťač"
+msgstr[1] "Nie je možné vypnúť spúšťače"
+msgstr[2] "Nie je možné vypnúť spúšťače"
 
 #: trigger_prototypes.php:248
 msgid "Cannot disable trigger prototype"
 msgid_plural "Cannot disable trigger prototypes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie je možné vypnúť prototyp spúšťača"
+msgstr[1] "Nie je možné vypnúť prototypy spúšťača"
+msgstr[2] "Nie je možné vypnúť prototypy spúšťača"
 
 #: usergrps.php:343
 msgid "Cannot disable user group"
 msgid_plural "Cannot disable user groups"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie je možné vypnúť používateľskú skupinu"
+msgstr[1] "Nie je možné vypnúť používateľské skupiny"
+msgstr[2] "Nie je možné vypnúť používateľské skupiny"
 
 #: httpconf.php:297
-#, fuzzy
 msgid "Cannot disable web scenario"
 msgid_plural "Cannot disable web scenarios"
 msgstr[0] "Nie je možné zakázať web scenár"
@@ -1892,54 +1890,53 @@ msgstr "Nie je možné zobraziť viac ako jednu položku s typom \"Súhrn grafu\
 #: actionconf.php:347
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie je možné vypnúť akciu"
+msgstr[1] "Nie je možné vypnúť akcie"
+msgstr[2] "Nie je možné vypnúť akcie"
 
 #: discoveryconf.php:187
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie je možné povoliť zisťovacie pravidlo"
+msgstr[1] "Nie je možné povoliť zisťovacie pravidlá"
+msgstr[2] "Nie je možné povoliť zisťovacie pravidlá"
 
 #: host_discovery.php:285
 msgid "Cannot enable discovery rules"
 msgid_plural "Cannot enable discovery rules"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie je možné povoliť zisťovacie pravidlá"
+msgstr[1] "Nie je možné povoliť zisťovacie pravidlá"
+msgstr[2] "Nie je možné povoliť zisťovacie pravidlá"
 
 #: hostgroups.php:230 hosts.php:620 proxies.php:182
 msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie je možné povoliť hosta"
+msgstr[1] "Nie je možné povoliť hostov"
+msgstr[2] "Nie je možné povoliť hostov"
 
 #: host_prototypes.php:235
 msgid "Cannot enable host prototype"
 msgid_plural "Cannot enable host prototypes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie je možné povoliť prototyp hosta"
+msgstr[1] "Nie je možné povoliť prototypy hosta"
+msgstr[2] "Nie je možné povoliť prototypy hosta"
 
 #: applications.php:210 items.php:681
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie je možné povoliť položku"
+msgstr[1] "Nie je možné povoliť položky"
+msgstr[2] "Nie je možné povoliť položky"
 
 #: disc_prototypes.php:328
 msgid "Cannot enable item prototype"
 msgid_plural "Cannot enable item prototypes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie je možné povoliť prototyp položky"
+msgstr[1] "Nie je možné povoliť prototypy položky"
+msgstr[2] "Nie je možné povoliť prototypy položky"
 
 #: media_types.php:165
-#, fuzzy
 msgid "Cannot enable media type"
 msgid_plural "Cannot enable media types"
 msgstr[0] "Nie je možné povoliť typ média"
@@ -1949,30 +1946,30 @@ msgstr[2] "Nie je možné povoliť typ média"
 #: triggers.php:275
 msgid "Cannot enable trigger"
 msgid_plural "Cannot enable triggers"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie je možné povoliť spúšťač"
+msgstr[1] "Nie je možné povoliť spúšťače"
+msgstr[2] "Nie je možné povoliť spúšťače"
 
 #: trigger_prototypes.php:247
 msgid "Cannot enable trigger prototype"
 msgid_plural "Cannot enable trigger prototypes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie je možné povoliť prototyp spúšťača"
+msgstr[1] "Nie je možné povoliť prototypy spúšťača"
+msgstr[2] "Nie je možné povoliť prototypy spúšťača"
 
 #: usergrps.php:342
 msgid "Cannot enable user group"
 msgid_plural "Cannot enable user groups"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie je možné povoliť používateľskú skupinu"
+msgstr[1] "Nie je možné povoliť používateľské skupiny"
+msgstr[2] "Nie je možné povoliť používateľské skupiny"
 
 #: httpconf.php:296
 msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie je možné povoliť scenár"
+msgstr[1] "Nie je možné povoliť scenáre"
+msgstr[2] "Nie je možné povoliť scenáre"
 
 #: include/classes/import/CXmlImport18.php:677
 #: include/classes/import/importers/CMapImporter.php:188
@@ -8938,7 +8935,6 @@ msgid "Media type deleted"
 msgstr "Typ média zmazaný"
 
 #: media_types.php:163
-#, fuzzy
 msgid "Media type disabled"
 msgid_plural "Media types disabled"
 msgstr[0] "Typ média zakázaný"
@@ -8946,7 +8942,6 @@ msgstr[1] "Typ média zakázaný"
 msgstr[2] "Typ média zakázaný"
 
 #: media_types.php:162
-#, fuzzy
 msgid "Media type enabled"
 msgid_plural "Media types enabled"
 msgstr[0] "Typ média povolený"
@@ -15021,7 +15016,6 @@ msgid "Web scenario deleted"
 msgstr "Web scenár zmazaný"
 
 #: httpconf.php:294
-#, fuzzy
 msgid "Web scenario disabled"
 msgid_plural "Web scenarios disabled"
 msgstr[0] "Web scenár zakázaný"
