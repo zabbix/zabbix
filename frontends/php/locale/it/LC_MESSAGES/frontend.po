@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-12-17 23:54+0200\n"
-"PO-Revision-Date: 2013-12-02 16:48+0300\n"
+"POT-Creation-Date: 2013-12-17 23:58+0200\n"
+"PO-Revision-Date: 2013-12-16 17:02+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: it\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1385995720.0\n"
+"X-POOTLE-MTIME: 1387206137.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -339,14 +339,14 @@ msgstr "Azione rimossa"
 #: actionconf.php:345
 msgid "Action disabled"
 msgid_plural "Actions disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Azione disabilitata"
+msgstr[1] "Azioni disabilitate"
 
 #: actionconf.php:344
 msgid "Action enabled"
 msgid_plural "Actions enabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Azione abilitata"
+msgstr[1] "Azioni abilitate"
 
 #: include/views/configuration.action.edit.php:420
 msgid "Action operations"
@@ -1786,47 +1786,46 @@ msgstr "Impossibile rimuovere scenario web"
 #: actionconf.php:348
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossibile disabilitare azione"
+msgstr[1] "Impossibile disabilitare le azioni"
 
 #: discoveryconf.php:188
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossibile disabilitare regola di discovery"
+msgstr[1] "Impossibile disabilitare regole di discovery"
 
 #: host_discovery.php:286
 msgid "Cannot disable discovery rules"
 msgid_plural "Cannot disable discovery rules"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossibile disabilitare regole di discovery"
+msgstr[1] "Impossibile disabilitare regole di discovery"
 
 #: hostgroups.php:231 hosts.php:621 proxies.php:183
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossibile disabilitare host"
+msgstr[1] "Impossibile disabilitare gli host"
 
 #: host_prototypes.php:236
 msgid "Cannot disable host prototype"
 msgid_plural "Cannot disable host prototypes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossibile disabilitare prototipo host"
+msgstr[1] "Impossibile disabilitare prototipi host"
 
 #: applications.php:211 items.php:682
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossibile disabilitare item"
+msgstr[1] "Impossibile disabilitare gli item"
 
 #: disc_prototypes.php:329
 msgid "Cannot disable item prototype"
 msgid_plural "Cannot disable item prototypes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossibile disabilitare prototipo item"
+msgstr[1] "Impossibile disabilitare prototipi item"
 
 #: media_types.php:166
-#, fuzzy
 msgid "Cannot disable media type"
 msgid_plural "Cannot disable media types"
 msgstr[0] "Impossibile disabilitare tipo di supporto"
@@ -1835,23 +1834,22 @@ msgstr[1] "Impossibile disabilitare tipo di supporto"
 #: triggers.php:276
 msgid "Cannot disable trigger"
 msgid_plural "Cannot disable triggers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossibile disabilitare trigger"
+msgstr[1] "Impossibile disabilitare i trigger"
 
 #: trigger_prototypes.php:248
 msgid "Cannot disable trigger prototype"
 msgid_plural "Cannot disable trigger prototypes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossibile disabilitare prototipo trigger"
+msgstr[1] "Impossibile disabilitare prototipi trigger"
 
 #: usergrps.php:343
 msgid "Cannot disable user group"
 msgid_plural "Cannot disable user groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossibile disabilitare gruppo utente"
+msgstr[1] "Impossibile disabilitare gruppi utente"
 
 #: httpconf.php:297
-#, fuzzy
 msgid "Cannot disable web scenario"
 msgid_plural "Cannot disable web scenarios"
 msgstr[0] "Impossibile disabilitare scenario web"
@@ -1868,47 +1866,46 @@ msgstr "Impossibile visualizzare più di un item del tipo \"Somma grafici\"."
 #: actionconf.php:347
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossibile abilitare l'azione"
+msgstr[1] "Impossibile abilitare le azioni"
 
 #: discoveryconf.php:187
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossibile abilitare regola discovery"
+msgstr[1] "Impossibile abilitare le regole di discovery"
 
 #: host_discovery.php:285
 msgid "Cannot enable discovery rules"
 msgid_plural "Cannot enable discovery rules"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossibile abilitare le regole di discovery"
+msgstr[1] "Impossibile abilitare le regole di discovery"
 
 #: hostgroups.php:230 hosts.php:620 proxies.php:182
 msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossibile abilitare host"
+msgstr[1] "Impossibile abilitare gli host"
 
 #: host_prototypes.php:235
 msgid "Cannot enable host prototype"
 msgid_plural "Cannot enable host prototypes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossibile abilitare prototipo host"
+msgstr[1] "Impossibile abilitare prototipi host"
 
 #: applications.php:210 items.php:681
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossibile abilitare item"
+msgstr[1] "Impossibile abilitare gli item"
 
 #: disc_prototypes.php:328
 msgid "Cannot enable item prototype"
 msgid_plural "Cannot enable item prototypes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossibile abilitare prototipo item"
+msgstr[1] "Impossibile abilitare i prototipi item"
 
 #: media_types.php:165
-#, fuzzy
 msgid "Cannot enable media type"
 msgid_plural "Cannot enable media types"
 msgstr[0] "Impossibile abilitare tipo di supporto"
@@ -1917,26 +1914,26 @@ msgstr[1] "Impossibile abilitare tipo di supporto"
 #: triggers.php:275
 msgid "Cannot enable trigger"
 msgid_plural "Cannot enable triggers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossibile abilitare trigger"
+msgstr[1] "Impossibile abilitare i trigger"
 
 #: trigger_prototypes.php:247
 msgid "Cannot enable trigger prototype"
 msgid_plural "Cannot enable trigger prototypes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossibile abilitare prototipo trigger"
+msgstr[1] "Impossibile abilitare prototipi trigger"
 
 #: usergrps.php:342
 msgid "Cannot enable user group"
 msgid_plural "Cannot enable user groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossibile abilitare gruppo utente"
+msgstr[1] "Impossibile abilitare gruppi utente"
 
 #: httpconf.php:296
 msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossibile abilitare scenario web"
+msgstr[1] "Impossibile abilitare scenari web"
 
 #: include/classes/import/CXmlImport18.php:677
 #: include/classes/import/importers/CMapImporter.php:188
@@ -2060,7 +2057,7 @@ msgstr "Impossibile trovare schermata \"%1$s\" utilizzata nella schermata \"%2$s
 #: include/classes/import/CConfigurationImport.php:778
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Impossibile trovare template \"%1$s\" per prototipo host \"%2$s\" della regola di discovery \"%3$s\" su \"%4$s\"."
 
 #: include/classes/import/CXmlImport18.php:746
 #: include/classes/import/CXmlImport18.php:789
@@ -2632,16 +2629,16 @@ msgstr ""
 #: include/classes/items/CHelpItems.php:125
 #: include/classes/items/CHelpItems.php:375
 msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If ip is missing 127.0.0.1 is used.  If port number is missing, default service port is used."
-msgstr ""
+msgstr "Verifica stato del servizio \"service\". 0 - servizio down,  sec - numero di secondi trascorsi per connetersi al servizio. Se l'ip non e' specificato viene utilizzato 127.0.0.1. Se la porta non viene specificata, viene utilizzata la porta standard del servizio."
 
 #: include/classes/items/CHelpItems.php:579
 msgid "Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
-msgstr ""
+msgstr "Controlla le prestazioni del servizio. 0 - servizio è down, sec - numero di secondi trascorsi per la connessione al servizio. Se <ip> assente, IP o nome DNS è acquisito dalla definizione dell'host. Se <porta> assente, viene utilizzata la porta di default del servizio."
 
 #: include/classes/items/CHelpItems.php:69
 #: include/classes/items/CHelpItems.php:311
 msgid "Check the agent usability. Always return 1. Can be used as a TCP ping."
-msgstr ""
+msgstr "Controlla la fruibilità dell'agente. Risulta sempre 1. Può essere usato come un ping TCP."
 
 #: api/classes/CItemGeneral.php:283
 msgid "Check the key, please. Default example was passed."
@@ -8882,14 +8879,12 @@ msgid "Media type deleted"
 msgstr "Tipo di supporto rimosso"
 
 #: media_types.php:163
-#, fuzzy
 msgid "Media type disabled"
 msgid_plural "Media types disabled"
 msgstr[0] "Tipo di supporto disabilitato"
 msgstr[1] "Tipo di supporto disabilitato"
 
 #: media_types.php:162
-#, fuzzy
 msgid "Media type enabled"
 msgid_plural "Media types enabled"
 msgstr[0] "Tipo di supporto abilitato"
@@ -14964,7 +14959,6 @@ msgid "Web scenario deleted"
 msgstr "Scenario web rimosso"
 
 #: httpconf.php:294
-#, fuzzy
 msgid "Web scenario disabled"
 msgid_plural "Web scenarios disabled"
 msgstr[0] "Scenario web disabilitato"
