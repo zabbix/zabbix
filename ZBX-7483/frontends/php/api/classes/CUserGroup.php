@@ -682,7 +682,7 @@ class CUserGroup extends CZBXAPI {
 				$dbGroup = reset($dbUser['usrgrps']);
 
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'User group "%1$s" is used in user "%2$s".',
+					'User group "%1$s" is the only group that user "%2$s" belongs to.',
 					$dbUserGroups[$dbGroup['usrgrpid']]['name'],
 					$dbUser['alias']
 				));
