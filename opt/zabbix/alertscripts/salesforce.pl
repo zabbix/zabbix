@@ -69,7 +69,7 @@ my $caseid = check_case($accountid, $subject);
 
 if (!defined($caseid)) {
     $caseid = create_case($accountid, $subject, $description);
-    
+
     print "Incedent with CaseID = $caseid has created\n";
 }
 else {
@@ -114,6 +114,8 @@ sub check_case($) {
     elsif ($size > 1) {
         return ${$results->result->{'records'}}[0]->{'Id'}[0];
     }
+
+    return;
 }
 
 sub create_case() {
@@ -121,19 +123,19 @@ sub create_case() {
     my $subject = shift;
     my $description = shift;
 
-    my %case=();                                                       
-                                                                   
-    %case = (                                                          
+    my %case=();
+
+    %case = (
 	AccountID => $accountid,
         Subject => $subject,
         Description => $description,
-    );                                                                 
+    );
 
     my $result = $sforce->create(type => 'case',%case);
 
     if (defined($result->result) and $result->result->{'success'} eq 'true') {
         return $result->result->{'id'};
-    }                                                              
+    }
 
     return $result->result;
 }
