@@ -5,6 +5,7 @@ New features:
 A.F....... [ZBX-1357] updated American English, French, Hungarian, Japanese, Russian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-7483] fixed user group delete validation (Eduard)
 ..F....... [ZBX-6296] optimized macro resolving in latest data (Eduard)
 ..F....... [ZBX-6296] rewrote user macros resolving (Eduard, Sasha)
 ..F....... [ZBX-6296] rewrote macro resolving in function parameters (Eduard)
