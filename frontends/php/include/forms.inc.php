@@ -961,9 +961,6 @@
 	 * @return array
 	 */
 	function getItemFormData($options = array()) {
-		$ifm = get_request('filter_macro');
-		$ifv = get_request('filter_value');
-
 		$data = array(
 			'form' => get_request('form'),
 			'form_refresh' => get_request('form_refresh'),
@@ -1017,7 +1014,6 @@
 			'possibleHostInventories' => null,
 			'alreadyPopulated' => null,
 			'lifetime' => get_request('lifetime', 30),
-			'filter' => isset($ifm, $ifv) ? $ifm.':'.$ifv : '',
 			'initial_item_type' => null,
 			'templates' => array()
 		);
@@ -1065,7 +1061,7 @@
 						'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'multiplier', 'delta',
 						'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase',
 						'formula', 'logtimefmt', 'templateid', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor',
-						'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'filter',
+						'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',
 						'interfaceid', 'port', 'description', 'inventory_link', 'lifetime', 'snmpv3_authprotocol',
 						'snmpv3_privprotocol', 'snmpv3_contextname'
 					)
@@ -1186,7 +1182,6 @@
 			$data['inventory_link'] = $data['item']['inventory_link'];
 			$data['new_application'] = get_request('new_application', '');
 			$data['lifetime'] = $data['item']['lifetime'];
-			$data['filter'] = $data['item']['filter'];
 
 			if (!$data['limited'] || !isset($_REQUEST['form_refresh'])) {
 				$data['delay'] = $data['item']['delay'];

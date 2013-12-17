@@ -40,8 +40,6 @@ $fields = array(
 	'interfaceid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null, _('Interface')),
 	'name' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save})', _('Name')),
 	'description' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
-	'filter_macro' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
-	'filter_value' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
 	'key' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Key')),
 	'delay' =>				array(T_ZBX_INT, O_OPT, null, BETWEEN(0, SEC_PER_DAY),
 		'isset({save})&&(isset({type})&&({type}!='.ITEM_TYPE_TRAPPER.'&&{type}!='.ITEM_TYPE_SNMPTRAP.'))',
@@ -199,10 +197,6 @@ elseif (isset($_REQUEST['save'])) {
 	}
 	$db_delay_flex = trim($db_delay_flex, ';');
 
-	$ifm = get_request('filter_macro');
-	$ifv = get_request('filter_value');
-	$filter = isset($ifm, $ifv) ? $ifm.':'.$ifv : '';
-
 	$item = array(
 		'interfaceid' => get_request('interfaceid'),
 		'name' => get_request('name'),
@@ -231,8 +225,7 @@ elseif (isset($_REQUEST['save'])) {
 		'privatekey' => get_request('privatekey'),
 		'params' => get_request('params'),
 		'ipmi_sensor' => get_request('ipmi_sensor'),
-		'lifetime' => get_request('lifetime'),
-		'filter' => $filter
+		'lifetime' => get_request('lifetime')
 	);
 
 	if (hasRequest('itemid')) {
