@@ -146,8 +146,25 @@
 </script>
 
 <script type="text/javascript">
+	function getMediaTypeFields(fieldList) {
+		var i = 0,
+			j = 0,
+			cnt = fieldList.length - 1,
+			fields = new Array();
+
+		fieldList.each(function() {
+			if (i > 1 && i < cnt) {
+				fields[j++] = this;
+			}
+			i++;
+		});
+
+		return fields;
+	}
+
 	function removeMediaTypeFields(fieldList) {
-		var i = 0, cnt = fieldList.length - 1;
+		var i = 0,
+			cnt = fieldList.length - 1;
 
 		fieldList.each(function() {
 			if (i > 1 && i < cnt) {
@@ -158,16 +175,29 @@
 	}
 
 	jQuery(document).ready(function($) {
-		var type = $('#type');
+		var type = $('#type'),
+			selectedType = type.val(),
+			fieldList = $('.formlist').children(),
+			originalFields = getMediaTypeFields(fieldList);
+
 		type.change(function() {
-			// list where changeable fields are being held
-			var fieldList = $('.formlist').children();
+			var fieldList = $('.formlist').children(),
+				destinationTemplate = '';
+
+			// when at some point we switch back to original fields, replace template with original data we had
+			if (type.val() == selectedType) {
+				$(originalFields).each(function(index, value) {
+					destinationTemplate += value.outerHTML;
+				});
+			}
+			else {
+				destinationTemplate = $('#'+type.val()+'-fields').html();
+			}
+
 			removeMediaTypeFields(fieldList);
 
-			// get destination fields
-			var tpl = new Template($('#'+type.val()+'-fields').html());
+			var tpl = new Template(destinationTemplate);
 
-			// insert new fields after sencond field 'type'
 			$(fieldList[1]).after(tpl.evaluate());
 		});
 	});
