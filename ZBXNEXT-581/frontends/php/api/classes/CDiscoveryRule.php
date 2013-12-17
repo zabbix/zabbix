@@ -85,6 +85,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectTriggers'			=> null,
 			'selectGraphs'				=> null,
 			'selectHostPrototypes'		=> null,
+			'selectConditions'			=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -597,11 +598,21 @@ class CDiscoveryRule extends CItemGeneral {
 	}
 
 	protected function createReal(&$items) {
-		$itemids = DB::insert('items', $items);
+		$items = DB::save('items', $items);
 
-		foreach ($items as $key => $item) {
-			$items[$key]['itemid'] = $itemids[$key];
+		$conditions = array();
+		foreach ($items as $item) {
+			// conditions
+			if (isset($item['conditions'])) {
+				foreach ($item['conditions'] as $condition) {
+					$condition['itemid'] = $item['itemid'];
+
+					$conditions[] = $condition;
+				}
+			}
 		}
+
+		DB::save('item_condition', $conditions);
 
 		// TODO: REMOVE info
 		$itemHosts = $this->get(array(
@@ -619,26 +630,44 @@ class CDiscoveryRule extends CItemGeneral {
 	protected function updateReal($items) {
 		$items = zbx_toArray($items);
 
+		$exRules = $this->get(array(
+			'itemids' => zbx_objectValues($items, 'itemid'),
+			'output' => array('key_', 'name'),
+			'selectHosts' => array('name'),
+			'selectConditions' => array('item_conditionid', 'macro', 'operator', 'value'),
+			'nopermissions' => true,
+			'preservekeys' => true,
+		));
+
 		$data = array();
 		foreach ($items as $item) {
 			$data[] = array('values' => $item, 'where'=> array('itemid' => $item['itemid']));
 		}
 		$result = DB::update('items', $data);
-		if (!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
-		$itemids = array();
-		foreach ($items as $key => $item) {
-			$itemids[] = $item['itemid'];
+		$conditions = array();
+		$exConditions = array();
+		foreach ($items as $item) {
+			// conditions
+			if (isset($item['conditions'])) {
+				foreach ($item['conditions'] as $condition) {
+					$condition['itemid'] = $item['itemid'];
+
+					$conditions[] = $condition;
+				}
+
+				foreach ($exRules[$item['itemid']]['conditions'] as $condition) {
+					$exConditions[] = $condition;
+				}
+			}
+		}
+
+		if ($conditions) {
+			DB::replace('item_condition', $exConditions, $conditions);
 		}
 
 		// TODO: REMOVE info
-		$itemHosts = $this->get(array(
-			'itemids' => $itemids,
-			'output' => array('key_', 'name'),
-			'selectHosts' => array('name'),
-			'nopermissions' => true
-		));
-		foreach ($itemHosts as $item) {
+		foreach ($exRules as $item) {
 			$host = reset($item['hosts']);
 			info(_s('Updated: Discovery rule "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
@@ -1156,6 +1185,24 @@ class CDiscoveryRule extends CItemGeneral {
 					$result[$itemid]['hostPrototypes'] = isset($hostPrototypes[$itemid]) ? $hostPrototypes[$itemid]['rowscount'] : 0;
 				}
 			}
+		}
+
+		// adding conditions
+		if ($options['selectConditions'] !== null) {
+			$conditions = API::getApi()->select('item_condition', array(
+				'output' => $this->outputExtend('item_condition', array('itemid', 'item_conditionid'),
+					$options['selectConditions']
+				),
+				'filter' => array('itemid' => $itemIds),
+				'preservekeys' => true,
+				'nodeids' => get_current_nodeid(true)
+			));
+			$relationMap = $this->createRelationMap($conditions, 'itemid', 'item_conditionid');
+
+			$conditions = $this->unsetExtraFields($conditions, array('itemid', 'item_conditionid'),
+				$options['selectConditions']
+			);
+			$result = $relationMap->mapMany($result, $conditions, 'conditions');
 		}
 
 		return $result;
