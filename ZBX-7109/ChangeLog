@@ -1,10 +1,30 @@
+Changes for 2.0.11rc1
+
+New features:
+A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 2.0.10
+
+2.0.10rc1 was released as 2.0.10 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.0.10rc1
 
 New features:
+....I..... [ZBXNEXT-1256] changed example directory size user parameter to return bytes (Richlv)
 ..F....... [ZBX-7103] improved loading speed of tr_events.php page (Sasha)
-A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Czech, Dutch, French, German, Hungarian, Japanese, Italian, Romanian, Russian, Slovak, Spanish and Ukrainian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Czech, Dutch, French, German, Greek, Hungarian, Japanese, Italian, Romanian, Russian, Slovak, Spanish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-7479] fixed remote command execution from Zabbix server if flexible user parameters are configured; thanks to Recurity Labs Team for the report (Sasha)
+..F....... [ZBX-7347] fixed custom step duration max size in action configuration (Eduard)
+........S. [ZBX-7400] fixed fetching of empty text or log history data with Oracle backend (Sasha)
+....I..... [ZBX-7218] fixed configuration failing with Oracle 12.1 instant client libraries (asaveljevs, Sasha)
+..F....... [ZBX-6129] fixed trying to change the status of a deleted trigger or trigger prototype changes the status of all trigger and prototypes (Pavels)
+..F....... [ZBX-6920] fixed displaying of soft linked IT services (Eduard)
 .......PS. [ZBX-7292] fixed resolving of macros in host interfaces (Sasha)
 ....I..... [ZBX-7273] fixed newlines in default data strings for Oracle (Sasha)
 .......PS. [ZBX-6835] fixed bug when agent/proxy connection error could have resulted in a wrong warning about message size (wiper)
@@ -1430,8 +1450,17 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.20rc1
+
+
+Changes for 1.8.19
+
+1.8.19rc1 was released as 1.8.19 without any changes
+
 Changes for 1.8.19rc1
 
+...G...... [ZBX-7479] fixed remote command execution from Zabbix server if flexible user parameters are configured; thanks to Recurity Labs Team for the report (Sasha)
+....I..... [ZBXNEXT-1256] changed example directory size user parameter to return bytes (Richlv)
 ..F....... [ZBX-7156] fixed string value escaping in profiles (Eduard)
 ...G...... [ZBX-4658] fixed system.boottime and system.uptime returning bogus values on Solaris when agent is compiled as a 64-bit binary (asaveljevs)
 ........S. [ZBX-7119] fixed data collection stopping after no data maintenance until configuration cache is updated (asaveljevs)

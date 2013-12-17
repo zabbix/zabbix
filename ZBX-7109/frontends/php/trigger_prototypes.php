@@ -229,54 +229,56 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 		'preservekeys' => true
 	));
 
-	// triggerids to gather child triggers
-	$childTriggerIds = array_keys($triggers);
-
-	// triggerids which status must be changed
-	$triggerIdsToUpdate = array();
-	foreach ($triggers as $triggerid => $trigger){
-		if ($trigger['status'] != $status) {
-			$triggerIdsToUpdate[] = $triggerid;
-		}
-	}
-
-	do {
-		// gather all triggerids which status should be changed including child triggers
-		$options = array(
-			'filter' => array('templateid' => $childTriggerIds),
-			'output' => array('triggerid', 'status'),
-			'preservekeys' => true,
-			'nopermissions' => true
-		);
-		$triggers = API::TriggerPrototype()->get($options);
-
+	if ($triggers) {
+		// triggerids to gather child triggers
 		$childTriggerIds = array_keys($triggers);
 
-		foreach ($triggers as $triggerid => $trigger) {
+		// triggerids which status must be changed
+		$triggerIdsToUpdate = array();
+		foreach ($triggers as $triggerid => $trigger){
 			if ($trigger['status'] != $status) {
 				$triggerIdsToUpdate[] = $triggerid;
 			}
 		}
-	} while (!empty($childTriggerIds));
 
-	DB::update('triggers', array(
-		'values' => array('status' => $status),
-		'where' => array('triggerid' => $triggerIdsToUpdate)
-	));
+		do {
+			// gather all triggerids which status should be changed including child triggers
+			$options = array(
+				'filter' => array('templateid' => $childTriggerIds),
+				'output' => array('triggerid', 'status'),
+				'preservekeys' => true,
+				'nopermissions' => true
+			);
+			$triggers = API::TriggerPrototype()->get($options);
 
-	// get updated triggers with additional data
-	$options = array(
-		'triggerids' => $triggerIdsToUpdate,
-		'output' => array('triggerid', 'description'),
-		'preservekeys' => true,
-		'selectHosts' => API_OUTPUT_EXTEND,
-		'nopermissions' => true
-	);
-	$triggers = API::TriggerPrototype()->get($options);
-	foreach ($triggers as $triggerid => $trigger) {
-		$host = reset($trigger['hosts']);
-		add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER_PROTOTYPE, $triggerid,
-			$host['host'].':'.$trigger['description'], 'triggers', $statusOld, $statusNew);
+			$childTriggerIds = array_keys($triggers);
+
+			foreach ($triggers as $triggerid => $trigger) {
+				if ($trigger['status'] != $status) {
+					$triggerIdsToUpdate[] = $triggerid;
+				}
+			}
+		} while (!empty($childTriggerIds));
+
+		DB::update('triggers', array(
+			'values' => array('status' => $status),
+			'where' => array('triggerid' => $triggerIdsToUpdate)
+		));
+
+		// get updated triggers with additional data
+		$options = array(
+			'triggerids' => $triggerIdsToUpdate,
+			'output' => array('triggerid', 'description'),
+			'preservekeys' => true,
+			'selectHosts' => API_OUTPUT_EXTEND,
+			'nopermissions' => true
+		);
+		$triggers = API::TriggerPrototype()->get($options);
+		foreach ($triggers as $triggerid => $trigger) {
+			$host = reset($trigger['hosts']);
+			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER_PROTOTYPE, $triggerid,
+				$host['host'].': '.$trigger['description'], 'triggers', $statusOld, $statusNew);
+		}
 	}
 
 	$go_result = DBend($go_result);
