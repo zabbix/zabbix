@@ -1,0 +1,16 @@
+[zapi]
+url = https://zabbix.example.com
+user = Admin
+password = zabbix
+
+[slv]
+path = /opt/zabbix/scripts/slv
+sender = /usr/bin/zabbix_sender
+zserver = 127.0.0.1
+logdir = /var/log/zabbix
+
+[db]
+name = zabbix
+user = zabbix
+password = zabbix
+host = localhost
