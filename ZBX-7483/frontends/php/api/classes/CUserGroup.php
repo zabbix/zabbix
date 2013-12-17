@@ -635,7 +635,7 @@ class CUserGroup extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$dbUserGroup = $this->get(array(
+		$dbUserGroups = $this->get(array(
 			'output' => array('usrgrpid', 'name'),
 			'usrgrpids' => $userGroupIds,
 			'preservekeys' => true
@@ -655,7 +655,7 @@ class CUserGroup extends CZBXAPI {
 
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 				'User group "%1$s" is used in script "%2$s".',
-				$dbUserGroup[$dbScript['usrgrpid']]['name'],
+				$dbUserGroups[$dbScript['usrgrpid']]['name'],
 				$dbScript['name']
 			));
 		}
@@ -663,10 +663,10 @@ class CUserGroup extends CZBXAPI {
 		// check if user group is used in config
 		$config = select_config();
 
-		if (isset($dbUserGroup[$config['alert_usrgrpid']])) {
+		if (isset($dbUserGroups[$config['alert_usrgrpid']])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 				'User group "%1$s" is used in configuration for database down messages.',
-				$dbUserGroup[$config['alert_usrgrpid']]['name']
+				$dbUserGroups[$config['alert_usrgrpid']]['name']
 			));
 		}
 
@@ -683,7 +683,7 @@ class CUserGroup extends CZBXAPI {
 
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 					'User group "%1$s" is used in user "%2$s".',
-					$dbUserGroup[$dbGroup['usrgrpid']]['name'],
+					$dbUserGroups[$dbGroup['usrgrpid']]['name'],
 					$dbUser['alias']
 				));
 			}
