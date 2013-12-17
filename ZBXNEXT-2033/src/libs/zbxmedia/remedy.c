@@ -1011,17 +1011,23 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 				remedy_fields_set_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_STATUS,
 						ZBX_REMEDY_STATUS_ASSIGNED);
 
+				remedy_fields_set_value(fields, ARRSIZE(fields), ZBX_REMEDY_STATUS_WORK_INFO_SUMMARY,
+						alert->subject);
+
 				ret = remedy_modify_ticket(media->smtp_server, media->smtp_helo, media->username,
 						media->passwd, fields, ARRSIZE(fields), error);
 				goto out;
 			}
 
-			/* if ticket is still being worked on, ignore message    */
-			/* TODO: add some additional information to the ticket ? */
+			/* if ticket is still being worked on, add work info */
 			if (0 != strcmp(status, ZBX_REMEDY_STATUS_CLOSED) &&
 					0 != strcmp(status, ZBX_REMEDY_STATUS_CANCELLED))
 			{
-				ret = SUCCEED;
+				remedy_fields_set_value(fields, ARRSIZE(fields), ZBX_REMEDY_STATUS_WORK_INFO_SUMMARY,
+						alert->subject);
+
+				ret = remedy_modify_ticket(media->smtp_server, media->smtp_helo, media->username,
+						media->passwd, fields, ARRSIZE(fields), error);
 				goto out;
 			}
 		}
