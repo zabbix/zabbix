@@ -616,7 +616,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 		// TODO: REMOVE info
 		$itemHosts = $this->get(array(
-			'itemids' => $itemids,
+			'itemids' => zbj_objectValues($items, 'itemid'),
 			'output' => array('key_', 'name'),
 			'selectHosts' => array('name'),
 			'nopermissions' => true
