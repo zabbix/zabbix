@@ -24,6 +24,7 @@
 #include "log.h"
 #include "zbxalgo.h"
 #include "valuecache.h"
+#include "string.h"
 
 /* The following definitions are used to identify the request field */
 /* for various value getters grouped by their scope:                */
@@ -4328,6 +4329,236 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 	ret = replace_key_params_dyn(data, key_type, replace_key_param, &replace_key_param_data, error, maxerrlen);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s data:'%s'", __function_name, zbx_result_string(ret), *data);
+
+	return ret;
+}
+
+#define ZBX_OPCODE_AND		'&'
+#define ZBX_OPCODE_OR		'|'
+#define ZBX_OPCODE_OPEN		'('
+#define ZBX_OPCODE_CLOSE	')'
+
+#define ZBX_OPCODE_CLASS_NONE		0
+#define ZBX_OPCODE_CLASS_OP_UNARY	1
+#define ZBX_OPCODE_CLASS_OP_BINARY	2
+#define ZBX_OPCODE_CLASS_VALUE		3
+
+/******************************************************************************
+ *                                                                            *
+ * Function: expression_get_token                                             *
+ *                                                                            *
+ * Purpose: return the first token from an expression                         *
+ *                                                                            *
+ * Parameters: expression  - [IN] the source expression                       *
+ *             start       - [OUT] a pointer to the token start (the first    *
+ *                                 token character)                           *
+ *             end         - [OUT] a pointer to the token end (the next after *
+ *                                 last token character)                      *
+ *                                                                            *
+ * Comments: A token is either a sequence of alphanumeric and '_', '{', '}'   *
+ *           characters or any other non whitespace character.                *
+ *                                                                            *
+ ******************************************************************************/
+static void	expression_get_token(const char *expression, char const **start, char const **end)
+{
+	const char	*pstart = expression, *pend;
+	int		delimiter = 0;
+
+	/* strip leading whitespace */
+	while (' ' == *pstart)
+		pstart++;
+
+	pend = pstart;
+
+	while('\0' != *pend && 0 == delimiter)
+	{
+		if (0 == isalnum(*pend) && '_' != *pend && '{' != *pend && '}' != *pend)
+		{
+			if (pstart != pend)
+				break;
+
+			delimiter = 1;
+		}
+
+		pend++;
+	}
+
+	*start = pstart;
+	*end = pend;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: translate_expression                                             *
+ *                                                                            *
+ * Purpose: translate logical expression containing AND/OR operators into     *
+ *          internal format with &/| operators and remove whitespace.         *
+ *                                                                            *
+ * Parameters: expression  - [IN] the source expression                       *
+ *             out         - [OUT] the resulting expression                   *
+ *             error       - [OUT] a short error description                  *
+ *                                                                            *
+ * Return value: SUCCEED - the expression was translated successfully         *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: This function allocates memory for output expression which must  *
+ *           be freed by the caller.                                          *
+ *           In the case of failure the error description is allocated by     *
+ *           this function and must be freed by the caller.                   *
+ *                                                                            *
+ ******************************************************************************/
+int	translate_expression(const char *expression, char **out, char **error)
+{
+	const char	*__function_name = "translate_expression";
+
+	const char	*start, *end = expression;
+	char		*ptr;
+	int		op_len, offset, level = 0, last_op = 0, size, ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (NULL == *out)
+	{
+		size = 256;
+		*out = zbx_malloc(NULL, size);
+	}
+
+	ptr = *out;
+
+	while ('\0' != *end)
+	{
+		offset = ptr - *out;
+
+		/* reserve space for op - &|() */
+		if (offset + 1 >= size)
+		{
+			size += (size >> 1);
+			*out = realloc(*out, size);
+			ptr = *out + offset;
+		}
+
+		expression_get_token(end, &start, &end);
+
+		op_len = end - start;
+
+		if (3 == op_len && 0 == zbx_strncasecmp(start, "AND", op_len))
+		{
+			/* check if the previous op was a logical value */
+			if (ZBX_OPCODE_CLASS_VALUE != last_op)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "expression '%s' error:"
+						" binary operator 'AND' must follow a value at position %d (%s)",
+						expression, start - expression, start);
+				goto out;
+			}
+
+			*ptr++ = ZBX_OPCODE_AND;
+			last_op = ZBX_OPCODE_CLASS_OP_BINARY;
+		}
+		else if (2 == op_len && 0 == zbx_strncasecmp(start, "OR", op_len))
+		{
+			/* check if the previous op was a logical value */
+			if (ZBX_OPCODE_CLASS_VALUE != last_op)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "expression '%s' error:"
+						" binary operator 'OR' must follow a value at position %d (%s)",
+						expression, start - expression, start);
+				goto out;
+			}
+
+			*ptr++ = ZBX_OPCODE_OR;
+			last_op = ZBX_OPCODE_CLASS_OP_BINARY;
+		}
+		else if (1 == op_len && '(' == *start)
+		{
+			/* check if the previous op was a logical value */
+			if (ZBX_OPCODE_CLASS_VALUE == last_op)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "expression '%s' error:"
+						" left parentheses '(' must follow an operator at %d (%s)",
+						expression, start - expression, start);
+				goto out;
+			}
+
+			level++;
+
+			*ptr++ = ZBX_OPCODE_OPEN;
+			last_op = ZBX_OPCODE_CLASS_NONE;
+		}
+		else if (1 == op_len && ')' == *start)
+		{
+			/* check if the previous op was a logical value */
+			if (ZBX_OPCODE_CLASS_VALUE != last_op)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "expression '%s' error:"
+						" right parentheses ')' must follow a value at %d (%s)",
+						expression, start - expression, start);
+				goto out;
+			}
+
+			/* check for matching parentheses */
+			if (0 >= level)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "expression '%s' error:"
+						" unmatched right parentheses ')' at %d (%s)",
+						expression, start - expression, start);
+				goto out;
+			}
+
+			level--;
+
+			*ptr++ = ZBX_OPCODE_CLOSE;
+			last_op = ZBX_OPCODE_CLASS_VALUE;
+		}
+		else
+		{
+			int	value_len;
+
+			/* check if the previous op was a logical value */
+			if (ZBX_OPCODE_CLASS_VALUE == last_op)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "expression '%s' error:"
+						" a value must either start (sub)expression or follow an operator"
+						" at %d (%s)", expression, start - expression, start);
+				goto out;
+			}
+
+			value_len = end - start;
+
+			/* reserve space for the value */
+			if (offset + value_len >= size)
+			{
+				while (offset + value_len >= size)
+					size += (size >> 1);
+
+				*out = realloc(*out, size);
+				ptr = *out + offset;
+			}
+
+			memcpy(ptr, start, value_len);
+			ptr += value_len;
+
+			last_op = ZBX_OPCODE_CLASS_VALUE;
+		}
+	}
+
+	/* check for matching parentheses */
+	if (0 != level)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "expression '%s' error: unmatched right parentheses ')'", expression);
+		goto out;
+	}
+
+	*ptr = '\0';
+
+	ret = SUCCEED;
+out:
+	if (SUCCEED != ret)
+		*error = zbx_dsprintf(*error, "invalid formula expression");
+
+	zabbix_log(LOG_LEVEL_DEBUG, "WDN: size=%d (%s)", size, *out);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
