@@ -1879,7 +1879,7 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 			sizeof(err)))
 	{
 		rtt43 = ZBX_EC_RDDS43_NOREPLY;
-		zbx_dns_errf(log_fd, "no answer from RDDS43 server %s", ip43, err);
+		zbx_dns_errf(log_fd, "no answer from RDDS43 server %s: %s", ip43, err);
 		goto out;
 	}
 
