@@ -562,6 +562,6 @@ $itemForm->addItem($itemTab);
 $itemForm->addItem(makeFormFooter(new CSubmit('update', _('Update')), new CButtonCancel(url_param('groupid').url_param('hostid').url_param('config'))));
 $itemWidget->addItem($itemForm);
 
-require_once dirname(__FILE__).'/js/configuration.item.edit.js.php';
+require_once dirname(__FILE__).'/js/configuration.item.massupdate.js.php';
 
 return $itemWidget;
