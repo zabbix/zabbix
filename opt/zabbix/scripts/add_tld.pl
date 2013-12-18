@@ -285,7 +285,7 @@ sub get_application_id {
 
 sub get_proxies_list {
     my $proxies_list;
- 
+
     $proxies_list = $zabbix->get('proxy',{'output' => ['proxyid', 'host'], 'selectInterfaces' => ['ip'], 'preservekeys' => 1 });
 
     return $proxies_list;
@@ -364,7 +364,7 @@ sub create_group {
     else {
 	my $result = $zabbix->get('hostgroup', {'filter' => {'name' => [$name]}});
         $groupid = $result->{'groupid'};
-    } 
+    }
 
     return $groupid;
 }
@@ -372,7 +372,7 @@ sub create_group {
 sub create_template {
     my $name = shift;
     my $child_templateid = shift;
-    
+
     my ($result, $templateid, $options);
 
     unless ($zabbix->exist('template',{'host' => $name})) {
@@ -443,7 +443,7 @@ sub create_trigger {
     else {
         $result = $zabbix->create('trigger', $options);
     }
-    
+
     return $result;
 }
 
@@ -499,7 +499,7 @@ sub create_item_dns_tcp_rtt {
 		     'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_ERRSIG,
 		     'priority' => '2',
 	};
-                                                            
+
 	create_trigger($options);
     }
 
@@ -507,7 +507,7 @@ sub create_item_dns_tcp_rtt {
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_RES_NOREPLY,
 			'priority' => '2',
                 };
-    
+
     create_trigger($options);
 
     $options = { 'description' => "5.1.1 Step 2 - 'ad' bit is missing from $ns_name on {HOST.NAME} for {\$DNSTEST.TLD} (TCP)",
@@ -537,7 +537,7 @@ sub create_item_dns_udp_rtt {
                                               'type' => 2, 'value_type' => 0,
 					      'valuemapid' => value_mappings->{'dnstest_dns'}};
     create_item($options);
-                                              
+
     $options = { 'description' => "No reply from Name Server $ns_name on {HOST.NAME} for {\$DNSTEST.TLD}",
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_NOREPLY,
                         'priority' => '2',
@@ -571,7 +571,7 @@ sub create_item_dns_udp_rtt {
 		     'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_ERRSIG,
 		     'priority' => '2',
 	};
-                                                            
+
 	create_trigger($options);
     }
 
@@ -579,7 +579,7 @@ sub create_item_dns_udp_rtt {
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_RES_NOREPLY,
 			'priority' => '2',
                 };
-    
+
     create_trigger($options);
 
     $options = { 'description' => "5.1.1 Step 2 - 'ad' bit is missing from $ns_name on {HOST.NAME} for {\$DNSTEST.TLD}",
@@ -608,7 +608,7 @@ sub create_slv_item {
                                               'type' => 2, 'value_type' => 3,
 					      'applications' => $applicationids,
 					      'valuemapid' => value_mappings->{'dnstest_slv'}};
-    } 
+    }
     elsif ($value_type == $VALUE_TYPE_PERC) {
 	$options = {'name' => $name,
                                               'key_'=> $key,
@@ -821,7 +821,7 @@ sub create_items_rdds {
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS43_NOREPLY,
                         'priority' => '2',
                 };
-                                              
+
     create_trigger($options);
 
     $options = { 'description' => "6.1.1 Step 5 - Whois server has returned no name servers for RDDS43 on {HOST.NAME} for {\$DNSTEST.TLD}",
@@ -835,22 +835,21 @@ sub create_items_rdds {
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS43_NOTS,
                         'priority' => '2',
                 };
-                                              
+
     create_trigger($options);
 
     $options = { 'description' => "6.1.1 Step 6 - Invalid UNIXTIME in reply from Whois server on {HOST.NAME} for {\$DNSTEST.TLD}",
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS43_ERRTS,
                         'priority' => '2',
                 };
-                                              
+
     create_trigger($options);
 
-    
     $options = { 'description' => "6.1.1 Step 5 - No reply from RDDS80 server on {HOST.NAME} for {\$DNSTEST.TLD}",
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS43_NOREPLY,
                         'priority' => '2',
                 };
-                                              
+
     create_trigger($options);
 
     $options = { 'description' => "6.1.1 Step 2 - Cannot resolve a Whois server on {HOST.NAME} for {\$DNSTEST.TLD}",
@@ -985,7 +984,7 @@ sub create_probe_template {
     create_macro('{$DNSTEST.IP4.ENABLED}', '1', $templateid);
     create_macro('{$DNSTEST.IP6.ENABLED}', '1', $templateid);
     create_macro('{$DNSTEST.RESOLVER}', '127.0.0.1', $templateid);
-    create_macro('{$DNSTEST.RDDS.ENABLED}', '0', $templateid);
+    create_macro('{$DNSTEST.RDDS.ENABLED}', '1', $templateid);
 
     return $templateid;
 }
@@ -999,7 +998,7 @@ sub update_root_servers {
     my $macros_v6;
     my $cnt_macros_v4 = 1;
     my $cnt_macros_v6 = 1;
-    
+
     return unless defined $content;
 
     for my $str (split("\n", $content)) {
@@ -1127,7 +1126,7 @@ sub create_slv_ns_items {
     foreach my $ns_name (sort keys %{$ns_servers}) {
         my @ipv4 = defined(@{$ns_servers->{$ns_name}{'v4'}}) ? @{$ns_servers->{$ns_name}{'v4'}} : undef;
 	my @ipv6 = defined(@{$ns_servers->{$ns_name}{'v6'}}) ? @{$ns_servers->{$ns_name}{'v6'}} : undef;
-                                          
+
         foreach (my $i_ipv4 = 0; $i_ipv4 <= $#ipv4; $i_ipv4++) {
 	    next unless defined $ipv4[$i_ipv4];
 
@@ -1248,10 +1247,10 @@ sub create_slv_items {
 	$options = { 'description' => "12.2 DNSSEC proper resolution > 25%",
 		     'expression' => '{'.$host_name.':dnstest.slv.dnssec.rollweek.last(0)}>25&'.
 			 '{'.$host_name.':dnstest.slv.dnssec.rollweek.last(0)}<50',
-			 'priority' => '3',                            
-	};                                                    
-                                                                      
-	create_trigger($options);                                         
+			 'priority' => '3',
+	};
+
+	create_trigger($options);
 
 	$options = { 'description' => "12.2 DNSSEC proper resolution > 50%",
 		     'expression' => '{'.$host_name.':dnstest.slv.dnssec.rollweek.last(0)}>50&'.
@@ -1274,7 +1273,7 @@ sub create_slv_items {
 			 '{'.$host_name.':dnstest.slv.dnssec.rollweek.last(0)}<100',
 			 'priority' => '4',
 	};
-                         
+
 	create_trigger($options);
 
 	$options = { 'description' => "12.2 DNSSEC proper resolution > 100%",
@@ -1297,7 +1296,7 @@ sub create_slv_items {
 			 '{'.$host_name.':dnstest.slv.rdds.avail.count(#{$INCIDENT.RDDS.RECOVER},0,"ne")}<{$INCIDENT.RDDS.RECOVER})',
 			 'priority' => '0',
 	};
-    
+
 	create_trigger($options);
 
 	create_slv_item('RDDS weekly unavailability', 'dnstest.slv.rdds.rollweek', $hostid, $VALUE_TYPE_PERC, [get_application_id(APP_SLV_ROLLWEEK, $hostid)]);
@@ -1313,11 +1312,11 @@ sub create_slv_items {
 	$options = { 'description' => "12.2 RDDS Availability > 25%",
 		     'expression' => '{'.$host_name.':dnstest.slv.rdds.rollweek.last(0)}>25&'.
 			 '{'.$host_name.':dnstest.slv.rdds.rollweek.last(0)}<50',
-			 'priority' => '3',                            
-	};                                                    
-                                                                      
-	create_trigger($options);                                         
-                                                                      
+			 'priority' => '3',
+	};
+
+	create_trigger($options);
+
 	$options = { 'description' => "12.2 RDDS Availability > 50%",
 		     'expression' => '{'.$host_name.':dnstest.slv.rdds.rollweek.last(0)}>50&'.
 			 '{'.$host_name.':dnstest.slv.rdds.rollweek.last(0)}<75',
@@ -1339,7 +1338,7 @@ sub create_slv_items {
 			 '{'.$host_name.':dnstest.slv.rdds.rollweek.last(0)}<100',
 			 'priority' => '4',
 	};
-                         
+
 	create_trigger($options);
 
 	$options = { 'description' => "12.2 RDDS Availability > 100%",
