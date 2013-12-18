@@ -232,7 +232,7 @@ if (isset($this->data['tld'])) {
 				isset($event['endTime']) ? date('d.m.Y H:i:s', $event['endTime']) : '-',
 				$event['incidentFailedTests'],
 				$event['incidentTotalTests'],
-				new CLink('XYZ123', 'http://ticket.com', null, null, true),
+				new CLink('XYZ123', 'http://ticket.com', null, null, true)
 			);
 
 			$dnsTable->addRow($row);
@@ -303,7 +303,7 @@ if (isset($this->data['tld'])) {
 				isset($event['endTime']) ? date('d.m.Y H:i:s', $event['endTime']) : '-',
 				$event['incidentFailedTests'],
 				$event['incidentTotalTests'],
-				new CLink('XYZ123', 'http://ticket.com', null, null, true),
+				new CLink('XYZ123', 'http://ticket.com', null, null, true)
 			);
 
 			$dnssecTable->addRow($row);
@@ -375,7 +375,7 @@ if (isset($this->data['tld'])) {
 				isset($event['endTime']) ? date('d.m.Y H:i:s', $event['endTime']) : '-',
 				$event['incidentFailedTests'],
 				$event['incidentTotalTests'],
-				new CLink('XYZ123', 'http://ticket.com', null, null, true),
+				new CLink('XYZ123', 'http://ticket.com', null, null, true)
 			);
 
 			$rddsTable->addRow($row);

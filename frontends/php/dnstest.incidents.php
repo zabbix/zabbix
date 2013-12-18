@@ -213,34 +213,34 @@ if ($host || $data['filter_search']) {
 						$data['dns']['itemid'] = $item['itemid'];
 						$data['dns']['slv'] = $item['lastvalue'];
 						$data['dns']['events'] = array();
-						$dnsItems[] = $item['itemid'];
-						$itemIds[] = $item['itemid'];
 						break;
 					case DNSTEST_SLV_DNSSEC_ROLLWEEK:
 						$data['dnssec']['itemid'] = $item['itemid'];
 						$data['dnssec']['slv'] = $item['lastvalue'];
 						$data['dnssec']['events'] = array();
-						$dnssecItems[] = $item['itemid'];
-						$itemIds[] = $item['itemid'];
 						break;
 					case DNSTEST_SLV_RDDS_ROLLWEEK:
 						$data['rdds']['itemid'] = $item['itemid'];
 						$data['rdds']['slv'] = $item['lastvalue'];
 						$data['rdds']['events'] = array();
-						$rddsItems[] = $item['itemid'];
-						$itemIds[] = $item['itemid'];
 						break;
 					case DNSTEST_SLV_DNS_AVAIL:
 						$data['dns']['availItemId'] = $item['itemid'];
 						$dnsAvailItem = $item['itemid'];
+						$dnsItems[] = $item['itemid'];
+						$itemIds[] = $item['itemid'];
 						break;
 					case DNSTEST_SLV_DNSSEC_AVAIL:
 						$data['dnssec']['availItemId'] = $item['itemid'];
 						$dnssecAvailItem = $item['itemid'];
+						$dnssecItems[] = $item['itemid'];
+						$itemIds[] = $item['itemid'];
 						break;
 					case DNSTEST_SLV_RDDS_AVAIL:
 						$data['rdds']['availItemId'] = $item['itemid'];
 						$rddsAvailItem = $item['itemid'];
+						$rddsItems[] = $item['itemid'];
+						$itemIds[] = $item['itemid'];
 						break;
 				}
 			}

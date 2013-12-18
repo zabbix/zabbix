@@ -249,28 +249,28 @@ if ($tlds) {
 				$data['tld'][$item['hostid']]['dns']['itemid'] = $item['itemid'];
 				$data['tld'][$item['hostid']]['dns']['lastvalue'] = $item['lastvalue'];
 				$data['tld'][$item['hostid']]['dns']['trigger'] = false;
-				$itemIds[] = $item['itemid'];
 			}
 			elseif ($item['key_'] == DNSTEST_SLV_DNSSEC_ROLLWEEK && $sortField != 'dnssec') {
 				$data['tld'][$item['hostid']]['dnssec']['itemid'] = $item['itemid'];
 				$data['tld'][$item['hostid']]['dnssec']['lastvalue'] = $item['lastvalue'];
 				$data['tld'][$item['hostid']]['dnssec']['trigger'] = false;
-				$itemIds[] = $item['itemid'];
 			}
 			elseif ($item['key_'] == DNSTEST_SLV_RDDS_ROLLWEEK && $sortField != 'rdds') {
 				$data['tld'][$item['hostid']]['rdds']['itemid'] = $item['itemid'];
 				$data['tld'][$item['hostid']]['rdds']['lastvalue'] = $item['lastvalue'];
 				$data['tld'][$item['hostid']]['rdds']['trigger'] = false;
-				$itemIds[] = $item['itemid'];
 			}
 			elseif ($item['key_'] == DNSTEST_SLV_DNS_AVAIL) {
 				$data['tld'][$item['hostid']]['dns']['availItemId'] = $item['itemid'];
+				$itemIds[] = $item['itemid'];
 			}
 			elseif ($item['key_'] == DNSTEST_SLV_DNSSEC_AVAIL) {
 				$data['tld'][$item['hostid']]['dnssec']['availItemId'] = $item['itemid'];
+				$itemIds[] = $item['itemid'];
 			}
 			elseif ($item['key_'] == DNSTEST_SLV_RDDS_AVAIL) {
 				$data['tld'][$item['hostid']]['rdds']['availItemId'] = $item['itemid'];
+				$itemIds[] = $item['itemid'];
 			}
 		}
 
@@ -284,10 +284,7 @@ if ($tlds) {
 		// get triggers
 		$triggers = API::Trigger()->get(array(
 			'output' => array('triggerid', 'value'),
-			'itemids' => $itemIds,
-			'filter' => array(
-				'priority' => TRIGGER_SEVERITY_NOT_CLASSIFIED
-			)
+			'itemids' => $itemIds
 		));
 
 		foreach ($triggers as $trigger) {
@@ -295,15 +292,15 @@ if ($tlds) {
 				$trItem = $trigger['itemid'];
 				$problem = array();
 				switch ($items[$trItem]['key_']) {
-					case DNSTEST_SLV_DNS_ROLLWEEK:
+					case DNSTEST_SLV_DNS_AVAIL:
 						$data['tld'][$items[$trItem]['hostid']]['dns']['trigger'] = true;
 						$data['tld'][$items[$trItem]['hostid']]['dns']['incident'] = getLastEvent($trigger['triggerid']);
 						break;
-					case DNSTEST_SLV_DNSSEC_ROLLWEEK:
+					case DNSTEST_SLV_DNSSEC_AVAIL:
 						$data['tld'][$items[$trItem]['hostid']]['dnssec']['trigger'] = true;
 						$data['tld'][$items[$trItem]['hostid']]['dnssec']['incident'] = getLastEvent($trigger['triggerid']);
 						break;
-					case DNSTEST_SLV_RDDS_ROLLWEEK:
+					case DNSTEST_SLV_RDDS_AVAIL:
 						$data['tld'][$items[$trItem]['hostid']]['rdds']['trigger'] = true;
 						$data['tld'][$items[$trItem]['hostid']]['rdds']['incident'] = getLastEvent($trigger['triggerid']);
 						break;

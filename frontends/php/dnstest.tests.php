@@ -42,7 +42,6 @@ $fields = array(
 	'filter_from' =>			array(T_ZBX_INT, O_OPT,		null,	null,			null),
 	'filter_to' =>				array(T_ZBX_INT, O_OPT,		null,	null,			null),
 	'filter_rolling_week' =>	array(T_ZBX_INT, O_OPT,		null,	null,			null),
-	'filter_failing_tests' =>	array(T_ZBX_INT, O_OPT,		null,	IN('0,1'),		null),
 	// ajax
 	'favobj'=>					array(T_ZBX_STR, O_OPT,		P_ACT,	null,			null),
 	'favref'=>					array(T_ZBX_STR, O_OPT,		P_ACT,  NOT_EMPTY,		'isset({favobj})'),
@@ -94,8 +93,6 @@ else {
 	}
 }
 
-$data['filter_failing_tests'] = get_request('filter_failing_tests');
-
 $data['sid'] = get_request('sid');
 
 // get TLD
@@ -111,39 +108,32 @@ $data['tld'] = reset($tld);
 
 // used items
 if ($data['type'] == 0) {
-	$keys = array(DNSTEST_SLV_DNS_AVAIL, DNSTEST_SLV_DNS_ROLLWEEK);
+	$key = DNSTEST_SLV_DNS_AVAIL;
 }
 elseif ($data['type'] == 1) {
-	$keys = array(DNSTEST_SLV_DNSSEC_AVAIL, DNSTEST_SLV_DNSSEC_ROLLWEEK);
+	$key = DNSTEST_SLV_DNSSEC_AVAIL;
 }
 else {
-	$keys = array(DNSTEST_SLV_RDDS_AVAIL, DNSTEST_SLV_RDDS_ROLLWEEK);
+	$key = DNSTEST_SLV_RDDS_AVAIL;
 }
 
 // get items
 $items = API::Item()->get(array(
 	'hostids' => $data['tld']['hostid'],
 	'filter' => array(
-		'key_' => $keys
+		'key_' => $key
 	),
 	'output' => array('itemid', 'hostid', 'key_'),
 	'preservekeys' => true
 ));
 
 if ($items) {
-	foreach ($items as $item) {
-		if ($item['key_'] == DNSTEST_SLV_DNS_ROLLWEEK || $item['key_'] == DNSTEST_SLV_DNSSEC_ROLLWEEK
-				|| $item['key_'] == DNSTEST_SLV_RDDS_ROLLWEEK) {
-			$itemIds[] = $item['itemid'];
-		}
-		else {
-			$availItem = $item['itemid'];
-		}
-	}
+	$item = reset($items);
+	$availItem = $item['itemid'];
 
 	// get triggers
 	$triggers = API::Trigger()->get(array(
-		'itemids' => $itemIds,
+		'itemids' => $availItem,
 		'output' => array('triggerids'),
 		'preservekeys' => true
 	));
@@ -232,7 +222,7 @@ if ($items) {
 						'status' => TRIGGER_VALUE_FALSE,
 						'startTime' => $addEvent['clock'],
 						'endTime' => $event['clock'],
-						'false_positive' => $event['false_positive']
+						'false_positive' => $addEvent['false_positive']
 					);
 				}
 			}
@@ -277,16 +267,12 @@ if ($items) {
 		}
 	}
 
-	// get tests results
-	$failingTests = $data['filter_failing_tests'] ? ' AND h.value=0' : null;
-
 	$tests = DBselect(
 		'SELECT h.clock, h.value'.
 		' FROM history_uint h'.
 		' WHERE h.itemid='.$availItem.
 			' AND h.clock>='.zbxDateToTime($data['filter_from']).
-			' AND h.clock<='.zbxDateToTime($data['filter_to']).
-			$failingTests
+			' AND h.clock<='.zbxDateToTime($data['filter_to'])
 	);
 
 	if ($data['tld'] && $data['slvItemId']) {
@@ -296,13 +282,17 @@ if ($items) {
 		$data['downTests'] = 0;
 		$data['statusChanges'] = 0;
 		while ($test = DBfetch($tests)) {
-			if (($data['type'] < 2 && $test['value'] == 1) || ($data['type'] == 2 && $test['value'] == 2)) {
+			if (($data['type'] < 2 && $test['value'] == 0) || ($data['type'] == 2 && $test['value'] != 2)) {
 				$data['tests'][] = array(
 					'value' => $test['value'],
 					'clock' => $test['clock'],
 					'incident' => 0,
 					'updated' => false
 				);
+
+				if (!$test['value']) {
+					$data['downTests']++;
+				}
 			}
 
 			// state changes
@@ -314,10 +304,6 @@ if ($items) {
 					$statusChanged = $test['value'];
 					$data['statusChanges']++;
 				}
-			}
-
-			if (!$test['value']) {
-				$data['downTests']++;
 			}
 		}
 
