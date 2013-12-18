@@ -1483,7 +1483,7 @@ static int	zbx_tcp_exchange(const char *request, const char *host, short port, i
 
 	if (SUCCEED != SUCCEED_OR_FAIL(zbx_tcp_recv_ext(&s, &recv_buf, ZBX_TCP_READ_UNTIL_CLOSE, timeout)))
 	{
-		zbx_strlcpy(err, "error receiving data", err_size);
+		zbx_strlcpy(err, zbx_tcp_strerror(), err_size);
 		goto out;
 	}
 
