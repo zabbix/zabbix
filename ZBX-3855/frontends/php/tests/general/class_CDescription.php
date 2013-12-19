@@ -78,6 +78,7 @@ class class_CDescription extends PHPUnit_Framework_TestCase {
 				' FROM triggers t'.
 				' WHERE t.triggerid='.$triggerId
 		));
+
 		$description = CMacrosResolverHelper::resolveTriggerName($trigger);
 
 		$this->assertEquals($expectedDescription, $description);

@@ -240,7 +240,7 @@ class testPageHosts extends CWebTest {
 
 		$this->getConfirmation();
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('Host status updated');
+		$this->zbxTestTextPresent('Hosts enabled');
 
 		$sql = "select host from hosts where status=".HOST_STATUS_NOT_MONITORED.
 			" and name NOT LIKE '%{#%'";
@@ -268,7 +268,7 @@ class testPageHosts extends CWebTest {
 
 		$this->getConfirmation();
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('Host status updated');
+		$this->zbxTestTextPresent('Host enabled');
 
 		$sql = "select * from hosts where hostid=$hostid and status=".HOST_STATUS_MONITORED;
 		$this->assertEquals(1, DBcount($sql), "Chuck Norris: host $hostid activated but status is wrong in the DB");
@@ -290,7 +290,7 @@ class testPageHosts extends CWebTest {
 
 		$this->getConfirmation();
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('Host status updated');
+		$this->zbxTestTextPresent('Hosts disabled');
 
 		$sql = "select * from hosts where status=".HOST_STATUS_MONITORED.
 			" and name NOT LIKE '%{#%'";
@@ -318,7 +318,7 @@ class testPageHosts extends CWebTest {
 
 		$this->getConfirmation();
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('Host status updated');
+		$this->zbxTestTextPresent('Host disabled');
 
 		$sql = "select * from hosts where hostid=$hostid and status=".HOST_STATUS_NOT_MONITORED;
 		$this->assertEquals(1, DBcount($sql), "Chuck Norris: host $hostid disabled but status is wrong in the DB");

@@ -87,7 +87,7 @@ class testPageUserGroups extends CWebTest {
 		$this->getConfirmation();
 		$this->wait();
 		$this->zbxTestCheckTitle('Configuration of user groups');
-		$this->zbxTestTextPresent('Users status updated');
+		$this->zbxTestTextPresent('User group enabled');
 
 		$sql="select * from usrgrp where usrgrpid=$usrgrpid and users_status=".GROUP_STATUS_ENABLED;
 		$this->assertEquals(1, DBcount($sql));
@@ -118,10 +118,10 @@ class testPageUserGroups extends CWebTest {
 		$this->wait();
 		$this->zbxTestCheckTitle('Configuration of user groups');
 		if ($cannotDisable) {
-			$this->zbxTestTextPresent('Cannot update users status');
+			$this->zbxTestTextPresent('ERROR: Cannot disable user group');
 		}
 		else {
-			$this->zbxTestTextPresent('Users status updated');
+			$this->zbxTestTextPresent('User group disabled');
 		}
 
 		$sql = "select * from usrgrp where usrgrpid=$usrgrpid and users_status=".GROUP_STATUS_DISABLED;

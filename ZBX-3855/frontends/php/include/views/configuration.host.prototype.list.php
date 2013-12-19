@@ -116,7 +116,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 
 // create go buttons
 $goComboBox = new CComboBox('go');
-$goOption = new CComboItem('activate', _('Activate selected'));
+$goOption = new CComboItem('activate', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable selected host prototypes?'));
 $goComboBox->addItem($goOption);
 
