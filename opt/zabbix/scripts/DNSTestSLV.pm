@@ -596,7 +596,7 @@ sub process_slv_ns_monthly
     foreach my $ns (keys(%successful_values))
     {
 	my $key_out = $cfg_key_out . $ns . ']';
-	my $perc = sprintf("%.0f", $successful_values{$ns} * 100 / $values_per_ns);
+	my $perc = sprintf("%.3f", $successful_values{$ns} * 100 / $values_per_ns);
 
 	info("$ns: $perc% successful values (", $successful_values{$ns}, " out of $values_per_ns)");
 	send_value($tld, $key_out, $value_ts, $perc);
@@ -624,7 +624,7 @@ sub process_slv_monthly
     my $successful_values = 0;
 
     while ($cur_from < $till)
-    {    
+    {
 	$total_iterations++;
 
 	# We treat missing values as successful. Also we treat values received during probe OFFLINE as successful.
@@ -654,7 +654,7 @@ sub process_slv_monthly
     }
 
     my $total_values = $total_iterations * scalar(keys(%$all_items_ref));
-    my $perc = sprintf("%.0f", $successful_values * 100 / $total_values);
+    my $perc = sprintf("%.3f", $successful_values * 100 / $total_values);
 
     info("$perc% successful values ($successful_values out of $total_values)");
     send_value($tld, $cfg_key_out, $value_ts, $perc);
@@ -718,7 +718,7 @@ sub process_slv_ns_avail
 
 	my $success_perc = $success_results * 100 / $count;
 	my $test_result = $success_perc > $max_fail_perc ? UP : DOWN;
-	info("$out_key: ", $test_result == UP ? "success" : "fail", " (", sprintf("%.2f", $success_perc), "% success)");
+	info("$out_key: ", $test_result == UP ? "success" : "fail", " (", sprintf("%.3f", $success_perc), "% success)");
 	send_value($tld, $out_key, $value_ts, $test_result);
     }
 }

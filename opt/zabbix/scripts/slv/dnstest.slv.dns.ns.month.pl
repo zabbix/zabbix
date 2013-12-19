@@ -65,7 +65,7 @@ foreach my $item (@items)
     my $key_out = $cfg_key_out . get_ns_from_key($key). "]";
     my $up_count = get_up_count($itemid);
 
-    my $perc = sprintf("%.0f", $up_count * 100 / $total_values);
+    my $perc = sprintf("%.3f", $up_count * 100 / $total_values);
 
     info("$key_out: up:$up_count perc:$perc");
     send_value($tld, $key_out, $value_ts, $perc);

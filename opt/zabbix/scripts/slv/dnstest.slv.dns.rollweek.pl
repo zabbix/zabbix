@@ -39,7 +39,7 @@ my $itemid_dst = $result->{'itemid'};
 db_connect();
 
 my $fails = get_down_count($itemid_src, $itemid_dst, $from, $till);
-my $perc = sprintf("%.0f", $fails * 100 / $cfg_sla);
+my $perc = sprintf("%.3f", $fails * 100 / $cfg_sla);
 
 info("fails:$fails perc:$perc");
 send_value($tld, $cfg_key_out, $value_ts, $perc);
