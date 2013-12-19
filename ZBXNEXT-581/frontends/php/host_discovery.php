@@ -305,7 +305,7 @@ if (isset($_REQUEST['form'])) {
 
 	$data = getItemFormData($rule, array('is_discovery_rule' => true));
 	$data['page_header'] = _('CONFIGURATION OF DISCOVERY RULES');
-	$data['lifetime'] = getRequest('lifetime');
+	$data['lifetime'] = getRequest('lifetime', 30);
 	$data['conditions'] = getRequest('conditions', array());
 
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
