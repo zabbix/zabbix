@@ -41,7 +41,6 @@ use DNSTest;
 
 my $VALUE_TYPE_AVAIL = 0;
 my $VALUE_TYPE_PERC = 1;
-my $VALUE_TYPE_NUM = 2;
 
 my $ZBX_EC_DNS_NS_NOREPLY  = -200; # no reply from Name Server
 my $ZBX_EC_DNS_NS_ERRREPLY = -201; # invalid reply from Name Server
@@ -546,20 +545,12 @@ sub create_slv_item {
 	$options = {'name' => $name,
                                               'key_'=> $key,
                                               'hostid' => $hostid,
-                                              'type' => 2, 'value_type' => 3,
+                                              'type' => 2, 'value_type' => 0,
                                               'applications' => $applicationids,
 					      'units' => '%'};
     }
-    elsif ($value_type == $VALUE_TYPE_NUM) {
-	$options = {'name' => $name,
-                                              'key_'=> $key,
-                                              'hostid' => $hostid,
-                                              'applications' => $applicationids,
-                                              'type' => 2, 'value_type' => 3};
-    }
     else {
-	print "Unknown value type $value_type.\n";
-	exit -1;
+	pfail("Unknown value type $value_type.");
     }
 
     return create_item($options);
@@ -1048,9 +1039,9 @@ sub create_all_slv_ns_items {
     my $ip = shift;
     my $hostid = shift;
 
-    create_slv_item('% of successful monthly DNS resolution RTT (UDP): $1 ($2)', 'dnstest.slv.dns.ns.rtt.udp.month['.$ns_name.','.$ip.']', $hostid, $VALUE_TYPE_NUM, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
-    create_slv_item('% of successful monthly DNS resolution RTT (TCP): $1 ($2)', 'dnstest.slv.dns.ns.rtt.tcp.month['.$ns_name.','.$ip.']', $hostid, $VALUE_TYPE_NUM, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
-    create_slv_item('% of successful monthly DNS update time: $1 ($2)', 'dnstest.slv.dns.ns.upd.month['.$ns_name.','.$ip.']', $hostid, $VALUE_TYPE_NUM, [get_application_id(APP_SLV_MONTHLY, $hostid)]) if (defined($OPTS{'epp'}));
+    create_slv_item('% of successful monthly DNS resolution RTT (UDP): $1 ($2)', 'dnstest.slv.dns.ns.rtt.udp.month['.$ns_name.','.$ip.']', $hostid, $VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
+    create_slv_item('% of successful monthly DNS resolution RTT (TCP): $1 ($2)', 'dnstest.slv.dns.ns.rtt.tcp.month['.$ns_name.','.$ip.']', $hostid, $VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
+    create_slv_item('% of successful monthly DNS update time: $1 ($2)', 'dnstest.slv.dns.ns.upd.month['.$ns_name.','.$ip.']', $hostid, $VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]) if (defined($OPTS{'epp'}));
     create_slv_item('DNS NS availability: $1 ($2)', 'dnstest.slv.dns.ns.avail['.$ns_name.','.$ip.']', $hostid, $VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
     create_slv_item('% of monthly DNS NS availability: $1 ($2)', 'dnstest.slv.dns.ns.month['.$ns_name.','.$ip.']', $hostid, $VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
 }
