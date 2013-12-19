@@ -28,6 +28,7 @@
 
 const char	*progname = NULL;
 const char	title_message[] = "Zabbix Agent";
+const char	syslog_app_name[] = "zabbix_agent";
 const char	usage_message[] = "[-Vhp] [-c <file>] [-t <item>]";
 
 const char	*help_message[] = {

@@ -97,7 +97,7 @@ int zabbix_open_log(int type, int level, const char *filename)
 		system_log_handle = RegisterEventSource(NULL, wevent_source);
 		zbx_free(wevent_source);
 #else
-		openlog(title_message, LOG_PID, LOG_DAEMON);
+		openlog(syslog_app_name, LOG_PID, LOG_DAEMON);
 #endif
 	}
 	else if (LOG_TYPE_FILE == type)

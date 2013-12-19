@@ -666,6 +666,7 @@ char    *zbx_strdup2(const char *filename, int line, char *old, const char *str)
 
 extern const char	*progname;
 extern const char	title_message[];
+extern const char	syslog_app_name[];
 extern const char	usage_message[];
 extern const char	*help_message[];
 
