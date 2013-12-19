@@ -48,7 +48,7 @@ foreach ($macros as $i => $macro) {
 
 	$deleteButtonCell = null;
 	if (!$readonly) {
-		$deleteButtonCell = array(new CButton('macros_'.$i.'_remove', _('Remove'), null, 'link_menu macroRemove'));
+		$deleteButtonCell = array(new CButton('macros_'.$i.'_remove', _('Remove'), null, 'link_menu element-table-remove'));
 		if (isset($macro['globalmacroid'])) {
 			$deleteButtonCell[] = new CVar('macros['.$i.'][globalmacroid]', $macro['globalmacroid'], 'macros_'.$i.'_id');
 		}
@@ -63,7 +63,7 @@ foreach ($macros as $i => $macro) {
 
 // buttons
 if (!$readonly) {
-	$addButton = new CButton('macro_add', _('Add'), null, 'link_menu');
+	$addButton = new CButton('macro_add', _('Add'), null, 'link_menu element-table-add');
 	$buttonColumn = new CCol($addButton);
 	$buttonColumn->setAttribute('colspan', 5);
 

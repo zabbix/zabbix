@@ -274,6 +274,7 @@ if (!$conditions) {
 $conditionFormList = new CFormList('conditionlist');
 
 $conditionTable = new CTable('', 'formElementTable');
+$conditionTable->attr('id', 'conditions');
 $conditionTable->addRow(array(_('Macro'), SPACE, _('Regular expression'), SPACE));
 
 // fields
@@ -284,7 +285,7 @@ foreach ($conditions as $i => $condition) {
 	$value = new CTextBox('conditions['.$i.'][value]', $condition['value'], 40, false, 255);
 	$value->setAttribute('placeholder', _('regular expression'));
 
-	$deleteButtonCell = array(new CButton('conditions_'.$i.'_remove', _('Remove'), null, 'link_menu macroRemove'));
+	$deleteButtonCell = array(new CButton('conditions_'.$i.'_remove', _('Remove'), null, 'link_menu element-table-remove'));
 	if (isset($condition['item_conditionid'])) {
 		$deleteButtonCell[] = new CVar('conditions['.$i.'][item_conditionid]', $condition['item_conditionid'], 'conditions_'.$i.'_id');
 	}
@@ -293,7 +294,7 @@ foreach ($conditions as $i => $condition) {
 	$conditionTable->addRow($row, 'form_row');
 }
 
-$addButton = new CButton('macro_add', _('Add'), null, 'link_menu');
+$addButton = new CButton('macro_add', _('Add'), null, 'link_menu element-table-add');
 $buttonColumn = new CCol($addButton);
 $buttonColumn->setAttribute('colspan', 5);
 
