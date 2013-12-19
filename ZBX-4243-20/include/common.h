@@ -741,6 +741,7 @@ while (0)
 
 extern const char	*progname;
 extern const char	title_message[];
+extern const char	syslog_app_name[];
 extern const char	usage_message[];
 extern const char	*help_message[];
 
