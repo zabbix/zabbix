@@ -12,7 +12,7 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 		</td>
 		<td>
 			<input class="input text" type="text" id="conditions_#{rowNum}_value" name="conditions[#{rowNum}][value]"
-				size="40" maxlength="255" placeholder="value">
+				size="40" maxlength="255" placeholder="<?php echo _('regular expression') ?>">
 		</td>
 		<td>
 			<input class="input link_menu element-table-remove" type="button" id="conditions_#{rowNum}_remove"
