@@ -95,6 +95,7 @@ $fields = array(
 		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_IPMI.'))', _('IPMI sensor')),
 	'trapper_hosts' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})&&isset({type})&&({type}==2)'),
 	'lifetime' => 			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
+	'conditions' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	// actions
 	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'g_hostdruleid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
@@ -125,6 +126,7 @@ if (get_request('itemid', false)) {
 		'itemids' => $_REQUEST['itemid'],
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => array('status', 'flags'),
+		'selectConditions' => array('item_conditionid', 'macro', 'value'),
 		'editable' => true
 	));
 	$item = reset($item);
@@ -197,7 +199,8 @@ elseif (isset($_REQUEST['save'])) {
 	}
 	$db_delay_flex = trim($db_delay_flex, ';');
 
-	$item = array(
+	$newItem = array(
+		'itemid' => getRequest('itemid'),
 		'interfaceid' => get_request('interfaceid'),
 		'name' => get_request('name'),
 		'description' => get_request('description'),
@@ -225,34 +228,47 @@ elseif (isset($_REQUEST['save'])) {
 		'privatekey' => get_request('privatekey'),
 		'params' => get_request('params'),
 		'ipmi_sensor' => get_request('ipmi_sensor'),
-		'lifetime' => get_request('lifetime')
+		'lifetime' => get_request('lifetime'),
+		'conditions' => array(),
 	);
 
-	if (hasRequest('itemid')) {
-		$itemId = getRequest('itemid');
+	// add macros; ignore empty new macros
+	foreach (getRequest('conditions') as $condition) {
+		if (isset($condition['item_conditionid']) || !(zbx_empty($condition['macro']) && zbx_empty($condition['value']))) {
+			$newItem['conditions'][] = $condition;
+		}
+	}
 
+	if (hasRequest('itemid')) {
 		DBstart();
 
-		$dbItem = get_item_by_itemid_limited($itemId);
-
 		// unset snmpv3 fields
-		if ($item['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
-			$item['snmpv3_authprotocol'] = ITEM_AUTHPROTOCOL_MD5;
-			$item['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
+		if ($newItem['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
+			$newItem['snmpv3_authprotocol'] = ITEM_AUTHPROTOCOL_MD5;
+			$newItem['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
 		}
-		elseif ($item['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV) {
-			$item['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
+		elseif ($newItem['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV) {
+			$newItem['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
 		}
 
-		$item = CArrayHelper::unsetEqualValues($item, $dbItem);
-		$item['itemid'] = $itemId;
+		// unset unchanged values
+		$newItem = CArrayHelper::unsetEqualValues($newItem, $item, array('itemid'));
+		$conditions = zbx_toHash($item['conditions'], 'item_conditionid');
+		foreach ($newItem['conditions'] as &$condition) {
+			if (isset($condition['item_conditionid'])) {
+				$condition = CArrayHelper::unsetEqualValues($condition, $conditions[$condition['item_conditionid']],
+					array('item_conditionid')
+				);
+			}
+		}
+		unset($condition);
 
-		$result = API::DiscoveryRule()->update($item);
+		$result = API::DiscoveryRule()->update($newItem);
 		$result = DBend($result);
 		show_messages($result, _('Discovery rule updated'), _('Cannot update discovery rule'));
 	}
 	else {
-		$result = API::DiscoveryRule()->create(array($item));
+		$result = API::DiscoveryRule()->create(array($newItem));
 		show_messages($result, _('Discovery rule created'), _('Cannot add discovery rule'));
 	}
 
@@ -296,7 +312,7 @@ if (isset($_REQUEST['form'])) {
 	if (hasRequest('itemid')) {
 		$rule = API::DiscoveryRule()->get(array(
 			'output' => API_OUTPUT_EXTEND,
-			'selectConditions' => array('macro', 'value'),
+			'selectConditions' => array('item_conditionid', 'macro', 'value'),
 			'itemids' => getRequest('itemid'),
 			'editable' => true
 		));
