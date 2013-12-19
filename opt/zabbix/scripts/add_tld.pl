@@ -235,7 +235,7 @@ foreach my $proxyid (sort keys %{$proxies}) {
 
     create_host({'groups' => [{'groupid' => $tld_groupid}, {'groupid' => $proxy_groupid}],
                                           'templates' => [{'templateid' => $main_templateid}, {'templateid' => $probe_templateid}],
-                                          'host' => uc($OPTS{'tld'}).' '.$probe_name,
+                                          'host' => $OPTS{'tld'}.' '.$probe_name,
                                           'proxy_hostid' => $proxyid,
                                           'interfaces' => [{'type' => 1, 'main' => 1, 'useip' => 1, 'ip'=> '127.0.0.1', 'dns' => '', 'port' => '10050'}]});
 }
@@ -1062,7 +1062,7 @@ sub create_main_template {
     my $tld = shift;
     my $ns_servers = shift;
 
-    my $template_name = 'Template '.uc($tld);
+    my $template_name = 'Template '.$tld;
 
     my $templateid = create_template($template_name);
 
