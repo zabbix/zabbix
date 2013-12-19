@@ -168,6 +168,7 @@ input[type="submit"].input[disabled].formlist { cursor: default; }
 input.jqueryinput,
 .jqueryinputset input[type="button"],
 .jqueryinputset input[type="submit"] { height: auto; }
+input.macro { text-transform: uppercase; }
 textarea.textarea_standard,
 textarea.textarea_big { height: auto; }
 

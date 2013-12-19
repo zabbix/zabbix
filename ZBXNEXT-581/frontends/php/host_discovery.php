@@ -292,8 +292,26 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_hostdruleid'])) {
  * Display
  */
 if (isset($_REQUEST['form'])) {
-	$data = getItemFormData(array('is_discovery_rule' => true));
+	$rule = array();
+	if (hasRequest('itemid')) {
+		$rule = API::DiscoveryRule()->get(array(
+			'output' => API_OUTPUT_EXTEND,
+			'selectConditions' => array('macro', 'value'),
+			'itemids' => getRequest('itemid'),
+			'editable' => true
+		));
+		$rule = reset($rule);
+	}
+
+	$data = getItemFormData($rule, array('is_discovery_rule' => true));
 	$data['page_header'] = _('CONFIGURATION OF DISCOVERY RULES');
+	$data['lifetime'] = getRequest('lifetime');
+	$data['conditions'] = getRequest('conditions', array());
+
+	if (hasRequest('itemid') && !getRequest('form_refresh')) {
+		$data['lifetime'] = $rule['lifetime'];
+		$data['conditions'] = $rule['conditions'];
+	}
 
 	// render view
 	$itemView = new CView('configuration.host.discovery.edit', $data);
