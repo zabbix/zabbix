@@ -1171,3 +1171,44 @@ function createPlaceholders() {
 		});
 	}
 }
+
+/**
+ * Creates a table with dynamic add/remove row buttons.
+ *
+ * Supported options:
+ * - template	- row template selector
+ * - row		- element row selector
+ * - add		- add row button selector
+ * - remove		- remove row button selector
+ *
+ * @param options
+ */
+jQuery.fn.elementTable = function(options) {
+	var options = jQuery.extend({
+		template: '',
+		row: '.form_row',
+		add: '.element-table-add',
+		remove: '.element-table-remove'
+	}, options)
+
+	var table = jQuery(this);
+
+	// add buttons
+	jQuery(options.add, table).click(function() {
+		// eval the template
+		var template = new Template(jQuery(options.template).html());
+
+		// add the new row before the row with the "Add" button
+		jQuery(this).closest('tr').before(template.evaluate({
+			rowNum: jQuery(options.row, table).length
+		}));
+
+		createPlaceholders();
+	});
+
+	// remove buttons
+	table.on('click', '.element-table-remove', function() {
+		// remove the parent row
+		jQuery(this).closest(options.row).remove();
+	});
+}
