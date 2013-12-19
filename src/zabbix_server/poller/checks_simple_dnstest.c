@@ -1471,11 +1471,10 @@ static int	zbx_tcp_exchange(const char *request, const char *host, short port, i
 	}
 
 	send_buf = zbx_dsprintf(send_buf, "%s\r\n", request);
-	timeout -= time(NULL) - start.sec;
 
-	if (SUCCEED != zbx_tcp_send_ext(&s, send_buf, 0, timeout))
+	if (SUCCEED != zbx_tcp_send_raw(&s, send_buf))
 	{
-		zbx_strlcpy(err, "error sending data", err_size);
+		zbx_snprintf(err, err_size, "cannot send data: %s", zbx_tcp_strerror());
 		goto out;
 	}
 
@@ -1483,7 +1482,7 @@ static int	zbx_tcp_exchange(const char *request, const char *host, short port, i
 
 	if (SUCCEED != SUCCEED_OR_FAIL(zbx_tcp_recv_ext(&s, &recv_buf, ZBX_TCP_READ_UNTIL_CLOSE, timeout)))
 	{
-		zbx_strlcpy(err, zbx_tcp_strerror(), err_size);
+		zbx_snprintf(err, err_size, "cannot receive data: %s", zbx_tcp_strerror());
 		goto out;
 	}
 
@@ -1879,7 +1878,7 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 			sizeof(err)))
 	{
 		rtt43 = ZBX_EC_RDDS43_NOREPLY;
-		zbx_dns_errf(log_fd, "no answer from RDDS43 server %s: %s", ip43, err);
+		zbx_dns_errf(log_fd, "RDDS43 test of %s failed: %s", ip43, err);
 		goto out;
 	}
 
@@ -1945,7 +1944,7 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 			sizeof(err)))
 	{
 		rtt80 = ZBX_EC_RDDS80_NOREPLY;
-		zbx_dns_errf(log_fd, "no answer from RDDS80 server %s: %s", ip80, err);
+		zbx_dns_errf(log_fd, "RDDS80 test of %s failed: %s", ip80, err);
 		goto out;
 	}
 out:
