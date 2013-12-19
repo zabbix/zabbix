@@ -263,9 +263,56 @@ $itemFormList->addRow(_('Description'), $description);
 $enabledCheckBox = new CCheckBox('status', !$this->data['status'], null, ITEM_STATUS_ACTIVE);
 $itemFormList->addRow(_('Enabled'), $enabledCheckBox);
 
+/*
+ * Condition tab
+ */
+$conditions = $this->data['conditions'];
+if (!$conditions) {
+	$conditions = array(array('macro' => '', 'value' => ''));
+}
+
+$conditionFormList = new CFormList('conditionlist');
+
+$conditionTable = new CTable('', 'formElementTable');
+$conditionTable->addRow(array(_('Macro'), SPACE, _('Regular expression'), SPACE));
+
+// fields
+foreach ($conditions as $i => $condition) {
+	$macro = new CTextBox('conditions['.$i.'][macro]', $condition['macro'], 30, false, 64);
+	$macro->addClass('macro');
+	$macro->setAttribute('placeholder', '{#MACRO}');
+	$value = new CTextBox('conditions['.$i.'][value]', $condition['value'], 40, false, 255);
+	$value->setAttribute('placeholder', _('regular expression'));
+
+	$deleteButtonCell = array(new CButton('conditions_'.$i.'_remove', _('Remove'), null, 'link_menu macroRemove'));
+	if (isset($condition['item_conditionid'])) {
+		$deleteButtonCell[] = new CVar('conditions['.$i.'][item_conditionid]', $condition['item_conditionid'], 'conditions_'.$i.'_id');
+	}
+
+	$row = array($macro, new CSpan(_('matches')), $value, $deleteButtonCell);
+	$conditionTable->addRow($row, 'form_row');
+}
+
+$addButton = new CButton('macro_add', _('Add'), null, 'link_menu');
+$buttonColumn = new CCol($addButton);
+$buttonColumn->setAttribute('colspan', 5);
+
+$buttonRow = new CRow();
+$buttonRow->setAttribute('id', 'row_new_macro');
+$buttonRow->addItem($buttonColumn);
+
+$conditionTable->addRow($buttonRow);
+
+$conditionFormList->addRow(_('Conditions'), new CDiv($conditionTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
+
+
 // append tabs to form
 $itemTab = new CTabView();
+if (!hasRequest('form_refresh')) {
+	$itemTab->setSelected(0);
+}
 $itemTab->addTab('itemTab', $this->data['caption'], $itemFormList);
+$itemTab->addTab('macroTab', _('Conditions'), $conditionFormList);
 $itemForm->addItem($itemTab);
 
 // append buttons to form

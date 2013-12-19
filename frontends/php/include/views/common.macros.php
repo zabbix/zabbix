@@ -39,8 +39,8 @@ $macrosTable->addRow(array(_('Macro'), SPACE, _('Value'), SPACE));
 // fields
 foreach ($macros as $i => $macro) {
 	$text1 = new CTextBox('macros['.$i.'][macro]', $macro['macro'], 30, $readonly, 64);
+	$text1->addClass('macro');
 	$text1->setAttribute('placeholder', '{$MACRO}');
-	$text1->setAttribute('style', 'text-transform:uppercase;');
 	$text2 = new CTextBox('macros['.$i.'][value]', $macro['value'], 40, $readonly, 255);
 	$text2->setAttribute('placeholder', _('value'));
 	$span = new CSpan(RARR);

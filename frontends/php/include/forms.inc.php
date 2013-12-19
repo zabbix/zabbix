@@ -956,11 +956,12 @@
 	/**
 	 * Get data for item edit page.
 	 *
+	 * @param array	$item							item, item prototype or LLD rule to take the data from
 	 * @param bool $options['is_discovery_rule']
 	 *
 	 * @return array
 	 */
-	function getItemFormData($options = array()) {
+	function getItemFormData(array $item = array(), array $options = array()) {
 		$data = array(
 			'form' => get_request('form'),
 			'form_refresh' => get_request('form_refresh'),
@@ -1008,12 +1009,10 @@
 			'privatekey' => get_request('privatekey', ''),
 			'formula' => get_request('formula', 1),
 			'logtimefmt' => get_request('logtimefmt', ''),
-			'inventory_link' => get_request('inventory_link', 0),
 			'add_groupid' => get_request('add_groupid', get_request('groupid', 0)),
 			'valuemaps' => null,
 			'possibleHostInventories' => null,
 			'alreadyPopulated' => null,
-			'lifetime' => get_request('lifetime', 30),
 			'initial_item_type' => null,
 			'templates' => array()
 		);
@@ -1043,36 +1042,13 @@
 		}
 
 		// item
-		if (!empty($data['itemid'])) {
-			if ($data['is_discovery_rule']) {
-				$data['item'] = API::DiscoveryRule()->get(array(
-					'itemids' => $data['itemid'],
-					'output' => API_OUTPUT_EXTEND,
-					'hostids' => $data['hostid'],
-					'editable' => true
-				));
-			}
-			else {
-				$data['item'] = API::Item()->get(array(
-					'itemids' => $data['itemid'],
-					'filter' => array('flags' => null),
-					'output' => array(
-						'itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
-						'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'multiplier', 'delta',
-						'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase',
-						'formula', 'logtimefmt', 'templateid', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor',
-						'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',
-						'interfaceid', 'port', 'description', 'inventory_link', 'lifetime', 'snmpv3_authprotocol',
-						'snmpv3_privprotocol', 'snmpv3_contextname'
-					)
-				));
-			}
-			$data['item'] = reset($data['item']);
+		if ($item) {
+			$data['item'] = $item;
 			$data['hostid'] = !empty($data['hostid']) ? $data['hostid'] : $data['item']['hostid'];
 			$data['limited'] = $data['item']['templateid'] != 0;
 
 			// get templates
-			$itemid = $data['itemid'];
+			$itemid = $item['itemid'];
 			do {
 				$params = array(
 					'itemids' => $itemid,
@@ -1147,7 +1123,7 @@
 		}
 
 		// fill data from item
-		if ((!empty($data['itemid']) && !isset($_REQUEST['form_refresh'])) || ($data['limited'] && !isset($_REQUEST['form_refresh']))) {
+		if (($item && !isset($_REQUEST['form_refresh'])) || ($data['limited'] && !isset($_REQUEST['form_refresh']))) {
 			$data['name'] = $data['item']['name'];
 			$data['description'] = $data['item']['description'];
 			$data['key'] = $data['item']['key_'];
@@ -1179,9 +1155,7 @@
 			$data['privatekey'] = $data['item']['privatekey'];
 			$data['formula'] = $data['item']['formula'];
 			$data['logtimefmt'] = $data['item']['logtimefmt'];
-			$data['inventory_link'] = $data['item']['inventory_link'];
 			$data['new_application'] = get_request('new_application', '');
-			$data['lifetime'] = $data['item']['lifetime'];
 
 			if (!$data['limited'] || !isset($_REQUEST['form_refresh'])) {
 				$data['delay'] = $data['item']['delay'];
