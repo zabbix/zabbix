@@ -1182,6 +1182,9 @@ function createPlaceholders() {
 	 * - add		- add row button selector
 	 * - remove		- remove row button selector
 	 *
+	 * Triggered events:
+	 * - change.elementTable 	- after adding or removing a row
+	 *
 	 * @param options
 	 */
 	$.fn.elementTable = function(options) {
@@ -1192,26 +1195,51 @@ function createPlaceholders() {
 			remove: '.element-table-remove'
 		}, options)
 
-		var template = new Template($(options.template).html());
-
 		return this.each(function() {
 			var table = $(this);
 
 			// add buttons
 			table.on('click', options.add, function() {
 				// add the new row before the row with the "Add" button
-				$(this).closest('tr').before(template.evaluate({
-					rowNum: $(options.row, table).length
-				}));
-
-				createPlaceholders();
+				addRow(table, $(this).closest('tr'), options);
 			});
 
 			// remove buttons
 			table.on('click', options.remove, function() {
 				// remove the parent row
-				$(this).closest(options.row).remove();
+				removeRow(table, $(this).closest(options.row), options);
 			});
 		});
 	};
+
+	/**
+	 * Adds a row before the given row.
+	 *
+	 * @param {jQuery} table
+	 * @param {jQuery} beforeRow
+	 * @param {object} options
+	 */
+	function addRow(table, beforeRow, options) {
+		var template = new Template($(options.template).html());
+		beforeRow.before(template.evaluate({
+			rowNum: $(options.row, table).length
+		}));
+
+		createPlaceholders();
+
+		table.trigger('tableupdate.elementTable', options);
+	}
+
+	/**
+	 * Removes the given row.
+	 *
+	 * @param {jQuery} table
+	 * @param {jQuery} row
+	 * @param {object} options
+	 */
+	function removeRow(table, row, options) {
+		row.remove();
+
+		table.trigger('tableupdate.elementTable', options);
+	}
 }(jQuery));

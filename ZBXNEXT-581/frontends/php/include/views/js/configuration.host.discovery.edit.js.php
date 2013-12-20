@@ -21,9 +21,21 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 	</tr>
 </script>
 <script type="text/javascript">
-	jQuery(function() {
-		jQuery('#conditions').elementTable({
-			template: '#condition-row'
+	(function($){
+		$(function() {
+			$('#conditions')
+				.elementTable({
+					template: '#condition-row'
+				})
+				.bind('tableupdate.elementTable', function(event, options) {
+					$('#conditionRow').toggleClass('hidden', ($(options.row, $(this)).length <= 1));
+				});
+
+			$('#evaltype').change(function() {
+				var custom = ($(this).val() == <?php echo ACTION_EVAL_TYPE_EXPRESSION ?>);
+				$('#expression').toggleClass('hidden', custom);
+				$('#formula').toggleClass('hidden', !custom);
+			});
 		});
-	});
+	})(jQuery);
 </script>
