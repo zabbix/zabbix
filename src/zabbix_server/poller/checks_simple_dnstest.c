@@ -341,7 +341,7 @@ static int	zbx_get_ns_values(ldns_resolver *res, const char *ns, const char *ip,
 	ldns_pkt_print(dtlog, pkt);
 
 	nsset = ldns_pkt_rr_list_by_name_and_type(pkt, testname_rdf, LDNS_RR_TYPE_NS, LDNS_SECTION_AUTHORITY);
-	rrsig = ldns_pkt_rr_list_by_name_and_type(pkt, testname_rdf, LDNS_RR_TYPE_RRSIG, LDNS_SECTION_AUTHORITY);
+	rrsig = ldns_pkt_rr_list_by_name_and_type(pkt, testname_rdf, LDNS_RR_TYPE_RRSIG, LDNS_SECTION_ANSWER);
 
 	if (0 != epp_enabled)
 	{
@@ -424,16 +424,16 @@ static int	zbx_get_ns_values(ldns_resolver *res, const char *ns, const char *ip,
 		{
 			if (NULL == rrsig)
 			{
-				zbx_snprintf(err, err_size, "no RRSIG records of \"%s\" at nameserver \"%s\" (%s)",
-						testname, ns, ip);
+				zbx_snprintf(err, err_size, "no RRSIG records in ANSWER section of \"%s\""
+						" at nameserver \"%s\" (%s)", testname, ns, ip);
 				*rtt = ZBX_EC_DNS_NS_ERRSIG;
 				goto out;
 			}
 
 			if (1 != ldns_rr_list_rr_count(rrsig))
 			{
-				zbx_snprintf(err, err_size, "more than one RRSIG record of \"%s\""
-						" at nameserver \"%s\" (%s)", testname, ns, ip);
+				zbx_snprintf(err, err_size, "more than one RRSIG record in ANSWER section"
+						" of \"%s\" at nameserver \"%s\" (%s)", testname, ns, ip);
 				*rtt = ZBX_EC_DNS_NS_ERRSIG;
 				goto out;
 			}
@@ -455,6 +455,22 @@ static int	zbx_get_ns_values(ldns_resolver *res, const char *ns, const char *ip,
 	}
 	else if (NULL != keys)	/* EPP disabled, DNSSEC enabled */
 	{
+		if (NULL == rrsig)
+		{
+			zbx_snprintf(err, err_size, "no RRSIG records in ANSWER section of \"%s\""
+					" at nameserver \"%s\" (%s)", testname, ns, ip);
+			*rtt = ZBX_EC_DNS_NS_ERRSIG;
+			goto out;
+		}
+
+		if (1 != ldns_rr_list_rr_count(rrsig))
+		{
+			zbx_snprintf(err, err_size, "more than one RRSIG record in ANSWER section"
+					" of \"%s\" at nameserver \"%s\" (%s)", testname, ns, ip);
+			*rtt = ZBX_EC_DNS_NS_ERRSIG;
+			goto out;
+		}
+
 		if (SUCCEED != zbx_remove_unmatched_dnskeys(&matched_keys, ldns_rr_list_rr(rrsig, 0), rtt,
 				err, err_size))
 		{
