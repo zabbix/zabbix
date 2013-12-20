@@ -99,6 +99,10 @@ static int	zbx_create_resolver(ldns_resolver **res, const char *name, const char
 		goto out;
 	}
 
+	/* push nameserver to it */
+	if (SUCCEED != zbx_set_resolver_ns(*res, name, ip, ipv4_enabled, ipv6_enabled, err, err_size))
+		goto out;
+
 	if (ZBX_DNSTEST_UDP == proto)
 	{
 		tv.tv_sec = ZBX_DNSTEST_UDP_TIMEOUT;
@@ -137,10 +141,6 @@ static int	zbx_create_resolver(ldns_resolver **res, const char *name, const char
 
 	ldns_resolver_set_ip6(*res, ip_support);
 
-	/* push nameserver to it */
-	if (SUCCEED != zbx_set_resolver_ns(*res, name, ip, ipv4_enabled, ipv6_enabled, err, err_size))
-		goto out;
-
 	ret = SUCCEED;
 out:
 	return ret;
@@ -162,22 +162,35 @@ static int	zbx_remove_unmatched_dnskeys(ldns_rr_list **keys, const ldns_rr *rrsi
 		char *err, size_t err_size)
 {
 	size_t		i, keys_count;
-	uint16_t	rrsig_keytag;
+	uint16_t	rrsig_uint;
 	ldns_rr_list	*matched_keys = NULL;
+	const ldns_rdf	*keytag;
 	int		ret = FAIL;
 
-	rrsig_keytag = ldns_rdf2native_int16(ldns_rr_rrsig_keytag(rrsig));
+	if (NULL == (keytag = ldns_rr_rrsig_keytag(rrsig)))
+	{
+		char	*str;
+
+		str = ldns_rr2str(rrsig);
+		zbx_snprintf(err, err_size, "cannot extract keytag from RRSIG \"%s\"", str);
+		zbx_free(str);
+
+		*rtt = ZBX_EC_DNS_NS_ERRSIG;
+		goto out;
+	}
+
+	rrsig_uint = ldns_rdf2native_int16(keytag);
 
 	keys_count = ldns_rr_list_rr_count(*keys);
 	for (i = 0; i < keys_count; i++)
 	{
-		uint16_t	dnskey_keytag;
+		uint16_t	dnskey_uint;
 		ldns_rr		*rr;
 
 		rr = ldns_rr_list_rr(*keys, i);
-		dnskey_keytag = ldns_calc_keytag(rr);
+		dnskey_uint = ldns_calc_keytag(rr);
 
-		if (dnskey_keytag == rrsig_keytag)
+		if (dnskey_uint == rrsig_uint)
 		{
 			if (NULL == matched_keys)
 				matched_keys = ldns_rr_list_new();
@@ -302,12 +315,6 @@ static int	zbx_get_ns_values(ldns_resolver *res, const char *ns, const char *ip,
 		zbx_snprintf(err, err_size, "invalid test name generated \"%s\"", testname);
 		*rtt = ZBX_EC_INTERNAL;
 		goto out;
-	}
-
-	if (NULL != keys)
-	{
-		/* set edns DO flag */
-		ldns_resolver_set_dnssec(res, true);
 	}
 
 	/* IN A query */
@@ -457,7 +464,6 @@ static int	zbx_get_ns_values(ldns_resolver *res, const char *ns, const char *ip,
 
 	/* successful rtt */
 	*rtt = ldns_pkt_querytime(pkt);
-
 
 	/* no errors */
 	ret = SUCCEED;
