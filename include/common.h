@@ -283,10 +283,10 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define OPERATION_OBJECT_GROUP			1
 
 /* condition evaluation types */
-#define ACTION_EVAL_TYPE_AND_OR			0
-#define ACTION_EVAL_TYPE_AND			1
-#define ACTION_EVAL_TYPE_OR			2
-#define ACTION_EVAL_TYPE_EXPRESSION		3
+#define CONDITION_EVAL_TYPE_AND_OR		0
+#define CONDITION_EVAL_TYPE_AND			1
+#define CONDITION_EVAL_TYPE_OR			2
+#define CONDITION_EVAL_TYPE_EXPRESSION		3
 
 /* condition types */
 #define CONDITION_TYPE_HOST_GROUP		0
