@@ -434,7 +434,20 @@ static void	*__mem_realloc(zbx_mem_info_t *info, void *old, zbx_uint64_t size)
 	}
 	else
 	{
-		void	*tmp = NULL;
+		void		*tmp = NULL;
+
+		/* check if there would be enough space if the current chunk */
+		/* would be freed before allocating a new one                */
+		new_chunk_size = chunk_size;
+
+		if (0 != next_free)
+			new_chunk_size += CHUNK_SIZE(next_chunk) + 2 * MEM_SIZE_FIELD;
+
+		if (info->lo_bound < chunk && FREE_CHUNK(chunk - MEM_SIZE_FIELD))
+			new_chunk_size += CHUNK_SIZE(chunk - MEM_SIZE_FIELD) + 2 * MEM_SIZE_FIELD;
+
+		if (size > new_chunk_size)
+			return NULL;
 
 		tmp = zbx_malloc(tmp, chunk_size);
 
@@ -442,40 +455,13 @@ static void	*__mem_realloc(zbx_mem_info_t *info, void *old, zbx_uint64_t size)
 
 		__mem_free(info, old);
 
-		new_chunk = __mem_malloc(info, size);
-
-		if (NULL != new_chunk)
+		if (NULL == (new_chunk = __mem_malloc(info, size)))
 		{
-			memcpy(new_chunk + MEM_SIZE_FIELD, tmp, chunk_size);
-		}
-		else
-		{
-			int	index;
-			void	*last_chunk;
-
-			index = mem_bucket_by_size(chunk_size);
-			last_chunk = info->buckets[index];
-
-			mem_unlink_chunk(info, last_chunk);
-
-			if (chunk != last_chunk)
-			{
-				/* The chunk was merged with a free space on the left during  */
-				/* __mem_free() operation. The left chunk must be restored to */
-				/* its previous state to avoid memory leaks.                  */
-				/* We can safely ignore if the chunk was merged on the right  */
-				/* as it will just increase the size of allocated chunk.      */
-				zbx_uint64_t	left_size;
-
-				left_size = chunk - last_chunk - 2 * MEM_SIZE_FIELD;
-				mem_set_chunk_size(chunk, CHUNK_SIZE(chunk) - left_size - 2 * MEM_SIZE_FIELD);
-				mem_set_chunk_size(last_chunk, left_size);
-				mem_link_chunk(info, last_chunk);
-			}
-
-			memcpy(chunk + MEM_SIZE_FIELD, tmp, chunk_size);
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(FAIL);
 		}
 
+		memcpy(new_chunk + MEM_SIZE_FIELD, tmp, chunk_size);
 		zbx_free(tmp);
 
 		return new_chunk;
