@@ -32,7 +32,7 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 				});
 
 			$('#evaltype').change(function() {
-				var custom = ($(this).val() == <?php echo ACTION_EVAL_TYPE_EXPRESSION ?>);
+				var custom = ($(this).val() == <?php echo CONDITION_EVAL_TYPE_EXPRESSION ?>);
 				$('#expression').toggleClass('hidden', custom);
 				$('#formula').toggleClass('hidden', !custom);
 			});

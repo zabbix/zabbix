@@ -96,7 +96,7 @@ $fields = array(
 	'trapper_hosts' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})&&isset({type})&&({type}==2)'),
 	'lifetime' => 			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
 	'evaltype' =>			array(T_ZBX_INT, O_OPT, null,
-		IN(array(ACTION_EVAL_TYPE_AND_OR, ACTION_EVAL_TYPE_AND, ACTION_EVAL_TYPE_OR, ACTION_EVAL_TYPE_EXPRESSION)), 'isset({save})'
+		IN(array(CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION)), 'isset({save})'
 	),
 	'formula' => 			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
 	'conditions' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
