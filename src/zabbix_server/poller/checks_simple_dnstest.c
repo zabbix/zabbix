@@ -1245,10 +1245,15 @@ int	check_dnstest_dns(DC_ITEM *item, const char *keyname, const char *params, AG
 	ret = SYSINFO_RET_OK;
 
 	/* get DNSKEY records */
-	if (0 != dnssec_enabled && SUCCEED != zbx_get_dnskeys(res, domain, res_ip, &keys, log_fd, &res_ec,
-			err, sizeof(err)))
+	if (0 != dnssec_enabled)
 	{
-		zbx_dns_err(log_fd, err);
+		/* set edns DO flag */
+		ldns_resolver_set_dnssec(res, true);
+
+		if (SUCCEED != zbx_get_dnskeys(res, domain, res_ip, &keys, log_fd, &res_ec, err, sizeof(err)))
+		{
+			zbx_dns_err(log_fd, err);
+		}
 	}
 
 	nss_num = zbx_get_nameservers(items, items_num, &nss);
