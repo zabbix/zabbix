@@ -122,9 +122,6 @@ static int	zbx_create_resolver(ldns_resolver **res, const char *name, const char
 	/* set number of tries */
 	ldns_resolver_set_retry(*res, retries);
 
-	/* set edns DO flag */
-	ldns_resolver_set_dnssec(*res, true);
-
 	/* unset the CD flag */
 	ldns_resolver_set_dnssec_cd(*res, false);
 
