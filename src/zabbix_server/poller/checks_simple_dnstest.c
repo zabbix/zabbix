@@ -99,10 +99,6 @@ static int	zbx_create_resolver(ldns_resolver **res, const char *name, const char
 		goto out;
 	}
 
-	/* push nameserver to it */
-	if (SUCCEED != zbx_set_resolver_ns(*res, name, ip, ipv4_enabled, ipv6_enabled, err, err_size))
-		goto out;
-
 	if (ZBX_DNSTEST_UDP == proto)
 	{
 		tv.tv_sec = ZBX_DNSTEST_UDP_TIMEOUT;
@@ -122,6 +118,9 @@ static int	zbx_create_resolver(ldns_resolver **res, const char *name, const char
 	/* set number of tries */
 	ldns_resolver_set_retry(*res, retries);
 
+	/* set DNSSEC */
+	ldns_resolver_set_dnssec(*res, true);
+
 	/* unset the CD flag */
 	ldns_resolver_set_dnssec_cd(*res, false);
 
@@ -138,6 +137,10 @@ static int	zbx_create_resolver(ldns_resolver **res, const char *name, const char
 
 	ldns_resolver_set_ip6(*res, ip_support);
 
+	/* push nameserver to it */
+	if (SUCCEED != zbx_set_resolver_ns(*res, name, ip, ipv4_enabled, ipv6_enabled, err, err_size))
+		goto out;
+
 	ret = SUCCEED;
 out:
 	return ret;
@@ -146,7 +149,11 @@ out:
 static int	zbx_change_resolver(ldns_resolver *res, const char *name, const char *ip, char ipv4_enabled,
 		char ipv6_enabled, char *err, size_t err_size)
 {
-	ldns_rdf_deep_free(ldns_resolver_pop_nameserver(res));
+	ldns_rdf	*pop;
+
+	/* remove current list of nameservers from resolver */
+	while (NULL != (pop = ldns_resolver_pop_nameserver(res)))
+		ldns_rdf_deep_free(pop);
 
 	return zbx_set_resolver_ns(res, name, ip, ipv4_enabled, ipv6_enabled, err, err_size);
 }
@@ -1242,6 +1249,7 @@ int	check_dnstest_dns(DC_ITEM *item, const char *keyname, const char *params, AG
 		goto out;
 	}
 
+	/* from this point item will not become NOT_SUPPORTED */
 	ret = SYSINFO_RET_OK;
 
 	/* get DNSKEY records */
@@ -1857,7 +1865,7 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 		goto out;
 	}
 
-	/* from this point something will be saved as rddstest item values, either error code or real result */
+	/* from this point item will not become NOT_SUPPORTED */
 	ret = SYSINFO_RET_OK;
 
 	/* start RDDS43 test, resolve hosts to ips */
