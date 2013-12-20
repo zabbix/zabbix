@@ -5,6 +5,8 @@ New features:
 A.F....... [ZBX-1357] updated American English, French, Hungarian, Italian, Japanese, Russian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-7521] fixed crash if value cache entered low memory mode when adding a new item to the cache (wiper)
+...G...PS. [ZBX-7521] fixed memory allocator realloc() function bug in low memory situations (wiper)
 ...G...PS. [ZBX-4243] fixed Zabbix syslog application names (RFC 5424 APP-NAME) (Andris)
 ..F....... [ZBX-3855] fixed bug that prevented the frontend from working with the Turkish locale (Pavels)
 A......... [ZBX-7483] fixed user group delete validation (Eduard)
