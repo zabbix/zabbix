@@ -95,6 +95,10 @@ $fields = array(
 		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_IPMI.'))', _('IPMI sensor')),
 	'trapper_hosts' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})&&isset({type})&&({type}==2)'),
 	'lifetime' => 			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
+	'evaltype' =>			array(T_ZBX_INT, O_OPT, null,
+		IN(array(ACTION_EVAL_TYPE_AND_OR, ACTION_EVAL_TYPE_AND, ACTION_EVAL_TYPE_OR, ACTION_EVAL_TYPE_EXPRESSION)), 'isset({save})'
+	),
+	'formula' => 			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
 	'conditions' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	// actions
 	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -229,7 +233,9 @@ elseif (isset($_REQUEST['save'])) {
 		'params' => get_request('params'),
 		'ipmi_sensor' => get_request('ipmi_sensor'),
 		'lifetime' => get_request('lifetime'),
-		'conditions' => array(),
+		'evaltype' => getRequest('evaltype'),
+		'formula' => getRequest('formula'),
+		'conditions' => array()
 	);
 
 	// add macros; ignore empty new macros
@@ -322,10 +328,14 @@ if (isset($_REQUEST['form'])) {
 	$data = getItemFormData($rule, array('is_discovery_rule' => true));
 	$data['page_header'] = _('CONFIGURATION OF DISCOVERY RULES');
 	$data['lifetime'] = getRequest('lifetime', 30);
+	$data['evaltype'] = getRequest('evaltype');
+	$data['formula'] = getRequest('formula');
 	$data['conditions'] = getRequest('conditions', array());
 
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
 		$data['lifetime'] = $rule['lifetime'];
+		$data['evaltype'] = $rule['evaltype'];
+		$data['formula'] = $rule['formula'];
 		$data['conditions'] = $rule['conditions'];
 	}
 

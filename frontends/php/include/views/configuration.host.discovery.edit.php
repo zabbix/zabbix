@@ -266,16 +266,37 @@ $itemFormList->addRow(_('Enabled'), $enabledCheckBox);
 /*
  * Condition tab
  */
+$conditionFormList = new CFormList('conditionlist');
+
+// type of calculation
+$formula = new CTextBox('formula', $this->data['formula']);
+$formula->attr('id', 'formula');
+if ($this->data['evaltype'] != ACTION_EVAL_TYPE_EXPRESSION)  {
+	$formula->addClass('hidden');
+}
+$conditionFormList->addRow(_('Type of calculation'),
+	array(
+		new CComboBox('evaltype', $this->data['evaltype'], null, array(
+			ACTION_EVAL_TYPE_AND_OR => _('AND / OR'),
+			ACTION_EVAL_TYPE_AND => _('AND'),
+			ACTION_EVAL_TYPE_OR => _('OR'),
+			ACTION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+		)),
+		new CSpan('', ($this->data['evaltype'] == ACTION_EVAL_TYPE_EXPRESSION) ? 'hidden' : '', 'expression'),
+		$formula
+	),
+	(count($this->data['conditions']) < 2), 'conditionRow'
+);
+
+// macros
+$conditionTable = new CTable('', 'formElementTable');
+$conditionTable->attr('id', 'conditions');
+$conditionTable->addRow(array(_('Macro'), SPACE, _('Regular expression'), SPACE));
+
 $conditions = $this->data['conditions'];
 if (!$conditions) {
 	$conditions = array(array('macro' => '', 'value' => ''));
 }
-
-$conditionFormList = new CFormList('conditionlist');
-
-$conditionTable = new CTable('', 'formElementTable');
-$conditionTable->attr('id', 'conditions');
-$conditionTable->addRow(array(_('Macro'), SPACE, _('Regular expression'), SPACE));
 
 // fields
 foreach ($conditions as $i => $condition) {
