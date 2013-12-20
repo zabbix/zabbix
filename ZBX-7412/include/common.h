@@ -1043,8 +1043,10 @@ int	is_macro_char(char c);
 int	is_time_function(const char *func);
 
 int	parse_host(char **exp, char **host);
-int	parse_key(char **exp, char **key);
+int	parse_key(char **exp);
 int	parse_function(char **exp, char **func, char **params);
+
+int	get_item_key(char **exp, char **key);
 
 int	parse_host_key(char *exp, char **host, char **key);
 

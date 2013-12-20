@@ -864,6 +864,56 @@ int	zbx_check_hostname(const char *hostname)
 
 /******************************************************************************
  *                                                                            *
+ * Function: get_item_key                                                     *
+ *                                                                            *
+ * Purpose: return key with parameters (if present)                           *
+ *                                                                            *
+ *  e.g., system.run[cat /etc/passwd | awk -F: '{ print $1 }']                *
+ *                                                                            *
+ * Parameters: exp - [IN] pointer to the first char of key                    *
+ *             key - [OUT] pointer to the resulted key                        *
+ *                                                                            *
+ *  e.g., {host:system.run[cat /etc/passwd | awk -F: '{ print $1 }'].last(0)} *
+ *              ^                                                             *
+ *                                                                            *
+ * Return value: return SUCCEED and move exp to the next character after key  *
+ *               or FAIL and move exp to incorrect character                  *
+ *                                                                            *
+ * Notes: implements the functionality of old parse_key() in a safe manner.   *
+ *        input pointer is NOT advanced.                                      *
+ *                                                                            *
+ ******************************************************************************/
+int     get_item_key(const char **const exp, char **key)
+{
+	char    *p = NULL, *s = NULL;
+	int      key_length = 0;
+
+	if (key == NULL)
+		return FAIL;
+
+	o = p = *exp;
+
+	if (SUCCEED != parse_key(&p))
+		return FAIL;
+
+	if ('(' == *p)
+	{
+		for (s = p - 1; o <= s && '.' != *s; s--)
+			;
+
+		if (s <= o)
+			return FAIL;
+	}
+
+	key_length = s - o;
+	*key = zbx_malloc(NULL, (key_length + 1) * sizeof(char));
+	zbx_strlcpy(*key, *exp, key_length + 1);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: parse_host                                                       *
  *                                                                            *
  * Purpose: parse hostname                                                    *
@@ -913,60 +963,41 @@ int	parse_host(char **exp, char **host)
  *                                                                            *
  * Function: parse_key                                                        *
  *                                                                            *
- * Purpose: return key with parameters (if present)                           *
+ * Purpose: return key with parameters (if present)                     (old) *
+ *                                                                            *
+ * Purpose: advances pointer to first invalid character in string             *
+ *          ensuring that everything before it is a valid key           (new) *
  *                                                                            *
  *  e.g., system.run[cat /etc/passwd | awk -F: '{ print $1 }']                *
  *                                                                            *
  * Parameters: exp - pointer to the first char of key                         *
- *             key - pointer to the resulted key                              *
+ *             key - pointer to the resulted key                    (removed) *
  *                                                                            *
  *  e.g., {host:system.run[cat /etc/passwd | awk -F: '{ print $1 }'].last(0)} *
  *              ^                                                             *
  *                                                                            *
  * Return value: return SUCCEED and move exp to the next character after key  *
- *               or FAIL and move exp to incorrect character                  *
+ *               or FAIL and move exp to incorrect character            (old) *
+ *                                                                            *
+ * Return value: returns FAIL only if no key is present (length 0),     (new) *
+ *               or the whole string is invalid. Otherwise succeeds.          *
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
+ * Last update: 19/12/2013 (dd/mm/yyyy)                                       *
+ *                                                                            *
  ******************************************************************************/
-int	parse_key(char **exp, char **key)
+int     parse_key(char **exp)
 {
-	char	c;
-	char	*p, *r, *s;
-
-	p = *exp;
+	char	*s;
 
 	for (s = *exp; SUCCEED == is_key_char(*s); s++)
 		;
 
-	if ('\0' == *s)		/* no function specified? */
+	if ('[' == *s)     /* for instance, net.tcp.port[,80] */
 	{
-		*key = strdup(p);
-		*exp = s;
-		return SUCCEED;
-	}
-	else if ('(' == *s)	/* for instance, ssh,22.last(0) */
-	{
-		for (r = s - 1; p <= r && '.' != *r; r--)
-			;
-
-		if (r <= p)
-		{
-			*exp = s;
-			return FAIL;
-		}
-
-		*r = '\0';
-		*key = strdup(p);
-		*r = '.';
-
-		*exp = r;
-		return SUCCEED;
-	}
-	else if ('[' == *s)	/* for instance, net.tcp.port[,80] */
-	{
-		int	state = 0;	/* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
-		int	array = 0;	/* array nest level */
+		int     state = 0;      /* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
+		int     array = 0;      /* array nest level */
 
 		for (s++; '\0' != *s; s++)
 		{
@@ -976,7 +1007,7 @@ int	parse_key(char **exp, char **key)
 				case 0:
 					if (',' == *s)
 						;
-					else if (']' == *s && '[' == s[1] && 0 == array)	/* Zapcat */
+					else if (']' == *s && '[' == s[1] && 0 == array)        /* Zapcat */
 						s++;
 					else if ('"' == *s)
 						state = 1;
@@ -999,7 +1030,7 @@ int	parse_key(char **exp, char **key)
 						if (',' != s[1] && !(0 != array && ']' == s[1]))
 						{
 							s++;
-							goto fail;	/* incorrect syntax */
+							goto fail;      /* incorrect syntax */
 						}
 					}
 					else if (']' == *s && 0 == array)
@@ -1015,7 +1046,7 @@ int	parse_key(char **exp, char **key)
 						while (' ' == s[1])
 							s++;
 
-						if (0 == array && ']' == s[1] && '[' == s[2])	/* Zapcat */
+						if (0 == array && ']' == s[1] && '[' == s[2])   /* Zapcat */
 						{
 							state = 0;
 							break;
@@ -1030,7 +1061,7 @@ int	parse_key(char **exp, char **key)
 						if (',' != s[1] && !(0 != array && ']' == s[1]))
 						{
 							s++;
-							goto fail;	/* incorrect syntax */
+							goto fail;      /* incorrect syntax */
 						}
 
 						state = 0;
@@ -1040,7 +1071,7 @@ int	parse_key(char **exp, char **key)
 					break;
 				/* unquoted */
 				case 2:
-					if (0 == array && ']' == *s && '[' == s[1])	/* Zapcat */
+					if (0 == array && ']' == *s && '[' == s[1])     /* Zapcat */
 					{
 						s--;
 						state = 0;
@@ -1059,19 +1090,13 @@ fail:
 		*exp = s;
 		return FAIL;
 succeed:
-		c = *(++s);
-		*s = '\0';
-		*key = strdup(p);
-		*s = c;
-
-		*exp = s;
-		return SUCCEED;
+		s++;
 	}
-	else
-	{
-		*exp = s;
+	else if (*exp == s)
 		return FAIL;
-	}
+
+	*exp = s;
+	return SUCCEED;
 }
 
 /******************************************************************************
