@@ -21,96 +21,117 @@
 
 class CUIWidget extends CDiv {
 
-	public $domid;
+	public $id;
 	public $state;
-	public $css_class;
-	private $_header;
-	private $_body;
-	private $_footer;
+	public $css;
+	public $refreshParams;
+	private $header;
+	private $body;
+	private $footer;
 
-	public function __construct($id, $body = null, $state = null) {
-		$this->domid = $id;
-		$this->state = $state; // 0 - closed, 1 - opened
-		$this->css_class = 'header';
-		$this->_header = null;
-		$this->_body = array($body);
-		$this->_footer = null;
+	public function __construct($id, $body = null) {
+		$this->id = $id;
+		$this->css = 'header';
+		$this->header = null;
+		$this->body = array($body);
+		$this->footer = null;
 
 		parent::__construct(null, 'ui-widget ui-widget-content ui-helper-clearfix ui-corner-all widget');
-		$this->setAttribute('id', $id.'_widget');
+
+		$this->setAttribute('id', $this->id.'_widget');
 	}
 
 	public function addItem($item) {
-		if (!is_null($item)) {
-			$this->_body[] = $item;
+		if ($item !== null) {
+			$this->body[] = $item;
 		}
+	}
+
+	// 0 - closed, 1 - opened
+	public function setState($state) {
+		$this->state = $state;
 	}
 
 	public function setHeader($caption = null, $icons = SPACE) {
 		zbx_value2array($icons);
-		if (is_null($caption) && !is_null($icons)) {
+
+		if ($caption === null && $icons !== null) {
 			$caption = SPACE;
 		}
-		$this->_header = new CDiv(null, 'nowrap ui-corner-all ui-widget-header '.$this->css_class);
 
-		if (!is_null($this->state)) {
+		$this->header = new CDiv(null, 'nowrap ui-corner-all ui-widget-header '.$this->css);
+
+		if ($this->state !== null) {
 			$icon = new CIcon(
 				_('Show').'/'._('Hide'),
 				$this->state ? 'arrowup' : 'arrowdown',
-				"changeHatStateUI(this,'".$this->domid."');"
+				'changeWidgetState(this, "'.$this->id.'");'
 			);
-			$icon->setAttribute('id', $this->domid.'_icon');
-			$this->_header->addItem($icon);
+			$icon->setAttribute('id', $this->id.'_icon');
+
+			$this->header->addItem($icon);
 		}
-		$this->_header->addItem($icons);
-		$this->_header->addItem($caption);
-		return $this->_header;
+
+		$this->header->addItem($icons);
+		$this->header->addItem($caption);
 	}
 
-	public function setDoubleHeader($left, $right) {
+	public function setDoubleHeader($leftColumn, $rightColumn) {
+		$leftColumn = new CCol($leftColumn);
+		$leftColumn->addStyle('text-align: left; border: 0;');
+
+		$rightColumn = new CCol($rightColumn);
+		$rightColumn->addStyle('text-align: right; border: 0;');
+
 		$table = new CTable();
 		$table->addStyle('width: 100%;');
-		$lCol = new CCol($left);
-		$lCol->addStyle('text-align: left; border: 0;');
-		$rCol = new CCol($right);
-		$rCol->addStyle('text-align: right; border: 0;');
-		$table->addRow(array($lCol, $rCol));
+		$table->addRow(array($leftColumn, $rightColumn));
 
-		$this->_header = new CDiv(null, 'nowrap ui-corner-all ui-widget-header '.$this->css_class);
-		$this->_header->addItem($table);
-		return $this->_header;
+		$this->header = new CDiv(null, 'nowrap ui-corner-all ui-widget-header '.$this->css);
+		$this->header->addItem($table);
 	}
 
 	public function setFooter($footer, $right = false) {
-		$this->_footer = new CDiv($footer, 'nowrap ui-corner-all ui-widget-header footer '.($right ? ' right' : ' left'));
-		return $this->_footer;
+		$this->footer = new CDiv($footer, 'nowrap ui-corner-all ui-widget-header footer '.($right ? ' right' : ' left'));
 	}
 
-	public function get() {
-		$this->cleanItems();
-		parent::addItem($this->_header);
+	public function setRefresh($frequency = 60) {
+		$this->refreshParams = array(
+			'frequency' => $frequency,
+			'url' => '?output=html',
+			'counter' => 0,
+			'darken' => 0,
+			'params' => array('widgetRefresh' => $this->id)
+		);
+	}
 
-		if (is_null($this->state)) {
+	public function build() {
+		$this->cleanItems();
+
+		parent::addItem($this->header);
+
+		if ($this->state === null) {
 			$this->state = true;
 		}
 
-		$div = new CDiv($this->_body, 'body');
-		$div->setAttribute('id', $this->domid);
+		$div = new CDiv($this->body, 'body');
+		$div->setAttribute('id', $this->id);
 
 		if (!$this->state) {
 			$div->setAttribute('style', 'display: none;');
-			if ($this->_footer) {
-				$this->_footer->setAttribute('style', 'display: none;');
+
+			if ($this->footer) {
+				$this->footer->setAttribute('style', 'display: none;');
 			}
 		}
 
 		parent::addItem($div);
-		parent::addItem($this->_footer);
-		return $this;
+		parent::addItem($this->footer);
 	}
 
 	public function toString($destroy = true) {
-		$this->get();
+		$this->build();
+
 		return parent::toString($destroy);
 	}
 }

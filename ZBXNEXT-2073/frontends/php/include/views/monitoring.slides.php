@@ -30,7 +30,7 @@ $configComboBox->addItem('screens.php', _('Screens'));
 $configComboBox->addItem('slides.php', _('Slide shows'));
 $slideHeaderForm->addItem($configComboBox);
 
-if (empty($this->data['slideshows'])) {
+if ($this->data['slideshows']) {
 	$slideWidget->addPageHeader(
 		_('SLIDE SHOWS'),
 		array(
@@ -48,8 +48,9 @@ else {
 		: new CIcon(_('Favourites'), 'iconplus');
 
 	$refreshIcon = new CIcon(_('Menu'), 'iconmenu');
-	if (!empty($this->data['screen'])) {
-		$refreshIcon->addAction('onclick', 'javascript: create_page_menu(event, "hat_slides");');
+
+	if ($this->data['screen']) {
+		$refreshIcon->setMenuPopup(getMenuPopupRefresh('hat_slides', $this->data['refreshMultiplier'], true));
 	}
 
 	$slideWidget->addPageHeader(
@@ -77,7 +78,7 @@ else {
 
 	$slideWidget->addHeader($this->data['slideshows'][$this->data['elementid']]['name'], $slideForm);
 
-	if (!empty($this->data['screen'])) {
+	if ($this->data['screen']) {
 		if (isset($this->data['isDynamicItems'])) {
 			$slideForm->addItem(array(SPACE, _('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()));
 			$slideForm->addItem(array(SPACE, _('Host'), SPACE, $this->data['pageFilter']->getHostsCB()));
@@ -89,8 +90,6 @@ else {
 		$slideWidget->addFlicker(BR(), CProfile::get('web.slides.filter.state', 1));
 
 		// js menu
-		insert_js('var page_menu='.zbx_jsvalue($this->data['menu']).";\n".'var page_submenu='.zbx_jsvalue($this->data['submenu']).";\n");
-
 		add_doll_objects(array(array(
 			'id' => 'hat_slides',
 			'frequency' => $this->data['element']['delay'] * $this->data['refresh_multiplier'],
@@ -104,5 +103,20 @@ else {
 		$slideWidget->addItem(new CTableInfo(_('No slides found.')));
 	}
 }
+
+/*
+ * Javascript
+ */
+// start refresh process
+$slideshowRefreshParams = array(
+	'hat_slides' => array(
+		'frequency' => '60',
+		'url' => '?output=html',
+		'counter' => 0,
+		'darken' => 0,
+		'params' => array('widgetRefresh' => 'hat_slides')
+	)
+);
+zbx_add_post_js('initPMaster("slideshows", '.zbx_jsvalue($slideshowRefreshParams).');');
 
 return $slideWidget;

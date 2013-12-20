@@ -378,6 +378,32 @@ function getMenuPopupHistory(options) {
 }
 
 /**
+ * Get menu popup refresh section data.
+ *
+ * @param string options['widgetName']
+ * @param string options['currentRate']
+ * @param bool   options['multiplier']
+ *
+ * @return array
+ */
+function getMenuPopupRefresh(options) {
+	var intervals = options.multiplier
+		? {'x0.25': 0.25, 'x0.5': 0.5, 'x1': 1, 'x1.5': 1.5, 'x2': 2, 'x3': 3, 'x4': 4, 'x5': 5}
+		: {10: t('10 seconds'), 30: t('30 seconds'), 60: t('1 minute'), 120: t('2 minutes'), 600: t('10 minutes'),
+			900: t('15 minutes')};
+
+	return [{
+		type: 'refresh',
+		title: options.multiplier ? t('Refresh time multiplier') : t('Refresh time'),
+		data: {
+			widgetName: options['widgetName'],
+			currentRate: options['currentRate'],
+			intervals: intervals
+		}
+	}];
+}
+
+/**
  * Recursive function to prepare menu tree data for createMenuTree().
  *
  * @param array  tree		menu tree data, will be modified by reference
@@ -489,6 +515,45 @@ jQuery(function($) {
 							menuPopup.append(menu);
 						}
 					}
+
+					// refresh
+					else if (section.type === 'refresh') {
+						var menu = $('<ul>', {'class': 'menu'});
+
+						$.each(section.data.intervals, function(value, label) {
+							css = (value === section.data.currentRate) ? 'selected' : '';
+
+							menu.append(createMenuItem(label, null, value, css, null, function() {
+								sendAjaxData({
+									data: {
+										widgetName: section.data.widgetName,
+										widgetRefreshRate: value,
+									},
+									dataType: 'script',
+									success: function(js) { js }
+								});
+
+								var currentRate = $(this).data('value');
+
+								$('li', menu).each(function() {
+									var obj = $(this);
+
+									if (obj.data('value') == currentRate) {
+										obj.addClass('selected');
+									}
+									else {
+										obj.removeClass('selected');
+									}
+								});
+
+								menuPopup.fadeOut(100);
+							}));
+						});
+
+						menuPopup.append($('<div>', {'class': 'title', text: section.title}));
+						menuPopup.append(menu);
+					}
+
 					// links
 					else {
 						var menu = $('<ul>', {'class': 'menu'});
@@ -633,7 +698,7 @@ jQuery(function($) {
 				createMenuTree(innerUl, item.items);
 			}
 
-			var li = createMenuItem(name, null, innerUl);
+			var li = createMenuItem(name, null, null, null, innerUl);
 
 			if (objectSize(item.params) > 0) {
 				$.each(item.params, function(key, value) {
@@ -646,21 +711,36 @@ jQuery(function($) {
 	}
 
 	/**
-	 * Create new menu item.
+	 * Create new menu item link.
 	 *
-	 * @param string label		name of item
-	 * @param string link		url to create onClick action, by default is empty
-	 * @param object subMenu	sub menu to build menu tree
+	 * @param string label			name of item
+	 * @param string url			url to create onClick action, by default is empty
+	 * @param string value			item value
+	 * @param string css			css class
+	 * @param object subMenu		sub menu to build menu tree
+	 * @param object clickCallback	item click javascript callback
 	 *
-	 * @return object			list item
+	 * @return object				list item
 	 */
-	function createMenuItem(label, link, subMenu) {
-		return $('<li>').append(
-			$('<a>', {
-				text: label,
-				href: link
-			}),
-			(typeof subMenu === 'undefined') ? null : subMenu
-		);
+	function createMenuItem(label, url, value, css, subMenu, clickCallback) {
+		var item = $('<li>').append($('<a>', {html: label, href: url}));
+
+		if (typeof value !== 'undefined') {
+			item.data('value', value);
+		}
+
+		if (typeof css !== 'undefined') {
+			item.addClass(css);
+		}
+
+		if (typeof clickCallback !== 'undefined') {
+			item.click(clickCallback);
+		}
+
+		if (typeof subMenu !== 'undefined') {
+			item.append(subMenu);
+		}
+
+		return item;
 	}
 });

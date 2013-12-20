@@ -126,7 +126,9 @@ searchServer: function(needle){
 			'limit': this.suggestLimit
 		},
 		'onSuccess': this.serverRespond.bind(this, needle),
-		'onFailure': function(){zbx_throw('Suggest Widget: search request failed.');}
+		'onFailure': function() {
+			throw('Suggest Widget: search request failed.');
+		}
 	};
 
 	new RPC.Call(rpcRequest);

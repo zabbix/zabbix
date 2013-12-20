@@ -1902,65 +1902,16 @@ function getPagingLine(&$items, array $removeUrlParams = array(), array $urlPara
 	return $table;
 }
 
-/************* DYNAMIC REFRESH *************/
-function add_doll_objects($ref_tab, $pmid = 'mainpage') {
-	$upd_script = array();
-	foreach ($ref_tab as $id => $doll) {
-		$upd_script[$doll['id']] = format_doll_init($doll);
-	}
-	zbx_add_post_js('initPMaster('.zbx_jsvalue($pmid).', '.zbx_jsvalue($upd_script).');');
-}
-
-function format_doll_init($doll) {
-	$args = array(
-		'frequency' => 60,
-		'url' => '',
-		'counter' => 0,
-		'darken' => 0,
-		'params' => array()
-	);
-	foreach ($args as $key => $def) {
-		if (isset($doll[$key])) {
-			$obj[$key] = $doll[$key];
-		}
-		else {
-			$obj[$key] = $def;
-		}
-	}
-	$obj['url'] .= (zbx_empty($obj['url']) ? '?' : '&').'output=html';
-	$obj['params']['favobj'] = 'hat';
-	$obj['params']['favref'] = $doll['id'];
-	$obj['params']['favaction'] = 'refresh';
-
-	return $obj;
-}
-
-function get_update_doll_script($pmasterid, $dollid, $key, $value = '') {
-	return 'PMasters['.zbx_jsvalue($pmasterid).'].dolls['.zbx_jsvalue($dollid).'].'.$key.'('.zbx_jsvalue($value).');';
-}
-
-function make_refresh_menu($pmid, $dollid, $cur_interval, $params = null, &$menu, &$submenu, $menu_type = 1) {
-	if ($menu_type == 1) {
-		$intervals = array('10' => 10, '30' => 30, '60' => 60, '120' => 120, '600' => 600, '900' => 900);
-		$title = _('Refresh time in seconds');
-	}
-	elseif ($menu_type == 2) {
-		$intervals = array('x0.25' => 0.25, 'x0.5' => 0.5, 'x1' => 1, 'x1.5' => 1.5, 'x2' => 2, 'x3' => 3, 'x4' => 4, 'x5' => 5);
-		$title = _('Refresh time multiplier');
-	}
-
-	$menu['menu_'.$dollid][] = array($title, null, null, array('outer' => array('pum_oheader'), 'inner' => array('pum_iheader')));
-
-	foreach ($intervals as $key => $value) {
-		$menu['menu_'.$dollid][] = array(
-			$key,
-			'javascript: setRefreshRate('.zbx_jsvalue($pmid).', '.zbx_jsvalue($dollid).', '.$value.', '.zbx_jsvalue($params).');'.
-			'void(0);',
-			null,
-			array('outer' => ($value == $cur_interval) ? 'pum_b_submenu' : 'pum_o_submenu', 'inner' => array('pum_i_submenu')
-		));
-	}
-	$submenu['menu_'.$dollid][] = array();
+/**
+ * Update widget refresh parameters.
+ *
+ * @param string $processId
+ * @param string $widgetId
+ * @param string $key
+ * @param string $value
+ */
+function updateWidgetRefresh($processId, $widgetId, $key, $value = '') {
+	return 'PMasters['.zbx_jsvalue($processId).'].dolls['.zbx_jsvalue($widgetId).'].'.$key.'('.zbx_jsvalue($value).');';
 }
 
 /************* MATH *************/
@@ -2797,6 +2748,24 @@ function getMenuPopupTrigger(array $trigger, array $items = null, array $acknowl
 	}
 
 	return $data;
+}
+
+/**
+ * Prepare data for refresh time menu popup.
+ *
+ * @param string $widgetName
+ * @param string $currentRate
+ * @param bool   $multiplier
+ *
+ * @return array
+ */
+function getMenuPopupRefresh($widgetName, $currentRate, $multiplier = false) {
+	return array(
+		'type' => 'refresh',
+		'widgetName' => $widgetName,
+		'currentRate' => $currentRate,
+		'multiplier' => $multiplier
+	);
 }
 
 /**

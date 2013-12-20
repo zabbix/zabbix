@@ -72,6 +72,10 @@ jQuery(function($) {
 			case 'map':
 				data = getMenuPopupMap(data);
 				break;
+
+			case 'refresh':
+				data = getMenuPopupRefresh(data);
+				break;
 		}
 
 		obj.menuPopup(data, event);

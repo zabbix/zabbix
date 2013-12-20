@@ -45,6 +45,9 @@ $fields = array(
 	'reset' =>			array(T_ZBX_STR, O_OPT, P_SYS,	IN("'reset'"), null),
 	'fullscreen' =>		array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'), null),
 	// ajax
+	'widgetName' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,	null),
+	'widgetRefresh' =>	array(T_ZBX_STR, O_OPT, P_ACT,	null,	null),
+	'widgetRefreshRate' => array(T_ZBX_STR, O_OPT, P_ACT, null,	null),
 	'favobj' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,	null),
 	'favref' =>			array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY, null),
 	'favid' =>			array(T_ZBX_INT, O_OPT, P_ACT,	null,	null),
@@ -74,6 +77,43 @@ if (get_request('elementid')) {
 /*
  * Actions
  */
+// get fresh widget data
+if (hasRequest('widgetRefresh')) {
+	switch (getRequest('widgetRefresh')) {
+		case WIDGET_SYSTEM_STATUS:
+			$widget = make_system_status($dashboardConfig);
+			$widget->show();
+			break;
+	}
+}
+
+if (hasRequest('widgetName')) {
+	$widgetName = getRequest('widgetName');
+
+	$widgets = array(
+		WIDGET_SYSTEM_STATUS, WIDGET_ZABBIX_STATUS, WIDGET_LAST_ISSUES,
+		WIDGET_WEB_OVERVIEW, WIDGET_DISCOVERY_STATUS, WIDGET_HOST_STATUS
+	);
+
+	if (in_array($widgetName, $widgets)) {
+		// refresh rate
+		if (hasRequest('widgetRefreshRate')) {
+			$widgetRefreshRate = getRequest('widgetRefreshRate');
+
+			CProfile::update('web.dashboard.widget.'.$widgetName.'.rf_rate', $widgetRefreshRate, PROFILE_TYPE_INT);
+
+			echo updateWidgetRefresh('dashboard', $widgetName, 'frequency', $widgetRefreshRate)
+				.updateWidgetRefresh('dashboard', $widgetName, 'restartDoll');
+
+			if (str_in_array($_REQUEST['favref'], array('hat_slides'))) {
+				$elementid = get_request('elementid');
+
+				// TODO
+				CProfile::update('web.slides.rf_rate.hat_slides', $_REQUEST['favcnt'], PROFILE_TYPE_STR, $elementid);
+			}
+		}
+	}
+}
 if (isset($_REQUEST['favobj'])) {
 	$_REQUEST['pmasterid'] = get_request('pmasterid', 'mainpage');
 
@@ -97,7 +137,7 @@ if (isset($_REQUEST['favobj'])) {
 			}
 		}
 		if ($page['type'] == PAGE_TYPE_JS && $result) {
-			echo 'switchElementsClass("addrm_fav", "iconminus", "iconplus");';
+			echo 'switchElementClass("addrm_fav", "iconminus", "iconplus");';
 		}
 	}
 	elseif ($_REQUEST['favobj'] == 'hat') {
@@ -149,27 +189,14 @@ if (isset($_REQUEST['favobj'])) {
 					$refresh = ($screen['delay'] > 0) ? $screen['delay'] : $slideshow['delay'];
 					$refresh_multipl = CProfile::get('web.slides.rf_rate.hat_slides', 1, $elementid);
 
-					$script = get_update_doll_script('mainpage', $_REQUEST['favref'], 'frequency', $refresh * $refresh_multipl)."\n";
-					$script .= get_update_doll_script('mainpage', $_REQUEST['favref'], 'restartDoll')."\n";
+					$script = updateWidgetRefresh('mainpage', $_REQUEST['favref'], 'frequency', $refresh * $refresh_multipl)."\n";
+					$script .= updateWidgetRefresh('mainpage', $_REQUEST['favref'], 'restartDoll')."\n";
 					insert_js($script);
 				}
 			}
 			else {
 				echo SBR._('No slide shows defined.');
 			}
-		}
-	}
-	elseif ($_REQUEST['favobj'] == 'set_rf_rate') {
-		if (str_in_array($_REQUEST['favref'], array('hat_slides'))) {
-			$elementid = get_request('elementid');
-
-			CProfile::update('web.slides.rf_rate.hat_slides', $_REQUEST['favcnt'], PROFILE_TYPE_STR, $elementid);
-
-			$menu = array();
-			$submenu = array();
-
-			make_refresh_menu('mainpage', $_REQUEST['favref'], $_REQUEST['favcnt'], array('elementid' => $elementid), $menu, $submenu, 2);
-			echo 'page_menu["menu_'.$_REQUEST['favref'].'"] = '.zbx_jsvalue($menu['menu_'.$_REQUEST['favref']]).';'."\n";
 		}
 	}
 
@@ -190,35 +217,37 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  */
 $data = array(
 	'fullscreen' => $_REQUEST['fullscreen'],
+	'elementid' => get_request('elementid', CProfile::get('web.slides.elementid', null)),
 	'slideshows' => array()
 );
 
 // get slideshows
-$db_slideshows = DBselect(
+$dbSlideshows = DBselect(
 	'SELECT s.slideshowid,s.name'.
 	' FROM slideshows s'.
 	whereDbNode('s.slideshowid')
 );
-while ($slideshow = DBfetch($db_slideshows)) {
-	if (slideshow_accessible($slideshow['slideshowid'], PERM_READ)) {
-		$data['slideshows'][$slideshow['slideshowid']] = $slideshow;
+while ($dbSlideshow = DBfetch($dbSlideshows)) {
+	if (slideshow_accessible($dbSlideshow['slideshowid'], PERM_READ)) {
+		$data['slideshows'][$dbSlideshow['slideshowid']] = $dbSlideshow;
 	}
 };
 order_result($data['slideshows'], 'name');
-
-// get element id
-$data['elementid'] = get_request('elementid', CProfile::get('web.slides.elementid', null));
-
-CProfile::update('web.slides.elementid', $data['elementid'], PROFILE_TYPE_ID);
 
 if (!isset($data['slideshows'][$data['elementid']])) {
 	$slideshow = reset($data['slideshows']);
 	$data['elementid'] = $slideshow['slideshowid'];
 }
 
+CProfile::update('web.slides.elementid', $data['elementid'], PROFILE_TYPE_ID);
+
+// refresh
+$data['refreshMultiplier'] = CProfile::get('web.slides.rf_rate.hat_slides', 1, $data['elementid']);
+
 // get screen
-$data['screen'] = empty($data['elementid']) ? array() : get_slideshow($data['elementid'], 0);
-if (!empty($data['screen'])) {
+$data['screen'] = $data['elementid'] ? get_slideshow($data['elementid'], 0) : array();
+
+if ($data['screen']) {
 	// get groups and hosts
 	if (check_dynamic_items($data['elementid'], 1)) {
 		$data['isDynamicItems'] = true;
@@ -245,18 +274,6 @@ if (!empty($data['screen'])) {
 	}
 
 	show_messages();
-
-	// js menu
-	$data['menu'] = array();
-	$data['submenu'] = array();
-	$data['refresh_multiplier'] = CProfile::get('web.slides.rf_rate.hat_slides', 1, $data['elementid']);
-
-	if (empty($data['refresh_multiplier'])) {
-		$data['refresh_multiplier'] = 1;
-		CProfile::update('web.slides.rf_rate.hat_slides', $data['refresh_multiplier'], PROFILE_TYPE_STR, $data['elementid']);
-	}
-
-	make_refresh_menu('mainpage', 'hat_slides', $data['refresh_multiplier'], array('elementid' => $data['elementid']), $data['menu'], $data['submenu'], 2);
 }
 
 // render view

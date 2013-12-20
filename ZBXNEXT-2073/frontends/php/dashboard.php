@@ -32,28 +32,28 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'groupid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'view_style' =>	array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
-	'type' =>		array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
-	'output' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'jsscriptid' =>	array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
+	'groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'view_style' =>		array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
+	'type' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
+	'output' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'jsscriptid' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'fullscreen' =>		array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
 	// ajax
-	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'favref' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'favid' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
-	'favcnt' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'pmasterid' =>	array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'favaction' =>	array(T_ZBX_STR, O_OPT, P_ACT,	IN("'add','remove','refresh','flop','sort'"), null),
-	'favstate' =>	array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favaction})&&"flop"=={favaction}'),
-	'favdata' =>	array(T_ZBX_STR, O_OPT, null,	null,		null)
+	'widgetName' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	'widgetRefresh' =>	array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	'widgetRefreshRate' => array(T_ZBX_STR, O_OPT, P_ACT, null,		null),
+	'widgetSort' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	'widgetState' =>	array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	'favobj' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	'favaction' =>		array(T_ZBX_STR, O_OPT, P_ACT,	IN('"add","remove"'), null),
+	'favid' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,		null)
 );
 check_fields($fields);
 
 /*
  * Filter
  */
-$dashconf = array(
+$dashboardConfig = array(
 	'groupids' => null,
 	'maintenance' => null,
 	'severity' => null,
@@ -61,373 +61,368 @@ $dashconf = array(
 	'filterEnable' => CProfile::get('web.dashconf.filter.enable', 0)
 );
 
-if ($dashconf['filterEnable'] == 1) {
+if ($dashboardConfig['filterEnable'] == 1) {
 	// groups
-	$dashconf['grpswitch'] = CProfile::get('web.dashconf.groups.grpswitch', 0);
+	$dashboardConfig['grpswitch'] = CProfile::get('web.dashconf.groups.grpswitch', 0);
 
-	if ($dashconf['grpswitch'] == 0) {
+	if ($dashboardConfig['grpswitch'] == 0) {
 		// null mean all groups
-		$dashconf['groupids'] = null;
+		$dashboardConfig['groupids'] = null;
 	}
 	else {
-		$dashconf['groupids'] = zbx_objectValues(CFavorite::get('web.dashconf.groups.groupids'), 'value');
-		$hideGroupIds = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.groupids'), 'value');
+		$dashboardConfig['groupids'] = zbx_objectValues(CFavorite::get('web.dashconf.groups.groupids'), 'value');
+		$hideHostGroupIds = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.groupids'), 'value');
 
-		if ($hideGroupIds) {
+		if ($hideHostGroupIds) {
 			// get all groups if no selected groups defined
-			if (empty($dashconf['groupids'])) {
-				$groups = API::HostGroup()->get(array(
+			if (!$dashboardConfig['groupids']) {
+				$dbHostGroups = API::HostGroup()->get(array(
 					'nodeids' => get_current_nodeid(),
 					'output' => array('groupid')
 				));
-				$dashconf['groupids'] = zbx_objectValues($groups, 'groupid');
+				$dashboardConfig['groupids'] = zbx_objectValues($dbHostGroups, 'groupid');
 			}
 
-			$dashconf['groupids'] = array_diff($dashconf['groupids'], $hideGroupIds);
+			$dashboardConfig['groupids'] = array_diff($dashboardConfig['groupids'], $hideHostGroupIds);
 
 			// get available hosts
-			$availableHosts = API::Host()->get(array(
-				'groupids' => $dashconf['groupids'],
+			$dbAvailableHosts = API::Host()->get(array(
+				'groupids' => $dashboardConfig['groupids'],
 				'output' => array('hostid')
 			));
-			$availableHostIds = zbx_objectValues($availableHosts, 'hostid');
+			$availableHostIds = zbx_objectValues($dbAvailableHosts, 'hostid');
 
-			$disabledHosts = API::Host()->get(array(
-				'groupids' => $hideGroupIds,
+			$dbDisabledHosts = API::Host()->get(array(
+				'groupids' => $hideHostGroupIds,
 				'output' => array('hostid')
 			));
-			$disabledHostIds = zbx_objectValues($disabledHosts, 'hostid');
+			$disabledHostIds = zbx_objectValues($dbDisabledHosts, 'hostid');
 
-			$dashconf['hostids'] = array_diff($availableHostIds, $disabledHostIds);
+			$dashboardConfig['hostids'] = array_diff($availableHostIds, $disabledHostIds);
 		}
 		else {
-			if (empty($dashconf['groupids'])) {
+			if (!$dashboardConfig['groupids']) {
 				// null mean all groups
-				$dashconf['groupids'] = null;
+				$dashboardConfig['groupids'] = null;
 			}
 		}
 	}
 
 	// hosts
 	$maintenance = CProfile::get('web.dashconf.hosts.maintenance', 1);
-	$dashconf['maintenance'] = ($maintenance == 0) ? 0 : null;
+	$dashboardConfig['maintenance'] = ($maintenance == 0) ? 0 : null;
 
 	// triggers
 	$severity = CProfile::get('web.dashconf.triggers.severity', null);
-	$dashconf['severity'] = zbx_empty($severity) ? null : explode(';', $severity);
-	$dashconf['severity'] = zbx_toHash($dashconf['severity']);
+	$dashboardConfig['severity'] = zbx_empty($severity) ? null : explode(';', $severity);
+	$dashboardConfig['severity'] = zbx_toHash($dashboardConfig['severity']);
 
 	$config = select_config();
-	$dashconf['extAck'] = $config['event_ack_enable'] ? CProfile::get('web.dashconf.events.extAck', 0) : 0;
+	$dashboardConfig['extAck'] = $config['event_ack_enable'] ? CProfile::get('web.dashconf.events.extAck', 0) : 0;
 }
 
 /*
  * Actions
  */
-if (isset($_REQUEST['favobj'])) {
-	$_REQUEST['pmasterid'] = get_request('pmasterid', 'mainpage');
+// get fresh widget data
+if (hasRequest('widgetRefresh')) {
+	switch (getRequest('widgetRefresh')) {
+		case WIDGET_SYSTEM_STATUS:
+			$widget = make_system_status($dashboardConfig);
+			$widget->show();
+			break;
 
-	if ($_REQUEST['favobj'] == 'hat') {
-		if ($_REQUEST['favaction'] == 'flop') {
-			$widgetName = substr($_REQUEST['favref'], 4);
+		case WIDGET_HOST_STATUS:
+			$widget = make_hoststat_summary($dashboardConfig);
+			$widget->show();
+			break;
 
-			CProfile::update('web.dashboard.widget.'.$widgetName.'.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
-		}
-		elseif (getRequest('favaction') == 'sort') {
-			$favdata = CJs::decodeJson(getRequest('favdata'));
+		case WIDGET_ZABBIX_STATUS:
+			$widget = make_status_of_zbx();
+			$widget->show();
+			break;
 
-			foreach ($favdata as $col => $column) {
-				foreach ($column as $row => $widgetName) {
-					$widgetName = substr($widgetName, 4, -7);
+		case WIDGET_LAST_ISSUES:
+			$widget = make_latest_issues($dashboardConfig);
+			$widget->show();
+			break;
 
-					CProfile::update('web.dashboard.widget.'.$widgetName.'.col', $col, PROFILE_TYPE_INT);
-					CProfile::update('web.dashboard.widget.'.$widgetName.'.row', $row, PROFILE_TYPE_INT);
-				}
-			}
-		}
-		elseif ($_REQUEST['favaction'] == 'refresh') {
-			switch ($_REQUEST['favref']) {
-				case 'hat_syssum':
-					$widget = make_system_status($dashconf);
-					$widget->show();
-					break;
+		case WIDGET_WEB_OVERVIEW:
+			$widget = make_webmon_overview($dashboardConfig);
+			$widget->show();
+			break;
 
-				case 'hat_hoststat':
-					$widget = make_hoststat_summary($dashconf);
-					$widget->show();
-					break;
-
-				case 'hat_stszbx':
-					$widget = make_status_of_zbx();
-					$widget->show();
-					break;
-
-				case 'hat_lastiss':
-					$widget = make_latest_issues($dashconf);
-					$widget->show();
-					break;
-
-				case 'hat_webovr':
-					$widget = make_webmon_overview($dashconf);
-					$widget->show();
-					break;
-
-				case 'hat_dscvry':
-					$widget = make_discovery_status();
-					$widget->show();
-					break;
-			}
-		}
+		case WIDGET_DISCOVERY_STATUS:
+			$widget = make_discovery_status();
+			$widget->show();
+			break;
 	}
+}
 
-	if ($_REQUEST['favobj'] == 'set_rf_rate') {
-		$refs = array('hat_syssum', 'hat_stszbx', 'hat_lastiss', 'hat_webovr', 'hat_dscvry', 'hat_hoststat');
+if (hasRequest('widgetName')) {
+	$widgetName = getRequest('widgetName');
 
-		if (str_in_array($_REQUEST['favref'], $refs)) {
-			$widgetName = substr($_REQUEST['favref'], 4);
+	$widgets = array(
+		WIDGET_SYSTEM_STATUS, WIDGET_ZABBIX_STATUS, WIDGET_LAST_ISSUES,
+		WIDGET_WEB_OVERVIEW, WIDGET_DISCOVERY_STATUS, WIDGET_HOST_STATUS
+	);
 
-			CProfile::update('web.dashboard.widget.'.$widgetName.'.rf_rate', $_REQUEST['favcnt'], PROFILE_TYPE_INT);
-			$_REQUEST['favcnt'] = CProfile::get('web.dashboard.widget.'.$widgetName.'.rf_rate', 60);
+	if (in_array($widgetName, $widgets)) {
+		// refresh rate
+		if (hasRequest('widgetRefreshRate')) {
+			$widgetRefreshRate = getRequest('widgetRefreshRate');
 
-			echo get_update_doll_script('mainpage', $_REQUEST['favref'], 'frequency', $_REQUEST['favcnt'])
-				.get_update_doll_script('mainpage', $_REQUEST['favref'], 'stopDoll')
-				.get_update_doll_script('mainpage', $_REQUEST['favref'], 'startDoll');
+			CProfile::update('web.dashboard.widget.'.$widgetName.'.rf_rate', $widgetRefreshRate, PROFILE_TYPE_INT);
 
-			$menu = $submenu = array();
-
-			make_refresh_menu('mainpage', $_REQUEST['favref'], $_REQUEST['favcnt'], null, $menu, $submenu);
-
-			echo 'page_menu["menu_'.$_REQUEST['favref'].'"] = '.zbx_jsvalue($menu['menu_'.$_REQUEST['favref']]).';';
+			echo updateWidgetRefresh('dashboard', $widgetName, 'frequency', $widgetRefreshRate)
+				.updateWidgetRefresh('dashboard', $widgetName, 'restartDoll');
 		}
-	}
 
-	if ($page['type'] == PAGE_TYPE_JS) {
-		// favorite graphs
-		if (str_in_array($_REQUEST['favobj'], array('itemid', 'graphid'))) {
-			$result = false;
-
-			if ($_REQUEST['favaction'] == 'add') {
-				zbx_value2array($_REQUEST['favid']);
-
-				foreach ($_REQUEST['favid'] as $sourceId) {
-					$result = CFavorite::add('web.favorite.graphids', $sourceId, $_REQUEST['favobj']);
-				}
-			}
-			elseif ($_REQUEST['favaction'] == 'remove') {
-				$result = CFavorite::remove('web.favorite.graphids', $_REQUEST['favid'], $_REQUEST['favobj']);
-			}
-
-			if ($result) {
-				$dataHtml = make_favorite_graphs();
-
-				echo '$("hat_favgrph").update('.zbx_jsvalue($dataHtml->toString()).'); '.
-					'page_submenu["menu_graphs"] = '.zbx_jsvalue(make_graph_submenu()).';';
-			}
-		}
-		// favorite maps
-		elseif ($_REQUEST['favobj'] == 'sysmapid') {
-			$result = false;
-
-			if ($_REQUEST['favaction'] == 'add') {
-				zbx_value2array($_REQUEST['favid']);
-
-				foreach ($_REQUEST['favid'] as $sourceId) {
-					$result = CFavorite::add('web.favorite.sysmapids', $sourceId, $_REQUEST['favobj']);
-				}
-			}
-			elseif ($_REQUEST['favaction'] == 'remove') {
-				$result = CFavorite::remove('web.favorite.sysmapids', $_REQUEST['favid'], $_REQUEST['favobj']);
-			}
-
-			if ($result) {
-				$dataHtml = make_favorite_maps();
-
-				echo '$("hat_favmap").update('.zbx_jsvalue($dataHtml->toString()).'); '.
-					'page_submenu["menu_sysmaps"] = '.zbx_jsvalue(make_sysmap_submenu()).';';
-			}
-		}
-		// favorite screens, slideshows
-		elseif (str_in_array($_REQUEST['favobj'], array('screenid', 'slideshowid'))) {
-			$result = false;
-
-			if ($_REQUEST['favaction'] == 'add') {
-				zbx_value2array($_REQUEST['favid']);
-
-				foreach ($_REQUEST['favid'] as $sourceId) {
-					$result = CFavorite::add('web.favorite.screenids', $sourceId, $_REQUEST['favobj']);
-				}
-			}
-			elseif ($_REQUEST['favaction'] == 'remove') {
-				$result = CFavorite::remove('web.favorite.screenids', $_REQUEST['favid'], $_REQUEST['favobj']);
-			}
-
-			if ($result) {
-				$dataHtml = make_favorite_screens();
-
-				echo '$("hat_favscr").update('.zbx_jsvalue($dataHtml->toString()).'); '.
-					'page_submenu["menu_screens"] = '.zbx_jsvalue(make_screen_submenu()).';';
-			}
+		// widget state
+		if (hasRequest('widgetState')) {
+			CProfile::update('web.dashboard.widget.'.$widgetName.'.state', getRequest('widgetState'), PROFILE_TYPE_INT);
 		}
 	}
 }
 
-if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
+// sort
+if (hasRequest('widgetSort')) {
+	foreach (CJs::decodeJson(getRequest('widgetSort')) as $col => $column) {
+		foreach ($column as $row => $widgetName) {
+			$widgetName = str_replace('_widget', '', $widgetName);
+
+			CProfile::update('web.dashboard.widget.'.$widgetName.'.col', $col, PROFILE_TYPE_INT);
+			CProfile::update('web.dashboard.widget.'.$widgetName.'.row', $row, PROFILE_TYPE_INT);
+		}
+	}
+}
+
+// favorites
+if (hasRequest('favobj') && hasRequest('favaction')) {
+	$favouriteObject = getRequest('favobj');
+	$favouriteAction = getRequest('favaction');
+	$favouriteId = getRequest('favid');
+
+	switch ($favouriteObject) {
+		// favourite graphs
+		case 'itemid':
+		case 'graphid':
+			if ($favouriteAction == 'add') {
+				zbx_value2array($favouriteId);
+
+				foreach ($favouriteId as $id) {
+					CFavorite::add('web.favorite.graphids', $id, $favouriteObject);
+				}
+			}
+			elseif ($favouriteAction == 'remove') {
+				CFavorite::remove('web.favorite.graphids', $favouriteId, $favouriteObject);
+			}
+
+			$data = make_favorite_graphs();
+			$data = $data->toString();
+
+			echo 'jQuery("#'.WIDGET_FAVOURITE_GRAPHS.'").html('.zbx_jsvalue($data).'); '.
+					'page_submenu["menu_graphs"] = '.zbx_jsvalue(make_graph_submenu()).';';
+			break;
+
+		// favourite maps
+		case 'sysmapid':
+			if ($favouriteAction == 'add') {
+				zbx_value2array($favouriteId);
+
+				foreach ($favouriteId as $id) {
+					CFavorite::add('web.favorite.sysmapids', $id, $favouriteObject);
+				}
+			}
+			elseif ($favouriteAction == 'remove') {
+				CFavorite::remove('web.favorite.sysmapids', $favouriteId, $favouriteObject);
+			}
+
+			$data = make_favorite_maps();
+			$data = $data->toString();
+
+			echo 'jQuery("#'.WIDGET_FAVOURITE_MAPS.'").html('.zbx_jsvalue($data).'); '.
+					'page_submenu["menu_sysmaps"] = '.zbx_jsvalue(make_sysmap_submenu()).';';
+			break;
+
+		// favourite screens, slideshows
+		case 'screenid':
+		case 'slideshowid':
+			if ($favouriteAction == 'add') {
+				zbx_value2array($favouriteId);
+
+				foreach ($favouriteId as $id) {
+					CFavorite::add('web.favorite.screenids', $id, $favouriteObject);
+				}
+			}
+			elseif ($favouriteAction == 'remove') {
+				CFavorite::remove('web.favorite.screenids', $favouriteId, $favouriteObject);
+			}
+
+			$data = make_favorite_screens();
+			$data = $data->toString();
+
+			echo 'jQuery("#'.WIDGET_FAVOURITE_SCREENS.'").html('.zbx_jsvalue($data).'); '.
+					'page_submenu["menu_screens"] = '.zbx_jsvalue(make_screen_submenu()).';';
+			break;
+	}
+}
+
+if (in_array($page['type'], array(PAGE_TYPE_JS, PAGE_TYPE_HTML_BLOCK))) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit();
+	exit;
 }
 
 /*
  * Display
  */
-$dashboardWidget = new CWidget('dashboard_wdgt');
+$dashboardWidget = new CWidget(null, 'dashboard');
 $dashboardWidget->setClass('header');
 $dashboardWidget->addHeader(_('PERSONAL DASHBOARD'), array(
 	new CIcon(
-		_s('Configure (Filter %s)', $dashconf['filterEnable'] ? _('Enabled') : _('Disabled')),
-		$dashconf['filterEnable'] ? 'iconconfig_hl' : 'iconconfig',
-		"document.location = 'dashconf.php';"
+		_s('Configure (Filter %s)', $dashboardConfig['filterEnable'] ? _('Enabled') : _('Disabled')),
+		$dashboardConfig['filterEnable'] ? 'iconconfig_hl' : 'iconconfig',
+		'document.location = "dashconf.php";'
 	),
 	SPACE,
-	get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])))
+	get_icon('fullscreen', array('fullscreen' => getRequest('fullscreen'))))
 );
 
 // js menu arrays
-$menu = $submenu = array();
+/*$menu = $submenu = array();
 make_graph_menu($menu, $submenu);
 make_sysmap_menu($menu, $submenu);
-make_screen_menu($menu, $submenu);
-
-make_refresh_menu('mainpage', 'hat_syssum', CProfile::get('web.dashboard.widget.syssum.rf_rate', 60), null, $menu, $submenu);
-make_refresh_menu('mainpage', 'hat_hoststat', CProfile::get('web.dashboard.widget.hoststat.rf_rate', 60), null, $menu, $submenu);
-make_refresh_menu('mainpage', 'hat_stszbx', CProfile::get('web.dashboard.widget.stszbx.rf_rate', 60), null, $menu, $submenu);
-make_refresh_menu('mainpage', 'hat_lastiss', CProfile::get('web.dashboard.widget.lastiss.rf_rate', 60), null, $menu, $submenu);
-make_refresh_menu('mainpage', 'hat_webovr', CProfile::get('web.dashboard.widget.webovr.rf_rate', 60), null, $menu, $submenu);
-make_refresh_menu('mainpage', 'hat_dscvry', CProfile::get('web.dashboard.widget.dscvry.rf_rate', 60), null, $menu, $submenu);
-
-insert_js('var page_menu='.zbx_jsvalue($menu).";\n".'var page_submenu='.zbx_jsvalue($submenu).";\n");
+make_screen_menu($menu, $submenu);*/
 
 /*
- * Columns
+ * Dashboard grid
  */
-$columns = array(array(), array(), array());
+$dashboardGrid = array(array(), array(), array());
+$widgetRefreshParams = array();
 
-// refresh tabs
-$refreshTabs = array(
-	array('id' => 'hat_syssum', 'frequency' => CProfile::get('web.dashboard.widget.syssum.rf_rate', 120)),
-	array('id' => 'hat_stszbx', 'frequency' => CProfile::get('web.dashboard.widget.stszbx.rf_rate', 120)),
-	array('id' => 'hat_lastiss', 'frequency' => CProfile::get('web.dashboard.widget.lastiss.rf_rate', 60)),
-	array('id' => 'hat_webovr', 'frequency' => CProfile::get('web.dashboard.widget.webovr.rf_rate', 60)),
-	array('id' => 'hat_hoststat', 'frequency' => CProfile::get('web.dashboard.widget.hoststat.rf_rate', 60))
-);
+// favourite graphs
+$icon = get_icon('menu', array('menu' => 'graphs'));
 
-// favorite graphs
-$favouriteGraphs = new CUIWidget(
-	'hat_favgrph',
-	make_favorite_graphs(),
-	CProfile::get('web.dashboard.widget.favgrph.state', 1)
-);
-$favouriteGraphs->setHeader(_('Favourite graphs'), get_icon('menu', array('menu' => 'graphs')));
+$favouriteGraphs = new CUIWidget(WIDGET_FAVOURITE_GRAPHS, make_favorite_graphs());
+$favouriteGraphs->setState(CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_GRAPHS.'.state', 1));
+$favouriteGraphs->setHeader(_('Favourite graphs'), $icon);
 $favouriteGraphs->setFooter(new CLink(_('Graphs').' &raquo;', 'charts.php', 'highlight'), true);
 
-$col = CProfile::get('web.dashboard.widget.favgrph.col', 0);
-$row = CProfile::get('web.dashboard.widget.favgrph.row', 0);
-$columns[$col][$row] = $favouriteGraphs;
+$col = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_GRAPHS.'.col', 0);
+$row = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_GRAPHS.'.row', 0);
+$dashboardGrid[$col][$row] = $favouriteGraphs;
 
-// favorite screens
-$favouriteScreens = new CUIWidget(
-	'hat_favscr',
-	make_favorite_screens(),
-	CProfile::get('web.dashboard.widget.favscr.state', 1)
-);
+// favourite screens
+$favouriteScreens = new CUIWidget(WIDGET_FAVOURITE_SCREENS, make_favorite_screens());
+$favouriteScreens->setState(CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_SCREENS.'.state', 1));
 $favouriteScreens->setHeader(_('Favourite screens'), get_icon('menu', array('menu' => 'screens')));
 $favouriteScreens->setFooter(new CLink(_('Screens').' &raquo;', 'screens.php', 'highlight'), true);
 
-$col = CProfile::get('web.dashboard.widget.favscr.col', 0);
-$row = CProfile::get('web.dashboard.widget.favscr.row', 1);
-$columns[$col][$row] = $favouriteScreens;
+$col = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_SCREENS.'.col', 0);
+$row = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_SCREENS.'.row', 1);
+$dashboardGrid[$col][$row] = $favouriteScreens;
 
-// favorite maps
-$favouriteMaps = new CUIWidget(
-	'hat_favmap',
-	make_favorite_maps(),
-	CProfile::get('web.dashboard.widget.favmap.state', 1)
-);
+// favourite maps
+$favouriteMaps = new CUIWidget(WIDGET_FAVOURITE_MAPS, make_favorite_maps());
+$favouriteMaps->setState(CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_MAPS.'.state', 1));
 $favouriteMaps->setHeader(_('Favourite maps'), get_icon('menu', array('menu' => 'sysmaps')));
 $favouriteMaps->setFooter(new CLink(_('Maps').' &raquo;', 'maps.php', 'highlight'), true);
 
-$col = CProfile::get('web.dashboard.widget.favmap.col', 0);
-$row = CProfile::get('web.dashboard.widget.favmap.row', 2);
-$columns[$col][$row] = $favouriteMaps;
+$col = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_MAPS.'.col', 0);
+$row = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_MAPS.'.row', 2);
+$dashboardGrid[$col][$row] = $favouriteMaps;
 
 // status of Zabbix
 if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
-	$zabbixStatus = new CUIWidget(
-		'hat_stszbx',
-		new CSpan(_('Loading...'), 'textcolorstyles'),
-		CProfile::get('web.dashboard.widget.stszbx.state', 1)
-	);
-	$zabbixStatus->setHeader(_('Status of Zabbix'), get_icon('menu', array('menu' => 'hat_stszbx')));
-	$zabbixStatus->setFooter(new CDiv(SPACE, 'textwhite', 'hat_stszbx_footer'));
+	$rate = CProfile::get('web.dashboard.widget.'.WIDGET_ZABBIX_STATUS.'.rf_rate', 120);
 
-	$col = CProfile::get('web.dashboard.widget.stszbx.col', 1);
-	$row = CProfile::get('web.dashboard.widget.stszbx.row', 0);
-	$columns[$col][$row] = $zabbixStatus;
+	$icon = new CIcon(_('Menu'), 'iconmenu');
+	$icon->setMenuPopup(getMenuPopupRefresh(WIDGET_ZABBIX_STATUS, $rate));
+
+	$zabbixStatus = new CUIWidget(WIDGET_ZABBIX_STATUS, new CSpan(_('Loading...'), 'textcolorstyles'));
+	$zabbixStatus->setState(CProfile::get('web.dashboard.widget.'.WIDGET_ZABBIX_STATUS.'.state', 1));
+	$zabbixStatus->setRefresh($rate);
+	$zabbixStatus->setHeader(_('Status of Zabbix'), $icon);
+	$zabbixStatus->setFooter(new CDiv(SPACE, 'textwhite', WIDGET_ZABBIX_STATUS.'_footer'));
+
+	$col = CProfile::get('web.dashboard.widget.'.WIDGET_ZABBIX_STATUS.'.col', 1);
+	$row = CProfile::get('web.dashboard.widget.'.WIDGET_ZABBIX_STATUS.'.row', 0);
+	$dashboardGrid[$col][$row] = $zabbixStatus;
+
+	$widgetRefreshParams[WIDGET_ZABBIX_STATUS] = $zabbixStatus->refreshParams;
 }
 
 // system status
-$systemStatus = new CUIWidget(
-	'hat_syssum',
-	new CSpan(_('Loading...'), 'textcolorstyles'),
-	CProfile::get('web.dashboard.widget.syssum.state', 1)
-);
-$systemStatus->setHeader(_('System status'), get_icon('menu', array('menu' => 'hat_syssum')));
-$systemStatus->setFooter(new CDiv(SPACE, 'textwhite', 'hat_syssum_footer'));
+$rate = CProfile::get('web.dashboard.widget.'.WIDGET_SYSTEM_STATUS.'.rf_rate', 120);
 
-$col = CProfile::get('web.dashboard.widget.syssum.col', 1);
-$row = CProfile::get('web.dashboard.widget.syssum.row', 1);
-$columns[$col][$row] = $systemStatus;
+$icon = new CIcon(_('Menu'), 'iconmenu');
+$icon->setMenuPopup(getMenuPopupRefresh(WIDGET_SYSTEM_STATUS, $rate));
+
+$systemStatus = new CUIWidget(WIDGET_SYSTEM_STATUS, new CSpan(_('Loading...'), 'textcolorstyles'));
+$systemStatus->setState(CProfile::get('web.dashboard.widget.'.WIDGET_SYSTEM_STATUS.'.state', 1));
+$systemStatus->setRefresh($rate);
+$systemStatus->setHeader(_('System status'), $icon);
+$systemStatus->setFooter(new CDiv(SPACE, 'textwhite', WIDGET_SYSTEM_STATUS.'_footer'));
+
+$col = CProfile::get('web.dashboard.widget.'.WIDGET_SYSTEM_STATUS.'.col', 1);
+$row = CProfile::get('web.dashboard.widget.'.WIDGET_SYSTEM_STATUS.'.row', 1);
+$dashboardGrid[$col][$row] = $systemStatus;
+
+$widgetRefreshParams[WIDGET_SYSTEM_STATUS] = $systemStatus->refreshParams;
 
 // host status
-$hostStatus = new CUIWidget(
-	'hat_hoststat',
-	new CSpan(_('Loading...'), 'textcolorstyles'),
-	CProfile::get('web.dashboard.widget.hoststat.state', 1)
-);
-$hostStatus->setHeader(_('Host status'), get_icon('menu', array('menu' => 'hat_hoststat')));
-$hostStatus->setFooter(new CDiv(SPACE, 'textwhite', 'hat_hoststat_footer'));
+$rate = CProfile::get('web.dashboard.widget.'.WIDGET_HOST_STATUS.'.rf_rate', 120);
 
-$col = CProfile::get('web.dashboard.widget.hoststat.col', 1);
-$row = CProfile::get('web.dashboard.widget.hoststat.row', 2);
-$columns[$col][$row] = $hostStatus;
+$icon = new CIcon(_('Menu'), 'iconmenu');
+$icon->setMenuPopup(getMenuPopupRefresh(WIDGET_HOST_STATUS, $rate));
+
+$hostStatus = new CUIWidget(WIDGET_HOST_STATUS, new CSpan(_('Loading...'), 'textcolorstyles'));
+$hostStatus->setState(CProfile::get('web.dashboard.widget.'.WIDGET_HOST_STATUS.'.state', 1));
+$hostStatus->setRefresh($rate);
+$hostStatus->setHeader(_('Host status'), $icon);
+$hostStatus->setFooter(new CDiv(SPACE, 'textwhite', WIDGET_HOST_STATUS.'_footer'));
+
+$col = CProfile::get('web.dashboard.widget.'.WIDGET_HOST_STATUS.'.col', 1);
+$row = CProfile::get('web.dashboard.widget.'.WIDGET_HOST_STATUS.'.row', 2);
+$dashboardGrid[$col][$row] = $hostStatus;
+
+$widgetRefreshParams[WIDGET_HOST_STATUS] = $hostStatus->refreshParams;
 
 // last issues
-$lastIssues = new CUIWidget(
-	'hat_lastiss',
-	new CSpan(_('Loading...'), 'textcolorstyles'),
-	CProfile::get('web.dashboard.widget.lastiss.state', 1)
-);
-$lastIssues->setHeader(
-	_n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT),
-	get_icon('menu', array('menu' => 'hat_lastiss'))
-);
-$lastIssues->setFooter(new CDiv(SPACE, 'textwhite', 'hat_lastiss_footer'));
+$rate = CProfile::get('web.dashboard.widget.'.WIDGET_LAST_ISSUES.'.rf_rate', 120);
 
-$col = CProfile::get('web.dashboard.widget.lastiss.col', 1);
-$row = CProfile::get('web.dashboard.widget.lastiss.row', 3);
-$columns[$col][$row] = $lastIssues;
+$icon = new CIcon(_('Menu'), 'iconmenu');
+$icon->setMenuPopup(getMenuPopupRefresh(WIDGET_LAST_ISSUES, $rate));
+
+$lastIssues = new CUIWidget(WIDGET_LAST_ISSUES, new CSpan(_('Loading...'), 'textcolorstyles'));
+$lastIssues->setState(CProfile::get('web.dashboard.widget.'.WIDGET_LAST_ISSUES.'.state', 1));
+$lastIssues->setRefresh($rate);
+$lastIssues->setHeader(_n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT), $icon);
+$lastIssues->setFooter(new CDiv(SPACE, 'textwhite', WIDGET_LAST_ISSUES.'_footer'));
+
+$col = CProfile::get('web.dashboard.widget.'.WIDGET_LAST_ISSUES.'.col', 1);
+$row = CProfile::get('web.dashboard.widget.'.WIDGET_LAST_ISSUES.'.row', 3);
+$dashboardGrid[$col][$row] = $lastIssues;
+
+$widgetRefreshParams[WIDGET_LAST_ISSUES] = $lastIssues->refreshParams;
 
 // web monitoring
-$webMonitoring = new CUIWidget(
-	'hat_webovr',
-	new CSpan(_('Loading...'), 'textcolorstyles'),
-	CProfile::get('web.dashboard.widget.webovr.state', 1)
-);
-$webMonitoring->setHeader(_('Web monitoring'), get_icon('menu', array('menu' => 'hat_webovr')));
-$webMonitoring->setFooter(new CDiv(SPACE, 'textwhite', 'hat_webovr_footer'));
+$rate = CProfile::get('web.dashboard.widget.'.WIDGET_WEB_OVERVIEW.'.rf_rate', 120);
 
-$col = CProfile::get('web.dashboard.widget.webovr.col', 1);
-$row = CProfile::get('web.dashboard.widget.webovr.row', 4);
-$columns[$col][$row] = $webMonitoring;
+$icon = new CIcon(_('Menu'), 'iconmenu');
+$icon->setMenuPopup(getMenuPopupRefresh(WIDGET_WEB_OVERVIEW, $rate));
+
+$webMonitoring = new CUIWidget(WIDGET_WEB_OVERVIEW, new CSpan(_('Loading...'), 'textcolorstyles'));
+$webMonitoring->setState(CProfile::get('web.dashboard.widget.'.WIDGET_WEB_OVERVIEW.'.state', 1));
+$webMonitoring->setRefresh($rate);
+$webMonitoring->setHeader(_('Web monitoring'), $icon);
+$webMonitoring->setFooter(new CDiv(SPACE, 'textwhite', WIDGET_WEB_OVERVIEW.'_footer'));
+
+$col = CProfile::get('web.dashboard.widget.'.WIDGET_WEB_OVERVIEW.'.col', 1);
+$row = CProfile::get('web.dashboard.widget.'.WIDGET_WEB_OVERVIEW.'.row', 4);
+$dashboardGrid[$col][$row] = $webMonitoring;
+
+$widgetRefreshParams[WIDGET_WEB_OVERVIEW] = $webMonitoring->refreshParams;
 
 // discovery rules
 $dbDiscoveryRules = DBfetch(DBselect(
@@ -436,36 +431,37 @@ $dbDiscoveryRules = DBfetch(DBselect(
 	' WHERE d.status='.DRULE_STATUS_ACTIVE.
 		andDbNode('d.druleid')
 ));
+
 if ($dbDiscoveryRules['cnt'] > 0 && check_right_on_discovery()) {
-	$refreshTabs[] = array(
-		'id' => 'hat_dscvry',
-		'frequency' => CProfile::get('web.dashboard.widget.dscvry.rf_rate', 60)
-	);
+	$rate = CProfile::get('web.dashboard.widget.'.WIDGET_DISCOVERY_STATUS.'.rf_rate', 120);
 
-	$discoveryStatus = new CUIWidget(
-		'hat_dscvry',
-		new CSpan(_('Loading...'), 'textcolorstyles'),
-		CProfile::get('web.dashboard.widget.dscvry.state', 1)
-	);
-	$discoveryStatus->setHeader(_('Discovery status'), get_icon('menu', array('menu' => 'hat_dscvry')));
-	$discoveryStatus->setFooter(new CDiv(SPACE, 'textwhite', 'hat_dscvry_footer'));
+	$icon = new CIcon(_('Menu'), 'iconmenu');
+	$icon->setMenuPopup(getMenuPopupRefresh(WIDGET_DISCOVERY_STATUS, $rate));
 
-	$col = CProfile::get('web.dashboard.widget.dscvry.col', 1);
-	$row = CProfile::get('web.dashboard.widget.dscvry.row', 5);
-	$columns[$col][$row] = $discoveryStatus;
+	$discoveryStatus = new CUIWidget(WIDGET_DISCOVERY_STATUS, new CSpan(_('Loading...'), 'textcolorstyles'));
+	$discoveryStatus->setState(CProfile::get('web.dashboard.widget.'.WIDGET_DISCOVERY_STATUS.'.state', 1));
+	$discoveryStatus->setRefresh($rate);
+	$discoveryStatus->setHeader(_('Discovery status'), $icon);
+	$discoveryStatus->setFooter(new CDiv(SPACE, 'textwhite', WIDGET_DISCOVERY_STATUS.'_footer'));
+
+	$col = CProfile::get('web.dashboard.widget.'.WIDGET_DISCOVERY_STATUS.'.col', 1);
+	$row = CProfile::get('web.dashboard.widget.'.WIDGET_DISCOVERY_STATUS.'.row', 5);
+	$dashboardGrid[$col][$row] = $discoveryStatus;
+
+	$widgetRefreshParams[WIDGET_DISCOVERY_STATUS] = $discoveryStatus->refreshParams;
 }
 
-add_doll_objects($refreshTabs);
-foreach ($columns as $key => $val) {
-	ksort($columns[$key]);
+// sort dashboard grid
+foreach ($dashboardGrid as $key => $val) {
+	ksort($dashboardGrid[$key]);
 }
 
 $dashboardTable = new CTable();
 $dashboardTable->addRow(
 	array(
-		new CDiv($columns[0], 'column'),
-		new CDiv($columns[1], 'column'),
-		new CDiv($columns[2], 'column')
+		new CDiv($dashboardGrid[0], 'column'),
+		new CDiv($dashboardGrid[1], 'column'),
+		new CDiv($dashboardGrid[2], 'column')
 	),
 	'top'
 );
@@ -473,25 +469,33 @@ $dashboardTable->addRow(
 $dashboardWidget->addItem($dashboardTable);
 $dashboardWidget->show();
 
+/*
+ * Javascript
+ */
+// start refresh process
+zbx_add_post_js('initPMaster("dashboard", '.zbx_jsvalue($widgetRefreshParams).');');
+
 // activating blinking
 zbx_add_post_js('jqBlink.blink();');
 
 ?>
 <script type="text/javascript">
 	function addPopupValues(list) {
-		var favorites = {graphid: 1, itemid: 1, screenid: 1, slideshowid: 1, sysmapid: 1};
+		var favourites = {graphid: 1, itemid: 1, screenid: 1, slideshowid: 1, sysmapid: 1};
 
-		if (isset(list.object, favorites)) {
+		if (isset(list.object, favourites)) {
 			var favouriteIds = [];
 
 			for (var i = 0; i < list.values.length; i++) {
 				favouriteIds.push(list.values[i][list.object]);
 			}
 
-			send_params({
-				favobj: list.object,
-				'favid[]': favouriteIds,
-				favaction: 'add'
+			sendAjaxData({
+				data: {
+					favobj: list.object,
+					'favid[]': favouriteIds,
+					favaction: 'add'
+				}
 			});
 		}
 	}

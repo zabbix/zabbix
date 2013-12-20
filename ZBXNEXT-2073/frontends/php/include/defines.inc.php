@@ -20,7 +20,7 @@
 
 define('ZABBIX_VERSION',     '2.3.0');
 define('ZABBIX_API_VERSION', '2.3.0');
-define('ZABBIX_DB_VERSION',	 2030000);
+define('ZABBIX_DB_VERSION',	 2020000);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
 define('ZABBIX_COPYRIGHT_TO',   '2013');
@@ -927,6 +927,17 @@ define('ZBX_TEXTBOX_FILTER_SIZE',		20);
 define('ZBX_TEXTAREA_STANDARD_WIDTH',	312);
 define('ZBX_TEXTAREA_BIG_WIDTH',		524);
 define('ZBX_TEXTAREA_STANDARD_ROWS',	7);
+
+// widgets
+define('WIDGET_DISCOVERY_STATUS',	'dscvry');
+define('WIDGET_FAVOURITE_GRAPHS',	'favgrph');
+define('WIDGET_FAVOURITE_MAPS',		'favmap');
+define('WIDGET_FAVOURITE_SCREENS',	'favscr');
+define('WIDGET_HOST_STATUS',		'hoststat');
+define('WIDGET_LAST_ISSUES',		'lastiss');
+define('WIDGET_SYSTEM_STATUS',		'syssum');
+define('WIDGET_WEB_OVERVIEW',		'webovr');
+define('WIDGET_ZABBIX_STATUS',		'stszbx');
 
 // validation
 define('DB_ID',		"({}>=0&&bccomp('{}',\"10000000000000000000\")<0)&&");

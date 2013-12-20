@@ -120,7 +120,7 @@ var CMessageList = Class.create(CDebug, {
 			'params': {},
 			'onSuccess': this.setSettings.bind(this),
 			'onFailure': function() {
-				zbx_throw('Messages Widget: settings request failed.');
+				throw('Messages Widget: settings request failed.');
 			}
 		};
 		new RPC.Call(rpcRequest);
@@ -159,7 +159,7 @@ var CMessageList = Class.create(CDebug, {
 		this.debug('mute');
 		e = e || window.event;
 		var icon = Event.element(e);
-		var newClass = switchElementsClass(icon, 'iconmute', 'iconsound');
+		var newClass = switchElementClass(icon, 'iconmute', 'iconsound');
 
 		if (newClass == 'iconmute') {
 			var action = 'message.mute';
@@ -174,7 +174,7 @@ var CMessageList = Class.create(CDebug, {
 			'method': action,
 			'params': {},
 			'onFailure': function() {
-				zbx_throw('Messages Widget: mute request failed.');
+				throw('Messages Widget: mute request failed.');
 			}
 		};
 		new RPC.Call(rpcRequest);
@@ -272,7 +272,7 @@ var CMessageList = Class.create(CDebug, {
 				'messageid': this.messageList[lastMessageId].messageid
 			},
 			'onFailure': function(resp) {
-				zbx_throw('Messages Widget: message request failed.');
+				throw('Messages Widget: message request failed.');
 			}
 		};
 
@@ -328,7 +328,7 @@ var CMessageList = Class.create(CDebug, {
 			},
 			'onSuccess': this.serverRespond.bind(this),
 			'onFailure': function() {
-				zbx_throw('Messages Widget: message request failed.');
+				throw('Messages Widget: message request failed.');
 			}
 		};
 		new RPC.Call(rpcRequest);

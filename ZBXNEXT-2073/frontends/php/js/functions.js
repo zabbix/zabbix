@@ -336,13 +336,13 @@ function closeForm(page) {
 		var msg = IE ? document.getElementById('page_msg').innerText : document.getElementById('page_msg').textContent;
 		window.opener.location.replace(page + '?msg=' + encodeURI(msg));
 	}
-	catch(e) {
-		zbx_throw(e);
+	catch (e) {
+		throw(e);
 	}
 
 	if (IE) {
 		// close current popup after 1s, wait when opener window is refreshed (IE7 issue)
-		window.setTimeout(function() { window.self.close() }, 1000);
+		window.setTimeout(function() { window.self.close(); }, 1000);
 	}
 	else {
 		window.self.close();
@@ -549,7 +549,7 @@ function cloneRow(elementid, count) {
 	newEntry.style.display = '';
 }
 
-// dashboard js menu
+// TODO DELETE ME! dashboard js menu
 function create_page_menu(e, id) {
 	if (!e) {
 		e = window.event;
@@ -720,6 +720,7 @@ function getUniqueId() {
 	if (typeof getUniqueId.id === 'undefined') {
 		getUniqueId.id = 0;
 	}
+
 	return 'new' + (getUniqueId.id++).toString();
 }
 
@@ -1157,16 +1158,16 @@ function showModalWindow(title, text, buttons) {
 }
 
 /**
- * Disable setup step button
+ * Disable setup step button.
  *
- * @param buttonId
+ * @param string buttonId
  */
 function disableSetupStepButton(buttonId) {
-	jQuery(buttonId).
-		addClass('ui-state-disabled').
-		addClass('ui-button-disabled').
-		attr('disabled', 'disabled').
-		attr('aria-disabled', 'true');
+	jQuery(buttonId)
+		.addClass('ui-state-disabled')
+		.addClass('ui-button-disabled')
+		.attr('disabled', 'disabled')
+		.attr('aria-disabled', 'true');
 
 	jQuery('.info_bar .ok').remove();
 }

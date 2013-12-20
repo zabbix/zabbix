@@ -558,7 +558,9 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 }
 .menuPopup .title { padding: 2px 2px 2px 6px; color: #ffffff; font-weight: bold; background: #5c9ccc url(themes/originalblue/images/bg_h-hard_55.png) 50% 50% repeat-x; }
 .menuPopup .ui-menu { width: 165px; }
-.menuPopup ul.ui-corner-all { border-radius: 0; }
+.menuPopup .ui-menu ul.ui-corner-all { border-radius: 0; }
+.menuPopup .ui-menu li.ui-menu-item.selected a { font-weight: bold; }
+.menuPopup .ui-menu li.ui-menu-item.selected a:hover { font-weight: bold; }
 
 .printless { display: none; border: 1px #333 dotted; padding-left: 10px; cursor: pointer; font-weight: bold; color: #000000; background-color: #FFFFFF; }
 .printless:hover { text-decoration: underline; }

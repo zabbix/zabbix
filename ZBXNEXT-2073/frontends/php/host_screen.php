@@ -87,7 +87,7 @@ if (isset($_REQUEST['favobj'])) {
 		}
 
 		if ($page['type'] == PAGE_TYPE_JS && $result) {
-			echo 'switchElementsClass("addrm_fav", "iconminus", "iconplus");';
+			echo 'switchElementClass("addrm_fav", "iconminus", "iconplus");';
 		}
 	}
 }

@@ -213,7 +213,13 @@ $tranStrings = array(
 		'Submap' => _('Submap'),
 		'Trigger' => _('Trigger'),
 		'URL' => _('URL'),
-		'URLs' => _('URLs')
+		'URLs' => _('URLs'),
+		'10 seconds' => _('10 seconds'),
+		'30 seconds' => _('30 seconds'),
+		'1 minute' => _('1 minute'),
+		'2 minutes' => _('2 minutes'),
+		'10 minutes' => _('10 minutes'),
+		'15 minutes' => _('15 minutes')
 	)
 );
 

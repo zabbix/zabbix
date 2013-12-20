@@ -180,7 +180,11 @@ class CWidget {
 		}
 
 		if (!is_null($this->state)) {
-			$icon = new CIcon(_('Show').'/'._('Hide'), ($this->state ? 'arrowup' : 'arrowdown'), "change_hat_state(this, '".$this->bodyId."');");
+			$icon = new CIcon(
+				_('Show').'/'._('Hide'),
+				$this->state ? 'arrowup' : 'arrowdown',
+				'changeWidgetState(this, "'.$this->bodyId.'");'
+			);
 			$icon->setAttribute('id', $this->bodyId.'_icon');
 			$columnRights[] = $icon;
 		}

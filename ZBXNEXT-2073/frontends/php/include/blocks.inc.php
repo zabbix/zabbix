@@ -364,7 +364,9 @@ function make_system_status($filter) {
 		$table->addRow($groupRow);
 	}
 
-	$script = new CJSScript(get_js("jQuery('#hat_syssum_footer').html('"._s('Updated: %s', zbx_date2str(_('H:i:s')))."')"));
+	$script = new CJSScript(get_js(
+		'jQuery("#'.WIDGET_SYSTEM_STATUS.'_footer").html("'._s('Updated: %s', zbx_date2str(_('H:i:s'))).'");'
+	));
 
 	return new CDiv(array($table, $script));
 }
@@ -704,7 +706,9 @@ function make_hoststat_summary($filter) {
 		$table->addRow($group_row);
 	}
 
-	$script = new CJSScript(get_js("jQuery('#hat_hoststat_footer').html('"._s('Updated: %s', zbx_date2str(_('H:i:s')))."')"));
+	$script = new CJSScript(get_js(
+		'jQuery("#'.WIDGET_HOST_STATUS.'_footer").html("'._s('Updated: %s', zbx_date2str(_('H:i:s'))).'");'
+	));
 
 	return new CDiv(array($table, $script));
 }
@@ -773,7 +777,11 @@ function make_status_of_zbx() {
 			}
 		}
 	}
-	$script = new CJSScript(get_js("jQuery('#hat_stszbx_footer').html('"._s('Updated: %s', zbx_date2str(_('H:i:s')))."')"));
+
+	$script = new CJSScript(get_js(
+		'jQuery("#'.WIDGET_ZABBIX_STATUS.'_footer").html("'._s('Updated: %s', zbx_date2str(_('H:i:s'))).'");'
+	));
+
 	return new CDiv(array($table, $script));
 }
 
@@ -1024,7 +1032,9 @@ function make_latest_issues(array $filter = array()) {
 	// initialize blinking
 	zbx_add_post_js('jqBlink.blink();');
 
-	$script = new CJSScript(get_js("jQuery('#hat_lastiss_footer').html('"._s('Updated: %s', zbx_date2str(_('H:i:s')))."')"));
+	$script = new CJSScript(get_js(
+		'jQuery("#'.WIDGET_LAST_ISSUES.'_footer").html("'._s('Updated: %s', zbx_date2str(_('H:i:s'))).'");'
+	));
 
 	$infoDiv = new CDiv(_n('%1$d of %2$d issue is shown', '%1$d of %2$d issues are shown', count($triggers), $triggersTotalCount));
 	$infoDiv->addStyle('text-align: right; padding-right: 3px;');
@@ -1123,7 +1133,9 @@ function make_webmon_overview($filter) {
 		}
 	}
 
-	$script = new CJSScript(get_js("jQuery('#hat_webovr_footer').html('"._s('Updated: %s', zbx_date2str(_('H:i:s')))."')"));
+	$script = new CJSScript(get_js(
+		'jQuery("#'.WIDGET_WEB_OVERVIEW.'_footer").html("'._s('Updated: %s', zbx_date2str(_('H:i:s'))).'");'
+	));
 
 	return new CDiv(array($table, $script));
 }
@@ -1170,7 +1182,7 @@ function make_discovery_status() {
 		new CCol(_x('Down', 'discovery results in dashboard'))
 	);
 
-	$table  = new CTableInfo();
+	$table = new CTableInfo();
 	$table->setHeader($header,'header');
 
 	foreach ($drules as $drule) {
@@ -1181,7 +1193,11 @@ function make_discovery_status() {
 			new CSpan($drule['down'], ($drule['down'] > 0) ? 'red' : 'green')
 		));
 	}
-	$script = new CJSScript(get_js("jQuery('#hat_dscvry_footer').html('"._s('Updated: %s', zbx_date2str(_('H:i:s')))."')"));
+
+	$script = new CJSScript(get_js(
+		'jQuery("#'.WIDGET_DISCOVERY_STATUS.'_footer").html("'._s('Updated: %s', zbx_date2str(_('H:i:s'))).'");'
+	));
+
 	return new CDiv(array($table, $script));
 }
 
