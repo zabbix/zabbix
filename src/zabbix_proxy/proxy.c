@@ -56,6 +56,7 @@
 
 const char	*progname = NULL;
 const char	title_message[] = "Zabbix proxy";
+const char	syslog_app_name[] = "zabbix_proxy";
 const char	usage_message[] = "[-hV] [-c <file>] [-R <option>]";
 
 const char	*help_message[] = {
