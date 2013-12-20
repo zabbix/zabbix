@@ -1,5 +1,6 @@
 Changes for 1.8.20rc1
 
+...G...PS. [ZBX-4243] fixed Zabbix syslog application names (RFC 5424 APP-NAME) (Andris)
 
 Changes for 1.8.19
 
