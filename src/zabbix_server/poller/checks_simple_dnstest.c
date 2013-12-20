@@ -1472,6 +1472,8 @@ static int	zbx_tcp_exchange(const char *request, const char *host, short port, i
 
 	send_buf = zbx_dsprintf(send_buf, "%s\r\n", request);
 
+	zbx_dns_infof(f, "RDDS%hd: sending request [%s]", port, send_buf);
+
 	if (SUCCEED != zbx_tcp_send_raw(&s, send_buf))
 	{
 		zbx_snprintf(err, err_size, "cannot send data: %s", zbx_tcp_strerror());
