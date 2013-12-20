@@ -1083,7 +1083,7 @@ sub create_slv_items {
     # priority must be set to 0!
     $options = { 'description' => '5.2.4 DNS service is not available at {HOST.HOST} TLD',
                          'expression' => '({TRIGGER.VALUE}=0&'.
-						'{'.$host_name.':dnstest.slv.dns.avail.count(INCIDENT.DNS.FAIL},0,"eq")}={$INCIDENT.DNS.FAIL})|'.
+						'{'.$host_name.':dnstest.slv.dns.avail.count(#{$INCIDENT.DNS.FAIL},0,"eq")}={$INCIDENT.DNS.FAIL})|'.
 					 '({TRIGGER.VALUE}=1&'.
 						'{'.$host_name.':dnstest.slv.dns.avail.count(#{$INCIDENT.DNS.RECOVER},0,"ne")}<{$INCIDENT.DNS.RECOVER})',
                         'priority' => '0',
