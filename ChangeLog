@@ -6,7 +6,6 @@ New features:
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
-...G...PS. [ZBX-4243] fixed Zabbix syslog application names (appnames) (Andris)
 ........S. [ZBX-7204] fixed the timestamp order of events generated during network discovery (igors)
 
 --------------------------------------------------------------------------------
@@ -17,6 +16,7 @@ New features:
 A.F....... [ZBX-1357] updated American English, French, Hungarian, Italian, Japanese, Russian and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...PS. [ZBX-4243] fixed Zabbix syslog application names (RFC 5424 APP-NAME) (Andris)
 ..F....... [ZBX-3855] fixed bug that prevented the frontend from working with the Turkish locale (Pavels)
 A......... [ZBX-7483] fixed user group delete validation (Eduard)
 ..F....... [ZBX-6296] optimized macro resolving in latest data (Eduard)
@@ -736,6 +736,7 @@ New features:
 A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...PS. [ZBX-4243] fixed Zabbix syslog application names (RFC 5424 APP-NAME) (Andris)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.10
@@ -2184,6 +2185,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.20rc1
 
+...G...PS. [ZBX-4243] fixed Zabbix syslog application names (RFC 5424 APP-NAME) (Andris)
 
 Changes for 1.8.19
 
