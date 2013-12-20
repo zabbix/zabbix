@@ -121,8 +121,8 @@ static void	lld_filter_clean(lld_filter_t *filter)
  *                                                                            *
  * Parameters: filter     - [IN] the lld filter                               *
  *             lld_ruleid - [IN] the lld rule id                              *
- *             evaltype   - [IN] the evaluation type, see ACTION_EVAL_TYPE_*  *
- *                               macros                                       *
+ *             evaltype   - [IN] the evaluation type, see                     *
+ *                               CONDITION_EVAL_TYPE_* macros                 *
  *             formula    - [IN] the lld filter formula                       *
  *             error      - [OUT] the error description                       *
  *                                                                            *
@@ -164,10 +164,10 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, int ev
 
 	DBfree_result(result);
 
-	if (ACTION_EVAL_TYPE_AND_OR == evaltype)
+	if (CONDITION_EVAL_TYPE_AND_OR == evaltype)
 			zbx_vector_ptr_sort(&filter->conditions, condition_compare_by_macro);
 
-	if (ACTION_EVAL_TYPE_EXPRESSION == evaltype &&
+	if (CONDITION_EVAL_TYPE_EXPRESSION == evaltype &&
 			FAIL == translate_expression(formula, &filter->expression, error))
 	{
 			return FAIL;
@@ -410,13 +410,13 @@ static int	filter_evaluate(lld_filter_t *filter, struct zbx_json_parse *jp_row)
 {
 	switch (filter->evaltype)
 	{
-		case ACTION_EVAL_TYPE_AND_OR:
+		case CONDITION_EVAL_TYPE_AND_OR:
 			return filter_evaluate_and_or(filter, jp_row);
-		case ACTION_EVAL_TYPE_AND:
+		case CONDITION_EVAL_TYPE_AND:
 			return filter_evaluate_and(filter, jp_row);
-		case ACTION_EVAL_TYPE_OR:
+		case CONDITION_EVAL_TYPE_OR:
 			return filter_evaluate_or(filter, jp_row);
-		case ACTION_EVAL_TYPE_EXPRESSION:
+		case CONDITION_EVAL_TYPE_EXPRESSION:
 			return filter_evaluate_expression(filter, jp_row);
 	}
 	return FAIL;
