@@ -504,11 +504,11 @@
 				globalOperator = '',
 				str = '';
 
-			if (jQuery('#evaltype').val() == <?php echo ACTION_EVAL_TYPE_AND; ?>) {
+			if (jQuery('#evaltype').val() == <?php echo CONDITION_EVAL_TYPE_AND; ?>) {
 				groupOperator = <?php echo CJs::encodeJson(_('and')); ?>;
 				globalOperator = <?php echo CJs::encodeJson(_('and')); ?>;
 			}
-			else if (jQuery('#evaltype').val() == <?php echo ACTION_EVAL_TYPE_OR; ?>) {
+			else if (jQuery('#evaltype').val() == <?php echo CONDITION_EVAL_TYPE_OR; ?>) {
 				groupOperator = <?php echo CJs::encodeJson(_('or')); ?>;
 				globalOperator = <?php echo CJs::encodeJson(_('or')); ?>;
 			}
