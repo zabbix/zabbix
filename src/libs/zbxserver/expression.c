@@ -2430,7 +2430,7 @@ static void	get_trigger_function_value(const char *expression, char **replace_to
 		DBget_trigger_value(expression, &key, N_functionid, ZBX_REQUEST_ITEM_KEY_ORIG);
 	}
 	else
-		ret = parse_key(&p, &key);
+		ret = get_item_key(&p, &key);
 
 	if (SUCCEED != ret || '.' != *p++)
 		goto fail;

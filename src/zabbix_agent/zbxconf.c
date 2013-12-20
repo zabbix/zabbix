@@ -79,18 +79,62 @@ char	**CONFIG_PERF_COUNTERS		= NULL;
  ******************************************************************************/
 void	load_aliases(char **lines)
 {
-	char	*value, **pline;
+	char	**pline = (void **)NULL;
+	char	*r = NULL, *s = NULL;
+	char	*key = NULL, *value = NULL;
+
+	int	 key_len = 0, value_len = 0;
+	int	 ret = 0;
 
 	for (pline = lines; NULL != *pline; pline++)
 	{
-		if (NULL == (value = strchr(*pline, ':')))
+		r = *pline;
+
+		if (SUCCEED != parse_key(&r))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "Alias \"%s\" FAILED: not colon-separated", *pline);
+			if ('\0' == *r)
+				zabbix_log(LOG_LEVEL_CRIT, "Alias \"%s\" FAILED: Malformed alias", *pline);
+			else
+				zabbix_log(LOG_LEVEL_CRIT, "Alias \"%s\" FAILED: No alias key found", *pline);
 			exit(FAIL);
 		}
-		*value++ = '\0';
 
-		add_alias(*pline, value);
+		if (':' != *r)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "Alias \"%s\" FAILED: Alias key contains invalid character `%c' at position %ld", *pline, *r, (r - *pline) + 1);
+			exit(FAIL);
+		}
+
+		key_length = r - *pline;
+		s = ++r;
+
+		if (SUCCEED != parse_key(&r))
+		{
+			if(s == r)
+				zabbix_log(LOG_LEVEL_CRIT, "Alias \"%s\" FAILED: No item key found", *pline, s);
+			else
+				zabbix_log(LOG_LEVEL_CRIT, "Alias \"%s\" FAILED: Malformed item key", *pline);
+			exit(FAIL);
+		}
+
+		if ('\0' != *r)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "Alias \"%s\" FAILED: Item key contains invalid character `%c' at position %ld", *pline, *r, (r - *pline) + 1);
+			exit(FAIL);
+		}
+
+		value_length = r - s;
+
+		key = zbx_malloc(NULL, (key_length + 1) * sizeof(char));
+		value = zbx_malloc(NULL, (value_length + 1) * sizeof(char));
+
+		zbx_strlcpy(key, *pline, key_length + 1);
+		zbx_strlcpy(value, s, value_length + 1);
+
+		add_alias(key, value);
+
+		zbx_free(key);
+		zbx_free(value);
 	}
 }
 
