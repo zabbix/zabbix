@@ -1198,6 +1198,10 @@ function createPlaceholders() {
 		return this.each(function() {
 			var table = $(this);
 
+			table.data('elementTable', {
+				counter: $(options.row, table).length
+			});
+
 			// add buttons
 			table.on('click', options.add, function() {
 				// add the new row before the row with the "Add" button
@@ -1222,8 +1226,9 @@ function createPlaceholders() {
 	function addRow(table, beforeRow, options) {
 		var template = new Template($(options.template).html());
 		beforeRow.before(template.evaluate({
-			rowNum: $(options.row, table).length
+			rowNum: table.data('elementTable').counter
 		}));
+		table.data('elementTable').counter++;
 
 		createPlaceholders();
 
