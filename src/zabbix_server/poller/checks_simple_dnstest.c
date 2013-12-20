@@ -1470,9 +1470,10 @@ static int	zbx_tcp_exchange(const char *request, const char *host, short port, i
 		goto out;
 	}
 
-	send_buf = zbx_dsprintf(send_buf, "%s\r\n", request);
-
-	zbx_dns_infof(f, "RDDS%hd: sending request [%s]", port, send_buf);
+	if (port == 43)
+		send_buf = zbx_dsprintf(send_buf, "%s\r\n", request);
+	else
+		send_buf = zbx_dsprintf(send_buf, "%s\r\n\r\n", request);
 
 	if (SUCCEED != zbx_tcp_send_raw(&s, send_buf))
 	{
