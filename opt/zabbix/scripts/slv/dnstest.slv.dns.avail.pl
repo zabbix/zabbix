@@ -7,11 +7,11 @@ use lib '/opt/zabbix/scripts';
 use DNSTest;
 use DNSTestSLV;
 
-parse_opts();
-exit_if_running();
-
 my $cfg_key_in = 'dnstest.dns.udp[{$DNSTEST.TLD}]';
 my $cfg_key_out = 'dnstest.slv.dns.avail';
+
+parse_opts();
+exit_if_running();
 
 my $config = get_dnstest_config();
 set_slv_config($config);

@@ -13,12 +13,12 @@ my $cfg_key_out = 'dnstest.slv.rdds.80.rtt.month';
 parse_opts();
 exit_if_running();
 
+my $config = get_dnstest_config();
+set_slv_config($config);
+
 my ($from, $till, $value_ts) = get_month_bounds();
 
 my $interval = $till + 1 - $from;
-
-my $config = get_dnstest_config();
-set_slv_config($config);
 
 zapi_connect();
 

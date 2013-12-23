@@ -14,18 +14,18 @@ use DNSTestSLV;
 warn("UPDATE TIME IS DISABLED TILL EPP IS IMPLEMENTED");
 exit(SUCCESS);
 
+my $cfg_key_in = 'dnstest.dns.udp.upd[{$DNSTEST.TLD},';
+my $cfg_key_out = 'dnstest.slv.dns.ns.upd.month[';
+
 parse_opts();
 exit_if_running();
 
-my $cfg_key_in = 'dnstest.dns.udp.upd[{$DNSTEST.TLD},';
-my $cfg_key_out = 'dnstest.slv.dns.ns.upd.month[';
+my $config = get_dnstest_config();
+set_slv_config($config);
 
 my ($from, $till, $value_ts) = get_month_bounds();
 
 my $interval = $till + 1 - $from;
-
-my $config = get_dnstest_config();
-set_slv_config($config);
 
 zapi_connect();
 

@@ -14,12 +14,11 @@ my $cfg_dnssec_ec = -204; 	# DNSSEC error
 parse_opts();
 exit_if_running();
 
-my ($from, $till, $value_ts) = get_minute_bounds();
-
-info("from:$from till:$till value_ts:$value_ts");
-
 my $config = get_dnstest_config();
 set_slv_config($config);
+
+my ($from, $till, $value_ts) = get_minute_bounds();
+info("from:$from till:$till value_ts:$value_ts");
 
 zapi_connect();
 
