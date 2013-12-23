@@ -280,6 +280,38 @@ static int	zbx_random(int max)
 	return rand() % max;
 }
 
+#define zbx_dns_errf(f, fmt, ...)	zbx_dns_logf(f, "Error", ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#define zbx_dns_warnf(f, fmt, ...)	zbx_dns_logf(f, "Warning", ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#define zbx_dns_infof(f, fmt, ...)	zbx_dns_logf(f, "Info", ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+static void	zbx_dns_logf(FILE *f, const char *prefix, const char *fmt, ...)
+{
+	va_list		args;
+	char		fmt_buf[ZBX_ERR_BUF_SIZE];
+	struct timeval	current_time;
+	struct tm	*tm;
+	long		ms;
+
+	gettimeofday(&current_time, NULL);
+	tm = localtime(&current_time.tv_sec);
+	ms = current_time.tv_usec / 1000;
+
+	zbx_snprintf(fmt_buf, sizeof(fmt_buf), "[%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld] %s: %s\n",
+			tm->tm_year + 1900,
+			tm->tm_mon + 1,
+			tm->tm_mday,
+			tm->tm_hour,
+			tm->tm_min,
+			tm->tm_sec,
+			ms,
+			prefix,
+			fmt);
+	fmt = fmt_buf;
+
+	va_start(args, fmt);
+	vfprintf(f, fmt, args);
+	va_end(args);
+}
+
 static int	zbx_get_ns_values(ldns_resolver *res, const char *ns, const char *ip, const ldns_rr_list *keys,
 		const char *testprefix, const char *domain, FILE *dtlog, int *rtt, int *upd, char ipv4_enabled,
 		char ipv6_enabled, char epp_enabled, char *err, size_t err_size)
@@ -287,7 +319,8 @@ static int	zbx_get_ns_values(ldns_resolver *res, const char *ns, const char *ip,
 	char		testname[ZBX_HOST_BUF_SIZE], *host;
 	ldns_rdf	*testname_rdf = NULL;
 	ldns_pkt	*pkt = NULL;
-	ldns_rr_list	*nsset = NULL, *dsset = NULL, *rrsig = NULL, *matched_keys = NULL;
+	ldns_rr_list	*nsset = NULL, *dsset = NULL, *matched_keys = NULL, *answer_rrlist = NULL,
+			*authority_rrlist = NULL, *rrsigs = NULL;
 	ldns_status	status;
 	ldns_rr		*rr = NULL;
 	time_t		now, ts;
@@ -340,13 +373,34 @@ static int	zbx_get_ns_values(ldns_resolver *res, const char *ns, const char *ip,
 
 	ldns_pkt_print(dtlog, pkt);
 
+	answer_rrlist = ldns_pkt_get_section_clone(pkt, LDNS_SECTION_ANSWER);
+	authority_rrlist = ldns_pkt_get_section_clone(pkt, LDNS_SECTION_AUTHORITY);
+
+	if (NULL != answer_rrlist && 0 != ldns_rr_list_rr_count(answer_rrlist))
+	{
+		/* RRSIG in ANSWER section should have the same owner */
+		zbx_dns_infof(dtlog, "answer not empty");
+		rrsigs = ldns_pkt_rr_list_by_name_and_type(pkt, testname_rdf, LDNS_RR_TYPE_RRSIG, LDNS_SECTION_ANSWER);
+	}
+	else if (NULL != authority_rrlist && 0 != ldns_rr_list_rr_count(authority_rrlist))
+	{
+		/* we do not check the owner of RRSIG in AUTHORITY */
+		zbx_dns_infof(dtlog, "answer is empty, considering authority");
+		rrsigs = ldns_pkt_rr_list_by_type(pkt, LDNS_RR_TYPE_RRSIG, LDNS_SECTION_AUTHORITY);
+	}
+	else
+	{
+		zbx_dns_infof(dtlog, "answer and authority are empty");
+		zbx_snprintf(err, err_size, "both ANSWER and AUTHORITY sections empty in the answer of \"%s\""
+				" from nameserver \"%s\" (%s)", testname, ns, ip);
+		*rtt = ZBX_EC_DNS_NS_ERRREPLY;
+		goto out;
+	}
+
 	nsset = ldns_pkt_rr_list_by_name_and_type(pkt, testname_rdf, LDNS_RR_TYPE_NS, LDNS_SECTION_AUTHORITY);
-	rrsig = ldns_pkt_rr_list_by_name_and_type(pkt, testname_rdf, LDNS_RR_TYPE_RRSIG, LDNS_SECTION_ANSWER);
 
 	if (0 != epp_enabled)
 	{
-		ldns_rr_list	*rrlist;
-
 		/* start referral validation */
 
 		/* no AA flag */
@@ -359,9 +413,8 @@ static int	zbx_get_ns_values(ldns_resolver *res, const char *ns, const char *ip,
 		}
 
 		/* no RRs in the ANSWER section */
-		if (NULL != (rrlist = ldns_pkt_rr_list_by_type(pkt, LDNS_RR_TYPE_ANY, LDNS_SECTION_ANSWER)))
+		if (NULL != answer_rrlist)
 		{
-			ldns_rr_list_deep_free(rrlist);
 			zbx_snprintf(err, err_size, "ANSWER section of \"%s\" contains RRs from nameserver \"%s\" (%s)",
 					testname, ns, ip);
 			*rtt = ZBX_EC_DNS_NS_ERRREPLY;
@@ -422,29 +475,22 @@ static int	zbx_get_ns_values(ldns_resolver *res, const char *ns, const char *ip,
 
 		if (NULL != keys)
 		{
-			if (NULL == rrsig)
+			if (NULL == rrsigs)
 			{
-				zbx_snprintf(err, err_size, "no RRSIG records in ANSWER section of \"%s\""
-						" at nameserver \"%s\" (%s)", testname, ns, ip);
+				zbx_snprintf(err, err_size, "no RRSIG records of \"%s\" at nameserver \"%s\" (%s)",
+						testname, ns, ip);
 				*rtt = ZBX_EC_DNS_NS_ERRSIG;
 				goto out;
 			}
+			else if (1 != ldns_rr_list_rr_count(rrsigs))
+				zbx_dns_warnf(dtlog, "more than one RRSIG found, using the first one");
 
-			if (1 != ldns_rr_list_rr_count(rrsig))
-			{
-				zbx_snprintf(err, err_size, "more than one RRSIG record in ANSWER section"
-						" of \"%s\" at nameserver \"%s\" (%s)", testname, ns, ip);
-				*rtt = ZBX_EC_DNS_NS_ERRSIG;
-				goto out;
-			}
-
-			if (SUCCEED != zbx_remove_unmatched_dnskeys(&matched_keys, ldns_rr_list_rr(rrsig, 0), rtt,
+			if (SUCCEED != zbx_remove_unmatched_dnskeys(&matched_keys, ldns_rr_list_rr(rrsigs, 0), rtt,
 					err, err_size))
-			{
 				goto out;
-			}
 
-			if (LDNS_STATUS_OK != (status = ldns_verify(dsset, rrsig, matched_keys, NULL)))
+			if (LDNS_STATUS_OK != (status = ldns_verify_rrsig_keylist(dsset, ldns_rr_list_rr(rrsigs, 0),
+					matched_keys, NULL)))
 			{
 				zbx_snprintf(err, err_size, "cannot verify DS keys of \"%s\" at nameserver \"%s\" (%s). %s",
 						testname, ns, ip, ldns_get_errorstr_by_id(status));
@@ -455,23 +501,17 @@ static int	zbx_get_ns_values(ldns_resolver *res, const char *ns, const char *ip,
 	}
 	else if (NULL != keys)	/* EPP disabled, DNSSEC enabled */
 	{
-		if (NULL == rrsig)
+		if (NULL == rrsigs)
 		{
-			zbx_snprintf(err, err_size, "no RRSIG records in ANSWER section of \"%s\""
-					" at nameserver \"%s\" (%s)", testname, ns, ip);
+			zbx_snprintf(err, err_size, "no RRSIG records of \"%s\" at nameserver \"%s\" (%s)",
+					testname, ns, ip);
 			*rtt = ZBX_EC_DNS_NS_ERRSIG;
 			goto out;
 		}
+		else if (1 != ldns_rr_list_rr_count(rrsigs))
+			zbx_dns_warnf(dtlog, "more than one RRSIG found, using the first one");
 
-		if (1 != ldns_rr_list_rr_count(rrsig))
-		{
-			zbx_snprintf(err, err_size, "more than one RRSIG record in ANSWER section"
-					" of \"%s\" at nameserver \"%s\" (%s)", testname, ns, ip);
-			*rtt = ZBX_EC_DNS_NS_ERRSIG;
-			goto out;
-		}
-
-		if (SUCCEED != zbx_remove_unmatched_dnskeys(&matched_keys, ldns_rr_list_rr(rrsig, 0), rtt,
+		if (SUCCEED != zbx_remove_unmatched_dnskeys(&matched_keys, ldns_rr_list_rr(rrsigs, 0), rtt,
 				err, err_size))
 		{
 			goto out;
@@ -489,8 +529,14 @@ out:
 	else
 		zabbix_log(LOG_LEVEL_WARNING, "DNSTEST DNS \"%s\" (%s) RTT:%d", ns, ip, *rtt);
 
-	if (NULL != rrsig)
-		ldns_rr_list_deep_free(rrsig);
+	if (NULL != authority_rrlist)
+		ldns_rr_list_deep_free(authority_rrlist);
+
+	if (NULL != answer_rrlist)
+		ldns_rr_list_deep_free(answer_rrlist);
+
+	if (NULL != rrsigs)
+		ldns_rr_list_deep_free(rrsigs);
 
 	if (NULL != dsset)
 		ldns_rr_list_deep_free(dsset);
@@ -736,38 +782,6 @@ static void	zbx_dns_log(FILE *f, const char *prefix, const char *text)
 			ms,
 			prefix,
 			text);
-}
-
-#define zbx_dns_errf(f, fmt, ...)	zbx_dns_logf(f, "Error", ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#define zbx_dns_warnf(f, fmt, ...)	zbx_dns_logf(f, "Warning", ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#define zbx_dns_infof(f, fmt, ...)	zbx_dns_logf(f, "Info", ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-static void	zbx_dns_logf(FILE *f, const char *prefix, const char *fmt, ...)
-{
-	va_list		args;
-	char		fmt_buf[ZBX_ERR_BUF_SIZE];
-	struct timeval	current_time;
-	struct tm	*tm;
-	long		ms;
-
-	gettimeofday(&current_time, NULL);
-	tm = localtime(&current_time.tv_sec);
-	ms = current_time.tv_usec / 1000;
-
-	zbx_snprintf(fmt_buf, sizeof(fmt_buf), "[%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld] %s: %s\n",
-			tm->tm_year + 1900,
-			tm->tm_mon + 1,
-			tm->tm_mday,
-			tm->tm_hour,
-			tm->tm_min,
-			tm->tm_sec,
-			ms,
-			prefix,
-			fmt);
-	fmt = fmt_buf;
-
-	va_start(args, fmt);
-	vfprintf(f, fmt, args);
-	va_end(args);
 }
 
 static int	zbx_parse_dns_item(DC_ITEM *item, char *host, size_t host_size)
