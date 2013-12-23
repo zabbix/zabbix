@@ -561,6 +561,8 @@ sub create_item_dns_udp_upd {
     my $ip = shift;
     my $templateid = shift;
 
+    my $proto_uc = 'UDP';
+
     my $options = {'name' => 'DNS update time of $2 ($3)',
                                               'key_'=> 'dnstest.dns.udp.upd[{$DNSTEST.TLD},'.$ns_name.','.$ip.']',
                                               'hostid' => $templateid,
