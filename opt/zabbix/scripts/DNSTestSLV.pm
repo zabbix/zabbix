@@ -935,7 +935,11 @@ sub __log
 {
     my $msg = shift;
 
-    if (defined($OPTS{'test'}) or defined($OPTS{'stdout'}))
+    if (defined($OPTS{'test'}) or
+	defined($OPTS{'stdout'}) or
+	not defined($config) or
+	not defined($config->{'slv'}) or
+	not defined($config->{'slv'}->{'logdir'}))
     {
 	print($msg);
 	return;
