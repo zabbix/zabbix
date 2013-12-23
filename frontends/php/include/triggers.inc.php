@@ -959,11 +959,11 @@ function implode_exp($expression, $triggerid, &$hostnames = array()) {
 			}
 		}
 
-		if (!$triggerFunctionValidator->validate(array('functionName' => $exprPart['functionName'],
-				'functionParamList' => $exprPart['functionParamList'],
-				'valueType' => $items[$exprPart['host']][$exprPart['item']]['valueType']))) {
-			throw new Exception($triggerFunctionValidator->getError());
-		}
+//		if (!$triggerFunctionValidator->validate(array('functionName' => $exprPart['functionName'],
+//				'functionParamList' => $exprPart['functionParamList'],
+//				'valueType' => $items[$exprPart['host']][$exprPart['item']]['valueType']))) {
+//			throw new Exception($triggerFunctionValidator->getError());
+//		}
 
 		$newFunctions[$exprPart['expression']] = 0;
 
