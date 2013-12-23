@@ -564,7 +564,7 @@ sub create_item_dns_udp_upd {
     my $options = {'name' => 'DNS update time of $2 ($3)',
                                               'key_'=> 'dnstest.dns.udp.upd[{$DNSTEST.TLD},'.$ns_name.','.$ip.']',
                                               'hostid' => $templateid,
-                                              'applications' => [get_application_id('DNS UPD', $templateid)],
+                                              'applications' => [get_application_id('DNS RTT ('.$proto_uc.')', $templateid)],
                                               'type' => 2, 'value_type' => 0,
                                               'valuemapid' => value_mappings->{'dnstest_dns'},
 		                              'status' => $UPDATE_TIME_STATUS};
@@ -654,7 +654,7 @@ sub create_items_dns {
     $options = {'name' => 'Number of working DNS Name Servers of $1 ('.$proto_uc.')',
                                               'key_'=> $item_key,
                                               'hostid' => $templateid,
-                                              'applications' => [get_application_id('DNS', $templateid)],
+                                              'applications' => [get_application_id('DNS ('.$proto_uc.')', $templateid)],
                                               'type' => 3, 'value_type' => 3,
                                               'delay' => $cfg_dns_udp_delay, 'valuemapid' => value_mappings->{'dnstest_dns'}};
 
