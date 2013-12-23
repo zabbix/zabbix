@@ -1760,7 +1760,7 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 	size_t			i, items_num = 0;
 	time_t			ts, now;
 	int			rtt43 = ZBX_NO_VALUE, upd43 = ZBX_NO_VALUE, rtt80 = ZBX_NO_VALUE, rtt_limit,
-				ipv4_enabled, ipv6_enabled, rdds_enabled, ret = SYSINFO_RET_FAIL;
+				ipv4_enabled, ipv6_enabled, rdds_enabled, epp_enabled, ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_WARNING, "In %s() keyname:'%s' params:'%s'", __function_name, keyname, params);
 
@@ -1773,6 +1773,20 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 
 	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_TLD_RDDS_ENABLED, &rdds_enabled, 0,
 			err, sizeof(err)) || 0 == rdds_enabled)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "End of %s(): disabled on this TLD", __function_name);
+		return SYSINFO_RET_OK;
+	}
+
+	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_EPP_ENABLED, &epp_enabled, 0, err, sizeof(err)) ||
+			0 == epp_enabled)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "End of %s(): disabled on this probe", __function_name);
+		return SYSINFO_RET_OK;
+	}
+
+	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_TLD_EPP_ENABLED, &epp_enabled, 0,
+			err, sizeof(err)) || 0 == epp_enabled)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "End of %s(): disabled on this TLD", __function_name);
 		return SYSINFO_RET_OK;
@@ -1950,29 +1964,32 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 	/* If we are here it means RDDS43 was successful. Now we will perform the UPD */
 	/* test but its errors will not affect the fact that we will run RDDS80 test. */
 
-	/* start RDDS UPD test, get timestamp from the host name */
-	if (SUCCEED != zbx_get_ts_from_host(random_ns, &ts))
+	if (0 != epp_enabled)
 	{
-		upd43 = ZBX_EC_RDDS43_NOTS;
-		zbx_dns_errf(log_fd, "cannot extract Unix timestamp from Name Server \"%s\"", random_ns);
-	}
-
-	if (upd43 == ZBX_NO_VALUE)
-	{
-		now = time(NULL);
-
-		if (0 > now - ts)
+		/* start RDDS UPD test, get timestamp from the host name */
+		if (SUCCEED != zbx_get_ts_from_host(random_ns, &ts))
 		{
-			zbx_dns_errf(log_fd, "Unix timestamp of Name Server \"%s\" is in the future (current: %lu)",
-					random_ns, now);
-			upd43 = ZBX_EC_RDDS43_ERRTS;
+			upd43 = ZBX_EC_RDDS43_NOTS;
+			zbx_dns_errf(log_fd, "cannot extract Unix timestamp from Name Server \"%s\"", random_ns);
 		}
-	}
 
-	if (upd43 == ZBX_NO_VALUE)
-	{
-		/* successful UPD */
-		upd43 = now - ts;
+		if (upd43 == ZBX_NO_VALUE)
+		{
+			now = time(NULL);
+
+			if (0 > now - ts)
+			{
+				zbx_dns_errf(log_fd, "Unix timestamp of Name Server \"%s\" is in the future"
+						" (current: %lu)", random_ns, now);
+				upd43 = ZBX_EC_RDDS43_ERRTS;
+			}
+		}
+
+		if (upd43 == ZBX_NO_VALUE)
+		{
+			/* successful UPD */
+			upd43 = now - ts;
+		}
 	}
 
 	/* start RDDS80 test, resolve hosts to ips */
