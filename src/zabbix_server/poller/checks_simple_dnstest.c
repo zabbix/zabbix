@@ -1852,7 +1852,7 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 	}
 
 	if (0 != epp_enabled && SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_TLD_EPP_ENABLED, &epp_enabled, 0,
-			err, sizeof(err)) || 0 == epp_enabled)
+			err, sizeof(err)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
 		goto out;
