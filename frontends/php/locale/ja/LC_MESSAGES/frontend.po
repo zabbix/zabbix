@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-12-18 00:54+0200\n"
-"PO-Revision-Date: 2013-12-12 05:27+0300\n"
+"PO-Revision-Date: 2013-12-18 08:59+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1386818872.0\n"
+"X-POOTLE-MTIME: 1387349999.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -2251,7 +2251,7 @@ msgstr "発見されたトリガーの\"%1$s\"を更新できません"
 #: api/classes/CAction.php:666
 #, c-format
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
-msgstr ""
+msgstr "アクション\"%2$s\"の\"%1$s\"を更新できません。"
 
 #: api/classes/CItemGeneral.php:207
 #, c-format
@@ -6268,7 +6268,7 @@ msgstr "ホストを更新しました"
 #: api/classes/CTemplate.php:900
 #, c-format
 msgid "Host with the same name \"%1$s\" already exists."
-msgstr ""
+msgstr "同じホスト名\"%1$s\"を持つホストがすでに存在します。"
 
 #: api/classes/CHost.php:809
 #, c-format
@@ -6278,7 +6278,7 @@ msgstr "同じホスト名\"%s\"を持つホストがすでに存在します。
 #: api/classes/CTemplate.php:526 api/classes/CTemplate.php:867
 #, c-format
 msgid "Host with the same visible name \"%1$s\" already exists."
-msgstr ""
+msgstr "同じホストの表示名\"%1$s\"を持つホストがすでに存在します。"
 
 #: api/classes/CHost.php:815
 #, c-format
@@ -6944,7 +6944,7 @@ msgstr "ノード名に不正な文字列が利用されています。"
 #: api/classes/CTemplate.php:501
 #, c-format
 msgid "Incorrect characters used for Template name \"%1$s\""
-msgstr ""
+msgstr "テンプレート名\"%1$s\"に不正な文字列が利用されています"
 
 #: api/classes/CHostPrototype.php:175
 #, c-format
@@ -6964,7 +6964,7 @@ msgstr "プロキシ名\"%1$s\"に利用されている文字列が正しくあ�
 #: api/classes/CTemplate.php:908
 #, c-format
 msgid "Incorrect characters used for template name \"%1$s\"."
-msgstr ""
+msgstr "テンプレート名\"%1$s\"に利用されている文字列が正しくありません。"
 
 #: api/classes/CDRule.php:261
 msgid "Incorrect delay."
@@ -7199,7 +7199,7 @@ msgstr "アイコンのマッピング\"%s\"のパラメータが正しくあり
 #: api/classes/CAction.php:650
 #, c-format
 msgid "Incorrect parameters for action update method \"%1$s\"."
-msgstr ""
+msgstr "アクション更新メソッド\"%1$s\"のパラメータが正しくありません。"
 
 #: api/classes/CAction.php:804
 msgid "Incorrect parameters for condition."
@@ -7652,7 +7652,7 @@ msgstr "インベントリ"
 #: api/classes/CHost.php:1306
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
-msgstr ""
+msgstr "ホスト\"%1$s\"のインベントリを無効にしました。"
 
 #: include/views/administration.general.iconmap.edit.php:41
 msgid "Inventory field"
@@ -9598,7 +9598,7 @@ msgstr "テンプレートにグループが設定されていません"
 #: api/classes/CTemplate.php:460
 #, c-format
 msgid "No groups for template \"%1$s\"."
-msgstr ""
+msgstr "テンプレート\"%1$s\"にグループが設定されていません。"
 
 #: api/classes/CDiscoveryRule.php:446
 msgid "No host IDs given."
@@ -12694,7 +12694,7 @@ msgstr "スライドショー"
 #: include/screens.inc.php:243
 #, c-format
 msgid "Slide show \"%1$s\" already exists."
-msgstr ""
+msgstr "スライドショー\"%1$s\"はすでに存在します。"
 
 #: include/screens.inc.php:181
 #, c-format
@@ -13212,7 +13212,7 @@ msgstr "キー\"%1$s\"を持つアイテムを含むテンプレートがすで�
 #: api/classes/CTemplate.php:892
 #, c-format
 msgid "Template with the same name \"%1$s\" already exists."
-msgstr ""
+msgstr "同じ名前\"%1$s\"を持つテンプレートがすでに存在します。"
 
 #: api/classes/CHost.php:825
 #, c-format
@@ -13222,7 +13222,7 @@ msgstr "同じ名前\"%s\"を持つテンプレートがすでに存在します
 #: api/classes/CTemplate.php:519 api/classes/CTemplate.php:859
 #, c-format
 msgid "Template with the same visible name \"%1$s\" already exists."
-msgstr ""
+msgstr "同じ表示名\"%1$s\"を持つテンプレートがすでに存在します。"
 
 #: api/classes/CHost.php:831
 #, c-format
@@ -14369,12 +14369,12 @@ msgstr "ユーザーグループ"
 #: api/classes/CUserGroup.php:685
 #, c-format
 msgid "User group \"%1$s\" is the only group that user \"%2$s\" belongs to."
-msgstr ""
+msgstr "ユーザーグループ\"%1$s\"はユーザー\"%2$s\"が所属する唯一のグループです。"
 
 #: api/classes/CUserGroup.php:668
 #, c-format
 msgid "User group \"%1$s\" is used in configuration for database down messages."
-msgstr ""
+msgstr "ユーザーグループ\"%1$s\"はデータベース停止メッセージの設定に利用されています。"
 
 #: api/classes/CUserGroup.php:657
 #, c-format
