@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-12-17 23:58+0200\n"
-"PO-Revision-Date: 2013-12-16 15:59+0300\n"
+"PO-Revision-Date: 2013-12-21 15:04+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1387202368.0\n"
+"X-POOTLE-MTIME: 1387631072.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -2325,7 +2325,7 @@ msgstr "Не удалось обновить \"%1$s\" для обнаружен�
 #: api/classes/CAction.php:666
 #, c-format
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
-msgstr ""
+msgstr "Не удалось обновить \"%1$s\" для действия \"%2$s\"."
 
 #: api/classes/CItemGeneral.php:207
 #, c-format
@@ -6356,7 +6356,7 @@ msgstr "Узел сети обновлен"
 #: api/classes/CTemplate.php:899
 #, c-format
 msgid "Host with the same name \"%1$s\" already exists."
-msgstr ""
+msgstr "Узел сети с таким же именем \"%1$s\" уже существует."
 
 #: api/classes/CHost.php:809
 #, c-format
@@ -6366,7 +6366,7 @@ msgstr "Узел сети с таким же именем \"%s\" уже суще
 #: api/classes/CTemplate.php:526 api/classes/CTemplate.php:866
 #, c-format
 msgid "Host with the same visible name \"%1$s\" already exists."
-msgstr ""
+msgstr "Узел сети с таким же видимым именем \"%1$s\" уже существует."
 
 #: api/classes/CHost.php:815
 #, c-format
@@ -7032,7 +7032,7 @@ msgstr "Использованы некорректные символы в им
 #: api/classes/CTemplate.php:501
 #, c-format
 msgid "Incorrect characters used for Template name \"%1$s\""
-msgstr ""
+msgstr "Использованы некорректные символы в имени шаблона \"%1$s\""
 
 #: api/classes/CHostPrototype.php:175
 #, c-format
@@ -7052,7 +7052,7 @@ msgstr "Использованы некорректные символы в им
 #: api/classes/CTemplate.php:907
 #, c-format
 msgid "Incorrect characters used for template name \"%1$s\"."
-msgstr ""
+msgstr "Использованы некорректные символы в имени шаблона \"%1$s\"."
 
 #: api/classes/CDRule.php:261
 msgid "Incorrect delay."
