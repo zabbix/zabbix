@@ -1778,20 +1778,6 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 		return SYSINFO_RET_OK;
 	}
 
-	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_EPP_ENABLED, &epp_enabled, 0, err, sizeof(err)) ||
-			0 == epp_enabled)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "End of %s(): disabled on this probe", __function_name);
-		return SYSINFO_RET_OK;
-	}
-
-	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_TLD_EPP_ENABLED, &epp_enabled, 0,
-			err, sizeof(err)) || 0 == epp_enabled)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "End of %s(): disabled on this TLD", __function_name);
-		return SYSINFO_RET_OK;
-	}
-
 	zbx_vector_str_create(&hosts43);
 	zbx_vector_str_create(&hosts80);
 	zbx_vector_str_create(&ips43);
@@ -1854,6 +1840,19 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 	}
 
 	if (SUCCEED != zbx_conf_str(&item->host.hostid, ZBX_MACRO_DNS_TESTPREFIX, &testprefix, err, sizeof(err)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+		goto out;
+	}
+
+	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_EPP_ENABLED, &epp_enabled, 0, err, sizeof(err)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+		goto out;
+	}
+
+	if (0 != epp_enabled && SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_TLD_EPP_ENABLED, &epp_enabled, 0,
+			err, sizeof(err)) || 0 == epp_enabled)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
 		goto out;
