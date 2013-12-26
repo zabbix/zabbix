@@ -541,7 +541,9 @@ function _llnw_allow_DBexecute($query) {
 		// page_footer.php:46:CProfile::flush()
 		"UPDATE users SET  autologin",
 		"table_name='auditlog' AND field_name='auditid'",
+		// Profile session information
 		"INSERT INTO profiles",
+		"UPDATE profiles",
 		// login related queries that drop into infinite look on failure.
 		"UPDATE ids SET nextid=nextid+1 WHERE nodeid=1 AND table_name='user_history' AND field_name='userhistoryid'",
 	);
