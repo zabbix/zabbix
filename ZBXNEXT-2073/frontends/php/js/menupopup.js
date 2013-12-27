@@ -383,14 +383,30 @@ function getMenuPopupHistory(options) {
  * @param string options['widgetName']
  * @param string options['currentRate']
  * @param bool   options['multiplier']
+ * @param array  options['params']
  *
  * @return array
  */
 function getMenuPopupRefresh(options) {
 	var intervals = options.multiplier
-		? {'x0.25': 0.25, 'x0.5': 0.5, 'x1': 1, 'x1.5': 1.5, 'x2': 2, 'x3': 3, 'x4': 4, 'x5': 5}
-		: {10: t('10 seconds'), 30: t('30 seconds'), 60: t('1 minute'), 120: t('2 minutes'), 600: t('10 minutes'),
-			900: t('15 minutes')};
+		? {
+			'x0.25': 'x0.25',
+			'x0.5': 'x0.5',
+			'x1': 'x1',
+			'x1.5': 'x1.5',
+			'x2': 'x2',
+			'x3': 'x3',
+			'x4': 'x4',
+			'x5': 'x5'
+		}
+		: {
+			10: t('10 seconds'),
+			30: t('30 seconds'),
+			60: t('1 minute'),
+			120: t('2 minutes'),
+			600: t('10 minutes'),
+			900: t('15 minutes')
+		};
 
 	return [{
 		type: 'refresh',
@@ -398,6 +414,7 @@ function getMenuPopupRefresh(options) {
 		data: {
 			widgetName: options['widgetName'],
 			currentRate: options['currentRate'],
+			params: options['params'],
 			intervals: intervals
 		}
 	}];
@@ -525,10 +542,10 @@ jQuery(function($) {
 
 							menu.append(createMenuItem(label, null, value, css, null, function() {
 								sendAjaxData({
-									data: {
+									data: jQuery.extend({}, section.data.params, {
 										widgetName: section.data.widgetName,
-										widgetRefreshRate: value,
-									},
+										widgetRefreshRate: value
+									}),
 									dataType: 'script',
 									success: function(js) { js }
 								});

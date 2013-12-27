@@ -45,17 +45,15 @@ $fields = array(
 	'reset' =>			array(T_ZBX_STR, O_OPT, P_SYS,	IN("'reset'"), null),
 	'fullscreen' =>		array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'), null),
 	// ajax
-	'widgetName' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,	null),
 	'widgetRefresh' =>	array(T_ZBX_STR, O_OPT, P_ACT,	null,	null),
 	'widgetRefreshRate' => array(T_ZBX_STR, O_OPT, P_ACT, null,	null),
+	'filterState' =>	array(T_ZBX_INT, O_OPT, P_ACT, null,	null),
 	'favobj' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,	null),
 	'favref' =>			array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY, null),
 	'favid' =>			array(T_ZBX_INT, O_OPT, P_ACT,	null,	null),
 	'favcnt' =>			array(T_ZBX_STR, O_OPT, null,	null,	null),
-	'pmasterid' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 	// actions
 	'favaction' =>		array(T_ZBX_STR, O_OPT, P_ACT,	IN("'add','remove','refresh','flop'"), null),
-	'favstate' =>		array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY, 'isset({favaction})&&"flop"=={favaction}'),
 	'upd_counter' =>	array(T_ZBX_INT, O_OPT, P_ACT,	null,	null)
 );
 check_fields($fields);
@@ -63,13 +61,16 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))
-		|| get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
+$dbSlideshow = null;
+
+if (hasRequest('groupid') && !API::HostGroup()->isReadable(array(getRequest('groupid')))
+		|| hasRequest('hostid') && !API::Host()->isReadable(array(getRequest('hostid')))) {
 	access_deny();
 }
-if (get_request('elementid')) {
-	$slideshow = get_slideshow_by_slideshowid($_REQUEST['elementid']);
-	if (!$slideshow) {
+if (hasRequest('elementid')) {
+	$dbSlideshow = get_slideshow_by_slideshowid(getRequest('elementid'));
+
+	if (!$dbSlideshow) {
 		access_deny();
 	}
 }
@@ -77,50 +78,69 @@ if (get_request('elementid')) {
 /*
  * Actions
  */
-// get fresh widget data
-if (hasRequest('widgetRefresh')) {
-	switch (getRequest('widgetRefresh')) {
-		case WIDGET_SYSTEM_STATUS:
-			$widget = make_system_status($dashboardConfig);
-			$widget->show();
-			break;
+if ((hasRequest('widgetRefresh') || hasRequest('widgetRefreshRate')) && $dbSlideshow) {
+	$elementId = getRequest('elementid');
+
+	$screen = getSlideshowScreens($elementId, getRequest('upd_counter'));
+
+	// display screens
+	$dbScreens = API::Screen()->get(array(
+		'screenids' => $screen['screenid'],
+		'output' => API_OUTPUT_EXTEND,
+		'selectScreenItems' => API_OUTPUT_EXTEND
+	));
+
+	if (!$dbScreens) {
+		insert_js('alert("'._('No permissions').'");');
 	}
-}
+	else {
+		$dbScreen = reset($dbScreens);
 
-if (hasRequest('widgetName')) {
-	$widgetName = getRequest('widgetName');
+		// get fresh widget data
+		if (hasRequest('widgetRefresh')) {
+			$screenBuilder = new CScreenBuilder(array(
+				'screen' => $dbScreen,
+				'mode' => SCREEN_MODE_PREVIEW,
+				'profileIdx' => 'web.slides',
+				'profileIdx2' => $elementId,
+				'period' => getRequest('period'),
+				'stime' => getRequest('stime')
+			));
 
-	$widgets = array(
-		WIDGET_SYSTEM_STATUS, WIDGET_ZABBIX_STATUS, WIDGET_LAST_ISSUES,
-		WIDGET_WEB_OVERVIEW, WIDGET_DISCOVERY_STATUS, WIDGET_HOST_STATUS
-	);
+			CScreenBuilder::insertScreenCleanJs();
 
-	if (in_array($widgetName, $widgets)) {
+			echo $screenBuilder->show()->toString();
+
+			CScreenBuilder::insertScreenStandardJs(array(
+				'timeline' => $screenBuilder->timeline,
+				'profileIdx' => $screenBuilder->profileIdx
+			));
+
+			insertPagePostJs();
+		}
+
 		// refresh rate
 		if (hasRequest('widgetRefreshRate')) {
-			$widgetRefreshRate = getRequest('widgetRefreshRate');
+			$widgetRefreshRate = substr(getRequest('widgetRefreshRate'), 1);
 
-			CProfile::update('web.dashboard.widget.'.$widgetName.'.rf_rate', $widgetRefreshRate, PROFILE_TYPE_INT);
+			CProfile::update('web.slides.rf_rate.'.WIDGET_SLIDESHOW, $widgetRefreshRate, PROFILE_TYPE_STR, $elementId);
 
-			echo updateWidgetRefresh('dashboard', $widgetName, 'frequency', $widgetRefreshRate)
-				.updateWidgetRefresh('dashboard', $widgetName, 'restartDoll');
+			$delay = ($screen['delay'] > 0) ? $screen['delay'] : $dbSlideshow['delay'];
 
-			if (str_in_array($_REQUEST['favref'], array('hat_slides'))) {
-				$elementid = get_request('elementid');
-
-				// TODO
-				CProfile::update('web.slides.rf_rate.hat_slides', $_REQUEST['favcnt'], PROFILE_TYPE_STR, $elementid);
-			}
+			echo updateWidgetRefresh('slideshows', WIDGET_SLIDESHOW, 'frequency', $delay * $widgetRefreshRate)."\n"
+				.updateWidgetRefresh('slideshows', WIDGET_SLIDESHOW, 'restartDoll');
 		}
 	}
 }
-if (isset($_REQUEST['favobj'])) {
-	$_REQUEST['pmasterid'] = get_request('pmasterid', 'mainpage');
 
-	if ($_REQUEST['favobj'] == 'filter') {
-		CProfile::update('web.slides.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
-	}
-	elseif (str_in_array($_REQUEST['favobj'], array('screenid', 'slideshowid'))) {
+// filter state
+if (hasRequest('filterState')) {
+	CProfile::update('web.slides.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
+}
+
+// favourites
+if (isset($_REQUEST['favobj'])) {
+	if (str_in_array($_REQUEST['favobj'], array('screenid', 'slideshowid'))) {
 		$result = false;
 		if ($_REQUEST['favaction'] == 'add') {
 			$result = CFavorite::add('web.favorite.screenids', $_REQUEST['favid'], $_REQUEST['favobj']);
@@ -140,65 +160,6 @@ if (isset($_REQUEST['favobj'])) {
 			echo 'switchElementClass("addrm_fav", "iconminus", "iconplus");';
 		}
 	}
-	elseif ($_REQUEST['favobj'] == 'hat') {
-		if ($_REQUEST['favref'] == 'hat_slides') {
-			$elementid = get_request('elementid');
-
-			if (!is_null($elementid)) {
-				$slideshow = get_slideshow_by_slideshowid($elementid);
-				$screen = get_slideshow($elementid, get_request('upd_counter'));
-				$screens = API::Screen()->get(array(
-					'screenids' => $screen['screenid']
-				));
-
-				if (empty($screens)) {
-					insert_js('alert("'._('No permissions').'");');
-				}
-				else {
-					$page['type'] = PAGE_TYPE_JS;
-
-					// display screens
-					$screens = API::Screen()->get(array(
-						'screenids' => $screen['screenid'],
-						'output' => API_OUTPUT_EXTEND,
-						'selectScreenItems' => API_OUTPUT_EXTEND
-					));
-					$currentScreen = reset($screens);
-
-					$screenBuilder = new CScreenBuilder(array(
-						'screen' => $currentScreen,
-						'mode' => SCREEN_MODE_PREVIEW,
-						'profileIdx' => 'web.slides',
-						'profileIdx2' => $elementid,
-						'period' => get_request('period'),
-						'stime' => get_request('stime')
-					));
-
-					CScreenBuilder::insertScreenCleanJs();
-
-					echo $screenBuilder->show()->toString();
-
-					CScreenBuilder::insertScreenStandardJs(array(
-						'timeline' => $screenBuilder->timeline,
-						'profileIdx' => $screenBuilder->profileIdx
-					));
-
-					insertPagePostJs();
-
-					// insert slide show refresh js
-					$refresh = ($screen['delay'] > 0) ? $screen['delay'] : $slideshow['delay'];
-					$refresh_multipl = CProfile::get('web.slides.rf_rate.hat_slides', 1, $elementid);
-
-					$script = updateWidgetRefresh('mainpage', $_REQUEST['favref'], 'frequency', $refresh * $refresh_multipl)."\n";
-					$script .= updateWidgetRefresh('mainpage', $_REQUEST['favref'], 'restartDoll')."\n";
-					insert_js($script);
-				}
-			}
-			else {
-				echo SBR._('No slide shows defined.');
-			}
-		}
-	}
 
 	// saving fixed/dynamic setting to profile
 	if ($_REQUEST['favobj'] == 'timelinefixedperiod') {
@@ -207,17 +168,17 @@ if (isset($_REQUEST['favobj'])) {
 		}
 	}
 }
-if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
+if (in_array($page['type'], array(PAGE_TYPE_JS, PAGE_TYPE_HTML_BLOCK))) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit();
+	exit;
 }
 
 /*
  * Display
  */
 $data = array(
-	'fullscreen' => $_REQUEST['fullscreen'],
-	'elementid' => get_request('elementid', CProfile::get('web.slides.elementid', null)),
+	'fullscreen' => getRequest('fullscreen'),
+	'elementId' => getRequest('elementid', CProfile::get('web.slides.elementid')),
 	'slideshows' => array()
 );
 
@@ -234,22 +195,20 @@ while ($dbSlideshow = DBfetch($dbSlideshows)) {
 };
 order_result($data['slideshows'], 'name');
 
-if (!isset($data['slideshows'][$data['elementid']])) {
+if (!isset($data['slideshows'][$data['elementId']])) {
 	$slideshow = reset($data['slideshows']);
-	$data['elementid'] = $slideshow['slideshowid'];
+
+	$data['elementId'] = $slideshow['slideshowid'];
 }
 
-CProfile::update('web.slides.elementid', $data['elementid'], PROFILE_TYPE_ID);
-
-// refresh
-$data['refreshMultiplier'] = CProfile::get('web.slides.rf_rate.hat_slides', 1, $data['elementid']);
+CProfile::update('web.slides.elementid', $data['elementId'], PROFILE_TYPE_ID);
 
 // get screen
-$data['screen'] = $data['elementid'] ? get_slideshow($data['elementid'], 0) : array();
+$data['screen'] = $data['elementId'] ? getSlideshowScreens($data['elementId'], 0) : array();
 
 if ($data['screen']) {
 	// get groups and hosts
-	if (check_dynamic_items($data['elementid'], 1)) {
+	if (check_dynamic_items($data['elementId'], 1)) {
 		$data['isDynamicItems'] = true;
 
 		$data['pageFilter'] = new CPageFilter(array(
@@ -262,19 +221,23 @@ if ($data['screen']) {
 				'with_items' => true,
 				'DDFirstLabel' => _('Default')
 			),
-			'hostid' => get_request('hostid', null),
-			'groupid' => get_request('groupid', null)
+			'hostid' => getRequest('hostid'),
+			'groupid' => getRequest('groupid')
 		));
 	}
 
 	// get element
-	$data['element'] = get_slideshow_by_slideshowid($data['elementid']);
+	$data['element'] = get_slideshow_by_slideshowid($data['elementId']);
+
 	if ($data['screen']['delay'] > 0) {
 		$data['element']['delay'] = $data['screen']['delay'];
 	}
 
 	show_messages();
 }
+
+// refresh
+$data['refreshMultiplier'] = CProfile::get('web.slides.rf_rate.'.WIDGET_SLIDESHOW, 1, $data['elementId']);
 
 // render view
 $slidesView = new CView('monitoring.slides', $data);

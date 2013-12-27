@@ -75,9 +75,8 @@ $fields = array(
 	'filter_rst'=>		array(T_ZBX_INT, O_OPT, P_SYS,	IN(array(0,1)), null),
 	'filter_set'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	// ajax
+	'filterState' =>	array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
 	'favobj'=>			array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'favref'=>			array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})&&"filter"=={favobj}'),
-	'favstate'=>		array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})&&"filter"=={favobj}'),
 	'favid'=>			array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
 );
 check_fields($fields);
@@ -98,10 +97,10 @@ if (get_request('triggerid') && !API::Trigger()->isReadable(array($_REQUEST['tri
 /*
  * Ajax
  */
+if (hasRequest('filterState')) {
+	CProfile::update('web.events.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
+}
 if (isset($_REQUEST['favobj'])) {
-	if ('filter' == $_REQUEST['favobj']) {
-		CProfile::update('web.events.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
-	}
 	// saving fixed/dynamic setting to profile
 	if ('timelinefixedperiod' == $_REQUEST['favobj']) {
 		if (isset($_REQUEST['favid'])) {

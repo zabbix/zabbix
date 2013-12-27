@@ -174,7 +174,7 @@ if (hasRequest('widgetName')) {
 
 			CProfile::update('web.dashboard.widget.'.$widgetName.'.rf_rate', $widgetRefreshRate, PROFILE_TYPE_INT);
 
-			echo updateWidgetRefresh('dashboard', $widgetName, 'frequency', $widgetRefreshRate)
+			echo updateWidgetRefresh('dashboard', $widgetName, 'frequency', $widgetRefreshRate)."\n"
 				.updateWidgetRefresh('dashboard', $widgetName, 'restartDoll');
 		}
 
@@ -197,7 +197,7 @@ if (hasRequest('widgetSort')) {
 	}
 }
 
-// favorites
+// favourites
 if (hasRequest('favobj') && hasRequest('favaction')) {
 	$favouriteObject = getRequest('favobj');
 	$favouriteAction = getRequest('favaction');

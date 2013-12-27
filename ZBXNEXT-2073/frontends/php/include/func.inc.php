@@ -2756,15 +2756,17 @@ function getMenuPopupTrigger(array $trigger, array $items = null, array $acknowl
  * @param string $widgetName
  * @param string $currentRate
  * @param bool   $multiplier
+ * @param array  $params
  *
  * @return array
  */
-function getMenuPopupRefresh($widgetName, $currentRate, $multiplier = false) {
+function getMenuPopupRefresh($widgetName, $currentRate, $multiplier = false, array $params = array()) {
 	return array(
 		'type' => 'refresh',
 		'widgetName' => $widgetName,
 		'currentRate' => $currentRate,
-		'multiplier' => $multiplier
+		'multiplier' => $multiplier,
+		'params' => $params
 	);
 }
 

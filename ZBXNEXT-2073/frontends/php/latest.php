@@ -49,10 +49,10 @@ $fields = array(
 	'show_details'=>		array(T_ZBX_INT, O_OPT, NULL,	IN('0,1'),	NULL),
 	'filter_rst'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),	NULL),
 	'filter_set'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	null,		NULL),
-//ajax
+	// ajax
+	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
 	'favobj'=>				array(T_ZBX_STR, O_OPT, P_ACT,	NULL,		NULL),
 	'favref'=>				array(T_ZBX_STR, O_OPT, P_ACT,  NULL,		NULL),
-	'favstate'=>			array(T_ZBX_INT, O_OPT, P_ACT,  NULL,		NULL),
 	'toggle_ids'=>			array(T_ZBX_STR, O_OPT, P_ACT,  NULL,		NULL),
 	'toggle_open_state'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NULL,		NULL)
 );
@@ -71,11 +71,11 @@ if (getRequest('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))
 /*
  * Ajax
  */
+if (hasRequest('filterState')) {
+	CProfile::update('web.latest.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
+}
 if (hasRequest('favobj')) {
-	if ($_REQUEST['favobj'] == 'filter') {
-		CProfile::update('web.latest.filter.state',$_REQUEST['favstate'], PROFILE_TYPE_INT);
-	}
-	elseif ($_REQUEST['favobj'] == 'toggle') {
+	if ($_REQUEST['favobj'] == 'toggle') {
 		// $_REQUEST['toggle_ids'] can be single id or list of ids,
 		// where id xxxx is application id and id 0_xxxx is 0_ + host id
 		if (!is_array($_REQUEST['toggle_ids'])) {

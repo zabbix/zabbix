@@ -998,8 +998,6 @@ function rm4favorites(favobj, favid, menu_rowid) {
 }
 
 function changeFlickerState(id) {
-	deselectAll();
-
 	var state = showHide(id);
 
 	switchElementClass('flicker_icon_l', 'dbl_arrow_up', 'dbl_arrow_down');
@@ -1007,10 +1005,7 @@ function changeFlickerState(id) {
 
 	sendAjaxData({
 		data: {
-			favaction: 'flop',
-			favobj: 'filter',
-			favref: id,
-			favstate: state
+			filterState: state
 		}
 	});
 

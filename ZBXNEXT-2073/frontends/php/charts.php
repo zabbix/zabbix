@@ -45,10 +45,10 @@ $fields = array(
 	'action' =>		array(T_ZBX_STR, O_OPT, P_SYS, IN("'go','add','remove'"), null),
 	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),	null),
 	// ajax
+	'filterState' => array(T_ZBX_INT, O_OPT, P_ACT, null,		null),
 	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT, null,		null),
 	'favref' =>		array(T_ZBX_STR, O_OPT, P_ACT, NOT_EMPTY,	null),
 	'favid' =>		array(T_ZBX_INT, O_OPT, P_ACT, null,		null),
-	'favstate' =>	array(T_ZBX_INT, O_OPT, P_ACT, NOT_EMPTY,	null),
 	'favaction' =>	array(T_ZBX_STR, O_OPT, P_ACT, IN("'add','remove'"), null)
 );
 check_fields($fields);
@@ -84,10 +84,11 @@ $pageFilter = new CPageFilter(array(
 /*
  * Ajax
  */
+if (hasRequest('filterState')) {
+	CProfile::update('web.charts.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
+}
+
 if (isset($_REQUEST['favobj'])) {
-	if ($_REQUEST['favobj'] == 'filter') {
-		CProfile::update('web.charts.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
-	}
 	if ($_REQUEST['favobj'] == 'timelinefixedperiod') {
 		if (isset($_REQUEST['favid'])) {
 			CProfile::update('web.screens.timelinefixed', $_REQUEST['favid'], PROFILE_TYPE_INT);

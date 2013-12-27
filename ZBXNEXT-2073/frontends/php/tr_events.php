@@ -47,7 +47,6 @@ $fields = array(
 	// ajax
 	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT,	IN("'filter','hat'"), null),
 	'favref' =>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})'),
-	'favstate' =>	array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})')
 );
 check_fields($fields);
 

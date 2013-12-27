@@ -935,6 +935,7 @@ define('WIDGET_FAVOURITE_MAPS',		'favmap');
 define('WIDGET_FAVOURITE_SCREENS',	'favscr');
 define('WIDGET_HOST_STATUS',		'hoststat');
 define('WIDGET_LAST_ISSUES',		'lastiss');
+define('WIDGET_SLIDESHOW',			'hat_slides');
 define('WIDGET_SYSTEM_STATUS',		'syssum');
 define('WIDGET_WEB_OVERVIEW',		'webovr');
 define('WIDGET_ZABBIX_STATUS',		'stszbx');
