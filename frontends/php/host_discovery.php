@@ -130,7 +130,7 @@ if (get_request('itemid', false)) {
 		'itemids' => $_REQUEST['itemid'],
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => array('status', 'flags'),
-		'selectConditions' => array('item_conditionid', 'macro', 'value'),
+		'selectConditions' => array('item_conditionid', 'macro', 'value', 'formulaid'),
 		'editable' => true
 	));
 	$item = reset($item);
@@ -263,7 +263,7 @@ elseif (isset($_REQUEST['save'])) {
 		foreach ($newItem['conditions'] as &$condition) {
 			if (isset($condition['item_conditionid'])) {
 				$condition = CArrayHelper::unsetEqualValues($condition, $conditions[$condition['item_conditionid']],
-					array('item_conditionid')
+					array('item_conditionid', 'formulaid')
 				);
 			}
 		}
@@ -314,18 +314,7 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_hostdruleid'])) {
  * Display
  */
 if (isset($_REQUEST['form'])) {
-	$rule = array();
-	if (hasRequest('itemid')) {
-		$rule = API::DiscoveryRule()->get(array(
-			'output' => API_OUTPUT_EXTEND,
-			'selectConditions' => array('item_conditionid', 'macro', 'value'),
-			'itemids' => getRequest('itemid'),
-			'editable' => true
-		));
-		$rule = reset($rule);
-	}
-
-	$data = getItemFormData($rule, array('is_discovery_rule' => true));
+	$data = getItemFormData($item, array('is_discovery_rule' => true));
 	$data['page_header'] = _('CONFIGURATION OF DISCOVERY RULES');
 	$data['lifetime'] = getRequest('lifetime', 30);
 	$data['evaltype'] = getRequest('evaltype');
@@ -333,10 +322,10 @@ if (isset($_REQUEST['form'])) {
 	$data['conditions'] = getRequest('conditions', array());
 
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
-		$data['lifetime'] = $rule['lifetime'];
-		$data['evaltype'] = $rule['evaltype'];
-		$data['formula'] = $rule['formula'];
-		$data['conditions'] = $rule['conditions'];
+		$data['lifetime'] = $item['lifetime'];
+		$data['evaltype'] = $item['evaltype'];
+		$data['formula'] = $item['formula'];
+		$data['conditions'] = $item['conditions'];
 	}
 
 	// render view

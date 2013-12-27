@@ -1194,6 +1194,7 @@ class CDiscoveryRule extends CItemGeneral {
 					$options['selectConditions']
 				),
 				'filter' => array('itemid' => $itemIds),
+				'sortfield' => 'item_conditionid',
 				'preservekeys' => true,
 				'nodeids' => get_current_nodeid(true)
 			));
@@ -1203,6 +1204,17 @@ class CDiscoveryRule extends CItemGeneral {
 				$options['selectConditions']
 			);
 			$result = $relationMap->mapMany($result, $conditions, 'conditions');
+
+			// add formula IDs
+			if ($this->outputIsRequested('formulaid', $options['selectConditions'])) {
+				foreach ($result as &$rule) {
+					foreach ($rule['conditions'] as $i => &$condition) {
+						$condition['formulaid'] = num2letter($i);
+					}
+					unset($condition);
+				}
+				unset($rule);
+			}
 		}
 
 		return $result;

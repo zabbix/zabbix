@@ -291,27 +291,37 @@ $conditionFormList->addRow(_('Type of calculation'),
 // macros
 $conditionTable = new CTable('', 'formElementTable');
 $conditionTable->attr('id', 'conditions');
-$conditionTable->addRow(array(_('Macro'), SPACE, _('Regular expression'), SPACE));
+$conditionTable->addRow(array(_('Label'), _('Macro'), SPACE, _('Regular expression'), SPACE));
 
 $conditions = $this->data['conditions'];
 if (!$conditions) {
-	$conditions = array(array('macro' => '', 'value' => ''));
+	$conditions = array(array('macro' => '', 'value' => '', 'formulaid' => num2letter(0)));
 }
 
 // fields
 foreach ($conditions as $i => $condition) {
+	// formula id
+	$formulaId = array(
+		new CSpan('('.$condition['formulaid'].')'),
+		new CVar('conditions['.$i.'][formulaid]', $condition['formulaid'])
+	);
+
+	// macro
 	$macro = new CTextBox('conditions['.$i.'][macro]', $condition['macro'], 30, false, 64);
 	$macro->addClass('macro');
 	$macro->setAttribute('placeholder', '{#MACRO}');
+
+	// value
 	$value = new CTextBox('conditions['.$i.'][value]', $condition['value'], 40, false, 255);
 	$value->setAttribute('placeholder', _('regular expression'));
 
+	// delete button
 	$deleteButtonCell = array(new CButton('conditions_'.$i.'_remove', _('Remove'), null, 'link_menu element-table-remove'));
 	if (isset($condition['item_conditionid'])) {
 		$deleteButtonCell[] = new CVar('conditions['.$i.'][item_conditionid]', $condition['item_conditionid'], 'conditions_'.$i.'_id');
 	}
 
-	$row = array($macro, new CSpan(_('matches')), $value, $deleteButtonCell);
+	$row = array($formulaId, $macro, new CSpan(_('matches')), $value, $deleteButtonCell);
 	$conditionTable->addRow($row, 'form_row');
 }
 
