@@ -678,7 +678,6 @@ static int	zbx_get_dnskeys(const ldns_resolver *res, const char *domain, const c
 {
 	ldns_pkt	*pkt = NULL;
 	ldns_rdf	*domain_rdf = NULL;
-	ldns_rr_list	*rrset = NULL;
 	int		i, ret = FAIL;
 
 	if (NULL == (domain_rdf = ldns_rdf_new_frm_str(LDNS_RDF_TYPE_DNAME, domain)))
@@ -709,7 +708,7 @@ static int	zbx_get_dnskeys(const ldns_resolver *res, const char *domain, const c
 	}
 
 	/* get the DNSKEY records */
-	if (NULL == (rrset = ldns_pkt_rr_list_by_name_and_type(pkt, domain_rdf, LDNS_RR_TYPE_DNSKEY,
+	if (NULL == (*keys = ldns_pkt_rr_list_by_name_and_type(pkt, domain_rdf, LDNS_RR_TYPE_DNSKEY,
 			LDNS_SECTION_ANSWER)))
 	{
 		zbx_snprintf(err, err_size, "no DNSKEY records of domain \"%s\" from resolver \"%s\"", domain,
@@ -718,40 +717,8 @@ static int	zbx_get_dnskeys(const ldns_resolver *res, const char *domain, const c
 		goto out;
 	}
 
-	/* ignore non-ZSK DNSKEYs */
-	for (i = 0; i < ldns_rr_list_rr_count(rrset); i++)
-	{
-		const ldns_rr	*rr;
-
-		rr = ldns_rr_list_rr(rrset, i);
-
-		if (256 == ldns_rdf2native_int16(ldns_rr_dnskey_flags(rr)))
-		{
-			if (NULL == *keys)
-				*keys = ldns_rr_list_new();
-
-			if (false == ldns_rr_list_push_rr(*keys, ldns_rr_clone(rr)))
-			{
-				zbx_strlcpy(err, "internal error: cannot add rr to rr_list", err_size);
-				*ec = ZBX_EC_INTERNAL;
-				goto out;
-			}
-		}
-	}
-
-	if (NULL == *keys)
-	{
-		zbx_snprintf(err, err_size, "no ZSK DNSKEY records of domain \"%s\" from resolver \"%s\"", domain,
-				resolver);
-		*ec = ZBX_EC_DNS_NS_ERRSIG;
-		goto out;
-	}
-
 	ret = SUCCEED;
 out:
-	if (NULL != rrset)
-		ldns_rr_list_deep_free(rrset);
-
 	if (NULL != domain_rdf)
 		ldns_rdf_deep_free(domain_rdf);
 
