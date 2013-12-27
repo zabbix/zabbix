@@ -4,6 +4,10 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 <script type="text/x-jquery-tmpl" id="condition-row">
 	<tr class="form_row">
 		<td>
+			<span>(#{formulaId})</span>
+			<input type="hidden" name="conditions[#{rowNum}][formulaid]" value="#{formulaId}">
+		</td>
+		<td>
 			<input class="input text macro" type="text" id="conditions_#{rowNum}_macro"
 				name="conditions[#{rowNum}][macro]" size="30" maxlength="64" placeholder="{#MACRO}">
 		</td>
@@ -25,7 +29,12 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 		$(function() {
 			$('#conditions')
 				.elementTable({
-					template: '#condition-row'
+					template: '#condition-row',
+					dataCallback: function(data) {
+						data.formulaId = num2letter(data.rowNum);
+
+						return data;
+					}
 				})
 				.bind('tableupdate.elementTable', function(event, options) {
 					$('#conditionRow').toggleClass('hidden', ($(options.row, $(this)).length <= 1));

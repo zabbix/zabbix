@@ -1172,15 +1172,45 @@ function createPlaceholders() {
 	}
 }
 
+/**
+ * Converts number to letter representation.
+ * From A to Z, then from AA to ZZ etc.
+ * Example: 0 => A, 25 => Z, 26 => AA, 27 => AB, 52 => BA, ...
+ *
+ * Keep in sync with PHP num2letter().
+ *
+ * @param {int} number
+ *
+ * @return {string}
+ */
+function num2letter(number) {
+	var start = 'A'.charCodeAt(0);
+	var base = 26;
+	var str = '';
+	var level = 0;
+
+	do {
+		if (level++ > 0) {
+			number--;
+		}
+		var remainder = number % base;
+		number = (number - remainder) / base;
+		str = String.fromCharCode(start + remainder) + str;
+	} while (number);
+
+	return str;
+}
+
 (function($) {
 	/**
 	 * Creates a table with dynamic add/remove row buttons.
 	 *
 	 * Supported options:
-	 * - template	- row template selector
-	 * - row		- element row selector
-	 * - add		- add row button selector
-	 * - remove		- remove row button selector
+	 * - template		- row template selector
+	 * - row			- element row selector
+	 * - add			- add row button selector
+	 * - remove			- remove row button selector
+	 * - dataCallback	- function to generate the data passed to the template
 	 *
 	 * Triggered events:
 	 * - change.elementTable 	- after adding or removing a row
@@ -1192,7 +1222,10 @@ function createPlaceholders() {
 			template: '',
 			row: '.form_row',
 			add: '.element-table-add',
-			remove: '.element-table-remove'
+			remove: '.element-table-remove',
+			dataCallback: function(data) {
+				return {};
+			}
 		}, options)
 
 		return this.each(function() {
@@ -1224,10 +1257,13 @@ function createPlaceholders() {
 	 * @param {object} options
 	 */
 	function addRow(table, beforeRow, options) {
-		var template = new Template($(options.template).html());
-		beforeRow.before(template.evaluate({
+		var data = {
 			rowNum: table.data('elementTable').counter
-		}));
+		};
+		data = $.extend(data, options.dataCallback(data));
+
+		var template = new Template($(options.template).html());
+		beforeRow.before(template.evaluate(data));
 		table.data('elementTable').counter++;
 
 		createPlaceholders();

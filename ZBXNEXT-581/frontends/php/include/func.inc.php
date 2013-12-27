@@ -2032,6 +2032,8 @@ function bcfmod($number, $modulus) {
  * From A to Z, then from AA to ZZ etc.
  * Example: 0 => A, 25 => Z, 26 => AA, 27 => AB, 52 => BA, ...
  *
+ * Keep in sync with JS num2letter().
+ *
  * @param int $number
  *
  * @return string
