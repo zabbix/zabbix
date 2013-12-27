@@ -79,47 +79,31 @@ char	**CONFIG_PERF_COUNTERS		= NULL;
  ******************************************************************************/
 void	load_aliases(char **lines)
 {
-	char	**pline = (void **)NULL;
-	char	*r = NULL, *s = NULL;
-	char	*key = NULL, *value = NULL;
-	int	 key_length = 0, value_length = 0;
-	int	 ret = 0;
+	char	**pline, *r, *c;
 
 	for (pline = lines; NULL != *pline; pline++)
 	{
 		r = *pline;
 
-		ret = parse_key(&r);
-
-		if (SUCCEED != ret || ':' != *r)
+		if (SUCCEED != parse_key(&r) || ':' != *r)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "Cannot parse alias \"%s\": invalid character at position %ld", *pline, (r - *pline) + 1);
-			exit(FAIL);
+			exit(EXIT_FAILURE);
 		}
 
-		key_length = r - *pline;
-		s = ++r;
+		c = r++;
 
-		ret = parse_key(&r);
-
-		if (SUCCEED != ret || '\0' != *r)
+		if (SUCCEED != parse_key(&r) || '\0' != *r)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "Cannot parse alias \"%s\": invalid character at position %ld", *pline, (r - *pline) + 1);
-			exit(FAIL);
+			exit(EXIT_FAILURE);
 		}
 
-		value_length = r - s;
+		*c++ = '\0';
 
-		key = zbx_malloc(NULL, (key_length + 1) * sizeof(char));
-		value = zbx_malloc(NULL, (value_length + 1) * sizeof(char));
+		add_alias(*pline, c);
 
-		zbx_strlcpy(key, *pline, key_length + 1);
-		zbx_strlcpy(value, s, value_length + 1);
-
-		add_alias(key, value);
-
-		zbx_free(key);
-		zbx_free(value);
+		*--c = ':';
 	}
 }
 
