@@ -885,10 +885,10 @@ int	zbx_check_hostname(const char *hostname)
  ******************************************************************************/
 int     get_item_key(const char **const exp, char **key)
 {
-	char    *p = NULL, *s = NULL;
+	char    *p = NULL, *s = NULL, *o = NULL;
 	int      key_length = 0;
 
-	if (key == NULL)
+	if (NULL == key)
 		return FAIL;
 
 	o = p = *exp;

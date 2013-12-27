@@ -83,8 +83,7 @@ void	load_aliases(char **lines)
 	char	*r = NULL, *s = NULL;
 	char	*key = NULL, *value = NULL;
 
-	int	 key_len = 0, value_len = 0;
-	int	 ret = 0;
+	int	 key_length = 0, value_length = 0;
 
 	for (pline = lines; NULL != *pline; pline++)
 	{
