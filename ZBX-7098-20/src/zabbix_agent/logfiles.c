@@ -21,6 +21,10 @@
 #include "logfiles.h"
 #include "log.h"
 
+#if defined(_WINDOWS)
+#	include "gnuregex.h"
+#endif /* _WINDOWS */
+
 /******************************************************************************
  *                                                                            *
  * Function: split_string                                                     *
@@ -369,7 +373,8 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 		unsigned char skip_old_data)
 {
 	const char		*__function_name = "process_logrt";
-	int			i = 0, nbytes, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, fd = 0, length = 0, j = 0;
+	int			i = 0, nbytes, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, fd = 0, j = 0,
+				reg_error;
 	char			buffer[MAX_BUFFER_LEN], *directory = NULL, *format = NULL, *logfile_candidate = NULL;
 	struct stat		file_buf;
 	struct st_logfile	*logfiles = NULL;
@@ -381,6 +386,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 	DIR			*dir = NULL;
 	struct dirent		*d_ent = NULL;
 #endif
+	regex_t			re;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d",
 			__function_name, filename, *lastlogsize, *mtime);
@@ -388,7 +394,17 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 	/* splitting filename */
 	if (SUCCEED != split_filename(filename, &directory, &format))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "filename '%s' does not contain a valid directory and/or format", filename);
+		zabbix_log(LOG_LEVEL_WARNING, "filename '%s' does not contain a valid directory and/or format",
+				filename);
+		goto out;
+	}
+
+	if (0 != (reg_error = regcomp(&re, format, REG_EXTENDED | REG_NEWLINE | REG_NOSUB)))
+	{
+		regerror(reg_error, &re, buffer, sizeof(buffer));
+		regfree(&re);
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot compile a regexp describing filename pattern '%s' for a logrt[] "
+				"item. Error: %s", format, buffer);
 		goto out;
 	}
 
@@ -412,9 +428,9 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 
 		if (-1 == zbx_stat(logfile_candidate, &file_buf) || !S_ISREG(file_buf.st_mode))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot process read entry '%s'", logfile_candidate);
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot process or read entry '%s'", logfile_candidate);
 		}
-		else if (NULL != zbx_regexp_match(find_data.name, format, &length))
+		else if (0 == regexec(&re, find_data.name, (size_t)0, NULL, 0))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
 			add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, find_data.name, (int)file_buf.st_mtime);
@@ -440,9 +456,9 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 
 		if (-1 == zbx_stat(logfile_candidate, &file_buf) || !S_ISREG(file_buf.st_mode))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot process read entry '%s'", logfile_candidate);
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot process or read entry '%s'", logfile_candidate);
 		}
-		else if (NULL != zbx_regexp_match(d_ent->d_name, format, &length))
+		else if (0 == regexec(&re, d_ent->d_name, (size_t)0, NULL, 0))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
 			add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, d_ent->d_name, (int)file_buf.st_mtime);
@@ -451,6 +467,8 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 		zbx_free(logfile_candidate);
 	}
 #endif	/*_WINDOWS*/
+
+	regfree(&re);
 
 	if (1 == skip_old_data)
 		i = logfiles_num ? logfiles_num - 1 : 0;
