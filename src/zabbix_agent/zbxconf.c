@@ -82,43 +82,29 @@ void	load_aliases(char **lines)
 	char	**pline = (void **)NULL;
 	char	*r = NULL, *s = NULL;
 	char	*key = NULL, *value = NULL;
-
 	int	 key_length = 0, value_length = 0;
+	int	 ret = 0;
 
 	for (pline = lines; NULL != *pline; pline++)
 	{
 		r = *pline;
 
-		if (SUCCEED != parse_key(&r))
-		{
-			if ('\0' == *r)
-				zabbix_log(LOG_LEVEL_CRIT, "Alias \"%s\" FAILED: Malformed alias", *pline);
-			else
-				zabbix_log(LOG_LEVEL_CRIT, "Alias \"%s\" FAILED: No alias key found", *pline);
-			exit(FAIL);
-		}
+		ret = parse_key(&r);
 
-		if (':' != *r)
+		if (SUCCEED != ret || ':' != *r)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "Alias \"%s\" FAILED: Alias key contains invalid character `%c' at position %ld", *pline, *r, (r - *pline) + 1);
+			zabbix_log(LOG_LEVEL_CRIT, "Cannot parse alias \"%s\": invalid character at position %ld", *pline, (r - *pline) + 1);
 			exit(FAIL);
 		}
 
 		key_length = r - *pline;
 		s = ++r;
 
-		if (SUCCEED != parse_key(&r))
-		{
-			if(s == r)
-				zabbix_log(LOG_LEVEL_CRIT, "Alias \"%s\" FAILED: No item key found", *pline, s);
-			else
-				zabbix_log(LOG_LEVEL_CRIT, "Alias \"%s\" FAILED: Malformed item key", *pline);
-			exit(FAIL);
-		}
+		ret = parse_key(&r);
 
-		if ('\0' != *r)
+		if (SUCCEED != ret || '\0' != *r)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "Alias \"%s\" FAILED: Item key contains invalid character `%c' at position %ld", *pline, *r, (r - *pline) + 1);
+			zabbix_log(LOG_LEVEL_CRIT, "Cannot parse alias \"%s\": invalid character at position %ld", *pline, (r - *pline) + 1);
 			exit(FAIL);
 		}
 
