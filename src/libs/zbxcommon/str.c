@@ -883,31 +883,28 @@ int	zbx_check_hostname(const char *hostname)
  *        input pointer is NOT advanced.                                      *
  *                                                                            *
  ******************************************************************************/
-int     get_item_key(const char **exp, char **key)
+int	get_item_key(char **exp, char **key)
 {
-	char    *p, *s, *o;
-	int      key_length;
-
-	if (NULL == key)
-		return FAIL;
-
-	o = p = *exp;
+	char	*p = *exp, c;
 
 	if (SUCCEED != parse_key(&p))
 		return FAIL;
 
 	if ('(' == *p)
 	{
-		for (s = p - 1; o <= s && '.' != *s; s--)
+		for (p--; *exp < p && '.' != *p; p--)
 			;
 
-		if (s <= o)
+		if (*exp == p)	/* the key is empty */
 			return FAIL;
 	}
 
-	key_length = s - o;
-	*key = zbx_malloc(NULL, (key_length + 1) * sizeof(char));
-	zbx_strlcpy(*key, *exp, key_length + 1);
+	c = *p;
+	*p = '\0';
+	*key = zbx_strdup(NULL, *exp);
+	*p = c;
+
+	*exp = p;
 
 	return SUCCEED;
 }
@@ -968,29 +965,30 @@ int	parse_host(char **exp, char **host)
  *                                                                            *
  *  e.g., system.run[cat /etc/passwd | awk -F: '{ print $1 }']                *
  *                                                                            *
- * Parameters: exp - pointer to the first char of key                         *
+ * Parameters: exp - [IN/OUT] pointer to the first char of key                *
  *                                                                            *
  *  e.g., {host:system.run[cat /etc/passwd | awk -F: '{ print $1 }'].last(0)} *
  *              ^                                                             *
  * Return value: returns FAIL only if no key is present (length 0),           *
- *               or the whole string is invalid. Otherwise succeeds.          *
+ *               or the whole string is invalid. SUCCEED otherwise.           *
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
- * Last update: 19/12/2013 (dd/mm/yyyy)                                       *
- *                                                                            *
  ******************************************************************************/
-int     parse_key(char **exp)
+int	parse_key(char **exp)
 {
 	char	*s;
 
 	for (s = *exp; SUCCEED == is_key_char(*s); s++)
 		;
 
+	if (*exp == s)	/* the key is empty */
+		return FAIL;
+
 	if ('[' == *s)	/* for instance, net.tcp.port[,80] */
 	{
-		int     state = 0;	/* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
-		int     array = 0;	/* array nest level */
+		int	state = 0;	/* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
+		int	array = 0;	/* array nest level */
 
 		for (s++; '\0' != *s; s++)
 		{
@@ -1085,8 +1083,6 @@ fail:
 succeed:
 		s++;
 	}
-	else if (*exp == s)
-		return FAIL;
 
 	*exp = s;
 	return SUCCEED;

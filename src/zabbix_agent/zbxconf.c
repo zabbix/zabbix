@@ -70,10 +70,6 @@ char	**CONFIG_PERF_COUNTERS		= NULL;
  *                                                                            *
  * Parameters: lines - aliase entries from configuration file                 *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Vladimir Levijev                                                   *
- *                                                                            *
  * Comments: calls add_alias() for each entry                                 *
  *                                                                            *
  ******************************************************************************/
@@ -87,7 +83,8 @@ void	load_aliases(char **lines)
 
 		if (SUCCEED != parse_key(&r) || ':' != *r)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "Cannot parse alias \"%s\": invalid character at position %ld", *pline, (r - *pline) + 1);
+			zabbix_log(LOG_LEVEL_CRIT, "cannot add alias \"%s\": invalid character at position %ld",
+					*pline, (r - *pline) + 1);
 			exit(EXIT_FAILURE);
 		}
 
@@ -95,7 +92,8 @@ void	load_aliases(char **lines)
 
 		if (SUCCEED != parse_key(&r) || '\0' != *r)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "Cannot parse alias \"%s\": invalid character at position %ld", *pline, (r - *pline) + 1);
+			zabbix_log(LOG_LEVEL_CRIT, "cannot add alias \"%s\": invalid character at position %ld",
+					*pline, (r - *pline) + 1);
 			exit(EXIT_FAILURE);
 		}
 
