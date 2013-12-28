@@ -30,23 +30,23 @@
 
 #define ZBX_EC_INTERNAL			-1	/* Zabbix or ldns error */
 #define ZBX_EC_DNS_NS_NOREPLY		-200	/* no reply from Name Server */
-#define ZBX_EC_DNS_NS_ERRREPLY		-201	/* invalid reply from Name Server */
+#define ZBX_EC_DNS_NS_EREPLY		-201	/* invalid reply from Name Server */
 #define ZBX_EC_DNS_NS_NOTS		-202	/* no UNIX timestamp */
-#define ZBX_EC_DNS_NS_ERRTS		-203	/* invalid UNIX timestamp */
-#define ZBX_EC_DNS_NS_ERRSIG		-204	/* DNSSEC error */
+#define ZBX_EC_DNS_NS_ETS		-203	/* invalid UNIX timestamp */
+#define ZBX_EC_DNS_NS_EDNSSEC		-204	/* DNSSEC error */
 #define ZBX_EC_DNS_RES_NOREPLY		-205	/* no reply from resolver */
 #define ZBX_EC_DNS_RES_NOADBIT		-206	/* no AD bit in the answer from resolver */
 #define ZBX_EC_RDDS43_NOREPLY		-200	/* no reply from RDDS43 server */
 #define ZBX_EC_RDDS43_NONS		-201	/* Whois server returned no NS */
 #define ZBX_EC_RDDS43_NOTS		-202	/* no Unix timestamp */
-#define ZBX_EC_RDDS43_ERRTS		-203	/* invalid Unix timestamp */
+#define ZBX_EC_RDDS43_ETS		-203	/* invalid Unix timestamp */
 #define ZBX_EC_RDDS80_NOREPLY		-204	/* no reply from RDDS80 server */
-#define ZBX_EC_RDDS_ERRRES		-205	/* cannot resolve a Whois server name */
+#define ZBX_EC_RDDS_ERES		-205	/* cannot resolve a Whois server name */
 #define ZBX_EC_PROBE_ONLINE		1	/* probe in automatic online mode */
 #define ZBX_EC_PROBE_OFFLINE		0	/* probe in automatic offline mode */
 #define ZBX_EC_PROBE_UNSUPPORTED	2	/* internal use only */
 
-#define ZBX_NO_VALUE		-1000	/* no item value should be set */
+#define ZBX_NO_VALUE			-1000	/* no item value should be set */
 
 #define ZBX_DNSTEST_UDP	0
 #define ZBX_DNSTEST_TCP	1
