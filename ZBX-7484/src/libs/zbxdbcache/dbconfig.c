@@ -3429,12 +3429,11 @@ void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num)
  *          started and not cancelled, because they are not seen in parallel  *
  *          transactions.                                                     *
  *                                                                            *
- * Parameters: itemids     - [IN] list of item IDs a history syncer wishes to *
- *                                take for processing                         *
+ * Parameters: itemids     - [IN/OUT] list of item IDs a history syncer       *
+ *                                    wishes to take for processing; on       *
+ *                                    output, the elements are set to 0 if    *
+ *                                    the corresponding item cannot be taken  *
  *             itemids_num - [IN] number of such item IDs                     *
- *             can_take    - [OUT] 1 if history syncer is allowed to take the *
- *                                 item, 0 otherwise; array elements should   *
- *                                 be initialized to 1 in the caller          *
  *             triggerids  - [OUT] list of trigger IDs that this function has *
  *                                 locked for processing; unlock those using  *
  *                                 DCconfig_unlock_triggers() function        *
@@ -3457,8 +3456,7 @@ void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num)
  *           timer processes use to lock and unlock triggers.                 *
  *                                                                            *
  ******************************************************************************/
-void	DCconfig_lock_triggers_by_itemids(const zbx_uint64_t *itemids, int itemids_num, unsigned char *can_take,
-		zbx_vector_uint64_t *triggerids)
+void	DCconfig_lock_triggers_by_itemids(zbx_uint64_t *itemids, int itemids_num, zbx_vector_uint64_t *triggerids)
 {
 	int			i, j;
 	const ZBX_DC_ITEM	*dc_item;
@@ -3475,7 +3473,7 @@ void	DCconfig_lock_triggers_by_itemids(const zbx_uint64_t *itemids, int itemids_
 		{
 			if (1 == dc_trigger->locked)
 			{
-				can_take[i] = 0;
+				itemids[i] = 0;
 				goto next;
 			}
 		}

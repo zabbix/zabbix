@@ -2165,7 +2165,6 @@ int	DCsync_history(int sync_type)
 	int			candidate_num;
 	int			indices[ZBX_SYNC_MAX];
 	zbx_uint64_t		itemids[ZBX_SYNC_MAX];
-	unsigned char		can_take[ZBX_SYNC_MAX];
 	zbx_vector_uint64_t	triggerids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_first:%d history_num:%d",
@@ -2244,7 +2243,6 @@ int	DCsync_history(int sync_type)
 
 			indices[candidate_num] = f;
 			itemids[candidate_num] = cache->history[f].itemid;
-			can_take[candidate_num] = 1;
 
 			candidate_num++;
 
@@ -2253,7 +2251,7 @@ int	DCsync_history(int sync_type)
 		}
 
 		if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
-			DCconfig_lock_triggers_by_itemids(itemids, candidate_num, can_take, &triggerids);
+			DCconfig_lock_triggers_by_itemids(itemids, candidate_num, &triggerids);
 
 		history_num = 0;
 
@@ -2261,7 +2259,7 @@ int	DCsync_history(int sync_type)
 		{
 			f = indices[i];
 
-			if (0 == can_take[i])
+			if (0 == itemids[i])
 			{
 				if (0 == skipped_clock || skipped_clock > cache->history[f].clock)
 					skipped_clock = cache->history[f].clock;
