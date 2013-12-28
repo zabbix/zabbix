@@ -287,13 +287,7 @@ static int	zbx_get_last_label(const char *name, char **last_label, char *err, si
 	if (name != last_label_start)
 		last_label_start++;
 
-	printf("allocating memory for last label\n");
-	fflush(stdout);
-
 	*last_label = zbx_strdup(*last_label, last_label_start);
-
-	printf("allocating memory for last label: done\n");
-	fflush(stdout);
 
 	return SUCCEED;
 }
@@ -430,21 +424,17 @@ static int	zbx_get_ns_values(ldns_resolver *res, const char *ns, const char *ip,
 
 		if (NULL != keys)	/* DNSSEC enabled */
 		{
-			/* ownername in the AUTHORITY section must contain DS RRs */
-			if (NULL == (dsset = ldns_pkt_rr_list_by_name_and_type(pkt, last_label_rdf, LDNS_RR_TYPE_DS,
-					LDNS_SECTION_AUTHORITY)))
+			/* AUTHORITY section must contain DS RRs */
+			if (NULL == (dsset = ldns_pkt_rr_list_by_type(pkt, LDNS_RR_TYPE_DS, LDNS_SECTION_AUTHORITY)))
 			{
-				zbx_snprintf(err, err_size, "no DS records of \"%s\" at nameserver \"%s\" (%s)",
-						last_label, ns, ip);
+				zbx_snprintf(err, err_size, "no DS records at nameserver \"%s\" (%s)", ns, ip);
 				*rtt = ZBX_EC_DNS_NS_EDNSSEC;
 				goto out;
 			}
 
-			if (NULL == (rrsigs = ldns_pkt_rr_list_by_name_and_type(pkt, last_label_rdf, LDNS_RR_TYPE_RRSIG,
-					LDNS_SECTION_AUTHORITY)))
+			if (NULL == (rrsigs = ldns_pkt_rr_list_by_type(pkt, LDNS_RR_TYPE_RRSIG, LDNS_SECTION_AUTHORITY)))
 			{
-				zbx_snprintf(err, err_size, "no RRSIG records of \"%s\" at nameserver \"%s\" (%s)",
-						last_label, ns, ip);
+				zbx_snprintf(err, err_size, "no RRSIG records at nameserver \"%s\" (%s)", ns, ip);
 				*rtt = ZBX_EC_DNS_NS_EDNSSEC;
 				goto out;
 			}
@@ -460,37 +450,20 @@ static int	zbx_get_ns_values(ldns_resolver *res, const char *ns, const char *ip,
 	}
 	else if (NULL != keys)	/* EPP disabled, DNSSEC enabled */
 	{
-		if (SUCCEED != zbx_get_last_label(testname, &last_label, err, err_size))
+		if (NULL == (rrsigs = ldns_pkt_rr_list_by_type(pkt, LDNS_RR_TYPE_RRSIG, LDNS_SECTION_AUTHORITY)))
 		{
-			*rtt = ZBX_EC_DNS_NS_EREPLY;
-			goto out;
-		}
-
-		if (NULL == (last_label_rdf = ldns_rdf_new_frm_str(LDNS_RDF_TYPE_DNAME, last_label)))
-		{
-			zbx_snprintf(err, err_size, "invalid last label \"%s\" generated from testname \"%s\"",
-					last_label, testname);
-			*rtt = ZBX_EC_DNS_NS_EREPLY;
-			goto out;
-		}
-
-		if (NULL == (rrsigs = ldns_pkt_rr_list_by_name_and_type(pkt, last_label_rdf, LDNS_RR_TYPE_RRSIG,
-				LDNS_SECTION_AUTHORITY)))
-		{
-			zbx_snprintf(err, err_size, "no RRSIG records of \"%s\" at nameserver \"%s\" (%s)",
-					last_label, ns, ip);
+			zbx_snprintf(err, err_size, "no RRSIG records at nameserver \"%s\" (%s)", ns, ip);
 			*rtt = ZBX_EC_DNS_NS_EDNSSEC;
 			goto out;
 		}
 
-		if (NULL == (nsecset = ldns_pkt_rr_list_by_name_and_type(pkt, last_label_rdf, LDNS_RR_TYPE_NSEC,
-				LDNS_SECTION_AUTHORITY)))
+		if (NULL == (nsecset = ldns_pkt_rr_list_by_type(pkt, LDNS_RR_TYPE_NSEC, LDNS_SECTION_AUTHORITY)))
 		{
-			if (NULL == (nsecset = ldns_pkt_rr_list_by_name_and_type(pkt, last_label_rdf, LDNS_RR_TYPE_NSEC3,
+			if (NULL == (nsecset = ldns_pkt_rr_list_by_type(pkt, LDNS_RR_TYPE_NSEC3,
 					LDNS_SECTION_AUTHORITY)))
 			{
-				zbx_snprintf(err, err_size, "neither NSEC nor NSEC3 records of \"%s\" at"
-						" nameserver \"%s\" (%s)", last_label, ns, ip);
+				zbx_snprintf(err, err_size, "neither NSEC nor NSEC3 records at nameserver \"%s\" (%s)",
+						ns, ip);
 				*rtt = ZBX_EC_DNS_NS_EDNSSEC;
 				goto out;
 			}
