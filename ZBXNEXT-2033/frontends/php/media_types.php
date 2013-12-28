@@ -25,6 +25,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of media types');
 $page['file'] = 'media_types.php';
+$page['scripts'] = array('class.cviewswitcher.js');
 $page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -36,33 +37,52 @@ $fields = array(
 	'type' =>			array(T_ZBX_INT, O_OPT,	null,	IN(implode(',', array_keys(media_type2str()))), 'isset({save})'),
 	'description' =>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY, 'isset({save})', _('Name')),
 	'smtp_server' =>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
-		'isset({save})&&isset({type})&&({type}=='.MEDIA_TYPE_EMAIL.'||{type}=='.MEDIA_TYPE_REMEDY.')',
-		getMediaTypeLabel('smtp_server', getRequest('type'))
+		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_EMAIL,
+		_('SMTP server')
+	),
+	'remedy_url' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
+		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_REMEDY,
+		_('Remedy Service URL')
 	),
 	'smtp_helo' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
 		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_EMAIL,
-		getMediaTypeLabel('smtp_helo', getRequest('type'))
+		_('SMTP helo')
+	),
+	'remedy_proxy' =>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
+		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_REMEDY,
+		_('Proxy')
 	),
 	'smtp_email' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
 		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_EMAIL,
 		_('SMTP email')
 	),
 	'exec_path' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
-		'isset({save})&&isset({type})&&({type}=='.MEDIA_TYPE_EXEC.
-			'||{type}=='.MEDIA_TYPE_EZ_TEXTING.
-			'||{type}=='.MEDIA_TYPE_REMEDY.')',
-		getMediaTypeLabel('exec_path', getRequest('type'))
+		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_EXEC,
+		_('Script name')
+	),
+	'msg_txt_limit' =>	array(T_ZBX_STR, O_OPT,	null,	IN(array(EZ_TEXTING_LIMIT_USA, EZ_TEXTING_LIMIT_CANADA)),
+		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_EZ_TEXTING,
+		_('Message text limit')
+	),
+	'remedy_company' =>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
+		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_REMEDY,
+		_('Company name')
 	),
 	'gsm_modem' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
 		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_SMS,
 		_('GSM modem')
 	),
 	'username' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
-		'isset({save})&&isset({type})&&({type}=='.MEDIA_TYPE_JABBER.
-			'||{type}=='.MEDIA_TYPE_EZ_TEXTING.
-			'||{type}=='.MEDIA_TYPE_REMEDY.
-		')',
-		getMediaTypeLabel('username', getRequest('type'))
+		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_REMEDY,
+		_('Username')
+	),
+	'jabber_identifier' =>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
+		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_JABBER,
+		_('Jabber identifier')
+	),
+	'ez_username' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
+		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_EZ_TEXTING,
+		_('Username')
 	),
 	'password' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
 		'isset({save})&&isset({type})&&({type}=='.MEDIA_TYPE_JABBER.
@@ -118,17 +138,52 @@ $_REQUEST['go'] = get_request('go', 'none');
  * Actions
  */
 if (isset($_REQUEST['save'])) {
+	$type = getRequest('type');
+
+	switch ($type) {
+		case MEDIA_TYPE_REMEDY:
+			$smtpServer = getRequest('remedy_url');
+			$smtpHelo = getRequest('remedy_proxy');
+			$execPath = getRequest('remedy_company');
+			$username = getRequest('username');
+			$password = getRequest('password');
+			break;
+
+		case MEDIA_TYPE_JABBER:
+			$smtpHelo = '';
+			$smtpServer = '';
+			$execPath = '';
+			$username = getRequest('jabber_identifier');
+			$password = getRequest('password');
+			break;
+
+		case MEDIA_TYPE_EZ_TEXTING:
+			$smtpServer = '';
+			$smtpHelo = '';
+			$execPath = getRequest('msg_txt_limit');
+			$username = getRequest('ez_username');
+			$password = getRequest('password');
+			break;
+
+		default:
+			$smtpServer = getRequest('smtp_server');
+			$smtpHelo = getRequest('smtp_helo');
+			$execPath = getRequest('exec_path');
+			$username = getRequest('username');
+			$password = '';
+	}
+
 	$mediaType = array(
-		'type' => get_request('type'),
-		'description' => get_request('description'),
-		'smtp_server' => get_request('smtp_server'),
-		'smtp_helo' => get_request('smtp_helo'),
-		'smtp_email' => get_request('smtp_email'),
-		'exec_path' => get_request('exec_path'),
-		'gsm_modem' => get_request('gsm_modem'),
-		'username' => get_request('username'),
-		'passwd' => get_request('password'),
-		'status' => get_request('status', MEDIA_TYPE_STATUS_DISABLED)
+		'type' => $type,
+		'description' => getRequest('description'),
+		'smtp_server' => $smtpServer,
+		'smtp_helo' => $smtpHelo,
+		'smtp_email' => getRequest('smtp_email'),
+		'exec_path' => $execPath,
+		'gsm_modem' => getRequest('gsm_modem'),
+		'username' => $username,
+		'passwd' => $password,
+		'status' => getRequest('status', MEDIA_TYPE_STATUS_DISABLED)
 	);
 
 	if (is_null($mediaType['passwd'])) {
@@ -221,35 +276,38 @@ if (!empty($_REQUEST['form'])) {
 
 		$data['type'] = $mediaType['type'];
 		$data['description'] = $mediaType['description'];
-		$data['smtp_server'] = $mediaType['smtp_server'];
-		$data['smtp_helo'] = $mediaType['smtp_helo'];
-		$data['smtp_email'] = $mediaType['smtp_email'];
-		$data['exec_path'] = $mediaType['exec_path'];
-		$data['gsm_modem'] = $mediaType['gsm_modem'];
+		$data['smtp_server'] = ($data['type'] != MEDIA_TYPE_EMAIL) ? 'localhost' : $mediaType['smtp_server'];
+		$data['smtp_helo'] = ($data['type'] != MEDIA_TYPE_EMAIL) ? 'localhost' : $mediaType['smtp_helo'];
+		$data['smtp_email'] = $mediaType['smtp_email'] ? $mediaType['smtp_email'] : 'zabbix@localhost';
+		$data['remedy_url'] = ($data['type'] != MEDIA_TYPE_REMEDY) ? 'localhost' : $mediaType['smtp_server'];
+		$data['remedy_proxy'] = ($data['type'] != MEDIA_TYPE_REMEDY) ? '' : $mediaType['smtp_helo'];
+		$data['remedy_company'] = ($data['type'] != MEDIA_TYPE_REMEDY) ? '' : $mediaType['exec_path'];
+		$data['exec_path'] = ($data['type'] == MEDIA_TYPE_EZ_TEXTING) ? '' : $mediaType['exec_path'];
+		$data['msg_txt_limit'] = $mediaType['exec_path'];
+		$data['gsm_modem'] = $mediaType['gsm_modem'] ? $mediaType['gsm_modem'] : '/dev/ttyS0';
+		$data['jabber_identifier'] = $mediaType['username'] ? $mediaType['username'] : 'user@server';
+		$data['ez_username'] = $mediaType['username'] ? $mediaType['username'] : 'username';
 		$data['username'] = $mediaType['username'];
 		$data['password'] = $mediaType['passwd'];
 		$data['status'] = $mediaType['status'];
 	}
 	else {
 		$data['type'] = get_request('type', MEDIA_TYPE_EMAIL);
-		$data['description'] = get_request('description', '');
-		$data['smtp_server'] = get_request('smtp_server', 'localhost');
-		$data['smtp_helo'] = getRequest('smtp_helo', ($data['type'] == MEDIA_TYPE_REMEDY) ? '' : 'localhost');
+		$data['description'] = getRequest('description', '');
+		$data['smtp_server'] = getRequest('smtp_server', 'localhost');
+		$data['smtp_helo'] = getRequest('smtp_helo', 'localhost');
 		$data['smtp_email'] = get_request('smtp_email', 'zabbix@localhost');
-		$data['exec_path'] = get_request('exec_path', '');
-		$data['gsm_modem'] = get_request('gsm_modem', '/dev/ttyS0');
-		if ($data['type'] == MEDIA_TYPE_EZ_TEXTING) {
-			$defaultUsername = 'username';
-		}
-		elseif ($data['type'] == MEDIA_TYPE_JABBER) {
-			$defaultUsername = 'user@server';
-		}
-		else {
-			$defaultUsername = '';
-		}
-		$data['username'] = getRequest('username', $defaultUsername);
-		$data['password'] = get_request('password', '');
-		$data['status'] = get_request('status', MEDIA_TYPE_STATUS_ACTIVE);
+		$data['remedy_url'] = getRequest('remedy_url', 'localhost');
+		$data['remedy_proxy'] = getRequest('remedy_proxy', '');
+		$data['remedy_company'] = getRequest('remedy_company', '');
+		$data['exec_path'] = getRequest('exec_path', '');
+		$data['msg_txt_limit'] = getRequest('msg_txt_limit', '');
+		$data['gsm_modem'] = getRequest('gsm_modem', '/dev/ttyS0');
+		$data['jabber_identifier'] = getRequest('jabber_identifier', 'user@server');
+		$data['ez_username'] = getRequest('ez_username', 'username');
+		$data['username'] = getRequest('username', '');
+		$data['password'] = getRequest('password', '');
+		$data['status'] = getRequest('status', MEDIA_TYPE_STATUS_ACTIVE);
 	}
 
 	// render view
