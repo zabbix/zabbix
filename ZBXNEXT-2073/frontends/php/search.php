@@ -36,7 +36,8 @@ $fields = array(
 	'search'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
 	// ajax
 	'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	null,			null),
-	'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})')
+	'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+	'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		null)
 );
 
 check_fields($fields);
@@ -218,8 +219,6 @@ foreach ($hosts as $hnum => $host) {
 		$httpTestsLink
 	));
 }
-
-$sysmap_menu = get_icon('menu', array('menu' => 'sysmaps'));
 
 $searchHostWidget = new CUIWidget('search_hosts', $table);
 $searchHostWidget->setState(CProfile::get('web.search.hats.search_hosts.state', 1));

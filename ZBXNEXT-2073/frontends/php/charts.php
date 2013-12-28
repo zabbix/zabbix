@@ -47,7 +47,6 @@ $fields = array(
 	// ajax
 	'filterState' => array(T_ZBX_INT, O_OPT, P_ACT, null,		null),
 	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT, null,		null),
-	'favref' =>		array(T_ZBX_STR, O_OPT, P_ACT, NOT_EMPTY,	null),
 	'favid' =>		array(T_ZBX_INT, O_OPT, P_ACT, null,		null),
 	'favaction' =>	array(T_ZBX_STR, O_OPT, P_ACT, IN("'add','remove'"), null)
 );
@@ -100,7 +99,7 @@ if (isset($_REQUEST['favobj'])) {
 			$result = CFavorite::add('web.favorite.graphids', $_REQUEST['favid'], $_REQUEST['favobj']);
 			if ($result) {
 				echo '$("addrm_fav").title = "'._('Remove from favourites').'";'."\n";
-				echo '$("addrm_fav").onclick = function() { rm4favorites("graphid", "'.$_REQUEST['favid'].'", 0); }'."\n";
+				echo '$("addrm_fav").onclick = function() { rm4favorites("graphid", "'.$_REQUEST['favid'].'"); }'."\n";
 			}
 		}
 		elseif ($_REQUEST['favaction'] == 'remove') {

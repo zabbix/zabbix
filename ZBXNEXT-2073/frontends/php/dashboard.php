@@ -207,7 +207,7 @@ if (hasRequest('favobj') && hasRequest('favaction')) {
 		// favourite graphs
 		case 'itemid':
 		case 'graphid':
-			if ($favouriteAction == 'add') {
+			if ($favouriteAction === 'add') {
 				zbx_value2array($favouriteId);
 
 				foreach ($favouriteId as $id) {
@@ -218,11 +218,10 @@ if (hasRequest('favobj') && hasRequest('favaction')) {
 				CFavorite::remove('web.favorite.graphids', $favouriteId, $favouriteObject);
 			}
 
-			$data = make_favorite_graphs();
+			$data = getFavouriteGraphs();
 			$data = $data->toString();
 
-			echo 'jQuery("#'.WIDGET_FAVOURITE_GRAPHS.'").html('.zbx_jsvalue($data).'); '.
-					'page_submenu["menu_graphs"] = '.zbx_jsvalue(make_graph_submenu()).';';
+			echo 'jQuery("#'.WIDGET_FAVOURITE_GRAPHS.'").html('.zbx_jsvalue($data).');';
 			break;
 
 		// favourite maps
@@ -238,11 +237,10 @@ if (hasRequest('favobj') && hasRequest('favaction')) {
 				CFavorite::remove('web.favorite.sysmapids', $favouriteId, $favouriteObject);
 			}
 
-			$data = make_favorite_maps();
+			$data = getFavouriteMaps();
 			$data = $data->toString();
 
-			echo 'jQuery("#'.WIDGET_FAVOURITE_MAPS.'").html('.zbx_jsvalue($data).'); '.
-					'page_submenu["menu_sysmaps"] = '.zbx_jsvalue(make_sysmap_submenu()).';';
+			echo 'jQuery("#'.WIDGET_FAVOURITE_MAPS.'").html('.zbx_jsvalue($data).');';
 			break;
 
 		// favourite screens, slideshows
@@ -259,11 +257,10 @@ if (hasRequest('favobj') && hasRequest('favaction')) {
 				CFavorite::remove('web.favorite.screenids', $favouriteId, $favouriteObject);
 			}
 
-			$data = make_favorite_screens();
+			$data = getFavouriteScreens();
 			$data = $data->toString();
 
-			echo 'jQuery("#'.WIDGET_FAVOURITE_SCREENS.'").html('.zbx_jsvalue($data).'); '.
-					'page_submenu["menu_screens"] = '.zbx_jsvalue(make_screen_submenu()).';';
+			echo 'jQuery("#'.WIDGET_FAVOURITE_SCREENS.'").html('.zbx_jsvalue($data).');';
 			break;
 	}
 }
@@ -288,12 +285,6 @@ $dashboardWidget->addHeader(_('PERSONAL DASHBOARD'), array(
 	get_icon('fullscreen', array('fullscreen' => getRequest('fullscreen'))))
 );
 
-// js menu arrays
-/*$menu = $submenu = array();
-make_graph_menu($menu, $submenu);
-make_sysmap_menu($menu, $submenu);
-make_screen_menu($menu, $submenu);*/
-
 /*
  * Dashboard grid
  */
@@ -301,9 +292,10 @@ $dashboardGrid = array(array(), array(), array());
 $widgetRefreshParams = array();
 
 // favourite graphs
-$icon = get_icon('menu', array('menu' => 'graphs'));
+$icon = new CIcon(_('Menu'), 'iconmenu');
+$icon->setMenuPopup(getMenuPopupFavouriteGraphs());
 
-$favouriteGraphs = new CUIWidget(WIDGET_FAVOURITE_GRAPHS, make_favorite_graphs());
+$favouriteGraphs = new CUIWidget(WIDGET_FAVOURITE_GRAPHS, getFavouriteGraphs());
 $favouriteGraphs->setState(CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_GRAPHS.'.state', 1));
 $favouriteGraphs->setHeader(_('Favourite graphs'), $icon);
 $favouriteGraphs->setFooter(new CLink(_('Graphs').' &raquo;', 'charts.php', 'highlight'), true);
@@ -312,25 +304,31 @@ $col = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_GRAPHS.'.col', 0);
 $row = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_GRAPHS.'.row', 0);
 $dashboardGrid[$col][$row] = $favouriteGraphs;
 
-// favourite screens
-$favouriteScreens = new CUIWidget(WIDGET_FAVOURITE_SCREENS, make_favorite_screens());
-$favouriteScreens->setState(CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_SCREENS.'.state', 1));
-$favouriteScreens->setHeader(_('Favourite screens'), get_icon('menu', array('menu' => 'screens')));
-$favouriteScreens->setFooter(new CLink(_('Screens').' &raquo;', 'screens.php', 'highlight'), true);
-
-$col = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_SCREENS.'.col', 0);
-$row = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_SCREENS.'.row', 1);
-$dashboardGrid[$col][$row] = $favouriteScreens;
-
 // favourite maps
-$favouriteMaps = new CUIWidget(WIDGET_FAVOURITE_MAPS, make_favorite_maps());
+$icon = new CIcon(_('Menu'), 'iconmenu');
+$icon->setMenuPopup(getMenuPopupFavouriteMaps());
+
+$favouriteMaps = new CUIWidget(WIDGET_FAVOURITE_MAPS, getFavouriteMaps());
 $favouriteMaps->setState(CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_MAPS.'.state', 1));
-$favouriteMaps->setHeader(_('Favourite maps'), get_icon('menu', array('menu' => 'sysmaps')));
+$favouriteMaps->setHeader(_('Favourite maps'), $icon);
 $favouriteMaps->setFooter(new CLink(_('Maps').' &raquo;', 'maps.php', 'highlight'), true);
 
 $col = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_MAPS.'.col', 0);
 $row = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_MAPS.'.row', 2);
 $dashboardGrid[$col][$row] = $favouriteMaps;
+
+// favourite screens
+$icon = new CIcon(_('Menu'), 'iconmenu');
+$icon->setMenuPopup(getMenuPopupFavouriteScreens());
+
+$favouriteScreens = new CUIWidget(WIDGET_FAVOURITE_SCREENS, getFavouriteScreens());
+$favouriteScreens->setState(CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_SCREENS.'.state', 1));
+$favouriteScreens->setHeader(_('Favourite screens'), $icon);
+$favouriteScreens->setFooter(new CLink(_('Screens').' &raquo;', 'screens.php', 'highlight'), true);
+
+$col = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_SCREENS.'.col', 0);
+$row = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_SCREENS.'.row', 1);
+$dashboardGrid[$col][$row] = $favouriteScreens;
 
 // status of Zabbix
 if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {

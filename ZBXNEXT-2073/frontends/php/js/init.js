@@ -76,6 +76,18 @@ jQuery(function($) {
 			case 'refresh':
 				data = getMenuPopupRefresh(data);
 				break;
+
+			case 'favouriteGraphs':
+				data = getMenuPopupFavouriteGraphs(data);
+				break;
+
+			case 'favouriteMaps':
+				data = getMenuPopupFavouriteMaps(data);
+				break;
+
+			case 'favouriteScreens':
+				data = getMenuPopupFavouriteScreens(data);
+				break;
 		}
 
 		obj.menuPopup(data, event);

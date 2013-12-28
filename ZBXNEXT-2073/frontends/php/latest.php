@@ -52,7 +52,6 @@ $fields = array(
 	// ajax
 	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
 	'favobj'=>				array(T_ZBX_STR, O_OPT, P_ACT,	NULL,		NULL),
-	'favref'=>				array(T_ZBX_STR, O_OPT, P_ACT,  NULL,		NULL),
 	'toggle_ids'=>			array(T_ZBX_STR, O_OPT, P_ACT,  NULL,		NULL),
 	'toggle_open_state'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NULL,		NULL)
 );

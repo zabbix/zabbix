@@ -219,7 +219,15 @@ $tranStrings = array(
 		'1 minute' => _('1 minute'),
 		'2 minutes' => _('2 minutes'),
 		'10 minutes' => _('10 minutes'),
-		'15 minutes' => _('15 minutes')
+		'15 minutes' => _('15 minutes'),
+		'Favourite graphs' => _('Favourite graphs'),
+		'Favourite maps' => _('Favourite maps'),
+		'Favourite screens' => _('Favourite screens'),
+		'Remove all graphs' => _('Remove all graphs'),
+		'Remove all simple graphs' => _('Remove all simple graphs'),
+		'Remove all maps' => _('Remove all maps'),
+		'Remove all screens' => _('Remove all screens'),
+		'Remove all slide shows' => _('Remove all slide shows')
 	)
 );
 

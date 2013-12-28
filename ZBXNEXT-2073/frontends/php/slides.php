@@ -49,11 +49,8 @@ $fields = array(
 	'widgetRefreshRate' => array(T_ZBX_STR, O_OPT, P_ACT, null,	null),
 	'filterState' =>	array(T_ZBX_INT, O_OPT, P_ACT, null,	null),
 	'favobj' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,	null),
-	'favref' =>			array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY, null),
 	'favid' =>			array(T_ZBX_INT, O_OPT, P_ACT,	null,	null),
-	'favcnt' =>			array(T_ZBX_STR, O_OPT, null,	null,	null),
-	// actions
-	'favaction' =>		array(T_ZBX_STR, O_OPT, P_ACT,	IN("'add','remove','refresh','flop'"), null),
+	'favaction' =>		array(T_ZBX_STR, O_OPT, P_ACT,	IN("'add','remove'"), null),
 	'upd_counter' =>	array(T_ZBX_INT, O_OPT, P_ACT,	null,	null)
 );
 check_fields($fields);
@@ -138,34 +135,39 @@ if (hasRequest('filterState')) {
 	CProfile::update('web.slides.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
 }
 
-// favourites
-if (isset($_REQUEST['favobj'])) {
-	if (str_in_array($_REQUEST['favobj'], array('screenid', 'slideshowid'))) {
+if (hasRequest('favobj') && hasRequest('favid')) {
+	$favouriteObject = getRequest('favobj');
+	$favouriteId = getRequest('favid');
+
+	// favourites
+	if (hasRequest('favaction') && in_array($favouriteObject, array('screenid', 'slideshowid'))) {
 		$result = false;
-		if ($_REQUEST['favaction'] == 'add') {
-			$result = CFavorite::add('web.favorite.screenids', $_REQUEST['favid'], $_REQUEST['favobj']);
+
+		if (getRequest('favaction') === 'add') {
+			$result = CFavorite::add('web.favorite.screenids', $favouriteId, $favouriteObject);
+
 			if ($result) {
-				echo '$("addrm_fav").title = "'._('Remove from').' '._('Favourites').'";'."\n".
-					'$("addrm_fav").onclick = function() { rm4favorites("'.$_REQUEST['favobj'].'", "'.$_REQUEST['favid'].'", 0); };'."\n";
+				echo '$("addrm_fav").title = "'._('Remove from').' '._('Favourites').'";'."\n"
+					.'$("addrm_fav").onclick = function() { rm4favorites("'.$favouriteObject.'", "'.$favouriteId.'"); };'."\n";
 			}
 		}
-		elseif ($_REQUEST['favaction'] == 'remove') {
-			$result = CFavorite::remove('web.favorite.screenids', $_REQUEST['favid'], $_REQUEST['favobj']);
+		else {
+			$result = CFavorite::remove('web.favorite.screenids', $favouriteId, $favouriteObject);
+
 			if ($result) {
-				echo '$("addrm_fav").title = "'._('Add to').' '._('Favourites').'";'."\n".
-					'$("addrm_fav").onclick = function() { add2favorites("'.$_REQUEST['favobj'].'", "'.$_REQUEST['favid'].'"); };'."\n";
+				echo '$("addrm_fav").title = "'._('Add to').' '._('Favourites').'";'."\n"
+					.'$("addrm_fav").onclick = function() { add2favorites("'.$favouriteObject.'", "'.$favouriteId.'"); };'."\n";
 			}
 		}
+
 		if ($page['type'] == PAGE_TYPE_JS && $result) {
 			echo 'switchElementClass("addrm_fav", "iconminus", "iconplus");';
 		}
 	}
 
 	// saving fixed/dynamic setting to profile
-	if ($_REQUEST['favobj'] == 'timelinefixedperiod') {
-		if (isset($_REQUEST['favid'])) {
-			CProfile::update('web.slides.timelinefixed', $_REQUEST['favid'], PROFILE_TYPE_INT);
-		}
+	if ($favouriteObject === 'timelinefixedperiod') {
+		CProfile::update('web.slides.timelinefixed', $favouriteId, PROFILE_TYPE_INT);
 	}
 }
 if (in_array($page['type'], array(PAGE_TYPE_JS, PAGE_TYPE_HTML_BLOCK))) {

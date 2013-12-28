@@ -421,6 +421,59 @@ function getMenuPopupRefresh(options) {
 }
 
 /**
+ * Get menu popup favourite graphs section data.
+ *
+ * @param array  options['data']
+ * @param string options['data'][n]['id']
+ * @param string options['data'][n]['name']
+ * @param string options['data'][n]['type']
+ *
+ * @return array
+ */
+function getMenuPopupFavouriteGraphs(options) {
+	return [{
+		type: 'favourite',
+		title: t('Favourite graphs'),
+		data: options.data
+	}];
+}
+
+/**
+ * Get menu popup favourite maps section data.
+ *
+ * @param array  options['data']
+ * @param string options['data'][n]['id']
+ * @param string options['data'][n]['name']
+ *
+ * @return array
+ */
+function getMenuPopupFavouriteMaps(options) {
+	return [{
+		type: 'favourite',
+		title: t('Favourite maps'),
+		data: options.data
+	}];
+}
+
+/**
+ * Get menu popup favourite screens section data.
+ *
+ * @param array  options['data']
+ * @param string options['data'][n]['id']
+ * @param string options['data'][n]['name']
+ * @param string options['data'][n]['type']
+ *
+ * @return array
+ */
+function getMenuPopupFavouriteScreens(options) {
+	return [{
+		type: 'favourite',
+		title: t('Favourite screens'),
+		data: options.data
+	}];
+}
+
+/**
  * Recursive function to prepare menu tree data for createMenuTree().
  *
  * @param array  tree		menu tree data, will be modified by reference
@@ -569,6 +622,21 @@ jQuery(function($) {
 
 						menuPopup.append($('<div>', {'class': 'title', text: section.title}));
 						menuPopup.append(menu);
+					}
+
+					// favourite
+					else if (section.type === 'favourite') {
+						/*'javascript: PopUp(\'popup.php?srctbl=graphs&srcfld1=graphid&reference=graphid&monitored_hosts=1&multiselect=1\',800,450); void(0);',
+
+						'javascript: PopUp(\'popup.php?srctbl=items&srcfld1=itemid&monitored_hosts=1&reference=itemid'.
+							'&multiselect=1&numeric=1&templated=0&with_simple_graph_items=1\',800,450); void(0);',
+
+						'javascript: PopUp(\'popup.php?srctbl=sysmaps&srcfld1=sysmapid&reference=sysmapid&multiselect=1\',800,450); void(0);',
+
+						'javascript: PopUp(\'popup.php?srctbl=screens&srcfld1=screenid&reference=screenid&multiselect=1\', 800, 450); void(0);',
+
+						'javascript: PopUp(\'popup.php?srctbl=slides&srcfld1=slideshowid&reference=slideshowid&multiselect=1\', 800, 450); void(0);'
+						*/
 					}
 
 					// links

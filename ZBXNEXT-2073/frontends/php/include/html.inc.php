@@ -199,10 +199,6 @@ function get_icon($type, $params = array()) {
 				"document.location = '".$url->getUrl()."';"
 			);
 
-		// TODO DELETE ME!
-		case 'menu':
-			return new CIcon(_('Menu'), 'iconmenu', 'create_page_menu(event, "'.$params['menu'].'");');
-
 		case 'reset':
 			return new CIcon(_('Reset'), 'iconreset', 'timeControl.objectReset();');
 	}

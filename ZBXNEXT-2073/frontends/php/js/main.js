@@ -965,14 +965,7 @@ function set_color_by_name(id, color) {
 	set_color(color);
 }
 
-/*
- * Zabbix ajax requests
- */
 function add2favorites(favobj, favid) {
-	if (typeof(favid) == 'undefined' || empty(favid)) {
-		return;
-	}
-
 	sendAjaxData({
 		data: {
 			favobj: favobj,
@@ -982,16 +975,11 @@ function add2favorites(favobj, favid) {
 	});
 }
 
-function rm4favorites(favobj, favid, menu_rowid) {
-	if (typeof(favobj) == 'undefined' || typeof(favid) == 'undefined') {
-		throw 'No agruments sent to function [rm4favorites()].';
-	}
-
+function rm4favorites(favobj, favid) {
 	sendAjaxData({
 		data: {
 			favobj: favobj,
 			favid: favid,
-			favcnt: menu_rowid,
 			favaction: 'remove'
 		}
 	});

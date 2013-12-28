@@ -2771,6 +2771,182 @@ function getMenuPopupRefresh($widgetName, $currentRate, $multiplier = false, arr
 }
 
 /**
+ * Prepare data for favourite graphs menu popup.
+ *
+ * @return array
+ */
+function getMenuPopupFavouriteGraphs() {
+	$data = array();
+
+	$favourites = CFavorite::get('web.favorite.graphids');
+
+	if ($graphIds) {
+		$graphIds = $itemIds = $dbGraphs = $dbItems = array();
+
+		foreach ($favourites as $favourite) {
+			if ($favourite['source'] === 'itemid') {
+				$itemIds[$favourite['value']] = $favourite['value'];
+			}
+			else {
+				$graphIds[$favourite['value']] = $favourite['value'];
+			}
+		}
+
+		if ($graphIds) {
+			$dbGraphs = API::Graph()->get(array(
+				'output' => array('graphid', 'name'),
+				'selectHosts' => array('hostid', 'host'),
+				'expandName' => true,
+				'graphids' => $graphIds,
+				'preservekeys' => true
+			));
+		}
+
+		if ($itemIds) {
+			$dbItems = API::Item()->get(array(
+				'output' => array('itemid', 'name', 'key_'),
+				'selectHosts' => array('hostid', 'host'),
+				'itemids' => $itemIds,
+				'webitems' => true,
+				'preservekeys' => true
+			));
+		}
+
+		foreach ($favourites as $favourite) {
+			$sourceId = $favourite['value'];
+
+			if ($favourite['source'] === 'itemid') {
+				if (isset($dbItems[$sourceId])) {
+					$dbItem = $dbItems[$sourceId];
+					$dbHost = reset($dbItem['hosts']);
+					$dbItem['name'] = itemName($dbItem); // TODO RESOLVE MACROS AFTER MERGING WITH TRUNK
+
+					$data[] = array(
+						'id' => $sourceId,
+						'name' => $dbHost['host'].NAME_DELIMITER.$dbItem['name'],
+						'type' => 'item'
+					);
+				}
+			}
+			else {
+				if (isset($dbGraphs[$sourceId])) {
+					$dbGraph = $dbGraphs[$sourceId];
+					$dbHost = reset($dbGraph['hosts']);
+
+					$data[] = array(
+						'id' => $sourceId,
+						'name' => $dbHost['host'].NAME_DELIMITER.$dbGraph['name'],
+						'type' => 'graph'
+					);
+				}
+			}
+		}
+	}
+
+	return array(
+		'type' => 'favouriteGraphs',
+		'data' => $data
+	);
+}
+
+/**
+ * Prepare data for favourite maps menu popup.
+ *
+ * @return array
+ */
+function getMenuPopupFavouriteMaps() {
+	$data = array();
+
+	$favourites = CFavorite::get('web.favorite.sysmapids');
+
+	if ($favourites) {
+		$mapIds = array();
+
+		foreach ($favourites as $favourite) {
+			$mapIds[$favourite['value']] = $favourite['value'];
+		}
+
+		$dbMaps = API::Map()->get(array(
+			'output' => array('sysmapid', 'name'),
+			'sysmapids' => $mapIds
+		));
+
+		foreach ($dbMaps as $dbMap) {
+			$data[] = array(
+				'id' => $dbMap['sysmapid'],
+				'name' => $dbMap['name']
+			);
+		}
+	}
+
+	return array(
+		'type' => 'favouriteMaps',
+		'data' => $data
+	);
+}
+
+/**
+ * Prepare data for favourite screens menu popup.
+ *
+ * @return array
+ */
+function getMenuPopupFavouriteScreens() {
+	$data = array();
+
+	$favourites = CFavorite::get('web.favorite.screenids');
+
+	if ($favourites) {
+		$screenIds = $slideshowIds = array();
+
+		foreach ($favourites as $favourite) {
+			if ($favourite['source'] === 'screenid') {
+				$screenIds[$favourite['value']] = $favourite['value'];
+			}
+		}
+
+		$dbScreens = API::Screen()->get(array(
+			'output' => array('screenid', 'name'),
+			'screenids' => $screenIds,
+			'preservekeys' => true
+		));
+
+		foreach ($favourites as $favourite) {
+			$sourceId = $favourite['value'];
+
+			if ($favourite['source'] === 'slideshowid') {
+				if (slideshow_accessible($sourceId, PERM_READ)) {
+					$dbSlideshow = get_slideshow_by_slideshowid($sourceId);
+
+					if ($dbSlideshow) {
+						$data[] = array(
+							'id' => $dbSlideshow['slideshowid'],
+							'name' => $dbSlideshow['name'],
+							'type' => 'slideshow'
+						);
+					}
+				}
+			}
+			else {
+				if (isset($dbScreens[$sourceId])) {
+					$dbScreen = $dbScreens[$sourceId];
+
+					$data[] = array(
+						'id' => $dbScreen['screenid'],
+						'name' => $dbScreen['name'],
+						'type' => 'screen'
+					);
+				}
+			}
+		}
+	}
+
+	return array(
+		'type' => 'favouriteScreens',
+		'data' => $data
+	);
+}
+
+/**
  * Splitting string using slashes with escape backslash support.
  *
  * @param string $path				string path to parse

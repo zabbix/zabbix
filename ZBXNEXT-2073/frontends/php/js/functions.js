@@ -549,32 +549,6 @@ function cloneRow(elementid, count) {
 	newEntry.style.display = '';
 }
 
-// TODO DELETE ME! dashboard js menu
-function create_page_menu(e, id) {
-	if (!e) {
-		e = window.event;
-	}
-	id = 'menu_' + id;
-
-	var dbrd_menu = [];
-
-	// to create a copy of array, but not references!!!!
-	for (var i=0; i < page_menu[id].length; i++) {
-		if (typeof(page_menu[id][i]) != 'undefined' && !empty(page_menu[id][i])) {
-			dbrd_menu[i] = page_menu[id][i].clone();
-		}
-	}
-
-	for (var i = 0; i < page_submenu[id].length; i++) {
-		if (typeof(page_submenu[id][i]) != 'undefined' && !empty(page_submenu[id][i])) {
-			var row = page_submenu[id][i];
-			var menu_row = [row.name, "javascript: rm4favorites('" + row.favobj + "', '" + row.favid + "', '" + i + "');"];
-			dbrd_menu[dbrd_menu.length-1].push(menu_row);
-		}
-	}
-	show_popup_menu(e, dbrd_menu);
-}
-
 // triggers js menu
 function create_mon_trigger_menu(e, args, items) {
 	var tr_menu = [[t('Triggers'), null, null, {'outer' : ['pum_oheader'], 'inner' : ['pum_iheader']}], [t('Events'), 'events.php?triggerid=' + args[0].triggerid + '&nav_time=' + args[0].lastchange, null]];
