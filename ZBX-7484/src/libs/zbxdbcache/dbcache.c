@@ -132,7 +132,8 @@ typedef struct
 	int		history_gap_num;
 	int		text_free;
 	int		trends_num;
-	int		itemids_alloc, itemids_num;
+	int		itemids_alloc;
+	int		itemids_num;
 	zbx_timespec_t	last_ts;
 }
 ZBX_DC_CACHE;

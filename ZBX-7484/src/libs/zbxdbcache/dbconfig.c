@@ -3433,7 +3433,8 @@ void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num)
  *                                take for processing                         *
  *             itemids_num - [IN] number of such item IDs                     *
  *             can_take    - [OUT] 1 if history syncer is allowed to take the *
- *                                 item, 0 otherwise                          *
+ *                                 item, 0 otherwise; array elements should   *
+ *                                 be initialized to 1 in the caller          *
  *             triggerids  - [OUT] list of trigger IDs that this function has *
  *                                 locked for processing; unlock those using  *
  *                                 DCconfig_unlock_triggers() function        *
