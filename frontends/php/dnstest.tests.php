@@ -276,7 +276,7 @@ if ($items) {
 	);
 
 	if ($data['tld'] && $data['slvItemId']) {
-		$data['slv'] = getSLV($data['slvItemId']);
+		$data['slv'] = round(getSLV($data['slvItemId']), ZBX_UNITS_ROUNDOFF_DNSTEST_LIMIT);
 
 		// result generation
 		$data['downTests'] = 0;

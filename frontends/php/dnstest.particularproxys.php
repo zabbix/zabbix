@@ -159,7 +159,7 @@ foreach ($probeItems as $probeItem) {
 $data['totalNs'] = count($totalNs);
 
 if ($data['tld'] && $data['slvItem'] && $data['probe']) {
-	$data['slv'] = $data['slvItem']['lastvalue'];
+	$data['slv'] = round($data['slvItem']['lastvalue'], ZBX_UNITS_ROUNDOFF_DNSTEST_LIMIT);
 }
 else {
 	access_deny();

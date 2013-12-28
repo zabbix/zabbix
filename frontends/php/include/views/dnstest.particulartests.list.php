@@ -25,10 +25,20 @@ $dnsTestWidget = new CWidget(null, 'particular-test');
 $dnsTestWidget->addPageHeader(_('Details of particular test'), SPACE);
 $dnsTestWidget->addHeader(_('Details of particular test'));
 
-$headers = array(
-	_('Probe ID'),
-	_('Row result')
-);
+if ($this->data['type'] == 0 || $this->data['type'] == 1) {
+	$headers = array(
+		_('Probe ID'),
+		_('Row result')
+	);
+}
+else {
+	$headers = array(
+		_('Probe ID'),
+		_('RDDS43'),
+		_('RDDS80')
+	);
+}
+
 $noData = _('No particular test found.');
 
 $particularTestsInfoTable = new CTable(null, 'filter info-block');
@@ -39,7 +49,13 @@ $particularTestsTable->setHeader($headers);
 foreach ($this->data['probes'] as $probe) {
 	$status = null;
 	if (isset($probe['status']) && $probe['status'] === PROBE_DOWN) {
-		$link = new CSpan(_('Offline'), 'red');
+		if ($this->data['type'] == 0 || $this->data['type'] == 1) {
+			$link = new CSpan(_('Offline'), 'red');
+		}
+		else {
+			$rdds43 = new CSpan(_('Offline'), 'red');
+			$rdds80 = new CSpan(_('Offline'), 'red');
+		}
 	}
 	else {
 		if ($this->data['type'] == 0) {
@@ -84,25 +100,59 @@ foreach ($this->data['probes'] as $probe) {
 		}
 		elseif ($this->data['type'] == 2) {
 			if (!isset($probe['value']) || $probe['value'] == null) {
-				$link = _('No result');
+				$rdds43 = _('No result');
+				$rdds80 = _('No result');
 			}
 			elseif ($probe['value'] == 2) {
-				$link = new CSpan(_('Up'), 'green');
+				$rdds43 = new CSpan(_('Up'), 'green');
+				$rdds80 = new CSpan(_('Up'), 'green');
 			}
 			elseif ($probe['value'] == 1) {
-				$link = _('Only RDDS43');
+				$rdds43 = new CSpan(_('Up'), 'green');
+				$rdds80 = new CSpan(_('Down'), 'red');
 			}
 			else {
-				$link = new CSpan(_('Down'), 'red');
+				$rdds43 = new CSpan(_('Down'), 'red');
+				$rdds80 = new CSpan(_('Down'), 'red');
 			}
 		}
 	}
-	$row = array(
-		$probe['name'],
-		$link
-	);
+
+	if ($this->data['type'] == 0 || $this->data['type'] == 1) {
+		$row = array(
+			$probe['name'],
+			$link
+		);
+	}
+	else {
+		$row = array(
+			$probe['name'],
+			$rdds43,
+			$rdds80
+		);
+	}
 
 	$particularTestsTable->addRow($row);
+}
+if ($this->data['type'] == 0) {
+	$additionInfo = array(
+		BR(),
+		new CSpan(bold(_s(
+				'%1$s out of %2$s probes reported availability of service',
+				$this->data['totalProbes'] ? round($this->data['availProbes'] / $this->data['totalProbes'], ZBX_UNITS_ROUNDOFF_UPPER_LIMIT).'%' : 0,
+				$this->data['totalProbes']
+			)))
+	);
+}
+elseif ($this->data['type'] == 1) {
+	$additionInfo = array(
+		BR(),
+		new CSpan(bold(_s(
+				'%1$s out of %2$s tests reported availability of service',
+				$this->data['totalTests'] ? round($this->data['availTests'] / $this->data['totalTests'], ZBX_UNITS_ROUNDOFF_UPPER_LIMIT).'%' : 0,
+				$this->data['totalTests']
+			)))
+	);
 }
 
 $particularTests = array(
@@ -112,6 +162,10 @@ $particularTests = array(
 	BR(),
 	new CSpan(array(bold(_('Test time')), ':', SPACE, date('d.m.Y H:i:s', $this->data['time'])))
 );
+
+if ($this->data['type'] == 0 || $this->data['type'] == 1) {
+	$particularTests = array_merge($particularTests, $additionInfo);
+}
 
 $rollingWeek = new CSpan(_s('%1$s Rolling week status', $this->data['slv'].'%'), 'rolling-week-status');
 $particularTestsInfoTable->addRow(array(array($particularTests, $rollingWeek)));

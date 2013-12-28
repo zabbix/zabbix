@@ -47,6 +47,7 @@ define('ZBX_MAX_IMAGE_SIZE', 1048576); // 1024 * 1024
 
 define('ZBX_UNITS_ROUNDOFF_THRESHOLD',		0.01);
 define('ZBX_UNITS_ROUNDOFF_UPPER_LIMIT',	2);
+define('ZBX_UNITS_ROUNDOFF_DNSTEST_LIMIT',	3);
 define('ZBX_UNITS_ROUNDOFF_LOWER_LIMIT',	6);
 
 define('ZBX_DEFAULT_INTERVAL', '1-7,00:00-24:00');
@@ -899,7 +900,7 @@ define('AVAILABILITY_REPORT_BY_TEMPLATE', 1);
 define('DNSTEST_PAGE_SLV',			'{$ROLLING.WEEK.STATUS.PAGE.SLV}');
 define('DNSTEST_MIN_DNS_COUNT',		'{$DNSTEST.DNS.AVAIL.MINNS}');
 define('DNSTEST_DNS_UDP_RTT',		'{$DNSTEST.DNS.UDP.RTT}');
-define('DNSTEST_DNSSEC_DELAY',		'{$DNSTEST.DNSSEC.UDP.DELAY}');
+define('DNSTEST_DNSSEC_DELAY',		'{$DNSTEST.DNSSEC.DELAY}');
 define('DNSTEST_RDDS_DELAY',		'{$DNSTEST.RDDS.DELAY}');
 
 // DNS TEST rolling week items keys
@@ -934,15 +935,11 @@ define('CALCULATED_ITEM_RDDS_FAIL',			'dnstest.configvalue[INCIDENT.RDDS.FAIL]')
 define('CALCULATED_ITEM_RDDS_RECOVERY',		'dnstest.configvalue[INCIDENT.RDDS.RECOVER]');
 define('CALCULATED_ITEM_RDDS_DELAY',		'dnstest.configvalue[DNSTEST.RDDS.DELAY]');
 
-// DNS TEST probes info
-define('NUMBER_OF_ONLINE_AND_TOTAL_PROBES',	'online.nodes.pl[online,percent]');
-define('NUMBER_OF_ONLINE_PROBES',			'online.nodes.pl');
-define('NUMBER_OF_TOTAL_PROBES',			'online.nodes.pl[total]');
-
 // DNS TEST probe status items keys
 define('PROBE_STATUS_AUTOMATIC',	'dnstest.probe.status[automatic,"{$DNSTEST.IP4.ROOTSERVERS1}","{$DNSTEST.IP6.ROOTSERVERS1}"]');
 define('PROBE_STATUS_MANUAL',		'dnstest.probe.status[manual]');
-define('PROBE_DNS_UDP_ITEM',		'dnstest.dns.udp.rtt[');
+define('PROBE_DNS_UDP_ITEM',		'dnstest.dns.udp[{$DNSTEST.TLD}]');
+define('PROBE_DNS_UDP_ITEM_RTT',	'dnstest.dns.udp.rtt[');
 define('PROBE_RDDS_ITEM',			'dnstest.rdds[');
 
 // DNS TEST probe status

@@ -61,6 +61,14 @@ $testTimeFrom = mktime(
 // macro
 if ($data['type'] == 0 || $data['type'] == 1) {
 	$macro[] = DNSTEST_DNSSEC_DELAY;
+	if ($data['type'] == 0) {
+		$data['availProbes'] = 0;
+		$data['totalProbes'] = 0;
+	}
+	else {
+		$data['availTests'] = 0;
+		$data['totalTests'] = 0;
+	}
 }
 else {
 	$macro[] = DNSTEST_RDDS_DELAY;
@@ -148,23 +156,20 @@ foreach ($hosts as $host) {
 $probeItems = API::Item()->get(array(
 	'hostids' => $hostIds,
 	'output' => array('itemid', 'key_', 'hostid'),
+	'filter' => array(
+		'key_' => array(PROBE_STATUS_MANUAL, PROBE_STATUS_AUTOMATIC)
+	),
 	'preservekeys' => true
 ));
 
 foreach ($probeItems as $probeItem) {
-	if ($probeItem['key_'] != NUMBER_OF_ONLINE_AND_TOTAL_PROBES && $probeItem['key_'] != NUMBER_OF_ONLINE_PROBES
-			&& $probeItem['key_'] != NUMBER_OF_TOTAL_PROBES ) {
-		// manual items
-		if ($probeItem['key_'] != PROBE_STATUS_MANUAL) {
-			$manualItemIds[] = $probeItem['itemid'];
-		}
-		// automatic items
-		if ($probeItem['key_'] != PROBE_STATUS_AUTOMATIC) {
-			$automaticItemIds[$probeItem['itemid']] = $probeItem['hostid'];
-		}
+	// manual items
+	if ($probeItem['key_'] != PROBE_STATUS_MANUAL) {
+		$manualItemIds[] = $probeItem['itemid'];
 	}
-	elseif (isset($hosts[$probeItem['hostid']])) {
-		unset($hosts[$probeItem['hostid']]);
+	// automatic items
+	if ($probeItem['key_'] != PROBE_STATUS_AUTOMATIC) {
+		$automaticItemIds[$probeItem['itemid']] = $probeItem['hostid'];
 	}
 }
 
@@ -231,89 +236,86 @@ foreach ($hosts as $host) {
 	$hostIds[] = $host['hostid'];
 }
 
-// time calculation
-$timeFrom = $macroTime - 59;
-$testTimeTill = $testTimeFrom + 59;
-$testTimeFrom -= $timeFrom;
+$data['totalProbes'] = count($hostIds);
 
 // get only used items
 if ($data['type'] == 0 || $data['type'] == 1) {
-	$probeItems = API::Item()->get(array(
-		'hostids' => $hostIds,
-		'output' => array('itemid', 'key_', 'hostid'),
-		'search' => array(
-			'key_' => PROBE_DNS_UDP_ITEM
-		),
-		'startSearch' => true,
-		'preservekeys' => true
-	));
+	$probeItemKey = ' AND (i.key_ LIKE ('.zbx_dbstr(PROBE_DNS_UDP_ITEM_RTT.'%').') OR i.key_='.zbx_dbstr(PROBE_DNS_UDP_ITEM).')';
 }
 else {
-	$probeItems = API::Item()->get(array(
-		'hostids' => $hostIds,
-		'output' => array('itemid', 'key_', 'hostid'),
-		'search' => array(
-			'key_' => PROBE_RDDS_ITEM
-		),
-		'startSearch' => true,
-		'preservekeys' => true
-	));
+	$probeItemKey = ' AND i.key_ LIKE ('.zbx_dbstr(PROBE_RDDS_ITEM.'%').')';
 }
 
+// SQL
+$items = DBselect(
+	'SELECT i.itemid,i.key_,i.hostid'.
+	' FROM items i'.
+	' WHERE '.dbConditionInt('i.hostid', $hostIds).
+		$probeItemKey
+);
+
+$nsArray = array();
+
 // get items value
-foreach ($probeItems as $probeItem) {
+while ($item = DBfetch($items)) {
 	if ($data['type'] == 0 || $data['type'] == 1) {
 		$itemValue = DBfetch(DBselect(DBaddLimit(
 			'SELECT h.value'.
 			' FROM history_uint h'.
-			' WHERE h.itemid='.$probeItem['itemid'].
+			' WHERE h.itemid='.$item['itemid'].
 				' AND h.clock>='.$testTimeFrom.
 				' AND h.clock<='.$testTimeTill.
 			' ORDER BY h.clock DESC',
 			1
 		)));
 	}
-	if ($data['type'] == 0) {
-		preg_match('/^[^\[]+\[([^\]]+)]$/', $probeItem['key_'], $matches);
+	if ($data['type'] == 0 && $item['key_'] == PROBE_DNS_UDP_ITEM_RTT) {
+		preg_match('/^[^\[]+\[([^\]]+)]$/', $item['key_'], $matches);
 		$nsValues = explode(',', $matches[1]);
 
 		if (!$itemValue) {
-			$nsArray[$probeItems[$probeItem['itemid']]['hostid']][$nsValues[1]]['value'][] = null;
+			$nsArray[$item['hostid']][$nsValues[1]]['value'][] = null;
 		}
 		elseif ($itemValue['value'] < $udpRtt * 5 && $itemValue['value'] > DNSTEST_NO_REPLY_ERROR_CODE) {
-			$nsArray[$probeItems[$probeItem['itemid']]['hostid']][$nsValues[1]]['value'][] = true;
+			$nsArray[$item['hostid']][$nsValues[1]]['value'][] = true;
 		}
 		else {
-			$nsArray[$probeItems[$probeItem['itemid']]['hostid']][$nsValues[1]]['value'][] = false;
+			$nsArray[$item['hostid']][$nsValues[1]]['value'][] = false;
 		}
 	}
-	elseif ($data['type'] == 1) {
-		if (!isset($hosts[$probeItems[$probeItem['itemid']]['hostid']]['value'])) {
-			$hosts[$probeItems[$probeItem['itemid']]['hostid']]['value']['ok'] = 0;
-			$hosts[$probeItems[$probeItem['itemid']]['hostid']]['value']['fail'] = 0;
-			$hosts[$probeItems[$probeItem['itemid']]['hostid']]['value']['total'] = 0;
-			$hosts[$probeItems[$probeItem['itemid']]['hostid']]['value']['noResult'] = 0;
+	elseif ($data['type'] == 0 && $item['key_'] == PROBE_DNS_UDP_ITEM) {
+		// avail probes
+		if ($itemValue['value'] == 1) {
+			$data['availProbes']++;
+		}
+	}
+	elseif ($data['type'] == 1 && $item['key_'] == PROBE_DNS_UDP_ITEM_RTT) {
+		if (!isset($hosts[$item['hostid']]['value'])) {
+			$hosts[$item['hostid']]['value']['ok'] = 0;
+			$hosts[$item['hostid']]['value']['fail'] = 0;
+			$hosts[$item['hostid']]['value']['total'] = 0;
+			$hosts[$item['hostid']]['value']['noResult'] = 0;
 		}
 
 		if ($itemValue) {
 			if ($itemValue['value'] != DNSSEC_FAIL_ERROR_CODE) {
-				$hosts[$probeItems[$probeItem['itemid']]['hostid']]['value']['ok']++;
+				$hosts[$item['hostid']]['value']['ok']++;
 			}
 			else {
-				$hosts[$probeItems[$probeItem['itemid']]['hostid']]['value']['fail']++;
+				$hosts[$item['hostid']]['value']['fail']++;
 			}
 		}
 		else {
-			$hosts[$probeItems[$probeItem['itemid']]['hostid']]['value']['noResult']++;
+			$hosts[$item['hostid']]['value']['noResult']++;
 		}
 
-		$hosts[$probeItems[$probeItem['itemid']]['hostid']]['value']['total']++;
+		$hosts[$item['hostid']]['value']['total']++;
 	}
 	elseif ($data['type'] == 2) {
 		$itemValue = DBfetch(DBselect(DBaddLimit(
 			'SELECT h.value'.
 			' FROM history_uint h'.
-			' WHERE h.itemid='.$probeItem['itemid'].
+			' WHERE h.itemid='.$item['itemid'].
 				' AND h.clock>='.$testTimeFrom.
 				' AND h.clock<='.$testTimeTill.
 			' ORDER BY h.clock DESC',
@@ -323,7 +325,7 @@ foreach ($probeItems as $probeItem) {
 		if (!$itemValue) {
 			$itemValue['value'] = null;
 		}
-		$hosts[$probeItems[$probeItem['itemid']]['hostid']]['value'] = $itemValue['value'];
+		$hosts[$item['hostid']]['value'] = $itemValue['value'];
 	}
 }
 
@@ -348,7 +350,8 @@ if ($data['type'] == 0) {
 
 foreach ($hosts as $host) {
 	foreach ($data['probes'] as $hostId => $probe) {
-		if (zbx_strtoupper($host['host']) == zbx_strtoupper($data['tld']['host'].' '.$probe['host'])) {
+		if (zbx_strtoupper($host['host']) == zbx_strtoupper($data['tld']['host'].' '.$probe['host'])
+				&& isset($host['value'])) {
 			$data['probes'][$hostId]['value'] = $host['value'];
 			break;
 		}
@@ -356,7 +359,7 @@ foreach ($hosts as $host) {
 }
 
 if ($data['tld'] && $data['slvItem']) {
-	$data['slv'] = $data['slvItem']['lastvalue'];
+	$data['slv'] = round($data['slvItem']['lastvalue'], ZBX_UNITS_ROUNDOFF_DNSTEST_LIMIT);
 }
 else {
 	access_deny();

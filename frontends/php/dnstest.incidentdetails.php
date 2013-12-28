@@ -236,7 +236,7 @@ if ($mainEvent) {
 if ($tld && $mainEvent && $slvItem) {
 	$data['tld'] = reset($tld);
 	$data['slvItem'] = $slvItem;
-	$data['slv'] = $data['slvItem']['lastvalue'];
+	$data['slv'] = round($data['slvItem']['lastvalue'], ZBX_UNITS_ROUNDOFF_DNSTEST_LIMIT);
 	if ($mainEvent['false_positive']) {
 		$data['incidentType'] = INCIDENT_FALSE_POSITIVE;
 	}

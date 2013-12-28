@@ -211,17 +211,26 @@ if ($host || $data['filter_search']) {
 				switch ($item['key_']) {
 					case DNSTEST_SLV_DNS_ROLLWEEK:
 						$data['dns']['itemid'] = $item['itemid'];
-						$data['dns']['slv'] = $item['lastvalue'];
+						$data['dns']['slv'] = round(
+							$item['lastvalue'],
+							ZBX_UNITS_ROUNDOFF_DNSTEST_LIMIT
+						);
 						$data['dns']['events'] = array();
 						break;
 					case DNSTEST_SLV_DNSSEC_ROLLWEEK:
 						$data['dnssec']['itemid'] = $item['itemid'];
-						$data['dnssec']['slv'] = $item['lastvalue'];
+						$data['dnssec']['slv'] = round(
+							$item['lastvalue'],
+							ZBX_UNITS_ROUNDOFF_DNSTEST_LIMIT
+						);
 						$data['dnssec']['events'] = array();
 						break;
 					case DNSTEST_SLV_RDDS_ROLLWEEK:
 						$data['rdds']['itemid'] = $item['itemid'];
-						$data['rdds']['slv'] = $item['lastvalue'];
+						$data['rdds']['slv'] = round(
+							$item['lastvalue'],
+							ZBX_UNITS_ROUNDOFF_DNSTEST_LIMIT
+						);
 						$data['rdds']['events'] = array();
 						break;
 					case DNSTEST_SLV_DNS_AVAIL:
