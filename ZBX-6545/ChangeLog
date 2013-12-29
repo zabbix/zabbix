@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-6546] fixed possible SQL errors when syncing a node configuration with PostgreSQL backend version 8.2 and later (Sasha)
 ...G...PS. [ZBX-4243] fixed Zabbix syslog application names (RFC 5424 APP-NAME) (Andris)
 
 --------------------------------------------------------------------------------
