@@ -606,6 +606,9 @@ int	node_history(char *data, size_t datalen)
 			break;
 	}
 
+	if (1 == events)
+		process_events();
+
 	if (SUCCEED == ret)
 		DBcommit();
 	else
