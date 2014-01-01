@@ -2,3 +2,6 @@ refactor config file inclusion (and info sourcing)
 refactor auth to use Zabbix internal mechanism
 refactor api_jsonrpc.php to front-controller style; push single-file libs to consistent lib file structure
 refactor toolbox.php to llnw.php lib
+determine what get-ack-info.php, squelch-json.php, and squelch-mgr.php are...
+re: internal Zabbix auth - legacy support key: sjE4i by checking and then assigning an API user for lookup
+integrate https://github.llnw.net/cchristensen/service-app-report
