@@ -1,1 +1,1 @@
-index.php
+app/index.php

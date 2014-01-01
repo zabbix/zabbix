@@ -3,14 +3,7 @@
 [llnw-zbx API](https://confluence.atlas.llnw.com/display/CDNENG/M3+-+llnw-zbx+API+-+provides+custom+Zabbix+interaction)
 
 
-### Configuration conventions
-
-Configuration is managed by directory conventions (starting with system locations).
-
-
-#### Refs
-
-*  http://symfony.com/doc/current/components/config/resources.html
+## [Config](doc/CONFIG.md)
 
 
 ## Contributing
@@ -25,10 +18,9 @@ Configuration is managed by directory conventions (starting with system location
 
 ### Project layout
 
-*  `api_jsonrpc.php -> index.php` - front controller
-*  `config.php` - ?? (TODO: push into lib dir)
-*  `data` - data for setup or runtime
+*  `api_jsonrpc.php -> app/index.php` - front controller
+*  `app` - application specific runtime files
 *  `doc` - examples or extended documentation
 *  `lib` - namespaced libs
-*  `tests` - tests to exercize Zabbix/LLNW functionality
+*  `test` - tests to exercize Zabbix/LLNW functionality
 *  `vendor` (controlled by: composer.json)
