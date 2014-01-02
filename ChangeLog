@@ -5,6 +5,7 @@ New features:
 A.F....... [ZBX-1357] updated American English, French, Hungarian, Italian, Japanese, Russian, Slovak and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-6545] fixed possible SQL errors when syncing a node configuration with PostgreSQL backend version 8.2 and later (Sasha)
 ........S. [ZBX-7452] fixed processing of received events from slave node (Sasha)
 .......... [ZBXNEXT-1256] fixed parameter passing for example userparameter to obtain directory size (Richlv)
 ........S. [ZBX-7521] fixed crash if value cache entered low memory mode when adding a new item to the cache (wiper)
