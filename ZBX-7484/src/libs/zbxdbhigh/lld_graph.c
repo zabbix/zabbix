@@ -529,13 +529,10 @@ static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, d
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid, struct zbx_json_parse *jp_data,
-		char **error, const char *f_macro, const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num)
+void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_rows, char **error)
 {
 	const char		*__function_name = "DBlld_update_graphs";
 
-	struct zbx_json_parse	jp_row;
-	const char		*p;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vector_ptr_t	graphs;
@@ -559,7 +556,7 @@ void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid, str
 				" and i.itemid=gi.itemid"
 				" and gi.graphid=g.graphid"
 				" and id.parent_itemid=" ZBX_FS_UI64,
-			discovery_itemid);
+			lld_ruleid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -582,7 +579,7 @@ void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid, str
 				" and i.itemid=gi.itemid"
 				" and gi.graphid=g.graphid"
 				" and id.parent_itemid=" ZBX_FS_UI64,
-			discovery_itemid);
+			lld_ruleid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -597,6 +594,7 @@ void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid, str
 				ymin_type = GRAPH_YAXIS_TYPE_CALCULATED, ymax_type = GRAPH_YAXIS_TYPE_CALCULATED,
 				ymin_flags = 0, ymax_flags = 0;
 		int		i;
+		zbx_lld_row_t	*lld_row;
 
 		ZBX_STR2UINT64(parent_graphid, row[0]);
 		name_proto = row[1];
@@ -640,23 +638,14 @@ void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid, str
 
 		DBget_graphitems(sql, &gitems_proto, &gitems_proto_alloc, &gitems_proto_num);
 
-		p = NULL;
-		/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
-		/*                      ^                                             */
-		while (NULL != (p = zbx_json_next(jp_data, p)))
+		for (i = 0; i < lld_rows->values_num; i++)
 		{
-			/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
-			/*                      ^------------------^                          */
-			if (FAIL == zbx_json_brackets_open(p, &jp_row))
-				continue;
-
-			if (SUCCEED != lld_check_record(&jp_row, f_macro, f_regexp, regexps, regexps_num))
-				continue;
+			lld_row = (zbx_lld_row_t *)lld_rows->values[i];
 
 			DBlld_make_graph(hostid, parent_graphid, &graphs, name_proto, gitems_proto, gitems_proto_num,
 					ymin_type, ymin_itemid, ymin_flags, ymin_key_proto,
 					ymax_type, ymax_itemid, ymax_flags, ymax_key_proto,
-					&jp_row, error);
+					&lld_row->jp_row, error);
 		}
 
 		zbx_vector_ptr_sort(&graphs, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);

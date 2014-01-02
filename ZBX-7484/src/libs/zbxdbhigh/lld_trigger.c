@@ -750,13 +750,10 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid, struct zbx_json_parse *jp_data,
-		char **error, const char *f_macro, const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num)
+void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_rows, char **error)
 {
 	const char		*__function_name = "DBlld_update_triggers";
 
-	struct zbx_json_parse	jp_row;
-	const char		*p;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vector_ptr_t	triggers;
@@ -777,7 +774,7 @@ void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid, s
 				" and f.itemid=i.itemid"
 				" and i.itemid=id.itemid"
 				" and id.parent_itemid=" ZBX_FS_UI64,
-			discovery_itemid);
+			lld_ruleid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -794,7 +791,7 @@ void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid, s
 				" and f.itemid=i.itemid"
 				" and i.itemid=id.itemid"
 				" and id.parent_itemid=" ZBX_FS_UI64,
-			discovery_itemid);
+			lld_ruleid);
 
 	/* run through trigger prototypes */
 	while (NULL != (row = DBfetch(result)))
@@ -804,6 +801,7 @@ void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid, s
 		char		*description_proto_esc, *comments_esc, *url_esc;
 		unsigned char	status, type, priority;
 		int		i;
+		zbx_lld_row_t	*lld_row;
 
 		ZBX_STR2UINT64(parent_triggerid, row[0]);
 		description_proto = row[1];
@@ -815,21 +813,12 @@ void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid, s
 		comments_esc = DBdyn_escape_string(row[6]);
 		url_esc = DBdyn_escape_string(row[7]);
 
-		p = NULL;
-		/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
-		/*                      ^                                             */
-		while (NULL != (p = zbx_json_next(jp_data, p)))
+		for (i = 0; i < lld_rows->values_num; i++)
 		{
-			/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
-			/*                      ^------------------^                          */
-			if (FAIL == zbx_json_brackets_open(p, &jp_row))
-				continue;
-
-			if (SUCCEED != lld_check_record(&jp_row, f_macro, f_regexp, regexps, regexps_num))
-				continue;
+			lld_row = (zbx_lld_row_t *)lld_rows->values[i];
 
 			DBlld_make_trigger(hostid, parent_triggerid, &triggers, description_proto, expression,
-					&jp_row, error);
+					&lld_row->jp_row, error);
 		}
 
 		zbx_vector_ptr_sort(&triggers, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
