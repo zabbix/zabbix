@@ -37,6 +37,11 @@ class CItemKey {
 	private $isValid = true;
 	private $error = '';
 
+	const STATE_NEW = 0;
+	const STATE_END = 1;
+	const STATE_UNQUOTED = 2;
+	const STATE_QUOTED = 3;
+
 	/**
 	 * Parse key and determine if it is valid
 	 * @param string $key
@@ -65,19 +70,18 @@ class CItemKey {
 		// checking if key is empty
 		if ($pos == 0) {
 			$this->isValid = false;
-			$this->error = _('Invalid item key format.');
+			$this->error = _('key is empty');
 			return;
 		}
 
 		// invalid symbol instead of '[', which would be the beginning of params
 		if (isset($key[$pos]) && $key[$pos] != '[') {
 			$this->isValid = false;
-			$this->error = _s('Invalid item key at position %1$s.', $pos);
+			$this->error = _s('error at position %1$s', $pos);
 			return;
 		}
 
-		// 0 - a new parameter started; 1 - end of parameter; 2 - an unquoted parameter; 3 - a quoted parameter
-		$state = 1;
+		$state = self::STATE_END;
 		$level = 0;
 		$num = 0;
 
@@ -85,7 +89,7 @@ class CItemKey {
 			if ($level == 0) {
 				// first square bracket + Zapcat compatibility
 				if ($state == 1 && $key[$pos] == '[') {
-					$state = 0; // a new parameter started
+					$state = self::STATE_NEW;
 				}
 				else {
 					break;
@@ -93,7 +97,8 @@ class CItemKey {
 			}
 
 			switch ($state) {
-				case 0: // a new parameter started
+				// a new parameter started
+				case self::STATE_NEW:
 					switch ($key[$pos]) {
 						case ' ':
 							break;
@@ -128,31 +133,32 @@ class CItemKey {
 								}
 							}
 							$level--;
-							$state = 1;	// end of parameter
+							$state = self::STATE_END;
 							break;
 
 						case '"':
-							$state = 3; // a quoted parameter
+							$state = self::STATE_QUOTED;
 							if ($level == 1) {
 								$l = $pos;
 							}
 							break;
 
 						default:
-							$state = 2; // an unquoted parameter
+							$state = self::STATE_UNQUOTED;
 							if ($level == 1) {
 								$l = $pos;
 							}
 					}
 					break;
 
-				case 1: // end of parameter
+				// end of parameter
+				case self::STATE_END:
 					switch ($key[$pos]) {
 						case ' ':
 							break;
 
 						case ',':
-							$state = 0; // a new parameter started
+							$state = self::STATE_NEW;
 							if ($level == 1) {
 								if (!isset($this->parameters[$num])) {
 									$this->parameters[$num] = '';
@@ -182,7 +188,8 @@ class CItemKey {
 					}
 					break;
 
-				case 2: // an unquoted parameter
+				// an unquoted parameter
+				case self::STATE_UNQUOTED:
 					if ($key[$pos] == ']' || $key[$pos] == ',') {
 						if ($level == 1) {
 							$this->parameters[$num] = '';
@@ -191,11 +198,12 @@ class CItemKey {
 							}
 						}
 						$pos--;
-						$state = 1; // end of parameter
+						$state = self::STATE_END;
 					}
 					break;
 
-				case 3: // a quoted parameter
+				// a quoted parameter
+				case self::STATE_QUOTED:
 					if ($key[$pos] == '"' && $key[$pos - 1] != '\\') {
 						if ($level == 1) {
 							$this->parameters[$num] = '';
@@ -205,7 +213,7 @@ class CItemKey {
 								}
 							}
 						}
-						$state = 1; // end of parameter
+						$state = self::STATE_END;
 					}
 					break;
 			}
@@ -215,7 +223,7 @@ class CItemKey {
 
 		if ($pos == 0 || isset($key[$pos]) || $level != 0) {
 			$this->isValid = false;
-			$this->error = _s('Invalid item key at position %1$s.', $pos);
+			$this->error = _s('error at position %1$s', $pos);
 		}
 	}
 
