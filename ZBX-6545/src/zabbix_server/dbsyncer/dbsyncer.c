@@ -28,7 +28,6 @@
 #include "dbsyncer.h"
 
 extern int		CONFIG_HISTSYNCER_FREQUENCY;
-extern int		ZBX_SYNC_MAX;
 extern unsigned char	process_type;
 extern int		process_num;
 
