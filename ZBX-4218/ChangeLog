@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A.F....... [ZBX-4218] rewrote the item key parser's source code for independence on the mbstring.func_overload option (Sasha)
 .......... [ZBXNEXT-1256] fixed parameter passing for example userparameter to obtain directory size (Richlv)
 ........S. [ZBX-7484] fixed escalations not being stopped and generation of multiple successive OK or PROBLEM events (asaveljevs)
 ...G...PS. [ZBX-4243] fixed Zabbix syslog application names (RFC 5424 APP-NAME) (Andris)
