@@ -8783,8 +8783,8 @@ msgstr "Massimizza"
 #, c-format
 msgid "Maximum DNS name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum DNS name length is %1$d characters, \"%2$s\" is %3$d characters."
-msgstr[0] "La massima lunghezza del nome DNS e' %2$d caratteri, \"%3$s\" e' %1$d carattere."
-msgstr[1] "La massima lunghezza del nome DNS e' %2$d caratteri, \"%3$s\" e' %1$d caratteri."
+msgstr[0] ""
+msgstr[1] ""
 
 #: api/classes/CUser.php:316
 #, c-format
@@ -14446,7 +14446,7 @@ msgstr "Gruppo utenti"
 #: api/classes/CUserGroup.php:685
 #, c-format
 msgid "User group \"%1$s\" is the only group that user \"%2$s\" belongs to."
-msgstr "Gruppo utente \"% 1 $ s\" è l'unico gruppo che contiene l'utente \"%2$s\"."
+msgstr "Gruppo utente \"%1$s\" è l'unico gruppo che contiene l'utente \"%2$s\"."
 
 #: api/classes/CUserGroup.php:668
 #, c-format

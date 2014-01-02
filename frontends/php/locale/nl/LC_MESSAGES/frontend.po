@@ -7028,7 +7028,7 @@ msgstr "Onjuiste ontdekking regel ID voor host prototype \"%1$s\"."
 #: include/classes/validators/event/CEventSourceObjectValidator.php:66
 #, c-format
 msgid "Incorrect event object \"%1$s\" (%2$s) for event source \"%3$s\" (%4$s), only the following objects are supported: %5$s."
-msgstr "Onjuist gebeurtenisobject \"%1$s\" (%2$s) voor event source \"%3$s\" (%4$s), worden alleen de volgende objecten ondersteund: % 5$s."
+msgstr "Onjuist gebeurtenisobject \"%1$s\" (%2$s) voor event source \"%3$s\" (%4$s), worden alleen de volgende objecten ondersteund: %5$s."
 
 #: api/classes/CAlert.php:348
 msgid "Incorrect eventobject value."
@@ -7553,7 +7553,7 @@ msgstr "Interface met IP \"%1$s\" kan geen lege DNS naam hebben zolang er gebrui
 #: api/classes/CHostInterface.php:370
 #, c-format
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name."
-msgstr "Interface met IP \"% 1 $ s\" kan geen lege DNS-naam hebben."
+msgstr "Interface met IP \"%1$s\" kan geen lege DNS-naam hebben."
 
 #: include/views/administration.authentication.edit.php:35
 msgctxt "authentication"

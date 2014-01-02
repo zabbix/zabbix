@@ -1547,7 +1547,7 @@ msgstr "Ekran oluşturulamıyor."
 #: api/classes/CUser.php:1201
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
-msgstr "\"%1 $s\" Zabbix dahili kullanıcısı silinemiyor, bu kullanıcıyı devredışı bırakmayı deneyin."
+msgstr "\"%1$s\" Zabbix dahili kullanıcısı silinemiyor, bu kullanıcıyı devredışı bırakmayı deneyin."
 
 #: actionconf.php:177
 msgid "Cannot delete action"
@@ -3299,7 +3299,7 @@ msgstr "Oluşturuldu: \"%2$s\" üzerinde \"%1$s\" keşif kuralı."
 #: api/classes/CHostPrototype.php:364
 #, c-format
 msgid "Created: Host prototype \"%1$s\" on \"%2$s\"."
-msgstr "Oluşturuldu: \"%2 $s\" üzerinde \"%1 $s\" konak prototipi."
+msgstr "Oluşturuldu: \"%2$s\" üzerinde \"%1$s\" konak prototipi."
 
 #: api/classes/CItem.php:591
 #, c-format
@@ -6817,7 +6817,7 @@ msgstr ""
 #: api/classes/CService.php:1163
 #, c-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
-msgstr "Servis için geçersiz kabul edilebilir SLA \"%1 $s\"."
+msgstr "Servis için geçersiz kabul edilebilir SLA \"%1$s\"."
 
 #: api/classes/CAction.php:1612
 msgid "Incorrect action condition discovery check."
