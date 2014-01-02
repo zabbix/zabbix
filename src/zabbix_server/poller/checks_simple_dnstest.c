@@ -292,23 +292,36 @@ static int	zbx_get_last_label(const char *name, char **last_label, char *err, si
 	return SUCCEED;
 }
 
-/* get NSEC and NSEC3 records*/
-static int	zbx_get_nsec_rr_list(const ldns_pkt *pkt, ldns_pkt_section s, ldns_rr_list **result)
+#define ZBX_COVERED_TYPE_NSEC	0
+#define ZBX_COVERED_TYPE_DS	1
+static int	zbx_get_rrset_to_verify(const ldns_pkt *pkt, const ldns_rdf *owner, ldns_pkt_section section,
+		int covered, ldns_rr_list **result)
 {
-	ldns_rr_list	*nsecset = NULL, *nsec3set = NULL;
+	ldns_rr_list	*rrset = NULL, *rrset2 = NULL;
 	int		ret = FAIL;
 
-	nsecset = ldns_pkt_rr_list_by_type(pkt, LDNS_RR_TYPE_NSEC, s);
-	nsec3set = ldns_pkt_rr_list_by_type(pkt, LDNS_RR_TYPE_NSEC3, s);
+	switch (covered)
+	{
+		case ZBX_COVERED_TYPE_NSEC:
+			rrset = ldns_pkt_rr_list_by_name_and_type(pkt, owner, LDNS_RR_TYPE_NSEC, section);
+			rrset2 = ldns_pkt_rr_list_by_name_and_type(pkt, owner, LDNS_RR_TYPE_NSEC3, section);
 
-	if (NULL == (*result = ldns_rr_list_new()))
-		goto out;
+			if (NULL == (*result = ldns_rr_list_new()))
+				goto out;
 
-	if (NULL != nsecset && 0 == ldns_rr_list_push_rr_list(*result, ldns_rr_list_clone(nsecset)))
-		goto out;
+			if (NULL != rrset && 0 == ldns_rr_list_push_rr_list(*result, ldns_rr_list_clone(rrset)))
+				goto out;
 
-	if (NULL != nsec3set && 0 == ldns_rr_list_push_rr_list(*result, ldns_rr_list_clone(nsec3set)))
-		goto out;
+			if (NULL != rrset2 && 0 == ldns_rr_list_push_rr_list(*result, ldns_rr_list_clone(rrset2)))
+				goto out;
+
+			break;
+		case ZBX_COVERED_TYPE_DS:
+			*result = ldns_pkt_rr_list_by_name_and_type(pkt, owner, LDNS_RR_TYPE_DS, section);
+			break;
+		default:
+			goto out;
+	}
 
 	ret = SUCCEED;
 out:
@@ -318,25 +331,26 @@ out:
 		*result = NULL;
 	}
 
-	if (NULL != nsec3set)
-		ldns_rr_list_deep_free(nsec3set);
+	if (NULL != rrset)
+		ldns_rr_list_deep_free(rrset);
 
-	if (NULL != nsecset)
-		ldns_rr_list_deep_free(nsecset);
+	if (NULL != rrset2)
+		ldns_rr_list_deep_free(rrset2);
 
 	return ret;
 }
 
-#define ZBX_COVERED_TYPE_NSEC	0
-#define ZBX_COVERED_TYPE_DS	1
-static int	zbx_get_covered_rrsigs(const ldns_pkt *pkt, ldns_pkt_section s, int covered, ldns_rr_list **result)
+static int	zbx_get_covered_rrsigs(const ldns_pkt *pkt, const ldns_rdf *owner, ldns_pkt_section s, int covered, ldns_rr_list **result)
 {
 	ldns_rr_list	*rrsigs;
 	ldns_rr		*rr;
 	size_t		i, count;
 	int		ret = FAIL;
 
-	rrsigs = ldns_pkt_rr_list_by_type(pkt, LDNS_RR_TYPE_RRSIG, s);
+	if (NULL != owner)
+		rrsigs = ldns_pkt_rr_list_by_name_and_type(pkt, owner, LDNS_RR_TYPE_RRSIG, s);
+	else
+		rrsigs = ldns_pkt_rr_list_by_type(pkt, LDNS_RR_TYPE_RRSIG, s);
 
 	*result = ldns_rr_list_new();
 
@@ -392,6 +406,156 @@ out:
 	return ret;
 }
 
+static int	zbx_ldns_rdf_compare(const void *d1, const void *d2)
+{
+	return ldns_rdf_compare(*(const ldns_rdf **)d1, *(const ldns_rdf **)d2);
+}
+
+static void	zbx_get_owners(const ldns_rr_list *rr_list, zbx_vector_ptr_t *owners)
+{
+	size_t		i, count;
+	ldns_rdf	*owner;
+
+	count = ldns_rr_list_rr_count(rr_list);
+	for (i = 0; i < count; i++)
+	{
+		owner = ldns_rr_owner(ldns_rr_list_rr(rr_list, i));
+
+		zbx_vector_ptr_append(owners, ldns_rdf_clone(owner));
+	}
+
+	zbx_vector_ptr_sort(owners, zbx_ldns_rdf_compare);
+	zbx_vector_ptr_uniq(owners, zbx_ldns_rdf_compare);
+}
+
+static void	zbx_destroy_owners(zbx_vector_ptr_t *owners)
+{
+	size_t	i;
+
+	for (i = 0; i < owners->values_num; i++)
+		ldns_rdf_deep_free((ldns_rdf *)owners->values[i]);
+
+	zbx_vector_ptr_destroy(owners);
+}
+
+static const char	*zbx_covered_to_str(int covered)
+{
+	switch (covered)
+	{
+		case ZBX_COVERED_TYPE_DS:
+			return "DS";
+		case ZBX_COVERED_TYPE_NSEC:
+			return "NSEC*";
+	}
+
+	return "*UNKNOWN*";
+}
+
+static int	zbx_verify_rrsigs(const ldns_pkt *pkt, ldns_pkt_section section, int covered, const ldns_rr_list *keys,
+		const char *ns, const char *ip, int *rtt, char *err, size_t err_size)
+{
+	zbx_vector_ptr_t	owners;
+	ldns_rr_list		*rrset = NULL, *rrsigs = NULL;
+	ldns_rdf		*owner_rdf;
+	size_t			i;
+	char			*owner_str, owner_buf[256];
+	int			ret = FAIL;
+
+	zbx_vector_ptr_create(&owners);
+
+	if (SUCCEED != zbx_get_covered_rrsigs(pkt, NULL, section, covered, &rrsigs))
+	{
+		zbx_snprintf(err, err_size, "internal error: cannot generate RR list");
+		*rtt = ZBX_EC_INTERNAL;
+		goto out;
+	}
+
+	if (NULL == rrsigs)
+	{
+		zbx_snprintf(err, err_size, "no %s RRSIG records found at nameserver \"%s\" (%s)",
+				zbx_covered_to_str(covered), ns, ip);
+		*rtt = ZBX_EC_DNS_NS_EDNSSEC;
+		goto out;
+	}
+
+	zbx_get_owners(rrsigs, &owners);
+
+	ldns_rr_list_deep_free(rrsigs);
+	rrsigs = NULL;
+
+	for (i = 0; i < owners.values_num; i++)
+	{
+		owner_rdf = (ldns_rdf *)owners.values[i];
+
+		if (NULL == (owner_str = ldns_rdf2str(owner_rdf)))
+		{
+			*rtt = ZBX_EC_INTERNAL;
+			zbx_strlcpy(err, "internal error: cannot convert owner name to a string", err_size);
+			goto out;
+		}
+
+		zbx_strlcpy(owner_buf, owner_str, sizeof(owner_buf));
+		zbx_free(owner_str);
+
+		if (NULL != rrset)
+		{
+			ldns_rr_list_deep_free(rrset);
+			rrset = NULL;
+		}
+
+		/* collect RRs to verify */
+		if (SUCCEED != zbx_get_rrset_to_verify(pkt, owner_rdf, section, covered, &rrset))
+		{
+			zbx_snprintf(err, err_size, "internal error: cannot generate RR list");
+			*rtt = ZBX_EC_INTERNAL;
+			goto out;
+		}
+
+		if (NULL == rrset)
+		{
+			zbx_snprintf(err, err_size, "no %s records of \"%s\" found at nameserver \"%s\" (%s)",
+					zbx_covered_to_str(covered), owner_buf, ns, ip);
+			*rtt = ZBX_EC_DNS_NS_EDNSSEC;
+			goto out;
+		}
+
+		/* now get RRSIGs of that owner, we know at least one exists */
+		if (SUCCEED != zbx_get_covered_rrsigs(pkt, owner_rdf, section, covered, &rrsigs))
+		{
+			zbx_snprintf(err, err_size, "internal error: cannot generate RR list");
+			*rtt = ZBX_EC_INTERNAL;
+			goto out;
+		}
+
+		/* verify RRSIGs */
+		if (LDNS_STATUS_OK != ldns_verify(rrset, rrsigs, keys, NULL))
+		{
+			zbx_snprintf(err, err_size, "DNSKEY that verifies %s RRSIGs of \"%s\" not found"
+					" (used %u %s, %u RRSIG and %u DNSKEY RRs)",
+					zbx_covered_to_str(covered),
+					owner_buf,
+					zbx_covered_to_str(covered),
+					ldns_rr_list_rr_count(rrset),
+					ldns_rr_list_rr_count(rrsigs),
+					ldns_rr_list_rr_count(keys));
+			*rtt = ZBX_EC_DNS_NS_EDNSSEC;
+			goto out;
+		}
+	}
+
+	ret = SUCCEED;
+out:
+	zbx_destroy_owners(&owners);
+
+	if (NULL != rrset)
+		ldns_rr_list_deep_free(rrset);
+
+	if (NULL != rrsigs)
+		ldns_rr_list_deep_free(rrsigs);
+
+	return ret;
+}
+
 static int	zbx_get_ns_values(ldns_resolver *res, const char *ns, const char *ip, const ldns_rr_list *keys,
 		const char *testprefix, const char *domain, FILE *dtlog, int *rtt, int *upd, char ipv4_enabled,
 		char ipv6_enabled, char epp_enabled, char *err, size_t err_size)
@@ -399,7 +563,7 @@ static int	zbx_get_ns_values(ldns_resolver *res, const char *ns, const char *ip,
 	char		testname[ZBX_HOST_BUF_SIZE], *host, *last_label = NULL;
 	ldns_rdf	*testname_rdf = NULL, *last_label_rdf = NULL;
 	ldns_pkt	*pkt = NULL;
-	ldns_rr_list	*nsset = NULL, *dsset = NULL, *nsecset = NULL, *rrsigs = NULL;
+	ldns_rr_list	*nsset = NULL;
 	ldns_status	status;
 	ldns_rr		*rr = NULL;
 	time_t		now, ts;
@@ -524,83 +688,18 @@ static int	zbx_get_ns_values(ldns_resolver *res, const char *ns, const char *ip,
 
 		if (NULL != keys)	/* DNSSEC enabled */
 		{
-			/* AUTHORITY section must contain DS RRs */
-			if (NULL == (dsset = ldns_pkt_rr_list_by_type(pkt, LDNS_RR_TYPE_DS, LDNS_SECTION_AUTHORITY)))
+			if (SUCCEED != zbx_verify_rrsigs(pkt, LDNS_SECTION_AUTHORITY, ZBX_COVERED_TYPE_DS, keys,
+					ns, ip, rtt, err, err_size))
 			{
-				zbx_snprintf(err, err_size, "no DS records at nameserver \"%s\" (%s)", ns, ip);
-				*rtt = ZBX_EC_DNS_NS_EDNSSEC;
-				goto out;
-			}
-
-			if (SUCCEED != zbx_get_covered_rrsigs(pkt, LDNS_SECTION_AUTHORITY, ZBX_COVERED_TYPE_DS, &rrsigs))
-			{
-				zbx_snprintf(err, err_size, "internal error: cannot generate RR list");
-				*rtt = ZBX_EC_INTERNAL;
-				goto out;
-			}
-
-			if (NULL == rrsigs)
-			{
-				zbx_snprintf(err, err_size, "no DS RRSIG records at nameserver \"%s\" (%s)", ns, ip);
-				*rtt = ZBX_EC_DNS_NS_EDNSSEC;
-				goto out;
-			}
-
-			/* verify RRSIGs */
-			if (LDNS_STATUS_OK != ldns_verify(dsset, rrsigs, keys, NULL))
-			{
-				zbx_snprintf(err, err_size, "DNSKEY that verifies DS RRSIGs not found"
-						" (used %u DS, %u RRSIG and %u DNSKEY RRs)",
-						ldns_rr_list_rr_count(dsset),
-						ldns_rr_list_rr_count(rrsigs),
-						ldns_rr_list_rr_count(keys));
-				*rtt = ZBX_EC_DNS_NS_EDNSSEC;
 				goto out;
 			}
 		}
 	}
 	else if (NULL != keys)	/* EPP disabled, DNSSEC enabled */
 	{
-		/* collect NSEC and NSEC3 records */
-		if (SUCCEED != zbx_get_nsec_rr_list(pkt, LDNS_SECTION_AUTHORITY, &nsecset))
+		if (SUCCEED != zbx_verify_rrsigs(pkt, LDNS_SECTION_AUTHORITY, ZBX_COVERED_TYPE_NSEC, keys, ns, ip, rtt,
+				err, err_size))
 		{
-			zbx_snprintf(err, err_size, "internal error: cannot generate RR list");
-			*rtt = ZBX_EC_INTERNAL;
-			goto out;
-		}
-
-		if (NULL == nsecset)
-		{
-			zbx_snprintf(err, err_size, "neither NSEC nor NSEC3 records found at nameserver \"%s\" (%s)",
-					ns, ip);
-			*rtt = ZBX_EC_DNS_NS_EDNSSEC;
-			goto out;
-		}
-
-		if (SUCCEED != zbx_get_covered_rrsigs(pkt, LDNS_SECTION_AUTHORITY, ZBX_COVERED_TYPE_NSEC, &rrsigs))
-		{
-			zbx_snprintf(err, err_size, "internal error: cannot generate RR list");
-			*rtt = ZBX_EC_INTERNAL;
-			goto out;
-		}
-
-		if (NULL == rrsigs)
-		{
-			zbx_snprintf(err, err_size, "no RRSIG records covering NSEC or NSEC3 at nameserver \"%s\" (%s)",
-					ns, ip);
-			*rtt = ZBX_EC_DNS_NS_EDNSSEC;
-			goto out;
-		}
-
-		/* verify RRSIGs */
-		if (LDNS_STATUS_OK != ldns_verify(nsecset, rrsigs, keys, NULL))
-		{
-			zbx_snprintf(err, err_size, "DNSKEY that verifies NSEC RRSIGs not found"
-					" (used %u NSEC, %u RRSIG and %u DNSKEY RRs)",
-					ldns_rr_list_rr_count(nsecset),
-					ldns_rr_list_rr_count(rrsigs),
-					ldns_rr_list_rr_count(keys));
-			*rtt = ZBX_EC_DNS_NS_EDNSSEC;
 			goto out;
 		}
 	}
@@ -615,15 +714,6 @@ out:
 		zabbix_log(LOG_LEVEL_WARNING, "DNSTEST DNS \"%s\" (%s) RTT:%d UPD:%d", ns, ip, *rtt, *upd);
 	else
 		zabbix_log(LOG_LEVEL_WARNING, "DNSTEST DNS \"%s\" (%s) RTT:%d", ns, ip, *rtt);
-
-	if (NULL != rrsigs)
-		ldns_rr_list_deep_free(rrsigs);
-
-	if (NULL != nsecset)
-		ldns_rr_list_deep_free(nsecset);
-
-	if (NULL != dsset)
-		ldns_rr_list_deep_free(dsset);
 
 	if (NULL != nsset)
 		ldns_rr_list_deep_free(nsset);
