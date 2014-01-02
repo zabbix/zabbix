@@ -5,6 +5,7 @@ New features:
 A.F....... [ZBX-1357] updated American English, French, Hungarian, Italian, Japanese, Russian, Slovak and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-7484] fixed escalations not being stopped and generation of multiple successive OK or PROBLEM events (asaveljevs)
 ........S. [ZBX-7521] fixed crash if value cache entered low memory mode when adding a new item to the cache (wiper)
 ...G...PS. [ZBX-7521] fixed memory allocator realloc() function bug in low memory situations (wiper)
 ...G...PS. [ZBX-4243] fixed Zabbix syslog application names (RFC 5424 APP-NAME) (Andris)
@@ -727,6 +728,7 @@ New features:
 A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-7484] fixed escalations not being stopped and generation of multiple successive OK or PROBLEM events (asaveljevs)
 ...G...PS. [ZBX-4243] fixed Zabbix syslog application names (RFC 5424 APP-NAME) (Andris)
 
 --------------------------------------------------------------------------------
