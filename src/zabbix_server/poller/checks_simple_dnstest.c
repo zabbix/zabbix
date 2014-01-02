@@ -480,9 +480,6 @@ static int	zbx_verify_rrsigs(const ldns_pkt *pkt, ldns_pkt_section section, int 
 
 	zbx_get_owners(rrsigs, &owners);
 
-	ldns_rr_list_deep_free(rrsigs);
-	rrsigs = NULL;
-
 	for (i = 0; i < owners.values_num; i++)
 	{
 		owner_rdf = (ldns_rdf *)owners.values[i];
@@ -519,10 +516,16 @@ static int	zbx_verify_rrsigs(const ldns_pkt *pkt, ldns_pkt_section section, int 
 			goto out;
 		}
 
+		if (NULL != rrsigs)
+		{
+			ldns_rr_list_deep_free(rrsigs);
+			rrsigs = NULL;
+		}
+
 		/* now get RRSIGs of that owner, we know at least one exists */
 		if (SUCCEED != zbx_get_covered_rrsigs(pkt, owner_rdf, section, covered, &rrsigs))
 		{
-			zbx_snprintf(err, err_size, "internal error: cannot generate RR list");
+			zbx_strlcpy(err, "internal error: cannot generate RR list", err_size);
 			*rtt = ZBX_EC_INTERNAL;
 			goto out;
 		}
@@ -534,8 +537,8 @@ static int	zbx_verify_rrsigs(const ldns_pkt *pkt, ldns_pkt_section section, int 
 					" (used %u %s, %u RRSIG and %u DNSKEY RRs)",
 					zbx_covered_to_str(covered),
 					owner_buf,
-					zbx_covered_to_str(covered),
 					ldns_rr_list_rr_count(rrset),
+					zbx_covered_to_str(covered),
 					ldns_rr_list_rr_count(rrsigs),
 					ldns_rr_list_rr_count(keys));
 			*rtt = ZBX_EC_DNS_NS_EDNSSEC;
