@@ -108,7 +108,7 @@ static zbx_vmcheck_t	vmchecks[] =
  *                                                                            *
  * Purpose: Retrieves a handler of the item key                               *
  *                                                                            *
- * Paramaters: key    - [IN] an item key (without parameters)                 *
+ * Parameters: key    - [IN] an item key (without parameters)                 *
  *             vmfunc - [OUT] a handler of the item key; can be NULL if       *
  *                            libxml2 or libcurl is not compiled in           *
  *                                                                            *
