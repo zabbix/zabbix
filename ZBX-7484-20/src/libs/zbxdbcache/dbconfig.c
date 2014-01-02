@@ -3496,7 +3496,7 @@ next:;
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
  ******************************************************************************/
-void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids)
+void	DCconfig_unlock_triggers(zbx_vector_uint64_t *triggerids)
 {
 	int		i;
 	ZBX_DC_TRIGGER	*dc_trigger;
@@ -3631,21 +3631,20 @@ void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_
 	const ZBX_DC_HOST	*dc_host;
 	DC_TRIGGER		*trigger;
 	const char		*p, *q;
-	zbx_uint64_t		last_triggerid;
 
 	LOCK_CACHE;
 
 	if (0 == trigger_order->values_num)
 	{
-		last_triggerid = 1;
-		hi = zbx_vector_ptr_nearestindex(&config->time_triggers, &last_triggerid,
-				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
 		*trigger_info = zbx_malloc(*trigger_info, max_triggers * sizeof(DC_TRIGGER));
 		zbx_vector_ptr_reserve(trigger_order, max_triggers);
+
+		hi = 0;
 	}
 	else
 	{
+		zbx_uint64_t	last_triggerid;
+
 		trigger = (DC_TRIGGER *)trigger_order->values[0];
 		lo = zbx_vector_ptr_nearestindex(&config->time_triggers, &trigger->triggerid,
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
