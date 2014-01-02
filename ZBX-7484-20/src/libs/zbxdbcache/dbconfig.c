@@ -3512,6 +3512,8 @@ void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids)
 	}
 
 	UNLOCK_CACHE;
+
+	triggerids->values_num = 0;
 }
 
 /******************************************************************************
