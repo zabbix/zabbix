@@ -1298,7 +1298,6 @@ sub create_dnstest_items {
 	'INCIDENT.RDDS.FAIL',
 	'INCIDENT.RDDS.RECOVER',
 	'DNSTEST.DNS.UDP.DELAY',
-	'DNSTEST.DNSSEC.UDP.DELAY',
 	'DNSTEST.RDDS.DELAY')
     {
 	$options = {'name' => '$1 value',
