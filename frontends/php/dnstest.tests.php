@@ -309,11 +309,8 @@ if ($items) {
 
 		$data['downPeriod'] = zbxDateToTime($data['filter_to']) - zbxDateToTime($data['filter_from']);
 
-		if (!$data['type']) {
+		if ($data['type'] > 2) {
 			$itemKey = CALCULATED_ITEM_DNS_DELAY;
-		}
-		elseif ($data['type'] == 1) {
-			$itemKey = CALCULATED_ITEM_DNSSEC_DELAY;
 		}
 		else {
 			$itemKey = CALCULATED_ITEM_RDDS_DELAY;

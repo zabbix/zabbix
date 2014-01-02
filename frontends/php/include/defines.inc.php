@@ -930,7 +930,6 @@ define('CALCULATED_ITEM_DNS_RECOVERY',		'dnstest.configvalue[INCIDENT.DNS.RECOVE
 define('CALCULATED_ITEM_DNS_DELAY',			'dnstest.configvalue[DNSTEST.DNS.UDP.DELAY]');
 define('CALCULATED_ITEM_DNSSEC_FAIL',		'dnstest.configvalue[INCIDENT.DNSSEC.FAIL]');
 define('CALCULATED_ITEM_DNSSEC_RECOVERY',	'dnstest.configvalue[INCIDENT.DNSSEC.RECOVER]');
-define('CALCULATED_ITEM_DNSSEC_DELAY',		'dnstest.configvalue[DNSTEST.DNSSEC.UDP.DELAY]');
 define('CALCULATED_ITEM_RDDS_FAIL',			'dnstest.configvalue[INCIDENT.RDDS.FAIL]');
 define('CALCULATED_ITEM_RDDS_RECOVERY',		'dnstest.configvalue[INCIDENT.RDDS.RECOVER]');
 define('CALCULATED_ITEM_RDDS_DELAY',		'dnstest.configvalue[DNSTEST.RDDS.DELAY]');

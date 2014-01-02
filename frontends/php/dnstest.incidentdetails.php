@@ -152,7 +152,7 @@ if ($mainEvent) {
 			$data['type'] = 0;
 			break;
 		case DNSTEST_SLV_DNSSEC_ROLLWEEK:
-			$keys = array(CALCULATED_ITEM_DNSSEC_FAIL, CALCULATED_ITEM_DNSSEC_RECOVERY, CALCULATED_ITEM_DNSSEC_DELAY);
+			$keys = array(CALCULATED_ITEM_DNSSEC_FAIL, CALCULATED_ITEM_DNSSEC_RECOVERY, CALCULATED_ITEM_DNS_DELAY);
 			$data['type'] = 1;
 			break;
 		case DNSTEST_SLV_RDDS_ROLLWEEK:
@@ -276,25 +276,51 @@ if ($tld && $mainEvent && $slvItem) {
 		);
 	}
 
-
 	while ($test = DBfetch($tests)) {
 		$data['tests'][] = array(
 			'clock' => $test['clock'],
 			'value' => $test['value']
 		);
 	}
+
+	$tempTests = $data['tests'];
+	$startEventExist = false;
+	$endEventExist = false;
+	foreach ($tempTests as $key => $test) {
+		$newClock = mktime(
+			date('H', $test['clock']),
+			date('i', $test['clock']),
+			0,
+			date('n', $test['clock']),
+			date('j', $test['clock']),
+			date('Y', $test['clock'])
+		);
+
+		if (!$startEventExist && $mainEventClock == $newClock) {
+			$data['tests'][$key]['startEvent'] = true;
+			$startEventExist = true;
+		}
+		else {
+			$data['tests'][$key]['startEvent'] = false;
+		}
+
+		if ($endEvent && !$endEventExist && $endEventClock == $newClock) {
+			$data['tests'][$key]['endEvent'] = true;
+			$endEventExist = true;
+		}
+		else {
+			$data['tests'][$key]['endEvent'] = false;
+		}
+	}
+
 	$slvs = DBselect(
 		'SELECT h.value,h.clock'.
-		' FROM history_uint h'.
+		' FROM history h'.
 		' WHERE h.itemid='.zbx_dbstr($data['slvItemId']).
 			' AND h.clock>='.$fromTime.
 			' AND h.clock<='.$toTime
 	);
 
-	$tempTests = $data['tests'];
-
-	$startEventExist = false;
-	$endEventExist = false;
 	while ($slv = DBfetch($slvs)) {
 		foreach ($tempTests as $key => $test) {
 			$newClock = mktime(
@@ -306,65 +332,22 @@ if ($tld && $mainEvent && $slvItem) {
 				date('Y', $test['clock'])
 			);
 
+			$slvValue = round($slv['value'], ZBX_UNITS_ROUNDOFF_DNSTEST_LIMIT);
+
 			if ($slv['clock'] == $test['clock']) {
-				if (!$startEventExist && $mainEventClock == $newClock) {
-					$startEventTest = true;
-					$startEventExist = true;
-				}
-				else {
-					$startEventTest = false;
-				}
-
-				if ($endEvent && !$endEventExist && $endEventClock == $newClock) {
-					$endEventTest = true;
-					$endEventExist = true;
-				}
-				else {
-					$endEventTest = false;
-				}
-
-				$data['tests'][$key]['slv'] = $slv['value'];
-				$data['tests'][$key]['startEvent'] = $startEventTest;
-				$data['tests'][$key]['endEvent'] = $endEventTest;
+				$data['tests'][$key]['slv'] = $slvValue;
 				unset($tempTests[$key]);
 				continue;
 			}
 			elseif (isset($old['clock']) && $test['clock'] < $slv['clock']) {
-				$newClock = mktime(
-					date('H', $old['clock']),
-					date('i', $old['clock']),
-					0,
-					date('n', $old['clock']),
-					date('j', $old['clock']),
-					date('Y', $old['clock'])
-				);
-
-				if (!$startEventExist && $mainEventClock == $newClock) {
-					$startEventTest = true;
-					$startEventExist = true;
-				}
-				else {
-					$startEventTest = false;
-				}
-
-				if ($endEvent && !$endEventExist && $endEventClock == $newClock) {
-					$endEventTest = true;
-					$endEventExist = true;
-				}
-				else {
-					$endEventTest = false;
-				}
-
-				$data['tests'][$key]['slv'] = $old['value'];
-				$data['tests'][$key]['startEvent'] = $startEventTest;
-				$data['tests'][$key]['endEvent'] = $endEventTest;
+				$data['tests'][$key]['slv'] = $slvValue;
 				unset($tempTests[$key]);
 				continue;
 			}
 
 			$old = array(
 				'clock' => $slv['clock'],
-				'value' => $slv['value']
+				'value' => $slvValue
 			);
 		}
 	}
