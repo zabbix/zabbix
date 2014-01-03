@@ -187,6 +187,10 @@ static void	DBtxn_operation(int (*txn_operation)())
 			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in %d seconds.", ZBX_DB_WAIT_DOWN);
 			sleep(ZBX_DB_WAIT_DOWN);
 		}
+		else if (ZBX_DB_FAIL != rc)
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "Connection to database re-established.");
+		}
 	}
 }
 
@@ -281,6 +285,11 @@ void	DBstatement_prepare(const char *sql)
 			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in %d seconds.", ZBX_DB_WAIT_DOWN);
 			sleep(ZBX_DB_WAIT_DOWN);
 		}
+		else if (ZBX_DB_FAIL != rc)
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "Connection to database re-established.");
+		}
+
 	}
 }
 
@@ -310,6 +319,11 @@ void	DBbind_parameter(int position, void *buffer, unsigned char type)
 			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in %d seconds.", ZBX_DB_WAIT_DOWN);
 			sleep(ZBX_DB_WAIT_DOWN);
 		}
+		else if (ZBX_DB_FAIL != rc)
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "Connection to database re-established.");
+		}
+
 	}
 }
 
@@ -338,6 +352,11 @@ int	DBstatement_execute()
 			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in %d seconds.", ZBX_DB_WAIT_DOWN);
 			sleep(ZBX_DB_WAIT_DOWN);
 		}
+		else if (ZBX_DB_FAIL != rc)
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "Connection to database re-established.");
+		}
+
 	}
 
 	return rc;
@@ -372,6 +391,11 @@ int	__zbx_DBexecute(const char *fmt, ...)
 			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in %d seconds.", ZBX_DB_WAIT_DOWN);
 			sleep(ZBX_DB_WAIT_DOWN);
 		}
+		else if (ZBX_DB_FAIL != rc)
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "Connection to database re-established.");
+		}
+
 	}
 
 	va_end(args);
@@ -438,6 +462,11 @@ DB_RESULT	__zbx_DBselect(const char *fmt, ...)
 			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in %d seconds.", ZBX_DB_WAIT_DOWN);
 			sleep(ZBX_DB_WAIT_DOWN);
 		}
+		else if (ZBX_DB_FAIL != rc)
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "Connection to database re-established.");
+		}
+
 	}
 
 	va_end(args);
@@ -470,6 +499,11 @@ DB_RESULT	DBselectN(const char *query, int n)
 			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in %d seconds.", ZBX_DB_WAIT_DOWN);
 			sleep(ZBX_DB_WAIT_DOWN);
 		}
+		else if (ZBX_DB_FAIL != rc)
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "Connection to database re-established.");
+		}
+
 	}
 
 	return rc;
