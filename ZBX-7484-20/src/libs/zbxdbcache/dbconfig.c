@@ -3462,7 +3462,7 @@ void	DCconfig_lock_triggers_by_itemids(zbx_uint64_t *itemids, int itemids_num, z
 	const ZBX_DC_ITEM	*dc_item;
 	ZBX_DC_TRIGGER		*dc_trigger;
 
-	triggerids.values_num = 0;
+	triggerids->values_num = 0;
 
 	LOCK_CACHE;
 
