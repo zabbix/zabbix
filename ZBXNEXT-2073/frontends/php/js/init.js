@@ -93,6 +93,10 @@ jQuery(function($) {
 				data = getMenuPopupTrigger(data);
 				break;
 
+			case 'triggerLog':
+				data = getMenuPopupTriggerLog(data);
+				break;
+
 			case 'triggerMacro':
 				data = getMenuPopupTriggerMacro(data);
 				break;

@@ -19,6 +19,134 @@
 
 
 /**
+ * Get menu popup favourite graphs section data.
+ *
+ * @param array options['graphs']			Graphs as id => label
+ * @param array options['simpleGraphs']		Simple graphs as id => label
+ *
+ * @return array
+ */
+function getMenuPopupFavouriteGraphs(options) {
+	var sections = [];
+
+	if (typeof options['graphs'] !== 'undefined') {
+		sections[sections.length] = {
+			type: 'favourite',
+			title: t('Favourite graphs'),
+			addParams: 'popup.php?srctbl=graphs&srcfld1=graphid&reference=graphid&monitored_hosts=1&multiselect=1',
+			favouriteObj: 'graphid',
+			data: options.graphs
+		};
+	}
+
+	if (typeof options['simpleGraphs'] !== 'undefined') {
+		sections[sections.length] = {
+			type: 'favourite',
+			title: t('Favourite simple graphs'),
+			addParams: 'popup.php?srctbl=items&srcfld1=itemid&monitored_hosts=1&reference=itemid&multiselect=1'
+				+ '&numeric=1&templated=0&with_simple_graph_items=1',
+			favouriteObj: 'itemid',
+			data: options.simpleGraphs
+		};
+	}
+
+	return sections;
+}
+
+/**
+ * Get menu popup favourite maps section data.
+ *
+ * @param array  options['maps']	Maps as id => label
+ *
+ * @return array
+ */
+function getMenuPopupFavouriteMaps(options) {
+	return [{
+		type: 'favourite',
+		title: t('Favourite maps'),
+		addParams: 'popup.php?srctbl=sysmaps&srcfld1=sysmapid&reference=sysmapid&multiselect=1',
+		favouriteObj: 'sysmapid',
+		data: options.maps
+	}];
+}
+
+/**
+ * Get menu popup favourite screens section data.
+ *
+ * @param array options['screens']		Screens as id => label
+ * @param array options['slideshows']	Slideshows as id => label
+ *
+ * @return array
+ */
+function getMenuPopupFavouriteScreens(options) {
+	var sections = [];
+
+	if (typeof options['screens'] !== 'undefined') {
+		sections[sections.length] = {
+			type: 'favourite',
+			title: t('Favourite screens'),
+			addParams: 'popup.php?srctbl=screens&srcfld1=screenid&reference=screenid&multiselect=1',
+			favouriteObj: 'screenid',
+			data: options.screens
+		};
+	}
+
+	if (typeof options['slideshows'] !== 'undefined') {
+		sections[sections.length] = {
+			type: 'favourite',
+			title: t('Favourite slide shows'),
+			addParams: 'popup.php?srctbl=slides&srcfld1=slideshowid&reference=slideshowid&multiselect=1',
+			favouriteObj: 'slideshowid',
+			data: options.slideshows
+		};
+	}
+
+	return sections;
+}
+
+/**
+ * Get menu popup history section data.
+ *
+ * @param string options['itemid']				item id
+ * @param bool   options['hasLatestGraphs']		link to history page with showgraph action (optional)
+ *
+ * @return array
+ */
+function getMenuPopupHistory(options) {
+	var items = [];
+
+	// latest graphs
+	if (typeof options.hasLatestGraphs !== 'undefined' && options.hasLatestGraphs) {
+		items[items.length] = {
+			label: t('Last hour graph'),
+			url: new Curl('history.php?itemid=' + options.itemid + '&action=showgraph&period=3600').getUrl()
+		};
+
+		items[items.length] = {
+			label: t('Last week graph'),
+			url: new Curl('history.php?itemid=' + options.itemid + '&action=showgraph&period=604800').getUrl()
+		};
+
+		items[items.length] = {
+			label: t('Last month graph'),
+			url: new Curl('history.php?itemid=' + options.itemid + '&action=showgraph&period=2678400').getUrl()
+		};
+	}
+
+	// latest values
+	items[items.length] = {
+		label: t('Latest values'),
+		url: new Curl('history.php?itemid=' + options.itemid + '&action=showvalues&period=3600').getUrl()
+	};
+
+	return [{
+		type: 'links',
+		title: t('History'),
+		data: items
+	}];
+}
+
+/**
  * Get menu popup host section data.
  *
  * @param string options['hostid']			host id
@@ -239,6 +367,68 @@ function getMenuPopupMap(options) {
 }
 
 /**
+ * Get menu popup refresh section data.
+ *
+ * @param string options['widgetName']
+ * @param string options['currentRate']
+ * @param bool   options['multiplier']
+ * @param array  options['params']
+ *
+ * @return array
+ */
+function getMenuPopupRefresh(options) {
+	var intervals = options.multiplier
+		? {
+			'x0.25': 'x0.25',
+			'x0.5': 'x0.5',
+			'x1': 'x1',
+			'x1.5': 'x1.5',
+			'x2': 'x2',
+			'x3': 'x3',
+			'x4': 'x4',
+			'x5': 'x5'
+		}
+		: {
+			10: t('10 seconds'),
+			30: t('30 seconds'),
+			60: t('1 minute'),
+			120: t('2 minutes'),
+			600: t('10 minutes'),
+			900: t('15 minutes')
+		};
+
+	return [{
+		type: 'refresh',
+		title: options.multiplier ? t('Refresh time multiplier') : t('Refresh time'),
+		data: {
+			widgetName: options['widgetName'],
+			currentRate: options['currentRate'],
+			params: options['params'],
+			intervals: intervals
+		}
+	}];
+}
+
+/**
+ * Get menu popup service configuration section data.
+ *
+ * @param string options['serviceid']		service id
+ * @param string options['name']			service name
+ * @param bool   options['deletable']		service has dependencies
+ *
+ * @return array
+ */
+function getMenuPopupServiceConfiguration(options) {
+	return [{
+		type: 'serviceConfiguration',
+		title: sprintf(t('Service "%1$s"'), options.name),
+		serviceId: options.serviceid,
+		name: options.name,
+		deletable: options.deletable
+	}];
+}
+
+/**
  * Get menu popup trigger section data.
  *
  * @param string options['triggerid']				trigger id
@@ -337,192 +527,20 @@ function getMenuPopupTrigger(options) {
 }
 
 /**
- * Get menu popup history section data.
+ * Get menu popup trigger log section data.
  *
- * @param string options['itemid']				item id
- * @param bool   options['hasLatestGraphs']		link to history page with showgraph action (optional)
+ * @param string options['itemid']		item id
+ * @param string options['itemName']	item name
+ * @param array  options['triggers']	triggers (optional)
  *
  * @return array
  */
-function getMenuPopupHistory(options) {
-	var items = [];
-
-	// latest graphs
-	if (typeof options.hasLatestGraphs !== 'undefined' && options.hasLatestGraphs) {
-		items[items.length] = {
-			label: t('Last hour graph'),
-			url: new Curl('history.php?itemid=' + options.itemid + '&action=showgraph&period=3600').getUrl()
-		};
-
-		items[items.length] = {
-			label: t('Last week graph'),
-			url: new Curl('history.php?itemid=' + options.itemid + '&action=showgraph&period=604800').getUrl()
-		};
-
-		items[items.length] = {
-			label: t('Last month graph'),
-			url: new Curl('history.php?itemid=' + options.itemid + '&action=showgraph&period=2678400').getUrl()
-		};
-	}
-
-	// latest values
-	items[items.length] = {
-		label: t('Latest values'),
-		url: new Curl('history.php?itemid=' + options.itemid + '&action=showvalues&period=3600').getUrl()
-	};
-
+function getMenuPopupTriggerLog(options) {
 	return [{
-		type: 'links',
-		title: t('History'),
-		data: items
-	}];
-}
-
-/**
- * Get menu popup refresh section data.
- *
- * @param string options['widgetName']
- * @param string options['currentRate']
- * @param bool   options['multiplier']
- * @param array  options['params']
- *
- * @return array
- */
-function getMenuPopupRefresh(options) {
-	var intervals = options.multiplier
-		? {
-			'x0.25': 'x0.25',
-			'x0.5': 'x0.5',
-			'x1': 'x1',
-			'x1.5': 'x1.5',
-			'x2': 'x2',
-			'x3': 'x3',
-			'x4': 'x4',
-			'x5': 'x5'
-		}
-		: {
-			10: t('10 seconds'),
-			30: t('30 seconds'),
-			60: t('1 minute'),
-			120: t('2 minutes'),
-			600: t('10 minutes'),
-			900: t('15 minutes')
-		};
-
-	return [{
-		type: 'refresh',
-		title: options.multiplier ? t('Refresh time multiplier') : t('Refresh time'),
-		data: {
-			widgetName: options['widgetName'],
-			currentRate: options['currentRate'],
-			params: options['params'],
-			intervals: intervals
-		}
-	}];
-}
-
-/**
- * Get menu popup favourite graphs section data.
- *
- * @param array options['graphs']			Graphs as id => label
- * @param array options['simpleGraphs']		Simple graphs as id => label
- *
- * @return array
- */
-function getMenuPopupFavouriteGraphs(options) {
-	var sections = [];
-
-	if (typeof options['graphs'] !== 'undefined') {
-		sections[sections.length] = {
-			type: 'favourite',
-			title: t('Favourite graphs'),
-			addParams: 'popup.php?srctbl=graphs&srcfld1=graphid&reference=graphid&monitored_hosts=1&multiselect=1',
-			favouriteObj: 'graphid',
-			data: options.graphs
-		};
-	}
-
-	if (typeof options['simpleGraphs'] !== 'undefined') {
-		sections[sections.length] = {
-			type: 'favourite',
-			title: t('Favourite simple graphs'),
-			addParams: 'popup.php?srctbl=items&srcfld1=itemid&monitored_hosts=1&reference=itemid&multiselect=1'
-				+ '&numeric=1&templated=0&with_simple_graph_items=1',
-			favouriteObj: 'itemid',
-			data: options.simpleGraphs
-		};
-	}
-
-	return sections;
-}
-
-/**
- * Get menu popup favourite maps section data.
- *
- * @param array  options['maps']	Maps as id => label
- *
- * @return array
- */
-function getMenuPopupFavouriteMaps(options) {
-	return [{
-		type: 'favourite',
-		title: t('Favourite maps'),
-		addParams: 'popup.php?srctbl=sysmaps&srcfld1=sysmapid&reference=sysmapid&multiselect=1',
-		favouriteObj: 'sysmapid',
-		data: options.maps
-	}];
-}
-
-/**
- * Get menu popup favourite screens section data.
- *
- * @param array options['screens']		Screens as id => label
- * @param array options['slideshows']	Slideshows as id => label
- *
- * @return array
- */
-function getMenuPopupFavouriteScreens(options) {
-	var sections = [];
-
-	if (typeof options['screens'] !== 'undefined') {
-		sections[sections.length] = {
-			type: 'favourite',
-			title: t('Favourite screens'),
-			addParams: 'popup.php?srctbl=screens&srcfld1=screenid&reference=screenid&multiselect=1',
-			favouriteObj: 'screenid',
-			data: options.screens
-		};
-	}
-
-	if (typeof options['slideshows'] !== 'undefined') {
-		sections[sections.length] = {
-			type: 'favourite',
-			title: t('Favourite slide shows'),
-			addParams: 'popup.php?srctbl=slides&srcfld1=slideshowid&reference=slideshowid&multiselect=1',
-			favouriteObj: 'slideshowid',
-			data: options.slideshows
-		};
-	}
-
-	return sections;
-}
-
-/**
- * Get menu popup service configuration section data.
- *
- * @param string options['serviceId']		service id
- * @param string options['name']			service name
- * @param bool   options['deletable']		service has dependencies
- *
- * @return array
- */
-function getMenuPopupServiceConfiguration(options) {
-	return [{
-		type: 'serviceConfiguration',
-		title: t('Service') + ' "' + options.name + '"',
-		id: options.serviceId,
-		name: options.name,
-		deletable: options.deletable
+		type: 'triggerLog',
+		title: sprintf(t('Item "%1$s"'), options.itemName),
+		itemId: options.itemid,
+		triggers: options.triggers
 	}];
 }
 
@@ -638,6 +656,10 @@ jQuery(function($) {
 
 						case 'scripts':
 							createScriptSection(menuPopup, section);
+							break;
+
+						case 'triggerLog':
+							createTriggerLogSection(menuPopup, section);
 							break;
 
 						case 'triggerMacro':
@@ -821,7 +843,7 @@ jQuery(function($) {
 		// add
 		menu.append(createMenuItem(t('Add'), null, null, null, null, function() {
 			var url = new Curl('services.php?form=1');
-			url.setArgument('parentid', section.id);
+			url.setArgument('parentid', section.serviceId);
 			url.setArgument('parentname', section.name);
 
 			window.location.href = url.getUrl();
@@ -830,21 +852,23 @@ jQuery(function($) {
 		}));
 
 		// edit
-		menu.append(createMenuItem(t('Edit'), null, null, null, null, function() {
-			var url = new Curl('services.php?form=1');
-			url.setArgument('serviceid', section.id);
+		if (section.serviceId !== null) {
+			menu.append(createMenuItem(t('Edit'), null, null, null, null, function() {
+				var url = new Curl('services.php?form=1');
+				url.setArgument('serviceid', section.serviceId);
 
-			window.location.href = url.getUrl();
+				window.location.href = url.getUrl();
 
-			menuPopup.fadeOut(100);
-		}));
+				menuPopup.fadeOut(100);
+			}));
+		}
 
 		// delete
 		if (section.deletable) {
 			menu.append(createMenuItem(t('Delete'), null, null, null, null, function() {
 				if (confirm(sprintf(t('Delete service "%1$s"?'), section.name))) {
 					var url = new Curl('services.php?delete=1');
-					url.setArgument('serviceid', section.id);
+					url.setArgument('serviceid', section.serviceId);
 
 					window.location.href = url.getUrl();
 				}
@@ -896,6 +920,54 @@ jQuery(function($) {
 			menuPopup.append($('<div>', {'class': 'title', text: section.title}));
 			menuPopup.append(menu);
 		}
+	}
+
+	/**
+	 * Create trigger log section in menu popup.
+	 *
+	 * @param object menuPopup
+	 * @param object section
+	 */
+	function createTriggerLogSection(menuPopup, section) {
+		var menu = $('<ul>', {'class': 'menu'});
+
+		// create
+		menu.append(createMenuItem(t('Create trigger'), null, null, null, null, function() {
+			openWinCentered(
+				'tr_logform.php?sform=1&itemid=' + section.itemId,
+				'TriggerLog',
+				760,
+				540,
+				'titlebar=no, resizable=yes, scrollbars=yes, dialog=no'
+			);
+
+			menuPopup.fadeOut(100);
+		}));
+
+		// edit
+		if (objectSize(section.triggers) > 0) {
+			var menuTriggers = $('<ul>', {'class': 'menu'}),
+				editTriggerButton = createMenuItem(t('Edit trigger'));
+
+			$.each(section.triggers, function(id, name) {
+				menuTriggers.append(createMenuItem(name, null, null, null, null, function() {
+					openWinCentered(
+						'tr_logform.php?sform=1&itemid=' + section.id + '&triggerid=' + id,
+						'TriggerLog',
+						760,
+						540,
+						'titlebar=no, resizable=yes, scrollbars=yes'
+					);
+
+					menuPopup.fadeOut(100);
+				}));
+			});
+
+			menu.append(editTriggerButton.append(menuTriggers));
+		}
+
+		menuPopup.append($('<div>', {'class': 'title', text: section.title}));
+		menuPopup.append(menu);
 	}
 
 	/**

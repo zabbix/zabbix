@@ -206,8 +206,7 @@ foreach ($this->data['items'] as $item) {
 
 	// if item type is 'Log' we must show log menu
 	if (in_array($item['value_type'], array(ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT))) {
-		$triggersFlag = false;
-		$triggers = 'Array("'._('Edit trigger').'", null, null, {"outer" : "pum_o_submenu", "inner" : ["pum_i_submenu"]}'."\n";
+		$triggers = array();
 
 		foreach ($item['triggers'] as $trigger) {
 			foreach ($trigger['functions'] as $function) {
@@ -216,31 +215,11 @@ foreach ($this->data['items'] as $item) {
 				}
 			}
 
-			$triggers .= ', ["'.$trigger['description'].'",'.
-				zbx_jsvalue("javascript: openWinCentered('tr_logform.php?sform=1&itemid=".$item['itemid'].
-					"&triggerid=".$trigger['triggerid'].
-					"','TriggerLog', 760, 540,".
-					"'titlebar=no, resizable=yes, scrollbars=yes');").']';
-			$triggersFlag = true;
+			$triggers[$trigger['triggerid']] = $trigger['description'];
 		}
 
-		if ($triggersFlag) {
-			$triggers = rtrim($triggers, ',').')';
-		}
-		else {
-			$triggers = 'Array()';
-		}
-
-		$menuIcon = new CIcon(
-			_('Menu'),
-			'iconmenu_b',
-			'call_triggerlog_menu('.
-				'event, '.
-				CJs::encodeJson($item['itemid']).', '.
-				CJs::encodeJson(CHtml::encode($item['name_expanded'])).', '.
-				$triggers.
-			');'
-		);
+		$menuIcon = new CIcon(_('Menu'), 'iconmenu_b');
+		$menuIcon->setMenuPopup(getMenuPopupTriggerLog($item['itemid'], $item['name_expanded'], $triggers));
 	}
 	else {
 		$menuIcon = SPACE;

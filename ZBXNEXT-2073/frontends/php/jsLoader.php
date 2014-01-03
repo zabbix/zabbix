@@ -50,7 +50,6 @@ require_once dirname(__FILE__).'/include/translateDefines.inc.php';
 // available scripts 'scriptFileName' => 'path relative to js/'
 $availableJScripts = array(
 	'common.js' => '',
-	'menu.js' => '',
 	'menupopup.js' => '',
 	'gtlc.js' => '',
 	'functions.js' => '',
@@ -218,9 +217,12 @@ $tranStrings = array(
 		'Delete' => _('Delete'),
 		'Remove' => _('Remove'),
 		'Remove all' => _('Remove all'),
-		'Service' => _('Service'),
+		'Service "%1$s"' => _('Service "%1$s"'),
 		'Delete service "%1$s"?' => _('Delete service "%1$s"?'),
-		'Insert macro' => _('Insert macro')
+		'Item "%1$s"' => _('Item "%1$s"'),
+		'Insert macro' => _('Insert macro'),
+		'Create trigger' => _('Create trigger'),
+		'Edit trigger' => _('Edit trigger')
 	)
 );
 
@@ -240,7 +242,6 @@ if (empty($_GET['files'])) {
 		'class.csuggest.js',
 		'main.js',
 		'functions.js',
-		'menu.js',
 		'menupopup.js',
 		'init.js'
 	);
