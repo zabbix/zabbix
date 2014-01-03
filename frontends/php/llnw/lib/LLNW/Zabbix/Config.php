@@ -27,10 +27,10 @@ class Config {
     }
 
     public static function includeZabbix() {
-        include_once(self::locateconfig('zabbix.conf.php'));
+        require_once(self::locateconfig('zabbix.conf.php'));
     }
 
     public static function includeLLNWZabbix() {
-        include_once(self::locateconfig('zabbix-llnw.conf.php'));
+        require_once(self::locateconfig('zabbix-llnw.conf.php'));
     }
 }
