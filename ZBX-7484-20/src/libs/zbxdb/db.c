@@ -1542,7 +1542,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 			{
 				result->values[i] = PQgetvalue(result->pg_result, result->cursor, i);
 				if (PQftype(result->pg_result, i) == ZBX_PG_BYTEAOID)	/* binary data type BYTEAOID */
-					zbx_pg_unescape_bytea((u_char *)result->values[i]);
+					DBbytea_unescape((u_char *)result->values[i]);
 			}
 		}
 	}
