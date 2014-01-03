@@ -33,6 +33,7 @@
     ],
     "require": {
         "confirmitsolutionsgmbh/phpzabbixapi": "dev-composer",
+        "jsonrpc/jsonrpc": "*",
         "jv2222/ezSQL": "dev-master",
         "pear-pear/Log": "*",
         "symfony/config": "*"
