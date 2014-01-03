@@ -294,7 +294,9 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 			/* process individual ping results */
 			if ('[' == *c)
 			{
-				/* check if response address does not match the target address */
+				/* Fping appends response source address in format '[<- 10.3.0.10]' */
+				/* if it does not match the target address. This means that the     */
+				/* target address was most probably a broadcast address.            */
 				if (NULL != strstr(c + 1, "[<-"))
 					host->broadcast = 1;
 
