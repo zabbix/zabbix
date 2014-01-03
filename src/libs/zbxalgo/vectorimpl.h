@@ -134,6 +134,32 @@ void	zbx_vector_ ## __id ## _uniq(zbx_vector_ ## __id ## _t *vector, zbx_compare
 	}													\
 }														\
 														\
+int	zbx_vector_ ## __id ## _nearestindex(zbx_vector_ ## __id ## _t *vector, __type value,			\
+									zbx_compare_func_t compare_func)	\
+{														\
+	int	lo = 0, hi = vector->values_num, mid, c;							\
+														\
+	while (1 <= hi - lo)											\
+	{													\
+		mid = (lo + hi) / 2;										\
+														\
+		c = compare_func(&vector->values[mid], &value);							\
+														\
+		if (0 > c)											\
+		{												\
+			lo = mid + 1;										\
+		}												\
+		else if (0 == c)										\
+		{												\
+			return mid;										\
+		}												\
+		else												\
+			hi = mid;										\
+	}													\
+														\
+	return hi;												\
+}														\
+														\
 int	zbx_vector_ ## __id ## _bsearch(zbx_vector_ ## __id ## _t *vector, __type value,			\
 									zbx_compare_func_t compare_func)	\
 {														\
