@@ -631,10 +631,10 @@ class DB {
 		$oldRecords = zbx_toHash($oldRecords, $pk);
 
 		$modifiedRecords = array();
-		foreach ($newRecords as $record) {
+		foreach ($newRecords as $key => $record) {
 			// if it's a new or modified record - save it later
 			if (!isset($record[$pk]) || self::recordModified($tableName, $oldRecords[$record[$pk]], $record)) {
-				$modifiedRecords[] = $record;
+				$modifiedRecords[$key] = $record;
 			}
 
 			// remove the existing records from the collection, the remaining ones will be deleted
@@ -646,6 +646,11 @@ class DB {
 		// save modified records
 		if ($modifiedRecords) {
 			$modifiedRecords = self::save($tableName, $modifiedRecords);
+
+			// add the new IDs to the new records
+			foreach ($modifiedRecords as $key => $record) {
+				$newRecords[$key][$pk] = $record[$pk];
+			}
 		}
 
 		// delete remaining records
@@ -655,7 +660,7 @@ class DB {
 			));
 		}
 
-		return $modifiedRecords;
+		return $newRecords;
 	}
 
 	/**

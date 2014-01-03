@@ -261,7 +261,20 @@ class CDiscoveryRule extends CItemGeneral {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, array('hostid'), $options['output']);
+			$result = $this->unsetExtraFields($result, array('hostid', 'formula', 'evaltype'), $options['output']);
+
+			// unset conditions
+			foreach ($result as &$rule) {
+				if ($options['selectConditions'] === null) {
+					unset($rule['conditions']);
+				}
+				else {
+					$rule['conditions'] = $this->unsetExtraFields($rule['conditions'], array('macro', 'itemid', 'item_conditionid'),
+						$options['selectConditions']
+					);
+				}
+			}
+			unset($rule);
 		}
 
 		if (is_null($options['preservekeys'])) {
@@ -598,10 +611,21 @@ class CDiscoveryRule extends CItemGeneral {
 	}
 
 	protected function createReal(&$items) {
-		$items = DB::save('items', $items);
+		// create items without formulas, they will be updated when items and conditions are saved
+		$createItems = array();
+		foreach ($items as $item) {
+			if ($item['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+				unset($item['formula']);
+			}
+
+			$createItems[] = $item;
+		}
+		$createItems = DB::save('items', $createItems);
 
 		$conditions = array();
-		foreach ($items as $item) {
+		foreach ($items as $key => &$item) {
+			$item['itemid'] = $createItems[$key]['itemid'];
+
 			// conditions
 			if (isset($item['conditions'])) {
 				foreach ($item['conditions'] as $condition) {
@@ -611,8 +635,18 @@ class CDiscoveryRule extends CItemGeneral {
 				}
 			}
 		}
+		unset($item);
 
-		DB::save('item_condition', $conditions);
+		$conditions = DB::save('item_condition', $conditions);
+
+		// update formulas
+		$itemConditions = array();
+		foreach ($conditions as $condition) {
+			$itemConditions[$condition['itemid']][] = $condition;
+		}
+		foreach ($items as $item) {
+			$this->updateFormula($item['itemid'], $item['formula'], $itemConditions[$item['itemid']]);
+		}
 
 		// TODO: REMOVE info
 		$itemHosts = $this->get(array(
@@ -632,18 +666,27 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$exRules = $this->get(array(
 			'itemids' => zbx_objectValues($items, 'itemid'),
-			'output' => array('key_', 'name'),
+			'output' => array('key_', 'name', 'evaltype'),
 			'selectHosts' => array('name'),
-			'selectConditions' => array('item_conditionid', 'macro', 'operator', 'value'),
+			'selectConditions' => array('item_conditionid', 'macro', 'operator', 'value', 'formulaid'),
 			'nopermissions' => true,
 			'preservekeys' => true,
 		));
 
+		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $exRules, array('evaltype'));
+
 		$data = array();
 		foreach ($items as $item) {
+			if ($item['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+				$item['formula'] = '';
+			}
+			else {
+				unset($item['formula']);
+			}
+
 			$data[] = array('values' => $item, 'where'=> array('itemid' => $item['itemid']));
 		}
-		$result = DB::update('items', $data);
+		DB::update('items', $data);
 
 		$conditions = array();
 		$exConditions = array();
@@ -663,7 +706,24 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		if ($conditions) {
-			DB::replace('item_condition', $exConditions, $conditions);
+			$conditions = DB::replace('item_condition', $exConditions, $conditions);
+		}
+
+		// update formulas
+		$itemConditions = array();
+		foreach ($conditions as $condition) {
+			$itemConditions[$condition['itemid']][] = $condition;
+		}
+
+		foreach ($items as $item) {
+			if (isset($item['formula']) && $item['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+
+				$conditions = (isset($itemConditions[$item['itemid']]))
+					? $itemConditions[$item['itemid']]
+					: $exRules[$item['itemid']]['conditions'];
+
+				$this->updateFormula($item['itemid'], $item['formula'], $conditions);
+			}
 		}
 
 		// TODO: REMOVE info
@@ -671,6 +731,25 @@ class CDiscoveryRule extends CItemGeneral {
 			$host = reset($item['hosts']);
 			info(_s('Updated: Discovery rule "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
+	}
+
+	/**
+	 * Converts a formula with letters to a formula with IDs and updates it.
+	 *
+	 * @param string 	$itemId
+	 * @param string 	$evalFormula		formula with letters
+	 * @param array 	$conditions
+	 */
+	protected function updateFormula($itemId, $evalFormula, array $conditions) {
+		$ids = array();
+		foreach ($conditions as $condition) {
+			$ids[$condition['formulaid']] = $condition['item_conditionid'];
+		}
+		$formula = CFormulaHelper::replaceIds($evalFormula, $ids);
+
+		DB::updateByPk('items', $itemId, array(
+			'formula' => $formula
+		));
 	}
 
 	/**
@@ -1040,6 +1119,15 @@ class CDiscoveryRule extends CItemGeneral {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if ($options['countOutput'] === null) {
+			// add formula and evaltype if we request anything related to the eval formula
+			if ($this->outputIsRequested('formula', $options['output']) ||
+					$this->outputIsRequested('eval_formula', $options['output']) ||
+					$this->outputIsRequested('formulaid', $options['selectConditions'])) {
+
+				$sqlParts = $this->addQuerySelect('i.formula', $sqlParts);
+				$sqlParts = $this->addQuerySelect('i.evaltype', $sqlParts);
+			}
+
 			if ($options['selectHosts'] !== null) {
 				$sqlParts = $this->addQuerySelect('i.hostid', $sqlParts);
 			}
@@ -1187,34 +1275,63 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 		}
 
+		$formulaRequested = $this->outputIsRequested('formula', $options['output']);
+		$evalFormulaRequested = $this->outputIsRequested('eval_formula', $options['output']);
+		$formulaIdRequested = $this->outputIsRequested('formulaid', $options['selectConditions']);
+
 		// adding conditions
-		if ($options['selectConditions'] !== null) {
+		$selectConditions = $options['selectConditions'];
+		if ($formulaRequested || $evalFormulaRequested || $formulaIdRequested) {
+			$selectConditions = $this->outputExtend('item_condition', array('item_conditionid', 'macro'), $selectConditions);
+		}
+		if ($selectConditions !== null) {
 			$conditions = API::getApi()->select('item_condition', array(
 				'output' => $this->outputExtend('item_condition', array('itemid', 'item_conditionid'),
-					$options['selectConditions']
+					$selectConditions
 				),
 				'filter' => array('itemid' => $itemIds),
-				'sortfield' => 'item_conditionid',
 				'preservekeys' => true,
 				'nodeids' => get_current_nodeid(true)
 			));
 			$relationMap = $this->createRelationMap($conditions, 'itemid', 'item_conditionid');
 
-			$conditions = $this->unsetExtraFields($conditions, array('itemid', 'item_conditionid'),
-				$options['selectConditions']
-			);
 			$result = $relationMap->mapMany($result, $conditions, 'conditions');
+		}
 
-			// add formula IDs
-			if ($this->outputIsRequested('formulaid', $options['selectConditions'])) {
-				foreach ($result as &$rule) {
-					foreach ($rule['conditions'] as $i => &$condition) {
-						$condition['formulaid'] = num2letter($i);
+		// eval formula
+		if ($formulaRequested || $evalFormulaRequested || $formulaIdRequested) {
+			foreach ($result as &$rule) {
+				$conditions = zbx_toHash($rule['conditions'], 'item_conditionid');
+				if ($rule['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+					$formula = $rule['formula'];
+				}
+				else {
+					$formulaConditions = array();
+					foreach ($conditions as $condition) {
+						$formulaConditions[$condition['item_conditionid']] = $condition['macro'];
+					}
+					$formula = CFormulaHelper::getFormula($formulaConditions, $rule['evaltype']);
+				}
+
+				// generate formulaids from the effective formula
+				$formulaIds = CFormulaHelper::getFormulaIds($formula);
+
+				if ($formulaRequested) {
+					$rule['formula'] = CFormulaHelper::replaceIds($formula, $formulaIds);
+				}
+
+				if ($evalFormulaRequested) {
+					$rule['eval_formula'] = CFormulaHelper::replaceIds($formula, $formulaIds);
+				}
+
+				if ($formulaIdRequested) {
+					foreach ($rule['conditions'] as &$condition) {
+						$condition['formulaid'] = $formulaIds[$condition['item_conditionid']];
 					}
 					unset($condition);
 				}
-				unset($rule);
 			}
+			unset($rule);
 		}
 
 		return $result;

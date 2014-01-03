@@ -282,7 +282,7 @@ $conditionFormList->addRow(_('Type of calculation'),
 			CONDITION_EVAL_TYPE_OR => _('OR'),
 			CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
 		)),
-		new CSpan('', ($this->data['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) ? 'hidden' : '', 'expression'),
+		new CSpan($this->data['eval_formula'], ($this->data['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) ? 'hidden' : '', 'expression'),
 		$formula
 	),
 	(count($this->data['conditions']) < 2), 'conditionRow'
@@ -297,6 +297,10 @@ $conditions = $this->data['conditions'];
 if (!$conditions) {
 	$conditions = array(array('macro' => '', 'value' => '', 'formulaid' => num2letter(0)));
 }
+else {
+	order_result($conditions, 'formulaid');
+}
+
 
 // fields
 foreach ($conditions as $i => $condition) {
