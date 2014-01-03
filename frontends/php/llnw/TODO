@@ -5,3 +5,4 @@ re: internal Zabbix auth - legacy support key: sjE4i by checking and then assign
 integrate https://github.llnw.net/cchristensen/service-app-report
 Create F-Vagrant branch for vagrant setup/dev
 doc legacy/deprecate tasks; remove key based custom API access: edge_scripts, ...?
+Remove global config dependencies

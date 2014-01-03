@@ -3,10 +3,8 @@
 namespace LLNW\Zabbix;
 
 class Ack {
-    protected $db = '';
-    protected $logger = '';
-
     public function get($eventids) {
+        global $db, $logger;
         // HACK: SQL injection!
         $sql_where = (isset($eventids) && $eventids != '') ? 'WHERE eventid IN ('.$eventids.')' : '';
         $q = "SELECT * FROM acknowledges $sql_where ORDER BY clock ASC";
@@ -16,6 +14,8 @@ class Ack {
     }
 
     public function add($userid, $triggerid, $message = '') {
+        global $db, $logger;
+
         // TODO: Act on behalf of userid, lookup trigger eventid
         //  (trigger.get, selectLastEvent) -> event.acknowledge
         // objectid in the events table have to use triggerid because checkboxes
