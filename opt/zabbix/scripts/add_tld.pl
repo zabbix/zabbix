@@ -470,28 +470,28 @@ sub create_item_dns_rtt {
 
     create_item($options);
 
-    $options = { 'description' => 'No reply from Name Server $ns_name on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
+    $options = { 'description' => 'No reply from Name Server '.$ns_name.' on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_NOREPLY,
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => 'Invalid reply from Name Server $ns_name on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
+    $options = { 'description' => 'Invalid reply from Name Server '.$ns_name.' on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_ERRREPLY,
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => 'UNIXTIME is missing from $ns_name on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
+    $options = { 'description' => 'UNIXTIME is missing from '.$ns_name.' on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_NOTS,
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => 'Invalid UNIXTIME from $ns_name on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
+    $options = { 'description' => 'Invalid UNIXTIME from '.$ns_name.' on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_ERRTS,
                         'priority' => '2',
                 };
@@ -499,7 +499,7 @@ sub create_item_dns_rtt {
     create_trigger($options);
 
     if (defined($OPTS{'dnssec'})) {
-	$options = { 'description' => '5.1.1 Step 7 - DNSSEC error from $ns_name on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
+	$options = { 'description' => '5.1.1 Step 7 - DNSSEC error from '.$ns_name.' on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
 		     'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_ERRSIG,
 		     'priority' => '2',
 	};
@@ -514,7 +514,7 @@ sub create_item_dns_rtt {
 
     create_trigger($options);
 
-    $options = { 'description' => '5.1.1 Step 2 - ad bit is missing from $ns_name on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
+    $options = { 'description' => '5.1.1 Step 2 - ad bit is missing from '.$ns_name.' on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_RES_NOADBIT,
 			'priority' => '2',
                 };
