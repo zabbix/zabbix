@@ -164,7 +164,8 @@ if (hasRequest('widgetName')) {
 
 	$widgets = array(
 		WIDGET_SYSTEM_STATUS, WIDGET_ZABBIX_STATUS, WIDGET_LAST_ISSUES,
-		WIDGET_WEB_OVERVIEW, WIDGET_DISCOVERY_STATUS, WIDGET_HOST_STATUS
+		WIDGET_WEB_OVERVIEW, WIDGET_DISCOVERY_STATUS, WIDGET_HOST_STATUS,
+		WIDGET_FAVOURITE_GRAPHS, WIDGET_FAVOURITE_MAPS, WIDGET_FAVOURITE_SCREENS
 	);
 
 	if (in_array($widgetName, $widgets)) {
@@ -221,7 +222,10 @@ if (hasRequest('favobj') && hasRequest('favaction')) {
 			$data = getFavouriteGraphs();
 			$data = $data->toString();
 
-			echo 'jQuery("#'.WIDGET_FAVOURITE_GRAPHS.'").html('.zbx_jsvalue($data).');';
+			echo '
+				jQuery("#'.WIDGET_FAVOURITE_GRAPHS.'").html('.zbx_jsvalue($data).');
+				jQuery(".menuPopup").remove();
+				jQuery("#favouriteGraphs").data("menu-popup", '.zbx_jsvalue(getMenuPopupFavouriteGraphs()).');';
 			break;
 
 		// favourite maps
@@ -240,7 +244,10 @@ if (hasRequest('favobj') && hasRequest('favaction')) {
 			$data = getFavouriteMaps();
 			$data = $data->toString();
 
-			echo 'jQuery("#'.WIDGET_FAVOURITE_MAPS.'").html('.zbx_jsvalue($data).');';
+			echo '
+				jQuery("#'.WIDGET_FAVOURITE_MAPS.'").html('.zbx_jsvalue($data).');
+				jQuery(".menuPopup").remove();
+				jQuery("#favouriteMaps").data("menu-popup", '.zbx_jsvalue(getMenuPopupFavouriteMaps()).');';
 			break;
 
 		// favourite screens, slideshows
@@ -260,7 +267,10 @@ if (hasRequest('favobj') && hasRequest('favaction')) {
 			$data = getFavouriteScreens();
 			$data = $data->toString();
 
-			echo 'jQuery("#'.WIDGET_FAVOURITE_SCREENS.'").html('.zbx_jsvalue($data).');';
+			echo '
+				jQuery("#'.WIDGET_FAVOURITE_SCREENS.'").html('.zbx_jsvalue($data).');
+				jQuery(".menuPopup").remove();
+				jQuery("#favouriteScreens").data("menu-popup", '.zbx_jsvalue(getMenuPopupFavouriteScreens()).');';
 			break;
 	}
 }
@@ -293,6 +303,7 @@ $widgetRefreshParams = array();
 
 // favourite graphs
 $icon = new CIcon(_('Menu'), 'iconmenu');
+$icon->setAttribute('id', 'favouriteGraphs');
 $icon->setMenuPopup(getMenuPopupFavouriteGraphs());
 
 $favouriteGraphs = new CUIWidget(WIDGET_FAVOURITE_GRAPHS, getFavouriteGraphs());
@@ -306,6 +317,7 @@ $dashboardGrid[$col][$row] = $favouriteGraphs;
 
 // favourite maps
 $icon = new CIcon(_('Menu'), 'iconmenu');
+$icon->setAttribute('id', 'favouriteMaps');
 $icon->setMenuPopup(getMenuPopupFavouriteMaps());
 
 $favouriteMaps = new CUIWidget(WIDGET_FAVOURITE_MAPS, getFavouriteMaps());
@@ -319,12 +331,22 @@ $dashboardGrid[$col][$row] = $favouriteMaps;
 
 // favourite screens
 $icon = new CIcon(_('Menu'), 'iconmenu');
+$icon->setAttribute('id', 'favouriteScreens');
 $icon->setMenuPopup(getMenuPopupFavouriteScreens());
 
 $favouriteScreens = new CUIWidget(WIDGET_FAVOURITE_SCREENS, getFavouriteScreens());
 $favouriteScreens->setState(CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_SCREENS.'.state', 1));
 $favouriteScreens->setHeader(_('Favourite screens'), $icon);
-$favouriteScreens->setFooter(new CLink(_('Screens').' &raquo;', 'screens.php', 'highlight'), true);
+$favouriteScreens->setFooter(
+	array(
+		new CLink(_('Screens').' &raquo;', 'screens.php', 'highlight'),
+		SPACE,
+		SPACE,
+		SPACE,
+		new CLink(_('Slide shows').' &raquo;', 'slides.php', 'highlight')
+	),
+	true
+);
 
 $col = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_SCREENS.'.col', 0);
 $row = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_SCREENS.'.row', 1);

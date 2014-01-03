@@ -2776,11 +2776,11 @@ function getMenuPopupRefresh($widgetName, $currentRate, $multiplier = false, arr
  * @return array
  */
 function getMenuPopupFavouriteGraphs() {
-	$data = array();
+	$graphs = $simpeGraphs = array();
 
 	$favourites = CFavorite::get('web.favorite.graphids');
 
-	if ($graphIds) {
+	if ($favourites) {
 		$graphIds = $itemIds = $dbGraphs = $dbItems = array();
 
 		foreach ($favourites as $favourite) {
@@ -2821,10 +2821,9 @@ function getMenuPopupFavouriteGraphs() {
 					$dbHost = reset($dbItem['hosts']);
 					$dbItem['name'] = itemName($dbItem); // TODO RESOLVE MACROS AFTER MERGING WITH TRUNK
 
-					$data[] = array(
+					$simpeGraphs[] = array(
 						'id' => $sourceId,
-						'name' => $dbHost['host'].NAME_DELIMITER.$dbItem['name'],
-						'type' => 'item'
+						'label' => $dbHost['host'].NAME_DELIMITER.$dbItem['name']
 					);
 				}
 			}
@@ -2833,10 +2832,9 @@ function getMenuPopupFavouriteGraphs() {
 					$dbGraph = $dbGraphs[$sourceId];
 					$dbHost = reset($dbGraph['hosts']);
 
-					$data[] = array(
+					$graphs[] = array(
 						'id' => $sourceId,
-						'name' => $dbHost['host'].NAME_DELIMITER.$dbGraph['name'],
-						'type' => 'graph'
+						'label' => $dbHost['host'].NAME_DELIMITER.$dbGraph['name']
 					);
 				}
 			}
@@ -2845,7 +2843,8 @@ function getMenuPopupFavouriteGraphs() {
 
 	return array(
 		'type' => 'favouriteGraphs',
-		'data' => $data
+		'graphs' => $graphs,
+		'simpleGraphs' => $simpeGraphs
 	);
 }
 
@@ -2855,7 +2854,7 @@ function getMenuPopupFavouriteGraphs() {
  * @return array
  */
 function getMenuPopupFavouriteMaps() {
-	$data = array();
+	$maps = array();
 
 	$favourites = CFavorite::get('web.favorite.sysmapids');
 
@@ -2872,16 +2871,16 @@ function getMenuPopupFavouriteMaps() {
 		));
 
 		foreach ($dbMaps as $dbMap) {
-			$data[] = array(
+			$maps[] = array(
 				'id' => $dbMap['sysmapid'],
-				'name' => $dbMap['name']
+				'label' => $dbMap['name']
 			);
 		}
 	}
 
 	return array(
 		'type' => 'favouriteMaps',
-		'data' => $data
+		'maps' => $maps
 	);
 }
 
@@ -2891,7 +2890,7 @@ function getMenuPopupFavouriteMaps() {
  * @return array
  */
 function getMenuPopupFavouriteScreens() {
-	$data = array();
+	$screens = $slideshows = array();
 
 	$favourites = CFavorite::get('web.favorite.screenids');
 
@@ -2918,10 +2917,9 @@ function getMenuPopupFavouriteScreens() {
 					$dbSlideshow = get_slideshow_by_slideshowid($sourceId);
 
 					if ($dbSlideshow) {
-						$data[] = array(
+						$slideshows[] = array(
 							'id' => $dbSlideshow['slideshowid'],
-							'name' => $dbSlideshow['name'],
-							'type' => 'slideshow'
+							'label' => $dbSlideshow['name']
 						);
 					}
 				}
@@ -2930,10 +2928,9 @@ function getMenuPopupFavouriteScreens() {
 				if (isset($dbScreens[$sourceId])) {
 					$dbScreen = $dbScreens[$sourceId];
 
-					$data[] = array(
+					$screens[] = array(
 						'id' => $dbScreen['screenid'],
-						'name' => $dbScreen['name'],
-						'type' => 'screen'
+						'label' => $dbScreen['name']
 					);
 				}
 			}
@@ -2942,7 +2939,8 @@ function getMenuPopupFavouriteScreens() {
 
 	return array(
 		'type' => 'favouriteScreens',
-		'data' => $data
+		'screens' => $screens,
+		'slideshows' => $slideshows
 	);
 }
 

@@ -423,27 +423,42 @@ function getMenuPopupRefresh(options) {
 /**
  * Get menu popup favourite graphs section data.
  *
- * @param array  options['data']
- * @param string options['data'][n]['id']
- * @param string options['data'][n]['name']
- * @param string options['data'][n]['type']
+ * @param array options['graphs']			Graphs as id => label
+ * @param array options['simpleGraphs']		Simple graphs as id => label
  *
  * @return array
  */
 function getMenuPopupFavouriteGraphs(options) {
-	return [{
-		type: 'favourite',
-		title: t('Favourite graphs'),
-		data: options.data
-	}];
+	var sections = [];
+
+	if (typeof options['graphs'] !== 'undefined') {
+		sections[sections.length] = {
+			type: 'favourite',
+			title: t('Favourite graphs'),
+			addParams: 'popup.php?srctbl=graphs&srcfld1=graphid&reference=graphid&monitored_hosts=1&multiselect=1',
+			favouriteObj: 'graphid',
+			data: options.graphs
+		};
+	}
+
+	if (typeof options['simpleGraphs'] !== 'undefined') {
+		sections[sections.length] = {
+			type: 'favourite',
+			title: t('Favourite simple graphs'),
+			addParams: 'popup.php?srctbl=items&srcfld1=itemid&monitored_hosts=1&reference=itemid&multiselect=1'
+				+ '&numeric=1&templated=0&with_simple_graph_items=1',
+			favouriteObj: 'itemid',
+			data: options.simpleGraphs
+		};
+	}
+
+	return sections;
 }
 
 /**
  * Get menu popup favourite maps section data.
  *
- * @param array  options['data']
- * @param string options['data'][n]['id']
- * @param string options['data'][n]['name']
+ * @param array  options['maps']	Maps as id => label
  *
  * @return array
  */
@@ -451,26 +466,44 @@ function getMenuPopupFavouriteMaps(options) {
 	return [{
 		type: 'favourite',
 		title: t('Favourite maps'),
-		data: options.data
+		addParams: 'popup.php?srctbl=sysmaps&srcfld1=sysmapid&reference=sysmapid&multiselect=1',
+		favouriteObj: 'sysmapid',
+		data: options.maps
 	}];
 }
 
 /**
  * Get menu popup favourite screens section data.
  *
- * @param array  options['data']
- * @param string options['data'][n]['id']
- * @param string options['data'][n]['name']
- * @param string options['data'][n]['type']
+ * @param array options['screens']		Screens as id => label
+ * @param array options['slideshows']	Slideshows as id => label
  *
  * @return array
  */
 function getMenuPopupFavouriteScreens(options) {
-	return [{
-		type: 'favourite',
-		title: t('Favourite screens'),
-		data: options.data
-	}];
+	var sections = [];
+
+	if (typeof options['screens'] !== 'undefined') {
+		sections[sections.length] = {
+			type: 'favourite',
+			title: t('Favourite screens'),
+			addParams: 'popup.php?srctbl=screens&srcfld1=screenid&reference=screenid&multiselect=1',
+			favouriteObj: 'screenid',
+			data: options.screens
+		};
+	}
+
+	if (typeof options['slideshows'] !== 'undefined') {
+		sections[sections.length] = {
+			type: 'favourite',
+			title: t('Favourite slide shows'),
+			addParams: 'popup.php?srctbl=slides&srcfld1=slideshowid&reference=slideshowid&multiselect=1',
+			favouriteObj: 'slideshowid',
+			data: options.slideshows
+		};
+	}
+
+	return sections;
 }
 
 /**
@@ -526,7 +559,7 @@ jQuery(function($) {
 			// hide all menu popups
 			jQuery('.menuPopup').css('display', 'none');
 
-			if (display == 'block') {
+			if (display === 'block') {
 				menuPopup.fadeOut(0);
 			}
 			else {
@@ -626,17 +659,55 @@ jQuery(function($) {
 
 					// favourite
 					else if (section.type === 'favourite') {
-						/*'javascript: PopUp(\'popup.php?srctbl=graphs&srcfld1=graphid&reference=graphid&monitored_hosts=1&multiselect=1\',800,450); void(0);',
+						var menu = $('<ul>', {'class': 'menu'});
 
-						'javascript: PopUp(\'popup.php?srctbl=items&srcfld1=itemid&monitored_hosts=1&reference=itemid'.
-							'&multiselect=1&numeric=1&templated=0&with_simple_graph_items=1\',800,450); void(0);',
+						// add
+						menu.append(createMenuItem(t('Add'), null, null, null, null, function() {
+							PopUp(section.addParams, 800,450);
 
-						'javascript: PopUp(\'popup.php?srctbl=sysmaps&srcfld1=sysmapid&reference=sysmapid&multiselect=1\',800,450); void(0);',
+							menuPopup.fadeOut(100);
+						}));
 
-						'javascript: PopUp(\'popup.php?srctbl=screens&srcfld1=screenid&reference=screenid&multiselect=1\', 800, 450); void(0);',
+						// remove
+						var menuRemove = $('<ul>', {'class': 'menu'}),
+							removeButton = createMenuItem(t('Remove')),
+							removeAllButton = createMenuItem(t('Remove all'), null, null, null, null, function() {
+								rm4favorites(section.favouriteObj, 0);
 
-						'javascript: PopUp(\'popup.php?srctbl=slides&srcfld1=slideshowid&reference=slideshowid&multiselect=1\', 800, 450); void(0);'
-						*/
+								menuRemove.remove();
+								$('.ui-menu-icon', removeButton).remove();
+								removeButton.addClass('ui-state-disabled');
+								$(this).addClass('ui-state-disabled');
+
+								menuPopup.fadeOut(100);
+							});
+
+						if (section.data.length > 0) {
+							$.each(section.data, function(i, item) {
+								menuRemove.append(createMenuItem(item.label, null, null, null, null, function() {
+									rm4favorites(section.favouriteObj, item.id);
+									$(this).remove();
+
+									if ($('li', menuRemove).length == 0) {
+										$('.ui-menu-icon', removeButton).remove();
+										removeButton.addClass('ui-state-disabled');
+										removeAllButton.addClass('ui-state-disabled');
+									}
+
+									menuPopup.fadeOut(100);
+								}));
+							});
+						}
+						else {
+							removeButton.addClass('ui-state-disabled');
+							removeAllButton.addClass('ui-state-disabled');
+						}
+
+						menu.append(removeButton.append(menuRemove));
+						menu.append(removeAllButton);
+
+						menuPopup.append($('<div>', {'class': 'title', text: section.title}));
+						menuPopup.append(menu);
 					}
 
 					// links
@@ -662,7 +733,7 @@ jQuery(function($) {
 			$('.menu', menuPopup).menu();
 
 			// set menu popup for map area
-			if (opener.prop('tagName') == 'AREA') {
+			if (opener.prop('tagName') === 'AREA') {
 				$('.menuPopupContainer').remove();
 
 				mapContainer = jQuery('<div>', {
@@ -702,7 +773,7 @@ jQuery(function($) {
 					closeInactiveMenuPopup(menuPopup, 1000);
 				})
 				.position({
-					of: (opener.prop('tagName') == 'AREA') ? mapContainer : event,
+					of: (opener.prop('tagName') === 'AREA') ? mapContainer : event,
 					my: 'left top',
 					at: 'left bottom'
 				});
@@ -803,7 +874,7 @@ jQuery(function($) {
 	 * @param string value			item value
 	 * @param string css			css class
 	 * @param object subMenu		sub menu to build menu tree
-	 * @param object clickCallback	item click javascript callback
+	 * @param object clickCallback	item click callback
 	 *
 	 * @return object				list item
 	 */

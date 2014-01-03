@@ -373,8 +373,8 @@
 .originalblue .ui-menu .ui-menu-item a[aria-haspopup="true"] { cursor: default; }
 .originalblue .ui-menu .ui-menu-item a.ui-state-focus,
 .originalblue .ui-menu .ui-menu-item a.ui-state-active { font-weight: normal; margin: -1px; background: #DAE6F1 url(images/bg_i-hard_100.png) 50% 50% repeat-x; }
-.originalblue .ui-menu .ui-state-disabled { font-weight: normal; margin: .4em 0 .2em; line-height: 1.5; }
-.originalblue .ui-menu .ui-state-disabled a { cursor: default; }
+.originalblue .ui-menu .ui-state-disabled { background: #ffffff; margin-top: 1px; }
+.originalblue .ui-menu .ui-state-disabled a { padding-top: 1px; color: #A8BFD4; cursor: default; }
 .originalblue .ui-menu-icons { position: relative; }
 .originalblue .ui-menu-icons .ui-menu-item a { position: relative; padding-left: 2em; }
 .originalblue .ui-menu .ui-icon { position: absolute; top: .2em; left: .2em; }
