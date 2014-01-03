@@ -1,20 +1,23 @@
 <?php
-require_once __DIR__ . '/vendor/autoload.php';
-$base_dir = __DIR__ . '/';
+// global $logfile;
+global $apiurl, $apiver, $zabbix_user, $zabbix_password, $zabbix_token_file;
+// global $db_host, $db_name, $db_user, $db_pass;
+// global $ldb_host, $ldb_name, $ldb_user, $ldb_pass;
+global $db, $ldb, $cdb, $logger;
 
 $script_name = basename($_SERVER['PHP_SELF']);
 $script_name = preg_replace('/\.php$/', '', $script_name);
 
-$debug = 1;
+
 $logfile = '/tmp/debug-'.$script_name.'.log';
 $logger = &Log::singleton('file', $logfile, 'LLNW', array('mode' => 0600, 'timeFormat' => '%X %x'));
+
 
 // Zabbix API settings
 $apiurl = 'http://zabbix-stage.llnw.net/api_jsonrpc.php';
 $apiver = '2.0';
 $zabbix_user     = 'zabbix-api-llnw-zabbix';
 $zabbix_password = "MgIym4h%$'gJroD%eTef80<";
-
 $zabbix_token_file = '/tmp/zbx-api-token_'.$script_name.'.tmp';
 
 

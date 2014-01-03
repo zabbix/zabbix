@@ -6,6 +6,8 @@ use LLNW\Zabbix\RPC;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 
+global $apiurl, $apiver, $zabbix_user, $zabbix_password, $zabbix_token_file;
+global $db, $ldb, $logger; // TODO: use more proper global include (DI?)
 Config::includeLLNWZabbix();
 
 $app = new Application();
