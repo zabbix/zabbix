@@ -70,6 +70,7 @@ my $args = GetOptions(\%OPTS,
 		      "rdds43-servers=s",
 		      "rdds80-servers=s",
 		      "dns-test-prefix=s",
+		      "rdds-test-prefix=s",
 		      "ipv4!",
 		      "ipv6!",
 		      "dnssec!",
@@ -1029,6 +1030,7 @@ sub create_main_template {
 
     create_macro('{$DNSTEST.TLD}', $tld, $templateid);
     create_macro('{$DNSTEST.DNS.TESTPREFIX}', $OPTS{'dns-test-prefix'}, $templateid);
+    create_macro('{$DNSTEST.RDDS.TESTPREFIX}', $OPTS{'rdds-test-prefix'}, $templateid) if (defined($OPTS{'rdds-test-prefix'}));
     create_macro('{$DNSTEST.RDDS.NS.STRING}', defined($OPTS{'rdds-ns-string'}) ? $OPTS{'rdds-ns-string'} : $cfg_default_rdds_ns_string, $templateid);
     create_macro('{$DNSTEST.TLD.DNSSEC.ENABLED}', defined($OPTS{'dnssec'}) ? 1 : 0, $templateid);
     create_macro('{$DNSTEST.TLD.RDDS.ENABLED}', defined($OPTS{'rdds43-servers'}) ? 1 : 0, $templateid);
@@ -1405,6 +1407,8 @@ Other options
         --rdds-ns-string=STRING
                 name server prefix in the WHOIS output
 		(default: "$cfg_default_rdds_ns_string")
+        --rdds-test-prefix=STRING
+		domain test prefix for RDDS monitoring (needed only if rdds servers specified)
         --help
                 display this message
 EOF
@@ -1417,6 +1421,7 @@ sub validate_input {
     $msg  = "TLD must be specified (--tld)\n" unless (defined($OPTS{'tld'}));
     $msg .= "at least one IPv4 or IPv6 must be enabled (--ipv4 or --ipv6)\n" unless ($OPTS{'ipv4'} or $OPTS{'ipv6'});
     $msg .= "DNS test prefix must be specified (--dns-test-prefix)\n" unless (defined($OPTS{'dns-test-prefix'}));
+    $msg .= "RDDS test prefix must be specified (--rdds-test-prefix)\n" if ((defined($OPTS{'rdds43-servers'}) or defined(defined($OPTS{'rdds80-servers'}))) and !defined($OPTS{'rdds-test-prefix'}));
     $msg .= "none or both --rdds43-servers and --rdds80-servers should be specified\n" if ((defined($OPTS{'rdds43-servers'}) and !defined($OPTS{'rdds80-servers'})) or
 											 (defined($OPTS{'rdds80-servers'}) and !defined($OPTS{'rdds43-servers'})));
     $msg .= "EPP is not implemented yet\n" if (defined($OPTS{'epp'}));
