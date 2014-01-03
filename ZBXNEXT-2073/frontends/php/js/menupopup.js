@@ -90,6 +90,7 @@ function getMenuPopupHost(options) {
 			data: gotos
 		};
 	}
+
 	return sections;
 }
 
@@ -507,6 +508,25 @@ function getMenuPopupFavouriteScreens(options) {
 }
 
 /**
+ * Get menu popup service configuration section data.
+ *
+ * @param string options['serviceId']		service id
+ * @param string options['name']			service name
+ * @param bool   options['deletable']		service has dependencies
+ *
+ * @return array
+ */
+function getMenuPopupServiceConfiguration(options) {
+	return [{
+		type: 'serviceConfiguration',
+		title: t('Service') + ' "' + options.name + '"',
+		id: options.serviceId,
+		name: options.name,
+		deletable: options.deletable
+	}];
+}
+
+/**
  * Recursive function to prepare menu tree data for createMenuTree().
  *
  * @param array  tree		menu tree data, will be modified by reference
@@ -583,143 +603,25 @@ jQuery(function($) {
 			// create sections
 			if (sections.length > 0) {
 				$.each(sections, function(i, section) {
-					// scripts
-					if (section.type === 'scripts') {
-						if (objectSize(section.data) > 0) {
-							var menu = $('<ul>', {'class': 'menu'});
+					switch(section.type) {
+						case 'favourite':
+							createFavouriteSection(menuPopup, section);
+							break;
 
-							createMenuTree(menu, section.data);
+						case 'refresh':
+							createRefreshSection(menuPopup, section);
+							break;
 
-							// execute script
-							$('li', menu).each(function() {
-								var item = $(this);
+						case 'serviceConfiguration':
+							createServiceConfigurationSection(menuPopup, section);
+							break;
 
-								if (!empty(item.data('scriptId'))) {
-									item.click(function(e) {
-										menuPopup.fadeOut(50);
+						case 'scripts':
+							createScriptSection(menuPopup, section);
+							break;
 
-										executeScript(
-											item.data('hostId'),
-											item.data('scriptId'),
-											item.data('confirmation')
-										);
-
-										cancelEvent(e);
-									});
-								}
-								else {
-									item.click(function(e) {
-										cancelEvent(e);
-									});
-								}
-							});
-
-							menuPopup.append($('<div>', {'class': 'title', text: section.title}));
-							menuPopup.append(menu);
-						}
-					}
-
-					// refresh
-					else if (section.type === 'refresh') {
-						var menu = $('<ul>', {'class': 'menu'});
-
-						$.each(section.data.intervals, function(value, label) {
-							css = (value === section.data.currentRate) ? 'selected' : '';
-
-							menu.append(createMenuItem(label, null, value, css, null, function() {
-								sendAjaxData({
-									data: jQuery.extend({}, section.data.params, {
-										widgetName: section.data.widgetName,
-										widgetRefreshRate: value
-									}),
-									dataType: 'script',
-									success: function(js) { js }
-								});
-
-								var currentRate = $(this).data('value');
-
-								$('li', menu).each(function() {
-									var obj = $(this);
-
-									if (obj.data('value') == currentRate) {
-										obj.addClass('selected');
-									}
-									else {
-										obj.removeClass('selected');
-									}
-								});
-
-								menuPopup.fadeOut(100);
-							}));
-						});
-
-						menuPopup.append($('<div>', {'class': 'title', text: section.title}));
-						menuPopup.append(menu);
-					}
-
-					// favourite
-					else if (section.type === 'favourite') {
-						var menu = $('<ul>', {'class': 'menu'});
-
-						// add
-						menu.append(createMenuItem(t('Add'), null, null, null, null, function() {
-							PopUp(section.addParams, 800,450);
-
-							menuPopup.fadeOut(100);
-						}));
-
-						// remove
-						var menuRemove = $('<ul>', {'class': 'menu'}),
-							removeButton = createMenuItem(t('Remove')),
-							removeAllButton = createMenuItem(t('Remove all'), null, null, null, null, function() {
-								rm4favorites(section.favouriteObj, 0);
-
-								menuRemove.remove();
-								$('.ui-menu-icon', removeButton).remove();
-								removeButton.addClass('ui-state-disabled');
-								$(this).addClass('ui-state-disabled');
-
-								menuPopup.fadeOut(100);
-							});
-
-						if (section.data.length > 0) {
-							$.each(section.data, function(i, item) {
-								menuRemove.append(createMenuItem(item.label, null, null, null, null, function() {
-									rm4favorites(section.favouriteObj, item.id);
-									$(this).remove();
-
-									if ($('li', menuRemove).length == 0) {
-										$('.ui-menu-icon', removeButton).remove();
-										removeButton.addClass('ui-state-disabled');
-										removeAllButton.addClass('ui-state-disabled');
-									}
-
-									menuPopup.fadeOut(100);
-								}));
-							});
-						}
-						else {
-							removeButton.addClass('ui-state-disabled');
-							removeAllButton.addClass('ui-state-disabled');
-						}
-
-						menu.append(removeButton.append(menuRemove));
-						menu.append(removeAllButton);
-
-						menuPopup.append($('<div>', {'class': 'title', text: section.title}));
-						menuPopup.append(menu);
-					}
-
-					// links
-					else {
-						var menu = $('<ul>', {'class': 'menu'});
-
-						$.each(section.data, function(i, item) {
-							menu.append(createMenuItem(item.label, item.url));
-						});
-
-						menuPopup.append($('<div>', {'class': 'title', text: section.title}));
-						menuPopup.append(menu);
+						default:
+							createLinkSection(menuPopup, section);
 					}
 				});
 			}
@@ -781,6 +683,213 @@ jQuery(function($) {
 
 		closeInactiveMenuPopup(menuPopup, 2000);
 	};
+
+	/**
+	 * Create favourite section in menu popup.
+	 *
+	 * @param object menuPopup
+	 * @param object section
+	 */
+	function createFavouriteSection(menuPopup, section) {
+		var menu = $('<ul>', {'class': 'menu'});
+
+		// add
+		menu.append(createMenuItem(t('Add'), null, null, null, null, function() {
+			PopUp(section.addParams, 800, 450);
+
+			menuPopup.fadeOut(100);
+		}));
+
+		// remove
+		var menuRemove = $('<ul>', {'class': 'menu'}),
+			removeButton = createMenuItem(t('Remove')),
+			removeAllButton = createMenuItem(t('Remove all'), null, null, null, null, function() {
+				rm4favorites(section.favouriteObj, 0);
+
+				menuRemove.remove();
+				$('.ui-menu-icon', removeButton).remove();
+				removeButton.addClass('ui-state-disabled');
+				$(this).addClass('ui-state-disabled');
+
+				menuPopup.fadeOut(100);
+			});
+
+		if (section.data.length > 0) {
+			$.each(section.data, function(i, item) {
+				menuRemove.append(createMenuItem(item.label, null, null, null, null, function() {
+					rm4favorites(section.favouriteObj, item.id);
+					$(this).remove();
+
+					if ($('li', menuRemove).length == 0) {
+						$('.ui-menu-icon', removeButton).remove();
+						removeButton.addClass('ui-state-disabled');
+						removeAllButton.addClass('ui-state-disabled');
+					}
+
+					menuPopup.fadeOut(100);
+				}));
+			});
+		}
+		else {
+			removeButton.addClass('ui-state-disabled');
+			removeAllButton.addClass('ui-state-disabled');
+		}
+
+		menu.append(removeButton.append(menuRemove));
+		menu.append(removeAllButton);
+
+		menuPopup.append($('<div>', {'class': 'title', text: section.title}));
+		menuPopup.append(menu);
+	}
+
+	/**
+	 * Create refresh section in menu popup.
+	 *
+	 * @param object menuPopup
+	 * @param object section
+	 */
+	function createRefreshSection(menuPopup, section) {
+		var menu = $('<ul>', {'class': 'menu'});
+
+		$.each(section.data.intervals, function(value, label) {
+			css = (value === section.data.currentRate) ? 'selected' : '';
+
+			menu.append(createMenuItem(label, null, value, css, null, function() {
+				sendAjaxData({
+					data: jQuery.extend({}, section.data.params, {
+						widgetName: section.data.widgetName,
+						widgetRefreshRate: value
+					}),
+					dataType: 'script',
+					success: function(js) { js }
+				});
+
+				var currentRate = $(this).data('value');
+
+				$('li', menu).each(function() {
+					var obj = $(this);
+
+					if (obj.data('value') == currentRate) {
+						obj.addClass('selected');
+					}
+					else {
+						obj.removeClass('selected');
+					}
+				});
+
+				menuPopup.fadeOut(100);
+			}));
+		});
+
+		menuPopup.append($('<div>', {'class': 'title', text: section.title}));
+		menuPopup.append(menu);
+	}
+
+	/**
+	 * Create service configuration section in menu popup.
+	 *
+	 * @param object menuPopup
+	 * @param object section
+	 */
+	function createServiceConfigurationSection(menuPopup, section) {
+		var menu = $('<ul>', {'class': 'menu'});
+
+		// add
+		menu.append(createMenuItem(t('Add'), null, null, null, null, function() {
+			var url = new Curl('services.php?form=1');
+			url.setArgument('parentid', section.id);
+			url.setArgument('parentname', section.name);
+
+			window.location.href = url.getUrl();
+
+			menuPopup.fadeOut(100);
+		}));
+
+		// edit
+		menu.append(createMenuItem(t('Edit'), null, null, null, null, function() {
+			var url = new Curl('services.php?form=1');
+			url.setArgument('serviceid', section.id);
+
+			window.location.href = url.getUrl();
+
+			menuPopup.fadeOut(100);
+		}));
+
+		// delete
+		if (section.deletable) {
+			menu.append(createMenuItem(t('Delete'), null, null, null, null, function() {
+				if (confirm(sprintf(t('Delete service "%1$s"?'), section.name))) {
+					var url = new Curl('services.php?delete=1');
+					url.setArgument('serviceid', section.id);
+
+					window.location.href = url.getUrl();
+				}
+
+				menuPopup.fadeOut(100);
+			}));
+		}
+
+		menuPopup.append($('<div>', {'class': 'title', text: section.title}));
+		menuPopup.append(menu);
+	}
+
+	/**
+	 * Create script section in menu popup.
+	 *
+	 * @param object menuPopup
+	 * @param object section
+	 */
+	function createScriptSection(menuPopup, section) {
+		if (objectSize(section.data) > 0) {
+			var menu = $('<ul>', {'class': 'menu'});
+
+			createMenuTree(menu, section.data);
+
+			// execute script
+			$('li', menu).each(function() {
+				var item = $(this);
+
+				if (!empty(item.data('scriptId'))) {
+					item.click(function(e) {
+						menuPopup.fadeOut(50);
+
+						executeScript(
+							item.data('hostId'),
+							item.data('scriptId'),
+							item.data('confirmation')
+						);
+
+						cancelEvent(e);
+					});
+				}
+				else {
+					item.click(function(e) {
+						cancelEvent(e);
+					});
+				}
+			});
+
+			menuPopup.append($('<div>', {'class': 'title', text: section.title}));
+			menuPopup.append(menu);
+		}
+	}
+
+	/**
+	 * Create link section in menu popup.
+	 *
+	 * @param object menuPopup
+	 * @param object section
+	 */
+	function createLinkSection(menuPopup, section) {
+		var menu = $('<ul>', {'class': 'menu'});
+
+		$.each(section.data, function(i, item) {
+			menu.append(createMenuItem(item.label, item.url));
+		});
+
+		menuPopup.append($('<div>', {'class': 'title', text: section.title}));
+		menuPopup.append(menu);
+	}
 
 	/**
 	 * Closing menu after delay.

@@ -177,17 +177,6 @@ $tranStrings = array(
 		'S_CLOSE' => _('Close'),
 		'S_NO_ELEMENTS_SELECTED' => _('No elements selected!')
 	),
-	'init.js' => array(
-		'Host screens' => _('Host screens'),
-		'Go to' => _('Go to'),
-		'Latest data' => _('Latest data'),
-		'Scripts' => _('Scripts'),
-		'Host inventories' => _('Host inventories'),
-		'Add service' => _('Add service'),
-		'Edit service' => _('Edit service'),
-		'Delete service' => _('Delete service'),
-		'Delete the selected service?' => _('Delete the selected service?')
-	),
 	'multiselect.js' => array(
 		'No matches found' => _('No matches found'),
 		'More matches found...' => _('More matches found...'),
@@ -226,8 +215,12 @@ $tranStrings = array(
 		'Favourite screens' => _('Favourite screens'),
 		'Favourite slide shows' => _('Favourite slide shows'),
 		'Add' => _('Add'),
+		'Edit' => _('Edit'),
+		'Delete' => _('Delete'),
 		'Remove' => _('Remove'),
-		'Remove all' => _('Remove all')
+		'Remove all' => _('Remove all'),
+		'Service' => _('Service'),
+		'Delete service "%1$s"?' => _('Delete service "%1$s"?')
 	)
 );
 

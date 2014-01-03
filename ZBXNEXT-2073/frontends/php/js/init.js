@@ -88,6 +88,10 @@ jQuery(function($) {
 			case 'favouriteScreens':
 				data = getMenuPopupFavouriteScreens(data);
 				break;
+
+			case 'serviceConfiguration':
+				data = getMenuPopupServiceConfiguration(data);
+				break;
 		}
 
 		obj.menuPopup(data, event);
