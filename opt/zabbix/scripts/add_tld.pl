@@ -915,6 +915,7 @@ sub create_probe_template {
     create_macro('{$DNSTEST.IP6.ENABLED}', '1', $templateid);
     create_macro('{$DNSTEST.RESOLVER}', '127.0.0.1', $templateid);
     create_macro('{$DNSTEST.RDDS.ENABLED}', '1', $templateid);
+    create_macro('{$DNSTEST.EPP.ENABLED}', '1', $templateid);
 
     return $templateid;
 }
