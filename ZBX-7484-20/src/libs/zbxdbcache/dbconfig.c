@@ -3496,7 +3496,7 @@ next:;
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
  ******************************************************************************/
-void	DCconfig_unlock_triggers(zbx_vector_uint64_t *triggerids)
+void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids)
 {
 	int		i;
 	ZBX_DC_TRIGGER	*dc_trigger;
