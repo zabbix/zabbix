@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-12-17 23:54+0200\n"
-"PO-Revision-Date: 2013-12-17 21:59+0300\n"
+"PO-Revision-Date: 2014-01-01 21:43+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1387310367.0\n"
+"X-POOTLE-MTIME: 1388605391.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -2326,7 +2326,7 @@ msgstr "Nie je možné aktualizovať \"%1$s\" pre zistený spúšťač."
 #: api/classes/CAction.php:666
 #, c-format
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
-msgstr ""
+msgstr "Nie je možné aktualizovať \"%1$s\" pre akciu \"%2$s\"."
 
 #: api/classes/CItemGeneral.php:207
 #, c-format
@@ -2361,7 +2361,7 @@ msgstr "Nie je možné aktualizovať \"templateid\" pre obrazovku \"%1$s\"."
 #: api/classes/CTemplateScreen.php:617
 #, c-format
 msgid "Cannot update \"templateid\" for template screen \"%1$s\"."
-msgstr ""
+msgstr "Nie je možné aktualizovať \"templateid\" pre šablónu obrazovky \"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:576
 #, c-format
@@ -4498,16 +4498,16 @@ msgstr "Zisťovacie pravidlo vymazané"
 #: discoveryconf.php:185 host_discovery.php:283
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Zisťovacie pravidlo vypnuté"
+msgstr[1] "Zisťovacie pravidlá vypnuté"
+msgstr[2] "Zisťovacie pravidlá vypnuté"
 
 #: discoveryconf.php:184 host_discovery.php:282
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Zisťovacie pravidlo povolené"
+msgstr[1] "Zisťovacie pravidlá povolené"
+msgstr[2] "Zisťovacie pravidlá povolené"
 
 #: discoveryconf.php:134 host_discovery.php:259
 msgid "Discovery rule updated"
@@ -6127,16 +6127,16 @@ msgstr "Host zmazaný"
 #: hostgroups.php:228 hosts.php:618 proxies.php:180
 msgid "Host disabled"
 msgid_plural "Hosts disabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Host vypnutý"
+msgstr[1] "Hosty vypnuté"
+msgstr[2] "Hosty vypnuté"
 
 #: hostgroups.php:227 hosts.php:617 proxies.php:179
 msgid "Host enabled"
 msgid_plural "Hosts enabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Host povolený"
+msgstr[1] "Hosty povolené"
+msgstr[2] "Hosty povolené"
 
 #: include/actions.inc.php:60 include/audit.inc.php:35
 #: include/blocks.inc.php:196 include/blocks.inc.php:386
@@ -6278,16 +6278,16 @@ msgstr "Prototyp hosta zmazaný"
 #: host_prototypes.php:233
 msgid "Host prototype disabled"
 msgid_plural "Host prototypes disabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Prototyp hosta vypnutý"
+msgstr[1] "Prototypy hosta vypnuté"
+msgstr[2] "Prototypy hosta vypnuté"
 
 #: host_prototypes.php:232
 msgid "Host prototype enabled"
 msgid_plural "Host prototypes enabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Prototyp hosta povolený"
+msgstr[1] "Prototypy hosta povolené"
+msgstr[2] "Prototypy hosta povolené"
 
 #: host_prototypes.php:188
 msgid "Host prototype updated"
@@ -6358,17 +6358,17 @@ msgstr "Host aktualizovaný"
 #: api/classes/CTemplate.php:899
 #, c-format
 msgid "Host with the same name \"%1$s\" already exists."
-msgstr ""
+msgstr "Host s rovnakým menom\"%1$s\" už existuje."
 
 #: api/classes/CHost.php:809
 #, c-format
 msgid "Host with the same name \"%s\" already exists."
-msgstr "Host s rovnakým menom\"%1$s\" už existuje."
+msgstr "Host s rovnakým menom\"%s\" už existuje."
 
 #: api/classes/CTemplate.php:526 api/classes/CTemplate.php:866
 #, c-format
 msgid "Host with the same visible name \"%1$s\" already exists."
-msgstr ""
+msgstr "Host s rovnakým zobrazovaným menom \"%1$s\" už existuje."
 
 #: api/classes/CHost.php:815
 #, c-format
@@ -7034,7 +7034,7 @@ msgstr "Nepovolené znaky použité pre meno uzla."
 #: api/classes/CTemplate.php:501
 #, c-format
 msgid "Incorrect characters used for Template name \"%1$s\""
-msgstr ""
+msgstr "Nepovolené znaky použité pre meno šablóny \"%1$s\""
 
 #: api/classes/CHostPrototype.php:175
 #, c-format
@@ -7054,7 +7054,7 @@ msgstr "Nepovolené znaky použité pre meno proxy \"%1$s\"."
 #: api/classes/CTemplate.php:907
 #, c-format
 msgid "Incorrect characters used for template name \"%1$s\"."
-msgstr ""
+msgstr "Nepovolené znaky použité pre meno šablóny \"%1$s\"."
 
 #: api/classes/CDRule.php:261
 msgid "Incorrect delay."
@@ -7113,7 +7113,7 @@ msgstr "Nie je použitá platná funkcia"
 #: api/classes/CScreenItem.php:607
 #, c-format
 msgid "Incorrect graph ID \"%1$s\" provided for screen element."
-msgstr ""
+msgstr "Neplatné ID grafu \"%1$s\" v prvku obrazovky."
 
 #: api/classes/CHostPrototype.php:396 api/classes/CHostPrototype.php:403
 msgid "Incorrect group prototype ID."
@@ -7127,12 +7127,12 @@ msgstr "Neplatné prototypy skupiny pre prototyp hosta \"%1$s\"."
 #: api/classes/CScreenItem.php:588
 #, c-format
 msgid "Incorrect host ID \"%1$s\" provided for screen element."
-msgstr ""
+msgstr "Neplatné ID hosta \"%1$s\" v prvku obrazovky."
 
 #: api/classes/CScreenItem.php:569
 #, c-format
 msgid "Incorrect host group ID \"%1$s\" provided for screen element."
-msgstr ""
+msgstr "Neplatné ID skupiny \"%1$s\" v prvku obrazovky."
 
 #: api/classes/CHostPrototype.php:241
 msgid "Incorrect host group ID for group prototype."
@@ -7157,7 +7157,7 @@ msgstr "Neplatný obrázkový index."
 
 #: api/classes/CScreen.php:375 api/classes/CTemplateScreen.php:549
 msgid "Incorrect input parameters."
-msgstr ""
+msgstr "Neplatné vstupné parametre."
 
 #: api/classes/CHostInterface.php:643
 #, c-format
@@ -7182,7 +7182,7 @@ msgstr "Neplatné inventárne pole \"%s\"."
 #: api/classes/CScreenItem.php:627
 #, c-format
 msgid "Incorrect item ID \"%1$s\" provided for screen element."
-msgstr ""
+msgstr "Neplatné ID položky \"%1$s\" v prvku obrazovky."
 
 #: api/classes/CGraphGeneral.php:314
 msgid "Incorrect item for axis value."
@@ -7247,7 +7247,7 @@ msgstr "Neplatná týždňová perióda údržby"
 #: api/classes/CScreenItem.php:646
 #, c-format
 msgid "Incorrect map ID \"%1$s\" provided for screen element."
-msgstr ""
+msgstr "Neplatné ID mapy \"%1$s\" v prvku obrazovky."
 
 #: api/classes/CMap.php:412
 #, c-format
@@ -7289,7 +7289,7 @@ msgstr "Neplatný parameter je použitý pre mapovú ikonu \"%s\"."
 #: api/classes/CAction.php:650
 #, c-format
 msgid "Incorrect parameters for action update method \"%1$s\"."
-msgstr ""
+msgstr "Neplatné parametre pre aktulizačnú metódu \"%1$s\"."
 
 #: api/classes/CAction.php:804
 msgid "Incorrect parameters for condition."
@@ -7347,7 +7347,7 @@ msgstr "Neplatná odpoveď prijatá od Zabbix servera \"%1$s\"."
 #: api/classes/CScreenItem.php:678
 #, c-format
 msgid "Incorrect screen ID \"%1$s\" provided for screen element."
-msgstr ""
+msgstr "Neplatné ID obrazovky \"%1$s\" v prvku obrazovky."
 
 #: include/screens.inc.php:171 include/screens.inc.php:229
 msgid "Incorrect screen provided for slide show."
@@ -7742,7 +7742,7 @@ msgstr "Inventár"
 #: api/classes/CHost.php:1306
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
-msgstr ""
+msgstr "Inventár vypnutý pre hosta \"%1$s\"."
 
 #: include/views/administration.general.iconmap.edit.php:41
 msgid "Inventory field"
@@ -7847,16 +7847,16 @@ msgstr "Položka zmazaná"
 #: applications.php:208 items.php:679
 msgid "Item disabled"
 msgid_plural "Items disabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Položka vypnutá"
+msgstr[1] "Položky vypnuté"
+msgstr[2] "Položky vypnuté"
 
 #: applications.php:207 items.php:678
 msgid "Item enabled"
 msgid_plural "Items enabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Položka povolená"
+msgstr[1] "Položky povolené"
+msgstr[2] "Položky povolené"
 
 #: include/actions.inc.php:1153
 msgid "Item in \"normal\" state"
@@ -7891,16 +7891,16 @@ msgstr "Prototyp položky zmazaný"
 #: disc_prototypes.php:326
 msgid "Item prototype disabled"
 msgid_plural "Item prototypes disabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Prototyp položky vypnutý"
+msgstr[1] "Prototypy položky vypnuté"
+msgstr[2] "Prototypy položky vypnuté"
 
 #: disc_prototypes.php:325
 msgid "Item prototype enabled"
 msgid_plural "Item prototypes enabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Prototyp položky povolený"
+msgstr[1] "Prototypy položky povolené"
+msgstr[2] "Prototypy položky povolené"
 
 #: disc_prototypes.php:301
 msgid "Item prototype updated"
@@ -9714,7 +9714,7 @@ msgstr "Žiadne skupiny pre šablónu"
 #: api/classes/CTemplate.php:460
 #, c-format
 msgid "No groups for template \"%1$s\"."
-msgstr ""
+msgstr "Žiadne skupiny pre šablónu \"%1$s\"."
 
 #: api/classes/CHost.php:1443
 msgid "No host ID given."
@@ -12219,27 +12219,27 @@ msgstr "Obrazovka \"%1$s\" už existuje."
 #: api/classes/CScreenItem.php:821 api/classes/CScreenItem.php:845
 #, c-format
 msgid "Screen \"%1$s\" cell X - %2$s Y - %3$s is already taken."
-msgstr ""
+msgstr "Obrazovka \"%1$s\" bunka X - %2$s Y - %3$s je uz obsadená."
 
 #: api/classes/CScreenItem.php:724
 #, c-format
 msgid "Screen \"%1$s\" column span in cell X - %2$s Y - %3$s is incorrect."
-msgstr ""
+msgstr "Obrazovka \"%1$s\" rozsah stĺpca v bunke X - %2$s Y - %3$s je neplatný."
 
 #: api/classes/CScreenItem.php:773
 #, c-format
 msgid "Screen \"%1$s\" column span in cell X - %2$s Y - %3$s is too big."
-msgstr ""
+msgstr "Obrazovka \"%1$s\" rozsah stĺpca v bunke X - %2$s Y - %3$s je príliš veľký."
 
 #: api/classes/CScreenItem.php:710
 #, c-format
 msgid "Screen \"%1$s\" row span in cell X - %2$s Y - %3$s is incorrect."
-msgstr ""
+msgstr "Obrazovka \"%1$s\" rozsah riadku v bunke X - %2$s Y - %3$s je neplatný."
 
 #: api/classes/CScreenItem.php:760
 #, c-format
 msgid "Screen \"%1$s\" row span in cell X - %2$s Y - %3$s is too big."
-msgstr ""
+msgstr "Obrazovka \"%1$s\" rozsah riadku v bunke X - %2$s Y - %3$s je príliš veľký."
 
 #: include/classes/import/CXmlImport18.php:460
 #: include/classes/import/CXmlImport18.php:1640
@@ -12824,7 +12824,7 @@ msgstr "Prezentácia"
 #: include/screens.inc.php:243
 #, c-format
 msgid "Slide show \"%1$s\" already exists."
-msgstr ""
+msgstr "Prezentácia \"%1$s\" už existuje."
 
 #: include/screens.inc.php:181
 #, c-format
@@ -13320,7 +13320,7 @@ msgstr "Meno šablóny"
 #: api/classes/CTemplateScreen.php:582 api/classes/CTemplateScreen.php:633
 #, c-format
 msgid "Template screen \"%1$s\" already exists."
-msgstr ""
+msgstr "Šablóna obrazovky \"%1$s\" už existuje."
 
 #: include/views/conf.import.php:29
 msgid "Template screens"
@@ -13342,7 +13342,7 @@ msgstr "Šablóna s kľúčom položky \"%1$s\" je už pripojená k hostu."
 #: api/classes/CTemplate.php:891
 #, c-format
 msgid "Template with the same name \"%1$s\" already exists."
-msgstr ""
+msgstr "Šablóna s rovnakým menom \"%1$s\" už existuje."
 
 #: api/classes/CHost.php:825
 #, c-format
@@ -13352,7 +13352,7 @@ msgstr "Šablóna s rovnakým menom \"%s\" už existuje."
 #: api/classes/CTemplate.php:519 api/classes/CTemplate.php:858
 #, c-format
 msgid "Template with the same visible name \"%1$s\" already exists."
-msgstr ""
+msgstr "Šablóna s rovnakým viditeľným menom \"%1$s\" už existuje."
 
 #: api/classes/CHost.php:831
 #, c-format
@@ -13421,12 +13421,12 @@ msgstr "Text"
 #: api/classes/CScreenItem.php:869
 #, c-format
 msgid "The X coordinate of screen element located at X - %1$s and Y - %2$s of screen \"%3$s\" is too big."
-msgstr ""
+msgstr "Súradnica X prvku obrazovky umiestneného na X - %1$s a Y - %2$s obrazovky \"%3$s\" je príliš veľká."
 
 #: api/classes/CScreenItem.php:881
 #, c-format
 msgid "The Y coordinate of screen element located at X - %1$s and Y - %2$s of screen \"%3$s\" is too big."
-msgstr ""
+msgstr "Súradnica Y prvku obrazovky umiestneného na X - %1$s a Y - %2$s obrazovky \"%3$s\" je príliš veľká."
 
 #: include/classes/db/Db2DbBackend.php:41
 #: include/classes/db/MysqlDbBackend.php:35
@@ -13761,9 +13761,9 @@ msgstr "Spúšťač zmazaný"
 #: triggers.php:273
 msgid "Trigger disabled"
 msgid_plural "Triggers disabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Spúštač vypnutý"
+msgstr[1] "Spúštače vypnuté"
+msgstr[2] "Spúštače vypnuté"
 
 #: adm.gui.php:104 adm.housekeeper.php:135 adm.iconmapping.php:118
 #: adm.images.php:140 adm.macros.php:167 adm.other.php:119 adm.regexps.php:201
@@ -13776,9 +13776,9 @@ msgstr "Zobrazovacie možnosti spúšťačov"
 #: triggers.php:272
 msgid "Trigger enabled"
 msgid_plural "Triggers enabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Spúštač povolený"
+msgstr[1] "Spúštače povolené"
+msgstr[2] "Spúštače povolené"
 
 #: adm.housekeeper.php:34
 msgid "Trigger event and alert data storage period"
@@ -13846,16 +13846,16 @@ msgstr "Prototyp spúšťača zmazaný"
 #: trigger_prototypes.php:245
 msgid "Trigger prototype disabled"
 msgid_plural "Trigger prototypes disabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Prototyp spúštača vypnutý"
+msgstr[1] "Prototypy spúštača vypnuté"
+msgstr[2] "Prototypy spúštača vypnuté"
 
 #: trigger_prototypes.php:244
 msgid "Trigger prototype enabled"
 msgid_plural "Trigger prototypes enabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Prototyp spúštača povolený"
+msgstr[1] "Prototypy spúštača povolené"
+msgstr[2] "Prototypy spúštača povolené"
 
 #: api/classes/CTriggerPrototype.php:530 api/classes/CTriggerPrototype.php:605
 #, c-format
@@ -14513,12 +14513,12 @@ msgstr "Používateľská skupina"
 #: api/classes/CUserGroup.php:685
 #, c-format
 msgid "User group \"%1$s\" is the only group that user \"%2$s\" belongs to."
-msgstr ""
+msgstr "Skupina \"%1$s\" je jediná skupina, kde patrí používateľ \"%2$s\"."
 
 #: api/classes/CUserGroup.php:668
 #, c-format
 msgid "User group \"%1$s\" is used in configuration for database down messages."
-msgstr ""
+msgstr "Skupina \"%1$s\" je použitá v nastavení skupiny pre správu o nefunčnej databáze."
 
 #: api/classes/CUserGroup.php:657
 #, c-format
@@ -14533,16 +14533,16 @@ msgstr "Používateľská skupina \"%s\" už existuje."
 #: usergrps.php:340
 msgid "User group disabled"
 msgid_plural "User groups disabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Skupina vypnutá"
+msgstr[1] "Skupiny vypnuté"
+msgstr[2] "Skupiny vypnuté"
 
 #: usergrps.php:339
 msgid "User group enabled"
 msgid_plural "User groups enabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Skupina povolená"
+msgstr[1] "Skupiny povolené"
+msgstr[2] "Skupiny povolené"
 
 #: include/views/administration.general.other.edit.php:37
 msgid "User group for database down message"
@@ -15037,9 +15037,9 @@ msgstr[2] "Web scenár zakázaný"
 #: httpconf.php:293
 msgid "Web scenario enabled"
 msgid_plural "Web scenarios enabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Scenár povolený"
+msgstr[1] "Scenáre povolené"
+msgstr[2] "Scenáre povolené"
 
 #: api/classes/CHttpTest.php:472 api/classes/CHttpTest.php:512
 #, c-format

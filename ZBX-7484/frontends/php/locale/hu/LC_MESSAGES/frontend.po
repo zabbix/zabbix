@@ -11448,7 +11448,7 @@ msgstr "Reguláris kifejezés"
 #: include/regexp.inc.php:62 include/regexp.inc.php:102
 #, c-format
 msgid "Regular expression \"%s\" already exists."
-msgstr "Reguláris kifejezés törölve"
+msgstr ""
 
 #: popup_trexpr.php:423
 msgid "Regular expression V matching last value in period T, then N = 1, 0 - otherwise"

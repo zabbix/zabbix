@@ -5,6 +5,10 @@ New features:
 A.F....... [ZBX-1357] updated American English, French, Hungarian, Italian, Japanese, Russian, Slovak and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-7567] fixed processing of services[] key without a 3rd parameter (Sasha)
+........S. [ZBX-6545] fixed possible SQL errors when syncing a node configuration with PostgreSQL backend version 8.2 and later (Sasha)
+........S. [ZBX-7452] fixed processing of received events from slave node (Sasha)
+.......... [ZBXNEXT-1256] fixed parameter passing for example userparameter to obtain directory size (Richlv)
 ........S. [ZBX-7484] fixed escalations not being stopped and generation of multiple successive OK or PROBLEM events (asaveljevs)
 ........S. [ZBX-7521] fixed crash if value cache entered low memory mode when adding a new item to the cache (wiper)
 ...G...PS. [ZBX-7521] fixed memory allocator realloc() function bug in low memory situations (wiper)
@@ -532,7 +536,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F.I..PS. [ZBXNEXT-1322] implemented automatic update of database structure when upgrading to newer version (Sasha, Vedmak)
 ..F.....S. [ZBX-3236] added support of value mapping for character data (Sasha, Vedmak)
 .......P.. [ZBX-3817] improved performance of the "data sender" process (Sasha)
-.......PS. [ZBX-5436] added support of AllowRoot paramater by server and proxy daemons (Sasha)
+.......PS. [ZBX-5436] added support of AllowRoot parameter by server and proxy daemons (Sasha)
 ..F....... [ZBX-5180] redesigned maintenance periods form (Vedmak)
 .......PS. [ZBXNEXT-1335] changed pingers to work without connection to a database (Sasha)
 ..F....... [ZBX-5127] redesigned regular expressions form (Vedmak)
@@ -728,6 +732,8 @@ New features:
 A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-6545] fixed possible SQL errors when syncing a node configuration with PostgreSQL backend version 8.2 and later (Sasha)
+.......... [ZBXNEXT-1256] fixed parameter passing for example userparameter to obtain directory size (Richlv)
 ........S. [ZBX-7484] fixed escalations not being stopped and generation of multiple successive OK or PROBLEM events (asaveljevs)
 ...G...PS. [ZBX-4243] fixed Zabbix syslog application names (RFC 5424 APP-NAME) (Andris)
 
@@ -4433,7 +4439,7 @@ Changes for 1.5:
  - [DEV-123] screen "queue" moved to administration section (Artem)
  - [DEV-126] moved graphs,maps,screens to dashboard, implemented quick add to favourites (Artem)
  - [DEV-116] added option to remember user login (Artem)
- - [DEV-117] added support of BufferSize and BufferSend paramaters (Alexei)
+ - [DEV-117] added support of BufferSize and BufferSend parameters (Alexei)
  - [DEV-118] added dashboard screen to monitoring (Artem)
  - [DEV-117] support of data buffering on agent side (Alexei)
  - [DEV-115] enhanced sender to use only one TCP connection (Alexei)
@@ -6618,7 +6624,7 @@ Changes for 1.0beta1:
  - added misc/init.d/debian/zabbix-server (Alexei)
  - zabbix_suckerd cannot be ran as root (Alexei)
  - added column URL to table triggers (Alexei)
- - character '.' can be used in definition of monitored paramaters (Alexei)
+ - character '.' can be used in definition of monitored parameters (Alexei)
  - added average-only mode for trends (Alexei)
  - fixed bug with unexpected change of item status to NOT SUPPORTED. This bug appeared because of incomplete processing of timeout situations (Alexei)
  - constant DELAY_ON_NETWORK_FAILURE is set to 60 (Alexei)

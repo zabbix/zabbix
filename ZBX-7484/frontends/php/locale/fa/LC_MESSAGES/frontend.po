@@ -2230,9 +2230,9 @@ msgid "Cannot unlink template"
 msgstr "قالب را نمی‌توانید جدا کنید"
 
 #: api/classes/CHostGeneral.php:233
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
-msgstr "هشدار \"%s\" را نمیتوانید جدا کنید ، آیتم های دارد از قالبی که از هاست جدا شده است.هشدار \"%s\" را نمیتوانید جدا کنید ، آیتم های دارد از قالبی که از هاست جدا شده است.هشدار \"%s\" را نمیتوانید جدا کنید ، آیتم های دارد از قالبی که از هاست جدا شده است.هشدار \"%s\" را نمیتوانید جدا کنید ، آیتم های دارد از قالبی که از هاست جدا شده است.هشدار \"%s\" را نمیتوانید جدا کنید ، آیتم های دارد از قالبی که از هاست جدا شده است."
+msgstr ""
 
 #: api/classes/CHost.php:684
 #, c-format
