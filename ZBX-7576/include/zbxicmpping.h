@@ -23,8 +23,15 @@
 typedef struct
 {
 	char	*addr;
-	double	min, avg, max;
-	int	rcv, cnt;
+	double	min;
+	double	avg;
+	double	max;
+
+	int	rcv;
+	int	cnt;
+	/* Set to 1 if the response address did not match the target address. */
+	/* This might happen if the target address is a broadcast address.    */
+	int	broadcast;
 }
 ZBX_FPING_HOST;
 

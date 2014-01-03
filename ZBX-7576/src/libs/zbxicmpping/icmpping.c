@@ -137,7 +137,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		fping_existence |= FPING6_EXISTS;
 #endif	/* HAVE_IPV6 */
 
-	offset = zbx_snprintf(params, sizeof(params), "-q -C%d", count);
+	offset = zbx_snprintf(params, sizeof(params), "-C%d", count);
 	if (0 != interval)
 		offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -p%d", interval);
 	if (0 != size)
@@ -291,8 +291,22 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 			c += 3;
 
+			/* process individual ping results */
+			if ('[' == *c)
+			{
+				/* check if response address does not match the target address */
+				if (NULL != strstr(c + 1, "[<-"))
+					host->broadcast = 1;
+
+				continue;
+			}
+
 			do
 			{
+				/* don't process statistics for hosts with broadcast addresses */
+				if (0 != host->broadcast)
+					continue;
+
 				if (NULL != (c2 = strchr(c, ' ')))
 					*c2 = '\0';
 
