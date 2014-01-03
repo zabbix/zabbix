@@ -60,7 +60,7 @@ $testTimeFrom = mktime(
 
 // macro
 if ($data['type'] == 0 || $data['type'] == 1) {
-	$macro[] = DNSTEST_DNSSEC_DELAY;
+	$macro[] = DNSTEST_DNS_UDP_DELAY;
 	if ($data['type'] == 0) {
 		$data['availProbes'] = 0;
 		$data['totalProbes'] = 0;
@@ -182,6 +182,8 @@ foreach ($hosts as $host) {
 }
 
 // get manual data
+$ignoredHostIds = array();
+
 foreach ($manualItemIds as $itemId) {
 	$itemValue = DBfetch(DBselect(DBaddLimit(
 		'SELECT h.value'.
