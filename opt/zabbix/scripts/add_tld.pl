@@ -1421,7 +1421,7 @@ sub validate_input {
     $msg  = "TLD must be specified (--tld)\n" unless (defined($OPTS{'tld'}));
     $msg .= "at least one IPv4 or IPv6 must be enabled (--ipv4 or --ipv6)\n" unless ($OPTS{'ipv4'} or $OPTS{'ipv6'});
     $msg .= "DNS test prefix must be specified (--dns-test-prefix)\n" unless (defined($OPTS{'dns-test-prefix'}));
-    $msg .= "RDDS test prefix must be specified (--rdds-test-prefix)\n" if ((defined($OPTS{'rdds43-servers'}) or defined(defined($OPTS{'rdds80-servers'}))) and !defined($OPTS{'rdds-test-prefix'}));
+    $msg .= "RDDS test prefix must be specified (--rdds-test-prefix)\n" if ((defined($OPTS{'rdds43-servers'}) and !defined($OPTS{'rdds-test-prefix'})) or (defined($OPTS{'rdds80-servers'}) and !defined($OPTS{'rdds-test-prefix'})))
     $msg .= "none or both --rdds43-servers and --rdds80-servers should be specified\n" if ((defined($OPTS{'rdds43-servers'}) and !defined($OPTS{'rdds80-servers'})) or
 											 (defined($OPTS{'rdds80-servers'}) and !defined($OPTS{'rdds43-servers'})));
     $msg .= "EPP is not implemented yet\n" if (defined($OPTS{'epp'}));
