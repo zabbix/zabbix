@@ -18,9 +18,13 @@ set_slv_config($config);
 
 my ($from, $till, $value_ts) = get_month_bounds();
 
-info("from:$from till:$till value_ts:$value_ts");
-
 zapi_connect();
+
+my $interval = $till + 1 - $from;
+
+exit_if_lastclock($tld, $cfg_key_out, $value_ts, $interval);
+
+info("from:$from till:$till value_ts:$value_ts");
 
 # First we need to get the list of items where the values should be saved.
 my $result = $zabbix->get('item', {output => ['key_'], host => $tld, startSearch => 1, search => {key_ => $cfg_key_out}});
