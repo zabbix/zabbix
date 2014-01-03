@@ -349,6 +349,35 @@ if ($data['type'] == 0) {
 		}
 	}
 }
+elseif ($data['type'] == 1) {
+	// get tests items
+	$testItems = API::Item()->get(array(
+		'hostids' => $hostIds,
+		'search' => array(
+			'key_' => PROBE_DNS_UDP_ITEM_RTT
+		),
+		'startSearch' => true,
+		'output' => array('itemid', 'value_type')
+	));
+
+	$data['totalTests'] = count($testItems);
+
+	foreach ($testItems as $testItem) {
+		$itemHistory = API::History()->get(array(
+			'itemids' => $testItem['itemid'],
+			'time_from' => $testTimeFrom,
+			'time_till' => $testTimeTill,
+			'history' => $testItem['value_type'],
+			'output' => API_OUTPUT_EXTEND
+		));
+
+		$itemHistory = reset($itemHistory);
+
+		if ($itemHistory['value'] != DNSSEC_FAIL_ERROR_CODE) {
+			$data['availTests']++;
+		}
+	}
+}
 
 foreach ($hosts as $host) {
 	foreach ($data['probes'] as $hostId => $probe) {

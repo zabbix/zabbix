@@ -138,20 +138,20 @@ if ($this->data['type'] == 0) {
 	$additionInfo = array(
 		BR(),
 		new CSpan(bold(_s(
-				'%1$s out of %2$s probes reported availability of service',
-				$this->data['totalProbes'] ? round($this->data['availProbes'] / $this->data['totalProbes'], ZBX_UNITS_ROUNDOFF_UPPER_LIMIT).'%' : 0,
-				$this->data['totalProbes']
-			)))
+			'%1$s out of %2$s probes reported availability of service',
+			round($this->data['availProbes'] / $this->data['totalProbes'] * 100, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT).'%',
+			$this->data['totalProbes']
+		)))
 	);
 }
 elseif ($this->data['type'] == 1) {
 	$additionInfo = array(
 		BR(),
 		new CSpan(bold(_s(
-				'%1$s out of %2$s tests reported availability of service',
-				$this->data['totalTests'] ? round($this->data['availTests'] / $this->data['totalTests'], ZBX_UNITS_ROUNDOFF_UPPER_LIMIT).'%' : 0,
-				$this->data['totalTests']
-			)))
+			'%1$s out of %2$s tests reported availability of service',
+			round($this->data['availTests'] / $this->data['totalTests'] * 100, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT).'%',
+			$this->data['totalTests']
+		)))
 	);
 }
 
