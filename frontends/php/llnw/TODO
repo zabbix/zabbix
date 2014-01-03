@@ -1,4 +1,3 @@
-refactor config file inclusion (and info sourcing)
 refactor auth to use Zabbix internal mechanism
 refactor toolbox.php to llnw.php lib
 determine what get-ack-info.php, squelch-json.php, and squelch-mgr.php are...
