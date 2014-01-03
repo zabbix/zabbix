@@ -57,26 +57,6 @@ jQuery(function($) {
 			data = obj.data('menu-popup');
 
 		switch (data.type) {
-			case 'host':
-				data = getMenuPopupHost(data);
-				break;
-
-			case 'trigger':
-				data = getMenuPopupTrigger(data);
-				break;
-
-			case 'history':
-				data = getMenuPopupHistory(data);
-				break;
-
-			case 'map':
-				data = getMenuPopupMap(data);
-				break;
-
-			case 'refresh':
-				data = getMenuPopupRefresh(data);
-				break;
-
 			case 'favouriteGraphs':
 				data = getMenuPopupFavouriteGraphs(data);
 				break;
@@ -89,8 +69,32 @@ jQuery(function($) {
 				data = getMenuPopupFavouriteScreens(data);
 				break;
 
+			case 'history':
+				data = getMenuPopupHistory(data);
+				break;
+
+			case 'host':
+				data = getMenuPopupHost(data);
+				break;
+
+			case 'map':
+				data = getMenuPopupMap(data);
+				break;
+
+			case 'refresh':
+				data = getMenuPopupRefresh(data);
+				break;
+
 			case 'serviceConfiguration':
 				data = getMenuPopupServiceConfiguration(data);
+				break;
+
+			case 'trigger':
+				data = getMenuPopupTrigger(data);
+				break;
+
+			case 'triggerMacro':
+				data = getMenuPopupTriggerMacro(data);
 				break;
 		}
 

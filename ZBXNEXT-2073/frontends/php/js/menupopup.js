@@ -527,6 +527,26 @@ function getMenuPopupServiceConfiguration(options) {
 }
 
 /**
+ * Get menu popup trigger macro section data.
+ *
+ * @return array
+ */
+function getMenuPopupTriggerMacro(options) {
+	return [{
+		type: 'triggerMacro',
+		title: t('Insert macro'),
+		data: {
+			'TRIGGER.VALUE=0': 0,
+			'TRIGGER.VALUE=1': 1,
+			'TRIGGER.VALUE=2': 2,
+			'TRIGGER.VALUE#0': 10,
+			'TRIGGER.VALUE#1': 11,
+			'TRIGGER.VALUE#2': 12
+		}
+	}];
+}
+
+/**
  * Recursive function to prepare menu tree data for createMenuTree().
  *
  * @param array  tree		menu tree data, will be modified by reference
@@ -618,6 +638,10 @@ jQuery(function($) {
 
 						case 'scripts':
 							createScriptSection(menuPopup, section);
+							break;
+
+						case 'triggerMacro':
+							createTriggerMacroSection(menuPopup, section);
 							break;
 
 						default:
@@ -872,6 +896,40 @@ jQuery(function($) {
 			menuPopup.append($('<div>', {'class': 'title', text: section.title}));
 			menuPopup.append(menu);
 		}
+	}
+
+	/**
+	 * Create trigger macro section in menu popup.
+	 *
+	 * @param object menuPopup
+	 * @param object section
+	 */
+	function createTriggerMacroSection(menuPopup, section) {
+		var menu = $('<ul>', {'class': 'menu'});
+
+		$.each(section.data, function(label, value) {
+			menu.append(createMenuItem(label, null, null, null, null, function() {
+				var expression = $('#expr_temp');
+
+				if (expression.val().length > 0 && !confirm(t('Do you wish to replace the conditional expression?'))) {
+					return false;
+				}
+
+				var sign = '=';
+
+				if (value >= 10) {
+					value %= 10;
+					sign = '#';
+				}
+
+				expression.val('{TRIGGER.VALUE}' + sign + value);
+
+				menuPopup.fadeOut(100);
+			}));
+		});
+
+		menuPopup.append($('<div>', {'class': 'title', text: section.title}));
+		menuPopup.append(menu);
 	}
 
 	/**

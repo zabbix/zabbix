@@ -100,13 +100,12 @@ $tranStrings = array(
 	),
 	'functions.js' => array(
 		'Cancel' => _('Cancel'),
-		'DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q' => _('Do you wish to replace the conditional expression?'),
+		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),
 		'Events' => _('Events'),
 		'Execute' => _('Execute'),
 		'Execution confirmation' => _('Execution confirmation'),
 		'History' => _('History'),
 		'History and simple graphs' => _('History and simple graphs'),
-		'S_INSERT_MACRO' => _('Insert macro'),
 		'S_CREATE_LOG_TRIGGER' => _('Create trigger'),
 		'S_DELETE' => _('Delete'),
 		'S_DELETE_KEYWORD_Q' => _('Delete keyword?'),
@@ -220,7 +219,8 @@ $tranStrings = array(
 		'Remove' => _('Remove'),
 		'Remove all' => _('Remove all'),
 		'Service' => _('Service'),
-		'Delete service "%1$s"?' => _('Delete service "%1$s"?')
+		'Delete service "%1$s"?' => _('Delete service "%1$s"?'),
+		'Insert macro' => _('Insert macro')
 	)
 );
 

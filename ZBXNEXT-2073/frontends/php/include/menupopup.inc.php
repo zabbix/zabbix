@@ -386,3 +386,18 @@ function getMenuPopupServiceConfiguration($serviceId, $name, $deletable) {
 		'deletable' => $deletable
 	);
 }
+
+/**
+ * Prepare data for trigger macro menu popup.
+ *
+ * @param string $serviceId
+ * @param string $name
+ * @param bool   $deletable
+ *
+ * @return array
+ */
+function getMenuPopupTriggerMacro() {
+	return array(
+		'type' => 'triggerMacro'
+	);
+}
