@@ -70,27 +70,38 @@ char	**CONFIG_PERF_COUNTERS		= NULL;
  *                                                                            *
  * Parameters: lines - aliase entries from configuration file                 *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Vladimir Levijev                                                   *
- *                                                                            *
  * Comments: calls add_alias() for each entry                                 *
  *                                                                            *
  ******************************************************************************/
 void	load_aliases(char **lines)
 {
-	char	*value, **pline;
+	char	**pline, *r, *c;
 
 	for (pline = lines; NULL != *pline; pline++)
 	{
-		if (NULL == (value = strchr(*pline, ':')))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "Alias \"%s\" FAILED: not colon-separated", *pline);
-			exit(FAIL);
-		}
-		*value++ = '\0';
+		r = *pline;
 
-		add_alias(*pline, value);
+		if (SUCCEED != parse_key(&r) || ':' != *r)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot add alias \"%s\": invalid character at position %ld",
+					*pline, (r - *pline) + 1);
+			exit(EXIT_FAILURE);
+		}
+
+		c = r++;
+
+		if (SUCCEED != parse_key(&r) || '\0' != *r)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot add alias \"%s\": invalid character at position %ld",
+					*pline, (r - *pline) + 1);
+			exit(EXIT_FAILURE);
+		}
+
+		*c++ = '\0';
+
+		add_alias(*pline, c);
+
+		*--c = ':';
 	}
 }
 
