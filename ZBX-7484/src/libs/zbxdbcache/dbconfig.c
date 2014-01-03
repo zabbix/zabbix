@@ -3940,9 +3940,6 @@ void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_
 	DC_TRIGGER		*trigger;
 	const char		*p, *q;
 
-	zabbix_log(LOG_LEVEL_WARNING, "DEBUG: DCconfig_get_time_based_triggers() trigger_info:%p trigger_order:%d",
-			*trigger_info, trigger_order->values_num);
-
 	LOCK_CACHE;
 
 	if (0 == trigger_order->values_num)
