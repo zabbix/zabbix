@@ -110,66 +110,6 @@ if ($data['filter_search']) {
 		if ($applications) {
 			$application = reset($applications);
 
-			// get items
-			$items = API::Item()->get(array(
-				'applicationids' => $application['applicationid'],
-				'output' => array('itemid', 'name', 'key_')
-			));
-
-			foreach ($items as $item) {
-				$itemKey = new CItemKey($item['key_']);
-				switch ($itemKey->getKeyId()) {
-					case MONTHLY_REPORTS_DNS_NS_RTT_UDP:
-						$newName = 'UDP DNS Resolution RTT';
-						$newKey = 'dnstest.dns.udp.rtt[{$DNSTEST.TLD},';
-						$macro = 'dnstest.configvalue[DNSTEST.SLV.DNS.UDP.RTT]';
-						break;
-					case MONTHLY_REPORTS_DNS_NS_RTT_TCP:
-						$newName = 'TCP DNS Resolution RTT';
-						$newKey = 'dnstest.dns.tcp.rtt[{$DNSTEST.TLD},';
-						$macro = 'dnstest.configvalue[DNSTEST.SLV.DNS.TCP.RTT]';
-						break;
-					case MONTHLY_REPORTS_DNS_NS_UPD:
-						$newName = 'DNS update time';
-						$newKey = 'dnstest.dns.udp.upd[{$DNSTEST.TLD},';
-						$macro = 'dnstest.configvalue[DNSTEST.SLV.DNS.NS.UPD]';
-						break;
-					case MONTHLY_REPORTS_DNS_NS:
-						$newName = 'DNS Name Server availability';
-						$newKey = 'dnstest.slv.dns.ns.avail[';
-						$macro = 'dnstest.configvalue[DNSTEST.SLV.NS.AVAIL]';
-						break;
-					case MONTHLY_REPORTS_RDDS43_RTT:
-						$newName = 'RDDS43 resolution RTT';
-						$newKey = 'dnstest.rdds.43.rtt[{$DNSTEST.TLD}]';
-						$macro = 'dnstest.configvalue[DNSTEST.SLV.RDDS43.RTT]';
-						break;
-					case MONTHLY_REPORTS_RDDS80_RTT:
-						$newName = 'RDDS80 resolution RTT';
-						$newKey = 'dnstest.rdds.80.rtt[{$DNSTEST.TLD}]';
-						$macro = 'dnstest.configvalue[DNSTEST.SLV.RDDS80.RTT]';
-						break;
-					case MONTHLY_REPORTS_RDDS_UPD:
-						$newName = 'RDDS update time';
-						$newKey = 'dnstest.rdds.43.upd[{$DNSTEST.TLD}]';
-						$macro = 'dnstest.configvalue[DNSTEST.SLV.RDDS.UPD]';
-						break;
-					default:
-						$newName = null;
-						break;
-				}
-
-				if ($newName) {
-					$data['services'][$newName]['parameters'][$item['itemid']]['ns'] = implode(': ', $itemKey->getParameters());
-
-					$itemIds[] = $item['itemid'];
-					$itemsAndServices[$item['itemid']] = $newName;
-					$newItemKeys[$item['itemid']] = $newKey;
-					$macroValue[$macro] = $item['itemid'];
-					$usedMacro[] = $macro;
-				}
-			}
-
 			// time limits
 			$startTime = mktime(
 				0,
@@ -198,52 +138,103 @@ if ($data['filter_search']) {
 				$endYear
 			);
 
-			// get history
-			if ($itemIds) {
-				$historyData = DBselect(
-					'SELECT h.value, h.itemid'.
-					' FROM history_uint h'.
-					' WHERE '.dbConditionInt('h.itemid', $itemIds).
-						' AND h.clock>='.$startTime.
-						' AND h.clock<'.$endTime
-				);
+			// get items
+			$items = API::Item()->get(array(
+				'applicationids' => $application['applicationid'],
+				'output' => array('itemid', 'name', 'key_', 'value_type')
+			));
 
-				while ($historyValue = DBfetch($historyData)) {
-					$itemId = $historyValue['itemid'];
-					$serviceName = $itemsAndServices[$itemId];
-
-					$data['services'][$serviceName]['parameters'][$itemId]['slv'] = $historyValue['value'];
+			foreach ($items as $item) {
+				$itemKey = new CItemKey($item['key_']);
+				switch ($itemKey->getKeyId()) {
+					case MONTHLY_REPORTS_DNS_NS_RTT_UDP:
+						$newName = 'UDP DNS Resolution RTT';
+						$macro = 'dnstest.configvalue[DNSTEST.SLV.DNS.UDP.RTT]';
+						break;
+					case MONTHLY_REPORTS_DNS_NS_RTT_TCP:
+						$newName = 'TCP DNS Resolution RTT';
+						$macro = 'dnstest.configvalue[DNSTEST.SLV.DNS.TCP.RTT]';
+						break;
+					case MONTHLY_REPORTS_DNS_NS_UPD:
+						$newName = 'DNS update time';
+						$macro = 'dnstest.configvalue[DNSTEST.SLV.DNS.NS.UPD]';
+						break;
+					case MONTHLY_REPORTS_DNS_NS:
+						$newName = 'DNS Name Server availability';
+						$macro = 'dnstest.configvalue[DNSTEST.SLV.NS.AVAIL]';
+						break;
+					case MONTHLY_REPORTS_RDDS43_RTT:
+						$newName = 'RDDS43 resolution RTT';
+						$macro = 'dnstest.configvalue[DNSTEST.SLV.RDDS43.RTT]';
+						break;
+					case MONTHLY_REPORTS_RDDS80_RTT:
+						$newName = 'RDDS80 resolution RTT';
+						$macro = 'dnstest.configvalue[DNSTEST.SLV.RDDS80.RTT]';
+						break;
+					case MONTHLY_REPORTS_RDDS_UPD:
+						$newName = 'RDDS update time';
+						$macro = 'dnstest.configvalue[DNSTEST.SLV.RDDS.UPD]';
+						break;
+					default:
+						$newName = null;
+						break;
 				}
 
-				// get calculated items
-				$calculatedItems = API::Item()->get(array(
-					'output' => array('itemid', 'key_'),
-					'filter' => array(
-						'key_' => $usedMacro
-					),
-					'preservekeys' => true
-				));
+				if ($newName) {
+					$data['services'][$newName]['parameters'][$item['itemid']]['ns'] = implode(': ', $itemKey->getParameters());
 
-				$calculatedItemIds = array_keys($calculatedItems);
+					$itemsAndServices[$item['itemid']] = $newName;
+					$macroValue[$macro] = $item['itemid'];
+					$usedMacro[] = $macro;
 
-				// get old value
-				foreach ($calculatedItemIds as $calculatedItemId) {
-					$historyData = DBfetch(DBselect(
-						'SELECT h.value, h.itemid'.
-						' FROM history_uint h'.
-						' WHERE h.itemid='.$calculatedItemId.
-							' AND h.clock>='.$startTime.
-							' AND h.clock<'.$endTime.
-						' ORDER BY h.clock DESC',
-						1
+					$itemHistory = API::History()->get(array(
+						'itemids' => $item['itemid'],
+						'time_from' => $startTime,
+						'time_till' => $endTime,
+						'history' => $item['value_type'],
+						'output' => API_OUTPUT_EXTEND
 					));
 
-					if ($historyData) {
-						$itemKey = $calculatedItems[$calculatedItemId]['key_'];
-						$mainItemId = $macroValue[$itemKey];
-						$serviceName = $itemsAndServices[$mainItemId];
-						$data['services'][$serviceName]['acceptable_sla'] = $historyData['value'];
+					$itemHistory = reset($itemHistory);
+
+					$serviceName = $itemsAndServices[$item['itemid']];
+					if (isset($itemHistory['value'])) {
+						$data['services'][$serviceName]['parameters'][$item['itemid']]['slv'] = round(
+							$itemHistory['value'],
+							ZBX_UNITS_ROUNDOFF_DNSTEST_LIMIT
+						);
 					}
+				}
+			}
+
+			// get calculated items
+			$calculatedItems = API::Item()->get(array(
+				'output' => array('itemid', 'key_'),
+				'filter' => array(
+					'key_' => $usedMacro
+				),
+				'preservekeys' => true
+			));
+
+			$calculatedItemIds = array_keys($calculatedItems);
+
+			// get old value
+			foreach ($calculatedItemIds as $calculatedItemId) {
+				$historyData = DBfetch(DBselect(
+					'SELECT h.value, h.itemid'.
+					' FROM history_uint h'.
+					' WHERE h.itemid='.$calculatedItemId.
+						' AND h.clock>='.$startTime.
+						' AND h.clock<'.$endTime.
+					' ORDER BY h.clock DESC',
+					1
+				));
+
+				if ($historyData) {
+					$itemKey = $calculatedItems[$calculatedItemId]['key_'];
+					$mainItemId = $macroValue[$itemKey];
+					$serviceName = $itemsAndServices[$mainItemId];
+					$data['services'][$serviceName]['acceptable_sla'] = $historyData['value'];
 				}
 			}
 		}
