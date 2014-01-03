@@ -24,14 +24,6 @@ class RPC extends Server {
         'dm' => 'DM', // TODO: Consider re-using Proxy...
         'queue' => 'Queue',
     );
-    // TODO: add.squelch,clear.squelch :: Squelch.php
-    // TODO: get.ack,ack.get,add.ack,ack.add :: Ack.php
-    // TODO: hostlist.get,hostlist.pull :: Hostlist.php
-    // TODO: proxymap.get :: proxy.php --> Proxymap.php
-    // TODO: alertqueue.create :: alert-queue.php --> AlertQueue.php
-    // TODO: proxy.status, proxy.reassign :: proxy-assign.php --> Proxy.php
-    // TODO: dm.info :: dm-info.php --> DM.php
-    // TODO: queue.info :: queue-info.php --> Queue.php
 
     /**
      * JSONRPC input string to be used in the RPC callback.
@@ -44,6 +36,19 @@ class RPC extends Server {
         // Peek into RPC message to lookup predefined class names
         $jsonrpc = \JsonRpc\Base\Rpc::decode($json, $batch);
         $method = empty($jsonrpc['method']) ? '' : $jsonrpc['method'];
+
+        define('ZBX_RPC_REQUEST', 1);
+        global $ZBX_CONFIGURATION_FILE;
+        $ZBX_CONFIGURATION_FILE = Config::locateconfig('zabbix.conf.php');
+        // Search for Zabbix config file
+        $config_inc_php = Config::locateconfig('config.inc.php', array(
+                dirname(__FILE__).'/../../../../include',
+                '/var/www/zabbix/include',
+        ));
+        require_once($config_inc_php);
+        // dirname(__FILE__).'/../include/config.inc.php'; // HACK
+        // CWebUser::$data['sessionid'] = $jsonrpc['key'];
+        // if key == sj... --> Act on behalf of global $zabbix_user
 
         // Convention handling
         $resource = 'RPC'; // Default class to instantiate
