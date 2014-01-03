@@ -230,6 +230,10 @@ class CZBXAPI {
 	protected function outputExtend($tableName, $fields, $output) {
 		$fields = (array) $fields;
 
+		if ($output === null) {
+			return $fields;
+		}
+
 		foreach ($fields as $field) {
 			if ($output == API_OUTPUT_REFER) {
 				$output = array($this->pk($tableName), $field);
@@ -259,11 +263,12 @@ class CZBXAPI {
 			case API_OUTPUT_REFER:
 				return true;
 
-			// if the number of objects is requested, return false
+			// return false if nothing or an object count is requested
 			case API_OUTPUT_COUNT:
+			case null:
 				return false;
 
-			// if an array of fields is passed, check if the field is present in the array
+				// if an array of fields is passed, check if the field is present in the array
 			default:
 				return in_array($field, $output);
 		}

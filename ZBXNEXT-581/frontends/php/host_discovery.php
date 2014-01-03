@@ -325,6 +325,7 @@ if (isset($_REQUEST['form'])) {
 		$data['lifetime'] = $item['lifetime'];
 		$data['evaltype'] = $item['evaltype'];
 		$data['formula'] = $item['formula'];
+		$data['eval_formula'] = $item['eval_formula'];
 		$data['conditions'] = $item['conditions'];
 	}
 
