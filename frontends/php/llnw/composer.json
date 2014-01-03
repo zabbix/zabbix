@@ -36,6 +36,7 @@
         "jsonrpc/jsonrpc": "*",
         "jv2222/ezSQL": "dev-master",
         "pear-pear/Log": "*",
+        "silex/silex": "*",
         "symfony/config": "*"
     },
     "autoload": {

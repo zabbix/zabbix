@@ -2,9 +2,7 @@
 
 namespace LLNW\Zabbix;
 
-use LLNW\Zabbix;
 use JsonRpc\Server;
-use JsonRpc\Base\Rpc;
 
 class RPC extends Server {
     /**
@@ -43,9 +41,8 @@ class RPC extends Server {
 
     public function __construct($json = '') {
         // Setup class and method call
-
         // Peek into RPC message to lookup predefined class names
-        $jsonrpc = Rpc::decode($json);
+        $jsonrpc = \JsonRpc\Base\Rpc::decode($json, $batch);
         $method = empty($jsonrpc['method']) ? '' : $jsonrpc['method'];
 
         // Convention handling
@@ -69,6 +66,7 @@ class RPC extends Server {
             }
         }
 
+        $resource = "\\LLNW\\Zabbix\\$resource"; // TODO: consider using RPC namespace
         $methodHandler = new $resource(); // TODO: Error handle instantiation
         $jsonrpc['method'] = $action; // Override the called method convention
         $this->input = json_encode($jsonrpc);
