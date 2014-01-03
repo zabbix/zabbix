@@ -2195,7 +2195,6 @@ int	DCsync_history(int sync_type)
 
 		candidate_num = 0;
 		skipped_clock = 0;
-		triggerids.values_num = 0;
 
 		for (n = cache->history_num, f = cache->history_first; 0 < n && ZBX_SYNC_MAX > candidate_num;)
 		{
