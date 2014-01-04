@@ -3,6 +3,21 @@ include_once('config.php');
 
 // this has the $static_proxies array in it
 include_once($base_dir.'static-proxy.list');
+/*
+protected $static_proxies;
+
+public function __construct() {
+    // TODO: Move to static constant
+    $this->static_proxies['PHX01'] = 'zabbix-proxy01.phx2.llnw.net';
+    $this->static_proxies['PHX02'] = 'zabbix-proxy02.phx2.llnw.net';
+    $this->static_proxies['PHXEXT01'] = 'zabbix-proxy-ext01.phx2.llnw.net';
+    $this->static_proxies['PHXEXT02'] = 'zabbix-proxy-ext02.phx2.llnw.net';
+    $this->static_proxies['PHXINT01'] = 'zabbix-proxy-int01.phx2.llnw.net';
+    $this->static_proxies['PHXINT02'] = 'zabbix-proxy-int02.phx2.llnw.net';
+    $this->static_proxies['PHXSEC01'] = 'zabbix-proxy-sec01.phx4.llnw.net';
+    $this->static_proxies['PHXSEC02'] = 'zabbix-proxy-sec02.phx4.llnw.net';
+}
+*/
 
 
 if ($json['method'] == 'proxymap.get') {
