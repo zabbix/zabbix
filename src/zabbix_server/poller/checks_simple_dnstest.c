@@ -2153,7 +2153,7 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 	/* prepare http request */
 	zbx_snprintf(testname, sizeof(testname), "GET / HTTP/1.1\r\nhost: %s.%s", testprefix, domain);
 
-	if (SUCCEED != zbx_tcp_exchange(testprefix, ip80, 80, ZBX_DNSTEST_TCP_TIMEOUT, NULL, &rtt80, log_fd, err,
+	if (SUCCEED != zbx_tcp_exchange(testname, ip80, 80, ZBX_DNSTEST_TCP_TIMEOUT, NULL, &rtt80, log_fd, err,
 			sizeof(err)))
 	{
 		rtt80 = ZBX_EC_RDDS80_NOREPLY;
