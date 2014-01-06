@@ -144,31 +144,28 @@ function add_logexpr() {
 	tr.appendChild(td);
 	td.appendChild(document.createTextNode(expr_v));
 
-	var input = IE ? document.createElement('<input name="expressions[' + logexpr_count + '][value]" />') : document.createElement('input');
-	input.setAttribute('type', 'hidden');
-	input.setAttribute('value', expression);
-	!IE ? input.setAttribute('name', 'expressions[' + logexpr_count + '][value]') : '';
+	jQuery(td).append(jQuery('<input>', {
+		name: 'expressions[' + logexpr_count + '][value]',
+		type: 'hidden',
+		value: expression
+	}));
 
-	td.appendChild(input);
-
-	var input = IE ? document.createElement('<input name="expressions[' + logexpr_count + '][view]" />') : document.createElement('input');
-	input.setAttribute('type', 'hidden');
-	input.setAttribute('value', expr_v);
-	!IE ? input.setAttribute('name', 'expressions[' + logexpr_count + '][view]') : '';
-
-	td.appendChild(input);
+	jQuery(td).append(jQuery('<input>', {
+		name: 'expressions[' + logexpr_count + '][view]',
+		type: 'hidden',
+		value: expr_v
+	}));
 
 	var td = document.createElement('td');
 	tr.appendChild(td);
 
 	td.appendChild(document.createTextNode(expr_t.options[expr_t.selectedIndex].text));
 
-	var input = IE ? document.createElement('<input name="expressions[' + logexpr_count + '][type]" />') : document.createElement('input');
-	input.setAttribute('type', 'hidden');
-	input.setAttribute('value', expr_t.value);
-	!IE ? input.setAttribute('name', 'expressions[' + logexpr_count + '][type]') : '';
-
-	td.appendChild(input);
+	jQuery(td).append(jQuery('<input>', {
+		name: 'expressions[' + logexpr_count + '][type]',
+		type: 'hidden',
+		value: expr_t.value
+	}));
 
 	// optional
 	var td = document.createElement('td');
