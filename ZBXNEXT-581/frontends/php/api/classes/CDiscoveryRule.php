@@ -745,7 +745,7 @@ class CDiscoveryRule extends CItemGeneral {
 		foreach ($conditions as $condition) {
 			$ids[$condition['formulaid']] = $condition['item_conditionid'];
 		}
-		$formula = CFormulaHelper::replaceFormulaIds($evalFormula, $ids);
+		$formula = CConditionHelper::replaceLetterIds($evalFormula, $ids);
 
 		DB::updateByPk('items', $itemId, array(
 			'formula' => $formula
@@ -1310,18 +1310,18 @@ class CDiscoveryRule extends CItemGeneral {
 					foreach ($conditions as $condition) {
 						$formulaConditions[$condition['item_conditionid']] = $condition['macro'];
 					}
-					$formula = CFormulaHelper::getFormula($formulaConditions, $rule['evaltype']);
+					$formula = CConditionHelper::getFormula($formulaConditions, $rule['evaltype']);
 				}
 
 				// generate formulaids from the effective formula
-				$formulaIds = CFormulaHelper::getFormulaIds($formula);
+				$formulaIds = CConditionHelper::getFormulaIds($formula);
 
 				if ($formulaRequested) {
-					$rule['formula'] = CFormulaHelper::replaceIds($formula, $formulaIds);
+					$rule['formula'] = CConditionHelper::replaceNumericIds($formula, $formulaIds);
 				}
 
 				if ($evalFormulaRequested) {
-					$rule['eval_formula'] = CFormulaHelper::replaceIds($formula, $formulaIds);
+					$rule['eval_formula'] = CConditionHelper::replaceNumericIds($formula, $formulaIds);
 				}
 
 				if ($formulaIdRequested) {
