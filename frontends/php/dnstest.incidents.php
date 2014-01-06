@@ -62,7 +62,7 @@ if ((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])) 
 	exit();
 }
 
-if (isset($_REQUEST['mark_incident'])) {
+if (isset($_REQUEST['mark_incident']) && CWebUser::getType() >= USER_TYPE_ZABBIX_ADMIN) {
 	$event = API::Event()->get(array(
 		'eventids' => get_request('eventid'),
 		'output' => API_OUTPUT_EXTEND,

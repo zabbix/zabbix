@@ -76,9 +76,7 @@ $filterTable->addRow(array(
 	array(array(bold(_('Current status')), ':'.SPACE), $filterStatus)
 ));
 
-$filter = new CButton('filter', _('Filter'),
-	"javascript: create_var('zbx_filter', 'filter_set', '1', true);"
-);
+$filter = new CButton('filter', _('Filter'), "submit();");
 $filter->useJQueryStyle('main');
 
 $reset = new CButton('reset', _('Reset'), "javascript: clearAllForm('zbx_filter');");
@@ -94,6 +92,7 @@ $filterForm->setAttribute('name', 'zbx_filter');
 $filterForm->setAttribute('id', 'zbx_filter');
 $filterForm->addItem($filterTable);
 $filterForm->addVar('checkallvalue', 0);
+$filterForm->addVar('filter_set', 1);
 $dnsTestWidget->addFlicker($filterForm, CProfile::get('web.dnstest.rollingweekstatus.filter.state', 0));
 
 $table = new CTableInfo(_('No TLD\'s found.'));

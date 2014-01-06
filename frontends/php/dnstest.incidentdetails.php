@@ -179,7 +179,6 @@ if ($mainEvent) {
 		if ($item['key_'] == CALCULATED_ITEM_DNS_FAIL || $item['key_'] == CALCULATED_ITEM_DNSSEC_FAIL
 				|| $item['key_'] == CALCULATED_ITEM_RDDS_FAIL) {
 			$failCount = getOldValue($item['itemid'], $mainEventFromTime);
-
 		}
 		elseif ($item['key_'] == CALCULATED_ITEM_DNS_RECOVERY || $item['key_'] == CALCULATED_ITEM_DNSSEC_RECOVERY
 				|| $item['key_'] == CALCULATED_ITEM_RDDS_RECOVERY) {
@@ -313,12 +312,14 @@ if ($tld && $mainEvent && $slvItem) {
 		}
 	}
 
+	$slvToTime = $toTime + $recoveryCount * $delayTime;
+
 	$slvs = DBselect(
 		'SELECT h.value,h.clock'.
 		' FROM history h'.
 		' WHERE h.itemid='.zbx_dbstr($data['slvItemId']).
 			' AND h.clock>='.$fromTime.
-			' AND h.clock<='.$toTime
+			' AND h.clock<='.$slvToTime
 	);
 
 	while ($slv = DBfetch($slvs)) {

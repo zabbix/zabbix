@@ -106,6 +106,17 @@ $macro = API::UserMacro()->get(array(
 
 $data['slv'] = reset($macro);
 
+if (!$macro) {
+	show_error_message(_s('Macros "%1$s" not exit.', DNSTEST_PAGE_SLV));
+	require_once dirname(__FILE__).'/include/page_footer.php';
+	exit;
+}
+elseif (!isset($data['slv']['value']) || !$data['slv']['value']) {
+	show_error_message(_s('Macros "%1$s" is empty.', DNSTEST_PAGE_SLV));
+	require_once dirname(__FILE__).'/include/page_footer.php';
+	exit;
+}
+
 $options = array(
 	'output' => array('hostid', 'name', 'host'),
 	'tlds' => true,

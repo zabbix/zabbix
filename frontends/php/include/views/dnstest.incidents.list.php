@@ -161,9 +161,7 @@ $filterTable->addRow(array(
 	)
 ));
 
-$filter = new CButton('filter', _('Filter'),
-	"javascript: create_var('zbx_filter', 'filter_set', '1', true);"
-);
+$filter = new CButton('filter', _('Filter'), "submit();");
 $filter->useJQueryStyle('main');
 
 $divButtons = new CDiv($filter);
@@ -178,6 +176,7 @@ $filterForm->addVar('filter_from', zbxDateToTime($this->data['filter_from']));
 $filterForm->addVar('filter_to', zbxDateToTime($this->data['filter_to']));
 $filterForm->addVar('original_from', zbxDateToTime($this->data['filter_from']));
 $filterForm->addVar('original_to', zbxDateToTime($this->data['filter_to']));
+$filterForm->addVar('filter_set', 1);
 $filterForm->addItem($filterTable);
 $dnsTestWidget->addFlicker($filterForm, CProfile::get('web.dnstest.incidents.filter.state', 0));
 

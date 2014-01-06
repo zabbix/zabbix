@@ -265,19 +265,21 @@ $dnsTestWidget->additem($detailsInfoTable);
 
 $dnsTestWidget->additem($detailsTable);
 
-$filterTable = new CTable('', 'filter');
+if (CWebUser::getType() >= USER_TYPE_ZABBIX_ADMIN) {
+	$filterTable = new CTable('', 'filter');
 
-$filter = new CButton('mark_incident', $changeIncidentTypeName,
-	'javascript: location.href = "dnstest.incidents.php?mark_incident='.
-		$changeIncidentType.'&eventid='.$this->data['eventid'].'&host='.$this->data['tld']['host'].'";'
-);
-$filter->useJQueryStyle('main');
+	$filter = new CButton('mark_incident', $changeIncidentTypeName,
+		'javascript: location.href = "dnstest.incidents.php?mark_incident='.
+			$changeIncidentType.'&eventid='.$this->data['eventid'].'&host='.$this->data['tld']['host'].'";'
+	);
+	$filter->useJQueryStyle('main');
 
-$divButtons = new CDiv($filter);
-$divButtons->setAttribute('style', 'padding: 4px 0px;');
+	$divButtons = new CDiv($filter);
+	$divButtons->setAttribute('style', 'padding: 4px 0px;');
 
-$filterTable->addRow(new CCol($divButtons, 'left'));
+	$filterTable->addRow(new CCol($divButtons, 'left'));
 
-$dnsTestWidget->additem($filterTable);
+	$dnsTestWidget->additem($filterTable);
+}
 
 return $dnsTestWidget;
