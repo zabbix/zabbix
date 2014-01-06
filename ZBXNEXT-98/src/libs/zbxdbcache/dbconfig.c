@@ -4157,11 +4157,11 @@ int	DCconfig_get_poller_nextcheck(unsigned char poller_type)
  *           DCrequeue_items().                                               *
  *                                                                            *
  ******************************************************************************/
-int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max_items)
+int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 {
 	const char		*__function_name = "DCconfig_get_poller_items";
 
-	int			now, num = 0;
+	int			now, num = 0, max_items;
 	zbx_binary_heap_t	*queue;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() poller_type:%d", __function_name, (int)poller_type);
@@ -4169,6 +4169,18 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max
 	now = time(NULL);
 
 	queue = &config->queues[poller_type];
+
+	switch (poller_type)
+	{
+		case ZBX_POLLER_TYPE_JAVA:
+			max_items = MAX_BUNCH_ITEMS;
+			break;
+		case ZBX_POLLER_TYPE_PINGER:
+			max_items = MAX_PINGER_ITEMS;
+			break;
+		default:
+			max_items = 1;
+	}
 
 	LOCK_CACHE;
 

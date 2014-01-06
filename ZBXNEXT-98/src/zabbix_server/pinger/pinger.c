@@ -36,8 +36,6 @@
 #define MAX_SIZE	65507
 #define MIN_TIMEOUT	50
 
-#define MAX_ITEMS	128
-
 extern unsigned char	process_type;
 extern int		process_num;
 
@@ -374,7 +372,7 @@ static void	add_icmpping_item(icmpitem_t **items, int *items_alloc, int *items_c
 static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int *icmp_items_count)
 {
 	const char		*__function_name = "get_pinger_hosts";
-	DC_ITEM			items[MAX_ITEMS];
+	DC_ITEM			items[MAX_PINGER_ITEMS];
 	int			i, num, count, interval, size, timeout, rc, errcode = SUCCEED;
 	char			error[MAX_STRING_LEN], *addr = NULL;
 	icmpping_t		icmpping;
@@ -382,7 +380,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	num = DCconfig_get_poller_items(ZBX_POLLER_TYPE_PINGER, items, MAX_ITEMS);
+	num = DCconfig_get_poller_items(ZBX_POLLER_TYPE_PINGER, items);
 
 	for (i = 0; i < num; i++)
 	{

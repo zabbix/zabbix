@@ -43,15 +43,8 @@
 #include "checks_java.h"
 #include "checks_calculated.h"
 
-#define MAX_BUNCH_ITEMS	32
-
 extern unsigned char	process_type;
 extern int		process_num;
-
-static int	is_bunch_poller(int poller_type)
-{
-	return ZBX_POLLER_TYPE_JAVA == poller_type ? SUCCEED : FAIL;
-}
 
 static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type_t type, zbx_timespec_t *ts, char *reason)
 {
@@ -555,8 +548,7 @@ static int	get_values(unsigned char poller_type)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	num = (SUCCEED == is_bunch_poller(poller_type) ? MAX_BUNCH_ITEMS : 1);
-	num = DCconfig_get_poller_items(poller_type, items, num);
+	num = DCconfig_get_poller_items(poller_type, items);
 
 	if (0 == num)
 		goto exit;
@@ -660,7 +652,7 @@ static int	get_values(unsigned char poller_type)
 	zbx_free(port);
 
 	/* retrieve item values */
-	if (SUCCEED != is_bunch_poller(poller_type))
+	if (1 == num)
 	{
 		if (SUCCEED == errcodes[0])
 			errcodes[0] = get_value(&items[0], &results[0]);
@@ -671,6 +663,8 @@ static int	get_values(unsigned char poller_type)
 		get_values_java(ZBX_JAVA_GATEWAY_REQUEST_JMX, items, results, errcodes, num);
 		alarm(0);
 	}
+	else
+		THIS_SHOULD_NEVER_HAPPEN;
 
 	zbx_timespec(&timespec);
 
