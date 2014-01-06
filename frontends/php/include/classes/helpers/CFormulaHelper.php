@@ -51,7 +51,7 @@ class CFormulaHelper {
 		$i = 0;
 		$groupedConditions = array();
 		foreach ($conditions as $id => $condition) {
-			$groupedConditions[$condition][] = $id;
+			$groupedConditions[$condition][] = '{'.$id.'}';
 
 			$i++;
 		}
@@ -74,7 +74,12 @@ class CFormulaHelper {
 
 		$groupFormulas = array();
 		foreach ($groupedConditions as $conditionIds) {
-			$groupFormulas[] = '('.implode(' '.$conditionOperator.' ', $conditionIds).')';
+			if (count($conditionIds) > 1) {
+				$groupFormulas[] = '('.implode(' '.$conditionOperator.' ', $conditionIds).')';
+			}
+			else {
+				$groupFormulas[] = array_pop($conditionIds);
+			}
 		}
 		$groupFormulas = implode(' '.$groupOperator.' ', $groupFormulas);
 
