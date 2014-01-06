@@ -1,11 +1,12 @@
 <?php
 namespace LLNW\Zabbix;
 
-class Proxymap {
-
+class Proxymap
+{
     protected $static_proxies;
 
-    public function __construct() {
+    public function __construct()
+    {
         // TODO: Move to static constant
         $this->static_proxies['PHX01'] = 'zabbix-proxy01.phx2.llnw.net';
         $this->static_proxies['PHX02'] = 'zabbix-proxy02.phx2.llnw.net';
@@ -17,8 +18,8 @@ class Proxymap {
         $this->static_proxies['PHXSEC02'] = 'zabbix-proxy-sec02.phx4.llnw.net';
     }
 
-    public function get($hostnames, $selectAll, $output) {
-
+    public function get($hostnames, $selectAll, $output)
+    {
         $hostnames = (is_array($hostnames) && count($hostnames) > 0) ? $hostnames : '';
         $all      = (isset($selectAll)) ? 1 : '';
         $output   = (isset($output) && $output == 'csv') ? 'csv' : 'json';
@@ -30,8 +31,7 @@ class Proxymap {
 
         if ($all == 1) {
             $host_hash = getHosts();
-        }
-        else {
+        } else {
             $hostids = array();
             foreach ($hostnames as $host) {
                 $hostid = getHostId($host);
@@ -55,15 +55,13 @@ class Proxymap {
 
             if (isset($this->static_proxies[$proxy_name])) {
                 $proxy_fqdn = $this->static_proxies[$proxy_name];
-            }
-            elseif (preg_match('/(\D{3})(\d{2})/', $proxy_name, $m)) {
+            } elseif (preg_match('/(\D{3})(\d{2})/', $proxy_name, $m)) {
                 $site = strtolower($m[1]);
                 $num  = $m[2];
                 // HACK: Override phx2 hostname
                 $site = ($site == 'phx' ? 'phx2' : $site);
                 $proxy_fqdn = 'zabbix-proxy'.$num.'.'.$site.'.llnw.net';
-            }
-            else {
+            } else {
                 $proxy_fqdn = 'zabbix-mainha.phx2.llnw.net';
             }
 
@@ -82,8 +80,7 @@ class Proxymap {
 
         if ($output == 'json') {
             sendResponse($resp);
-        }
-        else {
+        } else {
             foreach ($resp['result'] as $c) {
                 print $c['host'].','.$c['proxy']."\n";
             }

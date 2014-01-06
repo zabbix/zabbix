@@ -1,8 +1,10 @@
 <?php
 namespace LLNW\Zabbix;
 
-class Queue {
-    public function info() {
+class Queue
+{
+    public function info()
+    {
         // TODO: Move this inclusion down into the local Zabbix API lib
         $items_inc_php = Config::locateconfig('items.inc.php', array(
                 dirname(__FILE__).'/../../../../include',
@@ -77,8 +79,8 @@ class Queue {
 
         $data = array();
 
-        if($_REQUEST['config']==0){
-            foreach($item_types as $type){
+        if ($_REQUEST['config']==0) {
+            foreach ($item_types as $type) {
                 $sec_10[$type] = 0;
                 $sec_30[$type] = 0;
                 $sec_60[$type] = 0;
@@ -87,9 +89,9 @@ class Queue {
                 $sec_rest[$type] = 0;
             }
 
-            while($row = DBfetch($result)){
+            while ($row = DBfetch($result)) {
                 $res = calculateItemNextcheck($row['interfaceid'], $row['itemid'], $row['type'], $row['delay'], $row['delay_flex'], $row['lastclock']);
-                if(0 != $row['proxy_hostid']){
+                if (0 != $row['proxy_hostid']) {
                     $res['nextcheck'] = $row['lastclock'] + $res['delay'];
                 }
                 $diff = $now - $res['nextcheck'];
@@ -110,7 +112,7 @@ class Queue {
                     $sec_rest[$row['type']]++;
             }
 
-            foreach($item_types as $type){
+            foreach ($item_types as $type) {
                 $data[item_type2str($type)] = array(
                     $sec_10[$type],
                     $sec_30[$type],
@@ -120,8 +122,7 @@ class Queue {
                     $sec_rest[$type]
                 );
             }
-        }
-        else if ($_REQUEST['config'] == 1){
+        } elseif ($_REQUEST['config'] == 1) {
             $proxies = API::proxy()->get(array(
                     'output' => array('hostid', 'host'),
                     'preservekeys' => true,
@@ -129,7 +130,7 @@ class Queue {
             order_result($proxies, 'host');
 
             $proxies[0] = array('host' => _('Server'));
-            foreach($proxies as $proxyid => $proxy){
+            foreach ($proxies as $proxyid => $proxy) {
                 $sec_10[$proxyid] = 0;
                 $sec_30[$proxyid] = 0;
                 $sec_60[$proxyid] = 0;
@@ -138,13 +139,12 @@ class Queue {
                 $sec_rest[$proxyid] = 0;
             }
 
-            while($row = DBfetch($result)){
+            while ($row = DBfetch($result)) {
                 $res = calculateItemNextcheck($row['interfaceid'], $row['itemid'], $row['type'], $row['delay'], $row['delay_flex'], $row['lastclock']);
-                if(0 != $row['proxy_hostid']){
+                if (0 != $row['proxy_hostid']) {
                     $res['nextcheck'] = $row['lastclock'] + $res['delay'];
                 }
                 $diff = $now - $res['nextcheck'];
-
 
                 if($diff <= 5)
                     continue;
@@ -162,7 +162,7 @@ class Queue {
                     $sec_rest[$row['proxy_hostid']]++;
             }
 
-            foreach($proxies as $proxyid => $proxy){
+            foreach ($proxies as $proxyid => $proxy) {
                 $data[$proxy['host']] = array(
                     $sec_10[$proxyid],
                     $sec_30[$proxyid],

@@ -1,7 +1,7 @@
 <?php
 
-function apiAuth() {
-
+function apiAuth()
+{
    global $zabbix_user, $zabbix_password;
 
    $auth['method']  = 'user.login';
@@ -11,20 +11,21 @@ function apiAuth() {
 
    if ($token = zbxToken()) {
       dbug("Using auth token: $token from static file\n");
+
       return $token;
-   }
-   else {
+   } else {
       $resp = apiQuery($auth,'auth'); // the 'auth' prevents infinit loop in apiQuery fn
       $auth_resp = print_r($resp,true);
       dbug($auth_resp);
       dbug("auth token stale or not avail in static file. authenticated again and got token: ".$resp['result']);
       zbxToken($resp['result']);
+
       return $resp['result'];
    }
 }
 
-function zbxToken($token='') {
-
+function zbxToken($token='')
+{
    global $zabbix_token_file;
 
    if ($token == '') {
@@ -37,22 +38,18 @@ function zbxToken($token='') {
          $time_diff = $now_ts - $last_mod;
          if ($time_diff > 12800) {
             return false;
-         }
-         else {
+         } else {
             $token = file($zabbix_token_file,FILE_IGNORE_NEW_LINES);
             if ($token[0] == '') {
                return false;
-            }
-            else {
+            } else {
                return $token[0];
             }
          }
-      }
-      else {
+      } else {
          return false;
       }
-   }
-   else {
+   } else {
       // save token to file
       $fh = fopen($zabbix_token_file,'w');
       fwrite($fh,$token);
@@ -60,8 +57,8 @@ function zbxToken($token='') {
    }
 }
 
-function apiQuery($content,$type='') {
-
+function apiQuery($content,$type='')
+{
    global $apiurl, $apiver, $token, $api_reconnect_counter, $api_dynamic_timeout;
 
    if (!isset($api_reconnect_counter)) {
@@ -90,8 +87,7 @@ function apiQuery($content,$type='') {
       }
       $content['jsonrpc'] = $apiver;
       $content = json_encode($content);
-   }
-   else {
+   } else {
       dbug("Error: content passed to apiQuery is not an array!\n");
    }
 
@@ -114,7 +110,7 @@ function apiQuery($content,$type='') {
 
    $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
-   if ( $status != 200 ) {
+   if ($status != 200) {
       dbug("Error: (attempt # $api_reconnect_counter) call to URL $url failed with status $status, response $json_response, curl_error "
       . curl_error($curl) . ", curl_errno " . curl_errno($curl)."\n");
 
@@ -122,9 +118,9 @@ function apiQuery($content,$type='') {
          ++$api_reconnect_counter;
          $api_dynamic_timeout = $api_dynamic_timeout + 5;
          $response = apiQuery($orig_content,$orig_type);
+
          return $response;
-      }
-      else {
+      } else {
          die("Error: call to URL $url failed with status $status, response $json_response, curl_error "
          . curl_error($curl) . ", curl_errno " . curl_errno($curl));
       }
@@ -140,8 +136,8 @@ function apiQuery($content,$type='') {
 
 
 
-function sendResponse($hash) {
-
+function sendResponse($hash)
+{
    global $trans_id;
 
    header('Content-type: application/json');
@@ -154,8 +150,8 @@ function sendResponse($hash) {
    exit;
 }
 
-function sendErrorResponse($code,$msg,$data) {
-
+function sendErrorResponse($code,$msg,$data)
+{
    $d['error']['code'] = $code;
    $d['error']['message'] = $msg;
    $d['error']['data'] = $data;
@@ -163,14 +159,13 @@ function sendErrorResponse($code,$msg,$data) {
 }
 
 
-function getHostGrpIds($type='', $field='', $group_names) {
-
+function getHostGrpIds($type='', $field='', $group_names)
+{
    $t['method'] = 'hostgroup.get';
    $t['params']['output'] = 'extend';
    if ($type == 'search') {
       $t['params']['search'][$field] = $group_names;
-   }
-   else {
+   } else {
       $t['params']['filter']['name'] = $group_names;
    }
 
@@ -189,8 +184,8 @@ function getHostGrpIds($type='', $field='', $group_names) {
 
 }
 
-function getHostsInHostGrp($grpids) {
-
+function getHostsInHostGrp($grpids)
+{
    $t['method'] = 'hostgroup.get';
    $t['params']['output'] = 'extend';
    $t['params']['groupids'] = $grpids;
@@ -219,8 +214,8 @@ function getHostsInHostGrp($grpids) {
 
 }
 
-function getProxies() {
-
+function getProxies()
+{
    $t['method'] = 'proxy.get';
    $t['params']['output'] = 'extend';
 
@@ -228,15 +223,14 @@ function getProxies() {
 
    if (isset($resp['result'])) {
       return $resp['result'];
-   }
-   else {
+   } else {
       return 0;
    }
 }
 
 
-function getHosts($hids='') {
-
+function getHosts($hids='')
+{
    $t['method'] = 'host.get';
    if (is_array($hids)) {
       $t['params']['hostids'] = $hids;
@@ -247,15 +241,14 @@ function getHosts($hids='') {
 
    if (isset($resp['result'])) {
       return $resp['result'];
-   }
-   else {
+   } else {
       return 0;
    }
 }
 
 
-function getHostId($hostname) {
-
+function getHostId($hostname)
+{
    $t['method'] = 'host.get';
    $t['params']['search']['host'] = $hostname;
    $t['params']['startSearch'] = 1;
@@ -279,16 +272,15 @@ function getHostId($hostname) {
       }
       //print "returning first search result entry for hostname: $hostname\n";
       return $resp['result'][0]['hostid'];
-   }
-   else {
+   } else {
       //print "no matches found for: $hostname\n";
       return 0;
    }
 
 }
 
-function hostGroupMassUpdate($hostgroup_id, $hosts_array) {
-
+function hostGroupMassUpdate($hostgroup_id, $hosts_array)
+{
    //print "In mass update fn\n";
 
    $t['method'] = 'hostgroup.massUpdate';
@@ -306,8 +298,8 @@ function hostGroupMassUpdate($hostgroup_id, $hosts_array) {
 
 }
 
-function hostGroupMassRemove($hostgroup_id, $hosts_array) {
-
+function hostGroupMassRemove($hostgroup_id, $hosts_array)
+{
    $t['method'] = 'hostgroup.massRemove';
    $t['params']['groupids'][0] = $hostgroup_id;
    $c=0;
@@ -322,8 +314,8 @@ function hostGroupMassRemove($hostgroup_id, $hosts_array) {
 
 }
 
-function dbug($msg) {
-
+function dbug($msg)
+{
    global $debug, $log;
 
    if (is_array($msg)) {
@@ -340,5 +332,3 @@ function dbug($msg) {
       print $msg;
    }
 }
-
-?>

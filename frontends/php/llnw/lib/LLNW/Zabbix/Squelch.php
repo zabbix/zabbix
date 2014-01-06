@@ -1,8 +1,10 @@
 <?php
 namespace LLNW\Zabbix;
 
-class Squelch {
-    public function add($hostname, $username, $reason, $comment, $start, $end) {
+class Squelch
+{
+    public function add($hostname, $username, $reason, $comment, $start, $end)
+    {
         global $ldb, $logger;
 
         $hostname_param = $hostname;
@@ -83,8 +85,7 @@ class Squelch {
                     $logger->log($sql);
                     $ldb->query($sql);
                 }
-            }
-            else {
+            } else {
                 $sql = "INSERT INTO squelch SET ".
                         "hostname = '$hostname', ".
                         "start = '$start', ".
@@ -120,7 +121,8 @@ class Squelch {
         sendResponse($resp);
     }
 
-    public function clear() {
+    public function clear()
+    {
         // run the possibility of clearing someone elses squelch that may have been submitted for a different reason.
         // but not going to worry about that now.
         // be sure to log these clears as a separate entry in the squlech_log so we can track potential issues.

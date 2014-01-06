@@ -1,16 +1,20 @@
 <?php
 namespace LLNW\Zabbix;
 
-class Hostlist {
-    public function get($name, $output = 'json') {
+class Hostlist
+{
+    public function get($name, $output = 'json')
+    {
         $this->_getpull($name, $output, 'hostlist.get');
     }
 
-    public function pull($name, $output = 'json') {
+    public function pull($name, $output = 'json')
+    {
         $this->_getpull($name, $output, 'hostlist.pull');
     }
 
-    private function _getpull($list_name, $output, $method) {
+    private function _getpull($list_name, $output, $method)
+    {
         global $logger;
 
         $list_name = (isset($list_name) && $list_name != '') ? addslashes($list_name) : '';
@@ -40,8 +44,7 @@ class Hostlist {
         if ($method == 'hostlist.pull') {
             if (!is_writable($list_dir.$list_name)) {
                 $logger->log("Error: hostlist file $list_dir$list_name cannot be truncated");
-            }
-            else {
+            } else {
                 $fh = fopen($list_dir.$list_name, 'w');
                 fclose($fh);
             }
@@ -49,8 +52,7 @@ class Hostlist {
 
         if ($output == 'json') {
             sendResponse($resp);
-        }
-        else {
+        } else {
             foreach ($hostlist as $host) {
                 print $host."\n";
             }

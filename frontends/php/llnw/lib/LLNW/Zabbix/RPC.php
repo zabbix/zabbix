@@ -4,7 +4,8 @@ namespace LLNW\Zabbix;
 
 use JsonRpc\Server;
 
-class RPC extends Server {
+class RPC extends Server
+{
     /**
      * A map of classes that should handle the corresponding API objects requests.
      * NB: method overrides included for non-conventional legacy RPC calls.
@@ -31,7 +32,8 @@ class RPC extends Server {
      */
     protected $input;
 
-    public function __construct($json = '') {
+    public function __construct($json = '')
+    {
         // Setup class and method call
         // Peek into RPC message to lookup predefined class names
         $jsonrpc = \JsonRpc\Base\Rpc::decode($json, $batch);
@@ -60,8 +62,7 @@ class RPC extends Server {
                 $resource = $this::$classMap[$method][0];
                 $action = $this::$classMap[$method][1];
             }
-        }
-        elseif (substr_count($method, '.') == 1) {
+        } elseif (substr_count($method, '.') == 1) {
             // Account for CLASS.METHOD convention
             list($resource, $action) = explode('.', $method);
             if (in_array($resource, $this::$classMap)) {
@@ -79,7 +80,8 @@ class RPC extends Server {
         parent::__construct($methodHandler);
     }
 
-    public function receive() {
+    public function receive()
+    {
         // Use altered jsonrpc method to align with jsonrpc parent class call.
         return parent::receive($this->input);
     }
