@@ -152,6 +152,7 @@ create_macro('{$DNSTEST.SLV.RDDS80.RTT}', 99, undef);
 create_macro('{$DNSTEST.SLV.RDDS.UPD}', 99, undef);
 create_macro('{$DNSTEST.SLV.DNS.NS.UPD}', 99, undef);
 
+create_macro('{$ROLLING.WEEK.STATUS.PAGE.SLV}', '0,5,10,25,50,75,100', undef);
 
 my $result;
 my $m = '{$DNSTEST.DNS.UDP.DELAY}';
