@@ -438,9 +438,8 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 		case ITEM_TYPE_SNMPv2c:
 		case ITEM_TYPE_SNMPv3:
 #ifdef HAVE_SNMP
-			alarm(CONFIG_TIMEOUT);
+			/* SNMP checks use their own timeouts */
 			res = get_value_snmp(item, result);
-			alarm(0);
 #else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SNMP checks was not compiled in."));
 			res = NOTSUPPORTED;
