@@ -4394,6 +4394,8 @@ static void	expression_get_token(const char *expression, char const **start, cha
  *                                                                            *
  * Parameters: expression  - [IN] the source expression                       *
  *             out         - [OUT] the resulting expression                   *
+ *             size        - [IN] the size of out string (ignored if out is   *
+ *                                NULL)                                       *
  *             error       - [OUT] a short error description                  *
  *                                                                            *
  * Return value: SUCCEED - the expression was translated successfully         *
@@ -4405,14 +4407,14 @@ static void	expression_get_token(const char *expression, char const **start, cha
  *           this function and must be freed by the caller.                   *
  *                                                                            *
  ******************************************************************************/
-int	translate_expression(const char *expression, char **out, char **error)
+int	translate_expression(const char *expression, char **out, size_t size, char **error)
 {
 	const char	*__function_name = "translate_expression";
 
 	const char	*start, *end = expression;
 	char		*ptr;
 	int		level = 0, last_op = 0, ret = FAIL;
-	size_t		op_len, offset, size;
+	size_t		op_len, offset;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
