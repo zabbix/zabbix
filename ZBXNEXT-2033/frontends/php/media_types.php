@@ -138,53 +138,46 @@ $_REQUEST['go'] = get_request('go', 'none');
  * Actions
  */
 if (isset($_REQUEST['save'])) {
-	$type = getRequest('type');
+	$mediaType = array(
+		'type' => getRequest('type'),
+		'description' => getRequest('description'),
+		'smtp_email' => getRequest('smtp_email'),
+		'gsm_modem' => getRequest('gsm_modem'),
+		'status' => getRequest('status', MEDIA_TYPE_STATUS_DISABLED)
+	);
 
-	switch ($type) {
+	switch ($mediaType['type']) {
 		case MEDIA_TYPE_REMEDY:
-			$smtpServer = getRequest('remedy_url');
-			$smtpHelo = getRequest('remedy_proxy');
-			$execPath = getRequest('remedy_company');
-			$username = getRequest('username');
-			$password = getRequest('password');
+			$mediaType['smtp_server'] = getRequest('remedy_url');
+			$mediaType['smtp_helo'] = getRequest('remedy_proxy');
+			$mediaType['exec_path'] = getRequest('remedy_company');
+			$mediaType['username'] = getRequest('username');
+			$mediaType['password'] = getRequest('password');
 			break;
 
 		case MEDIA_TYPE_JABBER:
-			$smtpHelo = '';
-			$smtpServer = '';
-			$execPath = '';
-			$username = getRequest('jabber_identifier');
-			$password = getRequest('password');
+			$mediaType['smtp_server'] = '';
+			$mediaType['smtp_helo'] = '';
+			$mediaType['exec_path'] = '';
+			$mediaType['username'] = getRequest('jabber_identifier');
+			$mediaType['password'] = getRequest('password');
 			break;
 
 		case MEDIA_TYPE_EZ_TEXTING:
-			$smtpServer = '';
-			$smtpHelo = '';
-			$execPath = getRequest('msg_txt_limit');
-			$username = getRequest('ez_username');
-			$password = getRequest('password');
+			$mediaType['smtp_server'] = '';
+			$mediaType['smtp_helo'] = '';
+			$mediaType['exec_path'] = getRequest('msg_txt_limit');
+			$mediaType['username'] = getRequest('ez_username');
+			$mediaType['password'] = getRequest('password');
 			break;
 
 		default:
-			$smtpServer = getRequest('smtp_server');
-			$smtpHelo = getRequest('smtp_helo');
-			$execPath = getRequest('exec_path');
-			$username = getRequest('username');
-			$password = '';
+			$mediaType['smtp_server'] = getRequest('smtp_server');
+			$mediaType['smtp_helo'] = getRequest('smtp_helo');
+			$mediaType['exec_path'] = getRequest('exec_path');
+			$mediaType['username'] = getRequest('username');
+			$mediaType['password'] = '';
 	}
-
-	$mediaType = array(
-		'type' => $type,
-		'description' => getRequest('description'),
-		'smtp_server' => $smtpServer,
-		'smtp_helo' => $smtpHelo,
-		'smtp_email' => getRequest('smtp_email'),
-		'exec_path' => $execPath,
-		'gsm_modem' => getRequest('gsm_modem'),
-		'username' => $username,
-		'passwd' => $password,
-		'status' => getRequest('status', MEDIA_TYPE_STATUS_DISABLED)
-	);
 
 	if (is_null($mediaType['passwd'])) {
 		unset($mediaType['passwd']);
@@ -276,12 +269,12 @@ if (!empty($_REQUEST['form'])) {
 
 		$data['type'] = $mediaType['type'];
 		$data['description'] = $mediaType['description'];
-		$data['smtp_server'] = ($data['type'] != MEDIA_TYPE_EMAIL) ? 'localhost' : $mediaType['smtp_server'];
-		$data['smtp_helo'] = ($data['type'] != MEDIA_TYPE_EMAIL) ? 'localhost' : $mediaType['smtp_helo'];
+		$data['smtp_server'] = ($data['type'] == MEDIA_TYPE_EMAIL) ? $mediaType['smtp_server'] : 'localhost';
+		$data['smtp_helo'] = ($data['type'] == MEDIA_TYPE_EMAIL) ? $mediaType['smtp_helo'] : 'localhost';
 		$data['smtp_email'] = $mediaType['smtp_email'] ? $mediaType['smtp_email'] : 'zabbix@localhost';
-		$data['remedy_url'] = ($data['type'] != MEDIA_TYPE_REMEDY) ? 'localhost' : $mediaType['smtp_server'];
-		$data['remedy_proxy'] = ($data['type'] != MEDIA_TYPE_REMEDY) ? '' : $mediaType['smtp_helo'];
-		$data['remedy_company'] = ($data['type'] != MEDIA_TYPE_REMEDY) ? '' : $mediaType['exec_path'];
+		$data['remedy_url'] = ($data['type'] == MEDIA_TYPE_REMEDY) ? $mediaType['smtp_server'] : 'localhost';
+		$data['remedy_proxy'] = ($data['type'] == MEDIA_TYPE_REMEDY) ? $mediaType['smtp_helo'] : '';
+		$data['remedy_company'] = ($data['type'] == MEDIA_TYPE_REMEDY) ? $mediaType['exec_path'] : '';
 		$data['exec_path'] = ($data['type'] == MEDIA_TYPE_EZ_TEXTING) ? '' : $mediaType['exec_path'];
 		$data['msg_txt_limit'] = $mediaType['exec_path'];
 		$data['gsm_modem'] = $mediaType['gsm_modem'] ? $mediaType['gsm_modem'] : '/dev/ttyS0';

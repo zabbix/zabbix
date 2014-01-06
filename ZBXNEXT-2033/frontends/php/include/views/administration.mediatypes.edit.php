@@ -47,14 +47,11 @@ $cmbType->addItemsInGroup(_('Commercial'), array(
 	MEDIA_TYPE_REMEDY => _('Remedy Service')
 ));
 
-$cmbTypeRow = array($cmbType);
-
 $ezTextingLink = new CLink('https://app.eztexting.com', 'https://app.eztexting.com/', null, null, 'nosid');
 $ezTextingLink->setAttribute('id', 'ezTextingLink');
 $ezTextingLink->setTarget('_blank');
-$cmbTypeRow[] = $ezTextingLink;
 
-$mediaTypeFormList->addRow(_('Type'), $cmbTypeRow);
+$mediaTypeFormList->addRow(_('Type'), array($cmbType, $ezTextingLink));
 
 // SMTP
 $mediaTypeFormList->addRow(_('SMTP server'),

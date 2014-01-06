@@ -426,7 +426,6 @@ class CMediatype extends CZBXAPI {
 			'values' => array(MEDIA_TYPE_STATUS_ACTIVE, MEDIA_TYPE_STATUS_DISABLED)
 		));
 
-
 		$dbMediaTypes = API::getApi()->select($this->tableName(), array(
 			'mediatypeids' => $mediaTypeIds,
 			'output' => array('mediatypeid', 'type', 'description', 'status'),
@@ -438,7 +437,7 @@ class CMediatype extends CZBXAPI {
 			if (isset($mediaType['description'])
 					&& $dbMediaTypes[$mediaType['mediatypeid']]['description'] != $mediaType['description']) {
 				foreach ($dbMediaTypes as $dbMediaType) {
-					if ($dbMediaType['description'] == $mediaType['description']) {
+					if ($dbMediaType['description'] === $mediaType['description']) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 							'Media type "%1$s" already exists.',
 							$mediaType['description']
@@ -501,7 +500,6 @@ class CMediatype extends CZBXAPI {
 			MEDIA_TYPE_JABBER => array('username', 'passwd'),
 			MEDIA_TYPE_EZ_TEXTING => array('exec_path', 'username', 'passwd'),
 			MEDIA_TYPE_REMEDY => array('smtp_server', 'exec_path', 'username', 'passwd')
-
 		);
 
 		foreach ($requiredFieldsByType[$mediaType['type']] as $field) {
