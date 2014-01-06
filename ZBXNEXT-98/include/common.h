@@ -729,6 +729,7 @@ while (0)
 
 extern const char	*progname;
 extern const char	title_message[];
+extern const char	syslog_app_name[];
 extern const char	usage_message[];
 extern const char	*help_message[];
 
@@ -860,10 +861,6 @@ u_char	zbx_hex2num(char c);
 size_t	zbx_binary2hex(const u_char *input, size_t ilen, char **output, size_t *olen);
 size_t	zbx_hex2binary(char *io);
 void	zbx_hex2octal(const char *input, char **output, int *olen);
-#ifdef HAVE_POSTGRESQL
-size_t	zbx_pg_escape_bytea(const u_char *input, size_t ilen, char **output, size_t *olen);
-size_t	zbx_pg_unescape_bytea(u_char *io);
-#endif
 size_t	zbx_get_next_field(const char **line, char **output, size_t *olen, char separator);
 int	str_in_list(const char *list, const char *value, char delimiter);
 char	*str_linefeed(const char *src, size_t maxline, const char *delim);
