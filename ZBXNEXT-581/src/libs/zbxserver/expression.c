@@ -4435,7 +4435,7 @@ int	translate_expression(const char *expression, char **out, size_t size, char *
 	const char	*start, *end = expression;
 	char		*ptr;
 	int		level = 0, last_op = 0, ret = FAIL;
-	size_t		op_len, offset;
+	size_t		token_len, offset;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -4461,9 +4461,9 @@ int	translate_expression(const char *expression, char **out, size_t size, char *
 
 		expression_get_token(end, &start, &end);
 
-		op_len = end - start;
+		token_len = end - start;
 
-		if (3 == op_len && 0 == zbx_strncasecmp(start, "AND", op_len))
+		if (3 == token_len && 0 == zbx_strncasecmp(start, "AND", token_len))
 		{
 			/* check if the previous op was a logical value */
 			if (ZBX_OPCODE_CLASS_VALUE != last_op)
@@ -4477,7 +4477,7 @@ int	translate_expression(const char *expression, char **out, size_t size, char *
 			*ptr++ = ZBX_OPCODE_AND;
 			last_op = ZBX_OPCODE_CLASS_OP_BINARY;
 		}
-		else if (2 == op_len && 0 == zbx_strncasecmp(start, "OR", op_len))
+		else if (2 == token_len && 0 == zbx_strncasecmp(start, "OR", token_len))
 		{
 			/* check if the previous op was a logical value */
 			if (ZBX_OPCODE_CLASS_VALUE != last_op)
@@ -4491,7 +4491,7 @@ int	translate_expression(const char *expression, char **out, size_t size, char *
 			*ptr++ = ZBX_OPCODE_OR;
 			last_op = ZBX_OPCODE_CLASS_OP_BINARY;
 		}
-		else if (1 == op_len && '(' == *start)
+		else if (1 == token_len && '(' == *start)
 		{
 			/* check if the previous op was a logical value */
 			if (ZBX_OPCODE_CLASS_VALUE == last_op)
@@ -4507,7 +4507,7 @@ int	translate_expression(const char *expression, char **out, size_t size, char *
 			*ptr++ = ZBX_OPCODE_OPEN;
 			last_op = ZBX_OPCODE_CLASS_NONE;
 		}
-		else if (1 == op_len && ')' == *start)
+		else if (1 == token_len && ')' == *start)
 		{
 			/* check if the previous op was a logical value */
 			if (ZBX_OPCODE_CLASS_VALUE != last_op)
@@ -4534,8 +4534,6 @@ int	translate_expression(const char *expression, char **out, size_t size, char *
 		}
 		else
 		{
-			size_t	value_len;
-
 			/* check if the previous op was a logical value */
 			if (ZBX_OPCODE_CLASS_VALUE == last_op)
 			{
@@ -4545,20 +4543,18 @@ int	translate_expression(const char *expression, char **out, size_t size, char *
 				goto out;
 			}
 
-			value_len = end - start;
-
 			/* reserve space for the value */
-			if (offset + value_len >= size)
+			if (offset + token_len >= size)
 			{
-				while (offset + value_len >= size)
+				while (offset + token_len >= size)
 					size += (size >> 1);
 
 				*out = zbx_realloc(*out, size);
 				ptr = *out + offset;
 			}
 
-			memcpy(ptr, start, value_len);
-			ptr += value_len;
+			memcpy(ptr, start, token_len);
+			ptr += token_len;
 
 			last_op = ZBX_OPCODE_CLASS_VALUE;
 		}
