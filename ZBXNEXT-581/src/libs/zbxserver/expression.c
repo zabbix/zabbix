@@ -4432,7 +4432,7 @@ int	translate_expression(const char *expression, char **out, char **error)
 		if (offset + 1 >= size)
 		{
 			size += (size >> 1);
-			*out = realloc(*out, size);
+			*out = zbx_realloc(*out, size);
 			ptr = *out + offset;
 		}
 
@@ -4530,7 +4530,7 @@ int	translate_expression(const char *expression, char **out, char **error)
 				while (offset + value_len >= size)
 					size += (size >> 1);
 
-				*out = realloc(*out, size);
+				*out = zbx_realloc(*out, size);
 				ptr = *out + offset;
 			}
 
