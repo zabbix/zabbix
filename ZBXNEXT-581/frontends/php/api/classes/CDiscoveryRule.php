@@ -334,7 +334,15 @@ class CDiscoveryRule extends CItemGeneral {
 	 */
 	public function update($items) {
 		$items = zbx_toArray($items);
-		$this->checkInput($items, true);
+
+		$dbItems = $this->get(array(
+			'output' => array('itemid', 'evaltype', 'name', 'formula'),
+			'selectConditions' => array('macro', 'value', 'formulaid'),
+			'itemids' => zbx_objectValues($items, 'itemid'),
+			'preservekeys' => true
+		));
+
+		$this->checkInput($items, true, $dbItems);
 		$this->updateReal($items);
 		$this->inherit($items);
 
@@ -757,8 +765,9 @@ class CDiscoveryRule extends CItemGeneral {
 	 *
 	 * @param array $items passed by reference
 	 * @param bool  $update
+	 * @param array $dbItems
 	 */
-	protected function checkInput(array &$items, $update = false) {
+	protected function checkInput(array &$items, $update = false, array $dbItems = array()) {
 		// add the values that cannot be changed, but are required for further processing
 		foreach ($items as &$item) {
 			$item['flags'] = ZBX_FLAG_DISCOVERY_RULE;
@@ -767,6 +776,23 @@ class CDiscoveryRule extends CItemGeneral {
 		unset($item);
 
 		parent::checkInput($items, $update);
+
+		$validateItems = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $dbItems, array('evaltype', 'name'));
+
+		$conditionValidator = new CConditionValidator(array(
+			'messageInvalidFormula' => _('Incorrect custom expression "%2$s" for discovery rule "%1$s": %3$s.'),
+			'messageMissingCondition' => _('Condition "%2$s" used in formula "%3$s" for discovery rule "%1$s" is not defined.'),
+			'messageUnusedCondition' => _('Condition "%2$s" is not used in formula "%3$s" for discovery rule "%1$s".'),
+		));
+		foreach ($validateItems as $item) {
+			$dbItem = ($update) ? $dbItems[$item['itemid']] : array();
+
+			// validate custom formula and conditions
+			if ($item['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+				$conditionValidator->setObjectName($item['name']);
+				$this->checkPartialValidator($item, $conditionValidator, $dbItem);
+			}
+		}
 	}
 
 	protected function checkSpecificFields(array $item) {
