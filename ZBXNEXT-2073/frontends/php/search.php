@@ -35,26 +35,26 @@ $fields = array(
 	'type'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		null),
 	'search'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
 	// ajax
-	'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	null,			null),
-	'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
-	'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		null)
+	'widgetName' =>	array(T_ZBX_STR, O_OPT, P_ACT,	null,			null),
+	'widgetState'=>	array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,		null)
 );
-
 check_fields($fields);
 
-// ACTION /////////////////////////////////////////////////////////////////////////////
-if (isset($_REQUEST['favobj'])) {
-	if ('hat' == $_REQUEST['favobj']) {
-		CProfile::update('web.search.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
-	}
+/*
+ * Ajax
+ */
+if (hasRequest('widgetName')) {
+	CProfile::update('web.search.hats.'.getRequest('widgetName').'.state', getRequest('widgetState'), PROFILE_TYPE_INT);
 }
 
-if ((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])) {
+if (in_array($page['type'], array(PAGE_TYPE_JS, PAGE_TYPE_HTML_BLOCK))) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit();
+	exit;
 }
 
-
+/*
+ * Display
+ */
 $admin = in_array(CWebUser::$data['type'], array(
 	USER_TYPE_ZABBIX_ADMIN,
 	USER_TYPE_SUPER_ADMIN

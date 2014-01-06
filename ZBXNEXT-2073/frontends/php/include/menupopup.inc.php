@@ -304,10 +304,10 @@ function getMenuPopupMap($hostId, array $scripts = null, array $gotos = null, ar
 /**
  * Prepare data for refresh time menu popup.
  *
- * @param string $widgetName
- * @param string $currentRate
- * @param bool   $multiplier
- * @param array  $params
+ * @param string $widgetName		widget name
+ * @param string $currentRate		current rate value
+ * @param bool   $multiplier		multiplier or time mode
+ * @param array  $params			url parameters (optional)
  *
  * @return array
  */
@@ -374,7 +374,7 @@ function getMenuPopupTrigger(array $trigger, array $items = null, array $acknowl
 		'url' => resolveTriggerUrl($trigger)
 	);
 
-	if ((CWebUser::$data['type'] == USER_TYPE_ZABBIX_ADMIN || CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN)
+	if (in_array(CWebUser::$data['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN))
 			&& $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 		$host = reset($trigger['hosts']);
 
@@ -392,7 +392,7 @@ function getMenuPopupTrigger(array $trigger, array $items = null, array $acknowl
  *
  * @param string $itemId		item id
  * @param string $itemName		item name
- * @param array  $triggers		triggers as id => name
+ * @param array  $triggers		triggers as id => name (optional)
  *
  * @return array
  */
@@ -407,10 +407,6 @@ function getMenuPopupTriggerLog($itemId, $itemName, $triggers) {
 
 /**
  * Prepare data for trigger macro menu popup.
- *
- * @param string $serviceId
- * @param string $name
- * @param bool   $deletable
  *
  * @return array
  */

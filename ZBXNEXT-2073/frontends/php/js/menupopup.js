@@ -21,8 +21,8 @@
 /**
  * Get menu popup favourite graphs section data.
  *
- * @param array options['graphs']			Graphs as id => label
- * @param array options['simpleGraphs']		Simple graphs as id => label
+ * @param array options['graphs']			graphs as id => label (optional)
+ * @param array options['simpleGraphs']		simple graphs as id => label (optional)
  *
  * @return array
  */
@@ -56,7 +56,7 @@ function getMenuPopupFavouriteGraphs(options) {
 /**
  * Get menu popup favourite maps section data.
  *
- * @param array  options['maps']	Maps as id => label
+ * @param array options['maps']		maps as id => label
  *
  * @return array
  */
@@ -73,8 +73,8 @@ function getMenuPopupFavouriteMaps(options) {
 /**
  * Get menu popup favourite screens section data.
  *
- * @param array options['screens']		Screens as id => label
- * @param array options['slideshows']	Slideshows as id => label
+ * @param array options['screens']		screens as id => label (optional)
+ * @param array options['slideshows']	slideshows as id => label (optional)
  *
  * @return array
  */
@@ -369,10 +369,10 @@ function getMenuPopupMap(options) {
 /**
  * Get menu popup refresh section data.
  *
- * @param string options['widgetName']
- * @param string options['currentRate']
- * @param bool   options['multiplier']
- * @param array  options['params']
+ * @param string options['widgetName']		widget name
+ * @param string options['currentRate']		current rate value
+ * @param bool   options['multiplier']		multiplier or time mode
+ * @param array  options['params']			url parameters (optional)
  *
  * @return array
  */
@@ -401,9 +401,9 @@ function getMenuPopupRefresh(options) {
 		type: 'refresh',
 		title: options.multiplier ? t('Refresh time multiplier') : t('Refresh time'),
 		data: {
-			widgetName: options['widgetName'],
-			currentRate: options['currentRate'],
-			params: options['params'],
+			widgetName: options.widgetName,
+			currentRate: options.currentRate,
+			params: (typeof options.params === 'undefined' || options.params.length == 0) ? {} : options.params,
 			intervals: intervals
 		}
 	}];
@@ -414,7 +414,7 @@ function getMenuPopupRefresh(options) {
  *
  * @param string options['serviceid']		service id
  * @param string options['name']			service name
- * @param bool   options['deletable']		service has dependencies
+ * @param bool   options['deletable']		service has dependencies and cannot be deleted
  *
  * @return array
  */
@@ -529,9 +529,9 @@ function getMenuPopupTrigger(options) {
 /**
  * Get menu popup trigger log section data.
  *
- * @param string options['itemid']		item id
- * @param string options['itemName']	item name
- * @param array  options['triggers']	triggers (optional)
+ * @param string options['itemid']		Item id
+ * @param string options['itemName']	Item name
+ * @param array  options['triggers']	Triggers (optional)
  *
  * @return array
  */
@@ -540,7 +540,7 @@ function getMenuPopupTriggerLog(options) {
 		type: 'triggerLog',
 		title: sprintf(t('Item "%1$s"'), options.itemName),
 		itemId: options.itemid,
-		triggers: options.triggers
+		triggers: (typeof options.triggers === 'undefined') ? null : options.triggers
 	}];
 }
 
@@ -733,8 +733,8 @@ jQuery(function($) {
 	/**
 	 * Create favourite section in menu popup.
 	 *
-	 * @param object menuPopup
-	 * @param object section
+	 * @param object menuPopup		menu popup
+	 * @param object section		menu section
 	 */
 	function createFavouriteSection(menuPopup, section) {
 		var menu = $('<ul>', {'class': 'menu'});
@@ -790,8 +790,8 @@ jQuery(function($) {
 	/**
 	 * Create refresh section in menu popup.
 	 *
-	 * @param object menuPopup
-	 * @param object section
+	 * @param object menuPopup		menu popup
+	 * @param object section		menu section
 	 */
 	function createRefreshSection(menuPopup, section) {
 		var menu = $('<ul>', {'class': 'menu'});
@@ -832,8 +832,8 @@ jQuery(function($) {
 	/**
 	 * Create service configuration section in menu popup.
 	 *
-	 * @param object menuPopup
-	 * @param object section
+	 * @param object menuPopup		menu popup
+	 * @param object section		menu section
 	 */
 	function createServiceConfigurationSection(menuPopup, section) {
 		var menu = $('<ul>', {'class': 'menu'});
@@ -881,8 +881,8 @@ jQuery(function($) {
 	/**
 	 * Create script section in menu popup.
 	 *
-	 * @param object menuPopup
-	 * @param object section
+	 * @param object menuPopup		menu popup
+	 * @param object section		menu section
 	 */
 	function createScriptSection(menuPopup, section) {
 		if (objectSize(section.data) > 0) {
@@ -921,8 +921,8 @@ jQuery(function($) {
 	/**
 	 * Create trigger log section in menu popup.
 	 *
-	 * @param object menuPopup
-	 * @param object section
+	 * @param object menuPopup		menu popup
+	 * @param object section		menu section
 	 */
 	function createTriggerLogSection(menuPopup, section) {
 		var menu = $('<ul>', {'class': 'menu'});
@@ -968,8 +968,8 @@ jQuery(function($) {
 	/**
 	 * Create trigger macro section in menu popup.
 	 *
-	 * @param object menuPopup
-	 * @param object section
+	 * @param object menuPopup		menu popup
+	 * @param object section		menu section
 	 */
 	function createTriggerMacroSection(menuPopup, section) {
 		var menu = $('<ul>', {'class': 'menu'});
@@ -1001,8 +1001,8 @@ jQuery(function($) {
 	/**
 	 * Create link section in menu popup.
 	 *
-	 * @param object menuPopup
-	 * @param object section
+	 * @param object menuPopup		menu popup
+	 * @param object section		menu section
 	 */
 	function createLinkSection(menuPopup, section) {
 		var menu = $('<ul>', {'class': 'menu'});
@@ -1017,9 +1017,9 @@ jQuery(function($) {
 	/**
 	 * Append section to menu popup.
 	 *
-	 * @param object menuPopup
-	 * @param object section
-	 * @param string title
+	 * @param object menuPopup		menu popup
+	 * @param object section		menu section
+	 * @param string title			menu title
 	 */
 	function appendSection(menuPopup, section, title) {
 		menuPopup.append(
@@ -1031,8 +1031,8 @@ jQuery(function($) {
 	/**
 	 * Closing menu after delay.
 	 *
-	 * @param object menuPopup
-	 * @param int    delay
+	 * @param object menuPopup		menu popup
+	 * @param int    delay			delay to close menu popup
 	 */
 	function closeInactiveMenuPopup(menuPopup, delay) {
 		clearTimeout(window.menuPopupTimeoutHandler);
