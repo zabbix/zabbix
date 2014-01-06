@@ -4392,8 +4392,11 @@ static void	expression_get_token(const char *expression, char const **start, cha
 					pend++;
 					goto out;
 				}
+				if (0 == isdigit(*pend))
+					goto out;
+				break;
 			case ZBX_OPCODE_CLASS_OP_BINARY:
-				if (0 == isalnum(*pend))
+				if (0 == isalpha(*pend))
 					goto out;
 		}
 		pend++;
@@ -4574,8 +4577,6 @@ int	translate_expression(const char *expression, char **out, size_t size, char *
 out:
 	if (SUCCEED != ret)
 		*error = zbx_dsprintf(*error, "invalid formula expression");
-
-	zabbix_log(LOG_LEVEL_DEBUG, "WDN: size=%d (%s)", size, *out);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
