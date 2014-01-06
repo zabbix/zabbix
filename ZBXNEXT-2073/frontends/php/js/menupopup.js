@@ -784,8 +784,7 @@ jQuery(function($) {
 		menu.append(removeButton.append(menuRemove));
 		menu.append(removeAllButton);
 
-		menuPopup.append($('<div>', {'class': 'title', text: section.title}));
-		menuPopup.append(menu);
+		appendSection(menuPopup, menu, section.title);
 	}
 
 	/**
@@ -827,8 +826,7 @@ jQuery(function($) {
 			}));
 		});
 
-		menuPopup.append($('<div>', {'class': 'title', text: section.title}));
-		menuPopup.append(menu);
+		appendSection(menuPopup, menu, section.title);
 	}
 
 	/**
@@ -877,8 +875,7 @@ jQuery(function($) {
 			}));
 		}
 
-		menuPopup.append($('<div>', {'class': 'title', text: section.title}));
-		menuPopup.append(menu);
+		appendSection(menuPopup, menu, section.title);
 	}
 
 	/**
@@ -917,8 +914,7 @@ jQuery(function($) {
 				}
 			});
 
-			menuPopup.append($('<div>', {'class': 'title', text: section.title}));
-			menuPopup.append(menu);
+			appendSection(menuPopup, menu, section.title);
 		}
 	}
 
@@ -966,8 +962,7 @@ jQuery(function($) {
 			menu.append(editTriggerButton.append(menuTriggers));
 		}
 
-		menuPopup.append($('<div>', {'class': 'title', text: section.title}));
-		menuPopup.append(menu);
+		appendSection(menuPopup, menu, section.title);
 	}
 
 	/**
@@ -1000,8 +995,7 @@ jQuery(function($) {
 			}));
 		});
 
-		menuPopup.append($('<div>', {'class': 'title', text: section.title}));
-		menuPopup.append(menu);
+		appendSection(menuPopup, menu, section.title);
 	}
 
 	/**
@@ -1017,8 +1011,21 @@ jQuery(function($) {
 			menu.append(createMenuItem(item.label, item.url));
 		});
 
-		menuPopup.append($('<div>', {'class': 'title', text: section.title}));
-		menuPopup.append(menu);
+		appendSection(menuPopup, menu, section.title);
+	}
+
+	/**
+	 * Append section to menu popup.
+	 *
+	 * @param object menuPopup
+	 * @param object section
+	 * @param string title
+	 */
+	function appendSection(menuPopup, section, title) {
+		menuPopup.append(
+			$('<div>', {'class': 'title'}).append($('<div>', {'class': 'text', text: title})),
+			section
+		);
 	}
 
 	/**
