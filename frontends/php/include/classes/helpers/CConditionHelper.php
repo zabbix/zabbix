@@ -22,7 +22,7 @@
 /**
  * A class for creating conditions.
  */
-class CFormulaHelper {
+class CConditionHelper {
 
 	/**
 	 * Generate a formula from conditions $conditions with respect to evaluation type $evalType.
@@ -124,7 +124,7 @@ class CFormulaHelper {
 	 *
 	 * @return string
 	 */
-	public static function replaceIds($formula, array $ids) {
+	public static function replaceNumericIds($formula, array $ids) {
 		foreach ($ids as $id => $formulaId) {
 			$formula = str_replace('{'.$id.'}', $formulaId, $formula);
 		}
@@ -140,7 +140,7 @@ class CFormulaHelper {
 	 *
 	 * @return string
 	 */
-	public static function replaceFormulaIds($formula, array $ids) {
+	public static function replaceLetterIds($formula, array $ids) {
 		foreach ($ids as $formulaId => $id) {
 			$formula = str_replace($formulaId, '{'.$id.'}', $formula);
 		}
