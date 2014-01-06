@@ -426,15 +426,19 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 	{
 		logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, find_data.name);
 
-		if (-1 == zbx_stat(logfile_candidate, &file_buf) || !S_ISREG(file_buf.st_mode))
+		if (0 == zbx_stat(logfile_candidate, &file_buf))
 		{
+			if (S_ISREG(file_buf.st_mode) &&
+					*mtime <= file_buf.st_mtime &&
+					0 == regexec(&re, find_data.name, (size_t)0, NULL, 0))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
+				add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, find_data.name,
+						(int)file_buf.st_mtime);
+			}
+		}
+		else
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot process or read entry '%s'", logfile_candidate);
-		}
-		else if (0 == regexec(&re, find_data.name, (size_t)0, NULL, 0))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
-			add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, find_data.name, (int)file_buf.st_mtime);
-		}
 
 		zbx_free(logfile_candidate);
 
@@ -454,15 +458,19 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 	{
 		logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, d_ent->d_name);
 
-		if (-1 == zbx_stat(logfile_candidate, &file_buf) || !S_ISREG(file_buf.st_mode))
+		if (0 == zbx_stat(logfile_candidate, &file_buf))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot process or read entry '%s'", logfile_candidate);
+			if (S_ISREG(file_buf.st_mode) &&
+					*mtime <= file_buf.st_mtime &&
+					0 == regexec(&re, d_ent->d_name, (size_t)0, NULL, 0))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
+				add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, d_ent->d_name,
+						(int)file_buf.st_mtime);
+			}
 		}
-		else if (0 == regexec(&re, d_ent->d_name, (size_t)0, NULL, 0))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
-			add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, d_ent->d_name, (int)file_buf.st_mtime);
-		}
+		else
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot process entry '%s'", logfile_candidate);
 
 		zbx_free(logfile_candidate);
 	}
