@@ -110,10 +110,9 @@ static int	DBlld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zb
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*name_esc;
-	int		res = SUCCEED;
+	int		res = SUCCEED, i;
 	zbx_lld_graph_t	*graph;
 	ZBX_GRAPH_ITEMS	*gitem;
-	size_t		i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -280,7 +279,7 @@ static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, d
 		unsigned char ymin_type, unsigned char ymax_type, zbx_uint64_t parent_graphid,
 		const char *name_proto_esc)
 {
-	int		i, new_graphs = 0, new_graphs_items = 0;
+	int		i, j, new_graphs = 0, new_graphs_items = 0;
 	zbx_lld_graph_t	*graph;
 	zbx_uint64_t	graphid = 0, graphdiscoveryid = 0, gitemid = 0;
 	char		*sql1 = NULL, *sql2 = NULL, *sql3 = NULL, *sql4 = NULL,
@@ -288,8 +287,7 @@ static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, d
 	size_t		sql1_alloc = 8 * ZBX_KIBIBYTE, sql1_offset = 0,
 			sql2_alloc = 2 * ZBX_KIBIBYTE, sql2_offset = 0,
 			sql3_alloc = 2 * ZBX_KIBIBYTE, sql3_offset = 0,
-			sql4_alloc = 8 * ZBX_KIBIBYTE, sql4_offset = 0,
-			j;
+			sql4_alloc = 8 * ZBX_KIBIBYTE, sql4_offset = 0;
 
 	const char	*ins_graphs_sql =
 			"insert into graphs"

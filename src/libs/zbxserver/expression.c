@@ -24,7 +24,6 @@
 #include "log.h"
 #include "zbxalgo.h"
 #include "valuecache.h"
-#include "string.h"
 
 /* The following definitions are used to identify the request field */
 /* for various value getters grouped by their scope:                */
@@ -4370,7 +4369,7 @@ static void	expression_get_token(const char *expression, char const **start, cha
 
 	pend = pstart;
 
-	while('\0' != *pend && 0 == delimiter)
+	while ('\0' != *pend && 0 == delimiter)
 	{
 		if (0 == isalnum(*pend) && '_' != *pend && '{' != *pend && '}' != *pend)
 		{
@@ -4413,7 +4412,8 @@ int	translate_expression(const char *expression, char **out, char **error)
 
 	const char	*start, *end = expression;
 	char		*ptr;
-	int		op_len, offset, level = 0, last_op = 0, size, ret = FAIL;
+	int		level = 0, last_op = 0, ret = FAIL;
+	size_t		op_len, offset, size;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -4512,7 +4512,7 @@ int	translate_expression(const char *expression, char **out, char **error)
 		}
 		else
 		{
-			int	value_len;
+			size_t	value_len;
 
 			/* check if the previous op was a logical value */
 			if (ZBX_OPCODE_CLASS_VALUE == last_op)
