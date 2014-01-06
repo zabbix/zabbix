@@ -166,7 +166,7 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, int ev
 		zbx_vector_ptr_sort(&filter->conditions, lld_condition_compare_by_macro);
 
 	if (CONDITION_EVAL_TYPE_EXPRESSION == evaltype &&
-			FAIL == translate_expression(formula, &filter->expression, error))
+			FAIL == translate_expression(formula, &filter->expression, 0, error))
 	{
 		return FAIL;
 	}
