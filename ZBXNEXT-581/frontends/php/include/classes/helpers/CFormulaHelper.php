@@ -112,15 +112,35 @@ class CFormulaHelper {
 	}
 
 	/**
-	 * Replace IDs in the formula using the ID pairs given in $ids.
+	 * Replace numeric IDs with formula IDs using the pairs given in $ids.
 	 *
-	 * @param string $formula
-	 * @param array $ids
+	 * @param string 	$formula
+	 * @param array 	$ids		array of numeric ID - formula ID pairs
 	 *
 	 * @return string
 	 */
 	public static function replaceIds($formula, array $ids) {
-		return strtr($formula, $ids);
+		foreach ($ids as $id => $formulaId) {
+			$formula = str_replace('{'.$id.'}', $formulaId, $formula);
+		}
+
+		return $formula;
+	}
+
+	/**
+	 * Replace formula IDs with numeric IDs using the pairs given in $ids.
+	 *
+	 * @param string 	$formula
+	 * @param array 	$ids		array of formula ID - numeric ID pairs
+	 *
+	 * @return string
+	 */
+	public static function replaceFormulaIds($formula, array $ids) {
+		foreach ($ids as $formulaId => $id) {
+			$formula = str_replace($formulaId, '{'.$id.'}', $formula);
+		}
+
+		return $formula;
 	}
 
 }
