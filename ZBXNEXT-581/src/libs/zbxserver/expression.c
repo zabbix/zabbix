@@ -4360,27 +4360,45 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 static void	expression_get_token(const char *expression, char const **start, char const **end)
 {
 	const char	*pstart = expression, *pend;
-	int		delimiter = 0;
+	int		token_class;
 
 	/* strip leading whitespace */
 	while (' ' == *pstart)
 		pstart++;
 
-	pend = pstart;
+	if ('\0' == (pend = pstart))
+		goto out;
 
-	while ('\0' != *pend && 0 == delimiter)
+	/* get the token class */
+	if ('{' == *pend)
+		token_class = ZBX_OPCODE_CLASS_VALUE;
+	else if (0 != isalnum(*pend))
+		token_class = ZBX_OPCODE_CLASS_OP_BINARY;
+	else
+		token_class = ZBX_OPCODE_CLASS_NONE;
+
+	pend++;
+
+	/* find the next token */
+	while('\0' != *pend)
 	{
-		if (0 == isalnum(*pend) && '_' != *pend && '{' != *pend && '}' != *pend)
+		switch (token_class)
 		{
-			if (pstart != pend)
-				break;
-
-			delimiter = 1;
+			case ZBX_OPCODE_CLASS_NONE:
+				goto out;
+			case ZBX_OPCODE_CLASS_VALUE:
+				if ('}' == *pend)
+				{
+					pend++;
+					goto out;
+				}
+			case ZBX_OPCODE_CLASS_OP_BINARY:
+				if (0 == isalnum(*pend))
+					goto out;
 		}
-
 		pend++;
 	}
-
+out:
 	*start = pstart;
 	*end = pend;
 }
