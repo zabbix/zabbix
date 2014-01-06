@@ -46,14 +46,14 @@ lld_filter_t;
 
 /******************************************************************************
  *                                                                            *
- * Function: condition_free                                                   *
+ * Function: lld_condition_free                                               *
  *                                                                            *
  * Purpose: release resources allocated by filter condition                   *
  *                                                                            *
  * Parameters: condition  - [IN] the filter condition                         *
  *                                                                            *
  ******************************************************************************/
-static void	condition_free(lld_condition_t *condition)
+static void	lld_condition_free(lld_condition_t *condition)
 {
 	zbx_regexp_clean_expressions(&condition->regexps);
 	zbx_vector_ptr_destroy(&condition->regexps);
@@ -65,7 +65,7 @@ static void	condition_free(lld_condition_t *condition)
 
 /******************************************************************************
  *                                                                            *
- * Function: condition_compare_by_macro                                       *
+ * Function: lld_condition_compare_by_macro                                   *
  *                                                                            *
  * Purpose: compare two filter conditions by their macros                     *
  *                                                                            *
@@ -73,7 +73,7 @@ static void	condition_free(lld_condition_t *condition)
  *             item2  - [IN] the second filter condition                      *
  *                                                                            *
  ******************************************************************************/
-static int	condition_compare_by_macro(const void *item1, const void *item2)
+static int	lld_condition_compare_by_macro(const void *item1, const void *item2)
 {
 	lld_condition_t	*condition1 = *(lld_condition_t**)item1;
 	lld_condition_t	*condition2 = *(lld_condition_t**)item2;
@@ -94,7 +94,7 @@ static void	lld_filter_init(lld_filter_t *filter)
 {
 	zbx_vector_ptr_create(&filter->conditions);
 	filter->expression = NULL;
-	filter->evaltype = 0;
+	filter->evaltype = CONDITION_EVAL_TYPE_AND_OR;
 }
 
 /******************************************************************************
@@ -109,7 +109,7 @@ static void	lld_filter_init(lld_filter_t *filter)
 static void	lld_filter_clean(lld_filter_t *filter)
 {
 	zbx_free(filter->expression);
-	zbx_vector_ptr_clean(&filter->conditions, (zbx_mem_free_func_t)condition_free);
+	zbx_vector_ptr_clean(&filter->conditions, (zbx_mem_free_func_t)lld_condition_free);
 	zbx_vector_ptr_destroy(&filter->conditions);
 }
 
@@ -151,26 +151,24 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, int ev
 		condition = zbx_malloc(NULL, sizeof(lld_condition_t));
 		ZBX_STR2UINT64(condition->id, row[0]);
 		condition->macro = zbx_strdup(NULL, row[1]);
+		condition->regexp = zbx_strdup(NULL, row[2]);
 
 		zbx_vector_ptr_create(&condition->regexps);
 
-		condition->regexp = zbx_strdup(NULL, row[2]);
-
-		if ('@' == *row[2])
-			DCget_expressions_by_name(&condition->regexps, row[2] + 1);
+		if ('@' == *condition->regexp)
+			DCget_expressions_by_name(&condition->regexps, condition->regexp + 1);
 
 		zbx_vector_ptr_append(&filter->conditions, condition);
 	}
-
 	DBfree_result(result);
 
 	if (CONDITION_EVAL_TYPE_AND_OR == evaltype)
-			zbx_vector_ptr_sort(&filter->conditions, condition_compare_by_macro);
+		zbx_vector_ptr_sort(&filter->conditions, lld_condition_compare_by_macro);
 
 	if (CONDITION_EVAL_TYPE_EXPRESSION == evaltype &&
 			FAIL == translate_expression(formula, &filter->expression, error))
 	{
-			return FAIL;
+		return FAIL;
 	}
 
 	filter->evaltype = evaltype;
@@ -195,21 +193,18 @@ static int	filter_evaluate_and_or(lld_filter_t *filter, struct zbx_json_parse *j
 {
 	const char	*__function_name = "filter_evaluate_and_or";
 
-	int	i, ret = SUCCEED, rc = SUCCEED;
-	char	*lastmacro = NULL;
+	int		i, ret = SUCCEED, rc = SUCCEED;
+	char		*lastmacro = NULL, *value = NULL;
+	size_t		value_alloc = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	for (i = 0; i < filter->conditions.values_num; i++)
 	{
-		char		*value = NULL;
-		size_t		value_alloc = 0;
 		lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
 
 		if (SUCCEED == (rc = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc)))
 			rc = regexp_match_ex(&condition->regexps, value, condition->regexp, ZBX_CASE_SENSITIVE);
-
-		zbx_free(value);
 
 		/* check if a new condition group has started */
 		if (NULL == lastmacro || 0 != strcmp(lastmacro, condition->macro))
@@ -229,6 +224,8 @@ static int	filter_evaluate_and_or(lld_filter_t *filter, struct zbx_json_parse *j
 		lastmacro = condition->macro;
 	}
 out:
+	zbx_free(value);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -252,25 +249,25 @@ static int	filter_evaluate_and(lld_filter_t *filter, struct zbx_json_parse *jp_r
 	const char	*__function_name = "filter_evaluate_and";
 
 	int		i, ret = SUCCEED;
+	char		*value = NULL;
+	size_t		value_alloc = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	for (i = 0; i < filter->conditions.values_num; i++)
 	{
-		char		*value = NULL;
-		size_t		value_alloc = 0;
 		lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
 
 		if (SUCCEED == (ret = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc)))
 			ret = regexp_match_ex(&condition->regexps, value, condition->regexp, ZBX_CASE_SENSITIVE);
 
-		zbx_free(value);
-
 		/* if any of conditions are false the evaluation returns false */
 		if (SUCCEED != ret)
-			goto out;
+			break;
 	}
-out:
+
+	zbx_free(value);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -294,25 +291,25 @@ static int	filter_evaluate_or(lld_filter_t *filter, struct zbx_json_parse *jp_ro
 	const char	*__function_name = "filter_evaluate_or";
 
 	int		i, ret = SUCCEED;
+	char		*value = NULL;
+	size_t		value_alloc = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	for (i = 0; i < filter->conditions.values_num; i++)
 	{
-		char		*value = NULL;
-		size_t		value_alloc = 0;
 		lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
 
 		if (SUCCEED == (ret = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc)))
 			ret = regexp_match_ex(&condition->regexps, value, condition->regexp, ZBX_CASE_SENSITIVE);
 
-		zbx_free(value);
-
 		/* if any of conditions are true the evaluation returns true */
 		if (SUCCEED == ret)
-			goto out;
+			break;
 	}
-out:
+
+	zbx_free(value);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -462,7 +459,7 @@ static int	lld_rows_get(char *value, lld_filter_t *filter, zbx_vector_ptr_t *lld
 			continue;
 
 		lld_row = zbx_malloc(NULL, sizeof(zbx_lld_row_t));
-		memcpy(&lld_row->jp_row, &jp_row, sizeof(struct zbx_json_parse));
+		lld_row->jp_row = jp_row;
 
 		zbx_vector_ptr_append(lld_rows, lld_row);
 	}
@@ -515,7 +512,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_time
 	sql = zbx_malloc(sql, sql_alloc);
 
 	result = DBselect(
-			"select hostid,key_,state,evaltype,error,lifetime,formula"
+			"select hostid,key_,state,evaltype,formula,error,lifetime"
 			" from items"
 			" where itemid=" ZBX_FS_UI64,
 			lld_ruleid);
@@ -527,11 +524,11 @@ void	DBlld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_time
 		ZBX_STR2UINT64(hostid, row[0]);
 		discovery_key = zbx_strdup(discovery_key, row[1]);
 		state = (unsigned char)atoi(row[2]);
-		formula = zbx_strdup(formula, row[6]);
-		db_error = zbx_strdup(db_error, row[4]);
 		evaltype = atoi(row[3]);
+		formula = zbx_strdup(formula, row[4]);
+		db_error = zbx_strdup(db_error, row[5]);
 
-		lifetime_str = zbx_strdup(NULL, row[5]);
+		lifetime_str = zbx_strdup(NULL, row[6]);
 		substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL,
 				&lifetime_str, MACRO_TYPE_COMMON, NULL, 0);
 		if (SUCCEED != is_ushort(lifetime_str, &lifetime))

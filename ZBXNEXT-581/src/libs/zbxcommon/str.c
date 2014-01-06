@@ -2312,7 +2312,8 @@ size_t	zbx_get_next_field(const char **line, char **output, size_t *olen, char s
 int	str_in_list(const char *list, const char *value, char delimiter)
 {
 	const char	*end;
-	int		ret = FAIL, len;
+	int		ret = FAIL;
+	size_t		len;
 
 	len = strlen(value);
 
