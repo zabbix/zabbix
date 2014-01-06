@@ -22,7 +22,7 @@ $app->before(function (Request $request) {
 });
 
 // Process some regular browser requests (like info about how to use this API...)
-$app->get('/', function() use($app) {
+$app->get('/', function () use ($app) {
     return 'LLNW/Zabbix';
 });
 

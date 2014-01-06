@@ -2,18 +2,22 @@
 
 namespace LLNW\Zabbix;
 
-class Ack {
-    public function get($eventids) {
+class Ack
+{
+    public function get($eventids)
+    {
         global $db, $logger;
         // HACK: SQL injection!
         $sql_where = (isset($eventids) && $eventids != '') ? 'WHERE eventid IN ('.$eventids.')' : '';
         $q = "SELECT * FROM acknowledges $sql_where ORDER BY clock ASC";
 
         $logger->log("get.ack query: $q");
+
         return $db->get_results($q);
     }
 
-    public function add($userid, $triggerid, $message = '') {
+    public function add($userid, $triggerid, $message = '')
+    {
         global $db, $logger;
 
         // TODO: Act on behalf of userid, lookup trigger eventid
@@ -54,6 +58,7 @@ class Ack {
                 return 'success';
             }
         }
+
         return 'error';
     }
 }

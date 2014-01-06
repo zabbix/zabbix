@@ -1,8 +1,8 @@
 <?php
 namespace LLNW\Zabbix;
 
-class AlertQueue {
-
+class AlertQueue
+{
     // Attempts to create a new entry in the alert queue
     public function create(
             $data = '',
@@ -72,21 +72,21 @@ class AlertQueue {
         if (!isset($item["history"]) || strlen($item["history"]) < 1) {
             dbug("Error: Missing item history value, setting to default");
             $item["history"] = $default_history;
-        } else if ($item["history"] > $default_history) {
+        } elseif ($item["history"] > $default_history) {
             dbug("Error: Given item history value [".$item["history"]."] was larger than the default, using default");
             $item["history"] = $default_history;
         }
         if (!isset($item["status"]) || strlen($item["status"]) < 1) {
             dbug("Error: Missing item status value, setting to default");
             $item["status"] = $default_type;
-        } else if ($item["status"] < 0) {
+        } elseif ($item["status"] < 0) {
             dbug("Error: Invalid item status [".$item["status"]."]");
             sendErrorResponse('235', "Invalid params", "Invalid item status value");
         }
         if (!isset($item["trends"]) || strlen($item["trends"]) < 1) {
             dbug("Error: Missing item trends value, setting to default");
             $item["trends"] = $default_trends;
-        } else if ($item["trends"] > $default_trends) {
+        } elseif ($item["trends"] > $default_trends) {
             dbug("Error: Given item trends value [".$item["trends"]."] was larger than the default, using default");
             $item["trends"] = $default_trends;
         }
@@ -109,7 +109,7 @@ class AlertQueue {
         if (!isset($trigger["priority"]) || strlen($trigger["priority"]) < 1) {
             dbug("Error: Missing trigger priority");
             sendErrorResponse('235', "Invalid params", "Missing trigger priority");
-        } else if ($trigger["priority"] > 5 || $trigger["priority"] < 0) {
+        } elseif ($trigger["priority"] > 5 || $trigger["priority"] < 0) {
             dbug("Error: Invalid trigger priority [".$trigger["priority"]."]");
             sendErrorResponse('235', "Invalid params", "Invalid trigger priority value");
         }
@@ -156,7 +156,8 @@ class AlertQueue {
         sendErrorResponse('500', "DB Error", $ldb->last_error);
     }
 
-    public static function Copy_DB_Results(&$resp, $results) {
+    public static function Copy_DB_Results(&$resp, $results)
+    {
         $resp['result'][0]["id"] = $results->id;
         $resp['result'][0]["created"] = $results->created;
         $resp['result'][0]["data"] = stripslashes($results->data);

@@ -1,9 +1,10 @@
 <?php
 namespace LLNW\Zabbix;
 
-class DM {
-
-    public function info() {
+class DM
+{
+    public function info()
+    {
         // Original: proxies.php:229
         $data = array();
 
@@ -22,8 +23,7 @@ class DM {
 
         if (function_exists('DBcondition')) {
                 $dbcondition = ' AND '.DBcondition('h.proxy_hostid', $proxyids);
-        }
-        else {
+        } else {
                 $dbcondition = ' AND '.dbConditionInt('h.proxy_hostid', $proxyids);
         }
         // calculate performance

@@ -15,8 +15,10 @@ $json['params']['to_proxy'] = 'BAH02';
 $json['params']['force_move'] = 1;
 */
 
-class Proxy {
-    public function status($proxynames, $selectAll, $output) {
+class Proxy
+{
+    public function status($proxynames, $selectAll, $output)
+    {
         $proxynames = (is_array($proxynames) && count($proxynames) > 0) ? $proxynames : '';
         $all        = (isset($selectAll)) ? 1 : '';
         $output     = (isset($output) && $output == 'csv') ? 'csv' : 'json';
@@ -28,8 +30,7 @@ class Proxy {
 
         if ($all == 1) {
             $proxy_hash = $this::getProxiesNew('',1);
-        }
-        else {
+        } else {
             $proxyids = array();
             foreach ($proxynames as $proxy) {
                 $hostid = $this::getProxyId($proxy);
@@ -59,8 +60,7 @@ class Proxy {
 
         if ($output == 'json') {
             sendResponse($resp);
-        }
-        else {
+        } else {
             foreach ($resp['result'] as $c) {
                 print $c['host'].','.$c['proxyid'].','.$c['lastaccess'].','.$c['host_count']."\n";
             }
@@ -68,7 +68,8 @@ class Proxy {
         }
     }
 
-    public function reassign($from_proxy, $to_proxy, $force_move) {
+    public function reassign($from_proxy, $to_proxy, $force_move)
+    {
         // Automatically moves all hosts from a given proxy to the closest alternate.
         // A force move is possible by specifyin a second proxy and a force parameter.
         // proxy.reassign <proxy shortname 1> [<proxy shortname 2> <force true/false>]
@@ -121,14 +122,12 @@ class Proxy {
                         $new_proxy = $alternates;
                         break;
                     }
-                }
-                else {
+                } else {
                     if ($to_proxy == $alternates) {
                         if ($force_move != '') {
                             $new_proxy = $alternates;
                             break;
-                        }
-                        elseif ($resptime < 60) {
+                        } elseif ($resptime < 60) {
                             $new_proxy = $alternates;
                             break;
                         }
@@ -166,13 +165,11 @@ class Proxy {
                 $resp['moved_to']['host_count'] = $host_count_new;
                 sendResponse($resp);
                 exit;
-            }
-            else {
+            } else {
                 dbug('proxy host reassignment api query failed');
                 sendErrorResponse('246','Warning','proxy host assignment failed');
             }
-            }
-        else {
+            } else {
             dbug("Error: unable to find a suitable proxy to migrate to: $from_proxy");
             sendErrorResponse('225','Warning','unable to find a suitable proxy to migration to');
         }
@@ -185,8 +182,8 @@ class Proxy {
     * @param string,array $proxyids    Proxy or proxies
     * @param array        $selectHost  Specific hosts
     */
-    public static function getProxiesNew($proxyids='',$selectHosts='') {
-
+    public static function getProxiesNew($proxyids='',$selectHosts='')
+    {
         $t['method'] = 'proxy.get';
         $t['params']['output'] = 'extend';
         $t['params']['sortfield'] = 'host';
@@ -195,8 +192,7 @@ class Proxy {
         }
         if (is_array($proxyids)) {
             $t['params']['proxyids'] = $proxyids;
-        }
-        elseif ($proxyids != '') {
+        } elseif ($proxyids != '') {
             $t['params']['proxyids'] = array($proxyids);
         }
 
@@ -204,8 +200,7 @@ class Proxy {
 
         if (isset($resp['result'])) {
             return $resp['result'];
-        }
-        else {
+        } else {
             return 0;
         }
     }
@@ -214,7 +209,8 @@ class Proxy {
     * Get a proxy id from a hostname
     * @param $name hostname (long or short)
     */
-    public static function getProxyId($name) {
+    public static function getProxyId($name)
+    {
         $t['method'] = 'proxy.get';
         $t['params']['output'] = 'hostid';
         $t['params']['filter']['host'] = $name;
@@ -223,8 +219,7 @@ class Proxy {
 
         if (isset($resp['result'])) {
             return $resp['result'];
-        }
-        else {
+        } else {
             return 0;
         }
     }
@@ -234,7 +229,8 @@ class Proxy {
      * @param $proxyid
      * @param array $hostids
      */
-    public static function assignHostsToProxy($proxyid, $hostids) {
+    public static function assignHostsToProxy($proxyid, $hostids)
+    {
         $t['method'] = 'host.massupdate';
         $t['params']['hosts'] = $hostids;
         $t['params']['proxy_hostid'] = $proxyid;
@@ -245,8 +241,7 @@ class Proxy {
 
         if (isset($resp['result'])) {
             return $resp['result'];
-        }
-        else {
+        } else {
             return 0;
         }
     }

@@ -1,4 +1,4 @@
-.PHONY: help lint test composer cleangit
+.PHONY: help lint phpcs test composer cleangit
 
 help: # Show help
 	@grep "^[[:alnum:]]*:" Makefile
@@ -6,7 +6,10 @@ help: # Show help
 lint: # Lint all PHP files
 	find ./lib -name "*.php" -exec php -l {} \;
 
-test: lint
+phpcs: # PHP Codesniffer across project files
+	./vendor/bin/phpcs --standard=PSR1 --standard=PSR2 --ignore=vendor/* --report=summary .
+
+test: lint phpcs
 
 composer: # Get composer and install or update vendor
 	composer install

@@ -35,6 +35,7 @@
         "confirmitsolutionsgmbh/phpzabbixapi": "dev-composer",
         "jsonrpc/jsonrpc": "*",
         "jv2222/ezSQL": "dev-master",
+        "pear-pear/PHP_CodeSniffer": "*",
         "pear-pear/Log": "*",
         "silex/silex": "*",
         "symfony/config": "*"
