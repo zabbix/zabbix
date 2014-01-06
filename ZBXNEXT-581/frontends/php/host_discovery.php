@@ -316,11 +316,14 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_hostdruleid'])) {
  * Display
  */
 if (isset($_REQUEST['form'])) {
-	$data = getItemFormData($item, array('is_discovery_rule' => true));
+	$data = getItemFormData(hasRequest('itemid') ? $item : array(), array(
+		'is_discovery_rule' => true
+	));
 	$data['page_header'] = _('CONFIGURATION OF DISCOVERY RULES');
 	$data['lifetime'] = getRequest('lifetime', 30);
 	$data['evaltype'] = getRequest('evaltype');
 	$data['formula'] = getRequest('formula');
+	$data['eval_formula'] = '';
 	$data['conditions'] = getRequest('conditions', array());
 
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
