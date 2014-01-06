@@ -240,7 +240,7 @@ elseif (isset($_REQUEST['save'])) {
 
 	// add macros; ignore empty new macros
 	foreach (getRequest('conditions') as $condition) {
-		if (isset($condition['item_conditionid']) || !(zbx_empty($condition['macro']) && zbx_empty($condition['value']))) {
+		if (isset($condition['item_conditionid']) || !(zbx_empty($condition['macro']))) {
 			$condition['macro'] = zbx_strtoupper($condition['macro']);
 
 			$newItem['conditions'][] = $condition;
