@@ -745,7 +745,7 @@ class CDiscoveryRule extends CItemGeneral {
 		foreach ($conditions as $condition) {
 			$ids[$condition['formulaid']] = $condition['item_conditionid'];
 		}
-		$formula = CFormulaHelper::replaceIds($evalFormula, $ids);
+		$formula = CFormulaHelper::replaceFormulaIds($evalFormula, $ids);
 
 		DB::updateByPk('items', $itemId, array(
 			'formula' => $formula
