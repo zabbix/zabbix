@@ -114,6 +114,21 @@ static int	DBpatch_2030006(void)
 	return DBdrop_field("items", "filter");
 }
 
+static int	DBpatch_2030007(void)
+{
+	const ZBX_FIELD	field = {"formula",	"", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("items", &field);
+}
+
+static int	DBpatch_2030008(void)
+{
+	if (ZBX_DB_OK > DBexecute("update items set formula='' where flags=%d", ZBX_FLAG_DISCOVERY_RULE))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(2030)
@@ -127,5 +142,7 @@ DBPATCH_ADD(2030003, 0, 1)
 DBPATCH_ADD(2030004, 0, 1)
 DBPATCH_ADD(2030005, 0, 1)
 DBPATCH_ADD(2030006, 0, 1)
+DBPATCH_ADD(2030007, 0, 1)
+DBPATCH_ADD(2030008, 0, 1)
 
 DBPATCH_END()
