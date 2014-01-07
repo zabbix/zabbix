@@ -134,56 +134,98 @@ static void	set_daemon_signal_handlers()
  * Purpose: init process as daemon                                            *
  *                                                                            *
  * Parameters: allow_root - allow root permission for application             *
+ *             user - user on the system to which to drop the privileges      *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: it doesn't allow running under 'root' if allow_root is zero      *
  *                                                                            *
  ******************************************************************************/
-int	daemon_start(int allow_root)
+int	daemon_start(int allow_root, char *user)
 {
 	pid_t			pid;
 	struct passwd		*pwd;
-	char			user[7] = "zabbix";
 
-	if (0 == allow_root && (0 == getuid() || 0 == getgid()))	/* running as root? */
+	if (0 == getuid())
 	{
-		pwd = getpwnam(user);
-
-		if (NULL == pwd)
+		if (0 == allow_root)
 		{
-			zbx_error("user %s does not exist", user);
-			zbx_error("cannot run as root!");
-			exit(FAIL);
-		}
+			if (NULL != user && '\0' != *user)
+			{
+				if (0 == strcmp(user, "root"))
+				{
+					zbx_error("cannot escalate privileges to root!");
+					exit(FAIL);
+				}
+				else
+				{
+					pwd = getpwnam(user);
 
-		if (-1 == setgid(pwd->pw_gid))
-		{
-			zbx_error("cannot setgid to %s: %s", user, zbx_strerror(errno));
-			exit(FAIL);
-		}
+					if (NULL != pwd)
+					{
+						if (-1 == setgid(pwd->pw_gid))
+						{
+							zbx_error("cannot setgid to %s: %s", user, zbx_strerror(errno));
+							exit(FAIL);
+						}
 
 #ifdef HAVE_FUNCTION_INITGROUPS
-		if (-1 == initgroups(user, pwd->pw_gid))
-		{
-			zbx_error("cannot initgroups to %s: %s", user, zbx_strerror(errno));
-			exit(FAIL);
-		}
+						if (-1 == initgroups(user, pwd->pw_gid))
+						{
+							zbx_error("cannot initgroups to %s: %s", user, zbx_strerror(errno);
+							exit(FAIL);
+						}
 #endif
 
-		if (-1 == setuid(pwd->pw_uid))
-		{
-			zbx_error("cannot setuid to %s: %s", user, zbx_strerror(errno));
-			exit(FAIL);
-		}
+						if (-1 == setuid(pwd->pw_uid))
+						{
+							zbx_error("cannot setuid to %s: %s", user, zbx_strerror(errno));
+							exit(FAIL);
+						}
 
 #ifdef HAVE_FUNCTION_SETEUID
-		if (-1 == setegid(pwd->pw_gid) || -1 == seteuid(pwd->pw_uid))
-		{
-			zbx_error("cannot setegid or seteuid to %s: %s", user, zbx_strerror(errno));
-			exit(FAIL);
-		}
+						if (-1 == setegid(pwd->pw_gid) || -1 == seteuid(pwd->pw_uid))
+						{
+							zbx_error("cannot setegid or seteuid to %s: %s", user, zbx_strerror(errno));
+							exit(FAIL);
+						}
 #endif
+					}
+					else
+					{
+						zbx_error("user %s does not exist", user);
+						zbx_error("cannot run as root!");
+						exit(FAIL);
+					}
+				}
+			}
+			else
+			{
+				zbx_error("cannot run as root!");
+				exit(FAIL);
+			}
+		}
+	}
+	else
+	{
+		if (NULL != user && '\0' != *user)
+		{
+			pwd = getpwnam(user);
+
+			if (NULL == pwd)
+			{
+				zbx_error("user %s does not exist", user);
+				exit(FAIL);
+			}
+			else
+			{
+				if (pwd->pw_uid != getuid())
+				{
+					zbx_error("cannot setuid to %s: insufficient privileges", user);
+					exit(FAIL);
+				}
+			}
+		}
 	}
 
 	if (0 != (pid = zbx_fork()))

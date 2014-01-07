@@ -196,6 +196,8 @@ int	CONFIG_PROXYPOLLER_FORKS	= 1;	/* parameters for passive proxies */
 int	CONFIG_PROXYCONFIG_FREQUENCY	= 3600;	/* 1h */
 int	CONFIG_PROXYDATA_FREQUENCY	= 1;	/* 1s */
 
+char	*CONFIG_USER			= NULL;
+
 char	*CONFIG_LOAD_MODULE_PATH	= NULL;
 char	**CONFIG_LOAD_MODULE		= NULL;
 
@@ -429,6 +431,8 @@ static void	zbx_load_config()
 			PARM_OPT,	10,			SEC_PER_DAY},
 		{"VMwareCacheSize",		&CONFIG_VMWARE_CACHE_SIZE,		TYPE_UINT64,
 			PARM_OPT,	256 * ZBX_KIBIBYTE,	0x7fffffff},	/* just below 2GB */
+		{"User",			&CONFIG_USER,				TYPE_STRING,
+			PARM_OPT,	0,			0},
 		{NULL}
 	};
 
@@ -552,7 +556,7 @@ int	main(int argc, char **argv)
 			break;
 	}
 
-	return daemon_start(CONFIG_ALLOW_ROOT);
+	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER);
 }
 
 int	MAIN_ZABBIX_ENTRY()
