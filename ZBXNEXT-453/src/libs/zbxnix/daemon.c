@@ -172,7 +172,7 @@ int	daemon_start(int allow_root, char *user)
 #ifdef HAVE_FUNCTION_INITGROUPS
 						if (-1 == initgroups(user, pwd->pw_gid))
 						{
-							zbx_error("cannot initgroups to %s: %s", user, zbx_strerror(errno);
+							zbx_error("cannot initgroups to %s: %s", user, zbx_strerror(errno));
 							exit(FAIL);
 						}
 #endif
