@@ -4416,8 +4416,7 @@ out:
  *          internal format with &/| operators and remove whitespace.         *
  *                                                                            *
  * Parameters: expression  - [IN] the source expression                       *
- *             size        - [IN] the size of out string (ignored if out is   *
- *                                NULL)                                       *
+ *             out         - [OUT] the resulting expression                   *
  *             error       - [OUT] a short error description                  *
  *                                                                            *
  * Return value: SUCCEED - the expression was translated successfully         *
@@ -4516,8 +4515,9 @@ int	translate_expression(const char *expression, char **out, char **error)
 out:
 	if (SUCCEED != ret)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "expression '%s' error at position %d (%s)", expression, start - expression, start);
-		*error = zbx_dsprintf(*error, "invalid formula expression");
+		zabbix_log(LOG_LEVEL_DEBUG, "invalid expression '%s': error at position " ZBX_FS_SIZE_T,
+				expression, (zbx_fs_size_t)(start - expression));
+		*error = zbx_strdup(*error, "Invalid formula expression.");
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
