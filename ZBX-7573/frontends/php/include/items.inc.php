@@ -1232,11 +1232,9 @@ function calculateItemNextcheck($interfaceid, $itemid, $itemType, $delay, $flexI
 				break;
 			}
 		}
-
-		$delay = $currentDelay;
 	}
 
-	return array('nextcheck' => $nextcheck, 'delay' => $delay);
+	return $nextcheck;
 }
 
 /**

@@ -612,7 +612,7 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
  *                                                                            *
  ******************************************************************************/
 int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int item_type,
-		int delay, const char *flex_intervals, time_t now, int *effective_delay)
+		int delay, const char *flex_intervals, time_t now)
 {
 	int	nextcheck = 0;
 
@@ -675,12 +675,7 @@ int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int 
 			else
 				break;	/* nextcheck is within the current interval */
 		}
-
-		delay = current_delay;
 	}
-
-	if (NULL != effective_delay)
-		*effective_delay = delay;
 
 	return nextcheck;
 }
