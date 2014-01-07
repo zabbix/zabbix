@@ -5245,7 +5245,7 @@ void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, ch
  * Parameters: items - [OUT] the copy of item history                         *
  *             ids   - [IN] a vector of item ids to get the history for       *
  *                                                                            *
- * Comments: The hahset must be created by the caller like:                   *
+ * Comments: The hashset must be created by the caller like:                  *
  *            zbx_hashset_create(items, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,   *
  *                               ZBX_DEFAULT_UINT64_COMPARE_FUNC)             *
  *                                                                            *
@@ -5342,7 +5342,7 @@ void	DCfree_item_queue(zbx_vector_ptr_t *queue)
  *             to    - [IN] the maximum delay time in seconds or -1 if there  *
  *                          is no maximum limit                               *
  *                                                                            *
- * Return value: the number of delayed items,                                 *
+ * Return value: the number of delayed items                                  *
  *                                                                            *
  ******************************************************************************/
 int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
