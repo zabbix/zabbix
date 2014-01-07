@@ -68,39 +68,41 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 	if (0 >= (nbytes = (int)read(fd, buf, count)))
 		return nbytes;
 
-	if (0 == strcmp(encoding, "UNICODE") || 0 == strcmp(encoding, "UNICODELITTLE") ||
-			0 == strcmp(encoding, "UTF-16") || 0 == strcmp(encoding, "UTF-16LE") ||
-			0 == strcmp(encoding, "UTF16") || 0 == strcmp(encoding, "UTF16LE"))
+	/* default is single-byte character set */
+	cr = "\r";
+	lf = "\n";
+	szbyte = 1;
+
+	if ('\0' != *encoding)
 	{
-		cr = "\r\0";
-		lf = "\n\0";
-		szbyte = 2;
-	}
-	else if (0 == strcmp(encoding, "UNICODEBIG") || 0 == strcmp(encoding, "UNICODEFFFE") ||
-			0 == strcmp(encoding, "UTF-16BE") || 0 == strcmp(encoding, "UTF16BE"))
-	{
-		cr = "\0\r";
-		lf = "\0\n";
-		szbyte = 2;
-	}
-	else if (0 == strcmp(encoding, "UTF-32") || 0 == strcmp(encoding, "UTF-32LE") ||
-			0 == strcmp(encoding, "UTF32") || 0 == strcmp(encoding, "UTF32LE"))
-	{
-		cr = "\r\0\0\0";
-		lf = "\n\0\0\0";
-		szbyte = 4;
-	}
-	else if (0 == strcmp(encoding, "UTF-32BE") || 0 == strcmp(encoding, "UTF32BE"))
-	{
-		cr = "\0\0\0\r";
-		lf = "\0\0\0\n";
-		szbyte = 4;
-	}
-	else	/* Single or Multi Byte Character Sets */
-	{
-		cr = "\r";
-		lf = "\n";
-		szbyte = 1;
+		if (0 == strcmp(encoding, "UNICODE") || 0 == strcmp(encoding, "UNICODELITTLE") ||
+				0 == strcmp(encoding, "UTF-16") || 0 == strcmp(encoding, "UTF-16LE") ||
+				0 == strcmp(encoding, "UTF16") || 0 == strcmp(encoding, "UTF16LE"))
+		{
+			cr = "\r\0";
+			lf = "\n\0";
+			szbyte = 2;
+		}
+		else if (0 == strcmp(encoding, "UNICODEBIG") || 0 == strcmp(encoding, "UNICODEFFFE") ||
+				0 == strcmp(encoding, "UTF-16BE") || 0 == strcmp(encoding, "UTF16BE"))
+		{
+			cr = "\0\r";
+			lf = "\0\n";
+			szbyte = 2;
+		}
+		else if (0 == strcmp(encoding, "UTF-32") || 0 == strcmp(encoding, "UTF-32LE") ||
+				0 == strcmp(encoding, "UTF32") || 0 == strcmp(encoding, "UTF32LE"))
+		{
+			cr = "\r\0\0\0";
+			lf = "\n\0\0\0";
+			szbyte = 4;
+		}
+		else if (0 == strcmp(encoding, "UTF-32BE") || 0 == strcmp(encoding, "UTF32BE"))
+		{
+			cr = "\0\0\0\r";
+			lf = "\0\0\0\n";
+			szbyte = 4;
+		}
 	}
 
 	for (i = 0; i + szbyte <= (size_t)nbytes; i += szbyte)
