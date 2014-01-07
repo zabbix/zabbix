@@ -99,7 +99,7 @@
 	ZBX_OCI_DB_RESULT;
 
 	void	OCI_DBfree_result(DB_RESULT result);
-	ub4	OCI_DBserver_status();
+	ub4	OCI_DBserver_status(sb4 last_err);
 
 #elif defined(HAVE_POSTGRESQL)
 
