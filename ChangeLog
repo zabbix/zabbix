@@ -745,6 +745,7 @@ New features:
 A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7586] fixed trigger log expression saving in IE10 (Eduard)
 .......... [ZBXNEXT-1256] fixed parameter passing for example userparameter to obtain process CPU usage (Richlv)
 ........S. [ZBX-6545] fixed possible SQL errors when syncing a node configuration with PostgreSQL backend version 8.2 and later (Sasha)
 .......... [ZBXNEXT-1256] fixed parameter passing for example userparameter to obtain directory size (Richlv)
