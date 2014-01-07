@@ -192,6 +192,10 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])) {
 	unset($_REQUEST['itemid']);
+	foreach (getRequest('conditions') as &$condition) {
+		unset($condition['item_conditionid']);
+	}
+	unset($condition);
 	$_REQUEST['form'] = 'clone';
 }
 elseif (isset($_REQUEST['save'])) {
