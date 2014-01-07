@@ -48,7 +48,7 @@ $fields = array(
 		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_EMAIL,
 		_('SMTP helo')
 	),
-	'remedy_proxy' =>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
+	'remedy_proxy' =>	array(T_ZBX_STR, O_OPT,	null,	null,
 		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_REMEDY,
 		_('Proxy')
 	),
@@ -152,7 +152,7 @@ if (isset($_REQUEST['save'])) {
 			$mediaType['smtp_helo'] = getRequest('remedy_proxy');
 			$mediaType['exec_path'] = getRequest('remedy_company');
 			$mediaType['username'] = getRequest('username');
-			$mediaType['password'] = getRequest('password');
+			$mediaType['passwd'] = getRequest('password');
 			break;
 
 		case MEDIA_TYPE_JABBER:
@@ -160,7 +160,7 @@ if (isset($_REQUEST['save'])) {
 			$mediaType['smtp_helo'] = '';
 			$mediaType['exec_path'] = '';
 			$mediaType['username'] = getRequest('jabber_identifier');
-			$mediaType['password'] = getRequest('password');
+			$mediaType['passwd'] = getRequest('password');
 			break;
 
 		case MEDIA_TYPE_EZ_TEXTING:
@@ -168,7 +168,7 @@ if (isset($_REQUEST['save'])) {
 			$mediaType['smtp_helo'] = '';
 			$mediaType['exec_path'] = getRequest('msg_txt_limit');
 			$mediaType['username'] = getRequest('ez_username');
-			$mediaType['password'] = getRequest('password');
+			$mediaType['passwd'] = getRequest('password');
 			break;
 
 		default:
@@ -176,11 +176,7 @@ if (isset($_REQUEST['save'])) {
 			$mediaType['smtp_helo'] = getRequest('smtp_helo');
 			$mediaType['exec_path'] = getRequest('exec_path');
 			$mediaType['username'] = getRequest('username');
-			$mediaType['password'] = '';
-	}
-
-	if (is_null($mediaType['passwd'])) {
-		unset($mediaType['passwd']);
+			$mediaType['passwd'] = '';
 	}
 
 	if ($mediaTypeId) {
