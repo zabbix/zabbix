@@ -4338,8 +4338,8 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 #define ZBX_OPCODE_CLOSE	')'
 
 #define ZBX_OPCODE_CLASS_NONE		0
-#define ZBX_OPCODE_CLASS_OP_BINARY	2
-#define ZBX_OPCODE_CLASS_VALUE		3
+#define ZBX_OPCODE_CLASS_OP_BINARY	1
+#define ZBX_OPCODE_CLASS_VALUE		2
 
 /******************************************************************************
  *                                                                            *
