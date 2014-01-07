@@ -4374,7 +4374,7 @@ static void	expression_get_token(const char *expression, char const **start, cha
 	/* get the token class */
 	if ('{' == *pend)
 		token_class = ZBX_OPCODE_CLASS_VALUE;
-	else if (0 != isalnum(*pend))
+	else if (0 != islower(*pend))
 		token_class = ZBX_OPCODE_CLASS_OP_BINARY;
 	else
 		token_class = ZBX_OPCODE_CLASS_NONE;
@@ -4398,7 +4398,7 @@ static void	expression_get_token(const char *expression, char const **start, cha
 					goto out;
 				break;
 			case ZBX_OPCODE_CLASS_OP_BINARY:
-				if (0 == isalpha(*pend))
+				if (0 == islower(*pend))
 					goto out;
 		}
 		pend++;
