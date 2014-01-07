@@ -4366,7 +4366,9 @@ static void	expression_get_token(const char *expression, char const **start, cha
 	while (' ' == *pstart)
 		pstart++;
 
-	if ('\0' == (pend = pstart))
+	pend = pstart;
+
+	if ('\0' == *pend)
 		goto out;
 
 	/* get the token class */
@@ -4414,7 +4416,6 @@ out:
  *          internal format with &/| operators and remove whitespace.         *
  *                                                                            *
  * Parameters: expression  - [IN] the source expression                       *
- *             out         - [OUT] the resulting expression                   *
  *             size        - [IN] the size of out string (ignored if out is   *
  *                                NULL)                                       *
  *             error       - [OUT] a short error description                  *
@@ -4428,151 +4429,96 @@ out:
  *           this function and must be freed by the caller.                   *
  *                                                                            *
  ******************************************************************************/
-int	translate_expression(const char *expression, char **out, size_t size, char **error)
+int	translate_expression(const char *expression, char **out, char **error)
 {
 	const char	*__function_name = "translate_expression";
 
 	const char	*start, *end = expression;
-	char		*ptr;
 	int		level = 0, last_op = 0, ret = FAIL;
-	size_t		token_len, offset;
+	size_t		token_len, out_offset = 0, out_alloc = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (NULL == *out)
-	{
-		size = 256;
-		*out = zbx_malloc(NULL, size);
-	}
-
-	ptr = *out;
-
 	while ('\0' != *end)
 	{
-		offset = ptr - *out;
-
-		/* reserve space for op - &|() */
-		if (offset + 1 >= size)
-		{
-			size += (size >> 1);
-			*out = zbx_realloc(*out, size);
-			ptr = *out + offset;
-		}
-
 		expression_get_token(end, &start, &end);
 
 		token_len = end - start;
 
-		if (3 == token_len && 0 == zbx_strncasecmp(start, "AND", token_len))
+		if (3 == token_len && 0 == strncmp(start, "and", token_len))
 		{
 			/* check if the previous op was a logical value */
 			if (ZBX_OPCODE_CLASS_VALUE != last_op)
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "expression '%s' error:"
-						" binary operator 'AND' must follow a value at position %d (%s)",
-						expression, start - expression, start);
 				goto out;
-			}
 
-			*ptr++ = ZBX_OPCODE_AND;
+			zbx_chrcpy_alloc(out, &out_alloc, &out_offset, ZBX_OPCODE_AND);
 			last_op = ZBX_OPCODE_CLASS_OP_BINARY;
 		}
-		else if (2 == token_len && 0 == zbx_strncasecmp(start, "OR", token_len))
+		else if (2 == token_len && 0 == strncmp(start, "or", token_len))
 		{
 			/* check if the previous op was a logical value */
 			if (ZBX_OPCODE_CLASS_VALUE != last_op)
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "expression '%s' error:"
-						" binary operator 'OR' must follow a value at position %d (%s)",
-						expression, start - expression, start);
 				goto out;
-			}
 
-			*ptr++ = ZBX_OPCODE_OR;
+			zbx_chrcpy_alloc(out, &out_alloc, &out_offset, ZBX_OPCODE_OR);
 			last_op = ZBX_OPCODE_CLASS_OP_BINARY;
 		}
 		else if (1 == token_len && '(' == *start)
 		{
 			/* check if the previous op was a logical value */
 			if (ZBX_OPCODE_CLASS_VALUE == last_op)
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "expression '%s' error:"
-						" left parentheses '(' must follow an operator at %d (%s)",
-						expression, start - expression, start);
 				goto out;
-			}
 
 			level++;
 
-			*ptr++ = ZBX_OPCODE_OPEN;
+			zbx_chrcpy_alloc(out, &out_alloc, &out_offset, ZBX_OPCODE_OPEN);
 			last_op = ZBX_OPCODE_CLASS_NONE;
 		}
 		else if (1 == token_len && ')' == *start)
 		{
 			/* check if the previous op was a logical value */
 			if (ZBX_OPCODE_CLASS_VALUE != last_op)
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "expression '%s' error:"
-						" right parentheses ')' must follow a value at %d (%s)",
-						expression, start - expression, start);
 				goto out;
-			}
 
 			/* check for matching parentheses */
 			if (0 >= level)
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "expression '%s' error:"
-						" unmatched right parentheses ')' at %d (%s)",
-						expression, start - expression, start);
 				goto out;
-			}
 
 			level--;
 
-			*ptr++ = ZBX_OPCODE_CLOSE;
+			zbx_chrcpy_alloc(out, &out_alloc, &out_offset, ZBX_OPCODE_CLOSE);
+			last_op = ZBX_OPCODE_CLASS_VALUE;
+		}
+		else if (2 < token_len && '{' == *start && '}' == start[token_len - 1])
+		{
+			/* check if the previous op was a logical value */
+			if (ZBX_OPCODE_CLASS_VALUE == last_op)
+				goto out;
+
+			zbx_strncpy_alloc(out, &out_alloc, &out_offset, start, token_len);
 			last_op = ZBX_OPCODE_CLASS_VALUE;
 		}
 		else
 		{
-			/* check if the previous op was a logical value */
-			if (ZBX_OPCODE_CLASS_VALUE == last_op)
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "expression '%s' error:"
-						" a value must either start (sub)expression or follow an operator"
-						" at %d (%s)", expression, start - expression, start);
+			if (start != end)
 				goto out;
-			}
-
-			/* reserve space for the value */
-			if (offset + token_len >= size)
-			{
-				while (offset + token_len >= size)
-					size += (size >> 1);
-
-				*out = zbx_realloc(*out, size);
-				ptr = *out + offset;
-			}
-
-			memcpy(ptr, start, token_len);
-			ptr += token_len;
-
-			last_op = ZBX_OPCODE_CLASS_VALUE;
 		}
+
 	}
 
 	/* check for matching parentheses */
 	if (0 != level)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "expression '%s' error: unmatched right parentheses ')'", expression);
 		goto out;
-	}
 
-	*ptr = '\0';
+	zbx_chrcpy_alloc(out, &out_alloc, &out_offset, '\0');
 
 	ret = SUCCEED;
 out:
 	if (SUCCEED != ret)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "expression '%s' error at position %d (%s)", expression, start - expression, start);
 		*error = zbx_dsprintf(*error, "invalid formula expression");
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
