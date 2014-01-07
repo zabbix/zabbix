@@ -857,6 +857,8 @@ define('SEC_PER_YEAR',	31536000); // 365 * SEC_PER_DAY
 
 define('DAY_IN_YEAR', 365);
 
+define('ZBX_JAN_2038', 2145916800);
+
 define('ZBX_MIN_PORT_NUMBER', 0);
 define('ZBX_MAX_PORT_NUMBER', 65535);
 
