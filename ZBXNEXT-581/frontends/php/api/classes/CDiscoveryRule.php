@@ -653,7 +653,9 @@ class CDiscoveryRule extends CItemGeneral {
 			$itemConditions[$condition['itemid']][] = $condition;
 		}
 		foreach ($items as $item) {
-			$this->updateFormula($item['itemid'], $item['formula'], $itemConditions[$item['itemid']]);
+			if ($item['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+				$this->updateFormula($item['itemid'], $item['formula'], $itemConditions[$item['itemid']]);
+			}
 		}
 
 		// TODO: REMOVE info
@@ -1342,7 +1344,8 @@ class CDiscoveryRule extends CItemGeneral {
 				// generate formulaids from the effective formula
 				$formulaIds = CConditionHelper::getFormulaIds($formula);
 
-				if ($formulaRequested) {
+				// generated a letter based formula only for rules with custom expressions
+				if ($formulaRequested && $rule['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 					$rule['formula'] = CConditionHelper::replaceNumericIds($formula, $formulaIds);
 				}
 
