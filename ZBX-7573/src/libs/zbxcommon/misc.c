@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1859,8 +1859,8 @@ int	uint64_in_list(char *list, zbx_uint64_t value)
  *             num - number of elements                                       *
  *             id  - index to look for                                        *
  *                                                                            *
- * Return value: nearest index position                                       *
- *               0 - otherwise                                                *
+ * Return value: index at which it would be possible to insert the element so *
+ *               that the array is still sorted                               *
  *                                                                            *
  ******************************************************************************/
 int	get_nearestindex(void *p, size_t sz, int num, zbx_uint64_t id)

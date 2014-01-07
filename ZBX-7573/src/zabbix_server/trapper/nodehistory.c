@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -310,7 +310,7 @@ static int	process_record(char **sql, size_t *sql_alloc, size_t *sql_offset, int
 				size_t	len;
 
 				len = zbx_hex2binary(buffer);
-				zbx_pg_escape_bytea((u_char *)buffer, len, &tmp, &tmp_alloc);
+				DBbytea_escape((u_char *)buffer, len, &tmp, &tmp_alloc);
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "'%s',", tmp);
 #else
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "0x%s,", buffer);

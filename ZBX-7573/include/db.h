@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -599,5 +599,10 @@ void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vec
 
 void	zbx_create_services_lock();
 void	zbx_destroy_services_lock();
+
+#ifdef HAVE_POSTGRESQL
+size_t	DBbytea_escape(const u_char *input, size_t ilen, char **output, size_t *olen);
+size_t	DBbytea_unescape(u_char *io);
+#endif
 
 #endif
