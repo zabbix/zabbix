@@ -273,6 +273,16 @@ var timeControl = {
 			location.href = url.getUrl();
 		}
 		else {
+			// calculate new gradation
+			this.scrollbar.px2sec =
+				(this.timeline.endtime() - this.timeline.starttime()) / this.scrollbar.size.scrollline;
+
+			// scrollbar
+			this.scrollbar.setBarPosition();
+			this.scrollbar.setGhostByBar();
+			this.scrollbar.setTabInfo();
+			this.scrollbar.resetIsNow();
+
 			flickerfreeScreen.refreshAll(period, date.getZBXDate(), this.timeline.isNow());
 		}
 	},
