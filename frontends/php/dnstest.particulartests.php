@@ -152,6 +152,8 @@ foreach ($hosts as $host) {
 	$hostIds[] = $host['hostid'];
 }
 
+$data['totalProbes'] = count($hostIds);
+
 // get probes items
 $probeItems = API::Item()->get(array(
 	'hostids' => $hostIds,
@@ -237,8 +239,6 @@ $hostIds = array();
 foreach ($hosts as $host) {
 	$hostIds[] = $host['hostid'];
 }
-
-$data['totalProbes'] = count($hostIds);
 
 // get only used items
 if ($data['type'] == 0 || $data['type'] == 1) {

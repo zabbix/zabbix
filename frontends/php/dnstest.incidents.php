@@ -391,7 +391,6 @@ if ($host || $data['filter_search']) {
 							$data[$itemType]['events'][$i]['incidentFailedTests'] = getFailedTestsCount(
 								$itemId,
 								$itemType,
-								$filterTimeFrom,
 								$filterTimeTill,
 								$data[$itemType]['events'][$i]['startTime'],
 								$data[$itemType]['events'][$i]['endTime']
@@ -427,7 +426,6 @@ if ($host || $data['filter_search']) {
 							$data[$itemInfo['itemType']]['events'][$i]['incidentFailedTests'] = getFailedTestsCount(
 								$itemInfo['itemId'],
 								$itemInfo['itemType'],
-								$filterTimeFrom,
 								$filterTimeTill,
 								$data[$itemInfo['itemType']]['events'][$i]['startTime']
 							);
@@ -508,7 +506,6 @@ if ($host || $data['filter_search']) {
 								'incidentFailedTests' => getFailedTestsCount(
 									$itemInfo['itemId'],
 									$itemInfo['itemType'],
-									$filterTimeFrom,
 									$filterTimeTill,
 									$addEvent['clock'],
 									$event['clock']
@@ -579,7 +576,6 @@ if ($host || $data['filter_search']) {
 					$data[$itemType]['events'][$i]['incidentFailedTests'] = getFailedTestsCount(
 						$itemId,
 						$itemType,
-						$filterTimeFrom,
 						$filterTimeTill,
 						$data[$itemType]['events'][$i]['startTime'],
 						$data[$itemType]['events'][$i]['endTime']
@@ -646,7 +642,6 @@ if ($host || $data['filter_search']) {
 					$data[$itemType]['events'][$i]['incidentFailedTests'] = getFailedTestsCount(
 						$itemId,
 						$itemType,
-						$filterTimeFrom,
 						$filterTimeTill,
 						$data[$itemType]['events'][$i]['startTime'],
 						$data[$itemType]['events'][$i]['endTime']
@@ -682,7 +677,6 @@ if ($host || $data['filter_search']) {
 					$data[$itemInfo['itemType']]['events'][$i]['incidentFailedTests'] = getFailedTestsCount(
 						$itemInfo['itemId'],
 						$itemInfo['itemType'],
-						$filterTimeFrom,
 						$filterTimeTill,
 						$data[$itemInfo['itemType']]['events'][$i]['startTime']
 					);

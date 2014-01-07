@@ -18,8 +18,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
-
-function getOldValue($itemId, $startTime) {
+/**
+ * Get first item value from history_uint table.
+ *
+ * @param int $itemId
+ * @param int $startTime
+ *
+ * @return string
+ */
+function getFirstUintValue($itemId, $startTime) {
 	$query = DBfetch(DBselect(DBaddLimit(
 		'SELECT h.value'.
 		' FROM history_uint h'.

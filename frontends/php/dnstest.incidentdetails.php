@@ -178,14 +178,14 @@ if ($mainEvent) {
 	foreach ($items as $item) {
 		if ($item['key_'] == CALCULATED_ITEM_DNS_FAIL || $item['key_'] == CALCULATED_ITEM_DNSSEC_FAIL
 				|| $item['key_'] == CALCULATED_ITEM_RDDS_FAIL) {
-			$failCount = getOldValue($item['itemid'], $mainEventFromTime);
+			$failCount = getFirstUintValue($item['itemid'], $mainEventFromTime);
 		}
 		elseif ($item['key_'] == CALCULATED_ITEM_DNS_RECOVERY || $item['key_'] == CALCULATED_ITEM_DNSSEC_RECOVERY
 				|| $item['key_'] == CALCULATED_ITEM_RDDS_RECOVERY) {
-			$recoveryCount = getOldValue($item['itemid'], $mainEventFromTime);
+			$recoveryCount = getFirstUintValue($item['itemid'], $mainEventFromTime);
 		}
 		else {
-			$delayTime = getOldValue($item['itemid'], $mainEventFromTime);
+			$delayTime = getFirstUintValue($item['itemid'], $mainEventFromTime);
 		}
 	}
 

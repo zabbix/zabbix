@@ -350,7 +350,7 @@ if ($items) {
 			exit;
 		}
 
-		$timeStep = getOldValue($item['itemid'], zbxDateToTime($data['filter_from'])) / 60;
+		$timeStep = getFirstUintValue($item['itemid'], zbxDateToTime($data['filter_from'])) / 60;
 		$timeStep = $timeStep ? $timeStep : 1;
 
 		$data['downTimeMinutes'] = $data['downTests'] * $timeStep;

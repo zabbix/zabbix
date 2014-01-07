@@ -18,8 +18,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
-
-function getFailedTestsCount($itemId, $itemType, $startTime, $endTime, $incidentStartTime, $incidentEndTime = null) {
+/**
+ * Get failed DNS tests count.
+ *
+ * @param int 		$itemId
+ * @param string 	$itemType
+ * @param int 		$endTime
+ * @param int 		$incidentStartTime
+ * @param int 		$incidentEndTime
+ *
+ * @return int
+ */
+function getFailedTestsCount($itemId, $itemType, $endTime, $incidentStartTime, $incidentEndTime = null) {
 	$to = $incidentEndTime ? $incidentEndTime : $endTime;
 	$value = ($itemType == 'rdds') ? '!=2' : '=0';
 
@@ -35,6 +45,17 @@ function getFailedTestsCount($itemId, $itemType, $startTime, $endTime, $incident
 	return $getFailedTestsCount['count'];
 }
 
+/**
+ * Get total DNS tests count.
+ *
+ * @param int 		$itemId
+ * @param int 		$startTime
+ * @param int 		$endTime
+ * @param int 		$incidentStartTime
+ * @param int 		$incidentEndTime
+ *
+ * @return int
+ */
 function getTotalTestsCount($itemId, $startTime, $endTime, $incidentStartTime = null, $incidentEndTime = null) {
 	$from = $incidentStartTime ? $incidentStartTime : $startTime;
 	$to = $incidentEndTime ? $incidentEndTime : $endTime;
