@@ -144,6 +144,8 @@ class CHttpTestManager {
 			'preservekeys' => true
 		));
 
+		$deleteStepItemIds = array();
+
 		foreach ($httpTests as $httpTest) {
 			DB::update('httptest', array(
 				'values' => $httpTest,
@@ -199,7 +201,12 @@ class CHttpTestManager {
 				$stepidsDelete = array_keys($dbSteps);
 
 				if (!empty($stepidsDelete)) {
-					$this->deleteStepsReal($stepidsDelete);
+					$result = DBselect(
+						'SELECT hi.itemid FROM httpstepitem hi WHERE '.dbConditionInt('hi.httpstepid', $stepidsDelete)
+					);
+					$deleteStepItemIds = array_merge($deleteStepItemIds, DBfetchColumn($result, 'itemid'));
+
+					DB::delete('httpstep', array('httpstepid' => $stepidsDelete));
 				}
 				if (!empty($stepsUpdate)) {
 					$this->updateStepsReal($httpTest, $stepsUpdate);
@@ -236,6 +243,10 @@ class CHttpTestManager {
 					));
 				}
 			}
+		}
+
+		if ($deleteStepItemIds) {
+			API::Item()->delete($deleteStepItemIds, true);
 		}
 
 		// TODO: REMOVE info
