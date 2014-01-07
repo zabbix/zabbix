@@ -667,7 +667,7 @@ class CGraph extends CGraphGeneral {
 	 */
 	protected function validateCreate(array $graphs) {
 		$itemIds = $this->validateItemsCreate($graphs);
-		$this->validateItems($itemIds);
+		$this->validateItems($itemIds, $graphs);
 
 		parent::validateCreate($graphs);
 	}
@@ -683,7 +683,7 @@ class CGraph extends CGraphGeneral {
 	 */
 	protected function validateUpdate(array $graphs, array $dbGraphs) {
 		$itemIds = $this->validateItemsUpdate($graphs);
-		$this->validateItems($itemIds);
+		$this->validateItems($itemIds, $graphs);
 
 		parent::validateUpdate($graphs, $dbGraphs);
 	}
@@ -692,22 +692,21 @@ class CGraph extends CGraphGeneral {
 	 * Validates graph item permissions.
 	 *
 	 * @param array $itemIds
-	 *
-	 * @return void
+	 * @param array $graphs
 	 */
-	protected function validateItems(array $itemIds) {
-		$allowedItems = API::Item()->get(array(
+	protected function validateItems(array $itemIds, array $graphs) {
+		$dbItems = API::Item()->get(array(
+			'output' => array('name', 'value_type'),
 			'nodeids' => get_current_nodeid(true),
 			'itemids' => $itemIds,
 			'webitems' => true,
 			'editable' => true,
-			'output' => array('name', 'value_type'),
 			'preservekeys' => true
 		));
 
 		// check if items exist and user has permission to access those items
-		foreach ($itemIds as $itemid) {
-			if (!isset($allowedItems[$itemid])) {
+		foreach ($itemIds as $itemId) {
+			if (!isset($dbItems[$itemId])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
@@ -715,11 +714,33 @@ class CGraph extends CGraphGeneral {
 		$allowedValueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
 
 		// get value type and name for these items
-		foreach ($allowedItems as $item) {
-			if (!in_array($item['value_type'], $allowedValueTypes)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Cannot add a non-numeric item "%1$s" to graph "%2$s".', $item['name'], $graph['name'])
-				);
+		foreach ($graphs as $graph) {
+			// graph items
+			foreach ($graph['gitems'] as $graphItem) {
+				$item = $dbItems[$graphItem['itemid']];
+
+				if (!in_array($item['value_type'], $allowedValueTypes)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Cannot add a non-numeric item "%1$s" to graph "%2$s".',
+						$item['name'],
+						$graph['name']
+					));
+				}
+			}
+
+			// Y axis min/max
+			foreach (array('ymin_itemid', 'ymax_itemid') as $field) {
+				if (isset($graph[$field]) && $graph[$field]) {
+					$item = $dbItems[$graph[$field]];
+
+					if (!in_array($item['value_type'], $allowedValueTypes)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Cannot add a non-numeric item "%1$s" to graph "%2$s".',
+							$item['name'],
+							$graph['name']
+						));
+					}
+				}
 			}
 		}
 	}

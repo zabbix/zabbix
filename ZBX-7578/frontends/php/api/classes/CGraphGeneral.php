@@ -547,7 +547,6 @@ abstract class CGraphGeneral extends CZBXAPI {
 					);
 				}
 
-
 				// items fields
 				foreach ($graph['gitems'] as $gitem) {
 					// check color
