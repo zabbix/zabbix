@@ -98,14 +98,12 @@ static void	zbx_dns_log(FILE *log_fd, const char *prefix, const char *text)
 			text);
 }
 
-static int	zbx_set_resolver_ns(ldns_resolver *res, const char *name, const char *ip, char ipv4_enabled,
-		char ipv6_enabled, FILE *log_fd, char *err, size_t err_size)
+static int	zbx_validate_ip(const char *ip, char ipv4_enabled, char ipv6_enabled, ldns_rdf **ip_rdf_out)
 {
 	ldns_rdf	*ip_rdf = NULL;
-	ldns_status	status;
 	int		ret = FAIL;
 
-	/* create a rdf from ip */
+	/* try IPv4 */
 	if (0 == ipv4_enabled || NULL == (ip_rdf = ldns_rdf_new_frm_str(LDNS_RDF_TYPE_A, ip)))
 	{
 		/* try IPv6 */
@@ -114,8 +112,29 @@ static int	zbx_set_resolver_ns(ldns_resolver *res, const char *name, const char 
 	}
 
 	if (NULL == ip_rdf)
+		goto out;
+
+	if (NULL != ip_rdf_out)
+		*ip_rdf_out = ldns_rdf_clone(ip_rdf);
+
+	ret = SUCCEED;
+out:
+	if (NULL != ip_rdf)
+		ldns_rdf_deep_free(ip_rdf);
+
+	return ret;
+}
+
+static int	zbx_set_resolver_ns(ldns_resolver *res, const char *name, const char *ip, char ipv4_enabled,
+		char ipv6_enabled, FILE *log_fd, char *err, size_t err_size)
+{
+	ldns_rdf	*ip_rdf = NULL;
+	ldns_status	status;
+	int		ret = FAIL;
+
+	if (SUCCEED != zbx_validate_ip(ip, ipv4_enabled, ipv6_enabled, &ip_rdf))
 	{
-		zbx_snprintf(err, err_size, "invalid or unsupported %s IP \"%s\"", name, ip);
+		zbx_snprintf(err, err_size, "invalid or unsupported IP of \"%s\": \"%s\"", name, ip);
 		goto out;
 	}
 
@@ -1043,7 +1062,8 @@ static size_t	zbx_get_dns_items(const char *keyname, DC_ITEM *item, const char *
 	return out_items_num;
 }
 
-static size_t	zbx_get_nameservers(const DC_ITEM *items, size_t items_num, zbx_ns_t **nss)
+static size_t	zbx_get_nameservers(const DC_ITEM *items, size_t items_num, zbx_ns_t **nss, char ipv4_enabled,
+		char ipv6_enabled)
 {
 	char		ns[ZBX_HOST_BUF_SIZE], ip[ZBX_IP_BUF_SIZE], ns_found, ip_found;
 	size_t		i, j, j2, nss_num = 0, nss_alloc = 8;
@@ -1057,6 +1077,9 @@ static size_t	zbx_get_nameservers(const DC_ITEM *items, size_t items_num, zbx_ns
 
 		get_param(item->params, 2, ns, sizeof(ns));
 		get_param(item->params, 3, ip, sizeof(ip));
+
+		if (SUCCEED != zbx_validate_ip(ip, ipv4_enabled, ipv6_enabled, NULL))
+			continue;
 
 		if (0 == nss_num)
 		{
@@ -1424,7 +1447,7 @@ int	check_dnstest_dns(DC_ITEM *item, const char *keyname, const char *params, AG
 		zbx_dns_err(log_fd, err);
 	}
 
-	nss_num = zbx_get_nameservers(items, items_num, &nss);
+	nss_num = zbx_get_nameservers(items, items_num, &nss, ipv4_enabled, ipv6_enabled);
 
 	for (i = 0; i < nss_num; i++)
 	{
