@@ -25,7 +25,7 @@
 class CConditionHelper {
 
 	/**
-	 * Generate a formula from conditions $conditions with respect to evaluation type $evalType.
+	 * Generate a numeric formula from conditions $conditions with respect to evaluation type $evalType.
 	 * Each condition must have a condition type, that will be used for grouping.
 	 *
 	 * Supported $evalType values:
@@ -35,12 +35,14 @@ class CConditionHelper {
 	 *
 	 * Example:
 	 * echo CFormulaHelper::getFormula(array(
-	 * 	'A' => 'condition1',
-	 *	'B' => 'condition1',
-	 *	'C' => 'condition2'
+	 * 	1 => 'condition1',
+	 *	2 => 'condition1',
+	 *	5 => 'condition2'
 	 * ), CONDITION_EVAL_TYPE_AND_OR);
 	 *
-	 * // (A or B) and (C)
+	 * // ({1} or {2}) and {5}
+	 *
+	 * Keep in sync with JS getConditionFormula().
 	 *
 	 * @param array $conditions		conditions with IDs as keys and condition type with values
 	 * @param int	$evalType
@@ -48,12 +50,9 @@ class CConditionHelper {
 	 * @return string
 	 */
 	public static function getFormula(array $conditions, $evalType) {
-		$i = 0;
 		$groupedConditions = array();
 		foreach ($conditions as $id => $condition) {
 			$groupedConditions[$condition][] = '{'.$id.'}';
-
-			$i++;
 		}
 
 		// operators
@@ -78,12 +77,18 @@ class CConditionHelper {
 				$groupFormulas[] = '('.implode(' '.$conditionOperator.' ', $conditionIds).')';
 			}
 			else {
-				$groupFormulas[] = array_pop($conditionIds);
+				$groupFormulas[] = $conditionIds[0];
 			}
 		}
-		$groupFormulas = implode(' '.$groupOperator.' ', $groupFormulas);
 
-		return $groupFormulas;
+		$formula = implode(' '.$groupOperator.' ', $groupFormulas);
+
+		// strip parentheses if there's only one condition group
+		if (count($groupedConditions) == 1) {
+			$formula = trim($formula, '()');
+		}
+
+		return $formula;
 	}
 
 	/**

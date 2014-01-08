@@ -1201,6 +1201,87 @@ function num2letter(number) {
 	return str;
 }
 
+/**
+ * Generate a formula from the given conditions with respect to the given evaluation type.
+ * Each condition must have a condition type, that will be used for grouping.
+ *
+ * Each condition object must have the following properties:
+ * - id		- ID used in the formula
+ * - type	- condition type used for grouping
+ *
+ * Supported evalType values:
+ * - 1 - or
+ * - 2 - and
+ * - 3 - and/or
+ *
+ * Example:
+ * getConditionFormula([{'id': 'A', 'type': '1'}, {'id': 'B', 'type': '1'}, {'id': 'C', 'type': '2'}], '1');
+ *
+ * // (A and B) and C
+ *
+ * Keep in sync with PHP CConditionHelper::getFormula().
+ *
+ * @param {array} 	conditions	array of condition objects
+ * @param {string} 	evalType
+ *
+ * @returns {string}
+ */
+function getConditionFormula(conditions, evalType) {
+	switch (evalType) {
+		// and
+		case 1:
+			var conditionOperator = 'and';
+			var groupOperator = conditionOperator;
+
+			break;
+		// or
+		case 2:
+			var conditionOperator = 'or';
+			var groupOperator = conditionOperator;
+
+			break;
+		// and/or
+		default:
+			var conditionOperator = 'or';
+			var groupOperator = 'and';
+	}
+
+	var groupedFormulas = [];
+	for (var i = 0; i < conditions.length; i++) {
+		if (typeof conditions[i] == 'undefined') {
+			continue;
+		}
+
+		var groupedConditions = [];
+		groupedConditions.push(conditions[i].id);
+
+		// search for other conditions of the same type
+		for (var n = i + 1; n < conditions.length; n++) {
+			if (typeof conditions[n] != 'undefined' && conditions[i].type == conditions[n].type) {
+				groupedConditions.push(conditions[n].id);
+				delete conditions[n];
+			}
+		}
+
+		// join conditions of the same type
+		if (groupedConditions.length > 1) {
+			groupedFormulas.push('(' + groupedConditions.join(' ' + conditionOperator + ' ') + ')');
+		}
+		else {
+			groupedFormulas.push(groupedConditions[0]);
+		}
+	}
+
+	var formula = groupedFormulas.join(' ' + groupOperator + ' ');
+
+	// strip parentheses if there's only one condition group
+	if (groupedFormulas.length == 1) {
+		formula = formula.substr(1, formula.length - 2);
+	}
+
+	return formula;
+}
+
 (function($) {
 	/**
 	 * Creates a table with dynamic add/remove row buttons.
@@ -1213,7 +1294,8 @@ function num2letter(number) {
 	 * - dataCallback	- function to generate the data passed to the template
 	 *
 	 * Triggered events:
-	 * - change.elementTable 	- after adding or removing a row
+	 * - rowremove.elementTable 	- after removing a row (triggered before tableupdate.elementTable)
+	 * - tableupdate.elementTable 	- after adding or removing a row
 	 *
 	 * @param options
 	 */
@@ -1281,6 +1363,7 @@ function num2letter(number) {
 	function removeRow(table, row, options) {
 		row.remove();
 
+		table.trigger('rowremove.elementTable', options);
 		table.trigger('tableupdate.elementTable', options);
 	}
 }(jQuery));

@@ -282,7 +282,7 @@ $conditionFormList->addRow(_('Type of calculation'),
 			CONDITION_EVAL_TYPE_OR => _('OR'),
 			CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
 		)),
-		new CSpan($this->data['eval_formula'], ($this->data['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) ? 'hidden' : '', 'expression'),
+		new CSpan('', ($this->data['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) ? 'hidden' : '', 'expression'),
 		$formula
 	),
 	(count($this->data['conditions']) < 2), 'conditionRow'
@@ -306,7 +306,7 @@ else {
 foreach ($conditions as $i => $condition) {
 	// formula id
 	$formulaId = array(
-		new CSpan('('.$condition['formulaid'].')'),
+		new CSpan($condition['formulaid']),
 		new CVar('conditions['.$i.'][formulaid]', $condition['formulaid'])
 	);
 
@@ -314,6 +314,7 @@ foreach ($conditions as $i => $condition) {
 	$macro = new CTextBox('conditions['.$i.'][macro]', $condition['macro'], 30, false, 64);
 	$macro->addClass('macro');
 	$macro->setAttribute('placeholder', '{#MACRO}');
+	$macro->setAttribute('data-formulaid', $condition['formulaid']);
 
 	// value
 	$value = new CTextBox('conditions['.$i.'][value]', $condition['value'], 40, false, 255);
