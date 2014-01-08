@@ -21,7 +21,6 @@
 #include "checks_simple_dnstest.h"
 #include "zbxserver.h"
 #include "comms.h"
-#include "log.h"	/* TODO: REMOVE ME */
 
 #include <ldns/ldns.h>
 
@@ -43,8 +42,64 @@ typedef struct
 }
 zbx_ns_t;
 
+#define zbx_dns_errf(log_fd, fmt, ...)	zbx_dns_logf(log_fd, "Error", ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#define zbx_dns_warnf(log_fd, fmt, ...)	zbx_dns_logf(log_fd, "Warning", ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#define zbx_dns_infof(log_fd, fmt, ...)	zbx_dns_logf(log_fd, "Info", ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+static void	zbx_dns_logf(FILE *log_fd, const char *prefix, const char *fmt, ...)
+{
+	va_list		args;
+	char		fmt_buf[ZBX_ERR_BUF_SIZE];
+	struct timeval	current_time;
+	struct tm	*tm;
+	long		ms;
+
+	gettimeofday(&current_time, NULL);
+	tm = localtime(&current_time.tv_sec);
+	ms = current_time.tv_usec / 1000;
+
+	zbx_snprintf(fmt_buf, sizeof(fmt_buf), "[%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld] %s: %s\n",
+			tm->tm_year + 1900,
+			tm->tm_mon + 1,
+			tm->tm_mday,
+			tm->tm_hour,
+			tm->tm_min,
+			tm->tm_sec,
+			ms,
+			prefix,
+			fmt);
+	fmt = fmt_buf;
+
+	va_start(args, fmt);
+	vfprintf(log_fd, fmt, args);
+	va_end(args);
+}
+
+#define zbx_dns_err(log_fd, text)	zbx_dns_log(log_fd, "Error", text)
+#define zbx_dns_info(log_fd, text)	zbx_dns_log(log_fd, "Info", text)
+static void	zbx_dns_log(FILE *log_fd, const char *prefix, const char *text)
+{
+	struct timeval	current_time;
+	struct tm	*tm;
+	long		ms;
+
+	gettimeofday(&current_time, NULL);
+	tm = localtime(&current_time.tv_sec);
+	ms = current_time.tv_usec / 1000;
+
+	fprintf(log_fd, "[%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld] %s: %s\n",
+			tm->tm_year + 1900,
+			tm->tm_mon + 1,
+			tm->tm_mday,
+			tm->tm_hour,
+			tm->tm_min,
+			tm->tm_sec,
+			ms,
+			prefix,
+			text);
+}
+
 static int	zbx_set_resolver_ns(ldns_resolver *res, const char *name, const char *ip, char ipv4_enabled,
-		char ipv6_enabled, char *err, size_t err_size)
+		char ipv6_enabled, FILE *log_fd, char *err, size_t err_size)
 {
 	ldns_rdf	*ip_rdf = NULL;
 	ldns_status	status;
@@ -72,7 +127,7 @@ static int	zbx_set_resolver_ns(ldns_resolver *res, const char *name, const char 
 		goto out;
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "successfully using %s (%s)", name, ip);
+	zbx_dns_infof(log_fd, "successfully using %s (%s)", name, ip);
 
 	ret = SUCCEED;
 out:
@@ -83,7 +138,7 @@ out:
 }
 
 static int	zbx_create_resolver(ldns_resolver **res, const char *name, const char *ip, char proto,
-		char ipv4_enabled, char ipv6_enabled, char *err, size_t err_size)
+		char ipv4_enabled, char ipv6_enabled, FILE *log_fd, char *err, size_t err_size)
 {
 	struct timeval	tv;
 	int		retries, ip_support, ret = FAIL;
@@ -102,7 +157,7 @@ static int	zbx_create_resolver(ldns_resolver **res, const char *name, const char
 	}
 
 	/* push nameserver to it */
-	if (SUCCEED != zbx_set_resolver_ns(*res, name, ip, ipv4_enabled, ipv6_enabled, err, err_size))
+	if (SUCCEED != zbx_set_resolver_ns(*res, name, ip, ipv4_enabled, ipv6_enabled, log_fd, err, err_size))
 		goto out;
 
 	if (ZBX_DNSTEST_UDP == proto)
@@ -149,7 +204,7 @@ out:
 }
 
 static int	zbx_change_resolver(ldns_resolver *res, const char *name, const char *ip, char ipv4_enabled,
-		char ipv6_enabled, char *err, size_t err_size)
+		char ipv6_enabled, FILE *log_fd, char *err, size_t err_size)
 {
 	ldns_rdf	*pop;
 
@@ -157,7 +212,7 @@ static int	zbx_change_resolver(ldns_resolver *res, const char *name, const char 
 	while (NULL != (pop = ldns_resolver_pop_nameserver(res)))
 		ldns_rdf_deep_free(pop);
 
-	return zbx_set_resolver_ns(res, name, ip, ipv4_enabled, ipv6_enabled, err, err_size);
+	return zbx_set_resolver_ns(res, name, ip, ipv4_enabled, ipv6_enabled, log_fd, err, err_size);
 }
 
 /******************************************************************************
@@ -219,38 +274,6 @@ static int	zbx_random(int max)
 	srand(timespec.sec + timespec.ns);
 
 	return rand() % max;
-}
-
-#define zbx_dns_errf(f, fmt, ...)	zbx_dns_logf(f, "Error", ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#define zbx_dns_warnf(f, fmt, ...)	zbx_dns_logf(f, "Warning", ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#define zbx_dns_infof(f, fmt, ...)	zbx_dns_logf(f, "Info", ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-static void	zbx_dns_logf(FILE *f, const char *prefix, const char *fmt, ...)
-{
-	va_list		args;
-	char		fmt_buf[ZBX_ERR_BUF_SIZE];
-	struct timeval	current_time;
-	struct tm	*tm;
-	long		ms;
-
-	gettimeofday(&current_time, NULL);
-	tm = localtime(&current_time.tv_sec);
-	ms = current_time.tv_usec / 1000;
-
-	zbx_snprintf(fmt_buf, sizeof(fmt_buf), "[%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld] %s: %s\n",
-			tm->tm_year + 1900,
-			tm->tm_mon + 1,
-			tm->tm_mday,
-			tm->tm_hour,
-			tm->tm_min,
-			tm->tm_sec,
-			ms,
-			prefix,
-			fmt);
-	fmt = fmt_buf;
-
-	va_start(args, fmt);
-	vfprintf(f, fmt, args);
-	va_end(args);
 }
 
 static int	zbx_get_last_label(const char *name, char **last_label, char *err, size_t err_size)
@@ -562,7 +585,7 @@ out:
 }
 
 static int	zbx_get_ns_values(ldns_resolver *res, const char *ns, const char *ip, const ldns_rr_list *keys,
-		const char *testprefix, const char *domain, FILE *dtlog, int *rtt, int *upd, char ipv4_enabled,
+		const char *testprefix, const char *domain, FILE *log_fd, int *rtt, int *upd, char ipv4_enabled,
 		char ipv6_enabled, char epp_enabled, char *err, size_t err_size)
 {
 	char		testname[ZBX_HOST_BUF_SIZE], *host, *last_label = NULL;
@@ -576,7 +599,7 @@ static int	zbx_get_ns_values(ldns_resolver *res, const char *ns, const char *ip,
 	int		ret = FAIL;
 
 	/* change the resolver */
-	if (SUCCEED != zbx_change_resolver(res, ns, ip, ipv4_enabled, ipv6_enabled, err, err_size))
+	if (SUCCEED != zbx_change_resolver(res, ns, ip, ipv4_enabled, ipv6_enabled, log_fd, err, err_size))
 	{
 		*rtt = ZBX_EC_INTERNAL;
 		goto out;
@@ -616,7 +639,7 @@ static int	zbx_get_ns_values(ldns_resolver *res, const char *ns, const char *ip,
 		goto out;
 	}
 
-	ldns_pkt_print(dtlog, pkt);
+	ldns_pkt_print(log_fd, pkt);
 
 	if (0 != epp_enabled)
 	{
@@ -665,7 +688,7 @@ static int	zbx_get_ns_values(ldns_resolver *res, const char *ns, const char *ip,
 			rr = ldns_rr_list_rr(nsset, zbx_random(ldns_rr_list_rr_count(nsset)));
 			host = ldns_rdf2str(ldns_rr_rdf(rr, 0));
 
-			zabbix_log(LOG_LEVEL_WARNING, "DNSTEST DNS randomly chose ns %s", host);
+			zbx_dns_infof(log_fd, "randomly chose ns %s", host);
 			if (SUCCEED != zbx_get_ts_from_host(host, &ts))
 			{
 				zbx_snprintf(err, err_size, "cannot extract Unix timestamp from %s", host);
@@ -716,9 +739,9 @@ static int	zbx_get_ns_values(ldns_resolver *res, const char *ns, const char *ip,
 	ret = SUCCEED;
 out:
 	if (NULL != upd)
-		zabbix_log(LOG_LEVEL_WARNING, "DNSTEST DNS \"%s\" (%s) RTT:%d UPD:%d", ns, ip, *rtt, *upd);
+		zbx_dns_infof(log_fd, "DNSTEST DNS \"%s\" (%s) RTT:%d UPD:%d", ns, ip, *rtt, *upd);
 	else
-		zabbix_log(LOG_LEVEL_WARNING, "DNSTEST DNS \"%s\" (%s) RTT:%d", ns, ip, *rtt);
+		zbx_dns_infof(log_fd, "DNSTEST DNS \"%s\" (%s) RTT:%d", ns, ip, *rtt);
 
 	if (NULL != nsset)
 		ldns_rr_list_deep_free(nsset);
@@ -756,17 +779,12 @@ static void	zbx_set_value_ts(zbx_timespec_t *ts, int sec)
  ******************************************************************************/
 static void	zbx_add_value(const DC_ITEM *item, AGENT_RESULT *result, int ts)
 {
-	const char	*__function_name = "zbx_add_value";
 	zbx_timespec_t	timespec;
-
-	zabbix_log(LOG_LEVEL_WARNING, "In %s() itemid:" ZBX_FS_UI64 " ts:%d", __function_name, item->itemid, ts);
 
 	zbx_set_value_ts(&timespec, ts);
 
 	dc_add_history(item->itemid, item->value_type, item->flags, result, &timespec, ITEM_STATUS_ACTIVE,
 			NULL, 0, NULL, 0, 0, 0, 0);
-
-	zabbix_log(LOG_LEVEL_WARNING, "End of %s()", __function_name);
 }
 
 static void	zbx_add_value_uint(const DC_ITEM *item, int ts, int value)
@@ -809,8 +827,6 @@ static void	zbx_set_dnstest_values(const char *item_ns, const char *item_ip, int
 	const char	*p;
 	char		rtt_set = 0, upd_set = 0, ns[ZBX_HOST_BUF_SIZE], ip[ZBX_IP_BUF_SIZE];
 
-	zabbix_log(LOG_LEVEL_WARNING, "DNSTEST DNS In %s()", __function_name);
-
 	if (ZBX_NO_VALUE == upd)
 		upd_set = 1;
 
@@ -828,8 +844,6 @@ static void	zbx_set_dnstest_values(const char *item_ns, const char *item_ip, int
 			{
 				zbx_add_value_dbl(item, value_ts, rtt);
 
-				zabbix_log(LOG_LEVEL_WARNING, "DNSTEST DNS set item %s value %d", item->key, rtt);
-
 				rtt_set = 1;
 			}
 		}
@@ -842,8 +856,6 @@ static void	zbx_set_dnstest_values(const char *item_ns, const char *item_ip, int
 			{
 				zbx_add_value_dbl(item, value_ts, upd);
 
-				zabbix_log(LOG_LEVEL_WARNING, "DNSTEST DNS set item %s value %d", item->key, upd);
-
 				upd_set = 1;
 			}
 		}
@@ -851,8 +863,6 @@ static void	zbx_set_dnstest_values(const char *item_ns, const char *item_ip, int
 		if (0 != rtt_set && 0 != upd_set)
 			return;
 	}
-
-	zabbix_log(LOG_LEVEL_WARNING, "DNSTEST DNS End of %s() rtt_set:%d", __function_name, rtt_set);
 }
 
 static int	zbx_get_dnskeys(const ldns_resolver *res, const char *domain, const char *resolver,
@@ -910,29 +920,6 @@ out:
 	return ret;
 }
 
-#define zbx_dns_err(f, text)	zbx_dns_log(f, "Error", text)
-static void	zbx_dns_log(FILE *f, const char *prefix, const char *text)
-{
-	struct timeval	current_time;
-	struct tm	*tm;
-	long		ms;
-
-	gettimeofday(&current_time, NULL);
-	tm = localtime(&current_time.tv_sec);
-	ms = current_time.tv_usec / 1000;
-
-	fprintf(f, "[%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld] %s: %s\n",
-			tm->tm_year + 1900,
-			tm->tm_mon + 1,
-			tm->tm_mday,
-			tm->tm_hour,
-			tm->tm_min,
-			tm->tm_sec,
-			ms,
-			prefix,
-			text);
-}
-
 static int	zbx_parse_dns_item(DC_ITEM *item, char *host, size_t host_size)
 {
 	char	keyname[32], params[MAX_STRING_LEN];
@@ -986,7 +973,8 @@ static int	zbx_parse_rdds_item(DC_ITEM *item, char *host, size_t host_size)
 	return SUCCEED;
 }
 
-static size_t	zbx_get_dns_items(const char *keyname, DC_ITEM *item, const char *domain, DC_ITEM **out_items)
+static size_t	zbx_get_dns_items(const char *keyname, DC_ITEM *item, const char *domain, DC_ITEM **out_items,
+		FILE *log_fd)
 {
 	char		*keypart, host[ZBX_HOST_BUF_SIZE];
 	const char	*p;
@@ -1006,8 +994,8 @@ static size_t	zbx_get_dns_items(const char *keyname, DC_ITEM *item, const char *
 		ZBX_STRDUP(in_items[i].key, in_items[i].key_orig);
 		if (SUCCEED != substitute_key_macros(&in_items[i].key, NULL, item, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0))
 		{
-			/* unexpected item key syntax, skip it */
-			zabbix_log(LOG_LEVEL_WARNING, "DNSTEST DNS %s: cannot substitute key macros", in_items[i].key_orig);
+			/* problem with key macros, skip it */
+			zbx_dns_warnf(log_fd, "%s: cannot substitute key macros", in_items[i].key_orig);
 			continue;
 		}
 
@@ -1015,24 +1003,20 @@ static size_t	zbx_get_dns_items(const char *keyname, DC_ITEM *item, const char *
 		if (SUCCEED != zbx_parse_dns_item(&in_items[i], host, sizeof(host)))
 		{
 			/* unexpected item key syntax, skip it */
-			zabbix_log(LOG_LEVEL_WARNING, "DNSTEST DNS %s: unexpected key syntax", in_items[i].key);
+			zbx_dns_warnf(log_fd, "%s: unexpected key syntax", in_items[i].key);
 			continue;
 		}
 
 		if (0 != strcmp(host, domain))
 		{
 			/* first parameter does not match expected domain name, skip it */
-			zabbix_log(LOG_LEVEL_WARNING, "DNSTEST DNS %s: first parameter does not match host %s", in_items[i].key,
-					domain);
+			zbx_dns_warnf(log_fd, "%s: first parameter does not match host %s", in_items[i].key, domain);
 			continue;
 		}
 
 		p = in_items[i].key + keypart_size;
 		if (0 != strncmp(p, "rtt[", 4) && 0 != strncmp(p, "upd[", 4))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "DNSTEST DNS %s: not our item", in_items[i].key);
 			continue;
-		}
 
 		if (0 == out_items_num)
 		{
@@ -1345,12 +1329,17 @@ int	check_dnstest_dns(DC_ITEM *item, const char *keyname, const char *params, AG
 	int		ipv4_enabled, ipv6_enabled, dnssec_enabled, epp_enabled, rdds_enabled, res_ec = ZBX_EC_NOERROR,
 			rtt, upd = ZBX_NO_VALUE, rtt_limit, ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_WARNING, "In %s() keyname:'%s' params:'%s'", __function_name, keyname, params);
-
 	if (0 != get_param(params, 1, domain, sizeof(domain)) || '\0' == *domain)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "first key parameter missing"));
-		goto out;
+		return SYSINFO_RET_FAIL;
+	}
+
+	/* open log file */
+	if (NULL == (log_fd = open_item_log(domain, ZBX_DNS_LOG_PREFIX, err, sizeof(err))))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+		return SYSINFO_RET_FAIL;
 	}
 
 	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_TLD_DNSSEC_ENABLED, &dnssec_enabled, 0,
@@ -1395,8 +1384,6 @@ int	check_dnstest_dns(DC_ITEM *item, const char *keyname, const char *params, AG
 			SET_MSG_RESULT(result, zbx_strdup(NULL, err));
 			goto out;
 		}
-
-		zabbix_log(LOG_LEVEL_WARNING, "DNSTEST DNS testprefix: \"%s\"", testprefix);
 	}
 
 	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_DNSTEST_UDP == proto ? ZBX_MACRO_DNS_UDP_RTT :
@@ -1413,22 +1400,15 @@ int	check_dnstest_dns(DC_ITEM *item, const char *keyname, const char *params, AG
 	}
 
 	/* create resolver */
-	if (SUCCEED != zbx_create_resolver(&res, "resolver", res_ip, proto, ipv4_enabled, ipv6_enabled,
+	if (SUCCEED != zbx_create_resolver(&res, "resolver", res_ip, proto, ipv4_enabled, ipv6_enabled, log_fd,
 			err, sizeof(err)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "cannot create resolver: %s", err));
 		goto out;
 	}
 
-	/* open dns log file */
-	if (NULL == (log_fd = open_item_log(domain, ZBX_DNS_LOG_PREFIX, err, sizeof(err))))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
-		goto out;
-	}
-
 	/* get dnstest items */
-	if (0 == (items_num = zbx_get_dns_items(keyname, item, domain, &items)))
+	if (0 == (items_num = zbx_get_dns_items(keyname, item, domain, &items, log_fd)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "no trapper %s.* items found", keyname));
 		goto out;
@@ -1512,15 +1492,16 @@ int	check_dnstest_dns(DC_ITEM *item, const char *keyname, const char *params, AG
 			ldns_resolver_free(res);
 	}
 out:
+	if (0 != ISSET_MSG(result))
+		zbx_dns_err(log_fd, result->msg);
+
 	zbx_free(testprefix);
 	zbx_free(res_ip);
-
-	zabbix_log(LOG_LEVEL_WARNING, "End of %s():%s", __function_name, SYSINFO_RET_OK == ret ? "SUCCEED" : "FAIL");
 
 	return ret;
 }
 
-static void	zbx_get_rdds43_nss(zbx_vector_str_t *nss, const char *recv_buf, const char *rdds_ns_string, FILE *f)
+static void	zbx_get_rdds43_nss(zbx_vector_str_t *nss, const char *recv_buf, const char *rdds_ns_string, FILE *log_fd)
 {
 	const char	*p;
 	char		ns_buf[ZBX_HOST_BUF_SIZE];
@@ -1546,15 +1527,13 @@ static void	zbx_get_rdds43_nss(zbx_vector_str_t *nss, const char *recv_buf, cons
 
 			ns_buf_len = 0;
 			while ('\0' != *p && 0 == isspace(*p) && ns_buf_len < sizeof(ns_buf))
-			{
 				ns_buf[ns_buf_len++] = *p++;
-			}
 
 			if (sizeof(ns_buf) == ns_buf_len)
 			{
 				/* internal error, ns buffer not enough */
-				zbx_dns_errf(f, "DNSTEST RDDS internal error, ns buffer too small (%u) for host in \"%s\"",
-						sizeof(ns_buf), p);
+				zbx_dns_errf(log_fd, "DNSTEST RDDS internal error, ns buffer too small"
+						" (%u bytes) for host in \"%s\"", sizeof(ns_buf), p);
 				continue;
 			}
 
@@ -1571,7 +1550,8 @@ static void	zbx_get_rdds43_nss(zbx_vector_str_t *nss, const char *recv_buf, cons
 	}
 }
 
-static size_t	zbx_get_rdds_items(const char *keyname, DC_ITEM *item, const char *domain, DC_ITEM **out_items)
+static size_t	zbx_get_rdds_items(const char *keyname, DC_ITEM *item, const char *domain, DC_ITEM **out_items,
+		FILE *log_fd)
 {
 	char		*keypart, host[ZBX_HOST_BUF_SIZE];
 	const char	*p;
@@ -1591,23 +1571,22 @@ static size_t	zbx_get_rdds_items(const char *keyname, DC_ITEM *item, const char 
 		ZBX_STRDUP(in_items[i].key, in_items[i].key_orig);
 		if (SUCCEED != substitute_key_macros(&in_items[i].key, NULL, item, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0))
 		{
-			/* unexpected item key syntax, skip it */
-			zabbix_log(LOG_LEVEL_WARNING, "DNSTEST RDDS %s: cannot substitute key macros", in_items[i].key_orig);
+			/* problem with key macros, skip it */
+			zbx_dns_warnf(log_fd, "%s: cannot substitute key macros", in_items[i].key_orig);
 			continue;
 		}
 
 		if (SUCCEED != zbx_parse_rdds_item(&in_items[i], host, sizeof(host)))
 		{
 			/* unexpected item key syntax, skip it */
-			zabbix_log(LOG_LEVEL_WARNING, "DNSTEST RDDS %s: unexpected key syntax", in_items[i].key);
+			zbx_dns_warnf(log_fd, "%s: unexpected key syntax", in_items[i].key);
 			continue;
 		}
 
 		if (0 != strcmp(host, domain))
 		{
 			/* first parameter does not match expected domain name, skip it */
-			zabbix_log(LOG_LEVEL_WARNING, "DNSTEST RDDS %s: first parameter does not match host %s", in_items[i].key,
-					domain);
+			zbx_dns_warnf(log_fd, "%s: first parameter does not match host %s", in_items[i].key, domain);
 			continue;
 		}
 
@@ -1615,7 +1594,6 @@ static size_t	zbx_get_rdds_items(const char *keyname, DC_ITEM *item, const char 
 		if (0 != strncmp(p, "43.ip[", 6) && 0 != strncmp(p, "43.rtt[", 7) && 0 != strncmp(p, "43.upd[", 7) &&
 				0 != strncmp(p, "80.ip[", 6) && 0 != strncmp(p, "80.rtt[", 7))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "DNSTEST RDDS %s: not our item", in_items[i].key);
 			continue;
 		}
 
@@ -1645,7 +1623,7 @@ static size_t	zbx_get_rdds_items(const char *keyname, DC_ITEM *item, const char 
 }
 
 static int	zbx_tcp_exchange(const char *request, const char *host, short port, int timeout, char **answer,
-		int *rtt, FILE *f, char *err, size_t err_size)
+		int *rtt, FILE *log_fd, char *err, size_t err_size)
 {
 	zbx_sock_t	s;
 	char		*recv_buf, send_buf[ZBX_SEND_BUF_SIZE];
@@ -1655,7 +1633,7 @@ static int	zbx_tcp_exchange(const char *request, const char *host, short port, i
 	memset(&s, 0, sizeof(s));
 	zbx_timespec(&start);
 
-	zbx_dns_infof(f, "start RDDS%hd test", port);
+	zbx_dns_infof(log_fd, "start RDDS%hd test", port);
 
 	if (SUCCEED != zbx_tcp_connect(&s, NULL, host, port, timeout))
 	{
@@ -1703,7 +1681,7 @@ static int	zbx_tcp_exchange(const char *request, const char *host, short port, i
 	zbx_timespec(&now);
 	*rtt = (now.sec - start.sec) * 1000 + (now.ns - start.ns) / 1000000;
 
-	zbx_dns_infof(f, "===>\n%.*s\n<=== end RDDS%hd test", ZBX_RDDS_PREVIEW_SIZE, recv_buf, port);
+	zbx_dns_infof(log_fd, "===>\n%.*s\n<=== end RDDS%hd test", ZBX_RDDS_PREVIEW_SIZE, recv_buf, port);
 
 	if (NULL != answer)
 		*answer = zbx_strdup(*answer, recv_buf);
@@ -1714,7 +1692,7 @@ out:
 }
 
 static int	zbx_resolve_hosts(const ldns_resolver *res, const zbx_vector_str_t *hosts, zbx_vector_str_t *ips,
-		int ipv4_enabled, int ipv6_enabled, FILE *f, char *err, size_t err_size)
+		int ipv4_enabled, int ipv6_enabled, FILE *log_fd, char *err, size_t err_size)
 {
 	ldns_pkt	*pkt = NULL;
 	ldns_rdf	*host_rdf = NULL;
@@ -1750,7 +1728,7 @@ static int	zbx_resolve_hosts(const ldns_resolver *res, const zbx_vector_str_t *h
 				goto out;
 			}
 
-			ldns_pkt_print(f, pkt);
+			ldns_pkt_print(log_fd, pkt);
 
 			if (NULL != rrset)
 				ldns_rr_list_deep_free(rrset);
@@ -1785,7 +1763,7 @@ static int	zbx_resolve_hosts(const ldns_resolver *res, const zbx_vector_str_t *h
 				goto out;
 			}
 
-			ldns_pkt_print(f, pkt);
+			ldns_pkt_print(log_fd, pkt);
 
 			if (NULL != rrset)
 				ldns_rr_list_deep_free(rrset);
@@ -1912,8 +1890,6 @@ static void	zbx_set_rddstest_values(const char *ip43, int rtt43, int upd43, cons
 
 int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_dnstest_rdds";
-
 	char			domain[ZBX_HOST_BUF_SIZE], *value_str = NULL, *res_ip = NULL, *testprefix = NULL,
 				*rdds_ns_string = NULL, *answer = NULL, testname[ZBX_HOST_BUF_SIZE],
 				err[ZBX_ERR_BUF_SIZE], *random_ns = NULL;
@@ -1927,20 +1903,18 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 	int			rtt43 = ZBX_NO_VALUE, upd43 = ZBX_NO_VALUE, rtt80 = ZBX_NO_VALUE, rtt_limit,
 				ipv4_enabled, ipv6_enabled, rdds_enabled, epp_enabled, ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_WARNING, "In %s() keyname:'%s' params:'%s'", __function_name, keyname, params);
-
-	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_RDDS_ENABLED, &rdds_enabled, 0, err, sizeof(err)) ||
-			0 == rdds_enabled)
+	/* first read the TLD */
+	if (0 != get_param(params, 1, domain, sizeof(domain)) || '\0' == *domain)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "End of %s(): disabled on this probe", __function_name);
-		return SYSINFO_RET_OK;
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "first key parameter missing"));
+		return SYSINFO_RET_FAIL;
 	}
 
-	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_TLD_RDDS_ENABLED, &rdds_enabled, 0,
-			err, sizeof(err)) || 0 == rdds_enabled)
+	/* open log file */
+	if (NULL == (log_fd = open_item_log(domain, ZBX_RDDS_LOG_PREFIX, err, sizeof(err))))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "End of %s(): disabled on this TLD", __function_name);
-		return SYSINFO_RET_OK;
+		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+		return SYSINFO_RET_FAIL;
 	}
 
 	zbx_vector_str_create(&hosts43);
@@ -1949,12 +1923,23 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 	zbx_vector_str_create(&ips80);
 	zbx_vector_str_create(&nss);
 
-	if (0 != get_param(params, 1, domain, sizeof(domain)) || '\0' == *domain)
+	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_RDDS_ENABLED, &rdds_enabled, 0, err, sizeof(err)) ||
+			0 == rdds_enabled)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "first key parameter missing"));
+		zbx_dns_info(log_fd, "RDDS disabled on this probe");
+		ret = SYSINFO_RET_OK;
 		goto out;
 	}
 
+	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_TLD_RDDS_ENABLED, &rdds_enabled, 0,
+			err, sizeof(err)) || 0 == rdds_enabled)
+	{
+		zbx_dns_info(log_fd, "RDDS disabled on this TLD");
+		ret = SYSINFO_RET_OK;
+		goto out;
+	}
+
+	/* read rest of key parameters */
 	if (NULL == (value_str = get_param_dyn(params, 2)) || '\0' == *value_str)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "second key parameter missing"));
@@ -2032,8 +2017,6 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 			SET_MSG_RESULT(result, zbx_strdup(NULL, err));
 			goto out;
 		}
-
-		zabbix_log(LOG_LEVEL_WARNING, "DNSTEST RDDS testprefix: \"%s\"", testprefix);
 	}
 
 	if (SUCCEED != zbx_conf_str(&item->host.hostid, ZBX_MACRO_RDDS_NS_STRING, &rdds_ns_string, err, sizeof(err)))
@@ -2055,25 +2038,15 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 	}
 
 	/* create resolver */
-	if (SUCCEED != zbx_create_resolver(&res, "resolver", res_ip, ZBX_DNSTEST_TCP, ipv4_enabled, ipv6_enabled,
+	if (SUCCEED != zbx_create_resolver(&res, "resolver", res_ip, ZBX_DNSTEST_TCP, ipv4_enabled, ipv6_enabled, log_fd,
 			err, sizeof(err)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "cannot create resolver: %s", err));
 		goto out;
 	}
 
-	for (i = 0; i < items_num; i++)
-		zabbix_log(LOG_LEVEL_WARNING, "DNSTEST RDDS got item %s", items[i].key);
-
-	/* open rdds log file */
-	if (NULL == (log_fd = open_item_log(domain, ZBX_RDDS_LOG_PREFIX, err, sizeof(err))))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
-		goto out;
-	}
-
 	/* get rddstest items */
-	if (0 == (items_num = zbx_get_rdds_items(keyname, item, domain, &items)))
+	if (0 == (items_num = zbx_get_rdds_items(keyname, item, domain, &items, log_fd)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "no rddstest items found"));
 		goto out;
@@ -2106,8 +2079,6 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 		zbx_dns_errf(log_fd, "RDDS43 test of %s failed: %s", ip43, err);
 		goto out;
 	}
-
-	zabbix_log(LOG_LEVEL_WARNING, "RECEIVED ==>%s<==", answer ? answer : "NULL");
 
 	zbx_get_rdds43_nss(&nss, answer, rdds_ns_string, log_fd);
 
@@ -2179,6 +2150,9 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 		goto out;
 	}
 out:
+	if (0 != ISSET_MSG(result))
+		zbx_dns_err(log_fd, result->msg);
+
 	if (SYSINFO_RET_OK == ret)
 	{
 		int	ok_tests = 2;	/* RDDS43 and RDDS80 */
@@ -2231,31 +2205,29 @@ out:
 	zbx_vector_str_destroy(&hosts80);
 	zbx_vector_str_destroy(&hosts43);
 
-	zabbix_log(LOG_LEVEL_WARNING, "End of %s():%s", __function_name, SYSINFO_RET_OK == ret ? "SUCCEED" : "FAIL");
-
 	return ret;
 }
 
 static int	zbx_check_dns_connection(ldns_resolver **res, const char *ip, ldns_rdf *query_rdf, int reply_ms,
-		int *dns_res, FILE *f, int ipv4_enabled, int ipv6_enabled, char *err, size_t err_size)
+		int *dns_res, FILE *log_fd, int ipv4_enabled, int ipv6_enabled, char *err, size_t err_size)
 {
-	const char	*__function_name = "zbx_check_dns_connection";
 	ldns_pkt	*pkt = NULL;
 	ldns_rr_list	*rrset = NULL;
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_WARNING, "In %s() ip:'%s'", __function_name, ip);
-
 	if (NULL == *res)
 	{
 		if (SUCCEED != zbx_create_resolver(res, "root server", ip, ZBX_DNSTEST_UDP, ipv4_enabled, ipv6_enabled,
-				err, err_size))
+				log_fd, err, err_size))
 		{
 			goto out;
 		}
 	}
-	else if (SUCCEED != zbx_change_resolver(*res, "root server", ip, ipv4_enabled, ipv6_enabled, err, sizeof(err)))
+	else if (SUCCEED != zbx_change_resolver(*res, "root server", ip, ipv4_enabled, ipv6_enabled, log_fd,
+			err, sizeof(err)))
+	{
 		goto out;
+	}
 
 	/* not internal error */
 	ret = SUCCEED;
@@ -2266,15 +2238,15 @@ static int	zbx_check_dns_connection(ldns_resolver **res, const char *ip, ldns_rd
 
 	if (NULL == (pkt = ldns_resolver_query(*res, query_rdf, LDNS_RR_TYPE_SOA, LDNS_RR_CLASS_IN, 0)))
 	{
-		zbx_dns_errf(f, "cannot connect to root server %s", ip);
+		zbx_dns_errf(log_fd, "cannot connect to root server %s", ip);
 		goto out;
 	}
 
-	ldns_pkt_print(f, pkt);
+	ldns_pkt_print(log_fd, pkt);
 
 	if (NULL == (rrset = ldns_pkt_rr_list_by_type(pkt, LDNS_RR_TYPE_SOA, LDNS_SECTION_ANSWER)))
 	{
-		zbx_dns_warnf(f, "no SOA records from %s", ip);
+		zbx_dns_warnf(log_fd, "no SOA records from %s", ip);
 		goto out;
 	}
 
@@ -2282,13 +2254,13 @@ static int	zbx_check_dns_connection(ldns_resolver **res, const char *ip, ldns_rd
 
 	if (NULL == (rrset = ldns_pkt_rr_list_by_type(pkt, LDNS_RR_TYPE_RRSIG, LDNS_SECTION_ANSWER)))
 	{
-		zbx_dns_warnf(f, "no RRSIG records from %s", ip);
+		zbx_dns_warnf(log_fd, "no RRSIG records from %s", ip);
 		goto out;
 	}
 
 	if (ldns_pkt_querytime(pkt) > reply_ms)
 	{
-		zbx_dns_warnf(f, "%s query RTT %d over limit (%d)", ip, ldns_pkt_querytime(pkt), reply_ms);
+		zbx_dns_warnf(log_fd, "%s query RTT %d over limit (%d)", ip, ldns_pkt_querytime(pkt), reply_ms);
 		goto out;
 	}
 
@@ -2300,8 +2272,6 @@ out:
 
 	if (NULL != pkt)
 		ldns_pkt_free(pkt);
-
-	zabbix_log(LOG_LEVEL_WARNING, "End of %s():%s dns_res:%d", __function_name, zbx_result_string(ret), *dns_res);
 
 	return ret;
 }
@@ -2318,6 +2288,13 @@ int	check_dnstest_probe_status(DC_ITEM *item, const char *keyname, const char *p
 	int			ipv4_enabled = 0, ipv6_enabled = 0, min_servers, reply_ms, online_delay, dns_res,
 				ok_servers, ret, status = ZBX_EC_PROBE_UNSUPPORTED;
 
+	/* open probestatus log file */
+	if (NULL == (log_fd = open_item_log(NULL, ZBX_PROBESTATUS_LOG_PREFIX, err, sizeof(err))))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+		return SYSINFO_RET_FAIL;
+	}
+
 	if (SUCCEED != zbx_conf_ip_support(&item->host.hostid, &ipv4_enabled, &ipv6_enabled, err, sizeof(err)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
@@ -2331,13 +2308,6 @@ int	check_dnstest_probe_status(DC_ITEM *item, const char *keyname, const char *p
 		goto out;
 	}
 
-	/* open probestatus log file */
-	if (NULL == (log_fd = open_item_log(NULL, ZBX_PROBESTATUS_LOG_PREFIX, err, sizeof(err))))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
-		goto out;
-	}
-
 	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_PROBE_ONLINE_DELAY, &online_delay, 60,
 			err, sizeof(err)))
 	{
@@ -2345,7 +2315,7 @@ int	check_dnstest_probe_status(DC_ITEM *item, const char *keyname, const char *p
 		goto out;
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "PROBESTATUS IPv4:%s IPv6:%s", 0 == ipv4_enabled ? "DISABLED" : "ENABLED",
+	zbx_dns_infof(log_fd, "IPv4:%s IPv6:%s", 0 == ipv4_enabled ? "DISABLED" : "ENABLED",
 			0 == ipv6_enabled ? "DISABLED" : "ENABLED");
 
 	if (0 != ipv4_enabled)
@@ -2484,6 +2454,9 @@ int	check_dnstest_probe_status(DC_ITEM *item, const char *keyname, const char *p
 
 	status = ZBX_EC_PROBE_ONLINE;
 out:
+	if (0 != ISSET_MSG(result))
+		zbx_dns_err(log_fd, result->msg);
+
 	/* If tests are successful and we are ONLINE currently we continue being ONLINE. If     */
 	/* tests are successful and we are OFFLINE we can change to ONLINE only if successful   */
 	/* test results were received for PROBE_ONLINE_DELAY seconds. Otherwise we are OFFLINE. */
