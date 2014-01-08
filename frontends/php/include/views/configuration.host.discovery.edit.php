@@ -188,10 +188,6 @@ $itemFormList->addRow(_('SQL query'),
 	false,
 	'label_params'
 );
-$itemFormList->addRow(_('Formula'),
-	new CTextArea('params_f', $this->data['params'], array('rows' => ZBX_TEXTAREA_STANDARD_ROWS, 'width' => ZBX_TEXTAREA_STANDARD_WIDTH)),
-	false, 'label_formula'
-);
 
 $itemFormList->addRow(_('Update interval (in sec)'), new CNumericBox('delay', $this->data['delay'], 5), false, 'row_delay');
 
@@ -269,7 +265,7 @@ $itemFormList->addRow(_('Enabled'), $enabledCheckBox);
 $conditionFormList = new CFormList('conditionlist');
 
 // type of calculation
-$formula = new CTextBox('formula', $this->data['formula']);
+$formula = new CTextBox('formula', $this->data['formula'], ZBX_TEXTBOX_STANDARD_SIZE);
 $formula->attr('id', 'formula');
 if ($this->data['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION)  {
 	$formula->addClass('hidden');
