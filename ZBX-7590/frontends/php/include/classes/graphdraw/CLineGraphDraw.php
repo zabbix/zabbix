@@ -115,6 +115,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$host = get_host_by_hostid($item['hostid']);
 
+		$this->items[$this->num]['host'] = $host['host'];
 		$this->items[$this->num]['hostname'] = $host['name'];
 		$this->items[$this->num]['color'] = is_null($color) ? 'Dark Green' : $color;
 		$this->items[$this->num]['drawtype'] = is_null($drawtype) ? GRAPH_ITEM_DRAWTYPE_LINE : $drawtype;
