@@ -45,11 +45,12 @@ class CGraph extends CGraphGeneral {
 	}
 
 	/**
-	* Get graph data
-	*
-	* @param array $options
-	* @return array
-	*/
+	 * Get graph data.
+	 *
+	 * @param array $options
+	 *
+	 * @return array
+	 */
 	public function get($options = array()) {
 		$result = array();
 		$userType = self::$userData['type'];
@@ -531,7 +532,7 @@ class CGraph extends CGraphGeneral {
 	 * Delete graphs.
 	 *
 	 * @param array $graphids
-	 * @param bool $nopermissions
+	 * @param bool  $nopermissions
 	 *
 	 * @return array
 	 */
@@ -662,8 +663,6 @@ class CGraph extends CGraphGeneral {
 	 * Get allowed item ID's, check permissions, do all general validation and check for numeric item types.
 	 *
 	 * @param array $graphs
-	 *
-	 * @return void
 	 */
 	protected function validateCreate(array $graphs) {
 		$itemIds = $this->validateItemsCreate($graphs);
@@ -678,8 +677,6 @@ class CGraph extends CGraphGeneral {
 	 *
 	 * @param array $graphs
 	 * @param array $dbGraphs
-	 *
-	 * @return void
 	 */
 	protected function validateUpdate(array $graphs, array $dbGraphs) {
 		$itemIds = $this->validateItemsUpdate($graphs);

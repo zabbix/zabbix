@@ -197,11 +197,13 @@ class C20ImportFormatter extends CImportFormatter {
 	public function getGraphs() {
 		$graphsData = array();
 
-		if (!empty($this->data['graphs'])) {
+		if (isset($this->data['graphs']) && $this->data['graphs']) {
 			foreach ($this->data['graphs'] as $graph) {
 				$graph = $this->renameGraphFields($graph);
 
-				$graph['gitems'] = array_values($graph['gitems']);
+				if (isset($graph['gitems']) && $graph['gitems']) {
+					$graph['gitems'] = array_values($graph['gitems']);
+				}
 
 				$graphsData[] = $graph;
 			}
