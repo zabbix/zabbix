@@ -59,10 +59,11 @@ char	**CONFIG_ALIASES		= NULL;
 char	**CONFIG_LOAD_MODULE		= NULL;
 char	**CONFIG_USER_PARAMETERS	= NULL;
 
-char	*CONFIG_USER			= NULL;
 #if defined(_WINDOWS)
 char	**CONFIG_PERF_COUNTERS		= NULL;
 #endif
+
+char	*CONFIG_USER			= NULL;
 
 /******************************************************************************
  *                                                                            *
