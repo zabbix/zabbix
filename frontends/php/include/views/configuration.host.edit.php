@@ -200,7 +200,7 @@ if (!$isDiscovered) {
 		$tmp_label .= SPACE._('(Only super admins can create groups)');
 		$newgroupTB->setReadonly(true);
 	}
-	$hostList->addRow(SPACE, array(new CLabel($tmp_label, 'newgroup'), BR(), $newgroupTB), null, null, null, 'new');
+	$hostList->addRow(SPACE, array(new CLabel($tmp_label, 'newgroup'), BR(), $newgroupTB), null, null, 'new');
 }
 // groups for discovered hosts
 else {
