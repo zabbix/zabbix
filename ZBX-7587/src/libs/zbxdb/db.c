@@ -87,6 +87,24 @@ static const char	*zbx_oci_error(sword status, sb4 *err)
 	return errbuf;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: OCI_handle_sql_error                                             *
+ *                                                                            *
+ * Purpose: handles Oracle prepare/bind/execute/select operation error        *
+ *                                                                            *
+ * Parameters: zerrcode   - [IN] the Zabbix errorcode for the failed database *
+ *                               operation                                    *
+ *             oci_error  - [IN] the return code from failed Oralce operation *
+ *             sql        - [IN] the failed sql statement (can be NULL)       *
+ *                                                                            *
+ * Return value: ZBX_DB_DOWN - database connection is down                    *
+ *               ZBX_DB_FAIL - otherwise                                      *
+ *                                                                            *
+ * Comments: This function logs the error description and checks the          *
+ *           database connection status.                                      *
+ *                                                                            *
+ ******************************************************************************/
 int	OCI_handle_sql_error(int zerrcode, sword oci_error, const char *sql)
 {
 	sb4	errcode;
@@ -1735,7 +1753,7 @@ ub4	OCI_DBserver_status()
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot determine Oracle server status, assuming not connected");
 	}
-out:
+
 	return server_status;
 }
 
