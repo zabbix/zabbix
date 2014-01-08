@@ -29,6 +29,8 @@
 #define ZBX_IP_BUF_SIZE		64
 #define ZBX_ERR_BUF_SIZE	256
 #define ZBX_LOGNAME_BUF_SIZE	128
+#define ZBX_SEND_BUF_SIZE	128
+#define ZBX_RDDS_PREVIEW_SIZE	100
 
 extern const char	*CONFIG_LOG_FILE;
 
@@ -1646,7 +1648,7 @@ static int	zbx_tcp_exchange(const char *request, const char *host, short port, i
 		int *rtt, FILE *f, char *err, size_t err_size)
 {
 	zbx_sock_t	s;
-	char		*recv_buf, *send_buf = NULL;
+	char		*recv_buf, send_buf[ZBX_SEND_BUF_SIZE];
 	zbx_timespec_t	start, now;
 	int		ret = FAIL;
 
@@ -1661,10 +1663,24 @@ static int	zbx_tcp_exchange(const char *request, const char *host, short port, i
 		goto out;
 	}
 
-	if (port == 43)
-		send_buf = zbx_dsprintf(send_buf, "%s\r\n", request);
+	if (43 == port)
+	{
+		zbx_snprintf(send_buf, sizeof(send_buf), "%s\r\n", request);
+	}
+	else if (80 == port)
+	{
+		zbx_snprintf(send_buf, sizeof(send_buf),
+				"GET / HTTP/1.1\r\n"
+				"Host: %s\r\n"
+				"Connection: close\r\n"
+				"\r\n",
+				request);
+	}
 	else
-		send_buf = zbx_dsprintf(send_buf, "%s\r\n\r\n", request);
+	{
+		zbx_snprintf(err, err_size, "invalid port specified: %d (expecting 43 or 80)", port);
+		goto out;
+	}
 
 	if (SUCCEED != zbx_tcp_send_raw(&s, send_buf))
 	{
@@ -1676,7 +1692,10 @@ static int	zbx_tcp_exchange(const char *request, const char *host, short port, i
 
 	if (SUCCEED != SUCCEED_OR_FAIL(zbx_tcp_recv_ext(&s, &recv_buf, ZBX_TCP_READ_UNTIL_CLOSE, timeout)))
 	{
-		zbx_snprintf(err, err_size, "cannot receive data: %s", zbx_tcp_strerror());
+		if (EINTR == errno)
+			zbx_strlcpy(err, "timeout occured", err_size);
+		else
+			zbx_snprintf(err, err_size, "cannot receive data: %s", zbx_tcp_strerror());
 		goto out;
 	}
 
@@ -1684,13 +1703,12 @@ static int	zbx_tcp_exchange(const char *request, const char *host, short port, i
 	zbx_timespec(&now);
 	*rtt = (now.sec - start.sec) * 1000 + (now.ns - start.ns) / 1000000;
 
-	zbx_dns_infof(f, "===>\n%s\n<=== end RDDS%hd test", recv_buf, port);
+	zbx_dns_infof(f, "===>\n%.*s\n<=== end RDDS%hd test", ZBX_RDDS_PREVIEW_SIZE, recv_buf, port);
 
 	if (NULL != answer)
 		*answer = zbx_strdup(*answer, recv_buf);
 out:
-	zbx_tcp_close(&s);
-	zbx_free(send_buf);
+	zbx_tcp_close(&s);	/* takes care of freeing received buffer */
 
 	return ret;
 }
