@@ -4,12 +4,13 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 <script type="text/x-jquery-tmpl" id="condition-row">
 	<tr class="form_row">
 		<td>
-			<span>(#{formulaId})</span>
+			<span class="formulaid">#{formulaId}</span>
 			<input type="hidden" name="conditions[#{rowNum}][formulaid]" value="#{formulaId}">
 		</td>
 		<td>
 			<input class="input text macro" type="text" id="conditions_#{rowNum}_macro"
-				name="conditions[#{rowNum}][macro]" size="30" maxlength="64" placeholder="{#MACRO}">
+				name="conditions[#{rowNum}][macro]" size="30" maxlength="64" placeholder="{#MACRO}"
+				data-formulaid="#{formulaId}">
 		</td>
 		<td>
 			<span><?php echo _('matches') ?></span>
@@ -27,6 +28,19 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 <script type="text/javascript">
 	(function($){
 		$(function() {
+			function updateExpression() {
+				var conditions = [];
+				$('#conditions .macro').each(function(index, macroInput) {
+					macroInput = $(macroInput);
+					conditions.push({
+						id: macroInput.data('formulaid'),
+						type: macroInput.val()
+					});
+				})
+
+				$('#expression').html(getConditionFormula(conditions, +$('#evaltype').val()));
+			}
+
 			$('#conditions')
 				.elementTable({
 					template: '#condition-row',
@@ -38,13 +52,24 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 				})
 				.bind('tableupdate.elementTable', function(event, options) {
 					$('#conditionRow').toggleClass('hidden', ($(options.row, $(this)).length <= 1));
+				})
+				.bind('rowremove.elementTable', function() {
+					updateExpression();
+				})
+				.on('change', '.macro', function() {
+					updateExpression();
 				});
 
 			$('#evaltype').change(function() {
 				var custom = ($(this).val() == <?php echo CONDITION_EVAL_TYPE_EXPRESSION ?>);
 				$('#expression').toggleClass('hidden', custom);
 				$('#formula').toggleClass('hidden', !custom);
+				if (!custom) {
+					updateExpression();
+				}
 			});
+
+			updateExpression();
 		});
 	})(jQuery);
 </script>

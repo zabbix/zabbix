@@ -87,9 +87,9 @@ foreach ($this->data['action']['conditions'] as $condition) {
 	}
 
 	$label = num2letter($i);
-	$labelSpan = new CSpan('('.$label.')', 'label');
+	$labelSpan = new CSpan($label, 'label');
 	$labelSpan->setAttribute('data-conditiontype', $condition['conditiontype']);
-	$labelSpan->setAttribute('data-label', $label);
+	$labelSpan->setAttribute('data-formulaid', $label);
 
 	$conditionTable->addRow(
 		array(

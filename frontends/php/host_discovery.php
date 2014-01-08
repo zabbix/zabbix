@@ -327,14 +327,12 @@ if (isset($_REQUEST['form'])) {
 	$data['lifetime'] = getRequest('lifetime', 30);
 	$data['evaltype'] = getRequest('evaltype');
 	$data['formula'] = getRequest('formula');
-	$data['eval_formula'] = '';
 	$data['conditions'] = getRequest('conditions', array());
 
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
 		$data['lifetime'] = $item['lifetime'];
 		$data['evaltype'] = $item['evaltype'];
 		$data['formula'] = $item['formula'];
-		$data['eval_formula'] = $item['eval_formula'];
 		$data['conditions'] = $item['conditions'];
 	}
 
