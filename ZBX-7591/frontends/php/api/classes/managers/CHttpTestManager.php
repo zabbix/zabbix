@@ -204,7 +204,10 @@ class CHttpTestManager {
 					$result = DBselect(
 						'SELECT hi.itemid FROM httpstepitem hi WHERE '.dbConditionInt('hi.httpstepid', $stepidsDelete)
 					);
-					$deleteStepItemIds = array_merge($deleteStepItemIds, DBfetchColumn($result, 'itemid'));
+
+					foreach (DBfetchColumn($result, 'itemid') as $itemId) {
+						$deleteStepItemIds[] = $itemId;
+					}
 
 					DB::delete('httpstep', array('httpstepid' => $stepidsDelete));
 				}
@@ -950,22 +953,6 @@ class CHttpTestManager {
 				$this->updateItemsApplications($itemids, $httpTest['applicationid']);
 			}
 		}
-	}
-
-	/**
-	 * Delete web scenario steps.
-	 *
-	 * @param $httpStepIds
-	 */
-	protected function deleteStepsReal($httpStepIds) {
-		$itemIds = DBfetchColumn(
-			DBselect('SELECT hi.itemid FROM httpstepitem hi WHERE '.dbConditionInt('hi.httpstepid', $httpStepIds)),
-			'itemid'
-		);
-
-		DB::delete('httpstep', array('httpstepid' => $httpStepIds));
-
-		API::Item()->delete($itemIds, true);
 	}
 
 	/**
