@@ -55,7 +55,7 @@ int	__zbx_open(const char *pathname, int flags)
  *             buf      - [IN] buffer to read into                            *
  *             count    - [IN] buffer size in bytes                           *
  *             encoding - [IN] pointer a to text string describing encoding.  *
- *                        The following enocdings are recognized:             *
+ *                        The following encodings are recognized:             *
  *                          "UNICODE"                                         *
  *                          "UNICODEBIG"                                      *
  *                          "UNICODEFFFE"                                     *
