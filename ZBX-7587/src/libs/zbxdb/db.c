@@ -86,6 +86,29 @@ static const char	*zbx_oci_error(sword status, sb4 *err)
 
 	return errbuf;
 }
+
+int	OCI_handle_sql_error(int zerrcode, sword oci_error, const char *sql)
+{
+	sb4	errcode;
+	int	ret = ZBX_DB_DOWN;
+
+	zabbix_errlog(zerrcode, oci_error, zbx_oci_error(oci_error, &errcode), sql);
+
+	/* after ORA-02396 (and consequent ORA-01012) errors the OCI_SERVER_NORMAL server status is still returned */
+	switch (errcode)
+	{
+		case 1012:	/* ORA-01012: not logged on */
+		case 2396:	/* ORA-02396: exceeded maximum idle time */
+			goto out;
+	}
+
+	if (OCI_SERVER_NORMAL == OCI_DBserver_status())
+		ret = ZBX_DB_FAIL;
+
+out:
+	return ret;
+}
+
 #endif	/* HAVE_ORACLE */
 
 /******************************************************************************
@@ -723,7 +746,6 @@ static sword	zbx_oracle_statement_execute(ub4 *nrows)
 int	zbx_db_statement_prepare(const char *sql)
 {
 	sword	err;
-	sb4	errcode;
 	int	ret = ZBX_DB_OK;
 
 	if (0 == txn_init && 0 == txn_level)
@@ -737,12 +759,8 @@ int	zbx_db_statement_prepare(const char *sql)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", txn_level, sql);
 
-	/* Oracle */
 	if (OCI_SUCCESS != (err = zbx_oracle_statement_prepare(sql)))
-	{
-		zabbix_errlog(ERR_Z3005, err, zbx_oci_error(err, &errcode), sql);
-		ret = (OCI_SERVER_NORMAL == OCI_DBserver_status(errcode) ? ZBX_DB_FAIL : ZBX_DB_DOWN);
-	}
+		ret = OCI_handle_sql_error(ERR_Z3005, err, sql);
 
 	if (ZBX_DB_FAIL == ret && 0 < txn_level)
 	{
@@ -756,7 +774,6 @@ int	zbx_db_statement_prepare(const char *sql)
 int	zbx_db_bind_parameter(int position, void *buffer, unsigned char type)
 {
 	sword	err;
-	sb4	errcode;
 	int	ret = ZBX_DB_OK;
 
 	if (1 == txn_error)
@@ -782,10 +799,7 @@ int	zbx_db_bind_parameter(int position, void *buffer, unsigned char type)
 	}
 
 	if (OCI_SUCCESS != err)
-	{
-		zabbix_errlog(ERR_Z3007, err, zbx_oci_error(err, &errcode));
-		ret = (OCI_SERVER_NORMAL == OCI_DBserver_status(errcode) ? ZBX_DB_FAIL : ZBX_DB_DOWN);
-	}
+		ret = OCI_handle_sql_error(ERR_Z3007, err, NULL);
 
 	if (ZBX_DB_FAIL == ret && 0 < txn_level)
 	{
@@ -803,7 +817,6 @@ int	zbx_db_statement_execute()
 
 	sword	err;
 	ub4	nrows;
-	sb4	errcode;
 	int	ret;
 
 	if (1 == txn_error)
@@ -814,10 +827,7 @@ int	zbx_db_statement_execute()
 	}
 
 	if (OCI_SUCCESS != (err = zbx_oracle_statement_execute(&nrows)))
-	{
-		zabbix_errlog(ERR_Z3007, err, zbx_oci_error(err, &errcode));
-		ret = (OCI_SERVER_NORMAL == OCI_DBserver_status(errcode) ? ZBX_DB_FAIL : ZBX_DB_DOWN);
-	}
+		ret = OCI_handle_sql_error(ERR_Z3007, err, NULL);
 	else
 		ret = (int)nrows;
 
@@ -851,7 +861,6 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	int		status;
 #elif defined(HAVE_ORACLE)
 	sword		err = OCI_SUCCESS;
-	sb4		errcode;
 #elif defined(HAVE_POSTGRESQL)
 	PGresult	*result;
 	char		*error = NULL;
@@ -975,10 +984,8 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	}
 
 	if (OCI_SUCCESS != err)
-	{
-		zabbix_errlog(ERR_Z3005, err, zbx_oci_error(err, &errcode), sql);
-		ret = (OCI_SERVER_NORMAL == OCI_DBserver_status(errcode) ? ZBX_DB_FAIL : ZBX_DB_DOWN);
-	}
+		ret = OCI_handle_sql_error(ERR_Z3005, err, sql);
+
 #elif defined(HAVE_POSTGRESQL)
 	result = PQexec(conn,sql);
 
@@ -1080,7 +1087,6 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 #elif defined(HAVE_ORACLE)
 	sword		err = OCI_SUCCESS;
 	ub4		prefetch_rows = 200, counter;
-	sb4		errcode;
 #elif defined(HAVE_POSTGRESQL)
 	char		*error = NULL;
 #elif defined(HAVE_SQLITE3)
@@ -1324,11 +1330,12 @@ error:
 error:
 	if (OCI_SUCCESS != err)
 	{
-		zabbix_errlog(ERR_Z3005, err, zbx_oci_error(err, &errcode), sql);
+		int	server_status;
 
+		server_status = OCI_handle_sql_error(ERR_Z3005, err, sql);
 		OCI_DBfree_result(result);
 
-		result = (OCI_SERVER_NORMAL == OCI_DBserver_status(errcode) ? NULL : (DB_RESULT)ZBX_DB_DOWN);
+		result = (ZBX_DB_DOWN == server_status) ? (DB_RESULT)server_status : NULL;
 	}
 #elif defined(HAVE_POSTGRESQL)
 	result = zbx_malloc(NULL, sizeof(ZBX_PG_DB_RESULT));
@@ -1716,18 +1723,10 @@ void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl)
 }
 #elif defined(HAVE_ORACLE)
 /* server status: OCI_SERVER_NORMAL or OCI_SERVER_NOT_CONNECTED */
-ub4	OCI_DBserver_status(sb4 last_err)
+ub4	OCI_DBserver_status()
 {
 	sword	err;
 	ub4	server_status = OCI_SERVER_NOT_CONNECTED;
-
-	/* after ORA-02396 (and consequent ORA-01012) errors the OCI_SERVER_NORMAL server status is still returned */
-	switch (last_err)
-	{
-		case 1012:	/* ORA-01012: not logged on */
-		case 2396:	/* ORA-02396: exceeded maximum idle time */
-			goto out;
-	}
 
 	err = OCIAttrGet((void *)oracle.srvhp, OCI_HTYPE_SERVER, (void *)&server_status,
 			(ub4 *)0, OCI_ATTR_SERVER_STATUS, (OCIError *)oracle.errhp);
@@ -1739,4 +1738,5 @@ ub4	OCI_DBserver_status(sb4 last_err)
 out:
 	return server_status;
 }
+
 #endif	/* HAVE_ORACLE */
