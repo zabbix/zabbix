@@ -59,16 +59,16 @@ class CConditionHelper {
 		// operators
 		switch ($evalType) {
 			case CONDITION_EVAL_TYPE_AND:
-				$conditionOperator = _('and');
+				$conditionOperator = 'and';
 				$groupOperator = $conditionOperator;
 				break;
 			case CONDITION_EVAL_TYPE_OR:
-				$conditionOperator = _('or');
+				$conditionOperator = 'or';
 				$groupOperator = $conditionOperator;
 				break;
 			default:
-				$conditionOperator = _('or');
-				$groupOperator = _('and');
+				$conditionOperator = 'or';
+				$groupOperator = 'and';
 				break;
 		}
 
