@@ -147,7 +147,7 @@ int	daemon_start(int allow_root, const char *user)
 	struct passwd	*pwd;
 	char		*usr;
 
-	usr = zbx_strdup(NULL, (NULL != user) ? user : "zabbix")
+	usr = zbx_strdup(NULL, (NULL != user) ? user : "zabbix");
 
 	if (0 == getuid())
 	{
