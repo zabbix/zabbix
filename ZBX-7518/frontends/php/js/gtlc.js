@@ -280,8 +280,6 @@ var timeControl = {
 			// scrollbar
 			this.scrollbar.setBarPosition();
 			this.scrollbar.setGhostByBar();
-			this.scrollbar.setTabInfo();
-			this.scrollbar.resetIsNow();
 
 			flickerfreeScreen.refreshAll(period, date.getZBXDate(), this.timeline.isNow());
 		}
