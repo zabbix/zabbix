@@ -17,10 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include <tchar.h>
+
 #include "common.h"
 
 #include "log.h"
 #include "eventlog.h"
+
 
 #define MAX_INSERT_STRS 100
 #define MAX_MSG_LENGTH 1024
@@ -94,7 +97,7 @@ static int	zbx_get_eventlog_message(LPCTSTR wsource, HANDLE eventlog_handle, lon
 	LPTSTR		pFile = NULL, pNextFile = NULL;
 	DWORD		szData, Type;
 	HINSTANCE	hLib = NULL;				/* handle to the messagetable DLL */
-	LPTSTR		pCh, aInsertStrs[MAX_INSERT_STRS];	/* array of pointers to insert */
+	LPWSTR		pCh;
 	LPTSTR		msgBuf = NULL;				/* hold text of the error message */
 	char		*buf = NULL;
 	long		i, err = 0;
@@ -107,7 +110,6 @@ static int	zbx_get_eventlog_message(LPCTSTR wsource, HANDLE eventlog_handle, lon
 	*out_severity	= 0;
 	*out_timestamp	= 0;
 	*out_eventid	= 0;
-	memset(aInsertStrs, 0, sizeof(aInsertStrs));
 
 	pELR = (EVENTLOGRECORD *)zbx_malloc((void *)pELR, buffer_size);
 retry:
@@ -134,15 +136,6 @@ retry:
 	*out_source	= zbx_unicode_to_utf8((LPTSTR)(pELR + 1));	/* copy source name */
 
 	err = FAIL;
-
-	/* prepare the array of insert strings for FormatMessage - the
-	insert strings are in the log entry. */
-	for (i = 0, pCh = (LPTSTR)((LPBYTE)pELR + pELR->StringOffset);
-			i < pELR->NumStrings && i < MAX_INSERT_STRS;
-			i++, pCh += zbx_strlen(pCh) + 1) /* point to next string */
-	{
-		aInsertStrs[i] = pCh;
-	}
 
 	/* Get path to message dll */
 	zbx_wsnprintf(stat_buf, MAX_PATH, EVENTLOG_REG_PATH TEXT("%s\\%s"), wsource, (LPTSTR)(pELR + 1));
@@ -173,6 +166,42 @@ retry:
 		{
 			if (NULL != (hLib = LoadLibraryEx(MsgDll, NULL, LOAD_LIBRARY_AS_DATAFILE)))
 			{
+				LPTSTR	*pInsertStrings = NULL;
+
+				if (0 < pELR->NumStrings)
+				{
+					pInsertStrings = zbx_malloc(NULL, sizeof(LPTSTR) * pELR->NumStrings);
+					memset(pInsertStrings, 0, sizeof(LPTSTR) * pELR->NumStrings);
+
+					/* prepare the array of insert strings for FormatMessage - the
+					insert strings are in the log entry. */
+					for (i = 0, pCh = (LPTSTR)((LPBYTE)pELR + pELR->StringOffset);
+							i < pELR->NumStrings;
+							i++, pCh += zbx_strlen(pCh) + 1) /* point to next string */
+					{
+						/* try to translate %%<id> insert strings */
+						if (0 != wcsncmp(L"%%%%", pCh, 2) ||
+								0 == FormatMessage(FORMAT_MESSAGE_FROM_HMODULE |
+									FORMAT_MESSAGE_ALLOCATE_BUFFER |
+									FORMAT_MESSAGE_ARGUMENT_ARRAY |
+									FORMAT_MESSAGE_FROM_SYSTEM |
+									FORMAT_MESSAGE_MAX_WIDTH_MASK,
+									hLib,
+									_wtoi(pCh + 2),
+									MAKELANGID(LANG_NEUTRAL, SUBLANG_ENGLISH_US),
+									(LPTSTR)&pInsertStrings[i],
+									0,
+									NULL))
+						{
+							int	len;
+
+							len = zbx_strlen(pCh);
+							pInsertStrings[i] = LocalAlloc(0,  sizeof(LPTSTR) * (len + 1));
+							_tcsncpy(pInsertStrings[i], pCh, len);
+						}
+					}
+				}
+
 				/* Format the message from the message DLL with the insert strings */
 				if (0 != FormatMessage(FORMAT_MESSAGE_FROM_HMODULE | FORMAT_MESSAGE_ALLOCATE_BUFFER |
 						FORMAT_MESSAGE_ARGUMENT_ARRAY | FORMAT_MESSAGE_FROM_SYSTEM |
@@ -182,7 +211,7 @@ retry:
 						MAKELANGID(LANG_NEUTRAL, SUBLANG_ENGLISH_US),	/* language ID */
 						(LPTSTR)&msgBuf,		/* address of pointer to buffer for message */
 						0,
-						(va_list *)aInsertStrs))	/* array of insert strings for the message */
+						(va_list *)pInsertStrings))	/* array of insert strings for the message */
 				{
 					*out_message = zbx_unicode_to_utf8(msgBuf);
 					zbx_rtrim(*out_message, "\r\n ");
@@ -192,6 +221,15 @@ retry:
 
 					err = SUCCEED;
 				}
+
+				for (i = 0; i < pELR->NumStrings; i++)
+				{
+					if (NULL != pInsertStrings[i])
+						LocalFree((HLOCAL)pInsertStrings[i]);
+				}
+
+				zbx_free(pInsertStrings);
+
 				FreeLibrary(hLib);
 			}
 		}
@@ -205,15 +243,18 @@ retry:
 		*out_message = zbx_strdcatf(*out_message, "The description for Event ID (%lu) in Source (%s) cannot be found."
 				" The local computer may not have the necessary registry information or message DLL files to"
 				" display messages from a remote computer.", *out_eventid, NULL == *out_source ? "" : *out_source);
-		if (pELR->NumStrings)
-			*out_message = zbx_strdcatf(*out_message, " The following information is part of the event: ");
-		for (i = 0; i < pELR->NumStrings && i < MAX_INSERT_STRS; i++)
+		if (0 < pELR->NumStrings)
 		{
-			if (i > 0)
-				*out_message = zbx_strdcatf(*out_message, "; ");
-			if (aInsertStrs[i])
+			*out_message = zbx_strdcatf(*out_message, " The following information is part of the event: ");
+
+			for (i = 0, pCh = (LPTSTR)((LPBYTE)pELR + pELR->StringOffset);
+					i < pELR->NumStrings;
+					i++, pCh += zbx_strlen(pCh) + 1)
 			{
-				buf = zbx_unicode_to_utf8(aInsertStrs[i]);
+				if (i > 0)
+					*out_message = zbx_strdcatf(*out_message, "; ");
+
+				buf = zbx_unicode_to_utf8(pCh);
 				*out_message = zbx_strdcatf(*out_message, "%s", buf);
 				zbx_free(buf);
 			}
@@ -276,7 +317,7 @@ int	process_eventlog(const char *source, zbx_uint64_t *lastlogsize, unsigned lon
 		if (*lastlogsize > LastID)
 			*lastlogsize = FirstID;
 		else if (*lastlogsize >= FirstID)
-			FirstID = (*lastlogsize) + 1;
+			FirstID = (long)(*lastlogsize) + 1;
 
 		for (i = FirstID; i < LastID; i++)
 		{
