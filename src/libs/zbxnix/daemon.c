@@ -141,10 +141,10 @@ static void	set_daemon_signal_handlers()
  * Comments: it doesn't allow running under 'root' if allow_root is zero      *
  *                                                                            *
  ******************************************************************************/
-int	daemon_start(int allow_root, char *user)
+int	daemon_start(int allow_root, const char *user)
 {
-	pid_t			pid;
-	struct passwd		*pwd;
+	pid_t		pid;
+	struct passwd	*pwd;
 
 	if (0 == getuid())
 	{
