@@ -464,6 +464,8 @@ static void	zbx_load_config()
 			PARM_OPT,	10,			SEC_PER_DAY},
 		{"VMwareCacheSize",		&CONFIG_VMWARE_CACHE_SIZE,		TYPE_UINT64,
 			PARM_OPT,	256 * ZBX_KIBIBYTE,	0x7fffffff},	/* just below 2GB */
+		{"User",			&CONFIG_USER,				TYPE_STRING,
+			PARM_OPT,	0			0},
 		{NULL}
 	};
 
