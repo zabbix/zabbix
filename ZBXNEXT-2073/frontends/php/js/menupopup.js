@@ -797,7 +797,7 @@ jQuery(function($) {
 		var menu = $('<ul>', {'class': 'menu'});
 
 		$.each(section.data.intervals, function(value, label) {
-			css = (value === section.data.currentRate) ? 'selected' : '';
+			css = (value == section.data.currentRate) ? 'selected' : '';
 
 			menu.append(createMenuItem(label, null, value, css, null, function() {
 				sendAjaxData({
@@ -839,7 +839,7 @@ jQuery(function($) {
 		var menu = $('<ul>', {'class': 'menu'});
 
 		// add
-		menu.append(createMenuItem(t('Add'), null, null, null, null, function() {
+		menu.append(createMenuItem(t('Add child'), null, null, null, null, function() {
 			var url = new Curl('services.php?form=1');
 			url.setArgument('parentid', section.serviceId);
 			url.setArgument('parentname', section.name);
@@ -948,7 +948,7 @@ jQuery(function($) {
 			$.each(section.triggers, function(id, name) {
 				menuTriggers.append(createMenuItem(name, null, null, null, null, function() {
 					openWinCentered(
-						'tr_logform.php?sform=1&itemid=' + section.id + '&triggerid=' + id,
+						'tr_logform.php?sform=1&itemid=' + section.itemId + '&triggerid=' + id,
 						'TriggerLog',
 						760,
 						540,
@@ -982,14 +982,18 @@ jQuery(function($) {
 					return false;
 				}
 
-				var sign = '=';
+				var sign, valueString;
 
 				if (value >= 10) {
-					value %= 10;
+					valueString = value % 10;
 					sign = '#';
 				}
+				else {
+					valueString = value;
+					sign = '=';
+				}
 
-				expression.val('{TRIGGER.VALUE}' + sign + value);
+				expression.val('{TRIGGER.VALUE}' + sign + valueString);
 
 				menuPopup.fadeOut(100);
 			}));

@@ -354,7 +354,7 @@ $dashboardGrid[$col][$row] = $favouriteScreens;
 
 // status of Zabbix
 if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
-	$rate = CProfile::get('web.dashboard.widget.'.WIDGET_ZABBIX_STATUS.'.rf_rate', 120);
+	$rate = CProfile::get('web.dashboard.widget.'.WIDGET_ZABBIX_STATUS.'.rf_rate', 60);
 
 	$icon = new CIcon(_('Menu'), 'iconmenu');
 	$icon->setMenuPopup(getMenuPopupRefresh(WIDGET_ZABBIX_STATUS, $rate));
@@ -373,7 +373,7 @@ if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
 }
 
 // system status
-$rate = CProfile::get('web.dashboard.widget.'.WIDGET_SYSTEM_STATUS.'.rf_rate', 120);
+$rate = CProfile::get('web.dashboard.widget.'.WIDGET_SYSTEM_STATUS.'.rf_rate', 60);
 
 $icon = new CIcon(_('Menu'), 'iconmenu');
 $icon->setMenuPopup(getMenuPopupRefresh(WIDGET_SYSTEM_STATUS, $rate));
@@ -391,7 +391,7 @@ $dashboardGrid[$col][$row] = $systemStatus;
 $widgetRefreshParams[WIDGET_SYSTEM_STATUS] = $systemStatus->refreshParams;
 
 // host status
-$rate = CProfile::get('web.dashboard.widget.'.WIDGET_HOST_STATUS.'.rf_rate', 120);
+$rate = CProfile::get('web.dashboard.widget.'.WIDGET_HOST_STATUS.'.rf_rate', 60);
 
 $icon = new CIcon(_('Menu'), 'iconmenu');
 $icon->setMenuPopup(getMenuPopupRefresh(WIDGET_HOST_STATUS, $rate));
@@ -409,7 +409,7 @@ $dashboardGrid[$col][$row] = $hostStatus;
 $widgetRefreshParams[WIDGET_HOST_STATUS] = $hostStatus->refreshParams;
 
 // last issues
-$rate = CProfile::get('web.dashboard.widget.'.WIDGET_LAST_ISSUES.'.rf_rate', 120);
+$rate = CProfile::get('web.dashboard.widget.'.WIDGET_LAST_ISSUES.'.rf_rate', 60);
 
 $icon = new CIcon(_('Menu'), 'iconmenu');
 $icon->setMenuPopup(getMenuPopupRefresh(WIDGET_LAST_ISSUES, $rate));
@@ -427,7 +427,7 @@ $dashboardGrid[$col][$row] = $lastIssues;
 $widgetRefreshParams[WIDGET_LAST_ISSUES] = $lastIssues->refreshParams;
 
 // web monitoring
-$rate = CProfile::get('web.dashboard.widget.'.WIDGET_WEB_OVERVIEW.'.rf_rate', 120);
+$rate = CProfile::get('web.dashboard.widget.'.WIDGET_WEB_OVERVIEW.'.rf_rate', 60);
 
 $icon = new CIcon(_('Menu'), 'iconmenu');
 $icon->setMenuPopup(getMenuPopupRefresh(WIDGET_WEB_OVERVIEW, $rate));
@@ -453,7 +453,7 @@ $dbDiscoveryRules = DBfetch(DBselect(
 ));
 
 if ($dbDiscoveryRules['cnt'] > 0 && check_right_on_discovery()) {
-	$rate = CProfile::get('web.dashboard.widget.'.WIDGET_DISCOVERY_STATUS.'.rf_rate', 120);
+	$rate = CProfile::get('web.dashboard.widget.'.WIDGET_DISCOVERY_STATUS.'.rf_rate', 60);
 
 	$icon = new CIcon(_('Menu'), 'iconmenu');
 	$icon->setMenuPopup(getMenuPopupRefresh(WIDGET_DISCOVERY_STATUS, $rate));

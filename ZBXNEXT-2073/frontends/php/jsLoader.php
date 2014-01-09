@@ -213,6 +213,7 @@ $tranStrings = array(
 		'Favourite screens' => _('Favourite screens'),
 		'Favourite slide shows' => _('Favourite slide shows'),
 		'Add' => _('Add'),
+		'Add child' => _('Add child'),
 		'Edit' => _('Edit'),
 		'Delete' => _('Delete'),
 		'Remove' => _('Remove'),
