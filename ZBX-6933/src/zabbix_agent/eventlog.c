@@ -17,8 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include <tchar.h>
-
 #include "common.h"
 
 #include "log.h"
@@ -166,19 +164,23 @@ retry:
 		{
 			if (NULL != (hLib = LoadLibraryEx(MsgDll, NULL, LOAD_LIBRARY_AS_DATAFILE)))
 			{
-				LPTSTR	*pInsertStrings = NULL;
+				LPWSTR	*pInsertStrings = NULL;
 
 				if (0 < pELR->NumStrings)
 				{
-					pInsertStrings = zbx_malloc(NULL, sizeof(LPTSTR) * pELR->NumStrings);
-					memset(pInsertStrings, 0, sizeof(LPTSTR) * pELR->NumStrings);
+					pInsertStrings = zbx_malloc(NULL, sizeof(LPWSTR) * pELR->NumStrings);
+					memset(pInsertStrings, 0, sizeof(LPWSTR) * pELR->NumStrings);
 
 					/* prepare the array of insert strings for FormatMessage - the
 					insert strings are in the log entry. */
-					for (i = 0, pCh = (LPTSTR)((LPBYTE)pELR + pELR->StringOffset);
-							i < pELR->NumStrings;
-							i++, pCh += zbx_strlen(pCh) + 1) /* point to next string */
+					pCh = (LPWSTR)((LPBYTE)pELR + pELR->StringOffset);
+
+					for (i = 0; i < pELR->NumStrings; i++)
 					{
+						int	len;
+
+						len = zbx_strlen(pCh) + 1;
+
 						/* try to translate %%<id> insert strings */
 						if (0 != wcsncmp(L"%%%%", pCh, 2) ||
 								0 == FormatMessage(FORMAT_MESSAGE_FROM_HMODULE |
@@ -189,16 +191,15 @@ retry:
 									hLib,
 									_wtoi(pCh + 2),
 									MAKELANGID(LANG_NEUTRAL, SUBLANG_ENGLISH_US),
-									(LPTSTR)&pInsertStrings[i],
+									(LPWSTR)&pInsertStrings[i],
 									0,
 									NULL))
 						{
-							int	len;
-
-							len = zbx_strlen(pCh);
-							pInsertStrings[i] = LocalAlloc(0,  sizeof(LPTSTR) * (len + 1));
-							_tcsncpy(pInsertStrings[i], pCh, len);
+							pInsertStrings[i] = LocalAlloc(0, sizeof(WCHAR) * len);
+							memcpy(pInsertStrings[i], pCh, sizeof(WCHAR) * len);
 						}
+
+						pCh += len;
 					}
 				}
 
@@ -247,7 +248,7 @@ retry:
 		{
 			*out_message = zbx_strdcatf(*out_message, " The following information is part of the event: ");
 
-			for (i = 0, pCh = (LPTSTR)((LPBYTE)pELR + pELR->StringOffset);
+			for (i = 0, pCh = (LPWSTR)((LPBYTE)pELR + pELR->StringOffset);
 					i < pELR->NumStrings;
 					i++, pCh += zbx_strlen(pCh) + 1)
 			{
