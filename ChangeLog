@@ -6,6 +6,7 @@ New features:
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+...G...... [ZBX-7414] added description to HostnameItem that UserParameters and aliases are not supported (igors)
 ...G...... [ZBX-7413] fixed concistentcy of config file handling for loading and checking userparameters and aliases before starting the daemon (igors)
 ...G...... [ZBX-7412] fixed alias parsing; colon symbols are now supported in alias parameters (Juris)
 ........S. [ZBX-7204] fixed the timestamp order of events generated during network discovery (igors)
