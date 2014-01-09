@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -316,15 +316,19 @@ class CConfigurationImport {
 				$hostsRefs[$yMinItem['host']] = $yMinItem['host'];
 				$itemsRefs[$yMinItem['host']][$yMinItem['key']] = $yMinItem['key'];
 			}
+
 			if ($graph['ymax_item_1']) {
 				$yMaxItem = $graph['ymax_item_1'];
 				$hostsRefs[$yMaxItem['host']] = $yMaxItem['host'];
 				$itemsRefs[$yMaxItem['host']][$yMaxItem['key']] = $yMaxItem['key'];
 			}
-			foreach ($graph['gitems'] as $gitem) {
-				$gitemItem = $gitem['item'];
-				$hostsRefs[$gitemItem['host']] = $gitemItem['host'];
-				$itemsRefs[$gitemItem['host']][$gitemItem['key']] = $gitemItem['key'];
+
+			if (isset($graph['gitems']) && $graph['gitems']) {
+				foreach ($graph['gitems'] as $gitem) {
+					$gitemItem = $gitem['item'];
+					$hostsRefs[$gitemItem['host']] = $gitemItem['host'];
+					$itemsRefs[$gitemItem['host']][$gitemItem['key']] = $gitemItem['key'];
+				}
 			}
 		}
 
@@ -1025,17 +1029,24 @@ class CConfigurationImport {
 				$graph['ymax_itemid'] = $itemId;
 			}
 
-			foreach ($graph['gitems'] as &$gitem) {
-				if (!$gitemHostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host'])) {
-					throw new Exception(_s('Cannot find host or template "%1$s" used in graph "%2$s".',
-						$gitem['item']['host'], $graph['name']));
+			if (isset($graph['gitems']) && $graph['gitems']) {
+				foreach ($graph['gitems'] as &$gitem) {
+					$gitemHostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host']);
+
+					if (!$gitemHostId) {
+						throw new Exception(_s(
+							'Cannot find host or template "%1$s" used in graph "%2$s".',
+							$gitem['item']['host'],
+							$graph['name']
+						));
+					}
+
+					$gitem['itemid'] = $this->referencer->resolveItem($gitemHostId, $gitem['item']['key']);
+
+					$graphHostIds[$gitemHostId] = $gitemHostId;
 				}
-
-				$gitem['itemid'] = $this->referencer->resolveItem($gitemHostId, $gitem['item']['key']);
-
-				$graphHostIds[$gitemHostId] = $gitemHostId;
+				unset($gitem);
 			}
-			unset($gitem);
 
 			// TODO: do this for all graphs at once
 			$sql = 'SELECT g.graphid'.

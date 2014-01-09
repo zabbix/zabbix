@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -191,7 +191,7 @@ class CProfiler {
 		}
 
 		$debug = new CDiv(null, 'textcolorstyles');
-		$debug->attr('name', 'zbx_gebug_info');
+		$debug->attr('name', 'zbx_debug_info');
 		$debug->attr('style', 'display: none; overflow: auto; width: 95%; border: 1px #777777 solid; margin: 4px; padding: 4px;');
 		$debug->addItem(array(BR(), new CJSscript($debug_str), BR()));
 		$debug->show();

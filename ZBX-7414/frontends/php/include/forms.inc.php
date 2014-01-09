@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1392,7 +1392,7 @@
 			);
 			$trigger = ($data['parent_discoveryid']) ? API::TriggerPrototype()->get($options) : API::Trigger()->get($options);
 			$data['trigger'] = reset($trigger);
-			if (!empty($data['trigger']['description'])) {
+			if (!zbx_empty($data['trigger']['description'])) {
 				$data['description'] = $data['trigger']['description'];
 			}
 
@@ -1516,9 +1516,7 @@
 				'selectHosts' => array('name')
 			));
 			foreach ($data['db_dependencies'] as &$dependency) {
-				if (!empty($dependency['hosts'][0]['name'])) {
-					$dependency['host'] = $dependency['hosts'][0]['name'];
-				}
+				$dependency['host'] = $dependency['hosts'][0]['name'];
 				unset($dependency['hosts']);
 			}
 			order_result($data['db_dependencies'], 'description');

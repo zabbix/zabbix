@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2877,14 +2877,11 @@ static void	DBlld_interfaces_validate(zbx_vector_ptr_t *hosts, char **error)
  * Purpose: add or update low-level discovered hosts                          *
  *                                                                            *
  ******************************************************************************/
-void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data, char **error,
-		const char *f_macro, const char *f_regexp, zbx_vector_ptr_t *regexps, unsigned short lifetime,
+void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_rows, char **error, unsigned short lifetime,
 		int lastcheck)
 {
 	const char		*__function_name = "DBlld_update_hosts";
 
-	struct zbx_json_parse	jp_row;
-	const char		*p;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vector_ptr_t	hosts, group_prototypes, groups, interfaces, hostmacros;
@@ -2948,6 +2945,8 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 		const char	*host_proto, *name_proto;
 		zbx_lld_host_t	*host;
 		unsigned char	status;
+		zbx_lld_row_t	*lld_row;
+		int		i;
 
 		ZBX_STR2UINT64(parent_hostid, row[0]);
 		host_proto = row[1];
@@ -2966,21 +2965,12 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 		DBlld_group_prototypes_get(parent_hostid, &group_prototypes);
 		DBlld_groups_get(parent_hostid, &groups);
 
-		p = NULL;
-		/* {"data":[{"{#VMNAME}":"vm_001"},{"{#VMNAME}":"vm_002"},...]} */
-		/*          ^                                                   */
-		while (NULL != (p = zbx_json_next(jp_data, p)))
+		for (i = 0; i < lld_rows->values_num; i++)
 		{
-			/* {"data":[{"{#VMNAME}":"vm_001"},{"{#VMNAME}":"vm_002"},...]} */
-			/*          ^--------------------^                              */
-			if (FAIL == zbx_json_brackets_open(p, &jp_row))
-				continue;
+			lld_row = (zbx_lld_row_t *)lld_rows->values[i];
 
-			if (SUCCEED != lld_check_record(&jp_row, f_macro, f_regexp, regexps))
-				continue;
-
-			host = DBlld_host_make(&hosts, host_proto, name_proto, &jp_row);
-			DBlld_groups_make(host, &groups, &group_prototypes, &jp_row);
+			host = DBlld_host_make(&hosts, host_proto, name_proto, &lld_row->jp_row);
+			DBlld_groups_make(host, &groups, &group_prototypes, &lld_row->jp_row);
 		}
 
 		zbx_vector_ptr_sort(&hosts, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);

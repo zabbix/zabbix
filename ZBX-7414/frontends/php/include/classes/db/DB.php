@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -670,7 +670,9 @@ class DB {
 	 */
 	public static function recordModified($tableName, array $oldRecord, array $newRecord) {
 		foreach ($oldRecord as $field => $value) {
-			if (self::hasField($tableName, $field) && isset($newRecord[$field]) && $value != $newRecord[$field]) {
+			if (self::hasField($tableName, $field)
+					&& isset($newRecord[$field])
+					&& (string) $value !== (string) $newRecord[$field]) {
 				return true;
 			}
 		}

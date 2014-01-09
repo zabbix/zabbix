@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -616,17 +616,20 @@ if (!isset($function)) {
 
 if ($itemId) {
 	$items = API::Item()->get(array(
-		'output' => array('itemid', 'key_', 'name'),
+		'output' => array('itemid', 'hostid', 'name', 'key_'),
 		'itemids' => $itemId,
 		'webitems' => true,
 		'selectHosts' => array('host'),
 		'filter' => array('flags' => null)
 	));
+
+	$items = CMacrosResolverHelper::resolveItemNames($items);
+
 	$item = reset($items);
 	$itemKey = $item['key_'];
 	$itemHost = reset($item['hosts']);
 	$itemHost = $itemHost['host'];
-	$description = $itemHost.NAME_DELIMITER.itemName($item);
+	$description = $itemHost.NAME_DELIMITER.$item['name_expanded'];
 }
 else {
 	$itemKey = $itemHost = $description = '';
