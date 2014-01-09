@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/include/html.inc.php';
 
 $page['title'] = _('Search');
 $page['file'] = 'search.php';
-$page['hist_arg'] = array();
+$page['hist_arg'] = array('search');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
