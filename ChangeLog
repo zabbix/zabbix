@@ -17,6 +17,7 @@ New features:
 A.F....... [ZBX-1357] updated American English, French, Hungarian, Italian, Japanese, Russian, Slovak and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7508] fixed import map with LLD triggers (Eduard)
 ..F....... [ZBX-7518] fixed graph scrollbar overflow when clicking period "All" and with no page refresh option (Ivo)
 A......... [ZBX-7578] fixed graph item validation (Eduard)
 ..F....... [ZBX-7616] fixed green background color for "New group" field in host edit form (Ivo)
@@ -749,6 +750,7 @@ New features:
 A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7508] fixed import map with LLD triggers (Eduard)
 ..F....... [ZBX-7586] fixed trigger log expression saving in IE10 (Eduard)
 ..F.....S. [ZBX-7573] fixed item being checked at a wrong time when using flexible intervals (asaveljevs)
 ........S. [ZBX-6545] fixed possible SQL errors when syncing a node configuration with PostgreSQL backend version 8.2 and later (Sasha)
