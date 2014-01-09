@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -691,7 +691,13 @@ class CImportReferencer {
 			$allowedTriggers = API::Trigger()->get(array(
 				'triggerids' => $triggerIds,
 				'output' => API_OUTPUT_SHORTEN,
-				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CHILD)),
+				'filter' => array(
+					'flags' => array(
+						ZBX_FLAG_DISCOVERY_NORMAL,
+						ZBX_FLAG_DISCOVERY_CHILD,
+						ZBX_FLAG_DISCOVERY_CREATED
+					)
+				),
 				'editable' => true,
 				'preservekeys' => true
 			));

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -133,7 +133,7 @@ require_once 'include/page_header.php';
 
 		while($row = DBfetch($result)){
 			$res = calculateItemNextcheck($row['interfaceid'], $row['itemid'], $row['type'], $row['delay'], $row['delay_flex'], $row['lastclock']);
-			if(0 != $row['proxy_hostid']){
+			if (0 != $row['proxy_hostid'] && 0 != $res['delay']) {
 				$res['nextcheck'] = $row['lastclock'] + $res['delay'];
 			}
 			$diff = $now - $res['nextcheck'];
@@ -195,7 +195,7 @@ require_once 'include/page_header.php';
 
 		while($row = DBfetch($result)){
 			$res = calculateItemNextcheck($row['interfaceid'], $row['itemid'], $row['type'], $row['delay'], $row['delay_flex'], $row['lastclock']);
-			if(0 != $row['proxy_hostid']){
+			if (0 != $row['proxy_hostid'] && 0 != $res['delay']) {
 				$res['nextcheck'] = $row['lastclock'] + $res['delay'];
 			}
 			$diff = $now - $res['nextcheck'];
@@ -252,7 +252,7 @@ require_once 'include/page_header.php';
 
 		while($row = DBfetch($result)){
 			$res = calculateItemNextcheck($row['interfaceid'], $row['itemid'], $row['type'], $row['delay'], $row['delay_flex'], $row['lastclock']);
-			if(0 != $row['proxy_hostid']){
+			if (0 != $row['proxy_hostid'] && 0 != $res['delay']) {
 				$res['nextcheck'] = $row['lastclock'] + $res['delay'];
 			}
 			$diff = $now - $res['nextcheck'];

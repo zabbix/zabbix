@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,6 +33,8 @@
 
 #define TIMER_DELAY	30
 
+#define ZBX_TRIGGERS_MAX	1000
+
 extern unsigned char	process_type;
 
 /******************************************************************************
@@ -48,8 +50,8 @@ static void	process_time_functions(void)
 {
 	const char		*__function_name = "process_time_functions";
 	char			*sql = NULL;
-	size_t			sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
-	int			i, events_num = 0;
+	size_t			sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset;
+	int			i, events_num;
 	DC_TRIGGER		*trigger;
 	DC_TRIGGER		*trigger_info = NULL;
 	zbx_vector_ptr_t	trigger_order;
@@ -58,67 +60,73 @@ static void	process_time_functions(void)
 
 	zbx_vector_ptr_create(&trigger_order);
 
-	DCconfig_get_time_based_triggers(&trigger_info, &trigger_order);
-
-	if (0 == trigger_order.values_num)
-		goto clean;
-
-	evaluate_expressions(&trigger_order);
-
-	DBbegin();
-
-	sql = zbx_malloc(sql, sql_alloc);
-
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	for (i = 0; i < trigger_order.values_num; i++)
+	while (1)
 	{
-		trigger = (DC_TRIGGER *)trigger_order.values[i];
+		DCconfig_get_time_based_triggers(&trigger_info, &trigger_order, ZBX_TRIGGERS_MAX);
 
-		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, trigger->triggerid,
-				trigger->type, trigger->value, trigger->value_flags, trigger->error,
-				trigger->new_value, trigger->new_error, &trigger->timespec, &trigger->add_event,
-				&trigger->value_changed))
-		{
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+		if (0 == trigger_order.values_num)
+			break;
 
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-		}
+		evaluate_expressions(&trigger_order);
 
-		zbx_free(trigger->expression);
-		zbx_free(trigger->new_error);
+		DBbegin();
 
-		if (1 == trigger->add_event)
-			events_num++;
-	}
+		events_num = 0;
+		sql_offset = 0;
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		if (NULL == sql)
+			sql = zbx_malloc(sql, sql_alloc);
 
-	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
-		DBexecute("%s", sql);
-
-	zbx_free(sql);
-
-	if (0 != events_num)
-	{
-		zbx_uint64_t	eventid;
-
-		eventid = DBget_maxid_num("events", events_num);
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (i = 0; i < trigger_order.values_num; i++)
 		{
 			trigger = (DC_TRIGGER *)trigger_order.values[i];
 
-			if (1 != trigger->add_event)
-				continue;
+			if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, trigger->triggerid,
+					trigger->type, trigger->value, trigger->value_flags, trigger->error,
+					trigger->new_value, trigger->new_error, &trigger->timespec, &trigger->add_event,
+					&trigger->value_changed))
+			{
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
-			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
-					&trigger->timespec, trigger->new_value, trigger->value_changed, 0, 0);
+				DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+			}
+
+			zbx_free(trigger->expression);
+			zbx_free(trigger->new_error);
+
+			if (1 == trigger->add_event)
+				events_num++;
 		}
+
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+			DBexecute("%s", sql);
+
+		if (0 != events_num)
+		{
+			zbx_uint64_t	eventid;
+
+			eventid = DBget_maxid_num("events", events_num);
+
+			for (i = 0; i < trigger_order.values_num; i++)
+			{
+				trigger = (DC_TRIGGER *)trigger_order.values[i];
+
+				if (1 != trigger->add_event)
+					continue;
+
+				process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
+						&trigger->timespec, trigger->new_value, trigger->value_changed, 0, 0);
+			}
+		}
+
+		DBcommit();
 	}
 
-	DBcommit();
-clean:
+	zbx_free(sql);
 	zbx_free(trigger_info);
 	zbx_vector_ptr_destroy(&trigger_order);
 

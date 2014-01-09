@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,6 +56,7 @@
 
 const char	*progname = NULL;
 const char	title_message[] = "Zabbix proxy";
+const char	syslog_app_name[] = "zabbix_proxy";
 const char	usage_message[] = "[-hV] [-c <file>] [-R <option>]";
 
 const char	*help_message[] = {
