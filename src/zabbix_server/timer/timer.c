@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,6 +33,8 @@
 
 #define TIMER_DELAY	30
 
+#define ZBX_TRIGGERS_MAX	1000
+
 extern unsigned char	process_type;
 extern int		process_num;
 
@@ -55,23 +57,26 @@ static void	process_time_functions(int *triggers_count, int *events_count)
 
 	zbx_vector_ptr_create(&trigger_order);
 
-	DCconfig_get_time_based_triggers(&trigger_info, &trigger_order, process_num, triggers_count);
+	while (1)
+	{
+		DCconfig_get_time_based_triggers(&trigger_info, &trigger_order, ZBX_TRIGGERS_MAX, process_num);
 
-	if (0 == trigger_order.values_num)
-		goto clean;
+		if (0 == trigger_order.values_num)
+			break;
 
-	evaluate_expressions(&trigger_order);
+		*triggers_count += trigger_order.values_num;
 
-	DBbegin();
+		evaluate_expressions(&trigger_order);
 
-	process_triggers(&trigger_order);
+		DBbegin();
 
-	DCfree_triggers(&trigger_order);
+		process_triggers(&trigger_order);
 
-	*events_count = process_events();
+		*events_count += process_events();
 
-	DBcommit();
-clean:
+		DBcommit();
+	}
+
 	zbx_free(trigger_info);
 	zbx_vector_ptr_destroy(&trigger_order);
 

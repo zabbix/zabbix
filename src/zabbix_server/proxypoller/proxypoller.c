@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -174,7 +174,7 @@ static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	process_proxy()
+static int	process_proxy(void)
 {
 	const char		*__function_name = "process_proxy";
 	DC_PROXY		proxy;
@@ -232,7 +232,18 @@ static int	process_proxy()
 			if (SUCCEED == (ret = connect_to_proxy(&proxy, &s, CONFIG_TRAPPER_TIMEOUT)))
 			{
 				if (SUCCEED == (ret = send_data_to_proxy(&proxy, &s, j.buffer)))
-					ret = zbx_recv_response(&s, NULL, 0, 0);
+				{
+					char	*info = NULL, *error = NULL;
+
+					if (SUCCEED != (ret = zbx_recv_response(&s, &info, 0, &error)))
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy: "
+								"error:\"%s\", info:\"%s\"", ZBX_NULL2EMPTY_STR(error),
+								ZBX_NULL2EMPTY_STR(info));
+					}
+					zbx_free(info);
+					zbx_free(error);
+				}
 
 				disconnect_proxy(&s);
 			}

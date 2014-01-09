@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,39 @@
 #include "log.h"
 #include "zbxalgo.h"
 #include "valuecache.h"
+
+/* The following definitions are used to identify the request field */
+/* for various value getters grouped by their scope:                */
+
+/* DBget_item_value(), DBget_interface_value() */
+#define ZBX_REQUEST_HOST_IP		1
+#define ZBX_REQUEST_HOST_DNS		2
+#define ZBX_REQUEST_HOST_CONN		3
+#define ZBX_REQUEST_HOST_PORT		4
+
+/* DBget_item_value() */
+#define ZBX_REQUEST_HOST_HOST		101
+#define ZBX_REQUEST_HOST_NAME		102
+#define ZBX_REQUEST_ITEM_ID		103
+#define ZBX_REQUEST_ITEM_NAME		104
+#define ZBX_REQUEST_ITEM_NAME_ORIG	105
+#define ZBX_REQUEST_ITEM_KEY		106
+#define ZBX_REQUEST_ITEM_KEY_ORIG	107
+#define ZBX_REQUEST_ITEM_DESCRIPTION	108
+#define ZBX_REQUEST_PROXY_NAME		109
+
+/* DBget_history_log_value() */
+#define ZBX_REQUEST_ITEM_LOG_DATE	201
+#define ZBX_REQUEST_ITEM_LOG_TIME	202
+#define ZBX_REQUEST_ITEM_LOG_AGE	203
+#define ZBX_REQUEST_ITEM_LOG_SOURCE	204
+#define ZBX_REQUEST_ITEM_LOG_SEVERITY	205
+#define ZBX_REQUEST_ITEM_LOG_NSEVERITY	206
+#define ZBX_REQUEST_ITEM_LOG_EVENTID	207
+
+/* DBget_node_value() */
+#define ZBX_REQUEST_NODE_ID		301
+#define ZBX_REQUEST_NODE_NAME		302
 
 /******************************************************************************
  *                                                                            *
@@ -898,9 +931,6 @@ out:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-#define ZBX_REQUEST_HOST_IP	1
-#define ZBX_REQUEST_HOST_DNS	2
-#define ZBX_REQUEST_HOST_CONN	3
 static int	DBget_interface_value(zbx_uint64_t hostid, char **replace_to, int request, unsigned char agent_only)
 {
 	DB_RESULT	result;
@@ -918,7 +948,7 @@ static int	DBget_interface_value(zbx_uint64_t hostid, char **replace_to, int req
 		zbx_snprintf(sql, sizeof(sql), "=%d", INTERFACE_TYPE_AGENT);
 
 	result = DBselect(
-			"select type,useip,ip,dns"
+			"select type,useip,ip,dns,port"
 			" from interface"
 			" where hostid=" ZBX_FS_UI64
 				" and type%s"
@@ -949,6 +979,9 @@ static int	DBget_interface_value(zbx_uint64_t hostid, char **replace_to, int req
 				useip = (unsigned char)atoi(row[1]);
 				*replace_to = zbx_strdup(*replace_to, 1 == useip ? row[2] : row[3]);
 				break;
+			case ZBX_REQUEST_HOST_PORT:
+				*replace_to = zbx_strdup(*replace_to, row[4]);
+				break;
 		}
 		ret = SUCCEED;
 	}
@@ -967,15 +1000,6 @@ static int	DBget_interface_value(zbx_uint64_t hostid, char **replace_to, int req
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-#define ZBX_REQUEST_HOST_NAME		0
-#define ZBX_REQUEST_ITEM_ID		4
-#define ZBX_REQUEST_ITEM_NAME		5
-#define ZBX_REQUEST_ITEM_NAME_ORIG	6
-#define ZBX_REQUEST_ITEM_KEY		7
-#define ZBX_REQUEST_ITEM_KEY_ORIG	8
-#define ZBX_REQUEST_ITEM_DESCRIPTION	9
-#define ZBX_REQUEST_PROXY_NAME		10
-#define ZBX_REQUEST_HOST_HOST		11
 static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 {
 	const char	*__function_name = "DBget_item_value";
@@ -1011,6 +1035,7 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 			case ZBX_REQUEST_HOST_IP:
 			case ZBX_REQUEST_HOST_DNS:
 			case ZBX_REQUEST_HOST_CONN:
+			case ZBX_REQUEST_HOST_PORT:
 				ZBX_STR2UINT64(hostid, row[0]);
 				ret = DBget_interface_value(hostid, replace_to, request, 0);
 				break;
@@ -1352,13 +1377,6 @@ static int	DBget_drule_value_by_event(const DB_EVENT *event, char **replace_to, 
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-#define ZBX_REQUEST_ITEM_LOG_DATE	0
-#define ZBX_REQUEST_ITEM_LOG_TIME	1
-#define ZBX_REQUEST_ITEM_LOG_AGE	2
-#define ZBX_REQUEST_ITEM_LOG_SOURCE	3
-#define ZBX_REQUEST_ITEM_LOG_SEVERITY	4
-#define ZBX_REQUEST_ITEM_LOG_NSEVERITY	5
-#define ZBX_REQUEST_ITEM_LOG_EVENTID	6
 static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int request, int clock, int ns)
 {
 	const char	*__function_name = "DBget_history_log_value";
@@ -1734,8 +1752,6 @@ static void	get_event_ack_history(const DB_EVENT *event, char **replace_to)
  * Return value: upon successful completion return SUCCEED, otherwise FAIL    *
  *                                                                            *
  ******************************************************************************/
-#define ZBX_REQUEST_NODE_ID	0
-#define ZBX_REQUEST_NODE_NAME	1
 static int	DBget_node_value(zbx_uint64_t objectid, char **replace_to, int request)
 {
 	const char	*__function_name = "DBget_node_value";
@@ -2039,7 +2055,7 @@ static const char	*ex_macros[] =
 	MVAR_PROFILE_TAG, MVAR_PROFILE_MACADDRESS, MVAR_PROFILE_HARDWARE, MVAR_PROFILE_SOFTWARE,
 	MVAR_PROFILE_CONTACT, MVAR_PROFILE_LOCATION, MVAR_PROFILE_NOTES,
 	MVAR_HOST_HOST, MVAR_HOST_NAME, MVAR_HOSTNAME, MVAR_PROXY_NAME,
-	MVAR_HOST_CONN, MVAR_HOST_DNS, MVAR_HOST_IP, MVAR_IPADDRESS,
+	MVAR_HOST_CONN, MVAR_HOST_DNS, MVAR_HOST_IP, MVAR_HOST_PORT, MVAR_IPADDRESS,
 	MVAR_ITEM_ID, MVAR_ITEM_NAME, MVAR_ITEM_NAME_ORIG, MVAR_ITEM_DESCRIPTION,
 	MVAR_ITEM_KEY, MVAR_ITEM_KEY_ORIG, MVAR_TRIGGER_KEY,
 	MVAR_ITEM_LASTVALUE,
@@ -2414,7 +2430,7 @@ static void	get_trigger_function_value(const char *expression, char **replace_to
 		DBget_trigger_value(expression, &key, N_functionid, ZBX_REQUEST_ITEM_KEY_ORIG);
 	}
 	else
-		ret = parse_key(&p, &key);
+		ret = get_item_key(&p, &key);
 
 	if (SUCCEED != ret || '.' != *p++)
 		goto fail;
@@ -2577,6 +2593,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_HOST_IP);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_PORT))
+				{
+					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
+							N_functionid, ZBX_REQUEST_HOST_PORT);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_NAME))
 				{
@@ -2811,6 +2832,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_HOST_IP);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_PORT))
+				{
+					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
+							N_functionid, ZBX_REQUEST_HOST_PORT);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_NAME))
 				{
@@ -3129,6 +3155,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_HOST_IP);
 				}
+				else if (0 == strcmp(m, MVAR_HOST_PORT))
+				{
+					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_HOST_PORT);
+				}
 				else if (0 == strcmp(m, MVAR_HOST_NAME))
 				{
 					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_HOST_NAME);
@@ -3224,6 +3254,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 				{
 					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_HOST_IP);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_PORT))
+				{
+					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_HOST_PORT);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_NAME))
 				{
@@ -4074,7 +4108,7 @@ static int	substitute_discovery_macros_simple(char *data, char **replace_to, siz
 	zbx_strncpy_alloc(replace_to, replace_to_alloc, &replace_to_offset, pl, pr - pl);
 
 	/* an item key */
-	if (SUCCEED != parse_key(&pr, &key))
+	if (SUCCEED != get_item_key(&pr, &key))
 		return FAIL;
 
 	substitute_key_macros(&key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);

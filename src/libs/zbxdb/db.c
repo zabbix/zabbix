@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1543,7 +1543,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 			{
 				result->values[i] = PQgetvalue(result->pg_result, result->cursor, i);
 				if (PQftype(result->pg_result, i) == ZBX_PG_BYTEAOID)	/* binary data type BYTEAOID */
-					zbx_pg_unescape_bytea((u_char *)result->values[i]);
+					DBbytea_unescape((u_char *)result->values[i]);
 			}
 		}
 	}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -444,9 +444,11 @@ elseif (isset($_REQUEST['save'])) {
 			'inventory_link' => get_request('inventory_link')
 		);
 
-		if (isset($_REQUEST['itemid'])) {
-			$db_item = get_item_by_itemid_limited($_REQUEST['itemid']);
-			$db_item['applications'] = get_applications_by_itemid($_REQUEST['itemid']);
+		if (hasRequest('itemid')) {
+			$itemId = getRequest('itemid');
+
+			$dbItem = get_item_by_itemid_limited($itemId);
+			$dbItem['applications'] = get_applications_by_itemid($itemId);
 
 			// unset snmpv3 fields
 			if ($item['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
@@ -457,14 +459,8 @@ elseif (isset($_REQUEST['save'])) {
 				$item['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
 			}
 
-			// unset fields without changes
-			foreach ($item as $field => $value) {
-				if ($item[$field] == $db_item[$field]) {
-					unset($item[$field]);
-				}
-			}
-
-			$item['itemid'] = $_REQUEST['itemid'];
+			$item = CArrayHelper::unsetEqualValues($item, $dbItem);
+			$item['itemid'] = $itemId;
 
 			$result = API::Item()->update($item);
 		}
@@ -1025,9 +1021,10 @@ else {
 	}
 
 	// set values for subfilters, if any of subfilters = false then item shouldnt be shown
-	if (!empty($data['items'])) {
+	if ($data['items']) {
 		// fill template host
 		fillItemsWithChildTemplates($data['items']);
+
 		$dbHostItems = DBselect(
 			'SELECT i.itemid,h.name,h.hostid'.
 			' FROM hosts h,items i'.
@@ -1035,16 +1032,19 @@ else {
 				' AND '.dbConditionInt('i.itemid', zbx_objectValues($data['items'], 'templateid'))
 		);
 		while ($dbHostItem = DBfetch($dbHostItems)) {
-			foreach ($data['items'] as $itemid => $item) {
+			foreach ($data['items'] as &$item) {
 				if ($item['templateid'] == $dbHostItem['itemid']) {
-					$data['items'][$itemid]['template_host'] = $dbHostItem;
+					$item['template_host'] = $dbHostItem;
 				}
 			}
+			unset($item);
 		}
+
+		// resolve name macros
+		$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
 
 		foreach ($data['items'] as &$item) {
 			$item['hostids'] = zbx_objectValues($item['hosts'], 'hostid');
-			$item['name_expanded'] = itemName($item);
 
 			if (empty($data['filter_hostid'])) {
 				$host = reset($item['hosts']);
@@ -1076,6 +1076,7 @@ else {
 					|| uint_in_array($item['delay'], $_REQUEST['subfilter_interval']),
 				'subfilter_apps' => empty($_REQUEST['subfilter_apps'])
 			);
+
 			if (!empty($_REQUEST['subfilter_apps'])) {
 				foreach ($item['applications'] as $application) {
 					if (str_in_array($application['name'], $_REQUEST['subfilter_apps'])) {

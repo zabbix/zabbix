@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -149,7 +149,6 @@ int	zbx_send_response_ext(zbx_sock_t *sock, int result, const char *info, int pr
 #define zbx_send_response_raw(sock, result, info, timeout) \
 		zbx_send_response_ext(sock, result, info, 0, timeout)
 
-
-int	zbx_recv_response(zbx_sock_t *sock, char *info, int max_info_len, int timeout);
+int	zbx_recv_response(zbx_sock_t *sock, char **info, int timeout, char **error);
 
 #endif
