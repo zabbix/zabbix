@@ -483,7 +483,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 			if (isset($graph['ymin_type']) && $graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 				if (!isset($graph['ymin_itemid']) || zbx_empty($graph['ymin_itemid'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s($this->getErrorMsg(self::ERROR_MISSING_REQUIRED_FIELD), 'ymin_itemid')
+						_s($this->getErrorMsg(self::ERROR_MISSING_REQUIRED_VALUE), 'ymin_itemid')
 					);
 				}
 				else {
@@ -493,7 +493,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 			if (isset($graph['ymax_type']) && $graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 				if (!isset($graph['ymax_itemid']) || zbx_empty($graph['ymax_itemid'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s($this->getErrorMsg(self::ERROR_MISSING_REQUIRED_FIELD), 'ymax_itemid')
+						_s($this->getErrorMsg(self::ERROR_MISSING_REQUIRED_VALUE), 'ymax_itemid')
 					);
 				}
 				else {
@@ -547,10 +547,14 @@ abstract class CGraphGeneral extends CZBXAPI {
 					);
 				}
 
-
-				// items fields
+				// check color
 				foreach ($graph['gitems'] as $gitem) {
-					// check color
+					if (!isset($gitem['color'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s($this->getErrorMsg(self::ERROR_MISSING_REQUIRED_VALUE), 'color')
+						);
+					}
+
 					if (!$colorValidator->validate($gitem['color'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, $colorValidator->getError());
 					}

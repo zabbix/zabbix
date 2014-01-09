@@ -470,7 +470,7 @@ static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, int now)
 	if (ITEM_STATE_NOTSUPPORTED == item->state)
 	{
 		nextcheck = calculate_item_nextcheck(item->interfaceid, item->itemid, item->type,
-				config->config->refresh_unsupported, NULL, now, NULL);
+				config->config->refresh_unsupported, NULL, now);
 	}
 	else
 	{
@@ -478,7 +478,7 @@ static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, int now)
 
 		flexitem = zbx_hashset_search(&config->flexitems, &item->itemid);
 		nextcheck = calculate_item_nextcheck(item->interfaceid, item->itemid, item->type,
-				item->delay, flexitem ? flexitem->delay_flex : NULL, now, NULL);
+				item->delay, NULL != flexitem ? flexitem->delay_flex : NULL, now);
 	}
 
 	return nextcheck;
@@ -932,12 +932,12 @@ static void	DCsync_items(DB_RESULT result)
 			if (ITEM_STATE_NOTSUPPORTED == item->state)
 			{
 				item->nextcheck = calculate_item_nextcheck(item->interfaceid, itemid,
-						item->type, config->config->refresh_unsupported, NULL, now, NULL);
+						item->type, config->config->refresh_unsupported, NULL, now);
 			}
 			else
 			{
 				item->nextcheck = calculate_item_nextcheck(item->interfaceid, itemid,
-						item->type, delay, row[16], now, NULL);
+						item->type, delay, row[16], now);
 			}
 		}
 		else
@@ -947,7 +947,7 @@ static void	DCsync_items(DB_RESULT result)
 			if (ITEM_STATE_NORMAL == item->state && delay != item->delay)
 			{
 				item->nextcheck = calculate_item_nextcheck(item->interfaceid, itemid,
-						item->type, delay, row[16], now, NULL);
+						item->type, delay, row[16], now);
 			}
 		}
 
@@ -1019,7 +1019,7 @@ static void	DCsync_items(DB_RESULT result)
 					ITEM_STATE_NOTSUPPORTED != item->state)
 			{
 				item->nextcheck = calculate_item_nextcheck(item->interfaceid, item->itemid, item->type,
-						item->delay, flexitem->delay_flex, now, NULL);
+						item->delay, flexitem->delay_flex, now);
 			}
 		}
 		else if (NULL != (flexitem = zbx_hashset_search(&config->flexitems, &itemid)))
@@ -1032,7 +1032,7 @@ static void	DCsync_items(DB_RESULT result)
 			if (ITEM_STATE_NOTSUPPORTED != item->state)
 			{
 				item->nextcheck = calculate_item_nextcheck(item->interfaceid, item->itemid, item->type,
-						item->delay, NULL, now, NULL);
+						item->delay, NULL, now);
 			}
 		}
 
@@ -5245,7 +5245,7 @@ void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, ch
  * Parameters: items - [OUT] the copy of item history                         *
  *             ids   - [IN] a vector of item ids to get the history for       *
  *                                                                            *
- * Comments: The hahset must be created by the caller like:                   *
+ * Comments: The hashset must be created by the caller like:                  *
  *            zbx_hashset_create(items, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,   *
  *                               ZBX_DEFAULT_UINT64_COMPARE_FUNC)             *
  *                                                                            *
@@ -5342,7 +5342,7 @@ void	DCfree_item_queue(zbx_vector_ptr_t *queue)
  *             to    - [IN] the maximum delay time in seconds or -1 if there  *
  *                          is no maximum limit                               *
  *                                                                            *
- * Return value: the number of delayed items,                                 *
+ * Return value: the number of delayed items                                  *
  *                                                                            *
  ******************************************************************************/
 int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
