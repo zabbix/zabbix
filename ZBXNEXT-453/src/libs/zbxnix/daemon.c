@@ -153,9 +153,9 @@ int	daemon_start(int allow_root, const char *user)
 	{
 		if (0 == allow_root)
 		{
-			if ('\0' != *user)
+			if ('\0' != *usr)
 			{
-				if (0 == strcmp(user, "root"))
+				if (0 == strcmp(usr, "root"))
 				{
 					zbx_error("option User does not accept value \"root\"; use AllowRoot=1 "
 							"by itself to run as root");
@@ -163,7 +163,7 @@ int	daemon_start(int allow_root, const char *user)
 				}
 				else
 				{
-					pwd = getpwnam(user);
+					pwd = getpwnam(usr);
 
 					if (NULL == pwd)
 					{
@@ -174,28 +174,28 @@ int	daemon_start(int allow_root, const char *user)
 
 					if (-1 == setgid(pwd->pw_gid))
 					{
-						zbx_error("cannot setgid to %s: %s", user, zbx_strerror(errno));
+						zbx_error("cannot setgid to %s: %s", usr, zbx_strerror(errno));
 						exit(FAIL);
 					}
 
 #ifdef HAVE_FUNCTION_INITGROUPS
-					if (-1 == initgroups(user, pwd->pw_gid))
+					if (-1 == initgroups(usr, pwd->pw_gid))
 					{
-						zbx_error("cannot initgroups to %s: %s", user, zbx_strerror(errno));
+						zbx_error("cannot initgroups to %s: %s", usr, zbx_strerror(errno));
 						exit(FAIL);
 					}
 #endif
 
 					if (-1 == setuid(pwd->pw_uid))
 					{
-						zbx_error("cannot setuid to %s: %s", user, zbx_strerror(errno));
+						zbx_error("cannot setuid to %s: %s", usr, zbx_strerror(errno));
 						exit(FAIL);
 					}
 
 #ifdef HAVE_FUNCTION_SETEUID
 					if (-1 == setegid(pwd->pw_gid) || -1 == seteuid(pwd->pw_uid))
 					{
-						zbx_error("cannot setegid or seteuid to %s: %s", user,
+						zbx_error("cannot setegid or seteuid to %s: %s", usr,
 								zbx_strerror(errno));
 						exit(FAIL);
 					}
@@ -212,20 +212,20 @@ int	daemon_start(int allow_root, const char *user)
 	}
 	else
 	{
-		if ('\0' != *user)
+		if ('\0' != *usr)
 		{
-			pwd = getpwnam(user);
+			pwd = getpwnam(usr);
 
 			if (NULL == pwd)
 			{
-				zbx_error("user %s does not exist", user);
+				zbx_error("user %s does not exist", usr);
 				exit(FAIL);
 			}
 			else
 			{
 				if (pwd->pw_uid != getuid())
 				{
-					zbx_error("cannot setuid to %s: insufficient privileges", user);
+					zbx_error("cannot setuid to %s: insufficient privileges", usr);
 					exit(FAIL);
 				}
 			}
