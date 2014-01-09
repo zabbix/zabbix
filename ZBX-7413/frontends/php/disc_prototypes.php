@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -362,8 +362,8 @@ else {
 		'discovery_rule' => $discovery_rule
 	);
 
-	// get items
 	$sortfield = getPageSortField('name');
+
 	$data['items'] = API::ItemPrototype()->get(array(
 		'discoveryids' => $data['parent_discoveryid'],
 		'output' => API_OUTPUT_EXTEND,
@@ -373,9 +373,9 @@ else {
 		'limit' => $config['search_limit'] + 1
 	));
 
-	if (!empty($data['items'])) {
-		order_result($data['items'], $sortfield, getPageSortOrder());
-	}
+	$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
+
+	order_result($data['items'], $sortfield, getPageSortOrder());
 
 	$data['paging'] = getPagingLine(
 		$data['items'],

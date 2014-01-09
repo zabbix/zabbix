@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -252,18 +252,25 @@ if(isset($_REQUEST['sform'])){
 
 	$frmTRLog->addRow(_('Description'), new CTextBox('description', $description, 80));
 
-	$item = '';
-	$db_items = DBselect('SELECT DISTINCT * FROM items WHERE itemid='.zbx_dbstr($itemid));
-	while($db_item = DBfetch($db_items)){
-		if($db_item['templateid']){
-			$template_host = get_realhost_by_itemid($db_item['templateid']);
-			$item = $template_host['host'].NAME_DELIMITER;
-		}
+	$itemName = '';
 
-		$item .= itemName($db_item,$db_item['key_']);
+	$dbItems = DBfetchArray(DBselect(
+		'SELECT itemid,hostid,name,key_,templateid'.
+		' FROM items'.
+		' WHERE itemid='.zbx_dbstr($itemid)
+	));
+	$dbItems = CMacrosResolverHelper::resolveItemNames($dbItems);
+	$dbItem = reset($dbItems);
+
+	if ($dbItem['templateid']) {
+		$template = get_realhost_by_itemid($dbItem['templateid']);
+		$itemName = $template['host'].NAME_DELIMITER.$dbItem['name_expanded'];
+	}
+	else {
+		$itemName = $dbItem['name_expanded'];
 	}
 
-	$ctb = new CTextBox('item',$item,80);
+	$ctb = new CTextBox('item', $itemName, 80);
 	$ctb->setAttribute('id','item');
 	$ctb->setAttribute('disabled','disabled');
 
