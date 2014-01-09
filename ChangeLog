@@ -1,6 +1,7 @@
 Changes for 2.0.11rc1
 
 New features:
+...G...... [ZBX-7414] added description to HostnameItem that UserParameters and aliases are not supported (igors)
 A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
