@@ -165,11 +165,12 @@ retry:
 			if (NULL != (hLib = LoadLibraryEx(MsgDll, NULL, LOAD_LIBRARY_AS_DATAFILE)))
 			{
 				LPWSTR	*pInsertStrings = NULL;
+				char	*pAllocFlags = NULL;
 
 				if (0 < pELR->NumStrings)
 				{
 					pInsertStrings = zbx_malloc(NULL, sizeof(LPWSTR) * pELR->NumStrings);
-					memset(pInsertStrings, 0, sizeof(LPWSTR) * pELR->NumStrings);
+					pAllocFlags = zbx_malloc(NULL, pELR->NumStrings);
 
 					/* prepare the array of insert strings for FormatMessage - the
 					insert strings are in the log entry. */
@@ -195,9 +196,11 @@ retry:
 									0,
 									NULL))
 						{
-							pInsertStrings[i] = LocalAlloc(0, sizeof(WCHAR) * len);
-							memcpy(pInsertStrings[i], pCh, sizeof(WCHAR) * len);
+							pInsertStrings[i] = pCh;
+							pAllocFlags[i] = 0;
 						}
+						else
+							pAllocFlags[i] = 1;
 
 						pCh += len;
 					}
@@ -225,10 +228,11 @@ retry:
 
 				for (i = 0; i < pELR->NumStrings; i++)
 				{
-					if (NULL != pInsertStrings[i])
+					if (0 != pAllocFlags[i])
 						LocalFree((HLOCAL)pInsertStrings[i]);
 				}
 
+				zbx_free(pAllocFlags);
 				zbx_free(pInsertStrings);
 
 				FreeLibrary(hLib);
