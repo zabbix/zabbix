@@ -1989,6 +1989,9 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 				zbx_chrcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ')');
 			}
 
+			t = (char **) NULL;
+			zbx_free(textfieldlist);
+
 			if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
 			{
 				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
