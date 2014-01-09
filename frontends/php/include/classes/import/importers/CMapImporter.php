@@ -192,7 +192,6 @@ class CMapImporter extends CImporter {
 			$map['backgroundid'] = $image['imageid'];
 		}
 
-
 		if (isset($map['selements'])) {
 			foreach ($map['selements'] as &$selement) {
 				switch ($selement['elementtype']) {
@@ -223,9 +222,13 @@ class CMapImporter extends CImporter {
 					case SYSMAP_ELEMENT_TYPE_TRIGGER:
 						$el = $selement['element'];
 						$selement['elementid'] = $this->referencer->resolveTrigger($el['description'], $el['expression']);
+
 						if (!$selement['elementid']) {
-							throw new Exception(_s('Cannot find trigger "%1$s" used in map "%2$s".',
-								$selement['element']['description'], $map['name']));
+							throw new Exception(_s(
+								'Cannot find trigger "%1$s" used in map "%2$s".',
+								$selement['element']['description'],
+								$map['name']
+							));
 						}
 						break;
 
@@ -254,7 +257,6 @@ class CMapImporter extends CImporter {
 			unset($selement);
 		}
 
-
 		if (isset($map['links'])) {
 			foreach ($map['links'] as &$link) {
 				if (empty($link['linktriggers'])) {
@@ -265,8 +267,11 @@ class CMapImporter extends CImporter {
 				foreach ($link['linktriggers'] as &$linktrigger) {
 					$dbTriggers = API::Trigger()->getObjects($linktrigger['trigger']);
 					if (empty($dbTriggers)) {
-						throw new Exception(_s('Cannot find trigger "%1$s" used in map "%2$s".',
-							$linktrigger['trigger']['description'], $map['name']));
+						throw new Exception(_s(
+							'Cannot find trigger "%1$s" used in map "%2$s".',
+							$linktrigger['trigger']['description'],
+							$map['name']
+						));
 					}
 
 					$tmp = reset($dbTriggers);
