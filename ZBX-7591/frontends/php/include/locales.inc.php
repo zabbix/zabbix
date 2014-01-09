@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,7 +74,7 @@ function getLocales() {
 		'sk_SK' => array('name' => _('Slovak (sk_SK)'),		'display' => true),
 		'es_ES' => array('name' => _('Spanish (es_ES)'),	'display' => false),
 		'sv_SE' => array('name' => _('Swedish (sv_SE)'),	'display' => false),
-		'tr_TR' => array('name' => _('Turkish (tr_TR)'),	'display' => false),
+		'tr_TR' => array('name' => _('Turkish (tr_TR)'),	'display' => true),
 		'uk_UA' => array('name' => _('Ukrainian (uk_UA)'),	'display' => true)
 	);
 }
