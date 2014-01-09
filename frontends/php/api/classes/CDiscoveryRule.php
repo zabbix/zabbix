@@ -85,7 +85,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectTriggers'			=> null,
 			'selectGraphs'				=> null,
 			'selectHostPrototypes'		=> null,
-			'selectConditions'			=> null,
+			'selectFilter'				=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -263,15 +263,13 @@ class CDiscoveryRule extends CItemGeneral {
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, array('hostid', 'formula', 'evaltype'), $options['output']);
 
-			// unset conditions
-			foreach ($result as &$rule) {
-				if ($options['selectConditions'] === null) {
-					unset($rule['conditions']);
-				}
-				else {
-					$rule['conditions'] = $this->unsetExtraFields($rule['conditions'], array('macro', 'itemid', 'item_conditionid'),
-						$options['selectConditions']
+			if ($options['selectFilter'] !== null) {
+				foreach ($result as &$rule) {
+					$filter = $this->unsetExtraFields(array($rule['filter']),
+						array('conditions', 'formula', 'evaltype'),
+						$options['selectFilter']
 					);
+					$rule['filter'] = $filter[0];
 				}
 			}
 			unset($rule);
@@ -336,8 +334,8 @@ class CDiscoveryRule extends CItemGeneral {
 		$items = zbx_toArray($items);
 
 		$dbItems = $this->get(array(
-			'output' => array('itemid', 'evaltype', 'name', 'formula'),
-			'selectConditions' => array('macro', 'value', 'formulaid'),
+			'output' => array('itemid', 'name'),
+			'selectFilter' => array('evaltype', 'formula', 'conditions'),
 			'itemids' => zbx_objectValues($items, 'itemid'),
 			'preservekeys' => true
 		));
@@ -502,7 +500,8 @@ class CDiscoveryRule extends CItemGeneral {
 		$items = $this->get(array(
 			'hostids' => $data['templateids'],
 			'preservekeys' => true,
-			'output' => $selectFields
+			'output' => $selectFields,
+			'selectFilter' => array('formula', 'evaltype', 'conditions')
 		));
 
 		$this->inherit($items, $data['hostids']);
@@ -622,8 +621,9 @@ class CDiscoveryRule extends CItemGeneral {
 		// create items without formulas, they will be updated when items and conditions are saved
 		$createItems = array();
 		foreach ($items as $item) {
-			if ($item['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-				unset($item['formula']);
+			if (isset($item['filter'])) {
+				$item['evaltype'] = $item['filter']['evaltype'];
+				unset($item['filter']);
 			}
 
 			$createItems[] = $item;
@@ -635,8 +635,8 @@ class CDiscoveryRule extends CItemGeneral {
 			$item['itemid'] = $createItems[$key]['itemid'];
 
 			// conditions
-			if (isset($item['conditions'])) {
-				foreach ($item['conditions'] as $condition) {
+			if (isset($item['filter'])) {
+				foreach ($item['filter']['conditions'] as $condition) {
 					$condition['itemid'] = $item['itemid'];
 
 					$conditions[] = $condition;
@@ -653,8 +653,8 @@ class CDiscoveryRule extends CItemGeneral {
 			$itemConditions[$condition['itemid']][] = $condition;
 		}
 		foreach ($items as $item) {
-			if ($item['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-				$this->updateFormula($item['itemid'], $item['formula'], $itemConditions[$item['itemid']]);
+			if (isset($item['filter']) && $item['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+				$this->updateFormula($item['itemid'], $item['filter']['formula'], $itemConditions[$item['itemid']]);
 			}
 		}
 
@@ -676,23 +676,23 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$exRules = $this->get(array(
 			'itemids' => zbx_objectValues($items, 'itemid'),
-			'output' => array('key_', 'name', 'evaltype'),
+			'output' => array('key_', 'name'),
 			'selectHosts' => array('name'),
-			'selectConditions' => array('item_conditionid', 'macro', 'operator', 'value', 'formulaid'),
+			'selectFilter' => array('evaltype', 'formula', 'conditions'),
 			'nopermissions' => true,
 			'preservekeys' => true,
 		));
 
-		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $exRules, array('evaltype'));
+		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $exRules, array('filter'));
 
 		$data = array();
 		foreach ($items as $item) {
-			if ($item['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-				$item['formula'] = '';
+			if ($item['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+				$item['filter']['formula'] = '';
 			}
-			else {
-				unset($item['formula']);
-			}
+
+			$item['evaltype'] = $item['filter']['evaltype'];
+			unset($item['filter']);
 
 			$data[] = array('values' => $item, 'where'=> array('itemid' => $item['itemid']));
 		}
@@ -702,14 +702,14 @@ class CDiscoveryRule extends CItemGeneral {
 		$exConditions = array();
 		foreach ($items as $item) {
 			// conditions
-			if (isset($item['conditions'])) {
-				foreach ($item['conditions'] as $condition) {
+			if (isset($item['filter'])) {
+				foreach ($item['filter']['conditions'] as $condition) {
 					$condition['itemid'] = $item['itemid'];
 
 					$conditions[] = $condition;
 				}
 
-				foreach ($exRules[$item['itemid']]['conditions'] as $condition) {
+				foreach ($exRules[$item['itemid']]['filter']['conditions'] as $condition) {
 					$exConditions[] = $condition;
 				}
 			}
@@ -726,13 +726,13 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		foreach ($items as $item) {
-			if (isset($item['formula']) && $item['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+			if (isset($item['filter']) && $item['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 
 				$conditions = (isset($itemConditions[$item['itemid']]))
 					? $itemConditions[$item['itemid']]
-					: $exRules[$item['itemid']]['conditions'];
+					: $exRules[$item['itemid']]['filter']['conditions'];
 
-				$this->updateFormula($item['itemid'], $item['formula'], $conditions);
+				$this->updateFormula($item['itemid'], $item['filter']['formula'], $conditions);
 			}
 		}
 
@@ -779,7 +779,12 @@ class CDiscoveryRule extends CItemGeneral {
 
 		parent::checkInput($items, $update);
 
-		$validateItems = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $dbItems, array('evaltype', 'name'));
+		$validateItems = $items;
+		if ($update) {
+			$validateItems = $this->extendFromObjects(zbx_toHash($validateItems, 'itemid'), $dbItems, array(
+				'filter', 'name'
+			));
+		}
 
 		$conditionValidator = new CConditionValidator(array(
 			'messageInvalidFormula' => _('Incorrect custom expression "%2$s" for discovery rule "%1$s": %3$s.'),
@@ -790,9 +795,11 @@ class CDiscoveryRule extends CItemGeneral {
 			$dbItem = ($update) ? $dbItems[$item['itemid']] : array();
 
 			// validate custom formula and conditions
-			if ($item['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-				$conditionValidator->setObjectName($item['name']);
-				$this->checkPartialValidator($item, $conditionValidator, $dbItem);
+			if (isset($item['filter'])) {
+				if ($item['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+					$conditionValidator->setObjectName($item['name']);
+					$this->checkPartialValidator($item['filter'], $conditionValidator, $dbItem);
+				}
 			}
 		}
 	}
@@ -835,6 +842,23 @@ class CDiscoveryRule extends CItemGeneral {
 
 		// propagate the inheritance to the children
 		return $this->inherit(array_merge($updateItems, $insertItems));
+	}
+
+	protected function prepareInheritedItems(array $itemsToInherit, array $hostIds = null) {
+		$items = parent::prepareInheritedItems($itemsToInherit, $hostIds);
+
+		// unset condition ids, so they would override all child conditions
+		foreach ($items as &$item) {
+			if (isset($item['filter'])) {
+				foreach ($item['filter']['conditions'] as &$condition) {
+					unset($condition['item_conditionid'], $condition['itemid']);
+				}
+				unset($condition);
+			}
+		}
+		unset($item);
+
+		return $items;
 	}
 
 	/**
@@ -1147,12 +1171,15 @@ class CDiscoveryRule extends CItemGeneral {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if ($options['countOutput'] === null) {
-			// add formula and evaltype if we request anything related to the eval formula
-			if ($this->outputIsRequested('formula', $options['output']) ||
-					$this->outputIsRequested('eval_formula', $options['output']) ||
-					$this->outputIsRequested('formulaid', $options['selectConditions'])) {
+			// add filter fields
+			if ($this->outputIsRequested('formula', $options['selectFilter']) ||
+					$this->outputIsRequested('eval_formula', $options['selectFilter']) ||
+					$this->outputIsRequested('conditions', $options['selectFilter'])) {
 
 				$sqlParts = $this->addQuerySelect('i.formula', $sqlParts);
+				$sqlParts = $this->addQuerySelect('i.evaltype', $sqlParts);
+			}
+			if ($this->outputIsRequested('evaltype', $options['selectFilter'])) {
 				$sqlParts = $this->addQuerySelect('i.evaltype', $sqlParts);
 			}
 
@@ -1303,64 +1330,69 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 		}
 
-		$formulaRequested = $this->outputIsRequested('formula', $options['output']);
-		$evalFormulaRequested = $this->outputIsRequested('eval_formula', $options['output']);
-		$formulaIdRequested = $this->outputIsRequested('formulaid', $options['selectConditions']);
+		if ($options['selectFilter'] !== null) {
+			$formulaRequested = $this->outputIsRequested('formula', $options['selectFilter']);
+			$evalFormulaRequested = $this->outputIsRequested('eval_formula', $options['selectFilter']);
+			$conditionsRequested = $this->outputIsRequested('conditions', $options['selectFilter']);
 
-		// adding conditions
-		$selectConditions = $options['selectConditions'];
-		if ($formulaRequested || $evalFormulaRequested || $formulaIdRequested) {
-			$selectConditions = $this->outputExtend('item_condition', array('item_conditionid', 'macro'), $selectConditions);
-		}
-		if ($selectConditions !== null) {
-			$conditions = API::getApi()->select('item_condition', array(
-				'output' => $this->outputExtend('item_condition', array('itemid', 'item_conditionid'),
-					$selectConditions
-				),
-				'filter' => array('itemid' => $itemIds),
-				'preservekeys' => true,
-				'nodeids' => get_current_nodeid(true)
-			));
-			$relationMap = $this->createRelationMap($conditions, 'itemid', 'item_conditionid');
+			$filters = array();
+			foreach ($result as $rule) {
+				$filters[$rule['itemid']] = array(
+					'evaltype' => $rule['evaltype'],
+					'formula' => $rule['formula']
+				);
+			}
 
-			$result = $relationMap->mapMany($result, $conditions, 'conditions');
-		}
+			// adding conditions
+			if ($formulaRequested || $evalFormulaRequested || $conditionsRequested) {
+				$conditions = API::getApi()->select('item_condition', array(
+					'output' => array('item_conditionid', 'macro', 'value', 'formulaid', 'itemid'),
+					'filter' => array('itemid' => $itemIds),
+					'preservekeys' => true,
+					'nodeids' => get_current_nodeid(true)
+				));
+				$relationMap = $this->createRelationMap($conditions, 'itemid', 'item_conditionid');
 
-		// eval formula
-		if ($formulaRequested || $evalFormulaRequested || $formulaIdRequested) {
-			foreach ($result as &$rule) {
-				$conditions = zbx_toHash($rule['conditions'], 'item_conditionid');
-				if ($rule['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-					$formula = $rule['formula'];
-				}
-				else {
-					$formulaConditions = array();
-					foreach ($conditions as $condition) {
-						$formulaConditions[$condition['item_conditionid']] = $condition['macro'];
+				$filters = $relationMap->mapMany($filters, $conditions, 'conditions');
+			}
+
+			if ($formulaRequested || $evalFormulaRequested || $conditionsRequested) {
+				foreach ($filters as &$filter) {
+					$conditions = zbx_toHash($filter['conditions'], 'item_conditionid');
+					if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+						$formula = $filter['formula'];
 					}
-					$formula = CConditionHelper::getFormula($formulaConditions, $rule['evaltype']);
-				}
+					else {
+						$formulaConditions = array();
+						foreach ($conditions as $condition) {
+							$formulaConditions[$condition['item_conditionid']] = $condition['macro'];
+						}
+						$formula = CConditionHelper::getFormula($formulaConditions, $rule['evaltype']);
+					}
 
-				// generate formulaids from the effective formula
-				$formulaIds = CConditionHelper::getFormulaIds($formula);
-
-				// generated a letter based formula only for rules with custom expressions
-				if ($formulaRequested && $rule['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-					$rule['formula'] = CConditionHelper::replaceNumericIds($formula, $formulaIds);
-				}
-
-				if ($evalFormulaRequested) {
-					$rule['eval_formula'] = CConditionHelper::replaceNumericIds($formula, $formulaIds);
-				}
-
-				if ($formulaIdRequested) {
-					foreach ($rule['conditions'] as &$condition) {
+					// generate formulaids from the effective formula
+					$formulaIds = CConditionHelper::getFormulaIds($formula);
+					foreach ($filter['conditions'] as &$condition) {
 						$condition['formulaid'] = $formulaIds[$condition['item_conditionid']];
 					}
 					unset($condition);
+
+					// generated a letter based formula only for rules with custom expressions
+					if ($formulaRequested && $filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+						$filter['formula'] = CConditionHelper::replaceNumericIds($formula, $formulaIds);
+					}
+
+					if ($evalFormulaRequested) {
+						$filter['eval_formula'] = CConditionHelper::replaceNumericIds($formula, $formulaIds);
+					}
 				}
+				unset($filter);
 			}
-			unset($rule);
+
+			// add filters to the result
+			foreach ($result as &$rule) {
+				$rule['filter'] = $filters[$rule['itemid']];
+			}
 		}
 
 		return $result;

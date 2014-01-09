@@ -130,7 +130,7 @@ if (get_request('itemid', false)) {
 		'itemids' => $_REQUEST['itemid'],
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => array('status', 'flags'),
-		'selectConditions' => array('item_conditionid', 'macro', 'value', 'formulaid'),
+		'selectFilter' => array('formula', 'evaltype', 'conditions'),
 		'editable' => true
 	));
 	$item = reset($item);
@@ -237,9 +237,11 @@ elseif (isset($_REQUEST['save'])) {
 		'params' => get_request('params'),
 		'ipmi_sensor' => get_request('ipmi_sensor'),
 		'lifetime' => get_request('lifetime'),
-		'evaltype' => getRequest('evaltype'),
-		'formula' => getRequest('formula'),
-		'conditions' => array()
+		'filter' => array(
+			'evaltype' => getRequest('evaltype'),
+			'formula' => getRequest('formula'),
+			'conditions' => array()
+		)
 	);
 
 	// add macros; ignore empty new macros
@@ -247,7 +249,7 @@ elseif (isset($_REQUEST['save'])) {
 		if (isset($condition['item_conditionid']) || !(zbx_empty($condition['macro']))) {
 			$condition['macro'] = zbx_strtoupper($condition['macro']);
 
-			$newItem['conditions'][] = $condition;
+			$newItem['filter']['conditions'][] = $condition;
 		}
 	}
 
@@ -265,15 +267,27 @@ elseif (isset($_REQUEST['save'])) {
 
 		// unset unchanged values
 		$newItem = CArrayHelper::unsetEqualValues($newItem, $item, array('itemid'));
-		$conditions = zbx_toHash($item['conditions'], 'item_conditionid');
-		foreach ($newItem['conditions'] as &$condition) {
+
+		// don't update the filter if it hasn't changed
+		$conditionsChanged = false;
+		$conditions = zbx_toHash($item['filter']['conditions'], 'item_conditionid');
+		foreach ($newItem['filter']['conditions'] as $condition) {
 			if (isset($condition['item_conditionid'])) {
-				$condition = CArrayHelper::unsetEqualValues($condition, $conditions[$condition['item_conditionid']],
-					array('item_conditionid', 'formulaid')
-				);
+				$condition = CArrayHelper::unsetEqualValues($condition, $conditions[$condition['item_conditionid']]);
+				if ($condition) {
+					$conditionsChanged = true;
+					break;
+				}
+			}
+			else {
+				$conditionsChanged = true;
+				break;
 			}
 		}
-		unset($condition);
+		$filter = CArrayHelper::unsetEqualValues($newItem['filter'], $item['filter']);
+		if (!isset($filter['evaltype']) && !isset($filter['formula']) && !$conditionsChanged) {
+			unset($newItem['filter']);
+		}
 
 		$result = API::DiscoveryRule()->update($newItem);
 		$result = DBend($result);
@@ -331,9 +345,9 @@ if (isset($_REQUEST['form'])) {
 
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
 		$data['lifetime'] = $item['lifetime'];
-		$data['evaltype'] = $item['evaltype'];
-		$data['formula'] = $item['formula'];
-		$data['conditions'] = $item['conditions'];
+		$data['evaltype'] = $item['filter']['evaltype'];
+		$data['formula'] = $item['filter']['formula'];
+		$data['conditions'] = $item['filter']['conditions'];
 	}
 
 	// render view
