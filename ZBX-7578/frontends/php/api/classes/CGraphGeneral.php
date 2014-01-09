@@ -547,10 +547,15 @@ abstract class CGraphGeneral extends CZBXAPI {
 					);
 				}
 
-				// items fields
+				// check color
 				foreach ($graph['gitems'] as $gitem) {
-					// check color
-					if (isset($gitem['color']) && !$colorValidator->validate($gitem['color'])) {
+					if (!isset($gitem['color'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s($this->getErrorMsg(self::ERROR_MISSING_REQUIRED_FIELD), 'color')
+						);
+					}
+
+					if (!$colorValidator->validate($gitem['color'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, $colorValidator->getError());
 					}
 				}
