@@ -336,7 +336,7 @@ $buttonRow->addItem($buttonColumn);
 
 $conditionTable->addRow($buttonRow);
 
-$conditionFormList->addRow(_('Conditions'), new CDiv($conditionTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
+$conditionFormList->addRow(_('Filters'), new CDiv($conditionTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
 
 
 // append tabs to form
@@ -345,7 +345,7 @@ if (!hasRequest('form_refresh')) {
 	$itemTab->setSelected(0);
 }
 $itemTab->addTab('itemTab', $this->data['caption'], $itemFormList);
-$itemTab->addTab('macroTab', _('Conditions'), $conditionFormList);
+$itemTab->addTab('macroTab', _('Filters'), $conditionFormList);
 $itemForm->addItem($itemTab);
 
 // append buttons to form
