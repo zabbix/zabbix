@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -76,7 +76,9 @@ function valueDistributionFormForMultiplePeriods($items = array()) {
 
 	$reportForm->addRow(_('Period'), $reporttimetab);
 
-	if (is_array($items) && $items) {
+	if ($items) {
+		$items = CMacrosResolverHelper::resolveItemNames($items);
+
 		$items_table = new CTableInfo();
 		foreach ($items as $id => &$item) {
 			$color = new CColorCell(null, $item['color']);
@@ -91,7 +93,7 @@ function valueDistributionFormForMultiplePeriods($items = array()) {
 				'", 550, 400, "graph_item_form");'
 			);
 
-			$description = $item['host']['name'].NAME_DELIMITER.itemName($item);
+			$description = $item['host']['name'].NAME_DELIMITER.$item['name_expanded'];
 
 			$items_table->addRow(array(
 				new CCheckBox('group_gid['.$id.']', isset($group_gid[$id])),
@@ -101,8 +103,9 @@ function valueDistributionFormForMultiplePeriods($items = array()) {
 				($item['axisside'] == GRAPH_YAXIS_SIDE_LEFT) ? _('Left') : _('Right'),
 				$color,
 			));
+
 			// once used, unset unnecessary fields so they don't pass to URL
-			unset($item['value_type'], $item['host'], $item['name']);
+			unset($item['value_type'], $item['host'], $item['name'], $item['name_expanded']);
 		}
 		unset($item);
 
@@ -220,7 +223,9 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 	));
 	unset($periods_table, $delete_button);
 
-	if (is_array($items) && $items) {
+	if ($items) {
+		$items = CMacrosResolverHelper::resolveItemNames($items);
+
 		$items_table = new CTableInfo();
 		foreach ($items as $id => &$item) {
 			$caption = new CSpan($item['caption'], 'link');
@@ -233,7 +238,7 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 				'", 550, 400, "graph_item_form");'
 			);
 
-			$description = $item['host']['name'].NAME_DELIMITER.itemName($item);
+			$description = $item['host']['name'].NAME_DELIMITER.$item['name_expanded'];
 
 			$items_table->addRow(array(
 				new CCheckBox('group_gid['.$id.']', isset($group_gid[$id])),
@@ -241,8 +246,9 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 				$description,
 				graph_item_calc_fnc2str($item['calc_fnc'], 0)
 			));
+
 			// once used, unset unnecessary fields so they don't pass to URL. "color" goes in "periods" parameter.
-			unset($item['value_type'], $item['host'], $item['name'], $item['color']);
+			unset($item['value_type'], $item['host'], $item['name'], $item['name_expanded'], $item['color']);
 		}
 		unset($item);
 
@@ -410,8 +416,10 @@ function valueComparisonFormForMultiplePeriods() {
 
 	$itemName = '';
 	if ($itemId) {
-		$itemName = get_item_by_itemid($itemId);
-		$itemName = itemName($itemName);
+		$items = CMacrosResolverHelper::resolveItemNames(array(get_item_by_itemid($itemId)));
+		$item = reset($items);
+
+		$itemName = $item['name_expanded'];
 	}
 
 	$itemidVar = new CVar('itemid', $itemId, 'itemid');
@@ -487,12 +495,12 @@ function validateBarReportItems($items = array()) {
 	}
 
 	$validItems = API::Item()->get(array(
+		'output' => array('itemid', 'hostid', 'name', 'key_', 'value_type'),
+		'selectHosts' => array('name'),
+		'webitems' => true,
 		'nodeids' => get_current_nodeid(true),
 		'itemids' => $itemIds,
-		'webitems' => true,
-		'output' => array('name', 'value_type'),
-		'preservekeys' => true,
-		'selectHosts' => array('name')
+		'preservekeys' => true
 	));
 
 	$items = zbx_toHash($items, 'itemid');

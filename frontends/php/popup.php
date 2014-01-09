@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -760,8 +760,8 @@ elseif ($srctbl == 'triggers') {
 				BR()
 			);
 
-			foreach ($trigger['dependencies'] as $val) {
-				$description[] = array(CMacrosResolverHelper::resolveTriggerName($val), BR());
+			foreach ($trigger['dependencies'] as $dependentTrigger) {
+				$description[] = array(CMacrosResolverHelper::resolveTriggerName($dependentTrigger), BR());
 			}
 		}
 
@@ -824,7 +824,7 @@ elseif ($srctbl == 'items') {
 		'nodeids' => $nodeId,
 		'hostids' => $hostid,
 		'webitems' => true,
-		'output' => array('itemid', 'hostid', 'name', 'key_', 'type', 'value_type', 'state', 'status'),
+		'output' => array('itemid', 'hostid', 'name', 'key_', 'type', 'value_type', 'status', 'state'),
 		'selectHosts' => array('hostid', 'name')
 	);
 	if (!is_null($normalOnly)) {
@@ -841,7 +841,10 @@ elseif ($srctbl == 'items') {
 	}
 
 	$items = API::Item()->get($options);
-	order_result($items, 'name', ZBX_SORT_UP);
+
+	$items = CMacrosResolverHelper::resolveItemNames($items);
+
+	order_result($items, 'name_expanded');
 
 	if ($multiselect) {
 		$jsItems = array();
@@ -851,9 +854,8 @@ elseif ($srctbl == 'items') {
 		$host = reset($item['hosts']);
 		$item['hostname'] = $host['name'];
 
-		$item['name'] = itemName($item);
-		$description = new CLink($item['name'], '#');
-		$item['name'] = $item['hostname'].NAME_DELIMITER.$item['name'];
+		$description = new CLink($item['name_expanded'], '#');
+		$item['name'] = $item['hostname'].NAME_DELIMITER.$item['name_expanded'];
 
 		if ($multiselect) {
 			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($item['itemid']).');';
@@ -875,7 +877,7 @@ elseif ($srctbl == 'items') {
 		$description->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
 
 		$table->addRow(array(
-			$hostid > 0 ? null : $item['hostname'],
+			($hostid > 0) ? null : $item['hostname'],
 			$multiselect ? new CCheckBox('items['.zbx_jsValue($item[$srcfld1]).']', null, null, $item['itemid']) : null,
 			$description,
 			$item['key_'],
@@ -950,14 +952,16 @@ elseif ($srctbl == 'prototypes') {
 	}
 
 	$items = API::ItemPrototype()->get($options);
-	order_result($items, 'name');
+
+	$items = CMacrosResolverHelper::resolveItemNames($items);
+
+	order_result($items, 'name_expanded');
 
 	foreach ($items as &$item) {
 		$host = reset($item['hosts']);
 
-		$item['name'] = itemName($item);
-		$description = new CSpan($item['name'], 'link');
-		$item['name'] = $host['name'].NAME_DELIMITER.$item['name'];
+		$description = new CSpan($item['name_expanded'], 'link');
+		$item['name'] = $host['name'].NAME_DELIMITER.$item['name_expanded'];
 
 		if ($multiselect) {
 			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($item['itemid']).');';

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1388,14 +1388,11 @@ static void	DBlld_remove_lost_resources(zbx_vector_ptr_t *items, unsigned short 
  * Purpose: add or update discovered items                                    *
  *                                                                            *
  ******************************************************************************/
-void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data, char **error,
-		const char *f_macro, const char *f_regexp, zbx_vector_ptr_t *regexps, unsigned short lifetime,
-		int lastcheck)
+void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_rows, char **error,
+		unsigned short lifetime, int lastcheck)
 {
 	const char		*__function_name = "DBlld_update_items";
 
-	struct zbx_json_parse	jp_row;
-	const char		*p;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vector_ptr_t	items;
@@ -1428,7 +1425,8 @@ void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, struct zbx
 				*password, *publickey, *privatekey, *description_proto, *snmpv3_contextname;
 		unsigned char	type, value_type, data_type, status, multiplier, delta, snmpv3_securitylevel,
 				snmpv3_authprotocol, snmpv3_privprotocol, authtype;
-		int		delay, history, trends;
+		int		delay, history, trends, i;
+		zbx_lld_row_t	*lld_row;
 
 		ZBX_STR2UINT64(parent_itemid, row[0]);
 		name_proto = row[1];
@@ -1474,21 +1472,12 @@ void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, struct zbx
 				snmpv3_authpassphrase, snmpv3_privprotocol, snmpv3_privpassphrase, authtype, username,
 				password, publickey, privatekey, description_proto, interfaceid, snmpv3_contextname);
 
-		p = NULL;
-		/* {"data":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
-		/*          ^                                             */
-		while (NULL != (p = zbx_json_next(jp_data, p)))
+		for (i = 0; i < lld_rows->values_num; i++)
 		{
-			/* {"data":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
-			/*          ^------------------^                          */
-			if (FAIL == zbx_json_brackets_open(p, &jp_row))
-				continue;
-
-			if (SUCCEED != lld_check_record(&jp_row, f_macro, f_regexp, regexps))
-				continue;
+			lld_row = (zbx_lld_row_t *)lld_rows->values[i];
 
 			DBlld_item_make(&items, name_proto, key_proto, params_proto, snmp_oid_proto, description_proto,
-					&jp_row);
+					&lld_row->jp_row);
 		}
 
 		zbx_vector_ptr_sort(&items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);

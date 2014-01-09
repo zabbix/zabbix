@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,10 +20,10 @@
 
 define('ZABBIX_VERSION',     '2.3.0');
 define('ZABBIX_API_VERSION', '2.3.0');
-define('ZABBIX_DB_VERSION',	 2020000);
+define('ZABBIX_DB_VERSION',	 2030000);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
-define('ZABBIX_COPYRIGHT_TO',   '2013');
+define('ZABBIX_COPYRIGHT_TO',   '2014');
 
 define('ZBX_LOGIN_ATTEMPTS',	5);
 define('ZBX_LOGIN_BLOCK',		30); // sec
@@ -914,6 +914,8 @@ define('SEC_PER_DAY',	86400);
 define('SEC_PER_WEEK',	604800); // 7 * SEC_PER_DAY
 define('SEC_PER_MONTH',	2592000); // 30 * SEC_PER_DAY
 define('SEC_PER_YEAR',	31536000); // 365 * SEC_PER_DAY
+
+define('ZBX_JAN_2038', 2145916800);
 
 define('DAY_IN_YEAR', 365);
 
