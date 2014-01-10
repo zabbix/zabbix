@@ -78,7 +78,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	const char	*__function_name = "process_ping";
 
 	FILE		*f;
-	char		*c, *c2, params[64];
+	char		*c, params[64];
 	char		filename[MAX_STRING_LEN], tmp[MAX_STRING_LEN];
 	size_t		offset;
 	ZBX_FPING_HOST	*host;
@@ -295,41 +295,30 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 			if ('[' == *c)
 			{
 				/* Fping appends response source address in format '[<- 10.3.0.10]' */
-				/* if it does not match the target address. This means that the     */
-				/* target address was most probably a broadcast address.            */
+				/* if it does not match the target address. Ignore such responses.  */
 				if (NULL != strstr(c + 1, "[<-"))
-					host->broadcast = 1;
+					continue;
+
+				/* find the second ',' (just before response time)  */
+				/* in fping output for each received response:      */
+				/*      ...": [%d], %d bytes, %s ms"...             */
+				if (NULL == (c = strchr(c, ',')) || NULL == (c = strchr(c + 1, ',')))
+					continue;
+
+				sec = atof(c + 1) / 1000; /* convert ms to seconds */
+
+				if (host->rcv == 0 || host->min > sec)
+					host->min = sec;
+				if (host->rcv == 0 || host->max < sec)
+					host->max = sec;
+				host->avg = (host->avg * host->rcv + sec) / (host->rcv + 1);
+				host->rcv++;
 
 				continue;
 			}
 
-			do
-			{
-				/* don't process statistics for hosts with broadcast addresses */
-				if (0 != host->broadcast)
-					continue;
-
-				if (NULL != (c2 = strchr(c, ' ')))
-					*c2 = '\0';
-
-				if (0 != strcmp(c, "-"))
-				{
-					sec = atof(c) / 1000; /* convert ms to seconds */
-
-					if (host->rcv == 0 || host->min > sec)
-						host->min = sec;
-					if (host->rcv == 0 || host->max < sec)
-						host->max = sec;
-					host->avg = (host->avg * host->rcv + sec) / (host->rcv + 1);
-					host->rcv++;
-				}
-
-				host->cnt++;
-
-				if (NULL != c2)
-					*c2++ = ' ';
-			}
-			while (NULL != (c = c2));
+			/* process summary line for a host */
+			host->cnt = count;
 
 			ret = SUCCEED;
 		}

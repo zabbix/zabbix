@@ -29,9 +29,6 @@ typedef struct
 
 	int	rcv;
 	int	cnt;
-	/* Set to 1 if the response address did not match the target address. */
-	/* This might happen if the target address is a broadcast address.    */
-	int	broadcast;
 }
 ZBX_FPING_HOST;
 
