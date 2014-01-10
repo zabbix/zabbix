@@ -781,27 +781,97 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$validateItems = $items;
 		if ($update) {
-			$validateItems = $this->extendFromObjects(zbx_toHash($validateItems, 'itemid'), $dbItems, array(
-				'filter', 'name'
-			));
+			$validateItems = $this->extendFromObjects(zbx_toHash($validateItems, 'itemid'), $dbItems, array('name'));
 		}
 
-		$conditionValidator = new CConditionValidator(array(
-			'messageInvalidFormula' => _('Incorrect custom expression "%2$s" for discovery rule "%1$s": %3$s.'),
-			'messageMissingCondition' => _('Condition "%2$s" used in formula "%3$s" for discovery rule "%1$s" is not defined.'),
-			'messageUnusedCondition' => _('Condition "%2$s" is not used in formula "%3$s" for discovery rule "%1$s".'),
-		));
+		$filterValidator = new CSchemaValidator($this->getFilterSchema());
+		$conditionValidator = new CSchemaValidator($this->getFilterConditionSchema());
 		foreach ($validateItems as $item) {
-			$dbItem = ($update) ? $dbItems[$item['itemid']] : array();
-
+			var_dump($item);
 			// validate custom formula and conditions
 			if (isset($item['filter'])) {
-				if ($item['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+				$filterValidator->setObjectName($item['name']);
+				$this->checkValidator($item['filter'], $filterValidator);
+
+				foreach ($item['filter']['conditions'] as $condition) {
 					$conditionValidator->setObjectName($item['name']);
-					$this->checkPartialValidator($item['filter'], $conditionValidator, $dbItem);
+					$this->checkValidator($condition, $conditionValidator);
 				}
 			}
 		}
+	}
+
+	/**
+	 * Returns the parameters for creating a discovery rule filter validator.
+	 *
+	 * @return array
+	 */
+	protected function getFilterSchema() {
+		return array(
+			'validators' => array(
+				'evaltype' => new CSetValidator(array(
+					'values' => array(
+						CONDITION_EVAL_TYPE_OR,
+						CONDITION_EVAL_TYPE_AND,
+						CONDITION_EVAL_TYPE_AND_OR,
+						CONDITION_EVAL_TYPE_EXPRESSION
+					),
+					'messageInvalid' => _('Incorrect type of calculation for discovery rule "%1$s".')
+				)),
+				'formula' => new CStringValidator(array(
+					'messageEmpty' => _('Empty custom expression for discovery rule "%1$s".')
+				)),
+				'conditions' => new CCollectionValidator(array(
+					'messageEmpty' => _('Discovery rule "%1$s" must have at least one condition.'),
+					'messageInvalid' => _('Incorrect conditions for discovery rule "%1$s".'),
+				))
+			),
+			'postValidators' => array(
+				new CConditionValidator(array(
+					'messageInvalidFormula' => _('Incorrect custom expression "%2$s" for discovery rule "%1$s": %3$s.'),
+					'messageMissingCondition' => _('Condition "%2$s" used in formula "%3$s" for discovery rule "%1$s" is not defined.'),
+					'messageUnusedCondition' => _('Condition "%2$s" is not used in formula "%3$s" for discovery rule "%1$s".'),
+				))
+			),
+			'required' => array('evaltype', 'conditions'),
+			'messageRequired' => _('No "%2$s" given for the filter of discovery rule "%1$s".'),
+			'messageUnsupported' => _('Unsupported parameter "%2$s" the filter of discovery rule "%1$s".')
+		);
+	}
+
+	/**
+	 * Returns the parameters for creating a discovery rule filter condition validator.
+	 *
+	 * @return array
+	 */
+	protected function getFilterConditionSchema() {
+		return array(
+			'validators' => array(
+				'macro' => new CStringValidator(array(
+					'regex' => ZBX_PREG_EXPRESSION_LLD_MACROS,
+					'messageEmpty' => _('Empty filter condition macro for discovery rule "%1$s"'),
+					'messageRegex' => _('Incorrect filter condition macro for discovery rule "%1$s"')
+				)),
+				'value' => new CStringValidator(array(
+					'empty' => true
+				)),
+				'formulaid' => new CStringValidator(array(
+					'regex' => '/[A-Z]+/',
+					'messageEmpty' => _('Empty filter condition formula ID for discovery rule "%1$s"'),
+					'messageRegex' => _('Incorrect filter condition formula ID for discovery rule "%1$s"')
+				)),
+				'operator' => new CSetValidator(array(
+					'values' => array(CONDITION_OPERATOR_REGEXP),
+					'messageInvalid' => _('Incorrect filter condition operator for discovery rule "%1$s".')
+				)),
+				'item_conditionid' => new CIdValidator(array(
+					'messageRegex' => _('Incorrect filter condition ID for discovery rule "%1$s".')
+				))
+			),
+			'required' => array('macro', 'value'),
+			'messageRequired' => _('No "%2$s" given for a filter condition of discovery rule "%1$s".'),
+			'messageUnsupported' => _('Unsupported parameter "%2$s" for a filter condition of discovery rule "%1$s".')
+		);
 	}
 
 	protected function checkSpecificFields(array $item) {
