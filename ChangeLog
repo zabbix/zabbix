@@ -6,6 +6,7 @@ New features:
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+..F....... [ZBX-6940] fixed frontend history links not remembering search queries (Pavels)
 ...GI..PS. [ZBX-5526] removed checking for PosgreSQL server version and disabled nonstandard use of escape strings in order to support versions newer than 8.1 (igors)
 ...G...... [ZBX-7414] added description to HostnameItem that UserParameters and aliases are not supported (igors)
 ...G...... [ZBX-7413] fixed concistentcy of config file handling for loading and checking userparameters and aliases before starting the daemon (igors)
