@@ -241,22 +241,28 @@ elseif (isset($_REQUEST['save'])) {
 
 	// add macros; ignore empty new macros
 	$conditions = array();
-	foreach (getRequest('conditions') as $condition) {
+	$filter = array(
+		'evaltype' => getRequest('evaltype'),
+		'conditions' => array()
+	);
+	foreach (getRequest('conditions', array()) as $condition) {
 		if (isset($condition['item_conditionid']) || !(zbx_empty($condition['macro']))) {
 			$condition['macro'] = zbx_strtoupper($condition['macro']);
 
-			$conditions[] = $condition;
+			$filter['conditions'][] = $condition;
 		}
 	}
-	if ($conditions) {
-		$newItem['filter'] = array(
-			'evaltype' => getRequest('evaltype'),
-			'conditions' => $conditions
-		);
-		if ($newItem['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-			$newItem['filter']['formula'] = getRequest('formula');
+	if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+		// if only one or no conditions are left, reset the evaltype to and/or and clear the formula
+		if (count($filter['conditions']) <= 1) {
+			$filter['formula'] = '';
+			$filter['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
+		}
+		else {
+			$filter['formula'] = getRequest('formula');
 		}
 	}
+	$newItem['filter'] = $filter;
 
 	if (hasRequest('itemid')) {
 		DBstart();
