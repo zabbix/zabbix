@@ -1153,9 +1153,12 @@
 			$data['password'] = $data['item']['password'];
 			$data['publickey'] = $data['item']['publickey'];
 			$data['privatekey'] = $data['item']['privatekey'];
-			$data['formula'] = $data['item']['formula'];
 			$data['logtimefmt'] = $data['item']['logtimefmt'];
 			$data['new_application'] = get_request('new_application', '');
+
+			if (!$data['is_discovery_rule']) {
+				$data['formula'] = $data['item']['formula'];
+			}
 
 			if (!$data['limited'] || !isset($_REQUEST['form_refresh'])) {
 				$data['delay'] = $data['item']['delay'];
