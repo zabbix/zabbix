@@ -702,11 +702,14 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 		DB::update('items', $data);
 
-		$conditions = array();
+		$conditions = null;
 		$exConditions = array();
 		foreach ($items as $item) {
 			// conditions
 			if (isset($item['filter'])) {
+				if ($conditions === null) {
+					$conditions = array();
+				}
 				foreach ($item['filter']['conditions'] as $condition) {
 					$condition['itemid'] = $item['itemid'];
 
@@ -719,7 +722,7 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 		}
 
-		if ($conditions) {
+		if ($conditions !== null) {
 			$conditions = DB::replace('item_condition', $exConditions, $conditions);
 		}
 
@@ -823,10 +826,10 @@ class CDiscoveryRule extends CItemGeneral {
 					'messageInvalid' => _('Incorrect type of calculation for discovery rule "%1$s".')
 				)),
 				'formula' => new CStringValidator(array(
-					'messageEmpty' => _('Empty custom expression for discovery rule "%1$s".')
+					'empty' => true
 				)),
 				'conditions' => new CCollectionValidator(array(
-					'messageEmpty' => _('Discovery rule "%1$s" must have at least one condition.'),
+					'empty' => true,
 					'messageInvalid' => _('Incorrect conditions for discovery rule "%1$s".'),
 				))
 			),
