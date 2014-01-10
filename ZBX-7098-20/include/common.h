@@ -1001,6 +1001,16 @@ int	__zbx_stat(const char *path, struct stat *buf);
 int	__zbx_open(const char *pathname, int flags);
 #endif	/* _WINDOWS && _UNICODE */
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
+
+typedef struct
+{
+	size_t	start;
+	size_t	end;
+}
+zbx_start_end_pos_t;
+
+int	zbx_read2(int fd, char *buf, size_t count, const char *encoding, zbx_start_end_pos_t **s_pos, int *s_num,
+		int *s_num_alloc);
 int	zbx_is_regular_file(const char *path);
 
 int	MAIN_ZABBIX_ENTRY();
