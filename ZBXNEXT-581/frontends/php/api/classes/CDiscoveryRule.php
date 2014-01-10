@@ -263,8 +263,11 @@ class CDiscoveryRule extends CItemGeneral {
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, array('hostid', 'formula', 'evaltype'), $options['output']);
 
-			if ($options['selectFilter'] !== null) {
-				foreach ($result as &$rule) {
+			foreach ($result as &$rule) {
+				// unset the fields that are returned in the filter
+				unset($rule['formula'], $rule['evaltype']);
+
+				if ($options['selectFilter'] !== null) {
 					$filter = $this->unsetExtraFields(array($rule['filter']),
 						array('conditions', 'formula', 'evaltype'),
 						$options['selectFilter']
@@ -687,8 +690,9 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$data = array();
 		foreach ($items as $item) {
+			// clear the formula for non-custom expression rules
 			if ($item['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-				$item['filter']['formula'] = '';
+				$item['formula'] = '';
 			}
 
 			$item['evaltype'] = $item['filter']['evaltype'];
