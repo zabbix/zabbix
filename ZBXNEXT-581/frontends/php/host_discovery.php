@@ -236,20 +236,25 @@ elseif (isset($_REQUEST['save'])) {
 		'privatekey' => get_request('privatekey'),
 		'params' => get_request('params'),
 		'ipmi_sensor' => get_request('ipmi_sensor'),
-		'lifetime' => get_request('lifetime'),
-		'filter' => array(
-			'evaltype' => getRequest('evaltype'),
-			'formula' => getRequest('formula'),
-			'conditions' => array()
-		)
+		'lifetime' => get_request('lifetime')
 	);
 
 	// add macros; ignore empty new macros
+	$conditions = array();
 	foreach (getRequest('conditions') as $condition) {
 		if (isset($condition['item_conditionid']) || !(zbx_empty($condition['macro']))) {
 			$condition['macro'] = zbx_strtoupper($condition['macro']);
 
-			$newItem['filter']['conditions'][] = $condition;
+			$conditions[] = $condition;
+		}
+	}
+	if ($conditions) {
+		$newItem['filter'] = array(
+			'evaltype' => getRequest('evaltype'),
+			'conditions' => $conditions
+		);
+		if ($newItem['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+			$newItem['filter']['formula'] = getRequest('formula');
 		}
 	}
 
@@ -270,18 +275,23 @@ elseif (isset($_REQUEST['save'])) {
 
 		// don't update the filter if it hasn't changed
 		$conditionsChanged = false;
-		$conditions = zbx_toHash($item['filter']['conditions'], 'item_conditionid');
-		foreach ($newItem['filter']['conditions'] as $condition) {
-			if (isset($condition['item_conditionid'])) {
-				$condition = CArrayHelper::unsetEqualValues($condition, $conditions[$condition['item_conditionid']]);
-				if ($condition) {
+		if (count($newItem['filter']['conditions']) != count($item['filter']['conditions'])) {
+			$conditionsChanged = true;
+		}
+		else {
+			$conditions = zbx_toHash($item['filter']['conditions'], 'item_conditionid');
+			foreach ($newItem['filter']['conditions'] as $condition) {
+				if (isset($condition['item_conditionid'])) {
+					$condition = CArrayHelper::unsetEqualValues($condition, $conditions[$condition['item_conditionid']]);
+					if ($condition) {
+						$conditionsChanged = true;
+						break;
+					}
+				}
+				else {
 					$conditionsChanged = true;
 					break;
 				}
-			}
-			else {
-				$conditionsChanged = true;
-				break;
 			}
 		}
 		$filter = CArrayHelper::unsetEqualValues($newItem['filter'], $item['filter']);

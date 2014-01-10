@@ -19,7 +19,7 @@
 **/
 
 
-class CConditionValidator extends CValidator implements CPartialValidatorInterface {
+class CConditionValidator extends CValidator {
 
 	/**
 	 * Error message if the formula is invalid.
@@ -51,6 +51,11 @@ class CConditionValidator extends CValidator implements CPartialValidatorInterfa
 	 */
 	public function validate($object)
 	{
+		// validate only custom expressions
+		if ($object['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+			return true;
+		}
+
 		// check if the formula is valid
 		$parser = new CConditionFormula();
 		if (!$parser->parse($object['formula'])) {
@@ -82,17 +87,4 @@ class CConditionValidator extends CValidator implements CPartialValidatorInterfa
 
 		return true;
 	}
-
-	public function validatePartial(array $object, array $fullObject) {
-		// skip validation if non of the fields are set
-		if (!isset($options['formula']) && !isset($object['conditions'])) {
-			return true;
-		}
-
-		$object['formula'] = isset($object['formula']) ? $object['formula'] : $fullObject['formula'];
-		$object['conditions'] = isset($object['conditions']) ? $object['conditions'] : $fullObject['conditions'];
-
-		return $this->validate($object);
-	}
-
 }

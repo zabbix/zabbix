@@ -219,6 +219,7 @@ define('CONDITION_OPERATOR_IN',			4);
 define('CONDITION_OPERATOR_MORE_EQUAL',	5);
 define('CONDITION_OPERATOR_LESS_EQUAL',	6);
 define('CONDITION_OPERATOR_NOT_IN',		7);
+define('CONDITION_OPERATOR_REGEXP',		8);
 
 // event type action condition values
 define('EVENT_TYPE_ITEM_NOTSUPPORTED',		0);
@@ -819,6 +820,7 @@ define('ZBX_PREG_FUNCTION_FORMAT', '([a-z]+(\('.ZBX_PREG_PARAMS.'\)))');
 define('ZBX_PREG_MACRO_NAME_FORMAT', '(\{[A-Z\.]+\})');
 define('ZBX_PREG_EXPRESSION_SIMPLE_MACROS', '(\{TRIGGER\.VALUE\})');
 define('ZBX_PREG_EXPRESSION_USER_MACROS', '(\{\$'.ZBX_PREG_MACRO_NAME.'\})');
+define('ZBX_PREG_EXPRESSION_LLD_MACROS', '(\{\#'.ZBX_PREG_MACRO_NAME_LLD.'\})');
 
 // !!! should be used with "x" modifier
 define('ZBX_PREG_ITEM_KEY_PARAMETER_FORMAT', '(
