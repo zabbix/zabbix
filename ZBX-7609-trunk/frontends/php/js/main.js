@@ -423,233 +423,125 @@ var chkbxRange = {
 };
 
 /*
- * Audio Control System
+ * Audio control system
  */
 var AudioList = {
-	list:		{}, // audio files options
-	dom:		{}, // dom objects links
-	standart:	{
-		'embed': {
-			'enablejavascript': 'true',
-			'autostart': 'false',
-			'loop': 0
-		},
-		'audio': {
-			'autobuffer': 'autobuffer',
-			'autoplay': null,
-			'controls': null
-		}
-	},
 
-	play: function(audiofile) {
-		if (!this.create(audiofile)) {
-			return false;
-		}
-		if (IE) {
-			try {
-				this.dom[audiofile].Play();
-			}
-			catch(e) {
-				setTimeout(this.play.bind(this, audiofile), 500);
-			}
-		}
-		else {
-			this.dom[audiofile].play();
-		}
-	},
+	timeoutHandler: null,
 
-	pause: function(audiofile) {
-		if (!this.create(audiofile)) {
-			return false;
-		}
-		if (IE) {
-			try {
-				this.dom[audiofile].Stop();
-			}
-			catch(e) {
-				setTimeout(this.pause.bind(this, audiofile), 1000);
-			}
-		}
-		else {
-			this.dom[audiofile].pause();
-		}
-	},
-
-	stop: function(audiofile) {
-		if (!this.create(audiofile)) {
-			return false;
-		}
-
-		if (IE) {
-			this.dom[audiofile].setAttribute('loop', '0');
-		}
-		else {
-			this.dom[audiofile].removeAttribute('loop');
-		}
-
-		if (!IE) {
-			try {
-				if (!this.dom[audiofile].paused) {
-					this.dom[audiofile].currentTime = 0;
+	loop: function(name, timeout) {
+		AudioList.timeoutHandler = setTimeout(
+			function() {
+				if (new Date().getTime() >= timeout) {
+					AudioList.stop(name);
 				}
-				else if (this.dom[audiofile].currentTime > 0) {
-					this.dom[audiofile].play();
-					this.dom[audiofile].currentTime = 0;
-					this.dom[audiofile].pause();
+				else {
+					AudioList.loop(name, timeout);
 				}
-			}
-			catch(e) {
-			}
-		}
-
-		if (!is_null(this.list[audiofile].timeout)) {
-			clearTimeout(this.list[audiofile].timeout);
-			this.list[audiofile].timeout = null;
-		}
-
-		this.pause(audiofile);
-		this.endLoop(audiofile);
+			},
+			1000
+		);
 	},
 
-	stopAll: function(e) {
-		for (var name in this.list) {
-			if (empty(this.dom[name])) {
-				continue;
-			}
+	playOnce: function(name) {
+		if (document.getElementById(name) !== null) {
 			this.stop(name);
 		}
+
+		this.create(name, false);
 	},
 
-	volume: function(audiofile, vol) {
-		if (!this.create(audiofile)) {
-			return false;
-		}
-	},
+	playLoop: function(name, delay) {
+		if (document.getElementById(name) !== null) {
+			this.stop(name);
 
-	loop: function(audiofile, params) {
-		if (!this.create(audiofile)) {
-			return false;
-		}
-
-		if (isset('repeat', params)) {
-			if (IE) {
-				this.play(audiofile);
-			}
-			else {
-				if (this.list[audiofile].loop == 0) {
-					if (params.repeat != 0) {
-						this.startLoop(audiofile, params.repeat);
-					}
-					else {
-						this.endLoop(audiofile);
-					}
-				}
-				if (this.list[audiofile].loop != 0) {
-					this.list[audiofile].loop--;
-					this.play(audiofile);
-				}
-			}
-		}
-		else if (isset('seconds', params)) {
-			if (IE) {
-				this.dom[audiofile].setAttribute('loop', '1');
-			}
-			else {
-				this.startLoop(audiofile, 9999999);
-				this.list[audiofile].loop--;
-			}
-			this.play(audiofile);
-			this.list[audiofile].timeout = setTimeout(AudioList.stop.bind(AudioList, audiofile), 1000 * parseInt(params.seconds, 10));
-		}
-	},
-
-	startLoop: function(audiofile, loop) {
-		if (!isset(audiofile, this.list)) {
-			return false;
-		}
-		if (isset('onEnded', this.list[audiofile])) {
-			this.endLoop(audiofile);
-		}
-		this.list[audiofile].loop = parseInt(loop, 10);
-		this.list[audiofile].onEnded = this.loop.bind(this, audiofile, {'repeat' : 0});
-		addListener(this.dom[audiofile], 'ended', this.list[audiofile].onEnded);
-	},
-
-	endLoop: function(audiofile) {
-		if (!isset(audiofile, this.list)) {
-			return true;
-		}
-		this.list[audiofile].loop = 0;
-
-		if (isset('onEnded', this.list[audiofile])) {
-			removeListener(this.dom[audiofile], 'ended', this.list[audiofile].onEnded);
-			this.list[audiofile].onEnded = null;
-			delete(this.list[audiofile].onEnded);
-		}
-	},
-
-	create: function(audiofile, params) {
-		if (typeof(audiofile) == 'undefined') {
-			return false;
-		}
-		if (isset(audiofile, this.list)) {
-			return true;
-		}
-		if (typeof(params) == 'undefined') {
-			params = {};
-		}
-		if (!isset('audioList', this.dom)) {
-			this.dom.audioList = document.createElement('div');
-			document.getElementsByTagName('body')[0].appendChild(this.dom.audioList);
-			this.dom.audioList.setAttribute('id', 'audiolist');
+			clearTimeout(AudioList.timeoutHandler);
 		}
 
 		if (IE) {
-			this.dom[audiofile] = document.createElement('embed');
-			this.dom.audioList.appendChild(this.dom[audiofile]);
-			this.dom[audiofile].setAttribute('name', audiofile);
-			this.dom[audiofile].setAttribute('src', 'audio/' + audiofile);
-			this.dom[audiofile].style.display = 'none';
+			this.create(name, true);
+		}
+		else {
+			if (document.getElementById(name) !== null) {
+				jQuery(document.getElementById(name)).trigger('play');
+			}
+			else {
+				this.create(name, true);
+			}
+		}
 
-			for (var key in this.standart.embed) {
-				if (isset(key, params)) {
-					this.dom[audiofile].setAttribute(key, params[key]);
-				}
-				else if (!is_null(this.standart.embed[key])) {
-					this.dom[audiofile].setAttribute(key, this.standart.embed[key]);
-				}
+		AudioList.loop(name, new Date().getTime() + delay * 1000);
+	},
+
+	stop: function(name) {
+		if (IE) {
+			var obj = document.getElementById(name);
+
+			obj.setAttribute('loop', 0);
+			obj.setAttribute('playcount', 0);
+
+			try {
+				obj.stop();
+			}
+			catch (e) {
+				setTimeout(
+					function() {
+						document.getElementById(name).stop();
+					},
+					100
+				);
 			}
 		}
 		else {
-			this.dom[audiofile] = document.createElement('audio');
-			this.dom.audioList.appendChild(this.dom[audiofile]);
-			this.dom[audiofile].setAttribute('id', audiofile);
-			this.dom[audiofile].setAttribute('src', 'audio/' + audiofile);
-
-			for (var key in this.standart.audio) {
-				if (isset(key, params)) {
-					this.dom[audiofile].setAttribute(key, params[key]);
-				}
-				else if (!is_null(this.standart.audio[key])) {
-					this.dom[audiofile].setAttribute(key, this.standart.audio[key]);
-				}
-			}
-			this.dom[audiofile].load();
+			jQuery(document.getElementById(name)).trigger('pause');
 		}
-		this.list[audiofile] = params;
-		this.list[audiofile].loop = 0;
-		this.list[audiofile].timeout = null;
-		return true;
 	},
 
-	remove: function(audiofile) {
-		if (!isset(audiofile, this.dom)) {
-			return true;
-		}
-		$(this.dom[audiofile]).remove();
+	stopAll: function() {
+		jQuery('#audioList .audioFile').each(function() {
+			AudioList.stop(jQuery(this).attr('id'));
+		});
+	},
 
-		delete(this.dom[audiofile]);
-		delete(this.list[audiofile]);
+	create: function(name, loop) {
+		var obj = document.getElementById(name),
+			audioList = jQuery('#audioList');
+
+		if (audioList.length == 0) {
+			audioList = jQuery('<div>', {id: 'audioList'});
+
+			jQuery('body').append(audioList);
+		}
+
+		if (IE) {
+			if (obj !== null) {
+				jQuery(obj).remove();
+			}
+
+			audioList.append(jQuery('<embed>', {
+				id: name,
+				src: 'audio/' + name,
+				enablejavascript: true,
+				autostart: true,
+				loop: true,
+				playcount: loop ? 9999999 : 1,
+				'class': 'audioFile',
+				css: {
+					display: 'none'
+				}
+			}));
+		}
+		else {
+			if (obj === null) {
+				audioList.append(jQuery('<audio>', {
+					id: name,
+					src: 'audio/' + name,
+					autoplay: true,
+					loop: loop ? 9999999 : 1,
+					'class': 'audioFile'
+				}));
+			}
+		}
 	}
 };
 
