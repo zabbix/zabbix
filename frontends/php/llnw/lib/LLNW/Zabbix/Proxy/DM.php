@@ -31,10 +31,10 @@ class DM
             'SELECT h.proxy_hostid,SUM(1.0/i.delay) AS qps'.
             ' FROM items i,hosts h'.
             ' WHERE i.status='.ITEM_STATUS_ACTIVE.
-                ' AND i.hostid=h.hostid '.
-                ' AND h.status='.HOST_STATUS_MONITORED.
-                ' AND i.delay<>0'.
-                $dbcondition.
+            ' AND i.hostid=h.hostid '.
+            ' AND h.status='.HOST_STATUS_MONITORED.
+            ' AND i.delay<>0'.
+            $dbcondition.
             ' GROUP BY h.proxy_hostid'
         );
         while ($performance = DBfetch($dbPerformance)) {

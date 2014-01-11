@@ -51,4 +51,3 @@ $db = new ezSQL_mysql($db_user, $db_pass, $db_name, $db_host);
 $ldb = new ezSQL_mysql($ldb_user, $ldb_pass, $ldb_name, $ldb_host);
 $cdb = new ezSQL_mysql($cdb_user, $cdb_pass, $cdb_name, $cdb_host);
 
-?>

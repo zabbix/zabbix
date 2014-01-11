@@ -5,11 +5,12 @@ class AlertQueue
 {
     // Attempts to create a new entry in the alert queue
     public function create(
-            $data = '',
-            $host = '',
-            $item_key = '',
-            $item = '',
-            $trigger = '') {
+        $data = '',
+        $host = '',
+        $item_key = '',
+        $item = '',
+        $trigger = ''
+    ) {
         global $ldb;
 
         // defaults for now
@@ -129,7 +130,7 @@ class AlertQueue
         if (isset($results) && $results->id > 0) {
             $query = "UPDATE $table_name SET count = count + 1 WHERE id = ".$results->id;
             $ldb->query($query);
-            $this::Copy_DB_Results($resp, $results);
+            $this::copyDBResult($resp, $results);
             $resp['result'][0]["count"]++;
             sendResponse($resp);
         }
@@ -149,14 +150,14 @@ class AlertQueue
         $query = "SELECT * FROM $table_name WHERE id = ".$ldb->insert_id;
         $results = $ldb->get_row($query);
         if (isset($results) && $results->id > 0) {
-            $this::Copy_DB_Results($resp, $results);
+            $this::copyDBResult($resp, $results);
             sendResponse($resp);
         }
         dbug("Error: DB error: ".$ldb->last_error);
         sendErrorResponse('500', "DB Error", $ldb->last_error);
     }
 
-    public static function Copy_DB_Results(&$resp, $results)
+    public static function copyDBResult(&$resp, $results)
     {
         $resp['result'][0]["id"] = $results->id;
         $resp['result'][0]["created"] = $results->created;

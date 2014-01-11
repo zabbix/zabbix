@@ -7,7 +7,7 @@ lint: # Lint all PHP files
 	find ./lib -name "*.php" -exec php -l {} \;
 
 phpcs: # PHP Codesniffer across project files
-	./vendor/bin/phpcs --standard=PSR1 --standard=PSR2 --ignore=vendor/* --report=summary .
+	./vendor/bin/phpcs --standard=PSR1 --standard=PSR2 --ignore=vendor/* --ignore=lib/LLNW/Zabbix/toolbox.php --report=summary .
 
 test: lint phpcs
 
