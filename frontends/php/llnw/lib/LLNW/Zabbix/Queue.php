@@ -66,11 +66,11 @@ class Queue
                 ' AND i.value_type NOT IN ('.ITEM_VALUE_TYPE_LOG.')'.
                 ' AND NOT i.lastclock IS NULL'.
                 ' AND ('.
-                ' i.type IN ('.implode(',',$norm_item_types).')'.
-                ' OR (h.available<>'.HOST_AVAILABLE_FALSE.' AND i.type IN ('.implode(',',$zbx_item_types).'))'.
-                ' OR (h.snmp_available<>'.HOST_AVAILABLE_FALSE.' AND i.type IN ('.implode(',',$snmp_item_types).'))'.
-                ' OR (h.ipmi_available<>'.HOST_AVAILABLE_FALSE.' AND i.type IN ('.implode(',',$ipmi_item_types).'))'.
-                ' OR (h.jmx_available<>'.HOST_AVAILABLE_FALSE.' AND i.type IN ('.implode(',',$jmx_item_types).'))'.
+                ' i.type IN ('.implode(', ', $norm_item_types).')'.
+                ' OR (h.available<>'.HOST_AVAILABLE_FALSE.' AND i.type IN ('.implode(',', $zbx_item_types).'))'.
+                ' OR (h.snmp_available<>'.HOST_AVAILABLE_FALSE.' AND i.type IN ('.implode(',', $snmp_item_types).'))'.
+                ' OR (h.ipmi_available<>'.HOST_AVAILABLE_FALSE.' AND i.type IN ('.implode(',', $ipmi_item_types).'))'.
+                ' OR (h.jmx_available<>'.HOST_AVAILABLE_FALSE.' AND i.type IN ('.implode(',', $jmx_item_types).'))'.
                 ')'.
                 ' AND '.DBin_node('i.itemid', get_current_nodeid()).
                 ' AND i.flags NOT IN ('.ZBX_FLAG_DISCOVERY_CHILD.')'.
@@ -90,26 +90,34 @@ class Queue
             }
 
             while ($row = DBfetch($result)) {
-                $res = calculateItemNextcheck($row['interfaceid'], $row['itemid'], $row['type'], $row['delay'], $row['delay_flex'], $row['lastclock']);
+                $res = calculateItemNextcheck(
+                    $row['interfaceid'],
+                    $row['itemid'],
+                    $row['type'],
+                    $row['delay'],
+                    $row['delay_flex'],
+                    $row['lastclock']
+                );
                 if (0 != $row['proxy_hostid']) {
                     $res['nextcheck'] = $row['lastclock'] + $res['delay'];
                 }
                 $diff = $now - $res['nextcheck'];
 
-                if($diff <= 5)
+                if ($diff <= 5) {
                     continue;
-                else if($diff <= 10)
+                } elseif ($diff <= 10) {
                     $sec_10[$row['type']]++;
-                else if($diff <= 30)
+                } elseif ($diff <= 30) {
                     $sec_30[$row['type']]++;
-                else if($diff <= 60)
+                } elseif ($diff <= 60) {
                     $sec_60[$row['type']]++;
-                else if($diff <= 300)
+                } elseif ($diff <= 300) {
                     $sec_300[$row['type']]++;
-                else if($diff <= 600)
+                } elseif ($diff <= 600) {
                     $sec_600[$row['type']]++;
-                else
+                } else {
                     $sec_rest[$row['type']]++;
+                }
             }
 
             foreach ($item_types as $type) {
@@ -140,26 +148,34 @@ class Queue
             }
 
             while ($row = DBfetch($result)) {
-                $res = calculateItemNextcheck($row['interfaceid'], $row['itemid'], $row['type'], $row['delay'], $row['delay_flex'], $row['lastclock']);
+                $res = calculateItemNextcheck(
+                    $row['interfaceid'],
+                    $row['itemid'],
+                    $row['type'],
+                    $row['delay'],
+                    $row['delay_flex'],
+                    $row['lastclock']
+                );
                 if (0 != $row['proxy_hostid']) {
                     $res['nextcheck'] = $row['lastclock'] + $res['delay'];
                 }
                 $diff = $now - $res['nextcheck'];
 
-                if($diff <= 5)
+                if ($diff <= 5) {
                     continue;
-                else if($diff <= 10)
+                } elseif ($diff <= 10) {
                     $sec_10[$row['proxy_hostid']]++;
-                else if($diff <= 30)
+                } elseif ($diff <= 30) {
                     $sec_30[$row['proxy_hostid']]++;
-                else if($diff <= 60)
+                } elseif ($diff <= 60) {
                     $sec_60[$row['proxy_hostid']]++;
-                else if($diff <= 300)
+                } elseif ($diff <= 300) {
                     $sec_300[$row['proxy_hostid']]++;
-                else if($diff <= 600)
+                } elseif ($diff <= 600) {
                     $sec_600[$row['proxy_hostid']]++;
-                else
+                } else {
                     $sec_rest[$row['proxy_hostid']]++;
+                }
             }
 
             foreach ($proxies as $proxyid => $proxy) {

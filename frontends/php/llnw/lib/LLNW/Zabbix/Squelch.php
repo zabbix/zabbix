@@ -27,18 +27,18 @@ class Squelch
 
         if ($username == '') {
             error_log("Error: no username set to apply squelch!");
-            sendErrorResponse('235','Invalid params','no username provided');
+            sendErrorResponse('235', 'Invalid params', 'no username provided');
         }
 
         // validate hostname entries
-        foreach ($hostname_param as $key=>$hostname) {
+        foreach ($hostname_param as $key => $hostname) {
             $hostname = addslashes($hostname);
 
             error_log("received squelch for $hostname start: $start end: $end");
 
             if ($hostname == '') {
                 error_log("Error: no hostname set to apply squelch!");
-                sendErrorResponse('234','Invalid params','invalid hostname or hostname missing');
+                sendErrorResponse('234', 'Invalid params', 'invalid hostname or hostname missing');
             }
         }
 
@@ -47,10 +47,12 @@ class Squelch
         // if not, insert a new squelch entry.
 
         // maintain 2 tables: squelch = just hostid, start and end times.
-        // squelch_log = entries for each submittion - hostid,start,end plus - username,reason,comment,action (add or clear)
+        // squelch_log = entries for each submittion
+        //  - hostid,start,end plus
+        //  - username,reason,comment,action (add or clear)
 
 
-        foreach ($hostname_param as $key=>$hostname) {
+        foreach ($hostname_param as $key => $hostname) {
             $hostname = addslashes($hostname);
 
             $q = "SELECT * FROM squelch WHERE hostname = '$hostname'";

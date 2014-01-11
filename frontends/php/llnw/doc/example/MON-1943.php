@@ -68,7 +68,7 @@ $proxies = array(
  "PHXSEC02",
  "PHXSEC01",
  "GRR01",
-		 );
+);
 
 // TODO: Move this to a test on proxy.php
 foreach ($proxies as $proxy_name) {

@@ -5,15 +5,15 @@ class Hostlist
 {
     public function get($name, $output = 'json')
     {
-        $this->_getpull($name, $output, 'hostlist.get');
+        $this->getpull($name, $output, 'hostlist.get');
     }
 
     public function pull($name, $output = 'json')
     {
-        $this->_getpull($name, $output, 'hostlist.pull');
+        $this->getpull($name, $output, 'hostlist.pull');
     }
 
-    private function _getpull($list_name, $output, $method)
+    private function getpull($list_name, $output, $method)
     {
         global $logger;
 
@@ -22,14 +22,14 @@ class Hostlist
 
         if ($list_name == '') {
             $logger->log("Error: no hostlist name supplied in request");
-            sendErrorResponse('235','Invalid params','no hostlist name provided');
+            sendErrorResponse('235', 'Invalid params', 'no hostlist name provided');
         }
 
         $list_dir = '/tmp/';
 
         if (!is_readable($list_dir.$list_name)) {
             $logger->log("Error: hostlist file $list_dir$list_name does not exist");
-            sendErrorResponse('151','Internal error','hostlist file does not exist');
+            sendErrorResponse('151', 'Internal error', 'hostlist file does not exist');
         }
 
         $hostlist = file($list_dir.$list_name);

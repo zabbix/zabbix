@@ -15,10 +15,11 @@ class Config
      * @return string config path info
      */
     public static function locateconfig(
-        $filename='config.php',
-        $configDirectories=array('/etc/zabbix', '/var/www/zabbix/conf')) {
+        $filename = 'config.php',
+        $configDirectories = array('/etc/zabbix', '/var/www/zabbix/conf')
+    ) {
         // Load current users' home directory for config overrides
-        $home = NULL;
+        $home = null;
         if (($home = getmyuid()) && ($home = posix_getpwuid($home)) && !empty($home['dir'])) {
             array_unshift($configDirectories, $home['dir']);
         }

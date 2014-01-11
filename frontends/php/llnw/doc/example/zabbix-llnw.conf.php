@@ -40,5 +40,3 @@ $ldb_pass = 'test';
 // for ezSQL help:  http://justinvincent.com/docs/ezsql/ez_sql_help.htm
 $db = new ezSQL_mysql($db_user, $db_pass, $db_name, $db_host);
 $ldb = new ezSQL_mysql($ldb_user, $ldb_pass, $ldb_name, $ldb_host);
-
-?>

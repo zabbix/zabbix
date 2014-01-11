@@ -51,7 +51,9 @@ class Ack
                 $db->query($q);
                 $logger->log($q);
 
-                $q = "INSERT INTO acknowledges SET acknowledgeid='$ackid', userid='$userid', eventid='$eventid', clock='$clock', message='$message'";
+                $q = "INSERT INTO acknowledges SET acknowledgeid='$ackid'," .
+                     " userid='$userid', eventid='$eventid', clock='$clock'," .
+                     " message='$message'";
                 $db->query($q);
                 $logger->log($q);
 

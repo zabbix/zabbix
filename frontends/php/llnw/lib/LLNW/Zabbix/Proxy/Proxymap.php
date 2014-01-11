@@ -26,7 +26,7 @@ class Proxymap
 
         if ($hostnames == '' && $all == '') {
             dbug("Error: no hostnames or selectAll param supplied in request");
-            sendErrorResponse('235','Invalid params','no hostname or selectAll param provided');
+            sendErrorResponse('235', 'Invalid params', 'no hostname or selectAll param provided');
         }
 
         if ($all == 1) {
@@ -70,7 +70,7 @@ class Proxymap
         }
 
         $c=0;
-        foreach ($host_hash as $a=>$b) {
+        foreach ($host_hash as $a => $b) {
             $host = $host_hash[$a]['host'];
             $host_proxyid = $host_hash[$a]['proxy_hostid'];
             $resp['result'][$c]['host'] = $host;

@@ -25,24 +25,24 @@ class Proxy
 
         if ($proxynames == '' && $all == '') {
             dbug("Error: no proxynames or selectAll param supplied in request");
-            sendErrorResponse('235','Invalid params','no proxyname or selectAll param provided');
+            sendErrorResponse('235', 'Invalid params', 'no proxyname or selectAll param provided');
         }
 
         if ($all == 1) {
-            $proxy_hash = $this::getProxiesNew('',1);
+            $proxy_hash = $this::getProxiesNew('', 1);
         } else {
             $proxyids = array();
             foreach ($proxynames as $proxy) {
                 $hostid = $this::getProxyId($proxy);
                 array_push($proxyids, $hostid[0]['proxyid']);
             }
-            $proxy_hash = $this::getProxiesNew($proxyids,1);
+            $proxy_hash = $this::getProxiesNew($proxyids, 1);
         }
 
         $resp = array();
 
         $c=0;
-        foreach ($proxy_hash as $a=>$b) {
+        foreach ($proxy_hash as $a => $b) {
             $host       = $proxy_hash[$a]['host'];
             $lastaccess = $proxy_hash[$a]['lastaccess'];
             $proxyid    = $proxy_hash[$a]['proxyid'];
@@ -75,7 +75,7 @@ class Proxy
         // proxy.reassign <proxy shortname 1> [<proxy shortname 2> <force true/false>]
         // ex: proxy.reassign PRX01 PRX02 1
         $proxy_data = file_get_contents(__DIR__.'/proxymap.json');
-        $proxymap = json_decode($proxy_data,true);
+        $proxymap = json_decode($proxy_data, true);
 
         $from_proxy = (isset($from_proxy)) ? $from_proxy : '';
         $to_proxy   = (isset($to_proxy)) ? $to_proxy : '';
@@ -83,7 +83,7 @@ class Proxy
 
         if ($from_proxy == '') {
             dbug("Error: required from_proxy param was not set");
-            sendErrorResponse('235','Invalid params','no from_proxy param provided');
+            sendErrorResponse('235', 'Invalid params', 'no from_proxy param provided');
         }
 
         $proxy_hash = $this::getProxiesNew();
@@ -91,7 +91,7 @@ class Proxy
         $proxies_lastaccess = array();
         $proxyids = array();
 
-        foreach ($proxy_hash as $a=>$b) {
+        foreach ($proxy_hash as $a => $b) {
             $proxy      = $proxy_hash[$a]['host'];
             $lastaccess = $proxy_hash[$a]['lastaccess'];
             $proxyid    = $proxy_hash[$a]['proxyid'];
@@ -106,12 +106,12 @@ class Proxy
 
         if (!isset($the_proxy)) {
             dbug("Error: no matching proxy found by the name: $from_proxy");
-            sendErrorResponse('285','Invalid params','proxy name not found');
+            sendErrorResponse('285', 'Invalid params', 'proxy name not found');
         }
 
         if (!isset($proxymap[$the_proxy])) {
             dbug("Error: no matching proxy found in sitemap: $from_proxy");
-            sendErrorResponse('285','Invalid params','proxy name not found in sitemap');
+            sendErrorResponse('285', 'Invalid params', 'proxy name not found in sitemap');
         }
 
         foreach ($proxymap[$the_proxy] as $alternates) {
@@ -152,11 +152,13 @@ class Proxy
             $resp = $this::getProxiesNew($proxyids[$new_proxy], 1);
             $host_count_new = count($resp[0]['hosts']);
 
-            dbug("Attempting to move Hosts from: $the_proxy (current host assignment count: $host_count_prev) "
-            ."to: $new_proxy (current host assignment count: $host_count_new) [resp time: $resptime secs]. "
-            ."force option set to: $force_move");
+            dbug(
+                "Attempting to move Hosts from: $the_proxy (current host assignment count: $host_count_prev) "
+                . "to: $new_proxy (current host assignment count: $host_count_new) [resp time: $resptime secs]. "
+                . "force option set to: $force_move"
+            );
 
-            $resp = $this::assignHostsToProxy($proxyids[$new_proxy],$hostids_obj);
+            $resp = $this::assignHostsToProxy($proxyids[$new_proxy], $hostids_obj);
 
             if (is_array($resp)) {
                 $resp['moved_from']['name'] = $the_proxy;
@@ -167,11 +169,11 @@ class Proxy
                 exit;
             } else {
                 dbug('proxy host reassignment api query failed');
-                sendErrorResponse('246','Warning','proxy host assignment failed');
+                sendErrorResponse('246', 'Warning', 'proxy host assignment failed');
             }
-            } else {
+        } else {
             dbug("Error: unable to find a suitable proxy to migrate to: $from_proxy");
-            sendErrorResponse('225','Warning','unable to find a suitable proxy to migration to');
+            sendErrorResponse('225', 'Warning', 'unable to find a suitable proxy to migration to');
         }
         exit;
     }
@@ -182,7 +184,7 @@ class Proxy
     * @param string,array $proxyids    Proxy or proxies
     * @param array        $selectHost  Specific hosts
     */
-    public static function getProxiesNew($proxyids='',$selectHosts='')
+    public static function getProxiesNew($proxyids = '', $selectHosts = '')
     {
         $t['method'] = 'proxy.get';
         $t['params']['output'] = 'extend';
