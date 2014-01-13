@@ -26,7 +26,6 @@ typedef struct
 	double	min;
 	double	avg;
 	double	max;
-
 	int	rcv;
 	int	cnt;
 }

@@ -305,11 +305,11 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 				if (NULL == (c = strchr(c, ',')) || NULL == (c = strchr(c + 1, ',')))
 					continue;
 
-				sec = atof(c + 1) / 1000; /* convert ms to seconds */
+				sec = atof(c + 2) / 1000; /* convert ms to seconds */
 
-				if (host->rcv == 0 || host->min > sec)
+				if (0 == host->rcv || host->min > sec)
 					host->min = sec;
-				if (host->rcv == 0 || host->max < sec)
+				if (0 == host->rcv || host->max < sec)
 					host->max = sec;
 				host->avg = (host->avg * host->rcv + sec) / (host->rcv + 1);
 				host->rcv++;
