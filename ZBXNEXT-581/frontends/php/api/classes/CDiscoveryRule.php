@@ -791,8 +791,18 @@ class CDiscoveryRule extends CItemGeneral {
 			$validateItems = $this->extendFromObjects(zbx_toHash($validateItems, 'itemid'), $dbItems, array('name'));
 		}
 
+		// filter validator
 		$filterValidator = new CSchemaValidator($this->getFilterSchema());
+
+		// condition validation
 		$conditionValidator = new CSchemaValidator($this->getFilterConditionSchema());
+		if ($update) {
+			$conditionValidator->setValidator('item_conditionid', new CIdValidator(array(
+				'messageRegex' => _('Incorrect filter condition ID for discovery rule "%1$s".')
+			)));
+		}
+
+
 		foreach ($validateItems as $item) {
 			var_dump($item);
 			// validate custom formula and conditions
@@ -870,9 +880,6 @@ class CDiscoveryRule extends CItemGeneral {
 				'operator' => new CSetValidator(array(
 					'values' => array(CONDITION_OPERATOR_REGEXP),
 					'messageInvalid' => _('Incorrect filter condition operator for discovery rule "%1$s".')
-				)),
-				'item_conditionid' => new CIdValidator(array(
-					'messageRegex' => _('Incorrect filter condition ID for discovery rule "%1$s".')
 				))
 			),
 			'required' => array('macro', 'value'),
