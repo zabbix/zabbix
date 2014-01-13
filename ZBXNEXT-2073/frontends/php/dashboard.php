@@ -175,8 +175,8 @@ if (hasRequest('widgetName')) {
 
 			CProfile::update('web.dashboard.widget.'.$widgetName.'.rf_rate', $widgetRefreshRate, PROFILE_TYPE_INT);
 
-			echo updateWidgetRefresh('dashboard', $widgetName, 'frequency', $widgetRefreshRate)."\n"
-				.updateWidgetRefresh('dashboard', $widgetName, 'restartDoll');
+			echo 'PMasters["dashboard"].dolls["'.$widgetName.'"].frequency('.zbx_jsvalue($widgetRefreshRate).');'."\n"
+				.'PMasters["dashboard"].dolls["'.$widgetName.'"].restartDoll();';
 		}
 
 		// widget state
@@ -361,7 +361,6 @@ if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
 
 	$zabbixStatus = new CUIWidget(WIDGET_ZABBIX_STATUS, new CSpan(_('Loading...'), 'textcolorstyles'));
 	$zabbixStatus->setState(CProfile::get('web.dashboard.widget.'.WIDGET_ZABBIX_STATUS.'.state', 1));
-	$zabbixStatus->setRefresh($rate);
 	$zabbixStatus->setHeader(_('Status of Zabbix'), $icon);
 	$zabbixStatus->setFooter(new CDiv(SPACE, 'textwhite', WIDGET_ZABBIX_STATUS.'_footer'));
 
@@ -369,7 +368,13 @@ if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
 	$row = CProfile::get('web.dashboard.widget.'.WIDGET_ZABBIX_STATUS.'.row', 0);
 	$dashboardGrid[$col][$row] = $zabbixStatus;
 
-	$widgetRefreshParams[WIDGET_ZABBIX_STATUS] = $zabbixStatus->refreshParams;
+	$widgetRefreshParams[WIDGET_ZABBIX_STATUS] = array(
+		'frequency' => $rate,
+		'url' => '?output=html',
+		'counter' => 0,
+		'darken' => 0,
+		'params' => array('widgetRefresh' => WIDGET_ZABBIX_STATUS)
+	);
 }
 
 // system status
@@ -380,7 +385,6 @@ $icon->setMenuPopup(getMenuPopupRefresh(WIDGET_SYSTEM_STATUS, $rate));
 
 $systemStatus = new CUIWidget(WIDGET_SYSTEM_STATUS, new CSpan(_('Loading...'), 'textcolorstyles'));
 $systemStatus->setState(CProfile::get('web.dashboard.widget.'.WIDGET_SYSTEM_STATUS.'.state', 1));
-$systemStatus->setRefresh($rate);
 $systemStatus->setHeader(_('System status'), $icon);
 $systemStatus->setFooter(new CDiv(SPACE, 'textwhite', WIDGET_SYSTEM_STATUS.'_footer'));
 
@@ -388,7 +392,13 @@ $col = CProfile::get('web.dashboard.widget.'.WIDGET_SYSTEM_STATUS.'.col', 1);
 $row = CProfile::get('web.dashboard.widget.'.WIDGET_SYSTEM_STATUS.'.row', 1);
 $dashboardGrid[$col][$row] = $systemStatus;
 
-$widgetRefreshParams[WIDGET_SYSTEM_STATUS] = $systemStatus->refreshParams;
+$widgetRefreshParams[WIDGET_SYSTEM_STATUS] = array(
+	'frequency' => $rate,
+	'url' => '?output=html',
+	'counter' => 0,
+	'darken' => 0,
+	'params' => array('widgetRefresh' => WIDGET_SYSTEM_STATUS)
+);
 
 // host status
 $rate = CProfile::get('web.dashboard.widget.'.WIDGET_HOST_STATUS.'.rf_rate', 60);
@@ -398,7 +408,6 @@ $icon->setMenuPopup(getMenuPopupRefresh(WIDGET_HOST_STATUS, $rate));
 
 $hostStatus = new CUIWidget(WIDGET_HOST_STATUS, new CSpan(_('Loading...'), 'textcolorstyles'));
 $hostStatus->setState(CProfile::get('web.dashboard.widget.'.WIDGET_HOST_STATUS.'.state', 1));
-$hostStatus->setRefresh($rate);
 $hostStatus->setHeader(_('Host status'), $icon);
 $hostStatus->setFooter(new CDiv(SPACE, 'textwhite', WIDGET_HOST_STATUS.'_footer'));
 
@@ -406,7 +415,13 @@ $col = CProfile::get('web.dashboard.widget.'.WIDGET_HOST_STATUS.'.col', 1);
 $row = CProfile::get('web.dashboard.widget.'.WIDGET_HOST_STATUS.'.row', 2);
 $dashboardGrid[$col][$row] = $hostStatus;
 
-$widgetRefreshParams[WIDGET_HOST_STATUS] = $hostStatus->refreshParams;
+$widgetRefreshParams[WIDGET_HOST_STATUS] = array(
+	'frequency' => $rate,
+	'url' => '?output=html',
+	'counter' => 0,
+	'darken' => 0,
+	'params' => array('widgetRefresh' => WIDGET_HOST_STATUS)
+);
 
 // last issues
 $rate = CProfile::get('web.dashboard.widget.'.WIDGET_LAST_ISSUES.'.rf_rate', 60);
@@ -416,7 +431,6 @@ $icon->setMenuPopup(getMenuPopupRefresh(WIDGET_LAST_ISSUES, $rate));
 
 $lastIssues = new CUIWidget(WIDGET_LAST_ISSUES, new CSpan(_('Loading...'), 'textcolorstyles'));
 $lastIssues->setState(CProfile::get('web.dashboard.widget.'.WIDGET_LAST_ISSUES.'.state', 1));
-$lastIssues->setRefresh($rate);
 $lastIssues->setHeader(_n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT), $icon);
 $lastIssues->setFooter(new CDiv(SPACE, 'textwhite', WIDGET_LAST_ISSUES.'_footer'));
 
@@ -424,7 +438,13 @@ $col = CProfile::get('web.dashboard.widget.'.WIDGET_LAST_ISSUES.'.col', 1);
 $row = CProfile::get('web.dashboard.widget.'.WIDGET_LAST_ISSUES.'.row', 3);
 $dashboardGrid[$col][$row] = $lastIssues;
 
-$widgetRefreshParams[WIDGET_LAST_ISSUES] = $lastIssues->refreshParams;
+$widgetRefreshParams[WIDGET_LAST_ISSUES] = array(
+	'frequency' => $rate,
+	'url' => '?output=html',
+	'counter' => 0,
+	'darken' => 0,
+	'params' => array('widgetRefresh' => WIDGET_LAST_ISSUES)
+);
 
 // web monitoring
 $rate = CProfile::get('web.dashboard.widget.'.WIDGET_WEB_OVERVIEW.'.rf_rate', 60);
@@ -434,7 +454,6 @@ $icon->setMenuPopup(getMenuPopupRefresh(WIDGET_WEB_OVERVIEW, $rate));
 
 $webMonitoring = new CUIWidget(WIDGET_WEB_OVERVIEW, new CSpan(_('Loading...'), 'textcolorstyles'));
 $webMonitoring->setState(CProfile::get('web.dashboard.widget.'.WIDGET_WEB_OVERVIEW.'.state', 1));
-$webMonitoring->setRefresh($rate);
 $webMonitoring->setHeader(_('Web monitoring'), $icon);
 $webMonitoring->setFooter(new CDiv(SPACE, 'textwhite', WIDGET_WEB_OVERVIEW.'_footer'));
 
@@ -442,7 +461,13 @@ $col = CProfile::get('web.dashboard.widget.'.WIDGET_WEB_OVERVIEW.'.col', 1);
 $row = CProfile::get('web.dashboard.widget.'.WIDGET_WEB_OVERVIEW.'.row', 4);
 $dashboardGrid[$col][$row] = $webMonitoring;
 
-$widgetRefreshParams[WIDGET_WEB_OVERVIEW] = $webMonitoring->refreshParams;
+$widgetRefreshParams[WIDGET_WEB_OVERVIEW] = array(
+	'frequency' => $rate,
+	'url' => '?output=html',
+	'counter' => 0,
+	'darken' => 0,
+	'params' => array('widgetRefresh' => WIDGET_WEB_OVERVIEW)
+);
 
 // discovery rules
 $dbDiscoveryRules = DBfetch(DBselect(
@@ -460,7 +485,6 @@ if ($dbDiscoveryRules['cnt'] > 0 && check_right_on_discovery()) {
 
 	$discoveryStatus = new CUIWidget(WIDGET_DISCOVERY_STATUS, new CSpan(_('Loading...'), 'textcolorstyles'));
 	$discoveryStatus->setState(CProfile::get('web.dashboard.widget.'.WIDGET_DISCOVERY_STATUS.'.state', 1));
-	$discoveryStatus->setRefresh($rate);
 	$discoveryStatus->setHeader(_('Discovery status'), $icon);
 	$discoveryStatus->setFooter(new CDiv(SPACE, 'textwhite', WIDGET_DISCOVERY_STATUS.'_footer'));
 
@@ -468,7 +492,13 @@ if ($dbDiscoveryRules['cnt'] > 0 && check_right_on_discovery()) {
 	$row = CProfile::get('web.dashboard.widget.'.WIDGET_DISCOVERY_STATUS.'.row', 5);
 	$dashboardGrid[$col][$row] = $discoveryStatus;
 
-	$widgetRefreshParams[WIDGET_DISCOVERY_STATUS] = $discoveryStatus->refreshParams;
+	$widgetRefreshParams[WIDGET_DISCOVERY_STATUS] = array(
+		'frequency' => $rate,
+		'url' => '?output=html',
+		'counter' => 0,
+		'darken' => 0,
+		'params' => array('widgetRefresh' => WIDGET_DISCOVERY_STATUS)
+	);
 }
 
 // sort dashboard grid

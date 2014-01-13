@@ -1902,18 +1902,6 @@ function getPagingLine(&$items, array $removeUrlParams = array(), array $urlPara
 	return $table;
 }
 
-/**
- * Update widget refresh parameters.
- *
- * @param string $processId
- * @param string $widgetId
- * @param string $key
- * @param string $value
- */
-function updateWidgetRefresh($processId, $widgetId, $key, $value = '') {
-	return 'PMasters['.zbx_jsvalue($processId).'].dolls['.zbx_jsvalue($widgetId).'].'.$key.'('.zbx_jsvalue($value).');';
-}
-
 /************* MATH *************/
 function bcfloor($number) {
 	if (strpos($number, '.') !== false) {

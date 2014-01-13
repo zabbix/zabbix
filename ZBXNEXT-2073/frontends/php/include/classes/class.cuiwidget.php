@@ -21,17 +21,43 @@
 
 class CUIWidget extends CDiv {
 
+	/**
+	 * Widget id.
+	 *
+	 * @var string
+	 */
 	public $id;
-	public $state;
-	public $css;
-	public $refreshParams;
+
+	/**
+	 * Header div.
+	 *
+	 * @var CDiv
+	 */
 	private $header;
+
+	/**
+	 * Body div.
+	 *
+	 * @var CDiv
+	 */
 	private $body;
+
+	/**
+	 * Footer div.
+	 *
+	 * @var CDiv
+	 */
 	private $footer;
+
+	/**
+	 * Expand/collapse widget.
+	 *
+	 * @var CDiv
+	 */
+	private $state;
 
 	public function __construct($id, $body = null) {
 		$this->id = $id;
-		$this->css = 'header';
 		$this->header = null;
 		$this->body = array($body);
 		$this->footer = null;
@@ -47,7 +73,6 @@ class CUIWidget extends CDiv {
 		}
 	}
 
-	// 0 - closed, 1 - opened
 	public function setState($state) {
 		$this->state = $state;
 	}
@@ -59,7 +84,7 @@ class CUIWidget extends CDiv {
 			$caption = SPACE;
 		}
 
-		$this->header = new CDiv(null, 'nowrap ui-corner-all ui-widget-header '.$this->css);
+		$this->header = new CDiv(null, 'nowrap ui-corner-all ui-widget-header header');
 
 		if ($this->state !== null) {
 			$icon = new CIcon(
@@ -87,22 +112,12 @@ class CUIWidget extends CDiv {
 		$table->addStyle('width: 100%;');
 		$table->addRow(array($leftColumn, $rightColumn));
 
-		$this->header = new CDiv(null, 'nowrap ui-corner-all ui-widget-header '.$this->css);
+		$this->header = new CDiv(null, 'nowrap ui-corner-all ui-widget-header header');
 		$this->header->addItem($table);
 	}
 
 	public function setFooter($footer, $right = false) {
 		$this->footer = new CDiv($footer, 'nowrap ui-corner-all ui-widget-header footer '.($right ? ' right' : ' left'));
-	}
-
-	public function setRefresh($frequency = 60) {
-		$this->refreshParams = array(
-			'frequency' => $frequency,
-			'url' => '?output=html',
-			'counter' => 0,
-			'darken' => 0,
-			'params' => array('widgetRefresh' => $this->id)
-		);
 	}
 
 	public function build() {

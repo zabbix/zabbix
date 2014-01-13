@@ -124,8 +124,8 @@ if ((hasRequest('widgetRefresh') || hasRequest('widgetRefreshRate')) && $dbSlide
 
 			$delay = ($screen['delay'] > 0) ? $screen['delay'] : $dbSlideshow['delay'];
 
-			echo updateWidgetRefresh('slideshows', WIDGET_SLIDESHOW, 'frequency', $delay * $widgetRefreshRate)."\n"
-				.updateWidgetRefresh('slideshows', WIDGET_SLIDESHOW, 'restartDoll');
+			echo 'PMasters["slideshows"].dolls["'.WIDGET_SLIDESHOW.'"].frequency('.zbx_jsvalue($delay * $widgetRefreshRate).');'."\n"
+				.'PMasters["slideshows"].dolls["'.WIDGET_SLIDESHOW.'"].restartDoll();';
 		}
 	}
 }
