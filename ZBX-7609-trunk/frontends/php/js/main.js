@@ -452,7 +452,9 @@ var AudioList = {
 	},
 
 	playLoop: function(name, delay) {
-		if (document.getElementById(name) !== null) {
+		var obj = document.getElementById(name);
+
+		if (obj !== null) {
 			this.stop(name);
 
 			clearTimeout(AudioList.timeoutHandler);
@@ -462,8 +464,8 @@ var AudioList = {
 			this.create(name, true);
 		}
 		else {
-			if (document.getElementById(name) !== null) {
-				jQuery(document.getElementById(name)).trigger('play');
+			if (obj !== null) {
+				jQuery(obj).trigger('play');
 			}
 			else {
 				this.create(name, true);
