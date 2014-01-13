@@ -92,6 +92,7 @@ class CXmlExportWriter extends CExportWriter {
 			'applications' => 'application',
 			'items' => 'item',
 			'discovery_rules' => 'discovery_rule',
+			'conditions' => 'condition',
 			'item_prototypes' => 'item_prototype',
 			'trigger_prototypes' => 'trigger_prototype',
 			'graph_prototypes' => 'graph_prototype',

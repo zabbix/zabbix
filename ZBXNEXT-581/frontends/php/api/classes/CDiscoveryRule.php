@@ -722,16 +722,16 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 		}
 
+		$itemConditions = array();
 		if ($conditions !== null) {
 			$conditions = DB::replace('item_condition', $exConditions, $conditions);
+
+			foreach ($conditions as $condition) {
+				$itemConditions[$condition['itemid']][] = $condition;
+			}
 		}
 
 		// update formulas
-		$itemConditions = array();
-		foreach ($conditions as $condition) {
-			$itemConditions[$condition['itemid']][] = $condition;
-		}
-
 		foreach ($items as $item) {
 			if (isset($item['filter']) && $item['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 
@@ -1423,7 +1423,7 @@ class CDiscoveryRule extends CItemGeneral {
 			// adding conditions
 			if ($formulaRequested || $evalFormulaRequested || $conditionsRequested) {
 				$conditions = API::getApi()->select('item_condition', array(
-					'output' => array('item_conditionid', 'macro', 'value', 'formulaid', 'itemid'),
+					'output' => array('item_conditionid', 'macro', 'value', 'formulaid', 'itemid', 'operator'),
 					'filter' => array('itemid' => $itemIds),
 					'preservekeys' => true,
 					'nodeids' => get_current_nodeid(true)
