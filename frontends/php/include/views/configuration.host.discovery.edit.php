@@ -267,6 +267,7 @@ $conditionFormList = new CFormList('conditionlist');
 // type of calculation
 $formula = new CTextBox('formula', $this->data['formula'], ZBX_TEXTBOX_STANDARD_SIZE);
 $formula->attr('id', 'formula');
+$formula->attr('placeholder', 'A or (B and C) &hellip;');
 if ($this->data['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION)  {
 	$formula->addClass('hidden');
 }
