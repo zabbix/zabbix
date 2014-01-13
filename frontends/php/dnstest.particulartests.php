@@ -263,7 +263,7 @@ while ($item = DBfetch($items)) {
 	if ($data['type'] == 0 || $data['type'] == 1) {
 		$itemValue = DBfetch(DBselect(DBaddLimit(
 			'SELECT h.value'.
-			' FROM history_uint h'.
+			' FROM history h'.
 			' WHERE h.itemid='.$item['itemid'].
 				' AND h.clock>='.$testTimeFrom.
 				' AND h.clock<='.$testTimeTill.
@@ -271,7 +271,8 @@ while ($item = DBfetch($items)) {
 			1
 		)));
 	}
-	if ($data['type'] == 0 && $item['key_'] == PROBE_DNS_UDP_ITEM_RTT) {
+
+	if ($data['type'] == 0 && zbx_substring($item['key_'], 0, 20) == PROBE_DNS_UDP_ITEM_RTT) {
 		preg_match('/^[^\[]+\[([^\]]+)]$/', $item['key_'], $matches);
 		$nsValues = explode(',', $matches[1]);
 
@@ -291,7 +292,7 @@ while ($item = DBfetch($items)) {
 			$data['availProbes']++;
 		}
 	}
-	elseif ($data['type'] == 1 && $item['key_'] == PROBE_DNS_UDP_ITEM_RTT) {
+	elseif ($data['type'] == 1 && zbx_substring($item['key_'], 0, 20) == PROBE_DNS_UDP_ITEM_RTT) {
 		if (!isset($hosts[$item['hostid']]['value'])) {
 			$hosts[$item['hostid']]['value']['ok'] = 0;
 			$hosts[$item['hostid']]['value']['fail'] = 0;
