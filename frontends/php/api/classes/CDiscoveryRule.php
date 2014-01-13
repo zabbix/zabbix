@@ -1449,11 +1449,13 @@ class CDiscoveryRule extends CItemGeneral {
 
 			if ($formulaRequested || $evalFormulaRequested || $conditionsRequested) {
 				foreach ($filters as &$filter) {
-					$conditions = zbx_toHash($filter['conditions'], 'item_conditionid');
 					if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 						$formula = $filter['formula'];
 					}
 					else {
+						$conditions = zbx_toHash($filter['conditions'], 'item_conditionid');
+						$conditions = order_macros($conditions, 'macro');
+
 						$formulaConditions = array();
 						foreach ($conditions as $condition) {
 							$formulaConditions[$condition['item_conditionid']] = $condition['macro'];
