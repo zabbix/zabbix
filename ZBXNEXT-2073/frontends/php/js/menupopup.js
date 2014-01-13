@@ -33,7 +33,7 @@ function getMenuPopupFavouriteGraphs(options) {
 		sections[sections.length] = {
 			type: 'favourite',
 			title: t('Favourite graphs'),
-			addParams: 'popup.php?srctbl=graphs&srcfld1=graphid&reference=graphid&monitored_hosts=1&multiselect=1',
+			addParams: 'popup.php?srctbl=graphs&srcfld1=graphid&reference=graphid&multiselect=1',
 			favouriteObj: 'graphid',
 			data: options.graphs
 		};
@@ -43,8 +43,8 @@ function getMenuPopupFavouriteGraphs(options) {
 		sections[sections.length] = {
 			type: 'favourite',
 			title: t('Favourite simple graphs'),
-			addParams: 'popup.php?srctbl=items&srcfld1=itemid&monitored_hosts=1&reference=itemid&multiselect=1'
-				+ '&numeric=1&templated=0&with_simple_graph_items=1',
+			addParams: 'popup.php?srctbl=items&srcfld1=itemid&reference=itemid&multiselect=1&numeric=1&templated=0'
+				+ '&with_simple_graph_items=1',
 			favouriteObj: 'itemid',
 			data: options.simpleGraphs
 		};
