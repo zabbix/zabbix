@@ -107,9 +107,9 @@ foreach ($this->data['action']['conditions'] as $condition) {
 }
 
 $calculationTypeComboBox = new CComboBox('evaltype', $this->data['action']['evaltype'], 'submit()');
-$calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND_OR, _('AND / OR'));
-$calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND, _('AND'));
-$calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_OR, _('OR'));
+$calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND_OR, _('And / or'));
+$calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND, _('And'));
+$calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_OR, _('Or'));
 $conditionFormList->addRow(_('Type of calculation'), array($calculationTypeComboBox, new CSpan('', null, 'conditionLabel')), false, 'conditionRow');
 $conditionFormList->addRow(_('Conditions'), new CDiv($conditionTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
 
