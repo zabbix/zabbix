@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Configuration of authentication');
@@ -31,22 +31,23 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'config' =>			array(T_ZBX_INT, O_OPT, null, IN(ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP.','.ZBX_AUTH_HTTP), null),
 	// LDAP
-	'ldap_host' =>			array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,
+	'ldap_host' =>		array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,
 		'isset({config})&&({config}==1)&&(isset({save})||isset({test}))',	_('LDAP host')),
-	'ldap_port' =>			array(T_ZBX_INT, O_OPT, null, BETWEEN(0, 65535),
+	'ldap_port' =>		array(T_ZBX_INT, O_OPT, null, BETWEEN(0, 65535),
 		'isset({config})&&({config}==1)&&(isset({save})||isset({test}))',	_('Port')),
-	'ldap_base_dn' =>		array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,
+	'ldap_base_dn' =>	array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,
 		'isset({config})&&({config}==1)&&(isset({save})||isset({test}))',	_('Base DN')),
-	'ldap_bind_dn' =>		array(T_ZBX_STR, O_OPT, null, null,
+	'ldap_bind_dn' =>	array(T_ZBX_STR, O_OPT, null, null,
 		'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
-	'ldap_bind_password' =>		array(T_ZBX_STR, O_OPT, null, null,
-		'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
-	'ldap_search_attribute' =>	array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,
+	'ldap_bind_password' => array(T_ZBX_STR, O_OPT, null, null,
+		'isset({save})&&isset({change_bind_password})', _('Bind password')),
+	'ldap_search_attribute' => array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,
 		'isset({config})&&({config}==1)&&(isset({save})||isset({test}))',	_('Search attribute')),
 	'user' =>			array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,
 		'isset({config})&&({config}==1)&&(isset({test}))'),
-	'user_password' =>		array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,
-		'isset({config})&&({config}==1)&&(isset({test}))',			_('Bind password')),
+	'user_password' =>	array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,
+		'isset({config})&&({config}==1)&&(isset({test}))',					_('User password')),
+	'change_bind_password' => array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	// actions
 	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
 	'test' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null)
@@ -58,7 +59,7 @@ if (!isset($_REQUEST['config'])) {
 }
 
 $config = select_config();
-$isAuthenticationTypeChanged = ($config['authentication_type'] != $_REQUEST['config']) ? true : false;
+$isAuthenticationTypeChanged = ($config['authentication_type'] != $_REQUEST['config']);
 
 foreach ($config as $id => $value) {
 	if (isset($_REQUEST[$id])) {
@@ -164,6 +165,7 @@ elseif ($_REQUEST['config'] == ZBX_AUTH_HTTP) {
 		}
 	}
 }
+
 show_messages();
 
 /*
@@ -175,6 +177,7 @@ $data['is_authentication_type_changed'] = $isAuthenticationTypeChanged;
 $data['user'] = get_request('user', $USER_DETAILS['alias']);
 $data['user_password'] = get_request('user_password', '');
 $data['user_list'] = null;
+$data['change_bind_password'] = get_request('change_bind_password');
 
 // get tab title
 switch ($data['config']) {
@@ -207,4 +210,3 @@ $authenticationView->render();
 $authenticationView->show();
 
 require_once 'include/page_footer.php';
-?>
