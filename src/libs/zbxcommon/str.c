@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -864,6 +864,53 @@ int	zbx_check_hostname(const char *hostname)
 
 /******************************************************************************
  *                                                                            *
+ * Function: get_item_key                                                     *
+ *                                                                            *
+ * Purpose: return key with parameters (if present)                           *
+ *                                                                            *
+ *  e.g., system.run[cat /etc/passwd | awk -F: '{ print $1 }']                *
+ *                                                                            *
+ * Parameters: exp - [IN] pointer to the first char of key                    *
+ *             key - [OUT] pointer to the resulted key                        *
+ *                                                                            *
+ *  e.g., {host:system.run[cat /etc/passwd | awk -F: '{ print $1 }'].last(0)} *
+ *              ^                                                             *
+ *                                                                            *
+ * Return value: return SUCCEED and move exp to the next character after key  *
+ *               or FAIL and move exp to incorrect character                  *
+ *                                                                            *
+ * Notes: implements the functionality of old parse_key() in a safe manner.   *
+ *        input pointer is NOT advanced.                                      *
+ *                                                                            *
+ ******************************************************************************/
+int	get_item_key(char **exp, char **key)
+{
+	char	*p = *exp, c;
+
+	if (SUCCEED != parse_key(&p))
+		return FAIL;
+
+	if ('(' == *p)
+	{
+		for (p--; *exp < p && '.' != *p; p--)
+			;
+
+		if (*exp == p)	/* the key is empty */
+			return FAIL;
+	}
+
+	c = *p;
+	*p = '\0';
+	*key = zbx_strdup(NULL, *exp);
+	*p = c;
+
+	*exp = p;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: parse_host                                                       *
  *                                                                            *
  * Purpose: parse hostname                                                    *
@@ -913,57 +960,32 @@ int	parse_host(char **exp, char **host)
  *                                                                            *
  * Function: parse_key                                                        *
  *                                                                            *
- * Purpose: return key with parameters (if present)                           *
+ * Purpose: advances pointer to first invalid character in string             *
+ *          ensuring that everything before it is a valid key                 *
  *                                                                            *
  *  e.g., system.run[cat /etc/passwd | awk -F: '{ print $1 }']                *
  *                                                                            *
- * Parameters: exp - pointer to the first char of key                         *
- *             key - pointer to the resulted key                              *
+ * Parameters: exp - [IN/OUT] pointer to the first char of key                *
  *                                                                            *
  *  e.g., {host:system.run[cat /etc/passwd | awk -F: '{ print $1 }'].last(0)} *
  *              ^                                                             *
- *                                                                            *
- * Return value: return SUCCEED and move exp to the next character after key  *
- *               or FAIL and move exp to incorrect character                  *
+ * Return value: returns FAIL only if no key is present (length 0),           *
+ *               or the whole string is invalid. SUCCEED otherwise.           *
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
  ******************************************************************************/
-int	parse_key(char **exp, char **key)
+int	parse_key(char **exp)
 {
-	char	c;
-	char	*p, *r, *s;
-
-	p = *exp;
+	char	*s;
 
 	for (s = *exp; SUCCEED == is_key_char(*s); s++)
 		;
 
-	if ('\0' == *s)		/* no function specified? */
-	{
-		*key = strdup(p);
-		*exp = s;
-		return SUCCEED;
-	}
-	else if ('(' == *s)	/* for instance, ssh,22.last(0) */
-	{
-		for (r = s - 1; p <= r && '.' != *r; r--)
-			;
+	if (*exp == s)	/* the key is empty */
+		return FAIL;
 
-		if (r <= p)
-		{
-			*exp = s;
-			return FAIL;
-		}
-
-		*r = '\0';
-		*key = strdup(p);
-		*r = '.';
-
-		*exp = r;
-		return SUCCEED;
-	}
-	else if ('[' == *s)	/* for instance, net.tcp.port[,80] */
+	if ('[' == *s)	/* for instance, net.tcp.port[,80] */
 	{
 		int	state = 0;	/* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
 		int	array = 0;	/* array nest level */
@@ -1059,19 +1081,11 @@ fail:
 		*exp = s;
 		return FAIL;
 succeed:
-		c = *(++s);
-		*s = '\0';
-		*key = strdup(p);
-		*s = c;
+		s++;
+	}
 
-		*exp = s;
-		return SUCCEED;
-	}
-	else
-	{
-		*exp = s;
-		return FAIL;
-	}
+	*exp = s;
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -2099,149 +2113,6 @@ size_t	zbx_hex2binary(char *io)
 
 	return (int)(o - io);
 }
-
-#ifdef HAVE_POSTGRESQL
-/******************************************************************************
- *                                                                            *
- * Function: zbx_pg_escape_bytea                                              *
- *                                                                            *
- * Purpose: converts from binary string to the null terminated escaped string *
- *                                                                            *
- * Transformations:                                                           *
- *      '\0' [0x00] -> \\ooo (ooo is an octal number)                         *
- *      '\'' [0x37] -> \'                                                     *
- *      '\\' [0x5c] -> \\\\                                                   *
- *      <= 0x1f || >= 0x7f -> \\ooo                                           *
- *                                                                            *
- * Parameters:                                                                *
- *      input - null terminated hexadecimal string                            *
- *      output - pointer to buffer                                            *
- *      olen - size of returned buffer                                        *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-size_t	zbx_pg_escape_bytea(const u_char *input, size_t ilen, char **output, size_t *olen)
-{
-	const u_char	*i;
-	char		*o;
-	size_t		len;
-
-	assert(input);
-	assert(output);
-	assert(*output);
-	assert(olen);
-
-	len = 1; /* '\0' */
-	i = input;
-	while(i - input < ilen)
-	{
-		if(*i == '\0' || *i <= 0x1f || *i >= 0x7f)
-			len += 5;
-		else if(*i == '\'')
-			len += 2;
-		else if(*i == '\\')
-			len += 4;
-		else
-			len++;
-		i++;
-	}
-
-	if(*olen < len)
-	{
-		*olen = len;
-		*output = zbx_realloc(*output, *olen);
-	}
-	o = *output;
-	i = input;
-
-	while(i - input < ilen)
-	{
-		if(*i == '\0' || *i <= 0x1f || *i >= 0x7f)
-		{
-			*o++ = '\\';
-			*o++ = '\\';
-			*o++ = ((*i >> 6) & 0x7) + 0x30;
-			*o++ = ((*i >> 3) & 0x7) + 0x30;
-			*o++ = (*i & 0x7) + 0x30;
-		}
-		else if (*i == '\'')
-		{
-			*o++ = '\\';
-			*o++ = '\'';
-		}
-		else if (*i == '\\')
-		{
-			*o++ = '\\';
-			*o++ = '\\';
-			*o++ = '\\';
-			*o++ = '\\';
-		}
-		else
-			*o++ = *i;
-		i++;
-	}
-	*o = '\0';
-
-	return len - 1;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_pg_unescape_bytea                                            *
- *                                                                            *
- * Purpose: converts the null terminated string into binary buffer            *
- *                                                                            *
- * Transformations:                                                           *
- *      \ooo == a byte whose value = ooo (ooo is an octal number)             *
- *      \x   == x (x is any character)                                        *
- *                                                                            *
- * Parameters:                                                                *
- *      io - null terminated string                                           *
- *                                                                            *
- * Return value: length of the binary buffer                                  *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-size_t	zbx_pg_unescape_bytea(u_char *io)
-{
-	const u_char	*i = io;
-	u_char		*o = io;
-
-	assert(io);
-
-	while(*i != '\0')
-	{
-		switch(*i)
-		{
-			case '\\':
-				i++;
-				if(*i == '\\')
-				{
-					*o++ = *i++;
-				}
-				else
-				{
-					if(*i >= 0x30 && *i <= 0x39 && *(i + 1) >= 0x30 && *(i + 1) <= 0x39 && *(i + 2) >= 0x30 && *(i + 2) <= 0x39)
-					{
-						*o = (*i++ - 0x30) << 6;
-						*o += (*i++ - 0x30) << 3;
-						*o++ += *i++ - 0x30;
-					}
-				}
-				break;
-
-			default:
-				*o++ = *i++;
-		}
-	}
-
-	return o - io;
-}
-#endif
 
 /******************************************************************************
  *                                                                            *

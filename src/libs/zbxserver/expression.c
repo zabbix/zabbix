@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2430,7 +2430,7 @@ static void	get_trigger_function_value(const char *expression, char **replace_to
 		DBget_trigger_value(expression, &key, N_functionid, ZBX_REQUEST_ITEM_KEY_ORIG);
 	}
 	else
-		ret = parse_key(&p, &key);
+		ret = get_item_key(&p, &key);
 
 	if (SUCCEED != ret || '.' != *p++)
 		goto fail;
@@ -4108,7 +4108,7 @@ static int	substitute_discovery_macros_simple(char *data, char **replace_to, siz
 	zbx_strncpy_alloc(replace_to, replace_to_alloc, &replace_to_offset, pl, pr - pl);
 
 	/* an item key */
-	if (SUCCEED != parse_key(&pr, &key))
+	if (SUCCEED != get_item_key(&pr, &key))
 		return FAIL;
 
 	substitute_key_macros(&key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);

@@ -6,7 +6,11 @@ New features:
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
-...G...PS. [ZBX-4243] fixed Zabbix syslog application names (appnames) (Andris)
+..F....... [ZBX-6940] fixed frontend history links not remembering search queries (Pavels)
+...GI..PS. [ZBX-5526] removed checking for PosgreSQL server version and disabled nonstandard use of escape strings in order to support versions newer than 8.1 (igors)
+...G...... [ZBX-7414] added description to HostnameItem that UserParameters and aliases are not supported (igors)
+...G...... [ZBX-7413] fixed concistentcy of config file handling for loading and checking userparameters and aliases before starting the daemon (igors)
+...G...... [ZBX-7412] fixed alias parsing; colon symbols are now supported in alias parameters (Juris)
 ........S. [ZBX-7204] fixed the timestamp order of events generated during network discovery (igors)
 
 --------------------------------------------------------------------------------
@@ -14,9 +18,28 @@ Changes for 2.2.2rc1
 
 New features:
 ........S. [ZBXNEXT-2069] added HOST.PORT macro support for internal and trigger based notifications (wiper)
-A.F....... [ZBX-1357] updated American English, French, Hungarian, Japanese, Russian and Slovak translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated American English, French, Hungarian, Italian, Japanese, Russian, Slovak and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...GI..PS. [ZBX-5526] removed checking for PosgreSQL server version and disabled nonstandard use of escape strings in order to support versions newer than 8.1 (igors)
+...G...... [ZBX-7414] added description to HostnameItem that UserParameters and aliases are not supported (igors)
+..F....... [ZBX-7590] fixed displaying functional macros in graph names when host visible name is not empty (Ivo)
+A......... [ZBX-7591] fixed deleting web scenario steps on template linked to host (Ivo)
+..F....... [ZBX-7508] fixed import map with LLD triggers (Eduard)
+..F....... [ZBX-7518] fixed graph scrollbar overflow when clicking period "All" and with no page refresh option (Ivo)
+A......... [ZBX-7578] fixed graph item validation (Eduard)
+..F....... [ZBX-7616] fixed green background color for "New group" field in host edit form (Ivo)
+...G...... [ZBX-7567] fixed processing of services[] key without a 3rd parameter (Sasha)
+..F.....S. [ZBX-7573] fixed item being checked at a wrong time when using flexible intervals (asaveljevs)
+........S. [ZBX-6545] fixed possible SQL errors when syncing a node configuration with PostgreSQL backend version 8.2 and later (Sasha)
+........S. [ZBX-7452] fixed processing of received events from slave node (Sasha)
+.......... [ZBXNEXT-1256] fixed parameter passing for example userparameter to obtain process CPU usage (Richlv)
+.......... [ZBXNEXT-1256] fixed parameter passing for example userparameter to obtain directory size (Richlv)
+........S. [ZBX-7484] fixed escalations not being stopped and generation of multiple successive OK or PROBLEM events (asaveljevs)
+........S. [ZBX-7521] fixed crash if value cache entered low memory mode when adding a new item to the cache (wiper)
+...G...PS. [ZBX-7521] fixed memory allocator realloc() function bug in low memory situations (wiper)
+...G...PS. [ZBX-4243] fixed Zabbix syslog application names (RFC 5424 APP-NAME) (Andris)
+..F....... [ZBX-3855] fixed bug that prevented the frontend from working with the Turkish locale (Pavels)
 A......... [ZBX-7483] fixed user group delete validation (Eduard)
 ..F....... [ZBX-6296] optimized macro resolving in latest data (Eduard)
 ..F....... [ZBX-6296] rewrote user macros resolving (Eduard, Sasha)
@@ -539,7 +562,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F.I..PS. [ZBXNEXT-1322] implemented automatic update of database structure when upgrading to newer version (Sasha, Vedmak)
 ..F.....S. [ZBX-3236] added support of value mapping for character data (Sasha, Vedmak)
 .......P.. [ZBX-3817] improved performance of the "data sender" process (Sasha)
-.......PS. [ZBX-5436] added support of AllowRoot paramater by server and proxy daemons (Sasha)
+.......PS. [ZBX-5436] added support of AllowRoot parameter by server and proxy daemons (Sasha)
 ..F....... [ZBX-5180] redesigned maintenance periods form (Vedmak)
 .......PS. [ZBXNEXT-1335] changed pingers to work without connection to a database (Sasha)
 ..F....... [ZBX-5127] redesigned regular expressions form (Vedmak)
@@ -735,6 +758,16 @@ New features:
 A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...GI..PS. [ZBX-5526] removed checking for PosgreSQL server version and disabled nonstandard use of escape strings in order to support versions newer than 8.1 (igors)
+...G...... [ZBX-7414] added description to HostnameItem that UserParameters and aliases are not supported (igors)
+..F....... [ZBX-7508] fixed import map with LLD triggers (Eduard)
+..F....... [ZBX-7586] fixed trigger log expression saving in IE10 (Eduard)
+..F.....S. [ZBX-7573] fixed item being checked at a wrong time when using flexible intervals (asaveljevs)
+........S. [ZBX-6545] fixed possible SQL errors when syncing a node configuration with PostgreSQL backend version 8.2 and later (Sasha)
+.......... [ZBXNEXT-1256] fixed parameter passing for example userparameter to obtain process CPU usage (Richlv)
+.......... [ZBXNEXT-1256] fixed parameter passing for example userparameter to obtain directory size (Richlv)
+........S. [ZBX-7484] fixed escalations not being stopped and generation of multiple successive OK or PROBLEM events (asaveljevs)
+...G...PS. [ZBX-4243] fixed Zabbix syslog application names (RFC 5424 APP-NAME) (Andris)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.10
@@ -2183,6 +2216,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.20rc1
 
+...G...PS. [ZBX-4243] fixed Zabbix syslog application names (RFC 5424 APP-NAME) (Andris)
 
 Changes for 1.8.19
 
@@ -4437,7 +4471,7 @@ Changes for 1.5:
  - [DEV-123] screen "queue" moved to administration section (Artem)
  - [DEV-126] moved graphs,maps,screens to dashboard, implemented quick add to favourites (Artem)
  - [DEV-116] added option to remember user login (Artem)
- - [DEV-117] added support of BufferSize and BufferSend paramaters (Alexei)
+ - [DEV-117] added support of BufferSize and BufferSend parameters (Alexei)
  - [DEV-118] added dashboard screen to monitoring (Artem)
  - [DEV-117] support of data buffering on agent side (Alexei)
  - [DEV-115] enhanced sender to use only one TCP connection (Alexei)
@@ -6622,7 +6656,7 @@ Changes for 1.0beta1:
  - added misc/init.d/debian/zabbix-server (Alexei)
  - zabbix_suckerd cannot be ran as root (Alexei)
  - added column URL to table triggers (Alexei)
- - character '.' can be used in definition of monitored paramaters (Alexei)
+ - character '.' can be used in definition of monitored parameters (Alexei)
  - added average-only mode for trends (Alexei)
  - fixed bug with unexpected change of item status to NOT SUPPORTED. This bug appeared because of incomplete processing of timeout situations (Alexei)
  - constant DELAY_ON_NETWORK_FAILURE is set to 60 (Alexei)
