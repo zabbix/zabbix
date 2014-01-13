@@ -199,9 +199,9 @@ if ($data['filter_search']) {
 
 					$serviceName = $itemsAndServices[$item['itemid']];
 					if (isset($itemHistory['value'])) {
-						$data['services'][$serviceName]['parameters'][$item['itemid']]['slv'] = round(
-							$itemHistory['value'],
-							ZBX_UNITS_ROUNDOFF_DNSTEST_LIMIT
+						$data['services'][$serviceName]['parameters'][$item['itemid']]['slv'] = sprintf(
+							'%.3f',
+							$itemHistory['value']
 						);
 					}
 				}

@@ -235,7 +235,7 @@ if ($mainEvent) {
 if ($tld && $mainEvent && $slvItem) {
 	$data['tld'] = reset($tld);
 	$data['slvItem'] = $slvItem;
-	$data['slv'] = round($data['slvItem']['lastvalue'], ZBX_UNITS_ROUNDOFF_DNSTEST_LIMIT);
+	$data['slv'] = sprintf('%.3f', $data['slvItem']['lastvalue']);
 	if ($mainEvent['false_positive']) {
 		$data['incidentType'] = INCIDENT_FALSE_POSITIVE;
 	}
@@ -333,7 +333,7 @@ if ($tld && $mainEvent && $slvItem) {
 				date('Y', $test['clock'])
 			);
 
-			$slvValue = round($slv['value'], ZBX_UNITS_ROUNDOFF_DNSTEST_LIMIT);
+			$slvValue = sprintf('%.3f', $slv['value']);
 
 			if ($slv['clock'] == $test['clock']) {
 				$data['tests'][$key]['slv'] = $slvValue;

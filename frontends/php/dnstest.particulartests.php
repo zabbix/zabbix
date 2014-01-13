@@ -390,7 +390,7 @@ foreach ($hosts as $host) {
 }
 
 if ($data['tld'] && $data['slvItem']) {
-	$data['slv'] = round($data['slvItem']['lastvalue'], ZBX_UNITS_ROUNDOFF_DNSTEST_LIMIT);
+	$data['slv'] = sprintf('%.3f', $data['slvItem']['lastvalue']);
 }
 else {
 	access_deny();

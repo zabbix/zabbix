@@ -250,9 +250,9 @@ if ($tlds) {
 
 			foreach ($sortItems as $itemId => $sortItem) {
 				$data['tld'][$sortItem['hostid']][$sortField]['itemid'] = $itemId;
-				$data['tld'][$sortItem['hostid']][$sortField]['lastvalue'] = round(
-					$sortItem['lastvalue'],
-					ZBX_UNITS_ROUNDOFF_DNSTEST_LIMIT
+				$data['tld'][$sortItem['hostid']][$sortField]['lastvalue'] = sprintf(
+					'%.3f',
+					$sortItem['lastvalue']
 				);
 				$data['tld'][$sortItem['hostid']][$sortField]['trigger'] = false;
 			}
@@ -261,25 +261,25 @@ if ($tlds) {
 		foreach ($items as $item) {
 			if ($item['key_'] == DNSTEST_SLV_DNS_ROLLWEEK && $sortField != 'dns') {
 				$data['tld'][$item['hostid']]['dns']['itemid'] = $item['itemid'];
-				$data['tld'][$item['hostid']]['dns']['lastvalue'] = round(
-					$item['lastvalue'],
-					ZBX_UNITS_ROUNDOFF_DNSTEST_LIMIT
+				$data['tld'][$item['hostid']]['dns']['lastvalue'] = sprintf(
+					'%.3f',
+					$item['lastvalue']
 				);
 				$data['tld'][$item['hostid']]['dns']['trigger'] = false;
 			}
 			elseif ($item['key_'] == DNSTEST_SLV_DNSSEC_ROLLWEEK && $sortField != 'dnssec') {
 				$data['tld'][$item['hostid']]['dnssec']['itemid'] = $item['itemid'];
-				$data['tld'][$item['hostid']]['dnssec']['lastvalue'] = round(
-					$item['lastvalue'],
-					ZBX_UNITS_ROUNDOFF_DNSTEST_LIMIT
+				$data['tld'][$item['hostid']]['dnssec']['lastvalue'] = sprintf(
+					'%.3f',
+					$item['lastvalue']
 				);
 				$data['tld'][$item['hostid']]['dnssec']['trigger'] = false;
 			}
 			elseif ($item['key_'] == DNSTEST_SLV_RDDS_ROLLWEEK && $sortField != 'rdds') {
 				$data['tld'][$item['hostid']]['rdds']['itemid'] = $item['itemid'];
-				$data['tld'][$item['hostid']]['rdds']['lastvalue'] = round(
-					$item['lastvalue'],
-					ZBX_UNITS_ROUNDOFF_DNSTEST_LIMIT
+				$data['tld'][$item['hostid']]['rdds']['lastvalue'] = sprintf(
+					'%.3f',
+					$item['lastvalue']
 				);
 				$data['tld'][$item['hostid']]['rdds']['trigger'] = false;
 			}

@@ -127,13 +127,13 @@ if (isset($this->data['tld'])) {
 				$dnsStatus =  new CDiv(null, 'status_icon status_icon_extra iconrollingweekok cell-value');
 			}
 
-			$dnsValue = $tld['dns']['lastvalue']
+			$dnsValue = ($tld['dns']['lastvalue'] > 0)
 				? new CLink(
 					$tld['dns']['lastvalue'].'%',
 					'dnstest.incidents.php?filter_set=1&filter_rolling_week=1&incident_type=0&host='.$tld['host'],
 					'first-cell-value'
 				)
-				: new CSpan('0%', 'first-cell-value');
+				: new CSpan('0.000%', 'first-cell-value');
 
 			$dnsGraph = $tld['dns']['lastvalue']
 				? new CLink(
@@ -167,13 +167,13 @@ if (isset($this->data['tld'])) {
 				$dnssecStatus =  new CDiv(null, 'status_icon status_icon_extra iconrollingweekok cell-value');
 			}
 
-			$dnssecValue = $tld['dnssec']['lastvalue']
+			$dnssecValue = ($tld['dnssec']['lastvalue'] > 0)
 				? new CLink(
 					$tld['dnssec']['lastvalue'].'%',
 					'dnstest.incidents.php?filter_set=1&filter_rolling_week=1&incident_type=1&host='.$tld['host'],
 					'first-cell-value'
 				)
-				: new CSpan('0%', 'first-cell-value');
+				: new CSpan('0.000%', 'first-cell-value');
 
 			$dnssecGraph = $tld['dnssec']['lastvalue']
 				? new CLink(
@@ -207,13 +207,13 @@ if (isset($this->data['tld'])) {
 				$rddsStatus =  new CDiv(null, 'status_icon status_icon_extra iconrollingweekok cell-value');
 			}
 
-			$rddsValue = $tld['rdds']['lastvalue']
+			$rddsValue = ($tld['rdds']['lastvalue'] > 0)
 				? new CLink(
 					$tld['rdds']['lastvalue'].'%',
 					'dnstest.incidents.php?filter_set=1&filter_rolling_week=1&incident_type=2&host='.$tld['host'],
 					'first-cell-value'
 				)
-				: new CSpan('0%', 'first-cell-value');
+				: new CSpan('0.000%', 'first-cell-value');
 
 			$rddsGraph = $tld['rdds']['lastvalue']
 				? new CLink(
