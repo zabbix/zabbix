@@ -246,10 +246,10 @@ ROW   |11        |SNMP interface status (ifAdminStatus)|
 ROW   |8         |SNMP interface status (ifOperStatus) |
 ROW   |3         |Windows service state                |
 ROW   |10        |Zabbix agent ping status             |
-ROW   |13        |DNSTEST DNS		               |
-ROW   |14        |DNSTEST Probe		               |
-ROW   |15	 |DNSTEST RDDS rtt/udp		       |
-ROW   |16        |DNSTEST availability                 |
+ROW   |13        |DNSTEST DNS result                   |
+ROW   |14        |DNSTEST Probe	                       |
+ROW   |15        |DNSTEST RDDS result                  |
+ROW   |16        |DNSTEST DNS availability             |
 ROW   |18        |DNSTEST RDDS availability            |
 
 TABLE |items
@@ -2813,30 +2813,30 @@ ROW   |68       |10        |1    |Up                |
 ROW   |69       |11        |1    |up                |
 ROW   |70       |11        |2    |down              |
 ROW   |71       |11        |3    |testing           |
-ROW   |74    	|13   	   |-1   |Internal error    |
-ROW   |75    	|13   	   |-205 |No reply from resolver   |
-ROW   |76    	|13   	   |-206 |No AD bit in the answer from resolver   |
-ROW   |78    	|13   	   |-200 |No reply from Name Server   |
-ROW   |79    	|13   	   |-201 |Invalid reply from Name Server   |
-ROW   |80    	|13   	   |-202 |No UNIX timestamp |
-ROW   |81    	|13   	   |-203 |Invalid UNIX timestamp   |
-ROW   |82    	|13   	   |-204 |DNSSEC error      |
-ROW   |83    	|14   	   |1    |Online            |
-ROW   |84    	|14   	   |0    |Offline           |
-ROW   |85    	|15   	   |-1   |Internal error    |
-ROW   |86    	|15   	   |-200 |No reply from RDDS43 server   |
-ROW   |87    	|15   	   |-201 |Whois server returned no NS   |
-ROW   |88    	|15   	   |-202 |No Unix timestamp |
-ROW   |89    	|15   	   |-203 |Invalid Unix timestamp   |
-ROW   |90    	|15   	   |-204 |No reply from RDDS80 server   |
-ROW   |91    	|15   	   |-205 |Cannot resolve a Whois host name   |
-ROW   |92    	|15   	   |-206 |no HTTP status code   |
-ROW   |93    	|15   	   |-207 |invalid HTTP status code   |
-ROW   |94    	|16   	   |0    |Down 		    |
-ROW   |95    	|16   	   |1    |Up   		    |
-ROW   |96    	|18   	   |0    |Down              |
-ROW   |97    	|18   	   |1    |Only RDDS43       |
-ROW   |98    	|18   	   |2    |UP   		    |
+ROW   |74       |13        |-1   |Internal error    |
+ROW   |75       |13        |-205 |No reply from resolver|
+ROW   |76       |13        |-206 |No AD bit in the answer from resolver|
+ROW   |78       |13        |-200 |No reply from Name Server|
+ROW   |79       |13        |-201 |Invalid reply from Name Server|
+ROW   |80       |13        |-202 |No UNIX timestamp |
+ROW   |81       |13        |-203 |Invalid UNIX timestamp|
+ROW   |82       |13        |-204 |DNSSEC error      |
+ROW   |83       |14        |1    |Online            |
+ROW   |84       |14        |0    |Offline           |
+ROW   |85       |15        |-1   |Internal error    |
+ROW   |86       |15        |-200 |No reply from RDDS43 server|
+ROW   |87       |15        |-201 |Whois server returned no NS|
+ROW   |88       |15        |-202 |No Unix timestamp |
+ROW   |89       |15        |-203 |Invalid Unix timestamp|
+ROW   |90       |15        |-204 |No reply from RDDS80 server|
+ROW   |91       |15        |-205 |Cannot resolve a Whois host name|
+ROW   |92       |15        |-206 |no HTTP status code|
+ROW   |93       |15        |-207 |invalid HTTP status code|
+ROW   |94       |16        |0    |Down 	            |
+ROW   |95       |16        |1    |Up   	            |
+ROW   |96       |18        |0    |Down              |
+ROW   |97       |18        |1    |Only RDDS43       |
+ROW   |98       |18        |2    |UP   	            |
 
 TABLE |sysmaps
 FIELDS|sysmapid|name         |width|height|backgroundid|label_type|label_location|highlight|expandproblem|markelements|show_unack|grid_size|grid_show|grid_align|label_format|label_type_host|label_type_hostgroup|label_type_trigger|label_type_map|label_type_image|label_string_host|label_string_hostgroup|label_string_trigger|label_string_map|label_string_image|iconmapid|expand_macros|
