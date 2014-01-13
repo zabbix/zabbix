@@ -250,7 +250,7 @@ else {
 
 // SQL
 $items = DBselect(
-	'SELECT i.itemid,i.key_,i.hostid'.
+	'SELECT i.itemid,i.key_,i.hostid,i.value_type'.
 	' FROM items i'.
 	' WHERE '.dbConditionInt('i.hostid', $hostIds).
 		$probeItemKey
@@ -261,15 +261,15 @@ $nsArray = array();
 // get items value
 while ($item = DBfetch($items)) {
 	if ($data['type'] == 0 || $data['type'] == 1) {
-		$itemValue = DBfetch(DBselect(DBaddLimit(
-			'SELECT h.value'.
-			' FROM history h'.
-			' WHERE h.itemid='.$item['itemid'].
-				' AND h.clock>='.$testTimeFrom.
-				' AND h.clock<='.$testTimeTill.
-			' ORDER BY h.clock DESC',
-			1
-		)));
+		$itemValue = API::History()->get(array(
+			'itemids' => $item['itemid'],
+			'time_from' => $testTimeFrom,
+			'time_till' => $testTimeTill,
+			'history' => $item['value_type'],
+			'output' => API_OUTPUT_EXTEND
+		));
+
+		$itemValue = reset($itemValue);
 	}
 
 	if ($data['type'] == 0 && zbx_substring($item['key_'], 0, 20) == PROBE_DNS_UDP_ITEM_RTT) {
