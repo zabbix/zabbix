@@ -56,6 +56,12 @@ class CUIWidget extends CDiv {
 	 */
 	private $state;
 
+	/**
+	 * Construct widget.
+	 *
+	 * @param string $id
+	 * @param object $body
+	 */
 	public function __construct($id, $body = null) {
 		$this->id = $id;
 		$this->header = null;
@@ -67,16 +73,32 @@ class CUIWidget extends CDiv {
 		$this->setAttribute('id', $this->id.'_widget');
 	}
 
+	/**
+	 * Add element to widget body.
+	 *
+	 * @param object $item
+	 */
 	public function addItem($item) {
 		if ($item !== null) {
 			$this->body[] = $item;
 		}
 	}
 
+	/**
+	 * Expand/collapse widget state.
+	 *
+	 * @param bool $state
+	 */
 	public function setState($state) {
 		$this->state = $state;
 	}
 
+	/**
+	 * Set widget header.
+	 *
+	 * @param string $caption
+	 * @param object $icons
+	 */
 	public function setHeader($caption = null, $icons = SPACE) {
 		zbx_value2array($icons);
 
@@ -101,6 +123,12 @@ class CUIWidget extends CDiv {
 		$this->header->addItem($caption);
 	}
 
+	/**
+	 * Set widget header with left and right parts.
+	 *
+	 * @param object $leftColumn
+	 * @param object $rightColumn
+	 */
 	public function setDoubleHeader($leftColumn, $rightColumn) {
 		$leftColumn = new CCol($leftColumn);
 		$leftColumn->addStyle('text-align: left; border: 0;');
@@ -116,10 +144,19 @@ class CUIWidget extends CDiv {
 		$this->header->addItem($table);
 	}
 
+	/**
+	 * Set widget footer.
+	 *
+	 * @param object $footer
+	 * @param bool   $right
+	 */
 	public function setFooter($footer, $right = false) {
 		$this->footer = new CDiv($footer, 'nowrap ui-corner-all ui-widget-header footer '.($right ? ' right' : ' left'));
 	}
 
+	/**
+	 * Build widget header, body and footer.
+	 */
 	public function build() {
 		$this->cleanItems();
 
@@ -144,6 +181,9 @@ class CUIWidget extends CDiv {
 		parent::addItem($this->footer);
 	}
 
+	/**
+	 * Get widget html.
+	 */
 	public function toString($destroy = true) {
 		$this->build();
 
