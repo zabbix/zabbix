@@ -42,6 +42,8 @@
 #define ZBX_EC_RDDS43_ETS		-203	/* invalid Unix timestamp */
 #define ZBX_EC_RDDS80_NOREPLY		-204	/* no reply from RDDS80 server */
 #define ZBX_EC_RDDS_ERES		-205	/* cannot resolve a Whois server name */
+#define ZBX_EC_RDDS80_NOHTTPCODE	-206	/* no HTTP status code in response from RDDS80 server */
+#define ZBX_EC_RDDS80_EHTTPCODE		-207	/* invalid HTTP status code in response from RDDS80 server */
 #define ZBX_EC_PROBE_ONLINE		1	/* probe in automatic online mode */
 #define ZBX_EC_PROBE_OFFLINE		0	/* probe in automatic offline mode */
 #define ZBX_EC_PROBE_UNSUPPORTED	2	/* internal use only */

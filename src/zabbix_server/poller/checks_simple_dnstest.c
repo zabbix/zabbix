@@ -31,6 +31,8 @@
 #define ZBX_SEND_BUF_SIZE	128
 #define ZBX_RDDS_PREVIEW_SIZE	100
 
+#define HTTP_STATUS_CODE_OK	200
+
 extern const char	*CONFIG_LOG_FILE;
 
 typedef struct
@@ -1885,6 +1887,69 @@ static void	zbx_set_rddstest_values(const char *ip43, int rtt43, int upd43, cons
 	}
 }
 
+#define HTTP_CODE_PREFIX	"HTTP"
+static int	zbx_get_http_status_code(const char *response, int *http_code)
+{
+	const char	*p, *p_tmp;
+	char		code_buf[4];	/* HTTP code is 3 characters */
+	int		ret = FAIL;
+
+	*code_buf = '\0';
+	p = response;
+
+	do
+	{
+		if ('\r' == *p && '\n' == p[1])
+			p += 2;
+		else if ('\n' == *p)
+			p += 1;
+
+		if (('\r' == *p && '\n' == p[1]) || ('\n' == *p))
+		{
+			/* end of headers */
+			break;
+		}
+
+		while (0 != isblank(*p))
+			p++;
+
+		if (0 == strncmp(HTTP_CODE_PREFIX, p, sizeof(HTTP_CODE_PREFIX) - 1))
+		{
+			/* we got our HTTP header, consider formats: "HTTP/x.y" code or "HTTP code" (old) */
+
+			p += sizeof(HTTP_CODE_PREFIX) - 1;
+
+			while ('\0' != *p && 0 == isspace(*p))
+				p++;
+
+			if ('\0' == *p)	/* in case of broken reply it may end here */
+				break;
+
+			p++;	/* skip space in "HTTP/1.1 200" */
+
+			zbx_strlcpy(code_buf, p, sizeof(code_buf) - 1);
+			code_buf[3] = '\0';
+
+			break;
+		}
+
+		if (NULL == (p_tmp = strstr(p, "\r\n")) && NULL == (p_tmp = strstr(p, "\n")))
+			p = NULL;
+		else
+			p = p_tmp;
+	}
+	while (NULL != p);
+
+	if ('\0' == *code_buf)
+		goto out;
+
+	*http_code = atoi(code_buf);
+
+	ret = SUCCEED;
+out:
+	return ret;
+}
+
 int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, AGENT_RESULT *result)
 {
 	char			domain[ZBX_HOST_BUF_SIZE], *value_str = NULL, *res_ip = NULL, *testprefix = NULL,
@@ -1898,7 +1963,7 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 	size_t			i, items_num = 0;
 	time_t			ts, now;
 	int			rtt43 = ZBX_NO_VALUE, upd43 = ZBX_NO_VALUE, rtt80 = ZBX_NO_VALUE, rtt_limit,
-				ipv4_enabled, ipv6_enabled, rdds_enabled, epp_enabled, ret = SYSINFO_RET_FAIL;
+				ipv4_enabled, ipv6_enabled, rdds_enabled, epp_enabled, ret = SYSINFO_RET_FAIL, http_code;
 
 	/* first read the TLD */
 	if (0 != get_param(params, 1, domain, sizeof(domain)) || '\0' == *domain)
@@ -2144,11 +2209,29 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 	i = zbx_random(ips80.values_num);
 	ip80 = ips80.values[i];
 
-	if (SUCCEED != zbx_tcp_exchange(random_host, ip80, 80, ZBX_DNSTEST_TCP_TIMEOUT, NULL, &rtt80, log_fd, err,
+	zbx_free(answer);
+
+	if (SUCCEED != zbx_tcp_exchange(random_host, ip80, 80, ZBX_DNSTEST_TCP_TIMEOUT, &answer, &rtt80, log_fd, err,
 			sizeof(err)))
 	{
 		rtt80 = ZBX_EC_RDDS80_NOREPLY;
 		zbx_dns_errf(log_fd, "RDDS80 of \"%s\" (%s) failed: %s", random_host, ip80, err);
+		goto out;
+	}
+
+	/* make sure we get HTTP 200 */
+	if (SUCCEED != zbx_get_http_status_code(answer, &http_code))
+	{
+		rtt80 = ZBX_EC_RDDS80_NOHTTPCODE;
+		zbx_dns_errf(log_fd, "RDDS80 of \"%s\" (%s) failed: no HTTP status code in response", random_host, ip80);
+		goto out;
+	}
+
+	if (HTTP_STATUS_CODE_OK != http_code)
+	{
+		rtt80 = ZBX_EC_RDDS80_EHTTPCODE;
+		zbx_dns_errf(log_fd, "RDDS80 of \"%s\" (%s) failed: invalid HTTP status code in response "
+				"(%d, expected %d)", random_host, ip80, http_code, HTTP_STATUS_CODE_OK);
 		goto out;
 	}
 out:

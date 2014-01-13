@@ -42,19 +42,21 @@ use DNSTest;
 my $VALUE_TYPE_AVAIL = 0;
 my $VALUE_TYPE_PERC = 1;
 
-my $ZBX_EC_DNS_NS_NOREPLY  = -200; # no reply from Name Server
-my $ZBX_EC_DNS_NS_ERRREPLY = -201; # invalid reply from Name Server
-my $ZBX_EC_DNS_NS_NOTS     = -202; # no UNIX timestamp
-my $ZBX_EC_DNS_NS_ERRTS    = -203; # invalid UNIX timestamp
-my $ZBX_EC_DNS_NS_ERRSIG   = -204; # DNSSEC error
-my $ZBX_EC_DNS_RES_NOREPLY = -205; # no reply from resolver
-my $ZBX_EC_DNS_RES_NOADBIT = -206; # no AD bit in the answer from resolver
-my $ZBX_EC_RDDS43_NOREPLY  = -200; # no reply from RDDS43 server
-my $ZBX_EC_RDDS43_NONS     = -201; # Whois server returned no NS
-my $ZBX_EC_RDDS43_NOTS     = -202; # no Unix timestamp
-my $ZBX_EC_RDDS43_ERRTS    = -203; # invalid Unix timestamp
-my $ZBX_EC_RDDS80_NOREPLY  = -204; # no reply from RDDS80 server
-my $ZBX_EC_RDDS_ERRRES     = -205; # cannot resolve a Whois server name
+my $ZBX_EC_DNS_NS_NOREPLY    = -200; # no reply from Name Server
+my $ZBX_EC_DNS_NS_ERRREPLY   = -201; # invalid reply from Name Server
+my $ZBX_EC_DNS_NS_NOTS       = -202; # no UNIX timestamp
+my $ZBX_EC_DNS_NS_ERRTS      = -203; # invalid UNIX timestamp
+my $ZBX_EC_DNS_NS_ERRSIG     = -204; # DNSSEC error
+my $ZBX_EC_DNS_RES_NOREPLY   = -205; # no reply from resolver
+my $ZBX_EC_DNS_RES_NOADBIT   = -206; # no AD bit in the answer from resolver
+my $ZBX_EC_RDDS43_NOREPLY    = -200; # no reply from RDDS43 server
+my $ZBX_EC_RDDS43_NONS       = -201; # Whois server returned no NS
+my $ZBX_EC_RDDS43_NOTS       = -202; # no Unix timestamp
+my $ZBX_EC_RDDS43_ERRTS      = -203; # invalid Unix timestamp
+my $ZBX_EC_RDDS80_NOREPLY    = -204; # no reply from RDDS80 server
+my $ZBX_EC_RDDS_ERRRES       = -205; # cannot resolve a Whois host
+my $ZBX_EC_RDDS80_NOHTTPCODE = -206; # no HTTP status code in response from RDDS80 server
+my $ZBX_EC_RDDS80_EHTTPCODE  = -207; # invalid HTTP status code in response from RDDS80 server
 
 my $UPDATE_TIME_STATUS = 1; # create "update time" items enabled (0) or disabled (1)
 
@@ -731,15 +733,17 @@ sub create_items_rdds {
     my $applicationid_43 = get_application_id('RDDS43', $templateid);
     my $applicationid_80 = get_application_id('RDDS80', $templateid);
 
+    my $item_key = 'dnstest.rdds.43.ip[{$DNSTEST.TLD}]';
+
     my $options = {'name' => 'RDDS43 IP of $1',
-                                              'key_'=> 'dnstest.rdds.43.ip[{$DNSTEST.TLD}]',
+                                              'key_'=> $item_key,
                                               'hostid' => $templateid,
                                               'applications' => [$applicationid_43],
                                               'type' => 2, 'value_type' => 1,
                                               'valuemapid' => value_mappings->{'dnstest_rdds_rttudp'}};
     create_item($options);
 
-    my $item_key = 'dnstest.rdds.43.rtt[{$DNSTEST.TLD}]';
+    $item_key = 'dnstest.rdds.43.rtt[{$DNSTEST.TLD}]';
 
     $options = {'name' => 'RDDS43 RTT of $1',
                                               'key_'=> $item_key,
@@ -756,35 +760,28 @@ sub create_items_rdds {
 
     create_trigger($options);
 
-    $options = { 'description' => '6.1.1 Step 5 - Whois server has returned no name servers for RDDS43 on {HOST.NAME} for {$DNSTEST.TLD}',
+    $options = { 'description' => '6.1.1 Step 5 - RDDS43 server has returned no name servers on {HOST.NAME} for {$DNSTEST.TLD}',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS43_NONS,
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => '6.1.1 Step 6 - UNIXTIME is missing in reply from Whois server on {HOST.NAME} for {$DNSTEST.TLD}',
+    $options = { 'description' => '6.1.1 Step 6 - UNIXTIME is missing in reply from RDDS43 server on {HOST.NAME} for {$DNSTEST.TLD}',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS43_NOTS,
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => '6.1.1 Step 6 - Invalid UNIXTIME in reply from Whois server on {HOST.NAME} for {$DNSTEST.TLD}',
+    $options = { 'description' => '6.1.1 Step 6 - Invalid UNIXTIME in reply from RDDS43 server on {HOST.NAME} for {$DNSTEST.TLD}',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS43_ERRTS,
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => '6.1.1 Step 5 - No reply from RDDS80 server on {HOST.NAME} for {$DNSTEST.TLD}',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS43_NOREPLY,
-                        'priority' => '2',
-                };
-
-    create_trigger($options);
-
-    $options = { 'description' => '6.1.1 Step 2 - Cannot resolve a Whois server on {HOST.NAME} for {$DNSTEST.TLD}',
+    $options = { 'description' => '6.1.1 Step 2 - Cannot resolve an RDDS43 host on {HOST.NAME} for {$DNSTEST.TLD}',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS_ERRRES,
                         'priority' => '2',
                 };
@@ -792,8 +789,10 @@ sub create_items_rdds {
     create_trigger($options);
 
     if (defined($OPTS{'epp'})) {
+	$item_key = 'dnstest.rdds.43.upd[{$DNSTEST.TLD}]';
+
 	$options = {'name' => 'RDDS43 update time of $1',
-		    'key_'=> 'dnstest.rdds.43.upd[{$DNSTEST.TLD}]',
+		    'key_'=> $item_key,
 		    'hostid' => $templateid,
 		    'applications' => [$applicationid_43],
 		    'type' => 2, 'value_type' => 0,
@@ -802,23 +801,57 @@ sub create_items_rdds {
 	create_item($options);
     }
 
+    $item_key = 'dnstest.rdds.80.ip[{$DNSTEST.TLD}]';
+
     $options = {'name' => 'RDDS80 IP of $1',
-                                              'key_'=> 'dnstest.rdds.80.ip[{$DNSTEST.TLD}]',
+                                              'key_'=> $item_key,
                                               'hostid' => $templateid,
                                               'applications' => [$applicationid_80],
                                               'type' => 2, 'value_type' => 1};
     create_item($options);
 
+    $item_key = 'dnstest.rdds.80.rtt[{$DNSTEST.TLD}]';
+
     $options = {'name' => 'RDDS80 RTT of $1',
-                                              'key_'=> 'dnstest.rdds.80.rtt[{$DNSTEST.TLD}]',
+                                              'key_'=> $item_key,
                                               'hostid' => $templateid,
                                               'applications' => [$applicationid_80],
                                               'type' => 2, 'value_type' => 0,
                                               'valuemapid' => value_mappings->{'dnstest_rdds_rttudp'}};
     create_item($options);
 
+    $options = { 'description' => '6.1.1 Step 5 - No reply from RDDS80 server on {HOST.NAME} for {$DNSTEST.TLD}',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS80_NOREPLY,
+                        'priority' => '2',
+                };
+
+    create_trigger($options);
+
+    $options = { 'description' => '6.1.1 Step 2 - Cannot resolve an RDDS80 host on {HOST.NAME} for {$DNSTEST.TLD}',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS_ERRRES,
+                        'priority' => '2',
+                };
+
+    create_trigger($options);
+
+    $options = { 'description' => '6.1.1 Step 2 - Cannot get HTTP status code from RDDS80 server on {HOST.NAME} for {$DNSTEST.TLD}',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS80_NOHTTPCODE,
+                        'priority' => '2',
+                };
+
+    create_trigger($options);
+
+    $options = { 'description' => '6.1.1 Step 2 - Invalid HTTP status code from RDDS80 server on {HOST.NAME} for {$DNSTEST.TLD}',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS80_EHTTPCODE,
+                        'priority' => '2',
+                };
+
+    create_trigger($options);
+
+    $item_key = 'dnstest.rdds[{$DNSTEST.TLD},"'.$OPTS{'rdds43-servers'}.'","'.$OPTS{'rdds80-servers'}.'"]';
+
     $options = {'name' => 'Number of working RDDS services (43, 80) of $1',
-                                              'key_'=> 'dnstest.rdds[{$DNSTEST.TLD},"'.$OPTS{'rdds43-servers'}.'","'.$OPTS{'rdds80-servers'}.'"]',
+                                              'key_'=> $item_key,
                                               'hostid' => $templateid,
                                               'applications' => [get_application_id('RDDS', $templateid)],
                                               'type' => 3, 'value_type' => 3,
