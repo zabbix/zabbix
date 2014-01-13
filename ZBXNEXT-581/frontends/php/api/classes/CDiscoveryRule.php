@@ -954,6 +954,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$srcDiscovery = $this->get(array(
 			'itemids' => $discoveryid,
 			'output' => API_OUTPUT_EXTEND,
+			'selectFilter' => array('evaltype', 'formula', 'conditions'),
 			'preservekeys' => true
 		));
 		$srcDiscovery = reset($srcDiscovery);
@@ -971,7 +972,13 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$dstDiscovery = $srcDiscovery;
 		$dstDiscovery['hostid'] = $hostid;
-		unset($dstDiscovery['templateid'], $dstDiscovery['state']);
+		unset($dstDiscovery['templateid'], $dstDiscovery['state'], $dstDiscovery['itemid']);
+		if ($dstDiscovery['filter']) {
+			foreach ($dstDiscovery['filter']['conditions'] as &$condition) {
+				unset($condition['itemid'], $condition['item_conditionid']);
+			}
+			unset($condition);
+		}
 
 		// if this is a plain host, map discovery interfaces
 		if ($srcHost['status'] != HOST_STATUS_TEMPLATE) {
