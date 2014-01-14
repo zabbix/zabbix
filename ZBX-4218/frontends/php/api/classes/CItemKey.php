@@ -27,8 +27,6 @@
  *		echo $itemKey->isValid(); // true
  *		echo $itemKey->getKeyId(); // test.key
  *		print_r($itemKey->parameters()); // array('a', 'b', 'c')
- *
- * @package API
  */
 class CItemKey {
 
