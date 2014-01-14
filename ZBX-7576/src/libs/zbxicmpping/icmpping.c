@@ -305,10 +305,6 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 				if (NULL != strstr(c + 1, "[<-"))
 					continue;
 
-				/* find the second ',' (just before response time)  */
-				/* in fping output for each received response:      */
-				/*      ...": [%d], %d bytes, %s ms"...             */
-
 				index = atoi(c + 1);
 
 				if (0 > index || index >= count)
@@ -319,6 +315,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 				continue;
 			}
 
+			/* process summary line for a host */
 			index = 0;
 			do
 			{
@@ -334,7 +331,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 					host->rcv++;
 				}
 			}
-			while (NULL != (c = strchr(c + 1, ' ')) && ++index < count);
+			while (++index < count && NULL != (c = strchr(c + 1, ' ')));
 
 			host->cnt = count;
 

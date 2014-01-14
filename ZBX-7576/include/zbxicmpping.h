@@ -28,8 +28,7 @@ typedef struct
 	double	max;
 	int	rcv;
 	int	cnt;
-	/* array of individual response statuses: 1 - valid, 0 - timout */
-	char	*status;
+	char	*status;	/* array of individual response statuses: 1 - valid, 0 - timeout */
 }
 ZBX_FPING_HOST;
 
