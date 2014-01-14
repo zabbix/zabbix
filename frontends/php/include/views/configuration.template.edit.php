@@ -393,7 +393,7 @@ foreach ($this->data['linkedTemplates'] as $template) {
 
 	$linkedTemplateTable->addRow(
 		array(
-			$template['name'],
+			new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']),
 			array(
 				new CSubmit('unlink['.$template['templateid'].']', _('Unlink'), null, 'link_menu'),
 				SPACE,
