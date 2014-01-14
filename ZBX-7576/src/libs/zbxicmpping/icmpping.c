@@ -299,7 +299,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 			/* The were two issues with processing only the fping's final status line:  */
 			/*   1) pinging broadcast addresses could have resulted in responses from   */
-			/*      different host, which were counted as the target host responses.    */
+			/*      different hosts, which were counted as the target host responses;   */
 			/*   2) there is a bug in fping (v3.8 at least) where pinging broadcast     */
 			/*      address will result in no individual responses, but the final       */
 			/*      status line might contain a bogus value.                            */
@@ -323,7 +323,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 				continue;
 			}
 
-			/* process summary line for a host */
+			/* process status line for a host */
 			index = 0;
 			do
 			{
