@@ -41,7 +41,8 @@ class CItemKey {
 	private $error = '';
 
 	/**
-	 * Parse key and determine if it is valid
+	 * Parse key and determine if it is valid.
+	 *
 	 * @param string $key
 	 */
 	public function __construct($key) {
@@ -52,7 +53,6 @@ class CItemKey {
 	 * Parse key and parameters and put them into $this->parameters array
 	 *
 	 * @param string $key
-	 * @return void
 	 */
 	private function parseKey($key) {
 		$pos = 0;
@@ -226,7 +226,8 @@ class CItemKey {
 	}
 
 	/**
-	 * Is key valid?
+	 * Returns the result of validation.
+	 *
 	 * @return bool
 	 */
 	public function isValid() {
@@ -234,7 +235,8 @@ class CItemKey {
 	}
 
 	/**
-	 * Get the error if key is invalid
+	 * Returns the error message if key is invalid.
+	 *
 	 * @return string
 	 */
 	public function getError() {
@@ -242,18 +244,20 @@ class CItemKey {
 	}
 
 	/**
-	 * Get the list of key parameters
-	 * @return array
-	 */
-	public function getParameters() {
-		return $this->parameters;
-	}
-
-	/**
-	 * Get the key id (first part of the key)
+	 * Returns the left part of key without parameters.
+	 *
 	 * @return string
 	 */
 	public function getKeyId() {
 		return $this->keyId;
+	}
+
+	/**
+	 * Returns the list of key parameters.
+	 *
+	 * @return array
+	 */
+	public function getParameters() {
+		return $this->parameters;
 	}
 }
