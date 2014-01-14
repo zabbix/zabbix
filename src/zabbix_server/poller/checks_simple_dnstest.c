@@ -31,7 +31,8 @@
 #define ZBX_SEND_BUF_SIZE	128
 #define ZBX_RDDS_PREVIEW_SIZE	100
 
-#define HTTP_STATUS_CODE_OK	200
+#define ZBX_HTTP_RESPONSE_OK	200
+#define ZBX_MAXREDIRS		10L
 
 extern const char	*CONFIG_LOG_FILE;
 
@@ -1887,66 +1888,92 @@ static void	zbx_set_rddstest_values(const char *ip43, int rtt43, int upd43, cons
 	}
 }
 
-#define HTTP_CODE_PREFIX	"HTTP"
-static int	zbx_get_http_status_code(const char *response, int *http_code)
+/* discard the curl output */
+static size_t	curl_devnull(char *ptr, size_t size, size_t nmemb, void *userdata)
 {
-	const char	*p, *p_tmp;
-	char		code_buf[4];	/* HTTP code is 3 characters */
-	int		ret = FAIL;
+	return size * nmemb;
+}
 
-	*code_buf = '\0';
-	p = response;
+static int	zbx_rdds80_test(const char *host, const char *url, int timeout, int *rtt80, char *err, size_t err_size)
+{
+#ifdef HAVE_LIBCURL
+	int			curl_err, opt;
+	CURL			*easyhandle = NULL;
+	char			host_buf[ZBX_HOST_BUF_SIZE];
+	double			total_time;
+	long			response_code;
+	struct curl_slist	*slist = NULL;
+#endif
+	int	ret = FAIL;
 
-	do
+#ifdef HAVE_LIBCURL
+	zbx_snprintf(host_buf, sizeof(host_buf), "Host: %s", host);
+	slist = curl_slist_append(slist, host_buf);
+
+	if (NULL == (easyhandle = curl_easy_init()))
 	{
-		if ('\r' == *p && '\n' == p[1])
-			p += 2;
-		else if ('\n' == *p)
-			p += 1;
-
-		if (('\r' == *p && '\n' == p[1]) || ('\n' == *p))
-		{
-			/* end of headers */
-			break;
-		}
-
-		while (0 != isblank(*p))
-			p++;
-
-		if (0 == strncmp(HTTP_CODE_PREFIX, p, sizeof(HTTP_CODE_PREFIX) - 1))
-		{
-			/* we got our HTTP header, consider formats: "HTTP/x.y" code or "HTTP code" (old) */
-
-			p += sizeof(HTTP_CODE_PREFIX) - 1;
-
-			while ('\0' != *p && 0 == isspace(*p))
-				p++;
-
-			if ('\0' == *p)	/* in case of broken reply it may end here */
-				break;
-
-			p++;	/* skip space in "HTTP/1.1 200" */
-
-			zbx_strlcpy(code_buf, p, sizeof(code_buf) - 1);
-			code_buf[3] = '\0';
-
-			break;
-		}
-
-		if (NULL == (p_tmp = strstr(p, "\r\n")) && NULL == (p_tmp = strstr(p, "\n")))
-			p = NULL;
-		else
-			p = p_tmp;
-	}
-	while (NULL != p);
-
-	if ('\0' == *code_buf)
+		*rtt80 = ZBX_EC_INTERNAL;
+		zbx_strlcpy(err, "could not init cURL library", err_size);
 		goto out;
+	}
 
-	*http_code = atoi(code_buf);
+	if (CURLE_OK != (curl_err = curl_easy_setopt(easyhandle, opt = CURLOPT_FOLLOWLOCATION, 1L)) ||
+			CURLE_OK != (curl_err = curl_easy_setopt(easyhandle, opt = CURLOPT_MAXREDIRS, ZBX_MAXREDIRS)) ||
+			CURLE_OK != (curl_err = curl_easy_setopt(easyhandle, opt = CURLOPT_URL, url)) ||
+			CURLE_OK != (curl_err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT, (long)timeout)) ||
+			CURLE_OK != (curl_err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPHEADER, slist)) ||
+			CURLE_OK != (curl_err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYPEER, 0L)) ||
+			CURLE_OK != (curl_err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0L)) ||
+			CURLE_OK != (curl_err = curl_easy_setopt(easyhandle, opt = CURLOPT_WRITEFUNCTION, curl_devnull)))
+
+	{
+		*rtt80 = ZBX_EC_INTERNAL;
+		zbx_snprintf(err, err_size, "cannot set cURL option [%d] (%s)", opt, curl_easy_strerror(curl_err));
+		goto out;
+	}
+
+	if (CURLE_OK != (curl_err = curl_easy_perform(easyhandle)))
+	{
+		*rtt80 = ZBX_EC_RDDS80_NOREPLY;
+		zbx_strlcpy(err, curl_easy_strerror(curl_err), err_size);
+		goto out;
+	}
+
+	if (CURLE_OK != (curl_err = curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE, &response_code)))
+	{
+		*rtt80 = ZBX_EC_RDDS80_NOHTTPCODE;
+		zbx_snprintf(err, err_size, "cannot get HTTP response code (%s)", curl_easy_strerror(curl_err));
+		goto out;
+	}
+
+	if (ZBX_HTTP_RESPONSE_OK != (int)response_code)
+	{
+		*rtt80 = ZBX_EC_RDDS80_EHTTPCODE;
+		zbx_snprintf(err, err_size, "invalid HTTP response code (%d), expected %d", (int)response_code,
+				ZBX_HTTP_RESPONSE_OK);
+		goto out;
+	}
+
+	if (CURLE_OK != (curl_err = curl_easy_getinfo(easyhandle, CURLINFO_TOTAL_TIME, &total_time)))
+	{
+		*rtt80 = ZBX_EC_INTERNAL;
+		zbx_snprintf(err, err_size, "cannot get HTTP request time (%s)", curl_easy_strerror(curl_err));
+		goto out;
+	}
+
+	*rtt80 = total_time * 1000;	/* expected in ms */
 
 	ret = SUCCEED;
 out:
+	if (NULL != slist)
+		curl_slist_free_all(slist);
+
+	if (NULL != easyhandle)
+		curl_easy_cleanup(easyhandle);
+#else
+	*rtt80 = ZBX_EC_INTERNAL;
+	zbx_strlcpy(err, "zabbix is not compiled with libcurl support (--with-libcurl)", err_size);
+#endif
 	return ret;
 }
 
@@ -2209,29 +2236,11 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 	i = zbx_random(ips80.values_num);
 	ip80 = ips80.values[i];
 
-	zbx_free(answer);
+	zbx_snprintf(testname, sizeof(testname), "http://%s", ip80);
 
-	if (SUCCEED != zbx_tcp_exchange(random_host, ip80, 80, ZBX_DNSTEST_TCP_TIMEOUT, &answer, &rtt80, log_fd, err,
-			sizeof(err)))
+	if (SUCCEED != zbx_rdds80_test(random_host, testname, ZBX_DNSTEST_TCP_TIMEOUT, &rtt80, err, sizeof(err)))
 	{
-		rtt80 = ZBX_EC_RDDS80_NOREPLY;
 		zbx_dns_errf(log_fd, "RDDS80 of \"%s\" (%s) failed: %s", random_host, ip80, err);
-		goto out;
-	}
-
-	/* make sure we get HTTP 200 */
-	if (SUCCEED != zbx_get_http_status_code(answer, &http_code))
-	{
-		rtt80 = ZBX_EC_RDDS80_NOHTTPCODE;
-		zbx_dns_errf(log_fd, "RDDS80 of \"%s\" (%s) failed: no HTTP status code in response", random_host, ip80);
-		goto out;
-	}
-
-	if (HTTP_STATUS_CODE_OK != http_code)
-	{
-		rtt80 = ZBX_EC_RDDS80_EHTTPCODE;
-		zbx_dns_errf(log_fd, "RDDS80 of \"%s\" (%s) failed: invalid HTTP status code in response "
-				"(%d, expected %d)", random_host, ip80, http_code, HTTP_STATUS_CODE_OK);
 		goto out;
 	}
 out:

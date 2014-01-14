@@ -55,8 +55,8 @@ my $ZBX_EC_RDDS43_NOTS       = -202; # no Unix timestamp
 my $ZBX_EC_RDDS43_ERRTS      = -203; # invalid Unix timestamp
 my $ZBX_EC_RDDS80_NOREPLY    = -204; # no reply from RDDS80 server
 my $ZBX_EC_RDDS_ERRRES       = -205; # cannot resolve a Whois host
-my $ZBX_EC_RDDS80_NOHTTPCODE = -206; # no HTTP status code in response from RDDS80 server
-my $ZBX_EC_RDDS80_EHTTPCODE  = -207; # invalid HTTP status code in response from RDDS80 server
+my $ZBX_EC_RDDS80_NOHTTPCODE = -206; # no HTTP response code in response from RDDS80 server
+my $ZBX_EC_RDDS80_EHTTPCODE  = -207; # invalid HTTP response code in response from RDDS80 server
 
 my $UPDATE_TIME_STATUS = 1; # create "update time" items enabled (0) or disabled (1)
 
@@ -834,14 +834,14 @@ sub create_items_rdds {
 
     create_trigger($options);
 
-    $options = { 'description' => '6.1.1 Step 2 - Cannot get HTTP status code from RDDS80 server on {HOST.NAME} for {$DNSTEST.TLD}',
+    $options = { 'description' => '6.1.1 Step 2 - Cannot get HTTP response code from RDDS80 server on {HOST.NAME} for {$DNSTEST.TLD}',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS80_NOHTTPCODE,
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => '6.1.1 Step 2 - Invalid HTTP status code from RDDS80 server on {HOST.NAME} for {$DNSTEST.TLD}',
+    $options = { 'description' => '6.1.1 Step 2 - Invalid HTTP response code from RDDS80 server on {HOST.NAME} for {$DNSTEST.TLD}',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS80_EHTTPCODE,
                         'priority' => '2',
                 };
