@@ -86,7 +86,7 @@ class CItemKey {
 		while (isset($key[$pos])) {
 			if ($level == 0) {
 				// first square bracket + Zapcat compatibility
-				if ($state == 1 && $key[$pos] == '[') {
+				if ($state == self::STATE_END && $key[$pos] == '[') {
 					$state = self::STATE_NEW;
 				}
 				else {
