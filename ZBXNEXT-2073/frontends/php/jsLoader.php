@@ -100,17 +100,11 @@ $tranStrings = array(
 	'functions.js' => array(
 		'Cancel' => _('Cancel'),
 		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),
-		'Events' => _('Events'),
 		'Execute' => _('Execute'),
 		'Execution confirmation' => _('Execution confirmation'),
-		'History' => _('History'),
-		'History and simple graphs' => _('History and simple graphs'),
-		'S_CREATE_LOG_TRIGGER' => _('Create trigger'),
 		'S_DELETE' => _('Delete'),
 		'S_DELETE_KEYWORD_Q' => _('Delete keyword?'),
-		'S_DELETE_EXPRESSION_Q' => _('Delete expression?'),
-		'Simple graphs' => _('Simple graphs'),
-		'Triggers' => _('Triggers')
+		'S_DELETE_EXPRESSION_Q' => _('Delete expression?')
 	),
 	'class.calendar.js' => array(
 		'S_JANUARY' => _('January'),
@@ -165,15 +159,13 @@ $tranStrings = array(
 		'S_UNMUTE' => _('Unmute'),
 		'S_MESSAGES' => _('Messages'),
 		'S_CLEAR' => _('Clear'),
-		'S_SNOOZE' => _('Snooze'),
-		'S_MOVE' => _('Move')
+		'S_SNOOZE' => _('Snooze')
 	),
 	'class.cookie.js' => array(
 		'S_MAX_COOKIE_SIZE_REACHED' => _('We are sorry, the maximum possible number of elements to remember has been reached.')
 	),
 	'main.js' => array(
-		'S_CLOSE' => _('Close'),
-		'S_NO_ELEMENTS_SELECTED' => _('No elements selected!')
+		'S_CLOSE' => _('Close')
 	),
 	'multiselect.js' => array(
 		'No matches found' => _('No matches found'),
@@ -246,6 +238,7 @@ if (empty($_GET['files'])) {
 		'menupopup.js',
 		'init.js'
 	);
+
 	// load frontend messaging only for some pages
 	if (isset($_GET['showGuiMessaging']) && $_GET['showGuiMessaging']) {
 		$files[] = 'class.cmessages.js';

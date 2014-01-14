@@ -1013,12 +1013,12 @@ function changeWidgetState(obj, widgetId) {
 		state = 0;
 
 	if (css === 'arrowdown') {
-		jQuery('.body', widgetObj).fadeOut(50);
-		jQuery('.footer', widgetObj).fadeOut(50);
+		jQuery('.body', widgetObj).slideUp(50);
+		jQuery('.footer', widgetObj).slideUp(50);
 	}
 	else {
-		jQuery('.body', widgetObj).fadeIn(100);
-		jQuery('.footer', widgetObj).fadeIn(100);
+		jQuery('.body', widgetObj).slideDown(50);
+		jQuery('.footer', widgetObj).slideDown(50);
 
 		state = 1;
 	}

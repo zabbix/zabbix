@@ -500,7 +500,7 @@ foreach ($applications as $appid => $dbApp) {
 		$hostName = new CSpan($host['name'],
 			'link_menu menu-host'.(($host['status'] == HOST_STATUS_NOT_MONITORED) ? ' not-monitored' : '')
 		);
-		$hostName->setMenuPopup(getMenuPopupHost($host, $hostScripts[$host['hostid']]));
+		$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
 	}
 
 	// add toggle row
@@ -668,7 +668,7 @@ foreach ($hosts as $hostId => $dbHost) {
 		$hostName = new CSpan($host['name'],
 			'link_menu menu-host'.(($host['status'] == HOST_STATUS_NOT_MONITORED) ? ' not-monitored' : '')
 		);
-		$hostName->setMenuPopup(getMenuPopupHost($host, $hostScripts[$host['hostid']]));
+		$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
 	}
 
 	// add toggle row

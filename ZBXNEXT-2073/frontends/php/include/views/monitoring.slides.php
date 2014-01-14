@@ -42,7 +42,7 @@ if ($this->data['slideshows']) {
 	$refreshIcon = new CIcon(_('Menu'), 'iconmenu');
 
 	if ($this->data['screen']) {
-		$refreshIcon->setMenuPopup(getMenuPopupRefresh(
+		$refreshIcon->setMenuPopup(CMenuPopupHelper::getRefresh(
 			WIDGET_SLIDESHOW,
 			'x'.$this->data['refreshMultiplier'],
 			true,
@@ -125,6 +125,6 @@ $slideshowRefreshParams = array(
 		)
 	)
 );
-zbx_add_post_js('initPMaster("slideshows", '.zbx_jsvalue($slideshowRefreshParams).');');
+zbx_add_post_js('initPMaster("slideshows", '.CJs::encodeJson($slideshowRefreshParams).');');
 
 return $slideshowWidget;

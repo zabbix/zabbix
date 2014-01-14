@@ -702,7 +702,7 @@ else {
 				)));
 
 				$triggerDescription = new CSpan($description, 'pointer link_menu');
-				$triggerDescription->setMenuPopup(getMenuPopupTrigger($trigger, $triggerItems, null, $event['clock']));
+				$triggerDescription->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $triggerItems, null, $event['clock']));
 
 				// acknowledge
 				$ack = getEventAckState($event, true);
@@ -727,7 +727,7 @@ else {
 
 				if ($_REQUEST['hostid'] == 0) {
 					$hostName = new CSpan($host['name'], 'link_menu');
-					$hostName->setMenuPopup(getMenuPopupHost($host, $scripts[$host['hostid']]));
+					$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
 				}
 
 				// action

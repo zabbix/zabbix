@@ -29,6 +29,13 @@ class CUIWidget extends CDiv {
 	public $id;
 
 	/**
+	 * Expand/collapse widget.
+	 *
+	 * @var CDiv
+	 */
+	public $state;
+
+	/**
 	 * Header div.
 	 *
 	 * @var CDiv
@@ -48,13 +55,6 @@ class CUIWidget extends CDiv {
 	 * @var CDiv
 	 */
 	private $footer;
-
-	/**
-	 * Expand/collapse widget.
-	 *
-	 * @var CDiv
-	 */
-	private $state;
 
 	/**
 	 * Construct widget.
@@ -82,15 +82,6 @@ class CUIWidget extends CDiv {
 		if ($item !== null) {
 			$this->body[] = $item;
 		}
-	}
-
-	/**
-	 * Expand/collapse widget state.
-	 *
-	 * @param bool $state
-	 */
-	public function setState($state) {
-		$this->state = $state;
 	}
 
 	/**

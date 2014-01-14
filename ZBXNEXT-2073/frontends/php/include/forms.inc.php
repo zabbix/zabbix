@@ -1493,7 +1493,7 @@
 				$data['expression_field_readonly'] = 'yes';
 				$data['expression_field_params'] = 'this.form.elements["'.$data['expression_field_name'].'"].value';
 				$data['expression_macro_button'] = new CButton('insert_macro', _('Insert macro'), null, 'formlist');
-				$data['expression_macro_button']->setMenuPopup(getMenuPopupTriggerMacro());
+				$data['expression_macro_button']->setMenuPopup(CMenuPopupHelper::getTriggerMacro());
 
 				if ($data['limited'] == 'yes') {
 					$data['expression_macro_button']->setAttribute('disabled', 'disabled');

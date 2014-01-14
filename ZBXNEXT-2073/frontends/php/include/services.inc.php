@@ -102,7 +102,7 @@ function get_service_childs($serviceid, $soft = 0) {
 function createServiceConfigurationTree(array $services, &$tree, array $parentService = array(), array $service = array(), array $dependency = array()) {
 	if (!$service) {
 		$caption = new CLink(_('root'), '#');
-		$caption->setMenuPopup(getMenuPopupServiceConfiguration(null, _('root'), false));
+		$caption->setMenuPopup(CMenuPopupHelper::getServiceConfiguration(null, _('root'), false));
 
 		$serviceNode = array(
 			'id' => 0,
@@ -144,7 +144,7 @@ function createServiceConfigurationTree(array $services, &$tree, array $parentSe
 			}
 		}
 
-		$caption->setMenuPopup(getMenuPopupServiceConfiguration($service['serviceid'], $service['name'], $deletable));
+		$caption->setMenuPopup(CMenuPopupHelper::getServiceConfiguration($service['serviceid'], $service['name'], $deletable));
 
 		$serviceNode = array(
 			'id' => $service['serviceid'],

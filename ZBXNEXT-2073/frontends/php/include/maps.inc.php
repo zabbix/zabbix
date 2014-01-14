@@ -176,7 +176,7 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 
 		order_result($elem['urls'], 'name');
 
-		$area->setMenuPopup(getMenuPopupMap($hostId, $scripts, $gotos, $elem['urls']));
+		$area->setMenuPopup(CMenuPopupHelper::getMap($hostId, $scripts, $gotos, $elem['urls']));
 
 		$actionMap->addItem($area);
 	}

@@ -583,7 +583,7 @@ foreach ($triggers as $trigger) {
 	}
 
 	$description = new CSpan($trigger['description'], 'link_menu');
-	$description->setMenuPopup(getMenuPopupTrigger($trigger, $triggerItems));
+	$description->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $triggerItems));
 
 	if ($_REQUEST['show_details']) {
 		$description = array($description, BR(), explode_exp($trigger['expression'], true, true));
@@ -641,7 +641,7 @@ foreach ($triggers as $trigger) {
 		}
 
 		$hostName = new CSpan($triggerHost['name'], 'link_menu');
-		$hostName->setMenuPopup(getMenuPopupHost($hosts[$triggerHost['hostid']], $scripts));
+		$hostName->setMenuPopup(CMenuPopupHelper::getHost($hosts[$triggerHost['hostid']], $scripts));
 
 		$hostDiv = new CDiv($hostName);
 

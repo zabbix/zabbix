@@ -215,11 +215,14 @@ foreach ($this->data['items'] as $item) {
 				}
 			}
 
-			$triggers[$trigger['triggerid']] = $trigger['description'];
+			$triggers[] = array(
+				'id' => $trigger['triggerid'],
+				'name' => $trigger['description']
+			);
 		}
 
 		$menuIcon = new CIcon(_('Menu'), 'iconmenu_b');
-		$menuIcon->setMenuPopup(getMenuPopupTriggerLog($item['itemid'], $item['name_expanded'], $triggers));
+		$menuIcon->setMenuPopup(CMenuPopupHelper::getTriggerLog($item['itemid'], $item['name_expanded'], $triggers));
 	}
 	else {
 		$menuIcon = SPACE;

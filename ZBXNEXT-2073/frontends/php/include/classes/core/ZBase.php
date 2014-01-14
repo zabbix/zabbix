@@ -79,7 +79,6 @@ class ZBase {
 		require_once $this->getRootDir().'/include/gettextwrapper.inc.php';
 		require_once $this->getRootDir().'/include/defines.inc.php';
 		require_once $this->getRootDir().'/include/func.inc.php';
-		require_once $this->getRootDir().'/include/menupopup.inc.php';
 		require_once $this->getRootDir().'/include/html.inc.php';
 		require_once $this->getRootDir().'/include/perm.inc.php';
 		require_once $this->getRootDir().'/include/audit.inc.php';
