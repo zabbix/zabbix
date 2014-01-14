@@ -742,6 +742,7 @@ New features:
 A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7634] removed sid from trigger URL in Monitoring->Triggers
 ...GI..PS. [ZBX-5526] removed checking for PosgreSQL server version and disabled nonstandard use of escape strings in order to support versions newer than 8.1 (igors)
 ...G...... [ZBX-7414] added description to HostnameItem that UserParameters and aliases are not supported (igors)
 ..F....... [ZBX-7508] fixed import map with LLD triggers (Eduard)
