@@ -83,7 +83,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	size_t		offset;
 	ZBX_FPING_HOST	*host;
 	double		sec;
-	int 		i, ret = NOTSUPPORTED;
+	int 		i, ret = NOTSUPPORTED, index;
 
 #ifdef HAVE_IPV6
 	int		family;
@@ -258,6 +258,12 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	}
 	else
 	{
+		for (i = 0; i < hosts_count; i++)
+		{
+			hosts[i].status = zbx_malloc(NULL, count);
+			memset(hosts[i].status, 0, count);
+		}
+
 		do
 		{
 			zbx_rtrim(tmp, "\n");
@@ -302,27 +308,42 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 				/* find the second ',' (just before response time)  */
 				/* in fping output for each received response:      */
 				/*      ...": [%d], %d bytes, %s ms"...             */
-				if (NULL == (c = strchr(c, ',')) || NULL == (c = strchr(c + 1, ',')))
+
+				index = atoi(c + 1);
+
+				if (0 > index || index >= count)
 					continue;
 
-				sec = atof(c + 2) / 1000; /* convert ms to seconds */
-
-				if (0 == host->rcv || host->min > sec)
-					host->min = sec;
-				if (0 == host->rcv || host->max < sec)
-					host->max = sec;
-				host->avg = (host->avg * host->rcv + sec) / (host->rcv + 1);
-				host->rcv++;
+				host->status[index] = 1;
 
 				continue;
 			}
 
-			/* process summary line for a host */
+			index = 0;
+			do
+			{
+				if (1 == host->status[index])
+				{
+					sec = atof(c) / 1000; /* convert ms to seconds */
+
+					if (0 == host->rcv || host->min > sec)
+						host->min = sec;
+					if (0 == host->rcv || host->max < sec)
+						host->max = sec;
+					host->avg = (host->avg * host->rcv + sec) / (host->rcv + 1);
+					host->rcv++;
+				}
+			}
+			while (NULL != (c = strchr(c + 1, ' ')) && ++index < count);
+
 			host->cnt = count;
 
 			ret = SUCCEED;
 		}
 		while (NULL != fgets(tmp, sizeof(tmp), f));
+
+		for (i = 0; i < hosts_count; i++)
+			zbx_free(hosts[i].status);
 	}
 	pclose(f);
 
