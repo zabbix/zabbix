@@ -21,6 +21,7 @@ New features:
 A.F....... [ZBX-1357] updated American English, French, Hungarian, Italian, Japanese, Russian, Slovak and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-7576] when pinging a broadcast address ignore responses from other addresses (wiper)
 ..F....... [ZBX-7632] allow to add favourite graph from disable host (Eduard)
 ..F....... [ZBX-7634] removed sid from trigger URL in Monitoring->Triggers (Oleg)
 ...GI..PS. [ZBX-5526] removed checking for PosgreSQL server version and disabled nonstandard use of escape strings in order to support versions newer than 8.1 (igors)
