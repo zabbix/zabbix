@@ -50,7 +50,39 @@ class CItemKey {
 	}
 
 	/**
-	 * Parse key and parameters and put them into $this->parameters array
+	 * Returns an error message depending on input parameters.
+	 *
+	 * @param string $key
+	 * @param int $pos
+	 *
+	 * @return string
+	 */
+	private function errorMessage($key, $pos)
+	{
+		if ($pos == 0 && !isset($key[$pos])) {
+			return _('key is empty');
+		}
+
+		/* calculating position in characters */
+		for ($i = 0, $pos_utf8 = 0; $i < $pos; $i++) {
+			if (0x80 != (0xc0 & ord($key[$i]))) {
+				$pos_utf8++;
+			}
+		}
+
+		/* calculating starting position in characters for a chunk */
+		$from = ($pos_utf8 <= 5) ? 0 : $pos_utf8 - 5;
+
+		/* creating a chunk */
+		$chunk = $from ? '... ' : '';
+		$chunk .= zbx_substr($key, $from, 10);
+		$chunk .= zbx_strlen($key) > $from + 10 ? ' ...' : '';
+
+		return _s('incorrect syntax near "%1$s" at position %2$s', $chunk, $pos_utf8 + 1);
+	}
+
+	/**
+	 * Parse key and parameters and put them into $this->parameters array.
 	 *
 	 * @param string $key
 	 */
@@ -68,14 +100,14 @@ class CItemKey {
 		// checking if key is empty
 		if ($pos == 0) {
 			$this->isValid = false;
-			$this->error = _('key is empty');
+			$this->error = $this->errorMessage($key, $pos);
 			return;
 		}
 
 		// invalid symbol instead of '[', which would be the beginning of params
 		if (isset($key[$pos]) && $key[$pos] != '[') {
 			$this->isValid = false;
-			$this->error = _s('error at position %1$s', $pos);
+			$this->error = $this->errorMessage($key, $pos);
 			return;
 		}
 
@@ -221,7 +253,7 @@ class CItemKey {
 
 		if ($pos == 0 || isset($key[$pos]) || $level != 0) {
 			$this->isValid = false;
-			$this->error = _s('error at position %1$s', $pos);
+			$this->error = $this->errorMessage($key, $pos);
 		}
 	}
 
