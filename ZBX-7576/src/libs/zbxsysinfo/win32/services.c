@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -239,13 +239,12 @@ int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 			{
 				if (SUCCEED == check_service_state(h_srv, service_state))
 				{
-					if (NULL != exclude && '\0' != *exclude)
-					{
-						utf8 = zbx_unicode_to_utf8(ssp[i].lpServiceName);
-						if (FAIL == str_in_list(exclude, utf8, ','))
-							buf = zbx_strdcatf(buf, "%s\n", utf8);
-						zbx_free(utf8);
-					}
+					utf8 = zbx_unicode_to_utf8(ssp[i].lpServiceName);
+
+					if (NULL == exclude || FAIL == str_in_list(exclude, utf8, ','))
+						buf = zbx_strdcatf(buf, "%s\n", utf8);
+
+					zbx_free(utf8);
 				}
 			}
 
@@ -267,7 +266,7 @@ int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 	CloseServiceHandle(h_mgr);
 
 	if (NULL == buf)
-		buf = strdup("0");
+		buf = zbx_strdup(buf, "0");
 
 	SET_STR_RESULT(result, buf);
 
