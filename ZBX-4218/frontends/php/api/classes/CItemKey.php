@@ -30,15 +30,15 @@
  */
 class CItemKey {
 
-	private $keyId = ''; // main part of the key (for 'key[1, 2, 3]' key id would be 'key')
-	private $parameters = array();
-	private $isValid = true;
-	private $error = '';
-
 	const STATE_NEW = 0;
 	const STATE_END = 1;
 	const STATE_UNQUOTED = 2;
 	const STATE_QUOTED = 3;
+
+	private $keyId = ''; // main part of the key (for 'key[1, 2, 3]' key id would be 'key')
+	private $parameters = array();
+	private $isValid = true;
+	private $error = '';
 
 	/**
 	 * Parse key and determine if it is valid
