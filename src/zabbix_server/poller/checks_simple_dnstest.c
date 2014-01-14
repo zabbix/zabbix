@@ -1907,13 +1907,18 @@ static int	zbx_rdds80_test(const char *host, const char *url, int timeout, int *
 	int	ret = FAIL;
 
 #ifdef HAVE_LIBCURL
-	zbx_snprintf(host_buf, sizeof(host_buf), "Host: %s", host);
-	slist = curl_slist_append(slist, host_buf);
-
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
 		*rtt80 = ZBX_EC_INTERNAL;
-		zbx_strlcpy(err, "could not init cURL library", err_size);
+		zbx_strlcpy(err, "cannot init cURL library", err_size);
+		goto out;
+	}
+
+	zbx_snprintf(host_buf, sizeof(host_buf), "Host: %s", host);
+	if (NULL == (slist = curl_slist_append(slist, host_buf)))
+	{
+		*rtt80 = ZBX_EC_INTERNAL;
+		zbx_strlcpy(err, "cannot generate cURL list of HTTP headers", err_size);
 		goto out;
 	}
 
