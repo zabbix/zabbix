@@ -297,7 +297,14 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 			c += 3;
 
-			/* process individual ping results */
+			/* The were two issues with processing only the fping's final status line:  */
+			/*   1) pinging broadcast addresses could have resulted in responses from   */
+			/*      different host, which were counted as the target host responses.    */
+			/*   2) there is a bug in fping (v3.8 at least) where pinging broadcast     */
+			/*      address will result in no individual responses, but the final       */
+			/*      status line might contain a bogus value.                            */
+			/* Because of the above issues we must monitor the individual responses     */
+			/* and mark the valid ones.                                                 */
 			if ('[' == *c)
 			{
 				/* Fping appends response source address in format '[<- 10.3.0.10]' */
@@ -305,6 +312,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 				if (NULL != strstr(c + 1, "[<-"))
 					continue;
 
+				/* get the index of individual ping response */
 				index = atoi(c + 1);
 
 				if (0 > index || index >= count)
