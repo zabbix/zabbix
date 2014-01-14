@@ -155,13 +155,6 @@ int	daemon_start(int allow_root, const char *user)
 
 			if ('\0' != *user)
 			{
-				if (0 == strcmp(user, "root"))
-				{
-					zbx_error("option User does not accept value \"root\"; use AllowRoot=1 "
-							"by itself to run as root");
-					exit(FAIL);
-				}
-
 				pwd = getpwnam(user);
 
 				if (NULL == pwd)
@@ -169,6 +162,12 @@ int	daemon_start(int allow_root, const char *user)
 					zbx_error("user '%s' does not exist", user);
 					zbx_error("cannot run as root!");
 					exit(FAIL);
+				}
+
+				if (0 == pwd->pw_uid)
+				{
+					zbx_error("option User does not allow changing privileges to a superuser "
+							"account; user AllowRoot=1 by itself to run as root");
 				}
 
 				if (-1 == setgid(pwd->pw_gid))
@@ -203,35 +202,6 @@ int	daemon_start(int allow_root, const char *user)
 			{
 				zbx_error("empty \"User\" parameter passed");
 				zbx_error("cannot run as root!");
-				exit(FAIL);
-			}
-		}
-	}
-	else
-	{
-		if (NULL != user)
-		{
-			if ('\0' != *user)
-			{
-				pwd = getpwnam(user);
-
-				if (NULL == pwd)
-				{
-					zbx_error("user %s does not exist", user);
-					exit(FAIL);
-				}
-				else
-				{
-					if (pwd->pw_uid != getuid())
-					{
-						zbx_error("cannot setuid to %s: insufficient privileges", user);
-						exit(FAIL);
-					}
-				}
-			}
-			else
-			{
-				zbx_error("empty \"User\" parameter passed");
 				exit(FAIL);
 			}
 		}
