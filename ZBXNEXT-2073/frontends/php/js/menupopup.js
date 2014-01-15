@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,25 +29,23 @@
 function getMenuPopupFavouriteGraphs(options) {
 	var sections = [];
 
-	if (typeof options['graphs'] !== 'undefined') {
-		sections[sections.length] = {
-			type: 'favourite',
-			title: t('Favourite graphs'),
-			addParams: 'popup.php?srctbl=graphs&srcfld1=graphid&reference=graphid&multiselect=1&real_hosts=1',
-			favouriteObj: 'graphid',
-			data: options.graphs
-		};
+	if (typeof options.graphs !== 'undefined') {
+		sections[sections.length] = getMenuPopupFavouriteData(
+			t('Favourite graphs'),
+			options.graphs,
+			'graphid',
+			'popup.php?srctbl=graphs&srcfld1=graphid&reference=graphid&multiselect=1&real_hosts=1'
+		);
 	}
 
-	if (typeof options['simpleGraphs'] !== 'undefined') {
-		sections[sections.length] = {
-			type: 'favourite',
-			title: t('Favourite simple graphs'),
-			addParams: 'popup.php?srctbl=items&srcfld1=itemid&reference=itemid&multiselect=1&numeric=1&templated=0'
-				+ '&with_simple_graph_items=1&real_hosts=1',
-			favouriteObj: 'itemid',
-			data: options.simpleGraphs
-		};
+	if (typeof options.simpleGraphs !== 'undefined') {
+		sections[sections.length] = getMenuPopupFavouriteData(
+			t('Favourite simple graphs'),
+			options.simpleGraphs,
+			'itemid',
+			'popup.php?srctbl=items&srcfld1=itemid&reference=itemid&multiselect=1&numeric=1&templated=0'
+				+ '&with_simple_graph_items=1&real_hosts=1'
+		);
 	}
 
 	return sections;
@@ -61,13 +59,12 @@ function getMenuPopupFavouriteGraphs(options) {
  * @return array
  */
 function getMenuPopupFavouriteMaps(options) {
-	return [{
-		type: 'favourite',
-		title: t('Favourite maps'),
-		addParams: 'popup.php?srctbl=sysmaps&srcfld1=sysmapid&reference=sysmapid&multiselect=1',
-		favouriteObj: 'sysmapid',
-		data: options.maps
-	}];
+	return [getMenuPopupFavouriteData(
+		t('Favourite maps'),
+		options.maps,
+		'sysmapid',
+		'popup.php?srctbl=sysmaps&srcfld1=sysmapid&reference=sysmapid&multiselect=1'
+	)];
 }
 
 /**
@@ -81,27 +78,76 @@ function getMenuPopupFavouriteMaps(options) {
 function getMenuPopupFavouriteScreens(options) {
 	var sections = [];
 
-	if (typeof options['screens'] !== 'undefined') {
-		sections[sections.length] = {
-			type: 'favourite',
-			title: t('Favourite screens'),
-			addParams: 'popup.php?srctbl=screens&srcfld1=screenid&reference=screenid&multiselect=1',
-			favouriteObj: 'screenid',
-			data: options.screens
-		};
+	if (typeof options.screens !== 'undefined') {
+		sections[sections.length] = getMenuPopupFavouriteData(
+			t('Favourite screens'),
+			options.screens,
+			'screenid',
+			'popup.php?srctbl=screens&srcfld1=screenid&reference=screenid&multiselect=1'
+		);
 	}
 
-	if (typeof options['slideshows'] !== 'undefined') {
-		sections[sections.length] = {
-			type: 'favourite',
-			title: t('Favourite slide shows'),
-			addParams: 'popup.php?srctbl=slides&srcfld1=slideshowid&reference=slideshowid&multiselect=1',
-			favouriteObj: 'slideshowid',
-			data: options.slideshows
-		};
+	if (typeof options.slideshows !== 'undefined') {
+		sections[sections.length] = getMenuPopupFavouriteData(
+			t('Favourite slide shows'),
+			options.slideshows,
+			'slideshowid',
+			'popup.php?srctbl=slides&srcfld1=slideshowid&reference=slideshowid&multiselect=1'
+		);
 	}
 
 	return sections;
+}
+
+function getMenuPopupFavouriteData(label, data, favouriteObj, addParams) {
+	var removeItems = [];
+
+	if (objectSize(data) > 0) {
+		jQuery.each(data, function(i, item) {
+			removeItems[i] = {
+				label: item.label,
+				clickCallback: function() {
+					var obj = jQuery(this);
+
+					rm4favorites(favouriteObj, item.id);
+					obj.remove();
+
+					obj.closest('.menuPopup').fadeOut(100);
+				}
+			};
+		});
+	}
+
+	return {
+		label: label,
+		items: [
+			{
+				label: t('Add'),
+				clickCallback: function() {
+					PopUp(addParams, 800, 450);
+
+					jQuery(this).closest('.menuPopup').fadeOut(100);
+				}
+			},
+			{
+				label: t('Remove'),
+				css: (removeItems.length == 0) ? 'ui-state-disabled' : '',
+				data: {
+					id: 'remove'
+				},
+				items: removeItems
+			},
+			{
+				label: t('Remove all'),
+				css: (removeItems.length == 0) ? 'ui-state-disabled' : '',
+				clickCallback: function() {
+					rm4favorites(favouriteObj, 0);
+
+					jQuery(this).closest('.menuPopup').fadeOut(100);
+				}
+			}
+		]
+	};
 }
 
 /**
@@ -140,9 +186,8 @@ function getMenuPopupHistory(options) {
 	};
 
 	return [{
-		type: 'links',
-		title: t('History'),
-		data: items
+		label: t('History'),
+		items: items
 	}];
 }
 
@@ -164,27 +209,9 @@ function getMenuPopupHost(options) {
 
 	// scripts
 	if (typeof options.scripts !== 'undefined') {
-		var menuTree = {};
-
-		for (var key in options.scripts) {
-			var script = options.scripts[key];
-
-			if (typeof script.scriptid !== 'undefined') {
-				var items = splitPath(script.name),
-					name = (items.length > 0) ? items.pop() : script.name;
-
-				appendTreeItem(menuTree, name, items, {
-					hostId: options.hostid,
-					scriptId: script.scriptid,
-					confirmation: script.confirmation
-				});
-			}
-		}
-
 		sections[sections.length] = {
-			type: 'scripts',
-			title: t('Scripts'),
-			data: menuTree
+			label: t('Scripts'),
+			items: getMenuPopupScriptData(options.scripts, options.hostid)
 		};
 	}
 
@@ -213,9 +240,8 @@ function getMenuPopupHost(options) {
 		}
 
 		sections[sections.length] = {
-			type: 'links',
-			title: t('Go to'),
-			data: gotos
+			label: t('Go to'),
+			items: gotos
 		};
 	}
 
@@ -247,27 +273,9 @@ function getMenuPopupMap(options) {
 
 	// scripts
 	if (typeof options.scripts !== 'undefined') {
-		var menuTree = {};
-
-		for (var key in options.scripts) {
-			var script = options.scripts[key];
-
-			if (typeof script.scriptid !== 'undefined') {
-				var items = splitPath(script.name),
-					name = (items.length > 0) ? items.pop() : script.name;
-
-				appendTreeItem(menuTree, name, items, {
-					hostId: options.hostid,
-					scriptId: script.scriptid,
-					confirmation: script.confirmation
-				});
-			}
-		}
-
 		sections[sections.length] = {
-			type: 'scripts',
-			title: t('Scripts'),
-			data: menuTree
+			label: t('Scripts'),
+			items: getMenuPopupScriptData(options.scripts, options.hostid)
 		};
 	}
 
@@ -286,7 +294,7 @@ function getMenuPopupMap(options) {
 			});
 
 			gotos[gotos.length] = {
-			label: t('Host inventory'),
+				label: t('Host inventory'),
 				url: url.getUrl()
 			};
 		}
@@ -348,18 +356,16 @@ function getMenuPopupMap(options) {
 		}
 
 		sections[sections.length] = {
-			type: 'links',
-			title: t('Go to'),
-			data: gotos
+			label: t('Go to'),
+			items: gotos
 		};
 	}
 
 	// urls
 	if (typeof options.urls !== 'undefined') {
 		sections[sections.length] = {
-			type: 'links',
-			title: t('URLs'),
-			data: options.urls
+			label: t('URLs'),
+			items: options.urls
 		};
 	}
 
@@ -377,35 +383,67 @@ function getMenuPopupMap(options) {
  * @return array
  */
 function getMenuPopupRefresh(options) {
-	var intervals = options.multiplier
-		? {
-			'x0.25': 'x0.25',
-			'x0.5': 'x0.5',
-			'x1': 'x1',
-			'x1.5': 'x1.5',
-			'x2': 'x2',
-			'x3': 'x3',
-			'x4': 'x4',
-			'x5': 'x5'
-		}
-		: {
-			10: t('10 seconds'),
-			30: t('30 seconds'),
-			60: t('1 minute'),
-			120: t('2 minutes'),
-			600: t('10 minutes'),
-			900: t('15 minutes')
+	var items = [],
+		params = (typeof options.params === 'undefined' || options.params.length == 0) ? {} : options.params,
+		intervals = options.multiplier
+			? {
+				'x0.25': 'x0.25',
+				'x0.5': 'x0.5',
+				'x1': 'x1',
+				'x1.5': 'x1.5',
+				'x2': 'x2',
+				'x3': 'x3',
+				'x4': 'x4',
+				'x5': 'x5'
+			}
+			: {
+				10: t('10 seconds'),
+				30: t('30 seconds'),
+				60: t('1 minute'),
+				120: t('2 minutes'),
+				600: t('10 minutes'),
+				900: t('15 minutes')
+			};
+
+	jQuery.each(intervals, function(value, label) {
+		items[items.length] = {
+			label: label,
+			css: (value == options.currentRate) ? 'selected' : '',
+			data: {
+				value: value
+			},
+			clickCallback: function() {
+				var obj = jQuery(this),
+					currentRate = obj.data('value');
+
+				sendAjaxData({
+					data: jQuery.extend({}, params, {
+						widgetName: options.widgetName,
+						widgetRefreshRate: currentRate
+					}),
+					dataType: 'script',
+					success: function(js) { js }
+				});
+
+				jQuery('li', obj.closest('ul')).each(function() {
+					var li = jQuery(this);
+
+					if (li.data('value') == currentRate) {
+						li.addClass('selected');
+					}
+					else {
+						li.removeClass('selected');
+					}
+				});
+
+				obj.closest('.menuPopup').fadeOut(100);
+			}
 		};
+	});
 
 	return [{
-		type: 'refresh',
-		title: options.multiplier ? t('Refresh time multiplier') : t('Refresh time'),
-		data: {
-			widgetName: options.widgetName,
-			currentRate: options.currentRate,
-			params: (typeof options.params === 'undefined' || options.params.length == 0) ? {} : options.params,
-			intervals: intervals
-		}
+		label: options.multiplier ? t('Refresh time multiplier') : t('Refresh time'),
+		items: items
 	}];
 }
 
@@ -419,12 +457,63 @@ function getMenuPopupRefresh(options) {
  * @return array
  */
 function getMenuPopupServiceConfiguration(options) {
+	var items = [];
+
+	// add
+	items[items.length] = {
+		label: t('Add child'),
+		clickCallback: function() {
+			var url = new Curl('services.php?form=1');
+			url.setArgument('parentid', options.serviceid);
+			url.setArgument('parentname', options.name);
+
+			window.location.href = url.getUrl();
+
+			jQuery(this).closest('.menuPopup').fadeOut(100);
+		}
+	};
+
+	if (options.serviceid !== null) {
+		// edit
+		items[items.length] = {
+			label: t('Edit'),
+			clickCallback: function() {
+				var url = new Curl('services.php?form=1');
+				url.setArgument('serviceid', options.serviceid);
+
+				window.location.href = url.getUrl();
+
+				jQuery(this).closest('.menuPopup').fadeOut(100);
+			}
+		};
+
+		// delete
+		if (options.deletable) {
+			items[items.length] = {
+				label: t('Delete'),
+				clickCallback: function() {
+					if (confirm(sprintf(t('Delete service "%1$s"?'), options.name))) {
+						var url = new Curl('services.php?delete=1');
+						url.setArgument('serviceid', options.serviceid);
+
+						window.location.href = url.getUrl();
+					}
+
+					jQuery(this).closest('.menuPopup').fadeOut(100);
+				}
+			};
+		}
+		else {
+			items[items.length] = {
+				label: t('Delete'),
+				css: 'ui-state-disabled'
+			};
+		}
+	}
+
 	return [{
-		type: 'serviceConfiguration',
-		title: sprintf(t('Service "%1$s"'), options.name),
-		serviceId: options.serviceid,
-		name: options.name,
-		deletable: options.deletable
+		label: sprintf(t('Service "%1$s"'), options.name),
+		items: items
 	}];
 }
 
@@ -432,7 +521,7 @@ function getMenuPopupServiceConfiguration(options) {
  * Get menu popup trigger section data.
  *
  * @param string options['triggerid']				trigger id
- * @param object options['items']					link to trigger item history page (optional)
+ * @param array  options['items']					link to trigger item history page (optional)
  * @param string options['items'][]['name']			item name
  * @param object options['items'][]['params']		item url parameters ("name" => "value")
  * @param object options['acknowledge']				link to acknowledge page (optional)
@@ -451,7 +540,7 @@ function getMenuPopupTrigger(options) {
 	// events
 	var url = new Curl('events.php?triggerid=' + options.triggerid);
 
-	if (!empty(options.eventTime)) {
+	if (typeof options.eventTime !== 'undefined') {
 		url.setArgument('nav_time', options.eventTime);
 	}
 
@@ -461,7 +550,7 @@ function getMenuPopupTrigger(options) {
 	};
 
 	// acknowledge
-	if (!empty(options.acknowledge)) {
+	if (typeof options.acknowledge !== 'undefined' && objectSize(options.acknowledge) > 0) {
 		var url = new Curl('acknow.php');
 
 		jQuery.each(options.acknowledge, function(name, value) {
@@ -475,7 +564,7 @@ function getMenuPopupTrigger(options) {
 	}
 
 	// configuration
-	if (!empty(options.configuration)) {
+	if (typeof options.configuration !== 'undefined' && options.configuration !== null) {
 		var url = new Curl('triggers.php?triggerid=' + options.triggerid +
 			'&hostid=' + options.configuration.hostid + '&form=update&switch_node=' + options.configuration.switchNode);
 
@@ -486,7 +575,7 @@ function getMenuPopupTrigger(options) {
 	}
 
 	// url
-	if (!empty(options.url)) {
+	if (typeof options.url !== 'undefined' && options.url.length > 0) {
 		items[items.length] = {
 			label: t('URL'),
 			url: options.url
@@ -494,13 +583,12 @@ function getMenuPopupTrigger(options) {
 	}
 
 	sections[sections.length] = {
-		type: 'links',
-		title: t('Trigger'),
-		data: items
+		label: t('Trigger'),
+		items: items
 	};
 
 	// items
-	if (!empty(options.items)) {
+	if (typeof options.items !== 'undefined' && options.items.length > 0) {
 		var items = [];
 
 		jQuery.each(options.items, function(i, item) {
@@ -517,9 +605,8 @@ function getMenuPopupTrigger(options) {
 		});
 
 		sections[sections.length] = {
-			type: 'links',
-			title: t('History'),
-			data: items
+			label: t('History'),
+			items: items
 		};
 	}
 
@@ -538,11 +625,60 @@ function getMenuPopupTrigger(options) {
  * @return array
  */
 function getMenuPopupTriggerLog(options) {
+	var items = [];
+
+	// create
+	items[items.length] = {
+		label: t('Create trigger'),
+		clickCallback: function() {
+			openWinCentered(
+				'tr_logform.php?sform=1&itemid=' + options.itemid,
+				'TriggerLog',
+				760,
+				540,
+				'titlebar=no, resizable=yes, scrollbars=yes, dialog=no'
+			);
+
+			jQuery(this).closest('.menuPopup').fadeOut(100);
+		}
+	};
+
+	// edit
+	if (options.triggers.length > 0) {
+		var triggers = [];
+
+		jQuery.each(options.triggers, function(i, trigger) {
+			triggers[triggers.length] = {
+				label: trigger.name,
+				clickCallback: function() {
+					openWinCentered(
+						'tr_logform.php?sform=1&itemid=' + options.itemid + '&triggerid=' + trigger.id,
+						'TriggerLog',
+						760,
+						540,
+						'titlebar=no, resizable=yes, scrollbars=yes'
+					);
+
+					jQuery(this).closest('.menuPopup').fadeOut(100);
+				}
+			};
+		});
+
+		items[items.length] = {
+			label: t('Edit trigger'),
+			items: triggers
+		};
+	}
+	else {
+		items[items.length] = {
+			label: t('Edit trigger'),
+			css: 'ui-state-disabled'
+		};
+	}
+
 	return [{
-		type: 'triggerLog',
-		title: sprintf(t('Item "%1$s"'), options.itemName),
-		itemId: options.itemid,
-		triggers: (typeof options.triggers === 'undefined') ? null : options.triggers
+		label: sprintf(t('Item "%1$s"'), options.itemName),
+		items: items
 	}];
 }
 
@@ -552,44 +688,121 @@ function getMenuPopupTriggerLog(options) {
  * @return array
  */
 function getMenuPopupTriggerMacro(options) {
-	return [{
-		type: 'triggerMacro',
-		title: t('Insert macro'),
-		data: {
+	var items = [],
+		data = {
 			'TRIGGER.VALUE=0': 0,
 			'TRIGGER.VALUE=1': 1,
 			'TRIGGER.VALUE=2': 2,
 			'TRIGGER.VALUE#0': 10,
 			'TRIGGER.VALUE#1': 11,
 			'TRIGGER.VALUE#2': 12
-		}
+		};
+
+	jQuery.each(data, function(label, value) {
+		items[items.length] = {
+			label: label,
+			clickCallback: function() {
+				var expression = jQuery('#expr_temp');
+
+				if (expression.val().length > 0 && !confirm(t('Do you wish to replace the conditional expression?'))) {
+					return false;
+				}
+
+				var sign, valueString;
+
+				if (value >= 10) {
+					valueString = value % 10;
+					sign = '#';
+				}
+				else {
+					valueString = value;
+					sign = '=';
+				}
+
+				expression.val('{TRIGGER.VALUE}' + sign + valueString);
+
+				jQuery(this).closest('.menuPopup').fadeOut(100);
+			}
+		};
+	});
+
+	return [{
+		label: t('Insert macro'),
+		items: items
 	}];
 }
 
 /**
- * Recursive function to prepare menu tree data for createMenuTree().
+ * Build script menu tree.
  *
- * @param array  tree		menu tree data, will be modified by reference
- * @param string name		script name
- * @param array  items		script path
- * @param object params		script params ("hostId", "scriptId" and "confirmation" fields)
+ * @param array scripts		scripts names
+ * @param array hostid		host id
+ *
+ * @returns array
  */
-function appendTreeItem(tree, name, items, params) {
-	if (items.length > 0) {
-		var item = items.shift();
+function getMenuPopupScriptData(scripts, hostid) {
+	var tree = {};
 
-		if (typeof tree[item] === 'undefined') {
-			tree[item] = {items: {}};
+	var appendTreeItem = function(tree, name, items, params) {
+		if (items.length > 0) {
+			var item = items.shift();
+
+			if (typeof tree[item] === 'undefined') {
+				tree[item] = {items: {}};
+			}
+
+			appendTreeItem(tree[item].items, name, items, params);
+		}
+		else {
+			tree[name] = {
+				params: params,
+				items: {}
+			};
+		}
+	};
+
+	for (var key in scripts) {
+		var script = scripts[key];
+
+		if (typeof script.scriptid !== 'undefined') {
+			var items = splitPath(script.name),
+				name = (items.length > 0) ? items.pop() : script.name;
+
+			appendTreeItem(tree, name, items, {
+				hostId: hostid,
+				scriptId: script.scriptid,
+				confirmation: script.confirmation
+			});
+		}
+	}
+
+	var getMenuPopupScriptItems = function(tree) {
+		var items = [];
+
+		if (objectSize(tree) > 0) {
+			jQuery.each(tree, function(name, data) {
+				items[items.length] = {
+					label: name,
+					items: (typeof data.items !== 'undefined' && objectSize(data.items) > 0)
+						? getMenuPopupScriptItems(data.items)
+						: [],
+					clickCallback: function(e) {
+						if (typeof data.params.scriptId !== 'undefined') {
+							executeScript(data.params.hostId, data.params.scriptId, data.params.confirmation);
+						}
+
+						cancelEvent(e);
+
+						jQuery(this).closest('.menuPopup').fadeOut(100);
+					}
+				};
+			});
 		}
 
-		appendTreeItem(tree[item].items, name, items, params);
-	}
-	else {
-		tree[name] = {
-			params: params,
-			items: {}
-		};
-	}
+		return items;
+	};
+
+	return getMenuPopupScriptItems(tree);
 }
 
 jQuery(function($) {
@@ -643,34 +856,24 @@ jQuery(function($) {
 			// create sections
 			if (sections.length > 0) {
 				$.each(sections, function(i, section) {
-					switch(section.type) {
-						case 'favourite':
-							createFavouriteSection(menuPopup, section);
-							break;
+					var sectionTitleBox = $('<div>', {
+							'class': 'title'
+						}),
+						sectionTitleText = $('<div>', {
+							'class': 'text',
+							text: section.label
+						}),
+						sectionMenu = $('<ul>', {
+							'class': 'menu'
+						});
 
-						case 'refresh':
-							createRefreshSection(menuPopup, section);
-							break;
-
-						case 'serviceConfiguration':
-							createServiceConfigurationSection(menuPopup, section);
-							break;
-
-						case 'scripts':
-							createScriptSection(menuPopup, section);
-							break;
-
-						case 'triggerLog':
-							createTriggerLogSection(menuPopup, section);
-							break;
-
-						case 'triggerMacro':
-							createTriggerMacroSection(menuPopup, section);
-							break;
-
-						default:
-							createLinkSection(menuPopup, section);
+					if (section.items.length > 0) {
+						$.each(section.items, function(i, item) {
+							sectionMenu.append(createMenuItem(item));
+						});
 					}
+
+					menuPopup.append(sectionTitleBox.append(sectionTitleText), sectionMenu);
 				});
 			}
 
@@ -733,308 +936,6 @@ jQuery(function($) {
 	};
 
 	/**
-	 * Create favourite section in menu popup.
-	 *
-	 * @param object menuPopup		menu popup
-	 * @param object section		menu section
-	 */
-	function createFavouriteSection(menuPopup, section) {
-		var menu = $('<ul>', {'class': 'menu'});
-
-		// add
-		menu.append(createMenuItem(t('Add'), null, null, null, null, function() {
-			PopUp(section.addParams, 800, 450);
-
-			menuPopup.fadeOut(100);
-		}));
-
-		// remove
-		var menuRemove = $('<ul>', {'class': 'menu'}),
-			removeButton = createMenuItem(t('Remove')),
-			removeAllButton = createMenuItem(t('Remove all'), null, null, null, null, function() {
-				rm4favorites(section.favouriteObj, 0);
-
-				menuRemove.remove();
-				$('.ui-menu-icon', removeButton).remove();
-				removeButton.addClass('ui-state-disabled');
-				$(this).addClass('ui-state-disabled');
-
-				menuPopup.fadeOut(100);
-			});
-
-		if (section.data.length > 0) {
-			$.each(section.data, function(i, item) {
-				menuRemove.append(createMenuItem(item.label, null, null, null, null, function() {
-					rm4favorites(section.favouriteObj, item.id);
-					$(this).remove();
-
-					if ($('li', menuRemove).length == 0) {
-						$('.ui-menu-icon', removeButton).remove();
-						removeButton.addClass('ui-state-disabled');
-						removeAllButton.addClass('ui-state-disabled');
-					}
-
-					menuPopup.fadeOut(100);
-				}));
-			});
-		}
-		else {
-			removeButton.addClass('ui-state-disabled');
-			removeAllButton.addClass('ui-state-disabled');
-		}
-
-		menu.append(removeButton.append(menuRemove));
-		menu.append(removeAllButton);
-
-		appendSection(menuPopup, menu, section.title);
-	}
-
-	/**
-	 * Create refresh section in menu popup.
-	 *
-	 * @param object menuPopup		menu popup
-	 * @param object section		menu section
-	 */
-	function createRefreshSection(menuPopup, section) {
-		var menu = $('<ul>', {'class': 'menu'});
-
-		$.each(section.data.intervals, function(value, label) {
-			css = (value == section.data.currentRate) ? 'selected' : '';
-
-			menu.append(createMenuItem(label, null, value, css, null, function() {
-				sendAjaxData({
-					data: jQuery.extend({}, section.data.params, {
-						widgetName: section.data.widgetName,
-						widgetRefreshRate: value
-					}),
-					dataType: 'script',
-					success: function(js) { js }
-				});
-
-				var currentRate = $(this).data('value');
-
-				$('li', menu).each(function() {
-					var obj = $(this);
-
-					if (obj.data('value') == currentRate) {
-						obj.addClass('selected');
-					}
-					else {
-						obj.removeClass('selected');
-					}
-				});
-
-				menuPopup.fadeOut(100);
-			}));
-		});
-
-		appendSection(menuPopup, menu, section.title);
-	}
-
-	/**
-	 * Create service configuration section in menu popup.
-	 *
-	 * @param object menuPopup		menu popup
-	 * @param object section		menu section
-	 */
-	function createServiceConfigurationSection(menuPopup, section) {
-		var menu = $('<ul>', {'class': 'menu'});
-
-		// add
-		menu.append(createMenuItem(t('Add child'), null, null, null, null, function() {
-			var url = new Curl('services.php?form=1');
-			url.setArgument('parentid', section.serviceId);
-			url.setArgument('parentname', section.name);
-
-			window.location.href = url.getUrl();
-
-			menuPopup.fadeOut(100);
-		}));
-
-		// edit
-		if (section.serviceId !== null) {
-			menu.append(createMenuItem(t('Edit'), null, null, null, null, function() {
-				var url = new Curl('services.php?form=1');
-				url.setArgument('serviceid', section.serviceId);
-
-				window.location.href = url.getUrl();
-
-				menuPopup.fadeOut(100);
-			}));
-		}
-
-		// delete
-		if (section.deletable) {
-			menu.append(createMenuItem(t('Delete'), null, null, null, null, function() {
-				if (confirm(sprintf(t('Delete service "%1$s"?'), section.name))) {
-					var url = new Curl('services.php?delete=1');
-					url.setArgument('serviceid', section.serviceId);
-
-					window.location.href = url.getUrl();
-				}
-
-				menuPopup.fadeOut(100);
-			}));
-		}
-
-		appendSection(menuPopup, menu, section.title);
-	}
-
-	/**
-	 * Create script section in menu popup.
-	 *
-	 * @param object menuPopup		menu popup
-	 * @param object section		menu section
-	 */
-	function createScriptSection(menuPopup, section) {
-		if (objectSize(section.data) > 0) {
-			var menu = $('<ul>', {'class': 'menu'});
-
-			createMenuTree(menu, section.data);
-
-			// execute script
-			$('li', menu).each(function() {
-				var item = $(this);
-
-				if (!empty(item.data('scriptId'))) {
-					item.click(function(e) {
-						menuPopup.fadeOut(50);
-
-						executeScript(
-							item.data('hostId'),
-							item.data('scriptId'),
-							item.data('confirmation')
-						);
-
-						cancelEvent(e);
-					});
-				}
-				else {
-					item.click(function(e) {
-						cancelEvent(e);
-					});
-				}
-			});
-
-			appendSection(menuPopup, menu, section.title);
-		}
-	}
-
-	/**
-	 * Create trigger log section in menu popup.
-	 *
-	 * @param object menuPopup		menu popup
-	 * @param object section		menu section
-	 */
-	function createTriggerLogSection(menuPopup, section) {
-		var menu = $('<ul>', {'class': 'menu'});
-
-		// create
-		menu.append(createMenuItem(t('Create trigger'), null, null, null, null, function() {
-			openWinCentered(
-				'tr_logform.php?sform=1&itemid=' + section.itemId,
-				'TriggerLog',
-				760,
-				540,
-				'titlebar=no, resizable=yes, scrollbars=yes, dialog=no'
-			);
-
-			menuPopup.fadeOut(100);
-		}));
-
-		// edit
-		if (section.triggers.length > 0) {
-			var menuTriggers = $('<ul>', {'class': 'menu'}),
-				editTriggerButton = createMenuItem(t('Edit trigger'));
-
-			$.each(section.triggers, function(i, trigger) {
-				menuTriggers.append(createMenuItem(trigger.name, null, null, null, null, function() {
-					openWinCentered(
-						'tr_logform.php?sform=1&itemid=' + section.itemId + '&triggerid=' + trigger.id,
-						'TriggerLog',
-						760,
-						540,
-						'titlebar=no, resizable=yes, scrollbars=yes'
-					);
-
-					menuPopup.fadeOut(100);
-				}));
-			});
-
-			menu.append(editTriggerButton.append(menuTriggers));
-		}
-
-		appendSection(menuPopup, menu, section.title);
-	}
-
-	/**
-	 * Create trigger macro section in menu popup.
-	 *
-	 * @param object menuPopup		menu popup
-	 * @param object section		menu section
-	 */
-	function createTriggerMacroSection(menuPopup, section) {
-		var menu = $('<ul>', {'class': 'menu'});
-
-		$.each(section.data, function(label, value) {
-			menu.append(createMenuItem(label, null, null, null, null, function() {
-				var expression = $('#expr_temp');
-
-				if (expression.val().length > 0 && !confirm(t('Do you wish to replace the conditional expression?'))) {
-					return false;
-				}
-
-				var sign, valueString;
-
-				if (value >= 10) {
-					valueString = value % 10;
-					sign = '#';
-				}
-				else {
-					valueString = value;
-					sign = '=';
-				}
-
-				expression.val('{TRIGGER.VALUE}' + sign + valueString);
-
-				menuPopup.fadeOut(100);
-			}));
-		});
-
-		appendSection(menuPopup, menu, section.title);
-	}
-
-	/**
-	 * Create link section in menu popup.
-	 *
-	 * @param object menuPopup		menu popup
-	 * @param object section		menu section
-	 */
-	function createLinkSection(menuPopup, section) {
-		var menu = $('<ul>', {'class': 'menu'});
-
-		$.each(section.data, function(i, item) {
-			menu.append(createMenuItem(item.label, item.url));
-		});
-
-		appendSection(menuPopup, menu, section.title);
-	}
-
-	/**
-	 * Append section to menu popup.
-	 *
-	 * @param object menuPopup		menu popup
-	 * @param object section		menu section
-	 * @param string title			menu title
-	 */
-	function appendSection(menuPopup, section, title) {
-		menuPopup.append(
-			$('<div>', {'class': 'title'}).append($('<div>', {'class': 'text', text: title})),
-			section
-		);
-	}
-
-	/**
 	 * Closing menu after delay.
 	 *
 	 * @param object menuPopup		menu popup
@@ -1057,96 +958,52 @@ jQuery(function($) {
 	}
 
 	/**
-	 * Create menu using structure:
+	 * Create menu item.
 	 *
-	 * array(
-	 * 	'a' => array(
-	 * 		'items' => array(
-	 * 			'a' => array(
-	 * 				'items' => array(
-	 * 					'a' => array(
-	 * 						'params' => array(),
-	 * 						'items' => array()
-	 * 					),
-	 * 					'b' => array(
-	 * 						'params' => array(),
-	 * 						'items' => array()
-	 * 					)
-	 * 				)
-	 * 			),
-	 * 			'b' => array(
-	 * 				'items' => array(
-	 * 					'a' => array(
-	 * 						'params' => array(),
-	 * 						'items' => array()
-	 * 					),
-	 * 					'b' => array(
-	 * 						'params' => array(),
-	 * 						'items' => array()
-	 * 					)
-	 * 				)
-	 * 			)
-	 * 		),
-	 * 	'b' => array(
-	 * 		'params' => array(),
-	 * 		'items' => array()
-	 * 	)
-	 * )
+	 * @param string options['label']			link text
+	 * @param string options['url']				link url
+	 * @param string options['css']				item class
+	 * @param array  options['data']			item data as key => value
+	 * @param array  options['items']			item sub menu
+	 * @param object options['clickCallback']	item click callback
 	 *
-	 * @param object ul		list object, will be modified by reference
-	 * @param object items	tree data with prescribed structure
+	 * @return object
 	 */
-	function createMenuTree(ul, items) {
-		$.each(items, function(name, item) {
-			var innerUl = null;
+	function createMenuItem(options) {
+		var link = $('<a>');
 
-			if (objectSize(item.items) > 0) {
-				innerUl = $('<ul>');
-
-				createMenuTree(innerUl, item.items);
-			}
-
-			var li = createMenuItem(name, null, null, null, innerUl);
-
-			if (objectSize(item.params) > 0) {
-				$.each(item.params, function(key, value) {
-					li.data(key, value);
-				});
-			}
-
-			ul.append(li);
-		});
-	}
-
-	/**
-	 * Create new menu item link.
-	 *
-	 * @param string label			name of item
-	 * @param string url			url to create onClick action, by default is empty
-	 * @param string value			item value
-	 * @param string css			css class
-	 * @param object subMenu		sub menu to build menu tree
-	 * @param object clickCallback	item click callback
-	 *
-	 * @return object				list item
-	 */
-	function createMenuItem(label, url, value, css, subMenu, clickCallback) {
-		var item = $('<li>').append($('<a>', {html: label, href: url}));
-
-		if (typeof value !== 'undefined') {
-			item.data('value', value);
+		if (typeof options.label !== 'undefined') {
+			link.html(options.label);
 		}
 
-		if (typeof css !== 'undefined') {
-			item.addClass(css);
+		if (typeof options.url !== 'undefined') {
+			link.attr('href', options.url);
 		}
 
-		if (typeof clickCallback !== 'undefined') {
-			item.click(clickCallback);
+		var item = $('<li>').append(link);
+
+		if (typeof options.css !== 'undefined') {
+			item.addClass(options.css);
 		}
 
-		if (typeof subMenu !== 'undefined') {
-			item.append(subMenu);
+		if (typeof options.data !== 'undefined' && objectSize(options.data) > 0) {
+			$.each(options.data, function(key, value) {
+				item.data(key, value);
+			});
+		}
+
+		if (typeof options.items !== 'undefined' && options.items.length > 0) {
+			var menu = $('<ul>');
+
+			$.each(options.items, function(i, item) {
+				menu.append(createMenuItem(item));
+			});
+
+			item.append(menu);
+		}
+
+		if (typeof options.clickCallback !== 'undefined') {
+			item.click(options.clickCallback);
 		}
 
 		return item;
