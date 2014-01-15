@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -729,6 +729,7 @@ while (0)
 
 extern const char	*progname;
 extern const char	title_message[];
+extern const char	syslog_app_name[];
 extern const char	usage_message[];
 extern const char	*help_message[];
 
@@ -852,7 +853,7 @@ int	num_key_param(char *param);
 size_t	zbx_get_escape_string_len(const char *src, const char *charlist);
 char	*zbx_dyn_escape_string(const char *src, const char *charlist);
 int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int item_type,
-		int delay, const char *flex_intervals, time_t now, int *effective_delay);
+		int delay, const char *flex_intervals, time_t now);
 time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t now);
 int	check_time_period(const char *period, time_t now);
 char	zbx_num2hex(u_char c);
@@ -860,10 +861,6 @@ u_char	zbx_hex2num(char c);
 size_t	zbx_binary2hex(const u_char *input, size_t ilen, char **output, size_t *olen);
 size_t	zbx_hex2binary(char *io);
 void	zbx_hex2octal(const char *input, char **output, int *olen);
-#ifdef HAVE_POSTGRESQL
-size_t	zbx_pg_escape_bytea(const u_char *input, size_t ilen, char **output, size_t *olen);
-size_t	zbx_pg_unescape_bytea(u_char *io);
-#endif
 size_t	zbx_get_next_field(const char **line, char **output, size_t *olen, char separator);
 int	str_in_list(const char *list, const char *value, char delimiter);
 char	*str_linefeed(const char *src, size_t maxline, const char *delim);
@@ -889,6 +886,7 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define SEC_PER_WEEK		(7 * SEC_PER_DAY)
 #define SEC_PER_MONTH		(30 * SEC_PER_DAY)
 #define SEC_PER_YEAR		(365 * SEC_PER_DAY)
+#define ZBX_JAN_2038		2145916800
 #define ZBX_JAN_1970_IN_SEC	2208988800.0	/* 1970 - 1900 in seconds */
 
 #define ZBX_MAX_RECV_DATA_SIZE	(64 * ZBX_MEBIBYTE)
@@ -976,6 +974,7 @@ char	*zbx_date2str(time_t date);
 char	*zbx_time2str(time_t time);
 
 #define ZBX_NULL2STR(str)	(NULL != str ? str : "(null)")
+#define ZBX_NULL2EMPTY_STR(str)	(NULL != (str) ? (str) : "")
 
 char	*zbx_strcasestr(const char *haystack, const char *needle);
 int	zbx_mismatch(const char *s1, const char *s2);
@@ -1040,8 +1039,10 @@ int	is_macro_char(char c);
 
 int	is_time_function(const char *func);
 
+int	get_item_key(char **exp, char **key);
+
 int	parse_host(char **exp, char **host);
-int	parse_key(char **exp, char **key);
+int	parse_key(char **exp);
 int	parse_function(char **exp, char **func, char **params);
 
 int	parse_host_key(char *exp, char **host, char **key);

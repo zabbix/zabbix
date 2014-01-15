@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -282,8 +282,8 @@ elseif (hasRequest('save')) {
 	if (hasRequest('itemid')) {
 		$itemId = getRequest('itemid');
 
-		$db_item = get_item_by_itemid_limited($itemId);
-		$db_item['applications'] = get_applications_by_itemid($itemId);
+		$dbItem = get_item_by_itemid_limited($itemId);
+		$dbItem['applications'] = get_applications_by_itemid($itemId);
 
 		// unset snmpv3 fields
 		if ($item['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
@@ -294,13 +294,7 @@ elseif (hasRequest('save')) {
 			$item['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
 		}
 
-		// unset fields without changes
-		foreach ($item as $field => $value) {
-			if (isset($db_item[$field]) && ($item[$field] == $db_item[$field])) {
-				unset($item[$field]);
-			}
-		}
-
+		$item = CArrayHelper::unsetEqualValues($item, $dbItem);
 		$item['itemid'] = $itemId;
 
 		$result = API::Itemprototype()->update($item);
@@ -368,8 +362,8 @@ else {
 		'discovery_rule' => $discovery_rule
 	);
 
-	// get items
 	$sortfield = getPageSortField('name');
+
 	$data['items'] = API::ItemPrototype()->get(array(
 		'discoveryids' => $data['parent_discoveryid'],
 		'output' => API_OUTPUT_EXTEND,
@@ -379,9 +373,9 @@ else {
 		'limit' => $config['search_limit'] + 1
 	));
 
-	if (!empty($data['items'])) {
-		order_result($data['items'], $sortfield, getPageSortOrder());
-	}
+	$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
+
+	order_result($data['items'], $sortfield, getPageSortOrder());
 
 	$data['paging'] = getPagingLine(
 		$data['items'],

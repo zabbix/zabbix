@@ -23,31 +23,6 @@
 #include "zbxserver.h"
 #include "zbxregexp.h"
 
-int	lld_check_record(struct zbx_json_parse *jp_row, const char *f_macro, const char *f_regexp,
-		zbx_vector_ptr_t *regexps)
-{
-	const char	*__function_name = "lld_check_record";
-
-	char		*value = NULL;
-	size_t		value_alloc = 0;
-	int		res = SUCCEED;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() jp_row:'%.*s'", __function_name,
-			jp_row->end - jp_row->start + 1, jp_row->start);
-
-	if (NULL == f_macro || NULL == f_regexp)
-		goto out;
-
-	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, f_macro, &value, &value_alloc))
-		res = regexp_match_ex(regexps, value, f_regexp, ZBX_CASE_SENSITIVE);
-
-	zbx_free(value);
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
-
-	return res;
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: DBlld_get_item                                                   *

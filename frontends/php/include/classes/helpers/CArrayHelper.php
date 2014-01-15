@@ -1,7 +1,7 @@
 <?php
 /*
  ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -162,7 +162,7 @@ class CArrayHelper {
 
 		foreach ($a1 as $key => $value) {
 			// check if the values under $key are equal, skip arrays
-			if (isset($a2[$key]) && !is_array($value) && $a2[$key] == $a1[$key]) {
+			if (isset($a2[$key]) && !is_array($value) && (string) $a1[$key] === (string) $a2[$key]) {
 				unset($a1[$key]);
 			}
 		}

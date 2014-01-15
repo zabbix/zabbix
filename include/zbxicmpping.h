@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,8 +23,12 @@
 typedef struct
 {
 	char	*addr;
-	double	min, avg, max;
-	int	rcv, cnt;
+	double	min;
+	double	avg;
+	double	max;
+	int	rcv;
+	int	cnt;
+	char	*status;	/* array of individual response statuses: 1 - valid, 0 - timeout */
 }
 ZBX_FPING_HOST;
 

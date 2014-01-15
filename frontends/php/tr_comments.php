@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,11 +50,12 @@ $trigger = API::Trigger()->get(array(
 	'output' => API_OUTPUT_EXTEND,
 	'expandDescription' => true
 ));
-$trigger = reset($trigger);
 
 if (!$trigger) {
 	access_deny();
 }
+
+$trigger = reset($trigger);
 
 /*
  * Actions

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -291,6 +291,33 @@ class CMacrosResolverHelper {
 	}
 
 	/**
+	 * Resolve user macros in trigger expression.
+	 *
+	 * @static
+	 *
+	 * @param array $trigger
+	 * @param array $trigger['triggerid']
+	 * @param array $trigger['expression']
+	 *
+	 * @return string
+	 */
+	public static function resolveTriggerExpressionUserMacro(array $trigger) {
+		if (zbx_empty($trigger['expression'])) {
+			return $trigger['expression'];
+		}
+
+		self::init();
+
+		$triggers = self::$macrosResolver->resolve(array(
+			'config' => 'triggerExpressionUser',
+			'data' => zbx_toHash(array($trigger), 'triggerid')
+		));
+		$trigger = reset($triggers);
+
+		return $trigger['expression'];
+	}
+
+	/**
 	 * Resolve macros in event description.
 	 *
 	 * @static
@@ -314,6 +341,8 @@ class CMacrosResolverHelper {
 	/**
 	 * Resolve positional macros and functional item macros, for example, {{HOST.HOST1}:key.func(param)}.
 	 *
+	 * @static
+	 *
 	 * @param type   $name					string in which macros should be resolved
 	 * @param array  $items					list of graph items
 	 * @param int    $items[n]['hostid']	graph n-th item corresponding host Id
@@ -321,7 +350,7 @@ class CMacrosResolverHelper {
 	 *
 	 * @return string	string with macros replaced with corresponding values
 	 */
-	public static function resolveGraphName($name, $items) {
+	public static function resolveGraphName($name, array $items) {
 		self::init();
 
 		$graph = self::$macrosResolver->resolve(array(
@@ -335,8 +364,9 @@ class CMacrosResolverHelper {
 
 	/**
 	 * Resolve positional macros and functional item macros, for example, {{HOST.HOST1}:key.func(param)}.
+	 * ! if same graph will be passed more than once only name for first entry will be resolved.
 	 *
-	 *  ! if same graph will be passed more than once only name for first entry will be resolved.
+	 * @static
 	 *
 	 * @param array  $data					list or hashmap of graphs
 	 * @param int    $data[n]['graphid']	id of graph
@@ -344,7 +374,7 @@ class CMacrosResolverHelper {
 	 *
 	 * @return array	inputted data with resolved names
 	 */
-	public static function resolveGraphNameByIds($data) {
+	public static function resolveGraphNameByIds(array $data) {
 		self::init();
 
 		$graphIds = array();
@@ -389,6 +419,62 @@ class CMacrosResolverHelper {
 		unset($graph);
 
 		return $data;
+	}
+
+	/**
+	 * Resolve item name macros to "name_expanded" field.
+	 *
+	 * @static
+	 *
+	 * @param array  $items
+	 * @param string $items[n]['itemid']
+	 * @param string $items[n]['hostid']
+	 * @param string $items[n]['name']
+	 * @param string $items[n]['key_']				item key (optional)
+	 *												but is (mandatory) if macros exist and "key_expanded" is not present
+	 * @param string $items[n]['key_expanded']		expanded item key (optional)
+	 *
+	 * @return array
+	 */
+	public static function resolveItemNames(array $items) {
+		self::init();
+
+		return self::$macrosResolver->resolveItemNames($items);
+	}
+
+	/**
+	 * Resolve item key macros to "key_expanded" field.
+	 *
+	 * @static
+	 *
+	 * @param array  $items
+	 * @param string $items[n]['itemid']
+	 * @param string $items[n]['hostid']
+	 * @param string $items[n]['key_']
+	 *
+	 * @return array
+	 */
+	public static function resolveItemKeys(array $items) {
+		self::init();
+
+		return self::$macrosResolver->resolveItemKeys($items);
+	}
+
+	/**
+	 * Resolve function parameter macros to "parameter_expanded" field.
+	 *
+	 * @static
+	 *
+	 * @param array  $data
+	 * @param string $data[n]['hostid']
+	 * @param string $data[n]['parameter']
+	 *
+	 * @return array
+	 */
+	public static function resolveFunctionParameters(array $data) {
+		self::init();
+
+		return self::$macrosResolver->resolveFunctionParameters($data);
 	}
 
 	/**
