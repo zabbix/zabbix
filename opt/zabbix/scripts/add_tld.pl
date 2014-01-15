@@ -244,7 +244,7 @@ foreach my $proxyid (sort keys %{$proxies}) {
                                           'interfaces' => [{'type' => 1, 'main' => 1, 'useip' => 1, 'ip'=> '127.0.0.1', 'dns' => '', 'port' => '10050'}]});
 }
 
-create_probe_status_host($probes_groupid);
+create_probe_status_host($probes_mon_groupid);
 
 create_cron_items($OPTS{'tld'});
 
@@ -438,10 +438,6 @@ sub create_trigger {
     my $result;
 
     if ($zabbix->exist('trigger',{'expression' => $options->{'expression'}})) {
-#        $result = $zabbix->get('trigger', {'});
-
-#        $options->{'triggerid'} = $result->{'triggerid'};
-
         $result = $zabbix->update('trigger', $options);
     }
     else {
@@ -595,7 +591,7 @@ sub create_items_dns {
 
     create_item($options);
 
-    $options = { 'description' => '5.2.3 - Less than {$DNSTEST.DNS.AVAIL.MINNS} NS servers have answered on {HOST.NAME} for {$DNSTEST.TLD} TLD ('.$proto_uc.')',
+    $options = { 'description' => '5.2.3 - Less than {$DNSTEST.DNS.AVAIL.MINNS} NS servers have answered succesfully on {HOST.NAME} ('.$proto_uc.')',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}<{$DNSTEST.DNS.AVAIL.MINNS}',
 			'priority' => '4',
                 };

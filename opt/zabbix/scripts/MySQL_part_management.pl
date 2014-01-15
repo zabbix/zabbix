@@ -28,20 +28,20 @@ my $dsn = 'DBI:mysql:'.$db_schema.':mysql_socket=/var/lib/mysql/mysql.sock';
 my $db_user_name = $config->{'db'}->{'user'};
 my $db_password = $config->{'db'}->{'password'};
 
-my $tables = {	'history' => { 'period' => 'day', 'keep_history' => '30'},
-		'history_log' => { 'period' => 'day', 'keep_history' => '30'},
-		'history_str' => { 'period' => 'day', 'keep_history' => '30'},
-		'history_text' => { 'period' => 'day', 'keep_history' => '30'},
-		'history_uint' => { 'period' => 'day', 'keep_history' => '30'},
+my $tables = {	'history' => { 'period' => 'day', 'keep_history' => '60'},
+		'history_log' => { 'period' => 'day', 'keep_history' => '60'},
+		'history_str' => { 'period' => 'day', 'keep_history' => '60'},
+		'history_text' => { 'period' => 'day', 'keep_history' => '60'},
+		'history_uint' => { 'period' => 'day', 'keep_history' => '60'},
 
-		'trends' => { 'period' => 'month', 'keep_history' => '2'},
-		'trends_uint' => { 'period' => 'month', 'keep_history' => '2'},
+		'trends' => { 'period' => 'month', 'keep_history' => '9999'},
+		'trends_uint' => { 'period' => 'month', 'keep_history' => '9999'},
 
-		'acknowledges' => { 'period' => 'month', 'keep_history' => '23'},
-		'alerts' => { 'period' => 'month', 'keep_history' => '6'},
+		'acknowledges' => { 'period' => 'month', 'keep_history' => '24'},
+		'alerts' => { 'period' => 'month', 'keep_history' => '12'},
 		'auditlog' => { 'period' => 'month', 'keep_history' => '24'},
 		'events' => { 'period' => 'month', 'keep_history' => '12'},
-		'service_alarms' => { 'period' => 'month', 'keep_history' => '6'},
+		'service_alarms' => { 'period' => 'month', 'keep_history' => '1'},
 	     };
 my $amount_partitions = 10;
 
