@@ -463,13 +463,50 @@ static unsigned char	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_host
 	return ZBX_NO_POLLER;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: item_get_nextcheck_salt                                          *
+ *                                                                            *
+ * Purpose: get the salt value to be used for item nextcheck calculations     *
+ *                                                                            *
+ * Parameters: item - [IN] the item                                           *
+ *                                                                            *
+ * Return value: the salt for nextcheck calculations                          *
+ *                                                                            *
+ * Comments: The salt value is used to spread multiple item nextchecks over   *
+ *           the item delay period to even the system load.                   *
+ *           Items with the same delay period and salt value will have the    *
+ *           same nextcheck values.                                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	item_get_nextcheck_salt(const ZBX_DC_ITEM *item)
+{
+	zbx_uint64_t	salt;
+
+	switch (item->poller_type)
+	{
+		case ZBX_POLLER_TYPE_JAVA:
+		case ZBX_POLLER_TYPE_PINGER:
+			/* Java and pinger pollers can process multiple items at the same time.     */
+			/* To take advantage of that we must schedule items with the same interface */
+			/* to be processed at the same time.                                        */
+			salt = item->interfaceid * item->poller_type;
+			break;
+		default:
+			/* by default just try to spread all item processing over the delay period  */
+			salt = item->itemid;
+	}
+
+	return salt;
+}
+
 static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, int now)
 {
 	int	nextcheck;
 
 	if (ITEM_STATE_NOTSUPPORTED == item->state)
 	{
-		nextcheck = calculate_item_nextcheck(item->interfaceid, item->itemid, item->type,
+		nextcheck = calculate_item_nextcheck(item_get_nextcheck_salt(item), item->type,
 				config->config->refresh_unsupported, NULL, now);
 	}
 	else
@@ -477,7 +514,7 @@ static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, int now)
 		const ZBX_DC_FLEXITEM	*flexitem;
 
 		flexitem = zbx_hashset_search(&config->flexitems, &item->itemid);
-		nextcheck = calculate_item_nextcheck(item->interfaceid, item->itemid, item->type,
+		nextcheck = calculate_item_nextcheck(item_get_nextcheck_salt(item), item->type,
 				item->delay, NULL != flexitem ? flexitem->delay_flex : NULL, now);
 	}
 
@@ -931,12 +968,12 @@ static void	DCsync_items(DB_RESULT result)
 
 			if (ITEM_STATE_NOTSUPPORTED == item->state)
 			{
-				item->nextcheck = calculate_item_nextcheck(item->interfaceid, itemid,
+				item->nextcheck = calculate_item_nextcheck(item_get_nextcheck_salt(item),
 						item->type, config->config->refresh_unsupported, NULL, now);
 			}
 			else
 			{
-				item->nextcheck = calculate_item_nextcheck(item->interfaceid, itemid,
+				item->nextcheck = calculate_item_nextcheck(item_get_nextcheck_salt(item),
 						item->type, delay, row[16], now);
 			}
 		}
@@ -946,7 +983,7 @@ static void	DCsync_items(DB_RESULT result)
 
 			if (ITEM_STATE_NORMAL == item->state && delay != item->delay)
 			{
-				item->nextcheck = calculate_item_nextcheck(item->interfaceid, itemid,
+				item->nextcheck = calculate_item_nextcheck(item_get_nextcheck_salt(item),
 						item->type, delay, row[16], now);
 			}
 		}
@@ -1018,7 +1055,7 @@ static void	DCsync_items(DB_RESULT result)
 			if (SUCCEED == DCstrpool_replace(found, &flexitem->delay_flex, row[16]) &&
 					ITEM_STATE_NOTSUPPORTED != item->state)
 			{
-				item->nextcheck = calculate_item_nextcheck(item->interfaceid, item->itemid, item->type,
+				item->nextcheck = calculate_item_nextcheck(item_get_nextcheck_salt(item), item->type,
 						item->delay, flexitem->delay_flex, now);
 			}
 		}
@@ -1031,7 +1068,7 @@ static void	DCsync_items(DB_RESULT result)
 
 			if (ITEM_STATE_NOTSUPPORTED != item->state)
 			{
-				item->nextcheck = calculate_item_nextcheck(item->interfaceid, item->itemid, item->type,
+				item->nextcheck = calculate_item_nextcheck(item_get_nextcheck_salt(item), item->type,
 						item->delay, NULL, now);
 			}
 		}
