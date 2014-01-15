@@ -124,39 +124,6 @@ conn = PQsetdbLogin(NULL, NULL, NULL, NULL, NULL, NULL, NULL);
         fi
     fi
 
-    if test "x$found_postgresql" = "xyes"; then
-        dnl
-        dnl Check for function PQserverVersion()
-        dnl
-
-        _save_postgresql_cflags="${CFLAGS}"
-        _save_postgresql_ldflags="${LDFLAGS}"
-        _save_postgresql_libs="${LIBS}"
-        CFLAGS="${CFLAGS} ${POSTGRESQL_CFLAGS}"
-        LDFLAGS="${LDFLAGS} ${POSTGRESQL_LDFLAGS}"
-        LIBS="${LIBS} ${POSTGRESQL_LIBS}"
-
-        AC_MSG_CHECKING(for function PQserverVersion())
-        AC_TRY_LINK(
-[
-#include <libpq-fe.h>
-],
-[
-PGconn	*conn = NULL;
-PQserverVersion(conn);
-],
-        AC_DEFINE(HAVE_FUNCTION_PQSERVERVERSION,1,[Define to 1 if 'PQserverVersion' exist.])
-        AC_MSG_RESULT(yes),
-        AC_MSG_RESULT(no))
-
-        CFLAGS="${_save_postgresql_cflags}"
-        LDFLAGS="${_save_postgresql_ldflags}"
-        LIBS="${_save_postgresql_libs}"
-        unset _save_postgresql_cflags
-        unset _save_postgresql_ldflags
-        unset _save_postgresql_libs
-    fi
-
     dnl
     dnl Check if required version of PostgreSQL is available
     dnl

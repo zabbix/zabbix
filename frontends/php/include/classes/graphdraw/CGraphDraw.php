@@ -231,11 +231,6 @@ abstract class CGraphDraw {
 			$str = $this->items[0]['hostname'].NAME_DELIMITER.$this->items[0]['name'];
 		}
 		else {
-			foreach ($this->items as &$item) {
-				$item['host'] = $item['hostname'];
-			}
-			unset($item);
-
 			$str = CMacrosResolverHelper::resolveGraphName($this->header, $this->items);
 		}
 
