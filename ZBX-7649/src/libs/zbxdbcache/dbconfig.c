@@ -3047,6 +3047,27 @@ static int	__config_nextcheck_compare(const void *d1, const void *d2)
 	return 0;
 }
 
+static int	__config_pinger_nextcheck_compare(const void *d1, const void *d2)
+{
+	const zbx_binary_heap_elem_t	*e1 = (const zbx_binary_heap_elem_t *)d1;
+	const zbx_binary_heap_elem_t	*e2 = (const zbx_binary_heap_elem_t *)d2;
+
+	const ZBX_DC_ITEM		*i1 = (const ZBX_DC_ITEM *)e1->data;
+	const ZBX_DC_ITEM		*i2 = (const ZBX_DC_ITEM *)e2->data;
+
+	if (i1->nextcheck < i2->nextcheck)
+		return -1;
+	if (i1->nextcheck > i2->nextcheck)
+		return +1;
+
+	if (i1->interfaceid < i2->interfaceid)
+		return -1;
+	if (i1->interfaceid > i2->interfaceid)
+		return +1;
+
+	return 0;
+}
+
 static int	__config_java_item_compare(const ZBX_DC_ITEM *i1, const ZBX_DC_ITEM *i2)
 {
 	const ZBX_DC_JMXITEM	*j1;
@@ -3213,23 +3234,34 @@ void	init_configuration_cache()
 
 	for (i = 0; i < ZBX_POLLER_TYPE_COUNT; i++)
 	{
-		if (ZBX_POLLER_TYPE_JAVA != i)
+		switch(i)
 		{
-			zbx_binary_heap_create_ext(&config->queues[i],
-					__config_nextcheck_compare,
-					ZBX_BINARY_HEAP_OPTION_DIRECT,
-					__config_mem_malloc_func,
-					__config_mem_realloc_func,
-					__config_mem_free_func);
+			case ZBX_POLLER_TYPE_JAVA:
+				zbx_binary_heap_create_ext(&config->queues[i],
+						__config_java_elem_compare,
+						ZBX_BINARY_HEAP_OPTION_DIRECT,
+						__config_mem_malloc_func,
+						__config_mem_realloc_func,
+						__config_mem_free_func);
+				break;
+			case ZBX_POLLER_TYPE_PINGER:
+				zbx_binary_heap_create_ext(&config->queues[i],
+						__config_pinger_nextcheck_compare,
+						ZBX_BINARY_HEAP_OPTION_DIRECT,
+						__config_mem_malloc_func,
+						__config_mem_realloc_func,
+						__config_mem_free_func);
+				break;
+			default:
+				zbx_binary_heap_create_ext(&config->queues[i],
+						__config_nextcheck_compare,
+						ZBX_BINARY_HEAP_OPTION_DIRECT,
+						__config_mem_malloc_func,
+						__config_mem_realloc_func,
+						__config_mem_free_func);
+				break;
 		}
 	}
-
-	zbx_binary_heap_create_ext(&config->queues[ZBX_POLLER_TYPE_JAVA],
-			__config_java_elem_compare,
-			ZBX_BINARY_HEAP_OPTION_DIRECT,
-			__config_mem_malloc_func,
-			__config_mem_realloc_func,
-			__config_mem_free_func);
 
 	zbx_binary_heap_create_ext(&config->pqueue,
 					__config_proxy_compare,
