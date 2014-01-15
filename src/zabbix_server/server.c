@@ -263,13 +263,14 @@ static void	zbx_set_defaults()
  * Author: Vladimir Levijev                                                   *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_validate_config()
+static void	zbx_validate_config(void)
 {
 	if ((NULL == CONFIG_JAVA_GATEWAY || '\0' == *CONFIG_JAVA_GATEWAY) && CONFIG_JAVAPOLLER_FORKS > 0)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "JavaGateway not specified in config file or empty");
 		exit(EXIT_FAILURE);
 	}
+
 	if (0 != CONFIG_VALUE_CACHE_SIZE && 128 * ZBX_KIBIBYTE > CONFIG_VALUE_CACHE_SIZE)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "value cache size must be either 0 or greater than 128KB");

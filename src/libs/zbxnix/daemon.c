@@ -146,65 +146,54 @@ int	daemon_start(int allow_root, const char *user)
 	pid_t		pid;
 	struct passwd	*pwd;
 
-	if (0 == getuid())
+	if (0 == allow_root && 0 == getuid())	/* running as root? */
 	{
-		if (0 == allow_root)
+		if (NULL == user)
+			user = "zabbix";
+
+		pwd = getpwnam(user);
+
+		if (NULL == pwd)
 		{
-			if (NULL == user)
-				user = "zabbix";
+			zbx_error("user %s does not exist", user);
+			zbx_error("cannot run as root!");
+			exit(FAIL);
+		}
 
-			if ('\0' != *user)
-			{
-				pwd = getpwnam(user);
+		if (0 == pwd->pw_uid)
+		{
+			zbx_error("User=%s contradicts AllowRoot=0", user);
+			zbx_error("cannot run as root!");
+			exit(FAIL);
+		}
 
-				if (NULL == pwd)
-				{
-					zbx_error("user '%s' does not exist", user);
-					zbx_error("cannot run as root!");
-					exit(FAIL);
-				}
-
-				if (0 == pwd->pw_uid)
-				{
-					zbx_error("option User does not allow changing privileges to a superuser "
-							"account; user AllowRoot=1 by itself to run as root");
-				}
-
-				if (-1 == setgid(pwd->pw_gid))
-				{
-					zbx_error("cannot setgid to %s: %s", user, zbx_strerror(errno));
-					exit(FAIL);
-				}
+		if (-1 == setgid(pwd->pw_gid))
+		{
+			zbx_error("cannot setgid to %s: %s", user, zbx_strerror(errno));
+			exit(FAIL);
+		}
 
 #ifdef HAVE_FUNCTION_INITGROUPS
-				if (-1 == initgroups(user, pwd->pw_gid))
-				{
-					zbx_error("cannot initgroups to %s: %s", user, zbx_strerror(errno));
-					exit(FAIL);
-				}
+		if (-1 == initgroups(user, pwd->pw_gid))
+		{
+			zbx_error("cannot initgroups to %s: %s", user, zbx_strerror(errno));
+			exit(FAIL);
+		}
 #endif
 
-				if (-1 == setuid(pwd->pw_uid))
-				{
-					zbx_error("cannot setuid to %s: %s", user, zbx_strerror(errno));
-					exit(FAIL);
-				}
+		if (-1 == setuid(pwd->pw_uid))
+		{
+			zbx_error("cannot setuid to %s: %s", user, zbx_strerror(errno));
+			exit(FAIL);
+		}
 
 #ifdef HAVE_FUNCTION_SETEUID
-				if (-1 == setegid(pwd->pw_gid) || -1 == seteuid(pwd->pw_uid))
-				{
-					zbx_error("cannot setegid or seteuid to %s: %s", user, zbx_strerror(errno));
-					exit(FAIL);
-				}
-#endif
-			}
-			else
-			{
-				zbx_error("empty \"User\" parameter passed");
-				zbx_error("cannot run as root!");
-				exit(FAIL);
-			}
+		if (-1 == setegid(pwd->pw_gid) || -1 == seteuid(pwd->pw_uid))
+		{
+			zbx_error("cannot setegid or seteuid to %s: %s", user, zbx_strerror(errno));
+			exit(FAIL);
 		}
+#endif
 	}
 
 	if (0 != (pid = zbx_fork()))
