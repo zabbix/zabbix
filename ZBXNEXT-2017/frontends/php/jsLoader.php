@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -199,7 +199,7 @@ $tranStrings = array(
 		'Configuration' => _('Configuration'),
 		'Events' => _('Events'),
 		'Go to' => _('Go to'),
-		'History' => _('History'),
+		'Scripts' => _('History'),
 		'Host inventory' => _('Host inventory'),
 		'Host screens' => _('Host screens'),
 		'Latest data' => _('Latest data'),

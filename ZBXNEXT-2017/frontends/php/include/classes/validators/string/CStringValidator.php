@@ -63,7 +63,6 @@ class CStringValidator extends CValidator {
 	 */
 	public $messageRegex;
 
-
 	/**
 	 * Checks if the given string is:
 	 * - empty
@@ -74,8 +73,7 @@ class CStringValidator extends CValidator {
 	 *
 	 * @return bool
 	 */
-	public function validate($value)
-	{
+	public function validate($value) {
 		if (zbx_empty($value)) {
 			if ($this->empty) {
 				return true;
@@ -101,5 +99,4 @@ class CStringValidator extends CValidator {
 
 		return true;
 	}
-
 }

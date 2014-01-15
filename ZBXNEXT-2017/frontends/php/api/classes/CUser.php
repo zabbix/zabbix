@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,20 +31,21 @@ class CUser extends CZBXAPI {
 	protected $sortColumns = array('userid', 'alias');
 
 	/**
-	 * Get Users data
+	 * Get users data.
 	 *
-	 * @param array $options
-	 * @param array $options['nodeids'] filter by Node IDs
-	 * @param array $options['usrgrpids'] filter by UserGroup IDs
-	 * @param array $options['userids'] filter by User IDs
-	 * @param boolean $options['type'] filter by User type [ USER_TYPE_ZABBIX_USER: 1, USER_TYPE_ZABBIX_ADMIN: 2, USER_TYPE_SUPER_ADMIN: 3 ]
-	 * @param boolean $options['selectUsrgrps'] extend with UserGroups data for each User
-	 * @param boolean $options['getAccess'] extend with access data for each User
-	 * @param boolean $options['count'] output only count of objects in result. ( result returned in property 'rowscount' )
-	 * @param string $options['pattern'] filter by Host name containing only give pattern
-	 * @param int $options['limit'] output will be limited to given number
-	 * @param string $options['sortfield'] output will be sorted by given property [ 'userid', 'alias' ]
-	 * @param string $options['sortorder'] output will be sorted in given order [ 'ASC', 'DESC' ]
+	 * @param array  $options
+	 * @param array  $options['nodeids']		filter by Node IDs
+	 * @param array  $options['usrgrpids']		filter by UserGroup IDs
+	 * @param array  $options['userids']		filter by User IDs
+	 * @param bool   $options['type']			filter by User type [USER_TYPE_ZABBIX_USER: 1, USER_TYPE_ZABBIX_ADMIN: 2, USER_TYPE_SUPER_ADMIN: 3]
+	 * @param bool   $options['selectUsrgrps']	extend with UserGroups data for each User
+	 * @param bool   $options['getAccess']		extend with access data for each User
+	 * @param bool   $options['count']			output only count of objects in result. (result returned in property 'rowscount')
+	 * @param string $options['pattern']		filter by Host name containing only give pattern
+	 * @param int    $options['limit']			output will be limited to given number
+	 * @param string $options['sortfield']		output will be sorted by given property ['userid', 'alias']
+	 * @param string $options['sortorder']		output will be sorted in given order ['ASC', 'DESC']
+	 *
 	 * @return array
 	 */
 	public function get($options = array()) {
@@ -1066,24 +1067,26 @@ class CUser extends CZBXAPI {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		$userids = zbx_objectValues($result, 'userid');
+		$userIds = zbx_objectValues($result, 'userid');
 
 		// adding usergroups
 		if ($options['selectUsrgrps'] !== null && $options['selectUsrgrps'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'userid', 'usrgrpid', 'users_groups');
-			$usrgrps = API::UserGroup()->get(array(
+
+			$dbUserGroups = API::UserGroup()->get(array(
 				'output' => $options['selectUsrgrps'],
 				'usrgrpids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			));
-			$result = $relationMap->mapMany($result, $usrgrps, 'usrgrps');
+
+			$result = $relationMap->mapMany($result, $dbUserGroups, 'usrgrps');
 		}
 
 		// adding medias
 		if ($options['selectMedias'] !== null && $options['selectMedias'] != API_OUTPUT_COUNT) {
 			$userMedias = API::UserMedia()->get(array(
 				'output' => $this->outputExtend($options['selectMedias'], array('userid', 'mediaid')),
-				'userids' => $userids,
+				'userids' => $userIds,
 				'preservekeys' => true
 			));
 
