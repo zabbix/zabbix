@@ -94,7 +94,8 @@ $mediaTypeFormList->addRow(_('Jabber identifier'),
 // Password
 if (!empty($this->data['password'])) {
 	$passwordButton = new CButton('chPass_btn', _('Change password'),
-		'this.style.display="none"; $("password").enable().show().focus();'
+		'this.style.display="none"; $("password").enable().show().focus();',
+		'formlist'
 	);
 	$passwordBox = new CPassBox('password', $this->data['password'], ZBX_TEXTBOX_SMALL_SIZE);
 	$passwordBox->addStyle('display: none;');
