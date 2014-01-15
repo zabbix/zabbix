@@ -1895,7 +1895,7 @@ static int	zbx_rdds80_test(const char *host, const char *url, short port, int ti
 	int	ret = FAIL;
 
 #ifdef HAVE_LIBCURL
-	zbx_dns_infof(log_fd, "start RDDS%hd test (url %s, host %s", port, url, host);
+	zbx_dns_infof(log_fd, "start RDDS%hd test (url %s, host %s)", port, url, host);
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
