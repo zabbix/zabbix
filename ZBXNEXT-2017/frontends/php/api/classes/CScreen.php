@@ -554,7 +554,7 @@ class CScreen extends CZBXAPI {
 	 */
 	protected function validateDelete(array $screenIds) {
 		$dbScreens = $this->get(array(
-			'output' => array('screenitemid'),
+			'output' => array('screenid'),
 			'screenids' => $screenIds,
 			'editable' => true,
 			'preservekeys' => true
