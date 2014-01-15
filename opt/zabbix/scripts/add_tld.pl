@@ -133,6 +133,7 @@ create_macro('{$DNSTEST.RDDS.DELAY}', 300, undef);
 create_macro('{$DNSTEST.RDDS.UPDATE.TIME}', 3600, undef);
 create_macro('{$DNSTEST.RDDS.PROBE.ONLINE}', 10, undef);
 create_macro('{$DNSTEST.RDDS.ROLLWEEK.SLA}', 48, undef);
+create_macro('{$DNSTEST.RDDS.MAXREDIRS}', 10, undef);
 
 create_macro('{$DNSTEST.PROBE.ONLINE.DELAY}', 180, undef);
 

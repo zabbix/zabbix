@@ -32,7 +32,6 @@
 #define ZBX_RDDS_PREVIEW_SIZE	100
 
 #define ZBX_HTTP_RESPONSE_OK	200
-#define ZBX_MAXREDIRS		10L
 
 extern const char	*CONFIG_LOG_FILE;
 
@@ -1894,7 +1893,8 @@ static size_t	curl_devnull(char *ptr, size_t size, size_t nmemb, void *userdata)
 	return size * nmemb;
 }
 
-static int	zbx_rdds80_test(const char *host, const char *url, int timeout, int *rtt80, char *err, size_t err_size)
+static int	zbx_rdds80_test(const char *host, const char *url, int timeout, int maxredirs, int *rtt80, char *err,
+		size_t err_size)
 {
 #ifdef HAVE_LIBCURL
 	int			curl_err, opt;
@@ -1923,14 +1923,13 @@ static int	zbx_rdds80_test(const char *host, const char *url, int timeout, int *
 	}
 
 	if (CURLE_OK != (curl_err = curl_easy_setopt(easyhandle, opt = CURLOPT_FOLLOWLOCATION, 1L)) ||
-			CURLE_OK != (curl_err = curl_easy_setopt(easyhandle, opt = CURLOPT_MAXREDIRS, ZBX_MAXREDIRS)) ||
+			CURLE_OK != (curl_err = curl_easy_setopt(easyhandle, opt = CURLOPT_MAXREDIRS, (long)maxredirs)) ||
 			CURLE_OK != (curl_err = curl_easy_setopt(easyhandle, opt = CURLOPT_URL, url)) ||
 			CURLE_OK != (curl_err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT, (long)timeout)) ||
 			CURLE_OK != (curl_err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPHEADER, slist)) ||
 			CURLE_OK != (curl_err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYPEER, 0L)) ||
 			CURLE_OK != (curl_err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0L)) ||
 			CURLE_OK != (curl_err = curl_easy_setopt(easyhandle, opt = CURLOPT_WRITEFUNCTION, curl_devnull)))
-
 	{
 		*rtt80 = ZBX_EC_INTERNAL;
 		zbx_snprintf(err, err_size, "cannot set cURL option [%d] (%s)", opt, curl_easy_strerror(curl_err));
@@ -1995,7 +1994,8 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 	size_t			i, items_num = 0;
 	time_t			ts, now;
 	int			rtt43 = ZBX_NO_VALUE, upd43 = ZBX_NO_VALUE, rtt80 = ZBX_NO_VALUE, rtt_limit,
-				ipv4_enabled, ipv6_enabled, rdds_enabled, epp_enabled, ret = SYSINFO_RET_FAIL, http_code;
+				ipv4_enabled, ipv6_enabled, rdds_enabled, epp_enabled, ret = SYSINFO_RET_FAIL, http_code,
+				maxredirs;
 
 	/* first read the TLD */
 	if (0 != get_param(params, 1, domain, sizeof(domain)) || '\0' == *domain)
@@ -2076,7 +2076,7 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 		goto out;
 	}
 
-	/* get configuration */
+	/* get rest of configuration */
 	if (SUCCEED != zbx_conf_str(&item->host.hostid, ZBX_MACRO_DNS_RESOLVER, &res_ip, err, sizeof(err)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
@@ -2126,6 +2126,12 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 	}
 
 	if (SUCCEED != zbx_conf_ip_support(&item->host.hostid, &ipv4_enabled, &ipv6_enabled, err, sizeof(err)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+		goto out;
+	}
+
+	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_RDDS_MAXREDIRS, &maxredirs, 1, err, sizeof(err)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
 		goto out;
@@ -2243,7 +2249,8 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 
 	zbx_snprintf(testname, sizeof(testname), "http://%s", ip80);
 
-	if (SUCCEED != zbx_rdds80_test(random_host, testname, ZBX_DNSTEST_TCP_TIMEOUT, &rtt80, err, sizeof(err)))
+	if (SUCCEED != zbx_rdds80_test(random_host, testname, ZBX_DNSTEST_TCP_TIMEOUT, maxredirs, &rtt80, err,
+			sizeof(err)))
 	{
 		zbx_dns_errf(log_fd, "RDDS80 of \"%s\" (%s) failed: %s", random_host, ip80, err);
 		goto out;
