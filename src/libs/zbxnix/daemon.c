@@ -134,25 +134,35 @@ static void	set_daemon_signal_handlers()
  * Purpose: init process as daemon                                            *
  *                                                                            *
  * Parameters: allow_root - allow root permission for application             *
+ *             user - user on the system to which to drop the privileges      *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: it doesn't allow running under 'root' if allow_root is zero      *
  *                                                                            *
  ******************************************************************************/
-int	daemon_start(int allow_root)
+int	daemon_start(int allow_root, const char *user)
 {
-	pid_t			pid;
-	struct passwd		*pwd;
-	char			user[7] = "zabbix";
+	pid_t		pid;
+	struct passwd	*pwd;
 
-	if (0 == allow_root && (0 == getuid() || 0 == getgid()))	/* running as root? */
+	if (0 == allow_root && 0 == getuid())	/* running as root? */
 	{
+		if (NULL == user)
+			user = "zabbix";
+
 		pwd = getpwnam(user);
 
 		if (NULL == pwd)
 		{
 			zbx_error("user %s does not exist", user);
+			zbx_error("cannot run as root!");
+			exit(FAIL);
+		}
+
+		if (0 == pwd->pw_uid)
+		{
+			zbx_error("User=%s contradicts AllowRoot=0", user);
 			zbx_error("cannot run as root!");
 			exit(FAIL);
 		}

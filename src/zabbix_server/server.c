@@ -199,6 +199,8 @@ int	CONFIG_PROXYDATA_FREQUENCY	= 1;	/* 1s */
 char	*CONFIG_LOAD_MODULE_PATH	= NULL;
 char	**CONFIG_LOAD_MODULE		= NULL;
 
+char	*CONFIG_USER			= NULL;
+
 /* mutex for node syncs */
 ZBX_MUTEX	node_sync_access;
 
@@ -261,13 +263,14 @@ static void	zbx_set_defaults()
  * Author: Vladimir Levijev                                                   *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_validate_config()
+static void	zbx_validate_config(void)
 {
 	if ((NULL == CONFIG_JAVA_GATEWAY || '\0' == *CONFIG_JAVA_GATEWAY) && CONFIG_JAVAPOLLER_FORKS > 0)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "JavaGateway not specified in config file or empty");
 		exit(EXIT_FAILURE);
 	}
+
 	if (0 != CONFIG_VALUE_CACHE_SIZE && 128 * ZBX_KIBIBYTE > CONFIG_VALUE_CACHE_SIZE)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "value cache size must be either 0 or greater than 128KB");
@@ -429,6 +432,8 @@ static void	zbx_load_config()
 			PARM_OPT,	10,			SEC_PER_DAY},
 		{"VMwareCacheSize",		&CONFIG_VMWARE_CACHE_SIZE,		TYPE_UINT64,
 			PARM_OPT,	256 * ZBX_KIBIBYTE,	0x7fffffff},	/* just below 2GB */
+		{"User",			&CONFIG_USER,				TYPE_STRING,
+			PARM_OPT,	0,			0},
 		{NULL}
 	};
 
@@ -552,7 +557,7 @@ int	main(int argc, char **argv)
 			break;
 	}
 
-	return daemon_start(CONFIG_ALLOW_ROOT);
+	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER);
 }
 
 int	MAIN_ZABBIX_ENTRY()
