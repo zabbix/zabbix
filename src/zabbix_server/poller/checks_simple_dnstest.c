@@ -1663,7 +1663,7 @@ static int	zbx_rdds43_test(const char *request, const char *ip, short port, int 
 	memset(&s, 0, sizeof(s));
 	zbx_timespec(&start);
 
-	zbx_dns_infof(log_fd, "start RDDS%hd test (ip %s, request %s", port, ip, request);
+	zbx_dns_infof(log_fd, "start RDDS%hd test (ip %s, request %s)", port, ip, request);
 
 	if (SUCCEED != zbx_tcp_connect(&s, NULL, ip, port, timeout))
 	{
