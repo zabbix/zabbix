@@ -99,7 +99,6 @@ class CHistory extends CZBXAPI {
 			$items = API::Item()->get(array(
 				'itemids' => ($options['itemids'] === null) ? null : $options['itemids'],
 				'output' => array('itemid'),
-				'output' => array('itemid'),
 				'editable' => $options['editable'],
 				'preservekeys' => true,
 				'webitems' => true

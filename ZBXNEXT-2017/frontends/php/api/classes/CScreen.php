@@ -219,6 +219,7 @@ class CScreen extends CZBXAPI {
 
 			// item
 			$allowedItems = API::Item()->get(array(
+				'output' => array('itemid'),
 				'nodeids' => $options['nodeids'],
 				'itemids' => $itemsToCheck,
 				'webitems' => true,
