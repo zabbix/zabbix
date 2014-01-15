@@ -24,3 +24,8 @@ Branch strategy
 ##### Contributing
 
 Note the `F-*` branch you should be building changes off of (for example: LLNW custom API changes would be `F-LLNW-API`) and make updates/additions based off the branch. If it is a new feature: first makes sure you've consulted [support.zabbix.com](https://support.zabbix.com) and the [forums](https://www.zabbix.com/forum) to ensure upstream alignment. New features are based off the Zabbix release tag where the feature starts and later all feature branches are merged together.
+
+
+*protip*
+
+`git fetch upstream refs/tags/*:refs/tags/*` to get all tag info from upstream to your local repo.
