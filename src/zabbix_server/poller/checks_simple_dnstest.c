@@ -100,7 +100,8 @@ static void	zbx_dns_log(FILE *log_fd, const char *prefix, const char *text)
 			text);
 }
 
-static int	zbx_validate_ip(const char *ip, char ipv4_enabled, char ipv6_enabled, ldns_rdf **ip_rdf_out)
+static int	zbx_validate_ip(const char *ip, char ipv4_enabled, char ipv6_enabled, ldns_rdf **ip_rdf_out,
+		char *is_ipv4)
 {
 	ldns_rdf	*ip_rdf = NULL;
 	int		ret = FAIL;
@@ -109,8 +110,16 @@ static int	zbx_validate_ip(const char *ip, char ipv4_enabled, char ipv6_enabled,
 	if (0 == ipv4_enabled || NULL == (ip_rdf = ldns_rdf_new_frm_str(LDNS_RDF_TYPE_A, ip)))
 	{
 		/* try IPv6 */
-		if (0 != ipv6_enabled)
-			ip_rdf = ldns_rdf_new_frm_str(LDNS_RDF_TYPE_AAAA, ip);
+		if (0 != ipv6_enabled && NULL != (ip_rdf = ldns_rdf_new_frm_str(LDNS_RDF_TYPE_AAAA, ip)))
+		{
+			if (NULL != is_ipv4)
+				*is_ipv4 = 0;
+		}
+	}
+	else
+	{
+		if (NULL != is_ipv4)
+			*is_ipv4 = 1;
 	}
 
 	if (NULL == ip_rdf)
@@ -134,7 +143,7 @@ static int	zbx_set_resolver_ns(ldns_resolver *res, const char *name, const char 
 	ldns_status	status;
 	int		ret = FAIL;
 
-	if (SUCCEED != zbx_validate_ip(ip, ipv4_enabled, ipv6_enabled, &ip_rdf))
+	if (SUCCEED != zbx_validate_ip(ip, ipv4_enabled, ipv6_enabled, &ip_rdf, NULL))
 	{
 		zbx_snprintf(err, err_size, "invalid or unsupported IP of \"%s\": \"%s\"", name, ip);
 		goto out;
@@ -613,7 +622,6 @@ static int	zbx_get_ns_values(ldns_resolver *res, const char *ns, const char *ip,
 	ldns_rdf	*testname_rdf = NULL, *last_label_rdf = NULL;
 	ldns_pkt	*pkt = NULL;
 	ldns_rr_list	*nsset = NULL;
-	ldns_status	status;
 	ldns_rr		*rr = NULL;
 	time_t		now, ts;
 	ldns_pkt_rcode	rcode;
@@ -841,8 +849,6 @@ static void	zbx_add_value_str(const DC_ITEM *item, int ts, const char *value)
 static void	zbx_set_dnstest_values(const char *item_ns, const char *item_ip, int rtt, int upd, int value_ts,
 		size_t keypart_size, const DC_ITEM *items, size_t items_num)
 {
-	const char	*__function_name = "zbx_set_dnstest_values";
-
 	size_t		i;
 	const DC_ITEM	*item;
 	const char	*p;
@@ -891,7 +897,7 @@ static int	zbx_get_dnskeys(const ldns_resolver *res, const char *domain, const c
 {
 	ldns_pkt	*pkt = NULL;
 	ldns_rdf	*domain_rdf = NULL;
-	int		i, ret = FAIL;
+	int		ret = FAIL;
 
 	if (NULL == (domain_rdf = ldns_rdf_new_frm_str(LDNS_RDF_TYPE_DNAME, domain)))
 	{
@@ -1080,7 +1086,7 @@ static size_t	zbx_get_nameservers(const DC_ITEM *items, size_t items_num, zbx_ns
 		get_param(item->params, 2, ns, sizeof(ns));
 		get_param(item->params, 3, ip, sizeof(ip));
 
-		if (SUCCEED != zbx_validate_ip(ip, ipv4_enabled, ipv6_enabled, NULL))
+		if (SUCCEED != zbx_validate_ip(ip, ipv4_enabled, ipv6_enabled, NULL, NULL))
 			continue;
 
 		if (0 == nss_num)
@@ -1342,7 +1348,6 @@ out:
 
 int	check_dnstest_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_RESULT *result, char proto)
 {
-	const char	*__function_name = "check_dnstest_dns";
 	char		err[ZBX_ERR_BUF_SIZE], domain[ZBX_HOST_BUF_SIZE], ok_nss_num = 0, *res_ip = NULL,
 			*testprefix = NULL;
 	ldns_resolver	*res = NULL;
@@ -1647,7 +1652,7 @@ static size_t	zbx_get_rdds_items(const char *keyname, DC_ITEM *item, const char 
 	return out_items_num;
 }
 
-static int	zbx_tcp_exchange(const char *request, const char *host, short port, int timeout, char **answer,
+static int	zbx_rdds43_test(const char *request, const char *ip, short port, int timeout, char **answer,
 		int *rtt, FILE *log_fd, char *err, size_t err_size)
 {
 	zbx_sock_t	s;
@@ -1658,32 +1663,15 @@ static int	zbx_tcp_exchange(const char *request, const char *host, short port, i
 	memset(&s, 0, sizeof(s));
 	zbx_timespec(&start);
 
-	zbx_dns_infof(log_fd, "start RDDS%hd test", port);
+	zbx_dns_infof(log_fd, "start RDDS%hd test (ip %s, request %s", port, ip, request);
 
-	if (SUCCEED != zbx_tcp_connect(&s, NULL, host, port, timeout))
+	if (SUCCEED != zbx_tcp_connect(&s, NULL, ip, port, timeout))
 	{
 		zbx_strlcpy(err, "cannot connect to host", err_size);
 		goto out;
 	}
 
-	if (43 == port)
-	{
-		zbx_snprintf(send_buf, sizeof(send_buf), "%s\r\n", request);
-	}
-	else if (80 == port)
-	{
-		zbx_snprintf(send_buf, sizeof(send_buf),
-				"GET / HTTP/1.1\r\n"
-				"Host: %s\r\n"
-				"Connection: close\r\n"
-				"\r\n",
-				request);
-	}
-	else
-	{
-		zbx_snprintf(err, err_size, "invalid port specified: %d (expecting 43 or 80)", port);
-		goto out;
-	}
+	zbx_snprintf(send_buf, sizeof(send_buf), "%s\r\n", request);
 
 	if (SUCCEED != zbx_tcp_send_raw(&s, send_buf))
 	{
@@ -1706,7 +1694,7 @@ static int	zbx_tcp_exchange(const char *request, const char *host, short port, i
 	zbx_timespec(&now);
 	*rtt = (now.sec - start.sec) * 1000 + (now.ns - start.ns) / 1000000;
 
-	zbx_dns_infof(log_fd, "===>\n%.*s\n<=== end RDDS%hd test", ZBX_RDDS_PREVIEW_SIZE, recv_buf, port);
+	zbx_dns_infof(log_fd, "===>\n%.*s\n<=== end RDDS%hd test (rtt:%d)", ZBX_RDDS_PREVIEW_SIZE, recv_buf, port, *rtt);
 
 	if (NULL != answer)
 		*answer = zbx_strdup(*answer, recv_buf);
@@ -1722,7 +1710,7 @@ static int	zbx_resolve_host(const ldns_resolver *res, const char *host, zbx_vect
 	ldns_pkt	*pkt = NULL;
 	ldns_rdf	*host_rdf = NULL;
 	ldns_rr_list	*rrset = NULL;
-	size_t		i, j;
+	size_t		i;
 	char		*ip;
 	int		ret = FAIL, rr_count;
 
@@ -1745,9 +1733,9 @@ static int	zbx_resolve_host(const ldns_resolver *res, const char *host, zbx_vect
 		if (NULL != (rrset = ldns_pkt_rr_list_by_type(pkt, LDNS_RR_TYPE_A, LDNS_SECTION_ANSWER)))
 		{
 			rr_count = ldns_rr_list_rr_count(rrset);
-			for (j = 0; j < rr_count; j++)
+			for (i = 0; i < rr_count; i++)
 			{
-				ip = ldns_rdf2str(ldns_rr_a_address(ldns_rr_list_rr(rrset, j)));
+				ip = ldns_rdf2str(ldns_rr_a_address(ldns_rr_list_rr(rrset, i)));
 				zbx_vector_str_append(ips, ip);
 			}
 		}
@@ -1778,9 +1766,9 @@ static int	zbx_resolve_host(const ldns_resolver *res, const char *host, zbx_vect
 		if (NULL != (rrset = ldns_pkt_rr_list_by_type(pkt, LDNS_RR_TYPE_AAAA, LDNS_SECTION_ANSWER)))
 		{
 			rr_count = ldns_rr_list_rr_count(rrset);
-			for (j = 0; j < rr_count; j++)
+			for (i = 0; i < rr_count; i++)
 			{
-				ip = ldns_rdf2str(ldns_rr_a_address(ldns_rr_list_rr(rrset, j)));
+				ip = ldns_rdf2str(ldns_rr_a_address(ldns_rr_list_rr(rrset, i)));
 				zbx_vector_str_append(ips, ip);
 			}
 		}
@@ -1893,8 +1881,8 @@ static size_t	curl_devnull(char *ptr, size_t size, size_t nmemb, void *userdata)
 	return size * nmemb;
 }
 
-static int	zbx_rdds80_test(const char *host, const char *url, int timeout, int maxredirs, int *rtt80, char *err,
-		size_t err_size)
+static int	zbx_rdds80_test(const char *host, const char *url, short port, int timeout, int maxredirs, int *rtt80,
+		FILE *log_fd, char *err, size_t err_size)
 {
 #ifdef HAVE_LIBCURL
 	int			curl_err, opt;
@@ -1907,6 +1895,8 @@ static int	zbx_rdds80_test(const char *host, const char *url, int timeout, int m
 	int	ret = FAIL;
 
 #ifdef HAVE_LIBCURL
+	zbx_dns_infof(log_fd, "start RDDS%hd test (url %s, host %s", port, url, host);
+
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
 		*rtt80 = ZBX_EC_INTERNAL;
@@ -1967,6 +1957,8 @@ static int	zbx_rdds80_test(const char *host, const char *url, int timeout, int m
 
 	*rtt80 = total_time * 1000;	/* expected in ms */
 
+	zbx_dns_infof(log_fd, "end RDDS%hd test (rtt:%d)", port, *rtt80);
+
 	ret = SUCCEED;
 out:
 	if (NULL != slist)
@@ -1984,8 +1976,8 @@ out:
 int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, AGENT_RESULT *result)
 {
 	char			domain[ZBX_HOST_BUF_SIZE], *value_str = NULL, *res_ip = NULL, *testprefix = NULL,
-				*rdds_ns_string = NULL, *answer = NULL, testname[ZBX_HOST_BUF_SIZE],
-				err[ZBX_ERR_BUF_SIZE], *random_ns;
+				*rdds_ns_string = NULL, *answer = NULL, testname[ZBX_HOST_BUF_SIZE], is_ipv4, *random_ns,
+				err[ZBX_ERR_BUF_SIZE];
 	const char		*random_host, *ip43, *ip80;
 	zbx_vector_str_t	hosts43, hosts80, ips43, ips80, nss;
 	FILE			*log_fd = NULL;
@@ -1994,8 +1986,7 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 	size_t			i, items_num = 0;
 	time_t			ts, now;
 	int			rtt43 = ZBX_NO_VALUE, upd43 = ZBX_NO_VALUE, rtt80 = ZBX_NO_VALUE, rtt_limit,
-				ipv4_enabled, ipv6_enabled, rdds_enabled, epp_enabled, ret = SYSINFO_RET_FAIL, http_code,
-				maxredirs;
+				ipv4_enabled, ipv6_enabled, rdds_enabled, epp_enabled, ret = SYSINFO_RET_FAIL, maxredirs;
 
 	/* first read the TLD */
 	if (0 != get_param(params, 1, domain, sizeof(domain)) || '\0' == *domain)
@@ -2176,7 +2167,7 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 	else
 		zbx_strlcpy(testname, testprefix, sizeof(testname));
 
-	if (SUCCEED != zbx_tcp_exchange(testname, ip43, 43, ZBX_DNSTEST_TCP_TIMEOUT, &answer, &rtt43, log_fd, err,
+	if (SUCCEED != zbx_rdds43_test(testname, ip43, 43, ZBX_DNSTEST_TCP_TIMEOUT, &answer, &rtt43, log_fd, err,
 			sizeof(err)))
 	{
 		rtt43 = ZBX_EC_RDDS43_NOREPLY;
@@ -2247,10 +2238,20 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 	i = zbx_random(ips80.values_num);
 	ip80 = ips80.values[i];
 
-	zbx_snprintf(testname, sizeof(testname), "http://%s", ip80);
+	if (SUCCEED != zbx_validate_ip(ip80, ipv4_enabled, ipv6_enabled, NULL, &is_ipv4))
+	{
+		rtt80 = ZBX_EC_INTERNAL;
+		zbx_dns_errf(log_fd, "internal error, selected unsupported IP of \"%s\": \"%s\"", random_host, ip80);
+		goto out;
+	}
 
-	if (SUCCEED != zbx_rdds80_test(random_host, testname, ZBX_DNSTEST_TCP_TIMEOUT, maxredirs, &rtt80, err,
-			sizeof(err)))
+	if (0 != is_ipv4)
+		zbx_snprintf(testname, sizeof(testname), "http://%s", ip80);
+	else
+		zbx_snprintf(testname, sizeof(testname), "http://[%s]", ip80);
+
+	if (SUCCEED != zbx_rdds80_test(random_host, testname, 80, ZBX_DNSTEST_TCP_TIMEOUT, maxredirs, &rtt80, log_fd,
+			err, sizeof(err)))
 	{
 		zbx_dns_errf(log_fd, "RDDS80 of \"%s\" (%s) failed: %s", random_host, ip80, err);
 		goto out;
