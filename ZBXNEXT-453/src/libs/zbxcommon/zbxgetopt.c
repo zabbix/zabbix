@@ -397,6 +397,7 @@ static int zbx_getopt_internal (int argc, char **argv, const char *optstring,
                 exact = 1;
                 break;
               }
+#if OFF	/* ZBX: disable long option partial matching */
             else if (pfound == NULL)
               {
                 /* First nonexact match found.  */
@@ -406,6 +407,7 @@ static int zbx_getopt_internal (int argc, char **argv, const char *optstring,
             else
               /* Second nonexact match found.  */
               ambig = 1;
+#endif
           }
 
       /* don't allow nonexact longoptions */
