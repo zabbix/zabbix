@@ -62,6 +62,8 @@ char	**CONFIG_USER_PARAMETERS	= NULL;
 char	**CONFIG_PERF_COUNTERS		= NULL;
 #endif
 
+char	*CONFIG_USER			= NULL;
+
 /******************************************************************************
  *                                                                            *
  * Function: load_aliases                                                     *
