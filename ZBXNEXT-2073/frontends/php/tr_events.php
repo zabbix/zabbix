@@ -118,7 +118,7 @@ $right_col = array();
 // if acknowledges are not disabled in configuration, let's show them
 if ($config['event_ack_enable']) {
 	$eventAcknowledgesWidget = new CUIWidget('hat_eventack', makeAckTab($event));
-	$eventAcknowledgesWidget->state = CProfile::get('web.tr_events.hats.hat_eventack.state', 1);
+	$eventAcknowledgesWidget->open = (bool) CProfile::get('web.tr_events.hats.hat_eventack.state', true);
 	$eventAcknowledgesWidget->setHeader(_('Acknowledges'));
 
 	$right_col[] = $eventAcknowledgesWidget;
@@ -126,19 +126,19 @@ if ($config['event_ack_enable']) {
 
 // event sms actions
 $actionsSmsWidget = new CUIWidget('hat_eventactionmsgs', get_action_msgs_for_event($event));
-$actionsSmsWidget->state = CProfile::get('web.tr_events.hats.hat_eventactionmsgs.state', 1);
+$actionsSmsWidget->open = (bool) CProfile::get('web.tr_events.hats.hat_eventactionmsgs.state', true);
 $actionsSmsWidget->setHeader(_('Message actions'));
 $right_col[] = $actionsSmsWidget;
 
 // event cmd actions
 $actionsCommandWidget = new CUIWidget('hat_eventactionmcmds', get_action_cmds_for_event($event));
-$actionsCommandWidget->state = CProfile::get('web.tr_events.hats.hat_eventactioncmds.state', 1);
+$actionsCommandWidget->open = (bool) CProfile::get('web.tr_events.hats.hat_eventactioncmds.state', true);
 $actionsCommandWidget->setHeader(_('Command actions'));
 $right_col[] = $actionsCommandWidget;
 
 // event history
 $eventsHistoryWidget = new CUIWidget('hat_eventlist', make_small_eventlist($event));
-$eventsHistoryWidget->state = CProfile::get('web.tr_events.hats.hat_eventlist.state', 1);
+$eventsHistoryWidget->open = (bool) CProfile::get('web.tr_events.hats.hat_eventlist.state', true);
 $eventsHistoryWidget->setHeader(_('Event list [previous 20]'));
 $right_col[] = $eventsHistoryWidget;
 

@@ -32,12 +32,12 @@ class CUIWidget extends CDiv {
 	 * Expand/collapse widget.
 	 *
 	 * Supported values:
-	 * - 1 - expanded;
-	 * - 2 - collapsed.
+	 * - true - expanded;
+	 * - false - collapsed.
 	 *
-	 * @var int
+	 * @var bool
 	 */
-	public $state;
+	public $open;
 
 	/**
 	 * Header div.
@@ -68,8 +68,9 @@ class CUIWidget extends CDiv {
 	 */
 	public function __construct($id, $body = null) {
 		$this->id = $id;
+		$this->open = true;
 		$this->header = null;
-		$this->body = array($body);
+		$this->body = $body ? array($body) : array();
 		$this->footer = null;
 
 		parent::__construct(null, 'ui-widget ui-widget-content ui-helper-clearfix ui-corner-all widget');
@@ -103,19 +104,14 @@ class CUIWidget extends CDiv {
 
 		$this->header = new CDiv(null, 'nowrap ui-corner-all ui-widget-header header');
 
-		if ($this->state !== null) {
-			$icon = new CIcon(
-				_('Show').'/'._('Hide'),
-				$this->state ? 'arrowup' : 'arrowdown',
-				'changeWidgetState(this, "'.$this->id.'");'
-			);
-			$icon->setAttribute('id', $this->id.'_icon');
+		$icon = new CIcon(
+			_('Show').'/'._('Hide'),
+			$this->open ? 'arrowup' : 'arrowdown',
+			'changeWidgetState(this, "'.$this->id.'");'
+		);
+		$icon->setAttribute('id', $this->id.'_icon');
 
-			$this->header->addItem($icon);
-		}
-
-		$this->header->addItem($icons);
-		$this->header->addItem($caption);
+		$this->header->addItem(array($icon, $icons, $caption));
 	}
 
 	/**
@@ -135,15 +131,14 @@ class CUIWidget extends CDiv {
 		$table->addStyle('width: 100%;');
 		$table->addRow(array($leftColumn, $rightColumn));
 
-		$this->header = new CDiv(null, 'nowrap ui-corner-all ui-widget-header header');
-		$this->header->addItem($table);
+		$this->header = new CDiv($table, 'nowrap ui-corner-all ui-widget-header header');
 	}
 
 	/**
 	 * Set widget footer.
 	 *
 	 * @param string|array|CTag $footer
-	 * @param bool   			$right
+	 * @param bool				$right
 	 */
 	public function setFooter($footer, $right = false) {
 		$this->footer = new CDiv($footer, 'nowrap ui-corner-all ui-widget-header footer '.($right ? ' right' : ' left'));
@@ -153,26 +148,21 @@ class CUIWidget extends CDiv {
 	 * Build widget header, body and footer.
 	 */
 	public function build() {
-		$this->cleanItems();
+		$body = new CDiv($this->body, 'body');
+		$body->setAttribute('id', $this->id);
 
-		parent::addItem($this->header);
-
-		if ($this->state === null) {
-			$this->state = true;
-		}
-
-		$div = new CDiv($this->body, 'body');
-		$div->setAttribute('id', $this->id);
-
-		if (!$this->state) {
-			$div->setAttribute('style', 'display: none;');
+		if (!$this->open) {
+			$body->setAttribute('style', 'display: none;');
 
 			if ($this->footer) {
 				$this->footer->setAttribute('style', 'display: none;');
 			}
 		}
 
-		parent::addItem($div);
+		$this->cleanItems();
+
+		parent::addItem($this->header);
+		parent::addItem($body);
 		parent::addItem($this->footer);
 	}
 

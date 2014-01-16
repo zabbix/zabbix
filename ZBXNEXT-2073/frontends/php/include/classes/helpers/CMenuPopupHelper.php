@@ -46,7 +46,7 @@ class CMenuPopupHelper {
 			if ($graphIds) {
 				$dbGraphs = API::Graph()->get(array(
 					'output' => array('graphid', 'name'),
-					'selectHosts' => array('hostid', 'host'),
+					'selectHosts' => array('hostid', 'name'),
 					'expandName' => true,
 					'graphids' => $graphIds,
 					'preservekeys' => true
@@ -56,7 +56,7 @@ class CMenuPopupHelper {
 			if ($itemIds) {
 				$dbItems = API::Item()->get(array(
 					'output' => array('itemid', 'hostid', 'name', 'key_'),
-					'selectHosts' => array('hostid', 'host'),
+					'selectHosts' => array('hostid', 'name'),
 					'itemids' => $itemIds,
 					'webitems' => true,
 					'preservekeys' => true
@@ -75,7 +75,7 @@ class CMenuPopupHelper {
 
 						$simpeGraphs[] = array(
 							'id' => $sourceId,
-							'label' => $dbHost['host'].NAME_DELIMITER.$dbItem['name_expanded']
+							'label' => $dbHost['name'].NAME_DELIMITER.$dbItem['name_expanded']
 						);
 					}
 				}
@@ -86,7 +86,7 @@ class CMenuPopupHelper {
 
 						$graphs[] = array(
 							'id' => $sourceId,
-							'label' => $dbHost['host'].NAME_DELIMITER.$dbGraph['name']
+							'label' => $dbHost['name'].NAME_DELIMITER.$dbGraph['name']
 						);
 					}
 				}
@@ -401,7 +401,7 @@ class CMenuPopupHelper {
 	 *
 	 * @return array
 	 */
-	public static function getTriggerLog($itemId, $itemName, $triggers) {
+	public static function getTriggerLog($itemId, $itemName, array $triggers) {
 		return array(
 			'type' => 'triggerLog',
 			'itemid' => $itemId,
