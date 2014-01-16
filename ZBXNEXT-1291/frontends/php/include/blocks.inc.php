@@ -82,7 +82,7 @@ function make_favorite_graphs() {
 				get_node_name_by_elid($sourceid, null, NAME_DELIMITER).$host['name'].NAME_DELIMITER.$item['name_expanded'],
 				'history.php?action=showgraph&itemid='.$sourceid
 			);
-			$link->setTarget('blank');
+			$link->setTarget('_blank');
 		}
 		else {
 			if (!isset($graphs[$sourceid])) {
@@ -96,7 +96,7 @@ function make_favorite_graphs() {
 				get_node_name_by_elid($sourceid, null, NAME_DELIMITER).$ghost['name'].NAME_DELIMITER.$graph['name'],
 				'charts.php?graphid='.$sourceid
 			);
-			$link->setTarget('blank');
+			$link->setTarget('_blank');
 		}
 
 		$favList->addItem($link, 'nowrap');
@@ -140,7 +140,7 @@ function make_favorite_screens() {
 			}
 
 			$link = new CLink(get_node_name_by_elid($sourceid, null, NAME_DELIMITER).$slide['name'], 'slides.php?elementid='.$sourceid);
-			$link->setTarget('blank');
+			$link->setTarget('_blank');
 		}
 		else {
 			if (!isset($screens[$sourceid])) {
@@ -149,7 +149,7 @@ function make_favorite_screens() {
 			$screen = $screens[$sourceid];
 
 			$link = new CLink(get_node_name_by_elid($sourceid, null, NAME_DELIMITER).$screen['name'], 'screens.php?elementid='.$sourceid);
-			$link->setTarget('blank');
+			$link->setTarget('_blank');
 		}
 		$favList->addItem($link, 'nowrap');
 	}
@@ -177,7 +177,7 @@ function make_favorite_maps() {
 		$sysmapid = $sysmap['sysmapid'];
 
 		$link = new CLink(get_node_name_by_elid($sysmapid, null, NAME_DELIMITER).$sysmap['name'], 'maps.php?sysmapid='.$sysmapid);
-		$link->setTarget('blank');
+		$link->setTarget('_blank');
 
 		$favList->addItem($link, 'nowrap');
 	}
