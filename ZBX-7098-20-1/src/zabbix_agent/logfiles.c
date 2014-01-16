@@ -406,7 +406,6 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 	}
 	zbx_free(find_path);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "we are in the Windows directory reading cycle");
 	do
 	{
 		logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, find_data.name);
@@ -420,8 +419,6 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 			zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
 			add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, find_data.name, (int)file_buf.st_mtime);
 		}
-		else
-			zabbix_log(LOG_LEVEL_DEBUG, "'%s' does not match '%s'", logfile_candidate, format);
 
 		zbx_free(logfile_candidate);
 
@@ -437,7 +434,6 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 		goto out;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "we are in the *nix directory reading cycle");
 	while (NULL != (d_ent = readdir(dir)))
 	{
 		logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, d_ent->d_name);
@@ -451,8 +447,6 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 			zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
 			add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, d_ent->d_name, (int)file_buf.st_mtime);
 		}
-		else
-			zabbix_log(LOG_LEVEL_DEBUG, "'%s' does not match '%s'", logfile_candidate, format);
 
 		zbx_free(logfile_candidate);
 	}
