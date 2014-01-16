@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ extern char	*CONFIG_PID_FILE;
 
 #include "threads.h"
 
-int	daemon_start(int allow_root);
+int	daemon_start(int allow_root, const char *user);
 void	daemon_stop();
 
 int	zbx_sigusr_send(zbx_task_t task);
@@ -38,6 +38,6 @@ int	zbx_sigusr_send(zbx_task_t task);
 #define ZBX_IS_RUNNING()	1
 #define ZBX_DO_EXIT()
 
-#define START_MAIN_ZABBIX_ENTRY(a)	daemon_start(a)
+#define START_MAIN_ZABBIX_ENTRY(a, u)	daemon_start(a, u)
 
 #endif	/* ZABBIX_DAEMON_H */

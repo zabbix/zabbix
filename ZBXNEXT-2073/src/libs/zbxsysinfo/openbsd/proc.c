@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,7 +61,8 @@ static int	proc_argv(pid_t pid, char ***argv, size_t *argv_alloc, int *argc)
 	size_t	sz;
 	int	mib[4];
 
-	if (NULL == *argv) {
+	if (NULL == *argv)
+	{
 		*argv_alloc = ARGS_START_SIZE;
 		*argv = zbx_malloc(*argv, *argv_alloc);
 	}

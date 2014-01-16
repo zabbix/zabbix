@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,6 +72,7 @@ $itemTable->setHeader(array(
 	make_sorting_header(_('Status'), 'status'),
 	$data['showErrorColumn'] ? _('Error') : null
 ));
+
 foreach ($this->data['items'] as $item) {
 	// description
 	$description = array();
@@ -222,7 +223,7 @@ foreach ($this->data['items'] as $item) {
 		}
 
 		$menuIcon = new CIcon(_('Menu'), 'iconmenu_b');
-		$menuIcon->setMenuPopup(CMenuPopupHelper::getTriggerLog($item['itemid'], $item['name_expanded'], $triggers));
+		$menuIcon->setMenuPopup(CMenuPopupHelper::getTriggerLog($item['itemid'], $item['name'], $triggers));
 	}
 	else {
 		$menuIcon = SPACE;

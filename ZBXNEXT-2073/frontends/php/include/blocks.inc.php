@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,40 +56,50 @@ function getFavouriteGraphs() {
 	}
 
 	if ($itemids) {
-		$options = array(
+		$items = API::Item()->get(array(
 			'itemids' => $itemids,
 			'selectHosts' => array('hostid', 'name'),
-			'output' => array('itemid', 'name', 'key_'),
+			'output' => array('itemid', 'hostid', 'name', 'key_'),
 			'webitems' => true
-		);
-		$items = API::Item()->get($options);
+		));
 		$items = zbx_toHash($items, 'itemid');
+
+		$items = CMacrosResolverHelper::resolveItemNames($items);
 	}
 
 	foreach ($fav_graphs as $favorite) {
 		$sourceid = $favorite['value'];
 
-		if ('itemid' == $favorite['source']) {
+		if ($favorite['source'] == 'itemid') {
 			if (!isset($items[$sourceid])) {
 				continue;
 			}
+
 			$item = $items[$sourceid];
 			$host = reset($item['hosts']);
-			$item['name'] = itemName($item);
 
-			$link = new CLink(get_node_name_by_elid($sourceid, null, NAME_DELIMITER).$host['name'].NAME_DELIMITER.$item['name'], 'history.php?action=showgraph&itemid='.$sourceid);
+			$link = new CLink(
+				get_node_name_by_elid($sourceid, null, NAME_DELIMITER).$host['name'].NAME_DELIMITER.$item['name_expanded'],
+				'history.php?action=showgraph&itemid='.$sourceid
+			);
 		}
 		else {
 			if (!isset($graphs[$sourceid])) {
 				continue;
 			}
+
 			$graph = $graphs[$sourceid];
 			$ghost = reset($graph['hosts']);
 
-			$link = new CLink(get_node_name_by_elid($sourceid, null, NAME_DELIMITER).$ghost['name'].NAME_DELIMITER.$graph['name'], 'charts.php?graphid='.$sourceid);
+			$link = new CLink(
+				get_node_name_by_elid($sourceid, null, NAME_DELIMITER).$ghost['name'].NAME_DELIMITER.$graph['name'],
+				'charts.php?graphid='.$sourceid
+			);
 		}
+
 		$favList->addItem($link, 'nowrap');
 	}
+
 	return $favList;
 }
 

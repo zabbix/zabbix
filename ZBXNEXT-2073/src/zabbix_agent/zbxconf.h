@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ extern char	**CONFIG_LOAD_MODULE;
 #ifdef _WINDOWS
 extern char	**CONFIG_PERF_COUNTERS;
 #endif
+extern char	*CONFIG_USER;
 
 void	load_aliases(char **lines);
 void	load_user_parameters(char **lines);

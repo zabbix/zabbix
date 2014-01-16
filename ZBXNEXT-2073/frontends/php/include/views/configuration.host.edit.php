@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,11 +77,13 @@ if ($_REQUEST['hostid'] > 0) {
 	// get items that populate host inventory fields
 	$hostItemsToInventory = API::Item()->get(array(
 		'filter' => array('hostid' => $dbHost['hostid']),
-		'output' => array('inventory_link', 'name', 'key_'),
+		'output' => array('inventory_link', 'itemid', 'hostid', 'name', 'key_'),
 		'preserveKeys' => true,
 		'nopermissions' => true
 	));
 	$hostItemsToInventory = zbx_toHash($hostItemsToInventory, 'inventory_link');
+
+	$hostItemsToInventory = CMacrosResolverHelper::resolveItemNames($hostItemsToInventory);
 }
 else {
 	$original_templates = array();
@@ -198,7 +200,7 @@ if (!$isDiscovered) {
 		$tmp_label .= SPACE._('(Only super admins can create groups)');
 		$newgroupTB->setReadonly(true);
 	}
-	$hostList->addRow(SPACE, array(new CLabel($tmp_label, 'newgroup'), BR(), $newgroupTB), null, null, null, 'new');
+	$hostList->addRow(SPACE, array(new CLabel($tmp_label, 'newgroup'), BR(), $newgroupTB), null, null, 'new');
 }
 // groups for discovered hosts
 else {
@@ -436,12 +438,15 @@ if ($_REQUEST['form'] == 'full_clone') {
 		'hostids' => $_REQUEST['hostid'],
 		'inherited' => false,
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
-		'output' => array('itemid', 'key_', 'name')
+		'output' => array('itemid', 'hostid', 'key_', 'name')
 	));
-	if (!empty($hostItems)) {
+
+	if ($hostItems) {
+		$hostItems = CMacrosResolverHelper::resolveItemNames($hostItems);
+
 		$itemsList = array();
 		foreach ($hostItems as $hostItem) {
-			$itemsList[$hostItem['itemid']] = itemName($hostItem);
+			$itemsList[$hostItem['itemid']] = $hostItem['name_expanded'];
 		}
 		order_result($itemsList);
 
@@ -516,12 +521,15 @@ if ($_REQUEST['form'] == 'full_clone') {
 	$hostDiscoveryRules = API::DiscoveryRule()->get(array(
 		'inherited' => false,
 		'hostids' => $_REQUEST['hostid'],
-		'output' => array('itemid', 'key_', 'name')
+		'output' => array('itemid', 'hostid', 'key_', 'name')
 	));
-	if (!empty($hostDiscoveryRules)) {
+
+	if ($hostDiscoveryRules) {
+		$hostDiscoveryRules = CMacrosResolverHelper::resolveItemNames($hostDiscoveryRules);
+
 		$discoveryRuleList = array();
 		foreach ($hostDiscoveryRules as $discoveryRule) {
-			$discoveryRuleList[$discoveryRule['itemid']] = itemName($discoveryRule);
+			$discoveryRuleList[$discoveryRule['itemid']] = $discoveryRule['name_expanded'];
 		}
 		order_result($discoveryRuleList);
 		$hostDiscoveryRuleids = array_keys($discoveryRuleList);
@@ -537,12 +545,15 @@ if ($_REQUEST['form'] == 'full_clone') {
 		'hostids' => $_REQUEST['hostid'],
 		'discoveryids' => $hostDiscoveryRuleids,
 		'inherited' => false,
-		'output' => array('itemid', 'key_', 'name')
+		'output' => array('itemid', 'hostid', 'key_', 'name')
 	));
-	if (!empty($hostItemPrototypes)) {
+
+	if ($hostItemPrototypes) {
+		$hostItemPrototypes = CMacrosResolverHelper::resolveItemNames($hostItemPrototypes);
+
 		$prototypeList = array();
 		foreach ($hostItemPrototypes as $itemPrototype) {
-			$prototypeList[$itemPrototype['itemid']] = itemName($itemPrototype);
+			$prototypeList[$itemPrototype['itemid']] = $itemPrototype['name_expanded'];
 		}
 		order_result($prototypeList);
 
@@ -791,7 +802,8 @@ foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
 
 	// link to populating item at the right side (if any)
 	if (isset($hostItemsToInventory[$inventoryNo])) {
-		$itemName = itemName($hostItemsToInventory[$inventoryNo]);
+		$itemName = $hostItemsToInventory[$inventoryNo]['name_expanded'];
+
 		$populatingLink = new CLink($itemName, 'items.php?form=update&itemid='.$hostItemsToInventory[$inventoryNo]['itemid']);
 		$populatingLink->setAttribute('title', _s('This field is automatically populated by item "%s".', $itemName));
 		$populatingItemCell = array(' &larr; ', $populatingLink);

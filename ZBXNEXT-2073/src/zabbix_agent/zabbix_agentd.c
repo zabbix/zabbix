@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,6 +72,8 @@ const char	title_message[] = APPLICATION_NAME
 #endif
 	;
 /* end of application TITLE */
+
+const char	syslog_app_name[] = "zabbix_agentd";
 
 /* application USAGE message */
 const char	usage_message[] =
@@ -454,6 +456,8 @@ static void	zbx_load_config(int requirement)
 			PARM_OPT,	0,			0},
 		{"LoadModule",			&CONFIG_LOAD_MODULE,			TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
+		{"User",			&CONFIG_USER,				TYPE_STRING,
+			PARM_OPT,	0,			0},
 #endif
 #ifdef _WINDOWS
 		{"PerfCounter",			&CONFIG_PERF_COUNTERS,			TYPE_MULTISTRING,
@@ -581,9 +585,6 @@ int	MAIN_ZABBIX_ENTRY()
 	init_perf_collector(1);
 	load_perf_counters(CONFIG_PERF_COUNTERS);
 #endif
-	load_user_parameters(CONFIG_USER_PARAMETERS);
-	load_aliases(CONFIG_ALIASES);
-
 	zbx_free_config();
 
 	/* --- START THREADS ---*/
@@ -828,10 +829,12 @@ int	main(int argc, char **argv)
 			break;
 		default:
 			zbx_load_config(ZBX_CFG_FILE_REQUIRED);
+			load_user_parameters(CONFIG_USER_PARAMETERS);
+			load_aliases(CONFIG_ALIASES);
 			break;
 	}
 
-	START_MAIN_ZABBIX_ENTRY(CONFIG_ALLOW_ROOT);
+	START_MAIN_ZABBIX_ENTRY(CONFIG_ALLOW_ROOT, CONFIG_USER);
 
 	exit(SUCCEED);
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,6 +45,6 @@ int	application_status;	/* required for closing application from service */
 #define ZBX_IS_RUNNING()	(ZBX_APP_RUNNING == application_status)
 #define ZBX_DO_EXIT()		application_status = ZBX_APP_STOPPED
 
-#define START_MAIN_ZABBIX_ENTRY(a)	service_start()
+#define START_MAIN_ZABBIX_ENTRY(a, u)	service_start()
 
 #endif /* ZABBIX_SERVICE_H */

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,6 +60,7 @@
 
 const char	*progname = NULL;
 const char	title_message[] = "Zabbix proxy";
+const char	syslog_app_name[] = "zabbix_proxy";
 const char	usage_message[] = "[-hV] [-c <file>] [-R <option>]";
 
 const char	*help_message[] = {
@@ -197,6 +198,8 @@ int	CONFIG_SERVER_STARTUP_TIME	= 0;
 char	*CONFIG_LOAD_MODULE_PATH	= NULL;
 char	**CONFIG_LOAD_MODULE		= NULL;
 
+char	*CONFIG_USER			= NULL;
+
 /* mutex for node syncs; not used in proxy */
 ZBX_MUTEX	node_sync_access;
 
@@ -289,7 +292,7 @@ static void	zbx_set_defaults()
  * Author: Alexei Vladishev, Rudolfs Kreicbergs                               *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_validate_config()
+static void	zbx_validate_config(void)
 {
 	if ((NULL == CONFIG_JAVA_GATEWAY || '\0' == *CONFIG_JAVA_GATEWAY) && 0 < CONFIG_JAVAPOLLER_FORKS)
 	{
@@ -461,6 +464,8 @@ static void	zbx_load_config()
 			PARM_OPT,	10,			SEC_PER_DAY},
 		{"VMwareCacheSize",		&CONFIG_VMWARE_CACHE_SIZE,		TYPE_UINT64,
 			PARM_OPT,	256 * ZBX_KIBIBYTE,	0x7fffffff},	/* just below 2GB */
+		{"User",			&CONFIG_USER,				TYPE_STRING,
+			PARM_OPT,	0,			0},
 		{NULL}
 	};
 
@@ -570,7 +575,7 @@ int	main(int argc, char **argv)
 	init_ipmi_handler();
 #endif
 
-	return daemon_start(CONFIG_ALLOW_ROOT);
+	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER);
 }
 
 int	MAIN_ZABBIX_ENTRY()

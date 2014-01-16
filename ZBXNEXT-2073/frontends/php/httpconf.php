@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -205,7 +205,7 @@ elseif (isset($_REQUEST['save'])) {
 		}
 
 		if (isset($_REQUEST['httptestid'])) {
-			// unset fields tht did not change
+			// unset fields that did not change
 			$dbHttpTest = API::HttpTest()->get(array(
 				'httptestids' => $_REQUEST['httptestid'],
 				'output' => API_OUTPUT_EXTEND,

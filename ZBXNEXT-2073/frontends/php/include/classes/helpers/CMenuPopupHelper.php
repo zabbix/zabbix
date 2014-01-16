@@ -55,12 +55,14 @@ class CMenuPopupHelper {
 
 			if ($itemIds) {
 				$dbItems = API::Item()->get(array(
-					'output' => array('itemid', 'name', 'key_'),
+					'output' => array('itemid', 'hostid', 'name', 'key_'),
 					'selectHosts' => array('hostid', 'host'),
 					'itemids' => $itemIds,
 					'webitems' => true,
 					'preservekeys' => true
 				));
+
+				$dbItems = CMacrosResolverHelper::resolveItemNames($dbItems);
 			}
 
 			foreach ($favourites as $favourite) {
@@ -70,11 +72,10 @@ class CMenuPopupHelper {
 					if (isset($dbItems[$sourceId])) {
 						$dbItem = $dbItems[$sourceId];
 						$dbHost = reset($dbItem['hosts']);
-						$dbItem['name'] = itemName($dbItem); // TODO RESOLVE MACROS AFTER MERGING WITH TRUNK
 
 						$simpeGraphs[] = array(
 							'id' => $sourceId,
-							'label' => $dbHost['host'].NAME_DELIMITER.$dbItem['name']
+							'label' => $dbHost['host'].NAME_DELIMITER.$dbItem['name_expanded']
 						);
 					}
 				}
