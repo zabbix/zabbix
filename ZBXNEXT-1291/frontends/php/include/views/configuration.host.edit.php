@@ -696,7 +696,10 @@ if (!$isDiscovered) {
 else {
 	$linkedTemplateTable->setHeader(array(_('Name')));
 	foreach ($linkedTemplates as $template) {
-		$linkedTemplateTable->addRow(array($template['name']),null, 'conditions_'.$template['templateid']);
+		$templateLink = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']);
+		$templateLink->setTarget('_blank');
+
+		$linkedTemplateTable->addRow($templateLink, null, 'conditions_'.$template['templateid']);
 	}
 
 	$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
