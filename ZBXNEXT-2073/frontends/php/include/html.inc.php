@@ -175,7 +175,7 @@ function get_icon($type, $params = array()) {
 				$icon = new CIcon(
 					_('Remove from favourites'),
 					'iconminus',
-					'rm4favorites("'.$params['elname'].'", "'.$params['elid'].'", 0);'
+					'rm4favorites("'.$params['elname'].'", "'.$params['elid'].'");'
 				);
 			}
 			else {
