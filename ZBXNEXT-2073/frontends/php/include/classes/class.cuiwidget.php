@@ -31,7 +31,11 @@ class CUIWidget extends CDiv {
 	/**
 	 * Expand/collapse widget.
 	 *
-	 * @var CDiv
+	 * Supported values:
+	 * - 1 - expanded;
+	 * - 2 - collapsed.
+	 *
+	 * @var int
 	 */
 	public $state;
 
@@ -45,7 +49,7 @@ class CUIWidget extends CDiv {
 	/**
 	 * Body div.
 	 *
-	 * @var CDiv
+	 * @var array
 	 */
 	private $body;
 
@@ -59,8 +63,8 @@ class CUIWidget extends CDiv {
 	/**
 	 * Construct widget.
 	 *
-	 * @param string $id
-	 * @param object $body
+	 * @param string 			$id
+	 * @param string|array|CTag $body
 	 */
 	public function __construct($id, $body = null) {
 		$this->id = $id;
@@ -76,7 +80,7 @@ class CUIWidget extends CDiv {
 	/**
 	 * Add element to widget body.
 	 *
-	 * @param object $item
+	 * @param string|array|CTag $item
 	 */
 	public function addItem($item) {
 		if ($item !== null) {
@@ -87,8 +91,8 @@ class CUIWidget extends CDiv {
 	/**
 	 * Set widget header.
 	 *
-	 * @param string $caption
-	 * @param object $icons
+	 * @param string|array|CTag $caption
+	 * @param string|array|CTag $icons
 	 */
 	public function setHeader($caption = null, $icons = SPACE) {
 		zbx_value2array($icons);
@@ -117,8 +121,8 @@ class CUIWidget extends CDiv {
 	/**
 	 * Set widget header with left and right parts.
 	 *
-	 * @param object $leftColumn
-	 * @param object $rightColumn
+	 * @param string|array|CTag $leftColumn
+	 * @param string|array|CTag $rightColumn
 	 */
 	public function setDoubleHeader($leftColumn, $rightColumn) {
 		$leftColumn = new CCol($leftColumn);
@@ -138,8 +142,8 @@ class CUIWidget extends CDiv {
 	/**
 	 * Set widget footer.
 	 *
-	 * @param object $footer
-	 * @param bool   $right
+	 * @param string|array|CTag $footer
+	 * @param bool   			$right
 	 */
 	public function setFooter($footer, $right = false) {
 		$this->footer = new CDiv($footer, 'nowrap ui-corner-all ui-widget-header footer '.($right ? ' right' : ' left'));
