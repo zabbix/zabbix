@@ -115,9 +115,9 @@ $macro = reset($macro);
 // get items
 $probeItems = API::Item()->get(array(
 	'hostids' => $host['hostid'],
-	'output' => array('itemid', 'key_', 'hostid', 'valuemapid', 'units'),
+	'output' => array('itemid', 'key_', 'hostid', 'valuemapid', 'units', 'value_type'),
 	'search' => array(
-		'key_' => PROBE_RDDS_ITEM
+		'key_' => PROBE_DNS_UDP_ITEM_RTT
 	),
 	'startSearch' => true,
 	'preservekeys' => true
@@ -130,15 +130,15 @@ foreach ($probeItems as $probeItem) {
 	$nsValues = explode(',', $matches[1]);
 
 	// get NS values
-	$itemValue = DBfetch(DBselect(DBaddLimit(
-		'SELECT h.value'.
-		' FROM history h'.
-		' WHERE h.itemid='.$probeItem['itemid'].
-			' AND h.clock>='.$testTimeFrom.
-			' AND h.clock<='.$testTimeTill.
-		' ORDER BY h.clock DESC',
-		1
-	)));
+	$itemValue = API::History()->get(array(
+		'itemids' => $probeItem['itemid'],
+		'time_from' => $testTimeFrom,
+		'time_till' => $testTimeTill,
+		'history' => $probeItem['value_type'],
+		'output' => API_OUTPUT_EXTEND
+	));
+
+	$itemValue = reset($itemValue);
 
 	$ms = convert_units($itemValue['value'], $probeItem['units']);
 	$ms = $itemValue ? applyValueMap($ms, $probeItem['valuemapid']) : null;
