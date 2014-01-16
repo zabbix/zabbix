@@ -212,12 +212,12 @@ $tranStrings = array(
 		'Trigger' => _('Trigger'),
 		'URL' => _('URL'),
 		'URLs' => _('URLs'),
-		'10 seconds' => _('10 seconds'),
-		'30 seconds' => _('30 seconds'),
-		'1 minute' => _('1 minute'),
-		'2 minutes' => _('2 minutes'),
-		'10 minutes' => _('10 minutes'),
-		'15 minutes' => _('15 minutes')
+		'10 seconds' => _n('%1$s second', '%1$s seconds', 10),
+		'30 seconds' => _n('%1$s second', '%1$s seconds', 30),
+		'1 minute' => _n('%1$s minute', '%1$s minutes', 1),
+		'2 minutes' => _n('%1$s minute', '%1$s minutes', 2),
+		'10 minutes' => _n('%1$s minute', '%1$s minutes', 10),
+		'15 minutes' => _n('%1$s minute', '%1$s minutes', 15)
 	)
 );
 
