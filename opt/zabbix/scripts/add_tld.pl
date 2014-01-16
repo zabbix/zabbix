@@ -183,6 +183,7 @@ my $dnstest_hostid = create_host({'groups' => [{'groupid' => $dnstest_groupid}],
 			      'host' => $dnstest_host,
 			      'interfaces' => [{'type' => 1, 'main' => 1, 'useip' => 1, 'ip'=> '127.0.0.1', 'dns' => '', 'port' => '10050'}]});
 
+# calculated items, configuration history (TODO: rename host to something like config_history)
 create_dnstest_items($dnstest_hostid);
 
 $ns_servers = get_ns_servers($OPTS{'tld'});
@@ -1317,6 +1318,7 @@ sub create_slv_items {
     }
 }
 
+# calculated items, configuration history (TODO: rename host to something like config_history)
 sub create_dnstest_items {
     my $hostid = shift;
 
@@ -1332,7 +1334,9 @@ sub create_dnstest_items {
 	'INCIDENT.RDDS.FAIL',
 	'INCIDENT.RDDS.RECOVER',
 	'DNSTEST.DNS.UDP.DELAY',
-	'DNSTEST.RDDS.DELAY')
+	'DNSTEST.RDDS.DELAY',
+	'DNSTEST.DNS.UDP.RTT',
+	'DNSTEST.DNS.AVAIL.MINNS')
     {
 	$options = {'name' => '$1 value',
 		   'key_'=> 'dnstest.configvalue['.$m.']',
