@@ -594,7 +594,7 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
  *                                                                            *
  * Purpose: calculate nextcheck timestamp for item                            *
  *                                                                            *
- * Parameters: salt      - [IN] the salt value applied to delay to spread     *
+ * Parameters: seed      - [IN] the seed value applied to delay to spread     *
  *                          item checks over the delay period                 *
  *             item_type - [IN] the item type                                 *
  *             delay     - [IN] default delay value, can be overridden        *
@@ -614,7 +614,7 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
  *           !!! Don't forget to sync code with PHP !!!                       *
  *                                                                            *
  ******************************************************************************/
-int	calculate_item_nextcheck(zbx_uint64_t salt, int item_type, int delay, const char *flex_intervals, time_t now)
+int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int delay, const char *flex_intervals, time_t now)
 {
 	int	nextcheck = 0;
 
@@ -646,7 +646,7 @@ int	calculate_item_nextcheck(zbx_uint64_t salt, int item_type, int delay, const 
 			if (0 != current_delay)
 			{
 				nextcheck = current_delay * (int)(t / (time_t)current_delay) +
-						(int)(salt % (zbx_uint64_t)current_delay);
+						(int)(seed % (zbx_uint64_t)current_delay);
 
 				if (0 == try)
 				{
