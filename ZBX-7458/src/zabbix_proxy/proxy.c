@@ -312,7 +312,8 @@ static void	zbx_validate_config()
 
 	if (ZBX_PROXYMODE_ACTIVE == CONFIG_PROXYMODE &&	NULL == CONFIG_SERVER)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "missing active proxy mandatory \"Server\" configuration parameter");
+		zabbix_log(LOG_LEVEL_CRIT, "\"Server\" configuration parameter is not defined."
+				"This parameter is mandatory for active proxies.");
 		exit(EXIT_FAILURE);
 	}
 
