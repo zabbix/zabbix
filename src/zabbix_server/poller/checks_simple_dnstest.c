@@ -21,6 +21,7 @@
 #include "checks_simple_dnstest.h"
 #include "zbxserver.h"
 #include "comms.h"
+#include "log.h"	/* TODO: tracking down crash when adding a value, remove later */
 
 #include <ldns/ldns.h>
 
@@ -810,10 +811,15 @@ static void	zbx_add_value(const DC_ITEM *item, AGENT_RESULT *result, int ts)
 {
 	zbx_timespec_t	timespec;
 
+	zabbix_log(LOG_LEVEL_WARNING, "DNSTEST: add value for itemid:" ZBX_FS_UI64 " type:%s",
+			item->itemid, zbx_item_value_type_string(item->value_type));
+
 	zbx_set_value_ts(&timespec, ts);
 
 	dc_add_history(item->itemid, item->value_type, item->flags, result, &timespec, ITEM_STATUS_ACTIVE,
 			NULL, 0, NULL, 0, 0, 0, 0);
+
+	zabbix_log(LOG_LEVEL_WARNING, "DNSTEST: value added");
 }
 
 static void	zbx_add_value_uint(const DC_ITEM *item, int ts, int value)
