@@ -268,12 +268,18 @@ static void	zbx_validate_config()
 		zabbix_log(LOG_LEVEL_CRIT, "JavaGateway not specified in config file or empty");
 		exit(EXIT_FAILURE);
 	}
+
 	if (0 != CONFIG_VALUE_CACHE_SIZE && 128 * ZBX_KIBIBYTE > CONFIG_VALUE_CACHE_SIZE)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "value cache size must be either 0 or greater than 128KB");
 		exit(EXIT_FAILURE);
 	}
 
+	if (NULL != CONFIG_SOURCE_IP && ('\0' == *CONFIG_SOURCE_IP || SUCCEED != is_ip(CONFIG_SOURCE_IP)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid SourceIP parameter value");
+		exit(EXIT_FAILURE);
+	}
 #if !defined(HAVE_LIBXML2) || !defined(HAVE_LIBCURL)
 	if (0 != CONFIG_VMWARE_FORKS)
 	{

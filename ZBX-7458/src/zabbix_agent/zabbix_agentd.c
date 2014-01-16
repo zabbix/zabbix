@@ -311,6 +311,12 @@ static void	zbx_validate_config(void)
 		zabbix_log(LOG_LEVEL_CRIT, "either active or passive checks must be enabled");
 		exit(EXIT_FAILURE);
 	}
+
+	if (NULL != CONFIG_SOURCE_IP && ('\0' == *CONFIG_SOURCE_IP || SUCCEED != is_ip(CONFIG_SOURCE_IP)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid SourceIP parameter value");
+		exit(EXIT_FAILURE);
+	}
 }
 
 static int	add_activechk_host(const char *host, unsigned short port)

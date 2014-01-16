@@ -317,6 +317,12 @@ static void	zbx_validate_config()
 		exit(EXIT_FAILURE);
 	}
 
+	if (NULL != CONFIG_SOURCE_IP && ('\0' == *CONFIG_SOURCE_IP || SUCCEED != is_ip(CONFIG_SOURCE_IP)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid SourceIP parameter value");
+		exit(EXIT_FAILURE);
+	}
+
 #if !defined(HAVE_LIBXML2) || !defined(HAVE_LIBCURL)
 	if (0 != CONFIG_VMWARE_FORKS)
 	{
