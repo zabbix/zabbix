@@ -292,34 +292,33 @@ static void	zbx_set_defaults()
  ******************************************************************************/
 static void	zbx_validate_config()
 {
-	if ((NULL == CONFIG_JAVA_GATEWAY || '\0' == *CONFIG_JAVA_GATEWAY) && 0 < CONFIG_JAVAPOLLER_FORKS)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "JavaGateway not in config file or empty");
-		exit(EXIT_FAILURE);
-	}
-
-	if (ZBX_PROXYMODE_ACTIVE == CONFIG_PROXYMODE &&	NULL == CONFIG_SERVER)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "missing active proxy mandatory parameter [Server] in config file [%s]",
-				CONFIG_FILE);
-		exit(EXIT_FAILURE);
-	}
-
 	if (NULL == CONFIG_HOSTNAME)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "hostname is not defined");
+		zabbix_log(LOG_LEVEL_CRIT, "\"Hostname\" configuration parameter is not defined");
 		exit(EXIT_FAILURE);
 	}
 
 	if (FAIL == zbx_check_hostname(CONFIG_HOSTNAME))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "invalid host name: [%s]", CONFIG_HOSTNAME);
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"Hostname\" configuration parameter: %s", CONFIG_HOSTNAME);
+		exit(EXIT_FAILURE);
+	}
+
+	if ((NULL == CONFIG_JAVA_GATEWAY || '\0' == *CONFIG_JAVA_GATEWAY) && 0 < CONFIG_JAVAPOLLER_FORKS)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "\"JavaGateway\" configuration parameter is not specified or empty");
+		exit(EXIT_FAILURE);
+	}
+
+	if (ZBX_PROXYMODE_ACTIVE == CONFIG_PROXYMODE &&	NULL == CONFIG_SERVER)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "missing active proxy mandatory \"Server\" configuration parameter");
 		exit(EXIT_FAILURE);
 	}
 
 	if (NULL != CONFIG_SOURCE_IP && ('\0' == *CONFIG_SOURCE_IP || SUCCEED != is_ip(CONFIG_SOURCE_IP)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "invalid SourceIP parameter value");
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"SourceIP\" configuration parameter: %s", CONFIG_SOURCE_IP);
 		exit(EXIT_FAILURE);
 	}
 
