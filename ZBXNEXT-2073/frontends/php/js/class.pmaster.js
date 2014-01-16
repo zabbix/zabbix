@@ -18,12 +18,12 @@
 **/
 
 
-var PMasters = [];
+var PMasters = {};
+
 function initPMaster(pmid, args) {
-	if (typeof(PMasters[pmid]) == 'undefined') {
+	if (typeof PMasters[pmid] === 'undefined') {
 		PMasters[pmid] = new CPMaster(pmid, args);
 	}
-	return pmid;
 }
 
 var CPMaster = Class.create(CDebug,{

@@ -19,6 +19,8 @@
 **/
 
 
+require_once dirname(__FILE__).'/js/monitoring.slides.js.php';
+
 $slideshowWidget = new CWidget('hat_slides');
 
 // create header form
@@ -108,23 +110,5 @@ else {
 	$slideshowWidget->addItem(BR());
 	$slideshowWidget->addItem(new CTableInfo(_('No slide shows found.')));
 }
-
-/*
- * Javascript
- */
-// start refresh process
-$slideshowRefreshParams = array(
-	WIDGET_SLIDESHOW => array(
-		'frequency' => $this->data['element']['delay'] * $this->data['refreshMultiplier'],
-		'url' => 'slides.php?output=html&elementid='.$this->data['elementId'].url_param('groupid').url_param('hostid'),
-		'counter' => 0,
-		'darken' => 0,
-		'params' => array(
-			'widgetRefresh' => WIDGET_SLIDESHOW,
-			'lastupdate' => time()
-		)
-	)
-);
-zbx_add_post_js('initPMaster("slideshows", '.CJs::encodeJson($slideshowRefreshParams).');');
 
 return $slideshowWidget;
