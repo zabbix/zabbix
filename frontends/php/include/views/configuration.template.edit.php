@@ -390,10 +390,12 @@ $linkedTemplateTable->setHeader(array(_('Name'), _('Action')));
 $ignoredTemplates = array();
 foreach ($this->data['linkedTemplates'] as $template) {
 	$tmplList->addVar('templates[]', $template['templateid']);
+	$templateLink = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']);
+	$templateLink->setTarget('_blank');
 
 	$linkedTemplateTable->addRow(
 		array(
-			new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']),
+			$templateLink,
 			array(
 				new CSubmit('unlink['.$template['templateid'].']', _('Unlink'), null, 'link_menu'),
 				SPACE,
