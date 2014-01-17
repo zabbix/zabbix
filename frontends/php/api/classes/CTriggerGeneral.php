@@ -343,7 +343,7 @@ abstract class CTriggerGeneral extends CZBXAPI {
 		// adding functions
 		if ($options['selectFunctions'] !== null && $options['selectFunctions'] != API_OUTPUT_COUNT) {
 			$functions = API::getApi()->select('functions', array(
-				'output' => $this->outputExtend('functions', array('triggerid', 'functionid'), $options['selectFunctions']),
+				'output' => $this->outputExtend($options['selectFunctions'], array('triggerid', 'functionid')),
 				'filter' => array('triggerid' => $triggerids),
 				'preservekeys' => true,
 				'nodeids' => get_current_nodeid(true)

@@ -298,6 +298,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		if (isset($_REQUEST['mass_replace_tpls'])) {
 			if (isset($_REQUEST['mass_clear_tpls'])) {
 				$hostTemplates = API::Template()->get(array(
+					'output' => array('templateid'),
 					'hostids' => $hostIds
 				));
 
@@ -817,6 +818,7 @@ else {
 
 	if ($pageFilter->groupsSelected) {
 		$hosts = API::Host()->get(array(
+			'output' => array('hostid', 'name', 'status'),
 			'groupids' => ($pageFilter->groupid > 0) ? $pageFilter->groupid : null,
 			'editable' => true,
 			'sortfield' => $sortfield,
@@ -864,6 +866,7 @@ else {
 	$templateIds = array_unique($templateIds);
 
 	$templates = API::Template()->get(array(
+		'output' => array('templateid', 'name'),
 		'templateids' => $templateIds,
 		'selectParentTemplates' => array('hostid', 'name')
 	));

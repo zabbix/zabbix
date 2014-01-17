@@ -77,7 +77,7 @@ class CMaintenance extends CZBXAPI {
 			'filter'					=> null,
 			'searchWildcardsEnabled'	=> null,
 			// output
-			'output'					=> API_OUTPUT_REFER,
+			'output'					=> API_OUTPUT_EXTEND,
 			'selectGroups'				=> null,
 			'selectHosts'				=> null,
 			'selectTimeperiods'			=> null,
@@ -200,16 +200,6 @@ class CMaintenance extends CZBXAPI {
 			$sqlParts['where'][] = dbConditionInt('m.maintenanceid', $maintenanceids);
 		}
 
-		// groupids
-		if (!is_null($options['groupids'])) {
-			$options['selectGroups'] = 1;
-		}
-
-		// hostids
-		if (!is_null($options['hostids'])) {
-			$options['selectHosts'] = 1;
-		}
-
 		// maintenanceids
 		if (!is_null($options['maintenanceids'])) {
 			zbx_value2array($options['maintenanceids']);
@@ -232,7 +222,6 @@ class CMaintenance extends CZBXAPI {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		$maintenanceids = array();
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
@@ -247,30 +236,7 @@ class CMaintenance extends CZBXAPI {
 				}
 			}
 			else {
-				$maintenanceids[$maintenance['maintenanceid']] = $maintenance['maintenanceid'];
-
-				if (!isset($result[$maintenance['maintenanceid']])) {
-					$result[$maintenance['maintenanceid']] = array();
-				}
-
-				// groupids
-				if (isset($maintenance['groupid']) && is_null($options['selectGroups'])) {
-					if (!isset($result[$maintenance['maintenanceid']]['groups'])) {
-						$result[$maintenance['maintenanceid']]['groups'] = array();
-					}
-					$result[$maintenance['maintenanceid']]['groups'][] = array('groupid' => $maintenance['groupid']);
-					unset($maintenance['groupid']);
-				}
-
-				// hostids
-				if (isset($maintenance['hostid']) && is_null($options['selectHosts'])) {
-					if (!isset($result[$maintenance['maintenanceid']]['hosts'])) {
-						$result[$maintenance['maintenanceid']]['hosts'] = array();
-					}
-					$result[$maintenance['maintenanceid']]['hosts'][] = array('hostid' => $maintenance['hostid']);
-					unset($maintenance['hostid']);
-				}
-				$result[$maintenance['maintenanceid']] += $maintenance;
+				$result[$maintenance['maintenanceid']] = $maintenance;
 			}
 		}
 
@@ -472,8 +438,8 @@ class CMaintenance extends CZBXAPI {
 			'maintenanceids' => zbx_objectValues($maintenances, 'maintenanceid'),
 			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
-			'selectGroups' => API_OUTPUT_REFER,
-			'selectHosts' => API_OUTPUT_REFER,
+			'selectGroups' => array('groupid'),
+			'selectHosts' => array('hostid'),
 			'selectTimeperiods' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		));
@@ -485,6 +451,7 @@ class CMaintenance extends CZBXAPI {
 
 			// Checking whether a maintenance with this name already exists. First, getting all maintenances with the same name as this
 			$receivedMaintenances = API::Maintenance()->get(array(
+				'output' => array('maintenanceid'),
 				'filter' => array('name' => $maintenance['name'])
 			));
 

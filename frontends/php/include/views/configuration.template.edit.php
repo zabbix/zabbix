@@ -65,6 +65,7 @@ if ($templateid > 0 && !hasRequest('form_refresh')) {
 
 	// get template hosts from db
 	$hosts_linked_to = API::Host()->get(array(
+		'output' => array('hostid'),
 		'templateids' => $templateid,
 		'editable' => true,
 		'templated_hosts' => true

@@ -818,6 +818,7 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 
 	// hosts
 	$data['hosts'] = API::Host()->get(array(
+		'output' => array('hostid'),
 		'itemids' => $data['itemids'],
 		'selectInterfaces' => API_OUTPUT_EXTEND
 	));
@@ -932,7 +933,7 @@ else {
 		),
 		'editable' => true,
 		'selectHosts' => API_OUTPUT_EXTEND,
-		'selectTriggers' => API_OUTPUT_REFER,
+		'selectTriggers' => array('triggerid', 'description'),
 		'selectApplications' => API_OUTPUT_EXTEND,
 		'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 		'selectItemDiscovery' => array('ts_delete'),

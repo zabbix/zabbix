@@ -70,7 +70,7 @@ class CImage extends CZBXAPI {
 			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
 			// output
-			'output'					=> API_OUTPUT_REFER,
+			'output'					=> API_OUTPUT_EXTEND,
 			'select_image'				=> null,
 			'editable'					=> null,
 			'countOutput'				=> null,
@@ -96,7 +96,6 @@ class CImage extends CZBXAPI {
 		if (!is_null($options['sysmapids'])) {
 			zbx_value2array($options['sysmapids']);
 
-			$sqlParts['select']['sm'] = 'sm.sysmapid';
 			$sqlParts['from']['sysmaps'] = 'sysmaps sm';
 			$sqlParts['from']['sysmaps_elements'] = 'sysmaps_elements se';
 			$sqlParts['where']['sm'] = dbConditionInt('sm.sysmapid', $options['sysmapids']);
@@ -137,18 +136,7 @@ class CImage extends CZBXAPI {
 				$imageids[$image['imageid']] = $image['imageid'];
 				unset($image['image']);
 
-				if (!isset($result[$image['imageid']])) {
-					$result[$image['imageid']] = array();
-				}
-
-				// sysmapds
-				if (isset($image['sysmapid'])) {
-					if (!isset($result[$image['imageid']]['sysmaps'])) {
-						$result[$image['imageid']]['sysmaps'] = array();
-					}
-					$result[$image['imageid']]['sysmaps'][] = array('sysmapid' => $image['sysmapid']);
-				}
-				$result[$image['imageid']] += $image;
+				$result[$image['imageid']] = $image;
 			}
 		}
 

@@ -271,7 +271,7 @@ elseif (isset($_REQUEST['save'])) {
 			$dbGraphs = API::Graph()->get(array(
 				'hostids' => $cloneTemplateId,
 				'inherited' => false,
-				'output' => API_OUTPUT_REFER
+				'output' => array('graphid')
 			));
 
 			$result = true;
@@ -285,6 +285,7 @@ elseif (isset($_REQUEST['save'])) {
 
 			// clone discovery rules
 			$discoveryRules = API::DiscoveryRule()->get(array(
+				'output' => array('itemid'),
 				'hostids' => $cloneTemplateId,
 				'inherited' => false
 			));
@@ -502,6 +503,7 @@ else {
 
 	if ($pageFilter->groupsSelected) {
 		$templates = API::Template()->get(array(
+			'output' => array('templateid', 'name'),
 			'groupids' => ($pageFilter->groupid > 0) ? $pageFilter->groupid : null,
 			'editable' => true,
 			'sortfield' => $sortfield,

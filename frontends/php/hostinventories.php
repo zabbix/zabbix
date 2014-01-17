@@ -107,6 +107,7 @@ if ($hostid > 0) {
 	}
 	else if ($userType == USER_TYPE_ZABBIX_ADMIN) {
 		$rwHost = API::Host()->get(array(
+			'output' => array('hostid'),
 			'hostids' => $hostid,
 			'editable' => true
 		));

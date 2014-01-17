@@ -346,6 +346,7 @@ else {
 
 	// get hosts and templates count
 	$data['groupCounts'] = API::HostGroup()->get(array(
+		'output' => array('groupid'),
 		'groupids' => zbx_objectValues($groups, 'groupid'),
 		'selectHosts' => API_OUTPUT_COUNT,
 		'selectTemplates' => API_OUTPUT_COUNT,
