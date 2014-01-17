@@ -24,159 +24,245 @@ require_once dirname(__FILE__).'/screens.inc.php';
 require_once dirname(__FILE__).'/maps.inc.php';
 require_once dirname(__FILE__).'/users.inc.php';
 
-function getFavouriteGraphs() {
-	$favList = new CList(null, 'favorites', _('No graphs added.'));
-	$graphids = array();
-	$itemids = array();
+/**
+ * Get favourite graphs and simple graph data.
+ *
+ * @return array['graphs']
+ * @return array['simpleGraphs']
+ */
+function getFavouriteGraphsData() {
+	$graphs = $simpeGraphs = array();
 
-	$fav_graphs = CFavorite::get('web.favorite.graphids');
+	$favourites = CFavorite::get('web.favorite.graphids');
 
-	if (!$fav_graphs) {
-		return $favList;
-	}
+	if ($favourites) {
+		$graphIds = $itemIds = $dbGraphs = $dbItems = array();
 
-	foreach ($fav_graphs as $favorite) {
-		if ('itemid' == $favorite['source']) {
-			$itemids[$favorite['value']] = $favorite['value'];
-		}
-		else {
-			$graphids[$favorite['value']] = $favorite['value'];
-		}
-	}
-
-	if ($graphids) {
-		$options = array(
-			'graphids' => $graphids,
-			'selectHosts' => array('hostid', 'name'),
-			'output' => array('graphid', 'name'),
-			'expandName' => true
-		);
-		$graphs = API::Graph()->get($options);
-		$graphs = zbx_toHash($graphs, 'graphid');
-	}
-
-	if ($itemids) {
-		$items = API::Item()->get(array(
-			'itemids' => $itemids,
-			'selectHosts' => array('hostid', 'name'),
-			'output' => array('itemid', 'hostid', 'name', 'key_'),
-			'webitems' => true
-		));
-		$items = zbx_toHash($items, 'itemid');
-
-		$items = CMacrosResolverHelper::resolveItemNames($items);
-	}
-
-	foreach ($fav_graphs as $favorite) {
-		$sourceid = $favorite['value'];
-
-		if ($favorite['source'] == 'itemid') {
-			if (!isset($items[$sourceid])) {
-				continue;
+		foreach ($favourites as $favourite) {
+			if ($favourite['source'] === 'itemid') {
+				$itemIds[$favourite['value']] = $favourite['value'];
 			}
-
-			$item = $items[$sourceid];
-			$host = reset($item['hosts']);
-
-			$link = new CLink(
-				get_node_name_by_elid($sourceid, null, NAME_DELIMITER).$host['name'].NAME_DELIMITER.$item['name_expanded'],
-				'history.php?action=showgraph&itemid='.$sourceid
-			);
-		}
-		else {
-			if (!isset($graphs[$sourceid])) {
-				continue;
+			else {
+				$graphIds[$favourite['value']] = $favourite['value'];
 			}
-
-			$graph = $graphs[$sourceid];
-			$ghost = reset($graph['hosts']);
-
-			$link = new CLink(
-				get_node_name_by_elid($sourceid, null, NAME_DELIMITER).$ghost['name'].NAME_DELIMITER.$graph['name'],
-				'charts.php?graphid='.$sourceid
-			);
 		}
 
-		$favList->addItem($link, 'nowrap');
-	}
+		if ($graphIds) {
+			$dbGraphs = API::Graph()->get(array(
+				'output' => array('graphid', 'name'),
+				'selectHosts' => array('hostid', 'name'),
+				'expandName' => true,
+				'graphids' => $graphIds,
+				'preservekeys' => true
+			));
+		}
 
-	return $favList;
-}
+		if ($itemIds) {
+			$dbItems = API::Item()->get(array(
+				'output' => array('itemid', 'hostid', 'name', 'key_'),
+				'selectHosts' => array('hostid', 'name'),
+				'itemids' => $itemIds,
+				'webitems' => true,
+				'preservekeys' => true
+			));
 
-function getFavouriteScreens() {
-	$favList = new CList(null, 'favorites', _('No screens added.'));
-	$fav_screens = CFavorite::get('web.favorite.screenids');
+			$dbItems = CMacrosResolverHelper::resolveItemNames($dbItems);
+		}
 
-	if (!$fav_screens) {
-		return $favList;
-	}
+		foreach ($favourites as $favourite) {
+			$sourceId = $favourite['value'];
 
-	$screenids = array();
-	foreach ($fav_screens as $favorite) {
-		if ('screenid' == $favorite['source']) {
-			$screenids[$favorite['value']] = $favorite['value'];
+			if ($favourite['source'] === 'itemid') {
+				if (isset($dbItems[$sourceId])) {
+					$dbItem = $dbItems[$sourceId];
+					$dbHost = reset($dbItem['hosts']);
+
+					$simpeGraphs[] = array(
+						'id' => $sourceId,
+						'label' => $dbHost['name'].NAME_DELIMITER.$dbItem['name_expanded']
+					);
+				}
+			}
+			else {
+				if (isset($dbGraphs[$sourceId])) {
+					$dbGraph = $dbGraphs[$sourceId];
+					$dbHost = reset($dbGraph['hosts']);
+
+					$graphs[] = array(
+						'id' => $sourceId,
+						'label' => $dbHost['name'].NAME_DELIMITER.$dbGraph['name']
+					);
+				}
+			}
 		}
 	}
 
-	$options = array(
-		'screenids' => $screenids,
-		'output' => array('screenid', 'name')
+	return array(
+		'graphs' => $graphs,
+		'simpleGraphs' => $simpeGraphs
 	);
-	$screens = API::Screen()->get($options);
-	$screens = zbx_toHash($screens, 'screenid');
-
-	foreach ($fav_screens as $favorite) {
-		$source = $favorite['source'];
-		$sourceid = $favorite['value'];
-
-		if ('slideshowid' == $source) {
-			if (!slideshow_accessible($sourceid, PERM_READ)) {
-				continue;
-			}
-			if (!$slide = get_slideshow_by_slideshowid($sourceid)) {
-				continue;
-			}
-
-			$link = new CLink(get_node_name_by_elid($sourceid, null, NAME_DELIMITER).$slide['name'], 'slides.php?elementid='.$sourceid);
-		}
-		else {
-			if (!isset($screens[$sourceid])) {
-				continue;
-			}
-			$screen = $screens[$sourceid];
-
-			$link = new CLink(get_node_name_by_elid($sourceid, null, NAME_DELIMITER).$screen['name'], 'screens.php?elementid='.$sourceid);
-		}
-		$favList->addItem($link, 'nowrap');
-	}
-	return $favList;
 }
 
+/**
+ * Get favourite graphs and simple graph.
+ *
+ * @return CList
+ */
+function getFavouriteGraphs() {
+	$data = getFavouriteGraphsData();
+
+	$favourites = new CList(null, 'favorites', _('No graphs added.'));
+
+	if ($data['graphs']) {
+		foreach ($data['graphs'] as $graph) {
+			$favourites->addItem(new CLink($graph['label'], 'charts.php?graphid='.$graph['id']), 'nowrap');
+		}
+	}
+
+	if ($data['simpleGraphs']) {
+		foreach ($data['simpleGraphs'] as $item) {
+			$favourites->addItem(new CLink($item['label'], 'history.php?action=showgraph&itemid='.$item['id']), 'nowrap');
+		}
+	}
+
+	return $favourites;
+}
+
+/**
+ * Get favourite maps data.
+ *
+ * @return array
+ */
+function getFavouriteMapsData() {
+	$maps = array();
+
+	$favourites = CFavorite::get('web.favorite.sysmapids');
+
+	if ($favourites) {
+		$mapIds = array();
+
+		foreach ($favourites as $favourite) {
+			$mapIds[$favourite['value']] = $favourite['value'];
+		}
+
+		$dbMaps = API::Map()->get(array(
+			'output' => array('sysmapid', 'name'),
+			'sysmapids' => $mapIds
+		));
+
+		foreach ($dbMaps as $dbMap) {
+			$maps[] = array(
+				'id' => $dbMap['sysmapid'],
+				'label' => $dbMap['name']
+			);
+		}
+	}
+
+	return $maps;
+}
+
+/**
+ * Get favourite maps.
+ *
+ * @return CList
+ */
 function getFavouriteMaps() {
-	$favList = new CList(null, 'favorites', _('No maps added.'));
-	$fav_sysmaps = CFavorite::get('web.favorite.sysmapids');
+	$data = getFavouriteMapsData();
 
-	if (!$fav_sysmaps) {
-		return $favList;
+	$favourites = new CList(null, 'favorites', _('No maps added.'));
+
+	if ($data) {
+		foreach ($data as $map) {
+			$favourites->addItem(new CLink($map['label'], 'maps.php?sysmapid='.$map['id']), 'nowrap');
+		}
 	}
 
-	$sysmapids = array();
-	foreach ($fav_sysmaps as $favorite) {
-		$sysmapids[$favorite['value']] = $favorite['value'];
+	return $favourites;
+}
+
+/**
+ * Get favourite screens and slide shows data.
+ *
+ * @return array['screens']
+ * @return array['slideshows']
+ */
+function getFavouriteScreensData() {
+	$screens = $slideshows = array();
+
+	$favourites = CFavorite::get('web.favorite.screenids');
+
+	if ($favourites) {
+		$screenIds = $slideshowIds = array();
+
+		foreach ($favourites as $favourite) {
+			if ($favourite['source'] === 'screenid') {
+				$screenIds[$favourite['value']] = $favourite['value'];
+			}
+		}
+
+		$dbScreens = API::Screen()->get(array(
+			'output' => array('screenid', 'name'),
+			'screenids' => $screenIds,
+			'preservekeys' => true
+		));
+
+		foreach ($favourites as $favourite) {
+			$sourceId = $favourite['value'];
+
+			if ($favourite['source'] === 'slideshowid') {
+				if (slideshow_accessible($sourceId, PERM_READ)) {
+					$dbSlideshow = get_slideshow_by_slideshowid($sourceId);
+
+					if ($dbSlideshow) {
+						$slideshows[] = array(
+							'id' => $dbSlideshow['slideshowid'],
+							'label' => $dbSlideshow['name']
+						);
+					}
+				}
+			}
+			else {
+				if (isset($dbScreens[$sourceId])) {
+					$dbScreen = $dbScreens[$sourceId];
+
+					$screens[] = array(
+						'id' => $dbScreen['screenid'],
+						'label' => $dbScreen['name']
+					);
+				}
+			}
+		}
 	}
 
-	$sysmaps = API::Map()->get(array(
-		'sysmapids' => $sysmapids,
-		'output' => array('sysmapid', 'name')
-	));
-	foreach ($sysmaps as $sysmap) {
-		$sysmapid = $sysmap['sysmapid'];
+	return array(
+		'screens' => $screens,
+		'slideshows' => $slideshows
+	);
+}
 
-		$link = new CLink(get_node_name_by_elid($sysmapid, null, NAME_DELIMITER).$sysmap['name'], 'maps.php?sysmapid='.$sysmapid);
+/**
+ * Get favourite screens and slide shows.
+ *
+ * @return CList
+ */
+function getFavouriteScreens() {
+	$data = getFavouriteScreensData();
 
-		$favList->addItem($link, 'nowrap');
+	$favourites = new CList(null, 'favorites', _('No screens added.'));
+
+	if ($data['screens']) {
+		foreach ($data['screens'] as $screen) {
+			$favourites->addItem(new CLink($screen['label'], 'screens.php?elementid='.$screen['id']), 'nowrap');
+		}
 	}
-	return $favList;
+
+	if ($data['slideshows']) {
+		foreach ($data['slideshows'] as $slideshow) {
+			$favourites->addItem(new CLink($slideshow['label'], 'slides.php?elementid='.$slideshow['id']), 'nowrap');
+		}
+	}
+
+	return $favourites;
 }
 
 function make_system_status($filter) {

@@ -27,77 +27,10 @@ class CMenuPopupHelper {
 	 * @return array
 	 */
 	public static function getFavouriteGraphs() {
-		$graphs = $simpeGraphs = array();
+		$data = getFavouriteGraphsData();
+		$data['type'] = 'favouriteGraphs';
 
-		$favourites = CFavorite::get('web.favorite.graphids');
-
-		if ($favourites) {
-			$graphIds = $itemIds = $dbGraphs = $dbItems = array();
-
-			foreach ($favourites as $favourite) {
-				if ($favourite['source'] === 'itemid') {
-					$itemIds[$favourite['value']] = $favourite['value'];
-				}
-				else {
-					$graphIds[$favourite['value']] = $favourite['value'];
-				}
-			}
-
-			if ($graphIds) {
-				$dbGraphs = API::Graph()->get(array(
-					'output' => array('graphid', 'name'),
-					'selectHosts' => array('hostid', 'name'),
-					'expandName' => true,
-					'graphids' => $graphIds,
-					'preservekeys' => true
-				));
-			}
-
-			if ($itemIds) {
-				$dbItems = API::Item()->get(array(
-					'output' => array('itemid', 'hostid', 'name', 'key_'),
-					'selectHosts' => array('hostid', 'name'),
-					'itemids' => $itemIds,
-					'webitems' => true,
-					'preservekeys' => true
-				));
-
-				$dbItems = CMacrosResolverHelper::resolveItemNames($dbItems);
-			}
-
-			foreach ($favourites as $favourite) {
-				$sourceId = $favourite['value'];
-
-				if ($favourite['source'] === 'itemid') {
-					if (isset($dbItems[$sourceId])) {
-						$dbItem = $dbItems[$sourceId];
-						$dbHost = reset($dbItem['hosts']);
-
-						$simpeGraphs[] = array(
-							'id' => $sourceId,
-							'label' => $dbHost['name'].NAME_DELIMITER.$dbItem['name_expanded']
-						);
-					}
-				}
-				else {
-					if (isset($dbGraphs[$sourceId])) {
-						$dbGraph = $dbGraphs[$sourceId];
-						$dbHost = reset($dbGraph['hosts']);
-
-						$graphs[] = array(
-							'id' => $sourceId,
-							'label' => $dbHost['name'].NAME_DELIMITER.$dbGraph['name']
-						);
-					}
-				}
-			}
-		}
-
-		return array(
-			'type' => 'favouriteGraphs',
-			'graphs' => $graphs,
-			'simpleGraphs' => $simpeGraphs
-		);
+		return $data;
 	}
 
 	/**
@@ -106,33 +39,9 @@ class CMenuPopupHelper {
 	 * @return array
 	 */
 	public static function getFavouriteMaps() {
-		$maps = array();
-
-		$favourites = CFavorite::get('web.favorite.sysmapids');
-
-		if ($favourites) {
-			$mapIds = array();
-
-			foreach ($favourites as $favourite) {
-				$mapIds[$favourite['value']] = $favourite['value'];
-			}
-
-			$dbMaps = API::Map()->get(array(
-				'output' => array('sysmapid', 'name'),
-				'sysmapids' => $mapIds
-			));
-
-			foreach ($dbMaps as $dbMap) {
-				$maps[] = array(
-					'id' => $dbMap['sysmapid'],
-					'label' => $dbMap['name']
-				);
-			}
-		}
-
 		return array(
 			'type' => 'favouriteMaps',
-			'maps' => $maps
+			'maps' => getFavouriteMapsData()
 		);
 	}
 
@@ -142,58 +51,10 @@ class CMenuPopupHelper {
 	 * @return array
 	 */
 	public static function getFavouriteScreens() {
-		$screens = $slideshows = array();
+		$data = getFavouriteScreensData();
+		$data['type'] = 'favouriteScreens';
 
-		$favourites = CFavorite::get('web.favorite.screenids');
-
-		if ($favourites) {
-			$screenIds = $slideshowIds = array();
-
-			foreach ($favourites as $favourite) {
-				if ($favourite['source'] === 'screenid') {
-					$screenIds[$favourite['value']] = $favourite['value'];
-				}
-			}
-
-			$dbScreens = API::Screen()->get(array(
-				'output' => array('screenid', 'name'),
-				'screenids' => $screenIds,
-				'preservekeys' => true
-			));
-
-			foreach ($favourites as $favourite) {
-				$sourceId = $favourite['value'];
-
-				if ($favourite['source'] === 'slideshowid') {
-					if (slideshow_accessible($sourceId, PERM_READ)) {
-						$dbSlideshow = get_slideshow_by_slideshowid($sourceId);
-
-						if ($dbSlideshow) {
-							$slideshows[] = array(
-								'id' => $dbSlideshow['slideshowid'],
-								'label' => $dbSlideshow['name']
-							);
-						}
-					}
-				}
-				else {
-					if (isset($dbScreens[$sourceId])) {
-						$dbScreen = $dbScreens[$sourceId];
-
-						$screens[] = array(
-							'id' => $dbScreen['screenid'],
-							'label' => $dbScreen['name']
-						);
-					}
-				}
-			}
-		}
-
-		return array(
-			'type' => 'favouriteScreens',
-			'screens' => $screens,
-			'slideshows' => $slideshows
-		);
+		return $data;
 	}
 
 	/**

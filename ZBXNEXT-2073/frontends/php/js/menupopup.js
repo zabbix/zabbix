@@ -432,10 +432,11 @@ function getMenuPopupRefresh(options) {
 					success: function(js) { js }
 				});
 
-				jQuery('li', obj.closest('ul')).each(function() {
-					var li = jQuery(this);
+				jQuery('a', obj.closest('ul')).each(function() {
+					var a = jQuery(this),
+						li = a.parent();
 
-					if (li.data('value') == currentRate) {
+					if (a.data('value') == currentRate) {
 						li.addClass('selected');
 					}
 					else {
@@ -466,32 +467,24 @@ function getMenuPopupRefresh(options) {
 function getMenuPopupServiceConfiguration(options) {
 	var items = [];
 
-	// add
-	items[items.length] = {
-		label: t('Add child'),
-		clickCallback: function() {
-			var url = new Curl('services.php?form=1');
-			url.setArgument('parentid', options.serviceid);
-			url.setArgument('parentname', options.name);
+	if (options.serviceid === null) {
+		// add
+		items[items.length] = {
+			label: t('Add child'),
+			url: new Curl('services.php?form=1&parentname=' + options.name).getUrl()
+		};
+	}
+	else {
+		// add
+		items[items.length] = {
+			label: t('Add child'),
+			url: new Curl('services.php?form=1&parentid=' + options.serviceid + '&parentname=' + options.name).getUrl()
+		};
 
-			window.location.href = url.getUrl();
-
-			jQuery(this).closest('.menuPopup').fadeOut(100);
-		}
-	};
-
-	if (options.serviceid !== null) {
 		// edit
 		items[items.length] = {
 			label: t('Edit'),
-			clickCallback: function() {
-				var url = new Curl('services.php?form=1');
-				url.setArgument('serviceid', options.serviceid);
-
-				window.location.href = url.getUrl();
-
-				jQuery(this).closest('.menuPopup').fadeOut(100);
-			}
+			url: new Curl('services.php?form=1&serviceid=' + options.serviceid).getUrl()
 		};
 
 		// delete
@@ -500,10 +493,7 @@ function getMenuPopupServiceConfiguration(options) {
 				label: t('Delete'),
 				clickCallback: function() {
 					if (confirm(sprintf(t('Delete service "%1$s"?'), options.name))) {
-						var url = new Curl('services.php?delete=1');
-						url.setArgument('serviceid', options.serviceid);
-
-						window.location.href = url.getUrl();
+						window.location.href = new Curl('services.php?delete=1&serviceid=' + options.serviceid).getUrl();
 					}
 
 					jQuery(this).closest('.menuPopup').fadeOut(100);
@@ -958,7 +948,8 @@ jQuery(function($) {
 	 * @return object
 	 */
 	function createMenuItem(options) {
-		var link = $('<a>');
+		var item = $('<li>'),
+			link = $('<a>');
 
 		if (typeof options.label !== 'undefined') {
 			link.html(options.label);
@@ -968,16 +959,18 @@ jQuery(function($) {
 			link.attr('href', options.url);
 		}
 
-		var item = $('<li>').append(link);
+		if (typeof options.data !== 'undefined' && objectSize(options.data) > 0) {
+			$.each(options.data, function(key, value) {
+				link.data(key, value);
+			});
+		}
+
+		if (typeof options.clickCallback !== 'undefined') {
+			link.click(options.clickCallback);
+		}
 
 		if (typeof options.css !== 'undefined') {
 			item.addClass(options.css);
-		}
-
-		if (typeof options.data !== 'undefined' && objectSize(options.data) > 0) {
-			$.each(options.data, function(key, value) {
-				item.data(key, value);
-			});
 		}
 
 		if (typeof options.items !== 'undefined' && options.items.length > 0) {
@@ -990,11 +983,7 @@ jQuery(function($) {
 			item.append(menu);
 		}
 
-		if (typeof options.clickCallback !== 'undefined') {
-			item.click(options.clickCallback);
-		}
-
-		return item;
+		return item.append(link);
 	}
 
 	/**
