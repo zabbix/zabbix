@@ -472,28 +472,28 @@ sub create_item_dns_rtt {
 
     create_item($options);
 
-    $options = { 'description' => 'No reply from Name Server '.$ns_name.' on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
+    $options = { 'description' => 'No reply from Name Server '.$ns_name.' ['.$ip.'] on {HOST.NAME} ('.$proto_uc.')',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_NOREPLY,
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => 'Invalid reply from Name Server '.$ns_name.' on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
+    $options = { 'description' => 'Invalid reply from Name Server '.$ns_name.' ['.$ip.'] on {HOST.NAME} ('.$proto_uc.')',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_ERRREPLY,
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => 'UNIXTIME is missing from '.$ns_name.' on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
+    $options = { 'description' => 'UNIXTIME is missing from '.$ns_name.' ['.$ip.'] on {HOST.NAME} ('.$proto_uc.')',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_NOTS,
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => 'Invalid UNIXTIME from '.$ns_name.' on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
+    $options = { 'description' => 'Invalid UNIXTIME from '.$ns_name.' ['.$ip.'] on {HOST.NAME} ('.$proto_uc.')',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_ERRTS,
                         'priority' => '2',
                 };
@@ -501,7 +501,7 @@ sub create_item_dns_rtt {
     create_trigger($options);
 
     if (defined($OPTS{'dnssec'})) {
-	$options = { 'description' => '5.1.1 Step 7 - DNSSEC error from '.$ns_name.' on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
+	$options = { 'description' => '5.1.1 Step 7 - DNSSEC error from '.$ns_name.' ['.$ip.'] on {HOST.NAME} ('.$proto_uc.')',
 		     'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_ERRSIG,
 		     'priority' => '2',
 	};
@@ -509,14 +509,14 @@ sub create_item_dns_rtt {
 	create_trigger($options);
     }
 
-    $options = { 'description' => 'No reply from resolver on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
+    $options = { 'description' => 'No reply from resolver on {HOST.NAME} ('.$proto_uc.')',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_RES_NOREPLY,
 			'priority' => '2',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => '5.1.1 Step 2 - ad bit is missing from '.$ns_name.' on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
+    $options = { 'description' => '5.1.1 Step 2 - ad bit is missing from '.$ns_name.' ['.$ip.'] on {HOST.NAME} ('.$proto_uc.')',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_RES_NOADBIT,
 			'priority' => '2',
                 };
@@ -599,28 +599,28 @@ sub create_items_dns {
 
     create_trigger($options);
 
-    $options = { 'description' => 'No reply from Name Server on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
+    $options = { 'description' => 'No reply from Name Server on {HOST.NAME} ('.$proto_uc.')',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_NOREPLY,
 		    'priority' => '3',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => 'Invalid reply from Name Server on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
+    $options = { 'description' => 'Invalid reply from Name Server on {HOST.NAME} ('.$proto_uc.')',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_ERRREPLY,
 			'priority' => '3',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => '5.1.1 Step 6 - UNIXTIME is missing on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
+    $options = { 'description' => '5.1.1 Step 6 - UNIXTIME is missing on {HOST.NAME} ('.$proto_uc.')',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_NOTS,
 		    'priority' => '3',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => '5.1.1 Step 6 - Invalid UNIXTIME on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
+    $options = { 'description' => '5.1.1 Step 6 - Invalid UNIXTIME on {HOST.NAME} ('.$proto_uc.')',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_ERRTS,
 			'priority' => '3',
                 };
@@ -628,7 +628,7 @@ sub create_items_dns {
     create_trigger($options);
 
     if (defined($OPTS{'dnssec'})) {
-	$options = { 'description' => 'DNSSEC error on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
+	$options = { 'description' => 'DNSSEC error on {HOST.NAME} ('.$proto_uc.')',
 		     'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_ERRSIG,
 		     'priority' => '3',
 	};
@@ -636,7 +636,7 @@ sub create_items_dns {
 	create_trigger($options);
     }
 
-    $options = { 'description' => 'No reply from resolver on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
+    $options = { 'description' => 'No reply from resolver on {HOST.NAME} ('.$proto_uc.')',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_RES_NOREPLY,
 			'priority' => '3',
                 };
@@ -644,7 +644,7 @@ sub create_items_dns {
     create_trigger($options);
 
 
-    $options = { 'description' => '5.1.1 Step 2 - ad bit is missing on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
+    $options = { 'description' => '5.1.1 Step 2 - ad bit is missing on {HOST.NAME} ('.$proto_uc.')',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_RES_NOADBIT,
 			'priority' => '3',
                 };
@@ -664,35 +664,35 @@ sub create_items_dns {
 
     create_item($options);
 
-    $options = { 'description' => '5.2.3 - Less than {$DNSTEST.DNS.AVAIL.MINNS} NS servers have answered on {HOST.NAME} for {$DNSTEST.TLD} TLD ('.$proto_uc.')',
+    $options = { 'description' => '5.2.3 - Less than {$DNSTEST.DNS.AVAIL.MINNS} NS servers have answered on {HOST.NAME} ('.$proto_uc.')',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}<{$DNSTEST.DNS.AVAIL.MINNS}',
 			'priority' => '4',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => 'No reply from Name Server on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
+    $options = { 'description' => 'No reply from Name Server on {HOST.NAME} ('.$proto_uc.')',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_NOREPLY,
 		    'priority' => '3',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => 'Invalid reply from Name Server on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
+    $options = { 'description' => 'Invalid reply from Name Server on {HOST.NAME} ('.$proto_uc.')',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_ERRREPLY,
 			'priority' => '3',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => '5.1.1 Step 6 - UNIXTIME is missing on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
+    $options = { 'description' => '5.1.1 Step 6 - UNIXTIME is missing on {HOST.NAME} ('.$proto_uc.')',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_NOTS,
 		    'priority' => '3',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => '5.1.1 Step 6 - Invalid UNIXTIME on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
+    $options = { 'description' => '5.1.1 Step 6 - Invalid UNIXTIME on {HOST.NAME} ('.$proto_uc.')',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_ERRTS,
 			'priority' => '3',
                 };
@@ -700,7 +700,7 @@ sub create_items_dns {
     create_trigger($options);
 
     if (defined($OPTS{'dnssec'})) {
-	$options = { 'description' => 'DNSSEC error on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
+	$options = { 'description' => 'DNSSEC error on {HOST.NAME} ('.$proto_uc.')',
 		     'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_ERRSIG,
 		     'priority' => '3',
 	};
@@ -708,7 +708,7 @@ sub create_items_dns {
 	create_trigger($options);
     }
 
-    $options = { 'description' => 'No reply from resolver on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
+    $options = { 'description' => 'No reply from resolver on {HOST.NAME} ('.$proto_uc.')',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_RES_NOREPLY,
 			'priority' => '3',
                 };
@@ -716,7 +716,7 @@ sub create_items_dns {
     create_trigger($options);
 
 
-    $options = { 'description' => '5.1.1 Step 2 - ad bit is missing on {HOST.NAME} for {$DNSTEST.TLD} ('.$proto_uc.')',
+    $options = { 'description' => '5.1.1 Step 2 - ad bit is missing on {HOST.NAME} ('.$proto_uc.')',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_RES_NOADBIT,
 			'priority' => '3',
                 };
@@ -751,36 +751,41 @@ sub create_items_rdds {
                                               'valuemapid' => value_mappings->{'dnstest_rdds_rttudp'}};
     create_item($options);
 
-    $options = { 'description' => '6.1.1 Step 5 - No reply from RDDS43 server on {HOST.NAME} for {$DNSTEST.TLD}',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS43_NOREPLY,
+    $options = { 'description' => '6.1.1 Step 5 - No reply from RDDS43 server [{ITEM.LASTVALUE2}] on {HOST.NAME}',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS43_NOREPLY.
+                        		    '|{'.$template_name.':dnstest.rdds.43.ip[{$DNSTEST.TLD}].str(dummy)}=1',
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => '6.1.1 Step 5 - RDDS43 server has returned no name servers on {HOST.NAME} for {$DNSTEST.TLD}',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS43_NONS,
+    $options = { 'description' => '6.1.1 Step 5 - RDDS43 server [{ITEM.LASTVALUE2}] has returned no name servers on {HOST.NAME}',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS43_NONS.
+				        '|{'.$template_name.':dnstest.rdds.43.ip[{$DNSTEST.TLD}].str(dummy)}=1',
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => '6.1.1 Step 6 - UNIXTIME is missing in reply from RDDS43 server on {HOST.NAME} for {$DNSTEST.TLD}',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS43_NOTS,
+    $options = { 'description' => '6.1.1 Step 6 - UNIXTIME is missing in reply from RDDS43 server [{ITEM.LASTVALUE2}] on {HOST.NAME}',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS43_NOTS.
+                        		    '|{'.$template_name.':dnstest.rdds.43.ip[{$DNSTEST.TLD}].str(dummy)}=1',
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => '6.1.1 Step 6 - Invalid UNIXTIME in reply from RDDS43 server on {HOST.NAME} for {$DNSTEST.TLD}',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS43_ERRTS,
+    $options = { 'description' => '6.1.1 Step 6 - Invalid UNIXTIME in reply from RDDS43 server [{ITEM.LASTVALUE2}] on {HOST.NAME}',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS43_ERRTS.
+                        		'|{'.$template_name.':dnstest.rdds.43.ip[{$DNSTEST.TLD}].str(dummy)}=1',
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => '6.1.1 Step 2 - Cannot resolve an RDDS43 host on {HOST.NAME} for {$DNSTEST.TLD}',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS_ERRRES,
+    $options = { 'description' => '6.1.1 Step 2 - Cannot resolve an RDDS43 host [{ITEM.LASTVALUE2}] on {HOST.NAME}',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS_ERRRES.
+                        		'|{'.$template_name.':dnstest.rdds.43.ip[{$DNSTEST.TLD}].str(dummy)}=1',
                         'priority' => '2',
                 };
 
@@ -818,29 +823,33 @@ sub create_items_rdds {
                                               'valuemapid' => value_mappings->{'dnstest_rdds_rttudp'}};
     create_item($options);
 
-    $options = { 'description' => '6.1.1 Step 5 - No reply from RDDS80 server on {HOST.NAME} for {$DNSTEST.TLD}',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS80_NOREPLY,
+    $options = { 'description' => '6.1.1 Step 5 - No reply from RDDS80 server [{ITEM.LASTVALUE2}] on {HOST.NAME}',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS80_NOREPLY.
+                        		    '|{'.$template_name.':dnstest.rdds.80.ip[{$DNSTEST.TLD}].str(dummy)}=1',
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => '6.1.1 Step 2 - Cannot resolve an RDDS80 host on {HOST.NAME} for {$DNSTEST.TLD}',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS_ERRRES,
+    $options = { 'description' => '6.1.1 Step 2 - Cannot resolve an RDDS80 host [{ITEM.LASTVALUE2}] on {HOST.NAME}',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS_ERRRES.
+                        		'|{'.$template_name.':dnstest.rdds.80.ip[{$DNSTEST.TLD}].str(dummy)}=1',
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => '6.1.1 Step 2 - Cannot get HTTP response code from RDDS80 server on {HOST.NAME} for {$DNSTEST.TLD}',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS80_NOHTTPCODE,
+    $options = { 'description' => '6.1.1 Step 2 - Cannot get HTTP response code from RDDS80 server [{ITEM.LASTVALUE2}] on {HOST.NAME}',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS80_NOHTTPCODE.
+                        		    '|{'.$template_name.':dnstest.rdds.80.ip[{$DNSTEST.TLD}].str(dummy)}=1',
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => '6.1.1 Step 2 - Invalid HTTP response code from RDDS80 server on {HOST.NAME} for {$DNSTEST.TLD}',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS80_EHTTPCODE,
+    $options = { 'description' => '6.1.1 Step 2 - Invalid HTTP response code from RDDS80 server [{ITEM.LASTVALUE2}] on {HOST.NAME}',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS80_EHTTPCODE.
+                        		'|{'.$template_name.':dnstest.rdds.80.ip[{$DNSTEST.TLD}].str(dummy)}=1',
                         'priority' => '2',
                 };
 
