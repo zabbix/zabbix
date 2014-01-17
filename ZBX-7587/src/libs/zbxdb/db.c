@@ -50,7 +50,7 @@ static const char	*zbx_oci_error(sword status, sb4 *err)
 	static char	errbuf[512];
 	sb4		errcode, *perrcode;
 
-	perrcode = (NULL == err) ? &errcode : err;
+	perrcode = (NULL == err ? &errcode : err);
 
 	errbuf[0] = '\0';
 	*perrcode = 0;
@@ -95,7 +95,7 @@ static const char	*zbx_oci_error(sword status, sb4 *err)
  *                                                                            *
  * Parameters: zerrcode   - [IN] the Zabbix errorcode for the failed database *
  *                               operation                                    *
- *             oci_error  - [IN] the return code from failed Oralce operation *
+ *             oci_error  - [IN] the return code from failed Oracle operation *
  *             sql        - [IN] the failed sql statement (can be NULL)       *
  *                                                                            *
  * Return value: ZBX_DB_DOWN - database connection is down                    *
@@ -105,7 +105,7 @@ static const char	*zbx_oci_error(sword status, sb4 *err)
  *           database connection status.                                      *
  *                                                                            *
  ******************************************************************************/
-int	OCI_handle_sql_error(int zerrcode, sword oci_error, const char *sql)
+static int	OCI_handle_sql_error(int zerrcode, sword oci_error, const char *sql)
 {
 	sb4	errcode;
 	int	ret = ZBX_DB_DOWN;
@@ -122,7 +122,6 @@ int	OCI_handle_sql_error(int zerrcode, sword oci_error, const char *sql)
 
 	if (OCI_SERVER_NORMAL == OCI_DBserver_status())
 		ret = ZBX_DB_FAIL;
-
 out:
 	return ret;
 }
@@ -135,7 +134,7 @@ out:
  *                                                                            *
  * Purpose: connect to the database                                           *
  *                                                                            *
- * Return value: ZBX_DB_OK - succefully connected                             *
+ * Return value: ZBX_DB_OK - successfully connected                           *
  *               ZBX_DB_DOWN - database is down                               *
  *               ZBX_DB_FAIL - failed to connect                              *
  *                                                                            *
@@ -800,7 +799,6 @@ int	zbx_db_bind_parameter(int position, void *buffer, unsigned char type)
 		return ZBX_DB_FAIL;
 	}
 
-	/* Oracle */
 	switch (type)
 	{
 		case ZBX_TYPE_ID:
@@ -826,7 +824,6 @@ int	zbx_db_bind_parameter(int position, void *buffer, unsigned char type)
 	}
 
 	return ret;
-
 }
 
 int	zbx_db_statement_execute()
@@ -1353,7 +1350,7 @@ error:
 		server_status = OCI_handle_sql_error(ERR_Z3005, err, sql);
 		OCI_DBfree_result(result);
 
-		result = (ZBX_DB_DOWN == server_status) ? (DB_RESULT)server_status : NULL;
+		result = (ZBX_DB_DOWN == server_status ? (DB_RESULT)(intptr_t)server_status : NULL);
 	}
 #elif defined(HAVE_POSTGRESQL)
 	result = zbx_malloc(NULL, sizeof(ZBX_PG_DB_RESULT));
@@ -1750,9 +1747,7 @@ ub4	OCI_DBserver_status()
 			(ub4 *)0, OCI_ATTR_SERVER_STATUS, (OCIError *)oracle.errhp);
 
 	if (OCI_SUCCESS != err)
-	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot determine Oracle server status, assuming not connected");
-	}
 
 	return server_status;
 }
