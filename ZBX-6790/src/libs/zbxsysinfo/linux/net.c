@@ -85,6 +85,55 @@ static int	get_net_stat(const char *if_name, net_stat_t *result)
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: proc_read_file                                                   *
+ *                                                                            *
+ * Purpose: reads whole file into a buffer                                    *
+ *                                                                            *
+ * Parameters: fd           - [IN] the file to read                           *
+ *             buffer       - [IN/OUT] the output buffer                      *
+ *             buffer_alloc - [IN/OUT] the output buffer size                 *
+ *                                                                            *
+ * Return value: -1 error occurred during reading                             *
+ *                0 empty file (shouldn't happen)                             *
+ *               <0 the number of bytes read                                  *
+ *                                                                            *
+ * Comments:  When reading line by line the file might be changed between     *
+ *            reads resulting in a possible information loss. To avoid it try *
+ *            reading/expanding the buffer until it fits the whole file.      *
+ *                                                                            *
+ ******************************************************************************/
+static int	proc_read_file(const char *filename, char **buffer, int *buffer_alloc)
+{
+	int	n, fd;
+
+	if (-1 == (fd = open(filename, O_RDONLY)))
+		return -1;
+
+	while (1)
+	{
+		if (-1 == (n = read(fd, *buffer, *buffer_alloc)))
+		{
+			if (EINTR == errno)
+				continue;
+			break;
+		}
+
+		if (*buffer_alloc != n)
+			break;
+
+		*buffer_alloc *= 2;
+		*buffer = zbx_realloc(*buffer, *buffer_alloc);
+
+		lseek(fd, 0, SEEK_SET);
+	}
+
+	close(fd);
+
+	return n;
+}
+
 int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	net_stat_t	ns;
@@ -230,56 +279,12 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: read_file                                                        *
- *                                                                            *
- * Purpose: reads whole file into a buffere                                   *
- *                                                                            *
- * Parameters: fd           - [IN] the file to read                           *
- *             buffer       - [IN/OUT] the output buffer                      *
- *             buffer_alloc - [IN/OUT] the output buffer size                 *
- *                                                                            *
- * Return value: -1 error occurred during reading                             *
- *                0 empty file (shouldn't happen)                             *
- *               <0 the number of bytes read                                  *
- *                                                                            *
- * Comments:  When reading line by line the file might be changed between     *
- *            reads resulting in a possible information loss. To avoid it try *
- *            reading/expanding the buffer until it fits the whole file.      *
- *                                                                            *
- ******************************************************************************/
-static int	read_file(int fd, char **buffer, int *buffer_alloc)
-{
-	int	n;
-
-	while (1)
-	{
-		if (-1 == (n = read(fd, *buffer, *buffer_alloc)))
-		{
-			if (EINTR == errno)
-				continue;
-			break;
-		}
-
-		if (*buffer_alloc != n)
-			break;
-
-		*buffer_alloc *= 2;
-		*buffer = zbx_realloc(*buffer, *buffer_alloc);
-
-		lseek(fd, 0, SEEK_SET);
-	}
-
-	return n;
-}
-
 int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		pattern[64], *port_str, *buffer = NULL;
 	unsigned short	port;
 	zbx_uint64_t	listen = 0;
-	int		ret = SYSINFO_RET_FAIL, n, fd, buffer_alloc = 64 * ZBX_KIBIBYTE;
+	int		ret = SYSINFO_RET_FAIL, n, buffer_alloc = 64 * ZBX_KIBIBYTE;
 
 	if (1 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -291,46 +296,32 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	buffer = zbx_malloc(NULL, buffer_alloc);
 
-	if (-1 != (fd = open("/proc/net/tcp", O_RDONLY)))
+	if (0 < (n = proc_read_file("/proc/net/tcp", &buffer, &buffer_alloc)))
 	{
+		ret = SYSINFO_RET_OK;
+
 		zbx_snprintf(pattern, sizeof(pattern), "%04X 00000000:0000 0A", (unsigned int)port);
 
-		n = read_file(fd, &buffer, &buffer_alloc);
+		buffer[n] = '\0';
 
-		close(fd);
-
-		if (0 < n)
+		if (NULL != strstr(buffer, pattern))
 		{
-			buffer[n] = '\0';
-
-			ret = SYSINFO_RET_OK;
-
-			if (NULL != strstr(buffer, pattern))
-			{
-				listen = 1;
-				goto out;
-			}
+			listen = 1;
+			goto out;
 		}
 	}
 
-	if (-1 != (fd = open("/proc/net/tcp6", O_RDONLY)))
+	if (0 < (n = proc_read_file("/proc/net/tcp6", &buffer, &buffer_alloc)))
 	{
+		ret = SYSINFO_RET_OK;
+
 		zbx_snprintf(pattern, sizeof(pattern), "%04X 00000000000000000000000000000000:0000 0A",
 				(unsigned int)port);
 
-		n = read_file(fd, &buffer, &buffer_alloc);
+		buffer[n] = '\0';
 
-		close(fd);
-
-		if (0 < n)
-		{
-			buffer[n] = '\0';
-
-			ret = SYSINFO_RET_OK;
-
-			if (NULL != strstr(buffer, pattern))
-				listen = 1;
-		}
+		if (NULL != strstr(buffer, pattern))
+			listen = 1;
 	}
 out:
 	zbx_free(buffer);
