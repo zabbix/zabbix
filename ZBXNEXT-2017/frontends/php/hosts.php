@@ -99,9 +99,7 @@ $fields = array(
 	'filter_dns' =>		array(T_ZBX_STR, O_OPT, null,		null,			null),
 	'filter_port' =>	array(T_ZBX_STR, O_OPT, null,		null,			null),
 	// ajax
-	'favobj' =>			array(T_ZBX_STR, O_OPT, P_ACT,		null,			null),
-	'favref' =>			array(T_ZBX_STR, O_OPT, P_ACT,		NOT_EMPTY,		'isset({favobj})'),
-	'favstate' =>		array(T_ZBX_INT, O_OPT, P_ACT,		NOT_EMPTY,		'isset({favobj})&&"filter"=={favobj}')
+	'filterState' =>	array(T_ZBX_INT, O_OPT, P_ACT,		null,			null)
 );
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
@@ -121,12 +119,9 @@ if (get_request('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid'])
 /*
  * Ajax
  */
-if (isset($_REQUEST['favobj'])) {
-	if ('filter' == $_REQUEST['favobj']) {
-		CProfile::update('web.hosts.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
-	}
+if (hasRequest('filterState')) {
+	CProfile::update('web.hosts.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
 }
-
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit();

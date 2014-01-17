@@ -19,6 +19,186 @@
 
 
 /**
+ * Get menu popup favourite graphs section data.
+ *
+ * @param array options['graphs']			graphs as id => label (optional)
+ * @param array options['simpleGraphs']		simple graphs as id => label (optional)
+ *
+ * @return array
+ */
+function getMenuPopupFavouriteGraphs(options) {
+	var sections = [];
+
+	if (typeof options.graphs !== 'undefined') {
+		sections[sections.length] = getMenuPopupFavouriteData(
+			t('Favourite graphs'),
+			options.graphs,
+			'graphid',
+			'popup.php?srctbl=graphs&srcfld1=graphid&reference=graphid&multiselect=1&real_hosts=1'
+		);
+	}
+
+	if (typeof options.simpleGraphs !== 'undefined') {
+		sections[sections.length] = getMenuPopupFavouriteData(
+			t('Favourite simple graphs'),
+			options.simpleGraphs,
+			'itemid',
+			'popup.php?srctbl=items&srcfld1=itemid&reference=itemid&multiselect=1&numeric=1&templated=0'
+				+ '&with_simple_graph_items=1&real_hosts=1'
+		);
+	}
+
+	return sections;
+}
+
+/**
+ * Get menu popup favourite maps section data.
+ *
+ * @param array options['maps']		maps as id => label
+ *
+ * @return array
+ */
+function getMenuPopupFavouriteMaps(options) {
+	return [getMenuPopupFavouriteData(
+		t('Favourite maps'),
+		options.maps,
+		'sysmapid',
+		'popup.php?srctbl=sysmaps&srcfld1=sysmapid&reference=sysmapid&multiselect=1'
+	)];
+}
+
+/**
+ * Get menu popup favourite screens section data.
+ *
+ * @param array options['screens']		screens as id => label (optional)
+ * @param array options['slideshows']	slideshows as id => label (optional)
+ *
+ * @return array
+ */
+function getMenuPopupFavouriteScreens(options) {
+	var sections = [];
+
+	if (typeof options.screens !== 'undefined') {
+		sections[sections.length] = getMenuPopupFavouriteData(
+			t('Favourite screens'),
+			options.screens,
+			'screenid',
+			'popup.php?srctbl=screens&srcfld1=screenid&reference=screenid&multiselect=1'
+		);
+	}
+
+	if (typeof options.slideshows !== 'undefined') {
+		sections[sections.length] = getMenuPopupFavouriteData(
+			t('Favourite slide shows'),
+			options.slideshows,
+			'slideshowid',
+			'popup.php?srctbl=slides&srcfld1=slideshowid&reference=slideshowid&multiselect=1'
+		);
+	}
+
+	return sections;
+}
+
+/**
+ * Prepare data for favourite section.
+ *
+ * @param string label			item label
+ * @param array  data			item submenu
+ * @param string favouriteObj	favourite object name
+ * @param string addParams		popup parameters
+ *
+ * @returns array
+ */
+function getMenuPopupFavouriteData(label, data, favouriteObj, addParams) {
+	var removeItems = [];
+
+	if (objectSize(data) > 0) {
+		jQuery.each(data, function(i, item) {
+			removeItems[i] = {
+				label: item.label,
+				clickCallback: function() {
+					var obj = jQuery(this);
+
+					rm4favorites(favouriteObj, item.id);
+
+					obj.closest('.menuPopup').fadeOut(100);
+					obj.remove();
+				}
+			};
+		});
+	}
+
+	return {
+		label: label,
+		items: [
+			{
+				label: t('Add'),
+				clickCallback: function() {
+					PopUp(addParams, 800, 450);
+
+					jQuery(this).closest('.menuPopup').fadeOut(100);
+				}
+			},
+			{
+				label: t('Remove'),
+				css: (removeItems.length == 0) ? 'ui-state-disabled' : '',
+				items: removeItems
+			},
+			{
+				label: t('Remove all'),
+				css: (removeItems.length == 0) ? 'ui-state-disabled' : '',
+				clickCallback: function() {
+					rm4favorites(favouriteObj, 0);
+
+					jQuery(this).closest('.menuPopup').fadeOut(100);
+				}
+			}
+		]
+	};
+}
+
+/**
+ * Get menu popup history section data.
+ *
+ * @param string options['itemid']				item id
+ * @param bool   options['hasLatestGraphs']		link to history page with showgraph action (optional)
+ *
+ * @return array
+ */
+function getMenuPopupHistory(options) {
+	var items = [];
+
+	// latest graphs
+	if (typeof options.hasLatestGraphs !== 'undefined' && options.hasLatestGraphs) {
+		items[items.length] = {
+			label: t('Last hour graph'),
+			url: new Curl('history.php?itemid=' + options.itemid + '&action=showgraph&period=3600').getUrl()
+		};
+
+		items[items.length] = {
+			label: t('Last week graph'),
+			url: new Curl('history.php?itemid=' + options.itemid + '&action=showgraph&period=604800').getUrl()
+		};
+
+		items[items.length] = {
+			label: t('Last month graph'),
+			url: new Curl('history.php?itemid=' + options.itemid + '&action=showgraph&period=2678400').getUrl()
+		};
+	}
+
+	// latest values
+	items[items.length] = {
+		label: t('Latest values'),
+		url: new Curl('history.php?itemid=' + options.itemid + '&action=showvalues&period=3600').getUrl()
+	};
+
+	return [{
+		label: t('History'),
+		items: items
+	}];
+}
+
+/**
  * Get menu popup host section data.
  *
  * @param string options['hostid']			host id
@@ -36,27 +216,9 @@ function getMenuPopupHost(options) {
 
 	// scripts
 	if (typeof options.scripts !== 'undefined') {
-		var menuTree = {};
-
-		for (var key in options.scripts) {
-			var script = options.scripts[key];
-
-			if (typeof script.scriptid !== 'undefined') {
-				var items = splitPath(script.name),
-					name = (items.length > 0) ? items.pop() : script.name;
-
-				appendTreeItem(menuTree, name, items, {
-					hostId: options.hostid,
-					scriptId: script.scriptid,
-					confirmation: script.confirmation
-				});
-			}
-		}
-
 		sections[sections.length] = {
-			type: 'scripts',
-			title: t('Scripts'),
-			data: menuTree
+			label: t('Scripts'),
+			items: getMenuPopupScriptData(options.scripts, options.hostid)
 		};
 	}
 
@@ -85,11 +247,11 @@ function getMenuPopupHost(options) {
 		}
 
 		sections[sections.length] = {
-			type: 'links',
-			title: t('Go to'),
-			data: gotos
+			label: t('Go to'),
+			items: gotos
 		};
 	}
+
 	return sections;
 }
 
@@ -118,27 +280,9 @@ function getMenuPopupMap(options) {
 
 	// scripts
 	if (typeof options.scripts !== 'undefined') {
-		var menuTree = {};
-
-		for (var key in options.scripts) {
-			var script = options.scripts[key];
-
-			if (typeof script.scriptid !== 'undefined') {
-				var items = splitPath(script.name),
-					name = (items.length > 0) ? items.pop() : script.name;
-
-				appendTreeItem(menuTree, name, items, {
-					hostId: options.hostid,
-					scriptId: script.scriptid,
-					confirmation: script.confirmation
-				});
-			}
-		}
-
 		sections[sections.length] = {
-			type: 'scripts',
-			title: t('Scripts'),
-			data: menuTree
+			label: t('Scripts'),
+			items: getMenuPopupScriptData(options.scripts, options.hostid)
 		};
 	}
 
@@ -157,7 +301,7 @@ function getMenuPopupMap(options) {
 			});
 
 			gotos[gotos.length] = {
-			label: t('Host inventory'),
+				label: t('Host inventory'),
 				url: url.getUrl()
 			};
 		}
@@ -219,18 +363,16 @@ function getMenuPopupMap(options) {
 		}
 
 		sections[sections.length] = {
-			type: 'links',
-			title: t('Go to'),
-			data: gotos
+			label: t('Go to'),
+			items: gotos
 		};
 	}
 
 	// urls
 	if (typeof options.urls !== 'undefined') {
 		sections[sections.length] = {
-			type: 'links',
-			title: t('URLs'),
-			data: options.urls
+			label: t('URLs'),
+			items: options.urls
 		};
 	}
 
@@ -238,10 +380,144 @@ function getMenuPopupMap(options) {
 }
 
 /**
+ * Get menu popup refresh section data.
+ *
+ * @param string options['widgetName']		widget name
+ * @param string options['currentRate']		current rate value
+ * @param bool   options['multiplier']		multiplier or time mode
+ * @param array  options['params']			url parameters (optional)
+ *
+ * @return array
+ */
+function getMenuPopupRefresh(options) {
+	var items = [],
+		params = (typeof options.params === 'undefined' || options.params.length == 0) ? {} : options.params,
+		intervals = options.multiplier
+			? {
+				'x0.25': 'x0.25',
+				'x0.5': 'x0.5',
+				'x1': 'x1',
+				'x1.5': 'x1.5',
+				'x2': 'x2',
+				'x3': 'x3',
+				'x4': 'x4',
+				'x5': 'x5'
+			}
+			: {
+				10: t('10 seconds'),
+				30: t('30 seconds'),
+				60: t('1 minute'),
+				120: t('2 minutes'),
+				600: t('10 minutes'),
+				900: t('15 minutes')
+			};
+
+	jQuery.each(intervals, function(value, label) {
+		items[items.length] = {
+			label: label,
+			css: (value == options.currentRate) ? 'selected' : '',
+			data: {
+				value: value
+			},
+			clickCallback: function() {
+				var obj = jQuery(this),
+					currentRate = obj.data('value');
+
+				sendAjaxData({
+					data: jQuery.extend({}, params, {
+						widgetName: options.widgetName,
+						widgetRefreshRate: currentRate
+					}),
+					dataType: 'script',
+					success: function(js) { js }
+				});
+
+				jQuery('a', obj.closest('ul')).each(function() {
+					var a = jQuery(this),
+						li = a.parent();
+
+					if (a.data('value') == currentRate) {
+						li.addClass('selected');
+					}
+					else {
+						li.removeClass('selected');
+					}
+				});
+
+				obj.closest('.menuPopup').fadeOut(100);
+			}
+		};
+	});
+
+	return [{
+		label: options.multiplier ? t('Refresh time multiplier') : t('Refresh time'),
+		items: items
+	}];
+}
+
+/**
+ * Get menu popup service configuration section data.
+ *
+ * @param string options['serviceid']		service id
+ * @param string options['name']			service name
+ * @param bool   options['deletable']		service has dependencies and cannot be deleted
+ *
+ * @return array
+ */
+function getMenuPopupServiceConfiguration(options) {
+	var items = [];
+
+	if (options.serviceid === null) {
+		// add
+		items[items.length] = {
+			label: t('Add child'),
+			url: new Curl('services.php?form=1&parentname=' + options.name).getUrl()
+		};
+	}
+	else {
+		// add
+		items[items.length] = {
+			label: t('Add child'),
+			url: new Curl('services.php?form=1&parentid=' + options.serviceid + '&parentname=' + options.name).getUrl()
+		};
+
+		// edit
+		items[items.length] = {
+			label: t('Edit'),
+			url: new Curl('services.php?form=1&serviceid=' + options.serviceid).getUrl()
+		};
+
+		// delete
+		if (options.deletable) {
+			items[items.length] = {
+				label: t('Delete'),
+				url: new Curl('services.php?delete=1&serviceid=' + options.serviceid).getUrl(),
+				clickCallback: function() {
+					jQuery(this).closest('.menuPopup').fadeOut(100);
+
+					return confirm(sprintf(t('Delete service "%1$s"?'), options.name));
+				}
+			};
+		}
+		else {
+			items[items.length] = {
+				label: t('Delete'),
+				css: 'ui-state-disabled'
+			};
+		}
+	}
+
+	return [{
+		label: sprintf(t('Service "%1$s"'), options.name),
+		items: items
+	}];
+}
+
+/**
  * Get menu popup trigger section data.
  *
  * @param string options['triggerid']				trigger id
- * @param object options['items']					link to trigger item history page (optional)
+ * @param array  options['items']					link to trigger item history page (optional)
  * @param string options['items'][]['name']			item name
  * @param object options['items'][]['params']		item url parameters ("name" => "value")
  * @param object options['acknowledge']				link to acknowledge page (optional)
@@ -260,7 +536,7 @@ function getMenuPopupTrigger(options) {
 	// events
 	var url = new Curl('events.php?triggerid=' + options.triggerid);
 
-	if (!empty(options.eventTime)) {
+	if (typeof options.eventTime !== 'undefined') {
 		url.setArgument('nav_time', options.eventTime);
 	}
 
@@ -270,7 +546,7 @@ function getMenuPopupTrigger(options) {
 	};
 
 	// acknowledge
-	if (!empty(options.acknowledge)) {
+	if (typeof options.acknowledge !== 'undefined' && objectSize(options.acknowledge) > 0) {
 		var url = new Curl('acknow.php');
 
 		jQuery.each(options.acknowledge, function(name, value) {
@@ -284,9 +560,9 @@ function getMenuPopupTrigger(options) {
 	}
 
 	// configuration
-	if (!empty(options.configuration)) {
-		var url = new Curl('triggers.php?triggerid=' + options.triggerid +
-			'&hostid=' + options.configuration.hostid + '&form=update&switch_node=' + options.configuration.switchNode);
+	if (typeof options.configuration !== 'undefined' && options.configuration !== null) {
+		var url = new Curl('triggers.php?triggerid=' + options.triggerid + '&hostid=' + options.configuration.hostid
+				+ '&form=update&switch_node=' + options.configuration.switchNode);
 
 		items[items.length] = {
 			label: t('Configuration'),
@@ -295,7 +571,7 @@ function getMenuPopupTrigger(options) {
 	}
 
 	// url
-	if (!empty(options.url)) {
+	if (typeof options.url !== 'undefined' && options.url.length > 0) {
 		items[items.length] = {
 			label: t('URL'),
 			url: options.url
@@ -303,13 +579,12 @@ function getMenuPopupTrigger(options) {
 	}
 
 	sections[sections.length] = {
-		type: 'links',
-		title: t('Trigger'),
-		data: items
+		label: t('Trigger'),
+		items: items
 	};
 
 	// items
-	if (!empty(options.items)) {
+	if (typeof options.items !== 'undefined' && options.items.length > 0) {
 		var items = [];
 
 		jQuery.each(options.items, function(i, item) {
@@ -326,9 +601,8 @@ function getMenuPopupTrigger(options) {
 		});
 
 		sections[sections.length] = {
-			type: 'links',
-			title: t('History'),
-			data: items
+			label: t('History'),
+			items: items
 		};
 	}
 
@@ -336,71 +610,197 @@ function getMenuPopupTrigger(options) {
 }
 
 /**
- * Get menu popup history section data.
+ * Get menu popup trigger log section data.
  *
  * @param string options['itemid']				item id
- * @param bool   options['hasLatestGraphs']		link to history page with showgraph action (optional)
+ * @param string options['itemName']			item name
+ * @param array  options['triggers']			triggers (optional)
+ * @param string options['triggers'][n]['id']	trigger id
+ * @param string options['triggers'][n]['name']	trigger name
  *
  * @return array
  */
-function getMenuPopupHistory(options) {
+function getMenuPopupTriggerLog(options) {
 	var items = [];
 
-	// latest graphs
-	if (typeof options.hasLatestGraphs !== 'undefined' && options.hasLatestGraphs) {
-		items[items.length] = {
-			label: t('Last hour graph'),
-			url: new Curl('history.php?itemid=' + options.itemid + '&action=showgraph&period=3600').getUrl()
-		};
+	// create
+	items[items.length] = {
+		label: t('Create trigger'),
+		clickCallback: function() {
+			openWinCentered(
+				'tr_logform.php?sform=1&itemid=' + options.itemid,
+				'TriggerLog',
+				760,
+				540,
+				'titlebar=no, resizable=yes, scrollbars=yes, dialog=no'
+			);
+
+			jQuery(this).closest('.menuPopup').fadeOut(100);
+		}
+	};
+
+	// edit
+	if (options.triggers.length > 0) {
+		var triggers = [];
+
+		jQuery.each(options.triggers, function(i, trigger) {
+			triggers[triggers.length] = {
+				label: trigger.name,
+				clickCallback: function() {
+					openWinCentered(
+						'tr_logform.php?sform=1&itemid=' + options.itemid + '&triggerid=' + trigger.id,
+						'TriggerLog',
+						760,
+						540,
+						'titlebar=no, resizable=yes, scrollbars=yes'
+					);
+
+					jQuery(this).closest('.menuPopup').fadeOut(100);
+				}
+			};
+		});
 
 		items[items.length] = {
-			label: t('Last week graph'),
-			url: new Curl('history.php?itemid=' + options.itemid + '&action=showgraph&period=604800').getUrl()
+			label: t('Edit trigger'),
+			items: triggers
 		};
-
+	}
+	else {
 		items[items.length] = {
-			label: t('Last month graph'),
-			url: new Curl('history.php?itemid=' + options.itemid + '&action=showgraph&period=2678400').getUrl()
+			label: t('Edit trigger'),
+			css: 'ui-state-disabled'
 		};
 	}
 
-	// latest values
-	items[items.length] = {
-		label: t('Latest values'),
-		url: new Curl('history.php?itemid=' + options.itemid + '&action=showvalues&period=3600').getUrl()
-	};
-
 	return [{
-		type: 'links',
-		title: t('History'),
-		data: items
+		label: sprintf(t('Item "%1$s"'), options.itemName),
+		items: items
 	}];
 }
 
 /**
- * Recursive function to prepare menu tree data for createMenuTree().
+ * Get menu popup trigger macro section data.
  *
- * @param array  tree		menu tree data, will be modified by reference
- * @param string name		script name
- * @param array  items		script path
- * @param object params		script params ("hostId", "scriptId" and "confirmation" fields)
+ * @return array
  */
-function appendTreeItem(tree, name, items, params) {
-	if (items.length > 0) {
-		var item = items.shift();
+function getMenuPopupTriggerMacro(options) {
+	var items = [],
+		data = {
+			'TRIGGER.VALUE=0': 0,
+			'TRIGGER.VALUE=1': 1,
+			'TRIGGER.VALUE=2': 2,
+			'TRIGGER.VALUE#0': 10,
+			'TRIGGER.VALUE#1': 11,
+			'TRIGGER.VALUE#2': 12
+		};
 
-		if (typeof tree[item] === 'undefined') {
-			tree[item] = {items: {}};
+	jQuery.each(data, function(label, value) {
+		items[items.length] = {
+			label: label,
+			clickCallback: function() {
+				var expression = jQuery('#expr_temp');
+
+				if (expression.val().length > 0 && !confirm(t('Do you wish to replace the conditional expression?'))) {
+					return false;
+				}
+
+				var sign, valueString;
+
+				if (value >= 10) {
+					valueString = value % 10;
+					sign = '#';
+				}
+				else {
+					valueString = value;
+					sign = '=';
+				}
+
+				expression.val('{TRIGGER.VALUE}' + sign + valueString);
+
+				jQuery(this).closest('.menuPopup').fadeOut(100);
+			}
+		};
+	});
+
+	return [{
+		label: t('Insert macro'),
+		items: items
+	}];
+}
+
+/**
+ * Build script menu tree.
+ *
+ * @param array scripts		scripts names
+ * @param array hostId		host id
+ *
+ * @returns array
+ */
+function getMenuPopupScriptData(scripts, hostId) {
+	var tree = {};
+
+	var appendTreeItem = function(tree, name, items, params) {
+		if (items.length > 0) {
+			var item = items.shift();
+
+			if (typeof tree[item] === 'undefined') {
+				tree[item] = {items: {}};
+			}
+
+			appendTreeItem(tree[item].items, name, items, params);
+		}
+		else {
+			tree[name] = {
+				params: params,
+				items: {}
+			};
+		}
+	};
+
+	// parse scripts and create tree
+	for (var key in scripts) {
+		var script = scripts[key];
+
+		if (typeof script.scriptid !== 'undefined') {
+			var items = splitPath(script.name),
+				name = (items.length > 0) ? items.pop() : script.name;
+
+			appendTreeItem(tree, name, items, {
+				hostId: hostId,
+				scriptId: script.scriptid,
+				confirmation: script.confirmation
+			});
+		}
+	}
+
+	// build menu items from tree
+	var getMenuPopupScriptItems = function(tree) {
+		var items = [];
+
+		if (objectSize(tree) > 0) {
+			jQuery.each(tree, function(name, data) {
+				items[items.length] = {
+					label: name,
+					items: (typeof data.items !== 'undefined' && objectSize(data.items) > 0)
+						? getMenuPopupScriptItems(data.items)
+						: [],
+					clickCallback: function(e) {
+						if (typeof data.params !== 'undefined' && typeof data.params.scriptId !== 'undefined') {
+							executeScript(data.params.hostId, data.params.scriptId, data.params.confirmation);
+						}
+
+						cancelEvent(e);
+
+						jQuery(this).closest('.menuPopup').fadeOut(100);
+					}
+				};
+			});
 		}
 
-		appendTreeItem(tree[item].items, name, items, params);
-	}
-	else {
-		tree[name] = {
-			params: params,
-			items: {}
-		};
-	}
+		return items;
+	};
+
+	return getMenuPopupScriptItems(tree);
 }
 
 jQuery(function($) {
@@ -408,11 +808,12 @@ jQuery(function($) {
 	/**
 	 * Menu popup.
 	 *
-	 * @param array  sections			menu sections
-	 * @param string sections['type']	section display type "script" or "links"
-	 * @param string sections['data']	if section type is "script": menu tree getted from appendTreeItem()
-	 *									if section type is "links": array with "name" => "url"
-	 * @param object event				menu popup call event
+	 * @param array  sections				menu sections
+	 * @param string sections[n]['label']	section title
+	 * @param array  sections[n]['items']	section menu data (see createMenuItem() for available options)
+	 * @param object event					menu popup call event
+	 *
+	 * @see createMenuItem()
 	 */
 	$.fn.menuPopup = function(sections, event) {
 		if (!event) {
@@ -430,7 +831,7 @@ jQuery(function($) {
 			// hide all menu popups
 			jQuery('.menuPopup').css('display', 'none');
 
-			if (display == 'block') {
+			if (display === 'block') {
 				menuPopup.fadeOut(0);
 			}
 			else {
@@ -454,52 +855,24 @@ jQuery(function($) {
 			// create sections
 			if (sections.length > 0) {
 				$.each(sections, function(i, section) {
-					// scripts
-					if (section.type === 'scripts') {
-						if (objectSize(section.data) > 0) {
-							var menu = $('<ul>', {'class': 'menu'});
-
-							createMenuTree(menu, section.data);
-
-							// execute script
-							$('li', menu).each(function() {
-								var item = $(this);
-
-								if (!empty(item.data('scriptId'))) {
-									item.click(function(e) {
-										menuPopup.fadeOut(50);
-
-										executeScript(
-											item.data('hostId'),
-											item.data('scriptId'),
-											item.data('confirmation')
-										);
-
-										cancelEvent(e);
-									});
-								}
-								else {
-									item.click(function(e) {
-										cancelEvent(e);
-									});
-								}
-							});
-
-							menuPopup.append($('<div>', {'class': 'title', text: section.title}));
-							menuPopup.append(menu);
-						}
-					}
-					// links
-					else {
-						var menu = $('<ul>', {'class': 'menu'});
-
-						$.each(section.data, function(i, item) {
-							menu.append(createMenuItem(item.label, item.url));
+					var sectionTitleBox = $('<div>', {
+							'class': 'title'
+						}),
+						sectionTitleText = $('<div>', {
+							'class': 'text',
+							text: section.label
+						}),
+						sectionMenu = $('<ul>', {
+							'class': 'menu'
 						});
 
-						menuPopup.append($('<div>', {'class': 'title', text: section.title}));
-						menuPopup.append(menu);
+					if (section.items.length > 0) {
+						$.each(section.items, function(i, item) {
+							sectionMenu.append(createMenuItem(item));
+						});
 					}
+
+					menuPopup.append(sectionTitleBox.append(sectionTitleText), sectionMenu);
 				});
 			}
 
@@ -512,7 +885,7 @@ jQuery(function($) {
 			$('.menu', menuPopup).menu();
 
 			// set menu popup for map area
-			if (opener.prop('tagName') == 'AREA') {
+			if (opener.prop('tagName') === 'AREA') {
 				$('.menuPopupContainer').remove();
 
 				mapContainer = jQuery('<div>', {
@@ -552,7 +925,7 @@ jQuery(function($) {
 					closeInactiveMenuPopup(menuPopup, 1000);
 				})
 				.position({
-					of: (opener.prop('tagName') == 'AREA') ? mapContainer : event,
+					of: (opener.prop('tagName') === 'AREA') ? mapContainer : event,
 					my: 'left top',
 					at: 'left bottom'
 				});
@@ -562,15 +935,66 @@ jQuery(function($) {
 	};
 
 	/**
+	 * Create menu item.
+	 *
+	 * @param string options['label']			link text
+	 * @param string options['url']				link url
+	 * @param string options['css']				item class
+	 * @param array  options['data']			item data as key => value
+	 * @param array  options['items']			item sub menu
+	 * @param object options['clickCallback']	item click callback
+	 *
+	 * @return object
+	 */
+	function createMenuItem(options) {
+		var item = $('<li>'),
+			link = $('<a>');
+
+		if (typeof options.label !== 'undefined') {
+			link.html(options.label);
+		}
+
+		if (typeof options.url !== 'undefined') {
+			link.attr('href', options.url);
+		}
+
+		if (typeof options.data !== 'undefined' && objectSize(options.data) > 0) {
+			$.each(options.data, function(key, value) {
+				link.data(key, value);
+			});
+		}
+
+		if (typeof options.clickCallback !== 'undefined') {
+			link.click(options.clickCallback);
+		}
+
+		if (typeof options.css !== 'undefined') {
+			item.addClass(options.css);
+		}
+
+		if (typeof options.items !== 'undefined' && options.items.length > 0) {
+			var menu = $('<ul>');
+
+			$.each(options.items, function(i, item) {
+				menu.append(createMenuItem(item));
+			});
+
+			item.append(menu);
+		}
+
+		return item.append(link);
+	}
+
+	/**
 	 * Closing menu after delay.
 	 *
-	 * @param object menuPopup
-	 * @param int    delay
+	 * @param object menuPopup		menu popup
+	 * @param int    delay			delay to close menu popup
 	 */
 	function closeInactiveMenuPopup(menuPopup, delay) {
 		clearTimeout(window.menuPopupTimeoutHandler);
 
-		window.menuPopupTimeoutHandler = window.setTimeout(function() {
+		window.menuPopupTimeoutHandler = setTimeout(function() {
 			if (!menuPopup.data('is-active')) {
 				menuPopup.data('is-active', false);
 
@@ -581,86 +1005,5 @@ jQuery(function($) {
 				menuPopup.fadeOut(0);
 			}
 		}, delay);
-	}
-
-	/**
-	 * Create menu using structure:
-	 *
-	 * array(
-	 * 	'a' => array(
-	 * 		'items' => array(
-	 * 			'a' => array(
-	 * 				'items' => array(
-	 * 					'a' => array(
-	 * 						'params' => array(),
-	 * 						'items' => array()
-	 * 					),
-	 * 					'b' => array(
-	 * 						'params' => array(),
-	 * 						'items' => array()
-	 * 					)
-	 * 				)
-	 * 			),
-	 * 			'b' => array(
-	 * 				'items' => array(
-	 * 					'a' => array(
-	 * 						'params' => array(),
-	 * 						'items' => array()
-	 * 					),
-	 * 					'b' => array(
-	 * 						'params' => array(),
-	 * 						'items' => array()
-	 * 					)
-	 * 				)
-	 * 			)
-	 * 		),
-	 * 	'b' => array(
-	 * 		'params' => array(),
-	 * 		'items' => array()
-	 * 	)
-	 * )
-	 *
-	 * @param object ul		list object, will be modified by reference
-	 * @param object items	tree data with prescribed structure
-	 */
-	function createMenuTree(ul, items) {
-		$.each(items, function(name, item) {
-			var innerUl = null;
-
-			if (objectSize(item.items) > 0) {
-				innerUl = $('<ul>');
-
-				createMenuTree(innerUl, item.items);
-			}
-
-			var li = createMenuItem(name, null, innerUl);
-
-			if (objectSize(item.params) > 0) {
-				$.each(item.params, function(key, value) {
-					li.data(key, value);
-				});
-			}
-
-			ul.append(li);
-		});
-	}
-
-	/**
-	 * Create new menu item.
-	 *
-	 * @param string label		name of item
-	 * @param string link		url to create onClick action, by default is empty
-	 * @param object subMenu	sub menu to build menu tree
-	 *
-	 * @return object			list item
-	 */
-	function createMenuItem(label, link, subMenu) {
-		return $('<li>').append(
-			$('<a>', {
-				text: label,
-				href: link
-			}),
-			(typeof subMenu === 'undefined') ? null : subMenu
-		);
 	}
 });
