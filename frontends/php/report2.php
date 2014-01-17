@@ -204,7 +204,10 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
 		// trigger options
 		if (!empty($_REQUEST['filter_hostid']) || !$config['dropdown_first_entry']) {
-			$hosts = API::Host()->get(array('templateids' => $_REQUEST['filter_hostid']));
+			$hosts = API::Host()->get(array(
+				'output' => array('hostid'),
+				'templateids' => $_REQUEST['filter_hostid']
+			));
 
 			$triggerOptions['hostids'] = zbx_objectValues($hosts, 'hostid');
 		}

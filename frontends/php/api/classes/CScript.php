@@ -77,7 +77,7 @@ class CScript extends CZBXAPI {
 			'excludeSearch'			=> null,
 			'searchWildcardsEnabled'=> null,
 			// output
-			'output'				=> API_OUTPUT_REFER,
+			'output'				=> API_OUTPUT_EXTEND,
 			'selectGroups'			=> null,
 			'selectHosts'			=> null,
 			'countOutput'			=> null,

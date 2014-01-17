@@ -80,7 +80,7 @@ class CMap extends CMapElement {
 			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
 			// output
-			'output'					=> API_OUTPUT_REFER,
+			'output'					=> API_OUTPUT_EXTEND,
 			'selectSelements'			=> null,
 			'selectLinks'				=> null,
 			'selectIconMap'				=> null,
@@ -128,17 +128,13 @@ class CMap extends CMapElement {
 			else {
 				$sysmapids[$sysmap['sysmapid']] = $sysmap['sysmapid'];
 
-				if (!isset($result[$sysmap['sysmapid']])) {
-					$result[$sysmap['sysmapid']] = array();
-				}
-
 				// originally we intended not to pass those parameters if advanced labels are off, but they might be useful
 				// leaving this block commented
 				// if (isset($sysmap['label_format']) && ($sysmap['label_format'] == SYSMAP_LABEL_ADVANCED_OFF)) {
 				// 	unset($sysmap['label_string_hostgroup'], $sysmap['label_string_host'], $sysmap['label_string_trigger'], $sysmap['label_string_map'], $sysmap['label_string_image']);
 				// }
 
-				$result[$sysmap['sysmapid']] += $sysmap;
+				$result[$sysmap['sysmapid']] = $sysmap;
 			}
 		}
 
@@ -944,7 +940,7 @@ class CMap extends CMapElement {
 		// adding elements
 		if ($options['selectSelements'] !== null && $options['selectSelements'] != API_OUTPUT_COUNT) {
 			$selements = API::getApi()->select('sysmaps_elements', array(
-				'output' => $this->outputExtend('sysmaps_elements', array('selementid', 'sysmapid'), $options['selectSelements']),
+				'output' => $this->outputExtend($options['selectSelements'], array('selementid', 'sysmapid')),
 				'filter' => array('sysmapid' => $sysmapIds),
 				'preservekeys' => true,
 				'nodeids' => get_current_nodeid(true)
@@ -998,7 +994,7 @@ class CMap extends CMapElement {
 		// adding icon maps
 		if ($options['selectIconMap'] !== null && $options['selectIconMap'] != API_OUTPUT_COUNT) {
 			$iconMaps = API::IconMap()->get(array(
-				'output' => $this->outputExtend('icon_map', array('sysmapid', 'iconmapid'), $options['selectIconMap']),
+				'output' => $this->outputExtend($options['selectIconMap'], array('sysmapid', 'iconmapid')),
 				'sysmapids' => $sysmapIds,
 				'preservekeys' => true,
 				'nopermissions' => true
@@ -1012,7 +1008,7 @@ class CMap extends CMapElement {
 		// adding links
 		if ($options['selectLinks'] !== null && $options['selectLinks'] != API_OUTPUT_COUNT) {
 			$links = API::getApi()->select('sysmaps_links', array(
-				'output' => $this->outputExtend('sysmaps_links', array('sysmapid', 'linkid'), $options['selectLinks']),
+				'output' => $this->outputExtend($options['selectLinks'], array('sysmapid', 'linkid')),
 				'filter' => array('sysmapid' => $sysmapIds),
 				'preservekeys' => true,
 				'nodeids' => get_current_nodeid(true)
@@ -1037,7 +1033,7 @@ class CMap extends CMapElement {
 		// adding urls
 		if ($options['selectUrls'] !== null && $options['selectUrls'] != API_OUTPUT_COUNT) {
 			$links = API::getApi()->select('sysmap_url', array(
-				'output' => $this->outputExtend('sysmap_url', array('sysmapid', 'sysmapurlid'), $options['selectUrls']),
+				'output' => $this->outputExtend($options['selectUrls'], array('sysmapid', 'sysmapurlid')),
 				'filter' => array('sysmapid' => $sysmapIds),
 				'preservekeys' => true,
 				'nodeids' => get_current_nodeid(true)
