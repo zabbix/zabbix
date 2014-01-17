@@ -25,6 +25,7 @@ New features:
 A.F....... [ZBX-1357] updated American English, French, Hungarian, Italian, Japanese, Russian, Slovak and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-7587] set the correct server status (down) after ORA-01012, ORA-02396 errors (wiper)
 ....I..... [ZBX-7515] added missing delayed loading option of wevtapi.dll for x64 systems (igors)
 ...G...... [ZBX-7481] added checking for OpenBSD version to avoid compilation error on OpenBSD v5.4 and newer due to removed swapins/swapouts uvmexp fields (igors)
 .......PS. [ZBX-7576] when pinging a broadcast address ignore responses from other addresses (wiper)
@@ -767,6 +768,7 @@ New features:
 A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-7587] set the correct server status (down) after ORA-01012, ORA-02396 errors (wiper)
 ...G...... [ZBX-7481] added checking for OpenBSD version to avoid compilation error on OpenBSD v5.4 and newer due to removed swapins/swapouts uvmexp fields (igors)
 ..F....... [ZBX-7634] removed sid from trigger URL in Monitoring->Triggers (Oleg)
 ...GI..PS. [ZBX-5526] removed checking for PosgreSQL server version and disabled nonstandard use of escape strings in order to support versions newer than 8.1 (igors)
