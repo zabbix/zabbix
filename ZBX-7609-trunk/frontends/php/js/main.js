@@ -425,18 +425,18 @@ var chkbxRange = {
 /*
  * Audio control system
  */
-var AudioList = {
+var AudioControl = {
 
 	timeoutHandler: null,
 
-	loop: function(name, timeout) {
-		AudioList.timeoutHandler = setTimeout(
+	loop: function(timeout) {
+		AudioControl.timeoutHandler = setTimeout(
 			function() {
 				if (new Date().getTime() >= timeout) {
-					AudioList.stop(name);
+					AudioControl.stop();
 				}
 				else {
-					AudioList.loop(name, timeout);
+					AudioControl.loop(timeout);
 				}
 			},
 			1000
@@ -444,103 +444,100 @@ var AudioList = {
 	},
 
 	playOnce: function(name) {
-		if (document.getElementById(name) !== null) {
-			this.stop(name);
-		}
+		this.stop();
 
-		this.create(name, false);
+		if (IE) {
+			this.create(name, false);
+		}
+		else {
+			var obj = jQuery('#audio');
+
+			if (obj.length > 0 && obj.data('name') === name) {
+				obj.trigger('play');
+			}
+			else {
+				this.create(name, false);
+			}
+		}
 	},
 
 	playLoop: function(name, delay) {
-		var obj = document.getElementById(name);
-
-		if (obj !== null) {
-			this.stop(name);
-
-			clearTimeout(AudioList.timeoutHandler);
-		}
+		this.stop();
 
 		if (IE) {
 			this.create(name, true);
 		}
 		else {
-			if (obj !== null) {
-				jQuery(obj).trigger('play');
+			var obj = jQuery('#audio');
+
+			if (obj.length > 0 && obj.data('name') === name) {
+				obj.trigger('play');
 			}
 			else {
 				this.create(name, true);
 			}
 		}
 
-		AudioList.loop(name, new Date().getTime() + delay * 1000);
+		AudioControl.loop(new Date().getTime() + delay * 1000);
 	},
 
-	stop: function(name) {
-		if (IE) {
-			var obj = document.getElementById(name);
+	stop: function() {
+		var obj = document.getElementById('audio');
 
-			obj.setAttribute('loop', 0);
-			obj.setAttribute('playcount', 0);
+		if (obj !== null) {
+			clearTimeout(AudioControl.timeoutHandler);
 
-			try {
-				obj.stop();
+			if (IE) {
+				obj.setAttribute('loop', 0);
+				obj.setAttribute('playcount', 0);
+
+				try {
+					obj.stop();
+				}
+				catch (e) {
+					setTimeout(
+						function() {
+							document.getElementById('audio').stop();
+						},
+						100
+					);
+				}
 			}
-			catch (e) {
-				setTimeout(
-					function() {
-						document.getElementById(name).stop();
-					},
-					100
-				);
+			else {
+				jQuery(obj).trigger('pause');
 			}
 		}
-		else {
-			jQuery(document.getElementById(name)).trigger('pause');
-		}
-	},
-
-	stopAll: function() {
-		jQuery('#audioList .audioFile').each(function() {
-			AudioList.stop(jQuery(this).attr('id'));
-		});
 	},
 
 	create: function(name, loop) {
-		var obj = document.getElementById(name),
-			audioList = jQuery('#audioList');
-
-		if (audioList.length == 0) {
-			audioList = jQuery('<div>', {id: 'audioList'});
-
-			jQuery('body').append(audioList);
-		}
-
 		if (IE) {
-			if (obj !== null) {
-				jQuery(obj).remove();
-			}
+			jQuery('#audio').remove();
 
-			audioList.append(jQuery('<embed>', {
-				id: name,
+			jQuery('body').append(jQuery('<embed>', {
+				id: 'audio',
 				src: 'audio/' + name,
+				'data-name': name,
 				enablejavascript: true,
 				autostart: true,
 				loop: true,
 				playcount: loop ? 9999999 : 1,
-				'class': 'audioFile',
 				css: {
 					display: 'none'
 				}
 			}));
 		}
 		else {
-			if (obj === null) {
-				audioList.append(jQuery('<audio>', {
-					id: name,
+			var obj = jQuery('#audio');
+
+			if (obj.length == 0 || obj.data('name') !== name) {
+				obj.remove();
+
+				jQuery('body').append(jQuery('<audio>', {
+					id: 'audio',
 					src: 'audio/' + name,
+					'data-name': name,
 					autoplay: true,
-					loop: loop ? 9999999 : 1,
-					'class': 'audioFile'
+					loop: loop ? 9999999 : 1
 				}));
 			}
 		}

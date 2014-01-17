@@ -636,13 +636,13 @@ function testUserSound(idx) {
 	var repeat = $('messages_sounds.repeat').options[$('messages_sounds.repeat').selectedIndex].value;
 
 	if (repeat == 1) {
-		AudioList.playOnce(sound);
+		AudioControl.playOnce(sound);
 	}
 	else if (repeat > 1) {
-		AudioList.playLoop(sound, repeat);
+		AudioControl.playLoop(sound, repeat);
 	}
 	else {
-		AudioList.playLoop(sound, $('messages_timeout').value);
+		AudioControl.playLoop(sound, $('messages_timeout').value);
 	}
 }
 

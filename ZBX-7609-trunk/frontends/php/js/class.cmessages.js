@@ -27,7 +27,7 @@ function initMessages(args) {
 	return messagesListId;
 }
 
-var CMessageList = Class.create(CDebug, {
+var CMessageList = Class.create({
 	messageListId:		0,		// reference id
 	updateFrequency:	60,		// seconds
 	timeoutFrequency:	10,		// seconds
@@ -51,9 +51,8 @@ var CMessageList = Class.create(CDebug, {
 		'timeout':	0
 	},
 
-	initialize: function($super, messagesListId, args) {
+	initialize: function(messagesListId, args) {
 		this.messageListId = messagesListId;
-		$super('CMessageList[' + messagesListId + ']');
 		this.dom = {};
 		this.messages = {};
 		this.messageList = {};
@@ -209,20 +208,20 @@ var CMessageList = Class.create(CDebug, {
 
 		if (this.sounds.sound !== null) {
 			if (this.sounds.repeat == 1) {
-				AudioList.playOnce(this.sounds.sound);
+				AudioControl.playOnce(this.sounds.sound);
 			}
 			else if (this.sounds.repeat > 0) {
-				AudioList.playLoop(this.sounds.sound, this.sounds.repeat);
+				AudioControl.playLoop(this.sounds.sound, this.sounds.repeat);
 			}
 			else {
-				AudioList.playLoop(this.sounds.sound, this.sounds.timeout);
+				AudioControl.playLoop(this.sounds.sound, this.sounds.timeout);
 			}
 		}
 	},
 
 	stopSound: function() {
 		if (!is_null(this.sounds.sound)) {
-			AudioList.stop(this.sounds.sound);
+			AudioControl.stop();
 		}
 	},
 
@@ -231,7 +230,7 @@ var CMessageList = Class.create(CDebug, {
 			return true;
 		}
 
-		AudioList.stop(this.messageList[messageid].sound);
+		AudioControl.stop();
 
 		if (withEffect) {
 			this.messageList[messageid].remove();
@@ -293,7 +292,7 @@ var CMessageList = Class.create(CDebug, {
 			count++;
 		}
 
-		AudioList.stopAll();
+		AudioControl.stop();
 	},
 
 	timeoutMessages: function() {
@@ -407,7 +406,7 @@ var CMessageList = Class.create(CDebug, {
 	}
 });
 
-var CMessage = Class.create(CDebug, {
+var CMessage = Class.create({
 	list:		null,		// link to message list containing this message
 	messageid:	null,		// msg id
 	caption:	'unknown',	// msg caption (events, actions, infos.. e.t.c.)
@@ -422,9 +421,8 @@ var CMessage = Class.create(CDebug, {
 	timeout:	60,			// msg timeout
 	dom:		{},			// msg dom links
 
-	initialize: function($super, messageList, message) {
+	initialize: function(messageList, message) {
 		this.messageid = message.messageid;
-		$super('CMessage[' + this.messageid + ']');
 		this.dom = {};
 		this.list = messageList;
 

@@ -823,11 +823,6 @@ class CJSON {
 		return trim($str);
 	}
 
-	protected function _exception($code, $info = array()) {
-		$class = get_class($this);
-		SDI(array($class, $code, (array) $info));
-	}
-
 	//***************************************************************************
 	// 								CHECK JSON									*
 	//***************************************************************************
