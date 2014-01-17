@@ -449,15 +449,24 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	if (1 == short_answer)
 	{
 		SET_UI64_RESULT(result, NOERROR != hp->rcode || 0 == ntohs(hp->ancount) || -1 == res ? 0 : 1);
-		memcpy(&(_res.nsaddr_list[0]), &saved_ns, sizeof(struct sockaddr_in));
-		_res.nscount = saved_nscount;
+
+		if (NULL != ip && '\0' != *ip)
+		{
+			memcpy(&(_res.nsaddr_list[0]), &saved_ns, sizeof(struct sockaddr_in));
+			_res.nscount = saved_nscount;
+		}
+
 		return SYSINFO_RET_OK;
 	}
 
 	if (NOERROR != hp->rcode || 0 == ntohs(hp->ancount) || -1 == res)
 	{
-		memcpy(&(_res.nsaddr_list[0]), &saved_ns, sizeof(struct sockaddr_in));
-		_res.nscount = saved_nscount;
+		if (NULL != ip && '\0' != *ip)
+		{
+			memcpy(&(_res.nsaddr_list[0]), &saved_ns, sizeof(struct sockaddr_in));
+			_res.nscount = saved_nscount;
+		}
+
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -476,8 +485,11 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	{
 		if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
 		{
-			memcpy(&(_res.nsaddr_list[0]), &saved_ns, sizeof(struct sockaddr_in));
-			_res.nscount = saved_nscount;
+			if (NULL != ip && '\0' != *ip)
+			{
+				memcpy(&(_res.nsaddr_list[0]), &saved_ns, sizeof(struct sockaddr_in));
+				_res.nscount = saved_nscount;
+			}
 			return SYSINFO_RET_FAIL;
 		}
 
@@ -516,8 +528,12 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 			case T_PTR:
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
 				{
-					memcpy(&(_res.nsaddr_list[0]), &saved_ns, sizeof(struct sockaddr_in));
-					_res.nscount = saved_nscount;
+					if (NULL != ip && '\0' != *ip)
+					{
+						memcpy(&(_res.nsaddr_list[0]), &saved_ns, sizeof(struct sockaddr_in));
+						_res.nscount = saved_nscount;
+					}
+
 					return SYSINFO_RET_FAIL;
 				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
@@ -528,8 +544,12 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* exchange */
 				{
-					memcpy(&(_res.nsaddr_list[0]), &saved_ns, sizeof(struct sockaddr_in));
-					_res.nscount = saved_nscount;
+					if (NULL != ip && '\0' != *ip)
+					{
+						memcpy(&(_res.nsaddr_list[0]), &saved_ns, sizeof(struct sockaddr_in));
+						_res.nscount = saved_nscount;
+					}
+
 					return SYSINFO_RET_FAIL;
 				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
@@ -538,16 +558,24 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 			case T_SOA:
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* source host */
 				{
-					memcpy(&(_res.nsaddr_list[0]), &saved_ns, sizeof(struct sockaddr_in));
-					_res.nscount = saved_nscount;
+					if (NULL != ip && '\0' != *ip)
+					{
+						memcpy(&(_res.nsaddr_list[0]), &saved_ns, sizeof(struct sockaddr_in));
+						_res.nscount = saved_nscount;
+					}
+
 					return SYSINFO_RET_FAIL;
 				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* administrator */
 				{
-					memcpy(&(_res.nsaddr_list[0]), &saved_ns, sizeof(struct sockaddr_in));
-					_res.nscount = saved_nscount;
+					if (NULL != ip && '\0' != *ip)
+					{
+						memcpy(&(_res.nsaddr_list[0]), &saved_ns, sizeof(struct sockaddr_in));
+						_res.nscount = saved_nscount;
+					}
+
 					return SYSINFO_RET_FAIL;
 				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
@@ -575,8 +603,12 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 			case T_WKS:
 				if (INT32SZ + 1 > q_len)
 				{
-					memcpy(&(_res.nsaddr_list[0]), &saved_ns, sizeof(struct sockaddr_in));
-					_res.nscount = saved_nscount;
+					if (NULL != ip && '\0' != *ip)
+					{
+						memcpy(&(_res.nsaddr_list[0]), &saved_ns, sizeof(struct sockaddr_in));
+						_res.nscount = saved_nscount;
+					}
+
 					return SYSINFO_RET_FAIL;
 				}
 
@@ -642,16 +674,24 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 			case T_MINFO:
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* mailbox responsible for mailing lists */
 				{
-					memcpy(&(_res.nsaddr_list[0]), &saved_ns, sizeof(struct sockaddr_in));
-					_res.nscount = saved_nscount;
+					if (NULL != ip && '\0' != *ip)
+					{
+						memcpy(&(_res.nsaddr_list[0]), &saved_ns, sizeof(struct sockaddr_in));
+						_res.nscount = saved_nscount;
+					}
+
 					return SYSINFO_RET_FAIL;
 				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* mailbox for error messages */
 				{
-					memcpy(&(_res.nsaddr_list[0]), &saved_ns, sizeof(struct sockaddr_in));
-					_res.nscount = saved_nscount;
+					if (NULL != ip && '\0' != *ip)
+					{
+						memcpy(&(_res.nsaddr_list[0]), &saved_ns, sizeof(struct sockaddr_in));
+						_res.nscount = saved_nscount;
+					}
+
 					return SYSINFO_RET_FAIL;
 				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
@@ -682,8 +722,12 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* target */
 				{
-					memcpy(&(_res.nsaddr_list[0]), &saved_ns, sizeof(struct sockaddr_in));
-					_res.nscount = saved_nscount;
+					if (NULL != ip && '\0' != *ip)
+					{
+						memcpy(&(_res.nsaddr_list[0]), &saved_ns, sizeof(struct sockaddr_in));
+						_res.nscount = saved_nscount;
+					}
+
 					return SYSINFO_RET_FAIL;
 				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
