@@ -164,10 +164,10 @@ foreach ($triggers as $trigger) {
 	$hostId = $trigger['hostid'];
 
 	$hostName = new CSpan($trigger['hostname'], 'link_menu');
-	$hostName->setMenuPopup(getMenuPopupHost($hosts[$hostId], $scripts[$hostId]));
+	$hostName->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId]));
 
 	$triggerDescription = new CSpan($trigger['description'], 'link_menu');
-	$triggerDescription->setMenuPopup(getMenuPopupTrigger($trigger, $trigger['items']));
+	$triggerDescription->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $trigger['items']));
 
 	$table->addRow(array(
 		get_node_name_by_elid($trigger['triggerid']),

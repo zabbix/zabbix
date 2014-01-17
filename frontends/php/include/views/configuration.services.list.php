@@ -19,8 +19,6 @@
 **/
 
 
-include('include/views/js/configuration.services.list.js.php');
-
 $serviceWidget = new CWidget(null, 'service-list');
 $serviceWidget->addPageHeader(_('CONFIGURATION OF IT SERVICES'), SPACE);
 $serviceWidget->addHeader(_('IT services'));
@@ -31,4 +29,5 @@ $serviceForm->setName('serviceForm');
 
 $serviceWidget->addItem(BR());
 $serviceWidget->addItem($this->data['tree']->getHTML());
+
 return $serviceWidget;

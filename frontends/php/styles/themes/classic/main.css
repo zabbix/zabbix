@@ -48,7 +48,7 @@ ul.favorites { margin: 0; padding: 4px 4px 4px 1em; border: 1px solid #AAAAAA; }
 .column .widget, #search_wdgt .widget { padding: 0; border-radius: 0; }
 .widget .footer { margin-top: 0; border-top: 0; }
 .classic .ui-corner-all { border-radius: 0; }
-.classic #dashboard_wdgt .ui-widget-content,
+.classic .dashboard .ui-widget-content,
 .classic #search_wdgt .ui-widget-content {
 	border: 0; background: #EEE;
 }

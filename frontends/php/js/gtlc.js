@@ -974,15 +974,14 @@ var CScrollBar = Class.create(CDebug, {
 		this.fixedperiod = (this.fixedperiod == 1) ? 0 : 1;
 
 		// sending fixed/dynamic setting to server to save in a profile
-		var params = {
-			favobj: 'timelinefixedperiod',
-			favid: this.fixedperiod
-		};
-		send_params(params);
+		sendAjaxData({
+			data: {
+				favobj: 'timelinefixedperiod',
+				favid: this.fixedperiod
+			}
+		});
 
-		this.dom.period_state.innerHTML = (this.fixedperiod)
-			? locale['S_FIXED_SMALL']
-			: locale['S_DYNAMIC_SMALL'];
+		this.dom.period_state.innerHTML = this.fixedperiod ? locale['S_FIXED_SMALL'] : locale['S_DYNAMIC_SMALL'];
 	},
 
 	getTZOffset: function(time) {
