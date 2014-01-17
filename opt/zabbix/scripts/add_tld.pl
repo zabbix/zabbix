@@ -1471,6 +1471,8 @@ Other options
                 list of RDDS43 servers separated by comma: "NAME1,NAME2,..."
         --rdds80-servers=STRING
                 list of RDDS80 servers separated by comma: "NAME1,NAME2,..."
+        --epp-server=STRING
+                specify EPP server
         --rdds-ns-string=STRING
                 name server prefix in the WHOIS output
 		(default: "$cfg_default_rdds_ns_string")
@@ -1491,7 +1493,6 @@ sub validate_input {
     $msg .= "RDDS test prefix must be specified (--rdds-test-prefix)\n" if ((defined($OPTS{'rdds43-servers'}) and !defined($OPTS{'rdds-test-prefix'})) or (defined($OPTS{'rdds80-servers'}) and !defined($OPTS{'rdds-test-prefix'})));
     $msg .= "none or both --rdds43-servers and --rdds80-servers should be specified\n" if ((defined($OPTS{'rdds43-servers'}) and !defined($OPTS{'rdds80-servers'})) or
 											 (defined($OPTS{'rdds80-servers'}) and !defined($OPTS{'rdds43-servers'})));
-    $msg .= "EPP is not implemented yet\n" if (defined($OPTS{'epp-server'}));
 
     if ($msg ne "")
     {
