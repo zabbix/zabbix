@@ -1297,7 +1297,7 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
 
 		foreach ($hostNames as $hostId => $hostName) {
 			$name = new CSpan($hostName, 'link_menu');
-			$name->setMenuPopup(getMenuPopupHost($hosts[$hostId], $scripts[$hostId]));
+			$name->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId]));
 
 			$columns = array($name);
 			foreach ($triggers as $triggerHosts) {
@@ -1328,7 +1328,7 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
  */
 function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 	$ack = $css = $style = null;
-	$desc = $menuPopup = $triggerItems = $acknowledge = array();
+	$desc = $triggerItems = $acknowledge = array();
 
 	// for how long triggers should blink on status change (set by user in administration->general)
 	$config = select_config();
@@ -1445,7 +1445,7 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 	}
 
 	if ($trigger) {
-		$column->setMenuPopup(getMenuPopupTrigger($trigger, $triggerItems, $acknowledge));
+		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $triggerItems, $acknowledge));
 	}
 
 	return $column;
@@ -1628,7 +1628,7 @@ function make_trigger_details($trigger) {
 	$scripts = API::Script()->getScriptsByHosts($hostId);
 
 	$hostName = new CSpan($host['name'], 'link_menu');
-	$hostName->setMenuPopup(getMenuPopupHost($host, $scripts ? reset($scripts) : null));
+	$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts ? reset($scripts) : null));
 
 	$table = new CTableInfo();
 

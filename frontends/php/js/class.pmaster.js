@@ -18,12 +18,12 @@
 **/
 
 
-var PMasters = [];
+var PMasters = {};
+
 function initPMaster(pmid, args) {
-	if (typeof(PMasters[pmid]) == 'undefined') {
+	if (typeof PMasters[pmid] === 'undefined') {
 		PMasters[pmid] = new CPMaster(pmid, args);
 	}
-	return pmid;
 }
 
 var CPMaster = Class.create(CDebug,{
@@ -395,40 +395,38 @@ var CDoll = Class.create(CDebug,{
 	},
 
 	updateSortable: function() {
-		if (empty(jQuery('.column'))) {
-			return false;
-		}
+		var columnObj = jQuery('.column');
 
-		jQuery('.column')
-			.sortable({
-				connectWith: '.column',
-				handle: 'div.header',
-				forcePlaceholderSize: true,
-				placeholder: 'widget ui-corner-all ui-sortable-placeholder',
-				opacity: '0.8',
-				update: function(e, ui) {
-					// prevent duplicate save requests when moving a widget from one column to another
-					if (!ui.sender) {
-						var widgetPositions = {};
+		if (columnObj.length > 0) {
+			columnObj
+				.sortable({
+					connectWith: '.column',
+					handle: 'div.header',
+					forcePlaceholderSize: true,
+					placeholder: 'widget ui-corner-all ui-sortable-placeholder',
+					opacity: '0.8',
+					update: function(e, ui) {
+						// prevent duplicate save requests when moving a widget from one column to another
+						if (!ui.sender) {
+							var widgetPositions = {};
 
-						jQuery('.column').each(function(colNum, column) {
-							widgetPositions[colNum] = {};
+							jQuery('.column').each(function(colNum, column) {
+								widgetPositions[colNum] = {};
 
-							jQuery('.widget', column).each(function(rowNum, widget) {
-								widgetPositions[colNum][rowNum] = widget.id;
+								jQuery('.widget', column).each(function(rowNum, widget) {
+									widgetPositions[colNum][rowNum] = widget.id;
+								});
 							});
-						});
 
-						send_params({
-							favaction: 'sort',
-							favobj : 'hat',
-							favdata: Object.toJSON(widgetPositions)
-						});
+							sendAjaxData({
+								data: {widgetSort: Object.toJSON(widgetPositions)}
+							});
+						}
 					}
-				}
-			})
-			.children('div')
-			.children('div.header')
-			.addClass('move');
+				})
+				.children('div')
+				.children('div.header')
+				.addClass('move');
+		}
 	}
 });

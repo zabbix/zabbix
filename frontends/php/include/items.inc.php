@@ -699,7 +699,7 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 			$host = $hosts[$hostId];
 
 			$name = new CSpan($host['name'], 'link_menu');
-			$name->setMenuPopup(getMenuPopupHost($host, $scripts[$hostId]));
+			$name->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$hostId]));
 
 			$tableRow = array(new CCol($name));
 			foreach ($items as $ithosts) {
@@ -738,7 +738,7 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 	$column = new CCol(array($value, $ack), $css);
 
 	if (isset($ithosts[$hostName])) {
-		$column->setMenuPopup(getMenuPopupHistory($item));
+		$column->setMenuPopup(CMenuPopupHelper::getHistory($item));
 	}
 
 	$tableRow[] = $column;

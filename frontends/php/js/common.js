@@ -616,34 +616,34 @@ function showHideByName(name, style) {
 	}
 }
 
-function switchElementsClass(obj, class1, class2) {
-	obj = $(obj);
-	if (!obj) {
-		return false;
+/**
+ * Switch element classes and return final class.
+ *
+ * @param object|string obj			object or object id
+ * @param string        class1
+ * @param string        class2
+ *
+ * @return string
+ */
+function switchElementClass(obj, class1, class2) {
+	obj = (typeof obj === 'string') ? jQuery('#' + obj) : jQuery(obj);
+
+	if (obj.length > 0) {
+		if (obj.hasClass(class1)) {
+			obj.removeClass(class1);
+			obj.addClass(class2);
+
+			return class2;
+		}
+		else if (obj.hasClass(class2)) {
+			obj.removeClass(class2);
+			obj.addClass(class1);
+
+			return class1;
+		}
 	}
 
-	var result = false;
-
-	if (obj.hasClassName(class1)) {
-		obj.removeClassName(class1);
-		obj.className = class2 + ' ' + obj.className;
-		result = class2;
-	}
-	else if (obj.hasClassName(class2)) {
-		obj.removeClassName(class2);
-		obj.className =  class1 + ' ' + obj.className;
-		result = class1;
-	}
-	else {
-		obj.className = class1 + ' ' + obj.className;
-		result = class1;
-	}
-
-	return result;
-}
-
-function zbx_throw(msg) {
-	throw(msg);
+	return null;
 }
 
 /**
@@ -657,7 +657,7 @@ function zbx_throw(msg) {
 function basename(path, suffix) {
 	var name = path.replace(/^.*[\/\\]/g, '');
 
-	if (typeof(suffix) == 'string' && name.substr(name.length - suffix.length) == suffix) {
+	if (typeof suffix === 'string' && name.substr(name.length - suffix.length) == suffix) {
 		name = name.substr(0, name.length - suffix.length);
 	}
 
