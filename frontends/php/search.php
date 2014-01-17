@@ -103,12 +103,12 @@ order_result($db_hosts, 'name');
 $hosts = selectByPattern($db_hosts, 'name', $search, $rows_per_page);
 $hostids = zbx_objectValues($hosts, 'hostid');
 
-$params = array(
+$rw_hosts = API::Host()->get(array(
+	'output' => array('hostid'),
 	'nodeids' => get_current_nodeid(true),
 	'hostids' => $hostids,
 	'editable' => 1
-);
-$rw_hosts = API::Host()->get($params);
+));
 $rw_hosts = zbx_toHash($rw_hosts, 'hostid');
 
 $params = array(
@@ -244,12 +244,12 @@ order_result($db_hostGroups, 'name');
 $hostGroups = selectByPattern($db_hostGroups, 'name', $search, $rows_per_page);
 $groupids = zbx_objectValues($hostGroups, 'groupid');
 
-$params = array(
+$rw_hostGroups = API::HostGroup()->get(array(
+	'output' => array('groupid'),
 	'nodeids' => get_current_nodeid(true),
 	'groupids' => $groupids,
 	'editable' => true
-);
-$rw_hostGroups = API::HostGroup()->get($params);
+));
 $rw_hostGroups = zbx_toHash($rw_hostGroups, 'groupid');
 
 $params = array(
@@ -341,7 +341,7 @@ if ($admin) {
 		'nodeids' => get_current_nodeid(true),
 		'search' => array('name' => $search),
 		'output' => array('name'),
-		'selectGroups' => API_OUTPUT_REFER,
+		'selectGroups' => array('groupid'),
 		'sortfield' => 'name',
 		'selectItems' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,
@@ -358,12 +358,12 @@ if ($admin) {
 	$templates = selectByPattern($db_templates, 'name', $search, $rows_per_page);
 	$templateids = zbx_objectValues($templates, 'templateid');
 
-	$params = array(
+	$rw_templates = API::Template()->get(array(
+		'output' => array('templateid'),
 		'nodeids' => get_current_nodeid(true),
 		'templateids' => $templateids,
 		'editable' => 1
-	);
-	$rw_templates = API::Template()->get($params);
+	));
 	$rw_templates = zbx_toHash($rw_templates, 'templateid');
 
 	$params = array(

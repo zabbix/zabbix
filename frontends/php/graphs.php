@@ -129,6 +129,7 @@ if (CUser::$userData['type'] !== USER_TYPE_SUPER_ADMIN) {
 	elseif (!empty($_REQUEST['graphid'])) {
 		// check whether graph is normal and editable by user
 		$graphs = API::Graph()->get(array(
+			'output' => array('graphid'),
 			'nodeids' => get_current_nodeid(true),
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 			'graphids' => array($_REQUEST['graphid']),
@@ -142,6 +143,7 @@ if (CUser::$userData['type'] !== USER_TYPE_SUPER_ADMIN) {
 	elseif (!empty($_REQUEST['hostid'])) {
 		// check whether host is editable by user
 		$hosts = API::Host()->get(array(
+			'output' => array('hostid'),
 			'nodeids' => get_current_nodeid(true),
 			'hostids' => array($_REQUEST['hostid']),
 			'templated_hosts' => true,
@@ -305,6 +307,7 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQU
 		$goResult = true;
 
 		$options = array(
+			'output' => array('hostid'),
 			'editable' => true,
 			'nodes' => get_current_nodeid(true),
 			'templated_hosts' => true
@@ -319,6 +322,7 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQU
 			zbx_value2array($_REQUEST['copy_targetid']);
 
 			$dbGroups = API::HostGroup()->get(array(
+				'output' => array('groupid'),
 				'groupids' => $_REQUEST['copy_targetid'],
 				'nodes' => get_current_nodeid(true),
 				'editable' => true
@@ -442,6 +446,7 @@ elseif (isset($_REQUEST['form'])) {
 				// parent graph prototype link
 				if (get_request('parent_discoveryid')) {
 					$parentGraphPrototype = API::GraphPrototype()->get(array(
+						'output' => array('graphid'),
 						'graphids' => $parentGraph['graphid'],
 						'selectTemplates' => API_OUTPUT_EXTEND,
 						'selectDiscoveryRule' => array('itemid')

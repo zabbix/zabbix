@@ -128,6 +128,7 @@ function slideshow_accessible($slideshowid, $perm) {
 		}
 
 		$options = array(
+			'output' => array('screenid'),
 			'screenids' => $screenids
 		);
 		if ($perm == PERM_READ_WRITE) {

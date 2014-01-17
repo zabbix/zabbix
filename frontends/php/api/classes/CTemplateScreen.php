@@ -75,7 +75,7 @@ class CTemplateScreen extends CScreen {
 			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
 			// output
-			'output'					=> API_OUTPUT_REFER,
+			'output'					=> API_OUTPUT_EXTEND,
 			'selectScreenItems'			=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
@@ -97,6 +97,7 @@ class CTemplateScreen extends CScreen {
 				unset($options['hostids']);
 
 				$options['templateids'] = API::Template()->get(array(
+					'output' => array('templateid'),
 					'templateids' => $options['templateids'],
 					'editable' => $options['editable'],
 					'preservekeys' => true
@@ -105,6 +106,7 @@ class CTemplateScreen extends CScreen {
 			}
 			elseif (!is_null($options['hostids'])) {
 				$options['templateids'] = API::Host()->get(array(
+					'output' => array('hostid'),
 					'hostids' => $options['hostids'],
 					'editable' => $options['editable'],
 					'preservekeys' => true
@@ -143,9 +145,7 @@ class CTemplateScreen extends CScreen {
 		// screenitemids
 		if (!is_null($options['screenitemids'])) {
 			zbx_value2array($options['screenitemids']);
-			if ($options['output'] != API_OUTPUT_EXTEND) {
-				$sqlParts['select']['screenitemid'] = 'si.screenitemid';
-			}
+
 			$sqlParts['from']['screens_items'] = 'screens_items si';
 			$sqlParts['where']['ssi'] = 'si.screenid=s.screenid';
 			$sqlParts['where'][] = dbConditionInt('si.screenitemid', $options['screenitemids']);
@@ -222,18 +222,7 @@ class CTemplateScreen extends CScreen {
 				}
 			}
 			else {
-				if (!isset($result[$screen['screenid']])) {
-					$result[$screen['screenid']] = array();
-				}
-
-				if (isset($screen['screenitemid']) && is_null($options['selectScreenItems'])) {
-					if (!isset($result[$screen['screenid']]['screenitems'])) {
-						$result[$screen['screenid']]['screenitems'] = array();
-					}
-					$result[$screen['screenid']]['screenitems'][] = array('screenitemid' => $screen['screenitemid']);
-					unset($screen['screenitemid']);
-				}
-				$result[$screen['screenid']] += $screen;
+				$result[$screen['screenid']] = $screen;
 			}
 		}
 
@@ -246,8 +235,8 @@ class CTemplateScreen extends CScreen {
 		// adding screenitems
 		if ($options['selectScreenItems'] !== null && $options['selectScreenItems'] != API_OUTPUT_COUNT) {
 			$screenItems = API::getApi()->select('screens_items', array(
-				'output' => $this->outputExtend('screens_items',
-					array('screenid', 'screenitemid', 'resourcetype', 'resourceid'), $options['selectScreenItems']
+				'output' => $this->outputExtend($options['selectScreenItems'],
+					array('screenid', 'screenitemid', 'resourcetype', 'resourceid')
 				),
 				'filter' => array('screenid' => $screenIds),
 				'preservekeys' => true,

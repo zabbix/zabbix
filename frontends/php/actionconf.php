@@ -96,6 +96,7 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 }
 if (isset($_REQUEST['actionid'])) {
 	$actionPermissions = API::Action()->get(array(
+		'output' => array('actionid'),
 		'actionids' => $_REQUEST['actionid'],
 		'editable' => true
 	));

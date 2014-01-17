@@ -366,7 +366,7 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 		'triggerids' => $srcTriggerIds,
 		'output' => array('triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type'),
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
-		'selectDependencies' => API_OUTPUT_REFER
+		'selectDependencies' => array('triggerid')
 	);
 	if ($srcHostId) {
 		$srcHost = API::Host()->get(array(
@@ -2302,6 +2302,7 @@ function get_item_function_info($expr) {
 			}
 
 			$hostFound = API::Host()->get(array(
+				'output' => array('hostid'),
 				'filter' => array('host' => array($exprPart['host'])),
 				'templated_hosts' => true
 			));

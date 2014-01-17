@@ -337,6 +337,7 @@ function make_system_status($filter) {
 		'sortorder' => ZBX_SORT_DOWN,
 		'output' =>  API_OUTPUT_EXTEND,
 		'selectHosts' => array('name'),
+		'selectGroups' => array('groupid'),
 		'preservekeys' => true
 	));
 
@@ -352,6 +353,7 @@ function make_system_status($filter) {
 	}
 	if ($eventIds) {
 		$eventAcknowledges = API::Event()->get(array(
+			'output' => array('eventid'),
 			'eventids' => $eventIds,
 			'select_acknowledges' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
@@ -524,12 +526,12 @@ function make_hoststat_summary($filter) {
 			'monitored' => true,
 			'maintenance' => $filter['maintenance'],
 			'withLastEventUnacknowledged' => true,
-			'selectHosts' => API_OUTPUT_REFER,
+			'selectHosts' => array('hostid'),
 			'filter' => array(
 				'priority' => $filter['severity'],
 				'value' => TRIGGER_VALUE_TRUE
 			),
-			'output' => API_OUTPUT_REFER
+			'output' => array('triggerid')
 		));
 		$triggers_unack = zbx_toHash($triggers_unack, 'triggerid');
 		foreach ($triggers_unack as $tunack) {
@@ -943,6 +945,7 @@ function make_latest_issues(array $filter = array()) {
 	}
 	if ($eventIds) {
 		$eventAcknowledges = API::Event()->get(array(
+			'output' => array('eventid'),
 			'eventids' => $eventIds,
 			'select_acknowledges' => API_OUTPUT_EXTEND,
 			'preservekeys' => true

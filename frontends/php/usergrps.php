@@ -98,6 +98,7 @@ elseif (isset($_REQUEST['go'])) {
 	}
 	else {
 		$dbUserGroupCount = API::UserGroup()->get(array(
+			'output' => array('usrgrpid'),
 			'usrgrpids' => $_REQUEST['group_groupid'],
 			'countOutput' => true
 		));
