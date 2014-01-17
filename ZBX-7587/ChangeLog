@@ -4,7 +4,15 @@ New features:
 A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-7481] added checking for OpenBSD version to avoid compilation error on OpenBSD v5.4 and newer due to removed swapins/swapouts uvmexp fields (igors)
+..F....... [ZBX-7634] removed sid from trigger URL in Monitoring->Triggers (Oleg)
+...GI..PS. [ZBX-5526] removed checking for PosgreSQL server version and disabled nonstandard use of escape strings in order to support versions newer than 8.1 (igors)
+...G...... [ZBX-7414] added description to HostnameItem that UserParameters and aliases are not supported (igors)
+..F....... [ZBX-7508] fixed import map with LLD triggers (Eduard)
+..F....... [ZBX-7586] fixed trigger log expression saving in IE10 (Eduard)
+..F.....S. [ZBX-7573] fixed item being checked at a wrong time when using flexible intervals (asaveljevs)
 ........S. [ZBX-6545] fixed possible SQL errors when syncing a node configuration with PostgreSQL backend version 8.2 and later (Sasha)
+.......... [ZBXNEXT-1256] fixed parameter passing for example userparameter to obtain process CPU usage (Richlv)
 .......... [ZBXNEXT-1256] fixed parameter passing for example userparameter to obtain directory size (Richlv)
 ........S. [ZBX-7484] fixed escalations not being stopped and generation of multiple successive OK or PROBLEM events (asaveljevs)
 ...G...PS. [ZBX-4243] fixed Zabbix syslog application names (RFC 5424 APP-NAME) (Andris)

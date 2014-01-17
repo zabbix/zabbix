@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -517,7 +517,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		if (!zbx_empty($trigger['url'])) {
 			// double CHtml::encode is required to prevent XSS attacks
 			$menu_trigger_url = "['"._('URL')."',".CJs::encodeJson(CHtml::encode(CHtml::encode(resolveTriggerUrl($trigger)))).",
-				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
+				true, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
 
 		$description = new CSpan($trigger['description'], 'link_menu');

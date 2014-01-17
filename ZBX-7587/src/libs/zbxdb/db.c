@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -368,21 +368,16 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		DBfree_result(result);
 	}
 
-#ifdef HAVE_FUNCTION_PQSERVERVERSION
 	ZBX_PG_SVERSION = PQserverVersion(conn);
 	zabbix_log(LOG_LEVEL_DEBUG, "PostgreSQL Server version: %d", ZBX_PG_SVERSION);
-#endif
 
-	if (80100 <= ZBX_PG_SVERSION)
-	{
-		/* disable "nonstandard use of \' in a string literal" warning */
-		DBexecute("set escape_string_warning to off");
+	/* disable "nonstandard use of \' in a string literal" warning */
+	DBexecute("set escape_string_warning to off");
 
-		result = DBselect("show standard_conforming_strings");
-		if (NULL != (row = DBfetch(result)))
-			ZBX_PG_ESCAPE_BACKSLASH = (0 == strcmp(row[0], "off"));
-		DBfree_result(result);
-	}
+	result = DBselect("show standard_conforming_strings");
+	if (NULL != (row = DBfetch(result)))
+		ZBX_PG_ESCAPE_BACKSLASH = (0 == strcmp(row[0], "off"));
+	DBfree_result(result);
 
 	if (90000 <= ZBX_PG_SVERSION)
 	{

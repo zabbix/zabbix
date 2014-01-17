@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -930,7 +930,7 @@ int	DBget_queue_count(int from, int to)
 		nextcheck = calculate_item_nextcheck(interfaceid, itemid, item_type,
 				delay, delay_flex, lastclock, &effective_delay);
 
-		if (0 != proxy_hostid)
+		if (0 != proxy_hostid && 0 != effective_delay)
 			nextcheck = lastclock + effective_delay;
 
 		if ((-1 == from || from <= now - nextcheck) && (-1 == to || now - nextcheck <= to))
