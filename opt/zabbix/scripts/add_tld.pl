@@ -58,8 +58,6 @@ my $ZBX_EC_RDDS_ERRRES       = -205; # cannot resolve a Whois host
 my $ZBX_EC_RDDS80_NOHTTPCODE = -206; # no HTTP response code in response from RDDS80 server
 my $ZBX_EC_RDDS80_EHTTPCODE  = -207; # invalid HTTP response code in response from RDDS80 server
 
-my $UPDATE_TIME_STATUS = 1; # create "update time" items enabled (0) or disabled (1)
-
 my $cfg_probe_status_delay = 60;
 my $cfg_default_rdds_ns_string = "Name Server:";
 
@@ -572,7 +570,7 @@ sub create_item_dns_udp_upd {
                                               'applications' => [get_application_id('DNS RTT ('.$proto_uc.')', $templateid)],
                                               'type' => 2, 'value_type' => 0,
                                               'valuemapid' => value_mappings->{'dnstest_dns'},
-		                              'status' => $UPDATE_TIME_STATUS};
+		                              'status' => (defined($OPTS{'epp-server'}) ? 0 : 1)};
     return create_item($options);
 }
 
@@ -801,7 +799,7 @@ sub create_items_rdds {
 		    'applications' => [$applicationid_43],
 		    'type' => 2, 'value_type' => 0,
 		    'valuemapid' => value_mappings->{'dnstest_rdds_rttudp'},
-		    'status' => $UPDATE_TIME_STATUS};
+		    'status' => (defined($OPTS{'epp-server'}) ? 0 : 1)};
 	create_item($options);
     }
 
