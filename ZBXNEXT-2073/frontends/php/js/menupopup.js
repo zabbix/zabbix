@@ -491,12 +491,11 @@ function getMenuPopupServiceConfiguration(options) {
 		if (options.deletable) {
 			items[items.length] = {
 				label: t('Delete'),
+				url: new Curl('services.php?delete=1&serviceid=' + options.serviceid).getUrl(),
 				clickCallback: function() {
-					if (confirm(sprintf(t('Delete service "%1$s"?'), options.name))) {
-						window.location.href = new Curl('services.php?delete=1&serviceid=' + options.serviceid).getUrl();
-					}
-
 					jQuery(this).closest('.menuPopup').fadeOut(100);
+
+					return confirm(sprintf(t('Delete service "%1$s"?'), options.name));
 				}
 			};
 		}
