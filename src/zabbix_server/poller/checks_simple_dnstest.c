@@ -2691,8 +2691,8 @@ static int	command_hello(const char *name, SSL *ssl, int *res, char *err, size_t
 
 	if (0 != strcmp(EXPECTED_SERVER_ID, xml_value))
 	{
-		zbx_snprintf(err, err_size, "invalid result code in reply: \"%s\" (expected \"%s\")", xml_value,
-				EXPECTED_RESULT_CODE);
+		zbx_snprintf(err, err_size, "invalid server ID in reply: \"%s\" (expected \"%s\")", xml_value,
+				EXPECTED_SERVER_ID);
 		*res = ZBX_EC_EPP_EREPLY;
 		goto out;
 	}

@@ -586,7 +586,7 @@ sub create_items_dns {
                                               'key_'=> $item_key,
                                               'hostid' => $templateid,
                                               'applications' => [get_application_id('DNS ('.$proto_uc.')', $templateid)],
-                                              'type' => 3, 'value_type' => 3,
+                                              'type' => 3, 'value_type' => 0,
                                               'delay' => $cfg_dns_tcp_delay, 'valuemapid' => value_mappings->{'dnstest_dns'}};
 
     create_item($options);
