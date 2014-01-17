@@ -449,10 +449,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 		if ($interfaceMacrosAvailable) {
 			$macroValues = $this->getIpMacros($macros['interface'], $macroValues, true);
-			$paterntInterfaceFunction = self::PATTERN_INTERFACE_FUNCTION;
+			$patternInterfaceFunction = self::PATTERN_INTERFACE_FUNCTION;
 		}
 		else {
-			$paterntInterfaceFunction = self::PATTERN_INTERFACE_FUNCTION_WITHOUT_PORT;
+			$patternInterfaceFunction = self::PATTERN_INTERFACE_FUNCTION_WITHOUT_PORT;
 		}
 		if ($itemMacrosAvailable) {
 			$macroValues = $this->getItemMacros($macros['item'], $triggers, $macroValues);
@@ -486,7 +486,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// replace macros to value
 		foreach ($triggers as $triggerId => $trigger) {
 			preg_match_all('/'.self::PATTERN_HOST_FUNCTION.
-								'|'.$paterntInterfaceFunction.
+								'|'.$patternInterfaceFunction.
 								'|'.self::PATTERN_ITEM_FUNCTION.
 								'|'.ZBX_PREG_EXPRESSION_USER_MACROS.
 								'|\$([1-9])/', $trigger[$source], $matches, PREG_OFFSET_CAPTURE);
