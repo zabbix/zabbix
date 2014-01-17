@@ -52,9 +52,7 @@ $fields = array(
 	'status_change' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'txt_select' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// ajax
-	'favobj' =>				array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'favref' =>				array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),
-	'favstate' =>			array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})')
+	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
 );
 check_fields($fields);
 
@@ -71,10 +69,8 @@ if (get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid'])
 /*
  * Ajax
  */
-if (isset($_REQUEST['favobj'])) {
-	if ($_REQUEST['favobj'] == 'filter') {
-		CProfile::update('web.tr_status.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
-	}
+if (hasRequest('filterState')) {
+	CProfile::update('web.tr_status.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
 }
 
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
@@ -583,7 +579,7 @@ foreach ($triggers as $trigger) {
 	}
 
 	$description = new CSpan($trigger['description'], 'link_menu');
-	$description->setMenuPopup(getMenuPopupTrigger($trigger, $triggerItems));
+	$description->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $triggerItems));
 
 	if ($_REQUEST['show_details']) {
 		$description = array($description, BR(), explode_exp($trigger['expression'], true, true));
@@ -641,7 +637,7 @@ foreach ($triggers as $trigger) {
 		}
 
 		$hostName = new CSpan($triggerHost['name'], 'link_menu');
-		$hostName->setMenuPopup(getMenuPopupHost($hosts[$triggerHost['hostid']], $scripts));
+		$hostName->setMenuPopup(CMenuPopupHelper::getHost($hosts[$triggerHost['hostid']], $scripts));
 
 		$hostDiv = new CDiv($hostName);
 

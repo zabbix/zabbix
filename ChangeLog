@@ -2,6 +2,13 @@
 Changes for 2.3.0
 
 New features:
+..F....... [ZBXNEXT-2073] improved dashboard refresh time menu (Eduard)
+..F....... [ZBXNEXT-2073] improved dashboard favourite menu (Eduard)
+..F....... [ZBXNEXT-2073] improved service configuration menu (Eduard)
+..F....... [ZBXNEXT-2073] improved slide show refresh multiplier menu (Eduard)
+..F....... [ZBXNEXT-2073] improved trigger log menu (Eduard)
+..F....... [ZBXNEXT-2073] improved trigger macros menu (Eduard)
+..F....... [ZBXNEXT-2073] update jQuery to latest 1.10.2 (Eduard)
 ...G...PS. [ZBXNEXT-453] added a new User parameter to daemon configurations that allows dropping privileges to the specified user (Juris)
 ....I...S. [ZBXNEXT-581] split database upgrade patches over multiple files for easier maintenance (wiper)
 A......... [ZBX-7345] removed deprecated API features (Pavels)

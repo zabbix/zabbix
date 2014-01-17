@@ -20,8 +20,6 @@
 // Array indexOf method for javascript<1.6 compatibility
 if (!Array.prototype.indexOf) {
 	Array.prototype.indexOf = function (searchElement) {
-		'use strict';
-
 		if (this === void 0 || this === null) {
 			throw new TypeError();
 		}
@@ -967,63 +965,40 @@ function set_color_by_name(id, color) {
 	set_color(color);
 }
 
-/*
- * Zabbix ajax requests
- */
 function add2favorites(favobj, favid) {
-	if ('undefined' == typeof(Ajax)) {
-		throw('Prototype.js lib is required!');
-	}
-
-	if (typeof(favid) == 'undefined' || empty(favid)) {
-		return;
-	}
-
-	var params = {
-		'favobj': favobj,
-		'favid': favid,
-		'favaction': 'add'
-	};
-
-	send_params(params);
+	sendAjaxData({
+		data: {
+			favobj: favobj,
+			favid: favid,
+			favaction: 'add'
+		}
+	});
 }
 
-function rm4favorites(favobj, favid, menu_rowid) {
-	if ('undefined' == typeof(Ajax)) {
-		throw('Prototype.js lib is required!');
-	}
-
-	if (typeof(favobj) == 'undefined' || typeof(favid) == 'undefined') {
-		throw 'No agruments sent to function [rm4favorites()].';
-	}
-
-	var params = {
-		'favobj': favobj,
-		'favid': favid,
-		'favcnt': menu_rowid,
-		'favaction': 'remove'
-	};
-
-	send_params(params);
+function rm4favorites(favobj, favid) {
+	sendAjaxData({
+		data: {
+			favobj: favobj,
+			favid: favid,
+			favaction: 'remove'
+		}
+	});
 }
 
 function changeFlickerState(id) {
-	deselectAll();
-
 	var state = showHide(id);
 
-	switchElementsClass($('flicker_icon_l'), 'dbl_arrow_up', 'dbl_arrow_down');
-	switchElementsClass($('flicker_icon_r'), 'dbl_arrow_up', 'dbl_arrow_down');
+	switchElementClass('flicker_icon_l', 'dbl_arrow_up', 'dbl_arrow_down');
+	switchElementClass('flicker_icon_r', 'dbl_arrow_up', 'dbl_arrow_down');
 
-	send_params({
-		favaction: 'flop',
-		favobj: 'filter',
-		favref: id,
-		favstate: state
+	sendAjaxData({
+		data: {
+			filterState: state
+		}
 	});
 
 	// resize multiselect
-	if (typeof(flickerResizeMultiselect) === 'undefined' && state == 1) {
+	if (typeof flickerResizeMultiselect === 'undefined' && state == 1) {
 		flickerResizeMultiselect = true;
 
 		if (jQuery('.multiselect').length > 0) {
@@ -1032,109 +1007,45 @@ function changeFlickerState(id) {
 	}
 }
 
-function changeHatStateUI(icon, divid) {
-	deselectAll();
+function changeWidgetState(obj, widgetId) {
+	var widgetObj = jQuery('#' + widgetId + '_widget'),
+		css = switchElementClass(obj, 'arrowup', 'arrowdown'),
+		state = 0;
 
-	var switchIcon = function() {
-		switchElementsClass(icon, 'arrowup', 'arrowdown');
-	};
+	if (css === 'arrowdown') {
+		jQuery('.body', widgetObj).slideUp(50);
+		jQuery('.footer', widgetObj).slideUp(50);
+	}
+	else {
+		jQuery('.body', widgetObj).slideDown(50);
+		jQuery('.footer', widgetObj).slideDown(50);
 
-	jQuery($(divid).parentNode).
-		find('.body').toggle().end().
-		find('.footer').toggle().end();
-
-	switchIcon();
-
-	var hat_state = jQuery(icon).hasClass('arrowup') ? 1 : 0;
-	if (false === hat_state) {
-		return false;
+		state = 1;
 	}
 
-	var params = {
-		'favaction': 'flop',
-		'favobj': 'hat',
-		'favref': divid,
-		'favstate': hat_state
-	};
-
-	send_params(params);
+	sendAjaxData({
+		data: {
+			widgetName: widgetId,
+			widgetState: state
+		}
+	});
 }
 
-function change_hat_state(icon, divid) {
-	deselectAll();
-
-	var switchIcon = function() {
-		switchElementsClass(icon, 'arrowup', 'arrowdown');
-	};
-
-	var hat_state = showHide(divid);
-	switchIcon();
-
-	if (false === hat_state) {
-		return false;
-	}
-
-	var params = {
-		'favaction': 'flop',
-		'favobj': 'hat',
-		'favref': divid,
-		'favstate': hat_state
-	};
-
-	send_params(params);
-}
-
-function send_params(params) {
-	if (typeof(params) === 'undefined') {
-		params = [];
-	}
-
+/**
+ * Send ajax data.
+ *
+ * @param object options
+ */
+function sendAjaxData(options) {
 	var url = new Curl(location.href);
 	url.setQuery('?output=ajax');
 
-	new Ajax.Request(url.getUrl(), {
-			'method': 'post',
-			'parameters': params,
-			'onSuccess': function() { },
-			'onFailure': function() {
-				document.location = url.getPath() + '?' + Object.toQueryString(params);
-			}
-		}
-	);
-}
-
-function setRefreshRate(pmasterid, dollid, interval, params) {
-	if (typeof(Ajax) == 'undefined') {
-		throw('Prototype.js lib is required!');
-	}
-
-	if (typeof(params) == 'undefined' || is_null(params)) {
-		params = {};
-	}
-	params['pmasterid'] = pmasterid;
-	params['favobj'] = 'set_rf_rate';
-	params['favref'] = dollid;
-	params['favcnt'] = interval;
-
-	send_params(params);
-}
-
-function switch_mute(icon) {
-	deselectAll();
-	var sound_state = switchElementsClass(icon, 'iconmute', 'iconsound');
-
-	if (false === sound_state) {
-		return false;
-	}
-	sound_state = (sound_state == 'iconmute') ? 1 : 0;
-
-	var params = {
-		'favobj': 'sound',
-		'favref': 'sound',
-		'favstate': sound_state
+	var defaults = {
+		type: 'post',
+		url: url.getUrl()
 	};
 
-	send_params(params);
+	jQuery.ajax(jQuery.extend({}, defaults, options));
 }
 
 function createPlaceholders() {
