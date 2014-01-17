@@ -25,6 +25,13 @@
 
 #include <ldns/ldns.h>
 
+#include <openssl/bio.h>
+#include <openssl/ssl.h>
+#include <openssl/err.h>
+#include <openssl/pem.h>
+#include <openssl/x509.h>
+#include <openssl/x509_vfy.h>
+
 #define ZBX_HOST_BUF_SIZE	128
 #define ZBX_IP_BUF_SIZE		64
 #define ZBX_ERR_BUF_SIZE	256
@@ -33,6 +40,29 @@
 #define ZBX_RDDS_PREVIEW_SIZE	100
 
 #define ZBX_HTTP_RESPONSE_OK	200
+
+#define XML_PATH_SERVER_ID	0
+#define XML_PATH_RESULT_CODE	1
+
+#define COMMAND_BUF_SIZE	1024
+#define XML_VALUE_BUF_SIZE	512
+
+#define COMMANDS_DIR			"/opt/zabbix/epp/commands"
+#define CERTS_DIR			"/opt/zabbix/epp/certs"
+
+#define EXPECTED_SERVER_ID		"192.0.34.201/620:0:2d0:270:1::201"
+#define EXPECTED_RESULT_CODE		"1000"
+#define EXPECTED_RESULT_CODE_LOGOUT	"1500"
+
+#define REQUEST_DOMAIN			"icann-test.icanntest1"
+
+#define COMMAND_LOGIN			"login"
+#define COMMAND_LOGIN_USER		"monitor"
+#define COMMAND_LOGIN_PSWD		"cawabonga"
+#define COMMAND_HELLO			"hello"
+/*#define COMMAND_DOMAIN_INFO		"domain_info"*/
+#define COMMAND_DOMAIN_UPDATE		"domain_update"
+#define COMMAND_LOGOUT			"logout"
 
 extern const char	*CONFIG_LOG_FILE;
 
@@ -1506,6 +1536,7 @@ int	check_dnstest_dns(DC_ITEM *item, const char *keyname, const char *params, AG
 			ok_nss_num++;
 	}
 
+	/* set the value of our simple check item itself */
 	zbx_add_value_uint(item, item->nextcheck, ok_nss_num);
 
 	if (0 != nss_num)
@@ -1995,7 +2026,7 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 				ipv4_enabled, ipv6_enabled, rdds_enabled, epp_enabled, ret = SYSINFO_RET_FAIL, maxredirs;
 
 	/* first read the TLD */
-	if (0 != get_param(params, 1, domain, sizeof(domain)) || '\0' == *domain)
+	if (SUCCEED != get_param(params, 1, domain, sizeof(domain)) || '\0' == *domain)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "first key parameter missing"));
 		return SYSINFO_RET_FAIL;
@@ -2284,6 +2315,7 @@ out:
 			ok_tests -= 1;
 		}
 
+		/* set the value of our simple check item itself */
 		zbx_add_value_uint(item, item->nextcheck, ok_tests);
 	}
 
@@ -2317,6 +2349,754 @@ out:
 	zbx_vector_str_destroy(&ips43);
 	zbx_vector_str_destroy(&hosts80);
 	zbx_vector_str_destroy(&hosts43);
+
+	return ret;
+}
+
+static int	create_socket(const char *host, const char *port, int *sock, char *err, size_t err_size)
+{
+	struct addrinfo	hints;
+	struct addrinfo	*res;
+	int		gai_err, ret = FAIL;
+
+	memset(&hints, 0, sizeof(struct addrinfo));
+
+	hints.ai_family = AF_INET6;
+	hints.ai_socktype = SOCK_STREAM;
+
+	if (0 != (gai_err = getaddrinfo(host, port, &hints, &res)))
+	{
+		zbx_snprintf(err, err_size, "cannot create socket (%s)", gai_strerror(gai_err));
+		goto out;
+	}
+
+	if (0 > (*sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol)))
+	{
+		zbx_snprintf(err, err_size, "cannot create socket (%s)", strerror(errno));
+		goto out;
+	}
+
+	if (0 > connect(*sock, res->ai_addr, res->ai_addrlen))
+	{
+		zbx_snprintf(err, err_size, "cannot connect to host (%s)", strerror(errno));
+		goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	return ret;
+}
+
+static int	recv_buf(SSL *ssl, void *buf, int num)
+{
+	void	*p;
+	int	read, ret = FAIL;
+
+	if (1 > num)
+		goto out;
+
+	p = buf;
+
+	while (0 < num)
+	{
+		if (0 >= (read = SSL_read(ssl, p, num)))
+			goto out;
+
+		p += read;
+		num -= read;
+	}
+
+	ret = SUCCEED;
+out:
+	return ret;
+}
+
+static int	recv_message(SSL *ssl, char **data, size_t *data_len)
+{
+	int	message_size, ret = FAIL;
+
+	if (NULL == data || NULL != *data)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "internal error at %s:%d", __FILE__, __LINE__);
+		exit(-1);
+	}
+
+	/* receive header */
+	if (SUCCEED != recv_buf(ssl, &message_size, sizeof(message_size)))
+		goto out;
+
+	*data_len = ntohl(message_size) - sizeof(message_size);
+	*data = malloc(*data_len);
+
+	/* receive body */
+	if (SUCCEED != recv_buf(ssl, *data, *data_len - 1))
+		goto out;
+
+	(*data)[*data_len - 1] = '\0';
+
+	ret = SUCCEED;
+out:
+	if (SUCCEED != ret && NULL != *data)
+	{
+		free(*data);
+		*data = NULL;
+	}
+
+	return ret;
+}
+
+static int	send_buf(SSL *ssl, const void *buf, int num)
+{
+	const void	*p;
+	int		written, ret = FAIL;
+
+	if (1 > num)
+		goto out;
+
+	p = buf;
+
+	while (0 < num)
+	{
+		if (0 >= (written = SSL_write(ssl, p, num)))
+			goto out;
+
+		p += written;
+		num -= written;
+	}
+
+	ret = SUCCEED;
+out:
+	return ret;
+}
+
+static int	send_message(SSL *ssl, const char *data, int data_size)
+{
+	int	message_size, ret = FAIL;
+
+	message_size = htonl(data_size + sizeof(message_size));
+
+	/* send header */
+	if (SUCCEED != send_buf(ssl, &message_size, sizeof(message_size)))
+		goto out;
+
+	/* send body */
+	if (SUCCEED != send_buf(ssl, data, data_size))
+		goto out;
+
+	ret = SUCCEED;
+out:
+	return ret;
+}
+
+static int	get_xml_value(const char *data, int xml_path, char *xml_value, size_t xml_value_size)
+{
+	const char	*p_start, *p_end, *start_tag, *end_tag;
+	int		ret = FAIL;
+
+	switch (xml_path)
+	{
+		case XML_PATH_SERVER_ID:
+			start_tag = "<svID>";
+			end_tag = "</svID>";
+			break;
+		case XML_PATH_RESULT_CODE:
+			start_tag = "<result code=\"";
+			end_tag = "\">";
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_CRIT, "invalid XML path type (%d)", xml_path);
+			exit(1);
+	}
+
+	if (NULL == (p_start = zbx_strcasestr(data, start_tag)))
+		goto out;
+
+	p_start += strlen(start_tag);
+
+	if (NULL == (p_end = zbx_strcasestr(p_start, end_tag)))
+		goto out;
+
+	zbx_strlcpy(xml_value, p_start, MIN(p_end - p_start, xml_value_size - 1));
+	xml_value[MIN(p_end - p_start, xml_value_size - 1)] = '\0';
+
+	ret = SUCCEED;
+out:
+	return ret;
+}
+
+static int	get_tmpl(const char *command, char *tmpl_buf, size_t tmpl_buf_size)
+{
+	FILE		*f;
+	static char	path_buf[256];
+	size_t		read;
+	int		ret = FAIL;
+
+	path_buf[sizeof(path_buf) - 1] = '\0';
+
+	zbx_snprintf(path_buf, sizeof(path_buf) -1, "%s/%s.tmpl", COMMANDS_DIR, command);
+
+	if (NULL == (f = fopen(path_buf, "r")))
+		goto out;
+
+	if (0 >= (read = fread(tmpl_buf, sizeof(char), tmpl_buf_size - 1, f)))
+		goto out;
+
+	tmpl_buf[read] = '\0';
+
+	ret = SUCCEED;
+out:
+	if (NULL != f)
+		fclose(f);
+
+	return ret;
+}
+
+static int	set_command(char *command_buf, size_t command_buf_size, const char *fmt, ...)
+{
+	va_list	args;
+
+	va_start(args, fmt);
+	vsnprintf(command_buf, command_buf_size - 1, fmt, args);
+	va_end(args);
+
+	return SUCCEED;
+}
+
+static int	get_first_message(SSL *ssl, int *res, char *err, size_t err_size)
+{
+	char	xml_value[XML_VALUE_BUF_SIZE], *data = NULL;
+	size_t	data_len;
+	int	ret = FAIL;
+
+	if (SUCCEED != recv_message(ssl, &data, &data_len))
+	{
+		zbx_strlcpy(err, "cannot get first message from server", err_size);
+		*res = ZBX_EC_EPP_NOREPLY;
+		goto out;
+	}
+
+	if (SUCCEED != get_xml_value(data, XML_PATH_SERVER_ID, xml_value, sizeof(xml_value)))
+	{
+		zbx_snprintf(err, err_size, "no Server ID in first message from server");
+		*res = ZBX_EC_EPP_EREPLY;
+		goto out;
+	}
+
+	if (0 != strcmp(EXPECTED_SERVER_ID, xml_value))
+	{
+		zbx_snprintf(err, err_size, "invalid result code in first message from server: \"%s\" (expected \"%s\")",
+				xml_value, EXPECTED_RESULT_CODE);
+		*res = ZBX_EC_EPP_EREPLY;
+		goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	if (NULL != data)
+		free(data);
+
+	return ret;
+}
+
+static int	command_login(const char *name, SSL *ssl, int *res, char *err, size_t err_size)
+{
+	char	command_buf[COMMAND_BUF_SIZE], tmpl_buf[COMMAND_BUF_SIZE], xml_value[XML_VALUE_BUF_SIZE], *data = NULL;
+	size_t	data_len;
+	int	ret = FAIL;
+
+	if (SUCCEED != get_tmpl(name, tmpl_buf, sizeof(tmpl_buf)))
+	{
+		zbx_snprintf(err, err_size, "cannot load template \"%s\"", name);
+		*res = ZBX_EC_INTERNAL;
+		goto out;
+	}
+
+	if (SUCCEED != set_command(command_buf, sizeof(command_buf), tmpl_buf, COMMAND_LOGIN_USER, COMMAND_LOGIN_PSWD))
+	{
+		zbx_snprintf(err, err_size, "cannot set \"%s\" template variables", name);
+		*res = ZBX_EC_INTERNAL;
+		goto out;
+	}
+
+	if (SUCCEED != send_message(ssl, command_buf, strlen(command_buf)))
+	{
+		zbx_snprintf(err, err_size, "cannot send command \"%s\"", name);
+		*res = ZBX_EC_EPP_EREQUEST;
+		goto out;
+	}
+
+	if (SUCCEED != recv_message(ssl, &data, &data_len))
+	{
+		zbx_snprintf(err, err_size, "cannot get reply to command \"%s\"", name);
+		*res = ZBX_EC_EPP_NOREPLY;
+		goto out;
+	}
+
+	if (SUCCEED != get_xml_value(data, XML_PATH_RESULT_CODE, xml_value, sizeof(xml_value)))
+	{
+		zbx_snprintf(err, err_size, "no result code in reply");
+		*res = ZBX_EC_EPP_EREPLY;
+		goto out;
+	}
+
+	if (0 != strcmp(EXPECTED_RESULT_CODE, xml_value))
+	{
+		zbx_snprintf(err, err_size, "invalid result code in reply: \"%s\" (expected \"%s\")", xml_value,
+				EXPECTED_RESULT_CODE);
+		*res = ZBX_EC_EPP_EREPLY;
+		goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	if (NULL != data)
+		free(data);
+
+	return ret;
+}
+
+static int	command_hello(const char *name, SSL *ssl, int *res, char *err, size_t err_size)
+{
+	char	tmpl_buf[COMMAND_BUF_SIZE], xml_value[XML_VALUE_BUF_SIZE], *data = NULL;
+	size_t	data_len;
+	int	ret = FAIL;
+
+	if (SUCCEED != get_tmpl(name, tmpl_buf, sizeof(tmpl_buf)))
+	{
+		zbx_snprintf(err, err_size, "cannot load template \"%s\"", name);
+		*res = ZBX_EC_INTERNAL;
+		goto out;
+	}
+
+	if (SUCCEED != send_message(ssl, tmpl_buf, strlen(tmpl_buf)))
+	{
+		zbx_snprintf(err, err_size, "cannot send command \"%s\"", name);
+		*res = ZBX_EC_EPP_EREQUEST;
+		goto out;
+	}
+
+	if (SUCCEED != recv_message(ssl, &data, &data_len))
+	{
+		zbx_snprintf(err, err_size, "cannot get reply to command \"%s\"", name);
+		*res = ZBX_EC_EPP_NOREPLY;
+		goto out;
+	}
+
+	if (SUCCEED != get_xml_value(data, XML_PATH_SERVER_ID, xml_value, sizeof(xml_value)))
+	{
+		zbx_snprintf(err, err_size, "no Server ID in reply to command \"%s\"", name);
+		*res = ZBX_EC_EPP_EREPLY;
+		goto out;
+	}
+
+	if (0 != strcmp(EXPECTED_SERVER_ID, xml_value))
+	{
+		zbx_snprintf(err, err_size, "invalid result code in reply: \"%s\" (expected \"%s\")", xml_value,
+				EXPECTED_RESULT_CODE);
+		*res = ZBX_EC_EPP_EREPLY;
+		goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	if (NULL != data)
+		free(data);
+
+	return ret;
+}
+
+/*
+static int	command_domain_info(const char *name, SSL *ssl, char *err, size_t err_size)
+{
+	char	command_buf[COMMAND_BUF_SIZE], tmpl_buf[COMMAND_BUF_SIZE], xml_value[XML_VALUE_BUF_SIZE], *data = NULL;
+	size_t	data_len;
+	int	ret = FAIL;
+
+	if (SUCCEED != get_tmpl(name, tmpl_buf, sizeof(tmpl_buf)))
+	{
+		zbx_snprintf(err, err_size, "cannot load template \"%s\"", name);
+		goto out;
+	}
+
+	if (SUCCEED != set_command(command_buf, sizeof(command_buf), tmpl_buf, REQUEST_DOMAIN))
+	{
+		zbx_snprintf(err, err_size, "cannot set \"%s\" template variables", name);
+		goto out;
+	}
+
+	if (SUCCEED != send_message(ssl, command_buf, strlen(command_buf)))
+	{
+		zbx_snprintf(err, err_size, "cannot send command \"%s\"", name);
+		goto out;
+	}
+
+	if (SUCCEED != recv_message(ssl, &data, &data_len))
+	{
+		zbx_snprintf(err, err_size, "cannot get reply to command \"%s\"", name);
+		goto out;
+	}
+
+	if (SUCCEED != get_xml_value(data, XML_PATH_RESULT_CODE, xml_value, sizeof(xml_value)))
+	{
+		zbx_snprintf(err, err_size, "no result code in reply");
+		goto out;
+	}
+
+	if (0 != strcmp(EXPECTED_RESULT_CODE, xml_value))
+	{
+		zbx_snprintf(err, err_size, "invalid result code in reply: \"%s\" (expected \"%s\")", xml_value,
+				EXPECTED_RESULT_CODE);
+		goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	if (NULL != data)
+		free(data);
+
+	return ret;
+}
+*/
+
+static int	command_domain_update(const char *name, SSL *ssl, int *res, char *err, size_t err_size)
+{
+	char	command_buf[COMMAND_BUF_SIZE], tmpl_buf[COMMAND_BUF_SIZE], xml_value[XML_VALUE_BUF_SIZE], *data = NULL;
+	size_t	data_len;
+	time_t	now;
+	int	ret = FAIL;
+
+	if (SUCCEED != get_tmpl(name, tmpl_buf, sizeof(tmpl_buf)))
+	{
+		zbx_snprintf(err, err_size, "cannot load template \"%s\"", name);
+		*res = ZBX_EC_INTERNAL;
+		goto out;
+	}
+
+	time(&now);
+
+	if (SUCCEED != set_command(command_buf, sizeof(command_buf), tmpl_buf, REQUEST_DOMAIN, now, now))
+	{
+		zbx_snprintf(err, err_size, "cannot set \"%s\" template variables", name);
+		*res = ZBX_EC_INTERNAL;
+		goto out;
+	}
+
+	if (SUCCEED != send_message(ssl, command_buf, strlen(command_buf)))
+	{
+		zbx_snprintf(err, err_size, "cannot send command \"%s\"", name);
+		*res = ZBX_EC_EPP_EREQUEST;
+		goto out;
+	}
+
+	if (SUCCEED != recv_message(ssl, &data, &data_len))
+	{
+		zbx_snprintf(err, err_size, "cannot get reply to command \"%s\"", name);
+		*res = ZBX_EC_EPP_NOREPLY;
+		goto out;
+	}
+
+	if (SUCCEED != get_xml_value(data, XML_PATH_RESULT_CODE, xml_value, sizeof(xml_value)))
+	{
+		zbx_snprintf(err, err_size, "no result code in reply");
+		*res = ZBX_EC_EPP_EREPLY;
+		goto out;
+	}
+
+	if (0 != strcmp(EXPECTED_RESULT_CODE, xml_value))
+	{
+		zbx_snprintf(err, err_size, "invalid result code in reply: \"%s\" (expected \"%s\")", xml_value,
+				EXPECTED_RESULT_CODE);
+		*res = ZBX_EC_EPP_EREPLY;
+		goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	if (NULL != data)
+		free(data);
+
+	return ret;
+}
+
+static int	command_logout(const char *name, SSL *ssl, int *res, char *err, size_t err_size)
+{
+	char	tmpl_buf[COMMAND_BUF_SIZE], xml_value[XML_VALUE_BUF_SIZE], *data = NULL;
+	size_t	data_len;
+	int	ret = FAIL;
+
+	if (SUCCEED != get_tmpl(name, tmpl_buf, sizeof(tmpl_buf)))
+	{
+		zbx_snprintf(err, err_size, "cannot load template \"%s\"", name);
+		*res = ZBX_EC_INTERNAL;
+		goto out;
+	}
+
+	if (SUCCEED != send_message(ssl, tmpl_buf, strlen(tmpl_buf)))
+	{
+		zbx_snprintf(err, err_size, "cannot send command \"%s\"", name);
+		*res = ZBX_EC_EPP_EREQUEST;
+		goto out;
+	}
+
+	if (SUCCEED != recv_message(ssl, &data, &data_len))
+	{
+		zbx_snprintf(err, err_size, "cannot get reply to command \"%s\"", name);
+		*res = ZBX_EC_EPP_NOREPLY;
+		goto out;
+	}
+
+	if (SUCCEED != get_xml_value(data, XML_PATH_RESULT_CODE, xml_value, sizeof(xml_value)))
+	{
+		zbx_snprintf(err, err_size, "no result code in reply");
+		*res = ZBX_EC_EPP_EREPLY;
+		goto out;
+	}
+
+	if (0 != strcmp(EXPECTED_RESULT_CODE_LOGOUT, xml_value))
+	{
+		zbx_snprintf(err, err_size, "invalid result code in reply: \"%s\" (expected \"%s\")", xml_value,
+				EXPECTED_RESULT_CODE_LOGOUT);
+		*res = ZBX_EC_EPP_EREPLY;
+		goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	if (NULL != data)
+		free(data);
+
+	return ret;
+}
+
+int	check_dnstest_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_RESULT *result)
+{
+	static int		ssl_initialized = 0;
+
+	char			domain[ZBX_HOST_BUF_SIZE], epp_host[ZBX_HOST_BUF_SIZE], *dest_port,
+				err[ZBX_ERR_BUF_SIZE];
+	X509			*cert = NULL;
+	const SSL_METHOD	*method;
+	const char		*cert_file, *key_file/*, *ca_file*/;
+	SSL_CTX			*ctx = NULL;
+	SSL			*ssl = NULL;
+	FILE			*log_fd = NULL;
+	int			sock = 0, epp_enabled, res = ZBX_NO_VALUE, ret = SYSINFO_RET_FAIL;
+
+	dest_port = "700";
+	cert_file = CERTS_DIR "/client.crt";
+	key_file = CERTS_DIR "/client.unsecured.key";
+	/*ca_file = "ca.crt";*/
+
+	/* first read the TLD */
+	if (0 != get_param(params, 1, domain, sizeof(domain)) || '\0' == *domain)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "first key parameter missing"));
+		goto out;
+	}
+
+	/* open log file */
+	if (NULL == (log_fd = open_item_log(domain, ZBX_EPP_LOG_PREFIX, err, sizeof(err))))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+		goto out;
+	}
+
+	/* get EPP server */
+	if (0 != get_param(params, 2, epp_host, sizeof(epp_host)) || '\0' == *epp_host)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "second key parameter missing"));
+		goto out;
+	}
+
+	/* make sure the service is enabled */
+	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_EPP_ENABLED, &epp_enabled, 0, err, sizeof(err)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+		goto out;
+	}
+
+	if (0 == epp_enabled)
+	{
+		zbx_dns_info(log_fd, "EPP disabled on this probe");
+		ret = SYSINFO_RET_OK;
+		goto out;
+	}
+
+	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_TLD_EPP_ENABLED, &epp_enabled, 0, err, sizeof(err)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+		goto out;
+	}
+
+	if (0 == epp_enabled)
+	{
+		zbx_dns_info(log_fd, "EPP disabled on this TLD");
+		ret = SYSINFO_RET_OK;
+		goto out;
+	}
+
+	/* from this point item will not become NOT_SUPPORTED */
+	ret = SYSINFO_RET_OK;
+
+	/* these function calls initialize openssl for correct work */
+	if (0 == ssl_initialized)
+	{
+		OpenSSL_add_all_algorithms();
+		ERR_load_BIO_strings();
+		ERR_load_crypto_strings();
+		SSL_load_error_strings();
+
+		/* initialize SSL library and register algorithms */
+		if (0 > SSL_library_init())
+		{
+			res = ZBX_EC_INTERNAL;
+			zbx_dns_err(log_fd, "cannot initialize SSL library");
+			goto out;
+		}
+
+		ssl_initialized = 1;
+	}
+
+	/* set SSLv2 client hello, also announce SSLv3 and TLSv1 */
+	method = SSLv23_client_method();
+
+	/* create a new SSL context */
+	if (NULL == (ctx = SSL_CTX_new(method)))
+	{
+		res = ZBX_EC_INTERNAL;
+		zbx_dns_err(log_fd, "cannot create a new SSL context structure");
+		goto out;
+	}
+
+	/* disabling SSLv2 will leave v3 and TSLv1 for negotiation */
+	SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv2);
+
+	/* create new SSL connection state object */
+	if (NULL == (ssl = SSL_new(ctx)))
+	{
+		res = ZBX_EC_INTERNAL;
+		zbx_dns_err(log_fd, "cannot create a new SSL context structure");
+		goto out;
+	}
+
+	/* make the underlying TCP socket connection */
+	if (SUCCEED != create_socket(epp_host, dest_port, &sock, err, sizeof(err)))
+	{
+		res = ZBX_EC_INTERNAL;
+		zbx_dns_err(log_fd, "cannot create TCP socket");
+		goto out;
+	}
+
+	/* attach the SSL session to the socket descriptor */
+	if (1 != SSL_set_fd(ssl, sock))
+	{
+		res = ZBX_EC_INTERNAL;
+		zbx_dns_err(log_fd, "cannot attach the SSL session to the socket");
+		goto out;
+	}
+
+	if (1 != SSL_use_certificate_file(ssl, cert_file, SSL_FILETYPE_PEM))
+	{
+		res = ZBX_EC_INTERNAL;
+		zbx_dns_errf(log_fd, "cannot load certificate from file %s", cert_file);
+		goto out;
+	}
+
+	if (1 != SSL_use_PrivateKey_file(ssl, key_file, SSL_FILETYPE_PEM))
+	{
+		res = ZBX_EC_INTERNAL;
+		zbx_dns_errf(log_fd, "cannot load private key from file %s", key_file);
+		goto out;
+	}
+
+	/* try to SSL-connect, returns 1 for success */
+	if (1 != SSL_connect(ssl))
+	{
+		res = ZBX_EC_INTERNAL;
+		zbx_dns_errf(log_fd, "cannot build an SSL connection to %s", epp_host);
+		goto out;
+	}
+
+	/* get the remote certificate into the X509 structure */
+	if (NULL == (cert = SSL_get_peer_certificate(ssl)))
+	{
+		res = ZBX_EC_INTERNAL;
+		zbx_dns_errf(log_fd, "cannot get a certificate from %s", epp_host);
+		goto out;
+	}
+
+	if (SUCCEED != get_first_message(ssl, &res, err, sizeof(err)))
+	{
+		zbx_dns_err(log_fd, err);
+		goto out;
+	}
+
+	if (SUCCEED != command_login(COMMAND_LOGIN, ssl, &res, err, sizeof(err)))
+	{
+		zbx_dns_err(log_fd, err);
+		goto out;
+	}
+
+	if (SUCCEED != command_hello(COMMAND_HELLO, ssl, &res, err, sizeof(err)))
+	{
+		zbx_dns_err(log_fd, err);
+		goto out;
+	}
+
+	/*
+	if (SUCCEED != command_domain_info(COMMAND_DOMAIN_INFO, ssl, &res, err, sizeof(err)))
+	{
+		zbx_dns_err(log_fd, err);
+		goto out;
+	}
+	*/
+
+	if (SUCCEED != command_domain_update(COMMAND_DOMAIN_UPDATE, ssl, &res, err, sizeof(err)))
+	{
+		zbx_dns_err(log_fd, err);
+		goto out;
+	}
+
+	/*
+	if (SUCCEED != command_domain_info(COMMAND_DOMAIN_INFO, ssl, &res, err, sizeof(err)))
+	{
+		zbx_dns_err(log_fd, err);
+		goto out;
+	}
+	*/
+
+	if (SUCCEED != command_logout(COMMAND_LOGOUT, ssl, &res, err, sizeof(err)))
+	{
+		zbx_dns_err(log_fd, err);
+		goto out;
+	}
+
+	res = 1;	/* success */
+out:
+	if (0 != ISSET_MSG(result))
+		zbx_dns_err(log_fd, result->msg);
+
+	/* set the value of our simple check item itself */
+	if (ZBX_NO_VALUE != res)
+		zbx_add_value_uint(item, item->nextcheck, res);
+
+	if (NULL != cert)
+		X509_free(cert);
+
+	if (NULL != ssl)
+	{
+		SSL_shutdown(ssl);
+		SSL_free(ssl);
+	}
+
+	if (NULL != ctx)
+		SSL_CTX_free(ctx);
+
+	if (0 != sock)
+		close(sock);
+
+	if (NULL != log_fd)
+		fclose(log_fd);
 
 	return ret;
 }

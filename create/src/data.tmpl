@@ -251,6 +251,7 @@ ROW   |14        |DNSTEST Probe	                       |
 ROW   |15        |DNSTEST RDDS result                  |
 ROW   |16        |DNSTEST DNS availability             |
 ROW   |18        |DNSTEST RDDS availability            |
+ROW   |19        |DNSTEST EPP availability             |
 
 TABLE |items
 FIELDS|itemid|type|snmp_community   |snmp_oid                                                 |hostid|name                                                             |key_                                                                           |delay|history|trends|status|value_type|trapper_hosts|units   |multiplier|delta|snmpv3_securityname|snmpv3_securitylevel|snmpv3_authpassphrase|snmpv3_privpassphrase|formula|logtimefmt|templateid|valuemapid|delay_flex|params                                                                              |ipmi_sensor     |data_type|authtype|username|password|publickey|privatekey|flags|filter                                          |interfaceid|port|description                                                                                                                                                                                                                                                                                                                                                                                                                               |inventory_link|lifetime|
@@ -2837,6 +2838,9 @@ ROW   |95       |16        |1    |Up   	            |
 ROW   |96       |18        |0    |Down              |
 ROW   |97       |18        |1    |Only RDDS43       |
 ROW   |98       |18        |2    |UP   	            |
+ROW   |99       |19        |-200 |no reply from EPP server|
+ROW   |100      |19        |-201 |invalid reply from EPP server|
+ROW   |101      |19        |-202 |cannot send request to EPP server|
 
 TABLE |sysmaps
 FIELDS|sysmapid|name         |width|height|backgroundid|label_type|label_location|highlight|expandproblem|markelements|show_unack|grid_size|grid_show|grid_align|label_format|label_type_host|label_type_hostgroup|label_type_trigger|label_type_map|label_type_image|label_string_host|label_string_hostgroup|label_string_trigger|label_string_map|label_string_image|iconmapid|expand_macros|

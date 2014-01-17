@@ -62,6 +62,11 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 			if (SYSINFO_RET_OK == check_dnstest_rdds(item, key, params, result))
 				ret = SUCCEED;
 		}
+		else if (0 == strcmp(kp, "epp"))
+		{
+			if (SYSINFO_RET_OK == check_dnstest_epp(item, key, params, result))
+				ret = SUCCEED;
+		}
 		else if (0 == strcmp(kp, "probe.status"))
 		{
 			char	mode[16];

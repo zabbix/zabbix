@@ -44,6 +44,9 @@
 #define ZBX_EC_RDDS_ERES		-205	/* cannot resolve a Whois server name */
 #define ZBX_EC_RDDS80_NOHTTPCODE	-206	/* no HTTP response code in response from RDDS80 server */
 #define ZBX_EC_RDDS80_EHTTPCODE		-207	/* invalid HTTP response code in response from RDDS80 server */
+#define ZBX_EC_EPP_NOREPLY		-200	/* no reply from EPP server */
+#define ZBX_EC_EPP_EREPLY		-201	/* invalid reply from EPP server */
+#define ZBX_EC_EPP_EREQUEST		-202	/* cannot send request to EPP server */
 #define ZBX_EC_PROBE_ONLINE		1	/* probe in automatic online mode */
 #define ZBX_EC_PROBE_OFFLINE		0	/* probe in automatic offline mode */
 #define ZBX_EC_PROBE_UNSUPPORTED	2	/* internal use only */
@@ -82,10 +85,12 @@
 #define ZBX_DNSTEST_DEFAULT_LOGDIR	"/var/log"	/* if Zabbix log dir is undefined */
 #define ZBX_DNS_LOG_PREFIX		"dns"		/* file will be <LOGDIR>/<DOMAIN>-ZBX_DNS_LOG_PREFIX.log */
 #define ZBX_RDDS_LOG_PREFIX		"rdds"		/* file will be <LOGDIR>/<DOMAIN>-ZBX_RDDS_LOG_PREFIX.log */
+#define ZBX_EPP_LOG_PREFIX		"epp"		/* file will be <LOGDIR>/<DOMAIN>-ZBX_EPP_LOG_PREFIX.log */
 #define ZBX_PROBESTATUS_LOG_PREFIX	"probestatus"	/* file will be <LOGDIR>/probestatus.log */
 
 int	check_dnstest_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_RESULT *result, char proto);
 int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, AGENT_RESULT *result);
+int	check_dnstest_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_RESULT *result);
 int	check_dnstest_probe_status(DC_ITEM *item, const char *keyname, const char *params, AGENT_RESULT *result);
 
 #endif
