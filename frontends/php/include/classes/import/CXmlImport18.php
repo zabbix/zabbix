@@ -547,6 +547,7 @@ class CXmlImport18 {
 							$db_items = API::Item()->get(array(
 								'output' => array('itemid'),
 								'nodeids' => $nodeId,
+								'webitems' => true,
 								'filter' => array(
 									'host' => $screenitem['resourceid']['host'],
 									'key_' => $screenitem['resourceid']['key_']
