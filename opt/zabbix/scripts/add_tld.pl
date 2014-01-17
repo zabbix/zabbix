@@ -880,7 +880,7 @@ sub create_items_epp {
 		'key_'=> $item_key,
 		'hostid' => $templateid,
 		'applications' => [$applicationid],
-		'type' => 2, 'value_type' => 0,
+		'type' => 3, 'value_type' => 3,
 		'valuemapid' => value_mappings->{'dnstest_epp'},
 		'status' => 0};
 
