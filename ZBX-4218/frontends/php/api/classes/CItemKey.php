@@ -57,28 +57,23 @@ class CItemKey {
 	 *
 	 * @return string
 	 */
-	private function errorMessage($key, $pos)
-	{
-		if ($pos == 0 && !isset($key[$pos])) {
-			return _('key is empty');
+	private function errorMessage($key, $pos) {
+		if (!isset($key[$pos])) {
+			return ($pos == 0) ? _('key is empty') : _('unexpected end of key');
 		}
 
-		/* calculating position in characters */
-		for ($i = 0, $pos_utf8 = 0; $i < $pos; $i++) {
-			if (0x80 != (0xc0 & ord($key[$i]))) {
-				$pos_utf8++;
+		for ($i = $pos, $chunk = '', $maxChunkSize = 5; isset($key[$i]); $i++) {
+			if (0x80 != (0xc0 & ord($key[$i])) && $maxChunkSize-- == 0) {
+				break;
 			}
+			$chunk .= $key[$i];
 		}
 
-		/* calculating starting position in characters for a chunk */
-		$from = ($pos_utf8 <= 5) ? 0 : $pos_utf8 - 5;
+		if (isset($key[$i])) {
+			$chunk .= ' ...';
+		}
 
-		/* creating a chunk */
-		$chunk = $from ? '... ' : '';
-		$chunk .= zbx_substr($key, $from, 10);
-		$chunk .= zbx_strlen($key) > $from + 10 ? ' ...' : '';
-
-		return _s('incorrect syntax near "%1$s" at position %2$s', $chunk, $pos_utf8 + 1);
+		return _s('incorrect syntax near "%1$s"', $chunk);
 	}
 
 	/**
