@@ -121,6 +121,7 @@ static int	DBlld_rows_get(char *value, char *filter, zbx_vector_ptr_t *lld_rows,
 
 		lld_row = zbx_malloc(NULL, sizeof(zbx_lld_row_t));
 		memcpy(&lld_row->jp_row, &jp_row, sizeof(struct zbx_json_parse));
+		zbx_vector_ptr_create(&lld_row->item_links);
 
 		zbx_vector_ptr_append(lld_rows, lld_row);
 	}
@@ -135,6 +136,17 @@ out:
 	return ret;
 }
 
+static void	DBlld_item_links_free(zbx_vector_ptr_t *item_links)
+{
+	zbx_lld_item_link_t	*item_link;
+
+	while (0 != item_links->values_num)
+	{
+		item_link = (zbx_lld_item_link_t *)item_links->values[--item_links->values_num];
+
+		zbx_free(item_link);
+	}
+}
 static void	DBlld_rows_free(zbx_vector_ptr_t *lld_rows)
 {
 	zbx_lld_row_t	*lld_row;
@@ -143,6 +155,8 @@ static void	DBlld_rows_free(zbx_vector_ptr_t *lld_rows)
 	{
 		lld_row = (zbx_lld_row_t *)lld_rows->values[--lld_rows->values_num];
 
+		DBlld_item_links_free(&lld_row->item_links);
+		zbx_vector_ptr_destroy(&lld_row->item_links);
 		zbx_free(lld_row);
 	}
 }

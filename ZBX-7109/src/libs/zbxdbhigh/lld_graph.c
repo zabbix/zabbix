@@ -100,6 +100,59 @@ static int	DBlld_graph_exists(zbx_uint64_t hostid, zbx_uint64_t graphid, const c
 	return res;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBlld_get_item                                                   *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBlld_get_item(zbx_uint64_t hostid, const char *tmpl_key, struct zbx_json_parse *jp_row, zbx_uint64_t *itemid)
+{
+	const char	*__function_name = "DBlld_get_item";
+
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*key = NULL, *key_esc;
+	int		res = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (NULL != jp_row)
+	{
+		key = zbx_strdup(key, tmpl_key);
+		substitute_key_macros(&key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
+		key_esc = DBdyn_escape_string_len(key, ITEM_KEY_LEN);
+	}
+	else
+		key_esc = DBdyn_escape_string_len(tmpl_key, ITEM_KEY_LEN);
+
+	result = DBselect(
+			"select itemid"
+			" from items"
+			" where hostid=" ZBX_FS_UI64
+				" and key_='%s'",
+			hostid, key_esc);
+
+	zbx_free(key_esc);
+	zbx_free(key);
+
+	if (NULL == (row = DBfetch(result)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot find item [%s] on the host",
+				__function_name, key);
+		res = FAIL;
+	}
+	else
+		ZBX_STR2UINT64(*itemid, row[0]);
+
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+
+	return res;
+}
+
 static int	DBlld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graphs,
 		const char *name_proto, ZBX_GRAPH_ITEMS *gitems_proto, int gitems_proto_num,
 		unsigned char ymin_type, zbx_uint64_t ymin_itemid, unsigned char ymin_flags, const char *ymin_key_proto,
