@@ -116,7 +116,7 @@ static int	DBpatch_2030006(void)
 
 static int	DBpatch_2030007(void)
 {
-	const ZBX_FIELD	field = {"formula",	"", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"formula", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBset_default("items", &field);
 }

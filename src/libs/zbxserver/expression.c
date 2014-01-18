@@ -4502,14 +4502,13 @@ int	translate_expression(const char *expression, char **out, char **error)
 			if (start != end)
 				goto out;
 		}
-
 	}
 
 	/* check for matching parentheses */
 	if (0 != level)
 		goto out;
 
-	zbx_chrcpy_alloc(out, &out_alloc, &out_offset, '\0');
+	zbx_strncpy_alloc(out, &out_alloc, &out_offset, "", 0);
 
 	ret = SUCCEED;
 out:
