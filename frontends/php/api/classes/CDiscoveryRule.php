@@ -804,7 +804,6 @@ class CDiscoveryRule extends CItemGeneral {
 
 
 		foreach ($validateItems as $item) {
-			var_dump($item);
 			// validate custom formula and conditions
 			if (isset($item['filter'])) {
 				$filterValidator->setObjectName($item['name']);
