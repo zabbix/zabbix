@@ -190,14 +190,6 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
 	clearCookies($result, $_REQUEST['hostid']);
 }
-elseif (isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])) {
-	unset($_REQUEST['itemid']);
-	foreach (getRequest('conditions') as &$condition) {
-		unset($condition['item_conditionid']);
-	}
-	unset($condition);
-	$_REQUEST['form'] = 'clone';
-}
 elseif (isset($_REQUEST['save'])) {
 	$delay_flex = get_request('delay_flex', array());
 
@@ -359,11 +351,21 @@ if (isset($_REQUEST['form'])) {
 	$data['formula'] = getRequest('formula');
 	$data['conditions'] = getRequest('conditions', array());
 
+	// update form
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
 		$data['lifetime'] = $item['lifetime'];
 		$data['evaltype'] = $item['filter']['evaltype'];
 		$data['formula'] = $item['filter']['formula'];
 		$data['conditions'] = $item['filter']['conditions'];
+	}
+	// clone form
+	elseif (hasRequest('clone')) {
+		unset($data['itemid']);
+		foreach ($data['conditions'] as &$condition) {
+			unset($condition['item_conditionid']);
+		}
+		unset($condition);
+		$data['form'] = 'clone';
 	}
 
 	// render view
