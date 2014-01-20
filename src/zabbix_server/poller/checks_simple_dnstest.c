@@ -3024,6 +3024,8 @@ int	check_dnstest_epp(DC_ITEM *item, const char *keyname, const char *params, AG
 		goto out;
 	}
 
+	zbx_dns_infof(log_fd, "start EPP test (ip %s)", epp_host);
+
 	if (SUCCEED != get_first_message(ssl, &res, err, sizeof(err)))
 	{
 		zbx_dns_err(log_fd, err);
@@ -3071,6 +3073,8 @@ int	check_dnstest_epp(DC_ITEM *item, const char *keyname, const char *params, AG
 	}
 
 	res = 1;	/* success */
+
+	zbx_dns_infof(log_fd, "end EPP test (ip %s):SUCCESS", epp_host);
 out:
 	if (0 != ISSET_MSG(result))
 		zbx_dns_err(log_fd, result->msg);
