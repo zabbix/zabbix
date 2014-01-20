@@ -60,7 +60,7 @@ $testTimeFrom = mktime(
 
 // macro
 if ($data['type'] == 0 || $data['type'] == 1) {
-	$macro[] = DNSTEST_DNS_UDP_DELAY;
+	$calculatedItemKey[] = CALCULATED_ITEM_DNS_DELAY;
 	if ($data['type'] == 0) {
 		$data['availProbes'] = 0;
 		$data['totalProbes'] = 0;
@@ -71,44 +71,70 @@ if ($data['type'] == 0 || $data['type'] == 1) {
 	}
 }
 else {
-	$macro[] = DNSTEST_RDDS_DELAY;
+	$calculatedItemKey[] = CALCULATED_ITEM_RDDS_DELAY;
 }
 
 if ($data['type'] == 0) {
-	$macro[] = DNSTEST_MIN_DNS_COUNT;
-	$macro[] = DNSTEST_DNS_UDP_RTT;
+	$calculatedItemKey[] = CALCULATED_ITEM_DNS_AVAIL_MINNS;
+	$calculatedItemKey[] = CALCULATED_ITEM_DNS_UDP_RTT;
 }
 
-// get global macros
-$macros = API::UserMacro()->get(array(
-	'globalmacro' => true,
-	'output' => API_OUTPUT_EXTEND,
+// get host with calculated items
+$dnstest = API::Host()->get(array(
+	'output' => array('hostid'),
 	'filter' => array(
-		'macro' => $macro
+		'host' => DNSTEST_HOST
 	)
 ));
 
-if ($data['type'] == 0) {
-	foreach ($macros as $macro) {
-		if ($macro['macro'] == DNSTEST_MIN_DNS_COUNT) {
-			$minDnsCount = $macro['value'];
-		}
-		elseif ($macro['macro'] == DNSTEST_DNS_UDP_RTT) {
-			$udpRtt = $macro['value'];
-		}
-		else {
-			$macroTime = $macro['value'] - 1;
-		}
-	}
+if ($dnstest) {
+	$dnstest = reset($dnstest);
 }
 else {
-	$macro = reset($macros);
-	$macroTime = $macro['value'] - 1;
+	show_error_message(_s('No permissions to referred host "%1$s" or it does not exist!', DNSTEST_HOST));
+	require_once dirname(__FILE__).'/include/page_footer.php';
+	exit;
+}
+
+// get macros old value
+$macroItems = API::Item()->get(array(
+	'hostids' => $dnstest['hostid'],
+	'output' => array('itemid', 'key_', 'value_type'),
+	'filter' => array(
+		'key_' => $calculatedItemKey
+	)
+));
+
+foreach ($macroItems as $macroItem) {
+	$macroItemValue = API::History()->get(array(
+		'itemids' => $macroItem['itemid'],
+		'time_from' => $testTimeFrom,
+		'history' => $macroItem['value_type'],
+		'output' => API_OUTPUT_EXTEND,
+		'limit' => 1
+	));
+
+	$macroItemValue = reset($macroItemValue);
+
+	if ($data['type'] == 0) {
+		if ($macroItem['key_'] == CALCULATED_ITEM_DNS_AVAIL_MINNS) {
+			$minDnsCount = $macroItemValue['value'];
+		}
+		elseif ($macroItem['key_'] == CALCULATED_ITEM_DNS_UDP_RTT) {
+			$udpRtt = $macroItemValue['value'];
+		}
+		else {
+			$macroTime = $macroItemValue['value'] - 1;
+		}
+	}
+	else {
+		$macroTime = $macroItemValue['value'] - 1;
+	}
 }
 
 // time calculation
-$timeFrom = $macroTime - 59;
 $testTimeTill = $testTimeFrom + 59;
+$timeFrom = $macroTime - 59;
 $testTimeFrom -= $timeFrom;
 
 // get TLD
@@ -248,7 +274,7 @@ else {
 	$probeItemKey = ' AND i.key_ LIKE ('.zbx_dbstr(PROBE_RDDS_ITEM.'%').')';
 }
 
-// SQL
+// get items
 $items = DBselect(
 	'SELECT i.itemid,i.key_,i.hostid,i.value_type'.
 	' FROM items i'.

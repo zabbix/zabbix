@@ -38,10 +38,24 @@ $particularProxysTable = new CTableInfo($noData);
 $particularProxysTable->setHeader($headers);
 
 foreach ($this->data['proxys'] as $proxy) {
+	if ($proxy['ms']) {
+		if (!$this->data['minMs']) {
+			$ms = $proxy['ms'];
+		}
+		elseif ($proxy['ms'] < $this->data['minMs']) {
+			$ms = new CSpan($proxy['ms'], 'green');
+		}
+		else {
+			$ms = new CSpan($proxy['ms'], 'red');
+		}
+	}
+	else {
+		$ms = '-';
+	}
 	$row = array(
 		$proxy['ns'],
 		$proxy['ip'],
-		$proxy['ms'] ? $proxy['ms'] : '-'
+		$ms
 	);
 	$particularProxysTable->addRow($row);
 }
@@ -53,7 +67,14 @@ $particularProxys = array(
 	BR(),
 	new CSpan(array(bold(_('Test time')), ':', SPACE, date('d.m.Y H:i:s', $this->data['time']))),
 	BR(),
-	new CSpan(array(bold(_('Probe')), ':', SPACE, $this->data['probe']['name']))
+	new CSpan(array(bold(_('Probe')), ':', SPACE, $this->data['probe']['name'])),
+	BR(),
+	new CSpan(array(
+		bold(_('Test result')),
+		':',
+		SPACE,
+		$this->data['probe']['test'] ? new CSpan(_('Up'), 'green') : new CSpan(_('Down'), 'red')
+	))
 );
 
 $rollingWeek = new CSpan(_s('%1$s Rolling week status', $this->data['slv'].'%'), 'rolling-week-status');

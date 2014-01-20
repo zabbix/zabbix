@@ -69,7 +69,7 @@ foreach ($this->data['probes'] as $probe) {
 				$link = new CLink(
 					$status,
 					'dnstest.particularproxys.php?slvItemId='.$this->data['slvItemId'].'&host='.$this->data['tld']['host'].
-						'&time='.$this->data['time'].'&probe='.$probe['host']
+						'&time='.$this->data['time'].'&probe='.$probe['host'].'&type='.$this->data['type']
 				);
 			}
 			else {
@@ -91,7 +91,7 @@ foreach ($this->data['probes'] as $probe) {
 				$link = new CLink(
 					implode(', ', $values),
 					'dnstest.particularproxys.php?slvItemId='.$this->data['slvItemId'].'&host='.$this->data['tld']['host'].
-						'&time='.$this->data['time'].'&probe='.$probe['host']
+						'&time='.$this->data['time'].'&probe='.$probe['host'].'&type='.$this->data['type']
 				);
 			}
 			else {

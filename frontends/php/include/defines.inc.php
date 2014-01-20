@@ -926,12 +926,14 @@ define('DNSSEC_FAIL_ERROR_CODE',		-204);
 // DNS TEST calculated items keys
 define('CALCULATED_ITEM_DNS_FAIL',			'dnstest.configvalue[INCIDENT.DNS.FAIL]');
 define('CALCULATED_ITEM_DNS_RECOVERY',		'dnstest.configvalue[INCIDENT.DNS.RECOVER]');
-define('CALCULATED_ITEM_DNS_DELAY',			'dnstest.configvalue[DNSTEST.DNS.UDP.DELAY]');
 define('CALCULATED_ITEM_DNSSEC_FAIL',		'dnstest.configvalue[INCIDENT.DNSSEC.FAIL]');
 define('CALCULATED_ITEM_DNSSEC_RECOVERY',	'dnstest.configvalue[INCIDENT.DNSSEC.RECOVER]');
 define('CALCULATED_ITEM_RDDS_FAIL',			'dnstest.configvalue[INCIDENT.RDDS.FAIL]');
 define('CALCULATED_ITEM_RDDS_RECOVERY',		'dnstest.configvalue[INCIDENT.RDDS.RECOVER]');
+define('CALCULATED_ITEM_DNS_DELAY',			'dnstest.configvalue[DNSTEST.DNS.UDP.DELAY]');
 define('CALCULATED_ITEM_RDDS_DELAY',		'dnstest.configvalue[DNSTEST.RDDS.DELAY]');
+define('CALCULATED_ITEM_DNS_AVAIL_MINNS',	'dnstest.configvalue[DNSTEST.DNS.AVAIL.MINNS]');
+define('CALCULATED_ITEM_DNS_UDP_RTT',		'dnstest.configvalue[DNSTEST.DNS.UDP.RTT]');
 
 // DNS TEST probe status items keys
 define('PROBE_STATUS_AUTOMATIC',	'dnstest.probe.status[automatic,"{$DNSTEST.IP4.ROOTSERVERS1}","{$DNSTEST.IP6.ROOTSERVERS1}"]');

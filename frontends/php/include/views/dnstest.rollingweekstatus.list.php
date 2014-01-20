@@ -135,14 +135,14 @@ if (isset($this->data['tld'])) {
 				)
 				: new CSpan('0.000%', 'first-cell-value');
 
-			$dnsGraph = $tld['dns']['lastvalue']
+			$dnsGraph = ($tld['dns']['lastvalue'] > 0)
 				? new CLink(
 					'graph',
 					'history.php?action=showgraph&period='.SEC_PER_WEEK.'&itemid='.$tld['dns']['itemid'],
 					'cell-value'
 				)
 				: null;
-			$dns = array($dnsValue, $dnsStatus, $dnsGraph);
+			$dns = array(new CSpan($dnsValue, 'right'), $dnsStatus, $dnsGraph);
 		}
 		else {
 			$dns = new CDiv(null, 'status_icon status_icon_extra iconrollingweekdisabled disabled-service');
@@ -175,14 +175,14 @@ if (isset($this->data['tld'])) {
 				)
 				: new CSpan('0.000%', 'first-cell-value');
 
-			$dnssecGraph = $tld['dnssec']['lastvalue']
+			$dnssecGraph = ($tld['dnssec']['lastvalue'] > 0)
 				? new CLink(
 					'graph',
 					'history.php?action=showgraph&period='.SEC_PER_WEEK.'&itemid='.$tld['dnssec']['itemid'],
 					'cell-value'
 				)
 				: null;
-			$dnssec =  array($dnssecValue, $dnssecStatus, $dnssecGraph);
+			$dnssec =  array(new CSpan($dnssecValue, 'right'), $dnssecStatus, $dnssecGraph);
 		}
 		else {
 			$dnssec = new CDiv(null, 'status_icon status_icon_extra iconrollingweekdisabled disabled-service');
@@ -215,14 +215,14 @@ if (isset($this->data['tld'])) {
 				)
 				: new CSpan('0.000%', 'first-cell-value');
 
-			$rddsGraph = $tld['rdds']['lastvalue']
+			$rddsGraph = ($tld['rdds']['lastvalue'] > 0)
 				? new CLink(
 					'graph',
 					'history.php?action=showgraph&period='.SEC_PER_WEEK.'&itemid='.$tld['rdds']['itemid'],
 					'cell-value'
 				)
 				: null;
-			$rdds =  array($rddsValue, $rddsStatus, $rddsGraph);
+			$rdds =  array(new CSpan($rddsValue, 'right'), $rddsStatus, $rddsGraph);
 		}
 		else {
 			$rdds = new CDiv(null, 'status_icon status_icon_extra iconrollingweekdisabled disabled-service');
