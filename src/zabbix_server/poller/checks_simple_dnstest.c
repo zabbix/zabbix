@@ -2516,8 +2516,7 @@ static int	get_xml_value(const char *data, int xml_path, char *xml_value, size_t
 	if (NULL == (p_end = zbx_strcasestr(p_start, end_tag)))
 		goto out;
 
-	zbx_strlcpy(xml_value, p_start, MIN(p_end - p_start, xml_value_size - 1));
-	xml_value[MIN(p_end - p_start, xml_value_size - 1)] = '\0';
+	zbx_strlcpy(xml_value, p_start, MIN(p_end - p_start + 1, xml_value_size));
 
 	ret = SUCCEED;
 out:
@@ -2584,8 +2583,8 @@ static int	get_first_message(SSL *ssl, int *res, char *err, size_t err_size)
 
 	if (0 != strcmp(EXPECTED_SERVER_ID, xml_value))
 	{
-		zbx_snprintf(err, err_size, "invalid result code in first message from server: \"%s\" (expected \"%s\")",
-				xml_value, EXPECTED_RESULT_CODE);
+		zbx_snprintf(err, err_size, "invalid Server ID in the first message from server: \"%s\""
+				" (expected \"%s\")", xml_value, EXPECTED_SERVER_ID);
 		*res = ZBX_EC_EPP_EREPLY;
 		goto out;
 	}
@@ -2641,8 +2640,8 @@ static int	command_login(const char *name, SSL *ssl, int *res, char *err, size_t
 
 	if (0 != strcmp(EXPECTED_RESULT_CODE, xml_value))
 	{
-		zbx_snprintf(err, err_size, "invalid result code in reply: \"%s\" (expected \"%s\")", xml_value,
-				EXPECTED_RESULT_CODE);
+		zbx_snprintf(err, err_size, "invalid result code in reply to \"%s\": \"%s\" (expected \"%s\")",
+				name, xml_value, EXPECTED_RESULT_CODE);
 		*res = ZBX_EC_EPP_EREPLY;
 		goto out;
 	}
@@ -2691,8 +2690,8 @@ static int	command_hello(const char *name, SSL *ssl, int *res, char *err, size_t
 
 	if (0 != strcmp(EXPECTED_SERVER_ID, xml_value))
 	{
-		zbx_snprintf(err, err_size, "invalid server ID in reply: \"%s\" (expected \"%s\")", xml_value,
-				EXPECTED_SERVER_ID);
+		zbx_snprintf(err, err_size, "invalid Server ID in reply \"%s\": \"%s\" (expected \"%s\")",
+				name, xml_value, EXPECTED_SERVER_ID);
 		*res = ZBX_EC_EPP_EREPLY;
 		goto out;
 	}
@@ -2744,8 +2743,8 @@ static int	command_domain_info(const char *name, SSL *ssl, char *err, size_t err
 
 	if (0 != strcmp(EXPECTED_RESULT_CODE, xml_value))
 	{
-		zbx_snprintf(err, err_size, "invalid result code in reply: \"%s\" (expected \"%s\")", xml_value,
-				EXPECTED_RESULT_CODE);
+		zbx_snprintf(err, err_size, "invalid result code in reply to \"%s\": \"%s\" (expected \"%s\")",
+				name, xml_value, EXPECTED_RESULT_CODE);
 		goto out;
 	}
 
@@ -2804,8 +2803,8 @@ static int	command_domain_update(const char *name, SSL *ssl, int *res, char *err
 
 	if (0 != strcmp(EXPECTED_RESULT_CODE, xml_value))
 	{
-		zbx_snprintf(err, err_size, "invalid result code in reply: \"%s\" (expected \"%s\")", xml_value,
-				EXPECTED_RESULT_CODE);
+		zbx_snprintf(err, err_size, "invalid result code in reply to \"%s\": \"%s\" (expected \"%s\")",
+				name, xml_value, EXPECTED_RESULT_CODE);
 		*res = ZBX_EC_EPP_EREPLY;
 		goto out;
 	}
@@ -2854,8 +2853,8 @@ static int	command_logout(const char *name, SSL *ssl, int *res, char *err, size_
 
 	if (0 != strcmp(EXPECTED_RESULT_CODE_LOGOUT, xml_value))
 	{
-		zbx_snprintf(err, err_size, "invalid result code in reply: \"%s\" (expected \"%s\")", xml_value,
-				EXPECTED_RESULT_CODE_LOGOUT);
+		zbx_snprintf(err, err_size, "invalid result code in reply to \"%s\": \"%s\" (expected \"%s\")",
+				name, xml_value, EXPECTED_RESULT_CODE_LOGOUT);
 		*res = ZBX_EC_EPP_EREPLY;
 		goto out;
 	}
@@ -3078,7 +3077,7 @@ out:
 
 	/* set the value of our simple check item itself */
 	if (ZBX_NO_VALUE != res)
-		zbx_add_value_uint(item, item->nextcheck, res);
+		zbx_add_value_dbl(item, item->nextcheck, res);
 
 	if (NULL != cert)
 		X509_free(cert);
