@@ -33,22 +33,63 @@ class CHistoryManager {
 	 * @return array    an array with items IDs as keys and arrays of history objects as values
 	 */
 	public function getLast(array $items, $limit = 1) {
-		$rs = array();
+		$periods = array(SEC_PER_HOUR, SEC_PER_DAY, SEC_PER_WEEK, SEC_PER_MONTH, null);
+
+		$items = zbx_toHash($items, 'itemid');
+
+		$values = array();
+		$startTime = time();
+		foreach ($periods as $period) {
+			$endTime = $startTime - $period;
+
+			$periodValues = $this->getLastByPeriod($items, $startTime, $endTime, $limit);
+			foreach ($periodValues as $value) {
+				$values[$value['itemid']][] = $value;
+			}
+
+			foreach ($values as $itemId => $itemValues) {
+				if (count($itemValues) == $limit) {
+					unset($items[$itemId]);
+				}
+			}
+
+			if (!$items) {
+				break;
+			}
+
+			$startTime -= $period;
+		}
+
+		return $values;
+	}
+
+	public function getLastByPeriod(array $items, $start, $end = null, $limit = 1) {
+		$queries = array();
 		foreach ($items as $item) {
 			$table = self::getTableName($item['value_type']);
-			$query = DBselect(
+			$queries[$table][] = DBaddLimit(
 				'SELECT *'.
 				' FROM '.$table.' h'.
 				' WHERE h.itemid='.zbx_dbstr($item['itemid']).
+					' AND h.clock<='.$start.
+					($end ? ' AND h.clock>'.$end : '').
 				' ORDER BY h.clock DESC',
 				$limit
 			);
-			while ($history = DBfetch($query)) {
-				$rs[$history['itemid']][] = $history;
+		}
+
+		$values = array();
+		foreach ($queries as $tableQueries) {
+			$chunks = array_chunk($tableQueries, 10);
+			foreach ($chunks as $queries) {
+				$query = DBunion($queries);
+				while ($history = DBfetch($query)) {
+					$values[] = $history;
+				}
 			}
 		}
 
-		return $rs;
+		return $values;
 	}
 
 	/**
