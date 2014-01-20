@@ -40,9 +40,7 @@ class CHistoryManager {
 		$values = array();
 		$startTime = time();
 		foreach ($periods as $period) {
-			$endTime = $startTime - $period;
-
-			$periodValues = $this->getLastByPeriod($items, $startTime, $endTime, $limit);
+			$periodValues = $this->getLastByPeriod($items, $startTime, $limit, $period);
 			foreach ($periodValues as $value) {
 				$values[$value['itemid']][] = $value;
 			}
@@ -63,7 +61,7 @@ class CHistoryManager {
 		return $values;
 	}
 
-	public function getLastByPeriod(array $items, $start, $end = null, $limit = 1) {
+	public function getLastByPeriod(array $items, $start, $limit = 1, $period = null) {
 		$queries = array();
 		foreach ($items as $item) {
 			$table = self::getTableName($item['value_type']);
@@ -72,7 +70,7 @@ class CHistoryManager {
 				' FROM '.$table.' h'.
 				' WHERE h.itemid='.zbx_dbstr($item['itemid']).
 					' AND h.clock<='.$start.
-					($end ? ' AND h.clock>'.$end : '').
+					($period ? ' AND h.clock>'.($start - $period) : '').
 				' ORDER BY h.clock DESC',
 				$limit
 			);
