@@ -497,7 +497,11 @@ var AudioControl = {
 				catch (e) {
 					setTimeout(
 						function() {
-							document.getElementById('audio').stop();
+							try {
+								document.getElementById('audio').stop();
+							}
+							catch (e) {
+							}
 						},
 						100
 					);
@@ -515,8 +519,8 @@ var AudioControl = {
 
 			jQuery('body').append(jQuery('<embed>', {
 				id: 'audio',
-				src: 'audio/' + name,
 				'data-name': name,
+				src: 'audio/' + name,
 				enablejavascript: true,
 				autostart: true,
 				loop: true,
@@ -534,8 +538,9 @@ var AudioControl = {
 
 				jQuery('body').append(jQuery('<audio>', {
 					id: 'audio',
-					src: 'audio/' + name,
 					'data-name': name,
+					src: 'audio/' + name,
+					preload: 'auto',
 					autoplay: true,
 					loop: loop ? 9999999 : 1
 				}));

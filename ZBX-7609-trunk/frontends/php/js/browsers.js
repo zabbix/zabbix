@@ -29,8 +29,8 @@ var agt = navigator.userAgent.toLowerCase(),
 	IE = (IE6 || IE7 || IE8 || IE9 || IE10 || IE11),
 	CR = (agt.indexOf('chrome') != -1),
 	SF = (agt.indexOf('safari') != -1 && !CR),
-	KQ = (agt.indexOf('khtml') != -1),
-	GK = (agt.indexOf('gecko') != -1 && !KQ);
+	KQ = (agt.indexOf('konqueror') && agt.indexOf('khtml') != -1 && agt.indexOf('applewebkit') == -1),
+	GK = (agt.indexOf('gecko') != -1);
 
 // redirect outdated browser to warning page
 if (document.cookie.indexOf('browserwarning_ignore') < 0) {
