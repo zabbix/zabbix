@@ -2,6 +2,7 @@
 Changes for 2.3.0
 
 New features:
+..F....... [ZBXNEXT-1291] added clickable links for template names in the hosts, templates, hosts prototypes and discovered hosts (Oleg)
 ..F....... [ZBXNEXT-2073] improved dashboard refresh time menu (Eduard)
 ..F....... [ZBXNEXT-2073] improved dashboard favourite menu (Eduard)
 ..F....... [ZBXNEXT-2073] improved service configuration menu (Eduard)
