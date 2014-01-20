@@ -35,21 +35,53 @@ class CHistoryManager {
 	public function getLast(array $items, $limit = 1) {
 		$rs = array();
 		foreach ($items as $item) {
-			$table = self::getTableName($item['value_type']);
-			$query = DBselect(
-				'SELECT *'.
-				' FROM '.$table.' h'.
-				' WHERE h.itemid='.zbx_dbstr($item['itemid']).
-				' ORDER BY h.clock DESC',
-				$limit
-			);
-			while ($history = DBfetch($query)) {
-				$rs[$history['itemid']][] = $history;
+			$values = $this->getLastForItem($item['itemid'], $item['value_type'], $limit);
+			if ($values) {
+				$rs[$item['itemid']] = $values;
 			}
 		}
 
 		return $rs;
 	}
+
+	protected function getLastForItem($itemId, $valueType, $limit = 1) {
+		$periods = array(
+			SEC_PER_HOUR,
+			SEC_PER_DAY,
+			SEC_PER_WEEK,
+			SEC_PER_MONTH,
+			0,
+		);
+
+		$values = array();
+		$startTime = time();
+		foreach ($periods as $period) {
+			$endTime = $startTime - $period;
+
+			$table = self::getTableName($valueType);
+			$query = DBselect(
+				'SELECT *'.
+					' FROM '.$table.' h'.
+					' WHERE h.itemid='.zbx_dbstr($itemId).
+					' AND h.clock<='.$startTime.
+					($period ? ' AND h.clock>'.$endTime : '').
+					' ORDER BY h.clock DESC',
+				$limit
+			);
+			while ($history = DBfetch($query)) {
+				$values[] = $history;
+
+				if (count($values) == $limit) {
+					break 2;
+				}
+			}
+
+			$startTime -= $period;
+		}
+
+		return $values;
+	}
+
 
 	/**
 	 * Return the name of the table where the data for the given value type is stored.
