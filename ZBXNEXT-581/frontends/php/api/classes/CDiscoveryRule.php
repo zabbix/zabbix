@@ -802,7 +802,6 @@ class CDiscoveryRule extends CItemGeneral {
 			)));
 		}
 
-
 		foreach ($validateItems as $item) {
 			// validate custom formula and conditions
 			if (isset($item['filter'])) {
