@@ -1577,38 +1577,31 @@ static void	zbx_get_rdds43_nss(zbx_vector_str_t *nss, const char *recv_buf, cons
 	p = recv_buf;
 	rdds_ns_string_size = strlen(rdds_ns_string);
 
-	do
+	while (NULL != (p = strstr(p, rdds_ns_string)))
 	{
-		while ('\0' != *p && 0 != isspace(*p))
+		p += rdds_ns_string_size;
+
+		while (0 != isblank(*p))
 			p++;
 
-		if (0 == strncmp(p, rdds_ns_string, rdds_ns_string_size))
+		if (0 == isalnum(*p))
+			continue;
+
+		ns_buf_len = 0;
+		while ('\0' != *p && 0 == isspace(*p) && ns_buf_len < sizeof(ns_buf))
+			ns_buf[ns_buf_len++] = *p++;
+
+		if (sizeof(ns_buf) == ns_buf_len)
 		{
-			p += rdds_ns_string_size;
-
-			while (0 != isblank(*p))
-				p++;
-
-			if (0 == isalnum(*p))
-				continue;
-
-			ns_buf_len = 0;
-			while ('\0' != *p && 0 == isspace(*p) && ns_buf_len < sizeof(ns_buf))
-				ns_buf[ns_buf_len++] = *p++;
-
-			if (sizeof(ns_buf) == ns_buf_len)
-			{
-				/* internal error, ns buffer not enough */
-				zbx_dns_errf(log_fd, "DNSTEST RDDS internal error, ns buffer too small"
-						" (%u bytes) for host in \"%s\"", sizeof(ns_buf), p);
-				continue;
-			}
-
-			ns_buf[ns_buf_len] = '\0';
-			zbx_vector_str_append(nss, zbx_strdup(NULL, ns_buf));
+			/* internal error, ns buffer not enough */
+			zbx_dns_errf(log_fd, "DNSTEST RDDS internal error, NS buffer too small (%u bytes)"
+					" for host in \"%.*s...\"", sizeof(ns_buf), sizeof(ns_buf), p);
+			continue;
 		}
+
+		ns_buf[ns_buf_len] = '\0';
+		zbx_vector_str_append(nss, zbx_strdup(NULL, ns_buf));
 	}
-	while (NULL != (p = strstr(p, "\n")) && '\0' != *++p);
 
 	if (0 != nss->values_num)
 	{
