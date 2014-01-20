@@ -15,7 +15,6 @@ New features:
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
-....I..... [ZBX-7622] set the default value of 'timeperiods' table 'every' field to '1' (wiper)
 ....I..... [ZBX-7515] added missing delayed loading option of wevtapi.dll for x64 systems (igors)
 ...G...... [ZBX-7481] added checking for OpenBSD version to avoid compilation error on OpenBSD v5.4 and newer due to removed swapins/swapouts uvmexp fields (igors)
 ...G...PS. [ZBX-7618] removed partial matching for long format command line options (Juris)
