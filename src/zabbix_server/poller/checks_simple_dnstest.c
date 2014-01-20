@@ -2015,7 +2015,7 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 	char			domain[ZBX_HOST_BUF_SIZE], *value_str = NULL, *res_ip = NULL, *testprefix = NULL,
 				*rdds_ns_string = NULL, *answer = NULL, testname[ZBX_HOST_BUF_SIZE], is_ipv4, *random_ns,
 				err[ZBX_ERR_BUF_SIZE];
-	const char		*random_host, *ip43, *ip80;
+	const char		*random_host, *ip43 = NULL, *ip80 = NULL;
 	zbx_vector_str_t	hosts43, hosts80, ips43, ips80, nss;
 	FILE			*log_fd = NULL;
 	ldns_resolver		*res = NULL;
