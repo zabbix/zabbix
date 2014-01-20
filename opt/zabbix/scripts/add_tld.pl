@@ -428,7 +428,9 @@ sub create_item {
         $result = $zabbix->create('item', $options);
     }
 
-    return ${$result->{'itemids'}}[0] if (defined(${$result->{'itemids'}}[0]));
+    $result = ${$result->{'itemids'}}[0] if (defined(${$result->{'itemids'}}[0]));
+
+    pfail("cannot create item:\n", Dumper($options)) if (ref($result) ne '' or $result eq '');
 
     return $result;
 }
