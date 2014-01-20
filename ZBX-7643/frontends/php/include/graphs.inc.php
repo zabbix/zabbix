@@ -390,7 +390,7 @@ function get_min_itemclock_by_itemid($itemids) {
 				zbx_dbstr($ymin_type).','.zbx_dbstr($ymax_type).','.zbx_dbstr($yaxismin).','.zbx_dbstr($yaxismax).','.
 				zbx_dbstr($ymin_itemid).','.zbx_dbstr($ymax_itemid).','.zbx_dbstr($templateid).','.
 				zbx_dbstr($showworkperiod).','.zbx_dbstr($showtriggers).','.zbx_dbstr($graphtype).','.zbx_dbstr($legend).','.
-				zbx_dbstr($graph3d).','.zbx_dbstr($percent_left).','.zbx_dbstr($percent_right));
+				zbx_dbstr($graph3d).','.zbx_dbstr($percent_left).','.zbx_dbstr($percent_right).')');
 
 		return ( $result ? $graphid : $result);
 	}
