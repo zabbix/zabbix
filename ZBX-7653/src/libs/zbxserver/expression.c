@@ -58,6 +58,8 @@
 #define ZBX_REQUEST_NODE_ID		301
 #define ZBX_REQUEST_NODE_NAME		302
 
+#define STR_UNKNOWN_VARIABLE		"*UNKNOWN*"
+
 /******************************************************************************
  *                                                                            *
  * Function: get_N_functionid                                                 *
@@ -1402,6 +1404,13 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 	if (SUCCEED != zbx_vc_get_value(itemid, value_type, &ts, &value, &found) || 1 != found)
 		goto out;
 
+	/* the additional log attributes are set only for eventlog[] items,  which have logeventid set */
+	if (0 == value.value.log->logeventid)
+	{
+		*replace_to = zbx_strdup(*replace_to, STR_UNKNOWN_VARIABLE);
+		goto finish;
+	}
+
 	switch (request)
 	{
 		case ZBX_REQUEST_ITEM_LOG_DATE:
@@ -1427,7 +1436,7 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 			*replace_to = zbx_dsprintf(*replace_to, "%d", value.value.log->logeventid);
 			break;
 	}
-
+finish:
 	zbx_history_record_clear(&value, ITEM_VALUE_TYPE_LOG);
 
 	ret = SUCCEED;
@@ -2024,8 +2033,6 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_DISCOVERY_DEVICE_DNS	"{DISCOVERY.DEVICE.DNS}"
 #define MVAR_DISCOVERY_DEVICE_STATUS	"{DISCOVERY.DEVICE.STATUS}"
 #define MVAR_DISCOVERY_DEVICE_UPTIME	"{DISCOVERY.DEVICE.UPTIME}"
-
-#define STR_UNKNOWN_VARIABLE		"*UNKNOWN*"
 
 static const char	*ex_macros[] =
 {
