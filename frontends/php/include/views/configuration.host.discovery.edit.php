@@ -354,11 +354,6 @@ $buttons = array();
 if (!empty($this->data['itemid'])) {
 	array_push($buttons, new CSubmit('clone', _('Clone')));
 
-	if (!$this->data['is_template'] && !empty($this->data['itemid']) && empty($this->data['parent_discoveryid']) && !$this->data['is_discovery_rule']) {
-		array_push($buttons,
-			new CButtonQMessage('del_history', _('Clear history and trends'), _('History clearing can take a long time. Continue?'))
-		);
-	}
 	if (!$this->data['limited']) {
 		array_push($buttons, new CButtonDelete(_('Delete discovery rule?'),
 			url_params(array('form', 'groupid', 'itemid', 'parent_discoveryid', 'hostid')))
