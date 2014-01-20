@@ -111,14 +111,8 @@ static int	proc_read_file(const char *filename, char **buffer, int *buffer_alloc
 	if (-1 == (fd = open(filename, O_RDONLY)))
 		return -1;
 
-	while (1)
+	while (*buffer_alloc == (n = read(fd, *buffer, *buffer_alloc)))
 	{
-		if (-1 == (n = read(fd, *buffer, *buffer_alloc)))
-			break;
-
-		if (*buffer_alloc != n)
-			break;
-
 		*buffer_alloc *= 2;
 		*buffer = zbx_realloc(*buffer, *buffer_alloc);
 
