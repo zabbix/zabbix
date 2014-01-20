@@ -2411,7 +2411,7 @@ out:
 	return ret;
 }
 
-static int	recv_message(SSL *ssl, char **data, size_t *data_len)
+static int	recv_message(SSL *ssl, char **data, size_t *data_len, FILE *log_fd)
 {
 	int	message_size, ret = FAIL;
 
@@ -2433,6 +2433,8 @@ static int	recv_message(SSL *ssl, char **data, size_t *data_len)
 		goto out;
 
 	(*data)[*data_len - 1] = '\0';
+
+	zbx_dns_infof(log_fd, "received message ===>%s<===", *data);
 
 	ret = SUCCEED;
 out:
@@ -2469,7 +2471,7 @@ out:
 	return ret;
 }
 
-static int	send_message(SSL *ssl, const char *data, int data_size)
+static int	send_message(SSL *ssl, const char *data, int data_size, FILE *log_fd)
 {
 	int	message_size, ret = FAIL;
 
@@ -2482,6 +2484,8 @@ static int	send_message(SSL *ssl, const char *data, int data_size)
 	/* send body */
 	if (SUCCEED != send_buf(ssl, data, data_size))
 		goto out;
+
+	zbx_dns_infof(log_fd, "sent message ===>%s<===", data);
 
 	ret = SUCCEED;
 out:
@@ -2561,13 +2565,13 @@ static int	set_command(char *command_buf, size_t command_buf_size, const char *f
 	return SUCCEED;
 }
 
-static int	get_first_message(SSL *ssl, int *res, char *err, size_t err_size)
+static int	get_first_message(SSL *ssl, int *res, FILE *log_fd, char *err, size_t err_size)
 {
 	char	xml_value[XML_VALUE_BUF_SIZE], *data = NULL;
 	size_t	data_len;
 	int	ret = FAIL;
 
-	if (SUCCEED != recv_message(ssl, &data, &data_len))
+	if (SUCCEED != recv_message(ssl, &data, &data_len, log_fd))
 	{
 		zbx_strlcpy(err, "cannot get first message from server", err_size);
 		*res = ZBX_EC_EPP_NOREPLY;
@@ -2597,7 +2601,7 @@ out:
 	return ret;
 }
 
-static int	command_login(const char *name, SSL *ssl, int *res, char *err, size_t err_size)
+static int	command_login(const char *name, SSL *ssl, int *res, FILE *log_fd, char *err, size_t err_size)
 {
 	char	command_buf[COMMAND_BUF_SIZE], tmpl_buf[COMMAND_BUF_SIZE], xml_value[XML_VALUE_BUF_SIZE], *data = NULL;
 	size_t	data_len;
@@ -2617,14 +2621,14 @@ static int	command_login(const char *name, SSL *ssl, int *res, char *err, size_t
 		goto out;
 	}
 
-	if (SUCCEED != send_message(ssl, command_buf, strlen(command_buf)))
+	if (SUCCEED != send_message(ssl, command_buf, strlen(command_buf), log_fd))
 	{
 		zbx_snprintf(err, err_size, "cannot send command \"%s\"", name);
 		*res = ZBX_EC_EPP_EREQUEST;
 		goto out;
 	}
 
-	if (SUCCEED != recv_message(ssl, &data, &data_len))
+	if (SUCCEED != recv_message(ssl, &data, &data_len, log_fd))
 	{
 		zbx_snprintf(err, err_size, "cannot get reply to command \"%s\"", name);
 		*res = ZBX_EC_EPP_NOREPLY;
@@ -2654,7 +2658,7 @@ out:
 	return ret;
 }
 
-static int	command_hello(const char *name, SSL *ssl, int *res, char *err, size_t err_size)
+static int	command_hello(const char *name, SSL *ssl, int *res, FILE *log_fd, char *err, size_t err_size)
 {
 	char	tmpl_buf[COMMAND_BUF_SIZE], xml_value[XML_VALUE_BUF_SIZE], *data = NULL;
 	size_t	data_len;
@@ -2667,14 +2671,14 @@ static int	command_hello(const char *name, SSL *ssl, int *res, char *err, size_t
 		goto out;
 	}
 
-	if (SUCCEED != send_message(ssl, tmpl_buf, strlen(tmpl_buf)))
+	if (SUCCEED != send_message(ssl, tmpl_buf, strlen(tmpl_buf), log_fd))
 	{
 		zbx_snprintf(err, err_size, "cannot send command \"%s\"", name);
 		*res = ZBX_EC_EPP_EREQUEST;
 		goto out;
 	}
 
-	if (SUCCEED != recv_message(ssl, &data, &data_len))
+	if (SUCCEED != recv_message(ssl, &data, &data_len, log_fd))
 	{
 		zbx_snprintf(err, err_size, "cannot get reply to command \"%s\"", name);
 		*res = ZBX_EC_EPP_NOREPLY;
@@ -2705,7 +2709,7 @@ out:
 }
 
 /*
-static int	command_domain_info(const char *name, SSL *ssl, char *err, size_t err_size)
+static int	command_domain_info(const char *name, SSL *ssl, FILE *log_fd, char *err, size_t err_size)
 {
 	char	command_buf[COMMAND_BUF_SIZE], tmpl_buf[COMMAND_BUF_SIZE], xml_value[XML_VALUE_BUF_SIZE], *data = NULL;
 	size_t	data_len;
@@ -2723,13 +2727,13 @@ static int	command_domain_info(const char *name, SSL *ssl, char *err, size_t err
 		goto out;
 	}
 
-	if (SUCCEED != send_message(ssl, command_buf, strlen(command_buf)))
+	if (SUCCEED != send_message(ssl, command_buf, strlen(command_buf), log_fd))
 	{
 		zbx_snprintf(err, err_size, "cannot send command \"%s\"", name);
 		goto out;
 	}
 
-	if (SUCCEED != recv_message(ssl, &data, &data_len))
+	if (SUCCEED != recv_message(ssl, &data, &data_len, log_fd))
 	{
 		zbx_snprintf(err, err_size, "cannot get reply to command \"%s\"", name);
 		goto out;
@@ -2757,7 +2761,7 @@ out:
 }
 */
 
-static int	command_domain_update(const char *name, SSL *ssl, int *res, char *err, size_t err_size)
+static int	command_domain_update(const char *name, SSL *ssl, int *res, FILE *log_fd, char *err, size_t err_size)
 {
 	char	command_buf[COMMAND_BUF_SIZE], tmpl_buf[COMMAND_BUF_SIZE], xml_value[XML_VALUE_BUF_SIZE], *data = NULL;
 	size_t	data_len;
@@ -2780,14 +2784,14 @@ static int	command_domain_update(const char *name, SSL *ssl, int *res, char *err
 		goto out;
 	}
 
-	if (SUCCEED != send_message(ssl, command_buf, strlen(command_buf)))
+	if (SUCCEED != send_message(ssl, command_buf, strlen(command_buf), log_fd))
 	{
 		zbx_snprintf(err, err_size, "cannot send command \"%s\"", name);
 		*res = ZBX_EC_EPP_EREQUEST;
 		goto out;
 	}
 
-	if (SUCCEED != recv_message(ssl, &data, &data_len))
+	if (SUCCEED != recv_message(ssl, &data, &data_len, log_fd))
 	{
 		zbx_snprintf(err, err_size, "cannot get reply to command \"%s\"", name);
 		*res = ZBX_EC_EPP_NOREPLY;
@@ -2817,7 +2821,7 @@ out:
 	return ret;
 }
 
-static int	command_logout(const char *name, SSL *ssl, int *res, char *err, size_t err_size)
+static int	command_logout(const char *name, SSL *ssl, int *res, FILE *log_fd, char *err, size_t err_size)
 {
 	char	tmpl_buf[COMMAND_BUF_SIZE], xml_value[XML_VALUE_BUF_SIZE], *data = NULL;
 	size_t	data_len;
@@ -2830,14 +2834,14 @@ static int	command_logout(const char *name, SSL *ssl, int *res, char *err, size_
 		goto out;
 	}
 
-	if (SUCCEED != send_message(ssl, tmpl_buf, strlen(tmpl_buf)))
+	if (SUCCEED != send_message(ssl, tmpl_buf, strlen(tmpl_buf), log_fd))
 	{
 		zbx_snprintf(err, err_size, "cannot send command \"%s\"", name);
 		*res = ZBX_EC_EPP_EREQUEST;
 		goto out;
 	}
 
-	if (SUCCEED != recv_message(ssl, &data, &data_len))
+	if (SUCCEED != recv_message(ssl, &data, &data_len, log_fd))
 	{
 		zbx_snprintf(err, err_size, "cannot get reply to command \"%s\"", name);
 		*res = ZBX_EC_EPP_NOREPLY;
@@ -3026,47 +3030,47 @@ int	check_dnstest_epp(DC_ITEM *item, const char *keyname, const char *params, AG
 
 	zbx_dns_infof(log_fd, "start EPP test (ip %s)", epp_host);
 
-	if (SUCCEED != get_first_message(ssl, &res, err, sizeof(err)))
+	if (SUCCEED != get_first_message(ssl, &res, log_fd, err, sizeof(err)))
 	{
 		zbx_dns_err(log_fd, err);
 		goto out;
 	}
 
-	if (SUCCEED != command_login(COMMAND_LOGIN, ssl, &res, err, sizeof(err)))
+	if (SUCCEED != command_login(COMMAND_LOGIN, ssl, &res, log_fd, err, sizeof(err)))
 	{
 		zbx_dns_err(log_fd, err);
 		goto out;
 	}
 
-	if (SUCCEED != command_hello(COMMAND_HELLO, ssl, &res, err, sizeof(err)))
-	{
-		zbx_dns_err(log_fd, err);
-		goto out;
-	}
-
-	/*
-	if (SUCCEED != command_domain_info(COMMAND_DOMAIN_INFO, ssl, &res, err, sizeof(err)))
-	{
-		zbx_dns_err(log_fd, err);
-		goto out;
-	}
-	*/
-
-	if (SUCCEED != command_domain_update(COMMAND_DOMAIN_UPDATE, ssl, &res, err, sizeof(err)))
+	if (SUCCEED != command_hello(COMMAND_HELLO, ssl, &res, log_fd, err, sizeof(err)))
 	{
 		zbx_dns_err(log_fd, err);
 		goto out;
 	}
 
 	/*
-	if (SUCCEED != command_domain_info(COMMAND_DOMAIN_INFO, ssl, &res, err, sizeof(err)))
+	if (SUCCEED != command_domain_info(COMMAND_DOMAIN_INFO, ssl, &res, log_fd, err, sizeof(err)))
 	{
 		zbx_dns_err(log_fd, err);
 		goto out;
 	}
 	*/
 
-	if (SUCCEED != command_logout(COMMAND_LOGOUT, ssl, &res, err, sizeof(err)))
+	if (SUCCEED != command_domain_update(COMMAND_DOMAIN_UPDATE, ssl, &res, log_fd, err, sizeof(err)))
+	{
+		zbx_dns_err(log_fd, err);
+		goto out;
+	}
+
+	/*
+	if (SUCCEED != command_domain_info(COMMAND_DOMAIN_INFO, ssl, &res, log_fd, err, sizeof(err)))
+	{
+		zbx_dns_err(log_fd, err);
+		goto out;
+	}
+	*/
+
+	if (SUCCEED != command_logout(COMMAND_LOGOUT, ssl, &res, log_fd, err, sizeof(err)))
 	{
 		zbx_dns_err(log_fd, err);
 		goto out;
