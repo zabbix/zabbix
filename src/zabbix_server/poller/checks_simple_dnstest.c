@@ -2434,7 +2434,7 @@ static int	recv_message(SSL *ssl, char **data, size_t *data_len, FILE *log_fd)
 
 	(*data)[*data_len - 1] = '\0';
 
-	zbx_dns_infof(log_fd, "received message ===>%s<===", *data);
+	zbx_dns_infof(log_fd, "received message ===>\n%s\n<===", *data);
 
 	ret = SUCCEED;
 out:
@@ -2485,7 +2485,7 @@ static int	send_message(SSL *ssl, const char *data, int data_size, FILE *log_fd)
 	if (SUCCEED != send_buf(ssl, data, data_size))
 		goto out;
 
-	zbx_dns_infof(log_fd, "sent message ===>%s<===", data);
+	zbx_dns_infof(log_fd, "sent message ===>\n%s\n<===", data);
 
 	ret = SUCCEED;
 out:
