@@ -53,11 +53,14 @@ if (isset($_REQUEST['execute'])) {
 		$isErrorExist = true;
 	}
 	elseif ($result['response'] == 'failed') {
-		error($result['value']);
+		if (isset($result['value'])) {
+			error($result['value']);
+		}
+
 		$isErrorExist = true;
 	}
 	else {
-		$data['message'] = $result['value'];
+		$data['message'] = isset($result['value']) ? $result['value'] : '';
 	}
 
 	if ($isErrorExist) {
