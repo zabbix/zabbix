@@ -58,8 +58,6 @@
 #define ZBX_REQUEST_NODE_ID		301
 #define ZBX_REQUEST_NODE_NAME		302
 
-#define STR_UNKNOWN_VARIABLE		"*UNKNOWN*"
-
 /******************************************************************************
  *                                                                            *
  * Function: get_N_functionid                                                 *
@@ -2038,6 +2036,8 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_DISCOVERY_DEVICE_DNS	"{DISCOVERY.DEVICE.DNS}"
 #define MVAR_DISCOVERY_DEVICE_STATUS	"{DISCOVERY.DEVICE.STATUS}"
 #define MVAR_DISCOVERY_DEVICE_UPTIME	"{DISCOVERY.DEVICE.UPTIME}"
+
+#define STR_UNKNOWN_VARIABLE		"*UNKNOWN*"
 
 static const char	*ex_macros[] =
 {
