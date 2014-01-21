@@ -251,7 +251,7 @@ int	node_process_command(zbx_sock_t *sock, const char *data, struct zbx_json_par
 	else
 		result = zbx_dsprintf(result, "NODE %d: Unknown Node ID [%d].", CONFIG_NODEID, nodeid);
 finish:
-	if (FAIL == ret)
+	if (SUCCEED != ret)
 	{
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_FAILED, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_INFO, (NULL != result ? result : "Unknown error."),
