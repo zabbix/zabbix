@@ -309,7 +309,7 @@ COpt::memoryPick();
 		if(!is_null($options['selectDChecks'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'dhostids' => $dhostids,
+				'druleids' => $druleids,
 				'preservekeys' => 1
 			);
 
@@ -319,17 +319,17 @@ COpt::memoryPick();
 
 				if(!is_null($options['limitSelects'])) order_result($dchecks, 'name');
 				foreach($dchecks as $dcheckid => $dcheck){
-					unset($dchecks[$dcheckid]['dhosts']);
+					unset($dchecks[$dcheckid]['drules']);
 					$count = array();
-					foreach($dcheck['dhosts'] as $dnum => $dhost){
+					foreach($dcheck['drules'] as $dnum => $drule){
 						if(!is_null($options['limitSelects'])){
-							if(!isset($count[$dhost['dhostid']])) $count[$dhost['dhostid']] = 0;
-							$count[$dhost['dhostid']]++;
+							if(!isset($count[$drule['druleid']])) $count[$drule['druleid']] = 0;
+							$count[$drule['druleid']]++;
 
-							if($count[$dhost['dhostid']] > $options['limitSelects']) continue;
+							if($count[$drule['druleid']] > $options['limitSelects']) continue;
 						}
 
-						$result[$dhost['dhostid']]['dchecks'][] = &$dchecks[$dcheckid];
+						$result[$drule['druleid']]['dchecks'][] = &$dchecks[$dcheckid];
 					}
 				}
 			}
@@ -339,11 +339,11 @@ COpt::memoryPick();
 
 				$dchecks = CDCheck::get($obj_params);
 				$dchecks = zbx_toHash($dchecks, 'druleid');
-				foreach($result as $dhostid => $dhost){
+				foreach($result as $druleid => $drule){
 					if(isset($dchecks[$druleid]))
-						$result[$dhostid]['dchecks'] = $dchecks[$druleid]['rowscount'];
+						$result[$druleid]['dchecks'] = $dchecks[$druleid]['rowscount'];
 					else
-						$result[$dhostid]['dchecks'] = 0;
+						$result[$druleid]['dchecks'] = 0;
 				}
 			}
 		}
