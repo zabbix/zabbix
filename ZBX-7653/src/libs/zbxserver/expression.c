@@ -1406,40 +1406,38 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 	{
 		case ZBX_REQUEST_ITEM_LOG_DATE:
 			*replace_to = zbx_strdup(*replace_to, zbx_date2str((time_t)value.value.log->timestamp));
-			break;
+			goto success;
 		case ZBX_REQUEST_ITEM_LOG_TIME:
 			*replace_to = zbx_strdup(*replace_to, zbx_time2str((time_t)value.value.log->timestamp));
-			break;
+			goto success;
 		case ZBX_REQUEST_ITEM_LOG_AGE:
 			*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - value.value.log->timestamp));
+			goto success;
+	}
+
+	/* the eventid, source and severity attributes are set only for eventlog[] items */
+	if (0 == value.value.log->logeventid)
+		goto clean;
+
+	switch (request)
+	{
+
+		case ZBX_REQUEST_ITEM_LOG_SOURCE:
+			*replace_to = zbx_strdup(*replace_to, value.value.log->source);
+			break;
+		case ZBX_REQUEST_ITEM_LOG_SEVERITY:
+			*replace_to = zbx_strdup(*replace_to,
+					zbx_item_logtype_string((unsigned char)value.value.log->severity));
+			break;
+		case ZBX_REQUEST_ITEM_LOG_NSEVERITY:
+			*replace_to = zbx_dsprintf(*replace_to, "%d", value.value.log->severity);
+			break;
+		case ZBX_REQUEST_ITEM_LOG_EVENTID:
+			*replace_to = zbx_dsprintf(*replace_to, "%d", value.value.log->logeventid);
 			break;
 	}
 
-	if (NULL == replace_to)
-	{
-		/* the eventid, source and severity attributes are set only for eventlog[] items */
-		if (0 == value.value.log->logeventid)
-			goto clean;
-
-		switch (request)
-		{
-
-			case ZBX_REQUEST_ITEM_LOG_SOURCE:
-				*replace_to = zbx_strdup(*replace_to, value.value.log->source);
-				break;
-			case ZBX_REQUEST_ITEM_LOG_SEVERITY:
-				*replace_to = zbx_strdup(*replace_to,
-						zbx_item_logtype_string((unsigned char)value.value.log->severity));
-				break;
-			case ZBX_REQUEST_ITEM_LOG_NSEVERITY:
-				*replace_to = zbx_dsprintf(*replace_to, "%d", value.value.log->severity);
-				break;
-			case ZBX_REQUEST_ITEM_LOG_EVENTID:
-				*replace_to = zbx_dsprintf(*replace_to, "%d", value.value.log->logeventid);
-				break;
-		}
-	}
-
+success:
 	ret = SUCCEED;
 clean:
 	zbx_history_record_clear(&value, ITEM_VALUE_TYPE_LOG);
