@@ -777,6 +777,7 @@ New features:
 A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7554] fixed script execution confirmation label encoding (Eduard)
 ...G...... [ZBX-6790] changed net.tcp.listen and net.udp.listen keys to read the whole /proc/net/(tcp|udp)(6) file in a single operation to avoid losing data if the file is changed between reading operations (wiper)
 .......PS. [ZBX-7587] set the correct server status (down) after ORA-01012, ORA-02396 errors (wiper)
 ...G...... [ZBX-7481] added checking for OpenBSD version to avoid compilation error on OpenBSD v5.4 and newer due to removed swapins/swapouts uvmexp fields (igors)
