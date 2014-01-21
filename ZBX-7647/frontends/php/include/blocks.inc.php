@@ -900,7 +900,7 @@ function make_latest_issues(array $filter = array()) {
 	// hide the sort indicator if no sortfield and sortorder are given
 	$showSortIndicator = isset($filter['sortfield']) || isset($filter['sortorder']);
 
-	if (isset($filter['sortfield']) && $filter['sortfield'] != 'lastchange') {
+	if (isset($filter['sortfield']) && $filter['sortfield'] !== 'lastchange') {
 		$sortField = array($filter['sortfield'], 'lastchange');
 		$sortOrder = array($filter['sortorder'], ZBX_SORT_DOWN);
 	}
