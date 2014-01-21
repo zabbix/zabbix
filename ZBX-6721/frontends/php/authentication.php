@@ -35,20 +35,20 @@ $fields = array(
 	'test' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null, null),
 	// LDAP
 	'ldap_host' =>		array(T_ZBX_STR, O_OPT, null,			NOT_EMPTY,
-		'isset({config})&&{config}==1&&(isset({save})||isset({test}))',		_('LDAP host')),
+		'isset({config})&&{config}=='.ZBX_AUTH_LDAP.'&&(isset({save})||isset({test}))',	_('LDAP host')),
 	'ldap_port' =>		array(T_ZBX_INT, O_OPT, null,			BETWEEN(0, 65535),
-		'isset({config})&&{config}==1&&(isset({save})||isset({test}))',		_('Port')),
+		'isset({config})&&{config}=='.ZBX_AUTH_LDAP.'&&(isset({save})||isset({test}))',	_('Port')),
 	'ldap_base_dn' =>	array(T_ZBX_STR, O_OPT, null,			NOT_EMPTY,
-		'isset({config})&&{config}==1&&(isset({save})||isset({test}))',		_('Base DN')),
+		'isset({config})&&{config}=='.ZBX_AUTH_LDAP.'&&(isset({save})||isset({test}))',	_('Base DN')),
 	'ldap_bind_dn' =>	array(T_ZBX_STR, O_OPT, null,			null,
-		'isset({config})&&{config}==1&&(isset({save})||isset({test}))'),
-	'ldap_bind_password' => array(T_ZBX_STR, O_OPT, null,		null, null,	_('Bind password')),
+		'isset({config})&&{config}=='.ZBX_AUTH_LDAP.'&&(isset({save})||isset({test}))'),
+	'ldap_bind_password' => array(T_ZBX_STR, O_OPT, null,		null, null,				_('Bind password')),
 	'ldap_search_attribute' => array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
-		'isset({config})&&{config}==1&&(isset({save})||isset({test}))',		_('Search attribute')),
+		'isset({config})&&{config}=='.ZBX_AUTH_LDAP.'&&(isset({save})||isset({test}))',	_('Search attribute')),
 	'user' =>			array(T_ZBX_STR, O_OPT, null,			NOT_EMPTY,
-		'isset({config})&&{config}==1'),
+		'isset({config})&&{config}=='.ZBX_AUTH_LDAP.'&&(isset({save})||isset({test}))'),
 	'user_password' =>	array(T_ZBX_STR, O_OPT, null,			NOT_EMPTY,
-		'isset({config})&&{config}==1',										_('User password')),
+		'isset({config})&&{config}=='.ZBX_AUTH_LDAP.'&&(isset({save})||isset({test}))',	_('User password')),
 	'change_bind_password' => array(T_ZBX_STR, O_OPT, null, null,	null)
 );
 check_fields($fields);

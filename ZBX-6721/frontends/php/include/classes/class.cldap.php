@@ -28,7 +28,7 @@ class CLdap {
 			'host' => 'ldap://localhost',
 			'port' => '389',
 			'bind_dn' => 'uid=admin,ou=system',
-			'bind_password' => 'secret',
+			'bind_password' => '',
 			'base_dn' => 'ou=users,ou=system',
 			'search_attribute' => 'uid',
 			'userfilter' => '(%{attr}=%{user})',
