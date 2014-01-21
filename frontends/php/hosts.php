@@ -242,7 +242,6 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		}
 
 		// add new or existing host groups
-		$newHostGroupIds = array();
 		if (isset($visible['new_groups']) && !empty($_REQUEST['new_groups'])) {
 			if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 				foreach ($_REQUEST['new_groups'] as $newGroup) {
@@ -250,7 +249,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 						$newGroups[] = array('name' => $newGroup['new']);
 					}
 					else {
-						$newHostGroupIds[] = $newGroup;
+						$existGroups[] = $newGroup;
 					}
 				}
 
@@ -259,24 +258,22 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 						throw new Exception();
 					}
 
-					$newHostGroupIds = $newHostGroupIds
-						? array_merge($newHostGroupIds, $createdGroups['groupids'])
-						: $createdGroups['groupids'];
+					$existGroups = isset($existGroups)
+						? array_merge($existGroups, $createdGroups['groupids']) : $createdGroups['groupids'];
 				}
 			}
 			else {
-				$newHostGroupIds = getRequest('new_groups');
+				$existGroups = $_REQUEST['new_groups'];
 			}
 		}
 
 		if (isset($visible['groups'])) {
 			if (isset($_REQUEST['groups'])) {
-				$replaceHostGroupsIds = $newHostGroupIds
-					? array_unique(array_merge(getRequest('groups'), $newHostGroupIds))
-					: $_REQUEST['groups'];
+				$replaceHostGroupsIds = isset($existGroups)
+					? array_unique(array_merge($_REQUEST['groups'], $existGroups)) : $_REQUEST['groups'];
 			}
-			elseif ($newHostGroupIds) {
-				$replaceHostGroupsIds = $newHostGroupIds;
+			elseif (isset($existGroups)) {
+				$replaceHostGroupsIds = $existGroups;
 			}
 
 			if (isset($replaceHostGroupsIds)) {
@@ -290,9 +287,9 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 				$hosts['groups'] = array();
 			}
 		}
-		elseif ($newHostGroupIds) {
-			$newHostGroups = API::HostGroup()->get(array(
-				'groupids' => $newHostGroupIds,
+		elseif (isset($existGroups)) {
+			$existGroups = API::HostGroup()->get(array(
+				'groupids' => $existGroups,
 				'editable' => true,
 				'output' => array('groupid')
 			));
@@ -325,8 +322,8 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		}
 
 		// add new host groups
-		if ($newHostGroupIds && (!isset($visible['groups']) || !isset($replaceHostGroups))) {
-			$add['groups'] = zbx_toObject($newHostGroupIds, 'groupid');
+		if (isset($existGroups) && (!isset($visible['groups']) || !isset($replaceHostGroups))) {
+			$add['groups'] = $existGroups;
 		}
 
 		if ($add) {
