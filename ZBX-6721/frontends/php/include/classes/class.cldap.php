@@ -72,23 +72,17 @@ class CLdap {
 		if ($this->cnf['version']) {
 			if (!ldap_set_option($this->ds, LDAP_OPT_PROTOCOL_VERSION, $this->cnf['version'])) {
 				error('Setting LDAP Protocol version '.$this->cnf['version'].' failed.');
-
-				return false;
 			}
 			else {
 				// use TLS (needs version 3)
 				if (isset($this->cnf['starttls']) && !ldap_start_tls($this->ds)) {
 					error('Starting TLS failed.');
-
-					return false;
 				}
 
 				// needs version 3
 				if (!zbx_empty($this->cnf['referrals'])
 						&& !ldap_set_option($this->ds, LDAP_OPT_REFERRALS, $this->cnf['referrals'])) {
 					error('Setting LDAP referrals to off failed.');
-
-					return false;
 				}
 			}
 		}
@@ -96,8 +90,6 @@ class CLdap {
 		// set deref mode
 		if (isset($this->cnf['deref']) && !ldap_set_option($this->ds, LDAP_OPT_DEREF, $this->cnf['deref'])) {
 			error('Setting LDAP Deref mode '.$this->cnf['deref'].' failed.');
-
-			return false;
 		}
 
 		return true;
