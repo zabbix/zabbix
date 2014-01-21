@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 class CLdap {
 
@@ -65,6 +64,7 @@ class CLdap {
 
 		if (!$this->ds = ldap_connect($this->cnf['host'], $this->cnf['port'])) {
 			error('LDAP: couldn\'t connect to LDAP server.');
+
 			return false;
 		}
 
@@ -72,36 +72,39 @@ class CLdap {
 		if ($this->cnf['version']) {
 			if (!ldap_set_option($this->ds, LDAP_OPT_PROTOCOL_VERSION, $this->cnf['version'])) {
 				error('Setting LDAP Protocol version '.$this->cnf['version'].' failed.');
+
+				return false;
 			}
 			else {
 				// use TLS (needs version 3)
-				if (isset($this->cnf['starttls'])) {
-					if (!ldap_start_tls($this->ds)) {
-						error('Starting TLS failed.');
-					}
+				if (isset($this->cnf['starttls']) && !ldap_start_tls($this->ds)) {
+					error('Starting TLS failed.');
+
+					return false;
 				}
 
 				// needs version 3
-				if (!zbx_empty($this->cnf['referrals'])) {
-					if (!ldap_set_option($this->ds, LDAP_OPT_REFERRALS, $this->cnf['referrals'])) {
-						error('Setting LDAP referrals to off failed.');
-					}
+				if (!zbx_empty($this->cnf['referrals'])
+						&& !ldap_set_option($this->ds, LDAP_OPT_REFERRALS, $this->cnf['referrals'])) {
+					error('Setting LDAP referrals to off failed.');
+
+					return false;
 				}
 			}
 		}
 
 		// set deref mode
-		if (isset($this->cnf['deref'])) {
-			if (!ldap_set_option($this->ds, LDAP_OPT_DEREF, $this->cnf['deref'])) {
-				error('Setting LDAP Deref mode '.$this->cnf['deref'].' failed.');
-			}
+		if (isset($this->cnf['deref']) && !ldap_set_option($this->ds, LDAP_OPT_DEREF, $this->cnf['deref'])) {
+			error('Setting LDAP Deref mode '.$this->cnf['deref'].' failed.');
+
+			return false;
 		}
+
 		return true;
 	}
 
 	public function checkPass($user, $pass) {
-		// reject empty password
-		if (empty($pass)) {
+		if (!$pass) {
 			return false;
 		}
 
@@ -114,8 +117,10 @@ class CLdap {
 			// use superuser credentials
 			if (!ldap_bind($this->ds, $this->cnf['bind_dn'], $this->cnf['bind_password'])) {
 				error('LDAP: cannot bind by given Bind DN.');
+
 				return false;
 			}
+
 			$this->bound = 2;
 		}
 		elseif (!empty($this->cnf['bind_dn']) && !empty($this->cnf['base_dn']) && !empty($this->cnf['userfilter'])) {
@@ -130,17 +135,20 @@ class CLdap {
 			// anonymous bind
 			if (!ldap_bind($this->ds)) {
 				error('LDAP: can not bind anonymously.');
+
 				return false;
 			}
 		}
 
 		// try to bind to with the dn if we have one.
-		if (!empty($dn)) {
+		if ($dn) {
 			// user/password bind
 			if (!ldap_bind($this->ds, $dn, $pass)) {
 				return false;
 			}
+
 			$this->bound = 1;
+
 			return true;
 		}
 		else {
@@ -158,7 +166,9 @@ class CLdap {
 			if (!ldap_bind($this->ds, $dn, $pass)) {
 				return false;
 			}
+
 			$this->bound = 1;
+
 			return true;
 		}
 
@@ -262,4 +272,3 @@ class CLdap {
 		return $filter;
 	}
 }
-?>
