@@ -421,7 +421,8 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		pDnsRecord = pDnsRecord->pNext;
 	}
 #else	/* not _WINDOWS */
-	res_init();	/* initialize always, settings might have changed */
+	if (0 != res_init())	/* initialize always, settings might have changed */
+		return SYSINFO_RET_FAIL;
 
 	if (-1 == (res = res_mkquery(QUERY, zone, C_IN, type, NULL, 0, NULL, buf, sizeof(buf))))
 		return SYSINFO_RET_FAIL;
