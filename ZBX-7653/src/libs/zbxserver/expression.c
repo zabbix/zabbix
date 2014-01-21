@@ -1406,10 +1406,7 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 
 	/* the additional log attributes are set only for eventlog[] items,  which have logeventid set */
 	if (0 == value.value.log->logeventid)
-	{
-		*replace_to = zbx_strdup(*replace_to, STR_UNKNOWN_VARIABLE);
-		goto finish;
-	}
+		goto out;
 
 	switch (request)
 	{
@@ -1436,7 +1433,7 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 			*replace_to = zbx_dsprintf(*replace_to, "%d", value.value.log->logeventid);
 			break;
 	}
-finish:
+
 	zbx_history_record_clear(&value, ITEM_VALUE_TYPE_LOG);
 
 	ret = SUCCEED;
