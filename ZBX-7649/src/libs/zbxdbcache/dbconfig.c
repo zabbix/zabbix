@@ -929,6 +929,9 @@ static void	DCsync_items(DB_RESULT result)
 			ZBX_STR2UINT64(item->lastlogsize, row[31]);
 			item->mtime = atoi(row[32]);
 			item->data_expected_from = now;
+
+			item->location = ZBX_LOC_NOWHERE;
+			item->poller_type = ZBX_NO_POLLER;
 		}
 		else if (NULL != item->triggers && NULL == item->triggers[0])
 		{
@@ -954,10 +957,19 @@ static void	DCsync_items(DB_RESULT result)
 			zbx_hashset_insert(&config->items_hk, &item_hk_local, sizeof(ZBX_DC_ITEM_HK));
 		}
 
+		old_poller_type = item->poller_type;
+		item->poller_type = poller_by_item(itemid, proxy_hostid, item->type, item->key, item->flags);
+
+		if (ZBX_POLLER_TYPE_UNREACHABLE == old_poller_type &&
+				(ZBX_POLLER_TYPE_NORMAL == item->poller_type ||
+				ZBX_POLLER_TYPE_IPMI == item->poller_type ||
+				ZBX_POLLER_TYPE_JAVA == item->poller_type))
+		{
+			item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
+		}
+
 		if (0 == found)
 		{
-			item->location = ZBX_LOC_NOWHERE;
-			item->poller_type = ZBX_NO_POLLER;
 			item->state = (unsigned char)atoi(row[20]);
 			old_nextcheck = 0;
 
@@ -984,17 +996,6 @@ static void	DCsync_items(DB_RESULT result)
 		}
 
 		item->delay = delay;
-
-		old_poller_type = item->poller_type;
-		item->poller_type = poller_by_item(itemid, proxy_hostid, item->type, item->key, item->flags);
-
-		if (ZBX_POLLER_TYPE_UNREACHABLE == old_poller_type &&
-				(ZBX_POLLER_TYPE_NORMAL == item->poller_type ||
-				ZBX_POLLER_TYPE_IPMI == item->poller_type ||
-				ZBX_POLLER_TYPE_JAVA == item->poller_type))
-		{
-			item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
-		}
 
 		/* SNMP items */
 
