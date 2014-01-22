@@ -1415,15 +1415,15 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 			goto success;
 	}
 
-	/* the eventid, source and severity attributes are set only for eventlog[] items */
-	if (0 == value.value.log->logeventid)
+	/* the following attributes are set only for windows eventlog items */
+	if (SUCCEED != DCitem_match_key(itemid, "eventlog[", 9))
 		goto clean;
 
 	switch (request)
 	{
-
 		case ZBX_REQUEST_ITEM_LOG_SOURCE:
-			*replace_to = zbx_strdup(*replace_to, value.value.log->source);
+			*replace_to = zbx_strdup(*replace_to, (NULL == value.value.log->source ? "" :
+					value.value.log->source));
 			break;
 		case ZBX_REQUEST_ITEM_LOG_SEVERITY:
 			*replace_to = zbx_strdup(*replace_to,

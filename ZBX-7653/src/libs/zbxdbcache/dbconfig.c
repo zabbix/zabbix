@@ -5712,3 +5712,32 @@ int	DCget_data_expected_from(zbx_uint64_t itemid, int *seconds)
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCitem_match_key                                                 *
+ *                                                                            *
+ * Purpose: Checks if the item key matches the specified value                *
+ *                                                                            *
+ * Parameters: itemid  - [IN] the item id                                     *
+ *             key     - [IN] the value to match                              *
+ *             len     - [IN] length of the value (key) to match              *
+ *                                                                            *
+ * Return value: SUCCCEED - the item key matched the specified value          *
+ *               FAIL     - the item key did not match the specified value    *
+ *                                                                            *
+ ******************************************************************************/
+int	DCitem_match_key(zbx_uint64_t itemid, const char *key, int len)
+{
+	int		ret = FAIL;
+	ZBX_DC_ITEM	*item;
+
+	LOCK_CACHE;
+
+	if (NULL != (item = zbx_hashset_search(&config->items, &itemid)) && 0 == strncmp(item->key, key, len))
+		ret = SUCCEED;
+
+	UNLOCK_CACHE;
+
+	return ret;
+}

@@ -355,4 +355,6 @@ void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name);
 
 int	DCget_data_expected_from(zbx_uint64_t itemid, int *seconds);
 
+int	DCitem_match_key(zbx_uint64_t itemid, const char *key, int len);
+
 #endif
