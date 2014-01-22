@@ -114,6 +114,8 @@ class CLdap {
 			}
 
 			$this->bound = 2;
+
+			$dn = null;
 		}
 		elseif (!empty($this->cnf['bind_dn']) && !empty($this->cnf['base_dn']) && !empty($this->cnf['userfilter'])) {
 			// special bind string
@@ -130,6 +132,8 @@ class CLdap {
 
 				return false;
 			}
+
+			$dn = null;
 		}
 
 		// try to bind to with the dn if we have one.

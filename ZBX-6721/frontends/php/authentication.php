@@ -63,6 +63,12 @@ else {
 	$isAuthenticationTypeChanged = false;
 }
 
+foreach ($config as $name => $value) {
+	if (array_key_exists($name, $_REQUEST)) {
+		$config[$name] = $_REQUEST[$name];
+	}
+}
+
 /*
  * Actions
  */
@@ -92,12 +98,6 @@ if ($config['authentication_type'] == ZBX_AUTH_INTERNAL) {
 }
 elseif ($config['authentication_type'] == ZBX_AUTH_LDAP) {
 	if (isset($_REQUEST['save']) || isset($_REQUEST['test'])) {
-		foreach ($config as $id => $value) {
-			if (isset($_REQUEST[$id])) {
-				$config[$id] = $_REQUEST[$id];
-			}
-		}
-
 		// check LDAP login/password
 		$ldap = new CLdap(array(
 			'host' => $config['ldap_host'],
@@ -151,7 +151,7 @@ elseif ($config['authentication_type'] == ZBX_AUTH_LDAP) {
 			}
 		}
 		elseif (isset($_REQUEST['test'])) {
-			show_messages($ldapAccountOk, _('LDAP login successful'), _('LDAP login was not successful'));
+			show_messages($login, _('LDAP login successful'), _('LDAP login was not successful'));
 		}
 	}
 }
