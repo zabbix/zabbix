@@ -1539,17 +1539,15 @@ sub create_probe_status_host {
                                               };
     create_item($options);
 
-    $options = { 'description' => '12.2 Small amount of online probes for DNS test [{ITEM.VALUE1}]',
-                         'expression' => '{'.$name.':online.nodes.pl.last(0)}<{$DNSTEST.DNS.PROBE.ONLINE}|'.
-						'{'.$name.':online.nodes.pl.last(0)}={$DNSTEST.DNS.PROBE.ONLINE}',
+    $options = { 'description' => '12.2 Online probes for DNS test [{ITEM.LASTVALUE1}] is less than [{$DNSTEST.DNS.PROBE.ONLINE}]',
+                         'expression' => '{'.$name.':online.nodes.pl.last(0)}<{$DNSTEST.DNS.PROBE.ONLINE}',
                         'priority' => '5',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => '12.2 Small amount of online probes for RDDS test [{ITEM.VALUE1}]',
-                         'expression' => '{'.$name.':online.nodes.pl.last(0)}<{$DNSTEST.RDDS.PROBE.ONLINE}|'.
-						'{'.$name.':online.nodes.pl.last(0)}={$DNSTEST.RDDS.PROBE.ONLINE}',
+    $options = { 'description' => '12.2 Online probes for RDDS test [{ITEM.LASTVALUE1}] is less than [{$DNSTEST.RDDS.PROBE.ONLINE}]',
+                         'expression' => '{'.$name.':online.nodes.pl.last(0)}<{$DNSTEST.RDDS.PROBE.ONLINE}',
                         'priority' => '5',
                 };
 
