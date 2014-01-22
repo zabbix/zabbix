@@ -490,7 +490,7 @@ static int	item_get_nextcheck_seed(const ZBX_DC_ITEM *item)
 			/* Java and pinger pollers can process multiple items at the same time.     */
 			/* To take advantage of that we must schedule items with the same interface */
 			/* to be processed at the same time.                                        */
-			seed = item->interfaceid * item->poller_type;
+			seed = item->interfaceid;
 			break;
 		default:
 			/* by default just try to spread all item processing over the delay period  */
