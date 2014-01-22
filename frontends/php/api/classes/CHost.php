@@ -189,7 +189,7 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['templateids'])) {
 			zbx_value2array($options['templateids']);
 
-			$sqlParts['select']['parentTemplateId'] = 'ht.templateid as parentTemplateId';
+			$sqlParts['select']['parent_templateid'] = 'ht.templateid as parent_templateid';
 			$sqlParts['from']['hosts_templates'] = 'hosts_templates ht';
 			$sqlParts['where'][] = dbConditionInt('ht.templateid', $options['templateids']);
 			$sqlParts['where']['hht'] = 'h.hostid=ht.hostid';
@@ -453,16 +453,16 @@ class CHost extends CHostGeneral {
 				}
 
 				// templateids
-				if (isset($host['parentTemplateId'])) {
+				if (isset($host['parent_templateid'])) {
 					if (!isset($result[$host['hostid']]['templates'])) {
 						$result[$host['hostid']]['templates'] = array();
 					}
 
 					$result[$host['hostid']]['templates'][] = array(
-						'templateid' => $host['parentTemplateId'],
-						'hostid' => $host['parentTemplateId']
+						'templateid' => $host['parent_templateid'],
+						'hostid' => $host['parent_templateid']
 					);
-					unset($host['parentTemplateId']);
+					unset($host['parent_templateid']);
 				}
 
 				// triggerids
