@@ -294,7 +294,7 @@ static void	zbx_validate_config(void)
 
 	if (FAIL == zbx_check_hostname(CONFIG_HOSTNAME))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "invalid \"Hostname\" configuration parameter: %s", CONFIG_HOSTNAME);
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"Hostname\" configuration parameter: '%s'", CONFIG_HOSTNAME);
 		exit(EXIT_FAILURE);
 	}
 
@@ -314,7 +314,7 @@ static void	zbx_validate_config(void)
 
 	if (NULL != CONFIG_SOURCE_IP && ('\0' == *CONFIG_SOURCE_IP || SUCCEED != is_ip(CONFIG_SOURCE_IP)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "invalid \"SourceIP\" configuration parameter: %s", CONFIG_SOURCE_IP);
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"SourceIP\" configuration parameter: '%s'", CONFIG_SOURCE_IP);
 		exit(EXIT_FAILURE);
 	}
 }
