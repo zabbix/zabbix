@@ -465,7 +465,7 @@ static unsigned char	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_host
 
 /******************************************************************************
  *                                                                            *
- * Function: item_get_nextcheck_sed                                           *
+ * Function: get_item_nextcheck_seed                                          *
  *                                                                            *
  * Purpose: get the seed value to be used for item nextcheck calculations     *
  *                                                                            *
@@ -479,10 +479,8 @@ static unsigned char	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_host
  *           same nextcheck values.                                           *
  *                                                                            *
  ******************************************************************************/
-static int	item_get_nextcheck_seed(const ZBX_DC_ITEM *item)
+static zbx_uint64_t	get_item_nextcheck_seed(const ZBX_DC_ITEM *item)
 {
-	zbx_uint64_t	seed;
-
 	switch (item->poller_type)
 	{
 		case ZBX_POLLER_TYPE_JAVA:
@@ -490,14 +488,11 @@ static int	item_get_nextcheck_seed(const ZBX_DC_ITEM *item)
 			/* Java and pinger pollers can process multiple items at the same time.     */
 			/* To take advantage of that we must schedule items with the same interface */
 			/* to be processed at the same time.                                        */
-			seed = item->interfaceid;
-			break;
+			return item->interfaceid;
 		default:
 			/* by default just try to spread all item processing over the delay period  */
-			seed = item->itemid;
+			return item->itemid;
 	}
-
-	return seed;
 }
 
 static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, int now)
@@ -506,7 +501,7 @@ static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, int now)
 
 	if (ITEM_STATE_NOTSUPPORTED == item->state)
 	{
-		nextcheck = calculate_item_nextcheck(item_get_nextcheck_seed(item), item->type,
+		nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item), item->type,
 				config->config->refresh_unsupported, NULL, now);
 	}
 	else
@@ -514,7 +509,7 @@ static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, int now)
 		const ZBX_DC_FLEXITEM	*flexitem;
 
 		flexitem = zbx_hashset_search(&config->flexitems, &item->itemid);
-		nextcheck = calculate_item_nextcheck(item_get_nextcheck_seed(item), item->type,
+		nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item), item->type,
 				item->delay, NULL != flexitem ? flexitem->delay_flex : NULL, now);
 	}
 
@@ -968,12 +963,12 @@ static void	DCsync_items(DB_RESULT result)
 
 			if (ITEM_STATE_NOTSUPPORTED == item->state)
 			{
-				item->nextcheck = calculate_item_nextcheck(item_get_nextcheck_seed(item),
+				item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item),
 						item->type, config->config->refresh_unsupported, NULL, now);
 			}
 			else
 			{
-				item->nextcheck = calculate_item_nextcheck(item_get_nextcheck_seed(item),
+				item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item),
 						item->type, delay, row[16], now);
 			}
 		}
@@ -983,7 +978,7 @@ static void	DCsync_items(DB_RESULT result)
 
 			if (ITEM_STATE_NORMAL == item->state && delay != item->delay)
 			{
-				item->nextcheck = calculate_item_nextcheck(item_get_nextcheck_seed(item),
+				item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item),
 						item->type, delay, row[16], now);
 			}
 		}
@@ -1055,7 +1050,7 @@ static void	DCsync_items(DB_RESULT result)
 			if (SUCCEED == DCstrpool_replace(found, &flexitem->delay_flex, row[16]) &&
 					ITEM_STATE_NOTSUPPORTED != item->state)
 			{
-				item->nextcheck = calculate_item_nextcheck(item_get_nextcheck_seed(item), item->type,
+				item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item), item->type,
 						item->delay, flexitem->delay_flex, now);
 			}
 		}
@@ -1068,7 +1063,7 @@ static void	DCsync_items(DB_RESULT result)
 
 			if (ITEM_STATE_NOTSUPPORTED != item->state)
 			{
-				item->nextcheck = calculate_item_nextcheck(item_get_nextcheck_seed(item), item->type,
+				item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item), item->type,
 						item->delay, NULL, now);
 			}
 		}
@@ -3234,7 +3229,7 @@ void	init_configuration_cache()
 
 	for (i = 0; i < ZBX_POLLER_TYPE_COUNT; i++)
 	{
-		switch(i)
+		switch (i)
 		{
 			case ZBX_POLLER_TYPE_JAVA:
 				zbx_binary_heap_create_ext(&config->queues[i],

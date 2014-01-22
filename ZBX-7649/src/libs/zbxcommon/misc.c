@@ -595,12 +595,12 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
  * Purpose: calculate nextcheck timestamp for item                            *
  *                                                                            *
  * Parameters: seed      - [IN] the seed value applied to delay to spread     *
- *                          item checks over the delay period                 *
+ *                              item checks over the delay period             *
  *             item_type - [IN] the item type                                 *
  *             delay     - [IN] default delay value, can be overridden        *
  *             flex_intervals - [IN] descriptions of flexible intervals       *
  *                                   in the form [dd/d1-d2,hh:mm-hh:mm;]      *
- *             now        - [IN] current timestamp                            *
+ *             now       - [IN] current timestamp                             *
  *                                                                            *
  * Return value: nextcheck value                                              *
  *                                                                            *
@@ -628,8 +628,8 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int delay, const 
 	}
 	else
 	{
-		int		current_delay = 0, try = 0;
-		time_t		next_interval, t, tmax;
+		int	current_delay = 0, try = 0;
+		time_t	next_interval, t, tmax;
 
 		/* Try to find the nearest 'nextcheck' value with condition */
 		/* 'now' < 'nextcheck' < 'now' + SEC_PER_YEAR. If it is not */
