@@ -451,11 +451,6 @@ function disable_item($itemids) {
 	return update_item_status($itemids, ITEM_STATUS_DISABLED);
 }
 
-function get_items_by_hostid($hostids) {
-	zbx_value2array($hostids);
-	return DBselect('SELECT i.* FROM items i WHERE '.dbConditionInt('i.hostid', $hostids));
-}
-
 function get_item_by_key($key, $host = '') {
 	$item = false;
 	$sql_from = '';

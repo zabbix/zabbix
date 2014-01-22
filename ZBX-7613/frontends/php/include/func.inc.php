@@ -1083,52 +1083,6 @@ function zbx_stripos($haystack, $needle, $offset = 0) {
 	}
 }
 
-function zbx_strrpos($haystack, $needle) {
-	if (defined('ZBX_MBSTRINGS_ENABLED')) {
-		return mb_strrpos($haystack, $needle);
-	}
-	else {
-		return strrpos($haystack, $needle);
-	}
-}
-
-function zbx_substr_replace($string, $replacement, $start, $length = null) {
-	if (defined('ZBX_MBSTRINGS_ENABLED')) {
-		$string_length = mb_strlen($string);
-
-		if ($start < 0) {
-			$start = max(0, $string_length + $start);
-		}
-		elseif ($start > $string_length) {
-			$start = $string_length;
-		}
-
-		if ($length < 0) {
-			$length = max(0, $string_length - $start + $length);
-		}
-		elseif ($length === null || $length > $string_length) {
-			$length = $string_length;
-		}
-
-		if (($start + $length) > $string_length) {
-			$length = $string_length - $start;
-		}
-
-		return mb_substr($string, 0, $start) . $replacement . mb_substr($string, $start + $length, $string_length - $start - $length);
-	}
-	else {
-		return substr_replace($string, $replacement, $start, $length);
-	}
-}
-
-function str_replace_first($search, $replace, $subject) {
-	$pos = zbx_strpos($subject, $search);
-	if ($pos !== false) {
-		$subject = zbx_substr_replace($subject, $replace, $pos, zbx_strlen($search));
-	}
-	return $subject;
-}
-
 /************* SELECT *************/
 function selectByPattern(&$table, $column, $pattern, $limit) {
 	$chunk_size = $limit;
@@ -1292,30 +1246,6 @@ function order_macros(array $macros, $sortfield, $order = ZBX_SORT_UP) {
 	return $rs;
 }
 
-function unsetExcept(&$array, $allowedFields) {
-	foreach ($array as $key => $value) {
-		if (!isset($allowedFields[$key])) {
-			unset($array[$key]);
-		}
-	}
-}
-
-function zbx_implodeHash($glue1, $glue2, $hash) {
-	if (is_null($glue2)) {
-		$glue2 = $glue1;
-	}
-
-	$str = '';
-	foreach ($hash as $key => $value) {
-		if (!empty($str)) {
-			$str .= $glue2;
-		}
-		$str .= $key.$glue1.$value;
-	}
-
-	return $str;
-}
-
 // preserve keys
 function zbx_array_merge() {
 	$args = func_get_args();
@@ -1340,17 +1270,6 @@ function uint_in_array($needle, $haystack) {
 	}
 
 	return false;
-}
-
-function zbx_uint_array_intersect(&$array1, &$array2) {
-	$result = array();
-	foreach ($array1 as $key => $value) {
-		if (uint_in_array($value, $array2)) {
-			$result[$key] = $value;
-		}
-	}
-
-	return $result;
 }
 
 function str_in_array($needle, $haystack, $strict = false) {
@@ -1604,26 +1523,6 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element = null, $key = null) {
 	else {
 		$mainArray[$sIndex][] = is_null($element) ? $sIndex : $element;
 	}
-}
-
-/**
- * Check if two arrays have same values.
- *
- * @param array $a
- * @param array $b
- * @param bool $strict
- *
- * @return bool
- */
-function array_equal(array $a, array $b, $strict=false) {
-	if (count($a) !== count($b)) {
-		return false;
-	}
-
-	sort($a);
-	sort($b);
-
-	return $strict ? $a === $b : $a == $b;
 }
 
 /*************** PAGE SORTING ******************/
@@ -1933,37 +1832,6 @@ function bcceil($number) {
 	}
 
 	return $number == '-0' ? '0' : $number;
-}
-
-function bcround($number, $precision = 0) {
-	if (strpos($number, '.') !== false) {
-		if ($number[0] != '-') {
-			$number = bcadd($number, '0.' . str_repeat('0', $precision) . '5', $precision);
-		}
-		else {
-			$number = bcsub($number, '0.' . str_repeat('0', $precision) . '5', $precision);
-		}
-	}
-	elseif ($precision != 0) {
-		$number .= '.' . str_repeat('0', $precision);
-	}
-
-	// according to bccomp(), '-0.0' does not equal '-0'. However, '0.0' and '0' are equal.
-	$zero = ($number[0] != '-' ? bccomp($number, '0') == 0 : bccomp(substr($number, 1), '0') == 0);
-
-	return $zero ? ($precision == 0 ? '0' : '0.' . str_repeat('0', $precision)) : $number;
-}
-
-/**
- * Calculates the modulus for float numbers.
- *
- * @param string $number
- * @param string $modulus
- *
- * @return string
- */
-function bcfmod($number, $modulus) {
-	return bcsub($number, bcmul($modulus, bcfloor(bcdiv($number, $modulus))));
 }
 
 /**

@@ -47,7 +47,7 @@ validate_sort_and_sortorder('host_count', ZBX_SORT_DOWN);
 
 if ((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit();
+	exit;
 }
 
 $options = array(
