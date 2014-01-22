@@ -2,6 +2,7 @@
 Changes for 2.3.0
 
 New features:
+..F....... [ZBX-7609] fixed frontend messages mute/unmute (Eduard)
 ..F....... [ZBXNEXT-1291] added clickable links for template names in the hosts, templates, hosts prototypes and discovered hosts (Oleg)
 ..F....... [ZBXNEXT-2073] improved dashboard refresh time menu (Eduard)
 ..F....... [ZBXNEXT-2073] improved dashboard favourite menu (Eduard)
@@ -781,6 +782,7 @@ New features:
 A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7609] fixed sound playing after frontend messages closing (Eduard)
 ..F....... [ZBX-7554] fixed script execution confirmation label encoding (Eduard)
 ...G...... [ZBX-6790] changed net.tcp.listen and net.udp.listen keys to read the whole /proc/net/(tcp|udp)(6) file in a single operation to avoid losing data if the file is changed between reading operations (wiper)
 .......PS. [ZBX-7587] set the correct server status (down) after ORA-01012, ORA-02396 errors (wiper)
