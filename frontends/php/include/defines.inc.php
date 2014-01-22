@@ -942,6 +942,11 @@ define('PROBE_DNS_UDP_ITEM',		'dnstest.dns.udp[{$DNSTEST.TLD}]');
 define('PROBE_DNS_UDP_ITEM_RTT',	'dnstest.dns.udp.rtt[');
 define('PROBE_RDDS_ITEM',			'dnstest.rdds[');
 
+// NS names
+define('NS_NO_RESULT',	0);
+define('NS_DOWN',		1);
+define('NS_UP',			2);
+
 // DNS TEST probe status
 define('PROBE_DOWN',	0);
 define('PROBE_UP',		1);

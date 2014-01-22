@@ -303,18 +303,18 @@ while ($item = DBfetch($items)) {
 		$nsValues = explode(',', $matches[1]);
 
 		if (!$itemValue) {
-			$nsArray[$item['hostid']][$nsValues[1]]['value'][] = null;
+			$nsArray[$item['hostid']][$nsValues[1]]['value'][] = NS_NO_RESULT;
 		}
 		elseif ($itemValue['value'] < $udpRtt * 5 && $itemValue['value'] > DNSTEST_NO_REPLY_ERROR_CODE) {
-			$nsArray[$item['hostid']][$nsValues[1]]['value'][] = true;
+			$nsArray[$item['hostid']][$nsValues[1]]['value'][] = NS_UP;
 		}
 		else {
-			$nsArray[$item['hostid']][$nsValues[1]]['value'][] = false;
+			$nsArray[$item['hostid']][$nsValues[1]]['value'][] = NS_DOWN;
 		}
 	}
 	elseif ($data['type'] == 0 && $item['key_'] == PROBE_DNS_UDP_ITEM) {
 		// avail probes
-		if ($itemValue['value'] == 1) {
+		if ($itemValue['value'] == 1 || $itemValue['value'] === null) {
 			$data['availProbes']++;
 		}
 	}
@@ -363,7 +363,7 @@ if ($data['type'] == 0) {
 		$failNs = 0;
 
 		foreach ($nss as $nsName => $nsValue) {
-			if (in_array(false, $nsValue)) {
+			if (in_array(NS_DOWN, $nsValue['value'])) {
 				$failNs++;
 			}
 		}
