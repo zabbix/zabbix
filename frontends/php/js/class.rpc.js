@@ -54,9 +54,6 @@ RPC.Base = Class.create({
 	'userParams':	{},		// user OPtions
 	'auth':			null,	// authentication hash
 	'callid':		0,		// rpc request id
-	'debug_status':	0,		// debug status: 0 - off, 1 - on, 2 - SDI;
-	'debug_info':	'',		// debug string
-	'debug_prev':	'',		// don't log repeated fnc
 
 	initialize: function(userParams) {
 		this.userParams = {
@@ -72,23 +69,6 @@ RPC.Base = Class.create({
 
 		this.callid = RPC.callid();
 		this.auth = RPC.auth();
-	},
-
-	debug: function(fnc_name, id) {
-		if (this.debug_status) {
-			var str = 'RPC.Call[' + RPC.id + '].' + fnc_name;
-			if (typeof(id) != 'undefined') {
-				str += ' :' + id;
-			}
-
-			this.debug_info += str + '\n';
-
-			if (this.debug_status == 2) {
-				SDI(str);
-			}
-
-			this.debug_prev = str;
-		}
 	}
 });
 
@@ -99,8 +79,6 @@ RPC.Call = Class.create(RPC.Base, {
 	},
 
 	call: function() {
-		this.debug('call');
-
 		var header = {
 			'Content-type': 'application/json-rpc'
 		};
@@ -129,8 +107,6 @@ RPC.Call = Class.create(RPC.Base, {
 	},
 
 	processRespond: function(resp){
-		this.debug('processRespond');
-
 		var isError = this.processError(resp);
 		if (isError) {
 			return false;
@@ -144,8 +120,6 @@ RPC.Call = Class.create(RPC.Base, {
 	},
 
 	processError: function(resp) {
-		this.debug('error');
-
 		// json request failed or server responded with incorrect json
 		if (is_null(resp) || !isset('responseJSON', resp)) {
 			throw('RPC call [' + this.userParams.method + '] request failed');
