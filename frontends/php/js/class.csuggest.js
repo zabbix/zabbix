@@ -26,7 +26,7 @@ function createSuggest(oid){
 return sid;
 }
 
-var CSuggest = Class.create(CDebug,{
+var CSuggest = Class.create({
 // PUBLIC
 'useLocal':			true,	// use cache to find suggests
 'useServer':		true,	// use server to find suggests
@@ -64,9 +64,8 @@ var CSuggest = Class.create(CDebug,{
 
 'mouseOverSuggest':	false,	// indicates if mouse is over suggests
 
-initialize: function($super, id, objid){
+initialize: function(id, objid){
 	this.id = id;
-	$super('CSuggest['+id+']');
 //--
 
 	this.cleanCache();
@@ -83,8 +82,6 @@ initialize: function($super, id, objid){
 },
 
 needleChange: function(e){
-	this.debug('needleChange');
-//--
 	this.hlIndex = 0;
 	this.suggestCount = 0;
 
@@ -112,8 +109,6 @@ needleChange: function(e){
 
 // SEARCH
 searchServer: function(needle){
-	this.debug('searchServer', needle);
-//---
 	if(needle != this.userNeedle) return true;
 
 	var rpcRequest = {
@@ -137,9 +132,6 @@ return true;
 },
 
 serverRespond: function(needle, respond){
-	this.debug('serverRespond', needle);
-//--
-
 	var params = {
 		'list': {},
 		'needle': needle
@@ -160,9 +152,6 @@ serverRespond: function(needle, respond){
 },
 
 searchClient: function(needle){
-	this.debug('searchClient', needle);
-//---
-
 	var found = false;
 	if(this.inCache(needle)){
 		this.needles[needle].list = this.cache.needle[needle];
@@ -185,8 +174,6 @@ return found;
 // CACHE
 // -----------------------------------------------------------------------
 searchCache: function(needle){
-	this.debug('searchCache', needle);
-//---
 	var fkey = needle[0];
 	if(!isset(fkey, this.cache.list)) return false;
 
@@ -209,8 +196,6 @@ return found;
 },
 
 inCache: function(needle){
-	this.debug('inCache');
-//---
 	if(this.useServer){
 		var dd = new Date();
 		if((this.cache.time + (this.cacheTimeOut*1000)) < dd.getTime()) this.cleanCache();
@@ -220,8 +205,6 @@ return isset(needle, this.cache.needle);
 },
 
 saveCache: function(needle, list){
-	this.debug('saveCache');
-//---
 	if(this.useServer){
 		var dd = new Date();
 		if((this.cache.time + (this.cacheTimeOut*1000)) < dd.getTime()) this.cleanCache();
@@ -246,9 +229,6 @@ saveCache: function(needle, list){
 },
 
 cleanCache: function(){
-	this.debug('cleanCache');
-//---
-
 	var time = new Date();
 	this.cache = {
 		'time':		time.getTime(),
@@ -269,8 +249,6 @@ onSelect: function(selection){
 // Keyboard
 // -----------------------------------------------------------------------
 searchFocus: function(e){
-	this.debug('keyPressed');
-//---
 	if(!e) e = window.event;
 
 	var elem = e.element();
@@ -285,9 +263,6 @@ searchFocus: function(e){
 },
 
 keyPressed: function(e){
-	this.debug('keyPressed');
-//---
-
 	if(!e) e = window.event;
 	var key = e.keyCode;
 
@@ -319,9 +294,6 @@ keyPressed: function(e){
 },
 
 keyUp: function(e){
-	this.debug('keyUp');
-//---
-
 	if(this.hlIndex == 0) this.hlIndex = this.suggestCount;
 	else this.hlIndex--;
 
@@ -331,8 +303,6 @@ keyUp: function(e){
 },
 
 keyDown: function(e){
-	this.debug('keyDown');
-//---
 	if(is_null(this.dom.suggest) || (this.dom.suggest.style.display == 'none')){
 		this.needleChange(e);
 		return true;
@@ -347,8 +317,6 @@ keyDown: function(e){
 },
 
 mouseOver: function(e){
-	this.debug('mouseOver');
-//---
 	this.mouseOverSuggest = true;
 
 	var row = Event.element(e).parentNode;
@@ -364,16 +332,10 @@ mouseOver: function(e){
 },
 
 mouseOut: function(e){
-	this.debug('mouseOut');
-//---
-
 	this.mouseOverSuggest = false;
 },
 
 suggestBlur: function(e){
-	this.debug('suggestBlur');
-//---
-
 	if(this.mouseOverSuggest) Event.stop(e);
 	else this.hideSuggests(e);
 },
@@ -383,24 +345,16 @@ suggestBlur: function(e){
 // -----------------------------------------------------------------------
 
 removeHighLight: function(){
-	this.debug('rmvHighLight');
-//---
-
 	$$('tr.highlight').each( function(hlRow){hlRow.className = '';});
 },
 
 
 highLightSuggest: function(){
-	this.debug('highLightSuggest');
-//---
-
 	var row = $('line_'+this.hlIndex);
 	if(!is_null(row)) row.className = 'highlight';
 },
 
 setNeedleByHighLight: function(){
-	this.debug('setNeedleByHighLight');
-//---
 	if(this.hlIndex == 0)
 		this.dom.input.value = this.userNeedle;
 	else
@@ -408,13 +362,8 @@ setNeedleByHighLight: function(){
 },
 
 selectSuggest: function(e){
-	this.debug('selectSuggest');
-//---
-
 	this.setNeedleByHighLight(e);
 	this.hideSuggests();
-
-//SDJ(this.dom.input);
 
 	if(this.onSelect(this.dom.input.value) && !GK) this.dom.input.form.submit();
 },
@@ -425,9 +374,6 @@ selectSuggest: function(e){
 // -----------------------------------------------------------------------
 
 showSuggests: function(){
-	this.debug('showSuggests');
-//---
-
 	if(is_null(this.dom.suggest)){
 		this.dom.suggest = document.createElement('div');
 		this.dom.suggest = $(this.dom.suggest);
@@ -445,18 +391,12 @@ showSuggests: function(){
 },
 
 hideSuggests: function(){
-	this.debug('hideSuggest');
-//--
-
 	if(!is_null(this.dom.suggest)){
 		this.dom.suggest.style.display = 'none';
 	}
 },
 
 positionSuggests: function(){
-	this.debug('positionSuggests');
-//---
-
 	if(is_null(this.dom.suggest)) return true;
 
 	var pos = jQuery(this.dom.input).offset();
@@ -467,8 +407,6 @@ positionSuggests: function(){
 },
 
 newSugTab: function(needle){
-	this.debug('newSugTab', needle);
-//---
 	var list = this.needles[needle].list;
 
 	var sugTab = document.createElement('table');
