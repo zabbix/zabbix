@@ -665,7 +665,7 @@ sub create_items_dns {
 
     create_item($options);
 
-    $options = { 'description' => '5.2.3 - Less than {$DNSTEST.DNS.AVAIL.MINNS} NS servers have answered on {HOST.NAME} ('.$proto_uc.')',
+    $options = { 'description' => '5.2.3 - Less than {$DNSTEST.DNS.AVAIL.MINNS} NS servers have answered succesfully on {HOST.NAME} ('.$proto_uc.')',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}<{$DNSTEST.DNS.AVAIL.MINNS}',
 			'priority' => '4',
                 };
