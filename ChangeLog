@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-7686] fixed UTF-8 strings not being fetched fully from Oracle (asaveljevs)
 ..F....... [ZBX-6721] fixed LDAP authentication (Eduard)
 ..F....... [ZBX-7609] fixed sound playing after frontend messages closing (Eduard)
 ..F....... [ZBX-7554] fixed script execution confirmation label encoding (Eduard)
