@@ -44,9 +44,18 @@
 #define ZBX_EC_RDDS_ERES		-205	/* cannot resolve a Whois server name */
 #define ZBX_EC_RDDS80_NOHTTPCODE	-206	/* no HTTP response code in response from RDDS80 server */
 #define ZBX_EC_RDDS80_EHTTPCODE		-207	/* invalid HTTP response code in response from RDDS80 server */
-#define ZBX_EC_EPP_NOREPLY		-200	/* no reply from EPP server */
-#define ZBX_EC_EPP_EREPLY		-201	/* invalid reply from EPP server */
-#define ZBX_EC_EPP_EREQUEST		-202	/* cannot send request to EPP server */
+#define ZBX_EC_EPP_CONNECT		-200	/* cannot connect to EPP server */
+#define ZBX_EC_EPP_RECVFIRST		-201	/* cannot receive first message */
+#define ZBX_EC_EPP_INVALFIRST		-202	/* first message is invalid */
+#define ZBX_EC_EPP_SENDLOGIN		-203	/* cannot send LOGIN command */
+#define ZBX_EC_EPP_RECVLOGIN		-204	/* cannot receive LOGIN command */
+#define ZBX_EC_EPP_INVALLOGIN		-205	/* invalid reply to LOGIN command */
+#define ZBX_EC_EPP_SENDUPDATE		-206	/* cannot send UPDATE command */
+#define ZBX_EC_EPP_RECVUPDATE		-207	/* cannot receive UPDATE command */
+#define ZBX_EC_EPP_INVALUPDATE		-208	/* invalid reply to UPDATE command */
+#define ZBX_EC_EPP_SENDINFO		-209	/* cannot send INFO command */
+#define ZBX_EC_EPP_RECVINFO		-210	/* cannot receive INFO command */
+#define ZBX_EC_EPP_INVALINFO		-211	/* invalid reply to INFO command */
 #define ZBX_EC_PROBE_ONLINE		1	/* probe in automatic online mode */
 #define ZBX_EC_PROBE_OFFLINE		0	/* probe in automatic offline mode */
 #define ZBX_EC_PROBE_UNSUPPORTED	2	/* internal use only */
@@ -65,6 +74,9 @@
 #define ZBX_MACRO_RDDS_NS_STRING	"{$DNSTEST.RDDS.NS.STRING}"
 #define ZBX_MACRO_RDDS_MAXREDIRS	"{$DNSTEST.RDDS.MAXREDIRS}"
 #define ZBX_MACRO_RDDS_ENABLED		"{$DNSTEST.RDDS.ENABLED}"
+#define ZBX_MACRO_EPP_LOGIN_RTT		"{$DNSTEST.EPP.LOGIN.RTT}"
+#define ZBX_MACRO_EPP_UPDATE_RTT	"{$DNSTEST.EPP.UPDATE.RTT}"
+#define ZBX_MACRO_EPP_INFO_RTT		"{$DNSTEST.EPP.INFO.RTT}"
 #define ZBX_MACRO_IP4_ENABLED		"{$DNSTEST.IP4.ENABLED}"
 #define ZBX_MACRO_IP6_ENABLED		"{$DNSTEST.IP6.ENABLED}"
 #define ZBX_MACRO_IP4_MIN_SERVERS	"{$DNSTEST.IP4.MIN.SERVERS}"

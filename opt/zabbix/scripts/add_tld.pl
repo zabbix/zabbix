@@ -98,7 +98,7 @@ my $ns_servers;
 use constant value_mappings => {'dnstest_dns' => 13,
 				'dnstest_probe' => 14,
 				'dnstest_rdds_rttudp' => 15,
-				'dnstest_slv' => 16,
+				'dnstest_avail' => 16,
 				'dnstest_rdds_avail' => 18,
                                 'dnstest_epp' => 19};
 
@@ -133,6 +133,11 @@ create_macro('{$DNSTEST.RDDS.UPDATE.TIME}', 3600, undef);
 create_macro('{$DNSTEST.RDDS.PROBE.ONLINE}', 10, undef);
 create_macro('{$DNSTEST.RDDS.ROLLWEEK.SLA}', 48, undef);
 create_macro('{$DNSTEST.RDDS.MAXREDIRS}', 10, undef);
+
+create_macro('{$DNSTEST.EPP.DELAY}', 300, undef);
+create_macro('{$DNSTEST.EPP.LOGIN.RTT}', 4000, undef);
+create_macro('{$DNSTEST.EPP.UPDATE.RTT}', 4000, undef);
+create_macro('{$DNSTEST.EPP.INFO.RTT}', 2000, undef);
 
 create_macro('{$DNSTEST.PROBE.ONLINE.DELAY}', 180, undef);
 
@@ -175,6 +180,12 @@ unless (($result = $zabbix->get('usermacro', {'globalmacro' => 1, output => 'ext
     pfail('cannot get macro ', $m);
 }
 my $cfg_rdds_delay = $result->{'value'};
+$m = '{$DNSTEST.EPP.DELAY}';
+unless (($result = $zabbix->get('usermacro', {'globalmacro' => 1, output => 'extend', 'filter' => {'macro' => $m}}))
+	         and defined $result->{'value'}) {
+        pfail('cannot get macro ', $m);
+    }
+my $cfg_epp_delay = $result->{'value'};
 
 my $dnstest_groupid = create_group($dnstest_group);
 
@@ -542,7 +553,7 @@ sub create_slv_item {
                                               'hostid' => $hostid,
                                               'type' => 2, 'value_type' => 3,
 					      'applications' => $applicationids,
-					      'valuemapid' => value_mappings->{'dnstest_slv'}};
+					      'valuemapid' => value_mappings->{'dnstest_avail'}};
     }
     elsif ($value_type == $VALUE_TYPE_PERC) {
 	$options = {'name' => $name,
@@ -882,9 +893,51 @@ sub create_items_epp {
 		'key_'=> $item_key,
 		'hostid' => $templateid,
 		'applications' => [$applicationid],
-		'type' => 3, 'value_type' => 0,
-		'valuemapid' => value_mappings->{'dnstest_epp'},
-		'status' => 0};
+		'type' => 3, 'value_type' => 3,
+		'delay' => $cfg_epp_delay, 'valuemapid' => value_mappings->{'dnstest_avail'}};
+
+    create_item($options);
+
+    $item_key = 'dnstest.epp.ip[{$DNSTEST.TLD}]';
+
+    $options = {'name' => 'EPP IP of $1',
+		'key_'=> $item_key,
+		'hostid' => $templateid,
+		'applications' => [$applicationid],
+		'type' => 2, 'value_type' => 1};
+
+    create_item($options);
+
+    $item_key = 'dnstest.epp.rtt[{$DNSTEST.TLD},login]';
+
+    $options = {'name' => 'EPP $2 command RTT of $1',
+		'key_'=> $item_key,
+		'hostid' => $templateid,
+		'applications' => [$applicationid],
+		'type' => 2, 'value_type' => 0,
+		'valuemapid' => value_mappings->{'dnstest_epp'}};
+
+    create_item($options);
+
+    $item_key = 'dnstest.epp.rtt[{$DNSTEST.TLD},update]';
+
+    $options = {'name' => 'EPP $2 command RTT of $1',
+		'key_'=> $item_key,
+		'hostid' => $templateid,
+		'applications' => [$applicationid],
+		'type' => 2, 'value_type' => 0,
+		'valuemapid' => value_mappings->{'dnstest_epp'}};
+
+    create_item($options);
+
+    $item_key = 'dnstest.epp.rtt[{$DNSTEST.TLD},info]';
+
+    $options = {'name' => 'EPP $2 command RTT of $1',
+		'key_'=> $item_key,
+		'hostid' => $templateid,
+		'applications' => [$applicationid],
+		'type' => 2, 'value_type' => 0,
+		'valuemapid' => value_mappings->{'dnstest_epp'}};
 
     create_item($options);
 }
