@@ -222,12 +222,7 @@ foreach ($this->data['tests'] as $test) {
 		$startEndIncident = SPACE;
 	}
 
-	if ($this->data['type'] == 2) {
-		$value = ($test['value'] != 2) ? _('Down') : _('Up');
-	}
-	else {
-		$value = $test['value'] ? _('Up') : _('Down');
-	}
+	$value = $test['value'] ? _('Up') : _('Down');
 
 	$row = array(
 		$startEndIncident,
