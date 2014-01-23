@@ -2252,6 +2252,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.20rc1
 
+.......PS. [ZBX-7686] fixed UTF-8 strings not being fetched fully from Oracle (asaveljevs)
 ..F....... [ZBX-7643] fixed graph copying (Eduard)
 A......... [ZBX-3702] fixed drule.get selectDChecks parameter not returning any results; thanks to Sergey Sireskin (Pavels)
 ...G...PS. [ZBX-4243] fixed Zabbix syslog application names (RFC 5424 APP-NAME) (Andris)
