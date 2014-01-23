@@ -294,6 +294,8 @@ var CMessageList = Class.create(CDebug, {
 			}
 			count++;
 		}
+
+		this.stopSound();
 	},
 
 	timeoutMessages: function() {
