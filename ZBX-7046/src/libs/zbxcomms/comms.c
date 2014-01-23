@@ -1081,12 +1081,9 @@ char	*get_ip_by_socket(zbx_sock_t *s)
 	ZBX_SOCKADDR	sa;
 	ZBX_SOCKLEN_T	sz = sizeof(sa);
 	static char	host[64];
-#if defined(HAVE_IPV6)
-	static char	serv[NI_MAXSERV];	/* required by getnameinfo(3); refer to manpage for details. unusued. */
-#endif
 	char		*error_message = NULL;
 
-	if (ZBX_TCP_ERROR == getpeername(s->socket, (struct sockaddr*)&sa, &sz))
+	if (ZBX_TCP_ERROR == getpeername(s->socket, (struct sockaddr*)&sa, sizeof(struct sockaddr)))
 	{
 		error_message = strerror_from_system(zbx_sock_last_error());
 		zbx_set_tcp_strerror("connection rejected, getpeername() failed: %s", error_message);
@@ -1094,7 +1091,7 @@ char	*get_ip_by_socket(zbx_sock_t *s)
 	}
 
 #if defined(HAVE_IPV6)
-	if (0 != getnameinfo((struct sockaddr*)&sa, sizeof(sa), host, sizeof(host), serv, NI_MAXSERV, NI_NUMERICHOST))
+	if (0 != getnameinfo((struct sockaddr*)&sa, sizeof(struct sockaddr), host, sizeof(host), NULL, 0, NI_NUMERICHOST))
 	{
 		error_message = strerror_from_system(zbx_sock_last_error());
 		zbx_set_tcp_strerror("connection rejected, getnameinfo() failed: %s", error_message);
