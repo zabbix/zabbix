@@ -594,10 +594,13 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
  *                                                                            *
  * Purpose: calculate nextcheck timestamp for item                            *
  *                                                                            *
- * Parameters: delay - [IN] default delay value, can be overridden            *
+ * Parameters: seed      - [IN] the seed value applied to delay to spread     *
+ *                              item checks over the delay period             *
+ *             item_type - [IN] the item type                                 *
+ *             delay     - [IN] default delay value, can be overridden        *
  *             flex_intervals - [IN] descriptions of flexible intervals       *
  *                                   in the form [dd/d1-d2,hh:mm-hh:mm;]      *
- *             now - current timestamp                                        *
+ *             now       - [IN] current timestamp                             *
  *                                                                            *
  * Return value: nextcheck value                                              *
  *                                                                            *
@@ -611,8 +614,7 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
  *           !!! Don't forget to sync code with PHP !!!                       *
  *                                                                            *
  ******************************************************************************/
-int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int item_type,
-		int delay, const char *flex_intervals, time_t now)
+int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int delay, const char *flex_intervals, time_t now)
 {
 	int	nextcheck = 0;
 
@@ -626,9 +628,8 @@ int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int 
 	}
 	else
 	{
-		int		current_delay = 0, try = 0;
-		time_t		next_interval, t, tmax;
-		zbx_uint64_t	shift;
+		int	current_delay = 0, try = 0;
+		time_t	next_interval, t, tmax;
 
 		/* Try to find the nearest 'nextcheck' value with condition */
 		/* 'now' < 'nextcheck' < 'now' + SEC_PER_YEAR. If it is not */
@@ -636,8 +637,6 @@ int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int 
 
 		t = now;
 		tmax = now + SEC_PER_YEAR;
-
-		shift = (ITEM_TYPE_JMX == item_type ? interfaceid : itemid);
 
 		while (t < tmax)
 		{
@@ -647,7 +646,7 @@ int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int 
 			if (0 != current_delay)
 			{
 				nextcheck = current_delay * (int)(t / (time_t)current_delay) +
-						(int)(shift % (zbx_uint64_t)current_delay);
+						(int)(seed % (zbx_uint64_t)current_delay);
 
 				if (0 == try)
 				{

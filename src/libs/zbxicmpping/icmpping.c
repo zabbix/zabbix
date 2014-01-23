@@ -235,7 +235,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 	for (i = 0; i < hosts_count; i++)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s", hosts[i].addr);
+		zabbix_log(LOG_LEVEL_DEBUG, "    %s", hosts[i].addr);
 		fprintf(f, "%s\n", hosts[i].addr);
 	}
 
