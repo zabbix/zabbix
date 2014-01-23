@@ -35,6 +35,13 @@ static int	DBpatch_2030000(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_2030001(void)
+{
+	const ZBX_FIELD	field = {"every", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("timeperiods", &field);
+}
+
 #endif
 
 DBPATCH_START(2030)
@@ -42,5 +49,6 @@ DBPATCH_START(2030)
 /* version, duplicates flag, mandatory flag */
 
 DBPATCH_ADD(2030000, 0, 1)
+DBPATCH_ADD(2030001, 0, 1)
 
 DBPATCH_END()
