@@ -67,8 +67,8 @@ msgstr[1] "Registrati %1$s tentativi di accesso fallito. L'ultimo tentativo fall
 #, php-format
 msgid "%2$d of %1$d issue is shown"
 msgid_plural "%2$d of %1$d issues are shown"
-msgstr[0] "%d dispositivo"
-msgstr[1] "%d dispositivi"
+msgstr[0] ""
+msgstr[1] ""
 
 #: include/views/monitoring.discovery.php:133
 #, php-format

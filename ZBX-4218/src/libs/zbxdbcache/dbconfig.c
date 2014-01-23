@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -3462,6 +3462,8 @@ void	DCconfig_lock_triggers_by_itemids(zbx_uint64_t *itemids, int itemids_num, z
 	const ZBX_DC_ITEM	*dc_item;
 	ZBX_DC_TRIGGER		*dc_trigger;
 
+	triggerids->values_num = 0;
+
 	LOCK_CACHE;
 
 	for (i = 0; i < itemids_num; i++)
@@ -3629,21 +3631,20 @@ void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_
 	const ZBX_DC_HOST	*dc_host;
 	DC_TRIGGER		*trigger;
 	const char		*p, *q;
-	zbx_uint64_t		last_triggerid;
 
 	LOCK_CACHE;
 
 	if (0 == trigger_order->values_num)
 	{
-		last_triggerid = 1;
-		hi = zbx_vector_ptr_nearestindex(&config->time_triggers, &last_triggerid,
-				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
 		*trigger_info = zbx_malloc(*trigger_info, max_triggers * sizeof(DC_TRIGGER));
 		zbx_vector_ptr_reserve(trigger_order, max_triggers);
+
+		hi = 0;
 	}
 	else
 	{
+		zbx_uint64_t	last_triggerid;
+
 		trigger = (DC_TRIGGER *)trigger_order->values[0];
 		lo = zbx_vector_ptr_nearestindex(&config->time_triggers, &trigger->triggerid,
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
