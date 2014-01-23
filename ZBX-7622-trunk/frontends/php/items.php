@@ -820,6 +820,7 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 	$data['hosts'] = API::Host()->get(array(
 		'output' => array('hostid'),
 		'itemids' => $data['itemids'],
+		'selectItems' => array('itemid'),
 		'selectInterfaces' => API_OUTPUT_EXTEND
 	));
 	$data['is_multiple_hosts'] = count($data['hosts']) > 1;

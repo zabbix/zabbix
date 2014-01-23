@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 /**
  * A class for validating LDAP credentials.
  */
@@ -49,5 +50,4 @@ class CLdapAuthValidator extends CValidator {
 
 		return $ldap->checkPass($value['user'], $value['password']);
 	}
-
 }

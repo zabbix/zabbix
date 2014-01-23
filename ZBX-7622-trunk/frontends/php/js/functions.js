@@ -493,13 +493,13 @@ function testUserSound(idx) {
 	var repeat = $('messages_sounds.repeat').options[$('messages_sounds.repeat').selectedIndex].value;
 
 	if (repeat == 1) {
-		AudioList.play(sound);
+		AudioControl.playOnce(sound);
 	}
 	else if (repeat > 1) {
-		AudioList.loop(sound, {'seconds': repeat});
+		AudioControl.playLoop(sound, repeat);
 	}
 	else {
-		AudioList.loop(sound, {'seconds': $('messages_timeout').value});
+		AudioControl.playLoop(sound, $('messages_timeout').value);
 	}
 }
 
