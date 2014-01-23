@@ -1094,6 +1094,9 @@ error:
 				/* retrieve the column width in characters */
 				err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width, (ub4 *)0,
 						(ub4)OCI_ATTR_CHAR_SIZE, (OCIError *)oracle.errhp);
+
+				/* adjust for UTF-8 */
+				col_width *= 4;
 			}
 			else
 			{
