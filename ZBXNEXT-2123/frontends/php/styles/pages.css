@@ -99,6 +99,7 @@
 
 /* trigger monitoring */
 .trigger-mon #inventory-filter td { padding-left: 0px; padding-right: 3px; height: 21px; }
+.trigger-mon .filter-button { height: 16px; }
 
 /* regexp test result table, based on .tableinfo */
 #testResultTable tr td:first-child { width: auto; }

@@ -57,28 +57,11 @@ class Curl {
 		}
 	}
 
+	/**
+	 * Creates a HTTP query string from the arguments set in self::$arguments and saves it in self::$query.
+	 */
 	public function formatQuery() {
-		$query = array();
-
-		foreach ($this->arguments as $key => $value) {
-			if (is_null($value)) {
-				continue;
-			}
-
-			if (is_array($value)) {
-				foreach ($value as $vkey => $vvalue) {
-					if (is_array($vvalue)) {
-						continue;
-					}
-
-					$query[] = $key.'['.$vkey.']='.rawurlencode($vvalue);
-				}
-			}
-			else {
-				$query[] = $key.'='.rawurlencode($value);
-			}
-		}
-		$this->query = implode('&', $query);
+		$this->query = http_build_query($this->arguments);
 	}
 
 	public function formatGetArguments() {
