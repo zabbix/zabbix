@@ -62,7 +62,7 @@ class CItemKey {
 			return ($pos == 0) ? _('key is empty') : _('unexpected end of key');
 		}
 
-		for ($i = $pos, $chunk = '', $maxChunkSize = 5; isset($key[$i]); $i++) {
+		for ($i = $pos, $chunk = '', $maxChunkSize = 50; isset($key[$i]); $i++) {
 			if (0x80 != (0xc0 & ord($key[$i])) && $maxChunkSize-- == 0) {
 				break;
 			}
