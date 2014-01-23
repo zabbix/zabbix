@@ -1379,7 +1379,7 @@ static int	DBget_drule_value_by_event(const DB_EVENT *event, char **replace_to, 
  ******************************************************************************/
 static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int request, int clock, int ns)
 {
-	const char	*__function_name = "DBget_history_log_value";
+	const char		*__function_name = "DBget_history_log_value";
 
 	DC_ITEM			item;
 	int			ret = FAIL, found, errcode = FAIL;
@@ -1430,7 +1430,6 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 			*replace_to = zbx_dsprintf(*replace_to, "%d", value.value.log->logeventid);
 			break;
 	}
-
 success:
 	ret = SUCCEED;
 clean:
