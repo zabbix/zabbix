@@ -18,6 +18,7 @@
 **/
 
 #include "common.h"
+#include "log.h"
 
 #if defined(_WINDOWS) && defined(_UNICODE)
 int	__zbx_stat(const char *path, struct stat *buf)
@@ -250,10 +251,10 @@ static void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char 
 	}
 }
 
-int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, unsigned char *skip_old_data, int *big_rec, const char *encoding,
-		ZBX_REGEXP *regexps, int regexps_num, const char *pattern, int *p_count, int *s_count,
-		int (*process_value)(const char *, unsigned short, const char *, const char *, const char *,
-		zbx_uint64_t *, int *, unsigned long *, const char *, unsigned short *, unsigned long *,
+int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data, int *big_rec,
+		const char *encoding, ZBX_REGEXP *regexps, int regexps_num, const char *pattern, int *p_count,
+		int *s_count, int (*process_value)(const char *, unsigned short, const char *, const char *,
+		const char *, zbx_uint64_t *, int *, unsigned long *, const char *, unsigned short *, unsigned long *,
 		unsigned char), const char *server, unsigned short port, const char *hostname, const char *key)
 {
 	int		ret = FAIL, nbytes;
@@ -333,6 +334,11 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, unsigned char *skip_old_data, i
 					else
 						value = buf;
 
+					zabbix_log(LOG_LEVEL_WARNING, "Logfile contains a large record: \"%.64s\""
+							" (showing only the first 64 characters). Only the first 64 kB"
+							" will be analyzed, the rest will be ignored while Zabbix agent"
+							" is running", value);
+
 					lastlogsize1 = (size_t)offset + (size_t)nbytes;
 					send_err = SUCCEED;
 
@@ -340,7 +346,7 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, unsigned char *skip_old_data, i
 							ZBX_CASE_SENSITIVE))
 					{
 						send_err = process_value(server, port, hostname, key, value,
-								&lastlogsize1, NULL, NULL, NULL, NULL, NULL, 1);
+								&lastlogsize1, mtime, NULL, NULL, NULL, NULL, 1);
 						if (SUCCEED == send_err)
 							(*s_count)--;
 					}
@@ -391,7 +397,7 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, unsigned char *skip_old_data, i
 							ZBX_CASE_SENSITIVE))
 					{
 						send_err = process_value(server, port, hostname, key, value,
-								&lastlogsize1, NULL, NULL, NULL, NULL, NULL, 1);
+								&lastlogsize1, mtime, NULL, NULL, NULL, NULL, 1);
 						if (SUCCEED == send_err)
 							(*s_count)--;
 					}
