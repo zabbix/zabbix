@@ -205,7 +205,7 @@ elseif (isset($_REQUEST['save'])) {
 		}
 
 		if (isset($_REQUEST['httptestid'])) {
-			// unset fields tht did not change
+			// unset fields that did not change
 			$dbHttpTest = API::HttpTest()->get(array(
 				'httptestids' => $_REQUEST['httptestid'],
 				'output' => API_OUTPUT_EXTEND,

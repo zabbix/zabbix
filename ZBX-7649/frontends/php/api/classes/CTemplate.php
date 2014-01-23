@@ -164,7 +164,7 @@ class CTemplate extends CHostGeneral {
 		if (!is_null($options['parentTemplateids'])) {
 			zbx_value2array($options['parentTemplateids']);
 
-			$sqlParts['select']['parentTemplateid'] = 'ht.templateid as parentTemplateid';
+			$sqlParts['select']['parent_templateid'] = 'ht.templateid as parent_templateid';
 			$sqlParts['from']['hosts_templates'] = 'hosts_templates ht';
 			$sqlParts['where'][] = dbConditionInt('ht.templateid', $options['parentTemplateids']);
 			$sqlParts['where']['hht'] = 'h.hostid=ht.hostid';
@@ -345,12 +345,12 @@ class CTemplate extends CHostGeneral {
 					unset($template['linked_hostid']);
 				}
 				// parentTemplateids
-				if (isset($template['parentTemplateid']) && is_null($options['selectParentTemplates'])) {
+				if (isset($template['parent_templateid']) && is_null($options['selectParentTemplates'])) {
 					if (!isset($result[$template['templateid']]['parentTemplates']))
 						$result[$template['templateid']]['parentTemplates'] = array();
 
-					$result[$template['templateid']]['parentTemplates'][] = array('templateid' => $template['parentTemplateid']);
-					unset($template['parentTemplateid']);
+					$result[$template['templateid']]['parentTemplates'][] = array('templateid' => $template['parent_templateid']);
+					unset($template['parent_templateid']);
 				}
 
 				// itemids

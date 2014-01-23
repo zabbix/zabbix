@@ -954,6 +954,7 @@ int 	parse_command(const char *command, char *cmd, size_t cmd_max_len, char *par
 int	is_ip6(const char *ip);
 #endif
 int	is_ip4(const char *ip);
+int	is_ip(const char *ip);
 
 void	zbx_on_exit(); /* calls exit() at the end! */
 
