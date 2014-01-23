@@ -138,6 +138,7 @@ create_macro('{$DNSTEST.EPP.DELAY}', 300, undef);
 create_macro('{$DNSTEST.EPP.LOGIN.RTT}', 4000, undef);
 create_macro('{$DNSTEST.EPP.UPDATE.RTT}', 4000, undef);
 create_macro('{$DNSTEST.EPP.INFO.RTT}', 2000, undef);
+create_macro('{$DNSTEST.EPP.PROBE.ONLINE}', 5, undef);
 
 create_macro('{$DNSTEST.PROBE.ONLINE.DELAY}', 180, undef);
 

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# RDDS availability
+# EPP availability
 
 use lib '/opt/zabbix/scripts';
 
@@ -26,7 +26,7 @@ exit_if_lastclock($tld, $cfg_key_out, $value_ts, $interval);
 
 info("from:$from till:$till value_ts:$value_ts");
 
-my $cfg_minonline = zapi_get_macro_rdds_probe_online();
+my $cfg_minonline = zapi_get_macro_epp_probe_online();
 
 db_connect();
 

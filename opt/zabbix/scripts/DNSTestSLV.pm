@@ -121,6 +121,11 @@ sub zapi_get_macro_rdds_update_time
     return get_macro('{$DNSTEST.RDDS.UPDATE.TIME}');
 }
 
+sub zapi_get_macro_epp_probe_online
+{
+    return get_macro('{$DNSTEST.EPP.PROBE.ONLINE}');
+}
+
 sub zapi_get_macro_epp_delay
 {
     return get_macro('{$DNSTEST.EPP.DELAY}');
