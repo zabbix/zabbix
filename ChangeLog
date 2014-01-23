@@ -2,6 +2,7 @@
 Changes for 2.3.0
 
 New features:
+..F....... [ZBX-7609] fixed frontend messages mute/unmute (Eduard)
 ..F....... [ZBXNEXT-1291] added clickable links for template names in the hosts, templates, hosts prototypes and discovered hosts (Oleg)
 ..F....... [ZBXNEXT-2073] improved dashboard refresh time menu (Eduard)
 ..F....... [ZBXNEXT-2073] improved dashboard favourite menu (Eduard)
@@ -15,6 +16,7 @@ New features:
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+A......... [ZBX-7647] fixed trigger.get trying to sort by "lastchange" DESC even if a different sort field or sort order is given (Pavels)
 ....I..... [ZBX-7515] added missing delayed loading option of wevtapi.dll for x64 systems (igors)
 ...G...... [ZBX-7481] added checking for OpenBSD version to avoid compilation error on OpenBSD v5.4 and newer due to removed swapins/swapouts uvmexp fields (igors)
 ...G...PS. [ZBX-7618] removed partial matching for long format command line options (Juris)
@@ -33,6 +35,10 @@ New features:
 A.F....... [ZBX-1357] updated American English, French, Hungarian, Italian, Japanese, Russian, Slovak and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-7661] fixed configuration parser to allow 2G cache values (it was restricted to 2G-1 before) (wiper)
+..F....... [ZBX-7639] fixed error when trying to replace host groups and add a new host group at the same time in the host mass update form (Pavels)
+...G...PS. [ZBX-7458] added source IP validation on daemon startup (Juris)
+A......... [ZBX-7660] fixed host.get returning the "templates" property even if the "templateids" parameter is not used (Pavels)
 ...G...... [ZBX-6790] changed net.tcp.listen and net.udp.listen keys to read the whole /proc/net/(tcp|udp)(6) file in a single operation to avoid losing data if the file is changed between reading operations (wiper)
 .......PS. [ZBX-7587] set the correct server status (down) after ORA-01012, ORA-02396 errors (wiper)
 ....I..... [ZBX-7515] added missing delayed loading option of wevtapi.dll for x64 systems (igors)
@@ -777,6 +783,9 @@ New features:
 A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-6721] fixed LDAP authentication (Eduard)
+..F....... [ZBX-7609] fixed sound playing after frontend messages closing (Eduard)
+..F....... [ZBX-7554] fixed script execution confirmation label encoding (Eduard)
 ...G...... [ZBX-6790] changed net.tcp.listen and net.udp.listen keys to read the whole /proc/net/(tcp|udp)(6) file in a single operation to avoid losing data if the file is changed between reading operations (wiper)
 .......PS. [ZBX-7587] set the correct server status (down) after ORA-01012, ORA-02396 errors (wiper)
 ...G...... [ZBX-7481] added checking for OpenBSD version to avoid compilation error on OpenBSD v5.4 and newer due to removed swapins/swapouts uvmexp fields (igors)
@@ -2239,6 +2248,8 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.20rc1
 
+..F....... [ZBX-7643] fixed graph copying (Eduard)
+A......... [ZBX-3702] fixed drule.get selectDChecks parameter not returning any results; thanks to Sergey Sireskin (Pavels)
 ...G...PS. [ZBX-4243] fixed Zabbix syslog application names (RFC 5424 APP-NAME) (Andris)
 
 Changes for 1.8.19
