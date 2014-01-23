@@ -999,6 +999,11 @@ int	__zbx_stat(const char *path, struct stat *buf);
 int	__zbx_open(const char *pathname, int flags);
 #endif	/* _WINDOWS && _UNICODE */
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
+int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, unsigned char *skip_old_data, int *big_rec, const char *encoding,
+		ZBX_REGEXP *regexps, int regexps_num, const char *pattern, int *p_count, int *s_count,
+		int (*process_value)(const char *, unsigned short, const char *, const char *, const char *,
+		zbx_uint64_t *, int *, unsigned long *, const char *, unsigned short *, unsigned long *,
+		unsigned char), const char *server, unsigned short port, const char *hostname, const char *key);
 int	zbx_is_regular_file(const char *path);
 
 int	MAIN_ZABBIX_ENTRY();
