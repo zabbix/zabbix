@@ -7,8 +7,8 @@ use lib '/opt/zabbix/scripts';
 use DNSTest;
 use DNSTestSLV;
 
-my $cfg_key_in = 'dnstest.rdds[{$DNSTEST.TLD}';
-my $cfg_key_out = 'dnstest.slv.rdds.avail';
+my $cfg_key_in = 'dnstest.epp[{$DNSTEST.TLD}';
+my $cfg_key_out = 'dnstest.slv.epp.avail';
 
 parse_opts();
 exit_if_running();
@@ -18,7 +18,7 @@ set_slv_config($config);
 
 zapi_connect();
 
-my $interval = zapi_get_macro_rdds_delay();
+my $interval = zapi_get_macro_epp_delay();
 
 my ($from, $till, $value_ts) = get_interval_bounds($interval);
 
@@ -72,7 +72,7 @@ foreach my $itemid (keys(%$values_ref))
 }
 
 my $test_result = DOWN;
-$test_result = UP if ($success_probes * 100 / scalar(@$items_ref) > 49);    
+$test_result = UP if ($success_probes * 100 / scalar(@$items_ref) > 49);
 
 info($test_result == UP ? "success" : "fail");
 send_value($tld, $cfg_key_out, $value_ts, $test_result);
@@ -89,7 +89,7 @@ sub check_item_values
 
     foreach (@$values_ref)
     {
-	return SUCCESS if ($_ == RDDS_UP);
+	return SUCCESS if ($_ == UP);
     }
 
     return FAIL;

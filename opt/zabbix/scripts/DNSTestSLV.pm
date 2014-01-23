@@ -15,7 +15,7 @@ use constant UP => 1;
 use constant DOWN => 0;
 
 use constant MAX_SERVICE_ERROR => -200; # -200, -201 ...
-use constant RDDS_SUCCESS => 2; # results of input items: 0 - RDDS down, 1 - only RDDS43 up, 2 - both RDDS43 and RDDS80 up
+use constant RDDS_UP => 2; # results of input items: 0 - RDDS down, 1 - only RDDS43 up, 2 - both RDDS43 and RDDS80 up
 
 use constant TRIGGER_SEVERITY_NOT_CLASSIFIED => 0;
 use constant TRIGGER_VALUE_CHANGED_YES => 1;
@@ -27,14 +27,15 @@ our ($zabbix, $result, $dbh, $tld);
 our %OPTS; # command-line options
 
 our @EXPORT = qw($zabbix $result $dbh $tld %OPTS
-		SUCCESS FAIL UP DOWN RDDS_SUCCESS
+		SUCCESS FAIL UP DOWN RDDS_UP
 		zapi_connect zapi_get_macro_minns zapi_get_macro_dns_probe_online
 		zapi_get_macro_rdds_probe_online zapi_get_macro_dns_rollweek_sla zapi_get_macro_rdds_rollweek_sla
 		zapi_get_macro_dns_udp_rtt zapi_get_macro_dns_tcp_rtt zapi_get_macro_rdds_rtt
-		rtt zapi_get_macro_dns_udp_delay zapi_get_macro_dns_tcp_delay zapi_get_macro_rdds_delay
+		zapi_get_macro_dns_udp_delay zapi_get_macro_dns_tcp_delay zapi_get_macro_rdds_delay
+		zapi_get_macro_epp_delay
 		zapi_get_macro_dns_update_time zapi_get_macro_rdds_update_time zapi_get_items_by_hostids
 		db_connect db_select
-		set_slv_config get_minute_bounds get_rdds_bounds get_rollweek_bounds get_month_bounds
+		set_slv_config get_minute_bounds get_interval_bounds get_rollweek_bounds get_month_bounds
 		minutes_last_month get_probes get_online_probes probes2tldhostids send_value get_ns_from_key
 		is_service_error process_slv_ns_monthly process_slv_ns_avail process_slv_monthly get_item_values
 		exit_if_lastclock get_down_count
@@ -118,6 +119,11 @@ sub zapi_get_macro_dns_update_time
 sub zapi_get_macro_rdds_update_time
 {
     return get_macro('{$DNSTEST.RDDS.UPDATE.TIME}');
+}
+
+sub zapi_get_macro_epp_delay
+{
+    return get_macro('{$DNSTEST.EPP.DELAY}');
 }
 
 sub zapi_get_items_by_hostids
@@ -205,7 +211,7 @@ sub get_minute_bounds
 }
 
 # Get bounds of the previous rdds test period shifted $avail_shift_back minutes back.
-sub get_rdds_bounds
+sub get_interval_bounds
 {
     my $interval = shift;
 

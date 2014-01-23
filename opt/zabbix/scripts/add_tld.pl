@@ -1401,6 +1401,10 @@ sub create_slv_items {
 	create_slv_item('% of successful monthly RDDS80 resolution RTT', 'dnstest.slv.rdds.80.rtt.month', $hostid, $VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
 	create_slv_item('% of successful monthly RDDS update time', 'dnstest.slv.rdds.upd.month', $hostid, $VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]) if (defined($OPTS{'epp-server'}));
     }
+
+    if (defined($OPTS{'epp-server'})) {
+	create_slv_item('EPP availability', 'dnstest.slv.epp.avail', $hostid, $VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
+    }
 }
 
 # calculated items, configuration history (TODO: rename host to something like config_history)
