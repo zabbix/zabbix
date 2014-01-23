@@ -1083,7 +1083,7 @@ char	*get_ip_by_socket(zbx_sock_t *s)
 	static char	host[64];
 	char		*error_message = NULL;
 
-	if (ZBX_TCP_ERROR == getpeername(s->socket, (struct sockaddr*)&sa, sizeof(struct sockaddr)))
+	if (ZBX_TCP_ERROR == getpeername(s->socket, (struct sockaddr*)&sa, &sz))
 	{
 		error_message = strerror_from_system(zbx_sock_last_error());
 		zbx_set_tcp_strerror("connection rejected, getpeername() failed: %s", error_message);
@@ -1281,7 +1281,7 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 			*end = ',';
 	}
 #if defined(HAVE_IPV6)
-	if (0 == getnameinfo((struct sockaddr *)&name, sizeof(name), sname, sizeof(sname), NULL, 0, NI_NUMERICHOST))
+	if (0 == getnameinfo((struct sockaddr *)&name, sizeof(struct sockaddr), sname, sizeof(sname), NULL, 0, NI_NUMERICHOST))
 		zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s].", sname, ip_list);
 	else
 		zbx_set_tcp_strerror("Connection rejected. Allowed server is [%s].", ip_list);
