@@ -1381,25 +1381,19 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 {
 	const char	*__function_name = "DBget_history_log_value";
 
-	DB_RESULT		result;
-	DB_ROW			row;
-	int			ret = FAIL, found;
-	unsigned char		value_type = ITEM_VALUE_TYPE_MAX;
+	DC_ITEM			item;
+	int			ret = FAIL, found, errcode = FAIL;
 	zbx_timespec_t		ts = {clock, ns};
 	zbx_history_record_t	value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	result = DBselect("select value_type from items where itemid=" ZBX_FS_UI64, itemid);
+	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
 
-	if (NULL != (row = DBfetch(result)))
-		value_type = (unsigned char)atoi(row[0]);
-	DBfree_result(result);
-
-	if (ITEM_VALUE_TYPE_LOG != value_type)
+	if (SUCCEED != errcode || ITEM_VALUE_TYPE_LOG != item.value_type)
 		goto out;
 
-	if (SUCCEED != zbx_vc_get_value(itemid, value_type, &ts, &value, &found) || 1 != found)
+	if (SUCCEED != zbx_vc_get_value(itemid, item.value_type, &ts, &value, &found) || 1 != found)
 		goto out;
 
 	switch (request)
@@ -1416,7 +1410,7 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 	}
 
 	/* the following attributes are set only for windows eventlog items */
-	if (SUCCEED != DCitem_match_key(itemid, "eventlog[", 9))
+	if (0 != strncmp(item.key_orig, "eventlog[", 9))
 		goto clean;
 
 	switch (request)
@@ -1442,6 +1436,8 @@ success:
 clean:
 	zbx_history_record_clear(&value, ITEM_VALUE_TYPE_LOG);
 out:
+	DCconfig_clean_items(&item, &errcode, 1);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
