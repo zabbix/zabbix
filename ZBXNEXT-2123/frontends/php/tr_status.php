@@ -253,7 +253,7 @@ $showEvents = $_REQUEST['show_events'];
 $showSeverity = $_REQUEST['show_severity'];
 $ackStatus = $_REQUEST['ack_status'];
 
-$triggerWidget = new CWidget();
+$triggerWidget = new CWidget(null, 'trigger-mon');
 
 $rightForm = new CForm('get');
 $rightForm->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB(true)));
@@ -323,6 +323,32 @@ $daysSpan->addStyle('vertical-align: middle;');
 $filterForm->addRow(_('Age less than'), array($statusChangeCheckBox, $statusChangeDays, SPACE, $daysSpan));
 $filterForm->addRow(_('Show details'), new CCheckBox('show_details', $_REQUEST['show_details'], null, 1));
 $filterForm->addRow(_('Filter by name'), new CTextBox('txt_select', $_REQUEST['txt_select'], 40));
+$filterForm->addRow(_('Filter by application'), new CTextBox('application', getRequest('application'), 40));
+
+// inventory filter
+$inventoryFilters = array(
+	array('field' => '', 'value' => '')
+);
+$inventoryFields = array();
+foreach (getHostInventories() as $inventory) {
+	$inventoryFields[$inventory['db_field']] = $inventory['title'];
+}
+
+$inventoryFilterTable = new CTable();
+$inventoryFilterTable->setAttribute('id', 'inventory-filter');
+foreach ($inventoryFilters as $i => $filter) {
+	$inventoryFilterTable->addRow(array(
+		new CComboBox('inventory['.$i.'][field]', $filter['field'], null, $inventoryFields),
+		new CTextBox('inventory['.$i.'][value]', $filter['value'], 20),
+		new CButton('inventory['.$i.'][remove]', _('Remove'), null, 'link_menu element-table-remove')
+	), 'form_row');
+}
+$inventoryFilterTable->addRow(
+	new CCol(new CButton('inventory_add', _('Add'), null, 'link_menu element-table-add'), null, 3)
+);
+$filterForm->addRow(_('Filter by host inventory'), $inventoryFilterTable);
+
+// maintenance filter
 $filterForm->addRow(_('Show hosts in maintenance'), new CCheckBox('show_maintenance', $_REQUEST['show_maintenance'], null, 1));
 
 $filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();'));
@@ -865,5 +891,7 @@ $triggerWidget->show();
 
 zbx_add_post_js('jqBlink.blink();');
 zbx_add_post_js('var switcher = new CSwitcher(\''.$switcherName.'\');');
+
+require_once dirname(__FILE__).'/include/views/js/monitoring.triggers.js.php';
 
 require_once dirname(__FILE__).'/include/page_footer.php';
