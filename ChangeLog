@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A.F....... [ZBX-4218] rewrote the item key parser's source code for independence on the mbstring.func_overload option (Sasha)
 .......PS. [ZBX-7686] fixed UTF-8 strings not being fetched fully from Oracle (asaveljevs)
 ..F....... [ZBX-6721] fixed LDAP authentication (Eduard)
 ..F....... [ZBX-7609] fixed sound playing after frontend messages closing (Eduard)
