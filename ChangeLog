@@ -36,6 +36,7 @@ New features:
 A.F....... [ZBX-1357] updated American English, French, Hungarian, Italian, Japanese, Russian, Slovak and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-7653] correctly expand ITEM.LOG.* macros when retrieving eventlog specific attributes for log,logrt items (wiper)
 .......PS. [ZBX-7661] fixed configuration parser to allow 2G cache values (it was restricted to 2G-1 before) (wiper)
 ..F....... [ZBX-7639] fixed error when trying to replace host groups and add a new host group at the same time in the host mass update form (Pavels)
 ...G...PS. [ZBX-7458] added source IP validation on daemon startup (Juris)
