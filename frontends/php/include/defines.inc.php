@@ -942,7 +942,7 @@ define('PROBE_DNS_UDP_ITEM',		'dnstest.dns.udp[{$DNSTEST.TLD}]');
 define('PROBE_DNS_UDP_ITEM_RTT',	'dnstest.dns.udp.rtt[');
 define('PROBE_RDDS_ITEM',			'dnstest.rdds[');
 
-// NS names
+// DNS TEST NS names
 define('NS_NO_RESULT',	0);
 define('NS_DOWN',		1);
 define('NS_UP',			2);
@@ -965,6 +965,10 @@ define('MONTHLY_REPORTS_RDDS_UPD',			'dnstest.slv.rdds.upd.month');
 
 // DNS TEST "dnstest" host name
 define('DNSTEST_HOST',	'dnstest');
+
+// DNS TEST SalesForce ticket system
+define('SALES_FORCE_PATTERN',	' #');
+define('SALES_FORCE_LINK',		'https://eu2.salesforce.com/');
 
 // if magic quotes on, then get rid of them
 if (version_compare(phpversion(), '6.0', '<') && get_magic_quotes_gpc()) {
