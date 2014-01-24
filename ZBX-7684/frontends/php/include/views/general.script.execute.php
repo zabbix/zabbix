@@ -21,14 +21,15 @@
 
 $scriptWidget = new CWidget();
 
-// create form
 $scriptForm = new CForm();
-$scriptForm->setName('scriptForm');
 
-// append tabs to form
 $scriptTab = new CTabView();
-$scriptTab->addTab('scriptTab', _s('Result of "%s"', $this->data['info']['name']), new CSpan($this->data['message'], 'pre fixedfont'));
+$scriptTab->addTab('scriptTab', _s(
+	'Result of "%s"', $this->data['info']['name']),
+	new CSpan($this->data['message'], 'pre fixedfont')
+);
 $scriptForm->addItem($scriptTab);
 
 $scriptWidget->addItem($scriptForm);
+
 return $scriptWidget;

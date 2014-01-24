@@ -497,18 +497,10 @@ function openWinCentered(url, name, width, height, params) {
 		params = ', ' + params;
 	}
 
-	// open empty window
-	window.open(new Curl(url.substring(0, url.indexOf('?'))).getUrl(), name,
+	var windowObj = window.open(new Curl(url).getUrl(), name,
 		'width=' + width + ', height=' + height + ', top=' + top + ', left=' + left + params
 	);
-
-	// open script window
-	setTimeout(function() {
-		var windowObj = window.open(new Curl(url).getUrl(), name,
-			'width=' + width + ', height=' + height + ', top=' + top + ', left=' + left + params
-		);
-		windowObj.focus();
-	}, 100);
+	windowObj.focus();
 }
 
 function PopUp(url, width, height, form_name) {

@@ -20,8 +20,6 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
-require_once dirname(__FILE__).'/include/hosts.inc.php';
-require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Scripts');
 $page['file'] = 'scripts_exec.php';
@@ -38,23 +36,31 @@ $fields = array(
 );
 check_fields($fields);
 
-if (isset($_REQUEST['execute'])) {
-	$scriptid = get_request('scriptid');
-	$hostid = get_request('hostid');
+ob_flush();
+flush();
+
+if (hasRequest('execute')) {
+	$scriptId = getRequest('scriptid');
+	$hostId = getRequest('hostid');
 
 	$data = array(
 		'message' => '',
-		'info' => DBfetch(DBselect('SELECT s.name FROM scripts s WHERE s.scriptid='.zbx_dbstr($scriptid)))
+		'info' => DBfetch(DBselect('SELECT s.name FROM scripts s WHERE s.scriptid='.zbx_dbstr($scriptId)))
 	);
 
-	$result = API::Script()->execute(array('hostid' => $hostid, 'scriptid' => $scriptid));
+	$result = API::Script()->execute(array(
+		'hostid' => $hostId,
+		'scriptid' => $scriptId
+	));
 
 	$isErrorExist = false;
-	if (empty($result)) {
+
+	if (!$result) {
 		$isErrorExist = true;
 	}
 	elseif ($result['response'] == 'failed') {
 		error($result['value']);
+
 		$isErrorExist = true;
 	}
 	else {
@@ -62,7 +68,9 @@ if (isset($_REQUEST['execute'])) {
 	}
 
 	if ($isErrorExist) {
-		show_error_message(_('Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script.'));
+		show_error_message(
+			_('Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script.')
+		);
 	}
 
 	// render view
