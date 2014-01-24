@@ -22,6 +22,8 @@ use constant TRIGGER_VALUE_CHANGED_YES => 1;
 use constant API_OUTPUT_REFER => 'refer';
 use constant TRIGGER_VALUE_TRUE => 1;
 
+use constant RTT_LIMIT_MULTIPLIER => 5;
+
 our ($zabbix, $result, $dbh, $tld);
 
 our %OPTS; # command-line options
