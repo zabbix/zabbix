@@ -122,7 +122,7 @@ if (isset($_REQUEST['filter_rst'])) {
 	}
 }
 // update filter in profiles
-elseif (hasRequest('filter_set') || hasRequest('filter_rst')) {
+elseif (hasRequest('filter_set')) {
 	CProfile::update('web.tr_status.filter.application', getRequest('application'), PROFILE_TYPE_STR);
 
 	// update host inventory filter
