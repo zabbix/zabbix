@@ -197,10 +197,10 @@ function getPermissionsFormList($rights = array(), $user_type = USER_TYPE_ZABBIX
 	}
 
 	// group
-	$lists['group']['label']		= _('Host groups');
-	$lists['group']['read_write']	= new CListBox('groups_write', null, 15);
-	$lists['group']['read_only']	= new CListBox('groups_read', null, 15);
-	$lists['group']['deny']			= new CListBox('groups_deny', null, 15);
+	$lists['group']['label'] = _('Host groups');
+	$lists['group']['read_write'] = new CListBox('groups_write', null, 15);
+	$lists['group']['read_only'] = new CListBox('groups_read', null, 15);
+	$lists['group']['deny'] = new CListBox('groups_deny', null, 15);
 
 	$groups = get_accessible_groups_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY, get_current_nodeid(true));
 
@@ -220,10 +220,10 @@ function getPermissionsFormList($rights = array(), $user_type = USER_TYPE_ZABBIX
 	unset($groups);
 
 	// host
-	$lists['host']['label']		= _('Hosts');
-	$lists['host']['read_write']= new CListBox('hosts_write', null, 15);
-	$lists['host']['read_only']	= new CListBox('hosts_read', null, 15);
-	$lists['host']['deny']		= new CListBox('hosts_deny', null, 15);
+	$lists['host']['label'] = _('Hosts');
+	$lists['host']['read_write'] = new CListBox('hosts_write', null, 15);
+	$lists['host']['read_only'] = new CListBox('hosts_read', null, 15);
+	$lists['host']['deny'] = new CListBox('hosts_deny', null, 15);
 
 	$hosts = get_accessible_hosts_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY, get_current_nodeid(true));
 
