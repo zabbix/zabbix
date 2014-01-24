@@ -94,7 +94,7 @@ if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
 					$itemKey = new CItemKey($check['value']);
 
 					if (!$itemKey->isValid()) {
-						$ajaxResponse->error(_s('Incorrect key: "%1$s".', $itemKey->getError()));
+						$ajaxResponse->error(_s('Invalid key "%1$s": %2$s.', $check['value'], $itemKey->getError()));
 					}
 					break;
 			}

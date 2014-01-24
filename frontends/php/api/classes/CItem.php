@@ -35,7 +35,8 @@ class CItem extends CItemGeneral {
 
 		$this->errorMessages = array_merge($this->errorMessages, array(
 			self::ERROR_EXISTS_TEMPLATE => _('Item "%1$s" already exists on "%2$s", inherited from another template.'),
-			self::ERROR_EXISTS => _('Item "%1$s" already exists on "%2$s".')
+			self::ERROR_EXISTS => _('Item "%1$s" already exists on "%2$s".'),
+			self::ERROR_INVALID_KEY => _('Invalid key "%1$s" for item "%2$s" on "%3$s": %4$s.')
 		));
 	}
 
