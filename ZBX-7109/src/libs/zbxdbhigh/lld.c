@@ -147,6 +147,7 @@ static void	DBlld_item_links_free(zbx_vector_ptr_t *item_links)
 		zbx_free(item_link);
 	}
 }
+
 static void	DBlld_rows_free(zbx_vector_ptr_t *lld_rows)
 {
 	zbx_lld_row_t	*lld_row;

@@ -125,11 +125,11 @@ static void	DBlld_triggers_free(zbx_vector_ptr_t *triggers)
  *                                                                            *
  * Function: DBlld_triggers_get                                               *
  *                                                                            *
- * Purpose: retreve triggers which were created by the specified trigger      *
+ * Purpose: retrieve triggers which were created by the specified trigger     *
  *          prototype                                                         *
  *                                                                            *
  * Parameters: parent_triggerid - [IN] trigger prototype identificator        *
- *             triggers         - [OUT] list of triggers                      *
+ *             triggers         - [OUT] sorted list of triggers               *
  *                                                                            *
  ******************************************************************************/
 static void	DBlld_triggers_get(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *triggers, unsigned char type,
@@ -189,7 +189,7 @@ static void	DBlld_triggers_get(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *
  *                                                                            *
  * Function: DBlld_functions_get                                              *
  *                                                                            *
- * Purpose: retreve functions which are used by all triggers in the host of   *
+ * Purpose: retrieve functions which are used by all triggers in the host of  *
  *          the trigger prototype                                             *
  *                                                                            *
  ******************************************************************************/
@@ -198,8 +198,8 @@ static void	DBlld_functions_get(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t 
 {
 	const char		*__function_name = "DBlld_functions_get";
 
-	zbx_lld_trigger_t	*trigger;
 	int			i;
+	zbx_lld_trigger_t	*trigger;
 	zbx_vector_uint64_t	triggerids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -383,8 +383,7 @@ static void	DBlld_items_get(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *ite
  *                                                                            *
  * Purpose: finds already existing trigger, using an item                     *
  *                                                                            *
- * Return value: upon successful completion return SUCCEED and pointer to the *
- *               trigger                                                      *
+ * Return value: upon successful completion return pointer to the trigger     *
  *                                                                            *
  ******************************************************************************/
 static zbx_lld_trigger_t	*lld_trigger_by_item(zbx_vector_ptr_t *triggers, zbx_uint64_t itemid)
@@ -419,18 +418,16 @@ static zbx_lld_trigger_t	*lld_trigger_by_item(zbx_vector_ptr_t *triggers, zbx_ui
  * Purpose: finds already existing trigger, using an item prototype and items *
  *          already created by it                                             *
  *                                                                            *
- * Return value: upon successful completion return SUCCEED and pointer to the *
- *               trigger                                                      *
+ * Return value: upon successful completion return pointer to the trigger     *
  *                                                                            *
  ******************************************************************************/
 static zbx_lld_trigger_t	*lld_trigger_get(const zbx_vector_ptr_t *functions_proto, zbx_vector_ptr_t *triggers,
 		zbx_vector_ptr_t *item_links)
 {
+	int			i, index;
 	zbx_lld_trigger_t	*trigger;
 	zbx_lld_item_link_t	*item_link;
-	int			i, index;
 
-	/* iterate the trigger prototype's functions */
 	for (i = 0; i < functions_proto->values_num; i++)
 	{
 		zbx_lld_function_t	*function = (zbx_lld_function_t *)functions_proto->values[i];
@@ -503,7 +500,7 @@ static char	*lld_expression_expand(const char *expression, zbx_vector_ptr_t *fun
 {
 	const char		*__function_name = "lld_expression_expand";
 
-	size_t			l, r = 0;
+	size_t			l, r;
 	int			i;
 	zbx_uint64_t		index;
 	zbx_lld_function_t	*function;
@@ -544,6 +541,8 @@ static char	*lld_expression_expand(const char *expression, zbx_vector_ptr_t *fun
 
 			zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, ZBX_FS_UI64 ":%s(%s)",
 					function->itemid, function->function, function->parameter);
+
+			break;
 		}
 
 		l = r - 1;
@@ -661,8 +660,6 @@ out:
  * Function: lld_trigger_make                                                 *
  *                                                                            *
  * Purpose: create a trigger based on lld rule and add it to the list         *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
  *                                                                            *
  ******************************************************************************/
 static void 	lld_trigger_make(zbx_vector_ptr_t *functions_proto, zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *items,
@@ -819,7 +816,7 @@ static int	lld_trigger_changed(zbx_lld_trigger_t *trigger)
  * Function: lld_triggers_equal                                               *
  *                                                                            *
  * Return value: returns SUCCEED if descriptions and expressions of           *
-		the triggers are identical; FAIL - otherwise                  *
+ *               the triggers are identical; FAIL - otherwise                 *
  *                                                                            *
  ******************************************************************************/
 static int	lld_triggers_equal(zbx_lld_trigger_t *trigger, zbx_lld_trigger_t *trigger_b)
@@ -1054,6 +1051,7 @@ static void	DBlld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigg
  * Purpose: transforms the simple trigger expression to the DB format         *
  *                                                                            *
  * Example:                                                                   *
+ *                                                                            *
  *     "{1} > 5" => "{84756} > 5"                                             *
  *       ^            ^                                                       *
  *       |            functionid from the database                            *
@@ -1101,6 +1099,8 @@ static void	lld_expression_create(char **expression, zbx_vector_ptr_t *functions
 			r--;
 			zbx_replace_string(expression, l + 1, &r, buffer);
 			r++;
+
+			break;
 		}
 
 		l = r;
@@ -1425,7 +1425,6 @@ static void	DBlld_triggers_save(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t 
 		DBexecute("%s", sql2);
 		zbx_free(sql1);
 		zbx_free(sql2);
-		zbx_free(error_esc);
 	}
 
 	if (0 != new_functions)
