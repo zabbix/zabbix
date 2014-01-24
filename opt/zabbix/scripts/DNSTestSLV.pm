@@ -32,7 +32,7 @@ our @EXPORT = qw($zabbix $result $dbh $tld %OPTS
 		zapi_get_macro_rdds_probe_online zapi_get_macro_dns_rollweek_sla zapi_get_macro_rdds_rollweek_sla
 		zapi_get_macro_dns_udp_rtt zapi_get_macro_dns_tcp_rtt zapi_get_macro_rdds_rtt
 		zapi_get_macro_dns_udp_delay zapi_get_macro_dns_tcp_delay zapi_get_macro_rdds_delay
-		zapi_get_macro_epp_delay zapi_get_macro_epp_probe_online
+		zapi_get_macro_epp_delay zapi_get_macro_epp_probe_online zapi_get_macro_epp_rollweek_sla
 		zapi_get_macro_dns_update_time zapi_get_macro_rdds_update_time zapi_get_items_by_hostids
 		db_connect db_select
 		set_slv_config get_minute_bounds get_interval_bounds get_rollweek_bounds get_month_bounds
@@ -129,6 +129,11 @@ sub zapi_get_macro_epp_probe_online
 sub zapi_get_macro_epp_delay
 {
     return get_macro('{$DNSTEST.EPP.DELAY}');
+}
+
+sub zapi_get_macro_epp_rollweek_sla
+{
+    return get_macro('{$DNSTEST.EPP.ROLLWEEK.SLA}');
 }
 
 sub zapi_get_items_by_hostids

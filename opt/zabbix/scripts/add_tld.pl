@@ -139,6 +139,7 @@ create_macro('{$DNSTEST.EPP.LOGIN.RTT}', 4000, undef);
 create_macro('{$DNSTEST.EPP.UPDATE.RTT}', 4000, undef);
 create_macro('{$DNSTEST.EPP.INFO.RTT}', 2000, undef);
 create_macro('{$DNSTEST.EPP.PROBE.ONLINE}', 5, undef);
+create_macro('{$DNSTEST.EPP.ROLLWEEK.SLA}', 48, undef);
 
 create_macro('{$DNSTEST.PROBE.ONLINE.DELAY}', 180, undef);
 
@@ -1405,6 +1406,19 @@ sub create_slv_items {
 
     if (defined($OPTS{'epp-server'})) {
 	create_slv_item('EPP availability', 'dnstest.slv.epp.avail', $hostid, $VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
+	create_slv_item('EPP weekly unavailability', 'dnstest.slv.epp.rollweek', $hostid, $VALUE_TYPE_PERC, [get_application_id(APP_SLV_ROLLWEEK, $hostid)]);
+
+	# NB! Configuration trigger that is used in PHP and C code to detect incident!
+	# priority must be set to 0!
+	$options = { 'description' => 'EPP service is not available at {HOST.HOST} TLD',
+		     'expression' => '({TRIGGER.VALUE}=0&'.
+			 '{'.$host_name.':dnstest.slv.epp.avail.count(#{$INCIDENT.EPP.FAIL},0,"eq")}={$INCIDENT.EPP.FAIL})|'.
+			 '({TRIGGER.VALUE}=1&'.
+			 '{'.$host_name.':dnstest.slv.epp.avail.count(#{$INCIDENT.EPP.RECOVER},0,"ne")}<{$INCIDENT.EPP.RECOVER})',
+			 'priority' => '0',
+	};
+
+	create_trigger($options);
     }
 }
 
@@ -1423,8 +1437,11 @@ sub create_dnstest_items {
 	'INCIDENT.DNSSEC.RECOVER',
 	'INCIDENT.RDDS.FAIL',
 	'INCIDENT.RDDS.RECOVER',
+	'INCIDENT.EPP.FAIL',
+	'INCIDENT.EPP.RECOVER',
 	'DNSTEST.DNS.UDP.DELAY',
 	'DNSTEST.RDDS.DELAY',
+	'DNSTEST.EPP.DELAY',
 	'DNSTEST.DNS.UDP.RTT',
 	'DNSTEST.DNS.AVAIL.MINNS')
     {
