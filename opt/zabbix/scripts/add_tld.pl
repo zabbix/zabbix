@@ -1408,6 +1408,10 @@ sub create_slv_items {
 	create_slv_item('EPP availability', 'dnstest.slv.epp.avail', $hostid, $VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
 	create_slv_item('EPP weekly unavailability', 'dnstest.slv.epp.rollweek', $hostid, $VALUE_TYPE_PERC, [get_application_id(APP_SLV_ROLLWEEK, $hostid)]);
 
+	create_slv_item('% of successful monthly EPP LOGIN resolution RTT', 'dnstest.slv.epp.rtt.login.month', $hostid, $VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
+	create_slv_item('% of successful monthly EPP UPDATE resolution RTT', 'dnstest.slv.epp.rtt.update.month', $hostid, $VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
+	create_slv_item('% of successful monthly EPP INFO resolution RTT', 'dnstest.slv.epp.rtt.info.month', $hostid, $VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
+
 	# NB! Configuration trigger that is used in PHP and C code to detect incident!
 	# priority must be set to 0!
 	$options = { 'description' => 'EPP service is not available at {HOST.HOST} TLD',

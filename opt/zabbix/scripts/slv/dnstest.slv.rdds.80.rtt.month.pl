@@ -26,7 +26,6 @@ exit_if_lastclock($tld, $cfg_key_out, $value_ts, $interval);
 
 info("from:$from till:$till value_ts:$value_ts");
 
-my $cfg_minonline = zapi_get_macro_rdds_probe_online();
 my $cfg_max_value = zapi_get_macro_rdds_rtt();
 my $cfg_delay = zapi_get_macro_rdds_delay();
 

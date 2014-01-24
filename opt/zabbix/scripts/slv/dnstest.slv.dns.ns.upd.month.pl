@@ -11,9 +11,6 @@ use lib '/opt/zabbix/scripts';
 use DNSTest;
 use DNSTestSLV;
 
-warn("UPDATE TIME IS DISABLED TILL EPP IS IMPLEMENTED");
-exit(SUCCESS);
-
 my $cfg_key_in = 'dnstest.dns.udp.upd[{$DNSTEST.TLD},';
 my $cfg_key_out = 'dnstest.slv.dns.ns.upd.month[';
 
@@ -33,7 +30,6 @@ exit_if_lastclock($tld, $cfg_key_out, $value_ts, $interval);
 
 info("from:$from till:$till value_ts:$value_ts");
 
-my $cfg_minonline = zapi_get_macro_dns_probe_online();
 my $cfg_update_time = zapi_get_macro_dns_update_time();
 my $cfg_delay = zapi_get_macro_dns_udp_delay();
 
