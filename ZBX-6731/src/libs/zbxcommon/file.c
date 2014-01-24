@@ -88,7 +88,7 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 	off_t		offset;
 #endif
 
-	offset = lseek(fd, 0, SEEK_CUR);
+	offset = lseek(fd, (off_t)0, SEEK_CUR);
 
 	if (0 >= (nbytes = (int)read(fd, buf, count)))
 		return nbytes;
@@ -149,7 +149,7 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 		}
 	}
 
-	lseek(fd, offset + i, SEEK_SET);
+	lseek(fd, offset + (off_t)i, SEEK_SET);
 
 	return (int)i;
 }
@@ -267,9 +267,17 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip
 #else
 	off_t		offset;
 #endif
-	char		buf[MAX_BUFFER_LEN + 1];
+	static char	*buf = NULL;
 	int		send_err;
 	zbx_uint64_t	lastlogsize1;
+
+#define BUF_SIZE	(256 * ZBX_KIBIBYTE)	/* The longest encodings use 4-bytes for every character. To send */
+						/* up to 64 k characters to the Zabbix server a 256 kB buffer might */
+						/* be required. */
+	if (NULL == buf)
+	{
+		buf = zbx_malloc(buf, (size_t)(BUF_SIZE + 1));
+	}
 
 	find_cr_lf_szbyte(encoding, &cr, &lf, &szbyte);
 
@@ -282,9 +290,9 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip
 			goto out;
 		}
 
-		offset = lseek(fd, 0, SEEK_CUR);
+		offset = lseek(fd, (off_t)0, SEEK_CUR);
 
-		nbytes = (int)read(fd, buf, sizeof(buf) - 1);
+		nbytes = (int)read(fd, buf, (size_t)BUF_SIZE);
 
 		if (-1 == nbytes)
 		{
@@ -306,7 +314,7 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip
 
 		if (NULL == (p_nl = buf_find_newline(p, &p_next, p_end, cr, lf, szbyte)))
 		{
-			if (sizeof(buf) - 1 > (size_t)nbytes)
+			if (BUF_SIZE > nbytes)
 			{
 				/* Buffer is not full (no more data available) and there is no "newline" in it. */
 				/* Do not analyze it now, keep the same position in the file and wait the next check, */
@@ -328,10 +336,10 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip
 				{
 					char	*value = NULL;
 
-					buf[sizeof(buf) - 1] = '\0';
+					buf[BUF_SIZE] = '\0';
 
 					if ('\0' != *encoding)
-						value = convert_to_utf8(buf, sizeof(buf) - 1, encoding);
+						value = convert_to_utf8(buf, (size_t)BUF_SIZE, encoding);
 					else
 						value = buf;
 
@@ -440,6 +448,8 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip
 	}
 out:
 	return ret;
+
+#undef BUF_SIZE
 }
 
 int	zbx_is_regular_file(const char *path)
