@@ -246,12 +246,12 @@ class CUser extends CZBXAPI {
 	}
 
 	protected function checkInput(&$users, $method) {
-		$create = ($method == 'create');
-		$update = ($method == 'update');
+		$create = ($method === 'create');
+		$update = ($method === 'update');
 
-		// permissions
 		if ($update) {
 			$userDBfields = array('userid' => null);
+
 			$dbUsers = $this->get(array(
 				'output' => array('userid', 'alias', 'autologin', 'autologout'),
 				'userids' => zbx_objectValues($users, 'userid'),
@@ -267,14 +267,15 @@ class CUser extends CZBXAPI {
 		$themes[] = THEME_DEFAULT;
 		$themeValidator = new CSetValidator(array('values' => $themes));
 		$alias = array();
+
 		foreach ($users as &$user) {
 			if (!check_db_fields($userDBfields, $user)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for user "%s".', $user['alias']));
 			}
 
-			// permission check
+			// permissions
 			if ($create) {
-				if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
+				if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions to create users.'));
 				}
 
@@ -285,18 +286,17 @@ class CUser extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions to update user or user does not exist.'));
 				}
 
-				if (bccomp(self::$userData['userid'], $user['userid']) != 0) {
-					if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions to update other users.'));
-					}
+				if (bccomp(self::$userData['userid'], $user['userid']) != 0 && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions to update other users.'));
 				}
+
 				$dbUser = $dbUsers[$user['userid']];
 			}
 
 			// check if user alais
 			if (isset($user['alias'])) {
 				// check if we change guest user
-				if ($dbUser['alias'] == ZBX_GUEST_USER && $user['alias'] != ZBX_GUEST_USER) {
+				if ($dbUser['alias'] === ZBX_GUEST_USER && $user['alias'] !== ZBX_GUEST_USER) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot rename guest user.'));
 				}
 
@@ -396,28 +396,29 @@ class CUser extends CZBXAPI {
 	}
 
 	/**
-	 * Add Users
+	 * Create user.
 	 *
-	 * @param array $users multidimensional array with Users data
+	 * @param array  $users
 	 * @param string $users['name']
 	 * @param string $users['surname']
-	 * @param array $users['alias']
+	 * @param array  $users['alias']
 	 * @param string $users['passwd']
 	 * @param string $users['url']
-	 * @param int $users['autologin']
-	 * @param int $users['autologout']
+	 * @param int    $users['autologin']
+	 * @param int    $users['autologout']
 	 * @param string $users['lang']
 	 * @param string $users['theme']
-	 * @param int $users['refresh']
-	 * @param int $users['rows_per_page']
-	 * @param int $users['type']
-	 * @param array $users['user_medias']
+	 * @param int    $users['refresh']
+	 * @param int    $users['rows_per_page']
+	 * @param int    $users['type']
+	 * @param array  $users['user_medias']
 	 * @param string $users['user_medias']['mediatypeid']
 	 * @param string $users['user_medias']['address']
-	 * @param int $users['user_medias']['severity']
-	 * @param int $users['user_medias']['active']
+	 * @param int    $users['user_medias']['severity']
+	 * @param int    $users['user_medias']['active']
 	 * @param string $users['user_medias']['period']
-	 * @return array|boolean
+	 *
+	 * @return array
 	 */
 	public function create($users) {
 		$users = zbx_toArray($users);
@@ -455,29 +456,30 @@ class CUser extends CZBXAPI {
 	}
 
 	/**
-	 * Update Users
+	 * Update user.
 	 *
-	 * @param array $users multidimensional array with Users data
+	 * @param array  $users
 	 * @param string $users['userid']
 	 * @param string $users['name']
 	 * @param string $users['surname']
-	 * @param array $users['alias']
+	 * @param array  $users['alias']
 	 * @param string $users['passwd']
 	 * @param string $users['url']
-	 * @param int $users['autologin']
-	 * @param int $users['autologout']
+	 * @param int    $users['autologin']
+	 * @param int    $users['autologout']
 	 * @param string $users['lang']
 	 * @param string $users['theme']
-	 * @param int $users['refresh']
-	 * @param int $users['rows_per_page']
-	 * @param int $users['type']
-	 * @param array $users['user_medias']
+	 * @param int    $users['refresh']
+	 * @param int    $users['rows_per_page']
+	 * @param int    $users['type']
+	 * @param array  $users['user_medias']
 	 * @param string $users['user_medias']['mediatypeid']
 	 * @param string $users['user_medias']['address']
-	 * @param int $users['user_medias']['severity']
-	 * @param int $users['user_medias']['active']
+	 * @param int    $users['user_medias']['severity']
+	 * @param int    $users['user_medias']['active']
 	 * @param string $users['user_medias']['period']
-	 * @return boolean
+	 *
+	 * @return array
 	 */
 	public function update($users) {
 		$users = zbx_toArray($users);
@@ -538,6 +540,7 @@ class CUser extends CZBXAPI {
 
 	public function updateProfile($user) {
 		$user['userid'] = self::$userData['userid'];
+
 		return $this->update(array($user));
 	}
 
@@ -547,11 +550,9 @@ class CUser extends CZBXAPI {
 	 * @throws APIException if the input is invalid
 	 *
 	 * @param array $userIds
-	 *
-	 * @return void
 	 */
 	protected function validateDelete(array $userIds) {
-		if (empty($userIds)) {
+		if (!$userIds) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
@@ -561,11 +562,11 @@ class CUser extends CZBXAPI {
 	}
 
 	/**
-	 * Delete Users
+	 * Delete user.
 	 *
-	 * @param $userIds
+	 * @param array $userIds
 	 *
-	 * @return boolean
+	 * @return array
 	 */
 	public function delete($userIds) {
 		$userIds = zbx_toArray($userIds);
@@ -619,25 +620,25 @@ class CUser extends CZBXAPI {
 	}
 
 	/**
-	 * Add Medias for User
+	 * Add medias for user.
 	 *
-	 * @param array $mediaData
 	 * @param string $mediaData['userid']
 	 * @param string $mediaData['medias']['mediatypeid']
 	 * @param string $mediaData['medias']['address']
-	 * @param int $mediaData['medias']['severity']
-	 * @param int $mediaData['medias']['active']
+	 * @param int    $mediaData['medias']['severity']
+	 * @param int    $mediaData['medias']['active']
 	 * @param string $mediaData['medias']['period']
-	 * @return boolean
+	 *
+	 * @return array
 	 */
 	public function addMedia($mediaData) {
 		$medias = zbx_toArray($mediaData['medias']);
 		$users = zbx_toArray($mediaData['users']);
-		$mediaids = array();
-		$userids = array();
 
-		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only Zabbix Admins can add user media.'));
+		$mediaids = $userids = array();
+
+		if (self::$userData['type'] < USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only Super Admins can add user media.'));
 		}
 
 		$timePeriodValidator = new CTimePeriodValidator();
@@ -666,20 +667,20 @@ class CUser extends CZBXAPI {
 	}
 
 	/**
-	 * Delete User Medias
+	 * Delete user medias.
 	 *
 	 * @param array $mediaids
-	 * @return boolean
+	 *
+	 * @return array
 	 */
 	public function deleteMedia($mediaids) {
 		$mediaids = zbx_toArray($mediaids);
 
-		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only Zabbix Admins can remove user media.'));
+		if (self::$userData['type'] < USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only Super Admins can remove user media.'));
 		}
 
-		$sql = 'DELETE FROM media WHERE '.dbConditionInt('mediaid', $mediaids);
-		if (!DBexecute($sql)) {
+		if (!DBexecute('DELETE FROM media WHERE '.dbConditionInt('mediaid', $mediaids))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 		}
 
@@ -687,25 +688,26 @@ class CUser extends CZBXAPI {
 	}
 
 	/**
-	 * Update Medias for User
+	 * Update user medias.
 	 *
-	 * @param array $mediaData
-	 * @param array $mediaData['users']
-	 * @param array $mediaData['users']['userid']
-	 * @param array $mediaData['medias']
+	 * @param array  $mediaData
+	 * @param array  $mediaData['users']
+	 * @param array  $mediaData['users']['userid']
+	 * @param array  $mediaData['medias']
 	 * @param string $mediaData['medias']['mediatypeid']
 	 * @param string $mediaData['medias']['sendto']
-	 * @param int $mediaData['medias']['severity']
-	 * @param int $mediaData['medias']['active']
+	 * @param int    $mediaData['medias']['severity']
+	 * @param int    $mediaData['medias']['active']
 	 * @param string $mediaData['medias']['period']
-	 * @return boolean
+	 *
+	 * @return array
 	 */
 	public function updateMedia($mediaData) {
 		$newMedias = zbx_toArray($mediaData['medias']);
 		$users = zbx_toArray($mediaData['users']);
 
-		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Zabbix Admins can change user media.'));
+		if (self::$userData['type'] < USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can change user media.'));
 		}
 
 		$updMedias = array();
@@ -775,10 +777,6 @@ class CUser extends CZBXAPI {
 		return array('userids'=>$userids);
 	}
 
-	// ******************************************************************************
-	// LOGIN Methods
-	// ******************************************************************************
-
 	/**
 	 * Authenticate a user using LDAP.
 	 *
@@ -793,6 +791,7 @@ class CUser extends CZBXAPI {
 	protected function ldapLogin(array $user) {
 		$config = select_config();
 		$cnf = array();
+
 		foreach ($config as $id => $value) {
 			if (zbx_strpos($id, 'ldap_') !== false) {
 				$cnf[str_replace('ldap_', '', $id)] = $config[$id];
@@ -804,6 +803,7 @@ class CUser extends CZBXAPI {
 		}
 
 		$ldapValidator = new CLdapAuthValidator(array('conf' => $cnf));
+
 		if ($ldapValidator->validate($user)) {
 			return true;
 		}
@@ -822,6 +822,7 @@ class CUser extends CZBXAPI {
 				' AND u.passwd='.zbx_dbstr(md5($user['password'])).
 				andDbNode('u.userid', $ZBX_LOCALNODEID)
 		));
+
 		if ($login) {
 			return true;
 		}
@@ -842,6 +843,7 @@ class CUser extends CZBXAPI {
 				' AND s.status='.ZBX_SESSION_ACTIVE.
 				andDbNode('s.userid', $ZBX_LOCALNODEID)
 		));
+
 		if (!$session) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot logout.'));
 		}
@@ -853,12 +855,13 @@ class CUser extends CZBXAPI {
 	}
 
 	/**
-	 * Login user
+	 * Login user.
 	 *
 	 * @param array $user
-	 * @param array $user['user'] User alias
-	 * @param array $user['password'] User password
-	 * @return string session ID
+	 * @param array $user['user']		User alias
+	 * @param array $user['password']	User password
+	 *
+	 * @return string					session id
 	 */
 	public function login($user) {
 		global $ZBX_LOCALNODEID;
@@ -896,6 +899,7 @@ class CUser extends CZBXAPI {
 			' WHERE ug.userid='.$userInfo['userid'].
 				' AND g.usrgrpid=ug.usrgrpid'
 		));
+
 		if (zbx_empty($dbAccess['gui_access'])) {
 			$guiAccess = GROUP_GUI_ACCESS_SYSTEM;
 		}
@@ -905,6 +909,7 @@ class CUser extends CZBXAPI {
 
 		$config = select_config();
 		$authType = $config['authentication_type'];
+
 		switch ($guiAccess) {
 			case GROUP_GUI_ACCESS_INTERNAL:
 				$authType = ($authType == ZBX_AUTH_HTTP) ? ZBX_AUTH_HTTP : ZBX_AUTH_INTERNAL;
@@ -965,11 +970,11 @@ class CUser extends CZBXAPI {
 	}
 
 	/**
-	 * Check if session ID is authenticated
+	 * Check if session id is authenticated.
 	 *
-	 * @param string $sessionid     session ID
+	 * @param string $sessionid		session id
 	 *
-	 * @return array    an array of user data
+	 * @return array				an array of user data
 	 */
 	public function checkAuthentication($sessionid) {
 		global $ZBX_LOCALNODEID;
@@ -980,6 +985,7 @@ class CUser extends CZBXAPI {
 		}
 
 		$time = time();
+
 		$userInfo = DBfetch(DBselect(
 			'SELECT u.userid,u.autologout,s.lastaccess'.
 			' FROM sessions s,users u'.
@@ -1013,6 +1019,7 @@ class CUser extends CZBXAPI {
 			' WHERE ug.userid='.$userInfo['userid'].
 				' AND g.usrgrpid=ug.usrgrpid'
 		));
+
 		if (!zbx_empty($dbAccess['gui_access'])) {
 			$guiAccess = $dbAccess['gui_access'];
 		}
@@ -1047,9 +1054,9 @@ class CUser extends CZBXAPI {
 				' AND g.debug_mode='.GROUP_DEBUG_MODE_ENABLED
 		));
 
-		$userData['userip'] = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))
-					? $_SERVER['HTTP_X_FORWARDED_FOR']
-					: $_SERVER['REMOTE_ADDR'];
+		$userData['userip'] = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'])
+			? $_SERVER['HTTP_X_FORWARDED_FOR']
+			: $_SERVER['REMOTE_ADDR'];
 
 		if (isset($ZBX_NODES[$ZBX_LOCALNODEID])) {
 			$userData['node'] = $ZBX_NODES[$ZBX_LOCALNODEID];
@@ -1159,9 +1166,9 @@ class CUser extends CZBXAPI {
 	/**
 	 * Checks if the given users are editable.
 	 *
-	 * @param array $userIds    user IDs to check
+	 * @param array $userIds	user ids to check
 	 *
-	 * @throws APIException     if the user has no permissions to edit users or a user does not exist
+	 * @throws APIException		if the user has no permissions to edit users or a user does not exist
 	 */
 	protected function checkPermissions(array $userIds) {
 		if (!$this->isWritable($userIds)) {
@@ -1172,9 +1179,9 @@ class CUser extends CZBXAPI {
 	/**
 	 * Check if we're trying to delete the currently logged in user.
 	 *
-	 * @param array $userIds    user IDs to check
+	 * @param array $userIds	user ids to check
 	 *
-	 * @throws APIException  if we're deleting the current user
+	 * @throws APIException		if we're deleting the current user
 	 */
 	protected function checkDeleteCurrentUser(array $userIds) {
 		if (in_array(self::$userData['userid'], $userIds)) {
@@ -1185,9 +1192,9 @@ class CUser extends CZBXAPI {
 	/**
 	 * Check if we're trying to delete the guest user.
 	 *
-	 * @param array $userIds    user IDs to check
+	 * @param array $userIds	user ids to check
 	 *
-	 * @throws APIException  if we're deleting the guest user
+	 * @throws APIException		if we're deleting the guest user
 	 */
 	protected function checkDeleteInternal(array $userIds) {
 		$guest = $this->get(array(
@@ -1197,8 +1204,11 @@ class CUser extends CZBXAPI {
 			)
 		));
 		$guest = reset($guest);
+
 		if (in_array($guest['userid'], $userIds)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete Zabbix internal user "%1$s", try disabling that user.', ZBX_GUEST_USER));
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Cannot delete Zabbix internal user "%1$s", try disabling that user.', ZBX_GUEST_USER)
+			);
 		}
 	}
 }
