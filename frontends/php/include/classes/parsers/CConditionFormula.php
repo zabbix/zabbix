@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 **/
 
 class CConditionFormula {
+
 	// possible parsing states
 	const STATE_INIT = 0;
 	const STATE_AFTER_OPEN_BRACE = 1;
@@ -105,6 +106,7 @@ class CConditionFormula {
 							$state = self::STATE_AFTER_CONSTANT;
 					}
 					break;
+
 				case self::STATE_AFTER_CLOSE_BRACE:
 				case self::STATE_AFTER_CONSTANT:
 					switch ($this->formula[$this->pos]) {
@@ -135,7 +137,8 @@ class CConditionFormula {
 
 		if ($level != 0 || isset($this->formula[$this->pos]) || $state == self::STATE_AFTER_OPERATOR) {
 			$this->error = _s('check expression starting from "%1$s"',
-					substr($this->formula, $this->pos == 0 ? 0 : $this->pos - 1));
+				substr($this->formula, $this->pos == 0 ? 0 : $this->pos - 1)
+			);
 			$this->isValid = false;
 		}
 
@@ -199,7 +202,7 @@ class CConditionFormula {
 	}
 
 	/**
-	 * Returns true is the given character is a valid constant character.
+	 * Returns true if the given character is a valid constant character.
 	 *
 	 * @param string $c
 	 *
@@ -210,7 +213,7 @@ class CConditionFormula {
 	}
 
 	/**
-	 * Returns true is the given character is a valid operator character.
+	 * Returns true if the given character is a valid operator character.
 	 *
 	 * @param string $c
 	 *
@@ -219,6 +222,4 @@ class CConditionFormula {
 	protected function isOperatorChar($c) {
 		return ($c >= 'a' && $c <= 'z');
 	}
-
-
 }
