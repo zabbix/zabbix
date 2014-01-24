@@ -830,7 +830,8 @@ ZABBIX.apps.map = (function($) {
 					y: 0,
 					urls: {},
 					elementName: this.sysmap.defaultIconName, // first image name
-					use_iconmap: '1'
+					use_iconmap: '1',
+					application: ''
 				};
 			}
 			else {
@@ -890,7 +891,8 @@ ZABBIX.apps.map = (function($) {
 					dataFelds = [
 						'elementtype', 'elementid', 'iconid_off', 'iconid_on', 'iconid_maintenance',
 						'iconid_disabled', 'label', 'label_location', 'x', 'y', 'elementsubtype',  'areatype', 'width',
-						'height', 'viewtype', 'urls', 'elementName', 'use_iconmap', 'elementExpressionTrigger'
+						'height', 'viewtype', 'urls', 'elementName', 'use_iconmap', 'elementExpressionTrigger',
+						'application'
 					],
 					fieldsUnsettable = ['iconid_off', 'iconid_on', 'iconid_maintenance', 'iconid_disabled'],
 					i,
@@ -1207,6 +1209,18 @@ ZABBIX.apps.map = (function($) {
 							{
 								elementType: '3',
 								subtypeHostGroupElements: 'checked'
+							}
+						]
+					},
+					{
+						action: 'show',
+						value: '#applicationSelectRow',
+						cond: [
+							{
+								elementType: '0'
+							},
+							{
+								elementType: '3'
 							}
 						]
 					}
