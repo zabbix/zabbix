@@ -620,7 +620,7 @@ class CUser extends CZBXAPI {
 	}
 
 	/**
-	 * Add medias for user.
+	 * Add media for user.
 	 *
 	 * @param string $mediaData['userid']
 	 * @param string $mediaData['medias']['mediatypeid']
@@ -667,7 +667,7 @@ class CUser extends CZBXAPI {
 	}
 
 	/**
-	 * Delete user medias.
+	 * Delete user media.
 	 *
 	 * @param array $mediaids
 	 *
@@ -688,7 +688,7 @@ class CUser extends CZBXAPI {
 	}
 
 	/**
-	 * Update user medias.
+	 * Update user media.
 	 *
 	 * @param array  $mediaData
 	 * @param array  $mediaData['users']
