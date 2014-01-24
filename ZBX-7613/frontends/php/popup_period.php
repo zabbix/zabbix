@@ -22,8 +22,6 @@
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/js.inc.php';
 
-$dstfrm		= get_request('dstfrm',		0);	// destination form
-
 $page['title'] = _('Period');
 $page['file'] = 'popup_period.php';
 $page['scripts'] = array('class.calendar.js');
