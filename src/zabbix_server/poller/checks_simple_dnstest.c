@@ -1696,7 +1696,7 @@ static size_t	zbx_get_rdds_items(const char *keyname, DC_ITEM *item, const char 
 }
 
 static int	zbx_rdds43_test(const char *request, const char *ip, short port, int timeout, char **answer,
-		int *rtt, FILE *log_fd, char *err, size_t err_size)
+		int *rtt, char *err, size_t err_size)
 {
 	zbx_sock_t	s;
 	char		*recv_buf, send_buf[ZBX_SEND_BUF_SIZE];
@@ -1705,8 +1705,6 @@ static int	zbx_rdds43_test(const char *request, const char *ip, short port, int 
 
 	memset(&s, 0, sizeof(s));
 	zbx_timespec(&start);
-
-	zbx_dns_infof(log_fd, "start RDDS%hd test (ip %s, request %s)", port, ip, request);
 
 	if (SUCCEED != zbx_tcp_connect(&s, NULL, ip, port, timeout))
 	{
@@ -1736,8 +1734,6 @@ static int	zbx_rdds43_test(const char *request, const char *ip, short port, int 
 	ret = SUCCEED;
 	zbx_timespec(&now);
 	*rtt = (now.sec - start.sec) * 1000 + (now.ns - start.ns) / 1000000;
-
-	zbx_dns_infof(log_fd, "===>\n%.*s\n<=== end RDDS%hd test (rtt:%d)", ZBX_RDDS_PREVIEW_SIZE, recv_buf, port, *rtt);
 
 	if (NULL != answer)
 		*answer = zbx_strdup(*answer, recv_buf);
@@ -1925,7 +1921,7 @@ static size_t	curl_devnull(char *ptr, size_t size, size_t nmemb, void *userdata)
 }
 
 static int	zbx_rdds80_test(const char *host, const char *url, short port, int timeout, int maxredirs, int *rtt80,
-		FILE *log_fd, char *err, size_t err_size)
+		char *err, size_t err_size)
 {
 #ifdef HAVE_LIBCURL
 	int			curl_err, opt;
@@ -1938,8 +1934,6 @@ static int	zbx_rdds80_test(const char *host, const char *url, short port, int ti
 	int	ret = FAIL;
 
 #ifdef HAVE_LIBCURL
-	zbx_dns_infof(log_fd, "start RDDS%hd test (url %s, host %s)", port, url, host);
-
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
 		*rtt80 = ZBX_EC_INTERNAL;
@@ -1999,8 +1993,6 @@ static int	zbx_rdds80_test(const char *host, const char *url, short port, int ti
 	}
 
 	*rtt80 = total_time * 1000;	/* expected in ms */
-
-	zbx_dns_infof(log_fd, "end RDDS%hd test (rtt:%d)", port, *rtt80);
 
 	ret = SUCCEED;
 out:
@@ -2210,8 +2202,11 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 	else
 		zbx_strlcpy(testname, testprefix, sizeof(testname));
 
-	if (SUCCEED != zbx_rdds43_test(testname, ip43, 43, ZBX_DNSTEST_TCP_TIMEOUT, &answer, &rtt43, log_fd, err,
-			sizeof(err)))
+
+	zbx_dns_infof(log_fd, "start RDDS43 test (ip %s, request \"%s\", expected prefix \"%s\")", ip43, testname,
+			rdds_ns_string);
+
+	if (SUCCEED != zbx_rdds43_test(testname, ip43, 43, ZBX_DNSTEST_TCP_TIMEOUT, &answer, &rtt43, err, sizeof(err)))
 	{
 		rtt43 = ZBX_EC_RDDS43_NOREPLY;
 		zbx_dns_errf(log_fd, "RDDS43 of \"%s\" (%s) failed: %s", random_host, ip43, err);
@@ -2224,7 +2219,7 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 	{
 		rtt43 = ZBX_EC_RDDS43_NONS;
 		zbx_dns_errf(log_fd, "no Name Servers found in the output of RDDS43 server \"%s\" (%s) for query \"%s\""
-				" (using prefix \"%s\")", random_host, ip43, testname, rdds_ns_string);
+				" (expecting prefix \"%s\")", random_host, ip43, testname, rdds_ns_string);
 		goto out;
 	}
 
@@ -2265,6 +2260,8 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 		}
 	}
 
+	zbx_dns_infof(log_fd, "===>\n%.*s\n<=== end RDDS43 test (rtt:%d)", ZBX_RDDS_PREVIEW_SIZE, answer, rtt43);
+
 	/* choose random host */
 	i = zbx_random(hosts80.values_num);
 	random_host = hosts80.values[i];
@@ -2293,12 +2290,16 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 	else
 		zbx_snprintf(testname, sizeof(testname), "http://[%s]", ip80);
 
-	if (SUCCEED != zbx_rdds80_test(random_host, testname, 80, ZBX_DNSTEST_TCP_TIMEOUT, maxredirs, &rtt80, log_fd,
+	zbx_dns_infof(log_fd, "start RDDS80 test (url %s, host %s)", testname, random_host);
+
+	if (SUCCEED != zbx_rdds80_test(random_host, testname, 80, ZBX_DNSTEST_TCP_TIMEOUT, maxredirs, &rtt80,
 			err, sizeof(err)))
 	{
 		zbx_dns_errf(log_fd, "RDDS80 of \"%s\" (%s) failed: %s", random_host, ip80, err);
 		goto out;
 	}
+
+	zbx_dns_infof(log_fd, "end RDDS80 test (rtt:%d)", rtt80);
 out:
 	if (0 != ISSET_MSG(result))
 		zbx_dns_err(log_fd, result->msg);
