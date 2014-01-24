@@ -658,18 +658,17 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_trigger_make                                               *
+ * Function: lld_trigger_make                                                 *
  *                                                                            *
  * Purpose: create a trigger based on lld rule and add it to the list         *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *                                                                            *
  ******************************************************************************/
-static void 	DBlld_trigger_make(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *functions_proto,
-		zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *items, const char *description_proto,
-		const char *expression_proto, zbx_lld_row_t *lld_row)
+static void 	lld_trigger_make(zbx_vector_ptr_t *functions_proto, zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *items,
+		const char *description_proto, const char *expression_proto, zbx_lld_row_t *lld_row)
 {
-	const char		*__function_name = "DBlld_trigger_make";
+	const char		*__function_name = "lld_trigger_make";
 
 	zbx_lld_trigger_t	*trigger = NULL;
 	char			*buffer = NULL;
@@ -728,9 +727,9 @@ static void 	DBlld_trigger_make(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	DBlld_triggers_make(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *functions_proto,
-		zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *items, const char *description_proto,
-		const char *expression_proto, zbx_vector_ptr_t *lld_rows)
+static void	lld_triggers_make(zbx_vector_ptr_t *functions_proto, zbx_vector_ptr_t *triggers,
+		zbx_vector_ptr_t *items, const char *description_proto, const char *expression_proto,
+		zbx_vector_ptr_t *lld_rows)
 {
 	int	i;
 
@@ -738,8 +737,7 @@ static void	DBlld_triggers_make(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t 
 	{
 		zbx_lld_row_t	*lld_row = (zbx_lld_row_t *)lld_rows->values[i];
 
-		DBlld_trigger_make(parent_triggerid, functions_proto, triggers, items, description_proto,
-				expression_proto, lld_row);
+		lld_trigger_make(functions_proto, triggers, items, description_proto, expression_proto, lld_row);
 	}
 
 	zbx_vector_ptr_sort(triggers, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
@@ -1527,8 +1525,7 @@ void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vec
 
 		/* making triggers */
 
-		DBlld_triggers_make(parent_triggerid, &functions_proto, &triggers, &items, description_proto,
-				expression_proto, lld_rows);
+		lld_triggers_make(&functions_proto, &triggers, &items, description_proto, expression_proto, lld_rows);
 		DBlld_triggers_validate(hostid, &triggers, error);
 		DBlld_triggers_save(parent_triggerid, &triggers, status, type, priority, comments, url);
 
