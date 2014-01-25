@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-25 02:05+0200\n"
-"PO-Revision-Date: 2013-12-18 08:59+0300\n"
+"POT-Creation-Date: 2014-01-25 03:35+0200\n"
+"PO-Revision-Date: 2014-01-15 06:27+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1387349999.0\n"
+"X-POOTLE-MTIME: 1389760023.0\n"
 
 #: api/classes/CMaintenance.php:353 api/classes/CMaintenance.php:358
 #: api/classes/CMaintenance.php:467 api/classes/CMaintenance.php:472
@@ -1056,7 +1056,7 @@ msgstr "ホストの設定"
 
 #: adm.housekeeper.php:141
 msgid "CONFIGURATION OF HOUSEKEEPING"
-msgstr "Housekeepingの設定"
+msgstr "データの保存期間設定"
 
 #: adm.iconmapping.php:130
 msgid "CONFIGURATION OF ICON MAPPING"
@@ -2904,7 +2904,7 @@ msgstr "ホストの設定"
 
 #: adm.housekeeper.php:24
 msgid "Configuration of housekeeping"
-msgstr "Housekeepingの設定"
+msgstr "データの保存期間設定"
 
 #: adm.iconmapping.php:24
 msgid "Configuration of icon mapping"
@@ -4794,7 +4794,7 @@ msgstr "選択したプロキシによるホストの監視を有効にします
 #: include/views/administration.general.housekeeper.edit.php:124
 #: include/views/administration.general.housekeeper.edit.php:145
 msgid "Enable internal housekeeping"
-msgstr "内部のHousekeeping処理を有効"
+msgstr "データの削除処理を有効"
 
 #: hosts.php:1010 include/views/administration.mediatypes.list.php:113
 #: include/views/administration.proxy.list.php:104
@@ -6354,7 +6354,7 @@ msgstr "時間"
 #: adm.valuemapping.php:127 adm.workingtime.php:62
 #: include/views/administration.general.housekeeper.edit.php:163
 msgid "Housekeeping"
-msgstr ""
+msgstr "データの保存期間"
 
 #: include/locales.inc.php:61
 msgid "Hungarian (hu_HU)"
@@ -10663,7 +10663,7 @@ msgstr "アイテムのトレンドの保存期間を上書き"
 #: include/views/configuration.item.edit.php:371
 #: include/views/configuration.item.edit.php:392
 msgid "Overriden by global housekeeping settings"
-msgstr "グローバルなhousekeepingの設定を上書き"
+msgstr "グローバルなデータの保存期間設定を上書き"
 
 #: include/menu.inc.php:38 include/menu.inc.php:108
 #: include/views/inventory.host.view.php:258
@@ -15582,7 +15582,7 @@ msgstr "found"
 #: include/views/configuration.item.edit.php:385
 msgctxt "item_form"
 msgid "global housekeeping settings"
-msgstr "グローバルなhousekeepingの設定"
+msgstr "グローバルなデータの保存期間設定"
 
 #: include/func.inc.php:559 jsLoader.php:97
 msgctxt "hour short"
