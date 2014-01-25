@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-25 01:48+0200\n"
-"PO-Revision-Date: 2013-11-12 15:53+0300\n"
+"POT-Creation-Date: 2014-01-25 02:24+0200\n"
+"PO-Revision-Date: 2014-01-14 15:37+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: it\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1384264426.0\n"
+"X-POOTLE-MTIME: 1389706664.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -67,8 +67,8 @@ msgstr[1] "Registrati %1$s tentativi di accesso fallito. L'ultimo tentativo fall
 #, php-format
 msgid "%2$d of %1$d issue is shown"
 msgid_plural "%2$d of %1$d issues are shown"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%2$d di %1$d problemi visualizzati"
+msgstr[1] "%2$d di %1$d problemi visualizzati"
 
 #: include/views/monitoring.discovery.php:133
 #, php-format
