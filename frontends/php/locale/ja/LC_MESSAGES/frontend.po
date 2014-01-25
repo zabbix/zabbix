@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-25 02:03+0200\n"
-"PO-Revision-Date: 2013-12-18 08:45+0300\n"
-"Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
+"POT-Creation-Date: 2014-01-25 03:04+0200\n"
+"PO-Revision-Date: 2014-01-05 13:09+0300\n"
+"Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1387349117.0\n"
+"X-POOTLE-MTIME: 1388920174.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -763,12 +763,12 @@ msgstr "アクションの履歴"
 
 #: adm.housekeeper.php:51
 msgid "Audit data storage period"
-msgstr "監査データ保存期間"
+msgstr "監査データの保存期間"
 
 #: adm.housekeeper.php:110
 #, c-format
 msgid "Audit data storage period (in days) \"%1$s\"."
-msgstr "監査データ保存期間 (日) \"%1$s\""
+msgstr "監査データの保存期間 (日) \"%1$s\""
 
 #: auditlogs.php:27
 msgid "Audit logs"
@@ -838,16 +838,16 @@ msgstr "自動ログアウト (最低90秒)"
 
 #: include/views/administration.general.housekeeper.edit.php:56
 msgid "Auto-registration data storage period (in days)"
-msgstr "自動登録データ保存期間(日)"
+msgstr "自動登録データの保存期間(日)"
 
 #: adm.housekeeper.php:43
 msgid "Auto-registration event and alert data storage period"
-msgstr "自動登録イベントとアラートのデータ保存期間"
+msgstr "自動登録イベントとアラートデータの保存期間"
 
 #: adm.housekeeper.php:108
 #, c-format
 msgid "Auto-registration event and alert data storage period (in days) \"%1$s\"."
-msgstr "自動登録イベントとアラートのデータ保存期間(日) \"%1$s\"。"
+msgstr "自動登録イベントとアラートデータの保存期間(日) \"%1$s\"。"
 
 #: include/views/configuration.host.edit.php:777
 #: include/views/configuration.host.massupdate.php:242
@@ -1048,7 +1048,7 @@ msgstr "ホストの設定"
 
 #: adm.housekeeper.php:141
 msgid "CONFIGURATION OF HOUSEKEEPING"
-msgstr "Housekeepingの設定"
+msgstr "データの保存期間設定"
 
 #: adm.iconmapping.php:130
 msgid "CONFIGURATION OF ICON MAPPING"
@@ -2896,7 +2896,7 @@ msgstr "ホストの設定"
 
 #: adm.housekeeper.php:24
 msgid "Configuration of housekeeping"
-msgstr "Housekeepingの設定"
+msgstr "データの保存期間設定"
 
 #: adm.iconmapping.php:24
 msgid "Configuration of icon mapping"
@@ -3509,7 +3509,7 @@ msgstr "データの概要"
 #: include/views/administration.general.housekeeper.edit.php:135
 #: include/views/administration.general.housekeeper.edit.php:156
 msgid "Data storage period (in days)"
-msgstr "データ保存期間 (日)"
+msgstr "データの保存期間 (日)"
 
 #: include/forms.inc.php:458 include/views/configuration.item.edit.php:239
 #: include/views/configuration.item.massupdate.php:227
@@ -4793,7 +4793,7 @@ msgstr "選択したプロキシによるホストの監視を有効にします
 #: include/views/administration.general.housekeeper.edit.php:124
 #: include/views/administration.general.housekeeper.edit.php:145
 msgid "Enable internal housekeeping"
-msgstr "内部のHousekeeping処理を有効"
+msgstr "データの削除処理を有効"
 
 #: hosts.php:1012 include/views/administration.mediatypes.list.php:113
 #: include/views/administration.proxy.list.php:104
@@ -5930,12 +5930,12 @@ msgstr "ヒストリの削除には時間を要します。実行しますか？
 
 #: adm.housekeeper.php:59
 msgid "History data storage period"
-msgstr "ヒストリデータ保存期間"
+msgstr "ヒストリデータの保存期間"
 
 #: adm.housekeeper.php:112
 #, c-format
 msgid "History data storage period (in days) \"%1$s\"."
-msgstr "ヒストリデータ保存期間(日) \"%1$s\""
+msgstr "ヒストリデータの保存期間(日) \"%1$s\""
 
 #: include/screens.inc.php:31
 msgid "History of actions"
@@ -6356,7 +6356,7 @@ msgstr "時間"
 #: adm.valuemapping.php:127 adm.workingtime.php:62
 #: include/views/administration.general.housekeeper.edit.php:163
 msgid "Housekeeping"
-msgstr ""
+msgstr "データの保存期間"
 
 #: include/locales.inc.php:61
 msgid "Hungarian (hu_HU)"
@@ -7510,7 +7510,7 @@ msgstr "JSON-RPC内部エラー。"
 
 #: include/views/administration.general.housekeeper.edit.php:48
 msgid "Internal data storage period (in days)"
-msgstr "内部データ保存期間 (日)"
+msgstr "内部データの保存期間 (日)"
 
 #: api/rpc/class.cjsonrpc.php:201
 msgid "Internal error."
@@ -7518,12 +7518,12 @@ msgstr "内部エラー。"
 
 #: adm.housekeeper.php:37
 msgid "Internal event and alert data storage period"
-msgstr "内部イベントとアラートのデータ保存期間"
+msgstr "内部イベントとアラートデータの保存期間"
 
 #: adm.housekeeper.php:106
 #, c-format
 msgid "Internal event and alert data storage period (in days) \"%1$s\"."
-msgstr "内部イベントとアラートのデータ保存期間(日) \"%1$s\"。"
+msgstr "内部イベントとアラートデータの保存期間(日) \"%1$s\"。"
 
 #: include/views/configuration.httpconf.edit.php:94
 msgid "Internet Explorer"
@@ -9239,12 +9239,12 @@ msgstr "ネットワークディスカバリデータの保存期間 (日)"
 
 #: adm.housekeeper.php:40
 msgid "Network discovery event and alert data storage period"
-msgstr "ネットワークディスカバリイベントとアラートのデータ保存期間"
+msgstr "ネットワークディスカバリイベントとアラートデータの保存期間"
 
 #: adm.housekeeper.php:107
 #, c-format
 msgid "Network discovery event and alert data storage period (in days) \"%1$s\"."
-msgstr "ネットワークディスカバリイベントとアラートのデータ保存期間 (日) \"%1$s\"。"
+msgstr "ネットワークディスカバリイベントとアラートデータの保存期間 (日) \"%1$s\"。"
 
 #: include/classes/items/CHelpItems.php:97
 #: include/classes/items/CHelpItems.php:351
@@ -10683,7 +10683,7 @@ msgstr "アイテムのトレンドの保存期間を上書き"
 #: include/views/configuration.item.edit.php:371
 #: include/views/configuration.item.edit.php:392
 msgid "Overriden by global housekeeping settings"
-msgstr "グローバルなhousekeepingの設定を上書き"
+msgstr "グローバルなデータの保存期間設定を上書き"
 
 #: include/menu.inc.php:38 include/menu.inc.php:108
 #: include/views/inventory.host.view.php:258
@@ -12552,12 +12552,12 @@ msgstr "イベントの最大表示期間 \"%1$s\""
 
 #: adm.gui.php:37 include/views/administration.general.gui.edit.php:43
 msgid "Show events not older than (in days)"
-msgstr "イベントの表示期間(日)"
+msgstr "トリガー画面のイベント表示期間(日)"
 
 #: adm.gui.php:75
 #, c-format
 msgid "Show events not older than (in days) \"%1$s\"."
-msgstr "イベントの表示期間(日) \"%1$s\""
+msgstr "トリガー画面のイベント表示期間(日) \"%1$s\""
 
 #: include/views/monitoring.dashconf.php:75 tr_status.php:326
 msgid "Show hosts in maintenance"
@@ -13285,7 +13285,7 @@ msgstr "テストデータ"
 
 #: include/views/administration.general.regularexpressions.edit.php:69
 msgid "Test expressions"
-msgstr "テスト条件式"
+msgstr "条件式のテスト"
 
 #: adm.regexps.php:38
 #: include/views/administration.general.regularexpressions.edit.php:66
@@ -13551,12 +13551,12 @@ msgstr "転送エラー。"
 
 #: adm.housekeeper.php:64
 msgid "Trend data storage period"
-msgstr "トレンドデータ保存期間"
+msgstr "トレンドデータの保存期間"
 
 #: adm.housekeeper.php:113
 #, c-format
 msgid "Trend data storage period (in days) \"%1$s\"."
-msgstr "トレンドデータ保存期間(日) \"%1$s\""
+msgstr "トレンドデータの保存期間(日) \"%1$s\""
 
 #: disc_prototypes.php:119 items.php:62
 msgid "Trend storage period"
@@ -13626,7 +13626,7 @@ msgstr "トリガーのコメント"
 
 #: include/views/administration.general.housekeeper.edit.php:44
 msgid "Trigger data storage period (in days)"
-msgstr "トリガーデータ保存期間(日)"
+msgstr "トリガーデータの保存期間(日)"
 
 #: triggers.php:197
 msgid "Trigger deleted"
@@ -13652,12 +13652,12 @@ msgstr[0] "トリガーを有効にしました"
 
 #: adm.housekeeper.php:34
 msgid "Trigger event and alert data storage period"
-msgstr "トリガーイベントとアラートのデータ保存期間"
+msgstr "トリガーイベントとアラートデータの保存期間"
 
 #: adm.housekeeper.php:105
 #, c-format
 msgid "Trigger event and alert data storage period (in days) \"%1$s\"."
-msgstr "トリガーイベントとアラートのデータ保存期間 (日) \"%1$s\"。"
+msgstr "トリガーイベントとアラートデータの保存期間 (日) \"%1$s\"。"
 
 #: include/views/configuration.triggers.expression.php:125
 msgid "Trigger expression condition"
@@ -14459,12 +14459,12 @@ msgstr "ユーザープロファイル"
 
 #: adm.housekeeper.php:55
 msgid "User session data storage period"
-msgstr "ユーザーセッションデータ保存期間"
+msgstr "ユーザーセッションデータの保存期間"
 
 #: adm.housekeeper.php:111
 #, c-format
 msgid "User session data storage period (in days) \"%1$s\"."
-msgstr "ユーザーセッションデータ保存期間(日) \"%1$s\""
+msgstr "ユーザーセッションデータの保存期間(日) \"%1$s\""
 
 #: include/views/administration.general.housekeeper.edit.php:118
 msgid "User sessions"
@@ -15604,7 +15604,7 @@ msgstr "found"
 #: include/views/configuration.item.edit.php:385
 msgctxt "item_form"
 msgid "global housekeeping settings"
-msgstr "グローバルなhousekeepingの設定"
+msgstr "グローバルなデータの保存期間設定"
 
 #: include/func.inc.php:559 jsLoader.php:98
 msgctxt "hour short"

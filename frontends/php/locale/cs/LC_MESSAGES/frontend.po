@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-25 02:03+0200\n"
-"PO-Revision-Date: 2013-11-04 20:24+0300\n"
+"POT-Creation-Date: 2014-01-25 03:04+0200\n"
+"PO-Revision-Date: 2014-01-07 20:14+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -13,14 +13,14 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1383589494.0\n"
+"X-POOTLE-MTIME: 1389118472.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
 #: maintenance.php:141 maintenance.php:153 services.php:184 services.php:198
 #, c-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
-msgstr ""
+msgstr "\"%s\" musí být v intervalu od 1970.01.01 do 2038.01.18."
 
 #: include/profiles.inc.php:320
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
@@ -55,9 +55,9 @@ msgstr ""
 #, c-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s Položka"
+msgstr[1] "%1$s Položky"
+msgstr[2] "%1$s Položek"
 
 #: include/views/configuration.item.edit.php:368
 #: include/views/configuration.item.edit.php:372
@@ -94,7 +94,7 @@ msgstr ""
 
 #: include/views/configuration.action.edit.php:450
 msgid "(0 - infinitely)"
-msgstr ""
+msgstr "(0 - nekonečně)"
 
 #: include/views/configuration.host.edit.php:200
 #: include/views/configuration.hostgroups.list.php:31
@@ -104,7 +104,7 @@ msgstr ""
 
 #: include/forms.inc.php:591 include/forms.inc.php:606
 msgid "(in days)"
-msgstr ""
+msgstr "(ve dnech)"
 
 #: include/forms.inc.php:451
 msgid "(in sec)"
@@ -181,7 +181,7 @@ msgstr "<manuálně>"
 #: include/views/configuration.item.massupdate.php:172
 #: include/views/js/configuration.discovery.edit.js.php:95
 msgid "AES"
-msgstr ""
+msgstr "AES"
 
 #: acknow.php:187
 msgid "ALARM ACKNOWLEDGES"
@@ -381,7 +381,7 @@ msgstr "Aktivní"
 #: include/views/configuration.maintenance.list.php:62
 msgctxt "maintenance status"
 msgid "Active"
-msgstr ""
+msgstr "Aktivní"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:500
 #: include/views/configuration.maintenance.edit.php:89 maintenance.php:135
@@ -928,7 +928,7 @@ msgstr "Poloha osy"
 #: include/func.inc.php:427
 msgctxt "Byte short"
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: include/views/administration.general.image.edit.php:29
 #: include/views/administration.general.image.list.php:25
@@ -8737,7 +8737,7 @@ msgstr ""
 #: include/views/administration.general.iconmap.edit.php:136
 #: include/views/administration.general.valuemapping.edit.php:43
 msgid "Mappings"
-msgstr ""
+msgstr "Mapování"
 
 #: dashboard.php:340 include/blocks.inc.php:1366 include/menu.inc.php:72
 #: include/menu.inc.php:204 include/views/configuration.sysmap.list.php:36
@@ -9632,11 +9632,11 @@ msgstr "Nejsou vybrané žádné položky!"
 
 #: include/views/configuration.triggers.edit.php:172
 msgid "No errors found."
-msgstr ""
+msgstr "Nebyly nalezeny žádné chyby."
 
 #: include/blocks.inc.php:996 include/blocks.inc.php:1508 tr_status.php:729
 msgid "No events"
-msgstr ""
+msgstr "Žádné události"
 
 #: events.php:370 include/blocks.inc.php:915
 #: include/classes/screens/CScreenEvents.php:37 include/events.inc.php:198
@@ -10454,15 +10454,15 @@ msgstr ""
 
 #: include/hosts.inc.php:305
 msgid "OOB IP address"
-msgstr ""
+msgstr "OOB IP adresa"
 
 #: include/hosts.inc.php:315
 msgid "OOB router"
-msgstr ""
+msgstr "OOB směrovač"
 
 #: include/hosts.inc.php:310
 msgid "OOB subnet mask"
-msgstr ""
+msgstr "OOB síťová maska"
 
 #: include/triggers.inc.php:1700
 #: include/views/configuration.action.edit.php:112
@@ -10527,7 +10527,7 @@ msgstr ""
 
 #: include/views/administration.users.edit.php:219
 msgid "Once"
-msgstr ""
+msgstr "Jednou"
 
 #: api/classes/CHostGroup.php:857 api/classes/CHostGroup.php:989
 msgid "One of the objects is left without a host group."
@@ -10801,7 +10801,7 @@ msgstr "Přehled podle proxy"
 #: include/func.inc.php:674
 msgctxt "Peta short"
 msgid "P"
-msgstr ""
+msgstr "P"
 
 #: dashboard.php:268
 msgid "PERSONAL DASHBOARD"
@@ -10809,7 +10809,7 @@ msgstr "ŘÍDÍCÍ PANEL"
 
 #: include/classes/class.frontendsetup.php:283
 msgid "PHP bcmath"
-msgstr ""
+msgstr "PHP bcmath"
 
 #: include/classes/class.frontendsetup.php:287
 msgid "PHP bcmath extension missing (PHP configuration parameter --enable-bcmath)."
@@ -10817,7 +10817,7 @@ msgstr ""
 
 #: include/classes/class.frontendsetup.php:497
 msgid "PHP ctype"
-msgstr ""
+msgstr "PHP ctype"
 
 #: include/classes/class.frontendsetup.php:501
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)."
@@ -10829,7 +10829,7 @@ msgstr "PHP - podpora databází"
 
 #: include/classes/class.frontendsetup.php:342
 msgid "PHP gd"
-msgstr ""
+msgstr "PHP gd"
 
 #: include/classes/class.frontendsetup.php:413
 msgid "PHP gd FreeType support"
@@ -10873,7 +10873,7 @@ msgstr ""
 
 #: include/classes/class.frontendsetup.php:436
 msgid "PHP libxml"
-msgstr ""
+msgstr "PHP libxml"
 
 #: include/classes/class.frontendsetup.php:440
 msgid "PHP libxml extension missing."
@@ -10881,7 +10881,7 @@ msgstr ""
 
 #: include/classes/class.frontendsetup.php:300
 msgid "PHP mbstring"
-msgstr ""
+msgstr "PHP mbstring"
 
 #: include/classes/class.frontendsetup.php:304
 msgid "PHP mbstring extension missing (PHP configuration parameter --enable-mbstring)."
@@ -15303,7 +15303,7 @@ msgstr "j. n. Y"
 
 #: include/translateDefines.inc.php:37
 msgid "Y.m.d H:i"
-msgstr "j. n. Y G:i"
+msgstr "d.m.Y H:i"
 
 #: include/func.inc.php:598 include/translateDefines.inc.php:47
 msgid "Y.m.d H:i:s"
@@ -15648,7 +15648,7 @@ msgstr "j. M"
 #: include/classes/graphdraw/CLineGraphDraw.php:1347
 #: include/classes/graphdraw/CLineGraphDraw.php:1400
 msgid "d.m"
-msgstr "j.n."
+msgstr "d.m"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1369
 #: include/classes/graphdraw/CLineGraphDraw.php:1384
@@ -16013,7 +16013,7 @@ msgstr ""
 
 #: include/classes/class.cmultiselect.php:53 jsLoader.php:194
 msgid "type here to search"
-msgstr ""
+msgstr "pište zde pro vyhledávání"
 
 #: api/classes/CItemKey.php:62
 msgid "unexpected end of key"
@@ -16027,17 +16027,17 @@ msgstr ""
 
 #: include/views/common.macros.php:45
 msgid "value"
-msgstr ""
+msgstr "hodnota"
 
 #: include/actions.inc.php:345 include/actions.inc.php:357
 msgid "via"
-msgstr ""
+msgstr "přes"
 
 #: include/func.inc.php:556 jsLoader.php:95
 msgctxt "year short"
 msgid "y"
-msgstr ""
+msgstr "r"
 
 #: include/html.inc.php:645
 msgid "yyyy"
-msgstr ""
+msgstr "rrrr"

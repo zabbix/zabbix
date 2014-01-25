@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-25 02:03+0200\n"
-"PO-Revision-Date: 2013-12-27 11:19+0300\n"
+"POT-Creation-Date: 2014-01-25 03:04+0200\n"
+"PO-Revision-Date: 2014-01-05 18:43+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1388135977.0\n"
+"X-POOTLE-MTIME: 1388940216.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -1944,8 +1944,8 @@ msgstr[2] "Не удалось активировать прототипы эл�
 msgid "Cannot enable media type"
 msgid_plural "Cannot enable media types"
 msgstr[0] "Не удалось включить способ оповещения"
-msgstr[1] "Не удалось включить способ оповещения"
-msgstr[2] "Не удалось включить способ оповещения"
+msgstr[1] "Не удалось включить способы оповещения"
+msgstr[2] "Не удалось включить способы оповещения"
 
 #: triggers.php:275
 msgid "Cannot enable trigger"
@@ -2644,7 +2644,7 @@ msgstr "Шасси"
 #: include/classes/items/CHelpItems.php:177
 #: include/classes/items/CHelpItems.php:431
 msgid "Chassis info - returns full info by default"
-msgstr "Инфо о шасси - по умолчанию возвращает полную информацию "
+msgstr "Инфо о шасси - по умолчанию возвращает полную информацию"
 
 #: include/views/js/configuration.discovery.edit.js.php:536
 msgid "Check already exists."
@@ -8935,15 +8935,15 @@ msgstr "Способ оповещения удален"
 msgid "Media type disabled"
 msgid_plural "Media types disabled"
 msgstr[0] "Способ оповещения деактивирован"
-msgstr[1] "Способ оповещения деактивирован"
-msgstr[2] "Способ оповещения деактивирован"
+msgstr[1] "Способы оповещения деактивирован"
+msgstr[2] "Способы оповещения деактивирован"
 
 #: media_types.php:162
 msgid "Media type enabled"
 msgid_plural "Media types enabled"
 msgstr[0] "Способ оповещения активирован"
-msgstr[1] "Способ оповещения активирован"
-msgstr[2] "Способ оповещения активирован"
+msgstr[1] "Способы оповещения активирован"
+msgstr[2] "Способы оповещения активирован"
 
 #: media_types.php:121
 msgid "Media type updated"
@@ -15774,7 +15774,7 @@ msgstr "изображение"
 
 #: include/actions.inc.php:33
 msgid "in"
-msgstr "внутреннее"
+msgstr "в"
 
 #: api/classes/CItemKey.php:76
 #, c-format

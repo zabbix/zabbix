@@ -2,18 +2,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-25 02:03+0200\n"
-"PO-Revision-Date: 2013-11-05 18:31+0300\n"
+"POT-Creation-Date: 2014-01-25 03:04+0200\n"
+"PO-Revision-Date: 2014-01-05 18:51+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : n%10==1 && n%100!=11 ? 1 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 2 : 3);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1384234602.0\n"
+"X-POOTLE-MTIME: 1388940677.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -35,16 +35,18 @@ msgstr "\"Мигання тригера при зміні статусу\" ма�
 msgid "%1$d day"
 msgid_plural "%1$d days"
 msgstr[0] "%1$d день"
-msgstr[1] "%1$d дні"
-msgstr[2] "%1$d днів"
+msgstr[1] "%1$d день"
+msgstr[2] "%1$d дні"
+msgstr[3] "%1$d днів"
 
 #: include/blocks.inc.php:1041
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
 msgstr[0] "відображено %1$d з %2$d проблеми"
-msgstr[1] "відображено %1$d з %2$d проблем"
+msgstr[1] "відображено %1$d з %2$d проблеми"
 msgstr[2] "відображено %1$d з %2$d проблем"
+msgstr[3] "відображено %1$d з %2$d проблем"
 
 #: chart4.php:89 chart5.php:83
 #, c-format
@@ -56,8 +58,9 @@ msgstr "%1$s (рік %2$s)"
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
 msgstr[0] "%1$s елемент даних"
-msgstr[1] "%1$s елемента даних"
-msgstr[2] "%1$s елементів даних"
+msgstr[1] "%1$s елемент даних"
+msgstr[2] "%1$s елемента даних"
+msgstr[3] "%1$s елементів даних"
 
 #: include/views/configuration.item.edit.php:368
 #: include/views/configuration.item.edit.php:372
@@ -67,24 +70,27 @@ msgstr[2] "%1$s елементів даних"
 msgid "%1$s day"
 msgid_plural "%1$s days"
 msgstr[0] "%1$s день"
-msgstr[1] "%1$s дні"
-msgstr[2] "%1$s днів"
+msgstr[1] "%1$s день"
+msgstr[2] "%1$s дні"
+msgstr[3] "%1$s днів"
 
 #: include/page_header.php:446
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgstr[0] "Зафіксовано %4$s невдалу спробу входу в систему. Остання невдала спроба була з %1$s о %2$s %3$s."
-msgstr[1] "Зафіксовано %4$s невдалих спроби входу в систему. Остання невдала спроба була з %1$s о %2$s %3$s."
-msgstr[2] "Зафіксовано %4$s невдалих спроб входу в систему. Остання невдала спроба була з %1$s о %2$s %3$s."
+msgstr[1] "Зафіксовано %4$s невдалу спробу входу в систему. Остання невдала спроба була з %1$s о %2$s %3$s."
+msgstr[2] "Зафіксовано %4$s невдалих спроби входу в систему. Остання невдала спроба була з %1$s о %2$s %3$s."
+msgstr[3] "Зафіксовано %4$s невдалих спроб входу в систему. Остання невдала спроба була з %1$s о %2$s %3$s."
 
 #: include/views/monitoring.discovery.php:131
 #, c-format
 msgid "%d device"
 msgid_plural "%d devices"
 msgstr[0] "%d пристрій"
-msgstr[1] "%d пристрої"
-msgstr[2] "%d пристроїв"
+msgstr[1] "%d пристрій"
+msgstr[2] "%d пристрої"
+msgstr[3] "%d пристроїв"
 
 #: include/users.inc.php:293
 #, c-format
@@ -348,6 +354,7 @@ msgid_plural "Actions disabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: actionconf.php:344
 msgid "Action enabled"
@@ -355,6 +362,7 @@ msgid_plural "Actions enabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: include/views/configuration.action.edit.php:420
 msgid "Action operations"
@@ -744,17 +752,19 @@ msgstr "О %1$s:%2$s на %3$s день кожний %4$s"
 #, c-format
 msgid "At %1$s:%2$s on every %3$s of every week"
 msgid_plural "At %1$s:%2$s on every %3$s of every %4$s weeks"
-msgstr[0] "О %1$s:%2$s кожний %3$s кожний тиждень"
-msgstr[1] "О %1$s:%2$s кожний %3$s кожні %4$s тижні"
-msgstr[2] "О %1$s:%2$s кожний %3$s кожні %4$s тижнів"
+msgstr[0] "О %1$s:%2$s кожний/у %3$s кожний тиждень"
+msgstr[1] "О %1$s:%2$s кожний/у %3$s кожний %4$s тиждень"
+msgstr[2] "О %1$s:%2$s кожний/у %3$s кожні %4$s тижні"
+msgstr[3] "О %1$s:%2$s кожний/у %3$s кожні %4$s тижнів"
 
 #: include/maintenances.inc.php:63
 #, c-format
 msgid "At %1$s:%2$s on every day"
 msgid_plural "At %1$s:%2$s on every %3$s days"
 msgstr[0] "О %1$s:%2$s кожний день"
-msgstr[1] "О %1$s:%2$s кожні %3$s дні"
-msgstr[2] "О %1$s:%2$s кожні %3$s днів"
+msgstr[1] "О %1$s:%2$s кожний %3$s день"
+msgstr[2] "О %1$s:%2$s кожні %3$s дні"
+msgstr[3] "О %1$s:%2$s кожні %3$s днів"
 
 #: include/forms.inc.php:1776
 msgid "At (hour:minute)"
@@ -805,7 +815,7 @@ msgstr "Серпень"
 
 #: include/menu.inc.php:247 include/views/configuration.httpconf.edit.php:80
 msgid "Authentication"
-msgstr "Аутентиф."
+msgstr "Автентифікація"
 
 #: include/views/configuration.host.edit.php:717
 #: include/views/configuration.host.edit.php:729
@@ -1299,7 +1309,7 @@ msgstr "Не вдалося додати дію"
 
 #: actionconf.php:233
 msgid "Cannot add action condition"
-msgstr "Не вдалося додати умову дії."
+msgstr "Не вдалося додати умову дії"
 
 #: applications.php:108
 msgid "Cannot add application"
@@ -1383,7 +1393,7 @@ msgstr "Не вдалося додати більше одного елемен�
 #: api/classes/CGraphPrototype.php:43
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
-msgstr "Неможливо додати більше одного елемента даних з типом 'Сумарний графік' до прототипу графіка \"%1$s\"."
+msgstr "Неможливо додати більше одного елемента даних з типом \"Сумарний графік\" до прототипу графіка \"%1$s\"."
 
 #: sysmaps.php:171
 msgid "Cannot add network map"
@@ -1622,7 +1632,7 @@ msgstr "Не вдалося видалити групу вузлів мереж�
 
 #: api/classes/CDiscoveryRule.php:413
 msgid "Cannot delete host prototype."
-msgstr "Не вдалося видалити прототип вузла мережі. "
+msgstr "Не вдалося видалити прототип вузла мережі."
 
 #: host_prototypes.php:119 host_prototypes.php:244
 msgid "Cannot delete host prototypes"
@@ -1684,8 +1694,9 @@ msgstr "Не вдалося видалити проксі"
 msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
 msgstr[0] "Не вдалося видалити регулярний вираз"
-msgstr[1] "Не вдалося видалити регулярний вираз"
-msgstr[2] "Не вдалося видалити регулярний вираз"
+msgstr[1] "Не вдалося видалити регулярні вирази"
+msgstr[2] "Не вдалося видалити регулярні вирази"
+msgstr[3] "Не вдалося видалити регулярні вирази"
 
 #: screenconf.php:221
 msgid "Cannot delete screen"
@@ -1805,6 +1816,7 @@ msgid_plural "Cannot disable actions"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: discoveryconf.php:188
 msgid "Cannot disable discovery rule"
@@ -1812,6 +1824,7 @@ msgid_plural "Cannot disable discovery rules"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: host_discovery.php:286
 msgid "Cannot disable discovery rules"
@@ -1819,6 +1832,7 @@ msgid_plural "Cannot disable discovery rules"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: hostgroups.php:231 hosts.php:624 proxies.php:183
 msgid "Cannot disable host"
@@ -1826,6 +1840,7 @@ msgid_plural "Cannot disable hosts"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: host_prototypes.php:236
 msgid "Cannot disable host prototype"
@@ -1833,6 +1848,7 @@ msgid_plural "Cannot disable host prototypes"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: applications.php:211 items.php:682
 msgid "Cannot disable item"
@@ -1840,6 +1856,7 @@ msgid_plural "Cannot disable items"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: disc_prototypes.php:329
 msgid "Cannot disable item prototype"
@@ -1847,14 +1864,15 @@ msgid_plural "Cannot disable item prototypes"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: media_types.php:166
-#, fuzzy
 msgid "Cannot disable media type"
 msgid_plural "Cannot disable media types"
 msgstr[0] "Не вдалося дезактивувати метод повідомлень"
-msgstr[1] "Не вдалося дезактивувати метод повідомлень"
-msgstr[2] "Не вдалося дезактивувати метод повідомлень"
+msgstr[1] "Не вдалося дезактивувати методи повідомлень"
+msgstr[2] "Не вдалося дезактивувати методи повідомлень"
+msgstr[3] "Не вдалося дезактивувати методи повідомлень"
 
 #: triggers.php:276
 msgid "Cannot disable trigger"
@@ -1862,6 +1880,7 @@ msgid_plural "Cannot disable triggers"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: trigger_prototypes.php:248
 msgid "Cannot disable trigger prototype"
@@ -1869,6 +1888,7 @@ msgid_plural "Cannot disable trigger prototypes"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: usergrps.php:343
 msgid "Cannot disable user group"
@@ -1876,14 +1896,15 @@ msgid_plural "Cannot disable user groups"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: httpconf.php:297
-#, fuzzy
 msgid "Cannot disable web scenario"
 msgid_plural "Cannot disable web scenarios"
 msgstr[0] "Не вдалося відключити веб-сценарій"
-msgstr[1] "Не вдалося відключити веб-сценарій"
-msgstr[2] "Не вдалося відключити веб-сценарій"
+msgstr[1] "Не вдалося відключити веб-сценарії"
+msgstr[2] "Не вдалося відключити веб-сценарії"
+msgstr[3] "Не вдалося відключити веб-сценарії"
 
 #: queue.php:61
 msgid "Cannot display item queue."
@@ -1891,7 +1912,7 @@ msgstr "Не вдалося відобразити чергу елементів
 
 #: chart7.php:78
 msgid "Cannot display more than one item with type \"Graph sum\"."
-msgstr "Не удалось відобразити більше одного елемента даних з типом \"Сума графіку\". "
+msgstr "Не удалось відобразити більше одного елемента даних з типом \"Сума графіку\"."
 
 #: actionconf.php:347
 msgid "Cannot enable action"
@@ -1899,6 +1920,7 @@ msgid_plural "Cannot enable actions"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: discoveryconf.php:187
 msgid "Cannot enable discovery rule"
@@ -1906,6 +1928,7 @@ msgid_plural "Cannot enable discovery rules"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: host_discovery.php:285
 msgid "Cannot enable discovery rules"
@@ -1913,6 +1936,7 @@ msgid_plural "Cannot enable discovery rules"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: hostgroups.php:230 hosts.php:623 proxies.php:182
 msgid "Cannot enable host"
@@ -1920,6 +1944,7 @@ msgid_plural "Cannot enable hosts"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: host_prototypes.php:235
 msgid "Cannot enable host prototype"
@@ -1927,6 +1952,7 @@ msgid_plural "Cannot enable host prototypes"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: applications.php:210 items.php:681
 msgid "Cannot enable item"
@@ -1934,6 +1960,7 @@ msgid_plural "Cannot enable items"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: disc_prototypes.php:328
 msgid "Cannot enable item prototype"
@@ -1941,14 +1968,15 @@ msgid_plural "Cannot enable item prototypes"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: media_types.php:165
-#, fuzzy
 msgid "Cannot enable media type"
 msgid_plural "Cannot enable media types"
 msgstr[0] "Не вдалося активувати метод повідомлень"
-msgstr[1] "Не вдалося активувати метод повідомлень"
-msgstr[2] "Не вдалося активувати метод повідомлень"
+msgstr[1] "Не вдалося активувати методи повідомлень"
+msgstr[2] "Не вдалося активувати методи повідомлень"
+msgstr[3] "Не вдалося активувати методи повідомлень"
 
 #: triggers.php:275
 msgid "Cannot enable trigger"
@@ -1956,6 +1984,7 @@ msgid_plural "Cannot enable triggers"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: trigger_prototypes.php:247
 msgid "Cannot enable trigger prototype"
@@ -1963,6 +1992,7 @@ msgid_plural "Cannot enable trigger prototypes"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: usergrps.php:342
 msgid "Cannot enable user group"
@@ -1970,6 +2000,7 @@ msgid_plural "Cannot enable user groups"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: httpconf.php:296
 msgid "Cannot enable web scenario"
@@ -1977,6 +2008,7 @@ msgid_plural "Cannot enable web scenarios"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: include/classes/import/CXmlImport18.php:677
 #: include/classes/import/importers/CMapImporter.php:188
@@ -2145,6 +2177,7 @@ msgid_plural "Cannot import screen \"%1$s\": subscreens \"%2$s\" do not exist."
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: include/classes/import/importers/CTemplateImporter.php:114
 #, c-format
@@ -2153,6 +2186,7 @@ msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not 
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: include/classes/class.cview.php:113
 #, c-format
@@ -4059,8 +4093,9 @@ msgstr "Видалити вибрані перетворення значень?
 msgid "Delete selected value mapping? It is used for %d item!"
 msgid_plural "Delete selected value mapping? It is used for %d items!"
 msgstr[0] "Видалити вибране перетворення значення? Воно використовується в %d елементі даних!"
-msgstr[1] "Видалити вибране перетворення значення? Воно використовується в %d елементах даних!"
+msgstr[1] "Видалити вибране перетворення значення? Воно використовується в %d елементі даних!"
 msgstr[2] "Видалити вибране перетворення значення? Воно використовується в %d елементах даних!"
+msgstr[3] "Видалити вибране перетворення значення? Воно використовується в %d елементах даних!"
 
 #: templates.php:647
 msgid "Delete selected with linked elements"
@@ -4508,6 +4543,7 @@ msgid_plural "Discovery rules disabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: discoveryconf.php:184 host_discovery.php:282
 msgid "Discovery rule enabled"
@@ -4515,6 +4551,7 @@ msgid_plural "Discovery rules enabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: discoveryconf.php:134 host_discovery.php:259
 msgid "Discovery rule updated"
@@ -5486,7 +5523,7 @@ msgstr "Доступ до GUI відключено."
 
 #: include/menu.inc.php:226
 msgid "General"
-msgstr "Загальні парам."
+msgstr "Загальні"
 
 #: chart4.php:168 chart5.php:200
 #: include/classes/graphdraw/CBarGraphDraw.php:779
@@ -6137,6 +6174,7 @@ msgid_plural "Hosts disabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: hostgroups.php:227 hosts.php:620 proxies.php:179
 msgid "Host enabled"
@@ -6144,6 +6182,7 @@ msgid_plural "Hosts enabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: include/actions.inc.php:60 include/audit.inc.php:35
 #: include/blocks.inc.php:196 include/blocks.inc.php:386
@@ -6288,6 +6327,7 @@ msgid_plural "Host prototypes disabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: host_prototypes.php:232
 msgid "Host prototype enabled"
@@ -6295,6 +6335,7 @@ msgid_plural "Host prototypes enabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: host_prototypes.php:188
 msgid "Host prototype updated"
@@ -7312,7 +7353,7 @@ msgstr "Некоректні параметри для групи користу
 #: api/classes/CService.php:1211
 #, c-format
 msgid "Incorrect parent for service \"%1$s\"."
-msgstr "Некоректна батьківська для послуги \"%s\"."
+msgstr "Некоректна батьківська послуга для послуги \"%1$s\"."
 
 #: api/classes/CService.php:1214
 msgid "Incorrect parent service."
@@ -7845,6 +7886,7 @@ msgid_plural "Items disabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: applications.php:207 items.php:678
 msgid "Item enabled"
@@ -7852,6 +7894,7 @@ msgid_plural "Items enabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: include/actions.inc.php:1153
 msgid "Item in \"normal\" state"
@@ -7889,6 +7932,7 @@ msgid_plural "Item prototypes disabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: disc_prototypes.php:325
 msgid "Item prototype enabled"
@@ -7896,6 +7940,7 @@ msgid_plural "Item prototypes enabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: disc_prototypes.php:301
 msgid "Item prototype updated"
@@ -8189,8 +8234,9 @@ msgstr "Остання"
 msgid "Last %1$d issue"
 msgid_plural "Last %1$d issues"
 msgstr[0] "Остання %1$d подія"
-msgstr[1] "Останні %1$d події"
-msgstr[2] "Останні %1$d подій"
+msgstr[1] "Остання %1$d подія"
+msgstr[2] "Останні %1$d події"
+msgstr[3] "Останні %1$d подій"
 
 #: popup_trexpr.php:239
 msgid "Last (most recent) T value is < N"
@@ -8836,6 +8882,7 @@ msgid_plural "Maximum DNS name length is %1$d characters, \"%2$s\" is %3$d chara
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: api/classes/CUser.php:316
 #, c-format
@@ -8844,6 +8891,7 @@ msgid_plural "Maximum alias length is %1$d characters, \"%2$s\" is %3$d characte
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: api/classes/CHost.php:733
 #, c-format
@@ -8852,6 +8900,7 @@ msgid_plural "Maximum host name length is %1$d characters, \"%2$s\" is %3$d char
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: include/views/configuration.item.edit.php:319
 #: include/views/configuration.item.massupdate.php:372
@@ -8875,6 +8924,7 @@ msgid_plural "Maximum time period to display is %1$s days."
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: popup_trexpr.php:259
 msgid "Maximum value for period T is < N"
@@ -8899,6 +8949,7 @@ msgid_plural "Maximum visible host name length is %1$d characters, \"%2$s\" is %
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: include/forms.inc.php:1700 include/func.inc.php:133
 #: include/func.inc.php:264 jsLoader.php:122
@@ -8934,20 +8985,20 @@ msgid "Media type deleted"
 msgstr "Метод повідомлень видалено"
 
 #: media_types.php:163
-#, fuzzy
 msgid "Media type disabled"
 msgid_plural "Media types disabled"
 msgstr[0] "Метод повідомлень дезактивовано"
-msgstr[1] "Метод повідомлень дезактивовано"
-msgstr[2] "Метод повідомлень дезактивовано"
+msgstr[1] "Методи повідомлень дезактивовано"
+msgstr[2] "Методи повідомлень дезактивовано"
+msgstr[3] "Методи повідомлень дезактивовано"
 
 #: media_types.php:162
-#, fuzzy
 msgid "Media type enabled"
 msgid_plural "Media types enabled"
 msgstr[0] "Метод повідомлень активовано"
-msgstr[1] "Метод повідомлень активовано"
-msgstr[2] "Метод повідомлень активовано"
+msgstr[1] "Методи повідомлень активовано"
+msgstr[2] "Методи повідомлень активовано"
+msgstr[3] "Методи повідомлень активовано"
 
 #: media_types.php:121
 msgid "Media type updated"
@@ -9076,6 +9127,7 @@ msgid_plural "Minimum time period to display is %1$s hours."
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: include/views/configuration.sysmap.edit.php:132 tr_status.php:310
 msgid "Minimum trigger severity"
@@ -11545,8 +11597,9 @@ msgstr "Регулярний вираз додано"
 msgid "Regular expression deleted"
 msgid_plural "Regular expressions deleted"
 msgstr[0] "Регулярний вираз видалено"
-msgstr[1] "Регулярні вирази видалено"
+msgstr[1] "Регулярний вираз видалено"
 msgstr[2] "Регулярні вирази видалено"
+msgstr[3] "Регулярні вирази видалено"
 
 #: include/regexp.inc.php:85
 msgid "Regular expression does not exist."
@@ -13459,6 +13512,7 @@ msgid_plural "The image is used in icon maps %1$s."
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: api/classes/CImage.php:519
 #, c-format
@@ -13467,6 +13521,7 @@ msgid_plural "The image is used in maps %1$s."
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: include/views/configuration.item.list.php:127
 #, c-format
@@ -13498,8 +13553,9 @@ msgstr "Тема інтерфейсу"
 msgid "There is \"%1$d\" group with Internal GUI access."
 msgid_plural "There are \"%1$d\" groups with Internal GUI access."
 msgstr[0] "Існує \"%1$d\" група з Внутрішнім доступом до GUI."
-msgstr[1] "Існує \"%1$d\" групи з Внутрішнім доступом до GUI."
-msgstr[2] "Існує \"%1$d\" груп з Внутрішнім доступом до GUI."
+msgstr[1] "Існує \"%1$d\" група з Внутрішнім доступом до GUI."
+msgstr[2] "Існує \"%1$d\" групи з Внутрішнім доступом до GUI."
+msgstr[3] "Існує \"%1$d\" груп з Внутрішнім доступом до GUI."
 
 #: include/forms.inc.php:1725 include/maintenances.inc.php:120
 msgid "Third"
@@ -13765,6 +13821,7 @@ msgid_plural "Triggers disabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: adm.gui.php:104 adm.housekeeper.php:135 adm.iconmapping.php:118
 #: adm.images.php:140 adm.macros.php:167 adm.other.php:119 adm.regexps.php:201
@@ -13780,6 +13837,7 @@ msgid_plural "Triggers enabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: adm.housekeeper.php:34
 msgid "Trigger event and alert data storage period"
@@ -13850,6 +13908,7 @@ msgid_plural "Trigger prototypes disabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: trigger_prototypes.php:244
 msgid "Trigger prototype enabled"
@@ -13857,6 +13916,7 @@ msgid_plural "Trigger prototypes enabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: api/classes/CTriggerPrototype.php:530 api/classes/CTriggerPrototype.php:605
 #, c-format
@@ -14537,6 +14597,7 @@ msgid_plural "User groups disabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: usergrps.php:339
 msgid "User group enabled"
@@ -14544,6 +14605,7 @@ msgid_plural "User groups enabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: include/views/administration.general.other.edit.php:37
 msgid "User group for database down message"
@@ -15035,6 +15097,7 @@ msgid_plural "Web scenarios disabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: httpconf.php:293
 msgid "Web scenario enabled"
@@ -15042,6 +15105,7 @@ msgid_plural "Web scenarios enabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: api/classes/CHttpTest.php:472 api/classes/CHttpTest.php:512
 #, c-format
