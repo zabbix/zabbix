@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-25 02:05+0200\n"
-"PO-Revision-Date: 2013-11-12 16:41+0300\n"
+"POT-Creation-Date: 2014-01-25 03:35+0200\n"
+"PO-Revision-Date: 2014-01-21 16:02+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: it\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1384267313.0\n"
+"X-POOTLE-MTIME: 1390312974.0\n"
 
 #: api/classes/CMaintenance.php:353 api/classes/CMaintenance.php:358
 #: api/classes/CMaintenance.php:467 api/classes/CMaintenance.php:472
@@ -131,7 +131,7 @@ msgstr "(nessun proxy)"
 
 #: include/setup.inc.php:244
 msgid "(with warnings)"
-msgstr ""
+msgstr "(con problemi)"
 
 #: include/blocks.inc.php:1348
 msgid "-"
@@ -353,14 +353,14 @@ msgstr "Azione rimossa"
 #: actionconf.php:342
 msgid "Action disabled"
 msgid_plural "Actions disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Azione disabilitata"
+msgstr[1] "Azioni disabilitate"
 
 #: actionconf.php:341
 msgid "Action enabled"
 msgid_plural "Actions enabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Azione abilitata"
+msgstr[1] "Azioni abilitate"
 
 #: include/views/configuration.action.edit.php:420
 msgid "Action operations"
@@ -546,7 +546,7 @@ msgstr "Agente"
 #: include/classes/items/CHelpItems.php:65
 #: include/classes/items/CHelpItems.php:307
 msgid "Agent host name defined in the configuration file. String value."
-msgstr ""
+msgstr "Agent host name definito nel file di configurazione. Valore stringa."
 
 #: include/views/configuration.host.edit.php:253
 #: include/views/configuration.host.edit.php:337
@@ -561,7 +561,7 @@ msgstr "Interfaccia agente o SNMP o JMX o IPMI"
 
 #: include/classes/items/CHelpItems.php:561
 msgid "Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual."
-msgstr ""
+msgstr "Aggregate check non richiedono alcun agent in esecuzione sull'host monitorato. Zabbix server aggrega le informazioni raccolte tramite query al database. Vedere il Manuale Zabbix."
 
 #: include/hosts.inc.php:120 include/views/administration.users.edit.php:52
 #: include/views/administration.users.list.php:55 popup.php:615 users.php:44
@@ -613,7 +613,7 @@ msgstr "Host consentiti"
 #: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:543
 msgid "Amount of memory size in bytes. If mode is missing total is used."
-msgstr ""
+msgstr "Dimensione quantita' di memoria in byte. Viene utilizzata la \"total\" se la modalità è mancante."
 
 #: tr_status.php:277 tr_status.php:283
 msgid "Any"
@@ -770,7 +770,7 @@ msgstr "Creare almeno un intervallo di manutenzione."
 
 #: include/classes/class.frontendsetup.php:225
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported."
-msgstr ""
+msgstr "Almeno uno di MySQL, PostgreSQL, Oracle, SQLite3 o IBM DB2 dovrebbe essere supportato."
 
 #: include/menu.inc.php:264
 #: include/views/administration.general.housekeeper.edit.php:99
@@ -783,12 +783,12 @@ msgstr "Azioni audit"
 
 #: adm.housekeeper.php:51
 msgid "Audit data storage period"
-msgstr ""
+msgstr "Periodo ritenzione dati di Audit"
 
 #: adm.housekeeper.php:110
 #, c-format
 msgid "Audit data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "Periodo ritenzione dati di Audit (in giorni) \"%1$s\"."
 
 #: auditlogs.php:27
 msgid "Audit logs"
@@ -858,16 +858,16 @@ msgstr "Auto-logout (min 90 secondi)"
 
 #: include/views/administration.general.housekeeper.edit.php:56
 msgid "Auto-registration data storage period (in days)"
-msgstr ""
+msgstr "Auto-registratione periodo ritenzione dati (in giorni)"
 
 #: adm.housekeeper.php:43
 msgid "Auto-registration event and alert data storage period"
-msgstr ""
+msgstr "Auto-registratione eventi e segnalazioni periodo ritenzione dati"
 
 #: adm.housekeeper.php:108
 #, c-format
 msgid "Auto-registration event and alert data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "Auto-registratione eventi e segnalazioni periodo ritenzione dati (in giorni) %1$s\"."
 
 #: include/views/configuration.host.edit.php:782
 #: include/views/configuration.host.massupdate.php:242
@@ -1068,7 +1068,7 @@ msgstr "CONFIGURAZIONE HOST"
 
 #: adm.housekeeper.php:141
 msgid "CONFIGURATION OF HOUSEKEEPING"
-msgstr ""
+msgstr "CONFIGURAZIONE DI HOUSEKEEPING"
 
 #: adm.iconmapping.php:130
 msgid "CONFIGURATION OF ICON MAPPING"
@@ -1194,7 +1194,7 @@ msgstr "CONFIGURAZIONE ZABBIX"
 #: include/classes/items/CHelpItems.php:181
 #: include/classes/items/CHelpItems.php:435
 msgid "CPU info - lists full info for all CPUs by default"
-msgstr ""
+msgstr "CPU info - Mostra informazioni complete per tutte le CPU di default"
 
 #: include/classes/items/CHelpItems.php:157
 #: include/classes/items/CHelpItems.php:411
