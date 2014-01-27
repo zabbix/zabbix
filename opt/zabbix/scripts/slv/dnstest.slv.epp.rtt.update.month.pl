@@ -31,7 +31,7 @@ my $cfg_delay = zapi_get_macro_epp_delay();
 
 db_connect();
 
-process_slv_monthly($tld, $cfg_key_in, $cfg_key_out, $from, $till, $value_ts, $cfg_delay, \&check_item_value);
+process_slv_monthly($tld, $cfg_key_in, $cfg_key_out, $from, $till, $value_ts, $cfg_delay, \&check_item_value, MIN_UPDATE_ERROR, MAX_UPDATE_ERROR);
 
 exit(SUCCESS);
 

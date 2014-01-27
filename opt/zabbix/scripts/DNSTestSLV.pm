@@ -16,6 +16,12 @@ use constant DOWN => 0;
 
 use constant MAX_SERVICE_ERROR => -200; # -200, -201 ...
 use constant RDDS_UP => 2; # results of input items: 0 - RDDS down, 1 - only RDDS43 up, 2 - both RDDS43 and RDDS80 up
+use constant MIN_LOGIN_ERROR => -205;
+use constant MAX_LOGIN_ERROR => -203;
+use constant MIN_UPDATE_ERROR => -208;
+use constant MAX_UPDATE_ERROR => -206;
+use constant MIN_INFO_ERROR => -211;
+use constant MAX_INFO_ERROR => -209;
 
 use constant TRIGGER_SEVERITY_NOT_CLASSIFIED => 0;
 use constant TRIGGER_VALUE_CHANGED_YES => 1;
@@ -630,6 +636,8 @@ sub process_slv_monthly
     my $value_ts = shift;        # value timestamp
     my $cfg_interval = shift;    # input values interval
     my $check_value_ref = shift; # a pointer to subroutine to check if the value was successful
+    my $min_error = shift;       # min error that relates to this item
+    my $max_error = shift;       # max error that relates to this item
 
     my $probes_ref = get_probes();
 
@@ -654,10 +662,15 @@ sub process_slv_monthly
 
 	my $online_items_ref = get_online_items($hostids_ref, $all_items_ref);
 
-	my $values_ref = get_values($online_items_ref, $cur_from, $cur_till);
+	my $values_ref = get_dbl_values($online_items_ref, $cur_from, $cur_till);
 
 	foreach my $value (@$values_ref)
 	{
+	    if ($value < 0 and (defined($min_error) or defined($max_error)))
+	    {
+		next if ((defined($min_error) and $value < $min_error) or (defined($max_error) and $value > $max_error));
+	    }
+
 	    $total_values++;
 	    $successful_values++ if ($check_value_ref->($value) == SUCCESS);
 	}
@@ -786,7 +799,7 @@ sub get_item_values
 	}
     }
 
-    return \%result;    
+    return \%result;
 }
 
 sub exit_if_lastclock
@@ -1056,7 +1069,7 @@ sub get_ns_values
 }
 
 # return an array reference of values of items for the particular period
-sub get_values
+sub get_dbl_values
 {
     my $items_ref = shift;
     my $from = shift;
@@ -1088,7 +1101,7 @@ sub get_online_items
 {
     my $hostids_ref = shift;
     my $all_items = shift;
-			    
+
     my %result;
 
     foreach my $hostid (@$hostids_ref)

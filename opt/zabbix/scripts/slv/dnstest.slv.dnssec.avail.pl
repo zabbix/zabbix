@@ -53,7 +53,7 @@ else
     fail("no input items ($cfg_key_in.*)");
 }
 
-my $values_ref = get_values(\@items);
+my $values_ref = get_values_by_items(\@items);
 
 info("itemid:", $_->[0], " value:", $_->[1]) foreach (@$values_ref);
 
@@ -78,7 +78,7 @@ info(($test_result == UP ? "success" : "fail"), " (dnssec_errors: $dnssec_errors
 send_value($tld, $cfg_key_out, $value_ts, $test_result);
 exit(SUCCESS);
 
-sub get_values
+sub get_values_by_items
 {
     my $items_ref = shift;
 
