@@ -1090,16 +1090,19 @@ char	*get_ip_by_socket(zbx_sock_t *s)
 		goto out;
 	}
 
-#if defined(HAVE_IPV6)
-	if (0 != getnameinfo((struct sockaddr*)&sa, sizeof(struct sockaddr), host, sizeof(host), NULL, 0, NI_NUMERICHOST))
+	switch (((struct sockaddr *)&sa)->sa_family)
 	{
-		error_message = strerror_from_system(zbx_sock_last_error());
-		zbx_set_tcp_strerror("connection rejected, getnameinfo() failed: %s", error_message);
-	}
-#else
-	zbx_snprintf(host, sizeof(host), "%s", inet_ntoa(sa.sin_addr));
+		case AF_INET:
+			inet_ntop(AF_INET, &(((struct sockaddr_in *)&sa)->sin_addr), host, sizeof(host));
+			break;
+#if defined(HAVE_IPV6)
+		case AF_INET6:
+			inet_ntop(AF_INET6, &(((struct sockaddr_in6 *)&sa)->sin6_addr), host, sizeof(host));
+			break;
 #endif
-
+		default:
+			error_message = "Unrecognized address family";
+	}
 out:
 	if (NULL != error_message)
 	{
