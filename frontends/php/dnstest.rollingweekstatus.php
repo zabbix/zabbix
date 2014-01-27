@@ -225,7 +225,8 @@ if ($tlds) {
 		'filter' => array(
 			'key_' => array(
 				DNSTEST_SLV_DNS_ROLLWEEK, DNSTEST_SLV_DNSSEC_ROLLWEEK, DNSTEST_SLV_RDDS_ROLLWEEK,
-				DNSTEST_SLV_DNS_AVAIL, DNSTEST_SLV_DNSSEC_AVAIL, DNSTEST_SLV_RDDS_AVAIL
+				DNSTEST_SLV_EPP_ROLLWEEK, DNSTEST_SLV_DNS_AVAIL, DNSTEST_SLV_DNSSEC_AVAIL,
+				DNSTEST_SLV_RDDS_AVAIL, DNSTEST_SLV_EPP_AVAIL
 			)
 		),
 		'output' => array('itemid', 'hostid', 'key_', 'lastvalue'),
@@ -238,7 +239,8 @@ if ($tlds) {
 			foreach ($items as $item) {
 				if (($item['key_'] == DNSTEST_SLV_DNS_ROLLWEEK && $sortField == 'dns')
 						|| ($item['key_'] == DNSTEST_SLV_DNSSEC_ROLLWEEK && $sortField == 'dnssec')
-						|| ($item['key_'] == DNSTEST_SLV_RDDS_ROLLWEEK && $sortField == 'rdds')) {
+						|| ($item['key_'] == DNSTEST_SLV_RDDS_ROLLWEEK && $sortField == 'rdds')
+						|| ($item['key_'] == DNSTEST_SLV_EPP_ROLLWEEK && $sortField == 'epp')) {
 					$sortItems[$item['itemid']]['lastvalue'] = $item['lastvalue'];
 					$sortItems[$item['itemid']]['hostid'] = $item['hostid'];
 					$itemIds[] = $item['itemid'];
@@ -283,6 +285,14 @@ if ($tlds) {
 				);
 				$data['tld'][$item['hostid']]['rdds']['trigger'] = false;
 			}
+			elseif ($item['key_'] == DNSTEST_SLV_EPP_ROLLWEEK && $sortField != 'epp') {
+				$data['tld'][$item['hostid']]['epp']['itemid'] = $item['itemid'];
+				$data['tld'][$item['hostid']]['epp']['lastvalue'] = sprintf(
+					'%.3f',
+					$item['lastvalue']
+				);
+				$data['tld'][$item['hostid']]['epp']['trigger'] = false;
+			}
 			elseif ($item['key_'] == DNSTEST_SLV_DNS_AVAIL) {
 				$data['tld'][$item['hostid']]['dns']['availItemId'] = $item['itemid'];
 				$itemIds[] = $item['itemid'];
@@ -293,6 +303,10 @@ if ($tlds) {
 			}
 			elseif ($item['key_'] == DNSTEST_SLV_RDDS_AVAIL) {
 				$data['tld'][$item['hostid']]['rdds']['availItemId'] = $item['itemid'];
+				$itemIds[] = $item['itemid'];
+			}
+			elseif ($item['key_'] == DNSTEST_SLV_EPP_AVAIL) {
+				$data['tld'][$item['hostid']]['epp']['availItemId'] = $item['itemid'];
 				$itemIds[] = $item['itemid'];
 			}
 		}
@@ -326,6 +340,10 @@ if ($tlds) {
 					case DNSTEST_SLV_RDDS_AVAIL:
 						$data['tld'][$items[$trItem]['hostid']]['rdds']['trigger'] = true;
 						$data['tld'][$items[$trItem]['hostid']]['rdds']['incident'] = getLastEvent($trigger['triggerid']);
+						break;
+					case DNSTEST_SLV_EPP_AVAIL:
+						$data['tld'][$items[$trItem]['hostid']]['epp']['trigger'] = true;
+						$data['tld'][$items[$trItem]['hostid']]['epp']['incident'] = getLastEvent($trigger['triggerid']);
 						break;
 				}
 

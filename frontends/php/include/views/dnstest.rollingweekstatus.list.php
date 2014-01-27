@@ -108,6 +108,8 @@ if (isset($this->data['tld'])) {
 	$from = date('YmdHis', time() - SEC_PER_WEEK);
 	$till = date('YmdHis', time());
 	foreach ($this->data['tld'] as $key => $tld) {
+
+		// DNS
 		if (isset($tld['dns'])) {
 			if ($tld['dns']['trigger']) {
 				if ($tld['dns']['incident'] && isset($tld['dns']['availItemId'])
@@ -148,6 +150,8 @@ if (isset($this->data['tld'])) {
 			$dns = new CDiv(null, 'status_icon status_icon_extra iconrollingweekdisabled disabled-service');
 			$dns->setHint('Incorrect TLD configuration.', '', 'on');
 		}
+
+		// DNSSEC
 		if (isset($tld['dnssec'])) {
 			if ($tld['dnssec']['trigger']) {
 				if ($tld['dnssec']['incident'] && isset($tld['dnssec']['availItemId'])
@@ -188,6 +192,8 @@ if (isset($this->data['tld'])) {
 			$dnssec = new CDiv(null, 'status_icon status_icon_extra iconrollingweekdisabled disabled-service');
 			$dnssec->setHint('DNSSEC is disabled.', '', 'on');
 		}
+
+		// RDDS
 		if (isset($tld['rdds'])) {
 			if ($tld['rdds']['trigger']) {
 				if ($tld['rdds']['incident'] && isset($tld['rdds']['availItemId'])
@@ -228,12 +234,54 @@ if (isset($this->data['tld'])) {
 			$rdds = new CDiv(null, 'status_icon status_icon_extra iconrollingweekdisabled disabled-service');
 			$rdds->setHint('RDDS is disabled.', '', 'on');
 		}
+
+		// EPP
+		if (isset($tld['epp'])) {
+			if ($tld['epp']['trigger']) {
+				if ($tld['epp']['incident'] && isset($tld['epp']['availItemId'])
+						&& isset($tld['epp']['itemid'])) {
+					$eppStatus =  new CLink(
+						new CDiv(null, 'status_icon status_icon_extra iconrollingweekfail cell-value'),
+						'dnstest.incidentdetails.php?host='.$tld['host'].'&eventid='.$tld['epp']['incident'].
+							'&slvItemId='.$tld['epp']['itemid'].'&filter_from='.$from.'&filter_to='.$till.
+							'&availItemId='.$tld['epp']['availItemId']
+					);
+				}
+				else {
+					$eppStatus =  new CDiv(null, 'status_icon status_icon_extra iconrollingweekfail cell-value');
+				}
+			}
+			else {
+				$eppStatus =  new CDiv(null, 'status_icon status_icon_extra iconrollingweekok cell-value');
+			}
+
+			$eppValue = ($tld['epp']['lastvalue'] > 0)
+				? new CLink(
+					$tld['epp']['lastvalue'].'%',
+					'dnstest.incidents.php?filter_set=1&filter_rolling_week=1&incident_type=2&host='.$tld['host'],
+					'first-cell-value'
+				)
+				: new CSpan('0.000%', 'first-cell-value');
+
+			$eppGraph = ($tld['epp']['lastvalue'] > 0)
+				? new CLink(
+					'graph',
+					'history.php?action=showgraph&period='.SEC_PER_WEEK.'&itemid='.$tld['epp']['itemid'],
+					'cell-value'
+				)
+				: null;
+			$epp =  array(new CSpan($eppValue, 'right'), $eppStatus, $eppGraph);
+		}
+		else {
+			$epp = new CDiv(null, 'status_icon status_icon_extra iconrollingweekdisabled disabled-service');
+			$epp->setHint('EPP is disabled.', '', 'on');
+		}
 		$row = array(
 			$tld['name'],
 			$dns,
 			$dnssec,
 			$rdds,
-			'-'
+			$epp
 		);
 
 		$table->addRow($row);
