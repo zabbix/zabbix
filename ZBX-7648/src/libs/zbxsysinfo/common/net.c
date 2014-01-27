@@ -429,7 +429,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 	if (NULL != ip && '\0' != *ip)
 	{
-		if (0 == _res.nscount /* should never happen on a sane system */ || 0 == inet_aton(ip, &inaddr))
+		if (0 == inet_aton(ip, &inaddr))
 			return SYSINFO_RET_FAIL;
 
 		memcpy(&saved_ns, &(_res.nsaddr_list[0]), sizeof(struct sockaddr_in));
