@@ -69,7 +69,7 @@ foreach my $itemid (keys(%$values_ref))
 }
 
 my $test_result = DOWN;
-$test_result = UP if ($success_probes * 100 / scalar(@$items_ref) > 49);    
+$test_result = UP if ($success_probes * 100 / scalar(@$items_ref) > 49);
 
 info($test_result == UP ? "success" : "fail");
 send_value($tld, $cfg_key_out, $value_ts, $test_result);

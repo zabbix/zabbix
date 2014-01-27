@@ -29,7 +29,7 @@ our ($zabbix, $result, $dbh, $tld);
 our %OPTS; # command-line options
 
 our @EXPORT = qw($zabbix $result $dbh $tld %OPTS
-		SUCCESS FAIL UP DOWN RDDS_UP
+		SUCCESS FAIL UP DOWN RDDS_UP RTT_LIMIT_MULTIPLIER
 		zapi_connect zapi_get_macro_minns zapi_get_macro_dns_probe_online
 		zapi_get_macro_rdds_probe_online zapi_get_macro_dns_rollweek_sla zapi_get_macro_rdds_rollweek_sla
 		zapi_get_macro_dns_udp_rtt zapi_get_macro_dns_tcp_rtt zapi_get_macro_rdds_rtt
