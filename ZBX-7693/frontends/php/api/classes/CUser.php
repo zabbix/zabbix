@@ -286,18 +286,18 @@ class CUser extends CZBXAPI {
 			// permissions
 			if ($create) {
 				if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions to create users.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('You do not have permissions to create users.'));
 				}
 
 				$dbUser = $user;
 			}
 			elseif ($update) {
 				if (!isset($dbUsers[$user['userid']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions to update user or user does not exist.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('You do not have permissions to update user or user does not exist.'));
 				}
 
 				if (bccomp(self::$userData['userid'], $user['userid']) != 0 && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions to update other users.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('You do not have permissions to update other users.'));
 				}
 
 				$dbUser = $dbUsers[$user['userid']];
@@ -381,7 +381,7 @@ class CUser extends CZBXAPI {
 				}
 				else {
 					if ($dbUser['alias'] == ZBX_GUEST_USER && !zbx_empty($user['passwd'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not allowed to set password for user "guest".'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Not allowed to set password for user "guest".'));
 					}
 
 					$user['passwd'] = md5($user['passwd']);
@@ -649,6 +649,10 @@ class CUser extends CZBXAPI {
 		$media = zbx_toArray($data['medias']);
 		$users = zbx_toArray($data['users']);
 
+		if (!$this->isWritable(zbx_objectValues($users, 'userid'))) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permissions to create other user media.'));
+		}
+
 		$mediaDBfields = array(
 			'period' => null,
 			'mediatypeid' => null,
@@ -705,6 +709,16 @@ class CUser extends CZBXAPI {
 
 		$mediaIds = zbx_toArray($mediaIds);
 
+		$dbMediaCount = API::UserMedia()->get(array(
+			'countOutput' => true,
+			'mediaids' => $mediaIds,
+			'editable' => true
+		));
+
+		if (count($mediaIds) != $dbMediaCount) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('You do not have permissions to delete other user media.'));
+		}
+
 		if (!DBexecute('DELETE FROM media WHERE '.dbConditionInt('mediaid', $mediaIds))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete user media.'));
 		}
@@ -741,6 +755,7 @@ class CUser extends CZBXAPI {
 		$userIds = zbx_objectValues($users, 'userid');
 
 		$dbMedia = API::UserMedia()->get(array(
+			'output' => array('mediaid'),
 			'userids' => $userIds,
 			'editable' => true,
 			'preservekeys' => true
@@ -749,7 +764,7 @@ class CUser extends CZBXAPI {
 		foreach ($media as $mediaItem) {
 			if (isset($mediaItem['mediaid'])) {
 				if (!isset($dbMedia[$mediaItem['mediaid']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions to update other user media.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('You do not have permissions to update other user media.'));
 				}
 
 				$mediaToUpdate[$mediaItem['mediaid']] = $mediaItem;
@@ -1229,7 +1244,7 @@ class CUser extends CZBXAPI {
 	 */
 	protected function checkDeleteCurrentUser(array $userIds) {
 		if (in_array(self::$userData['userid'], $userIds)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('User is not allowed to delete himself.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('User is not allowed to delete himself.'));
 		}
 	}
 
