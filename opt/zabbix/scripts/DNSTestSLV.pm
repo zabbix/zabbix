@@ -398,16 +398,16 @@ sub get_online_probes
 	$probe_down = 0;
         $no_values = 1;
 	while (@row = $res->fetchrow_array)
-        {   
+        {
             $no_values = 0;
 
             if ($row[0] == DOWN)
-            {   
+            {
 		dbg("  $host ($hostid) down (automatic: between $from and $till)");
                 $probe_down = 1;
                 last;
             }
-        }	
+        }
 
 	next if ($probe_down == 1);
 
@@ -433,7 +433,7 @@ sub get_online_probes
 		    next;
 		}
 	    }
-	}	    
+	}
 
 	push(@result, $host);
     }
@@ -560,9 +560,11 @@ sub process_slv_ns_monthly
     # 'g.ns.se.,2001:6b0:e:3::1' => 150,
     # 'b.ns.se.,192.36.133.107' => 200,
     # ...
+    my %total_values;;
     my %successful_values;
     foreach my $ns (@$nss_ref)
     {
+	$total_values{$ns} = 0;
 	$successful_values{$ns} = 0;
     }
 
@@ -572,23 +574,8 @@ sub process_slv_ns_monthly
 
     my $cur_from = $from;
     my ($interval, $cur_till);
-    my $total_iterations = 0;
     while ($cur_from < $till)
-    {    
-	$total_iterations++;
-
-	# We treat missing values as successful. Also we treat values received during probe OFFLINE as successful.
-	# So we set all the possible values to SUCCESS and then substract number of failed results later.
-	foreach my $hostid (keys(%$all_ns_items_ref))
-	{
-	    foreach my $itemid (keys(%{$all_ns_items_ref->{$hostid}}))
-	    {
-		my $ns = $all_ns_items_ref->{$hostid}{$itemid};
-
-		$successful_values{$ns}++;
-	    }
-	}
-
+    {
 	$interval = ($cur_from + $cfg_interval > $till ? $till - $cur_from : $cfg_interval);
 	$cur_till = $cur_from + $interval;
 	$cur_till-- unless ($cur_till == $till); # SQL BETWEEN includes upper bound
@@ -609,20 +596,26 @@ sub process_slv_ns_monthly
 
 	    foreach (@$item_values_ref)
 	    {
-		$successful_values{$ns}-- if ($check_value_ref->($_) != SUCCESS);
+		$total_values{$ns}++;
+		$successful_values{$ns}++ if ($check_value_ref->($_) == SUCCESS);
 	    }
 	}
 
 	$cur_from += $interval;
     }
 
-    my $values_per_ns = $total_iterations * scalar(keys(%$all_ns_items_ref));
-    foreach my $ns (keys(%successful_values))
+    foreach my $ns (keys(%total_values))
     {
-	my $key_out = $cfg_key_out . $ns . ']';
-	my $perc = sprintf("%.3f", $successful_values{$ns} * 100 / $values_per_ns);
+	if ($total_values{$ns} == 0)
+	{
+	    info("$ns: no values found in the database for a given period");
+	    next;
+	}
 
-	info("$ns: $perc% successful values (", $successful_values{$ns}, " out of $values_per_ns)");
+	my $key_out = $cfg_key_out . $ns . ']';
+	my $perc = sprintf("%.3f", $successful_values{$ns} * 100 / $total_values{$ns});
+
+	info("$ns: $perc% successful values (", $successful_values{$ns}, " out of ", $total_values{$ns});
 	send_value($tld, $key_out, $value_ts, $perc);
     }
 }
@@ -644,17 +637,11 @@ sub process_slv_monthly
 
     my $cur_from = $from;
     my ($interval, $cur_till);
-    my $total_iterations = 0;
+    my $total_values = 0;
     my $successful_values = 0;
 
     while ($cur_from < $till)
     {
-	$total_iterations++;
-
-	# We treat missing values as successful. Also we treat values received during probe OFFLINE as successful.
-	# So we set all the possible values to SUCCESS and then substract number of failed results later.
-	$successful_values++ foreach (keys(%$all_items_ref));
-
 	$interval = ($cur_from + $cfg_interval > $till ? $till - $cur_from : $cfg_interval);
 	$cur_till = $cur_from + $interval;
 	$cur_till-- unless ($cur_till == $till); # SQL BETWEEN includes upper bound
@@ -671,13 +658,19 @@ sub process_slv_monthly
 
 	foreach my $value (@$values_ref)
 	{
-	    $successful_values-- if ($check_value_ref->($value) != SUCCESS);
+	    $total_values++;
+	    $successful_values++ if ($check_value_ref->($value) == SUCCESS);
 	}
 
 	$cur_from += $interval;
     }
 
-    my $total_values = $total_iterations * scalar(keys(%$all_items_ref));
+    if ($total_values == 0)
+    {
+	info("no values found in the database for a given period");
+	return;
+    }
+
     my $perc = sprintf("%.3f", $successful_values * 100 / $total_values);
 
     info("$perc% successful values ($successful_values out of $total_values)");
