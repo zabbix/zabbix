@@ -233,10 +233,10 @@ ul.objectlist li.selected { font-weight: bold; font-size: 1.2em; }
 ul.objectlist li a { color: #000000; font-weight: normal; }
 
 /* favorites */
-ul.favorites { vertical-align: top; margin: 8px 4px 8px 0; text-align: left; }
-ul.favorites li { line-height: 16px; vertical-align: top; list-style: url("../images/general/chart.png"); margin: 4px 0 4px 20px; }
+ul.favorites { padding-left: 5px; vertical-align: top; margin: 8px 4px 8px 0; text-align: left; }
+ul.favorites li { padding-left: 25px; margin: 9px 0; list-style: none; background: url("../images/general/chart.png") no-repeat left top; }
 ul.favorites li.empty { list-style: none; line-height: 18px; vertical-align: top; margin-left: 10px; color: #999; }
-ul.favorites li a { line-height: 18px; vertical-align: top; }
+ul.favorites li a { line-height: 18px; }
 
 /* frondend messages */
 ul.messages { overflow: auto; vertical-align: top; background-color: #FFFFFF; margin: 1px; text-align: left; }
