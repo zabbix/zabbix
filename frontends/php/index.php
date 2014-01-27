@@ -77,7 +77,7 @@ if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 			$url = 'dashboard.php';
 		}
 		redirect($url);
-		exit();
+		exit;
 	}
 	// login failed, fall back to a guest account
 	else {

@@ -105,7 +105,8 @@ if ($isExportData) {
 	else {
 		print($exportData);
 	}
-	exit();
+
+	exit;
 }
 
 

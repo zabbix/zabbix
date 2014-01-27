@@ -104,14 +104,14 @@ if (isset($_REQUEST['favobj'])) {
 		}
 
 		@ob_flush();
-		exit();
+		exit;
 
 	}
 }
 
 if (PAGE_TYPE_HTML != $page['type']) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit();
+	exit;
 }
 
 /*

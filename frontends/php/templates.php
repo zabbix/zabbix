@@ -104,7 +104,8 @@ if ($exportData) {
 	else {
 		show_messages();
 	}
-	exit();
+
+	exit;
 }
 
 /*

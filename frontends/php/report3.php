@@ -227,4 +227,3 @@ foreach ($sla['sla'] as $intervalSla) {
 $table->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

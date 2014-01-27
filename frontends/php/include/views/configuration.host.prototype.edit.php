@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 $discoveryRule = $data['discovery_rule'];
 $hostPrototype = $data['host_prototype'];
 $parentHost = $data['parent_host'];

@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 $itemsWidget = new CWidget();
 
 $discoveryRule = $this->data['discovery_rule'];
@@ -139,5 +139,5 @@ $itemForm->addItem(array($this->data['paging'], $hostTable, $this->data['paging'
 
 // append form to widget
 $itemsWidget->addItem($itemForm);
+
 return $itemsWidget;
-?>
