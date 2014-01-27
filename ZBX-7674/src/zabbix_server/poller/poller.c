@@ -211,6 +211,8 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
 					&trigger->timespec, trigger->new_value, trigger->value_changed, 0, 0);
 		}
+
+		DBflush_itservice_updates();
 	}
 
 	zbx_free(tr);

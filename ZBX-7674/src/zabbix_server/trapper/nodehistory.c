@@ -638,6 +638,8 @@ int	node_history(char *data, size_t datalen)
 			break;
 	}
 
+	DBflush_itservice_updates();
+
 	if (SUCCEED == res)
 		DBcommit();
 	else

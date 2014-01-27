@@ -554,6 +554,10 @@ void	DBdelete_host(zbx_uint64_t hostid);
 void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems, size_t *gitems_alloc, size_t *gitems_num);
 void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock);
 
+void	DBqueue_itservice_update(zbx_uint64_t triggerid, int status, int clock);
+int	DBflush_itservice_updates();
+int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_num);
+
 void	DBadd_trend(zbx_uint64_t itemid, double value, int clock);
 void	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
 
