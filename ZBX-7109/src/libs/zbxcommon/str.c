@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1889,149 +1889,6 @@ size_t	zbx_hex2binary(char *io)
 	return (int)(o - io);
 }
 
-#ifdef HAVE_POSTGRESQL
-/******************************************************************************
- *                                                                            *
- * Function: zbx_pg_escape_bytea                                              *
- *                                                                            *
- * Purpose: converts from binary string to the null terminated escaped string *
- *                                                                            *
- * Transformations:                                                           *
- *      '\0' [0x00] -> \\ooo (ooo is an octal number)                         *
- *      '\'' [0x37] -> \'                                                     *
- *      '\\' [0x5c] -> \\\\                                                   *
- *      <= 0x1f || >= 0x7f -> \\ooo                                           *
- *                                                                            *
- * Parameters:                                                                *
- *      input - null terminated hexadecimal string                            *
- *      output - pointer to buffer                                            *
- *      olen - size of returned buffer                                        *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-size_t	zbx_pg_escape_bytea(const u_char *input, size_t ilen, char **output, size_t *olen)
-{
-	const u_char	*i;
-	char		*o;
-	size_t		len;
-
-	assert(input);
-	assert(output);
-	assert(*output);
-	assert(olen);
-
-	len = 1; /* '\0' */
-	i = input;
-	while(i - input < ilen)
-	{
-		if(*i == '\0' || *i <= 0x1f || *i >= 0x7f)
-			len += 5;
-		else if(*i == '\'')
-			len += 2;
-		else if(*i == '\\')
-			len += 4;
-		else
-			len++;
-		i++;
-	}
-
-	if(*olen < len)
-	{
-		*olen = len;
-		*output = zbx_realloc(*output, *olen);
-	}
-	o = *output;
-	i = input;
-
-	while(i - input < ilen)
-	{
-		if(*i == '\0' || *i <= 0x1f || *i >= 0x7f)
-		{
-			*o++ = '\\';
-			*o++ = '\\';
-			*o++ = ((*i >> 6) & 0x7) + 0x30;
-			*o++ = ((*i >> 3) & 0x7) + 0x30;
-			*o++ = (*i & 0x7) + 0x30;
-		}
-		else if (*i == '\'')
-		{
-			*o++ = '\\';
-			*o++ = '\'';
-		}
-		else if (*i == '\\')
-		{
-			*o++ = '\\';
-			*o++ = '\\';
-			*o++ = '\\';
-			*o++ = '\\';
-		}
-		else
-			*o++ = *i;
-		i++;
-	}
-	*o = '\0';
-
-	return len - 1;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_pg_unescape_bytea                                            *
- *                                                                            *
- * Purpose: converts the null terminated string into binary buffer            *
- *                                                                            *
- * Transformations:                                                           *
- *      \ooo == a byte whose value = ooo (ooo is an octal number)             *
- *      \x   == x (x is any character)                                        *
- *                                                                            *
- * Parameters:                                                                *
- *      io - null terminated string                                           *
- *                                                                            *
- * Return value: length of the binary buffer                                  *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-size_t	zbx_pg_unescape_bytea(u_char *io)
-{
-	const u_char	*i = io;
-	u_char		*o = io;
-
-	assert(io);
-
-	while(*i != '\0')
-	{
-		switch(*i)
-		{
-			case '\\':
-				i++;
-				if(*i == '\\')
-				{
-					*o++ = *i++;
-				}
-				else
-				{
-					if(*i >= 0x30 && *i <= 0x39 && *(i + 1) >= 0x30 && *(i + 1) <= 0x39 && *(i + 2) >= 0x30 && *(i + 2) <= 0x39)
-					{
-						*o = (*i++ - 0x30) << 6;
-						*o += (*i++ - 0x30) << 3;
-						*o++ += *i++ - 0x30;
-					}
-				}
-				break;
-
-			default:
-				*o++ = *i++;
-		}
-	}
-
-	return o - io;
-}
-#endif
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_get_next_field                                               *
@@ -3229,7 +3086,7 @@ int	is_ascii_string(const char *str)
 {
 	while ('\0' != *str)
 	{
-		if (0 != ((1<<7) & *str)) /* check for range 0..127 */
+		if (0 != ((1 << 7) & *str))	/* check for range 0..127 */
 			return FAIL;
 
 		str++;

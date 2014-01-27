@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -100,7 +100,8 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 			break;
 		}
 
-		switch (types[num] = (unsigned char)atoi(row[0])) {
+		switch (types[num] = (unsigned char)atoi(row[0]))
+		{
 			case ZBX_HTTPITEM_TYPE_SPEED:
 			case ZBX_HTTPITEM_TYPE_LASTSTEP:
 				break;

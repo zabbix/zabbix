@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1107,22 +1107,22 @@ function getCurrentDelay($delay, array $arrOfFlexIntervals, $now) {
 		return $delay;
 	}
 
-	$currentDelay = SEC_PER_YEAR;
+	$currentDelay = -1;
 
 	foreach ($arrOfFlexIntervals as $flexInterval) {
 		if (sscanf($flexInterval, '%d/%29s', $flexDelay, $flexPeriod) != 2) {
 			continue;
 		}
-		if ($flexDelay < $currentDelay && checkTimePeriod($flexPeriod, $now)) {
+		if (($currentDelay == -1 || $flexDelay < $currentDelay) && checkTimePeriod($flexPeriod, $now)) {
 			$currentDelay = $flexDelay;
 		}
 	}
 
-	if ($currentDelay == SEC_PER_YEAR) {
+	if ($currentDelay == -1) {
 		return $delay;
 	}
 
-	return $currentDelay == 0 ? SEC_PER_YEAR : $currentDelay;
+	return $currentDelay;
 }
 
 /**
@@ -1227,16 +1227,18 @@ function getNextDelayInterval(array $arrOfFlexIntervals, $now, &$nextInterval) {
  * @return array
  */
 function calculateItemNextcheck($interfaceid, $itemid, $itemType, $delay, $flexIntervals, $now) {
-	if ($delay == 0) {
-		$delay = SEC_PER_YEAR;
-	}
-
 	// special processing of active items to see better view in queue
 	if ($itemType == ITEM_TYPE_ZABBIX_ACTIVE) {
-		$nextcheck = $now + $delay;
+		if ($delay != 0) {
+			$nextcheck = $now + $delay;
+		}
+		else {
+			$nextcheck = ZBX_JAN_2038;
+		}
 	}
 	else {
 		// try to find the nearest 'nextcheck' value with condition 'now' < 'nextcheck' < 'now' + SEC_PER_YEAR
+		// if it is not possible to check the item within a year, fail
 
 		$arrOfFlexIntervals = explode(';', $flexIntervals);
 		$t = $now;
@@ -1249,17 +1251,22 @@ function calculateItemNextcheck($interfaceid, $itemid, $itemType, $delay, $flexI
 			// calculate 'nextcheck' value for the current interval
 			$currentDelay = getCurrentDelay($delay, $arrOfFlexIntervals, $t);
 
-			$nextcheck = $currentDelay * floor($t / $currentDelay) + ($shift % $currentDelay);
+			if ($currentDelay != 0) {
+				$nextcheck = $currentDelay * floor($t / $currentDelay) + ($shift % $currentDelay);
 
-			if ($try == 0) {
-				while ($nextcheck <= $t) {
-					$nextcheck += $currentDelay;
+				if ($try == 0) {
+					while ($nextcheck <= $t) {
+						$nextcheck += $currentDelay;
+					}
+				}
+				else {
+					while ($nextcheck < $t) {
+						$nextcheck += $currentDelay;
+					}
 				}
 			}
 			else {
-				while ($nextcheck < $t) {
-					$nextcheck += $currentDelay;
-				}
+				$nextcheck = ZBX_JAN_2038;
 			}
 
 			// 'nextcheck' < end of the current interval ?
@@ -1273,6 +1280,7 @@ function calculateItemNextcheck($interfaceid, $itemid, $itemType, $delay, $flexI
 				break;
 			}
 		}
+
 		$delay = $currentDelay;
 	}
 

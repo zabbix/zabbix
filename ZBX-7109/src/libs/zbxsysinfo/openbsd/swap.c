@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -174,13 +174,18 @@ static int	get_swap_io(zbx_uint64_t *icount, zbx_uint64_t *ipages, zbx_uint64_t 
 	/* int pgswapin;	pages swapped in */
 	/* int pgswapout;	pages swapped out */
 
-	if (icount)
+#if OpenBSD < 201311		/* swapins and swapouts are not supported starting from OpenBSD 5.4 */
+	if (NULL != icount)
 		*icount = (zbx_uint64_t)v.swapins;
-	if (ipages)
-		*ipages = (zbx_uint64_t)v.pgswapin;
-	if (ocount)
+	if (NULL != ocount)
 		*ocount = (zbx_uint64_t)v.swapouts;
-	if (opages)
+#else
+	if (NULL != icount || NULL != ocount)
+		return SYSINFO_RET_FAIL;
+#endif
+	if (NULL != ipages)
+		*ipages = (zbx_uint64_t)v.pgswapin;
+	if (NULL != opages)
 		*opages = (zbx_uint64_t)v.pgswapout;
 
 	return SYSINFO_RET_OK;
@@ -261,7 +266,7 @@ int	SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		if (SYSINFO_RET_OK != get_swap_io(NULL, NULL, &value, NULL))
 			return SYSINFO_RET_FAIL;
 	}
-	else if (0 == strcmp(mode,"pages"))
+	else if (0 == strcmp(mode, "pages"))
 	{
 		if (SYSINFO_RET_OK != get_swap_io(NULL, NULL, NULL, &value))
 			return SYSINFO_RET_FAIL;

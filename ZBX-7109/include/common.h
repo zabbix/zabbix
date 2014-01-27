@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -741,6 +741,7 @@ while (0)
 
 extern const char	*progname;
 extern const char	title_message[];
+extern const char	syslog_app_name[];
 extern const char	usage_message[];
 extern const char	*help_message[];
 
@@ -826,10 +827,6 @@ u_char	zbx_hex2num(char c);
 size_t	zbx_binary2hex(const u_char *input, size_t ilen, char **output, size_t *olen);
 size_t	zbx_hex2binary(char *io);
 void	zbx_hex2octal(const char *input, char **output, int *olen);
-#ifdef HAVE_POSTGRESQL
-size_t	zbx_pg_escape_bytea(const u_char *input, size_t ilen, char **output, size_t *olen);
-size_t	zbx_pg_unescape_bytea(u_char *io);
-#endif
 size_t	zbx_get_next_field(const char **line, char **output, size_t *olen, char separator);
 int	str_in_list(const char *list, const char *value, char delimiter);
 char	*str_linefeed(const char *src, size_t maxline, const char *delim);
@@ -855,6 +852,7 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define SEC_PER_WEEK		(7 * SEC_PER_DAY)
 #define SEC_PER_MONTH		(30 * SEC_PER_DAY)
 #define SEC_PER_YEAR		(365 * SEC_PER_DAY)
+#define ZBX_JAN_2038		2145916800
 #define ZBX_JAN_1970_IN_SEC	2208988800.0	/* 1970 - 1900 in seconds */
 
 #define ZBX_MAX_RECV_DATA_SIZE	(128 * ZBX_MEBIBYTE)
