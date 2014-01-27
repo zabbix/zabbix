@@ -36,7 +36,7 @@ typedef struct
 }
 zbx_lld_graph_t;
 
-static void	DBlld_clean_graphs(zbx_vector_ptr_t *graphs)
+static void	lld_clean_graphs(zbx_vector_ptr_t *graphs)
 {
 	zbx_lld_graph_t	*graph;
 
@@ -53,14 +53,14 @@ static void	DBlld_clean_graphs(zbx_vector_ptr_t *graphs)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_graph_exists                                               *
+ * Function: lld_graph_exists                                                 *
  *                                                                            *
  * Purpose: check if graph exists                                             *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static int	DBlld_graph_exists(zbx_uint64_t hostid, zbx_uint64_t graphid, const char *name, zbx_vector_ptr_t *graphs)
+static int	lld_graph_exists(zbx_uint64_t hostid, zbx_uint64_t graphid, const char *name, zbx_vector_ptr_t *graphs)
 {
 	char		*name_esc, *sql = NULL;
 	size_t		sql_alloc = 256, sql_offset = 0;
@@ -102,14 +102,14 @@ static int	DBlld_graph_exists(zbx_uint64_t hostid, zbx_uint64_t graphid, const c
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_get_item                                                   *
+ * Function: lld_get_item                                                     *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static int	DBlld_get_item(zbx_uint64_t hostid, const char *tmpl_key, struct zbx_json_parse *jp_row, zbx_uint64_t *itemid)
+static int	lld_get_item(zbx_uint64_t hostid, const char *tmpl_key, struct zbx_json_parse *jp_row, zbx_uint64_t *itemid)
 {
-	const char	*__function_name = "DBlld_get_item";
+	const char	*__function_name = "lld_get_item";
 
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -153,13 +153,13 @@ static int	DBlld_get_item(zbx_uint64_t hostid, const char *tmpl_key, struct zbx_
 	return res;
 }
 
-static int	DBlld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graphs,
+static int	lld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graphs,
 		const char *name_proto, ZBX_GRAPH_ITEMS *gitems_proto, int gitems_proto_num,
 		unsigned char ymin_type, zbx_uint64_t ymin_itemid, unsigned char ymin_flags, const char *ymin_key_proto,
 		unsigned char ymax_type, zbx_uint64_t ymax_itemid, unsigned char ymax_flags, const char *ymax_key_proto,
 		struct zbx_json_parse *jp_row, char **error)
 {
-	const char	*__function_name = "DBlld_make_graph";
+	const char	*__function_name = "lld_make_graph";
 
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -215,7 +215,7 @@ static int	DBlld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zb
 		DBfree_result(result);
 	}
 
-	if (SUCCEED == DBlld_graph_exists(hostid, graph->graphid, graph->name, graphs))
+	if (SUCCEED == lld_graph_exists(hostid, graph->graphid, graph->name, graphs))
 	{
 		*error = zbx_strdcatf(*error, "Cannot %s graph [%s]: graph already exists\n",
 				0 != graph->graphid ? "update" : "create", graph->name);
@@ -238,7 +238,7 @@ static int	DBlld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zb
 
 			if (0 != (ZBX_FLAG_DISCOVERY_CHILD & gitem->flags))
 			{
-				if (FAIL == (res = DBlld_get_item(hostid, gitem->key, jp_row, &gitem->itemid)))
+				if (FAIL == (res = lld_get_item(hostid, gitem->key, jp_row, &gitem->itemid)))
 					break;
 			}
 		}
@@ -255,7 +255,7 @@ static int	DBlld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zb
 		graph->ymin_itemid = ymin_itemid;
 
 		if (0 != (ZBX_FLAG_DISCOVERY_CHILD & ymin_flags) &&
-				FAIL == (res = DBlld_get_item(hostid, ymin_key_proto, jp_row, &graph->ymin_itemid)))
+				FAIL == (res = lld_get_item(hostid, ymin_key_proto, jp_row, &graph->ymin_itemid)))
 		{
 			goto out;
 		}
@@ -266,7 +266,7 @@ static int	DBlld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zb
 		graph->ymax_itemid = ymax_itemid;
 
 		if (0 != (ZBX_FLAG_DISCOVERY_CHILD & ymax_flags) &&
-				FAIL == (res = DBlld_get_item(hostid, ymax_key_proto, jp_row, &graph->ymax_itemid)))
+				FAIL == (res = lld_get_item(hostid, ymax_key_proto, jp_row, &graph->ymax_itemid)))
 		{
 			goto out;
 		}
@@ -327,7 +327,7 @@ out:
 	return res;
 }
 
-static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, double yaxismin, double yaxismax,
+static void	lld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, double yaxismin, double yaxismax,
 		unsigned char show_work_period, unsigned char show_triggers, unsigned char graphtype,
 		unsigned char show_legend, unsigned char show_3d, double percent_left, double percent_right,
 		unsigned char ymin_type, unsigned char ymax_type, zbx_uint64_t parent_graphid,
@@ -571,7 +571,7 @@ static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, d
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_update_graphs                                              *
+ * Function: lld_update_graphs                                                *
  *                                                                            *
  * Purpose: add or update graphs for discovery item                           *
  *                                                                            *
@@ -582,9 +582,9 @@ static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, d
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_rows, char **error)
+void	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_rows, char **error)
 {
-	const char		*__function_name = "DBlld_update_graphs";
+	const char		*__function_name = "lld_update_graphs";
 
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -695,7 +695,7 @@ void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vecto
 		{
 			lld_row = (zbx_lld_row_t *)lld_rows->values[i];
 
-			DBlld_make_graph(hostid, parent_graphid, &graphs, name_proto, gitems_proto, gitems_proto_num,
+			lld_make_graph(hostid, parent_graphid, &graphs, name_proto, gitems_proto, gitems_proto_num,
 					ymin_type, ymin_itemid, ymin_flags, ymin_key_proto,
 					ymax_type, ymax_itemid, ymax_flags, ymax_key_proto,
 					&lld_row->jp_row, error);
@@ -703,7 +703,7 @@ void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vecto
 
 		zbx_vector_ptr_sort(&graphs, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-		DBlld_save_graphs(&graphs, width, height, yaxismin, yaxismax, show_work_period, show_triggers,
+		lld_save_graphs(&graphs, width, height, yaxismin, yaxismax, show_work_period, show_triggers,
 				graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type,
 				parent_graphid, name_proto_esc);
 
@@ -721,7 +721,7 @@ void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vecto
 				i++;
 		}
 
-		DBlld_clean_graphs(&graphs);
+		lld_clean_graphs(&graphs);
 	}
 	DBfree_result(result);
 

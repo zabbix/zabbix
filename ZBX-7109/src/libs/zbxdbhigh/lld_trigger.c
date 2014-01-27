@@ -78,18 +78,18 @@ typedef struct
 }
 zbx_lld_item_t;
 
-static void	DBlld_item_free(zbx_lld_item_t *item)
+static void	lld_item_free(zbx_lld_item_t *item)
 {
 	zbx_free(item);
 }
 
-static void	DBlld_items_free(zbx_vector_ptr_t *items)
+static void	lld_items_free(zbx_vector_ptr_t *items)
 {
 	while (0 != items->values_num)
-		DBlld_item_free((zbx_lld_item_t *)items->values[--items->values_num]);
+		lld_item_free((zbx_lld_item_t *)items->values[--items->values_num]);
 }
 
-static void	DBlld_function_free(zbx_lld_function_t *function)
+static void	lld_function_free(zbx_lld_function_t *function)
 {
 	zbx_free(function->parameter_orig);
 	zbx_free(function->parameter);
@@ -98,15 +98,15 @@ static void	DBlld_function_free(zbx_lld_function_t *function)
 	zbx_free(function);
 }
 
-static void	DBlld_functions_free(zbx_vector_ptr_t *functions)
+static void	lld_functions_free(zbx_vector_ptr_t *functions)
 {
 	while (0 != functions->values_num)
-		DBlld_function_free((zbx_lld_function_t *)functions->values[--functions->values_num]);
+		lld_function_free((zbx_lld_function_t *)functions->values[--functions->values_num]);
 }
 
-static void	DBlld_trigger_free(zbx_lld_trigger_t *trigger)
+static void	lld_trigger_free(zbx_lld_trigger_t *trigger)
 {
-	DBlld_functions_free(&trigger->functions);
+	lld_functions_free(&trigger->functions);
 	zbx_vector_ptr_destroy(&trigger->functions);
 	zbx_free(trigger->expression_orig);
 	zbx_free(trigger->expression);
@@ -115,15 +115,15 @@ static void	DBlld_trigger_free(zbx_lld_trigger_t *trigger)
 	zbx_free(trigger);
 }
 
-static void	DBlld_triggers_free(zbx_vector_ptr_t *triggers)
+static void	lld_triggers_free(zbx_vector_ptr_t *triggers)
 {
 	while (0 != triggers->values_num)
-		DBlld_trigger_free((zbx_lld_trigger_t *)triggers->values[--triggers->values_num]);
+		lld_trigger_free((zbx_lld_trigger_t *)triggers->values[--triggers->values_num]);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_triggers_get                                               *
+ * Function: lld_triggers_get                                                 *
  *                                                                            *
  * Purpose: retrieve triggers which were created by the specified trigger     *
  *          prototype                                                         *
@@ -132,10 +132,10 @@ static void	DBlld_triggers_free(zbx_vector_ptr_t *triggers)
  *             triggers         - [OUT] sorted list of triggers               *
  *                                                                            *
  ******************************************************************************/
-static void	DBlld_triggers_get(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *triggers, unsigned char type,
+static void	lld_triggers_get(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *triggers, unsigned char type,
 		unsigned char priority, const char *comments, const char *url)
 {
-	const char		*__function_name = "DBlld_triggers_get";
+	const char		*__function_name = "lld_triggers_get";
 
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -187,16 +187,16 @@ static void	DBlld_triggers_get(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_functions_get                                              *
+ * Function: lld_functions_get                                                *
  *                                                                            *
  * Purpose: retrieve functions which are used by all triggers in the host of  *
  *          the trigger prototype                                             *
  *                                                                            *
  ******************************************************************************/
-static void	DBlld_functions_get(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *functions_proto,
+static void	lld_functions_get(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *functions_proto,
 		zbx_vector_ptr_t *triggers)
 {
-	const char		*__function_name = "DBlld_functions_get";
+	const char		*__function_name = "lld_functions_get";
 
 	int			i;
 	zbx_lld_trigger_t	*trigger;
@@ -270,7 +270,7 @@ static void	DBlld_functions_get(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t 
 			else
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
-				DBlld_function_free(function);
+				lld_function_free(function);
 			}
 		}
 		DBfree_result(result);
@@ -293,7 +293,7 @@ static void	DBlld_functions_get(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t 
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_items_get                                                  *
+ * Function: lld_items_get                                                    *
  *                                                                            *
  * Purpose: returns the list of items which are related to the trigger        *
  *          prototype                                                         *
@@ -302,9 +302,9 @@ static void	DBlld_functions_get(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t 
  *             items            - [OUT] sorted list of items                  *
  *                                                                            *
  ******************************************************************************/
-static void	DBlld_items_get(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *items)
+static void	lld_items_get(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *items)
 {
-	const char		*__function_name = "DBlld_items_get";
+	const char		*__function_name = "lld_items_get";
 
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -742,10 +742,10 @@ static void	lld_triggers_make(zbx_vector_ptr_t *functions_proto, zbx_vector_ptr_
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_validate_trigger_field                                     *
+ * Function: lld_validate_trigger_field                                       *
  *                                                                            *
  ******************************************************************************/
-static void	DBlld_validate_trigger_field(zbx_lld_trigger_t *trigger, char **field, char **field_orig,
+static void	lld_validate_trigger_field(zbx_lld_trigger_t *trigger, char **field, char **field_orig,
 		zbx_uint64_t flag, size_t field_len, char **error)
 {
 	if (0 == (trigger->flags & ZBX_FLAG_LLD_TRIGGER_DISCOVERED))
@@ -848,14 +848,14 @@ static int	lld_triggers_equal(zbx_lld_trigger_t *trigger, zbx_lld_trigger_t *tri
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_triggers_validate                                          *
+ * Function: lld_triggers_validate                                            *
  *                                                                            *
  * Parameters: triggers - [IN] sorted list of triggers                        *
  *                                                                            *
  ******************************************************************************/
-static void	DBlld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *triggers, char **error)
+static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *triggers, char **error)
 {
-	const char		*__function_name = "DBlld_triggers_validate";
+	const char		*__function_name = "lld_triggers_validate";
 
 	int			i, j, k;
 	zbx_lld_trigger_t	*trigger;
@@ -874,7 +874,7 @@ static void	DBlld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigg
 	{
 		trigger = (zbx_lld_trigger_t *)triggers->values[i];
 
-		DBlld_validate_trigger_field(trigger, &trigger->description, &trigger->description_orig,
+		lld_validate_trigger_field(trigger, &trigger->description, &trigger->description_orig,
 				ZBX_FLAG_LLD_TRIGGER_UPDATE_DESCRIPTION, TRIGGER_DESCRIPTION_LEN, error);
 	}
 
@@ -966,7 +966,7 @@ static void	DBlld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigg
 
 		zbx_vector_ptr_sort(&db_triggers, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-		DBlld_functions_get(0, NULL, &db_triggers);
+		lld_functions_get(0, NULL, &db_triggers);
 
 		for (i = 0; i < db_triggers.values_num; i++)
 		{
@@ -1031,7 +1031,7 @@ static void	DBlld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigg
 			}
 		}
 
-		DBlld_triggers_free(&db_triggers);
+		lld_triggers_free(&db_triggers);
 		zbx_vector_ptr_destroy(&db_triggers);
 
 		zbx_free(sql);
@@ -1111,15 +1111,15 @@ static void	lld_expression_create(char **expression, zbx_vector_ptr_t *functions
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_triggers_save                                              *
+ * Function: lld_triggers_save                                                *
  *                                                                            *
  * Purpose: add or update triggers in database based on discovery rule        *
  *                                                                            *
  ******************************************************************************/
-static void	DBlld_triggers_save(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *triggers, unsigned char status,
+static void	lld_triggers_save(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *triggers, unsigned char status,
 		unsigned char type, unsigned char priority, const char *comments, const char *url)
 {
-	const char		*__function_name = "DBlld_triggers_save";
+	const char		*__function_name = "lld_triggers_save";
 
 	int			i, j, new_triggers = 0, upd_triggers = 0, new_functions = 0;
 	zbx_lld_trigger_t	*trigger;
@@ -1455,14 +1455,14 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_update_triggers                                            *
+ * Function: lld_update_triggers                                              *
  *                                                                            *
  * Purpose: add or update triggers for discovered items                       *
  *                                                                            *
  ******************************************************************************/
-void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_rows, char **error)
+void	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_rows, char **error)
 {
-	const char		*__function_name = "DBlld_update_triggers";
+	const char		*__function_name = "lld_update_triggers";
 
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -1507,9 +1507,9 @@ void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vec
 		comments = row[6];
 		url = row[7];
 
-		DBlld_triggers_get(parent_triggerid, &triggers, type, priority, comments, url);
-		DBlld_functions_get(parent_triggerid, &functions_proto, &triggers);
-		DBlld_items_get(parent_triggerid, &items);
+		lld_triggers_get(parent_triggerid, &triggers, type, priority, comments, url);
+		lld_functions_get(parent_triggerid, &functions_proto, &triggers);
+		lld_items_get(parent_triggerid, &items);
 
 		/* simplifying trigger expressions */
 
@@ -1525,14 +1525,14 @@ void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vec
 		/* making triggers */
 
 		lld_triggers_make(&functions_proto, &triggers, &items, description_proto, expression_proto, lld_rows);
-		DBlld_triggers_validate(hostid, &triggers, error);
-		DBlld_triggers_save(parent_triggerid, &triggers, status, type, priority, comments, url);
+		lld_triggers_validate(hostid, &triggers, error);
+		lld_triggers_save(parent_triggerid, &triggers, status, type, priority, comments, url);
 
 		/* cleaning */
 
-		DBlld_items_free(&items);
-		DBlld_functions_free(&functions_proto);
-		DBlld_triggers_free(&triggers);
+		lld_items_free(&items);
+		lld_functions_free(&functions_proto);
+		lld_triggers_free(&triggers);
 
 		zbx_free(expression_proto);
 	}

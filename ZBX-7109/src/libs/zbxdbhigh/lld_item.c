@@ -95,7 +95,7 @@ typedef struct
 }
 zbx_lld_item_t;
 
-static void	DBlld_items_free(zbx_vector_ptr_t *items)
+static void	lld_items_free(zbx_vector_ptr_t *items)
 {
 	zbx_lld_item_t	*item;
 
@@ -119,7 +119,7 @@ static void	DBlld_items_free(zbx_vector_ptr_t *items)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_items_get                                                  *
+ * Function: lld_items_get                                                    *
  *                                                                            *
  * Purpose: retrieves existing items for the specified item prototype         *
  *                                                                            *
@@ -127,7 +127,7 @@ static void	DBlld_items_free(zbx_vector_ptr_t *items)
  *             items         - [OUT] list of items                            *
  *                                                                            *
  ******************************************************************************/
-static void	DBlld_items_get(zbx_uint64_t parent_itemid, zbx_vector_ptr_t *items,
+static void	lld_items_get(zbx_uint64_t parent_itemid, zbx_vector_ptr_t *items,
 		unsigned char type, unsigned char value_type, unsigned char data_type, int delay,
 		const char *delay_flex, int history, int trends, const char *trapper_hosts, const char *units,
 		unsigned char multiplier, unsigned char delta, const char *formula, const char *logtimefmt,
@@ -136,7 +136,7 @@ static void	DBlld_items_get(zbx_uint64_t parent_itemid, zbx_vector_ptr_t *items,
 		const char *snmpv3_privpassphrase, unsigned char authtype, const char *username, const char *password,
 		const char *publickey, const char *privatekey, const char *description, zbx_uint64_t interfaceid)
 {
-	const char	*__function_name = "DBlld_items_get";
+	const char	*__function_name = "lld_items_get";
 
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -277,7 +277,7 @@ static void	DBlld_items_get(zbx_uint64_t parent_itemid, zbx_vector_ptr_t *items,
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_applications_get                                           *
+ * Function: lld_applications_get                                             *
  *                                                                            *
  * Purpose: retrieve list of application which should be assigned to the each *
  *          discovered item                                                   *
@@ -286,9 +286,9 @@ static void	DBlld_items_get(zbx_uint64_t parent_itemid, zbx_vector_ptr_t *items,
  *             applicationids - [OUT] sorted list of applications             *
  *                                                                            *
  ******************************************************************************/
-static void	DBlld_applications_get(zbx_uint64_t parent_itemid, zbx_vector_uint64_t *applicationids)
+static void	lld_applications_get(zbx_uint64_t parent_itemid, zbx_vector_uint64_t *applicationids)
 {
-	const char	*__function_name = "DBlld_applications_get";
+	const char	*__function_name = "lld_applications_get";
 
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -316,10 +316,10 @@ static void	DBlld_applications_get(zbx_uint64_t parent_itemid, zbx_vector_uint64
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_validate_item_field                                        *
+ * Function: lld_validate_item_field                                          *
  *                                                                            *
  ******************************************************************************/
-static void	DBlld_validate_item_field(zbx_lld_item_t *item, char **field, char **field_orig, zbx_uint64_t flag,
+static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **field_orig, zbx_uint64_t flag,
 		size_t field_len, char **error)
 {
 	if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
@@ -351,14 +351,14 @@ static void	DBlld_validate_item_field(zbx_lld_item_t *item, char **field, char *
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_items_validate                                             *
+ * Function: lld_items_validate                                               *
  *                                                                            *
  * Parameters: items - [IN] list of items; should be sorted by itemid         *
  *                                                                            *
  ******************************************************************************/
-static void	DBlld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, char **error)
+static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, char **error)
 {
-	const char		*__function_name = "DBlld_items_validate";
+	const char		*__function_name = "lld_items_validate";
 
 	char			*keys = NULL, *key_esc;
 	size_t			keys_alloc = 256, keys_offset = 0;
@@ -379,13 +379,13 @@ static void	DBlld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, c
 	{
 		item = (zbx_lld_item_t *)items->values[i];
 
-		DBlld_validate_item_field(item, &item->name, &item->name_orig,
+		lld_validate_item_field(item, &item->name, &item->name_orig,
 				ZBX_FLAG_LLD_ITEM_UPDATE_NAME, ITEM_NAME_LEN, error);
-		DBlld_validate_item_field(item, &item->key, &item->key_orig,
+		lld_validate_item_field(item, &item->key, &item->key_orig,
 				ZBX_FLAG_LLD_ITEM_UPDATE_KEY, ITEM_KEY_LEN, error);
-		DBlld_validate_item_field(item, &item->params, &item->params_orig,
+		lld_validate_item_field(item, &item->params, &item->params_orig,
 				ZBX_FLAG_LLD_ITEM_UPDATE_PARAMS, ITEM_PARAM_LEN, error);
-		DBlld_validate_item_field(item, &item->snmp_oid, &item->snmp_oid_orig,
+		lld_validate_item_field(item, &item->snmp_oid, &item->snmp_oid_orig,
 				ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_OID, ITEM_SNMP_OID_LEN, error);
 	}
 
@@ -514,10 +514,10 @@ static void	DBlld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, c
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	DBlld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const char *key_proto,
+static void	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const char *key_proto,
 		const char *params_proto, const char *snmp_oid_proto, struct zbx_json_parse *jp_row)
 {
-	const char	*__function_name = "DBlld_make_item";
+	const char	*__function_name = "lld_make_item";
 
 	char		*buffer = NULL;
 	int		i;
@@ -625,7 +625,7 @@ static void	DBlld_item_make(zbx_vector_ptr_t *items, const char *name_proto, con
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	DBlld_items_make(zbx_vector_ptr_t *items, const char *name_proto, const char *key_proto,
+static void	lld_items_make(zbx_vector_ptr_t *items, const char *name_proto, const char *key_proto,
 		const char *params_proto, const char *snmp_oid_proto, zbx_vector_ptr_t *lld_rows)
 {
 	int	i;
@@ -634,7 +634,7 @@ static void	DBlld_items_make(zbx_vector_ptr_t *items, const char *name_proto, co
 	{
 		zbx_lld_row_t	*lld_row = (zbx_lld_row_t *)lld_rows->values[i];
 
-		DBlld_item_make(items, name_proto, key_proto, params_proto, snmp_oid_proto, &lld_row->jp_row);
+		lld_item_make(items, name_proto, key_proto, params_proto, snmp_oid_proto, &lld_row->jp_row);
 	}
 
 	zbx_vector_ptr_sort(items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
@@ -642,7 +642,7 @@ static void	DBlld_items_make(zbx_vector_ptr_t *items, const char *name_proto, co
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_applications_make                                          *
+ * Function: lld_applications_make                                            *
  *                                                                            *
  * Parameters: parent_itemid  - [IN] item prototype id                        *
  *             items          - [IN/OUT] sorted list of items                 *
@@ -650,10 +650,10 @@ static void	DBlld_items_make(zbx_vector_ptr_t *items, const char *name_proto, co
  *                                    deleted                                 *
  *                                                                            *
  ******************************************************************************/
-static void	DBlld_applications_make(zbx_uint64_t parent_itemid, zbx_vector_ptr_t *items,
+static void	lld_applications_make(zbx_uint64_t parent_itemid, zbx_vector_ptr_t *items,
 		zbx_vector_uint64_t *del_itemappids)
 {
-	const char		*__function_name = "DBlld_applications_make";
+	const char		*__function_name = "lld_applications_make";
 
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -667,7 +667,7 @@ static void	DBlld_applications_make(zbx_uint64_t parent_itemid, zbx_vector_ptr_t
 	zbx_vector_uint64_create(&applicationids);
 	zbx_vector_uint64_create(&itemids);
 
-	DBlld_applications_get(parent_itemid, &applicationids);
+	lld_applications_get(parent_itemid, &applicationids);
 
 	for (i = 0; i < items->values_num; i++)
 	{
@@ -740,7 +740,7 @@ static void	DBlld_applications_make(zbx_uint64_t parent_itemid, zbx_vector_ptr_t
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_items_save                                                 *
+ * Function: lld_items_save                                                   *
  *                                                                            *
  * Parameters: hostid         - [IN] parent host id                           *
  *             parent_itemid  - [IN] item prototype id                        *
@@ -749,7 +749,7 @@ static void	DBlld_applications_make(zbx_uint64_t parent_itemid, zbx_vector_ptr_t
  *                                   deleted                                  *
  *                                                                            *
  ******************************************************************************/
-static void	DBlld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_vector_ptr_t *items,
+static void	lld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_vector_ptr_t *items,
 		const char *key_proto, unsigned char type, unsigned char value_type, unsigned char data_type, int delay,
 		const char *delay_flex, int history, int trends, unsigned char status, const char *trapper_hosts,
 		const char *units, unsigned char multiplier, unsigned char delta, const char *formula,
@@ -759,7 +759,7 @@ static void	DBlld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zb
 		const char *username, const char *password, const char *publickey, const char *privatekey,
 		const char *description, zbx_uint64_t interfaceid, zbx_vector_uint64_t *del_itemappids)
 {
-	const char	*__function_name = "DBlld_items_save";
+	const char	*__function_name = "lld_items_save";
 
 	int		i, j, new_items = 0, upd_items = 0, new_applications = 0;
 	zbx_lld_item_t	*item;
@@ -1225,13 +1225,13 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_remove_lost_resources                                      *
+ * Function: lld_remove_lost_resources                                        *
  *                                                                            *
  * Purpose: updates item_discovery.lastcheck and item_discovery.ts_delete     *
  *          fields; removes lost resources                                    *
  *                                                                            *
  ******************************************************************************/
-static void	DBlld_remove_lost_resources(zbx_vector_ptr_t *items, unsigned short lifetime, int lastcheck)
+static void	lld_remove_lost_resources(zbx_vector_ptr_t *items, unsigned short lifetime, int lastcheck)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0;
@@ -1328,7 +1328,7 @@ static void	DBlld_remove_lost_resources(zbx_vector_ptr_t *items, unsigned short 
 	zbx_vector_uint64_destroy(&del_itemids);
 }
 
-static void	DBlld_item_links_populate(zbx_vector_ptr_t *lld_rows, zbx_uint64_t parent_itemid,
+static void	lld_item_links_populate(zbx_vector_ptr_t *lld_rows, zbx_uint64_t parent_itemid,
 		zbx_vector_ptr_t *items)
 {
 	int	i, j;
@@ -1360,7 +1360,7 @@ static void	DBlld_item_links_populate(zbx_vector_ptr_t *lld_rows, zbx_uint64_t p
 	}
 }
 
-static void	DBlld_item_links_sort(zbx_vector_ptr_t *lld_rows)
+static void	lld_item_links_sort(zbx_vector_ptr_t *lld_rows)
 {
 	int	i;
 
@@ -1374,15 +1374,15 @@ static void	DBlld_item_links_sort(zbx_vector_ptr_t *lld_rows)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_update_items                                               *
+ * Function: lld_update_items                                                 *
  *                                                                            *
  * Purpose: add or update discovered items                                    *
  *                                                                            *
  ******************************************************************************/
-void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_rows, char **error,
+void	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_rows, char **error,
 		unsigned short lifetime, int lastcheck)
 {
-	const char		*__function_name = "DBlld_update_items";
+	const char		*__function_name = "lld_update_items";
 
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -1451,29 +1451,29 @@ void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector
 		description = row[32];
 		ZBX_DBROW2UINT64(interfaceid, row[33]);
 
-		DBlld_items_get(parent_itemid, &items, type, value_type, data_type, delay, delay_flex, history, trends,
+		lld_items_get(parent_itemid, &items, type, value_type, data_type, delay, delay_flex, history, trends,
 				trapper_hosts, units, multiplier, delta, formula, logtimefmt, valuemapid, ipmi_sensor,
 				snmp_community, port, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase,
 				snmpv3_privpassphrase, authtype, username, password, publickey, privatekey, description,
 				interfaceid);
 
-		DBlld_items_make(&items, name_proto, key_proto, params_proto, snmp_oid_proto, lld_rows);
+		lld_items_make(&items, name_proto, key_proto, params_proto, snmp_oid_proto, lld_rows);
 
-		DBlld_items_validate(hostid, &items, error);
+		lld_items_validate(hostid, &items, error);
 
-		DBlld_applications_make(parent_itemid, &items, &del_itemappids);
+		lld_applications_make(parent_itemid, &items, &del_itemappids);
 
-		DBlld_items_save(hostid, parent_itemid, &items, key_proto, type, value_type, data_type, delay,
+		lld_items_save(hostid, parent_itemid, &items, key_proto, type, value_type, data_type, delay,
 				delay_flex, history, trends, status, trapper_hosts, units, multiplier, delta, formula,
 				logtimefmt, valuemapid, ipmi_sensor, snmp_community, port, snmpv3_securityname,
 				snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, authtype, username,
 				password, publickey, privatekey, description, interfaceid, &del_itemappids);
 
-		DBlld_item_links_populate(lld_rows, parent_itemid, &items);
+		lld_item_links_populate(lld_rows, parent_itemid, &items);
 
-		DBlld_remove_lost_resources(&items, lifetime, lastcheck);
+		lld_remove_lost_resources(&items, lifetime, lastcheck);
 
-		DBlld_items_free(&items);
+		lld_items_free(&items);
 		del_itemappids.values_num = 0;
 	}
 	DBfree_result(result);
@@ -1481,7 +1481,7 @@ void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector
 	zbx_vector_uint64_destroy(&del_itemappids);
 	zbx_vector_ptr_destroy(&items);
 
-	DBlld_item_links_sort(lld_rows);
+	lld_item_links_sort(lld_rows);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

@@ -45,9 +45,9 @@ static int	lld_check_record(struct zbx_json_parse *jp_row, const char *f_macro, 
 	return res;
 }
 
-static int	DBlld_rows_get(char *value, char *filter, zbx_vector_ptr_t *lld_rows, char **error)
+static int	lld_rows_get(char *value, char *filter, zbx_vector_ptr_t *lld_rows, char **error)
 {
-	const char		*__function_name = "DBlld_parse_value";
+	const char		*__function_name = "lld_parse_value";
 
 	struct zbx_json_parse	jp, jp_data, jp_row;
 	char			*f_macro = NULL, *f_regexp = NULL;
@@ -136,7 +136,7 @@ out:
 	return ret;
 }
 
-static void	DBlld_item_links_free(zbx_vector_ptr_t *item_links)
+static void	lld_item_links_free(zbx_vector_ptr_t *item_links)
 {
 	zbx_lld_item_link_t	*item_link;
 
@@ -148,7 +148,7 @@ static void	DBlld_item_links_free(zbx_vector_ptr_t *item_links)
 	}
 }
 
-static void	DBlld_rows_free(zbx_vector_ptr_t *lld_rows)
+static void	lld_rows_free(zbx_vector_ptr_t *lld_rows)
 {
 	zbx_lld_row_t	*lld_row;
 
@@ -156,7 +156,7 @@ static void	DBlld_rows_free(zbx_vector_ptr_t *lld_rows)
 	{
 		lld_row = (zbx_lld_row_t *)lld_rows->values[--lld_rows->values_num];
 
-		DBlld_item_links_free(&lld_row->item_links);
+		lld_item_links_free(&lld_row->item_links);
 		zbx_vector_ptr_destroy(&lld_row->item_links);
 		zbx_free(lld_row);
 	}
@@ -164,7 +164,7 @@ static void	DBlld_rows_free(zbx_vector_ptr_t *lld_rows)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_process_discovery_rule                                     *
+ * Function: lld_process_discovery_rule                                       *
  *                                                                            *
  * Purpose: add or update items, triggers and graphs for discovery item       *
  *                                                                            *
@@ -174,9 +174,9 @@ static void	DBlld_rows_free(zbx_vector_ptr_t *lld_rows)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	DBlld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_timespec_t *ts)
+void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_timespec_t *ts)
 {
-	const char		*__function_name = "DBlld_process_discovery_rule";
+	const char		*__function_name = "lld_process_discovery_rule";
 
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -230,14 +230,14 @@ void	DBlld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_time
 	if (0 == hostid)
 		goto clean;
 
-	if (SUCCEED != DBlld_rows_get(value, filter, &lld_rows, &error))
+	if (SUCCEED != lld_rows_get(value, filter, &lld_rows, &error))
 		goto error;
 
 	error = zbx_strdup(error, "");
 
-	DBlld_update_items(hostid, lld_ruleid, &lld_rows, &error, lifetime, ts->sec);
-	DBlld_update_triggers(hostid, lld_ruleid, &lld_rows, &error);
-	DBlld_update_graphs(hostid, lld_ruleid, &lld_rows, &error);
+	lld_update_items(hostid, lld_ruleid, &lld_rows, &error, lifetime, ts->sec);
+	lld_update_triggers(hostid, lld_ruleid, &lld_rows, &error);
+	lld_update_graphs(hostid, lld_ruleid, &lld_rows, &error);
 
 	if (ITEM_STATUS_NOTSUPPORTED == status)
 	{
@@ -270,7 +270,7 @@ clean:
 	zbx_free(discovery_key);
 	zbx_free(sql);
 
-	DBlld_rows_free(&lld_rows);
+	lld_rows_free(&lld_rows);
 	zbx_vector_ptr_destroy(&lld_rows);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
