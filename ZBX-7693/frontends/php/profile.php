@@ -148,12 +148,12 @@ elseif (isset($_REQUEST['save'])) {
 		updateMessageSettings($messages);
 
 		$result = API::User()->updateProfile($user);
-		if ($result && (CwebUser::$data['type'] > USER_TYPE_ZABBIX_USER)) {
-			$data = array(
+
+		if ($result && CwebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
+			$result = API::User()->updateMedia(array(
 				'users' => $user,
 				'medias' => $user['user_medias']
-			);
-			$result = API::User()->updateMedia($data);
+			));
 		}
 
 		$result = DBend($result);

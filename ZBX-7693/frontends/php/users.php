@@ -198,7 +198,10 @@ elseif (isset($_REQUEST['save'])) {
 
 			$result = API::User()->update(array($user));
 			if ($result) {
-				$result = API::User()->updateMedia(array('users' => $user, 'medias' => $user['user_medias']));
+				$result = API::User()->updateMedia(array(
+					'users' => $user,
+					'medias' => $user['user_medias']
+				));
 			}
 			$result = DBend($result);
 
