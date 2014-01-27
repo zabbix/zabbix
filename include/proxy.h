@@ -72,6 +72,6 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 void	process_dhis_data(struct zbx_json_parse *jp);
 void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid);
 
-void	DBlld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_timespec_t *ts);
+void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_timespec_t *ts);
 
 #endif
