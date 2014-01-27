@@ -65,9 +65,11 @@ sub new($$) {
 	sleep(SLEEP);
     }
 
-    croak "Can't connect to Zabbix: " . $res->status_line unless ($res->is_success);
+    croak "cannot connect to Zabbix: " . $res->status_line unless ($res->is_success);
 
-    my $auth = decode_json($res->content)->{'result'};
+    my $auth;
+    eval { $auth = decode_json($res->content)->{'result'} };
+    croak "Zabbix API returned invalid JSON: " . $@ if $@;
 
     return bless {
         UserAgent => $ua,
