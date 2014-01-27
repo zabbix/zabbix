@@ -20,9 +20,16 @@
 #ifndef ZABBIX_LOGFILES_H
 #define ZABBIX_LOGFILES_H
 
-int	process_log(char *filename, zbx_uint64_t *lastlogsize, char **value, const char *encoding,
-		unsigned char skip_old_data);
-int	process_logrt(char *fileformat, zbx_uint64_t *lastlogsize, int *mtime, char **value, const char *encoding,
-		unsigned char skip_old_data);
+int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data, int *big_rec,
+		const char *encoding, ZBX_REGEXP *regexps, int regexps_num, const char *pattern, int *p_count,
+		int *s_count, int (*process_value)(const char *, unsigned short, const char *, const char *,
+		const char *, zbx_uint64_t *, int *, unsigned long *, const char *, unsigned short *, unsigned long *,
+		unsigned char), const char *server, unsigned short port, const char *hostname, const char *key);
 
+int	process_logrt(char *fileformat, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data,
+		int *big_rec, const char *encoding, ZBX_REGEXP *regexps, int regexps_num, const char *pattern,
+		int *p_count, int *s_count, int (*process_value)(const char *, unsigned short, const char *,
+		const char *, const char *, zbx_uint64_t *, int *, unsigned long *, const char *, unsigned short *,
+		unsigned long *, unsigned char), const char *server, unsigned short port, const char *hostname,
+		const char *key);
 #endif
