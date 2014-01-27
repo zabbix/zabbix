@@ -75,7 +75,7 @@ if (hasRequest('filterState')) {
 
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit();
+	exit;
 }
 
 /*

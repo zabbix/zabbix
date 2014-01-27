@@ -104,7 +104,7 @@ if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
 	$ajaxResponse->send();
 
 	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit();
+	exit;
 }
 
 /*

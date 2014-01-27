@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 $readonly = (isset($data['readonly']) && $data['readonly']);
 $macros = array_values($this->data['macros']);
 

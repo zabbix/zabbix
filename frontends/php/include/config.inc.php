@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
+
 // reset the LC_CTYPE locale so that case transformation functions would work correctly
 // it is also required for PHP to work with the Turkish locale (https://bugs.php.net/bug.php?id=18556)
 // WARNING: this must be done before executing any other code, otherwise code execution could fail!

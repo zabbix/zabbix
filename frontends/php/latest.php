@@ -101,7 +101,7 @@ if (hasRequest('favobj')) {
 
 if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
 	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit();
+	exit;
 }
 
 require_once dirname(__FILE__).'/include/views/js/monitoring.latest.js.php';
