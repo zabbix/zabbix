@@ -270,7 +270,7 @@ $etag = md5($jsLength);
 if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] == $etag) {
 	header('HTTP/1.1 304 Not Modified');
 	header('ETag: '.$etag);
-	exit();
+	exit;
 }
 
 header('Content-type: text/javascript; charset=UTF-8');

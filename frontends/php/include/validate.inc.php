@@ -44,14 +44,6 @@ function BETWEEN($min, $max, $var = null) {
 	return '({'.$var.'}>='.$min.'&&{'.$var.'}<='.$max.')&&';
 }
 
-function REGEXP($regexp, $var = null) {
-	return "(preg_match(\"".$regexp."\", {".$var."}))&&";
-}
-
-function GT($value, $var = '') {
-	return '({'.$var.'}>='.$value.')&&';
-}
-
 function IN($array, $var = '') {
 	if (is_array($array)) {
 		$array = implode(',', $array);

@@ -34,7 +34,7 @@ $content_type = $content_type[0];
 
 if (!isset($allowed_content[$content_type])) {
 	header('HTTP/1.0 412 Precondition Failed');
-	exit();
+	exit;
 }
 
 
