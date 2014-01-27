@@ -557,6 +557,17 @@ ZABBIX.apps.map = (function($) {
 					this.value = isNaN(value) || (value < 10) ? 10 : value;
 				});
 
+				// application selection pop up
+				$('#application-select').click(function() {
+					var data = $('elementNameHost').multiSelect.getData();
+
+					PopUp('popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'
+						+ '&with_applications=1&dstfrm=selementForm'
+						+ ((data.length) ? '&hostid='+ data[0].id : ''),
+						450, 450
+					);
+				})
+
 				// mass update form
 				$('#massClose').click(function() {
 					that.clearSelection();
@@ -1214,7 +1225,7 @@ ZABBIX.apps.map = (function($) {
 					},
 					{
 						action: 'show',
-						value: '#applicationSelectRow',
+						value: '#application-select-row',
 						cond: [
 							{
 								elementType: '0'

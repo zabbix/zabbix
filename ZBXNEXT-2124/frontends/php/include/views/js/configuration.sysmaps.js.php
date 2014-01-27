@@ -116,11 +116,11 @@
 					<span class="link" onclick='PopUp("popup.php?srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameMap&writeonly=1&excludeids[]=#{sysmapid}", 450, 450)'><?php echo _('Select'); ?></span>
 				</td>
 			</tr>
-			<tr id="applicationSelectRow">
+			<tr id="application-select-row">
 				<td><?php echo _('Application'); ?></td>
 				<td>
 					<input size="50" id="application" name="application" class="input">
-					<span class="link" onclick="PopUp('popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application&with_applications=1&dstfrm=selementForm',450,450)"><?php echo _('Select'); ?></span>
+					<span id="application-select" class="link"><?php echo _('Select'); ?></span>
 				</td>
 			</tr>
 
