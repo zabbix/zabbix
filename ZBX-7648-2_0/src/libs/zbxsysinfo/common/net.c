@@ -429,7 +429,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 		if (0 == inet_aton(ip, &inaddr))
 			return SYSINFO_RET_FAIL;
 
-		memcpy(&saved_ns, &(_res.nsaddr_list[0]), sizeof(struct sockaddr_in)));
+		memcpy(&saved_ns, &(_res.nsaddr_list[0]), sizeof(struct sockaddr_in));
 		saved_nscount = _res.nscount;
 
 		_res.nsaddr_list[0].sin_addr = inaddr;
