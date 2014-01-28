@@ -1240,7 +1240,7 @@ sub __script
 }
 
 sub __ts
-{   
+{
     my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime(time);
 
     $year += 1900;
@@ -1290,7 +1290,7 @@ sub get_eventtimes
 	push(@eventtimes, $clock) if ($value == TRIGGER_VALUE_TRUE);
     }
 
-    $result = $zabbix->get('event', 
+    $result = $zabbix->get('event',
 			   {'triggerids' => [$triggerid],
 			    'selectTriggers' => API_OUTPUT_REFER,
 			    'time_from' => $from,

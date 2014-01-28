@@ -773,7 +773,7 @@ sub create_items_rdds {
 
     create_trigger($options);
 
-    $options = { 'description' => '6.1.1 Step 5 - RDDS43 server [{ITEM.LASTVALUE2}] has returned no name servers on {HOST.NAME}',
+    $options = { 'description' => '6.1.1 Step 5 - RDDS43 server [{ITEM.LASTVALUE2}] output does not contain "{$DNSTEST.RDDS.NS.STRING}" on {HOST.NAME}',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS43_NONS.
 				        '|{'.$template_name.':dnstest.rdds.43.ip[{$DNSTEST.TLD}].str(dummy)}=1',
                         'priority' => '2',
@@ -1414,7 +1414,7 @@ sub create_slv_items {
 
 	# NB! Configuration trigger that is used in PHP and C code to detect incident!
 	# priority must be set to 0!
-	$options = { 'description' => 'EPP service is not available at {HOST.HOST} TLD',
+	$options = { 'description' => '7.2.3 EPP service is not available at {HOST.HOST} TLD',
 		     'expression' => '({TRIGGER.VALUE}=0&'.
 			 '{'.$host_name.':dnstest.slv.epp.avail.count(#{$INCIDENT.EPP.FAIL},0,"eq")}={$INCIDENT.EPP.FAIL})|'.
 			 '({TRIGGER.VALUE}=1&'.
@@ -1423,6 +1423,60 @@ sub create_slv_items {
 	};
 
 	create_trigger($options);
+
+        $options = { 'description' => '12.2 EPP Service Availability [{ITEM.LASTVALUE1}] > 10%',
+                         'expression' => '({'.$host_name.':dnstest.slv.epp.rollweek.last(0)}=10|'.
+                                        '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}>10)&'.
+                                        '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}<25',
+                        'priority' => '2',
+                };
+
+	create_trigger($options);
+
+	$options = { 'description' => '12.2 EPP Service Availability [{ITEM.LASTVALUE1}] > 25%',
+                         'expression' => '({'.$host_name.':dnstest.slv.epp.rollweek.last(0)}=25|'.
+                                        '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}>25)&'.
+                                        '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}<50',
+                        'priority' => '3',
+                };
+
+	create_trigger($options);
+
+	$options = { 'description' => '12.2 EPP Service Availability [{ITEM.LASTVALUE1}] > 50%',
+                         'expression' => '({'.$host_name.':dnstest.slv.epp.rollweek.last(0)}=50|'.
+                                        '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}>50)&'.
+                                        '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}<75',
+                        'priority' => '3',
+                };
+
+	create_trigger($options);
+
+	$options = { 'description' => '12.2 EPP Service Availability [{ITEM.LASTVALUE1}] > 75%',
+                         'expression' => '({'.$host_name.':dnstest.slv.epp.rollweek.last(0)}>75|'.
+                                        '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}>75)&'.
+                                        '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}<90',
+                        'priority' => '4',
+                };
+
+	create_trigger($options);
+
+	$options = { 'description' => '12.2 EPP Service Availability [{ITEM.LASTVALUE1}] > 90%',
+                         'expression' => '({'.$host_name.':dnstest.slv.epp.rollweek.last(0)}=90|'.
+                                        '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}>90)&'.
+                                        '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}<100',
+                        'priority' => '4',
+                };
+
+	create_trigger($options);
+
+        $options = { 'description' => '12.2 EPP Service Availability [{ITEM.LASTVALUE1}] > 100%',
+                         'expression' => '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}=100|'.
+                                        '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}>100',
+                        'priority' => '5',
+                };
+
+	create_trigger($options);
+
     }
 }
 
@@ -1632,6 +1686,12 @@ sub create_probe_status_host {
 
     create_trigger($options);
 
+    $options = { 'description' => '12.2 Online probes for EPP test [{ITEM.LASTVALUE1}] is less than [{$DNSTEST.EPP.PROBE.ONLINE}]',
+                         'expression' => '{'.$name.':online.nodes.pl.last(0)}<{$DNSTEST.EPP.PROBE.ONLINE}',
+                        'priority' => '5',
+                };
+
+    create_trigger($options);
 }
 
 sub add_default_actions() {
