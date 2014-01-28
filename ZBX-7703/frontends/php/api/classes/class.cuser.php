@@ -1170,7 +1170,7 @@ Copt::memoryPick();
 			$auth_type = $user['auth_type'];
 
 			// check if the user name used when calling the API matches the one used for HTTP authentication
-			if ($auth_type == ZBX_AUTH_HTTP && $name != $_SERVER['PHP_AUTH_USER']) {
+			if ($auth_type == ZBX_AUTH_HTTP && $name !== $_SERVER['PHP_AUTH_USER']) {
 				throw new APIException(ZBX_API_ERROR_INTERNAL, S_CUSER_ERROR_USER_DOES_NOT_MATCH_HTTP_LOGIN);
 			}
 
