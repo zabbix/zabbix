@@ -63,10 +63,10 @@ define('ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT',	4);
 define('ZBX_SCRIPT_EXECUTE_ON_AGENT',	0);
 define('ZBX_SCRIPT_EXECUTE_ON_SERVER',	1);
 
-define('ZBX_FLAG_DISCOVERY_NORMAL',		0x0); // a normal item
-define('ZBX_FLAG_DISCOVERY_RULE',		0x1); // a low level discovery rule
-define('ZBX_FLAG_DISCOVERY_PROTOTYPE',	0x2); // an item prototype
-define('ZBX_FLAG_DISCOVERY_CREATED',	0x4); // an item created via a discovery rule
+define('ZBX_FLAG_DISCOVERY_NORMAL',		0x0);
+define('ZBX_FLAG_DISCOVERY_RULE',		0x1);
+define('ZBX_FLAG_DISCOVERY_PROTOTYPE',	0x2);
+define('ZBX_FLAG_DISCOVERY_CREATED',	0x4);
 
 define('EXTACK_OPTION_ALL',		0);
 define('EXTACK_OPTION_UNACK',	1);
