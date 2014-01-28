@@ -950,6 +950,15 @@ class CUser extends CZBXAPI {
 				break;
 		}
 
+		// check if the user name used when calling the API matches the one used for HTTP authentication
+		if ($authType == ZBX_AUTH_HTTP && $name !== $_SERVER['PHP_AUTH_USER']) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Login name "%1$s" does not match the name "%2$s" used to pass HTTP authentication.',
+					$name, $_SERVER['PHP_AUTH_USER']
+				)
+			);
+		}
+
 		try {
 			switch ($authType) {
 				case ZBX_AUTH_LDAP:
