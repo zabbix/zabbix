@@ -143,10 +143,10 @@ const char	*zbx_interface_type_string(zbx_interface_type_t type);
 #define INTERFACE_TYPE_COUNT	4	/* number of interface types */
 extern const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT];
 
-#define ZBX_FLAG_DISCOVERY_NORMAL	0x00	/* normal item */
-#define ZBX_FLAG_DISCOVERY_RULE		0x01	/* low-level discovery rule */
-#define ZBX_FLAG_DISCOVERY_PROTOTYPE	0x02	/* low-level discovery host, item, trigger or graph prototypes */
-#define ZBX_FLAG_DISCOVERY_CREATED	0x04	/* auto-created item, trigger or graph */
+#define ZBX_FLAG_DISCOVERY_NORMAL	0x00
+#define ZBX_FLAG_DISCOVERY_RULE		0x01
+#define ZBX_FLAG_DISCOVERY_PROTOTYPE	0x02
+#define ZBX_FLAG_DISCOVERY_CREATED	0x04
 
 typedef enum
 {
