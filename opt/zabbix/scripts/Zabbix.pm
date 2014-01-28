@@ -24,6 +24,9 @@ use constant false => 0;
 sub to_ascii($);
 sub to_utf8($);
 
+sub get_authid($);
+sub set_authid($$);
+
 use constant ATTEMPTS => 20;
 use constant SLEEP => 2;
 
@@ -44,9 +47,26 @@ sub new($$) {
 
     $req->content_type('application/json-rpc');
 
+    my $domain = $options->{'url'};
+    $domain =~ s/^https*\:\/\/(.+)\/*$/$1/;
+
+    if (my $authid = get_authid($domain)) {
+	my $self = {
+            UserAgent => $ua,
+            request   => $req,
+            count     => 0,
+            auth      => $authid,
+            error => '',
+            };
+        
+	bless( $self, $class );
+
+	return bless ($self, $class) if defined $self->api_version();
+    }
+
     $req->content(encode_json( {
-        jsonrpc => "2.0",
-        method => "user.authenticate",
+	    jsonrpc => "2.0",
+    	method => "user.authenticate",
         params => {
             user => $options->{user},
             password => $options->{password},
@@ -71,6 +91,10 @@ sub new($$) {
     eval { $auth = decode_json($res->content)->{'result'} };
     croak "Zabbix API returned invalid JSON: " . $@ if $@;
 
+    set_authid($domain, $auth);
+
+    
+
     return bless {
         UserAgent => $ua,
         request   => $req,
@@ -78,6 +102,36 @@ sub new($$) {
         auth      => $auth,
 	error => '',
     }, $class;
+}
+
+sub get_authid($) {
+    my $domain = shift;
+
+    my $authid;
+    
+    if (-e '/tmp/'.$domain.'.tmp') {
+
+        open(TMP, '< /tmp/'.$domain.'.tmp');
+
+        my @lines = <TMP>;
+
+        close(TMP);                                                   
+                                                                      
+        $authid = shift (@lines);                                    
+    }
+
+    return $authid;
+}
+
+sub set_authid($$) {
+    my $domain = shift;
+    my $authid = shift;
+
+    open(TMP, '> /tmp/'.$domain.'.tmp');
+    
+    print TMP $authid;
+    
+    close(TMP);
 }
 
 sub ua {
