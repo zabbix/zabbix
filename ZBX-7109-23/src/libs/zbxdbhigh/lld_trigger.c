@@ -1146,7 +1146,7 @@ static void	lld_triggers_save(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *t
 	zbx_lld_function_t	*function;
 	zbx_vector_ptr_t	upd_functions;	/* the ordered list of functions which will be updated */
 	zbx_vector_uint64_t	del_functionids;
-	zbx_uint64_t		triggerid = 0, triggerdiscoveryid = 0, functionid = 0;
+	zbx_uint64_t		triggerid = 0, functionid = 0;
 	unsigned char		flags = ZBX_FLAG_LLD_TRIGGER_UNSET;
 	char			*sql1 = NULL, *sql2 = NULL, *sql3 = NULL, *sql4 = NULL,
 				*url_esc = NULL, *function_esc, *parameter_esc;
@@ -1160,9 +1160,7 @@ static void	lld_triggers_save(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *t
 					"comments,url,type,value,state,flags)"
 				" values ";
 	const char		*ins_trigger_discovery_sql =
-				"insert into trigger_discovery"
-				" (triggerdiscoveryid,triggerid,parent_triggerid)"
-				" values ";
+				"insert into trigger_discovery (triggerid,parent_triggerid) values ";
 	const char		*ins_functions_sql =
 				"insert into functions"
 				" (functionid,itemid,triggerid,function,parameter)"
@@ -1221,7 +1219,6 @@ static void	lld_triggers_save(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *t
 	if (0 != new_triggers)
 	{
 		triggerid = DBget_maxid_num("triggers", new_triggers);
-		triggerdiscoveryid = DBget_maxid_num("trigger_discovery", new_triggers);
 
 		sql1 = zbx_malloc(sql1, sql1_alloc);
 		sql2 = zbx_malloc(sql2, sql2_alloc);
@@ -1319,11 +1316,9 @@ static void	lld_triggers_save(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *t
 			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ins_trigger_discovery_sql);
 #endif
 			zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset,
-					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
-					triggerdiscoveryid, triggerid, parent_triggerid);
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL, triggerid, parent_triggerid);
 
 			trigger->triggerid = triggerid++;
-			triggerdiscoveryid++;
 		}
 		else if (0 != (trigger->flags & ZBX_FLAG_LLD_TRIGGER_UPDATE))
 		{
