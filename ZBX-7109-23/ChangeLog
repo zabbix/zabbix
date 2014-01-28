@@ -37,6 +37,8 @@ New features:
 A.F....... [ZBX-1357] updated American English, French, Hungarian, Italian, Japanese, Russian, Slovak and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-6315] fixed deleting of lost triggers by the low-level discovery rule (Sasha)
+........S. [ZBX-7109] improved performance of processing discovered triggers by the low-level discovery rule (Sasha)
 ..F....... [ZBX-7688] fixed discovery item import (Eduard)
 A.F....... [ZBX-4218] rewrote the item key parser's source code for independence on the mbstring.func_overload option (Sasha)
 ...G...... [ZBX-7687] fixed items system.swap.in[] and system.swap.out[] going into an infinite loop on Solaris (asaveljevs)
