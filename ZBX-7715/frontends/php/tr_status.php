@@ -98,20 +98,28 @@ $pageFilter = new CPageFilter(array(
 $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = $pageFilter->hostid;
 
+// reset filter
 if (isset($_REQUEST['filter_rst'])) {
 	$_REQUEST['show_details'] = 0;
 	$_REQUEST['show_maintenance'] = 1;
-	$_REQUEST['show_triggers'] = TRIGGERS_OPTION_ONLYTRUE;
 	$_REQUEST['show_events'] = EVENTS_OPTION_NOEVENT;
 	$_REQUEST['ack_status'] = ZBX_ACK_STS_ANY;
 	$_REQUEST['show_severity'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 	$_REQUEST['txt_select'] = '';
 	$_REQUEST['status_change'] = 0;
 	$_REQUEST['status_change_days'] = 14;
+
+	CProfile::update('web.tr_status.filter.show_triggers', TRIGGERS_OPTION_ONLYTRUE, PROFILE_TYPE_INT);;
+}
+// update filter in profiles
+elseif (hasRequest('filter_set')) {
+	CProfile::update('web.tr_status.filter.show_triggers', getRequest('show_triggers'), PROFILE_TYPE_INT);
 }
 
-// show triggers
-$_REQUEST['show_triggers'] = isset($_REQUEST['show_triggers']) ? $_REQUEST['show_triggers'] : TRIGGERS_OPTION_ONLYTRUE;
+// fetch filter from profiles
+$filter = array(
+	'show_triggers' => CProfile::get('web.tr_status.filter.show_triggers', TRIGGERS_OPTION_ONLYTRUE)
+);
 
 // show events
 if (isset($_REQUEST['show_events'])) {
@@ -244,7 +252,6 @@ if (isset($audio) && !$mute) {
  */
 $displayNodes = (is_show_all_nodes() && $pageFilter->groupid == 0 && $pageFilter->hostid == 0);
 
-$showTriggers = $_REQUEST['show_triggers'];
 $showEvents = $_REQUEST['show_events'];
 $showSeverity = $_REQUEST['show_severity'];
 $ackStatus = $_REQUEST['ack_status'];
@@ -273,7 +280,7 @@ $filterForm->addVar('fullscreen', $_REQUEST['fullscreen']);
 $filterForm->addVar('groupid', $_REQUEST['groupid']);
 $filterForm->addVar('hostid', $_REQUEST['hostid']);
 
-$statusComboBox = new CComboBox('show_triggers', $showTriggers);
+$statusComboBox = new CComboBox('show_triggers', $filter['show_triggers']);
 $statusComboBox->addItem(TRIGGERS_OPTION_ALL, _('Any'));
 $statusComboBox->additem(TRIGGERS_OPTION_ONLYTRUE, _('Problem'));
 $filterForm->addRow(_('Triggers status'), $statusComboBox);
@@ -401,7 +408,7 @@ else {
 if (!zbx_empty($_REQUEST['txt_select'])) {
 	$options['search'] = array('description' => $_REQUEST['txt_select']);
 }
-if ($showTriggers == TRIGGERS_OPTION_ONLYTRUE) {
+if ($filter['show_triggers'] == TRIGGERS_OPTION_ONLYTRUE) {
 	$options['only_true'] = 1;
 }
 if ($ackStatus == ZBX_ACK_STS_WITH_UNACK) {
