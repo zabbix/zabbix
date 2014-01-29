@@ -1612,7 +1612,7 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
                                         ZBX_SQL_NODE,
                                 EVENT_SOURCE_AUTO_REGISTRATION,
                                 ACTION_STATUS_ACTIVE,
-                                DBnode_local("actionid"));
+                                DBand_node_local("actionid"));
         
                 if (NULL != DBfetch(result))
                         res = FAIL;
