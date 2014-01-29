@@ -74,10 +74,15 @@ if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 		$request = get_request('request');
 		$url = zbx_empty($request) ? CWebUser::$data['url'] : $request;
 		if (zbx_empty($url) || $url == $page['file']) {
-			$url = 'dashboard.php';
+			require_once dirname(__FILE__).'/include/page_header.php';
+			$searchForm = new CView('general.searchpage');
+			$searchForm->render();
+			require_once dirname(__FILE__).'/include/page_footer.php';
 		}
-		redirect($url);
-		exit();
+		else {
+			redirect($url);
+			exit();
+		}
 	}
 	// login failed, fall back to a guest account
 	else {
@@ -110,5 +115,8 @@ if (!CWebUser::$data['alias'] || CWebUser::$data['alias'] == ZBX_GUEST_USER) {
 	}
 }
 else {
-	redirect(zbx_empty(CWebUser::$data['url']) ? 'dashboard.php' : CWebUser::$data['url']);
-}
+	require_once dirname(__FILE__).'/include/page_header.php';
+	$searchForm = new CView('general.searchpage');
+	$searchForm->render();
+	require_once dirname(__FILE__).'/include/page_footer.php';
+ }
