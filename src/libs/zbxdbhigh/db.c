@@ -1609,7 +1609,7 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
                                 " from actions"
                                 " where eventsource=%d"
                                         " and status=%d"
-                                        DB_NODE,
+                                        ZBX_SQL_NODE,
                                 EVENT_SOURCE_AUTO_REGISTRATION,
                                 ACTION_STATUS_ACTIVE,
                                 DBnode_local("actionid"));
