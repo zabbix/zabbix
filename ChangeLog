@@ -16,6 +16,7 @@ New features:
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+..F....... [ZBX-7631] fixed dashboard favourite widget width (Eduard)
 ..F....... [ZBX-7613] removed frontend unused code (Eduard)
 ....I..... [ZBX-7622] changed the default value of timeperiods.every field to '1' (wiper)
 ....I..... [ZBX-7515] added missing delayed loading option of wevtapi.dll for x64 systems (igors)
