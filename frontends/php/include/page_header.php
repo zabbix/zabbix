@@ -239,8 +239,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 		array_push($page_header_r_col, $logout);
 	}
 
-	$logo = new CLink(new CDiv(SPACE, 'zabbix_logo'), 'http://www.zabbix.com/', 'image', null, 'nosid');
-	$logo->setTarget('_blank');
+	$logo = new CLink(new CDiv(SPACE, 'zabbix_logo'), '/', 'image', null, 'nosid');
 
 	$top_page_row = array(
 		new CCol($logo, 'page_header_l'),
