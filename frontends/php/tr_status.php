@@ -111,6 +111,8 @@ if (isset($_REQUEST['filter_rst'])) {
 }
 
 // show triggers
+// the state of this filter must not be remembered in the profiles because setting it's value to "All" may render the
+// whole page inaccessible on large installations.
 $_REQUEST['show_triggers'] = isset($_REQUEST['show_triggers']) ? $_REQUEST['show_triggers'] : TRIGGERS_OPTION_ONLYTRUE;
 
 // show events
