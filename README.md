@@ -29,3 +29,11 @@ Note the `F-*` branch you should be building changes off of (for example: LLNW c
 *protip*
 
 `git fetch upstream refs/tags/*:refs/tags/*` to get all tag info from upstream to your local repo.
+
+*Upstream major version cherry-pick onto new branch*
+
+`git rebase --onto F-LLNW-API-2.2 a495dde~1 upstream/F-LLNW-API`
+
+a495dde is base of comparison, in this case: 2.0.3rc1.
+
+(Note: helpful comparison: https://github.llnw.net/Zabbix/svn.zabbix.com/compare/2.0.8...F-LLNW-API)
