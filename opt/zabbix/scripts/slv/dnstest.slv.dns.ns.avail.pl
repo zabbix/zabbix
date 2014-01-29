@@ -5,7 +5,7 @@
 use lib '/opt/zabbix/scripts';
 
 use DNSTest;
-use DNSTestSLV;
+use DNSTestSLV2;
 
 my $cfg_key_in = 'dnstest.dns.udp.rtt[{$DNSTEST.TLD},';
 my $cfg_key_out = 'dnstest.slv.dns.ns.avail[';
@@ -20,14 +20,12 @@ my ($from, $till, $value_ts) = get_minute_bounds();
 
 info("from:$from till:$till value_ts:$value_ts");
 
-zapi_connect();
-
-my $cfg_minonline = zapi_get_macro_dns_probe_online();
-my $cfg_max_value = zapi_get_macro_dns_udp_rtt();
-
 db_connect();
 
-process_slv_ns_avail($tld, $cfg_key_in, $cfg_key_out, $from, $till, $value_ts, $cfg_minonline, 49, \&check_item_value);
+my $cfg_minonline = get_macro_dns_probe_online();
+my $cfg_max_value = get_macro_dns_udp_rtt();
+
+process_slv_ns_avail($tld, $cfg_key_in, $cfg_key_out, $from, $till, $value_ts, $cfg_minonline, SLV_UNAVAILABILITY_LIMIT, \&check_item_value);
 
 exit(SUCCESS);
 

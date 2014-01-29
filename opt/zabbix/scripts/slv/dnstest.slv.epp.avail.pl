@@ -5,7 +5,7 @@
 use lib '/opt/zabbix/scripts';
 
 use DNSTest;
-use DNSTestSLV;
+use DNSTestSLV2;
 
 my $cfg_key_in = 'dnstest.epp[{$DNSTEST.TLD}';
 my $cfg_key_out = 'dnstest.slv.epp.avail';
@@ -16,19 +16,18 @@ exit_if_running();
 my $config = get_dnstest_config();
 set_slv_config($config);
 
-zapi_connect();
+db_connect();
 
-my $interval = zapi_get_macro_epp_delay();
+my $interval = get_macro_epp_delay();
 
 my ($from, $till, $value_ts) = get_interval_bounds($interval);
 
-exit_if_lastclock($tld, $cfg_key_out, $value_ts, $interval);
+my $lastclock = get_lastclock($tld, $cfg_key_out);
+exit_if_lastclock($lastclock, $value_ts, $interval);
 
 info("from:$from till:$till value_ts:$value_ts");
 
-my $cfg_minonline = zapi_get_macro_epp_probe_online();
-
-db_connect();
+my $cfg_minonline = get_macro_epp_probe_online();
 
 my $probes_ref = get_online_probes($from, $till, undef);
 my $count = scalar(@$probes_ref);
@@ -41,7 +40,7 @@ if ($count < $cfg_minonline)
 
 my $hostids_ref = probes2tldhostids($tld, $probes_ref);
 
-my $items_ref = zapi_get_items_by_hostids($hostids_ref, $cfg_key_in, 0); # not complete key
+my $items_ref = get_items_by_hostids($hostids_ref, $cfg_key_in, 0); # not complete key
 
 my $values_ref = get_item_values($items_ref, $from, $till);
 $count = scalar(keys(%$values_ref));
@@ -72,7 +71,7 @@ foreach my $itemid (keys(%$values_ref))
 }
 
 my $test_result = DOWN;
-$test_result = UP if ($success_probes * 100 / scalar(@$items_ref) > 49);
+$test_result = UP if ($success_probes * 100 / scalar(@$items_ref) > SLV_UNAVAILABILITY_LIMIT);
 
 info($test_result == UP ? "success" : "fail");
 send_value($tld, $cfg_key_out, $value_ts, $test_result);
