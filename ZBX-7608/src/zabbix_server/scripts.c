@@ -308,12 +308,9 @@ void	zbx_script_clean(zbx_script_t *script)
  *                                                                            *
  * Purpose: executing user scripts or remote commands                         *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
+ *                TIMEOUT_ERROR - a timeout occurred                          *
  *                                                                            *
  * Comments: !!! always call 'zbx_script_clean' function after                *
  *           'zbx_execute_script' to clear allocated memory                   *
