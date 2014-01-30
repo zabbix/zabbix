@@ -88,19 +88,19 @@ class CUser extends CZBXAPI {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// permission check
-		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
-		}
-		elseif ($options['editable'] === null && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
-			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['where']['uug'] = 'u.userid=ug.userid';
-			$sqlParts['where'][] = 'ug.usrgrpid IN ('.
-				' SELECT uug.usrgrpid'.
-				' FROM users_groups uug'.
-				' WHERE uug.userid='.self::$userData['userid'].
-			')';
-		}
-		elseif ($options['editable'] !== null || self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			$options['userids'] = self::$userData['userid'];
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			if (!$options['editable'] && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
+				$sqlParts['from']['users_groups'] = 'users_groups ug';
+				$sqlParts['where']['uug'] = 'u.userid=ug.userid';
+				$sqlParts['where'][] = 'ug.usrgrpid IN ('.
+					' SELECT uug.usrgrpid'.
+					' FROM users_groups uug'.
+					' WHERE uug.userid='.self::$userData['userid'].
+				')';
+			}
+			else {
+				$sqlParts['where'][] = 'u.userid='.self::$userData['userid'];
+			}
 		}
 
 		// userids
@@ -184,7 +184,7 @@ class CUser extends CZBXAPI {
 				}
 
 				// usrgrpids
-				if (isset($user['usrgrpid']) && is_null($options['selectUsrgrps'])) {
+				if (isset($user['usrgrpid']) && $options['selectUsrgrps'] === null) {
 					if (!isset($result[$user['userid']]['usrgrps'])) {
 						$result[$user['userid']]['usrgrps'] = array();
 					}
@@ -194,7 +194,7 @@ class CUser extends CZBXAPI {
 				}
 
 				// mediaids
-				if (isset($user['mediaid']) && is_null($options['selectMedias'])) {
+				if (isset($user['mediaid']) && $options['selectMedias'] === null) {
 					if (!isset($result[$user['userid']]['medias'])) {
 						$result[$user['userid']]['medias'] = array();
 					}
@@ -204,7 +204,7 @@ class CUser extends CZBXAPI {
 				}
 
 				// mediatypeids
-				if (isset($user['mediatypeid']) && is_null($options['selectMediatypes'])) {
+				if (isset($user['mediatypeid']) && $options['selectMediatypes'] === null) {
 					if (!isset($result[$user['userid']]['mediatypes'])) {
 						$result[$user['userid']]['mediatypes'] = array();
 					}
@@ -224,7 +224,7 @@ class CUser extends CZBXAPI {
 		/*
 		 * Adding objects
 		 */
-		if (!is_null($options['getAccess'])) {
+		if ($options['getAccess'] !== null) {
 			foreach ($result as $userid => $user) {
 				$result[$userid] += array('gui_access' => 0, 'debug_mode' => 0, 'users_status' => 0);
 			}
