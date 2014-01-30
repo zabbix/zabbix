@@ -171,6 +171,9 @@ create_macro('{$DNSTEST.SLV.RDDS43.RTT}', 99, undef);
 create_macro('{$DNSTEST.SLV.RDDS80.RTT}', 99, undef);
 create_macro('{$DNSTEST.SLV.RDDS.UPD}', 99, undef);
 create_macro('{$DNSTEST.SLV.DNS.NS.UPD}', 99, undef);
+create_macro('{$DNSTEST.SLV.EPP.LOGIN}', 99, undef);
+create_macro('{$DNSTEST.SLV.EPP.UPDATE}', 99, undef);
+create_macro('{$DNSTEST.SLV.EPP.INFO}', 99, undef);
 
 create_macro('{$ROLLING.WEEK.STATUS.PAGE.SLV}', '0,5,10,25,50,75,100', undef);
 
@@ -1533,7 +1536,10 @@ sub create_dnstest_items {
 	'DNSTEST.SLV.RDDS43.RTT',
 	'DNSTEST.SLV.RDDS80.RTT',
 	'DNSTEST.SLV.RDDS.UPD',
-	'DNSTEST.SLV.DNS.NS.UPD')
+	'DNSTEST.SLV.DNS.NS.UPD',
+	'DNSTEST.SLV.EPP.LOGIN',
+	'DNSTEST.SLV.EPP.UPDATE',
+	'DNSTEST.SLV.EPP.INFO')
     {
 	$options = {'name' => '$1 value',
 		   'key_'=> 'dnstest.configvalue['.$m.']',
