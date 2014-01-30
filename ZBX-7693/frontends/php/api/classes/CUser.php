@@ -632,7 +632,7 @@ class CUser extends CZBXAPI {
 	/**
 	 * Add user media.
 	 *
-	 * @param string $data['userid']
+	 * @param string $data['users']['userid']
 	 * @param string $data['medias']['mediatypeid']
 	 * @param string $data['medias']['address']
 	 * @param int    $data['medias']['severity']
@@ -642,12 +642,31 @@ class CUser extends CZBXAPI {
 	 * @return array
 	 */
 	public function addMedia($data) {
+		$users = zbx_toArray($data['users']);
+		$media = zbx_toArray($data['medias']);
+
+		$this->validateAddMedia($users, $media);
+		$mediaIds = $this->addMediaReal($users, $media);
+
+		return array('mediaids' => $mediaIds);
+	}
+
+	/**
+	 * Validate add user media.
+	 *
+	 * @throws APIException if the input is invalid
+	 *
+	 * @param string $users['userid']
+	 * @param string $media['mediatypeid']
+	 * @param string $media['address']
+	 * @param int    $media['severity']
+	 * @param int    $media['active']
+	 * @param string $media['period']
+	 */
+	protected function validateAddMedia(array $users, array $media) {
 		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only Zabbix Admins can add user media.'));
 		}
-
-		$media = zbx_toArray($data['medias']);
-		$users = zbx_toArray($data['users']);
 
 		if (!$this->isWritable(zbx_objectValues($users, 'userid'))) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permissions to create other user media.'));
@@ -667,8 +686,6 @@ class CUser extends CZBXAPI {
 			}
 		}
 
-		$mediaIds = array();
-
 		$timePeriodValidator = new CTimePeriodValidator();
 
 		foreach ($users as $user) {
@@ -676,7 +693,27 @@ class CUser extends CZBXAPI {
 				if (!$timePeriodValidator->validate($mediaItem['period'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $timePeriodValidator->getError());
 				}
+			}
+		}
+	}
 
+	/**
+	 * Create user media.
+	 *
+	 * @param string $users['userid']
+	 * @param string $media['mediatypeid']
+	 * @param string $media['address']
+	 * @param int    $media['severity']
+	 * @param int    $media['active']
+	 * @param string $media['period']
+	 *
+	 * @return array
+	 */
+	protected function addMediaReal(array $users, array $media) {
+		$mediaIds = array();
+
+		foreach ($users as $user) {
+			foreach ($media as $mediaItem) {
 				$mediaId = get_dbid('media', 'mediaid');
 
 				$sql = 'INSERT INTO media (mediaid,userid,mediatypeid,sendto,active,severity,period)'.
@@ -692,38 +729,7 @@ class CUser extends CZBXAPI {
 			}
 		}
 
-		return array('mediaids' => $mediaIds);
-	}
-
-	/**
-	 * Delete user media.
-	 *
-	 * @param array $mediaIds
-	 *
-	 * @return array
-	 */
-	public function deleteMedia($mediaIds) {
-		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only Zabbix Admins can remove user media.'));
-		}
-
-		$mediaIds = zbx_toArray($mediaIds);
-
-		$dbMediaCount = API::UserMedia()->get(array(
-			'countOutput' => true,
-			'mediaids' => $mediaIds,
-			'editable' => true
-		));
-
-		if (count($mediaIds) != $dbMediaCount) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('You do not have permissions to delete other user media.'));
-		}
-
-		if (!DBexecute('DELETE FROM media WHERE '.dbConditionInt('mediaid', $mediaIds))) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete user media.'));
-		}
-
-		return array('mediaids' => $mediaIds);
+		return $mediaIds;
 	}
 
 	/**
@@ -742,15 +748,9 @@ class CUser extends CZBXAPI {
 	 *
 	 * @return array
 	 */
-	public function updateMedia($data) {
-		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Zabbix Admins can change user media.'));
-		}
-
-		$media = zbx_toArray($data['medias']);
+	public function updateMedia(array $data) {
 		$users = zbx_toArray($data['users']);
-
-		$mediaToCreate = $mediaToUpdate = $mediaToDelete = array();
+		$media = zbx_toArray($data['medias']);
 
 		$userIds = zbx_objectValues($users, 'userid');
 
@@ -761,12 +761,12 @@ class CUser extends CZBXAPI {
 			'preservekeys' => true
 		));
 
+		$this->validateUpdateMedia($media, $dbMedia);
+
+		$mediaToCreate = $mediaToUpdate = $mediaToDelete = array();
+
 		foreach ($media as $mediaItem) {
 			if (isset($mediaItem['mediaid'])) {
-				if (!isset($dbMedia[$mediaItem['mediaid']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('You do not have permissions to update other user media.'));
-				}
-
 				$mediaToUpdate[$mediaItem['mediaid']] = $mediaItem;
 			}
 			else {
@@ -791,6 +791,64 @@ class CUser extends CZBXAPI {
 
 		// update
 		if ($mediaToUpdate) {
+			foreach ($mediaToUpdate as $media) {
+				$result = DBexecute(
+					'UPDATE media'.
+					' SET mediatypeid='.zbx_dbstr($media['mediatypeid']).','.
+						' sendto='.zbx_dbstr($media['sendto']).','.
+						' active='.zbx_dbstr($media['active']).','.
+						' severity='.zbx_dbstr($media['severity']).','.
+						' period='.zbx_dbstr($media['period']).
+					' WHERE mediaid='.zbx_dbstr($media['mediaid'])
+				);
+
+				if (!$result) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update user media.'));
+				}
+			}
+		}
+
+		// create
+		if ($mediaToCreate) {
+			$this->validateAddMedia($users, $mediaToCreate);
+			$this->addMediaReal($users, $mediaToCreate);
+		}
+
+		return array('userids' => $userIds);
+	}
+
+	/**
+	 * Validate update user media.
+	 *
+	 * @throws APIException if the input is invalid
+	 *
+	 * @param string $media['mediatypeid']
+	 * @param string $media['address']
+	 * @param int    $media['severity']
+	 * @param int    $media['active']
+	 * @param string $media['period']
+	 * @param array  $dbMedia
+	 *
+	 * @return array
+	 */
+	protected function validateUpdateMedia(array $media, array $dbMedia) {
+		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Zabbix Admins can change user media.'));
+		}
+
+		$mediaToUpdate = array();
+
+		foreach ($media as $mediaItem) {
+			if (isset($mediaItem['mediaid'])) {
+				if (!isset($dbMedia[$mediaItem['mediaid']])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('You do not have permissions to update other user media.'));
+				}
+
+				$mediaToUpdate[$mediaItem['mediaid']] = $mediaItem;
+			}
+		}
+
+		if ($mediaToUpdate) {
 			$mediaDBfields = array(
 				'period' => null,
 				'mediatypeid' => null,
@@ -811,29 +869,52 @@ class CUser extends CZBXAPI {
 				if (!$timePeriodValidator->validate($media['period'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $timePeriodValidator->getError());
 				}
-
-				$result = DBexecute(
-					'UPDATE media'.
-					' SET mediatypeid='.zbx_dbstr($media['mediatypeid']).','.
-						' sendto='.zbx_dbstr($media['sendto']).','.
-						' active='.zbx_dbstr($media['active']).','.
-						' severity='.zbx_dbstr($media['severity']).','.
-						' period='.zbx_dbstr($media['period']).
-					' WHERE mediaid='.zbx_dbstr($media['mediaid'])
-				);
-
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update user media.'));
-				}
 			}
 		}
+	}
 
-		// create
-		if ($mediaToCreate) {
-			$this->addMedia(array('users' => $users, 'medias' => $mediaToCreate));
+	/**
+	 * Delete user media.
+	 *
+	 * @param array $mediaIds
+	 *
+	 * @return array
+	 */
+	public function deleteMedia($mediaIds) {
+		$mediaIds = zbx_toArray($mediaIds);
+
+		$this->validateDeleteMedia($mediaIds);
+
+		if (!DBexecute('DELETE FROM media WHERE '.dbConditionInt('mediaid', $mediaIds))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete user media.'));
 		}
 
-		return array('userids' => $userIds);
+		return array('mediaids' => $mediaIds);
+	}
+
+	/**
+	 * Validate delete user media.
+	 *
+	 * @throws APIException if the input is invalid
+	 *
+	 * @param array $mediaIds
+	 *
+	 * @return array
+	 */
+	protected function validateDeleteMedia(array $mediaIds) {
+		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only Zabbix Admins can remove user media.'));
+		}
+
+		$dbMediaCount = API::UserMedia()->get(array(
+			'countOutput' => true,
+			'mediaids' => $mediaIds,
+			'editable' => true
+		));
+
+		if (count($mediaIds) != $dbMediaCount) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('You do not have permissions to delete other user media.'));
+		}
 	}
 
 	/**
