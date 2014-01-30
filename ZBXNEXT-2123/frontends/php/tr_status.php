@@ -117,8 +117,14 @@ if (isset($_REQUEST['filter_rst'])) {
 	$_REQUEST['status_change_days'] = 14;
 
 	CProfile::update('web.tr_status.filter.application', '', PROFILE_TYPE_STR);
-	foreach (getHostInventories() as $field) {
-		CProfile::delete('web.tr_status.filter.inventory.'.$field['db_field']);
+
+	// reset inventory filters
+	$i = 0;
+	while (CProfile::get('web.tr_status.filter.inventory.field', null, $i) !== null) {
+		CProfile::delete('web.tr_status.filter.inventory.field', $i);
+		CProfile::delete('web.tr_status.filter.inventory.value', $i);
+
+		$i++;
 	}
 }
 // update filter in profiles
@@ -126,20 +132,24 @@ elseif (hasRequest('filter_set')) {
 	CProfile::update('web.tr_status.filter.application', getRequest('application'), PROFILE_TYPE_STR);
 
 	// update host inventory filter
-	$inventoryFilter = zbx_toHash(getRequest('inventory', array()), 'field');
-	foreach (getHostInventories() as $field) {
-		$idx = 'web.tr_status.filter.inventory.'.$field['db_field'];
-
-		// delete old values
-		if ((!isset($inventoryFilter[$field['db_field']]) || $inventoryFilter[$field['db_field']]['value'] === '')
-				&& CProfile::get($idx) !== null) {
-
-			CProfile::delete($idx);
+	$i = 0;
+	foreach (getRequest('inventory', array()) as $field) {
+		if ($field['value'] === '') {
+			continue;
 		}
-		// set new values
-		elseif (isset($inventoryFilter[$field['db_field']])) {
-			CProfile::update($idx, $inventoryFilter[$field['db_field']]['value'], PROFILE_TYPE_STR);
-		}
+
+		CProfile::update('web.tr_status.filter.inventory.field', $field['field'], PROFILE_TYPE_STR, $i);
+		CProfile::update('web.tr_status.filter.inventory.value', $field['value'], PROFILE_TYPE_STR, $i);
+
+		$i++;
+	}
+
+	// delete remaining old values
+	while (CProfile::get('web.tr_status.filter.inventory.field', null, $i) !== null) {
+		CProfile::delete('web.tr_status.filter.inventory.field', $i);
+		CProfile::delete('web.tr_status.filter.inventory.value', $i);
+
+		$i++;
 	}
 }
 
@@ -148,11 +158,14 @@ $filter = array(
 	'application' => CProfile::get('web.tr_status.filter.application', ''),
 	'inventory' => array()
 );
-foreach (getHostInventories() as $field) {
-	$idx = 'web.tr_status.filter.inventory.'.$field['db_field'];
-	if (!zbx_empty(CProfile::get($idx))) {
-		$filter['inventory'][$field['db_field']] = CProfile::get($idx);
-	}
+$i = 0;
+while (CProfile::get('web.tr_status.filter.inventory.field', null, $i) !== null) {
+	$filter['inventory'][] = array(
+		'field' => CProfile::get('web.tr_status.filter.inventory.field', null, $i),
+		'value' => CProfile::get('web.tr_status.filter.inventory.value', null, $i)
+	);
+
+	$i++;
 }
 
 // show triggers
@@ -376,7 +389,9 @@ $filterForm->addRow(_('Filter by application'), array(
 // inventory filter
 $inventoryFilters = $filter['inventory'];
 if (!$inventoryFilters) {
-	$inventoryFilters = array('' => '');
+	$inventoryFilters = array(
+		array('field' => '', 'value' => '')
+	);
 }
 $inventoryFields = array();
 foreach (getHostInventories() as $inventory) {
@@ -386,10 +401,10 @@ foreach (getHostInventories() as $inventory) {
 $inventoryFilterTable = new CTable();
 $inventoryFilterTable->setAttribute('id', 'inventory-filter');
 $i = 0;
-foreach ($inventoryFilters as $field => $value) {
+foreach ($inventoryFilters as $field) {
 	$inventoryFilterTable->addRow(array(
-		new CComboBox('inventory['.$i.'][field]', $field, null, $inventoryFields),
-		new CTextBox('inventory['.$i.'][value]', $value, 20),
+		new CComboBox('inventory['.$i.'][field]', $field['field'], null, $inventoryFields),
+		new CTextBox('inventory['.$i.'][value]', $field['value'], 20),
 		new CButton('inventory['.$i.'][remove]', _('Remove'), null, 'link_menu element-table-remove')
 	), 'form_row');
 
@@ -482,10 +497,15 @@ else {
 
 // inventory filter
 if ($filter['inventory']) {
+	$inventoryFilter = array();
+	foreach ($filter['inventory'] as $field) {
+		$inventoryFilter[$field['field']][] = $field['value'];
+	}
+
 	$hosts = API::Host()->get(array(
 		'output' => array('hostid'),
 		'hostids' => isset($options['hostids']) ? $options['hostids'] : null,
-		'searchInventory' => $filter['inventory']
+		'searchInventory' => $inventoryFilter
 	));
 	$options['hostids'] = zbx_objectValues($hosts, 'hostid');
 }
