@@ -1169,16 +1169,15 @@ function getNextDelayInterval(array $arrOfFlexIntervals, $now, &$nextInterval) {
  *         hh      - hours (0-24)
  *         mm      - minutes (0-59)
  *
- * @param string $interfaceid
- * @param string $itemid
+ * @param string $seed               seed value applied to delay to spread item checks over the delay period
  * @param int $itemType
- * @param int $delay                 default delay
+ * @param int $delay                 default delay, can be overriden
  * @param string $flexIntervals      flexible intervals
  * @param int $now                   current timestamp
  *
  * @return array
  */
-function calculateItemNextcheck($interfaceid, $itemid, $itemType, $delay, $flexIntervals, $now) {
+function calculateItemNextcheck($seed, $itemType, $delay, $flexIntervals, $now) {
 	// special processing of active items to see better view in queue
 	if ($itemType == ITEM_TYPE_ZABBIX_ACTIVE) {
 		if ($delay != 0) {
@@ -1197,14 +1196,12 @@ function calculateItemNextcheck($interfaceid, $itemid, $itemType, $delay, $flexI
 		$tmax = $now + SEC_PER_YEAR;
 		$try = 0;
 
-		$shift = ($itemType == ITEM_TYPE_JMX) ? $interfaceid : $itemid;
-
 		while ($t < $tmax) {
 			// calculate 'nextcheck' value for the current interval
 			$currentDelay = getCurrentDelay($delay, $arrOfFlexIntervals, $t);
 
 			if ($currentDelay != 0) {
-				$nextcheck = $currentDelay * floor($t / $currentDelay) + ($shift % $currentDelay);
+				$nextcheck = $currentDelay * floor($t / $currentDelay) + ($seed % $currentDelay);
 
 				if ($try == 0) {
 					while ($nextcheck <= $t) {
