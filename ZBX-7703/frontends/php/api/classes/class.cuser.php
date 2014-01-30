@@ -1169,9 +1169,16 @@ Copt::memoryPick();
 			$passwd = $user['password'];
 			$auth_type = $user['auth_type'];
 
-			// check if the user name used when calling the API matches the one used for HTTP authentication
-			if ($auth_type == ZBX_AUTH_HTTP && $name !== $_SERVER['PHP_AUTH_USER']) {
-				throw new APIException(ZBX_API_ERROR_INTERNAL, S_CUSER_ERROR_USER_DOES_NOT_MATCH_HTTP_LOGIN);
+			if ($auth_type == ZBX_AUTH_HTTP) {
+				// if PHP_AUTH_USER is not set, it means that HTTP authentication is not enabled
+				if (!isset($_SERVER['PHP_AUTH_USER'])) {
+					throw new APIException(ZBX_API_ERROR_INTERNAL, S_CUSER_ERROR_CANNOT_LOGIN);
+				}
+				// check if the user name used when calling the API matches the one used for HTTP authentication
+				elseif ($name !== $_SERVER['PHP_AUTH_USER']) {
+					throw new APIException(ZBX_API_ERROR_INTERNAL, S_CUSER_ERROR_USER_DOES_NOT_MATCH_HTTP_LOGIN);
+				}
+
 			}
 
 			$password = md5($passwd);

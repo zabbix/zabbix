@@ -2342,6 +2342,7 @@
 	'S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_FIRST_PART'=> 'Account is blocked for',
 	'S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_SECOND_PART'=>	'seconds',
 	'S_CUSER_ERROR_LOGIN_OR_PASSWORD_INCORRECT'=>		'Login name or password is incorrect',
+	'S_CUSER_ERROR_CANNOT_LOGIN' =>	'Cannot login.',
 	'S_CUSER_ERROR_USER_DOES_NOT_MATCH_HTTP_LOGIN'=>	'Login name does not match the name used to pass HTTP authentication',
 	'S_CUSER_ERROR_SESSION_TERMINATED'=>			'Session terminated, please re-login!',
 	'S_CUSER_ERROR_TABLE_USERS_EMPTY'=>			'Table users is empty. Possible database corruption.',
