@@ -6,6 +6,7 @@ New features:
 A.F....... [ZBX-1357] updated American English, French, Hungarian, Italian, Japanese, Russian, Slovak and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-7608] fixed crashes when global scripts timed out (wiper)
 ........S. [ZBX-7561] fixed SQL errors while processing host prototypes under MySQL (Sasha)
 ..F....... [ZBX-7688] fixed discovery item import (Eduard)
 A.F....... [ZBX-4218] rewrote the item key parser's source code for independence on the mbstring.func_overload option (Sasha)
