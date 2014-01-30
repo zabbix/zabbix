@@ -32,22 +32,22 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'host' =>					array(T_ZBX_STR, O_OPT,	null,	null,		NULL),
-	'eventid' =>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
-	'incident_type' =>			array(T_ZBX_INT, O_OPT,	null,	null,		NULL),
-	'mark_incident' =>			array(T_ZBX_INT, O_OPT,	null,	null,		NULL),
-	'original_from' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'original_to' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
+	'host' =>					array(T_ZBX_STR, O_OPT,	null,	null,			null),
+	'eventid' =>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			null),
+	'type' =>					array(T_ZBX_INT, O_OPT,	null,	IN('0,1,2,3'),	null),
+	'mark_incident' =>			array(T_ZBX_INT, O_OPT,	null,	null,			null),
+	'original_from' =>			array(T_ZBX_INT, O_OPT, null,	null,			null),
+	'original_to' =>			array(T_ZBX_INT, O_OPT, null,	null,			null),
 	// filter
-	'filter_set' =>				array(T_ZBX_STR, O_OPT,	P_ACT,	null,		null),
-	'filter_search' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'filter_from' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'filter_to' =>				array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'filter_rolling_week' =>	array(T_ZBX_INT, O_OPT, null,	null,		null),
+	'filter_set' =>				array(T_ZBX_STR, O_OPT,	P_ACT,	null,			null),
+	'filter_search' =>			array(T_ZBX_STR, O_OPT, null,	null,			null),
+	'filter_from' =>			array(T_ZBX_INT, O_OPT, null,	null,			null),
+	'filter_to' =>				array(T_ZBX_INT, O_OPT, null,	null,			null),
+	'filter_rolling_week' =>	array(T_ZBX_INT, O_OPT, null,	null,			null),
 	// ajax
-	'favobj'=>					array(T_ZBX_STR, O_OPT, P_ACT,	NULL,		NULL),
-	'favref'=>					array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})'),
-	'favstate'=>				array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})&&("filter"=={favobj})')
+	'favobj'=>					array(T_ZBX_STR, O_OPT, P_ACT,	null,			null),
+	'favref'=>					array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+	'favstate'=>				array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})&&("filter"=={favobj})')
 );
 check_fields($fields);
 
@@ -798,7 +798,7 @@ if (isset($data['epp']['events'])) {
 	$data['epp']['events'] = array_reverse($data['epp']['events']);
 }
 
-$data['incident_type'] = get_request('incident_type', get_cookie('ui-tabs-1', 0));
+$data['type'] = get_request('type', get_cookie('ui-tabs-1', 0));
 
 $dnsTestView = new CView('dnstest.incidents.list', $data);
 

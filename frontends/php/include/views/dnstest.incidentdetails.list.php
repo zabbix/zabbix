@@ -273,8 +273,8 @@ if (CWebUser::getType() >= USER_TYPE_ZABBIX_ADMIN) {
 	$filterTable = new CTable('', 'filter');
 
 	$filter = new CButton('mark_incident', $changeIncidentTypeName,
-		'javascript: location.href = "dnstest.incidents.php?mark_incident='.
-			$changeIncidentType.'&eventid='.$this->data['eventid'].'&host='.$this->data['tld']['host'].'";'
+		'javascript: location.href = "dnstest.incidents.php?mark_incident='.$changeIncidentType.
+		'&eventid='.$this->data['eventid'].'&host='.$this->data['tld']['host'].'&type='.$this->data['type'].'";'
 	);
 	$filter->useJQueryStyle('main');
 

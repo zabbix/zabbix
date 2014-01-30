@@ -930,19 +930,29 @@ define('DNSTEST_NO_REPLY_ERROR_CODE',	-200);
 define('DNSSEC_FAIL_ERROR_CODE',		-204);
 
 // DNS TEST calculated items keys
-define('CALCULATED_ITEM_DNS_FAIL',			'dnstest.configvalue[INCIDENT.DNS.FAIL]');
-define('CALCULATED_ITEM_DNS_RECOVERY',		'dnstest.configvalue[INCIDENT.DNS.RECOVER]');
-define('CALCULATED_ITEM_DNSSEC_FAIL',		'dnstest.configvalue[INCIDENT.DNSSEC.FAIL]');
-define('CALCULATED_ITEM_DNSSEC_RECOVERY',	'dnstest.configvalue[INCIDENT.DNSSEC.RECOVER]');
-define('CALCULATED_ITEM_RDDS_FAIL',			'dnstest.configvalue[INCIDENT.RDDS.FAIL]');
-define('CALCULATED_ITEM_RDDS_RECOVERY',		'dnstest.configvalue[INCIDENT.RDDS.RECOVER]');
-define('CALCULATED_ITEM_EPP_FAIL',			'dnstest.configvalue[INCIDENT.EPP.FAIL]');
-define('CALCULATED_ITEM_EPP_RECOVERY',		'dnstest.configvalue[INCIDENT.EPP.RECOVER]');
-define('CALCULATED_ITEM_DNS_DELAY',			'dnstest.configvalue[DNSTEST.DNS.UDP.DELAY]');
-define('CALCULATED_ITEM_RDDS_DELAY',		'dnstest.configvalue[DNSTEST.RDDS.DELAY]');
-define('CALCULATED_ITEM_EPP_DELAY',			'dnstest.configvalue[DNSTEST.EPP.DELAY]');
-define('CALCULATED_ITEM_DNS_AVAIL_MINNS',	'dnstest.configvalue[DNSTEST.DNS.AVAIL.MINNS]');
-define('CALCULATED_ITEM_DNS_UDP_RTT',		'dnstest.configvalue[DNSTEST.DNS.UDP.RTT]');
+define('CALCULATED_ITEM_DNS_FAIL',				'dnstest.configvalue[INCIDENT.DNS.FAIL]');
+define('CALCULATED_ITEM_DNS_RECOVERY',			'dnstest.configvalue[INCIDENT.DNS.RECOVER]');
+define('CALCULATED_ITEM_DNSSEC_FAIL',			'dnstest.configvalue[INCIDENT.DNSSEC.FAIL]');
+define('CALCULATED_ITEM_DNSSEC_RECOVERY',		'dnstest.configvalue[INCIDENT.DNSSEC.RECOVER]');
+define('CALCULATED_ITEM_RDDS_FAIL',				'dnstest.configvalue[INCIDENT.RDDS.FAIL]');
+define('CALCULATED_ITEM_RDDS_RECOVERY',			'dnstest.configvalue[INCIDENT.RDDS.RECOVER]');
+define('CALCULATED_ITEM_EPP_FAIL',				'dnstest.configvalue[INCIDENT.EPP.FAIL]');
+define('CALCULATED_ITEM_EPP_RECOVERY',			'dnstest.configvalue[INCIDENT.EPP.RECOVER]');
+define('CALCULATED_ITEM_DNS_DELAY',				'dnstest.configvalue[DNSTEST.DNS.UDP.DELAY]');
+define('CALCULATED_ITEM_RDDS_DELAY',			'dnstest.configvalue[DNSTEST.RDDS.DELAY]');
+define('CALCULATED_ITEM_EPP_DELAY',				'dnstest.configvalue[DNSTEST.EPP.DELAY]');
+define('CALCULATED_ITEM_DNS_AVAIL_MINNS',		'dnstest.configvalue[DNSTEST.DNS.AVAIL.MINNS]');
+define('CALCULATED_ITEM_DNS_UDP_RTT',			'dnstest.configvalue[DNSTEST.DNS.UDP.RTT]');
+define('CALCULATED_ITEM_SLV_DNS_NS_RTT_UDP',	'dnstest.configvalue[DNSTEST.SLV.DNS.UDP.RTT]');
+define('CALCULATED_ITEM_SLV_DNS_NS_RTT_TCP',	'dnstest.configvalue[DNSTEST.SLV.DNS.TCP.RTT]');
+define('CALCULATED_ITEM_SLV_DNS_NS_UPD',		'dnstest.configvalue[DNSTEST.SLV.DNS.NS.UPD]');
+define('CALCULATED_ITEM_SLV_DNS_NS',			'dnstest.configvalue[DNSTEST.SLV.NS.AVAIL]');
+define('CALCULATED_ITEM_SLV_RDDS43_RTT',		'dnstest.configvalue[DNSTEST.SLV.RDDS43.RTT]');
+define('CALCULATED_ITEM_SLV_RDDS80_RTT',		'dnstest.configvalue[DNSTEST.SLV.RDDS80.RTT]');
+define('CALCULATED_ITEM_SLV_RDDS_UPD',			'dnstest.configvalue[DNSTEST.SLV.RDDS.UPD]');
+define('CALCULATED_ITEM_SLV_EPP_INFO',			'dnstest.configvalue[DNSTEST.SLV.EPP.INFO]');
+define('CALCULATED_ITEM_SLV_EPP_LOGIN',			'dnstest.configvalue[DNSTEST.SLV.EPP.LOGIN]');
+define('CALCULATED_ITEM_EPP_UPDATE',			'dnstest.configvalue[DNSTEST.SLV.EPP.UPDATE]');
 
 // DNS TEST probe status items keys
 define('PROBE_STATUS_AUTOMATIC',	'dnstest.probe.status[automatic,"{$DNSTEST.IP4.ROOTSERVERS1}","{$DNSTEST.IP6.ROOTSERVERS1}"]');
@@ -971,6 +981,9 @@ define('MONTHLY_REPORTS_DNS_NS',			'dnstest.slv.dns.ns.month');
 define('MONTHLY_REPORTS_RDDS43_RTT',		'dnstest.slv.rdds.43.rtt.month');
 define('MONTHLY_REPORTS_RDDS80_RTT',		'dnstest.slv.rdds.80.rtt.month');
 define('MONTHLY_REPORTS_RDDS_UPD',			'dnstest.slv.rdds.upd.month');
+define('MONTHLY_REPORTS_EPP_INFO',			'dnstest.slv.epp.rtt.info.month');
+define('MONTHLY_REPORTS_EPP_LOGIN',			'dnstest.slv.epp.rtt.login.month');
+define('MONTHLY_REPORTS_EPP_UPDATE',		'dnstest.slv.epp.rtt.update.month');
 
 // DNS TEST "dnstest" host name
 define('DNSTEST_HOST',	'dnstest');

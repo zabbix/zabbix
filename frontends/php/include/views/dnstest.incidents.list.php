@@ -156,7 +156,7 @@ $filterTable->addRow(array(
 			'Rolling week',
 			null,
 			'time-period',
-			'rollingweek('.$this->data['incident_type'].', \''.$this->data['sid'].'\');'
+			'rollingweek('.$this->data['type'].', \''.$this->data['sid'].'\');'
 		)
 	)
 ));
@@ -187,7 +187,7 @@ if (isset($this->data['tld'])) {
 }
 
 $incidentPage = new CTabView(array('remember' => true));
-$incidentPage->setSelected($this->data['incident_type']);
+$incidentPage->setSelected($this->data['type']);
 
 $headers = array(
 	_('Incident ID'),

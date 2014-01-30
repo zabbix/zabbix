@@ -149,31 +149,43 @@ if ($data['filter_search']) {
 				switch ($itemKey->getKeyId()) {
 					case MONTHLY_REPORTS_DNS_NS_RTT_UDP:
 						$newName = 'UDP DNS Resolution RTT';
-						$macro = 'dnstest.configvalue[DNSTEST.SLV.DNS.UDP.RTT]';
+						$macro = CALCULATED_ITEM_SLV_DNS_NS_RTT_UDP;
 						break;
 					case MONTHLY_REPORTS_DNS_NS_RTT_TCP:
 						$newName = 'TCP DNS Resolution RTT';
-						$macro = 'dnstest.configvalue[DNSTEST.SLV.DNS.TCP.RTT]';
+						$macro = CALCULATED_ITEM_SLV_DNS_NS_RTT_TCP;
 						break;
 					case MONTHLY_REPORTS_DNS_NS_UPD:
 						$newName = 'DNS update time';
-						$macro = 'dnstest.configvalue[DNSTEST.SLV.DNS.NS.UPD]';
+						$macro = CALCULATED_ITEM_SLV_DNS_NS_UPD;
 						break;
 					case MONTHLY_REPORTS_DNS_NS:
 						$newName = 'DNS Name Server availability';
-						$macro = 'dnstest.configvalue[DNSTEST.SLV.NS.AVAIL]';
+						$macro = CALCULATED_ITEM_SLV_DNS_NS;
 						break;
 					case MONTHLY_REPORTS_RDDS43_RTT:
 						$newName = 'RDDS43 resolution RTT';
-						$macro = 'dnstest.configvalue[DNSTEST.SLV.RDDS43.RTT]';
+						$macro = CALCULATED_ITEM_SLV_RDDS43_RTT;
 						break;
 					case MONTHLY_REPORTS_RDDS80_RTT:
 						$newName = 'RDDS80 resolution RTT';
-						$macro = 'dnstest.configvalue[DNSTEST.SLV.RDDS80.RTT]';
+						$macro = CALCULATED_ITEM_SLV_RDDS80_RTT;
 						break;
 					case MONTHLY_REPORTS_RDDS_UPD:
 						$newName = 'RDDS update time';
-						$macro = 'dnstest.configvalue[DNSTEST.SLV.RDDS.UPD]';
+						$macro = CALCULATED_ITEM_SLV_RDDS_UPD;
+						break;
+					case MONTHLY_REPORTS_EPP_INFO:
+						$newName = 'EPP INFO resolution RTT';
+						$macro = CALCULATED_ITEM_SLV_EPP_INFO;
+						break;
+					case MONTHLY_REPORTS_EPP_LOGIN:
+						$newName = 'EPP LOGIN resolution RTT';
+						$macro = CALCULATED_ITEM_SLV_EPP_LOGIN;
+						break;
+					case MONTHLY_REPORTS_EPP_UPDATE:
+						$newName = 'EPP UPDATE resolution RTT';
+						$macro = CALCULATED_ITEM_EPP_UPDATE;
 						break;
 					default:
 						$newName = null;

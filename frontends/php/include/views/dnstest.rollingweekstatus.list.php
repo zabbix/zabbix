@@ -132,7 +132,7 @@ if (isset($this->data['tld'])) {
 			$dnsValue = ($tld['dns']['lastvalue'] > 0)
 				? new CLink(
 					$tld['dns']['lastvalue'].'%',
-					'dnstest.incidents.php?filter_set=1&filter_rolling_week=1&incident_type='.DNSTEST_DNS.'&host='.$tld['host'],
+					'dnstest.incidents.php?filter_set=1&filter_rolling_week=1&type='.DNSTEST_DNS.'&host='.$tld['host'],
 					'first-cell-value'
 				)
 				: new CSpan('0.000%', 'first-cell-value');
@@ -174,7 +174,7 @@ if (isset($this->data['tld'])) {
 			$dnssecValue = ($tld['dnssec']['lastvalue'] > 0)
 				? new CLink(
 					$tld['dnssec']['lastvalue'].'%',
-					'dnstest.incidents.php?filter_set=1&filter_rolling_week=1&incident_type='.DNSTEST_DNSSEC.'&host='.$tld['host'],
+					'dnstest.incidents.php?filter_set=1&filter_rolling_week=1&type='.DNSTEST_DNSSEC.'&host='.$tld['host'],
 					'first-cell-value'
 				)
 				: new CSpan('0.000%', 'first-cell-value');
@@ -216,7 +216,7 @@ if (isset($this->data['tld'])) {
 			$rddsValue = ($tld['rdds']['lastvalue'] > 0)
 				? new CLink(
 					$tld['rdds']['lastvalue'].'%',
-					'dnstest.incidents.php?filter_set=1&filter_rolling_week=1&incident_type='.DNSTEST_RDDS.'&host='.$tld['host'],
+					'dnstest.incidents.php?filter_set=1&filter_rolling_week=1&type='.DNSTEST_RDDS.'&host='.$tld['host'],
 					'first-cell-value'
 				)
 				: new CSpan('0.000%', 'first-cell-value');
@@ -258,7 +258,7 @@ if (isset($this->data['tld'])) {
 			$eppValue = ($tld['epp']['lastvalue'] > 0)
 				? new CLink(
 					$tld['epp']['lastvalue'].'%',
-					'dnstest.incidents.php?filter_set=1&filter_rolling_week=1&incident_type='.DNSTEST_EPP.'&host='.$tld['host'],
+					'dnstest.incidents.php?filter_set=1&filter_rolling_week=1&type='.DNSTEST_EPP.'&host='.$tld['host'],
 					'first-cell-value'
 				)
 				: new CSpan('0.000%', 'first-cell-value');
