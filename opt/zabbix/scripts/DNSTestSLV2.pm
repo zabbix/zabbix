@@ -8,6 +8,7 @@ use Getopt::Long;
 use Exporter qw(import);
 use DateTime;
 use Zabbix;
+use Sender;
 
 use constant SUCCESS => 0;
 use constant FAIL => 1;
@@ -475,18 +476,12 @@ sub send_value
 
     return if (defined($OPTS{'test'}));
 
-    fail('zabbix sender ('.$config->{'slv'}->{'sender'}.') not found') unless (defined($config->{'slv'}->{'sender'})
-									       and -x $config->{'slv'}->{'sender'});
+    my $sender = Zabbix::Sender->new({
+        'server' => $config->{'slv'}->{'zserver'},
+        'port' => $config->{'slv'}->{'zport'}
+				     });
 
-    my @cmd = ("echo \\\"$hostname\\\" \\\"$key\\\" \\\"$timestamp\\\" \\\"$value\\\" | ".
-	       $config->{'slv'}->{'sender'}." -T -z ".$config->{'slv'}->{'zserver'}." -i -");
-
-    my ($stdout, $stderr) = capture_exec(@cmd);
-
-    my @lines = split("\n", $stdout);
-    info($_) foreach (@lines);
-    @lines = split("\n", $stderr);
-    info($_) foreach (@lines);
+    $sender->send($hostname, $key, "$value", "$timestamp");
 }
 
 # Get name server details (name, IP) from item key.

@@ -5,8 +5,8 @@ password = zabbix
 
 [slv]
 path = /opt/zabbix/scripts/slv
-sender = /usr/bin/zabbix_sender
 zserver = 127.0.0.1
+zport = 10051
 logdir = /var/log/zabbix
 
 [db]
