@@ -28,10 +28,7 @@
 
 static ZBX_MUTEX	services_lock;
 
-#define ZBX_UPDATES_CLEAN	0
-#define ZBX_UPDATES_DESTROY	1
-
-/* service update queue items */
+/* status update queue items */
 typedef struct
 {
 	/* the update source id */
@@ -48,122 +45,131 @@ typedef struct zbx_itservice_t
 {
 	/* service id */
 	zbx_uint64_t		serviceid;
-	/* trigger id for leaf nodes */
+	/* trigger id of leaf nodes */
 	zbx_uint64_t		triggerid;
 	/* the initial service status */
 	int			old_status;
-	/* the new service status */
+
+	/* the calculated service status */
 	int			status;
-	/* the service status calculation algorithm for branch nodes, see SERVICE_ALGORITHM_* defines */
+	/* the service status calculation algorithm, see SERVICE_ALGORITHM_* defines */
 	int			algorithm;
-	/* the parent (hard linked) node */
-	struct zbx_itservice_t	*parent;
-	/* the soft linked parent nodes */
-	zbx_vector_ptr_t	links;
-	/* the child nodes (hard or soft linked) */
+	/* the parent nodes */
+	zbx_vector_ptr_t	parents;
+	/* the child nodes */
 	zbx_vector_ptr_t	children;
 }
 zbx_itservice_t;
 
+/* index of services by triggerid */
+typedef struct
+{
+	zbx_uint64_t		triggerid;
+	zbx_vector_ptr_t	services;
+}
+zbx_itservice_index_t;
+
 /* the service update queue */
 static zbx_vector_ptr_t	itservice_updates;
 
+/* a set of IT services used during update session */
+typedef struct
+{
+	zbx_hashset_t		services;
+	zbx_hashset_t		index;
+}
+zbx_itservices_set_t;
+
 /******************************************************************************
  *                                                                            *
- * Function: service_create                                                   *
+ * Function: init_itservice_set                                               *
  *                                                                            *
- * Purpose: create a new IT service node                                      *
+ * Purpose: initializes IT services data set to store services during update  *
+ *          session                                                           *
  *                                                                            *
- * Parameters: serviceid   - [IN] the service id                              *
- *             algo        - [IN] the service status calculation mode for     *
- *                                branch nodes                                *
+ * Parameters: set   - [IN] the data set to initialize                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	init_itservice_set(zbx_itservices_set_t *set)
+{
+	zbx_hashset_create(&set->services, 512, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_hashset_create(&set->index, 128, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: clean_itservice_set                                              *
+ *                                                                            *
+ * Purpose: cleans IT services data set by releasing allocated memory         *
+ *                                                                            *
+ * Parameters: set   - [IN] the data set to clean                             *
+ *                                                                            *
+ ******************************************************************************/
+static void	clean_itservice_set(zbx_itservices_set_t *set)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_itservice_t		*service;
+	zbx_itservice_index_t	*index;
+
+	zbx_hashset_iter_reset(&set->index, &iter);
+
+	while (NULL != (index = zbx_hashset_iter_next(&iter)))
+		zbx_vector_ptr_destroy(&index->services);
+
+	zbx_hashset_destroy(&set->index);
+
+	zbx_hashset_iter_reset(&set->services, &iter);
+
+	while (NULL != (service = zbx_hashset_iter_next(&iter)))
+	{
+		zbx_vector_ptr_destroy(&service->children);
+		zbx_vector_ptr_destroy(&service->parents);
+	}
+
+	zbx_hashset_destroy(&set->services);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: create_service                                                   *
+ *                                                                            *
+ * Purpose: creates a new IT service node                                     *
+ *                                                                            *
+ * Parameters: set         - [IN] the IT services data set                    *
+ *             serviceid   - [IN] the service id                              *
+ *             algo        - [IN] the service status calculation mode         *
  *             triggerid   - [IN] the source trigger id for leaf nodes        *
  *             status      - [IN] the initial service status                  *
  *                                                                            *
  * Return value: the created service node                                     *
  *                                                                            *
  ******************************************************************************/
-static zbx_itservice_t	*service_create(zbx_uint64_t serviceid, int algo, zbx_uint64_t triggerid, int status)
+static zbx_itservice_t	*create_service(zbx_itservices_set_t *set, zbx_uint64_t serviceid, int algo, zbx_uint64_t
+		triggerid, int status)
 {
-	zbx_itservice_t	*service;
+	zbx_itservice_t		service = {serviceid, triggerid, status, status, algo}, *pservice;
+	zbx_itservice_index_t	*pindex;
 
-	service = zbx_malloc(NULL, sizeof(zbx_itservice_t));
-	memset(service, 0, sizeof(zbx_itservice_t));
+	zbx_vector_ptr_create(&service.children);
+	zbx_vector_ptr_create(&service.parents);
 
-	service->serviceid = serviceid;
-	service->triggerid = triggerid;
-	service->old_status = status;
-	service->status = status;
-	service->algorithm = algo;
+	pservice = zbx_hashset_insert(&set->services, &service, sizeof(service));
 
-	zbx_vector_ptr_create(&service->children);
-	zbx_vector_ptr_create(&service->links);
-
-	return service;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: service_free                                                     *
- *                                                                            *
- * Purpose: frees a service and its child nodes                               *
- *                                                                            *
- * Parameters: service   - [IN] the service to free                           *
- *                                                                            *
- * Comments: Only hard linked or soft linked nodes without parents are freed. *
- *                                                                            *
- ******************************************************************************/
-static void	service_free(zbx_itservice_t* service)
-{
-	int	i;
-
-	for (i = 0; i < service->children.values_num; i++)
+	if (0 != triggerid)
 	{
-		zbx_itservice_t	*child = (zbx_itservice_t *)service->children.values[i];
-		/* free only hard linked children or soft linked children without parents */
-		if (NULL == child->parent || service == child->parent)
-			service_free(service->children.values[i]);
+		if (NULL == (pindex = zbx_hashset_search(&set->index, &triggerid)))
+		{
+			zbx_itservice_index_t	index = {triggerid};
+
+			zbx_vector_ptr_create(&index.services);
+
+			pindex = zbx_hashset_insert(&set->index, &index, sizeof(index));
+		}
+
+		zbx_vector_ptr_append(&pindex->services, pservice);
 	}
 
-	zbx_vector_ptr_destroy(&service->children);
-	zbx_vector_ptr_destroy(&service->links);
-	zbx_free(service);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: service_find_by_serviceid                                        *
- *                                                                            *
- * Purpose: locates service node by its serviceid                             *
- *                                                                            *
- * Parameters: root       - [IN] the root node                                *
- *             serviceid  - [IN] an id of the service to find                 *
- *                                                                            *
- * Return value: The located node or NULL if the service tree does not        *
- *               contain a node with the specified serviceid.                 *
- *                                                                            *
- ******************************************************************************/
-static zbx_itservice_t	*service_find_by_serviceid(zbx_itservice_t *root, zbx_uint64_t serviceid)
-{
-	int		i;
-	zbx_itservice_t	*service;
-
-	if (root->serviceid == serviceid)
-		return root;
-
-	for (i = 0; i < root->children.values_num; i++)
-	{
-		zbx_itservice_t	*child = (zbx_itservice_t *)root->children.values[i];
-
-		/* iterate only over hard linked nodes or soft linked nodes without parents */
-		if (NULL != child->parent && root != child->parent)
-			continue;
-
-		if (NULL != (service = service_find_by_serviceid(root->children.values[i], serviceid)))
-			return service;
-	}
-
-	return NULL;
+	return pservice;
 }
 
 /******************************************************************************
@@ -193,94 +199,75 @@ static void	updates_append(zbx_vector_ptr_t *updates, zbx_uint64_t sourceid, int
 
 /******************************************************************************
  *                                                                            *
- * Function: service_add                                                      *
+ * Function: load_service_parents                                             *
  *                                                                            *
- * Purpose: adds a node to the service node tree                              *
+ * Purpose: recursively loads parent nodes of the specified service until the *
+ *          root node                                                         *
  *                                                                            *
- * Parameters: root     - [IN] the root node                                  *
- *             service  - [IN] the node to add                                *
- *                                                                            *
- * Comments: This function recursively iterates through the parent nodes      *
- *           until the root node and add also the missing nodes to the tree.  *
+ * Parameters: set      - [IN] the IT services data set                       *
+ *             service  - [IN] the service                                    *
  *                                                                            *
  ******************************************************************************/
-static void	service_add(zbx_itservice_t *root, zbx_itservice_t *service)
+static void	load_service_parents(zbx_itservices_set_t *set, zbx_itservice_t *service)
 {
 	DB_RESULT	result;
 	DB_RESULT	result2;
 	DB_ROW		row;
 	zbx_itservice_t	*parent, *sibling;
-	zbx_uint64_t	serviceid;
-	int		top_node = 1;
+	zbx_uint64_t	parentid, siblingid;
 
-	result = DBselect("select s.serviceid,s.algorithm,s.status,sl.soft from services s,services_links sl"
+	result = DBselect("select s.serviceid,s.algorithm,s.status from services s,services_links sl"
 			" where sl.servicedownid=" ZBX_FS_UI64
-			" and s.serviceid=sl.serviceupid"
-			" order by sl.soft", service->serviceid);
+			" and s.serviceid=sl.serviceupid", service->serviceid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(serviceid, row[0]);
+		ZBX_STR2UINT64(parentid, row[0]);
 
 		/* find/load the parent service */
-		if (NULL == (parent = service_find_by_serviceid(root, serviceid)))
-		{
-			/* first try to build the tree upwards to the root node to ensure    */
-			/* that the tree fragment we are building is linked to the root node */
-			/* when we start processing sibling nodes                            */
-			parent = service_create(serviceid, atoi(row[1]), atoi(row[3]), atoi(row[2]));
-			service_add(root, parent);
-		}
+		if (NULL == (parent = zbx_hashset_search(&set->services, &parentid)))
+			parent = create_service(set, parentid, atoi(row[1]), 0, atoi(row[2]));
 
-		if (0 == atoi(row[3]))
-		{
-			top_node = 0;
-			service->parent = parent;
-		}
-		else
-			zbx_vector_ptr_append(&service->links, parent);
+		/* for newly created or indirectly linked parent services we must load */
+		/* their parents until we reach the root service                       */
+		if (0 == parent->parents.values_num && 0 == parent->children.values_num)
+			load_service_parents(set, parent);
 
-		zbx_vector_ptr_append(&parent->children, service);
+		/* link the service as a parent's child */
+		if (FAIL == zbx_vector_ptr_search(&parent->children, service, ZBX_DEFAULT_PTR_COMPARE_FUNC))
+			zbx_vector_ptr_append(&parent->children, service);
+
+		if (FAIL == zbx_vector_ptr_search(&service->parents, parent, ZBX_DEFAULT_PTR_COMPARE_FUNC))
+			zbx_vector_ptr_append(&service->parents, parent);
 
 		/* load the sibling services */
-		result2 = DBselect("select s.serviceid,s.algorithm,s.status,s.triggerid,sl.soft"
+		result2 = DBselect("select s.serviceid,s.algorithm,s.status,s.triggerid"
 				" from services s,services_links sl"
 					" where sl.serviceupid=" ZBX_FS_UI64
-					" and s.serviceid=sl.servicedownid", serviceid);
+					" and s.serviceid=sl.servicedownid", parentid);
 
 		while (NULL != (row = DBfetch(result2)))
 		{
-			ZBX_STR2UINT64(serviceid, row[0]);
+			ZBX_STR2UINT64(siblingid, row[0]);
 
-			if (serviceid == service->serviceid)
+			if (siblingid == service->serviceid)
 				continue;
 
-			if (NULL == (sibling = service_find_by_serviceid(root, serviceid)))
+			if (NULL == (sibling = zbx_hashset_search(&set->services, &siblingid)))
 			{
 				zbx_uint64_t	triggerid = 0;
 
 				if (SUCCEED != DBis_null(row[3]))
 					ZBX_STR2UINT64(triggerid, row[3]);
 
-				sibling = service_create(serviceid, atoi(row[1]), triggerid, atoi(row[2]));
-
-				if (0 == atoi(row[4]))
-					sibling->parent = parent;
-				else
-					zbx_vector_ptr_append(&sibling->links, parent);
-
-				zbx_vector_ptr_append(&parent->children, sibling);
+				sibling = create_service(set, siblingid, atoi(row[1]), triggerid, atoi(row[2]));
 			}
+
+			if (FAIL == zbx_vector_ptr_search(&parent->children, sibling, ZBX_DEFAULT_PTR_COMPARE_FUNC))
+				zbx_vector_ptr_append(&parent->children, sibling);
 		}
 
 		DBfree_result(result2);
-	}
-
-	if (1 == top_node)
-	{
-		/* top node, link to the root node */
-		zbx_vector_ptr_append(&root->children, service);
-		service->parent = root;
 	}
 
 	DBfree_result(result);
@@ -288,20 +275,20 @@ static void	service_add(zbx_itservice_t *root, zbx_itservice_t *service)
 
 /******************************************************************************
  *                                                                            *
- * Function: service_load                                                     *
+ * Function: load_services_by_triggerd                                        *
  *                                                                            *
- * Purpose: loads all services the specified trigger can affect into service  *
- *          node tree                                                         *
+ * Purpose: loads services that might be affected by the specified triggerid  *
+ *          or are required to calculate status of loaded services            *
  *                                                                            *
- * Parameters: root       - [IN] the root node                                *
+ * Parameters: set        - [IN] the IT services data set                     *
  *             triggerid  - [IN] the source trigger id                        *
  *                                                                            *
  ******************************************************************************/
-static void	service_load(zbx_itservice_t *root, zbx_uint64_t triggerid)
+static void	load_services_by_triggerd(zbx_itservices_set_t *set, zbx_uint64_t triggerid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	serviceid;
+	zbx_uint64_t	serviceid, *pserviceid = &serviceid;
 	zbx_itservice_t	*service;
 
 	result = DBselect("select serviceid,status,algorithm from services where triggerid=" ZBX_FS_UI64, triggerid);
@@ -310,11 +297,14 @@ static void	service_load(zbx_itservice_t *root, zbx_uint64_t triggerid)
 	{
 		ZBX_STR2UINT64(serviceid, row[0]);
 
-		if (NULL == (service = service_find_by_serviceid(root, serviceid)))
-		{
-			service = service_create(serviceid, atoi(row[2]), triggerid, atoi(row[1]));
-			service_add(root, service);
-		}
+		if (NULL == (service = zbx_hashset_search(&set->services, &pserviceid)))
+			service = create_service(set, serviceid, atoi(row[2]), triggerid, atoi(row[1]));
+
+		/* Even if the service already exists it might be loaded only to calculate value */
+		/* of parent service (indirectly linked). In this case we also must load its     */
+		/* parent services.                                                              */
+		if (0 == service->parents.values_num)
+			load_service_parents(set, service);
 	}
 
 	DBfree_result(result);
@@ -340,12 +330,8 @@ static void	service_update_status(zbx_itservice_t *service, int clock, zbx_vecto
 {
 	int	status, i;
 
-	/* parent node can be NULL only for:                                  */
-	/*   1) root node                                                     */
-	/*   2) soft linked nodes which are static during this service update */
-	/* In both cases we don't need to calculate new status value          */
-	if (NULL == service->parent)
-		return;
+	if (0 == service->children.values_num)
+		goto out;
 
 	switch (service->algorithm)
 	{
@@ -382,12 +368,9 @@ static void	service_update_status(zbx_itservice_t *service, int clock, zbx_vecto
 
 		updates_append(alarms, service->serviceid, status, clock);
 
-		/* update status of hard linked parent */
-		service_update_status(service->parent, clock, alarms);
-
-		/* and soft linked upper nodes  */
-		for (i = 0; i < service->links.values_num; i++)
-			service_update_status(service->links.values[i], clock, alarms);
+		/* update parent services */
+		for (i = 0; i < service->parents.values_num; i++)
+			service_update_status(service->parents.values[i], clock, alarms);
 	}
 
 out:;
@@ -395,55 +378,12 @@ out:;
 
 /******************************************************************************
  *                                                                            *
- * Function: service_get_services_by_triggerid                                *
+ * Function: compare_updates                                                  *
  *                                                                            *
- * Purpose: get a list of services directly based on the specified trigger    *
- *                                                                            *
- * Parameters: service    - [IN] the service to check                         *
- *             triggerid  - [IN] the trigger id the service is based on       *
- *             services   - [OUT] a list of services                          *
+ * Purpose: used to sort service updates by service id                        *
  *                                                                            *
  ******************************************************************************/
-static void	service_get_services_by_triggerid(zbx_itservice_t *service, zbx_uint64_t triggerid,
-		zbx_vector_ptr_t *services)
-{
-	int	i;
-
-	if (service->triggerid == triggerid)
-		zbx_vector_ptr_append(services, service);
-
-	for (i = 0; i < service->children.values_num; i++)
-	{
-		zbx_itservice_t	*child = (zbx_itservice_t *)service->children.values[i];
-
-		/* iterate only over hard linked nodes or soft linked nodes without parents */
-		if (NULL != child->parent && service != child->parent)
-			continue;
-
-		service_get_services_by_triggerid(child, triggerid, services);
-	}
-}
-
-static void	service_check_status_change(zbx_itservice_t *service, zbx_vector_ptr_t *updates)
-{
-	int	i;
-
-	if (service->old_status != service->status)
-		updates_append(updates, service->serviceid, service->status, 0);
-
-	for (i = 0; i < service->children.values_num; i++)
-	{
-		zbx_itservice_t	*child = (zbx_itservice_t *)service->children.values[i];
-
-		/* iterate only over hard linked nodes or soft linked nodes without parents */
-		if (NULL != child->parent && service != child->parent)
-			continue;
-
-		service_check_status_change(child, updates);
-	}
-}
-
-static int	compare_updates(zbx_status_update_t **update1, zbx_status_update_t **update2)
+static int	compare_updates(const zbx_status_update_t **update1, const zbx_status_update_t **update2)
 {
 	if ((*update1)->sourceid < (*update2)->sourceid)
 		return -1;
@@ -456,20 +396,19 @@ static int	compare_updates(zbx_status_update_t **update1, zbx_status_update_t **
 
 /******************************************************************************
  *                                                                            *
- * Function: service_write_changes                                            *
+ * Function: write_service_changes_and_alarms                                 *
  *                                                                            *
  * Purpose: writes service status changes and generated service alarms into   *
  *          database                                                          *
- *          DBflush_service_updates() function                                *
  *                                                                            *
- * Parameters: root    - [IN] the root service                                *
+ * Parameters: set     - [IN] the IT services data set                        *
  *             alarms  - [IN] the service alarms update queue                 *
  *                                                                            *
  * Return value: SUCCEED - the data was written successfully                  *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	service_write_changes(zbx_itservice_t *root, zbx_vector_ptr_t *alarms)
+static int	write_service_changes_and_alarms(zbx_itservices_set_t *set, zbx_vector_ptr_t *alarms)
 {
 	int			i, ret = FAIL;
 	zbx_vector_ptr_t	updates;
@@ -478,15 +417,26 @@ static int	service_write_changes(zbx_itservice_t *root, zbx_vector_ptr_t *alarms
 							" (servicealarmid,serviceid,value,clock) values ";
 	size_t			sql_offset = 0, sql_alloc = 256;
 	zbx_uint64_t		alarmid;
+	zbx_hashset_iter_t	iter;
+	zbx_itservice_t		*service;
 
 	sql = zbx_malloc(NULL, sql_alloc);
 
+	/* get a list of service status updates that must be written to database */
 	zbx_vector_ptr_create(&updates);
+	zbx_hashset_iter_reset(&set->services, &iter);
 
-	service_check_status_change(root, &updates);
+	while (NULL != (service = zbx_hashset_iter_next(&iter)))
+	{
+		if (service->old_status != service->status)
+			updates_append(&updates, service->serviceid, service->status, 0);
+
+	}
+
 	zbx_vector_ptr_sort(&updates, (zbx_compare_func_t)compare_updates);
 	zbx_vector_ptr_uniq(&updates, (zbx_compare_func_t)compare_updates);
 
+	/* write service status changes into database */
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < updates.values_num; i++)
@@ -502,6 +452,7 @@ static int	service_write_changes(zbx_itservice_t *root, zbx_vector_ptr_t *alarms
 			goto out;
 	}
 
+	/* write generated service alarms into database */
 	alarmid = DBget_maxid_num("service_alarms", alarms->values_num);
 
 	for (i = 0; i < alarms->values_num; i++)
@@ -551,7 +502,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: service_flush_updates                                            *
+ * Function: flush_service_updates                                            *
  *                                                                            *
  * Purpose: processes the service update queue                                *
  *                                                                            *
@@ -563,24 +514,25 @@ out:
  *              by update queue or dependent on those services (directly or   *
  *              indirectly) or required to calculate status of any loaded     *
  *              services.                                                     *
- *           2) Apply updates to the loaded service tree. Queue service       *
+ *           2) Apply updates to the loaded service tree. Queue new service   *
  *              alarms whenever service status changes.                       *
  *           3) Write the final service status changes and the generated      *
  *              service alarm queue into database.                            *
  *                                                                            *
  ******************************************************************************/
-int	service_flush_updates(zbx_vector_ptr_t *service_updates)
+int	flush_service_updates(zbx_vector_ptr_t *service_updates)
 {
 	int			iupdate, iservice, i, ret = FAIL;
-	zbx_itservice_t		*root;
 	zbx_status_update_t	*update;
-	zbx_vector_ptr_t	services, alarms;
+	zbx_itservices_set_t	set;
+	zbx_vector_ptr_t	alarms;
+	zbx_itservice_index_t	*index;
 
 	if (NULL == service_updates->values)
 		return SUCCEED;
 
-	root = service_create(0, 0, 0, 0);
-	zbx_vector_ptr_create(&services);
+	init_itservice_set(&set);
+
 	zbx_vector_ptr_create(&alarms);
 
 	/* load all services affected by the trigger status change and      */
@@ -589,7 +541,7 @@ int	service_flush_updates(zbx_vector_ptr_t *service_updates)
 	{
 		update = service_updates->values[iupdate];
 
-		service_load(root, update->sourceid);
+		load_services_by_triggerd(&set, update->sourceid);
 	}
 
 	/* apply status updates */
@@ -597,40 +549,40 @@ int	service_flush_updates(zbx_vector_ptr_t *service_updates)
 	{
 		update = service_updates->values[iupdate];
 
-		service_get_services_by_triggerid(root, update->sourceid, &services);
-
-		/* change the status of services based on the update */
-		for (iservice = 0; iservice < services.values_num; iservice++)
+		if (NULL != (index = zbx_hashset_search(&set.index, update)))
 		{
-			zbx_itservice_t	*service = (zbx_itservice_t*)services.values[iservice];
+			/* change the status of services based on the update */
+			for (iservice = 0; iservice < index->services.values_num; iservice++)
+			{
+				zbx_itservice_t	*service = (zbx_itservice_t*)index->services.values[iservice];
 
-			if (SERVICE_ALGORITHM_NONE == service->algorithm || service->status == update->status)
-				continue;
+				if (SERVICE_ALGORITHM_NONE == service->algorithm || service->status == update->status)
+					continue;
 
-			updates_append(&alarms, service->serviceid, update->status, update->clock);
-			service->status = update->status;
+				updates_append(&alarms, service->serviceid, update->status, update->clock);
+				service->status = update->status;
+			}
+
+			/* recalculate status of the parent services */
+			for (iservice = 0; iservice < index->services.values_num; iservice++)
+			{
+				zbx_itservice_t	*service = (zbx_itservice_t*)index->services.values[iservice];
+
+				/* update parent services */
+				for (i = 0; i < service->parents.values_num; i++)
+					service_update_status(service->parents.values[i], update->clock, &alarms);
+			}
 		}
-
-		/* recalculate status of the parent services */
-		for (iservice = 0; iservice < services.values_num; iservice++)
-		{
-			zbx_itservice_t	*service = (zbx_itservice_t*)services.values[iservice];
-
-			service_update_status(service->parent, update->clock, &alarms);
-		}
-
-		services.values_num = 0;
 	}
 
-	ret = service_write_changes(root, &alarms);
+	ret = write_service_changes_and_alarms(&set, &alarms);
 
 	for (i = 0; i < alarms.values_num; i++)
 		zbx_free(alarms.values[i]);
 
 	zbx_vector_ptr_destroy(&alarms);
 
-	zbx_vector_ptr_destroy(&services);
-	service_free(root);
+	clean_itservice_set(&set);
 
 	return ret;
 }
@@ -680,7 +632,7 @@ int	DBflush_itservice_updates()
 
 	LOCK_SERVICES;
 
-	ret = service_flush_updates(&itservice_updates);
+	ret = flush_service_updates(&itservice_updates);
 
 	for (i = 0; i < itservice_updates.values_num; i++)
 		zbx_free(itservice_updates.values[i]);
@@ -723,7 +675,7 @@ int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_n
 	for (i = 0; i < triggerids_num; i++)
 		updates_append(&updates, triggerids[i], 0, 0);
 
-	if (FAIL == service_flush_updates(&updates))
+	if (FAIL == flush_service_updates(&updates))
 		goto out;
 
 	sql = zbx_malloc(sql, sql_alloc);
@@ -736,11 +688,10 @@ int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_n
 		ret = SUCCEED;
 
 	zbx_free(sql);
-
+out:
 	for (i = 0; i < updates.values_num; i++)
 		zbx_free(updates.values[i]);
 
-out:
 	zbx_vector_ptr_destroy(&updates);
 
 	UNLOCK_SERVICES;
