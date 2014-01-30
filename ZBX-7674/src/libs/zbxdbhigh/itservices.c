@@ -72,10 +72,28 @@ zbx_itservice_index_t;
 /* the service update queue */
 static zbx_vector_ptr_t	itservice_updates;
 
-/* a set of IT services used during update session */
+/* a set of IT services used during update session                          */
+/*                                                                          */
+/* All services are stored into hashset accessed by serviceid. The services */
+/* also are indexed by triggerid.                                           */
+/* The following types of services are loaded during update session:        */
+/*  1) services directly linked to the triggers with values changed         */
+/*     during update session.                                               */
+/*  2) direct or indirect parent services of (1)                            */
+/*  3) services required to calculate status of (2) and not already loaded  */
+/*     as (1) or (2).                                                       */
+/*                                                                          */
+/* In this schema:                                                          */
+/*   (1) can't have children services                                       */
+/*   (2) will have children services                                        */
+/*   (1) and (2) will have parent services unless it's the root service     */
+/*   (3) will have neither children or parent services                      */
+/*                                                                          */
 typedef struct
 {
+	/* loaded services */
 	zbx_hashset_t		services;
+	/* service index by triggerid */
 	zbx_hashset_t		index;
 }
 zbx_itservices_set_t;
@@ -329,9 +347,6 @@ static void	load_services_by_triggerd(zbx_itservices_set_t *set, zbx_uint64_t tr
 static void	service_update_status(zbx_itservice_t *service, int clock, zbx_vector_ptr_t *alarms)
 {
 	int	status, i;
-
-	if (0 == service->children.values_num)
-		goto out;
 
 	switch (service->algorithm)
 	{
