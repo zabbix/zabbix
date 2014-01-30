@@ -116,7 +116,7 @@ if (isset($_REQUEST['filter_rst'])) {
 	$_REQUEST['status_change'] = 0;
 	$_REQUEST['status_change_days'] = 14;
 
-	CProfile::update('web.tr_status.filter.application', '', PROFILE_TYPE_STR);
+	CProfile::delete('web.tr_status.filter.application');
 
 	// reset inventory filters
 	$i = 0;
@@ -129,7 +129,12 @@ if (isset($_REQUEST['filter_rst'])) {
 }
 // update filter in profiles
 elseif (hasRequest('filter_set')) {
-	CProfile::update('web.tr_status.filter.application', getRequest('application'), PROFILE_TYPE_STR);
+	if (getRequest('application') !== '') {
+		CProfile::update('web.tr_status.filter.application', getRequest('application'), PROFILE_TYPE_STR);
+	}
+	else {
+		CProfile::delete('web.tr_status.filter.application');
+	}
 
 	// update host inventory filter
 	$i = 0;
