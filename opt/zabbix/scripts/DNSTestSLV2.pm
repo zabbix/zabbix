@@ -27,6 +27,7 @@ use constant MAX_INFO_ERROR => -209;
 use constant TRIGGER_SEVERITY_NOT_CLASSIFIED => 0;
 use constant TRIGGER_VALUE_CHANGED_YES => 1;
 use constant EVENT_OBJECT_TRIGGER => 0;
+use constant EVENT_SOURCE_TRIGGERS => 0;
 use constant API_OUTPUT_REFER => 'refer'; # TODO: OBSOLETE AFTER API
 use constant TRIGGER_VALUE_TRUE => 1;
 
@@ -364,21 +365,13 @@ sub get_online_probes
 
 	if ($no_values == 1)
 	{
-	    # We did not get any values between $from and $till, consider the latest value.
+	    # We did not get any values between $from and $till, consider the last value.
 
-	    $res = db_select(
-		"select h.value".
-		" from history_uint h,items i".
-		" where h.itemid=i.itemid".
-			" and i.key_='$probe_key_manual'".
-			" and i.hostid=$hostid".
-			" and h.clock<$from".
-		" order by clock desc".
-		" limit 1");
+	    $res = db_select("select lastvalue from items where key_='$probe_key_manual' and hostid=$hostid");
 
 	    if (@row = $res->fetchrow_array)
 	    {
-		if ($row[0] == DOWN)
+		if (defined($row[0]) and $row[0] == DOWN)
 		{
 		    dbg("  $host ($hostid) down (manual: latest)");
 		    next;
@@ -418,19 +411,11 @@ sub get_online_probes
         {
 	    # We did not get any values between $from and $till, consider the latest value.
 
-	    $res = db_select(
-                "select h.value".
-                " from history_uint h,items i".
-                " where h.itemid=i.itemid".
-                        " and i.key_ like '$probe_key_automatic'".
-                        " and i.hostid=$hostid".
-                        " and h.clock<$from".
-                " order by clock desc".
-                " limit 1");
+	    $res = db_select("select lastvalue from items where key_='$probe_key_automatic' and hostid=$hostid");
 
 	    if (@row = $res->fetchrow_array)
 	    {
-		if ($row[0] == DOWN)
+		if (defined($row[0]) and $row[0] == DOWN)
 		{
 		    dbg("  $host ($hostid) down (automatic: latest)");
 		    next;
@@ -1335,7 +1320,9 @@ sub get_eventtimes
     $res = db_select(
 	"select clock,value".
 	" from events".
-	" where objectid=$triggerid".
+	" where object=".EVENT_OBJECT_TRIGGER.
+		" and source=".EVENT_SOURCE_TRIGGERS.
+		" and objectid=$triggerid".
 		" and clock<$from".
 		" and value_changed=".TRIGGER_VALUE_CHANGED_YES.
 	" order by clock desc".
@@ -1346,12 +1333,15 @@ sub get_eventtimes
 	my $clock = $row[0];
 	my $value = $row[1];
 
+	# we cannot add 'value=TRIGGER_VALUE_TRUE' to the SQL query as this way
+	# we might ignore the latest value with value not TRIGGER_VALUE_TRUE
 	push(@eventtimes, $clock) if ($value == TRIGGER_VALUE_TRUE);
     }
 
     $res = db_select(
 	"select clock from events".
 	" where object=".EVENT_OBJECT_TRIGGER.
+		" and source=".EVENT_SOURCE_TRIGGERS.
 		" and objectid=$triggerid".
 		" and value_changed=".TRIGGER_VALUE_CHANGED_YES.
 		" and clock between $from and $till");
