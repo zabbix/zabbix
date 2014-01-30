@@ -31,7 +31,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'host' =>		array(T_ZBX_STR, O_MAND,	P_SYS,	null,			null),
-	'type' =>		array(T_ZBX_INT, O_MAND,	null,	IN('0,1,2'),	null),
+	'type' =>		array(T_ZBX_INT, O_MAND,	null,	IN('0,1,2,3'),	null),
 	'time' =>		array(T_ZBX_INT, O_MAND,	P_SYS,	DB_ID,			null),
 	'slvItemId' =>	array(T_ZBX_INT, O_MAND,	P_SYS,	DB_ID,			null)
 );
@@ -59,7 +59,7 @@ $testTimeFrom = mktime(
 );
 
 // macro
-if ($data['type'] == 0 || $data['type'] == 1) {
+if ($data['type'] == DNSTEST_DNS || $data['type'] == DNSTEST_DNSSEC) {
 	$calculatedItemKey[] = CALCULATED_ITEM_DNS_DELAY;
 	if ($data['type'] == 0) {
 		$data['availProbes'] = 0;
@@ -70,11 +70,14 @@ if ($data['type'] == 0 || $data['type'] == 1) {
 		$data['totalTests'] = 0;
 	}
 }
-else {
+elseif ($data['type'] == DNSTEST_RDDS) {
 	$calculatedItemKey[] = CALCULATED_ITEM_RDDS_DELAY;
 }
+else {
+	$calculatedItemKey[] = CALCULATED_ITEM_EPP_DELAY;
+}
 
-if ($data['type'] == 0) {
+if ($data['type'] == DNSTEST_DNS) {
 	$calculatedItemKey[] = CALCULATED_ITEM_DNS_AVAIL_MINNS;
 	$calculatedItemKey[] = CALCULATED_ITEM_DNS_UDP_RTT;
 }
@@ -116,7 +119,7 @@ foreach ($macroItems as $macroItem) {
 
 	$macroItemValue = reset($macroItemValue);
 
-	if ($data['type'] == 0) {
+	if ($data['type'] == DNSTEST_DNS) {
 		if ($macroItem['key_'] == CALCULATED_ITEM_DNS_AVAIL_MINNS) {
 			$minDnsCount = $macroItemValue['value'];
 		}
@@ -267,7 +270,7 @@ foreach ($hosts as $host) {
 }
 
 // get only used items
-if ($data['type'] == 0 || $data['type'] == 1) {
+if ($data['type'] == DNSTEST_DNS || $data['type'] == DNSTEST_DNSSEC) {
 	$probeItemKey = ' AND (i.key_ LIKE ('.zbx_dbstr(PROBE_DNS_UDP_ITEM_RTT.'%').') OR i.key_='.zbx_dbstr(PROBE_DNS_UDP_ITEM).')';
 }
 else {
@@ -286,7 +289,7 @@ $nsArray = array();
 
 // get items value
 while ($item = DBfetch($items)) {
-	if ($data['type'] == 0 || $data['type'] == 1) {
+	if ($data['type'] == DNSTEST_DNS || $data['type'] == DNSTEST_DNSSEC) {
 		$itemValue = API::History()->get(array(
 			'itemids' => $item['itemid'],
 			'time_from' => $testTimeFrom,
@@ -298,7 +301,7 @@ while ($item = DBfetch($items)) {
 		$itemValue = reset($itemValue);
 	}
 
-	if ($data['type'] == 0 && zbx_substring($item['key_'], 0, 20) == PROBE_DNS_UDP_ITEM_RTT) {
+	if ($data['type'] == DNSTEST_DNS && zbx_substring($item['key_'], 0, 20) == PROBE_DNS_UDP_ITEM_RTT) {
 		preg_match('/^[^\[]+\[([^\]]+)]$/', $item['key_'], $matches);
 		$nsValues = explode(',', $matches[1]);
 
@@ -312,13 +315,13 @@ while ($item = DBfetch($items)) {
 			$nsArray[$item['hostid']][$nsValues[1]]['value'][] = NS_DOWN;
 		}
 	}
-	elseif ($data['type'] == 0 && $item['key_'] == PROBE_DNS_UDP_ITEM) {
+	elseif ($data['type'] == DNSTEST_DNS && $item['key_'] == PROBE_DNS_UDP_ITEM) {
 		// avail probes
 		if ($itemValue['value'] == 1 || $itemValue['value'] === null) {
 			$data['availProbes']++;
 		}
 	}
-	elseif ($data['type'] == 1 && zbx_substring($item['key_'], 0, 20) == PROBE_DNS_UDP_ITEM_RTT) {
+	elseif ($data['type'] == DNSTEST_DNSSEC && zbx_substring($item['key_'], 0, 20) == PROBE_DNS_UDP_ITEM_RTT) {
 		if (!isset($hosts[$item['hostid']]['value'])) {
 			$hosts[$item['hostid']]['value']['ok'] = 0;
 			$hosts[$item['hostid']]['value']['fail'] = 0;
@@ -340,7 +343,7 @@ while ($item = DBfetch($items)) {
 
 		$hosts[$item['hostid']]['value']['total']++;
 	}
-	elseif ($data['type'] == 2) {
+	elseif ($data['type'] == DNSTEST_RDDS) {
 		$itemValue = DBfetch(DBselect(DBaddLimit(
 			'SELECT h.value'.
 			' FROM history_uint h'.
@@ -358,7 +361,7 @@ while ($item = DBfetch($items)) {
 	}
 }
 
-if ($data['type'] == 0) {
+if ($data['type'] == DNSTEST_DNS) {
 	foreach ($nsArray as $hostId => $nss) {
 		$failNs = 0;
 
@@ -376,7 +379,7 @@ if ($data['type'] == 0) {
 		}
 	}
 }
-elseif ($data['type'] == 1) {
+elseif ($data['type'] == DNSTEST_DNSSEC) {
 	// get tests items
 	$testItems = API::Item()->get(array(
 		'hostids' => $hostIds,

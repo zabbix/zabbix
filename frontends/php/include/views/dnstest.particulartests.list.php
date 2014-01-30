@@ -25,7 +25,7 @@ $dnsTestWidget = new CWidget(null, 'particular-test');
 $dnsTestWidget->addPageHeader(_('Details of particular test'), SPACE);
 $dnsTestWidget->addHeader(_('Details of particular test'));
 
-if ($this->data['type'] == 0 || $this->data['type'] == 1) {
+if ($this->data['type'] == DNSTEST_DNS || $this->data['type'] == DNSTEST_DNSSEC) {
 	$headers = array(
 		_('Probe ID'),
 		_('Row result')
@@ -49,7 +49,7 @@ $particularTestsTable->setHeader($headers);
 foreach ($this->data['probes'] as $probe) {
 	$status = null;
 	if (isset($probe['status']) && $probe['status'] === PROBE_DOWN) {
-		if ($this->data['type'] == 0 || $this->data['type'] == 1) {
+		if ($this->data['type'] == DNSTEST_DNS || $this->data['type'] == DNSTEST_DNSSEC) {
 			$link = new CSpan(_('Offline'), 'red');
 		}
 		else {
@@ -58,7 +58,7 @@ foreach ($this->data['probes'] as $probe) {
 		}
 	}
 	else {
-		if ($this->data['type'] == 0) {
+		if ($this->data['type'] == DNSTEST_DNS) {
 			if (isset($probe['value'])) {
 				if ($probe['value']) {
 					$status = new CSpan(_('Up'), 'green');
@@ -76,7 +76,7 @@ foreach ($this->data['probes'] as $probe) {
 				$link = new CSpan(_('Not monitored'), 'red');
 			}
 		}
-		elseif ($this->data['type'] == 1) {
+		elseif ($this->data['type'] == DNSTEST_DNSSEC) {
 			if (isset($probe['value']['ok'])) {
 				$values = array();
 				if ($probe['value']['ok']) {
@@ -98,27 +98,31 @@ foreach ($this->data['probes'] as $probe) {
 				$link = new CSpan(_('Not monitored'), 'red');
 			}
 		}
-		elseif ($this->data['type'] == 2) {
-			if (!isset($probe['value']) || $probe['value'] == null) {
+		elseif ($this->data['type'] == DNSTEST_RDDS) {
+			if (!isset($probe['value']) || $probe['value'] === null) {
 				$rdds43 = _('No result');
 				$rdds80 = _('No result');
 			}
-			elseif ($probe['value'] == 2) {
-				$rdds43 = new CSpan(_('Up'), 'green');
-				$rdds80 = new CSpan(_('Up'), 'green');
+			elseif ($probe['value'] == 0) {
+				$rdds43 = new CSpan(_('Down'), 'red');
+				$rdds80 = new CSpan(_('Down'), 'red');
 			}
 			elseif ($probe['value'] == 1) {
 				$rdds43 = new CSpan(_('Up'), 'green');
+				$rdds80 = new CSpan(_('Up'), 'green');
+			}
+			elseif ($probe['value'] == 2) {
+				$rdds43 = new CSpan(_('Up'), 'green');
 				$rdds80 = new CSpan(_('Down'), 'red');
 			}
-			else {
-				$rdds43 = new CSpan(_('Down'), 'red');
-				$rdds80 = new CSpan(_('Down'), 'red');
+			elseif ($probe['value'] == 3) {
+				$rdds43 = new CSpan(_('Down'), 'green');
+				$rdds80 = new CSpan(_('Up'), 'red');
 			}
 		}
 	}
 
-	if ($this->data['type'] == 0 || $this->data['type'] == 1) {
+	if ($this->data['type'] == DNSTEST_DNS || $this->data['type'] == DNSTEST_DNSSEC) {
 		$row = array(
 			$probe['name'],
 			$link
@@ -134,7 +138,7 @@ foreach ($this->data['probes'] as $probe) {
 
 	$particularTestsTable->addRow($row);
 }
-if ($this->data['type'] == 0) {
+if ($this->data['type'] == DNSTEST_DNS) {
 	$additionInfo = array(
 		BR(),
 		new CSpan(bold(_s(
@@ -144,7 +148,7 @@ if ($this->data['type'] == 0) {
 		)))
 	);
 }
-elseif ($this->data['type'] == 1) {
+elseif ($this->data['type'] == DNSTEST_DNSSEC) {
 	$additionInfo = array(
 		BR(),
 		new CSpan(bold(_s(
@@ -163,7 +167,7 @@ $particularTests = array(
 	new CSpan(array(bold(_('Test time')), ':', SPACE, date('d.m.Y H:i:s', $this->data['time'])))
 );
 
-if ($this->data['type'] == 0 || $this->data['type'] == 1) {
+if ($this->data['type'] == DNSTEST_DNS || $this->data['type'] == DNSTEST_DNSSEC) {
 	$particularTests = array_merge($particularTests, $additionInfo);
 }
 

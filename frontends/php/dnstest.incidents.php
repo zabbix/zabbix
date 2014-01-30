@@ -203,9 +203,11 @@ if ($host || $data['filter_search']) {
 			$dnsItems = array();
 			$dnssecItems = array();
 			$rddsItems = array();
+			$eppItems = array();
 			$dnsAvailItem = array();
 			$dnssecAvailItem = array();
 			$rddsAvailItem = array();
+			$eppAvailItem = array();
 
 			foreach ($items as $item) {
 				switch ($item['key_']) {
@@ -224,6 +226,11 @@ if ($host || $data['filter_search']) {
 						$data['rdds']['slv'] = sprintf('%.3f', $item['lastvalue']);
 						$data['rdds']['events'] = array();
 						break;
+					case DNSTEST_SLV_EPP_ROLLWEEK:
+						$data['epp']['itemid'] = $item['itemid'];
+						$data['epp']['slv'] = sprintf('%.3f', $item['lastvalue']);
+						$data['epp']['events'] = array();
+						break;
 					case DNSTEST_SLV_DNS_AVAIL:
 						$data['dns']['availItemId'] = $item['itemid'];
 						$dnsAvailItem = $item['itemid'];
@@ -240,6 +247,12 @@ if ($host || $data['filter_search']) {
 						$data['rdds']['availItemId'] = $item['itemid'];
 						$rddsAvailItem = $item['itemid'];
 						$rddsItems[] = $item['itemid'];
+						$itemIds[] = $item['itemid'];
+						break;
+					case DNSTEST_SLV_EPP_AVAIL:
+						$data['epp']['availItemId'] = $item['itemid'];
+						$eppAvailItem = $item['itemid'];
+						$eppItems[] = $item['itemid'];
 						$itemIds[] = $item['itemid'];
 						break;
 				}
@@ -260,6 +273,7 @@ if ($host || $data['filter_search']) {
 			$dnsTriggers = array();
 			$dnssecTriggers = array();
 			$rddsTriggers = array();
+			$eppTriggers = array();
 			foreach ($triggers as $trigger) {
 				$triggerItem = reset($trigger['items']);
 
@@ -269,8 +283,11 @@ if ($host || $data['filter_search']) {
 				elseif (in_array($triggerItem['itemid'], $dnssecItems)) {
 					$dnssecTriggers[] = $trigger['triggerid'];
 				}
-				if (in_array($triggerItem['itemid'], $rddsItems)) {
+				elseif (in_array($triggerItem['itemid'], $rddsItems)) {
 					$rddsTriggers[] = $trigger['triggerid'];
+				}
+				elseif (in_array($triggerItem['itemid'], $eppItems)) {
+					$eppTriggers[] = $trigger['triggerid'];
 				}
 			}
 
@@ -373,6 +390,12 @@ if ($host || $data['filter_search']) {
 								$itemId = $rddsAvailItem;
 								$data['rdds']['events'][$i] = array_merge($data['rdds']['events'][$i], $newData[$i]);
 							}
+							elseif (in_array($eventTrigger['triggerid'], $eppTriggers)) {
+								unset($data['epp']['events'][$i]['status']);
+								$itemType = 'epp';
+								$itemId = $eppAvailItem;
+								$data['epp']['events'][$i] = array_merge($data['epp']['events'][$i], $newData[$i]);
+							}
 
 							$data[$itemType]['events'][$i]['incidentTotalTests'] = getTotalTestsCount(
 								$itemId,
@@ -384,7 +407,6 @@ if ($host || $data['filter_search']) {
 
 							$data[$itemType]['events'][$i]['incidentFailedTests'] = getFailedTestsCount(
 								$itemId,
-								$itemType,
 								$filterTimeTill,
 								$data[$itemType]['events'][$i]['startTime'],
 								$data[$itemType]['events'][$i]['endTime']
@@ -403,10 +425,16 @@ if ($host || $data['filter_search']) {
 									'itemId' => $dnssecAvailItem
 								);
 							}
-							else {
+							elseif (isset($data['rdds']['events'][$i])) {
 								$itemInfo = array(
 									'itemType' => 'rdds',
 									'itemId' => $rddsAvailItem
+								);
+							}
+							elseif (isset($data['epp']['events'][$i])) {
+								$itemInfo = array(
+									'itemType' => 'epp',
+									'itemId' => $eppAvailItem
 								);
 							}
 
@@ -419,7 +447,6 @@ if ($host || $data['filter_search']) {
 
 							$data[$itemInfo['itemType']]['events'][$i]['incidentFailedTests'] = getFailedTestsCount(
 								$itemInfo['itemId'],
-								$itemInfo['itemType'],
 								$filterTimeTill,
 								$data[$itemInfo['itemType']]['events'][$i]['startTime']
 							);
@@ -467,22 +494,16 @@ if ($host || $data['filter_search']) {
 							$eventTrigger = reset($addEvent['triggers']);
 
 							if (in_array($eventTrigger['triggerid'], $dnsTriggers)) {
-								$itemInfo = array(
-									'itemType' => 'dns',
-									'itemId' => $dnsAvailItem
-								);
+								$infoItemId = $dnsAvailItem;
 							}
 							elseif (in_array($eventTrigger['triggerid'], $dnssecTriggers)) {
-								$itemInfo = array(
-									'itemType' => 'dnssec',
-									'itemId' => $dnssecAvailItem
-								);
+								$infoItemId = $dnssecAvailItem;
 							}
-							else {
-								$itemInfo = array(
-									'itemType' => 'rdds',
-									'itemId' => $rddsAvailItem
-								);
+							elseif (in_array($eventTrigger['triggerid'], $rddsTriggers)) {
+								$infoItemId = $rddsAvailItem;
+							}
+							elseif (in_array($eventTrigger['triggerid'], $eppTriggers)) {
+								$infoItemId = $eppAvailItem;
 							}
 
 							$incidents[$i] = array(
@@ -493,15 +514,14 @@ if ($host || $data['filter_search']) {
 								'endTime' => $event['clock'],
 								'false_positive' => $event['false_positive'],
 								'incidentTotalTests' => getTotalTestsCount(
-									$itemInfo['itemId'],
+									$infoItemId,
 									$filterTimeFrom,
 									$filterTimeTill,
 									$addEvent['clock'],
 									$event['clock']
 								),
 								'incidentFailedTests' => getFailedTestsCount(
-									$itemInfo['itemId'],
-									$itemInfo['itemType'],
+									$infoItemId,
 									$filterTimeTill,
 									$addEvent['clock'],
 									$event['clock']
@@ -544,7 +564,7 @@ if ($host || $data['filter_search']) {
 						}
 					}
 				}
-				else {
+				elseif (in_array($eventTrigger['triggerid'], $rddsTriggers)) {
 					if (isset($data['rdds']['events'][$i]) && $data['rdds']['events'][$i]) {
 						unset($data['rdds']['events'][$i]['status']);
 
@@ -560,6 +580,22 @@ if ($host || $data['filter_search']) {
 						}
 					}
 				}
+				elseif (in_array($eventTrigger['triggerid'], $eppTriggers)) {
+					if (isset($data['epp']['events'][$i]) && $data['epp']['events'][$i]) {
+						unset($data['epp']['events'][$i]['status']);
+
+						$itemType = 'epp';
+						$itemId = $eppAvailItem;
+						$getHistory = true;
+
+						$data['epp']['events'][$i] = array_merge($data['epp']['events'][$i], $incidents[$i]);
+					}
+					else {
+						if (isset($incidents[$i])) {
+							$data['epp']['events'][$i] = $incidents[$i];
+						}
+					}
+				}
 
 				if ($getHistory) {
 					$data[$itemType]['events'][$i]['incidentTotalTests'] = getTotalTestsCount(
@@ -572,7 +608,6 @@ if ($host || $data['filter_search']) {
 
 					$data[$itemType]['events'][$i]['incidentFailedTests'] = getFailedTestsCount(
 						$itemId,
-						$itemType,
 						$filterTimeTill,
 						$data[$itemType]['events'][$i]['startTime'],
 						$data[$itemType]['events'][$i]['endTime']
@@ -621,11 +656,17 @@ if ($host || $data['filter_search']) {
 							$newData[$i]
 						);
 					}
-					else {
+					elseif (in_array($eventTrigger['triggerid'], $rddsTriggers)) {
 						unset($data['rdds']['events'][$i]['status']);
 						$itemType = 'rdds';
 						$itemId = $rddsAvailItem;
 						$data['rdds']['events'][$i] = array_merge($data['rdds']['events'][$i], $newData[$i]);
+					}
+					elseif (in_array($eventTrigger['triggerid'], $eppTriggers)) {
+						unset($data['epp']['events'][$i]['status']);
+						$itemType = 'epp';
+						$itemId = $eppAvailItem;
+						$data['epp']['events'][$i] = array_merge($data['epp']['events'][$i], $newData[$i]);
 					}
 
 					$data[$itemType]['events'][$i]['incidentTotalTests'] = getTotalTestsCount(
@@ -638,7 +679,6 @@ if ($host || $data['filter_search']) {
 
 					$data[$itemType]['events'][$i]['incidentFailedTests'] = getFailedTestsCount(
 						$itemId,
-						$itemType,
 						$filterTimeTill,
 						$data[$itemType]['events'][$i]['startTime'],
 						$data[$itemType]['events'][$i]['endTime']
@@ -657,10 +697,16 @@ if ($host || $data['filter_search']) {
 							'itemId' => $dnssecAvailItem
 						);
 					}
-					else {
+					elseif (isset($data['rdds']['events'][$i])) {
 						$itemInfo = array(
 							'itemType' => 'rdds',
 							'itemId' => $rddsAvailItem
+						);
+					}
+					elseif (isset($data['epp']['events'][$i])) {
+						$itemInfo = array(
+							'itemType' => 'epp',
+							'itemId' => $eppAvailItem
 						);
 					}
 
@@ -673,7 +719,6 @@ if ($host || $data['filter_search']) {
 
 					$data[$itemInfo['itemType']]['events'][$i]['incidentFailedTests'] = getFailedTestsCount(
 						$itemInfo['itemId'],
-						$itemInfo['itemType'],
 						$filterTimeTill,
 						$data[$itemInfo['itemType']]['events'][$i]['startTime']
 					);
@@ -683,69 +728,55 @@ if ($host || $data['filter_search']) {
 			$data['dns']['totalTests'] = 0;
 			$data['dnssec']['totalTests'] = 0;
 			$data['rdds']['totalTests'] = 0;
+			$data['epp']['totalTests'] = 0;
 			$data['dns']['inIncident'] = 0;
 			$data['dnssec']['inIncident'] = 0;
 			$data['rdds']['inIncident'] = 0;
+			$data['epp']['inIncident'] = 0;
 
-			$dnsAndDnssec = array();
-
-			if ($dnsAvailItem && $dnssecAvailItem) {
-				$dnsAndDnssec = array($dnsAvailItem, $dnssecAvailItem);
+			$availItems = array();
+			if ($dnsAvailItem) {
+				$availItems[] = $dnsAvailItem;
 			}
-			elseif ($dnsAvailItem && !$dnssecAvailItem) {
-				$dnsAndDnssec[] = $dnsAvailItem;
+			if ($dnssecAvailItem) {
+				$availItems[] = $dnssecAvailItem;
 			}
-			elseif (!$dnsAvailItem && $dnssecAvailItem) {
-				$dnsAndDnssec[] = $dnssecAvailItem;
-			}
-
-			if ($dnsAndDnssec) {
-				$itemsHistories = DBselect(
-					'SELECT h.clock, h.value, h.itemid'.
-					' FROM history_uint h'.
-					' WHERE '.dbConditionInt('h.itemid', $dnsAndDnssec).
-						' AND h.clock>='.$filterTimeFrom.
-						' AND h.clock<='.$filterTimeTill.
-						' AND h.value=0'
-				);
-
-				while ($itemsHistory = DBfetch($itemsHistories)) {
-					if ($itemsHistory['itemid'] == $dnsAvailItem) {
-						$type = 'dns';
-					}
-					else {
-						$type = 'dnssec';
-					}
-
-					$data[$type]['totalTests']++;
-
-					foreach ($data[$type]['events'] as $incident) {
-						if ($itemsHistory['clock'] >= $incident['startTime'] && (!isset($incident['endTime'])
-								|| (isset($incident['endTime']) && $itemsHistory['clock'] <= $incident['endTime']))) {
-							$data[$type]['inIncident']++;
-						}
-					}
-				}
-			}
-
 			if ($rddsAvailItem) {
-				$itemsHistories = DBselect(
-					'SELECT h.clock, h.value, h.itemid'.
-					' FROM history_uint h'.
-					' WHERE h.itemid='.$rddsAvailItem.
-						' AND h.clock>='.$filterTimeFrom.
-						' AND h.clock<='.$filterTimeTill.
-						' AND h.value<2'
-				);
+				$availItems[] = $rddsAvailItem;
+			}
+			if ($eppAvailItem) {
+				$availItems[] = $eppAvailItem;
+			}
 
-				while ($itemsHistory = DBfetch($itemsHistories)) {
-					$data['rdds']['totalTests']++;
+			$itemsHistories = DBselect(
+				'SELECT h.clock, h.value, h.itemid'.
+				' FROM history_uint h'.
+				' WHERE '.dbConditionInt('h.itemid', $availItems).
+					' AND h.clock>='.$filterTimeFrom.
+					' AND h.clock<='.$filterTimeTill.
+					' AND h.value=0'
+			);
 
-					foreach ($data['rdds']['events'] as $incident) {
-						if ($itemsHistory['clock'] >= $incident['startTime'] && (!isset($incident['endTime'])
-								|| (isset($incident['endTime']) && $itemsHistory['clock'] <= $incident['endTime']))) {
-							$data['rdds']['inIncident']++;
-						}
+			while ($itemsHistory = DBfetch($itemsHistories)) {
+				if ($itemsHistory['itemid'] == $dnsAvailItem) {
+					$type = 'dns';
+				}
+				elseif ($itemsHistory['itemid'] == $dnssecAvailItem) {
+					$type = 'dnssec';
+				}
+				elseif ($itemsHistory['itemid'] == $rddsAvailItem) {
+					$type = 'rdds';
+				}
+				elseif ($itemsHistory['itemid'] == $eppAvailItem) {
+					$type = 'epp';
+				}
+
+				$data[$type]['totalTests']++;
+
+				foreach ($data[$type]['events'] as $incident) {
+					if ($itemsHistory['clock'] >= $incident['startTime'] && (!isset($incident['endTime'])
+							|| (isset($incident['endTime']) && $itemsHistory['clock'] <= $incident['endTime']))) {
+						$data[$type]['inIncident']++;
 					}
 				}
 			}
@@ -762,6 +793,9 @@ if (isset($data['dnssec']['events'])) {
 }
 if (isset($data['rdds']['events'])) {
 	$data['rdds']['events'] = array_reverse($data['rdds']['events']);
+}
+if (isset($data['epp']['events'])) {
+	$data['epp']['events'] = array_reverse($data['epp']['events']);
 }
 
 $data['incident_type'] = get_request('incident_type', get_cookie('ui-tabs-1', 0));

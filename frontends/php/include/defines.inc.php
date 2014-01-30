@@ -895,6 +895,12 @@ define('SHORT_DESCRIPTION',	1);
 define('AVAILABILITY_REPORT_BY_HOST', 0);
 define('AVAILABILITY_REPORT_BY_TEMPLATE', 1);
 
+// DNS TEST services
+define('DNSTEST_DNS',			0);
+define('DNSTEST_DNSSEC',		1);
+define('DNSTEST_RDDS',			2);
+define('DNSTEST_EPP',			3);
+
 // DNS TEST macros
 define('DNSTEST_PAGE_SLV',			'{$ROLLING.WEEK.STATUS.PAGE.SLV}');
 define('DNSTEST_MIN_DNS_COUNT',		'{$DNSTEST.DNS.AVAIL.MINNS}');
@@ -930,8 +936,11 @@ define('CALCULATED_ITEM_DNSSEC_FAIL',		'dnstest.configvalue[INCIDENT.DNSSEC.FAIL
 define('CALCULATED_ITEM_DNSSEC_RECOVERY',	'dnstest.configvalue[INCIDENT.DNSSEC.RECOVER]');
 define('CALCULATED_ITEM_RDDS_FAIL',			'dnstest.configvalue[INCIDENT.RDDS.FAIL]');
 define('CALCULATED_ITEM_RDDS_RECOVERY',		'dnstest.configvalue[INCIDENT.RDDS.RECOVER]');
+define('CALCULATED_ITEM_EPP_FAIL',			'dnstest.configvalue[INCIDENT.EPP.FAIL]');
+define('CALCULATED_ITEM_EPP_RECOVERY',		'dnstest.configvalue[INCIDENT.EPP.RECOVER]');
 define('CALCULATED_ITEM_DNS_DELAY',			'dnstest.configvalue[DNSTEST.DNS.UDP.DELAY]');
 define('CALCULATED_ITEM_RDDS_DELAY',		'dnstest.configvalue[DNSTEST.RDDS.DELAY]');
+define('CALCULATED_ITEM_EPP_DELAY',			'dnstest.configvalue[DNSTEST.EPP.DELAY]');
 define('CALCULATED_ITEM_DNS_AVAIL_MINNS',	'dnstest.configvalue[DNSTEST.DNS.AVAIL.MINNS]');
 define('CALCULATED_ITEM_DNS_UDP_RTT',		'dnstest.configvalue[DNSTEST.DNS.UDP.RTT]');
 

@@ -894,8 +894,8 @@ fieldset legend { margin: 0.2em 0.5em; }
 /* DNS TEST pages */
 .rolling-week-status .filter .checkbox-block { margin-left: 15px; }
 .rolling-week-status .filter .select-block { margin-left: 20px; }
-.rolling-week-status .tableinfo .first-cell-value { width: 55px; display: inline-block; }
-.rolling-week-status .tableinfo .disabled-service { margin-left: 65px; }
+.rolling-week-status .tableinfo .first-cell-value { width: 65px; display: inline-block; }
+.rolling-week-status .tableinfo .disabled-service { margin-left: 75px; }
 .rolling-week-status .tableinfo .cell-value { margin-left: 10px; }
 
 .incidents table.filter.info-block { text-align: left; }

@@ -22,16 +22,14 @@
  * Get failed DNS tests count.
  *
  * @param int 		$itemId
- * @param string 	$itemType
  * @param int 		$endTime
  * @param int 		$incidentStartTime
  * @param int 		$incidentEndTime
  *
  * @return int
  */
-function getFailedTestsCount($itemId, $itemType, $endTime, $incidentStartTime, $incidentEndTime = null) {
+function getFailedTestsCount($itemId, $endTime, $incidentStartTime, $incidentEndTime = null) {
 	$to = $incidentEndTime ? $incidentEndTime : $endTime;
-	$value = ($itemType == 'rdds') ? '!=2' : '=0';
 
 	$getFailedTestsCount = DBfetch(DBselect(
 		'SELECT COUNT(itemid) AS count'.
@@ -39,7 +37,7 @@ function getFailedTestsCount($itemId, $itemType, $endTime, $incidentStartTime, $
 		' WHERE h.itemid='.$itemId.
 			' AND h.clock>='.$incidentStartTime.
 			' AND h.clock<='.$to.
-			' AND h.value'.$value
+			' AND h.value=0'
 	));
 
 	return $getFailedTestsCount['count'];

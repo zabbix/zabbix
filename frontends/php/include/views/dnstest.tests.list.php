@@ -214,14 +214,17 @@ foreach ($this->data['tests'] as $test) {
 	$testsTable->addRow($row);
 }
 
-if ($this->data['type'] == 0) {
+if ($this->data['type'] == DNSTEST_DNS) {
 	$serviceName = _('DNS service availability');
 }
-elseif ($this->data['type'] == 1) {
+elseif ($this->data['type'] == DNSTEST_DNSSEC) {
 	$serviceName = _('DNSSEC service availability');
 }
-else {
+elseif ($this->data['type'] == DNSTEST_RDDS) {
 	$serviceName = _('RDDS service availability');
+}
+else {
+	$serviceName = _('EPP service availability');
 }
 
 $testsInfoTable->addRow(array(array(

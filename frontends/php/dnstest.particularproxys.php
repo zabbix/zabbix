@@ -122,7 +122,7 @@ else {
 
 $macroItemKey[] = CALCULATED_ITEM_DNS_UDP_RTT;
 
-if ($data['type'] == 0) {
+if ($data['type'] == DNSTEST_DNS) {
 	$macroItemKey[] = CALCULATED_ITEM_DNS_AVAIL_MINNS;
 }
 
@@ -161,7 +161,7 @@ if (!isset($dnsUdpRtt)) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit;
 }
-if ($data['type'] == 0 && !isset($minNs)) {
+if ($data['type'] == DNSTEST_DNS && !isset($minNs)) {
 	show_error_message(_s(
 		'No permissions to referred item with key "%1$s" or it does not exist!',
 		CALCULATED_ITEM_DNS_AVAIL_MINNS
@@ -221,7 +221,7 @@ if ($data['tld'] && $data['slvItem'] && $data['probe']) {
 	$data['slv'] = sprintf('%.3f', $data['slvItem']['lastvalue']);
 	$data['minMs'] = $dnsUdpRtt;
 
-	if ($data['type'] == 0) {
+	if ($data['type'] == DNSTEST_DNS) {
 		$data['probe']['test'] = ($data['positiveNs'] >= $minNs) ? true : false;
 	}
 	else {

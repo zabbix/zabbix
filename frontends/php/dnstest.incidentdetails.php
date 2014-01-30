@@ -151,15 +151,19 @@ if ($mainEvent) {
 	switch ($slvItem['key_']) {
 		case DNSTEST_SLV_DNS_ROLLWEEK:
 			$keys = array(CALCULATED_ITEM_DNS_FAIL, CALCULATED_ITEM_DNS_RECOVERY, CALCULATED_ITEM_DNS_DELAY);
-			$data['type'] = 0;
+			$data['type'] = DNSTEST_DNS;
 			break;
 		case DNSTEST_SLV_DNSSEC_ROLLWEEK:
 			$keys = array(CALCULATED_ITEM_DNSSEC_FAIL, CALCULATED_ITEM_DNSSEC_RECOVERY, CALCULATED_ITEM_DNS_DELAY);
-			$data['type'] = 1;
+			$data['type'] = DNSTEST_DNSSEC;
 			break;
 		case DNSTEST_SLV_RDDS_ROLLWEEK:
 			$keys = array(CALCULATED_ITEM_RDDS_FAIL, CALCULATED_ITEM_RDDS_RECOVERY, CALCULATED_ITEM_RDDS_DELAY);
-			$data['type'] = 2;
+			$data['type'] = DNSTEST_RDDS;
+			break;
+		case DNSTEST_SLV_EPP_ROLLWEEK:
+			$keys = array(CALCULATED_ITEM_EPP_FAIL, CALCULATED_ITEM_EPP_RECOVERY, CALCULATED_ITEM_EPP_DELAY);
+			$data['type'] = DNSTEST_EPP;
 			break;
 	}
 
@@ -179,11 +183,11 @@ if ($mainEvent) {
 
 	foreach ($items as $item) {
 		if ($item['key_'] == CALCULATED_ITEM_DNS_FAIL || $item['key_'] == CALCULATED_ITEM_DNSSEC_FAIL
-				|| $item['key_'] == CALCULATED_ITEM_RDDS_FAIL) {
+				|| $item['key_'] == CALCULATED_ITEM_RDDS_FAIL || $item['key_'] == CALCULATED_ITEM_EPP_FAIL) {
 			$failCount = getFirstUintValue($item['itemid'], $mainEventFromTime);
 		}
 		elseif ($item['key_'] == CALCULATED_ITEM_DNS_RECOVERY || $item['key_'] == CALCULATED_ITEM_DNSSEC_RECOVERY
-				|| $item['key_'] == CALCULATED_ITEM_RDDS_RECOVERY) {
+				|| $item['key_'] == CALCULATED_ITEM_RDDS_RECOVERY|| $item['key_'] == CALCULATED_ITEM_EPP_RECOVERY) {
 			$recoveryCount = getFirstUintValue($item['itemid'], $mainEventFromTime);
 		}
 		else {

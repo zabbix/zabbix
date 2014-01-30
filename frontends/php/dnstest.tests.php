@@ -33,7 +33,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'host' =>					array(T_ZBX_STR, O_OPT,		P_SYS,	null,			null),
-	'type' =>					array(T_ZBX_INT, O_OPT,		null,	IN('0,1,2'),	null),
+	'type' =>					array(T_ZBX_INT, O_OPT,		null,	IN('0,1,2,3'),	null),
 	'slvItemId' =>				array(T_ZBX_INT, O_OPT,		P_SYS,	DB_ID,			null),
 	'original_from' =>			array(T_ZBX_INT, O_OPT,		null,	null,			null),
 	'original_to' =>			array(T_ZBX_INT, O_OPT,		null,	null,			null),
@@ -107,14 +107,17 @@ $tld = API::Host()->get(array(
 $data['tld'] = reset($tld);
 
 // used items
-if ($data['type'] == 0) {
+if ($data['type'] == DNSTEST_DNS) {
 	$key = DNSTEST_SLV_DNS_AVAIL;
 }
-elseif ($data['type'] == 1) {
+elseif ($data['type'] == DNSTEST_DNSSEC) {
 	$key = DNSTEST_SLV_DNSSEC_AVAIL;
 }
-else {
+elseif ($data['type'] == DNSTEST_RDDS) {
 	$key = DNSTEST_SLV_RDDS_AVAIL;
+}
+else {
+	$key = DNSTEST_SLV_EPP_AVAIL;
 }
 
 // get items
@@ -282,7 +285,7 @@ if ($items) {
 		$data['downTests'] = 0;
 		$data['statusChanges'] = 0;
 		while ($test = DBfetch($tests)) {
-			if (($data['type'] < 2 && $test['value'] == 0) || ($data['type'] == 2 && $test['value'] != 2)) {
+			if ($test['value'] == 0) {
 				$data['tests'][] = array(
 					'value' => $test['value'],
 					'clock' => $test['clock'],
@@ -309,11 +312,14 @@ if ($items) {
 
 		$data['downPeriod'] = zbxDateToTime($data['filter_to']) - zbxDateToTime($data['filter_from']);
 
-		if ($data['type'] > 2) {
+		if ($data['type'] == DNSTEST_DNS || $data['type'] == DNSTEST_DNSSEC) {
 			$itemKey = CALCULATED_ITEM_DNS_DELAY;
 		}
-		else {
+		elseif ($data['type'] == DNSTEST_RDDS) {
 			$itemKey = CALCULATED_ITEM_RDDS_DELAY;
+		}
+		else {
+			$itemKey = CALCULATED_ITEM_EPP_DELAY;
 		}
 
 		// get host with calculated items

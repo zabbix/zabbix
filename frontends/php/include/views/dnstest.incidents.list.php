@@ -203,8 +203,11 @@ $noData = _('No incidents found.');
 $dnsTab = new CDiv();
 $dnssecTab = new CDiv();
 $rddsTab = new CDiv();
+$eppTab = new CDiv();
 
 if (isset($this->data['tld'])) {
+
+	// DNS
 	if (isset($this->data['dns']['events'])) {
 		$dnsInfoTable = new CTable(null, 'incidents-info');
 
@@ -250,7 +253,8 @@ if (isset($this->data['tld'])) {
 		$testsDown = new CLink(
 			$this->data['dns']['totalTests'],
 			'dnstest.tests.php?filter_from='.$this->data['filter_from'].'&filter_to='.$this->data['filter_to'].
-				'&filter_set=1&host='.$this->data['tld']['host'].'&type=0&slvItemId='.$this->data['dns']['itemid']
+				'&filter_set=1&host='.$this->data['tld']['host'].'&type='.DNSTEST_DNS.
+				'&slvItemId='.$this->data['dns']['itemid']
 		);
 
 		$testsInfo = array(
@@ -286,6 +290,7 @@ if (isset($this->data['tld'])) {
 		$dnsTab->additem(new CDiv(bold(_('Incorrect TLD configuration.')), 'red center'));
 	}
 
+	// DNSSEC
 	if (isset($this->data['dnssec']['events'])) {
 		$dnssecInfoTable = new CTable(null, 'incidents-info');
 
@@ -332,7 +337,7 @@ if (isset($this->data['tld'])) {
 		$testsDown = new CLink(
 			$this->data['dnssec']['totalTests'],
 			'dnstest.tests.php?filter_from='.$this->data['filter_from'].'&filter_to='.$this->data['filter_to'].
-				'&filter_set=1&host='.$this->data['tld']['host'].'&type=1&slvItemId='.$this->data['dnssec']['itemid']
+				'&filter_set=1&host='.$this->data['tld']['host'].'&type='.DNSTEST_DNSSEC.'&slvItemId='.$this->data['dnssec']['itemid']
 		);
 
 		$testsInfo = array(
@@ -368,6 +373,7 @@ if (isset($this->data['tld'])) {
 		$dnssecTab->additem(new CDiv(bold(_('DNSSEC is disabled.')), 'red center'));
 	}
 
+	// RDDS
 	if (isset($this->data['rdds']['events'])) {
 		$rddsInfoTable = new CTable(null, 'incidents-info');
 
@@ -413,7 +419,7 @@ if (isset($this->data['tld'])) {
 		$testsDown = new CLink(
 			$this->data['rdds']['totalTests'],
 			'dnstest.tests.php?filter_from='.$this->data['filter_from'].'&filter_to='.$this->data['filter_to'].
-				'&filter_set=1&host='.$this->data['tld']['host'].'&type=2&slvItemId='.$this->data['rdds']['itemid']
+				'&filter_set=1&host='.$this->data['tld']['host'].'&type='.DNSTEST_RDDS.'&slvItemId='.$this->data['rdds']['itemid']
 		);
 
 		$testsInfo = array(
@@ -448,14 +454,95 @@ if (isset($this->data['tld'])) {
 	else {
 		$rddsTab->additem(new CDiv(bold(_('RDDS is disabled.')), 'red center'));
 	}
+
+	// EPP
+	if (isset($this->data['epp']['events'])) {
+		$eppInfoTable = new CTable(null, 'incidents-info');
+
+		$eppTable = new CTableInfo($noData);
+		$eppTable->setHeader($headers);
+
+		foreach ($this->data['epp']['events'] as $event) {
+			if ($event['false_positive']) {
+				$incidentStatus = _('False positive');
+			}
+			else {
+				$incidentStatus = $event['status'] ? _('Active') : _('Resolved');
+			}
+
+			if ($event['ticket']) {
+				$ticketParts = explode(SALES_FORCE_PATTERN, $event['ticket']);
+				$ticketLink = new CLink($event['ticket'], SALES_FORCE_LINK.$ticketParts[1], null, null, true);
+				$ticketLink->setTarget('_blank');
+			}
+			else {
+				$ticketLink = SPACE;
+			}
+
+			$row = array(
+				new CLink(
+					$event['eventid'],
+					'dnstest.incidentdetails.php?host='.$this->data['tld']['host'].
+						'&eventid='.$event['eventid'].'&slvItemId='.$this->data['epp']['itemid'].
+						'&filter_from='.$this->data['filter_from'].'&filter_to='.$this->data['filter_to'].
+						'&availItemId='.$this->data['epp']['availItemId']
+				),
+				$incidentStatus,
+				date('d.m.Y H:i:s', $event['startTime']),
+				isset($event['endTime']) ? date('d.m.Y H:i:s', $event['endTime']) : '-',
+				$event['incidentFailedTests'],
+				$event['incidentTotalTests'],
+				$ticketLink
+			);
+
+			$eppTable->addRow($row);
+		}
+
+		$testsDown = new CLink(
+			$this->data['epp']['totalTests'],
+			'dnstest.tests.php?filter_from='.$this->data['filter_from'].'&filter_to='.$this->data['filter_to'].
+				'&filter_set=1&host='.$this->data['tld']['host'].'&type='.DNSTEST_EPP.'&slvItemId='.$this->data['epp']['itemid']
+		);
+
+		$testsInfo = array(
+			_('Tests are down'),
+			':',
+			SPACE,
+			$testsDown,
+			SPACE,
+			_n('test', 'tests', $this->data['epp']['totalTests']),
+			'('._s(
+				'%1$s in incidents, %2$s outside incidents',
+				$this->data['epp']['inIncident'],
+				$this->data['epp']['totalTests'] - $this->data['epp']['inIncident']
+			).')'
+		);
+
+		$details = new CSpan(array(
+			_s(
+				'Incidents: %1$s',
+				isset($this->data['epp']) ? count($this->data['epp']['events']) : 0
+			),
+			BR(),
+			$testsInfo
+		));
+
+		$rollingWeek = new CSpan(_s('%1$s Rolling week status', $this->data['epp']['slv'].'%'), 'rolling-week-status');
+		$eppInfoTable->addRow(array($details, $rollingWeek));
+		$eppTab->additem($eppInfoTable);
+
+		$eppTab->additem($eppTable);
+	}
+	else {
+		$eppTab->additem(new CDiv(bold(_('EPP is disabled.')), 'red center'));
+	}
 }
 else {
 	$dnsTab->additem(new CDiv(_($noData), 'center'));
 	$dnssecTab->additem(new CDiv(_($noData), 'center'));
 	$rddsTab->additem(new CDiv(_($noData), 'center'));
+	$eppTab->additem(new CDiv(_($noData), 'center'));
 }
-
-$eppTab = null;
 
 $incidentPage->addTab('dnsTab', _('DNS'), $dnsTab);
 $incidentPage->addTab('dnssecTab', _('DNSSEC'), $dnssecTab);
