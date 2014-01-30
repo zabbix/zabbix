@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar ns="" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+<start>
+	<element name="zabbix_export">
+		<attribute name="date">
+			<data type="NMTOKEN"/>
+		</attribute>
+		<attribute name="time">
+			<data type="decimal"/>
+		</attribute>
+		<attribute name="version">
+			<data type="decimal"/>
+		</attribute>
+		<element name="screens">
+			<oneOrMore>
+				<element name="screen">
+					<interleave>
+						<element name="screenitems">
+							<zeroOrMore>
+								<element name="screenitem">
+									<interleave>
+										<element name="resourcetype">
+											<data type="integer"/>
+										</element>
+										<element name="resourceid">
+											<choice>
+												<data type="integer"/>
+												<element name="name">
+													<text/>
+												</element>
+												<element name="host">
+													<text/>
+												</element>
+												<group>
+													<interleave>
+														<element name="name">
+															<text/>
+														</element>
+														<element name="host">
+															<text/>
+														</element>
+													</interleave>
+												</group>
+												<group>
+													<interleave>
+														<element name="key_">
+															<text/>
+														</element>
+														<element name="host">
+															<text/>
+														</element>
+													</interleave>
+												</group>
+											</choice>
+										</element>
+										<optional>
+											<element name="width">
+												<data type="integer"/>
+											</element>
+										</optional>
+										<optional>
+											<element name="height">
+												<data type="integer"/>
+											</element>
+										</optional>
+										<element name="x">
+											<data type="integer"/>
+										</element>
+										<element name="y">
+											<data type="integer"/>
+										</element>
+										<optional>
+											<element name="colspan">
+												<data type="integer"/>
+											</element>
+										</optional>
+										<optional>
+											<element name="rowspan">
+												<data type="integer"/>
+											</element>
+										</optional>
+										<optional>
+											<element name="elements">
+												<data type="integer"/>
+											</element>
+										</optional>
+										<optional>
+											<element name="valign">
+												<data type="integer"/>
+											</element>
+										</optional>
+										<optional>
+											<element name="halign">
+												<data type="integer"/>
+											</element>
+										</optional>
+										<optional>
+											<element name="style">
+												<data type="integer"/>
+											</element>
+										</optional>
+										<optional>
+											<element name="dynamic">
+												<data type="integer"/>
+											</element>
+										</optional>
+										<optional>
+											<element name="url">
+												<text/>
+											</element>
+										</optional>
+									</interleave>
+								</element>
+							</zeroOrMore>
+						</element>
+						<element name="name">
+							<text/>
+						</element>
+						<optional>
+							<element name="hsize">
+								<data type="integer"/>
+							</element>
+						</optional>
+						<optional>
+							<element name="vsize">
+								<data type="integer"/>
+							</element>
+						</optional>
+					</interleave>
+				</element>
+			</oneOrMore>
+		</element>
+	</element>
+</start>
+</grammar>
