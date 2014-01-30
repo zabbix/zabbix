@@ -665,20 +665,20 @@ ROW   |93       |15        |-207 |invalid HTTP status code             |
 ROW   |94       |16        |0    |Down 	                               |
 ROW   |95       |16        |1    |Up   	                               |
 ROW   |96       |18        |0    |Down                                 |
-ROW   |97       |18        |1    |Only RDDS43                          |
-ROW   |98       |18        |2    |UP   	                               |
-ROW   |99       |19        |-200 |Cannot connect to EPP server         |
-ROW   |100      |19        |-201 |Cannot receive first message         |
-ROW   |101      |19        |-202 |First message is invalid             |
-ROW   |102      |19        |-203 |Cannot send LOGIN command            |
-ROW   |103      |19        |-204 |Cannot receive LOGIN command         |
-ROW   |104      |19        |-205 |Invalid reply to LOGIN command       |
-ROW   |105      |19        |-206 |Cannot send UPDATE command           |
-ROW   |106      |19        |-207 |Cannot receive UPDATE command        |
-ROW   |107      |19        |-208 |Invalid reply to UPDATE command      |
-ROW   |108      |19        |-209 |Cannot send INFO command             |
-ROW   |109      |19        |-210 |Cannot receive INFO command          |
-ROW   |110      |19        |-211 |Invalid reply to INFO command        |
+ROW   |97       |18        |1    |Up                                   |
+ROW   |98       |18        |2    |RDDS43 only                          |
+ROW   |99       |18        |3    |RDDS80 only                          |
+ROW   |100      |19        |-200 |IP is missing for EPP server         |
+ROW   |100      |19        |-201 |Cannot connect to EPP server         |
+ROW   |101      |19        |-202 |Invalid certificate or private key   |
+ROW   |101      |19        |-203 |First message timeout                |
+ROW   |101      |19        |-204 |First message is invalid             |
+ROW   |101      |19        |-205 |LOGIN command timeout                |
+ROW   |101      |19        |-206 |Invalid reply to LOGIN command       |
+ROW   |101      |19        |-207 |UPDATE command timeout               |
+ROW   |101      |19        |-208 |Invalid reply to UPDATE command      |
+ROW   |101      |19        |-209 |INFO command timeout                 |
+ROW   |101      |19        |-210 |Invalid reply to INFO command        |
 
 TABLE |regexps
 FIELDS|regexpid|name                              |test_string|

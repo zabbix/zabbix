@@ -44,18 +44,17 @@
 #define ZBX_EC_RDDS_ERES		-205	/* cannot resolve a Whois server name */
 #define ZBX_EC_RDDS80_NOHTTPCODE	-206	/* no HTTP response code in response from RDDS80 server */
 #define ZBX_EC_RDDS80_EHTTPCODE		-207	/* invalid HTTP response code in response from RDDS80 server */
-#define ZBX_EC_EPP_CONNECT		-200	/* cannot connect to EPP server */
-#define ZBX_EC_EPP_RECVFIRST		-201	/* cannot receive first message */
-#define ZBX_EC_EPP_INVALFIRST		-202	/* first message is invalid */
-#define ZBX_EC_EPP_SENDLOGIN		-203	/* cannot send LOGIN command */
-#define ZBX_EC_EPP_RECVLOGIN		-204	/* cannot receive LOGIN command */
-#define ZBX_EC_EPP_INVALLOGIN		-205	/* invalid reply to LOGIN command */
-#define ZBX_EC_EPP_SENDUPDATE		-206	/* cannot send UPDATE command */
-#define ZBX_EC_EPP_RECVUPDATE		-207	/* cannot receive UPDATE command */
-#define ZBX_EC_EPP_INVALUPDATE		-208	/* invalid reply to UPDATE command */
-#define ZBX_EC_EPP_SENDINFO		-209	/* cannot send INFO command */
-#define ZBX_EC_EPP_RECVINFO		-210	/* cannot receive INFO command */
-#define ZBX_EC_EPP_INVALINFO		-211	/* invalid reply to INFO command */
+#define ZBX_EC_EPP_NO_IP		-200	/* IP is missing for EPP server */
+#define ZBX_EC_EPP_CONNECT		-201	/* cannot connect to EPP server */
+#define ZBX_EC_EPP_CRYPT		-202	/* invalid certificate or private key */
+#define ZBX_EC_EPP_FIRSTTO		-203	/* first message timeout */
+#define ZBX_EC_EPP_FIRSTINVAL		-204	/* first message is invalid */
+#define ZBX_EC_EPP_LOGINTO		-205	/* LOGIN command timeout */
+#define ZBX_EC_EPP_LOGININVAL		-206	/* invalid reply to LOGIN command */
+#define ZBX_EC_EPP_UPDATETO		-207	/* UPDATE command timeout */
+#define ZBX_EC_EPP_UPDATEINVAL		-208	/* invalid reply to UPDATE command */
+#define ZBX_EC_EPP_INFOTO		-209	/* INFO command timeout */
+#define ZBX_EC_EPP_INFOINVAL		-210	/* invalid reply to INFO command */
 #define ZBX_EC_PROBE_ONLINE		1	/* probe in automatic online mode */
 #define ZBX_EC_PROBE_OFFLINE		0	/* probe in automatic offline mode */
 #define ZBX_EC_PROBE_UNSUPPORTED	2	/* internal use only */

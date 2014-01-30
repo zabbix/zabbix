@@ -15,7 +15,6 @@ use constant UP => 1;
 use constant DOWN => 0;
 
 use constant MAX_SERVICE_ERROR => -200; # -200, -201 ...
-use constant RDDS_UP => 2; # results of input items: 0 - RDDS down, 1 - only RDDS43 up, 2 - both RDDS43 and RDDS80 up
 use constant MIN_LOGIN_ERROR => -205;
 use constant MAX_LOGIN_ERROR => -203;
 use constant MIN_UPDATE_ERROR => -208;
@@ -35,7 +34,7 @@ our ($zabbix, $result, $dbh, $tld);
 our %OPTS; # command-line options
 
 our @EXPORT = qw($zabbix $result $dbh $tld %OPTS
-		SUCCESS FAIL UP DOWN RDDS_UP RTT_LIMIT_MULTIPLIER
+		SUCCESS FAIL UP DOWN RTT_LIMIT_MULTIPLIER
 		zapi_connect zapi_get_macro_minns zapi_get_macro_dns_probe_online
 		zapi_get_macro_rdds_probe_online zapi_get_macro_dns_rollweek_sla zapi_get_macro_rdds_rollweek_sla
 		zapi_get_macro_dns_udp_rtt zapi_get_macro_dns_tcp_rtt zapi_get_macro_rdds_rtt

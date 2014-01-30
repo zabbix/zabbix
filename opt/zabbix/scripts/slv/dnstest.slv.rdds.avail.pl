@@ -88,7 +88,7 @@ sub check_item_values
 
     foreach (@$values_ref)
     {
-	return SUCCESS if ($_ == RDDS_UP);
+	return SUCCESS if ($_ == UP);
     }
 
     return FAIL;

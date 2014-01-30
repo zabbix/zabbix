@@ -1214,18 +1214,28 @@ static void	zbx_clean_nss(zbx_ns_t *nss, size_t nss_num)
 
 static int	rtt_over_limit(int rtt, int rtt_limit)
 {
-	if (rtt <= rtt_limit * RTT_LIMIT_MULTIPLIER)
+	if (rtt > rtt_limit * RTT_LIMIT_MULTIPLIER)
 		return SUCCEED;
 
+	/* not over limit */
 	return FAIL;
 }
 
 static int	is_service_err(int ec)
 {
-	if (-200 >= ec && ec > ZBX_NO_VALUE)
+	if (0 > ec && -200 >= ec && ec > ZBX_NO_VALUE)
 		return SUCCEED;
 
+	/* not a service error */
 	return FAIL;
+}
+
+static int	rtt_result(int rtt, int rtt_limit)
+{
+	if (SUCCEED == is_service_err(rtt) || SUCCEED == rtt_over_limit(rtt, rtt_limit))
+		return FAIL;
+
+	return SUCCEED;
 }
 
 static int	zbx_conf_str(zbx_uint64_t *hostid, const char *macro, char **value, char *err, size_t err_size)
@@ -1523,7 +1533,7 @@ int	check_dnstest_dns(DC_ITEM *item, const char *keyname, const char *params, AG
 
 			/* The ns is considered non-working only in case it was the one to blame. Resolver */
 			/* and internal errors do not count. Another case of ns fail is slow response.     */
-			if ((0 > rtt && SUCCEED == is_service_err(rtt)) || SUCCEED != rtt_over_limit(rtt, rtt_limit))
+			if (SUCCEED != rtt_result(rtt, rtt_limit))
 				nss[i].result = FAIL;
 		}
 	}
@@ -2008,6 +2018,11 @@ out:
 	return ret;
 }
 
+#define RDDS_DOWN	0
+#define RDDS_UP		1
+#define RDDS_ONLY43	2
+#define RDDS_ONLY80	3
+
 int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, AGENT_RESULT *result)
 {
 	char			domain[ZBX_HOST_BUF_SIZE], *value_str = NULL, *res_ip = NULL, *testprefix = NULL,
@@ -2190,77 +2205,85 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 	{
 		rtt43 = ZBX_EC_RDDS_ERES;
 		zbx_dns_errf(log_fd, "RDDS43 \"%s\": %s", random_host, err);
-		goto out;
 	}
 
-	/* choose random IP */
-	i = zbx_random(ips43.values_num);
-	ip43 = ips43.values[i];
+	/* if RDDS43 fails we should still process RDDS80 */
 
-	if (0 != strcmp(".", domain))
-		zbx_snprintf(testname, sizeof(testname), "%s.%s", testprefix, domain);
-	else
-		zbx_strlcpy(testname, testprefix, sizeof(testname));
-
-
-	zbx_dns_infof(log_fd, "start RDDS43 test (ip %s, request \"%s\", expected prefix \"%s\")", ip43, testname,
-			rdds_ns_string);
-
-	if (SUCCEED != zbx_rdds43_test(testname, ip43, 43, ZBX_DNSTEST_TCP_TIMEOUT, &answer, &rtt43, err, sizeof(err)))
+	if (0 < rtt43)
 	{
-		rtt43 = ZBX_EC_RDDS43_NOREPLY;
-		zbx_dns_errf(log_fd, "RDDS43 of \"%s\" (%s) failed: %s", random_host, ip43, err);
-		goto out;
-	}
+		/* choose random IP */
+		i = zbx_random(ips43.values_num);
+		ip43 = ips43.values[i];
 
-	zbx_get_rdds43_nss(&nss, answer, rdds_ns_string, log_fd);
+		if (0 != strcmp(".", domain))
+			zbx_snprintf(testname, sizeof(testname), "%s.%s", testprefix, domain);
+		else
+			zbx_strlcpy(testname, testprefix, sizeof(testname));
 
-	if (0 == nss.values_num)
-	{
-		rtt43 = ZBX_EC_RDDS43_NONS;
-		zbx_dns_errf(log_fd, "no Name Servers found in the output of RDDS43 server \"%s\" (%s) for query \"%s\""
-				" (expecting prefix \"%s\")", random_host, ip43, testname, rdds_ns_string);
-		goto out;
-	}
+		zbx_dns_infof(log_fd, "start RDDS43 test (ip %s, request \"%s\", expected prefix \"%s\")",
+				ip43, testname, rdds_ns_string);
 
-	/* If we are here it means RDDS43 was successful. Now we will perform the UPD */
-	/* test but its errors will not affect the fact that we will run RDDS80 test. */
-
-	/* choose random NS from the output */
-	i = zbx_random(nss.values_num);
-	random_ns = nss.values[i];
-
-	zbx_dns_infof(log_fd, "randomly selected Name Server server \"%s\"", random_ns);
-
-	if (0 != epp_enabled)
-	{
-		/* start RDDS UPD test, get timestamp from the host name */
-		if (SUCCEED != zbx_get_ts_from_host(random_ns, &ts))
+		if (SUCCEED != zbx_rdds43_test(testname, ip43, 43, ZBX_DNSTEST_TCP_TIMEOUT, &answer, &rtt43,
+				err, sizeof(err)))
 		{
-			upd43 = ZBX_EC_RDDS43_NOTS;
-			zbx_dns_errf(log_fd, "cannot extract Unix timestamp from Name Server \"%s\"", random_ns);
+			rtt43 = ZBX_EC_RDDS43_NOREPLY;
+			zbx_dns_errf(log_fd, "RDDS43 of \"%s\" (%s) failed: %s", random_host, ip43, err);
 		}
+	}
 
-		if (upd43 == ZBX_NO_VALUE)
+	if (0 < rtt43)
+	{
+		zbx_get_rdds43_nss(&nss, answer, rdds_ns_string, log_fd);
+
+		if (0 == nss.values_num)
 		{
-			now = time(NULL);
+			rtt43 = ZBX_EC_RDDS43_NONS;
+			zbx_dns_errf(log_fd, "no Name Servers found in the output of RDDS43 server \"%s\""
+					" (%s) for query \"%s\" (expecting prefix \"%s\")",
+					random_host, ip43, testname, rdds_ns_string);
+		}
+	}
 
-			if (0 > now - ts)
+	if (0 < rtt43)
+	{
+		/* choose random NS from the output */
+		i = zbx_random(nss.values_num);
+		random_ns = nss.values[i];
+
+		zbx_dns_infof(log_fd, "randomly selected Name Server server \"%s\"", random_ns);
+
+		if (0 != epp_enabled)
+		{
+			/* start RDDS UPD test, get timestamp from the host name */
+			if (SUCCEED != zbx_get_ts_from_host(random_ns, &ts))
 			{
-				zbx_dns_errf(log_fd, "Unix timestamp of Name Server \"%s\" is in the future"
-						" (current: %lu)", random_ns, now);
-				upd43 = ZBX_EC_RDDS43_ETS;
+				upd43 = ZBX_EC_RDDS43_NOTS;
+				zbx_dns_errf(log_fd, "cannot extract Unix timestamp from Name Server \"%s\"", random_ns);
+			}
+
+			if (upd43 == ZBX_NO_VALUE)
+			{
+				now = time(NULL);
+
+				if (0 > now - ts)
+				{
+					zbx_dns_errf(log_fd, "Unix timestamp of Name Server \"%s\" is in the future"
+							" (current: %lu)", random_ns, now);
+					upd43 = ZBX_EC_RDDS43_ETS;
+				}
+			}
+
+			if (upd43 == ZBX_NO_VALUE)
+			{
+				/* successful UPD */
+				upd43 = now - ts;
 			}
 		}
 
-		if (upd43 == ZBX_NO_VALUE)
-		{
-			/* successful UPD */
-			upd43 = now - ts;
-		}
+		zbx_dns_infof(log_fd, "===>\n%.*s\n<=== end RDDS43 test (rtt:%d)", ZBX_RDDS_PREVIEW_SIZE, answer, rtt43);
 	}
 
-	zbx_dns_infof(log_fd, "===>\n%.*s\n<=== end RDDS43 test (rtt:%d)", ZBX_RDDS_PREVIEW_SIZE, answer, rtt43);
+	zbx_dns_infof(log_fd, "start RDDS80 test (url %s, host %s)", testname, random_host);
 
 	/* choose random host */
 	i = zbx_random(hosts80.values_num);
@@ -2270,7 +2293,7 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 	if (SUCCEED != zbx_resolve_host(res, random_host, &ips80, ipv4_enabled, ipv6_enabled, log_fd, err, sizeof(err)))
 	{
 		rtt80 = ZBX_EC_RDDS_ERES;
-		zbx_dns_errf(log_fd, "RDDS43 \"%s\": %s", random_host, err);
+		zbx_dns_errf(log_fd, "RDDS80 \"%s\": %s", random_host, err);
 		goto out;
 	}
 
@@ -2290,8 +2313,6 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 	else
 		zbx_snprintf(testname, sizeof(testname), "http://[%s]", ip80);
 
-	zbx_dns_infof(log_fd, "start RDDS80 test (url %s, host %s)", testname, random_host);
-
 	if (SUCCEED != zbx_rdds80_test(random_host, testname, 80, ZBX_DNSTEST_TCP_TIMEOUT, maxredirs, &rtt80,
 			err, sizeof(err)))
 	{
@@ -2306,24 +2327,31 @@ out:
 
 	if (SYSINFO_RET_OK == ret)
 	{
-		int	ok_tests = 2;	/* RDDS43 and RDDS80 */
+		int	rdds_result, rdds43, rdds80;
 
 		zbx_set_rdds_values(ip43, rtt43, upd43, ip80, rtt80, item->nextcheck, strlen(keyname), items,
 				items_num);
 
-		if ((0 > rtt43 && SUCCEED == is_service_err(rtt43)) || SUCCEED != rtt_over_limit(rtt43,
-				rtt_limit))
+		rdds43 = rtt_result(rtt43, rtt_limit);
+		rdds80 = rtt_result(rtt80, rtt_limit);
+
+		if (SUCCEED == rdds43)
 		{
-			ok_tests -= 2;
+			if (SUCCEED == rdds80)
+				rdds_result = RDDS_UP;
+			else
+				rdds_result = RDDS_ONLY43;
 		}
-		else if ((0 > rtt80 && SUCCEED == is_service_err(rtt80)) || SUCCEED != rtt_over_limit(rtt80,
-				rtt_limit))
+		else
 		{
-			ok_tests -= 1;
+			if (SUCCEED == rdds80)
+				rdds_result = RDDS_ONLY80;
+			else
+				rdds_result = RDDS_DOWN;
 		}
 
-		/* set the value of our simple check item itself */
-		zbx_add_value_uint(item, item->nextcheck, ok_tests);
+		/* set the value of our item itself */
+		zbx_add_value_uint(item, item->nextcheck, rdds_result);
 	}
 
 	zbx_free(answer);
@@ -2547,14 +2575,14 @@ static int	get_first_message(SSL *ssl, int *res, FILE *log_fd, char *err, size_t
 	if (SUCCEED != epp_recv_message(ssl, &data, &data_len, log_fd))
 	{
 		zbx_strlcpy(err, "cannot receive first message from server", err_size);
-		*res = ZBX_EC_EPP_RECVFIRST;
+		*res = ZBX_EC_EPP_FIRSTTO;
 		goto out;
 	}
 
 	if (SUCCEED != get_xml_value(data, XML_PATH_SERVER_ID, xml_value, sizeof(xml_value)))
 	{
 		zbx_snprintf(err, err_size, "no Server ID in first message from server");
-		*res = ZBX_EC_EPP_INVALFIRST;
+		*res = ZBX_EC_EPP_FIRSTINVAL;
 		goto out;
 	}
 
@@ -2562,7 +2590,7 @@ static int	get_first_message(SSL *ssl, int *res, FILE *log_fd, char *err, size_t
 	{
 		zbx_snprintf(err, err_size, "invalid Server ID in the first message from server: \"%s\""
 				" (expected \"%s\")", xml_value, EXPECTED_SERVER_ID);
-		*res = ZBX_EC_EPP_INVALFIRST;
+		*res = ZBX_EC_EPP_FIRSTINVAL;
 		goto out;
 	}
 
@@ -2601,21 +2629,21 @@ static int	command_login(const char *name, SSL *ssl, int *rtt, FILE *log_fd, cha
 	if (SUCCEED != epp_send_message(ssl, command_buf, strlen(command_buf), log_fd))
 	{
 		zbx_snprintf(err, err_size, "cannot send command \"%s\"", name);
-		*rtt = ZBX_EC_EPP_SENDLOGIN;
+		*rtt = ZBX_EC_EPP_LOGINTO;
 		goto out;
 	}
 
 	if (SUCCEED != epp_recv_message(ssl, &data, &data_len, log_fd))
 	{
 		zbx_snprintf(err, err_size, "cannot receive reply to command \"%s\"", name);
-		*rtt = ZBX_EC_EPP_RECVLOGIN;
+		*rtt = ZBX_EC_EPP_LOGINTO;
 		goto out;
 	}
 
 	if (SUCCEED != get_xml_value(data, XML_PATH_RESULT_CODE, xml_value, sizeof(xml_value)))
 	{
 		zbx_snprintf(err, err_size, "no result code in reply");
-		*rtt = ZBX_EC_EPP_INVALLOGIN;
+		*rtt = ZBX_EC_EPP_LOGININVAL;
 		goto out;
 	}
 
@@ -2623,7 +2651,7 @@ static int	command_login(const char *name, SSL *ssl, int *rtt, FILE *log_fd, cha
 	{
 		zbx_snprintf(err, err_size, "invalid result code in reply to \"%s\": \"%s\" (expected \"%s\")",
 				name, xml_value, EXPECTED_RESULT_CODE);
-		*rtt = ZBX_EC_EPP_INVALLOGIN;
+		*rtt = ZBX_EC_EPP_LOGININVAL;
 		goto out;
 	}
 
@@ -2667,21 +2695,21 @@ static int	command_update(const char *name, SSL *ssl, int *rtt, FILE *log_fd, ch
 	if (SUCCEED != epp_send_message(ssl, command_buf, strlen(command_buf), log_fd))
 	{
 		zbx_snprintf(err, err_size, "cannot send command \"%s\"", name);
-		*rtt = ZBX_EC_EPP_SENDUPDATE;
+		*rtt = ZBX_EC_EPP_UPDATETO;
 		goto out;
 	}
 
 	if (SUCCEED != epp_recv_message(ssl, &data, &data_len, log_fd))
 	{
 		zbx_snprintf(err, err_size, "cannot receive reply to command \"%s\"", name);
-		*rtt = ZBX_EC_EPP_RECVUPDATE;
+		*rtt = ZBX_EC_EPP_UPDATETO;
 		goto out;
 	}
 
 	if (SUCCEED != get_xml_value(data, XML_PATH_RESULT_CODE, xml_value, sizeof(xml_value)))
 	{
 		zbx_snprintf(err, err_size, "no result code in reply");
-		*rtt = ZBX_EC_EPP_INVALUPDATE;
+		*rtt = ZBX_EC_EPP_UPDATEINVAL;
 		goto out;
 	}
 
@@ -2689,7 +2717,7 @@ static int	command_update(const char *name, SSL *ssl, int *rtt, FILE *log_fd, ch
 	{
 		zbx_snprintf(err, err_size, "invalid result code in reply to \"%s\": \"%s\" (expected \"%s\")",
 				name, xml_value, EXPECTED_RESULT_CODE);
-		*rtt = ZBX_EC_EPP_INVALUPDATE;
+		*rtt = ZBX_EC_EPP_UPDATEINVAL;
 		goto out;
 	}
 
@@ -2731,21 +2759,21 @@ static int	command_info(const char *name, SSL *ssl, int *rtt, FILE *log_fd, char
 	if (SUCCEED != epp_send_message(ssl, command_buf, strlen(command_buf), log_fd))
 	{
 		zbx_snprintf(err, err_size, "cannot send command \"%s\"", name);
-		*rtt = ZBX_EC_EPP_SENDINFO;
+		*rtt = ZBX_EC_EPP_INFOTO;
 		goto out;
 	}
 
 	if (SUCCEED != epp_recv_message(ssl, &data, &data_len, log_fd))
 	{
 		zbx_snprintf(err, err_size, "cannot receive reply to command \"%s\"", name);
-		*rtt = ZBX_EC_EPP_RECVINFO;
+		*rtt = ZBX_EC_EPP_INFOTO;
 		goto out;
 	}
 
 	if (SUCCEED != get_xml_value(data, XML_PATH_RESULT_CODE, xml_value, sizeof(xml_value)))
 	{
 		zbx_snprintf(err, err_size, "no result code in reply");
-		*rtt = ZBX_EC_EPP_INVALINFO;
+		*rtt = ZBX_EC_EPP_INFOINVAL;
 		goto out;
 	}
 
@@ -2753,7 +2781,7 @@ static int	command_info(const char *name, SSL *ssl, int *rtt, FILE *log_fd, char
 	{
 		zbx_snprintf(err, err_size, "invalid result code in reply to \"%s\": \"%s\" (expected \"%s\")",
 				name, xml_value, EXPECTED_RESULT_CODE);
-		*rtt = ZBX_EC_EPP_INVALINFO;
+		*rtt = ZBX_EC_EPP_INFOINVAL;
 		goto out;
 	}
 
@@ -2961,7 +2989,7 @@ int	check_dnstest_epp(DC_ITEM *item, const char *keyname, const char *params, AG
 	DC_ITEM			*items = NULL;
 	size_t			items_num = 0;
 	int			epp_enabled, rtt1 = ZBX_NO_VALUE, rtt2 = ZBX_NO_VALUE, rtt3 = ZBX_NO_VALUE, res,
-				rtt1_limit, rtt2_limit, rtt3_limit, ret = SYSINFO_RET_FAIL;
+				rtt1_limit, rtt2_limit, rtt3_limit, ipv4_enabled, ipv6_enabled, ret = SYSINFO_RET_FAIL;
 
 	memset(&sock, 0, sizeof(zbx_sock_t));
 	sock.socket = ZBX_SOCK_ERROR;
@@ -3039,6 +3067,12 @@ int	check_dnstest_epp(DC_ITEM *item, const char *keyname, const char *params, AG
 		goto out;
 	}
 
+	if (SUCCEED != zbx_conf_ip_support(&item->host.hostid, &ipv4_enabled, &ipv6_enabled, err, sizeof(err)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+		goto out;
+	}
+
 	/* from this point item will not become NOT_SUPPORTED */
 	ret = SYSINFO_RET_OK;
 
@@ -3090,6 +3124,14 @@ int	check_dnstest_epp(DC_ITEM *item, const char *keyname, const char *params, AG
 		goto out;
 	}
 
+	/* validate IP */
+	if (SUCCEED != zbx_validate_ip(epp_host, ipv4_enabled, ipv6_enabled, NULL, NULL))
+	{
+		rtt1 = rtt2 = rtt3 = ZBX_EC_EPP_NO_IP;
+		zbx_dns_errf(log_fd, "invalid or unsupported IP \"%s\"", epp_host);
+		goto out;
+	}
+
 	/* make the underlying TCP socket connection */
 	if (SUCCEED != zbx_tcp_connect(&sock, NULL, epp_host, epp_port, ZBX_DNSTEST_TCP_TIMEOUT))
 	{
@@ -3108,14 +3150,14 @@ int	check_dnstest_epp(DC_ITEM *item, const char *keyname, const char *params, AG
 
 	if (1 != SSL_use_certificate_file(ssl, cert_file, SSL_FILETYPE_PEM))
 	{
-		rtt1 = rtt2 = rtt3 = ZBX_EC_INTERNAL;
+		rtt1 = rtt2 = rtt3 = ZBX_EC_EPP_CRYPT;
 		zbx_dns_errf(log_fd, "cannot load certificate from file %s", cert_file);
 		goto out;
 	}
 
 	if (1 != SSL_use_PrivateKey_file(ssl, key_file, SSL_FILETYPE_PEM))
 	{
-		rtt1 = rtt2 = rtt3 = ZBX_EC_INTERNAL;
+		rtt1 = rtt2 = rtt3 = ZBX_EC_EPP_CRYPT;
 		zbx_dns_errf(log_fd, "cannot load private key from file %s", key_file);
 		goto out;
 	}
@@ -3181,14 +3223,17 @@ out:
 		zbx_set_epp_values(ip, rtt1, rtt2, rtt3, item->nextcheck, strlen(keyname), items, items_num);
 
 	/* set availability of EPP (up/down) */
-	if (((0 > rtt1 && SUCCEED == is_service_err(rtt1)) || SUCCEED != rtt_over_limit(rtt1, rtt1_limit)) ||
-			((0 > rtt2 && SUCCEED == is_service_err(rtt2)) || SUCCEED != rtt_over_limit(rtt2, rtt2_limit)) ||
-			((0 > rtt3 && SUCCEED == is_service_err(rtt3)) || SUCCEED != rtt_over_limit(rtt3, rtt3_limit)))
+	if (SUCCEED != rtt_result(rtt1, rtt1_limit) || SUCCEED != rtt_result(rtt2, rtt2_limit) ||
+			SUCCEED != rtt_result(rtt3, rtt3_limit))
 	{
+		/* up */
 		zbx_add_value_uint(item, item->nextcheck, 0);
 	}
 	else
+	{
+		/* down */
 		zbx_add_value_uint(item, item->nextcheck, 1);
+	}
 
 	if (0 != items_num)
 	{
