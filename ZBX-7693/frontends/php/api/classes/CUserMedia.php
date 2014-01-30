@@ -85,19 +85,20 @@ class CUserMedia extends CZBXAPI {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// permission check
-		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
-		}
-		elseif ($options['editable'] === null && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
-			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['where']['mug'] = 'm.userid=ug.userid';
-			$sqlParts['where'][] = 'ug.usrgrpid IN ('.
-				' SELECT uug.usrgrpid'.
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			if (!$options['editable'] && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
+				$sqlParts['from']['users_groups'] = 'users_groups ug';
+				$sqlParts['where']['uug'] = 'u.userid=ug.userid';
+				$sqlParts['where'][] = 'ug.usrgrpid IN ('.
+					' SELECT uug.usrgrpid'.
 					' FROM users_groups uug'.
 					' WHERE uug.userid='.self::$userData['userid'].
-				' )';
-		}
-		elseif ($options['editable'] !== null || self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			$options['userids'] = self::$userData['userid'];
+				')';
+			}
+			else {
+				$sqlParts['from']['users'] = 'users u';
+				$sqlParts['where'][] = 'u.userid='.self::$userData['userid'];
+			}
 		}
 
 		// nodeids
