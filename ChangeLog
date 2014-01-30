@@ -6,6 +6,7 @@ New features:
 A.F....... [ZBX-1357] updated American English, French, Hungarian, Italian, Japanese, Russian, Slovak and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-7648] fixed name resolution when using net.dns items (Juris)
 ........S. [ZBX-6315] fixed deleting of lost triggers by the low-level discovery rule (Sasha)
 ........S. [ZBX-7109] improved performance of processing discovered triggers by the low-level discovery rule (Sasha)
 ........S. [ZBX-7608] fixed crashes when global scripts timed out (wiper)
@@ -764,6 +765,7 @@ New features:
 A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-7648] fixed name resolution when using net.dns items (Juris)
 ........S. [ZBX-6315] fixed deleting of lost triggers by the low-level discovery rule (Sasha)
 ........S. [ZBX-7109] improved performance of processing discovered triggers by the low-level discovery rule (Sasha)
 A.F....... [ZBX-4218] rewrote the item key parser's source code for independence on the mbstring.func_overload option (Sasha)
