@@ -143,10 +143,10 @@ const char	*zbx_interface_type_string(zbx_interface_type_t type);
 #define INTERFACE_TYPE_COUNT	4	/* number of interface types */
 extern const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT];
 
-#define ZBX_FLAG_DISCOVERY_NORMAL	0x00	/* normal item */
-#define ZBX_FLAG_DISCOVERY_RULE		0x01	/* low-level discovery rule */
-#define ZBX_FLAG_DISCOVERY_PROTOTYPE	0x02	/* low-level discovery host, item, trigger or graph prototypes */
-#define ZBX_FLAG_DISCOVERY_CREATED	0x04	/* auto-created item, trigger or graph */
+#define ZBX_FLAG_DISCOVERY_NORMAL	0x00
+#define ZBX_FLAG_DISCOVERY_RULE		0x01
+#define ZBX_FLAG_DISCOVERY_PROTOTYPE	0x02
+#define ZBX_FLAG_DISCOVERY_CREATED	0x04
 
 typedef enum
 {
@@ -271,10 +271,6 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define ITEM_STORE_AS_IS			0
 #define ITEM_STORE_SPEED_PER_SECOND		1
 #define ITEM_STORE_SIMPLE_CHANGE		2
-
-/* object types for operations */
-#define OPERATION_OBJECT_USER			0
-#define OPERATION_OBJECT_GROUP			1
 
 /* condition evaluation types */
 #define ACTION_EVAL_TYPE_AND_OR			0
