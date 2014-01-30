@@ -57,6 +57,17 @@ my $ZBX_EC_RDDS80_NOREPLY    = -204; # no reply from RDDS80 server
 my $ZBX_EC_RDDS_ERRRES       = -205; # cannot resolve a Whois host
 my $ZBX_EC_RDDS80_NOHTTPCODE = -206; # no HTTP response code in response from RDDS80 server
 my $ZBX_EC_RDDS80_EHTTPCODE  = -207; # invalid HTTP response code in response from RDDS80 server
+my $ZBX_EC_EPP_NO_IP         = -200; # IP is missing for EPP server
+my $ZBX_EC_EPP_CONNECT       = -201; # cannot connect to EPP server
+my $ZBX_EC_EPP_CRYPT         = -202; # invalid certificate or private key
+my $ZBX_EC_EPP_FIRSTTO       = -203; # first message timeout
+my $ZBX_EC_EPP_FIRSTINVAL    = -204; # first message is invalid
+my $ZBX_EC_EPP_LOGINTO       = -205; # LOGIN command timeout
+my $ZBX_EC_EPP_LOGININVAL    = -206; # invalid reply to LOGIN command
+my $ZBX_EC_EPP_UPDATETO      = -207; # UPDATE command timeout
+my $ZBX_EC_EPP_UPDATEINVAL   = -208; # invalid reply to UPDATE command
+my $ZBX_EC_EPP_INFOTO        = -209; # INFO command timeout
+my $ZBX_EC_EPP_INFOINVAL     = -210; # invalid reply to INFO command
 
 my $cfg_probe_status_delay = 60;
 my $cfg_default_rdds_ns_string = "Name Server:";
