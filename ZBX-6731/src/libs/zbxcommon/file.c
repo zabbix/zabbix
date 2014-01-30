@@ -254,9 +254,8 @@ static void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char 
 
 int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data, int *big_rec,
 		const char *encoding, ZBX_REGEXP *regexps, int regexps_num, const char *pattern, int *p_count,
-		int *s_count, int (*process_value)(const char *, unsigned short, const char *, const char *,
-		const char *, zbx_uint64_t *, int *, unsigned long *, const char *, unsigned short *, unsigned long *,
-		unsigned char), const char *server, unsigned short port, const char *hostname, const char *key)
+		int *s_count, zbx_process_value_func_t process_value, const char *server, unsigned short port,
+		const char *hostname, const char *key)
 {
 	int		ret = FAIL, nbytes;
 	const char	*cr, *lf, *p_end;
