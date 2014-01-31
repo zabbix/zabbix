@@ -98,7 +98,7 @@
 .latest-mon .tableinfo div.item { padding-left: 8px; }
 
 /* trigger monitoring */
-.trigger-mon #inventory-filter td { padding-left: 0px; padding-right: 3px; height: 21px; }
+.trigger-mon #inventory-filter td { padding-left: 0px; padding-right: 3px; }
 .trigger-mon .filter-button { height: 16px; }
 
 /* regexp test result table, based on .tableinfo */
