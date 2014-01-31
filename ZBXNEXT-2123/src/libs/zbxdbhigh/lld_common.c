@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,58 +21,38 @@
 #include "db.h"
 #include "log.h"
 #include "zbxserver.h"
-#include "zbxregexp.h"
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_get_item                                                   *
+ * Function: lld_field_str_rollback                                           *
  *                                                                            *
- * Purpose: finds item in the selected host by an item prototype key and      *
- *          discovered data                                                   *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-int	DBlld_get_item(zbx_uint64_t hostid, const char *tmpl_key, struct zbx_json_parse *jp_row, zbx_uint64_t *itemid)
+void	lld_field_str_rollback(char **field, char **field_orig, zbx_uint64_t *flags, zbx_uint64_t flag)
 {
-	const char	*__function_name = "DBlld_get_item";
+	if (0 == (*flags & flag))
+		return;
 
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*key = NULL, *key_esc;
-	int		res = SUCCEED;
+	zbx_free(*field);
+	*field = *field_orig;
+	*field_orig = NULL;
+	*flags &= ~flag;
+}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_field_uint64_rollback                                        *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ ******************************************************************************/
+void	lld_field_uint64_rollback(zbx_uint64_t *field, zbx_uint64_t *field_orig, zbx_uint64_t *flags, zbx_uint64_t flag)
+{
+	if (0 == (*flags & flag))
+		return;
 
-	if (NULL != jp_row)
-	{
-		key = zbx_strdup(key, tmpl_key);
-		substitute_key_macros(&key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
-		key_esc = DBdyn_escape_string_len(key, ITEM_KEY_LEN);
-	}
-	else
-		key_esc = DBdyn_escape_string_len(tmpl_key, ITEM_KEY_LEN);
-
-	result = DBselect(
-			"select itemid"
-			" from items"
-			" where hostid=" ZBX_FS_UI64
-				" and key_='%s'",
-			hostid, key_esc);
-
-	zbx_free(key_esc);
-	zbx_free(key);
-
-	if (NULL == (row = DBfetch(result)))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot find item [%s] on the host",
-				__function_name, key);
-		res = FAIL;
-	}
-	else
-		ZBX_STR2UINT64(*itemid, row[0]);
-
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
-
-	return res;
+	*field = *field_orig;
+	*field_orig = 0;
+	*flags &= ~flag;
 }

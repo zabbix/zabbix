@@ -366,23 +366,23 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		if (NULL != (row = DBfetch(result)))
 			ZBX_PG_BYTEAOID = atoi(row[0]);
 		DBfree_result(result);
-	}
 
-	ZBX_PG_SVERSION = PQserverVersion(conn);
-	zabbix_log(LOG_LEVEL_DEBUG, "PostgreSQL Server version: %d", ZBX_PG_SVERSION);
+		ZBX_PG_SVERSION = PQserverVersion(conn);
+		zabbix_log(LOG_LEVEL_DEBUG, "PostgreSQL Server version: %d", ZBX_PG_SVERSION);
 
-	/* disable "nonstandard use of \' in a string literal" warning */
-	DBexecute("set escape_string_warning to off");
+		/* disable "nonstandard use of \' in a string literal" warning */
+		DBexecute("set escape_string_warning to off");
 
-	result = DBselect("show standard_conforming_strings");
-	if (NULL != (row = DBfetch(result)))
-		ZBX_PG_ESCAPE_BACKSLASH = (0 == strcmp(row[0], "off"));
-	DBfree_result(result);
+		result = DBselect("show standard_conforming_strings");
+		if (NULL != (row = DBfetch(result)))
+			ZBX_PG_ESCAPE_BACKSLASH = (0 == strcmp(row[0], "off"));
+		DBfree_result(result);
 
-	if (90000 <= ZBX_PG_SVERSION)
-	{
-		/* change the output format for values of type bytea from hex (the default) to escape */
-		DBexecute("set bytea_output=escape");
+		if (90000 <= ZBX_PG_SVERSION)
+		{
+			/* change the output format for values of type bytea from hex (the default) to escape */
+			DBexecute("set bytea_output=escape");
+		}
 	}
 #elif defined(HAVE_SQLITE3)
 #ifdef HAVE_FUNCTION_SQLITE3_OPEN_V2
@@ -1312,6 +1312,9 @@ error:
 					/* retrieve the column width in characters */
 					err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width,
 							(ub4 *)NULL, (ub4)OCI_ATTR_CHAR_SIZE, (OCIError *)oracle.errhp);
+
+					/* adjust for UTF-8 */
+					col_width *= 4;
 				}
 				else
 				{
