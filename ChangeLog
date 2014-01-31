@@ -18,6 +18,7 @@ New features:
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo)
 ..F....... [ZBX-7631] fixed dashboard favourite widget width (Eduard)
 ....I..... [ZBX-7622] changed the default value of timeperiods.every field to '1' (wiper)
 ...G...PS. [ZBX-7618] removed partial matching for long format command line options (Juris)
