@@ -34,6 +34,7 @@ New features:
 A.F....... [ZBX-1357] updated American English, French, Hungarian, Italian, Japanese, Russian, Slovak and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-7703] fixed being able to switch users without proper credentials when using HTTP authentication (Pavels)
 ...G...... [ZBX-7648] fixed name resolution when using net.dns items (Juris)
 ........S. [ZBX-6315] fixed deleting of lost triggers by the low-level discovery rule (Sasha)
 ........S. [ZBX-7109] improved performance of processing discovered triggers by the low-level discovery rule (Sasha)
@@ -793,6 +794,7 @@ New features:
 A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-7703] fixed being able to switch users without proper credentials when using HTTP authentication (Pavels)
 ...G...... [ZBX-7648] fixed name resolution when using net.dns items (Juris)
 ........S. [ZBX-6315] fixed deleting of lost triggers by the low-level discovery rule (Sasha)
 ........S. [ZBX-7109] improved performance of processing discovered triggers by the low-level discovery rule (Sasha)
@@ -2263,6 +2265,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.20rc1
 
+A......... [ZBX-7703] fixed being able to switch users without proper credentials when using HTTP authentication (Pavels)
 .......PS. [ZBX-7686] fixed UTF-8 strings not being fetched fully from Oracle (asaveljevs)
 ..F....... [ZBX-7643] fixed graph copying (Eduard)
 A......... [ZBX-3702] fixed drule.get selectDChecks parameter not returning any results; thanks to Sergey Sireskin (Pavels)
