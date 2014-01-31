@@ -109,6 +109,7 @@ sub create_next_partition {
         my $next_name = name_next_part($tables->{$table_name}->{'period'}, $curr_part);
 	my $found = 0;
 
+
 	foreach my $partition (sort keys %{$table_part}) {
 	    if ($next_name eq $partition) {
 		syslog(LOG_INFO, "Next partition for $table_name table is already created. It is $next_name");
@@ -120,8 +121,8 @@ sub create_next_partition {
 	    syslog(LOG_INFO, "Creating a partition for $table_name table ($next_name)");
             my $query = 'ALTER TABLE '."$db_schema.$table_name".' ADD PARTITION (PARTITION '.$next_name.
 			' VALUES less than (UNIX_TIMESTAMP("'.date_next_part($tables->{$table_name}->{'period'}, $curr_part).'") div 1))';
+
 	    syslog(LOG_DEBUG, $query);
-	    print $query."\n";
 	    $dbh->do($query);
         }
     }    
@@ -178,16 +179,19 @@ sub name_next_part {
     $curr_date->set_time_zone( $curr_tz );
     
     if ( $period eq 'day' ) {
+	my $curr_date = $curr_date->truncate( to => 'day' );
 	$curr_date->add(days => 1 + $curr_part);
 	
 	$name_template = $curr_date->strftime('p%Y_%m_%d');
     }
     elsif ($period eq 'week') {
-	$curr_date->add(days => 7 - $curr_date->day_of_week + 7 * $curr_part);
+	my $curr_date = $curr_date->truncate( to => 'week' );
+	$curr_date->add(days => 7 * $curr_part);
 
         $name_template = $curr_date->strftime('p%Y_%m_w%W');	
     }
     elsif ($period eq 'month') {
+	my $curr_date = $curr_date->truncate( to => 'month' );
         $curr_date->add(months => 1 + $curr_part);
 
         $name_template = $curr_date->strftime('p%Y_%m');
@@ -204,19 +208,22 @@ sub date_next_part {
     my $period_date;
 
     my $curr_date = DateTime->now;
+
     $curr_date->set_time_zone( $curr_tz );
 
     if ( $period eq 'day' ) {
+	my $curr_date = $curr_date->truncate( to => 'day' );
 	$curr_date->add(days => 2 + $curr_part);
         $period_date = $curr_date->strftime('%Y-%m-%d');
     }
     elsif ($period eq 'week') {
-	$curr_date->add(days => 7 - $curr_date->day_of_week + 7 * $curr_part + 1);
+	my $curr_date = $curr_date->truncate( to => 'week' );
+	$curr_date->add(days => 7 * $curr_part + 1);
         $period_date = $curr_date->strftime('%Y-%m-%d');
     }
     elsif ($period eq 'month') {
+	my $curr_date = $curr_date->truncate( to => 'month' );
         $curr_date->add(months => 2 + $curr_part);
-	$curr_date->add(days => -$curr_date->strftime('%d')+1);
 
         $period_date = $curr_date->strftime('%Y-%m-%d');
     }
