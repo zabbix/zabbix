@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-25 02:03+0200\n"
+"POT-Creation-Date: 2014-01-31 11:58+0200\n"
 "PO-Revision-Date: 2013-12-22 19:46+0300\n"
 "Last-Translator: Murat <murat@profelis.com.tr>\n"
 "Language-Team: American English <>\n"
@@ -1549,7 +1549,7 @@ msgstr "Yeni eleman oluşturulamıyor"
 msgid "Cannot create screen."
 msgstr "Ekran oluşturulamıyor."
 
-#: api/classes/CUser.php:1201
+#: api/classes/CUser.php:1216
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "\"%1$s\" Zabbix dahili kullanıcısı silinemiyor, bu kullanıcıyı devredışı bırakmayı deneyin."
@@ -2127,6 +2127,10 @@ msgstr ""
 #: api/classes/CHost.php:1265
 msgid "Cannot link template"
 msgstr "Şablon bağlantısı yapılamıyor"
+
+#: api/classes/CUser.php:921
+msgid "Cannot login."
+msgstr ""
 
 #: api/classes/CUser.php:846
 msgid "Cannot logout."
@@ -3145,7 +3149,7 @@ msgstr "Kopyala"
 msgid "Copy selected to ..."
 msgstr "Seçilenleri kopyalanacağı ..."
 
-#: api/classes/CUser.php:951
+#: api/classes/CUser.php:966
 #, c-format
 msgid "Correct login \"%s\"."
 msgstr ""
@@ -8431,9 +8435,14 @@ msgstr "Oturum aç"
 msgid "Login as Guest"
 msgstr "Misafir Olarak Oturum Aç"
 
-#: api/classes/CUser.php:943
+#: api/classes/CUser.php:958
 #, c-format
 msgid "Login failed \"%s\"."
+msgstr ""
+
+#: api/classes/CUser.php:926
+#, c-format
+msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
 msgstr ""
 
 #: authentication.php:119
@@ -9861,7 +9870,7 @@ msgstr ""
 msgid "No permissions for screen \"%1$s\"."
 msgstr ""
 
-#: api/classes/CUser.php:890 api/classes/CUser.php:1000
+#: api/classes/CUser.php:890 api/classes/CUser.php:1015
 msgid "No permissions for system access."
 msgstr "Sistem erişimi için izin yok."
 
@@ -9904,7 +9913,7 @@ msgstr "Sistem erişimi için izin yok."
 #: api/classes/CTrigger.php:960 api/classes/CTrigger.php:981
 #: api/classes/CTrigger.php:1856 api/classes/CTriggerPrototype.php:566
 #: api/classes/CTriggerPrototype.php:669 api/classes/CUserMacro.php:589
-#: api/classes/CUserMacro.php:698 api/classes/CUser.php:1168
+#: api/classes/CUserMacro.php:698 api/classes/CUser.php:1183
 #: include/func.inc.php:2070
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Refere edilen obje için izin yk veya mevcut değil!"
@@ -12552,7 +12561,7 @@ msgstr "Servisler"
 msgid "Services form a circular dependency."
 msgstr ""
 
-#: api/classes/CUser.php:994
+#: api/classes/CUser.php:1009
 msgid "Session terminated, re-login, please."
 msgstr "Oturum sonlandı, lütfen tekrar oturum açın."
 
@@ -14491,7 +14500,7 @@ msgstr ""
 msgid "User groups"
 msgstr "Kullanıcı Grupları"
 
-#: api/classes/CUser.php:1181
+#: api/classes/CUser.php:1196
 msgid "User is not allowed to delete himself."
 msgstr "Kullanıcının kendisini silmesine izin verilmez."
 

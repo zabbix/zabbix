@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-25 02:03+0200\n"
+"POT-Creation-Date: 2014-01-31 11:58+0200\n"
 "PO-Revision-Date: 2013-12-17 21:07+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: \n"
@@ -1547,7 +1547,7 @@ msgstr "Cannot create new element"
 msgid "Cannot create screen."
 msgstr "Cannot create screen."
 
-#: api/classes/CUser.php:1201
+#: api/classes/CUser.php:1216
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
@@ -2125,6 +2125,10 @@ msgstr "Cannot insert user media."
 #: api/classes/CHost.php:1265
 msgid "Cannot link template"
 msgstr "Cannot link template"
+
+#: api/classes/CUser.php:921
+msgid "Cannot login."
+msgstr ""
 
 #: api/classes/CUser.php:846
 msgid "Cannot logout."
@@ -3143,7 +3147,7 @@ msgstr "Copy"
 msgid "Copy selected to ..."
 msgstr "Copy selected to ..."
 
-#: api/classes/CUser.php:951
+#: api/classes/CUser.php:966
 #, c-format
 msgid "Correct login \"%s\"."
 msgstr "Correct login \"%s\"."
@@ -8429,10 +8433,15 @@ msgstr "Login"
 msgid "Login as Guest"
 msgstr "Login as Guest"
 
-#: api/classes/CUser.php:943
+#: api/classes/CUser.php:958
 #, c-format
 msgid "Login failed \"%s\"."
 msgstr "Login failed \"%s\"."
+
+#: api/classes/CUser.php:926
+#, c-format
+msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
+msgstr ""
 
 #: authentication.php:119
 msgid "Login name or password is incorrect!"
@@ -9859,7 +9868,7 @@ msgstr "No permissions for map \"%1$s\"."
 msgid "No permissions for screen \"%1$s\"."
 msgstr "No permissions for screen \"%1$s\"."
 
-#: api/classes/CUser.php:890 api/classes/CUser.php:1000
+#: api/classes/CUser.php:890 api/classes/CUser.php:1015
 msgid "No permissions for system access."
 msgstr "No permissions for system access."
 
@@ -9902,7 +9911,7 @@ msgstr "No permissions for system access."
 #: api/classes/CTrigger.php:960 api/classes/CTrigger.php:981
 #: api/classes/CTrigger.php:1856 api/classes/CTriggerPrototype.php:566
 #: api/classes/CTriggerPrototype.php:669 api/classes/CUserMacro.php:589
-#: api/classes/CUserMacro.php:698 api/classes/CUser.php:1168
+#: api/classes/CUserMacro.php:698 api/classes/CUser.php:1183
 #: include/func.inc.php:2070
 msgid "No permissions to referred object or it does not exist!"
 msgstr "No permissions to referred object or it does not exist!"
@@ -12550,7 +12559,7 @@ msgstr "Services"
 msgid "Services form a circular dependency."
 msgstr "Services form a circular dependency."
 
-#: api/classes/CUser.php:994
+#: api/classes/CUser.php:1009
 msgid "Session terminated, re-login, please."
 msgstr "Session terminated, re-login, please."
 
@@ -14489,7 +14498,7 @@ msgstr "User group for database down message \"%1$s\"."
 msgid "User groups"
 msgstr "User groups"
 
-#: api/classes/CUser.php:1181
+#: api/classes/CUser.php:1196
 msgid "User is not allowed to delete himself."
 msgstr "User is not allowed to delete himself."
 

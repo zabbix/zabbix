@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-25 03:04+0200\n"
+"POT-Creation-Date: 2014-01-31 11:58+0200\n"
 "PO-Revision-Date: 2014-01-20 10:54+0300\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -1552,7 +1552,7 @@ msgstr "Αδύνατη η δημιουργία νέου στοιχείου"
 msgid "Cannot create screen."
 msgstr "Αδύνατη η δημιουργία οθόνης."
 
-#: api/classes/CUser.php:1201
+#: api/classes/CUser.php:1216
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Αδύνατη η διαγραφή Zabbix εσωτερικού χρήστη \"%1$s\", απενεργοποιήστε το χρήστη."
@@ -2130,6 +2130,10 @@ msgstr "Αδύνατη η εισαγωγή μέσου χρήστη."
 #: api/classes/CHost.php:1265
 msgid "Cannot link template"
 msgstr "Αδύνατη η συσχέτιση σχεδιότυπου"
+
+#: api/classes/CUser.php:921
+msgid "Cannot login."
+msgstr ""
 
 #: api/classes/CUser.php:846
 msgid "Cannot logout."
@@ -3148,7 +3152,7 @@ msgstr "Αντιγραφή"
 msgid "Copy selected to ..."
 msgstr "Αντιγραφή επιλεγμένων σε ..."
 
-#: api/classes/CUser.php:951
+#: api/classes/CUser.php:966
 #, c-format
 msgid "Correct login \"%s\"."
 msgstr "Σωστή σύνδεση \"%s\"."
@@ -8436,10 +8440,15 @@ msgstr "Σύνδεση"
 msgid "Login as Guest"
 msgstr "Σύνδεση ως Φιλοξενούμενος"
 
-#: api/classes/CUser.php:943
+#: api/classes/CUser.php:958
 #, c-format
 msgid "Login failed \"%s\"."
 msgstr "Αποτυχημένη σύνδεση \"%s\"."
+
+#: api/classes/CUser.php:926
+#, c-format
+msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
+msgstr ""
 
 #: authentication.php:119
 msgid "Login name or password is incorrect!"
@@ -9867,7 +9876,7 @@ msgstr "Χωρίς δικαιώματα για χάρτη \"%1$s\"."
 msgid "No permissions for screen \"%1$s\"."
 msgstr "Χωρίς δικαιώματα για οθόνη \"%1$s\"."
 
-#: api/classes/CUser.php:890 api/classes/CUser.php:1000
+#: api/classes/CUser.php:890 api/classes/CUser.php:1015
 msgid "No permissions for system access."
 msgstr "Χωρίς δικαιώματα για πρόσβαση συστήματος."
 
@@ -9910,7 +9919,7 @@ msgstr "Χωρίς δικαιώματα για πρόσβαση συστήματ
 #: api/classes/CTrigger.php:960 api/classes/CTrigger.php:981
 #: api/classes/CTrigger.php:1856 api/classes/CTriggerPrototype.php:566
 #: api/classes/CTriggerPrototype.php:669 api/classes/CUserMacro.php:589
-#: api/classes/CUserMacro.php:698 api/classes/CUser.php:1168
+#: api/classes/CUserMacro.php:698 api/classes/CUser.php:1183
 #: include/func.inc.php:2070
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Χωρίς δικαιώματα σε αναφερόμενο αντικείμενο ή δεν υπάρχει!"
@@ -12559,7 +12568,7 @@ msgstr "Υπηρεσίες"
 msgid "Services form a circular dependency."
 msgstr "Οι υπηρεσίες σχηματίζουν κυκλική εξάρτηση."
 
-#: api/classes/CUser.php:994
+#: api/classes/CUser.php:1009
 msgid "Session terminated, re-login, please."
 msgstr "Τερματισμός συνεδρίας, επανασυνδεθείτε."
 
@@ -14498,7 +14507,7 @@ msgstr "Ομάδα χρήστη για μήνυμα πτώσης βάσης δε
 msgid "User groups"
 msgstr "Ομάδες χρηστών"
 
-#: api/classes/CUser.php:1181
+#: api/classes/CUser.php:1196
 msgid "User is not allowed to delete himself."
 msgstr "Ο χρήστης δεν επιτρέπεται να διαγράψει τον εαυτό του."
 
