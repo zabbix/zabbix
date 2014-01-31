@@ -523,8 +523,12 @@ class CHost extends CHostGeneral {
 				'preservekeys' => true
 			));
 
-			if (!$dbHosts) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+			foreach ($hosts as $host) {
+				if (!isset($dbHosts[$host['hostid']])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _(
+						'No permissions to referred object or it does not exist!'
+					));
+				}
 			}
 		}
 		else {
