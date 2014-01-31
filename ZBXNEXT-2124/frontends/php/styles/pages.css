@@ -142,6 +142,7 @@
 #sysmap_cnt .ui-selecting { border: 3px #FFCC00 solid; margin: -3px; }
 #map-window { z-index: 100; position: absolute; display: none; top: 50px; left: 500px; box-shadow: 0 0 5px 5px rgba(204, 204, 204, 0.5); }
 #map-window .formtable { width: 100%; }
+#map-window .formtable #application { width: 313px; }
 #map-window #elements-selected { border: 1px dotted black; margin-bottom: 5px; height: 128px; overflow-y: scroll; overflow-x: hidden; }
 #map-window #mapLinksContainer { border: 1px solid rgb(170, 170, 170); max-height: 128px; overflow-y: scroll; overflow-x: hidden; }
 #map-window #linkForm { display: none; }
