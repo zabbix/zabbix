@@ -539,19 +539,23 @@ class CHost extends CHostGeneral {
 		$inventoryFields = getHostInventories();
 		$inventoryFields = zbx_objectValues($inventoryFields, 'db_field');
 
-		$allowedStatuses = new CSetValidator(array(
-			'values' => array(HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED)
+		$statusValidator = new CSetValidator(array(
+			'values' => array(HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED),
+			'messageInvalid' => _('Incorrect status for host "%1$s".')
 		));
 
 		$hostNames = array();
 		foreach ($hosts as &$host) {
+			$hostName = (isset($host['host'])) ? $host['host'] : $dbHosts[$host['hostid']]['host'];
+
 			if (!check_db_fields($hostDBfields, $host)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Wrong fields for host "%s".', isset($host['host']) ? $host['host'] : ''));
 			}
 
-			if (isset($host['status']) && !$allowedStatuses->validate($host['status'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect host status.'));
+			if (isset($host['status'])) {
+				$statusValidator->setObjectName($hostName);
+				$this->checkValidator($host['status'], $statusValidator);
 			}
 
 			if (isset($host['inventory']) && !empty($host['inventory'])) {
