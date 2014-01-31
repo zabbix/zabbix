@@ -4145,21 +4145,21 @@ static int	substitute_discovery_macros_simple(char *data, char **replace_to, siz
  *                                                                            *
  * Parameters: data   - [IN/OUT] pointer to a buffer                          *
  *             jp_row - [IN] discovery data                                   *
- *             flags  - [IN] ZBX_MACRO_ANY - all LLD macros will resolved     *
+ *             flags  - [IN] ZBX_MACRO_ANY - all LLD macros will be resolved  *
  *                            without validation of the value type            *
  *                           ZBX_MACRO_NUMERIC - values for LLD macros should *
  *                            be numeric                                      *
  *                           ZBX_MACRO_SIMPLE - LLD macros, located in the    *
- *                            item key parameters in simple macros will       *
- *                            resolved with considering quotes.               *
+ *                            item key parameters in simple macros will be    *
+ *                            resolved considering quotes.                    *
  *                            Flag ZBX_MACRO_NUMERIC doesn't affect these     *
- *                            macros                                          *
+ *                            macros.                                         *
  *             error  - [OUT] should be not NULL if ZBX_MACRO_NUMERIC flag is *
  *                            set                                             *
  *                                                                            *
  * Return value: Always SUCCEED if numeric flag is not set, otherwise SUCCEED *
- *               if all discovery macros resoved to numeric values, otherwise *
- *               FAIL with an error message                                   *
+ *               if all discovery macros resolved to numeric values,          *
+ *               otherwise FAIL with an error message.                        *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
