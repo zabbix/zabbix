@@ -80,6 +80,8 @@
 #define ZBX_REMEDY_ACTION_CREATE	"CREATE"
 #define ZBX_REMEDY_ACTION_MODIFY	"MODIFY"
 
+#define ZBX_REMEDY_CI_ID_FIELD		"tag"
+
 typedef struct
 {
 	char	*name;
@@ -433,8 +435,8 @@ out:
  ******************************************************************************/
 static int	remedy_create_ticket(const char *url, const char *proxy, const char *user, const char *password,
 		const char *loginid, const char *service_name, const char *service_id, const char *ci,
-		const char *summary, const char *notes, const char *impact, const char *urgency, const char *company,
-		char **externalid, char **error)
+		const char *ci_id, const char *summary, const char *notes, const char *impact, const char *urgency,
+		const char *company, char **externalid, char **error)
 {
 #	define ZBX_POST_REMEDY_CREATE_SERVICE								\
 		ZBX_SOAP_ENVELOPE_CREATE_OPEN								\
@@ -442,7 +444,6 @@ static int	remedy_create_ticket(const char *url, const char *proxy, const char *
 		ZBX_SOAP_BODY_OPEN									\
 		"<urn:HelpDesk_Submit_Service>"								\
 			"<urn:Assigned_Group>Control center</urn:Assigned_Group>"			\
-			"<urn:CI_Name>%s</urn:CI_Name>"							\
 			"<urn:First_Name/>"								\
 			"<urn:Impact>%s</urn:Impact>"							\
 			"<urn:Last_Name/>"								\
@@ -455,6 +456,8 @@ static int	remedy_create_ticket(const char *url, const char *proxy, const char *
 			"<urn:Urgency>%s</urn:Urgency>"							\
 			"<urn:ServiceCI>%s</urn:ServiceCI>"						\
 			"<urn:ServiceCI_ReconID>%s</urn:ServiceCI_ReconID>"				\
+			"<urn:HPD_CI>%s</urn:HPD_CI>"							\
+			"<urn:HPD_CI_ReconID>%s</urn:HPD_CI_ReconID>"					\
 			"<urn:Login_ID>%s</urn:Login_ID>"						\
 			"<urn:Customer_Company>%s</urn:Customer_Company>"				\
 		"</urn:HelpDesk_Submit_Service>"							\
@@ -467,7 +470,7 @@ static int	remedy_create_ticket(const char *url, const char *proxy, const char *
 	int			ret = FAIL, err, opt;
 	char			*xml = NULL, *summary_esc = NULL, *notes_esc = NULL, *ci_esc = NULL,
 				*service_url = NULL, *impact_esc, *urgency_esc, *company_esc, *service_name_esc,
-				*service_id_esc, *user_esc = NULL, *password_esc = NULL;
+				*service_id_esc, *user_esc = NULL, *password_esc = NULL, *ci_id_esc = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -484,15 +487,16 @@ static int	remedy_create_ticket(const char *url, const char *proxy, const char *
 	summary_esc = xml_escape_dyn(summary);
 	notes_esc = xml_escape_dyn(notes);
 	ci_esc = xml_escape_dyn(ci);
+	ci_id_esc = xml_escape_dyn(ci_id);
 	impact_esc = xml_escape_dyn(impact);
 	urgency_esc = xml_escape_dyn(urgency);
 	service_name_esc = xml_escape_dyn(service_name);
 	service_id_esc = xml_escape_dyn(service_id);
 	company_esc = xml_escape_dyn(company);
 
-	xml = zbx_dsprintf(xml, ZBX_POST_REMEDY_CREATE_SERVICE, user_esc, password_esc, ci_esc, impact_esc,
+	xml = zbx_dsprintf(xml, ZBX_POST_REMEDY_CREATE_SERVICE, user_esc, password_esc, impact_esc,
 			ZBX_REMEDY_ACTION_CREATE, summary_esc, notes_esc, urgency_esc, service_name_esc,
-			service_id_esc, loginid, company_esc);
+			service_id_esc, ci_esc, ci_id_esc, loginid, company_esc);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, xml)))
 	{
@@ -528,6 +532,7 @@ out:
 	zbx_free(service_id_esc);
 	zbx_free(service_name_esc);
 	zbx_free(company_esc);
+	zbx_free(ci_id_esc);
 	zbx_free(ci_esc);
 	zbx_free(notes_esc);
 	zbx_free(summary_esc);
@@ -971,15 +976,16 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	result = DBselect("select e.value,t.priority,t.triggerid,h.host,h.hostid"
-			" from triggers t,hosts h,items i,functions f,events e"
+	result = DBselect("select e.value,t.priority,t.triggerid,h.host,h.hostid,hi." ZBX_REMEDY_CI_ID_FIELD
+			" from triggers t,hosts h,items i,functions f,events e,host_inventory hi"
 			" where e.eventid=" ZBX_FS_UI64
 				" and e.source=%d"
 				" and e.object=%d"
 				" and e.objectid=t.triggerid"
 				" and t.triggerid=f.triggerid"
 				" and f.itemid=i.itemid"
-				" and i.hostid=h.hostid",
+				" and i.hostid=h.hostid"
+				" and hi.hostid=h.hostid",
 				alert->eventid, EVENT_SOURCE_TRIGGERS,  EVENT_OBJECT_TRIGGER);
 
 	if (NULL == (row = DBfetch(result)))
@@ -1052,7 +1058,7 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 		remedy_get_service_by_host(hostid, media->smtp_email, &service_name, &service_id);
 
 		if (SUCCEED == (ret = remedy_create_ticket(media->smtp_server, media->smtp_helo, media->username,
-				media->passwd, alert->sendto, service_name, service_id, row[3], alert->subject,
+				media->passwd, alert->sendto, service_name, service_id, row[3], row[5], alert->subject,
 				alert->message, impact_map[remedy_event], urgency_map[remedy_event], media->exec_path,
 				&ticketnumber, error)))
 		{
