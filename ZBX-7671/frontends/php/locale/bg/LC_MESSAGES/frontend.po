@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-25 02:03+0200\n"
+"POT-Creation-Date: 2014-01-31 11:58+0200\n"
 "PO-Revision-Date: 2013-01-12 23:52+0200\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -1550,7 +1550,7 @@ msgstr "Не може да се създаде нов елемент"
 msgid "Cannot create screen."
 msgstr "Не може да се създаде екран."
 
-#: api/classes/CUser.php:1201
+#: api/classes/CUser.php:1216
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Не може да се изтрие Zabbix вътрешен потребител \"%1$s\", опитайте с изключване на този потребител."
@@ -2132,6 +2132,10 @@ msgstr "Не може да вмъкне потребителско уведом�
 #: api/classes/CHost.php:1265
 msgid "Cannot link template"
 msgstr "Не може да се върже шаблона"
+
+#: api/classes/CUser.php:921
+msgid "Cannot login."
+msgstr ""
 
 #: api/classes/CUser.php:846
 msgid "Cannot logout."
@@ -3153,7 +3157,7 @@ msgstr "Копирай"
 msgid "Copy selected to ..."
 msgstr "Копиране на избраните в ..."
 
-#: api/classes/CUser.php:951
+#: api/classes/CUser.php:966
 #, c-format
 msgid "Correct login \"%s\"."
 msgstr "Неправилен вход \"%s\"."
@@ -8448,10 +8452,15 @@ msgstr "Вход в системата"
 msgid "Login as Guest"
 msgstr "Вход като гост"
 
-#: api/classes/CUser.php:943
+#: api/classes/CUser.php:958
 #, c-format
 msgid "Login failed \"%s\"."
 msgstr "Неуспешно влизане \"%s\"."
+
+#: api/classes/CUser.php:926
+#, c-format
+msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
+msgstr ""
 
 #: authentication.php:119
 msgid "Login name or password is incorrect!"
@@ -9882,7 +9891,7 @@ msgstr "Нямате право на достъп до карта на мреж�
 msgid "No permissions for screen \"%1$s\"."
 msgstr "Нямате право на достъп до екран \"%1$s\"."
 
-#: api/classes/CUser.php:890 api/classes/CUser.php:1000
+#: api/classes/CUser.php:890 api/classes/CUser.php:1015
 msgid "No permissions for system access."
 msgstr "Нямате право на достъп до системата."
 
@@ -9925,7 +9934,7 @@ msgstr "Нямате право на достъп до системата."
 #: api/classes/CTrigger.php:960 api/classes/CTrigger.php:981
 #: api/classes/CTrigger.php:1856 api/classes/CTriggerPrototype.php:566
 #: api/classes/CTriggerPrototype.php:669 api/classes/CUserMacro.php:589
-#: api/classes/CUserMacro.php:698 api/classes/CUser.php:1168
+#: api/classes/CUserMacro.php:698 api/classes/CUser.php:1183
 #: include/func.inc.php:2070
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Нямате право на достъп до посочения обект или той не съществува!"
@@ -12579,7 +12588,7 @@ msgstr "Услуги"
 msgid "Services form a circular dependency."
 msgstr "Услугите образуват кръгова зависимост."
 
-#: api/classes/CUser.php:994
+#: api/classes/CUser.php:1009
 msgid "Session terminated, re-login, please."
 msgstr "Сесията е прекратена, моля влезте повторно в системата."
 
@@ -14520,7 +14529,7 @@ msgstr ""
 msgid "User groups"
 msgstr "Потребителски групи"
 
-#: api/classes/CUser.php:1181
+#: api/classes/CUser.php:1196
 msgid "User is not allowed to delete himself."
 msgstr "Не е позполено на потребителя да изтрие себе си."
 

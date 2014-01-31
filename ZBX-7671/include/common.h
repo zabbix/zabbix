@@ -272,10 +272,6 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define ITEM_STORE_SPEED_PER_SECOND		1
 #define ITEM_STORE_SIMPLE_CHANGE		2
 
-/* object types for operations */
-#define OPERATION_OBJECT_USER			0
-#define OPERATION_OBJECT_GROUP			1
-
 /* condition evaluation types */
 #define ACTION_EVAL_TYPE_AND_OR			0
 #define ACTION_EVAL_TYPE_AND			1
