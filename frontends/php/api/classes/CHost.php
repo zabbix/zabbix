@@ -522,6 +522,14 @@ class CHost extends CHostGeneral {
 				'editable' => true,
 				'preservekeys' => true
 			));
+
+			foreach ($hosts as $host) {
+				if (!isset($dbHosts[$host['hostid']])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _(
+						'No permissions to referred object or it does not exist!'
+					));
+				}
+			}
 		}
 		else {
 			$hostDBfields = array('host' => null);
@@ -539,6 +547,11 @@ class CHost extends CHostGeneral {
 		$inventoryFields = getHostInventories();
 		$inventoryFields = zbx_objectValues($inventoryFields, 'db_field');
 
+		$statusValidator = new CSetValidator(array(
+			'values' => array(HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED),
+			'messageInvalid' => _('Incorrect status for host "%1$s".')
+		));
+
 		$hostNames = array();
 		foreach ($hosts as &$host) {
 			if (!check_db_fields($hostDBfields, $host)) {
@@ -546,8 +559,14 @@ class CHost extends CHostGeneral {
 					_s('Wrong fields for host "%s".', isset($host['host']) ? $host['host'] : ''));
 			}
 
-			if (isset($host['inventory']) && !empty($host['inventory'])) {
+			if (isset($host['status'])) {
+				$hostName = (isset($host['host'])) ? $host['host'] : $dbHosts[$host['hostid']]['host'];
 
+				$statusValidator->setObjectName($hostName);
+				$this->checkValidator($host['status'], $statusValidator);
+			}
+
+			if (isset($host['inventory']) && !empty($host['inventory'])) {
 				if (isset($host['inventory_mode']) && $host['inventory_mode'] == HOST_INVENTORY_DISABLED) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set inventory fields for disabled inventory.'));
 				}
@@ -565,10 +584,6 @@ class CHost extends CHostGeneral {
 				'messageAllowedField' => _('Cannot update "%1$s" for a discovered host.')
 			));
 			if ($update) {
-				if (!isset($dbHosts[$host['hostid']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-				}
-
 				// cannot update certain fields for discovered hosts
 				$this->checkPartialValidator($host, $updateDiscoveredValidator, $dbHosts[$host['hostid']]);
 			}
@@ -1264,10 +1279,7 @@ class CHost extends CHostGeneral {
 	public function massRemove(array $data) {
 		$hostids = zbx_toArray($data['hostids']);
 
-		// check permissions
-		if (!$this->isWritable($hostids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-		}
+		$this->checkPermissions($hostids);
 
 		if (isset($data['interfaces'])) {
 			$options = array(
