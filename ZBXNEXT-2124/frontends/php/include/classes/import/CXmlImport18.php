@@ -1720,7 +1720,7 @@ class CXmlImport18 {
 			if ($dependencies->length > 0) {
 				$triggersForDependencies = zbx_objectValues($triggersForDependencies, 'triggerid');
 				$triggersForDependencies = array_flip($triggersForDependencies);
-				$newDependencies = array();
+				$triggerDependencies = array();
 				foreach ($dependencies as $dependency) {
 
 					$triggerDescription = $dependency->getAttribute('description');
@@ -1731,18 +1731,24 @@ class CXmlImport18 {
 
 						foreach ($dependsOnList as $dependsOn) {
 							$depTrigger = get_trigger_by_description($dependsOn->nodeValue);
-							if ($depTrigger['triggerid']) {
-								$newDependencies[] = array(
-									'triggerid' => $currentTrigger['triggerid'],
-									'dependsOnTriggerid' => $depTrigger['triggerid']
+							if ($depTrigger) {
+								if (!isset($triggerDependencies[$currentTrigger['triggerid']])) {
+									$triggerDependencies[$currentTrigger['triggerid']] = array(
+										'triggerid' => $currentTrigger['triggerid'],
+										'dependencies' => array()
+									);
+								}
+
+								$triggerDependencies[$currentTrigger['triggerid']]['dependencies'][] = array(
+									'triggerid' => $depTrigger['triggerid']
 								);
 							}
 						}
 					}
 				}
 
-				if ($newDependencies) {
-					API::Trigger()->addDependencies($newDependencies);
+				if ($triggerDependencies) {
+					API::Trigger()->update($triggerDependencies);
 				}
 			}
 		}
