@@ -1329,8 +1329,8 @@ PROXY_LIBS="$PROXY_LIBS $LDAP_LIBS"
 AGENT_LDFLAGS="$AGENT_LDFLAGS $LDAP_LDFLAGS"
 AGENT_LIBS="$AGENT_LIBS $LDAP_LIBS"
 
-found_libcurl="no"
-dnl Checking for libCurl [default - yes]
+found_curl="no"
+dnl Checking for libCurl [by default - skip]
 LIBCURL_CHECK_CONFIG(, [7.13.1], [],[])
 if test "x$want_curl" = "xyes"; then
 	if test "x$found_curl" != "xyes"; then
@@ -1348,6 +1348,7 @@ SERVER_LIBS="$SERVER_LIBS $LIBCURL_LIBS"
 PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBCURL_LDFLAGS"
 PROXY_LIBS="$PROXY_LIBS $LIBCURL_LIBS"
 
+dnl Starting from 2.0 agent can do web monitoring
 AGENT_LDFLAGS="$AGENT_LDFLAGS $LIBCURL_LDFLAGS"
 AGENT_LIBS="$AGENT_LIBS $LIBCURL_LIBS"
 
