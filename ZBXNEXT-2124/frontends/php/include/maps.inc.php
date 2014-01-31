@@ -1199,7 +1199,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 			));
 
 			$triggerApps = array();
-			foreach ($triggers as $trigger) {
+			foreach ($triggersToFilter as $trigger) {
 				foreach ($trigger['items'] as $item) {
 					foreach ($items[$item['itemid']]['applications'] as $app) {
 						$triggerApps[$trigger['triggerid']][$app['name']] = true;
