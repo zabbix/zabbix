@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-25 01:48+0200\n"
+"POT-Creation-Date: 2014-01-31 11:59+0200\n"
 "PO-Revision-Date: 2013-11-08 09:29+0300\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -1708,6 +1708,10 @@ msgstr "Αδύνατη η εισαγωγή μέσου χρήστη."
 msgid "Cannot link template"
 msgstr "Αδύνατη η συσχέτιση σχεδιότυπου"
 
+#: api/classes/CUser.php:956
+msgid "Cannot login."
+msgstr ""
+
 #: api/classes/CUser.php:881
 msgid "Cannot logout."
 msgstr "Αδύνατη η αποσύνδεση."
@@ -2540,7 +2544,7 @@ msgstr "Αντιγραφή"
 msgid "Copy selected to ..."
 msgstr "Αντιγραφή επιλεγμένων σε ..."
 
-#: api/classes/CUser.php:986
+#: api/classes/CUser.php:1001
 #, php-format
 msgid "Correct login \"%s\"."
 msgstr "Σωστή σύνδεση \"%s\"."
@@ -7180,10 +7184,15 @@ msgstr "Σύνδεση"
 msgid "Login as Guest"
 msgstr "Σύνδεση ως φιλοξενούμενος"
 
-#: api/classes/CUser.php:978
+#: api/classes/CUser.php:993
 #, php-format
 msgid "Login failed \"%s\"."
 msgstr "Σύνδεση απέτυχε \"%s\"."
+
+#: api/classes/CUser.php:961
+#, php-format
+msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
+msgstr ""
 
 #: authentication.php:115
 msgid "Login name or password is incorrect!"
@@ -8420,7 +8429,7 @@ msgstr "Χωρίς δικαιώματα για χάρτη \"%1$s\"."
 msgid "No permissions for screen \"%1$s\"."
 msgstr "Χωρίς δικαιώματα για οθόνη \"%1$s\"."
 
-#: api/classes/CUser.php:925 api/classes/CUser.php:1035
+#: api/classes/CUser.php:925 api/classes/CUser.php:1050
 msgid "No permissions for system access."
 msgstr "Χωρίς δικαιώματα για πρόσβαση συστήματος."
 
@@ -10920,7 +10929,7 @@ msgstr "Υπηρεσίες"
 msgid "Services form a circular dependency."
 msgstr "Οι υπηρεσίες σχηματίζουν κυκλική εξάρτηση."
 
-#: api/classes/CUser.php:1029
+#: api/classes/CUser.php:1044
 msgid "Session terminated, re-login, please."
 msgstr "Τερματισμός συνεδρίας. Επανασυνδεθείτε."
 

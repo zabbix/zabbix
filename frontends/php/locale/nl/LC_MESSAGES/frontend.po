@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-25 01:48+0200\n"
+"POT-Creation-Date: 2014-01-31 11:59+0200\n"
 "PO-Revision-Date: 2013-10-11 14:13+0300\n"
 "Last-Translator: open-future <patrik@open-future.be>\n"
 "Language-Team: NL\n"
@@ -1706,6 +1706,10 @@ msgstr "Kan media van gebruiker niet invoegen."
 msgid "Cannot link template"
 msgstr "Kan template niet ontkoppelen"
 
+#: api/classes/CUser.php:956
+msgid "Cannot login."
+msgstr ""
+
 #: api/classes/CUser.php:881
 msgid "Cannot logout."
 msgstr "Kan niet afmelden."
@@ -2538,7 +2542,7 @@ msgstr "Kopiëren"
 msgid "Copy selected to ..."
 msgstr "Kopiëer selectie naar ..."
 
-#: api/classes/CUser.php:986
+#: api/classes/CUser.php:1001
 #, php-format
 msgid "Correct login \"%s\"."
 msgstr "Correcte login \"%s\"."
@@ -7184,9 +7188,14 @@ msgstr "Login"
 msgid "Login as Guest"
 msgstr "Login in als Guest"
 
-#: api/classes/CUser.php:978
+#: api/classes/CUser.php:993
 #, php-format
 msgid "Login failed \"%s\"."
+msgstr ""
+
+#: api/classes/CUser.php:961
+#, php-format
+msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
 msgstr ""
 
 #: authentication.php:115
@@ -8424,7 +8433,7 @@ msgstr ""
 msgid "No permissions for screen \"%1$s\"."
 msgstr ""
 
-#: api/classes/CUser.php:925 api/classes/CUser.php:1035
+#: api/classes/CUser.php:925 api/classes/CUser.php:1050
 msgid "No permissions for system access."
 msgstr ""
 
@@ -10924,7 +10933,7 @@ msgstr ""
 msgid "Services form a circular dependency."
 msgstr ""
 
-#: api/classes/CUser.php:1029
+#: api/classes/CUser.php:1044
 msgid "Session terminated, re-login, please."
 msgstr ""
 

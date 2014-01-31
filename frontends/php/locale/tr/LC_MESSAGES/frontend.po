@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-25 01:48+0200\n"
+"POT-Creation-Date: 2014-01-31 11:59+0200\n"
 "PO-Revision-Date: 2013-04-29 23:58+0200\n"
 "Last-Translator: Murat <murat@profelis.com.tr>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1705,6 +1705,10 @@ msgstr "Kullanıcı iletişim aracı eklenemiyor."
 msgid "Cannot link template"
 msgstr "Şablon bağlantılanamadı"
 
+#: api/classes/CUser.php:956
+msgid "Cannot login."
+msgstr ""
+
 #: api/classes/CUser.php:881
 msgid "Cannot logout."
 msgstr "Oturum kapatılamadı."
@@ -2537,7 +2541,7 @@ msgstr "Kopyala"
 msgid "Copy selected to ..."
 msgstr "Seçilenleri kopyalanacağı ..."
 
-#: api/classes/CUser.php:986
+#: api/classes/CUser.php:1001
 #, php-format
 msgid "Correct login \"%s\"."
 msgstr "Başarılı oturum açımı \"%s\"."
@@ -7175,10 +7179,15 @@ msgstr "Oturum aç"
 msgid "Login as Guest"
 msgstr "Misafir Olarak Oturum Aç"
 
-#: api/classes/CUser.php:978
+#: api/classes/CUser.php:993
 #, php-format
 msgid "Login failed \"%s\"."
 msgstr "Oturum açma başarısız \"%s\"."
+
+#: api/classes/CUser.php:961
+#, php-format
+msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
+msgstr ""
 
 #: authentication.php:115
 msgid "Login name or password is incorrect!"
@@ -8415,7 +8424,7 @@ msgstr ""
 msgid "No permissions for screen \"%1$s\"."
 msgstr ""
 
-#: api/classes/CUser.php:925 api/classes/CUser.php:1035
+#: api/classes/CUser.php:925 api/classes/CUser.php:1050
 msgid "No permissions for system access."
 msgstr "Sistem erişimi için izin yok."
 
@@ -10915,7 +10924,7 @@ msgstr "Servisler"
 msgid "Services form a circular dependency."
 msgstr ""
 
-#: api/classes/CUser.php:1029
+#: api/classes/CUser.php:1044
 msgid "Session terminated, re-login, please."
 msgstr "Oturum sonlandı, lütfen tekrar oturum açın."
 

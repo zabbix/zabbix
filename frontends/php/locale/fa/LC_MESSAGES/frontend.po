@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-25 01:48+0200\n"
+"POT-Creation-Date: 2014-01-31 11:59+0200\n"
 "PO-Revision-Date: 2012-10-06 14:22+0200\n"
 "Last-Translator: Nader <jafari@sain.ir>\n"
 "Language-Team: none\n"
@@ -1693,6 +1693,10 @@ msgstr ""
 msgid "Cannot link template"
 msgstr "قالب نمی تواند پیوندزده شود"
 
+#: api/classes/CUser.php:956
+msgid "Cannot login."
+msgstr ""
+
 #: api/classes/CUser.php:881
 msgid "Cannot logout."
 msgstr "نمیتوانید خارج شوید"
@@ -2514,7 +2518,7 @@ msgstr "رونوشت"
 msgid "Copy selected to ..."
 msgstr "کپی انتخاب شده ها به..."
 
-#: api/classes/CUser.php:986
+#: api/classes/CUser.php:1001
 #, php-format
 msgid "Correct login \"%s\"."
 msgstr ""
@@ -7151,9 +7155,14 @@ msgstr "ورود"
 msgid "Login as Guest"
 msgstr "ورود به عنوان میهمان"
 
-#: api/classes/CUser.php:978
+#: api/classes/CUser.php:993
 #, php-format
 msgid "Login failed \"%s\"."
+msgstr ""
+
+#: api/classes/CUser.php:961
+#, php-format
+msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
 msgstr ""
 
 #: authentication.php:115
@@ -8388,7 +8397,7 @@ msgstr ""
 msgid "No permissions for screen \"%1$s\"."
 msgstr ""
 
-#: api/classes/CUser.php:925 api/classes/CUser.php:1035
+#: api/classes/CUser.php:925 api/classes/CUser.php:1050
 msgid "No permissions for system access."
 msgstr ""
 
@@ -10886,7 +10895,7 @@ msgstr "سرویس ها "
 msgid "Services form a circular dependency."
 msgstr ""
 
-#: api/classes/CUser.php:1029
+#: api/classes/CUser.php:1044
 msgid "Session terminated, re-login, please."
 msgstr "جلسه پایان یافت ، لطفاً دوباره وارد شوید"
 

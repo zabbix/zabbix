@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-25 01:48+0200\n"
+"POT-Creation-Date: 2014-01-31 11:59+0200\n"
 "PO-Revision-Date: 2013-08-16 03:47+0200\n"
 "Last-Translator: solutionware <shiys@solutionware.com.cn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1697,6 +1697,10 @@ msgstr "不能插入用户示警媒体"
 msgid "Cannot link template"
 msgstr "无法连结模板"
 
+#: api/classes/CUser.php:956
+msgid "Cannot login."
+msgstr ""
+
 #: api/classes/CUser.php:881
 msgid "Cannot logout."
 msgstr "不能登出"
@@ -2529,7 +2533,7 @@ msgstr "复制"
 msgid "Copy selected to ..."
 msgstr "复制所选的到 ..."
 
-#: api/classes/CUser.php:986
+#: api/classes/CUser.php:1001
 #, php-format
 msgid "Correct login \"%s\"."
 msgstr "正确登录\"%s\"."
@@ -7165,10 +7169,15 @@ msgstr "登录"
 msgid "Login as Guest"
 msgstr "登录为访客"
 
-#: api/classes/CUser.php:978
+#: api/classes/CUser.php:993
 #, php-format
 msgid "Login failed \"%s\"."
 msgstr "登录失败\"%s\"."
+
+#: api/classes/CUser.php:961
+#, php-format
+msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
+msgstr ""
 
 #: authentication.php:115
 msgid "Login name or password is incorrect!"
@@ -8402,7 +8411,7 @@ msgstr "不具拓扑图\"%1$s\"的许可权."
 msgid "No permissions for screen \"%1$s\"."
 msgstr "不具筛选 \"%1$s\"的许可权."
 
-#: api/classes/CUser.php:925 api/classes/CUser.php:1035
+#: api/classes/CUser.php:925 api/classes/CUser.php:1050
 msgid "No permissions for system access."
 msgstr "没有系统访问的许可权"
 
@@ -10900,7 +10909,7 @@ msgstr "服务"
 msgid "Services form a circular dependency."
 msgstr "服务形成了一个循环式依赖."
 
-#: api/classes/CUser.php:1029
+#: api/classes/CUser.php:1044
 msgid "Session terminated, re-login, please."
 msgstr "连接期已中断, 请重连."
 

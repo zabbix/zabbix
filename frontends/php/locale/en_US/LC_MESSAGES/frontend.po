@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-25 01:48+0200\n"
+"POT-Creation-Date: 2014-01-31 11:59+0200\n"
 "PO-Revision-Date: 2013-11-05 22:47+0300\n"
 "Last-Translator: Jonathan <linuxgurugamer@gmail.com>\n"
 "Language-Team: RedPrairie\n"
@@ -1703,6 +1703,10 @@ msgstr "Cannot insert user media."
 msgid "Cannot link template"
 msgstr "Cannot link template"
 
+#: api/classes/CUser.php:956
+msgid "Cannot login."
+msgstr ""
+
 #: api/classes/CUser.php:881
 msgid "Cannot logout."
 msgstr "Cannot logout."
@@ -2535,7 +2539,7 @@ msgstr "Copy"
 msgid "Copy selected to ..."
 msgstr "Copy selected to ..."
 
-#: api/classes/CUser.php:986
+#: api/classes/CUser.php:1001
 #, php-format
 msgid "Correct login \"%s\"."
 msgstr "Correct login \"%s\"."
@@ -7173,10 +7177,15 @@ msgstr "Login"
 msgid "Login as Guest"
 msgstr "Login as Guest"
 
-#: api/classes/CUser.php:978
+#: api/classes/CUser.php:993
 #, php-format
 msgid "Login failed \"%s\"."
 msgstr "Login failed \"%s\"."
+
+#: api/classes/CUser.php:961
+#, php-format
+msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
+msgstr ""
 
 #: authentication.php:115
 msgid "Login name or password is incorrect!"
@@ -8413,7 +8422,7 @@ msgstr "No permissions for map \"%1$s\"."
 msgid "No permissions for screen \"%1$s\"."
 msgstr "No permissions for screen \"%1$s\"."
 
-#: api/classes/CUser.php:925 api/classes/CUser.php:1035
+#: api/classes/CUser.php:925 api/classes/CUser.php:1050
 msgid "No permissions for system access."
 msgstr "No permissions for system access."
 
@@ -10912,7 +10921,7 @@ msgstr "Services"
 msgid "Services form a circular dependency."
 msgstr "Services form a circular dependency."
 
-#: api/classes/CUser.php:1029
+#: api/classes/CUser.php:1044
 msgid "Session terminated, re-login, please."
 msgstr "Session terminated, re-login, please."
 
