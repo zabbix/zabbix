@@ -539,6 +539,10 @@ class CHost extends CHostGeneral {
 		$inventoryFields = getHostInventories();
 		$inventoryFields = zbx_objectValues($inventoryFields, 'db_field');
 
+		$allowedStatuses = new CSetValidator(array(
+			'values' => array(HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED)
+		));
+
 		$hostNames = array();
 		foreach ($hosts as &$host) {
 			if (!check_db_fields($hostDBfields, $host)) {
@@ -546,8 +550,11 @@ class CHost extends CHostGeneral {
 					_s('Wrong fields for host "%s".', isset($host['host']) ? $host['host'] : ''));
 			}
 
-			if (isset($host['inventory']) && !empty($host['inventory'])) {
+			if (isset($host['status']) && !$allowedStatuses->validate($host['status'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect host status.'));
+			}
 
+			if (isset($host['inventory']) && !empty($host['inventory'])) {
 				if (isset($host['inventory_mode']) && $host['inventory_mode'] == HOST_INVENTORY_DISABLED) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set inventory fields for disabled inventory.'));
 				}
@@ -1264,10 +1271,7 @@ class CHost extends CHostGeneral {
 	public function massRemove(array $data) {
 		$hostids = zbx_toArray($data['hostids']);
 
-		// check permissions
-		if (!$this->isWritable($hostids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-		}
+		$this->checkPermissions($hostids);
 
 		if (isset($data['interfaces'])) {
 			$options = array(
