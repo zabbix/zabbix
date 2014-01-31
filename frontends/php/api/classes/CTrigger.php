@@ -453,9 +453,6 @@ class CTrigger extends CTriggerGeneral {
 			return count($triggers);
 		}
 
-		$triggerids = array_keys($triggers);
-		sort($triggerids);
-
 		foreach ($triggers as $trigger) {
 			if (!isset($result[$trigger['triggerid']])) {
 				$result[$trigger['triggerid']] = array();
@@ -1825,8 +1822,6 @@ class CTrigger extends CTriggerGeneral {
 			if (isset($sqlParts['select']['hostname'])) {
 				$sqlParts['select']['hostname'] = 'h.name as hostname';
 			}
-
-			$sqlParts = $this->addQueryOrder('t.lastchange', $sqlParts, ZBX_SORT_DOWN);
 		}
 
 		return $sqlParts;
