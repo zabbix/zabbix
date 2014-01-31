@@ -479,7 +479,12 @@ int	main(int argc, char **argv)
 				}
 			}
 
-			p = get_string(p, key_value, sizeof(key_value));
+			if ('\0' == *p || NULL == (p = get_string(p, key_value, sizeof(key_value))))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "[line %d] 'Key value' required");
+				ret = FAIL;
+				break;
+			}
 
 			zbx_rtrim(key_value, "\r\n");
 
