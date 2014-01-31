@@ -2,6 +2,7 @@
 Changes for 2.3.0
 
 New features:
+..F....... [ZBX-7713] changed the event details page to display all hosts used in a trigger (Ivo)
 ....I..... [ZBX-7109] removed unused fields in trigger_discovery table (Sasha)
 ........S. [ZBXNEXT-1700] added informative messages about database connection restoration (Juris)
 ..F....... [ZBX-7609] fixed frontend messages mute/unmute (Eduard)
