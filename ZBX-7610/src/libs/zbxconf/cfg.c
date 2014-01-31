@@ -176,10 +176,6 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 						if (FAIL == str2uint64(value, "KMGT", &var))
 							goto incorrect_config;
 
-						/* usability: 2G converts to 0x7fffffff (2GB - 1 byte) */
-						if ((zbx_uint64_t)2 * ZBX_GIBIBYTE == var)
-							var--;
-
 						if (cfg[i].min > var || (0 != cfg[i].max && var > cfg[i].max))
 							goto incorrect_config;
 
