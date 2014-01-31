@@ -481,7 +481,7 @@ int	main(int argc, char **argv)
 
 			if ('\0' == *p || NULL == (p = get_string(p, key_value, sizeof(key_value))))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "[line %d] 'Key value' required");
+				zabbix_log(LOG_LEVEL_WARNING, "[line %d] 'Key value' required", total_count);
 				ret = FAIL;
 				break;
 			}
