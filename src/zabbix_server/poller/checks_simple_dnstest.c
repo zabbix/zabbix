@@ -2023,6 +2023,14 @@ out:
 #define RDDS_ONLY43	2
 #define RDDS_ONLY80	3
 
+static int	zbx_ec_noerror(int ec)
+{
+	if (0 < ec || ZBX_NO_VALUE == ec)
+		return SUCCEED;
+
+	return FAIL;
+}
+
 int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, AGENT_RESULT *result)
 {
 	char			domain[ZBX_HOST_BUF_SIZE], *value_str = NULL, *res_ip = NULL, *testprefix = NULL,
@@ -2209,7 +2217,7 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 
 	/* if RDDS43 fails we should still process RDDS80 */
 
-	if (0 < rtt43)
+	if (SUCCEED == zbx_ec_noerror(rtt43))
 	{
 		/* choose random IP */
 		i = zbx_random(ips43.values_num);
@@ -2231,7 +2239,7 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 		}
 	}
 
-	if (0 < rtt43)
+	if (SUCCEED == zbx_ec_noerror(rtt43))
 	{
 		zbx_get_rdds43_nss(&nss, answer, rdds_ns_string, log_fd);
 
@@ -2244,7 +2252,7 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 		}
 	}
 
-	if (0 < rtt43)
+	if (SUCCEED == zbx_ec_noerror(rtt43))
 	{
 		/* choose random NS from the output */
 		i = zbx_random(nss.values_num);
@@ -2278,9 +2286,15 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 				/* successful UPD */
 				upd43 = now - ts;
 			}
-		}
 
-		zbx_dns_infof(log_fd, "===>\n%.*s\n<=== end RDDS43 test (rtt:%d)", ZBX_RDDS_PREVIEW_SIZE, answer, rtt43);
+			zbx_dns_infof(log_fd, "===>\n%.*s\n<=== end RDDS43 test (rtt:%d upd43:%d)",
+					ZBX_RDDS_PREVIEW_SIZE, answer, rtt43, upd43);
+		}
+		else
+		{
+			zbx_dns_infof(log_fd, "===>\n%.*s\n<=== end RDDS43 test (rtt:%d)",
+					ZBX_RDDS_PREVIEW_SIZE, answer, rtt43);
+		}
 	}
 
 	zbx_dns_infof(log_fd, "start RDDS80 test (url %s, host %s)", testname, random_host);
