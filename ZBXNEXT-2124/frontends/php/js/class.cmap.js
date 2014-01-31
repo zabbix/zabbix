@@ -563,10 +563,10 @@ ZABBIX.apps.map = (function($) {
 
 					PopUp('popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'
 						+ '&with_applications=1&dstfrm=selementForm'
-						+ ((data.length) ? '&hostid='+ data[0].id : ''),
+						+ ((data.length > 0) ? '&hostid='+ data[0].id : ''),
 						450, 450
 					);
-				})
+				});
 
 				// mass update form
 				$('#massClose').click(function() {
