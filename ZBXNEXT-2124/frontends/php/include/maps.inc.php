@@ -1166,7 +1166,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 
 		$all_triggers = array_merge($all_triggers, $triggers);
 
-		$triggerToFilter = array();
+		$triggersToFilter = array();
 		foreach ($triggers as $trigger) {
 			foreach ($trigger['hosts'] as $host) {
 				if (isset($hosts_map[$host['hostid']])) {
@@ -1192,7 +1192,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 				}
 			}
 			$items = API::Item()->get(array(
-				'output' => array('item'),
+				'output' => array('itemid'),
 				'selectApplications' => array('name'),
 				'itemids' => $itemIds,
 				'preservekeys' => true
@@ -1202,7 +1202,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 			foreach ($triggers as $trigger) {
 				foreach ($trigger['items'] as $item) {
 					foreach ($items[$item['itemid']]['applications'] as $app) {
-						$triggerApps[$trigger['triggerid']][$app['name']] = $app['name'];
+						$triggerApps[$trigger['triggerid']][$app['name']] = true;
 					}
 				}
 			}
