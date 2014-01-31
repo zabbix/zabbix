@@ -18,6 +18,7 @@ New features:
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo)
 ..F....... [ZBX-7631] fixed dashboard favourite widget width (Eduard)
 ....I..... [ZBX-7622] changed the default value of timeperiods.every field to '1' (wiper)
 ...G...PS. [ZBX-7618] removed partial matching for long format command line options (Juris)
@@ -35,6 +36,7 @@ New features:
 A.F....... [ZBX-1357] updated American English, French, Hungarian, Italian, Japanese, Russian, Slovak and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-7671] fixed error when importing an existing trigger with dependencies from 1.8 (Pavels)
 A......... [ZBX-7703] fixed being able to switch users without proper credentials when using HTTP authentication (Pavels)
 ...G...... [ZBX-7648] fixed name resolution when using net.dns items (Juris)
 ........S. [ZBX-6315] fixed deleting of lost triggers by the low-level discovery rule (Sasha)
