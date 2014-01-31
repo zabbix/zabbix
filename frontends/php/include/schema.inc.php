@@ -5903,13 +5903,8 @@ return array(
 	),
 	'trigger_discovery' => array(
 		'type' => DB::TABLE_TYPE_CONFIG,
-		'key' => 'triggerdiscoveryid',
+		'key' => 'triggerid',
 		'fields' => array(
-			'triggerdiscoveryid' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-			),
 			'triggerid' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
@@ -5923,12 +5918,6 @@ return array(
 				'length' => 20,
 				'ref_table' => 'triggers',
 				'ref_field' => 'triggerid',
-			),
-			'name' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => '',
 			),
 		),
 	),
