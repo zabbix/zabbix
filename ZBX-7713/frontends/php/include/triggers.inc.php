@@ -1621,20 +1621,16 @@ function make_trigger_details($trigger) {
 	$hosts = API::Host()->get(array(
 		'output' => array('name', 'hostid', 'status'),
 		'hostids' => $hostIds,
-		'selectScreens' => API_OUTPUT_COUNT,
-		'preservekeys' => true
+		'selectScreens' => API_OUTPUT_COUNT
 	));
 
-	$hostNameCount = 0;
-	foreach ($hosts as $host) {
-		$scripts = API::Script()->getScriptsByHosts($host['hostid']);
+	$scripts = API::Script()->getScriptsByHosts($hostIds);
 
+	foreach ($hosts as $host) {
 		$hostName = new CSpan($host['name'], 'link_menu');
-		$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts ? reset($scripts) : null));
+		$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
 		$hostNames[] = $hostName;
 		$hostNames[] = ', ';
-
-		$hostNameCount++;
 	}
 	array_pop($hostNames);
 
@@ -1642,7 +1638,7 @@ function make_trigger_details($trigger) {
 	if (is_show_all_nodes()) {
 		$table->addRow(array(_('Node'), get_node_name_by_elid($trigger['triggerid'])));
 	}
-	$table->addRow(array(_n('Host', 'Hosts', $hostNameCount), $hostNames));
+	$table->addRow(array(_n('Host', 'Hosts', count($hosts)), $hostNames));
 	$table->addRow(array(_('Trigger'), CMacrosResolverHelper::resolveTriggerName($trigger)));
 	$table->addRow(array(_('Severity'), getSeverityCell($trigger['priority'])));
 	$table->addRow(array(_('Expression'), explode_exp($trigger['expression'], true, true)));
