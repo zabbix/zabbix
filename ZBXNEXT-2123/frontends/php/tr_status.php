@@ -500,16 +500,6 @@ else {
 	$options['hostids'] = array();
 }
 
-// application filter
-if ($filter['application'] !== '') {
-	$applications = API::Application()->get(array(
-		'output' => array('applicationid'),
-		'hostids' => isset($options['hostids']) ? $options['hostids'] : null,
-		'search' => array('name' => $filter['application'])
-	));
-	$options['applicationids'] = zbx_objectValues($applications, 'applicationid');
-}
-
 // inventory filter
 if ($filter['inventory']) {
 	$inventoryFilter = array();
@@ -523,6 +513,16 @@ if ($filter['inventory']) {
 		'searchInventory' => $inventoryFilter
 	));
 	$options['hostids'] = zbx_objectValues($hosts, 'hostid');
+}
+
+// application filter
+if ($filter['application'] !== '') {
+	$applications = API::Application()->get(array(
+		'output' => array('applicationid'),
+		'hostids' => isset($options['hostids']) ? $options['hostids'] : null,
+		'search' => array('name' => $filter['application'])
+	));
+	$options['applicationids'] = zbx_objectValues($applications, 'applicationid');
 }
 
 if (!zbx_empty($_REQUEST['txt_select'])) {
