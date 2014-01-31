@@ -2,7 +2,7 @@ Changes for 2.2.2rc1
 
 New features:
 .......PS. [ZBX-7649] synchronize ICMP checks based on item interface. This should reduce the number of fping invocations in most cases (wiper)
-..F.....S. [ZBXNEXT-2069] added HOST.PORT macro support to internal/trigger based notifications and also to trigger names/descriptions  (wiper, Oleg)
+..F.....S. [ZBXNEXT-2069] added HOST.PORT macro support to internal/trigger based notifications and also to trigger names/descriptions (wiper, Oleg)
 A.F....... [ZBX-1357] updated American English, French, Hungarian, Italian, Japanese, Russian, Slovak and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
