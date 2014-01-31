@@ -522,6 +522,10 @@ class CHost extends CHostGeneral {
 				'editable' => true,
 				'preservekeys' => true
 			));
+
+			if (!$dbHosts) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+			}
 		}
 		else {
 			$hostDBfields = array('host' => null);
@@ -546,14 +550,14 @@ class CHost extends CHostGeneral {
 
 		$hostNames = array();
 		foreach ($hosts as &$host) {
-			$hostName = (isset($host['host'])) ? $host['host'] : $dbHosts[$host['hostid']]['host'];
-
 			if (!check_db_fields($hostDBfields, $host)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Wrong fields for host "%s".', isset($host['host']) ? $host['host'] : ''));
 			}
 
 			if (isset($host['status'])) {
+				$hostName = (isset($host['host'])) ? $host['host'] : $dbHosts[$host['hostid']]['host'];
+
 				$statusValidator->setObjectName($hostName);
 				$this->checkValidator($host['status'], $statusValidator);
 			}
@@ -576,10 +580,6 @@ class CHost extends CHostGeneral {
 				'messageAllowedField' => _('Cannot update "%1$s" for a discovered host.')
 			));
 			if ($update) {
-				if (!isset($dbHosts[$host['hostid']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-				}
-
 				// cannot update certain fields for discovered hosts
 				$this->checkPartialValidator($host, $updateDiscoveredValidator, $dbHosts[$host['hostid']]);
 			}
