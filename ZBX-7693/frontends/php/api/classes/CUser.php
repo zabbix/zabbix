@@ -632,7 +632,9 @@ class CUser extends CZBXAPI {
 	/**
 	 * Add user media.
 	 *
+	 * @param array  $data['users']
 	 * @param string $data['users']['userid']
+	 * @param array  $data['medias']
 	 * @param string $data['medias']['mediatypeid']
 	 * @param string $data['medias']['address']
 	 * @param int    $data['medias']['severity']
@@ -641,12 +643,9 @@ class CUser extends CZBXAPI {
 	 *
 	 * @return array
 	 */
-	public function addMedia($data) {
-		$users = zbx_toArray($data['users']);
-		$media = zbx_toArray($data['medias']);
-
-		$this->validateAddMedia($users, $media);
-		$mediaIds = $this->addMediaReal($users, $media);
+	public function addMedia(array $data) {
+		$this->validateAddMedia($data);
+		$mediaIds = $this->addMediaReal($data);
 
 		return array('mediaids' => $mediaIds);
 	}
@@ -656,20 +655,29 @@ class CUser extends CZBXAPI {
 	 *
 	 * @throws APIException if the input is invalid
 	 *
-	 * @param string $users['userid']
-	 * @param string $media['mediatypeid']
-	 * @param string $media['address']
-	 * @param int    $media['severity']
-	 * @param int    $media['active']
-	 * @param string $media['period']
+	 * @param array  $data['users']
+	 * @param string $data['users']['userid']
+	 * @param array  $data['medias']
+	 * @param string $data['medias']['mediatypeid']
+	 * @param string $data['medias']['address']
+	 * @param int    $data['medias']['severity']
+	 * @param int    $data['medias']['active']
+	 * @param string $data['medias']['period']
 	 */
-	protected function validateAddMedia(array $users, array $media) {
+	protected function validateAddMedia(array $data) {
 		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only Zabbix Admins can add user media.'));
 		}
 
+		if (!isset($data['users']) || !isset($data['medias'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
+		}
+
+		$users = zbx_toArray($data['users']);
+		$media = zbx_toArray($data['medias']);
+
 		if (!$this->isWritable(zbx_objectValues($users, 'userid'))) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permissions to create other user media.'));
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permissions to create media for other users.'));
 		}
 
 		$mediaDBfields = array(
@@ -688,11 +696,9 @@ class CUser extends CZBXAPI {
 
 		$timePeriodValidator = new CTimePeriodValidator();
 
-		foreach ($users as $user) {
-			foreach ($media as $mediaItem) {
-				if (!$timePeriodValidator->validate($mediaItem['period'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $timePeriodValidator->getError());
-				}
+		foreach ($media as $mediaItem) {
+			if (!$timePeriodValidator->validate($mediaItem['period'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $timePeriodValidator->getError());
 			}
 		}
 	}
@@ -700,16 +706,23 @@ class CUser extends CZBXAPI {
 	/**
 	 * Create user media.
 	 *
-	 * @param string $users['userid']
-	 * @param string $media['mediatypeid']
-	 * @param string $media['address']
-	 * @param int    $media['severity']
-	 * @param int    $media['active']
-	 * @param string $media['period']
+	 * @throws APIException if user media insert is fail.
+	 *
+	 * @param array  $data['users']
+	 * @param string $data['users']['userid']
+	 * @param array  $data['medias']
+	 * @param string $data['medias']['mediatypeid']
+	 * @param string $data['medias']['address']
+	 * @param int    $data['medias']['severity']
+	 * @param int    $data['medias']['active']
+	 * @param string $data['medias']['period']
 	 *
 	 * @return array
 	 */
-	protected function addMediaReal(array $users, array $media) {
+	protected function addMediaReal(array $data) {
+		$users = zbx_toArray($data['users']);
+		$media = zbx_toArray($data['medias']);
+
 		$mediaIds = array();
 
 		foreach ($users as $user) {
@@ -735,13 +748,13 @@ class CUser extends CZBXAPI {
 	/**
 	 * Update user media.
 	 *
-	 * @param array  $data
+	 * @throws APIException if user media update is fail.
+	 *
 	 * @param array  $data['users']
-	 * @param array  $data['users']['userid']
+	 * @param string $data['users']['userid']
 	 * @param array  $data['medias']
-	 * @param string $data['medias']['mediaid']
 	 * @param string $data['medias']['mediatypeid']
-	 * @param string $data['medias']['sendto']
+	 * @param string $data['medias']['address']
 	 * @param int    $data['medias']['severity']
 	 * @param int    $data['medias']['active']
 	 * @param string $data['medias']['period']
@@ -749,6 +762,8 @@ class CUser extends CZBXAPI {
 	 * @return array
 	 */
 	public function updateMedia(array $data) {
+		$this->validateUpdateMedia($data);
+
 		$users = zbx_toArray($data['users']);
 		$media = zbx_toArray($data['medias']);
 
@@ -760,8 +775,6 @@ class CUser extends CZBXAPI {
 			'editable' => true,
 			'preservekeys' => true
 		));
-
-		$this->validateUpdateMedia($media, $dbMedia);
 
 		$mediaToCreate = $mediaToUpdate = $mediaToDelete = array();
 
@@ -784,9 +797,12 @@ class CUser extends CZBXAPI {
 			$mediaToDelete[$dbMediaItem['mediaid']] = $dbMediaItem['mediaid'];
 		}
 
-		// delete
-		if ($mediaToDelete) {
-			$this->deleteMedia($mediaToDelete);
+		// create
+		if ($mediaToCreate) {
+			$this->addMediaReal(array(
+				'users' => $users,
+				'medias' => $mediaToCreate
+			));
 		}
 
 		// update
@@ -808,10 +824,9 @@ class CUser extends CZBXAPI {
 			}
 		}
 
-		// create
-		if ($mediaToCreate) {
-			$this->validateAddMedia($users, $mediaToCreate);
-			$this->addMediaReal($users, $mediaToCreate);
+		// delete
+		if ($mediaToDelete) {
+			$this->deleteMediaReal($mediaToDelete);
 		}
 
 		return array('userids' => $userIds);
@@ -822,21 +837,35 @@ class CUser extends CZBXAPI {
 	 *
 	 * @throws APIException if the input is invalid
 	 *
-	 * @param string $media['mediatypeid']
-	 * @param string $media['address']
-	 * @param int    $media['severity']
-	 * @param int    $media['active']
-	 * @param string $media['period']
-	 * @param array  $dbMedia
-	 *
-	 * @return array
+	 * @param array  $data['users']
+	 * @param string $data['users']['userid']
+	 * @param array  $data['medias']
+	 * @param string $data['medias']['mediatypeid']
+	 * @param string $data['medias']['address']
+	 * @param int    $data['medias']['severity']
+	 * @param int    $data['medias']['active']
+	 * @param string $data['medias']['period']
 	 */
-	protected function validateUpdateMedia(array $media, array $dbMedia) {
+	protected function validateUpdateMedia(array $data) {
 		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Zabbix Admins can change user media.'));
 		}
 
-		$mediaToUpdate = array();
+		if (!isset($data['users']) || !isset($data['medias'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
+		}
+
+		$users = zbx_toArray($data['users']);
+		$media = zbx_toArray($data['medias']);
+
+		$dbMedia = API::UserMedia()->get(array(
+			'output' => array('mediaid'),
+			'userids' => zbx_objectValues($users, 'userid'),
+			'editable' => true,
+			'preservekeys' => true
+		));
+
+		$mediaToCreate = $mediaToUpdate = $mediaToDelete = array();
 
 		foreach ($media as $mediaItem) {
 			if (isset($mediaItem['mediaid'])) {
@@ -846,6 +875,26 @@ class CUser extends CZBXAPI {
 
 				$mediaToUpdate[$mediaItem['mediaid']] = $mediaItem;
 			}
+			else {
+				$mediaToCreate[] = $mediaItem;
+			}
+		}
+
+		foreach ($dbMedia as $dbMediaItem) {
+			foreach ($media as $mediaItem) {
+				if (isset($mediaItem['mediaid']) && bccomp($mediaItem['mediaid'], $dbMediaItem['mediaid']) == 0) {
+					continue 2;
+				}
+			}
+
+			$mediaToDelete[$dbMediaItem['mediaid']] = $dbMediaItem['mediaid'];
+		}
+
+		if ($mediaToCreate) {
+			$this->validateAddMedia(array(
+				'users' => $users,
+				'medias' => $mediaToCreate
+			));
 		}
 
 		if ($mediaToUpdate) {
@@ -871,6 +920,10 @@ class CUser extends CZBXAPI {
 				}
 			}
 		}
+
+		if ($mediaToDelete) {
+			$this->validateDeleteMedia($mediaToDelete);
+		}
 	}
 
 	/**
@@ -884,10 +937,7 @@ class CUser extends CZBXAPI {
 		$mediaIds = zbx_toArray($mediaIds);
 
 		$this->validateDeleteMedia($mediaIds);
-
-		if (!DBexecute('DELETE FROM media WHERE '.dbConditionInt('mediaid', $mediaIds))) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete user media.'));
-		}
+		$this->deleteMediaReal($mediaIds);
 
 		return array('mediaids' => $mediaIds);
 	}
@@ -896,10 +946,6 @@ class CUser extends CZBXAPI {
 	 * Validate delete user media.
 	 *
 	 * @throws APIException if the input is invalid
-	 *
-	 * @param array $mediaIds
-	 *
-	 * @return array
 	 */
 	protected function validateDeleteMedia(array $mediaIds) {
 		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
@@ -914,6 +960,17 @@ class CUser extends CZBXAPI {
 
 		if (count($mediaIds) != $dbMediaCount) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('You do not have permissions to delete other user media.'));
+		}
+	}
+
+	/**
+	 * Delete user media.
+	 *
+	 * @throws APIException if delete is fail
+	 */
+	public function deleteMediaReal($mediaIds) {
+		if (!DBexecute('DELETE FROM media WHERE '.dbConditionInt('mediaid', $mediaIds))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
 

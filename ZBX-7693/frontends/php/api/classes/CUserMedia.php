@@ -88,7 +88,7 @@ class CUserMedia extends CZBXAPI {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			if (!$options['editable'] && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
 				$sqlParts['from']['users_groups'] = 'users_groups ug';
-				$sqlParts['where']['uug'] = 'u.userid=ug.userid';
+				$sqlParts['where']['mug'] = 'm.userid=ug.userid';
 				$sqlParts['where'][] = 'ug.usrgrpid IN ('.
 					' SELECT uug.usrgrpid'.
 					' FROM users_groups uug'.
@@ -97,6 +97,7 @@ class CUserMedia extends CZBXAPI {
 			}
 			else {
 				$sqlParts['from']['users'] = 'users u';
+				$sqlParts['where']['mu'] = 'm.userid=u.userid';
 				$sqlParts['where'][] = 'u.userid='.self::$userData['userid'];
 			}
 		}
