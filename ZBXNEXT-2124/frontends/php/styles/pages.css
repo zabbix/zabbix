@@ -116,7 +116,6 @@
 .item-list table.filter tr td.label.col4 { width: 8%; }
 .item-list .filter .col1 .text,
 .item-list .filter .multiselect { width: 165px; line-height: 12px; }
-.item-list .filter .multiselect { height: 10px; top: -10px; }
 
 /* service list */
 .service-list .tableinfo .service-caption-soft a { color: #888; }
