@@ -34,6 +34,8 @@ If target item has triggers referencing it, all timestamps must be in an increas
 Send values one by one as soon as they are received. This can be used when reading from standard input.
 .IP "-v, --verbose"
 Verbose mode, -vv for more details.
+.IP "-q, --quiet"
+Quiet mode, suppresses all output.
 .IP "-h, --help"
 Display this help and exit.
 .IP "-V, --version"

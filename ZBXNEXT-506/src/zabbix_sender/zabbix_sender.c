@@ -29,7 +29,7 @@
 const char	*progname = NULL;
 const char	title_message[] = "Zabbix Sender";
 const char	syslog_app_name[] = "zabbix_sender";
-const char	usage_message[] = "[-Vhv] {[-zpsI] -ko | [-zpI] -T -i <file> -r} [-c <file>]";
+const char	usage_message[] = "[-Vhv] [-q] {[-zpsI] -ko | [-zpI] -T -i <file> -r} [-c <file>]";
 
 const char	*help_message[] = {
 	"Options:",
@@ -53,6 +53,7 @@ const char	*help_message[] = {
 	"                                       This can be used when reading from standard input",
 	"",
 	"  -v --verbose                         Verbose mode, -vv for more details",
+	"  -v --quiet                           Quiet mode, suppresses all output"
 	"",
 	"Other options:",
 	"  -h --help                            Give this help",
@@ -76,13 +77,14 @@ static struct zbx_option	longopts[] =
 	{"with-timestamps",	0,	NULL,	'T'},
 	{"real-time",		0,	NULL,	'r'},
 	{"verbose",		0,	NULL,	'v'},
+	{"quiet",		0,	NULL,	'q'},
 	{"help",		0,	NULL,	'h'},
 	{"version",		0,	NULL,	'V'},
 	{NULL}
 };
 
 /* short options */
-static char	shortopts[] = "c:I:z:p:s:k:o:Ti:rvhV";
+static char	shortopts[] = "c:I:z:p:s:k:o:Ti:rvqhV";
 
 /* end of COMMAND LINE OPTIONS */
 
@@ -183,7 +185,10 @@ static int	check_response(char *response)
 	{
 		int	failed;
 
-		printf("info from server: \"%s\"\n", info);
+		if (CONFIG_LOG_LEVEL != LOG_LEVEL_EMPTY)
+		{
+			printf("info from server: \"%s\"\n", info);
+		}
 		fflush(stdout);
 
 		if (1 == sscanf(info, "processed: %*d; failed: %d", &failed) && 0 < failed)
@@ -350,6 +355,9 @@ static void	parse_commandline(int argc, char **argv)
 					CONFIG_LOG_LEVEL = LOG_LEVEL_WARNING;
 				else if (LOG_LEVEL_DEBUG > CONFIG_LOG_LEVEL)
 					CONFIG_LOG_LEVEL = LOG_LEVEL_DEBUG;
+				break;
+			case 'q':
+				CONFIG_LOG_LEVEL = LOG_LEVEL_EMPTY;
 				break;
 			default:
 				usage();
@@ -601,14 +609,17 @@ int	main(int argc, char **argv)
 free:
 	zbx_json_free(&sentdval_args.json);
 exit:
-	if (FAIL != ret)
+	if (CONFIG_LOG_LEVEL != LOG_LEVEL_EMPTY)
 	{
-		printf("sent: %d; skipped: %d; total: %d\n", succeed_count, total_count - succeed_count, total_count);
-	}
-	else
-	{
-		printf("Sending failed.%s\n", CONFIG_LOG_LEVEL != LOG_LEVEL_DEBUG ?
-				" Use option -vv for more detailed output." : "");
+		if (FAIL != ret)
+		{
+			printf("sent: %d; skipped: %d; total: %d\n", succeed_count, total_count - succeed_count, total_count);
+		}
+		else
+		{
+			printf("Sending failed.%s\n", CONFIG_LOG_LEVEL != LOG_LEVEL_DEBUG ?
+					" Use option -vv for more detailed output." : "");
+		}
 	}
 
 	zabbix_close_log();
