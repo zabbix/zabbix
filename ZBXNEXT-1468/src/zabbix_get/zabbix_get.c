@@ -28,12 +28,16 @@
 const char	*progname = NULL;
 const char	title_message[] = "Zabbix get";
 const char	syslog_app_name[] = "zabbix_get";
+#if !define(_WINDOWS)
+const char	usage_message[] = "[-hV] -s <host name or IP> [-p <port>] [-t <seconds>] [-I <IP address>] -k <key>";
+#else
 const char	usage_message[] = "[-hV] -s <host name or IP> [-p <port>] [-I <IP address>] -k <key>";
-
+#endif
 const char	*help_message[] = {
 	"Options:",
 	"  -s --host <host name or IP>          Specify host name or IP address of a host",
 	"  -p --port <port number>              Specify port number of agent running on the host. Default is " ZBX_DEFAULT_AGENT_PORT_STR,
+	"  -t --timeout <seconds>               Specify connection timeout in seconds within the range of 1-600. Default is " GET_SENDER_TIMEOUT_STR,
 	"  -I --source-address <IP address>     Specify source IP address",
 	"",
 	"  -k --key <key of metric>             Specify key of item to retrieve value for",
@@ -52,6 +56,9 @@ struct zbx_option	longopts[] =
 {
 	{"host",		1,	NULL,	's'},
 	{"port",		1,	NULL,	'p'},
+#if !defined(_WINDOWS)
+	{"timeout",		1,	NULL,	't'},
+#endif
 	{"key",			1,	NULL,	'k'},
 	{"source-address",	1,	NULL,	'I'},
 	{"help",		0,	NULL,	'h'},
@@ -60,7 +67,11 @@ struct zbx_option	longopts[] =
 };
 
 /* short options */
+#if !defined(_WINDOWS)
+static char     shortopts[] = "s:p:t:k:I:hV";
+#else
 static char     shortopts[] = "s:p:k:I:hV";
+#endif
 
 /* end of COMMAND LINE OPTIONS */
 
@@ -109,7 +120,7 @@ static void	get_signal_handler(int sig)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_value(const char *source_ip, const char *host, unsigned short port, const char *key, char **value)
+static int	get_value(const char *source_ip, const char *host, unsigned short port, unsigned short timeout, const char *key, char **value)
 {
 	zbx_sock_t	s;
 	int		ret;
@@ -119,7 +130,7 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 
 	*value = NULL;
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, source_ip, host, port, GET_SENDER_TIMEOUT)))
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, source_ip, host, port, timeout)))
 	{
 		zbx_snprintf(request, sizeof(request), "%s\n", key);
 
@@ -159,6 +170,7 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 int	main(int argc, char **argv)
 {
 	unsigned short	port = ZBX_DEFAULT_AGENT_PORT;
+	unsigned short	timeout = GET_SENDER_TIMEOUT;
 	int		ret = SUCCEED;
 	char		*value = NULL, *host = NULL, *key = NULL, *source_ip = NULL, ch;
 
@@ -175,6 +187,11 @@ int	main(int argc, char **argv)
 			case 'p':
 				port = (unsigned short)atoi(zbx_optarg);
 				break;
+#if !defined(_WINDOWS)
+			case 't':
+				timeout = (unsigned short)atoi(zbx_optarg);
+				break;
+#endif
 			case 's':
 				host = strdup(zbx_optarg);
 				break;
@@ -196,7 +213,7 @@ int	main(int argc, char **argv)
 		}
 	}
 
-	if (NULL == host || NULL == key)
+	if (NULL == host || NULL == key || (1 > timeout || timeout > 600))
 	{
 		usage();
 		ret = FAIL;
@@ -212,7 +229,7 @@ int	main(int argc, char **argv)
 		signal(SIGALRM, get_signal_handler);
 #endif
 
-		ret = get_value(source_ip, host, port, key, &value);
+		ret = get_value(source_ip, host, port, timeout, key, &value);
 
 		if (SUCCEED == ret)
 			printf("%s\n", value);

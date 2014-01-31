@@ -667,10 +667,11 @@ zbx_script_t;
 #define ZBX_SCRIPT_EXECUTE_ON_AGENT	0
 #define ZBX_SCRIPT_EXECUTE_ON_SERVER	1
 
-#define POLLER_DELAY		5
-#define DISCOVERER_DELAY	60
+#define POLLER_DELAY			5
+#define DISCOVERER_DELAY		60
 
-#define	GET_SENDER_TIMEOUT	60
+#define	GET_SENDER_TIMEOUT		60
+#define GET_SENDER_TIMEOUT_STR		"60"
 
 #ifndef MAX
 #	define MAX(a, b) ((a) > (b) ? (a) : (b))
