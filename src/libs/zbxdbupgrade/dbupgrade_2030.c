@@ -90,19 +90,24 @@ static int	DBpatch_2030005(void)
 
 static int	DBpatch_2030006(void)
 {
+	return DBcreate_index("trigger_discovery", "trigger_discovery_1", "parent_triggerid", 0);
+}
+
+static int	DBpatch_2030007(void)
+{
 	const ZBX_FIELD	field = {"triggerid", NULL, "triggers", "triggerid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("trigger_discovery", 1, &field);
 }
 
-static int	DBpatch_2030007(void)
+static int	DBpatch_2030008(void)
 {
 	const ZBX_FIELD	field = {"parent_triggerid", NULL, "triggers", "triggerid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("trigger_discovery", 2, &field);
 }
 
-static int	DBpatch_2030008(void)
+static int	DBpatch_2030009(void)
 {
 	if (ZBX_DB_OK <= DBexecute(
 			"insert into trigger_discovery (select triggerid,parent_triggerid from trigger_discovery_tmp)"))
@@ -113,7 +118,7 @@ static int	DBpatch_2030008(void)
 	return FAIL;
 }
 
-static int	DBpatch_2030009(void)
+static int	DBpatch_2030010(void)
 {
 	return DBdrop_table("trigger_discovery_tmp");
 }
@@ -134,5 +139,6 @@ DBPATCH_ADD(2030006, 0, 1)
 DBPATCH_ADD(2030007, 0, 1)
 DBPATCH_ADD(2030008, 0, 1)
 DBPATCH_ADD(2030009, 0, 1)
+DBPATCH_ADD(2030010, 0, 1)
 
 DBPATCH_END()
