@@ -6,6 +6,7 @@ New features:
 A.F....... [ZBX-1357] updated American English, French, Hungarian, Italian, Japanese, Russian, Slovak and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+....I..... [ZBX-7168] fixed configure.ac template to properly link libcurl to all components independently (Juris)
 A......... [ZBX-7671] fixed error when importing an existing trigger with dependencies from 1.8 (Pavels)
 A......... [ZBX-7703] fixed being able to switch users without proper credentials when using HTTP authentication (Pavels)
 ...G...... [ZBX-7648] fixed name resolution when using net.dns items (Juris)
@@ -767,6 +768,7 @@ New features:
 A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+....I..... [ZBX-7168] fixed configure.in template to properly link libcurl to all components independently (Juris)
 A......... [ZBX-7703] fixed being able to switch users without proper credentials when using HTTP authentication (Pavels)
 ...G...... [ZBX-7648] fixed name resolution when using net.dns items (Juris)
 ........S. [ZBX-6315] fixed deleting of lost triggers by the low-level discovery rule (Sasha)

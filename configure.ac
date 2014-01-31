@@ -1198,27 +1198,6 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBXML2_LDFLAGS"
 	PROXY_LIBS="$PROXY_LIBS $LIBXML2_LIBS"
 
-	dnl Checking for libCurl [default - yes]
-	LIBCURL_CHECK_CONFIG(, [7.13.1], [],[])
-	if test "x$want_curl" = "xyes"; then
-		if test "x$found_curl" != "xyes"; then
-			AC_MSG_ERROR([Curl library not found])
-		fi
-	fi
-	if test "x$found_curl" = "xyes"; then
-		have_web_monitoring="yes"
-	fi
-	CFLAGS="$CFLAGS $LIBCURL_CPPFLAGS"
-	SERVER_LDFLAGS="$SERVER_LDFLAGS $LIBCURL_LDFLAGS"
-	SERVER_LIBS="$SERVER_LIBS $LIBCURL_LIBS"
-
-	PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBCURL_LDFLAGS"
-	PROXY_LIBS="$PROXY_LIBS $LIBCURL_LIBS"
-
-	dnl Starting from 2.0 agent can do web monitoring
-	AGENT_LDFLAGS="${AGENT_LDFLAGS} ${LIBCURL_LDFLAGS}"
-	AGENT_LIBS="${AGENT_LIBS} ${LIBCURL_LIBS}"
-
 	dnl Checking for unixODBC support
 	LIBUNIXODBC_CHECK_CONFIG([no])
 	if test "x$want_unixodbc" = "xyes"; then
@@ -1318,6 +1297,29 @@ PROXY_LIBS="$PROXY_LIBS $LDAP_LIBS"
 
 AGENT_LDFLAGS="$AGENT_LDFLAGS $LDAP_LDFLAGS"
 AGENT_LIBS="$AGENT_LIBS $LDAP_LIBS"
+
+found_curl="no"
+dnl Checking for libCurl [by default - skip]
+LIBCURL_CHECK_CONFIG(, [7.13.1], [],[])
+if test "x$want_curl" = "xyes"; then
+	if test "x$found_curl" != "xyes"; then
+		AC_MSG_ERROR([Curl library not found])
+	fi
+fi
+if test "x$found_curl" = "xyes"; then
+	have_web_monitoring="cURL"
+fi
+CFLAGS="$CFLAGS $LIBCURL_CPPFLAGS"
+
+SERVER_LDFLAGS="$SERVER_LDFLAGS $LIBCURL_LDFLAGS"
+SERVER_LIBS="$SERVER_LIBS $LIBCURL_LIBS"
+
+PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBCURL_LDFLAGS"
+PROXY_LIBS="$PROXY_LIBS $LIBCURL_LIBS"
+
+dnl Starting from 2.0 agent can do web monitoring
+AGENT_LDFLAGS="$AGENT_LDFLAGS $LIBCURL_LDFLAGS"
+AGENT_LIBS="$AGENT_LIBS $LIBCURL_LIBS"
 
 found_iconv="no"
 dnl Check for libiconv [by default - skip]
