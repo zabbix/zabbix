@@ -3575,6 +3575,12 @@ return array(
 				'length' => 10,
 				'default' => '1',
 			),
+			'application' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			),
 		),
 	),
 	'sysmaps_links' => array(

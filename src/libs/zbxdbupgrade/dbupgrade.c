@@ -2396,6 +2396,13 @@ static int	DBpatch_2020000(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_2020001(void)
+{
+	const ZBX_FIELD field = {"application", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sysmaps_elements", &field);
+}
+
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 #define DBPATCH_END()					{NULL}};
@@ -2643,7 +2650,7 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010198, 0, 1)
 	DBPATCH_ADD(2010199, 0, 1)
 	DBPATCH_ADD(2020000, 0, 1)
-	/* Patch 2020001 is reserved for ZBXNEXT-2124 */
+	DBPATCH_ADD(2020001, 0, 0) /* ZBXNEXT-2124 */
 
 	DBPATCH_END()
 
