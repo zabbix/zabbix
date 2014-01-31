@@ -1674,7 +1674,12 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 				" values ";
 	const char		*ins_host_discovery_sql =
 				"insert into host_discovery (hostid,parent_hostid,host) values ";
+#ifdef HAVE_MYSQL
+	const ZBX_TABLE		*table;
+	char			*ins_host_inventory_sql = NULL, *ex_values = NULL;
+#else
 	const char		*ins_host_inventory_sql = "insert into host_inventory (hostid,inventory_mode) values ";
+#endif
 	const char		*ins_hosts_groups_sql = "insert into hosts_groups (hostgroupid,hostid,groupid) values ";
 	const char		*ins_hostmacro_sql = "insert into hostmacro (hostmacroid,hostid,macro,value) values ";
 	const char		*ins_interface_sql =
@@ -1767,6 +1772,29 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 	if (0 != new_host_inventories)
 	{
+#ifdef HAVE_MYSQL
+		table = DBget_table("host_inventory");
+
+		ins_host_inventory_sql = zbx_strdcat(ins_host_inventory_sql,
+				"insert into host_inventory (hostid,inventory_mode");
+
+		for (i = 0; NULL != table->fields[i].name; i++)
+		{
+			switch (table->fields[i].type)
+			{
+				case ZBX_TYPE_BLOB:
+				case ZBX_TYPE_TEXT:
+				case ZBX_TYPE_SHORTTEXT:
+				case ZBX_TYPE_LONGTEXT:
+					ins_host_inventory_sql = zbx_strdcat(ins_host_inventory_sql, ",");
+					ins_host_inventory_sql =
+							zbx_strdcat(ins_host_inventory_sql, table->fields[i].name);
+					ex_values = zbx_strdcat(ex_values, ",''");
+			}
+		}
+
+		ins_host_inventory_sql = zbx_strdcat(ins_host_inventory_sql, ") values ");
+#endif
 		DBbegin_multiple_update(&sql3, &sql3_alloc, &sql3_offset);
 #ifdef HAVE_MULTIROW_INSERT
 		zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ins_host_inventory_sql);
@@ -1848,8 +1876,12 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 #ifndef HAVE_MULTIROW_INSERT
 				zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ins_host_inventory_sql);
 #endif
-				zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset, "(" ZBX_FS_UI64 ",%d)" ZBX_ROW_DL,
+				zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset, "(" ZBX_FS_UI64 ",%d",
 						host->hostid, (int)inventory_mode);
+#ifdef HAVE_MYSQL
+				zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ex_values);
+#endif
+				zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ")" ZBX_ROW_DL);
 			}
 		}
 		else
@@ -1908,8 +1940,12 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 #ifndef HAVE_MULTIROW_INSERT
 				zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ins_host_inventory_sql);
 #endif
-				zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset, "(" ZBX_FS_UI64 ",%d)" ZBX_ROW_DL,
+				zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset, "(" ZBX_FS_UI64 ",%d",
 						host->hostid, (int)inventory_mode);
+#ifdef HAVE_MYSQL
+				zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ex_values);
+#endif
+				zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ")" ZBX_ROW_DL);
 			}
 
 			if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
@@ -2066,6 +2102,10 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 	if (0 != new_host_inventories)
 	{
+#ifdef HAVE_MYSQL
+		zbx_free(ex_values);
+		zbx_free(ins_host_inventory_sql);
+#endif
 #ifdef HAVE_MULTIROW_INSERT
 		sql3_offset--;
 		zbx_chrcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ';');
