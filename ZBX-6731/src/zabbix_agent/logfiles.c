@@ -398,10 +398,8 @@ out:
  ******************************************************************************/
 int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data,
 		int *big_rec, const char *encoding, ZBX_REGEXP *regexps, int regexps_num, const char *pattern,
-		int *p_count, int *s_count, int (*process_value)(const char *, unsigned short, const char *,
-		const char *, const char *, zbx_uint64_t *, int *, unsigned long *, const char *, unsigned short *,
-		unsigned long *, unsigned char), const char *server, unsigned short port, const char *hostname,
-		const char *key)
+		int *p_count, int *s_count, zbx_process_value_func_t process_value, const char *server,
+		unsigned short port, const char *hostname, const char *key)
 {
 	const char		*__function_name = "process_logrt";
 	int			i = 0, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, j = 0, reg_error;

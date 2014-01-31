@@ -1006,7 +1006,7 @@ typedef int (*zbx_process_value_func_t)(const char *, unsigned short, const char
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
 int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data, int *big_rec,
 		const char *encoding, ZBX_REGEXP *regexps, int regexps_num, const char *pattern, int *p_count,
-		int *s_count, zbx_process_value_func_t process_value , const char *server, unsigned short port,
+		int *s_count, zbx_process_value_func_t process_value, const char *server, unsigned short port,
 		const char *hostname, const char *key);
 int	zbx_is_regular_file(const char *path);
 
