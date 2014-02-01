@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-31 11:58+0200\n"
-"PO-Revision-Date: 2014-01-05 13:09+0300\n"
+"POT-Creation-Date: 2014-02-02 01:37+0200\n"
+"PO-Revision-Date: 2014-01-29 02:05+0300\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1388920174.0\n"
+"X-POOTLE-MTIME: 1390953918.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -1436,7 +1436,7 @@ msgstr "Webシナリオを追加できません"
 
 #: authentication.php:152
 msgid "Cannot change authentication"
-msgstr ""
+msgstr "認証方式を変更できません"
 
 #: authentication.php:193
 msgid "Cannot change authentication method to HTTP"
@@ -4407,7 +4407,7 @@ msgstr "ディスカバリルール\"%1$s\"は\"%2$s\"にすでに存在しま�
 #: api/classes/CDiscoveryRule.php:41
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "ディスカバリルール\"%1$s\"は\"%2$s\"にすでに存在します。"
 
 #: api/classes/CDiscoveryRule.php:668
 #, c-format
@@ -5298,7 +5298,7 @@ msgstr "第1週"
 #: include/func.inc.php:1831
 msgctxt "page navigation"
 msgid "First"
-msgstr "第1週"
+msgstr "最初"
 
 #: include/views/js/configuration.sysmaps.js.php:42
 msgid "Fit to map"
@@ -7577,22 +7577,22 @@ msgstr "マクロ\"%1$s\"のhostidが正しくありません。"
 #: api/classes/CDiscoveryRule.php:42
 #, c-format
 msgid "Invalid key \"%1$s\" for discovery rule \"%2$s\" on \"%3$s\": %4$s."
-msgstr ""
+msgstr "\"%3$s\": %4$sのディスカバリルール\"%2$s\"のアイテムキー\"%1$s\"が正しくありません。"
 
 #: api/classes/CItem.php:39
 #, c-format
 msgid "Invalid key \"%1$s\" for item \"%2$s\" on \"%3$s\": %4$s."
-msgstr ""
+msgstr "\"%3$s\": %4$sのアイテム\"%2$s\"のキー\"%1$s\"が正しくありません。"
 
 #: api/classes/CItemPrototype.php:39
 #, c-format
 msgid "Invalid key \"%1$s\" for item prototype \"%2$s\" on \"%3$s\": %4$s."
-msgstr ""
+msgstr "\"%3$s\": %4$sのアイテムプロトタイプ\"%2$s\"のキー\"%1$s\"が正しくありません。"
 
 #: api/classes/CDRule.php:311 discoveryconf.php:97
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
-msgstr ""
+msgstr "キー\"%1$s\": %2$sが正しくありません。"
 
 #: maintenance.php:302
 msgid "Invalid maintenance period"
@@ -7782,7 +7782,7 @@ msgstr "アイテムのプロトタイプ\"%1$s\"は\"%2$s\"にすでに存在�
 #: api/classes/CItemPrototype.php:38
 #, c-format
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "アイテムのプロトタイプ\"%1$s\"は\"%2$s\"にすでに存在します。"
 
 #: disc_prototypes.php:305
 msgid "Item prototype added"
@@ -8040,7 +8040,7 @@ msgstr "LDAP認証"
 
 #: authentication.php:140
 msgid "LDAP authentication changed"
-msgstr ""
+msgstr "LDAP認証を変更しました"
 
 #: authentication.php:38
 #: include/views/administration.authentication.edit.php:67
@@ -8087,7 +8087,7 @@ msgstr "最新"
 #: include/func.inc.php:1871
 msgctxt "page navigation"
 msgid "Last"
-msgstr "最新"
+msgstr "最後"
 
 #: dashboard.php:397
 #, c-format
@@ -8397,7 +8397,7 @@ msgstr ""
 
 #: authentication.php:119
 msgid "Login name or password is incorrect!"
-msgstr ""
+msgstr "ログイン名かパスワードが間違っています!"
 
 #: api/classes/CUser.php:811 api/classes/CUser.php:829
 #: api/classes/CUser.php:876
@@ -15648,7 +15648,7 @@ msgstr "期間中"
 #: api/classes/CItemKey.php:76
 #, c-format
 msgid "incorrect syntax near \"%1$s\""
-msgstr ""
+msgstr "間違った書式が\"%1$s\"付近に見つかりました"
 
 #: include/events.inc.php:37
 msgctxt "event source"
@@ -15665,7 +15665,7 @@ msgstr "アイテム"
 
 #: api/classes/CItemKey.php:62
 msgid "key is empty"
-msgstr ""
+msgstr "キーが設定されていません"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1805
 #: include/classes/graphdraw/CPieGraphDraw.php:315 include/graphs.inc.php:92
@@ -15902,7 +15902,7 @@ msgstr "検索文字列を入力"
 
 #: api/classes/CItemKey.php:62
 msgid "unexpected end of key"
-msgstr ""
+msgstr "キーの末尾が間違っています"
 
 #: include/classes/class.frontendsetup.php:199
 #: include/classes/class.frontendsetup.php:337

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-31 11:58+0200\n"
-"PO-Revision-Date: 2014-01-07 20:14+0300\n"
+"POT-Creation-Date: 2014-02-02 01:37+0200\n"
+"PO-Revision-Date: 2014-02-01 11:09+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1389118472.0\n"
+"X-POOTLE-MTIME: 1391245771.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -3790,6 +3790,7 @@ msgid "Delete and clear"
 msgstr "Smazat a pročistit"
 
 #: templates.php:648
+#, fuzzy
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "Upozornění: tímto smažete vybrané šablony a pročistíte všechny připojené hostitele"
 
@@ -9237,7 +9238,7 @@ msgstr ""
 
 #: include/triggers.inc.php:1644
 msgid "Multiple PROBLEM events"
-msgstr "opakování události"
+msgstr "Opakování události"
 
 #: include/views/configuration.triggers.edit.php:244
 msgid "Multiple PROBLEM events generation"
