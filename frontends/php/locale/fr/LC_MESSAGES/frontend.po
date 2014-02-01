@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-31 11:59+0200\n"
-"PO-Revision-Date: 2013-11-05 13:39+0300\n"
+"POT-Creation-Date: 2014-02-02 00:59+0200\n"
+"PO-Revision-Date: 2014-01-26 19:55+0300\n"
 "Last-Translator: Sébastien <sebastien@tiramiseb.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1383651576.0\n"
+"X-POOTLE-MTIME: 1390758944.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -1252,7 +1252,7 @@ msgstr "Impossible d'ajouter une table de correspondance"
 
 #: authentication.php:148
 msgid "Cannot change authentication"
-msgstr ""
+msgstr "Impossible de changer l'authentification"
 
 #: authentication.php:189
 msgid "Cannot change authentication method to HTTP"
@@ -6849,7 +6849,7 @@ msgstr "Authentification LDAP"
 
 #: authentication.php:136
 msgid "LDAP authentication changed"
-msgstr ""
+msgstr "Authentification LDAP modifiée"
 
 #: authentication.php:38
 #: include/views/administration.authentication.edit.php:67
@@ -7192,7 +7192,7 @@ msgstr ""
 
 #: authentication.php:115
 msgid "Login name or password is incorrect!"
-msgstr ""
+msgstr "L'identifiant ou le mot de passe est incorrect !"
 
 #: api/classes/CUser.php:846 api/classes/CUser.php:864
 #: api/classes/CUser.php:911
@@ -13644,7 +13644,7 @@ msgstr "dans"
 #: api/classes/CItemKey.php:76
 #, php-format
 msgid "incorrect syntax near \"%1$s\""
-msgstr ""
+msgstr "Syntaxe incorrecte près de \"%1$s\""
 
 #: include/classes/class.cserverinfo.php:46
 msgid "is"
@@ -13652,7 +13652,7 @@ msgstr "est"
 
 #: api/classes/CItemKey.php:62
 msgid "key is empty"
-msgstr ""
+msgstr "la clé est vide"
 
 #: include/classes/class.cchart.php:1744 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:42
@@ -13880,7 +13880,7 @@ msgstr "déclencheur"
 
 #: api/classes/CItemKey.php:62
 msgid "unexpected end of key"
-msgstr ""
+msgstr "fin de clé non attendue"
 
 #: include/classes/class.frontendsetup.php:213
 #: include/classes/class.frontendsetup.php:376

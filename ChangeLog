@@ -1,7 +1,7 @@
 Changes for 2.0.11rc1
 
 New features:
-A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated French, Italian, Japanese, Russian and Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 ....I..... [ZBX-7168] fixed configure.in template to properly link libcurl to all components independently (Juris)

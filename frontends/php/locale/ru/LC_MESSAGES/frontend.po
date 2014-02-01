@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-31 11:59+0200\n"
-"PO-Revision-Date: 2013-11-05 16:17+0300\n"
-"Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
+"POT-Creation-Date: 2014-02-02 00:59+0200\n"
+"PO-Revision-Date: 2014-01-26 15:18+0300\n"
+"Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1383661066.0\n"
+"X-POOTLE-MTIME: 1390742314.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -1258,7 +1258,7 @@ msgstr "Не удалось добавить преобразование зна
 
 #: authentication.php:148
 msgid "Cannot change authentication"
-msgstr ""
+msgstr "Не удалось изменить аутентификацию"
 
 #: authentication.php:189
 msgid "Cannot change authentication method to HTTP"
@@ -6475,7 +6475,7 @@ msgstr "Ошибочный hostid для макроса \"%1$s\"."
 
 #: maintenance.php:311
 msgid "Invalid maintenance period"
-msgstr "Ошибочный период обслуживания."
+msgstr "Ошибочный период обслуживания"
 
 #: api/classes/CScreenItem.php:148 api/classes/CScreenItem.php:228
 #: api/classes/CService.php:209 api/classes/CService.php:385
@@ -6857,7 +6857,7 @@ msgstr "LDAP аутентификация"
 
 #: authentication.php:136
 msgid "LDAP authentication changed"
-msgstr ""
+msgstr "Аутентификация LDAP изменена"
 
 #: authentication.php:38
 #: include/views/administration.authentication.edit.php:67
@@ -7202,7 +7202,7 @@ msgstr ""
 
 #: authentication.php:115
 msgid "Login name or password is incorrect!"
-msgstr ""
+msgstr "Имя пользователя или пароль некорректны!"
 
 #: api/classes/CUser.php:846 api/classes/CUser.php:864
 #: api/classes/CUser.php:911
@@ -12267,7 +12267,7 @@ msgstr "Невозможно выбрать конфигурацию."
 
 #: include/classes/helpers/CUploadFile.php:57
 msgid "Unable to upload file because \"file_uploads\" is disabled."
-msgstr "Не удалось загрузить файл, т.к. \"file_uploads\" отключено."
+msgstr "Не удалось загрузить файл, потому что \"file_uploads\" отключено."
 
 #: include/maps.inc.php:706 include/maps.inc.php:796 include/maps.inc.php:894
 msgid "Unacknowledged"
@@ -13664,7 +13664,7 @@ msgstr "в"
 #: api/classes/CItemKey.php:76
 #, php-format
 msgid "incorrect syntax near \"%1$s\""
-msgstr ""
+msgstr "некорректный синтаксис около \"%1$s\""
 
 #: include/classes/class.cserverinfo.php:46
 msgid "is"
@@ -13672,7 +13672,7 @@ msgstr "-"
 
 #: api/classes/CItemKey.php:62
 msgid "key is empty"
-msgstr ""
+msgstr "пустой ключ"
 
 #: include/classes/class.cchart.php:1744 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:42
@@ -13900,7 +13900,7 @@ msgstr "триггер"
 
 #: api/classes/CItemKey.php:62
 msgid "unexpected end of key"
-msgstr ""
+msgstr "неожиданное окончание ключа"
 
 #: include/classes/class.frontendsetup.php:213
 #: include/classes/class.frontendsetup.php:376

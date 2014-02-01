@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-31 11:59+0200\n"
-"PO-Revision-Date: 2013-11-04 07:37+0300\n"
+"POT-Creation-Date: 2014-02-02 00:59+0200\n"
+"PO-Revision-Date: 2014-01-25 03:26+0300\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1383543432.0\n"
+"X-POOTLE-MTIME: 1390613191.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -1246,7 +1246,7 @@ msgstr "値のマッピングを追加できません"
 
 #: authentication.php:148
 msgid "Cannot change authentication"
-msgstr ""
+msgstr "認証方式を変更できません"
 
 #: authentication.php:189
 msgid "Cannot change authentication method to HTTP"
@@ -6837,7 +6837,7 @@ msgstr "LDAP認証"
 
 #: authentication.php:136
 msgid "LDAP authentication changed"
-msgstr ""
+msgstr "LDAP認証を変更しました"
 
 #: authentication.php:38
 #: include/views/administration.authentication.edit.php:67
@@ -7149,7 +7149,7 @@ msgstr "ログの時間の形式"
 
 #: include/views/administration.general.other.edit.php:39
 msgid "Log unmatched SNMP traps"
-msgstr "Log unmatched SNMP traps"
+msgstr "マッチしないトラップをログに記録"
 
 #: include/classes/class.cserverinfo.php:45
 msgid "Logged in as"
@@ -7179,7 +7179,7 @@ msgstr ""
 
 #: authentication.php:115
 msgid "Login name or password is incorrect!"
-msgstr ""
+msgstr "ログイン名かパスワードが間違っています!"
 
 #: api/classes/CUser.php:846 api/classes/CUser.php:864
 #: api/classes/CUser.php:911
@@ -13622,7 +13622,7 @@ msgstr "期間中"
 #: api/classes/CItemKey.php:76
 #, php-format
 msgid "incorrect syntax near \"%1$s\""
-msgstr ""
+msgstr "間違った書式が\"%1$s\"付近に見つかりました"
 
 #: include/classes/class.cserverinfo.php:46
 msgid "is"
@@ -13630,7 +13630,7 @@ msgstr "is"
 
 #: api/classes/CItemKey.php:62
 msgid "key is empty"
-msgstr ""
+msgstr "キーが設定されていません"
 
 #: include/classes/class.cchart.php:1744 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:42
@@ -13858,7 +13858,7 @@ msgstr "トリガー"
 
 #: api/classes/CItemKey.php:62
 msgid "unexpected end of key"
-msgstr ""
+msgstr "キーの末尾が正しくありません"
 
 #: include/classes/class.frontendsetup.php:213
 #: include/classes/class.frontendsetup.php:376
