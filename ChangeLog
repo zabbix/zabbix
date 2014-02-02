@@ -25,7 +25,7 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ....I..... [ZBX-7622] changed the default value of timeperiods.every field to '1' (wiper)
 ...G...PS. [ZBX-7618] removed partial matching for long format command line options (Juris)
 ..F....... [ZBX-6940] fixed frontend history links not remembering search queries (Pavels)
-...G...... [ZBX-7413] fixed concistentcy of config file handling for loading and checking userparameters and aliases before starting the daemon (igors)
+...G...... [ZBX-7413] fixed consistentcy of config file handling for loading and checking userparameters and aliases before starting the daemon (igors)
 ...G...... [ZBX-7412] fixed alias parsing; colon symbols are now supported in alias parameters (Juris)
 ........S. [ZBX-7204] fixed the timestamp order of events generated during network discovery (igors)
 
