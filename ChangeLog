@@ -3,31 +3,31 @@ Changes for 2.3.0
 
 New features:
 ..F....... [ZBX-7713] changed the event details page to display all hosts used in a trigger (Ivo)
-....I..... [ZBX-7109] removed unused fields in trigger_discovery table (Sasha)
 ........S. [ZBXNEXT-1700] added informative messages about database connection restoration (Juris)
 ..F....... [ZBX-7609] fixed frontend messages mute/unmute (Eduard)
-..F....... [ZBXNEXT-1291] added clickable links for template names in the hosts, templates, hosts prototypes and discovered hosts (Oleg)
+..F....... [ZBXNEXT-1291] added clickable links for template names in host, template, host prototype and discovered host property templates tab (Oleg)
 ..F....... [ZBXNEXT-2073] improved dashboard refresh time menu (Eduard)
 ..F....... [ZBXNEXT-2073] improved dashboard favourite menu (Eduard)
 ..F....... [ZBXNEXT-2073] improved service configuration menu (Eduard)
-..F....... [ZBXNEXT-2073] improved slide show refresh multiplier menu (Eduard)
+..F....... [ZBXNEXT-2073] improved slide show refresh multiplier popup menu (Eduard)
 ..F....... [ZBXNEXT-2073] improved trigger log menu (Eduard)
 ..F....... [ZBXNEXT-2073] improved trigger macros menu (Eduard)
-..F....... [ZBXNEXT-2073] update jQuery to latest 1.10.2 (Eduard)
-...G...PS. [ZBXNEXT-453] added a new User parameter to daemon configurations that allows dropping privileges to the specified user (Juris)
+..F....... [ZBXNEXT-2073] updated jQuery to latest 1.10.2 (Eduard)
+...G...PS. [ZBXNEXT-453] added a new parameter 'User' to daemon configuration that allows dropping privileges to the specified user (Juris)
 ....I...S. [ZBXNEXT-581] split database upgrade patches over multiple files for easier maintenance (wiper)
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+....I..... [ZBX-7109] removed unused fields in trigger_discovery table (Sasha)
 ....I..... [ZBX-7168] fixed configure.ac template to properly link libcurl to all components independently (Juris)
 A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo)
 ..F....... [ZBX-7631] fixed dashboard favourite widget width (Eduard)
 ....I..... [ZBX-7622] changed the default value of timeperiods.every field to '1' (wiper)
 ...G...PS. [ZBX-7618] removed partial matching for long format command line options (Juris)
 ..F....... [ZBX-6940] fixed frontend history links not remembering search queries (Pavels)
-...G...... [ZBX-7413] fixed consistentcy of config file handling for loading and checking userparameters and aliases before starting the daemon (igors)
+...G...... [ZBX-7413] fixed inconsistency of config file handling for loading and checking userparameters and aliases before starting the daemon (igors)
 ...G...... [ZBX-7412] fixed alias parsing; colon symbols are now supported in alias parameters (Juris)
-........S. [ZBX-7204] fixed the timestamp order of events generated during network discovery (igors)
+........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.2rc1
