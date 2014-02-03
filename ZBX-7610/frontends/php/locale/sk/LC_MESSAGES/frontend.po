@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-31 11:58+0200\n"
-"PO-Revision-Date: 2014-01-01 21:43+0300\n"
+"POT-Creation-Date: 2014-02-02 01:37+0200\n"
+"PO-Revision-Date: 2014-01-28 10:57+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1388605391.0\n"
+"X-POOTLE-MTIME: 1390899448.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -1248,7 +1248,7 @@ msgstr "Nebolo možné pripojiť šablónu"
 
 #: api/classes/CTemplate.php:964
 msgid "Can't remove group"
-msgstr "Nebolo možné odstrániť skupinu"
+msgstr "Nebolo možné zmazať skupinu"
 
 #: api/classes/CTemplate.php:1001 api/classes/CTemplate.php:1019
 msgid "Can't unlink template"
@@ -1456,7 +1456,7 @@ msgstr "Nie je možné pridať scenár"
 
 #: authentication.php:152
 msgid "Cannot change authentication"
-msgstr ""
+msgstr "Nie je možné zmeniť autentifikáciu"
 
 #: authentication.php:193
 msgid "Cannot change authentication method to HTTP"
@@ -2224,7 +2224,7 @@ msgstr "Nie je možné zmazať všetky položky, najmenej jedna musí ostať."
 
 #: adm.macros.php:104
 msgid "Cannot remove macro."
-msgstr "Nie je možné odstrániť makro."
+msgstr "Nie je možné zmazať makro."
 
 #: api/classes/CUser.php:300
 msgid "Cannot rename guest user."
@@ -4485,7 +4485,7 @@ msgstr "Zisťovacie pravidlo \"%1$s\" už existuje na \"%2$s\", zdedené z inej 
 #: api/classes/CDiscoveryRule.php:41
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "Zisťovacie pravidlo \"%1$s\" už existuje na \"%2$s\"."
 
 #: api/classes/CDiscoveryRule.php:668
 #, c-format
@@ -7667,22 +7667,22 @@ msgstr "Neplatné hostid pre makro \"%1$s\"."
 #: api/classes/CDiscoveryRule.php:42
 #, c-format
 msgid "Invalid key \"%1$s\" for discovery rule \"%2$s\" on \"%3$s\": %4$s."
-msgstr ""
+msgstr "Neplatný kľúč \"%1$s\" pre zisťovacie pravidlo \"%2$s\" na \"%3$s\": %4$s."
 
 #: api/classes/CItem.php:39
 #, c-format
 msgid "Invalid key \"%1$s\" for item \"%2$s\" on \"%3$s\": %4$s."
-msgstr ""
+msgstr "Neplatný kľúč \"%1$s\" pre položku \"%2$s\" na \"%3$s\": %4$s."
 
 #: api/classes/CItemPrototype.php:39
 #, c-format
 msgid "Invalid key \"%1$s\" for item prototype \"%2$s\" on \"%3$s\": %4$s."
-msgstr ""
+msgstr "Neplatný kľúč \"%1$s\" pre prototyp \"%2$s\" na \"%3$s\": %4$s."
 
 #: api/classes/CDRule.php:311 discoveryconf.php:97
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
-msgstr ""
+msgstr "Neplatný kľúč \"%1$s\": %2$s."
 
 #: maintenance.php:302
 msgid "Invalid maintenance period"
@@ -7876,7 +7876,7 @@ msgstr "Prototyp položky \"%1$s\" už existuje na \"%2$s\", zdedený z inej ša
 #: api/classes/CItemPrototype.php:38
 #, c-format
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "Prototyp položky \"%1$s\" už existuje na \"%2$s\"."
 
 #: disc_prototypes.php:305
 msgid "Item prototype added"
@@ -8138,7 +8138,7 @@ msgstr "LDAP autentifikácia"
 
 #: authentication.php:140
 msgid "LDAP authentication changed"
-msgstr ""
+msgstr "LDAP autentifikácia zmenená"
 
 #: authentication.php:38
 #: include/views/administration.authentication.edit.php:67
@@ -8497,7 +8497,7 @@ msgstr ""
 
 #: authentication.php:119
 msgid "Login name or password is incorrect!"
-msgstr ""
+msgstr "Nesprávne prihlasovacie meno alebo heslo!"
 
 #: api/classes/CUser.php:811 api/classes/CUser.php:829
 #: api/classes/CUser.php:876
@@ -11621,11 +11621,11 @@ msgstr "Vzdialený príkaz"
 #: include/views/js/configuration.sysmaps.js.php:458
 #: include/views/js/configuration.sysmaps.js.php:467
 msgid "Remove"
-msgstr "Odstrániť"
+msgstr "Zmazať"
 
 #: include/views/configuration.sysmap.constructor.php:30
 msgid "Remove element"
-msgstr "Odstrániť element"
+msgstr "Zmazať element"
 
 #: slides.php:88
 msgid "Remove from"
@@ -11650,11 +11650,11 @@ msgstr "Zmazať host"
 
 #: include/views/configuration.sysmap.constructor.php:35
 msgid "Remove link"
-msgstr "Odstrániť linku"
+msgstr "Zmazať linku"
 
 #: include/views/monitoring.history.php:105
 msgid "Remove selected"
-msgstr "Odstrániť označené"
+msgstr "Zmazať označené"
 
 #: include/views/configuration.host.massupdate.php:176
 #: include/views/configuration.triggers.edit.php:120
@@ -14133,7 +14133,7 @@ msgstr "Ukrajinsky (uk_UA)"
 
 #: include/nodes.inc.php:346
 msgid "Unable to remove local node."
-msgstr "Nie je možné odstrániť lokálny uzol."
+msgstr "Nie je možné zmazať lokálny uzol."
 
 #: include/profiles.inc.php:262
 msgid "Unable to select configuration."
@@ -15788,7 +15788,7 @@ msgstr "v"
 #: api/classes/CItemKey.php:76
 #, c-format
 msgid "incorrect syntax near \"%1$s\""
-msgstr ""
+msgstr "nesprávna syntax pri \"%1$s\""
 
 #: include/events.inc.php:37
 msgctxt "event source"
@@ -15805,7 +15805,7 @@ msgstr "položka"
 
 #: api/classes/CItemKey.php:62
 msgid "key is empty"
-msgstr ""
+msgstr "kľúč je prázdny"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1805
 #: include/classes/graphdraw/CPieGraphDraw.php:315 include/graphs.inc.php:92
@@ -16042,7 +16042,7 @@ msgstr "píšte sem pre hľadanie"
 
 #: api/classes/CItemKey.php:62
 msgid "unexpected end of key"
-msgstr ""
+msgstr "neočakávaný koniec kľúča"
 
 #: include/classes/class.frontendsetup.php:199
 #: include/classes/class.frontendsetup.php:337

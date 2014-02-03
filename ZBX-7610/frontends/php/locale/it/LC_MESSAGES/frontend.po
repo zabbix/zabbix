@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-31 11:58+0200\n"
-"PO-Revision-Date: 2014-01-14 15:35+0300\n"
+"POT-Creation-Date: 2014-02-02 01:37+0200\n"
+"PO-Revision-Date: 2014-01-28 13:34+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: it\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1389706526.0\n"
+"X-POOTLE-MTIME: 1390908891.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -1446,7 +1446,7 @@ msgstr "Impossibile aggiungere scenario web"
 
 #: authentication.php:152
 msgid "Cannot change authentication"
-msgstr ""
+msgstr "Impossibile modificare l'autenticazione"
 
 #: authentication.php:193
 msgid "Cannot change authentication method to HTTP"
@@ -4445,7 +4445,7 @@ msgstr "La regola di discovery \"%1$s\" esiste già su \"%2$s\", ereditata da un
 #: api/classes/CDiscoveryRule.php:41
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "Regola di discovery \"%1$s\" gia' presente in \"%2$s\"."
 
 #: api/classes/CDiscoveryRule.php:668
 #, c-format
@@ -7621,22 +7621,22 @@ msgstr "Parametro hostid non valido per la macro \"%1$s\"."
 #: api/classes/CDiscoveryRule.php:42
 #, c-format
 msgid "Invalid key \"%1$s\" for discovery rule \"%2$s\" on \"%3$s\": %4$s."
-msgstr ""
+msgstr "Key invalida \"%1$s\" per la regola di discovery \"%2$s\" su \"%3$s\": %4$s."
 
 #: api/classes/CItem.php:39
 #, c-format
 msgid "Invalid key \"%1$s\" for item \"%2$s\" on \"%3$s\": %4$s."
-msgstr ""
+msgstr "Key invalida \"%1$s\" per l'item \"%2$s\" in \"%3$s\": %4$s."
 
 #: api/classes/CItemPrototype.php:39
 #, c-format
 msgid "Invalid key \"%1$s\" for item prototype \"%2$s\" on \"%3$s\": %4$s."
-msgstr ""
+msgstr "Key non valida \"%1$s\" come prototipo item \"%2$s\" in \"%3$s\": %4$s."
 
 #: api/classes/CDRule.php:311 discoveryconf.php:97
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
-msgstr ""
+msgstr "Key non valida \"%1$s\": %2$s."
 
 #: maintenance.php:302
 msgid "Invalid maintenance period"
@@ -7828,7 +7828,7 @@ msgstr "Il prototipo item \"%1$s\" esiste già su \"%2$s\", ereditato da un altr
 #: api/classes/CItemPrototype.php:38
 #, c-format
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "Prototipo Item \"%1$s\" gia' definito in \"%2$s\"."
 
 #: disc_prototypes.php:305
 msgid "Item prototype added"
@@ -8088,7 +8088,7 @@ msgstr "Autenticazione LDAP"
 
 #: authentication.php:140
 msgid "LDAP authentication changed"
-msgstr ""
+msgstr "Autenticazione LDAP modificata"
 
 #: authentication.php:38
 #: include/views/administration.authentication.edit.php:67
@@ -8446,7 +8446,7 @@ msgstr ""
 
 #: authentication.php:119
 msgid "Login name or password is incorrect!"
-msgstr ""
+msgstr "Nome login o password non corretta!"
 
 #: api/classes/CUser.php:811 api/classes/CUser.php:829
 #: api/classes/CUser.php:876
@@ -15717,7 +15717,7 @@ msgstr "in"
 #: api/classes/CItemKey.php:76
 #, c-format
 msgid "incorrect syntax near \"%1$s\""
-msgstr ""
+msgstr "Sintassi non corretta in \"%1$s\""
 
 #: include/events.inc.php:37
 msgctxt "event source"
@@ -15734,7 +15734,7 @@ msgstr "item"
 
 #: api/classes/CItemKey.php:62
 msgid "key is empty"
-msgstr ""
+msgstr "Key non definita"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1805
 #: include/classes/graphdraw/CPieGraphDraw.php:315 include/graphs.inc.php:92
@@ -15971,7 +15971,7 @@ msgstr "digita qui per cercare"
 
 #: api/classes/CItemKey.php:62
 msgid "unexpected end of key"
-msgstr ""
+msgstr "fine della key non prevista"
 
 #: include/classes/class.frontendsetup.php:199
 #: include/classes/class.frontendsetup.php:337

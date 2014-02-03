@@ -2,10 +2,11 @@ Changes for 2.2.2rc1
 
 New features:
 .......PS. [ZBX-7649] synchronize ICMP checks based on item interface. This should reduce the number of fping invocations in most cases (wiper)
-..F.....S. [ZBXNEXT-2069] added HOST.PORT macro support to internal/trigger based notifications and also to trigger names/descriptions  (wiper, Oleg)
-A.F....... [ZBX-1357] updated American English, French, Hungarian, Italian, Japanese, Russian, Slovak and Turkish translations; thanks to Zabbix translators (Richlv)
+..F.....S. [ZBXNEXT-2069] added HOST.PORT macro support to internal/trigger based notifications and also to trigger names/descriptions (wiper, Oleg)
+A.F....... [ZBX-1357] updated American English, Czech, French, Greek, Hungarian, Italian, Japanese, Russian, Slovak, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+....I..... [ZBX-7168] fixed configure.ac template to properly link libcurl to all components independently (Juris)
 A......... [ZBX-7671] fixed error when importing an existing trigger with dependencies from 1.8 (Pavels)
 A......... [ZBX-7703] fixed being able to switch users without proper credentials when using HTTP authentication (Pavels)
 ...G...... [ZBX-7648] fixed name resolution when using net.dns items (Juris)
@@ -764,9 +765,10 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.11rc1
 
 New features:
-A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated French, Italian, Japanese, Russian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+....I..... [ZBX-7168] fixed configure.in template to properly link libcurl to all components independently (Juris)
 A......... [ZBX-7703] fixed being able to switch users without proper credentials when using HTTP authentication (Pavels)
 ...G...... [ZBX-7648] fixed name resolution when using net.dns items (Juris)
 ........S. [ZBX-6315] fixed deleting of lost triggers by the low-level discovery rule (Sasha)

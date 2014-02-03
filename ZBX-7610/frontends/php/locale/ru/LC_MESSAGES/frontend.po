@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-31 11:58+0200\n"
-"PO-Revision-Date: 2014-01-05 18:43+0300\n"
+"POT-Creation-Date: 2014-02-02 01:37+0200\n"
+"PO-Revision-Date: 2014-01-26 15:22+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1388940216.0\n"
+"X-POOTLE-MTIME: 1390742531.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -1456,7 +1456,7 @@ msgstr "Не удалось добавить веб-сценарий"
 
 #: authentication.php:152
 msgid "Cannot change authentication"
-msgstr ""
+msgstr "Не удалось изменить аутентификацию"
 
 #: authentication.php:193
 msgid "Cannot change authentication method to HTTP"
@@ -4483,7 +4483,7 @@ msgstr "Правило обнаружения \"%1$s\" уже существуе
 #: api/classes/CDiscoveryRule.php:41
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "Правило обнаружения \"%1$s\" уже существует у \"%2$s\"."
 
 #: api/classes/CDiscoveryRule.php:668
 #, c-format
@@ -7665,22 +7665,22 @@ msgstr "Ошибочный hostid для макроса \"%1$s\"."
 #: api/classes/CDiscoveryRule.php:42
 #, c-format
 msgid "Invalid key \"%1$s\" for discovery rule \"%2$s\" on \"%3$s\": %4$s."
-msgstr ""
+msgstr "Ошибочный ключ \"%1$s\" для правила обнаружения \"%2$s\" у \"%3$s\": %4$s."
 
 #: api/classes/CItem.php:39
 #, c-format
 msgid "Invalid key \"%1$s\" for item \"%2$s\" on \"%3$s\": %4$s."
-msgstr ""
+msgstr "Ошибочный ключ \"%1$s\" для элемента данных \"%2$s\" у \"%3$s\": %4$s."
 
 #: api/classes/CItemPrototype.php:39
 #, c-format
 msgid "Invalid key \"%1$s\" for item prototype \"%2$s\" on \"%3$s\": %4$s."
-msgstr ""
+msgstr "Ошибочный ключ \"%1$s\" для прототипа элемента данных \"%2$s\" у \"%3$s\": %4$s."
 
 #: api/classes/CDRule.php:311 discoveryconf.php:97
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
-msgstr ""
+msgstr "Ошибочный ключ \"%1$s\": %2$s."
 
 #: maintenance.php:302
 msgid "Invalid maintenance period"
@@ -7874,7 +7874,7 @@ msgstr "Прототип элемента данных \"%1$s\" уже суще�
 #: api/classes/CItemPrototype.php:38
 #, c-format
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "Прототип элемента данных \"%1$s\" уже существует у \"%2$s\"."
 
 #: disc_prototypes.php:305
 msgid "Item prototype added"
@@ -8136,7 +8136,7 @@ msgstr "LDAP аутентификация"
 
 #: authentication.php:140
 msgid "LDAP authentication changed"
-msgstr ""
+msgstr "Аутентификация LDAP изменена"
 
 #: authentication.php:38
 #: include/views/administration.authentication.edit.php:67
@@ -8496,7 +8496,7 @@ msgstr ""
 
 #: authentication.php:119
 msgid "Login name or password is incorrect!"
-msgstr ""
+msgstr "Имя пользователя или пароль некорректны!"
 
 #: api/classes/CUser.php:811 api/classes/CUser.php:829
 #: api/classes/CUser.php:876
@@ -15788,7 +15788,7 @@ msgstr "в"
 #: api/classes/CItemKey.php:76
 #, c-format
 msgid "incorrect syntax near \"%1$s\""
-msgstr ""
+msgstr "Некорректный синтаксис около \"%1$s\""
 
 #: include/events.inc.php:37
 msgctxt "event source"
@@ -15805,7 +15805,7 @@ msgstr "элемент данных"
 
 #: api/classes/CItemKey.php:62
 msgid "key is empty"
-msgstr ""
+msgstr "пустой ключ"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1805
 #: include/classes/graphdraw/CPieGraphDraw.php:315 include/graphs.inc.php:92
@@ -16042,7 +16042,7 @@ msgstr "начните печатать здесь для поиска"
 
 #: api/classes/CItemKey.php:62
 msgid "unexpected end of key"
-msgstr ""
+msgstr "неожиданное окончание ключа"
 
 #: include/classes/class.frontendsetup.php:199
 #: include/classes/class.frontendsetup.php:337
