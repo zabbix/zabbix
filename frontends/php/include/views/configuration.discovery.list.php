@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 $discoveryWidget = new CWidget();
 
 // create new discovery rule button
@@ -87,5 +87,5 @@ $discoveryForm->addItem(array($this->data['paging'], $discoveryTable, $this->dat
 
 // append form to widget
 $discoveryWidget->addItem($discoveryForm);
+
 return $discoveryWidget;
-?>

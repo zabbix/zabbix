@@ -82,30 +82,28 @@ function check_screen_recursion($mother_screenid, $child_screenid) {
 	return false;
 }
 
-function get_slideshow($slideshowid, $step) {
-	$db_slides = DBfetch(DBselect(
+function getSlideshowScreens($slideshowId, $step) {
+	$dbSlides = DBfetch(DBselect(
 		'SELECT MIN(s.step) AS min_step,MAX(s.step) AS max_step'.
 		' FROM slides s'.
-		' WHERE s.slideshowid='.zbx_dbstr($slideshowid)
+		' WHERE s.slideshowid='.zbx_dbstr($slideshowId)
 	));
-	if (!$db_slides || is_null($db_slides['min_step'])) {
+
+	if (!$dbSlides || $dbSlides['min_step'] === null) {
 		return false;
 	}
 
-	$step = $step % ($db_slides['max_step'] + 1);
-	if (!isset($step) || $step < $db_slides['min_step'] || $step > $db_slides['max_step']) {
-		$curr_step = $db_slides['min_step'];
-	}
-	else {
-		$curr_step = $step;
-	}
+	$step = $step % ($dbSlides['max_step'] + 1);
+
+	$currentStep = (!$step || $step < $dbSlides['min_step'] || $step > $dbSlides['max_step'])
+		? $dbSlides['min_step'] : $step;
 
 	return DBfetch(DBselect(
 		'SELECT sl.*'.
 		' FROM slides sl,slideshows ss'.
-		' WHERE ss.slideshowid='.zbx_dbstr($slideshowid).
+		' WHERE ss.slideshowid='.zbx_dbstr($slideshowId).
 			' AND sl.slideshowid=ss.slideshowid'.
-			' AND sl.step='.zbx_dbstr($curr_step)
+			' AND sl.step='.zbx_dbstr($currentStep)
 	));
 }
 
@@ -130,6 +128,7 @@ function slideshow_accessible($slideshowid, $perm) {
 		}
 
 		$options = array(
+			'output' => array('screenid'),
 			'screenids' => $screenids
 		);
 		if ($perm == PERM_READ_WRITE) {

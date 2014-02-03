@@ -74,7 +74,7 @@ class CUserGroup extends CZBXAPI {
 			'searchWildcardsEnabled'	=> null,
 			// output
 			'editable'					=> null,
-			'output'					=> API_OUTPUT_REFER,
+			'output'					=> API_OUTPUT_EXTEND,
 			'selectUsers'				=> null,
 			'countOutput'				=> null,
 			'preservekeys'				=> null,
@@ -110,7 +110,6 @@ class CUserGroup extends CZBXAPI {
 		if (!is_null($options['userids'])) {
 			zbx_value2array($options['userids']);
 
-			$sqlParts['select']['userid'] = 'ug.userid';
 			$sqlParts['from']['users_groups'] = 'users_groups ug';
 			$sqlParts['where'][] = dbConditionInt('ug.userid', $options['userids']);
 			$sqlParts['where']['gug'] = 'g.usrgrpid=ug.usrgrpid';
@@ -150,19 +149,7 @@ class CUserGroup extends CZBXAPI {
 				$result = $usrgrp['rowscount'];
 			}
 			else {
-				if (!isset($result[$usrgrp['usrgrpid']])) {
-					$result[$usrgrp['usrgrpid']]= array();
-				}
-
-				// groupids
-				if (isset($usrgrp['userid']) && is_null($options['selectUsers'])) {
-					if (!isset($result[$usrgrp['usrgrpid']]['users'])) {
-						$result[$usrgrp['usrgrpid']]['users'] = array();
-					}
-					$result[$usrgrp['usrgrpid']]['users'][] = array('userid' => $usrgrp['userid']);
-					unset($usrgrp['userid']);
-				}
-				$result[$usrgrp['usrgrpid']] += $usrgrp;
+				$result[$usrgrp['usrgrpid']] = $usrgrp;
 			}
 		}
 

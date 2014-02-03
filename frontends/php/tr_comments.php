@@ -78,7 +78,7 @@ if (isset($_REQUEST['save'])) {
 }
 elseif (isset($_REQUEST['cancel'])) {
 	jsRedirect('tr_status.php');
-	exit();
+	exit;
 }
 
 /*

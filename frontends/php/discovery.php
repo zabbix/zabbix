@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/discovery.inc.php';
 
@@ -126,8 +126,8 @@ if ($data['pageFilter']->drulesSelected) {
 	// discovery hosts
 	$data['dhosts'] = API::DHost()->get(array(
 		'druleids' => zbx_objectValues($data['drules'], 'druleid'),
-		'selectDServices' => API_OUTPUT_REFER,
-		'output' => API_OUTPUT_REFER
+		'selectDServices' => array('dserviceid', 'ip', 'dns', 'type', 'status', 'key_'),
+		'output' => array('dhostid', 'lastdown', 'lastup', 'druleid')
 	));
 	$data['dhosts'] = zbx_toHash($data['dhosts'], 'dhostid');
 }
@@ -138,4 +138,3 @@ $discoveryView->render();
 $discoveryView->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

@@ -34,27 +34,27 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'type'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		null),
 	'search'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
-//ajax
-	'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	null,			null),
-	'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
-	'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		null),
+	// ajax
+	'widgetName' =>	array(T_ZBX_STR, O_OPT, P_ACT,	null,			null),
+	'widgetState'=>	array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,		null)
 );
-
 check_fields($fields);
 
-// ACTION /////////////////////////////////////////////////////////////////////////////
-if (isset($_REQUEST['favobj'])) {
-	if ('hat' == $_REQUEST['favobj']) {
-		CProfile::update('web.search.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
-	}
+/*
+ * Ajax
+ */
+if (hasRequest('widgetName')) {
+	CProfile::update('web.search.hats.'.getRequest('widgetName').'.state', getRequest('widgetState'), PROFILE_TYPE_INT);
 }
 
-if ((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])) {
+if (in_array($page['type'], array(PAGE_TYPE_JS, PAGE_TYPE_HTML_BLOCK))) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit();
+	exit;
 }
 
-
+/*
+ * Display
+ */
 $admin = in_array(CWebUser::$data['type'], array(
 	USER_TYPE_ZABBIX_ADMIN,
 	USER_TYPE_SUPER_ADMIN
@@ -103,12 +103,12 @@ order_result($db_hosts, 'name');
 $hosts = selectByPattern($db_hosts, 'name', $search, $rows_per_page);
 $hostids = zbx_objectValues($hosts, 'hostid');
 
-$params = array(
+$rw_hosts = API::Host()->get(array(
+	'output' => array('hostid'),
 	'nodeids' => get_current_nodeid(true),
 	'hostids' => $hostids,
 	'editable' => 1
-);
-$rw_hosts = API::Host()->get($params);
+));
 $rw_hosts = zbx_toHash($rw_hosts, 'hostid');
 
 $params = array(
@@ -220,13 +220,12 @@ foreach ($hosts as $hnum => $host) {
 	));
 }
 
-$sysmap_menu = get_icon('menu', array('menu' => 'sysmaps'));
+$searchHostWidget = new CUIWidget('search_hosts', $table);
+$searchHostWidget->open = (bool) CProfile::get('web.search.hats.search_hosts.state', true);
+$searchHostWidget->setHeader(_('Hosts'), SPACE);
+$searchHostWidget->setFooter(_s('Displaying %1$s of %2$s found', $viewCount, $overalCount));
 
-$wdgt_hosts = new CUIWidget('search_hosts', $table, CProfile::get('web.search.hats.search_hosts.state', true));
-$wdgt_hosts->setHeader(_('Hosts'), SPACE);
-$wdgt_hosts->setFooter(_s('Displaying %1$s of %2$s found', $viewCount, $overalCount));
-
-$searchWidget->addItem(new CDiv($wdgt_hosts));
+$searchWidget->addItem(new CDiv($searchHostWidget));
 //----------------
 
 
@@ -245,12 +244,12 @@ order_result($db_hostGroups, 'name');
 $hostGroups = selectByPattern($db_hostGroups, 'name', $search, $rows_per_page);
 $groupids = zbx_objectValues($hostGroups, 'groupid');
 
-$params = array(
+$rw_hostGroups = API::HostGroup()->get(array(
+	'output' => array('groupid'),
 	'nodeids' => get_current_nodeid(true),
 	'groupids' => $groupids,
 	'editable' => true
-);
-$rw_hostGroups = API::HostGroup()->get($params);
+));
 $rw_hostGroups = zbx_toHash($rw_hostGroups, 'groupid');
 
 $params = array(
@@ -328,11 +327,12 @@ foreach ($hostGroups as $hnum => $group) {
 	));
 }
 
-$wdgt_hgroups = new CUIWidget('search_hostgroup', $table, CProfile::get('web.search.hats.search_hostgroup.state', true));
-$wdgt_hgroups->setHeader(_('Host groups'), SPACE);
-$wdgt_hgroups->setFooter(_s('Displaying %1$s of %2$s found', $viewCount, $overalCount));
+$searchHostGroupWidget = new CUIWidget('search_hostgroup', $table);
+$searchHostGroupWidget->open = (bool) CProfile::get('web.search.hats.search_hostgroup.state', true);
+$searchHostGroupWidget->setHeader(_('Host groups'), SPACE);
+$searchHostGroupWidget->setFooter(_s('Displaying %1$s of %2$s found', $viewCount, $overalCount));
 
-$searchWidget->addItem(new CDiv($wdgt_hgroups));
+$searchWidget->addItem(new CDiv($searchHostGroupWidget));
 //----------------
 
 // FIND Templates
@@ -341,7 +341,7 @@ if ($admin) {
 		'nodeids' => get_current_nodeid(true),
 		'search' => array('name' => $search),
 		'output' => array('name'),
-		'selectGroups' => API_OUTPUT_REFER,
+		'selectGroups' => array('groupid'),
 		'sortfield' => 'name',
 		'selectItems' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,
@@ -358,12 +358,12 @@ if ($admin) {
 	$templates = selectByPattern($db_templates, 'name', $search, $rows_per_page);
 	$templateids = zbx_objectValues($templates, 'templateid');
 
-	$params = array(
+	$rw_templates = API::Template()->get(array(
+		'output' => array('templateid'),
 		'nodeids' => get_current_nodeid(true),
 		'templateids' => $templateids,
 		'editable' => 1
-	);
-	$rw_templates = API::Template()->get($params);
+	));
 	$rw_templates = zbx_toHash($rw_templates, 'templateid');
 
 	$params = array(
@@ -454,10 +454,12 @@ if ($admin) {
 		));
 	}
 
-	$wdgt_templates = new CUIWidget('search_templates', $table, CProfile::get('web.search.hats.search_templates.state', true));
-	$wdgt_templates->setHeader(_('Templates'), SPACE);
-	$wdgt_templates->setFooter(_s('Displaying %1$s of %2$s found', $viewCount, $overalCount));
-	$searchWidget->addItem(new CDiv($wdgt_templates));
+	$searchTemplateWidget = new CUIWidget('search_templates', $table);
+	$searchTemplateWidget->open = (bool) CProfile::get('web.search.hats.search_templates.state', true);
+	$searchTemplateWidget->setHeader(_('Templates'), SPACE);
+	$searchTemplateWidget->setFooter(_s('Displaying %1$s of %2$s found', $viewCount, $overalCount));
+
+	$searchWidget->addItem(new CDiv($searchTemplateWidget));
 }
 //----------------
 

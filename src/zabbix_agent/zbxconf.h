@@ -39,6 +39,7 @@ extern char	**CONFIG_LOAD_MODULE;
 #ifdef _WINDOWS
 extern char	**CONFIG_PERF_COUNTERS;
 #endif
+extern char	*CONFIG_USER;
 
 void	load_aliases(char **lines);
 void	load_user_parameters(char **lines);

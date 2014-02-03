@@ -308,7 +308,7 @@ function copyItemsToHosts($srcItemIds, $dstHostIds) {
 			'description', 'inventory_link'
 		),
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
-		'selectApplications' => API_OUTPUT_REFER
+		'selectApplications' => array('applicationid')
 	));
 
 	$dstHosts = API::Host()->get(array(
@@ -371,7 +371,7 @@ function copyItems($srcHostId, $dstHostId) {
 		),
 		'inherited' => false,
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
-		'selectApplications' => API_OUTPUT_REFER
+		'selectApplications' => array('applicationid')
 	));
 	$dstHosts = API::Host()->get(array(
 		'output' => array('hostid', 'host', 'status'),
@@ -449,11 +449,6 @@ function disable_item($itemids) {
 		disable_item($chd_items); // Recursion !!!
 	}
 	return update_item_status($itemids, ITEM_STATUS_DISABLED);
-}
-
-function get_items_by_hostid($hostids) {
-	zbx_value2array($hostids);
-	return DBselect('SELECT i.* FROM items i WHERE '.dbConditionInt('i.hostid', $hostids));
 }
 
 function get_item_by_key($key, $host = '') {
@@ -699,7 +694,7 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 			$host = $hosts[$hostId];
 
 			$name = new CSpan($host['name'], 'link_menu');
-			$name->setMenuPopup(getMenuPopupHost($host, $scripts[$hostId]));
+			$name->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$hostId]));
 
 			$tableRow = array(new CCol($name));
 			foreach ($items as $ithosts) {
@@ -738,7 +733,7 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 	$column = new CCol(array($value, $ack), $css);
 
 	if (isset($ithosts[$hostName])) {
-		$column->setMenuPopup(getMenuPopupHistory($item));
+		$column->setMenuPopup(CMenuPopupHelper::getHistory($item));
 	}
 
 	$tableRow[] = $column;
@@ -1169,16 +1164,15 @@ function getNextDelayInterval(array $arrOfFlexIntervals, $now, &$nextInterval) {
  *         hh      - hours (0-24)
  *         mm      - minutes (0-59)
  *
- * @param string $interfaceid
- * @param string $itemid
+ * @param string $seed               seed value applied to delay to spread item checks over the delay period
  * @param int $itemType
- * @param int $delay                 default delay
+ * @param int $delay                 default delay, can be overriden
  * @param string $flexIntervals      flexible intervals
  * @param int $now                   current timestamp
  *
  * @return array
  */
-function calculateItemNextcheck($interfaceid, $itemid, $itemType, $delay, $flexIntervals, $now) {
+function calculateItemNextcheck($seed, $itemType, $delay, $flexIntervals, $now) {
 	// special processing of active items to see better view in queue
 	if ($itemType == ITEM_TYPE_ZABBIX_ACTIVE) {
 		if ($delay != 0) {
@@ -1197,14 +1191,12 @@ function calculateItemNextcheck($interfaceid, $itemid, $itemType, $delay, $flexI
 		$tmax = $now + SEC_PER_YEAR;
 		$try = 0;
 
-		$shift = ($itemType == ITEM_TYPE_JMX) ? $interfaceid : $itemid;
-
 		while ($t < $tmax) {
 			// calculate 'nextcheck' value for the current interval
 			$currentDelay = getCurrentDelay($delay, $arrOfFlexIntervals, $t);
 
 			if ($currentDelay != 0) {
-				$nextcheck = $currentDelay * floor($t / $currentDelay) + ($shift % $currentDelay);
+				$nextcheck = $currentDelay * floor($t / $currentDelay) + ($seed % $currentDelay);
 
 				if ($try == 0) {
 					while ($nextcheck <= $t) {

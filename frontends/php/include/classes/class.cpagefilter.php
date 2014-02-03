@@ -369,9 +369,9 @@ class CPageFilter {
 		$graphs = API::Graph()->get(array(
 			'graphids' => $options['graphid'],
 			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => API_OUTPUT_REFER,
-			'selectTemplates' => API_OUTPUT_REFER,
-			'selectGroups' => API_OUTPUT_REFER
+			'selectHosts' => array('hostid'),
+			'selectTemplates' => array('templateid'),
+			'selectGroups' => array('groupid')
 		));
 
 		if ($graph = reset($graphs)) {

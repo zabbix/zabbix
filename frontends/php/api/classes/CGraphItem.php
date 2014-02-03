@@ -58,7 +58,7 @@ class CGraphItem extends CZBXAPI {
 			'nopermissions'	=> null,
 			// output
 			'selectGraphs'	=> null,
-			'output'		=> API_OUTPUT_REFER,
+			'output'		=> API_OUTPUT_EXTEND,
 			'expandData'	=> null,
 			'countOutput'	=> null,
 			'preservekeys'	=> null,
@@ -92,7 +92,6 @@ class CGraphItem extends CZBXAPI {
 		if (!is_null($options['graphids'])) {
 			zbx_value2array($options['graphids']);
 
-			$sqlParts['select']['graphid'] = 'gi.graphid';
 			$sqlParts['from']['graphs'] = 'graphs g';
 			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
 			$sqlParts['where'][] = dbConditionInt('g.graphid', $options['graphids']);
@@ -102,7 +101,6 @@ class CGraphItem extends CZBXAPI {
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
 
-			$sqlParts['select']['itemid'] = 'gi.itemid';
 			$sqlParts['where'][] = dbConditionInt('gi.itemid', $options['itemids']);
 		}
 
@@ -125,18 +123,7 @@ class CGraphItem extends CZBXAPI {
 				$result = $gitem['rowscount'];
 			}
 			else {
-				if (!isset($result[$gitem['gitemid']])) {
-					$result[$gitem['gitemid']] = array();
-				}
-
-				// graphids
-				if (isset($gitem['graphid']) && is_null($options['selectGraphs'])) {
-					if (!isset($result[$gitem['gitemid']]['graphs'])) {
-						$result[$gitem['gitemid']]['graphs'] = array();
-					}
-					$result[$gitem['gitemid']]['graphs'][] = array('graphid' => $gitem['graphid']);
-				}
-				$result[$gitem['gitemid']] += $gitem;
+				$result[$gitem['gitemid']] = $gitem;
 			}
 		}
 

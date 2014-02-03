@@ -59,7 +59,7 @@ class CDCheck extends CZBXAPI {
 			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
 			// output
-			'output'					=> API_OUTPUT_REFER,
+			'output'					=> API_OUTPUT_EXTEND,
 			'selectDRules'				=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
@@ -98,7 +98,6 @@ class CDCheck extends CZBXAPI {
 		if (!is_null($options['druleids'])) {
 			zbx_value2array($options['druleids']);
 
-			$sqlParts['select']['druleid'] = 'dc.druleid';
 			$sqlParts['where'][] = dbConditionInt('dc.druleid', $options['druleids']);
 
 			if (!is_null($options['groupCount'])) {
@@ -115,7 +114,6 @@ class CDCheck extends CZBXAPI {
 		if (!is_null($options['dserviceids'])) {
 			zbx_value2array($options['dserviceids']);
 
-			$sqlParts['select']['dserviceid'] = 'ds.dserviceid';
 			$sqlParts['from']['dhosts'] = 'dhosts dh';
 			$sqlParts['from']['dservices'] = 'dservices ds';
 
@@ -161,20 +159,8 @@ class CDCheck extends CZBXAPI {
 				else
 					$result = $dcheck['rowscount'];
 			}
-			else{
-				if (!isset($result[$dcheck['dcheckid']])) {
-					$result[$dcheck['dcheckid']]= array();
-				}
-
-				// druleids
-				if (isset($dcheck['druleid']) && is_null($options['selectDRules'])) {
-					if (!isset($result[$dcheck['dcheckid']]['drules']))
-						$result[$dcheck['dcheckid']]['drules'] = array();
-
-					$result[$dcheck['dcheckid']]['drules'][] = array('druleid' => $dcheck['druleid']);
-				}
-
-				$result[$dcheck['dcheckid']] += $dcheck;
+			else {
+				$result[$dcheck['dcheckid']] = $dcheck;
 			}
 		}
 

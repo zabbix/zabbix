@@ -160,14 +160,6 @@ var cookie = {
 		return value_json;
 	},
 
-	printall: function() {
-		var allCookies = document.cookie.split('; ');
-		for (var i = 0; i < allCookies.length; i++) {
-			var cookiePair = allCookies[i].split('=');
-			SDI('[' + cookiePair[0] + '] is ' + cookiePair[1]); // assumes print is already defined
-		}
-	},
-
 	erase: function(name) {
 		this.create(name, '', -1);
 		this.cookies[name] = undefined;

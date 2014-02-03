@@ -34,9 +34,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'grpaction' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	// group
-	'usrgrpid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({grpaction})&&isset({form})&&{form}=="update"'),
+	'usrgrpid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})&&{form}=="update"'),
 	'group_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'selusrgrp' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'gname' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})'),
@@ -98,6 +97,7 @@ elseif (isset($_REQUEST['go'])) {
 	}
 	else {
 		$dbUserGroupCount = API::UserGroup()->get(array(
+			'output' => array('usrgrpid'),
 			'usrgrpids' => $_REQUEST['group_groupid'],
 			'countOutput' => true
 		));

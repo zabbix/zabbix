@@ -163,13 +163,18 @@ static int	get_swap_io(zbx_uint64_t *icount, zbx_uint64_t *ipages, zbx_uint64_t 
 	/* int pgswapin;	pages swapped in */
 	/* int pgswapout;	pages swapped out */
 
-	if (icount)
+#if OpenBSD < 201311		/* swapins and swapouts are not supported starting from OpenBSD 5.4 */
+	if (NULL != icount)
 		*icount = (zbx_uint64_t)v.swapins;
-	if (ipages)
-		*ipages = (zbx_uint64_t)v.pgswapin;
-	if (ocount)
+	if (NULL != ocount)
 		*ocount = (zbx_uint64_t)v.swapouts;
-	if (opages)
+#else
+	if (NULL != icount || NULL != ocount)
+		return SYSINFO_RET_FAIL;
+#endif
+	if (NULL != ipages)
+		*ipages = (zbx_uint64_t)v.pgswapin;
+	if (NULL != opages)
 		*opages = (zbx_uint64_t)v.pgswapout;
 
 	return SYSINFO_RET_OK;

@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 include(dirname(__FILE__).'/js/configuration.services.child.list.js.php');
 
 $servicesChildWidget = new CWidget();
@@ -67,5 +67,5 @@ $servicesChildForm->addItem($servicesChildTable);
 
 // append form to widget
 $servicesChildWidget->addItem($servicesChildForm);
+
 return $servicesChildWidget;
-?>
