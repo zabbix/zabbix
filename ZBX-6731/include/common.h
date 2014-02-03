@@ -1009,6 +1009,7 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip
 		int *s_count, zbx_process_value_func_t process_value, const char *server, unsigned short port,
 		const char *hostname, const char *key);
 int	zbx_is_regular_file(const char *path);
+zbx_offset_t	zbx_lseek(int fd, zbx_offset_t offset, int whence);
 
 int	MAIN_ZABBIX_ENTRY();
 
