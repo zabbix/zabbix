@@ -1175,7 +1175,8 @@ static void	vc_item_reset_cache(zbx_vc_item_t *item)
 	vch_item_free_cache(item);
 
 	/* reset all item data except the zbx_vc_item_t structure members before 'state' - itemid and value_type */
-	memset((char *)&(item->state), 0, sizeof(zbx_vc_item_t) - sizeof(item->itemid) - sizeof(item->value_type));
+	memset((char *)item + sizeof(item->itemid) + sizeof(item->value_type), 0,
+			sizeof(zbx_vc_item_t) - sizeof(item->itemid) - sizeof(item->value_type));
 }
 
 /******************************************************************************
