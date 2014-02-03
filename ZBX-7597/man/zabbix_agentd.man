@@ -12,9 +12,42 @@ Use the alternate \fIconfig-file\fR instead of the default one.
 Absolute path should be specified.
 .
 .IP "-p, --print"
-Print known items and exit.
-.IP "-t, --test \fI<item key>\fR"
-Test single item and exit.
+Print known items and exit. For each item either generic defaults are used, or specific defaults for testing are supplied. These defaults are listed in square brackets as item key parameters.
+Returned values are enclosed in square brackets and prefixed with the type of the returned value, separated by a pipe character.
+For user parameters type is always \fBt\fR, as the agent can not determine all possible return values. Returned value types are:
+.RS 4
+.TP 4
+d
+Decimal or double - number with decimal part.
+.RE
+.RE
+.RS 4
+.TP 4
+m
+Not supported. This could be caused by querying an item that only works in the active mode like a log monitoring item or an item that requires multiple collected values.
+Permission issues or incorrect user parameters could also result in the not supported state.
+.RE
+.RE
+.RS 4
+.TP 4
+s
+String. Not longer than 255 characters.
+.RE
+.RE
+.RS 4
+.TP 4
+t
+Text. Maximum length not limited.
+.RE
+.RE
+.RS 4
+.TP 4
+u
+Unsigned integer.
+.RE
+.RE
+.IP "-t, --test \fI<item-key>\fR"
+Test single item and exit. See \fI--print\fR for output description.
 .IP "-h, --help"
 Display this help and exit.
 .IP "-V, --version"
