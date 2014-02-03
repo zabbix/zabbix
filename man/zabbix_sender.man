@@ -57,6 +57,10 @@ Send values from file \fBdata_values.txt\fR to server with IP \fB192.168.1.113\f
 
 Send a timestamped value from the commandline to Zabbix server, specified in the agent daemon configuration file. Dash in the input data indicates that hostname also should be used from the same configuration file.
 
+.B echo '"Zabbix server" trapper.item \&"\&"' | zabbix_sender -z 192.168.1.113 -p 10000 -i -
+
+Send empty value of an item to the Zabbix server with IP address \fB192.168.1.113\fR on port \fB10000\fR from the commandline. Empty values must be indicated by double empty double quotes.
+
 .SH "SEE ALSO"
 .BR zabbix_agentd (8),
 .BR zabbix_get (8),

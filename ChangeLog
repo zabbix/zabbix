@@ -6,6 +6,7 @@ New features:
 A.F....... [ZBX-1357] updated American English, Czech, French, Greek, Hungarian, Italian, Japanese, Russian, Slovak, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-7668] fixed sending empty values when reading from a file with zabbix_sender (Juris)
 ........S. [ZBX-7571] fixed incorrect processing of \177 (U+007F) control character in json (igors)
 ..F....... [ZBX-7726] fixed max frontend available date displaying (Eduard)
 .......PS. [ZBX-7690] fixed cache for dynamic SNMP indexes not being used (asaveljevs)
