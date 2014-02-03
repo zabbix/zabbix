@@ -124,7 +124,8 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 	int		nbytes;
 	zbx_offset_t	offset;
 
-	offset = zbx_lseek(fd, 0, SEEK_CUR);
+	if ((zbx_offset_t)-1 == (offset = zbx_lseek(fd, 0, SEEK_CUR)))
+		return -1;
 
 	if (0 >= (nbytes = (int)read(fd, buf, count)))
 		return nbytes;
@@ -150,7 +151,8 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 		}
 	}
 
-	zbx_lseek(fd, offset + (zbx_offset_t)i, SEEK_SET);
+	if ((zbx_offset_t)-1 == (zbx_lseek(fd, offset + (zbx_offset_t)i, SEEK_SET)))
+		return -1;
 
 	return (int)i;
 }
@@ -247,7 +249,11 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip
 			goto out;
 		}
 
-		offset = zbx_lseek(fd, 0, SEEK_CUR);
+		if ((zbx_offset_t)-1 == (offset = zbx_lseek(fd, 0, SEEK_CUR)))
+		{
+			*big_rec = 0;
+			goto out;
+		}
 
 		nbytes = (int)read(fd, buf, (size_t)BUF_SIZE);
 
